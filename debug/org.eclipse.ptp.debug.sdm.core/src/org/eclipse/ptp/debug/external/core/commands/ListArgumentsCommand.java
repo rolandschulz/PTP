@@ -42,10 +42,11 @@ public class ListArgumentsCommand extends AbstractDebugCommand {
 	
 	public IPCDIArgument[] getArguments() throws PCDIException {
 		if (waitForReturn()) {
-			if (result instanceof IPCDIArgument[])
+			if (result instanceof IPCDIArgument[]) {
 				return (IPCDIArgument[])result;
+			}
 		}
-		throw new PCDIException("No arguments found in " + tasks.toString());
+		throw new PCDIException("Wrong type return on command: " + getName());
 	}
 	public String getName() {
 		return "List arguments"; 

@@ -39,11 +39,7 @@ public class ConnectionCommand extends AbstractDebugCommand {
 		}
 	}
 	public void waitFinish() throws PCDIException {
-		if (waitForReturn()) {
-			if (result.equals(OK))
-				return;
-		}
-		throw new PCDIException("Cannot start debugger");		
+		waitForReturn();
 	}
 	
 	public String getName() {

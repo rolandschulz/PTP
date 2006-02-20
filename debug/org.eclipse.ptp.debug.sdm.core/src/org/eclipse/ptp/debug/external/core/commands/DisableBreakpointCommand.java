@@ -35,14 +35,6 @@ public class DisableBreakpointCommand extends AbstractBreakpointCommand{
 		setTimeout(timeout);
 		debugger.disableBreakpoint(tasks, ((IPCDIBreakpoint)cdiBpt).getBreakpointId());
 	}
-	public void deleteBreakpoints() throws PCDIException {
-		if (waitForReturn()) {
-			if (result.equals(OK)) {
-				return;
-			}
-		}
-		throw new PCDIException("Breakpoint cannot be disabled in " + tasks.toString());
-	}	
 	public String getName() {
 		return "Disable breakpoint"; 
 	}

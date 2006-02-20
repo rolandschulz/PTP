@@ -59,7 +59,7 @@ public class DebugCommandQueue extends Thread {
 				currentCommand.execCommand(debugger, command_timeout);
 				currentCommand.waitForReturn();
 			} catch (PCDIException e) {
-				debugger.handleErrorEvent(currentCommand.getTasks(), "Executing " + currentCommand.getName() + " command problem - " + e.getMessage(), IPCDIErrorEvent.DBG_ERROR);
+				debugger.handleErrorEvent(currentCommand.getTasks(), e.getMessage(), IPCDIErrorEvent.DBG_ERROR);
 			} finally {
 				currentCommand = null;
 			}
@@ -126,7 +126,7 @@ public class DebugCommandQueue extends Thread {
 				if (result == null) {
 					flushCommands();
 					currentCommand.flush();
-				}
+				} 
 				else {
 					currentCommand.setReturn(tasks, result);
 				}

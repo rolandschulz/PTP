@@ -41,10 +41,11 @@ public class GetAIFCommand extends AbstractDebugCommand {
 	
 	public IAIF getAIF() throws PCDIException {
 		if (waitForReturn()) {
-			if (result instanceof IAIF)
+			if (result instanceof IAIF) {
 				return (IAIF)result;
+			}
 		}
-		throw new PCDIException("No aif found in " + tasks.toString());
+		throw new PCDIException("Wrong type return on command: " + getName());
 	}
 	public String getName() {
 		return "Get AIF"; 

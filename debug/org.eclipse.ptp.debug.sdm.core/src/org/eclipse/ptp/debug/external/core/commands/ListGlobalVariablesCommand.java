@@ -37,10 +37,11 @@ public class ListGlobalVariablesCommand extends AbstractDebugCommand {
 	}
 	public IPCDIGlobalVariable[] getGlobalVariables() throws PCDIException {
 		if (waitForReturn()) {
-			if (result instanceof IPCDIGlobalVariable[])
+			if (result instanceof IPCDIGlobalVariable[]) {
 				return (IPCDIGlobalVariable[])result;
+			}
 		}
-		throw new PCDIException("No global variables found in " + tasks.toString());
+		throw new PCDIException("Wrong type return on command: " + getName());
 	}
 	public String getName() {
 		return "List global variables"; 

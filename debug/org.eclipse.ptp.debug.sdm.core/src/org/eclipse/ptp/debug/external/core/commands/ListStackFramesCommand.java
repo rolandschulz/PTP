@@ -38,10 +38,11 @@ public class ListStackFramesCommand extends AbstractDebugCommand {
 	
 	public IPCDIStackFrame[] getStackFrames() throws PCDIException {
 		if (waitForReturn()) {
-			if (result instanceof IPCDIStackFrame[])
+			if (result instanceof IPCDIStackFrame[]) {
 				return (IPCDIStackFrame[])result;
+			}
 		}
-		throw new PCDIException("No stack frames found in " + tasks.toString());
+		throw new PCDIException("Wrong type return on command: " + getName());
 	}
 	public String getName() {
 		return "List stack frames"; 
