@@ -37,7 +37,6 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugException;
-import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.debug.core.model.IPVariableManager;
 import org.eclipse.ptp.debug.core.sourcelookup.IPSourceLocation;
 import org.eclipse.ptp.debug.internal.core.IPDebugInternalConstants;

@@ -34,17 +34,10 @@ public class ConditionBreakpointCommand extends AbstractBreakpointCommand {
 		super(tasks, cdiBpt);
 		this.expr = expr;
 	}
-	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
+	public void execCommand(IAbstractDebugger debugger, int timeout) throws PCDIException {
+		setTimeout(timeout);
 		debugger.conditionBreakpoint(tasks, ((IPCDIBreakpoint)cdiBpt).getBreakpointId(), expr);
 	}
-	public void deleteBreakpoints() throws PCDIException {
-		if (waitForReturn()) {
-			if (result.equals(OK)) {
-				return;
-			}
-		}
-		throw new PCDIException("Breakpoint cannot be condition in " + tasks.toString());
-	}	
 	public String getName() {
 		return "Condition breakpoint"; 
 	}

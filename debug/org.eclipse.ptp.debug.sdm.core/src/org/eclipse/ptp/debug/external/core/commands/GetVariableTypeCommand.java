@@ -33,7 +33,8 @@ public class GetVariableTypeCommand extends AbstractDebugCommand {
 		super(tasks, false, true);
 		this.varName = varName;
 	}
-	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
+	public void execCommand(IAbstractDebugger debugger, int timeout) throws PCDIException {
+		setTimeout(timeout);
 		debugger.getVariableType(tasks, varName);
 	}
 	

@@ -36,9 +36,11 @@ public class DebugCommandQueue extends Thread {
 	private boolean isTerminated = false;
 	private IDebugCommand currentCommand = null;
 	private IAbstractDebugger debugger = null;
+	private int command_timeout;
 	
-	public DebugCommandQueue(IAbstractDebugger debugger) {
+	public DebugCommandQueue(IAbstractDebugger debugger, int timeout) {
 		this.debugger = debugger;
+		this.command_timeout = timeout;
 		queue = Collections.synchronizedList(new LinkedList());
 	}
 	public void setTerminated() {
@@ -54,15 +56,10 @@ public class DebugCommandQueue extends Thread {
 			currentCommand = getCommand();
 			try {
 				System.out.println("***** CURRENT COMMAND: " + currentCommand);
-				currentCommand.execCommand(debugger);
+				currentCommand.execCommand(debugger, command_timeout);
 				currentCommand.waitForReturn();
-				//if (!currentCommand.waitForReturn()) {
-					//debugger.handleErrorEvent(currentCommand.getTasks(), "Wait for return error in " + currentCommand.getName() + " command");
-					//System.out.println("************ ERROR in DebugCommandQueue -- wait for return, cmd: " + currentCommand);
-				//}
 			} catch (PCDIException e) {
 				debugger.handleErrorEvent(currentCommand.getTasks(), "Executing " + currentCommand.getName() + " command problem - " + e.getMessage(), IPCDIErrorEvent.DBG_ERROR);
-				//System.out.println("************ ERROR in DebugCommandQueue -- execCommand, cmd: " + currentCommand + ", err: " + e.getMessage());
 			} finally {
 				currentCommand = null;
 			}

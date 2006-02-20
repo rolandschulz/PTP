@@ -18,7 +18,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.launch.internal;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.MessageFormat;
@@ -37,7 +36,6 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
-import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
@@ -161,9 +159,9 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 				exeFile = verifyBinary(project, exePath);
 			}
 			
+			IPreferenceStore store = PTPDebugUIPlugin.getDefault().getPreferenceStore();
 			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
 				monitor.subTask("Configuring debug setting . . .");
-				IPreferenceStore store = PTPDebugUIPlugin.getDefault().getPreferenceStore();
 				String dbgFile = store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_FILE);
 				String dbgArgs = "--host=" + store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_HOST);
 				dbgArgs += " --debugger=" + store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_BACKEND);
@@ -192,7 +190,8 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 				job.setAttribute(PreferenceConstants.JOB_DEBUG_DIR, exePath.removeLastSegments(1).toOSString());
 				PLaunch pLaunch = (PLaunch) launch;
 				pLaunch.setPJob(job);
-				PTPDebugCorePlugin.getDebugModel().createDebuggerSession(debugger, pLaunch, exeFile, new SubProgressMonitor(monitor, 40));
+				int timeout = store.getInt(IPDebugConstants.PREF_PTP_DEBUG_COMM_TIMEOUT);
+				PTPDebugCorePlugin.getDebugModel().createDebuggerSession(debugger, pLaunch, exeFile, timeout, new SubProgressMonitor(monitor, 40));
 				monitor.worked(10);
 				if (monitor.isCanceled()) {
 					PTPDebugCorePlugin.getDebugModel().shutdownSession(job);

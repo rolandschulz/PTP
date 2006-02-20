@@ -30,7 +30,8 @@ public class ConnectionCommand extends AbstractDebugCommand {
 	public ConnectionCommand() {
 		super(null, false, true);
 	}
-	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
+	public void execCommand(IAbstractDebugger debugger, int timeout) throws PCDIException {
+		setTimeout(timeout);
 		try {
 			debugger.connection();
 		} catch (CoreException e) {
