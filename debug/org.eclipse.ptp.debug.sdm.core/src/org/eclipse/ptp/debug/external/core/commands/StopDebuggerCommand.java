@@ -47,14 +47,10 @@ public class StopDebuggerCommand extends AbstractDebugCommand {
 	}
 	public void waitFinish(IAbstractDebugger debugger) throws PCDIException {
 		if (waitForReturn()) {
-			if (result.equals(OK)) {
-				if (sendEvent) {
-					debugger.handleStopDebuggerEvent();
-				}
-				return;
+			if (sendEvent) {
+				debugger.handleStopDebuggerEvent();
 			}
 		}
-		throw new PCDIException("Cannot stop debugger");		
 	}
 	public String getName() {
 		return "Stop debugger"; 

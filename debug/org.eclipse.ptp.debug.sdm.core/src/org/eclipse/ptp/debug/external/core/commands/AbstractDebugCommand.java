@@ -66,6 +66,9 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 			lock.notifyAll();
 		}
 	}
+	/**
+	 * @return true - normal, false - flush
+	 */
 	public boolean waitForReturn() throws PCDIException {
 		if (!isWaitForReturn())
 			return true;
@@ -78,6 +81,9 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 				if (getReturn() == null) {
 					lock.wait(timeout);
 					if (getReturn() == null) {
+						if (isFlush)
+							return false;
+						
 						throw new PCDIException("Time out");
 					}
 				}
@@ -101,7 +107,6 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 			lock.notifyAll();
 		}
 	}
-	
 	protected void setTimeout(int timeout) {
 		this.timeout = timeout;
 	}

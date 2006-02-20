@@ -50,14 +50,10 @@ public class KillCommand extends AbstractDebugCommand {
 	}
 	public void waitFinish(IAbstractDebugger debugger) throws PCDIException {
 		if (waitForReturn()) {
-			if (result.equals(OK)) {
-				if (sendEvent) {
-					debugger.handleProcessTerminatedEvent(tasks);
-				}
-				return;
+			if (sendEvent) {
+				debugger.handleProcessTerminatedEvent(tasks);
 			}
 		}
-		throw new PCDIException("Cannot terminate tasks: " + tasks.toString());		
 	}
 	public String getName() {
 		return "Kill"; 

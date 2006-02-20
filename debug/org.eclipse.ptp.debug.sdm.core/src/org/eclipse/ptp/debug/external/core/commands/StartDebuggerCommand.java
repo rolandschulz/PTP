@@ -45,11 +45,7 @@ public class StartDebuggerCommand extends AbstractDebugCommand {
 	}
 	
 	public void waitFnish() throws PCDIException {
-		if (waitForReturn()) {
-			if (result.equals(OK))
-				return;
-		}
-		throw new PCDIException("Cannot start debugger");		
+		waitForReturn();
 	}
 	public String getName() {
 		return "Start debugger"; 

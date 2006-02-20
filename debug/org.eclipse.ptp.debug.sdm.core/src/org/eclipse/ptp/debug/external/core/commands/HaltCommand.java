@@ -49,7 +49,7 @@ public class HaltCommand extends AbstractDebugCommand {
 				return;
 			}
 		}
-		throw new PCDIException("Cannot terminate tasks: " + tasks.toString());		
+		throw new PCDIException("Wrong type return on command: " + getName());
 	}
 	public String getName() {
 		return "Halt"; 

@@ -39,11 +39,7 @@ public class SetCurrentStackFrameCommand extends AbstractDebugCommand {
 		debugger.setCurrentStackFrame(tasks, frame);
 	}
 	public void waitFinish() throws PCDIException {
-		if (waitForReturn()) {
-			if (result.equals(OK))
-				return;
-		}
-		throw new PCDIException("Stack frame have not set in " + tasks.toString());
+		waitForReturn();
 	}	
 	public String getName() {
 		return "Set current stack frame"; 

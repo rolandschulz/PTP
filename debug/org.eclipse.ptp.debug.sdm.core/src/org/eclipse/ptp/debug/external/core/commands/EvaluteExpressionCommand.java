@@ -41,10 +41,11 @@ public class EvaluteExpressionCommand extends AbstractDebugCommand {
 	
 	public String getExpressionValue() throws PCDIException {
 		if (waitForReturn()) {
-			if (result instanceof IAIF)
+			if (result instanceof IAIF) {
 				return ((IAIF)result).getValue().toString();
+			}
 		}
-		throw new PCDIException("No evalute expression found in " + tasks.toString());
+		throw new PCDIException("Wrong type return on command: " + getName());
 	}
 	public String getName() {
 		return "Evalute expression"; 

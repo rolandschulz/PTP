@@ -36,10 +36,11 @@ public abstract class AbstractBreakpointCommand extends AbstractDebugCommand {
 	}
 	public IPCDIBreakpoint getBreakpoint() throws PCDIException {
 		if (waitForReturn()) {
-			if (result instanceof IPCDIBreakpoint)
+			if (result instanceof IPCDIBreakpoint) {
 				return (IPCDIBreakpoint)result;
+			}
 		}
-		return null;
+		throw new PCDIException("Wrong type return on command: " + getName());
 	}
 }
 

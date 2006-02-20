@@ -42,10 +42,11 @@ public class ListLocalVariablesCommand extends AbstractDebugCommand {
 	
 	public IPCDILocalVariable[] getLocalVariables() throws PCDIException {
 		if (waitForReturn()) {
-			if (result instanceof IPCDILocalVariable[])
+			if (result instanceof IPCDILocalVariable[]) {
 				return (IPCDILocalVariable[])result;
+			}
 		}
-		throw new PCDIException("No local variables found in " + tasks.toString());
+		throw new PCDIException("Wrong type return on command: " + getName());
 	}
 	public String getName() {
 		return "List local variables"; 

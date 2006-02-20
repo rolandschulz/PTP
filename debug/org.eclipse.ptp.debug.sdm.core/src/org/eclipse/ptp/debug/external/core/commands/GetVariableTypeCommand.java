@@ -40,10 +40,11 @@ public class GetVariableTypeCommand extends AbstractDebugCommand {
 	
 	public String getVariableType() throws PCDIException {
 		if (waitForReturn()) {
-			if (result instanceof String)
+			if (result instanceof String) {
 				return (String)result;
+			}
 		}
-		throw new PCDIException("No variable type found in " + tasks.toString());
+		throw new PCDIException("Wrong type return on command: " + getName());
 	}
 	public String getName() {
 		return "Get Variable type"; 
