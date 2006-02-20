@@ -30,7 +30,8 @@ public class GoCommand extends AbstractDebugCommand {
 	public GoCommand(BitList tasks) {
 		super(tasks, false, false);
 	}
-	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
+	public void execCommand(IAbstractDebugger debugger, int timeout) throws PCDIException {
+		setTimeout(timeout);
 		debugger.filterRunningTasks(tasks);
 		if (!tasks.isEmpty()) {
 			debugger.handleProcessResumedEvent(tasks);

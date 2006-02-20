@@ -20,6 +20,7 @@ package org.eclipse.ptp.debug.external.core.commands;
 
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IDebugCommand;
+import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
 
 /**
@@ -27,7 +28,6 @@ import org.eclipse.ptp.debug.core.IDebugCommand;
  * 
  */
 public abstract class AbstractDebugCommand implements IDebugCommand {
-	protected final long WAIT_COMMAND_RETURN_TIME = 30000; 
 	protected final Object lock = new Object(); 
 	
 	protected BitList tasks = null;
@@ -35,6 +35,7 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 	protected boolean waitForReturn = false;
 	protected boolean interrupt = false;
 	private boolean isFlush = false;
+	protected int timeout = 0;
 	
 	public AbstractDebugCommand(BitList tasks) {
 		this(tasks, false, false);
@@ -65,7 +66,7 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 			lock.notifyAll();
 		}
 	}
-	public boolean waitForReturn() {
+	public boolean waitForReturn() throws PCDIException {
 		if (!isWaitForReturn())
 			return true;
 
@@ -75,13 +76,13 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 					return false;
 				
 				if (getReturn() == null) {
-					lock.wait(WAIT_COMMAND_RETURN_TIME);
+					lock.wait(timeout);
 					if (getReturn() == null) {
-						return false;
+						throw new PCDIException("Time out");
 					}
 				}
 			} catch (InterruptedException e) {
-				return false;
+				throw new PCDIException(e);
 			}
 			return true;
 		}
@@ -99,6 +100,10 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 			isFlush = true;
 			lock.notifyAll();
 		}
+	}
+	
+	protected void setTimeout(int timeout) {
+		this.timeout = timeout;
 	}
 	
 	/**

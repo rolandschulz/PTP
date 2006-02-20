@@ -35,7 +35,8 @@ public class StepIntoCommand extends AbstractDebugCommand {
 		super(tasks, true, false);
 		this.count = count;
 	}
-	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
+	public void execCommand(IAbstractDebugger debugger, int timeout) throws PCDIException {
+		setTimeout(timeout);
 		debugger.filterRunningTasks(tasks);
 		if (!tasks.isEmpty()) {
 			debugger.handleProcessResumedEvent(tasks);

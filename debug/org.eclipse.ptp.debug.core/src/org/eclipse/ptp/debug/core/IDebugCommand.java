@@ -29,11 +29,11 @@ public interface IDebugCommand extends Comparable {
 	public static final String OK = "OK";
 	
 	public BitList getTasks();
-	public void execCommand(IAbstractDebugger debugger) throws PCDIException;
+	public void execCommand(IAbstractDebugger debugger, int timeout) throws PCDIException;
 	public boolean isWaitForReturn();
 	public Object getReturn();
 	public void setReturn(BitList tasks, Object result);
-	public boolean waitForReturn();
+	public boolean waitForReturn() throws PCDIException;
 	public boolean canInterrupt();
 	public void cancelWaiting();
 	

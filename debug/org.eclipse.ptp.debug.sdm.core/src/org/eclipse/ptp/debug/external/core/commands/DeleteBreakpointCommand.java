@@ -31,17 +31,10 @@ public class DeleteBreakpointCommand extends AbstractBreakpointCommand {
 	public DeleteBreakpointCommand(BitList tasks, IPCDIBreakpoint cdiBpt) {
 		super(tasks, cdiBpt);
 	}
-	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
-		debugger.deleteBreakpoint(tasks, ((IPCDIBreakpoint)cdiBpt).getBreakpointId());
+	public void execCommand(IAbstractDebugger debugger, int timeout) throws PCDIException {
+		setTimeout(timeout);
+		debugger.deleteBreakpoint(tasks, ((IPCDIBreakpoint)cdiBpt).getBreakpointId());		
 	}
-	public void deleteBreakpoints() throws PCDIException {
-		if (waitForReturn()) {
-			if (result.equals(OK)) {
-				return;
-			}
-		}
-		throw new PCDIException("Breakpoint cannot be deleted in " + tasks.toString());
-	}	
 	public String getName() {
 		return "Delete breakpoint"; 
 	}

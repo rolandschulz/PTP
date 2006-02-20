@@ -21,7 +21,6 @@ package org.eclipse.ptp.ui;
 import java.io.IOException;
 import java.io.InputStream;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.ptp.internal.ui.ParallelImages;
 import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.MessageConsole;
@@ -39,7 +38,7 @@ public class OutputConsole extends MessageConsole {
 	private boolean isKilled = false;
 
 	public OutputConsole(String name, InputStream inputStream) {
-		this(name, ParallelImages.ID_ICON_SHOWLEGEND_ACTION_NORMAL, inputStream);
+		this(name, null, inputStream);
 	}
 	public OutputConsole(String name, ImageDescriptor imageDescriptor, InputStream inputStream) {
 		super(name, imageDescriptor);

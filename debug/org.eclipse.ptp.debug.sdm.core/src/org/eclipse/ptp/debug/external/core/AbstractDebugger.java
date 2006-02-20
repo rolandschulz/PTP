@@ -28,6 +28,8 @@ import org.eclipse.cdt.core.IBinaryParser.IBinaryObject;
 import org.eclipse.cdt.debug.core.cdi.ICDILocator;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.util.BitList;
@@ -35,6 +37,7 @@ import org.eclipse.ptp.core.util.Queue;
 import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.IDebugCommand;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
+import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIErrorEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIExitedEvent;
@@ -61,10 +64,12 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 	protected IPCDISession session = null;
 	protected IPProcess[] procs;
 	protected boolean isExited = false;
-	private IPJob job = null;
+	protected IPJob job = null;
 	protected DebugCommandQueue commandQueue = null;
+	protected int timeout = 0;
 	
-	public IPCDISession createDebuggerSession(IPLaunch launch, IBinaryObject exe, IProgressMonitor monitor) throws CoreException {
+	public IPCDISession createDebuggerSession(IPLaunch launch, IBinaryObject exe, int timeout, IProgressMonitor monitor) throws CoreException {
+		this.timeout = timeout;
 		IPJob job = launch.getPJob();
 		initialize(job);
 		session = new Session(this, job, launch, exe);
@@ -74,10 +79,6 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 	public void postCommand(IDebugCommand command) {
 		commandQueue.addCommand(command);
 	}
-	public void postCommandAndWait(IDebugCommand command) {
-		postCommand(command);
-		command.waitForReturn();
-	}
 	public void completeCommand(BitList tasks, Object result) {
 		commandQueue.setCommandReturn(tasks, result);
 	}
@@ -86,7 +87,7 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		this.job = job;
 		job.setAttribute(TERMINATED_PROC_KEY, new BitList(job.size()));
 		job.setAttribute(SUSPENDED_PROC_KEY, new BitList(job.size()));
-		commandQueue = new DebugCommandQueue(this);
+		commandQueue = new DebugCommandQueue(this, timeout);
 		commandQueue.start();
 		
 		isExited = false;
@@ -96,7 +97,13 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		procs = job.getSortedProcesses();
 		// Initialize state variables
 		
-		postCommandAndWait(new StartDebuggerCommand(job));
+		StartDebuggerCommand command = new StartDebuggerCommand(job);
+		postCommand(command);
+		try {
+			command.waitFnish();
+		} catch (PCDIException e) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPDebugExternalPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));
+		}
 	}
 	
 	public final void exit() throws CoreException {

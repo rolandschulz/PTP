@@ -18,11 +18,16 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.ui.preferences;
 
+import java.text.MessageFormat;
 import org.eclipse.debug.ui.IDebugModelPresentation;
 import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.debug.ui.IDebugView;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.preference.IntegerFieldEditor;
+import org.eclipse.jface.preference.StringFieldEditor;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.debug.core.IPDebugConstants;
@@ -49,7 +54,15 @@ import org.eclipse.ui.IWorkbenchPage;
 public class PDebugPreferencePage extends AbstractPerferencePage {
 	private Button fPathsButton = null;
 	private Button fRegisteredProcessButton = null;
+	private IntegerFieldEditor commandTimeoutField = null;
 	
+    protected class WidgetListener implements IPropertyChangeListener {
+    	public void propertyChange(PropertyChangeEvent event) {
+	    	setValid(isValid());	
+	    }
+    }
+    protected WidgetListener listener = new WidgetListener();
+    
 	public PDebugPreferencePage() {
 		super();
 		setPreferenceStore(PTPDebugUIPlugin.getDefault().getPreferenceStore());		
@@ -70,6 +83,8 @@ public class PDebugPreferencePage extends AbstractPerferencePage {
 		composite.setLayoutData(data);
 		createSpacer(composite, 1);
 		createViewSettingPreferences(composite);
+		createSpacer(composite, 1);
+		createCommunicationPreferences(composite);
 		setValues();
 		return composite;
 	}
@@ -87,10 +102,28 @@ public class PDebugPreferencePage extends AbstractPerferencePage {
 			}
 		});
 	}
+	protected void createCommunicationPreferences(Composite parent) {
+		Composite comp = createGroupComposite(parent, 1, false, PreferenceMessages.getString("PDebugPreferencePage.communication_group"));
+		Composite spacingComposite = new Composite(comp, SWT.NONE);
+		spacingComposite.setLayout(new GridLayout());
+		GridData data = new GridData(GridData.FILL_HORIZONTAL);
+		data.horizontalSpan = 2;
+		spacingComposite.setLayoutData(data);
+		
+		commandTimeoutField = new IntegerFieldEditor(IPDebugConstants.PREF_PTP_DEBUG_COMM_TIMEOUT, PreferenceMessages.getString("PDebugPreferencePage.command_timeout"), spacingComposite);
+		commandTimeoutField.setValidateStrategy(StringFieldEditor.VALIDATE_ON_KEY_STROKE);
+		commandTimeoutField.setValidRange(IPDebugConstants.MIN_REQUEST_TIMEOUT, IPDebugConstants.MAX_REQUEST_TIMEOUT);
+		String minValue = Integer.toString(IPDebugConstants.MIN_REQUEST_TIMEOUT);
+		String maxValue = Integer.toString(IPDebugConstants.MAX_REQUEST_TIMEOUT);
+		commandTimeoutField.setErrorMessage(MessageFormat.format(PreferenceMessages.getString("PDebugPreferencePage.timeoutError"), new String[]{ minValue, maxValue }));
+		commandTimeoutField.setEmptyStringAllowed(false);
+		commandTimeoutField.setPropertyChangeListener(listener);
+	}
 	public void performDefaults() { 
 		IPreferenceStore store = getPreferenceStore();
 		fPathsButton.setSelection(store.getDefaultBoolean(IPDebugConstants.PREF_SHOW_FULL_PATHS));
-		fRegisteredProcessButton.setSelection(store.getDefaultBoolean(IPDebugConstants.PREF_PTP_DEBUG_REGISTER_PROC_0));		
+		fRegisteredProcessButton.setSelection(store.getDefaultBoolean(IPDebugConstants.PREF_PTP_DEBUG_REGISTER_PROC_0));
+		commandTimeoutField.setStringValue(String.valueOf(store.getDefaultInt(IPDebugConstants.PREF_PTP_DEBUG_COMM_TIMEOUT)));
 		super.performDefaults();
 	}
 	
@@ -105,12 +138,24 @@ public class PDebugPreferencePage extends AbstractPerferencePage {
 		IPreferenceStore store = getPreferenceStore();
 		fPathsButton.setSelection(store.getBoolean(IPDebugConstants.PREF_SHOW_FULL_PATHS));
 		fRegisteredProcessButton.setSelection(store.getBoolean(IPDebugConstants.PREF_PTP_DEBUG_REGISTER_PROC_0));
+		commandTimeoutField.setStringValue(String.valueOf(store.getInt(IPDebugConstants.PREF_PTP_DEBUG_COMM_TIMEOUT)));
 	}
 	protected void storeValues() {
 		IPreferenceStore store = getPreferenceStore();
 		store.setValue(IPDebugConstants.PREF_SHOW_FULL_PATHS, fPathsButton.getSelection());
 		store.setValue(IPDebugConstants.PREF_PTP_DEBUG_REGISTER_PROC_0, fRegisteredProcessButton.getSelection());
+		store.setValue(IPDebugConstants.PREF_PTP_DEBUG_COMM_TIMEOUT, commandTimeoutField.getIntValue());
 	}
+	public boolean isValid() {
+		setErrorMessage(null);
+		setMessage(null);
+		if (!commandTimeoutField.isValid()) {
+			setErrorMessage(commandTimeoutField.getErrorMessage());
+			return false;
+		}
+		return true;
+	}
+	
     protected void refreshView() {
     	IWorkbenchPage[] pages = getPages();
     	for (int i=0; i<pages.length; i++) {

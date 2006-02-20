@@ -30,7 +30,8 @@ public class RestartCommand extends AbstractDebugCommand {
 	public RestartCommand(BitList tasks) {
 		super(tasks, false, false);
 	}
-	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
+	public void execCommand(IAbstractDebugger debugger, int timeout) throws PCDIException {
+		setTimeout(timeout);
 		debugger.restart();
 	}
 	public String getName() {

@@ -35,7 +35,8 @@ public class StartDebuggerCommand extends AbstractDebugCommand {
 		super(null, false, true);
 		this.job = job;
 	}
-	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
+	public void execCommand(IAbstractDebugger debugger, int timeout) throws PCDIException {
+		setTimeout(timeout);
 		try {
 			debugger.startDebugger(job);
 		} catch (CoreException e) {

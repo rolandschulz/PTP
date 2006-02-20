@@ -31,7 +31,8 @@ public class SetLineBreakpointCommand extends AbstractBreakpointCommand {
 	public SetLineBreakpointCommand(BitList tasks, IPCDILineBreakpoint lineBpt) {
 		super(tasks, lineBpt);
 	}
-	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
+	public void execCommand(IAbstractDebugger debugger, int timeout) throws PCDIException {
+		setTimeout(timeout);
 		debugger.setLineBreakpoint(tasks, (IPCDILineBreakpoint)cdiBpt);
 	}
 	public String getName() {

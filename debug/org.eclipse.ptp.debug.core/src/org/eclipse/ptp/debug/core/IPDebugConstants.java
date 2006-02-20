@@ -87,11 +87,10 @@ public interface IPDebugConstants {
 
 	public static final String PREF_PTP_DEBUGGER = PLUGIN_ID + ".pDebug.debuggers";
 	public static final String PREF_PTP_DEBUG_COMM_TIMEOUT = PLUGIN_ID + ".pDebug.timeout";
-	public static final String PREF_PTP_DEBUG_EVENT_TIME = PLUGIN_ID + ".pDebug.eventTime";
 
 	public static final String PREF_PTP_DEBUG_REGISTER_PROC_0 = PLUGIN_ID + ".pDebug.regPro0";
 	
-	public static final int DEFAULT_DEBUG_TIMEOUT = 0;
-	public static final int DEFAULT_DEBUG_EVENTTIME = 0;
-	
+	public static final int DEFAULT_DEBUG_COMM_TIMEOUT = 60000;
+	public static final int MIN_REQUEST_TIMEOUT = 10000;
+	public static final int MAX_REQUEST_TIMEOUT = Integer.MAX_VALUE;	
 }

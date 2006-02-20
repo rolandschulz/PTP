@@ -124,9 +124,14 @@ public class BreakpointManager extends Manager implements IBreakpointsListener {
 			IPCDIBreakpoint cdiBpt = findCDIBreakpoint(bpt);
 			boolean isEnable = bpt.isEnabled();
 			AbstractBreakpointCommand command = isEnable?getEnableBreakpointCommand(tasks, cdiBpt):getDisableBreakpointCommand(tasks, cdiBpt);
-			Session session = (Session) getSession();
-			session.getDebugger().postCommandAndWait(command);
-			cdiBpt.setEnabled(isEnable);
+			((Session) getSession()).getDebugger().postCommand(command);
+			try {
+				if (command.getBreakpoint() != null) {
+					cdiBpt.setEnabled(isEnable);
+				}
+			} catch (PCDIException e) {
+				throw new CoreException(new Status(IStatus.ERROR, PTPDebugExternalPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));
+			}
 		}
 	}
 	public void deleteBreakpoint(String job_id, IPBreakpoint bpt) throws CoreException {
@@ -134,9 +139,14 @@ public class BreakpointManager extends Manager implements IBreakpointsListener {
 		if (breakMap.containsKey(bpt)) {
 			IPCDIBreakpoint cdiBpt = findCDIBreakpoint(bpt);
 			AbstractBreakpointCommand command = getDeleteBreakpointCommand(tasks, cdiBpt);
-			Session session = (Session) getSession();
-			session.getDebugger().postCommandAndWait(command);
-			removeBreakpoint(bpt);
+			((Session) getSession()).getDebugger().postCommand(command);
+			try {
+				if (command.getBreakpoint() != null) {
+					removeBreakpoint(bpt);
+				}
+			} catch (PCDIException e) {
+				throw new CoreException(new Status(IStatus.ERROR, PTPDebugExternalPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));
+			}
 		}
 	}
 	public void setBreakpoint(String job_id, IPBreakpoint bpt) throws CoreException {

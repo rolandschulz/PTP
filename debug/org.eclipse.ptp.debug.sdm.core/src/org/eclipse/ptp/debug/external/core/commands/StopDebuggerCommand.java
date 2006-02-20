@@ -36,7 +36,8 @@ public class StopDebuggerCommand extends AbstractDebugCommand {
 	public StopDebuggerCommand() {
 		this(true);
 	}
-	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
+	public void execCommand(IAbstractDebugger debugger, int timeout) throws PCDIException {
+		setTimeout(timeout);
 		try {
 			debugger.stopDebugger();
 		} catch (CoreException e) {

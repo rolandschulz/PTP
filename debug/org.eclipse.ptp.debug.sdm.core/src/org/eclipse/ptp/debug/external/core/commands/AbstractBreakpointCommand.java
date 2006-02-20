@@ -19,6 +19,7 @@
 package org.eclipse.ptp.debug.external.core.commands;
 
 import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIBreakpoint;
 
 
@@ -33,7 +34,7 @@ public abstract class AbstractBreakpointCommand extends AbstractDebugCommand {
 		super(tasks, false, true);
 		this.cdiBpt = cdiBpt;
 	}
-	public IPCDIBreakpoint getBreakpoint() {
+	public IPCDIBreakpoint getBreakpoint() throws PCDIException {
 		if (waitForReturn()) {
 			if (result instanceof IPCDIBreakpoint)
 				return (IPCDIBreakpoint)result;

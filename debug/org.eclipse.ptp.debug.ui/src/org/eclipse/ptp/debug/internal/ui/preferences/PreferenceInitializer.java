@@ -43,5 +43,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		
 		store.setDefault(IPDebugConstants.PREF_SHOW_FULL_PATHS, false);
 		store.setDefault(IPDebugConstants.PREF_PTP_DEBUG_REGISTER_PROC_0, true);
+
+		store.setDefault(IPDebugConstants.PREF_PTP_DEBUG_COMM_TIMEOUT, IPDebugConstants.DEFAULT_DEBUG_COMM_TIMEOUT);
 	}
 }

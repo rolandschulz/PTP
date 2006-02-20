@@ -37,7 +37,8 @@ public class KillCommand extends AbstractDebugCommand {
 	public KillCommand(BitList tasks) {
 		this(tasks, true);
 	}
-	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
+	public void execCommand(IAbstractDebugger debugger, int timeout) throws PCDIException {
+		setTimeout(timeout);
 		debugger.filterTerminateTasks(tasks);
 		if (!tasks.isEmpty()) {
 			debugger.kill(tasks);
