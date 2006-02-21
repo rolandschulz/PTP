@@ -98,8 +98,6 @@ static int	GDBMIQuit(void);
 
 static char* GetModifierType(char *);
 static AIF* CreateNamed(AIF*, int);
-static AIF* CreateReference(char *, int);
-
 
 dbg_backend_funcs	GDBMIBackend =
 {
@@ -1272,16 +1270,14 @@ CreateStruct(MIVar *var, int named)
 	else
 		a = EmptyStructToAIF(NULL);
 
+
 	for ( i = 0 ; i < var->numchild ; i++ )
 	{
 		v = var->children[i];
 		//check whether child contains parent
 		if (strcmp(var->type, v->type) == 0 && strcmp(var->name, v->name)) {
-			if ((ac = CreateReference(var->type, named)) == NULL) {
-				AIFFree(a);
-				return NULL;
-			}
 			a = CreateNamed(a, named);
+			ac = AIFNull(a);
 		}
 		else {
 			if ( (ac = ConvertVarToAIF(v->exp, v, named)) == NULL ) {
@@ -1289,9 +1285,7 @@ CreateStruct(MIVar *var, int named)
 				return NULL;
 			}
 		}
-fprintf(stderr, "=============== adding field ==========\n");
 		AIFAddFieldToStruct(a, v->exp, ac);
-fprintf(stderr, "=============== added field ==========\n");
 	}
 	return a;
 }
@@ -1309,17 +1303,14 @@ CreateUnion(MIVar *var, int named)
 		a = EmptyUnionToAIF(&var->type[7]);
 	else
 		a = EmptyUnionToAIF(NULL);
-				
+	
 	for ( i = 0 ; i < var->numchild ; i++ )
 	{
 		v = var->children[i];
 		//check whether child contains parent
 		if (strcmp(var->type, v->type) == 0 && strcmp(var->name, v->name)) {
-			if ((ac = CreateReference(var->type, named)) == NULL) {
-				AIFFree(a);
-				return NULL;
-			}
 			a = CreateNamed(a, named);
+			ac = AIFNull(a);
 		}
 		else {
 			if ( (ac = ConvertVarToAIF(v->exp, v, named)) == NULL ) {
@@ -1342,17 +1333,6 @@ CreateUnion(MIVar *var, int named)
 static AIF* CreateNamed(AIF *a, int named) {
 	if (FDSType(AIF_FORMAT(a)) != AIF_NAME) {
 		return NameAIF(a, named);
-	}
-	return a;
-}
-
-static AIF* CreateReference(char *type, int named) {
-	AIF * a = NULL;
-	a = ReferenceAIF(named);
-	if (type[strlen(type) - 1] == '*') {
-		if (a != NULL) {
-			return PointerToAIF(a);
-		}
 	}
 	return a;
 }
