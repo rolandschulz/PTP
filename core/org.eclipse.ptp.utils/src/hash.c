@@ -87,13 +87,20 @@
 static void _hgrow(Hash *);
 
 Hash *
-HashCreate(int logsize)
+HashCreate(int size)
 {
 	unsigned int	i;
+	unsigned int	logsize = -1;
 	Hash *	htab;
 
 	htab = (Hash *)malloc(sizeof(Hash));
 
+	/*
+	 * Compute log2(size)
+	 */
+	for (i = (unsigned int)size; i > 0; i >>= 1)
+		logsize++;
+		
 	/*
 	** Maximum size is 2^31
 	*/

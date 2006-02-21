@@ -56,23 +56,6 @@
 <pathentry kind="out" path=""/>
 <pathentry kind="con" path="org.eclipse.cdt.make.core.DISCOVERED_SCANNER_INFO"/>
 </item>
-<item id="org.eclipse.cdt.make.core.buildtargets">
-<buildTargets>
-<target name="all" targetID="org.eclipse.cdt.make.MakeTargetBuilder" path="">
-<buildCommand>make</buildCommand>
-<buildArguments/>
-<buildTarget>all</buildTarget>
-<stopOnError>false</stopOnError>
-<useDefaultCommand>true</useDefaultCommand>
-</target>
-<target name="clean" targetID="org.eclipse.cdt.make.MakeTargetBuilder" path="">
-<buildCommand>make</buildCommand>
-<buildArguments/>
-<buildTarget>clean</buildTarget>
-<stopOnError>false</stopOnError>
-<useDefaultCommand>true</useDefaultCommand>
-</target>
-</buildTargets>
-</item>
+
 </data>
 </cdtproject>
