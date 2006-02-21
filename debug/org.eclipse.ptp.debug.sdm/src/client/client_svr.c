@@ -38,7 +38,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <math.h>
 
 #include "dbg.h"
 #include "dbg_client.h"
@@ -110,7 +109,7 @@ new_request(bitset *procs, int wait_type, void *data)
 	r->wait_type = wait_type;
 	r->data = data;
 	r->timer_state = TIMER_DISABLED;
-	r->events = HashCreate((int)log2((float)bitset_size(procs)));;
+	r->events = HashCreate(bitset_size(procs));
 	AddToList(active_requests, (void *)r);
 
 	DEBUG_PRINT("created new request %d for %s\n", r->id, bitset_to_set(procs));
