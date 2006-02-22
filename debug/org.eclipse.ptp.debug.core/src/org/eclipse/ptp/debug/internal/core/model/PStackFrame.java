@@ -504,7 +504,8 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 	protected boolean isDisposed() {
 		return fIsDisposed;
 	}
-	private synchronized void setDisposed(boolean isDisposed) {
+	//FIXME - commented synchronized to prevent hanging here
+	private /* synchronized */ void setDisposed(boolean isDisposed) {
 		fIsDisposed = isDisposed;
 	}
 	public boolean canRunToLine(IFile file, int lineNumber) {
