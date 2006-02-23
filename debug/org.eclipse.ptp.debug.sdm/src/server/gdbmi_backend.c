@@ -76,7 +76,7 @@ static AIF *	ConvertVarToAIF(char *, MIVar *, int);
 static int	GDBMIInit(void (*)(dbg_event *, void *), void *);
 static int	GDBMIProgress(void);
 static int	GDBMIInterrupt(void);
-static int	GDBMIStartSession(char *, char *, char *, char **, char **);
+static int	GDBMIStartSession(char *, char *, char *, char *, char **, char **);
 static int	GDBMISetLineBreakpoint(int, int, int, char *, int, char*, int, int);
 static int	GDBMISetFuncBreakpoint(int, int, int, char *, char *, char*, int, int);
 static int	GDBMIDeleteBreakpoint(int);
@@ -374,8 +374,9 @@ SendCommandWait(MISession *sess, MICommand *cmd)
  * Start GDB session
  */	
 static int
-GDBMIStartSession(char *gdb_path, char *dir, char *prog, char **args, char **env)
+GDBMIStartSession(char *gdb_path, char *prog, char *path, char *work_dir, char **args, char **env)
 {
+	char *		prog_path;
 	char **		e;
 	struct stat	st;
 	MICommand *	cmd;
@@ -396,13 +397,19 @@ GDBMIStartSession(char *gdb_path, char *dir, char *prog, char **args, char **env
 	 	}
 	}
 
-	if (*dir != '\0' && chdir(dir) < 0) {
-		DbgSetError(DBGERR_CHDIR, dir);
+	if (*work_dir != '\0' && chdir(work_dir) < 0) {
+		DbgSetError(DBGERR_CHDIR, work_dir);
 		return DBGRES_ERR;
 	}
 
-	if (access(prog, R_OK) < 0) {
-		DbgSetError(DBGERR_NOFILEDIR, prog);
+	if (path != NULL)
+		asprintf(&prog_path, "%s/%s", path, prog);
+	else
+		prog_path = strdup(prog);
+	
+	if (access(prog_path, R_OK) < 0) {
+		DbgSetError(DBGERR_NOFILEDIR, prog_path);
+		free(prog_path);
 		return DBGRES_ERR;
 	}
 	
@@ -412,11 +419,14 @@ GDBMIStartSession(char *gdb_path, char *dir, char *prog, char **args, char **env
 	
 	MISessionSetGDBPath(sess, gdb_path);
 	
-	if (MISessionStartLocal(sess, prog) < 0) {
+	if (MISessionStartLocal(sess, prog_path) < 0) {
 		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
 		MISessionFree(sess);
+		free(prog_path);
 		return DBGRES_ERR;
 	}
+	
+	free(prog_path);
 
 	for (e = env; e != NULL && *e != NULL; e++) {
 		cmd = MIGDBSet("environment", *e);
