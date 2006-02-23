@@ -131,6 +131,15 @@ public abstract class AbstractProxyClient {
 		this.sendCommand(cmd);
 	}
 
+	protected void sendCommand(String cmd, String arg1, String arg2, String arg3, String[] args) throws IOException {
+		cmd += " " + encodeString(arg1) + " " + encodeString(arg2) + " " + encodeString(arg3);
+		
+		for (int i = 0; i < args.length; i++)
+			cmd += " " + encodeString(args[i]);
+		
+		this.sendCommand(cmd);
+	}
+
 	public void addEventListener(IProxyEventListener listener) {
 		synchronized (listeners) {
 			listeners.add(listener);

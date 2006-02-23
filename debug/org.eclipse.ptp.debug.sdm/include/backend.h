@@ -31,7 +31,7 @@ struct dbg_backend_funcs {
 	int (*init)(void (*)(dbg_event *, void *), void *);
 	int (*progress)(void);
 	int (*interrupt)(void);
-	int (*start_session)(char *, char *, char *, char **, char **);
+	int (*start_session)(char *, char *, char *, char *, char **, char **);
 	int (*setlinebreakpoint)(int, int, int, char *, int, char *, int, int);
 	int (*setfuncbreakpoint)(int, int, int, char *, char *, char *, int, int);
 	int (*deletebreakpoint)(int);

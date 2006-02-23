@@ -125,12 +125,13 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 	
 	public void startDebugger(IPJob job) throws CoreException {
 		try {
-			String app = (String) job.getAttribute(PreferenceConstants.JOB_APP);
+			String app = (String) job.getAttribute(PreferenceConstants.JOB_APP_NAME);
+			String path = (String) job.getAttribute(PreferenceConstants.JOB_APP_PATH);
 			String dir = (String) job.getAttribute(PreferenceConstants.JOB_WORK_DIR);
 			String[] args = (String[]) job.getAttribute(PreferenceConstants.JOB_ARGS);
 			proxy.waitForConnect();
 			proxy.addEventListener(this);
-			proxy.debugStartSession(dir, app, args);
+			proxy.debugStartSession(app, path, dir, args);
 		} catch (IOException e) {
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugCorePlugin.getUniqueIdentifier(), IStatus.ERROR, "Cannot start debugger", e));
 		}

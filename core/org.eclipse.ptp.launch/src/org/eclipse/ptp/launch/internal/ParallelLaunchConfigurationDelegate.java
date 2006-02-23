@@ -184,7 +184,8 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			
 			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
 				monitor.setTaskName("Starting the debugger . . .");
-				job.setAttribute(PreferenceConstants.JOB_APP, jrunconfig.getExecName());
+				job.setAttribute(PreferenceConstants.JOB_APP_NAME, jrunconfig.getExecName());
+				job.setAttribute(PreferenceConstants.JOB_APP_PATH, jrunconfig.getPathToExec());
 				job.setAttribute(PreferenceConstants.JOB_WORK_DIR, jrunconfig.getWorkingDir());
 				job.setAttribute(PreferenceConstants.JOB_ARGS, jrunconfig.getArguments());
 				job.setAttribute(PreferenceConstants.JOB_DEBUG_DIR, exePath.removeLastSegments(1).toOSString());
