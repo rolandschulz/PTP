@@ -104,6 +104,9 @@ MIEventCreateStoppedEvent(char *reason, List *results)
 		event = MIEventNew(MIEventClassStopped, MIEventTypeInferiorExit);
 	} else if (strcmp(reason, "exited-signalled") == 0) {
 		event = MIEventNew(MIEventClassStopped, MIEventTypeInferiorSignalExit);
+	} else {
+		//added by clement - for handling temporary breakpoints
+		event = MIEventNew(MIEventClassStopped, MIEventTypeSteppingRange);
 	}
 	
 	MIEventParseStopped(event, results);
