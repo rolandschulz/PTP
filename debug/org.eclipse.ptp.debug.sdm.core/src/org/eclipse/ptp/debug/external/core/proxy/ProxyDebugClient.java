@@ -52,7 +52,7 @@ public class ProxyDebugClient extends AbstractProxyDebugClient {
 	public void debugSetFuncBreakpoint(BitList procs, int bpid, boolean isTemporary, boolean isHardware, String file, String func, String expression, int ignoreCount, int tid) throws IOException {
 		String[] args = new String[] {
 			Integer.toString(bpid),
-			Integer.toString(isTemporary?0:0),
+			Integer.toString(isTemporary?1:0),
 			Integer.toString(isHardware?1:0),
 			file,
 			func,
