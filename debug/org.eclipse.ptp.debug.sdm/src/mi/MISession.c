@@ -243,6 +243,7 @@ WriteCommand(int fd, char *cmd)
 	int	n;
 	int	len = strlen(cmd);
 
+	printf("gdb>>> %s\n", cmd);
 #ifdef DEBUG
 	printf("gdb>>> %s\n", cmd);
 #endif
@@ -324,6 +325,9 @@ ReadResponse(int fd)
 		p[n] = '\0';
 	printf("<<<gdb %s\n", res_buf);
 #endif
+	if (n > 0)
+		p[n] = '\0';
+	printf("<<<gdb %s\n", res_buf);
 
 	return res_buf;
 }
@@ -375,8 +379,9 @@ MISessionProcessCommandsAndResponses(MISession *sess, fd_set *rfds, fd_set *wfds
 			
 		if (output->oobs != NULL) {
 #ifdef __gnu_linux__
-			if (sess->command != NULL && strcmp(sess->command->command, "-exec-interrupt") == 0)
+			if (sess->command != NULL && strcmp(sess->command->command, "-exec-interrupt") == 0) {
 				sess->command->completed = 1;
+			}
 #endif /* __gnu_linux__ */	
 			DoOOBCallbacks(sess, output->oobs);
 		}
@@ -417,13 +422,22 @@ DoOOBCallbacks(MISession *sess, List *oobs)
 				if (sess->exec_callback != NULL)
 					sess->exec_callback(oob->class, oob->results);
 				if (strcmp(oob->class, "stopped") == 0) {
+					int cmdSend = 0;
 					for (SetList(oob->results); (res = (MIResult *)GetListElement(oob->results)); ) {
 						if (strcmp(res->variable, "reason") == 0) {
 							val = res->value;
 							if (val->type == MIValueTypeConst) {
-								if (sess->event_callback)
+								if (sess->event_callback) {
 									sess->event_callback(MIEventCreateStoppedEvent(val->cstring, oob->results));
+									cmdSend = 1;
+								}
 							}
+						}
+					}
+					if (cmdSend == 0) {
+						if (sess->event_callback) {
+							sess->event_callback(MIEventCreateStoppedEvent("", oob->results));
+							cmdSend = 1;
 						}
 					}
 				}
