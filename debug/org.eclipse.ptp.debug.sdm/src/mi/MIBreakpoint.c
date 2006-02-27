@@ -161,7 +161,6 @@ MIBreakpointGetBreakInsertInfo(MICommand *cmd)
 		var = result->variable;
 		val = result->value;
 		
-fprintf(stderr, "-------var: %s\n", var);
 		bpt = NULL;
 		if (strcmp(var, "wpt") == 0) {
 			if (val->type == MIValueTypeTuple) {
@@ -194,7 +193,6 @@ fprintf(stderr, "-------var: %s\n", var);
 			if (breakpoints == NULL)
 				breakpoints = NewList();
 
-fprintf(stderr, "-------add bpt\n");
 			AddToList(breakpoints, (void *)bpt);
 		}
 	}

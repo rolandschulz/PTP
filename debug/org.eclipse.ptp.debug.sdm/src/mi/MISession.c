@@ -243,7 +243,6 @@ WriteCommand(int fd, char *cmd)
 	int	n;
 	int	len = strlen(cmd);
 
-	printf("gdb>>> %s\n", cmd);
 #ifdef DEBUG
 	printf("gdb>>> %s\n", cmd);
 #endif
@@ -325,9 +324,6 @@ ReadResponse(int fd)
 		p[n] = '\0';
 	printf("<<<gdb %s\n", res_buf);
 #endif
-	if (n > 0)
-		p[n] = '\0';
-	printf("<<<gdb %s\n", res_buf);
 
 	return res_buf;
 }

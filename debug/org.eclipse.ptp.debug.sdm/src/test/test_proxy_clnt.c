@@ -77,6 +77,9 @@ event_callback(dbg_event *e, void *data)
 	case DBGEV_BPSET:
 		printf("breakpoint set\n");
 		break;
+	case DBGEV_SUSPEND:
+		printf("suspend completed\n");
+		break;
 	case DBGEV_STEP:
 		printf("step completed\n");
 		break;

@@ -28,13 +28,14 @@
 
 #define MIEventTypeBreakpointHit		1
 #define MIEventTypeWatchpointTrigger	2
-#define MIEventTypeWatchpointScope	3
+#define MIEventTypeWatchpointScope		3
 #define MIEventTypeSteppingRange		4
 #define MIEventTypeSignal				5
-#define MIEventTypeLocationReached	6
-#define MIEventTypeFunctionFinished	7
-#define MIEventTypeInferiorExit		8
+#define MIEventTypeLocationReached		6
+#define MIEventTypeFunctionFinished		7
+#define MIEventTypeInferiorExit			8
 #define MIEventTypeInferiorSignalExit	9
+#define MIEventTypeSuspended			10
 
 /**
  * Represents an asynchronous event.

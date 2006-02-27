@@ -31,19 +31,20 @@
 #define DBG_EV_WAITSOME	1
 
 #define DBG_EV_OFFSET		100
-#define DBGEV_BPHIT		DBG_EV_OFFSET + 0
+#define DBGEV_BPHIT			DBG_EV_OFFSET + 0
 #define DBGEV_SIGNAL		DBG_EV_OFFSET + 1
-#define DBGEV_EXIT		DBG_EV_OFFSET + 2
-#define DBGEV_STEP		DBG_EV_OFFSET + 3
-#define DBGEV_BPSET		DBG_EV_OFFSET + 4
+#define DBGEV_EXIT			DBG_EV_OFFSET + 2
+#define DBGEV_STEP			DBG_EV_OFFSET + 3
+#define DBGEV_BPSET			DBG_EV_OFFSET + 4
 #define DBGEV_FRAMES		DBG_EV_OFFSET + 5
-#define DBGEV_DATA		DBG_EV_OFFSET + 6
-#define DBGEV_TYPE		DBG_EV_OFFSET + 7
-#define DBGEV_VARS		DBG_EV_OFFSET + 8
-#define DBGEV_ARGS		DBG_EV_OFFSET + 9
-#define DBGEV_INIT		DBG_EV_OFFSET + 10
+#define DBGEV_DATA			DBG_EV_OFFSET + 6
+#define DBGEV_TYPE			DBG_EV_OFFSET + 7
+#define DBGEV_VARS			DBG_EV_OFFSET + 8
+#define DBGEV_ARGS			DBG_EV_OFFSET + 9
+#define DBGEV_INIT			DBG_EV_OFFSET + 10
 #define DBGEV_OK			DBG_EV_OFFSET + 11
-#define DBGEV_ERROR		DBG_EV_OFFSET + 12
+#define DBGEV_ERROR			DBG_EV_OFFSET + 12
+#define DBGEV_SUSPEND		DBG_EV_OFFSET + 13
 
 struct dbg_event {
 	int			event;
@@ -98,7 +99,7 @@ struct dbg_event {
 	char *		error_msg;
 	
 	/*
-	 * DBGEV_STEP, DBGEV_SIGNAL
+	 * DBGEV_STEP, DBGEV_SIGNAL, DBGEV_SUSPEND
 	 */
 	stackframe *	frame;
 };
