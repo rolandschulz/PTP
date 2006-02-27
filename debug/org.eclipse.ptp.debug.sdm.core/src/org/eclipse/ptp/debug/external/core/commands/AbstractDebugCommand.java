@@ -86,6 +86,11 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 						
 						throw new PCDIException("Time out");
 					}
+					else {
+						if (getReturn() instanceof PCDIException) {
+							throw (PCDIException)getReturn();
+						}
+					}
 				}
 			} catch (InterruptedException e) {
 				throw new PCDIException(e);

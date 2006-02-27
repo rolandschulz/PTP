@@ -25,7 +25,6 @@ package org.eclipse.ptp.debug.external.core;
 import java.util.Observable;
 import java.util.Observer;
 import org.eclipse.cdt.core.IBinaryParser.IBinaryObject;
-import org.eclipse.cdt.debug.core.cdi.ICDILocator;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -44,6 +43,7 @@ import org.eclipse.ptp.debug.core.cdi.event.IPCDIExitedEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIResumedEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDISuspendedEvent;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIBreakpoint;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDILocator;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.debug.external.core.cdi.Session;
 import org.eclipse.ptp.debug.external.core.cdi.event.BreakpointCreatedEvent;
@@ -54,6 +54,7 @@ import org.eclipse.ptp.debug.external.core.cdi.event.ErrorEvent;
 import org.eclipse.ptp.debug.external.core.cdi.event.InferiorExitedEvent;
 import org.eclipse.ptp.debug.external.core.cdi.event.InferiorResumedEvent;
 import org.eclipse.ptp.debug.external.core.cdi.event.InferiorSignaledEvent;
+import org.eclipse.ptp.debug.external.core.cdi.event.SuspendEvent;
 import org.eclipse.ptp.debug.external.core.cdi.model.LineLocation;
 import org.eclipse.ptp.debug.external.core.commands.StartDebuggerCommand;
 import org.eclipse.ptp.debug.external.core.commands.StopDebuggerCommand;
@@ -179,9 +180,11 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		}
 	}
 	private void setJobFinished(BitList tasks, String status) {
-		setSuspendTasks(false, tasks);
-		setTerminateTasks(true, tasks);
-		session.unregisterTargets(tasks.toArray(), true);
+		if (session != null) {
+			setSuspendTasks(false, tasks);
+			setTerminateTasks(true, tasks);
+			session.unregisterTargets(tasks.toArray(), true);
+		}
 		setProcessStatus(tasks.toArray(), status);
 	}
 	public final void notifyObservers(Object arg) {
@@ -198,7 +201,9 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 	//event
 	public void handleStopDebuggerEvent() {
 		eventQueue.addItem(new DebuggerExitedEvent(getSession(), new BitList(0)));
-		getSession().shutdown();
+		if (session != null) {
+			session.shutdown();
+		}
 	}
 	//not used breakpoint created event
 	public void handleBreakpointCreatedEvent(BitList tasks) {
@@ -210,6 +215,9 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 			fireEvent(new BreakpointHitEvent(getSession(), tasks, bpt));
 		}
 	}
+	public void handleSuspendEvent(BitList tasks, IPCDILocator locator) {
+		fireEvent(new SuspendEvent(getSession(), tasks, locator));
+	}
 	public void handleEndSteppingEvent(BitList tasks, int lineNumber, String filename) {
 		LineLocation loc = new LineLocation(filename, lineNumber);
 		fireEvent(new EndSteppingRangeEvent(getSession(), tasks, loc));
@@ -220,13 +228,15 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 	public void handleProcessTerminatedEvent(BitList tasks) {
 		fireEvent(new InferiorExitedEvent(getSession(), tasks));
 	}
-	public void handleProcessSignaledEvent(BitList tasks, ICDILocator locator) {
+	public void handleProcessSignaledEvent(BitList tasks, IPCDILocator locator) {
 		fireEvent(new InferiorSignaledEvent(getSession(), tasks, locator));
 	}
 	public void handleErrorEvent(BitList tasks, String errMsg, int errCode) {
 		System.err.println("----- debugger error: " + errMsg + " ------------");
 		if (errCode == IPCDIErrorEvent.DBG_FATAL) {
-			tasks = ((Session)session).createBitList();
+			if (session != null) {
+				tasks = ((Session)session).createBitList();
+			}
 		}
 		fireEvent(new ErrorEvent(getSession(), tasks, errMsg, errCode));
 	}

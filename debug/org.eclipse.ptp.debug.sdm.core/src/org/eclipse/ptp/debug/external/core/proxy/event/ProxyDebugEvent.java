@@ -84,6 +84,11 @@ public class ProxyDebugEvent extends ProxyEvent {
 			evt = new ProxyDebugExitEvent(set, status);
 			break;
 			
+		case IProxyDebugEvent.EVENT_DBG_SUSPEND:
+			IPCDILocator suspendLoc = toLocator(args[3], args[4], args[5], args[6]);
+			evt = new ProxyDebugSuspendEvent(set, suspendLoc);
+			break;
+			
 		case IProxyDebugEvent.EVENT_DBG_STEP:
 			ProxyDebugStackframe frame = toFrame(args[2], args[3], args[4], args[6], args[5]);
 			evt = new ProxyDebugStepEvent(set, frame);

@@ -25,7 +25,6 @@ import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.IDebugCommand;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
-import org.eclipse.ptp.debug.core.cdi.event.IPCDIErrorEvent;
 
 /**
  * @author Clement chu
@@ -59,7 +58,7 @@ public class DebugCommandQueue extends Thread {
 				currentCommand.execCommand(debugger, command_timeout);
 				currentCommand.waitForReturn();
 			} catch (PCDIException e) {
-				debugger.handleErrorEvent(currentCommand.getTasks(), e.getMessage(), IPCDIErrorEvent.DBG_ERROR);
+				debugger.handleErrorEvent(currentCommand.getTasks(), e.getMessage(), e.getErrorCode());
 			} finally {
 				currentCommand = null;
 			}

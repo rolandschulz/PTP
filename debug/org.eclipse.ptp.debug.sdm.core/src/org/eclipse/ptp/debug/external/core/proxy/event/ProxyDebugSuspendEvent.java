@@ -16,47 +16,24 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-
 package org.eclipse.ptp.debug.external.core.proxy.event;
 
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDILocator;
 
-
-public class ProxyDebugSignalEvent extends AbstractProxyDebugEvent implements IProxyDebugEvent {
-	private String		signalName;
-	private String		signalMeaning;
-	private int			threadID;
-	private IPCDILocator	locator;
+public class ProxyDebugSuspendEvent extends AbstractProxyDebugEvent implements IProxyDebugEvent {
+	private IPCDILocator loc;
 	
-	public ProxyDebugSignalEvent(BitList set, String name, String meaning, int tid, IPCDILocator loc) {
-		super(EVENT_DBG_SIGNAL, set);
-		this.signalName = name;
-		this.signalMeaning = meaning;
-		this.threadID = tid;
-		this.locator = loc;
-	}
-	
-	public String getSignalName() {
-		return this.signalName;
-	}
-	
-	public String getSignalMeaning() {
-		return this.signalMeaning;
-	}
-	
-	public int getThreadID() {
-		return this.threadID;
+	public ProxyDebugSuspendEvent(BitList set, IPCDILocator loc) {
+		super(EVENT_DBG_SUSPEND, set);
+		this.loc = loc;
 	}
 	
 	public IPCDILocator getLocator() {
-		return this.locator;
+		return this.loc;
 	}
 	
 	public String toString() {
-		String res = "EVENT_DBG_SIGNAL " + this.getBitSet().toString() + " " + this.signalName;
-		if (this.locator != null)
-			res += " " + locator.toString();
-		return res;
+		return "EVENT_DBG_SUSPEND " + this.getBitSet().toString() + " " + this.loc.toString();
 	}
 }

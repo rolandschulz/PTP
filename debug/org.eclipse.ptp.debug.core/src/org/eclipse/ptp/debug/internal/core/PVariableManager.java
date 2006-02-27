@@ -19,9 +19,14 @@
 package org.eclipse.ptp.debug.internal.core;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.core.IPJob;
+import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.PCDIDebugModel;
 import org.eclipse.ptp.debug.core.aif.AIFException;
 import org.eclipse.ptp.debug.core.aif.IAIF;
@@ -34,17 +39,18 @@ import org.eclipse.ptp.debug.core.model.IPVariableManager;
  * 
  */
 public class PVariableManager implements IPVariableManager {
+	private Map jobList = new HashMap(); 
 	private List variables = new ArrayList();
 	private PCDIDebugModel debugModel = null;
 	
 	public PVariableManager(PCDIDebugModel debugModel) {
 		this.debugModel = debugModel;
 	}	
-	
 	public void shutdown() {
 		variables.clear();
+		jobList.clear();
 	}
-	
+
 	public void addVariable(String variable_name) {
 		if (!variables.contains(variable_name))
 			variables.add(variable_name);
@@ -58,6 +64,19 @@ public class PVariableManager implements IPVariableManager {
 	}
 	public void removeAllVariables() {
 		variables.clear();
+	}
+
+	//public List 
+	public void updateVariables(IPJob job, String set_id, IProgressMonitor monitor) throws CoreException {
+		
+		BitList tasks = debugModel.getTasks(job.getIDString(), set_id);
+		int total = tasks.cardinality();
+		monitor.beginTask("Updating " + total + " variables info...", total);
+		
+	}
+	
+	public void refresh(IPJob job) {
+		
 	}
 	
 	public String getValues(IPJob job, int taskID) {

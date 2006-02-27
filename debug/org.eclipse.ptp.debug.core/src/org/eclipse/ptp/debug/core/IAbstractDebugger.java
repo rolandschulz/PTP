@@ -24,7 +24,6 @@ package org.eclipse.ptp.debug.core;
 
 import java.util.Observer;
 import org.eclipse.cdt.core.IBinaryParser.IBinaryObject;
-import org.eclipse.cdt.debug.core.cdi.ICDILocator;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.core.IPJob;
@@ -33,6 +32,7 @@ import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.core.util.Queue;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDILocator;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 
 public interface IAbstractDebugger extends IDebugger {
@@ -66,7 +66,7 @@ public interface IAbstractDebugger extends IDebugger {
 	public void handleEndSteppingEvent(BitList tasks, int lineNumber, String filename);
 	public void handleProcessResumedEvent(BitList tasks);
 	public void handleProcessTerminatedEvent(BitList tasks);
-	public void handleProcessSignaledEvent(BitList tasks, ICDILocator locator);
+	public void handleProcessSignaledEvent(BitList tasks, IPCDILocator locator);
 	public void handleErrorEvent(BitList tasks, String errMsg);
 	public void handleErrorEvent(BitList tasks, String errMsg, int errCode);
 	

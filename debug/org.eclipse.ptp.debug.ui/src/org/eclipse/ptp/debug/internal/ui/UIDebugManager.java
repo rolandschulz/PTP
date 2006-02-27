@@ -59,6 +59,7 @@ import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEventListener;
+import org.eclipse.ptp.debug.core.cdi.event.IPCDISuspendedEvent;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIBreakpoint;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDILocationBreakpoint;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDILocator;
@@ -533,48 +534,43 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 				fireRegListener(UNREG_TYPE, event.getAllUnregisteredProcesses());
 			}
 			*/
-			if (event instanceof BreakpointHitEvent) {
-				BreakpointHitEvent bptHitEvent = (BreakpointHitEvent) event;
-				IPCDIBreakpoint bpt = ((BreakpointHitInfo) bptHitEvent.getReason()).getBreakpoint();
-				if (bpt instanceof IPCDILocationBreakpoint) {
-					IPCDILocator locator = ((IPCDILocationBreakpoint) bpt).getLocator();
-					int lineNumber = locator.getLineNumber();
-					if (lineNumber == 0)
-						lineNumber = 1;
-					String fileName = workingDebugDir + "/" + locator.getFile();
-					try {
-						annotationMgr.addAnnotation(job.getIDString(), fileName, lineNumber, event.getAllUnregisteredProcesses(), false);
-						annotationMgr.addAnnotation(job.getIDString(), fileName, lineNumber, event.getAllRegisteredProcesses(), true);
-					} catch (final CoreException e) {
-						PTPDebugUIPlugin.getDisplay().asyncExec(new Runnable() {
-							public void run() {
-								PTPDebugUIPlugin.errorDialog("Error", e);
-							}
-						});
+			if (event instanceof IPCDISuspendedEvent) {
+				int lineNumber = 0;
+				String fileName = workingDebugDir + "/";
+				if (event instanceof BreakpointHitEvent) {
+					IPCDIBreakpoint bpt = ((BreakpointHitInfo) ((BreakpointHitEvent) event).getReason()).getBreakpoint();
+					if (bpt instanceof IPCDILocationBreakpoint) {
+						IPCDILocator locator = ((IPCDILocationBreakpoint) bpt).getLocator();
+						lineNumber = locator.getLineNumber();
+						fileName += locator.getFile();
+					}
+				} 
+				else if (event instanceof EndSteppingRangeEvent) {
+					ICDILineLocation lineLocation = ((EndSteppingRangeInfo) ((EndSteppingRangeEvent) event).getReason()).getLineLocation();
+					if (lineLocation != null) {
+						lineNumber = lineLocation.getLineNumber();
+						fileName += lineLocation.getFile();
 					}
 				}
-				fireSuspendEvent(job, event.getAllProcesses());
-			} else if (event instanceof EndSteppingRangeEvent) {
-				EndSteppingRangeEvent endStepEvent = (EndSteppingRangeEvent) event;
-				ICDILineLocation lineLocation = ((EndSteppingRangeInfo) endStepEvent.getReason()).getLineLocation();
-				if (lineLocation != null) {
-					int lineNumber = lineLocation.getLineNumber();
-					if (lineNumber == 0)
-						lineNumber = 1;
-					String fileName = workingDebugDir + "/" + lineLocation.getFile();
-					try {
-						annotationMgr.addAnnotation(job.getIDString(), fileName, lineNumber, event.getAllUnregisteredProcesses(), false);
-						annotationMgr.addAnnotation(job.getIDString(), fileName, lineNumber, event.getAllRegisteredProcesses(), true);
-					} catch (final CoreException e) {
-						PTPDebugUIPlugin.getDisplay().asyncExec(new Runnable() {
-							public void run() {
-								PTPDebugUIPlugin.errorDialog("Error", e);
-							}
-						});
+				else {
+					ICDILocator locator = ((InferiorSignaledEvent) event).getLocator();
+					if (locator != null) {
+						lineNumber = locator.getLineNumber();
+						fileName += locator.getFile();
 					}
 				}
-				// System.out.println("-------------------- end stepping ------------------------");
-				// annotationMgr.printBitList(event.getAllProcesses().toBitList());
+				if (lineNumber == 0)
+					lineNumber = 1;
+				try {
+					annotationMgr.addAnnotation(job.getIDString(), fileName, lineNumber, event.getAllUnregisteredProcesses(), false);
+					annotationMgr.addAnnotation(job.getIDString(), fileName, lineNumber, event.getAllRegisteredProcesses(), true);
+				} catch (final CoreException e) {
+					PTPDebugUIPlugin.getDisplay().asyncExec(new Runnable() {
+						public void run() {
+							PTPDebugUIPlugin.errorDialog("Error", e);
+						}
+					});
+				}
 				fireSuspendEvent(job, event.getAllProcesses());
 			} else if (event instanceof InferiorResumedEvent) {
 				try {
@@ -622,28 +618,6 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 						}
 					});
 				}
-			} else if (event instanceof InferiorSignaledEvent) {
-				InferiorSignaledEvent signalEvent = (InferiorSignaledEvent) event;
-				ICDILocator locator = signalEvent.getLocator();
-				if (locator != null) {
-					int lineNumber = locator.getLineNumber();
-					if (lineNumber == 0)
-						lineNumber = 1;
-					String fileName = workingDebugDir + "/" + locator.getFile();
-					try {
-						annotationMgr.addAnnotation(job.getIDString(), fileName, lineNumber, event.getAllUnregisteredProcesses(), false);
-						annotationMgr.addAnnotation(job.getIDString(), fileName, lineNumber, event.getAllRegisteredProcesses(), true);
-					} catch (final CoreException e) {
-						PTPDebugUIPlugin.getDisplay().asyncExec(new Runnable() {
-							public void run() {
-								PTPDebugUIPlugin.errorDialog("Error", e);
-							}
-						});
-					}
-				}
-				// System.out.println("-------------------- suspend ------------------------");
-				// annotationMgr.printBitList(event.getAllProcesses().toBitList());
-				fireSuspendEvent(job, event.getAllProcesses());
 			} else if (event instanceof BreakpointCreatedEvent) {
 				// do nothing in breakpoint created event
 				continue;
