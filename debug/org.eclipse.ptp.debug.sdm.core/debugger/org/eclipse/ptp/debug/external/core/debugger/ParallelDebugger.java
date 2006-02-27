@@ -126,7 +126,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 	
 	public void startDebugger(IPJob job) throws CoreException {
 		try {
-			String app = (String) job.getAttribute(PreferenceConstants.JOB_APP_NAME) + "asdasd";
+			String app = (String) job.getAttribute(PreferenceConstants.JOB_APP_NAME);
 			String path = (String) job.getAttribute(PreferenceConstants.JOB_APP_PATH);
 			String dir = (String) job.getAttribute(PreferenceConstants.JOB_WORK_DIR);
 			String[] args = (String[]) job.getAttribute(PreferenceConstants.JOB_ARGS);
