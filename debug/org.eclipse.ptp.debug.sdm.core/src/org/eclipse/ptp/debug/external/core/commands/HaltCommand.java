@@ -18,10 +18,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.core.commands;
 
-import org.eclipse.cdt.debug.core.cdi.ICDILocator;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDILocator;
 
 /**
  * @author Clement chu
@@ -44,8 +44,8 @@ public class HaltCommand extends AbstractDebugCommand {
 	}
 	public void waitFinish(IAbstractDebugger debugger) throws PCDIException {
 		if (waitForReturn()) {
-			if (result instanceof ICDILocator) {
-				debugger.handleProcessSignaledEvent(tasks, (ICDILocator)result);
+			if (result instanceof IPCDILocator) {
+				debugger.handleProcessSignaledEvent(tasks, (IPCDILocator)result);
 				return;
 			}
 		}

@@ -38,6 +38,7 @@ public interface IProxyDebugEvent extends IProxyEvent {
 	public static final int EVENT_DBG_INIT = DBG_EVENT_OFFSET + 10;
 	public static final int EVENT_DBG_OK = DBG_EVENT_OFFSET + 11;
 	public static final int EVENT_DBG_ERROR = DBG_EVENT_OFFSET + 12;
+	public static final int EVENT_DBG_SUSPEND = DBG_EVENT_OFFSET + 13;
 	
 	public BitList getBitSet();
 }

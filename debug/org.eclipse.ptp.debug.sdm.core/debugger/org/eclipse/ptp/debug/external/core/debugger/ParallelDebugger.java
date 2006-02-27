@@ -60,6 +60,7 @@ import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugInitEvent;
 import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugSignalEvent;
 import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugStackframeEvent;
 import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugStepEvent;
+import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugSuspendEvent;
 import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugTypeEvent;
 import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugVarsEvent;
 
@@ -125,7 +126,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 	
 	public void startDebugger(IPJob job) throws CoreException {
 		try {
-			String app = (String) job.getAttribute(PreferenceConstants.JOB_APP_NAME);
+			String app = (String) job.getAttribute(PreferenceConstants.JOB_APP_NAME) + "asdasd";
 			String path = (String) job.getAttribute(PreferenceConstants.JOB_APP_PATH);
 			String dir = (String) job.getAttribute(PreferenceConstants.JOB_WORK_DIR);
 			String[] args = (String[]) job.getAttribute(PreferenceConstants.JOB_ARGS);
@@ -334,6 +335,11 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			handleBreakpointHitEvent(e.getBitSet(), bptHitEvent.getBreakpointId());
 			break;
 			
+		case IProxyDebugEvent.EVENT_DBG_SUSPEND:
+			ProxyDebugSuspendEvent suspendEvent = (ProxyDebugSuspendEvent)e;
+			handleSuspendEvent(e.getBitSet(), suspendEvent.getLocator());
+			break;
+			
 		case IProxyDebugEvent.EVENT_DBG_STEP:
 			ProxyDebugStepEvent stepEvent = (ProxyDebugStepEvent)e;
 			handleEndSteppingEvent(e.getBitSet(), stepEvent.getFrame().getLocator().getLineNumber(), stepEvent.getFrame().getLocator().getFile());
@@ -424,7 +430,6 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 		case IProxyDebugEvent.EVENT_DBG_ERROR:
 			System.err.println("======================= EVENT_DBG_ERROR ====================");
 			ProxyDebugErrorEvent errEvent = (ProxyDebugErrorEvent)e;
-			completeCommand(e.getBitSet(), null);
 			int code = errEvent.getErrorCode();
 			if (code == IParallelDebuggerConstants.DBGERR_DEBUGGER || code == IParallelDebuggerConstants.DBGERR_NOFILEDIR || code == IParallelDebuggerConstants.DBGERR_CHDIR) {
 				code = IPCDIErrorEvent.DBG_FATAL;
@@ -432,7 +437,8 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			else {
 				code = IPCDIErrorEvent.DBG_ERROR;
 			}
-			handleErrorEvent(e.getBitSet(), errEvent.getErrorMessage(), code);
+			completeCommand(e.getBitSet(), new PCDIException(errEvent.getErrorMessage(), code));
+			//handleErrorEvent(e.getBitSet(), errEvent.getErrorMessage(), code);
 			break;
 		}
 	}
