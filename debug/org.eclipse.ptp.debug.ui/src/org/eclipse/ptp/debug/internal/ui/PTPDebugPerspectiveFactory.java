@@ -20,6 +20,7 @@ package org.eclipse.ptp.debug.internal.ui;
 
 import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
+import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.search.ui.NewSearchUI;
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
@@ -56,7 +57,8 @@ public class PTPDebugPerspectiveFactory implements IPerspectiveFactory {
 		
 		// set toolbar or menu icon
 		layout.addActionSet(IDebugUIConstants.LAUNCH_ACTION_SET);
-
+		layout.addActionSet(IPTPUIConstants.ACTION_SET);
+		
 		// views - short cut
 		layout.addShowViewShortcut(IConsoleConstants.ID_CONSOLE_VIEW);
 		layout.addShowViewShortcut(NewSearchUI.SEARCH_VIEW_ID);
