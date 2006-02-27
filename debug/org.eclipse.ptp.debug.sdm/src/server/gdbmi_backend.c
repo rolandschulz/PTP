@@ -269,6 +269,16 @@ AsyncStop(void *data)
 		e->bpid = LocalToRemoteBP(evt->bkptno);
 		break;
 
+	case MIEventTypeSuspended:
+		if (get_current_frame(&frame) < 0) {
+			ERROR_TO_EVENT(e);
+		} else {
+			e = NewDbgEvent(DBGEV_SUSPEND);
+			e->thread_id = evt->threadId;
+			e->frame = frame;
+		}
+		break;
+
 	case MIEventTypeSteppingRange:
 		if (get_current_frame(&frame) < 0) {
 			ERROR_TO_EVENT(e);
@@ -573,7 +583,6 @@ SetAndCheckBreak(int bpid, int isTemp, int isHard, char *where, char *condition,
 	}
 
 	bpts = MIBreakpointGetBreakInsertInfo(cmd);
-
 	MICommandFree(cmd);
 			
 	if (bpts == NULL) {
@@ -584,7 +593,10 @@ SetAndCheckBreak(int bpid, int isTemp, int isHard, char *where, char *condition,
 	SetList(bpts);
 	bpt = (MIBreakpoint *)GetListElement(bpts);
 	
-	AddBPMap(bpt->number, bpid);
+	//only add bpt which is not temporary
+	if (!isTemp) {
+		AddBPMap(bpt->number, bpid);
+	}
 	
 	bp = NewBreakpoint(bpt->number);
 

@@ -170,9 +170,16 @@ DbgEventToStr(dbg_event *e, char **result)
 		asprintf(result, "%d %s %d", e->event, pstr, e->exit_status);
 		break;
 
+	case DBGEV_SUSPEND:
+		dbg_stackframe_to_str(e->frame, &str);
+		asprintf(result, "%d %s %s %d", e->event, pstr, str, e->thread_id);
+		free(str);
+		break;
+
 	case DBGEV_STEP:
 		dbg_stackframe_to_str(e->frame, &str);
 		asprintf(result, "%d %s %s", e->event, pstr, str);
+		free(str);
 		break;
 
 	case DBGEV_FRAMES:
@@ -407,6 +414,12 @@ DbgStrToEvent(char *str, dbg_event **ev)
 			goto error_out;
 		break;
 	
+	case DBGEV_SUSPEND:
+		e = NewDbgEvent(DBGEV_SUSPEND);
+		if (proxy_str_to_int(args[3], &e->thread_id) < 0 || dbg_str_to_stackframe(&args[2], &e->frame) < 0)
+			goto error_out;
+		break;
+	
 	case DBGEV_STEP:
 		e = NewDbgEvent(DBGEV_STEP);
 		if (dbg_str_to_stackframe(&args[2], &e->frame) < 0)
@@ -487,6 +500,11 @@ FreeDbgEvent(dbg_event *e) {
 	case DBGEV_BPHIT:
 		break;
 		
+	case DBGEV_SUSPEND:
+		if (e->frame != NULL)
+			FreeStackframe(e->frame);
+		break;
+			
 	case DBGEV_STEP:
 		if (e->frame != NULL)
 			FreeStackframe(e->frame);
