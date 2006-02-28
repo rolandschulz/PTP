@@ -224,7 +224,7 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 	public static Display getStandardDisplay() {
 		Display display;
 		display = Display.getCurrent();
-		if ( display == null )
+		if (display == null)
 			display = Display.getDefault();
 		return display;
 	}

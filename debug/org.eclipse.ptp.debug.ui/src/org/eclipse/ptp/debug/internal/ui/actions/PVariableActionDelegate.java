@@ -31,16 +31,24 @@ import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IObjectActionDelegate;
+import org.eclipse.ui.IViewActionDelegate;
+import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.actions.ActionDelegate;
 
 /**
  * @author Clement chu
  * 
  */
-public abstract class PVariableActionDelegate implements IObjectActionDelegate {
+public abstract class PVariableActionDelegate extends ActionDelegate implements IObjectActionDelegate, IViewActionDelegate {
 	private IPVariable[] fVariables = null;
+	private IViewPart fView = null; 
 
+	public void init(IViewPart view) {
+		fView = view;
+	}
+	
 	public void setActivePart(IAction action, IWorkbenchPart targetPart) {}
 
 	public void run(IAction action) {
@@ -81,9 +89,9 @@ public abstract class PVariableActionDelegate implements IObjectActionDelegate {
 				}
 			}
 			setVariables((IPVariable[])list.toArray(new IPVariable[list.size()]));
+			action.setEnabled(list.size() > 0);
 		}
 		else {
-			action.setChecked(false);
 			action.setEnabled(false);
 		}
 	}
@@ -96,4 +104,11 @@ public abstract class PVariableActionDelegate implements IObjectActionDelegate {
 		fVariables = variables;
 	}
 	protected abstract void doAction(IPVariable[] vars) throws DebugException;
+	
+	protected IViewPart getView() {
+		return fView;
+	}
+	protected void setView( IViewPart viewPart ) {
+		fView = viewPart;
+	}	
 }

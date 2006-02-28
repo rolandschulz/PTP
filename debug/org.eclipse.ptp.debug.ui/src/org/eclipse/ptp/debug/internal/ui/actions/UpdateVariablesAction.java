@@ -18,18 +18,27 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.ui.actions;
 
-import org.eclipse.debug.core.DebugException;
-import org.eclipse.jface.action.IAction;
-import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
-import org.eclipse.ptp.debug.core.model.IPVariable;
-
+import org.eclipse.ptp.debug.internal.ui.UIDebugManager;
+import org.eclipse.ptp.debug.ui.views.ParallelDebugView;
+import org.eclipse.ptp.ui.IManager;
+import org.eclipse.ptp.ui.model.IElement;
 /**
- * @author Clement chu
- * 
+ * @author clement chu
+ *
  */
-public class RemoveAllPVariableActionDelegate extends PVariableActionDelegate {
-	public void run(IAction action) {
-		PTPDebugCorePlugin.getPVariableManager().removeAllVariables();
+public class UpdateVariablesAction extends DebugAction {
+	public static final String name = "Update variables";
+	
+	public UpdateVariablesAction(ParallelDebugView view) {
+		super(name, view);
+		setEnabled(true);
+	}	
+	public void run() {
+		IManager manager = view.getUIManager();
+		if (manager instanceof UIDebugManager) {
+			((UIDebugManager)manager).updateDebugVariables();
+		}
 	}
-	protected void doAction(IPVariable[] vars) throws DebugException {}
+
+	public void run(IElement[] elements) {}
 }

@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.PCDIDebugModel;
@@ -66,24 +68,59 @@ public class PVariableManager implements IPVariableManager {
 		variables.clear();
 	}
 
-	//public List 
+	public String[] getVariables(IPJob job) {
+		if (jobList.containsKey(job.getIDString())) {
+			return (String[])jobList.get(job.getIDString());
+		}
+		return new String[job.totalProcesses()];
+	}
+	public void setVariable(String job_id, String[] variableTexts) {
+		jobList.put(job_id, variableTexts);
+	}
 	public void updateVariables(IPJob job, String set_id, IProgressMonitor monitor) throws CoreException {
-		
-		BitList tasks = debugModel.getTasks(job.getIDString(), set_id);
-		int total = tasks.cardinality();
-		monitor.beginTask("Updating " + total + " variables info...", total);
-		
-	}
-	
-	public void refresh(IPJob job) {
-		
-	}
-	
-	public String getValues(IPJob job, int taskID) {
+		if (variables.size() == 0) {
+			monitor.done();
+			return;
+		}
+		if (job == null) {
+			throw new CoreException(new Status(IStatus.ERROR, PCDIDebugModel.getPluginIdentifier(), IStatus.ERROR, "No job", null));
+		}
 		IPCDISession session = debugModel.getPCDISession(job);
 		if (session == null) {
-			return "No session found.";
+			throw new CoreException(new Status(IStatus.ERROR, PCDIDebugModel.getPluginIdentifier(), IStatus.ERROR, "No session found", null));
 		}
+
+		String[] variableTexts = getVariables(job);
+		BitList taskList = debugModel.getTasks(job.getIDString(), set_id);
+		int[] tasks = taskList.toArray();
+		monitor.beginTask("Updating " + tasks.length + " variables info...", tasks.length);
+		for (int i=0; i<tasks.length; i++) {
+			if (!monitor.isCanceled()) {
+				variableTexts[tasks[i]] = getValue(session, tasks[i]);
+				monitor.worked(1);
+			}
+		}
+		setVariable(job.getIDString(), variableTexts);
+		monitor.done();
+	}
+	
+	public void cleanVariables(IPJob job) {
+		if (jobList.containsKey(job.getIDString())) {
+			jobList.remove(job.getIDString());
+		}
+	}
+	
+	public String getValueText(IPJob job, int taskID) {
+		String[] variableTexts = getVariables(job);
+		if (variableTexts.length > 0 && taskID < variableTexts.length) {
+			if (variableTexts[taskID] != null) {
+				return variableTexts[taskID];
+			}
+		}
+		return "No value found.";
+	}
+	
+	private String getValue(IPCDISession session, int taskID) {
 		String content = "";
 		for (Iterator i=variables.iterator(); i.hasNext();) {
 			String variable = (String)i.next();
@@ -101,4 +138,3 @@ public class PVariableManager implements IPVariableManager {
 		return content;
 	}
 }
-

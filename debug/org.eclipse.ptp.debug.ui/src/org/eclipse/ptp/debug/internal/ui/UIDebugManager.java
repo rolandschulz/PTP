@@ -69,6 +69,7 @@ import org.eclipse.ptp.debug.core.launch.PDebugTargetRegisterEvent;
 import org.eclipse.ptp.debug.core.launch.PDebugTargetUnRegisterEvent;
 import org.eclipse.ptp.debug.core.launch.PLaunchStartedEvent;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
+import org.eclipse.ptp.debug.core.model.IPVariableManager;
 import org.eclipse.ptp.debug.external.core.cdi.BreakpointHitInfo;
 import org.eclipse.ptp.debug.external.core.cdi.EndSteppingRangeInfo;
 import org.eclipse.ptp.debug.external.core.cdi.event.BreakpointCreatedEvent;
@@ -88,6 +89,7 @@ import org.eclipse.ptp.debug.ui.listeners.IDebugActionUpdateListener;
 import org.eclipse.ptp.debug.ui.listeners.IRegListener;
 import org.eclipse.ptp.internal.ui.JobManager;
 import org.eclipse.ptp.ui.OutputConsole;
+import org.eclipse.ptp.ui.UIMessage;
 import org.eclipse.ptp.ui.UIUtils;
 import org.eclipse.ptp.ui.listeners.ISetListener;
 import org.eclipse.ptp.ui.model.IElement;
@@ -108,11 +110,13 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	private PAnnotationManager annotationMgr = null;
 	private PCDIDebugModel debugModel = null;
 	private Map consoleWindows = new HashMap();
+	private IPVariableManager variableManager = null;
 
 	public UIDebugManager() {
 		addSetListener(this);
 		DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener(this);
 		debugModel = PTPDebugCorePlugin.getDebugModel();
+		variableManager = PTPDebugCorePlugin.getPVariableManager();
 		debugModel.addLaunchListener(this);
 		annotationMgr = new PAnnotationManager(this);
 	}
@@ -124,6 +128,13 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		annotationMgr.shutdown();
 		super.shutdown();
 	}
+	public IPVariableManager getPVariableManager() {
+		return variableManager;
+	}
+	public String getValueText(IPJob job, int taskID) {
+		return variableManager.getValueText(job, taskID);
+	}
+	
 	private void defaultRegister(IPCDISession session) { // register process 0 if the preference is checked
 		if (PTPDebugUIPlugin.getDefault().getPreferenceStore().getBoolean(IPDebugConstants.PREF_PTP_DEBUG_REGISTER_PROC_0)) {
 			IPProcess proc = session.getJob().findProcessByTaskId(0);
@@ -571,8 +582,11 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 						}
 					});
 				}
+				
+				updateDebugVariables(job);
 				fireSuspendEvent(job, event.getAllProcesses());
 			} else if (event instanceof InferiorResumedEvent) {
+				variableManager.cleanVariables(job);
 				try {
 					annotationMgr.removeAnnotation(job.getIDString(), event.getAllProcesses());
 				} catch (final CoreException e) {
@@ -738,5 +752,30 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			debugModel.shutdownSession(job);
 		}
 		super.removeJob(job);
+	}
+	
+	public void updateDebugVariables() {
+		updateDebugVariables(findJobById(getCurrentJobId()));
+	}
+	public void updateDebugVariables(final IPJob pJob) {
+		final Job job = new Job(UIMessage.REFRESH_SYSTEM_JOB_NAME) {
+			public IStatus run(final IProgressMonitor monitor) {
+				if (!monitor.isCanceled()) {
+					try {
+						variableManager.updateVariables(pJob, getCurrentSetId(), monitor);
+					} catch (CoreException e) {
+						return e.getStatus();
+					}
+				}
+				return Status.OK_STATUS;
+			}
+		};
+		job.setPriority(Job.INTERACTIVE);
+		PTPDebugUIPlugin.getDisplay().asyncExec(new Runnable() {
+			public void run() {
+				PlatformUI.getWorkbench().getProgressService().showInDialog(PTPDebugUIPlugin.getActiveWorkbenchShell(), job);
+			}
+		});
+		job.schedule();
 	}
 }

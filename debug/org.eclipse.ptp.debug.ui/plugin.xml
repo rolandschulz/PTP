@@ -291,31 +291,21 @@
       <objectContribution
 			objectClass="org.eclipse.ptp.debug.core.model.IPVariable"
             id="org.eclipse.ptp.debug.ui.PVariableActions">
+         <menu
+               label="PVariableMenu"
+               id="org.eclipse.ptp.debug.ui.PVariableMenu">
+            <separator
+                  name="pVarGroup">
+            </separator>
+         </menu>
          <action
-               label="%AddPVariableAction.label"
-               helpContextId="ptp_variable_action_context"
-               class="org.eclipse.ptp.debug.internal.ui.actions.AddPVariableActionDelegate"
-               enablesFor="1"
-               id="org.eclipse.ptp.debug.internal.ui.actions.AddPVariableActionDelegate">
-         </action>
-         <action
-               label="%RemovePVariableAction.label"
-               helpContextId="ptp_variable_action_context"
-               class="org.eclipse.ptp.debug.internal.ui.actions.RemovePVariableActionDelegate"
-               enablesFor="1"
-               id="org.eclipse.ptp.debug.internal.ui.actions.RemovePVariableActionDelegate">
-         </action>
-      </objectContribution>
-      <viewerContribution
-            targetID="org.eclipse.debug.ui.VariableView"
-            id="org.eclipse.debug.ui.variablesView.popupMenu">
-         <action
-               helpContextId="remove_all_ptp_variable_action_context"
-               enablesFor="*"
+               helpContextId="ptp_all_variables_action_context"
                label="%RemoveAllPVariableAction.label"
                tooltip="%RemoveAllPVariableAction.tooltip"
+	           icon="icons/debug/ptp_bpt_set.gif"
+               enablesFor="*"
+               menubarPath="pVarGroup"
                class="org.eclipse.ptp.debug.internal.ui.actions.RemoveAllPVariableActionDelegate"
-               menubarPath="additions"
                id="org.eclipse.ptp.debug.internal.ui.actions.RemoveAllPVariableActionDelegate">
             <enablement>
                <pluginState
@@ -323,8 +313,83 @@
                      id="org.eclipse.ptp.debug.ui"/>
             </enablement>
          </action>
-      </viewerContribution>
-      <!-- variable end -->            
+         <action
+               helpContextId="ptp_remove_variable_action_context"
+               label="%RemovePVariableAction.label"
+               tooltip="%RemovePVariableAction.tooltip"
+	           icon="icons/debug/ptp_bpt_set.gif"
+               menubarPath="pVarGroup"
+               enablesFor="1"
+               class="org.eclipse.ptp.debug.internal.ui.actions.RemovePVariableActionDelegate"
+               id="org.eclipse.ptp.debug.internal.ui.actions.RemovePVariableActionDelegate">
+         </action>
+         <action
+               helpContextId="ptp_add_variable_action_context"
+               label="%AddPVariableAction.label"
+               tooltip="%AddPVariableAction.tooltip"
+	           icon="icons/debug/ptp_bpt_set.gif"
+               menubarPath="pVarGroup"
+               enablesFor="1"
+               class="org.eclipse.ptp.debug.internal.ui.actions.AddPVariableActionDelegate"
+               id="org.eclipse.ptp.debug.internal.ui.actions.AddPVariableActionDelegate">
+         </action>
+      </objectContribution>
+      <!-- variable end -->
+   </extension>
+
+   <extension
+         point="org.eclipse.ui.viewActions">
+	  <!-- variable toolbar start //-->
+      <viewContribution
+            targetID="org.eclipse.debug.ui.VariableView"
+            id="org.eclipse.debug.ui.variablesView.toolbar">
+         <menu
+               label="PVariableMenu"
+               id="org.eclipse.ptp.debug.ui.PVariableMenu">
+            <separator
+                  name="pVarGroup">
+            </separator>
+         </menu>
+         <action
+               helpContextId="ptp_all_variables_action_context"
+               label="%RemoveAllPVariableAction.label"
+               tooltip="%RemoveAllPVariableAction.tooltip"
+	           icon="icons/debug/ptp_bpt_set.gif"
+               disabledIcon="icons/ptpdebug.gif"
+               enablesFor="*"
+               toolbarPath="pVarGroup"
+               class="org.eclipse.ptp.debug.internal.ui.actions.RemoveAllPVariableActionDelegate"
+               id="org.eclipse.ptp.debug.internal.ui.actions.RemoveAllPVariableActionDelegate">
+            <enablement>
+               <pluginState
+                     value="activated"
+                     id="org.eclipse.ptp.debug.ui"/>
+            </enablement>
+         </action>
+         <action
+               helpContextId="ptp_remove_variable_action_context"
+               label="%RemovePVariableAction.label"
+               tooltip="%RemovePVariableAction.tooltip"
+	           icon="icons/debug/ptp_bpt_set.gif"
+               disabledIcon="icons/ptpdebug.gif"
+               enablesFor="1"
+               toolbarPath="pVarGroup"
+               class="org.eclipse.ptp.debug.internal.ui.actions.RemovePVariableActionDelegate"
+               id="org.eclipse.ptp.debug.internal.ui.actions.RemovePVariableActionDelegate">
+         </action>
+         <action
+               helpContextId="ptp_add_variable_action_context"
+               label="%AddPVariableAction.label"
+               tooltip="%AddPVariableAction.tooltip"
+	           icon="icons/debug/ptp_bpt_set.gif"
+               disabledIcon="icons/ptpdebug.gif"
+               enablesFor="1"
+               toolbarPath="pVarGroup"
+               class="org.eclipse.ptp.debug.internal.ui.actions.AddPVariableActionDelegate"
+               id="org.eclipse.ptp.debug.internal.ui.actions.AddPVariableActionDelegate">
+         </action>
+      </viewContribution>      
+	  <!-- variable toolbar end //-->
    </extension>
 
    <extension

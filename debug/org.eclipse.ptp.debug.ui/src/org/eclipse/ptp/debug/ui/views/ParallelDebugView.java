@@ -26,7 +26,6 @@ import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IAbstractDebugger;
-import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.internal.ui.UIDebugManager;
 import org.eclipse.ptp.debug.internal.ui.actions.RegisterAction;
 import org.eclipse.ptp.debug.internal.ui.actions.ResumeAction;
@@ -36,6 +35,7 @@ import org.eclipse.ptp.debug.internal.ui.actions.StepReturnAction;
 import org.eclipse.ptp.debug.internal.ui.actions.SuspendAction;
 import org.eclipse.ptp.debug.internal.ui.actions.TerminateAction;
 import org.eclipse.ptp.debug.internal.ui.actions.UnregisterAction;
+import org.eclipse.ptp.debug.internal.ui.actions.UpdateVariablesAction;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.debug.ui.events.IDebugActionEvent;
 import org.eclipse.ptp.debug.ui.events.IResumedDebugEvent;
@@ -49,6 +49,7 @@ import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.ptp.ui.views.IIconCanvasActionListener;
 import org.eclipse.ptp.ui.views.ParallelJobView;
+import org.eclipse.ui.IActionBars;
 
 /**
  * @author clement chu
@@ -65,7 +66,7 @@ public class ParallelDebugView extends ParallelJobView implements IDebugActionUp
 	protected ParallelAction stepReturnAction = null;
 	protected ParallelAction registerAction = null;
 	protected ParallelAction unregisterAction = null;
-
+	
 	public ParallelDebugView() {
 		instance = this;
 		manager = PTPDebugUIPlugin.getDefault().getUIDebugManager();
@@ -109,8 +110,20 @@ public class ParallelDebugView extends ParallelJobView implements IDebugActionUp
 		toolBarMgr.appendToGroup(IPTPUIConstants.IUIACTIONGROUP, new Separator());
 		toolBarMgr.appendToGroup(IPTPUIConstants.IUIACTIONGROUP, registerAction);
 		toolBarMgr.appendToGroup(IPTPUIConstants.IUIACTIONGROUP, unregisterAction);
+		
 		super.buildInToolBarActions(toolBarMgr);
+		
+		createOrientationActions();
 	}
+	protected void createOrientationActions() {
+		IActionBars actionBars = getViewSite().getActionBars();
+		IMenuManager viewMenu = actionBars.getMenuManager();
+		
+		viewMenu.add(new Separator());
+		viewMenu.add(new UpdateVariablesAction(this));
+		viewMenu.add(new Separator());		
+	}
+	
 	/*******************************************************************************************************************************************************************************************************************************************************************************************************
 	 * IIconCanvasActionListener
 	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
@@ -136,7 +149,7 @@ public class ParallelDebugView extends ParallelJobView implements IDebugActionUp
 	public String getToolTipText(Object obj) {
 		String tooltip = super.getToolTipText(obj);
 		IPJob job = ((UIDebugManager) manager).findJobById(getCurrentID());
-		String variableText = PTPDebugCorePlugin.getPVariableManager().getValues(job, ((IPProcess)obj).getTaskId());
+		String variableText = ((UIDebugManager) manager).getValueText(job, ((IPProcess)obj).getTaskId());
 		if (variableText != null && variableText.length() > 0) {
 			tooltip += "\n" + variableText;
 		}
