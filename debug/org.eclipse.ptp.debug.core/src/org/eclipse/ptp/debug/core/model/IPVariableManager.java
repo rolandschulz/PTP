@@ -18,6 +18,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.model;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.core.IPJob;
 
 /**
@@ -30,6 +32,8 @@ public interface IPVariableManager {
 	public String[] getVariables();
 	public void removeAllVariables();
 	public void shutdown();
-	public String getValues(IPJob job, int taskID);
+	public String getValueText(IPJob job, int taskID);
+	public void cleanVariables(IPJob job);
+	public void updateVariables(IPJob job, String set_id, IProgressMonitor monitor) throws CoreException;
 }
 
