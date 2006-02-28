@@ -582,8 +582,8 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 						}
 					});
 				}
-				
-				updateDebugVariables(job);
+				//TODO
+				//updateDebugVariables(job);
 				fireSuspendEvent(job, event.getAllProcesses());
 			} else if (event instanceof InferiorResumedEvent) {
 				variableManager.cleanVariables(job);

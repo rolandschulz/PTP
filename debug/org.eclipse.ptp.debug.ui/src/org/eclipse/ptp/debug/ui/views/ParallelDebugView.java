@@ -113,7 +113,7 @@ public class ParallelDebugView extends ParallelJobView implements IDebugActionUp
 		
 		super.buildInToolBarActions(toolBarMgr);
 		
-		createOrientationActions();
+		//createOrientationActions();
 	}
 	protected void createOrientationActions() {
 		IActionBars actionBars = getViewSite().getActionBars();
