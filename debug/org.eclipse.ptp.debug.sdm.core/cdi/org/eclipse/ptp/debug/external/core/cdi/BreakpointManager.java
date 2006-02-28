@@ -126,9 +126,8 @@ public class BreakpointManager extends Manager implements IBreakpointsListener {
 			AbstractBreakpointCommand command = isEnable?getEnableBreakpointCommand(tasks, cdiBpt):getDisableBreakpointCommand(tasks, cdiBpt);
 			((Session) getSession()).getDebugger().postCommand(command);
 			try {
-				if (command.getBreakpoint() != null) {
-					cdiBpt.setEnabled(isEnable);
-				}
+				command.waitFinish();
+				cdiBpt.setEnabled(isEnable);
 			} catch (PCDIException e) {
 				throw new CoreException(new Status(IStatus.ERROR, PTPDebugExternalPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));
 			}
@@ -141,9 +140,8 @@ public class BreakpointManager extends Manager implements IBreakpointsListener {
 			AbstractBreakpointCommand command = getDeleteBreakpointCommand(tasks, cdiBpt);
 			((Session) getSession()).getDebugger().postCommand(command);
 			try {
-				if (command.getBreakpoint() != null) {
-					removeBreakpoint(bpt);
-				}
+				command.waitFinish();
+				removeBreakpoint(bpt);
 			} catch (PCDIException e) {
 				throw new CoreException(new Status(IStatus.ERROR, PTPDebugExternalPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));
 			}

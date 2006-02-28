@@ -16,37 +16,40 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.external.core.commands;
+package org.eclipse.ptp.debug.internal.ui;
 
-import org.eclipse.ptp.core.util.BitList;
-import org.eclipse.ptp.debug.core.cdi.PCDIException;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIBreakpoint;
-
+import org.eclipse.core.runtime.IAdapterFactory;
+import org.eclipse.ptp.debug.core.model.IPBreakpoint;
+import org.eclipse.ptp.debug.core.model.IPLineBreakpoint;
+import org.eclipse.ptp.debug.core.model.IPWatchpoint;
+import org.eclipse.ui.model.IWorkbenchAdapter;
+import org.eclipse.ui.model.WorkbenchAdapter;
 
 /**
  * @author Clement chu
  * 
  */
-public abstract class AbstractBreakpointCommand extends AbstractDebugCommand {
-	IPCDIBreakpoint cdiBpt;
-	
-	public AbstractBreakpointCommand(BitList tasks, IPCDIBreakpoint cdiBpt) {
-		super(tasks, false, true);
-		this.cdiBpt = cdiBpt;
-	}
-	public void waitFinish() throws PCDIException {
-		if (waitForReturn()) {
-			if (result == null) {
-				throw new PCDIException("No result found on command: " + getName());
+public class PBreakpointWorkbenchAdapterFactory implements IAdapterFactory {
+	public Object getAdapter(Object adaptableObject, Class adapterType) {
+		if (adapterType != IWorkbenchAdapter.class || !(adaptableObject instanceof IPBreakpoint)) {
+			return null;
+		}
+		return new WorkbenchAdapter() {
+			public String getLabel(Object o) {
+				// for now
+				if (o instanceof IPLineBreakpoint) {
+					return PDebugUIMessages.getString("PBreakpointWorkbenchAdapterFactory.0");
+				}
+				if (o instanceof IPWatchpoint) {
+					return PDebugUIMessages.getString("PBreakpointWorkbenchAdapterFactory.1");
+				}
+				return super.getLabel(o); 
 			}
-		}
-	}	
-	public IPCDIBreakpoint getBreakpoint() throws PCDIException {
-		waitFinish();
-		if (result instanceof IPCDIBreakpoint) {
-			return (IPCDIBreakpoint)result;
-		}
-		throw new PCDIException("Wrong type return on command: " + getName());
+		};
+	}
+	public Class[] getAdapterList() {
+		return new Class[] { IWorkbenchAdapter.class };
 	}
 }
+
 
