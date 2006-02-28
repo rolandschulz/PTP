@@ -50,7 +50,9 @@
 struct bpentry {
 	int local;
 	int remote;
+	int temp;
 };
+typedef struct bpentry	bpentry;
 
 struct bpmap {
 	int				nels; // number of elements currently in map
@@ -151,7 +153,7 @@ SaveEvent(dbg_event *e)
 }
 
 static void
-AddBPMap(int local, int remote)
+AddBPMap(int local, int remote, int temp)
 {
 	int				i;
 	struct bpentry *	map;
@@ -163,6 +165,7 @@ AddBPMap(int local, int remote)
 		for (i = 0; i < BPMap.size; i++) {
 			map = &BPMap.maps[i];
 			map->remote = map->local = -1;
+			map->temp = 0;
 		}
 	}
 	
@@ -174,6 +177,7 @@ AddBPMap(int local, int remote)
 		for (; i < BPMap.size; i++) {
 			map = &BPMap.maps[i];
 			map->remote = map->local = -1;
+			map->temp = 0;
 		}
 	}
 	
@@ -182,30 +186,32 @@ AddBPMap(int local, int remote)
 		if (map->remote == -1) {
 			map->remote = remote;
 			map->local = local;
+			map->temp = temp;
 			BPMap.nels++;
 		}
 	}
 }
 
 static void
-RemoveBPMap(int remote)
+RemoveBPMap(bpentry *bp)
 {
 	int				i;
 	struct bpentry *	map;
 	
 	for (i = 0; i < BPMap.nels; i++) {
 		map = &BPMap.maps[i];
-		if (map->remote == remote) {
+		if (map == bp) {
 			map->remote = -1;
 			map->local = -1;
+			map->temp = 0;
 			BPMap.nels--;
 			return;
 		}
 	}		
 }
 
-static int
-LocalToRemoteBP(int local) 
+static bpentry *
+FindLocalBP(int local) 
 {
 	int				i;
 	struct bpentry *	map;
@@ -213,15 +219,15 @@ LocalToRemoteBP(int local)
 	for (i = 0; i < BPMap.nels; i++) {
 		map = &BPMap.maps[i];
 		if (map->local == local) {
-			return map->remote;
+			return map;
 		}
 	}
 
-	return -1;
+	return NULL;
 }
 
-static int
-RemoteToLocalBP(int remote) 
+static bpentry *
+FindRemoteBP(int remote) 
 {
 	int				i;
 	struct bpentry *	map;
@@ -229,11 +235,11 @@ RemoteToLocalBP(int remote)
 	for (i = 0; i < BPMap.nels; i++) {
 		map = &BPMap.maps[i];
 		if (map->remote == remote) {
-			return map->local;
+			return map;
 		}
 	}
 
-	return -1;
+	return NULL;
 }
 
 static int
@@ -260,14 +266,23 @@ AsyncStop(void *data)
 {
 	dbg_event *	e;
 	stackframe *	frame;
+	bpentry * bpmap;
 	MIEvent *	evt = (MIEvent *)data;
 
 	switch ( evt->type )
 	{
 	case MIEventTypeBreakpointHit:
-		e = NewDbgEvent(DBGEV_BPHIT);
-		e->bpid = LocalToRemoteBP(evt->bkptno);
-		break;
+		bpmap = FindLocalBP(evt->bkptno);
+		
+		if (!bpmap->temp) {
+			e = NewDbgEvent(DBGEV_BPHIT);
+			e->bpid = bpmap->remote;
+			break;
+		}
+		
+		/* else must be a temporary breakpoint drop through... */
+		
+		RemoveBPMap(bpmap);
 
 	case MIEventTypeSuspended:
 		if (get_current_frame(&frame) < 0) {
@@ -593,10 +608,7 @@ SetAndCheckBreak(int bpid, int isTemp, int isHard, char *where, char *condition,
 	SetList(bpts);
 	bpt = (MIBreakpoint *)GetListElement(bpts);
 	
-	//only add bpt which is not temporary
-	if (!isTemp) {
-		AddBPMap(bpt->number, bpid);
-	}
+	AddBPMap(bpt->number, bpid, isTemp);
 	
 	bp = NewBreakpoint(bpt->number);
 
@@ -628,20 +640,20 @@ SetAndCheckBreak(int bpid, int isTemp, int isHard, char *where, char *condition,
 static int
 GDBMIDeleteBreakpoint(int bpid)
 {
-	int			lbpid;
+	bpentry *	bp;
 	char *		bpstr;
 	MICommand *	cmd;
 	
 	CHECK_SESSION()
 
-	if ((lbpid = RemoteToLocalBP(bpid)) < 0) {
+	if ((bp = FindRemoteBP(bpid)) == NULL) {
 		asprintf(&bpstr, "%d", bpid);
 		DbgSetError(DBGERR_NOBP, bpstr);
 		free(bpstr);
 		return DBGRES_ERR;
 	}
 	
-	cmd = MIBreakDelete(1, &lbpid);
+	cmd = MIBreakDelete(1, &bp->local);
 	SendCommandWait(DebugSession, cmd);
 	
 	if (!MICommandResultOK(cmd)) {
@@ -650,7 +662,7 @@ GDBMIDeleteBreakpoint(int bpid)
 		return DBGRES_ERR;
 	}
 
-	RemoveBPMap(bpid);
+	RemoveBPMap(bp);
 
 	SaveEvent(NewDbgEvent(DBGEV_OK));
 
@@ -663,20 +675,20 @@ GDBMIDeleteBreakpoint(int bpid)
 static int
 GDBMIEnableBreakpoint(int bpid)
 {
-	int			lbpid;
+	bpentry *	bp;
 	char *		bpstr;
 	MICommand *	cmd;
 	
 	CHECK_SESSION()
 
-	if ((lbpid = RemoteToLocalBP(bpid)) < 0) {
+	if ((bp = FindRemoteBP(bpid)) == NULL) {
 		asprintf(&bpstr, "%d", bpid);
 		DbgSetError(DBGERR_NOBP, bpstr);
 		free(bpstr);
 		return DBGRES_ERR;
 	}
 	
-	cmd = MIBreakEnable(1, &lbpid);
+	cmd = MIBreakEnable(1, &bp->local);
 	SendCommandWait(DebugSession, cmd);
 	
 	if (!MICommandResultOK(cmd)) {
@@ -694,20 +706,20 @@ GDBMIEnableBreakpoint(int bpid)
 static int
 GDBMIDisableBreakpoint(int bpid)
 {
-	int			lbpid;
+	bpentry *	bp;
 	char *		bpstr;
 	MICommand *	cmd;
 	
 	CHECK_SESSION()
 
-	if ((lbpid = RemoteToLocalBP(bpid)) < 0) {
+	if ((bp = FindRemoteBP(bpid)) == NULL) {
 		asprintf(&bpstr, "%d", bpid);
 		DbgSetError(DBGERR_NOBP, bpstr);
 		free(bpstr);
 		return DBGRES_ERR;
 	}
 	
-	cmd = MIBreakDisable(1, &lbpid);
+	cmd = MIBreakDisable(1, &bp->local);
 	SendCommandWait(DebugSession, cmd);
 	
 	if (!MICommandResultOK(cmd)) {
@@ -725,20 +737,20 @@ GDBMIDisableBreakpoint(int bpid)
 static int
 GDBMIConditionBreakpoint(int bpid, char *expr)
 {
-	int			lbpid;
+	bpentry *	bp;
 	char *		bpstr;
 	MICommand *	cmd;
 	
 	CHECK_SESSION()
 
-	if ((lbpid = RemoteToLocalBP(bpid)) < 0) {
+	if ((bp = FindRemoteBP(bpid)) == NULL) {
 		asprintf(&bpstr, "%d", bpid);
 		DbgSetError(DBGERR_NOBP, bpstr);
 		free(bpstr);
 		return DBGRES_ERR;
 	}
 	
-	cmd = MIBreakCondition(1, &lbpid, expr);
+	cmd = MIBreakCondition(1, &bp->local, expr);
 	SendCommandWait(DebugSession, cmd);
 	
 	if (!MICommandResultOK(cmd)) {
