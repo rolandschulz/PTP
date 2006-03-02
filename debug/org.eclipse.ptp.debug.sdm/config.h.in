@@ -21,9 +21,6 @@
 /* Define to 1 if you have the <jni.h> header file. */
 #undef HAVE_JNI_H
 
-/* Define to 1 if you have the `m' library (-lm). */
-#undef HAVE_LIBM
-
 /* Define to 1 if you have the `nsl' library (-lnsl). */
 #undef HAVE_LIBNSL
 
