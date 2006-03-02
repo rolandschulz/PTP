@@ -28,7 +28,6 @@ dnl
 dnl Check for libraries.
 dnl
 
-AC_CHECK_LIB(m, log2l)
 AC_CHECK_LIB(nsl, gethostbyname)
 AC_CHECK_LIB(socket, socket)
 AC_SEARCH_LIBS(openpty, [util],
