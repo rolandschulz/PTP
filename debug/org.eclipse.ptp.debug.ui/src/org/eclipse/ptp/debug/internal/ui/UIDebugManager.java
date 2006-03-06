@@ -57,8 +57,12 @@ import org.eclipse.ptp.debug.core.ProcessInputStream;
 import org.eclipse.ptp.debug.core.cdi.IPCDIErrorInfo;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
+import org.eclipse.ptp.debug.core.cdi.event.IPCDIDebugExitedEvent;
+import org.eclipse.ptp.debug.core.cdi.event.IPCDIErrorEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEventListener;
+import org.eclipse.ptp.debug.core.cdi.event.IPCDIExitedEvent;
+import org.eclipse.ptp.debug.core.cdi.event.IPCDIResumedEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDISuspendedEvent;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIBreakpoint;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDILocationBreakpoint;
@@ -74,11 +78,8 @@ import org.eclipse.ptp.debug.external.core.cdi.BreakpointHitInfo;
 import org.eclipse.ptp.debug.external.core.cdi.EndSteppingRangeInfo;
 import org.eclipse.ptp.debug.external.core.cdi.event.BreakpointCreatedEvent;
 import org.eclipse.ptp.debug.external.core.cdi.event.BreakpointHitEvent;
-import org.eclipse.ptp.debug.external.core.cdi.event.DebuggerExitedEvent;
 import org.eclipse.ptp.debug.external.core.cdi.event.EndSteppingRangeEvent;
 import org.eclipse.ptp.debug.external.core.cdi.event.ErrorEvent;
-import org.eclipse.ptp.debug.external.core.cdi.event.InferiorExitedEvent;
-import org.eclipse.ptp.debug.external.core.cdi.event.InferiorResumedEvent;
 import org.eclipse.ptp.debug.external.core.cdi.event.InferiorSignaledEvent;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.debug.ui.events.IDebugActionEvent;
@@ -582,11 +583,9 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 						}
 					});
 				}
-				//TODO
-				//updateDebugVariables(job);
+				updateDebugVariables(job);
 				fireSuspendEvent(job, event.getAllProcesses());
-			} else if (event instanceof InferiorResumedEvent) {
-				variableManager.cleanVariables(job);
+			} else if (event instanceof IPCDIResumedEvent) {
 				try {
 					annotationMgr.removeAnnotation(job.getIDString(), event.getAllProcesses());
 				} catch (final CoreException e) {
@@ -598,8 +597,9 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 				}
 				// System.out.println("-------------------- resume ------------------------");
 				// annotationMgr.printBitList(event.getAllProcesses().toBitList());
+				cleanupDebugVariables(job);
 				fireResumeEvent(job, event.getAllProcesses());
-			} else if (event instanceof InferiorExitedEvent) {
+			} else if (event instanceof IPCDIExitedEvent) {
 				try {
 					annotationMgr.removeAnnotation(job.getIDString(), event.getAllProcesses());
 				} catch (final CoreException e) {
@@ -611,8 +611,9 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 				}
 				// System.out.println("-------------------- terminate ------------------------");
 				// annotationMgr.printBitList(event.getAllProcesses());
+				cleanupDebugVariables(job);
 				fireTerminatedEvent(job, event.getAllProcesses());
-			} else if (event instanceof ErrorEvent) {
+			} else if (event instanceof IPCDIErrorEvent) {
 				try {
 					annotationMgr.removeAnnotation(job.getIDString(), event.getAllProcesses());
 				} catch (final CoreException e) {
@@ -622,7 +623,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 						}
 					});
 				}
-				final ErrorEvent errEvent = (ErrorEvent)event;
+				final IPCDIErrorEvent errEvent = (IPCDIErrorEvent)event;
 				int errCode = errEvent.getErrorCode();
 				if (errCode == ErrorEvent.DBG_ERROR || errCode == ErrorEvent.DBG_FATAL) {
 					PTPDebugUIPlugin.getDisplay().asyncExec(new Runnable() {
@@ -632,13 +633,15 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 						}
 					});
 				}
+				cleanupDebugVariables(job);
 			} else if (event instanceof BreakpointCreatedEvent) {
 				// do nothing in breakpoint created event
 				continue;
-			} else if (event instanceof DebuggerExitedEvent) {
+			} else if (event instanceof IPCDIDebugExitedEvent) {
 				condition = new Boolean(true);
 				annotationMgr.removeAnnotationGroup(job.getIDString());
 				getDebugSession(job).getEventManager().removeEventListener(this);
+				cleanupDebugVariables(job);
 			}
 			firePaintListener(condition);
 		}
@@ -754,28 +757,35 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		super.removeJob(job);
 	}
 	
+	public void cleanupDebugVariables(final IPJob job) {
+		variableManager.cleanVariables(job);
+	}
 	public void updateDebugVariables() {
 		updateDebugVariables(findJobById(getCurrentJobId()));
 	}
 	public void updateDebugVariables(final IPJob pJob) {
-		final Job job = new Job(UIMessage.REFRESH_SYSTEM_JOB_NAME) {
-			public IStatus run(final IProgressMonitor monitor) {
-				if (!monitor.isCanceled()) {
-					try {
-						variableManager.updateVariables(pJob, getCurrentSetId(), monitor);
-					} catch (CoreException e) {
-						return e.getStatus();
+		if (variableManager.hasVariable()) {
+			if (PTPDebugUIPlugin.getDefault().getPreferenceStore().getBoolean(IPDebugConstants.PREF_UPDATE_VARIABLES)) {
+				final Job job = new Job(UIMessage.REFRESH_SYSTEM_JOB_NAME) {
+					public IStatus run(final IProgressMonitor monitor) {
+						if (!monitor.isCanceled()) {
+							try {
+								variableManager.updateVariables(pJob, getCurrentSetId(), monitor);
+							} catch (CoreException e) {
+								return e.getStatus();
+							}
+						}
+						return Status.OK_STATUS;
 					}
-				}
-				return Status.OK_STATUS;
+				};
+				job.setPriority(Job.INTERACTIVE);
+				PTPDebugUIPlugin.getDisplay().asyncExec(new Runnable() {
+					public void run() {
+						PlatformUI.getWorkbench().getProgressService().showInDialog(PTPDebugUIPlugin.getActiveWorkbenchShell(), job);
+					}
+				});
+				job.schedule();
 			}
-		};
-		job.setPriority(Job.INTERACTIVE);
-		PTPDebugUIPlugin.getDisplay().asyncExec(new Runnable() {
-			public void run() {
-				PlatformUI.getWorkbench().getProgressService().showInDialog(PTPDebugUIPlugin.getActiveWorkbenchShell(), job);
-			}
-		});
-		job.schedule();
+		}
 	}
 }

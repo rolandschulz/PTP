@@ -17,14 +17,18 @@
  * LA-CC 04-115
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.cdi.event;
+
+import org.eclipse.ptp.debug.core.cdi.IPCDISessionObject;
+
 /**
  * @author Clement chu
  * 
  */
-public interface IPCDIErrorEvent extends IPCDISuspendedEvent {
+public interface IPCDIErrorEvent extends IPCDIEvent {
 	public static final int DBG_WARNING = 0; // do nothing
 	public static final int DBG_ERROR = 1; // display error only
 	public static final int DBG_FATAL = 2; // display error and terminate debugger
 	public int getErrorCode();
 	public String getMessage();
+	public IPCDISessionObject getReason();
 }
