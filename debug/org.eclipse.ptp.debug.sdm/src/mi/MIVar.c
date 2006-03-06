@@ -17,6 +17,7 @@
 #include "MIValue.h"
 #include "MIResult.h"
 #include "MIVar.h"
+#include "MIOOBRecord.h"
 
 MIVar *
 MIVarNew(void)
@@ -172,7 +173,6 @@ MIGetVarEvaluateExpressionInfo(MICommand *cmd)
 	if (rr != NULL) {
 		for (SetList(rr->results); (result = (MIResult *)GetListElement(rr->results)) != NULL; ) {
 			value = result->value;
-
 			if (strcmp(result->variable, "value") == 0) {
 				if (value->type == MIValueTypeConst) {
 					expr = strdup(value->cstring);
@@ -180,7 +180,21 @@ MIGetVarEvaluateExpressionInfo(MICommand *cmd)
 			}
 		}
 	}
-	
 	return expr;
 }
 
+char *
+MIGetDetailsType(MICommand *cmd) {
+	MIResultRecord* rr;
+	MIOOBRecord *result;
+
+	if (!cmd->completed || cmd->result == NULL)
+		return NULL;
+
+	rr = cmd->result;
+	if (rr != NULL) {
+		for (SetList(rr->results); (result = (MIOOBRecord *)GetListElement(rr->results)) != NULL; ) {
+		}
+	}
+	return "";
+}
