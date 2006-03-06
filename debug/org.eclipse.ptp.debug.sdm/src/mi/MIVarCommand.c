@@ -57,3 +57,11 @@ MIVarEvaluateExpression(char *name)
 	MICommandAddOption(cmd, name, NULL);
 	return cmd;
 }
+
+MICommand *
+MIPType(char *name) {
+	MICommand * cmd;
+	cmd = MICommandNew("ptype", MIResultRecordDONE);
+	MICommandAddOption(cmd, name, NULL);
+	return cmd;
+}
