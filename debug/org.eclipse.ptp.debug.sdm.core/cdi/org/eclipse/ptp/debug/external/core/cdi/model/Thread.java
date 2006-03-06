@@ -26,6 +26,7 @@ import org.eclipse.cdt.debug.core.cdi.ICDILocation;
 import org.eclipse.cdt.debug.core.cdi.model.ICDISignal;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIBreakpoint;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDILocation;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIStackFrame;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIThread;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIThreadStorage;
@@ -247,7 +248,7 @@ public class Thread extends PObject implements IPCDIThread {
 		((Target)getTarget()).setCurrentThread(this);
 		getTarget().resume(passSignal);
 	}
-	public void resume(ICDILocation location) throws PCDIException {
+	public void resume(IPCDILocation location) throws PCDIException {
 		((Target)getTarget()).setCurrentThread(this);
 		getTarget().resume(location);
 	}
@@ -255,7 +256,7 @@ public class Thread extends PObject implements IPCDIThread {
 		((Target)getTarget()).setCurrentThread(this);
 		getTarget().resume(signal);
 	}
-	public void jump(ICDILocation location) throws PCDIException {
+	public void jump(IPCDILocation location) throws PCDIException {
 		resume(location);
 	}
 	public void signal() throws PCDIException {
