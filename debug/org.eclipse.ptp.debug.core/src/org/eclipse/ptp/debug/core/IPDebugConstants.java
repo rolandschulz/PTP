@@ -93,4 +93,6 @@ public interface IPDebugConstants {
 	public static final int DEFAULT_DEBUG_COMM_TIMEOUT = 60000;
 	public static final int MIN_REQUEST_TIMEOUT = 10000;
 	public static final int MAX_REQUEST_TIMEOUT = Integer.MAX_VALUE;	
+
+	public static final String PREF_UPDATE_VARIABLES = PLUGIN_ID + ".pDebug.update_variables";
 }
