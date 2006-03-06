@@ -47,6 +47,7 @@ import org.eclipse.ptp.debug.core.cdi.model.IPCDIFunctionBreakpoint;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIGlobalVariable;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIGlobalVariableDescriptor;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDILineBreakpoint;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDILocation;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIStackFrame;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITargetConfiguration;
@@ -299,7 +300,7 @@ public class Target extends SessionObject implements IPCDITarget {
 	public void resume() throws PCDIException {
 		resume(false);
 	}
-	public void resume(ICDILocation location) throws PCDIException {
+	public void resume(IPCDILocation location) throws PCDIException {
 		resume(location);
 	}
 	public void resume(ICDISignal signal) throws PCDIException {
