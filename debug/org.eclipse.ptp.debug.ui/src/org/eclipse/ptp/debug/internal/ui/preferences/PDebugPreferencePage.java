@@ -39,6 +39,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -55,6 +56,7 @@ public class PDebugPreferencePage extends AbstractPerferencePage {
 	private Button fPathsButton = null;
 	private Button fRegisteredProcessButton = null;
 	private IntegerFieldEditor commandTimeoutField = null;
+	private Button updateVariableButton = null;
 	
     protected class WidgetListener implements IPropertyChangeListener {
     	public void propertyChange(PropertyChangeEvent event) {
@@ -85,8 +87,13 @@ public class PDebugPreferencePage extends AbstractPerferencePage {
 		createViewSettingPreferences(composite);
 		createSpacer(composite, 1);
 		createCommunicationPreferences(composite);
+		createSpacer(composite, 1);
+		createOtherDebugSetting(composite);
 		setValues();
 		return composite;
+	}
+	protected void createOtherDebugSetting(Composite parent) {
+		updateVariableButton = createCheckButton(parent, PreferenceMessages.getString("PDebugPreferencePage.enableUpdateVariableSuspend"));
 	}
 	protected void createViewSettingPreferences(Composite parent) {
 		Composite comp = createGroupComposite(parent, 1, false, PreferenceMessages.getString("PDebugPreferencePage.default1"));
@@ -124,6 +131,7 @@ public class PDebugPreferencePage extends AbstractPerferencePage {
 		fPathsButton.setSelection(store.getDefaultBoolean(IPDebugConstants.PREF_SHOW_FULL_PATHS));
 		fRegisteredProcessButton.setSelection(store.getDefaultBoolean(IPDebugConstants.PREF_PTP_DEBUG_REGISTER_PROC_0));
 		commandTimeoutField.setStringValue(String.valueOf(store.getDefaultInt(IPDebugConstants.PREF_PTP_DEBUG_COMM_TIMEOUT)));
+		updateVariableButton.setSelection(store.getDefaultBoolean(IPDebugConstants.PREF_UPDATE_VARIABLES));
 		super.performDefaults();
 	}
 	
@@ -139,12 +147,14 @@ public class PDebugPreferencePage extends AbstractPerferencePage {
 		fPathsButton.setSelection(store.getBoolean(IPDebugConstants.PREF_SHOW_FULL_PATHS));
 		fRegisteredProcessButton.setSelection(store.getBoolean(IPDebugConstants.PREF_PTP_DEBUG_REGISTER_PROC_0));
 		commandTimeoutField.setStringValue(String.valueOf(store.getInt(IPDebugConstants.PREF_PTP_DEBUG_COMM_TIMEOUT)));
+		updateVariableButton.setSelection(store.getBoolean(IPDebugConstants.PREF_UPDATE_VARIABLES));
 	}
 	protected void storeValues() {
 		IPreferenceStore store = getPreferenceStore();
 		store.setValue(IPDebugConstants.PREF_SHOW_FULL_PATHS, fPathsButton.getSelection());
 		store.setValue(IPDebugConstants.PREF_PTP_DEBUG_REGISTER_PROC_0, fRegisteredProcessButton.getSelection());
 		store.setValue(IPDebugConstants.PREF_PTP_DEBUG_COMM_TIMEOUT, commandTimeoutField.getIntValue());
+		store.setValue(IPDebugConstants.PREF_UPDATE_VARIABLES, updateVariableButton.getSelection());
 	}
 	public boolean isValid() {
 		setErrorMessage(null);
