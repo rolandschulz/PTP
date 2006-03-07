@@ -99,8 +99,11 @@ static int	GDBMIGetGlobalVariables(void);
 static int	GDBMIQuit(void);
 
 static char* GetModifierType(char *);
-static int getSimpleTypeID(char* type);
+static int getSimpleTypeID(char*);
 static AIF* CreateNamed(AIF*, int);
+
+static char * GetPtypeValue(char *);
+static AIF * ComplexVarToAIF(MIVar *, int);
 
 dbg_backend_funcs	GDBMIBackend =
 {
@@ -1171,6 +1174,17 @@ GetVarValue(char *var)
 	return res;
 }
 
+static char * GetPtypeValue(char *exp) {
+	MICommand* cmd;
+	char * type = NULL;
+	
+	cmd = MIPType(exp);
+	SendCommandWait(DebugSession, cmd);
+	type = MIGetDetailsType(cmd);
+	MICommandFree(cmd);
+	return type;
+}
+
 static AIF *
 SimpleVarToAIF(char *exp, MIVar *var)
 {
@@ -1211,14 +1225,9 @@ SimpleVarToAIF(char *exp, MIVar *var)
 
 	type_id = getSimpleTypeID(type);
 	if (type_id == -1) {//try again with ptype
-		MICommand* cmd;
-		cmd = MIPType(exp);
-		SendCommandWait(DebugSession, cmd);
-		var->type = MIGetDetailsType(cmd);
-		MICommandFree(cmd);
+		var->type = GetPtypeValue(exp);
 		type_id = getSimpleTypeID(var->type);
 	}		
-		
 	if (type_id > -1) {
 		if ((res = GetVarValue(var->name)) == NULL) {
 			return NULL;
@@ -1413,57 +1422,62 @@ ConvertVarToAIF(char *exp, MIVar *var, int named)
 	AIF *		a;
 	MICommand *	cmd;
 	
-	if ( var->numchild == 0 )
-	{
+	if ( var->numchild == 0 ) {
 		if ( (a = SimpleVarToAIF(exp, var)) == NULL )
 			return NULL;
 	}
-	else
-	{
+	else {
 		cmd = MIVarListChildren(var->name);
-	
 		SendCommandWait(DebugSession, cmd);
-		
 		if (!MICommandResultOK(cmd)) {
 			DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
 			MICommandFree(cmd);
 			return NULL;
 		}
-			
 		MIGetVarListChildrenInfo(var, cmd);
-		
 		MICommandFree(cmd);
 
-		switch ( var->type[strlen(var->type) - 1] )
-		{
-		case ']': /* array */
-			a = CreateArray(var, named);
-			break;
-
-		case '*': /* pointer */
-			if (strncmp(var->type, "struct", 6) == 0) {
-				a = CreateStruct(var, named);
-			} else if (strncmp(var->type, "union", 5) == 0) {
-				a = CreateUnion(var, named);
-			} else {
-				a = ConvertVarToAIF(var->children[0]->exp, var->children[0], named);
-			}
-			if (a != NULL)
-				a = PointerToAIF(a);
-			break;
-						
-		default:
-			if (strncmp(var->type, "struct", 6) == 0) { /* struct */
-				a = CreateStruct(var, named);
-			} else if (strncmp(var->type, "union", 5) == 0) {
-				a = CreateUnion(var, named);
-			} else {
-				DbgSetError(DBGERR_DEBUGGER, "type not supported (yet)");
-				return NULL;
-			}
+		a = ComplexVarToAIF(var, named);
+		if (a == NULL) {//try again with ptype
+			var->type = GetPtypeValue(exp);
+			a = ComplexVarToAIF(var, named);
+		}
+		if (a == NULL) {
+			DbgSetError(DBGERR_DEBUGGER, "type not supported (yet)");
 		}
 	}
+	return a;
+}
 
+static AIF * ComplexVarToAIF(MIVar *var, int named) {
+	AIF * a;
+
+	switch (var->type[strlen(var->type) - 1]) {
+	case ']': /* array */
+		a = CreateArray(var, named);
+		break;
+
+	case '*': /* pointer */
+		if (strncmp(var->type, "struct", 6) == 0) {
+			a = CreateStruct(var, named);
+		} else if (strncmp(var->type, "union", 5) == 0) {
+			a = CreateUnion(var, named);
+		} else {
+			a = ConvertVarToAIF(var->children[0]->exp, var->children[0], named);
+		}
+		if (a != NULL)
+			a = PointerToAIF(a);
+		break;
+					
+	default:
+		if (strncmp(var->type, "struct", 6) == 0) { /* struct */
+			a = CreateStruct(var, named);
+		} else if (strncmp(var->type, "union", 5) == 0) {
+			a = CreateUnion(var, named);
+		} else {
+			return NULL;
+		}
+	}
 	return a;
 }
 
