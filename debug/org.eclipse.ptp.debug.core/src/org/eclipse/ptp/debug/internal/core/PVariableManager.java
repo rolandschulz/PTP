@@ -127,7 +127,7 @@ public class PVariableManager implements IPVariableManager {
 	}
 	
 	private String getValue(IPCDISession session, int taskID, String set_id) {
-		String content = "<u>Set: " + set_id + "</u>";		
+		String content = "<u>Set: " + set_id + "</u><br>";		
 		for (Iterator i=variables.iterator(); i.hasNext();) {
 			String variable = (String)i.next();
 			content += "-<i>" + variable + ":</i> ";
