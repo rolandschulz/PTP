@@ -99,7 +99,7 @@ public class PVariableManager implements IPVariableManager {
 		monitor.beginTask("Updating " + tasks.length + " variables info...", tasks.length);
 		for (int i=0; i<tasks.length; i++) {
 			if (!monitor.isCanceled()) {
-				variableTexts[tasks[i]] = getValue(session, tasks[i]);
+				variableTexts[tasks[i]] = getValue(session, tasks[i], set_id);
 				monitor.worked(1);
 			}
 		}
@@ -126,8 +126,8 @@ public class PVariableManager implements IPVariableManager {
 		return "";
 	}
 	
-	private String getValue(IPCDISession session, int taskID) {
-		String content = "";
+	private String getValue(IPCDISession session, int taskID, String set_id) {
+		String content = "<u>Set: " + set_id + "</u>";		
 		for (Iterator i=variables.iterator(); i.hasNext();) {
 			String variable = (String)i.next();
 			content += "-<i>" + variable + ":</i> ";
