@@ -35,7 +35,7 @@ public class DebugCommandQueue extends Thread {
 	private boolean isTerminated = false;
 	private IDebugCommand currentCommand = null;
 	private IAbstractDebugger debugger = null;
-	private int command_timeout;
+	private int command_timeout = 10000;
 	
 	public DebugCommandQueue(IAbstractDebugger debugger, int timeout) {
 		this.debugger = debugger;

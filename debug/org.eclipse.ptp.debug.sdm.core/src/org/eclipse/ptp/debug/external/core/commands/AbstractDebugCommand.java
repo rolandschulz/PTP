@@ -35,15 +35,23 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 	protected boolean waitForReturn = false;
 	protected boolean interrupt = false;
 	private boolean isFlush = false;
-	protected int timeout = 0;
+	protected int timeout = 10000;
+	protected boolean waitInQueue = false;
 	
 	public AbstractDebugCommand(BitList tasks) {
-		this(tasks, false, false);
+		this(tasks, false, false, false);
 	}
 	public AbstractDebugCommand(BitList tasks, boolean interrupt, boolean waitForReturn) {
+		this(tasks, interrupt, waitForReturn, false);
+	}
+	public AbstractDebugCommand(BitList tasks, boolean interrupt, boolean waitForReturn, boolean waitInQueue) {
 		this.tasks = tasks;
 		this.interrupt = interrupt;
 		this.waitForReturn = waitForReturn;
+		this.waitInQueue = waitInQueue;
+	}
+	public boolean isWaitInQueue() {
+		return waitInQueue;
 	}
 	public boolean canInterrupt() {
 		return interrupt;
