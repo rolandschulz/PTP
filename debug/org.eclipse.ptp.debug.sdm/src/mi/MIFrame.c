@@ -107,11 +107,10 @@ MIGetStackListFramesInfo(MICommand *cmd)
 	MIResult *		result;
 	List *			frames = NULL;
 	
-	if (!cmd->completed || cmd->result == NULL)
+	if (!cmd->completed || cmd->output == NULL || cmd->output->rr == NULL)
 		return NULL;
 		
-	rr = cmd->result;
-	
+	rr = cmd->output->rr;
 	for (SetList(rr->results); (result = (MIResult *)GetListElement(rr->results)) != NULL; ) {
 		if (strcmp(result->variable, "stack") == 0) {
 			val = result->value;
@@ -129,7 +128,6 @@ MIGetStackListFramesInfo(MICommand *cmd)
 			}
 		}
 	}
-	
 	return frames;
 }
 
@@ -159,11 +157,10 @@ MIGetFrameInfo(MICommand *cmd)
 {
 	MIResultRecord *	rr;
 	
-	if (!cmd->completed || cmd->result == NULL)
+	if (!cmd->completed || cmd->output == NULL || cmd->output->rr == NULL)
 		return NULL;
 		
-	rr = cmd->result;
-	
+	rr = cmd->output->rr;
 	return MIFrameInfoParse(rr->results);
 }
 
@@ -175,11 +172,10 @@ MIGetStackListLocalsInfo(MICommand *cmd)
 	MIResult *		result;
 	List *			locals = NULL;
 
-	if (!cmd->completed || cmd->result == NULL)
+	if (!cmd->completed || cmd->output == NULL || cmd->output->rr == NULL)
 		return NULL;
 	
-	rr = cmd->result;
-	
+	rr = cmd->output->rr;
 	for (SetList(rr->results); (result = (MIResult *)GetListElement(rr->results)) != NULL; ) {
 		if (strcmp(result->variable, "locals") == 0) {
 			val = result->value;
@@ -188,7 +184,6 @@ MIGetStackListLocalsInfo(MICommand *cmd)
 			}
 		}
 	}
-
 	return locals;
 }
 
@@ -200,11 +195,10 @@ MIGetStackListArgumentsInfo(MICommand *cmd)
 	MIResult *		result;
 	List *			frames = NULL;
 
-	if (!cmd->completed || cmd->result == NULL)
+	if (!cmd->completed || cmd->output == NULL || cmd->output->rr == NULL)
 		return NULL;
 	
-	rr = cmd->result;
-	
+	rr = cmd->output->rr;
 	SetList(rr->results); 
 	if ((result = (MIResult *)GetListElement(rr->results)) != NULL) {
 		if (strcmp(result->variable, "stack-args") == 0) {
@@ -214,7 +208,6 @@ MIGetStackListArgumentsInfo(MICommand *cmd)
 			}
 		}
 	}
-
 	return frames;
 }
 

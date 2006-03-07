@@ -20,6 +20,7 @@
 #define _MICOMMAND_H_
 
 #include "MIResultRecord.h"
+#include "MIOutput.h"
 
 struct MICommand {
 	char *			command;							/* command to execute */
@@ -28,8 +29,8 @@ struct MICommand {
 	int				opt_size;						/* allocated size of options */
 	int				completed;						/* command has been completed */
 	int				expected_class;
-	MIResultRecord *	result;							/* result from completed command */
-	void				(*callback)(MIResultRecord *);	/* command completed callback */
+	MIOutput *		output;							/* result from completed command */
+	void			(*callback)(MIResultRecord *);	/* command completed callback */
 };
 typedef struct MICommand	MICommand;
 

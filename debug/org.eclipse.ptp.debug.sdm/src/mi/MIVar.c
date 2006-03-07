@@ -83,10 +83,10 @@ MIVarParse(List *results)
 MIVar *
 MIGetVarCreateInfo(MICommand *cmd) 
 {
-	if (!cmd->completed || cmd->result == NULL)
+	if (!cmd->completed || cmd->output == NULL || cmd->output->rr == NULL)
 		return NULL;
 		
-	return MIVarParse(cmd->result->results);
+	return MIVarParse(cmd->output->rr->results);
 }
 
 /*
@@ -114,7 +114,6 @@ parseChildren(MIValue *val, List **res)
 			}
 		}
 	}
-	
 	*res = children;
 }
 
@@ -128,25 +127,22 @@ MIGetVarListChildrenInfo(MIVar *var, MICommand *cmd)
 	MIResultRecord *	rr;
 	List *			children = NULL;
 	
-	if (!cmd->completed)
+	if (!cmd->completed || cmd->output == NULL || cmd->output->rr == NULL)
 		return;
 
-	rr = cmd->result;
-	
-	if (rr != NULL) {
-		for (SetList(rr->results); (result = (MIResult *)GetListElement(rr->results)) != NULL; ) {
-			value = result->value;
+	rr = cmd->output->rr;
+	for (SetList(rr->results); (result = (MIResult *)GetListElement(rr->results)) != NULL; ) {
+		value = result->value;
 
-			if (strcmp(result->variable, "numchild") == 0) {
-				if (value->type == MIValueTypeConst) {
-					var->numchild = atoi(value->cstring);
-				}
-			} else if (strcmp(result->variable, "children") == 0) {
-				parseChildren(value, &children);
+		if (strcmp(result->variable, "numchild") == 0) {
+			if (value->type == MIValueTypeConst) {
+				var->numchild = atoi(value->cstring);
 			}
+		} else if (strcmp(result->variable, "children") == 0) {
+			parseChildren(value, &children);
 		}
 	}
-	
+
 	if (children != NULL) {
 		num = SizeOfList(children);
 		if (var->numchild != num)
@@ -165,18 +161,15 @@ MIGetVarEvaluateExpressionInfo(MICommand *cmd)
 	MIResultRecord *	rr;
 	char *			expr = NULL;
 
-	if (!cmd->completed)
+	if (!cmd->completed || cmd->output == NULL || cmd->output->rr == NULL)
 		return NULL;
 
-	rr = cmd->result;
-	
-	if (rr != NULL) {
-		for (SetList(rr->results); (result = (MIResult *)GetListElement(rr->results)) != NULL; ) {
-			value = result->value;
-			if (strcmp(result->variable, "value") == 0) {
-				if (value->type == MIValueTypeConst) {
-					expr = strdup(value->cstring);
-				}
+	rr = cmd->output->rr;
+	for (SetList(rr->results); (result = (MIResult *)GetListElement(rr->results)) != NULL; ) {
+		value = result->value;
+		if (strcmp(result->variable, "value") == 0) {
+			if (value->type == MIValueTypeConst) {
+				expr = strdup(value->cstring);
 			}
 		}
 	}
@@ -185,16 +178,25 @@ MIGetVarEvaluateExpressionInfo(MICommand *cmd)
 
 char *
 MIGetDetailsType(MICommand *cmd) {
-	MIResultRecord* rr;
-	MIOOBRecord *result;
+	List *oobs;
+	MIOOBRecord *oob;
+	char * type = NULL;
+	char * p = NULL;
 
-	if (!cmd->completed || cmd->result == NULL)
+	if (!cmd->completed || cmd->output == NULL || cmd->output->oobs == NULL)
 		return NULL;
 
-	rr = cmd->result;
-	if (rr != NULL) {
-		for (SetList(rr->results); (result = (MIOOBRecord *)GetListElement(rr->results)) != NULL; ) {
+	oobs = cmd->output->oobs;
+	for (SetList(oobs); (oob = (MIOOBRecord *)GetListElement(oobs)) != NULL; ) {
+		type = oob->cstring;
+		if (strncmp(type, "type", 4) == 0) {
+			type += 7; //bypass " = "
+			p = strchr(type, '\\');
+			if (p != NULL) {
+				*p = '\0';
+				return strdup(type);
+			}
 		}
 	}
-	return "";
+	return NULL;
 }

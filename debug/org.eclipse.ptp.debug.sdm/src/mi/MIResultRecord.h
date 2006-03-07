@@ -14,9 +14,9 @@
 #include "list.h"
 #include "MIString.h"
 
-#define MIResultRecordINVALID		0
+#define MIResultRecordINVALID	0
 #define MIResultRecordDONE		1
-#define MIResultRecordRUNNING		2
+#define MIResultRecordRUNNING	2
 #define MIResultRecordCONNECTED	3
 #define MIResultRecordERROR		4
 #define MIResultRecordEXIT		5

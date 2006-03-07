@@ -37,7 +37,7 @@ MICommandNew(char *command, int class)
 	cmd->num_options = 0;
 	cmd->completed = 0;
 	cmd->expected_class = class;
-	cmd->result = NULL;
+	cmd->output = NULL;
 	cmd->callback = NULL;
 	return cmd;
 }
@@ -54,8 +54,8 @@ MICommandFree(MICommand *cmd)
 			free(cmd->options[i]);
 		free(cmd->options);
 	}
-	if (cmd->result != NULL)
-		MIResultRecordFree(cmd->result);
+	if (cmd->output != NULL)
+		MIOutputFree(cmd->output);
 	free(cmd);
 }
 
@@ -93,16 +93,18 @@ MICommandCompleted(MICommand *cmd)
 MIResultRecord *
 MICommandResult(MICommand *cmd)
 {
-	return cmd->result;
+	if (cmd->output == NULL)
+		return NULL;
+	return cmd->output->rr;
 }
 
 int
 MICommandResultOK(MICommand *cmd)
 {
-	if (!cmd->completed || cmd->result == NULL)
+	if (!cmd->completed || cmd->output == NULL || cmd->output->rr == NULL)
 		return 0;
 		
-	return cmd->result->resultClass == cmd->expected_class;
+	return cmd->output->rr->resultClass == cmd->expected_class;
 }
 
 char *

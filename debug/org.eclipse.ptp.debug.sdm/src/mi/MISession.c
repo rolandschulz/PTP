@@ -39,10 +39,12 @@
 static List *			MISessionList = NULL;
 static struct timeval		MISessionDefaultSelectTimeout = {0, 1000};
 
-static void DoOOBCallbacks(MISession *sess, List *oobs);
+static List* DoOOBCallbacks(MISession *sess, List *oobs);
 static void HandleChild(int sig);
 static int WriteCommand(int fd, char *cmd);
 static char *ReadResponse(int fd);
+
+#define DEBUG
 
 MISession *
 MISessionNew(void)
@@ -379,21 +381,22 @@ MISessionProcessCommandsAndResponses(MISession *sess, fd_set *rfds, fd_set *wfds
 				sess->command->completed = 1;
 			}
 #endif /* __gnu_linux__ */	
-			DoOOBCallbacks(sess, output->oobs);
+			output->oobs = DoOOBCallbacks(sess, output->oobs);
 		}
 			
 		if (output->rr != NULL) {
 			sess->command->completed = 1;
-			sess->command->result = output->rr;
+			sess->command->output = output;
 			if (sess->command->callback != NULL)
 				sess->command->callback(output->rr);
-			output->rr = NULL; /* Freed by MICommandFree() */
+			//output->rr = NULL; /* Freed by MICommandFree() */
+			//output->oobs = NULL;
 		}
 
 		if (sess->command != NULL && sess->command->completed)
 			sess->command = NULL;
 
-		MIOutputFree(output);
+		//MIOutputFree(output);
 	}
 }
 
@@ -403,12 +406,13 @@ MISessionCommandCompleted(MISession *sess)
 	return sess->command == NULL;
 }
 
-static void
+static List*
 DoOOBCallbacks(MISession *sess, List *oobs)
 {
 	MIOOBRecord *	oob;
 	MIResult *		res;
 	MIValue *		val;
+	List *aList = NewList();
 	
 	for (SetList(oobs); (oob = (MIOOBRecord *)GetListElement(oobs)) != NULL; ) {
 		switch (oob->type) {
@@ -454,8 +458,9 @@ DoOOBCallbacks(MISession *sess, List *oobs)
 		case MIOOBRecordTypeStream:
 			switch (oob->sub_type) {
 			case MIOOBRecordConsoleStream:
-				if (sess->console_callback != NULL)
+				if (sess->console_callback != NULL) {
 					sess->console_callback(oob->cstring);
+				}
 				break;
 				
 			case MIOOBRecordLogStream:
@@ -468,9 +473,11 @@ DoOOBCallbacks(MISession *sess, List *oobs)
 					sess->target_callback(oob->cstring);
 				break;
 			}
+			AddToList(aList, (void *)oob);
 			break;
 		}
 	}
+	return aList;
 }
 
 void
