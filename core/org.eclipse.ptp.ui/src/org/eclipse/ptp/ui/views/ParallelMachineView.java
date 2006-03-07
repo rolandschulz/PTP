@@ -211,10 +211,10 @@ public class ParallelMachineView extends AbstractParallelSetView {
 		}
 		return super.getRulerIndex(obj, index);
 	}	
-	public String getToolTipText(Object obj) {
+	public String[] getToolTipText(Object obj) {
 		IElementHandler setManager = getCurrentElementHandler();
 		if (obj == null || !(obj instanceof IPNode) || setManager == null || cur_element_set == null)
-			return " Unknown element";
+			return IToolTipProvider.NO_TOOLTIP;
 
 		IPNode node = (IPNode)obj;
 		StringBuffer buffer = new StringBuffer();
@@ -233,7 +233,7 @@ public class ParallelMachineView extends AbstractParallelSetView {
 				buffer.append(",");
 		}
 		// buffer.append("\nStatus: " + getMachineManager().getNodeStatusText(node));
-		return buffer.toString();
+		return new String[] { buffer.toString() };
 	}
 	public String getCurrentID() {
 		return ((MachineManager) manager).getCurrentMachineId();

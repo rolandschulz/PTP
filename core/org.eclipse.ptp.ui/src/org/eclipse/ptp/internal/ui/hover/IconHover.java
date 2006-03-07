@@ -16,12 +16,18 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.ui.views;
+package org.eclipse.ptp.internal.ui.hover;
+
+import org.eclipse.ptp.ui.hover.IIconInformationControl;
+import org.eclipse.swt.widgets.Shell;
+
 /**
  * @author Clement chu
- *
+ * 
  */
-public interface IToolTipProvider {
-	public String[] NO_TOOLTIP = new String[] { "" };
-	public String[] toolTipText(Object obj);
+public class IconHover {
+	public IIconInformationControl getHoverControlCreator(Shell parent, boolean hasExtra) {
+		return new DefaultInformationControl(parent, hasExtra);
+	}
 }
+

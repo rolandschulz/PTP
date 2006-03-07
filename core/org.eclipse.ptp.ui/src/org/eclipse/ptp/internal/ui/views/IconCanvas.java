@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.ptp.internal.ui.hover.IconHover;
+import org.eclipse.ptp.ui.hover.IIconInformationControl;
 import org.eclipse.ptp.ui.views.IContentProvider;
 import org.eclipse.ptp.ui.views.IIconCanvasActionListener;
 import org.eclipse.ptp.ui.views.IImageProvider;
@@ -40,6 +42,8 @@ import org.eclipse.swt.accessibility.AccessibleControlAdapter;
 import org.eclipse.swt.accessibility.AccessibleControlEvent;
 import org.eclipse.swt.accessibility.AccessibleEvent;
 import org.eclipse.swt.custom.ST;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Font;
@@ -54,7 +58,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Shell;
@@ -81,11 +84,6 @@ public class IconCanvas extends Canvas {
 	protected int e_height = 16;
 	protected int max_e_row = -1;
 	protected int max_e_col = -1;
-	// tooltip
-	protected Shell toolTipShell = null;
-	protected Label toolTipLabel = null;
-	protected long tooltip_timeout = 10000;
-	private Timer hoverTimer = null;
 	// key and listener
 	protected Hashtable keyActionMap = new Hashtable();
 	protected Listener listener = null;
@@ -116,9 +114,18 @@ public class IconCanvas extends Canvas {
 	protected Color margin_color = null;
 	protected boolean displayRuler = true;
 	private final int DEFAULT_OFFSET = 5;
-	//tooltip
-	protected Color tooltip_color_bg = null;
-	protected Color tooltip_color_fg = null;	
+	// tooltip
+	//TODO
+	//protected IconViewerInformation viewerInformation = null;
+	private IconHover iconHover = new IconHover();
+	private IIconInformationControl fInformationControl = null; 
+	//protected Shell toolTipShell = null;
+	//protected Label toolTipLabel = null;
+	//protected Color tooltip_color_bg = null;
+	//protected Color tooltip_color_fg = null;	
+	protected long tooltip_timeout = 10000;
+	protected boolean show_tooltip_allthetime = false;
+	private Timer hoverTimer = null;
 	
 	// input
 	protected int total_elements = 0;
@@ -143,12 +150,20 @@ public class IconCanvas extends Canvas {
 		initializeAccessible();
 		sel_color = display.getSystemColor(SWT.COLOR_RED);
 		margin_color = display.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
-		tooltip_color_fg = display.getSystemColor(SWT.COLOR_INFO_FOREGROUND);
-		tooltip_color_bg = display.getSystemColor(SWT.COLOR_INFO_BACKGROUND);
-			
+		//viewerInformation = new IconViewerInformation(getShell(), SWT.READ_ONLY);
+		//TODO
+		//tooltip_color_fg = display.getSystemColor(SWT.COLOR_INFO_FOREGROUND);
+		//tooltip_color_bg = display.getSystemColor(SWT.COLOR_INFO_BACKGROUND);
+	
 		changeFontSize(display);
 		super.setBackground(getBackground());
 		super.setForeground(getForeground());
+	}
+	public void dispose() {
+		if (fInformationControl == null) {
+			fInformationControl.dispose();
+		}
+		super.dispose();
 	}
 	private void changeFontSize(Display display) {
         FontData[] data = getFont().getFontData();
@@ -249,6 +264,9 @@ public class IconCanvas extends Canvas {
 			SWT.error(SWT.ERROR_NULL_ARGUMENT);
 		}
 		tooltip_timeout = timeout;
+	}
+	public void showTooltipAllthetime(boolean isAll) {
+		show_tooltip_allthetime = isAll;
 	}
 	public int getTotalElements() {
 		return total_elements;
@@ -1348,7 +1366,9 @@ public class IconCanvas extends Canvas {
 		if (index > -1) {
 			setCursor(new Cursor(getDisplay(), SWT.CURSOR_HAND));
 			showToolTip(index, event.x, event.y);
-			if (toolTipShell != null) {
+			//TODO
+			//if (toolTipShell != null) {
+			if (!show_tooltip_allthetime && fInformationControl != null) {
 				getHoverTimer().schedule(new TimerTask() {
 					public void run() {
 						getDisplay().asyncExec(new Runnable() {
@@ -1365,11 +1385,18 @@ public class IconCanvas extends Canvas {
 		}
 	}
 	protected void hideToolTip() {
+		/*
 		if (toolTipShell != null) {
 			toolTipLabel.dispose();
 			toolTipShell.dispose();
 			toolTipLabel = null;
 			toolTipShell = null;
+		}
+		*/
+		//TODO
+		if (fInformationControl != null) {
+			fInformationControl.setVisible(false);
+			fInformationControl.dispose();
 		}
 		if (hoverTimer != null) {
 			hoverTimer.cancel();
@@ -1538,6 +1565,7 @@ public class IconCanvas extends Canvas {
 		hideToolTip();
 	}
 	protected void showToolTip(int index, int mx, int my) {
+		/*
 		if (toolTipProvider == null || index == -1) {
 			hideToolTip();
 			return;
@@ -1573,6 +1601,39 @@ public class IconCanvas extends Canvas {
 		}
 		toolTipShell.setLocation(getViewActualLocation(this, null, display_x, display_y));
 		toolTipShell.setVisible(true);
+		*/
+		//TODO
+		if (index == -1) {
+			hideToolTip();
+			return;
+		}
+		String[] tooltipTexts = getToolTipText(getObject(index));
+		IIconInformationControl informationControl= getInformationControl((tooltipTexts.length>1));
+		if (informationControl != null) {
+			Rectangle clientArea = getClientArea();
+			informationControl.setSizeConstraints(clientArea.width, clientArea.height);
+			informationControl.setHeader(tooltipTexts[0]);
+			if (tooltipTexts.length > 1) {
+				informationControl.setInformation(tooltipTexts[1]);
+			}
+			Point location = findLocation(index);
+			Point t_size = informationControl.computeSizeHint();
+			final int gap_x = 2;
+			int display_x = location.x + getElementWidth() + gap_x;
+			int display_y = location.y + getElementHeight();
+			if (display_x + t_size.x > clientArea.width) {
+				int lx = location.x - t_size.x - gap_x;
+				if (lx > 0)
+					display_x = lx; 
+			}
+			if (display_y > clientArea.height - e_offset_y) {
+				display_y = location.y - t_size.y;
+			}
+			Point real_location = getViewActualLocation(this, null, display_x, display_y);
+			informationControl.setSize(t_size.x, t_size.y);
+			informationControl.setLocation(real_location);
+			informationControl.setVisible(true);
+		}
 	}
 	protected Point getViewActualLocation(Control from, Control to, int mx, int my) {
 		Point mappedpt = getDisplay().map(from, to, 0, 0);
@@ -1588,9 +1649,9 @@ public class IconCanvas extends Canvas {
 		}
 		return retValue;
 	}
-	protected String getToolTipText(Object obj) {
+	protected String[] getToolTipText(Object obj) {
 		if (toolTipProvider == null)
-			return "";
+			return IToolTipProvider.NO_TOOLTIP;
 		return toolTipProvider.toolTipText(obj);
 	}
 	protected Object getObject(int index) {
@@ -1614,7 +1675,7 @@ public class IconCanvas extends Canvas {
 	 * Self testing
 	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
 	public static void main(String[] args) {
-		final int totalImage = 100000;
+		final int totalImage = 100;
         final Display display = new Display();
         final Shell shell = new Shell(display);
         shell.setLocation(0, 0);
@@ -1655,8 +1716,15 @@ public class IconCanvas extends Canvas {
         	}
         });
         iconCanvas.setToolTipProvider(new IToolTipProvider() {
-        	public String toolTipText(Object obj) {
-        		return " The element: " + obj.toString();
+        	public String[] toolTipText(Object obj) {
+        		String[] texts = new String[2];
+        		String contentText = "<u>Variables</u><br>";
+        		contentText += "<ind>abc: <key>PrintStream</key><br>";
+        		contentText += "<ind><hl>aasdbc:</hl> PrintStream<br>";
+        		contentText += "<ind><i>ab99213 32c:</i> PrintStream<br>";
+        		texts[0] = "Object: " + obj;
+        		texts[1] = contentText;
+        		return texts;
         	}
         });
         iconCanvas.setTotal(totalImage);
@@ -1665,6 +1733,20 @@ public class IconCanvas extends Canvas {
         while (!shell.isDisposed()) {
         	if (!display.readAndDispatch())
         		display.sleep();
-       	}        
+       	}
+	}
+	protected IIconInformationControl getInformationControl(boolean hasExtra) {
+		if (fInformationControl == null) {
+			fInformationControl= iconHover.getHoverControlCreator(getShell(), hasExtra);
+			fInformationControl.addDisposeListener(new DisposeListener() {
+				public void widgetDisposed(DisposeEvent e) {
+					handleInformationControlDisposed();
+				}
+			});
+		}
+		return fInformationControl;
+	}
+	protected void handleInformationControlDisposed() {
+		fInformationControl= null;
 	}
 }

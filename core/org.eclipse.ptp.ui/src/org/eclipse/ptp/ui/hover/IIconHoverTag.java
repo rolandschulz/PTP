@@ -16,12 +16,23 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.ui.views;
+package org.eclipse.ptp.ui.hover;
 /**
  * @author Clement chu
- *
+ * 
  */
-public interface IToolTipProvider {
-	public String[] NO_TOOLTIP = new String[] { "" };
-	public String[] toolTipText(Object obj);
+public interface IIconHoverTag {
+	public final static String UNDERLINE_TAG = "u";
+	public final static String STRIKE_TAG = "s";
+	public final static String BOLD_TAG = "b";
+	public final static String ITALIC_TAG = "i";
+	public final static String P_TAG = "p";
+	public final static String KEY_TAG = "key";
+	public final static String HIGHLIGHT_TAG = "hl";
+	public final static String INDENT_TAG = "ind";
+	public final static String NEXT_LINE_TAG = "br";
+		
+	public final static char CLOSED_TAG = '/';
+	public final static char START_TAG = '<';
+	public final static char END_TAG = '>';
 }
