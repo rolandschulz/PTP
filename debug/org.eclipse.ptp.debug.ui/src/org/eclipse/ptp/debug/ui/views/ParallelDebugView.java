@@ -113,7 +113,7 @@ public class ParallelDebugView extends ParallelJobView implements IDebugActionUp
 		
 		super.buildInToolBarActions(toolBarMgr);
 		
-		//createOrientationActions();
+		createOrientationActions();
 	}
 	protected void createOrientationActions() {
 		IActionBars actionBars = getViewSite().getActionBars();
@@ -146,14 +146,14 @@ public class ParallelDebugView extends ParallelJobView implements IDebugActionUp
 			PTPDebugUIPlugin.errorDialog(getViewSite().getShell(), "Error", e.getStatus());
 		}
 	}
-	public String getToolTipText(Object obj) {
-		String tooltip = super.getToolTipText(obj);
+	public String[] getToolTipText(Object obj) {
+		String[] header = super.getToolTipText(obj);
 		IPJob job = ((UIDebugManager) manager).findJobById(getCurrentID());
 		String variableText = ((UIDebugManager) manager).getValueText(job, ((IPProcess)obj).getTaskId());
 		if (variableText != null && variableText.length() > 0) {
-			tooltip += "\n" + variableText;
+			return new String[] { header[0], variableText };
 		}
-		return tooltip;
+		return header;
 	}
 	
 	public void registerElement(IElement element) throws CoreException {

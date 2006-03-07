@@ -36,6 +36,7 @@ public interface IDebugCommand extends Comparable {
 	public boolean waitForReturn() throws PCDIException;
 	public boolean canInterrupt();
 	public void cancelWaiting();
+	public boolean isWaitInQueue();
 	
 	public void flush();
 	

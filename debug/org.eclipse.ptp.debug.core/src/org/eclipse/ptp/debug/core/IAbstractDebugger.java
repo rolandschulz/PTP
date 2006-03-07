@@ -42,7 +42,7 @@ public interface IAbstractDebugger extends IDebugger {
 	public IPCDISession createDebuggerSession(IPLaunch launch, IBinaryObject exe, int timeout, IProgressMonitor monitor) throws CoreException;
 	
 	/* Debugger Initialization/Termination */
-	public void initialize(IPJob job) throws CoreException;
+	public void initialize(IPJob job, int timeout) throws CoreException;
 	public void exit() throws CoreException;
 	
 	public void addDebuggerObserver(Observer obs);
@@ -67,7 +67,6 @@ public interface IAbstractDebugger extends IDebugger {
 	public void handleProcessResumedEvent(BitList tasks);
 	public void handleProcessTerminatedEvent(BitList tasks);
 	public void handleProcessSignaledEvent(BitList tasks, IPCDILocator locator);
-	public void handleErrorEvent(BitList tasks, String errMsg);
 	public void handleErrorEvent(BitList tasks, String errMsg, int errCode);
 	
 	/* others */

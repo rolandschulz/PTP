@@ -35,5 +35,6 @@ public interface IPVariableManager {
 	public String getValueText(IPJob job, int taskID);
 	public void cleanVariables(IPJob job);
 	public void updateVariables(IPJob job, String set_id, IProgressMonitor monitor) throws CoreException;
+	public boolean hasVariable();
 }
 

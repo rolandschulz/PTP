@@ -67,6 +67,9 @@ public class PVariableManager implements IPVariableManager {
 	public void removeAllVariables() {
 		variables.clear();
 	}
+	public boolean hasVariable() {
+		return (variables.size()>0);
+	}
 
 	public String[] getVariables(IPJob job) {
 		if (jobList.containsKey(job.getIDString())) {
@@ -111,20 +114,23 @@ public class PVariableManager implements IPVariableManager {
 	}
 	
 	public String getValueText(IPJob job, int taskID) {
-		String[] variableTexts = getVariables(job);
-		if (variableTexts.length > 0 && taskID < variableTexts.length) {
-			if (variableTexts[taskID] != null) {
-				return variableTexts[taskID];
+		if (hasVariable()) {
+			String[] variableTexts = getVariables(job);
+			if (variableTexts.length > 0 && taskID < variableTexts.length) {
+				if (variableTexts[taskID] != null) {
+					return variableTexts[taskID];
+				}
+				return "No value found.";
 			}
 		}
-		return "No value found.";
+		return "";
 	}
 	
 	private String getValue(IPCDISession session, int taskID) {
 		String content = "";
 		for (Iterator i=variables.iterator(); i.hasNext();) {
 			String variable = (String)i.next();
-			content += "\t" + variable + ": ";
+			content += "-<i>" + variable + ":</i> ";
 			try {
 				IAIF aif = session.getExpressionValue(taskID, variable);
 				content += aif.getValue().getValueString(); 
@@ -133,7 +139,7 @@ public class PVariableManager implements IPVariableManager {
 			} catch (AIFException e) {
 				content += "Unknown";
 			}
-			content += "\n";
+			content += "<br>";
 		}
 		return content;
 	}
