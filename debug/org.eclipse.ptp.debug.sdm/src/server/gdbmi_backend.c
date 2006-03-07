@@ -1127,12 +1127,11 @@ struct simple_type {
 #define FLOAT		9
 #define DOUBLE		10
 
-#define TOTAL_MODIFIER 3
-
 char* MODIFIERS[] = {
-	"const",
+	"const volatile",
 	"volatile",
-	"const volatile"
+	"const",
+	NULL
 };
 
 struct simple_type simple_types[] = {
@@ -1292,25 +1291,25 @@ SimpleVarToAIF(char *exp, MIVar *var)
 static int getSimpleTypeID(char* type) {
 	struct simple_type *	s;
 	
-	for (s = simple_types ; s->type_c != NULL ; s++ ) {
-		type = GetModifierType(type);
-		if ( strcmp(type, s->type_c) == 0 ) {
+	type = GetModifierType(type);
+	for (s = simple_types; s->type_c != NULL; s++) {
+		if (strcmp(type, s->type_c) == 0) {
 			return s->type;
 		}
 	}
 	return -1;	
 }
 
-static char* GetModifierType(char* original_type) {
-	int modifier_len;
-	int index;
-	for (index=0; index<TOTAL_MODIFIER; index++) {
-		modifier_len = strlen(MODIFIERS[index]);
-		if (strncmp(original_type, MODIFIERS[index], modifier_len) == 0) {
-			return original_type + modifier_len + 1;
+static char* GetModifierType(char* type) {
+	char** m;
+	int len;
+	for (m = MODIFIERS; *m != NULL; m++) {
+		len = strlen(*m);
+		if (strncmp(type, *m, len) == 0) {
+			return type + len + 1; //+1 remove whitespace
 		}
 	}
-	return original_type;
+	return type;
 }
 
 static AIF *
