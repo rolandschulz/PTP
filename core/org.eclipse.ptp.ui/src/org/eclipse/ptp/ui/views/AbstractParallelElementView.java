@@ -160,7 +160,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	protected abstract void doubleClick(IElement element);
 	protected abstract void updateView(Object condition);
 	protected abstract Image getImage(int index1, int index2);
-	protected abstract String getToolTipText(Object obj);
+	protected abstract String[] getToolTipText(Object obj);
 	protected abstract Object convertElementObject(IElement element);
 	/*******************************************************************************************************************************************************************************************************************************************************************************************************
 	 * Paint Listener
@@ -183,11 +183,11 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	/*******************************************************************************************************************************************************************************************************************************************************************************************************
 	 * IToolTipProvider
 	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
-	public String toolTipText(Object obj) {
+	public String[] toolTipText(Object obj) {
 		if (obj instanceof IElement) {			
 			return getToolTipText(convertElementObject((IElement)obj));
 		}
-		return "";
+		return new String[] { "" };
 	}	
 	/*******************************************************************************************************************************************************************************************************************************************************************************************************
 	 * Image Provider

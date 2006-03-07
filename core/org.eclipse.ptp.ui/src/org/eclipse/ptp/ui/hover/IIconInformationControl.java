@@ -16,12 +16,15 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.ui.views;
+package org.eclipse.ptp.ui.hover;
+
+import org.eclipse.jface.text.IInformationControl;
+
 /**
  * @author Clement chu
- *
+ * 
  */
-public interface IToolTipProvider {
-	public String[] NO_TOOLTIP = new String[] { "" };
-	public String[] toolTipText(Object obj);
+public interface IIconInformationControl extends IInformationControl {
+	public void setHeader(String header);
 }
+

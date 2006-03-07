@@ -207,26 +207,26 @@ public class ParallelJobView extends AbstractParallelSetView {
 		}
 		return super.getRulerIndex(obj, index);
 	}
-	public String getToolTipText(Object obj) {
+	public String[] getToolTipText(Object obj) {
 		IElementHandler setManager = getCurrentElementHandler();
 		if (obj == null || !(obj instanceof IPProcess) || setManager == null || cur_element_set == null)
-			return " Unknown element";
+			return IToolTipProvider.NO_TOOLTIP;
 
 		IPProcess proc = (IPProcess)obj;
 		StringBuffer buffer = new StringBuffer();
-		buffer.append(" Task ID: " + proc.getTaskId());
+		buffer.append("Task ID: " + proc.getTaskId());
 		buffer.append("\n");
-		buffer.append(" Process ID: " + proc.getPid());
+		buffer.append("Process ID: " + proc.getPid());
 		IElementSet[] sets = setManager.getSetsWithElement(proc.getIDString());
 		if (sets.length > 1)
-			buffer.append("\n Set: ");
+			buffer.append("\nSet: ");
 		for (int i = 1; i < sets.length; i++) {
 			buffer.append(sets[i].getID());
 			if (i < sets.length - 1)
 				buffer.append(",");
 		}
 		// buffer.append("\nStatus: " + getJobManager().getProcessStatusText(proc));
-		return buffer.toString();
+		return new String[] { buffer.toString() };
 	}
 	public String getCurrentID() {
 		return ((JobManager) manager).getCurrentJobId();
