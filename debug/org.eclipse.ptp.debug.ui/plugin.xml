@@ -288,7 +288,6 @@
          </action>
       </objectContribution>
       <!-- variable start -->
-      <!--
       <objectContribution
 			objectClass="org.eclipse.ptp.debug.core.model.IPVariable"
             id="org.eclipse.ptp.debug.ui.PVariableActions">
@@ -335,12 +334,10 @@
                id="org.eclipse.ptp.debug.internal.ui.actions.AddPVariableActionDelegate">
          </action>
       </objectContribution>
-      //-->
       <!-- variable end -->
    </extension>
 
   <!-- variable toolbar start //-->
-  <!--
    <extension
          point="org.eclipse.ui.viewActions">
       <viewContribution
@@ -393,7 +390,6 @@
          </action>
       </viewContribution>
    </extension>
-   //-->
    <!-- variable toolbar end //-->
 
    <extension
