@@ -43,7 +43,6 @@ public class StartDebuggerCommand extends AbstractDebugCommand {
 			throw new PCDIException(e);
 		}
 	}
-	
 	public void waitFnish() throws PCDIException {
 		waitForReturn();
 	}

@@ -67,13 +67,11 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 	protected boolean isExited = false;
 	protected IPJob job = null;
 	protected DebugCommandQueue commandQueue = null;
-	protected int timeout = 0;
 	
 	public IPCDISession createDebuggerSession(IPLaunch launch, IBinaryObject exe, int timeout, IProgressMonitor monitor) throws CoreException {
-		this.timeout = timeout;
 		IPJob job = launch.getPJob();
-		initialize(job);
 		session = new Session(this, job, launch, exe);
+		initialize(job, timeout);
 		return session;
 	}	
 	
@@ -84,7 +82,7 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		commandQueue.setCommandReturn(tasks, result);
 	}
 
-	public final void initialize(IPJob job) throws CoreException {
+	public final void initialize(IPJob job, int timeout) throws CoreException {
 		this.job = job;
 		job.setAttribute(TERMINATED_PROC_KEY, new BitList(job.size()));
 		job.setAttribute(SUSPENDED_PROC_KEY, new BitList(job.size()));
@@ -181,6 +179,9 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 	}
 	private void setJobFinished(BitList tasks, String status) {
 		if (session != null) {
+			if (tasks == null) {
+				tasks = session.createBitList();
+			}
 			setSuspendTasks(false, tasks);
 			setTerminateTasks(true, tasks);
 			session.unregisterTargets(tasks.toArray(), true);
@@ -239,11 +240,7 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 			}
 		}
 		fireEvent(new ErrorEvent(getSession(), tasks, errMsg, errCode));
-	}
-	public void handleErrorEvent(BitList tasks, String errMsg) {
-		fireEvent(new ErrorEvent(getSession(), tasks, errMsg));
-	}
-	
+	}	
 	public IPProcess getProcess(int number) {
 		return procs[number];
 	}
