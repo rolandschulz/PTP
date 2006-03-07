@@ -191,6 +191,11 @@ MIGetDetailsType(MICommand *cmd) {
 		type = oob->cstring;
 		if (strncmp(type, "type", 4) == 0) {
 			type += 7; //bypass " = "
+			p = strchr(type, '{');
+			if (p != NULL) {
+				*p-- = '\0';//remove the whitespace before {
+				return strdup(type);
+			}
 			p = strchr(type, '\\');
 			if (p != NULL) {
 				*p = '\0';
