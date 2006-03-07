@@ -99,6 +99,7 @@ static int	GDBMIGetGlobalVariables(void);
 static int	GDBMIQuit(void);
 
 static char* GetModifierType(char *);
+static int getSimpleTypeID(char* type);
 static AIF* CreateNamed(AIF*, int);
 
 dbg_backend_funcs	GDBMIBackend =
@@ -1178,18 +1179,16 @@ SimpleVarToAIF(char *exp, MIVar *var)
 	char *				res;
 	AIF *				a;
 	AIF *				av;
-	struct simple_type *	s;
 	char * 				type;
+	int 				type_id;
 	
 	type = var->type;
-
 	if ( strcmp(type, "<text variable, no debug info>") == 0 ) {
 		DbgSetError(DBGERR_NOSYMS, "");
 		return NULL;
 	}
 
 	len = strlen(type);
-	
 	if (type[len - 1] == ')') { /* function */
 		return MakeAIF("&/is4", exp);
 	} 
@@ -1210,20 +1209,25 @@ SimpleVarToAIF(char *exp, MIVar *var)
 		return a;
 	}
 
-	for (s = simple_types ; s->type_c != NULL ; s++ )
-	{
-		type = GetModifierType(type);
-
-		if ( strcmp(type, s->type_c) == 0 )
-		{
-			if ((res = GetVarValue(var->name)) == NULL) {
-				return NULL;
-			}
+	type_id = getSimpleTypeID(type);
+	if (type_id == -1) {//try again with ptype
+		MICommand* cmd;
+		cmd = MIPType(exp);
+		SendCommandWait(DebugSession, cmd);
+		var->type = MIGetDetailsType(cmd);
+		MICommandFree(cmd);
+		type_id = getSimpleTypeID(var->type);
+	}		
 		
-			switch (s->type) {
-			case CHAR:
-				if ((p = strchr(res, ' ')) != NULL)
-					*p = '\0';
+	if (type_id > -1) {
+		if ((res = GetVarValue(var->name)) == NULL) {
+			return NULL;
+		}
+		
+		switch (type_id) {
+		case CHAR:
+			if ((p = strchr(res, ' ')) != NULL)
+				*p = '\0';
 					a = CharToAIF((char)atoi(res));
 					break;
 				
@@ -1260,22 +1264,32 @@ SimpleVarToAIF(char *exp, MIVar *var)
 				a = UnsignedLongLongToAIF((unsigned long long)atoll(res));
 				break;
 #endif /* CC_HAS_LONG_LONG */
-				
-			case FLOAT:
-				a = FloatToAIF((float)atof(res));
-				break;
-				
-			case DOUBLE:
-				a = DoubleToAIF(atof(res));
-				break;				
-			}
-		
-			return a;
+			
+		case FLOAT:
+			a = FloatToAIF((float)atof(res));
+			break;
+			
+		case DOUBLE:
+			a = DoubleToAIF(atof(res));
+			break;				
 		}
+		return a;
 	}
 
 	DbgSetError(DBGERR_DEBUGGER, "could not convert simple type");
 	return NULL;
+}
+
+static int getSimpleTypeID(char* type) {
+	struct simple_type *	s;
+	
+	for (s = simple_types ; s->type_c != NULL ; s++ ) {
+		type = GetModifierType(type);
+		if ( strcmp(type, s->type_c) == 0 ) {
+			return s->type;
+		}
+	}
+	return -1;	
 }
 
 static char* GetModifierType(char* original_type) {
@@ -1511,7 +1525,6 @@ GetAIFVar(char *var, AIF **val, char **type)
 	MICommand *	cmd;
 	
 	cmd = MIVarCreate("-", "*", var);
-
 	SendCommandWait(DebugSession, cmd);
 	
 	if (!MICommandResultOK(cmd)) {
@@ -1519,11 +1532,9 @@ GetAIFVar(char *var, AIF **val, char **type)
 		MICommandFree(cmd);
 		return DBGRES_ERR;
 	}
-		
 	mivar = MIGetVarCreateInfo(cmd);
-	
 	MICommandFree(cmd);
-
+	
 	if ( (res = ConvertVarToAIF(var, mivar, 0)) == NULL ) {
 		return DBGRES_ERR;
 	}

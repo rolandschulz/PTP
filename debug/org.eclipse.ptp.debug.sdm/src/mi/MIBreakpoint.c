@@ -152,11 +152,10 @@ MIBreakpointGetBreakInsertInfo(MICommand *cmd)
 	MIResultRecord *	rr;
 	List *			breakpoints = NULL;
 	
-	if (!cmd->completed || cmd->result == NULL)
+	if (!cmd->completed || cmd->output == NULL || cmd->output->rr == NULL)
 		return NULL;
 		
-	rr = cmd->result;
-	
+	rr = cmd->output->rr;
 	for (SetList(rr->results); (result = (MIResult *)GetListElement(rr->results)) != NULL; ) {
 		var = result->variable;
 		val = result->value;
