@@ -65,6 +65,7 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 	private int CSChoiceID = -1;
 	private int lastMSChoiceID = -1;
 	private int lastCSChoiceID = -1;
+	protected Button develModeButton = null;
 
 	public PTPPreferencesPage() {
 		setPreferenceStore(PTPCorePlugin.getDefault().getPreferenceStore());
@@ -97,10 +98,25 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 		createChooseRSContents(composite);
 		// createMPICTRLContents(composite);
 		createOutputContents(composite);
+		develModeButton = createCheckButton(composite,
+			CoreMessages.getResourceString("PTPPreferencesPage.devel_mode"));
 		loadSaved();
 		defaultSetting();
 		return composite;
 	}
+	
+	protected Button createCheckButton(Composite parent, String label) {
+		return createButton(parent, label, SWT.CHECK | SWT.LEFT);
+	}
+	
+	protected Button createButton(Composite parent, String label, int type) {
+		Button button = new Button(parent, type);
+		button.setText(label);
+		GridData data = new GridData();
+		button.setLayoutData(data);
+		return button;
+	}
+	
 	private void createOutputContents(Composite parent) {
 		Group aGroup = new Group(parent, SWT.SHADOW_ETCHED_IN);
 		aGroup.setLayout(createGridLayout(1, true, 10, 10));
@@ -166,6 +182,7 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 		CSChoiceID = preferences.getInt(PreferenceConstants.CONTROL_SYSTEM_SELECTION);
 		comboCS.select(ControlSystemChoices.getCSArrayIndexByID(CSChoiceID));
 		lastCSChoiceID = CSChoiceID;
+		develModeButton.setSelection(preferences.getBoolean(PreferenceConstants.DEVELOPER_MODE));
 	}
 	/* do stuff on init() of preferences, if anything */
 	public void init(IWorkbench workbench) {}
@@ -189,6 +206,7 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 		preferences.setValue(PreferenceConstants.CONTROL_SYSTEM_SELECTION, CSChoiceID);
 		preferences.setValue(PreferenceConstants.OUTPUT_DIR, outputDIR);
 		preferences.setValue(PreferenceConstants.STORE_LINE, storeLine);
+		preferences.setValue(PreferenceConstants.DEVELOPER_MODE, develModeButton.getSelection());
 		PTPCorePlugin.getDefault().savePluginPreferences();
 		/*
 		 * IModelManager manager = PTPCorePlugin.getDefault().getModelManager(); 

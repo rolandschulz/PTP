@@ -19,6 +19,8 @@
 
 package org.eclipse.ptp.core;
 
+import org.eclipse.core.runtime.Preferences;
+
 public class MonitoringSystemChoices {
 	
 	/* HOWTO ADD A NEW MS:
@@ -37,8 +39,7 @@ public class MonitoringSystemChoices {
 	static public final int MPICH1 = 104;
 	static public final int MPICH2 = 105;
 	
-	static private String[] MSChoices = new String[] {
-			"Simulated", 
+	static private String[] NonDevelMSChoices = new String[] {
 			"Open Runtime Environment (ORTE)",
 			/*
 			"Los Alamos MPI (LAMPI)",
@@ -48,8 +49,7 @@ public class MonitoringSystemChoices {
 			*/ 
 	};
 	
-	static private int[] MSIDs = new int[] {
-			SIMULATED,
+	static private int[] NonDevelMSIDs = new int[] {
 			ORTE,
 			/*
 			LAMPI,
@@ -59,9 +59,50 @@ public class MonitoringSystemChoices {
 			*/
 	};
 	
+	static private String[] DevelMSChoices = new String[] {
+		"Simulated", 
+		"Open Runtime Environment (ORTE)",
+		/*
+		"Los Alamos MPI (LAMPI)",
+		"LAM-MPI",
+		"MPICH 1.x",
+		"MPICH 2.x (MPD)"
+		*/ 
+};
+
+	static private int[] DevelMSIDs = new int[] {
+		SIMULATED,
+		ORTE,
+		/*
+		LAMPI,
+		LAMMPI,
+		MPICH1,
+		MPICH2
+		*/
+	};
+	
+	public static boolean queryDevelMode()
+	{
+		Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
+		return preferences.getBoolean(PreferenceConstants.DEVELOPER_MODE);
+	}
+	
+	public static String[] queryMSChoices()
+	{
+		if(queryDevelMode()) return DevelMSChoices;
+		return NonDevelMSChoices;
+	}
+	
+	public static int[] queryMSIDs()
+	{
+		if(queryDevelMode()) return DevelMSIDs;
+		return NonDevelMSIDs;
+	}
+	
+	
 	public static String[] getMSStrings()
 	{
-		return MSChoices;
+		return queryMSChoices();
 	}
 
 	/* returns -1 if not found */
@@ -70,8 +111,8 @@ public class MonitoringSystemChoices {
 		int i;
 		
 		/* find the index number by the name */
-		for(i=0; i<MSChoices.length; i++) {
-			if(MSname.equals(MSChoices[i])) return i;
+		for(i=0; i<queryMSChoices().length; i++) {
+			if(MSname.equals(queryMSChoices()[i])) return i;
 		}
 		
 		return -1;
@@ -81,8 +122,8 @@ public class MonitoringSystemChoices {
 	{
 		int i;
 		
-		for(i=0; i<MSIDs.length; i++) {
-			if(ID == MSIDs[i]) return i;
+		for(i=0; i<queryMSIDs().length; i++) {
+			if(ID == queryMSIDs()[i]) return i;
 		}
 		
 		return -1;
@@ -95,22 +136,22 @@ public class MonitoringSystemChoices {
 		idx = getMSArrayIndexByName(MSname);
 		if(idx < 0) return idx;
 		
-		return MSIDs[idx];
+		return queryMSIDs()[idx];
 	}
 	
 	public static int getMSIDByIndex(int idx)
 	{
 
-		if(idx < 0 || idx >= MSIDs.length) return -1;
-		return MSIDs[idx];
+		if(idx < 0 || idx >= queryMSIDs().length) return -1;
+		return queryMSIDs()[idx];
 	}
 	
 	public static String getMSNameByID(int ID)
 	{
 		int i;
 		
-		for(i=0; i<MSIDs.length; i++) {
-			if(ID == MSIDs[i]) return MSChoices[i];
+		for(i=0; i<queryMSIDs().length; i++) {
+			if(ID == queryMSIDs()[i]) return queryMSChoices()[i];
 		}
 		
 		return "<UNDEFINED MS>";
@@ -118,7 +159,7 @@ public class MonitoringSystemChoices {
 	
 	public static String getMSNameByIndex(int idx)
 	{
-		if(idx < 0 || idx >= MSChoices.length) return "<UNDEFINED MS>";
-		return MSChoices[idx];
+		if(idx < 0 || idx >= queryMSChoices().length) return "<UNDEFINED MS>";
+		return queryMSChoices()[idx];
 	}
 }
