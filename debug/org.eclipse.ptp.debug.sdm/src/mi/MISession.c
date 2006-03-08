@@ -39,7 +39,8 @@
 static List *			MISessionList = NULL;
 static struct timeval		MISessionDefaultSelectTimeout = {0, 1000};
 
-static List* DoOOBCallbacks(MISession *sess, List *oobs);
+static void DoOOBAsyncCallbacks(MISession *sess, List *oobs);
+static void DoOOBStreamCallbacks(MISession *sess, List *oobs);
 static void HandleChild(int sig);
 static int WriteCommand(int fd, char *cmd);
 static char *ReadResponse(int fd);
@@ -373,28 +374,45 @@ MISessionProcessCommandsAndResponses(MISession *sess, fd_set *rfds, fd_set *wfds
 		
 		output = MIParse(str);	
 			
+		/*
+		 * The output can consist of:
+		 * 	async oob records that are not necessarily the result of a command
+		 * 	stream oob records that always result from a command
+		 *	result records from a command
+		 * 
+		 * Async oob records are processed immediately and removed.
+		 * 
+		 * Stream oob records are processed immediately but a retained with the
+		 * command in case they are needed for later processing.
+		 * 
+		 * If there are result records, then the output *should* have resulted
+		 * from the execution of a command. Mark the command as completed an
+		 * invoke its callback.
+		 * 
+		 * The stream oob and result records are freed when the command is freed.
+		 */
+		 
 		if (output->oobs != NULL) {
 #ifdef __gnu_linux__
 			if (sess->command != NULL && strcmp(sess->command->command, "-exec-interrupt") == 0) {
 				sess->command->completed = 1;
 			}
 #endif /* __gnu_linux__ */	
-			output->oobs = DoOOBCallbacks(sess, output->oobs);
+			DoOOBAsyncCallbacks(sess, output->oobs);
+			DoOOBStreamCallbacks(sess, output->oobs);
 		}
 			
-		if (output->rr != NULL) {
+		if (output->rr != NULL && sess->command != NULL) {
 			sess->command->completed = 1;
 			sess->command->output = output;
 			if (sess->command->callback != NULL)
 				sess->command->callback(output->rr);
-			//output->rr = NULL; /* Freed by MICommandFree() */
-			//output->oobs = NULL;
+		} else {
+			MIOutputFree(output);
 		}
 
 		if (sess->command != NULL && sess->command->completed)
 			sess->command = NULL;
-
-		//MIOutputFree(output);
 	}
 }
 
@@ -404,38 +422,43 @@ MISessionCommandCompleted(MISession *sess)
 	return sess->command == NULL;
 }
 
-static List*
-DoOOBCallbacks(MISession *sess, List *oobs)
+/*
+ * Process async callbacks. Removes records from oobs list.
+ */
+static void
+DoOOBAsyncCallbacks(MISession *sess, List *oobs)
 {
 	MIOOBRecord *	oob;
 	MIResult *		res;
 	MIValue *		val;
-	List *aList = NewList();
 	
 	for (SetList(oobs); (oob = (MIOOBRecord *)GetListElement(oobs)) != NULL; ) {
-		switch (oob->type) {
-		case MIOOBRecordTypeAsync:
+		if (oob->type == MIOOBRecordTypeAsync) {
 			switch (oob->sub_type) {
 			case MIOOBRecordExecAsync:
 				if (sess->exec_callback != NULL)
 					sess->exec_callback(oob->class, oob->results);
 				if (strcmp(oob->class, "stopped") == 0) {
-					int cmdSend = 0;
+					int seen_reason = 0;
 					for (SetList(oob->results); (res = (MIResult *)GetListElement(oob->results)); ) {
 						if (strcmp(res->variable, "reason") == 0) {
+							seen_reason = 1;
 							val = res->value;
 							if (val->type == MIValueTypeConst) {
 								if (sess->event_callback) {
 									sess->event_callback(MIEventCreateStoppedEvent(val->cstring, oob->results));
-									cmdSend = 1;
 								}
 							}
 						}
 					}
-					if (cmdSend == 0) {
+					
+					/*
+					 * Temporary breakpoints under Linux don't have a "reason". If we receive
+					 * a stopped event with no reason, then we created a StoppedEvent anyway
+					 */
+					if (seen_reason == 0) {
 						if (sess->event_callback) {
-							sess->event_callback(MIEventCreateStoppedEvent("", oob->results));
-							cmdSend = 1;
+							sess->event_callback(MIEventCreateStoppedEvent("temporary-breakpoint-hit", oob->results));
 						}
 					}
 				}
@@ -451,9 +474,24 @@ DoOOBCallbacks(MISession *sess, List *oobs)
 					sess->notify_callback(oob->class, oob->results);
 				break;
 			}
-			break;
 			
-		case MIOOBRecordTypeStream:
+			RemoveFromList(oobs, (void *)oob);
+			MIOOBRecordFree(oob);
+		}
+	}
+}
+
+/*
+ * Process stream callbacks. We leave the records on the oobs list
+ * because they may be needed by later command processing.
+ */
+static void
+DoOOBStreamCallbacks(MISession *sess, List *oobs)
+{
+	MIOOBRecord *	oob;
+	
+	for (SetList(oobs); (oob = (MIOOBRecord *)GetListElement(oobs)) != NULL; ) {
+		if (oob->type == MIOOBRecordTypeStream) {
 			switch (oob->sub_type) {
 			case MIOOBRecordConsoleStream:
 				if (sess->console_callback != NULL) {
@@ -471,11 +509,8 @@ DoOOBCallbacks(MISession *sess, List *oobs)
 					sess->target_callback(oob->cstring);
 				break;
 			}
-			AddToList(aList, (void *)oob);
-			break;
 		}
 	}
-	return aList;
 }
 
 void

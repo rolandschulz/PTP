@@ -104,8 +104,11 @@ MIEventCreateStoppedEvent(char *reason, List *results)
 		event = MIEventNew(MIEventClassStopped, MIEventTypeInferiorExit);
 	} else if (strcmp(reason, "exited-signalled") == 0) {
 		event = MIEventNew(MIEventClassStopped, MIEventTypeInferiorSignalExit);
-	} else {
-		//added by clement - for handling temporary breakpoints
+	} else if (strcmp(reason, "temporary-breakpoint-hit") == 0) {
+		/*
+		 * temporary-breakpoint-hit is a fake reason we use because Linux
+		 * support for temporary breakpoints is broken.
+		 */ 
 		event = MIEventNew(MIEventClassStopped, MIEventTypeSuspended);
 	}
 	
