@@ -573,7 +573,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 				}
 				if (lineNumber == 0)
 					lineNumber = 1;
-				try {
+				try {					
 					annotationMgr.addAnnotation(job.getIDString(), fileName, lineNumber, event.getAllUnregisteredProcesses(), false);
 					annotationMgr.addAnnotation(job.getIDString(), fileName, lineNumber, event.getAllRegisteredProcesses(), true);
 				} catch (final CoreException e) {
@@ -586,53 +586,26 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 				updateDebugVariables(job);
 				fireSuspendEvent(job, event.getAllProcesses());
 			} else if (event instanceof IPCDIResumedEvent) {
-				try {
-					annotationMgr.removeAnnotation(job.getIDString(), event.getAllProcesses());
-				} catch (final CoreException e) {
-					PTPDebugUIPlugin.getDisplay().asyncExec(new Runnable() {
-						public void run() {
-							PTPDebugUIPlugin.errorDialog("Error", e);
-						}
-					});
-				}
+				removeAnnotation(job.getIDString(), event.getAllProcesses());
 				// System.out.println("-------------------- resume ------------------------");
 				// annotationMgr.printBitList(event.getAllProcesses().toBitList());
 				cleanupDebugVariables(job);
 				fireResumeEvent(job, event.getAllProcesses());
 			} else if (event instanceof IPCDIExitedEvent) {
-				try {
-					annotationMgr.removeAnnotation(job.getIDString(), event.getAllProcesses());
-				} catch (final CoreException e) {
-					PTPDebugUIPlugin.getDisplay().asyncExec(new Runnable() {
-						public void run() {
-							PTPDebugUIPlugin.errorDialog("Error", e);
-						}
-					});
-				}
+				removeAnnotation(job.getIDString(), event.getAllProcesses());
 				// System.out.println("-------------------- terminate ------------------------");
 				// annotationMgr.printBitList(event.getAllProcesses());
 				cleanupDebugVariables(job);
 				fireTerminatedEvent(job, event.getAllProcesses());
 			} else if (event instanceof IPCDIErrorEvent) {
-				try {
-					annotationMgr.removeAnnotation(job.getIDString(), event.getAllProcesses());
-				} catch (final CoreException e) {
-					PTPDebugUIPlugin.getDisplay().asyncExec(new Runnable() {
-						public void run() {
-							PTPDebugUIPlugin.errorDialog("Error", e);
-						}
-					});
-				}
+				removeAnnotation(job.getIDString(), event.getAllProcesses());
 				final IPCDIErrorEvent errEvent = (IPCDIErrorEvent)event;
-				int errCode = errEvent.getErrorCode();
-				if (errCode == ErrorEvent.DBG_ERROR || errCode == ErrorEvent.DBG_FATAL) {
-					PTPDebugUIPlugin.getDisplay().asyncExec(new Runnable() {
-						public void run() {
-							IPCDIErrorInfo info = (IPCDIErrorInfo)errEvent.getReason();
-							PTPDebugUIPlugin.errorDialog("Error", new Exception(info.getMessage() + " on tasks: "+ errEvent.getAllProcesses().toString()));
-						}
-					});
-				}
+				PTPDebugUIPlugin.getDisplay().asyncExec(new Runnable() {
+					public void run() {
+						IPCDIErrorInfo info = (IPCDIErrorInfo)errEvent.getReason();
+						PTPDebugUIPlugin.errorDialog("Error", new Exception(info.getMessage() + " on tasks: "+ PDebugUIUtils.arrayToString(errEvent.getAllProcesses().toArray())));
+					}
+				});
 				cleanupDebugVariables(job);
 			} else if (event instanceof BreakpointCreatedEvent) {
 				// do nothing in breakpoint created event
@@ -640,10 +613,23 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			} else if (event instanceof IPCDIDebugExitedEvent) {
 				condition = new Boolean(true);
 				annotationMgr.removeAnnotationGroup(job.getIDString());
+				System.err.println("--- TESTING exit event and remove all annotation in job: " + job.getIDString());
 				getDebugSession(job).getEventManager().removeEventListener(this);
 				cleanupDebugVariables(job);
 			}
 			firePaintListener(condition);
+		}
+	}
+	private void removeAnnotation(String job_id, BitList tasks) {
+		try {
+			annotationMgr.removeAnnotation(job_id, tasks);
+			System.err.println("--- TESTING err event and remove annotation of processes in this event: " + tasks.cardinality());
+		} catch (final CoreException e) {
+			PTPDebugUIPlugin.getDisplay().asyncExec(new Runnable() {
+				public void run() {
+					PTPDebugUIPlugin.errorDialog("Error", e);
+				}
+			});
 		}
 	}
 	public void fireSuspendEvent(IPJob job, BitList tasks) {

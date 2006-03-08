@@ -59,4 +59,5 @@ public interface IParallelDebuggerConstants {
 	public static final int DBGERR_SETVAR			=	35;
 	public static final int DBGERR_PROCSET			=	36;
 	public static final int DBGERR_UNKNOWN			=	37;
+	public static final int DBGERR_UNKOWN_TYPE		=	38;	
 }

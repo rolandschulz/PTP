@@ -71,25 +71,7 @@ public class PInstructionPointerAnnotation extends MarkerAnnotation {
 			return;
 		}
 		String msg = "Suspended on " + (isRegister ? "registered" : "unregistered") + " " + (tasks.length == 1 ? "process" : "processes") + ": ";
-		int preTask = tasks[0];
-		msg += preTask;
-		boolean isContinue = false;
-		for (int i = 1; i < tasks.length; i++) {
-			if (preTask == (tasks[i] - 1)) {
-				preTask = tasks[i];
-				isContinue = true;
-				if (i == (tasks.length - 1)) {
-					msg += "-" + tasks[i];
-					break;
-				}
-				continue;
-			}
-			if (isContinue)
-				msg += "-" + preTask;
-			msg += "," + tasks[i];
-			isContinue = false;
-			preTask = tasks[i];
-		}
+		msg += PDebugUIUtils.arrayToString(tasks);
 		setMessage(msg);
 	}
 	public String getMessage() {

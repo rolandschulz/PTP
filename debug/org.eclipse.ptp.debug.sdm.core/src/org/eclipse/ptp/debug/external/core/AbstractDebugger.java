@@ -56,6 +56,7 @@ import org.eclipse.ptp.debug.external.core.cdi.event.InferiorResumedEvent;
 import org.eclipse.ptp.debug.external.core.cdi.event.InferiorSignaledEvent;
 import org.eclipse.ptp.debug.external.core.cdi.event.SuspendEvent;
 import org.eclipse.ptp.debug.external.core.cdi.model.LineLocation;
+import org.eclipse.ptp.debug.external.core.commands.KillCommand;
 import org.eclipse.ptp.debug.external.core.commands.StartDebuggerCommand;
 import org.eclipse.ptp.debug.external.core.commands.StopDebuggerCommand;
 
@@ -161,9 +162,18 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 				setProcessStatus(tasks.toArray(), IPProcess.RUNNING);
 			} else if (event instanceof IPCDIErrorEvent) {
 				IPCDIErrorEvent errEvent = (IPCDIErrorEvent)event;
-				setJobFinished(tasks, IPProcess.ERROR);
-				if (errEvent.getErrorCode() == IPCDIErrorEvent.DBG_FATAL) {
+				switch (errEvent.getErrorCode()) {
+				case IPCDIErrorEvent.DBG_FATAL:
+					setJobFinished(tasks, IPProcess.ERROR);
 					postCommand(new StopDebuggerCommand());
+				break;
+				case IPCDIErrorEvent.DBG_ERROR:
+					setJobFinished(tasks, IPProcess.ERROR);
+					postCommand(new KillCommand(event.getAllProcesses()));
+				break;
+				case IPCDIErrorEvent.DBG_WARNING:
+					session.unregisterTargets(tasks.toArray(), true);
+				break;
 				}
 			} else if (event instanceof IPCDISuspendedEvent) {
 				setSuspendTasks(true, tasks);

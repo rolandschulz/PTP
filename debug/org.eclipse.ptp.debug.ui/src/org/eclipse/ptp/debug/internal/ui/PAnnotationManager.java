@@ -307,12 +307,14 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 		if (annotationGroup == null)
 			annotationGroup = new AnnotationGroup();
 		synchronized (tasks) {
-			addAnnotation(annotationGroup, textEditor, file, lineNumber, tasks, type);
-			putAnnotationGroup(job_id, annotationGroup);
-			// remove marker if it is not in current job
-			if (!uiDebugManager.getCurrentJobId().equals(job_id)) {
-				annotationGroup.removeAllMarkers();
+			if (uiDebugManager.getCurrentJobId().equals(job_id)) {
+				addAnnotation(annotationGroup, textEditor, file, lineNumber, tasks, type);
+				putAnnotationGroup(job_id, annotationGroup);
 			}
+			// remove marker if it is not in current job
+			//if (!uiDebugManager.getCurrentJobId().equals(job_id)) {
+				//annotationGroup.removeAllMarkers();
+			//}
 		}
 	}
 	public boolean containsCurrentSet(BitList aTasks) {
@@ -351,7 +353,7 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 			annotationGroup.addAnnotation(annotation);
 			annotationModel.addAnnotation(annotation, position);
 		}
-		Display.getDefault().asyncExec(new Runnable() {
+		Display.getDefault().syncExec(new Runnable() {
 			public void run() {
 				textEditor.selectAndReveal(position.getOffset(), 0);
 			}
