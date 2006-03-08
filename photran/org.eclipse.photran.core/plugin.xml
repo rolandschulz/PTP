@@ -34,6 +34,14 @@
 <!-- Define the list of Error Parsers provided by the FDT                                 -->
 <!-- =================================================================================== -->
    <extension
+         id="AbsoftErrorParser"
+         name="Photran Error Parser for Absoft Fortran"
+         point="org.eclipse.cdt.core.ErrorParser">
+      <errorparser
+            class="org.eclipse.photran.internal.errorparsers.AbsoftErrorParser">
+      </errorparser>
+   </extension>
+   <extension
          id="XLFErrorParser"
          name="%FDTXLFErrorParser.name"
          point="org.eclipse.cdt.core.ErrorParser">
