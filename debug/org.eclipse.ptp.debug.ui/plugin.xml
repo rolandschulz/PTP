@@ -130,7 +130,7 @@
       <specification
             annotationType="org.eclipse.ptp.debug.ui.currentSetIP"
             icon="icons/debug/cur_set_ip.gif"
-            presentationLayer="5"
+            presentationLayer="6"
             colorPreferenceValue="198,219,174"
             colorPreferenceKey="ptpSecondaryIPColor"
             highlightPreferenceValue="true"
@@ -145,7 +145,7 @@
       <specification
             annotationType="org.eclipse.ptp.debug.ui.setIP"
             icon="icons/debug/set_ip.gif"
-            presentationLayer="5"
+            presentationLayer="6"
             colorPreferenceValue="198,219,174"
             colorPreferenceKey="ptpSecondaryIPColor"
             highlightPreferenceValue="true"

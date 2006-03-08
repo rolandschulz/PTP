@@ -430,16 +430,21 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 		case IProxyDebugEvent.EVENT_DBG_ERROR:
 			System.err.println("======================= EVENT_DBG_ERROR ====================");
 			ProxyDebugErrorEvent errEvent = (ProxyDebugErrorEvent)e;
-			int code = errEvent.getErrorCode();
-			if (code == IParallelDebuggerConstants.DBGERR_DEBUGGER || code == IParallelDebuggerConstants.DBGERR_NOFILEDIR || code == IParallelDebuggerConstants.DBGERR_CHDIR) {
-				code = IPCDIErrorEvent.DBG_FATAL;
-			}
-			else {
-				code = IPCDIErrorEvent.DBG_ERROR;
-			}
-			completeCommand(e.getBitSet(), new PCDIException(errEvent.getErrorMessage(), code));
+			completeCommand(e.getBitSet(), new PCDIException(errEvent.getErrorMessage(), getErrorCode(errEvent.getErrorCode())));
 			//handleErrorEvent(e.getBitSet(), errEvent.getErrorMessage(), code);
 			break;
+		}
+	}
+	private int getErrorCode(int internalErrorCode) {
+		switch (internalErrorCode) {
+		case IParallelDebuggerConstants.DBGERR_DEBUGGER:
+		case IParallelDebuggerConstants.DBGERR_NOFILEDIR:
+		case IParallelDebuggerConstants.DBGERR_CHDIR:
+			return IPCDIErrorEvent.DBG_FATAL;
+		case IParallelDebuggerConstants.DBGERR_UNKOWN_TYPE:
+			return IPCDIErrorEvent.DBG_WARNING;
+		default:
+			return IPCDIErrorEvent.DBG_ERROR;
 		}
 	}
 	
