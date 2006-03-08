@@ -19,6 +19,8 @@
 
 package org.eclipse.ptp.core;
 
+import org.eclipse.core.runtime.Preferences;
+
 public class ControlSystemChoices {
 	
 	/* HOWTO ADD A NEW CS:
@@ -37,8 +39,7 @@ public class ControlSystemChoices {
 	static public final int MPICH1 = 104;
 	static public final int MPICH2 = 105;
 	
-	static private String[] CSChoices = new String[] {
-			"Simulated", 
+	static private String[] NonDevelCSChoices = new String[] {
 			"Open Runtime Environment (ORTE)",
 			"Los Alamos MPI (LAMPI)",
 			"LAM-MPI",
@@ -46,8 +47,7 @@ public class ControlSystemChoices {
 			"MPICH 2.x (MPD)" 
 	};
 	
-	static private int[] CSIDs = new int[] {
-			SIMULATED,
+	static private int[] NonDevelCSIDs = new int[] {
 			ORTE,
 			LAMPI,
 			LAMMPI,
@@ -55,9 +55,46 @@ public class ControlSystemChoices {
 			MPICH2
 	};
 	
+	static private String[] DevelCSChoices = new String[] {
+		"Simulated", 
+		"Open Runtime Environment (ORTE)",
+		"Los Alamos MPI (LAMPI)",
+		"LAM-MPI",
+		"MPICH 1.x",
+		"MPICH 2.x (MPD)" 
+	};
+
+	static private int[] DevelCSIDs = new int[] {
+		SIMULATED,
+		ORTE,
+		LAMPI,
+		LAMMPI,
+		MPICH1,
+		MPICH2
+	};
+	
+	public static boolean queryDevelMode()
+	{
+		Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
+		return preferences.getBoolean(PreferenceConstants.DEVELOPER_MODE);
+	}
+	
+	public static String[] queryCSChoices()
+	{
+		if(queryDevelMode()) return DevelCSChoices;
+		return NonDevelCSChoices;
+	}
+	
+	public static int[] queryCSIDs()
+	{
+		if(queryDevelMode()) return DevelCSIDs;
+		return NonDevelCSIDs;
+	}
+	
+	
 	public static String[] getCSStrings()
 	{
-		return CSChoices;
+		return queryCSChoices();
 	}
 
 	/* returns -1 if not found */
@@ -66,8 +103,8 @@ public class ControlSystemChoices {
 		int i;
 		
 		/* find the index number by the name */
-		for(i=0; i<CSChoices.length; i++) {
-			if(CSname.equals(CSChoices[i])) return i;
+		for(i=0; i<queryCSChoices().length; i++) {
+			if(CSname.equals(queryCSChoices()[i])) return i;
 		}
 		
 		return -1;
@@ -77,8 +114,8 @@ public class ControlSystemChoices {
 	{
 		int i;
 		
-		for(i=0; i<CSIDs.length; i++) {
-			if(ID == CSIDs[i]) return i;
+		for(i=0; i<queryCSIDs().length; i++) {
+			if(ID == queryCSIDs()[i]) return i;
 		}
 		
 		return -1;
@@ -91,22 +128,22 @@ public class ControlSystemChoices {
 		idx = getCSArrayIndexByName(CSname);
 		if(idx < 0) return idx;
 		
-		return CSIDs[idx];
+		return queryCSIDs()[idx];
 	}
 	
 	public static int getCSIDByIndex(int idx)
 	{
 
-		if(idx < 0 || idx >= CSIDs.length) return -1;
-		return CSIDs[idx];
+		if(idx < 0 || idx >= queryCSIDs().length) return -1;
+		return queryCSIDs()[idx];
 	}
 	
 	public static String getCSNameByID(int ID)
 	{
 		int i;
 		
-		for(i=0; i<CSIDs.length; i++) {
-			if(ID == CSIDs[i]) return CSChoices[i];
+		for(i=0; i<queryCSIDs().length; i++) {
+			if(ID == queryCSIDs()[i]) return queryCSChoices()[i];
 		}
 		
 		return "<UNDEFINED CS>";
@@ -114,7 +151,7 @@ public class ControlSystemChoices {
 	
 	public static String getCSNameByIndex(int idx)
 	{
-		if(idx < 0 || idx >= CSChoices.length) return "<UNDEFINED CS>";
-		return CSChoices[idx];
+		if(idx < 0 || idx >= queryCSChoices().length) return "<UNDEFINED CS>";
+		return queryCSChoices()[idx];
 	}
 }
