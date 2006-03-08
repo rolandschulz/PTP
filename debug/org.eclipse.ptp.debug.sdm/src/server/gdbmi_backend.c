@@ -1283,8 +1283,7 @@ SimpleVarToAIF(char *exp, MIVar *var)
 		}
 		return a;
 	}
-
-	DbgSetError(DBGERR_DEBUGGER, "could not convert simple type");
+	DbgSetError(DBGERR_UNKOWN_TYPE, "could not convert simple type");
 	return NULL;
 }
 
@@ -1442,7 +1441,7 @@ ConvertVarToAIF(char *exp, MIVar *var, int named)
 			a = ComplexVarToAIF(var, named);
 		}
 		if (a == NULL) {
-			DbgSetError(DBGERR_DEBUGGER, "type not supported (yet)");
+			DbgSetError(DBGERR_UNKOWN_TYPE, "type not supported (yet)");
 		}
 	}
 	return a;

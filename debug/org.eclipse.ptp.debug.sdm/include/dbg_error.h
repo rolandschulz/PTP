@@ -57,6 +57,7 @@
 #define DBGERR_SETVAR			35
 #define DBGERR_PROCSET		36
 #define DBGERR_UNKNOWN		37
+#define DBGERR_UNKOWN_TYPE		38
 
 /*
  * Error Handling
