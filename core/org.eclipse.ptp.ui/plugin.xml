@@ -52,12 +52,12 @@
             class="org.eclipse.ptp.ui.preferences.PTPPreferencesPage"
             id="org.eclipse.ptp.ui.preferences.ptpPreferencesPage">
       </page>
-      <page
+<!--      <page
             name="%SimulationpreferencePage.name"
             class="org.eclipse.ptp.ui.preferences.SimulationPreferencesPage"
             id="org.eclipse.ptp.ui.preferences.simulationPreferencesPage"
             category="org.eclipse.ptp.ui.preferences.ptpPreferencesPage">
-      </page>
+      </page>-->
       <page
             name="%OMPIpreferencePage.name"
             class="org.eclipse.ptp.ui.preferences.OMPIPreferencesPage"
