@@ -265,7 +265,7 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 			provider.disconnect(input);
 		}
 		return null;
-	}	
+	}
 	
 	// called by debug view
 	public void addAnnotation(IEditorPart editorPart, IStackFrame stackFrame) throws CoreException {
@@ -328,14 +328,6 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 			return false;
 		}
 	}
-	// FIXME temp testing method
-	public void printBitList(BitList tasks) {
-		System.out.print("++++++++++++++++ tasks: " + tasks.cardinality() + ": ");
-		for (int i = tasks.nextSetBit(0), j = 0; i >= 0; i = tasks.nextSetBit(i + 1), j++) {
-			System.out.print("[" + i + "], ");
-		}
-		System.out.println();
-	}
 	// generic
 	public synchronized void addAnnotation(AnnotationGroup annotationGroup, final ITextEditor textEditor, final IFile file, final int lineNumber, final BitList tasks, final String type) throws CoreException {
 		IDocumentProvider docProvider = textEditor.getDocumentProvider();
@@ -353,7 +345,7 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 			annotationGroup.addAnnotation(annotation);
 			annotationModel.addAnnotation(annotation, position);
 		}
-		Display.getDefault().syncExec(new Runnable() {
+		Display.getDefault().asyncExec(new Runnable() {
 			public void run() {
 				textEditor.selectAndReveal(position.getOffset(), 0);
 			}

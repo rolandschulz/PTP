@@ -100,7 +100,7 @@
       <specification
             annotationType="org.eclipse.ptp.debug.ui.regCurrentIP"
             icon="icons/debug/reg_cur_ip.gif"
-            presentationLayer="6"
+            presentationLayer="7"
             colorPreferenceKey="ptpCurrentIPColor"
             colorPreferenceValue="198,219,174"
             highlightPreferenceValue="true"
@@ -115,7 +115,7 @@
       <specification
             annotationType="org.eclipse.ptp.debug.ui.regSecondaryIP"
             icon="icons/debug/reg_sec_ip.gif"
-            presentationLayer="6"
+            presentationLayer="7"
             colorPreferenceValue="219,235,204"
             colorPreferenceKey="ptpSecondaryIPColor"
             highlightPreferenceValue="true"
@@ -167,8 +167,7 @@
             label="%PBreakpointSet.label"
             icon="icons/debug/ptp_bpt_set.gif"
             class="org.eclipse.ptp.debug.internal.ui.views.breakpoints.PBreakpointSetOrganizer"
-            id="org.eclipse.ptp.debug.ui.pBreakpointSetOrganizer">
-      </breakpointOrganizer>
+            id="org.eclipse.ptp.debug.ui.pBreakpointSetOrganizer"/>
    </extension>
    
    <!--
