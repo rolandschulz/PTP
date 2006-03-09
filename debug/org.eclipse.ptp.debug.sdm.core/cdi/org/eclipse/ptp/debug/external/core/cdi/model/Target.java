@@ -22,7 +22,6 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.cdt.debug.core.cdi.ICDIAddressLocation;
-import org.eclipse.cdt.debug.core.cdi.ICDICondition;
 import org.eclipse.cdt.debug.core.cdi.ICDIFunctionLocation;
 import org.eclipse.cdt.debug.core.cdi.ICDILineLocation;
 import org.eclipse.cdt.debug.core.cdi.ICDILocation;
@@ -38,6 +37,10 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDISignal;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.aif.IAIF;
+import org.eclipse.ptp.debug.core.cdi.IPCDIAddressLocation;
+import org.eclipse.ptp.debug.core.cdi.IPCDICondition;
+import org.eclipse.ptp.debug.core.cdi.IPCDIFunctionLocation;
+import org.eclipse.ptp.debug.core.cdi.IPCDILineLocation;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIAddressBreakpoint;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIBreakpoint;
@@ -53,7 +56,6 @@ import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITargetConfiguration;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIThread;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIWatchpoint;
-import org.eclipse.ptp.debug.external.core.cdi.BreakpointManager;
 import org.eclipse.ptp.debug.external.core.cdi.ExpressionManager;
 import org.eclipse.ptp.debug.external.core.cdi.Session;
 import org.eclipse.ptp.debug.external.core.cdi.SessionObject;
@@ -123,14 +125,7 @@ public class Target extends SessionObject implements IPCDITarget {
 			return;
 		}
 		if (currentThreadId != id) {
-			currentThreadId = cthread.getStackFrameCount();
-			if (doUpdate) {
-				Session session = (Session)getSession();
-				VariableManager varMgr = session.getVariableManager();
-				if (varMgr.isAutoUpdate()) {
-					varMgr.update(this);
-				}
-			}
+			
 		}
 		if (currentThreadId != id) {
 			throw new PCDIException("Cannot switch to thread " + id);
@@ -410,25 +405,17 @@ public class Target extends SessionObject implements IPCDITarget {
 	public Process getProcess() {
 		return null;
 	}
-	public IPCDILineBreakpoint setLineBreakpoint(int type, ICDILineLocation location, ICDICondition condition, boolean deferred) throws PCDIException {
-		Session session = (Session)getSession();
-		BreakpointManager bMgr = session.getBreakpointManager();
-		return bMgr.setLineBreakpoint(session.createBitList(getTargetID()), type, location, condition, deferred);
+	public IPCDILineBreakpoint setLineBreakpoint(int type, IPCDILineLocation location, IPCDICondition condition, boolean deferred) throws PCDIException {
+		return getSession().getBreakpointManager().setLineBreakpoint(getSession().createBitList(getTargetID()), type, location, condition, deferred);
 	}
-	public IPCDIFunctionBreakpoint setFunctionBreakpoint(int type, ICDIFunctionLocation location, ICDICondition condition, boolean deferred) throws PCDIException {		
-		Session session = (Session)getSession();
-		BreakpointManager bMgr = session.getBreakpointManager();
-		return bMgr.setFunctionBreakpoint(session.createBitList(getTargetID()), type, location, condition, deferred);
+	public IPCDIFunctionBreakpoint setFunctionBreakpoint(int type, IPCDIFunctionLocation location, IPCDICondition condition, boolean deferred) throws PCDIException {		
+		return getSession().getBreakpointManager().setFunctionBreakpoint(getSession().createBitList(getTargetID()), type, location, condition, deferred);
 	}
-	public IPCDIAddressBreakpoint setAddressBreakpoint(int type, ICDIAddressLocation location, ICDICondition condition, boolean deferred) throws PCDIException {
-		Session session = (Session)getSession();
-		BreakpointManager bMgr = session.getBreakpointManager();
-		return bMgr.setAddressBreakpoint(session.createBitList(getTargetID()), type, location, condition, deferred);
+	public IPCDIAddressBreakpoint setAddressBreakpoint(int type, IPCDIAddressLocation location, IPCDICondition condition, boolean deferred) throws PCDIException {
+		return getSession().getBreakpointManager().setAddressBreakpoint(getSession().createBitList(getTargetID()), type, location, condition, deferred);
 	}
-	public IPCDIWatchpoint setWatchpoint(int type, int watchType, String expression, ICDICondition condition) throws PCDIException {
-		Session session = (Session)getSession();
-		BreakpointManager bMgr = session.getBreakpointManager();
-		return bMgr.setWatchpoint(session.createBitList(getTargetID()), type, watchType, expression, condition);
+	public IPCDIWatchpoint setWatchpoint(int type, int watchType, String expression, IPCDICondition condition) throws PCDIException {
+		return getSession().getBreakpointManager().setWatchpoint(getSession().createBitList(getTargetID()), type, watchType, expression, condition);
 	}
 	public IPCDIExceptionpoint setExceptionBreakpoint(String clazz, boolean stopOnThrow, boolean stopOnCatch) throws PCDIException {
 		throw new PCDIException("Not implemented yet setExceptionBreakpoint");
@@ -442,24 +429,20 @@ public class Target extends SessionObject implements IPCDITarget {
 	public void deleteAllBreakpoints() throws PCDIException {
 		throw new PCDIException("Not implemented yet - Target: deleteAllBreakpoints");
 	}
-	public ICDICondition createCondition(int ignoreCount, String expression) {
+	public IPCDICondition createCondition(int ignoreCount, String expression) {
 		return createCondition(ignoreCount, expression, null);
 	}
-	public ICDICondition createCondition(int ignoreCount, String expression, String[] tids) {
-		BreakpointManager bMgr = ((Session)getSession()).getBreakpointManager();
-		return bMgr.createCondition(ignoreCount, expression, tids);
+	public IPCDICondition createCondition(int ignoreCount, String expression, String[] tids) {
+		return getSession().getBreakpointManager().createCondition(ignoreCount, expression, tids);
 	}
-	public ICDILineLocation createLineLocation(String file, int line) {
-		BreakpointManager bMgr = ((Session)getSession()).getBreakpointManager();
-		return bMgr.createLineLocation(file, line);
+	public IPCDILineLocation createLineLocation(String file, int line) {
+		return getSession().getBreakpointManager().createLineLocation(file, line);
 	}
-	public ICDIFunctionLocation createFunctionLocation(String file, String function) {
-		BreakpointManager bMgr = ((Session)getSession()).getBreakpointManager();
-		return bMgr.createFunctionLocation(file, function);
+	public IPCDIFunctionLocation createFunctionLocation(String file, String function) {
+		return getSession().getBreakpointManager().createFunctionLocation(file, function);
 	}
-	public ICDIAddressLocation createAddressLocation(BigInteger address) {
-		BreakpointManager bMgr = ((Session)getSession()).getBreakpointManager();
-		return bMgr.createAddressLocation(address);
+	public IPCDIAddressLocation createAddressLocation(BigInteger address) {
+		return getSession().getBreakpointManager().createAddressLocation(address);
 	}
 	public ICDIRuntimeOptions getRuntimeOptions() {
 		//TODO implement later

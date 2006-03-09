@@ -18,8 +18,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.core.cdi.breakpoints;
 
-import org.eclipse.cdt.debug.core.cdi.ICDICondition;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
+import org.eclipse.ptp.debug.core.cdi.IPCDICondition;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIBreakpoint;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIExceptionpoint;
 
 
@@ -31,8 +31,8 @@ public class Exceptionpoint extends Breakpoint implements IPCDIExceptionpoint {
 	String fClazz;
 	boolean fStopOnThrow;
 	boolean fStopOnCatch;
-	public Exceptionpoint(String clazz, boolean stopOnThrow, boolean stopOnCatch, ICDICondition cond) {
-		super(ICDIBreakpoint.REGULAR, cond);
+	public Exceptionpoint(String clazz, boolean stopOnThrow, boolean stopOnCatch, IPCDICondition cond) {
+		super(IPCDIBreakpoint.REGULAR, cond);
 		fClazz = clazz;
 		fStopOnThrow = stopOnThrow;
 		fStopOnCatch = stopOnCatch;

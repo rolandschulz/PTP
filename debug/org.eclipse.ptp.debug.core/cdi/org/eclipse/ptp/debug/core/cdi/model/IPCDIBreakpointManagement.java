@@ -18,10 +18,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.cdi.model;
 
-import org.eclipse.cdt.debug.core.cdi.ICDIAddressLocation;
-import org.eclipse.cdt.debug.core.cdi.ICDICondition;
-import org.eclipse.cdt.debug.core.cdi.ICDIFunctionLocation;
-import org.eclipse.cdt.debug.core.cdi.ICDILineLocation;
+import org.eclipse.ptp.debug.core.cdi.IPCDIAddressLocation;
+import org.eclipse.ptp.debug.core.cdi.IPCDICondition;
+import org.eclipse.ptp.debug.core.cdi.IPCDIFunctionLocation;
+import org.eclipse.ptp.debug.core.cdi.IPCDILineLocation;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
 /**
@@ -29,10 +29,10 @@ import org.eclipse.ptp.debug.core.cdi.PCDIException;
  * 
  */
 public interface IPCDIBreakpointManagement {
-	IPCDILineBreakpoint setLineBreakpoint(int type, ICDILineLocation location, ICDICondition condition, boolean deferred) throws PCDIException;		
-	IPCDIFunctionBreakpoint setFunctionBreakpoint(int type, ICDIFunctionLocation location, ICDICondition condition, boolean deferred) throws PCDIException;
-	IPCDIAddressBreakpoint setAddressBreakpoint(int type, ICDIAddressLocation location, ICDICondition condition, boolean deferred) throws PCDIException;		
-	IPCDIWatchpoint setWatchpoint(int type, int watchType, String expression, ICDICondition condition) throws PCDIException;
+	IPCDILineBreakpoint setLineBreakpoint(int type, IPCDILineLocation location, IPCDICondition condition, boolean deferred) throws PCDIException;		
+	IPCDIFunctionBreakpoint setFunctionBreakpoint(int type, IPCDIFunctionLocation location, IPCDICondition condition, boolean deferred) throws PCDIException;
+	IPCDIAddressBreakpoint setAddressBreakpoint(int type, IPCDIAddressLocation location, IPCDICondition condition, boolean deferred) throws PCDIException;		
+	IPCDIWatchpoint setWatchpoint(int type, int watchType, String expression, IPCDICondition condition) throws PCDIException;
 	IPCDIExceptionpoint setExceptionBreakpoint(String clazz, boolean stopOnThrow, boolean stopOnCatch) throws PCDIException;
 	IPCDIBreakpoint[] getBreakpoints() throws PCDIException;
 	void deleteBreakpoints(IPCDIBreakpoint[] breakpoints) throws PCDIException;

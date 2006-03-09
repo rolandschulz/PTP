@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.cdi.model;
 
-import org.eclipse.cdt.debug.core.cdi.ICDICondition;
+import org.eclipse.ptp.debug.core.cdi.IPCDICondition;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
 /**
@@ -35,8 +35,8 @@ public interface IPCDIBreakpoint extends IPCDIObject {
 	boolean isHardware();
 	boolean isEnabled() throws PCDIException;
 	void setEnabled(boolean enabled);
-	ICDICondition getCondition() throws PCDIException;
-	void setCondition(ICDICondition condition);
+	IPCDICondition getCondition() throws PCDIException;
+	void setCondition(IPCDICondition condition);
 	int getBreakpointId();	
 	void setBreakpointId(int bpid);
 }

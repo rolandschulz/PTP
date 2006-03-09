@@ -18,13 +18,13 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.core.cdi.breakpoints;
 
-import org.eclipse.cdt.debug.core.cdi.ICDICondition;
-import org.eclipse.cdt.debug.core.cdi.ICDILocation;
+import org.eclipse.ptp.debug.core.cdi.IPCDICondition;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIFunctionBreakpoint;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDILocation;
 
 
 public class FunctionBreakpoint extends LocationBreakpoint implements IPCDIFunctionBreakpoint {
-	public FunctionBreakpoint(int kind, ICDILocation loc, ICDICondition cond) {
+	public FunctionBreakpoint(int kind, IPCDILocation loc, IPCDICondition cond) {
 		super(kind, loc, cond);
 	}
 }

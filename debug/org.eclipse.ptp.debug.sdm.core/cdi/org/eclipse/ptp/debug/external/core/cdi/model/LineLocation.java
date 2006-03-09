@@ -29,10 +29,10 @@
 
 package org.eclipse.ptp.debug.external.core.cdi.model;
 
-import org.eclipse.cdt.debug.core.cdi.ICDILineLocation;
+import org.eclipse.ptp.debug.core.cdi.IPCDILineLocation;
 import org.eclipse.ptp.debug.external.core.cdi.Location;
 
-public class LineLocation extends Location implements ICDILineLocation {
+public class LineLocation extends Location implements IPCDILineLocation {
 	public LineLocation(String file, int line) {
 		super(file, line);
 	}

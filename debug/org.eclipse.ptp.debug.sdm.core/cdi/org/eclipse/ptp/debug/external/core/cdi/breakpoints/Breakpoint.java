@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.core.cdi.breakpoints;
 
-import org.eclipse.cdt.debug.core.cdi.ICDICondition;
+import org.eclipse.ptp.debug.core.cdi.IPCDICondition;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIBreakpoint;
 import org.eclipse.ptp.debug.external.core.cdi.Condition;
@@ -29,20 +29,20 @@ import org.eclipse.ptp.debug.external.core.cdi.model.PObject;
  *
  */
 public abstract class Breakpoint extends PObject implements IPCDIBreakpoint {
-	ICDICondition condition;
+	IPCDICondition condition;
 	int bpid = -1;
 	
 	int type;
 	boolean enable;
 
-	public Breakpoint(int kind, ICDICondition cond) {
+	public Breakpoint(int kind, IPCDICondition cond) {
 		super(null);
 		type = kind;
 		condition = cond;
 		enable = true;
 	}
 
-	public ICDICondition getCondition() throws PCDIException {
+	public IPCDICondition getCondition() throws PCDIException {
 		if (condition == null) {
 			condition =  new Condition(0, new String(), null);
 		}
@@ -60,7 +60,7 @@ public abstract class Breakpoint extends PObject implements IPCDIBreakpoint {
 	public boolean isTemporary() {
 		return (type == IPCDIBreakpoint.TEMPORARY);
 	}
-	public void setCondition(ICDICondition newCondition) {
+	public void setCondition(IPCDICondition newCondition) {
 		condition = newCondition;
 	}
 	public void setEnabled(boolean on) {

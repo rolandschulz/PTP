@@ -19,10 +19,6 @@
 package org.eclipse.ptp.debug.core.cdi.model;
 
 import java.math.BigInteger;
-import org.eclipse.cdt.debug.core.cdi.ICDIAddressLocation;
-import org.eclipse.cdt.debug.core.cdi.ICDICondition;
-import org.eclipse.cdt.debug.core.cdi.ICDIFunctionLocation;
-import org.eclipse.cdt.debug.core.cdi.ICDILineLocation;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIMemoryBlockManagement;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIRegister;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIRegisterDescriptor;
@@ -31,6 +27,10 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIRuntimeOptions;
 import org.eclipse.cdt.debug.core.cdi.model.ICDISharedLibraryManagement;
 import org.eclipse.cdt.debug.core.cdi.model.ICDISourceManagement;
 import org.eclipse.ptp.core.IPProcess;
+import org.eclipse.ptp.debug.core.cdi.IPCDIAddressLocation;
+import org.eclipse.ptp.debug.core.cdi.IPCDICondition;
+import org.eclipse.ptp.debug.core.cdi.IPCDIFunctionLocation;
+import org.eclipse.ptp.debug.core.cdi.IPCDILineLocation;
 import org.eclipse.ptp.debug.core.cdi.IPCDISessionObject;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
@@ -52,9 +52,9 @@ public interface IPCDITarget extends IPCDIThreadGroup, IPCDIExpressionManagement
 	void restart() throws PCDIException;
 	
 	ICDIRuntimeOptions getRuntimeOptions();
-	ICDICondition createCondition(int ignoreCount, String expression);
-	ICDICondition createCondition(int ignoreCount, String expression, String[] threadIds);
-	ICDILineLocation createLineLocation(String file, int line);
-	ICDIFunctionLocation createFunctionLocation(String file, String function);
-	ICDIAddressLocation createAddressLocation(BigInteger address);	
+	IPCDICondition createCondition(int ignoreCount, String expression);
+	IPCDICondition createCondition(int ignoreCount, String expression, String[] threadIds);
+	IPCDILineLocation createLineLocation(String file, int line);
+	IPCDIFunctionLocation createFunctionLocation(String file, String function);
+	IPCDIAddressLocation createAddressLocation(BigInteger address);	
 }

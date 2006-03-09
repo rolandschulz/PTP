@@ -36,6 +36,8 @@ import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.IMemoryBlockRetrieval;
 import org.eclipse.debug.core.model.IStackFrame;
+import org.eclipse.ptp.debug.core.cdi.IPCDIBreakpointHit;
+import org.eclipse.ptp.debug.core.cdi.IPCDIBreakpointManager;
 import org.eclipse.ptp.debug.core.cdi.IPCDIEndSteppingRange;
 import org.eclipse.ptp.debug.core.cdi.IPCDISessionObject;
 import org.eclipse.ptp.debug.core.cdi.IPCDISignalReceived;
@@ -206,12 +208,15 @@ public class PThread extends PDebugElement implements IPThread, IRestart, IResum
 		List list = new ArrayList(1);
 		if (isSuspended()) {
 			IBreakpoint bkpt = null;
-			// FIXME Donny
-			/*
-			 * if ( getCurrentStateInfo() instanceof ICDIBreakpointHit ) bkpt = ((PDebugTarget)getDebugTarget()).getBreakpointManager().getBreakpoint(
-			 * ((ICDIBreakpointHit)getCurrentStateInfo()).getBreakpoint() ); else if ( getCurrentStateInfo() instanceof ICDIWatchpointTrigger ) bkpt =
-			 * ((PDebugTarget)getDebugTarget()).getBreakpointManager().getBreakpoint( ((ICDIWatchpointTrigger)getCurrentStateInfo()).getWatchpoint() );
-			 */if (bkpt != null)
+			IPCDIBreakpointManager bManager = getCDISession().getBreakpointManager();
+			 if (getCurrentStateInfo() instanceof IPCDIBreakpointHit) {
+				 bkpt = bManager.findBreakpoint(((IPCDIBreakpointHit)getCurrentStateInfo()).getBreakpoint()); 				 
+			 }
+			 //FIXME
+			 //else if (getCurrentStateInfo() instanceof IPCDIWatchpointTrigger) {
+			 //bkpt = bManager.getBreakpoint(((ICDIWatchpointTrigger)getCurrentStateInfo()).getWatchpoint());
+			 //}
+			 if (bkpt != null)
 				list.add(bkpt);
 		}
 		return (IBreakpoint[]) list.toArray(new IBreakpoint[list.size()]);

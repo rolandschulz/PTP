@@ -30,10 +30,10 @@
 package org.eclipse.ptp.debug.external.core.cdi.model;
 
 import java.math.BigInteger;
-import org.eclipse.cdt.debug.core.cdi.ICDIAddressLocation;
+import org.eclipse.ptp.debug.core.cdi.IPCDIAddressLocation;
 import org.eclipse.ptp.debug.external.core.cdi.Location;
 
-public class AddressLocation extends Location implements ICDIAddressLocation {
+public class AddressLocation extends Location implements IPCDIAddressLocation {
 	public AddressLocation(BigInteger address) {
 		super(address);
 	}
