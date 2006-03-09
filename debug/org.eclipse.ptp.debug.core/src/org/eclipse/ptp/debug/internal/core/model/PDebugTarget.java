@@ -28,7 +28,6 @@ import org.eclipse.cdt.core.IAddress;
 import org.eclipse.cdt.core.IAddressFactory;
 import org.eclipse.cdt.core.IBinaryParser.IBinaryObject;
 import org.eclipse.cdt.core.IBinaryParser.ISymbol;
-import org.eclipse.cdt.debug.core.CDebugUtils;
 import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.cdt.debug.core.cdi.ICDIAddressLocation;
 import org.eclipse.cdt.debug.core.cdi.ICDIFunctionLocation;
@@ -74,10 +73,14 @@ import org.eclipse.debug.core.sourcelookup.ISourceLookupParticipant;
 import org.eclipse.debug.core.sourcelookup.containers.FolderSourceContainer;
 import org.eclipse.debug.core.sourcelookup.containers.ProjectSourceContainer;
 import org.eclipse.ptp.core.IPProcess;
+import org.eclipse.ptp.debug.core.PDebugUtils;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
+import org.eclipse.ptp.debug.core.cdi.IPCDIAddressLocation;
 import org.eclipse.ptp.debug.core.cdi.IPCDIBreakpointHit;
 import org.eclipse.ptp.debug.core.cdi.IPCDIEndSteppingRange;
 import org.eclipse.ptp.debug.core.cdi.IPCDIErrorInfo;
+import org.eclipse.ptp.debug.core.cdi.IPCDIFunctionLocation;
+import org.eclipse.ptp.debug.core.cdi.IPCDILineLocation;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.IPCDISessionConfiguration;
 import org.eclipse.ptp.debug.core.cdi.IPCDISessionObject;
@@ -150,17 +153,16 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPCDIE
 		setExecFile(file);
 		initializePreferences();
 		setConfiguration((IPCDITargetConfiguration)cdiTarget.getConfiguration());
-		if (!process.getStatus().equals(IPProcess.EXITED)) {
+		setThreadList(new ArrayList(5));
+		if (process.getStatus().equals(IPProcess.EXITED)) {
+			setState(PDebugElementState.TERMINATED);
+		} else {
 			setState(PDebugElementState.SUSPENDED);
-			setThreadList(new ArrayList(5));
 			setGlobalVariableManager(new PGlobalVariableManager(this));
 			initialize();
 			DebugPlugin.getDefault().getLaunchManager().addLaunchListener(this);
 			DebugPlugin.getDefault().getExpressionManager().addExpressionListener(this);
 			getCDISession().getEventManager().addEventListener(this);
-		} else {
-			setState(PDebugElementState.TERMINATED);
-			setThreadList(new ArrayList(5));
 		}
 	}
 	public int getTargetID() {
@@ -664,7 +666,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPCDIE
 				}
 				status.add(new Status(IStatus.ERROR, status.getPlugin(), IPDebugInternalConstants.STATUS_CODE_ERROR, token, null));
 			}
-			CDebugUtils.error(status, this);
+			PDebugUtils.error(status, this);
 		}
 		fireSuspendEvent(DebugEvent.UNSPECIFIED);
 	}
@@ -741,11 +743,11 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPCDIE
 	public void setInternalTemporaryBreakpoint(IPCDILocation location) throws DebugException {
 		try {
 			if (location instanceof ICDIFunctionLocation) {
-				getCDITarget().setFunctionBreakpoint(IPCDIBreakpoint.TEMPORARY, (ICDIFunctionLocation) location, null, false);
+				getCDITarget().setFunctionBreakpoint(IPCDIBreakpoint.TEMPORARY, (IPCDIFunctionLocation) location, null, false);
 			} else if (location instanceof ICDILineLocation) {
-				getCDITarget().setLineBreakpoint(IPCDIBreakpoint.TEMPORARY, (ICDILineLocation) location, null, false);
+				getCDITarget().setLineBreakpoint(IPCDIBreakpoint.TEMPORARY, (IPCDILineLocation) location, null, false);
 			} else if (location instanceof ICDIAddressLocation) {
-				getCDITarget().setAddressBreakpoint(IPCDIBreakpoint.TEMPORARY, (ICDIAddressLocation) location, null, false);
+				getCDITarget().setAddressBreakpoint(IPCDIBreakpoint.TEMPORARY, (IPCDIAddressLocation) location, null, false);
 			} else {
 				// ???
 				targetRequestFailed("not_a_location", null);

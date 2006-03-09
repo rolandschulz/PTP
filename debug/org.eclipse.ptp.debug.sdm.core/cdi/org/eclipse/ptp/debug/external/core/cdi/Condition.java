@@ -19,12 +19,13 @@
 package org.eclipse.ptp.debug.external.core.cdi;
 
 import org.eclipse.cdt.debug.core.cdi.ICDICondition;
+import org.eclipse.ptp.debug.core.cdi.IPCDICondition;
 
 /**
  * @author Clement chu
  * 
  */
-public class Condition implements ICDICondition {
+public class Condition implements IPCDICondition {
 	int ignoreCount;
 	String expression;
 	String[] tids;

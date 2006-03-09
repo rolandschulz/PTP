@@ -18,13 +18,13 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.core.cdi.breakpoints;
 
-import org.eclipse.cdt.debug.core.cdi.ICDICondition;
-import org.eclipse.cdt.debug.core.cdi.ICDILocation;
+import org.eclipse.ptp.debug.core.cdi.IPCDICondition;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIAddressBreakpoint;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDILocation;
 
 
 public class AddressBreakpoint extends LocationBreakpoint implements IPCDIAddressBreakpoint {
-	public AddressBreakpoint(int kind, ICDILocation loc, ICDICondition cond) {
+	public AddressBreakpoint(int kind, IPCDILocation loc, IPCDICondition cond) {
 		super(kind, loc, cond);
 	}
 }

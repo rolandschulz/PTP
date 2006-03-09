@@ -18,20 +18,20 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.core.cdi;
 
-import org.eclipse.cdt.debug.core.cdi.ICDILineLocation;
 import org.eclipse.ptp.debug.core.cdi.IPCDIEndSteppingRange;
+import org.eclipse.ptp.debug.core.cdi.IPCDILineLocation;
 import org.eclipse.ptp.debug.external.core.cdi.event.EndSteppingRangeEvent;
 
 public class EndSteppingRangeInfo extends SessionObject implements IPCDIEndSteppingRange {
 	EndSteppingRangeEvent event;
-	ICDILineLocation lineLoc;
+	IPCDILineLocation lineLoc;
 
-	public EndSteppingRangeInfo(Session session, EndSteppingRangeEvent e, ICDILineLocation loc) {
+	public EndSteppingRangeInfo(Session session, EndSteppingRangeEvent e, IPCDILineLocation loc) {
 		super(session);
 		event = e;
 		lineLoc = loc;
 	}
-	public ICDILineLocation getLineLocation() {
+	public IPCDILineLocation getLineLocation() {
 		return lineLoc;
 	}
 }

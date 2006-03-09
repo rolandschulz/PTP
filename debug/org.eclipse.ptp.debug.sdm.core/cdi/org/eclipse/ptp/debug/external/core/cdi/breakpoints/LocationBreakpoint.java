@@ -19,11 +19,12 @@
 package org.eclipse.ptp.debug.external.core.cdi.breakpoints;
 
 import java.math.BigInteger;
-import org.eclipse.cdt.debug.core.cdi.ICDIAddressLocation;
-import org.eclipse.cdt.debug.core.cdi.ICDICondition;
 import org.eclipse.cdt.debug.core.cdi.ICDIFunctionLocation;
-import org.eclipse.cdt.debug.core.cdi.ICDILineLocation;
-import org.eclipse.cdt.debug.core.cdi.ICDILocation;
+import org.eclipse.ptp.debug.core.cdi.IPCDIAddressLocation;
+import org.eclipse.ptp.debug.core.cdi.IPCDICondition;
+import org.eclipse.ptp.debug.core.cdi.IPCDIFunctionLocation;
+import org.eclipse.ptp.debug.core.cdi.IPCDILineLocation;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDILocation;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDILocator;
 import org.eclipse.ptp.debug.external.core.cdi.Locator;
 
@@ -32,35 +33,35 @@ import org.eclipse.ptp.debug.external.core.cdi.Locator;
  * 
  */
 public abstract class LocationBreakpoint extends Breakpoint {
-	ICDILocation fLocation;
+	IPCDILocation fLocation;
 
-	public LocationBreakpoint(int kind, ICDILocation loc, ICDICondition cond) {
+	public LocationBreakpoint(int kind, IPCDILocation loc, IPCDICondition cond) {
 		super(kind, cond);
 		fLocation = loc;
 	}
 	public int getLineNumber() {
-		if (fLocation instanceof ICDILineLocation) {
-			return ((ICDILineLocation) fLocation).getLineNumber();
+		if (fLocation instanceof IPCDILineLocation) {
+			return ((IPCDILineLocation) fLocation).getLineNumber();
 		}
 		return 0;
 	}
 	public String getFile() {
-		if (fLocation instanceof ICDILineLocation) {
-			return ((ICDILineLocation) fLocation).getFile();
+		if (fLocation instanceof IPCDILineLocation) {
+			return ((IPCDILineLocation) fLocation).getFile();
 		} else if (fLocation instanceof ICDIFunctionLocation) {
-			return ((ICDIFunctionLocation) fLocation).getFile();
+			return ((IPCDIFunctionLocation) fLocation).getFile();
 		}
 		return null;
 	}
 	public BigInteger getAddress() {
-		if (fLocation instanceof ICDIAddressLocation) {
-			return ((ICDIAddressLocation) fLocation).getAddress();
+		if (fLocation instanceof IPCDIAddressLocation) {
+			return ((IPCDIAddressLocation) fLocation).getAddress();
 		}
 		return null;
 	}
 	public String getFunction() {
-		if (fLocation instanceof ICDIFunctionLocation) {
-			return ((ICDIFunctionLocation) fLocation).getFunction();
+		if (fLocation instanceof IPCDIFunctionLocation) {
+			return ((IPCDIFunctionLocation) fLocation).getFunction();
 		}
 		return null;
 	}

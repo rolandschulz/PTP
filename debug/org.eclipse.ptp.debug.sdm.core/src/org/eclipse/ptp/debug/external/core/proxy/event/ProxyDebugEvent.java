@@ -20,14 +20,14 @@
 package org.eclipse.ptp.debug.external.core.proxy.event;
 
 import java.math.BigInteger;
-import org.eclipse.cdt.debug.core.cdi.ICDICondition;
-import org.eclipse.cdt.debug.core.cdi.ICDILineLocation;
 import org.eclipse.ptp.core.proxy.event.IProxyEvent;
 import org.eclipse.ptp.core.proxy.event.ProxyEvent;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.ExtFormat;
 import org.eclipse.ptp.debug.core.aif.AIF;
 import org.eclipse.ptp.debug.core.aif.IAIF;
+import org.eclipse.ptp.debug.core.cdi.IPCDICondition;
+import org.eclipse.ptp.debug.core.cdi.IPCDILineLocation;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIBreakpoint;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDILocator;
 import org.eclipse.ptp.debug.external.core.cdi.Condition;
@@ -63,7 +63,7 @@ public class ProxyDebugEvent extends ProxyEvent {
 			
 		case IProxyDebugEvent.EVENT_DBG_BPSET:
 			int setId = Integer.parseInt(args[2]);
-			ICDILineLocation loc = toLineLocation(args[8], args[11]);
+			IPCDILineLocation loc = toLineLocation(args[8], args[11]);
 			IPCDIBreakpoint bpt = toBreakpoint(args[4], args[5], args[6], args[7], loc);
 			evt = new ProxyDebugBreakpointSetEvent(set, setId, bpt);
 			break;
@@ -156,12 +156,12 @@ public class ProxyDebugEvent extends ProxyEvent {
 		return a;
 	}
 	
-	public static IPCDIBreakpoint toBreakpoint(String ignoreStr, String spec, String del, String typeStr, ICDILineLocation loc) {
+	public static IPCDIBreakpoint toBreakpoint(String ignoreStr, String spec, String del, String typeStr, IPCDILineLocation loc) {
 		IPCDIBreakpoint bpt = null;
 		int typeVal;
 		
 		int ignore = Integer.parseInt(ignoreStr);
-		ICDICondition cond = new Condition(ignore, null, null);
+		IPCDICondition cond = new Condition(ignore, null, null);
 		
 		String type = decodeString(typeStr);
 
@@ -177,7 +177,7 @@ public class ProxyDebugEvent extends ProxyEvent {
 		return bpt;
 	}
 	
-	public static ICDILineLocation toLineLocation(String fileStr, String lineStr) {
+	public static IPCDILineLocation toLineLocation(String fileStr, String lineStr) {
 		String file = decodeString(fileStr);
 		int line = Integer.parseInt(lineStr);
 		return new LineLocation(file, line);

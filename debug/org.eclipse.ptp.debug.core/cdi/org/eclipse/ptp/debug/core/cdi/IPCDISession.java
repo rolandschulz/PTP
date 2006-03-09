@@ -32,6 +32,7 @@ public interface IPCDISession extends ICommonActions {
 	void setAttribute(String key, String value);
 	String getAttribute(String key);
 	IPCDIEventManager getEventManager();
+	IPCDIBreakpointManager getBreakpointManager();
 	IPCDISessionConfiguration getConfiguration();
 	void terminate() throws PCDIException;
 	Process getSessionProcess() throws PCDIException;
