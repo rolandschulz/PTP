@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import org.eclipse.cdt.debug.core.cdi.ICDILineLocation;
 import org.eclipse.cdt.debug.core.cdi.ICDILocator;
 import org.eclipse.cdt.debug.core.model.ICLineBreakpoint;
 import org.eclipse.core.resources.IMarkerDelta;
@@ -55,6 +54,7 @@ import org.eclipse.ptp.debug.core.PCDIDebugModel;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.ProcessInputStream;
 import org.eclipse.ptp.debug.core.cdi.IPCDIErrorInfo;
+import org.eclipse.ptp.debug.core.cdi.IPCDILineLocation;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIDebugExitedEvent;
@@ -79,7 +79,6 @@ import org.eclipse.ptp.debug.external.core.cdi.EndSteppingRangeInfo;
 import org.eclipse.ptp.debug.external.core.cdi.event.BreakpointCreatedEvent;
 import org.eclipse.ptp.debug.external.core.cdi.event.BreakpointHitEvent;
 import org.eclipse.ptp.debug.external.core.cdi.event.EndSteppingRangeEvent;
-import org.eclipse.ptp.debug.external.core.cdi.event.ErrorEvent;
 import org.eclipse.ptp.debug.external.core.cdi.event.InferiorSignaledEvent;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.debug.ui.events.IDebugActionEvent;
@@ -558,7 +557,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 					}
 				} 
 				else if (event instanceof EndSteppingRangeEvent) {
-					ICDILineLocation lineLocation = ((EndSteppingRangeInfo) ((EndSteppingRangeEvent) event).getReason()).getLineLocation();
+					IPCDILineLocation lineLocation = ((EndSteppingRangeInfo) ((EndSteppingRangeEvent) event).getReason()).getLineLocation();
 					if (lineLocation != null) {
 						lineNumber = lineLocation.getLineNumber();
 						fileName += lineLocation.getFile();
@@ -598,8 +597,10 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 				cleanupDebugVariables(job);
 				fireTerminatedEvent(job, event.getAllProcesses());
 			} else if (event instanceof IPCDIErrorEvent) {
-				removeAnnotation(job.getIDString(), event.getAllProcesses());
 				final IPCDIErrorEvent errEvent = (IPCDIErrorEvent)event;
+				if (errEvent.getErrorCode() != IPCDIErrorEvent.DBG_WARNING) {
+					removeAnnotation(job.getIDString(), event.getAllProcesses());					
+				}				
 				PTPDebugUIPlugin.getDisplay().asyncExec(new Runnable() {
 					public void run() {
 						IPCDIErrorInfo info = (IPCDIErrorInfo)errEvent.getReason();
