@@ -25,8 +25,10 @@ import org.eclipse.ui.editors.text.TextEditor;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 import org.eclipse.ui.texteditor.WorkbenchChainedTextFontFieldEditor;
 
-public abstract class AbstractFortranEditor extends TextEditor implements
-ISelectionChangedListener {
+public abstract class AbstractFortranEditor
+    extends TextEditor
+    implements ISelectionChangedListener
+{
 
 	protected int linesOfCode = 0;
 	
@@ -37,20 +39,19 @@ ISelectionChangedListener {
 	public AbstractFortranEditor() {
 		// This has to be set to be notified of changes to preferences
 		// Without this, the editor will not auto-update
-		IPreferenceStore store = FortranUIPlugin.getDefault()
-				.getPreferenceStore();
+		IPreferenceStore store = FortranUIPlugin.getDefault().getPreferenceStore();
 		IPreferenceStore generalTextStore = EditorsUI.getPreferenceStore();
-		fCombinedPreferenceStore = new ChainedPreferenceStore(
-				new IPreferenceStore[] { store, generalTextStore, getPreferenceStore()});
+		fCombinedPreferenceStore = new ChainedPreferenceStore(new IPreferenceStore[] { store, generalTextStore, getPreferenceStore()});
 		setPreferenceStore(fCombinedPreferenceStore);
 		// This enables any global changes to editor e.g. font type and size
 		// to take effect
-		WorkbenchChainedTextFontFieldEditor.startPropagate(store,
-				JFaceResources.TEXT_FONT);
+		WorkbenchChainedTextFontFieldEditor.startPropagate(store, JFaceResources.TEXT_FONT);
 
-		// JO: This will put the Refactor menu in the editor's
-		// context menu, among other things
-		setEditorContextMenuId("#CEditorContext"); //$NON-NLS-1$
+		//// JO: This will put the Refactor menu in the editor's
+		//// context menu, among other things
+		//setEditorContextMenuId("#CEditorContext"); //$NON-NLS-1$
+        // JO CHANGED -- We will use FortranEditorContext, but only in the free form editor
+        // (no refactoring fixed form!)
 
 		// JO: This gives you a "Toggle Breakpoint" action (and others)
 		// when you right-click the Fortran editor's ruler

@@ -52,6 +52,9 @@ public class FortranFreeFormEditor extends AbstractFortranEditor {
 		// function correctly.
 		// setDocumentProvider(new EbnfDocumentProvider());
 		setDocumentProvider(CUIPlugin.getDefault().getDocumentProvider());
+        
+        // So our Refactoring menu will appear
+        setEditorContextMenuId("#FortranEditorContext");
 	}
 
 	// Since we don't have our "own" document provider, we can't set up
