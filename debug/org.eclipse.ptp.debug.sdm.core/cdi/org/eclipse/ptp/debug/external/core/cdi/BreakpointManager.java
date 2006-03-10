@@ -21,10 +21,6 @@ package org.eclipse.ptp.debug.external.core.cdi;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
-import org.eclipse.cdt.debug.core.cdi.ICDIAddressLocation;
-import org.eclipse.cdt.debug.core.cdi.ICDICondition;
-import org.eclipse.cdt.debug.core.cdi.ICDIFunctionLocation;
-import org.eclipse.cdt.debug.core.cdi.ICDILineLocation;
 import org.eclipse.core.resources.IMarkerDelta;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -236,11 +232,11 @@ public class BreakpointManager extends Manager implements IPCDIBreakpointManager
 	public void setInternalTemporaryBreakpoint(BitList tasks, IPCDILocation location) throws DebugException {
 		IPCDIBreakpoint cdiBpt = null;
 		try {
-			if (location instanceof ICDIFunctionLocation) {
+			if (location instanceof IPCDIFunctionLocation) {
 				cdiBpt = createFunctionBreakpoint(tasks, IPCDIBreakpoint.TEMPORARY, (IPCDIFunctionLocation) location, null, false);
-			} else if (location instanceof ICDILineLocation) {
+			} else if (location instanceof IPCDILineLocation) {
 				cdiBpt = createLineBreakpoint(tasks, IPCDIBreakpoint.TEMPORARY, (IPCDILineLocation) location, null, false);
-			} else if (location instanceof ICDIAddressLocation) {
+			} else if (location instanceof IPCDIAddressLocation) {
 				cdiBpt = createAddressBreakpoint(tasks, IPCDIBreakpoint.TEMPORARY, (IPCDIAddressLocation) location, null, false);
 			}
 			cdiBpt = setBreakpointCommand(tasks, cdiBpt);
@@ -324,7 +320,7 @@ public class BreakpointManager extends Manager implements IPCDIBreakpointManager
 		// TODO - dunno what implement here
 		throw new PCDIException("Not implement yet -- BreakpointManager: update");
 	}
-	public void setCondition(Breakpoint breakpoint, ICDICondition newCondition) throws PCDIException {
+	public void setCondition(Breakpoint breakpoint, IPCDICondition newCondition) throws PCDIException {
 		// Target target = (Target)breakpoint.getTarget();
 		throw new PCDIException("Not implement yet -- BreakpointManager: setCondition");
 	}
@@ -405,7 +401,7 @@ public class BreakpointManager extends Manager implements IPCDIBreakpointManager
 								continue;
 							}
 
-							ICDICondition condition0 = null;
+							IPCDICondition condition0 = null;
 							int ignoreCount = breakpoint.getIgnoreCount();
 							int oldIgnoreCount = (deltas != null)?deltas[i].getAttribute(IPBreakpoint.IGNORE_COUNT, 0):ignoreCount;
 							String condition = breakpoint.getCondition();
@@ -418,7 +414,7 @@ public class BreakpointManager extends Manager implements IPCDIBreakpointManager
 								enabled0 = (enabled)?Boolean.TRUE:Boolean.FALSE;
 							}
 							if (ignoreCount != oldIgnoreCount || condition.compareTo(oldCondition) != 0) {
-								ICDICondition cdiCondition = createCondition(ignoreCount, condition, null);
+								IPCDICondition cdiCondition = createCondition(ignoreCount, condition, null);
 								if (!cdiCondition.equals(cdiBpt.getCondition())) {
 									condition0 = cdiCondition;
 								}
