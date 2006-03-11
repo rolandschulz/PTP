@@ -6,7 +6,6 @@
 <h1>Building an MPI program with Managed Build</h1>
 <p>Topics include:
 <ul>
-<li><a href="#runP">Introducing the PTP Runtime Perspecgtive</a>
 <li><a href="#create">Creating an MPI project </a>(same as for C but worth describing)
 
 <li><a href="#include">include paths</a>
@@ -32,14 +31,15 @@ The C/C++ Perspective appears.
 <p>Your new project is shown in the C/C++ Projects view.
 <br><img src="images/cPersp.gif">
 <p>Now create a source file.
-Click File -> New Source File.  
-<br>Type a name, e.g. "test.c"
-Click Finish.
+Click File -> New -> Source File.  
+<br>Type a name for the source file, e.g. "test.c"
+<br><img src="images/newSourceFile.gif">
+<br>Click Finish.
 <p>A new editor appears, in which you can enter your program.
 <br><img src="images/newEditor.gif">
 <p>Since this is a managed build project, Eclipse creates a makefile
 and tries to build with the new file.  Since the file is empty,
-you will see errors in the Problems view.
+you will see errors in the Problems view, and in the Console view.
 <br><img src="images/newFileErrors.gif">
 <p>Enter a program in the editor.
 (If you have the PTP MPI Tools installed, a sample program is available 
@@ -62,7 +62,7 @@ activate the context menu  on the Project, and select "Properties."
 The project properties window is displayed for this C project.
 Select "C/C++ Build" on the left, and under "Configuration settings" 
 on the "Tool Settings" tab, select "Directories" under "GCC Compiler."
-This lists the Include paths used to build the project, which is now
+This lists the Include paths used to build the project, which are now
 empty.
  
 <br><img src="images/propsBuild.gif">
@@ -94,18 +94,9 @@ and change the default "gcc" value to "mpicc"
 <br><img src="images/projPropsMpicc.gif">
 <p>Then do the same for the "GCC C Linker."
 <br><img src="images/projPropsMpicc2.gif">
-
+<p>Now proceed to <a href="02pLaunchConfig.html">launch the parallel program.</a>
 <p>&nbsp;
-<h2 id="launch">Launching the MPI program</h2>
-<p>Set up the launch configuration for launching the 
-MPI program by configuring for "external tools."
-Under the External tools menu
-<img src="images/extToolsIcon.gif" border="1">, select External Tools
-<p><img src="images/extToolsMenu.gif">
-<p>In the External Tools dialog, under Configurations, select Program
-and select the "New..." button.
-<br><img src="images/extToolsDlg.gif">
-<p><!-- TODO -->TBD.
+
 <p>&nbsp;
 
 
