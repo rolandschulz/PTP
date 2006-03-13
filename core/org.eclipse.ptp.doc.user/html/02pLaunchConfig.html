@@ -17,7 +17,7 @@ processes, but this will include other requirements, such as scheduler informati
 <p>This section explains how to launch a parallel program.
 
 <h2>The old way to launch parallel programs</h2>
-<p>You can launch parallel programs directly from eclipse
+<p>You can launch parallel programs the old way, directly from eclipse, without PTP,
 by using the <a href="02pLaunchOld.html">external tools and launch dialogs</a>.
 <p>But limitations of the old way include:
 <ul>
@@ -59,8 +59,11 @@ then clicking on the "New" button below.
 <ul>
 <li>Choose the machine that the job will run on
 </li>
-<li>Enter the number of processes to run.  This will dismiss the Error at the top of the 
+<li>Enter the number of processes to run, which was probably
+set to "0" initially. Enter a value > 0.  
+This will dismiss the Error at the top of the 
 dialog which reports "[Parallel]: Value must be an Integer."
+Actually, this should probably say "an integer greater than zero."
 <br><img src="images/launch4.gif">
 </li>
 </ul>
@@ -85,6 +88,9 @@ dialog which reports "[Debugger]: No debugger available."</li>
 <p>Continue with Monitoring Parallel
 Program execution with <a href="03ptpRuntimePersp.html">the PTP Runtime Perspective
 </a>.
+
+<p>While not applicable to most users, there is information on 
+<a href="02pLaunchSim.html">Launching the simulator</a>.
 
 <p><a href="#top">Back to Top</a> | <a href="toc.html">Back to Table of Contents</a>
 
