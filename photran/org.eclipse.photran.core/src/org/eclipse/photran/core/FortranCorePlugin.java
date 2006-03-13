@@ -10,6 +10,8 @@ import org.osgi.framework.BundleContext;
  */
 public class FortranCorePlugin extends Plugin
 {
+    public static final String LANGUAGE_ID = "org.eclipse.photran.core.fortran";
+    
     public static final String FIXED_FORM_CONTENT_TYPE = "org.eclipse.photran.core.fixedFormFortranSource";
     public static final String FREE_FORM_CONTENT_TYPE = "org.eclipse.photran.core.freeFormFortranSource";
     

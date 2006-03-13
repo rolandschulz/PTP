@@ -1,9 +1,9 @@
 package org.eclipse.photran.internal.core.model;
 
-import org.eclipse.cdt.core.addl_langs.IAdditionalLanguageElement;
 import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.cdt.core.model.IParent;
 import org.eclipse.cdt.core.model.ISourceReference;
+import org.eclipse.cdt.core.model.addl_langs.IContributedCElement;
 import org.eclipse.cdt.internal.core.model.Parent;
 import org.eclipse.cdt.internal.core.model.SourceManipulation;
 import org.eclipse.photran.internal.core.f95modelparser.Token;
@@ -43,7 +43,7 @@ import org.eclipse.photran.modelicons.ModelIconsPlugin;
  * @see FortranElementInfo
  */
 public abstract class FortranElement extends SourceManipulation // Parent
-    implements ICElement, IParent, ISourceReference, IAdditionalLanguageElement
+    implements ICElement, IParent, ISourceReference, IContributedCElement
 {
     /**
      * Most elements in the <code>FortranElement</code> hierarchy have a name (functions,

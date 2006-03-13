@@ -1,5 +1,7 @@
 % Getting the Photran 3.0 Sources from CVS
 
+\textit{Updated 3/13/06 to correspond to Photran 3.2/CDT 3.2 sources}
+
 \hspace{1em}\textbf{Part I.  Check out the CDT sources from CVS}
 
 \begin{enumerate}
@@ -13,21 +15,25 @@
          Username:        & anonymous \\
          Password:        & (no password) \\
 \end{tabular}
-\item  Right-click on :pserver:anonymous@dev.eclipse.org:/cvsroot/tools, and choose
-    Refresh Branches...
-\item  Select the following, and click OK:
-\begin{itemize}
-    \item     org.eclipse.cdt-build
-    \item     org.eclipse.cdt-core
-    \item     org.eclipse.cdt-doc
-    \item     org.eclipse.cdt-debug
-    \item     org.eclipse.cdt-launch
-\end{itemize}
-    When prompted, tell it to Search Deeply.
+%\item  Right-click on :pserver:anonymous@dev.eclipse.org:/cvsroot/tools, and choose
+%    Refresh Branches...
+%\item  Select the following, and click OK:
+%\begin{itemize}
+%    \item     org.eclipse.cdt-build
+%    \item     org.eclipse.cdt-core
+%    \item     org.eclipse.cdt-doc
+%    \item     org.eclipse.cdt-debug
+%    \item     org.eclipse.cdt-launch
+%\end{itemize}
+%    When prompted, tell it to Search Deeply.
+%\item  Expand :pserver:anonymous@dev.eclipse.org:/cvsroot/tools,
+%    and then expand Versions (in the CVS Repositories view)
 \item  Expand :pserver:anonymous@dev.eclipse.org:/cvsroot/tools,
-    and then expand Versions (in the CVS Repositories view)
-\item  Under org.eclipse.cdt-build, expand org.eclipse.cdt-build CDT\_3\_0
-\item  Right click and check out all of the org.eclipse.cdt.* packages
+    and then expand HEAD (in the CVS Repositories view)
+%\item  Under org.eclipse.cdt-build, expand org.eclipse.cdt-build CDT\_3\_0
+\item  Expand org.eclipse.cdt-build
+%\item  Right click and check out all of the org.eclipse.cdt.* packages
+\item  Under org.eclipse.cdt-build, right click and check out all of the org.eclipse.cdt.* packages
     EXCEPT for the ones ending in "tests" (why bother testing?)
 \item  Do the same with org.eclipse.cdt-core, org.eclipse.cdt-debug,
     org.eclipse.cdt-doc, and org.eclipse.cdt-launch
@@ -71,14 +77,17 @@ The sources will NOT compile at this point; you must complete the following...
 \item Go to a bash prompt.  Change to your Eclipse workspace directory
     (the one containing all of the org.eclipse.cdt and
     org.eclipse.photran projects).
-\item \texttt{cd org.eclipse.photran-misc/photran30-cdt30-patches}
+%\item \texttt{cd org.eclipse.photran-misc/photran30-cdt30-patches}
+\item \texttt{cd org.eclipse.photran-misc/photran32-cdt32-patches}
 \item Run ./install
 \item{Go back into Eclipse.  Refresh all of the org.eclipse.cdt packages.
     (Click the first, shift-click the last, right-click, choose Refresh.)}
 
-The sources should all compile (albeit with about 640 warnings).
+%The sources should all compile (albeit with about 640 warnings).
+The sources should all compile.
 
 \end{enumerate}
 
 \noindent\textit{\textbf{Note.} Committers working on the parser or refactoring
-engine should have access to /usr/local/cvsroot on brain.}
+engine should have access to /usr/local/cvsroot on brain, where they can
+check out the org.eclipse.photran.tests project.}

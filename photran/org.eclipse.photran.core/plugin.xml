@@ -188,9 +188,19 @@
   </extension>
 
    <!-- JO -->
-   <extension point="org.eclipse.cdt.core.AdditionalLanguages">
+   <!--extension point="org.eclipse.cdt.core.AdditionalLanguages">
       <language
          class="org.eclipse.photran.core.FortranLanguage" />
+   </extension-->
+   <extension
+         point="org.eclipse.cdt.core.language">
+      <language
+            class="org.eclipse.photran.core.FortranLanguage"
+            id="fortran"
+            name="Fortran">
+         <contentType id="org.eclipse.photran.core.fixedFormFortranSource"/>
+         <contentType id="org.eclipse.photran.core.freeFormFortranSource"/>
+      </language>
    </extension>
 
 <!-- =================================================================================== -->

@@ -6,9 +6,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.eclipse.cdt.core.addl_langs.IModelBuilder;
 import org.eclipse.cdt.core.model.CModelException;
 import org.eclipse.cdt.core.model.ICElement;
+import org.eclipse.cdt.core.model.addl_langs.IContributedModelBuilder;
 import org.eclipse.cdt.internal.core.model.Parent;
 import org.eclipse.photran.core.FortranCorePlugin;
 import org.eclipse.photran.internal.core.f95modelparser.FortranProcessor;
@@ -27,11 +27,11 @@ import org.eclipse.photran.internal.core.preferences.FortranShowParseTreePrefere
  * filename extension and the user's workspace preferences).
  * 
  * All CDT extension languages are expected to supply a model builder.
- * @see IModelBuilder
+ * @see IContributedModelBuilder
  * 
  * @author joverbey
  */
-public final class FortranModelBuilder implements IModelBuilder
+public final class FortranModelBuilder implements IContributedModelBuilder
 {
     private org.eclipse.cdt.internal.core.model.TranslationUnit translationUnit;
 
@@ -50,71 +50,7 @@ public final class FortranModelBuilder implements IModelBuilder
         this.newElements = new HashMap();
     }
 
-//    public Map parse(boolean quickParseMode) throws Exception
-//    {
-//        String input = translationUnit.getBuffer().getContents();
-//        InputStream inputStream = new ByteArrayInputStream(input.getBytes());
-//        String filename = translationUnit.getFile().getName();
-//        boolean wasSuccessful = true;
-//
-//        try
-//        {
-//            FortranProcessor processor = new FortranProcessor();
-//
-//            ParseTreeNode parseTree;
-//            if (formatAssociations.containsKey(filename))
-//                parseTree = processor.parse(inputStream, filename, ((Boolean)formatAssociations.get(filename)).booleanValue());
-//            else
-//                parseTree = processor.parse(inputStream, filename);
-//
-//            FortranElement note = new FortranElement.UnknownNode(translationUnit, processor
-//                .lastParseWasFixedForm() ? "<Fixed Form Source>" : "<Free Form Source>");
-//            this.addF90Element(note);
-//
-//            // Build a model (for our purposes, it's just to populate the Outline view)
-//            if (isParseTreeModelEnabled())
-//            {
-//                // Show full parse tree rather than Outline view
-//                parseTree.visitUsing(new FortranParseTreeModelBuildingVisitor(translationUnit, this));
-//            }
-//            else
-//            {
-//                // Show normal Outline view
-//                parseTree.visitUsing(new FortranModelBuildingVisitor(translationUnit, this));
-//            }
-//
-//            // If parser debugging is enabled, try creating a symbol table
-//            if (FortranProcessor.isParserDebuggingEnabled())
-//            {
-//                try
-//                {
-//                    // processor.createSymbolTableFromParseTree(parseTree);
-//                }
-//                catch (SemanticError e)
-//                {
-//                    createSemanticFailureNode(translationUnit, e);
-//                    wasSuccessful = false;
-//                }
-//            }
-//        }
-//        catch (SyntaxError e)
-//        {
-//            createParseFailureNode(translationUnit, e.getErrorToken());
-//            wasSuccessful = false;
-//        }
-//        catch (Exception e)
-//        {
-//            createParseFailureNode(translationUnit, e.getMessage());
-//            wasSuccessful = false;
-//        }
-//
-//        // From CDT: important to know if the unit has parse errors or not
-//        translationUnit.getElementInfo().setIsStructureKnown(wasSuccessful);
-//
-//        return this.newElements;
-//    }
-
-    public Map parse(boolean quickParseMode) throws Exception
+    public void parse(boolean quickParseMode) throws Exception
     {
         String input = translationUnit.getBuffer().getContents();
         InputStream inputStream = new ByteArrayInputStream(input.getBytes());
@@ -152,9 +88,7 @@ public final class FortranModelBuilder implements IModelBuilder
         }
 
         // From CDT: important to know if the unit has parse errors or not
-        translationUnit.getElementInfo().setIsStructureKnown(wasSuccessful);
-
-        return this.newElements;
+        translationUnit.setIsStructureKnown(wasSuccessful);
     }
 
     private boolean isParseTreeModelEnabled()

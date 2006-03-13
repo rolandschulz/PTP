@@ -10,25 +10,30 @@
  *******************************************************************************/
 package org.eclipse.photran.managedbuilder.core.makegen;
 
-import java.io.*;
-import java.lang.String;
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StreamTokenizer;
 import java.util.ArrayList;
 import java.util.Collection;
 
 import org.eclipse.cdt.core.CCorePlugin;
-import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
+import org.eclipse.cdt.managedbuilder.core.IConfiguration;
 import org.eclipse.cdt.managedbuilder.core.IManagedBuildInfo;
 import org.eclipse.cdt.managedbuilder.core.IManagedOutputNameProvider;
-import org.eclipse.cdt.managedbuilder.core.IConfiguration;
 import org.eclipse.cdt.managedbuilder.core.ITool;
+import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.cdt.managedbuilder.makegen.IManagedDependencyGenerator;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-
+import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.photran.core.FortranLanguage;
 
 // import org.eclipse.photran.internal.core.f95parser.FortranProcessor;
