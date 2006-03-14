@@ -167,19 +167,42 @@ The debug commands in the toolbar of the Debug view
 control the single process that is currently selected  in that view.
 
 <h2>Putting it all together</h2>
-<p>Try this:
+<p>Note that with the above instructions, you should now be able to do the following:
 <ul>
-<li>Set a global breakpont</li>
-<li>Start a 100 process job</li>
+<li>Set a global breakpont
+<br><i>Double-click in the area to the left of the source line. You should see
+the global breakpoint icon <img src="images/globalBkpt.gif"> appear. </i>
+</li>
+<li>Start a 100 process job
+<br><i>Use the menu: Debug->Debug... Make a launch configuration (or reuse one).
+On the Parallel tab, specify 100 processes.</i>
+</li>
 <li>When the breakpoint is reached,</li>
   <ul>
   <li>Create a process set containing processes 0-10 (set_1)
+  <br><i>In the Parallel Debug view, select a group of the process diamonds,
+  which should be yellow=stopped processes. 
+  Select a rectangular region with the mouse, or click the mouse and shift-click 
+  or ctrl-click to select a contiguous region, or separate processes, respectively. 
+  Then click the <img src="images/createProcessSet.gif"> button and give
+  the process the name "set_1"
+  </i>
   <li>Create a process set containing processes 20-30 (set_2)
+  <br><i>Same as above.</i>
   <li>Single step all processes
+  <br><i>Use the step-over icon <img src="images/fromPTP/stepover_normal.gif"> in the toolbar of the 
+  Parallel Debug View (near the top).</i>
   <li>Single step processes in set_1
+  <br><i>Make sure the process set is selected via
+  <img src="images/selectProcessSet.gif">, then use the step-over icon <img src="images/fromPTP/stepover_normal.gif"> in the toolbar of the 
+  Parallel Debug View (near the top).</i>
   <li>Register a process
+  <br><i>Double-click on the process icon diamond.  It should then have a rectangle around it. </i>
   <li>Single step the registered process
+  <br><i>Select the process in the debug view (near the center of the screen), and Use the step-over icon <img src="images/fromPTP/stepover_normal.gif"> in the toolbar of the 
+  Debug View (near the top).</i>
   <li>Select a stack frame and view the variables
+  <br><i></i>
   </ul>
 <li>Terminate execution</li>
 

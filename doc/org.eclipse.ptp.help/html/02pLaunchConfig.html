@@ -5,7 +5,7 @@
 <body>
 
 <h1 id="top">Launching Parallel Programs</h1>
-<h2>The parallel launch configuration dialog</h2>
+
 <p>Topics  include:
 <ul>
 <li>selecting the machine to run on
@@ -13,22 +13,9 @@
 <li>supplying resource requirements (currently only number of  
 processes, but this will include other requirements, such as scheduler information, later)
 <li>debugger information (this is not finished yet)
+<!--  TODO not finished debugger info? -->
 </ul>
-<p>This section explains how to launch a parallel program.
-
-<h2>The old way to launch parallel programs</h2>
-<p>You can launch parallel programs the old way, directly from eclipse, without PTP,
-by using the <a href="02pLaunchOld.html">external tools and launch dialogs</a>.
-<p>But limitations of the old way include:
-<ul>
-<li>No indication of job or process status
-<li>Cannot easily interact with a job scheduler
-<li>Must have MPI installed on local machine
-<li>No access to individual stdout of processes
-<li>No ability to debug program
-</ul>
-
-<h2>The New Way: Launching Parallel Programs</h2>
+<h2>The parallel launch configuration dialog</h2>
 <ul>
 <li>Open the run configuration dialog (Run ->Run...)
 or click the run icon on the tool bar and select Run...
@@ -37,6 +24,7 @@ then clicking on the "New" button below.
 <br>
 <img src="images/launch1.gif">
 <p>Enter a name for the configuration in the "Name:" field.
+Here we use the same name as the project, MyCProject.
 <li>In the Main Tab:</li>
 <ul>
 
