@@ -3,7 +3,7 @@
 <title>The PTP Debug Perspective</title>
 </head>
 <body>
-<!-- test -->
+
 <h1>The PTP Debug Perspective</h1>
 <ul>
 <li><a href="#feat">PTP Debug Perspective </a> - main features
@@ -46,8 +46,28 @@ launch using the debug button rather than the Run button
 <img src="images/parDebugIcon.gif">
 </li>
 
-<li>Eclipse will switch to the PTP Debug perspective.</li>
+<li>Eclipse may ask you to switch to the PTP Debug perspective.
+<br><img src="images/confirmPerspSwitch.gif">
+<br>Answer yes; if you check "Remember my decision" it won't ask you this
+for future launches.  It will then
+switch to the PTP Debug perspective.</li>
 </ul>
+<p><img src="images/ptpDebugPersp.gif">
+<br>The debug perspective appears as in the example above.
+This is a launch with 32 processes set on the launch configuration.
+The Parallel Debug view shows the 32 processes  (yellow diamonds
+indicate a stopped process); the Debug view shows process 0
+stopped at main; the Source view shows the line at which process
+0 is stopped.
+<p>Note that the breakpoints view (upper right) is empty, since
+no breakpoints are set.  You can view the variables in this area
+by selecting the tab on the Variables View
+<br><img src="images/variablesViewSelect.gif">
+<br>Note that most variables don't have valid values
+yet since we haven't executed their initializations in the
+program.
+<br><img src="images/variablesViewDisplay.gif">
+
 <h2 id="pSets">Process Sets</h2>
 <p>Traditional debuggers apply operations to a single
 process.  Parallel debugging operations apply to a single process
@@ -74,26 +94,36 @@ number of processes in a job.
 <br><img src="images/pSetDebug.gif">
 
 <h2 id="pSetsCreate">Creating Process Sets</h2>
-<p><!-- TODO : need screenshots here--> 
+
 <p>Select the processes to be placed in the set
 by selecting a rectangular region with the mouse,
 or click the mouse and shift-click or ctrl-click to 
 select a contiguous region, or separate processes, respectively.
+
+<p>Selecting a rectangular set:
 <br><img src="images/pSetSelect.gif">
-<p>
-<p>Choose the set to add processes to
-<br><img src="images/pSetChoose.gif">
-<p>To remove processes from a set, select the processes
-as described above, and remove them.
-<br><img src="images/pSetSelect.gif">
+<p>Create a process set from the group that was selected by
+clicking on the <i>image</i> in the icon <img src="images/createProcessSetIcon.gif">..
+<p><img src="images/selectProcessSetCreate.gif">
+
+<p>Or, add the group of processes to an existing process set by clicking
+on the <img src="images/downArrowSelect.gif"> down-arrow to the right of the icon:
+<p><img src="images/selectProcessSetCreateAdd.gif">
+
+
 <p>To change the current process set, select the icon
 <img src="images/pSetChooseIcon.gif">
-and choose from the list.  Clicking on the icon will cycle through
-the sets.)
+and choose from the list via the down-arrow <img src="images/downArrowSelect.gif">, or 
+click on the image in the icon itself to cycle through the sets.
 <br><img src="images/pSetChange.gif">
+
+<p>To remove processes from <i>the current set</i>, select the processes 
+as described above, and Click the
+"Remove Elements" button.
+<br><img src="images/pSetRemove.gif">
 <p>Select the "Delete Set" icon to delete the current process set.
 <br><img src="images/pSetDelete.gif">
-
+<br><img src="images/pSetDeleteConfirm.gif">
 <h2 id="bkpt">Breakpoints</h2>
 <p>There are two main types of breakpoints.
 <ul>
@@ -170,7 +200,7 @@ control the single process that is currently selected  in that view.
 <p>Note that with the above instructions, you should now be able to do the following:
 <ul>
 <li>Set a global breakpont
-<br><i>Double-click in the area to the left of the source line. You should see
+<br><i>Make sure no job is selected, then double-click in the area to the left of the source line. You should see
 the global breakpoint icon <img src="images/globalBkpt.gif"> appear. </i>
 </li>
 <li>Start a 100 process job
