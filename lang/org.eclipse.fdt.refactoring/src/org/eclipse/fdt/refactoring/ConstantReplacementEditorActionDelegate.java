@@ -14,11 +14,12 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.photran.internal.core.f95parser.FortranProcessor;
-import org.eclipse.photran.internal.core.f95parser.GenericParseTreeVisitor;
-import org.eclipse.photran.internal.core.f95parser.ParseTreeNode;
-import org.eclipse.photran.internal.core.f95parser.Terminal;
-import org.eclipse.photran.internal.core.f95parser.Token;
+import org.eclipse.photran.internal.core.f95modelparser.FortranProcessor;
+import org.eclipse.photran.internal.core.f95refactoringparser.GenericParseTreeVisitor;
+import org.eclipse.photran.internal.core.f95modelparser.ILexer;
+import org.eclipse.photran.internal.core.f95refactoringparser.ParseTreeNode;
+import org.eclipse.photran.internal.core.f95modelparser.Terminal;
+import org.eclipse.photran.internal.core.f95modelparser.Token;
 import org.eclipse.photran.internal.core.f95parser.symboltable.SymbolTable;
 import org.eclipse.photran.internal.core.f95parser.symboltable.SymbolTableType;
 import org.eclipse.photran.internal.core.f95parser.symboltable.SymbolTableTypeProcessor;
@@ -38,6 +39,19 @@ import org.eclipse.ui.internal.ide.dialogs.CleanDialog;
 
 public class ConstantReplacementEditorActionDelegate implements IEditorActionDelegate
 {
+	public static String replacement(String constant)
+	{
+		String str;
+		if (constant.indexOf('e') > -1) {
+			str = constant.replace('e', 'D');
+		} else if (constant.indexOf('E') > -1) {
+			str = constant.replace('E', 'D');
+		} else {
+			str = constant + "D0";
+		}
+		return str;
+	}
+	
     protected IEditorPart activeEditor = null;
 
     public void setActiveEditor(IAction action, IEditorPart targetEditor)
@@ -55,13 +69,22 @@ public class ConstantReplacementEditorActionDelegate implements IEditorActionDel
                 try
                 {
                 	   FortranProcessor processor = new FortranProcessor();
+              /*******
                 	   ParseTreeNode parseTree = processor.parse(
                 	       getActiveEditorInput(),
                 	       getActiveEditorFile().getName());
                     // SymbolTable symTbl = processor.parseAndCreateSymbolTableFor(
                     //SymbolTable symTbl = processor.createSymbolTableFromParseTree(ptRoot);
-                    
-                    final String[] constants = processConstants(parseTree);
+                     * 
+                     * No longer able to get a ParseTreeNode from the FortranProcessor, just using lexer for now
+                     * 
+                     */
+                	   ILexer scanner = FortranProcessor.createLexerFor(
+                	       getActiveEditorInput(),
+                	       getActiveEditorFile().getName());
+                   
+ //                   final String[] constants = processConstants(parseTree);
+                	   final String[] constants = processConstants(scanner);
                     
             		   showReplaceDialog(constants);
             		   
@@ -119,11 +142,36 @@ public class ConstantReplacementEditorActionDelegate implements IEditorActionDel
         job.schedule();
     }
 
-    private String[] processConstants(ParseTreeNode parseTree)
+
+//    private String[] processConstants(ParseTreeNode parseTree)
+    private String[] processConstants(ILexer scanner)
     {
-    	    final ArrayList /*<String>*/ sa = new ArrayList();
-    	    final StringBuffer sb = new StringBuffer();
-    	    
+    	final ArrayList /*<String>*/ sa = new ArrayList();
+    	final StringBuffer sb = new StringBuffer();
+    	
+    	try
+    	{
+    		Token thisToken = scanner.yylex();
+    		while (thisToken.getTerminal() != Terminal.END_OF_INPUT) {
+    			Token nextToken = scanner.yylex();
+   		 		if (thisToken.getTerminal() == Terminal.T_RCON) {
+   		 			// Ignore (for now) explicit kind specification using underscore, e.g., 3.0_4
+   		 			if (nextToken.getTerminal() != Terminal.T_UNDERSCORE) {
+   		 				sb.replace(0, sb.length(), thisToken.getStartLine() + ":" + thisToken.getStartCol() + ":" + thisToken.getEndCol());
+   		 				sb.append(": text = " + thisToken.getText() + "\n");
+   		 				sa.add(sb.toString());
+   		 			}
+   		 		}
+   		 		thisToken = nextToken;
+    		}
+    	}
+    	catch (Exception e)
+    	{
+    		return new String[0];
+    	}
+
+    	
+    	/*************  
         parseTree.visitUsing(new GenericParseTreeVisitor()
                 {
                     public void visitToken(Token thisToken)
@@ -145,6 +193,7 @@ public class ConstantReplacementEditorActionDelegate implements IEditorActionDel
                 		 }
                     }
                 });
+            ******/
         
         String[] s = new String[sa.size()];
         for (int i = 0; i < sa.size(); i++) {

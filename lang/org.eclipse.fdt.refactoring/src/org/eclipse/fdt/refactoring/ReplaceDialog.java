@@ -955,7 +955,7 @@ class ReplaceDialog extends Dialog {
 		
 			String in = elements[3].substring(8, elements[3].length() - 1);
 			fFindField.setText(in);
-			fReplaceField.setText(in + "D0");
+			fReplaceField.setText(ConstantReplacementEditorActionDelegate.replacement(in));
 			fTargetIndex += 1;			
 		}
 		updateButtonState();	// no more work to do
