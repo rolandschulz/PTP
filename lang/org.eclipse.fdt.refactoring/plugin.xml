@@ -27,7 +27,7 @@
       </actionSet>
    </extension-->
 
-   <extension point="org.eclipse.ui.popupMenus">
+   <!--extension point="org.eclipse.ui.popupMenus">
       <viewerContribution 
             targetID="#CEditorContext" 
             id="org.eclipse.fdt.refactoring.constantreplacement">
@@ -38,6 +38,26 @@
                id="org.eclipse.fdt.refactoring.constantreplacement.action">
          </action>
       </viewerContribution>
+   </extension-->
+   
+   <extension point="org.eclipse.ui.popupMenus"> 
+	  <!-- Refactoring popup menu in Fortran editor -->
+	  <viewerContribution 
+	        targetID="#FortranEditorContext" 
+	        id="org.eclipse.fdt.refactoring.constantreplacement">
+	     <menu
+	           id="org.eclipse.photran.ui.refactoring.menu"
+	           label="Constant Replacement"
+	           path="group.reorganize">
+	        <separator name="refactorings"/>
+	     </menu>
+	     <action 
+	           label="&amp;Constant Replacement..." 
+	           class="org.eclipse.fdt.refactoring.ConstantReplacementEditorActionDelegate" 
+	           menubarPath="org.eclipse.photran.ui.refactoring.menu/refactorings" 
+	           id="org.eclipse.fdt.refactoring.constantreplacement.action"/>
+	  </viewerContribution>
    </extension>
+   
 
 </plugin>
