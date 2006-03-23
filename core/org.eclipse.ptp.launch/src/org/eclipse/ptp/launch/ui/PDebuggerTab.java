@@ -31,6 +31,8 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
+import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.debug.core.IPDebugConfiguration;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.launch.internal.ui.AbstractPDebuggerTab;
@@ -172,6 +174,13 @@ public class PDebuggerTab extends AbstractPDebuggerTab {
 		}
 		String defaultSelection = selection;
 		for (int i = 0; i < debugConfigs.length; i++) {
+			//hard code the sim2 id
+			if (debugConfigs[i].getID().equals("org.eclipse.ptp.debug.external.sim2")) {
+				if (!PTPCorePlugin.getDefault().getPluginPreferences().getBoolean(PreferenceConstants.DEVELOPER_MODE)) {
+					continue;
+				}
+			}			
+			
 			if (debugConfigs[i].supportsMode(mode)) {
 				String debuggerPlatform = debugConfigs[i].getPlatform();
 				if (validatePlatform(config, debugConfigs[i])) {
