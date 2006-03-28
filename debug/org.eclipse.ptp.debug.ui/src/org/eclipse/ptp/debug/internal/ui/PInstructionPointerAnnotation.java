@@ -112,6 +112,7 @@ public class PInstructionPointerAnnotation extends MarkerAnnotation {
 			try {
 				marker.delete();
 			} catch (CoreException e) {
+				System.err.println("################# PInstructionPointerAnnotation - deleteMarker(): " + e.getMessage());
 				return false;
 			}
 		}

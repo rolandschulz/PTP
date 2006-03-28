@@ -24,6 +24,7 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Region;
+import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.model.IPStackFrame;
 
 /**
@@ -75,6 +76,9 @@ public class PDebugUIUtils {
 	}
 	
 	static public String arrayToString(int[] array) {
+		if (array.length == 0) {
+			return "";
+		}
 		String msg = "";
 		int preTask = array[0];
 		msg += preTask;
@@ -99,7 +103,8 @@ public class PDebugUIUtils {
 	}
 	//self testing
 	public static void main(String[] args) {
+		BitList tasks = new BitList(0);
 		int[] array = { 1, 2, 4, 5, 6, 8, 9, 10 };
-		System.out.println(arrayToString(array));
+		System.out.println(arrayToString(tasks.toArray()));
 	}
 }

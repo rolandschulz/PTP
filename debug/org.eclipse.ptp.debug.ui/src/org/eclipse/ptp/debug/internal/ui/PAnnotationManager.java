@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -95,15 +96,13 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 		clearAllAnnotations();
 		annotationMap = null;
 	}
-	public void clearAllAnnotations() {
+	public synchronized void clearAllAnnotations() {
 		for (Iterator i = annotationMap.values().iterator(); i.hasNext();) {
 			((AnnotationGroup) i.next()).removeAnnotations();
 		}
 		annotationMap.clear();
 	}
-	public void removeAnnotationGroup(String job_id) {
-		if (!annotationMap.containsKey(job_id))
-			return;
+	public synchronized void removeAnnotationGroup(String job_id) {
 		AnnotationGroup annotationGroup = (AnnotationGroup) annotationMap.remove(job_id);
 		if (annotationGroup != null) {
 			annotationGroup.removeAllMarkers();
@@ -512,8 +511,7 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 							try {
 								if (isRegister)// register annotation
 									addToExistedAnnotation(annotationGroup, annotation, tasks, isRegister);
-								else
-									// unregister annotation
+								else // unregister annotation
 									removeFromExistedAnnotation(annotationGroup, annotation, tasks, isRegister);
 							} catch (CoreException e) {
 								return Status.CANCEL_STATUS;
@@ -545,8 +543,7 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 							try {
 								if (isRegister)// register annotation
 									removeFromExistedAnnotation(annotationGroup, annotation, tasks, isRegister);
-								else
-									// unregister annotation
+								else // unregister annotation
 									addToExistedAnnotation(annotationGroup, annotation, tasks, isRegister);
 							} catch (CoreException e) {
 								return Status.CANCEL_STATUS;
@@ -564,6 +561,8 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 		}
 	}
 	private synchronized void addToExistedAnnotation(AnnotationGroup annotationGroup, PInstructionPointerAnnotation annotation, BitList tasks, boolean isRegister) throws CoreException {
+		IResource file = annotation.getMarker().getResource();
+		Position position = annotation.getPosition();
 		annotation.addTasks(tasks);
 		annotation.setMessage(isRegister);
 		PInstructionPointerAnnotation oAnnotation = findOtherAnnotation(annotationGroup, annotation.getPosition(), isRegister);
@@ -576,31 +575,34 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 				oAnnotation.setMessage(!isRegister);
 		} else {
 			String type = isRegister ? IPTPDebugUIConstants.REG_ANN_INSTR_POINTER_CURRENT : ((containsCurrentSet(tasks)) ? IPTPDebugUIConstants.CURSET_ANN_INSTR_POINTER_CURRENT : IPTPDebugUIConstants.SET_ANN_INSTR_POINTER_CURRENT);
-			IMarker marker = annotationGroup.createMarker(annotation.getMarker().getResource(), type);
-			oAnnotation = new PInstructionPointerAnnotation(marker, annotation.getPosition(), annotation.getAnnotationModel());
+			IMarker marker = annotationGroup.createMarker(file, type);
+			oAnnotation = new PInstructionPointerAnnotation(marker, position, annotation.getAnnotationModel());
 			annotationGroup.addAnnotation(oAnnotation);
-			annotation.getAnnotationModel().addAnnotation(oAnnotation, annotation.getPosition());
+			annotation.getAnnotationModel().addAnnotation(oAnnotation, position);
 			oAnnotation.addTasks(tasks);
 			oAnnotation.setMessage(!isRegister);
 		}
 	}
 	private synchronized void removeFromExistedAnnotation(AnnotationGroup annotationGroup, PInstructionPointerAnnotation annotation, BitList tasks, boolean isRegister) throws CoreException {
+		IResource file = annotation.getMarker().getResource();
+		Position position = annotation.getPosition();
 		annotation.removeTasks(tasks);
 		if (annotation.isEmpty()) {
 			if (annotation.deleteMarker())
 				annotationGroup.removeAnnotation(annotation);
 		} else
 			annotation.setMessage(isRegister);
+
 		PInstructionPointerAnnotation oAnnotation = findOtherAnnotation(annotationGroup, annotation.getPosition(), isRegister);
 		if (oAnnotation != null) {
 			oAnnotation.addTasks(tasks);
 			oAnnotation.setMessage(!isRegister);
 		} else {
 			String type = isRegister ? ((containsCurrentSet(tasks)) ? IPTPDebugUIConstants.CURSET_ANN_INSTR_POINTER_CURRENT : IPTPDebugUIConstants.SET_ANN_INSTR_POINTER_CURRENT) : IPTPDebugUIConstants.REG_ANN_INSTR_POINTER_CURRENT;
-			IMarker marker = annotationGroup.createMarker(annotation.getMarker().getResource(), type);
-			oAnnotation = new PInstructionPointerAnnotation(marker, annotation.getPosition(), annotation.getAnnotationModel());
+			IMarker marker = annotationGroup.createMarker(file, type);
+			oAnnotation = new PInstructionPointerAnnotation(marker, position, annotation.getAnnotationModel());
 			annotationGroup.addAnnotation(oAnnotation);
-			annotation.getAnnotationModel().addAnnotation(oAnnotation, annotation.getPosition());
+			annotation.getAnnotationModel().addAnnotation(oAnnotation, position);
 			oAnnotation.addTasks(tasks);
 			oAnnotation.setMessage(!isRegister);
 		}
