@@ -87,7 +87,6 @@ class ReplaceDialog extends Dialog {
 	public static String FindReplace_Status_replacements_label = "Replaced";
 	public static String FindNext_Status_noMatch_label = "Status nomatch";
 
-	
 
 	/**
 	 * Updates the find replace dialog on activation changes.
@@ -169,6 +168,10 @@ class ReplaceDialog extends Dialog {
 	private Button fReplaceSelectionButton, fReplaceFindButton, fFindNextButton, fReplaceAllButton;
 	private Combo fFindField, fReplaceField;
 	private Rectangle fDialogPositionInit;
+	
+	/** Used to keep track of column changes when text substitutions are done */
+	private int fPrevLine;
+	private int fExtraColumns;
 
 	/**
 	 * The content assist handler for the find combo.
@@ -220,6 +223,9 @@ class ReplaceDialog extends Dialog {
 		fTargetIndex = 0;
 		fTargetOffset = -1;
 		fTargetLength = -1;
+		
+		fPrevLine = -1;
+		fExtraColumns = 0;
 
 		fDialogPositionInit= null;
 		fFindHistory= new ArrayList(HISTORY_SIZE - 1);
@@ -898,16 +904,17 @@ class ReplaceDialog extends Dialog {
 			return false;
 
 		boolean replaced;
+		String replacement = getReplaceString();
 		try {
 			ITextEditor editor = (ITextEditor) fActiveEditor;
-			String replace = getReplaceString();
-			editor.getDocumentProvider().getDocument(editor.getEditorInput()).replace(fTargetOffset, fTargetLength, replace);
+			editor.getDocumentProvider().getDocument(editor.getEditorInput()).replace(fTargetOffset, fTargetLength, replacement);
 			replaced = true;
 		} catch (BadLocationException e) {
 			replaced = false;
 		}
 		
 		if (replaced) {
+			fExtraColumns += replacement.length() - fTargetLength;
 			fTargetOffset = -1;
 			fTargetLength = -1;
 			fFindField.setText("");
@@ -935,17 +942,22 @@ class ReplaceDialog extends Dialog {
 		}
 				
 		if (fTargetIndex < fConstants.length) {
-			int offset;
 			ITextEditor editor = (ITextEditor) fActiveEditor;
 			String target = fConstants[fTargetIndex];
-			String[] elements = target.split(":");
-			int line = Integer.decode(elements[0]).intValue() - 1;
-			int column = Integer.decode(elements[1]).intValue() - 1;
-			int length = Integer.decode(elements[2]).intValue() - column;
+    		TextChanges ch = new TextChanges(target);
+    		String replacement = TextChanges.replacement(ch.text());
+			int line = ch.line();
+
+			if (fPrevLine < line) {
+    			fPrevLine = line;
+    			fExtraColumns = 0;
+    		}
+
+			int column = ch.column() + fExtraColumns;
 			
 			try {
 				fTargetOffset = column + editor.getDocumentProvider().getDocument(editor.getEditorInput()).getLineOffset(line);
-				fTargetLength = length;
+				fTargetLength = ch.length();
 				editor.selectAndReveal(fTargetOffset, fTargetLength);
 			} catch (BadLocationException e) {
 				fTargetOffset = -1;
@@ -953,9 +965,9 @@ class ReplaceDialog extends Dialog {
 				return;
 			}
 		
-			String in = elements[3].substring(8, elements[3].length() - 1);
+			String in = ch.text();
 			fFindField.setText(in);
-			fReplaceField.setText(ConstantReplacementEditorActionDelegate.replacement(in));
+			fReplaceField.setText(replacement);
 			fTargetIndex += 1;			
 		}
 		updateButtonState();	// no more work to do
