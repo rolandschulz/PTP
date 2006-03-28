@@ -23,14 +23,19 @@ import org.eclipse.ptp.debug.core.cdi.model.IPCDILocator;
 
 public class ProxyDebugSuspendEvent extends AbstractProxyDebugEvent implements IProxyDebugEvent {
 	private IPCDILocator loc;
+	private int thread_id = 0;
 	
-	public ProxyDebugSuspendEvent(BitList set, IPCDILocator loc) {
+	public ProxyDebugSuspendEvent(BitList set, IPCDILocator loc, int thread_id) {
 		super(EVENT_DBG_SUSPEND, set);
 		this.loc = loc;
+		this.thread_id = thread_id;
 	}
 	
 	public IPCDILocator getLocator() {
 		return this.loc;
+	}
+	public int getThreadId() {
+		return thread_id;
 	}
 	
 	public String toString() {

@@ -92,7 +92,7 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 						if (isFlush)
 							return false;
 						
-						throw new PCDIException("Time out");
+						throw new PCDIException("Time out - Command: " + getName());
 					}
 					else {
 						if (getReturn() instanceof PCDIException) {

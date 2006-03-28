@@ -420,7 +420,7 @@ public class VariableManager extends Manager {
 		try {
 			Session session = (Session)getSession();
 			BitList tasks = session.createBitList(target.getTargetID());
-			ListArgumentsCommand argCmd = new ListArgumentsCommand(tasks, frame);
+			ListArgumentsCommand argCmd = new ListArgumentsCommand(tasks, frame, frame.getThread().getStackFrameCount());
 			session.getDebugger().postCommand(argCmd);
 			IPCDIArgument[] args = argCmd.getArguments();
 			if (args != null) {

@@ -21,7 +21,6 @@ package org.eclipse.ptp.debug.external.core.commands;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDILocator;
 
 /**
  * @author Clement chu
@@ -36,20 +35,18 @@ public class HaltCommand extends AbstractDebugCommand {
 		debugger.filterSuspendTasks(tasks);
 		if (!tasks.isEmpty()) {
 			debugger.halt(tasks);
-			waitFinish(debugger);
+			waitFinish();
 		}
 		else {
 			cancelWaiting();
 		}
 	}
-	public void waitFinish(IAbstractDebugger debugger) throws PCDIException {
+	public void waitFinish() throws PCDIException {
 		if (waitForReturn()) {
-			if (result instanceof IPCDILocator) {
-				debugger.handleProcessSignaledEvent(tasks, (IPCDILocator)result);
-				return;
+			if (!result.equals(OK)) {
+				throw new PCDIException("Wrong type return on command: " + getName());
 			}
 		}
-		throw new PCDIException("Wrong type return on command: " + getName());
 	}
 	public String getName() {
 		return "Halt"; 

@@ -58,7 +58,8 @@ public class ProxyDebugEvent extends ProxyEvent {
 
 		case IProxyDebugEvent.EVENT_DBG_BPHIT:
 			int hitId = Integer.parseInt(args[2]);
-			evt = new ProxyDebugBreakpointHitEvent(set, hitId);
+			int bpTid = Integer.parseInt(args[3]);
+			evt = new ProxyDebugBreakpointHitEvent(set, hitId, bpTid);
 			break;
 			
 		case IProxyDebugEvent.EVENT_DBG_BPSET:
@@ -86,21 +87,21 @@ public class ProxyDebugEvent extends ProxyEvent {
 			
 		case IProxyDebugEvent.EVENT_DBG_SUSPEND:
 			IPCDILocator suspendLoc = toLocator(args[3], args[4], args[5], args[6]);
-			evt = new ProxyDebugSuspendEvent(set, suspendLoc);
+			int susTid = Integer.parseInt(args[7]);
+			evt = new ProxyDebugSuspendEvent(set, suspendLoc, susTid);
 			break;
 			
 		case IProxyDebugEvent.EVENT_DBG_STEP:
 			ProxyDebugStackframe frame = toFrame(args[2], args[3], args[4], args[6], args[5]);
-			evt = new ProxyDebugStepEvent(set, frame);
+			int stTid = Integer.parseInt(args[7]);
+			evt = new ProxyDebugStepEvent(set, frame, stTid);
 			break;
 			
 		case IProxyDebugEvent.EVENT_DBG_FRAMES:
 			int numFrames = Integer.parseInt(args[2]);
 			ProxyDebugStackframe[] frames = new ProxyDebugStackframe[numFrames];
 			for (int i = 0; i < numFrames; i++) {
-				int frameLevel = Integer.parseInt(args[5*i+3]);
-				int line = Integer.parseInt(args[5*i+7]);
-				frames[i] = new ProxyDebugStackframe(frameLevel, decodeString(args[5*i+4]), decodeString(args[5*i+5]), line, decodeString(args[5*i+6]));
+				frames[i] = toFrame(args[5*i+3], args[5*i+4], args[5*i+5], args[5*i+7], args[5*i+6]);
 			}
 			evt = new ProxyDebugStackframeEvent(set, frames);
 			break;
@@ -135,6 +136,27 @@ public class ProxyDebugEvent extends ProxyEvent {
 		case IProxyDebugEvent.EVENT_DBG_INIT:
 			int num_servers = Integer.parseInt(args[2]);
 			evt = new ProxyDebugInitEvent(set, num_servers);
+			break;
+			
+		case IProxyDebugEvent.EVENT_DBG_THREADS:
+			int numThreads = Integer.parseInt(args[3]);
+			String[] thread_ids = new String[numThreads + 1];
+			thread_ids[0] = args[2];
+			for (int i=1; i<thread_ids.length; i++) {
+				thread_ids[i] = decodeString(args[i+3]);
+			}
+			evt = new ProxyDebugInfoThreadsEvent(set, thread_ids);
+			break;
+
+		case IProxyDebugEvent.EVENT_DBG_THREAD_SELECT:
+			int current_thread_id = Integer.parseInt(args[2]);
+			ProxyDebugStackframe th_frame = toFrame(args[3], args[4], args[5], args[7], args[6]);
+			evt = new ProxyDebugSetThreadSelectEvent(set, current_thread_id, th_frame);
+			break;
+
+		case IProxyDebugEvent.EVENT_DBG_STACK_INFO_DEPTH:
+			int depth = Integer.parseInt(args[2]);
+			evt = new ProxyDebugStackInfoDepthEvent(set, depth);
 			break;
 		}
 		

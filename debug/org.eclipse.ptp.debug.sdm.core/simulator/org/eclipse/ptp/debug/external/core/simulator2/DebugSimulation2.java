@@ -42,7 +42,6 @@ import org.eclipse.ptp.debug.core.cdi.model.IPCDILineBreakpoint;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDILocalVariable;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIStackFrame;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIThread;
 import org.eclipse.ptp.debug.external.core.AbstractDebugger;
 import org.eclipse.ptp.debug.external.core.cdi.breakpoints.LineBreakpoint;
 import org.eclipse.ptp.debug.external.core.cdi.model.LineLocation;
@@ -310,10 +309,9 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 				List frameList = new ArrayList();
 				for (int i=0; i<taskArray.length; i++) {
 					IPCDITarget target = getSession().getTarget(taskArray[i]);
-				    IPCDIThread thread = new org.eclipse.ptp.debug.external.core.cdi.model.Thread((Target) target, 0);
-				    SimulateFrame[] frames = getSimProg(taskArray[i]).getSimStackFrames();
+					SimulateFrame[] frames = getSimProg(taskArray[i]).getSimStackFrames();
 				    for (int j=0; j<frames.length; j++) {
-				    	frameList.add(new StackFrame((org.eclipse.ptp.debug.external.core.cdi.model.Thread) thread, frames[j].getLevel(), frames[j].getFile(), frames[j].getFunc(), frames[j].getLine(), frames[j].getAddr()));
+				    	frameList.add(new StackFrame((Target)target, frames[j].getLevel(), frames[j].getFile(), frames[j].getFunc(), frames[j].getLine(), frames[j].getAddr()));
 				    }
 				}
 				completeCommand(tasks, (IPCDIStackFrame[]) frameList.toArray(new IPCDIStackFrame[0]));
@@ -321,10 +319,9 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 		}).start();
 	}
 	
-	public void setCurrentStackFrame(final BitList tasks, final IPCDIStackFrame frame) throws PCDIException {
+	public void setCurrentStackFrame(final BitList tasks, final int level) throws PCDIException {
 		new Thread(new Runnable() {
 			public void run() {
-				current_frame = frame;
 				completeCommand(tasks, IDebugCommand.OK);
 			}
 		}).start();
@@ -361,7 +358,7 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 			}
 		}).start();
 	}
-	public void listArguments(final BitList tasks, final IPCDIStackFrame frame) throws PCDIException {
+	public void listArguments(final BitList tasks, final IPCDIStackFrame frame, final int depth) throws PCDIException {
 		new Thread(new Runnable() {
 			public void run() {
 				current_frame = frame;
@@ -370,10 +367,9 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 				List argList = new ArrayList();
 				for (int i=0; i<taskArray.length; i++) {
 					IPCDITarget target = getSession().getTarget(taskArray[i]);
-				    IPCDIThread thread = new org.eclipse.ptp.debug.external.core.cdi.model.Thread((Target) target, 0);
 				    SimVariable[] args = getArguments();
 				    for (int j=0; j<args.length; j++) {
-						argList.add(new Argument((Target) target, (org.eclipse.ptp.debug.external.core.cdi.model.Thread) thread, (StackFrame)current_frame, args[j].getVariable(), args[j].getVariable(), args.length - j, frame.getLevel(), null));
+						argList.add(new Argument((Target) target, null, (StackFrame)current_frame, args[j].getVariable(), args[j].getVariable(), args.length - j, frame.getLevel(), null));
 				    }
 				}
 				completeCommand(tasks, (IPCDIArgument[]) argList.toArray(new IPCDIArgument[0]));
@@ -389,10 +385,9 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 				List varList = new ArrayList();
 				for (int i=0; i<taskArray.length; i++) {
 					IPCDITarget target = getSession().getTarget(taskArray[i]);
-				    IPCDIThread thread = new org.eclipse.ptp.debug.external.core.cdi.model.Thread((Target) target, 0);
 				    SimVariable[] vars = getVariables();
 				    for (int j=0; j<vars.length; j++) {
-				    	varList.add(new LocalVariable((Target) target, (org.eclipse.ptp.debug.external.core.cdi.model.Thread) thread, (StackFrame)current_frame, vars[j].getVariable(), vars[j].getVariable(), vars.length - j, frame.getLevel(), null));
+				    	varList.add(new LocalVariable((Target) target, null, (StackFrame)current_frame, vars[j].getVariable(), vars[j].getVariable(), vars.length - j, frame.getLevel(), null));
 				    }
 				}
 				completeCommand(tasks, (IPCDILocalVariable[])varList.toArray(new IPCDILocalVariable[0]));
@@ -403,6 +398,27 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 		completeCommand(tasks, null);
 		handleErrorEvent(tasks, PCDIException.NOT_IMPLEMENTED + " - listGlobalVariables", IPCDIErrorEvent.DBG_FATAL);
 		//throw new PCDIException(PCDIException.NOT_IMPLEMENTED, "listGlobalVariables");
+	}
+	public void getInfothreads(final BitList tasks) throws PCDIException {
+		new Thread(new Runnable() {
+			public void run() {
+				completeCommand(tasks, new String[] { "0" });			
+			}
+		}).start();
+	}
+	public void setThreadSelect(final BitList tasks, final int threadNum) throws PCDIException {
+		new Thread(new Runnable() {
+			public void run() {
+				completeCommand(tasks, new Object[] { new Integer(threadNum),  });
+			}
+		}).start();
+	}
+	public void getStackInfoDepth(final BitList tasks) throws PCDIException {
+		new Thread(new Runnable() {
+			public void run() {
+				completeCommand(tasks, new Integer(1));			
+			}
+		}).start();
 	}
 	
 	public synchronized void update(Observable obs, Object obj) {
@@ -436,10 +452,10 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 		if (state.equals(EXIT_STATE)) {
 			handleProcessTerminatedEvent(qItem.getTasks());
 		} else if (state.equals(HIT_BPT_STATE)) {
-			handleBreakpointHitEvent(qItem.getTasks(), qItem.getLine());
+			handleBreakpointHitEvent(qItem.getTasks(), qItem.getLine(), 0);
 			//handleBreakpointHitEvent(qItem.getTasks(), qItem.getLine(), qItem.getFile());
 		} else if (state.equals(STEP_END_STATE)) {
-			handleEndSteppingEvent(qItem.getTasks(), qItem.getLine(), qItem.getFile());
+			handleEndSteppingEvent(qItem.getTasks(), qItem.getLine(), qItem.getFile(), 0);
 		}
 	}
 	public static int convertInt(String s_id) {

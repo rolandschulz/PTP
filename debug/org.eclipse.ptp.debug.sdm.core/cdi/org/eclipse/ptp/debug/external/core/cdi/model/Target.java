@@ -21,10 +21,6 @@ package org.eclipse.ptp.debug.external.core.cdi.model;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-import org.eclipse.cdt.debug.core.cdi.ICDIAddressLocation;
-import org.eclipse.cdt.debug.core.cdi.ICDIFunctionLocation;
-import org.eclipse.cdt.debug.core.cdi.ICDILineLocation;
-import org.eclipse.cdt.debug.core.cdi.ICDILocation;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIInstruction;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIMemoryBlock;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIMixedInstruction;
@@ -63,9 +59,11 @@ import org.eclipse.ptp.debug.external.core.cdi.VariableManager;
 import org.eclipse.ptp.debug.external.core.cdi.model.variable.GlobalVariableDescriptor;
 import org.eclipse.ptp.debug.external.core.cdi.model.variable.Variable;
 import org.eclipse.ptp.debug.external.core.commands.EvaluteExpressionCommand;
+import org.eclipse.ptp.debug.external.core.commands.GetInfoThreadsCommand;
 import org.eclipse.ptp.debug.external.core.commands.GoCommand;
 import org.eclipse.ptp.debug.external.core.commands.HaltCommand;
 import org.eclipse.ptp.debug.external.core.commands.KillCommand;
+import org.eclipse.ptp.debug.external.core.commands.SetThreadSelectCommand;
 import org.eclipse.ptp.debug.external.core.commands.StepIntoCommand;
 import org.eclipse.ptp.debug.external.core.commands.StepOverCommand;
 
@@ -119,14 +117,36 @@ public class Target extends SessionObject implements IPCDITarget {
 		suspended = state;
 		notifyAll();
 	}
-	public void setCurrentThread(Thread cthread, boolean doUpdate) throws PCDIException {
-		int id = cthread.getId();
+	public void setCurrentThread(Thread pthread, boolean doUpdate) throws PCDIException {
+		int id = pthread.getId();
 		if (id == 0) {
 			return;
 		}
+		final Session session = (Session) getSession();
 		if (currentThreadId != id) {
+			SetThreadSelectCommand command = new SetThreadSelectCommand(session.createBitList(getTargetID()), id);
+			session.getDebugger().postCommand(command);
+			Object[] objects = command.getThreadInfo();
+			if (objects == null || objects.length != 2) {
+				throw new PCDIException("Cannot SetThreadSelectCommand error");
+			}
 			
+			currentThreadId = ((Integer)objects[0]).intValue();
+			IPCDIStackFrame frame = (IPCDIStackFrame)objects[1];
+			
+			int depth = pthread.getStackFrameCount();
+			frame.setLevel(depth-frame.getLevel());
+			frame.setThread(pthread);
+			pthread.currentFrame = (StackFrame)frame;
 		}
+		
+		if (doUpdate) {
+			VariableManager varMgr = session.getVariableManager();
+			if (varMgr.isAutoUpdate()) {
+				varMgr.update(this);
+			}
+		}
+		
 		if (currentThreadId != id) {
 			throw new PCDIException("Cannot switch to thread " + id);
 		}
@@ -135,7 +155,7 @@ public class Target extends SessionObject implements IPCDITarget {
 		Thread[] oldThreads = currentThreads;
 		currentThreadId = newThreadId;
 		try {
-			currentThreads = getCThreads();
+			currentThreads = getPThreads();
 		} catch (PCDIException e) {
 			currentThreads = noThreads;
 		}
@@ -175,16 +195,28 @@ public class Target extends SessionObject implements IPCDITarget {
 			//TODO - thread created event?
 		}
 	}
-	private Thread[] getCThreads() throws PCDIException {
-		Thread[] cthreads = noThreads;
-		//TODO - implement list threads
-		//Session session = (Sessoin)getSession();
-		//cthreads = debugger.listTheads(session.createBitList(getTargetID()));
-		cthreads = new Thread[]{new Thread(this, 0)};
-		if (currentThreadId == 0 && cthreads.length > 0) {
-			currentThreadId = cthreads[0].getId();
+	private Thread[] getPThreads() throws PCDIException {
+		Thread[] pthreads = noThreads;
+		final Session session = (Session)getSession();
+		GetInfoThreadsCommand command = new GetInfoThreadsCommand(session.createBitList(getTargetID()));
+		session.getDebugger().postCommand(command);
+		String[] ids = command.getThreadIds();//first index is current thread id
+
+		if (ids != null && ids.length > 0) {
+			pthreads = new Thread[ids.length];
+			for (int i=0; i<ids.length; i++) {
+				pthreads[i] = new Thread(this, Integer.parseInt(ids[i]));
+			}
 		}
-		return cthreads;
+		else {
+			pthreads = new Thread[] { new Thread(this, 0) };
+		}
+		currentThreadId = pthreads[0].getId();
+
+		if (currentThreadId == 0 && pthreads.length > 1) {
+			currentThreadId = pthreads[0].getId();
+		}
+		return pthreads;
 	}
 	public IPCDIThread getCurrentThread() throws PCDIException {
 		IPCDIThread[] threads = getThreads();
@@ -198,7 +230,7 @@ public class Target extends SessionObject implements IPCDITarget {
 	}
 	public synchronized IPCDIThread[] getThreads() throws PCDIException {
 		if (currentThreads.length == 0) {
-			currentThreads = getCThreads();
+			currentThreads = getPThreads();
 		}
 		return currentThreads;
 	}
@@ -251,23 +283,23 @@ public class Target extends SessionObject implements IPCDITarget {
 	public void stepReturn() throws PCDIException {
 		((Thread)getCurrentThread()).getCurrentStackFrame().stepReturn();
 	}
-	public void runUntil(ICDILocation location) throws PCDIException {
+	public void runUntil(IPCDILocation location) throws PCDIException {
 		stepUntil(location);
 	}
-	public void stepUntil(ICDILocation location) throws PCDIException {
+	public void stepUntil(IPCDILocation location) throws PCDIException {
 		String file = "";
 		String func = "";
 		String addr = "";
 		int line = -1;
-		if (location instanceof ICDILineLocation) {
-			ICDILineLocation lineLocation = (ICDILineLocation)location;
+		if (location instanceof IPCDILineLocation) {
+			IPCDILineLocation lineLocation = (IPCDILineLocation)location;
 			if (lineLocation.getFile() != null && lineLocation.getFile().length() > 0) {
 				file = lineLocation.getFile(); 
 				line = lineLocation.getLineNumber();
 			}
 		}
-		else if (location instanceof ICDIFunctionLocation) {
-			ICDIFunctionLocation funcLocation = (ICDIFunctionLocation)location;
+		else if (location instanceof IPCDIFunctionLocation) {
+			IPCDIFunctionLocation funcLocation = (IPCDIFunctionLocation)location;
 			if (funcLocation.getFunction() != null && funcLocation.getFunction().length() > 0) {
 				func = funcLocation.getFunction();
 			}
@@ -275,8 +307,8 @@ public class Target extends SessionObject implements IPCDITarget {
 				file = funcLocation.getFile();
 			}
 		}
-		else if (location instanceof ICDIAddressLocation) {
-			ICDIAddressLocation addrLocation = (ICDIAddressLocation) location;
+		else if (location instanceof IPCDIAddressLocation) {
+			IPCDIAddressLocation addrLocation = (IPCDIAddressLocation) location;
 			if (! addrLocation.getAddress().equals(BigInteger.ZERO)) {
 				addr = "*0x" + addrLocation.getAddress().toString(16);
 			}
@@ -322,20 +354,20 @@ public class Target extends SessionObject implements IPCDITarget {
 		getDebugger().postCommand(new GoCommand(((Session)getSession()).createBitList(getTargetID())));
 		//getDebugger().resume(((Session)getSession()).createBitList(getTargetID()));
 	}
-	public void jump(ICDILocation location) throws PCDIException {
+	public void jump(IPCDILocation location) throws PCDIException {
 		String file = "";
 		String func = "";
 		String addr = "";
 		int line = -1;
-		if (location instanceof ICDILineLocation) {
-			ICDILineLocation lineLocation = (ICDILineLocation)location;
+		if (location instanceof IPCDILineLocation) {
+			IPCDILineLocation lineLocation = (IPCDILineLocation)location;
 			if (lineLocation.getFile() != null && lineLocation.getFile().length() > 0) {
 				file = lineLocation.getFile(); 
 				line = lineLocation.getLineNumber();
 			}
 		}
-		else if (location instanceof ICDIFunctionLocation) {
-			ICDIFunctionLocation funcLocation = (ICDIFunctionLocation)location;
+		else if (location instanceof IPCDIFunctionLocation) {
+			IPCDIFunctionLocation funcLocation = (IPCDIFunctionLocation)location;
 			if (funcLocation.getFunction() != null && funcLocation.getFunction().length() > 0) {
 				func = funcLocation.getFunction();
 			}
@@ -343,8 +375,8 @@ public class Target extends SessionObject implements IPCDITarget {
 				file = funcLocation.getFile();
 			}
 		}
-		else if (location instanceof ICDIAddressLocation) {
-			ICDIAddressLocation addrLocation = (ICDIAddressLocation) location;
+		else if (location instanceof IPCDIAddressLocation) {
+			IPCDIAddressLocation addrLocation = (IPCDIAddressLocation) location;
 			if (! addrLocation.getAddress().equals(BigInteger.ZERO)) {
 				addr = "*0x" + addrLocation.getAddress().toString(16);
 			}

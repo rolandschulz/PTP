@@ -24,7 +24,7 @@ import org.eclipse.ptp.debug.core.cdi.model.IPCDILocator;
 
 
 public class SuspendEvent extends InferiorSignaledEvent {
-	public SuspendEvent(IPCDISession session, BitList tasks, IPCDILocator loc) {
-		super(session, tasks, loc);
+	public SuspendEvent(IPCDISession session, BitList tasks, IPCDILocator loc, int thread_id) {
+		super(session, tasks, loc, thread_id);
 	}
 }

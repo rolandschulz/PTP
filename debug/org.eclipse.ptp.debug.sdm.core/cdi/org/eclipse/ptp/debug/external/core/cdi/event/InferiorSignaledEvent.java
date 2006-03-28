@@ -21,14 +21,13 @@ package org.eclipse.ptp.debug.external.core.cdi.event;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.IPCDISessionObject;
-import org.eclipse.ptp.debug.core.cdi.event.IPCDISuspendedEvent;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDILocator;
 
-public class InferiorSignaledEvent extends AbstractEvent implements IPCDISuspendedEvent {
+public class InferiorSignaledEvent extends AbstractSuspendEvent {
 	private IPCDILocator	loc;
 	
-	public InferiorSignaledEvent(IPCDISession session, BitList tasks, IPCDILocator loc) {
-		super(session, tasks);
+	public InferiorSignaledEvent(IPCDISession session, BitList tasks, IPCDILocator loc, int thread_id) {
+		super(session, tasks, thread_id);
 		this.loc = loc;
 	}
 	
