@@ -179,7 +179,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPCDIE
 	protected void initializeThreads(List debugEvents) {
 		IPCDIThread[] cdiThreads = new IPCDIThread[0];
 		try {
-			cdiThreads = (IPCDIThread[])getCDITarget().getThreads();
+			cdiThreads = getCDITarget().getThreads();
 		} catch (PCDIException e) {
 			// ignore
 		}

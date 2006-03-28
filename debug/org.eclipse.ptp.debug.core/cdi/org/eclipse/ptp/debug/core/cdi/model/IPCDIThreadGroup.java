@@ -18,16 +18,14 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.cdi.model;
 
-import org.eclipse.cdt.debug.core.cdi.model.ICDIExecuteStep;
 import org.eclipse.cdt.debug.core.cdi.model.ICDISignalManagement;
-import org.eclipse.cdt.debug.core.cdi.model.ICDISuspend;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
 /**
  * @author Clement chu
  * 
  */
-public interface IPCDIThreadGroup extends IPCDIBreakpointManagement, ICDIExecuteStep, IPCDIExecuteResume, ICDISuspend, ICDISignalManagement, IPCDIObject {
+public interface IPCDIThreadGroup extends IPCDIBreakpointManagement, IPCDIExecuteStep, IPCDIExecuteResume, IPCDISuspend, ICDISignalManagement, IPCDIObject {
 	IPCDIThread[] getThreads() throws PCDIException;
 	IPCDIThread getCurrentThread() throws PCDIException;
 }

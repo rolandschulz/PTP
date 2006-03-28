@@ -57,13 +57,13 @@ public interface IDebugger {
 	public void stopDebugger() throws CoreException;
 	
 	public void listStackFrames(BitList tasks) throws PCDIException;
-	public void setCurrentStackFrame(BitList tasks, IPCDIStackFrame frame) throws PCDIException;
+	public void setCurrentStackFrame(BitList tasks, int level) throws PCDIException;
 	
 	/* Data Display and Manipulation */
 	public void getAIFValue(BitList tasks, String expr) throws PCDIException;
 	public void evaluateExpression(BitList tasks, String expression) throws PCDIException;
 	public void getVariableType(BitList tasks, String varName) throws PCDIException;	
-	public void listArguments(BitList tasks, IPCDIStackFrame frame) throws PCDIException;
+	public void listArguments(BitList tasks, IPCDIStackFrame frame, int depth) throws PCDIException;
 	public void listLocalVariables(BitList tasks, IPCDIStackFrame frame) throws PCDIException;
 	public void listGlobalVariables(BitList tasks) throws PCDIException;
 	
@@ -84,4 +84,10 @@ public interface IDebugger {
 	public void enableBreakpoint(BitList tasks, int bpid) throws PCDIException;
 	public void disableBreakpoint(BitList tasks, int bpid) throws PCDIException;
 	public void conditionBreakpoint(BitList tasks, int bpid, String expr) throws PCDIException;
+	
+	/* Thread */
+	public void getInfothreads(BitList tasks) throws PCDIException;
+	public void setThreadSelect(BitList tasks, int threadNum) throws PCDIException;
+
+	public void getStackInfoDepth(BitList tasks) throws PCDIException;
 }
