@@ -15,7 +15,6 @@ package org.eclipse.fdt.refactoring;
  * Dialog template from FindReplaceDialog
  */
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.PatternSyntaxException;
@@ -29,9 +28,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -39,34 +36,23 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.resource.JFaceColors;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IFindReplaceTarget;
 import org.eclipse.jface.text.IFindReplaceTargetExtension;
-import org.eclipse.jface.text.IFindReplaceTargetExtension3;
-import org.eclipse.jface.text.IRegion;
-import org.eclipse.jface.text.Region;
-import org.eclipse.jface.text.TextUtilities;
 
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.contentassist.ContentAssistHandler;
 import org.eclipse.ui.texteditor.IEditorStatusLine;
-import org.eclipse.ui.texteditor.IFindReplaceTargetExtension2;
 import org.eclipse.ui.texteditor.ITextEditor;
-
-import org.eclipse.ui.texteditor.IDocumentProvider;
-
 
 /**
  * Find/Replace dialog. The dialog is opened on a particular
@@ -98,24 +84,15 @@ class ReplaceDialog extends Dialog {
 		public void shellActivated(ShellEvent e) {
 			fActiveShell= (Shell)e.widget;
 			updateButtonState();
-
-			if (fGiveFocusToFindField && getShell() == fActiveShell && okToUse(fFindField))
-				fFindField.setFocus();
-
 		}
 
 		/*
 		 * @see ShellListener#shellDeactivated(ShellEvent)
 		 */
 		public void shellDeactivated(ShellEvent e) {
-			fGiveFocusToFindField= false;
-
-			storeSettings();
 
 			if (fTarget != null && (fTarget instanceof IFindReplaceTargetExtension))
 				((IFindReplaceTargetExtension) fTarget).setScope(null);
-
-			fOldScope= null;
 
 			fActiveShell= null;
 			updateButtonState();
@@ -132,15 +109,6 @@ class ReplaceDialog extends Dialog {
 		 * @see ModifyListener#modifyText(ModifyEvent)
 		 */
 		public void modifyText(ModifyEvent e) {
-				if (fFindField.getText().equals("") && fTarget != null) { //$NON-NLS-1$
-					// empty selection at base location
-					int offset= fIncrementalBaseLocation.x;
-
-				} else {
-					performSearch(false);
-				}
-
-//			updateButtonState(!isIncrementalSearch());
 			updateButtonState();
 		}
 	}
@@ -149,13 +117,10 @@ class ReplaceDialog extends Dialog {
 	private static final int HISTORY_SIZE= 5;
 
 	private Point fLocation;
-	private Point fIncrementalBaseLocation;
 
 	private List fFindHistory;
 	private List fReplaceHistory;
-	private IRegion fOldScope;
 
-	private boolean fIsTargetEditable;
 	private IFindReplaceTarget fTarget;
 	private Shell fParentShell;
 	private Shell fActiveShell;
@@ -173,33 +138,6 @@ class ReplaceDialog extends Dialog {
 	private int fPrevLine;
 	private int fExtraColumns;
 
-	/**
-	 * The content assist handler for the find combo.
-	 * @since 3.0
-	 */
-	private ContentAssistHandler fFindContentAssistHandler;
-	/**
-	 * The content assist handler for the replace combo.
-	 * @since 3.0
-	 */
-	private ContentAssistHandler fReplaceContentAssistHandler;
-	/**
-	 * Content assist's proposal popup background color.
-	 * @since 3.0
-	 */
-	private Color fProposalPopupBackgroundColor;
-	/**
-	 * Content assist's proposal popup foreground color.
-	 * @since 3.0
-	 */
-	private Color fProposalPopupForegroundColor;
-	/**
-	 * <code>true</code> if the find field should receive focus the next time
-	 * the dialog is activated, <code>false</code> otherwise.
-	 * @since 3.0
-	 */
-	private boolean fGiveFocusToFindField= true;
-	
 	private IWorkbenchPart fActiveEditor;	/* editor associated with action delegate */
 	private String[] fConstants;	/* list of constant work items */
 	private int fTargetIndex;		/* current index into fConstants */
@@ -266,9 +204,6 @@ class ReplaceDialog extends Dialog {
 		if (fLocation != null)
 			shell.setLocation(fLocation);
 
-		// set help context
-		//cer PlatformUI.getWorkbench().getHelpSystem().setHelp(shell, IAbstractTextEditorHelpContextIds.FIND_REPLACE_DIALOG);
-
 		// fill in combo contents
 		fFindField.removeModifyListener(fFindModifyListener);
 		updateCombo(fFindField, fFindHistory);
@@ -283,7 +218,6 @@ class ReplaceDialog extends Dialog {
 			shell.setBounds(fDialogPositionInit);
 
 		shell.setText(FindReplace_title);
-		// shell.setImage(null);
 	}
 
 	/**
@@ -303,7 +237,6 @@ class ReplaceDialog extends Dialog {
 		fFindNextButton= makeButton(panel, FindReplace_FindNextButton_label, 102, true, new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				performSeekNextTarget();
-				updateFindHistory();
 				fFindNextButton.setFocus();
 			}
 		});
@@ -314,7 +247,6 @@ class ReplaceDialog extends Dialog {
 				if (performReplaceSelection()) {
 					performSeekNextTarget();
 				}
-				updateFindAndReplaceHistory();
 				fReplaceFindButton.setFocus();
 			}
 		});
@@ -323,7 +255,6 @@ class ReplaceDialog extends Dialog {
 		fReplaceSelectionButton= makeButton(panel, FindReplace_ReplaceSelectionButton_label, 104, false, new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				performReplaceSelection();
-				updateFindAndReplaceHistory();
 				fFindNextButton.setFocus();
 			}
 		});
@@ -332,7 +263,6 @@ class ReplaceDialog extends Dialog {
 		fReplaceAllButton= makeButton(panel, FindReplace_ReplaceAllButton_label, 105, false, new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				performReplaceAll();
-				updateFindAndReplaceHistory();
 				fFindNextButton.setFocus();
 			}
 		});
@@ -370,54 +300,7 @@ class ReplaceDialog extends Dialog {
 
 		applyDialogFont(panel);
 
-		// Setup content assistants for find and replace combo boxes
-		fProposalPopupBackgroundColor= new Color(getShell().getDisplay(), new RGB(254, 241, 233));
-		fProposalPopupForegroundColor= new Color(getShell().getDisplay(), new RGB(0, 0, 0));
-
 		return panel;
-	}
-
-	private void setContentAssistsEnablement(boolean enable) {
-		if (enable) {
-		} else {
-			if (fFindContentAssistHandler == null)
-				return;
-			fFindContentAssistHandler.setEnabled(false);
-			fReplaceContentAssistHandler.setEnabled(false);
-		}
-	}
-
-
-	/**
-	 * Tells the dialog to perform searches only in the scope given by the actually selected lines.
-	 * @param selectedLines <code>true</code> if selected lines should be used
-	 * @since 2.0
-	 */
-	private void useSelectedLines(boolean selectedLines) {
-		if (fTarget == null || !(fTarget instanceof IFindReplaceTargetExtension))
-			return;
-
-		IFindReplaceTargetExtension extensionTarget= (IFindReplaceTargetExtension) fTarget;
-
-		if (selectedLines) {
-
-			IRegion scope;
-			if (fOldScope == null) {
-				Point lineSelection= extensionTarget.getLineSelection();
-				scope= new Region(lineSelection.x, lineSelection.y);
-			} else {
-				scope= fOldScope;
-				fOldScope= null;
-			}
-
-			int offset= scope.getOffset();
-			
-			extensionTarget.setSelection(offset, 0);
-			extensionTarget.setScope(scope);
-		} else {
-			fOldScope= extensionTarget.getScope();
-			extensionTarget.setScope(null);
-		}
 	}
 
 	/**
@@ -492,134 +375,7 @@ class ReplaceDialog extends Dialog {
 	}
 
 
-
-	// ------- action invocation ---------------------------------------
-
-	/**
-	 * Returns the position of the specified search string, or <code>-1</code> if the string can
-	 * not be found when searching using the given options.
-	 *
-	 * @param findString the string to search for
-	 * @param startPosition the position at which to start the search
-	 * @param forwardSearch the direction of the search
-	 * @param caseSensitive	should the search be case sensitive
-	 * @param wrapSearch	should the search wrap to the start/end if arrived at the end/start
-	 * @param wholeWord does the search string represent a complete word
-	 * @param regExSearch if <code>true</code> findString represents a regular expression
-	 * @return the occurrence of the find string following the options or <code>-1</code> if nothing found
-	 * @since 3.0
-	 */
-	private int findIndex(String findString, int startPosition, boolean forwardSearch, boolean caseSensitive, boolean wrapSearch, boolean wholeWord, boolean regExSearch) {
-
-		if (forwardSearch) {
-			return findAndSelect(startPosition, findString, true, caseSensitive, wholeWord, regExSearch);
-		}
-		return findAndSelect(startPosition - 1, findString, false, caseSensitive, wholeWord, regExSearch);
-	}
-
-	/**
-	 * Searches for a string starting at the given offset and using the specified search
-	 * directives. If a string has been found it is selected and its start offset is
-	 * returned.
-	 *
-	 * @param offset the offset at which searching starts
-	 * @param findString the string which should be found
-	 * @param forwardSearch the direction of the search
-	 * @param caseSensitive <code>true</code> performs a case sensitive search, <code>false</code> an insensitive search
-	 * @param wholeWord if <code>true</code> only occurrences are reported in which the findString stands as a word by itself
-	 * @param regExSearch if <code>true</code> findString represents a regular expression
-	 * @return the position of the specified string, or -1 if the string has not been found
-	 * @since 3.0
-	 */
-	private int findAndSelect(int offset, String findString, boolean forwardSearch, boolean caseSensitive, boolean wholeWord, boolean regExSearch) {
-		if (fTarget instanceof IFindReplaceTargetExtension3)
-			return ((IFindReplaceTargetExtension3)fTarget).findAndSelect(offset, findString, forwardSearch, caseSensitive, wholeWord, regExSearch);
-		return fTarget.findAndSelect(offset, findString, forwardSearch, caseSensitive, wholeWord);
-	}
-
-	/**
-	 * Replaces the selection with <code>replaceString</code>. If
-	 * <code>regExReplace</code> is <code>true</code>,
-	 * <code>replaceString</code> is a regex replace pattern which will get
-	 * expanded if the underlying target supports it. Returns the region of the
-	 * inserted text; note that the returned selection covers the expanded
-	 * pattern in case of regex replace.
-	 *
-	 * @param replaceString the replace string (or a regex pattern)
-	 * @param regExReplace <code>true</code> if <code>replaceString</code>
-	 *        is a pattern
-	 * @return the selection after replacing, i.e. the inserted text
-	 * @since 3.0
-	 */
-	Point replaceSelection(String replaceString, boolean regExReplace) {
-		if (fTarget instanceof IFindReplaceTargetExtension3)
-			((IFindReplaceTargetExtension3)fTarget).replaceSelection(replaceString, regExReplace);
-		else
-			fTarget.replaceSelection(replaceString);
-
-		return fTarget.getSelection();
-	}
-
-	/**
-	 * Returns whether the specified search string can be found using the given options.
-	 *
-	 * @param findString the string to search for
-	 * @param forwardSearch the direction of the search
-	 * @param caseSensitive	should the search be case sensitive
-	 * @param wrapSearch	should the search wrap to the start/end if arrived at the end/start
-	 * @param wholeWord does the search string represent a complete word
-	 * @param incremental is this an incremental search
-	 * @param regExSearch if <code>true</code> findString represents a regular expression
-	 * @return <code>true</code> if the search string can be found using the given options
-	 *
-	 * @since 3.0
-	 */
-	private boolean findNext(String findString, boolean forwardSearch, boolean caseSensitive, boolean wrapSearch, boolean wholeWord, boolean incremental, boolean regExSearch) {
-
-		if (fTarget == null)
-			return false;
-
-		Point r= null;
-		if (incremental)
-			r= fIncrementalBaseLocation;
-		else
-			r= fTarget.getSelection();
-
-		int findReplacePosition= r.x;
-		if (forwardSearch)
-			findReplacePosition += r.y;
-
-		int index= findIndex(findString, findReplacePosition, forwardSearch, caseSensitive, wrapSearch, wholeWord, regExSearch);
-
-		if (index != -1)
-			return true;
-
-		return false;
-	}
-
-	/**
-	 * Returns the dialog's boundaries.
-	 * @return the dialog's boundaries
-	 */
-	private Rectangle getDialogBoundaries() {
-		if (okToUse(getShell()))
-			return getShell().getBounds();
-		return fDialogPositionInit;
-	}
-
-
 	// ------- accessors ---------------------------------------
-
-	/**
-	 * Retrieves the string to search for from the appropriate text input field and returns it.
-	 * @return the search string
-	 */
-	private String getFindString() {
-		if (okToUse(fFindField)) {
-			return fFindField.getText();
-		}
-		return ""; //$NON-NLS-1$
-	}
 
 	/**
 	 * Retrieves the replacement string from the appropriate text input field and returns it.
@@ -633,22 +389,6 @@ class ReplaceDialog extends Dialog {
 	}
 
 	// ------- init / close ---------------------------------------
-
-	/**
-	 * Returns the actual selection of the find replace target.
-	 * @return the selection of the target
-	 */
-	private String getSelectionString() {
-		String selection= fTarget.getSelectionText();
-		if (selection != null && selection.length() > 0) {
-			int[] info= TextUtilities.indexOf(TextUtilities.DELIMITERS, selection, 0);
-			if (info[0] > 0)
-				return selection.substring(0, info[0]);
-			else if (info[0] == -1)
-				return selection;
-		}
-		return null;
-	}
 
 	/**
 	 * @see org.eclipse.jface.window.Window#close()
@@ -675,88 +415,14 @@ class ReplaceDialog extends Dialog {
 
 		getShell().removeShellListener(fActivationListener);
 
-		// store current settings in case of re-open
-		storeSettings();
-
 		if (fTarget != null && fTarget instanceof IFindReplaceTargetExtension)
 			((IFindReplaceTargetExtension) fTarget).endSession();
-
-		setContentAssistsEnablement(false);
-		fFindContentAssistHandler= null;
-		fReplaceContentAssistHandler= null;
-
-		fProposalPopupBackgroundColor.dispose();
-		fProposalPopupForegroundColor.dispose();
 
 		// prevent leaks
 		fActiveShell= null;
 		fTarget= null;
 
 	}
-
-	/**
-	 * Writes the current selection to the dialog settings.
-	 * @since 3.0
-	 */
-	private void writeSelection() {
-		if (fTarget == null)
-			return;
-		String selection= fTarget.getSelectionText();
-		if (selection == null)
-			selection= ""; //$NON-NLS-1$
-
-		//cer IDialogSettings s= getDialogSettings();
-		//cer s.put("selection", selection); //$NON-NLS-1$
-	}
-
-	/**
-	 * Stores the current state in the dialog settings.
-	 * @since 2.0
-	 */
-	private void storeSettings() {
-		// store (set from field settings) instance variables (CER)
-		fDialogPositionInit= getDialogBoundaries();
-	}
-
-	/**
-	 * Initializes the string to search for and the appropriate
-	 * text in the Find field based on the selection found in the
-	 * action's target.
-	 */
-	private void initFindStringFromSelection() {
-		fFindField.setText("Hello world!");
-		if (fTarget != null && okToUse(fFindField)) {
-			String selection= getSelectionString();
-			fFindField.removeModifyListener(fFindModifyListener);
-			if (selection != null) {
-				fFindField.setText(selection);
-				if (!selection.equals(fTarget.getSelectionText())) {
-					useSelectedLines(true);
-//					fGlobalRadioButton.setSelection(false);
-//					fSelectedRangeRadioButton.setSelection(true);
-//					fUseSelectedLines= true;
-				}
-			} else {
-				if ("".equals(fFindField.getText())) { //$NON-NLS-1$
-					if (fFindHistory.size() > 0)
-						fFindField.setText((String) fFindHistory.get(0));
-					else
-						fFindField.setText(""); //$NON-NLS-1$
-				}
-			}
-			fFindField.setSelection(new Point(0, fFindField.getText().length()));
-			fFindField.addModifyListener(fFindModifyListener);
-		}
-	}
-
-	/**
-	 * Initializes the anchor used as starting point for incremental searching.
-	 * @since 2.0
-	 */
-	private void initIncrementalBaseLocation() {
-		fIncrementalBaseLocation= new Point(0, 0);
-	}
-
 
 	/**
 	 * Creates a button.
@@ -871,7 +537,6 @@ class ReplaceDialog extends Dialog {
 				// we don't keep state in this dialog
 			}
 		}
-		writeSelection();
 		updateButtonState();
 	}
 
@@ -881,7 +546,6 @@ class ReplaceDialog extends Dialog {
 	 * @since 2.1
 	 */
 	private boolean validateTargetState() {
-
 		if (fTargetOffset < 0) {
 			updateButtonState();
 			return false;
@@ -926,14 +590,6 @@ class ReplaceDialog extends Dialog {
 	}
 
 	/**
-	 * Locates the user's findString in the text of the target.
-	 */
-	private void performSearch() {
-		//performSearch(isIncrementalSearch() && !isRegExSearchAvailableAndChecked());
-		performSearch(true);
-	}
-
-	/**
 	 * Locates the next replacement in the text of the target.
 	 */
 	private void performSeekNextTarget() {
@@ -971,39 +627,6 @@ class ReplaceDialog extends Dialog {
 			fTargetIndex += 1;			
 		}
 		updateButtonState();	// no more work to do
-	}
-
-	/**
-	 * Locates the user's findString in the text of the target.
-	 *
-	 * @param mustInitIncrementalBaseLocation <code>true</code> if base location must be initialized
-	 * @since 3.0
-	 */
-	private void performSearch(boolean mustInitIncrementalBaseLocation) {
-
-		if (mustInitIncrementalBaseLocation)
-			initIncrementalBaseLocation();
-
-		String findString= getFindString();
-
-		if (findString != null && findString.length() > 0) {
-
-			try {
-				boolean somethingFound = true;
-				//boolean somethingFound= findNext(findString, isForwardSearch(), isCaseSensitiveSearch(), isWrapSearch(), isWholeWordSearch(), isIncrementalSearch() && !isRegExSearchAvailableAndChecked(), isRegExSearchAvailableAndChecked());
-				if (somethingFound) {
-					statusMessage(""); //$NON-NLS-1$
-				} else {
-					statusMessage(FindReplace_Status_noMatch_label);
-				}
-			} catch (PatternSyntaxException ex) {
-				statusError(ex.getLocalizedMessage());
-			} catch (IllegalStateException ex) {
-				// we don't keep state in this dialog
-			}
-		}
-		writeSelection();
-		updateButtonState();
 	}
 
 	/**
@@ -1063,40 +686,11 @@ class ReplaceDialog extends Dialog {
 	 */
 	private void updateButtonState(boolean disableReplace) {
 		if (okToUse(getShell()) && okToUse(fFindNextButton)) {
-
-			boolean selection= false;
-			if (fTarget != null) {
-				String selectedText= fTarget.getSelectionText();
-				selection= (selectedText != null && selectedText.length() > 0);
-			}
-			boolean enable= fTarget != null && (fActiveShell == fParentShell || fActiveShell == getShell());
-			String str= getFindString();
-			boolean findString= str != null && str.length() > 0;
-
 			fFindNextButton.setEnabled(fTargetIndex < fConstants.length);
 			fReplaceSelectionButton.setEnabled(fTargetOffset >= 0);
 			fReplaceFindButton.setEnabled(fTargetOffset >= 0);
 			fReplaceAllButton.setEnabled(fTargetOffset >= 0);			
 		}
-	}
-
-	/**
-	 * Tests whether each character in the given
-	 * string is a letter.
-	 *
-	 * @param str
-	 * @return <code>true</code> if the given string is a word
-	 * @since 3.0
-	 */
-	private boolean isWord(String str) {
-		if (str == null || str.length() == 0)
-			return false;
-
-		for (int i= 0; i < str.length(); i++) {
-			if (!Character.isJavaIdentifierPart(str.charAt(i)))
-				return false;
-		}
-		return true;
 	}
 
 	/**
@@ -1114,104 +708,11 @@ class ReplaceDialog extends Dialog {
 	// ------- open / reopen ---------------------------------------
 
 	/**
-	 * Called after executed find/replace action to update the history.
-	 */
-	private void updateFindAndReplaceHistory() {
-		updateFindHistory();
-		if (okToUse(fReplaceField)) {
-			updateHistory(fReplaceField, fReplaceHistory);
-		}
-
-	}
-
-	/**
-	 * Called after executed find action to update the history.
-	 */
-	private void updateFindHistory() {
-		if (okToUse(fFindField)) {
-			fFindField.removeModifyListener(fFindModifyListener);
-			updateHistory(fFindField, fFindHistory);
-			fFindField.addModifyListener(fFindModifyListener);
-		}
-	}
-
-	/**
-	 * Updates the combo with the history.
-	 * @param combo to be updated
-	 * @param history to be put into the combo
-	 */
-	private void updateHistory(Combo combo, List history) {
-		String findString= combo.getText();
-		int index= history.indexOf(findString);
-		if (index != 0) {
-			if (index != -1) {
-				history.remove(index);
-			}
-			history.add(0, findString);
-			updateCombo(combo, history);
-			combo.setText(findString);
-		}
-	}
-
-	/**
 	 * Returns whether the target is editable.
 	 * @return <code>true</code> if target is editable
 	 */
 	private boolean isEditable() {
-//		boolean isEditable= (fTarget == null ? false : fTarget.isEditable());
 		return (fActiveEditor != null);
-	}
-
-	/**
-	 * Updates this dialog because of a different target.
-	 * @param target the new target
-	 * @param isTargetEditable <code>true</code> if the new target can be modified
-	 * @param initializeFindString <code>true</code> if the find string of this dialog should be initialized based on the viewer's selection
-	 * @since 2.0
-	 */
-	public void updateTarget(IFindReplaceTarget target, boolean isTargetEditable, boolean initializeFindString) {
-
-		fIsTargetEditable= isTargetEditable;
-
-		if (target != fTarget) {
-			if (fTarget != null && fTarget instanceof IFindReplaceTargetExtension)
-				((IFindReplaceTargetExtension) fTarget).endSession();
-
-			fTarget= target;
-//			if (fTarget != null)
-//				fIsTargetSupportingRegEx= fTarget instanceof IFindReplaceTargetExtension3;
-
-			if (fTarget instanceof IFindReplaceTargetExtension) {
-				((IFindReplaceTargetExtension) fTarget).beginSession();
-
-//				fGlobalInit= true;
-//				fGlobalRadioButton.setSelection(fGlobalInit);
-//				fSelectedRangeRadioButton.setSelection(!fGlobalInit);
-//				fUseSelectedLines= !fGlobalInit;
-			}
-		}
-
-//		if (okToUse(fIsRegExCheckBox))
-//			fIsRegExCheckBox.setEnabled(fIsTargetSupportingRegEx);
-
-//		if (okToUse(fWholeWordCheckBox))
-//			fWholeWordCheckBox.setEnabled(!isRegExSearchAvailableAndChecked());
-
-//		if (okToUse(fIncrementalCheckBox))
-//			fIncrementalCheckBox.setEnabled(!isRegExSearchAvailableAndChecked());
-
-		if (okToUse(fReplaceLabel)) {
-			fReplaceLabel.setEnabled(isEditable());
-			fReplaceField.setEnabled(isEditable());
-			if (initializeFindString) {
-				initFindStringFromSelection();
-				fGiveFocusToFindField= true;
-			}
-			initIncrementalBaseLocation();
-			updateButtonState();
-		}
-
-		setContentAssistsEnablement(false);
 	}
 
 	/**
