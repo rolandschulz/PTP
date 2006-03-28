@@ -45,6 +45,9 @@
 #define DBGEV_OK			DBG_EV_OFFSET + 11
 #define DBGEV_ERROR			DBG_EV_OFFSET + 12
 #define DBGEV_SUSPEND		DBG_EV_OFFSET + 13
+#define DBGEV_THREADS		DBG_EV_OFFSET + 14 //clement added
+#define DBGEV_THREAD_SELECT	DBG_EV_OFFSET + 15 //clement added
+#define DBGEV_STACK_DEPTH	DBG_EV_OFFSET + 16 //clement added
 
 struct dbg_event {
 	int			event;
@@ -102,6 +105,11 @@ struct dbg_event {
 	 * DBGEV_STEP, DBGEV_SIGNAL, DBGEV_SUSPEND
 	 */
 	stackframe *	frame;
+	/* 
+	 * clement added
+	 * DBGEV_STACK_DEPTH
+	 */
+	 int stack_depth;
 };
 typedef struct dbg_event dbg_event;
 

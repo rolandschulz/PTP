@@ -93,6 +93,9 @@ static proxy_svr_commands command_tab[] = {
 	{DBG_LISTLOCALVARIABLES_CMD,	DbgClntListLocalVariables},
 	{DBG_LISTARGUMENTS_CMD,			DbgClntListArguments},
 	{DBG_LISTGLOBALVARIABLES_CMD,	DbgClntListGlobalVariables},
+	{DBG_LISTINFOTHREADS_CMD,		DbgClntListInfoThreads}, //clement added
+	{DBG_SETTHREADSELECT_CMD,		DbgClntSetThreadSelect}, //clement added
+	{DBG_STACKINFODEPTH_CMD,		DbgClntStackInfoDepth}, //clement added
 	{NULL,							NULL}
 };
 

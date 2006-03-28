@@ -85,5 +85,14 @@ extern MICommand *MIVarCreate(char *name, char *frame, char *expr);
 extern MICommand *MIVarDelete(char *name);
 extern MICommand *MIVarListChildren(char *name);
 extern MICommand *MIVarEvaluateExpression(char *name);
+
+/*
+ * clement added
+ */
+extern MICommand *MIPType(char *name);
+extern MICommand *MIInfoThreads();
+extern MICommand *MIThreadSelect(int threadNum);
+extern MICommand *MIStackInfoDepth();
+ 
 #endif /* _MICOMMAND_H_ */
 

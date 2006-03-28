@@ -327,7 +327,33 @@ DbgListGlobalVariables(session *s, bitset *set)
 	return res;
 }
 
-int 
+//clement added
+int DbgListInfoThreads(session *s, bitset *set) {
+	int		res;
+	char *	set_str = bitset_to_str(set);
+	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_LISTINFOTHREADS_CMD, DBG_LISTINFOTHREADS_FMT, set_str);
+	free(set_str);
+	return res;
+}
+
+//clement added
+int DbgSetThreadSelect(session *s, bitset *set, int threadNum) {
+	int		res;
+	char *	set_str = bitset_to_str(set);
+	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_SETTHREADSELECT_CMD, DBG_SETTHREADSELECT_FMT, set_str, threadNum);
+	free(set_str);
+	return res;
+}
+
+//clement added
+int DbgStackInfoDepth(session *s, bitset *set) {
+	int		res;
+	char *	set_str = bitset_to_str(set);
+	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_STACKINFODEPTH_CMD, DBG_STACKINFODEPTH_FMT, set_str);
+	free(set_str);
+	return res;
+}
+
 DbgQuit(session *s)
 {
 	return proxy_clnt_quit(s->sess_proxy);
