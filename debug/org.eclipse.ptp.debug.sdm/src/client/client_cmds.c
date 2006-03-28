@@ -526,6 +526,62 @@ DbgClntListGlobalVariables(char **args)
 	return res;
 }
 
+//clement added
+int DbgClntListInfoThreads(char **args) {
+	int			res;
+	bitset *		set; 
+
+	set = str_to_bitset(args[1]);
+	if (set == NULL) {
+		DbgSetError(DBGERR_PROCSET, NULL);
+		return DBGRES_ERR;
+	}
+	
+	res = ClntSendCommand(set, DBG_EV_WAITALL, DBG_LISTINFOTHREADS_CMD, NULL);
+	bitset_free(set);
+	
+	return res;
+}
+
+//clement added
+int DbgClntSetThreadSelect(char **args) {
+	int			res;
+	char *		cmd;
+	bitset *		set; 
+
+	set = str_to_bitset(args[1]);
+	if (set == NULL) {
+		DbgSetError(DBGERR_PROCSET, NULL);
+		return DBGRES_ERR;
+	}
+	
+	asprintf(&cmd, "%s %s", DBG_SETTHREADSELECT_CMD, args[2]);
+	res = ClntSendCommand(set, DBG_EV_WAITALL, cmd, NULL);
+	
+	free(cmd);
+	bitset_free(set);
+	
+	return res;
+}
+
+//clement added
+int DbgClntStackInfoDepth(char **args) {
+	int			res;
+	char *		cmd;
+	bitset *		set; 
+
+	set = str_to_bitset(args[1]);
+	if (set == NULL) {
+		DbgSetError(DBGERR_PROCSET, NULL);
+		return DBGRES_ERR;
+	}
+	
+	res = ClntSendCommand(set, DBG_EV_WAITALL, DBG_STACKINFODEPTH_CMD, NULL);
+	bitset_free(set);
+	
+	return res;
+}
+
 int 
 DbgClntQuit(void)
 {

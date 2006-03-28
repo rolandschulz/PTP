@@ -48,6 +48,9 @@ struct dbg_backend_funcs {
 	int (*listlocalvariables)(void);
 	int (*listarguments)(int);
 	int (*listglobalvariables)(void);
+	int (*listinfothreads)(void); //clement added
+	int (*setthreadselect)(int); //clement added
+	int (*stackinfodepth)(void); //clement added
 	int (*quit)(void);
 };
 typedef struct dbg_backend_funcs	dbg_backend_funcs;

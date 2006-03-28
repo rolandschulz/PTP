@@ -69,6 +69,16 @@ int DbgClntListLocalVariables(char **);
 int DbgClntListArguments(char **);
 int DbgClntListGlobalVariables(char **);
 
+/**
+ * clement added
+ * Thread operations
+ */
+int DbgClntListInfoThreads(char **);
+int DbgClntSetThreadSelect(char **);
+
+//clement added
+int DbgClntStackInfoDepth(char **);
+
 /*
  * Event Handling
  */

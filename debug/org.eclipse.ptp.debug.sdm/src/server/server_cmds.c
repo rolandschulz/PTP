@@ -54,6 +54,9 @@ static int svr_gettype(dbg_backend *, char **);
 static int svr_listlocalvariables(dbg_backend *, char **);
 static int svr_listarguments(dbg_backend *, char **);
 static int svr_listglobalvariables(dbg_backend *, char **);
+static int svr_listinfothreads(dbg_backend *, char **); //clement added
+static int svr_setthreadselect(dbg_backend *, char **); //clement added
+static int svr_stackinfodepth(dbg_backend *, char **); //clement added
 static int svr_quit(dbg_backend *, char **);
 
 static svr_cmd svr_cmd_tab[] =
@@ -75,6 +78,9 @@ static svr_cmd svr_cmd_tab[] =
 	{DBG_LISTLOCALVARIABLES_CMD,	svr_listlocalvariables},
 	{DBG_LISTARGUMENTS_CMD,			svr_listarguments},
 	{DBG_LISTGLOBALVARIABLES_CMD,	svr_listglobalvariables},
+	{DBG_LISTINFOTHREADS_CMD,		svr_listinfothreads}, //clement added
+	{DBG_SETTHREADSELECT_CMD,		svr_setthreadselect}, //clement added
+	{DBG_STACKINFODEPTH_CMD,		svr_stackinfodepth}, //clement added
 	{"QUI",							svr_quit},
 };
 
@@ -243,6 +249,21 @@ static int
 svr_listglobalvariables(dbg_backend *db, char **args)
 {
 	return db->db_funcs->listglobalvariables();
+}
+
+//clement added
+static int svr_listinfothreads(dbg_backend *db, char **args) {
+	return db->db_funcs->listinfothreads();
+}
+
+//clement added
+static int svr_setthreadselect(dbg_backend *db, char **args) {
+	return db->db_funcs->setthreadselect(atoi(args[1]));
+}
+
+//clement added
+static int svr_stackinfodepth(dbg_backend *db, char **args) {
+	return db->db_funcs->stackinfodepth();
 }
 
 static int 

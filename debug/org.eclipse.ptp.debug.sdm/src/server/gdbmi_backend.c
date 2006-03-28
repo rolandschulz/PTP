@@ -95,6 +95,9 @@ static int	GDBMIGetNativeType(char *);
 static int	GDBMIGetAIFType(char *);
 static int	GDBMIGetLocalVariables(void);
 static int	GDBMIListArguments(int);
+static int	GDBMIGetInfoThread(void); //clement added
+static int	GDBMISetThreadSelect(int); //clement added
+static int	GDBMIStackInfoDepth(void); //clement added
 static int	GDBMIGetGlobalVariables(void);
 static int	GDBMIQuit(void);
 
@@ -127,6 +130,9 @@ dbg_backend_funcs	GDBMIBackend =
 	GDBMIGetLocalVariables,
 	GDBMIListArguments,
 	GDBMIGetGlobalVariables,
+	GDBMIGetInfoThread, //clement added
+	GDBMISetThreadSelect, //clement added
+	GDBMIStackInfoDepth, //clement added
 	GDBMIQuit
 };
 
@@ -281,11 +287,12 @@ AsyncStop(void *data)
 		if (!bpmap->temp) {
 			e = NewDbgEvent(DBGEV_BPHIT);
 			e->bpid = bpmap->remote;
+			e->thread_id = evt->threadId;
 			break;
 		}
 		
 		/* else must be a temporary breakpoint drop through... */
-		
+
 		RemoveBPMap(bpmap);
 
 	case MIEventTypeSuspended:
@@ -304,6 +311,7 @@ AsyncStop(void *data)
 		} else {
 			e = NewDbgEvent(DBGEV_STEP);
 			e->frame = frame;
+			e->thread_id = evt->threadId;
 		}
 		break;
 
@@ -958,8 +966,9 @@ GetStackframes(int current, List **flist)
 	
 	if (current)
 		frames = MIGetFrameInfo(cmd);
-	else
+	else {
 		frames = MIGetStackListFramesInfo(cmd);
+	}
 			
 	MICommandFree(cmd);
 	
@@ -970,7 +979,6 @@ GetStackframes(int current, List **flist)
 	}
 	
 	*flist = NewList();
-
 	for (SetList(frames); (f = (MIFrame *)GetListElement(frames)) != NULL; ) {
 		s = NewStackframe(f->level);
 
@@ -984,9 +992,7 @@ GetStackframes(int current, List **flist)
 		
 		AddToList(*flist, (void *)s);
 	}
-
 	DestroyList(frames, MIFrameFree);
-	
 	return DBGRES_OK;
 }
 
@@ -1682,6 +1688,106 @@ GDBMIQuit(void)
 		
 	SaveEvent(NewDbgEvent(DBGEV_OK));
 	ServerExit++;
+	
+	return DBGRES_OK;
+}
+
+//clement added
+static int GDBMIGetInfoThread(void) {
+	MICommand *	cmd;
+	dbg_event *	e;
+	char *		tid;
+	MIThreadInfo *	info;
+	
+	CHECK_SESSION();
+	
+	cmd = MIInfoThreads();
+	SendCommandWait(DebugSession, cmd);
+//	if (!MICommandResultOK(cmd)) {
+//		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
+//		MICommandFree(cmd);
+//		return DBGRES_ERR;
+//	}
+	info = MIGetInfoThreads(cmd);
+	MICommandFree(cmd);
+	
+	e = NewDbgEvent(DBGEV_THREADS);
+	e->thread_id = info->current_thread_id;
+	e->list = NewList();
+	for (SetList(info->thread_ids); (tid = (char *)GetListElement(info->thread_ids)) != NULL;) {
+		AddToList(e->list, (void *)strdup(tid));
+	}
+
+	DestroyList(info->thread_ids, NULL);
+	free(info);
+	SaveEvent(e);
+	
+	return DBGRES_OK;
+}
+
+//clement added
+static int GDBMISetThreadSelect(int threadNum) {
+	MICommand *	cmd;
+	dbg_event *	e;
+	MIThreadSelectInfo * info;
+	MIFrame *f;
+	stackframe *	s;
+		
+	CHECK_SESSION();
+	
+	cmd = MIThreadSelect(threadNum);
+	SendCommandWait(DebugSession, cmd);
+	if (!MICommandResultOK(cmd)) {
+		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
+		MICommandFree(cmd);
+		return DBGRES_ERR;
+	}
+	info = MISetThreadSelectInfo(cmd);
+	MICommandFree(cmd);
+
+	f = info->frame;
+	if (f != NULL) {
+		s = NewStackframe(f->level);
+		if ( f->addr != NULL )
+			s->loc.addr = strdup(f->addr);
+		if ( f->func != NULL )
+			s->loc.func = strdup(f->func);
+		if ( f->file != NULL )
+			s->loc.file = strdup(f->file);
+		s->loc.line = f->line;
+	}
+	
+	e = NewDbgEvent(DBGEV_THREAD_SELECT);
+	e->thread_id = info->current_thread_id;
+	e->frame = s;
+
+	free(info);
+	SaveEvent(e);
+	
+	return DBGRES_OK;
+}
+
+//clement added
+static int GDBMIStackInfoDepth() {
+	MICommand *	cmd;
+	dbg_event *	e;
+	int depth;
+	
+	CHECK_SESSION();
+	
+	cmd = MIStackInfoDepth();
+	SendCommandWait(DebugSession, cmd);
+	if (!MICommandResultOK(cmd)) {
+		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
+		MICommandFree(cmd);
+		return DBGRES_ERR;
+	}
+	depth = MIGetStackInfoDepth(cmd);
+	MICommandFree(cmd);
+
+	e = NewDbgEvent(DBGEV_STACK_DEPTH);
+	e->stack_depth = depth;
+	SaveEvent(e);
 	
 	return DBGRES_OK;
 }

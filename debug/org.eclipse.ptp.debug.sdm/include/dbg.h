@@ -74,6 +74,16 @@ int DbgListLocalVariables(session *s, bitset *set);
 int DbgListArguments(session *s, bitset *set, int);
 int DbgListGlobalVariables(session *s, bitset *set);
 
+/**
+ * clement added
+ * Thread operations
+ */
+int DbgListInfoThreads(session *s, bitset *set);
+int DbgSetThreadSelect(session *s, bitset *set, int);
+
+//clement added
+int DbgStackInfoDepth(session *s, bitset *set);
+ 
 /*
  * Event Handling
  */
@@ -87,7 +97,7 @@ void DbgRegisterEventHandler(session *s, void (*)(dbg_event *, void *), void *);
 /*
  * Error Handling
  */
-void		DbgSetError(int, char *);
+void	DbgSetError(int, char *);
 int		DbgGetError(void);
 char *	DbgGetErrorStr(void);
 

@@ -12,12 +12,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "list.h"
 #include "MIValue.h"
 #include "MIResult.h"
 #include "MIArg.h"
 #include "MIFrame.h"
+#include "MIOOBRecord.h" //clement added
 
 static List *MIFrameInfoParse(List *results);
 
@@ -106,6 +108,7 @@ MIGetStackListFramesInfo(MICommand *cmd)
 	MIResultRecord *	rr;
 	MIResult *		result;
 	List *			frames = NULL;
+	MIValue * frameVal;// clement added - forgot
 	
 	if (!cmd->completed || cmd->output == NULL || cmd->output->rr == NULL)
 		return NULL;
@@ -114,17 +117,21 @@ MIGetStackListFramesInfo(MICommand *cmd)
 	for (SetList(rr->results); (result = (MIResult *)GetListElement(rr->results)) != NULL; ) {
 		if (strcmp(result->variable, "stack") == 0) {
 			val = result->value;
-			if (val->type == MIValueTypeList || val->type == MIValueTypeTuple) {
+			if (val->type == MIValueTypeList) {
 				for (SetList(val->results); (result = (MIResult *)GetListElement(val->results)) != NULL; ) {
 					if (strcmp(result->variable, "frame") == 0) {
-						val = result->value;
-						if (val->type == MIValueTypeTuple) {
+						//val = result->value; /* error: overwrite prior MIValue
+						frameVal = result->value;
+						if (frameVal->type == MIValueTypeTuple) {
 							if (frames == NULL)
 								frames = NewList();
-							AddToList(frames, MIFrameParse(val));
+							AddToList(frames, MIFrameParse(frameVal));
 						}
 					}
 				}
+			}
+			else if (val->type == MIValueTypeTuple) {
+				//TODO?????
 			}
 		}
 	}
@@ -138,8 +145,9 @@ MIFrameInfoParse(List *results)
 	MIResult *	result;
 	List *		frames = NULL;
 
-	SetList(results); 
-	if ((result = (MIResult *)GetListElement(results)) != NULL) {
+	//SetList(results); 
+	//if ((result = (MIResult *)GetListElement(results)) != NULL) {
+	for (SetList(results); (result = (MIResult *)GetListElement(results)) != NULL;) {
 		if (strcmp(result->variable, "frame") == 0) {
 			val = result->value;
 			if (val->type == MIValueTypeTuple) {
@@ -235,4 +243,114 @@ MIFrameToString(MIFrame *f)
 	MIStringAppend(str, MIStringNew("]"));
 		
 	return str;
+}
+
+
+//clement added
+MIThreadInfo *MIThreadInfoNew(void) {
+	MIThreadInfo * info;
+	info = (MIThreadInfo *)malloc(sizeof(MIThreadInfo));
+	info->current_thread_id = -1;
+	info->thread_ids = NULL;
+	return info;
+}
+
+//clement added
+MIThreadSelectInfo *MIThreadSelectInfoNew(void) {
+	MIThreadSelectInfo * info;
+	info = (MIThreadSelectInfo *)malloc(sizeof(MIThreadSelectInfo));
+	info->current_thread_id = -1;
+	info->frame = NULL;
+	return info;
+}
+
+//clement added
+MIThreadInfo *MIGetInfoThreads(MICommand *cmd) {
+	List *oobs;
+	MIOOBRecord *oob;
+	MIThreadInfo * info = MIThreadInfoNew();
+	char * text = NULL;
+	char * id = NULL;
+
+	if (!cmd->completed || cmd->output == NULL || cmd->output->oobs == NULL) {
+		return info;
+	}
+
+	if (cmd->output->rr != NULL && cmd->output->rr->resultClass == MIResultRecordERROR) {
+		return info;
+	}
+
+	oobs = cmd->output->oobs;
+	info->thread_ids = NewList();
+	for (SetList(oobs); (oob = (MIOOBRecord *)GetListElement(oobs)) != NULL; ) {
+		text = oob->cstring;
+		if (*text == '\0') {
+			continue;
+		}
+		while (*text == ' ') {
+			*text++;
+		}
+		if (strncmp(text, "*", 1) == 0) {
+			text += 2;//escape "* ";
+			if (isdigit(*text)) {
+				info->current_thread_id = strtol(text, &text, 10);
+			}
+			continue;
+		}
+		if (isdigit(*text)) {
+			if (info->thread_ids == NULL)
+				info->thread_ids = NewList();
+
+			id = strchr(text, ' ');
+			if (id != NULL) {
+				*id = '\0';
+				AddToList(info->thread_ids, (void *)strdup(text));
+			}
+		}
+	}
+	return info;
+}
+//clement added
+MIThreadSelectInfo *MISetThreadSelectInfo(MICommand *cmd) {
+	MIThreadSelectInfo * info = MIThreadSelectInfoNew();
+	MIValue * val;
+	MIResultRecord * rr;
+	MIResult * result;
+
+	if (!cmd->completed || cmd->output == NULL || cmd->output->rr == NULL)
+		return NULL;
+
+	rr = cmd->output->rr;
+	for (SetList(rr->results); (result = (MIResult *)GetListElement(rr->results)) != NULL; ) {
+		if (strcmp(result->variable, "new-thread-id") == 0) {
+			val = result->value;
+			info->current_thread_id = atoi(val->cstring);
+		}
+		else if (strcmp(result->variable, "frame") == 0) {
+			val = result->value;
+			if (val->type == MIValueTypeTuple) {
+				info->frame = MIFrameParse(val);
+			}
+		}
+	}	
+	return info;	
+}
+//clement added
+int MIGetStackInfoDepth(MICommand *cmd) {
+	MIValue * val;
+	MIResultRecord * rr;
+	MIResult * result;
+
+	if (!cmd->completed || cmd->output == NULL || cmd->output->rr == NULL)
+		return -1;
+		
+	rr = cmd->output->rr;
+	SetList(rr->results); 
+	if ((result = (MIResult *)GetListElement(rr->results)) != NULL) {
+		if (strcmp(result->variable, "depth") == 0) {
+			val = result->value;
+			return atoi(val->cstring);
+		}
+	}
+	return -1;
 }

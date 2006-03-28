@@ -15,6 +15,7 @@
 #include "MICommand.h"
 #include "MIValue.h"
 
+
 struct MIFrame {
 	int		level;
 	char *	addr;
@@ -33,5 +34,25 @@ extern List *MIGetFrameInfo(MICommand *cmd);
 extern List *MIGetStackListLocalsInfo(MICommand *cmd);
 extern List *MIGetStackListArgumentsInfo(MICommand *cmd);
 extern MIString *MIFrameToString(MIFrame *f);
+
+
+struct MIThreadInfo {
+	int current_thread_id;
+	List * thread_ids;
+};
+typedef struct MIThreadInfo MIThreadInfo; //clement added
+
+struct MIThreadSelectInfo {
+	int current_thread_id;
+	MIFrame * frame;
+};
+typedef struct MIThreadSelectInfo MIThreadSelectInfo; //clement added
+
+extern MIThreadInfo *MIThreadInfoNew(void);
+extern MIThreadSelectInfo *MIThreadSelectInfoNew(void);
+
+extern MIThreadInfo *MIGetInfoThreads(MICommand *cmd); //clement added
+extern MIThreadSelectInfo *MISetThreadSelectInfo(MICommand *cmd); //clement added
+
 #endif /* _MIFRAME_H_ */
 

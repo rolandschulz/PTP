@@ -73,3 +73,25 @@ MIStackListAllArguments(int vals)
 	MICommandAddOption(cmd, MIIntToCString(vals), NULL);
 	return cmd;
 }
+
+//clement added
+MICommand * MIInfoThreads() {
+	MICommand * cmd;
+	cmd = MICommandNew("info threads", MIResultRecordDONE);
+	return cmd;
+}
+
+//clement added
+MICommand * MIThreadSelect(int threadNum) {
+	MICommand * cmd;
+	cmd = MICommandNew("-thread-select", MIResultRecordDONE);
+	MICommandAddOption(cmd, MIIntToCString(threadNum), NULL);
+	return cmd;
+}
+
+//clement added
+MICommand * MIStackInfoDepth() {
+		MICommand * cmd;
+		cmd = MICommandNew("-stack-info-depth", MIResultRecordDONE);
+		return cmd;
+}

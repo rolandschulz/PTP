@@ -147,7 +147,7 @@ DbgEventToStr(dbg_event *e, char **result)
 		break;
 	
 	case DBGEV_BPHIT:
-		asprintf(result, "%d %s %d", e->event, pstr, e->bpid);
+		asprintf(result, "%d %s %d %d", e->event, pstr, e->bpid, e->thread_id);
 		break;
 
 	case DBGEV_BPSET:
@@ -178,7 +178,7 @@ DbgEventToStr(dbg_event *e, char **result)
 
 	case DBGEV_STEP:
 		dbg_stackframe_to_str(e->frame, &str);
-		asprintf(result, "%d %s %s", e->event, pstr, str);
+		asprintf(result, "%d %s %s %d", e->event, pstr, str, e->thread_id);
 		free(str);
 		break;
 
@@ -188,6 +188,22 @@ DbgEventToStr(dbg_event *e, char **result)
 		free(str);
 		break;
 
+	case DBGEV_THREAD_SELECT: //clement added
+		dbg_stackframe_to_str(e->frame, &str);
+		asprintf(result, "%d %s %d %s", e->event, pstr, e->thread_id, str);
+		free(str);
+		break;
+	
+	case DBGEV_THREADS://clement added
+		dbg_cstring_list_to_str(e->list, &str);
+		asprintf(result, "%d %s %d %s", e->event, pstr, e->thread_id, str);
+		free(str);
+		break;
+		
+	case DBGEV_STACK_DEPTH://clement added
+		asprintf(result, "%d %s %d", e->event, pstr, e->stack_depth);
+		break;
+		
 	case DBGEV_VARS:
 		dbg_cstring_list_to_str(e->list, &str);
 		asprintf(result, "%d %s %s", e->event, pstr, str);
@@ -432,6 +448,24 @@ DbgStrToEvent(char *str, dbg_event **ev)
 			goto error_out;
 		break;
 
+	case DBGEV_THREAD_SELECT: //clement added
+		e = NewDbgEvent(DBGEV_THREAD_SELECT);
+		if (proxy_str_to_int(args[2], &e->thread_id) < 0 || dbg_str_to_stackframe(&args[3], &e->frame) < 0)
+			goto error_out;
+		break;
+	
+	case DBGEV_THREADS: //clement added
+		e = NewDbgEvent(DBGEV_THREADS);
+		if (proxy_str_to_int(args[2], &e->thread_id) < 0 || dbg_str_to_cstring_list(&args[3], &e->list) < 0)
+			goto error_out;
+		break;
+
+	case DBGEV_STACK_DEPTH: //clement added
+		e = NewDbgEvent(DBGEV_STACK_DEPTH);
+		if (proxy_str_to_int(args[2], &e->stack_depth) < 0)
+			goto error_out;
+		break;
+	
 	case DBGEV_VARS:
 		e = NewDbgEvent(DBGEV_VARS);
 		if (dbg_str_to_cstring_list(&args[2], &e->list) < 0)
@@ -527,6 +561,16 @@ FreeDbgEvent(dbg_event *e) {
 			free(e->type_desc);
 		break;
 		
+	case DBGEV_THREAD_SELECT://clement added
+		if (e->frame != NULL)
+			FreeStackframe(e->frame);
+		break;
+			
+	case DBGEV_THREADS://clement added
+		if (e->list != NULL)
+			DestroyList(e->list, free);
+		break;
+
 	case DBGEV_VARS:
 		if (e->list != NULL)
 			DestroyList(e->list, free);

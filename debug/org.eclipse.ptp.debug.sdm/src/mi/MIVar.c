@@ -180,26 +180,33 @@ char *
 MIGetDetailsType(MICommand *cmd) {
 	List *oobs;
 	MIOOBRecord *oob;
-	char * type = NULL;
-	char * p = NULL;
+	char *text = NULL;
+	char *p = NULL;
 
 	if (!cmd->completed || cmd->output == NULL || cmd->output->oobs == NULL)
 		return NULL;
 
 	oobs = cmd->output->oobs;
 	for (SetList(oobs); (oob = (MIOOBRecord *)GetListElement(oobs)) != NULL; ) {
-		type = oob->cstring;
-		if (strncmp(type, "type", 4) == 0) {
-			type += 7; //bypass " = "
-			p = strchr(type, '{');
+		text = oob->cstring;
+		if (*text == '\0') {
+			continue;
+		}
+		while (*text == ' ') {
+			*text++;
+		}
+
+		if (strncmp(text, "type", 4) == 0) {
+			text += 7; //bypass " = "
+			p = strchr(text, '{');
 			if (p != NULL) {
 				*p-- = '\0';//remove the whitespace before {
-				return strdup(type);
+				return strdup(text);
 			}
-			p = strchr(type, '\\');
+			p = strchr(text, '\\');
 			if (p != NULL) {
 				*p = '\0';
-				return strdup(type);
+				return strdup(text);
 			}
 		}
 	}

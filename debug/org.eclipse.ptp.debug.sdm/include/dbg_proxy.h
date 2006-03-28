@@ -38,6 +38,9 @@
 #define DBG_LISTLOCALVARIABLES_CMD		"LLV"
 #define DBG_LISTARGUMENTS_CMD			"LAR"
 #define DBG_LISTGLOBALVARIABLES_CMD		"LGV"
+#define DBG_LISTINFOTHREADS_CMD			"ITH" //clement added
+#define DBG_SETTHREADSELECT_CMD			"THS" //clement added
+#define DBG_STACKINFODEPTH_CMD			"SID" //clement added
 
 #define DBG_STARTSESSION_FMT			"%s \"%s\" \"%s\""
 #define DBG_SETLINEBREAKPOINT_FMT		"%s %d \"%s\" %d"
@@ -57,5 +60,8 @@
 #define DBG_LISTLOCALVARIABLES_FMT		"%s"
 #define DBG_LISTARGUMENTS_FMT			"%s %d"
 #define DBG_LISTGLOBALVARIABLES_FMT		"%s"
+#define DBG_LISTINFOTHREADS_FMT			"%s" //clement added
+#define DBG_SETTHREADSELECT_FMT			"%s %d" //clement added
+#define DBG_STACKINFODEPTH_FMT			"%s" //clement added
 
 #endif /* _DBG_PROXY_H_ */
