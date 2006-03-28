@@ -199,20 +199,23 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			regListeners.remove(listener);
 	}
 	public synchronized void fireRegListener(final int type, final BitList tasks) {
-		for (Iterator i = regListeners.iterator(); i.hasNext();) {
-			final IRegListener rListener = (IRegListener) i.next();
-			Platform.run(new SafeNotifier() {
-				public void run() {
+		Job uiJob = new Job("Firing register / unregister listener") {
+			protected IStatus run(IProgressMonitor monitor) {
+				for (Iterator i = regListeners.iterator(); i.hasNext();) {
+					final IRegListener rListener = (IRegListener) i.next();
 					switch (type) {
 					case REG_TYPE:
 						rListener.register(tasks);
-						break;
+					break;
 					case UNREG_TYPE:
 						rListener.unregister(tasks);
 					}
 				}
-			});
-		}
+				return Status.OK_STATUS;
+			}
+		};
+		uiJob.setPriority(Job.INTERACTIVE);
+		uiJob.schedule();
 	}
 	public IPCDISession getDebugSession(String job_id) {
 		if (isNoJob(job_id))
@@ -241,7 +244,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	/***************************************************************************************************************************************************************************************************
 	 * Launch Listener
 	 **************************************************************************************************************************************************************************************************/
-	public void handleLaunchEvent(IPLaunchEvent event) {
+	public synchronized void handleLaunchEvent(IPLaunchEvent event) {
 		IPJob job = event.getJob();
 		if (event instanceof PLaunchStartedEvent) {
 			addJob(job);			
@@ -503,6 +506,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	 * Event
 	 **************************************************************************************************************************************************************************************************/
 	public void handleDebugEvents(final IPCDIEvent[] events) {
+		/*
 		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
 			public void run(IProgressMonitor monitor) throws CoreException {
 				handleDebugEvents(events, monitor);
@@ -513,6 +517,15 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		} catch (CoreException e) {
 			PTPDebugUIPlugin.log(e);
 		}
+		*/
+		Job uiJob = new Job("Updating debug events") {
+			protected IStatus run(IProgressMonitor monitor) {
+				handleDebugEvents(events, monitor);
+				return Status.OK_STATUS;
+			}
+		};
+		uiJob.setPriority(Job.INTERACTIVE);
+		uiJob.schedule();
 	}
 	private synchronized void handleDebugEvents(IPCDIEvent[] events, IProgressMonitor monitor) {
 		for (int i = 0; i < events.length; i++) {
@@ -590,6 +603,12 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 				// annotationMgr.printBitList(event.getAllProcesses().toBitList());
 				cleanupDebugVariables(job);
 				fireResumeEvent(job, event.getAllProcesses());
+			} else if (event instanceof IPCDIDebugExitedEvent) {
+				condition = new Boolean(true);
+				annotationMgr.removeAnnotationGroup(job.getIDString());
+				System.err.println("--- TESTING exit event and remove all annotation in job: " + job.getIDString());
+				getDebugSession(job).getEventManager().removeEventListener(this);
+				cleanupDebugVariables(job);
 			} else if (event instanceof IPCDIExitedEvent) {
 				removeAnnotation(job.getIDString(), event.getAllProcesses());
 				// System.out.println("-------------------- terminate ------------------------");
@@ -611,12 +630,6 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			} else if (event instanceof BreakpointCreatedEvent) {
 				// do nothing in breakpoint created event
 				continue;
-			} else if (event instanceof IPCDIDebugExitedEvent) {
-				condition = new Boolean(true);
-				annotationMgr.removeAnnotationGroup(job.getIDString());
-				System.err.println("--- TESTING exit event and remove all annotation in job: " + job.getIDString());
-				getDebugSession(job).getEventManager().removeEventListener(this);
-				cleanupDebugVariables(job);
 			}
 			firePaintListener(condition);
 		}
@@ -624,7 +637,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	private void removeAnnotation(String job_id, BitList tasks) {
 		try {
 			annotationMgr.removeAnnotation(job_id, tasks);
-			System.err.println("--- TESTING err event and remove annotation of processes in this event: " + tasks.cardinality());
+			System.err.println("--- TESTING remove annotation of processes in this event: " + PDebugUIUtils.arrayToString(tasks.toArray()));
 		} catch (final CoreException e) {
 			PTPDebugUIPlugin.getDisplay().asyncExec(new Runnable() {
 				public void run() {
