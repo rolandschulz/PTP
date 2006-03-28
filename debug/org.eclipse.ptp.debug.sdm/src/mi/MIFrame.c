@@ -250,7 +250,7 @@ MIFrameToString(MIFrame *f)
 MIThreadInfo *MIThreadInfoNew(void) {
 	MIThreadInfo * info;
 	info = (MIThreadInfo *)malloc(sizeof(MIThreadInfo));
-	info->current_thread_id = -1;
+	info->current_thread_id = 0;
 	info->thread_ids = NULL;
 	return info;
 }
@@ -259,7 +259,7 @@ MIThreadInfo *MIThreadInfoNew(void) {
 MIThreadSelectInfo *MIThreadSelectInfoNew(void) {
 	MIThreadSelectInfo * info;
 	info = (MIThreadSelectInfo *)malloc(sizeof(MIThreadSelectInfo));
-	info->current_thread_id = -1;
+	info->current_thread_id = 0;
 	info->frame = NULL;
 	return info;
 }
