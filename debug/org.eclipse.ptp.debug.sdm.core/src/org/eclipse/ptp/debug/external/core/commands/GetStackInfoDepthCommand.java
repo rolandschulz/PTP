@@ -21,36 +21,29 @@ package org.eclipse.ptp.debug.external.core.commands;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIArgument;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIStackFrame;
 
 /**
  * @author Clement chu
  * 
  */
-public class ListArgumentsCommand extends AbstractDebugCommand {
-	private IPCDIStackFrame frame = null;
-	private int depth = 0;
-	
-	public ListArgumentsCommand(BitList tasks, IPCDIStackFrame frame, int depth) {
+public class GetStackInfoDepthCommand extends AbstractDebugCommand {
+	public GetStackInfoDepthCommand(BitList tasks) {
 		super(tasks, false, true);
-		this.frame = frame;
-		this.depth = depth;
 	}
 	public void execCommand(IAbstractDebugger debugger, int timeout) throws PCDIException {
 		setTimeout(timeout);
-		debugger.listArguments(tasks, frame, depth);
+		debugger.getStackInfoDepth(tasks);
 	}
 	
-	public IPCDIArgument[] getArguments() throws PCDIException {
+	public int getDepth() throws PCDIException {
 		if (waitForReturn()) {
-			if (result instanceof IPCDIArgument[]) {
-				return (IPCDIArgument[])result;
+			if (result instanceof Integer) {
+				return ((Integer)result).intValue();
 			}
 		}
 		throw new PCDIException("Wrong type return on command: " + getName());
 	}
 	public String getName() {
-		return "List arguments"; 
+		return "Get stack info depth"; 
 	}
 }

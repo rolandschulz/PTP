@@ -16,41 +16,34 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.external.core.commands;
+
+package org.eclipse.ptp.debug.external.core.proxy.event;
 
 import org.eclipse.ptp.core.util.BitList;
-import org.eclipse.ptp.debug.core.IAbstractDebugger;
-import org.eclipse.ptp.debug.core.cdi.PCDIException;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIArgument;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIStackFrame;
 
-/**
- * @author Clement chu
- * 
- */
-public class ListArgumentsCommand extends AbstractDebugCommand {
-	private IPCDIStackFrame frame = null;
-	private int depth = 0;
+
+public class ProxyDebugInfoThreadsEvent extends AbstractProxyDebugEvent implements IProxyDebugEvent {
+	private String[] thread_ids;
 	
-	public ListArgumentsCommand(BitList tasks, IPCDIStackFrame frame, int depth) {
-		super(tasks, false, true);
-		this.frame = frame;
-		this.depth = depth;
-	}
-	public void execCommand(IAbstractDebugger debugger, int timeout) throws PCDIException {
-		setTimeout(timeout);
-		debugger.listArguments(tasks, frame, depth);
+	public ProxyDebugInfoThreadsEvent(BitList set, String[] thread_ids) {
+		super(EVENT_DBG_THREADS, set);
+		this.thread_ids = thread_ids;
 	}
 	
-	public IPCDIArgument[] getArguments() throws PCDIException {
-		if (waitForReturn()) {
-			if (result instanceof IPCDIArgument[]) {
-				return (IPCDIArgument[])result;
-			}
+	public String[] getThreadIds() {
+		return this.thread_ids;
+	}
+
+	public String toString() {
+		String res = "EVENT_DBG_THREADS: " + this.getBitSet().toString() + " {";
+
+		for (int i = 0; i < thread_ids.length; i++) {
+			if (i > 0)
+				res += ", ";
+			res += thread_ids[i];
 		}
-		throw new PCDIException("Wrong type return on command: " + getName());
-	}
-	public String getName() {
-		return "List arguments"; 
+		
+		res += "}";
+		return res;
 	}
 }

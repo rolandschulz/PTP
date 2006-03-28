@@ -21,7 +21,6 @@ package org.eclipse.ptp.debug.external.core.cdi.event;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.IPCDISessionObject;
-import org.eclipse.ptp.debug.core.cdi.event.IPCDISuspendedEvent;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIBreakpoint;
 import org.eclipse.ptp.debug.external.core.cdi.BreakpointHitInfo;
 import org.eclipse.ptp.debug.external.core.cdi.Session;
@@ -30,11 +29,11 @@ import org.eclipse.ptp.debug.external.core.cdi.Session;
  * @author Clement chu
  * 
  */
-public class BreakpointHitEvent extends AbstractEvent implements IPCDISuspendedEvent {
+public class BreakpointHitEvent extends AbstractSuspendEvent {
 	IPCDIBreakpoint breakpoint;
 
-	public BreakpointHitEvent(IPCDISession session, BitList tasks, IPCDIBreakpoint bp) {
-		super(session, tasks);
+	public BreakpointHitEvent(IPCDISession session, BitList tasks, IPCDIBreakpoint bp, int thread_id) {
+		super(session, tasks, thread_id);
 		breakpoint = bp;
 	}
 	public IPCDISessionObject getReason() {

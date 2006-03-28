@@ -111,8 +111,8 @@ public class EventManager extends SessionObject implements IPCDIEventManager, Ob
 			}
 			*/
 			//TODO -- no thread id provided
-			//int threadId = threadId = event.getThreadId();
-			currentTarget.updateState(0);
+			int threadId = event.getThreadId();
+			currentTarget.updateState(threadId);
 			try {
 				Thread cthread = (Thread)currentTarget.getCurrentThread();
 				if (cthread != null) {
@@ -130,16 +130,16 @@ public class EventManager extends SessionObject implements IPCDIEventManager, Ob
 				if (expMgr.isAutoUpdate()) { 
 					expMgr.update(currentTarget);
 				}
-				if (bpMgr.isAutoUpdate()) {
-					bpMgr.update(currentTarget);
-				}
+				//if (bpMgr.isAutoUpdate()) {
+					//bpMgr.update(currentTarget);
+				//}
 				if (srcMgr.isAutoUpdate()) {
 					srcMgr.update(currentTarget);
 				}
 			} catch (PCDIException e) {
 				e.printStackTrace();
 			}
-			 */
+			*/
 		}
 		return true;
 	}

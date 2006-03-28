@@ -22,15 +22,14 @@ import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.IPCDILineLocation;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.IPCDISessionObject;
-import org.eclipse.ptp.debug.core.cdi.event.IPCDISuspendedEvent;
 import org.eclipse.ptp.debug.external.core.cdi.EndSteppingRangeInfo;
 import org.eclipse.ptp.debug.external.core.cdi.Session;
 
-public class EndSteppingRangeEvent extends AbstractEvent implements IPCDISuspendedEvent {
+public class EndSteppingRangeEvent extends AbstractSuspendEvent {
 	IPCDILineLocation lineLoc;
 
-	public EndSteppingRangeEvent(IPCDISession session, BitList tasks, IPCDILineLocation loc) {
-		super(session, tasks);
+	public EndSteppingRangeEvent(IPCDISession session, BitList tasks, IPCDILineLocation loc, int thread_id) {
+		super(session, tasks, thread_id);
 		lineLoc = loc;
 	}
 	public IPCDISessionObject getReason() {

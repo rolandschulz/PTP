@@ -79,6 +79,9 @@ public class ProxyDebugClient extends AbstractProxyDebugClient {
 		sendCommand("CBP", procs, Integer.toString(bpid), expr);
 	}
 
+	public void debugStackInfoDepth(BitList procs) throws IOException {
+		sendCommand("SID", procs);
+	}
 	public void debugGo(BitList procs) throws IOException {
 		sendCommand("GOP", procs);
 	}
@@ -121,5 +124,13 @@ public class ProxyDebugClient extends AbstractProxyDebugClient {
 
 	public void debugListGlobalVariables(BitList procs) throws IOException {
 		sendCommand("LGV", procs);
+	}
+
+
+	public void debugListInfoThreads(BitList procs) throws IOException {
+		sendCommand("ITH", procs);
+	}
+	public void debugSetThreadSelect(BitList procs, int threadNum) throws IOException {
+		sendCommand("THS", procs, Integer.toString(threadNum));
 	}
 }

@@ -44,7 +44,7 @@ import org.eclipse.ptp.debug.external.core.commands.StepFinishCommand;
  *
  */
 public class StackFrame extends PObject implements IPCDIStackFrame {
-	Thread cthread;
+	IPCDIThread pthread;
 	IPCDIArgumentDescriptor[] argDescs;
 	IPCDILocalVariableDescriptor[] localDescs;
 	Locator fLocator;
@@ -54,9 +54,8 @@ public class StackFrame extends PObject implements IPCDIStackFrame {
 	int line = -1;
 	String func = "";
 
-	public StackFrame(Thread thread, int level, String file, String func, int line, String addr) {
-		super((Target)thread.getTarget());
-		cthread = thread;
+	public StackFrame(Target target, int level, String file, String func, int line, String addr) {
+		super(target);
 		this.level = level;
 		this.addr = addr;
 		this.file = file;
@@ -64,7 +63,7 @@ public class StackFrame extends PObject implements IPCDIStackFrame {
 		this.func = func;
 	}
 	public IPCDIThread getThread() {
-		return cthread;
+		return pthread;
 	}
 	public IPCDIArgumentDescriptor[] getArgumentDescriptors() throws PCDIException {
 		if (argDescs == null) {
@@ -134,7 +133,7 @@ public class StackFrame extends PObject implements IPCDIStackFrame {
 	public boolean equals(IPCDIStackFrame stackframe) {
 		if (stackframe instanceof StackFrame) {
 			StackFrame stack = (StackFrame)stackframe;
-			boolean equal =  cthread != null && cthread.equals(stack.getThread()) && getLevel() == stack.getLevel();
+			boolean equal =  pthread != null && pthread.equals(stack.getThread()) && getLevel() == stack.getLevel();
 			if (equal) {
 				IPCDILocator otherLocator = stack.getLocator();
 				IPCDILocator myLocator = getLocator();
@@ -186,5 +185,12 @@ public class StackFrame extends PObject implements IPCDIStackFrame {
 	}
 	public String getFunction() {
 		return func;
+	}
+	
+	public void setThread(IPCDIThread thread) {
+		this.pthread = thread;
+	}
+	public void setLevel(int level) {
+		this.level = level;
 	}
 }

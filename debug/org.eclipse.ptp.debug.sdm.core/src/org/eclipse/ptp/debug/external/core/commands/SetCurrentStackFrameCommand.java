@@ -21,22 +21,21 @@ package org.eclipse.ptp.debug.external.core.commands;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIStackFrame;
 
 /**
  * @author Clement chu
  * 
  */
 public class SetCurrentStackFrameCommand extends AbstractDebugCommand {
-	private IPCDIStackFrame frame = null;
+	private int level = 0;
 	
-	public SetCurrentStackFrameCommand(BitList tasks, IPCDIStackFrame frame) {
+	public SetCurrentStackFrameCommand(BitList tasks, int level) {
 		super(tasks, false, true);
-		this.frame = frame;
+		this.level = level;
 	}
 	public void execCommand(IAbstractDebugger debugger, int timeout) throws PCDIException {
 		setTimeout(timeout);
-		debugger.setCurrentStackFrame(tasks, frame);
+		debugger.setCurrentStackFrame(tasks, level);
 	}
 	public void waitFinish() throws PCDIException {
 		waitForReturn();

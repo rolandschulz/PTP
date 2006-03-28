@@ -77,7 +77,8 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 	}	
 	
 	public void postCommand(IDebugCommand command) {
-		commandQueue.addCommand(command);
+		if (!isExited)
+			commandQueue.addCommand(command);
 	}
 	public void completeCommand(BitList tasks, Object result) {
 		commandQueue.setCommandReturn(tasks, result);
@@ -102,12 +103,17 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		try {
 			command.waitFnish();
 		} catch (PCDIException e) {
+			exit();
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugExternalPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));
 		}
 	}
 	
 	public final void exit() throws CoreException {
-		stopDebugger();
+		//make sure all processes are finished
+		if (session != null && !isJobFinished()) {
+			setJobFinished(session.createBitList(), IPProcess.EXITED);
+		}
+
 		isExited = true;
 		if (!eventThread.equals(Thread.currentThread())) {			
 			// Kill the event Thread.
@@ -120,10 +126,7 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		}
 		deleteObservers();
 		commandQueue.setTerminated();
-		//make sure all processes are finished
-		if (session != null && !isJobFinished()) {
-			setJobFinished(session.createBitList(), IPProcess.EXITED);
-		}
+		stopDebugger();
 	}
 	public final IPCDISession getSession() {
 		return session;
@@ -169,7 +172,7 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 				break;
 				case IPCDIErrorEvent.DBG_ERROR:
 					setJobFinished(tasks, IPProcess.ERROR);
-					postCommand(new KillCommand(event.getAllProcesses()));
+					postCommand(new KillCommand(tasks));
 				break;
 				case IPCDIErrorEvent.DBG_WARNING:
 					session.unregisterTargets(tasks.toArray(), true);
@@ -188,14 +191,12 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		}
 	}
 	private void setJobFinished(BitList tasks, String status) {
-		if (session != null) {
-			if (tasks == null) {
-				tasks = session.createBitList();
-			}
-			setSuspendTasks(false, tasks);
-			setTerminateTasks(true, tasks);
-			session.unregisterTargets(tasks.toArray(), true);
+		if (tasks == null) {
+			tasks = session.createBitList();
 		}
+		setSuspendTasks(false, tasks);
+		setTerminateTasks(true, tasks);
+		session.unregisterTargets(tasks.toArray(), true);
 		setProcessStatus(tasks.toArray(), status);
 	}
 	public final void notifyObservers(Object arg) {
@@ -212,26 +213,24 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 	//event
 	public void handleStopDebuggerEvent() {
 		eventQueue.addItem(new DebuggerExitedEvent(getSession(), new BitList(0)));
-		if (session != null) {
-			session.shutdown();
-		}
+		session.shutdown();
 	}
 	//not used breakpoint created event
 	public void handleBreakpointCreatedEvent(BitList tasks) {
 		fireEvent(new BreakpointCreatedEvent(getSession(), tasks));		
 	}
-	public void handleBreakpointHitEvent(BitList tasks, int bpid) {
+	public void handleBreakpointHitEvent(BitList tasks, int bpid, int thread_id) {
 		IPCDIBreakpoint bpt = ((Session)getSession()).getBreakpointManager().findCDIBreakpoint(bpid);
 		if (bpt != null) {
-			fireEvent(new BreakpointHitEvent(getSession(), tasks, bpt));
+			fireEvent(new BreakpointHitEvent(getSession(), tasks, bpt, thread_id));
 		}
 	}
-	public void handleSuspendEvent(BitList tasks, IPCDILocator locator) {
-		fireEvent(new SuspendEvent(getSession(), tasks, locator));
+	public void handleSuspendEvent(BitList tasks, IPCDILocator locator, int thread_id) {
+		fireEvent(new SuspendEvent(getSession(), tasks, locator, thread_id));
 	}
-	public void handleEndSteppingEvent(BitList tasks, int lineNumber, String filename) {
+	public void handleEndSteppingEvent(BitList tasks, int lineNumber, String filename, int thread_id) {
 		LineLocation loc = new LineLocation(filename, lineNumber);
-		fireEvent(new EndSteppingRangeEvent(getSession(), tasks, loc));
+		fireEvent(new EndSteppingRangeEvent(getSession(), tasks, loc, thread_id));
 	}
 	public void handleProcessResumedEvent(BitList tasks) {
 		fireEvent(new InferiorResumedEvent(getSession(), tasks));
@@ -239,15 +238,13 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 	public void handleProcessTerminatedEvent(BitList tasks) {
 		fireEvent(new InferiorExitedEvent(getSession(), tasks));
 	}
-	public void handleProcessSignaledEvent(BitList tasks, IPCDILocator locator) {
-		fireEvent(new InferiorSignaledEvent(getSession(), tasks, locator));
+	public void handleProcessSignaledEvent(BitList tasks, IPCDILocator locator, int thread_id) {
+		fireEvent(new InferiorSignaledEvent(getSession(), tasks, locator, thread_id));
 	}
 	public void handleErrorEvent(BitList tasks, String errMsg, int errCode) {
 		System.err.println("----- debugger error: " + errMsg + " ------------");
-		if (errCode == IPCDIErrorEvent.DBG_FATAL) {
-			if (session != null) {
-				tasks = ((Session)session).createBitList();
-			}
+		if (tasks == null || tasks.cardinality() == 0 || errCode == IPCDIErrorEvent.DBG_FATAL) {
+			tasks = ((Session)session).createBitList();
 		}
 		fireEvent(new ErrorEvent(getSession(), tasks, errMsg, errCode));
 	}	

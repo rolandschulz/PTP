@@ -20,10 +20,8 @@ package org.eclipse.ptp.debug.external.core.cdi.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.eclipse.cdt.debug.core.cdi.CDIException;
-import org.eclipse.cdt.debug.core.cdi.ICDICondition;
-import org.eclipse.cdt.debug.core.cdi.ICDILocation;
 import org.eclipse.cdt.debug.core.cdi.model.ICDISignal;
+import org.eclipse.ptp.debug.core.cdi.IPCDICondition;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIBreakpoint;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDILocation;
@@ -34,6 +32,7 @@ import org.eclipse.ptp.debug.core.cdi.model.IPCDIThreadStorageDescriptor;
 import org.eclipse.ptp.debug.external.core.cdi.Session;
 import org.eclipse.ptp.debug.external.core.cdi.VariableManager;
 import org.eclipse.ptp.debug.external.core.cdi.model.variable.ThreadStorageDescriptor;
+import org.eclipse.ptp.debug.external.core.commands.GetStackInfoDepthCommand;
 import org.eclipse.ptp.debug.external.core.commands.ListStackFramesCommand;
 import org.eclipse.ptp.debug.external.core.commands.SetCurrentStackFrameCommand;
 
@@ -99,6 +98,8 @@ public class Thread extends PObject implements IPCDIThread {
 				session.getDebugger().postCommand(command);
 				IPCDIStackFrame[] frames = command.getStackFrames();
 				for (int i = 0; i < frames.length; i++) {
+					frames[i].setThread(this);
+					frames[i].setLevel(depth - frames[i].getLevel());
 					currentFrames.add(frames[i]);
 				}
 			} finally {
@@ -119,20 +120,26 @@ public class Thread extends PObject implements IPCDIThread {
 		return (IPCDIStackFrame[]) currentFrames.toArray(noStack);
 	}
 	public int getStackFrameCount() throws PCDIException {
-		if (stackdepth == 0 || currentFrames == null) {
-			currentFrames = new ArrayList();
-			final Target target = (Target) getTarget();
+		if (stackdepth == 0) {
+			Target target = (Target)getTarget();
+			IPCDIThread currentThread = (IPCDIThread)target.getCurrentThread();
+			target.setCurrentThread(this, false);
+
 			final Session session = (Session) target.getSession();
-			
-			ListStackFramesCommand command = new ListStackFramesCommand(session.createBitList(target.getTargetID()));
-			session.getDebugger().postCommand(command);
-			IPCDIStackFrame[] frames = command.getStackFrames();
-			for (int i = 0; i < frames.length; i++) {
-				currentFrames.add(frames[i]);
-			}
-			stackdepth = currentFrames.size();
-			if (frames.length > 0) {
-				currentFrame = (StackFrame)frames[0];
+			GetStackInfoDepthCommand command = new GetStackInfoDepthCommand(session.createBitList(target.getTargetID()));
+			try {
+				session.getDebugger().postCommand(command);
+				stackdepth = command.getDepth();
+			} catch (PCDIException e) {
+				// First try fails, retry. gdb patches up the corrupt frame
+				// so retry should give us a frame count that is safe.
+				session.getDebugger().postCommand(command);
+				stackdepth = command.getDepth();
+				if (stackdepth > 0) {
+					stackdepth--;
+				}
+			} finally {
+				target.setCurrentThread(currentThread, false);
 			}
 		}
 		return stackdepth;
@@ -161,7 +168,8 @@ public class Thread extends PObject implements IPCDIThread {
 		}
 		Target target = (Target)getTarget();
 		Session session = (Session) target.getSession();
-		SetCurrentStackFrameCommand command = new SetCurrentStackFrameCommand(session.createBitList(target.getTargetID()), stackframe);
+		int level = getStackFrameCount() - frameLevel;
+		SetCurrentStackFrameCommand command = new SetCurrentStackFrameCommand(session.createBitList(target.getTargetID()), level);
 		session.getDebugger().postCommand(command);
 		command.waitFinish();
 		
@@ -178,68 +186,44 @@ public class Thread extends PObject implements IPCDIThread {
 	}
 	public void stepInto(int count) throws PCDIException {
 		((Target)getTarget()).setCurrentThread(this);
-		try {
-			getTarget().stepInto(count);
-		} catch (CDIException e) {
-			throw new PCDIException(e);
-		}
+		getTarget().stepInto(count);
 	}
 	public void stepIntoInstruction() throws PCDIException {
 		stepIntoInstruction(1);
 	}
 	public void stepIntoInstruction(int count) throws PCDIException {
 		((Target)getTarget()).setCurrentThread(this);
-		try {
-			getTarget().stepIntoInstruction(count);
-		} catch (CDIException e) {
-			throw new PCDIException(e);
-		}
+		getTarget().stepIntoInstruction(count);
 	}
 	public void stepOver() throws PCDIException {
 		stepOver(1);
 	}
 	public void stepOver(int count) throws PCDIException {
 		((Target)getTarget()).setCurrentThread(this);
-		try {
-			getTarget().stepOver(count);
-		} catch (CDIException e) {
-			throw new PCDIException(e);
-		}
+		getTarget().stepOver(count);
 	}
 	public void stepOverInstruction() throws PCDIException {
 		stepOverInstruction(1);
 	}
 	public void stepOverInstruction(int count) throws PCDIException {
 		((Target)getTarget()).setCurrentThread(this);
-		try {
-			getTarget().stepOverInstruction(count);
-		} catch (CDIException e) {
-			throw new PCDIException(e);
-		}
+		getTarget().stepOverInstruction(count);
 	}
 	public void stepReturn() throws PCDIException {
 		getCurrentStackFrame().stepReturn();
 	}
-	public void runUntil(ICDILocation location) throws PCDIException {
+	public void runUntil(IPCDILocation location) throws PCDIException {
 		stepUntil(location);
 	}
-	public void stepUntil(ICDILocation location) throws PCDIException {
+	public void stepUntil(IPCDILocation location) throws PCDIException {
 		((Target)getTarget()).setCurrentThread(this);
-		try {
-			getTarget().stepUntil(location);
-		} catch (CDIException e) {
-			throw new PCDIException(e);
-		}
+		getTarget().stepUntil(location);
 	}
 	public boolean isSuspended() {
 		return getTarget().isSuspended();
 	}
 	public void suspend() throws PCDIException {
-		try {
-			getTarget().suspend();
-		} catch (CDIException e) {
-			throw new PCDIException(e);
-		}
+		getTarget().suspend();
 	}
 	public void resume() throws PCDIException {
 		resume(false);
@@ -277,7 +261,7 @@ public class Thread extends PObject implements IPCDIThread {
 		IPCDIBreakpoint[] bps = target.getBreakpoints();
 		ArrayList list = new ArrayList(bps.length);
 		for (int i = 0; i < bps.length; i++) {
-			ICDICondition condition = bps[i].getCondition();
+			IPCDICondition condition = bps[i].getCondition();
 			if (condition == null) {
 				continue;
 			}
