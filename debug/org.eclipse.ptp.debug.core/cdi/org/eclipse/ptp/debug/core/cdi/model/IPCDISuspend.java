@@ -16,16 +16,16 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.core.cdi.event;
+package org.eclipse.ptp.debug.core.cdi.model;
 
-import org.eclipse.ptp.debug.core.cdi.IPCDISessionObject;
+import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
 /**
  * @author Clement chu
- *
+ * 
  */
-public interface IPCDISuspendedEvent extends IPCDIEvent {
-	IPCDISessionObject getReason();	
-	int getThreadId();
+public interface IPCDISuspend {
+	void suspend() throws PCDIException;
+	boolean isSuspended();	
 }
 

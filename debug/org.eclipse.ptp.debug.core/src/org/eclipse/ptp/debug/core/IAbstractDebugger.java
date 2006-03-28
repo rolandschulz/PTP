@@ -62,11 +62,12 @@ public interface IAbstractDebugger extends IDebugger {
 	/* event */
 	public void handleStopDebuggerEvent();
 	public void handleBreakpointCreatedEvent(BitList tasks);
-	public void handleBreakpointHitEvent(BitList tasks, int bpid);
-	public void handleEndSteppingEvent(BitList tasks, int lineNumber, String filename);
+	public void handleBreakpointHitEvent(BitList tasks, int bpid, int thread_id);
+	public void handleEndSteppingEvent(BitList tasks, int lineNumber, String filename, int thread_id);
+	public void handleSuspendEvent(BitList tasks, IPCDILocator locator, int thread_id);
+	public void handleProcessSignaledEvent(BitList tasks, IPCDILocator locator, int thread_id);
 	public void handleProcessResumedEvent(BitList tasks);
 	public void handleProcessTerminatedEvent(BitList tasks);
-	public void handleProcessSignaledEvent(BitList tasks, IPCDILocator locator);
 	public void handleErrorEvent(BitList tasks, String errMsg, int errCode);
 	
 	/* others */
