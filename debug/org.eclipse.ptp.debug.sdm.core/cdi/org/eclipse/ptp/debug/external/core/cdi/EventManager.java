@@ -110,7 +110,6 @@ public class EventManager extends SessionObject implements IPCDIEventManager, Ob
 				return false;
 			}
 			*/
-			//TODO -- no thread id provided
 			int threadId = event.getThreadId();
 			currentTarget.updateState(threadId);
 			try {
