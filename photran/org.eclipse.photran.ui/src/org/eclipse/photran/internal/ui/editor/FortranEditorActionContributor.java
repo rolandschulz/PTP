@@ -18,14 +18,14 @@ public class FortranEditorActionContributor extends TextEditorActionContributor
 {
 	protected AbstractFortranEditor editor = null;
 
-	@Override
+	/*@Override*/
 	public void setActiveEditor(IEditorPart part)
 	{
 		super.setActiveEditor(part);
 		editor = part instanceof AbstractFortranEditor ? (AbstractFortranEditor)part : null;
 	}
 
-	@Override
+	/*@Override*/
 	public void contributeToMenu(IMenuManager menu)
 	{
 		super.contributeToMenu(menu);

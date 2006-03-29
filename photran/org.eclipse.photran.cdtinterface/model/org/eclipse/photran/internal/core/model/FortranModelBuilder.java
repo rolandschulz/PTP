@@ -48,7 +48,7 @@ public final class FortranModelBuilder implements IContributedModelBuilder
 
     public FortranModelBuilder(ITranslationUnit tu)
     {
-    	assert tu instanceof ITranslationUnit;
+    	if (!(tu instanceof ITranslationUnit)) throw new Error("Unexpected subclass of ITranslationUnit");
     	
         this.translationUnit = (TranslationUnit)tu;
         this.newElements = new HashMap();
