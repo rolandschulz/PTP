@@ -17,12 +17,13 @@
       <import plugin="org.eclipse.ui"/>
       <import plugin="org.eclipse.core.runtime"/>
       <import plugin="org.eclipse.jface.text"/>
-      <import plugin="org.eclipse.ui.views"/>
       <import plugin="org.eclipse.ui.editors"/>
       <import plugin="org.eclipse.ui.workbench.texteditor"/>
       <import plugin="org.eclipse.photran.core"/>
       <import plugin="org.eclipse.cdt.core"/>
       <import plugin="org.eclipse.cdt.ui"/>
+      <import plugin="org.eclipse.photran.cdtinterface"/>
+      <import plugin="org.eclipse.ui.views"/>
    </requires>
    
 <!-- ===========================================================================   -->

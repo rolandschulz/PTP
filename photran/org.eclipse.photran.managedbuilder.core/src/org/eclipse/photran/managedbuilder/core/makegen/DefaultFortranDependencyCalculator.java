@@ -34,7 +34,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.content.IContentType;
-import org.eclipse.photran.core.FortranLanguage;
+import org.eclipse.photran.cdtinterface.core.FortranLanguage;
 
 // import org.eclipse.photran.internal.core.f95parser.FortranProcessor;
 // import org.eclipse.photran.internal.core.f95parser.ILexer;

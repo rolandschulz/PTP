@@ -17,7 +17,6 @@
       <import plugin="org.eclipse.core.runtime"/>
       <import plugin="org.eclipse.cdt.core"/>
       <import plugin="org.eclipse.core.resources"/>
-      <import plugin="org.eclipse.photran.modelicons"/>
       <import plugin="org.eclipse.jface"/>
    </requires>
 
@@ -186,22 +185,6 @@
 		  file-extensions="f,for,ftn,fix,fpp,F,FOR,FTN,FIX,FPP"
 		  priority="high"/>
   </extension>
-
-   <!-- JO -->
-   <!--extension point="org.eclipse.cdt.core.AdditionalLanguages">
-      <language
-         class="org.eclipse.photran.core.FortranLanguage" />
-   </extension-->
-   <extension
-         point="org.eclipse.cdt.core.language">
-      <language
-            class="org.eclipse.photran.core.FortranLanguage"
-            id="fortran"
-            name="Fortran">
-         <contentType id="org.eclipse.photran.core.fixedFormFortranSource"/>
-         <contentType id="org.eclipse.photran.core.freeFormFortranSource"/>
-      </language>
-   </extension>
 
 <!-- =================================================================================== -->
 <!-- Initialize the preference for the Core Plugin                                       -->

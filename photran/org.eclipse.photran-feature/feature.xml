@@ -224,7 +224,7 @@
          version="3.0.0"/>
 
    <plugin
-         id="org.eclipse.photran.modelicons"
+         id="org.eclipse.photran.cdtinterface"
          download-size="0"
          install-size="0"
          version="3.0.0"/>
