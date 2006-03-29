@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin
+   id="org.eclipse.photran.cdtinterface"
+   name="Photran CDT Interface Plug-in"
+   version="3.0.0"
+   provider-name="University of Illinois at Urbana-Champaign and Los Alamos National Laboratory"
+   class="org.eclipse.photran.cdtinterface.CDTInterfacePlugin">
+
+   <runtime>
+      <library name="fdtcdtinterface.jar">
+         <export name="*"/>
+      </library>
+   </runtime>
+
+   <requires>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.jface"/>
+      <import plugin="org.eclipse.cdt.core"/>
+      <import plugin="org.eclipse.core.resources"/>
+      <import plugin="org.eclipse.photran.core"/>
+      <import plugin="org.eclipse.search"/>
+      <import plugin="org.eclipse.ui.console"/>
+      <import plugin="org.eclipse.cdt.ui"/>
+      <import plugin="org.eclipse.ui.ide"/>
+      <import plugin="org.eclipse.cdt.make.ui"/>
+   </requires>
+
+   <!--======================-->
+   <!-- CDT Core Integration -->
+   <!--======================-->
+   <extension
+         point="org.eclipse.cdt.core.language">
+      <language
+            class="org.eclipse.photran.cdtinterface.core.FortranLanguage"
+            id="fortran"
+            name="Fortran">
+         <contentType id="org.eclipse.photran.core.fixedFormFortranSource"/>
+         <contentType id="org.eclipse.photran.core.freeFormFortranSource"/>
+      </language>
+   </extension>
+
+   <!--==============-->
+   <!-- CDT UI Clone -->
+   <!--==============-->
+
+   <!-- Fortran Perspective -->
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            name="Fortran"
+            icon="icons/etool16/f_pers.gif"
+            class="org.eclipse.photran.cdtinterface.ui.FortranPerspectiveFactory"
+            id="org.eclipse.photran.ui.FortranPerspective">
+      </perspective>
+   </extension>
+
+   <!-- Fortran Projects View -->
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            name="Fortran"
+            id="org.eclipse.photran.ui.views">
+      </category>
+      <view
+            name="Fortran Projects"
+            icon="icons/etool16/fview.gif"
+            category="org.eclipse.photran.ui.views"
+            class="org.eclipse.photran.cdtinterface.ui.FortranView"
+            id="org.eclipse.photran.ui.FortranView">
+      </view>
+   </extension>
+
+   <!-- Fortran Wizards -->
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <category
+            name="Fortran"
+            id="org.eclipse.photran.ui.newFortranWizards" />
+      <!-- New Project Wizards -->
+      <wizard
+            name="Standard Make Fortran Project"
+            icon="icons/etool16/newfortran_app.gif"
+            category="org.eclipse.photran.ui.newFortranWizards"
+            class="org.eclipse.photran.cdtinterface.ui.NewMakeFortranProjectWizard"
+            project="true"
+            finalPerspective="org.eclipse.photran.ui.FortranPerspective"
+            id="org.eclipse.photran.ui.wizards.NewMakeFortranProjectWizard">
+         <description>
+             Create a new Fortran project.  You must supply your own makefile.
+         </description>
+      </wizard>
+      <!-- New File Wizards -->
+      <wizard
+            name="New Source File"
+            icon="icons/etool16/newfortranfile_wiz.gif"
+            category="org.eclipse.photran.ui.newFortranWizards"
+            finalPerspective="org.eclipse.photran.ui.FortranPerspective"
+            id="org.eclipse.photran.ui.wizards.NewSourceFileCreationWizard">
+         <class class="org.eclipse.photran.cdtinterface.ui.NewSourceFileCreationWizard">
+            <parameter name="cfile" value="true"/>
+         </class>
+         <description>
+            Create a new source file
+         </description>
+      </wizard>
+      <wizard
+            name="File"
+            icon="icons/etool16/newfile_wiz.gif"
+            category="org.eclipse.photran.ui.newFortranWizards"
+            finalPerspective="org.eclipse.photran.ui.FortranPerspective"
+            id="org.eclipse.photran.ui.wizards.NewFileCreationWizard">
+         <class class="org.eclipse.cdt.ui.wizards.NewFileCreationWizard">
+            <parameter name="cfile" value="true"/>
+         </class>
+         <description>
+            Create a new file (not necessarily source code)
+         </description>
+      </wizard>
+      <wizard
+            name="Source Folder"
+            icon="icons/etool16/newsrcfldr_wiz.gif"
+            category="org.eclipse.photran.ui.newFortranWizards"
+            finalPerspective="org.eclipse.photran.ui.FortranPerspective"
+            id="org.eclipse.photran.ui.wizards.NewSourceFolderCreationWizard">
+         <class class="org.eclipse.photran.cdtinterface.ui.NewSourceFolderCreationWizard">
+            <parameter name="cfolder" value="true"/>
+         </class>
+         <description>
+            Create a new folder intended to contain source code
+         </description>
+      </wizard>
+      <wizard
+            name="Folder"
+            icon="icons/etool16/newfolder_wiz.gif"
+            category="org.eclipse.photran.ui.newFortranWizards"
+            finalPerspective="org.eclipse.photran.ui.FortranPerspective"
+            id="org.eclipse.photran.ui.wizards.NewFolderCreationWizard">
+         <class class="org.eclipse.cdt.ui.wizards.NewFolderCreationWizard">
+            <parameter name="cfolder" value="true"/>
+         </class>
+         <description>
+            Create a new folder (not necessarily containing source code)
+         </description>
+      </wizard>
+   </extension>
+</plugin>

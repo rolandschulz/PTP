@@ -20,18 +20,9 @@
       <import plugin="org.eclipse.jface"/>
    </requires>
 
-<!-- =================================================================================== -->
-<!-- Extension Point: FortranFileType and FortranFileTypeAssociation                     -->
-<!--                  for translation unit ident                                         -->
-<!-- =================================================================================== -->
-<!-- I do not think these are needed, as can use the CDT extension points -->
-   <!--extension-point id="FortranLanguage" name="FortranLanguage" schema="schema/FortranLanguage.exsd"/>
-   <extension-point id="FortranFileType" name="FortranFileType" schema="schema/FortranFileType.exsd"/>
-   <extension-point id="FortranFileTypeAssociation" name="FortranFileTypeAssociation" schema="schema/FortranFileTypeAssociation.exsd"/-->
-
-<!-- =================================================================================== -->
-<!-- Define the list of Error Parsers provided by the FDT                                 -->
-<!-- =================================================================================== -->
+<!-- ==============-->
+<!-- Error Parsers -->
+<!-- ==============-->
    <extension
          id="AbsoftErrorParser"
          name="Photran Error Parser for Absoft Fortran"
@@ -88,22 +79,9 @@
             class="org.eclipse.photran.internal.errorparsers.FErrorParser">
       </errorparser>
    </extension>
-<!-- =================================================================================== -->
-<!-- FDT Fortran Nature                                                                  -->
-<!-- =================================================================================== -->
-   <!--extension
-         id="fnature"
-         name="%fnature.name"
-         point="org.eclipse.core.resources.natures">
-      <runtime>
-         <run
-               class="org.eclipse.photran.core.FortranProjectNature">
-         </run>
-      </runtime>
-   </extension-->
-<!-- =================================================================================== -->
-<!-- FDT file type mappings                                                              -->
-<!-- =================================================================================== -->
+
+<!-- Old CDT stuff, don't think we need it - Jeff -->
+<!--
    <extension
          point="org.eclipse.cdt.core.CLanguage">
       <language
@@ -137,36 +115,11 @@
             pattern="*.fh">
       </association>
    </extension>
-<!-- =================================================================================== -->
-<!-- Some well known Fortran file extensions override for the team plugins               -->
-<!-- =================================================================================== -->
-   <!--extension
-         point="org.eclipse.team.core.fileTypes">
-      <fileTypes
-            type="text"
-            extension="f">
-      </fileTypes>
-      <fileTypes
-            type="text"
-            extension="f77">
-      </fileTypes>
-      <fileTypes
-            type="text"
-            extension="f90">
-      </fileTypes>
-      <fileTypes
-            type="text"
-            extension="f95">
-      </fileTypes>
-      <fileTypes
-            type="text"
-            extension="fh">
-      </fileTypes>
-   </extension-->
+   -->
 
-<!-- =================================================================================== -->
-<!-- Define Fortran file ContentTypes                                                   -->
-<!-- =================================================================================== -->
+<!-- ======================================-->
+<!-- Fortran Content Types/File Extensions -->
+<!-- ======================================-->
   <extension point="org.eclipse.core.runtime.contentTypes">
   
       <!-- A "base" content type, so that we can refer to both free and fixed form at once -->
@@ -179,16 +132,15 @@
 		  base-type="org.eclipse.photran.core.fortranSource"
 		  file-extensions="f77,f90,f95"
 		  priority="high"/>
-
 	  <content-type id="fixedFormFortranSource" name="Fortran Source File - Fixed Format"
 		  base-type="org.eclipse.photran.core.fortranSource"
 		  file-extensions="f,for,ftn,fix,fpp,F,FOR,FTN,FIX,FPP"
 		  priority="high"/>
   </extension>
 
-<!-- =================================================================================== -->
-<!-- Initialize the preference for the Core Plugin                                       -->
-<!-- =================================================================================== -->
+<!-- =======================-->
+<!-- Preference Initializer -->
+<!-- =======================-->
    <extension point="org.eclipse.core.runtime.preferences">
       <initializer class="org.eclipse.photran.core.FortranCorePreferenceInitializer"/>
    </extension>
