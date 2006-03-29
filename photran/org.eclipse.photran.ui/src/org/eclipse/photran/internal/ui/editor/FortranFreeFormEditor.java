@@ -1,6 +1,7 @@
 package org.eclipse.photran.internal.ui.editor;
 
 
+import org.eclipse.cdt.core.model.IWorkingCopy;
 import org.eclipse.cdt.internal.ui.editor.CContentOutlinePage;
 import org.eclipse.cdt.internal.ui.editor.CEditorMessages;
 import org.eclipse.cdt.internal.ui.editor.ICEditorActionDefinitionIds;
@@ -22,6 +23,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPageLayout;
+import org.eclipse.ui.internal.misc.Assert;
 import org.eclipse.ui.part.IShowInTargetList;
 import org.eclipse.ui.texteditor.DefaultRangeIndicator;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
@@ -249,9 +251,10 @@ public class FortranFreeFormEditor extends AbstractFortranEditor {
 	public static void setOutlinePageInput(CContentOutlinePage page,
 			IEditorInput input) {
 		if (page != null) {
-			IWorkingCopyManager manager = CUIPlugin.getDefault()
-					.getWorkingCopyManager();
-			page.setInput(manager.getWorkingCopy(input));
+			IWorkingCopyManager manager = CUIPlugin.getDefault().getWorkingCopyManager();
+			IWorkingCopy workingCopy = manager.getWorkingCopy(input);
+			Assert.isNotNull(workingCopy);
+			page.setInput(workingCopy);
 		}
 	}
 

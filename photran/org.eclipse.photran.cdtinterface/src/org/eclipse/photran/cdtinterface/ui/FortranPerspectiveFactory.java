@@ -22,7 +22,7 @@ import org.eclipse.ui.console.IConsoleConstants;
 /**
  * The Fortran perspective.
  * 
- * This is identical to CPerspectiveFactor, except we replace
+ * This is identical to CPerspectiveFactory, except we replace
  * the C/C++ Projects View with the Fortran Projects view.
  * 
  * This is, as far as I know, the only place where we have to actually copy
@@ -95,6 +95,5 @@ public class FortranPerspectiveFactory implements IPerspectiveFactory
 		for (int i = 0; i < wizIDs.length; ++i) {
 			layout.addNewWizardShortcut(wizIDs[i]);
 		}
-		
 	}
 }
