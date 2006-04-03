@@ -1676,8 +1676,8 @@ public class IconCanvas extends Canvas {
         		String[] texts = new String[2];
         		String contentText = "<u>Variables</u><br>";
         		contentText += "<ind>abc: <key>PrintStream</key><br>";
-        		contentText += "<ind><hl>hhhhhhh hhhhhhhhhhhh hhhhhhhhhhhhhhhhh hhhhhhhhhhhhh hhhhhhhhhh:</hl> PrintStream<br>";
-        		contentText += "<ind><hl>aasdbc:</hl> PrintStream<br>";
+        		contentText += "<ind><hl>aaaaaaaaaaa hhhhhhhhhh gggggggggggggggg bbbbbbbbbbbbbbb ccccccccccccccc:</hl> PrintStream<br>";
+        		contentText += "<ind><hl>aaaaaaa hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh ccccccccccccccc dddddddddddddddd eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee:</hl> PrintStream<br>";
         		contentText += "<ind><hl>aasdbc:</hl> PrintStream<br>";
         		contentText += "<ind><hl>aasdbc:</hl> PrintStream<br>";
         		contentText += "<ind><hl>aasdbc:</hl> PrintStream<br>";

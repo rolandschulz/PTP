@@ -58,17 +58,18 @@ public class DefaultInformationControl implements IIconInformationControl, Dispo
 	private StyledText fText;
 	private IInformationPresenter fPresenter;
 	private TextPresentation fPresentation= new TextPresentation();
-	private int fMaxWidth= SHELL_DEFAULT_WIDTH;
-	private int fMaxHeight= SHELL_DEFAULT_HEIGHT;
+	private int fMaxWidth= -1;
+	private int fMaxHeight= -1;
 	private Font fHeaderTextFont;
 	private Label headerField = null;
 	private ScrolledComposite sc = null;
+	private boolean showDetails = false;
 	
-	public DefaultInformationControl(Shell parent, boolean hasExtra) {
-		this(parent, hasExtra, SWT.NONE | SWT.WRAP);
+	public DefaultInformationControl(Shell parent, boolean showDetails) {
+		this(parent, showDetails, SWT.NONE | SWT.WRAP);
 	}
-	public DefaultInformationControl(Shell parent, boolean hasExtra, int style) {
-		this(parent, SWT.TOOL | SWT.NO_TRIM, hasExtra, style, new IconHoverPresenter(false));
+	public DefaultInformationControl(Shell parent, boolean showDetails, int style) {
+		this(parent, SWT.TOOL | SWT.NO_TRIM, showDetails, style, new IconHoverPresenter(false));
 	}
 	public DefaultInformationControl(Shell parent) {
 		this(parent, false);
@@ -77,7 +78,8 @@ public class DefaultInformationControl implements IIconInformationControl, Dispo
 		this(parent, SWT.TOOL | SWT.NO_TRIM, true, style, presenter);
 	}
 	
-	public DefaultInformationControl(Shell parent, int shellStyle, boolean hasExtra, int style, IInformationPresenter presenter) {
+	public DefaultInformationControl(Shell parent, int shellStyle, boolean showDetails, int style, IInformationPresenter presenter) {
+		this.showDetails = showDetails;
 		GridLayout layout;
 		GridData gd;
 
@@ -91,14 +93,6 @@ public class DefaultInformationControl implements IIconInformationControl, Dispo
 		layout.marginWidth= border;
 		fShell.setLayout(layout);
 		fShell.setLayoutData(new GridData(GridData.FILL_BOTH));
-		/*
-		fShell.addMouseTrackListener(new MouseTrackAdapter() {
-			public void mouseExit(MouseEvent e) {
-				if (fShell != null && !fShell.isDisposed())
-					fShell.dispose();
-			}
-		});
-		*/
 
 		sc = new ScrolledComposite(fShell, SWT.V_SCROLL | SWT.H_SCROLL);
 		sc.setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -131,7 +125,7 @@ public class DefaultInformationControl implements IIconInformationControl, Dispo
 		headerField= new Label(hdComposite, SWT.LEFT);
 		createHeadLabel(headerField);
 		
-		if (hasExtra) {
+		if (showDetails) {
 			Label labelField = new Label(hdComposite, SWT.RIGHT);
 			labelField.setText("Press ESC to close");
 			createHeadLabel(labelField);
@@ -141,8 +135,8 @@ public class DefaultInformationControl implements IIconInformationControl, Dispo
 			separator.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 			// Text field
 			fText= new StyledText(composite, SWT.MULTI | SWT.READ_ONLY | style);
-			if ((style & SWT.WRAP) == 0) {
-				fMaxWidth = -1;
+			if ((style & SWT.WRAP) != 0) {//is warp
+				fMaxWidth = SHELL_DEFAULT_WIDTH;
 			}
 			
 			fText.setCaret(null);
@@ -226,15 +220,16 @@ public class DefaultInformationControl implements IIconInformationControl, Dispo
 		fHeaderTextFont= null;
 	}
 	public void setSize(int width, int height) {
-		if (width >= SHELL_DEFAULT_WIDTH || height >= SHELL_DEFAULT_HEIGHT) {
-			sc.setMinSize(width, height);
-			fShell.setSize(SHELL_DEFAULT_WIDTH, SHELL_DEFAULT_HEIGHT);
+		int new_width = showDetails?(width + 75):width;
+		if (width > SHELL_DEFAULT_WIDTH || height > SHELL_DEFAULT_HEIGHT) {
+			sc.setMinSize(SHELL_DEFAULT_WIDTH, height);
 			sc.getHorizontalBar().setVisible(width > SHELL_DEFAULT_WIDTH);
 			sc.getVerticalBar().setVisible(height > SHELL_DEFAULT_HEIGHT);
+			fShell.setSize(width>SHELL_DEFAULT_WIDTH?SHELL_DEFAULT_WIDTH:new_width, height>SHELL_DEFAULT_HEIGHT?SHELL_DEFAULT_HEIGHT:height);
 		}
 		else {
 			sc.setAlwaysShowScrollBars(false);
-			fShell.setSize(width, height);
+			fShell.setSize(new_width, height);
 		}
 	}
 	public void setLocation(Point location) {
@@ -277,7 +272,7 @@ public class DefaultInformationControl implements IIconInformationControl, Dispo
 	}
 	
 	public Point getShellSize() {
-		Point size = sc.getContent().computeSize(SWT.DEFAULT, SWT.DEFAULT);
+		Point size = computeSizeHint();
 		//set Shell size
 		setSize(size.x, size.y);
 		
@@ -291,6 +286,6 @@ public class DefaultInformationControl implements IIconInformationControl, Dispo
 	}
 	
 	public boolean isWrap() {
-		return (fMaxWidth==-1);
+		return (fMaxWidth>-1);
 	}
 }
