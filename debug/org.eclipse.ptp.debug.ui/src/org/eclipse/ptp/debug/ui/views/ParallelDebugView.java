@@ -35,7 +35,6 @@ import org.eclipse.ptp.debug.internal.ui.actions.StepReturnAction;
 import org.eclipse.ptp.debug.internal.ui.actions.SuspendAction;
 import org.eclipse.ptp.debug.internal.ui.actions.TerminateAction;
 import org.eclipse.ptp.debug.internal.ui.actions.UnregisterAction;
-import org.eclipse.ptp.debug.internal.ui.actions.UpdateVariablesAction;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.debug.ui.events.IDebugActionEvent;
 import org.eclipse.ptp.debug.ui.events.IResumedDebugEvent;
@@ -113,15 +112,12 @@ public class ParallelDebugView extends ParallelJobView implements IDebugActionUp
 		
 		super.buildInToolBarActions(toolBarMgr);
 		
-		createOrientationActions();
+		//createOrientationActions();
 	}
 	protected void createOrientationActions() {
 		IActionBars actionBars = getViewSite().getActionBars();
 		IMenuManager viewMenu = actionBars.getMenuManager();
-		
 		viewMenu.add(new Separator());
-		viewMenu.add(new UpdateVariablesAction(this));
-		viewMenu.add(new Separator());		
 	}
 	
 	/*******************************************************************************************************************************************************************************************************************************************************************************************************

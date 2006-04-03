@@ -18,18 +18,27 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.ui.actions;
 
-import org.eclipse.debug.core.DebugException;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
-import org.eclipse.ptp.debug.core.model.IPVariable;
+import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
+import org.eclipse.swt.widgets.Shell;
 
 /**
  * @author Clement chu
  * 
  */
-public class RemoveAllPVariableActionDelegate extends PVariableActionDelegate {
+public class RemoveAllPVariableActionDelegate extends AbstractPVariableAction {
 	public void run(IAction action) {
-		PTPDebugCorePlugin.getPVariableManager().removeAllVariables();
+		doAction(view.getViewSite().getShell());
 	}
-	protected void doAction(IPVariable[] vars) throws DebugException {}
+	
+	public static void doAction(Shell shell) {
+		if (getCurrentRunningJob() == null)
+			return;
+
+		if (MessageDialog.openConfirm(shell, "Remove all variables", "Confirm to remove all variables?")) {
+			PTPDebugCorePlugin.getPVariableManager().removeAllVariables(PTPDebugUIPlugin.getDefault().getUIDebugManager().getCurrentJob());
+		}
+	}
 }
