@@ -35,6 +35,7 @@ import org.eclipse.swt.widgets.Display;
  */
 public class IconHoverPresenter implements DefaultInformationControl.IInformationPresenter {
 	private static final String LINE_DELIM = System.getProperty("line.separator", "\n");
+	private final String INDENTATION = "\t"; 
 
 	private int fCounter;
 	private boolean fEnforceUpperLineLimit;
@@ -53,7 +54,6 @@ public class IconHoverPresenter implements DefaultInformationControl.IInformatio
 	}
 
 	protected void adaptTextPresentation(TextPresentation presentation, int offset, int insertLength) {
-
 		int yoursStart= offset;
 		int yoursEnd=   offset + insertLength -1;
 		yoursEnd= Math.max(yoursStart, yoursEnd);
@@ -91,7 +91,7 @@ public class IconHoverPresenter implements DefaultInformationControl.IInformatio
 		int i= 0;
 		while (i < length && Character.isWhitespace(line.charAt(i))) ++i;
 
-		return (i == length ? line : line.substring(0, i)) + " ";
+		return (i == length ? line : line.substring(0, i)) + INDENTATION;
 	}
 
 	public String updatePresentation(Display display, String hoverInfo, TextPresentation presentation, int maxWidth, int maxHeight) {
@@ -146,8 +146,7 @@ public class IconHoverPresenter implements DefaultInformationControl.IInformatio
 			//display "..." if the content is over the shell size
 			if (line != null && buffer.length() > 0) {
 				append(buffer, LINE_DELIM, lineFormatted ? presentation : null);
-				//TODO
-				append(buffer, " ...", presentation);
+				append(buffer, "...", presentation);
 			}
 
 			return trim(buffer, presentation);

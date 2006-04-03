@@ -69,7 +69,7 @@ public class LineBreakingReader {
 				return null;
 
 			int lineLen= fGC.textExtent(line).x;
-			if (lineLen < fMaxWidth) {
+			if (fMaxWidth > -1 && lineLen < fMaxWidth) {
 				return line;
 			}
 			fLine= line;
@@ -98,7 +98,7 @@ public class LineBreakingReader {
 			String word= fLine.substring(currOffset, nextOffset);
 			int wordWidth= fGC.textExtent(word).x;
 			int nextWidth= wordWidth + currWidth;
-			if (nextWidth > fMaxWidth) {
+			if (fMaxWidth > -1 && nextWidth > fMaxWidth) {
 				if (currWidth > 0) {
 					return currOffset;
 				} else {

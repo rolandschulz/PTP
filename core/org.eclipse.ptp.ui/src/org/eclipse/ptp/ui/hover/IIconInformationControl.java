@@ -19,6 +19,7 @@
 package org.eclipse.ptp.ui.hover;
 
 import org.eclipse.jface.text.IInformationControl;
+import org.eclipse.swt.graphics.Point;
 
 /**
  * @author Clement chu
@@ -26,5 +27,7 @@ import org.eclipse.jface.text.IInformationControl;
  */
 public interface IIconInformationControl extends IInformationControl {
 	public void setHeader(String header);
+	public Point getShellSize();
+	public boolean isWrap();
 }
 
