@@ -62,7 +62,7 @@ public class LineBreakingReader {
 	 * Reads the next line. The lengths of the line will not exceed the gived maximum
 	 * width.
 	 */
-	public String readLine() throws IOException {
+	public String readLine(String indent) throws IOException {
 		if (fLine == null) {
 			String line= fReader.readLine();
 			if (line == null)
@@ -76,13 +76,16 @@ public class LineBreakingReader {
 			fLineBreakIterator.setText(line);
 			fOffset= 0;
 		}
-		int breakOffset= findNextBreakOffset(fOffset);
+		int breakOffset= findNextBreakOffset(fOffset, indent);
 		String res;
 		if (breakOffset != BreakIterator.DONE) {
 			res= fLine.substring(fOffset, breakOffset);
 			fOffset= findWordBegin(breakOffset);
 			if (fOffset == fLine.length()) {
 				fLine= null;
+			}
+			if (breakOffset == 1 && res.charAt(0) == '\t') {//added to prevent empty line
+				return "\t" + readLine(indent);
 			}
 		} else {
 			res= fLine.substring(fOffset);
@@ -91,8 +94,8 @@ public class LineBreakingReader {
 		return res;
 	}
 
-	private int findNextBreakOffset(int currOffset) {
-		int currWidth= 0;
+	private int findNextBreakOffset(int currOffset, String indent) {
+		int currWidth= indent!=null?fGC.textExtent(indent).x:0;
 		int nextOffset= fLineBreakIterator.following(currOffset);
 		while (nextOffset != BreakIterator.DONE) {
 			String word= fLine.substring(currOffset, nextOffset);
@@ -119,4 +122,3 @@ public class LineBreakingReader {
 		return idx;
 	}
 }
-
