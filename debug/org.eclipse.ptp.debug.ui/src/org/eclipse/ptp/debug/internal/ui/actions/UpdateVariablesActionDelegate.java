@@ -23,43 +23,34 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.debug.core.DebugException;
 import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
-import org.eclipse.ptp.debug.core.model.IPVariable;
 import org.eclipse.ptp.debug.internal.ui.UIDebugManager;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
 /**
- * @author Clement chu
- * 
+ * @author clement chu
+ *
  */
-public class AddPVariableActionDelegate extends AbstractPVariableAction {
-	private String variable = null;
-	public void dispose() {}
-	public void init(IAction action) {
-		this.action = action;
-	}
+public class UpdateVariablesActionDelegate extends AbstractPVariableAction {
 	public void run(IAction action) {
-		if (variable != null) {
-			doAction(view.getViewSite().getShell(), variable);
-		}
+		doAction(view.getViewSite().getShell());
 	}
-	public static void doAction(Shell shell, final String name) {
+	public static void doAction(Shell shell) {
+		if (getCurrentRunningJob() == null)
+			return;
+		
 		if (shell == null) {
 			shell = PTPDebugUIPlugin.getActiveWorkbenchShell();
 		}
-		final UIDebugManager uiManager = PTPDebugUIPlugin.getDefault().getUIDebugManager();
-		final Job job = new Job("Adding variables info.") {
+		final Job job = new Job("Updating variables info.") {
 			public IStatus run(final IProgressMonitor monitor) {
 				if (!monitor.isCanceled()) {
 					try {
-						PTPDebugCorePlugin.getPVariableManager().addVariable(uiManager.getCurrentJob(), uiManager.getCurrentSetId(), name, monitor);
+						UIDebugManager uiManager = PTPDebugUIPlugin.getDefault().getUIDebugManager();
+						PTPDebugCorePlugin.getPVariableManager().updateVariableResults(uiManager.getCurrentJob(), uiManager.getCurrentSetId(), monitor);
 					} catch (CoreException e) {
 						return e.getStatus();
 					}
@@ -71,25 +62,29 @@ public class AddPVariableActionDelegate extends AbstractPVariableAction {
 		PlatformUI.getWorkbench().getProgressService().showInDialog(shell, job);
 		job.schedule();
 	}
-	public void selectionChanged(IAction action, ISelection selection) {
-		variable = null;
-		if (selection instanceof IStructuredSelection) {
-			IPVariable var = (IPVariable)((IStructuredSelection)selection).getFirstElement();
-			if (var != null) {
-				try {
-					variable = var.getName();
-				} catch (DebugException e) {
-					variable = null;
+	
+	public static void doAction(Shell shell, final String name) {
+		if (getCurrentRunningJob() == null)
+			return;
+
+		if (shell == null) {
+			shell = PTPDebugUIPlugin.getActiveWorkbenchShell();
+		}
+		final UIDebugManager uiManager = PTPDebugUIPlugin.getDefault().getUIDebugManager();
+		final Job job = new Job("Updating variables info.") {
+			public IStatus run(final IProgressMonitor monitor) {
+				if (!monitor.isCanceled()) {
+					try {
+						PTPDebugCorePlugin.getPVariableManager().removeVariable(uiManager.getCurrentJob(), name, monitor);
+					} catch (CoreException e) {
+						return e.getStatus();
+					}
 				}
+				return Status.OK_STATUS;
 			}
-		}
-		action.setEnabled(variable != null);
-	}	
-	public void changeJobEvent(String cur_job_id, String pre_job_id) {
-		if (cur_job_id == null || cur_job_id == "") {
-			if (action != null)
-				action.setEnabled(false);
-		}
+		};
+		job.setPriority(Job.INTERACTIVE);
+		PlatformUI.getWorkbench().getProgressService().showInDialog(shell, job);
+		job.schedule();
 	}
-	public void update(IPJob job) {}
 }

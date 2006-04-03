@@ -18,27 +18,31 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.ui.actions;
 
-import org.eclipse.ptp.debug.internal.ui.UIDebugManager;
-import org.eclipse.ptp.debug.ui.views.ParallelDebugView;
-import org.eclipse.ptp.ui.IManager;
-import org.eclipse.ptp.ui.model.IElement;
-/**
- * @author clement chu
- *
- */
-public class UpdateVariablesAction extends DebugAction {
-	public static final String name = "Update variables";
-	
-	public UpdateVariablesAction(ParallelDebugView view) {
-		super(name, view);
-		setEnabled(true);
-	}	
-	public void run() {
-		IManager manager = view.getUIManager();
-		if (manager instanceof UIDebugManager) {
-			((UIDebugManager)manager).updateDebugVariables();
-		}
-	}
+import org.eclipse.jface.action.IAction;
+import org.eclipse.ptp.debug.internal.ui.dialogs.PTPVariablesDialog;
+import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Shell;
 
-	public void run(IElement[] elements) {}
+/**
+ * @author Clement chu
+ * 
+ */
+public class OpenPVariableDialogActionDelegate extends AbstractPVariableAction {
+	public void run(IAction action) {}
+
+	public void init(IAction action) {
+		action.setChecked(false);
+	}
+	public void runWithEvent(IAction action, Event event) {
+		doAction(view.getViewSite().getShell());
+		action.setChecked(false);
+	}
+	public void doAction(Shell shell) {
+		if (shell == null) {
+			shell = PTPDebugUIPlugin.getActiveWorkbenchShell();
+		}
+		new PTPVariablesDialog(shell).open();
+	}
 }
+

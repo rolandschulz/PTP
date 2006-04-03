@@ -26,8 +26,6 @@ import java.util.Map;
 import org.eclipse.cdt.debug.core.cdi.ICDILocator;
 import org.eclipse.cdt.debug.core.model.ICLineBreakpoint;
 import org.eclipse.core.resources.IMarkerDelta;
-import org.eclipse.core.resources.IWorkspaceRunnable;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -132,7 +130,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		return variableManager;
 	}
 	public String getValueText(IPJob job, int taskID) {
-		return variableManager.getValueText(job, taskID);
+		return variableManager.getResultDisplay(job, getCurrentSetId(), taskID);
 	}
 	
 	private void defaultRegister(IPCDISession session) { // register process 0 if the preference is checked
@@ -153,8 +151,6 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		return job.isDebug();
 	}
 	public boolean isRunning(IPJob job) {
-		if (job == null)
-			return false;
 		return (job != null && !job.isAllStop());
 	}
 	public boolean isRunning(String job_id) {
@@ -323,7 +319,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		removeConsoleWindow(proc);
 	}
 	public void unregisterElements(IElement[] elements) throws CoreException {
-		IPJob job = findJobById(getCurrentJobId());
+		IPJob job = getCurrentJob();
 		if (job == null)
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No job found", null));
 		IPCDISession session = getDebugSession(job);
@@ -339,7 +335,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		}
 	}
 	public void registerElements(IElement[] elements) throws CoreException {
-		IPJob job = findJobById(getCurrentJobId());
+		IPJob job = getCurrentJob();
 		if (job == null)
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No job found", null));
 		IPCDISession session = getDebugSession(job);
@@ -758,19 +754,19 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	}
 	
 	public void cleanupDebugVariables(final IPJob job) {
-		variableManager.cleanVariables(job);
+		variableManager.cleanVariableResults(job);
 	}
 	public void updateDebugVariables() {
-		updateDebugVariables(findJobById(getCurrentJobId()));
+		updateDebugVariables(getCurrentJob());
 	}
 	public void updateDebugVariables(final IPJob pJob) {
-		if (variableManager.hasVariable()) {
+		if (variableManager.hasVariable(pJob)) {
 			if (PTPDebugUIPlugin.getDefault().getPreferenceStore().getBoolean(IPDebugConstants.PREF_UPDATE_VARIABLES)) {
 				final Job job = new Job(UIMessage.REFRESH_SYSTEM_JOB_NAME) {
 					public IStatus run(final IProgressMonitor monitor) {
 						if (!monitor.isCanceled()) {
 							try {
-								variableManager.updateVariables(pJob, getCurrentSetId(), monitor);
+								variableManager.updateVariableResults(pJob, getCurrentSetId(), monitor);
 							} catch (CoreException e) {
 								return e.getStatus();
 							}
@@ -779,12 +775,13 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 					}
 				};
 				job.setPriority(Job.INTERACTIVE);
+				
 				PTPDebugUIPlugin.getDisplay().asyncExec(new Runnable() {
 					public void run() {
-						PlatformUI.getWorkbench().getProgressService().showInDialog(PTPDebugUIPlugin.getActiveWorkbenchShell(), job);
+						PlatformUI.getWorkbench().getProgressService().showInDialog(null, job);
+						job.schedule();
 					}
 				});
-				job.schedule();
 			}
 		}
 	}
