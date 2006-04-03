@@ -27,14 +27,20 @@ import org.eclipse.ptp.core.IPJob;
  * 
  */
 public interface IPVariableManager {
-	public void addVariable(String variable_name);
-	public void removeVariable(String variable_name);
-	public String[] getVariables();
-	public void removeAllVariables();
 	public void shutdown();
-	public String getValueText(IPJob job, int taskID);
-	public void cleanVariables(IPJob job);
-	public void updateVariables(IPJob job, String set_id, IProgressMonitor monitor) throws CoreException;
-	public boolean hasVariable();
+	public void addVariable(IPJob job, String set_id, String variable, IProgressMonitor monitor) throws CoreException;
+	public void removeVariable(IPJob job, String variable, IProgressMonitor monitor) throws CoreException;
+	public void removeAllVariables(IPJob job);
+	public boolean hasVariable(IPJob job);
+	public String[] getVariables(IPJob job);
+	public void updateVariableResults(IPJob job, String set_id, IProgressMonitor monitor) throws CoreException;
+	public String getResultDisplay(IPJob job, String set_id, int taskID);
+	public void cleanVariableResults(IPJob job);
+	public void addListener(IPVariableListener listener);
+	public void removeListener(IPVariableListener listener);
+
+	public interface IPVariableListener {
+		public void update(IPJob job);
+	}
 }
 
