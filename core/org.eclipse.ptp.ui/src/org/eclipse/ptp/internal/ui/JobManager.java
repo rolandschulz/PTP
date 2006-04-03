@@ -84,12 +84,16 @@ public class JobManager extends AbstractUIManager implements IProcessListener {
 		}
 		return universe.getSortedJobs();
 	}
+	public IPJob getCurrentJob() {
+		return findJobById(getCurrentJobId());
+	}
 	public String getCurrentJobId() {
 		return cur_job_id;
 	}
 	public void setCurrentJobId(String job_id) {
-		fireJobChangeEvent(job_id, cur_job_id);
-		cur_job_id = job_id;
+		String tmp_jod_id = cur_job_id;
+		cur_job_id = job_id;		
+		fireJobChangeEvent(job_id, tmp_jod_id);
 	}
 	public String getCurrentSetId() {
 		return cur_set_id;

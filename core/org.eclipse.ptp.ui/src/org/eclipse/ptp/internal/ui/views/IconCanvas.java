@@ -115,14 +115,8 @@ public class IconCanvas extends Canvas {
 	protected boolean displayRuler = true;
 	private final int DEFAULT_OFFSET = 5;
 	// tooltip
-	//TODO
-	//protected IconViewerInformation viewerInformation = null;
 	private IconHover iconHover = new IconHover();
 	private IIconInformationControl fInformationControl = null; 
-	//protected Shell toolTipShell = null;
-	//protected Label toolTipLabel = null;
-	//protected Color tooltip_color_bg = null;
-	//protected Color tooltip_color_fg = null;	
 	protected long tooltip_timeout = 10000;
 	protected boolean show_tooltip_allthetime = false;
 	private Timer hoverTimer = null;
@@ -150,11 +144,7 @@ public class IconCanvas extends Canvas {
 		initializeAccessible();
 		sel_color = display.getSystemColor(SWT.COLOR_RED);
 		margin_color = display.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
-		//viewerInformation = new IconViewerInformation(getShell(), SWT.READ_ONLY);
-		//TODO
-		//tooltip_color_fg = display.getSystemColor(SWT.COLOR_INFO_FOREGROUND);
-		//tooltip_color_bg = display.getSystemColor(SWT.COLOR_INFO_BACKGROUND);
-	
+
 		changeFontSize(display);
 		super.setBackground(getBackground());
 		super.setForeground(getForeground());
@@ -587,6 +577,7 @@ public class IconCanvas extends Canvas {
 		addListener(SWT.MouseUp, listener);
 		addListener(SWT.MouseDoubleClick, listener);
 		addListener(SWT.MouseMove, listener);
+		//addListener(SWT.MouseHover, listener);
 		addListener(SWT.Paint, listener);
 		addListener(SWT.Resize, listener);
 		addListener(SWT.FocusOut, listener);
@@ -1361,13 +1352,14 @@ public class IconCanvas extends Canvas {
 		}
 	}
 	
+	long last_mouse_move_time = 0;
 	protected void doMouseMoving(Event event) {
 		int index = findSelectedIndexByLocation(event.x, event.y, false);
 		if (index > -1) {
 			setCursor(new Cursor(getDisplay(), SWT.CURSOR_HAND));
-			showToolTip(index, event.x, event.y);
-			//TODO
-			//if (toolTipShell != null) {
+			if (fInformationControl == null)
+				showToolTip(index, event);
+			
 			if (!show_tooltip_allthetime && fInformationControl != null) {
 				getHoverTimer().schedule(new TimerTask() {
 					public void run() {
@@ -1385,15 +1377,6 @@ public class IconCanvas extends Canvas {
 		}
 	}
 	protected void hideToolTip() {
-		/*
-		if (toolTipShell != null) {
-			toolTipLabel.dispose();
-			toolTipShell.dispose();
-			toolTipLabel = null;
-			toolTipShell = null;
-		}
-		*/
-		//TODO
 		if (fInformationControl != null) {
 			fInformationControl.setVisible(false);
 			fInformationControl.dispose();
@@ -1562,77 +1545,47 @@ public class IconCanvas extends Canvas {
 			calculateTopIndex();
 	}
 	protected void handleFocusOut(Event event) {
-		hideToolTip();
+		//hideToolTip();
 	}
-	protected void showToolTip(int index, int mx, int my) {
-		/*
-		if (toolTipProvider == null || index == -1) {
-			hideToolTip();
-			return;
-		}
-		if (toolTipShell == null) {
-			toolTipShell = new Shell(getShell(), SWT.ON_TOP | SWT.TOOL);
-			toolTipLabel = new Label(toolTipShell, SWT.LEFT);
-			toolTipLabel.setForeground(tooltip_color_fg);
-			toolTipLabel.setBackground(tooltip_color_bg);
-		}
-		toolTipLabel.setText(getToolTipText(getObject(index)));
-		Point l_size = toolTipLabel.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-		l_size.x += 2;
-		l_size.y += 2;
-		toolTipLabel.setSize(l_size);
-		toolTipShell.pack();
-		Rectangle area = toolTipShell.getClientArea();
-		toolTipLabel.setSize(area.width, area.height);
-		// Find out the location to display tooltip
-		Point location = findLocation(index);
-		Point t_size = toolTipShell.getSize();
-		Rectangle clientArea = getClientArea();
-		final int gap_x = 5;
-		int display_x = location.x + getElementWidth() + gap_x;
-		int display_y = location.y + getElementHeight();
-		if (display_x + t_size.x > clientArea.width) {
-			int lx = location.x - t_size.x - gap_x;
-			if (lx > 0)
-				display_x = lx; 
-		}
-		if (display_y > clientArea.height - e_offset_y) {
-			display_y = location.y - t_size.y;
-		}
-		toolTipShell.setLocation(getViewActualLocation(this, null, display_x, display_y));
-		toolTipShell.setVisible(true);
-		*/
-		//TODO
+	protected void showToolTip(int index, Event event) {
 		if (index == -1) {
 			hideToolTip();
 			return;
 		}
+		boolean isShift = (event.stateMask & SWT.MOD2) != 0;
+		boolean isCtrl = (event.stateMask & SWT.MOD1) != 0;
 		String[] tooltipTexts = getToolTipText(getObject(index));
-		IIconInformationControl informationControl= getInformationControl((tooltipTexts.length>1));
+		boolean showExtra = (!isShift && !isCtrl && (tooltipTexts.length>1));
+		IIconInformationControl informationControl= getInformationControl(showExtra);
 		if (informationControl != null) {
 			Rectangle clientArea = getClientArea();
-			informationControl.setSizeConstraints(clientArea.width, clientArea.height);
+			//informationControl.setSizeConstraints(clientArea.width, clientArea.height);
 			informationControl.setHeader(tooltipTexts[0]);
-			if (tooltipTexts.length > 1) {
+			if (showExtra) {
 				informationControl.setInformation(tooltipTexts[1]);
 			}
 			Point location = findLocation(index);
-			Point t_size = informationControl.computeSizeHint();
-			final int gap_x = 2;
-			int display_x = location.x + getElementWidth() + gap_x;
-			int display_y = location.y + getElementHeight();
+			Point t_size = informationControl.getShellSize();
+			
+			final int x_gap = getElementWidth()/2;
+			final int y_gap = showExtra?(getElementHeight()* 1/2):getElementHeight();
+			
+			int display_x = location.x + x_gap;
+			int display_y = location.y + y_gap;
 			if (display_x + t_size.x > clientArea.width) {
-				int lx = location.x - t_size.x - gap_x;
+				int lx = location.x - t_size.x + x_gap;
 				if (lx > 0)
 					display_x = lx; 
 			}
-			if (display_y > clientArea.height - e_offset_y) {
-				display_y = location.y - t_size.y;
+			if (display_y + t_size.y > clientArea.height) {
+				int ly = location.y - t_size.y + y_gap;
+				if (ly > 0)
+					display_y = ly;
 			}
 			Point real_location = getViewActualLocation(this, null, display_x, display_y);
-			informationControl.setSize(t_size.x, t_size.y);
 			informationControl.setLocation(real_location);
 			informationControl.setVisible(true);
+			informationControl.setFocus();
 		}
 	}
 	protected Point getViewActualLocation(Control from, Control to, int mx, int my) {
@@ -1675,7 +1628,7 @@ public class IconCanvas extends Canvas {
 	 * Self testing
 	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
 	public static void main(String[] args) {
-		final int totalImage = 100;
+		final int totalImage = 500;
         final Display display = new Display();
         final Shell shell = new Shell(display);
         shell.setLocation(0, 0);
@@ -1717,9 +1670,20 @@ public class IconCanvas extends Canvas {
         });
         iconCanvas.setToolTipProvider(new IToolTipProvider() {
         	public String[] toolTipText(Object obj) {
+        		if (obj.toString().indexOf("1") > -1) {
+        			return new String[] { ("Object: " + obj) };
+        		}
         		String[] texts = new String[2];
         		String contentText = "<u>Variables</u><br>";
         		contentText += "<ind>abc: <key>PrintStream</key><br>";
+        		contentText += "<ind><hl>hhhhhhh hhhhhhhhhhhh hhhhhhhhhhhhhhhhh hhhhhhhhhhhhh hhhhhhhhhh:</hl> PrintStream<br>";
+        		contentText += "<ind><hl>aasdbc:</hl> PrintStream<br>";
+        		contentText += "<ind><hl>aasdbc:</hl> PrintStream<br>";
+        		contentText += "<ind><hl>aasdbc:</hl> PrintStream<br>";
+        		contentText += "<ind><hl>aasdbc:</hl> PrintStream<br>";
+        		contentText += "<ind><hl>aasdbc:</hl> PrintStream<br>";
+        		contentText += "<ind><hl>aasdbc:</hl> PrintStream<br>";
+        		contentText += "<ind><hl>aasdbc:</hl> PrintStream<br>";
         		contentText += "<ind><hl>aasdbc:</hl> PrintStream<br>";
         		contentText += "<ind><i>ab99213 32c:</i> PrintStream<br>";
         		texts[0] = "Object: " + obj;
