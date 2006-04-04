@@ -101,10 +101,16 @@ public class PDebugUIUtils {
 		}
 		return msg;
 	}
+	
+	static public String showBitList(BitList tasks) {
+		if (tasks == null) {
+			return "";
+		}
+		return arrayToString(tasks.toArray());
+	}
 	//self testing
 	public static void main(String[] args) {
 		BitList tasks = new BitList(0);
-		int[] array = { 1, 2, 4, 5, 6, 8, 9, 10 };
-		System.out.println(arrayToString(tasks.toArray()));
+		System.out.println(showBitList(tasks));
 	}
 }

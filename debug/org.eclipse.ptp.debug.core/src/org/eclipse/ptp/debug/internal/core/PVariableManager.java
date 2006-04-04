@@ -25,9 +25,12 @@ import java.util.List;
 import java.util.Map;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.PCDIDebugModel;
+import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.aif.AIFException;
 import org.eclipse.ptp.debug.core.aif.IAIF;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
@@ -145,15 +148,19 @@ public class PVariableManager implements IPVariableManager {
 			monitor.beginTask("Updating variables info...", (tasks.length * vars.length) + 1);
 			for (int i=0; i<tasks.length; i++) {
 				if (!monitor.isCanceled()) {
-					jobVar.setResult(getValue(session, tasks[i], monitor, vars), tasks[i]);
-					monitor.worked(1);
+					try {
+						jobVar.setResult(getValue(session, tasks[i], monitor, vars), tasks[i]);
+						monitor.worked(1);
+					} catch (PCDIException e) {
+						throw new CoreException(new Status(IStatus.ERROR, PTPDebugCorePlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));
+					}
 				}
 			}
 		}
 		monitor.done();
 	}
 	
-	public String getResultDisplay(IPJob job, String set_id, int taskID) {
+	public String getResultDisplay(IPJob job, int taskID) {
 		JobVariable jobVar = getJobVariable(job);
 		if (jobVar == null || !jobVar.hasMore()) {
 			return "";
@@ -162,7 +169,6 @@ public class PVariableManager implements IPVariableManager {
 		String[] values = jobVar.getResult(taskID);
 		String display = "";
 		if (values.length > 0) {
-			display += "<u>Set: " + set_id + "</u><br>";
 			String[] vars = jobVar.getVariables();
 			for (int i=0; i<values.length; i++) {
 				display += "<i>" + vars[i] + ":</i> ";
@@ -172,7 +178,7 @@ public class PVariableManager implements IPVariableManager {
 		return display;
 	}
 	
-	private String[] getValue(IPCDISession session, int taskID, IProgressMonitor monitor, String[] vars) {
+	private String[] getValue(IPCDISession session, int taskID, IProgressMonitor monitor, String[] vars) throws PCDIException {
 		String[] values = new String[vars.length];
 		for (int i=0; i<vars.length; i++) {			
 			try {
@@ -183,8 +189,6 @@ public class PVariableManager implements IPVariableManager {
 				else {
 					values[i] = aif.getValue().getValueString();
 				}
-			} catch (PCDIException e) {
-				values[i] = VALUE_UNKNOWN;
 			} catch (AIFException e) {
 				values[i] = VALUE_UNKNOWN;
 			} finally {

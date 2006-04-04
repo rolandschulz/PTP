@@ -52,18 +52,20 @@ public abstract class AbstractEvent implements IPCDIEvent {
 		return session.getJob();
 	}
 	public BitList getAllProcesses() {
+		if (tasks != null)
+			return tasks.copy();
 		return tasks;
 	}
 	public BitList getAllUnregisteredProcesses() {
 		BitList regTasks = session.getRegisteredTargets();
-		BitList orgTasks = tasks.copy();
+		BitList orgTasks = getAllProcesses();
 		orgTasks.andNot(regTasks);
 		return orgTasks;
 	}
 
 	public BitList getAllRegisteredProcesses() {
 		BitList regTasks = session.getRegisteredTargets();
-		BitList orgTasks = tasks.copy();
+		BitList orgTasks = getAllProcesses();
 		orgTasks.and(regTasks);
 		return orgTasks;
 	}

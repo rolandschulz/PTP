@@ -68,7 +68,7 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 	public void setReturn(BitList tasks, Object result) {
 		synchronized (lock) {
 			this.result = result;
-			if (tasks != null) {
+			if (tasks != null && !tasks.isEmpty()) {
 				this.tasks = tasks;
 			}
 			lock.notifyAll();
@@ -92,7 +92,7 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 						if (isFlush)
 							return false;
 						
-						throw new PCDIException("Time out - Command: " + getName());
+						throw new PCDIException("Time out - Command " + getName());
 					}
 					else {
 						if (getReturn() instanceof PCDIException) {

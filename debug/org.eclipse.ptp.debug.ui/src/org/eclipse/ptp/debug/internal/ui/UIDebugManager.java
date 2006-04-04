@@ -78,6 +78,7 @@ import org.eclipse.ptp.debug.external.core.cdi.event.BreakpointCreatedEvent;
 import org.eclipse.ptp.debug.external.core.cdi.event.BreakpointHitEvent;
 import org.eclipse.ptp.debug.external.core.cdi.event.EndSteppingRangeEvent;
 import org.eclipse.ptp.debug.external.core.cdi.event.InferiorSignaledEvent;
+import org.eclipse.ptp.debug.internal.ui.actions.UpdateVariablesActionDelegate;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.debug.ui.events.IDebugActionEvent;
 import org.eclipse.ptp.debug.ui.events.ResumedDebugEvent;
@@ -87,7 +88,6 @@ import org.eclipse.ptp.debug.ui.listeners.IDebugActionUpdateListener;
 import org.eclipse.ptp.debug.ui.listeners.IRegListener;
 import org.eclipse.ptp.internal.ui.JobManager;
 import org.eclipse.ptp.ui.OutputConsole;
-import org.eclipse.ptp.ui.UIMessage;
 import org.eclipse.ptp.ui.UIUtils;
 import org.eclipse.ptp.ui.listeners.ISetListener;
 import org.eclipse.ptp.ui.model.IElement;
@@ -130,7 +130,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		return variableManager;
 	}
 	public String getValueText(IPJob job, int taskID) {
-		return variableManager.getResultDisplay(job, getCurrentSetId(), taskID);
+		return variableManager.getResultDisplay(job, taskID);
 	}
 	
 	private void defaultRegister(IPCDISession session) { // register process 0 if the preference is checked
@@ -596,7 +596,6 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			} else if (event instanceof IPCDIResumedEvent) {
 				removeAnnotation(job.getIDString(), event.getAllProcesses());
 				// System.out.println("-------------------- resume ------------------------");
-				// annotationMgr.printBitList(event.getAllProcesses().toBitList());
 				cleanupDebugVariables(job);
 				fireResumeEvent(job, event.getAllProcesses());
 			} else if (event instanceof IPCDIDebugExitedEvent) {
@@ -619,7 +618,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 				PTPDebugUIPlugin.getDisplay().asyncExec(new Runnable() {
 					public void run() {
 						IPCDIErrorInfo info = (IPCDIErrorInfo)errEvent.getReason();
-						PTPDebugUIPlugin.errorDialog("Error", new Exception(info.getMessage() + " on tasks: "+ PDebugUIUtils.arrayToString(errEvent.getAllProcesses().toArray())));
+						PTPDebugUIPlugin.errorDialog("Error", new Exception(info.getMessage() + " on tasks: "+ PDebugUIUtils.showBitList(errEvent.getAllProcesses())));
 					}
 				});
 				cleanupDebugVariables(job);
@@ -633,7 +632,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	private void removeAnnotation(String job_id, BitList tasks) {
 		try {
 			annotationMgr.removeAnnotation(job_id, tasks);
-			System.err.println("--- TESTING remove annotation of processes in this event: " + PDebugUIUtils.arrayToString(tasks.toArray()));
+			System.err.println("--- TESTING remove annotation of processes in this event: " + PDebugUIUtils.showBitList(tasks));
 		} catch (final CoreException e) {
 			PTPDebugUIPlugin.getDisplay().asyncExec(new Runnable() {
 				public void run() {
@@ -756,9 +755,18 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	public void cleanupDebugVariables(final IPJob job) {
 		variableManager.cleanVariableResults(job);
 	}
-	public void updateDebugVariables() {
-		updateDebugVariables(getCurrentJob());
+	public void updateDebugVariables(IPJob job) {
+		if (getCurrentJob().equals(job)) {
+			if (variableManager.hasVariable(job)) {
+				PTPDebugUIPlugin.getDisplay().asyncExec(new Runnable() {
+					public void run() {
+						UpdateVariablesActionDelegate.doAction(null);
+					}
+				});
+			}
+		}
 	}
+	/*
 	public void updateDebugVariables(final IPJob pJob) {
 		if (variableManager.hasVariable(pJob)) {
 			if (PTPDebugUIPlugin.getDefault().getPreferenceStore().getBoolean(IPDebugConstants.PREF_UPDATE_VARIABLES)) {
@@ -785,4 +793,5 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			}
 		}
 	}
+	*/
 }
