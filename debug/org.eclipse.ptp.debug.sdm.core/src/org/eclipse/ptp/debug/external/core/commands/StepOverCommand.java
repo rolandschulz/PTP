@@ -44,6 +44,6 @@ public class StepOverCommand extends AbstractDebugCommand {
 		}
 	}
 	public String getName() {
-		return "Steo over"; 
+		return "Step over"; 
 	}
 }

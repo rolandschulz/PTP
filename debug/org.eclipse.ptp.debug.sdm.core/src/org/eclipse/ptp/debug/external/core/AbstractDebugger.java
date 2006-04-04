@@ -156,8 +156,8 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		if (event != null) {
 			//FIXME - add item here or??
 			eventQueue.addItem(event);
-			System.out.println("    --- Abs debugger: " + event);
 			BitList tasks = event.getAllProcesses();
+			System.out.println("***** Debugger event: " + event/* + " for tasks: " + showBitList(tasks)*/);
 			if (event instanceof IPCDIExitedEvent) {
 				setJobFinished(tasks, IPProcess.EXITED);
 			} else if (event instanceof IPCDIResumedEvent) {
@@ -189,9 +189,9 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 				}
 			}
 		}
-	}
+	}	
 	private void setJobFinished(BitList tasks, String status) {
-		if (tasks == null) {
+		if (tasks == null || tasks.isEmpty()) {
 			tasks = session.createBitList();
 		}
 		setSuspendTasks(false, tasks);
@@ -242,8 +242,8 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		fireEvent(new InferiorSignaledEvent(getSession(), tasks, locator, thread_id));
 	}
 	public void handleErrorEvent(BitList tasks, String errMsg, int errCode) {
-		System.err.println("----- debugger error: " + errMsg + " ------------");
-		if (tasks == null || tasks.cardinality() == 0 || errCode == IPCDIErrorEvent.DBG_FATAL) {
+		System.err.println("----- debugger error: " + errMsg + " on Tasks: " + showBitList(tasks) +" ------------");
+		if (tasks == null || tasks.isEmpty() || errCode == IPCDIErrorEvent.DBG_FATAL) {
 			tasks = ((Session)session).createBitList();
 		}
 		fireEvent(new ErrorEvent(getSession(), tasks, errMsg, errCode));
@@ -274,7 +274,7 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		return tasks;
 	}
 	public BitList filterTerminateTasks(BitList tasks) {//get not terminate tasks
-		removeTasks(tasks, (BitList) job.getAttribute(TERMINATED_PROC_KEY));
+		removeTasks(tasks, (BitList) job.getAttribute(TERMINATED_PROC_KEY));		
 		return tasks;
 	}
 	public boolean isJobFinished() {
@@ -308,4 +308,35 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		else
 			removeTasks(suspendedTasks, tasks);
 	}	
+
+	public String showBitList(BitList tasks) {
+		if (tasks == null) {
+			return "";
+		}
+		int[] array = tasks.toArray();
+		if (array.length == 0)
+			return "";
+		
+		String msg = "";
+		int preTask = array[0];
+		msg += preTask;
+		boolean isContinue = false;
+		for (int i = 1; i < array.length; i++) {
+			if (preTask == (array[i] - 1)) {
+				preTask = array[i];
+				isContinue = true;
+				if (i == (array.length - 1)) {
+					msg += "-" + array[i];
+					break;
+				}
+				continue;
+			}
+			if (isContinue)
+				msg += "-" + preTask;
+			msg += "," + array[i];
+			isContinue = false;
+			preTask = array[i];
+		}
+		return msg;
+	}
 }

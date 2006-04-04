@@ -506,8 +506,10 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 		case IProxyDebugEvent.EVENT_DBG_ERROR:
 			System.err.println("======================= EVENT_DBG_ERROR ====================");
 			ProxyDebugErrorEvent errEvent = (ProxyDebugErrorEvent)e;
-			completeCommand(e.getBitSet(), new PCDIException(errEvent.getErrorMessage(), getErrorCode(errEvent.getErrorCode())));
-			//handleErrorEvent(e.getBitSet(), errEvent.getErrorMessage(), code);
+			String errMsg = errEvent.getErrorMessage();
+			if (errMsg == null || errMsg.length() ==0)
+				errMsg = "Unknown Error";
+			completeCommand(e.getBitSet(), new PCDIException(errMsg, getErrorCode(errEvent.getErrorCode())));
 			break;
 		}
 	}

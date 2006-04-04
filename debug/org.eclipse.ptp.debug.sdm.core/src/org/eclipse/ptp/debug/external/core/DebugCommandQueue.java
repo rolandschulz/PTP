@@ -46,18 +46,19 @@ public class DebugCommandQueue extends Thread {
 		isTerminated = true;
 		cleanup();
 	}
-	
+		
 	public void run()  {
 		while (!isTerminated) {
 			if (!waitForCommand()) {
 				break;
 			}
-			currentCommand = getCommand();
 			try {
-				System.out.println("***** CURRENT COMMAND: " + currentCommand);
+				currentCommand = getCommand();
+				System.err.println("*** SEND COMMAND: " + currentCommand.getName() + ", tasks: " + debugger.showBitList(currentCommand.getTasks()));
 				currentCommand.execCommand(debugger, command_timeout);
 				currentCommand.waitForReturn();
 			} catch (PCDIException e) {
+				//System.err.println("----ERROR COMMAND: " + currentCommand.getName() + ", task: " + debugger.showBitList(currentCommand.getTasks()));
 				debugger.handleErrorEvent(currentCommand.getTasks(), e.getMessage(), e.getErrorCode());
 			} finally {
 				currentCommand = null;
@@ -77,9 +78,13 @@ public class DebugCommandQueue extends Thread {
 		}
 	}
 
-	public IDebugCommand getCommand() {
+	public IDebugCommand getCommand() throws PCDIException {
 		synchronized (queue) {
-			return (IDebugCommand)queue.remove(0);
+			IDebugCommand command = (IDebugCommand)queue.remove(0);
+			if (command == null)
+				throw new PCDIException("No DebugCommand found");
+			
+			return command;
 		}
 	}
 	public void addCommand(IDebugCommand command) {
