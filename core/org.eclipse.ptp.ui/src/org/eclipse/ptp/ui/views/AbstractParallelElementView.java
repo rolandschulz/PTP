@@ -239,7 +239,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 					IPreferenceStore store = PTPUIPlugin.getDefault().getPreferenceStore();
 					canvas.setIconSpace(store.getInt(IPTPUIConstants.VIEW_ICON_SPACING_X), store.getInt(IPTPUIConstants.VIEW_ICON_SPACING_Y));
 					canvas.setIconSize(store.getInt(IPTPUIConstants.VIEW_ICON_WIDTH), store.getInt(IPTPUIConstants.VIEW_ICON_HEIGHT));
-					canvas.setTooltipTimeout(store.getLong(IPTPUIConstants.VIEW_TOOLTIP));
+					canvas.setTooltip(store.getBoolean(IPTPUIConstants.VIEW_TOOLTIP_SHOWALLTIME), store.getLong(IPTPUIConstants.VIEW_TOOLTIP_TIMEOUT), store.getBoolean(IPTPUIConstants.VIEW_TOOLTIP_ISWRAP));
 					canvas.resetCanvas();
 				}
 				updateView(null);

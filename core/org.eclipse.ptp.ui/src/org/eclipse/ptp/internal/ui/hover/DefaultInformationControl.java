@@ -222,10 +222,12 @@ public class DefaultInformationControl implements IIconInformationControl, Dispo
 	public void setSize(int width, int height) {
 		int new_width = showDetails?(width + 75):width;
 		if (width > SHELL_DEFAULT_WIDTH || height > SHELL_DEFAULT_HEIGHT) {
-			sc.setMinSize(SHELL_DEFAULT_WIDTH, height);
+			sc.setMinSize(width, height);
 			sc.getHorizontalBar().setVisible(width > SHELL_DEFAULT_WIDTH);
 			sc.getVerticalBar().setVisible(height > SHELL_DEFAULT_HEIGHT);
-			fShell.setSize(width>SHELL_DEFAULT_WIDTH?SHELL_DEFAULT_WIDTH:new_width, height>SHELL_DEFAULT_HEIGHT?SHELL_DEFAULT_HEIGHT:height);
+			new_width = (width>SHELL_DEFAULT_WIDTH?SHELL_DEFAULT_WIDTH:new_width);
+			int new_height = (height>SHELL_DEFAULT_HEIGHT?SHELL_DEFAULT_HEIGHT:(width>SHELL_DEFAULT_WIDTH?(sc.getHorizontalBar().getSize().y+height):height));
+			fShell.setSize(new_width+10, new_height+10);
 		}
 		else {
 			sc.setAlwaysShowScrollBars(false);
@@ -259,9 +261,11 @@ public class DefaultInformationControl implements IIconInformationControl, Dispo
 		return fText.isFocusControl();
 	}
 	public void setFocus() {
-		fShell.forceFocus();
-		if (fText != null) {
-			fText.setFocus();
+		if (showDetails) {
+			fShell.forceFocus();
+			if (fText != null) {
+				fText.setFocus();
+			}
 		}
 	}
 	public void addFocusListener(FocusListener listener) {

@@ -24,8 +24,11 @@ import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -36,13 +39,15 @@ import org.eclipse.swt.widgets.Text;
  * 
  */
 public class PTPViewerPreferencesPage extends AbstractPerferencePage {
-	private IconIntFieldEditor iconSpacingXField = null;
-	private IconIntFieldEditor iconSpacingYField = null;
-	private IconIntFieldEditor iconWidthField = null;
-	private IconIntFieldEditor iconHeightField = null;
-	private IconIntFieldEditor toolTipField = null;
+	private ViewIntFieldEditor iconSpacingXField = null;
+	private ViewIntFieldEditor iconSpacingYField = null;
+	private ViewIntFieldEditor iconWidthField = null;
+	private ViewIntFieldEditor iconHeightField = null;
+	private ViewIntFieldEditor toolTipField = null;
+	private Button tooltipIsWrapButton = null;
+	private Button tooltipShowAllTimeButton = null;
 	
-	private class IconIntFieldEditor {
+	private class ViewIntFieldEditor {
 		private int textLimit = 5;
 		private String labelText = null;
 		private int min = 0;
@@ -50,7 +55,7 @@ public class PTPViewerPreferencesPage extends AbstractPerferencePage {
 		private Text textField = null;		
 		private String msg = "";
 		
-		IconIntFieldEditor(String labelText, int min, int max, Composite parent) {
+		ViewIntFieldEditor(String labelText, int min, int max, Composite parent) {
 			this.labelText = labelText;
 			this.min = min;
 			this.max = max;
@@ -73,6 +78,11 @@ public class PTPViewerPreferencesPage extends AbstractPerferencePage {
         	});
 			
 			new Label(parent, SWT.RIGHT).setText("(" + min + "-" + max + ")");
+		}
+		public void setEnabled(boolean isEnable) {
+			if (textField != null) {
+				textField.setEnabled(isEnable);
+			}
 		}
 	    public void setValue(int value) {
 	        if (textField != null) {
@@ -131,18 +141,34 @@ public class PTPViewerPreferencesPage extends AbstractPerferencePage {
 		setValues();
 		return composite;
 	}
-	protected void createViewSettingPreferences(Composite parent) {
+	protected void createTooltipGroup(Composite parent) {
+		Composite group = createGroupComposite(parent, 1, false, PreferenceMessages.getString("PTPViewerPreferencesPage.tooltipName"));
+		Composite compTooltip = createComposite(group, 1);
+
+		tooltipShowAllTimeButton = createCheckButton(compTooltip, PreferenceMessages.getString("PTPViewerPreferencesPage.tooltip_showAllTime"));
+		tooltipShowAllTimeButton.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				toolTipField.setEnabled(!tooltipShowAllTimeButton.getSelection());
+				if (tooltipShowAllTimeButton.getSelection())
+					toolTipField.setValue((int)getPreferenceStore().getDefaultLong(IPTPUIConstants.VIEW_TOOLTIP_TIMEOUT));
+			}
+		});
+		toolTipField = new ViewIntFieldEditor(PreferenceMessages.getString("PTPViewerPreferencesPage.tooltip_timeout"), 1000, 10000, createComposite(compTooltip, 3));
+		tooltipIsWrapButton = createCheckButton(compTooltip, PreferenceMessages.getString("PTPViewerPreferencesPage.tooltip_iswrap"));
+	}
+	protected void createIconGroup(Composite parent) {
 		Composite group = createGroupComposite(parent, 1, false, PreferenceMessages.getString("PTPViewerPreferencesPage.iconName"));
 		Composite compIcon = createComposite(group, 3);
 
-		iconSpacingXField = new IconIntFieldEditor(PreferenceMessages.getString("PTPViewerPreferencesPage.icon_spacing_x"), 1, 10, compIcon);
-		iconSpacingYField = new IconIntFieldEditor(PreferenceMessages.getString("PTPViewerPreferencesPage.icon_spacing_y"), 1, 10, compIcon);
+		iconSpacingXField = new ViewIntFieldEditor(PreferenceMessages.getString("PTPViewerPreferencesPage.icon_spacing_x"), 1, 10, compIcon);
+		iconSpacingYField = new ViewIntFieldEditor(PreferenceMessages.getString("PTPViewerPreferencesPage.icon_spacing_y"), 1, 10, compIcon);
 
-		iconWidthField = new IconIntFieldEditor(PreferenceMessages.getString("PTPViewerPreferencesPage.icon_width"), 12, 100, compIcon);
-		iconHeightField = new IconIntFieldEditor(PreferenceMessages.getString("PTPViewerPreferencesPage.icon_height"), 12, 100, compIcon);
-		
-		Composite compToolTip = createComposite(parent, 3);
-		toolTipField = new IconIntFieldEditor(PreferenceMessages.getString("PTPViewerPreferencesPage.tooltip"), 1000, 10000, compToolTip);
+		iconWidthField = new ViewIntFieldEditor(PreferenceMessages.getString("PTPViewerPreferencesPage.icon_width"), 12, 100, compIcon);
+		iconHeightField = new ViewIntFieldEditor(PreferenceMessages.getString("PTPViewerPreferencesPage.icon_height"), 12, 100, compIcon);		
+	}
+	protected void createViewSettingPreferences(Composite parent) {
+		createIconGroup(parent);
+		createTooltipGroup(parent);
 	}
 	public void performDefaults() { 
 		IPreferenceStore store = getPreferenceStore();
@@ -150,7 +176,9 @@ public class PTPViewerPreferencesPage extends AbstractPerferencePage {
 		iconSpacingYField.setValue(store.getDefaultInt(IPTPUIConstants.VIEW_ICON_SPACING_Y));
 		iconWidthField.setValue(store.getDefaultInt(IPTPUIConstants.VIEW_ICON_WIDTH));
 		iconHeightField.setValue(store.getDefaultInt(IPTPUIConstants.VIEW_ICON_HEIGHT));
-		toolTipField.setValue((int)store.getDefaultLong(IPTPUIConstants.VIEW_TOOLTIP));
+		toolTipField.setValue((int)store.getDefaultLong(IPTPUIConstants.VIEW_TOOLTIP_TIMEOUT));
+		tooltipIsWrapButton.setSelection(store.getDefaultBoolean(IPTPUIConstants.VIEW_TOOLTIP_ISWRAP));
+		tooltipShowAllTimeButton.setSelection(store.getDefaultBoolean(IPTPUIConstants.VIEW_TOOLTIP_SHOWALLTIME));
 		super.performDefaults();
 	}
 	public boolean performOk() {
@@ -166,7 +194,9 @@ public class PTPViewerPreferencesPage extends AbstractPerferencePage {
 		iconSpacingYField.setValue(store.getInt(IPTPUIConstants.VIEW_ICON_SPACING_Y));
 		iconWidthField.setValue(store.getInt(IPTPUIConstants.VIEW_ICON_WIDTH));
 		iconHeightField.setValue(store.getInt(IPTPUIConstants.VIEW_ICON_HEIGHT));
-		toolTipField.setValue((int)store.getLong(IPTPUIConstants.VIEW_TOOLTIP));
+		toolTipField.setValue((int)store.getLong(IPTPUIConstants.VIEW_TOOLTIP_TIMEOUT));
+		tooltipIsWrapButton.setSelection(store.getBoolean(IPTPUIConstants.VIEW_TOOLTIP_ISWRAP));
+		tooltipShowAllTimeButton.setSelection(store.getBoolean(IPTPUIConstants.VIEW_TOOLTIP_SHOWALLTIME));
 	}
 	protected void storeValues() {
 		IPreferenceStore store = getPreferenceStore();
@@ -174,7 +204,9 @@ public class PTPViewerPreferencesPage extends AbstractPerferencePage {
 		store.setValue(IPTPUIConstants.VIEW_ICON_SPACING_Y, iconSpacingYField.getValue());
 		store.setValue(IPTPUIConstants.VIEW_ICON_WIDTH, iconWidthField.getValue());
 		store.setValue(IPTPUIConstants.VIEW_ICON_HEIGHT, iconHeightField.getValue());
-		store.setValue(IPTPUIConstants.VIEW_TOOLTIP, (long)toolTipField.getValue());
+		store.setValue(IPTPUIConstants.VIEW_TOOLTIP_TIMEOUT, (long)toolTipField.getValue());
+		store.setValue(IPTPUIConstants.VIEW_TOOLTIP_ISWRAP, tooltipIsWrapButton.getSelection());
+		store.setValue(IPTPUIConstants.VIEW_TOOLTIP_SHOWALLTIME, tooltipShowAllTimeButton.getSelection());
 	}
 	
 	public boolean isValid() {
