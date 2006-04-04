@@ -73,7 +73,9 @@ public interface IPTPUIConstants {
 	public static final String VIEW_ICON_SPACING_Y = "icon_spacing_y";
 	public static final String VIEW_ICON_WIDTH = "icon_width";
 	public static final String VIEW_ICON_HEIGHT = "icon_height";
-	public static final String VIEW_TOOLTIP = "tooltip";
+	public static final String VIEW_TOOLTIP_SHOWALLTIME = "tt_show_all_time";
+	public static final String VIEW_TOOLTIP_TIMEOUT = "tt_timeout";
+	public static final String VIEW_TOOLTIP_ISWRAP = "tt_iswap";
 	public static final int DEFAULT_VIEW_ICON_SPACING_X = 4;
 	public static final int DEFAULT_VIEW_ICON_SPACING_Y = 4;
 	public static final int DEFAULT_VIEW_ICON_WIDTH = 16;

@@ -78,8 +78,7 @@ public abstract class AbstractPerferencePage extends PreferencePage implements I
 	protected Button createButton(Composite parent, String label, int type) {
 		Button button = new Button(parent, type);
 		button.setText(label);
-		GridData data = new GridData();
-		button.setLayoutData(data);
+		button.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		return button;
 	}
 	

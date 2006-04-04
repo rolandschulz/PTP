@@ -40,7 +40,7 @@ public class ElementIconCanvas extends IconCanvas {
 		IPreferenceStore store = PTPUIPlugin.getDefault().getPreferenceStore();
 		setIconSpace(store.getInt(IPTPUIConstants.VIEW_ICON_SPACING_X), store.getInt(IPTPUIConstants.VIEW_ICON_SPACING_Y));
 		setIconSize(store.getInt(IPTPUIConstants.VIEW_ICON_WIDTH), store.getInt(IPTPUIConstants.VIEW_ICON_HEIGHT));
-		setTooltipTimeout(store.getLong(IPTPUIConstants.VIEW_TOOLTIP));
+		setTooltip(store.getBoolean(IPTPUIConstants.VIEW_TOOLTIP_SHOWALLTIME), store.getLong(IPTPUIConstants.VIEW_TOOLTIP_TIMEOUT), store.getBoolean(IPTPUIConstants.VIEW_TOOLTIP_ISWRAP));
 	}
 	public void dispose() {
 		super.dispose();

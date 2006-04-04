@@ -120,6 +120,7 @@ public class IconCanvas extends Canvas {
 	protected long tooltip_timeout = 10000;
 	protected boolean show_tooltip_allthetime = false;
 	private Timer hoverTimer = null;
+	protected boolean tooltip_wrap = true; 
 	
 	// input
 	protected int total_elements = 0;
@@ -249,6 +250,11 @@ public class IconCanvas extends Canvas {
 		this.e_height = e_height;
 		this.e_width = e_width;
 	}
+	public void setTooltip(boolean showAllTime, long timeout, boolean isWrap) {
+		showTooltipAllthetime(showAllTime);
+		setTooltipTimeout(timeout);
+		setTooltipWrap(isWrap);
+	}
 	public void setTooltipTimeout(long timeout) {
 		if (timeout <= 0) {
 			SWT.error(SWT.ERROR_NULL_ARGUMENT);
@@ -257,6 +263,9 @@ public class IconCanvas extends Canvas {
 	}
 	public void showTooltipAllthetime(boolean isAll) {
 		show_tooltip_allthetime = isAll;
+	}
+	public void setTooltipWrap(boolean isWrap) {
+		tooltip_wrap = isWrap;
 	}
 	public int getTotalElements() {
 		return total_elements;
@@ -1653,6 +1662,7 @@ public class IconCanvas extends Canvas {
 		final Image selectedImage = ImageDescriptor.createFromURL(selectedlURL).createImage();
         
         IconCanvas iconCanvas = new IconCanvas(shell, SWT.NONE);
+        iconCanvas.setTooltipWrap(false);
         iconCanvas.setContentProvider(new IContentProvider() {
         	public Object getObject(int index) {
         		return new Integer(index);
@@ -1675,18 +1685,20 @@ public class IconCanvas extends Canvas {
         		}
         		String[] texts = new String[2];
         		String contentText = "<u>Variables</u><br>";
-        		contentText += "<ind>abc: <key>PrintStream</key><br>";
+        		//contentText += "<ind>abc: <key>PrintStream</key><br>";
         		contentText += "<ind><hl>aaaaaaaaaaa hhhhhhhhhh gggggggggggggggg bbbbbbbbbbbbbbb ccccccccccccccc:</hl> PrintStream<br>";
-        		contentText += "<ind><hl>aaaaaaa hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh ccccccccccccccc dddddddddddddddd eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee:</hl> PrintStream<br>";
-        		contentText += "<ind><hl>aasdbc:</hl> PrintStream<br>";
-        		contentText += "<ind><hl>aasdbc:</hl> PrintStream<br>";
-        		contentText += "<ind><hl>aasdbc:</hl> PrintStream<br>";
-        		contentText += "<ind><hl>aasdbc:</hl> PrintStream<br>";
-        		contentText += "<ind><hl>aasdbc:</hl> PrintStream<br>";
-        		contentText += "<ind><hl>aasdbc:</hl> PrintStream<br>";
-        		contentText += "<ind><hl>aasdbc:</hl> PrintStream<br>";
-        		contentText += "<ind><i>ab99213 32c:</i> PrintStream<br>";
-        		texts[0] = "Object: " + obj;
+        		//contentText += "<ind><hl>aaaaaaa hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh ccccccccccccccc dddddddddddddddd eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee:</hl> PrintStream<br>";
+        		contentText += "<ind><hl>1aasdbc:</hl> PrintStream<br>";
+        		contentText += "<ind><hl>2aasdbc:</hl> PrintStream<br>";
+        		/*
+        		contentText += "<ind><hl>3aasdbc:</hl> PrintStream<br>";
+        		contentText += "<ind><hl>4aasdbc:</hl> PrintStream<br>";
+        		contentText += "<ind><hl>5aasdbc:</hl> PrintStream<br>";
+        		contentText += "<ind><hl>6aasdbc:</hl> PrintStream<br>";
+        		contentText += "<ind><hl>7aasdbc:</hl> PrintStream<br>";
+        		contentText += "<ind><i>8ab99213 32c:</i> PrintStream<br>";
+        		*/
+        		texts[0] = "abc\nObject: " + obj;
         		texts[1] = contentText;
         		return texts;
         	}
@@ -1699,9 +1711,9 @@ public class IconCanvas extends Canvas {
         		display.sleep();
        	}
 	}
-	protected IIconInformationControl getInformationControl(boolean hasExtra) {
+	protected IIconInformationControl getInformationControl(boolean showDetails) {
 		if (fInformationControl == null) {
-			fInformationControl= iconHover.getHoverControlCreator(getShell(), hasExtra);
+			fInformationControl= iconHover.getHoverControlCreator(getShell(), showDetails, tooltip_wrap);
 			fInformationControl.addDisposeListener(new DisposeListener() {
 				public void widgetDisposed(DisposeEvent e) {
 					handleInformationControlDisposed();

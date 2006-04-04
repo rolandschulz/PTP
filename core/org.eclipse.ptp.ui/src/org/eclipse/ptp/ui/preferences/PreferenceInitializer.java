@@ -35,6 +35,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(IPTPUIConstants.VIEW_ICON_SPACING_Y, IPTPUIConstants.DEFAULT_VIEW_ICON_SPACING_Y);
 		store.setDefault(IPTPUIConstants.VIEW_ICON_WIDTH, IPTPUIConstants.DEFAULT_VIEW_ICON_WIDTH);
 		store.setDefault(IPTPUIConstants.VIEW_ICON_HEIGHT, IPTPUIConstants.DEFAULT_VIEW_ICON_HEIGHT);
-		store.setDefault(IPTPUIConstants.VIEW_TOOLTIP, IPTPUIConstants.DEFAULT_VIEW_TOOLTIP);
+		store.setDefault(IPTPUIConstants.VIEW_TOOLTIP_SHOWALLTIME, false);
+		store.setDefault(IPTPUIConstants.VIEW_TOOLTIP_TIMEOUT, IPTPUIConstants.DEFAULT_VIEW_TOOLTIP);
+		store.setDefault(IPTPUIConstants.VIEW_TOOLTIP_ISWRAP, true);
 	}
 }

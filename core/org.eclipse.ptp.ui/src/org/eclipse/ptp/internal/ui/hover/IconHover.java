@@ -19,6 +19,7 @@
 package org.eclipse.ptp.internal.ui.hover;
 
 import org.eclipse.ptp.ui.hover.IIconInformationControl;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Shell;
 
 /**
@@ -26,8 +27,8 @@ import org.eclipse.swt.widgets.Shell;
  * 
  */
 public class IconHover {
-	public IIconInformationControl getHoverControlCreator(Shell parent, boolean hasExtra) {
-		return new DefaultInformationControl(parent, hasExtra);
+	public IIconInformationControl getHoverControlCreator(Shell parent, boolean showDetails, boolean isWrap) {
+		return new DefaultInformationControl(parent, showDetails, isWrap?(SWT.NONE | SWT.WRAP):SWT.NONE);
 	}
 }
 
