@@ -117,7 +117,7 @@ MIGetStackListFramesInfo(MICommand *cmd)
 	for (SetList(rr->results); (result = (MIResult *)GetListElement(rr->results)) != NULL; ) {
 		if (strcmp(result->variable, "stack") == 0) {
 			val = result->value;
-			if (val->type == MIValueTypeList) {
+			if (val->type == MIValueTypeList || val->type == MIValueTypeTuple) {//TODO correct???
 				for (SetList(val->results); (result = (MIResult *)GetListElement(val->results)) != NULL; ) {
 					if (strcmp(result->variable, "frame") == 0) {
 						//val = result->value; /* error: overwrite prior MIValue
@@ -129,9 +129,6 @@ MIGetStackListFramesInfo(MICommand *cmd)
 						}
 					}
 				}
-			}
-			else if (val->type == MIValueTypeTuple) {
-				//TODO?????
 			}
 		}
 	}
