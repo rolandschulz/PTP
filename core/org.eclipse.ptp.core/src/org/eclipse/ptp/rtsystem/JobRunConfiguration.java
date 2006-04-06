@@ -19,6 +19,24 @@
 
 package org.eclipse.ptp.rtsystem;
 
+/**
+ * This is a complete description needed to run or debug a parallel job
+ * 
+ * execName					The name of the executable (can be a relative path).
+ * pathToExec				When appended to execName, gives the absolute path to the executable. 
+ * 							Can be null.
+ * machineName				The name of the machine (from model) on which to run the job.
+ * numberOfProcesses			Number of processes to start.
+ * numberOfProcessesPerNode	Number of processes to start on each node.
+ * firsNodeNumber			Node number (from model) of first node to use in the allocation.
+ * workingDir				The working directory for the job. If pathToExec is null, this will be used
+ * 							locate the executable.
+ * arguments					The arguments passed to the program. Can be null.
+ * environment				The environment passed to the program. Can be null.
+ * debuggerPath				Name (or path) to the debugger executable.
+ * debuggerArgs				Arguments to be passed to the debugger.
+ * isDebugJob				True if this is a debug job.
+ */
 public class JobRunConfiguration {
 	protected String execName;
 	protected String pathToExec;
