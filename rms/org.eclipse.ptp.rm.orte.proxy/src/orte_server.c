@@ -102,7 +102,7 @@
 
 int ORTEIsShutdown(void);
 int ORTEQuit(void);
-int ORTEInit(void);
+int ORTEInit(char *universe_name);
 
 int ORTEStartDaemon(char **);
 int ORTERun(char **);
@@ -140,7 +140,7 @@ int ORTE_Subscribe_Bproc(void);
 int 			orte_shutdown = 0;
 proxy_svr *	orte_proxy;
 int			is_orte_initialized = 0;
-int			orted_pid = 0;
+pid_t		orted_pid = 0;
 List *		eventList;
 List *		debugJobs;
 
@@ -221,9 +221,7 @@ int
 ORTEStartDaemon(char **args)
 {
 	int ret;
-	char *res;
-	
-	printf("StartDaemon(orted %s)\n", DEFAULT_ORTED_ARGS); fflush(stdout);
+	char *res, *universe_name;
 	
 	switch(orted_pid = fork()) {
 		case -1:
@@ -237,7 +235,14 @@ ORTEStartDaemon(char **args)
 		/* child */
 		case 0:
 			{
-				char **orted_args = Str2Args(DEFAULT_ORTED_ARGS);
+				char **orted_args;
+				
+				asprintf(&res, "%s --universe PTP-ORTE-%d", DEFAULT_ORTED_ARGS, getpid());
+				//asprintf(&res, "%s", DEFAULT_ORTED_ARGS);				
+
+				orted_args  = Str2Args(res);
+				printf("StartDaemon(orted %s)\n", res); fflush(stdout);
+				free(res);
 				
 				/* spawn the daemon */
 				printf("Starting execv now!\n"); fflush(stdout);
@@ -265,8 +270,14 @@ ORTEStartDaemon(char **args)
 		return 0;
 	}
 	
-	if (ORTEInit() != 0)
+	asprintf(&universe_name, "PTP-ORTE-%d", orted_pid);
+	
+	if (ORTEInit(universe_name) != 0) {
+		free(universe_name);
 		return 0;
+	}
+	
+	free(universe_name);
 	
 #ifdef HAVE_SYS_BPROC_H
 	ORTE_Subscribe_Bproc();
@@ -283,15 +294,23 @@ ORTEStartDaemon(char **args)
 }
 
 int
-ORTEInit(void)
+ORTEInit(char *universe_name)
 {
 	int rc;
+	char *str;
 	
-	printf("ORTEInit\n"); fflush(stdout);
+	printf("ORTEInit (%s)\n", universe_name); fflush(stdout);
+	asprintf(&str, "OMPI_MCA_universe=%s", universe_name);
 	
+	printf("str = '%s'\n", str);
 	/* this makes the orte_init() fail if the orte daemon isn't
 	 * running */
 	putenv("OMPI_MCA_orte_univ_exist=1");
+	putenv(str);
+	/* we cannot free 'str' because it's hooked into the environment, putenv()
+	 * man says that any changes to 'str' will automagically change the
+	 * environment variable's value - which includes freeing it */
+	//free(str);
 	
 	rc = orte_init(true);
 	
@@ -375,7 +394,7 @@ ORTE_Subscribe_Bproc(void)
 	OBJ_CONSTRUCT(&sub, orte_gpr_subscription_t);
 	sub.action = ORTE_GPR_NOTIFY_VALUE_CHG;
 	
-	OBJ_CONSTRUCT(&values, orte_gpr_value_t);
+	OBJ_CONSTRUCT(&value, orte_gpr_value_t);
 	values = &value;
 	sub.values = &values;
 	sub.cnt = 1; /* number of values */

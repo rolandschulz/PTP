@@ -119,8 +119,11 @@ public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventList
 		
 		argList.add("execName");
 		argList.add(jobRunConfig.getExecName());
-		argList.add("pathToExec");
-		argList.add(jobRunConfig.getPathToExec());
+		String path = jobRunConfig.getPathToExec();
+		if (path != null) {
+			argList.add("pathToExec");
+			argList.add(path);
+		}
 		argList.add("numOfProcs");
 		argList.add(Integer.toString(jobRunConfig.getNumberOfProcesses()));
 		argList.add("procsPerNode");

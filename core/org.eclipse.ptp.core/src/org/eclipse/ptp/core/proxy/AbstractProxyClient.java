@@ -71,7 +71,7 @@ public abstract class AbstractProxyClient {
 			return "1:00";
 		
 		byte[] b = str.getBytes();
-		String res = str.length()*2+1 + ":";
+		String res = Integer.toHexString(str.length()+1) + ":";
 		for (int i = 0; i < b.length; i++) {
 			if (b[i] < 10)
 				res += "0";

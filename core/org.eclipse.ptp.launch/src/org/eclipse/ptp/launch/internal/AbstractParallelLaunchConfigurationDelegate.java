@@ -114,7 +114,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 		String machineName = getMachineName(configuration);	
 		String[] args = getProgramParameters(configuration);
 		String[] env =  DebugPlugin.getDefault().getLaunchManager().getEnvironment(configuration);
-		String dir = vertifyWorkDirectory(configuration);
+		String dir = verifyWorkDirectory(configuration);
 
 		int nprocs = -1;
 		int nprocpnode = -1;
@@ -126,13 +126,12 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 			firstnode = (new Integer(firstnode_str)).intValue();
 		}
 		catch(NumberFormatException e) {}
-		
-		return new JobRunConfiguration(programFile.getLocation().lastSegment().toString(), 
-				programFile.getLocation().removeLastSegments(1).toOSString(), 
-				machineName, nprocs, nprocpnode, firstnode, args, env, dir);
+
+		return new JobRunConfiguration(programFile.getProjectRelativePath().toOSString(), 
+				dir, machineName, nprocs, nprocpnode, firstnode, args, env, dir);
 	}
 	
-   protected String vertifyWorkDirectory(ILaunchConfiguration configuration) throws CoreException {
+   protected String verifyWorkDirectory(ILaunchConfiguration configuration) throws CoreException {
         String workPath = getWorkDirectory(configuration);
         if (workPath == null) {
 			IProject project = verifyProject(configuration);
