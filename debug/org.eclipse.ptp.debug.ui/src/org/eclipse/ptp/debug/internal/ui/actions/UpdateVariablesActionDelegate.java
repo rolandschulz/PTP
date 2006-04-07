@@ -36,7 +36,7 @@ import org.eclipse.ui.PlatformUI;
  */
 public class UpdateVariablesActionDelegate extends AbstractPVariableAction {
 	public void run(IAction action) {
-		doAction(view.getViewSite().getShell());
+		doAction(view.getViewSite().getShell(), true);
 	}
 	public static void doAction(Shell shell) {
 		if (getCurrentRunningJob() == null)
@@ -63,19 +63,19 @@ public class UpdateVariablesActionDelegate extends AbstractPVariableAction {
 		job.schedule();
 	}
 	
-	public static void doAction(Shell shell, final String name) {
+	public static void doAction(Shell shell, final boolean force) {
 		if (getCurrentRunningJob() == null)
 			return;
 
 		if (shell == null) {
 			shell = PTPDebugUIPlugin.getActiveWorkbenchShell();
 		}
-		final UIDebugManager uiManager = PTPDebugUIPlugin.getDefault().getUIDebugManager();
 		final Job job = new Job("Updating variables info.") {
 			public IStatus run(final IProgressMonitor monitor) {
 				if (!monitor.isCanceled()) {
 					try {
-						PTPDebugCorePlugin.getPVariableManager().removeVariable(uiManager.getCurrentJob(), name, monitor);
+						UIDebugManager uiManager = PTPDebugUIPlugin.getDefault().getUIDebugManager();
+						PTPDebugCorePlugin.getPVariableManager().updateVariableResults(uiManager.getCurrentJob(), uiManager.getCurrentSetId(), force, monitor);
 					} catch (CoreException e) {
 						return e.getStatus();
 					}

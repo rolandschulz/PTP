@@ -55,7 +55,8 @@ public class PDebugPreferencePage extends AbstractPerferencePage {
 	private Button fPathsButton = null;
 	private Button fRegisteredProcessButton = null;
 	private IntegerFieldEditor commandTimeoutField = null;
-	private Button updateVariableButton = null;
+	private Button updateVariableOnSuspendButton = null;
+	private Button updateVariableOnChangeButton = null;
 	
     protected class WidgetListener implements IPropertyChangeListener {
     	public void propertyChange(PropertyChangeEvent event) {
@@ -87,12 +88,11 @@ public class PDebugPreferencePage extends AbstractPerferencePage {
 		createSpacer(composite, 1);
 		createCommunicationPreferences(composite);
 		createSpacer(composite, 1);
-		createOtherDebugSetting(composite);
+		createVariablesPreferences(composite);
 		setValues();
 		return composite;
 	}
 	protected void createOtherDebugSetting(Composite parent) {
-		updateVariableButton = createCheckButton(parent, PreferenceMessages.getString("PDebugPreferencePage.enableUpdateVariableSuspend"));
 	}
 	protected void createViewSettingPreferences(Composite parent) {
 		Composite comp = createGroupComposite(parent, 1, false, PreferenceMessages.getString("PDebugPreferencePage.default1"));
@@ -125,12 +125,18 @@ public class PDebugPreferencePage extends AbstractPerferencePage {
 		commandTimeoutField.setEmptyStringAllowed(false);
 		commandTimeoutField.setPropertyChangeListener(listener);
 	}
+	protected void createVariablesPreferences(Composite parent) {
+		Composite comp = createGroupComposite(parent, 1, false, PreferenceMessages.getString("PDebugPreferencePage.variable_group"));
+		updateVariableOnSuspendButton = createCheckButton(comp, PreferenceMessages.getString("PDebugPreferencePage.updateVariableOnSuspend"));
+		updateVariableOnChangeButton = createCheckButton(comp, PreferenceMessages.getString("PDebugPreferencePage.updateVariableOnChange"));
+	}
 	public void performDefaults() { 
 		IPreferenceStore store = getPreferenceStore();
 		fPathsButton.setSelection(store.getDefaultBoolean(IPDebugConstants.PREF_SHOW_FULL_PATHS));
 		fRegisteredProcessButton.setSelection(store.getDefaultBoolean(IPDebugConstants.PREF_PTP_DEBUG_REGISTER_PROC_0));
 		commandTimeoutField.setStringValue(String.valueOf(store.getDefaultInt(IPDebugConstants.PREF_PTP_DEBUG_COMM_TIMEOUT)));
-		updateVariableButton.setSelection(store.getDefaultBoolean(IPDebugConstants.PREF_UPDATE_VARIABLES));
+		updateVariableOnSuspendButton.setSelection(store.getDefaultBoolean(IPDebugConstants.PREF_UPDATE_VARIABLES_ON_SUSPEND));
+		updateVariableOnChangeButton.setSelection(store.getDefaultBoolean(IPDebugConstants.PREF_UPDATE_VARIABLES_ON_CHANGE));
 		super.performDefaults();
 	}
 	
@@ -146,14 +152,16 @@ public class PDebugPreferencePage extends AbstractPerferencePage {
 		fPathsButton.setSelection(store.getBoolean(IPDebugConstants.PREF_SHOW_FULL_PATHS));
 		fRegisteredProcessButton.setSelection(store.getBoolean(IPDebugConstants.PREF_PTP_DEBUG_REGISTER_PROC_0));
 		commandTimeoutField.setStringValue(String.valueOf(store.getInt(IPDebugConstants.PREF_PTP_DEBUG_COMM_TIMEOUT)));
-		updateVariableButton.setSelection(store.getBoolean(IPDebugConstants.PREF_UPDATE_VARIABLES));
+		updateVariableOnSuspendButton.setSelection(store.getBoolean(IPDebugConstants.PREF_UPDATE_VARIABLES_ON_SUSPEND));
+		updateVariableOnChangeButton.setSelection(store.getBoolean(IPDebugConstants.PREF_UPDATE_VARIABLES_ON_CHANGE));
 	}
 	protected void storeValues() {
 		IPreferenceStore store = getPreferenceStore();
 		store.setValue(IPDebugConstants.PREF_SHOW_FULL_PATHS, fPathsButton.getSelection());
 		store.setValue(IPDebugConstants.PREF_PTP_DEBUG_REGISTER_PROC_0, fRegisteredProcessButton.getSelection());
 		store.setValue(IPDebugConstants.PREF_PTP_DEBUG_COMM_TIMEOUT, commandTimeoutField.getIntValue());
-		store.setValue(IPDebugConstants.PREF_UPDATE_VARIABLES, updateVariableButton.getSelection());
+		store.setValue(IPDebugConstants.PREF_UPDATE_VARIABLES_ON_SUSPEND, updateVariableOnSuspendButton.getSelection());
+		store.setValue(IPDebugConstants.PREF_UPDATE_VARIABLES_ON_CHANGE, updateVariableOnChangeButton.getSelection());
 	}
 	public boolean isValid() {
 		setErrorMessage(null);

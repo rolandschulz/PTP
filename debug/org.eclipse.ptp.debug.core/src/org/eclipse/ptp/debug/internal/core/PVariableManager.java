@@ -87,8 +87,8 @@ public class PVariableManager implements IPVariableManager {
 		if (job != null) {
 			JobVariable jobVar = getJobVariable(job);
 			if (!jobVar.containVariable(variable)) {
+				updateVariableResult(job, set_id, variable, monitor);
 				jobVar.addName(variable);
-				updateVariableResults(job, set_id, monitor);
 			}
 			fireListener(job);
 		}
@@ -134,11 +134,41 @@ public class PVariableManager implements IPVariableManager {
 			jobVar.cleanupResults();
 		}
 	}
+	public void updateVariableResult(IPJob job, String set_id, String var_name, IProgressMonitor monitor) throws CoreException {
+		JobVariable jobVar = getJobVariable(job);
+		if (jobVar == null) {
+			monitor.done();
+			return;
+		}
+		IPCDISession session = debugModel.getPCDISession(job);
+		if (session != null) {
+			BitList taskList = debugModel.getTasks(job.getIDString(), set_id);
+			int[] tasks = taskList.toArray();
+			monitor.beginTask("Updating variables info...", (tasks.length+ 1));
+			for (int i=0; i<tasks.length; i++) {
+				if (!monitor.isCanceled()) {
+					try {
+						jobVar.addResult(getValue(session, tasks[i], monitor, var_name), tasks[i]);
+						monitor.worked(1);
+					} catch (PCDIException e) {
+						throw new CoreException(new Status(IStatus.ERROR, PTPDebugCorePlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));
+					}
+				}
+			}
+		}
+		monitor.done();		
+	}
 	public void updateVariableResults(IPJob job, String set_id, IProgressMonitor monitor) throws CoreException {
+		updateVariableResults(job, set_id, false, monitor);
+	}
+	public void updateVariableResults(IPJob job, String set_id, boolean force, IProgressMonitor monitor) throws CoreException {
 		JobVariable jobVar = getJobVariable(job);
 		if (jobVar == null || !jobVar.hasMore()) {
 			monitor.done();
 			return;
+		}
+		if (force) {
+			cleanVariableResults(job);
 		}
 		IPCDISession session = debugModel.getPCDISession(job);
 		if (session != null) {
@@ -149,7 +179,9 @@ public class PVariableManager implements IPVariableManager {
 			for (int i=0; i<tasks.length; i++) {
 				if (!monitor.isCanceled()) {
 					try {
-						jobVar.setResult(getValue(session, tasks[i], monitor, vars), tasks[i]);
+						if (!jobVar.hasResult(tasks[i])) {
+							jobVar.setResult(getValues(session, tasks[i], monitor, vars), tasks[i]);
+						}
 						monitor.worked(1);
 					} catch (PCDIException e) {
 						throw new CoreException(new Status(IStatus.ERROR, PTPDebugCorePlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));
@@ -177,27 +209,28 @@ public class PVariableManager implements IPVariableManager {
 		}
 		return display;
 	}
-	
-	private String[] getValue(IPCDISession session, int taskID, IProgressMonitor monitor, String[] vars) throws PCDIException {
-		String[] values = new String[vars.length];
-		for (int i=0; i<vars.length; i++) {			
-			try {
-				IAIF aif = session.getExpressionValue(taskID, vars[i]);
-				if (aif == null) {
-					values[i] = VALUE_UNKNOWN;
-				}
-				else {
-					values[i] = aif.getValue().getValueString();
-				}
-			} catch (AIFException e) {
-				values[i] = VALUE_UNKNOWN;
-			} finally {
-				monitor.worked(1);
+	private String getValue(IPCDISession session, int taskID, IProgressMonitor monitor, String var_name) throws PCDIException {
+		try {
+			IAIF aif = session.getExpressionValue(taskID, var_name);
+			if (aif == null) {
+				return VALUE_UNKNOWN;
 			}
+			else {
+				return aif.getValue().getValueString();
+			}
+		} catch (AIFException e) {
+			return VALUE_UNKNOWN;
+		} finally {
+			monitor.worked(1);
+		}
+	}
+	private String[] getValues(IPCDISession session, int taskID, IProgressMonitor monitor, String[] vars) throws PCDIException {
+		String[] values = new String[vars.length];
+		for (int i=0; i<vars.length; i++) {
+			values[i] = getValue(session, taskID, monitor, vars[i]);
 		}
 		return values;
 	}
-	
 	private class JobVariable {
 		private List variableList = new ArrayList();
 		private Object[] results = new Object[0];
@@ -226,6 +259,9 @@ public class PVariableManager implements IPVariableManager {
 		Object[] getResults() {
 			return results;
 		}
+		boolean hasResult(int taskID) {
+			return getResult(taskID).length > 0;
+		}
 		String[] getResult(int taskID) {
 			if (isValidTask(taskID)) {
 				Object result = results[taskID];
@@ -247,6 +283,13 @@ public class PVariableManager implements IPVariableManager {
 		}
 		boolean isValidTask(int taskID) {
 			return (taskID < results.length);
+		}
+		void addResult(String value, int taskID) {
+			String[] values = getResult(taskID);
+			String[] new_values = new String[values.length+1];
+			System.arraycopy(values, 0, new_values, 0, values.length);
+			new_values[new_values.length-1] = value;
+			setResult(new_values, taskID);
 		}
 		void setResult(String[] values, int taskID) {
 			if (isValidTask(taskID)) {

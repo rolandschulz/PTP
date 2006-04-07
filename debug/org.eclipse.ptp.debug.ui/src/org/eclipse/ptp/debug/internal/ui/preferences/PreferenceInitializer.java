@@ -46,6 +46,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
 		store.setDefault(IPDebugConstants.PREF_PTP_DEBUG_COMM_TIMEOUT, IPDebugConstants.DEFAULT_DEBUG_COMM_TIMEOUT);
 
-		store.setDefault(IPDebugConstants.PREF_UPDATE_VARIABLES, true);
+		store.setDefault(IPDebugConstants.PREF_UPDATE_VARIABLES_ON_SUSPEND, true);
+		store.setDefault(IPDebugConstants.PREF_UPDATE_VARIABLES_ON_CHANGE, false);
 	}
 }

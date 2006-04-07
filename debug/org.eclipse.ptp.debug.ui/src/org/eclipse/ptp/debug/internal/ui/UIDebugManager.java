@@ -31,6 +31,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
+import org.eclipse.core.runtime.Preferences.PropertyChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
@@ -40,6 +42,7 @@ import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IThread;
 import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.debug.ui.IDebugView;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.core.IPJob;
@@ -110,15 +113,44 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	private Map consoleWindows = new HashMap();
 	private IPVariableManager variableManager = null;
 
+	private boolean prefAutoUpdateVarOnSuspend = false;
+	private boolean prefAutoUpdateVarOnChange = false;
+	private boolean prefRegisterProc0 = true;
+		
+	private IPropertyChangeListener propertyChangeListener = new IPropertyChangeListener() {
+		public void propertyChange(PropertyChangeEvent event) {
+			String preferenceType = event.getProperty();
+			String value = (String)event.getNewValue();
+			if (preferenceType.equals(IPDebugConstants.PREF_PTP_DEBUG_REGISTER_PROC_0)) {
+				prefRegisterProc0 = new Boolean(value).booleanValue();
+			}
+			else if (preferenceType.equals(IPDebugConstants.PREF_UPDATE_VARIABLES_ON_SUSPEND)) {
+				prefAutoUpdateVarOnSuspend = new Boolean(value).booleanValue();
+			}
+			else if (preferenceType.equals(IPDebugConstants.PREF_UPDATE_VARIABLES_ON_CHANGE)) {
+				prefAutoUpdateVarOnChange = new Boolean(value).booleanValue();
+			}
+		}
+	};
+
 	public UIDebugManager() {
+		PTPDebugUIPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(propertyChangeListener);
 		addSetListener(this);
 		DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener(this);
 		debugModel = PTPDebugCorePlugin.getDebugModel();
 		variableManager = PTPDebugCorePlugin.getPVariableManager();
 		debugModel.addLaunchListener(this);
 		annotationMgr = new PAnnotationManager(this);
+		settingPreference();
+	}
+	private void settingPreference() {
+		IPreferenceStore prefStore = PTPDebugUIPlugin.getDefault().getPreferenceStore();
+		prefRegisterProc0 = prefStore.getBoolean(IPDebugConstants.PREF_PTP_DEBUG_REGISTER_PROC_0);
+		prefAutoUpdateVarOnSuspend = prefStore.getBoolean(IPDebugConstants.PREF_UPDATE_VARIABLES_ON_SUSPEND);
+		prefAutoUpdateVarOnChange = prefStore.getBoolean(IPDebugConstants.PREF_UPDATE_VARIABLES_ON_CHANGE);
 	}
 	public void shutdown() {
+		PTPDebugUIPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(propertyChangeListener);
 		removeSetListener(this);
 		DebugPlugin.getDefault().getBreakpointManager().removeBreakpointListener(this);
 		regListeners.clear();
@@ -134,7 +166,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	}
 	
 	private void defaultRegister(IPCDISession session) { // register process 0 if the preference is checked
-		if (PTPDebugUIPlugin.getDefault().getPreferenceStore().getBoolean(IPDebugConstants.PREF_PTP_DEBUG_REGISTER_PROC_0)) {
+		if (prefRegisterProc0) {
 			IPProcess proc = session.getJob().findProcessByTaskId(0);
 			if (proc != null)
 				registerProcess(session, proc, true);
@@ -223,7 +255,6 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	}
 	public IPCDISession getDebugSession(IPJob job) {
 		return debugModel.getPCDISession(job);
-		//return (IPCDISession) job.getAttribute(PreferenceConstants.JOB_DEBUG_SESSION);
 	}
 	public int convertToInt(String id) {
 		return Integer.parseInt(id);
@@ -305,8 +336,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 				viewer.setSelection(new StructuredSelection(selection));
 			}
 		}
-	}
-	
+	}	
 	/***************************************************************************************************************************************************************************************************
 	 * Register / Unregister
 	 **************************************************************************************************************************************************************************************************/
@@ -446,6 +476,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		} catch (CoreException e) {
 			PTPDebugUIPlugin.log(e);
 		}
+		updateDebugVariables();
 	}
 	// Delete the set that will delete the all related breakpoint
 	public void deleteSetEvent(IElementSet set) {
@@ -493,27 +524,10 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			PTPDebugUIPlugin.log(e);
 		}
 	}
-	/*
-	 * Cannot unregister the extension final String CDT_DEBUG_UI_ID = "org.eclipse.cdt.debug.ui"; Bundle bundle = Platform.getBundle(CDT_DEBUG_UI_ID); if (bundle != null && bundle.getState() ==
-	 * Bundle.ACTIVE) { //ExtensionRegistry reg = (ExtensionRegistry) Platform.getExtensionRegistry(); //reg.remove(bundle.getBundleId()); try { Platform.getBundle(CDT_DEBUG_UI_ID).uninstall();
-	 * System.out.println("Remove: " + bundle.getState()); } catch (BundleException e) { System.out.println("Err: " + e.getMessage()); } }
-	 */
 	/***************************************************************************************************************************************************************************************************
 	 * Event
 	 **************************************************************************************************************************************************************************************************/
 	public void handleDebugEvents(final IPCDIEvent[] events) {
-		/*
-		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
-			public void run(IProgressMonitor monitor) throws CoreException {
-				handleDebugEvents(events, monitor);
-			}
-		};
-		try {
-			ResourcesPlugin.getWorkspace().run(runnable, null);
-		} catch (CoreException e) {
-			PTPDebugUIPlugin.log(e);
-		}
-		*/
 		Job uiJob = new Job("Updating debug events") {
 			protected IStatus run(IProgressMonitor monitor) {
 				handleDebugEvents(events, monitor);
@@ -591,7 +605,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 						}
 					});
 				}
-				updateDebugVariables(job);
+				updateDebugVariablesOnSuspend(job);
 				fireSuspendEvent(job, event.getAllProcesses());
 			} else if (event instanceof IPCDIResumedEvent) {
 				removeAnnotation(job.getIDString(), event.getAllProcesses());
@@ -601,7 +615,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			} else if (event instanceof IPCDIDebugExitedEvent) {
 				condition = new Boolean(true);
 				annotationMgr.removeAnnotationGroup(job.getIDString());
-				System.err.println("--- TESTING exit event and remove all annotation in job: " + job.getIDString());
+				//System.err.println("--- TESTING exit event and remove all annotation in job: " + job.getIDString());
 				getDebugSession(job).getEventManager().removeEventListener(this);
 				cleanupDebugVariables(job);
 			} else if (event instanceof IPCDIExitedEvent) {
@@ -752,46 +766,28 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		super.removeJob(job);
 	}
 	
-	public void cleanupDebugVariables(final IPJob job) {
+	protected void cleanupDebugVariables(IPJob job) {
 		variableManager.cleanVariableResults(job);
 	}
-	public void updateDebugVariables(IPJob job) {
-		if (getCurrentJob().equals(job)) {
-			if (variableManager.hasVariable(job)) {
-				PTPDebugUIPlugin.getDisplay().asyncExec(new Runnable() {
-					public void run() {
-						UpdateVariablesActionDelegate.doAction(null);
-					}
-				});
+	protected void updateDebugVariables() {
+		if (prefAutoUpdateVarOnChange) {
+			updateDebugVariables(getCurrentJob());
+		}
+	}
+	private void updateDebugVariables(IPJob job) {
+		if (variableManager.hasVariable(job)) {
+			PTPDebugUIPlugin.getDisplay().asyncExec(new Runnable() {
+				public void run() {
+					UpdateVariablesActionDelegate.doAction(null);
+				}
+			});
+		}
+	}
+	private void updateDebugVariablesOnSuspend(IPJob job) {
+		if (prefAutoUpdateVarOnSuspend) {
+			if (getCurrentJob().equals(job)) {
+				updateDebugVariables(job);
 			}
 		}
 	}
-	/*
-	public void updateDebugVariables(final IPJob pJob) {
-		if (variableManager.hasVariable(pJob)) {
-			if (PTPDebugUIPlugin.getDefault().getPreferenceStore().getBoolean(IPDebugConstants.PREF_UPDATE_VARIABLES)) {
-				final Job job = new Job(UIMessage.REFRESH_SYSTEM_JOB_NAME) {
-					public IStatus run(final IProgressMonitor monitor) {
-						if (!monitor.isCanceled()) {
-							try {
-								variableManager.updateVariableResults(pJob, getCurrentSetId(), monitor);
-							} catch (CoreException e) {
-								return e.getStatus();
-							}
-						}
-						return Status.OK_STATUS;
-					}
-				};
-				job.setPriority(Job.INTERACTIVE);
-				
-				PTPDebugUIPlugin.getDisplay().asyncExec(new Runnable() {
-					public void run() {
-						PlatformUI.getWorkbench().getProgressService().showInDialog(null, job);
-						job.schedule();
-					}
-				});
-			}
-		}
-	}
-	*/
 }

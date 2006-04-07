@@ -94,5 +94,6 @@ public interface IPDebugConstants {
 	public static final int MIN_REQUEST_TIMEOUT = 10000;
 	public static final int MAX_REQUEST_TIMEOUT = Integer.MAX_VALUE;	
 
-	public static final String PREF_UPDATE_VARIABLES = PLUGIN_ID + ".pDebug.update_variables";
+	public static final String PREF_UPDATE_VARIABLES_ON_SUSPEND = PLUGIN_ID + ".pDebug.update_variables_on_suspend";
+	public static final String PREF_UPDATE_VARIABLES_ON_CHANGE = PLUGIN_ID + ".pDebug.update_variables_on_change";
 }
