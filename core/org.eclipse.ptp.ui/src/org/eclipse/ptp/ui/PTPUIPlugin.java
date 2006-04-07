@@ -41,7 +41,6 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.internal.ui.JobManager;
 import org.eclipse.ptp.internal.ui.MachineManager;
-import org.eclipse.ptp.ui.preferences.IPreferencesListener;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IPerspectiveListener;
@@ -65,29 +64,12 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 	private MachineManager machineManager = null;
 	private JobManager jobManager = null;
 
-	protected List listeners = new ArrayList();
 	private List jobList = Collections.synchronizedList(new ArrayList());
 	
 	public PTPUIPlugin() {
 		super();
 		plugin = this;
 	}
-	public void addPreferenceListener(IPreferencesListener listener) {
-		if (!listeners.contains(listener)) {
-			listeners.add(listener);
-		}
-	}
-	public void removePreferenceListener(IPreferencesListener listener) {
-		if (listeners.contains(listener)) {
-			listeners.remove(listener);
-		}
-	}
-	public void firePreferencesListeners() {
-		for (Iterator i=listeners.iterator(); i.hasNext();) {
-			((IPreferencesListener)i.next()).preferenceUpdated();
-		}
-	}
-
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		machineManager = new MachineManager();

@@ -19,6 +19,8 @@
 package org.eclipse.ptp.ui.views;
 
 import java.util.Iterator;
+import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
+import org.eclipse.core.runtime.Preferences.PropertyChangeEvent;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -29,8 +31,8 @@ import org.eclipse.ptp.ui.listeners.IPaintListener;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
-import org.eclipse.ptp.ui.preferences.IPreferencesListener;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -42,7 +44,7 @@ import org.eclipse.swt.widgets.Composite;
  * @author clement chu
  * 
  */
-public abstract class AbstractParallelElementView extends AbstractParallelView implements IPaintListener, IIconCanvasActionListener, IToolTipProvider, IImageProvider, IContentProvider, IPreferencesListener {
+public abstract class AbstractParallelElementView extends AbstractParallelView implements IPaintListener, IIconCanvasActionListener, IToolTipProvider, IImageProvider, IContentProvider {
 	protected IManager manager = null;
 	// Set
 	protected IElementSet cur_element_set = null;
@@ -51,6 +53,38 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	// title
 	protected final String EMPTY_TITLE = " ";
 	protected Color registerColor = null;
+
+	protected IPropertyChangeListener propertyChangeListener = new IPropertyChangeListener() {
+		public void propertyChange(PropertyChangeEvent event) {
+			final String preferenceType = event.getProperty();
+			final Object value = event.getNewValue();
+			if (value != null) {
+				//getDisplay().asyncExec(new Runnable() {
+				BusyIndicator.showWhile(getDisplay(), new Runnable() {
+					public void run() {
+						if (!canvas.isDisposed()) {
+							if (preferenceType.startsWith("icon")) {
+								IPreferenceStore store = PTPUIPlugin.getDefault().getPreferenceStore();
+								canvas.setIconSpace(store.getInt(IPTPUIConstants.VIEW_ICON_SPACING_X), store.getInt(IPTPUIConstants.VIEW_ICON_SPACING_Y));
+								canvas.setIconSize(store.getInt(IPTPUIConstants.VIEW_ICON_WIDTH), store.getInt(IPTPUIConstants.VIEW_ICON_HEIGHT));
+							}
+							else if (preferenceType.equals(IPTPUIConstants.VIEW_TOOLTIP_SHOWALLTIME)) {
+								canvas.showTooltipAllthetime(new Boolean((String)value).booleanValue());
+							}
+							else if (preferenceType.equals(IPTPUIConstants.VIEW_TOOLTIP_TIMEOUT)) {
+								canvas.setTooltipTimeout(new Long((String)value).longValue());
+							}
+							else if (preferenceType.equals(IPTPUIConstants.VIEW_TOOLTIP_ISWRAP)) {
+								canvas.setTooltipWrap(new Boolean((String)value).booleanValue());
+							}
+							canvas.resetCanvas();
+						}
+						updateView(null);
+					}
+				});
+			}
+		}
+	};
 
 	public void createPartControl(Composite parent) {
 		createView(parent);
@@ -90,7 +124,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 		canvas.setImageProvider(this);
 		canvas.setToolTipProvider(this);
 		canvas.addActionListener(this);
-		PTPUIPlugin.getDefault().addPreferenceListener(this);
+		PTPUIPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(propertyChangeListener);
 		return composite;
 	}
 	public void setSelection(ISelection selection) {
@@ -106,7 +140,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	public void dispose() {
 		manager.removePaintListener(this);
 		canvas.removeActionListener(this);
-		PTPUIPlugin.getDefault().removePreferenceListener(this);
+		PTPUIPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(propertyChangeListener);
 		super.dispose();
 	}
 	public void setFocus() {
@@ -231,19 +265,5 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 			return canvas.isDisplayRuler();
 		}
 		return false;
-	}
-	public void preferenceUpdated() {
-		getDisplay().asyncExec(new Runnable() {
-			public void run() {
-				if (!canvas.isDisposed()) {
-					IPreferenceStore store = PTPUIPlugin.getDefault().getPreferenceStore();
-					canvas.setIconSpace(store.getInt(IPTPUIConstants.VIEW_ICON_SPACING_X), store.getInt(IPTPUIConstants.VIEW_ICON_SPACING_Y));
-					canvas.setIconSize(store.getInt(IPTPUIConstants.VIEW_ICON_WIDTH), store.getInt(IPTPUIConstants.VIEW_ICON_HEIGHT));
-					canvas.setTooltip(store.getBoolean(IPTPUIConstants.VIEW_TOOLTIP_SHOWALLTIME), store.getLong(IPTPUIConstants.VIEW_TOOLTIP_TIMEOUT), store.getBoolean(IPTPUIConstants.VIEW_TOOLTIP_ISWRAP));
-					canvas.resetCanvas();
-				}
-				updateView(null);
-			}
-		});
 	}
 }

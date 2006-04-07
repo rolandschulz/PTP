@@ -184,7 +184,6 @@ public class PTPViewerPreferencesPage extends AbstractPerferencePage {
 	public boolean performOk() {
 		storeValues();
 		PTPUIPlugin.getDefault().savePluginPreferences();
-		PTPUIPlugin.getDefault().firePreferencesListeners();
 		return true;
 	}
 	
