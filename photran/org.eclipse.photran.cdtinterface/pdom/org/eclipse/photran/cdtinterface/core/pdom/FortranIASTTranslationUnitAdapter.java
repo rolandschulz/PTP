@@ -1,4 +1,4 @@
-package org.eclipse.photran.cdtinterface.core;
+package org.eclipse.photran.cdtinterface.core.pdom;
 
 import org.eclipse.cdt.core.dom.IPDOM;
 import org.eclipse.cdt.core.dom.ast.ASTNodeProperty;
@@ -18,6 +18,7 @@ import org.eclipse.cdt.core.dom.ast.IScope;
 import org.eclipse.cdt.core.dom.ast.IScope2;
 import org.eclipse.cdt.core.model.ILanguage;
 import org.eclipse.cdt.core.parser.ParserLanguage;
+import org.eclipse.photran.cdtinterface.core.FortranLanguage;
 
 /**
  * GoF-style Adapter which turns a Fortran parse tree into a minimalist IASTTranslationUnit
