@@ -227,11 +227,11 @@ public class DefaultInformationControl implements IIconInformationControl, Dispo
 			sc.getVerticalBar().setVisible(height > SHELL_DEFAULT_HEIGHT);
 			new_width = (width>SHELL_DEFAULT_WIDTH?SHELL_DEFAULT_WIDTH:new_width);
 			int new_height = (height>SHELL_DEFAULT_HEIGHT?SHELL_DEFAULT_HEIGHT:(width>SHELL_DEFAULT_WIDTH?(sc.getHorizontalBar().getSize().y+height):height));
-			fShell.setSize(new_width+10, new_height+10);
+			fShell.setSize(new_width+5, new_height+2);
 		}
 		else {
 			sc.setAlwaysShowScrollBars(false);
-			fShell.setSize(new_width, height);
+			fShell.setSize(new_width+5, height+2);
 		}
 	}
 	public void setLocation(Point location) {
