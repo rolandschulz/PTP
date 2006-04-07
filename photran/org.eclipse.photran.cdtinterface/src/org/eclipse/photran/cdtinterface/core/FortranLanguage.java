@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.eclipse.cdt.core.CCorePlugin;
-import org.eclipse.cdt.core.dom.ICodeReaderFactory;
 import org.eclipse.cdt.core.dom.ast.ASTCompletionNode;
 import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit;
 import org.eclipse.cdt.core.model.ICProject;
@@ -12,15 +11,10 @@ import org.eclipse.cdt.core.model.IContributedModelBuilder;
 import org.eclipse.cdt.core.model.ILanguage;
 import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.cdt.core.model.IWorkingCopy;
-import org.eclipse.cdt.core.parser.CodeReader;
-import org.eclipse.cdt.internal.core.dom.SavedCodeReaderFactory;
 import org.eclipse.cdt.internal.core.pdom.PDOM;
-import org.eclipse.cdt.internal.core.pdom.PDOMCodeReaderFactory;
 import org.eclipse.cdt.internal.core.pdom.dom.IPDOMLinkageFactory;
 import org.eclipse.cdt.internal.core.pdom.dom.PDOMLinkage;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.photran.cdtinterface.core.pdom.PDOMFortranLinkage;
@@ -73,43 +67,23 @@ public class FortranLanguage extends PlatformObject implements ILanguage
 			return super.getAdapter(adapter);
 	}
     
-    public IASTTranslationUnit getASTTranslationUnit(ITranslationUnit file, int style) {
-        IResource resource = file.getResource();
+    public IASTTranslationUnit getASTTranslationUnit(ITranslationUnit file, int style)
+    {
+        //IResource resource = file.getResource();
         ICProject project = file.getCProject();
-        IProject rproject = project.getProject();
-        
-//        IScannerInfo scanInfo = null;
-//        IScannerInfoProvider provider = CCorePlugin.getDefault().getScannerInfoProvider(rproject);
-//        if (provider != null){
-//            IResource infoResource = resource != null ? resource : rproject; 
-//            IScannerInfo buildScanInfo = provider.getScannerInformation(infoResource);
-//            if (buildScanInfo != null)
-//                scanInfo = buildScanInfo;
-//            else if ((style & ILanguage.AST_SKIP_IF_NO_BUILD_INFO) != 0)
-//                return null;
-//            else
-//                scanInfo = new ScannerInfo();
-//        }
+        //IProject rproject = project.getProject();
         
         PDOM pdom = (PDOM)CCorePlugin.getPDOMManager().getPDOM(project).getAdapter(PDOM.class);
-        ICodeReaderFactory fileCreator;
-        if ((style & ILanguage.AST_SKIP_INDEXED_HEADERS) != 0)
-            fileCreator = new PDOMCodeReaderFactory(pdom);
-        else
-            fileCreator = SavedCodeReaderFactory.getInstance();
-
         String path;
-        CodeReader reader;
-        if (file instanceof IWorkingCopy) {
-            // get the working copy contents
+        if (file instanceof IWorkingCopy)
+        {
             IFile rfile = (IFile)file.getResource();
             path = rfile.getLocation().toOSString();
-            reader = new CodeReader(rfile.getLocation().toOSString(), file.getContents());
-        } else {
+            // Maybe later we can get the working copy contents using file.getContents()
+        }
+        else
+        {
             path = file.getPath().toOSString();
-            reader = fileCreator.createCodeReaderForTranslationUnit(path);
-            if (reader == null)
-                return null;
         }
         
         // Parse
