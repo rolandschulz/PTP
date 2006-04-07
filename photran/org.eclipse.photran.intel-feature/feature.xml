@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="org.eclipse.photran.intel"
+      label="%featureName"
+      version="3.0.0"
+      provider-name="%providerName"
+      os="linux"
+      arch="ia64,x86">
+
+   <description>
+      %description
+   </description>
+
+   <copyright>
+      %copyright
+   </copyright>
+
+   <license url="%licenseURL">
+      %license
+   </license>
+
+   <plugin
+         id="org.eclipse.photran.managedbuilder.intel.ui"
+         os="linux"
+         arch="ia64,x86"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
+
+   <plugin
+         id="org.eclipse.photran.core.intel"
+         os="linux"
+         arch="ia64,x86"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
+
+</feature>
