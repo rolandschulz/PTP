@@ -70,6 +70,8 @@ public class FortranLanguage extends PlatformObject implements ILanguage
     
     public IASTTranslationUnit getASTTranslationUnit(ITranslationUnit file, int style)
     {
+        System.out.println("getASTTranslationUnit");
+        
         //IResource resource = file.getResource();
         ICProject project = file.getCProject();
         //IProject rproject = project.getProject();
