@@ -32,18 +32,20 @@ public class FortranAutoIndentStrategy extends
 
 	protected void smartIndentAfterNewLine(IDocument d, DocumentCommand c) {
 		int docLength = d.getLength();
+		//c.offset returns the absolute offset from beginning of document
 		if (c.offset == -1 || docLength == 0)
 			return;
 
 		try {
 			int p = (c.offset == docLength ? c.offset - 1 : c.offset);
 			int line = d.getLineOfOffset(p); // our current line
-
+			int lineOffSet = d.getLineOffset(line);
 			StringBuffer buf = new StringBuffer(c.text);
 			int start = d.getLineOffset(line);
+			//whiteend indicates absolute index as well
 			int whiteend = findEndOfWhiteSpace(d, start, c.offset);
 			buf.append(d.get(start, whiteend - start));
-			if (isIndentRightWord(d, whiteend)) {
+			if (isIndentRightWord(d, whiteend) && (amongKeyword(lineOffSet,c.offset,whiteend)) ) {
 				buf.append('\t');
 			}
 			c.text = buf.toString();
@@ -51,6 +53,10 @@ public class FortranAutoIndentStrategy extends
 		} catch (BadLocationException excp) {
 			excp.printStackTrace();
 		}
+	}
+
+	private boolean amongKeyword(int lineOffSet, int offset, int whiteend) {
+		return(!((offset<= whiteend)&&(offset>= lineOffSet)));
 	}
 
 	private boolean isIndentRightWord(IDocument doc, int firstChar) {
