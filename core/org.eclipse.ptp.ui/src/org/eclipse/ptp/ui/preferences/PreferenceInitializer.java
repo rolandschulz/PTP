@@ -29,6 +29,9 @@ import org.eclipse.ptp.ui.PTPUIPlugin;
  */
 public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer#initializeDefaultPreferences()
+	 */
 	public void initializeDefaultPreferences() {
 		IPreferenceStore store = PTPUIPlugin.getDefault().getPreferenceStore();
 		store.setDefault(IPTPUIConstants.VIEW_ICON_SPACING_X, IPTPUIConstants.DEFAULT_VIEW_ICON_SPACING_X);

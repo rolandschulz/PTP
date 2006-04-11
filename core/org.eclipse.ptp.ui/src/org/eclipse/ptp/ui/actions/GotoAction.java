@@ -30,15 +30,31 @@ public abstract class GotoAction extends ParallelAction {
 	protected String id = "";
 	protected GotoDropDownAction action = null;
 	
+	/** Constructor
+	 * @param name name of action
+	 * @param id action ID
+	 * @param view view
+	 * @param action drop down action
+	 */
 	public GotoAction(String name, String id, AbstractParallelElementView view, GotoDropDownAction action) {
 		this(name, id, view, IAction.AS_CHECK_BOX, action);
 	}
+	/** Constructor
+	 * @param name name of action
+	 * @param id action ID
+	 * @param view view
+	 * @param style style of action
+	 * @param action drop down action
+	 */
 	public GotoAction(String name, String id, AbstractParallelElementView view, int style, GotoDropDownAction action) {
 		super(name, style, view);
 		this.id = id;
 		this.action = action;	
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.actions.ParallelAction#run(org.eclipse.ptp.ui.model.IElement[])
+	 */
 	public void run(IElement[] elements) {
 		action.run(elements, id);
 	}

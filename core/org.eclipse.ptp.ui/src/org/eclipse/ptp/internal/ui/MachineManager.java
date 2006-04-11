@@ -42,28 +42,50 @@ public class MachineManager extends AbstractUIManager implements INodeListener {
 	private Map machineList = new HashMap();
 	protected String cur_machine_id = EMPTY_ID;
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.IManager#shutdown()
+	 */
 	public void shutdown() {
 		clear();
 		modelManager = null;
 		super.shutdown();
 	}
+	/** Is no machine
+	 * @return true if there is no machine
+	 */
 	public boolean isNoMachine() {
 		return isNoMachine(cur_machine_id);
 	}
+	/** Is no machine
+	 * @param machid machine ID
+	 * @return true if there is no machine 
+	 */
 	public boolean isNoMachine(String machid) {
 		return (machid == null || machid.length() == 0);
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.IManager#getElementHandler(java.lang.String)
+	 */
 	public IElementHandler getElementHandler(String id) {
 		return (IElementHandler) machineList.get(id);
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.IManager#size()
+	 */
 	public int size() {
 		return machineList.size();
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.IManager#clear()
+	 */
 	public void clear() {
 		if (machineList != null) {
 			machineList.clear();
 		}
 	}
+	/** Get machines
+	 * @return machines
+	 */
 	public IPMachine[] getMachines() {
 		IPUniverse universe = modelManager.getUniverse();
 		if (universe == null) {
@@ -71,18 +93,34 @@ public class MachineManager extends AbstractUIManager implements INodeListener {
 		}
 		return universe.getSortedMachines();
 	}
+	/** Get current machine ID
+	 * @return current machine ID
+	 */
 	public String getCurrentMachineId() {
 		return cur_machine_id;
 	}
+	/** Set current machine ID
+	 * @param machine_id machine ID
+	 */
 	public void setCurrentMachineId(String machine_id) {
 		cur_machine_id = machine_id;
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.IManager#getCurrentSetId()
+	 */
 	public String getCurrentSetId() {
 		return cur_set_id;
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.IManager#setCurrentSetId(java.lang.String)
+	 */
 	public void setCurrentSetId(String set_id) {
 		cur_set_id = set_id;
 	}
+	/** Get node status text
+	 * @param node
+	 * @return status text
+	 */
 	public String getNodeStatusText(IPNode node) {
 		switch (getNodeStatus(node)) {
 		case IPTPUIConstants.NODE_USER_ALLOC_EXCL:
@@ -105,9 +143,18 @@ public class MachineManager extends AbstractUIManager implements INodeListener {
 			return "Unknown";
 		}
 	}
+	/** Get node status text
+	 * @param job_id job ID
+	 * @param proc_id process ID
+	 * @return status
+	 */
 	public String getNodeStatusText(String job_id, String proc_id) {
 		return getNodeStatusText(findNode(job_id, proc_id));
 	}
+	/** Get process status
+	 * @param p_state
+	 * @return status
+	 */
 	public int getProcStatus(String p_state) {
 		if (p_state.equals(IPProcess.STARTING))
 			return IPTPUIConstants.PROC_STARTING;
@@ -124,6 +171,10 @@ public class MachineManager extends AbstractUIManager implements INodeListener {
 		else
 			return IPTPUIConstants.PROC_ERROR;
 	}
+	/** Get node status
+	 * @param node
+	 * @return
+	 */
 	public int getNodeStatus(IPNode node) {
 		if (node != null) {
 			String nodeState = (String)node.getAttrib(AttributeConstants.ATTRIB_NODE_STATE);
@@ -157,34 +208,61 @@ public class MachineManager extends AbstractUIManager implements INodeListener {
 		}
 		return IPTPUIConstants.NODE_UNKNOWN;
 	}
+	/** Get status 
+	 * @param machine_id Machine ID
+	 * @param node_id node ID
+	 * @return status
+	 */
 	public int getStatus(String machine_id, String node_id) {
 		return getNodeStatus(findNode(machine_id, node_id));
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.IManager#getStatus(java.lang.String)
+	 */
 	public int getStatus(String id) {
 		return getStatus(getCurrentMachineId(), id);
 	}
 	
+	/** Find node 
+	 * @param machine_id machine ID
+	 * @param node_id node ID
+	 * @return null is not found
+	 */
 	public IPNode findNode(String machine_id, String node_id) {
 		IPMachine machine = findMachineById(machine_id);
 		if (machine == null)
 			return null;
 		return machine.findNode(node_id);
 	}
+	/** Find machine
+	 * @param machine_name
+	 * @return
+	 */
 	public IPMachine findMachine(String machine_name) {
 		return (IPMachine) modelManager.getUniverse().findMachineByName(machine_name);
 	}
+	/** find machine by ID
+	 * @param machine_id machine ID
+	 * @return
+	 */
 	public IPMachine findMachineById(String machine_id) {
 		IPElement element = modelManager.getUniverse().findChild(machine_id);
 		if (element instanceof IPMachine)
 			return (IPMachine) element;
 		return null;
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.IManager#getName(java.lang.String)
+	 */
 	public String getName(String id) {
 		IPElement element = findMachineById(id);
 		if (element == null)
 			return "";
 		return element.getElementName();
 	}
+	/** Add machine
+	 * @param mac machine
+	 */
 	public void addMachine(IPMachine mac) {
 		if (machineList.containsKey(mac.getIDString()))
 			return;
@@ -202,6 +280,9 @@ public class MachineManager extends AbstractUIManager implements INodeListener {
 			machineList.put(mac.getIDString(), elementHandler);
 		}
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.IManager#initial()
+	 */
 	public String initial() {
 		IPMachine[] macs = getMachines();
 		if (macs.length > 0) {
@@ -214,8 +295,8 @@ public class MachineManager extends AbstractUIManager implements INodeListener {
 		}
 		return cur_machine_id;
 	}
-	/**
-	 * INodeListener
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.INodeListener#nodeEvent(org.eclipse.ptp.core.INodeEvent)
 	 */
 	public void nodeEvent(INodeEvent event) {
 		// only redraw if the current set contain the node
@@ -223,6 +304,11 @@ public class MachineManager extends AbstractUIManager implements INodeListener {
 			firePaintListener(null);
 		}
 	}
+	/** Is current set contain node
+	 * @param mid machine ID
+	 * @param nodeID node iD
+	 * @return true if current set contains node
+	 */
 	public boolean isCurrentSetContainNode(String mid, String nodeID) {
 		if (!getCurrentMachineId().equals(mid))
 			return false;

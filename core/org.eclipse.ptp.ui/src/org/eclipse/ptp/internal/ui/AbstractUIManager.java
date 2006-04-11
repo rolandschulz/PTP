@@ -52,6 +52,9 @@ public abstract class AbstractUIManager implements IManager {
 	protected List pListeners = new ArrayList(0);
 	protected List setListeners = new ArrayList(0);
 
+	/** Constructor 
+	 * 
+	 */
 	public AbstractUIManager() {
 		modelManager = PTPCorePlugin.getDefault().getModelManager();
 	}
@@ -62,18 +65,30 @@ public abstract class AbstractUIManager implements IManager {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.IManager#shutdown()
+	 */
 	public void shutdown() {
 		pListeners.clear();
 		pListeners = null;
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.IManager#addPaintListener(org.eclipse.ptp.ui.listeners.IPaintListener)
+	 */
 	public void addPaintListener(IPaintListener pListener) {
 		if (!pListeners.contains(pListener))
 			pListeners.add(pListener);
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.IManager#removePaintListener(org.eclipse.ptp.ui.listeners.IPaintListener)
+	 */
 	public void removePaintListener(IPaintListener pListener) {
 		if (pListeners.contains(pListener))
 			pListeners.remove(pListener);
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.IManager#firePaintListener(java.lang.Object)
+	 */
 	public void firePaintListener(final Object condition) {
 		for (Iterator i = pListeners.iterator(); i.hasNext();) {
 			final IPaintListener pListener = (IPaintListener) i.next();
@@ -84,14 +99,23 @@ public abstract class AbstractUIManager implements IManager {
 			});
 		}
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.IManager#addSetListener(org.eclipse.ptp.ui.listeners.ISetListener)
+	 */
 	public void addSetListener(ISetListener setListener) {
 		if (!setListeners.contains(setListener))
 			setListeners.add(setListener);
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.IManager#removeSetListener(org.eclipse.ptp.ui.listeners.ISetListener)
+	 */
 	public void removeSetListener(ISetListener setListener) {
 		if (setListeners.contains(setListener))
 			setListeners.remove(setListener);
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.IManager#fireEvent(int, org.eclipse.ptp.ui.model.IElement[], org.eclipse.ptp.ui.model.IElementSet, org.eclipse.ptp.ui.model.IElementSet)
+	 */
 	public void fireEvent(final int eventType, final IElement[] elements, final IElementSet cur_set, final IElementSet pre_set) {
 		for (Iterator i = setListeners.iterator(); i.hasNext();) {
 			final ISetListener setListener = (ISetListener) i.next();
@@ -118,17 +142,26 @@ public abstract class AbstractUIManager implements IManager {
 			});
 		}
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.IManager#addToSet(org.eclipse.ptp.ui.model.IElement[], org.eclipse.ptp.ui.model.IElementSet)
+	 */
 	public void addToSet(IElement[] elements, IElementSet set) {
 		for (int i = 0; i < elements.length; i++) {
 			set.add(elements[i]);
 		}
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.IManager#addToSet(org.eclipse.ptp.ui.model.IElement[], java.lang.String, org.eclipse.ptp.ui.model.IElementHandler)
+	 */
 	public void addToSet(IElement[] elements, String setID, IElementHandler elementHandler) {
 		IElementSet set = elementHandler.getSet(setID);
 		addToSet(elements, set);
 		updateMatchElementSets(set, elementHandler);
 		fireEvent(ADD_ELEMENT_TYPE, elements, set, null);
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.IManager#createSet(org.eclipse.ptp.ui.model.IElement[], java.lang.String, java.lang.String, org.eclipse.ptp.ui.model.IElementHandler)
+	 */
 	public String createSet(IElement[] elements, String setID, String setName, IElementHandler elementHandler) {
 		IElementSet set = new ElementSet(elementHandler, setID, setName);
 		addToSet(elements, set);
@@ -137,6 +170,9 @@ public abstract class AbstractUIManager implements IManager {
 		fireEvent(CREATE_SET_TYPE, elements, set, null);
 		return set.getID();
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.IManager#removeSet(java.lang.String, org.eclipse.ptp.ui.model.IElementHandler)
+	 */
 	public void removeSet(String setID, IElementHandler elementHandler) {
 		IElementSet set = elementHandler.getSet(setID);
 		String[] sets = set.getMatchSets();
@@ -146,6 +182,9 @@ public abstract class AbstractUIManager implements IManager {
 		elementHandler.remove(setID);
 		fireEvent(DELETE_SET_TYPE, null, set, null);
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.IManager#removeFromSet(org.eclipse.ptp.ui.model.IElement[], java.lang.String, org.eclipse.ptp.ui.model.IElementHandler)
+	 */
 	public void removeFromSet(IElement[] elements, String setID, IElementHandler elementHandler) {
 		IElementSet set = elementHandler.getSet(setID);
 		for (int i = 0; i < elements.length; i++) {
@@ -154,6 +193,9 @@ public abstract class AbstractUIManager implements IManager {
 		updateMatchElementSets(set, elementHandler);
 		fireEvent(REMOVE_ELEMENT_TYPE, elements, set, null);
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.IManager#updateMatchElementSets(org.eclipse.ptp.ui.model.IElementSet, org.eclipse.ptp.ui.model.IElementHandler)
+	 */
 	public void updateMatchElementSets(IElementSet targetSet, IElementHandler elementHandler) {
 		IElementSet[] sets = elementHandler.getSortedSets();
 		for (int i = 0; i < sets.length; i++) {
@@ -169,21 +211,33 @@ public abstract class AbstractUIManager implements IManager {
 			}
 		}
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.IManager#isNoJob(java.lang.String)
+	 */
 	public boolean isNoJob(String jid) {
 		return (jid == null || jid.length() == 0);
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.IManager#isJobStop(java.lang.String)
+	 */
 	public boolean isJobStop(String job_id) {
 		if (isNoJob(job_id))
 			return true;
 		IPJob job = findJobById(job_id);
 		return (job == null || job.isAllStop());
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.IManager#findJob(java.lang.String)
+	 */
 	public IPJob findJob(String job_name) {
 		IPUniverse universe = modelManager.getUniverse();
 		if (universe == null)
 			return null;
 		return universe.findJobByName(job_name);
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.IManager#findJobById(java.lang.String)
+	 */
 	public IPJob findJobById(String job_id) {
 		IPUniverse universe = modelManager.getUniverse();
 		if (universe == null)
@@ -193,12 +247,18 @@ public abstract class AbstractUIManager implements IManager {
 			return (IPJob) element;
 		return null;
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.IManager#removeJob(org.eclipse.ptp.core.IPJob)
+	 */
 	public void removeJob(IPJob job) {
 		IPUniverse universe = modelManager.getUniverse();
 		if (universe != null) {
 			universe.deleteJob(job);
 		}
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.IManager#removeAllStoppedJobs()
+	 */
 	public void removeAllStoppedJobs() {
 		IRunnableWithProgress runnable = new IRunnableWithProgress() {
 			public void run(IProgressMonitor pmonitor) throws InvocationTargetException {
@@ -231,6 +291,9 @@ public abstract class AbstractUIManager implements IManager {
 			PTPUIPlugin.log(e1);
 		}
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.IManager#hasStoppedJob()
+	 */
 	public boolean hasStoppedJob() {
 		IPUniverse universe = modelManager.getUniverse();
 		if (universe == null)
@@ -243,6 +306,9 @@ public abstract class AbstractUIManager implements IManager {
 		}
 		return false;
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.IManager#getStatus(org.eclipse.ptp.ui.model.IElement)
+	 */
 	public int getStatus(IElement element) {
 		return getStatus(element.getID());
 	}		

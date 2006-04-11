@@ -30,6 +30,10 @@ import org.eclipse.ui.IWorkbenchPart;
  *
  */
 public class EnableDisableBreakpointRulerAction extends AbstractBreakpointRulerAction {
+	/** Constructor
+	 * @param part
+	 * @param info
+	 */
 	public EnableDisableBreakpointRulerAction(IWorkbenchPart part, IVerticalRulerInfo info) {
 		setInfo(info);
 		setTargetPart(part);
@@ -37,6 +41,9 @@ public class EnableDisableBreakpointRulerAction extends AbstractBreakpointRulerA
 		setId(IPTPDebugUIConstants.ACTION_ENABLE_DISABLE_BREAKPOINT);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.action.IAction#run()
+	 */
 	public void run() {
 		if (getBreakpoint() != null) {
 			try {
@@ -47,6 +54,9 @@ public class EnableDisableBreakpointRulerAction extends AbstractBreakpointRulerA
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.texteditor.IUpdate#update()
+	 */
 	public void update() {
 		setBreakpoint(determineBreakpoint());
 		if (getBreakpoint() == null) {

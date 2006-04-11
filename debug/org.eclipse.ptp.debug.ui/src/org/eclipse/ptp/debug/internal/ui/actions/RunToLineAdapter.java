@@ -48,6 +48,9 @@ import org.eclipse.ui.texteditor.ITextEditor;
  *
  */
 public class RunToLineAdapter implements IRunToLineTarget {
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.ui.actions.IRunToLineTarget#runToLine(org.eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection, org.eclipse.debug.core.model.ISuspendResume)
+	 */
 	public void runToLine(IWorkbenchPart part, ISelection selection, ISuspendResume target) throws CoreException {
 		String errorMessage = null;
 		if (part instanceof ITextEditor) {
@@ -121,6 +124,9 @@ public class RunToLineAdapter implements IRunToLineTarget {
 		throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IPTPUIConstants.INTERNAL_ERROR, errorMessage, null));
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.ui.actions.IRunToLineTarget#canRunToLine(org.eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection, org.eclipse.debug.core.model.ISuspendResume)
+	 */
 	public boolean canRunToLine(IWorkbenchPart part, ISelection selection, ISuspendResume target) {
 		if (target instanceof IAdaptable) {			
 			if (part instanceof IEditorPart) {
@@ -171,6 +177,11 @@ public class RunToLineAdapter implements IRunToLineTarget {
 		return false;
 	}
 
+	/** Get file name
+	 * @param input
+	 * @return
+	 * @throws CoreException
+	 */
 	private String getFileName(IEditorInput input) throws CoreException {
 		if (input instanceof IFileEditorInput) {
 			return ((IFileEditorInput)input).getFile().getName();
@@ -181,10 +192,16 @@ public class RunToLineAdapter implements IRunToLineTarget {
 		return null;
 	}
 
+	/** Run a job in background
+	 * @param r
+	 */
 	private void runInBackground(Runnable r) {
 		DebugPlugin.getDefault().asyncExec(r);
 	}
 
+	/** Failed to store status handler
+	 * @param e
+	 */
 	protected void failed(Throwable e) {
 		MultiStatus ms = new MultiStatus(PTPDebugUIPlugin.getUniqueIdentifier(), IPTPUIConstants.STATUS_CODE_ERROR, ActionMessages.getString("ResumeAtLineAdapter.4"), null);
 		ms.add(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IPTPUIConstants.STATUS_CODE_ERROR, e.getMessage(), e));

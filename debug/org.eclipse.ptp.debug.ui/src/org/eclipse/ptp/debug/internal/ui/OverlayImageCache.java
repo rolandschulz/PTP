@@ -30,6 +30,10 @@ import org.eclipse.swt.graphics.Image;
 public class OverlayImageCache {
 	private Map cache = new HashMap();
 
+	/** Get image 
+	 * @param imageDescriptor
+	 * @return
+	 */
 	public Image getImageFor(OverlayImageDescriptor imageDescriptor) {
 		Image image = (Image)getCache().get(imageDescriptor);
 		if (image == null) {
@@ -39,6 +43,9 @@ public class OverlayImageCache {
 		return image;
 	}
 
+	/** Dispose all stored images
+	 * 
+	 */
 	public void disposeAll() {
 		for (Iterator it = getCache().values().iterator(); it.hasNext();) {
 			Image image = (Image)it.next();
@@ -47,6 +54,9 @@ public class OverlayImageCache {
 		getCache().clear();
 	}
 
+	/** Get stored images
+	 * @return
+	 */
 	private Map getCache() {
 		return cache;
 	}

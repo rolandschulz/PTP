@@ -23,11 +23,32 @@ package org.eclipse.ptp.ui.model;
  *
  */
 public interface IElement {
+	/**Get parent
+	 * @return element
+	 */
 	public IElement getParent();
+	/** Get element name
+	 * @return name of element
+	 */
 	public String getName();
+	/** Get element ID
+	 * @return element ID
+	 */
 	public int getIDNum();
+	/** Get element ID
+	 * @return element ID in string format
+	 */
 	public String getID();
+	/** Is element registered
+	 * @return true if element is registered
+	 */
 	public boolean isRegistered();
+	/** Set element to register or not
+	 * @param registered is register
+	 */
 	public void setRegistered(boolean registered);
+	/** Clone a new element
+	 * @return cloned element
+	 */
 	public IElement cloneElement();
 }

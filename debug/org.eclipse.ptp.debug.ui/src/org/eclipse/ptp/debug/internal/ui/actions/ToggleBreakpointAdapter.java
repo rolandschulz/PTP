@@ -49,10 +49,16 @@ import org.eclipse.ui.texteditor.ITextEditor;
  */
 public class ToggleBreakpointAdapter implements IToggleBreakpointsTarget {
 	private UIDebugManager uiDebugManager = null;
+	/** Constructor
+	 * 
+	 */
 	public ToggleBreakpointAdapter() {
 		uiDebugManager = PTPDebugUIPlugin.getDefault().getUIDebugManager();
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.ui.actions.IToggleBreakpointsTarget#toggleLineBreakpoints(org.eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection)
+	 */
 	public void toggleLineBreakpoints(IWorkbenchPart part, ISelection selection) throws CoreException {
 		if (!PTPDebugUIPlugin.isPTPDebugPerspective())
 			return;
@@ -154,6 +160,9 @@ public class ToggleBreakpointAdapter implements IToggleBreakpointsTarget {
 		throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IPTPUIConstants.INTERNAL_ERROR, errorMessage, null));
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.ui.actions.IToggleBreakpointsTarget#canToggleLineBreakpoints(org.eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection)
+	 */
 	public boolean canToggleLineBreakpoints(IWorkbenchPart part, ISelection selection) {
 		/*
 		 * TODO DisassemblyView
@@ -167,6 +176,9 @@ public class ToggleBreakpointAdapter implements IToggleBreakpointsTarget {
 		return (selection instanceof ITextSelection);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.ui.actions.IToggleBreakpointsTarget#toggleMethodBreakpoints(org.eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection)
+	 */
 	public void toggleMethodBreakpoints(IWorkbenchPart part, ISelection selection) throws CoreException {
 		System.out.println("*** Not Implemented YET ***");
 		/*
@@ -199,6 +211,9 @@ public class ToggleBreakpointAdapter implements IToggleBreakpointsTarget {
 		*/
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.ui.actions.IToggleBreakpointsTarget#canToggleMethodBreakpoints(org.eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection)
+	 */
 	public boolean canToggleMethodBreakpoints(IWorkbenchPart part, ISelection selection) {
 		/*
 		 * FIXME doesn't implemenet yet..
@@ -229,6 +244,9 @@ public class ToggleBreakpointAdapter implements IToggleBreakpointsTarget {
 		return false;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.ui.actions.IToggleBreakpointsTarget#toggleWatchpoints(org.eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection)
+	 */
 	public void toggleWatchpoints(IWorkbenchPart part, ISelection selection) throws CoreException {
 		/*
 		 * FIXME doesn't implemenet yet..
@@ -260,6 +278,9 @@ public class ToggleBreakpointAdapter implements IToggleBreakpointsTarget {
 		*/
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.ui.actions.IToggleBreakpointsTarget#canToggleWatchpoints(org.eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection)
+	 */
 	public boolean canToggleWatchpoints(IWorkbenchPart part, ISelection selection) {
 		/*
 		 * FIXME doesn't implemenet yet..
@@ -289,6 +310,10 @@ public class ToggleBreakpointAdapter implements IToggleBreakpointsTarget {
 		return false;
 	}
 
+	/** report
+	 * @param message
+	 * @param part
+	 */
 	protected void report(String message, IWorkbenchPart part) {
 		IEditorStatusLine statusLine = (IEditorStatusLine)part.getAdapter(IEditorStatusLine.class);
 		if (statusLine != null) {
@@ -302,6 +327,10 @@ public class ToggleBreakpointAdapter implements IToggleBreakpointsTarget {
 		}
 	}
 
+	/** Get resource
+	 * @param part
+	 * @return
+	 */
 	protected static IResource getResource(IWorkbenchPart part) {
 		if (part instanceof IEditorPart) {
 			IEditorInput editorInput = ((IEditorPart)part).getEditorInput();
@@ -311,6 +340,11 @@ public class ToggleBreakpointAdapter implements IToggleBreakpointsTarget {
 		return ResourcesPlugin.getWorkspace().getRoot();
 	}
 
+	/** Get source handle
+	 * @param input
+	 * @return
+	 * @throws CoreException
+	 */
 	private String getSourceHandle(IEditorInput input) throws CoreException {
 		if (input instanceof IFileEditorInput) {
 			return ((IFileEditorInput)input).getFile().getLocation().toOSString();
@@ -500,9 +534,19 @@ public class ToggleBreakpointAdapter implements IToggleBreakpointsTarget {
 	*/
 	
 	private class BreakpointLocationVerifier {
+		/** Get valid line breakpoint location
+		 * @param doc
+		 * @param lineNumber
+		 * @return
+		 */
 		public int getValidLineBreakpointLocation(IDocument doc, int lineNumber) {
 			return lineNumber + 1;
 		}
+		/** Get valid address breakpoint location
+		 * @param doc
+		 * @param lineNumber
+		 * @return
+		 */
 		public int getValidAddressBreakpointLocation(IDocument doc, int lineNumber) {
 			return lineNumber + 1;
 		}

@@ -22,7 +22,16 @@ package org.eclipse.ptp.ui.views;
  * 
  */
 public interface IContentProvider {
+	/** Get target element
+	 * @param index element index
+	 * @return element
+	 */
 	public Object getObject(int index);
+	/** Get index of left hand element
+	 * @param obj Target element
+	 * @param index element index
+	 * @return element ID
+	 */
 	public String getRulerIndex(Object obj, int index);
 }
 

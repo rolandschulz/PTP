@@ -45,6 +45,9 @@ import org.eclipse.ui.texteditor.ITextEditor;
  *
  */
 public class ResumeAtLineAdapter implements IResumeAtLineTarget {
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.internal.ui.actions.IResumeAtLineTarget#resumeAtLine(org.eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection, org.eclipse.debug.core.model.ISuspendResume)
+	 */
 	public void resumeAtLine(IWorkbenchPart part, ISelection selection, ISuspendResume target) throws CoreException {
 		String errorMessage = null;
 		if (part instanceof ITextEditor) {
@@ -118,6 +121,9 @@ public class ResumeAtLineAdapter implements IResumeAtLineTarget {
 		throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IPTPUIConstants.INTERNAL_ERROR, errorMessage, null));
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.internal.ui.actions.IResumeAtLineTarget#canResumeAtLine(org.eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection, org.eclipse.debug.core.model.ISuspendResume)
+	 */
 	public boolean canResumeAtLine(IWorkbenchPart part, ISelection selection, ISuspendResume target) {
 		if (target instanceof IAdaptable) {			
 			if (part instanceof IEditorPart) {
@@ -168,6 +174,11 @@ public class ResumeAtLineAdapter implements IResumeAtLineTarget {
 		return false;
 	}
 
+	/** Get file name
+	 * @param input
+	 * @return
+	 * @throws CoreException
+	 */
 	private String getFileName(IEditorInput input) throws CoreException {
 		if (input instanceof IFileEditorInput) {
 			return ((IFileEditorInput)input).getFile().getName();
@@ -178,10 +189,16 @@ public class ResumeAtLineAdapter implements IResumeAtLineTarget {
 		return null;
 	}
 
+	/** Run a job in background
+	 * @param r
+	 */
 	private void runInBackground(Runnable r) {
 		DebugPlugin.getDefault().asyncExec(r);
 	}
 
+	/** Failed to store status handler
+	 * @param e
+	 */
 	protected void failed(Throwable e) {
 		MultiStatus ms = new MultiStatus(PTPDebugUIPlugin.getUniqueIdentifier(), IPTPUIConstants.STATUS_CODE_ERROR, ActionMessages.getString("ResumeAtLineAdapter.4"), null);
 		ms.add(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IPTPUIConstants.STATUS_CODE_ERROR, e.getMessage(), e));

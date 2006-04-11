@@ -33,14 +33,23 @@ import org.eclipse.ptp.ui.model.IElement;
 public class TerminateAction extends DebugAction {
 	public static final String name = "Terminate";
 
+	/** Constructor
+	 * @param view
+	 */
 	public TerminateAction(ParallelDebugView view) {
 		super(name, view);
 	    setImageDescriptor(PDebugImage.ID_ICON_TERMINATEALL_NORMAL);
 	    setDisabledImageDescriptor(PDebugImage.ID_ICON_TERMINATEALL_DISABLE);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.actions.ParallelAction#run(org.eclipse.ptp.ui.model.IElement[])
+	 */
 	public void run(IElement[] elements) {}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.action.IAction#run()
+	 */
 	public void run() {
 		IManager manager = view.getUIManager();
 		if (manager instanceof UIDebugManager) {

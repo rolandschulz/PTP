@@ -49,6 +49,14 @@ public class DefaultInformationControl implements IIconInformationControl, Dispo
 	public static final int SHELL_DEFAULT_HEIGHT = 200;
 	
 	public interface IInformationPresenter {
+		/** Update presentation
+		 * @param display
+		 * @param hoverInfo
+		 * @param presentation
+		 * @param maxWidth
+		 * @param maxHeight
+		 * @return formatted text
+		 */
 		String updatePresentation(Display display, String hoverInfo, TextPresentation presentation, int maxWidth, int maxHeight);
 	}
 	
@@ -65,19 +73,43 @@ public class DefaultInformationControl implements IIconInformationControl, Dispo
 	private ScrolledComposite sc = null;
 	private boolean showDetails = false;
 	
+	/** Constructor
+	 * @param parent
+	 * @param showDetails
+	 */
 	public DefaultInformationControl(Shell parent, boolean showDetails) {
 		this(parent, showDetails, SWT.NONE | SWT.WRAP);
 	}
+	/** Constructor
+	 * @param parent
+	 * @param showDetails
+	 * @param style
+	 */
 	public DefaultInformationControl(Shell parent, boolean showDetails, int style) {
 		this(parent, SWT.TOOL | SWT.NO_TRIM, showDetails, style, new IconHoverPresenter(false));
 	}
+	/** Constructor
+	 * @param parent
+	 */
 	public DefaultInformationControl(Shell parent) {
 		this(parent, false);
 	}
+	/** Constructor
+	 * @param parent
+	 * @param style
+	 * @param presenter
+	 */
 	public DefaultInformationControl(Shell parent, int style, IInformationPresenter presenter) {
 		this(parent, SWT.TOOL | SWT.NO_TRIM, true, style, presenter);
 	}
 	
+	/** Constructor
+	 * @param parent
+	 * @param shellStyle
+	 * @param showDetails
+	 * @param style
+	 * @param presenter
+	 */
 	public DefaultInformationControl(Shell parent, int shellStyle, boolean showDetails, int style, IInformationPresenter presenter) {
 		this.showDetails = showDetails;
 		GridLayout layout;
@@ -164,10 +196,16 @@ public class DefaultInformationControl implements IIconInformationControl, Dispo
 		}
 		addDisposeListener(this);
 	}
+	/** Close shell
+	 * 
+	 */
 	private void close() {
 		if (fShell != null && !fShell.isDisposed())
 			fShell.dispose();		
 	}
+	/** Create head label field
+	 * @param labelField
+	 */
 	private void createHeadLabel(Label labelField) {
 		Font font= labelField.getFont();
 		if (fHeaderTextFont == null) {
@@ -183,11 +221,17 @@ public class DefaultInformationControl implements IIconInformationControl, Dispo
 		labelField.setBackground(labelField.getParent().getBackground());		
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.hover.IIconInformationControl#setHeader(java.lang.String)
+	 */
 	public void setHeader(String header) {
 		if (headerField != null) {
 			headerField.setText(header + " ");
 		}
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.text.IInformationControl#setInformation(java.lang.String)
+	 */
 	public void setInformation(String content) {
 		if (fPresenter == null) {
 			fText.setText(content);
@@ -202,15 +246,24 @@ public class DefaultInformationControl implements IIconInformationControl, Dispo
 			}
 		}
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.text.IInformationControl#setVisible(boolean)
+	 */
 	public void setVisible(boolean visible) {
 		fShell.setVisible(visible);
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.text.IInformationControl#dispose()
+	 */
 	public void dispose() {
 		if (fShell != null && !fShell.isDisposed())
 			fShell.dispose();
 		else
 			widgetDisposed(null);
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.swt.events.DisposeListener#widgetDisposed(org.eclipse.swt.events.DisposeEvent)
+	 */
 	public void widgetDisposed(DisposeEvent event) {
 		if (fHeaderTextFont != null && !fHeaderTextFont.isDisposed())
 			fHeaderTextFont.dispose();
@@ -219,6 +272,9 @@ public class DefaultInformationControl implements IIconInformationControl, Dispo
 		fText= null;
 		fHeaderTextFont= null;
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.text.IInformationControl#setSize(int, int)
+	 */
 	public void setSize(int width, int height) {
 		int new_width = showDetails?(width + 75):width;
 		if (width > SHELL_DEFAULT_WIDTH || height > SHELL_DEFAULT_HEIGHT) {
@@ -234,32 +290,59 @@ public class DefaultInformationControl implements IIconInformationControl, Dispo
 			fShell.setSize(new_width+5, height+2);
 		}
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.text.IInformationControl#setLocation(org.eclipse.swt.graphics.Point)
+	 */
 	public void setLocation(Point location) {
 		fShell.setLocation(location);
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.text.IInformationControl#setSizeConstraints(int, int)
+	 */
 	public void setSizeConstraints(int maxWidth, int maxHeight) {
 		fMaxWidth= maxWidth;
 		fMaxHeight= maxHeight;
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.text.IInformationControl#computeSizeHint()
+	 */
 	public Point computeSizeHint() {
 		//return fShell.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 		return sc.getContent().computeSize(SWT.DEFAULT, SWT.DEFAULT);
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.text.IInformationControl#addDisposeListener(org.eclipse.swt.events.DisposeListener)
+	 */
 	public void addDisposeListener(DisposeListener listener) {
 		fShell.addDisposeListener(listener);
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.text.IInformationControl#removeDisposeListener(org.eclipse.swt.events.DisposeListener)
+	 */
 	public void removeDisposeListener(DisposeListener listener) {
 		fShell.removeDisposeListener(listener);
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.text.IInformationControl#setForegroundColor(org.eclipse.swt.graphics.Color)
+	 */
 	public void setForegroundColor(Color foreground) {
 		fText.setForeground(foreground);
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.text.IInformationControl#setBackgroundColor(org.eclipse.swt.graphics.Color)
+	 */
 	public void setBackgroundColor(Color background) {
 		fText.setBackground(background);
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.text.IInformationControl#isFocusControl()
+	 */
 	public boolean isFocusControl() {
 		return fText.isFocusControl();
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.text.IInformationControl#setFocus()
+	 */
 	public void setFocus() {
 		if (showDetails) {
 			fShell.forceFocus();
@@ -268,13 +351,22 @@ public class DefaultInformationControl implements IIconInformationControl, Dispo
 			}
 		}
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.text.IInformationControl#addFocusListener(org.eclipse.swt.events.FocusListener)
+	 */
 	public void addFocusListener(FocusListener listener) {
 		fText.addFocusListener(listener);
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.text.IInformationControl#removeFocusListener(org.eclipse.swt.events.FocusListener)
+	 */
 	public void removeFocusListener(FocusListener listener) {
 		fText.removeFocusListener(listener);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.hover.IIconInformationControl#getShellSize()
+	 */
 	public Point getShellSize() {
 		Point size = computeSizeHint();
 		//set Shell size
@@ -289,6 +381,9 @@ public class DefaultInformationControl implements IIconInformationControl, Dispo
 		return size;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.hover.IIconInformationControl#isWrap()
+	 */
 	public boolean isWrap() {
 		return (fMaxWidth>-1);
 	}

@@ -32,14 +32,23 @@ import org.eclipse.ptp.ui.model.IElement;
 public class ResumeAction extends DebugAction {
 	public static final String name = "Resume";
 
+	/** Constructor
+	 * @param view
+	 */
 	public ResumeAction(ParallelDebugView view) {
 		super(name, view);
 	    setImageDescriptor(PDebugImage.ID_ICON_RESUME_NORMAL);
 	    setDisabledImageDescriptor(PDebugImage.ID_ICON_RESUME_DISABLE);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.actions.ParallelAction#run(org.eclipse.ptp.ui.model.IElement[])
+	 */
 	public void run(IElement[] elements) {}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.action.IAction#run()
+	 */
 	public void run() {
 		IManager manager = view.getUIManager();
 		if (manager instanceof UIDebugManager) {

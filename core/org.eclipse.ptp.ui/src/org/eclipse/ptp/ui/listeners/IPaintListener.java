@@ -23,5 +23,8 @@ package org.eclipse.ptp.ui.listeners;
  *
  */
 public interface IPaintListener {
+	/** Repaint the view
+	 * @param condition do nothing if null
+	 */
 	public void repaint(Object condition);
 }

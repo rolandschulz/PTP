@@ -26,9 +26,28 @@ import org.eclipse.ptp.ui.model.IElementSet;
  *
  */
 public interface ISetListener {
+	/** Change set event
+	 * @param currentSet current Set
+	 * @param preSet previous Set
+	 */
 	public void changeSetEvent(IElementSet currentSet, IElementSet preSet);
+	/** Create set event
+	 * @param set new Set
+	 * @param elements add elements into a given Set
+	 */
 	public void createSetEvent(IElementSet set, IElement[] elements);
+	/** Delete set event
+	 * @param set Set
+	 */
 	public void deleteSetEvent(IElementSet set);
+	/** Add element to set event
+	 * @param set Set
+	 * @param elements elements to add to set
+	 */
 	public void addElementsEvent(IElementSet set, IElement[] elements);
+	/** Remove elements event
+	 * @param set Set  
+	 * @param elements elements to remove from set
+	 */
 	public void removeElementsEvent(IElementSet set, IElement[] elements);
 }

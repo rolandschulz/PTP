@@ -39,27 +39,44 @@ public abstract class ViewFilterAction extends ViewerFilter implements IViewActi
 	private IViewPart view = null;
 	private IAction action = null;
 
+	/** Constructor
+	 * 
+	 */
 	public ViewFilterAction() {
 		super();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IViewActionDelegate#init(org.eclipse.ui.IViewPart)
+	 */
 	public void init(IViewPart view) {
 		this.view = view;
 		action.setChecked(getPreferenceValue(view));
 		run(action);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IActionDelegate2#init(org.eclipse.jface.action.IAction)
+	 */
 	public void init(IAction action) {
 		this.action = action;
 	}
 
-	public void dispose() {
-	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IActionDelegate2#dispose()
+	 */
+	public void dispose() {}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IActionDelegate2#runWithEvent(org.eclipse.jface.action.IAction, org.eclipse.swt.widgets.Event)
+	 */
 	public void runWithEvent(IAction action, Event event) {
 		run(action);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
+	 */
 	public void run(IAction action) {
 		StructuredViewer viewer = getStructuredViewer();
 		ViewerFilter[] filters = viewer.getFilters();
@@ -80,13 +97,22 @@ public abstract class ViewFilterAction extends ViewerFilter implements IViewActi
 		PTPDebugUIPlugin.getDefault().savePluginPreferences();
 	}
 
-	public void selectionChanged(IAction action, ISelection selection) {
-	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action.IAction, org.eclipse.jface.viewers.ISelection)
+	 */
+	public void selectionChanged(IAction action, ISelection selection) {}
 
+	/** Get preference store
+	 * @return
+	 */
 	protected IPreferenceStore getPreferenceStore() {
 		return PTPDebugUIPlugin.getDefault().getPreferenceStore();
 	}
 	
+	/** Get preference value
+	 * @param part
+	 * @return
+	 */
 	protected boolean getPreferenceValue(IViewPart part) {
 		String baseKey = getPreferenceKey();
 		String viewKey = part.getSite().getId();
@@ -101,12 +127,21 @@ public abstract class ViewFilterAction extends ViewerFilter implements IViewActi
 		return value;		
 	}
 	
+	/** Get preference key
+	 * @return
+	 */
 	protected abstract String getPreferenceKey(); 
 
+	/** Get view
+	 * @return
+	 */
 	protected IViewPart getView() {
 		return view;
 	}
 	
+	/** Get structured viewer
+	 * @return
+	 */
 	protected StructuredViewer getStructuredViewer() {
 		IDebugView view = (IDebugView)getView().getAdapter(IDebugView.class);
 		if (view != null) {
@@ -118,6 +153,9 @@ public abstract class ViewFilterAction extends ViewerFilter implements IViewActi
 		return null;
 	}
 	
+	/** Check if action is checked
+	 * @return true is action is checked
+	 */
 	protected boolean getValue() {
 		return action.isChecked();
 	}

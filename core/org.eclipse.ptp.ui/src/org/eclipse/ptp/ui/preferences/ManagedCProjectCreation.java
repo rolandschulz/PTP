@@ -47,23 +47,44 @@ import org.eclipse.ptp.ui.PTPUIPlugin;
  *
  */
 public class ManagedCProjectCreation extends SimulationProjectCreation {
+	/** Constructor
+	 * @param projectName
+	 * @param fileName
+	 */
 	public ManagedCProjectCreation(String projectName, String fileName) {
 		super(projectName, fileName);
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.preferences.SimulationProjectCreation#getFileExtension()
+	 */
 	public String getFileExtension() {
 		return ".c";
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.preferences.SimulationProjectCreation#getTemplateFile()
+	 */
 	protected String getTemplateFile() {
 		return "ctemplate.txt";
 	}
-	//TODO - hardcode the C editor
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.preferences.SimulationProjectCreation#getEditorID()
+	 */
 	protected String getEditorID() {
+		//hardcode the C editor
 		return "org.eclipse.cdt.ui.editor.CEditor";
 	}
 	
+	/** Get project ID
+	 * @return
+	 */
 	private String getProjectID() {
 		return ManagedBuilderCorePlugin.MANAGED_MAKE_PROJECT_ID;		
 	}
+	/** Add nature to project
+	 * @param newProject
+	 * @param monitor
+	 * @throws CoreException
+	 */
 	private void addNature(IProject newProject, IProgressMonitor monitor) throws CoreException {
 		monitor.beginTask("", 2);
 		monitor.subTask("Adding nature...");
@@ -72,6 +93,9 @@ public class ManagedCProjectCreation extends SimulationProjectCreation {
 		ManagedCProjectNature.addManagedBuilder(newProject, new SubProgressMonitor(monitor, 1));
 		monitor.done();
 	}
+	/** Get default project type
+	 * @return
+	 */
 	private IProjectType getDefaultProjectType() {
 		IProjectType[] types = ManagedBuildManager.getDefinedProjectTypes();
 		String os = Platform.getOS();
@@ -95,12 +119,19 @@ public class ManagedCProjectCreation extends SimulationProjectCreation {
 		}
 		return null;
 	}
+	/** Get default configuration
+	 * @param type
+	 * @return
+	 */
 	private IConfiguration[] getDefaultConfigurations(IProjectType type) {
 		if (type != null)
 			return type.getConfigurations();
 		return new IConfiguration[0];
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.preferences.SimulationProjectCreation#createProject(org.eclipse.core.resources.IProjectDescription, org.eclipse.core.resources.IProject, org.eclipse.core.runtime.IProgressMonitor)
+	 */
 	protected void createProject(IProjectDescription description, IProject newProject, IProgressMonitor monitor) throws CoreException {
 		CCorePlugin.getDefault().createCProject(description, newProject, monitor, getProjectID());
 		//add project nature
@@ -170,6 +201,11 @@ public class ManagedCProjectCreation extends SimulationProjectCreation {
 		monitor.done();
 	}
 	
+    /** Set project indexer 
+     * @param newProject
+     * @param monitor
+     * @throws CoreException
+     */
     public void setIndexer(IProject newProject, IProgressMonitor monitor) throws CoreException {
 		final String indexerID = CCorePlugin.DEFAULT_INDEXER_UNIQ_ID;
     	if (monitor == null)

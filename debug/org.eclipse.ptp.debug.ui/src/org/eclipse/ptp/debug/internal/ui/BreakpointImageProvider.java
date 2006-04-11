@@ -34,6 +34,9 @@ import org.eclipse.ui.texteditor.MarkerAnnotation;
 public class BreakpointImageProvider implements IAnnotationImageProvider {
 	private IDebugModelPresentation debugModelPresentation = null;
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.texteditor.IAnnotationImageProvider#getManagedImage(org.eclipse.jface.text.source.Annotation)
+	 */
 	public Image getManagedImage(Annotation annotation) {
 		if (annotation instanceof MarkerAnnotation) {
 			MarkerAnnotation markerAnnotation = (MarkerAnnotation)annotation;
@@ -44,14 +47,23 @@ public class BreakpointImageProvider implements IAnnotationImageProvider {
 		return null;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.texteditor.IAnnotationImageProvider#getImageDescriptorId(org.eclipse.jface.text.source.Annotation)
+	 */
 	public String getImageDescriptorId(Annotation annotation) {
 		return null;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.texteditor.IAnnotationImageProvider#getImageDescriptor(java.lang.String)
+	 */
 	public ImageDescriptor getImageDescriptor(String imageDescritporId) {
 		return null;
 	}
 	
+	/** Get IDebugModelPresentation
+	 * @return
+	 */
 	private IDebugModelPresentation getPresentation() {
 		if (debugModelPresentation == null)
 			debugModelPresentation = DebugUITools.newDebugModelPresentation();

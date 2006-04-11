@@ -26,6 +26,19 @@ import org.eclipse.swt.graphics.Image;
  *
  */
 public interface IImageProvider {
+	/** Get icon status
+	 * @param obj Target element
+	 * @param isSelected whether it is selected or not
+	 * @return Image
+	 */
 	public Image getStatusIcon(Object obj, boolean isSelected);
+	/** Draw special on the image
+	 * @param obj Target element
+	 * @param gc GC
+	 * @param x_loc x coordinate
+	 * @param y_loc y corrdinate
+	 * @param width image size
+	 * @param height image height
+	 */
 	public void drawSpecial(Object obj, GC gc, int x_loc, int y_loc, int width, int height);
 }

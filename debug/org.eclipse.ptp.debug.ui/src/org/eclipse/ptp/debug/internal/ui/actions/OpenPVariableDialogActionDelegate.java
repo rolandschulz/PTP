@@ -29,15 +29,27 @@ import org.eclipse.swt.widgets.Shell;
  * 
  */
 public class OpenPVariableDialogActionDelegate extends AbstractPVariableAction {
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
+	 */
 	public void run(IAction action) {}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IActionDelegate2#init(org.eclipse.jface.action.IAction)
+	 */
 	public void init(IAction action) {
 		action.setChecked(false);
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IActionDelegate2#runWithEvent(org.eclipse.jface.action.IAction, org.eclipse.swt.widgets.Event)
+	 */
 	public void runWithEvent(IAction action, Event event) {
 		doAction(view.getViewSite().getShell());
 		action.setChecked(false);
 	}
+	/** Open PTP Variable dialog
+	 * @param shell
+	 */
 	public void doAction(Shell shell) {
 		if (shell == null) {
 			shell = PTPDebugUIPlugin.getActiveWorkbenchShell();

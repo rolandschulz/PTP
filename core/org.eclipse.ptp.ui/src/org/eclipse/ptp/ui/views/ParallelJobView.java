@@ -77,13 +77,22 @@ public class ParallelJobView extends AbstractParallelSetView {
 	public static final String PRO_VIEW = "2";
 	protected String current_view = BOTH_VIEW;
 
+	/** Constructor
+	 * 
+	 */
 	public ParallelJobView() {
 		instance = this;
 		manager = PTPUIPlugin.getDefault().getJobManager();
 	}
+	/** Get current view flag
+	 * @return flag of view
+	 */
 	public String getCurrentView() {
 		return current_view;
 	}
+	/** Change view
+	 * @param view_flag
+	 */
 	public void changeView(String view_flag) {
 		current_view = view_flag;
 		if (current_view.equals(ParallelJobView.JOB_VIEW)) {
@@ -100,20 +109,35 @@ public class ParallelJobView extends AbstractParallelSetView {
 			sashForm.setWeights(new int[] { 1, 2 });
 		}
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#initialElement()
+	 */
 	protected void initialElement() {
 		changeJob(manager.initial());
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#initialView()
+	 */
 	protected void initialView() {
 		initialElement();
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#getImage(int, int)
+	 */
 	public Image getImage(int index1, int index2) {
 		return ParallelImages.procImages[index1][index2];
 	}
+	/** Get ParallelJobView instance
+	 * @return instance
+	 */
 	public static ParallelJobView getJobViewInstance() {
 		if (instance == null)
 			instance = new ParallelJobView();
 		return instance;
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#createView(org.eclipse.swt.widgets.Composite)
+	 */
 	protected void createView(Composite parent) {
 		parent.setLayout(new FillLayout(SWT.VERTICAL));
 		parent.setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -168,6 +192,9 @@ public class ParallelJobView extends AbstractParallelSetView {
 		elementViewComposite = createElementView(sashForm);
 		changeView(current_view);
 	}
+	/** Create Job context menu
+	 * 
+	 */
 	protected void createJobContextMenu() {
 		MenuManager menuMgr = new MenuManager("#jobpopupmenu");
 		menuMgr.setRemoveAllWhenShown(true);
@@ -181,32 +208,49 @@ public class ParallelJobView extends AbstractParallelSetView {
 		Menu menu = menuMgr.createContextMenu(jobTableViewer.getTable());
 		jobTableViewer.getTable().setMenu(menu);
 	}
+	/** Create job context menu
+	 * @param menuManager
+	 */
 	protected void fillJobContextMenu(IMenuManager menuManager) {
 		ParallelAction removeAllTerminatedAction = new RemoveAllTerminatedAction(this);
 		removeAllTerminatedAction.setEnabled(manager.hasStoppedJob());
 		menuManager.add(removeAllTerminatedAction);
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.views.AbstractParallelSetView#createToolBarActions(org.eclipse.jface.action.IToolBarManager)
+	 */
 	protected void createToolBarActions(IToolBarManager toolBarMgr) {
 		terminateAllAction = new TerminateAllAction(this);
 		toolBarMgr.appendToGroup(IPTPUIConstants.IUIACTIONGROUP, terminateAllAction);
 		super.buildInToolBarActions(toolBarMgr);
 	}
-	protected void setActionEnable() {}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#doubleClick(org.eclipse.ptp.ui.model.IElement)
+	 */
 	public void doubleClick(IElement element) {
 		openProcessViewer(((JobManager) manager).findProcess(getCurrentID(), element.getID()));
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#convertElementObject(org.eclipse.ptp.ui.model.IElement)
+	 */
 	protected Object convertElementObject(IElement element) {
 		if (element == null)
 			return null;
 		
 		return ((JobManager) manager).findProcess(getCurrentID(), element.getID());
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.views.IContentProvider#getRulerIndex(java.lang.Object, int)
+	 */
 	public String getRulerIndex(Object obj, int index) {
 		if (obj instanceof IElement) {
 			return ((IElement)obj).getName();
 		}
 		return super.getRulerIndex(obj, index);
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#getToolTipText(java.lang.Object)
+	 */
 	public String[] getToolTipText(Object obj) {
 		IElementHandler setManager = getCurrentElementHandler();
 		if (obj == null || !(obj instanceof IPProcess) || setManager == null || cur_element_set == null)
@@ -228,19 +272,31 @@ public class ParallelJobView extends AbstractParallelSetView {
 		// buffer.append("\nStatus: " + getJobManager().getProcessStatusText(proc));
 		return new String[] { buffer.toString() };
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#getCurrentID()
+	 */
 	public String getCurrentID() {
 		return ((JobManager) manager).getCurrentJobId();
 	}
+	/** Change job
+	 * @param job_id Target job ID
+	 */
 	protected void selectJob(String job_id) {
 		((JobManager) manager).setCurrentJobId(job_id);
 		updateJob();
 	}
+	/** Get selected job
+	 * @return selected job
+	 */
 	public IPJob getCheckedJob() {
 		String job_id = getCurrentID();
 		if (!manager.isNoJob(job_id))
 			return manager.findJobById(job_id);
 		return null;
 	}
+	/** Change job
+	 * @param job_id Job ID
+	 */
 	public void changeJob(final String job_id) {
 		getDisplay().syncExec(new Runnable() {
 			public void run() {
@@ -251,6 +307,9 @@ public class ParallelJobView extends AbstractParallelSetView {
 			}
 		});
 	}
+	/** Change job
+	 * @param job
+	 */
 	protected void changeJob(final IPJob job) {
 		String cur_id = getCurrentID();
 		if (cur_id != null && job != null && cur_id.equals(job.getIDString()))
@@ -259,10 +318,16 @@ public class ParallelJobView extends AbstractParallelSetView {
 		update();
 		refresh();
 	}
+	/** Update Job
+	 * 
+	 */
 	public void updateJob() {
 		IElementHandler setManager = getCurrentElementHandler();
 		selectSet(setManager == null ? null : setManager.getSetRoot());
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.views.AbstractParallelSetView#updateAction()
+	 */
 	protected void updateAction() {
 		super.updateAction();
 		if (terminateAllAction != null) {
@@ -275,6 +340,9 @@ public class ParallelJobView extends AbstractParallelSetView {
 			}
 		}
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#updateView(java.lang.Object)
+	 */
 	public void updateView(Object condition) {
 		if (condition != null) {
 			if (!jobTableViewer.getTable().isDisposed()) {
@@ -283,6 +351,9 @@ public class ParallelJobView extends AbstractParallelSetView {
 			}
 		}
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.IParallelModelListener#run(java.lang.String)
+	 */
 	public void run(final String arg) {
 		System.out.println("------------ job run: " + arg);
 		initialView();
@@ -298,44 +369,74 @@ public class ParallelJobView extends AbstractParallelSetView {
 		*/
 		refresh();
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.IParallelModelListener#start()
+	 */
 	public void start() {
 		System.out.println("------------ job start");
 		refresh();
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.IParallelModelListener#stopped()
+	 */
 	public void stopped() {
 		System.out.println("------------ job stop");
 		refresh();
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.IParallelModelListener#exit()
+	 */
 	public void exit() {
 		System.out.println("------------ job exit");
 		refresh();
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.IParallelModelListener#abort()
+	 */
 	public void abort() {
 		System.out.println("------------ job abort");
 		refresh();
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.IParallelModelListener#monitoringSystemChangeEvent(java.lang.Object)
+	 */
 	public void monitoringSystemChangeEvent(Object object) {
 		System.out.println("------------ job monitoringSystemChangeEvent");
 		manager.clear();
 		initialView();
 		refresh();
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.IParallelModelListener#execStatusChangeEvent(java.lang.Object)
+	 */
 	public void execStatusChangeEvent(Object object) {
 		System.out.println("------------ job execStatusChangeEvent");
 		refresh();
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.IParallelModelListener#sysStatusChangeEvent(java.lang.Object)
+	 */
 	public void sysStatusChangeEvent(Object object) {
 		System.out.println("------------ job sysStatusChangeEvent");
 		refresh();
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.IParallelModelListener#processOutputEvent(java.lang.Object)
+	 */
 	public void processOutputEvent(Object object) {
 		System.out.println("------------ job processOutputEvent");
 		refresh();
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.IParallelModelListener#errorEvent(java.lang.Object)
+	 */
 	public void errorEvent(Object object) {
 		System.out.println("------------ job errorEvent");
 		refresh();
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.IParallelModelListener#updatedStatusEvent()
+	 */
 	public void updatedStatusEvent() {
 		System.out.println("------------ job updatedStatusEvent");
 		refresh();

@@ -26,8 +26,16 @@ import org.eclipse.swt.graphics.Point;
  * 
  */
 public interface IIconInformationControl extends IInformationControl {
+	/** Set header
+	 * @param header
+	 */
 	public void setHeader(String header);
+	/** Get shell size
+	 * @return x is width, y is height
+	 */
 	public Point getShellSize();
+	/** Is wrap text
+	 * @return true if wrap text
+	 */
 	public boolean isWrap();
 }
-

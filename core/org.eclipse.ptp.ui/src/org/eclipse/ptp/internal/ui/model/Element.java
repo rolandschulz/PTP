@@ -31,16 +31,27 @@ public class Element implements IElement, Cloneable, Comparable {
 	protected boolean registered = false;
 	protected IElement parent = null;
 	
+	/** Constructor
+	 * @param parent Parent element
+	 * @param id element ID
+	 * @param name element name
+	 */
 	public Element(IElement parent, String id, String name) {
 		this.parent = parent;
 		this.id = id;
 		this.name = name;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.model.IElement#getParent()
+	 */
 	public IElement getParent() {
 		return parent;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.model.IElement#getIDNum()
+	 */
 	public int getIDNum() {
 		try {
 			return Integer.parseInt(id);
@@ -48,18 +59,33 @@ public class Element implements IElement, Cloneable, Comparable {
 			return -1;
 		}
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.model.IElement#getID()
+	 */
 	public String getID() {
 		return id;
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.model.IElement#getName()
+	 */
 	public String getName() {
 		return name;
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.model.IElement#isRegistered()
+	 */
 	public boolean isRegistered() {
 		return registered;
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.model.IElement#setRegistered(boolean)
+	 */
 	public void setRegistered(boolean registered) {
 		this.registered = registered;
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.model.IElement#cloneElement()
+	 */
 	public IElement cloneElement() {
 		try {
 			return (IElement)clone();

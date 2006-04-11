@@ -38,8 +38,14 @@ import org.eclipse.ui.IViewPart;
 public class GotoSet implements IViewActionDelegate {
 	private IStructuredSelection selection = null;
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IViewActionDelegate#init(org.eclipse.ui.IViewPart)
+	 */
 	public void init(IViewPart view) {}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
+	 */
 	public void run(IAction action) {
 		IPBreakpoint breakpoint = getPBreakpoint();
 		if (breakpoint != null) {
@@ -65,6 +71,9 @@ public class GotoSet implements IViewActionDelegate {
 		}
 	}
 	
+	/** Get PTP breakpoint
+	 * @return null if there is no ptp breakpoint
+	 */
 	private IPBreakpoint getPBreakpoint() {
 		if (selection.isEmpty())
 			return null;
@@ -76,6 +85,9 @@ public class GotoSet implements IViewActionDelegate {
 		return null;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action.IAction, org.eclipse.jface.viewers.ISelection)
+	 */
 	public void selectionChanged(IAction action, ISelection selection) {
 		if (selection instanceof IStructuredSelection) {
 			this.selection = (IStructuredSelection)selection;

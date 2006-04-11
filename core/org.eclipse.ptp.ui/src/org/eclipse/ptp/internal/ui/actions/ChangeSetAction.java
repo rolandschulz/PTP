@@ -36,11 +36,17 @@ import org.eclipse.ptp.ui.views.AbstractParallelElementView;
 public class ChangeSetAction extends GotoDropDownAction {
 	public static final String name = "Change Set";
     
+	/** Constructor
+	 * @param view
+	 */
 	public ChangeSetAction(AbstractParallelElementView view) {
 		super(name, view);
 	    setImageDescriptor(ParallelImages.ID_ICON_CHANGESET_NORMAL);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.actions.GotoDropDownAction#createDropDownMenu(org.eclipse.jface.action.MenuManager)
+	 */
 	protected void createDropDownMenu(MenuManager dropDownMenuMgr) {
 	    String curID = view.getCurrentSetID();    	
 	    if (curID == null || curID.length() == 0)
@@ -62,6 +68,9 @@ public class ChangeSetAction extends GotoDropDownAction {
 	    	}		
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.actions.GotoDropDownAction#addAction(org.eclipse.jface.action.MenuManager, java.lang.String, java.lang.String, java.lang.String)
+	 */
 	protected void addAction(MenuManager dropDownMenuMgr, String e_name, String id, String curID) {
 		IAction action = new InternalSetAction(e_name, id, view, this);
 		action.setChecked(curID.equals(id));
@@ -69,8 +78,14 @@ public class ChangeSetAction extends GotoDropDownAction {
 		dropDownMenuMgr.add(action);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.actions.ParallelAction#run(org.eclipse.ptp.ui.model.IElement[])
+	 */
 	public void run(IElement[] elements) {}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.action.IAction#run()
+	 */
 	public void run() {
 		IElementHandler setManager = view.getCurrentElementHandler();
 		if (setManager == null)
@@ -89,12 +104,19 @@ public class ChangeSetAction extends GotoDropDownAction {
 	    	}
 	}
 	
+	/** run action
+	 * @param elements
+	 * @param set
+	 */
 	public void run(IElement[] elements, IElementSet set) {
 		view.selectSet(set);
 		view.update();
 		view.refresh();
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.actions.GotoDropDownAction#run(org.eclipse.ptp.ui.model.IElement[], java.lang.String)
+	 */
 	public void run(IElement[] elements, String id) {
 		IElementHandler setManager = view.getCurrentElementHandler();
 		if (setManager == null)
@@ -103,6 +125,10 @@ public class ChangeSetAction extends GotoDropDownAction {
 		run(elements, setManager.getSet(id));
 	}
 
+	/** Inner internal set action
+	 * @author clement
+	 *
+	 */
 	private class InternalSetAction extends GotoAction {
 		public InternalSetAction(String name, String id, AbstractParallelElementView view, GotoDropDownAction action) {
 			super(name, id, view, action);

@@ -34,10 +34,16 @@ import org.eclipse.ptp.ui.views.ParallelJobView;
 public class ChangeJobViewAction extends GotoDropDownAction {
 	public static final String name = "Job View";
     
+	/** Constructor
+	 * @param view
+	 */
 	public ChangeJobViewAction(AbstractParallelElementView view) {
 		super(name, view);
 	    setImageDescriptor(ParallelImages.ID_ICON_JOB_NORMAL);
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.actions.GotoDropDownAction#createDropDownMenu(org.eclipse.jface.action.MenuManager)
+	 */
 	protected void createDropDownMenu(MenuManager dropDownMenuMgr) {
 		if (view instanceof ParallelJobView) {
 			ParallelJobView jView = (ParallelJobView)view;
@@ -48,6 +54,9 @@ public class ChangeJobViewAction extends GotoDropDownAction {
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.actions.GotoDropDownAction#addAction(org.eclipse.jface.action.MenuManager, java.lang.String, java.lang.String, java.lang.String)
+	 */
 	protected void addAction(MenuManager dropDownMenuMgr, String view_name, String id, String curID) {
 		IAction action = new InternalJobAction(view_name, id, getViewPart(), this);
 		action.setChecked(curID.equals(id));
@@ -55,8 +64,14 @@ public class ChangeJobViewAction extends GotoDropDownAction {
 		dropDownMenuMgr.add(action);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.actions.ParallelAction#run(org.eclipse.ptp.ui.model.IElement[])
+	 */
 	public void run(IElement[] elements) {}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.action.IAction#run()
+	 */
 	public void run() {
 		if (view instanceof ParallelJobView) {
 			ParallelJobView jView = ((ParallelJobView)view);
@@ -70,6 +85,9 @@ public class ChangeJobViewAction extends GotoDropDownAction {
     	}
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.actions.GotoDropDownAction#run(org.eclipse.ptp.ui.model.IElement[], java.lang.String)
+	 */
 	public void run(IElement[] elements, String id) {
 		if (view instanceof ParallelJobView) {
 			ParallelJobView jView = ((ParallelJobView)view);
@@ -77,6 +95,10 @@ public class ChangeJobViewAction extends GotoDropDownAction {
 		}
 	}
 
+	/** Inner internal job action
+	 * @author clement
+	 *
+	 */
 	private class InternalJobAction extends GotoAction {
 		public InternalJobAction(String name, String id, AbstractParallelElementView view, GotoDropDownAction action) {
 			super(name, id, view, action);

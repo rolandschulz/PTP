@@ -24,6 +24,4 @@ import org.eclipse.ui.part.ViewPart;
  * @author Clement chu
  *
  */
-public abstract class PDebugView extends ViewPart {
-
-}
+public abstract class PDebugView extends ViewPart {}

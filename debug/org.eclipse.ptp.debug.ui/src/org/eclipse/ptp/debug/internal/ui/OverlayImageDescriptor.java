@@ -43,14 +43,26 @@ public class OverlayImageDescriptor extends CompositeImageDescriptor {
 	// the size
 	private Point size;
 
+	/** Constructor
+	 * @param base
+	 * @param overlays
+	 */
 	public OverlayImageDescriptor(Image base, ImageDescriptor[] overlays) {
 		this(base, overlays, new Point(DEFAULT_WIDTH, DEFAULT_HEIGHT));
 	}
+	/** Constructor
+	 * @param base
+	 * @param overlays
+	 * @param size
+	 */
 	public OverlayImageDescriptor(Image base, ImageDescriptor[] overlays, Point size) {
 		setBase(base);
 		setOverlays(overlays);
 		setSize(size);
 	}
+	/** Draw overlays
+	 * @param overlays
+	 */
 	protected void drawOverlays(ImageDescriptor[] overlays) {
 		Point size = getSize();
 		for (int i = 0; i < overlays.length; i++) {
@@ -77,12 +89,18 @@ public class OverlayImageDescriptor extends CompositeImageDescriptor {
 			}
 		}
 	}
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	public boolean equals(Object o) {
 		if (!(o instanceof OverlayImageDescriptor))
 			return false;
 		OverlayImageDescriptor other = (OverlayImageDescriptor) o;
 		return getBase().equals(other.getBase()) && Arrays.equals(getOverlays(), other.getOverlays());
 	}
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
 	public int hashCode() {
 		int code = getBase().hashCode();
 		for (int i = 0; i < getOverlays().length; i++) {
@@ -91,25 +109,46 @@ public class OverlayImageDescriptor extends CompositeImageDescriptor {
 		}
 		return code;
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.resource.CompositeImageDescriptor#drawCompositeImage(int, int)
+	 */
 	protected void drawCompositeImage(int width, int height) {
 		drawImage(getBase().getImageData(), 0, 0);
 		drawOverlays(getOverlays());
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.resource.CompositeImageDescriptor#getSize()
+	 */
 	protected Point getSize() {
 		return size;
 	}
+	/** Get base image
+	 * @return
+	 */
 	private Image getBase() {
 		return base;
 	}
+	/** Set base image
+	 * @param base
+	 */
 	private void setBase(Image base) {
 		this.base = base;
 	}
+	/** Get overlays images
+	 * @return
+	 */
 	private ImageDescriptor[] getOverlays() {
 		return this.overlays;
 	}
+	/** Set overlays images
+	 * @param overlays
+	 */
 	private void setOverlays(ImageDescriptor[] overlays) {
 		this.overlays = overlays;
 	}
+	/** Set size
+	 * @param size
+	 */
 	private void setSize(Point size) {
 		this.size = size;
 	}

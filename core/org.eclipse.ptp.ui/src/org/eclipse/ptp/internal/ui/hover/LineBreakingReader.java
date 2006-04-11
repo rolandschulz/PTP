@@ -54,13 +54,17 @@ public class LineBreakingReader {
 		fLineBreakIterator= BreakIterator.getLineInstance();
 	}
 
+	/** Is formatted line
+	 * @return true if it is a formatted line
+	 */
 	public boolean isFormattedLine() {
 		return fLine != null;
 	}
 
-	/**
-	 * Reads the next line. The lengths of the line will not exceed the gived maximum
-	 * width.
+	/** Reads the next line. The lengths of the line will not exceed the gived maximum width
+	 * @param indent
+	 * @return
+	 * @throws IOException
 	 */
 	public String readLine(String indent) throws IOException {
 		if (fLine == null) {
@@ -94,6 +98,11 @@ public class LineBreakingReader {
 		return res;
 	}
 
+	/** Find next breaj offset
+	 * @param currOffset
+	 * @param indent
+	 * @return
+	 */
 	private int findNextBreakOffset(int currOffset, String indent) {
 		int currWidth= indent!=null?fGC.textExtent(indent).x:0;
 		int nextOffset= fLineBreakIterator.following(currOffset);
@@ -115,6 +124,10 @@ public class LineBreakingReader {
 		return nextOffset;
 	}
 
+	/** Find word begin index
+	 * @param idx
+	 * @return
+	 */
 	private int findWordBegin(int idx) {
 		while (idx < fLine.length() && Character.isWhitespace(fLine.charAt(idx))) {
 			idx++;

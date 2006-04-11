@@ -40,27 +40,45 @@ public abstract class AbstractPVariableAction implements IObjectActionDelegate, 
 	protected IViewPart view = null;
 	protected IAction action = null;
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IViewActionDelegate#init(org.eclipse.ui.IViewPart)
+	 */
 	public void init(IViewPart view) {
 		this.view = view;
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IObjectActionDelegate#setActivePart(org.eclipse.jface.action.IAction, org.eclipse.ui.IWorkbenchPart)
+	 */
 	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
 		this.action = action;
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IActionDelegate2#dispose()
+	 */
 	public void dispose() {
 		PTPDebugCorePlugin.getPVariableManager().removeListener(this);
 		PTPDebugUIPlugin.getDefault().getUIDebugManager().removeJobChangeListener(this);
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IActionDelegate2#init(org.eclipse.jface.action.IAction)
+	 */
 	public void init(IAction action) {
 		this.action = action;
 		PTPDebugCorePlugin.getPVariableManager().addListener(this);
 		PTPDebugUIPlugin.getDefault().getUIDebugManager().addJobChangeListener(this);
 		setEnable();
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.model.IPVariableManager.IPVariableListener#update(org.eclipse.ptp.core.IPJob)
+	 */
 	public void update(IPJob job) {
 		if (PTPDebugUIPlugin.getDefault().getUIDebugManager().getCurrentJob().equals(job)) {
 			setEnable();
 		}
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.listeners.IJobChangeListener#changeJobEvent(java.lang.String, java.lang.String)
+	 */
 	public void changeJobEvent(String cur_job_id, String pre_job_id) {
 		if (cur_job_id == null || cur_job_id == "") {
 			if (action != null)
@@ -70,17 +88,30 @@ public abstract class AbstractPVariableAction implements IObjectActionDelegate, 
 			setEnable();
 		}
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IActionDelegate2#runWithEvent(org.eclipse.jface.action.IAction, org.eclipse.swt.widgets.Event)
+	 */
 	public void runWithEvent(IAction action, Event event) {
 		run(action);
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action.IAction, org.eclipse.jface.viewers.ISelection)
+	 */
 	public void selectionChanged(IAction action, ISelection selection) {}
 	protected static IPJob getCurrentRunningJob() {
 		IPJob job = PTPDebugUIPlugin.getDefault().getUIDebugManager().getCurrentJob();
 		return isRunning(job)?job:null;
 	}
+	/** Check if given job is running
+	 * @param job
+	 * @return true if job is running
+	 */
 	protected static boolean isRunning(IPJob job) {
 		return (job != null && !job.isAllStop());
 	}
+	/** Set this action enable / disable if current job is running and there is more than one variable added to list
+	 * 
+	 */
 	public void setEnable() {
 		if (action != null) {
 			IPJob job = getCurrentRunningJob();
@@ -88,4 +119,3 @@ public abstract class AbstractPVariableAction implements IObjectActionDelegate, 
 		}
 	}
 }
-

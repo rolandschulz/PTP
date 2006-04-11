@@ -35,6 +35,11 @@ import org.eclipse.swt.widgets.Composite;
 public class ElementIconCanvas extends IconCanvas {
 	private IElementSet cur_element_set = null;
 
+	/** Constructor
+	 * @param view 
+	 * @param parent
+	 * @param style view style
+	 */
 	public ElementIconCanvas(AbstractParallelElementView view, Composite parent, int style) {
 		super(parent, style);
 		IPreferenceStore store = PTPUIPlugin.getDefault().getPreferenceStore();
@@ -42,9 +47,15 @@ public class ElementIconCanvas extends IconCanvas {
 		setIconSize(store.getInt(IPTPUIConstants.VIEW_ICON_WIDTH), store.getInt(IPTPUIConstants.VIEW_ICON_HEIGHT));
 		setTooltip(store.getBoolean(IPTPUIConstants.VIEW_TOOLTIP_SHOWALLTIME), store.getLong(IPTPUIConstants.VIEW_TOOLTIP_TIMEOUT), store.getBoolean(IPTPUIConstants.VIEW_TOOLTIP_ISWRAP));
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.swt.widgets.Widget#dispose()
+	 */
 	public void dispose() {
 		super.dispose();
 	}
+	/** Change set
+	 * @param e_set
+	 */
 	public void setElementSet(IElementSet e_set) {
 		this.cur_element_set = e_set;
 		getDisplay().syncExec(new Runnable() {
@@ -53,14 +64,25 @@ public class ElementIconCanvas extends IconCanvas {
 			}
 		});
 	}
+	/** Get current set
+	 * @return current set
+	 */
 	public IElementSet getCurrentElementSet() {
 		return cur_element_set;
 	}
+	/** Get element
+	 * @param index Element index
+	 * @return element
+	 */
 	public IElement getElement(int index) {
 		if (cur_element_set == null)
 			return null;
 		return cur_element_set.getSortedElements()[index];
 	}
+	/** Get elements
+	 * @param indexes Element indexes
+	 * @return elements
+	 */
 	public IElement[] getElements(int[] indexes) {
 		if (cur_element_set == null)
 			return new IElement[0];
@@ -70,6 +92,9 @@ public class ElementIconCanvas extends IconCanvas {
 		}
 		return (IElement[]) selectedElements.toArray(new IElement[selectedElements.size()]);
 	}
+	/** Get selected elements
+	 * @return selected elements
+	 */
 	public IElement[] getSelectedElements() {
 		return getElements(getSelectedIndexes());
 	}

@@ -30,6 +30,9 @@ import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
  */
 public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer#initializeDefaultPreferences()
+	 */
 	public void initializeDefaultPreferences() {
 		IPreferenceStore store = PTPDebugUIPlugin.getDefault().getPreferenceStore();
 

@@ -45,18 +45,34 @@ import org.eclipse.ui.PlatformUI;
  */
 public class RemovePVariableActionDelegate extends AbstractPVariableAction {
 	private String variable = null;
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IActionDelegate2#dispose()
+	 */
 	public void dispose() {}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IActionDelegate2#init(org.eclipse.jface.action.IAction)
+	 */
 	public void init(IAction action) {
 		this.action = action;
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IActionDelegate2#runWithEvent(org.eclipse.jface.action.IAction, org.eclipse.swt.widgets.Event)
+	 */
 	public void runWithEvent(IAction action, Event event) {
 		run(action);
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
+	 */
 	public void run(IAction action) {
 		if (variable != null) {
 			doAction(view.getViewSite().getShell(), variable);
 		}
 	}
+	/** Take an action to remove given variable in the current job
+	 * @param shell
+	 * @param name
+	 */
 	public static void doAction(Shell shell, final String name) {
 		if (shell == null) {
 			shell = PTPDebugUIPlugin.getActiveWorkbenchShell();

@@ -32,11 +32,17 @@ public class RegisterAction extends DebugAction {
 	public static final String name = "Register Selected Elements";
 	private int NUM_PROCESS_WARNING = 10;
 	
+	/** Constructor
+	 * @param view
+	 */
 	public RegisterAction(ParallelDebugView view) {
 		super(name, view);
 	    setImageDescriptor(PDebugImage.ID_ICON_REGISTER_NORMAL);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.actions.ParallelAction#run(org.eclipse.ptp.ui.model.IElement[])
+	 */
 	public void run(IElement[] elements) {
 		if (validation(elements)) {
 			if (elements.length > NUM_PROCESS_WARNING) {

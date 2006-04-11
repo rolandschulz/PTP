@@ -38,40 +38,146 @@ public interface IManager {
 	public static final int REMOVE_ELEMENT_TYPE = 4;	
 	
 	public void shutdown();
+	/** Get element size
+	 * @return size of element
+	 */
 	public int size();
+	/**
+	 * clean all setting
+	 */
 	public void clear();
+	/** initial elements
+	 * @return first element name
+	 */
 	public String initial();
+	/** Get IElementHandler
+	 * @param id element ID
+	 * @return IElementHandler
+	 */
 	public IElementHandler getElementHandler(String id);
+	/** Get name of element
+	 * @param id element ID
+	 * @return name of element
+	 */
 	public String getName(String id);
 	
+	/** Get current set ID
+	 * @return current set ID
+	 */
 	public String getCurrentSetId();
+	/** set current set ID
+	 * @param set_id set ID
+	 */
 	public void setCurrentSetId(String set_id);
 	
 	//set listener
+	/** Add Set Listener
+	 * @param setListener ISetListener
+	 */
 	public void addSetListener(ISetListener setListener);
+	/** Remove Set Listener
+	 * @param setListener ISetListener
+	 */
 	public void removeSetListener(ISetListener setListener);
+	/** Fire Event for set change
+	 * @param eventType the type of event
+	 * @param elements the selected elements
+	 * @param cur_set the current set
+	 * @param pre_set the previous set
+	 */
 	public void fireEvent(int eventType, IElement[] elements, IElementSet cur_set, IElementSet pre_set);
+	/** Add elements to set
+	 * @param elements selected elements
+	 * @param set Set
+	 */
 	public void addToSet(IElement[] elements, IElementSet set);
+	/** Add elements to set
+	 * @param elements selected elements
+	 * @param setID set ID
+	 * @param elementHandler IElementHandler
+	 */
 	public void addToSet(IElement[] elements, String setID, IElementHandler elementHandler);
+	/** Create a Set
+	 * @param elements selected elements
+	 * @param setID set ID
+	 * @param setName set Name
+	 * @param elementHandler IElementHandler
+	 * @return set ID
+	 */
 	public String createSet(IElement[] elements, String setID, String setName, IElementHandler elementHandler);
+	/** Remove Set
+	 * @param setID set ID
+	 * @param elementHandler IElementHandler
+	 */
 	public void removeSet(String setID, IElementHandler elementHandler);
+	/** Remove elements in specific Set
+	 * @param elements selected elements
+	 * @param setID set ID
+	 * @param elementHandler IElementHandler
+	 */
 	public void removeFromSet(IElement[] elements, String setID, IElementHandler elementHandler);
+	/** Update elements  
+	 * @param targetSet Target set
+	 * @param elementHandler IElementHandler
+	 */
 	public void updateMatchElementSets(IElementSet targetSet, IElementHandler elementHandler);
 	
 	//paint listener
+	/** Add Paint listener
+	 * @param pListener IPaintListener
+	 */
 	public void addPaintListener(IPaintListener pListener);
+	/** Remove Paint listener
+	 * @param pListener IPaintListener
+	 */
 	public void removePaintListener(IPaintListener pListener);
+	/** Fire Paint listener
+	 * @param condition paint or not
+	 */
 	public void firePaintListener(Object condition);
 	//job
+	/** Check is job existed
+	 * @param jid Job ID
+	 * @return true job ID is existed otherwise not existed
+	 */
 	public boolean isNoJob(String jid);
+	/** Check the job is stopped
+	 * @param job_id Job ID
+	 * @return true job is stopped
+	 */
 	public boolean isJobStop(String job_id);
+	/** Search a job by job name
+	 * @param job_name Job name
+	 * @return null if no job found
+	 */
 	public IPJob findJob(String job_name);
+	/** Search a job by job ID
+	 * @param job_id Job ID
+	 * @return null if no job found
+	 */
 	public IPJob findJobById(String job_id);
+	/** Remove Job
+	 * @param job Job
+	 */
 	public void removeJob(IPJob job);
+	/** Remove all stopped jobs
+	 * 
+	 */
 	public void removeAllStoppedJobs();
+	/** Check whether there is a job stopped
+	 * @return true if there is a job stopped
+	 */
 	public boolean hasStoppedJob();	
 	
 	//image
+	/** Get element status
+	 * @param element IElement
+	 * @return element status
+	 */
 	public int getStatus(IElement element);
+	/** Get element status
+	 * @param id Element ID
+	 * @return element status
+	 */
 	public int getStatus(String id);
 }

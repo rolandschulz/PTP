@@ -34,40 +34,73 @@ public abstract class Container extends Element implements IContainer {
 	protected IElement[] sortedArray = new IElement[0];
 	protected int store_element_type = ELEMENT_TYPE; 
 	
+	/** Constructor
+	 * @param parent
+	 * @param id set ID
+	 * @param name name of set
+	 * @param cur_type type of set
+	 */
 	public Container(IElement parent, String id, String name, int cur_type) {
 		super(parent, id, name);
 		this.store_element_type = cur_type;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.model.IContainer#setData(java.lang.String, java.lang.Object)
+	 */
 	public void setData(String key, Object data) {
 		dataMap.put(key, data);
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.model.IContainer#getData(java.lang.String)
+	 */
 	public Object getData(String key) {
 		return dataMap.get(key);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.model.IElement#getParent()
+	 */
 	public IElement getParent() {
 		return parent;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.model.IContainer#contains(java.lang.String)
+	 */
 	public boolean contains(String id) {
 		return elementMap.containsKey(id);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.model.IContainer#add(org.eclipse.ptp.ui.model.IElement)
+	 */
 	public void add(IElement element) {
 		if (!contains(element.getID()))		
 			elementMap.put(element.getID(), element);
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.model.IContainer#remove(org.eclipse.ptp.ui.model.IElement)
+	 */
 	public void remove(IElement element) {
 		remove(element.getID());
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.model.IContainer#remove(java.lang.String)
+	 */
 	public void remove(String id) {
 		if (contains(id))
 			elementMap.remove(id);
 	}
 		
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.model.IContainer#get()
+	 */
 	public abstract IElement[] get();
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.model.IContainer#getSorted()
+	 */
 	public IElement[] getSorted() {
 		if (sortedArray.length != size())
 			refresh(store_element_type);
@@ -75,28 +108,51 @@ public abstract class Container extends Element implements IContainer {
 		return sortedArray;		
 	}	
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.model.IContainer#get(java.lang.String)
+	 */
 	public IElement get(String id) {
 		return (IElement)elementMap.get(id);
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.model.IContainer#get(int)
+	 */
 	public IElement get(int index) {
 		return getSorted()[index];
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.model.IContainer#getElementID(int)
+	 */
 	public String getElementID(int index) {
 		return get(index).getID();
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.model.IContainer#clearAll()
+	 */
 	public void clearAll() {
 		elementMap.clear();
 		sortedArray = new IContainer[0];
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.model.IContainer#size()
+	 */
 	public int size() {
 		return elementMap.size();
 	}
+	/**
+	 * @param type
+	 */
 	public void refresh(int type) {
 		IElement[] sortingElements = get();
 		sort(sortingElements, type);
 		sortedArray = sortingElements;
 	}
 	
+	/** Quick sort given elements by thier ID
+	 * @param element elements being sorted
+	 * @param low
+	 * @param high
+	 */
 	private void quickSortNum(IElement element[], int low, int high) {
 		int lo = low;
 		int hi = high;
@@ -121,6 +177,11 @@ public abstract class Container extends Element implements IContainer {
 		}
 	}
 
+	/** QUick sort given elements by their text
+	 * @param element elements being sorted
+	 * @param low
+	 * @param high
+	 */
 	private void quickSortText(IElement[] element, int low, int high) {
 		int lo = low;
 		int hi = high;
@@ -144,6 +205,11 @@ public abstract class Container extends Element implements IContainer {
 				quickSortText(element, lo, high);
 		}
 	}	
+	/** Swap elements
+	 * @param element
+	 * @param i
+	 * @param j
+	 */
 	private void swap(IElement[] element, int i, int j) {
 		IElement tempElement;
 		tempElement = element[i];
@@ -151,6 +217,10 @@ public abstract class Container extends Element implements IContainer {
 		element[j] = tempElement;
 	}
 
+	/** Sort elements by given type
+	 * @param element elements being to sort
+	 * @param type
+	 */
 	protected void sort(IElement[] element, int type) {
 		//set sort will ignore the root
 		if (type == SET_TYPE)

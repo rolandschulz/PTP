@@ -65,11 +65,17 @@ public class PDebugPreferencePage extends AbstractPerferencePage {
     }
     protected WidgetListener listener = new WidgetListener();
     
+	/** Constructor
+	 * 
+	 */
 	public PDebugPreferencePage() {
 		super();
 		setPreferenceStore(PTPDebugUIPlugin.getDefault().getPreferenceStore());		
 		setDescription(PreferenceMessages.getString("PDebugPreferencePage.desc"));
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.preference.PreferencePage#createContents(org.eclipse.swt.widgets.Composite)
+	 */
 	protected Control createContents(Composite parent) {
 		//TODO ignored help
 		//getWorkbench().getHelpSystem().setHelp(getControl(), IPDebugHelpContextIds.P_DEBUG_PREFERENCE_PAGE);
@@ -92,8 +98,13 @@ public class PDebugPreferencePage extends AbstractPerferencePage {
 		setValues();
 		return composite;
 	}
-	protected void createOtherDebugSetting(Composite parent) {
-	}
+	/** Create other debug settings
+	 * @param parent
+	 */
+	protected void createOtherDebugSetting(Composite parent) {}
+	/** Create view preference settings
+	 * @param parent
+	 */
 	protected void createViewSettingPreferences(Composite parent) {
 		Composite comp = createGroupComposite(parent, 1, false, PreferenceMessages.getString("PDebugPreferencePage.default1"));
 		fPathsButton = createCheckButton(comp, PreferenceMessages.getString("PDebugPreferencePage.default2"));
@@ -108,6 +119,9 @@ public class PDebugPreferencePage extends AbstractPerferencePage {
 			}
 		});
 	}
+	/** Create communication preference settings
+	 * @param parent
+	 */
 	protected void createCommunicationPreferences(Composite parent) {
 		Composite comp = createGroupComposite(parent, 1, false, PreferenceMessages.getString("PDebugPreferencePage.communication_group"));
 		Composite spacingComposite = new Composite(comp, SWT.NONE);
@@ -125,11 +139,17 @@ public class PDebugPreferencePage extends AbstractPerferencePage {
 		commandTimeoutField.setEmptyStringAllowed(false);
 		commandTimeoutField.setPropertyChangeListener(listener);
 	}
+	/** Create variable preference settings
+	 * @param parent
+	 */
 	protected void createVariablesPreferences(Composite parent) {
 		Composite comp = createGroupComposite(parent, 1, false, PreferenceMessages.getString("PDebugPreferencePage.variable_group"));
 		updateVariableOnSuspendButton = createCheckButton(comp, PreferenceMessages.getString("PDebugPreferencePage.updateVariableOnSuspend"));
 		updateVariableOnChangeButton = createCheckButton(comp, PreferenceMessages.getString("PDebugPreferencePage.updateVariableOnChange"));
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.preference.PreferencePage#performDefaults()
+	 */
 	public void performDefaults() { 
 		IPreferenceStore store = getPreferenceStore();
 		fPathsButton.setSelection(store.getDefaultBoolean(IPDebugConstants.PREF_SHOW_FULL_PATHS));
@@ -140,6 +160,9 @@ public class PDebugPreferencePage extends AbstractPerferencePage {
 		super.performDefaults();
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.preference.IPreferencePage#performOk()
+	 */
 	public boolean performOk() {
 		storeValues();
 		PTPDebugUIPlugin.getDefault().savePluginPreferences();
@@ -147,6 +170,9 @@ public class PDebugPreferencePage extends AbstractPerferencePage {
 		return true;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.preferences.AbstractPerferencePage#setValues()
+	 */
 	protected void setValues() {
 		IPreferenceStore store = getPreferenceStore();
 		fPathsButton.setSelection(store.getBoolean(IPDebugConstants.PREF_SHOW_FULL_PATHS));
@@ -155,6 +181,9 @@ public class PDebugPreferencePage extends AbstractPerferencePage {
 		updateVariableOnSuspendButton.setSelection(store.getBoolean(IPDebugConstants.PREF_UPDATE_VARIABLES_ON_SUSPEND));
 		updateVariableOnChangeButton.setSelection(store.getBoolean(IPDebugConstants.PREF_UPDATE_VARIABLES_ON_CHANGE));
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.preferences.AbstractPerferencePage#storeValues()
+	 */
 	protected void storeValues() {
 		IPreferenceStore store = getPreferenceStore();
 		store.setValue(IPDebugConstants.PREF_SHOW_FULL_PATHS, fPathsButton.getSelection());
@@ -163,6 +192,9 @@ public class PDebugPreferencePage extends AbstractPerferencePage {
 		store.setValue(IPDebugConstants.PREF_UPDATE_VARIABLES_ON_SUSPEND, updateVariableOnSuspendButton.getSelection());
 		store.setValue(IPDebugConstants.PREF_UPDATE_VARIABLES_ON_CHANGE, updateVariableOnChangeButton.getSelection());
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.preference.IPreferencePage#isValid()
+	 */
 	public boolean isValid() {
 		setErrorMessage(null);
 		setMessage(null);
@@ -173,6 +205,9 @@ public class PDebugPreferencePage extends AbstractPerferencePage {
 		return true;
 	}
 	
+    /** Refresh debug breakpoint view
+     * 
+     */
     protected void refreshView() {
     	IWorkbenchPage[] pages = getPages();
     	for (int i=0; i<pages.length; i++) {

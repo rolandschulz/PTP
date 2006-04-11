@@ -30,6 +30,9 @@ import org.eclipse.ui.IPersistableElement;
 public class ProcessEditorInput implements IEditorInput {
     private IPProcess process = null;
     
+    /** Constructor
+     * @param process
+     */
     public ProcessEditorInput(IPProcess process) {
 		if (process == null) {
 			throw new IllegalArgumentException();
@@ -37,6 +40,9 @@ public class ProcessEditorInput implements IEditorInput {
         this.process = process;
     }
     
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
@@ -63,26 +69,44 @@ public class ProcessEditorInput implements IEditorInput {
 	}
 	*/
 	
+	/** Get process
+	 * @return
+	 */
 	public IPProcess getProcess() {
 		return process;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IEditorInput#getImageDescriptor()
+	 */
 	public ImageDescriptor getImageDescriptor() {
 		return null;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IEditorInput#getName()
+	 */
 	public String getName() {
 		return process.getElementName();
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IEditorInput#getPersistable()
+	 */
 	public IPersistableElement getPersistable() {
 		return null;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IEditorInput#getToolTipText()
+	 */
 	public String getToolTipText() {
 		return getName();
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
+	 */
 	public Object getAdapter(Class adapter) {
 		if (adapter == IPProcess.class)
 			return process;

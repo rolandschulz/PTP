@@ -25,5 +25,8 @@ import org.eclipse.ptp.debug.ui.events.IDebugActionEvent;
  *
  */
 public interface IDebugActionUpdateListener {
+	/** Handle debug action event
+	 * @param event
+	 */
 	public void handleDebugActionEvent(IDebugActionEvent event);
 }

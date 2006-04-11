@@ -36,11 +36,17 @@ import org.eclipse.ptp.ui.views.AbstractParallelElementView;
 public class RemoveElementAction extends ParallelAction {
 	public static final String name = "Remove Elements";
 	
+	/** Constructor
+	 * @param view
+	 */
 	public RemoveElementAction(AbstractParallelElementView view) {
 		super(name, view);
 	    setImageDescriptor(ParallelImages.ID_ICON_DELETEELEMENT_NORMAL);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.actions.ParallelAction#run(org.eclipse.ptp.ui.model.IElement[])
+	 */
 	public void run(IElement[] elements) {
 		if (validation(elements)) {
 			IElementSet set = view.getCurrentSet();
@@ -61,6 +67,9 @@ public class RemoveElementAction extends ParallelAction {
 		}		
 	}
 	
+	/** Call delete group action
+	 * 
+	 */
 	private void callDeleteGroupAction() {
 		IToolBarManager manager = view.getViewSite().getActionBars().getToolBarManager();
 		IContributionItem item = manager.find(DeleteSetAction.name);

@@ -41,15 +41,28 @@ import org.eclipse.ui.PlatformUI;
  */
 public class AddPVariableActionDelegate extends AbstractPVariableAction {
 	private String variable = null;
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IActionDelegate2#dispose()
+	 */
 	public void dispose() {}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IActionDelegate2#init(org.eclipse.jface.action.IAction)
+	 */
 	public void init(IAction action) {
 		this.action = action;
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
+	 */
 	public void run(IAction action) {
 		if (variable != null) {
 			doAction(view.getViewSite().getShell(), variable);
 		}
 	}
+	/** Add given variable name to the list
+	 * @param shell
+	 * @param name
+	 */
 	public static void doAction(Shell shell, final String name) {
 		if (shell == null) {
 			shell = PTPDebugUIPlugin.getActiveWorkbenchShell();
@@ -71,6 +84,9 @@ public class AddPVariableActionDelegate extends AbstractPVariableAction {
 		PlatformUI.getWorkbench().getProgressService().showInDialog(shell, job);
 		job.schedule();
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action.IAction, org.eclipse.jface.viewers.ISelection)
+	 */
 	public void selectionChanged(IAction action, ISelection selection) {
 		variable = null;
 		if (selection instanceof IStructuredSelection) {
@@ -85,11 +101,17 @@ public class AddPVariableActionDelegate extends AbstractPVariableAction {
 		}
 		action.setEnabled(variable != null);
 	}	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.listeners.IJobChangeListener#changeJobEvent(java.lang.String, java.lang.String)
+	 */
 	public void changeJobEvent(String cur_job_id, String pre_job_id) {
 		if (cur_job_id == null || cur_job_id == "") {
 			if (action != null)
 				action.setEnabled(false);
 		}
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.model.IPVariableManager.IPVariableListener#update(org.eclipse.ptp.core.IPJob)
+	 */
 	public void update(IPJob job) {}
 }

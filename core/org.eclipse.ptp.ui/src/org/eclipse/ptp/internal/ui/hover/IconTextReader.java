@@ -77,23 +77,34 @@ public class IconTextReader extends SubstitutionTextReader {
 	private int fStartOffset= -1;
 	private boolean fInParagraph= false;
 
+	/** Constructor
+	 * @param reader
+	 * @param presentation
+	 */
 	public IconTextReader(Reader reader, TextPresentation presentation) {
 		super(new PushbackReader(reader));
 		fTextPresentation= presentation;
 	}
-
+	/* (non-Javadoc)
+	 * @see java.io.Reader#read()
+	 */
 	public int read() throws IOException {
 		int c= super.read();
 		if (c != -1)
 			++ fCounter;
 		return c;
 	}
-
+	/** Start bold
+	 * 
+	 */
 	protected void startBold() {
 		if (fBold == 0)
 			fStartOffset= fCounter;
 		++ fBold;
 	}
+	/** Stop bold
+	 * 
+	 */
 	protected void stopBold() {
 		-- fBold;
 		if (fBold == 0) {
@@ -102,11 +113,17 @@ public class IconTextReader extends SubstitutionTextReader {
 		}
 	}
 
+	/** start underline
+	 * 
+	 */
 	protected void startUnderLine() {
 		if (fUnderline == 0)
 			fStartOffset= fCounter;
 		++ fUnderline;
 	}
+	/** stop underline
+	 * 
+	 */
 	protected void stopUnderLine() {
 		-- fUnderline;
 		if (fUnderline == 0) {
@@ -117,11 +134,17 @@ public class IconTextReader extends SubstitutionTextReader {
 		}
 	}
 
+	/** start strike
+	 * 
+	 */
 	protected void startStrike() {
 		if (fStrike == 0)
 			fStartOffset= fCounter;
 		++ fStrike;
 	}
+	/** stop strike
+	 * 
+	 */
 	protected void stopStrike() {
 		-- fStrike;
 		if (fStrike == 0) {
@@ -132,11 +155,17 @@ public class IconTextReader extends SubstitutionTextReader {
 		}
 	}
 	
+	/** start italic
+	 * 
+	 */
 	protected void startItalic() {
 		if (fItalic == 0)
 			fStartOffset= fCounter;
 		++ fItalic;
 	}
+	/** stop italic
+	 * 
+	 */
 	protected void stopItalic() {
 		-- fItalic;
 		if (fItalic == 0) {
@@ -145,11 +174,17 @@ public class IconTextReader extends SubstitutionTextReader {
 		}
 	}
 	
+	/** start key
+	 * 
+	 */
 	protected void startKey() {
 		if (fKey == 0)
 			fStartOffset= fCounter;
 		++ fKey;
 	}
+	/** stop key
+	 * 
+	 */
 	protected void stopKey() {
 		-- fKey;
 		if (fKey == 0) {
@@ -158,11 +193,17 @@ public class IconTextReader extends SubstitutionTextReader {
 		}
 	}
 
+	/** start highlight
+	 * 
+	 */
 	protected void startHighlight() {
 		if (fHighlight == 0)
 			fStartOffset= fCounter;
 		++ fHighlight;
 	}
+	/** stop highlight
+	 * 
+	 */
 	protected void stopHighlight() {
 		-- fHighlight;
 		if (fHighlight == 0) {
@@ -171,6 +212,9 @@ public class IconTextReader extends SubstitutionTextReader {
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.internal.ui.hover.SubstitutionTextReader#computeSubstitution(int)
+	 */
 	protected String computeSubstitution(int c) throws IOException {
 		if (c == '<')
 			return  processTag();
@@ -180,6 +224,10 @@ public class IconTextReader extends SubstitutionTextReader {
 		return null;
 	}
 
+	/** To formatted text
+	 * @param html original text
+	 * @return formatted text
+	 */
 	private String toText(String html) {
 		if (html == null || html.length() == 0)
 			return EMPTY_STRING;
@@ -270,6 +318,10 @@ public class IconTextReader extends SubstitutionTextReader {
 		return EMPTY_STRING;
 	}
 
+	/** Get process tag
+	 * @return
+	 * @throws IOException
+	 */
 	private String processTag() throws IOException {
 		StringBuffer buf= new StringBuffer();
 		int ch= nextChar();
@@ -295,10 +347,18 @@ public class IconTextReader extends SubstitutionTextReader {
 		return toText(buf.toString());
 	}
 
+	/** unread
+	 * @param ch
+	 * @throws IOException
+	 */
 	private void unread(int ch) throws IOException {
 		((PushbackReader) getReader()).unread(ch);
 	}
 
+	/** entity to text
+	 * @param symbol
+	 * @return
+	 */
 	protected String entity2Text(String symbol) {
 		if (symbol.length() > 1 && symbol.charAt(0) == '#') {
 			int ch;
@@ -320,6 +380,10 @@ public class IconTextReader extends SubstitutionTextReader {
 		return "&" + symbol; // not found
 	}
 
+	/** Get process entity
+	 * @return
+	 * @throws IOException
+	 */
 	private String processEntity() throws IOException {
 		StringBuffer buf= new StringBuffer();
 		int ch= nextChar();
