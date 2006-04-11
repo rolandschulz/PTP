@@ -74,6 +74,38 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 			lock.notifyAll();
 		}
 	}
+	public boolean waitForReturn(boolean hasTimeout) throws PCDIException {
+		if (hasTimeout)
+			return waitForReturn();
+		
+		if (!isWaitForReturn())
+			return true;
+
+		synchronized (lock) {
+			try {
+				if (isFlush)
+					return false;
+				
+				if (getReturn() == null) {
+					lock.wait();
+					if (getReturn() == null) {
+						if (isFlush)
+							return false;
+						
+						throw new PCDIException("No return - Command " + getName());
+					}
+					else {
+						if (getReturn() instanceof PCDIException) {
+							throw (PCDIException)getReturn();
+						}
+					}
+				}
+			} catch (InterruptedException e) {
+				throw new PCDIException(e);
+			}
+			return true;
+		}		
+	}
 	/**
 	 * @return true - normal, false - flush
 	 */
