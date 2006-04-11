@@ -23,7 +23,6 @@ import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
-
 /**
  * @author Clement chu
  * 
@@ -36,7 +35,8 @@ public class StartDebuggerCommand extends AbstractDebugCommand {
 		this.job = job;
 	}
 	public void execCommand(IAbstractDebugger debugger, int timeout) throws PCDIException {
-		setTimeout(timeout);
+		int final_timeout = (job != null)?job.totalProcesses()*timeout:timeout;
+		setTimeout(final_timeout);
 		try {
 			debugger.startDebugger(job);
 		} catch (CoreException e) {
