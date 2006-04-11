@@ -48,6 +48,10 @@ public class ToggleBreakpointRulerAction extends Action {
 		}
 	};
     
+	/** Constructor
+     * @param part
+     * @param ruler
+     */
     public ToggleBreakpointRulerAction(IWorkbenchPart part, IVerticalRulerInfo ruler) {
 		super(ActionMessages.getString("ToggleBreakpointRulerAction.Toggle_Breakpoint"));
    		this.ruler = ruler;
@@ -56,11 +60,17 @@ public class ToggleBreakpointRulerAction extends Action {
    		setId(IPTPDebugUIConstants.ACTION_SET_BREAKPOINT);
     }
 	
+    /** Dispose this action
+     * 
+     */
     public void dispose() {
     	setTargetPart(null);
     	ruler = null;
     }
     
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.action.IAction#run()
+     */
     public void run() {
 		try {
 			breakpointAdapter.toggleLineBreakpoints(getTargetPart(), getTargetSelection());
@@ -69,18 +79,30 @@ public class ToggleBreakpointRulerAction extends Action {
 		}
     }
 
+	/** Get vertical ruler info
+	 * @return
+	 */
 	protected IVerticalRulerInfo getVerticalRulerInfo() {
 		return ruler;
 	}
 
+	/** Get target workbench part
+	 * @return
+	 */
 	private IWorkbenchPart getTargetPart() {
 		return targetPart;
 	}
 
+	/** Set target workbench part
+	 * @param targetPart
+	 */
 	private void setTargetPart(IWorkbenchPart targetPart) {
 		this.targetPart = targetPart;
 	}
 
+	/** Get target selection
+	 * @return
+	 */
 	private ISelection getTargetSelection() {
 		IDocument doc = getDocument();
 		if (doc != null) {
@@ -96,6 +118,9 @@ public class ToggleBreakpointRulerAction extends Action {
 		return EMPTY_SELECTION;
 	}
 	
+	/** Get document
+	 * @return
+	 */
 	private IDocument getDocument() {
 		IWorkbenchPart targetPart = getTargetPart();
 		if (targetPart instanceof ITextEditor) {

@@ -41,6 +41,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 
 /**
+ *
  * @author clement chu
  * 
  */
@@ -54,6 +55,9 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	protected final String EMPTY_TITLE = " ";
 	protected Color registerColor = null;
 
+	/**
+	 * update preference setting 
+	 */
 	protected IPropertyChangeListener propertyChangeListener = new IPropertyChangeListener() {
 		public void propertyChange(PropertyChangeEvent event) {
 			final String preferenceType = event.getProperty();
@@ -86,27 +90,50 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 		}
 	};
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IWorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
+	 */
 	public void createPartControl(Composite parent) {
 		createView(parent);
 		setContentDescription(EMPTY_TITLE);
 		manager.addPaintListener(this);
 		registerColor = getDisplay().getSystemColor(SWT.COLOR_WIDGET_BORDER);
 	}
+	/** Set the color of registered element
+	 * @param color
+	 */
 	public void setRegisterColor(Color color) {
 		this.registerColor = color;
 	}
+	/** Create Element View
+	 * @param parent
+	 */
 	protected void createView(Composite parent) {
 		createElementView(parent);
 	}
+	/** Get IManager
+	 * @return IManager
+	 */
 	public IManager getUIManager() {
 		return manager;
 	}
+	/** Get current element handler
+	 * @return IElementHandler
+	 */
 	public IElementHandler getCurrentElementHandler() {
 		return manager.getElementHandler(getCurrentID());
 	}
+	/** Change view title
+	 * @param title title
+	 * @param setName set name
+	 * @param size element size
+	 */
 	protected void changeTitle(String title, String setName, int size) {
 		changeTitle(" " + title + " - " + setName + " [" + size + "]");
 	}
+	/** Change view title
+	 * @param message Message of title
+	 */
 	protected void changeTitle(final String message) {
 		getDisplay().asyncExec(new Runnable() {
 			public void run() {
@@ -114,6 +141,10 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 			}
 		});
 	}
+	/** Create element videw
+	 * @param parent parent composite
+	 * @return composite
+	 */
 	protected Composite createElementView(Composite parent) {
 		Composite composite = new Composite(parent, SWT.NONE);
 		composite.setLayout(new FillLayout());
@@ -127,6 +158,9 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 		PTPUIPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(propertyChangeListener);
 		return composite;
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.ISelectionProvider#setSelection(org.eclipse.jface.viewers.ISelection)
+	 */
 	public void setSelection(ISelection selection) {
 		if (selection instanceof StructuredSelection) {
 			for (Iterator i = ((StructuredSelection) selection).iterator(); i.hasNext();) {
@@ -137,26 +171,45 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 			}
 		}
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IWorkbenchPart#dispose()
+	 */
 	public void dispose() {
 		manager.removePaintListener(this);
 		canvas.removeActionListener(this);
 		PTPUIPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(propertyChangeListener);
 		super.dispose();
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IWorkbenchPart#setFocus()
+	 */
 	public void setFocus() {
 		canvas.setFocus();
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.ISelectionProvider#getSelection()
+	 */
 	public ISelection getSelection() {
 		if (cur_element_set == null)
 			return new StructuredSelection();
 		return new StructuredSelection(canvas.getSelectedElements());
 	}
+	/** Get current set ID
+	 * @return current set ID
+	 */
 	public String getCurrentSetID() {
 		return manager.getCurrentSetId();
 	}
+	/** Fire set change event
+	 * @param cur_set current set 
+	 * @param pre_set previous set
+	 */
 	public void fireChangeEvent(IElementSet cur_set, IElementSet pre_set) {
 		manager.fireEvent(IManager.CHANGE_SET_TYPE, null, cur_set, pre_set);
 	}
+	/** Select set
+	 * @param set Target set
+	 */
 	public void selectSet(IElementSet set) {
 		fireChangeEvent(set, cur_element_set);
 		cur_element_set = set;
@@ -167,12 +220,21 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 		}
 		canvas.setElementSet(cur_element_set);
 	}
+	/** Get current set
+	 * @return current set
+	 */
 	public IElementSet getCurrentSet() {
 		return cur_element_set;
 	}
+	/** Refresh view
+	 * 
+	 */
 	public void refresh() {
 		refresh(null);
 	}
+	/** Refresh view
+	 * @param condition refresh condition
+	 */
 	public void refresh(final Object condition) {
 		getDisplay().asyncExec(new Runnable() {
 			public void run() {
@@ -184,27 +246,67 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 		});
 	}
 	// Set element info
+	/** Initial view
+	 * 
+	 */
 	protected abstract void initialView();
 	// Set element to display
+	/** Initial elements
+	 * 
+	 */
 	protected abstract void initialElement();
 	// set update view details
+	/** Update view details
+	 * 
+	 */
 	public abstract void update();
+	/** Update view title
+	 * 
+	 */
 	public abstract void updateTitle();
+	/** Get current ID
+	 * @return element ID
+	 */
 	public abstract String getCurrentID();
+	/** Double click action
+	 * @param element Target element
+	 */
 	protected abstract void doubleClick(IElement element);
+	/** Update view
+	 * @param condition
+	 */
 	protected abstract void updateView(Object condition);
+	/** Get element image
+	 * @param index1 first array index
+	 * @param index2 second array index
+	 * @return image
+	 */
 	protected abstract Image getImage(int index1, int index2);
+	/** Get tooltip text
+	 * @param obj Selected element
+	 * @return text of tooltip
+	 */
 	protected abstract String[] getToolTipText(Object obj);
+	/** Find actual object
+	 * @param element Target element
+	 * @return object represent of element
+	 */
 	protected abstract Object convertElementObject(IElement element);
 	/*******************************************************************************************************************************************************************************************************************************************************************************************************
 	 * Paint Listener
 	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.listeners.IPaintListener#repaint(java.lang.Object)
+	 */
 	public void repaint(Object condition) {
 		refresh(condition);
 	}
 	/*******************************************************************************************************************************************************************************************************************************************************************************************************
 	 * IContentProvider
 	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.views.IContentProvider#getObject(int)
+	 */
 	public Object getObject(int index) {
 		if (canvas != null && manager != null) {
 			return canvas.getElement(index);
@@ -217,6 +319,9 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	/*******************************************************************************************************************************************************************************************************************************************************************************************************
 	 * IToolTipProvider
 	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.views.IToolTipProvider#toolTipText(java.lang.Object)
+	 */
 	public String[] toolTipText(Object obj) {
 		if (obj instanceof IElement) {			
 			return getToolTipText(convertElementObject((IElement)obj));
@@ -226,6 +331,9 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	/*******************************************************************************************************************************************************************************************************************************************************************************************************
 	 * Image Provider
 	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.views.IImageProvider#getStatusIcon(java.lang.Object, boolean)
+	 */
 	public Image getStatusIcon(Object obj, boolean isSelected) {
 		if (cur_element_set != null && obj instanceof IElement) {
 			int status = manager.getStatus((IElement)obj);
@@ -233,6 +341,9 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 		}
 		return null;
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.views.IImageProvider#drawSpecial(java.lang.Object, org.eclipse.swt.graphics.GC, int, int, int, int)
+	 */
 	public void drawSpecial(Object obj, GC gc, int x_loc, int y_loc, int width, int height) {
 		if (cur_element_set != null && obj instanceof IElement) {
 			if (((IElement)obj).isRegistered()) {
@@ -245,11 +356,17 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	/*******************************************************************************************************************************************************************************************************************************************************************************************************
 	 * IIconCanvasActionListener
 	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.views.IIconCanvasActionListener#handleAction(int, int)
+	 */
 	public void handleAction(int type, int index) {
 		if (type == IIconCanvasActionListener.DOUBLE_CLICK_ACTION) {
 			doubleClick(canvas.getElement(index));
 		}
 	}
+	/** Show ruler
+	 * @param showRuler true if show ruler
+	 */
 	public void setDisplayRuler(final boolean showRuler) {
 		getDisplay().asyncExec(new Runnable() {
 			public void run() {
@@ -260,6 +377,9 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 			}
 		});
 	}
+	/** Is ruler displayed
+	 * @return true if ruler is displayed
+	 */
 	public boolean isDisplayRuler() {
 		if (!canvas.isDisposed()) {
 			return canvas.isDisplayRuler();

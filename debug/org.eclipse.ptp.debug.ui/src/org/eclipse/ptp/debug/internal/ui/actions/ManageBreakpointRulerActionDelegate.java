@@ -33,11 +33,17 @@ public class ManageBreakpointRulerActionDelegate extends AbstractRulerActionDele
 	private IEditorPart activeEditor;
 	private ToggleBreakpointRulerAction targetAction = null;
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.texteditor.AbstractRulerActionDelegate#createAction(org.eclipse.ui.texteditor.ITextEditor, org.eclipse.jface.text.source.IVerticalRulerInfo)
+	 */
 	public IAction createAction(ITextEditor editor, IVerticalRulerInfo rulerInfo) {
 		targetAction = new ToggleBreakpointRulerAction(editor, rulerInfo);
 		return targetAction;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IEditorActionDelegate#setActiveEditor(org.eclipse.jface.action.IAction, org.eclipse.ui.IEditorPart)
+	 */
 	public void setActiveEditor(IAction callerAction, IEditorPart targetEditor) {
 		if (activeEditor != null) {
 			if (targetAction != null) {
@@ -49,6 +55,9 @@ public class ManageBreakpointRulerActionDelegate extends AbstractRulerActionDele
 		super.setActiveEditor(callerAction, targetEditor);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.swt.events.MouseListener#mouseDoubleClick(org.eclipse.swt.events.MouseEvent)
+	 */
 	public void mouseDoubleClick(MouseEvent e) {
 		targetAction.run();
 	}

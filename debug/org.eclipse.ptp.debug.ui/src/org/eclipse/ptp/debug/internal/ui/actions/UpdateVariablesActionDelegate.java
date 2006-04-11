@@ -35,9 +35,15 @@ import org.eclipse.ui.PlatformUI;
  *
  */
 public class UpdateVariablesActionDelegate extends AbstractPVariableAction {
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
+	 */
 	public void run(IAction action) {
 		doAction(view.getViewSite().getShell(), true);
 	}
+	/** Take an action to update values of ptp variables
+	 * @param shell
+	 */
 	public static void doAction(Shell shell) {
 		if (getCurrentRunningJob() == null)
 			return;
@@ -63,6 +69,10 @@ public class UpdateVariablesActionDelegate extends AbstractPVariableAction {
 		job.schedule();
 	}
 	
+	/** Take an action to update values of ptp variables
+	 * @param shell
+	 * @param force true remove all existed values and update all again, otherwise only update there is no value of variable
+	 */
 	public static void doAction(Shell shell, final boolean force) {
 		if (getCurrentRunningJob() == null)
 			return;

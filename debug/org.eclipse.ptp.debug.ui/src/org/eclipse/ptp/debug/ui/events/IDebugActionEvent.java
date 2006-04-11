@@ -22,7 +22,16 @@ package org.eclipse.ptp.debug.ui.events;
  *
  */
 public interface IDebugActionEvent {
+	/** Get job ID
+	 * @return
+	 */
 	public String getJobId();
+	/** Get source object
+	 * @return
+	 */
 	public Object getSource();
+	/** Get debug target
+	 * @return
+	 */
 	public Object getTarget();
 }

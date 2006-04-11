@@ -47,6 +47,9 @@ public abstract class AbstractBreakpointRulerAction extends Action implements IU
 	private IWorkbenchPart targetPart;
 	private IBreakpoint breakpoint;
 
+	/** Get line breakpoint
+	 * @return null if there is no line breakpoint
+	 */
 	protected IBreakpoint determineBreakpoint() {
 		IBreakpoint[] breakpoints = PTPDebugCorePlugin.getDebugModel().getPBreakpoints();
 		for(int i = 0; i < breakpoints.length; i++) {
@@ -61,35 +64,61 @@ public abstract class AbstractBreakpointRulerAction extends Action implements IU
 		return null;
 	}
 
+	/** Get vertical ruler info
+	 * @return
+	 */
 	protected IVerticalRulerInfo getInfo() {
 		return info;
 	}
 
+	/** Set vertical ruler info
+	 * @param info
+	 */
 	protected void setInfo(IVerticalRulerInfo info) {
 		this.info = info;
 	}
 
+	/** Get target workbench part
+	 * @return
+	 */
 	protected IWorkbenchPart getTargetPart() {
 		return targetPart;
 	}
+	/** Set target workbench part
+	 * @param targetPart
+	 */
 	protected void setTargetPart(IWorkbenchPart targetPart) {
 		this.targetPart = targetPart;
 	}
 
+	/** Get breakpoint
+	 * @return
+	 */
 	protected IBreakpoint getBreakpoint() {
 		return breakpoint;
 	}
 
+	/** Set breakpoint
+	 * @param breakpoint
+	 */
 	protected void setBreakpoint(IBreakpoint breakpoint) {
 		this.breakpoint = breakpoint;
 	}
 
+	/** Check given breakpoint line number same as current ruler line number
+	 * @param pBreakpoint
+	 * @return true if their line numbers are the same
+	 */
 	protected boolean breakpointAtRulerLine(ILineBreakpoint pBreakpoint) {
 		int lineNumber = getBreakpointLine(pBreakpoint);
 		int rulerLine = getInfo().getLineOfLastMouseButtonActivity();
 		return (rulerLine == lineNumber);
 	}
 
+	/** Get breakpoint line number
+	 * @param breakpoint
+	 * @return -1 if there is no line number
+	 */
 	private int getBreakpointLine(ILineBreakpoint breakpoint) {
 		if (getTargetPart() instanceof ISaveablePart && ((ISaveablePart)getTargetPart()).isDirty()) {
 			try {
@@ -116,6 +145,10 @@ public abstract class AbstractBreakpointRulerAction extends Action implements IU
 		return -1;
 	}
 
+	/** Get breakpoint position
+	 * @param breakpoint
+	 * @return null if there is no position found in given breakpoint
+	 */
 	private Position getBreakpointPosition(ILineBreakpoint breakpoint) {
 		IAnnotationModel model = getAnnotationModel();
 		if (model != null) {
@@ -130,6 +163,9 @@ public abstract class AbstractBreakpointRulerAction extends Action implements IU
 		return null;
 	}
 
+	/** Get document
+	 * @return
+	 */
 	private IDocument getDocument() {
 		IWorkbenchPart targetPart = getTargetPart();
 		if (targetPart instanceof ITextEditor) {
@@ -141,6 +177,9 @@ public abstract class AbstractBreakpointRulerAction extends Action implements IU
 		return null;
 	}
 
+	/** Get IAnnotationModel
+	 * @return
+	 */
 	private IAnnotationModel getAnnotationModel() {
 		IWorkbenchPart targetPart = getTargetPart();
 		if (targetPart instanceof ITextEditor) {

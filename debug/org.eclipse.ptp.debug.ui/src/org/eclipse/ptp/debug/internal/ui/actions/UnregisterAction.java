@@ -30,11 +30,17 @@ import org.eclipse.ptp.ui.model.IElement;
 public class UnregisterAction extends DebugAction {
 	public static final String name = "Unregister Selected Elements";
 	
+	/** Constructor
+	 * @param view
+	 */
 	public UnregisterAction(ParallelDebugView view) {
 		super(name, view);
 	    setImageDescriptor(PDebugImage.ID_ICON_UNREGISTER_NORMAL);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.actions.ParallelAction#run(org.eclipse.ptp.ui.model.IElement[])
+	 */
 	public void run(IElement[] elements) {
 		if (validation(elements)) {
 			try {

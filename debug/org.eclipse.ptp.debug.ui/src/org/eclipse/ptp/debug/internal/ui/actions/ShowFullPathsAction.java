@@ -34,14 +34,23 @@ import org.eclipse.swt.custom.BusyIndicator;
  *
  */
 public class ShowFullPathsAction extends ViewFilterAction {
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.internal.ui.actions.ViewFilterAction#getPreferenceKey()
+	 */
 	protected String getPreferenceKey() {
 		return IPDebugConstants.PREF_SHOW_FULL_PATHS;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.ViewerFilter#select(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
+	 */
 	public boolean select(Viewer viewer, Object parentElement, Object element) {
 		return true;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
+	 */
 	public void run(IAction action) {
 		final StructuredViewer viewer = getStructuredViewer();
 		IDebugView view = (IDebugView)getView().getAdapter(IDebugView.class);

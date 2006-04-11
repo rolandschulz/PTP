@@ -60,6 +60,9 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 		plugin = this;
 	}
 
+	/** Get unique identifier of plugin
+	 * @return
+	 */
 	public static String getUniqueIdentifier() {
 		if (getDefault() == null)
 			return PLUGIN_ID;
@@ -135,6 +138,9 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 		return AbstractUIPlugin.imageDescriptorFromPlugin("org.eclipse.ptp.debug.ui", path);
 	}
 	
+	/** Get active workbench shell
+	 * @return
+	 */
 	public static Shell getActiveWorkbenchShell() {
 		IWorkbenchWindow window = getActiveWorkbenchWindow();
 		if (window != null) {
@@ -143,6 +149,9 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 		return null;
 	}
 	
+	/** Get display
+	 * @return
+	 */
 	public static Display getDisplay() {
 		Display display= Display.getCurrent();
 		if (display == null) {
@@ -151,33 +160,66 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 		return display;		
 	}	
 	
+	/** Get active workbench window
+	 * @return
+	 */
 	public static IWorkbenchWindow getActiveWorkbenchWindow() {
 		return getDefault().getWorkbench().getActiveWorkbenchWindow();
 	}
 	
+	/** Get current perspective ID
+	 * @return
+	 */
 	public static String getCurrentPerspectiveID() {
 		return getActiveWorkbenchWindow().getActivePage().getPerspective().getId();
 	}
+	/** Is ptp debug perspective
+	 * @return
+	 */
 	public static boolean isPTPDebugPerspective() {
 		return getCurrentPerspectiveID().equals(IPTPDebugUIConstants.ID_PERSPECTIVE_DEBUG);		
 	}
 	
 	/***** LOG *****/
+	/** Log 
+	 * @param msg
+	 */
 	public static void log(String msg) {
 		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, msg, null));
 	}
+	/** Log
+	 * @param status
+	 */
 	public static void log(IStatus status) {
 		getDefault().getLog().log(status);
 	}
+	/** Log
+	 * @param e
+	 */
 	public static void log(Throwable e) {
 		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IPTPUIConstants.INTERNAL_ERROR, "Internal Error", e));
 	}
+	/** Show error dialog
+	 * @param title
+	 * @param t
+	 */
 	public static void errorDialog(String title, Throwable t) {
 		errorDialog(getActiveWorkbenchShell(), title, t.getMessage(), t);
 	}
+	/** Show error dialog
+	 * @param shell
+	 * @param title
+	 * @param t
+	 */
 	public static void errorDialog(Shell shell, String title, Throwable t) {
 		errorDialog(shell, title, t.getMessage(), t);
 	}
+	/** Show error dialog
+	 * @param shell
+	 * @param title
+	 * @param message
+	 * @param t
+	 */
 	public static void errorDialog(Shell shell, String title, String message, Throwable t) {
 		IStatus status;
 		if (t instanceof CoreException) {
@@ -188,18 +230,38 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 		}
 		errorDialog(shell, title, message, status);
 	}
+	/** Show error dialog
+	 * @param title
+	 * @param s
+	 */
 	public static void errorDialog(String title, IStatus s) {
 		errorDialog(getActiveWorkbenchShell(), title, s.getMessage(), s);
 	}
+	/** Show error dialog
+	 * @param shell
+	 * @param title
+	 * @param s
+	 */
 	public static void errorDialog(Shell shell, String title, IStatus s) {
 		errorDialog(shell, title, s.getMessage(), s);
 	}
+	/** Show error dialog
+	 * @param shell
+	 * @param title
+	 * @param message
+	 * @param s
+	 */
 	public static void errorDialog(Shell shell, String title, String message, IStatus s) {
 		if (s != null && message.equals(s.getMessage()))
 			message = null;
 
 		ErrorDialog.openError(shell, title, message, s);
 	}
+	/** Get launch debugger tab
+	 * @param debuggerID
+	 * @return
+	 * @throws CoreException
+	 */
 	public ILaunchConfigurationTab getDebuggerPage(String debuggerID) throws CoreException {
 		if (fDebuggerPageMap == null) {
 			initializeDebuggerPageMap();
@@ -211,6 +273,9 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 		}
 		return tab;
 	}
+	/** Initial launch debugger page  
+	 * 
+	 */
 	protected void initializeDebuggerPageMap() {
 		fDebuggerPageMap = new HashMap(10);
 		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(PLUGIN_ID, "PDebuggerPage");
@@ -221,6 +286,9 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 		}
 	}
 	
+	/** Get standard display
+	 * @return
+	 */
 	public static Display getStandardDisplay() {
 		Display display;
 		display = Display.getCurrent();
@@ -229,6 +297,9 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 		return display;
 	}
 	
+	/** Get shell
+	 * @return
+	 */
 	public static Shell getShell() {
 		if (getActiveWorkbenchWindow() != null) {
 			return getActiveWorkbenchWindow().getShell();

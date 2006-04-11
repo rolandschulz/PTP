@@ -33,6 +33,10 @@ import org.eclipse.ui.dialogs.PropertyDialogAction;
  *
  */
 public class PBreakpointPropertiesRulerAction extends AbstractBreakpointRulerAction {
+	/** Constructor
+	 * @param part
+	 * @param info
+	 */
 	public PBreakpointPropertiesRulerAction(IWorkbenchPart part, IVerticalRulerInfo info) {
 		setInfo(info);
 		setTargetPart(part);
@@ -40,6 +44,9 @@ public class PBreakpointPropertiesRulerAction extends AbstractBreakpointRulerAct
 		setId(IPTPDebugUIConstants.ACTION_BREAKPOINT_PROPERTIES);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.action.IAction#run()
+	 */
 	public void run() {
 		if (getBreakpoint() != null) {
 			PropertyDialogAction action = new PropertyDialogAction(getTargetPart().getSite(), new ISelectionProvider() {
@@ -58,6 +65,9 @@ public class PBreakpointPropertiesRulerAction extends AbstractBreakpointRulerAct
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.texteditor.IUpdate#update()
+	 */
 	public void update() {
 		setBreakpoint(determineBreakpoint());
 		if (getBreakpoint() == null || !(getBreakpoint() instanceof IPBreakpoint)) {

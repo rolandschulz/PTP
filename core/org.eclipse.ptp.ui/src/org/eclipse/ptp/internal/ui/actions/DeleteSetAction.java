@@ -34,12 +34,21 @@ import org.eclipse.ptp.ui.views.AbstractParallelElementView;
 public class DeleteSetAction extends ParallelAction {
 	public static final String name = "Delete Set";
 	
+	/** Constructor
+	 * @param view
+	 */
 	public DeleteSetAction(AbstractParallelElementView view) {
 		super(name, view);
 	    setImageDescriptor(ParallelImages.ID_ICON_DELETESET_NORMAL);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.actions.ParallelAction#run(org.eclipse.ptp.ui.model.IElement[])
+	 */
 	public void run(IElement[] elements) {}
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.action.IAction#run()
+	 */
 	public void run() {
 		IElementSet set = view.getCurrentSet();
 		if (set != null && set.size() > 0) {

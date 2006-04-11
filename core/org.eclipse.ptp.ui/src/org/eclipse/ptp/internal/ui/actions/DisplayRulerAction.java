@@ -31,6 +31,9 @@ public class DisplayRulerAction extends ParallelAction {
 	public static final String name = "Show ruler";
 	private boolean checked = false;
 	
+	/** Constructor
+	 * @param view
+	 */
 	public DisplayRulerAction(AbstractParallelElementView view) {
 		super(name, IAction.AS_CHECK_BOX, view);
 		setEnabled(view.getCurrentID().length()>0);
@@ -38,7 +41,13 @@ public class DisplayRulerAction extends ParallelAction {
 		setChecked(checked);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.actions.ParallelAction#run(org.eclipse.ptp.ui.model.IElement[])
+	 */
 	public void run(IElement[] elements) {}
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.action.IAction#run()
+	 */
 	public void run() {
 		getViewPart().setDisplayRuler(!checked);
 	}

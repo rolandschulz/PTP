@@ -65,32 +65,60 @@ public abstract class SimulationProjectCreation implements IRunnableContext {
 	private String projectName = "";
 	private String fileName = "";
 	
+	/** Constructor
+	 * @param projectName
+	 * @param fileName
+	 */
 	public SimulationProjectCreation(String projectName, String fileName) {
 		this.projectName = projectName;
 		this.fileName = fileName;
 	}
 	
+	/** Get project name
+	 * @return
+	 */
 	public String getProjectName() {
 		return projectName;
 	}
+	/** Get file name
+	 * @return
+	 */
 	public String getFileName() {
 		return fileName;
 	}
+	/** Set project name
+	 * @param projectName
+	 */
 	public void setProjectName(String projectName) {
 		this.projectName = projectName;
 	}
+	/** Set file name
+	 * @param fileName
+	 */
 	public void setFileName(String fileName) {
 		this.fileName = fileName;
 	}
+	/** Get full file name including extension
+	 * @return
+	 */
 	public String getFullFileName() {
 		return getFileName() + getFileExtension();
 	}
+	/** Get file extension
+	 * @return
+	 */
 	public abstract String getFileExtension();
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.operation.IRunnableContext#run(boolean, boolean, org.eclipse.jface.operation.IRunnableWithProgress)
+	 */
 	public void run(boolean fork, boolean cancelable, IRunnableWithProgress runnable) throws InvocationTargetException, InterruptedException {
 		new ProgressMonitorDialog(PTPUIPlugin.getActiveWorkbenchShell()).run(fork, cancelable, runnable);
 	}	
 		
+	/** Create simulator project
+	 * @throws CoreException
+	 */
 	public void createSimulatorProject() throws CoreException {
 		IRunnableWithProgress runnable = new IRunnableWithProgress() {
 			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
@@ -119,6 +147,9 @@ public abstract class SimulationProjectCreation implements IRunnableContext {
 			throw new CoreException(new Status(IStatus.ERROR, PTPUIPlugin.getUniqueIdentifier(), 0, "Internal error", innerException));
 		}
 	}
+	/** Is simulator project existed
+	 * @return
+	 */
 	public boolean isSimulatorProjectExisted() {
 		IResource project = ResourcesPlugin.getWorkspace().getRoot().findMember(getProjectName());
 		if (project == null || !project.exists() || project.getType() != IResource.PROJECT) {
@@ -130,6 +161,12 @@ public abstract class SimulationProjectCreation implements IRunnableContext {
 		}
 		return true;
 	}
+	/** Create simulator project
+	 * @param projectName
+	 * @param fileName
+	 * @param monitor
+	 * @throws CoreException
+	 */
 	private void createSimulatorProject(String projectName, String fileName, IProgressMonitor monitor) throws CoreException {
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		IProject project = workspace.getRoot().getProject(getProjectName());
@@ -147,6 +184,9 @@ public abstract class SimulationProjectCreation implements IRunnableContext {
 		openEditor(file);
 	}
 	
+	/** Get file content
+	 * @return
+	 */
 	protected InputStream getFileContent() {
 		String templateFile = getTemplateFile();
 		if (templateFile == null)
@@ -160,6 +200,10 @@ public abstract class SimulationProjectCreation implements IRunnableContext {
 		}
 		return null;
 	}
+	/** Get template file path
+	 * @param templateFile
+	 * @return
+	 */
 	private IPath getTemplateFilePath(String templateFile) {
 		String pluginPath =  PTPUIPlugin.getDefault().getPluginPath();
 		if (pluginPath == null)
@@ -167,9 +211,24 @@ public abstract class SimulationProjectCreation implements IRunnableContext {
 		
 		return new Path(pluginPath).append(TEMPLATE_FOLDER).append(templateFile);
 	}
+	/** Get template file
+	 * @return
+	 */
 	protected abstract String getTemplateFile();
+	/** Create project
+	 * @param description
+	 * @param newProject
+	 * @param monitor
+	 * @throws CoreException
+	 */
 	protected abstract void createProject(IProjectDescription description, IProject newProject, IProgressMonitor monitor) throws CoreException;
 	
+	/** Create file
+	 * @param fileHandle
+	 * @param contents
+	 * @param monitor
+	 * @throws CoreException
+	 */
 	protected void createFile(IFile fileHandle, InputStream contents, IProgressMonitor monitor) throws CoreException {
 		if (contents == null)
 			contents = new ByteArrayInputStream(new byte[0]);
@@ -192,6 +251,10 @@ public abstract class SimulationProjectCreation implements IRunnableContext {
 			throw new OperationCanceledException();
 	}
 	
+	/** Set file to read only
+	 * @param resource
+	 * @throws CoreException
+	 */
 	protected void setReadyOnly(IResource resource) throws CoreException {
 		ResourceAttributes attributes = resource.getResourceAttributes();
 		if (attributes != null) {
@@ -200,8 +263,15 @@ public abstract class SimulationProjectCreation implements IRunnableContext {
 		}
 	}
 	
+	/** Get editor ID
+	 * @return
+	 */
 	protected abstract String getEditorID();
 	
+	/** Open editor
+	 * @param file
+	 * @throws CoreException
+	 */
 	protected void openEditor(IFile file) throws CoreException {
 		IEditorPart editorPart = getEditorPart(file);
 		if (editorPart == null)
@@ -216,6 +286,10 @@ public abstract class SimulationProjectCreation implements IRunnableContext {
 			extension.validateState(editorPart.getEditorInput(), null);
 		}
 	}
+	/** Get editor part
+	 * @param file
+	 * @return
+	 */
 	protected IEditorPart getEditorPart(final IFile file) {
 		IWorkbenchPage page = PTPUIPlugin.getActiveWorkbenchWindow().getActivePage();
 		IEditorPart editorPart = page.getActiveEditor();
@@ -246,11 +320,19 @@ public abstract class SimulationProjectCreation implements IRunnableContext {
 		}
 		return null;
 	}
+	/** Get text editor
+	 * @param editorPart
+	 * @return
+	 */
 	protected ITextEditor getTextEditor(IEditorPart editorPart) {
 		if (editorPart instanceof ITextEditor)
 			return (ITextEditor) editorPart;
 		return (ITextEditor) editorPart.getAdapter(ITextEditor.class);
 	}
+	/** Get file
+	 * @param editorInput
+	 * @return
+	 */
 	protected IFile getFile(IEditorInput editorInput) {
 		if (editorInput instanceof IFileEditorInput)
 			return ((IFileEditorInput) editorInput).getFile();

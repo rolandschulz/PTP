@@ -32,6 +32,14 @@ import org.eclipse.swt.widgets.Menu;
  * @author Clement chu
  *
  */
+/**
+ * @author clement
+ *
+ */
+/**
+ * @author clement
+ *
+ */
 public abstract class GotoDropDownAction extends ParallelAction {
     protected IMenuCreator menuCreator = new IMenuCreator() {
         private MenuManager dropDownMenuMgr = null;
@@ -69,12 +77,29 @@ public abstract class GotoDropDownAction extends ParallelAction {
         }
     };
     
+    /** Constructor
+     * @param name name of action
+     * @param view view
+     */
     public GotoDropDownAction(String name, AbstractParallelElementView view) {
 		super(name, IAction.AS_DROP_DOWN_MENU, view);
 	    setMenuCreator(menuCreator);
     }
 
+	/** Create drop down menu
+	 * @param dropDownMenuMgr
+	 */
 	protected abstract void createDropDownMenu(MenuManager dropDownMenuMgr);	
+	/** run action
+	 * @param elements elements to take this action
+	 * @param setID set ID
+	 */
 	protected abstract void run(IElement[] elements, String setID);
+	/** Add action into drop down menu
+	 * @param dropDownMenuMgr
+	 * @param name name of action
+	 * @param id action ID
+	 * @param curID current ID
+	 */
 	protected abstract void addAction(MenuManager dropDownMenuMgr, String name, String id, String curID);
 }

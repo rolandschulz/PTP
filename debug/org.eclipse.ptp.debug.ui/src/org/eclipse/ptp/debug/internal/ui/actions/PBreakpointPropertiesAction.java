@@ -37,14 +37,23 @@ public class PBreakpointPropertiesAction implements IObjectActionDelegate {
 	private IWorkbenchPart part;
 	private IPBreakpoint breakpoint;
 
+	/** Constructor
+	 * 
+	 */
 	public PBreakpointPropertiesAction() {
 		super();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IObjectActionDelegate#setActivePart(org.eclipse.jface.action.IAction, org.eclipse.ui.IWorkbenchPart)
+	 */
 	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
 		part = targetPart;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
+	 */
 	public void run(IAction action) {
 		PropertyDialogAction propertyAction = new PropertyDialogAction(getActivePart().getSite(), new ISelectionProvider() {
 			public void addSelectionChangedListener( ISelectionChangedListener listener ) {
@@ -60,6 +69,9 @@ public class PBreakpointPropertiesAction implements IObjectActionDelegate {
 		propertyAction.run();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action.IAction, org.eclipse.jface.viewers.ISelection)
+	 */
 	public void selectionChanged(IAction action, ISelection selection) {
 		if (selection instanceof IStructuredSelection) {
 			IStructuredSelection ss = (IStructuredSelection)selection;
@@ -73,14 +85,23 @@ public class PBreakpointPropertiesAction implements IObjectActionDelegate {
 		}
 	}
 
+	/** Get active workbench part
+	 * @return
+	 */
 	protected IWorkbenchPart getActivePart() {
 		return part;
 	}
 
+	/** Get ptp breakpoint
+	 * @return
+	 */
 	protected IPBreakpoint getBreakpoint() {
 		return breakpoint;
 	}
 
+	/** Set ptp breakpoint
+	 * @param breakpoint
+	 */
 	protected void setBreakpoint(IPBreakpoint breakpoint) {
 		this.breakpoint = breakpoint;
 	}

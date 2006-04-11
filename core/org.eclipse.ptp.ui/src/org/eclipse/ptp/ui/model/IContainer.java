@@ -26,19 +26,64 @@ public interface IContainer extends IElement {
 	public static final int SET_TYPE = 1;
 	public static final int ELEMENT_TYPE = 2;
 	
+	/** Is Element contained
+	 * @param id Element ID
+	 * @return true if contain
+	 */
 	public boolean contains(String id);
+	/** Get Element ID
+	 * @param index Element index
+	 * @return element ID
+	 */
 	public String getElementID(int index);
+	/** Add element 
+	 * @param element Target element
+	 */
 	public void add(IElement element);
+	/** Remove element
+	 * @param element Target element
+	 */
 	public void remove(IElement element);
+	/** Remove element
+	 * @param id Targt element ID
+	 */
 	public void remove(String id);
+	/** Clean all elements
+	 * 
+	 */
 	public void clearAll();
-	public int size();	
+	/** Get element size
+	 * @return total elements
+	 */
+	public int size();
 
+	/** Get elements
+	 * @return elements
+	 */
 	public IElement[] get();
+	/** Get sorted elements
+	 * @return sorted elements
+	 */
 	public IElement[] getSorted();
+	/** Get element
+	 * @param id Element ID
+	 * @return element
+	 */
 	public IElement get(String id);
+	/** Get element
+	 * @param index Element index
+	 * @return element
+	 */
 	public IElement get(int index);
 	
+	/** Set data
+	 * @param key Unique key of data
+	 * @param data Data
+	 */
 	public void setData(String key, Object data);
+	/** Get data
+	 * @param key Unique key of data
+	 * @return Data
+	 */
 	public Object getData(String key);
 }

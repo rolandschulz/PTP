@@ -28,6 +28,10 @@ import org.eclipse.ptp.ui.actions.ParallelAction;
 public abstract class DebugAction extends ParallelAction {
 	protected ParallelDebugView view = null;
 	
+	/** Constructor
+	 * @param text
+	 * @param view
+	 */
 	public DebugAction(String text, ParallelDebugView view) {
 		super(text, view);
 		this.view = view;

@@ -36,6 +36,9 @@ import org.eclipse.ptp.debug.internal.ui.PDebugImage;
 public class PBreakpointSetOrganizer extends AbstractBreakpointOrganizerDelegate {
 	private Map types = new HashMap();
 
+    /* (non-Javadoc)
+     * @see org.eclipse.debug.ui.IBreakpointOrganizerDelegate#getCategories(org.eclipse.debug.core.model.IBreakpoint)
+     */
     public IAdaptable[] getCategories(IBreakpoint breakpoint) {
         if (!(breakpoint instanceof IPBreakpoint))
         		return null;
@@ -62,6 +65,9 @@ public class PBreakpointSetOrganizer extends AbstractBreakpointOrganizerDelegate
     	return null;
     }
     
+    /* (non-Javadoc)
+     * @see org.eclipse.debug.ui.IBreakpointOrganizerDelegate#dispose()
+     */
     public void dispose() {
     	types.clear();
     }

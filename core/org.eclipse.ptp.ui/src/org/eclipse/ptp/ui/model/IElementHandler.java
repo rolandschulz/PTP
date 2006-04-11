@@ -26,18 +26,58 @@ import org.eclipse.ptp.core.PreferenceConstants;
  */
 public interface IElementHandler extends IContainer {
 	public final static String SET_ROOT_ID = PreferenceConstants.SET_ROOT_ID;
+	/** Get Set root
+	 * @return root set
+	 */
 	public IElementSet getSetRoot();
 	
+	/** Get sets included
+	 * @param id Target element ID
+	 * @return included sets
+	 */
 	public IElementSet[] getSetsWithElement(String id);
+	/** Get sorted sets
+	 * @return sorted sets
+	 */
 	public IElementSet[] getSortedSets();
+	/** Get sets
+	 * @return sets
+	 */
 	public IElementSet[] getSets();
+	/** Get Set by set ID
+	 * @param id Set ID
+	 * @return set
+	 */
 	public IElementSet getSet(String id);
+	/** Get set by element index
+	 * @param index element index
+	 * @return set
+	 */
 	public IElementSet getSet(int index);
 	
+	/** Is element registered
+	 * @param element Target element
+	 * @return true if element is registered
+	 */
 	public boolean containsRegisterElement(IElement element);
+	/** Add element to registered list
+	 * @param element Target element
+	 */
 	public void addRegisterElement(IElement element);
+	/** Remove element from registered list
+	 * @param element Target element
+	 */
 	public void removeRegisterElement(IElement element);
+	/** Get registered elements
+	 * @return registered elements
+	 */
 	public IElement[] getRegisteredElements();
+	/** Remove all registered elements
+	 * 
+	 */
 	public void removeAllRegisterElements();
+	/** Get total of registered elements
+	 * @return number of registered elements
+	 */
 	public int totalRegisterElements();
 }

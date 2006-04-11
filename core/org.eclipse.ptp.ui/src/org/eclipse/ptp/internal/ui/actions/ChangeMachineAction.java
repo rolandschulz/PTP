@@ -36,11 +36,17 @@ import org.eclipse.ptp.ui.views.ParallelMachineView;
 public class ChangeMachineAction extends GotoDropDownAction {
 	public static final String name = "Machine";
     
+	/** Constructor
+	 * @param view
+	 */
 	public ChangeMachineAction(AbstractParallelElementView view) {
 		super(name, view);
 	    setImageDescriptor(ParallelImages.ID_ICON_MACHINE_NORMAL);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.actions.GotoDropDownAction#createDropDownMenu(org.eclipse.jface.action.MenuManager)
+	 */
 	protected void createDropDownMenu(MenuManager dropDownMenuMgr) {
 		if (view instanceof ParallelMachineView) {
 			ParallelMachineView pmView = (ParallelMachineView)view;
@@ -53,6 +59,9 @@ public class ChangeMachineAction extends GotoDropDownAction {
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.actions.GotoDropDownAction#addAction(org.eclipse.jface.action.MenuManager, java.lang.String, java.lang.String, java.lang.String)
+	 */
 	protected void addAction(MenuManager dropDownMenuMgr, String machine_name, String id, String curID) {
 		IAction action = new InternalMachineAction(machine_name, id, getViewPart(), this);
 		action.setChecked(curID.equals(id));
@@ -60,8 +69,14 @@ public class ChangeMachineAction extends GotoDropDownAction {
 		dropDownMenuMgr.add(action);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.actions.ParallelAction#run(org.eclipse.ptp.ui.model.IElement[])
+	 */
 	public void run(IElement[] elements) {}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.action.IAction#run()
+	 */
 	public void run() {
 		if (view instanceof ParallelMachineView) {
 			ParallelMachineView pmView = ((ParallelMachineView)view);
@@ -79,6 +94,9 @@ public class ChangeMachineAction extends GotoDropDownAction {
 	    }
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.actions.GotoDropDownAction#run(org.eclipse.ptp.ui.model.IElement[], java.lang.String)
+	 */
 	public void run(IElement[] elements, String id) {
 		if (view instanceof ParallelMachineView) {
 			ParallelMachineView pmView = ((ParallelMachineView)view);
@@ -88,6 +106,10 @@ public class ChangeMachineAction extends GotoDropDownAction {
 		}
 	}
 	
+	/** Inner internal machine action
+	 * @author clement
+	 *
+	 */
 	private class InternalMachineAction extends GotoAction {
 		public InternalMachineAction(String name, String id, AbstractParallelElementView view, GotoDropDownAction action) {
 			super(name, id, view, action);

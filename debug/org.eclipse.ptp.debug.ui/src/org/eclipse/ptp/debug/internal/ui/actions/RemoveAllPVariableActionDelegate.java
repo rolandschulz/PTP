@@ -29,10 +29,16 @@ import org.eclipse.swt.widgets.Shell;
  * 
  */
 public class RemoveAllPVariableActionDelegate extends AbstractPVariableAction {
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
+	 */
 	public void run(IAction action) {
 		doAction(view.getViewSite().getShell());
 	}
 	
+	/** Take action to remove all ptp varaible in the current selected job
+	 * @param shell
+	 */
 	public static void doAction(Shell shell) {
 		if (getCurrentRunningJob() == null)
 			return;

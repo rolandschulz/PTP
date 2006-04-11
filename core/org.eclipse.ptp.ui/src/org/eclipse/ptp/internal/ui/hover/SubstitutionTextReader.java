@@ -41,7 +41,9 @@ public abstract class SubstitutionTextReader extends SingleCharReader {
 	private StringBuffer fBuffer;
 	private int fIndex;
 
-
+	/** Constructor
+	 * @param reader
+	 */
 	protected SubstitutionTextReader(Reader reader) {
 		fReader= reader;
 		fBuffer= new StringBuffer();
@@ -57,16 +59,15 @@ public abstract class SubstitutionTextReader extends SingleCharReader {
 	 * to read subsequent characters.
 	 */
 	protected abstract String computeSubstitution(int c) throws IOException;
-
 	/**
-	 * Returns the internal reader.
+	 * @return the internal reader.
 	 */
 	protected Reader getReader() {
 		return fReader;
 	}
-
 	/**
-	 * Returns the next character.
+	 * @return the next character.
+	 * @throws IOException
 	 */
 	protected int nextChar() throws IOException {
 		fReadFromBuffer= (fBuffer.length() > 0);
@@ -96,9 +97,8 @@ public abstract class SubstitutionTextReader extends SingleCharReader {
 			return ch;
 		}
 	}
-
-	/**
-	 * @see Reader#read()
+	/* (non-Javadoc)
+	 * @see java.io.Reader#read()
 	 */
 	public int read() throws IOException {
 		int c;
@@ -117,23 +117,20 @@ public abstract class SubstitutionTextReader extends SingleCharReader {
 		fWasWhiteSpace= (c == ' ' || c == '\r' || c == '\n');
 		return c;
 	}
-
-	/**
-	 * @see Reader#ready()
-	 */
+    /* (non-Javadoc)
+     * @see java.io.Reader#ready()
+     */
     public boolean ready() throws IOException {
 		return fReader.ready();
 	}
-
-	/**
-	 * @see Reader#close()
+	/* (non-Javadoc)
+	 * @see java.io.Closeable#close()
 	 */
 	public void close() throws IOException {
 		fReader.close();
 	}
-
-	/**
-	 * @see Reader#reset()
+	/* (non-Javadoc)
+	 * @see java.io.Reader#reset()
 	 */
 	public void reset() throws IOException {
 		fReader.reset();
@@ -142,11 +139,15 @@ public abstract class SubstitutionTextReader extends SingleCharReader {
 		fBuffer.setLength(0);
 		fIndex= 0;
 	}
-
+	/** Set skip white space
+	 * @param state
+	 */
 	protected final void setSkipWhitespace(boolean state) {
 		fSkipWhiteSpace= state;
 	}
-
+	/** Is skip white space
+	 * @return
+	 */
 	protected final boolean isSkippingWhitespace() {
 		return fSkipWhiteSpace;
 	}

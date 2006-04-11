@@ -57,16 +57,25 @@ public class PTPVariablesDialog extends Dialog {
 	protected IPVariableManager manager = null;
 	protected IPJob current_job = null;
 
+	/** Constructor
+	 * @param parent
+	 */
 	public PTPVariablesDialog(Shell parent) {
 		super(parent);
 		manager = PTPDebugCorePlugin.getPVariableManager();
 		current_job = PTPDebugUIPlugin.getDefault().getUIDebugManager().getCurrentJob();
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.window.Window#configureShell(org.eclipse.swt.widgets.Shell)
+	 */
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
 		shell.setText(DialogMessages.getString("PTPVariablesDialog.name"));
 		shell.setSize(300, 400);
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets.Composite)
+	 */
 	protected Control createDialogArea(Composite parent) {
 		final Composite composite = (Composite) super.createDialogArea(parent);
 		Composite result = new Composite(composite, SWT.NONE);
@@ -111,6 +120,9 @@ public class PTPVariablesDialog extends Dialog {
 		createMenu(listViewer.getList());
 		return composite;
 	}
+	/** Create menu
+	 * @param control
+	 */
 	protected void createMenu(Control control) {
 	    Menu menu = new Menu(getShell(), SWT.POP_UP);
 	    MenuItem addWatchMItem = new MenuItem(menu, SWT.PUSH);
@@ -170,6 +182,9 @@ public class PTPVariablesDialog extends Dialog {
 	    });	    
 	    control.setMenu(menu);	    
 	}
+	/** Get variable name of selected element
+	 * @return
+	 */
 	protected String getSelection() {
 		ISelection selection = listViewer.getSelection();
 		if (!selection.isEmpty()) {

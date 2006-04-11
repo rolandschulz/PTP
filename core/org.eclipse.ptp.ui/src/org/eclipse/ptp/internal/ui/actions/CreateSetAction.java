@@ -36,11 +36,17 @@ import org.eclipse.ptp.ui.views.AbstractParallelElementView;
 public class CreateSetAction extends GotoDropDownAction {
 	public static final String name = "Create Set";
     
+	/** Constructor
+	 * @param view
+	 */
 	public CreateSetAction(AbstractParallelElementView view) {
 		super(name, view);
 	    setImageDescriptor(ParallelImages.ID_ICON_CREATESET_NORMAL);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.actions.GotoDropDownAction#createDropDownMenu(org.eclipse.jface.action.MenuManager)
+	 */
 	protected void createDropDownMenu(MenuManager dropDownMenuMgr) {
     	String curID = view.getCurrentSetID();
 		IElementHandler setManager = view.getCurrentElementHandler();
@@ -53,16 +59,25 @@ public class CreateSetAction extends GotoDropDownAction {
 	    	}		
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.actions.GotoDropDownAction#addAction(org.eclipse.jface.action.MenuManager, java.lang.String, java.lang.String, java.lang.String)
+	 */
 	protected void addAction(MenuManager dropDownMenuMgr, String e_name, String id, String curID) {
 		IAction action = new InternalSetAction("Add to set: " + e_name, id, view, this);
 		action.setEnabled(!curID.equals(id));
 		dropDownMenuMgr.add(action);
 	}	
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.actions.ParallelAction#run(org.eclipse.ptp.ui.model.IElement[])
+	 */
 	public void run(IElement[] elements) {
 		run(elements, null);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.actions.GotoDropDownAction#run(org.eclipse.ptp.ui.model.IElement[], java.lang.String)
+	 */
 	public void run(IElement[] elements, String setID) {
 		if (validation(elements)) {
 			final IElementHandler setManager = view.getCurrentElementHandler();
@@ -97,6 +112,10 @@ public class CreateSetAction extends GotoDropDownAction {
 		}
 	}
 	
+	/** Inner internal set action
+	 * @author clement
+	 *
+	 */
 	private class InternalSetAction extends GotoAction {
 		public InternalSetAction(String name, String id, AbstractParallelElementView view, GotoDropDownAction action) {
 			super(name, id, view, action);

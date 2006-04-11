@@ -29,7 +29,14 @@ public class ActionMessages {
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.debug.internal.ui.actions.ActionMessages";
 	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
 
+	/** Constructor
+	 * 
+	 */
 	public ActionMessages() {}
+	/** Get string
+	 * @param key
+	 * @return
+	 */
 	public static String getString(String key) {
 		try {
 			return RESOURCE_BUNDLE.getString(key);

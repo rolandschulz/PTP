@@ -46,6 +46,9 @@ public class JobManager extends AbstractUIManager implements IProcessListener {
 	protected String cur_job_id = EMPTY_ID;
 	protected List jobChangeListeners = new ArrayList();
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.IManager#shutdown()
+	 */
 	public void shutdown() {
 		clear();
 		modelManager = null;
@@ -53,30 +56,52 @@ public class JobManager extends AbstractUIManager implements IProcessListener {
 		jobChangeListeners = null;
 		super.shutdown();
 	}
+	/** Add Job change listener
+	 * @param listener
+	 */
 	public void addJobChangeListener(IJobChangeListener listener) {
 		if (!jobChangeListeners.contains(listener))
 			jobChangeListeners.add(listener);
 	}
+	/** Remove Job change listener
+	 * @param listener
+	 */
 	public void removeJobChangeListener(IJobChangeListener listener) {
 		if (jobChangeListeners.contains(listener))
 			jobChangeListeners.remove(listener);
 	}
+	/** Fire job change event
+	 * @param cur_jid current job ID
+	 * @param pre_jid previous job ID
+	 */
 	public void fireJobChangeEvent(String cur_jid, String pre_jid) {
 		for (Iterator i = jobChangeListeners.iterator(); i.hasNext();) {
 			((IJobChangeListener) i.next()).changeJobEvent(cur_jid, pre_jid);
 		}
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.IManager#getElementHandler(java.lang.String)
+	 */
 	public IElementHandler getElementHandler(String id) {
 		return (IElementHandler) jobList.get(id);
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.IManager#size()
+	 */
 	public int size() {
 		return jobList.size();
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.IManager#clear()
+	 */
 	public void clear() {
 		if (jobList != null) {
 			jobList.clear();
 		}
 	}
+	/** Get Jobs
+	 * @return jobs
+	 */
 	public IPJob[] getJobs() {
 		IPUniverse universe = modelManager.getUniverse();
 		if (universe == null) {
@@ -84,26 +109,47 @@ public class JobManager extends AbstractUIManager implements IProcessListener {
 		}
 		return universe.getSortedJobs();
 	}
+	/** Get current job
+	 * @return curretn job
+	 */
 	public IPJob getCurrentJob() {
 		return findJobById(getCurrentJobId());
 	}
+	/** Get current job ID
+	 * @return current job ID
+	 */
 	public String getCurrentJobId() {
 		return cur_job_id;
 	}
+	/** Set current job ID
+	 * @param job_id Job ID
+	 */
 	public void setCurrentJobId(String job_id) {
 		String tmp_jod_id = cur_job_id;
 		cur_job_id = job_id;		
 		fireJobChangeEvent(job_id, tmp_jod_id);
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.IManager#getCurrentSetId()
+	 */
 	public String getCurrentSetId() {
 		return cur_set_id;
 	}
 	public void setCurrentSetId(String set_id) {
 		cur_set_id = set_id;
 	}
+	/** Get process status text
+	 * @param job_id job ID
+	 * @param proc_id process ID
+	 * @return status
+	 */
 	public String getProcessStatusText(String job_id, String proc_id) {
 		return getProcessStatusText(findProcess(job_id, proc_id));
 	}
+	/** Get process status text
+	 * @param proc process
+	 * @return status
+	 */
 	public String getProcessStatusText(IPProcess proc) {
 		switch (getProcessStatus(proc)) {
 		case IPTPUIConstants.PROC_STARTING:
@@ -122,12 +168,24 @@ public class JobManager extends AbstractUIManager implements IProcessListener {
 			return "Error";
 		}
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.IManager#getStatus(java.lang.String)
+	 */
 	public int getStatus(String id) {
 		return getStatus(getCurrentJobId(), id);
 	}	
+	/** Get Status
+	 * @param job_id job ID
+	 * @param proc_id process ID
+	 * @return status 
+	 */
 	public int getStatus(String job_id, String proc_id) {
 		return getProcessStatus(findProcess(job_id, proc_id));
 	}
+	/** Get process status
+	 * @param proc process
+	 * @return status
+	 */
 	public int getProcessStatus(IPProcess proc) {
 		if (proc != null) {
 			String status = proc.getStatus();
@@ -146,20 +204,36 @@ public class JobManager extends AbstractUIManager implements IProcessListener {
 		}
 		return IPTPUIConstants.PROC_ERROR;
 	}
+	/** Find process
+	 * @param job_id job ID
+	 * @param id process ID
+	 * @return process
+	 */
 	public IPProcess findProcess(String job_id, String id) {
 		return findProcess(findJobById(job_id), id);
 	}
+	/** Find process
+	 * @param job job
+	 * @param id process ID
+	 * @return
+	 */
 	public IPProcess findProcess(IPJob job, String id) {
 		if (job == null)
 			return null;
 		return job.findProcess(id);
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.IManager#getName(java.lang.String)
+	 */
 	public String getName(String id) {
 		IPElement element = findJobById(id);
 		if (element == null)
 			return "";
 		return element.getElementName();
 	}
+	/** Add a job
+	 * @param job
+	 */
 	public void addJob(IPJob job) {
 		if (jobList.containsKey(job.getIDString()))
 			return;
@@ -177,6 +251,9 @@ public class JobManager extends AbstractUIManager implements IProcessListener {
 			jobList.put(job.getIDString(), elementHandler);
 		}
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.IManager#initial()
+	 */
 	public String initial() {
 		IPJob[] jobs = getJobs();
 		String last_job_id = EMPTY_ID;
@@ -193,9 +270,16 @@ public class JobManager extends AbstractUIManager implements IProcessListener {
 	/*******************************************************************************************************************************************************************************************************************************************************************************************************
 	 * Process Listener
 	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
+	/** Add process listener
+	 * @param process
+	 * @param currentJob
+	 */
 	public void addProcessListener(IPProcess process, IPJob currentJob) {
 		process.addProcessListener(this);
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.IProcessListener#processEvent(org.eclipse.ptp.core.IProcessEvent)
+	 */
 	public void processEvent(IProcessEvent event) {
 		// only redraw if the current set contain the process
 		if (isJobStop(event.getJobId()))
@@ -207,6 +291,11 @@ public class JobManager extends AbstractUIManager implements IProcessListener {
 			}
 		}
 	}
+	/** Is current set contain process
+	 * @param jid job ID
+	 * @param processID process ID
+	 * @return true if job contains process
+	 */
 	public boolean isCurrentSetContainProcess(String jid, String processID) {
 		if (!getCurrentJobId().equals(jid))
 			return false;
@@ -221,13 +310,23 @@ public class JobManager extends AbstractUIManager implements IProcessListener {
 	/*******************************************************************************************************************************************************************************************************************************************************************************************************
 	 * terminate action
 	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
+	/** terminate all processes in current job
+	 * @throws CoreException
+	 */
 	public void terminateAll() throws CoreException {
 		terminateAll(getCurrentJobId());
 	}
+	/** terminate all processes in given job
+	 * @param job_id job ID
+	 * @throws CoreException
+	 */
 	public void terminateAll(String job_id) throws CoreException {
 		modelManager.abortJob(getName(job_id));
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.IManager#removeJob(org.eclipse.ptp.core.IPJob)
+	 */
 	public void removeJob(IPJob job) {
 		jobList.remove(job.getIDString());
 		super.removeJob(job);

@@ -18,12 +18,16 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.ui.events;
 
-
 /**
  * @author Clement chu
  *
  */
 public class TerminatedDebugEvent extends DebugActionEvent implements ITerminatedDebugEvent {
+	/** Constructor
+	 * @param job_id
+	 * @param source
+	 * @param target
+	 */
 	public TerminatedDebugEvent(String job_id, Object source, Object target) {
 		super(job_id, source, target);
 	}

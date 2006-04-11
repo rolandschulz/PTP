@@ -34,14 +34,23 @@ import org.eclipse.ptp.ui.views.AbstractParallelElementView;
 public class TerminateAllAction extends ParallelAction {
 	public static final String name = "Terminate All";
 	
+	/** Constructor
+	 * @param view
+	 */
 	public TerminateAllAction(AbstractParallelElementView view) {
 		super(name, view);
 	    setImageDescriptor(ParallelImages.ID_ICON_TERMINATE_ALL_NORMAL);
 	    setDisabledImageDescriptor(ParallelImages.ID_ICON_TERMINATE_ALL_DISABLE);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.actions.ParallelAction#run(org.eclipse.ptp.ui.model.IElement[])
+	 */
 	public void run(IElement[] elements) {}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.action.IAction#run()
+	 */
 	public void run() {
 		IManager manager = view.getUIManager();
 		if (manager instanceof JobManager) {

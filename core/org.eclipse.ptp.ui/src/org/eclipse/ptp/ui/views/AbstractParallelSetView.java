@@ -57,10 +57,16 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 	protected ParallelAction deleteProcessAction = null;
 	protected ParallelAction changeSetAction = null;
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IWorkbenchPart#dispose()
+	 */
 	public void dispose() {
 		clipboard.clear();
 		super.dispose();
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IWorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
+	 */
 	public void createPartControl(Composite parent) {
 		super.createPartControl(parent);
 		IToolBarManager toolBarMgr = getViewSite().getActionBars().getToolBarManager();
@@ -72,6 +78,9 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 		initialView();
 		PTPUIPlugin.getDefault().refreshRuntimeSystem(true, false);
 	}
+	/** Create Toolbar menu
+	 * @param toolBarMgr 
+	 */
 	protected void createToolBarGroups(IToolBarManager toolBarMgr) {
 		toolBarMgr.add(new Separator(IPTPUIConstants.IUINAVIGATORGROUP));
 		toolBarMgr.add(new Separator(IPTPUIConstants.IUIACTIONGROUP));
@@ -80,6 +89,9 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 		toolBarMgr.add(new Separator(IPTPUIConstants.IUICHANGESETGROUP));
 		toolBarMgr.add(new Separator(IPTPUIConstants.IUIEMPTYGROUP));
 	}
+	/** Build-in Toolbar actions
+	 * @param toolBarMgr
+	 */
 	protected void buildInToolBarActions(IToolBarManager toolBarMgr) {
 		createSetAction = new CreateSetAction(this);
 		deleteSetAction = new DeleteSetAction(this);
@@ -90,10 +102,19 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 		toolBarMgr.appendToGroup(IPTPUIConstants.IUISETGROUP, deleteProcessAction);
 		toolBarMgr.appendToGroup(IPTPUIConstants.IUICHANGESETGROUP, changeSetAction);
 	}
+	/** Create toolbar actions
+	 * @param toolBarMgr
+	 */
 	protected void createToolBarActions(IToolBarManager toolBarMgr) {
 		buildInToolBarActions(toolBarMgr);
 	}
+	/** Create menu actions
+	 * @param menuMgr
+	 */
 	protected void createMenuActions(IMenuManager menuMgr) {}
+	/** Create context menu
+	 * 
+	 */
 	protected void createContextMenu() {
 		MenuManager menuMgr = new MenuManager("#popupmenu");
 		menuMgr.setRemoveAllWhenShown(true);
@@ -107,6 +128,9 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 		// Be sure to register it so that other plug-ins can add actions.
 		getSite().registerContextMenu(menuMgr, this);
 	}
+	/** Create context menu
+	 * @param manager
+	 */
 	protected void fillContextMenu(IMenuManager manager) {
 		manager.add(new Separator(IPTPUIConstants.IUIACTIONGROUP));
 		manager.add(new Separator(IPTPUIConstants.IUIEMPTYGROUP));
@@ -117,16 +141,25 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 		// Other plug-ins can contribute there actions here
 		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#update()
+	 */
 	public void update() {
 		updateAction();
 		updateTitle();
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#updateTitle()
+	 */
 	public void updateTitle() {
 		if (cur_element_set != null)
 			changeTitle(manager.getName(getCurrentID()), cur_element_set.getID(), cur_set_size);
 		else
 			changeTitle(EMPTY_TITLE);
 	}
+	/** Update action
+	 * 
+	 */
 	protected void updateAction() {
 		boolean deleteActionEnable = (manager.getCurrentSetId().length() == 0 || manager.getCurrentSetId().equals(IElementHandler.SET_ROOT_ID));
 		deleteSetAction.setEnabled(!deleteActionEnable);
@@ -135,6 +168,9 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 		IElementHandler elementHandler = getCurrentElementHandler();
 		changeSetAction.setEnabled(!(elementHandler == null || elementHandler.size() == 0));
 	}
+	/** Open process viewer
+	 * @param element Target IPProcess
+	 */
 	protected void openProcessViewer(final IPProcess element) {
 		if (element == null)
 			return;
@@ -151,6 +187,9 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 	/*******************************************************************************************************************************************************************************************************************************************************************************************************
 	 * IIconCanvasActionListener
 	 ******************************************************************************************************************************************************************************************************************************************************************************************************/	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.views.IIconCanvasActionListener#handleAction(int, int[])
+	 */
 	public void handleAction(int type, int[] indexes) {
 		if (cur_element_set == null)
 			return;

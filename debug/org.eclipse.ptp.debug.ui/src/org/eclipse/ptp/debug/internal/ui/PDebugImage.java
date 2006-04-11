@@ -131,13 +131,24 @@ public class PDebugImage {
 	public static final ImageDescriptor ID_IMG_DEBUG_OVER_BPT_FUNC_EN = createImageDescriptor(DEBUGICONURL, IMG_DEBUG_OVER_BPT_FUNC_EN, IMG_DEBUG_OVER_BPT_FUNC_EN);
 	public static final ImageDescriptor ID_IMG_DEBUG_OVER_BPT_FUNC_DI = createImageDescriptor(DEBUGICONURL, IMG_DEBUG_OVER_BPT_FUNC_DI, IMG_DEBUG_OVER_BPT_FUNC_DI);
 
+	/** Get image
+	 * @param key
+	 * @return
+	 */
 	public static Image getImage(String key) {
 		return getImageRegistry().get(key);
 	}
+	/** Get image descriptor
+	 * @param key
+	 * @return
+	 */
 	public static ImageDescriptor getDescriptor(String key) {
 		return getImageRegistry().getDescriptor(key);
 	}
 	
+	/** Get image registry
+	 * @return
+	 */
 	private static ImageRegistry getImageRegistry() {
 		if (imageRegistry == null) {
 			imageRegistry = new ImageRegistry();
@@ -145,13 +156,27 @@ public class PDebugImage {
 		return imageRegistry;
 	}
 	
+	/** Add image
+	 * @param key
+	 * @param image
+	 */
 	public static void addImage(String key, Image image) {
 		getImageRegistry().put(key, image);
 	}
+	/** Add image descriptor
+	 * @param key
+	 * @param imageDescriptor
+	 */
 	public static void addImageDescriptor(String key, ImageDescriptor imageDescriptor) {
 		getImageRegistry().put(key, imageDescriptor);
 	}
 		
+	/** Create image descriptor
+	 * @param iconURL
+	 * @param key
+	 * @param name
+	 * @return
+	 */
 	public static ImageDescriptor createImageDescriptor(URL iconURL, String key, String name) {
 		try {
 			ImageDescriptor imageDescriptor = ImageDescriptor.createFromURL(getIconURL(iconURL, name));
@@ -162,6 +187,12 @@ public class PDebugImage {
 		}
 	}
 	
+	/** Get icon url
+	 * @param iconURL
+	 * @param name
+	 * @return
+	 * @throws MalformedURLException
+	 */
 	private static URL getIconURL(URL iconURL, String name) throws MalformedURLException {
 		if (iconURL == null)
 			throw new MalformedURLException();

@@ -145,13 +145,24 @@ public class ParallelImages {
 		{ getImage(ParallelImages.IMG_PROC_STARTING), getImage(ParallelImages.IMG_PROC_STARTING_SEL) }, { getImage(ParallelImages.IMG_PROC_STOPPED), getImage(ParallelImages.IMG_PROC_STOPPED_SEL) } };
 	public static Image[] jobImages = { getImage(ParallelImages.ICON_RUNMODE_NORMAL), getImage(ParallelImages.ICON_DEBUGMODE_NORMAL), getImage(ParallelImages.ICON_TERMINATE_ALL_NORMAL) };
 	
+	/** Get image
+	 * @param key
+	 * @return
+	 */
 	public static Image getImage(String key) {
 		return getImageRegistry().get(key);
 	}
+	/** Get image descriptor
+	 * @param key
+	 * @return
+	 */
 	public static ImageDescriptor getDescriptor(String key) {
 		return getImageRegistry().getDescriptor(key);
 	}
 	
+	/** Get image registry
+	 * @return
+	 */
 	private static ImageRegistry getImageRegistry() {
 		if (imageRegistry == null) {
 			imageRegistry = new ImageRegistry();
@@ -159,13 +170,27 @@ public class ParallelImages {
 		return imageRegistry;
 	}
 	
+	/** add image 
+	 * @param key
+	 * @param image
+	 */
 	public static void addImage(String key, Image image) {
 		getImageRegistry().put(key, image);
 	}
+	/** add image descriptor
+	 * @param key
+	 * @param imageDescriptor
+	 */
 	public static void addImageDescriptor(String key, ImageDescriptor imageDescriptor) {
 		getImageRegistry().put(key, imageDescriptor);
 	}
 		
+	/** Create image descriptor
+	 * @param iconURL
+	 * @param key
+	 * @param name
+	 * @return
+	 */
 	public static ImageDescriptor createImageDescriptor(URL iconURL, String key, String name) {
 		try {
 			ImageDescriptor imageDescriptor = ImageDescriptor.createFromURL(getIconURL(iconURL, name));
@@ -176,6 +201,12 @@ public class ParallelImages {
 		}
 	}
 	
+	/** Get icon url
+	 * @param iconURL
+	 * @param name
+	 * @return
+	 * @throws MalformedURLException
+	 */
 	private static URL getIconURL(URL iconURL, String name) throws MalformedURLException {
 		if (iconURL == null)
 			throw new MalformedURLException();

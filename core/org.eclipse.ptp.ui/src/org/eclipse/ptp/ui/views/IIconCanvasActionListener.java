@@ -31,6 +31,14 @@ public interface IIconCanvasActionListener {
 	public static final int DOUBLE_CLICK_ACTION = 5;
 	public static final int SELECTION_ACTION = 6;
 	
+	/** Handle action
+	 * @param type action type
+	 * @param indexes element indexes
+	 */
 	public void handleAction(int type, int[] indexes);
+	/**Handle action
+	 * @param type action type
+	 * @param index element index
+	 */
 	public void handleAction(int type, int index);
 }

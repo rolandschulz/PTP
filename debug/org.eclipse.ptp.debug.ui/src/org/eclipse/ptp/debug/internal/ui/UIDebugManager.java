@@ -133,6 +133,9 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		}
 	};
 
+	/** Constructor
+	 * 
+	 */
 	public UIDebugManager() {
 		PTPDebugUIPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(propertyChangeListener);
 		addSetListener(this);
@@ -143,12 +146,18 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		annotationMgr = new PAnnotationManager(this);
 		settingPreference();
 	}
+	/** Initial preference settings
+	 * 
+	 */
 	private void settingPreference() {
 		IPreferenceStore prefStore = PTPDebugUIPlugin.getDefault().getPreferenceStore();
 		prefRegisterProc0 = prefStore.getBoolean(IPDebugConstants.PREF_PTP_DEBUG_REGISTER_PROC_0);
 		prefAutoUpdateVarOnSuspend = prefStore.getBoolean(IPDebugConstants.PREF_UPDATE_VARIABLES_ON_SUSPEND);
 		prefAutoUpdateVarOnChange = prefStore.getBoolean(IPDebugConstants.PREF_UPDATE_VARIABLES_ON_CHANGE);
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.IManager#shutdown()
+	 */
 	public void shutdown() {
 		PTPDebugUIPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(propertyChangeListener);
 		removeSetListener(this);
@@ -158,13 +167,24 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		annotationMgr.shutdown();
 		super.shutdown();
 	}
+	/** Get variable manager
+	 * @return
+	 */
 	public IPVariableManager getPVariableManager() {
 		return variableManager;
 	}
+	/** Get value text for tooltip
+	 * @param job
+	 * @param taskID
+	 * @return
+	 */
 	public String getValueText(IPJob job, int taskID) {
 		return variableManager.getResultDisplay(job, taskID);
 	}
 	
+	/** Register process 0 if default registeris true 
+	 * @param session
+	 */
 	private void defaultRegister(IPCDISession session) { // register process 0 if the preference is checked
 		if (prefRegisterProc0) {
 			IPProcess proc = session.getJob().findProcessByTaskId(0);
@@ -172,25 +192,44 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 				registerProcess(session, proc, true);
 		}
 	}
+	/** Is Job in debug mode
+	 * @param job_id Job ID
+	 * @return true if given job in debug mode
+	 */
 	public boolean isDebugMode(String job_id) {
 		if (isNoJob(job_id))
 			return false;
 		return isDebugMode(findJobById(job_id));
 	}
+	/** Is job in debug mode
+	 * @param job
+	 * @return true if given job in debug mode
+	 */
 	public boolean isDebugMode(IPJob job) {
 		if (job == null)
 			return false;
 		return job.isDebug();
 	}
+	/** Is job running
+	 * @param job
+	 * @return true if job is running
+	 */
 	public boolean isRunning(IPJob job) {
 		return (job != null && !job.isAllStop());
 	}
+	/** Is job running
+	 * @param job_id job ID
+	 * @return true if job is running
+	 */
 	public boolean isRunning(String job_id) {
 		if (isNoJob(job_id))
 			return false;
 		return isRunning(findJobById(job_id));
 	}
 	// change job
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.internal.ui.JobManager#fireJobChangeEvent(java.lang.String, java.lang.String)
+	 */
 	public void fireJobChangeEvent(String cur_jid, String pre_jid) {
 		updateBreakpointMarker(IElementHandler.SET_ROOT_ID);
 		try {
@@ -200,14 +239,23 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		}
 		super.fireJobChangeEvent(cur_jid, pre_jid);
 	}
+	/** Add debug event listener
+	 * @param listener
+	 */
 	public void addDebugEventListener(IDebugActionUpdateListener listener) {
 		if (!debugEventListeners.contains(listener))
 			debugEventListeners.add(listener);
 	}
+	/** Remove debug listener
+	 * @param listener
+	 */
 	public void removeDebugEventListener(IDebugActionUpdateListener listener) {
 		if (debugEventListeners.contains(listener))
 			debugEventListeners.remove(listener);
 	}
+	/** Fire debug event
+	 * @param event
+	 */
 	public void fireDebugEvent(final IDebugActionEvent event) {
 		for (Iterator i = debugEventListeners.iterator(); i.hasNext();) {
 			final IDebugActionUpdateListener dListener = (IDebugActionUpdateListener) i.next();
@@ -218,14 +266,24 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			});
 		}
 	}
+	/** Add register listener
+	 * @param listener
+	 */
 	public void addRegListener(IRegListener listener) {
 		if (!regListeners.contains(listener))
 			regListeners.add(listener);
 	}
+	/** Remove register listener
+	 * @param listener
+	 */
 	public void removeRegListener(IRegListener listener) {
 		if (regListeners.contains(listener))
 			regListeners.remove(listener);
 	}
+	/** Fire register listener
+	 * @param type
+	 * @param tasks
+	 */
 	public synchronized void fireRegListener(final int type, final BitList tasks) {
 		Job uiJob = new Job("Firing register / unregister listener") {
 			protected IStatus run(IProgressMonitor monitor) {
@@ -245,6 +303,10 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		uiJob.setPriority(Job.INTERACTIVE);
 		uiJob.schedule();
 	}
+	/** Get debug session
+	 * @param job_id Job ID
+	 * @return
+	 */
 	public IPCDISession getDebugSession(String job_id) {
 		if (isNoJob(job_id))
 			return null;
@@ -253,15 +315,29 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			return null;
 		return getDebugSession(job);
 	}
+	/** Get debug session
+	 * @param job
+	 * @return
+	 */
 	public IPCDISession getDebugSession(IPJob job) {
 		return debugModel.getPCDISession(job);
 	}
+	/** Convert string to integer
+	 * @param id
+	 * @return
+	 */
 	public int convertToInt(String id) {
 		return Integer.parseInt(id);
 	}
+	/** Add process to console window if it is register into Debug View
+	 * @param proc
+	 */
 	private void addConsoleWindow(IPProcess proc) {
 		consoleWindows.put(proc, new OutputConsole(proc.getElementName(), new ProcessInputStream(proc)));
 	}
+	/** Remove process from console list and close its output
+	 * @param proc
+	 */
 	private void removeConsoleWindow(IPProcess proc) {
 		OutputConsole outputConsole = (OutputConsole) consoleWindows.remove(proc);
 		if (outputConsole != null) {
@@ -271,6 +347,9 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	/***************************************************************************************************************************************************************************************************
 	 * Launch Listener
 	 **************************************************************************************************************************************************************************************************/
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.launch.IPLaunchListener#handleLaunchEvent(org.eclipse.ptp.debug.core.launch.IPLaunchEvent)
+	 */
 	public synchronized void handleLaunchEvent(IPLaunchEvent event) {
 		IPJob job = event.getJob();
 		if (event instanceof PLaunchStartedEvent) {
@@ -302,12 +381,21 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		}
 		// firePaintListener(null);
 	}
+	/** Focus on debug target
+	 * @param job
+	 * @param task_id
+	 */
 	public void focusOnDebugTarget(IPJob job, int task_id) {
 		Object debugObj = getDebugObject(job, task_id);
 		if (debugObj != null) {
 			focusOnDebugView(debugObj);
 		}
 	}
+	/** Get debug object
+	 * @param job
+	 * @param task_id
+	 * @return
+	 */
 	public Object getDebugObject(IPJob job, int task_id) {
 		IPCDISession session = getDebugSession(job);
 		if (session != null) {
@@ -328,6 +416,9 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		}
 		return null;
 	}
+	/** Focus on debug view
+	 * @param selection
+	 */
 	public void focusOnDebugView(Object selection) {
 		IViewPart part = UIUtils.findView(IDebugUIConstants.ID_DEBUG_VIEW);
 		if (part != null && part instanceof IDebugView) {
@@ -340,14 +431,28 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	/***************************************************************************************************************************************************************************************************
 	 * Register / Unregister
 	 **************************************************************************************************************************************************************************************************/
+	/** Register process
+	 * @param session
+	 * @param proc
+	 * @param isChanged
+	 */
 	public void registerProcess(IPCDISession session, IPProcess proc, boolean isChanged) {
 		session.registerTarget(proc.getTaskId(), isChanged);
 		addConsoleWindow(proc);
 	}
+	/** Unregister process
+	 * @param session
+	 * @param proc
+	 * @param isChanged
+	 */
 	public void unregisterProcess(IPCDISession session, IPProcess proc, boolean isChanged) {
 		session.unregisterTarget(proc.getTaskId(), isChanged);
 		removeConsoleWindow(proc);
 	}
+	/** Unregister elements
+	 * @param elements
+	 * @throws CoreException
+	 */
 	public void unregisterElements(IElement[] elements) throws CoreException {
 		IPJob job = getCurrentJob();
 		if (job == null)
@@ -364,6 +469,10 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			}
 		}
 	}
+	/** Register elements
+	 * @param elements
+	 * @throws CoreException
+	 */
 	public void registerElements(IElement[] elements) throws CoreException {
 		IPJob job = getCurrentJob();
 		if (job == null)
@@ -383,6 +492,9 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	/***************************************************************************************************************************************************************************************************
 	 * Breakpoint
 	 **************************************************************************************************************************************************************************************************/
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.core.IBreakpointListener#breakpointAdded(org.eclipse.debug.core.model.IBreakpoint)
+	 */
 	public void breakpointAdded(IBreakpoint breakpoint) {
 		if (PTPDebugUIPlugin.isPTPDebugPerspective()) {
 			if (breakpoint instanceof ICLineBreakpoint) {
@@ -394,11 +506,20 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			}
 		}
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.core.IBreakpointListener#breakpointRemoved(org.eclipse.debug.core.model.IBreakpoint, org.eclipse.core.resources.IMarkerDelta)
+	 */
 	public void breakpointRemoved(IBreakpoint breakpoint, IMarkerDelta delta) {}
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.core.IBreakpointListener#breakpointChanged(org.eclipse.debug.core.model.IBreakpoint, org.eclipse.core.resources.IMarkerDelta)
+	 */
 	public void breakpointChanged(IBreakpoint breakpoint, IMarkerDelta delta) {}
 	/***************************************************************************************************************************************************************************************************
 	 * Element Set
 	 **************************************************************************************************************************************************************************************************/
+	/** Update breakpoint marker
+	 * @param cur_sid current set ID
+	 */
 	public void updateBreakpointMarker(String cur_sid) {
 		try {
 			debugModel.updatePBreakpoints(cur_sid);
@@ -406,6 +527,10 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			PTPDebugUIPlugin.log(e);
 		}
 	}
+	/** Remove all register elements
+	 * @param job_id job ID
+	 * @throws CoreException
+	 */
 	public void removeAllRegisterElements(final String job_id) throws CoreException {
 		final IElementHandler elementHandler = getElementHandler(job_id);
 		if (elementHandler == null)
@@ -432,6 +557,12 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		PlatformUI.getWorkbench().getProgressService().showInDialog(PTPDebugUIPlugin.getActiveWorkbenchShell(), uiJob);
 		uiJob.schedule();
 	}
+	/** Update register and unregister elements
+	 * @param curSet
+	 * @param preSet
+	 * @param job_id
+	 * @throws CoreException
+	 */
 	public void updateRegisterUnRegisterElements(final IElementSet curSet, final IElementSet preSet, final String job_id) throws CoreException {
 		final IElementHandler elementHandler = getElementHandler(job_id);
 		if (elementHandler == null)
@@ -466,6 +597,9 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		PlatformUI.getWorkbench().getProgressService().showInDialog(PTPDebugUIPlugin.getActiveWorkbenchShell(), uiJob);
 		uiJob.schedule();
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.listeners.ISetListener#changeSetEvent(org.eclipse.ptp.ui.model.IElementSet, org.eclipse.ptp.ui.model.IElementSet)
+	 */
 	public void changeSetEvent(IElementSet curSet, IElementSet preSet) {
 		if (curSet == null)
 			return;
@@ -478,7 +612,10 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		}
 		updateDebugVariables();
 	}
-	// Delete the set that will delete the all related breakpoint
+	/* (non-Javadoc)
+	 * Delete the set that will delete the all related breakpoint
+	 * @see org.eclipse.ptp.ui.listeners.ISetListener#deleteSetEvent(org.eclipse.ptp.ui.model.IElementSet)
+	 */
 	public void deleteSetEvent(IElementSet set) {
 		try {
 			debugModel.deletePBreakpointBySet(getCurrentJobId(), set.getID());
@@ -491,6 +628,9 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			PTPDebugUIPlugin.log(e);
 		}
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.listeners.ISetListener#createSetEvent(org.eclipse.ptp.ui.model.IElementSet, org.eclipse.ptp.ui.model.IElement[])
+	 */
 	public void createSetEvent(IElementSet set, IElement[] elements) {
 		BitList tasks = new BitList(set.getElementHandler().getSetRoot().size());
 		for (int i = 0; i < elements.length; i++) {
@@ -502,6 +642,9 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			PTPDebugUIPlugin.log(e);
 		}
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.listeners.ISetListener#addElementsEvent(org.eclipse.ptp.ui.model.IElementSet, org.eclipse.ptp.ui.model.IElement[])
+	 */
 	public void addElementsEvent(IElementSet set, IElement[] elements) {
 		BitList tasks = new BitList(set.getElementHandler().getSetRoot().size());
 		for (int i = 0; i < elements.length; i++) {
@@ -513,6 +656,9 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			PTPDebugUIPlugin.log(e);
 		}
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.listeners.ISetListener#removeElementsEvent(org.eclipse.ptp.ui.model.IElementSet, org.eclipse.ptp.ui.model.IElement[])
+	 */
 	public void removeElementsEvent(IElementSet set, IElement[] elements) {
 		BitList tasks = new BitList(set.getElementHandler().getSetRoot().size());
 		for (int i = 0; i < elements.length; i++) {
@@ -527,6 +673,9 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	/***************************************************************************************************************************************************************************************************
 	 * Event
 	 **************************************************************************************************************************************************************************************************/
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.cdi.event.IPCDIEventListener#handleDebugEvents(org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent[])
+	 */
 	public void handleDebugEvents(final IPCDIEvent[] events) {
 		Job uiJob = new Job("Updating debug events") {
 			protected IStatus run(IProgressMonitor monitor) {
@@ -537,6 +686,10 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		uiJob.setPriority(Job.INTERACTIVE);
 		uiJob.schedule();
 	}
+	/** Handle debug events
+	 * @param events
+	 * @param monitor
+	 */
 	private synchronized void handleDebugEvents(IPCDIEvent[] events, IProgressMonitor monitor) {
 		for (int i = 0; i < events.length; i++) {
 			Object condition = null;
@@ -643,6 +796,10 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			firePaintListener(condition);
 		}
 	}
+	/** Remove annotation
+	 * @param job_id job ID
+	 * @param tasks
+	 */
 	private void removeAnnotation(String job_id, BitList tasks) {
 		try {
 			annotationMgr.removeAnnotation(job_id, tasks);
@@ -655,50 +812,92 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			});
 		}
 	}
+	/** Fire suspend event
+	 * @param job
+	 * @param tasks
+	 */
 	public void fireSuspendEvent(IPJob job, BitList tasks) {
 		fireDebugEvent(new SuspendedDebugEvent(job.getIDString(), (BitList) job.getAttribute(IAbstractDebugger.SUSPENDED_PROC_KEY), (BitList) job.getAttribute(IAbstractDebugger.TERMINATED_PROC_KEY)));
 	}
+	/** Fire resume event
+	 * @param job
+	 * @param tasks
+	 */
 	public void fireResumeEvent(IPJob job, BitList tasks) {
 		fireDebugEvent(new ResumedDebugEvent(job.getIDString(), (BitList) job.getAttribute(IAbstractDebugger.SUSPENDED_PROC_KEY), (BitList) job.getAttribute(IAbstractDebugger.TERMINATED_PROC_KEY)));
 	}
+	/** Fire terminate event
+	 * @param job
+	 * @param tasks
+	 */
 	public void fireTerminatedEvent(IPJob job, BitList tasks) {
 		fireDebugEvent(new TerminatedDebugEvent(job.getIDString(), (BitList) job.getAttribute(IAbstractDebugger.TERMINATED_PROC_KEY), (BitList) job.getAttribute(IAbstractDebugger.SUSPENDED_PROC_KEY)));
 	}
 	/***************************************************************************************************************************************************************************************************
 	 * debug actions
 	 **************************************************************************************************************************************************************************************************/
-	public BitList getCurrentSetTasks(String job_id, String set_id) throws CoreException {
+	/** Get tasks from given set
+	 * @param job_id job ID
+	 * @param set_id set ID
+	 * @return
+	 * @throws CoreException
+	 */
+	public BitList getTasks(String job_id, String set_id) throws CoreException {
 		return debugModel.getTasks(job_id, set_id);
 	}
+	/** Resume debugger
+	 * @throws CoreException
+	 */
 	public void resume() throws CoreException {
 		resume(getCurrentJobId(), getCurrentSetId());
 	}
+	/** Resume debugger
+	 * @param job_id job ID
+	 * @param set_id set ID
+	 * @throws CoreException
+	 */
 	public void resume(String job_id, String set_id) throws CoreException {
 		IPCDISession session = getDebugSession(job_id);
 		if (session == null)
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null));
 		try {
-			session.resume(getCurrentSetTasks(job_id, set_id));
+			session.resume(getTasks(job_id, set_id));
 		} catch (PCDIException e) {
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));
 		}
 	}
+	/** Suspend debugger
+	 * @throws CoreException
+	 */
 	public void suspend() throws CoreException {
 		suspend(getCurrentJobId(), getCurrentSetId());
 	}
+	/** Suspend debugger
+	 * @param job_id
+	 * @param set_id
+	 * @throws CoreException
+	 */
 	public void suspend(String job_id, String set_id) throws CoreException {
 		IPCDISession session = getDebugSession(job_id);
 		if (session == null)
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null));
 		try {
-			session.suspend(getCurrentSetTasks(job_id, set_id));
+			session.suspend(getTasks(job_id, set_id));
 		} catch (PCDIException e) {
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));
 		}
 	}
+	/** Terminate debugger
+	 * @throws CoreException
+	 */
 	public void terminate() throws CoreException {
 		terminate(getCurrentJobId(), getCurrentSetId());
 	}
+	/** Terminate debugger
+	 * @param job_id
+	 * @param set_id
+	 * @throws CoreException
+	 */
 	public void terminate(String job_id, String set_id) throws CoreException {
 		IPJob job = findJobById(job_id);
 		if (isDebugMode(job)) {
@@ -706,7 +905,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			if (session == null)
 				throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null));
 			try {
-				session.stop(getCurrentSetTasks(job_id, set_id));
+				session.stop(getTasks(job_id, set_id));
 			} catch (PCDIException e) {
 				throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));
 			}
@@ -714,45 +913,72 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			super.terminateAll(job_id);
 		}
 	}
+	/** Step into debugger
+	 * @throws CoreException
+	 */
 	public void stepInto() throws CoreException {
 		stepInto(getCurrentJobId(), getCurrentSetId());
 	}
+	/** Step into debugger
+	 * @param job_id
+	 * @param set_id
+	 * @throws CoreException
+	 */
 	public void stepInto(String job_id, String set_id) throws CoreException {
 		IPCDISession session = getDebugSession(job_id);
 		if (session == null)
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null));
 		try {
-			session.steppingInto(getCurrentSetTasks(job_id, set_id));
+			session.steppingInto(getTasks(job_id, set_id));
 		} catch (PCDIException e) {
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));
 		}
 	}
+	/** Step over debugger
+	 * @throws CoreException
+	 */
 	public void stepOver() throws CoreException {
 		stepOver(getCurrentJobId(), getCurrentSetId());
 	}
+	/** Step over debugger
+	 * @param job_id
+	 * @param set_id
+	 * @throws CoreException
+	 */
 	public void stepOver(String job_id, String set_id) throws CoreException {
 		IPCDISession session = getDebugSession(job_id);
 		if (session == null)
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null));
 		try {
-			session.steppingOver(getCurrentSetTasks(job_id, set_id));
+			session.steppingOver(getTasks(job_id, set_id));
 		} catch (PCDIException e) {
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));
 		}
 	}
+	/** Step return debugger
+	 * @throws CoreException
+	 */
 	public void stepReturn() throws CoreException {
 		stepReturn(getCurrentJobId(), getCurrentSetId());
 	}
+	/** Step return debugger
+	 * @param job_id
+	 * @param set_id
+	 * @throws CoreException
+	 */
 	public void stepReturn(String job_id, String set_id) throws CoreException {
 		IPCDISession session = getDebugSession(job_id);
 		if (session == null)
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null));
 		try {
-			session.steppingReturn(getCurrentSetTasks(job_id, set_id));
+			session.steppingReturn(getTasks(job_id, set_id));
 		} catch (PCDIException e) {
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));
 		}
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.IManager#removeJob(org.eclipse.ptp.core.IPJob)
+	 */
 	public void removeJob(IPJob job) {
 		if (job.isDebug()) {
 			try {
@@ -766,14 +992,23 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		super.removeJob(job);
 	}
 	
+	/** Clean up debug variables in given job
+	 * @param job
+	 */
 	protected void cleanupDebugVariables(IPJob job) {
 		variableManager.cleanVariableResults(job);
 	}
+	/** Update debug variables in current job
+	 * 
+	 */
 	protected void updateDebugVariables() {
 		if (prefAutoUpdateVarOnChange) {
 			updateDebugVariables(getCurrentJob());
 		}
 	}
+	/** Update debug variables in given job
+	 * @param job
+	 */
 	private void updateDebugVariables(IPJob job) {
 		if (variableManager.hasVariable(job)) {
 			PTPDebugUIPlugin.getDisplay().asyncExec(new Runnable() {
@@ -783,6 +1018,9 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			});
 		}
 	}
+	/** Update debug variable when the debugger is suspendeds
+	 * @param job
+	 */
 	private void updateDebugVariablesOnSuspend(IPJob job) {
 		if (prefAutoUpdateVarOnSuspend) {
 			if (getCurrentJob().equals(job)) {

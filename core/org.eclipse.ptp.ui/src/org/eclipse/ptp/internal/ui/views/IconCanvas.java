@@ -134,6 +134,10 @@ public class IconCanvas extends Canvas {
 		DOUBLE_BUFFER = !IS_CARBON;
 	}
 
+	/** Constructor
+	 * @param parent
+	 * @param style composite style
+	 */
 	public IconCanvas(Composite parent, int style) {
 		super(parent, SWT.V_SCROLL | SWT.WRAP | SWT.MULTI | style);
 		Display display = getDisplay();
@@ -150,12 +154,18 @@ public class IconCanvas extends Canvas {
 		super.setBackground(getBackground());
 		super.setForeground(getForeground());
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.swt.widgets.Widget#dispose()
+	 */
 	public void dispose() {
 		if (fInformationControl == null) {
 			fInformationControl.dispose();
 		}
 		super.dispose();
 	}
+	/** Change font size
+	 * @param display
+	 */
 	private void changeFontSize(Display display) {
         FontData[] data = getFont().getFontData();
         for (int i = 0; i < data.length; i++) {
@@ -164,22 +174,35 @@ public class IconCanvas extends Canvas {
         setFont(new Font(display, data));
 	}
 	
+	/** Add action listener
+	 * @param actionListener
+	 */
 	public void addActionListener(IIconCanvasActionListener actionListener) {
 		if (!actionListeners.contains(actionListener)) {
 			actionListeners.add(actionListener);
 		}
 	}
+	/** Remove action listener
+	 * @param actionListener
+	 */
 	public void removeActionListener(IIconCanvasActionListener actionListener) {
 		if (actionListeners.contains(actionListener)) {
 			actionListeners.remove(actionListener);
 		}
 	}
+	/** Fire action
+	 * @param type type of action
+	 */
 	protected void fireAction(int type) {
 		int[] indexes = getSelectedIndexes();
 		for (Iterator i = actionListeners.iterator(); i.hasNext();) {
 			((IIconCanvasActionListener) i.next()).handleAction(type, indexes);
 		}
 	}
+	/** Fire action
+	 * @param type type of action
+	 * @param index element index
+	 */
 	protected void fireAction(int type, int index) {
 		if (index > -1) {
 			for (Iterator i = actionListeners.iterator(); i.hasNext();) {
@@ -187,6 +210,9 @@ public class IconCanvas extends Canvas {
 			}
 		}
 	}
+	/** Reset canvas setting
+	 * 
+	 */
 	public void resetCanvas() {
 		checkWidget();
 		current_top_row = -1;
@@ -200,24 +226,45 @@ public class IconCanvas extends Canvas {
 		calculateVerticalScrollBar();
 		redraw();
 	}
+	/** Get tooltip provider
+	 * @return
+	 */
 	public IToolTipProvider getToolTipProvider() {
 		return toolTipProvider;
 	}
+	/** Set tooltip provider
+	 * @param toolTipProvider
+	 */
 	public void setToolTipProvider(IToolTipProvider toolTipProvider) {
 		this.toolTipProvider = toolTipProvider;
 	}
+	/** Get image provider
+	 * @return
+	 */
 	public IImageProvider getImageProvider() {
 		return imageProvider;
 	}
+	/** Set image provider
+	 * @param imageProvider
+	 */
 	public void setImageProvider(IImageProvider imageProvider) {
 		this.imageProvider = imageProvider;
 	}
+	/** Get content provider
+	 * @return
+	 */
 	public IContentProvider getContentProvider() {
 		return contentProvider;
 	}
+	/** Set content provider
+	 * @param contentProvider
+	 */
 	public void setContentProvider(IContentProvider contentProvider) {
 		this.contentProvider = contentProvider;
 	}
+	/** Get totla elements
+	 * @param total total elements
+	 */
 	public void setTotal(int total) {
 		if (total < 0) {
 			SWT.error(SWT.ERROR_NULL_ARGUMENT);
@@ -225,6 +272,9 @@ public class IconCanvas extends Canvas {
 		this.total_elements = total;
 		resetCanvas();
 	}
+	/** Reset margin of view
+	 * 
+	 */
 	private void resetMargin() {
 		if (isDisplayRuler()) {
 			GC newGC = getGC();
@@ -236,6 +286,10 @@ public class IconCanvas extends Canvas {
 			e_offset_x = DEFAULT_OFFSET;
 		}
 	}
+	/** Set icon spacing
+	 * @param e_spacing_x
+	 * @param e_spacing_y
+	 */
 	public void setIconSpace(int e_spacing_x, int e_spacing_y) {
 		if (e_spacing_x < 0 || e_spacing_y < 0) {
 			SWT.error(SWT.ERROR_NULL_ARGUMENT);
@@ -243,6 +297,10 @@ public class IconCanvas extends Canvas {
 		this.e_spacing_x = e_spacing_x;
 		this.e_spacing_y = e_spacing_y;
 	}
+	/** Set icon size
+	 * @param e_width
+	 * @param e_height
+	 */
 	public void setIconSize(int e_width, int e_height) {
 		if (e_width <= 0 || e_height <= 0) {
 			SWT.error(SWT.ERROR_NULL_ARGUMENT);
@@ -250,40 +308,72 @@ public class IconCanvas extends Canvas {
 		this.e_height = e_height;
 		this.e_width = e_width;
 	}
+	/** Set tooltip setting
+	 * @param showAllTime
+	 * @param timeout
+	 * @param isWrap
+	 */
 	public void setTooltip(boolean showAllTime, long timeout, boolean isWrap) {
 		showTooltipAllthetime(showAllTime);
 		setTooltipTimeout(timeout);
 		setTooltipWrap(isWrap);
 	}
+	/** Set tooltip timeout
+	 * @param timeout
+	 */
 	public void setTooltipTimeout(long timeout) {
 		if (timeout <= 0) {
 			SWT.error(SWT.ERROR_NULL_ARGUMENT);
 		}
 		tooltip_timeout = timeout;
 	}
+	/** Set tooltip to show all the time
+	 * @param isAll
+	 */
 	public void showTooltipAllthetime(boolean isAll) {
 		show_tooltip_allthetime = isAll;
 	}
+	/** Set tooltip content displaying
+	 * @param isWrap
+	 */
 	public void setTooltipWrap(boolean isWrap) {
 		tooltip_wrap = isWrap;
 	}
+	/** Get total elements
+	 * @return total elements
+	 */
 	public int getTotalElements() {
 		return total_elements;
 	}
+	/** Set selection size
+	 * @param size 
+	 */
 	public void setSelectionSize(int size) {
 		this.sel_size = size;
 	}
+	/** Set selection color
+	 * @param colorIndex
+	 */
 	public void setSelectionColor(int colorIndex) {
 		checkWidget();
 		this.sel_color = getDisplay().getSystemColor(colorIndex);
 	}
+	/**Show ruler
+	 * @param displayRuler
+	 */
 	public void setDisplayRuler(boolean displayRuler) {
 		this.displayRuler = displayRuler;
 		resetCanvas();
 	}
+	/** Is ruler displayed
+	 * @return
+	 */
 	public boolean isDisplayRuler() {
 		return displayRuler;
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.swt.widgets.Control#getBackground()
+	 */
 	public Color getBackground() {
 		checkWidget();
 		if (background == null) {
@@ -291,12 +381,18 @@ public class IconCanvas extends Canvas {
 		}
 		return background;
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.swt.widgets.Control#setBackground(org.eclipse.swt.graphics.Color)
+	 */
 	public void setBackground(Color color) {
 		checkWidget();
 		background = color;
 		super.setBackground(getBackground());
 		redraw();
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.swt.widgets.Control#getForeground()
+	 */
 	public Color getForeground() {
 		checkWidget();
 		if (foreground == null) {
@@ -304,18 +400,30 @@ public class IconCanvas extends Canvas {
 		}
 		return foreground;
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.swt.widgets.Control#setForeground(org.eclipse.swt.graphics.Color)
+	 */
 	public void setForeground(Color color) {
 		checkWidget();
 		foreground = color;
 		super.setForeground(getForeground());
 		redraw();
 	}
+	/** Get element height
+	 * @return element height
+	 */
 	protected int getElementHeight() {
 		return (e_spacing_y + e_height);
 	}
+	/** Get element width
+	 * @return element width
+	 */
 	protected int getElementWidth() {
 		return (e_spacing_x + e_width);
 	}
+	/** Get maximum column to display
+	 * @return maximum column
+	 */
 	protected int getMaxCol() {
 		if (max_e_col == -1) {
 			int width = getClientArea().width - getVerticalBar().getSize().x;
@@ -323,9 +431,15 @@ public class IconCanvas extends Canvas {
 		}
 		return max_e_col;
 	}
+	/** Get maximum client row 
+	 * @return maximum row number
+	 */
 	protected int getMaxClientRow() {
 		return (getClientArea().height - e_offset_y) / getElementHeight();
 	}
+	/** Get maximum row
+	 * @return maximum row
+	 */
 	protected int getMaxRow() {
 		if (max_e_row == -1) {
 			int total = getTotalElements();
@@ -339,15 +453,27 @@ public class IconCanvas extends Canvas {
 		}
 		return max_e_row;
 	}
+	/** Get maximum height of view
+	 * @return maximum height
+	 */
 	protected int getMaxHeight() {
 		return getMaxRow() * getElementHeight();
 	}
+	/** Get vertical increment
+	 * @return
+	 */
 	protected int getVerticalIncrement() {
 		return e_spacing_y + e_height;
 	}
+	/** Calculate vertical scrollbar 
+	 * 
+	 */
 	protected void calculateVerticalScrollBar() {
 		setVerticalScrollBar(getVerticalBar());
 	}
+	/** Set vertical scrollbar
+	 * @param verticalBar
+	 */
 	protected void setVerticalScrollBar(ScrollBar verticalBar) {
 		if (verticalBar != null) {
 			Rectangle clientArea = getClientArea();
@@ -360,6 +486,9 @@ public class IconCanvas extends Canvas {
 			}
 		}
 	}
+	/** Claim bottom free space
+	 * @return
+	 */
 	protected boolean claimBottomFreeSpace() {
 		int newVerticalOffset = Math.max(0, getMaxHeight() - getClientArea().height);
 		if (newVerticalOffset < verticalScrollOffset) {
@@ -367,9 +496,16 @@ public class IconCanvas extends Canvas {
 		}
 		return false;
 	}
+	/** Get current top row
+	 * @return top row number
+	 */
 	protected int getCurrentTopRow() {
 		return current_top_row;
 	}
+	/** Get key 
+	 * @param key unique key
+	 * @return keyboard key ID
+	 */
 	public int getKeyBinding(int key) {
 		checkWidget();
 		Integer action = (Integer) keyActionMap.get(new Integer(key));
@@ -381,6 +517,10 @@ public class IconCanvas extends Canvas {
 		}
 		return intAction;
 	}
+	/** Set key
+	 * @param key unique key
+	 * @param action keyboard key ID 
+	 */
 	public void setKeyBinding(int key, int action) {
 		checkWidget();
 		int keyValue = key & SWT.KEY_MASK;
@@ -409,6 +549,9 @@ public class IconCanvas extends Canvas {
 			}
 		}
 	}
+	/** Create keyboard binding
+	 * 
+	 */
 	protected void createKeyBindings() {
 		// Navigation
 		setKeyBinding(SWT.ARROW_UP, ST.LINE_UP);
@@ -437,6 +580,9 @@ public class IconCanvas extends Canvas {
 		setKeyBinding(SWT.BS, ST.DELETE_PREVIOUS);
 		setKeyBinding(SWT.DEL, ST.DELETE_NEXT);
 	}
+	/** Invoke action
+	 * @param action action ID
+	 */
 	public void invokeAction(int action) {
 		checkWidget();
 		switch (action) {
@@ -513,6 +659,9 @@ public class IconCanvas extends Canvas {
 			break;
 		}
 	}
+	/** initial accessiable
+	 * 
+	 */
 	protected void initializeAccessible() {
 		final Accessible accessible = getAccessible();
 		accessible.addAccessibleListener(new AccessibleAdapter() {
@@ -541,6 +690,9 @@ public class IconCanvas extends Canvas {
 			}
 		});
 	}
+	/** install listeners
+	 * 
+	 */
 	protected void installListeners() {
 		ScrollBar verticalBar = getVerticalBar();
 		listener = new Listener() {
@@ -598,6 +750,9 @@ public class IconCanvas extends Canvas {
 			});
 		}
 	}
+	/** Handle key
+	 * @param event
+	 */
 	protected void handleKey(Event event) {
 		int action;
 		if (event.keyCode != 0) {
@@ -615,12 +770,22 @@ public class IconCanvas extends Canvas {
 			invokeAction(action);
 		}
 	}
+	/** Is reached top of view
+	 * @return true if vertical scroll offset is 0
+	 */
 	protected boolean isReachTop() {
 		return (verticalScrollOffset <= 0);
 	}
+	/** Is reach bottom of view
+	 * @return true if vertical scroll to bottom of view
+	 */
 	protected boolean isReachBottom() {
 		return (getMaxRow() - current_top_row <= getMaxClientRow());
 	}
+	/** Do auto scrolling
+	 * @param x_loc
+	 * @param y_loc
+	 */
 	protected void doAutoScroll(int x_loc, int y_loc) {
 		if (y_loc > getClientArea().height && !isReachBottom()) {
 			hideToolTip();
@@ -637,6 +802,12 @@ public class IconCanvas extends Canvas {
 			endAutoScroll();
 		}
 	}
+	/** Do auto scrolling
+	 * @param direction 
+	 * @param distance
+	 * @param x_loc
+	 * @param y_loc
+	 */
 	protected void doAutoScroll(int direction, final int distance, final int x_loc, final int y_loc) {
 		// If we're already autoscrolling in the given direction do nothing
 		if (autoScrollDirection == direction) {
@@ -669,6 +840,9 @@ public class IconCanvas extends Canvas {
 			display.timerExec(TIMER_INTERVAL, timer);
 		}
 	}
+	/** Do selection page up
+	 * @param distance
+	 */
 	protected void doSelectionPageUp(int distance) {
 		int index = selection == null ? -1 : findSelectedIndexByLocation(selection.x, (actualScrollStart_y - verticalScrollOffset), false);
 		if (index > 0) {
@@ -685,6 +859,9 @@ public class IconCanvas extends Canvas {
 			redraw(start_index, index);
 		}
 	}
+	/** Do selection page down
+	 * @param distance
+	 */
 	protected void doSelectionPageDown(int distance) {
 		int index = selection == null ? -1 : findSelectedIndexByLocation(selection.x, (actualScrollStart_y - verticalScrollOffset), false);
 		if (index > -1) {
@@ -701,6 +878,12 @@ public class IconCanvas extends Canvas {
 			redraw(index, end_index);
 		}
 	}
+	/** Do selection page up
+	 * @param distance
+	 * @param x_loc
+	 * @param y_loc
+	 * @param isSelect
+	 */
 	protected void doSelectionPageUp(int distance, int x_loc, int y_loc, boolean isSelect) {
 		doPageUp(distance / getElementHeight());
 		if (movingSelectionStart != null && isSelect) {
@@ -708,6 +891,12 @@ public class IconCanvas extends Canvas {
 			doMouseSelection(movingSelectionStart.x, movingSelectionStart.y, x_loc, y_loc, true);
 		}
 	}
+	/** Do selection page down
+	 * @param distance
+	 * @param x_loc
+	 * @param y_loc
+	 * @param isSelect
+	 */
 	protected void doSelectionPageDown(int distance, int x_loc, int y_loc, boolean isSelect) {
 		doPageDown(distance / getElementHeight());
 		if (movingSelectionStart != null && isSelect) {
@@ -715,18 +904,33 @@ public class IconCanvas extends Canvas {
 			doMouseSelection(movingSelectionStart.x, movingSelectionStart.y, x_loc, y_loc, true);
 		}
 	}
+	/** Do delete
+	 * 
+	 */
 	protected void doDelete() {
 		fireAction(IIconCanvasActionListener.DELETE_ACTION);
 	}
+	/** Do copy
+	 * 
+	 */
 	protected void doCopy() {
 		fireAction(IIconCanvasActionListener.COPY_ACTION);
 	}
+	/** Do cut
+	 * 
+	 */
 	protected void doCut() {
 		fireAction(IIconCanvasActionListener.CUT_ACTION);
 	}
+	/** Do paste
+	 * 
+	 */
 	protected void doPaste() {
 		fireAction(IIconCanvasActionListener.PASTE_ACTION);
 	}
+	/** Do page up
+	 * @param rows number of row to page up
+	 */
 	protected void doPageUp(int rows) {
 		if (current_top_row >= 0 && verticalScrollOffset > 0) {
 			int scrollRows = Math.max(1, Math.min(current_top_row, rows));
@@ -740,6 +944,9 @@ public class IconCanvas extends Canvas {
 			}
 		}
 	}
+	/** Do page down
+	 * @param rows number of row to page down
+	 */
 	protected void doPageDown(int rows) {
 		int max_row = getMaxRow();
 		int max_client_row = getMaxClientRow();
@@ -753,6 +960,9 @@ public class IconCanvas extends Canvas {
 			}
 		}
 	}
+	/** Do up
+	 * @param isSelect true if element is selected
+	 */
 	protected void doUp(boolean isSelect) {
 		int index = selection == null ? -1 : findSelectedIndexByLocation(selection.x, (actualScrollStart_y - verticalScrollOffset), false);
 		if (index > 0) {
@@ -773,6 +983,9 @@ public class IconCanvas extends Canvas {
 			}
 		}
 	}
+	/** Do down
+	 * @param isSelect true if element is selected
+	 */
 	protected void doDown(boolean isSelect) {
 		int index = selection == null ? -1 : findSelectedIndexByLocation(selection.x, (actualScrollStart_y - verticalScrollOffset), false);
 		if (index > -1) {
@@ -793,6 +1006,9 @@ public class IconCanvas extends Canvas {
 			}
 		}
 	}
+	/** Go previous
+	 * @param isSelect true if element is selected
+	 */
 	protected void doPrevious(boolean isSelect) {
 		int index = selection == null ? -1 : findSelectedIndexByLocation(selection.x, (actualScrollStart_y - verticalScrollOffset), false);
 		if (index > 0) {
@@ -814,6 +1030,9 @@ public class IconCanvas extends Canvas {
 			redraw(index - 1, index);
 		}
 	}
+	/** Go next
+	 * @param isSelect true if element is selected
+	 */
 	protected void doNext(boolean isSelect) {
 		int index = selection == null ? -1 : findSelectedIndexByLocation(selection.x, (actualScrollStart_y - verticalScrollOffset), false);
 		if (index > -1 && index < getTotalElements() - 1) {
@@ -835,6 +1054,9 @@ public class IconCanvas extends Canvas {
 			redraw(index, index + 1);
 		}
 	}
+	/** Go to line start
+	 * @param isSelect true if element is selected
+	 */
 	protected void doLineStart(boolean isSelect) {
 		int index = selection == null ? -1 : findSelectedIndexByLocation(selection.x, (actualScrollStart_y - verticalScrollOffset), false);
 		if (index > -1) {
@@ -853,6 +1075,9 @@ public class IconCanvas extends Canvas {
 			}
 		}
 	}
+	/** Go to line end
+	 * @param isSelect true if element is selected
+	 */
 	protected void doLineEnd(boolean isSelect) {
 		int index = selection == null ? -1 : findSelectedIndexByLocation(selection.x, (actualScrollStart_y - verticalScrollOffset), false);
 		if (index > -1) {
@@ -883,10 +1108,18 @@ public class IconCanvas extends Canvas {
 			}
 		}
 	}
+	/** Select all elements
+	 * 
+	 */
 	protected void doSelectionAll() {
 		selectedElements.set(0, getTotalElements());
 		redraw();
 	}
+	/** Set vertical scrollbar offset
+	 * @param pixelOffset
+	 * @param adjustScrollBar
+	 * @return
+	 */
 	protected boolean setVerticalScrollOffset(int pixelOffset, boolean adjustScrollBar) {
 		if (pixelOffset == verticalScrollOffset) {
 			return false;
@@ -901,9 +1134,15 @@ public class IconCanvas extends Canvas {
 		calculateTopIndex();
 		return true;
 	}
+	/** Finished auto scrolling
+	 * 
+	 */
 	protected void endAutoScroll() {
 		autoScrollDirection = SWT.NULL;
 	}
+	/** Calculate top index
+	 * 
+	 */
 	protected void calculateTopIndex() {
 		int verticalIncrement = getVerticalIncrement();
 		if (verticalIncrement == 0) {
@@ -923,6 +1162,11 @@ public class IconCanvas extends Canvas {
 			}
 		}
 	}
+	/** Get selected column
+	 * @param x_loc
+	 * @param isApproximate
+	 * @return column number
+	 */
 	protected int getSelectedCol(int x_loc, boolean isApproximate) {
 		int col = Math.min(x_loc / getElementWidth(), getMaxCol() - 1);
 		if (isApproximate)
@@ -933,6 +1177,11 @@ public class IconCanvas extends Canvas {
 		}
 		return -1;
 	}
+	/** Get selected row
+	 * @param y_loc
+	 * @param isApproximate
+	 * @return row number
+	 */
 	protected int getSelectedRow(int y_loc, boolean isApproximate) {
 		int row = Math.max(0, (verticalScrollOffset + y_loc) / getElementHeight());
 		if (isApproximate)
@@ -943,9 +1192,20 @@ public class IconCanvas extends Canvas {
 		}
 		return -1;
 	}
+	/** Find selected index
+	 * @param row
+	 * @param col
+	 * @return selected index
+	 */
 	protected int findSelectedIndex(int row, int col) {
 		return row * getMaxCol() + col;
 	}
+	/** Find selected index
+	 * @param loc_x
+	 * @param loc_y
+	 * @param isApproximate true if searching is approximate
+	 * @return -1 if not found
+	 */
 	protected int findSelectedIndexByLocation(int loc_x, int loc_y, boolean isApproximate) {
 		int col = getSelectedCol(loc_x - e_offset_x, isApproximate);
 		if (col > -1) {
@@ -958,18 +1218,33 @@ public class IconCanvas extends Canvas {
 		}
 		return -1;
 	}
+	/** Find column and row
+	 * @param index element index
+	 * @return x is column and y is row
+	 */
 	protected Point findSection(int index) {
 		int max_col = getMaxCol();
 		int col = (int) Math.floor(index % max_col);
 		int row = (int) Math.floor(index / max_col);
 		return new Point(col, row);
 	}
+	/** Find location 
+	 * @param index element index
+	 * @return location of target element
+	 */
 	protected Point findLocation(int index) {
 		Point section = findSection(index);
 		int x_loc = (section.x * getElementWidth() + e_offset_x);
 		int y_loc = (section.y * getElementHeight() + e_offset_y) - verticalScrollOffset;
 		return new Point(x_loc, y_loc);
 	}
+	/** Get direction 
+	 * @param s_x
+	 * @param s_y
+	 * @param e_x
+	 * @param e_y
+	 * @return
+	 */
 	protected int getDirection(int s_x, int s_y, int e_x, int e_y) {
 		int direction = SE;
 		if (s_x > e_x) {
@@ -983,6 +1258,13 @@ public class IconCanvas extends Canvas {
 		}
 		return direction;
 	}
+	/** Get select elements
+	 * @param col_start
+	 * @param col_end
+	 * @param row_start
+	 * @param row_end
+	 * @return selected elements
+	 */
 	protected BitSet selectElements(int col_start, int col_end, int row_start, int row_end) {
 		BitSet newElements = new BitSet();
 		int total = getTotalElements();
@@ -996,12 +1278,29 @@ public class IconCanvas extends Canvas {
 		}
 		return newElements;
 	}
+	/** Get started point
+	 * @param x
+	 * @param y
+	 * @return
+	 */
 	private Point getStartedPoint(int x, int y) {
 		return new Point(Math.max(e_offset_x-e_spacing_x, x), Math.max(0, Math.min((getMaxRow() - current_top_row) * getElementHeight() + sel_size, y)));
 	}
+	/** Get finished point
+	 * @param x
+	 * @param y
+	 * @return
+	 */
 	private Point getFinishedPoint(int x, int y) {
 		return new Point(Math.min(getMaxCol()*getElementWidth() + e_offset_x - e_spacing_x, Math.max(e_offset_x-e_spacing_x, x)), Math.min((getMaxRow() - current_top_row) * getElementHeight() + sel_size, Math.max(0 + sel_size, y)));
 	}
+	/** Do mouse selection
+	 * @param mouse_start_x
+	 * @param mouse_start_y
+	 * @param mouse_end_x
+	 * @param mouse_end_y
+	 * @param isScrolling
+	 */
 	protected void doMouseSelection(int mouse_start_x, int mouse_start_y, int mouse_end_x, int mouse_end_y, boolean isScrolling) {
 		if (mouse_start_x < (e_offset_x - getElementWidth()) || mouse_start_y > (getMaxRow() - current_top_row + 1) * getElementHeight())
 			return;
@@ -1098,6 +1397,14 @@ public class IconCanvas extends Canvas {
 		redrawByIndex(col_start, col_end, row_start, row_end, direction, isScrolling);
 		//redrawByLocation(d_sx, d_ex, d_sy, d_ey, direction, isScrolling);
 	}
+	/** Redraw by location
+	 * @param d_sx
+	 * @param d_ex
+	 * @param d_sy
+	 * @param d_ey
+	 * @param direction
+	 * @param isScrolling
+	 */
 	protected void redrawByLocation(int d_sx, int d_ex, int d_sy, int d_ey, int direction, boolean isScrolling) {
 		int d_x = d_sx;
 		int d_y = d_sy + ((direction==NW||direction==NE)?(isScrolling ? getVerticalIncrement():0):0);
@@ -1105,6 +1412,14 @@ public class IconCanvas extends Canvas {
 		int d_h = e_offset_y + Math.abs(d_ey - d_sy) + ((direction==SE||direction==SW)?(isScrolling ? getVerticalIncrement():0):0); 
 		redraw(d_x, d_y, d_w, d_h, false);
 	}
+	/** Redraw by index
+	 * @param col_start
+	 * @param col_end
+	 * @param row_start
+	 * @param row_end
+	 * @param direction
+	 * @param isScrolling
+	 */
 	protected void redrawByIndex(int col_start, int col_end, int row_start, int row_end, int direction, boolean isScrolling) {
 		int redrawStart_x = e_offset_x + (col_start * getElementWidth()) - e_spacing_x;
 		int redrawEnd_x = e_offset_x + (col_end * getElementWidth()) + e_spacing_x;
@@ -1122,6 +1437,10 @@ public class IconCanvas extends Canvas {
 		}
 		redraw(d_x, d_y, d_w, d_h, false);
 	}
+	/** Redraw
+	 * @param start_index
+	 * @param end_index
+	 */
 	protected void redraw(int start_index, int end_index) {
 		int max_col = getMaxCol();
 		int start_row = (int) Math.floor(start_index / max_col);
@@ -1131,6 +1450,11 @@ public class IconCanvas extends Canvas {
 		int diff = Math.abs(end_row - start_row) + 1;
 		redraw(0, Math.min(start_y_loc, end_y_loc), (max_col * getElementWidth() + e_offset_x), diff * getElementHeight(), false);
 	}
+	/** Can select elements
+	 * @param start_pt
+	 * @param end_pt
+	 * @return true if element can be selected
+	 */
 	protected boolean canSelectElements(Point start_pt, Point end_pt) {
 		int start_index = start_pt == null ? -1 : findSelectedIndexByLocation(start_pt.x, start_pt.y, false);
 		int end_index = end_pt == null ? -1 : findSelectedIndexByLocation(end_pt.x, end_pt.y, false);
@@ -1158,6 +1482,9 @@ public class IconCanvas extends Canvas {
 		}
 		return true;
 	}
+	/** Select element
+	 * @param index Element index
+	 */
 	public void selectElement(int index) {
 		if (isSelected(index)) {
 			selectedElements.clear(index);
@@ -1165,15 +1492,31 @@ public class IconCanvas extends Canvas {
 			selectedElements.set(index);
 		}
 	}
+	/** Is element selected
+	 * @param index
+	 * @return true if element is selected
+	 */
 	public boolean isSelected(int index) {
 		return selectedElements.get(index);
 	}
+	/** Clear selected element
+	 * @param index Target element index
+	 */
 	public void clearSelection(int index) {
 		selectedElements.clear(index);
 	}
+	/** Select elements 
+	 * @param from_index
+	 * @param to_index
+	 */
 	public void selectElements(int from_index, int to_index) {
 		selectElements(from_index, to_index, false);
 	}
+	/** Select elements
+	 * @param from_index
+	 * @param to_index
+	 * @param checkStatus
+	 */
 	public void selectElements(int from_index, int to_index, boolean checkStatus) {
 		for (int index = from_index; index < to_index + 1; index++) {
 			if (checkStatus)
@@ -1182,6 +1525,17 @@ public class IconCanvas extends Canvas {
 				selectedElements.set(index);
 		}
 	}
+	/** Paint the view
+	 * @param gc
+	 * @param col_start
+	 * @param col_end
+	 * @param row_start
+	 * @param row_end
+	 * @param render_x
+	 * @param render_y
+	 * @param renderWidth
+	 * @param renderHeight
+	 */
 	protected void performPaint(GC gc, int col_start, int col_end, int row_start, int row_end, int render_x, int render_y, int renderWidth, int renderHeight) {
 		Image imageBuffer = null;
 		GC newGC = null;
@@ -1223,6 +1577,12 @@ public class IconCanvas extends Canvas {
 		}
 		clearMargin(gc, getBackground());
 	}
+	/** Draw index
+	 * @param gc
+	 * @param obj
+	 * @param index
+	 * @param y_loc
+	 */
 	protected void drawIndex(GC gc, Object obj, int index, int y_loc) {
 		String text = contentProvider.getRulerIndex(obj, index);
 		Point text_size = gc.stringExtent(text);
@@ -1230,6 +1590,13 @@ public class IconCanvas extends Canvas {
 		int valign = y_loc + e_height/2 - text_size.y/2 ;
 		gc.drawText(text, align, valign);
 	}
+	/** Draw image
+	 * @param gc
+	 * @param obj
+	 * @param x_loc
+	 * @param y_loc
+	 * @param isSelected
+	 */
 	protected void drawImage(GC gc, Object obj, int x_loc, int y_loc, boolean isSelected) {
 		Image statusImage = getStatusIcon(obj, isSelected);
 		if (statusImage != null) {
@@ -1237,6 +1604,9 @@ public class IconCanvas extends Canvas {
 			drawSpecial(obj, gc, x_loc, y_loc, e_width, e_height);
 		}
 	}
+	/** Draw selection
+	 * @param gc
+	 */
 	private void drawSelection(GC gc) {
 		gc.setForeground(sel_color);
 		gc.setLineWidth(sel_size);
@@ -1344,15 +1714,29 @@ public class IconCanvas extends Canvas {
 			break;
 		}
 	}
+	/** Clear margin background
+	 * @param gc
+	 * @param background
+	 */
 	protected void clearMargin(GC gc, Color background) {
 		gc.setBackground(background);
 	}
+	/** Get GC
+	 * @return
+	 */
 	protected GC getGC() {
 		return getGC(SWT.NONE);
 	}
+	/** Get GC by creating a new
+	 * @param style
+	 * @return
+	 */
 	protected GC getGC(int style) {
 		return new GC(this, style);
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.swt.widgets.Control#setCursor(org.eclipse.swt.graphics.Cursor)
+	 */
 	public void setCursor(Cursor cursor) {
 		if (cursor == null) {
 			super.setCursor(defaultCursor);
@@ -1361,7 +1745,9 @@ public class IconCanvas extends Canvas {
 		}
 	}
 	
-	long last_mouse_move_time = 0;
+	/** Do mouse moving
+	 * @param event
+	 */
 	protected void doMouseMoving(Event event) {
 		int index = findSelectedIndexByLocation(event.x, event.y, false);
 		if (index > -1) {
@@ -1385,6 +1771,9 @@ public class IconCanvas extends Canvas {
 			hideToolTip();
 		}
 	}
+	/** Hide tooltip
+	 * 
+	 */
 	protected void hideToolTip() {
 		if (fInformationControl != null) {
 			fInformationControl.setVisible(false);
@@ -1396,12 +1785,18 @@ public class IconCanvas extends Canvas {
 			hoverTimer = null;
 		}
 	}	
+	/** Get hover timer
+	 * @return
+	 */
 	private Timer getHoverTimer() {
 		if (hoverTimer == null) {
 			hoverTimer = new Timer();
 		}
 		return hoverTimer;
 	}
+	/** Reset info
+	 * 
+	 */
 	protected void resetInfo() {
 		hideToolTip();
 		mouseDown = false;
@@ -1412,6 +1807,9 @@ public class IconCanvas extends Canvas {
 		max_e_col = -1;
 		setCursor(null);
 	}
+	/** Handle dispose event
+	 * @param event
+	 */
 	protected void handleDispose(Event event) {
 		removeListener(SWT.Dispose, listener);
 		event.type = SWT.None;
@@ -1422,14 +1820,23 @@ public class IconCanvas extends Canvas {
 		actionListeners.clear();
 		total_elements = 0;
 	}
+	/** Handle key down event
+	 * @param event
+	 */
 	protected void handleKeyDown(Event event) {
 		if (event.doit == true) {
 			handleKey(event);
 		}
 	}
+	/** Handle key up event
+	 * @param event
+	 */
 	protected void handleKeyUp(Event event) {
 		resetInfo();
 	}
+	/** Handle mouse down event
+	 * @param event
+	 */
 	protected void handleMouseDown(Event event) {
 		mouseDown = true;
 		mouseDoubleClick = false;
@@ -1458,6 +1865,9 @@ public class IconCanvas extends Canvas {
 		}
 		redraw();
 	}
+	/** Handle mouse up event
+	 * @param event
+	 */
 	protected void handleMouseUp(Event event) {
 		selectedElements.or(tempSelectedElements);
 		if (movingSelectionStart != null) {
@@ -1466,6 +1876,9 @@ public class IconCanvas extends Canvas {
 		resetInfo();
 		endAutoScroll();
 	}
+	/** Handle mouse double click event
+	 * @param event
+	 */
 	protected void handleMouseDoubleClick(Event event) {
 		if (event.button != 1) {
 			return;
@@ -1478,6 +1891,9 @@ public class IconCanvas extends Canvas {
 			redraw(index, index);
 		}
 	}
+	/** Handle mouse move event
+	 * @param event
+	 */
 	protected void handleMouseMove(Event event) {
 		if (autoScrollDirection == SWT.NULL)
 			doMouseMoving(event);
@@ -1489,6 +1905,9 @@ public class IconCanvas extends Canvas {
 		update();
 		doAutoScroll(event.x, event.y);
 	}
+	/** Handle paint event
+	 * @param event
+	 */
 	protected void handlePaint(Event event) {
 		Rectangle clientArea = getClientArea();
 		if (getTotalElements() == 0 || event.height == 0 || (clientArea.width == 0 && clientArea.height == 0)) {
@@ -1542,6 +1961,9 @@ public class IconCanvas extends Canvas {
 		// System.out.println("performPaint: " + col_start + "," + col_end + " - " + row_start + "," + row_end);
 		performPaint(event.gc, col_start, col_end, row_start, row_end, 0, 0, renderWidth, renderHeight);
 	}
+	/** Handle resize event
+	 * @param event
+	 */
 	protected void handleResize(Event event) {
 		int index = selection == null ? -1 : findSelectedIndexByLocation(selection.x, (actualScrollStart_y - verticalScrollOffset), false);
 		if (index > -1) {
@@ -1553,9 +1975,16 @@ public class IconCanvas extends Canvas {
 		if (!claimBottomFreeSpace())
 			calculateTopIndex();
 	}
+	/** Handle focus out event
+	 * @param event
+	 */
 	protected void handleFocusOut(Event event) {
 		//hideToolTip();
 	}
+	/** Show tooltip
+	 * @param index Target element index
+	 * @param event mouse move event
+	 */
 	protected void showToolTip(int index, Event event) {
 		if (index == -1) {
 			hideToolTip();
@@ -1597,6 +2026,13 @@ public class IconCanvas extends Canvas {
 			informationControl.setFocus();
 		}
 	}
+	/** Get actual view location 
+	 * @param from
+	 * @param to
+	 * @param mx
+	 * @param my
+	 * @return
+	 */
 	protected Point getViewActualLocation(Control from, Control to, int mx, int my) {
 		Point mappedpt = getDisplay().map(from, to, 0, 0);
 		Point newpt = new Point(mx, my);
@@ -1604,6 +2040,9 @@ public class IconCanvas extends Canvas {
 		newpt.y += mappedpt.y;
 		return newpt;
 	}
+	/** Get selected indexes
+	 * @return selected indexes
+	 */
 	public int[] getSelectedIndexes() {
 		int[] retValue = new int[selectedElements.cardinality()];
 		for (int i = selectedElements.nextSetBit(0), j = 0; i >= 0; i = selectedElements.nextSetBit(i + 1), j++) {
@@ -1611,11 +2050,19 @@ public class IconCanvas extends Canvas {
 		}
 		return retValue;
 	}
+	/** Get tooltip text
+	 * @param obj
+	 * @return text of tooltip
+	 */
 	protected String[] getToolTipText(Object obj) {
 		if (toolTipProvider == null)
 			return IToolTipProvider.NO_TOOLTIP;
 		return toolTipProvider.toolTipText(obj);
 	}
+	/** Get object from selected elementindex 
+	 * @param index element index
+	 * @return
+	 */
 	protected Object getObject(int index) {
 		if (contentProvider == null) {
 			return null;
@@ -1623,16 +2070,51 @@ public class IconCanvas extends Canvas {
 		return contentProvider.getObject(index);
 	}
 
+	/** Get status image
+	 * @param obj
+	 * @param isSelected true if element is selected
+	 * @return
+	 */
 	protected Image getStatusIcon(Object obj, boolean isSelected) {
 		if (imageProvider == null)
 			return null;
 		return imageProvider.getStatusIcon(obj, isSelected);
 	}
+	/** Draw special on selected element
+	 * @param obj
+	 * @param gc
+	 * @param x_loc
+	 * @param y_loc
+	 * @param width
+	 * @param height
+	 */
 	protected void drawSpecial(Object obj, GC gc, int x_loc, int y_loc, int width, int height) {
 		if (imageProvider != null) {
 			imageProvider.drawSpecial(obj, gc, x_loc, y_loc, width, height);
 		}
 	}
+	/** Get information control
+	 * @param showDetails
+	 * @return
+	 */
+	protected IIconInformationControl getInformationControl(boolean showDetails) {
+		if (fInformationControl == null) {
+			fInformationControl= iconHover.getHoverControlCreator(getShell(), showDetails, tooltip_wrap);
+			fInformationControl.addDisposeListener(new DisposeListener() {
+				public void widgetDisposed(DisposeEvent e) {
+					handleInformationControlDisposed();
+				}
+			});
+		}
+		return fInformationControl;
+	}
+	/** Handle information control disposed event
+	 * 
+	 */
+	protected void handleInformationControlDisposed() {
+		fInformationControl= null;
+	}
+
 	/*******************************************************************************************************************************************************************************************************************************************************************************************************
 	 * Self testing
 	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
@@ -1710,19 +2192,5 @@ public class IconCanvas extends Canvas {
         	if (!display.readAndDispatch())
         		display.sleep();
        	}
-	}
-	protected IIconInformationControl getInformationControl(boolean showDetails) {
-		if (fInformationControl == null) {
-			fInformationControl= iconHover.getHoverControlCreator(getShell(), showDetails, tooltip_wrap);
-			fInformationControl.addDisposeListener(new DisposeListener() {
-				public void widgetDisposed(DisposeEvent e) {
-					handleInformationControlDisposed();
-				}
-			});
-		}
-		return fInformationControl;
-	}
-	protected void handleInformationControlDisposed() {
-		fInformationControl= null;
 	}
 }

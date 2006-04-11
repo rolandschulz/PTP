@@ -31,13 +31,22 @@ import org.eclipse.ptp.ui.views.ParallelJobView;
 public class RemoveAllTerminatedAction extends ParallelAction {
 	public static final String name = "Remove All Terminated";
 	
+	/** Constructor
+	 * @param view
+	 */
 	public RemoveAllTerminatedAction(AbstractParallelElementView view) {
 		super(name, view);
 	    setImageDescriptor(ParallelImages.ID_ICON_REMOVEALLTERMINATED_NORMAL);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.actions.ParallelAction#run(org.eclipse.ptp.ui.model.IElement[])
+	 */
 	public void run(IElement[] elements) {}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.action.IAction#run()
+	 */
 	public void run() {
 		view.getUIManager().removeAllStoppedJobs();
 		if (view instanceof ParallelJobView) {

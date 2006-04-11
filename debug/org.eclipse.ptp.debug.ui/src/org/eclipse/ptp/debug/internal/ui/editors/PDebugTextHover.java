@@ -48,10 +48,16 @@ public class PDebugTextHover implements ICEditorTextHover, ITextHoverExtension, 
 	protected ISelection fSelection = null;
 	protected IEditorPart fEditor;
 
+	/** Constructor
+	 * 
+	 */
 	public PDebugTextHover() {
 		super();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.text.ITextHover#getHoverInfo(org.eclipse.jface.text.ITextViewer, org.eclipse.jface.text.IRegion)
+	 */
 	public String getHoverInfo(ITextViewer textViewer, IRegion hoverRegion) {
 		IPStackFrame frame = getFrame();
 		if (frame != null && frame.canEvaluate()) {
@@ -88,12 +94,20 @@ public class PDebugTextHover implements ICEditorTextHover, ITextHoverExtension, 
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.text.ITextHover#getHoverRegion(org.eclipse.jface.text.ITextViewer, int)
+	 */
 	public IRegion getHoverRegion(ITextViewer viewer, int offset) {
 		if (viewer != null)
 			return PDebugUIUtils.findWord(viewer.getDocument(), offset);
 		return null;
 	}
 
+	/** Get evalute expression result
+	 * @param frame
+	 * @param expression
+	 * @return
+	 */
 	private String evaluateExpression(IPStackFrame frame, String expression) {
 		String result = null;
 		try {
@@ -105,6 +119,13 @@ public class PDebugTextHover implements ICEditorTextHover, ITextHoverExtension, 
 		return result;
 	}
 
+	/** Append formatted variable text 
+	 * @param buffer
+	 * @param taskID
+	 * @param expression
+	 * @param value
+	 * @throws DebugException
+	 */
 	private static void appendVariable(StringBuffer buffer, String taskID, String expression, String value) throws DebugException {
 		if (value.length() > MAX_HOVER_INFO_SIZE)
 			value = value.substring(0, MAX_HOVER_INFO_SIZE) + " ...";
@@ -115,6 +136,9 @@ public class PDebugTextHover implements ICEditorTextHover, ITextHoverExtension, 
 		buffer.append("</p>");
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.cdt.ui.text.c.hover.ICEditorTextHover#setEditor(org.eclipse.ui.IEditorPart)
+	 */
 	public void setEditor(IEditorPart editor) {
 		if (editor != null) {
 			fEditor = editor;
@@ -130,15 +154,24 @@ public class PDebugTextHover implements ICEditorTextHover, ITextHoverExtension, 
 			PTPDebugUIPlugin.getStandardDisplay().asyncExec(r);
 		}
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.ISelectionListener#selectionChanged(org.eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection)
+	 */
 	public void selectionChanged(IWorkbenchPart part, ISelection selection) {
 		fSelection = selection;
 	}
-	public void partActivated(IWorkbenchPart part) {
-	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IPartListener#partActivated(org.eclipse.ui.IWorkbenchPart)
+	 */
+	public void partActivated(IWorkbenchPart part) {}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IPartListener#partBroughtToTop(org.eclipse.ui.IWorkbenchPart)
+	 */
+	public void partBroughtToTop(IWorkbenchPart part) {}
 
-	public void partBroughtToTop(IWorkbenchPart part) {
-	}
-
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IPartListener#partClosed(org.eclipse.ui.IWorkbenchPart)
+	 */
 	public void partClosed(IWorkbenchPart part) {
 		if (part.equals(fEditor)) {
 			IWorkbenchPage page = fEditor.getSite().getPage();
@@ -149,11 +182,18 @@ public class PDebugTextHover implements ICEditorTextHover, ITextHoverExtension, 
 		}
 	}
 
-	public void partDeactivated(IWorkbenchPart part) {
-	}
-	public void partOpened(IWorkbenchPart part) {
-	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IPartListener#partDeactivated(org.eclipse.ui.IWorkbenchPart)
+	 */
+	public void partDeactivated(IWorkbenchPart part) {}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IPartListener#partOpened(org.eclipse.ui.IWorkbenchPart)
+	 */
+	public void partOpened(IWorkbenchPart part) {}
 
+	/** Get stack frame from selected element
+	 * @return
+	 */
 	protected IPStackFrame getFrame() {
 		if (fSelection instanceof IStructuredSelection) {
 			IStructuredSelection selection = (IStructuredSelection)fSelection;
@@ -167,10 +207,17 @@ public class PDebugTextHover implements ICEditorTextHover, ITextHoverExtension, 
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.text.ITextHoverExtension#getHoverControlCreator()
+	 */
 	public IInformationControlCreator getHoverControlCreator() {
 		return null;
 	}
 
+	/** Convert symbol to support html format
+	 * @param string
+	 * @return
+	 */
 	private static String makeHTMLSafe(String string) {
 		StringBuffer buffer = new StringBuffer(string.length());
 		for(int i = 0; i != string.length(); i++) {

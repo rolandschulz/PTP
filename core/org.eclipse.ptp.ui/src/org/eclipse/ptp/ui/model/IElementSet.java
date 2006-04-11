@@ -23,18 +23,53 @@ package org.eclipse.ptp.ui.model;
  *
  */
 public interface IElementSet extends IContainer {
+	/** Add to match set
+	 * @param setId set ID
+	 */
 	public void addMatchSet(String setId);
+	/** Remove from macth set 
+	 * @param setId set ID
+	 */
 	public void removeMatchSet(String setId);
+	/** Get match Sets
+	 * @return match sets
+	 */
 	public String[] getMatchSets();
+	/** Does this set contain with other sets
+	 * @return true if other sets contains this set
+	 */
 	public boolean containOtherSets();
+	/** Check given set ID already contained
+	 * @param set_id Set ID
+	 * @return true if given set ID contained in this set
+	 */
 	public boolean isContainSets(String set_id);
 	
+	/** Is this set root
+	 * @return ture if this set is root
+	 */
 	public boolean isRootSet();
 
+	/** Get sorted elements
+	 * @return sorted elements
+	 */
 	public IElement[] getSortedElements();
+	/** Get elements
+	 * @return elements
+	 */
 	public IElement[] getElements();
+	/** Get element
+	 * @param id Element ID
+	 * @return element
+	 */
 	public IElement getElement(String id);
+	/** Get element
+	 * @param index Element index
+	 * @return element
+	 */
 	public IElement getElement(int index);
-	
+	/** Get IElementHandler
+	 * @return IElementHandler
+	 */
 	public IElementHandler getElementHandler();
 }

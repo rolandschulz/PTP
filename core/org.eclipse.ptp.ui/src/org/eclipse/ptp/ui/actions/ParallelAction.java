@@ -34,10 +34,19 @@ import org.eclipse.swt.widgets.Shell;
 public abstract class ParallelAction extends Action {
 	protected AbstractParallelElementView view = null;
 	
+	/** Constructor
+	 * @param text name of action
+	 * @param view
+	 */
 	public ParallelAction(String text, AbstractParallelElementView view) {
 		this(text, IAction.AS_PUSH_BUTTON, view);
 	}
 	
+	/** Constructor
+	 * @param text name of action
+	 * @param style style of action
+	 * @param view
+	 */
 	public ParallelAction(String text, int style, AbstractParallelElementView view) {
 		super(text, style);
 		this.view = view;
@@ -46,16 +55,28 @@ public abstract class ParallelAction extends Action {
 	    setId(text);
 	}
 	
+	/** Get view part
+	 * @return
+	 */
 	public AbstractParallelElementView getViewPart() {
         return view;
     }
     
+    /** Get Shell
+     * @return
+     */
     public Shell getShell() {
         return view.getViewSite().getShell();
     }
     
+    /** run action
+     * @param elements action acts with these elements
+     */
     public abstract void run(IElement[] elements);
     
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.action.IAction#run()
+     */
     public void run() {
     	ISelection selection = getViewPart().getSelection();
     	if (selection != null && !selection.isEmpty() && selection instanceof IStructuredSelection) {
@@ -68,6 +89,10 @@ public abstract class ParallelAction extends Action {
     		run(new IElement[0]);
     }
     
+	/** Validation of given elements
+	 * @param elements elements to be doing validation
+	 * @return true if valid
+	 */
 	protected boolean validation(IElement[] elements) {
 		if (elements == null || elements.length == 0) {
 			UIUtils.showErrorDialog("No selected elements", "Please select some elements first", null);

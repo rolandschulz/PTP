@@ -30,6 +30,9 @@ import org.eclipse.ui.model.WorkbenchAdapter;
  * 
  */
 public class PBreakpointWorkbenchAdapterFactory implements IAdapterFactory {
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang.Object, java.lang.Class)
+	 */
 	public Object getAdapter(Object adaptableObject, Class adapterType) {
 		if (adapterType != IWorkbenchAdapter.class || !(adaptableObject instanceof IPBreakpoint)) {
 			return null;
@@ -47,6 +50,9 @@ public class PBreakpointWorkbenchAdapterFactory implements IAdapterFactory {
 			}
 		};
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapterList()
+	 */
 	public Class[] getAdapterList() {
 		return new Class[] { IWorkbenchAdapter.class };
 	}

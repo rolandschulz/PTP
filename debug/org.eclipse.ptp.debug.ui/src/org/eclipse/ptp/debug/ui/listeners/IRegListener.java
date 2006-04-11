@@ -25,6 +25,12 @@ import org.eclipse.ptp.core.util.BitList;
  *
  */
 public interface IRegListener {
+	/** Register tasks
+	 * @param tasks
+	 */
 	public void register(BitList tasks);
+	/** Unregister tasks
+	 * @param tasks
+	 */
 	public void unregister(BitList tasks);
 }

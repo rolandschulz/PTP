@@ -28,8 +28,8 @@ import org.eclipse.ui.console.IConsoleConstants;
 
 public class PRunPerspectiveFactory implements IPerspectiveFactory {
 
-	/**
-	 * @see IPerspectiveFactory#createInitialLayout
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IPerspectiveFactory#createInitialLayout(org.eclipse.ui.IPageLayout)
 	 */
 	public void createInitialLayout(IPageLayout layout) {
  		String editorArea = layout.getEditorArea();

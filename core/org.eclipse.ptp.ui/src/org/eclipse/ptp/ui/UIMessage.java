@@ -27,6 +27,10 @@ public class UIMessage {
     private static final String BUNDLE_NAME = PTPUIPlugin.PLUGIN_ID + ".UIMessages";
     private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
 
+    /** Get string
+     * @param key
+     * @return
+     */
     public static String getResourceString(String key) {
 		// No point trying if bundle is null as exceptions are costly
 		if (RESOURCE_BUNDLE != null) {

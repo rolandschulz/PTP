@@ -40,19 +40,35 @@ public class IconHoverPresenter implements DefaultInformationControl.IInformatio
 	private int fCounter;
 	private boolean fEnforceUpperLineLimit;
 
+	/** Constructor
+	 * @param enforceUpperLineLimit
+	 */
 	public IconHoverPresenter(boolean enforceUpperLineLimit) {
 		super();
 		fEnforceUpperLineLimit= enforceUpperLineLimit;
 	}
 
+	/** Constructor
+	 * 
+	 */
 	public IconHoverPresenter() {
 		this(true);
 	}
 
+	/** Create Reader
+	 * @param hoverInfo
+	 * @param presentation
+	 * @return
+	 */
 	protected Reader createReader(String hoverInfo, TextPresentation presentation) {
 		return new IconTextReader(new StringReader(hoverInfo), presentation);
 	}
 
+	/** Adpat text presentation
+	 * @param presentation
+	 * @param offset
+	 * @param insertLength
+	 */
 	protected void adaptTextPresentation(TextPresentation presentation, int offset, int insertLength) {
 		int yoursStart= offset;
 		int yoursEnd=   offset + insertLength -1;
@@ -75,6 +91,11 @@ public class IconHoverPresenter implements DefaultInformationControl.IInformatio
 		}
 	}
 
+	/** Append text
+	 * @param buffer
+	 * @param string
+	 * @param presentation
+	 */
 	private void append(StringBuffer buffer, String string, TextPresentation presentation) {
 		int length= string.length();
 		buffer.append(string);
@@ -85,6 +106,10 @@ public class IconHoverPresenter implements DefaultInformationControl.IInformatio
 		fCounter += length;
 	}
 
+	/** Get indentation
+	 * @param line
+	 * @return
+	 */
 	private String getIndent(String line) {
 		int length= line.length();
 
@@ -94,6 +119,9 @@ public class IconHoverPresenter implements DefaultInformationControl.IInformatio
 		return (i == length ? line : line.substring(0, i)) + LINE_INDENTATION;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.internal.ui.hover.DefaultInformationControl.IInformationPresenter#updatePresentation(org.eclipse.swt.widgets.Display, java.lang.String, org.eclipse.jface.text.TextPresentation, int, int)
+	 */
 	public String updatePresentation(Display display, String hoverInfo, TextPresentation presentation, int maxWidth, int maxHeight) {
 		if (hoverInfo == null)
 			return null;
@@ -160,6 +188,11 @@ public class IconHoverPresenter implements DefaultInformationControl.IInformatio
 		}
 	}
 
+	/** Trim given buffer
+	 * @param buffer
+	 * @param presentation
+	 * @return
+	 */
 	private String trim(StringBuffer buffer, TextPresentation presentation) {
 		int length= buffer.length();
 		int end= length -1;

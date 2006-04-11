@@ -77,6 +77,9 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 	protected UIDebugManager uiDebugManager = null;
 	private Map annotationMap = Collections.synchronizedMap(new HashMap());
 
+	/** Constructor
+	 * @param uiDebugManager
+	 */
 	public PAnnotationManager(UIDebugManager uiDebugManager) {
 		this.uiDebugManager = uiDebugManager;
 		uiDebugManager.addRegListener(this);
@@ -85,23 +88,35 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 		if (instance == null)
 			instance = this;
 	}
+	/** Get instance of PAnnotationManager
+	 * @return
+	 */
 	public static PAnnotationManager getDefault() {
 		if (instance == null)
 			instance = new PAnnotationManager(PTPDebugUIPlugin.getDefault().getUIDebugManager());
 		return instance;
 	}
+	/** Clean all settings and listeners
+	 * 
+	 */
 	public void shutdown() {
 		uiDebugManager.removeRegListener(this);
 		uiDebugManager.removeJobChangeListener(this);
 		clearAllAnnotations();
 		annotationMap = null;
 	}
+	/** Clean all stored annotations
+	 * 
+	 */
 	public synchronized void clearAllAnnotations() {
 		for (Iterator i = annotationMap.values().iterator(); i.hasNext();) {
 			((AnnotationGroup) i.next()).removeAnnotations();
 		}
 		annotationMap.clear();
 	}
+	/** Remove annotation group by given job
+	 * @param job_id job ID
+	 */
 	public synchronized void removeAnnotationGroup(String job_id) {
 		AnnotationGroup annotationGroup = (AnnotationGroup) annotationMap.remove(job_id);
 		if (annotationGroup != null) {
@@ -109,12 +124,24 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 			annotationGroup.clear();
 		}
 	}
+	/** Add annotation to given job
+	 * @param job_id Job ID
+	 * @param annotationGroup
+	 */
 	public void putAnnotationGroup(String job_id, AnnotationGroup annotationGroup) {
 		annotationMap.put(job_id, annotationGroup);
 	}
+	/** Get annotation by given hob ID
+	 * @param job_id job ID
+	 * @return
+	 */
 	public AnnotationGroup getAnnotationGroup(String job_id) {
 		return (AnnotationGroup) annotationMap.get(job_id);
 	}
+	/** Get top stack frame of given thread
+	 * @param thread
+	 * @return
+	 */
 	protected IStackFrame getTopStackFrame(IThread thread) {
 		try {
 			return thread.getTopStackFrame();
@@ -122,6 +149,12 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 			return null;
 		}
 	}
+	/** Get editor and open editor if it is not opened or focus on it if it is already opened
+	 * @param page
+	 * @param input
+	 * @param id
+	 * @return
+	 */
 	protected IEditorPart openEditor(final IWorkbenchPage page, final IEditorInput input, final String id) {
 		final IEditorPart[] editor = new IEditorPart[] { null };
 		Runnable r = new Runnable() {
@@ -136,6 +169,10 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 		BusyIndicator.showWhile(Display.getDefault(), r);
 		return editor[0];
 	}
+	/** Get editor part
+	 * @param file
+	 * @return
+	 */
 	protected IEditorPart getEditorPart(final IFile file) {
 		String fileExt = file.getFileExtension();
 		// FIXME hard the extension
@@ -181,6 +218,10 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 		});
 		return editor[0];
 	}
+	/** Find file
+	 * @param fileName
+	 * @return
+	 */
 	protected IFile findFile(String fileName) {
 		IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
 		IPath path = new Path(fileName);
@@ -188,16 +229,29 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 			return workspaceRoot.getFileForLocation(path);
 		return workspaceRoot.getFile(path);
 	}
+	/** Get text editor
+	 * @param editorPart
+	 * @return
+	 */
 	protected ITextEditor getTextEditor(IEditorPart editorPart) {
 		if (editorPart instanceof ITextEditor)
 			return (ITextEditor) editorPart;
 		return (ITextEditor) editorPart.getAdapter(ITextEditor.class);
 	}
+	/** Get file
+	 * @param editorInput
+	 * @return
+	 */
 	protected IFile getFile(IEditorInput editorInput) {
 		if (editorInput instanceof IFileEditorInput)
 			return ((IFileEditorInput) editorInput).getFile();
 		return null;
 	}
+	/** Create poistion in the source file
+	 * @param lineNumber
+	 * @param doc
+	 * @return
+	 */
 	protected Position createPosition(int lineNumber, IDocument doc) {
 		if (doc == null)
 			return null;
@@ -212,6 +266,10 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 			return null;
 		}
 	}
+	/** Get tasks from debug target
+	 * @param debugTarget
+	 * @return
+	 */
 	public BitList getTasks(IDebugTarget debugTarget) {
 		if (debugTarget instanceof IPDebugTarget) {
 			int taskId = ((IPDebugTarget) debugTarget).getTargetID();
@@ -224,15 +282,32 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 		}
 		return null;
 	}
+	/** Get tasks from thread
+	 * @param thread
+	 * @return
+	 */
 	public BitList getTasks(IThread thread) {
 		return getTasks(thread.getDebugTarget());
 	}
+	/** Get tasks from stack frame
+	 * @param stackFrame
+	 * @return
+	 */
 	public BitList getTasks(IStackFrame stackFrame) {
 		return getTasks(stackFrame.getDebugTarget());
 	}
+	/** Is given type register type
+	 * @param type
+	 * @return
+	 */
 	private boolean isRegisterType(String type) {
 		return (type.equals(IPTPDebugUIConstants.REG_ANN_INSTR_POINTER_CURRENT) || type.equals(IPTPDebugUIConstants.REG_ANN_INSTR_POINTER_SECONDARY));
 	}
+	/** Focus to annotation in source editor
+	 * @param editorPart
+	 * @param stackFrame
+	 * @throws CoreException
+	 */
 	public void focusAnnotation(IEditorPart editorPart, IStackFrame stackFrame) throws CoreException {
 		ITextEditor textEditor = getTextEditor(editorPart);
 		int charStart = stackFrame.getCharStart();
@@ -247,6 +322,11 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 			textEditor.selectAndReveal(region.getOffset(), 0);
 		}
 	}
+	/** Get line region in source editor
+	 * @param editor
+	 * @param lineNumber
+	 * @return
+	 */
 	private IRegion getLineInformation(ITextEditor editor, int lineNumber) {
 		IDocumentProvider provider= editor.getDocumentProvider();
 		IEditorInput input= editor.getEditorInput();
@@ -267,6 +347,11 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 	}
 	
 	// called by debug view
+	/** Add annotation called from Debug View
+	 * @param editorPart
+	 * @param stackFrame
+	 * @throws CoreException
+	 */
 	public void addAnnotation(IEditorPart editorPart, IStackFrame stackFrame) throws CoreException {
 		ITextEditor textEditor = getTextEditor(editorPart);
 		if (textEditor == null)
@@ -289,6 +374,14 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 		}
 	}
 	// called by event
+	/** Add annotation called from debug event
+	 * @param job_id
+	 * @param fullPathFileName
+	 * @param lineNumber
+	 * @param tasks
+	 * @param isRegister
+	 * @throws CoreException
+	 */
 	public void addAnnotation(String job_id, String fullPathFileName, int lineNumber, BitList tasks, boolean isRegister) throws CoreException {
 		if (tasks.isEmpty())
 			return;
@@ -316,6 +409,10 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 			//}
 		}
 	}
+	/** Is given tasks in the current set
+	 * @param aTasks
+	 * @return
+	 */
 	public boolean containsCurrentSet(BitList aTasks) {
 		String set_id = uiDebugManager.getCurrentSetId();
 		if (set_id.equals(IElementHandler.SET_ROOT_ID))
@@ -328,6 +425,15 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 		}
 	}
 	// generic
+	/** Add annotation
+	 * @param annotationGroup
+	 * @param textEditor
+	 * @param file
+	 * @param lineNumber
+	 * @param tasks
+	 * @param type
+	 * @throws CoreException
+	 */
 	public synchronized void addAnnotation(AnnotationGroup annotationGroup, final ITextEditor textEditor, final IFile file, final int lineNumber, final BitList tasks, final String type) throws CoreException {
 		IDocumentProvider docProvider = textEditor.getDocumentProvider();
 		IAnnotationModel annotationModel = docProvider.getAnnotationModel(textEditor.getEditorInput());
@@ -352,6 +458,12 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 		annotation.addTasks(tasks);
 		annotation.setMessage(isRegister);
 	}
+	/** Find annotation
+	 * @param annotationGroup
+	 * @param position
+	 * @param type
+	 * @return
+	 */
 	public PInstructionPointerAnnotation findAnnotation(AnnotationGroup annotationGroup, Position position, String type) {
 		for (Iterator i = annotationGroup.getAnnotationIterator(); i.hasNext();) {
 			PInstructionPointerAnnotation annotation = (PInstructionPointerAnnotation) i.next();
@@ -369,6 +481,11 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 		return null;
 	}
 	// called by debug view
+	/** Remove annotation called from Debug View
+	 * @param editorPart
+	 * @param thread
+	 * @throws CoreException
+	 */
 	public void removeAnnotation(IEditorPart editorPart, IThread thread) throws CoreException {
 		BitList tasks = getTasks(thread);
 		if (tasks == null)
@@ -384,6 +501,11 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 		}
 	}
 	// called by event
+	/** Remove annotation called from debug event
+	 * @param job_id
+	 * @param tasks
+	 * @throws CoreException
+	 */
 	public void removeAnnotation(String job_id, BitList tasks) throws CoreException {
 		if (tasks == null || tasks.isEmpty())
 			return;
@@ -397,6 +519,11 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 		}
 	}
 	// generic
+	/** Remove annotation
+	 * @param annotationGroup
+	 * @param tasks
+	 * @throws CoreException
+	 */
 	public synchronized void removeAnnotation(AnnotationGroup annotationGroup, BitList tasks) throws CoreException {
 		List removedList = new ArrayList(0);
 		for (Iterator i = annotationGroup.getAnnotationIterator(); i.hasNext();) {
@@ -411,6 +538,11 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 		}
 		annotationGroup.removeAnnotations(removedList);
 	}
+	/** Get iterator of stored annotations
+	 * @param annotationGroup
+	 * @param type
+	 * @return
+	 */
 	public Iterator findAnnotationIterator(AnnotationGroup annotationGroup, String type) {
 		List annotations = new ArrayList();
 		for (Iterator i = annotationGroup.getAnnotationIterator(); i.hasNext();) {
@@ -421,6 +553,11 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 		}
 		return annotations.iterator();
 	}
+	/** Get position of annotation
+	 * @param annotationGroup
+	 * @param tasks
+	 * @return
+	 */
 	public Position findAnnotationPosition(AnnotationGroup annotationGroup, BitList tasks) {
 		PInstructionPointerAnnotation annotation = findAnnotation(annotationGroup, tasks);
 		if (annotation != null)
@@ -437,6 +574,12 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 		}
 		return null;
 	}
+	/** Find other annotation
+	 * @param annotationGroup
+	 * @param position
+	 * @param isRegister
+	 * @return
+	 */
 	public synchronized PInstructionPointerAnnotation findOtherAnnotation(AnnotationGroup annotationGroup, Position position, boolean isRegister) {
 		if (position == null)
 			return null;
@@ -455,12 +598,21 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 		}
 		return null;
 	}
+	/** Change annotation type
+	 * @param annotation
+	 * @param type
+	 */
 	public void changeAnnotationType(PInstructionPointerAnnotation annotation, String type) {
 		if (!annotation.getType().equals(type)) {
 			annotation.setType(type);
 		}
 	}
 	// change set
+	/** Update annotation
+	 * @param currentSet current set
+	 * @param preSet previous set
+	 * @throws CoreException
+	 */
 	public void updateAnnotation(final IElementSet currentSet, final IElementSet preSet) throws CoreException {
 		final AnnotationGroup annotationGroup = getAnnotationGroup(uiDebugManager.getCurrentJobId());
 		if (annotationGroup == null)
@@ -496,6 +648,9 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 	/***************************************************************************************************************************************************************************************************
 	 * Register listener
 	 **************************************************************************************************************************************************************************************************/
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.ui.listeners.IRegListener#register(org.eclipse.ptp.core.util.BitList)
+	 */
 	public void register(final BitList tasks) {
 		String job_id = uiDebugManager.getCurrentJobId();
 		final AnnotationGroup annotationGroup = getAnnotationGroup(job_id);
@@ -528,6 +683,9 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 			PTPDebugUIPlugin.log(e);
 		}
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.ui.listeners.IRegListener#unregister(org.eclipse.ptp.core.util.BitList)
+	 */
 	public void unregister(final BitList tasks) {
 		String job_id = uiDebugManager.getCurrentJobId();
 		final AnnotationGroup annotationGroup = getAnnotationGroup(job_id);
@@ -560,6 +718,13 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 			PTPDebugUIPlugin.log(e);
 		}
 	}
+	/** Add tasks to existed annotation
+	 * @param annotationGroup
+	 * @param annotation
+	 * @param tasks
+	 * @param isRegister
+	 * @throws CoreException
+	 */
 	private synchronized void addToExistedAnnotation(AnnotationGroup annotationGroup, PInstructionPointerAnnotation annotation, BitList tasks, boolean isRegister) throws CoreException {
 		IResource file = annotation.getMarker().getResource();
 		Position position = annotation.getPosition();
@@ -583,6 +748,13 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 			oAnnotation.setMessage(!isRegister);
 		}
 	}
+	/** Remove tasks from existed annotation
+	 * @param annotationGroup
+	 * @param annotation
+	 * @param tasks Tasks being removed
+	 * @param isRegister
+	 * @throws CoreException
+	 */
 	private synchronized void removeFromExistedAnnotation(AnnotationGroup annotationGroup, PInstructionPointerAnnotation annotation, BitList tasks, boolean isRegister) throws CoreException {
 		IResource file = annotation.getMarker().getResource();
 		Position position = annotation.getPosition();
@@ -610,6 +782,9 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 	/***************************************************************************************************************************************************************************************************
 	 * Job Change Listener
 	 **************************************************************************************************************************************************************************************************/
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.listeners.IJobChangeListener#changeJobEvent(java.lang.String, java.lang.String)
+	 */
 	public synchronized void changeJobEvent(String cur_job_id, String pre_job_id) {
 		if (pre_job_id != null && !pre_job_id.equals(IManager.EMPTY_ID)) {
 			AnnotationGroup preAnnotationGroup = getAnnotationGroup(pre_job_id);

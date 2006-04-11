@@ -31,12 +31,19 @@ import org.eclipse.ptp.debug.core.model.IPValue;
 public class PValueDetailProvider {
 	private static PValueDetailProvider fInstance = null;
 
+	/** Get instance
+	 * @return
+	 */
 	public static PValueDetailProvider getDefault() {
 		if (fInstance == null) {
 			fInstance = new PValueDetailProvider();
 		}
 		return fInstance;
 	}
+	/** Compute detail
+	 * @param value
+	 * @param listener
+	 */
 	public void computeDetail(final IValue value, final IValueDetailListener listener) {
 		if (value instanceof IPValue) {
 			final IPStackFrame frame = PDebugUIUtils.getCurrentStackFrame();

@@ -27,6 +27,12 @@ import org.eclipse.swt.widgets.Shell;
  * 
  */
 public class IconHover {
+	/** Create hover control
+	 * @param parent
+	 * @param showDetails
+	 * @param isWrap
+	 * @return
+	 */
 	public IIconInformationControl getHoverControlCreator(Shell parent, boolean showDetails, boolean isWrap) {
 		return new DefaultInformationControl(parent, showDetails, isWrap?(SWT.NONE | SWT.WRAP):SWT.NONE);
 	}

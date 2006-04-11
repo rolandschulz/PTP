@@ -67,10 +67,16 @@ public class ParallelMachineView extends AbstractParallelSetView {
 	public static final String INFO_VIEW = "2";
 	protected String current_view = BOTH_VIEW;
 
+	/** Constructor
+	 * 
+	 */
 	public ParallelMachineView() {
 		instance = this;
 		manager = PTPUIPlugin.getDefault().getMachineManager();
 	}
+	/** Change view flag
+	 * @param view_flag view flag
+	 */
 	public void changeView(String view_flag) {
 		current_view = view_flag;
 		if (current_view.equals(ParallelMachineView.MACHINE_VIEW)) {
@@ -87,12 +93,21 @@ public class ParallelMachineView extends AbstractParallelSetView {
 			sashForm.setWeights(new int[] { 3, 1 });
 		}
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#getImage(int, int)
+	 */
 	public Image getImage(int index1, int index2) {
 		return ParallelImages.nodeImages[index1][index2];
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#initialElement()
+	 */
 	protected void initialElement() {
 		selectMachine(manager.initial());
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#initialView()
+	 */
 	protected void initialView() {
 		initialElement();
 		if (manager.size() > 0) {
@@ -100,11 +115,17 @@ public class ParallelMachineView extends AbstractParallelSetView {
 		}
 		update();
 	}
+	/** Get ParallelMachineView instance
+	 * @return instance
+	 */
 	public static ParallelMachineView getMachineViewInstance() {
 		if (instance == null)
 			instance = new ParallelMachineView();
 		return instance;
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#createView(org.eclipse.swt.widgets.Composite)
+	 */
 	protected void createView(Composite parent) {
 		parent.setLayout(new FillLayout(SWT.VERTICAL));
 		parent.setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -115,6 +136,10 @@ public class ParallelMachineView extends AbstractParallelSetView {
 		infoComposite = createLowerTextRegions(sashForm);
 		changeView(current_view);
 	}
+	/** Create lower text region layout
+	 * @param parent
+	 * @return
+	 */
 	protected Composite createLowerTextRegions(Composite parent) {
 		Composite composite = new Composite(parent, SWT.NONE);
 		GridLayout layout = new GridLayout(2, true);
@@ -167,12 +192,17 @@ public class ParallelMachineView extends AbstractParallelSetView {
 		});
 		return composite;
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.views.AbstractParallelSetView#createToolBarActions(org.eclipse.jface.action.IToolBarManager)
+	 */
 	protected void createToolBarActions(IToolBarManager toolBarMgr) {
 		changeMachineAction = new ChangeMachineAction(this);
 		toolBarMgr.appendToGroup(IPTPUIConstants.IUINAVIGATORGROUP, changeMachineAction);
 		super.buildInToolBarActions(toolBarMgr);
 	}
-	protected void setActionEnable() {}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#doubleClick(org.eclipse.ptp.ui.model.IElement)
+	 */
 	public void doubleClick(IElement element) {
 		boolean isElementRegistered = element.isRegistered();
 		unregister();
@@ -182,9 +212,15 @@ public class ParallelMachineView extends AbstractParallelSetView {
 		}
 		updateLowerTextRegions();
 	}
+	/** Register element
+	 * @param element Target element
+	 */
 	public void register(IElement element) {
 		element.setRegistered(true);
 	}
+	/** Unregister all registered elements
+	 * 
+	 */
 	public void unregister() {
 		IElementHandler elementHandler = getCurrentElementHandler();
 		IElementSet rootSet = elementHandler.getSetRoot();
@@ -196,12 +232,18 @@ public class ParallelMachineView extends AbstractParallelSetView {
 		}
 		elementHandler.removeAllRegisterElements();
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#convertElementObject(org.eclipse.ptp.ui.model.IElement)
+	 */
 	protected Object convertElementObject(IElement element) {
 		if (element == null)
 			return null;
 		
 		return ((MachineManager) manager).findNode(getCurrentID(), element.getID());
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.views.IContentProvider#getRulerIndex(java.lang.Object, int)
+	 */
 	public String getRulerIndex(Object obj, int index) {
 		if (obj instanceof IElement) {
 			Object nodeObj = convertElementObject((IElement)obj);
@@ -211,6 +253,9 @@ public class ParallelMachineView extends AbstractParallelSetView {
 		}
 		return super.getRulerIndex(obj, index);
 	}	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#getToolTipText(java.lang.Object)
+	 */
 	public String[] getToolTipText(Object obj) {
 		IElementHandler setManager = getCurrentElementHandler();
 		if (obj == null || !(obj instanceof IPNode) || setManager == null || cur_element_set == null)
@@ -235,27 +280,45 @@ public class ParallelMachineView extends AbstractParallelSetView {
 		// buffer.append("\nStatus: " + getMachineManager().getNodeStatusText(node));
 		return new String[] { buffer.toString() };
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#getCurrentID()
+	 */
 	public String getCurrentID() {
 		return ((MachineManager) manager).getCurrentMachineId();
 	}
+	/** Change machine
+	 * @param machine_id machine ID
+	 */
 	public void selectMachine(String machine_id) {
 		((MachineManager) manager).setCurrentMachineId(machine_id);
 		updateMachine();
 	}
+	/** Updat emachine
+	 * 
+	 */
 	public void updateMachine() {
 		IElementHandler setManager = getCurrentElementHandler();
 		if (setManager != null) {
 			selectSet(setManager.getSetRoot());
 		}
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.views.AbstractParallelSetView#updateAction()
+	 */
 	protected void updateAction() {
 		super.updateAction();
 		changeMachineAction.setEnabled(((MachineManager) manager).getMachines().length > 0);
 	}
+	/** Clean lower text regions information
+	 * 
+	 */
 	public void clearLowerTextRegions() {
 		BLtable.removeAll();
 		BRtable.removeAll();
 	}
+	/** Update lower text regions information
+	 * 
+	 */
 	public void updateLowerTextRegions() {
 		clearLowerTextRegions();
 		cur_selected_element_id = "";
@@ -287,6 +350,9 @@ public class ParallelMachineView extends AbstractParallelSetView {
 			}
 		}
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.IParallelModelListener#run(java.lang.String)
+	 */
 	public void run(String arg) {
 		System.out.println("------------ machine run - job " + arg);
 		IPJob job = ((MachineManager) manager).findJob(arg);
@@ -299,47 +365,80 @@ public class ParallelMachineView extends AbstractParallelSetView {
 		update();
 		refresh();
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#updateView(java.lang.Object)
+	 */
 	public void updateView(Object condition) {
 		updateLowerTextRegions();
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.IParallelModelListener#start()
+	 */
 	public void start() {
 		System.out.println("------------ machine start");
 		refresh();
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.IParallelModelListener#stopped()
+	 */
 	public void stopped() {
 		System.out.println("------------ machine stop");
 		refresh();
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.IParallelModelListener#exit()
+	 */
 	public void exit() {
 		System.out.println("------------ machine exit");
 		refresh();
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.IParallelModelListener#abort()
+	 */
 	public void abort() {
 		System.out.println("------------ machine abort");
 		refresh();
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.IParallelModelListener#monitoringSystemChangeEvent(java.lang.Object)
+	 */
 	public void monitoringSystemChangeEvent(Object object) {
 		System.out.println("------------ machine monitoringSystemChangeEvent");
 		manager.clear();
 		initialView();
 		refresh();
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.IParallelModelListener#execStatusChangeEvent(java.lang.Object)
+	 */
 	public void execStatusChangeEvent(Object object) {
 		System.out.println("------------ machine execStatusChangeEvent");
 		refresh();
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.IParallelModelListener#sysStatusChangeEvent(java.lang.Object)
+	 */
 	public void sysStatusChangeEvent(Object object) {
 		System.out.println("------------ machine sysStatusChangeEvent");
 		refresh();
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.IParallelModelListener#processOutputEvent(java.lang.Object)
+	 */
 	public void processOutputEvent(Object object) {
 		System.out.println("------------ machine processOutputEvent");
 		refresh();
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.IParallelModelListener#errorEvent(java.lang.Object)
+	 */
 	public void errorEvent(Object object) {
 		System.out.println("------------ machine errorEvent");
 		refresh();
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.IParallelModelListener#updatedStatusEvent()
+	 */
 	public void updatedStatusEvent() {
 		System.out.println("------------ machine updatedStatusEvent");
 		refresh();

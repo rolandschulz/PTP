@@ -86,22 +86,34 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 	protected Map attributes = new HashMap(3);
 	private OverlayImageCache imageCache = new OverlayImageCache();
 
+	/** Constructor
+	 * 
+	 */
 	public PDebugModelPresentation() {
 		// make sure using the one created by start up
 		if (instance == null)
 			instance = this;
 	} 
+	/** Get instance
+	 * @return
+	 */
 	public static PDebugModelPresentation getDefault() {
 		if (instance == null)
 			instance = new PDebugModelPresentation();
 		return instance;
 	}
+	/** Get UIDebugManager
+	 * @return
+	 */
 	private UIDebugManager getUIDebugManager() {
 		if (uiDebugManager == null) {
 			uiDebugManager = PTPDebugUIPlugin.getDefault().getUIDebugManager();
 		}
 		return uiDebugManager;
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.ui.ISourcePresentation#getEditorId(org.eclipse.ui.IEditorInput, java.lang.Object)
+	 */
 	public String getEditorId(IEditorInput input, Object element) {
 		if (input != null) {
 			IEditorRegistry registry = PlatformUI.getWorkbench().getEditorRegistry();
@@ -113,6 +125,9 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		}
 		return null;
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.ui.ISourcePresentation#getEditorInput(java.lang.Object)
+	 */
 	public IEditorInput getEditorInput(Object element) {
 		if (element instanceof IMarker) {
 			IResource resource = ((IMarker) element).getResource();
@@ -148,14 +163,23 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		 */
 		return null;
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.ui.IDebugModelPresentation#computeDetail(org.eclipse.debug.core.model.IValue, org.eclipse.debug.ui.IValueDetailListener)
+	 */
 	public void computeDetail(IValue value, IValueDetailListener listener) {
 		PValueDetailProvider.getDefault().computeDetail(value, listener);
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.ui.IDebugModelPresentation#setAttribute(java.lang.String, java.lang.Object)
+	 */
 	public void setAttribute(String attribute, Object value) {
 		if (value == null)
 			return;
 		getAttributes().put(attribute, value);
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.ILabelProvider#getImage(java.lang.Object)
+	 */
 	public Image getImage(Object element) {
 		Image baseImage = getBaseImage(element);
 		if (baseImage != null) {
@@ -171,6 +195,10 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		}
 		return null;
 	}
+	/** Get base image
+	 * @param element
+	 * @return
+	 */
 	private Image getBaseImage(Object element) {
 		// TODO element can be DebugTarget, Thread
 		if (element instanceof IMarker) {
@@ -184,6 +212,10 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		}
 		return super.getImage(element);
 	}
+	/** Get breakpoint image
+	 * @param breakpoint
+	 * @return
+	 */
 	protected Image getBreakpointImage(IPBreakpoint breakpoint) {
 		try {
 			if (breakpoint instanceof IPLineBreakpoint)
@@ -194,6 +226,11 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		}
 		return null;
 	}
+	/** Get line breakpoint image
+	 * @param breakpoint
+	 * @return
+	 * @throws CoreException
+	 */
 	protected Image getLineBreakpointImage(IPLineBreakpoint breakpoint) throws CoreException {
 		String job_id = breakpoint.getJobId();
 		String cur_job_id = getUIDebugManager().getCurrentJobId();
@@ -218,6 +255,9 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		}
 		return getImageCache().getImageFor(new OverlayImageDescriptor(PDebugImage.getImage(descriptor), computeBreakpointOverlays(breakpoint)));
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.ILabelProvider#getText(java.lang.Object)
+	 */
 	public String getText(Object element) {
 		String bt = getBaseText(element);
 		if (bt == null)
@@ -238,6 +278,10 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		}
 		return baseText.toString();
 	}
+	/** Get base text
+	 * @param element
+	 * @return
+	 */
 	private String getBaseText(Object element) {
 		boolean showQualified = isShowQualifiedNames();
 		StringBuffer label = new StringBuffer();
@@ -298,19 +342,32 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		}
 		return null;
 	}
+	/** Is show qualified names in the Breakpoint view for each breakpoints
+	 * @return
+	 */
 	protected boolean isShowQualifiedNames() {
 		Boolean showQualified = (Boolean) getAttributes().get(DISPLAY_FULL_PATHS);
 		showQualified = (showQualified == null) ? Boolean.FALSE : showQualified;
 		return showQualified.booleanValue();
 	}
+	/** Is show variable type names in the breakpoint view for each breakpoints
+	 * @return
+	 */
 	protected boolean isShowVariableTypeNames() {
 		Boolean show = (Boolean) getAttributes().get(DISPLAY_VARIABLE_TYPE_NAMES);
 		show = show == null ? Boolean.FALSE : show;
 		return show.booleanValue();
 	}
+	/** Get attributes
+	 * @return
+	 */
 	private Map getAttributes() {
 		return attributes;
 	}
+	/** Get variable type name
+	 * @param type
+	 * @return
+	 */
 	private String getVariableTypeName(IPType type) {
 		StringBuffer result = new StringBuffer();
 		String typeName = type.getName();
@@ -336,6 +393,11 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		}
 		return result.toString();
 	}
+	/** Get variable text
+	 * @param var
+	 * @return
+	 * @throws DebugException
+	 */
 	protected String getVariableText(IVariable var) throws DebugException {
 		StringBuffer label = new StringBuffer();
 		if (var instanceof IPVariable) {
@@ -362,6 +424,10 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		}
 		return label.toString();
 	}
+	/** Get value text
+	 * @param value
+	 * @return
+	 */
 	protected String getValueText(IValue value) {
 		StringBuffer label = new StringBuffer();
 		if (value instanceof IPDebugElementStatus && !((IPDebugElementStatus) value).isOK()) {
@@ -391,21 +457,44 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		}
 		return label.toString();
 	}
+	/** Get image cache
+	 * @return
+	 */
 	private OverlayImageCache getImageCache() {
 		return imageCache;
 	}
+	/** Is string empty
+	 * @param string
+	 * @return
+	 */
 	private boolean isEmpty(String string) {
 		return (string == null || string.trim().length() == 0);
 	}
+	/** Get breakpoint from marker
+	 * @param marker
+	 * @return
+	 */
 	protected IBreakpoint getBreakpoint(IMarker marker) {
 		return DebugPlugin.getDefault().getBreakpointManager().getBreakpoint(marker);
 	}
+	/** Get content of breakpoint
+	 * @param breakpoint
+	 * @param qualified
+	 * @return
+	 * @throws CoreException
+	 */
 	protected String getBreakpointText(IBreakpoint breakpoint, boolean qualified) throws CoreException {
 		if (breakpoint instanceof IPLineBreakpoint) {
 			return getLineBreakpointText((IPLineBreakpoint) breakpoint, qualified);
 		}
 		return "";
 	}
+	/** Get line of breakpoint
+	 * @param breakpoint
+	 * @param qualified
+	 * @return
+	 * @throws CoreException
+	 */
 	protected String getLineBreakpointText(IPLineBreakpoint breakpoint, boolean qualified) throws CoreException {
 		StringBuffer label = new StringBuffer();
 		appendSourceName(breakpoint, label, qualified);
@@ -413,6 +502,13 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		appendBreakpointStatus(breakpoint, label);
 		return label.toString();
 	}
+	/** Append source name into breakpoint
+	 * @param breakpoint
+	 * @param label
+	 * @param qualified
+	 * @return
+	 * @throws CoreException
+	 */
 	protected StringBuffer appendSourceName(IPBreakpoint breakpoint, StringBuffer label, boolean qualified) throws CoreException {
 		String handle = breakpoint.getSourceHandle();
 		if (!isEmpty(handle)) {
@@ -423,6 +519,12 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		}
 		return label;
 	}
+	/** Append line number into breakpoint
+	 * @param breakpoint
+	 * @param label
+	 * @return
+	 * @throws CoreException
+	 */
 	protected StringBuffer appendLineNumber(IPLineBreakpoint breakpoint, StringBuffer label) throws CoreException {
 		int lineNumber = breakpoint.getLineNumber();
 		if (lineNumber > 0) {
@@ -431,6 +533,12 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		}
 		return label;
 	}
+	/** Append status into breakpoint
+	 * @param breakpoint
+	 * @param label
+	 * @return
+	 * @throws CoreException
+	 */
 	protected StringBuffer appendBreakpointStatus(IPBreakpoint breakpoint, StringBuffer label) throws CoreException {
 		label.append(" ");
 		label.append("{");
@@ -441,6 +549,10 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		// label.append(MessageFormat.format(PDebugUIMessages.getString("PTPDebugModelPresentation.details1"), new String[] { jobName, breakpoint.getSetId() }));
 		return label;
 	}
+	/** Get image descriptor and compute breakpoint overlays
+	 * @param breakpoint
+	 * @return
+	 */
 	private ImageDescriptor[] computeBreakpointOverlays(IPBreakpoint breakpoint) {
 		ImageDescriptor[] overlays = new ImageDescriptor[] { null, null, null, null };
 		try {
@@ -464,6 +576,12 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		}
 		return overlays;
 	}
+	/** Get debug target text
+	 * @param target
+	 * @param qualified
+	 * @return
+	 * @throws DebugException
+	 */
 	protected String getTargetText(IDebugTarget target, boolean qualified) throws DebugException {
 		IPDebugTarget t = (IPDebugTarget) target.getAdapter(IPDebugTarget.class);
 		if (t != null) {
@@ -488,6 +606,12 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		}
 		return target.getName();
 	}
+	/** Get debug thread text
+	 * @param thread
+	 * @param qualified
+	 * @return
+	 * @throws DebugException
+	 */
 	protected String getThreadText(IThread thread, boolean qualified) throws DebugException {
 		IPDebugTarget target = (IPDebugTarget) thread.getDebugTarget().getAdapter(IPDebugTarget.class);
 		if (target.isPostMortem()) {
@@ -524,6 +648,12 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		}
 		return MessageFormat.format(PDebugUIMessages.getString("PTPDebugModelPresentation.thread11"), new String[] { thread.getName() });
 	}
+	/** Get debug stack frame text
+	 * @param f
+	 * @param qualified
+	 * @return
+	 * @throws DebugException
+	 */
 	protected String getStackFrameText(IStackFrame f, boolean qualified) throws DebugException {
 		if (f instanceof IPStackFrame) {
 			IPStackFrame frame = (IPStackFrame) f;
@@ -557,9 +687,19 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		// return (f.getAdapter(IDummyStackFrame.class) != null)?getDummyStackFrameLabel(f):f.getName();
 		return f.getName();
 	}
+	/** Get formatted text
+	 * @param key
+	 * @param arg
+	 * @return
+	 */
 	public static String getFormattedString(String key, String arg) {
 		return getFormattedString(key, new String[] { arg });
 	}
+	/** Get formatted text
+	 * @param string
+	 * @param args
+	 * @return
+	 */
 	public static String getFormattedString(String string, String[] args) {
 		return MessageFormat.format(string, args);
 	}
@@ -568,6 +708,9 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		attributes.clear();
 		super.dispose();
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.ui.IDebugEditorPresentation#addAnnotations(org.eclipse.ui.IEditorPart, org.eclipse.debug.core.model.IStackFrame)
+	 */
 	public boolean addAnnotations(IEditorPart editorPart, IStackFrame stackFrame) {
 		try {
 			PAnnotationManager.getDefault().focusAnnotation(editorPart, stackFrame);
@@ -578,6 +721,9 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.ui.IDebugEditorPresentation#removeAnnotations(org.eclipse.ui.IEditorPart, org.eclipse.debug.core.model.IThread)
+	 */
 	public void removeAnnotations(IEditorPart editorPart, IThread thread) {
 		//System.err.println("-------------PDebugModePresentation - removeAnnotations");
 		/*

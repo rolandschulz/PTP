@@ -33,14 +33,23 @@ import org.eclipse.ptp.ui.model.IElement;
 public class StepReturnAction extends StepAction {
 	public static final String name = "Step Return";
 
+	/** Constructor
+	 * @param view
+	 */
 	public StepReturnAction(ParallelDebugView view) {
 		super(name, view);
 	    setImageDescriptor(PDebugImage.ID_ICON_STEPRETURN_NORMAL);
 	    setDisabledImageDescriptor(PDebugImage.ID_ICON_STEPRETURN_DISABLE);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.actions.ParallelAction#run(org.eclipse.ptp.ui.model.IElement[])
+	 */
 	public void run(IElement[] elements) {}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.action.IAction#run()
+	 */
 	public void run() {
 		IManager manager = view.getUIManager();
 		if (manager instanceof UIDebugManager) {

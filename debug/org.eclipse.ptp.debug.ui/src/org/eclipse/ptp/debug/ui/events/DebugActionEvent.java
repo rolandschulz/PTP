@@ -28,20 +28,34 @@ public abstract class DebugActionEvent implements IDebugActionEvent {
 	private String job_id = "";
 	private Object target = null;
 	
+	/** Constructor
+	 * @param job_id
+	 * @param source
+	 * @param target
+	 */
 	public DebugActionEvent(String job_id, Object source, Object target) {
 		this.job_id = job_id;
 		this.source = source;
 		this.target = target;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.ui.events.IDebugActionEvent#getJobId()
+	 */
 	public String getJobId() {
 		return job_id;
 	}
 		
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.ui.events.IDebugActionEvent#getSource()
+	 */
 	public Object getSource() {
 		return source;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.ui.events.IDebugActionEvent#getTarget()
+	 */
 	public Object getTarget() {
 		return target;
 	}

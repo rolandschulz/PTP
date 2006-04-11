@@ -37,15 +37,27 @@ public class OutputConsole extends MessageConsole {
 	private static final int BUFFER_SIZE = 8192;
 	private boolean isKilled = false;
 
+	/** Constructor
+	 * @param name name of console window
+	 * @param inputStream
+	 */
 	public OutputConsole(String name, InputStream inputStream) {
 		this(name, null, inputStream);
 	}
+	/** Constructor
+	 * @param name name of console window
+	 * @param imageDescriptor image of console window
+	 * @param inputStream
+	 */
 	public OutputConsole(String name, ImageDescriptor imageDescriptor, InputStream inputStream) {
 		super(name, imageDescriptor);
 		this.inputStream = inputStream;
 		messageOutputStream = newMessageStream();
 		startMonitorOutput();
 	}
+	/** Start monitoring output
+	 * 
+	 */
 	protected void startMonitorOutput() {
 		if (thread == null) {
 			ConsolePlugin.getDefault().getConsoleManager().addConsoles(new IConsole[] { this });
@@ -62,6 +74,9 @@ public class OutputConsole extends MessageConsole {
 			thread.start();
 		}
 	}
+	/** Close console window
+	 * @throws IOException
+	 */
 	private void close() throws IOException {
 		if (thread != null) {
 			try {
@@ -75,9 +90,15 @@ public class OutputConsole extends MessageConsole {
 			}
 		}
 	}
+	/** Append text into console
+	 * @param text
+	 */
 	private void appendText(String text) {
 		messageOutputStream.print(text);
 	}
+	/** Kill console window
+	 * 
+	 */
 	public void kill() {
 		try {
 			close();
@@ -85,6 +106,9 @@ public class OutputConsole extends MessageConsole {
 			e.printStackTrace();
 		}
 	}
+	/** Close console input stream
+	 * @throws IOException
+	 */
 	private void closeStream() throws IOException {
 		try {
 			if (inputStream != null)
@@ -94,6 +118,9 @@ public class OutputConsole extends MessageConsole {
 			isKilled = true;
 		}
 	}
+	/** Read from input stream
+	 * @throws IOException
+	 */
 	private void read() throws IOException {
 		byte[] bytes = new byte[BUFFER_SIZE];
 		int read = 0;

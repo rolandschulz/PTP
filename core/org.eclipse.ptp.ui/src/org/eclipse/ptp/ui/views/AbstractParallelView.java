@@ -39,6 +39,9 @@ public abstract class AbstractParallelView extends ViewPart implements ISelectio
 	 */
 	protected List listeners = new ArrayList(0);
 	
+	/** Constructor to add paralell launch listener by default
+	 * 
+	 */
 	public AbstractParallelView() {
 		PTPCorePlugin.getDefault().getModelManager().addParallelLaunchListener(this);
 	}
@@ -63,9 +66,15 @@ public abstract class AbstractParallelView extends ViewPart implements ISelectio
 		super.dispose();
 	}
 	
+	/** Get Display
+	 * @return display
+	 */
 	protected Display getDisplay() {
 		return getViewSite().getShell().getDisplay();
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.ISelectionProvider#getSelection()
+	 */
 	public abstract ISelection getSelection();	
 }

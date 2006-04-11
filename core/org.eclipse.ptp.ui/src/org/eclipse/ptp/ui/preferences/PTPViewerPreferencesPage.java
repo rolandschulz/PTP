@@ -47,6 +47,10 @@ public class PTPViewerPreferencesPage extends AbstractPerferencePage {
 	private Button tooltipIsWrapButton = null;
 	private Button tooltipShowAllTimeButton = null;
 	
+	/** Inner class ViewIntFieldEditor
+	 *	used for validation of text field
+	 *
+	 */
 	private class ViewIntFieldEditor {
 		private int textLimit = 5;
 		private String labelText = null;
@@ -55,15 +59,27 @@ public class PTPViewerPreferencesPage extends AbstractPerferencePage {
 		private Text textField = null;		
 		private String msg = "";
 		
+		/** Constructor
+		 * @param labelText
+		 * @param min
+		 * @param max
+		 * @param parent
+		 */
 		ViewIntFieldEditor(String labelText, int min, int max, Composite parent) {
 			this.labelText = labelText;
 			this.min = min;
 			this.max = max;
 			createControl(parent);
 		}
+		/** Create control
+		 * @param parent
+		 */
 		protected void createControl(Composite parent) {
 			doFillIntoGrid(parent);
 		}
+		/** Create text field into given composite
+		 * @param parent
+		 */
 		protected void doFillIntoGrid(Composite parent) {
 			new Label(parent, SWT.LEFT).setText(labelText);
             
@@ -79,16 +95,25 @@ public class PTPViewerPreferencesPage extends AbstractPerferencePage {
 			
 			new Label(parent, SWT.RIGHT).setText("(" + min + "-" + max + ")");
 		}
+		/** Set text field enabled
+		 * @param isEnable
+		 */
 		public void setEnabled(boolean isEnable) {
 			if (textField != null) {
 				textField.setEnabled(isEnable);
 			}
 		}
+	    /** Set value into text field
+	     * @param value
+	     */
 	    public void setValue(int value) {
 	        if (textField != null) {
 	        	textField.setText(String.valueOf(value));
 	        }
 	    }
+	    /** Get value from text field
+	     * @return
+	     */
 	    public int getValue() {
 	    	try {
 	    		return Integer.parseInt(textField.getText());
@@ -96,12 +121,21 @@ public class PTPViewerPreferencesPage extends AbstractPerferencePage {
 	    		return 0;
 	    	}
 	    }
+	    /** Set error message 
+	     * @param msg
+	     */
 	    public void setErrorMessage(String msg) {
 	    	this.msg = msg;
 	    }
+	    /** Get error message
+	     * @return
+	     */
 	    public String getErrorMessage() {
 	    	return msg;
 	    }
+	    /** Is text field valid
+	     * @return
+	     */
 	    public boolean isValid() {
 	    	setErrorMessage("");
 	    	try {
@@ -118,12 +152,18 @@ public class PTPViewerPreferencesPage extends AbstractPerferencePage {
 	    }
 	}
 	
+	/** Constructor
+	 * 
+	 */
 	public PTPViewerPreferencesPage() {
 		super();
 		setPreferenceStore(PTPUIPlugin.getDefault().getPreferenceStore());
 		setDescription(PreferenceMessages.getString("PTPViewerPreferencePage.desc"));
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.preference.PreferencePage#createContents(org.eclipse.swt.widgets.Composite)
+	 */
 	protected Control createContents(Composite parent) {
 		//getWorkbench().getHelpSystem().setHelp(getControl(), IPDebugHelpContextIds.P_DEBUG_PREFERENCE_PAGE);
 		Composite composite = new Composite(parent, SWT.NULL);
@@ -141,6 +181,9 @@ public class PTPViewerPreferencesPage extends AbstractPerferencePage {
 		setValues();
 		return composite;
 	}
+	/** Create tooltip group composite
+	 * @param parent
+	 */
 	protected void createTooltipGroup(Composite parent) {
 		Composite group = createGroupComposite(parent, 1, false, PreferenceMessages.getString("PTPViewerPreferencesPage.tooltipName"));
 		Composite compTooltip = createComposite(group, 1);
@@ -156,6 +199,9 @@ public class PTPViewerPreferencesPage extends AbstractPerferencePage {
 		toolTipField = new ViewIntFieldEditor(PreferenceMessages.getString("PTPViewerPreferencesPage.tooltip_timeout"), 1000, 10000, createComposite(compTooltip, 3));
 		tooltipIsWrapButton = createCheckButton(compTooltip, PreferenceMessages.getString("PTPViewerPreferencesPage.tooltip_iswrap"));
 	}
+	/** Create icon group composite
+	 * @param parent
+	 */
 	protected void createIconGroup(Composite parent) {
 		Composite group = createGroupComposite(parent, 1, false, PreferenceMessages.getString("PTPViewerPreferencesPage.iconName"));
 		Composite compIcon = createComposite(group, 3);
@@ -166,10 +212,16 @@ public class PTPViewerPreferencesPage extends AbstractPerferencePage {
 		iconWidthField = new ViewIntFieldEditor(PreferenceMessages.getString("PTPViewerPreferencesPage.icon_width"), 12, 100, compIcon);
 		iconHeightField = new ViewIntFieldEditor(PreferenceMessages.getString("PTPViewerPreferencesPage.icon_height"), 12, 100, compIcon);		
 	}
+	/** Create view setting preferences
+	 * @param parent
+	 */
 	protected void createViewSettingPreferences(Composite parent) {
 		createIconGroup(parent);
 		createTooltipGroup(parent);
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.preference.PreferencePage#performDefaults()
+	 */
 	public void performDefaults() { 
 		IPreferenceStore store = getPreferenceStore();
 		iconSpacingXField.setValue(store.getDefaultInt(IPTPUIConstants.VIEW_ICON_SPACING_X));
@@ -181,12 +233,18 @@ public class PTPViewerPreferencesPage extends AbstractPerferencePage {
 		tooltipShowAllTimeButton.setSelection(store.getDefaultBoolean(IPTPUIConstants.VIEW_TOOLTIP_SHOWALLTIME));
 		super.performDefaults();
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.preference.IPreferencePage#performOk()
+	 */
 	public boolean performOk() {
 		storeValues();
 		PTPUIPlugin.getDefault().savePluginPreferences();
 		return true;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.preferences.AbstractPerferencePage#setValues()
+	 */
 	protected void setValues() {
 		IPreferenceStore store = getPreferenceStore();
 		iconSpacingXField.setValue(store.getInt(IPTPUIConstants.VIEW_ICON_SPACING_X));
@@ -197,6 +255,9 @@ public class PTPViewerPreferencesPage extends AbstractPerferencePage {
 		tooltipIsWrapButton.setSelection(store.getBoolean(IPTPUIConstants.VIEW_TOOLTIP_ISWRAP));
 		tooltipShowAllTimeButton.setSelection(store.getBoolean(IPTPUIConstants.VIEW_TOOLTIP_SHOWALLTIME));
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.preferences.AbstractPerferencePage#storeValues()
+	 */
 	protected void storeValues() {
 		IPreferenceStore store = getPreferenceStore();
 		store.setValue(IPTPUIConstants.VIEW_ICON_SPACING_X, iconSpacingXField.getValue());
@@ -208,6 +269,9 @@ public class PTPViewerPreferencesPage extends AbstractPerferencePage {
 		store.setValue(IPTPUIConstants.VIEW_TOOLTIP_SHOWALLTIME, tooltipShowAllTimeButton.getSelection());
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.preference.IPreferencePage#isValid()
+	 */
 	public boolean isValid() {
 		setErrorMessage(null);
 		setMessage(null);

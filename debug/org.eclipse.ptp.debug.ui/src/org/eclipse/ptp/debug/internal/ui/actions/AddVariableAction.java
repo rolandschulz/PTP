@@ -49,16 +49,25 @@ public class AddVariableAction extends Action {
 	protected PTabFolder folder = null;
 	public static final String name = "Add Variable"; 
 
+	/** Constructor
+	 * @param folder
+	 */
 	public AddVariableAction(PTabFolder folder) {
 		super(name, IAction.AS_PUSH_BUTTON);
 		setImageDescriptor(PDebugImage.ID_ICON_ADD_VAR_NORMAL);
 		setToolTipText(name);
 		this.folder = folder;
 	}
+    /** Get shell
+     * @return
+     */
     public Shell getShell() {
         return folder.getViewSite().getShell();
     }
     
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.action.IAction#run()
+	 */
 	public void run() {
 		final IStackFrame[] stackFrame = new IStackFrame[1];
 		getShell().getDisplay().syncExec(new Runnable() {
@@ -77,6 +86,10 @@ public class AddVariableAction extends Action {
 		}
 	}
 	
+	/** Get stack frame
+	 * @return
+	 * @throws CoreException
+	 */
 	protected IStackFrame getStackFrame() throws CoreException {
 		IWorkbenchWindow activeWindow = PTPDebugUIPlugin.getActiveWorkbenchWindow();
 		if (activeWindow == null)
@@ -102,6 +115,10 @@ public class AddVariableAction extends Action {
 		throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IPTPUIConstants.INTERNAL_ERROR, "No stack frame found", null));
 	}
 	
+	/** Open array variable dialog
+	 * @param frame
+	 * @throws DebugException
+	 */
 	protected void openDialog(IStackFrame frame) throws DebugException {
 		if (frame != null) {
 			ArrayVariableDialog dialog = new ArrayVariableDialog(getShell(), frame);

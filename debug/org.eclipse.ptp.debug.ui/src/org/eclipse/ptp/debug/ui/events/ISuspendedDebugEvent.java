@@ -21,6 +21,4 @@ package org.eclipse.ptp.debug.ui.events;
  * @author Clement chu
  *
  */
-public interface ISuspendedDebugEvent  extends IDebugActionEvent {
-
-}
+public interface ISuspendedDebugEvent  extends IDebugActionEvent {}

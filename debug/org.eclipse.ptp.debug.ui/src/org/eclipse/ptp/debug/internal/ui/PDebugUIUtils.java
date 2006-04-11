@@ -32,6 +32,11 @@ import org.eclipse.ptp.debug.core.model.IPStackFrame;
  * 
  */
 public class PDebugUIUtils {
+	/** Find region by given offset in given document
+	 * @param document
+	 * @param offset
+	 * @return
+	 */
 	static public IRegion findWord(IDocument document, int offset) {
 		int start = -1;
 		int end = -1;
@@ -70,11 +75,18 @@ public class PDebugUIUtils {
 		return null;
 	}
 
+	/** Get current stack frame
+	 * @return
+	 */
 	static public IPStackFrame getCurrentStackFrame() {
 		IAdaptable context = DebugUITools.getDebugContext();
 		return ( context != null ) ? (IPStackFrame)context.getAdapter( IPStackFrame.class ) : null;
 	}
 	
+	/** Show tasks with standard format
+	 * @param array
+	 * @return
+	 */
 	static public String arrayToString(int[] array) {
 		if (array.length == 0) {
 			return "";
@@ -102,6 +114,10 @@ public class PDebugUIUtils {
 		return msg;
 	}
 	
+	/** Show tasks with standard format
+	 * @param tasks
+	 * @return
+	 */
 	static public String showBitList(BitList tasks) {
 		if (tasks == null) {
 			return "";

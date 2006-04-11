@@ -37,41 +37,75 @@ import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 public class AnnotationGroup {
 	private List annotationList = Collections.synchronizedList(new ArrayList());
 
+	/** Check the annotation whether it contains in the list
+	 * @param annotation
+	 * @return true if contains
+	 */
 	public boolean contains(Annotation annotation) {
 		return annotationList.contains(annotation);
 	}
+	/** Add a new annotation to the list
+	 * @param annotation
+	 */
 	public void addAnnotation(PInstructionPointerAnnotation annotation) {
 		if (!contains(annotation))
 			annotationList.add(annotation);
 	}
+	/** Remove annotations from the list
+	 * @param removedAnnotations list of annotations
+	 */
 	public void removeAnnotations(Collection removedAnnotations) {
 		annotationList.removeAll(removedAnnotations);
 	}
+	/** Remove annotation from the list
+	 * @param annotation
+	 */
 	public void removeAnnotation(PInstructionPointerAnnotation annotation) {
 		if (contains(annotation))
 			annotationList.remove(annotation);
 	}
+	/** Remove all annotations
+	 * 
+	 */
 	public void removeAnnotations() {
 		removeAllMarkers();
 		annotationList.clear();
 	}
+	/** Total annotations
+	 * @return total annotations
+	 */
 	public int size() {
 		return annotationList.size();
 	}
+	/** Get iterator of annotations
+	 * @return
+	 */
 	public Iterator getAnnotationIterator() {
 		return annotationList.iterator();
 	}
+	/** Is annotation list empty
+	 * @return true if there is no annotation stored
+	 */
 	public boolean isEmpty() {
 		return annotationList.isEmpty();
 	}
+	/** Clean the list
+	 * 
+	 */
 	public void clear() {
 		annotationList.clear();
 	}
+	/** Remove all annotation markers
+	 * 
+	 */
 	public void removeAllMarkers() {
 		for (Iterator i = annotationList.iterator(); i.hasNext();) {
 			((PInstructionPointerAnnotation) i.next()).deleteMarker();
 		}
 	}
+	/** Retrieve all markers
+	 * 
+	 */
 	public void retrieveAllMarkers() {
 		for (Iterator i = annotationList.iterator(); i.hasNext();) {
 			PInstructionPointerAnnotation annotation = (PInstructionPointerAnnotation) i.next();
@@ -88,6 +122,12 @@ public class AnnotationGroup {
 			}
 		}
 	}
+	/** Create a marker
+	 * @param resource file of marker
+	 * @param type type of marker
+	 * @return
+	 * @throws CoreException
+	 */
 	public IMarker createMarker(IResource resource, String type) throws CoreException {
 		return resource.createMarker(type);
 	}
