@@ -1011,7 +1011,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	 */
 	private void updateDebugVariables(IPJob job) {
 		if (variableManager.hasVariable(job)) {
-			PTPDebugUIPlugin.getDisplay().asyncExec(new Runnable() {
+			PTPDebugUIPlugin.getDisplay().syncExec(new Runnable() {
 				public void run() {
 					UpdateVariablesActionDelegate.doAction(null);
 				}
