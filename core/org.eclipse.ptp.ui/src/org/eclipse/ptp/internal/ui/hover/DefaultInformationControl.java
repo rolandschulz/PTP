@@ -86,7 +86,7 @@ public class DefaultInformationControl implements IIconInformationControl, Dispo
 	 * @param style
 	 */
 	public DefaultInformationControl(Shell parent, boolean showDetails, int style) {
-		this(parent, SWT.TOOL | SWT.NO_TRIM, showDetails, style, new IconHoverPresenter(false));
+		this(parent, SWT.TOOL | SWT.NO_TRIM, showDetails, style, new IconHoverPresenter(false), false);
 	}
 	/** Constructor
 	 * @param parent
@@ -99,8 +99,8 @@ public class DefaultInformationControl implements IIconInformationControl, Dispo
 	 * @param style
 	 * @param presenter
 	 */
-	public DefaultInformationControl(Shell parent, int style, IInformationPresenter presenter) {
-		this(parent, SWT.TOOL | SWT.NO_TRIM, true, style, presenter);
+	public DefaultInformationControl(Shell parent, int style, IInformationPresenter presenter, boolean enableKey) {
+		this(parent, SWT.TOOL | SWT.NO_TRIM, true, style, presenter, enableKey);
 	}
 	
 	/** Constructor
@@ -110,7 +110,7 @@ public class DefaultInformationControl implements IIconInformationControl, Dispo
 	 * @param style
 	 * @param presenter
 	 */
-	public DefaultInformationControl(Shell parent, int shellStyle, boolean showDetails, int style, IInformationPresenter presenter) {
+	public DefaultInformationControl(Shell parent, int shellStyle, boolean showDetails, int style, IInformationPresenter presenter, boolean enableKey) {
 		this.showDetails = showDetails;
 		GridLayout layout;
 		GridData gd;
@@ -158,9 +158,11 @@ public class DefaultInformationControl implements IIconInformationControl, Dispo
 		createHeadLabel(headerField);
 		
 		if (showDetails) {
-			Label labelField = new Label(hdComposite, SWT.RIGHT);
-			labelField.setText("Press ESC to close");
-			createHeadLabel(labelField);
+			if (enableKey) {
+				Label labelField = new Label(hdComposite, SWT.RIGHT);
+				labelField.setText("Press ESC to close");
+				createHeadLabel(labelField);
+			}
 			
 			// Horizontal separator line
 			Label separator= new Label(composite, SWT.SEPARATOR | SWT.HORIZONTAL | SWT.LINE_DOT);
@@ -178,20 +180,22 @@ public class DefaultInformationControl implements IIconInformationControl, Dispo
 			fText.setLayoutData(gd);
 			fText.setForeground(composite.getForeground());
 			fText.setBackground(composite.getBackground());
-			fText.addKeyListener(new KeyListener() {
-				public void keyPressed(KeyEvent e) {
-					if (e.character == 0x1B) {// ESC
-						close();
-					}
-				}
-				public void keyReleased(KeyEvent e) {}
-			});
 			fText.addFocusListener(new FocusListener() {
 				public void focusGained(FocusEvent e) {}
 				public void focusLost(FocusEvent e) {
 					close();
 				}
 			});
+			if (enableKey) {
+				fText.addKeyListener(new KeyListener() {
+					public void keyPressed(KeyEvent e) {
+						if (e.character == 0x1B) {// ESC
+							close();
+						}
+					}
+					public void keyReleased(KeyEvent e) {}
+				});
+			}
 			fPresenter= presenter;
 		}
 		addDisposeListener(this);
@@ -345,7 +349,7 @@ public class DefaultInformationControl implements IIconInformationControl, Dispo
 	 */
 	public void setFocus() {
 		if (showDetails) {
-			fShell.forceFocus();
+			//fShell.forceFocus();
 			if (fText != null) {
 				fText.setFocus();
 			}

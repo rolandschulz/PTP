@@ -2023,7 +2023,7 @@ public class IconCanvas extends Canvas {
 			Point real_location = getViewActualLocation(this, null, display_x, display_y);
 			informationControl.setLocation(real_location);
 			informationControl.setVisible(true);
-			informationControl.setFocus();
+			//informationControl.setFocus();
 		}
 	}
 	/** Get actual view location 
