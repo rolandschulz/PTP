@@ -5,6 +5,7 @@ import java.util.Collection;
 
 import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.core.dom.ast.ASTCompletionNode;
+import org.eclipse.cdt.core.dom.ast.IASTName;
 import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit;
 import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.cdt.core.model.IContributedModelBuilder;
@@ -104,4 +105,21 @@ public class FortranLanguage extends PlatformObject implements ILanguage
 		
 		return null;
 	}
+	
+	/**
+	 * Gather the list of IASTNames that appear the selection with the given start offset
+	 * and length in the given ITranslationUnit.
+	 * 
+	 * @param tu
+	 * @param start
+	 * @param length
+	 * @param style
+	 * @return
+	 */
+	public IASTName[] getSelectedNames(IASTTranslationUnit ast, int start, int length)
+	{
+		// TODO This needs to be implemented.  I just added an empty stub to satisfy the interface (C.E.Rasmussen)
+		return new IASTName[0];
+	}
+
 }
