@@ -21,6 +21,7 @@ import org.eclipse.cdt.core.dom.ast.IProblemBinding;
 import org.eclipse.cdt.core.dom.ast.IScope;
 import org.eclipse.cdt.core.dom.ast.IVariable;
 import org.eclipse.cdt.core.dom.ast.c.ICASTElaboratedTypeSpecifier;
+import org.eclipse.cdt.core.model.ILanguage;
 import org.eclipse.cdt.internal.core.pdom.PDOM;
 import org.eclipse.cdt.internal.core.pdom.dom.PDOMBinding;
 import org.eclipse.cdt.internal.core.pdom.dom.PDOMLinkage;
@@ -183,6 +184,15 @@ public class PDOMFortranLinkage extends PDOMLinkage
 
         return null;
     }
+    
+    /* (non-Javadoc)
+     * @see org.eclipse.cdt.internal.core.pdom.dom.PDOMLinkage#getLanguage()
+     */
+	public ILanguage getLanguage()
+	{
+		// TODO This needs to be implemented.  I just added an empty stub to satisfy the interface (C.E.Rasmussen)
+		return null;
+	}
 
     public PDOMBinding resolveBinding(IASTName name) throws CoreException {
         IASTNode parent = name.getParent();
