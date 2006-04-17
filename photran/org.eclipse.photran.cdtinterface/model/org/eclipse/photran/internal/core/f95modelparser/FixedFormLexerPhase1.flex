@@ -34,7 +34,8 @@ import java.util.LinkedList;
 %line
 %column
 %ignorecase
-%8bit 
+//%8bit
+%unicode 
 %implements ILexer
 %type Token
 

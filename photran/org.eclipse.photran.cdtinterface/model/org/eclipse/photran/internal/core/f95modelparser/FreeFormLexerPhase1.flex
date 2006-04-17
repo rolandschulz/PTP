@@ -26,6 +26,7 @@ import java.util.LinkedList;
 %char
 %line
 %column
+%unicode
 %implements ILexer
 %ignorecase
 %type Token
