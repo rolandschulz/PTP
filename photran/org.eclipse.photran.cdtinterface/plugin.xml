@@ -93,30 +93,6 @@
          </description>
       </wizard>
       <wizard
-            name="Standard Make Fortran Project"
-            icon="icons/etool16/newfortran_app.gif"
-            category="org.eclipse.cdt.ui.newCWizards"
-            class="org.eclipse.photran.cdtinterface.ui.NewMakeFortranProjectWizard"
-            project="true"
-            finalPerspective="org.eclipse.photran.ui.FortranPerspective"
-            id="org.eclipse.photran.ui.wizards.NewMakeFortranProjectWizard_cdtmenu">
-         <description>
-             Create a new Fortran project.  You must supply your own makefile.
-         </description>
-      </wizard>
-      <wizard
-            name="Managed Make Fortran Project"
-            icon="icons/etool16/newfortran_app.gif"
-            category="org.eclipse.cdt.ui.newCWizards"
-            class="org.eclipse.photran.cdtinterface.ui.NewManagedFortranProjectWizard"
-            project="true"
-            finalPerspective="org.eclipse.photran.ui.FortranPerspective"
-            id="org.eclipse.photran.ui.wizards.NewManagedFortranProjectWizard_cdtmenu">
-         <description>
-            Create a new Fortran project and let Eclipse create and manage the makefile.
-         </description>
-      </wizard>
-      <wizard
             name="Managed Make Fortran Project"
             icon="icons/etool16/newfortran_app.gif"
             category="org.eclipse.photran.ui.newFortranWizards"
