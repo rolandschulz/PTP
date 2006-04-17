@@ -100,11 +100,11 @@ public class FortranFreeFormHorizontalRuler extends AbstractHorizontalRuler {
 		g.drawString(fDisplayText, 0 - rem + verticalRulerWidth, 0, true);
 
 		//Draw the rectangular pointer
-		g.setBackground(fBlackColor);
+		g.setBackground(fGrayColor);
 		g.fillRectangle(x + verticalRulerWidth, 0, g.getFontMetrics()
 				.getAverageCharWidth(), height);
 
-		g.setForeground(fWhiteColor);
+		g.setForeground(fBlackColor);
 
 		char c = 0;
 

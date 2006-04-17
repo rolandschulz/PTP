@@ -86,9 +86,13 @@ public abstract class AbstractHorizontalRuler extends Composite {
 
 	protected static RGB BLACK = new RGB(0, 0, 0);
 
+	protected static RGB GRAY = new RGB(190, 190, 190);
+	
 	protected static Color fWhiteColor = new Color(null, WHITE);
 	
 	protected static Color fBlackColor = new Color(null, BLACK);
+	
+	protected static Color fGrayColor = new Color(null, GRAY);
 
 	protected ISelectionChangedListener fSelectionChangedListener;
 
