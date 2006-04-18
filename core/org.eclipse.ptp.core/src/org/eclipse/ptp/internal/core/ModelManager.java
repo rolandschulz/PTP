@@ -135,6 +135,13 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 	
 	public int getMonitoringSystemID() { return currentMonitoringSystem; }
 	
+	public void fatalError(int errorCode, String errorMsg)
+	{
+		PTPCorePlugin.errorDialog("Fatal PTP Error",
+			"There was a fatal PTP error (ERROR CODE: "+errorCode+").\n"+
+			"Error message: \""+errorMsg+"\"\n\nPlugin unstable, exit required.", null);
+		System.exit(1);
+	}
 	
 	public void refreshRuntimeSystems(IProgressMonitor monitor, boolean force) throws CoreException {
 		Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
@@ -203,8 +210,8 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 						throw new CoreException(Status.CANCEL_STATUS);
 					}
 					//PTPCorePlugin.errorDialog("Failed to start OMPI proxy runtime",
-					//	"There was an error starting the OMPI proxy runtime.  The path to 'orte_server' or 'orted' "+
-					//	"may have been incorrect.  The 'orted' binary MUST be in your PATH to be found by 'orte_server'.  "+
+					//	"There was an error starting the OMPI proxy runtime.  The path to 'ptp_orte_proxy' or 'orted' "+
+					//	"may have been incorrect.  The 'orted' binary MUST be in your PATH to be found by 'ptp_orte_proxy'.  "+
 					//	"Try checking the console log or error logs for more detailed information.\n\nDefaulting to "+
 					//	"Simulation mode.  To change this, use the PTP preferences page.", null);
 					
@@ -221,8 +228,8 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 					}
 					*/
 					throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, 
-							"There was an error starting the OMPI proxy runtime.  The path to 'orte_server' or 'orted' "+
-							"may have been incorrect.  The 'orted' binary MUST be in your PATH to be found by 'orte_server'.  "+
+							"There was an error starting the OMPI proxy runtime.  The path to 'ptp_orte_proxy' or 'orted' "+
+							"may have been incorrect.  The 'orted' binary MUST be in your PATH to be found by 'ptp_orte_proxy'.  "+
 							"Try checking the console log or error logs for more detailed information.",
 							null));
 				}
