@@ -93,15 +93,15 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
 		System.out.println("OMPIProxyRuntimeClient - firing up proxy, waiting for connecting.  Please wait!  This can take a minute . . .");
 		
 		Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
-		String proxyPath = preferences.getString(PreferenceConstants.ORTE_SERVER_PATH);
+		String proxyPath = preferences.getString(PreferenceConstants.ORTE_PROXY_PATH);
 		System.out.println("ORTE_SERVER path = '"+proxyPath+"'");
 		
-		/* if they don't have the orte_server path set, let's try and give them a default that might help */
+		/* if they don't have the ptp_orte_proxy path set, let's try and give them a default that might help */
 		if(proxyPath.equals("")) {
-			proxyPath = PTPCorePlugin.getDefault().locateFragmentFile("org.eclipse.ptp.orte", "orte_server");
-			if(proxyPath != null) preferences.setValue(PreferenceConstants.ORTE_SERVER_PATH, proxyPath);
+			proxyPath = PTPCorePlugin.getDefault().locateFragmentFile("org.eclipse.ptp.orte", "ptp_orte_proxy");
+			if(proxyPath != null) preferences.setValue(PreferenceConstants.ORTE_PROXY_PATH, proxyPath);
 			else {
-				String err = "Could not find the ORTE server ('orte_server' binary).  "+
+				String err = "Could not find the ORTE server ('ptp_orte_proxy' binary).  "+
 					"File not found in the fragment directory or developer directories.  "+
 					"Defaulting to Simulation Mode.";
 				System.err.println(err);
@@ -119,12 +119,12 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
 			}
         }
 
-		final String proxyPath2 = preferences.getString(PreferenceConstants.ORTE_SERVER_PATH);
+		final String proxyPath2 = preferences.getString(PreferenceConstants.ORTE_PROXY_PATH);
 		try {
 			setWaitEvent(IProxyRuntimeEvent.EVENT_RUNTIME_CONNECTED);
 			sessionCreate();
 			if (preferences.getBoolean(PreferenceConstants.ORTE_LAUNCH_MANUALLY)) {
-				monitor.subTask("Waiting for manual lauch of orte_server on port "+getSessionPort()+"...");
+				monitor.subTask("Waiting for manual lauch of ptp_orte_proxy on port "+getSessionPort()+"...");
 			} else {
 				Thread runThread = new Thread("Proxy Server Thread") {
 					public void run() {
@@ -141,7 +141,7 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
 									try {
 										String output;
 										while ((output = out_reader.readLine()) != null) {
-											System.out.println("++++++++++ orte_server: " + output);
+											System.out.println("++++++++++ ptp_orte_proxy: " + output);
 										}
 									} catch (IOException e) {
 										e.printStackTrace();
@@ -251,6 +251,11 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
 			System.out.println("OMPIProxyRuntimeClient notifying...");
 			this.events.addItem(e);
 			notifyAll();
+		}
+		
+		if(e instanceof ProxyRuntimeErrorEvent) {
+			System.err.println("Fatal error from proxy: '"+((ProxyRuntimeErrorEvent)e).getErrorMessage()+"'");
+			PTPCorePlugin.getDefault().getModelManager().fatalError(((ProxyRuntimeErrorEvent)e).getErrorCode(), ((ProxyRuntimeErrorEvent)e).getErrorMessage());
 		}
     }
 

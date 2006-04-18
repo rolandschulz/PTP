@@ -4,8 +4,8 @@ export ARCH=`uname -p | sed -e 's/powerpc/ppc/' -e 's/ppc64/ppc/' -e 's/i.86/x86
 export OS=`uname -s | sed -e 's/Darwin/macosx/' -e 's/Linux/linux/'`
 export INSTALL_DIR=../org.eclipse.ptp.orte.$OS.$ARCH/bin
 
-echo "Copying orte_server to $INSTALL_DIR . . ."
-cp orte_server $INSTALL_DIR
-chmod 755 $INSTALL_DIR/orte_server
+echo "Copying ptp_orte_proxy to $INSTALL_DIR . . ."
+cp ptp_orte_proxy $INSTALL_DIR
+chmod 755 $INSTALL_DIR/ptp_orte_proxy
 
 exit 0

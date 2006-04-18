@@ -59,4 +59,5 @@ public interface IModelManager {
 	public IPJob run(ILaunch launch, JobRunConfiguration jobRunConfig, IProgressMonitor pm) throws CoreException;
 	public void setPTPConfiguration(ILaunchConfiguration config);
 	public ILaunchConfiguration getPTPConfiguration();
+	public void fatalError(int errorCode, String errorMsg);
 }

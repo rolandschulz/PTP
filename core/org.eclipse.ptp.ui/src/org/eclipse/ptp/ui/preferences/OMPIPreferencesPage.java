@@ -151,10 +151,10 @@ public class OMPIPreferencesPage extends PreferencePage implements IWorkbenchPre
 	{
 		Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
 		
-		orteServerFile = preferences.getString(PreferenceConstants.ORTE_SERVER_PATH);
-		/* if they don't have the orte_server path set, let's try and give them a default that might help */
+		orteServerFile = preferences.getString(PreferenceConstants.ORTE_PROXY_PATH);
+		/* if they don't have the ptp_orte_proxy path set, let's try and give them a default that might help */
 		if(orteServerFile.equals("")) {
-			orteServerFile = PTPCorePlugin.getDefault().locateFragmentFile("org.eclipse.ptp.orte", "orte_server");
+			orteServerFile = PTPCorePlugin.getDefault().locateFragmentFile("org.eclipse.ptp.orte", "ptp_orte_proxy");
         }
 		
 		orteServerText.setText(orteServerFile);
@@ -187,7 +187,7 @@ public class OMPIPreferencesPage extends PreferencePage implements IWorkbenchPre
 		Preferences preferences = PTPCorePlugin.getDefault()
 				.getPluginPreferences();
 
-		preferences.setValue(PreferenceConstants.ORTE_SERVER_PATH, orteServerFile);
+		preferences.setValue(PreferenceConstants.ORTE_PROXY_PATH, orteServerFile);
 		preferences.setValue(PreferenceConstants.ORTE_LAUNCH_MANUALLY, fManualButton.getSelection());
 
 		PTPCorePlugin.getDefault().savePluginPreferences();

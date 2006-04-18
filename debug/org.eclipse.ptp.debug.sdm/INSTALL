@@ -5,7 +5,7 @@ export ARCH=`uname -p | sed -e 's/powerpc/ppc/' -e 's/ppc64/ppc/' -e 's/i.86/x86
 export OS=`uname -s | sed -e 's/Darwin/macosx/' -e 's/Linux/linux/'`
 export INSTALL_DIR=../org.eclipse.ptp.debug.sdm.$RUNTIME.$OS.$ARCH/bin
 
-echo "Copying orte_server to $INSTALL_DIR . . ."
+echo "Copying sdm to $INSTALL_DIR . . ."
 cp sdm $INSTALL_DIR/sdm
 chmod 755 $INSTALL_DIR/sdm
 

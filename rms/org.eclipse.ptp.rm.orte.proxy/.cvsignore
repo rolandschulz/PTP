@@ -1,4 +1,5 @@
 orte_server
+ptp_orte_proxy
 .deps
 stamp-h1
 libtool
