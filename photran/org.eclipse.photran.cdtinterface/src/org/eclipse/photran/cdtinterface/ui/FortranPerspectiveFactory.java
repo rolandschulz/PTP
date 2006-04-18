@@ -71,27 +71,28 @@ public class FortranPerspectiveFactory implements IPerspectiveFactory
 		layout.addShowInPart(CUIPlugin.CVIEW_ID);
 		layout.addShowInPart(IPageLayout.ID_RES_NAV);
 		
-		addCWizardShortcuts(layout);
+		addFortranWizardShortcuts(layout);
 	}
 	
-	private void addCWizardShortcuts(IPageLayout layout) {
-		// new actions - C project creation wizard
-		String[] wizIDs = CWizardRegistry.getProjectWizardIDs();
+	private void addFortranWizardShortcuts(IPageLayout layout) {
+		// new actions - Fortran project creation wizard
+		String[] wizIDs = FortranWizardRegistry.getProjectWizardIDs();
 		for (int i = 0; i < wizIDs.length; ++i) {
 			layout.addNewWizardShortcut(wizIDs[i]);
 		}
-		// new actions - C folder creation wizard
-		wizIDs = CWizardRegistry.getFolderWizardIDs();
+		
+		// new actions - Fortran folder creation wizard
+		wizIDs = FortranWizardRegistry.getFolderWizardIDs();
 		for (int i = 0; i < wizIDs.length; ++i) {
 			layout.addNewWizardShortcut(wizIDs[i]);
 		}
-		// new actions - C file creation wizard
-		wizIDs = CWizardRegistry.getFileWizardIDs();
+		// new actions - Fortran file creation wizard
+		wizIDs = FortranWizardRegistry.getFileWizardIDs();
 		for (int i = 0; i < wizIDs.length; ++i) {
 			layout.addNewWizardShortcut(wizIDs[i]);
 		}
-		// new actions - C type creation wizard
-		wizIDs = CWizardRegistry.getTypeWizardIDs();
+		// new actions - Fortran type creation wizard
+		wizIDs = FortranWizardRegistry.getTypeWizardIDs();
 		for (int i = 0; i < wizIDs.length; ++i) {
 			layout.addNewWizardShortcut(wizIDs[i]);
 		}
