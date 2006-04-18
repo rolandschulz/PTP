@@ -36,7 +36,11 @@ public interface PreferenceConstants {
 	public String DEF_OUTPUT_DIR_NAME = "output";
 	public static final String ORTE_ORTED_PATH = "ORTE_ORTED_PATH";
 	public static final String ORTE_ORTED_ARGS = "ORTE_ORTED_ARGS";
-	public static final String ORTE_SERVER_PATH = "ORTE_SERVER_PATH";
+	/* we renamed the orte_server to ptp_orte_proxy and this old configuration entry was
+	 * screwing things up
+	 */
+	//public static final String ORTE_SERVER_PATH = "ORTE_SERVER_PATH";
+	public static final String ORTE_PROXY_PATH = "ORTE_PROXY_PATH";
 	public static final String ORTE_LAUNCH_MANUALLY = "ORTE_LAUNCH_MANUALLY";
 	public static final String SIMULATION_MACHINE_NODE_PREFIX = "SIMULATION_MACHINE_NODE_";
 	public static final String SIMULATION_NUM_MACHINES = "SIMULATION_NUM_MACHINES";

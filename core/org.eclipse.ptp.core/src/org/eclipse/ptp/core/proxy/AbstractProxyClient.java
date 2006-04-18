@@ -179,10 +179,12 @@ public abstract class AbstractProxyClient {
 					startEventThread();
 				} catch (IOException e) {
 					// TODO: what happens if the accept() fails?
+					System.out.println("accept failed... :(");
 				}
 				try {
 					sessSvrSock.close();
 				} catch (IOException e) {
+					System.out.println("accept thread IO Exception");
 				}
 				System.out.println("accept thread exiting...");
 			}
@@ -208,11 +210,13 @@ public abstract class AbstractProxyClient {
 						sessionProgress();
 					}
 				} catch (IOException e) {
+					System.out.println("event thread IOException . . .");
 				} 
 				sessConnected = false;
 				try {
 					sessSock.close();
 				} catch (IOException e) {
+					System.out.println("event thread IOException . . .");
 				} 
 				System.out.println("event thread exiting...");
 			}
