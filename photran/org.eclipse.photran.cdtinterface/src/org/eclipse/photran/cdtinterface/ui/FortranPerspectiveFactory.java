@@ -30,6 +30,9 @@ import org.eclipse.ui.console.IConsoleConstants;
  * of to let the CDT add the C/C++ Projects View (super.createInitialLayout())
  * and then remove it in our own implementation.
  * 
+ * Other files that are copied from CDT are starting to create in to add
+ * Fortran branding (CER)
+ * 
  * @author joverbey
  */
 public class FortranPerspectiveFactory implements IPerspectiveFactory
@@ -50,8 +53,8 @@ public class FortranPerspectiveFactory implements IPerspectiveFactory
 		IFolderLayout folder3= layout.createFolder("topRight", IPageLayout.RIGHT,(float)0.75, editorArea); //$NON-NLS-1$
 		folder3.addView(IPageLayout.ID_OUTLINE);
 
-		layout.addActionSet(CUIPlugin.SEARCH_ACTION_SET_ID);
-		layout.addActionSet(CUIPlugin.ID_CELEMENT_CREATION_ACTION_SET);
+		layout.addActionSet(CUIPlugin.SEARCH_ACTION_SET_ID);	// This is the "Open Type" search toolbar action
+		layout.addActionSet("org.eclipse.photran.cdtinterface.FortranElementCreationActionSet");
 		layout.addActionSet(IPageLayout.ID_NAVIGATE_ACTION_SET);
 		
 		// views - build console

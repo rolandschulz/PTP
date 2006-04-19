@@ -107,7 +107,7 @@
  
       <!-- New File Wizards -->
       <wizard
-            name="New Source File"
+            name="Source File"
             icon="icons/etool16/newfortranfile_wiz.gif"
             category="org.eclipse.photran.ui.newFortranWizards"
             finalPerspective="org.eclipse.photran.ui.FortranPerspective"
@@ -158,5 +158,38 @@
             Create a new folder (not necessarily containing source code)
          </description>
       </wizard>
+   </extension>
+   <extension
+         point="org.eclipse.ui.actionSets">
+      <actionSet
+            description="Fortran Element Creation Action Set"
+            id="org.eclipse.photran.cdtinterface.FortranElementCreationActionSet"
+            label="Fortran Element Creation"
+            visible="false">
+         <action
+               class="org.eclipse.photran.cdtinterface.ui.NewFileDropDownAction"
+               icon="icons/etool16/newfortranfile_wiz.gif"
+               id="org.eclipse.photran.cdtinterface.actions.NewFileDropDown"
+               label="&amp;Source File..."
+               style="pulldown"
+               toolbarPath="Normal/FortranWizards"
+               tooltip="New Source File"/>
+         <action
+               class="org.eclipse.photran.cdtinterface.ui.NewFolderDropDownAction"
+               icon="icons/etool16/newsrcfldr_wiz.gif"
+               id="org.eclipse.photran.cdtinterface.actions.NewFolderDropDown"
+               label="&amp;Source Folder..."
+               style="pulldown"
+               toolbarPath="Normal/FortranWizards"
+               tooltip="New Source Folder"/>
+         <action
+               class="org.eclipse.photran.cdtinterface.ui.NewProjectDropDownAction"
+               icon="icons/etool16/newfortran_app.gif"
+               id="org.eclipse.photran.cdtinterface.actions.NewProjectDropDown"
+               label="&amp;Project..."
+               style="pulldown"
+               toolbarPath="Normal/FortranWizards"
+               tooltip="New Compiled Language Project"/>
+      </actionSet>
    </extension>
 </plugin>
