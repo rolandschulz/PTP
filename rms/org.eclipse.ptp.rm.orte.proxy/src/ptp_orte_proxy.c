@@ -98,6 +98,9 @@
 #define RTEV_ERROR_INT			RTEV_OFFSET + 1010
 #define RTEV_ERROR_ILL			RTEV_OFFSET + 1011
 #define RTEV_ERROR_SEGV			RTEV_OFFSET + 1012
+#define RTEV_ERROR_TERM			RTEV_OFFSET + 1013
+#define RTEV_ERROR_QUIT			RTEV_OFFSET + 1014
+#define RTEV_ERROR_ABRT			RTEV_OFFSET + 1015
 
 #define JOB_STATE_NEW				5000
 
@@ -2109,6 +2112,39 @@ void signal_segv_proc()
 		exit(1);
 }
 
+void signal_term_proc()
+{
+		printf("###### SIGNAL: TERM\n"); fflush(stdout);
+		printf("###### Shuttig down ORTEd\n"); fflush(stdout);
+		ORTEShutdown();
+		proxy_svr_event_callback(orte_proxy, ORTEErrorStr(RTEV_ERROR_TERM, 
+		  "ptp_orte_proxy received signal TERM (Termination).  Exit was required and performed cleanly."));
+		proxy_svr_finish(orte_proxy);
+		exit(1);
+}
+
+void signal_quit_proc()
+{
+		printf("###### SIGNAL: QUIT\n"); fflush(stdout);
+		printf("###### Shuttig down ORTEd\n"); fflush(stdout);
+		ORTEShutdown();
+		proxy_svr_event_callback(orte_proxy, ORTEErrorStr(RTEV_ERROR_QUIT, 
+		  "ptp_orte_proxy received signal QUIT (Quit).  Exit was required and performed cleanly."));
+		proxy_svr_finish(orte_proxy);
+		exit(1);
+}
+
+void signal_abrt_proc()
+{
+		printf("###### SIGNAL: ABRT\n"); fflush(stdout);
+		printf("###### Shuttig down ORTEd\n"); fflush(stdout);
+		ORTEShutdown();
+		proxy_svr_event_callback(orte_proxy, ORTEErrorStr(RTEV_ERROR_ABRT, 
+		  "ptp_orte_proxy received signal ABRT (Process Aborted).  Exit was required and performed cleanly."));
+		proxy_svr_finish(orte_proxy);
+		exit(1);
+}
+
 int
 main(int argc, char *argv[])
 {
@@ -2143,6 +2179,9 @@ main(int argc, char *argv[])
 	signal(SIGHUP, signal_hup_proc);
 	signal(SIGILL, signal_ill_proc);
 	signal(SIGSEGV, signal_segv_proc);
+	signal(SIGTERM, signal_term_proc);
+	signal(SIGQUIT, signal_quit_proc);
+	signal(SIGABRT, signal_abrt_proc);
 	
 	server(proxy_str, host, port);
 	
