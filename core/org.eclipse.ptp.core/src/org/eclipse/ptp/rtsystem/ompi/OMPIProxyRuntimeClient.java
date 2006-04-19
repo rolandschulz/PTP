@@ -199,7 +199,6 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
 			waitForRuntimeEvent();
 			System.out.println("OMPIProxyRuntimeClient shut down.");
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			PTPCorePlugin.log(e);
 		}
 	}	
@@ -218,13 +217,14 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
 		
 		System.out.println("OMPIProxyRuntimeClient waiting on " + waitEvents.toString());
 		while (this.events.isEmpty()) {
-    		try {
-    			wait(500);
-    		} catch (InterruptedException e) {
-    		}
-    		if (monitor != null && monitor.isCanceled()) {
-    			throw new IOException("Cancelled by user");
-    		}
+    			try {
+    				wait(500);
+    			} catch (InterruptedException e) {
+    				System.err.println("Interrupted exception.");
+    			}
+    			if (monitor != null && monitor.isCanceled()) {
+    				throw new IOException("Cancelled by user");
+    			}
 		}
 		System.out.println("OMPIProxyRuntimeClient awoke!");
 		try {
@@ -251,11 +251,6 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
 			System.out.println("OMPIProxyRuntimeClient notifying...");
 			this.events.addItem(e);
 			notifyAll();
-		}
-		
-		if(e instanceof ProxyRuntimeErrorEvent) {
-			System.err.println("Fatal error from proxy: '"+((ProxyRuntimeErrorEvent)e).getErrorMessage()+"'");
-			PTPCorePlugin.getDefault().getModelManager().fatalError(((ProxyRuntimeErrorEvent)e).getErrorCode(), ((ProxyRuntimeErrorEvent)e).getErrorMessage());
 		}
     }
 

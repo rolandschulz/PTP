@@ -24,96 +24,53 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
+
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
+import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.rtsystem.IControlSystem;
 import org.eclipse.ptp.rtsystem.IRuntimeListener;
 import org.eclipse.ptp.rtsystem.JobRunConfiguration;
 import org.eclipse.ptp.rtsystem.RuntimeEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener;
+import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeErrorEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeJobStateEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeProcessOutputEvent;
 
 
 public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventListener {
-	private Process orted_process = null;
 	private Vector knownJobs = null;
 	
 	protected List listeners = new ArrayList(2);
 	
 	private OMPIProxyRuntimeClient proxy = null;
+	private boolean proxyDead = true;
 
 	public OMPIControlSystem(OMPIProxyRuntimeClient proxy) {
 		this.proxy = proxy;
+		if(proxy != null) proxyDead = false;
 	}
 	
-	private boolean failed_init = false;
+	public boolean isHealthy() { return !proxyDead; }
 	
 	public void startup() {
 		knownJobs = new Vector();
 		
-		/* start the daemon using JNI */
-		//jniBroker.OMPIStartDaemon(ompi_bin_path, orted_path, split_path[split_path.length - 1], split_args);
-		
-		/* start the daemon using Java */
-		//OMPIStartORTEd(orted_full);
-		
 		proxy.addRuntimeEventListener(this);
-		
-		/*
-		int rc = jniBroker.OMPIInit();
-		System.out.println("OMPI Init() return code = "+rc);
-		if(rc != 0) {
-			String error_msg = jniBroker.OMPIGetError();
-			CoreUtils.showErrorDialog("OMPI Runtime Initialization Error", error_msg, null);
-			failed_init = true;
-			return;
-		}*/
-
-		//startProgressMaker();
 	}
-	
-	/* this is how we can/would start the daemon from Java.  Call this if you really
-	 * want to do this, but for OMPI it's probably required to start it through
-	 * JNI.
-	 */
-	/*
-	private void OMPIStartORTEd(String cmd)
-	{
-		try {
-			orted_process = Runtime.getRuntime().exec(cmd);
-		} catch(IOException e) {
-			String err = "Some error occurred trying to spawn the ORTEd (ORTE daemon).  Check the "+
-				"PTP/OPen MPI preferences page and be certain that the path and arguments "+
-				"are correct.";
-			System.err.println(err);
-			CoreUtils.showErrorDialog("Failed to Spawn ORTED", err, null);
-			failed_init = true;
-		}
-	}
-	*/
-    
-	/*
-	public void startProgressMaker() {
-		if(!jniBroker.libraryLoaded()) {
-			System.err.println("Unable to startup OMPI Control System because of a failed "+
-					"library load.");
-			return;
-		}
-		Thread progressThread = new Thread("PTP RTE OMPI Progress Thread") {
-			public void run() {
-				jniBroker.OMPIProgress();
-			}
-		};
-		progressThread.start();
-	}
-	*/
 	
 	/* returns the new job name that it started - unique */
-	public int run(JobRunConfiguration jobRunConfig) {
+	public int run(JobRunConfiguration jobRunConfig) throws CoreException {
 		int jobID = -1;
 		System.out.println("JAVA OMPI: run() with args:\n"+jobRunConfig.toString());
+		
+		if(proxyDead) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, "Control system is shut down", null));
+		}
 
 		List argList = new ArrayList();
 		
@@ -167,12 +124,17 @@ public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventList
 			jobID = proxy.runJob((String[])argList.toArray(new String[0]));
 		} catch(IOException e) {
 			e.printStackTrace();
+			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, "Control system is shut down, proxy exception", null));
 		}
 		
 		return jobID;
 	}
 
-	public void terminateJob(IPJob job) {
+	public void terminateJob(IPJob job) throws CoreException {
+		if(proxyDead) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, "Control system is shut down", null));
+		}
+		
 		if(job == null) {
 			System.err.println("ERROR: Tried to abort a null job.");
 			return;
@@ -186,16 +148,20 @@ public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventList
 				proxy.terminateJob(jobID);
 			} catch(IOException e) {
 				e.printStackTrace();
+				throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, "Control system is shut down, proxy exception", null));
 			}
-		//	jniBroker.OMPITerminateJob(jobID);
 		}
 		else {
 			System.err.println("ERROR: Tried to abort a null job.");
 		}
 	}
 	
-	public String[] getJobs() 
+	public String[] getJobs() throws CoreException 
 	{
+		if(proxyDead) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, "Control system is shut down", null));
+		}
+		
 		Object a[];
 		//System.out.println("JAVA OMPI: getJobs() called");
 
@@ -210,8 +176,12 @@ public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventList
 	}
 
 	/* get the processes pertaining to a certain job */
-	public String[] getProcesses(IPJob job) 
+	public String[] getProcesses(IPJob job) throws CoreException 
 	{
+		if(proxyDead) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, "Control system is shut down", null));
+		}
+		
 		int jobID = job.getJobNumberInt();
 		int numProcs = -1;
 		
@@ -233,8 +203,12 @@ public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventList
 		return ne;
 	}
 	
-	public String[] getAllProcessesAttributes(IPJob job, String[] attribs)
+	public String[] getAllProcessesAttributes(IPJob job, String[] attribs) throws CoreException
 	{
+		if(proxyDead) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, "Control system is shut down", null));
+		}
+		
 		String[] values = null;
 		
 		try {
@@ -247,8 +221,12 @@ public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventList
 		return values;
 	}
 	
-	public String[] getProcessAttributes(IPProcess proc, String[] attrib)
+	public String[] getProcessAttributes(IPProcess proc, String[] attrib) throws CoreException
 	{
+		if(proxyDead) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, "Control system is shut down", null));
+		}
+		
 		String[] values = null;
 		
 		IPJob job = proc.getJob();
@@ -259,6 +237,7 @@ public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventList
 			values = proxy.getProcessAttributesBlocking(jobID, procID, attrib);
 		} catch(IOException e) {
 			e.printStackTrace();
+			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, "Control system is shut down, proxy exception", null));
 		}
 		
 		/* this part is hacked right now until we get this out of ORTE */
@@ -304,33 +283,12 @@ public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventList
 	}
 
 	public void shutdown() {
-//		if(!jniBroker.libraryLoaded()) {
-//			System.err.println("Unable to startup OMPI Control System because of a failed "+
-//					"library load.");
-//			return;
-//		}
 		System.out.println("OMPIControlSystem: shutdown() called");
-//		
-//		/* shutdown/kill the ORTE daemon */
-//		jniBroker.OMPIShutdown();
-//		
-//		/* finalize the registry - yes, it's odd it is in this order */
-//		jniBroker.OMPIFinalize();
-//		
-//		/*
-//		if(orted_process != null) {
-//			System.out.println("DESTROY ORTED!");
-//			orted_process.destroy();
-//			orted_process = null;
-//			orted_process = null;
-//		}
-//		*/
 		listeners.clear();
 		listeners = null;
 	}
 
     public synchronized void handleEvent(IProxyRuntimeEvent e) {
-        //System.out.println("OMPIControlSystem got event: " + e.toString());
         if(e instanceof ProxyRuntimeJobStateEvent) {
         		RuntimeEvent re = new RuntimeEvent(RuntimeEvent.EVENT_JOB_STATE_CHANGED);
         		int state = ((ProxyRuntimeJobStateEvent)e).getJobState();
@@ -359,5 +317,16 @@ public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventList
         		re.setText(text);
         		fireEvent("job"+jobID+"_process"+procID, re);
         }
+		
+        else if(e instanceof ProxyRuntimeErrorEvent) {
+			System.err.println("Fatal error from proxy: '"+((ProxyRuntimeErrorEvent)e).getErrorMessage()+"'");
+			int errorCode = ((ProxyRuntimeErrorEvent)e).getErrorCode();
+			String errorMsg = ((ProxyRuntimeErrorEvent)e).getErrorMessage();
+			PTPCorePlugin.errorDialog("Fatal PTP Control System Error",
+					"There was a fatal PTP Control System error (ERROR CODE: "+errorCode+").\n"+
+					"Error message: \""+errorMsg+"\"\n\n"+
+					"Control System is now disabled.", null);
+			proxyDead = true;
+		}
     }
 }

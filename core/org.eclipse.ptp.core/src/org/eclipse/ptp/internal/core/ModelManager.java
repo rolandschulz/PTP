@@ -135,14 +135,6 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 	
 	public int getMonitoringSystemID() { return currentMonitoringSystem; }
 	
-	public void fatalError(int errorCode, String errorMsg)
-	{
-		PTPCorePlugin.errorDialog("Fatal PTP Error",
-			"There was a fatal PTP error (ERROR CODE: "+errorCode+").\n"+
-			"Error message: \""+errorMsg+"\"\n\nPlugin unstable, exit required.", null);
-		System.exit(1);
-	}
-	
 	public void refreshRuntimeSystems(IProgressMonitor monitor, boolean force) throws CoreException {
 		Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
 		int MSChoiceID = preferences.getInt(PreferenceConstants.MONITORING_SYSTEM_SELECTION);
@@ -536,8 +528,14 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		/* so let's find which node this is */
 		IPNode n = universe.findNodeByName(ne);
 		if (n != null) {
-			n.setAttrib(AttributeConstants.ATTRIB_NODE_STATE, monitoringSystem.getNodeAttributes(n, new String[] {AttributeConstants.ATTRIB_NODE_STATE}));
-			fireEvent(n, EVENT_SYS_STATUS_CHANGE);
+			try {
+				n.setAttrib(AttributeConstants.ATTRIB_NODE_STATE, monitoringSystem.getNodeAttributes(n, new String[] {AttributeConstants.ATTRIB_NODE_STATE}));
+				fireEvent(n, EVENT_SYS_STATUS_CHANGE);
+			} catch(CoreException e) {
+				PTPCorePlugin.errorDialog("Fatal PTP Monitoring System Error",
+					"The PTP Monitoring System is down.", null);
+				return;
+			}
 		}
 	}
 
@@ -583,6 +581,12 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 	}
 	
 	public void runtimeNewJob(String ne) {
+		if(!controlSystem.isHealthy()) {
+			PTPCorePlugin.errorDialog("Fatal PTP Control System Error",
+				"The PTP Control System is down.", null);
+			return;
+		}
+		
 		IProgressMonitor monitor = new NullProgressMonitor();		
 		
 		IPJob job = universe.findJobByName(ne);
@@ -608,7 +612,16 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 
 		universe.addChild(pjob);
 		
-		String[] ne2 = controlSystem.getProcesses(pjob);
+		String[] ne2;
+		
+		try {
+			ne2 = controlSystem.getProcesses(pjob);
+		} catch(CoreException e) {
+			PTPCorePlugin.errorDialog("Fatal PTP Control System Error",
+					"The PTP Control System is down.", null);
+			return;
+		}
+		
 		for (int j = 0; j < ne2.length; j++) {		
 			IPProcess proc;
 			
@@ -747,7 +760,13 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			System.err.println("ERROR: tried to delete a job that was not found '"+jobName+"'");
 			return;
 		}
-		controlSystem.terminateJob(j);
+		try {
+			controlSystem.terminateJob(j);
+		} catch(CoreException e) {
+			PTPCorePlugin.errorDialog("Fatal PTP Control System Error",
+					"The PTP Control System is down.", null);
+			return;
+		}
 		System.out
 				.println("***** NEED TO REFRESH JOB STATUS HERE in abortJob() of ModelManager ONCE WE KNOW THE JOBID!");
 		refreshJobStatus(jobName);

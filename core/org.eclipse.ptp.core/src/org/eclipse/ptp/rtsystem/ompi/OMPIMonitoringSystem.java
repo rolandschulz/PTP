@@ -24,15 +24,20 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.core.AttributeConstants;
 import org.eclipse.ptp.core.IPMachine;
 import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
+import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.rtsystem.IMonitoringSystem;
 import org.eclipse.ptp.rtsystem.IRuntimeListener;
 import org.eclipse.ptp.rtsystem.RuntimeEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener;
+import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeErrorEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeJobStateEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeNodeChangeEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeProcessOutputEvent;
@@ -42,9 +47,13 @@ public class OMPIMonitoringSystem implements IMonitoringSystem, IProxyRuntimeEve
 	protected List listeners = new ArrayList(2);
 	
 	private OMPIProxyRuntimeClient proxy = null;
+	private boolean proxyDead = true;
+	
+	public boolean isHealthy() { return !proxyDead; }
 
 	public OMPIMonitoringSystem(OMPIProxyRuntimeClient proxy) {
 		this.proxy = proxy;
+		if(proxy != null) proxyDead = false;
 		proxy.addRuntimeEventListener(this);
 	}
 
@@ -66,7 +75,11 @@ public class OMPIMonitoringSystem implements IMonitoringSystem, IProxyRuntimeEve
 		listeners = null;
 	}
 	
-	public String[] getMachines() {
+	public String[] getMachines() throws CoreException {
+		if(proxyDead) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, "Monitoring system is shut down", null));
+		}
+		
 		System.out.println("JAVA OMPI: getMachines() called");
 
 		String[] ne = new String[1];
@@ -76,7 +89,10 @@ public class OMPIMonitoringSystem implements IMonitoringSystem, IProxyRuntimeEve
 	}
 
 	/* get the nodes pertaining to a certain machine */
-	public String[] getNodes(IPMachine machine) {
+	public String[] getNodes(IPMachine machine) throws CoreException {
+		if(proxyDead) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, "Monitoring system is shut down", null));
+		}
 		System.out.println("OMPIMonitoringSystem: getNodes(" + machine.getElementName() + ") called");
 
 		/* need to check if machineName is a valid machine name */
@@ -115,7 +131,10 @@ public class OMPIMonitoringSystem implements IMonitoringSystem, IProxyRuntimeEve
 		return ne;
 	}
 
-	public String getNodeMachineName(String nodeName) {
+	public String getNodeMachineName(String nodeName) throws CoreException {
+		if(proxyDead) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, "Monitoring system is shut down", null));
+		}
 		System.out.println("JAVA OMPI: getNodeMachineName(" + nodeName
 				+ ") called");
 
@@ -124,7 +143,10 @@ public class OMPIMonitoringSystem implements IMonitoringSystem, IProxyRuntimeEve
 		return "machine0";
 	}
 
-	public String[] getNodeAttributes(IPNode node, String[] attribs) {
+	public String[] getNodeAttributes(IPNode node, String[] attribs) throws CoreException {
+		if(proxyDead) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, "Monitoring system is shut down", null));
+		}
 		System.out.println("ORTE Monitoring System: getNodeAttribute(" + node.getElementName() + ", "
 				+ attribs + ") called");
 		IPMachine machine = node.getMachine();
@@ -155,7 +177,10 @@ public class OMPIMonitoringSystem implements IMonitoringSystem, IProxyRuntimeEve
 		return values;
 	}
 	
-	public String[] getAllNodesAttributes(IPMachine machine, String[] attribs) {
+	public String[] getAllNodesAttributes(IPMachine machine, String[] attribs) throws CoreException {
+		if(proxyDead) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, "Monitoring system is shut down", null));
+		}
 		int machID = machine.getMachineNumberInt();
 		
 		String[] values = null;
@@ -236,6 +261,16 @@ public class OMPIMonitoringSystem implements IMonitoringSystem, IProxyRuntimeEve
         			System.out.println("UNKNOWN KEY '"+key+"', value '"+val+"' - IGNORING.");
         		}
         }
+        else if(e instanceof ProxyRuntimeErrorEvent) {
+			System.err.println("Fatal error from proxy: '"+((ProxyRuntimeErrorEvent)e).getErrorMessage()+"'");
+			int errorCode = ((ProxyRuntimeErrorEvent)e).getErrorCode();
+			String errorMsg = ((ProxyRuntimeErrorEvent)e).getErrorMessage();
+			PTPCorePlugin.errorDialog("Fatal PTP Monitoring System Error",
+					"There was a fatal PTP Monitoring System error (ERROR CODE: "+errorCode+").\n"+
+					"Error message: \""+errorMsg+"\"\n\n"+
+					"Monitoring System is now disabled.", null);
+			proxyDead = true;
+		}
     }
     
 	protected synchronized void fireEvent(String ID, RuntimeEvent event) {
