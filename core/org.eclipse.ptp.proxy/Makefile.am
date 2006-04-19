@@ -1,6 +1,6 @@
 UTILS =					../org.eclipse.ptp.utils
 
-lib_LIBRARIES =			libproxyclnt.a libproxysvr.a
+noinst_LIBRARIES =		libproxyclnt.a libproxysvr.a
 
 libproxyclnt_a_SOURCES =	src/proxy.c \
 						src/proxy_clnt.c \

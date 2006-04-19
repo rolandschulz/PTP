@@ -1,4 +1,4 @@
-lib_LIBRARIES =			libutils.a
+noinst_LIBRARIES =		libutils.a
 
 libutils_a_SOURCES =		src/bitset.c \
 						src/args.c \
