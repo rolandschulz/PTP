@@ -32,6 +32,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.proxy.event.IProxyEvent;
 import org.eclipse.ptp.core.proxy.event.IProxyEventListener;
 import org.eclipse.ptp.core.proxy.event.ProxyConnectedEvent;
@@ -91,6 +96,9 @@ public abstract class AbstractProxyClient {
 			String buf = encodeLength(cmd.length()) + " " + cmd;
 			System.out.println("<" + buf + ">");
 			fullWrite(encoder.encode(CharBuffer.wrap(buf)));
+		}
+		else {
+			throw new IOException();
 		}
 	}
 

@@ -53,6 +53,9 @@ public class SimulationControlSystem implements IControlSystem {
 		simJobs = new Vector();
 	}
 	
+	/* a simulated (fake) system is always healthy :) */
+	public boolean isHealthy() { return true; }
+	
 	public void startup() {
 		processMap = new HashMap();
 	}

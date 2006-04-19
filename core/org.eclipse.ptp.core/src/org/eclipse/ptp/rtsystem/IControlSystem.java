@@ -19,6 +19,7 @@
 
 package org.eclipse.ptp.rtsystem;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.rtsystem.JobRunConfiguration;
@@ -33,31 +34,40 @@ import org.eclipse.ptp.rtsystem.JobRunConfiguration;
 
 public interface IControlSystem {	
 	/**
+	 * The control system can still be available even if the connection to the outside world
+	 * has been severed.  This method returns if that connection is alive or not.
+	 */
+	public boolean isHealthy();
+	
+	/**
 	 * Performs a job run given the jobRunConfig.  The JobRunConfiguration contains specifics
 	 * about how the user wants to run the job, such as the program name, number of
 	 * processes, etc.
 	 * 
 	 * @param jobRunConfig the configuration information about the job
 	 * @return the job identifier of the created job or -1 on error
+	 * @throws CoreException 
 	 * @see JobRunConfiguration
 	 */
-	public int run(JobRunConfiguration jobRunConfig);
+	public int run(JobRunConfiguration jobRunConfig) throws CoreException;
 
 	/**
 	 * Terminates a running job.  The {@link IPJob} contains the job identifier used to 
 	 * locate the job by the control system.
 	 * 
 	 * @param job the job to terminate
+	 * @throws CoreException 
 	 */
-	public void terminateJob(IPJob job);
+	public void terminateJob(IPJob job) throws CoreException;
 	
 	/**
 	 * Returns an array of {@link String}s of the form [ job1", "job2", "job10" ].
 	 * The jobs should be a concat of the string "job" and the identifier.
 	 * 
 	 * @return the names of the known jobs
+	 * @throws CoreException 
 	 */
-	public String[] getJobs();
+	public String[] getJobs() throws CoreException;
 
 	/**
 	 * Returns an array of {@link String}s of the form [ "jobXprocessA", "jobXprocessB" ] where
@@ -65,8 +75,9 @@ public interface IControlSystem {
 	 * 
 	 * @param job the job to look for processes on 
 	 * @return the names of the processes
+	 * @throws CoreException 
 	 */
-	public String[] getProcesses(IPJob job);
+	public String[] getProcesses(IPJob job) throws CoreException;
 	
 	/**
 	 * Gets the specified attributes for all processes of the specified job.  The
@@ -78,9 +89,10 @@ public interface IControlSystem {
 	 * @param job the job to get process attributes from
 	 * @param array of attribs to fetch
 	 * @return an array of the attribute values for each process
+	 * @throws CoreException 
 	 * @see org.eclipse.ptp.core.AttributeConstants
 	 */
-	public String[] getAllProcessesAttributes(IPJob job, String[] attribs);
+	public String[] getAllProcessesAttributes(IPJob job, String[] attribs) throws CoreException;
 	
 	/**
 	 * Gets the specified attributes for a specific process in a specific job.  The
@@ -91,8 +103,9 @@ public interface IControlSystem {
 	 * @param proc the process contained in the job to get the process attributes from
 	 * @param array of attribs to fetch
 	 * @return an array of the attribute values
+	 * @throws CoreException 
 	 */
-	public String[] getProcessAttributes(IPProcess proc, String[] attribs);
+	public String[] getProcessAttributes(IPProcess proc, String[] attribs) throws CoreException;
 
 	/**
 	 * Adds a listener to the control system.  The control system may fire {@link RuntimeEvent}s
