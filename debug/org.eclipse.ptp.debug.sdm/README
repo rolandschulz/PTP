@@ -1,35 +1,30 @@
-This is the initial release of the PTP Scalable Debug Manager (SDM). The SDM is a framework for debugging parallel programs.
-It comprises the following components:
+This is the initial release of the PTP Scalable Debug Manager (SDM). The SDM is an 
+MPI-based client/server framework for controlling multiple distributed processes. The 
+primary purpose of this framework is to attach backend debuggers to the processes being 
+debugged, and to provide a library interface to control the debugging of these processes.
 
-1. An MPI-based client/server framework for controlling multiple distributed processes. The primary purpose of this
-   framework is to attach backend debuggers to the processes being debugged, and to provide a library interface
-   to control the debugging of these processes.
-   
-2. A proxy library that allows the client/server framework to be controlled from a remote location.  This is particularly
-   important, since it is not always possible to know the location of the SDM client (it may be placed on a random
-   node in the parallel machine).
-
-3. A JNI library for interfacing Java applications to the proxy client. This allows applications like Eclipse to control
-   the debug framework, respond to events, etc.
-   
 Basic Installation
 ==================
 
-The simplest way to compile this package is:
+The following steps are used to set up your build environment so that the executable
+ will be correctly built and installed. In order to use the server binary, it needs to 
+be installed in a fragment that corresponds to the architecture of the machine 
+it will be run on. 
 
-  1. At the top level, run './configure' to create the Makefiles.
+1. Make sure you have checked out the fragment corresponding to your architecture. 
+   For example, if you're on a Linux x86 machine, you should have the fragment:
 
-  2. Type `make' to build the package.
+		org.eclipse.ptp.debug.sdm.orte.linux.x86
 
-  3. You can remove the program binaries and object files from the
-     source code directory by typing `make clean'.
+2. Run the following command to configure the project and set the prefix to
+   the appropriate fragment directory:
+   
+   		sh SETUP
 
-If you modify Makefile.am and wish to regenerate the Makefile.in and
-configure scripts:
+3. You are now able to use 'make' and 'make install', either from
+   the command line, or from the 'Make Targets' view in Eclipse to 
+   build and install the executable into the fragment directory.
 
-  1. Make sure you have the latest versions of 'automake' and 
-     'libtool' (at this time it is 1.9.6 and 1.5.20 respectively). 
-     They can be obtained from ftp.gnu.org if necessary.
-     
-  2. Run 'autogen.sh' which will build the various configure scripts.
-  
+4. If any of the automake/autoconf files changes, you should just need to
+   run 'make' and it will automatically regenerate the appropriate files.
+

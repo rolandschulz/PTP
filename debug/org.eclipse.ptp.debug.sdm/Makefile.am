@@ -2,7 +2,8 @@ PROXY =					../org.eclipse.ptp.proxy
 UTILS =					../org.eclipse.ptp.utils
 SUBDIRS =				libaif $(PROXY) $(UTILS)
 
-bin_PROGRAMS =			sdm test_proxy test_proxy_rev test_mi
+bin_PROGRAMS =			sdm
+noinst_PROGRAMS =		test_proxy test_proxy_rev test_mi
 
 sdm_SOURCES =			src/client/startup.c\
 						src/client/client.c \
@@ -33,9 +34,9 @@ test_mi_CFLAGS =			-I./include -I./src/mi -I$(UTILS)/include $(AM_CFLAGS) -g
 test_mi_LDFLAGS = 		-g
 test_mi_LDADD =			libmi.a $(UTILS)/libutils.a
 
-include_HEADERS =		include/breakpoint.h include/dbg.h include/location.h include/stackframe.h
+noinst_HEADERS =			include/breakpoint.h include/dbg.h include/location.h include/stackframe.h
 
-lib_LIBRARIES =			libdbgclnt.a libdbgutils.a libmi.a
+noinst_LIBRARIES =		libdbgclnt.a libdbgutils.a libmi.a
 
 libdbgclnt_a_SOURCES =	src/client/client_interface.c 
 libdbgclnt_a_CFLAGS =		-I./include -I./libaif -I$(PROXY)/include -I$(UTILS)/include $(AM_CFLAGS) -g
