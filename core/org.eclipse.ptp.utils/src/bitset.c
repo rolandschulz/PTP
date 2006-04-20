@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 #include <ctype.h>
 
 #include "compat.h"
@@ -223,6 +224,27 @@ bitset_test(bitset *b, int bit)
 		return 0;
 		
 	return (b->bs_bits[BIT_INDEX(bit)] & mask) == mask;
+}
+
+/*
+ * Find the first bit set in the bitset.
+ * 
+ * NOTE: ffs() assumes an integer argument. If sizeof(bits) is anything
+ * else this will need to be fixed.
+ */
+int
+bitset_firstset(bitset *b)
+{
+	int	i;
+	
+	for (i = 0; i < b->bs_size; i++)
+		if (b->bs_bits[i] != 0)
+			break;
+			
+	if (i == b->bs_size)
+		return -1;
+			
+	return (SIZE_TO_BYTES(i) << 3) + ffs(b->bs_bits[i]) - 1;
 }
 
 static char tohex[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
