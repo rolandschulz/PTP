@@ -24,6 +24,9 @@
 #define BIT_IN_OBJ(bit)		((bit) - ((BIT_INDEX((bit)) * sizeof(bits)) << 3))
 #define SIZE_TO_BYTES(size)	(sizeof(bits) * (size))
 
+/*
+ * NOTE: if you change the size of bits, then the ffs() routine may no longer work.
+ */
 typedef unsigned int	bits;
 
 struct bitset {
@@ -41,6 +44,7 @@ void			bitset_clear(bitset *);
 void			bitset_set(bitset *, int);
 void			bitset_unset(bitset *, int);
 int			bitset_test(bitset *, int);
+int			bitset_firstset(bitset *);
 bitset *		bitset_and(bitset *, bitset *);
 void			bitset_andeq(bitset *, bitset *);
 bitset *		bitset_or(bitset *, bitset *);
