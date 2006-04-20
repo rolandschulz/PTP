@@ -46,6 +46,7 @@
 #include <handler.h>
 #include <list.h>
 #include <args.h>
+#include <signal.h>
 
 #include "include/orte_constants.h"
 #include "mca/errmgr/errmgr.h"
@@ -150,6 +151,8 @@ int			is_orte_initialized = 0;
 pid_t		orted_pid = 0;
 List *		eventList;
 List *		debugJobs;
+
+int ptp_signal_fired;
 
 static proxy_handler_funcs handler_funcs = {
 	RegisterFileHandler,		// regfile() - call to register a file handler
@@ -2045,9 +2048,12 @@ ORTEQuit(void)
 	return PROXY_RES_OK;
 }
 
-void
+int
 server(char *name, char *host, int port)
 {
+	char *msg1, *msg2;
+	int error_code, rc;
+	
 	eventList = NewList();
 	debugJobs = NewList();
 	
@@ -2057,92 +2063,80 @@ server(char *name, char *host, int port)
 	proxy_svr_connect(orte_proxy, host, port);
 	printf("proxy_svr_connect returned.\n");
 	
+	ptp_signal_fired = 0;
+	
 	for (;;) {
 		if  ((ORTEProgress() != PROXY_RES_OK) ||
 			(proxy_svr_progress(orte_proxy) != PROXY_RES_OK))
 			break;
-		//printf("progress returned.\n");
+		if(ptp_signal_fired != 0) {
+			switch(ptp_signal_fired) {
+				case SIGINT:
+					asprintf(&msg1, "INT");
+					asprintf(&msg2, "Interrupt");
+					break;
+				case SIGHUP:
+					asprintf(&msg1, "HUP");
+					asprintf(&msg2, "Hangup");
+					break;
+				case SIGILL:
+					asprintf(&msg1, "ILL");
+					asprintf(&msg2, "Illegal Instruction");
+					break;
+				case SIGSEGV:
+					asprintf(&msg1, "SEGV");
+					asprintf(&msg2, "Segmentation Violation");
+					break;
+				case SIGTERM:
+					asprintf(&msg1, "TERM");
+					asprintf(&msg2, "Termination");
+					break;
+				case SIGQUIT:
+					asprintf(&msg1, "QUIT");
+					asprintf(&msg2, "Quit");
+					break;
+				case SIGABRT:
+					asprintf(&msg1, "ABRT");
+					asprintf(&msg2, "Process Aborted");
+					break;
+				default:
+					asprintf(&msg1, "***UNKNOWN SIGNAL***");
+					asprintf(&msg2, "ERROR - UNKNOWN SIGNAL, REPORT THIS!");
+					break;
+			}
+			printf("###### SIGNAL: %s\n", msg1);
+			printf("###### Shutting down ORTEd\n");
+			ORTEShutdown();
+			proxy_svr_event_callback(orte_proxy, ORTEErrorStr(error_code,
+				"ptp_orte_proxy received signal %s (%s).  Exit was required and performed cleanly."));
+			free(msg1);
+			free(msg2);
+			/* our return code = the signal that fired */
+			rc = ptp_signal_fired;
+			break;
+		}
 	}
 	
 	proxy_svr_finish(orte_proxy);
 	printf("proxy_svr_finish returned.\n");
+	
+	return rc;
 }
 
-void signal_int_proc()
-{
-		printf("###### SIGNAL: INT\n"); fflush(stdout);
-		printf("###### Shuttig down ORTEd\n"); fflush(stdout);
-		ORTEShutdown();
-		proxy_svr_event_callback(orte_proxy, ORTEErrorStr(RTEV_ERROR_INT, 
-		  "ptp_orte_proxy received signal INT (Interrupt).  Exit was required and performed cleanly."));
-		proxy_svr_finish(orte_proxy);
-		exit(1);
-}
+/*
+ * GREG:
+ * This sighandler_t stuff doesn't work on my MAC - maybe void *?  Maybe change autoconf?
+ * Also I can't figure out how to make the function call correctly in the next function,
+ * the call to the function pointer */
+sighandler_t saved_signals[NSIG];
 
-void signal_hup_proc()
+void ptp_signal_handler(int sig)
 {
-		printf("###### SIGNAL: HUP\n"); fflush(stdout);
-		printf("###### Shuttig down ORTEd\n"); fflush(stdout);
-		ORTEShutdown();
-		proxy_svr_event_callback(orte_proxy, ORTEErrorStr(RTEV_ERROR_HUP, 
-		  "ptp_orte_proxy received signal HUP (Hangup).  Exit was required and performed cleanly."));
-		proxy_svr_finish(orte_proxy);
-		exit(1);
-}
-
-void signal_ill_proc()
-{
-		printf("###### SIGNAL: ILL\n"); fflush(stdout);
-		printf("###### Shuttig down ORTEd\n"); fflush(stdout);
-		ORTEShutdown();
-		proxy_svr_event_callback(orte_proxy, ORTEErrorStr(RTEV_ERROR_ILL, 
-		  "ptp_orte_proxy received signal ILL (Illegal Instruction).  Exit was required and performed cleanly."));
-		proxy_svr_finish(orte_proxy);
-		exit(1);
-}
-
-void signal_segv_proc()
-{
-		printf("###### SIGNAL: SEGV\n"); fflush(stdout);
-		printf("###### Shuttig down ORTEd\n"); fflush(stdout);
-		ORTEShutdown();
-		proxy_svr_event_callback(orte_proxy, ORTEErrorStr(RTEV_ERROR_SEGV, 
-		  "ptp_orte_proxy received signal SEGV (Segmentation Violation).  Exit was required and performed cleanly."));
-		proxy_svr_finish(orte_proxy);
-		exit(1);
-}
-
-void signal_term_proc()
-{
-		printf("###### SIGNAL: TERM\n"); fflush(stdout);
-		printf("###### Shuttig down ORTEd\n"); fflush(stdout);
-		ORTEShutdown();
-		proxy_svr_event_callback(orte_proxy, ORTEErrorStr(RTEV_ERROR_TERM, 
-		  "ptp_orte_proxy received signal TERM (Termination).  Exit was required and performed cleanly."));
-		proxy_svr_finish(orte_proxy);
-		exit(1);
-}
-
-void signal_quit_proc()
-{
-		printf("###### SIGNAL: QUIT\n"); fflush(stdout);
-		printf("###### Shuttig down ORTEd\n"); fflush(stdout);
-		ORTEShutdown();
-		proxy_svr_event_callback(orte_proxy, ORTEErrorStr(RTEV_ERROR_QUIT, 
-		  "ptp_orte_proxy received signal QUIT (Quit).  Exit was required and performed cleanly."));
-		proxy_svr_finish(orte_proxy);
-		exit(1);
-}
-
-void signal_abrt_proc()
-{
-		printf("###### SIGNAL: ABRT\n"); fflush(stdout);
-		printf("###### Shuttig down ORTEd\n"); fflush(stdout);
-		ORTEShutdown();
-		proxy_svr_event_callback(orte_proxy, ORTEErrorStr(RTEV_ERROR_ABRT, 
-		  "ptp_orte_proxy received signal ABRT (Process Aborted).  Exit was required and performed cleanly."));
-		proxy_svr_finish(orte_proxy);
-		exit(1);
+		ptp_signal_fired = sig;
+		if(sig >= 0 && sig < NSIG) {
+			sighandler_t saved_signal = saved_signals[sig];
+			*(saved_signal)(sig);
+		}
 }
 
 int
@@ -2152,6 +2146,7 @@ main(int argc, char *argv[])
 	int				port = PROXY_TCP_PORT;
 	char *			host = "localhost";
 	char *			proxy_str = DEFAULT_PROXY;
+	int				rc;
 	
 	while ((ch = getopt_long(argc, argv, "P:p:h:", longopts, NULL)) != -1)
 	switch (ch) {
@@ -2169,23 +2164,16 @@ main(int argc, char *argv[])
 		return 1;
 	}
 	
-	//if (!ORTEInit()) {
-//		fprintf(stderr, "Faild to initialize ORTE\n");
-	//	return 1;
-	//}
-	
 	/* setup our signal handlers */
-	signal(SIGINT, signal_int_proc);
-	signal(SIGHUP, signal_hup_proc);
-	signal(SIGILL, signal_ill_proc);
-	signal(SIGSEGV, signal_segv_proc);
-	signal(SIGTERM, signal_term_proc);
-	signal(SIGQUIT, signal_quit_proc);
-	signal(SIGABRT, signal_abrt_proc);
+	saved_signals[SIGINT] = signal(SIGINT, ptp_signal_handler);
+	saved_signals[SIGHUP] = signal(SIGHUP, ptp_signal_handler);
+	saved_signals[SIGILL] = signal(SIGILL, ptp_signal_handler);
+	saved_signals[SIGSEGV] = signal(SIGSEGV, ptp_signal_handler);
+	saved_signals[SIGTERM] = signal(SIGTERM, ptp_signal_handler);
+	saved_signals[SIGQUIT] = signal(SIGQUIT, ptp_signal_handler);
+	saved_signals[SIGABRT] = signal(SIGABRT, ptp_signal_handler);
 	
-	server(proxy_str, host, port);
+	rc = server(proxy_str, host, port);
 	
-	//ORTEFinalize();
-	
-	return 0;
+	return rc;
 }
