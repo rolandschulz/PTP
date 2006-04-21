@@ -1,0 +1,53 @@
+<html>
+<head>
+<title>
+Running PTP OpenMP Tools Plug-in
+</title>
+<body>
+<h1> Running PTP OpenMP Tools </h1>
+<p>For the most part, the OpenMP tools are similar to the MPI
+tools.  See the setup and run instructions for the MPI tools to
+see how to configure CDT to find the header files, and compile
+and run.
+<p>The PTP Parallel Language Development Tools do add a few
+specific functions uniquely for OpenMP development:
+<ul>
+<li><a href="#pragma">Show #pragma regions</a></li>
+<li><a href="#concur">Show concurrency</a></li>
+</ul>
+
+
+
+<h2 id="pragma">Show #pragma regions</h2>
+<img src="images/ptp-openMPpragmaAnn.gif">
+<br>
+<p>In the example screenshot above, OpenMP analysis has been run
+on the source file and two artifacts were found, one API and
+one #pragma.  
+They are shown in the "OpenMP Artifact View" near the bottom of the screen.
+In the OpenMP artifact view, use the context menu on the #pragma item
+and select "Show pragma region" and the region that the #pragma
+encompasses is selected and shown in grey in the editor.
+<p>(Note: you must install the CDT fix as described in the 
+<a href="setupOMP.html">setup information</a>
+in order to see the pragmas, and thus to use this action.)
+
+
+<h2 id="concur">Show concurrency</h2>
+<p><img src="images/ptp-openMPshowConcurrency.gif"> 
+<p>Above are the screen-shot results of an analysis, perhaps on a not so real, 
+but at least interesting example.  
+Select a statement, e.g. the statement highlighted in grey above.
+Select the context menu on the highlighted statement, and click "Show concurrency."
+Other statments will be highlighted in yellow.
+The meaning is the following:
+The gray selected statement is analysed for the following: which 
+statements can execute concurrently to it.  
+The result includes all highlighted statements between the two barriers.  But because of the conditional jump around the lower barrier, execution could also reach the top of the loop - hitting the condition and the loop increment, as well as the first statement in the loop body.  All of those statements are highlighted as well. If correct, this example would usefully point out a bug  - being that the second barrier should be outside that if statement!
+
+
+<p>&nbsp;<p>&nbsp;<p>&nbsp;
+<p><a href="#top">Back to Top</a> | <a href="toc.html">Back to Table of Contents</a>
+
+</body>
+</html>

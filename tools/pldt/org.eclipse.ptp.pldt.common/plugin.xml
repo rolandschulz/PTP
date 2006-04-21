@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="org.eclipse.ptp.pldt.common.prefs.PLDTPreferencePage"
+            id="org.eclipse.ptp.pldt.common.prefs.PLDTPreferencePage"
+            name="Parallel Language Development Tools"
+            category="org.eclipse.ptp.ui.preferences.ptpPreferencesPage"
+            />
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer class="org.eclipse.ptp.pldt.common.prefs.PreferenceInitializer"/>
+   </extension>
+
+</plugin>

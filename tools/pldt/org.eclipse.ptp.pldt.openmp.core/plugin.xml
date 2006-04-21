@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+   <extension  
+	    point="org.eclipse.ui.actionSets"
+         id="org.eclipse.ptp.pldt.openmp.core.ui.actionSet"
+         name="OpenMP Artifacts action set"
+        >
+
+      <actionSet
+            label="OpenMP Artifacts Action Set"
+            visible="true"
+            id="org.eclipse.ptp.pldt.openmp.core.ui.actionSet">
+         <menu
+               label="&amp;OpenMP Artifacts"
+               id="openMPMenu">
+            <separator
+                  name="openMPGroup">
+            </separator>
+         </menu>
+         <action
+               label="Clear OpenMP Artifact Markers"
+               icon="icons/noOpenMP.gif"
+               class="org.eclipse.ptp.pldt.openmp.core.actions.RemoveMarkerAction"
+               tooltip="Clear OpenMP Artifacts Markers"
+               menubarPath="openMPMenu/openMPGroup"
+               toolbarPath="openMPToolbarGroup"
+               id="org.eclipse.ptp.pldt.openmp.core.actions.RemoveMarkerAction">
+            <selection
+                  class="org.eclipse.core.resources.IProject">
+            </selection>
+         </action>
+         <action
+               label="%run.label"
+               icon="icons/openMP.gif"
+               class="org.eclipse.ptp.pldt.openmp.core.actions.RunAnalyseOpenMP"
+               tooltip="%run.tooltip"
+               menubarPath="openMPMenu/openMPGroup"
+               toolbarPath="openMPToolbarGroup"
+               id="org.eclipse.ptp.pldt.openmp.core.actions.RunAnalyseAction">
+         </action>
+        </actionSet>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            name="%viewcat.name"
+            id="org.eclipse.ptp.pldt.openmp">
+      </category>
+      <view
+            name="%view.name"
+            icon="icons/openMP.gif"
+            category="org.eclipse.ptp.pldt.openmp"
+            class="org.eclipse.ptp.pldt.openmp.core.views.OpenMPArtifactView"
+            id="org.eclipse.ptp.pldt.openmp.core.views.OpenMPArtifactView">
+      </view>
+
+   </extension>
+   <!--  openMP markers -->
+   <!-- MARKER_ID       = "org.eclipse.ptp.pldt.openmp.core.openMPMarker" -->
+   <extension point="org.eclipse.core.resources.markers"
+		id="openMPMarker"
+        name="OpenMP Artifact Marker">
+      <super type="org.eclipse.core.resources.textmarker"/>
+      <attribute name="fileName"/>
+      <attribute name="theLineNo"/>
+      <attribute name="columnNo"/>
+      <attribute name="name"/>
+      <attribute name="description"/>
+      <attribute name="constructType"/>
+      <attribute name="uniqueID"/>
+   </extension>
+   <!-- this changes the marker image in the editor marker bar  -->
+   <extension
+         point="org.eclipse.ui.editors.annotationTypes">
+      <type
+            markerType="org.eclipse.ptp.pldt.openmp.core.openMPMarker"
+            name="org.eclipse.ptp.pldt.openmp.core.openMPMarkerAnnotation">
+      </type>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors.markerAnnotationSpecification">
+      <specification
+            annotationType="org.eclipse.ptp.pldt.openmp.core.openMPMarkerAnnotation"
+            icon="icons/openMP.gif" 
+            
+            presentationLayer="5"
+            label="OpenMP Annotation Marker"
+            
+            textPreferenceKey="openMPIndication"
+            textPreferenceValue="true"
+            highlightPreferenceKey="artifactHighlighting"
+            highlightPreferenceValue="false"
+            colorPreferenceKey="artifactIndicationColor"
+            colorPreferenceValue="0,128,192"
+            verticalRulerPreferenceKey="artifactIndicationInVerticalRuler"
+            verticalRulerPreferenceValue="true"
+			showInNextPrevDropdownToolbarActionKey="showOpenMPInNextPrevDropdownToolbarAction"
+            showInNextPrevDropdownToolbarAction="false"
+            overviewRulerPreferenceKey="artifactIndicationInOpldt.verviewRuler"
+            overviewRulerPreferenceValue="true"
+            
+            includeOnPreferencePage="true"
+            isGoToPreviousNavigationTargetKey="isopenmpGoToPreviousNavigationTarget"
+
+            isGoToNextNavigationTargetKey="isopenmpRecordGoToNextNavigationTarget"
+            >
+      </specification>  
+   </extension>
+   <extension
+      point="org.eclipse.ui.preferencePages">
+          <page id="org.eclipse.ptp.pldt.openmp.core.prefpage"
+            class="org.eclipse.ptp.pldt.openmp.core.prefs.OpenMPPreferencePage"
+            name="OpenMP"
+           category="org.eclipse.ptp.pldt.common.prefs.PLDTPreferencePage"
+  />
+   </extension>
+      <extension
+         point="org.eclipse.cdt.ui.CHelpProvider">
+      <provider
+            class="org.eclipse.ptp.pldt.openmp.core.editorHelp.OpenMPCHelpProvider"
+            id="org.eclipse.ptp.pldt.openmp.core.editorHelp.OpenMPCHelpProvider"/>
+   </extension>
+</plugin>

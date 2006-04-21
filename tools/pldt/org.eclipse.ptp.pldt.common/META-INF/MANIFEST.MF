@@ -1,0 +1,24 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Parallel Language Development Tools Common Plug-in
+Bundle-SymbolicName: org.eclipse.ptp.pldt.common; singleton:=true
+Bundle-Version: 1.0.0
+Bundle-Activator: org.eclipse.ptp.pldt.common.CommonPlugin
+Bundle-Localization: plugin
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.cdt.core,
+ org.eclipse.cdt.ui,
+ org.eclipse.search,
+ org.eclipse.ui.ide,
+ org.eclipse.core.resources,
+ org.eclipse.ui.editors,
+ org.eclipse.help
+Eclipse-AutoStart: true
+Export-Package: org.eclipse.ptp.pldt.common,
+ org.eclipse.ptp.pldt.common.actions,
+ org.eclipse.ptp.pldt.common.analysis,
+ org.eclipse.ptp.pldt.common.editorHelp,
+ org.eclipse.ptp.pldt.common.util,
+ org.eclipse.ptp.pldt.common.views
+Bundle-ClassPath: bin/
