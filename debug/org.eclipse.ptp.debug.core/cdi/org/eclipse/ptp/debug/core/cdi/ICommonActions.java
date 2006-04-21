@@ -26,13 +26,49 @@ import org.eclipse.ptp.debug.core.aif.IAIF;
  * 
  */
 public interface ICommonActions {
+	/** Stop debugger of given tasks
+	 * @param tasks
+	 * @throws PCDIException
+	 */
 	public void stop(BitList tasks) throws PCDIException;
+	/** Resume debugger of given tasks
+	 * @param tasks
+	 * @throws PCDIException
+	 */
 	public void resume(BitList tasks) throws PCDIException;
+	/** Suspend debugger of given tasks
+	 * @param tasks
+	 * @throws PCDIException
+	 */
 	public void suspend(BitList tasks) throws PCDIException;
+	/** Step into debugger of given tasks
+	 * @param tasks
+	 * @throws PCDIException
+	 */
 	public void steppingInto(BitList tasks) throws PCDIException;
+	/** step over debugger of given tasks
+	 * @param tasks
+	 * @throws PCDIException
+	 */
 	public void steppingOver(BitList tasks) throws PCDIException;
+	/** step return debugger of given tasks
+	 * @param tasks
+	 * @throws PCDIException
+	 */
 	public void steppingReturn(BitList tasks) throws PCDIException;
+	/** Get expression value of given tasks and given variable name
+	 * @param tasks
+	 * @param variable
+	 * @return
+	 * @throws PCDIException
+	 */
 	public IAIF getExpressionValue(BitList tasks, String variable) throws PCDIException;
+	/** Get expression value of given tasks and given variable name
+	 * @param task_id
+	 * @param variable
+	 * @return
+	 * @throws PCDIException
+	 */
 	public IAIF getExpressionValue(int task_id, String variable) throws PCDIException;
 }
 

@@ -23,5 +23,8 @@ package org.eclipse.ptp.debug.core.cdi;
  * 
  */
 public interface IPCDIExitInfo extends IPCDISessionObject {
+	/** Get exit code
+	 * @return
+	 */
 	int getCode();
 }

@@ -23,5 +23,8 @@ package org.eclipse.ptp.debug.core.cdi;
  * 
  */
 public interface IPCDISessionConfiguration extends IPCDISessionObject {
+	/** Is session terminated on exit
+	 * @return true if session is terminated on exit
+	 */
 	boolean terminateSessionOnExit();
 }

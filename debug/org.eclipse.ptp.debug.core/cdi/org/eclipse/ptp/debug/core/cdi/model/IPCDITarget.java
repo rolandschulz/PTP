@@ -19,7 +19,6 @@
 package org.eclipse.ptp.debug.core.cdi.model;
 
 import java.math.BigInteger;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIMemoryBlockManagement;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIRegister;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIRegisterDescriptor;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIRegisterGroup;
@@ -34,7 +33,7 @@ import org.eclipse.ptp.debug.core.cdi.IPCDILineLocation;
 import org.eclipse.ptp.debug.core.cdi.IPCDISessionObject;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
-public interface IPCDITarget extends IPCDIThreadGroup, IPCDIExpressionManagement, ICDISourceManagement, ICDISharedLibraryManagement, ICDIMemoryBlockManagement, IPCDISessionObject {
+public interface IPCDITarget extends IPCDIThreadGroup, IPCDIExpressionManagement, ICDISourceManagement, ICDISharedLibraryManagement, IPCDIMemoryBlockManagement, IPCDISessionObject {
 	public int getTargetID();
 	public IPProcess getPProcess();
 	

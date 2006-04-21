@@ -25,6 +25,12 @@ import org.eclipse.ptp.debug.core.cdi.event.IPCDIEventListener;
  * 
  */
 public interface IPCDIEventManager extends IPCDISessionObject {
+	/** Add pcdi event listener
+	 * @param listener
+	 */
 	void addEventListener(IPCDIEventListener listener);
+	/** Remove pcdi event listener
+	 * @param listener
+	 */
 	void removeEventListener(IPCDIEventListener listener);
 }

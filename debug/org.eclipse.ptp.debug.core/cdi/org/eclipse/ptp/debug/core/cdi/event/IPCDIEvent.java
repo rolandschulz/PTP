@@ -27,12 +27,35 @@ import org.eclipse.ptp.debug.core.cdi.model.IPCDIObject;
  *
  */
 public interface IPCDIEvent {
+	/** Get all processes including registered or unregistered
+	 * @return
+	 */
 	public BitList getAllProcesses();
+	/** Get unregistered processes only
+	 * @return
+	 */
 	public BitList getAllUnregisteredProcesses();
+	/** Get registered processes only
+	 * @return
+	 */
 	public BitList getAllRegisteredProcesses();
+	/** Get debug job
+	 * @return
+	 */
 	public IPJob getDebugJob();
+	/** Check given task id whether it contains in this event 
+	 * @param task_id
+	 * @return true if contains given task
+	 */
 	public boolean containTask(int task_id);
+	/** Get pcdi object by given task id
+	 * @param task_id
+	 * @return
+	 */
 	public IPCDIObject getSource(int task_id);
+	/** Get pcdi object
+	 * @return
+	 */
 	IPCDIObject getSource();
 }
 

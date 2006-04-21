@@ -25,5 +25,8 @@ import org.eclipse.ptp.debug.core.cdi.model.IPCDIWatchpoint;
  * 
  */
 public interface IPCDIWatchpointScope extends IPCDISessionObject {
+	/** Get pcdi watch point
+	 * @return
+	 */
 	IPCDIWatchpoint getWatchpoint();
 }

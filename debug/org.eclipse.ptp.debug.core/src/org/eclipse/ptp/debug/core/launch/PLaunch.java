@@ -79,7 +79,7 @@ public class PLaunch extends Launch implements IPLaunch {
 			IPDebugTarget debugTarget = getDebugTarget(taskArray[i]);
 			if (debugTarget != null) {
 				removeDebugTarget(debugTarget);
-				debugTarget.cleanup();
+				debugTarget.terminated();
 			}
 		}
 		if (sendEvent)

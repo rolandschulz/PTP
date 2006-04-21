@@ -30,27 +30,53 @@ public class PCDIException extends CDIException {
 	public static final String NOT_IMPLEMENTED = "<Not implemented>";
 	
 	private int error_code;
+	/** Constructor
+	 * @param msg
+	 * @param error_code
+	 */
 	public PCDIException(String msg, int error_code) {
 		super(msg);
 		this.error_code = error_code;
 	}
+	/** Constructor
+	 * @param msg
+	 */
 	public PCDIException(String msg) {
 		this(msg, IPCDIErrorEvent.DBG_ERROR);
 	}
+	/** Constructor
+	 * @param msg
+	 * @param details
+	 * @param error_code
+	 */
 	public PCDIException(String msg, String details, int error_code) {
 		super(msg, details);
 		this.error_code = error_code;
 	}
+	/** Constructor
+	 * @param msg
+	 * @param details
+	 */
 	public PCDIException(String msg, String details) {
 		this(msg, details, IPCDIErrorEvent.DBG_ERROR);
 	}
+	/** Constructor
+	 * @param e
+	 * @param error_code
+	 */
 	public PCDIException(Throwable e, int error_code) {
 		this(e.getMessage(), error_code);
 	}
+	/** Constructor
+	 * @param e
+	 */
 	public PCDIException(Throwable e) {
 		this(e.getMessage());
 	}
 	
+	/** Get error code
+	 * @return
+	 */
 	public int getErrorCode() {
 		return error_code;
 	}

@@ -30,6 +30,9 @@ public interface IPCDIResumedEvent extends IPCDIEvent {
 	final static public int STEP_INTO_INSTRUCTION = 4;
 	final static public int STEP_RETURN = 5;
 
+	/** Get type of resume
+	 * @return
+	 */
 	int getType();	
 }
 

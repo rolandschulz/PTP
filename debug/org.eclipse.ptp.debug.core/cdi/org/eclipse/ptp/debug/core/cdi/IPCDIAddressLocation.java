@@ -26,6 +26,9 @@ import org.eclipse.ptp.debug.core.cdi.model.IPCDILocation;
  * 
  */
 public interface IPCDIAddressLocation extends IPCDILocation {
+	/** Get address
+	 * @return
+	 */
 	BigInteger getAddress();	
 }
 

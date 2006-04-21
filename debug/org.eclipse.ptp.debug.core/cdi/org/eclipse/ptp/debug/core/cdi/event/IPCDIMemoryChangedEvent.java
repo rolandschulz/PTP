@@ -25,6 +25,9 @@ import java.math.BigInteger;
  * 
  */
 public interface IPCDIMemoryChangedEvent extends IPCDIChangedEvent {
+	/** Get address
+	 * @return
+	 */
 	BigInteger[] getAddresses();
 }
 

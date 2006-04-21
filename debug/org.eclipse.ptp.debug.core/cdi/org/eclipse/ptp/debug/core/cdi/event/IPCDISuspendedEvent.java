@@ -25,7 +25,13 @@ import org.eclipse.ptp.debug.core.cdi.IPCDISessionObject;
  *
  */
 public interface IPCDISuspendedEvent extends IPCDIEvent {
+	/** Get pcdi session object
+	 * @return
+	 */
 	IPCDISessionObject getReason();	
+	/** Get thread id
+	 * @return
+	 */
 	int getThreadId();
 }
 

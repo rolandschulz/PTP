@@ -25,5 +25,8 @@ import org.eclipse.ptp.debug.core.cdi.IPCDISessionObject;
  *
  */
 public interface IPCDIExitedEvent extends IPCDIDestroyedEvent {
+	/** Get pcid session object
+	 * @return
+	 */
 	IPCDISessionObject getReason();	
 }
