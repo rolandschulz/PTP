@@ -2058,7 +2058,7 @@ server(char *name, char *host, int port)
 	debugJobs = NewList();
 	
 	if (proxy_svr_init(name, &handler_funcs, &helper_funcs, command_tab, &orte_proxy) != PROXY_RES_OK)
-		return;
+		return 0;
 	
 	proxy_svr_connect(orte_proxy, host, port);
 	printf("proxy_svr_connect returned.\n");
@@ -2123,19 +2123,15 @@ server(char *name, char *host, int port)
 	return rc;
 }
 
-/*
- * GREG:
- * This sighandler_t stuff doesn't work on my MAC - maybe void *?  Maybe change autoconf?
- * Also I can't figure out how to make the function call correctly in the next function,
- * the call to the function pointer */
-sighandler_t saved_signals[NSIG];
+RETSIGTYPE (*saved_signals[NSIG])(int);
 
-void ptp_signal_handler(int sig)
+RETSIGTYPE
+ptp_signal_handler(int sig)
 {
 		ptp_signal_fired = sig;
 		if(sig >= 0 && sig < NSIG) {
-			sighandler_t saved_signal = saved_signals[sig];
-			*(saved_signal)(sig);
+			RETSIGTYPE (*saved_signal)(int) = saved_signals[sig];
+			saved_signal(sig);
 		}
 }
 
