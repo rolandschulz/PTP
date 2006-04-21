@@ -34,9 +34,9 @@ test_mi_CFLAGS =			-I./include -I./src/mi -I$(UTILS)/include $(AM_CFLAGS) -g
 test_mi_LDFLAGS = 		-g
 test_mi_LDADD =			libmi.a $(UTILS)/libutils.a
 
-include_HEADERS =		include/breakpoint.h include/dbg.h include/location.h include/stackframe.h include/memoryinfo.h
+noinst_HEADERS =			include/breakpoint.h include/dbg.h include/location.h include/stackframe.h include/memoryinfo.h
 
-lib_LIBRARIES =			libdbgclnt.a libdbgutils.a libmi.a
+noinst_LIBRARIES =		libdbgclnt.a libdbgutils.a libmi.a
 
 libdbgclnt_a_SOURCES =	src/client/client_interface.c 
 libdbgclnt_a_CFLAGS =		-I./include -I./libaif -I$(PROXY)/include -I$(UTILS)/include $(AM_CFLAGS) -g
