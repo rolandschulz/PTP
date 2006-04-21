@@ -66,6 +66,7 @@ public class Session implements IPCDISession, IPCDISessionObject {
 	ExpressionManager expressionManager;
 	VariableManager variableManager;
 	SourceManager sourceManager;
+	MemoryManager memoryManager;
 	IPCDISessionConfiguration configuration;
 	IAbstractDebugger debugger = null;
 	IPJob job = null;
@@ -89,6 +90,7 @@ public class Session implements IPCDISession, IPCDISessionObject {
 		expressionManager = new ExpressionManager(this);
 		variableManager = new VariableManager(this);
 		sourceManager = new SourceManager(this);
+		memoryManager = new MemoryManager(this);
 		//add observer
 		this.debugger.addDebuggerObserver(eventManager);
 	}
@@ -207,6 +209,9 @@ public class Session implements IPCDISession, IPCDISessionObject {
 	}
 	public SourceManager getSourceManager() {
 		return sourceManager;
+	}
+	public MemoryManager getMemoryManager() {
+		return memoryManager;
 	}
 	public IPCDITarget[] getTargets() {
 		return getProcessManager().getCDITargets();

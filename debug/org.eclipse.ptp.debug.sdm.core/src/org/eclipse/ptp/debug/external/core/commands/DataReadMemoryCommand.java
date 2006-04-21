@@ -20,34 +20,47 @@ package org.eclipse.ptp.debug.external.core.commands;
 
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IAbstractDebugger;
-import org.eclipse.ptp.debug.core.aif.IAIF;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
+import org.eclipse.ptp.debug.external.core.cdi.model.DataReadMemoryInfo;
 
 /**
  * @author Clement chu
  * 
  */
-public class EvaluteExpressionCommand extends AbstractDebugCommand {
-	private String varName = "";
-	
-	public EvaluteExpressionCommand(BitList tasks, String varName) {
+public class DataReadMemoryCommand extends AbstractDebugCommand {
+	long offset;
+	String address;
+	int wordFormat;
+	int wordSize;
+	int rows;
+	int cols;
+	Character asChar;
+
+	public DataReadMemoryCommand(BitList tasks, long offset, String address, int wordFormat, int wordSize, int rows, int cols, Character asChar) {
 		super(tasks, false, true);
-		this.varName = varName;
+		this.offset = offset;
+		this.address = address;
+		this.wordFormat = wordFormat;
+		this.wordSize = wordSize;
+		this.rows = rows;
+		this.cols = cols;
+		this.asChar = asChar;
 	}
 	public void execCommand(IAbstractDebugger debugger, int timeout) throws PCDIException {
 		setTimeout(timeout);
-		debugger.evaluateExpression(tasks, varName);
+		debugger.setDataReadMemoryCommand(tasks, offset, address, wordFormat, wordSize, rows, cols, asChar);
 	}
 	
-	public String getExpressionValue() throws PCDIException {
+	public DataReadMemoryInfo getDataReadMemoryInfo() throws PCDIException {
 		if (waitForReturn()) {
-			if (result instanceof IAIF) {
-				return ((IAIF)result).getValue().toString();
+			if (result instanceof DataReadMemoryInfo) {
+				return (DataReadMemoryInfo)result;
 			}
 		}
 		throw new PCDIException("Wrong type return on command: " + getName());
 	}
 	public String getName() {
-		return "Evaluate expression"; 
-	}
+		return "Data Read Memory"; 
+	}	
 }
+

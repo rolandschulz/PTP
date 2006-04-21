@@ -16,38 +16,27 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.external.core.commands;
+package org.eclipse.ptp.debug.external.core.cdi.event;
 
+import java.math.BigInteger;
 import org.eclipse.ptp.core.util.BitList;
-import org.eclipse.ptp.debug.core.IAbstractDebugger;
-import org.eclipse.ptp.debug.core.aif.IAIF;
-import org.eclipse.ptp.debug.core.cdi.PCDIException;
+import org.eclipse.ptp.debug.core.cdi.IPCDISession;
+import org.eclipse.ptp.debug.core.cdi.event.IPCDIMemoryChangedEvent;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIObject;
 
 /**
  * @author Clement chu
  * 
  */
-public class EvaluteExpressionCommand extends AbstractDebugCommand {
-	private String varName = "";
+public class MemoryChangedEvent extends ChangedEvent implements IPCDIMemoryChangedEvent {
+	BigInteger[] addrs;
 	
-	public EvaluteExpressionCommand(BitList tasks, String varName) {
-		super(tasks, false, true);
-		this.varName = varName;
+	public MemoryChangedEvent(IPCDISession session, BitList tasks, IPCDIObject source, BigInteger[] addrs) {
+		super(session, tasks, source);
+		this.addrs = addrs;
 	}
-	public void execCommand(IAbstractDebugger debugger, int timeout) throws PCDIException {
-		setTimeout(timeout);
-		debugger.evaluateExpression(tasks, varName);
-	}
-	
-	public String getExpressionValue() throws PCDIException {
-		if (waitForReturn()) {
-			if (result instanceof IAIF) {
-				return ((IAIF)result).getValue().toString();
-			}
-		}
-		throw new PCDIException("Wrong type return on command: " + getName());
-	}
-	public String getName() {
-		return "Evaluate expression"; 
+	public BigInteger[] getAddresses() {
+		return addrs;
 	}
 }
+

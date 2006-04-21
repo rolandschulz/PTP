@@ -217,7 +217,7 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 	}
 	//not used breakpoint created event
 	public void handleBreakpointCreatedEvent(BitList tasks) {
-		fireEvent(new BreakpointCreatedEvent(getSession(), tasks));		
+		fireEvent(new BreakpointCreatedEvent(getSession(), tasks));
 	}
 	public void handleBreakpointHitEvent(BitList tasks, int bpid, int thread_id) {
 		IPCDIBreakpoint bpt = ((Session)getSession()).getBreakpointManager().findCDIBreakpoint(bpid);

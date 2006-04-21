@@ -87,7 +87,6 @@ dbg_stackframe_to_str(stackframe *sf, char **result)
 	return 0;
 }
 
-
 static int
 dbg_cstring_list_to_str(List *lst, char **result)
 {
@@ -98,6 +97,50 @@ static int
 dbg_stackframes_to_str(List *lst, char **result)
 {
 	return proxy_list_to_str(lst, (int (*)(void *, char **))dbg_stackframe_to_str, result);
+}
+
+//clement added
+static int dbg_memory_to_str(memory *mem, char **result) {
+	char * addr;
+	char * ascii;
+	char * data;
+	
+	if (mem == NULL) {
+		asprintf(result, "%s", NULL_STR);
+		return 0;
+	}
+	
+	proxy_cstring_to_str(mem->addr, &addr);
+	proxy_cstring_to_str(mem->ascii, &ascii);
+	dbg_cstring_list_to_str(mem->data, &data);
+	asprintf(result, "%s %s %s", addr, ascii, data);
+	
+	free(addr);
+	free(ascii);
+	free(data);
+	return 0;
+}
+//clement added
+static int dbg_memories_to_str(List *lst, char **result) {
+	return proxy_list_to_str(lst, (int (*)(void *, char **))dbg_memory_to_str, result);
+}
+//clement added
+static int dbg_memoryinfo_to_str(memoryinfo *meninfo, char **result) {
+	char * addr;
+	char * memories;
+
+	if (meninfo == NULL) {
+		asprintf(result, "%s", NULL_STR);
+		return 0;
+	}
+
+	proxy_cstring_to_str(meninfo->addr, &addr);
+	dbg_memories_to_str(meninfo->memories, &memories);
+	asprintf(result, "%s %ld %ld %ld %ld %ld %ld %s", addr, meninfo->nextRow, meninfo->prevRow, meninfo->nextPage, meninfo->prevPage, meninfo->numBytes, meninfo->totalBytes, memories);
+
+	free(addr);
+	free(memories);
+	return 0;
 }
 
 static int
@@ -194,14 +237,20 @@ DbgEventToStr(dbg_event *e, char **result)
 		free(str);
 		break;
 	
-	case DBGEV_THREADS://clement added
+	case DBGEV_THREADS: //clement added
 		dbg_cstring_list_to_str(e->list, &str);
 		asprintf(result, "%d %s %d %s", e->event, pstr, e->thread_id, str);
 		free(str);
 		break;
 		
-	case DBGEV_STACK_DEPTH://clement added
+	case DBGEV_STACK_DEPTH: //clement added
 		asprintf(result, "%d %s %d", e->event, pstr, e->stack_depth);
+		break;
+
+	case DBGEV_DATAR_MEM: //clement added
+		dbg_memoryinfo_to_str(e->meminfo, &str);
+		asprintf(result, "%d %s %s", e->event, pstr, str);
+		free(str);
 		break;
 		
 	case DBGEV_VARS:
@@ -368,6 +417,93 @@ dbg_str_to_aif(char **args, AIF **res)
 	return 0;
 }
 
+static int dbg_str_to_memory_data(char **args, List **lst) {
+	int	i;
+	int	count = atoi(args[0]);
+	char * str;
+
+	*lst = NewList();
+	for (i=0; i<count; i++) {
+		if (proxy_str_to_cstring(args[i+1], &str) < 0) {
+			DestroyList(*lst, free);
+			return -1;
+		}
+		AddToList(*lst, (void *)str);
+	}
+	return 0;
+}
+
+//clement added
+static int dbg_str_to_memory(char **args, List **lst) {
+	int	i;
+	int	count = atoi(args[0]);
+	memory *m;
+	
+	*lst = NewList();
+	for (i=0; i<count; i++) {
+		m = NewMemory();
+		if (proxy_str_to_cstring(args[i+1], &m->addr) < 0) {
+			DestroyList(*lst, FreeMemory);
+			return -1;
+		}
+		if (proxy_str_to_cstring(args[i+2], &m->ascii) < 0) {
+			DestroyList(*lst, FreeMemory);
+			return -1;
+		}		
+		if (dbg_str_to_memory_data(&args[i+3], &m->data) < 0) {
+			DestroyList(*lst, FreeMemory);
+			return -1;
+		}
+		AddToList(*lst, (void *)m);
+	}
+	return 0;
+}
+//clement added
+static int dbg_str_to_memoryinfo(char **args, memoryinfo **info) {
+	memoryinfo * meminfo;
+	
+	if (strcmp(args[0], NULL_STR) == 0) {
+		*info = NULL;
+		return 0;
+	}
+
+	meminfo = NewMemoryInfo();
+	if (proxy_str_to_cstring(args[0], &meminfo->addr) < 0) {
+		FreeMemoryInfo(meminfo);
+		return -1;
+	}
+	if (proxy_str_to_int(args[1], &meminfo->nextRow) < 0) {
+		FreeMemoryInfo(meminfo);
+		return -1;
+	}
+	if (proxy_str_to_int(args[2], &meminfo->prevRow) < 0) {
+		FreeMemoryInfo(meminfo);
+		return -1;
+	}
+	if (proxy_str_to_int(args[3], &meminfo->nextPage) < 0) {
+		FreeMemoryInfo(meminfo);
+		return -1;
+	}
+	if (proxy_str_to_int(args[4], &meminfo->prevPage) < 0) {
+		FreeMemoryInfo(meminfo);
+		return -1;
+	}
+	if (proxy_str_to_int(args[5], &meminfo->numBytes) < 0) {
+		FreeMemoryInfo(meminfo);
+		return -1;
+	}
+	if (proxy_str_to_int(args[6], &meminfo->totalBytes) < 0) {
+		FreeMemoryInfo(meminfo);
+		return -1;
+	}
+	if (dbg_str_to_memory(&args[7], &meminfo->memories) < 0) {
+		FreeMemoryInfo(meminfo);
+		return -1;			
+	}
+	*info = meminfo;	
+	return 0;
+}
+
 int
 DbgStrToEvent(char *str, dbg_event **ev)
 {
@@ -380,7 +516,6 @@ DbgStrToEvent(char *str, dbg_event **ev)
 		return -1;
 		
 	event = atoi(args[0]);
-	
 	procs = str_to_bitset(args[1]);
 
 	switch (event)
@@ -463,6 +598,12 @@ DbgStrToEvent(char *str, dbg_event **ev)
 	case DBGEV_STACK_DEPTH: //clement added
 		e = NewDbgEvent(DBGEV_STACK_DEPTH);
 		if (proxy_str_to_int(args[2], &e->stack_depth) < 0)
+			goto error_out;
+		break;
+
+	case DBGEV_DATAR_MEM: //clement added
+		e = NewDbgEvent(DBGEV_DATAR_MEM);
+		if (dbg_str_to_memoryinfo(&args[2], &e->meminfo) < 0)
 			goto error_out;
 		break;
 	
@@ -569,6 +710,11 @@ FreeDbgEvent(dbg_event *e) {
 	case DBGEV_THREADS://clement added
 		if (e->list != NULL)
 			DestroyList(e->list, free);
+		break;
+
+	case DBGEV_DATAR_MEM://clement added
+		if (e->meminfo != NULL)
+			FreeMemoryInfo(e->meminfo);
 		break;
 
 	case DBGEV_VARS:

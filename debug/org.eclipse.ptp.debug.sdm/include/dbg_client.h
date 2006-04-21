@@ -79,6 +79,13 @@ int DbgClntSetThreadSelect(char **);
 //clement added
 int DbgClntStackInfoDepth(char **);
 
+/**
+ * clement added
+ * Thread operations
+ */
+int DbgClntDataReadMemory(char **);
+int DbgClntDataWriteMemory(char **);
+
 /*
  * Event Handling
  */

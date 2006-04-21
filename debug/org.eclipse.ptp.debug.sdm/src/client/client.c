@@ -96,6 +96,8 @@ static proxy_svr_commands command_tab[] = {
 	{DBG_LISTINFOTHREADS_CMD,		DbgClntListInfoThreads}, //clement added
 	{DBG_SETTHREADSELECT_CMD,		DbgClntSetThreadSelect}, //clement added
 	{DBG_STACKINFODEPTH_CMD,		DbgClntStackInfoDepth}, //clement added
+	{DBG_DATAREADMEMORY_CMD,		DbgClntDataReadMemory}, //clement added
+	{DBG_DATAWRITEMEMORY_CMD,		DbgClntDataWriteMemory}, //clement added
 	{NULL,							NULL}
 };
 

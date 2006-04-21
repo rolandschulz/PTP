@@ -133,4 +133,28 @@ public class ProxyDebugClient extends AbstractProxyDebugClient {
 	public void debugSetThreadSelect(BitList procs, int threadNum) throws IOException {
 		sendCommand("THS", procs, Integer.toString(threadNum));
 	}
+	
+	public void setDataReadMemoryCommand(BitList procs, long offset, String address, String format, int wordSize, int rows, int cols, Character asChar) throws IOException {
+		String[] args = new String[] {
+				Long.toString(offset),
+				address,
+				format,
+				Integer.toString(wordSize),
+				Integer.toString(rows),
+				Integer.toString(cols),
+				asChar==null?"":asChar.toString()
+			};
+		sendCommand("DRM", procs, args);
+	}
+	
+	public void setDataWriteMemoryCommand(BitList procs, long offset, String address, String format, int wordSize, String value) throws IOException {
+		String[] args = new String[] {
+				Long.toString(offset),
+				address,
+				format,
+				Integer.toString(wordSize),
+				value
+			};
+		sendCommand("DWM", procs, args);
+	}
 }

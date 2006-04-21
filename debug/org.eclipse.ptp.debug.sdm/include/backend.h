@@ -25,6 +25,7 @@
 #include "bitset.h"
 #include "breakpoint.h"
 #include "stackframe.h"
+#include "memoryinfo.h" //clement added
 #include "dbg_event.h"
 
 struct dbg_backend_funcs {
@@ -51,6 +52,9 @@ struct dbg_backend_funcs {
 	int (*listinfothreads)(void); //clement added
 	int (*setthreadselect)(int); //clement added
 	int (*stackinfodepth)(void); //clement added
+	int	(*datareadmemory)(long, char*, char*, int, int, int, char*); //clement added
+	int	(*datawritememory)(long, char*, char*, int, char*); //clement added
+	
 	int (*quit)(void);
 };
 typedef struct dbg_backend_funcs	dbg_backend_funcs;

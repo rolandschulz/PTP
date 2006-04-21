@@ -28,6 +28,7 @@ import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.ExtFormat;
 import org.eclipse.ptp.debug.core.IDebugCommand;
 import org.eclipse.ptp.debug.core.IDebugger;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
@@ -55,6 +56,7 @@ import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugDataEvent;
 import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugErrorEvent;
 import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugInfoThreadsEvent;
 import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugInitEvent;
+import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugMemoryInfoEvent;
 import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugSetThreadSelectEvent;
 import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugSignalEvent;
 import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugStackInfoDepthEvent;
@@ -335,6 +337,51 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			throw new PCDIException(e.getMessage());
 		}
 	}
+	private String createFormat(int wordFormat) {
+		switch (wordFormat) {
+		case ExtFormat.UNSIGNED :
+			return "u";
+		case ExtFormat.FLOAT :
+			return "f";
+		case ExtFormat.ADDRESS :
+			return "a";
+		case ExtFormat.INSTRUCTION :
+			return "i";
+		case ExtFormat.CHAR :
+			return "c";
+		case ExtFormat.STRING :
+			return "s";
+		case ExtFormat.DECIMAL :
+			return "d";
+		case ExtFormat.BINARY :
+			return "t";
+		case ExtFormat.OCTAL :
+			return "o";
+		case ExtFormat.HEXADECIMAL:
+		default :
+			return "x";
+		}
+	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.IDebugger#setDataReadMemoryCommand(org.eclipse.ptp.core.util.BitList, long, java.lang.String, int, int, int, int, java.lang.Character)
+	 */
+	public void setDataReadMemoryCommand(BitList tasks, long offset, String address, int wordFormat, int wordSize, int rows, int cols, Character asChar) throws PCDIException {
+		try {
+			proxy.setDataReadMemoryCommand(tasks, offset, address, createFormat(wordFormat), wordSize, rows, cols, asChar);
+		} catch (IOException e) {
+			throw new PCDIException(e.getMessage());
+		}
+	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.IDebugger#setDataWriteMemoryCommand(org.eclipse.ptp.core.util.BitList, long, java.lang.String, int, int, java.lang.String)
+	 */
+	public void setDataWriteMemoryCommand(BitList tasks, long offset, String address, int wordFormat, int wordSize, String value) throws PCDIException {
+		try {
+			proxy.setDataWriteMemoryCommand(tasks, offset, address, createFormat(wordFormat), wordSize, value);
+		} catch (IOException e) {
+			throw new PCDIException(e.getMessage());
+		}
+	}
 	/**
 	 * stack info depth 
 	 */
@@ -501,6 +548,11 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 		case IProxyDebugEvent.EVENT_DBG_STACK_INFO_DEPTH:
 			ProxyDebugStackInfoDepthEvent stackInfoDepthEvent = (ProxyDebugStackInfoDepthEvent)e;
 			completeCommand(e.getBitSet(), new Integer(stackInfoDepthEvent.getDepth()));			
+			break;
+			
+		case IProxyDebugEvent.EVENT_DBG_DATA_READ_MEMORY:
+			ProxyDebugMemoryInfoEvent memoryInfoEvent = (ProxyDebugMemoryInfoEvent)e;
+			completeCommand(e.getBitSet(), memoryInfoEvent.getMemoryInfo());			
 			break;
 			
 		case IProxyDebugEvent.EVENT_DBG_ERROR:

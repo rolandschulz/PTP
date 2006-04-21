@@ -28,5 +28,6 @@
 #include "MIVar.h"
 #include "MIArg.h"
 #include "MIError.h"
+#include "MIMemory.h" //clement added
 
 #endif /* _MI_H_ */

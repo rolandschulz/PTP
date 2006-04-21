@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.core.cdi;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -31,9 +32,12 @@ import org.eclipse.ptp.debug.core.cdi.event.IPCDIDisconnectedEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEventListener;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIExitedEvent;
+import org.eclipse.ptp.debug.core.cdi.event.IPCDIMemoryChangedEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIResumedEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDISuspendedEvent;
 import org.eclipse.ptp.debug.external.core.PTPDebugExternalPlugin;
+import org.eclipse.ptp.debug.external.core.cdi.event.MemoryChangedEvent;
+import org.eclipse.ptp.debug.external.core.cdi.model.MemoryBlock;
 import org.eclipse.ptp.debug.external.core.cdi.model.Target;
 import org.eclipse.ptp.debug.external.core.cdi.model.Thread;
 
@@ -42,9 +46,9 @@ public class EventManager extends SessionObject implements IPCDIEventManager, Ob
 
 	public void update(Observable o, Object arg) {
 		IPCDIEvent event = (IPCDIEvent) arg;
-		List cdiList = new ArrayList(1);
 
-		cdiList.add(event);
+		List cdiList = new ArrayList(1);		
+		Session session = (Session)getSession();		
 		if (event instanceof IPCDISuspendedEvent) {
 			processSuspendedEvent((IPCDISuspendedEvent)event);
 		}
@@ -57,8 +61,32 @@ public class EventManager extends SessionObject implements IPCDIEventManager, Ob
 		else if (event instanceof IPCDICreatedEvent) {
 		}
 		else if (event instanceof IPCDIChangedEvent) {
-			
+			if (event instanceof IPCDIMemoryChangedEvent) {
+				// We need to fire an event for all the register blocks
+				// that may contain the modified addresses.
+				System.err.println("******* GOT IPCDIMemoryChangedEvent");
+				MemoryManager mgr = session.getMemoryManager();
+				try {
+					MemoryBlock[] blocks = (MemoryBlock[])mgr.getMemoryBlocks((Target)event.getSource());
+					MemoryChangedEvent memEvent = (MemoryChangedEvent)event;
+					BigInteger[] addresses = memEvent.getAddresses();
+					List new_addresses = new ArrayList(addresses.length);
+					for (int i = 0; i < blocks.length; i++) {
+						for (int j=0; j<addresses.length; j++) {
+							if (blocks[i].contains(addresses[j]) && (! blocks[i].isFrozen() || blocks[i].isDirty())) {
+								new_addresses.add(addresses[j]);
+							}
+						}
+						cdiList.add(new MemoryChangedEvent(session, event.getAllProcesses(), event.getSource(), (BigInteger[]) new_addresses.toArray(new BigInteger[new_addresses.size()])));
+						blocks[i].setDirty(false);
+					}
+				} catch (PCDIException e) {
+					
+				}
+			}
 		}
+		cdiList.add(event);
+		
 		// Fire the event;
 		IPCDIEvent[] cdiEvents = (IPCDIEvent[])cdiList.toArray(new IPCDIEvent[0]);
 		fireEvents(cdiEvents);
@@ -97,6 +125,7 @@ public class EventManager extends SessionObject implements IPCDIEventManager, Ob
 		ExpressionManager expMgr  = session.getExpressionManager();		
 		BreakpointManager bpMgr = session.getBreakpointManager();
 		SourceManager srcMgr = session.getSourceManager();
+		MemoryManager memMgr = session.getMemoryManager();
 		*/
 		int[] procs = event.getAllRegisteredProcesses().toArray();
 		for (int i = 0; i < procs.length; i++) {
@@ -134,6 +163,9 @@ public class EventManager extends SessionObject implements IPCDIEventManager, Ob
 				//}
 				if (srcMgr.isAutoUpdate()) {
 					srcMgr.update(currentTarget);
+				}
+				if (memMgr.isAutoUpdate()) {
+					memMgr.update(currentTarget);
 				}
 			} catch (PCDIException e) {
 				e.printStackTrace();

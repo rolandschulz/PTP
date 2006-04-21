@@ -33,7 +33,9 @@ import org.eclipse.ptp.debug.core.cdi.model.IPCDILocator;
 import org.eclipse.ptp.debug.external.core.cdi.Condition;
 import org.eclipse.ptp.debug.external.core.cdi.Locator;
 import org.eclipse.ptp.debug.external.core.cdi.breakpoints.LineBreakpoint;
+import org.eclipse.ptp.debug.external.core.cdi.model.DataReadMemoryInfo;
 import org.eclipse.ptp.debug.external.core.cdi.model.LineLocation;
+import org.eclipse.ptp.debug.external.core.cdi.model.Memory;
 import org.eclipse.ptp.debug.external.core.proxy.ProxyDebugStackframe;
 
 public class ProxyDebugEvent extends ProxyEvent {
@@ -158,8 +160,25 @@ public class ProxyDebugEvent extends ProxyEvent {
 			int depth = Integer.parseInt(args[2]);
 			evt = new ProxyDebugStackInfoDepthEvent(set, depth);
 			break;
+
+		case IProxyDebugEvent.EVENT_DBG_DATA_READ_MEMORY:
+			int numMemories = Integer.parseInt(args[9]);
+			Memory[] memories = new Memory[numMemories];
+			int data_len = 0;
+			for (int i=0; i<numMemories; i++) {
+				int new_data_len = Integer.parseInt(args[data_len*i+12]);
+				String addr = decodeString(args[data_len*i+10]);
+				String ascii = decodeString(args[data_len*i+11]);
+				String[] data_str = new String[new_data_len];
+				for (int j=0; j<new_data_len; j++) {
+					data_str[j] = decodeString(args[data_len*i+13+j]);
+				}
+				data_len = new_data_len;
+				memories[i] = new Memory(addr, ascii, data_str);
+			}
+			evt = new ProxyDebugMemoryInfoEvent(set, toMemoryInfo(args[2], args[3], args[4], args[5], args[6], args[7], args[8], memories));
+			break;
 		}
-		
 		return evt;
 	}
 	
@@ -218,5 +237,8 @@ public class ProxyDebugEvent extends ProxyEvent {
 		int stepLevel = Integer.parseInt(level);
 		int stepLine = Integer.parseInt(line);
 		return new ProxyDebugStackframe(stepLevel, decodeString(file), decodeString(func), stepLine, decodeString(addr));
+	}
+	public static DataReadMemoryInfo toMemoryInfo(String addr, String nextRow, String prevRow, String nextPage, String prevPage, String numBytes, String totalBytes, Memory[] memories) {
+		return new DataReadMemoryInfo(decodeString(addr), Long.parseLong(nextRow), Long.parseLong(prevRow), Long.parseLong(nextPage), Long.parseLong(prevPage), Long.parseLong(numBytes), Long.parseLong(totalBytes), memories);
 	}
 }

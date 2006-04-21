@@ -98,6 +98,8 @@ static int	GDBMIListArguments(int);
 static int	GDBMIGetInfoThread(void); //clement added
 static int	GDBMISetThreadSelect(int); //clement added
 static int	GDBMIStackInfoDepth(void); //clement added
+static int	GDBMIDataReadMemory(long, char*, char*, int, int, int, char*); //clement added
+static int	GDBMIDataWriteMemory(long, char*, char*, int, char*); //clement added
 static int	GDBMIGetGlobalVariables(void);
 static int	GDBMIQuit(void);
 
@@ -133,6 +135,8 @@ dbg_backend_funcs	GDBMIBackend =
 	GDBMIGetInfoThread, //clement added
 	GDBMISetThreadSelect, //clement added
 	GDBMIStackInfoDepth, //clement added
+	GDBMIDataReadMemory, //clement added
+	GDBMIDataWriteMemory, //clement added
 	GDBMIQuit
 };
 
@@ -1718,7 +1722,7 @@ static int GDBMIGetInfoThread(void) {
 		AddToList(e->list, (void *)strdup(tid));
 	}
 
-	DestroyList(info->thread_ids, NULL);
+	DestroyList(info->thread_ids, free);
 	free(info);
 	SaveEvent(e);
 	
@@ -1761,6 +1765,7 @@ static int GDBMISetThreadSelect(int threadNum) {
 	e->thread_id = info->current_thread_id;
 	e->frame = s;
 
+	MIFrameFree(info->frame);
 	free(info);
 	SaveEvent(e);
 	
@@ -1791,6 +1796,90 @@ static int GDBMIStackInfoDepth() {
 	
 	return DBGRES_OK;
 }
+
+//clement added
+static int GDBMIDataReadMemory(long offset, char* address, char* format, int wordSize, int rows, int cols, char* asChar) {
+	MICommand *	cmd;
+	dbg_event *	e;
+	MIDataReadMemoryInfo * info;
+	MIMemory * mem;	
+	memoryinfo *meminfo;
+	memory * m;
+	
+	CHECK_SESSION();
+	
+	cmd = MIDataReadMemory(offset, address, format, wordSize, rows, cols, asChar);
+	SendCommandWait(DebugSession, cmd);
+	if (!MICommandResultOK(cmd)) {
+		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
+		MICommandFree(cmd);
+		return DBGRES_ERR;
+	}
+	info = MIGetDataReadMemoryInfo(cmd);
+	MICommandFree(cmd);
+
+	e = NewDbgEvent(DBGEV_DATAR_MEM);
+	if (info != NULL) {
+		meminfo = NewMemoryInfo();
+		if (info->addr != NULL) {
+			meminfo->addr = strdup(info->addr);
+		}
+		meminfo->nextRow = info->nextRow;
+		meminfo->prevRow = info->prevRow;
+		meminfo->nextPage = info->nextPage;
+		meminfo->prevPage = info->prevPage;
+		meminfo->numBytes = info->numBytes;
+		meminfo->totalBytes = info->totalBytes;
+		if (info->memories != NULL ) {
+			meminfo->memories = NewList();
+			for (SetList(info->memories); (mem = (MIMemory *)GetListElement(info->memories)) != NULL;) {
+				m = NewMemory();
+				if (mem->addr != NULL) {
+					m->addr = strdup(mem->addr);
+				}
+				if (mem->ascii != NULL) {
+					m->ascii = strdup(mem->ascii);
+				}
+				if (mem->data != NULL) {
+					char* d;
+					m->data = NewList();
+					for (SetList(mem->data); (d = (char *)GetListElement(mem->data)) != NULL;) {
+						AddToList(m->data, (void *) strdup(d));
+					}
+				}
+				AddToList(meminfo->memories, (void *)m);
+			}
+		}
+	}
+	e->meminfo = meminfo;
+	MIDataReadMemoryInfoFree(info);
+
+	SaveEvent(e);
+	return DBGRES_OK;
+}
+
+//clement added
+static int GDBMIDataWriteMemory(long offset, char* address, char* format, int wordSize, char* value) {
+	MICommand *	cmd;
+	dbg_event *	e;
+	
+	CHECK_SESSION();
+	
+printf("----- gdbmi_sevrer: GDBMIDataWriteMemory called ---------\n");	
+	cmd = MIDataWriteMemory(offset, address, format, wordSize, value);
+	SendCommandWait(DebugSession, cmd);
+	if (!MICommandResultOK(cmd)) {
+		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
+		MICommandFree(cmd);
+		return DBGRES_ERR;
+	}
+	MICommandFree(cmd);
+//TODO
+	SaveEvent(NewDbgEvent(DBGEV_OK));
+	
+	return DBGRES_OK;
+}
+
 
 #if 0
 char tohex[] =	{'0', '1', '2', '3', '4', '5', '6', '7', 
