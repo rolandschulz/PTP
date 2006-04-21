@@ -95,6 +95,7 @@
 #define RTEV_ERROR_NODES			RTEV_OFFSET + 1006
 #define RTEV_ERROR_NATTR			RTEV_OFFSET + 1007
 #define RTEV_ERROR_ORTE_BPROC_SUBSCRIBE	RTEV_OFFSET + 1008
+/* are separate event codes needed for each signal? */
 #define RTEV_ERROR_HUP			RTEV_OFFSET + 1009
 #define RTEV_ERROR_INT			RTEV_OFFSET + 1010
 #define RTEV_ERROR_ILL			RTEV_OFFSET + 1011
@@ -151,8 +152,8 @@ int			is_orte_initialized = 0;
 pid_t		orted_pid = 0;
 List *		eventList;
 List *		debugJobs;
-
-int ptp_signal_fired;
+int			ptp_signal_exit;
+RETSIGTYPE	(*saved_signals[NSIG])(int);
 
 static proxy_handler_funcs handler_funcs = {
 	RegisterFileHandler,		// regfile() - call to register a file handler
@@ -2063,58 +2064,57 @@ server(char *name, char *host, int port)
 	proxy_svr_connect(orte_proxy, host, port);
 	printf("proxy_svr_connect returned.\n");
 	
-	ptp_signal_fired = 0;
-	
-	for (;;) {
+	while (ptp_signal_exit == 0) {
 		if  ((ORTEProgress() != PROXY_RES_OK) ||
 			(proxy_svr_progress(orte_proxy) != PROXY_RES_OK))
 			break;
-		if(ptp_signal_fired != 0) {
-			switch(ptp_signal_fired) {
-				case SIGINT:
-					asprintf(&msg1, "INT");
-					asprintf(&msg2, "Interrupt");
-					break;
-				case SIGHUP:
-					asprintf(&msg1, "HUP");
-					asprintf(&msg2, "Hangup");
-					break;
-				case SIGILL:
-					asprintf(&msg1, "ILL");
-					asprintf(&msg2, "Illegal Instruction");
-					break;
-				case SIGSEGV:
-					asprintf(&msg1, "SEGV");
-					asprintf(&msg2, "Segmentation Violation");
-					break;
-				case SIGTERM:
-					asprintf(&msg1, "TERM");
-					asprintf(&msg2, "Termination");
-					break;
-				case SIGQUIT:
-					asprintf(&msg1, "QUIT");
-					asprintf(&msg2, "Quit");
-					break;
-				case SIGABRT:
-					asprintf(&msg1, "ABRT");
-					asprintf(&msg2, "Process Aborted");
-					break;
-				default:
-					asprintf(&msg1, "***UNKNOWN SIGNAL***");
-					asprintf(&msg2, "ERROR - UNKNOWN SIGNAL, REPORT THIS!");
-					break;
-			}
-			printf("###### SIGNAL: %s\n", msg1);
-			printf("###### Shutting down ORTEd\n");
-			ORTEShutdown();
-			proxy_svr_event_callback(orte_proxy, ORTEErrorStr(error_code,
-				"ptp_orte_proxy received signal %s (%s).  Exit was required and performed cleanly."));
-			free(msg1);
-			free(msg2);
-			/* our return code = the signal that fired */
-			rc = ptp_signal_fired;
-			break;
+	}
+	
+	if (ptp_signal_exit != 0) {
+		switch(ptp_signal_exit) {
+			case SIGINT:
+				asprintf(&msg1, "INT");
+				asprintf(&msg2, "Interrupt");
+				break;
+			case SIGHUP:
+				asprintf(&msg1, "HUP");
+				asprintf(&msg2, "Hangup");
+				break;
+			case SIGILL:
+				asprintf(&msg1, "ILL");
+				asprintf(&msg2, "Illegal Instruction");
+				break;
+			case SIGSEGV:
+				asprintf(&msg1, "SEGV");
+				asprintf(&msg2, "Segmentation Violation");
+				break;
+			case SIGTERM:
+				asprintf(&msg1, "TERM");
+				asprintf(&msg2, "Termination");
+				break;
+			case SIGQUIT:
+				asprintf(&msg1, "QUIT");
+				asprintf(&msg2, "Quit");
+				break;
+			case SIGABRT:
+				asprintf(&msg1, "ABRT");
+				asprintf(&msg2, "Process Aborted");
+				break;
+			default:
+				asprintf(&msg1, "***UNKNOWN SIGNAL***");
+				asprintf(&msg2, "ERROR - UNKNOWN SIGNAL, REPORT THIS!");
+				break;
 		}
+		printf("###### SIGNAL: %s\n", msg1);
+		printf("###### Shutting down ORTEd\n");
+		ORTEShutdown();
+		/* error_code = RTEV_ERROR_SIGNAL */
+		proxy_svr_event_callback(orte_proxy, ORTEErrorStr(error_code,
+			"ptp_orte_proxy received signal %s (%s).  Exit was required and performed cleanly."));
+		free(msg1);
+		free(msg2);
+		/* our return code = the signal that fired */
+		rc = ptp_signal_exit;
 	}
 	
 	proxy_svr_finish(orte_proxy);
@@ -2122,8 +2122,6 @@ server(char *name, char *host, int port)
 	
 	return rc;
 }
-
-RETSIGTYPE (*saved_signals[NSIG])(int);
 
 RETSIGTYPE
 ptp_signal_handler(int sig)
@@ -2159,6 +2157,12 @@ main(int argc, char *argv[])
 		fprintf(stderr, "%s [--proxy=proxy] [--host=host_name] [--port=port]\n", argv[0]);
 		return 1;
 	}
+	
+	/* 
+	 * signal can happen any time after handlers are installed, so
+	 * make sure we catch it
+	 */
+	ptp_signal_exit = 0;
 	
 	/* setup our signal handlers */
 	saved_signals[SIGINT] = signal(SIGINT, ptp_signal_handler);
