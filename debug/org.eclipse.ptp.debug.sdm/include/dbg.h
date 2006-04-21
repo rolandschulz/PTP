@@ -26,6 +26,7 @@
 #include "bitset.h"
 #include "breakpoint.h"
 #include "stackframe.h"
+#include "memoryinfo.h" //clement added
 #include "dbg_error.h"
 #include "dbg_event.h"
 #include "list.h"
@@ -83,6 +84,13 @@ int DbgSetThreadSelect(session *s, bitset *set, int);
 
 //clement added
 int DbgStackInfoDepth(session *s, bitset *set);
+
+/**
+ * clement added
+ * Memory operations
+ */
+int DbgDataReadMemory(session *s, bitset *set, long, char*, char*, int, int, int, char*);
+int DbgDataWriteMemory(session *s, bitset *set, long, char*, char*, int, char*);
  
 /*
  * Event Handling

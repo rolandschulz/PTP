@@ -16,38 +16,40 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.external.core.commands;
-
-import org.eclipse.ptp.core.util.BitList;
-import org.eclipse.ptp.debug.core.IAbstractDebugger;
-import org.eclipse.ptp.debug.core.aif.IAIF;
-import org.eclipse.ptp.debug.core.cdi.PCDIException;
-
-/**
+ 
+ /**
  * @author Clement chu
  * 
  */
-public class EvaluteExpressionCommand extends AbstractDebugCommand {
-	private String varName = "";
-	
-	public EvaluteExpressionCommand(BitList tasks, String varName) {
-		super(tasks, false, true);
-		this.varName = varName;
-	}
-	public void execCommand(IAbstractDebugger debugger, int timeout) throws PCDIException {
-		setTimeout(timeout);
-		debugger.evaluateExpression(tasks, varName);
-	}
-	
-	public String getExpressionValue() throws PCDIException {
-		if (waitForReturn()) {
-			if (result instanceof IAIF) {
-				return ((IAIF)result).getValue().toString();
-			}
-		}
-		throw new PCDIException("Wrong type return on command: " + getName());
-	}
-	public String getName() {
-		return "Evaluate expression"; 
-	}
-}
+
+#ifndef _MEMORYINFO_H_
+#define _MEMORYINFO_H_
+
+#include "list.h"
+
+struct memoryinfo {
+	char *addr;
+	long nextRow;
+	long prevRow;
+	long nextPage;
+	long prevPage;
+	long numBytes;
+	long totalBytes;
+	List *memories;
+};
+typedef struct memoryinfo memoryinfo;
+
+struct memory {
+	char *addr;
+	char *ascii;
+	List *data;
+};
+typedef struct memory memory;
+
+extern memoryinfo *	NewMemoryInfo(void);
+extern void	FreeMemoryInfo(memoryinfo *);
+
+extern memory *	NewMemory(void);
+extern void	FreeMemory(memory *);
+
+#endif /*_MEMORYINFO_H_*/

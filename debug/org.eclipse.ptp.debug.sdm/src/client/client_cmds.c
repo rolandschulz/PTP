@@ -547,7 +547,7 @@ int DbgClntListInfoThreads(char **args) {
 int DbgClntSetThreadSelect(char **args) {
 	int			res;
 	char *		cmd;
-	bitset *		set; 
+	bitset *	set; 
 
 	set = str_to_bitset(args[1]);
 	if (set == NULL) {
@@ -567,8 +567,7 @@ int DbgClntSetThreadSelect(char **args) {
 //clement added
 int DbgClntStackInfoDepth(char **args) {
 	int			res;
-	char *		cmd;
-	bitset *		set; 
+	bitset *	set; 
 
 	set = str_to_bitset(args[1]);
 	if (set == NULL) {
@@ -581,6 +580,44 @@ int DbgClntStackInfoDepth(char **args) {
 	
 	return res;
 }
+
+//clement added
+int DbgClntDataReadMemory(char **args) {
+	int			res;
+	char *		cmd;
+	bitset *	set; 
+
+	set = str_to_bitset(args[1]);
+	if (set == NULL) {
+		DbgSetError(DBGERR_PROCSET, NULL);
+		return DBGRES_ERR;
+	}
+	asprintf(&cmd, "%s %s \"%s\" \"%s\" %s %s %s \"%s\"", DBG_DATAREADMEMORY_CMD, args[2], args[3], args[4], args[5], args[6], args[7], args[8]);
+	res = ClntSendCommand(set, DBG_EV_WAITALL, cmd, NULL);
+	bitset_free(set);
+	
+	return res;
+}
+
+//clement added
+int DbgClntDataWriteMemory(char **args) {
+	int			res;
+	char *		cmd;
+	bitset *	set; 
+
+	set = str_to_bitset(args[1]);
+	if (set == NULL) {
+		DbgSetError(DBGERR_PROCSET, NULL);
+		return DBGRES_ERR;
+	}
+	
+	asprintf(&cmd, "%s %s \"%s\" \"%s\" %s \"%s\"", DBG_DATAWRITEMEMORY_CMD, args[2], args[3], args[4], args[5], args[6]);
+	res = ClntSendCommand(set, DBG_EV_WAITALL, cmd, NULL);
+	bitset_free(set);
+	
+	return res;
+}
+
 
 int 
 DbgClntQuit(void)

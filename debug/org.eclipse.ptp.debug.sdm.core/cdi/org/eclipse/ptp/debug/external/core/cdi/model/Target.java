@@ -22,7 +22,6 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIInstruction;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIMemoryBlock;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIMixedInstruction;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIRegister;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIRegisterDescriptor;
@@ -47,12 +46,14 @@ import org.eclipse.ptp.debug.core.cdi.model.IPCDIGlobalVariable;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIGlobalVariableDescriptor;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDILineBreakpoint;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDILocation;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIMemoryBlock;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIStackFrame;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITargetConfiguration;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIThread;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIWatchpoint;
 import org.eclipse.ptp.debug.external.core.cdi.ExpressionManager;
+import org.eclipse.ptp.debug.external.core.cdi.MemoryManager;
 import org.eclipse.ptp.debug.external.core.cdi.Session;
 import org.eclipse.ptp.debug.external.core.cdi.SessionObject;
 import org.eclipse.ptp.debug.external.core.cdi.VariableManager;
@@ -255,7 +256,6 @@ public class Target extends SessionObject implements IPCDITarget {
 	}
 	public void stepInto(int count) throws PCDIException {
 		getDebugger().postCommand(new StepIntoCommand(((Session)getSession()).createBitList(getTargetID()), count));
-		//getDebugger().steppingInto(((Session)getSession()).createBitList(getTargetID()), count);
 	}
 	public void stepIntoInstruction() throws PCDIException {
 		stepIntoInstruction(1);
@@ -270,7 +270,6 @@ public class Target extends SessionObject implements IPCDITarget {
 	}
 	public void stepOver(int count) throws PCDIException {
 		getDebugger().postCommand(new StepOverCommand(((Session)getSession()).createBitList(getTargetID()), count));
-		//getDebugger().steppingOver(((Session)getSession()).createBitList(getTargetID()), count);
 	}
 	public void stepOverInstruction() throws PCDIException {
 		stepOverInstruction(1);
@@ -524,17 +523,33 @@ public class Target extends SessionObject implements IPCDITarget {
 	public ICDIMixedInstruction[] getMixedInstructions(String filename, int linenum, int lines) throws PCDIException {
 		throw new PCDIException("Not implemented yet - Target: getMixedInstructions");
 	}
-	public ICDIMemoryBlock createMemoryBlock(String address, int units, int wordSize) throws PCDIException {
-		throw new PCDIException("Not implemented yet - Target: createMemoryBlock");
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.cdi.model.IPCDIMemoryBlockManagement#createMemoryBlock(java.lang.String, int, int)
+	 */
+	public IPCDIMemoryBlock createMemoryBlock(String address, int units, int wordSize) throws PCDIException {
+		MemoryManager memMgr = ((Session)getSession()).getMemoryManager();
+		return memMgr.createMemoryBlock(this, address, units, wordSize);
 	}
-	public void removeBlocks(ICDIMemoryBlock[] memoryBlocks) throws PCDIException {
-		throw new PCDIException("Not implemented yet - Target: removeBlocks");
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.cdi.model.IPCDIMemoryBlockManagement#removeBlocks(org.eclipse.ptp.debug.core.cdi.model.IPCDIMemoryBlock[])
+	 */
+	public void removeBlocks(IPCDIMemoryBlock[] memoryBlocks) throws PCDIException {
+		MemoryManager memMgr = ((Session)getSession()).getMemoryManager();
+		memMgr.removeBlocks(this, memoryBlocks);
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.cdi.model.IPCDIMemoryBlockManagement#removeAllBlocks()
+	 */
 	public void removeAllBlocks() throws PCDIException {
-		throw new PCDIException("Not implemented yet - Target: removeAllBlocks");
+		MemoryManager memMgr = ((Session)getSession()).getMemoryManager();
+		memMgr.removeAllBlocks(this);
 	}
-	public ICDIMemoryBlock[] getMemoryBlocks() throws PCDIException {
-		throw new PCDIException("Not implemented yet - Target: getMemoryBlocks");
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.cdi.model.IPCDIMemoryBlockManagement#getMemoryBlocks()
+	 */
+	public IPCDIMemoryBlock[] getMemoryBlocks() throws PCDIException {
+		MemoryManager memMgr = ((Session)getSession()).getMemoryManager();
+		return memMgr.getMemoryBlocks(this);
 	}
 	public ICDISharedLibrary[] getSharedLibraries() throws PCDIException {
 		throw new PCDIException("Not implemented yet - Target: getSharedLibraries");
@@ -571,4 +586,13 @@ public class Target extends SessionObject implements IPCDITarget {
 	public int getTargetID() {
 		return task_id;
 	}
+	
+	public boolean isLittleEndian() throws PCDIException {
+		//TODO
+		System.err.println("---- called isLittleEndian");
+		if (fEndian == null) {
+			//"le" : "be"
+		}
+		return true;
+	}	
 }

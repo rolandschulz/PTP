@@ -354,6 +354,24 @@ int DbgStackInfoDepth(session *s, bitset *set) {
 	return res;
 }
 
+//clement added
+int DbgDataReadMemory(session *s, bitset *set, long offset, char* address, char* format, int wordSize, int rows, int cols, char* asChar) {
+	int		res;
+	char *	set_str = bitset_to_str(set);
+	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_DATAREADMEMORY_CMD, DBG_DATAREADMEMORY_FMT, set_str, offset, address, format, wordSize, rows, cols, asChar);
+	free(set_str);
+	return res;
+}
+
+//clement added
+int DbgDataWriteMemory(session *s, bitset *set, long offset, char* address, char* format, int wordSize, char* value) {
+	int		res;
+	char *	set_str = bitset_to_str(set);
+	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_DATAWRITEMEMORY_CMD, DBG_DATAWRITEMEMORY_FMT, set_str, offset, address, format, wordSize, value);
+	free(set_str);
+	return res;
+}
+
 DbgQuit(session *s)
 {
 	return proxy_clnt_quit(s->sess_proxy);

@@ -85,7 +85,7 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient imple
 		
 	public synchronized void handleEvent(IProxyEvent event) {
 		IProxyDebugEvent e = null;
-System.out.println("AbstractProxyDebugClientgot event " + event);
+//System.out.println("AbstractProxyDebugClientgot event " + event);
 		if (listeners == null)
 			return;
 		

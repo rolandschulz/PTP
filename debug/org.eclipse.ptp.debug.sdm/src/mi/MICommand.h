@@ -94,5 +94,8 @@ extern MICommand *MIInfoThreads();
 extern MICommand *MIThreadSelect(int threadNum);
 extern MICommand *MIStackInfoDepth();
  
+extern MICommand *MIDataReadMemory(long, char*, char*, int, int, int, char*);
+extern MICommand *MIDataWriteMemory(long offset, char* address, char* format, int wordSize, char* value);
+
 #endif /* _MICOMMAND_H_ */
 

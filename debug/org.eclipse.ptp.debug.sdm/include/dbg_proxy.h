@@ -41,6 +41,8 @@
 #define DBG_LISTINFOTHREADS_CMD			"ITH" //clement added
 #define DBG_SETTHREADSELECT_CMD			"THS" //clement added
 #define DBG_STACKINFODEPTH_CMD			"SID" //clement added
+#define DBG_DATAREADMEMORY_CMD			"DRM" //clement added
+#define DBG_DATAWRITEMEMORY_CMD			"DWM" //clement added
 
 #define DBG_STARTSESSION_FMT			"%s \"%s\" \"%s\""
 #define DBG_SETLINEBREAKPOINT_FMT		"%s %d \"%s\" %d"
@@ -48,7 +50,7 @@
 #define DBG_DELETEBREAKPOINT_FMT		"%s %d"
 #define DBG_ENABLEBREAKPOINT_FMT		"%s %d"
 #define DBG_DISABLEBREAKPOINT_FMT		"%s %d"
-#define DBG_CONDITIONBREAKPOINT_FMT		"%s %d %s"
+#define DBG_CONDITIONBREAKPOINT_FMT		"%s %d \"%s\""
 #define DBG_GO_FMT						"%s"
 #define DBG_STEP_FMT					"%s %d %d"
 #define DBG_TERMINATE_FMT				"%s"
@@ -63,5 +65,7 @@
 #define DBG_LISTINFOTHREADS_FMT			"%s" //clement added
 #define DBG_SETTHREADSELECT_FMT			"%s %d" //clement added
 #define DBG_STACKINFODEPTH_FMT			"%s" //clement added
+#define DBG_DATAREADMEMORY_FMT			"%s %ld \"%s\" \"%s\" %d %d %d \"%s\"" //clement added
+#define DBG_DATAWRITEMEMORY_FMT			"%s %ld \"%s\" \"%s\" %d \"%s\"" //clement added
 
 #endif /* _DBG_PROXY_H_ */

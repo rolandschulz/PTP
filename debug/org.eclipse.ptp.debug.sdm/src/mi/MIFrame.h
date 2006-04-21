@@ -54,5 +54,7 @@ extern MIThreadSelectInfo *MIThreadSelectInfoNew(void);
 extern MIThreadInfo *MIGetInfoThreads(MICommand *cmd); //clement added
 extern MIThreadSelectInfo *MISetThreadSelectInfo(MICommand *cmd); //clement added
 
+extern int MIGetStackInfoDepth(MICommand *cmd); //clement added
+
 #endif /* _MIFRAME_H_ */
 

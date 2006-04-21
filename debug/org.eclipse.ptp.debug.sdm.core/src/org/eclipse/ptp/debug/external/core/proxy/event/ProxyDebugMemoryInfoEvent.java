@@ -16,38 +16,28 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.external.core.commands;
+package org.eclipse.ptp.debug.external.core.proxy.event;
 
 import org.eclipse.ptp.core.util.BitList;
-import org.eclipse.ptp.debug.core.IAbstractDebugger;
-import org.eclipse.ptp.debug.core.aif.IAIF;
-import org.eclipse.ptp.debug.core.cdi.PCDIException;
+import org.eclipse.ptp.debug.external.core.cdi.model.DataReadMemoryInfo;
 
 /**
- * @author Clement chu
- * 
+ * @author clement chu
+ *
  */
-public class EvaluteExpressionCommand extends AbstractDebugCommand {
-	private String varName = "";
+public class ProxyDebugMemoryInfoEvent extends AbstractProxyDebugEvent implements IProxyDebugEvent {
+	private DataReadMemoryInfo memoryInfo;
 	
-	public EvaluteExpressionCommand(BitList tasks, String varName) {
-		super(tasks, false, true);
-		this.varName = varName;
-	}
-	public void execCommand(IAbstractDebugger debugger, int timeout) throws PCDIException {
-		setTimeout(timeout);
-		debugger.evaluateExpression(tasks, varName);
+	public ProxyDebugMemoryInfoEvent(BitList set, DataReadMemoryInfo memoryInfo) {
+		super(EVENT_DBG_DATA_READ_MEMORY, set);
+		this.memoryInfo = memoryInfo;
 	}
 	
-	public String getExpressionValue() throws PCDIException {
-		if (waitForReturn()) {
-			if (result instanceof IAIF) {
-				return ((IAIF)result).getValue().toString();
-			}
-		}
-		throw new PCDIException("Wrong type return on command: " + getName());
+	public DataReadMemoryInfo getMemoryInfo() {
+		return this.memoryInfo;
 	}
-	public String getName() {
-		return "Evaluate expression"; 
+	
+	public String toString() {
+		return "EVENT_DBG_DATA_READ_MEMORY " + this.getBitSet().toString();
 	}
 }
