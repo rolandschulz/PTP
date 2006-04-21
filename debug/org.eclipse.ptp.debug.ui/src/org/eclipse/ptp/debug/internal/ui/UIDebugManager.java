@@ -366,6 +366,10 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 				element.setRegistered(true);
 				elementHandler.addRegisterElement(element);
 			}
+			//focus on the registered debug target.  If registered targets are more than one, focus on the first one.
+			if (processes.length > 0) {
+				focusOnDebugTarget(job, processes[0]);				
+			}
 			fireRegListener(REG_TYPE, tasks);
 		} else if (event instanceof PDebugTargetUnRegisterEvent) {
 			IElementHandler elementHandler = getElementHandler(job.getIDString());
@@ -424,7 +428,10 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		if (part != null && part instanceof IDebugView) {
 			Viewer viewer = ((IDebugView)part).getViewer();
 			if (viewer != null) {
-				viewer.setSelection(new StructuredSelection(selection));
+				if (selection != null) {
+					viewer.setSelection(new StructuredSelection(selection));
+				}
+				part.setFocus();
 			}
 		}
 	}	

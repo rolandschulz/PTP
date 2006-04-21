@@ -399,4 +399,17 @@
       </hover>
    </extension>
 
+	<!-- Memory //-->
+   <extension
+         point="org.eclipse.debug.ui.memoryRenderings">
+      <renderingBindings
+            defaultIds="org.eclipse.debug.ui.rendering.raw_memory"
+            primaryId="org.eclipse.debug.ui.rendering.raw_memory"
+            renderingIds="org.eclipse.debug.ui.rendering.raw_memory,org.eclipse.debug.ui.rendering.ascii,org.eclipse.debug.ui.rendering.signedint,org.eclipse.debug.ui.rendering.unsignedint">
+         <enablement>
+            <instanceof value="org.eclipse.ptp.debug.internal.core.model.PTPMemoryBlockExtension"/>
+         </enablement>
+      </renderingBindings>
+   </extension>
+
 </plugin>
