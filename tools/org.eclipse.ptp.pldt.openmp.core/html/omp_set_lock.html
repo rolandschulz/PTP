@@ -1,0 +1,13 @@
+<html><head><title>omp_set_lock</title>
+<body>
+<H3>omp_set_lock</H3>
+<PRE>
+void omp_set_lock(omp_lock_t *lock)
+</PRE>
+<DL><DD>
+Blocks the thread executing the function until the 
+specified lock is available and then sets the lock. 
+A simple lock is available if it is unlocked. 
+A nestable lock is available if it is unlocked or if it is 
+already owned by the thread executing the function.
+<P></DL></font></body></html>

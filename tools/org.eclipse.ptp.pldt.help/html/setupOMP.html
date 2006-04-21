@@ -1,0 +1,27 @@
+<html>
+<head>
+<title>
+Setup for OpenMP Tools Plug-in
+</title>
+<body>
+<h1> Setup for PTP OpenMP Tools Plug-in</h1>
+
+<p>Note: in order to have the OpenMP tools recognize #pragmas,
+you must install a slight fix to CDT.
+<p>CDT 3.0.x 
+<a href="https://bugs.eclipse.org/bugs/show_bug.cgi?id=133723">
+Bugzilla entry # 133723 </a> contains the 2-line patch.
+Without this, the rest of the plug-in functions, but pragmas
+will not be recognized.  This patch will be included in the
+next (3.1) release of CDT.
+<p>The basic setup for the OpenMP tools is the same
+as for the <a href="setup.html">MPI tools setup</a>.
+Essentially, point CDT at the header files and at the command
+to call your compiler with the OpenMP information.
+
+<p>&nbsp;
+<p>&nbsp;<p>&nbsp;<p>&nbsp;
+<p><a href="#top">Back to Top</a> | <a href="toc.html">Back to Table of Contents</a>
+
+</body>
+</html>

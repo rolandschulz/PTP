@@ -1,0 +1,53 @@
+<html>
+<head>
+<title>
+Setup for MPI Tools within the Parallel Language Development Tools
+</title>
+<body>
+<h1> Setup for PTP MPI Tools</h1>
+
+<p>Launch Eclipse with the PTP Parallel Language Development
+Tools feature.
+
+<p>The CDT (or FDT) plug-ins are also required.
+<ol>
+<li>Create a CDT project (e.g. Managed Make C Project)
+<li>Create a source file e.g. test.c with MPI artifacts 
+(see a small sample MPI program here: <a href="testMPI.c">testMPI.c</a>).
+
+<li>Set up the include paths etc:
+<br>Project Properties, C/C++ Build, Configuration Settings,
+Tool Settings tab, Directories
+<br>--> Add include path for mpi header files etc. - path to the 'include' dir
+<br><img src="images/include.gif">
+<p>
+Project Properties, C/C++ Build, Configuration Settings,
+Tool Settings tab, GCC C Linker, Libraries
+<ol>
+<li>Under "Libraries (-l)"  add the symbol "mpi"  
+<li> Under "Library search path (-L)" add the path to the 'lib' dir in MPI dir.
+<br><img src="images/lib.gif">
+</ol>
+<p>
+<li>Make sure the Indexer is turned on
+<br>Project Properties, C/C++ Indexer, select "Full C/C++ Indexer (declarations and cross references)"
+<br>And also the same in Window, Prefs, C/C++, Indexer (this seems to be the
+default setting for new projects)
+<p>
+<li>Tell the plug-in where to find the MPI header file
+<p>Window, Preferences, MPI
+<br>Add path to MPI include paths (again) - this tells it what symbols to look
+for in the MPI Artifact view.
+<br><img src="images/includeMPI.gif">
+</ol>
+
+<p>Now set up to <a href="run.html">run the MPI plug-in</a>
+
+
+
+<p>&nbsp;
+<p>&nbsp;<p>&nbsp;<p>&nbsp;
+<p><a href="#top">Back to Top</a> | <a href="toc.html">Back to Table of Contents</a>
+
+</body>
+</html>

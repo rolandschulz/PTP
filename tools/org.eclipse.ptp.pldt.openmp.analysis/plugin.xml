@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin
+   id="org.eclipse.ptp.pldt.openmp.analysis"
+   name="PTP OpenMP Analysis Plugin"
+   version="1.0.0"
+   provider-name="IBM Research">
+
+   <runtime>
+      <library name="analysis.jar">
+         <export name="*"/>
+      </library>
+   </runtime>
+   <requires>
+      <import plugin="org.eclipse.core.resources"/>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.cdt.core"/>
+      <import plugin="org.eclipse.ui.workbench"/>
+      <import plugin="org.eclipse.jface"/>
+      <import plugin="org.eclipse.cdt.ui"/>
+      <import plugin="org.eclipse.jface.text"/>
+      <import plugin="org.eclipse.ui.workbench.texteditor"/>
+      <import plugin="org.eclipse.ui.editors"/>
+      <import plugin="org.eclipse.ui"/>
+
+   </requires>
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <viewerContribution
+            id="org.eclipse.ptp.pldt.openmp.analysis.CEditorContribution"
+            targetID="#CEditorContext">
+         <action
+               class="org.eclipse.ptp.pldt.openmp.analysis.textview.ShowConcurrencyAction"
+               id="org.eclipse.ptp.pldt.openmp.analysis.showConcurrency"
+               label="Show Concurrency"
+               menubarPath="additions"/>
+      </viewerContribution>
+   </extension>
+   <extension
+         id="openMPConcurrencyMarker"
+         name="openMPConcurrencyMarker"
+         point="org.eclipse.ui.editors.markerAnnotationSpecification">
+      <specification
+            annotationType="org.eclipse.ptp.pldt.openmp.analysis.concurrency"
+            colorPreferenceKey="concurrencyIndicationColor"
+            colorPreferenceValue="250,230,110"
+            contributesToHeader="false"
+            highlightPreferenceKey="concurrencyHighlighting"
+            highlightPreferenceValue="true"
+            includeOnPreferencePage="true"
+            isGoToNextNavigationTarget="false"
+            isGoToNextNavigationTargetKey="isConcurrencyRecordGoToNextNavigationTarget"
+            label="Concurrency Marker"
+            overviewRulerPreferenceKey="concurrencyIndicationInOverviewRuler"
+            overviewRulerPreferenceValue="false"
+            presentationLayer="5"
+            showInNextPrevDropdownToolbarAction="false"
+            showInNextPrevDropdownToolbarActionKey="showConcurrencyInNextPrevDropdownToolbarAction"
+            textPreferenceKey="concurrencyIndication"
+            textPreferenceValue="true"
+            verticalRulerPreferenceKey="concurrencyIndicationInVerticalRuler"
+            verticalRulerPreferenceValue="false"/>
+      <specification
+            annotationType="org.eclipse.ptp.pldt.openmp.analysis.nonconcurrency"
+            colorPreferenceKey="nonConcurrencyIndicationColor"
+            colorPreferenceValue="250,150,140"
+            contributesToHeader="false"
+            highlightPreferenceKey="nonConcurrencyHighlighting"
+            highlightPreferenceValue="true"
+            includeOnPreferencePage="true"
+            isGoToNextNavigationTarget="false"
+            label="NonConcurrency Marker"
+            overviewRulerPreferenceKey="nonConcurrencyIndicationInOverviewRuler"
+            overviewRulerPreferenceValue="false"
+            presentationLayer="5"
+            showInNextPrevDropdownToolbarAction="false"
+            textPreferenceKey="nonConcurrencyIndication"
+            textPreferenceValue="true"
+            verticalRulerPreferenceKey="nonConcurrencyIndicationInVerticalRuler"
+            verticalRulerPreferenceValue="false"/>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors.annotationTypes">
+      <type
+            markerType="org.eclipse.core.resources.problemmarker"
+            name="org.eclipse.ptp.pldt.openmp.analysis.concurrency"/>
+      <type
+            markerType="org.eclipse.core.resources.problemmarker"
+            name="org.eclipse.ptp.pldt.openmp.analysis.nonconcurrency"/>
+   </extension>
+
+</plugin>
