@@ -23,6 +23,12 @@ package org.eclipse.ptp.debug.core.cdi;
  * 
  */
 public interface IPCDIErrorInfo extends IPCDISessionObject {
+	/** Get error message
+	 * @return
+	 */
 	String getMessage();
+	/** Get details error message
+	 * @return
+	 */
 	String getDetailMessage();
 }

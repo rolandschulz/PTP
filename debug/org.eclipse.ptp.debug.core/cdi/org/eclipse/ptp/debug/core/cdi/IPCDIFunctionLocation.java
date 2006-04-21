@@ -23,6 +23,9 @@ package org.eclipse.ptp.debug.core.cdi;
  * 
  */
 public interface IPCDIFunctionLocation extends IPCDIFileLocation {
+	/** Get function name
+	 * @return
+	 */
 	String getFunction();	
 }
 

@@ -23,6 +23,9 @@ package org.eclipse.ptp.debug.core.cdi.event;
  * 
  */
 public interface IPCDIEventListener {
+	/** Handle debug events
+	 * @param event
+	 */
 	void handleDebugEvents(IPCDIEvent[] event);	
 }
 

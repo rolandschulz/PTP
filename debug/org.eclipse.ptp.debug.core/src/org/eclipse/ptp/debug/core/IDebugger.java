@@ -90,4 +90,28 @@ public interface IDebugger {
 	public void setThreadSelect(BitList tasks, int threadNum) throws PCDIException;
 
 	public void getStackInfoDepth(BitList tasks) throws PCDIException;
+	
+	/* Memory */
+	/** Set Data Read memory to external debugger
+	 * @param tasks
+	 * @param offset
+	 * @param address
+	 * @param wordFormat
+	 * @param wordSize
+	 * @param rows
+	 * @param cols
+	 * @param asChar
+	 * @throws PCDIException
+	 */
+	public void setDataReadMemoryCommand(BitList tasks, long offset, String address, int wordFormat, int wordSize, int rows, int cols, Character asChar) throws PCDIException;
+	/** Set Data write memory to external debugger
+	 * @param tasks
+	 * @param offset
+	 * @param address
+	 * @param wordFormat
+	 * @param wordSize
+	 * @param value
+	 * @throws PCDIException
+	 */
+	public void setDataWriteMemoryCommand(BitList tasks, long offset, String address, int wordFormat, int wordSize, String value) throws PCDIException;
 }

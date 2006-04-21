@@ -38,6 +38,7 @@ import org.eclipse.debug.core.model.IRegisterGroup;
  */
 public interface IPDebugTarget extends IDebugTarget, IExecFileInfo, IRestart, IResumeWithoutSignal, IPDebugElement, ISteppingModeTarget, ITargetProperties {
 	public void cleanup();
+	public void terminated();
 	public int getTargetID();
 	public boolean isLittleEndian();
 	public boolean hasSignals() throws DebugException;

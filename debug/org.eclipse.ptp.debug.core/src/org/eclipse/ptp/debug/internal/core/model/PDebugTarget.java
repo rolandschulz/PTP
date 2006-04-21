@@ -63,6 +63,8 @@ import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.IExpression;
 import org.eclipse.debug.core.model.IMemoryBlock;
+import org.eclipse.debug.core.model.IMemoryBlockRetrieval;
+import org.eclipse.debug.core.model.IMemoryBlockRetrievalExtension;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IRegisterGroup;
 import org.eclipse.debug.core.model.ISourceLocator;
@@ -122,6 +124,7 @@ import org.eclipse.ptp.debug.core.sourcelookup.ISourceLookupChangeListener;
 import org.eclipse.ptp.debug.core.sourcelookup.PDirectorySourceContainer;
 import org.eclipse.ptp.debug.internal.core.IPDebugInternalConstants;
 import org.eclipse.ptp.debug.internal.core.PGlobalVariableManager;
+import org.eclipse.ptp.debug.internal.core.PTPMemoryBlockRetrievalExtension;
 import org.eclipse.ptp.debug.internal.core.sourcelookup.PSourceLookupParticipant;
 import org.eclipse.ptp.debug.internal.core.sourcelookup.PSourceManager;
 
@@ -142,6 +145,10 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPCDIE
 	private Boolean fIsLittleEndian = null;
 	private Preferences fPreferences = null;
 	private IAddressFactory fAddressFactory;
+	/**
+	 * Support for the memory retrival on this target.
+	 */
+	private PTPMemoryBlockRetrievalExtension fMemoryBlockRetrieval;
 
 	public PDebugTarget(IPLaunch launch, IPCDITarget cdiTarget, IProcess debuggeeProcess, IBinaryObject file, boolean allowsTerminate, boolean allowsDisconnect) {
 		super(null);
@@ -159,6 +166,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPCDIE
 		} else {
 			setState(PDebugElementState.SUSPENDED);
 			setGlobalVariableManager(new PGlobalVariableManager(this));
+			setMemoryBlockRetrieval(new PTPMemoryBlockRetrievalExtension(this));
 			initialize();
 			DebugPlugin.getDefault().getLaunchManager().addLaunchListener(this);
 			DebugPlugin.getDefault().getExpressionManager().addExpressionListener(this);
@@ -168,12 +176,20 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPCDIE
 	public int getTargetID() {
 		return fCDITarget.getTargetID();
 	}
+	private PTPMemoryBlockRetrievalExtension getMemoryBlockRetrieval() {
+		return fMemoryBlockRetrieval;
+	}
+
+	private void setMemoryBlockRetrieval(PTPMemoryBlockRetrievalExtension memoryBlockRetrieval) {
+		fMemoryBlockRetrieval = memoryBlockRetrieval;
+	}	
 	protected void initialize() {
 		initializeSourceLookupPath();
 		ArrayList debugEvents = new ArrayList(1);
 		debugEvents.add(createCreateEvent());
 		initializeThreads(debugEvents);
 		initializeSourceManager();
+		initializeMemoryBlocks();
 		fireEventSet((DebugEvent[]) debugEvents.toArray(new DebugEvent[debugEvents.size()]));
 	}
 	protected void initializeThreads(List debugEvents) {
@@ -200,6 +216,9 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPCDIE
 			debugEvents.add(suspendEvent);
 		}
 	}
+	protected void initializeMemoryBlocks() {
+		getMemoryBlockRetrieval().initialize();
+	}	
 	protected void initializeSourceManager() {
 		ISourceLocator locator = getLaunch().getSourceLocator();
 		if (locator instanceof IAdaptable) {
@@ -446,11 +465,16 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPCDIE
 			return getGlobalVariableManager();
 		if (adapter.equals(IPCDISession.class))
 			return getCDISession();
+		if (adapter.equals(IMemoryBlockRetrievalExtension.class))
+			return getMemoryBlockRetrieval();		
+		if ( adapter.equals( IMemoryBlockRetrieval.class ) )
+			return getMemoryBlockRetrieval();
 		return super.getAdapter(adapter);
 	}
 	public void handleDebugEvents(IPCDIEvent[] events) {
 		for (int i = 0; i < events.length; i++) {
 			IPCDIEvent event = events[i];
+
 			if (!event.containTask(getTargetID()))
 				return;
 			IPCDIObject source = event.getSource(getTargetID());
@@ -518,7 +542,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPCDIE
 	protected boolean isTerminating() {
 		return (getState().equals(PDebugElementState.TERMINATING));
 	}
-	protected void terminated() {
+	public void terminated() {
 		if (!isTerminated()) {
 			if (!isDisconnected()) {
 				setState(PDebugElementState.TERMINATED);
@@ -544,11 +568,19 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPCDIE
 		DebugPlugin.getDefault().getExpressionManager().removeExpressionListener(this);
 		DebugPlugin.getDefault().getLaunchManager().removeLaunchListener(this);
 		saveGlobalVariables();
+		//saveMemoryBlocks(); //Don't save to launch configuration
+		disposeMemoryBlockRetrieval();
 		disposeGlobalVariableManager();
 		disposeSourceManager();
 		disposeSourceLookupPath();
 		removeAllExpressions();
 		disposePreferences();
+	}
+	protected void saveMemoryBlocks() {
+		getMemoryBlockRetrieval().save();
+	}	
+	protected void disposeMemoryBlockRetrieval() {
+		getMemoryBlockRetrieval().dispose();
 	}
 	protected void removeAllThreads() {
 		List threads = getThreadList();

@@ -25,6 +25,9 @@ import org.eclipse.ptp.debug.core.cdi.model.IPCDISignal;
  * 
  */
 public interface IPCDISignalReceived extends IPCDISessionObject {
+	/** Get pcdi signal
+	 * @return
+	 */
 	IPCDISignal getSignal();
 }
 

@@ -46,6 +46,11 @@ public class PExpression extends PLocalVariable implements IExpression {
 	private IValue fValue = PValueFactory.NULL_VALUE;
 	private IPType fType;
 
+	/** Constructor
+	 * @param frame
+	 * @param cdiExpression
+	 * @param varObject
+	 */
 	public PExpression(PStackFrame frame, IPCDIExpression cdiExpression, IPCDIVariableDescriptor varObject) {
 		super(frame, varObject);
 		setFormat(PVariableFormat.getFormat(PTPDebugCorePlugin.getDefault().getPluginPreferences().getInt(IPDebugConstants.PREF_DEFAULT_EXPRESSION_FORMAT)));
@@ -53,9 +58,15 @@ public class PExpression extends PLocalVariable implements IExpression {
 		fCDIExpression = cdiExpression;
 		fStackFrame = frame;
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.core.model.IExpression#getExpressionText()
+	 */
 	public String getExpressionText() {
 		return fText;
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.cdi.event.IPCDIEventListener#handleDebugEvents(org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent[])
+	 */
 	public void handleDebugEvents(IPCDIEvent[] events) {
 		for (int i = 0; i < events.length; i++) {
 			IPCDIEvent event = events[i];
@@ -72,15 +83,27 @@ public class PExpression extends PLocalVariable implements IExpression {
 		}
 		super.handleDebugEvents(events);
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.cdt.debug.core.model.IEnableDisableTarget#isEnabled()
+	 */
 	public boolean isEnabled() {
 		return true;
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.cdt.debug.core.model.IEnableDisableTarget#canEnableDisable()
+	 */
 	public boolean canEnableDisable() {
 		return true;
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.internal.core.model.PVariable#isBookkeepingEnabled()
+	 */
 	protected boolean isBookkeepingEnabled() {
 		return false;
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.core.model.IVariable#getValue()
+	 */
 	public IValue getValue() {
 		PStackFrame frame = (PStackFrame) getStackFrame();
 		try {
@@ -89,6 +112,11 @@ public class PExpression extends PLocalVariable implements IExpression {
 		}
 		return null;
 	}
+	/** Get value
+	 * @param frame
+	 * @return
+	 * @throws DebugException
+	 */
 	protected synchronized IValue getValue(PStackFrame frame) throws DebugException {
 		if (fValue.equals(PValueFactory.NULL_VALUE)) {
 			if (frame.isSuspended()) {
@@ -104,18 +132,30 @@ public class PExpression extends PLocalVariable implements IExpression {
 		}
 		return fValue;
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.internal.core.model.AbstractPVariable#getStackFrame()
+	 */
 	protected IPStackFrame getStackFrame() {
 		return fStackFrame;
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.internal.core.model.AbstractPVariable#resetValue()
+	 */
 	protected void resetValue() {
 		if (fValue instanceof AbstractPValue) {
 			((AbstractPValue) fValue).reset();
 		}
 		fValue = PValueFactory.NULL_VALUE;
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.internal.core.model.AbstractPVariable#getExpressionString()
+	 */
 	public String getExpressionString() throws DebugException {
 		return getExpressionText();
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.internal.core.model.AbstractPVariable#dispose()
+	 */
 	public void dispose() {
 		if (fCDIExpression != null) {
 			try {
@@ -131,6 +171,9 @@ public class PExpression extends PLocalVariable implements IExpression {
 		internalDispose(true);
 		setDisposed(true);
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.model.IPVariable#getType()
+	 */
 	public IPType getType() throws DebugException {
 		if (isDisposed())
 			return null;
@@ -143,6 +186,9 @@ public class PExpression extends PLocalVariable implements IExpression {
 		}
 		return fType;
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.core.model.IVariable#getReferenceTypeName()
+	 */
 	public String getReferenceTypeName() throws DebugException {
 		IPType type = getType();
 		return (type != null) ? type.getName() : "";

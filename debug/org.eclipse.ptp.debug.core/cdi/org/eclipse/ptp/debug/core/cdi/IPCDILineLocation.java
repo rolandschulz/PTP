@@ -24,6 +24,9 @@ package org.eclipse.ptp.debug.core.cdi;
  * 
  */
 public interface IPCDILineLocation extends IPCDIFileLocation {
+	/** Get line number
+	 * @return
+	 */
 	int getLineNumber();
 }
 

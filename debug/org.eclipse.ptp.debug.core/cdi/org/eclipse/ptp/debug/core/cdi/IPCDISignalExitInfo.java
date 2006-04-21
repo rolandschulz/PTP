@@ -23,6 +23,12 @@ package org.eclipse.ptp.debug.core.cdi;
  * 
  */
 public interface IPCDISignalExitInfo extends IPCDISessionObject {
+	/** Get signal name
+	 * @return
+	 */
 	String getName();
+	/** Get signal description
+	 * @return
+	 */
 	String getDescription();
 }

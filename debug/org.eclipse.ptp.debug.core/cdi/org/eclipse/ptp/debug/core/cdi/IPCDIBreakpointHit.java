@@ -25,6 +25,9 @@ import org.eclipse.ptp.debug.core.cdi.model.IPCDIBreakpoint;
  * 
  */
 public interface IPCDIBreakpointHit extends IPCDISessionObject {
+	/** Get PCDI breakpoint
+	 * @return
+	 */
 	IPCDIBreakpoint getBreakpoint();
 }
 

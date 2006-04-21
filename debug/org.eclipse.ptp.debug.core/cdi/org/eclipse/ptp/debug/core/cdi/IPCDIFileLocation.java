@@ -25,6 +25,9 @@ import org.eclipse.ptp.debug.core.cdi.model.IPCDILocation;
  * 
  */
 public interface IPCDIFileLocation extends IPCDILocation {
+	/** Get file name
+	 * @return
+	 */
 	String getFile();
 }
 

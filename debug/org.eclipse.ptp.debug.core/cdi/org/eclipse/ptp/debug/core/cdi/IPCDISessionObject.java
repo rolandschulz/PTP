@@ -23,6 +23,9 @@ package org.eclipse.ptp.debug.core.cdi;
  * 
  */
 public interface IPCDISessionObject {
+	/** Get PCDI Session
+	 * @return
+	 */
 	IPCDISession getSession();
 }
 

@@ -26,8 +26,17 @@ import org.eclipse.debug.core.DebugException;
  * 
  */
 public interface IExecFileInfo {
+	/** Get binary file
+	 * @return
+	 */
 	public IBinaryObject getExecFile();
+	/** Is little endian
+	 * @return
+	 */
 	public boolean isLittleEndian();
-	public IGlobalVariableDescriptor[] getGlobals() throws DebugException;	
+	/** Get global variable descriptor
+	 * @return
+	 * @throws DebugException
+	 */
+	public IGlobalVariableDescriptor[] getGlobals() throws DebugException;
 }
-
