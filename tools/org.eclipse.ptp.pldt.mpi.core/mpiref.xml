@@ -1,0 +1,3097 @@
+<?xml version="1.0"?>
+<allFunctions>
+<function>
+<cname>MPI_Abort</cname>
+<cppname>MPI::Comm::Abort</cppname>
+<fname>MPI_ABORT</fname>
+<namespace></namespace>
+<description>Forces all tasks of an MPI job to terminate.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Abort</name>
+<arguments>MPI_Comm, int</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Accumulate</cname>
+<cppname>MPI::Win::Accumulate</cppname>
+<fname>MPI_ACCUMULATE</fname>
+<namespace></namespace>
+<description>Accumulates, according to the specified reduction operation, the contents of the origin buffer to the specified target buffer.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Accumulate</name>
+<arguments>void *, int, MPI_Datatype, int, MPI_Aint, int, MPI_Datatype,  MPI_Op, MPI_Win</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Add_error_class</cname>
+<cppname>MPI::Add_error_class</cppname>
+<fname>MPI_ADD_ERROR_CLASS</fname>
+<namespace></namespace>
+<description>Creates a new error class and returns the value for it.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Add_error_class</name>
+<arguments>int *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Add_error_code</cname>
+<cppname>MPI::Add_error_code</cppname>
+<fname>MPI_ADD_ERROR_CODE</fname>
+<namespace></namespace>
+<description>Creates a new error code and returns the value for it.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Add_error_code</name>
+<arguments>int, int *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Add_error_string</cname>
+<cppname>MPI::Add_error_string</cppname>
+<fname>MPI_ADD_ERROR_STRING</fname>
+<namespace></namespace>
+<description>Associates an error string with an error code or class.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Add_error_string</name>
+<arguments>int, char *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Address</cname>
+<cppname>(none)</cppname>
+<fname>MPI_ADDRESS</fname>
+<namespace></namespace>
+<description>Returns the address of a location in memory.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Address</name>
+<arguments>void*, MPI_Aint *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Allgather</cname>
+<cppname>MPI::Comm::Allgather</cppname>
+<fname>MPI_ALLGATHER</fname>
+<namespace></namespace>
+<description>Collects messages from each task and distributes the resulting message to each.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Allgather</name>
+<arguments>void* , int, MPI_Datatype, void*, int, MPI_Datatype, MPI_Comm</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Allgatherv</cname>
+<cppname>MPI::Comm::Allgatherv</cppname>
+<fname>MPI_ALLGATHERV</fname>
+<namespace></namespace>
+<description>Collects messages from each task and distributes the resulting message to all tasks. Messages can have variable sizes and displacements.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Allgatherv</name>
+<arguments>void* , int, MPI_Datatype, void*, int *, int *, MPI_Datatype, MPI_Comm</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Alloc_mem</cname>
+<cppname>MPI::Alloc_mem</cppname>
+<fname>MPI_ALLOC_MEM</fname>
+<namespace></namespace>
+<description>Allocates storage and returns a pointer to it.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Alloc_mem</name>
+<arguments>MPI_Aint, MPI_Info info, void *baseptr</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Allreduce</cname>
+<cppname>MPI::Comm::Allreduce</cppname>
+<fname>MPI_ALLREDUCE</fname>
+<namespace></namespace>
+<description>Applies a reduction operation.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Allreduce</name>
+<arguments>void* , void*, int, MPI_Datatype, MPI_Op, MPI_Comm</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Alltoall</cname>
+<cppname>MPI::Comm::Alltoall</cppname>
+<fname>MPI_ALLTOALL</fname>
+<namespace></namespace>
+<description>Sends a distinct message from each task to every task.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Alltoall</name>
+<arguments>void* , int, MPI_Datatype, void*, int, MPI_Datatype, MPI_Comm</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Alltoallv</cname>
+<cppname>MPI::Comm::Alltoallv</cppname>
+<fname>MPI_ALLTOALLV</fname>
+<namespace></namespace>
+<description>Sends a distinct message from each task to every task. Messages can have different sizes and displacements.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Alltoallv</name>
+<arguments>void* , int *, int *, MPI_Datatype, void*, int *, int *, MPI_Datatype, MPI_Comm</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Alltoallw</cname>
+<cppname>MPI::Comm::Alltoallw</cppname>
+<fname>MPI_ALLTOALLW</fname>
+<namespace></namespace>
+<description>Sends a distinct message from each task to every task. Messages can have different datatypes, sizes, and displacements.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Alltoallw</name>
+<arguments>void *, int [], int [], MPI_Datatype [], void *, int [], int [], MPI_Datatype [], MPI_Comm</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Attr_delete</cname>
+<cppname>(none)</cppname>
+<fname>MPI_ATTR_DELETE</fname>
+<namespace></namespace>
+<description>Removes an attribute value from a communicator.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Attr_delete</name>
+<arguments>MPI_Comm, int</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Attr_get</cname>
+<cppname>(none)</cppname>
+<fname>MPI_ATTR_GET</fname>
+<namespace></namespace>
+<description>Retrieves an attribute value from a communicator.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Attr_get</name>
+<arguments>MPI_Comm, int, void *, int *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Attr_put</cname>
+<cppname>(none)</cppname>
+<fname>MPI_ATTR_PUT</fname>
+<namespace></namespace>
+<description>Associates an attribute value with a communicator.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Attr_put</name>
+<arguments>MPI_Comm, int, void*</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Barrier</cname>
+<cppname>MPI::Comm::Barrier</cppname>
+<fname>MPI_BARRIER</fname>
+<namespace></namespace>
+<description>Blocks each task until all tasks have called it.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Barrier</name>
+<arguments>MPI_Comm </arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Bcast</cname>
+<cppname>MPI::Comm::Bcast</cppname>
+<fname>MPI_BCAST</fname>
+<namespace></namespace>
+<description>Broadcasts a message from root to all tasks in the group.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Bcast</name>
+<arguments>void*, int, MPI_Datatype, int, MPI_Comm </arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Bsend</cname>
+<cppname>MPI::Comm::Bsend</cppname>
+<fname>MPI_BSEND</fname>
+<namespace></namespace>
+<description>Performs a blocking buffered mode send operation.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Bsend</name>
+<arguments>void*, int, MPI_Datatype, int, int, MPI_Comm</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Bsend_init</cname>
+<cppname>MPI::Comm::Bsend_init</cppname>
+<fname>MPI_BSEND_INIT</fname>
+<namespace></namespace>
+<description>Creates a persistent buffered mode send request.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Bsend_init</name>
+<arguments>void*, int, MPI_Datatype, int,int, MPI_Comm, MPI_Request *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Buffer_attach</cname>
+<cppname>MPI::Attach_buffer</cppname>
+<fname>MPI_BUFFER_ATTACH</fname>
+<namespace></namespace>
+<description>Provides MPI with a message buffer for sending.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Buffer_attach</name>
+<arguments> void*, int</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Buffer_detach</cname>
+<cppname>MPI::Detach_buffer</cppname>
+<fname>MPI_BUFFER_DETACH</fname>
+<namespace></namespace>
+<description>Detaches the current buffer.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Buffer_detach</name>
+<arguments> void*, int *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Cancel</cname>
+<cppname>MPI::Request::Cancel</cppname>
+<fname>MPI_CANCEL</fname>
+<namespace></namespace>
+<description>Marks a non-blocking operation for cancellation.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Cancel</name>
+<arguments>MPI_Request *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Cart_coords</cname>
+<cppname>MPI::Cartcomm::Get_coords</cppname>
+<fname>MPI_CART_COORDS</fname>
+<namespace></namespace>
+<description>Translates task rank in a communicator into Cartesian task coordinates.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Cart_coords</name>
+<arguments>MPI_Comm, int, int, int *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Cart_create</cname>
+<cppname>MPI::Intracomm::Create_cart</cppname>
+<fname>MPI_CART_CREATE</fname>
+<namespace></namespace>
+<description>Creates a communicator containing topology information.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Cart_create</name>
+<arguments>MPI_Comm, int, int *, int *, int, MPI_Comm *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Cart_get</cname>
+<cppname>MPI::Cartcomm::Get_topo</cppname>
+<fname>MPI_CART_GET</fname>
+<namespace></namespace>
+<description>Retrieves Cartesian topology information from a communicator.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Cart_get</name>
+<arguments>MPI_Comm, int, int *, int *, int *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Cart_map</cname>
+<cppname>MPI::Cartcomm::Map</cppname>
+<fname>MPI_CART_MAP</fname>
+<namespace></namespace>
+<description>Computes placement of tasks on the physical processor.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Cart_map</name>
+<arguments>MPI_Comm, int, int *, int *, int *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Cart_rank</cname>
+<cppname>MPI::Cartcomm::Get_cart_rank</cppname>
+<fname>MPI_CART_RANK</fname>
+<namespace></namespace>
+<description>Translates task coordinates into a task rank.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Cart_rank</name>
+<arguments>MPI_Comm, int *, int *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Cart_shift</cname>
+<cppname>MPI::Cartcomm::Shift</cppname>
+<fname>MPI_CART_SHIFT</fname>
+<namespace></namespace>
+<description>Returns shifted source and destination ranks for a task.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Cart_shift</name>
+<arguments>MPI_Comm, int, int, int *, int *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Cart_sub</cname>
+<cppname>MPI::Cartcomm::Sub</cppname>
+<fname>MPI_CART_SUB</fname>
+<namespace></namespace>
+<description>Partitions a Cartesian communicator into lower-dimensional subgroups.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Cart_sub</name>
+<arguments>MPI_Comm, int *, MPI_Comm *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Cartdim_get</cname>
+<cppname>MPI::Cartcomm::Get_dim</cppname>
+<fname>MPI_CARTDIM_GET</fname>
+<namespace></namespace>
+<description>Retrieves the number of Cartesian dimensions from a communicator.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Cartdim_get</name>
+<arguments>MPI_Comm, int *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Comm_c2f</cname>
+<cppname>(none)</cppname>
+<fname>(none)</fname>
+<namespace></namespace>
+<description>Translates a C communicator handle into a FORTRAN handle to the same communicator.</description>
+<prototype>
+<returnType>MPI_Fint</returnType>
+<name>MPI_Comm_c2f</name>
+<arguments>MPI_Comm</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Comm_call_errhandler</cname>
+<cppname>MPI::Comm::Call_errhandler</cppname>
+<fname>MPI_COMM_CALL_ERRHANDLER</fname>
+<namespace></namespace>
+<description>Calls the error handler assigned to the communicator with the error code supplied.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Comm_call_errhandler</name>
+<arguments>MPI_Comm, int</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Comm_compare</cname>
+<cppname>MPI::Comm::Compare</cppname>
+<fname>MPI_COMM_COMPARE</fname>
+<namespace></namespace>
+<description>Compares the groups and contexts of two communicators.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Comm_compare</name>
+<arguments>MPI_Comm, MPI_Comm, int *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Comm_create</cname>
+<cppname>MPI::Intercomm::Create,</cppname>
+<fname>MPI::Intracomm::Create</fname>
+<namespace></namespace>
+<description>Creates a new communicator with a given group.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Comm_create</name>
+<arguments>MPI_Comm, MPI_Group, MPI_Comm *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Comm_create_errhandler</cname>
+<cppname>MPI::Comm::Create_errhandler</cppname>
+<fname>MPI_COMM_CREATE_ERRHANDLER</fname>
+<namespace></namespace>
+<description>Creates an error handler that can be attached to communicators.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Comm_create_errhandler</name>
+<arguments>MPI_Comm_errhandler_fn *, MPI_Errhandler *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Comm_create_keyval</cname>
+<cppname>MPI::Comm::Create_keyval</cppname>
+<fname>MPI_COMM_CREATE_KEYVAL</fname>
+<namespace></namespace>
+<description>Generates a new communicator attribute key.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Comm_create_keyval</name>
+<arguments>MPI_Comm_copy_attr_function *, MPI_Comm_delete_attr_function *, int *, void *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Comm_delete_attr</cname>
+<cppname>MPI::Comm::Delete_attr</cppname>
+<fname>MPI_COMM_DELETE_ATTR</fname>
+<namespace></namespace>
+<description>Removes an attribute value from a communicator.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Comm_delete_attr</name>
+<arguments>MPI_Comm, int</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Comm_dup</cname>
+<cppname>MPI::Cartcomm::Dup,</cppname>
+<fname>MPI::Graphcomm::Dup,</fname>
+<namespace></namespace>
+<description>Creates a new communicator that is a duplicate of an existing communicator.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Comm_dup</name>
+<arguments>MPI_Comm, MPI_Comm *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Comm_f2c</cname>
+<cppname>(none)</cppname>
+<fname>(none)</fname>
+<namespace></namespace>
+<description>Returns a C handle to a communicator.</description>
+<prototype>
+<returnType>MPI_Comm</returnType>
+<name>MPI_Comm_f2c</name>
+<arguments>MPI_Fint</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Comm_free</cname>
+<cppname>MPI::Comm::Free</cppname>
+<fname>MPI_COMM_FREE</fname>
+<namespace></namespace>
+<description>Marks a communicator for deallocation.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Comm_free</name>
+<arguments>MPI_Comm *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Comm_free_keyval</cname>
+<cppname>MPI::Comm::Free_keyval</cppname>
+<fname>MPI_COMM_FREE_KEYVAL</fname>
+<namespace></namespace>
+<description>Marks a communicator attribute key for deallocation.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Comm_free_keyval</name>
+<arguments>int *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Comm_get_attr</cname>
+<cppname>MPI::Comm::Get_attr</cppname>
+<fname>MPI_COMM_GET_ATTR</fname>
+<namespace></namespace>
+<description>Retrieves the communicator attribute value identified by the key.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Comm_get_attr</name>
+<arguments>MPI_Comm, int, void *, int *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Comm_get_errhandler</cname>
+<cppname>MPI::Comm::Get_errhandler</cppname>
+<fname>MPI_COMM_GET_ERRHANDLER</fname>
+<namespace></namespace>
+<description>Retrieves the error handler currently associated with a communicator.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Comm_get_errhandler</name>
+<arguments>MPI_Comm, MPI_Errhandler *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Comm_get_name</cname>
+<cppname>MPI::Comm::Get_name</cppname>
+<fname>MPI_COMM_GET_NAME</fname>
+<namespace></namespace>
+<description>Returns the name that was last associated with a communicator.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Comm_get_name</name>
+<arguments>MPI_Comm, char *, int *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Comm_group</cname>
+<cppname>MPI::Comm::Get_group</cppname>
+<fname>MPI_COMM_GROUP</fname>
+<namespace></namespace>
+<description>Returns the group handle associated with a communicator.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Comm_group</name>
+<arguments>MPI_Comm, MPI_Group *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Comm_rank</cname>
+<cppname>MPI::Comm::Get_rank</cppname>
+<fname>MPI_COMM_RANK</fname>
+<namespace></namespace>
+<description>Returns the rank of the local task in the group associated with a communicator.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Comm_rank</name>
+<arguments>MPI_Comm, int *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Comm_remote_group</cname>
+<cppname>MPI::Intercomm::Get_remote_group</cppname>
+<fname>MPI_COMM_REMOTE_GROUP</fname>
+<namespace></namespace>
+<description>Returns the handle of the remote group of an inter-communicator.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Comm_remote_group</name>
+<arguments>MPI_Comm, MPI_Group *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Comm_remote_size</cname>
+<cppname>MPI::Intercomm::Get_remote_size</cppname>
+<fname>MPI_COMM_REMOTE_SIZE</fname>
+<namespace></namespace>
+<description>Returns the size of the remote group of an inter-communicator.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Comm_remote_size</name>
+<arguments>MPI_Comm, int *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Comm_set_attr</cname>
+<cppname>MPI::Comm::Set_attr</cppname>
+<fname>MPI_COMM_SET_ATTR</fname>
+<namespace></namespace>
+<description>Attaches the communicator attribute value to the communicator and associates it with the key.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Comm_set_attr</name>
+<arguments>MPI_Comm, int, void *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Comm_set_errhandler</cname>
+<cppname>MPI::Comm::Set_errhandler</cppname>
+<fname>MPI_COMM_SET_ERRHANDLER</fname>
+<namespace></namespace>
+<description>Attaches a new error handler to a communicator.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Comm_set_errhandler</name>
+<arguments>MPI_Comm, MPI_Errhandler</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Comm_set_name</cname>
+<cppname>MPI::Comm::Set_name</cppname>
+<fname>MPI_COMM_SET_NAME</fname>
+<namespace></namespace>
+<description>Associates a name string with a communicator.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Comm_set_name</name>
+<arguments>MPI_Comm, char *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Comm_size</cname>
+<cppname>MPI::Comm::Get_size</cppname>
+<fname>MPI_COMM_SIZE</fname>
+<namespace></namespace>
+<description>Returns the size of the group associated with a communicator.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Comm_size</name>
+<arguments>MPI_Comm, int *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Comm_split</cname>
+<cppname>MPI::Intercomm::Split,</cppname>
+<fname>MPI::Intracomm::Split</fname>
+<namespace></namespace>
+<description>Splits a communicator into multiple communicators based on color andkey.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Comm_split</name>
+<arguments>MPI_Comm, int, int, MPI_Comm *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Comm_test_inter</cname>
+<cppname>MPI::Comm::Is_inter</cppname>
+<fname>MPI_COMM_TEST_INTER</fname>
+<namespace></namespace>
+<description>Returns the type of a communicator (intra-communicator or inter-communicator).</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Comm_test_inter</name>
+<arguments>MPI_Comm, int *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Dims_create</cname>
+<cppname>MPI::Compute_dims</cppname>
+<fname>MPI_DIMS_CREATE</fname>
+<namespace></namespace>
+<description>Defines a Cartesian grid to balance tasks.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Dims_create</name>
+<arguments>int, int, int *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Errhandler_create</cname>
+<cppname>(none)</cppname>
+<fname>MPI_ERRHANDLER_CREATE</fname>
+<namespace></namespace>
+<description>Registers a user-defined error handler.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Errhandler_create</name>
+<arguments>MPI_Handler_function *, MPI_Errhandler *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Errhandler_free</cname>
+<cppname>MPI::Errhandler::Free</cppname>
+<fname>MPI_ERRHANDLER_FREE</fname>
+<namespace></namespace>
+<description>Marks an error handler for deallocation.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Errhandler_free</name>
+<arguments>MPI_Errhandler *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Errhandler_get</cname>
+<cppname>(none)</cppname>
+<fname>MPI_ERRHANDLER_GET</fname>
+<namespace></namespace>
+<description>Gets an error handler associated with a communicator.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Errhandler_get</name>
+<arguments>MPI_Comm, MPI_Errhandler *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Errhandler_set</cname>
+<cppname>(none)</cppname>
+<fname>MPI_ERRHANDLER_SET</fname>
+<namespace></namespace>
+<description>Associates a new error handler with a communicator.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Errhandler_set</name>
+<arguments>MPI_Comm, MPI_Errhandler</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Error_class</cname>
+<cppname>MPI::Get_error_class</cppname>
+<fname>MPI_ERROR_CLASS</fname>
+<namespace></namespace>
+<description>Returns the error class for the corresponding error code.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Error_class</name>
+<arguments>int, int *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Error_string</cname>
+<cppname>MPI::Get_error_string</cppname>
+<fname>MPI_ERROR_STRING</fname>
+<namespace></namespace>
+<description>Returns the error string for a given error code.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Error_string</name>
+<arguments>int, char *, int *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Exscan</cname>
+<cppname>MPI::Intracomm::Exscan</cppname>
+<fname>MPI_EXSCAN</fname>
+<namespace></namespace>
+<description>Performs a prefix reduction on data distributed across the group.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Exscan</name>
+<arguments>void *, void *, int, MPI_Datatype, MPI_Op, MPI_Comm</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_File_c2f</cname>
+<cppname>(none)</cppname>
+<fname>(none)</fname>
+<namespace></namespace>
+<description>Translates a C file handle into a FORTRAN handle to the same file.</description>
+<prototype>
+<returnType>MPI_Fint</returnType>
+<name>MPI_File_c2f</name>
+<arguments>MPI_File</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_File_call_errhandler</cname>
+<cppname>MPI::File::Call_errhandler</cppname>
+<fname>MPI_FILE_CALL_ERRHANDLER</fname>
+<namespace></namespace>
+<description>Calls the error handler assigned to the file with the error code supplied.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_File_call_errhandler</name>
+<arguments>MPI_File, int</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_File_create_errhandler</cname>
+<cppname>MPI::File::Create_errhandler</cppname>
+<fname>MPI_FILE_CREATE_ERRHANDLER</fname>
+<namespace></namespace>
+<description>Registers a user-defined error handler that you can associate with an open file.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_File_create_errhandler</name>
+<arguments>MPI_File_errhandler_fn *, MPI_Errhandler *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_File_f2c</cname>
+<cppname>(none)</cppname>
+<fname>(none)</fname>
+<namespace></namespace>
+<description>Returns a C handle to a file.</description>
+<prototype>
+<returnType>MPI_File</returnType>
+<name>MPI_File_f2c</name>
+<arguments>MPI_Fint</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_File_get_errhandler</cname>
+<cppname>MPI::File::Get_errhandler</cppname>
+<fname>MPI_FILE_GET_ERRHANDLER</fname>
+<namespace></namespace>
+<description>Retrieves the error handler currently associated with a file handle.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_File_get_errhandler</name>
+<arguments>MPI_File, MPI_Errhandler *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_File_set_errhandler</cname>
+<cppname>MPI::File::Set_errhandler</cppname>
+<fname>MPI_FILE_SET_ERRHANDLER</fname>
+<namespace></namespace>
+<description>Associates a new error handler with a file.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_File_set_errhandler</name>
+<arguments>MPI_File, MPI_Errhandler</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Finalize</cname>
+<cppname>MPI::Finalize</cppname>
+<fname>MPI_FINALIZE</fname>
+<namespace></namespace>
+<description>Terminates all MPI processing.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Finalize</name>
+<arguments>void</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Finalized</cname>
+<cppname>MPI::Is_finalized</cppname>
+<fname>MPI_FINALIZED</fname>
+<namespace></namespace>
+<description>Returns true if MPI_FINALIZE has completed.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Finalized</name>
+<arguments>int *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Free_mem</cname>
+<cppname>MPI::Free_mem</cppname>
+<fname>MPI_FREE_MEM</fname>
+<namespace></namespace>
+<description>Frees a block of storage.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Free_mem</name>
+<arguments>void *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Gather</cname>
+<cppname>MPI::Comm::Gather</cppname>
+<fname>MPI_GATHER</fname>
+<namespace></namespace>
+<description>Collects individual messages from each task in a group at the root task.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Gather</name>
+<arguments>void* , int, MPI_Datatype, void*, int, MPI_Datatype, int, MPI_Comm</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Gatherv</cname>
+<cppname>MPI::Comm::Gatherv</cppname>
+<fname>MPI_GATHERV</fname>
+<namespace></namespace>
+<description>Collects individual messages from each task incomm at the root task. Messages can have different sizes and displacements.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Gatherv</name>
+<arguments>void* , int, MPI_Datatype, void*, int *, int *, MPI_Datatype, int, MPI_Comm</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Get</cname>
+<cppname>MPI::Win::Get</cppname>
+<fname>MPI_GET</fname>
+<namespace></namespace>
+<description>Transfers data from a window at the target task to the origin task.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Get</name>
+<arguments>void *, int, MPI_Datatype, int, MPI_Aint, int, MPI_Datatype, MPI_Win</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Get_address</cname>
+<cppname>MPI::Get_address</cppname>
+<fname>MPI_GET_ADDRESS</fname>
+<namespace></namespace>
+<description>Returns the address of a location in memory.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Get_address</name>
+<arguments>void *, MPI_Aint *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Get_count</cname>
+<cppname>MPI::Status::Get_count</cppname>
+<fname>MPI_GET_COUNT</fname>
+<namespace></namespace>
+<description>Returns the number of elements in a message.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Get_count</name>
+<arguments>MPI_Status *, MPI_Datatype, int *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Get_elements</cname>
+<cppname>MPI::Status::Get_elements</cppname>
+<fname>MPI_GET_ELEMENTS</fname>
+<namespace></namespace>
+<description>Returns the number of basic elements in a message.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Get_elements</name>
+<arguments>MPI_Status *, MPI_Datatype, int *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Get_processor_name</cname>
+<cppname>MPI::Get_processor_name</cppname>
+<fname>MPI_GET_PROCESSOR_NAME</fname>
+<namespace></namespace>
+<description>Returns the name of the local processor.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Get_processor_name</name>
+<arguments>char *, int *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Get_version</cname>
+<cppname>MPI::Get_version</cppname>
+<fname>MPI_GET_VERSION</fname>
+<namespace></namespace>
+<description>Returns the version of the MPI standard supported.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Get_version</name>
+<arguments>int *, int *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Graph_create</cname>
+<cppname>MPI::Intracomm::Create_graph</cppname>
+<fname>MPI_GRAPH_CREATE</fname>
+<namespace></namespace>
+<description>Creates a new communicator containing graph topology information.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Graph_create</name>
+<arguments>MPI_Comm, int, int *, int *, int, MPI_Comm *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Graph_get</cname>
+<cppname>MPI::Graphcomm::Get_topo</cppname>
+<fname>MPI_GRAPH_GET</fname>
+<namespace></namespace>
+<description>Retrieves graph topology information from a communicator.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Graph_get</name>
+<arguments>MPI_Comm, int, int, int *, int *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Graph_map</cname>
+<cppname>MPI::Graphcomm::Map</cppname>
+<fname>MPI_GRAPH_MAP</fname>
+<namespace></namespace>
+<description>Computes placement of tasks on the physical processor.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Graph_map</name>
+<arguments>MPI_Comm, int, int *, int *, int *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Graph_neighbors</cname>
+<cppname>MPI::Graphcomm::Get_neighbors</cppname>
+<fname>MPI_GRAPH_NEIGHBORS</fname>
+<namespace></namespace>
+<description>Returns the neighbors of the given task.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Graph_neighbors</name>
+<arguments>MPI_Comm, int, int, int *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Graph_neighbors_count</cname>
+<cppname>MPI::Graphcomm::Get_neighbors_count</cppname>
+<fname>MPI_GRAPH_NEIGHBORS_COUNT</fname>
+<namespace></namespace>
+<description>Returns the number of neighbors of the given task.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Graph_neighbors_count</name>
+<arguments>MPI_Comm, int, int *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Graphdims_get</cname>
+<cppname>MPI::Graphcomm::Get_dims</cppname>
+<fname>MPI_GRAPHDIMS_GET</fname>
+<namespace></namespace>
+<description>Retrieves graph topology information from a communicator.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Graphdims_get</name>
+<arguments>MPI_Comm, int *, int *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Grequest_complete</cname>
+<cppname>MPI::Grequest::Complete</cppname>
+<fname>MPI_GREQUEST_COMPLETE</fname>
+<namespace></namespace>
+<description>Marks the generalized request complete.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Grequest_complete</name>
+<arguments>MPI_Request</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Grequest_start</cname>
+<cppname>MPI::Grequest::Start</cppname>
+<fname>MPI_GREQUEST_START</fname>
+<namespace></namespace>
+<description>Initializes a generalized request.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Grequest_start</name>
+<arguments>MPI_Grequest_query_function *, MPI_Grequest_free_function *,MPI_Grequest_cancel_function *, void *, MPI_Request *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Group_c2f</cname>
+<cppname>(none)</cppname>
+<fname>(none)</fname>
+<namespace></namespace>
+<description>Translates a C group handle into a FORTRAN handle to the same group.</description>
+<prototype>
+<returnType>MPI_Fint</returnType>
+<name>MPI_Group_c2f</name>
+<arguments>MPI_Group</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Group_compare</cname>
+<cppname>MPI::Group::Compare</cppname>
+<fname>MPI_GROUP_COMPARE</fname>
+<namespace></namespace>
+<description>Compares the contents of two task groups.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Group_compare</name>
+<arguments>MPI_Group, MPI_Group, int *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Group_difference</cname>
+<cppname>MPI::Group::Difference</cppname>
+<fname>MPI_GROUP_DIFFERENCE</fname>
+<namespace></namespace>
+<description>Creates a new group that is the difference of two existing groups.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Group_difference</name>
+<arguments>MPI_Group, MPI_Group, MPI_Group *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Group_excl</cname>
+<cppname>MPI::Group::Excl</cppname>
+<fname>MPI_GROUP_EXCL</fname>
+<namespace></namespace>
+<description>Removes selected tasks from an existing group to create a new group.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Group_excl</name>
+<arguments>MPI_Group, int, int *, MPI_Group *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Group_f2c</cname>
+<cppname>(none)</cppname>
+<fname>(none)</fname>
+<namespace></namespace>
+<description>Returns a C handle to a group.</description>
+<prototype>
+<returnType>MPI_Group</returnType>
+<name>MPI_Group_f2c</name>
+<arguments>MPI_Fint</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Group_free</cname>
+<cppname>MPI::Group::Free</cppname>
+<fname>MPI_GROUP_FREE</fname>
+<namespace></namespace>
+<description>Marks a group for deallocation.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Group_free</name>
+<arguments>MPI_Group *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Group_incl</cname>
+<cppname>MPI::Group::Incl</cppname>
+<fname>MPI_GROUP_INCL</fname>
+<namespace></namespace>
+<description>Creates a new group consisting of selected tasks from an existing group.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Group_incl</name>
+<arguments>MPI_Group, int, int *, MPI_Group *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Group_intersection</cname>
+<cppname>MPI::Group::Intersect</cppname>
+<fname>MPI_GROUP_INTERSECTION</fname>
+<namespace></namespace>
+<description>Creates a new group that is the intersection of two existing groups.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Group_intersection</name>
+<arguments>MPI_Group, MPI_Group, MPI_Group *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Group_range_excl</cname>
+<cppname>MPI::Group::Range_excl</cppname>
+<fname>MPI_GROUP_RANGE_EXCL</fname>
+<namespace></namespace>
+<description>Creates a new group by excluding selected tasks of an existing group.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Group_range_excl</name>
+<arguments>MPI_Group, int, int [][3], MPI_Group *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Group_range_incl</cname>
+<cppname>MPI::Group::Range_incl</cppname>
+<fname>MPI_GROUP_RANGE_INCL</fname>
+<namespace></namespace>
+<description>Creates a new group consisting of selected ranges of tasks from an existing group.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Group_range_incl</name>
+<arguments>MPI_Group, int, int [][3], MPI_Group *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Group_rank</cname>
+<cppname>MPI::Group::Get_rank</cppname>
+<fname>MPI_GROUP_RANK</fname>
+<namespace></namespace>
+<description>Returns the rank of the local task with respect to group.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Group_rank</name>
+<arguments>MPI_Group, int *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Group_size</cname>
+<cppname>MPI::Group::Get_size</cppname>
+<fname>MPI_GROUP_SIZE</fname>
+<namespace></namespace>
+<description>Returns the number of tasks in a group.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Group_size</name>
+<arguments>MPI_Group, int *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Group_union</cname>
+<cppname>MPI::Group::Union</cppname>
+<fname>MPI_GROUP_UNION</fname>
+<namespace></namespace>
+<description>Creates a new group that is the union of two existing groups.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Group_union</name>
+<arguments>MPI_Group, MPI_Group, MPI_Group *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Ibsend</cname>
+<cppname>MPI::Comm::Ibsend</cppname>
+<fname>MPI_IBSEND</fname>
+<namespace></namespace>
+<description>Performs a non-blocking buffered send.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Ibsend</name>
+<arguments>void*, int, MPI_Datatype, int, int, MPI_Comm, MPI_Request *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Info_c2f</cname>
+<cppname>(none)</cppname>
+<fname>(none)</fname>
+<namespace></namespace>
+<description>Translates a C Info object handle into a FORTRAN handle to the same Info object.</description>
+<prototype>
+<returnType>MPI_Fint</returnType>
+<name>MPI_Info_c2f</name>
+<arguments>MPI_Info</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Info_create</cname>
+<cppname>MPI::Info::Create</cppname>
+<fname>MPI_INFO_CREATE</fname>
+<namespace></namespace>
+<description>Creates a new, empty Info object.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Info_create</name>
+<arguments>MPI_Info *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Info_delete</cname>
+<cppname>MPI::Info::Delete</cppname>
+<fname>MPI_INFO_DELETE</fname>
+<namespace></namespace>
+<description>Deletes a (key, value) pair from an Info object.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Info_delete</name>
+<arguments>MPI_Info, char *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Info_dup</cname>
+<cppname>MPI::Info::Dup</cppname>
+<fname>MPI_INFO_DUP</fname>
+<namespace></namespace>
+<description>Duplicates an Info object.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Info_dup</name>
+<arguments>MPI_Info, MPI_Info *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Info_f2c</cname>
+<cppname>(none)</cppname>
+<fname>(none)</fname>
+<namespace></namespace>
+<description>Returns a C handle to an Info object.</description>
+<prototype>
+<returnType>MPI_Info</returnType>
+<name>MPI_Info_f2c</name>
+<arguments>MPI_Fint</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Info_free</cname>
+<cppname>MPI::Info::Free</cppname>
+<fname>MPI_INFO_FREE</fname>
+<namespace></namespace>
+<description>Frees an Info object and sets its handle to MPI_INFO_NULL.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Info_free</name>
+<arguments>MPI_Info *info</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Info_get</cname>
+<cppname>MPI::Info::Get</cppname>
+<fname>MPI_INFO_GET</fname>
+<namespace></namespace>
+<description>Retrieves the value associated withkey in an Info object.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Info_get</name>
+<arguments>MPI_Info, char *, int, char *, int *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Info_get_nkeys</cname>
+<cppname>MPI::Info::Get_nkeys</cppname>
+<fname>MPI_INFO_GET_NKEYS</fname>
+<namespace></namespace>
+<description>Returns the number of keys defined in an Info object.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Info_get_nkeys</name>
+<arguments>MPI_Info, int *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Info_get_nthkey</cname>
+<cppname>MPI::Info::Get_nthkey</cppname>
+<fname>MPI_INFO_GET_NTHKEY</fname>
+<namespace></namespace>
+<description>Retrieves the nth key defined in an Info object.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Info_get_nthkey</name>
+<arguments>MPI_Info, int, char *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Info_get_valuelen</cname>
+<cppname>MPI::Info::Get_valuelen</cppname>
+<fname>MPI_INFO_GET_VALUELEN</fname>
+<namespace></namespace>
+<description>Retrieves the length of the value associated with a key of an Info object.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Info_get_valuelen</name>
+<arguments>MPI_Info, char *, int *, int *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Info_set</cname>
+<cppname>MPI::Info::Set</cppname>
+<fname>MPI_INFO_SET</fname>
+<namespace></namespace>
+<description>Adds a (key, value) pair to an Info object.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Info_set</name>
+<arguments>MPI_Info, char *, char *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Init</cname>
+<cppname>MPI::Init</cppname>
+<fname>MPI_INIT</fname>
+<namespace></namespace>
+<description>Initializes MPI.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Init</name>
+<arguments>int *, char ***</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Init_thread</cname>
+<cppname>MPI::Init_thread</cppname>
+<fname>MPI_INIT_THREAD</fname>
+<namespace></namespace>
+<description>Initializes MPI and the MPI threads environment.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Init_thread</name>
+<arguments>int *, char ***, int, int *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Initialized</cname>
+<cppname>MPI::Is_initialized</cppname>
+<fname>MPI_INITIALIZED</fname>
+<namespace></namespace>
+<description>Determines if MPI is initialized.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Initialized</name>
+<arguments>int *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Intercomm_create</cname>
+<cppname>MPI::Intracomm::Create_intercomm</cppname>
+<fname>MPI_INTERCOMM_CREATE</fname>
+<namespace></namespace>
+<description>Creates an inter-communicator from two intra-communicators.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Intercomm_create</name>
+<arguments>MPI_Comm, int, MPI_Comm, int, int, MPI_Comm * </arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Intercomm_merge</cname>
+<cppname>MPI::Intercomm::Merge</cppname>
+<fname>MPI_INTERCOMM_MERGE</fname>
+<namespace></namespace>
+<description>Creates an intra-communicator by merging the local and remote groups of an inter-communicator.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Intercomm_merge</name>
+<arguments>MPI_Comm, int, MPI_Comm *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Iprobe</cname>
+<cppname>MPI::Comm::Iprobe</cppname>
+<fname>MPI_IPROBE</fname>
+<namespace></namespace>
+<description>Checks to see if a message matchingsource, tag, andcomm has arrived.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Iprobe</name>
+<arguments>int, int, MPI_Comm, int *, MPI_Status *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Irecv</cname>
+<cppname>MPI::Comm::Irecv</cppname>
+<fname>MPI_IRECV</fname>
+<namespace></namespace>
+<description>Performs a non-blocking receive operation.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Irecv</name>
+<arguments>void*, int, MPI_Datatype, int, int, MPI_Comm, MPI_Request *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Irsend</cname>
+<cppname>MPI::Comm::Irsend</cppname>
+<fname>MPI_IRSEND</fname>
+<namespace></namespace>
+<description>Performs a non-blocking ready send operation.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Irsend</name>
+<arguments>void*, int, MPI_Datatype, int, int, MPI_Comm, MPI_Request *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Is_thread_main</cname>
+<cppname>MPI::Is_thread_main</cppname>
+<fname>MPI_IS_THREAD_MAIN</fname>
+<namespace></namespace>
+<description>Determines whether the calling thread is the thread that called MPI_INIT or MPI_INIT_THREAD.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Is_thread_main</name>
+<arguments>int *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Isend</cname>
+<cppname>MPI::Comm::Isend</cppname>
+<fname>MPI_ISEND</fname>
+<namespace></namespace>
+<description>Performs a non-blocking standard mode send operation.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Isend</name>
+<arguments>void*, int, MPI_Datatype, int, int, MPI_Comm, MPI_Request *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Issend</cname>
+<cppname>MPI::Comm::Issend</cppname>
+<fname>MPI_ISSEND</fname>
+<namespace></namespace>
+<description>Performs a non-blocking synchronous mode send operation.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Issend</name>
+<arguments>void*, int, MPI_Datatype, int, int, MPI_Comm, MPI_Request *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Keyval_create</cname>
+<cppname>(none)</cppname>
+<fname>MPI_KEYVAL_CREATE</fname>
+<namespace></namespace>
+<description>Generates a new communicator attribute key.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Keyval_create</name>
+<arguments>MPI_Copy_function *, MPI_Delete_function *, int *, void*</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Keyval_free</cname>
+<cppname>(none)</cppname>
+<fname>MPI_KEYVAL_FREE</fname>
+<namespace></namespace>
+<description>Marks a communicator attribute key for deallocation.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Keyval_free</name>
+<arguments>int *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Op_c2f</cname>
+<cppname>(none)</cppname>
+<fname>(none)</fname>
+<namespace></namespace>
+<description>Translates a C reduction operation handle into a FORTRAN handle to the same operation.</description>
+<prototype>
+<returnType>MPI_Fint</returnType>
+<name>MPI_Op_c2f</name>
+<arguments>MPI_Op</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Op_create</cname>
+<cppname>MPI::Op::Init</cppname>
+<fname>MPI_OP_CREATE</fname>
+<namespace></namespace>
+<description>Binds a user-defined reduction operation to anop handle.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Op_create</name>
+<arguments>MPI_User_function *, int, MPI_Op *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Op_f2c</cname>
+<cppname>(none)</cppname>
+<fname>(none)</fname>
+<namespace></namespace>
+<description>Returns a C reduction operation handle to an operation.</description>
+<prototype>
+<returnType>MPI_Op</returnType>
+<name>MPI_Op_f2c</name>
+<arguments>MPI_Fint</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Op_free</cname>
+<cppname>MPI::Op::Free</cppname>
+<fname>MPI_OP_FREE</fname>
+<namespace></namespace>
+<description>Marks a user-defined reduction operation for deallocation.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Op_free</name>
+<arguments> MPI_Op *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Pack</cname>
+<cppname>MPI::Datatype::Pack</cppname>
+<fname>MPI_PACK</fname>
+<namespace></namespace>
+<description>Packs the message in the specified send buffer into the specified buffer space.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Pack</name>
+<arguments>void*, int, MPI_Datatype, void *, int, int *,  MPI_Comm</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Pack_external</cname>
+<cppname>MPI::Datatype::Pack_external</cppname>
+<fname>MPI_PACK_EXTERNAL</fname>
+<namespace></namespace>
+<description>Packs the message in the specified send buffer into the specified buffer space, using the external32 data format.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Pack_external</name>
+<arguments>char *, void *, int, MPI_Datatype, void *, MPI_Aint, MPI_Aint *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Pack_external_size</cname>
+<cppname>MPI::Datatype::Pack_external_size</cppname>
+<fname>MPI_PACK_EXTERNAL_SIZE</fname>
+<namespace></namespace>
+<description>Returns the number of bytes required to hold the data, using the external32 data format.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Pack_external_size</name>
+<arguments>char *, int, MPI_Datatype, MPI_Aint *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Pack_size</cname>
+<cppname>MPI::Datatype::Pack_size</cppname>
+<fname>MPI_PACK_SIZE</fname>
+<namespace></namespace>
+<description>Returns the number of bytes required to hold the data.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Pack_size</name>
+<arguments>int, MPI_Datatype, MPI_Comm, int *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Pcontrol</cname>
+<cppname>MPI::Pcontrol</cppname>
+<fname>MPI_PCONTROL</fname>
+<namespace></namespace>
+<description>Provides profile control.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Pcontrol</name>
+<arguments>const int, ...</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Probe</cname>
+<cppname>MPI::Comm::Probe</cppname>
+<fname>MPI_PROBE</fname>
+<namespace></namespace>
+<description>Waits until a message matching source, tag, and comm arrives.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Probe</name>
+<arguments>int, int, MPI_Comm, MPI_Status *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Put</cname>
+<cppname>MPI::Win::Put</cppname>
+<fname>MPI_PUT</fname>
+<namespace></namespace>
+<description>Transfers data from the origin task to a window at the target task.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Put</name>
+<arguments>void *, int, MPI_Datatype, int, MPI_Aint, int, MPI_Datatype, MPI_Win</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Query_thread</cname>
+<cppname>MPI::Query_thread</cppname>
+<fname>MPI_QUERY_THREAD</fname>
+<namespace></namespace>
+<description>Returns the current level of threads support.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Query_thread</name>
+<arguments>int *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Recv</cname>
+<cppname>MPI::Comm::Recv</cppname>
+<fname>MPI_RECV</fname>
+<namespace></namespace>
+<description>Performs a blocking receive operation.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Recv</name>
+<arguments>void*, int, MPI_Datatype, int, int, MPI_Comm, MPI_Status *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Recv_init</cname>
+<cppname>MPI::Comm::Recv_init</cppname>
+<fname>MPI_RECV_INIT</fname>
+<namespace></namespace>
+<description>Creates a persistent receive request.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Recv_init</name>
+<arguments>void*, int, MPI_Datatype, int,int, MPI_Comm, MPI_Request *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Reduce</cname>
+<cppname>MPI::Comm::Reduce</cppname>
+<fname>MPI_REDUCE</fname>
+<namespace></namespace>
+<description>Applies a reduction operation to the vectorsendbuf over the set of tasks specified bycomm and places the result in recvbuf on root.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Reduce</name>
+<arguments>void* , void*, int, MPI_Datatype, MPI_Op, int, MPI_Comm</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Reduce_scatter</cname>
+<cppname>MPI::Comm::Reduce_scatter</cppname>
+<fname>MPI_REDUCE_SCATTER</fname>
+<namespace></namespace>
+<description>Applies a reduction operation to the vectorsendbuf over the set of tasks specified bycomm and scatters the result according to the values in recvcounts.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Reduce_scatter</name>
+<arguments>void* , void*, int *, MPI_Datatype, MPI_Op, MPI_Comm</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Request_c2f</cname>
+<cppname>(none)</cppname>
+<fname>(none)</fname>
+<namespace></namespace>
+<description>Translates a C request handle into a FORTRAN handle to the same request.</description>
+<prototype>
+<returnType>MPI_Fint</returnType>
+<name>MPI_Request_c2f</name>
+<arguments>MPI_Request</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Request_f2c</cname>
+<cppname>(none)</cppname>
+<fname>(none)</fname>
+<namespace></namespace>
+<description>Returns a C handle to a request.</description>
+<prototype>
+<returnType>MPI_Request</returnType>
+<name>MPI_Request_f2c</name>
+<arguments>MPI_Fint</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Request_free</cname>
+<cppname>MPI::Request::Free</cppname>
+<fname>MPI_REQUEST_FREE</fname>
+<namespace></namespace>
+<description>Marks a request for deallocation.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Request_free</name>
+<arguments>MPI_Request *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Request_get_status</cname>
+<cppname>MPI::Request::Get_status</cppname>
+<fname>MPI_REQUEST_GET_STATUS</fname>
+<namespace></namespace>
+<description>Accesses the information associated with a request, without freeing the request.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Request_get_status</name>
+<arguments>MPI_Request, int *, MPI_Status *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Rsend</cname>
+<cppname>MPI::Comm::Rsend</cppname>
+<fname>MPI_RSEND</fname>
+<namespace></namespace>
+<description>Performs a blocking ready mode send operation.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Rsend</name>
+<arguments>void*, int, MPI_Datatype, int, int, MPI_Comm</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Rsend_init</cname>
+<cppname>MPI::Comm::Rsend_init</cppname>
+<fname>MPI_RSEND_INIT</fname>
+<namespace></namespace>
+<description>Creates a persistent ready mode send request.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Rsend_init</name>
+<arguments>void*, int, MPI_Datatype, int,int, MPI_Comm, MPI_Request *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Scan</cname>
+<cppname>MPI::Intracomm::Scan</cppname>
+<fname>MPI_SCAN</fname>
+<namespace></namespace>
+<description>Performs a parallel prefix reduction on data distributed across a group.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Scan</name>
+<arguments>void* , void*, int, MPI_Datatype, MPI_Op, MPI_Comm </arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Scatter</cname>
+<cppname>MPI::Comm::Scatter</cppname>
+<fname>MPI_SCATTER</fname>
+<namespace></namespace>
+<description>Distributes individual messages fromroot to each task in comm.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Scatter</name>
+<arguments>void* , int, MPI_Datatype, void*, int, MPI_Datatype, int, MPI_Comm</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Scatterv</cname>
+<cppname>MPI::Comm::Scatterv</cppname>
+<fname>MPI_SCATTERV</fname>
+<namespace></namespace>
+<description>Distributes individual messages fromroot to each task in comm. Messages can have different sizes and displacements.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Scatterv</name>
+<arguments>void* , int *, int *,  MPI_Datatype, void*, int, MPI_Datatype, int, MPI_Comm</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Send</cname>
+<cppname>MPI::Comm::Send</cppname>
+<fname>MPI_SEND</fname>
+<namespace></namespace>
+<description>Blocking standard mode send.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Send</name>
+<arguments>void*, int, MPI_Datatype, int, int, MPI_Comm</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Send_init</cname>
+<cppname>MPI::Comm::Send_init</cppname>
+<fname>MPI_SEND_INIT</fname>
+<namespace></namespace>
+<description>Creates a persistent standard mode send request.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Send_init</name>
+<arguments>void*, int, MPI_Datatype, int, int, MPI_Comm, MPI_Request *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Sendrecv</cname>
+<cppname>MPI::Comm::Sendrecv</cppname>
+<fname>MPI_SENDRECV</fname>
+<namespace></namespace>
+<description>Performs a blocking send and receive operation.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Sendrecv</name>
+<arguments>void *, int, MPI_Datatype,int, int, void *, int, MPI_Datatype, int, int, MPI_Comm, MPI_Status *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Sendrecv_replace</cname>
+<cppname>MPI::Comm::Sendrecv_replace</cppname>
+<fname>MPI_SENDRECV_REPLACE</fname>
+<namespace></namespace>
+<description>Performs a blocking send and receive operation using a common buffer.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Sendrecv_replace</name>
+<arguments>void*, int, MPI_Datatype, int, int, int, int, MPI_Comm, MPI_Status *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Ssend</cname>
+<cppname>MPI::Comm::Ssend</cppname>
+<fname>MPI_SSEND</fname>
+<namespace></namespace>
+<description>Performs a blocking synchronous mode send operation.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Ssend</name>
+<arguments>void*, int, MPI_Datatype, int, int, MPI_Comm</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Ssend_init</cname>
+<cppname>MPI::Comm::Ssend_init</cppname>
+<fname>MPI_SSEND_INIT</fname>
+<namespace></namespace>
+<description>Creates a persistent synchronous mode send request.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Ssend_init</name>
+<arguments>void*, int, MPI_Datatype, int,int, MPI_Comm, MPI_Request *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Start</cname>
+<cppname>MPI::Prequest::Start</cppname>
+<fname>MPI_START</fname>
+<namespace></namespace>
+<description>Activates a persistent request operation.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Start</name>
+<arguments>MPI_Request *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Startall</cname>
+<cppname>MPI::Prequest::Startall</cppname>
+<fname>MPI_STARTALL</fname>
+<namespace></namespace>
+<description>Activates a collection of persistent request operations.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Startall</name>
+<arguments>int, MPI_Request *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Status_c2f</cname>
+<cppname>(none)</cppname>
+<fname>(none)</fname>
+<namespace></namespace>
+<description>Translates a C status object into a FORTRAN status object.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Status_c2f</name>
+<arguments>MPI_Status *, MPI_Fint *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Status_f2c</cname>
+<cppname>(none)</cppname>
+<fname>(none)</fname>
+<namespace></namespace>
+<description>Converts a FORTRAN status object into a C status object.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Status_f2c</name>
+<arguments>MPI_Fint *, MPI_Status *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Status_set_cancelled</cname>
+<cppname>MPI::Status::Set_cancelled</cppname>
+<fname>MPI_STATUS_SET_CANCELLED</fname>
+<namespace></namespace>
+<description>Defines cancellation information for a request.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Status_set_cancelled</name>
+<arguments>MPI_Status *, int</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Status_set_elements</cname>
+<cppname>MPI::Status::Set_elements</cppname>
+<fname>MPI_STATUS_SET_ELEMENTS</fname>
+<namespace></namespace>
+<description>Defines element information for a request.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Status_set_elements</name>
+<arguments>MPI_Status *, MPI_Datatype, int</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Test</cname>
+<cppname>MPI::Request::Test</cppname>
+<fname>MPI_TEST</fname>
+<namespace></namespace>
+<description>Checks to see if a non-blocking operation has completed.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Test</name>
+<arguments>MPI_Request *, int *, MPI_Status *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Test_cancelled</cname>
+<cppname>MPI::Status::Is_cancelled</cppname>
+<fname>MPI_TEST_CANCELLED</fname>
+<namespace></namespace>
+<description>Tests whether a non-blocking operation was cancelled.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Test_cancelled</name>
+<arguments>MPI_Status *, int *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Testall</cname>
+<cppname>MPI::Request::Testall</cppname>
+<fname>MPI_TESTALL</fname>
+<namespace></namespace>
+<description>Tests a collection of non-blocking operations for completion.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Testall</name>
+<arguments>int, MPI_Request *, int *, MPI_Status *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Testany</cname>
+<cppname>MPI::Request::Testany</cppname>
+<fname>MPI_TESTANY</fname>
+<namespace></namespace>
+<description>Tests for the completion of any specified non-blocking operation.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Testany</name>
+<arguments>int, MPI_Request *, int *, int *, MPI_Status *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Testsome</cname>
+<cppname>MPI::Request::Testsome</cppname>
+<fname>MPI_TESTSOME</fname>
+<namespace></namespace>
+<description>Tests a collection of non-blocking operations for completion.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Testsome</name>
+<arguments>int, MPI_Request *, int *, int *, MPI_Status *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Topo_test</cname>
+<cppname>MPI::Comm::Get_topology</cppname>
+<fname>MPI_TOPO_TEST</fname>
+<namespace></namespace>
+<description>Returns the type of virtual topology associated with a communicator.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Topo_test</name>
+<arguments>MPI_Comm, int *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Type_c2f</cname>
+<cppname>(none)</cppname>
+<fname>(none)</fname>
+<namespace></namespace>
+<description>Translates a C datatype handle into a FORTRAN handle to the same datatype.</description>
+<prototype>
+<returnType>MPI_Fint</returnType>
+<name>MPI_Type_c2f</name>
+<arguments>MPI_Datatype</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Type_commit</cname>
+<cppname>MPI::Datatype::Commit</cppname>
+<fname>MPI_TYPE_COMMIT</fname>
+<namespace></namespace>
+<description>Makes a datatype ready for use in communication.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Type_commit</name>
+<arguments>MPI_Datatype *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Type_contiguous</cname>
+<cppname>MPI::Datatype::Create_contiguous</cppname>
+<fname>MPI_TYPE_CONTIGUOUS</fname>
+<namespace></namespace>
+<description>Returns a new datatype that represents the concatenation of count instances ofoldtype.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Type_contiguous</name>
+<arguments>int, MPI_Datatype, MPI_Datatype *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Type_create_darray</cname>
+<cppname>MPI::Datatype::Create_darray</cppname>
+<fname>MPI_TYPE_CREATE_DARRAY</fname>
+<namespace></namespace>
+<description>Generates the datatypes corresponding to an HPF-like distribution of an ndims-dimensional array of oldtype elements onto anndims-dimensional grid of logical tasks.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Type_create_darray</name>
+<arguments>int, int, int, int [], int [], int [], int [], int,MPI_Datatype, MPI_Datatype *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Type_create_f90_complex</cname>
+<cppname>MPI::Datatype::Create_f90_complex</cppname>
+<fname>MPI_TYPE_CREATE_F90_COMPLEX</fname>
+<namespace></namespace>
+<description>Returns a predefined MPI datatype that matches a COMPLEX variable of KIND selected_real_kind(p, r).</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Type_create_f90_complex</name>
+<arguments> int, int, MPI_Datatype * </arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Type_create_f90_integer</cname>
+<cppname>MPI::Datatype::Create_f90_integer</cppname>
+<fname>MPI_TYPE_CREATE_F90_INTEGER</fname>
+<namespace></namespace>
+<description>Returns a predefined MPI datatype that matches an INTEGER variable of KIND selected_integer_kind(r).</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Type_create_f90_integer</name>
+<arguments> int, MPI_Datatype * </arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Type_create_f90_real</cname>
+<cppname>MPI::Datatype::Create_f90_real</cppname>
+<fname>MPI_TYPE_CREATE_F90_REAL</fname>
+<namespace></namespace>
+<description>Returns a predefined MPI datatype that matches a REAL variable of KIND selected_real_kind(p, r).</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Type_create_f90_real</name>
+<arguments> int, int, MPI_Datatype * </arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Type_create_hindexed</cname>
+<cppname>MPI::Datatype::Create_hindexed</cppname>
+<fname>MPI_TYPE_CREATE_HINDEXED</fname>
+<namespace></namespace>
+<description>Returns a new datatype that representscount blocks. Each block is defined by an entry in array_of_blocklengths andarray_of_displacements. Displacements are expressed in bytes.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Type_create_hindexed</name>
+<arguments>int, int [], MPI_Aint [], MPI_Datatype, MPI_Datatype *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Type_create_hvector</cname>
+<cppname>MPI::Datatype::Create_hvector</cppname>
+<fname>MPI_TYPE_CREATE_HVECTOR</fname>
+<namespace></namespace>
+<description>Returns a new datatype that represents equally-spaced blocks. The spacing between the start of each block is given in bytes.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Type_create_hvector</name>
+<arguments>int, int, MPI_Aint, MPI_Datatype, MPI_Datatype *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Type_create_indexed_block</cname>
+<cppname>MPI::Datatype::Create_indexed_block</cppname>
+<fname>MPI_TYPE_CREATE_INDEXED_BLOCK</fname>
+<namespace></namespace>
+<description>Returns a new datatype that representscount blocks.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Type_create_indexed_block</name>
+<arguments>int, int, int [], MPI_Datatype, MPI_Datatype *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Type_create_keyval</cname>
+<cppname>MPI::Datatype::Create_keyval</cppname>
+<fname>MPI_TYPE_CREATE_KEYVAL</fname>
+<namespace></namespace>
+<description>Generates a new attribute key for a datatype.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Type_create_keyval</name>
+<arguments>MPI_Type_copy_attr_function *, MPI_Type_delete_attr_function *, int *, void *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Type_create_resized</cname>
+<cppname>MPI::Datatype::Create_resized</cppname>
+<fname>MPI_TYPE_CREATE_RESIZED</fname>
+<namespace></namespace>
+<description>Duplicates a datatype and changes the upper bound, lower bound, and extent.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Type_create_resized</name>
+<arguments>MPI_Datatype, MPI_Aint, MPI_Aint, MPI_Datatype *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Type_create_struct</cname>
+<cppname>MPI::Datatype::Create_struct</cppname>
+<fname>MPI_TYPE_CREATE_STRUCT</fname>
+<namespace></namespace>
+<description>Returns a new datatype that representscount blocks. Each block is defined by an entry in array_of_blocklengths,array_of_displacements, and array_of_types. Displacements are expressed in bytes.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Type_create_struct</name>
+<arguments>int, int [], MPI_Aint [], MPI_Datatype [], MPI_Datatype *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Type_create_subarray</cname>
+<cppname>MPI::Datatype::Create_subarray</cppname>
+<fname>MPI_TYPE_CREATE_SUBARRAY</fname>
+<namespace></namespace>
+<description>Returns a new datatype that represents anndims-dimensional subarray of anndims-dimensional array.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Type_create_subarray</name>
+<arguments>int, int [], int [], int [], int, MPI_Datatype, MPI_Datatype *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Type_delete_attr</cname>
+<cppname>MPI::Datatype::Delete_attr</cppname>
+<fname>MPI_TYPE_DELETE_ATTR</fname>
+<namespace></namespace>
+<description>Deletes an attribute from a datatype.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Type_delete_attr</name>
+<arguments>MPI_Datatype, int</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Type_dup</cname>
+<cppname>MPI::Datatype::Dup</cppname>
+<fname>MPI_TYPE_DUP</fname>
+<namespace></namespace>
+<description>Duplicates the existing type with associated key values.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Type_dup</name>
+<arguments>MPI_Datatype, MPI_Datatype *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Type_extent</cname>
+<cppname>(none)</cppname>
+<fname>MPI_TYPE_EXTENT</fname>
+<namespace></namespace>
+<description>Returns the extent of any defined datatype.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Type_extent</name>
+<arguments>MPI_Datatype, MPI_Aint *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Type_f2c</cname>
+<cppname>(none)</cppname>
+<fname>(none)</fname>
+<namespace></namespace>
+<description>Returns a C handle to a datatype.</description>
+<prototype>
+<returnType>MPI_Datatype</returnType>
+<name>MPI_Type_f2c</name>
+<arguments>MPI_Fint</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Type_free</cname>
+<cppname>MPI::Datatype::Free</cppname>
+<fname>MPI_TYPE_FREE</fname>
+<namespace></namespace>
+<description>Marks a derived datatype for deallocation and sets its handle to MPI_DATATYPE_NULL.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Type_free</name>
+<arguments>MPI_Datatype *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Type_free_keyval</cname>
+<cppname>MPI::Datatype::Free_keyval</cppname>
+<fname>MPI_TYPE_FREE_KEYVAL</fname>
+<namespace></namespace>
+<description>Frees a datatype key value.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Type_free_keyval</name>
+<arguments>int *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Type_get_attr</cname>
+<cppname>MPI::Datatype::Get_attr</cppname>
+<fname>MPI_TYPE_GET_ATTR</fname>
+<namespace></namespace>
+<description>Attaches an attribute to a datatype.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Type_get_attr</name>
+<arguments>MPI_Datatype, int, void *, int *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Type_get_contents</cname>
+<cppname>MPI::Datatype::Get_contents</cppname>
+<fname>MPI_TYPE_GET_CONTENTS</fname>
+<namespace></namespace>
+<description>Obtains the arguments used in the creation of the datatype.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Type_get_contents</name>
+<arguments>MPI_Datatype, int, int, int, int [], MPI_Aint [], MPI_Datatype []</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Type_get_envelope</cname>
+<cppname>MPI::Datatype::Get_envelope</cppname>
+<fname>MPI_TYPE_GET_ENVELOPE</fname>
+<namespace></namespace>
+<description>Determines the constructor that was used to create the datatype.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Type_get_envelope</name>
+<arguments>MPI_Datatype, int *, int *, int *, int *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Type_get_extent</cname>
+<cppname>MPI::Datatype::Get_extent</cppname>
+<fname>MPI_TYPE_GET_EXTENT</fname>
+<namespace></namespace>
+<description>Returns the lower bound and the extent of any defined datatype.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Type_get_extent</name>
+<arguments>MPI_Datatype, MPI_Aint *, MPI_Aint *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Type_get_name</cname>
+<cppname>MPI::Datatype::Get_name</cppname>
+<fname>MPI_TYPE_GET_NAME</fname>
+<namespace></namespace>
+<description>Returns the name that was last associated with a datatype.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Type_get_name</name>
+<arguments>MPI_Datatype, char *, int *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Type_get_true_extent</cname>
+<cppname>MPI::Datatype::Get_true_extent</cppname>
+<fname>MPI_TYPE_GET_TRUE_EXTENT</fname>
+<namespace></namespace>
+<description>Returns the true extent of any defined datatype.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Type_get_true_extent</name>
+<arguments>MPI_Datatype, MPI_Aint *, MPI_Aint *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Type_hindexed</cname>
+<cppname>(none)</cppname>
+<fname>MPI_TYPE_HINDEXED</fname>
+<namespace></namespace>
+<description>Returns a new datatype that representscount distinct blocks with offsets expressed in bytes.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Type_hindexed</name>
+<arguments>int, int *, MPI_Aint *, MPI_Datatype, MPI_Datatype *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Type_hvector</cname>
+<cppname>(none)</cppname>
+<fname>MPI_TYPE_HVECTOR</fname>
+<namespace></namespace>
+<description>Returns a new datatype of count blocks with stride expressed in bytes.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Type_hvector</name>
+<arguments>int, int, MPI_Aint, MPI_Datatype, MPI_Datatype *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Type_indexed</cname>
+<cppname>MPI::Datatype::Create_indexed</cppname>
+<fname>MPI_TYPE_INDEXED</fname>
+<namespace></namespace>
+<description>Returns a new datatype that representscount blocks with stride in terms of defining type.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Type_indexed</name>
+<arguments>int, int *, int *, MPI_Datatype, MPI_Datatype *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Type_lb</cname>
+<cppname>(none)</cppname>
+<fname>MPI_TYPE_LB</fname>
+<namespace></namespace>
+<description>Returns the lower bound of a datatype.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Type_lb</name>
+<arguments>MPI_Datatype, MPI_Aint *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Type_match_size</cname>
+<cppname>MPI::Datatype::Match_size</cppname>
+<fname>MPI_TYPE_CREATE_MATCH_SIZE</fname>
+<namespace></namespace>
+<description>Returns a reference (handle) to one of the predefined named datatypes, not a duplicate.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Type_match_size</name>
+<arguments> int, int, MPI_Datatype *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Type_set_attr</cname>
+<cppname>MPI::Datatype::Set_attr</cppname>
+<fname>MPI_TYPE_SET_ATTR</fname>
+<namespace></namespace>
+<description>Attaches the datatype attribute value to the datatype and associates it with the key.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Type_set_attr</name>
+<arguments>MPI_Datatype, int, void *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Type_set_name</cname>
+<cppname>MPI::Datatype::Set_name</cppname>
+<fname>MPI_TYPE_SET_NAME</fname>
+<namespace></namespace>
+<description>Associates a name string with a datatype.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Type_set_name</name>
+<arguments>MPI_Datatype, char *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Type_size</cname>
+<cppname>MPI::Datatype::Get_size</cppname>
+<fname>MPI_TYPE_SIZE</fname>
+<namespace></namespace>
+<description>Returns the number of bytes represented by any defined datatype.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Type_size</name>
+<arguments>MPI_Datatype, int *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Type_struct</cname>
+<cppname>(none)</cppname>
+<fname>MPI_TYPE_STRUCT</fname>
+<namespace></namespace>
+<description>Returns a new datatype that representscount blocks, each with a distinct format and offset.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Type_struct</name>
+<arguments>int, int *, MPI_Aint *, MPI_Datatype *, MPI_Datatype *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Type_ub</cname>
+<cppname>(none)</cppname>
+<fname>MPI_TYPE_UB</fname>
+<namespace></namespace>
+<description>Returns the upper bound of a datatype.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Type_ub</name>
+<arguments>MPI_Datatype, MPI_Aint *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Type_vector</cname>
+<cppname>MPI::Datatype::Create_vector</cppname>
+<fname>MPI_TYPE_VECTOR</fname>
+<namespace></namespace>
+<description>Returns a new datatype that represents equally-spaced blocks of replicated data.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Type_vector</name>
+<arguments>int, int, int, MPI_Datatype, MPI_Datatype *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Unpack</cname>
+<cppname>MPI::Datatype::Unpack</cppname>
+<fname>MPI_UNPACK</fname>
+<namespace></namespace>
+<description>Unpacks the message into the specified receive buffer from the specified packed buffer.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Unpack</name>
+<arguments>void*, int, int *, void *, int, MPI_Datatype, MPI_Comm</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Unpack_external</cname>
+<cppname>MPI::Datatype::Unpack_external</cppname>
+<fname>MPI_UNPACK_EXTERNAL</fname>
+<namespace></namespace>
+<description>Unpacks the message into the specified receive buffer from the specified packed buffer, using the external32 data format.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Unpack_external</name>
+<arguments>char *, void *, MPI_Aint, MPI_Aint *, void *, int, MPI_Datatype</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Wait</cname>
+<cppname>MPI::Request::Wait</cppname>
+<fname>MPI_WAIT</fname>
+<namespace></namespace>
+<description>Waits for a non-blocking operation to complete.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Wait</name>
+<arguments>MPI_Request *, MPI_Status *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Waitall</cname>
+<cppname>MPI::Request::Waitall</cppname>
+<fname>MPI_WAITALL</fname>
+<namespace></namespace>
+<description>Waits for a collection of non-blocking operations to complete.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Waitall</name>
+<arguments>int, MPI_Request *, MPI_Status *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Waitany</cname>
+<cppname>MPI::Request::Waitany</cppname>
+<fname>MPI_WAITANY</fname>
+<namespace></namespace>
+<description>Waits for any specified non-blocking operation to complete.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Waitany</name>
+<arguments>int, MPI_Request *, int *, MPI_Status *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Waitsome</cname>
+<cppname>MPI::Request::Waitsome</cppname>
+<fname>MPI_WAITSOME</fname>
+<namespace></namespace>
+<description>Waits for at least one of a list of non-blocking operations to complete.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Waitsome</name>
+<arguments>int, MPI_Request *, int *, int *, MPI_Status *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Win_c2f</cname>
+<cppname>(none)</cppname>
+<fname>(none)</fname>
+<namespace></namespace>
+<description>Translates a C window handle into a FORTRAN handle to the same window.</description>
+<prototype>
+<returnType>MPI_Fint</returnType>
+<name>MPI_Win_c2f</name>
+<arguments>MPI_Win</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Win_call_errhandler</cname>
+<cppname>MPI::Win::Call_errhandler</cppname>
+<fname>MPI_WIN_CALL_ERRHANDLER</fname>
+<namespace></namespace>
+<description>Calls the error handler assigned to the window with the error code supplied.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Win_call_errhandler</name>
+<arguments>MPI_Win, int</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Win_complete</cname>
+<cppname>MPI::Win::Complete</cppname>
+<fname>MPI_WIN_COMPLETE</fname>
+<namespace></namespace>
+<description>Completes an RMA access epoch on a window object.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Win_complete</name>
+<arguments>MPI_Win</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Win_create</cname>
+<cppname>MPI::Win::Create</cppname>
+<fname>MPI_WIN_CREATE</fname>
+<namespace></namespace>
+<description>Allows each task in an intra-communicator group to specify a "window" in its memory that is made accessible to accesses by remote tasks.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Win_create</name>
+<arguments>void *, MPI_Aint, int, MPI_Info, MPI_Comm, MPI_Win *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Win_create_errhandler</cname>
+<cppname>MPI::Win::Create_errhandler</cppname>
+<fname>MPI_WIN_CREATE_ERRHANDLER</fname>
+<namespace></namespace>
+<description>Creates an error handler that can be attached to windows.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Win_create_errhandler</name>
+<arguments>MPI_Win_errhandler_fn *, MPI_Errhandler *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Win_create_keyval</cname>
+<cppname>MPI::Win::Create_keyval</cppname>
+<fname>MPI_WIN_CREATE_KEYVAL</fname>
+<namespace></namespace>
+<description>Generates a new window attribute key.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Win_create_keyval</name>
+<arguments>MPI_Win_copy_attr_function *, MPI_Win_delete_attr_function *, int *, void *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Win_delete_attr</cname>
+<cppname>MPI::Win::Delete_attr</cppname>
+<fname>MPI_WIN_DELETE_ATTR</fname>
+<namespace></namespace>
+<description>Deletes an attribute from a window.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Win_delete_attr</name>
+<arguments>MPI_Win, int</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Win_f2c</cname>
+<cppname>(none)</cppname>
+<fname>(none)</fname>
+<namespace></namespace>
+<description>Returns a C handle to a window.</description>
+<prototype>
+<returnType>MPI_Win</returnType>
+<name>MPI_Win_f2c</name>
+<arguments>MPI_Fint</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Win_fence</cname>
+<cppname>MPI::Win::Fence</cppname>
+<fname>MPI_WIN_FENCE</fname>
+<namespace></namespace>
+<description>Synchronizes RMA calls on a window.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Win_fence</name>
+<arguments>int, MPI_Win</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Win_free</cname>
+<cppname>MPI::Win::Free</cppname>
+<fname>MPI_WIN_FREE</fname>
+<namespace></namespace>
+<description>Frees the window object and returns a null handle (equal to MPI_WIN_NULL).</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Win_free</name>
+<arguments>MPI_Win *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Win_free_keyval</cname>
+<cppname>MPI::Win::Free_keyval</cppname>
+<fname>MPI_WIN_FREE_KEYVAL</fname>
+<namespace></namespace>
+<description>Marks a window attribute key for deallocation.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Win_free_keyval</name>
+<arguments>int *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Win_get_attr</cname>
+<cppname>MPI::Win::Get_attr</cppname>
+<fname>MPI_WIN_GET_ATTR</fname>
+<namespace></namespace>
+<description>Retrieves the window attribute value identified by the key.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Win_get_attr</name>
+<arguments>MPI_Win, int, void *, int *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Win_get_errhandler</cname>
+<cppname>MPI::Win::Get_errhandler</cppname>
+<fname>MPI_WIN_GET_ERRHANDLER</fname>
+<namespace></namespace>
+<description>Retrieves the error handler currently associated with a window.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Win_get_errhandler</name>
+<arguments>MPI_Win, MPI_Errhandler *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Win_get_group</cname>
+<cppname>MPI::Win::Get_group</cppname>
+<fname>MPI_WIN_GET_GROUP</fname>
+<namespace></namespace>
+<description>Returns a duplicate of the group of the communicator used to create a window.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Win_get_group</name>
+<arguments>MPI_Win, MPI_Group *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Win_get_name</cname>
+<cppname>MPI::Win::Get_name</cppname>
+<fname>MPI_WIN_GET_NAME</fname>
+<namespace></namespace>
+<description>Returns the name that was last associated with a window.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Win_get_name</name>
+<arguments>MPI_Win, char *, int *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Win_lock</cname>
+<cppname>MPI::Win::Lock</cppname>
+<fname>MPI_WIN_LOCK</fname>
+<namespace></namespace>
+<description>Starts an RMA access epoch at the target task.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Win_lock</name>
+<arguments>int, int, int, MPI_Win</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Win_post</cname>
+<cppname>MPI::Win::Post</cppname>
+<fname>MPI_WIN_POST</fname>
+<namespace></namespace>
+<description>Starts an RMA exposure epoch for a local window.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Win_post</name>
+<arguments>MPI_Group, int, MPI_Win</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Win_set_attr</cname>
+<cppname>MPI::Win::Set_attr</cppname>
+<fname>MPI_WIN_SET_ATTR</fname>
+<namespace></namespace>
+<description>Attaches the window attribute value to the window and associates it with the key.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Win_set_attr</name>
+<arguments>MPI_Win, int, void *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Win_set_errhandler</cname>
+<cppname>MPI::Win::Set_errhandler</cppname>
+<fname>MPI_WIN_SET_ERRHANDLER</fname>
+<namespace></namespace>
+<description>Attaches a new error handler to a window.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Win_set_errhandler</name>
+<arguments>MPI_Win, MPI_Errhandler</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Win_set_name</cname>
+<cppname>MPI::Win::Set_name</cppname>
+<fname>MPI_WIN_SET_NAME</fname>
+<namespace></namespace>
+<description>Associates a name string with a window.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Win_set_name</name>
+<arguments>MPI_Win, char *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Win_start</cname>
+<cppname>MPI::Win::Start</cppname>
+<fname>MPI_WIN_START</fname>
+<namespace></namespace>
+<description>Starts an RMA access epoch for a window object.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Win_start</name>
+<arguments>MPI_Group, int, MPI_Win</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Win_test</cname>
+<cppname>MPI::Win::Test</cppname>
+<fname>MPI_WIN_TEST</fname>
+<namespace></namespace>
+<description>Tries to complete an RMA exposure epoch.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Win_test</name>
+<arguments>MPI_Win, int *</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Win_unlock</cname>
+<cppname>MPI::Win::Unlock</cppname>
+<fname>MPI_WIN_UNLOCK</fname>
+<namespace></namespace>
+<description>Completes an RMA access epoch at the target task.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Win_unlock</name>
+<arguments>int, MPI_Win</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Win_wait</cname>
+<cppname>MPI::Win::Wait</cppname>
+<fname>MPI_WIN_WAIT</fname>
+<namespace></namespace>
+<description>Completes an RMA exposure epoch.</description>
+<prototype>
+<returnType>int</returnType>
+<name>MPI_Win_wait</name>
+<arguments>MPI_Win</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Wtick</cname>
+<cppname>MPI::Wtick</cppname>
+<fname>MPI_WTICK</fname>
+<namespace></namespace>
+<description>Returns the resolution of MPI_WTIME in seconds.</description>
+<prototype>
+<returnType>double</returnType>
+<name>MPI_Wtick</name>
+<arguments>void</arguments>
+</prototype>
+</function>
+
+<function>
+<cname>MPI_Wtime</cname>
+<cppname>MPI::Wtime</cppname>
+<fname>MPI_WTIME</fname>
+<namespace></namespace>
+<description>Returns the current value of time as a floating-point value.</description>
+<prototype>
+<returnType>double</returnType>
+<name>MPI_Wtime</name>
+<arguments>void</arguments>
+</prototype>
+</function>
+
+</allFunctions>

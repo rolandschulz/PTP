@@ -1,0 +1,28 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: PTP PLDT - MPI Tools Plug-in
+Bundle-SymbolicName: org.eclipse.ptp.pldt.mpi.core; singleton:=true
+Bundle-Version: 1.0.0
+Bundle-ClassPath: bin/
+Bundle-Activator: org.eclipse.ptp.pldt.mpi.core.MpiPlugin
+Bundle-Vendor: IBM Research
+Bundle-Localization: plugin
+Export-Package: org.eclipse.ptp.pldt.mpi.core,
+ org.eclipse.ptp.pldt.mpi.core.actions,
+ org.eclipse.ptp.pldt.mpi.core.analysis,
+ org.eclipse.ptp.pldt.mpi.core.editorHelp,
+ org.eclipse.ptp.pldt.mpi.core.prefs,
+ org.eclipse.ptp.pldt.mpi.core.util,
+ org.eclipse.ptp.pldt.mpi.core.views
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.core.resources,
+ org.eclipse.ui.ide,
+ org.eclipse.ui.editors,
+ org.eclipse.cdt.core,
+ org.eclipse.cdt.ui,
+ org.eclipse.search,
+ org.eclipse.help,
+ org.eclipse.cdt.doc.user,
+ org.eclipse.ptp.pldt.common
+Eclipse-AutoStart: true
