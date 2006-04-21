@@ -2126,7 +2126,7 @@ server(char *name, char *host, int port)
 RETSIGTYPE
 ptp_signal_handler(int sig)
 {
-		ptp_signal_fired = sig;
+		ptp_signal_exit = sig;
 		if(sig >= 0 && sig < NSIG) {
 			RETSIGTYPE (*saved_signal)(int) = saved_signals[sig];
 			saved_signal(sig);
