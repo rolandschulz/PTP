@@ -39,6 +39,7 @@ public class PTPDebugPerspectiveFactory implements IPerspectiveFactory {
 
 		IFolderLayout folder1= layout.createFolder("bottom", IPageLayout.BOTTOM, (float)0.8, editorArea);
 		folder1.addView(IConsoleConstants.ID_CONSOLE_VIEW);
+		folder1.addView("org.eclipse.debug.ui.MemoryView");
 
 		IFolderLayout folder2= layout.createFolder("topLeftUp", IPageLayout.TOP, (float)0.5, editorArea);
 		folder2.addView(IPTPDebugUIConstants.ID_VIEW_PARALLELDEBUG);
@@ -61,6 +62,7 @@ public class PTPDebugPerspectiveFactory implements IPerspectiveFactory {
 		
 		// views - short cut
 		layout.addShowViewShortcut(IConsoleConstants.ID_CONSOLE_VIEW);
+		layout.addShowViewShortcut("org.eclipse.debug.ui.MemoryView");
 		layout.addShowViewShortcut(NewSearchUI.SEARCH_VIEW_ID);
 		layout.addShowViewShortcut(IPTPDebugUIConstants.ID_VIEW_PARALLELDEBUG);
 		layout.addShowViewShortcut(IPTPDebugUIConstants.ID_VIEW_ARRAY);
