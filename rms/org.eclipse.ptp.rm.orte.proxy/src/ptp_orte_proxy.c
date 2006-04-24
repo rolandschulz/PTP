@@ -95,14 +95,7 @@
 #define RTEV_ERROR_NODES			RTEV_OFFSET + 1006
 #define RTEV_ERROR_NATTR			RTEV_OFFSET + 1007
 #define RTEV_ERROR_ORTE_BPROC_SUBSCRIBE	RTEV_OFFSET + 1008
-/* are separate event codes needed for each signal? */
-#define RTEV_ERROR_HUP			RTEV_OFFSET + 1009
-#define RTEV_ERROR_INT			RTEV_OFFSET + 1010
-#define RTEV_ERROR_ILL			RTEV_OFFSET + 1011
-#define RTEV_ERROR_SEGV			RTEV_OFFSET + 1012
-#define RTEV_ERROR_TERM			RTEV_OFFSET + 1013
-#define RTEV_ERROR_QUIT			RTEV_OFFSET + 1014
-#define RTEV_ERROR_ABRT			RTEV_OFFSET + 1015
+#define RTEV_ERROR_SIGNAL			RTEV_OFFSET + 1009
 
 #define JOB_STATE_NEW				5000
 
@@ -2052,8 +2045,8 @@ ORTEQuit(void)
 int
 server(char *name, char *host, int port)
 {
-	char *msg1, *msg2;
-	int error_code, rc;
+	char *msg, *msg1, *msg2;
+	int rc;
 	
 	eventList = NewList();
 	debugJobs = NewList();
@@ -2108,9 +2101,9 @@ server(char *name, char *host, int port)
 		printf("###### SIGNAL: %s\n", msg1);
 		printf("###### Shutting down ORTEd\n");
 		ORTEShutdown();
-		/* error_code = RTEV_ERROR_SIGNAL */
-		proxy_svr_event_callback(orte_proxy, ORTEErrorStr(error_code,
-			"ptp_orte_proxy received signal %s (%s).  Exit was required and performed cleanly."));
+		asprintf(msg, "ptp_orte_proxy received signal %s (%s).  Exit was requried and performed cleanly.", msg1, msg2);
+		proxy_svr_event_callback(orte_proxy, ORTEErrorStr(RTEV_ERROR_SIGNAL, msg));
+		free(msg);
 		free(msg1);
 		free(msg2);
 		/* our return code = the signal that fired */
@@ -2129,7 +2122,9 @@ ptp_signal_handler(int sig)
 		ptp_signal_exit = sig;
 		if(sig >= 0 && sig < NSIG) {
 			RETSIGTYPE (*saved_signal)(int) = saved_signals[sig];
-			saved_signal(sig);
+			if(saved_signal != SIG_ERR && saved_signal != SIG_IGN && saved_signal != SIG_DFL) {
+				saved_signal(sig);
+			}
 		}
 }
 
@@ -2173,6 +2168,27 @@ main(int argc, char *argv[])
 	saved_signals[SIGQUIT] = signal(SIGQUIT, ptp_signal_handler);
 	saved_signals[SIGABRT] = signal(SIGABRT, ptp_signal_handler);
 	
+	if(saved_signals[SIGINT] != SIG_ERR && saved_signals[SIGINT] != SIG_IGN && saved_signals[SIGINT] != SIG_DFL) {
+		printf("  ---> SIGNAL SIGINT was previously already defined.  Shadowing.\n"); fflush(stdout);
+	}
+	if(saved_signals[SIGHUP] != SIG_ERR && saved_signals[SIGHUP] != SIG_IGN && saved_signals[SIGHUP] != SIG_DFL) {
+		printf("  ---> SIGNAL SIGHUP was previously already defined.  Shadowing.\n"); fflush(stdout);
+	}
+	if(saved_signals[SIGILL] != SIG_ERR && saved_signals[SIGILL] != SIG_IGN && saved_signals[SIGILL] != SIG_DFL) {
+		printf("  ---> SIGNAL SIGILL was previously already defined.  Shadowing.\n"); fflush(stdout);
+	}
+	if(saved_signals[SIGSEGV] != SIG_ERR && saved_signals[SIGSEGV] != SIG_IGN && saved_signals[SIGSEGV] != SIG_DFL) {
+		printf("  ---> SIGNAL SIGSEGV was previously already defined.  Shadowing.\n"); fflush(stdout);
+	}	
+	if(saved_signals[SIGTERM] != SIG_ERR && saved_signals[SIGTERM] != SIG_IGN && saved_signals[SIGTERM] != SIG_DFL) {
+		printf("  ---> SIGNAL SIGTERM was previously already defined.  Shadowing.\n"); fflush(stdout);
+	}
+	if(saved_signals[SIGQUIT] != SIG_ERR && saved_signals[SIGQUIT] != SIG_IGN && saved_signals[SIGQUIT] != SIG_DFL) {
+		printf("  ---> SIGNAL SIGQUIT was previously already defined.  Shadowing.\n"); fflush(stdout);
+	}
+	if(saved_signals[SIGABRT] != SIG_ERR && saved_signals[SIGABRT] != SIG_IGN && saved_signals[SIGABRT] != SIG_DFL) {
+		printf("  ---> SIGNAL SIGABRT was previously already defined.  Shadowing.\n"); fflush(stdout);
+	}	
 	rc = server(proxy_str, host, port);
 	
 	return rc;
