@@ -2101,7 +2101,7 @@ server(char *name, char *host, int port)
 		printf("###### SIGNAL: %s\n", msg1);
 		printf("###### Shutting down ORTEd\n");
 		ORTEShutdown();
-		asprintf(msg, "ptp_orte_proxy received signal %s (%s).  Exit was requried and performed cleanly.", msg1, msg2);
+		asprintf(&msg, "ptp_orte_proxy received signal %s (%s).  Exit was requried and performed cleanly.", msg1, msg2);
 		proxy_svr_event_callback(orte_proxy, ORTEErrorStr(RTEV_ERROR_SIGNAL, msg));
 		free(msg);
 		free(msg1);
