@@ -149,16 +149,24 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 		// LaunchUtils.switchPerspectiveTo(LaunchUtils.PPerspectiveFactory_ID);
 		IAbstractDebugger debugger = null;
 		IPJob job = null;
+		
+		// done the verification phase
+		JobRunConfiguration jrunconfig = getJobRunConfiguration(configuration);
+		/* Assuming we have parsed the configuration */
+		
+		IPath exePath = null;
+		
 		try {
-			// done the verification phase
-			JobRunConfiguration jrunconfig = getJobRunConfiguration(configuration);
-			/* Assuming we have parsed the configuration */
-			IPath exePath = verifyProgramPath(configuration);
+			exePath = verifyProgramPath(configuration);
 			IProject project = verifyProject(configuration);
 			if (exePath != null) {
 				exeFile = verifyBinary(project, exePath);
 			}
-			
+		} catch(CoreException e) {
+			abort(LaunchMessages.getResourceString("ParallelLaunchConfigurationDelegate.Invalid_binary"), null, 0);
+		}
+		
+		try {
 			IPreferenceStore store = PTPDebugUIPlugin.getDefault().getPreferenceStore();
 			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
 				monitor.subTask("Configuring debug setting . . .");
