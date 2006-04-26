@@ -210,8 +210,12 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 				monitor.worked(40);
 			}
 		} catch (CoreException e) {
-			if (e.getStatus().getPlugin().equals(PTPCorePlugin.PLUGIN_ID))
-				abort(LaunchMessages.getResourceString("ParallelLaunchConfigurationDelegate.Control_system_does_not_exist"), null, 0);
+			if (e.getStatus().getPlugin().equals(PTPCorePlugin.PLUGIN_ID)) {
+				String msg = e.getMessage();
+				if(msg == null) msg = "";
+				else msg = msg + "\n\n";
+				abort(msg + LaunchMessages.getResourceString("ParallelLaunchConfigurationDelegate.Control_system_does_not_exist"), null, 0);
+			}
 			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
 				PTPDebugCorePlugin.getDebugModel().shutdownSession(job);
 				if (debugger != null) {
