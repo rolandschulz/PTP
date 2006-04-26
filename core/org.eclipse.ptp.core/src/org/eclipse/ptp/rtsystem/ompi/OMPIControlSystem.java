@@ -123,7 +123,7 @@ public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventList
 		try {
 			jobID = proxy.runJob((String[])argList.toArray(new String[0]));
 		} catch(IOException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, "Control system is shut down, proxy exception", null));
 		}
 		
@@ -148,7 +148,8 @@ public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventList
 				proxy.terminateJob(jobID);
 			} catch(IOException e) {
 				e.printStackTrace();
-				throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, "Control system is shut down, proxy exception", null));
+				throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, 
+					"Control system is shut down, proxy exception.  The proxy may have crashed or been killed.", null));
 			}
 		}
 		else {
