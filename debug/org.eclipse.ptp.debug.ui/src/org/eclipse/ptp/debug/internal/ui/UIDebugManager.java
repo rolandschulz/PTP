@@ -423,17 +423,21 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	/** Focus on debug view
 	 * @param selection
 	 */
-	public void focusOnDebugView(Object selection) {
-		IViewPart part = UIUtils.findView(IDebugUIConstants.ID_DEBUG_VIEW);
-		if (part != null && part instanceof IDebugView) {
-			Viewer viewer = ((IDebugView)part).getViewer();
-			if (viewer != null) {
-				if (selection != null) {
-					viewer.setSelection(new StructuredSelection(selection));
+	public void focusOnDebugView(final Object selection) {
+		PTPDebugUIPlugin.getDisplay().asyncExec(new Runnable() {
+			public void run() {
+				IViewPart part = UIUtils.findView(IDebugUIConstants.ID_DEBUG_VIEW);
+				if (part != null && part instanceof IDebugView) {
+					Viewer viewer = ((IDebugView)part).getViewer();
+					if (viewer != null) {
+						if (selection != null) {
+							viewer.setSelection(new StructuredSelection(selection));
+						}
+						part.setFocus();
+					}
 				}
-				part.setFocus();
 			}
-		}
+		});
 	}	
 	/***************************************************************************************************************************************************************************************************
 	 * Register / Unregister
@@ -1030,7 +1034,8 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	 */
 	private void updateDebugVariablesOnSuspend(IPJob job) {
 		if (prefAutoUpdateVarOnSuspend) {
-			if (getCurrentJob().equals(job)) {
+			IPJob cur_job = getCurrentJob();
+			if (cur_job != null && cur_job.equals(job)) {
 				updateDebugVariables(job);
 			}
 		}
