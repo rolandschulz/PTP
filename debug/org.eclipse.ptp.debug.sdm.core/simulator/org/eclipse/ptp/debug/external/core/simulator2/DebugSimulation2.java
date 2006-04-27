@@ -421,6 +421,13 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 		}).start();
 	}
 	
+	public void setDataReadMemoryCommand(final BitList tasks, long offset, String address, int wordFormat, int wordSize, int rows, int cols, Character asChar) throws PCDIException {
+		throw new PCDIException("not supported in simulator");
+	}
+	public void setDataWriteMemoryCommand(final BitList tasks, long offset, String address, int wordFormat, int wordSize, String value) throws PCDIException {
+		throw new PCDIException("not supported in simulator");
+	}
+	
 	public synchronized void update(Observable obs, Object obj) {
 		if (obs instanceof SimulateProgram) {
 			if (obj != null && obj instanceof String[]) {
