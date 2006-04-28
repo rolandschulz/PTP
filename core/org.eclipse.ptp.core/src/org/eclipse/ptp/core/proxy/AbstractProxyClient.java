@@ -40,7 +40,9 @@ import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.proxy.event.IProxyEvent;
 import org.eclipse.ptp.core.proxy.event.IProxyEventListener;
 import org.eclipse.ptp.core.proxy.event.ProxyConnectedEvent;
+import org.eclipse.ptp.core.proxy.event.ProxyDisconnectedEvent;
 import org.eclipse.ptp.core.proxy.event.ProxyEvent;
+import org.eclipse.ptp.core.proxy.event.ProxyOKEvent;
 import org.eclipse.ptp.core.util.BitList;
 
 public abstract class AbstractProxyClient {
@@ -56,6 +58,8 @@ public abstract class AbstractProxyClient {
 	private static Charset		charset = Charset.forName("US-ASCII");
 	private static CharsetEncoder	encoder = charset.newEncoder();
 	private static CharsetDecoder	decoder = charset.newDecoder();
+	private boolean shutting_down = false;
+	private boolean have_shut_down = false;
 	
 	private String encodeLength(int val) {
 		char[] res = new char[8];
@@ -214,7 +218,7 @@ public abstract class AbstractProxyClient {
 				System.out.println("event thread starting...");
 				try {
 					exitThread = false;
-					while (!exitThread) {
+					while (!exitThread && !query_have_shut_down()) {
 						sessionProgress();
 					}
 				} catch (IOException e) {
@@ -227,12 +231,24 @@ public abstract class AbstractProxyClient {
 					System.out.println("event thread IOException . . .");
 				} 
 				System.out.println("event thread exiting...");
+				fireProxyEvent(new ProxyDisconnectedEvent(!query_have_shut_down()));
 			}
 		};
 		eventThread.start();
 	}
 	
+	private synchronized boolean query_have_shut_down() {
+		return have_shut_down;
+	}
+	
+	private synchronized void set_have_shut_down(boolean state) {
+		have_shut_down = state;
+	}
+	
 	protected void fireProxyEvent(IProxyEvent event) {
+		if(shutting_down && event instanceof ProxyOKEvent) {
+			set_have_shut_down(true);
+		}
 		if (listeners == null)
 			return;
 		synchronized (listeners) {
@@ -248,8 +264,9 @@ public abstract class AbstractProxyClient {
 		buf.clear();
 		while (buf.remaining() > 0) {
 			int n = sessSock.read(buf);
-			if (n < 0)
+			if (n < 0) {
 				return false;
+			}
 		}
 		buf.flip();
 		return true;
@@ -258,8 +275,9 @@ public abstract class AbstractProxyClient {
 	private boolean fullWrite(ByteBuffer buf) throws IOException {
 		while (buf.remaining() > 0) {
 			int n = sessSock.write(buf);
-			if (n < 0)
+			if (n < 0) {
 				return false;
+			}
 		}
 		return true;
 	}
@@ -288,6 +306,7 @@ public abstract class AbstractProxyClient {
 
 	public void sessionFinish() throws IOException {
 		this.sendCommand("QUI");
+		shutting_down = true;
 		if (acceptThread.isAlive())
 			acceptThread.interrupt();
 	}

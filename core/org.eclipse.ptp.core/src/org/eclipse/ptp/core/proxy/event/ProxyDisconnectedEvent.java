@@ -19,11 +19,18 @@
 
 package org.eclipse.ptp.core.proxy.event;
 
-public interface IProxyEvent {
-	public static final int EVENT_OK = 0;
-	public static final int EVENT_ERROR = 1;
-	public static final int EVENT_CONNECTED = 2;
-	public static final int EVENT_DISCONNECTED = 3;
+public class ProxyDisconnectedEvent extends AbstractProxyEvent implements IProxyEvent {
+	
+	private boolean error = false;
+	
+	public ProxyDisconnectedEvent(boolean error) {
+		super(EVENT_DISCONNECTED);
+		this.error = error;
+	}
+	
+	public boolean wasError() { return error; }
 
-	public int getEventID();
+	public String toString() {
+		return "EVENT_DISCONNECTED " + "error? "+error;
+	}
 }

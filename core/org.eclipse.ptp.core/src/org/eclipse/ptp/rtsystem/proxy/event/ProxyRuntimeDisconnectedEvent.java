@@ -17,13 +17,20 @@
  * LA-CC 04-115
  *******************************************************************************/
 
-package org.eclipse.ptp.core.proxy.event;
+package org.eclipse.ptp.rtsystem.proxy.event;
 
-public interface IProxyEvent {
-	public static final int EVENT_OK = 0;
-	public static final int EVENT_ERROR = 1;
-	public static final int EVENT_CONNECTED = 2;
-	public static final int EVENT_DISCONNECTED = 3;
+public class ProxyRuntimeDisconnectedEvent extends AbstractProxyRuntimeEvent implements IProxyRuntimeEvent {
 
-	public int getEventID();
+	private boolean error = false;
+	
+	public ProxyRuntimeDisconnectedEvent(boolean error) {
+		super(EVENT_RUNTIME_CONNECTED);
+		this.error = error;
+	}
+	
+	public boolean wasError() { return error; }
+	
+	public String toString() {
+		return "EVENT_RUNTIME_CONNECTED " + "error? "+error;
+	}
 }

@@ -252,6 +252,7 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
 			this.events.addItem(e);
 			notifyAll();
 		}
+		
     }
 
 }
