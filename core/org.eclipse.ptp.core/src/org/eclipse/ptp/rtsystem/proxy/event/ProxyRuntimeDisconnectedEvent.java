@@ -24,13 +24,13 @@ public class ProxyRuntimeDisconnectedEvent extends AbstractProxyRuntimeEvent imp
 	private boolean error = false;
 	
 	public ProxyRuntimeDisconnectedEvent(boolean error) {
-		super(EVENT_RUNTIME_CONNECTED);
+		super(EVENT_RUNTIME_DISCONNECTED);
 		this.error = error;
 	}
 	
 	public boolean wasError() { return error; }
 	
 	public String toString() {
-		return "EVENT_RUNTIME_CONNECTED " + "error? "+error;
+		return "EVENT_RUNTIME_DISCONNECTED " + "error? "+error;
 	}
 }
