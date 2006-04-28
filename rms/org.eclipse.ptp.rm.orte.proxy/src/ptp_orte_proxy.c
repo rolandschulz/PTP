@@ -241,6 +241,8 @@ ORTEStartDaemon(char **args)
 			{
 				char **orted_args;
 				
+				proxy_svr_finish(orte_proxy);
+				
 				asprintf(&res, "%s --universe PTP-ORTE-%d", DEFAULT_ORTED_ARGS, getpid());
 				//asprintf(&res, "%s", DEFAULT_ORTED_ARGS);				
 
@@ -252,6 +254,7 @@ ORTEStartDaemon(char **args)
 				printf("Starting execv now!\n"); fflush(stdout);
 				errno = 0;
 
+				setsid();
 				ret = execvp("orted", orted_args);
 
 				FreeArgs(orted_args);
