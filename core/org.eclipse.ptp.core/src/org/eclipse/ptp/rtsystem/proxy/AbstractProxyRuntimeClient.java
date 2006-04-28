@@ -28,11 +28,13 @@ import org.eclipse.ptp.core.proxy.AbstractProxyClient;
 import org.eclipse.ptp.core.proxy.event.IProxyEvent;
 import org.eclipse.ptp.core.proxy.event.IProxyEventListener;
 import org.eclipse.ptp.core.proxy.event.ProxyConnectedEvent;
+import org.eclipse.ptp.core.proxy.event.ProxyDisconnectedEvent;
 import org.eclipse.ptp.core.proxy.event.ProxyErrorEvent;
 import org.eclipse.ptp.core.proxy.event.ProxyOKEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener;
 import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeConnectedEvent;
+import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeDisconnectedEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeErrorEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeEvent;
 
@@ -64,6 +66,8 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 			e = new ProxyRuntimeErrorEvent(null, ((ProxyErrorEvent)event).getErrorCode(), ((ProxyErrorEvent)event).getErrorMessage());
 		} else if (event instanceof ProxyConnectedEvent) {
 			e = new ProxyRuntimeConnectedEvent();
+		} else if (event instanceof ProxyDisconnectedEvent) {
+			e = new ProxyRuntimeDisconnectedEvent( ((ProxyDisconnectedEvent)event).wasError());
 		}
 		
 		if (e != null) {
