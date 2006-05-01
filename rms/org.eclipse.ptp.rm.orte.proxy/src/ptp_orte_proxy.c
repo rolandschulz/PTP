@@ -82,9 +82,9 @@
 #define RTEV_PATTR				RTEV_OFFSET + 5
 #define RTEV_NODES				RTEV_OFFSET + 7
 #define RTEV_NATTR				RTEV_OFFSET + 8
-#define RTEV_NEWJOB				RTEV_OFFSET + 11
-#define RTEV_PROCOUT				RTEV_OFFSET + 12
-#define RTEV_NODECHANGE			RTEV_OFFSET + 13
+#define RTEV_NEWJOB				RTEV_OFFSET + 12
+#define RTEV_PROCOUT				RTEV_OFFSET + 13
+#define RTEV_NODECHANGE			RTEV_OFFSET + 14
 
 #define RTEV_ERROR_ORTE_INIT		RTEV_OFFSET + 1000
 #define RTEV_ERROR_ORTE_FINALIZE	RTEV_OFFSET + 1001
@@ -567,7 +567,9 @@ ORTEProgress(void)
 	
 	/* only run the progress of the ORTE code if we've initted the ORTE daemon */
 	if(ORTEInitialized()) {
+		//printf("Open event_loop - calling now . . .\n"); fflush(stdout);
 		opal_event_loop(OPAL_EVLOOP_ONCE);
+		//printf("Open event loop - returned cleanly!\n"); fflush(stdout);
 	}
 	
 	return PROXY_RES_OK;
