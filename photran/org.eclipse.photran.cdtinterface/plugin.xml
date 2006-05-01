@@ -56,6 +56,22 @@
             id="org.eclipse.photran.ui.FortranPerspective">
       </perspective>
    </extension>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension targetID="org.eclipse.photran.ui.FortranPerspective">
+         <perspectiveShortcut id="org.eclipse.debug.ui.DebugPerspective"/>
+         <perspectiveShortcut id="org.eclipse.team.ui.TeamSynchronizingPerspective"/>
+         <actionSet id="org.eclipse.debug.ui.launchActionSet"/>
+         <actionSet id="org.eclipse.cdt.managedbuilder.ui.buildConfigActionSet"/>
+         <view
+               id="org.eclipse.cdt.make.ui.views.MakeView"
+               relationship="stack"
+               relative="org.eclipse.ui.views.ContentOutline"
+               visible="true"/>
+         <viewShortcut id="org.eclipse.cdt.make.ui.views.MakeView"/>
+         <actionSet id="org.eclipse.cdt.make.ui.makeTargetActionSet"/>
+      </perspectiveExtension>
+   </extension>
 
    <!-- Fortran Projects View -->
    <extension
