@@ -58,7 +58,7 @@
 #define DBGERR_PROCSET		36
 #define DBGERR_UNKNOWN		37
 #define DBGERR_UNKNOWN_TYPE		38
-
+/* REMEBER TO ADD NEW ERRORS TO utils/error.c! */
 /*
  * Error Handling
  */
