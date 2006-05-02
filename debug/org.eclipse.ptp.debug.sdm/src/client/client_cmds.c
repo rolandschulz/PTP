@@ -145,7 +145,7 @@ DbgClntStartSession(char **args)
 	asprintf(&cmd, "%s %s \"%s\"", DBG_STARTSESSION_CMD, args[1], args[2]);
 	
 	for (ap = &args[3]; *ap != NULL; ap++) {
-		asprintf(&buf, "%s %s", cmd, *ap);
+		asprintf(&buf, "%s \"%s\"", cmd, *ap);
 		free(cmd);
 		cmd = buf;
 	}
