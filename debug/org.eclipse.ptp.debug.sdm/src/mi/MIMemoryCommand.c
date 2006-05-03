@@ -30,7 +30,9 @@
 #include "MICommand.h"
 
 //clement added
-MICommand * MIDataReadMemory(long offset, char* address, char* format, int wordSize, int rows, int cols, char* asChar) {
+MICommand *
+MIDataReadMemory(long offset, char* address, char* format, int wordSize, int rows, int cols, char* asChar)
+{
 	MICommand * cmd;
 	cmd = MICommandNew("-data-read-memory", MIResultRecordDONE);
 	
@@ -49,7 +51,9 @@ MICommand * MIDataReadMemory(long offset, char* address, char* format, int wordS
 }
 
 //clement added
-MICommand * MIDataWriteMemory(long offset, char* address, char* format, int wordSize, char* value) {
+MICommand *
+MIDataWriteMemory(long offset, char* address, char* format, int wordSize, char* value)
+{
 	MICommand * cmd;
 	cmd = MICommandNew("-data-write-memory", MIResultRecordDONE);
 	
