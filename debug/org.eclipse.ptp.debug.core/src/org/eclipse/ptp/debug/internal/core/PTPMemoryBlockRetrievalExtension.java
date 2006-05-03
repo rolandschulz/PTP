@@ -193,7 +193,7 @@ public class PTPMemoryBlockRetrievalExtension implements IMemoryBlockRetrievalEx
 			msg = e.getMessage();
 		}
 		catch(NumberFormatException e) {
-			msg = MessageFormat.format(InternalDebugCoreMessages.getString("CMemoryBlockRetrievalExtension.0"), new String[] { expression, address });
+			msg = MessageFormat.format(InternalDebugCoreMessages.getString("PTPMemoryBlockRetrievalExtension.0"), new String[] { expression, address });
 		}
 		throw new DebugException(new Status(IStatus.ERROR, PTPDebugCorePlugin.getUniqueIdentifier(), DebugException.REQUEST_FAILED, msg, null));
 	}
