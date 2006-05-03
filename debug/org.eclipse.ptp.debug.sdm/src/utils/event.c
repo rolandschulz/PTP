@@ -481,27 +481,27 @@ dbg_str_to_memoryinfo(char **args, memoryinfo **info)
 		FreeMemoryInfo(meminfo);
 		return -1;
 	}
-	if (proxy_str_to_int(args[1], &meminfo->nextRow) < 0) {
+	if (proxy_str_to_int(args[1], (int *)&meminfo->nextRow) < 0) {
 		FreeMemoryInfo(meminfo);
 		return -1;
 	}
-	if (proxy_str_to_int(args[2], &meminfo->prevRow) < 0) {
+	if (proxy_str_to_int(args[2], (int *)&meminfo->prevRow) < 0) {
 		FreeMemoryInfo(meminfo);
 		return -1;
 	}
-	if (proxy_str_to_int(args[3], &meminfo->nextPage) < 0) {
+	if (proxy_str_to_int(args[3], (int *)&meminfo->nextPage) < 0) {
 		FreeMemoryInfo(meminfo);
 		return -1;
 	}
-	if (proxy_str_to_int(args[4], &meminfo->prevPage) < 0) {
+	if (proxy_str_to_int(args[4], (int *)&meminfo->prevPage) < 0) {
 		FreeMemoryInfo(meminfo);
 		return -1;
 	}
-	if (proxy_str_to_int(args[5], &meminfo->numBytes) < 0) {
+	if (proxy_str_to_int(args[5], (int *)&meminfo->numBytes) < 0) {
 		FreeMemoryInfo(meminfo);
 		return -1;
 	}
-	if (proxy_str_to_int(args[6], &meminfo->totalBytes) < 0) {
+	if (proxy_str_to_int(args[6], (int *)&meminfo->totalBytes) < 0) {
 		FreeMemoryInfo(meminfo);
 		return -1;
 	}
