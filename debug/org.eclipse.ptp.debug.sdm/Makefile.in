@@ -72,7 +72,8 @@ am_libdbgutils_a_OBJECTS = src/utils/libdbgutils_a-error.$(OBJEXT) \
 	src/utils/libdbgutils_a-breakpoint.$(OBJEXT) \
 	src/utils/libdbgutils_a-stackframe.$(OBJEXT) \
 	src/utils/libdbgutils_a-event.$(OBJEXT) \
-	src/utils/libdbgutils_a-itimer.$(OBJEXT)
+	src/utils/libdbgutils_a-itimer.$(OBJEXT) \
+	src/utils/libdbgutils_a-memoryinfo.$(OBJEXT)
 libdbgutils_a_OBJECTS = $(am_libdbgutils_a_OBJECTS)
 libmi_a_AR = $(AR) $(ARFLAGS)
 libmi_a_LIBADD =
@@ -94,7 +95,9 @@ am_libmi_a_OBJECTS = src/mi/libmi_a-MIParser.$(OBJEXT) \
 	src/mi/libmi_a-MIStackCommand.$(OBJEXT) \
 	src/mi/libmi_a-MIVarCommand.$(OBJEXT) \
 	src/mi/libmi_a-MIError.$(OBJEXT) \
-	src/mi/libmi_a-MISession.$(OBJEXT)
+	src/mi/libmi_a-MISession.$(OBJEXT) \
+	src/mi/libmi_a-MIMemory.$(OBJEXT) \
+	src/mi/libmi_a-MIMemoryCommand.$(OBJEXT)
 libmi_a_OBJECTS = $(am_libmi_a_OBJECTS)
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
@@ -292,7 +295,7 @@ test_mi_SOURCES = src/mi/test_mi.c
 test_mi_CFLAGS = -I./include -I./src/mi -I$(UTILS)/include $(AM_CFLAGS) -g
 test_mi_LDFLAGS = -g
 test_mi_LDADD = libmi.a $(UTILS)/libutils.a
-noinst_HEADERS = include/breakpoint.h include/dbg.h include/location.h include/stackframe.h
+noinst_HEADERS = include/breakpoint.h include/dbg.h include/location.h include/stackframe.h include/memoryinfo.h
 noinst_LIBRARIES = libdbgclnt.a libdbgutils.a libmi.a
 libdbgclnt_a_SOURCES = src/client/client_interface.c 
 libdbgclnt_a_CFLAGS = -I./include -I./libaif -I$(PROXY)/include -I$(UTILS)/include $(AM_CFLAGS) -g
@@ -300,7 +303,8 @@ libdbgutils_a_SOURCES = src/utils/error.c \
 						src/utils/breakpoint.c \
 						src/utils/stackframe.c \
 						src/utils/event.c \
-						src/utils/itimer.c
+						src/utils/itimer.c \
+						src/utils/memoryinfo.c
 
 libdbgutils_a_CFLAGS = -I./include -I./libaif -I$(PROXY)/include -I$(UTILS)/include $(AM_CFLAGS) -g
 libmi_a_SOURCES = src/mi/MIParser.c \
@@ -322,7 +326,9 @@ libmi_a_SOURCES = src/mi/MIParser.c \
 						src/mi/MIStackCommand.c \
 						src/mi/MIVarCommand.c \
 						src/mi/MIError.c \
-						src/mi/MISession.c
+						src/mi/MISession.c \
+						src/mi/MIMemory.c \
+						src/mi/MIMemoryCommand.c
 
 libmi_a_CFLAGS = -I./include -I$(UTILS)/include $(AM_CFLAGS) -g 
 all: config.h
@@ -412,6 +418,8 @@ src/utils/libdbgutils_a-event.$(OBJEXT): src/utils/$(am__dirstamp) \
 	src/utils/$(DEPDIR)/$(am__dirstamp)
 src/utils/libdbgutils_a-itimer.$(OBJEXT): src/utils/$(am__dirstamp) \
 	src/utils/$(DEPDIR)/$(am__dirstamp)
+src/utils/libdbgutils_a-memoryinfo.$(OBJEXT):  \
+	src/utils/$(am__dirstamp) src/utils/$(DEPDIR)/$(am__dirstamp)
 libdbgutils.a: $(libdbgutils_a_OBJECTS) $(libdbgutils_a_DEPENDENCIES) 
 	-rm -f libdbgutils.a
 	$(libdbgutils_a_AR) libdbgutils.a $(libdbgutils_a_OBJECTS) $(libdbgutils_a_LIBADD)
@@ -461,6 +469,10 @@ src/mi/libmi_a-MIVarCommand.$(OBJEXT): src/mi/$(am__dirstamp) \
 src/mi/libmi_a-MIError.$(OBJEXT): src/mi/$(am__dirstamp) \
 	src/mi/$(DEPDIR)/$(am__dirstamp)
 src/mi/libmi_a-MISession.$(OBJEXT): src/mi/$(am__dirstamp) \
+	src/mi/$(DEPDIR)/$(am__dirstamp)
+src/mi/libmi_a-MIMemory.$(OBJEXT): src/mi/$(am__dirstamp) \
+	src/mi/$(DEPDIR)/$(am__dirstamp)
+src/mi/libmi_a-MIMemoryCommand.$(OBJEXT): src/mi/$(am__dirstamp) \
 	src/mi/$(DEPDIR)/$(am__dirstamp)
 libmi.a: $(libmi_a_OBJECTS) $(libmi_a_DEPENDENCIES) 
 	-rm -f libmi.a
@@ -568,6 +580,8 @@ mostlyclean-compile:
 	-rm -f src/mi/libmi_a-MIExecCommand.$(OBJEXT)
 	-rm -f src/mi/libmi_a-MIFrame.$(OBJEXT)
 	-rm -f src/mi/libmi_a-MIGDBCommand.$(OBJEXT)
+	-rm -f src/mi/libmi_a-MIMemory.$(OBJEXT)
+	-rm -f src/mi/libmi_a-MIMemoryCommand.$(OBJEXT)
 	-rm -f src/mi/libmi_a-MIOOBRecord.$(OBJEXT)
 	-rm -f src/mi/libmi_a-MIOutput.$(OBJEXT)
 	-rm -f src/mi/libmi_a-MIParser.$(OBJEXT)
@@ -592,6 +606,7 @@ mostlyclean-compile:
 	-rm -f src/utils/libdbgutils_a-error.$(OBJEXT)
 	-rm -f src/utils/libdbgutils_a-event.$(OBJEXT)
 	-rm -f src/utils/libdbgutils_a-itimer.$(OBJEXT)
+	-rm -f src/utils/libdbgutils_a-memoryinfo.$(OBJEXT)
 	-rm -f src/utils/libdbgutils_a-stackframe.$(OBJEXT)
 
 distclean-compile:
@@ -611,6 +626,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/mi/$(DEPDIR)/libmi_a-MIExecCommand.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mi/$(DEPDIR)/libmi_a-MIFrame.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mi/$(DEPDIR)/libmi_a-MIGDBCommand.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/mi/$(DEPDIR)/libmi_a-MIMemory.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/mi/$(DEPDIR)/libmi_a-MIMemoryCommand.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mi/$(DEPDIR)/libmi_a-MIOOBRecord.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mi/$(DEPDIR)/libmi_a-MIOutput.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mi/$(DEPDIR)/libmi_a-MIParser.Po@am__quote@
@@ -635,6 +652,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libdbgutils_a-error.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libdbgutils_a-event.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libdbgutils_a-itimer.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libdbgutils_a-memoryinfo.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libdbgutils_a-stackframe.Po@am__quote@
 
 .c.o:
@@ -744,6 +762,20 @@ src/utils/libdbgutils_a-itimer.obj: src/utils/itimer.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/utils/itimer.c' object='src/utils/libdbgutils_a-itimer.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdbgutils_a_CFLAGS) $(CFLAGS) -c -o src/utils/libdbgutils_a-itimer.obj `if test -f 'src/utils/itimer.c'; then $(CYGPATH_W) 'src/utils/itimer.c'; else $(CYGPATH_W) '$(srcdir)/src/utils/itimer.c'; fi`
+
+src/utils/libdbgutils_a-memoryinfo.o: src/utils/memoryinfo.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdbgutils_a_CFLAGS) $(CFLAGS) -MT src/utils/libdbgutils_a-memoryinfo.o -MD -MP -MF "src/utils/$(DEPDIR)/libdbgutils_a-memoryinfo.Tpo" -c -o src/utils/libdbgutils_a-memoryinfo.o `test -f 'src/utils/memoryinfo.c' || echo '$(srcdir)/'`src/utils/memoryinfo.c; \
+@am__fastdepCC_TRUE@	then mv -f "src/utils/$(DEPDIR)/libdbgutils_a-memoryinfo.Tpo" "src/utils/$(DEPDIR)/libdbgutils_a-memoryinfo.Po"; else rm -f "src/utils/$(DEPDIR)/libdbgutils_a-memoryinfo.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/utils/memoryinfo.c' object='src/utils/libdbgutils_a-memoryinfo.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdbgutils_a_CFLAGS) $(CFLAGS) -c -o src/utils/libdbgutils_a-memoryinfo.o `test -f 'src/utils/memoryinfo.c' || echo '$(srcdir)/'`src/utils/memoryinfo.c
+
+src/utils/libdbgutils_a-memoryinfo.obj: src/utils/memoryinfo.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdbgutils_a_CFLAGS) $(CFLAGS) -MT src/utils/libdbgutils_a-memoryinfo.obj -MD -MP -MF "src/utils/$(DEPDIR)/libdbgutils_a-memoryinfo.Tpo" -c -o src/utils/libdbgutils_a-memoryinfo.obj `if test -f 'src/utils/memoryinfo.c'; then $(CYGPATH_W) 'src/utils/memoryinfo.c'; else $(CYGPATH_W) '$(srcdir)/src/utils/memoryinfo.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "src/utils/$(DEPDIR)/libdbgutils_a-memoryinfo.Tpo" "src/utils/$(DEPDIR)/libdbgutils_a-memoryinfo.Po"; else rm -f "src/utils/$(DEPDIR)/libdbgutils_a-memoryinfo.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/utils/memoryinfo.c' object='src/utils/libdbgutils_a-memoryinfo.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdbgutils_a_CFLAGS) $(CFLAGS) -c -o src/utils/libdbgutils_a-memoryinfo.obj `if test -f 'src/utils/memoryinfo.c'; then $(CYGPATH_W) 'src/utils/memoryinfo.c'; else $(CYGPATH_W) '$(srcdir)/src/utils/memoryinfo.c'; fi`
 
 src/mi/libmi_a-MIParser.o: src/mi/MIParser.c
 @am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-MIParser.o -MD -MP -MF "src/mi/$(DEPDIR)/libmi_a-MIParser.Tpo" -c -o src/mi/libmi_a-MIParser.o `test -f 'src/mi/MIParser.c' || echo '$(srcdir)/'`src/mi/MIParser.c; \
@@ -1024,6 +1056,34 @@ src/mi/libmi_a-MISession.obj: src/mi/MISession.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/MISession.c' object='src/mi/libmi_a-MISession.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-MISession.obj `if test -f 'src/mi/MISession.c'; then $(CYGPATH_W) 'src/mi/MISession.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/MISession.c'; fi`
+
+src/mi/libmi_a-MIMemory.o: src/mi/MIMemory.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-MIMemory.o -MD -MP -MF "src/mi/$(DEPDIR)/libmi_a-MIMemory.Tpo" -c -o src/mi/libmi_a-MIMemory.o `test -f 'src/mi/MIMemory.c' || echo '$(srcdir)/'`src/mi/MIMemory.c; \
+@am__fastdepCC_TRUE@	then mv -f "src/mi/$(DEPDIR)/libmi_a-MIMemory.Tpo" "src/mi/$(DEPDIR)/libmi_a-MIMemory.Po"; else rm -f "src/mi/$(DEPDIR)/libmi_a-MIMemory.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/MIMemory.c' object='src/mi/libmi_a-MIMemory.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-MIMemory.o `test -f 'src/mi/MIMemory.c' || echo '$(srcdir)/'`src/mi/MIMemory.c
+
+src/mi/libmi_a-MIMemory.obj: src/mi/MIMemory.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-MIMemory.obj -MD -MP -MF "src/mi/$(DEPDIR)/libmi_a-MIMemory.Tpo" -c -o src/mi/libmi_a-MIMemory.obj `if test -f 'src/mi/MIMemory.c'; then $(CYGPATH_W) 'src/mi/MIMemory.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/MIMemory.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "src/mi/$(DEPDIR)/libmi_a-MIMemory.Tpo" "src/mi/$(DEPDIR)/libmi_a-MIMemory.Po"; else rm -f "src/mi/$(DEPDIR)/libmi_a-MIMemory.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/MIMemory.c' object='src/mi/libmi_a-MIMemory.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-MIMemory.obj `if test -f 'src/mi/MIMemory.c'; then $(CYGPATH_W) 'src/mi/MIMemory.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/MIMemory.c'; fi`
+
+src/mi/libmi_a-MIMemoryCommand.o: src/mi/MIMemoryCommand.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-MIMemoryCommand.o -MD -MP -MF "src/mi/$(DEPDIR)/libmi_a-MIMemoryCommand.Tpo" -c -o src/mi/libmi_a-MIMemoryCommand.o `test -f 'src/mi/MIMemoryCommand.c' || echo '$(srcdir)/'`src/mi/MIMemoryCommand.c; \
+@am__fastdepCC_TRUE@	then mv -f "src/mi/$(DEPDIR)/libmi_a-MIMemoryCommand.Tpo" "src/mi/$(DEPDIR)/libmi_a-MIMemoryCommand.Po"; else rm -f "src/mi/$(DEPDIR)/libmi_a-MIMemoryCommand.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/MIMemoryCommand.c' object='src/mi/libmi_a-MIMemoryCommand.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-MIMemoryCommand.o `test -f 'src/mi/MIMemoryCommand.c' || echo '$(srcdir)/'`src/mi/MIMemoryCommand.c
+
+src/mi/libmi_a-MIMemoryCommand.obj: src/mi/MIMemoryCommand.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-MIMemoryCommand.obj -MD -MP -MF "src/mi/$(DEPDIR)/libmi_a-MIMemoryCommand.Tpo" -c -o src/mi/libmi_a-MIMemoryCommand.obj `if test -f 'src/mi/MIMemoryCommand.c'; then $(CYGPATH_W) 'src/mi/MIMemoryCommand.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/MIMemoryCommand.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "src/mi/$(DEPDIR)/libmi_a-MIMemoryCommand.Tpo" "src/mi/$(DEPDIR)/libmi_a-MIMemoryCommand.Po"; else rm -f "src/mi/$(DEPDIR)/libmi_a-MIMemoryCommand.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/MIMemoryCommand.c' object='src/mi/libmi_a-MIMemoryCommand.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-MIMemoryCommand.obj `if test -f 'src/mi/MIMemoryCommand.c'; then $(CYGPATH_W) 'src/mi/MIMemoryCommand.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/MIMemoryCommand.c'; fi`
 
 src/client/sdm-startup.o: src/client/startup.c
 @am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -MT src/client/sdm-startup.o -MD -MP -MF "src/client/$(DEPDIR)/sdm-startup.Tpo" -c -o src/client/sdm-startup.o `test -f 'src/client/startup.c' || echo '$(srcdir)/'`src/client/startup.c; \
