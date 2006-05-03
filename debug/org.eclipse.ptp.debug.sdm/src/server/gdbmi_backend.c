@@ -1550,7 +1550,7 @@ GetAIFVar(char *var, AIF **val, char **type)
 	SendCommandWait(DebugSession, cmd);
 	
 	if (!MICommandResultOK(cmd)) {
-		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
+		DbgSetError(DBGERR_UNKNOWN_VARIABLE, GetLastErrorStr());
 		MICommandFree(cmd);
 		return DBGRES_ERR;
 	}
