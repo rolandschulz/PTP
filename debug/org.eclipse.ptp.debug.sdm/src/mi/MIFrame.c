@@ -108,7 +108,7 @@ MIGetStackListFramesInfo(MICommand *cmd)
 	MIResultRecord *	rr;
 	MIResult *		result;
 	List *			frames = NULL;
-	MIValue * frameVal;// clement added - forgot
+	MIValue * frameVal;
 	
 	if (!cmd->completed || cmd->output == NULL || cmd->output->rr == NULL)
 		return NULL;
