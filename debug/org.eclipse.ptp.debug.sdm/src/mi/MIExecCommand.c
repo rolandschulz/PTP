@@ -63,3 +63,11 @@ MIExecInterrupt(void)
 {
 	return MICommandNew("-exec-interrupt", MIResultRecordDONE);
 }
+
+#ifdef __APPLE__
+MICommand *
+MIPidInfo(void)
+{
+	return MICommandNew("-pid-info", MIResultRecordDONE);
+}
+#endif /* __APPLE__ */
