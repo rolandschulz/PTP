@@ -41,13 +41,13 @@ MIFrameNew(void)
 void
 MIFrameFree(MIFrame *frame)
 {
-	if (	frame->addr != NULL)
+	if (frame->addr != NULL)
 		free(frame->addr);
-	if (	frame->func != NULL)
+	if (frame->func != NULL)
 		free(frame->func);
-	if (	frame->file != NULL)
+	if (frame->file != NULL)
 		free(frame->file);
-	if (	frame->args != NULL)
+	if (frame->args != NULL)
 		DestroyList(frame->args, MIArgFree);
 	free(frame);
 }
@@ -242,9 +242,9 @@ MIFrameToString(MIFrame *f)
 	return str;
 }
 
-
-//clement added
-MIThreadInfo *MIThreadInfoNew(void) {
+MIThreadInfo *
+MIThreadInfoNew(void) 
+{
 	MIThreadInfo * info;
 	info = (MIThreadInfo *)malloc(sizeof(MIThreadInfo));
 	info->current_thread_id = 0;
@@ -252,8 +252,9 @@ MIThreadInfo *MIThreadInfoNew(void) {
 	return info;
 }
 
-//clement added
-MIThreadSelectInfo *MIThreadSelectInfoNew(void) {
+MIThreadSelectInfo *
+MIThreadSelectInfoNew(void) 
+{
 	MIThreadSelectInfo * info;
 	info = (MIThreadSelectInfo *)malloc(sizeof(MIThreadSelectInfo));
 	info->current_thread_id = 0;
@@ -261,8 +262,9 @@ MIThreadSelectInfo *MIThreadSelectInfoNew(void) {
 	return info;
 }
 
-//clement added
-MIThreadInfo *MIGetInfoThreads(MICommand *cmd) {
+MIThreadInfo *
+MIGetInfoThreads(MICommand *cmd) 
+{
 	List *oobs;
 	MIOOBRecord *oob;
 	MIThreadInfo * info = MIThreadInfoNew();
@@ -307,8 +309,10 @@ MIThreadInfo *MIGetInfoThreads(MICommand *cmd) {
 	}
 	return info;
 }
-//clement added
-MIThreadSelectInfo *MISetThreadSelectInfo(MICommand *cmd) {
+
+MIThreadSelectInfo *
+MISetThreadSelectInfo(MICommand *cmd) 
+{
 	MIThreadSelectInfo * info = MIThreadSelectInfoNew();
 	MIValue * val;
 	MIResultRecord * rr;
@@ -332,8 +336,10 @@ MIThreadSelectInfo *MISetThreadSelectInfo(MICommand *cmd) {
 	}	
 	return info;	
 }
-//clement added
-int MIGetStackInfoDepth(MICommand *cmd) {
+
+int 
+MIGetStackInfoDepth(MICommand *cmd) 
+{
 	MIValue * val;
 	MIResultRecord * rr;
 	MIResult * result;
