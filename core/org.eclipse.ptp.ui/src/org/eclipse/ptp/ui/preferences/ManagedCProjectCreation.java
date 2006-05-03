@@ -223,7 +223,8 @@ public class ManagedCProjectCreation extends SimulationProjectCreation {
 				};
  				CCorePlugin.getDefault().getCDescriptorManager().runDescriptorOperation(newProject, op, monitor);
 				//Only send out an index changed notification if the indexer has actually changed
-				CCorePlugin.getDefault().getCoreModel().getIndexManager().indexerChangeNotification(newProject);
+ 				//FIXME temp for 3.1 cdt
+				//CCorePlugin.getDefault().getCoreModel().getIndexManager().indexerChangeNotification(newProject);
 			}
 		}
 		monitor.done();
