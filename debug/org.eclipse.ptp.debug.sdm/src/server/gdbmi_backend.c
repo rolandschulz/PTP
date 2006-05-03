@@ -95,11 +95,11 @@ static int	GDBMIGetNativeType(char *);
 static int	GDBMIGetAIFType(char *);
 static int	GDBMIGetLocalVariables(void);
 static int	GDBMIListArguments(int);
-static int	GDBMIGetInfoThread(void); //clement added
-static int	GDBMISetThreadSelect(int); //clement added
-static int	GDBMIStackInfoDepth(void); //clement added
-static int	GDBMIDataReadMemory(long, char*, char*, int, int, int, char*); //clement added
-static int	GDBMIDataWriteMemory(long, char*, char*, int, char*); //clement added
+static int	GDBMIGetInfoThread(void);
+static int	GDBMISetThreadSelect(int);
+static int	GDBMIStackInfoDepth(void);
+static int	GDBMIDataReadMemory(long, char*, char*, int, int, int, char*);
+static int	GDBMIDataWriteMemory(long, char*, char*, int, char*);
 static int	GDBMIGetGlobalVariables(void);
 static int	GDBMIQuit(void);
 
@@ -132,11 +132,11 @@ dbg_backend_funcs	GDBMIBackend =
 	GDBMIGetLocalVariables,
 	GDBMIListArguments,
 	GDBMIGetGlobalVariables,
-	GDBMIGetInfoThread, //clement added
-	GDBMISetThreadSelect, //clement added
-	GDBMIStackInfoDepth, //clement added
-	GDBMIDataReadMemory, //clement added
-	GDBMIDataWriteMemory, //clement added
+	GDBMIGetInfoThread,
+	GDBMISetThreadSelect,
+	GDBMIStackInfoDepth,
+	GDBMIDataReadMemory,
+	GDBMIDataWriteMemory,
 	GDBMIQuit
 };
 
@@ -1183,7 +1183,9 @@ GetVarValue(char *var)
 	return res;
 }
 
-static char * GetPtypeValue(char *exp) {
+static char * 
+GetPtypeValue(char *exp) 
+{
 	MICommand* cmd;
 	char * type = NULL;
 	
@@ -1297,7 +1299,9 @@ SimpleVarToAIF(char *exp, MIVar *var)
 	return NULL;
 }
 
-static int getSimpleTypeID(char* type) {
+static int 
+getSimpleTypeID(char* type) 
+{
 	struct simple_type *	s;
 	
 	type = GetModifierType(type);
@@ -1309,7 +1313,9 @@ static int getSimpleTypeID(char* type) {
 	return -1;	
 }
 
-static char* GetModifierType(char* type) {
+static char * 
+GetModifierType(char* type) 
+{
 	char** m;
 	int len;
 	for (m = MODIFIERS; *m != NULL; m++) {
@@ -1395,7 +1401,9 @@ CreateUnion(MIVar *var, int named)
 	return a;
 }
 
-static AIF* CreateNamed(AIF *a, int named) {
+static AIF* 
+CreateNamed(AIF *a, int named) 
+{
 	if (FDSType(AIF_FORMAT(a)) != AIF_NAME) {
 		return NameAIF(a, named);
 	}
@@ -1457,7 +1465,9 @@ ConvertVarToAIF(char *exp, MIVar *var, int named)
 	return a;
 }
 
-static AIF * ComplexVarToAIF(MIVar *var, int named) {
+static AIF * 
+ComplexVarToAIF(MIVar *var, int named) 
+{
 	AIF * a;
 
 	switch (var->type[strlen(var->type) - 1]) {
@@ -1696,8 +1706,9 @@ GDBMIQuit(void)
 	return DBGRES_OK;
 }
 
-//clement added
-static int GDBMIGetInfoThread(void) {
+static int
+GDBMIGetInfoThread(void) 
+{
 	MICommand *	cmd;
 	dbg_event *	e;
 	char *		tid;
@@ -1729,8 +1740,9 @@ static int GDBMIGetInfoThread(void) {
 	return DBGRES_OK;
 }
 
-//clement added
-static int GDBMISetThreadSelect(int threadNum) {
+static int 
+GDBMISetThreadSelect(int threadNum) 
+{
 	MICommand *	cmd;
 	dbg_event *	e;
 	MIThreadSelectInfo * info;
@@ -1772,8 +1784,9 @@ static int GDBMISetThreadSelect(int threadNum) {
 	return DBGRES_OK;
 }
 
-//clement added
-static int GDBMIStackInfoDepth() {
+static int 
+GDBMIStackInfoDepth() 
+{
 	MICommand *	cmd;
 	dbg_event *	e;
 	int depth;
@@ -1797,8 +1810,9 @@ static int GDBMIStackInfoDepth() {
 	return DBGRES_OK;
 }
 
-//clement added
-static int GDBMIDataReadMemory(long offset, char* address, char* format, int wordSize, int rows, int cols, char* asChar) {
+static int 
+GDBMIDataReadMemory(long offset, char* address, char* format, int wordSize, int rows, int cols, char* asChar) 
+{
 	MICommand *	cmd;
 	dbg_event *	e;
 	MIDataReadMemoryInfo * info;
@@ -1858,14 +1872,15 @@ static int GDBMIDataReadMemory(long offset, char* address, char* format, int wor
 	return DBGRES_OK;
 }
 
-//clement added
-static int GDBMIDataWriteMemory(long offset, char* address, char* format, int wordSize, char* value) {
+static int 
+GDBMIDataWriteMemory(long offset, char* address, char* format, int wordSize, char* value) 
+{
 	MICommand *	cmd;
 	dbg_event *	e;
 	
 	CHECK_SESSION();
 	
-printf("----- gdbmi_sevrer: GDBMIDataWriteMemory called ---------\n");	
+	//printf("----- gdbmi_sevrer: GDBMIDataWriteMemory called ---------\n");	
 	cmd = MIDataWriteMemory(offset, address, format, wordSize, value);
 	SendCommandWait(DebugSession, cmd);
 	if (!MICommandResultOK(cmd)) {
