@@ -256,6 +256,7 @@ public class MemoryBlock extends PObject implements IPCDIMemoryBlock {
 		for (int i = 0; i < bytes.length; i++) {
 			long l = new Byte(bytes[i]).longValue() & 0xff;
 			String value = "0x" + Long.toHexString(l);
+System.err.println("----------- DataWriteMemoryCommand is called --------------");
 			DataWriteMemoryCommand command = new DataWriteMemoryCommand(tasks, offset + i, expression, ExtFormat.HEXADECIMAL, 1, value);
 			session.getDebugger().postCommand(command);
 			if (command.getDataWriteMemoryInfo() == null) {

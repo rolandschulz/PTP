@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
+
 import org.eclipse.ptp.debug.core.cdi.IPCDIEventManager;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIChangedEvent;
@@ -35,6 +36,7 @@ import org.eclipse.ptp.debug.core.cdi.event.IPCDIExitedEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIMemoryChangedEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIResumedEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDISuspendedEvent;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIMemoryBlock;
 import org.eclipse.ptp.debug.external.core.PTPDebugExternalPlugin;
 import org.eclipse.ptp.debug.external.core.cdi.event.MemoryChangedEvent;
 import org.eclipse.ptp.debug.external.core.cdi.model.MemoryBlock;
@@ -67,18 +69,21 @@ public class EventManager extends SessionObject implements IPCDIEventManager, Ob
 				System.err.println("******* GOT IPCDIMemoryChangedEvent");
 				MemoryManager mgr = session.getMemoryManager();
 				try {
-					MemoryBlock[] blocks = (MemoryBlock[])mgr.getMemoryBlocks((Target)event.getSource());
+					IPCDIMemoryBlock[] blocks = (IPCDIMemoryBlock[])mgr.getMemoryBlocks((Target)event.getSource());
 					MemoryChangedEvent memEvent = (MemoryChangedEvent)event;
 					BigInteger[] addresses = memEvent.getAddresses();
 					List new_addresses = new ArrayList(addresses.length);
-					for (int i = 0; i < blocks.length; i++) {
-						for (int j=0; j<addresses.length; j++) {
-							if (blocks[i].contains(addresses[j]) && (! blocks[i].isFrozen() || blocks[i].isDirty())) {
-								new_addresses.add(addresses[j]);
+					for (int i=0; i<blocks.length; i++) {
+						if (blocks[i] instanceof MemoryBlock) {
+							MemoryBlock block = (MemoryBlock)blocks[i];
+							for (int j=0; j<addresses.length; j++) {
+								if (block.contains(addresses[j]) && (! blocks[i].isFrozen() || block.isDirty())) {
+									new_addresses.add(addresses[j]);
+								}
 							}
-						}
-						cdiList.add(new MemoryChangedEvent(session, event.getAllProcesses(), event.getSource(), (BigInteger[]) new_addresses.toArray(new BigInteger[new_addresses.size()])));
-						blocks[i].setDirty(false);
+							cdiList.add(new MemoryChangedEvent(session, event.getAllProcesses(), event.getSource(), (BigInteger[]) new_addresses.toArray(new BigInteger[new_addresses.size()])));
+							block.setDirty(false);
+						}	
 					}
 				} catch (PCDIException e) {
 					
