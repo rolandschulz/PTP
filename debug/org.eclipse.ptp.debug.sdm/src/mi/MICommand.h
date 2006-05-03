@@ -16,6 +16,7 @@
  *
  * LA-CC 04-115
  ******************************************************************************/
+ 
 #ifndef _MICOMMAND_H_
 #define _MICOMMAND_H_
 
@@ -77,6 +78,7 @@ extern MICommand *MIStackListAllFrames(void);
 extern MICommand *MIStackListLocals(int vals);
 extern MICommand *MIStackListArguments(int vals, int low, int high);
 extern MICommand *MIStackListAllArguments(int vals);
+extern MICommand *MIStackInfoDepth();
 
 /*
  * -var-* commands
@@ -87,15 +89,21 @@ extern MICommand *MIVarListChildren(char *name);
 extern MICommand *MIVarEvaluateExpression(char *name);
 
 /*
- * clement added
+ * -thread-* commands
  */
-extern MICommand *MIPType(char *name);
 extern MICommand *MIInfoThreads();
 extern MICommand *MIThreadSelect(int threadNum);
-extern MICommand *MIStackInfoDepth();
- 
+
+/*
+ * -data-* commands
+ */
 extern MICommand *MIDataReadMemory(long, char*, char*, int, int, int, char*);
 extern MICommand *MIDataWriteMemory(long offset, char* address, char* format, int wordSize, char* value);
+
+/*
+ * Non-MI commands
+ */
+extern MICommand *MIPType(char *name);
 
 #endif /* _MICOMMAND_H_ */
 
