@@ -327,8 +327,9 @@ DbgListGlobalVariables(session *s, bitset *set)
 	return res;
 }
 
-//clement added
-int DbgListInfoThreads(session *s, bitset *set) {
+int
+DbgListInfoThreads(session *s, bitset *set) 
+{
 	int		res;
 	char *	set_str = bitset_to_str(set);
 	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_LISTINFOTHREADS_CMD, DBG_LISTINFOTHREADS_FMT, set_str);
@@ -336,8 +337,9 @@ int DbgListInfoThreads(session *s, bitset *set) {
 	return res;
 }
 
-//clement added
-int DbgSetThreadSelect(session *s, bitset *set, int threadNum) {
+int 
+DbgSetThreadSelect(session *s, bitset *set, int threadNum) 
+{
 	int		res;
 	char *	set_str = bitset_to_str(set);
 	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_SETTHREADSELECT_CMD, DBG_SETTHREADSELECT_FMT, set_str, threadNum);
@@ -345,8 +347,9 @@ int DbgSetThreadSelect(session *s, bitset *set, int threadNum) {
 	return res;
 }
 
-//clement added
-int DbgStackInfoDepth(session *s, bitset *set) {
+int 
+DbgStackInfoDepth(session *s, bitset *set) 
+{
 	int		res;
 	char *	set_str = bitset_to_str(set);
 	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_STACKINFODEPTH_CMD, DBG_STACKINFODEPTH_FMT, set_str);
@@ -354,8 +357,9 @@ int DbgStackInfoDepth(session *s, bitset *set) {
 	return res;
 }
 
-//clement added
-int DbgDataReadMemory(session *s, bitset *set, long offset, char* address, char* format, int wordSize, int rows, int cols, char* asChar) {
+int 
+DbgDataReadMemory(session *s, bitset *set, long offset, char* address, char* format, int wordSize, int rows, int cols, char* asChar) 
+{
 	int		res;
 	char *	set_str = bitset_to_str(set);
 	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_DATAREADMEMORY_CMD, DBG_DATAREADMEMORY_FMT, set_str, offset, address, format, wordSize, rows, cols, asChar);
@@ -363,8 +367,9 @@ int DbgDataReadMemory(session *s, bitset *set, long offset, char* address, char*
 	return res;
 }
 
-//clement added
-int DbgDataWriteMemory(session *s, bitset *set, long offset, char* address, char* format, int wordSize, char* value) {
+int 
+DbgDataWriteMemory(session *s, bitset *set, long offset, char* address, char* format, int wordSize, char* value) 
+{
 	int		res;
 	char *	set_str = bitset_to_str(set);
 	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_DATAWRITEMEMORY_CMD, DBG_DATAWRITEMEMORY_FMT, set_str, offset, address, format, wordSize, value);
@@ -372,6 +377,7 @@ int DbgDataWriteMemory(session *s, bitset *set, long offset, char* address, char
 	return res;
 }
 
+int
 DbgQuit(session *s)
 {
 	return proxy_clnt_quit(s->sess_proxy);

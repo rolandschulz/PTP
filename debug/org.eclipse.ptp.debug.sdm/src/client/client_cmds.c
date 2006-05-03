@@ -526,8 +526,9 @@ DbgClntListGlobalVariables(char **args)
 	return res;
 }
 
-//clement added
-int DbgClntListInfoThreads(char **args) {
+int
+DbgClntListInfoThreads(char **args) 
+{
 	int			res;
 	bitset *		set; 
 
@@ -543,8 +544,9 @@ int DbgClntListInfoThreads(char **args) {
 	return res;
 }
 
-//clement added
-int DbgClntSetThreadSelect(char **args) {
+int
+DbgClntSetThreadSelect(char **args)
+{
 	int			res;
 	char *		cmd;
 	bitset *	set; 
@@ -564,8 +566,9 @@ int DbgClntSetThreadSelect(char **args) {
 	return res;
 }
 
-//clement added
-int DbgClntStackInfoDepth(char **args) {
+int
+DbgClntStackInfoDepth(char **args)
+{
 	int			res;
 	bitset *	set; 
 
@@ -581,8 +584,9 @@ int DbgClntStackInfoDepth(char **args) {
 	return res;
 }
 
-//clement added
-int DbgClntDataReadMemory(char **args) {
+int 
+DbgClntDataReadMemory(char **args) 
+{
 	int			res;
 	char *		cmd;
 	bitset *	set; 
@@ -599,8 +603,9 @@ int DbgClntDataReadMemory(char **args) {
 	return res;
 }
 
-//clement added
-int DbgClntDataWriteMemory(char **args) {
+int 
+DbgClntDataWriteMemory(char **args) 
+{
 	int			res;
 	char *		cmd;
 	bitset *	set; 
