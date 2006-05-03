@@ -29,7 +29,6 @@
 #include "MIString.h"
 #include "MICommand.h"
 
-//clement added
 MICommand *
 MIDataReadMemory(long offset, char* address, char* format, int wordSize, int rows, int cols, char* asChar)
 {
@@ -50,7 +49,6 @@ MIDataReadMemory(long offset, char* address, char* format, int wordSize, int row
 	return cmd;
 }
 
-//clement added
 MICommand *
 MIDataWriteMemory(long offset, char* address, char* format, int wordSize, char* value)
 {
