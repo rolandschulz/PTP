@@ -30,7 +30,9 @@
 #include "MIResult.h"
 #include "MIMemory.h"
 
-MIMemory* MIMemoryNew(void) {
+MIMemory * 
+MIMemoryNew(void)
+{
 	MIMemory *	memory;
 	memory = (MIMemory *)malloc(sizeof(MIMemory));
 	memory->addr = NULL;
@@ -39,7 +41,9 @@ MIMemory* MIMemoryNew(void) {
 	return memory;	
 }
 
-void MIMemoryFree(MIMemory *memory) {
+void 
+MIMemoryFree(MIMemory *memory)
+{
 	if (memory->addr != NULL)
 		free(memory->addr);
 	if (memory->ascii != NULL)
@@ -49,7 +53,9 @@ void MIMemoryFree(MIMemory *memory) {
 	free(memory);
 }
 
-MIMemory * MIMemoryParse(MIValue *tuple) {
+MIMemory *
+MIMemoryParse(MIValue *tuple)
+{
 	char *		str;
 	char *		var;
 	MIValue *	value;
@@ -78,7 +84,9 @@ MIMemory * MIMemoryParse(MIValue *tuple) {
 	return memory;
 }
 
-List* MIMemoryDataParse(MIValue* miValue) {
+List *
+MIMemoryDataParse(MIValue* miValue)
+{
 	List * data = NewList();
 	List * values = miValue->values;
 	MIValue * value;
@@ -93,7 +101,9 @@ List* MIMemoryDataParse(MIValue* miValue) {
 	return data;
 }
 
-MIDataReadMemoryInfo *MIDataReadMemoryInfoNew(void) {
+MIDataReadMemoryInfo *
+MIDataReadMemoryInfoNew(void)
+{
 	MIDataReadMemoryInfo *	memoryInfo;
 	memoryInfo = (MIDataReadMemoryInfo *)malloc(sizeof(MIDataReadMemoryInfo));
 	memoryInfo->addr = NULL;
@@ -101,7 +111,9 @@ MIDataReadMemoryInfo *MIDataReadMemoryInfoNew(void) {
 	return memoryInfo;	
 }
 
-void MIDataReadMemoryInfoFree(MIDataReadMemoryInfo *memoryInfo) {
+void
+MIDataReadMemoryInfoFree(MIDataReadMemoryInfo *memoryInfo)
+{
 	if (memoryInfo->addr != NULL)
 		free(memoryInfo->addr);
 	if (memoryInfo->memories != NULL)
@@ -109,7 +121,9 @@ void MIDataReadMemoryInfoFree(MIDataReadMemoryInfo *memoryInfo) {
 	free(memoryInfo);
 }
 
-MIDataReadMemoryInfo * MIGetDataReadMemoryInfo(MICommand *cmd) {
+MIDataReadMemoryInfo *
+MIGetDataReadMemoryInfo(MICommand *cmd)
+{
 	char * var;
 	char * str;
 	MIValue * value;
@@ -153,7 +167,9 @@ MIDataReadMemoryInfo * MIGetDataReadMemoryInfo(MICommand *cmd) {
 	return info;
 }
 
-List * MIGetMemoryList(MIValue *miValue) {
+List *
+MIGetMemoryList(MIValue *miValue)
+{
 	List *memories = NewList();
 	List *values = miValue->values;
 	MIValue *value;
