@@ -22,9 +22,11 @@ import java.math.BigInteger;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.eclipse.cdt.core.IAddress;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
@@ -57,7 +59,7 @@ import org.w3c.dom.NodeList;
  * @author Clement chu
  * 
  */
-public class PTPMemoryBlockRetrievalExtension implements IMemoryBlockRetrievalExtension {
+public class PTPMemoryBlockRetrievalExtension extends PlatformObject implements IMemoryBlockRetrievalExtension {
 	private static final String MEMORY_BLOCK_EXPRESSION_LIST = "memoryBlockExpressionList";
 	private static final String MEMORY_BLOCK_EXPRESSION = "expression";
 	private static final String ATTR_MEMORY_BLOCK_EXPRESSION_TEXT = "text";
