@@ -21,6 +21,8 @@ package org.eclipse.ptp.debug.internal.ui;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.eclipse.cdt.core.IAddress;
 import org.eclipse.cdt.debug.core.model.IEnableDisableTarget;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -58,6 +60,7 @@ import org.eclipse.ptp.debug.core.model.IPBreakpoint;
 import org.eclipse.ptp.debug.core.model.IPDebugElement;
 import org.eclipse.ptp.debug.core.model.IPDebugElementStatus;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
+import org.eclipse.ptp.debug.core.model.IPDummyStackFrame;
 import org.eclipse.ptp.debug.core.model.IPFunctionBreakpoint;
 import org.eclipse.ptp.debug.core.model.IPLineBreakpoint;
 import org.eclipse.ptp.debug.core.model.IPStackFrame;
@@ -82,6 +85,7 @@ import org.eclipse.ui.part.FileEditorInput;
 public class PDebugModelPresentation extends LabelProvider implements IDebugModelPresentation, IDebugEditorPresentation {
 	private static PDebugModelPresentation instance = null;
 	public final static String DISPLAY_FULL_PATHS = "DISPLAY_FULL_PATHS";
+	private static final String DUMMY_STACKFRAME_LABEL = "...";
 	protected UIDebugManager uiDebugManager = null;
 	protected Map attributes = new HashMap(3);
 	private OverlayImageCache imageCache = new OverlayImageCache();
@@ -657,11 +661,15 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 	protected String getStackFrameText(IStackFrame f, boolean qualified) throws DebugException {
 		if (f instanceof IPStackFrame) {
 			IPStackFrame frame = (IPStackFrame) f;
+
 			StringBuffer label = new StringBuffer();
 			label.append(frame.getLevel());
 			label.append(' ');
 			String function = frame.getFunction();
-			if (function != null) {
+			if (isEmpty(function)) {
+				label.append(PDebugUIMessages.getString("PTPDebugModelPresentation.frame2"));
+			}
+			else {
 				function = function.trim();
 				if (function.length() > 0) {
 					label.append(function);
@@ -679,14 +687,18 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 					}
 				}
 			}
-			if (isEmpty(function))
-				label.append(PDebugUIMessages.getString("PTPDebugModelPresentation.frame2"));
+			IAddress address = frame.getAddress();
+			if (address != null) {
+				label.append(' ');
+				label.append(address.toHexAddressString());
+			}
 			return label.toString();
 		}
-		// FIXME Dunno what is IDummyStacjFrame for
-		// return (f.getAdapter(IDummyStackFrame.class) != null)?getDummyStackFrameLabel(f):f.getName();
-		return f.getName();
+		return (f.getAdapter(IPDummyStackFrame.class) != null)?getDummyStackFrameLabel(f):f.getName();
 	}
+	private String getDummyStackFrameLabel(IStackFrame stackFrame) {
+		return DUMMY_STACKFRAME_LABEL;
+	}	
 	/** Get formatted text
 	 * @param key
 	 * @param arg
