@@ -19,15 +19,19 @@ import org.eclipse.cdt.core.dom.ast.IFunction;
 import org.eclipse.cdt.core.dom.ast.IParameter;
 import org.eclipse.cdt.core.dom.ast.IProblemBinding;
 import org.eclipse.cdt.core.dom.ast.IScope;
+import org.eclipse.cdt.core.dom.ast.IType;
 import org.eclipse.cdt.core.dom.ast.IVariable;
 import org.eclipse.cdt.core.dom.ast.c.ICASTElaboratedTypeSpecifier;
+import org.eclipse.cdt.core.dom.ast.gnu.c.GCCLanguage;
 import org.eclipse.cdt.core.model.ILanguage;
 import org.eclipse.cdt.internal.core.pdom.PDOM;
 import org.eclipse.cdt.internal.core.pdom.dom.PDOMBinding;
+import org.eclipse.cdt.internal.core.pdom.dom.PDOMFile;
 import org.eclipse.cdt.internal.core.pdom.dom.PDOMLinkage;
 import org.eclipse.cdt.internal.core.pdom.dom.PDOMMember;
 import org.eclipse.cdt.internal.core.pdom.dom.PDOMMemberOwner;
 import org.eclipse.cdt.internal.core.pdom.dom.PDOMName;
+import org.eclipse.cdt.internal.core.pdom.dom.PDOMNamedNode;
 import org.eclipse.cdt.internal.core.pdom.dom.PDOMNode;
 import org.eclipse.cdt.internal.core.pdom.dom.c.PDOMCField;
 import org.eclipse.cdt.internal.core.pdom.dom.c.PDOMCFunction;
@@ -48,11 +52,19 @@ public class PDOMFortranLinkage extends PDOMLinkage
         super(pdom, FortranLanguage.LANGUAGE_ID, "Fortran".toCharArray());
     }
 
-    public static final int CVARIABLE = 1;
-    public static final int CFUNCTION = 2;
-    public static final int CSTRUCTURE = 3;
-    public static final int CFIELD = 4;
+    public int getNodeType() {
+        return LINKAGE;
+    }
 
+    public static final int CVARIABLE = PDOMLinkage.LAST_NODE_TYPE + 1;
+    public static final int CFUNCTION = PDOMLinkage.LAST_NODE_TYPE + 2;
+    public static final int CSTRUCTURE = PDOMLinkage.LAST_NODE_TYPE + 3;
+    public static final int CFIELD = PDOMLinkage.LAST_NODE_TYPE + 4;
+
+    public ILanguage getLanguage() {
+        return new GCCLanguage();
+    }
+    
     public PDOMNode getParent(IBinding binding) throws CoreException {
         IScope scope = binding.getScope();
         if (scope == null)
@@ -76,14 +88,23 @@ public class PDOMFortranLinkage extends PDOMLinkage
         return null;
     }
     
-    public PDOMBinding addName(IASTName name) throws CoreException {
-        if (name == null || name.toCharArray().length == 0)
+    public PDOMBinding addName(IASTName name, PDOMFile file) throws CoreException {
+        if (name == null)
+            return null;
+        
+        char[] namechars = name.toCharArray();
+        if (namechars == null || name.toCharArray().length == 0)
             return null;
         
         IBinding binding = name.resolveBinding();
         if (binding == null || binding instanceof IProblemBinding)
+            // can't tell what it is
             return null;
 
+        if (binding instanceof IParameter)
+            // skip parameters
+            return null;
+    
         PDOMBinding pdomBinding = adaptBinding(binding);
         if (pdomBinding == null) {
             PDOMNode parent = getParent(binding);
@@ -104,12 +125,12 @@ public class PDOMFortranLinkage extends PDOMLinkage
         }
         
         if (pdomBinding != null)
-            new PDOMName(pdom, name, pdomBinding);
+            new PDOMName(pdom, name, file, pdomBinding);
         
         return pdomBinding;
     }
 
-    private static final class FindBinding extends PDOMNode.NodeFinder {
+    private static final class FindBinding extends PDOMNamedNode.NodeFinder {
         PDOMBinding pdomBinding;
         final int desiredType;
         public FindBinding(PDOM pdom, char[] name, int desiredType) {
@@ -123,7 +144,7 @@ public class PDOMFortranLinkage extends PDOMLinkage
             if (!tBinding.hasName(name))
                 // no more bindings with our desired name
                 return false;
-            if (tBinding.getBindingType() != desiredType)
+            if (tBinding.getNodeType() != desiredType)
                 // wrong type, try again
                 return true;
             
@@ -153,7 +174,7 @@ public class PDOMFortranLinkage extends PDOMLinkage
         PDOMNode parent = getParent(binding);
         if (parent == this) {
             FindBinding visitor = new FindBinding(pdom, binding.getNameCharArray(), getBindingType(binding));
-            getIndex().visit(visitor);
+            getIndex().accept(visitor);
             return visitor.pdomBinding;
         } else if (parent instanceof PDOMMemberOwner) {
             PDOMMemberOwner owner = (PDOMMemberOwner)parent;
@@ -164,14 +185,11 @@ public class PDOMFortranLinkage extends PDOMLinkage
         return null;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.cdt.internal.core.pdom.dom.PDOMLinkage#getBinding(int)
-     */
-    public PDOMBinding getBinding(int record) throws CoreException {
+    public PDOMNode getNode(int record) throws CoreException {
         if (record == 0)
             return null;
         
-        switch (PDOMBinding.getBindingType(pdom, record)) {
+        switch (PDOMNode.getNodeType(pdom, record)) {
         case CVARIABLE:
             return new PDOMCVariable(pdom, record);
         case CFUNCTION:
@@ -182,17 +200,8 @@ public class PDOMFortranLinkage extends PDOMLinkage
             return new PDOMCField(pdom, record);
         }
 
-        return null;
+        return super.getNode(record);
     }
-    
-    /* (non-Javadoc)
-     * @see org.eclipse.cdt.internal.core.pdom.dom.PDOMLinkage#getLanguage()
-     */
-	public ILanguage getLanguage()
-	{
-		// TODO This needs to be implemented.  I just added an empty stub to satisfy the interface (C.E.Rasmussen)
-		return null;
-	}
 
     public PDOMBinding resolveBinding(IASTName name) throws CoreException {
         IASTNode parent = name.getParent();
@@ -201,16 +210,16 @@ public class PDOMFortranLinkage extends PDOMLinkage
             IASTNode eParent = parent.getParent();
             if (eParent instanceof IASTFunctionCallExpression) {
                 FindBinding visitor = new FindBinding(pdom, name.toCharArray(), CFUNCTION);
-                getIndex().visit(visitor);
+                getIndex().accept(visitor);
                 return visitor.pdomBinding;
             } else {
                 FindBinding visitor = new FindBinding(pdom, name.toCharArray(), CVARIABLE);
-                getIndex().visit(visitor);
+                getIndex().accept(visitor);
                 return visitor.pdomBinding;
             }
         } else if (parent instanceof ICASTElaboratedTypeSpecifier) {
             FindBinding visitor = new FindBinding(pdom, name.toCharArray(), CSTRUCTURE);
-            getIndex().visit(visitor);
+            getIndex().accept(visitor);
             return visitor.pdomBinding;
         }
         return null;
@@ -218,6 +227,11 @@ public class PDOMFortranLinkage extends PDOMLinkage
     
     public void findBindings(String pattern, List bindings) throws CoreException {
         MatchBinding visitor = new MatchBinding(pdom, pattern, bindings);
-        getIndex().visit(visitor);
+        getIndex().accept(visitor);
+    }
+    
+    public PDOMNode addType(PDOMNode parent, IType type) throws CoreException {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

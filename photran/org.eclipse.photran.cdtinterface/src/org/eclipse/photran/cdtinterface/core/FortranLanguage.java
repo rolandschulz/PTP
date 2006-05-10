@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.eclipse.cdt.core.CCorePlugin;
+import org.eclipse.cdt.core.dom.ICodeReaderFactory;
 import org.eclipse.cdt.core.dom.ast.ASTCompletionNode;
 import org.eclipse.cdt.core.dom.ast.IASTName;
 import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit;
@@ -68,6 +69,11 @@ public class FortranLanguage extends PlatformObject implements ILanguage
 		else
 			return super.getAdapter(adapter);
 	}
+
+    public IASTTranslationUnit getASTTranslationUnit(ITranslationUnit file, ICodeReaderFactory codeReaderFactory, int style)
+    {
+        return getASTTranslationUnit(file, style);
+    }
     
     public IASTTranslationUnit getASTTranslationUnit(ITranslationUnit file, int style)
     {
@@ -121,5 +127,4 @@ public class FortranLanguage extends PlatformObject implements ILanguage
 		// TODO This needs to be implemented.  I just added an empty stub to satisfy the interface (C.E.Rasmussen)
 		return new IASTName[0];
 	}
-
 }
