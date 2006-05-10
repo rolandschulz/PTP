@@ -90,10 +90,10 @@ public class AddPVariableActionDelegate extends AbstractPVariableAction {
 	public void selectionChanged(IAction action, ISelection selection) {
 		variable = null;
 		if (selection instanceof IStructuredSelection) {
-			IPVariable var = (IPVariable)((IStructuredSelection)selection).getFirstElement();
-			if (var != null) {
+			Object obj = ((IStructuredSelection)selection).getFirstElement();
+			if (obj != null && obj instanceof IPVariable) {
 				try {
-					variable = var.getName();
+					variable = ((IPVariable)obj).getName();
 				} catch (DebugException e) {
 					variable = null;
 				}
