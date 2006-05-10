@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
 import org.eclipse.cdt.debug.core.cdi.ICDILocator;
 import org.eclipse.cdt.debug.core.model.ICLineBreakpoint;
 import org.eclipse.core.resources.IMarkerDelta;
@@ -38,12 +39,13 @@ import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.IBreakpointListener;
 import org.eclipse.debug.core.model.IBreakpoint;
+import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IThread;
 import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.debug.ui.IDebugView;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
@@ -98,6 +100,7 @@ import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.progress.WorkbenchJob;
 
 /**
  * @author clement chu
@@ -420,24 +423,48 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		}
 		return null;
 	}
+	private void doOnFocusDebugView(Object selection) {
+		IViewPart part = UIUtils.findView(IDebugUIConstants.ID_DEBUG_VIEW);
+		if (part != null && part instanceof IDebugView) {
+			Viewer viewer = ((IDebugView)part).getViewer();
+			if (viewer != null) {
+				//viewer.setSelection(new StructuredSelection(selection), true);
+				//Changed to TreeSelection since 3.2
+				//viewer.setSelection(new TreeSelection(getFocusTreePath(selection)), true);
+				part.setFocus();
+			}
+		}
+	}
+	private TreePath getFocusTreePath(Object selection) {
+		if (selection instanceof IDebugTarget) {
+			return new TreePath(new Object[] { selection} ); 
+		}
+		if (selection instanceof IStackFrame) {
+			return new TreePath(new Object[] { ((IStackFrame)selection).getThread(), selection });
+		}
+		return new TreePath(new Object[0]);
+	}
 	/** Focus on debug view
 	 * @param selection
 	 */
 	public void focusOnDebugView(final Object selection) {
-		PTPDebugUIPlugin.getDisplay().asyncExec(new Runnable() {
-			public void run() {
-				IViewPart part = UIUtils.findView(IDebugUIConstants.ID_DEBUG_VIEW);
-				if (part != null && part instanceof IDebugView) {
-					Viewer viewer = ((IDebugView)part).getViewer();
-					if (viewer != null) {
-						if (selection != null) {
-							viewer.setSelection(new StructuredSelection(selection));
-						}
-						part.setFocus();
-					}
+		if (selection == null) {
+			return;
+		}
+
+		if (PTPDebugUIPlugin.getDisplay().getThread() == Thread.currentThread()) {
+			doOnFocusDebugView(selection);
+		} else {
+			WorkbenchJob job = new WorkbenchJob("Focus on Debug View") {
+				public IStatus runInUIThread(IProgressMonitor monitor) {
+					doOnFocusDebugView(selection);
+					return Status.OK_STATUS;
 				}
-			}
-		});
+				
+			};
+			job.setSystem(true);
+			job.schedule();
+		}
 	}	
 	/***************************************************************************************************************************************************************************************************
 	 * Register / Unregister
