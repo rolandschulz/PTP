@@ -232,8 +232,8 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		LineLocation loc = new LineLocation(filename, lineNumber);
 		fireEvent(new EndSteppingRangeEvent(getSession(), tasks, loc, thread_id));
 	}
-	public void handleProcessResumedEvent(BitList tasks) {
-		fireEvent(new InferiorResumedEvent(getSession(), tasks));
+	public void handleProcessResumedEvent(BitList tasks, int type) {
+		fireEvent(new InferiorResumedEvent(getSession(), tasks, type));
 	}
 	public void handleProcessTerminatedEvent(BitList tasks) {
 		fireEvent(new InferiorExitedEvent(getSession(), tasks));
