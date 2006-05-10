@@ -66,7 +66,7 @@ public interface IAbstractDebugger extends IDebugger {
 	public void handleEndSteppingEvent(BitList tasks, int lineNumber, String filename, int thread_id);
 	public void handleSuspendEvent(BitList tasks, IPCDILocator locator, int thread_id);
 	public void handleProcessSignaledEvent(BitList tasks, IPCDILocator locator, int thread_id);
-	public void handleProcessResumedEvent(BitList tasks);
+	public void handleProcessResumedEvent(BitList tasks, int type);
 	public void handleProcessTerminatedEvent(BitList tasks);
 	public void handleErrorEvent(BitList tasks, String errMsg, int errCode);
 	

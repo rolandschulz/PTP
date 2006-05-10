@@ -176,7 +176,7 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 		} else {
 			return func;
 		}
-		return MessageFormat.format(CoreModelMessages.getString("CStackFrame.0"), new String[] { func, file, line });
+		return MessageFormat.format(CoreModelMessages.getString("PStackFrame.0"), new String[] { func, file, line });
 	}
 	public boolean canStepInto() {
 		try {
