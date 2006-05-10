@@ -21,15 +21,16 @@ package org.eclipse.ptp.debug.external.core.cdi.event;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIResumedEvent;
-import org.eclipse.ptp.debug.external.core.PTPDebugExternalPlugin;
 
 public class InferiorResumedEvent extends AbstractEvent implements IPCDIResumedEvent {
-	public InferiorResumedEvent(IPCDISession session, BitList tasks) {
+	private int type = 0;
+	
+	public InferiorResumedEvent(IPCDISession session, BitList tasks, int type) {
 		super(session, tasks);
+		this.type = type;
 	}
 	
 	public int getType() {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		return 0;
+		return type;
 	}
 }

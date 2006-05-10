@@ -21,6 +21,7 @@ package org.eclipse.ptp.debug.external.core.commands;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
+import org.eclipse.ptp.debug.core.cdi.event.IPCDIResumedEvent;
 
 /**
  * @author Clement chu
@@ -39,7 +40,7 @@ public class StepFinishCommand extends AbstractDebugCommand {
 		setTimeout(timeout);
 		debugger.filterRunningTasks(tasks);
 		if (!tasks.isEmpty()) {
-			debugger.handleProcessResumedEvent(tasks);
+			debugger.handleProcessResumedEvent(tasks, IPCDIResumedEvent.STEP_RETURN);
 			debugger.stepFinish(tasks, count);
 		}
 	}
