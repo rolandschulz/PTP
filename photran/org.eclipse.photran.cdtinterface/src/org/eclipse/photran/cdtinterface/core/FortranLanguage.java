@@ -57,14 +57,13 @@ public class FortranLanguage extends PlatformObject implements ILanguage
 			{
 				public PDOMLinkage getLinkage(PDOM pdom, int record)
 				{
-					return new PDOMFortranLinkage(pdom, record);
+					return null; //return new PDOMFortranLinkage(pdom, record);
 				}
 
 				public PDOMLinkage createLinkage(PDOM pdom) throws CoreException
 				{
-					return new PDOMFortranLinkage(pdom);
+					return null; //return new PDOMFortranLinkage(pdom);
 				}
-			
 			};
 		else
 			return super.getAdapter(adapter);
@@ -79,30 +78,31 @@ public class FortranLanguage extends PlatformObject implements ILanguage
     {
         System.out.println("getASTTranslationUnit");
         
-        //IResource resource = file.getResource();
-        ICProject project = file.getCProject();
-        //IProject rproject = project.getProject();
-        
-        PDOM pdom = (PDOM)CCorePlugin.getPDOMManager().getPDOM(project).getAdapter(PDOM.class);
-        String path;
-        if (file instanceof IWorkingCopy)
-        {
-            IFile rfile = (IFile)file.getResource();
-            path = rfile.getLocation().toOSString();
-            // Maybe later we can get the working copy contents using file.getContents()
-        }
-        else
-        {
-            path = file.getPath().toOSString();
-        }
-        
-        // Parse
-        IASTTranslationUnit ast = new FortranIASTTranslationUnitAdapter(path);
-
-        if ((style & AST_USE_INDEX) != 0) 
-            ast.setIndex(pdom);
-
-        return ast;
+//        //IResource resource = file.getResource();
+//        ICProject project = file.getCProject();
+//        //IProject rproject = project.getProject();
+//        
+//        PDOM pdom = (PDOM)CCorePlugin.getPDOMManager().getPDOM(project).getAdapter(PDOM.class);
+//        String path;
+//        if (file instanceof IWorkingCopy)
+//        {
+//            IFile rfile = (IFile)file.getResource();
+//            path = rfile.getLocation().toOSString();
+//            // Maybe later we can get the working copy contents using file.getContents()
+//        }
+//        else
+//        {
+//            path = file.getPath().toOSString();
+//        }
+//        
+//        // Parse
+//        IASTTranslationUnit ast = new FortranIASTTranslationUnitAdapter(path);
+//
+//        if ((style & AST_USE_INDEX) != 0) 
+//            ast.setIndex(pdom);
+//
+//        return ast;
+        return null;
     }
 	
 	public ASTCompletionNode getCompletionNode(IWorkingCopy workingCopy, int offset)

@@ -675,6 +675,11 @@ class FreeFormLexerPhase2 implements ILexer
                         && ((Token)tokenStream.elementAt(i+1)).getTerminal() == Terminal.T_ASTERISK
                         && ((Token)tokenStream.elementAt(i+2)).getTerminal() == Terminal.T_ICON)
             i += 3;
+        // ...or the first three tokens are <type> * (, as in character*(*)
+        else if (i+2 < tokenStream.size()
+                        && ((Token)tokenStream.elementAt(i+1)).getTerminal() == Terminal.T_ASTERISK
+                        && ((Token)tokenStream.elementAt(i+2)).getTerminal() == Terminal.T_LPAREN)
+            i += 3;
         // ...or the first two tokens are DOUBLE PRECISION
         else if (i+1 < tokenStream.size()
                         && ((Token)tokenStream.elementAt(i)).getTerminal() == Terminal.T_DOUBLE
