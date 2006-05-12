@@ -304,6 +304,7 @@ public class ParallelJobView extends AbstractParallelSetView {
 				IPJob job = manager.findJobById(job_id);
 				changeJob(job);
 				jobTableViewer.setSelection(job == null ? new StructuredSelection() : new StructuredSelection(job));
+				updateAction();
 			}
 		});
 	}
