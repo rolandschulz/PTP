@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="org.eclipse.ptp.ui.preferences.ptpPreferencesPage"
+            class="org.eclipse.ptp.tau.preferences.TauPreferencePage"
+            id="org.eclipse.ptp.tau.preferences.TauPreferencePage"
+            name="TAU"/>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer class="org.eclipse.ptp.tau.preferences.PreferenceInitializer"/>
+   </extension>
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            id="org.eclipse.ptp.tau.contribution1"
+            nameFilter="*"
+            objectClass="org.eclipse.cdt.core.model.ICProject">
+         <menu
+               id="org.eclipse.ptp.tau.menu1"
+               label="TAU"
+               path="additions">
+            <separator name="group1"/>
+         </menu>
+         <action
+               class="org.eclipse.ptp.tau.popup.actions.AddTAUConfiguration"
+               enablesFor="1"
+               id="org.eclipse.ptp.tau.newAction"
+               label="Add TAU Configuration"
+               menubarPath="org.eclipse.ptp.tau.menu1/group1"/>
+      </objectContribution>
+      <objectContribution
+            id="org.eclipse.ptp.tau.contribution1"
+            nameFilter="*"
+            objectClass="org.eclipse.cdt.core.model.IBinary">
+         <menu
+               id="org.eclipse.ptp.tau.menu1"
+               label="TAU"
+               path="additions">
+            <separator name="group1"/>
+         </menu>
+         <action
+               class="org.eclipse.ptp.tau.popup.actions.RunTAU"
+               enablesFor="1"
+               id="org.eclipse.ptp.tau.newAction"
+               label="Run TAU"
+               menubarPath="org.eclipse.ptp.tau.menu1/group1"/>
+      </objectContribution>
+   </extension>
+
+</plugin>
