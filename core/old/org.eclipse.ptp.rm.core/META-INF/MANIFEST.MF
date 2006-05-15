@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: ResourceManager Plug-in
+Bundle-SymbolicName: org.eclipse.ptp.rm.core; singleton:=true
+Bundle-Version: 1.0.0
+Bundle-Activator: org.eclipse.ptp.rm.core.ResourceManagerPlugin
+Bundle-Vendor: Los Alamos National Laboritory
+Bundle-Localization: plugin
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.ui
+Eclipse-LazyStart: true
+Export-Package: org.eclipse.ptp.rm.core,
+ org.eclipse.ptp.rm.core.attributes,
+ org.eclipse.ptp.rm.core.events

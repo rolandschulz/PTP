@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Sim Plug-in
+Bundle-SymbolicName: org.eclipse.ptp.rm.sim; singleton:=true
+Bundle-Version: 1.0.0
+Bundle-Activator: org.eclipse.ptp.rm.sim.SimPlugin
+Bundle-Vendor: Los Alamos National Laboratory
+Bundle-Localization: plugin
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.ptp.rm.core
+Eclipse-LazyStart: true

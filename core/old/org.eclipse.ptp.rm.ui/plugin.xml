@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            name="PTP Resource Manager Views"
+            id="org.eclipse.ptp.rm.ui.views">
+      </category>
+      <view
+            category="org.eclipse.ptp.rm.ui.views"
+            class="org.eclipse.ptp.rm.ui.views.MachinesView"
+            icon="icons/sample.gif"
+            id="org.eclipse.ptp.rm.ui.views.MachinesView"
+            name="Machines View"/>
+      <view
+            category="org.eclipse.ptp.rm.ui.views"
+            class="org.eclipse.ptp.rm.ui.views.NodesView"
+            icon="icons/sample.gif"
+            id="org.eclipse.ptp.rm.ui.views.NodesView"
+            name="Nodes View"/>
+      <view
+            category="org.eclipse.ptp.rm.ui.views"
+            class="org.eclipse.ptp.rm.ui.views.QueuesView"
+            icon="icons/sample.gif"
+            id="org.eclipse.ptp.rm.ui.views.QueuesView"
+            name="Queues View"/>
+      <view
+            category="org.eclipse.ptp.rm.ui.views"
+            class="org.eclipse.ptp.rm.ui.views.JobsView"
+            icon="icons/sample.gif"
+            id="org.eclipse.ptp.rm.ui.views.JobsView"
+            name="Jobs View"/>
+      <view
+            category="org.eclipse.ptp.rm.ui.views"
+            class="org.eclipse.ptp.rm.ui.views.ResourceManagersView"
+            icon="icons/sample.gif"
+            id="org.eclipse.ptp.rm.ui.views.ResourceManagersView"
+            name="Resource Managers View"/>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            class="org.eclipse.ptp.rm.ui.perspectives.ResourceManagerPerspectiveFactory"
+            id="org.eclipse.ptp.rm.ui.perspectives.ResourceManagerPerspective"
+            name="PTP Resource Manager"/>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension targetID="org.eclipse.ptp.rm.ui.perspectives.ResourceManagerPerspective">
+         <perspectiveShortcut id="org.eclipse.ptp.rm.ui.perspectives.ResourceManagerPerspective"/>
+         <viewShortcut id="org.eclipse.ptp.rm.ui.views.ResourceManagersView"/>
+         <viewShortcut id="org.eclipse.ptp.rm.ui.views.MachinesView"/>
+         <viewShortcut id="org.eclipse.ptp.rm.ui.views.NodesView"/>
+         <viewShortcut id="org.eclipse.ptp.rm.ui.views.QueuesView"/>
+         <viewShortcut id="org.eclipse.ptp.rm.ui.views.JobsView"/>
+      </perspectiveExtension>
+   </extension>
+
+</plugin>
