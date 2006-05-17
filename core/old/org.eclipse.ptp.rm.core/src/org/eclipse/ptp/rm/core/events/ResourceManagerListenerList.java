@@ -24,7 +24,16 @@ import java.util.ListIterator;
 
 import org.eclipse.ptp.rm.core.IRMNode;
 import org.eclipse.ptp.rm.core.IRMResourceManager;
+import org.eclipse.ptp.rm.core.attributes.IAttrDesc;
 
+/**
+ * A convenience class to enable an {@link {@link IRMResourceManager}} to
+ * add/remove listeners and fire events to the list of
+ * {@link {@link IRMResourceManagerListener}}s
+ * 
+ * @author rsqrd
+ * 
+ */
 public class ResourceManagerListenerList {
 
 	private final List listeners = new ArrayList();
@@ -50,15 +59,20 @@ public class ResourceManagerListenerList {
 		}
 	}
 
-	public synchronized void fireNodesChanged(IRMNode[] nodes, int type) {
-		RMNodesChangedEvent event = new RMNodesChangedEvent(nodes, manager,
-				type);
+	public synchronized void fireNodesChanged(IRMNode[] nodes,
+			IAttrDesc[] modifiedAttributes, int type) {
+		RMNodesChangedEvent event = new RMNodesChangedEvent(nodes,
+				modifiedAttributes, manager, type);
 		List listeners = new ArrayList(this.listeners);
 		for (ListIterator lit = listeners.listIterator(); lit.hasNext();) {
 			IRMResourceManagerListener rmlistener = (IRMResourceManagerListener) lit
 					.next();
 			rmlistener.nodesChanged(event);
 		}
+	}
+
+	public void fireNodesChanged(IRMNode[] nodes, int type) {
+		fireNodesChanged(nodes, null, type);
 	}
 
 	public synchronized void remove(IRMResourceManagerListener listener) {

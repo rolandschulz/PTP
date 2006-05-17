@@ -37,36 +37,45 @@ public class NodesView extends AbstractElementsView {
 	 * Factored out class to provide the IRMNode's needed for this view.
 	 * 
 	 * @author rsqrd
-	 *
+	 * 
 	 */
 	private static class ElementsProvider implements IRMElementsProvider {
-	
-		/* (non-Javadoc)
+
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see org.eclipse.ptp.rm.ui.views.IElementDisplayProvider#getElementAttrDescs(org.eclipse.ptp.rm.core.IRMResourceManager)
 		 */
 		public IAttrDesc[] getElementAttrDescs(IRMResourceManager manager) {
 			return manager.getNodeAttrDescs();
 		}
-	
-		/* (non-Javadoc)
+
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see org.eclipse.ptp.rm.ui.views.IElementDisplayProvider#getElements(org.eclipse.ptp.rm.core.IRMResourceManager)
 		 */
 		public IRMElement[] getElements(IRMResourceManager manager) {
 			return manager.getAllNodes();
 		}
-	
-		/* (non-Javadoc)
+
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see org.eclipse.ptp.rm.ui.views.IElementDisplayProvider#getNameFieldName()
 		 */
 		public String getNameFieldName() {
 			return "Node";
 		}
-	
+
 		public IStatusDisplayProvider getStatus(IRMElement element) {
-			return StatusDisplayProviderFactory.create(((IRMNode)element).getStatus());
+			return StatusDisplayProviderFactory.create(((IRMNode) element)
+					.getStatus());
 		}
-	
-		/* (non-Javadoc)
+
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see org.eclipse.ptp.rm.ui.views.IElementDisplayProvider#hasStatus()
 		 */
 		public boolean hasStatus() {
@@ -78,13 +87,15 @@ public class NodesView extends AbstractElementsView {
 	 * Respond to changes in the Nodes from the resource manager.
 	 * 
 	 * @author rsqrd
-	 *
+	 * 
 	 */
-	private final class ResourceManagerListener extends AbstractResourceManagerListener {
+	private final class ResourceManagerListener extends
+			AbstractResourceManagerListener {
 		public void nodesChanged(RMNodesChangedEvent event) {
 			switch (event.getType()) {
 			case RMResourceManagerEvent.MODIFIED:
-				elementsModified(event.getNodes());
+				elementsModified(event.getNodes(), event
+						.getModifiedAttributeDescriptions());
 				break;
 			case RMResourceManagerEvent.ADDED:
 				elementsAdded(event.getNodes());
@@ -93,7 +104,7 @@ public class NodesView extends AbstractElementsView {
 				elementsRemoved(event.getNodes());
 				break;
 			default:
-				throw new IllegalStateException("unknown event type");	
+				throw new IllegalStateException("unknown event type");
 			}
 		}
 	}
@@ -104,14 +115,18 @@ public class NodesView extends AbstractElementsView {
 		super();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.internal.rm.ui.views.AbstractElementsView#createElementsProvider()
 	 */
 	protected IRMElementsProvider createElementsProvider() {
 		return new ElementsProvider();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.internal.rm.ui.views.AbstractElementsView#getListener()
 	 */
 	protected IRMResourceManagerListener getListener() {

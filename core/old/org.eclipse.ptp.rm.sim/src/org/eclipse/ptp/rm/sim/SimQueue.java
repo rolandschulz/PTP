@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.sim;
 
+import org.eclipse.ptp.internal.rm.sim.AbstractSimElement;
 import org.eclipse.ptp.rm.core.IRMNode;
 import org.eclipse.ptp.rm.core.IRMQueue;
 import org.eclipse.ptp.rm.core.RMStatus;

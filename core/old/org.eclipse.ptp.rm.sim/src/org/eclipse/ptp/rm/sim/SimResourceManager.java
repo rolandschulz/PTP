@@ -194,7 +194,7 @@ public class SimResourceManager implements IRMResourceManager {
 		System.out.println("modifyFirstNode: " + nodeVal);
 		final IAttribute attr = attrDesc.createAttribute(Integer.toString(nodeVal));
 		node.setAttribute(attrDesc, attr);
-		listeners.fireNodesChanged(new IRMNode[] { node },
+		listeners.fireNodesChanged(new IRMNode[] { node }, new IAttrDesc[]{attrDesc},
 				RMResourceManagerEvent.MODIFIED);
 	}
 

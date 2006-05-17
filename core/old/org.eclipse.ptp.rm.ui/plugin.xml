@@ -13,25 +13,25 @@
             class="org.eclipse.ptp.rm.ui.views.MachinesView"
             icon="icons/sample.gif"
             id="org.eclipse.ptp.rm.ui.views.MachinesView"
-            name="Machines View"/>
+            name="RM Machines"/>
       <view
             category="org.eclipse.ptp.rm.ui.views"
             class="org.eclipse.ptp.rm.ui.views.NodesView"
             icon="icons/sample.gif"
             id="org.eclipse.ptp.rm.ui.views.NodesView"
-            name="Nodes View"/>
+            name="RM Nodes"/>
       <view
             category="org.eclipse.ptp.rm.ui.views"
             class="org.eclipse.ptp.rm.ui.views.QueuesView"
             icon="icons/sample.gif"
             id="org.eclipse.ptp.rm.ui.views.QueuesView"
-            name="Queues View"/>
+            name="RM Queues"/>
       <view
             category="org.eclipse.ptp.rm.ui.views"
             class="org.eclipse.ptp.rm.ui.views.JobsView"
             icon="icons/sample.gif"
             id="org.eclipse.ptp.rm.ui.views.JobsView"
-            name="Jobs View"/>
+            name="RM Jobs"/>
       <view
             category="org.eclipse.ptp.rm.ui.views"
             class="org.eclipse.ptp.rm.ui.views.ResourceManagersView"

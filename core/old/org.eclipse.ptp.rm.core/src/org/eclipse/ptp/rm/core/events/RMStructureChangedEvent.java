@@ -33,7 +33,7 @@ import org.eclipse.ptp.rm.core.IRMResourceManager;
 public class RMStructureChangedEvent extends RMResourceManagerEvent {
 
 	public RMStructureChangedEvent(IRMResourceManager manager, int type) {
-		super(manager, type);
+		super(null, manager, type);
 	}
 
 }

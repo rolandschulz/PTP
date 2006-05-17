@@ -18,6 +18,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.ui.views;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ColumnWeightData;
@@ -27,6 +29,7 @@ import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.ptp.internal.rm.ui.ResourceManagerUILog;
 import org.eclipse.ptp.internal.rm.ui.util.AutoResizeTableLayout;
 import org.eclipse.ptp.rm.core.ResourceManagerFactory;
 import org.eclipse.ptp.rm.core.ResourceManagerPlugin;
@@ -93,7 +96,9 @@ public class ResourceManagersView extends ViewPart {
 	 */
 	class CheckStateListener implements ICheckStateListener {
 
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see org.eclipse.jface.viewers.ICheckStateListener#checkStateChanged(org.eclipse.jface.viewers.CheckStateChangedEvent)
 		 */
 		public void checkStateChanged(CheckStateChangedEvent event) {
@@ -111,10 +116,19 @@ public class ResourceManagersView extends ViewPart {
 
 			// Set the current factory (and therefore the current manager?)
 			// to the checked factory.
-			
-			checkedFactory = (ResourceManagerFactory) event.getElement();
-			ResourceManagerPlugin.getDefault()
-					.setCurrentFactory(checkedFactory);
+
+			// exception safe assignment to checkedFactory
+			ResourceManagerFactory tmpFactory = (ResourceManagerFactory) event
+					.getElement();
+			try {
+				ResourceManagerPlugin.getDefault()
+						.setCurrentFactory(tmpFactory);
+				checkedFactory = tmpFactory;
+			} catch (CoreException e) {
+				ErrorDialog.openError(viewer.getTable().getShell(), "Error", e
+						.getMessage(), e.getStatus());
+				ResourceManagerUILog.log(e.getStatus());
+			}
 		}
 
 	}
@@ -166,12 +180,21 @@ public class ResourceManagersView extends ViewPart {
 		// empty
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
 	 */
 	public void createPartControl(Composite parent) {
 
-		factories = getFactories();
+		try {
+			factories = getFactories();
+		} catch (CoreException e) {
+			ErrorDialog.openError(parent.getShell(), "Error", e.getMessage(), e
+					.getStatus());
+			ResourceManagerUILog.log(e.getStatus());
+			return;
+		}
 
 		viewer = CheckboxTableViewer.newCheckList(parent, SWT.SINGLE
 				| SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION);
@@ -183,11 +206,23 @@ public class ResourceManagersView extends ViewPart {
 		viewer.addCheckStateListener(new CheckStateListener());
 		viewer.setInput(getViewSite());
 
-		checkedFactory = ResourceManagerPlugin.getDefault().getCurrentFactory();
+		try {
+			// exception safe assignment
+			ResourceManagerFactory tmpFactory = ResourceManagerPlugin
+					.getDefault().getCurrentFactory();
+			checkedFactory = tmpFactory;
+		} catch (CoreException e) {
+			ErrorDialog.openError(viewer.getTable().getShell(), "Error", e
+					.getMessage(), e.getStatus());
+			ResourceManagerUILog.log(e.getStatus());
+			return;
+		}
 		viewer.setChecked(checkedFactory, true);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
 	 */
 	public void setFocus() {
@@ -197,7 +232,7 @@ public class ResourceManagersView extends ViewPart {
 	/**
 	 * create the table column structure
 	 */
-	private synchronized void createTableStructure() {
+	private void createTableStructure() {
 		final int numColumns = 2;
 
 		final TableColumn[] tableColumns = new TableColumn[numColumns];
@@ -219,10 +254,12 @@ public class ResourceManagersView extends ViewPart {
 	}
 
 	/**
-	 * @return the extant factories from the ResourceManagerPlugin 
+	 * @return the extant factories from the ResourceManagerPlugin
+	 * @throws CoreException
 	 * 
 	 */
-	private synchronized ResourceManagerFactory[] getFactories() {
+	private ResourceManagerFactory[] getFactories()
+			throws CoreException {
 		return ResourceManagerPlugin.getDefault().getFactories();
 	}
 

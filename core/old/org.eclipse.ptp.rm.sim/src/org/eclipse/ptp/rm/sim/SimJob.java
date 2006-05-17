@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.sim;
 
+import org.eclipse.ptp.internal.rm.sim.AbstractSimElement;
 import org.eclipse.ptp.rm.core.IRMJob;
 import org.eclipse.ptp.rm.core.RMJobStatus;
 import org.eclipse.ptp.rm.core.attributes.IAttribute;

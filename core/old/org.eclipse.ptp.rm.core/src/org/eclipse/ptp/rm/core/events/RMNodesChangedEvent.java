@@ -20,6 +20,7 @@ package org.eclipse.ptp.rm.core.events;
 
 import org.eclipse.ptp.rm.core.IRMNode;
 import org.eclipse.ptp.rm.core.IRMResourceManager;
+import org.eclipse.ptp.rm.core.attributes.IAttrDesc;
 
 /**
  * Determine type of changed in the IRMResourceManager's state The type can be
@@ -32,11 +33,16 @@ import org.eclipse.ptp.rm.core.IRMResourceManager;
  */
 public class RMNodesChangedEvent extends RMResourceManagerEvent {
 
-	private IRMNode[] nodes;
+	final private IRMNode[] nodes;
 
 	public RMNodesChangedEvent(IRMNode[] nodes, IRMResourceManager manager,
 			int type) {
-		super(manager, type);
+		this(nodes, null, manager, type);
+	}
+
+	public RMNodesChangedEvent(IRMNode[] nodes, IAttrDesc[] modifiedAttributes,
+			IRMResourceManager manager, int type) {
+		super(modifiedAttributes, manager, type);
 		this.nodes = (IRMNode[]) nodes.clone();
 	}
 

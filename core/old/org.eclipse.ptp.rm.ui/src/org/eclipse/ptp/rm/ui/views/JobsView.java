@@ -37,39 +37,50 @@ public class JobsView extends AbstractElementsView {
 	 * Factored out class to provide the IRMJob's needed for this view.
 	 * 
 	 * @author rsqrd
-	 *
+	 * 
 	 */
 	private static class ElementsProvider implements IRMElementsProvider {
 
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see org.eclipse.ptp.internal.rm.ui.views.IRMElementsProvider#getElementAttrDescs(org.eclipse.ptp.rm.core.IRMResourceManager)
 		 */
 		public IAttrDesc[] getElementAttrDescs(IRMResourceManager manager) {
 			return manager.getJobAttrDescs();
 		}
 
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see org.eclipse.ptp.internal.rm.ui.views.IRMElementsProvider#getElements(org.eclipse.ptp.rm.core.IRMResourceManager)
 		 */
 		public IRMElement[] getElements(IRMResourceManager manager) {
 			return manager.getAllJobs();
 		}
 
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see org.eclipse.ptp.internal.rm.ui.views.IRMElementsProvider#getNameFieldName()
 		 */
 		public String getNameFieldName() {
 			return "Job";
 		}
 
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see org.eclipse.ptp.internal.rm.ui.views.IRMElementsProvider#getStatus(org.eclipse.ptp.rm.core.IRMElement)
 		 */
 		public IStatusDisplayProvider getStatus(IRMElement element) {
-			return StatusDisplayProviderFactory.create(((IRMJob)element).getStatus());
+			return StatusDisplayProviderFactory.create(((IRMJob) element)
+					.getStatus());
 		}
 
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see org.eclipse.ptp.internal.rm.ui.views.IRMElementsProvider#hasStatus()
 		 */
 		public boolean hasStatus() {
@@ -82,13 +93,15 @@ public class JobsView extends AbstractElementsView {
 	 * Respond to changes in the Jobs from the resource manager.
 	 * 
 	 * @author rsqrd
-	 *
+	 * 
 	 */
-	private final class ResourceManagerListener extends AbstractResourceManagerListener {
+	private final class ResourceManagerListener extends
+			AbstractResourceManagerListener {
 		public void jobsChanged(RMJobsChangedEvent event) {
 			switch (event.getType()) {
 			case RMResourceManagerEvent.MODIFIED:
-				elementsModified(event.getJobs());
+				elementsModified(event.getJobs(), event
+						.getModifiedAttributeDescriptions());
 				break;
 			case RMResourceManagerEvent.ADDED:
 				elementsAdded(event.getJobs());
@@ -106,14 +119,18 @@ public class JobsView extends AbstractElementsView {
 		super();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.internal.rm.ui.views.AbstractElementsView#createElementsProvider()
 	 */
 	protected IRMElementsProvider createElementsProvider() {
 		return new ElementsProvider();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.internal.rm.ui.views.AbstractElementsView#getListener()
 	 */
 	protected IRMResourceManagerListener getListener() {

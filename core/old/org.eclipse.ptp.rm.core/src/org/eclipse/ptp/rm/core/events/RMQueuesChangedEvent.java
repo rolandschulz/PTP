@@ -20,12 +20,13 @@ package org.eclipse.ptp.rm.core.events;
 
 import org.eclipse.ptp.rm.core.IRMQueue;
 import org.eclipse.ptp.rm.core.IRMResourceManager;
+import org.eclipse.ptp.rm.core.attributes.IAttrDesc;
 
 /**
  * Determine type of changed in the IRMResourceManager's state The type can be
  * ADDED, MODIFIED, or REMOVED
  * 
- *  Event created when the ARM has added, modified, or removed queues
+ * Event created when the ARM has added, modified, or removed queues
  * 
  * @author rsqrd
  * 
@@ -34,9 +35,9 @@ public class RMQueuesChangedEvent extends RMResourceManagerEvent {
 
 	private IRMQueue[] queues;
 
-	public RMQueuesChangedEvent(IRMQueue[] queues, IRMResourceManager manager,
-			int type) {
-		super(manager, type);
+	public RMQueuesChangedEvent(IRMQueue[] queues, IAttrDesc[] modifiedAttributes,
+			IRMResourceManager manager, int type) {
+		super(modifiedAttributes, manager, type);
 		this.queues = (IRMQueue[]) queues.clone();
 	}
 

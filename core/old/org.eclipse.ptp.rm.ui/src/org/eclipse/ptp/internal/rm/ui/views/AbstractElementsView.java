@@ -18,12 +18,15 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.rm.ui.views;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.ptp.internal.rm.ui.ResourceManagerUILog;
 import org.eclipse.ptp.internal.rm.ui.util.AutoResizeTableLayout;
 import org.eclipse.ptp.rm.core.IRMElement;
 import org.eclipse.ptp.rm.core.IRMResourceManager;
@@ -34,6 +37,7 @@ import org.eclipse.ptp.rm.core.events.IRMResourceManagerListener;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.part.ViewPart;
@@ -70,7 +74,7 @@ public abstract class AbstractElementsView extends ViewPart {
 		 * @see org.eclipse.ptp.rm.core.events.IRMResourceManagerChangedListener#resourceManagerChanged(org.eclipse.ptp.rm.core.IRMResourceManager,
 		 *      org.eclipse.ptp.rm.core.IRMResourceManager)
 		 */
-		public void resourceManagerChanged(IRMResourceManager oldManager,
+		public synchronized void resourceManagerChanged(IRMResourceManager oldManager,
 				IRMResourceManager newManager) {
 
 			// update the entire table if the manager has changed.
@@ -123,11 +127,13 @@ public abstract class AbstractElementsView extends ViewPart {
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 
 			// This method is called when dispose() called on the table.
-			// This gives us the opportunity to remove ourselves from the listener
+			// This gives us the opportunity to remove ourselves from the
+			// listener
 			// when the table is disposed.
-			
+
 			// If the input is changed that means that an old listener is no
-			// longer interested in listening to the current manager, and a new one is.
+			// longer interested in listening to the current manager, and a new
+			// one is.
 
 			if (oldInput != null) {
 				final IRMResourceManagerListener oldListener = (IRMResourceManagerListener) oldInput;
@@ -195,6 +201,14 @@ public abstract class AbstractElementsView extends ViewPart {
 			return getText(rmElement.getAttribute(attrDescs[descIndex]));
 		}
 
+	}
+
+	private static String[] toProperties(IAttrDesc[] modifiedAttributeDescriptions) {
+		final String[] properties = new String[modifiedAttributeDescriptions.length];
+		for (int i=0; i<properties.length; ++i) {
+			properties[i] = modifiedAttributeDescriptions[i].getName();
+		}
+		return properties;
 	}
 
 	// The attribute descriptions for the table column headers
@@ -290,13 +304,15 @@ public abstract class AbstractElementsView extends ViewPart {
 	 * @param runnable
 	 */
 	private void asyncExec(final Runnable runnable) {
-		viewer.getTable().getDisplay().asyncExec(runnable);
+		Display.getDefault().asyncExec(runnable);
 	}
 
 	/**
 	 * We need to set up a table's column headers.
+	 * 
+	 * @throws CoreException
 	 */
-	private void createTableStructure() {
+	private void createTableStructure() throws CoreException {
 		manager = getManager();
 		this.attrDescs = elementsProvider.getElementAttrDescs(manager);
 
@@ -342,7 +358,16 @@ public abstract class AbstractElementsView extends ViewPart {
 		viewer = new TableViewer(parent, SWT.SINGLE | SWT.H_SCROLL
 				| SWT.V_SCROLL | SWT.FULL_SELECTION);
 
-		createTableStructure();
+		try {
+			createTableStructure();
+		} catch (CoreException e) {
+			ErrorDialog.openError(parent.getShell(), "Error", e.getMessage(), e
+					.getStatus());
+			ResourceManagerUILog.log(e.getStatus());
+			viewer.getTable().dispose();
+			viewer = null;
+			return;
+		}
 
 		viewer.setContentProvider(viewContentProvider);
 		viewer.setLabelProvider(viewLabelProvider);
@@ -358,8 +383,9 @@ public abstract class AbstractElementsView extends ViewPart {
 	 * Get the current manager
 	 * 
 	 * @return
+	 * @throws CoreException
 	 */
-	private IRMResourceManager getManager() {
+	private IRMResourceManager getManager() throws CoreException {
 		return ResourceManagerPlugin.getDefault().getCurrentManager();
 	}
 
@@ -403,16 +429,19 @@ public abstract class AbstractElementsView extends ViewPart {
 	 * elems have been modified.
 	 * 
 	 * @param elems
+	 * @param modifiedAttributeDescriptions
+	 *            TODO
 	 */
-	protected synchronized void elementsModified(final IRMElement[] elems) {
+	protected synchronized void elementsModified(final IRMElement[] elems,
+			final IAttrDesc[] modifiedAttributeDescriptions) {
 		asyncExec(new Runnable() {
 			public void run() {
-				viewer.update(elems, new String[] { "" });
+				viewer.update(elems, toProperties(modifiedAttributeDescriptions));
 				// viewer.refresh();
 			}
+
 		});
 	}
-
 	/**
 	 * This is called by instantiations when elems have been removed by the
 	 * manager.

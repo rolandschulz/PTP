@@ -29,7 +29,6 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
-import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.ptp.internal.rm.core.ResourceManagerLog;
 import org.eclipse.ptp.rm.core.events.IRMResourceManagerChangedListener;
 import org.osgi.framework.BundleContext;
@@ -60,7 +59,6 @@ public class ResourceManagerPlugin extends Plugin {
 	public ResourceManagerPlugin() {
 		super();
 		plugin = this;
-		getFactories();
 	}
 
 	public synchronized void addResourceManagerChangedListener(
@@ -68,8 +66,10 @@ public class ResourceManagerPlugin extends Plugin {
 		listeners.add(listener);
 	}
 
-	public ResourceManagerFactory getCurrentFactory() {
+	public ResourceManagerFactory getCurrentFactory() throws CoreException {
 
+		getFactories();
+		
 		if (factories.length == 0) {
 			return null;
 		}
@@ -81,7 +81,7 @@ public class ResourceManagerPlugin extends Plugin {
 		return currentFactory;
 	}
 
-	public IRMResourceManager getCurrentManager() {
+	public IRMResourceManager getCurrentManager() throws CoreException {
 		// TODO need to retrieve manager from preferences or
 		// the Resource Managers View of org.eclipse.ptp.rm.ui
 		if (currentManager == null) {
@@ -91,7 +91,14 @@ public class ResourceManagerPlugin extends Plugin {
 		return currentManager;
 	}
 
-	public ResourceManagerFactory[] getFactories() {
+	/**
+	 * Generates the resource manager factories that been extended into this
+	 * plug-n's resource manager extension point.
+	 * 
+	 * @return the resource manager factories for this plug-in
+	 * @throws CoreException
+	 */
+	public ResourceManagerFactory[] getFactories() throws CoreException {
 
 		if (factories.length > 0) {
 			return factories;
@@ -131,23 +138,17 @@ public class ResourceManagerPlugin extends Plugin {
 		listeners.remove(listener);
 	}
 
-	public void setCurrentFactory(ResourceManagerFactory factory) {
+	public void setCurrentFactory(ResourceManagerFactory factory)
+			throws CoreException {
 
 		// TODO this needs a lot of work
-		
+
 		if (!Arrays.asList(factories).contains(factory)) {
-			try {
-				final IllegalArgumentException exc = new IllegalArgumentException(
-						"factory is not found in list");
-				final IStatus status = ResourceManagerLog.createErrorStatus(exc
-						.getMessage(), exc);
-				throw new CoreException(status);
-			} catch (CoreException e) {
-				ErrorDialog.openError(null, "Error", e.getMessage(), e
-						.getStatus());
-				ResourceManagerLog.log(e.getStatus());
-				return;
-			}
+			final IllegalArgumentException exc = new IllegalArgumentException(
+					"factory is not found in list");
+			final IStatus status = ResourceManagerLog.createErrorStatus(exc
+					.getMessage(), exc);
+			throw new CoreException(status);
 		}
 		if (factory != currentFactory) {
 			if (currentManager != null) {
@@ -198,18 +199,12 @@ public class ResourceManagerPlugin extends Plugin {
 		}
 	}
 
-	private ResourceManagerFactory[] noFactoriesError() {
-		try {
-			final String message = "No resourceManagers factory extensions";
-			final IllegalStateException illegalStateException = new IllegalStateException(
-					message);
-			IStatus status = ResourceManagerLog.createErrorStatus(message,
-					illegalStateException);
-			throw new CoreException(status);
-		} catch (CoreException e) {
-			ErrorDialog.openError(null, "Error", e.getMessage(), e.getStatus());
-			ResourceManagerLog.log(e.getStatus());
-			return factories;
-		}
+	private ResourceManagerFactory[] noFactoriesError() throws CoreException {
+		final String message = "No resourceManagers factory extensions";
+		final IllegalStateException illegalStateException = new IllegalStateException(
+				message);
+		IStatus status = ResourceManagerLog.createErrorStatus(message,
+				illegalStateException);
+		throw new CoreException(status);
 	}
 }

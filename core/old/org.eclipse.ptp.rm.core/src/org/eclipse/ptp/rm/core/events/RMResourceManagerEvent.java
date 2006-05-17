@@ -19,6 +19,7 @@
 package org.eclipse.ptp.rm.core.events;
 
 import org.eclipse.ptp.rm.core.IRMResourceManager;
+import org.eclipse.ptp.rm.core.attributes.IAttrDesc;
 
 /**
  * Determine type of changed in the IRMResourceManager's state. The type can be
@@ -47,9 +48,19 @@ public abstract class RMResourceManagerEvent {
 
 	private int type;
 
-	public RMResourceManagerEvent(IRMResourceManager manager, int type) {
+	protected final IAttrDesc[] modifiedAttributeDescriptions;
+
+	public RMResourceManagerEvent(IAttrDesc[] modifiedAttributes,
+			IRMResourceManager manager, int type) {
 		resourceManager = manager;
+		this.modifiedAttributeDescriptions = (IAttrDesc[]) (modifiedAttributes == null ? null
+				: modifiedAttributes.clone());
 		this.type = type;
+	}
+
+	public IAttrDesc[] getModifiedAttributeDescriptions() {
+		return (IAttrDesc[]) (modifiedAttributeDescriptions == null ? null
+				: modifiedAttributeDescriptions.clone());
 	}
 
 	/**

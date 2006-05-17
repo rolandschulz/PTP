@@ -84,7 +84,7 @@ public class QueuesView extends AbstractElementsView {
 		public void queuesChanged(RMQueuesChangedEvent event) {
 			switch (event.getType()) {
 			case RMResourceManagerEvent.MODIFIED:
-				elementsModified(event.getQueues());
+				elementsModified(event.getQueues(), event.getModifiedAttributeDescriptions());
 				break;
 			case RMResourceManagerEvent.ADDED:
 				elementsAdded(event.getQueues());

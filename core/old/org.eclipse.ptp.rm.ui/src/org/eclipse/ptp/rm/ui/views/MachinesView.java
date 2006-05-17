@@ -37,25 +37,31 @@ public class MachinesView extends AbstractElementsView {
 	 * Factored out class to provide the IRMMachine's needed for this view.
 	 * 
 	 * @author rsqrd
-	 *
+	 * 
 	 */
 	private static class ElementsProvider implements IRMElementsProvider {
 
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see org.eclipse.ptp.rm.ui.views.IElementDisplayProvider#getElementAttrDescs(org.eclipse.ptp.rm.core.IRMResourceManager)
 		 */
 		public IAttrDesc[] getElementAttrDescs(IRMResourceManager manager) {
 			return manager.getMachineAttrDescs();
 		}
 
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see org.eclipse.ptp.rm.ui.views.IElementDisplayProvider#getElements(org.eclipse.ptp.rm.core.IRMResourceManager)
 		 */
 		public IRMElement[] getElements(IRMResourceManager manager) {
 			return manager.getAllMachines();
 		}
 
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see org.eclipse.ptp.rm.ui.views.IElementDisplayProvider#getNameFieldName()
 		 */
 		public String getNameFieldName() {
@@ -63,10 +69,13 @@ public class MachinesView extends AbstractElementsView {
 		}
 
 		public IStatusDisplayProvider getStatus(IRMElement element) {
-			return StatusDisplayProviderFactory.create(((IRMMachine)element).getStatus());
+			return StatusDisplayProviderFactory.create(((IRMMachine) element)
+					.getStatus());
 		}
 
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see org.eclipse.ptp.rm.ui.views.IElementDisplayProvider#hasStatus()
 		 */
 		public boolean hasStatus() {
@@ -78,13 +87,15 @@ public class MachinesView extends AbstractElementsView {
 	 * Respond to changes in the Machines from the resource manager.
 	 * 
 	 * @author rsqrd
-	 *
+	 * 
 	 */
-	private final class ResourceManagerListener extends AbstractResourceManagerListener {
+	private final class ResourceManagerListener extends
+			AbstractResourceManagerListener {
 		public void machinesChanged(RMMachinesChangedEvent event) {
 			switch (event.getType()) {
 			case RMResourceManagerEvent.MODIFIED:
-				elementsModified(event.getMachines());
+				elementsModified(event.getMachines(), event
+						.getModifiedAttributeDescriptions());
 				break;
 			case RMResourceManagerEvent.ADDED:
 				elementsAdded(event.getMachines());
@@ -102,14 +113,18 @@ public class MachinesView extends AbstractElementsView {
 		super();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.internal.rm.ui.views.AbstractElementsView#createElementsProvider()
 	 */
 	protected IRMElementsProvider createElementsProvider() {
 		return new ElementsProvider();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.internal.rm.ui.views.AbstractElementsView#getListener()
 	 */
 	protected IRMResourceManagerListener getListener() {
