@@ -1,6 +1,16 @@
-package org.eclipse.ptp.pldt.openmp.core;
-//*****************************************************************************
-//File Name: OpenMPScanReturn
+/**********************************************************************
+ * Copyright (c) 2006 IBM Corporation.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     IBM Corporation - initial API and implementation
+ *******************************************************************************/
+
+package org.eclipse.ptp.pldt.openmp.core;//*****************************************************************************
+
 //Function: A way to use old code base to get information to view
 //Author: Donald P Pazel
 //Created: Feb. 1, 2006
@@ -32,7 +42,7 @@ public class OpenMPScanReturn extends ScanReturn
      */
     public void addOpenMPArtifact(Artifact a)
     {
-        addMpiArtifact(a);
+        addArtifact(a);
     }
 
     /**
