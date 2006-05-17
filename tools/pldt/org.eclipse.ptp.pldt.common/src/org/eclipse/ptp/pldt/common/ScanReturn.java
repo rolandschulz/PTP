@@ -42,7 +42,7 @@ public class ScanReturn
         return artifacts;
     }
 
-    public void addMpiArtifact(Artifact a)// BRT rename
+    public void addArtifact(Artifact a)// BRT rename
     {
         artifacts.add(a);
     }
