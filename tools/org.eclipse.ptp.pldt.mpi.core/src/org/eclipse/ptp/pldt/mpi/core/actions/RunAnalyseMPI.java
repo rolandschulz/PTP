@@ -16,6 +16,7 @@ import org.eclipse.ptp.pldt.mpi.core.MPIArtifactMarkingVisitor;
 import org.eclipse.ptp.pldt.mpi.core.MpiIDs;
 import org.eclipse.ptp.pldt.mpi.core.MpiPlugin;
 import org.eclipse.ptp.pldt.mpi.core.analysis.MpiCASTVisitor;
+import org.eclipse.ptp.pldt.mpi.core.analysis.MpiCPPASTVisitor;
 
 
 /**
@@ -54,6 +55,10 @@ public class RunAnalyseMPI extends RunAnalyseBase
                     CDOM.getInstance().getCodeReaderFactory(CDOM.PARSE_SAVED_RESOURCES));
             if (lang == ParserLanguage.C) {
                 astTransUnit.accept(new MpiCASTVisitor(includes_, fileName, msr));
+            }
+            else if (lang == ParserLanguage.CPP) {
+                astTransUnit.accept(new MpiCPPASTVisitor(includes_, fileName, msr));
+            	
             }
         } catch (IASTServiceProvider.UnsupportedDialectException e) {
         }
