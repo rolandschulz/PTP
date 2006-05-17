@@ -98,7 +98,7 @@ public class RunAnalyseOpenMP extends RunAnalyseBase
                                           OPENMP_DIRECTIVE,
                                           si,
                                           pop);
-                msr.addMpiArtifact(a);
+                msr.addArtifact(a);
             }
         }
         

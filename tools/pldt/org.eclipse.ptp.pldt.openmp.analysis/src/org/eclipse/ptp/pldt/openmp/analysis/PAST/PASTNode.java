@@ -16,7 +16,7 @@ import org.eclipse.cdt.core.dom.ast.IASTFileLocation;
 import org.eclipse.cdt.core.dom.ast.IASTNode;
 import org.eclipse.cdt.core.dom.ast.IASTNodeLocation;
 import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit;
-import org.eclipse.cdt.internal.core.parser.scanner2.LocationMap;
+import org.eclipse.cdt.internal.core.dom.parser.ASTNode;
 
 /**
  * Preprocessor node, pseudo for IASTNode, used for analysis
@@ -26,7 +26,8 @@ import org.eclipse.cdt.internal.core.parser.scanner2.LocationMap;
  */
 public abstract class PASTNode implements IASTNode 
 {
-    protected LocationMap.ScannerASTNode   astNode_  = null;
+
+    protected ASTNode   astNode_  = null;
     protected boolean                      compiled_ = false;
     
     // Location information
@@ -39,7 +40,7 @@ public abstract class PASTNode implements IASTNode
      * PASTNode - Constructor
      * @param astNode: LocationMap.ScannerASTNode
      */
-    public PASTNode(LocationMap.ScannerASTNode astNode)
+    public PASTNode(ASTNode astNode)
     {
     	astNode_ = astNode;
         
