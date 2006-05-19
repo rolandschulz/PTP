@@ -26,7 +26,7 @@ import org.eclipse.ptp.rm.core.attributes.IAttribute;
 
 public class SimNode extends AbstractSimElement implements IRMNode {
 
-	private final RMStatus status;
+	private RMStatus status;
 
 	public SimNode(int id, String name, RMStatus status, IAttribute[] attributes) {
 		super(id, name, attributes);
@@ -40,6 +40,10 @@ public class SimNode extends AbstractSimElement implements IRMNode {
 
 	public RMStatus getStatus() {
 		return status;
+	}
+
+	public void setStatus(RMStatus status) {
+		this.status = status;
 	}
 
 }

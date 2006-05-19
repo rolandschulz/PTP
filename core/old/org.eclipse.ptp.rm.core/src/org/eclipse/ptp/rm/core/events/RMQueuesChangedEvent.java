@@ -36,8 +36,8 @@ public class RMQueuesChangedEvent extends RMResourceManagerEvent {
 	private IRMQueue[] queues;
 
 	public RMQueuesChangedEvent(IRMQueue[] queues, IAttrDesc[] modifiedAttributes,
-			IRMResourceManager manager, int type) {
-		super(modifiedAttributes, manager, type);
+			boolean statusChanged, IRMResourceManager manager, int type) {
+		super(modifiedAttributes, statusChanged, manager, type);
 		this.queues = (IRMQueue[]) queues.clone();
 	}
 

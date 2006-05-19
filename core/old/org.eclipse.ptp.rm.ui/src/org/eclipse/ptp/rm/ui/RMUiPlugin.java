@@ -69,6 +69,6 @@ public class RMUiPlugin extends AbstractUIPlugin {
 	 * @return the image descriptor
 	 */
 	public static ImageDescriptor getImageDescriptor(String path) {
-		return AbstractUIPlugin.imageDescriptorFromPlugin("org.eclipse.ptp.resourcemanager.ui", path);
+		return AbstractUIPlugin.imageDescriptorFromPlugin("org.eclipse.ptp.rm.ui", path);
 	}
 }

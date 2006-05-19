@@ -26,12 +26,18 @@ import org.eclipse.ptp.rm.core.attributes.IAttribute;
 
 public class SimMachine extends AbstractSimElement implements IRMMachine {
 
+	private RMStatus status = RMStatus.OK;
+
 	public SimMachine(int id, String name, IAttribute[] attributes) {
 		super(id, name, attributes);
 	}
 
 	public RMStatus getStatus() {
-		return RMStatus.OK;
+		return status;
+	}
+
+	public void setStatus(RMStatus status) {
+		this.status = status;
 	}
 
 }

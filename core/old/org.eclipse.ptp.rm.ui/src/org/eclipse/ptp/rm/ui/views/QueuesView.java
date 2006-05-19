@@ -26,6 +26,7 @@ import org.eclipse.ptp.internal.rm.ui.views.StatusDisplayProviderFactory;
 import org.eclipse.ptp.rm.core.IRMElement;
 import org.eclipse.ptp.rm.core.IRMQueue;
 import org.eclipse.ptp.rm.core.IRMResourceManager;
+import org.eclipse.ptp.rm.core.RMStatus;
 import org.eclipse.ptp.rm.core.attributes.IAttrDesc;
 import org.eclipse.ptp.rm.core.events.IRMResourceManagerListener;
 import org.eclipse.ptp.rm.core.events.RMQueuesChangedEvent;
@@ -37,40 +38,52 @@ public class QueuesView extends AbstractElementsView {
 	 * Factored out class to provide the IRMQueue's needed for this view.
 	 * 
 	 * @author rsqrd
-	 *
+	 * 
 	 */
 	private static class ElementsProvider implements IRMElementsProvider {
-	
-		/* (non-Javadoc)
+
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see org.eclipse.ptp.rm.ui.views.IElementDisplayProvider#getElementAttrDescs(org.eclipse.ptp.rm.core.IRMResourceManager)
 		 */
 		public IAttrDesc[] getElementAttrDescs(IRMResourceManager manager) {
 			return manager.getQueueAttrDescs();
 		}
-	
-		/* (non-Javadoc)
+
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see org.eclipse.ptp.rm.ui.views.IElementDisplayProvider#getElements(org.eclipse.ptp.rm.core.IRMResourceManager)
 		 */
 		public IRMElement[] getElements(IRMResourceManager manager) {
 			return manager.getQueues();
 		}
-	
-		/* (non-Javadoc)
+
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see org.eclipse.ptp.rm.ui.views.IElementDisplayProvider#getNameFieldName()
 		 */
 		public String getNameFieldName() {
 			return "Queue";
 		}
-	
+
 		public IStatusDisplayProvider getStatus(IRMElement element) {
-			return StatusDisplayProviderFactory.create(((IRMQueue)element).getStatus());
+			return StatusDisplayProviderFactory.make(((IRMQueue) element).getStatus());
 		}
-	
-		/* (non-Javadoc)
+
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see org.eclipse.ptp.rm.ui.views.IElementDisplayProvider#hasStatus()
 		 */
 		public boolean hasStatus() {
 			return true;
+		}
+
+		public IStatusDisplayProvider[] getAllStatuses() {
+			return StatusDisplayProviderFactory.getAll((RMStatus)null);
 		}
 	}
 
@@ -78,13 +91,16 @@ public class QueuesView extends AbstractElementsView {
 	 * Respond to changes in the Queues from the resource manager.
 	 * 
 	 * @author rsqrd
-	 *
+	 * 
 	 */
-	private final class ResourceManagerListener extends AbstractResourceManagerListener {
+	private final class ResourceManagerListener extends
+			AbstractResourceManagerListener {
 		public void queuesChanged(RMQueuesChangedEvent event) {
 			switch (event.getType()) {
 			case RMResourceManagerEvent.MODIFIED:
-				elementsModified(event.getQueues(), event.getModifiedAttributeDescriptions());
+				elementsModified(event.getQueues(),
+						event.getModifiedAttributeDescriptions(),
+						event.isStatusChanged());
 				break;
 			case RMResourceManagerEvent.ADDED:
 				elementsAdded(event.getQueues());
@@ -102,14 +118,18 @@ public class QueuesView extends AbstractElementsView {
 		super();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.internal.rm.ui.views.AbstractElementsView#createElementsProvider()
 	 */
 	protected IRMElementsProvider createElementsProvider() {
 		return new ElementsProvider();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.internal.rm.ui.views.AbstractElementsView#getListener()
 	 */
 	protected IRMResourceManagerListener getListener() {

@@ -27,5 +27,15 @@ package org.eclipse.ptp.rm.core;
  * 
  */
 public interface IRMMachine extends IRMElement {
+	/**
+	 * @return the machine's status
+	 */
 	RMStatus getStatus();
+
+	/**
+	 * set the node's status
+	 * 
+	 * @param status
+	 */
+	void setStatus(RMStatus status);
 }

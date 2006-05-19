@@ -19,6 +19,9 @@
 package org.eclipse.ptp.internal.rm.ui.views;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
@@ -26,6 +29,7 @@ import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.ptp.internal.rm.ui.ResourceManagerUILog;
 import org.eclipse.ptp.internal.rm.ui.util.AutoResizeTableLayout;
 import org.eclipse.ptp.rm.core.IRMElement;
@@ -34,12 +38,15 @@ import org.eclipse.ptp.rm.core.ResourceManagerPlugin;
 import org.eclipse.ptp.rm.core.attributes.IAttrDesc;
 import org.eclipse.ptp.rm.core.events.IRMResourceManagerChangedListener;
 import org.eclipse.ptp.rm.core.events.IRMResourceManagerListener;
+import org.eclipse.ptp.rm.ui.RMUiPlugin;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.part.ViewPart;
 
 /**
@@ -56,6 +63,38 @@ import org.eclipse.ui.part.ViewPart;
  * 
  */
 public abstract class AbstractElementsView extends ViewPart {
+
+	private final class FiltersAction extends Action {
+
+		private FilterDialog dialog;
+
+		public FiltersAction(Composite composite) {
+			super("Filters...");
+			setImageDescriptor(RMUiPlugin.getImageDescriptor("icons/filter_ps.gif"));
+			final Shell shell = composite.getShell();
+			dialog = new FilterDialog(shell, elementsProvider);
+		}
+
+		public void resetFilters() {
+			dialog.resetFilters();
+		}
+
+		public void run() {
+			final int returnCode = dialog.open(elementsProvider.getElements(manager));
+			if (returnCode == FilterDialog.OK) {
+				// remove old filters
+				viewer.resetFilters();
+
+				// add new filters
+				final ViewerFilter[] newFilters = dialog.getFilters();
+				for (int i = 0; i < newFilters.length; ++i) {
+					viewer.addFilter(newFilters[i]);
+				}
+			}
+
+		}
+
+	}
 
 	/**
 	 * This class is responsible for updating the view when the
@@ -74,8 +113,8 @@ public abstract class AbstractElementsView extends ViewPart {
 		 * @see org.eclipse.ptp.rm.core.events.IRMResourceManagerChangedListener#resourceManagerChanged(org.eclipse.ptp.rm.core.IRMResourceManager,
 		 *      org.eclipse.ptp.rm.core.IRMResourceManager)
 		 */
-		public synchronized void resourceManagerChanged(IRMResourceManager oldManager,
-				IRMResourceManager newManager) {
+		public synchronized void resourceManagerChanged(
+				IRMResourceManager oldManager, IRMResourceManager newManager) {
 
 			// update the entire table if the manager has changed.
 			if (newManager != manager) {
@@ -170,8 +209,7 @@ public abstract class AbstractElementsView extends ViewPart {
 			if (elementsProvider.hasStatus()
 					&& columnIndex == statusColumnIndex) {
 				final IRMElement rmElement = (IRMElement) element;
-				final IStatusDisplayProvider status = elementsProvider
-						.getStatus(rmElement);
+				final IStatusDisplayProvider status = elementsProvider.getStatus(rmElement);
 				return status.getImage();
 			} else
 				return null;
@@ -203,10 +241,17 @@ public abstract class AbstractElementsView extends ViewPart {
 
 	}
 
-	private static String[] toProperties(IAttrDesc[] modifiedAttributeDescriptions) {
-		final String[] properties = new String[modifiedAttributeDescriptions.length];
-		for (int i=0; i<properties.length; ++i) {
+	private static String[] toProperties(
+			IAttrDesc[] modifiedAttributeDescriptions, boolean statusChanged) {
+		int nProperties = modifiedAttributeDescriptions.length;
+		if (statusChanged)
+			++nProperties;
+		final String[] properties = new String[nProperties];
+		for (int i = 0; i < modifiedAttributeDescriptions.length; ++i) {
 			properties[i] = modifiedAttributeDescriptions[i].getName();
+		}
+		if (statusChanged) {
+			properties[nProperties - 1] = IStatusDisplayProvider.STATUS_CHANGED_PROPERTY;
 		}
 		return properties;
 	}
@@ -226,24 +271,26 @@ public abstract class AbstractElementsView extends ViewPart {
 	// Where is the name column?
 	private int nameColumnIndex = 0;
 
-	// If and where is the status column? -1 means there is none.
-	private int statusColumnIndex = -1;
-
 	// Let's hold on to the listener for current resource manager swapping
 	private ResourceManagerChangedListener resourceManagerChangedListener = new ResourceManagerChangedListener();
 
-	// The main GUI element
-	private TableViewer viewer;
+	// If and where is the status column? -1 means there is none.
+	private int statusColumnIndex = -1;
 
 	// Keep hold of the ViewContentProvider so we can give it to new
 	// TableViewers when
 	// we have to destroy the old one.
 	private final ViewContentProvider viewContentProvider = new ViewContentProvider();
 
+	// The main GUI element
+	private TableViewer viewer;
+
 	// Keep hold of the ViewLableProvider so we can give it to new TableViewers
 	// when
 	// we have to destroy the old one.
 	private final ViewLabelProvider viewLabelProvider;
+
+	private FiltersAction filterAction;
 
 	public AbstractElementsView() {
 		super();
@@ -268,7 +315,17 @@ public abstract class AbstractElementsView extends ViewPart {
 	 */
 	public void createPartControl(Composite parent) {
 
+		filterAction = new FiltersAction(parent);
+
 		createViewer(parent);
+
+		IActionBars actionBars = getViewSite().getActionBars();
+		IMenuManager dropDownMenu = actionBars.getMenuManager();
+		IToolBarManager toolBar = actionBars.getToolBarManager();
+		dropDownMenu.add(filterAction);
+		toolBar.add(filterAction);
+		toolBar.update(false);
+		actionBars.updateActionBars();
 
 		ResourceManagerPlugin.getDefault().addResourceManagerChangedListener(
 				resourceManagerChangedListener);
@@ -284,9 +341,15 @@ public abstract class AbstractElementsView extends ViewPart {
 		super.dispose();
 		viewer = null;
 		// We don't need to listen to anything anylonger
-		ResourceManagerPlugin.getDefault()
-				.removeResourceManagerChangedListener(
-						resourceManagerChangedListener);
+		ResourceManagerPlugin.getDefault().removeResourceManagerChangedListener(
+				resourceManagerChangedListener);
+	}
+
+	public void resetFilters() {
+		filterAction.resetFilters();
+		if (viewer != null && !viewer.getControl().isDisposed()) {
+			viewer.resetFilters();
+		}
 	}
 
 	/*
@@ -331,8 +394,7 @@ public abstract class AbstractElementsView extends ViewPart {
 		}
 
 		tableColumns[nameColumnIndex] = new TableColumn(table, SWT.LEFT);
-		tableColumns[nameColumnIndex].setText(elementsProvider
-				.getNameFieldName());
+		tableColumns[nameColumnIndex].setText(elementsProvider.getNameFieldName());
 		// tableColumns[0].setWidth(50);
 		layout.addColumnData(new ColumnWeightData(50));
 
@@ -355,14 +417,17 @@ public abstract class AbstractElementsView extends ViewPart {
 	 * @param parent
 	 */
 	private void createViewer(Composite parent) {
+
+		resetFilters();
+
 		viewer = new TableViewer(parent, SWT.SINGLE | SWT.H_SCROLL
 				| SWT.V_SCROLL | SWT.FULL_SELECTION);
 
 		try {
 			createTableStructure();
 		} catch (CoreException e) {
-			ErrorDialog.openError(parent.getShell(), "Error", e.getMessage(), e
-					.getStatus());
+			ErrorDialog.openError(parent.getShell(), "Error", e.getMessage(),
+					e.getStatus());
 			ResourceManagerUILog.log(e.getStatus());
 			viewer.getTable().dispose();
 			viewer = null;
@@ -433,15 +498,25 @@ public abstract class AbstractElementsView extends ViewPart {
 	 *            TODO
 	 */
 	protected synchronized void elementsModified(final IRMElement[] elems,
-			final IAttrDesc[] modifiedAttributeDescriptions) {
+			final IAttrDesc[] modifiedAttributeDescriptions,
+			final boolean statusChanged) {
 		asyncExec(new Runnable() {
 			public void run() {
-				viewer.update(elems, toProperties(modifiedAttributeDescriptions));
+				final boolean bug_24521_workaround = true;
+				if (bug_24521_workaround) {
+					viewer.update(elems, toProperties(
+							modifiedAttributeDescriptions, statusChanged));
+					viewer.refresh();
+				} else {
+					viewer.update(elems, toProperties(
+							modifiedAttributeDescriptions, statusChanged));
+				}
 				// viewer.refresh();
 			}
 
 		});
 	}
+
 	/**
 	 * This is called by instantiations when elems have been removed by the
 	 * manager.

@@ -37,12 +37,12 @@ public class RMNodesChangedEvent extends RMResourceManagerEvent {
 
 	public RMNodesChangedEvent(IRMNode[] nodes, IRMResourceManager manager,
 			int type) {
-		this(nodes, null, manager, type);
+		this(nodes, null, false, manager, type);
 	}
 
 	public RMNodesChangedEvent(IRMNode[] nodes, IAttrDesc[] modifiedAttributes,
-			IRMResourceManager manager, int type) {
-		super(modifiedAttributes, manager, type);
+			boolean statusChanged, IRMResourceManager manager, int type) {
+		super(modifiedAttributes, statusChanged, manager, type);
 		this.nodes = (IRMNode[]) nodes.clone();
 	}
 

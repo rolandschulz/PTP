@@ -37,4 +37,11 @@ public interface IRMNode extends IRMElement {
 	 * @return the node's status
 	 */
 	RMStatus getStatus();
+	
+	/**
+	 * set the node's status
+	 * 
+	 * @param status
+	 */
+	void setStatus(RMStatus status);
 }

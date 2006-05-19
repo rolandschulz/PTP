@@ -37,4 +37,11 @@ public interface IRMQueue extends IRMElement {
 	 * @return the queue's status
 	 */
 	RMStatus getStatus();
+
+	/**
+	 * set the node's status
+	 * 
+	 * @param status
+	 */
+	void setStatus(RMStatus status);
 }

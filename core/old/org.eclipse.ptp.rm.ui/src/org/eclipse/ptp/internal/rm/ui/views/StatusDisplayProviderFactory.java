@@ -18,36 +18,54 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.rm.ui.views;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 import org.eclipse.ptp.rm.core.RMJobStatus;
 import org.eclipse.ptp.rm.core.RMStatus;
 import org.eclipse.swt.graphics.Image;
 
 public class StatusDisplayProviderFactory {
 
-	private static class RMStatusDP implements IStatusDisplayProvider {
-		private final RMStatus status;
-
-		public RMStatusDP(RMStatus status) {
-			this.status = status;
-		}
-
-		public Image getImage() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		public String getText() {
-			return status.toString();
-		}
-	}
-
 	private static class RMJobStatusDP implements IStatusDisplayProvider {
+		private static Map ordering;
+
+		static {
+			ordering = new HashMap();
+			ordering.put(RMJobStatus.PENDING, new Integer(0));
+			ordering.put(RMJobStatus.RUNNING, new Integer(1));
+			ordering.put(RMJobStatus.SUSPENDED, new Integer(2));
+			ordering.put(RMJobStatus.DONE, new Integer(3));
+			ordering.put(RMJobStatus.EXIT, new Integer(4));
+			ordering.put(RMJobStatus.UNKNOWN, new Integer(5));
+		}
+
+		public static IStatusDisplayProvider[] getAll() {
+			final Collection allStatuses = ordering.keySet();
+			final ArrayList sdps = new ArrayList(
+					allStatuses.size());
+			for (Iterator ait = allStatuses.iterator(); ait.hasNext();) {
+				sdps.add(make((RMJobStatus) ait.next()));
+			}
+			return (IStatusDisplayProvider[]) sdps.toArray(new IStatusDisplayProvider[0]);
+		}
+
 		private final RMJobStatus status;
 
 		public RMJobStatusDP(RMJobStatus status) {
 			this.status = status;
 		}
 
+		public int compareTo(Object arg0) {
+			final RMJobStatusDP other = (RMJobStatusDP) arg0;
+			Comparable orderThis = (Comparable) ordering.get(status);
+			Comparable orderOther = (Comparable) ordering.get(other.status);
+			return orderThis.compareTo(orderOther);
+		}
+
 		public Image getImage() {
 			// TODO Auto-generated method stub
 			return null;
@@ -58,12 +76,78 @@ public class StatusDisplayProviderFactory {
 		}
 	}
 
-	public static IStatusDisplayProvider create(RMStatus status) {
-		return new RMStatusDP(status);
+	private static class RMStatusDP implements IStatusDisplayProvider {
+		private static Map ordering;
+
+		static {
+			ordering = new HashMap();
+			ordering.put(RMStatus.OK, new Integer(0));
+			ordering.put(RMStatus.ALLOCATED_OTHER, new Integer(1));
+			ordering.put(RMStatus.UNAVAILABLE, new Integer(2));
+			ordering.put(RMStatus.DOWN, new Integer(3));
+			ordering.put(RMStatus.UNKNOWN, new Integer(4));
+		}
+
+		public static IStatusDisplayProvider[] getAll() {
+			final Collection allStatuses = ordering.keySet();
+			final ArrayList sdps = new ArrayList(
+					allStatuses.size());
+			for (Iterator ait = allStatuses.iterator(); ait.hasNext();) {
+				sdps.add(make((RMStatus) ait.next()));
+			}
+			return (IStatusDisplayProvider[]) sdps.toArray(new IStatusDisplayProvider[0]);
+		}
+
+		private final RMStatus status;
+
+		public RMStatusDP(RMStatus status) {
+			this.status = status;
+		}
+
+		public int compareTo(Object arg0) {
+			final RMStatusDP other = (RMStatusDP) arg0;
+			Comparable orderThis = (Comparable) ordering.get(status);
+			Comparable orderOther = (Comparable) ordering.get(other.status);
+			return orderThis.compareTo(orderOther);
+		}
+
+		public Image getImage() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public String getText() {
+			return status.toString();
+		}
 	}
 
-	public static IStatusDisplayProvider create(RMJobStatus status) {
-		return new RMJobStatusDP(status);
+	private static final Map statuses = new HashMap();
+
+	public static IStatusDisplayProvider[] getAll(RMJobStatus status) {
+		return RMJobStatusDP.getAll();
 	}
 
+	public static IStatusDisplayProvider[] getAll(RMStatus status) {
+		return RMStatusDP.getAll();
+	}
+
+	public static IStatusDisplayProvider make(RMJobStatus status) {
+		if (statuses.containsKey(status)) {
+			return (IStatusDisplayProvider) statuses.get(status);
+		} else {
+			final RMJobStatusDP statusDisplay = new RMJobStatusDP(status);
+			statuses.put(status, statusDisplay);
+			return statusDisplay;
+		}
+	}
+
+	public static IStatusDisplayProvider make(RMStatus status) {
+		if (statuses.containsKey(status)) {
+			return (IStatusDisplayProvider) statuses.get(status);
+		} else {
+			final RMStatusDP statusDisplay = new RMStatusDP(status);
+			statuses.put(status, statusDisplay);
+			return statusDisplay;
+		}
+	}
 }

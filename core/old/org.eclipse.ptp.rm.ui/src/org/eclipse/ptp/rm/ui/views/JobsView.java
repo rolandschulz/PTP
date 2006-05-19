@@ -26,6 +26,7 @@ import org.eclipse.ptp.internal.rm.ui.views.StatusDisplayProviderFactory;
 import org.eclipse.ptp.rm.core.IRMElement;
 import org.eclipse.ptp.rm.core.IRMJob;
 import org.eclipse.ptp.rm.core.IRMResourceManager;
+import org.eclipse.ptp.rm.core.RMJobStatus;
 import org.eclipse.ptp.rm.core.attributes.IAttrDesc;
 import org.eclipse.ptp.rm.core.events.IRMResourceManagerListener;
 import org.eclipse.ptp.rm.core.events.RMJobsChangedEvent;
@@ -40,6 +41,10 @@ public class JobsView extends AbstractElementsView {
 	 * 
 	 */
 	private static class ElementsProvider implements IRMElementsProvider {
+
+		public IStatusDisplayProvider[] getAllStatuses() {
+			return StatusDisplayProviderFactory.getAll((RMJobStatus)null);
+		}
 
 		/*
 		 * (non-Javadoc)
@@ -74,7 +79,7 @@ public class JobsView extends AbstractElementsView {
 		 * @see org.eclipse.ptp.internal.rm.ui.views.IRMElementsProvider#getStatus(org.eclipse.ptp.rm.core.IRMElement)
 		 */
 		public IStatusDisplayProvider getStatus(IRMElement element) {
-			return StatusDisplayProviderFactory.create(((IRMJob) element)
+			return StatusDisplayProviderFactory.make(((IRMJob) element)
 					.getStatus());
 		}
 
@@ -101,7 +106,8 @@ public class JobsView extends AbstractElementsView {
 			switch (event.getType()) {
 			case RMResourceManagerEvent.MODIFIED:
 				elementsModified(event.getJobs(), event
-						.getModifiedAttributeDescriptions());
+						.getModifiedAttributeDescriptions(), event
+						.isStatusChanged());
 				break;
 			case RMResourceManagerEvent.ADDED:
 				elementsAdded(event.getJobs());

@@ -35,9 +35,10 @@ public class RMMachinesChangedEvent extends RMResourceManagerEvent {
 
 	private IRMMachine[] machines;
 
-	public RMMachinesChangedEvent(IRMMachine[] machines, IAttrDesc[] modifiedAttributes,
+	public RMMachinesChangedEvent(IRMMachine[] machines,
+			IAttrDesc[] modifiedAttributes, boolean statusChanged,
 			IRMResourceManager manager, int type) {
-		super(modifiedAttributes, manager, type);
+		super(modifiedAttributes, statusChanged, manager, type);
 		this.machines = (IRMMachine[]) machines.clone();
 	}
 

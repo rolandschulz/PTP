@@ -20,7 +20,9 @@ package org.eclipse.ptp.internal.rm.ui.views;
 
 import org.eclipse.swt.graphics.Image;
 
-public interface IStatusDisplayProvider {
+public interface IStatusDisplayProvider extends Comparable {
+
+	public static final String STATUS_CHANGED_PROPERTY = "ELEMENT_STATUS_CHANGED";
 
 	Image getImage();
 

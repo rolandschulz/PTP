@@ -48,16 +48,22 @@ public abstract class RMResourceManagerEvent {
 
 	private int type;
 
-	protected final IAttrDesc[] modifiedAttributeDescriptions;
+	private final IAttrDesc[] modifiedAttributeDescriptions;
+
+	private final boolean statusChanged;
 
 	public RMResourceManagerEvent(IAttrDesc[] modifiedAttributes,
-			IRMResourceManager manager, int type) {
+			boolean statusChanged, IRMResourceManager manager, int type) {
 		resourceManager = manager;
 		this.modifiedAttributeDescriptions = (IAttrDesc[]) (modifiedAttributes == null ? null
 				: modifiedAttributes.clone());
+		this.statusChanged = statusChanged;
 		this.type = type;
 	}
 
+	/**
+	 * @return what the set of modified attributes' descriptions are
+	 */
 	public IAttrDesc[] getModifiedAttributeDescriptions() {
 		return (IAttrDesc[]) (modifiedAttributeDescriptions == null ? null
 				: modifiedAttributeDescriptions.clone());
@@ -78,5 +84,12 @@ public abstract class RMResourceManagerEvent {
 	 */
 	public int getType() {
 		return type;
+	}
+
+	/**
+	 * @return whether the element's status has changed
+	 */
+	public boolean isStatusChanged() {
+		return statusChanged;
 	}
 }

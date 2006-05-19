@@ -31,4 +31,11 @@ public interface IRMJob extends IRMElement {
 	 * @return the job's status
 	 */
 	RMJobStatus getStatus();
+
+	/**
+	 * set the node's status
+	 * 
+	 * @param status
+	 */
+	void setStatus(RMJobStatus status);
 }

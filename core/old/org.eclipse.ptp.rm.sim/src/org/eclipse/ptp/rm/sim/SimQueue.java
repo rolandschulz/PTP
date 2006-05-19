@@ -42,4 +42,8 @@ public class SimQueue extends AbstractSimElement implements IRMQueue {
 		return status;
 	}
 
+	public void setStatus(RMStatus status) {
+		this.status = status;
+	}
+
 }

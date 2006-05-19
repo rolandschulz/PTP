@@ -26,6 +26,7 @@ import org.eclipse.ptp.internal.rm.ui.views.StatusDisplayProviderFactory;
 import org.eclipse.ptp.rm.core.IRMElement;
 import org.eclipse.ptp.rm.core.IRMNode;
 import org.eclipse.ptp.rm.core.IRMResourceManager;
+import org.eclipse.ptp.rm.core.RMStatus;
 import org.eclipse.ptp.rm.core.attributes.IAttrDesc;
 import org.eclipse.ptp.rm.core.events.IRMResourceManagerListener;
 import org.eclipse.ptp.rm.core.events.RMNodesChangedEvent;
@@ -40,6 +41,10 @@ public class NodesView extends AbstractElementsView {
 	 * 
 	 */
 	private static class ElementsProvider implements IRMElementsProvider {
+
+		public IStatusDisplayProvider[] getAllStatuses() {
+			return StatusDisplayProviderFactory.getAll((RMStatus)null);
+		}
 
 		/*
 		 * (non-Javadoc)
@@ -69,8 +74,7 @@ public class NodesView extends AbstractElementsView {
 		}
 
 		public IStatusDisplayProvider getStatus(IRMElement element) {
-			return StatusDisplayProviderFactory.create(((IRMNode) element)
-					.getStatus());
+			return StatusDisplayProviderFactory.make(((IRMNode) element).getStatus());
 		}
 
 		/*
@@ -94,8 +98,9 @@ public class NodesView extends AbstractElementsView {
 		public void nodesChanged(RMNodesChangedEvent event) {
 			switch (event.getType()) {
 			case RMResourceManagerEvent.MODIFIED:
-				elementsModified(event.getNodes(), event
-						.getModifiedAttributeDescriptions());
+				elementsModified(event.getNodes(),
+						event.getModifiedAttributeDescriptions(),
+						event.isStatusChanged());
 				break;
 			case RMResourceManagerEvent.ADDED:
 				elementsAdded(event.getNodes());

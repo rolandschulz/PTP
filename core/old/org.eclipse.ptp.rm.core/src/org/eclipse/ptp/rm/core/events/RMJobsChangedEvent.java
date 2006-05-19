@@ -36,8 +36,8 @@ public class RMJobsChangedEvent extends RMResourceManagerEvent {
 	private IRMJob[] jobs;
 
 	public RMJobsChangedEvent(IRMJob[] jobs, IAttrDesc[] modifiedAttributes,
-			IRMResourceManager manager, int type) {
-		super(modifiedAttributes, manager, type);
+			boolean statusChanged, IRMResourceManager manager, int type) {
+		super(modifiedAttributes, statusChanged, manager, type);
 		this.jobs = (IRMJob[]) jobs.clone();
 	}
 

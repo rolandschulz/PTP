@@ -22,7 +22,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
+import org.eclipse.ptp.rm.core.IRMJob;
+import org.eclipse.ptp.rm.core.IRMMachine;
 import org.eclipse.ptp.rm.core.IRMNode;
+import org.eclipse.ptp.rm.core.IRMQueue;
 import org.eclipse.ptp.rm.core.IRMResourceManager;
 import org.eclipse.ptp.rm.core.attributes.IAttrDesc;
 
@@ -59,10 +62,42 @@ public class ResourceManagerListenerList {
 		}
 	}
 
+	public synchronized void fireJobsChanged(IRMJob[] jobs,
+			IAttrDesc[] modifiedAttributes, boolean statusChanged, int type) {
+		RMJobsChangedEvent event = new RMJobsChangedEvent(jobs,
+				modifiedAttributes, statusChanged, manager, type);
+		List listeners = new ArrayList(this.listeners);
+		for (ListIterator lit = listeners.listIterator(); lit.hasNext();) {
+			IRMResourceManagerListener rmlistener = (IRMResourceManagerListener) lit
+					.next();
+			rmlistener.jobsChanged(event);
+		}
+	}
+
+	public void fireJobsChanged(IRMJob[] jobs, int type) {
+		fireJobsChanged(jobs, null, false, type);
+	}
+
+	public synchronized void fireMachinesChanged(IRMMachine[] machines,
+			IAttrDesc[] modifiedAttributes, boolean statusChanged, int type) {
+		RMMachinesChangedEvent event = new RMMachinesChangedEvent(machines,
+				modifiedAttributes, statusChanged, manager, type);
+		List listeners = new ArrayList(this.listeners);
+		for (ListIterator lit = listeners.listIterator(); lit.hasNext();) {
+			IRMResourceManagerListener rmlistener = (IRMResourceManagerListener) lit
+					.next();
+			rmlistener.machinesChanged(event);
+		}
+	}
+
+	public void fireMachinesChanged(IRMMachine[] machines, int type) {
+		fireMachinesChanged(machines, null, false, type);
+	}
+
 	public synchronized void fireNodesChanged(IRMNode[] nodes,
-			IAttrDesc[] modifiedAttributes, int type) {
+			IAttrDesc[] modifiedAttributes, boolean statusChanged, int type) {
 		RMNodesChangedEvent event = new RMNodesChangedEvent(nodes,
-				modifiedAttributes, manager, type);
+				modifiedAttributes, statusChanged, manager, type);
 		List listeners = new ArrayList(this.listeners);
 		for (ListIterator lit = listeners.listIterator(); lit.hasNext();) {
 			IRMResourceManagerListener rmlistener = (IRMResourceManagerListener) lit
@@ -72,7 +107,23 @@ public class ResourceManagerListenerList {
 	}
 
 	public void fireNodesChanged(IRMNode[] nodes, int type) {
-		fireNodesChanged(nodes, null, type);
+		fireNodesChanged(nodes, null, false, type);
+	}
+
+	public synchronized void fireQueuesChanged(IRMQueue[] queues,
+			IAttrDesc[] modifiedAttributes, boolean statusChanged, int type) {
+		RMQueuesChangedEvent event = new RMQueuesChangedEvent(queues,
+				modifiedAttributes, statusChanged, manager, type);
+		List listeners = new ArrayList(this.listeners);
+		for (ListIterator lit = listeners.listIterator(); lit.hasNext();) {
+			IRMResourceManagerListener rmlistener = (IRMResourceManagerListener) lit
+					.next();
+			rmlistener.queuesChanged(event);
+		}
+	}
+
+	public void fireQueuesChanged(IRMQueue[] queues, int type) {
+		fireQueuesChanged(queues, null, false, type);
 	}
 
 	public synchronized void remove(IRMResourceManagerListener listener) {

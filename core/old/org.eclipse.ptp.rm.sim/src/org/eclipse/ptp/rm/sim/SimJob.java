@@ -36,4 +36,8 @@ public class SimJob extends AbstractSimElement implements IRMJob {
 		return status;
 	}
 
+	public void setStatus(RMJobStatus status) {
+		this.status = status;
+	}
+
 }

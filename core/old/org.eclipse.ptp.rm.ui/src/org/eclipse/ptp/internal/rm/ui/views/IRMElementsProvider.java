@@ -63,4 +63,9 @@ public interface IRMElementsProvider {
 	 */
 	public abstract IStatusDisplayProvider getStatus(IRMElement element);
 
+	/**
+	 * @return all of the possible statuses that may be displayed.
+	 */
+	public abstract IStatusDisplayProvider[] getAllStatuses();
+
 }

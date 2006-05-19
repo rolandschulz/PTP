@@ -65,7 +65,7 @@ public class SimResourceManager implements IRMResourceManager {
 						if (numExtraNodes % 100 == 1)
 							Thread.sleep(5000);
 						else
-							Thread.sleep(1000);
+							Thread.sleep(10000);
 					}
 				} catch (InterruptedException e) {
 					System.out.println("updater interupted");
@@ -160,9 +160,7 @@ public class SimResourceManager implements IRMResourceManager {
 	public synchronized IAttrDesc[] getQueueAttrDescs() {
 		final List descs = new ArrayList();
 		descs.add(new IntAttrDesc("PRIO", "Priority"));
-		descs
-				.add(new StringAttrDesc("State",
-						"The detailed Status information"));
+		descs.add(new StringAttrDesc("State", "The detailed Status information"));
 		descs.add(new IntAttrDesc("NJOBS", "The number of jobs"));
 		descs.add(new IntAttrDesc("PEND", "The number of pending jobs"));
 		descs.add(new IntAttrDesc("RUN", "The number of pending jobs"));
@@ -190,22 +188,31 @@ public class SimResourceManager implements IRMResourceManager {
 	private synchronized void modifyFirstNode() {
 		IRMNode node = getAllNodes()[0];
 		final IAttrDesc attrDesc = getNodeAttrDescs()[1];
-		final int nodeVal = numExtraNodes; 
+		final int nodeVal = numExtraNodes;
 		System.out.println("modifyFirstNode: " + nodeVal);
 		final IAttribute attr = attrDesc.createAttribute(Integer.toString(nodeVal));
 		node.setAttribute(attrDesc, attr);
-		listeners.fireNodesChanged(new IRMNode[] { node }, new IAttrDesc[]{attrDesc},
+		final RMStatus oldStatus = node.getStatus();
+		if (numExtraNodes % 3 == 0) {
+			node.setStatus(RMStatus.ALLOCATED_OTHER);
+		} else {
+			node.setStatus(RMStatus.OK);
+		}
+		final boolean statusChanged = !oldStatus.equals(node.getStatus());
+		listeners.fireNodesChanged(new IRMNode[] { node },
+				new IAttrDesc[] { attrDesc }, statusChanged,
 				RMResourceManagerEvent.MODIFIED);
 	}
 
 	private synchronized void incrementNumExtraNodes() {
 		++numExtraNodes;
+		if (numExtraNodes > 6)
+			return;
 		System.out.println("incrementNumExtraNodes: " + numExtraNodes);
 		final IAttrDesc[] descs = getNodeAttrDescs();
 		final IAttribute[] attrs = new IAttribute[descs.length];
 		attrs[0] = descs[0].createAttribute("Zippo" + numExtraNodes);
-		attrs[1] = descs[1].createAttribute(Integer
-				.toString(numExtraNodes * 10));
+		attrs[1] = descs[1].createAttribute(Integer.toString(numExtraNodes * 10));
 		attrs[2] = descs[2].createAttribute(new String[] { "mem4", "rms", "cs",
 				"qa" });
 		final SimNode node = new SimNode(numExtraNodes, "qx" + numExtraNodes,
