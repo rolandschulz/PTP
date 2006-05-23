@@ -26,6 +26,7 @@ import java.util.Map;
 
 import org.eclipse.ptp.rm.core.RMJobStatus;
 import org.eclipse.ptp.rm.core.RMStatus;
+import org.eclipse.ptp.rm.ui.RMUiPlugin;
 import org.eclipse.swt.graphics.Image;
 
 public class StatusDisplayProviderFactory {
@@ -78,6 +79,7 @@ public class StatusDisplayProviderFactory {
 
 	private static class RMStatusDP implements IStatusDisplayProvider {
 		private static Map ordering;
+		private static Map iconNames;
 
 		static {
 			ordering = new HashMap();
@@ -86,6 +88,12 @@ public class StatusDisplayProviderFactory {
 			ordering.put(RMStatus.UNAVAILABLE, new Integer(2));
 			ordering.put(RMStatus.DOWN, new Integer(3));
 			ordering.put(RMStatus.UNKNOWN, new Integer(4));
+			iconNames = new HashMap();
+			iconNames.put(RMStatus.OK, createImage("node_up.gif"));
+			iconNames.put(RMStatus.ALLOCATED_OTHER, createImage("node_alloc_other.gif"));
+			iconNames.put(RMStatus.UNAVAILABLE, createImage("node_unavailable.gif"));
+			iconNames.put(RMStatus.DOWN, createImage("node_down.gif"));
+			iconNames.put(RMStatus.UNKNOWN, createImage("node_unknown.gif"));
 		}
 
 		public static IStatusDisplayProvider[] getAll() {
@@ -112,8 +120,7 @@ public class StatusDisplayProviderFactory {
 		}
 
 		public Image getImage() {
-			// TODO Auto-generated method stub
-			return null;
+			return (Image) iconNames.get(status); 
 		}
 
 		public String getText() {
@@ -125,6 +132,10 @@ public class StatusDisplayProviderFactory {
 
 	public static IStatusDisplayProvider[] getAll(RMJobStatus status) {
 		return RMJobStatusDP.getAll();
+	}
+
+	public static Image createImage(String path) {
+		return RMUiPlugin.getImageDescriptor("icons/statuses/" + path).createImage();
 	}
 
 	public static IStatusDisplayProvider[] getAll(RMStatus status) {
