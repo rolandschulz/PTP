@@ -58,23 +58,6 @@ public interface IPNode extends IPElement {
 	 * @return Array of Jobs that have Processes running on this Node.
 	 */
 	public IPJob[] getJobs();
-	/**
-	 * Sets an attribute on a Node with a key-value pair. If the key already exists the new value overwrites the old one.
-	 * 
-	 * @param key
-	 *            The attribute key String
-	 * @param val
-	 *            The value to associate with <code>key</code>
-	 */
-	public void setAttrib(String key, Object val);
-	/**
-	 * Attempts to find an attribute on this Node by the given <code>key</code> and returns the associated value. If no key is found, <code>null</code> is returned.
-	 * 
-	 * @param key
-	 *            The attribute key to search for
-	 * @return The value assocaited with <code>key</code> or <code>null</code> if not found
-	 */
-	public Object getAttrib(String key);
 	public void fireEvent(INodeEvent event);
 	public void addNodeListener(INodeListener listener);
 	public void removerNodeListener(INodeListener listener);

@@ -19,7 +19,6 @@
 package org.eclipse.ptp.internal.core;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -34,13 +33,11 @@ import org.eclipse.ptp.core.IPProcess;
 
 public class PNode extends Parent implements IPNode {
 	protected String NAME_TAG = "node ";
-	protected Map attribs = null;
 	protected List listeners = new ArrayList();
 
 	public PNode(IPElement mac, String name, String key, int nodeNumber) {
 		super(mac, name, key, P_NODE);
-		attribs = new HashMap(0);
-		attribs.put(AttributeConstants.ATTRIB_NODE_NUMBER, new Integer(nodeNumber));
+		this.setAttribute(AttributeConstants.ATTRIB_NODE_NUMBER, new Integer(nodeNumber));
 	}
 	public IPMachine getMachine() {
 		IPElement current = this;
@@ -51,11 +48,11 @@ public class PNode extends Parent implements IPNode {
 		return null;
 	}
 	public String getNodeNumber() {
-		return ""+((Integer) attribs.get(AttributeConstants.ATTRIB_NODE_NUMBER)).intValue()+"";
+		return ""+((Integer) this.getAttribute(AttributeConstants.ATTRIB_NODE_NUMBER)).intValue()+"";
 	}
 	public int getNodeNumberInt()
 	{
-		return ((Integer) attribs.get(AttributeConstants.ATTRIB_NODE_NUMBER)).intValue();
+		return ((Integer) this.getAttribute(AttributeConstants.ATTRIB_NODE_NUMBER)).intValue();
 	}
 	public IPProcess[] getProcesses() {
 		return (IPProcess[]) getCollection().toArray(new IPProcess[size()]);
@@ -70,19 +67,6 @@ public class PNode extends Parent implements IPNode {
 		if (element != null)
 			return (IPProcess) element;
 		return null;
-	}
-	/*
-	 * public String getElementName() { return NAME_TAG + getKey(); }
-	 */
-	public void setAttrib(String key, Object val) {
-		if (attribs.containsKey(key))
-			attribs.remove(key);
-		attribs.put(key, val);
-	}
-	public Object getAttrib(String key) {
-		if (!attribs.containsKey(key))
-			return null;
-		return attribs.get(key);
 	}
 	/*
 	 * returns a list of jobs that are running on this node - does this by looking at the processes running on this node and seeing which jobs they are part of

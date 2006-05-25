@@ -121,7 +121,7 @@ public class PUniverse extends Parent implements IPUniverse {
 			if (ob instanceof IPMachine) {
 				IPNode nodes[] = ((IPMachine)ob).getNodes();
 				for(int i=0; i<nodes.length; i++) {
-					String aname = (String)nodes[i].getAttrib(AttributeConstants.ATTRIB_NODE_NAME);
+					String aname = (String)nodes[i].getAttribute(AttributeConstants.ATTRIB_NODE_NAME);
 					if(aname.equals(nname)) return nodes[i];
 					
 					/* what if the name is something like 'foo.bar.com' and later we just get 'foo' out of

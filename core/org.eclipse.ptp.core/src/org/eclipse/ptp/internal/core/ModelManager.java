@@ -311,40 +311,40 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 						nodename = attribs[(j * num_attribs)];
 					}
 					PNode node = new PNode(mac, ne2[j], "" + j + "", j);
-					node.setAttrib(AttributeConstants.ATTRIB_NODE_NAME, nodename);
-					System.out.println("NodeName According to ORTE = '"+node.getAttrib(AttributeConstants.ATTRIB_NODE_NAME)+"'");
+					node.setAttribute(AttributeConstants.ATTRIB_NODE_NAME, nodename);
+					System.out.println("NodeName According to ORTE = '"+node.getAttribute(AttributeConstants.ATTRIB_NODE_NAME)+"'");
 					System.out.println("\t#attribs returned: "+attribs.length);
 					
 					if(attribs.length > (j * num_attribs) + 1) {
-						node.setAttrib(AttributeConstants.ATTRIB_NODE_USER,
+						node.setAttribute(AttributeConstants.ATTRIB_NODE_USER,
 								attribs[(j * num_attribs) + 1]);
 					}
 					else {
-						node.setAttrib(AttributeConstants.ATTRIB_NODE_USER, "UNKNOWN");
+						node.setAttribute(AttributeConstants.ATTRIB_NODE_USER, "UNKNOWN");
 					}
 					
 					if(attribs.length > (j * num_attribs) + 2) {
-						node.setAttrib(AttributeConstants.ATTRIB_NODE_GROUP,
+						node.setAttribute(AttributeConstants.ATTRIB_NODE_GROUP,
 								attribs[(j * num_attribs) + 2]);
 					}
 					else {
-						node.setAttrib(AttributeConstants.ATTRIB_NODE_GROUP, "UNKNOWN");
+						node.setAttribute(AttributeConstants.ATTRIB_NODE_GROUP, "UNKNOWN");
 					}
 					
 					if(attribs.length > (j * num_attribs) + 3) {
-						node.setAttrib(AttributeConstants.ATTRIB_NODE_STATE,
+						node.setAttribute(AttributeConstants.ATTRIB_NODE_STATE,
 							attribs[(j * num_attribs) + 3]);
 					}
 					else {
-						node.setAttrib(AttributeConstants.ATTRIB_NODE_STATE, "up");
+						node.setAttribute(AttributeConstants.ATTRIB_NODE_STATE, "up");
 					}
 					
 					if(attribs.length > (j * num_attribs) + 4) {
-						node.setAttrib(AttributeConstants.ATTRIB_NODE_MODE,
+						node.setAttribute(AttributeConstants.ATTRIB_NODE_MODE,
 							attribs[(j * num_attribs) + 4]);
 					}
 					else {
-						node.setAttrib(AttributeConstants.ATTRIB_NODE_MODE, "73");
+						node.setAttribute(AttributeConstants.ATTRIB_NODE_MODE, "73");
 					}					
 					mac.addChild(node);
 					subMonitor.worked(1);
@@ -357,15 +357,15 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 					}
 					//System.out.println("node "+j);
 					PNode node = new PNode(mac, ne2[j], ""+j+"", j);
-					node.setAttrib(AttributeConstants.ATTRIB_NODE_NAME, 
+					node.setAttribute(AttributeConstants.ATTRIB_NODE_NAME, 
 							monitoringSystem.getNodeAttributes(node, new String[] {AttributeConstants.ATTRIB_NODE_NAME})[0]);
-					node.setAttrib(AttributeConstants.ATTRIB_NODE_USER, 
+					node.setAttribute(AttributeConstants.ATTRIB_NODE_USER, 
 							monitoringSystem.getNodeAttributes(node, new String[] {AttributeConstants.ATTRIB_NODE_USER})[0]);
-					node.setAttrib(AttributeConstants.ATTRIB_NODE_GROUP, 
+					node.setAttribute(AttributeConstants.ATTRIB_NODE_GROUP, 
 							monitoringSystem.getNodeAttributes(node, new String[] {AttributeConstants.ATTRIB_NODE_GROUP})[0]);
-					node.setAttrib(AttributeConstants.ATTRIB_NODE_STATE, 
+					node.setAttribute(AttributeConstants.ATTRIB_NODE_STATE, 
 							monitoringSystem.getNodeAttributes(node, new String[] {AttributeConstants.ATTRIB_NODE_STATE})[0]);
-					node.setAttrib(AttributeConstants.ATTRIB_NODE_MODE, 
+					node.setAttribute(AttributeConstants.ATTRIB_NODE_MODE, 
 							monitoringSystem.getNodeAttributes(node, new String[] {AttributeConstants.ATTRIB_NODE_MODE})[0]);
 					
 					mac.addChild(node);
@@ -517,9 +517,9 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		System.out.println("ModelManager.runtimeNodeGeneralName - node '"+ne+", key='"+key+"', value='"+value+"'");
 		IPNode n = universe.findNodeByName(ne);
 		if(n != null) {
-			System.out.print("\t before, val = "+n.getAttrib(key));
-			n.setAttrib(key, value);
-			System.out.println("\t after, val = "+n.getAttrib(key));
+			System.out.print("\t before, val = "+n.getAttribute(key));
+			n.setAttribute(key, value);
+			System.out.println("\t after, val = "+n.getAttribute(key));
 			fireEvent(n, EVENT_SYS_STATUS_CHANGE);
 		}
 	}
@@ -529,7 +529,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		IPNode n = universe.findNodeByName(ne);
 		if (n != null) {
 			try {
-				n.setAttrib(AttributeConstants.ATTRIB_NODE_STATE, monitoringSystem.getNodeAttributes(n, new String[] {AttributeConstants.ATTRIB_NODE_STATE}));
+				n.setAttribute(AttributeConstants.ATTRIB_NODE_STATE, monitoringSystem.getNodeAttributes(n, new String[] {AttributeConstants.ATTRIB_NODE_STATE}));
 				fireEvent(n, EVENT_SYS_STATUS_CHANGE);
 			} catch(CoreException e) {
 				PTPCorePlugin.errorDialog("Fatal PTP Monitoring System Error",
