@@ -19,6 +19,12 @@
 package org.eclipse.ptp.core;
 
 public interface IPNode extends IPElement {
+	/* node state attribute values */
+	public static final String NODE_STATE_UP = "up";
+	public static final String NODE_STATE_DOWN = "down";
+	public static final String NODE_STATE_ERROR = "error";
+	public static final String NODE_STATE_UNKNOWN = "unknown";
+
 	/**
 	 * Returns an array of all the Processes residing on this Node. May return <code>null</code> if there are none.
 	 * 
