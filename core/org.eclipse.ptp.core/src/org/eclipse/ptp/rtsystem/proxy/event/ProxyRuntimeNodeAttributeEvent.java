@@ -38,6 +38,6 @@ public class ProxyRuntimeNodeAttributeEvent extends AbstractProxyRuntimeEvent im
 	}
 	
 	public String toString() {
-		return "EVENT_RUNTIME_PROCATTR " + this.values;
+		return "EVENT_RUNTIME_NODEATTR " + this.values;
 	}
 }
