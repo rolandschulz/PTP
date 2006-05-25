@@ -333,12 +333,11 @@ public class ParallelMachineView extends AbstractParallelSetView {
 		if (node == null) {
 			return;
 		}
-		new TableItem(BLtable, SWT.NULL).setText(new String[] { "Node #", node.getNodeNumber() });
-		new TableItem(BLtable, SWT.NULL).setText(new String[] { "Name", (String) node.getAttribute(AttributeConstants.ATTRIB_NODE_NAME) });
-		new TableItem(BLtable, SWT.NULL).setText(new String[] { "State", (String) node.getAttribute(AttributeConstants.ATTRIB_NODE_STATE) });
-		new TableItem(BLtable, SWT.NULL).setText(new String[] { "User", (String) node.getAttribute(AttributeConstants.ATTRIB_NODE_USER) });
-		new TableItem(BLtable, SWT.NULL).setText(new String[] { "Group", (String) node.getAttribute(AttributeConstants.ATTRIB_NODE_GROUP) });
-		new TableItem(BLtable, SWT.NULL).setText(new String[] { "Mode", (String) node.getAttribute(AttributeConstants.ATTRIB_NODE_MODE) });
+		String[] keys = node.getAttributeKeys();
+		for (int i = 0; i < keys.length; i++) {
+			System.out.println("key="+keys[i]+" val="+node.getAttribute(keys[i]));
+			new TableItem(BLtable, SWT.NULL).setText(new String[] { keys[i], node.getAttribute(keys[i]).toString() });
+		}
 		IPProcess procs[] = node.getSortedProcesses();
 		if (procs != null) {
 			TableItem item = null;
