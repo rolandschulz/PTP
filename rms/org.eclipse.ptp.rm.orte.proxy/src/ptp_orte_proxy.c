@@ -74,28 +74,49 @@
 #define DEFAULT_PROXY			"tcp"
 #define DEFAULT_ORTED_ARGS	"orted --scope public --seed --persistent"
 
-#define RTEV_OFFSET				200
-#define RTEV_OK					RTEV_OFFSET + 0
-#define RTEV_ERROR				RTEV_OFFSET + 1
-#define RTEV_JOBSTATE				RTEV_OFFSET + 2
-#define RTEV_PROCS				RTEV_OFFSET + 4
-#define RTEV_PATTR				RTEV_OFFSET + 5
-#define RTEV_NODES				RTEV_OFFSET + 7
-#define RTEV_NATTR				RTEV_OFFSET + 8
-#define RTEV_NEWJOB				RTEV_OFFSET + 12
-#define RTEV_PROCOUT				RTEV_OFFSET + 13
-#define RTEV_NODECHANGE			RTEV_OFFSET + 14
+/*
+ * RTEV codes must EXACTLY match org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEvent
+ */
+#define RTEV_OFFSET						200
+#define RTEV_OK							RTEV_OFFSET + 0
+#define RTEV_ERROR						RTEV_OFFSET + 1
+#define RTEV_JOBSTATE					RTEV_OFFSET + 2
+#define RTEV_PROCS						RTEV_OFFSET + 4
+#define RTEV_PATTR						RTEV_OFFSET + 5
+#define RTEV_NODES						RTEV_OFFSET + 7
+#define RTEV_NATTR						RTEV_OFFSET + 8
+#define RTEV_NEWJOB						RTEV_OFFSET + 12
+#define RTEV_PROCOUT					RTEV_OFFSET + 13
+#define RTEV_NODECHANGE					RTEV_OFFSET + 14
 
-#define RTEV_ERROR_ORTE_INIT		RTEV_OFFSET + 1000
-#define RTEV_ERROR_ORTE_FINALIZE	RTEV_OFFSET + 1001
-#define RTEV_ERROR_ORTE_RUN		RTEV_OFFSET + 1002
-#define RTEV_ERROR_TERMINATE_JOB	RTEV_OFFSET + 1003
-#define RTEV_ERROR_PATTR			RTEV_OFFSET + 1004
-#define RTEV_ERROR_PROCS			RTEV_OFFSET + 1005
-#define RTEV_ERROR_NODES			RTEV_OFFSET + 1006
-#define RTEV_ERROR_NATTR			RTEV_OFFSET + 1007
+/*
+ * RTEV_ERROR codes are used internally in the ORTE specific plugin
+ */
+#define RTEV_ERROR_ORTE_INIT			RTEV_OFFSET + 1000
+#define RTEV_ERROR_ORTE_FINALIZE		RTEV_OFFSET + 1001
+#define RTEV_ERROR_ORTE_RUN				RTEV_OFFSET + 1002
+#define RTEV_ERROR_TERMINATE_JOB		RTEV_OFFSET + 1003
+#define RTEV_ERROR_PATTR				RTEV_OFFSET + 1004
+#define RTEV_ERROR_PROCS				RTEV_OFFSET + 1005
+#define RTEV_ERROR_NODES				RTEV_OFFSET + 1006
+#define RTEV_ERROR_NATTR				RTEV_OFFSET + 1007
 #define RTEV_ERROR_ORTE_BPROC_SUBSCRIBE	RTEV_OFFSET + 1008
-#define RTEV_ERROR_SIGNAL			RTEV_OFFSET + 1009
+#define RTEV_ERROR_SIGNAL				RTEV_OFFSET + 1009
+
+/*
+ * Attribute names must EXACTLY match org.eclipse.ptp.core.AttributeConstants
+ */
+#define ATTRIB_NODE_NAME			"Name"
+#define ATTRIB_NODE_NUMBER			"Number"
+#define ATTRIB_NODE_STATE			"State"
+#define ATTRIB_NODE_GROUP			"Group"
+#define ATTRIB_NODE_USER			"User"
+#define ATTRIB_NODE_MODE			"Mode"
+#define ATTRIB_PROCESS_PID			"PID"
+#define ATTRIB_PROCESS_EXIT_CODE	"Exit Code"
+#define ATTRIB_PROCESS_STATUS		"Status"
+#define ATTRIB_PROCESS_SIGNAL		"Signal"
+#define ATTRIB_PROCESS_NODE_NAME	"Node Name"
 
 #define JOB_STATE_NEW				5000
 
@@ -1485,10 +1506,10 @@ ORTEGetProcessAttribute(char **args)
 	
 	/* go through the args now, set up the key array */
 	for(i=3; i<last_arg; i++) {
-		if(!strcmp(args[i], "ATTRIB_PROCESS_PID")) {
+		if(!strcmp(args[i], ATTRIB_PROCESS_PID)) {
 			asprintf(&(keys[i-3]), "%s", ORTE_PROC_PID_KEY);
 			types[i-3] = PTP_UINT32;
-		} else if(!strcmp(args[i], "ATTRIB_PROCESS_NODE_NAME")) {
+		} else if(!strcmp(args[i], ATTRIB_PROCESS_NODE_NAME)) {
 			asprintf(&(keys[i-3]), "%s", ORTE_NODE_NAME_KEY);
 			types[i-3] = PTP_STRING;
 		} else {
@@ -1800,22 +1821,22 @@ ORTEGetNodeAttribute(char **args)
 	
 	/* go through the args now, set up the key array */
 	for(i=3; i<last_arg; i++) {
-		if(!strcmp(args[i], "ATTRIB_NODE_NAME")) {
+		if(!strcmp(args[i], ATTRIB_NODE_NAME)) {
 			asprintf(&(keys[i-3]), "%s", "orte-node-name");
 			types[i-3] = PTP_STRING;
 			default_needed++;
-		} else if(!strcmp(args[i], "ATTRIB_NODE_USER")) {
+		} else if(!strcmp(args[i], ATTRIB_NODE_USER)) {
 			asprintf(&(keys[i-3]), "%s", "orte-node-bproc-user");	
 			types[i-3] = PTP_STRING;
 			default_needed++;
-		} else if(!strcmp(args[i], "ATTRIB_NODE_GROUP")) {
+		} else if(!strcmp(args[i], ATTRIB_NODE_GROUP)) {
 			asprintf(&(keys[i-3]), "%s", "orte-node-bproc-group");
 			types[i-3] = PTP_STRING;
 			default_needed++;
-		} else if(!strcmp(args[i], "ATTRIB_NODE_STATE")) {
+		} else if(!strcmp(args[i], ATTRIB_NODE_STATE)) {
 			asprintf(&(keys[i-3]), "%s", "orte-node-bproc-status");
 			types[i-3] = PTP_STRING;
-		} else if(!strcmp(args[i], "ATTRIB_NODE_MODE")) {		
+		} else if(!strcmp(args[i], ATTRIB_NODE_MODE)) {		
 			asprintf(&(keys[i-3]), "%s", "orte-node-bproc-mode");
 			types[i-3] = PTP_UINT32;
 		} else {
