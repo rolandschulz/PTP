@@ -20,6 +20,7 @@ package org.eclipse.ptp.internal.core;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -43,7 +44,7 @@ public class PJob extends Parent implements IPJob {
 	public PJob(IPUniverse uni, String name, String key, int jobNumber) {
 		super(uni, name, key, P_JOB);
 		taskIdMap = new ArrayList();
-		attribs.put(AttributeConstants.ATTRIB_JOBID, new Integer(jobNumber));
+		this.setAttribute(AttributeConstants.ATTRIB_JOBID, new Integer(jobNumber));
 	}
 	
 	public boolean isDebug() {
@@ -72,7 +73,7 @@ public class PJob extends Parent implements IPJob {
 	}
 
 	public String getJobNumber() {
-		return ""+((Integer) attribs.get(AttributeConstants.ATTRIB_JOBID)).intValue()+"";
+		return ""+((Integer) this.getAttribute(AttributeConstants.ATTRIB_JOBID)).intValue()+"";
 		/*
 		int i = getID();
 		System.out.println("get job number - ID = "+i+", offset = "+BASE_OFFSET);
@@ -87,7 +88,7 @@ public class PJob extends Parent implements IPJob {
 	
 	public int getJobNumberInt()
 	{
-		return ((Integer) attribs.get(AttributeConstants.ATTRIB_JOBID)).intValue();
+		return ((Integer) this.getAttribute(AttributeConstants.ATTRIB_JOBID)).intValue();
 	}
 
 	public synchronized IPNode[] getSortedNodes() {
@@ -186,4 +187,17 @@ public class PJob extends Parent implements IPJob {
 		else
 			return findProcess(procNumber);
 	}
+	
+	public Object getAttribute(String key) {
+		return this.getAttribute(AttributeConstants.ATTRIB_CLASS_JOB, key);
+	}
+
+	public void setAttribute(String key, Object o) {
+		this.setAttribute(AttributeConstants.ATTRIB_CLASS_JOB, key, o);
+	}
+	
+	public String[] getAttributeKeys() {
+		return this.getAttributeKeys(AttributeConstants.ATTRIB_CLASS_JOB);
+	}
+
 }

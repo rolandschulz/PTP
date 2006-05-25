@@ -339,11 +339,17 @@ public class SimProcess extends Process implements IPProcess, IPElement, Compara
 			elementInfo = new PElementInfo(this);
 		return elementInfo;
 	}
-	/*
-	 * public String getKey() { return fKey; }
-	 */
 	public Object getAttribute(String key) {
+		return this.getAttribute(AttributeConstants.ATTRIB_CLASS_PROCESS, key);
+	}
+	public Object getAttribute(int attr, String key) {
 		return attribs.get(key);
+	}
+	public String[] getAttributeKeys() {
+		return this.getAttributeKeys(AttributeConstants.ATTRIB_CLASS_PROCESS);
+	}
+	public String[] getAttributeKeys(int attr) {
+		return (String[])attribs.keySet().toArray(new String[0]);
 	}
 	public String getElementName() {
 		// return NAME_TAG + getKey();
@@ -473,6 +479,9 @@ public class SimProcess extends Process implements IPProcess, IPElement, Compara
 		return threads.length;
 	}
 	public void setAttribute(String key, Object o) {
+		this.setAttribute(AttributeConstants.ATTRIB_CLASS_PROCESS, key, o);
+	}
+	public void setAttribute(int attr, String key, Object o) {
 		attribs.put(key, o);
 	}
 }

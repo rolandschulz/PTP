@@ -57,8 +57,8 @@ public class PProcess extends Parent implements IPProcess {
 	public PProcess(IPElement element, String name, String key, String pid, int taskId, String status, String exitCode, String signalName) {
 		super(element, name, key, P_PROCESS);
 		this.pid = pid;
-		attribs.put(AttributeConstants.ATTRIB_TASKID, new Integer(taskId));
-		attribs.put(AttributeConstants.ATTRIB_ISREGISTERED, new Boolean(false));
+		this.setAttribute(AttributeConstants.ATTRIB_TASKID, new Integer(taskId));
+		this.setAttribute(AttributeConstants.ATTRIB_ISREGISTERED, new Boolean(false));
 		this.exitCode = exitCode;
 		this.status = status;
 		setOutputStore();
@@ -164,7 +164,7 @@ public class PProcess extends Parent implements IPProcess {
 		return this.node;
 	}
 	public int getTaskId() {
-		return ((Integer) attribs.get(AttributeConstants.ATTRIB_TASKID)).intValue();
+		return ((Integer) this.getAttribute(AttributeConstants.ATTRIB_TASKID)).intValue();
 	}
 	public void fireEvent(IProcessEvent event) {
 		for (Iterator i=listeners.iterator(); i.hasNext();) {
@@ -181,4 +181,17 @@ public class PProcess extends Parent implements IPProcess {
 		if (listeners.contains(listener))
 			listeners.remove(listener);
 	}
+
+	public Object getAttribute(String key) {
+		return this.getAttribute(AttributeConstants.ATTRIB_CLASS_PROCESS, key);
+	}
+
+	public void setAttribute(String key, Object o) {
+		this.setAttribute(AttributeConstants.ATTRIB_CLASS_PROCESS, key, o);
+	}
+	
+	public String[] getAttributeKeys() {
+		return this.getAttributeKeys(AttributeConstants.ATTRIB_CLASS_PROCESS);
+	}
+
 }

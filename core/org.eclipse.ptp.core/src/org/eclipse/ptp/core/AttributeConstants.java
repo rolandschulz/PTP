@@ -20,6 +20,15 @@ package org.eclipse.ptp.core;
 
 public interface AttributeConstants {
 
+	public static final int ATTRIB_CLASS_ELEMENT = 0;
+	public static final int ATTRIB_CLASS_UNIVERSE = 1;
+	public static final int ATTRIB_CLASS_MACHINE = 2;
+	public static final int ATTRIB_CLASS_NODE = 3;
+	public static final int ATTRIB_CLASS_JOB = 4;
+	public static final int ATTRIB_CLASS_PROCESS = 5;
+	public static final int ATTRIB_CLASS_QUEUE = 6;
+	public static final int NUM_ATTRIB_CLASSES = 7;
+
 	public static final String ATTRIB_MACHINEID = "ATTRIB_MACHINEID";
 	
 	public static final String ATTRIB_JOBID = "ATTRIB_JOBID";

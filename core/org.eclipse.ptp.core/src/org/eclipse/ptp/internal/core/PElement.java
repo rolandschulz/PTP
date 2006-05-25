@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.core;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.ptp.core.AttributeConstants;
@@ -26,18 +27,21 @@ import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.search.ui.ISearchPageScoreComputer;
 
 public abstract class PElement extends PlatformObject implements IPElement, Comparable {
-	protected HashMap attribs = null;
+	protected HashMap[] attribClass = null;
+	protected HashMap elementAttribs = null;
 	
 	protected int ID = -1;
 
 	private PElementInfo elementInfo = null;
 
 	protected PElement(IPElement parent, String name, String key, int type) {
-		attribs = new HashMap();
+		attribClass = new HashMap[AttributeConstants.NUM_ATTRIB_CLASSES];
+		elementAttribs = new HashMap();
 		ID = PTPCorePlugin.getDefault().getNewID();
-		attribs.put(AttributeConstants.ATTRIB_PARENT, parent);
-		attribs.put(AttributeConstants.ATTRIB_NAME, name);
-		attribs.put(AttributeConstants.ATTRIB_TYPE, new Integer(type));
+		elementAttribs.put(AttributeConstants.ATTRIB_PARENT, parent);
+		elementAttribs.put(AttributeConstants.ATTRIB_NAME, name);
+		elementAttribs.put(AttributeConstants.ATTRIB_TYPE, new Integer(type));
+		attribClass[AttributeConstants.ATTRIB_CLASS_ELEMENT] = elementAttribs;
 	}
 
 	protected PElementInfo getElementInfo() {
@@ -46,21 +50,37 @@ public abstract class PElement extends PlatformObject implements IPElement, Comp
 		return elementInfo;
 	}
 
-	/*
-	 * public String getKey() { return fKey; }
-	 */
-
-	public Object getAttribute(String key) {
+	public Object getAttribute(int attr_class, String key) {
+		if (attr_class < 0 || attr_class >= AttributeConstants.NUM_ATTRIB_CLASSES)
+			return null;
+		HashMap attribs = attribClass[attr_class];
+		if (attribs == null)
+			return null;
 		return attribs.get(key);
 	}
 
-	public void setAttribute(String key, Object o) {
+	public void setAttribute(int attr_class, String key, Object o) {
+		if (attr_class < 0 || attr_class >= AttributeConstants.NUM_ATTRIB_CLASSES)
+			return;
+		HashMap attribs = attribClass[attr_class];
+		if (attribs == null)
+			attribs = new HashMap();
 		attribs.put(key, o);
+		attribClass[attr_class] = attribs;
+	}
+	
+	public String[] getAttributeKeys(int attr_class) {
+		if (attr_class < 0 || attr_class >= AttributeConstants.NUM_ATTRIB_CLASSES)
+			return new String[]{};
+		HashMap attribs = attribClass[attr_class];
+		if (attribs == null)
+			return new String[]{};
+		return (String[])attribs.keySet().toArray(new String[0]);
 	}
 	
 	public String getElementName() {
 		// return NAME_TAG + getKey();
-		return (String)attribs.get(AttributeConstants.ATTRIB_NAME);
+		return (String)elementAttribs.get(AttributeConstants.ATTRIB_NAME);
 	}
 
 	public int getID() {
@@ -76,14 +96,14 @@ public abstract class PElement extends PlatformObject implements IPElement, Comp
 	 *            The Name to set.
 	 */
 	public void setElementName(String name) {
-		attribs.put(AttributeConstants.ATTRIB_NAME, name);
+		elementAttribs.put(AttributeConstants.ATTRIB_NAME, name);
 	}
 
 	/**
 	 * @return Returns the Parent.
 	 */
 	public IPElement getParent() {
-		return (IPElement)attribs.get(AttributeConstants.ATTRIB_PARENT);
+		return (IPElement)elementAttribs.get(AttributeConstants.ATTRIB_PARENT);
 	}
 
 	/**
@@ -91,14 +111,14 @@ public abstract class PElement extends PlatformObject implements IPElement, Comp
 	 *            The Parent to set.
 	 */
 	public void setParent(IPElement parent) {
-		attribs.put(AttributeConstants.ATTRIB_PARENT, parent);
+		elementAttribs.put(AttributeConstants.ATTRIB_PARENT, parent);
 	}
 
 	/**
 	 * @return Returns the Type.
 	 */
 	public int getElementType() {
-		Integer i = (Integer)attribs.get(AttributeConstants.ATTRIB_TYPE);
+		Integer i = (Integer)elementAttribs.get(AttributeConstants.ATTRIB_TYPE);
 		if(i == null) return P_TYPE_ERROR;
 		else return i.intValue();
 	}
@@ -108,7 +128,7 @@ public abstract class PElement extends PlatformObject implements IPElement, Comp
 	 *            The Type to set.
 	 */
 	public void setElementType(int type) {
-		attribs.put(AttributeConstants.ATTRIB_TYPE, new Integer(type));
+		elementAttribs.put(AttributeConstants.ATTRIB_TYPE, new Integer(type));
 	}
 
 	public String toString() {

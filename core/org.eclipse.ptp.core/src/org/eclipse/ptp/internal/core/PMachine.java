@@ -41,16 +41,16 @@ public class PMachine extends Parent implements IPMachine {
 		//System.out.println("Name is " + name + ", key is " + machineID);
 		//System.out.println("NAME_TAG = " + NAME_TAG + ", toString = "
 		//		+ this.toString() + ", key# = " + this.getID());
-		attribs.put(AttributeConstants.ATTRIB_MACHINEID, new Integer(machineID));
+		this.setAttribute(AttributeConstants.ATTRIB_MACHINEID, new Integer(machineID));
 	}
 
 	public String getMachineNumber() {
-		return ""+((Integer) attribs.get(AttributeConstants.ATTRIB_MACHINEID)).intValue()+"";
+		return ""+((Integer) this.getAttribute(AttributeConstants.ATTRIB_MACHINEID)).intValue()+"";
 	}
 	
 	public int getMachineNumberInt()
 	{
-		return ((Integer) attribs.get(AttributeConstants.ATTRIB_MACHINEID)).intValue();
+		return ((Integer) this.getAttribute(AttributeConstants.ATTRIB_MACHINEID)).intValue();
 	}
 
 	public IPUniverse getUniverse() {
@@ -180,4 +180,17 @@ public class PMachine extends Parent implements IPMachine {
 	public void setArch(String arch) {
 		this.arch = arch;
 	}
+	
+	public Object getAttribute(String key) {
+		return this.getAttribute(AttributeConstants.ATTRIB_CLASS_MACHINE, key);
+	}
+
+	public void setAttribute(String key, Object o) {
+		this.setAttribute(AttributeConstants.ATTRIB_CLASS_MACHINE, key, o);
+	}
+	
+	public String[] getAttributeKeys() {
+		return this.getAttributeKeys(AttributeConstants.ATTRIB_CLASS_MACHINE);
+	}
+
 }
