@@ -141,4 +141,30 @@ public interface IPJob extends IPElement {
 	public IPUniverse getUniverse();
 	
 	public IPProcess findProcessByTaskId(int taskId);
+	
+	/**
+	 * Searches for an attribute on the Element given a key.  
+	 * The resulting attribute Object is returned.  The returned may be null if the attribute
+	 * was not found.
+	 * 
+	 * @param key String key of the attribute to look for
+	 * @return Object of the attribute or null if not found
+	 */
+	public Object getAttribute(String key);
+	
+	/**
+	 * Sets an attribute given a key and Object.
+	 * 
+	 * @param key String key of the attribute
+	 * @param Object of the attribute
+	 */
+	public void setAttribute(String key, Object o);
+	
+	/**
+	 * Get all the keys of all job attributes.
+	 * 
+	 * @return A string array containing the keys
+	 */
+	public String[] getAttributeKeys();
+
 }

@@ -96,4 +96,17 @@ public class PNode extends Parent implements IPNode {
 		if (listeners.contains(listener))
 			listeners.remove(listener);
 	}	
+	
+	public Object getAttribute(String key) {
+		return this.getAttribute(AttributeConstants.ATTRIB_CLASS_NODE, key);
+	}
+
+	public void setAttribute(String key, Object o) {
+		this.setAttribute(AttributeConstants.ATTRIB_CLASS_NODE, key, o);
+	}
+	
+	public String[] getAttributeKeys() {
+		return this.getAttributeKeys(AttributeConstants.ATTRIB_CLASS_NODE);
+	}
+
 }
