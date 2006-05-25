@@ -268,7 +268,7 @@ public class ParallelMachineView extends AbstractParallelSetView {
 		//buffer.append(" Node name: " + node.getElementName());
 		//buffer.append(" Node name: " + node.getAttrib(AttributeConstants.ATTRIB_NODE_NAME));
 		//buffer.append(" (ID: "+node.getNodeNumber()+")");
-		buffer.append(" "+node.getAttrib(AttributeConstants.ATTRIB_NODE_NAME));
+		buffer.append(" "+node.getAttribute(AttributeConstants.ATTRIB_NODE_NAME));
 		IElementSet[] sets = setManager.getSetsWithElement(node.getIDString());
 		if (sets.length > 1)
 			buffer.append("\n Set: ");
@@ -334,11 +334,11 @@ public class ParallelMachineView extends AbstractParallelSetView {
 			return;
 		}
 		new TableItem(BLtable, SWT.NULL).setText(new String[] { "Node #", node.getNodeNumber() });
-		new TableItem(BLtable, SWT.NULL).setText(new String[] { "Name", (String) node.getAttrib(AttributeConstants.ATTRIB_NODE_NAME) });
-		new TableItem(BLtable, SWT.NULL).setText(new String[] { "State", (String) node.getAttrib(AttributeConstants.ATTRIB_NODE_STATE) });
-		new TableItem(BLtable, SWT.NULL).setText(new String[] { "User", (String) node.getAttrib(AttributeConstants.ATTRIB_NODE_USER) });
-		new TableItem(BLtable, SWT.NULL).setText(new String[] { "Group", (String) node.getAttrib(AttributeConstants.ATTRIB_NODE_GROUP) });
-		new TableItem(BLtable, SWT.NULL).setText(new String[] { "Mode", (String) node.getAttrib(AttributeConstants.ATTRIB_NODE_MODE) });
+		new TableItem(BLtable, SWT.NULL).setText(new String[] { "Name", (String) node.getAttribute(AttributeConstants.ATTRIB_NODE_NAME) });
+		new TableItem(BLtable, SWT.NULL).setText(new String[] { "State", (String) node.getAttribute(AttributeConstants.ATTRIB_NODE_STATE) });
+		new TableItem(BLtable, SWT.NULL).setText(new String[] { "User", (String) node.getAttribute(AttributeConstants.ATTRIB_NODE_USER) });
+		new TableItem(BLtable, SWT.NULL).setText(new String[] { "Group", (String) node.getAttribute(AttributeConstants.ATTRIB_NODE_GROUP) });
+		new TableItem(BLtable, SWT.NULL).setText(new String[] { "Mode", (String) node.getAttribute(AttributeConstants.ATTRIB_NODE_MODE) });
 		IPProcess procs[] = node.getSortedProcesses();
 		if (procs != null) {
 			TableItem item = null;

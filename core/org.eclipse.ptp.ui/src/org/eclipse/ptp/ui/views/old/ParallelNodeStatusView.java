@@ -393,7 +393,7 @@ public class ParallelNodeStatusView extends AbstractParallelView implements
 						}
 					}
 				} else if (filterSelection == ALLOCATED_NODES
-						&& ((String) somenode.getAttrib("user")).equals(System
+						&& ((String) somenode.getAttribute("user")).equals(System
 								.getProperty("user.name"))) {
 					tmpNodes[copied_elements] = displayElements[i];
 					copied_elements++;
@@ -1185,20 +1185,20 @@ public class ParallelNodeStatusView extends AbstractParallelView implements
 
 			/* node up */
 			else if (somenode != null
-					&& somenode.getAttrib("state").equals("up")) {
+					&& somenode.getAttribute("state").equals("up")) {
 				/*
 				 * PORT else
 				 * if(sysDescNodes[index].getBprocState().equals("up")) {
 				 */
 				/* what if I have the node allocated to me? */
-				if (somenode.getAttrib("user").equals(
+				if (somenode.getAttribute("user").equals(
 						System.getProperty("user.name"))) {
 					/*
 					 * PORT
 					 * if(sysDescNodes[index].getBprocUser().equals(System.getProperty("user.name"))) {
 					 */
 					/* check the mode */
-					String mode = (String) somenode.getAttrib("mode");
+					String mode = (String) somenode.getAttribute("mode");
 					/*
 					 * PORT String mode = sysDescNodes[index].getBprocMode();
 					 */
@@ -1209,14 +1209,14 @@ public class ParallelNodeStatusView extends AbstractParallelView implements
 						return NODE_USER_ALLOC_SHARED;
 				}
 				/* someone else owns it */
-				else if (!somenode.getAttrib("user").equals("")) {
+				else if (!somenode.getAttribute("user").equals("")) {
 					// else if(somenode.getAttrib("user").equals("root")) {
 					/*
 					 * PORT else
 					 * if(!sysDescNodes[index].getBprocUser().equals("root")) {
 					 */
 					/* check the mode */
-					String mode = (String) somenode.getAttrib("mode");
+					String mode = (String) somenode.getAttribute("mode");
 					/*
 					 * PORT String mode = sysDescNodes[index].getBprocMode();
 					 */
@@ -1231,14 +1231,14 @@ public class ParallelNodeStatusView extends AbstractParallelView implements
 			}
 			/* node down */
 			else if (somenode != null
-					&& somenode.getAttrib("state").equals("down")) {
+					&& somenode.getAttribute("state").equals("down")) {
 				/*
 				 * PORT else
 				 * if(sysDescNodes[index].getBprocState().equals("down")) {
 				 */
 				return NODE_DOWN;
 			} else if (somenode != null
-					&& somenode.getAttrib("state").equals("error")) {
+					&& somenode.getAttribute("state").equals("error")) {
 				/*
 				 * PORT else
 				 * if(sysDescNodes[index].getBprocState().equals("error")) {
@@ -1613,22 +1613,22 @@ public class ParallelNodeStatusView extends AbstractParallelView implements
 			item.setText(new String[] {
 					"State",
 					(String) ((IPNode) displayElements[selected_node_num])
-							.getAttrib("state") });
+							.getAttribute("state") });
 			item = new TableItem(BLtable, 0);
 			item.setText(new String[] {
 					"User",
 					(String) ((IPNode) displayElements[selected_node_num])
-							.getAttrib("user") });
+							.getAttribute("user") });
 			item = new TableItem(BLtable, 0);
 			item.setText(new String[] {
 					"Group",
 					(String) ((IPNode) displayElements[selected_node_num])
-							.getAttrib("group") });
+							.getAttribute("group") });
 			item = new TableItem(BLtable, 0);
 			item.setText(new String[] {
 					"Mode",
 					(String) ((IPNode) displayElements[selected_node_num])
-							.getAttrib("mode") });
+							.getAttribute("mode") });
 
 			IPNode somenode = (IPNode) displayElements[selected_node_num];
 

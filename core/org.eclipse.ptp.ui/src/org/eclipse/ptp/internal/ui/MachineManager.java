@@ -177,7 +177,7 @@ public class MachineManager extends AbstractUIManager implements INodeListener {
 	 */
 	public int getNodeStatus(IPNode node) {
 		if (node != null) {
-			String nodeState = (String)node.getAttrib(AttributeConstants.ATTRIB_NODE_STATE);
+			String nodeState = (String)node.getAttribute(AttributeConstants.ATTRIB_NODE_STATE);
 			//System.out.println("nodestate = '"+nodeState+"'");
 			if(nodeState == null) {
 				System.out.println("null node state!");
@@ -186,15 +186,15 @@ public class MachineManager extends AbstractUIManager implements INodeListener {
 			if (nodeState.equals("up")) {
 				if (node.size() > 0)
 					return (node.isAllStop() ? IPTPUIConstants.NODE_EXITED : IPTPUIConstants.NODE_RUNNING);
-				if (node.getAttrib(AttributeConstants.ATTRIB_NODE_USER).equals(System.getProperty("user.name"))) {
-					String mode = (String) node.getAttrib(AttributeConstants.ATTRIB_NODE_MODE);
+				if (node.getAttribute(AttributeConstants.ATTRIB_NODE_USER).equals(System.getProperty("user.name"))) {
+					String mode = (String) node.getAttribute(AttributeConstants.ATTRIB_NODE_MODE);
 					//System.out.println("Mode = '"+mode+"'");
 					if (mode.equals("64"))
 						return IPTPUIConstants.NODE_USER_ALLOC_EXCL;
 					else if (mode.equals("72") || mode.equals("73") || mode.equals("65"))
 						return IPTPUIConstants.NODE_USER_ALLOC_SHARED;
-				} else if (!node.getAttrib(AttributeConstants.ATTRIB_NODE_USER).equals("")) {
-					String mode = (String) node.getAttrib(AttributeConstants.ATTRIB_NODE_MODE);
+				} else if (!node.getAttribute(AttributeConstants.ATTRIB_NODE_USER).equals("")) {
+					String mode = (String) node.getAttribute(AttributeConstants.ATTRIB_NODE_MODE);
 					if (mode.equals("64"))
 						return IPTPUIConstants.NODE_OTHER_ALLOC_EXCL;
 					else if (mode.equals("72") || mode.equals("73") || mode.equals("65"))

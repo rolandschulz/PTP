@@ -120,21 +120,21 @@ public class ParallelElementLabelProvider extends LabelProvider implements IColo
 			}
 			
 			else {
-				String nodeState = (String)node.getAttrib(AttributeConstants.ATTRIB_NODE_STATE);
+				String nodeState = (String)node.getAttribute(AttributeConstants.ATTRIB_NODE_STATE);
 				//System.out.println("NODE: "+node+" - state = "+nodeState);
 				
 				if (nodeState != null && nodeState.equals("up")) {
-					String user = (String)node.getAttrib(AttributeConstants.ATTRIB_NODE_USER);
+					String user = (String)node.getAttribute(AttributeConstants.ATTRIB_NODE_USER);
 
 					if (user.equals(System.getProperty("user.name"))) {
-						String mode = (String)node.getAttrib(AttributeConstants.ATTRIB_NODE_MODE);
+						String mode = (String)node.getAttribute(AttributeConstants.ATTRIB_NODE_MODE);
 						if (mode != null && mode.equals("0100"))
 							return NODE_USER_ALLOC_EXCL;
 						else if (mode != null && (mode.equals("0110") || mode.equals("0111") || mode.equals("0101")))
 							return NODE_USER_ALLOC_SHARED;
 					}
 					else if (user != null && !user.equals("root")) {
-						String mode = (String)node.getAttrib(AttributeConstants.ATTRIB_NODE_MODE);
+						String mode = (String)node.getAttribute(AttributeConstants.ATTRIB_NODE_MODE);
 						if (mode != null && mode.equals("0100"))
 							return NODE_OTHER_ALLOC_EXCL;
 						else if (mode != null && (mode.equals("0110") || mode.equals("0111") || mode.equals("0101")))
