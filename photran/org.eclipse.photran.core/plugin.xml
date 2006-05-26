@@ -79,6 +79,14 @@
             class="org.eclipse.photran.internal.errorparsers.FErrorParser">
       </errorparser>
    </extension>
+   <extension
+         id="PGIErrorParser"
+         name="Photran Error Parser for PGI Fortran"
+         point="org.eclipse.cdt.core.ErrorParser">
+      <errorparser
+            class="org.eclipse.photran.internal.errorparsers.PGIErrorParser">
+      </errorparser>
+   </extension>
 
 <!-- Old CDT stuff, don't think we need it - Jeff -->
 <!--

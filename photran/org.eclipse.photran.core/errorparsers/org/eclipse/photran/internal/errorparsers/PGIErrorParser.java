@@ -26,47 +26,40 @@ final public class PGIErrorParser implements IErrorParser
      *     \w matches [A-Za-z_0-9]
      *     Parentheses define a capturing group
      */
-    private Pattern errorLineRegex_ab = Pattern.compile("\\S+ f90fe: ERROR \\S+, File = (\\S+), Line = (\\d+), Column = \\d+");
-    private Pattern errorLineRegex = Pattern.compile("PGFTN-S-\\d+-(\\S+)((\\S+): (\\d+))");
-
-    private boolean expectingErrorMessage = false;
-    
-    private Matcher errorLineMatcher = null;
-    private String filename = null;
-    private int lineNum = 0;
+    private Pattern lineError = Pattern.compile("PGF\\w\\w-S-\\d+-([a-zA-Z ]+):* [(](\\S+): (\\d+)[)]");
+    private Pattern nolineError = Pattern.compile("PGF\\w\\w-S-\\d+-([a-zA-Z, ]+)[(](\\S+)[)]");
 
     public boolean processLine(String thisLine, ErrorParserManager eoParser)
     {
-        if (isErrorLine(thisLine))
-        {
-            rememberInfoFromErrorLine(thisLine);
-            expectingErrorMessage = true;
-        }
-        else if (expectingErrorMessage)
-        {
-            generateMarker(thisLine, eoParser);
-            expectingErrorMessage = false;
+        //String test = "PGFTN-S-0034-Syntax error at or near :: (life_f.f: 19)"
+        String test = "PGF90-S-0038-Symbol, junk, has not been explicitly declared (life_f.f90)";
+        boolean match = Pattern.matches("PGF\\w\\w-S-\\d+-([a-zA-Z, ]+)[(](\\S+)[)]", test);
+        
+        String errorMessage = null, filename = null;
+        boolean errorFound = false;
+        int lineNum = 0;
+        
+        Matcher m = lineError.matcher(thisLine);
+        if (m.matches()) {
+        	errorMessage = m.group(1);
+        	filename = m.group(2);
+            lineNum = Integer.parseInt(m.group(3));
+            errorFound = true;
+        } else {
+        	m = nolineError.matcher(thisLine);
+        	if (m.matches()) {
+            	errorMessage = m.group(1);
+            	filename = m.group(2);
+            	lineNum = 1;			//TODO - should be end of file?
+            	errorFound = true;
+        	}
         }
         
-        return false;
-    }
+        if (errorFound) {
+        	IFile file = eoParser.findFilePath(filename);
+            eoParser.generateMarker(file, lineNum, errorMessage, IMarkerGenerator.SEVERITY_ERROR_RESOURCE, null);
+        }
 
-    private boolean isErrorLine(String thisLine)
-    {
-        errorLineMatcher = errorLineRegex.matcher(thisLine);
-        return errorLineMatcher.matches();
-    }
-
-    private void rememberInfoFromErrorLine(String thisLine)
-    {
-        filename = errorLineMatcher.group(1);
-        lineNum = Integer.parseInt(errorLineMatcher.group(2));
-    }
-
-    private void generateMarker(String lineContainingErrorMessage, ErrorParserManager eoParser)
-    {
-        String errorMessage = lineContainingErrorMessage.trim();
-        IFile file = eoParser.findFilePath(filename);
-        eoParser.generateMarker(file, lineNum, errorMessage, IMarkerGenerator.SEVERITY_ERROR_RESOURCE, null);
+        return errorFound;
     }
 }
