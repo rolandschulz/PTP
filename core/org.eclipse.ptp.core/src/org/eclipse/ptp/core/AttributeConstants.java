@@ -40,17 +40,17 @@ public interface AttributeConstants {
 	public static final String ATTRIB_ISREGISTERED = "ATTRIB_ISREGISTERED";
 	
 	/* node attributes */
-	public static final String ATTRIB_NODE_NAME = "Name";
-	public static final String ATTRIB_NODE_NUMBER = "Number";
-	public static final String ATTRIB_NODE_STATE = "State";
-	public static final String ATTRIB_NODE_GROUP = "Group";
-	public static final String ATTRIB_NODE_USER = "User";
-	public static final String ATTRIB_NODE_MODE = "Mode";
+	public static final String ATTRIB_NODE_NAME = "ATTRIB_NODE_NAME";
+	public static final String ATTRIB_NODE_NUMBER = "ATTRIB_NODE_NUMBER";
+	public static final String ATTRIB_NODE_STATE = "ATTRIB_NODE_STATE";
+	public static final String ATTRIB_NODE_GROUP = "ATTRIB_NODE_GROUP";
+	public static final String ATTRIB_NODE_USER = "ATTRIB_NODE_USER";
+	public static final String ATTRIB_NODE_MODE = "ATTRIB_NODE_MODE";
 
 	/* process attributes */
-	public static final String ATTRIB_PROCESS_PID = "PID";
-	public static final String ATTRIB_PROCESS_EXIT_CODE = "Exit Code";
-	public static final String ATTRIB_PROCESS_STATUS = "Status";
-	public static final String ATTRIB_PROCESS_SIGNAL = "Signal";
-	public static final String ATTRIB_PROCESS_NODE_NAME = "Node Name";
+	public static final String ATTRIB_PROCESS_PID = "ATTRIB_PROCESS_PID";
+	public static final String ATTRIB_PROCESS_EXIT_CODE = "ATTRIB_PROCESS_EXIT_CODE";
+	public static final String ATTRIB_PROCESS_STATUS = "ATTRIB_PROCESS_STATUS";
+	public static final String ATTRIB_PROCESS_SIGNAL = "ATTRIB_PROCESS_SIGNAL";
+	public static final String ATTRIB_PROCESS_NODE_NAME = "ATTRIB_PROCESS_NODE_NAME";
 }
