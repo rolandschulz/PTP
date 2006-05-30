@@ -33,6 +33,8 @@ import org.eclipse.ptp.internal.ui.model.ElementHandler;
 import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.TableItem;
 
 /**
  * @author clement chu
@@ -117,6 +119,27 @@ public class MachineManager extends AbstractUIManager implements INodeListener {
 	public void setCurrentSetId(String set_id) {
 		cur_set_id = set_id;
 	}
+	/** Convert attribute key to display name
+	 * 
+	 * @param key
+	 * @return name
+	 */
+	public String getNodeAttributeName(String key) {
+		if (key.equals(AttributeConstants.ATTRIB_NODE_NAME))
+			return "Name";
+		if (key.equals(AttributeConstants.ATTRIB_NODE_NUMBER))
+			return "Node #";
+		if (key.equals(AttributeConstants.ATTRIB_NODE_STATE))
+			return "State";
+		if (key.equals(AttributeConstants.ATTRIB_NODE_GROUP))
+			return "Group";
+		if (key.equals(AttributeConstants.ATTRIB_NODE_USER))
+			return "User";
+		if (key.equals(AttributeConstants.ATTRIB_NODE_MODE))
+			return "Mode";
+			
+		return "Unknown";
+	}
 	/** Get node status text
 	 * @param node
 	 * @return status text
@@ -183,7 +206,7 @@ public class MachineManager extends AbstractUIManager implements INodeListener {
 				System.out.println("null node state!");
 				return IPTPUIConstants.NODE_UNKNOWN;
 			}
-			if (nodeState.equals("up")) {
+			if (nodeState.equals(IPNode.NODE_STATE_UP)) {
 				if (node.size() > 0)
 					return (node.isAllStop() ? IPTPUIConstants.NODE_EXITED : IPTPUIConstants.NODE_RUNNING);
 				if (node.getAttribute(AttributeConstants.ATTRIB_NODE_USER).equals(System.getProperty("user.name"))) {
@@ -201,9 +224,9 @@ public class MachineManager extends AbstractUIManager implements INodeListener {
 						return IPTPUIConstants.NODE_OTHER_ALLOC_SHARED;
 				}
 				return IPTPUIConstants.NODE_UP;
-			} else if (nodeState.equals("down"))
+			} else if (nodeState.equals(IPNode.NODE_STATE_DOWN))
 				return IPTPUIConstants.NODE_DOWN;
-			else if (nodeState.equals("error"))
+			else if (nodeState.equals(IPNode.NODE_STATE_ERROR))
 				return IPTPUIConstants.NODE_ERROR;
 		}
 		return IPTPUIConstants.NODE_UNKNOWN;

@@ -335,7 +335,7 @@ public class ParallelMachineView extends AbstractParallelSetView {
 		}
 		String[] keys = node.getAttributeKeys();
 		for (int i = 0; i < keys.length; i++) {
-			new TableItem(BLtable, SWT.NULL).setText(new String[] { keys[i], node.getAttribute(keys[i]).toString() });
+			new TableItem(BLtable, SWT.NULL).setText(new String[] { ((MachineManager) manager).getNodeAttributeName(keys[i]), node.getAttribute(keys[i]).toString() });
 		}
 		IPProcess procs[] = node.getSortedProcesses();
 		if (procs != null) {
