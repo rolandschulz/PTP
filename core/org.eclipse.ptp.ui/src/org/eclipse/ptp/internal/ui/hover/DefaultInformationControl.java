@@ -290,6 +290,10 @@ public class DefaultInformationControl implements IIconInformationControl, Dispo
 			fShell.setSize(new_width+5, new_height+2);
 		}
 		else {
+			int min_h = sc.getHorizontalBar().getSize().y;
+			if (height <= min_h) {
+				height = min_h + 1;
+			}
 			sc.setAlwaysShowScrollBars(false);
 			fShell.setSize(new_width+5, height+2);
 		}
