@@ -207,7 +207,7 @@ public class ManagedCProjectCreation extends SimulationProjectCreation {
      * @throws CoreException
      */
     public void setIndexer(IProject newProject, IProgressMonitor monitor) throws CoreException {
-		final String indexerID = CCorePlugin.DEFAULT_INDEXER_UNIQ_ID;
+		final String indexerID = CCorePlugin.INDEXER_UNIQ_ID;
     	if (monitor == null)
 			monitor = new NullProgressMonitor();
 
