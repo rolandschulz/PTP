@@ -40,45 +40,25 @@ public class MonitoringSystemChoices {
 	static public final int MPICH2 = 105;
 	
 	static private String[] NonDevelMSChoices = new String[] {
-			"Open Runtime Environment (ORTE)",
-			/*
-			"Los Alamos MPI (LAMPI)",
-			"LAM-MPI",
-			"MPICH 1.x",
-			"MPICH 2.x (MPD)"
-			*/ 
+		"Open Runtime Environment (ORTE)",
+		"MPICH 2.x (MPD)"
 	};
 	
 	static private int[] NonDevelMSIDs = new int[] {
-			ORTE,
-			/*
-			LAMPI,
-			LAMMPI,
-			MPICH1,
-			MPICH2
-			*/
+		ORTE,
+		MPICH2
 	};
 	
 	static private String[] DevelMSChoices = new String[] {
 		"Simulated", 
 		"Open Runtime Environment (ORTE)",
-		/*
-		"Los Alamos MPI (LAMPI)",
-		"LAM-MPI",
-		"MPICH 1.x",
 		"MPICH 2.x (MPD)"
-		*/ 
 };
 
 	static private int[] DevelMSIDs = new int[] {
 		SIMULATED,
 		ORTE,
-		/*
-		LAMPI,
-		LAMMPI,
-		MPICH1,
 		MPICH2
-		*/
 	};
 	
 	public static boolean queryDevelMode()

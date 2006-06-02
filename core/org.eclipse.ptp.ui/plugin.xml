@@ -70,6 +70,11 @@
             id="org.eclipse.ptp.ui.preferences.viewerPreferencesPage"
             category="org.eclipse.ptp.ui.preferences.ptpPreferencesPage">
       </page>
+      <page
+            category="org.eclipse.ptp.ui.preferences.ptpPreferencesPage"
+            class="org.eclipse.ptp.ui.preferences.MPICH2PreferencesPage"
+            id="org.eclipse.ptp.ui.preferences.mpich2PreferencesPage"
+            name="%MPICH2preferencePage.name"/>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
