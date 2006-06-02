@@ -290,6 +290,51 @@ DbgClntConditionBreakpoint(char **args)
 		
 	return res;
 }
+
+int 
+DbgClntBreakpointAfter(char **args)
+{
+	int			res;
+	char *		cmd;
+	bitset *		set; 
+
+	set = str_to_bitset(args[1]);
+	if (set == NULL) {
+		DbgSetError(DBGERR_PROCSET, NULL);
+		return DBGRES_ERR;
+	}
+	
+	asprintf(&cmd, "%s %s %s", DBG_BREAKPOINTAFTER_CMD, args[2], args[3]);
+	res = ClntSendCommand(set, DBG_EV_WAITALL, cmd, NULL);
+	
+	free(cmd);
+	bitset_free(set);
+		
+	return res;
+}
+
+int 
+DbgClntSetWatchpoint(char **args)
+{
+	int			res;
+	char *		cmd;
+	bitset *		set; 
+
+	set = str_to_bitset(args[1]);
+	if (set == NULL) {
+		DbgSetError(DBGERR_PROCSET, NULL);
+		return DBGRES_ERR;
+	}
+	
+	asprintf(&cmd, "%s %s \"%s\" %s %s \"%s\" %s", DBG_SETWATCHPOINT_CMD, args[2], args[3], args[4], args[5], args[6], args[7]);
+	res = ClntSendCommand(set, DBG_EV_WAITALL, cmd, NULL);
+	
+	free(cmd);
+	bitset_free(set);
+		
+	return res;
+}
+
 /*
  * Process control operations
  */

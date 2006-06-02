@@ -103,6 +103,7 @@ MIBreakEnable(int nbps, int *bpids)
 	return cmd;
 }
 
+//-break-condition NUMBER EXPR
 MICommand *
 MIBreakCondition(int nbps, int *bpids, char *expr)
 {
@@ -113,6 +114,39 @@ MIBreakCondition(int nbps, int *bpids, char *expr)
 	
 	for (i = 0; i < nbps; i++) {
 		MICommandAddOption(cmd, MIIntToCString(bpids[i]), expr);
+	}	
+	return cmd;
+}
+
+//-break-watch [ -a | -r ]
+MICommand *
+MIBreakWatch(char *expr, int access, int read)
+{
+	MICommand *	cmd;
+	
+	cmd = MICommandNew("-break-watch", MIResultRecordDONE);
+
+	if (access) {
+		MICommandAddOption(cmd, "-a", NULL);
+	} else if (read) {
+		MICommandAddOption(cmd, "-r", NULL);
+	}
+
+	MICommandAddOption(cmd, expr, NULL);
+	return cmd;
+}
+
+//-break-after NUMBER COUNT
+MICommand *
+MIBreakAfter(int nbps, int *bpids, int ignoreCount)
+{
+	int i;
+	MICommand *	cmd;
+	
+	cmd = MICommandNew("-break-after", MIResultRecordDONE);
+
+	for (i = 0; i < nbps; i++) {
+		MICommandAddOption(cmd, MIIntToCString(bpids[i]), MIIntToCString(ignoreCount));
 	}	
 	return cmd;
 }

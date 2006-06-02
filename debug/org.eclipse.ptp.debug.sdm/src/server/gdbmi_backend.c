@@ -85,6 +85,8 @@ static int	GDBMIDeleteBreakpoint(int);
 static int	GDBMIEnableBreakpoint(int);
 static int	GDBMIDisableBreakpoint(int);
 static int	GDBMIConditionBreakpoint(int, char *expr);
+static int	GDBMIBreakpointAfter(int, int icount);
+static int	GDBMIWatchpoint(int, char *, int, int, char *, int);
 static int	GDBMIGo(void);
 static int	GDBMIStep(int, int);
 static int	GDBMITerminate(void);
@@ -122,6 +124,8 @@ dbg_backend_funcs	GDBMIBackend =
 	GDBMIEnableBreakpoint,
 	GDBMIDisableBreakpoint,
 	GDBMIConditionBreakpoint,
+	GDBMIBreakpointAfter,
+	GDBMIWatchpoint,
 	GDBMIGo,
 	GDBMIStep,
 	GDBMITerminate,
@@ -775,6 +779,95 @@ GDBMIConditionBreakpoint(int bpid, char *expr)
 		return DBGRES_ERR;
 	}
 	SaveEvent(NewDbgEvent(DBGEV_OK));
+	return DBGRES_OK;
+}
+
+/*
+** breakpoint after.
+*/
+static int
+GDBMIBreakpointAfter(int bpid, int icount)
+{
+	bpentry *	bp;
+	char *		bpstr;
+	MICommand *	cmd;
+	
+	CHECK_SESSION()
+
+	if ((bp = FindRemoteBP(bpid)) == NULL) {
+		asprintf(&bpstr, "%d", bpid);
+		DbgSetError(DBGERR_NOBP, bpstr);
+		free(bpstr);
+		return DBGRES_ERR;
+	}
+	
+	cmd = MIBreakAfter(1, &bp->local, icount);
+	SendCommandWait(DebugSession, cmd);
+	
+	if (!MICommandResultOK(cmd)) {
+		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
+		MICommandFree(cmd);
+		return DBGRES_ERR;
+	}
+	SaveEvent(NewDbgEvent(DBGEV_OK));
+	return DBGRES_OK;
+}
+
+/*
+ * Set watch point
+ */
+static int GDBMIWatchpoint(int bpid, char *expr, int isAccess, int isRead, char *condition, int ignoreCount) {
+	dbg_event *		e;
+	MIBreakpoint *	bpt;
+	MICommand *		cmd;
+	List *			bpts;
+	breakpoint *	bp;
+
+	if (condition != NULL && strlen(condition) == 0)
+		condition = NULL;
+
+	cmd = MIBreakWatch(expr, isAccess, isRead);
+	SendCommandWait(DebugSession, cmd);
+
+	if (!MICommandResultOK(cmd)) {
+		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
+		MICommandFree(cmd);
+		return DBGRES_ERR;
+	}
+		
+	bpts = MIBreakpointGetBreakInsertInfo(cmd);
+	MICommandFree(cmd);
+			
+	if (bpts == NULL) {
+		DbgSetError(DBGERR_DEBUGGER, "error getting breakpoint information");
+		return DBGRES_ERR;
+	}
+	
+	SetList(bpts);
+	bpt = (MIBreakpoint *)GetListElement(bpts);
+	
+	AddBPMap(bpt->number, bpid, 0); //0 is not temp??
+	
+	bp = NewBreakpoint(bpt->number);
+
+	bp->ignore = bpt->ignore;
+	bp->type = strdup(bpt->type);
+	bp->hits = bpt->times;
+
+	if (condition != NULL) {
+		GDBMIConditionBreakpoint(bpid, condition);
+	}
+	if (ignoreCount > 0) {
+		GDBMIBreakpointAfter(bpid, ignoreCount);
+	}
+
+	e = NewDbgEvent(DBGEV_BPSET);
+	e->bpid = bpid;
+	e->bp = bp;
+	SaveEvent(e);
+	
+	DestroyList(bpts, MIBreakpointFree);
+
 	return DBGRES_OK;
 }
 
@@ -1876,7 +1969,6 @@ static int
 GDBMIDataWriteMemory(long offset, char* address, char* format, int wordSize, char* value) 
 {
 	MICommand *	cmd;
-	dbg_event *	e;
 	
 	CHECK_SESSION();
 	

@@ -45,6 +45,8 @@ int DbgClntDeleteBreakpoint(char **);
 int DbgClntEnableBreakpoint(char **);
 int DbgClntDisableBreakpoint(char **);
 int DbgClntConditionBreakpoint(char **);
+int DbgClntBreakpointAfter(char **);
+int DbgClntSetWatchpoint(char **);
 
 /*
  * Process control operations

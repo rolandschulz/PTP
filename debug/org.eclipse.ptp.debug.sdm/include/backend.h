@@ -39,6 +39,8 @@ struct dbg_backend_funcs {
 	int (*enablebreakpoint)(int);
 	int (*disablebreakpoint)(int);
 	int (*conditionbreakpoint)(int, char *);
+	int (*breakpointafter)(int, int);
+	int (*setwatchpoint)(int, char *, int, int, char *, int);
 	int (*go)(void);
 	int (*step)(int, int);
 	int (*terminate)(void);

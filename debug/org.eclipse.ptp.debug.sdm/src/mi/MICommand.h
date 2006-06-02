@@ -68,6 +68,8 @@ extern MICommand *MIBreakDelete(int nbps, int *bpids);
 extern MICommand *MIBreakDisable(int nbps, int *bpids);
 extern MICommand *MIBreakEnable(int nbps, int *bpids);
 extern MICommand *MIBreakCondition(int nbps, int *bpids, char *expr);
+extern MICommand *MIBreakWatch(char *expr, int access, int read);
+extern MICommand *MIBreakAfter(int nbps, int *bpids, int ignoreCount);
 
 /*
  * -stack-* commands

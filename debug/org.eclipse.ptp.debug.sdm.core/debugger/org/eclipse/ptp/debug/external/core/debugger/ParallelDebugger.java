@@ -40,6 +40,7 @@ import org.eclipse.ptp.debug.core.cdi.model.IPCDILineBreakpoint;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDILocalVariable;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIStackFrame;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIWatchpoint;
 import org.eclipse.ptp.debug.external.core.AbstractDebugger;
 import org.eclipse.ptp.debug.external.core.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.core.cdi.model.Target;
@@ -217,6 +218,18 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 		try {
 			ICDICondition condition = bpt.getCondition();
 			proxy.debugSetFuncBreakpoint(tasks, newBreakpointId(), bpt.isTemporary(), bpt.isHardware(), bpt.getLocator().getFile(), bpt.getLocator().getFunction(), (condition!=null?condition.getExpression():""), (condition!=null?condition.getIgnoreCount():0), 0);
+		} catch (IOException e) {
+			throw new PCDIException(e.getMessage());
+		}
+	}
+	public void setWatchpoint(BitList tasks, IPCDIWatchpoint bpt) throws PCDIException {
+		try {
+			String expression = bpt.getWatchExpression();
+			boolean access = bpt.isReadType() && bpt.isWriteType(); 
+			boolean read = ! bpt.isWriteType() && bpt.isReadType(); 
+			
+			ICDICondition condition = bpt.getCondition();
+			proxy.debugSetWatchpoint(tasks, newBreakpointId(), expression, access, read, (condition!=null?condition.getExpression():""), (condition!=null?condition.getIgnoreCount():0));
 		} catch (IOException e) {
 			throw new PCDIException(e.getMessage());
 		}

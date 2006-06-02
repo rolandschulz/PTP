@@ -63,6 +63,18 @@ public class ProxyDebugClient extends AbstractProxyDebugClient {
 		sendCommand("SFB", procs, args);
 	}
 	
+	public void debugSetWatchpoint(BitList procs, int bpid, String expression, boolean isAccess, boolean isRead, String condition, int ignoreCount) throws IOException {
+		String[] args = new String[] {
+			Integer.toString(bpid),
+			expression,
+			Integer.toString(isAccess?1:0),
+			Integer.toString(isRead?1:0),
+			condition,
+			Integer.toString(ignoreCount)
+		};
+		sendCommand("SWP", procs, args);
+	}
+	
 	public void debugDeleteBreakpoint(BitList procs, int bpid) throws IOException {
 		sendCommand("DBP", procs, Integer.toString(bpid));
 	}
@@ -77,6 +89,10 @@ public class ProxyDebugClient extends AbstractProxyDebugClient {
 
 	public void debugConditionBreakpoint(BitList procs, int bpid, String expr) throws IOException {
 		sendCommand("CBP", procs, Integer.toString(bpid), expr);
+	}
+
+	public void debugBreakpointAfter(BitList procs, int bpid, int icount) throws IOException {
+		sendCommand("BPA", procs, Integer.toString(bpid), Integer.toString(icount));
 	}
 
 	public void debugStackInfoDepth(BitList procs) throws IOException {
