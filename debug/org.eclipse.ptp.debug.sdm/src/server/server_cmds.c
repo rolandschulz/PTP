@@ -44,6 +44,8 @@ static int svr_deletebreakpoint(dbg_backend *, char **);
 static int svr_enablebreakpoint(dbg_backend *, char **);
 static int svr_disablebreakpoint(dbg_backend *, char **);
 static int svr_conditionbreakpoint(dbg_backend *, char **);
+static int svr_breakpointafter(dbg_backend *, char **);
+static int svr_setwatchpoint(dbg_backend *, char **);
 static int svr_go(dbg_backend *, char **);
 static int svr_step(dbg_backend *, char **);
 static int svr_terminate(dbg_backend *, char **);
@@ -70,6 +72,8 @@ static svr_cmd svr_cmd_tab[] =
 	{DBG_ENABLEBREAKPOINT_CMD,		svr_enablebreakpoint},
 	{DBG_DISABLEBREAKPOINT_CMD,		svr_disablebreakpoint},
 	{DBG_CONDITIONBREAKPOINT_CMD,	svr_conditionbreakpoint},
+	{DBG_BREAKPOINTAFTER_CMD,		svr_breakpointafter},
+	{DBG_SETWATCHPOINT_CMD,			svr_setwatchpoint},
 	{DBG_GO_CMD,					svr_go},
 	{DBG_STEP_CMD,					svr_step},
 	{DBG_TERMINATE_CMD,				svr_terminate},
@@ -193,6 +197,18 @@ static int
 svr_conditionbreakpoint(dbg_backend *db, char **args)
 {
 	return db->db_funcs->conditionbreakpoint(atoi(args[1]), args[2]);
+}
+
+static int 
+svr_breakpointafter(dbg_backend *db, char **args)
+{
+	return db->db_funcs->breakpointafter(atoi(args[1]), atoi(args[2]));
+}
+
+static int 
+svr_setwatchpoint(dbg_backend *db, char **args)
+{
+	return db->db_funcs->setwatchpoint(atoi(args[1]), args[2], atoi(args[3]), atoi(args[4]), args[5], atoi(args[6]));
 }
 
 static int 

@@ -395,6 +395,7 @@ public class Target extends SessionObject implements IPCDITarget {
 		throw new PCDIException("Not implement yet - signal(ICDISignal)");
 	}
 	public String evaluateExpressionToString(IPCDIStackFrame frame, String expressionText) throws PCDIException {
+		//TODO - make sure using -data-evaluate-expression or -var-evaluate-expression
 		Target target = (Target)frame.getTarget();
 		Thread currentThread = (Thread)target.getCurrentThread();
 		StackFrame currentFrame = currentThread.getCurrentStackFrame();

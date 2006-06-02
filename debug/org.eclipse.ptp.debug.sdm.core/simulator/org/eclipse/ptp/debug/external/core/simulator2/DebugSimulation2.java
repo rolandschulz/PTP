@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Random;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.util.BitList;
@@ -42,6 +43,7 @@ import org.eclipse.ptp.debug.core.cdi.model.IPCDILineBreakpoint;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDILocalVariable;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIStackFrame;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIWatchpoint;
 import org.eclipse.ptp.debug.external.core.AbstractDebugger;
 import org.eclipse.ptp.debug.external.core.cdi.breakpoints.LineBreakpoint;
 import org.eclipse.ptp.debug.external.core.cdi.model.LineLocation;
@@ -291,6 +293,9 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 				completeCommand(tasks, new_bpt);
 			}
 		}).start();
+	}
+	public void setWatchpoint(final BitList tasks, final IPCDIWatchpoint bpt) throws PCDIException {
+		throw new PCDIException(PCDIException.NOT_IMPLEMENTED, "setWatchpoint");
 	}
 	private IPCDIBreakpoint createBreakpoint(String file, int line, IPCDIBreakpoint oldBpt) {
 		try {

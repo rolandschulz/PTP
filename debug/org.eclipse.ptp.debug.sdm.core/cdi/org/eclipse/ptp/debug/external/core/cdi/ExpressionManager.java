@@ -92,6 +92,7 @@ public class ExpressionManager extends Manager {
 		IPCDIExpression[] expressions = getExpressions(target);
 		destroyExpressions(target, expressions);
 	}
+	/*
 	public Variable getVariable(Target target, String varName) {
 		if (target == null)
 			return null;
@@ -136,4 +137,5 @@ public class ExpressionManager extends Manager {
 		//fire variable change event maybe
 		throw new PCDIException("Not implement yet - ExpressionManager: deleteVariable");
 	}
+	*/
 }

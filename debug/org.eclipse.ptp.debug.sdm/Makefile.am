@@ -70,6 +70,7 @@ libmi_a_SOURCES =		src/mi/MIParser.c \
 						src/mi/MIVarCommand.c \
 						src/mi/MIError.c \
 						src/mi/MISession.c \
+						src/mi/MIThreadCommand.c \
 						src/mi/MIMemory.c \
 						src/mi/MIMemoryCommand.c
 						

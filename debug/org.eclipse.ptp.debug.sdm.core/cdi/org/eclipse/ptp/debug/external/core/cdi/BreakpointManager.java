@@ -21,6 +21,7 @@ package org.eclipse.ptp.debug.external.core.cdi;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.eclipse.core.resources.IMarkerDelta;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -70,6 +71,7 @@ import org.eclipse.ptp.debug.external.core.commands.DisableBreakpointCommand;
 import org.eclipse.ptp.debug.external.core.commands.EnableBreakpointCommand;
 import org.eclipse.ptp.debug.external.core.commands.SetFunctionBreakpointCommand;
 import org.eclipse.ptp.debug.external.core.commands.SetLineBreakpointCommand;
+import org.eclipse.ptp.debug.external.core.commands.SetWatchpointCommand;
 
 public class BreakpointManager extends Manager implements IPCDIBreakpointManager, IBreakpointsListener {
 	public static IPCDIBreakpoint[] EMPTY_BREAKPOINTS = {};
@@ -271,20 +273,11 @@ public class BreakpointManager extends Manager implements IPCDIBreakpointManager
 		} catch (NumberFormatException e) {
 			//
 		}
-		Watchpoint bkpt = new Watchpoint(expression, type, watchType, condition);
-		setWatchpoint(tasks, bkpt);
-		// Fire a created Event.
-		throw new PCDIException("Not implement - setWatchpoint");
-		// return bkpt;
-	}
-	public void setWatchpoint(BitList tasks, Watchpoint watchpoint) throws PCDIException {
-		/*
-		 * Session session = (Session)getSession(); boolean access = watchpoint.isReadType() && watchpoint.isWriteType(); boolean read = ! watchpoint.isWriteType() && watchpoint.isReadType(); String
-		 * expression = watchpoint.getWatchExpression();
-		 */
-		// TODO - implement set watch point
-		// session.getDebugger().setWatchpoint(tasks, access, read, expression);
-		throw new PCDIException("Not implement yet - setWatchpoint");
+		IPCDIWatchpoint cdiWatchpt = new Watchpoint(expression, type, watchType, condition);
+		IPCDIBreakpoint cdiBpt = setBreakpointCommand(tasks, cdiWatchpt);
+		cdiBreakIDMap.put(new Integer(cdiBpt.getBreakpointId()), cdiBpt);
+		return cdiWatchpt;
+
 	}
 	public IPCDIExceptionpoint setExceptionpoint(BitList tasks, String clazz, boolean stopOnThrow, boolean stopOnCatch) throws PCDIException {
 		if (!stopOnThrow && !stopOnCatch) {
@@ -352,6 +345,8 @@ public class BreakpointManager extends Manager implements IPCDIBreakpointManager
 		} else if (bkpt instanceof IPCDIFunctionBreakpoint) {
 			return new SetFunctionBreakpointCommand(tasks, (IPCDIFunctionBreakpoint) bkpt);
 		} else if (bkpt instanceof IPCDIAddressBreakpoint) {
+		} else if (bkpt instanceof IPCDIWatchpoint) {
+			return new SetWatchpointCommand(tasks, (IPCDIWatchpoint) bkpt);
 		}
 		return null;
 	}

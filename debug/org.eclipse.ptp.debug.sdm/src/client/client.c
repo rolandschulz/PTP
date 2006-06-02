@@ -82,6 +82,8 @@ static proxy_svr_commands command_tab[] = {
 	{DBG_ENABLEBREAKPOINT_CMD,		DbgClntEnableBreakpoint},
 	{DBG_DISABLEBREAKPOINT_CMD,		DbgClntDisableBreakpoint},
 	{DBG_CONDITIONBREAKPOINT_CMD,	DbgClntConditionBreakpoint},
+	{DBG_BREAKPOINTAFTER_CMD,		DbgClntBreakpointAfter},
+	{DBG_SETWATCHPOINT_CMD,			DbgClntSetWatchpoint},
 	{DBG_GO_CMD,					DbgClntGo},
 	{DBG_STEP_CMD,					DbgClntStep},
 	{DBG_TERMINATE_CMD,				DbgClntTerminate},

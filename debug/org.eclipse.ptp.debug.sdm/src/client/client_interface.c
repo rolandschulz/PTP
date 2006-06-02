@@ -206,6 +206,28 @@ DbgConditionBreakpoint(session *s, bitset *set, int bpid, char *expr)
 	free(set_str);
 	return res;
 }
+
+int 
+DbgBreakpointAfter(session *s, bitset *set, int bpid, int icount)
+{
+	int		res;
+	char *	set_str = bitset_to_str(set);
+	
+	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_BREAKPOINTAFTER_CMD, DBG_BREAKPOINTAFTER_FMT, set_str, bpid, icount);
+	free(set_str);
+	return res;
+}
+
+int 
+DbgSetWatchpoint(session *s, bitset *set, int bpid, char *expr, int access, int read, char *condition, int icount)
+{
+	int		res;
+	char *	set_str = bitset_to_str(set);
+
+	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_SETWATCHPOINT_CMD, DBG_SETWATCHPOINT_FMT, set_str, bpid, expr, access, read, condition, icount);
+	free(set_str);
+	return res;
+}
 /*
  * Process control operations
  */
