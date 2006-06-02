@@ -23,7 +23,7 @@ __date__ = ctime()
 __version__ = "1.0"
 __credits__ = ""
 
-import os, socket, binascii
+import os, sys, socket, binascii
 
 PROXY_EV_OK		        	= 0
 PROXY_EV_ERROR			    = 1
@@ -168,3 +168,7 @@ def from_ptp_string(s):
     if val[0] == '1':
         return ''
     return binascii.a2b_hex(val[1][0:-2])
+
+def ptp_print(str):
+    sys.stdout.write(str + '\n')
+    sys.stdout.flush()

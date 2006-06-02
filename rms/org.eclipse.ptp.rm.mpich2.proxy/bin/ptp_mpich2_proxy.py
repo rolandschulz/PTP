@@ -17,7 +17,7 @@
 # 
 
 """
-usage: ptp_mpd_proxy [--host=hostname --port=port]
+usage: ptp_mpich2_proxy [[--host=hostname] --port=port]
 """
 
 from time import ctime
@@ -30,6 +30,18 @@ import sys, os
 import signal, socket, binascii, pwd, grp
 import imp
 
+from  sets     import  Set
+from  re       import  sub
+from  urllib   import  unquote
+
+from  ptplib   import  PTPProxy, ptp_print, to_ptp_string, from_ptp_string, \
+                       RTEV_OK, RTEV_NEWJOB, RTEV_NODES, RTEV_NATTR, \
+                       RTEV_PATTR, RTEV_JOBSTATE, RTEV_PROCOUT, \
+                       RTEV_ERROR_PROCS, RTEV_ERROR_PATTR, \
+                       RTEV_ERROR_NODES, RTEV_ERROR_NATTR, \
+                       RTEV_ERROR_RUN, RTEV_ERROR_TERMINATE_JOB
+                       
+ptp_print(os.environ['PATH'])
 #
 # Try and locate MPICH2 installation
 #
@@ -37,24 +49,15 @@ try:
     fp, path, desc = imp.find_module('mpdlib', os.environ['PATH'].split(':'))
     imp.load_module('mpdlib', fp, path, desc)
 except ImportError:
-    print 'Could not locate MPICH2 installation. Please check your PATH.'
+    ptp_print('Could not locate MPICH2 installation. Please check your PATH.')
     sys.exit(1)
 
-from  sets     import  Set
-from  re       import  sub
-from  urllib   import  unquote
-from  mpdlib   import  mpd_set_my_id, mpd_uncaught_except_tb, mpd_print, \
+from  mpdlib   import  mpd_set_my_id, mpd_get_my_id, mpd_uncaught_except_tb, \
                        mpd_handle_signal, mpd_get_my_username, mpd_version, \
-                       MPDConClientSock, MPDParmDB, MPDListenSock, \
+                       MPDSock, MPDParmDB, MPDListenSock, \
                        MPDStreamHandler, mpd_get_my_username, \
                        mpd_get_groups_for_username
-from  ptplib   import  PTPProxy, to_ptp_string, from_ptp_string, \
-                       RTEV_OK, RTEV_NEWJOB, RTEV_NODES, RTEV_NATTR, \
-                       RTEV_PATTR, RTEV_JOBSTATE, RTEV_PROCOUT, \
-                       RTEV_ERROR_PROCS, RTEV_ERROR_PATTR, \
-                       RTEV_ERROR_NODES, RTEV_ERROR_NATTR, \
-                       RTEV_ERROR_RUN, RTEV_ERROR_TERMINATE_JOB
-
+                     
 global exit, parmdb, myHost, myIP, cliMode, runningJobs, jobIDMap
 global sigOccurred, streamHandler, manSocks, ptpProxy, extraEvent, debug
 
@@ -71,7 +74,7 @@ def ptp_mpd_proxy():
 
     sys.excepthook = mpd_uncaught_except_tb
 
-    ptpHost = ''
+    ptpHost = 'localhost'
     ptpPort = 0
     sigOccurred = 0
     manSocks = []
@@ -92,7 +95,7 @@ def ptp_mpd_proxy():
     if len(sys.argv) > 1:
         if (sys.argv[1] == '-h' or sys.argv[1] == '--help'):
             usage()
-            
+      
     arg = 1
     while arg < len(sys.argv):
         args = sys.argv[arg].split('=')
@@ -101,29 +104,28 @@ def ptp_mpd_proxy():
         	    usage()
         	ptpHost = args[1]
         elif args[0] == '--port':
-        	if len(args) < 2 or not args[1].isdigit():
-        	    usage()
-        	ptpPort = int(args[1])
+            if len(args) < 2 or not args[1].isdigit():
+                usage()
+            ptpPort = int(args[1])
+            ptp_print('ptpport = %d' % ptpPort)
         elif args[0] == '--debug':
             debug = 1
         else:
         	usage()
         arg += 1
 
-	if (ptpHost == '' or ptpPort == 0):
-	    usage()
-
     streamHandler = MPDStreamHandler()
 
     #
     # Connect to PTP
     #
-    if ptpHost != '':
+    if ptpPort != 0:
+        ptp_print('about to connect')
         ptpProxy = PTPProxy(ptpHost, ptpPort, ptpProxyCmds, debug=debug)
     	try:
     	    ptpProxy.connect()
     	except:
-    	    print 'ptp_mpd_proxy: could not connect to %s:%d' % (ptpHost,ptpPort)
+    	    ptp_print('ptp_mpich2_proxy: could not connect to %s:%d' % (ptpHost,ptpPort))
     	    sys.exit(-1)
     	streamHandler.set_handler(ptpProxy.getsocket(),ptpProxy.read_commands,args=())
 
@@ -135,13 +137,13 @@ def ptp_mpd_proxy():
     if hasattr(signal,'SIGALRM'):
         signal.signal(signal.SIGALRM,sig_handler)
 
-    mpd_set_my_id(myid='ptp_mpd_proxy')
+    mpd_set_my_id(myid='ptp_mpich2_proxy')
 
     myHost = socket.gethostname();
     try:
     	hostinfo = socket.gethostbyname_ex(myHost)
     except:
-    	print 'ptp_mpd_proxy failed: gethostbyname_ex failed for %s' % (myHost)
+    	ptp_print('ptp_mpich2_proxy failed: gethostbyname_ex failed for %s' % (myHost))
     	sys.exit(-1)
     myIP = hostinfo[2][0]
 
@@ -169,7 +171,7 @@ def ptp_mpd_proxy():
     parmdb[('thispgm','print_parmdb_all')] = 0
     parmdb[('thispgm','print_parmdb_def')] = 0
 
-    if ptpHost == '':
+    if ptpPort == 0:
     	sys.stdout.write('>>> ')
     	sys.stdout.flush()
     	streamHandler.set_handler(sys.stdin,do_input,args=())
@@ -213,22 +215,22 @@ def do_input(fd):
     	listjobs([])
     elif line[0] == 'listprocs':
     	if len(line) < 2:
-    	    print 'listprocs <jobid>'
+    	    ptp_print('listprocs <jobid>')
     	else:
     	    listprocs([line[1]])
     elif line[0] == 'procattrs':
     	if len(line) < 2:
-    	    print 'procattrs <jobid>'
+    	    ptp_print('procattrs <jobid>')
     	else:
     	    procattrs([line[1]])
     elif line[0] == 'kill':
     	if len(line) < 2:
-    	    print 'kill <jobid>'
+    	    ptp_print('kill <jobid>')
     	else:
     	    kill([line[1]])
     elif line[0] == 'run':
     	if len(line) < 3:
-    	    print 'run <nprocs> <cmd> [<args>]'
+    	    ptp_print('run <nprocs> <cmd> [<args>]')
     	args = []
     	args.append('execName')
     	args.append(line[2])
@@ -243,7 +245,7 @@ def do_input(fd):
     	    pos += 1
     	run(args)
     else:
-    	print 'Unknown command: ', line[0]
+    	ptp_print('Unknown command: %s' % line[0])
     sys.stdout.write('>>> ')
     sys.stdout.flush()
 
@@ -252,10 +254,12 @@ def open_mpd_console():
     if (hasattr(os,'getuid')  and  os.getuid() == 0)  or  parmdb['MPD_USE_ROOT_MPD']:
         fullDirName = os.path.abspath(os.path.split(sys.argv[0])[0])  # normalize
         mpdroot = os.path.join(fullDirName,'mpdroot')
-        conSock = MPDConClientSock(mpdroot=mpdroot,secretword=parmdb['MPD_SECRETWORD'])
+        conSock = PTPConClientSock(mpdroot=mpdroot,secretword=parmdb['MPD_SECRETWORD'])
     else:
-        conSock = MPDConClientSock(secretword=parmdb['MPD_SECRETWORD'])
-    return conSock
+        conSock = PTPConClientSock(secretword=parmdb['MPD_SECRETWORD'])
+    if conSock.connect():
+        return conSock
+    return 0
 
 def make_jobid(str):
     smjobid = str.split('  ')  # jobnum, mpdid, and alias (if present)
@@ -357,7 +361,7 @@ def listjobs(args):
         else:  # mpdlistjobs_trailer
             done = 1
     conSock.close()
-    print jobids
+    ptp_printjobids
     return (1, jobids)
 
 def listprocs(args):
@@ -392,7 +396,7 @@ def listprocs(args):
         else:  # mpdlistjobs_trailer
             done = 1
     conSock.close()
-    print procs
+    ptp_printprocs
     return (RTEV_PROCS, procs)
 
 def procattrs(args):
@@ -675,57 +679,57 @@ def handle_man_input(sock,streamHandler,jobid):
     if not msg:
         streamHandler.del_handler(sock)
     elif not msg.has_key('cmd'):
-        mpd_print(1,'mpiexec: from man, invalid msg=:%s:' % (msg) )
+        ptp_print('mpiexec: from man, invalid msg=:%s:' % (msg) )
     elif msg['cmd'] == 'execution_problem':
-        print 'rank %d (%s) in job %s failed to find executable %s' % \
-              ( msg['rank'], msg['src'], msg['jobid'], msg['exec'] )
+        ptp_print('rank %d (%s) in job %s failed to find executable %s' % \
+              ( msg['rank'], msg['src'], msg['jobid'], msg['exec'] ))
         host = msg['src'].split('_')[0]
         reason = unquote(msg['reason'])
-        print 'problem with execution of %s  on  %s:  %s ' % \
-              (msg['exec'],host,reason)
+        ptp_print('problem with execution of %s  on  %s:  %s ' % \
+              (msg['exec'],host,reason))
         # keep going until all man's finish
     	if ptpProxy != None:
     	    ptpProxy.send_ok_event(RTEV_JOBSTATE, [jobIDMap.index(jobid), 9])
     	return
     elif msg['cmd'] == 'job_aborted_early':
-        print 'rank %d in job %s caused collective abort of all ranks' % \
-              ( msg['rank'], msg['jobid'] )
+        ptp_print('rank %d in job %s caused collective abort of all ranks' % \
+              ( msg['rank'], msg['jobid'] ))
         status = msg['exit_status']
         if hasattr(os,'WIFSIGNALED')  and  os.WIFSIGNALED(status):
             killed_status = status & 0x007f  # AND off core flag
-            print '  exit status of rank %d: killed by signal %d ' % \
-                  (msg['rank'],killed_status)
+            ptp_print('  exit status of rank %d: killed by signal %d ' % \
+                  (msg['rank'],killed_status))
         elif hasattr(os,'WEXITSTATUS'):
             exit_status = os.WEXITSTATUS(status)
-            print '  exit status of rank %d: return code %d ' % \
-                  (msg['rank'],exit_status)
-    	if ptpProxy != None:
-    	    ptpProxy.send_ok_event(RTEV_JOBSTATE, [jobIDMap.index(jobid), 8])
+            ptp_print('  exit status of rank %d: return code %d ' % \
+                  (msg['rank'],exit_status))
+    	job_state = 8
+        runningJobs[jobid] -= 1
     elif msg['cmd'] == 'job_aborted':
-        print 'job aborted; reason = %s' % (msg['reason'])
-    	if ptpProxy != None:
-    	    ptpProxy.send_ok_event(RTEV_JOBSTATE, [jobIDMap.index(jobid), 9])
+        ptp_print('job aborted; reason = %s' % (msg['reason']))
+        job_state = 9
+        runningJobs[jobid] = 0
     elif msg['cmd'] == 'client_exit_status':
-        print "exit info: rank=%d  host=%s  pid=%d  status=%d" % \
+        ptp_print("exit info: rank=%d  host=%s  pid=%d  status=%d" % \
               (msg['cli_rank'],msg['cli_host'],
-               msg['cli_pid'],msg['cli_status'])
+               msg['cli_pid'],msg['cli_status']))
         status = msg['cli_status']
         if hasattr(os,'WIFSIGNALED')  and  os.WIFSIGNALED(status):
             killed_status = status & 0x007f  # AND off core flag
-            print 'exit status of rank %d: killed by signal %d ' % \
-                   (msg['cli_rank'],killed_status)
+            ptp_print('exit status of rank %d: killed by signal %d ' % \
+                   (msg['cli_rank'],killed_status))
         elif hasattr(os,'WEXITSTATUS'):
             exit_status = os.WEXITSTATUS(status)
-            print 'exit status of rank %d: return code %d ' % \
-                  (msg['cli_rank'],exit_status)
-    	if ptpProxy != None:
-    	    ptpProxy.send_ok_event(RTEV_JOBSTATE, [jobIDMap.index(jobid), 8])
+            ptp_print('exit status of rank %d: return code %d ' % \
+                  (msg['cli_rank'],exit_status))
+        job_state = 8
+        runningJobs[jobid] -= 1
     else:
-        print 'unrecognized msg from manager :%s:' % msg
-
-    runningJobs[jobid] -= 1
+        ptp_print('unrecognized msg from manager :%s:' % msg)
 
     if runningJobs[jobid] <= 0:
+        if ptpProxy != None:
+            ptpProxy.send_ok_event(RTEV_JOBSTATE, [jobIDMap.index(jobid), job_state])
     	streamHandler.del_handler(sock)
     	manSocks.remove(sock)
     	sock.close()
@@ -769,7 +773,7 @@ def handle_sig_occurred(manSock):
             msgToSend = { 'cmd' : 'signal', 'signo' : 'SIGKILL' }
             manSock.send_dict_msg(msgToSend)
             manSock.close()
-        mpd_print(1,'job ending due to env var MPIEXEC_TIMEOUT=%s' % \
+        ptp_print('job ending due to env var MPIEXEC_TIMEOUT=%s' % \
                   os.environ['MPIEXEC_TIMEOUT'])
         exit = 1
 
@@ -781,10 +785,139 @@ def sig_handler(signum,frame):
 def debug_print(str):
     global debug
     if debug:
-    	print str
+    	ptp_print(str)
+
+#
+# Replacement for MPDConClientSock() that doesn't
+# call sys.exit()
+#
+class PTPConClientSock(MPDSock):
+    def __init__(self,name='console_to_mpd',mpdroot='',secretword='',**kargs):
+        MPDSock.__init__(self)
+        self.sock = 0
+        if os.environ.has_key('MPD_CON_EXT'):
+            self.conExt = '_'  + os.environ['MPD_CON_EXT']
+        else:       
+            self.conExt = ''
+        self.secretword = secretword
+        self.mpdroot = mpdroot
+        self.name = name
+        
+    def connect(self):
+        if self.mpdroot: 
+            self.conFilename = '/tmp/mpd2.console_root' + self.conExt
+            self.sock = MPDSock(family=socket.AF_UNIX,name=self.name)
+            rootpid = os.fork()
+            if rootpid == 0:
+                os.execvpe(self.mpdroot,[self.mpdroot,self.conFilename,str(self.sock.fileno())],{})           
+                ptp_print('failed to exec mpdroot (%s)' % self.mpdroot ) 
+                return 0    
+            else:   
+                (pid,status) = os.waitpid(rootpid,0)
+                if os.WIFSIGNALED(status):
+                    status = status & 0x007f  # AND off core flag
+                else:
+                    status = os.WEXITSTATUS(status)
+                if status != 0:
+                    ptp_print('forked process failed; status=' % status)
+                    return 0
+        else:
+            self.conFilename = '/tmp/mpd2.console_' + mpd_get_my_username() + self.conExt
+            if hasattr(socket,'AF_UNIX'):
+                sockFamily = socket.AF_UNIX
+            else:
+                sockFamily = socket.AF_INET
+            if os.environ.has_key('MPD_CON_INET_HOST_PORT'):
+                sockFamily = socket.AF_INET    # override above-assigned value
+                (conHost,conPort) = os.environ['MPD_CON_INET_HOST_PORT'].split(':')
+                conPort = int(conPort)
+            else:
+                (conHost,conPort) = ('',0)
+            self.sock = MPDSock(family=sockFamily,socktype=socket.SOCK_STREAM,name=self.name)
+            if hasattr(socket,'AF_UNIX')  and  sockFamily == socket.AF_UNIX:
+                if hasattr(signal,'alarm'):
+                    oldAlarmTime = signal.alarm(8)
+                else:    # assume python2.3 or later
+                    oldTimeout = socket.getdefaulttimeout()
+                    socket.setdefaulttimeout(8)
+                try:
+                    self.sock.connect(self.conFilename)
+                except Exception, errmsg:
+                    self.sock.close()
+                    self.sock = 0
+                if hasattr(signal,'alarm'):
+                    signal.alarm(oldAlarmTime)
+                else:    # assume python2.3 or later
+                    socket.setdefaulttimeout(oldTimeout)
+                if self.sock:
+                    # this is done by mpdroot otherwise
+                    msgToSend = 'realusername=%s secretword=UNUSED\n' % \
+                                mpd_get_my_username()
+                    self.sock.send_char_msg(msgToSend)
+            else:
+                if not conPort:
+                    conFile = open(self.conFilename)
+                    for line in conFile:
+                        line = line.strip()
+                        (k,v) = line.split('=')
+                        if k == 'port':
+                            conPort = int(v)
+                    conFile.close()
+                if conHost:
+                    conIfhn = socket.gethostbyname_ex(conHost)[2][0]
+                else:
+                    conIfhn = 'localhost'
+                self.sock = MPDSock(name=self.name)
+                if hasattr(signal,'alarm'):
+                    oldAlarmTime = signal.alarm(8)
+                else:    # assume python2.3 or later
+                    oldTimeout = socket.getdefaulttimeout()
+                    socket.setdefaulttimeout(8)
+                try:
+                    self.sock.connect((conIfhn,conPort))
+                except Exception, errmsg:
+                    ptp_print("failed to connect to host %s port %d" % \
+                              (conIfhn,conPort) )
+                    self.sock.close()
+                    self.sock = 0
+                if hasattr(signal,'alarm'):
+                    signal.alarm(oldAlarmTime)
+                else:    # assume python2.3 or later
+                    socket.setdefaulttimeout(oldTimeout)
+                if not self.sock:
+                    ptp_print('%s: cannot connect to local mpd (%s); possible causes:' % \
+                          (mpd_get_my_id(),self.conFilename))
+                    ptp_print('  1. no mpd is running on this host')
+                    ptp_print('  2. an mpd is running but was started without a "console" (-n option)')
+                    return 0
+                msgToSend = { 'cmd' : 'con_init' }
+                self.sock.send_dict_msg(msgToSend)
+                msg = self.sock.recv_dict_msg()
+                if not msg:
+                    ptp_print('expected con_challenge from mpd; got eof')
+                    return 0
+                if msg['cmd'] != 'con_challenge':
+                    ptp_print('expected con_challenge from mpd; got msg=:%s:' % (msg) )
+                    return 0
+                randVal = self.secretword + str(msg['randnum'])
+                response = md5new(randVal).digest()
+                msgToSend = { 'cmd' : 'con_challenge_response', 'response' : response,
+                              'realusername' : mpd_get_my_username() }
+                self.sock.send_dict_msg(msgToSend)
+                msg = self.sock.recv_dict_msg()
+                if not msg  or  msg['cmd'] != 'valid_response':
+                    ptp_print('expected valid_response from mpd; got msg=:%s:' % (msg) )
+                    return 0
+        if not self.sock:
+            ptp_print('%s: cannot connect to local mpd (%s); possible causes:' % \
+                  (mpd_get_my_id(),self.conFilename))
+            ptp_print('  1. no mpd is running on this host')
+            ptp_print('  2. an mpd is running but was started without a "console" (-n option)')
+            return 0
+        return 1
 
 def usage():
-    print __doc__
+    ptp_print(__doc__)
     sys.exit(-1)
 
 if __name__ == '__main__':
