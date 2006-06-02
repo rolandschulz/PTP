@@ -399,6 +399,14 @@
       </hover>
    </extension>
 
+	<!-- Watch Expression //-->
+	<extension
+         point="org.eclipse.debug.core.watchExpressionDelegates">
+      <watchExpressionDelegate
+            debugModel="org.eclipse.ptp.debug.core"
+            delegateClass="org.eclipse.ptp.debug.internal.ui.PWatchExpressionDelegate"/>
+   </extension>
+   
 	<!-- Memory //-->
    <extension
          point="org.eclipse.debug.ui.memoryRenderings">

@@ -42,6 +42,7 @@ import org.eclipse.debug.core.model.ITerminate;
 import org.eclipse.debug.core.model.IThread;
 import org.eclipse.debug.core.model.IValue;
 import org.eclipse.debug.core.model.IVariable;
+import org.eclipse.debug.core.model.IWatchExpression;
 import org.eclipse.debug.ui.IDebugEditorPresentation;
 import org.eclipse.debug.ui.IDebugModelPresentation;
 import org.eclipse.debug.ui.IValueDetailListener;
@@ -125,7 +126,7 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 			if (descriptor != null)
 				return descriptor.getId();
 			// TODO return CEditor id hardcode, CUIPlugin.EDITOR_ID
-			return (descriptor != null) ? descriptor.getId() : "org.eclipse.cdt.ui..editor.CEditor";
+			return (descriptor != null) ? descriptor.getId() : "org.eclipse.cdt.ui.editor.CEditor";
 		}
 		return null;
 	}
@@ -282,6 +283,47 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		}
 		return baseText.toString();
 	}
+
+	/** Get watch expression text on Expression View
+	 * @param expression
+	 * @return
+	 */
+	protected String getWatchExpressionText(IWatchExpression expression) {
+		StringBuffer result = new StringBuffer();
+		result.append('"').append(expression.getExpressionText()).append('"');
+		if (expression.isPending()) {
+			result.append(" = ").append("...");
+		}
+		else {
+			IValue value = expression.getValue();
+			if (value instanceof IPValue) {
+				IPType type = null;
+				try {
+					type = ((IPValue)value).getType();
+				}
+				catch(DebugException e1) {
+				}
+				if (type != null && isShowVariableTypeNames()) {
+					String typeName = getVariableTypeName(type);
+					if (!isEmpty(typeName)) {
+						result.insert(0, typeName + ' ');
+					}
+				}
+				if (expression.isEnabled()) {
+					String valueString = getValueText(value);
+					if (valueString.length() > 0) {
+						result.append(" = ").append(valueString);
+					}
+				}
+			}
+		}
+		if (!expression.isEnabled()) {
+			result.append(' ');
+			result.append(PDebugUIMessages.getString("PTPDebugModelPresentation.disabled1"));
+		}
+		return result.toString();
+	}
+	
 	/** Get base text
 	 * @param element
 	 * @return
@@ -291,10 +333,14 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		StringBuffer label = new StringBuffer();
 		try {
 			/*
-			 * if (element instanceof ICModule) { label.append(getModuleText((ICModule)element, showQualified)); return label.toString(); } if (element instanceof ICSignal) {
+			 * if (element instanceof ICModule) { label.append(getModuleText((ICModule)element, showQualified)); 
+			 * return label.toString(); } if (element instanceof ICSignal) {
 			 * label.append(getSignalText((ICSignal)element)); return label.toString(); } if (element instanceof IRegisterGroup) { label.append(((IRegisterGroup)element).getName()); return
-			 * label.toString(); } if (element instanceof IWatchExpression) { return getWatchExpressionText((IWatchExpression)element); }
+			 * label.toString(); } 
 			 */
+			if ( element instanceof IWatchExpression ) {
+				return getWatchExpressionText((IWatchExpression)element);
+			}
 			if (element instanceof IVariable) {
 				label.append(getVariableText((IVariable) element));
 				return label.toString();
@@ -435,7 +481,7 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 	protected String getValueText(IValue value) {
 		StringBuffer label = new StringBuffer();
 		if (value instanceof IPDebugElementStatus && !((IPDebugElementStatus) value).isOK()) {
-			label.append(getFormattedString(PDebugUIMessages.getString("CDTDebugModelPresentation.4"), ((IPDebugElementStatus) value).getMessage()));
+			label.append(getFormattedString(PDebugUIMessages.getString("PTPDebugModelPresentation.error1"), ((IPDebugElementStatus) value).getMessage()));
 		} else if (value instanceof IPValue) {
 			IPType type = null;
 			try {
