@@ -216,28 +216,13 @@ public class PTPCorePlugin extends AbstractUIPlugin {
 			}
 		});
 	}
-	/*
-	public void addPerspectiveListener(final IPerspectiveListener perspectiveListener) {
-		IWorkbenchWindow workBenchWindow = PTPCorePlugin.getActiveWorkbenchWindow();
-		if (workBenchWindow instanceof WorkbenchWindow) {
-			workBenchWindow.addPerspectiveListener(perspectiveListener);
-		}
-	}
-	public void removePerspectiveListener(final IPerspectiveListener perspectiveListener) {
-		IWorkbenchWindow workBenchWindow = PTPCorePlugin.getActiveWorkbenchWindow();
-		if (workBenchWindow instanceof WorkbenchWindow) {
-			workBenchWindow.removePerspectiveListener(perspectiveListener);
-		}
-	}
-	*/
-	public String locateFragmentFile(String fragment, String file) {
-		
-		
+
+	public String locateFragmentFile(String fragment, String file) {		
 		Bundle[] frags = Platform.getFragments(Platform.getBundle(PTPCorePlugin.PLUGIN_ID));
 		String os = Platform.getOS();
 		String arch = Platform.getOSArch();
-		String os_arch = os+"."+arch;
-		System.out.println("OS = '"+os+"', Architecture = '"+arch+"', OS_ARCH combo = '"+os_arch+"'");
+		String frag_os_arch = fragment+"."+os+"."+arch;
+		System.out.println("OS = '"+os+"', Architecture = '"+arch+"', OS_ARCH combo = '"+frag_os_arch+"'");
 		String ptp_version = (String)getDefault().getBundle().getHeaders().get("Bundle-Version");
 		System.out.println("PTP Version = "+ptp_version);
 		
@@ -254,22 +239,29 @@ public class PTPCorePlugin extends AbstractUIPlugin {
 				String str_path = local_path.getPath();
 				System.out.println("Testing fragment "+(i+1)+" with this OS/arch - path: '"+str_path+"'");
 				
-				/* OK so now we know where the absolute path of this fragment is -
+				/* 
+				 * OK so now we know where the absolute path of this fragment is -
 				 * but is this the fragment for the machine we're running on?
+				 * 
+				 * First: check for a 'bin' directory in the fragment. This may be an architecture
+				 * 		  independent fragment.
+				 * 
+				 * Second: check for a 'bin' directory in the fragment with the os and arch appended.
 				 */
-				int idx = str_path.indexOf(os_arch);
+				int idx = str_path.indexOf(fragment);
 				if(idx > 0) {
-					/* found it!  This is the right fragment for our OS & arch */
-					System.out.println("\tCorrect fragment for our OS & arch");
-					/*
 					String file_path = str_path + "bin/"+file;
-					System.out.println("\tStep 1: Searching for file in '"+file_path+"'");
+					System.out.println("\tSearching for file in '"+file_path+"'");
 					File f = new File(file_path);
 					if(f.exists()) {
 						System.out.println("\t\t**** FOUND IT!");
 						return file_path;
 					}
-					*/
+				}
+				idx = str_path.indexOf(frag_os_arch);
+				if(idx > 0) {
+					/* found it!  This is the right fragment for our OS & arch */
+					System.out.println("\tCorrect fragment for our OS & arch");
 					String file_path = str_path + "bin/"+file;
 					System.out.println("\tSearching for file in '"+file_path+"'");
 					File f = new File(file_path);
@@ -284,65 +276,5 @@ public class PTPCorePlugin extends AbstractUIPlugin {
 		
 		/* guess we never found it.... */
 		return null;
-		
-		
-		
-//		String	filePath = null;
-//		URL		url = Platform.find(Platform.getBundle(PTPCorePlugin.PLUGIN_ID), new Path("/"));
-//
-//		if (url != null) {
-//			try {
-//				File path = new File(Platform.asLocalURL(url).getPath());
-//				String ipath = path.getAbsolutePath();
-//				System.out.println("Plugin install dir = '"+ipath+"'");
-//				
-//				/* org.eclipse.ptp.orte.linux.x86_64_1.0.0
-//				   org.eclipse.ptp.orte.$(OS).$(ARCH)_$(VERSION) */
-//				String ptp_version = (String)getDefault().getBundle().getHeaders().get("Bundle-Version");
-//				System.out.println("PTP Version = "+ptp_version);
-//				Properties p = System.getProperties();
-//				String os = p.getProperty("osgi.os");
-//				String arch = p.getProperty("osgi.arch");
-//				System.out.println("osgi.os = "+os);
-//				System.out.println("osgi.arch = "+arch);
-//				if(os != null && arch != null && ptp_version != null) {
-//					String combo = PLUGIN_ID;
-//					System.out.println("[1] Searching for plug-in directory: "+combo);
-//					int idx = ipath.indexOf(combo);
-//					/* if we found it */
-//					if(idx > 0) {
-//						String ipath2 = ipath.substring(0, idx)+fragment+"."+os+"."+arch+"_"+ptp_version+"/bin/"+file;
-//						System.out.println("[2] Searching for '"+file+"' in: "+ipath2);
-//						File f = new File(ipath2);
-//						if(f.exists()) {
-//							filePath = ipath2;
-//							System.out.println("\tFOUND HERE!");
-//						}
-//						else {
-//							ipath2 = ipath.substring(0, idx)+fragment+"."+os+"."+arch+"/bin/"+file;
-//							System.out.println("[3] Searching for '"+file+"' in: "+ipath2);
-//							f = new File(ipath2);
-//							if(f.exists()) {
-//								filePath = ipath2;
-//								System.out.println("\tFOUND HERE!");
-//							}
-//						}
-//					}
-//				}
-//				
-//				if(filePath == null) {
-//					int idx = ipath.indexOf(PLUGIN_ID);
-//					String ipath2 = ipath.substring(0, idx) + fragment+"/"+file;
-//					System.out.println("[4] Searching for: "+ipath2);
-//					File f = new File(ipath2);
-//					if(f.exists()) {
-//						filePath = ipath2;
-//						System.out.println("\tFOUND HERE!");
-//					}
-//				}
-//			} catch(Exception e) { 
-//			}
-//		}
-//		return filePath;
 	}
 }
