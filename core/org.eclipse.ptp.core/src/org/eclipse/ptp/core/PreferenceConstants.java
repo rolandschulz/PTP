@@ -42,6 +42,8 @@ public interface PreferenceConstants {
 	//public static final String ORTE_SERVER_PATH = "ORTE_SERVER_PATH";
 	public static final String ORTE_PROXY_PATH = "ORTE_PROXY_PATH";
 	public static final String ORTE_LAUNCH_MANUALLY = "ORTE_LAUNCH_MANUALLY";
+	public static final String MPICH2_PROXY_PATH = "MPICH2_PROXY_PATH";
+	public static final String MPICH2_LAUNCH_MANUALLY = "MPICH2_LAUNCH_MANUALLY";
 	public static final String SIMULATION_MACHINE_NODE_PREFIX = "SIMULATION_MACHINE_NODE_";
 	public static final String SIMULATION_NUM_MACHINES = "SIMULATION_NUM_MACHINES";
 	public final static String SIMULATION_PROJECT_NAME = "PTPSimulation";

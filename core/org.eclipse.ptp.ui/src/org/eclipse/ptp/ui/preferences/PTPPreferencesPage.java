@@ -238,29 +238,43 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 	 * Returns true if the selected monitoring system is a valid selection. We allow the system to display MS choices which are not yet complete or enabled yet.
 	 */
 	protected boolean isValidMSSetting() {
-		int intchoice = comboMS.getSelectionIndex();
-		if (intchoice > 1) {
-			setErrorMessage("Sorry, that monitoring system choice is not yet implemented.");
-			setValid(false);
-			return false;
-		} else if (intchoice < 0) {
+		int MS = comboMS.getSelectionIndex();
+		if (MS < 0) {
 			setErrorMessage("Select a monitoring system.");
 			setValid(false);
 			return false;
 		}
+		int MSID = MonitoringSystemChoices.getMSIDByIndex(MS);
+		switch (MSID) {
+		case MonitoringSystemChoices.SIMULATED:
+		case MonitoringSystemChoices.ORTE:
+		case MonitoringSystemChoices.MPICH2:
+			break;
+		default:
+			setErrorMessage("Sorry, that monitoring system choice is not yet implemented.");
+			setValid(false);
+			return false;
+		} 
 		return true;
 	}
 	/**
 	 * Returns true if the selected control system is a valid selection. We allow the system to display CS choices which are not yet complete or enabled yet.
 	 */
 	protected boolean isValidCSSetting() {
-		int intchoice = comboCS.getSelectionIndex();
-		if (intchoice > 1) {
-			setErrorMessage("Sorry, that control system choice is not yet implemented.");
+		int CS = comboCS.getSelectionIndex();
+		if (CS < 0) {
+			setErrorMessage("Select a control system.");
 			setValid(false);
 			return false;
-		} else if (intchoice < 0) {
-			setErrorMessage("Select a control system.");
+		}
+		int CSID = ControlSystemChoices.getCSIDByIndex(CS);
+		switch (CSID) {
+		case ControlSystemChoices.SIMULATED:
+		case ControlSystemChoices.ORTE:
+		case ControlSystemChoices.MPICH2:
+			break;
+		default:
+			setErrorMessage("Sorry, that control system choice is not yet implemented.");
 			setValid(false);
 			return false;
 		}
@@ -277,6 +291,8 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 		if (CSID == ControlSystemChoices.SIMULATED && MSID == MonitoringSystemChoices.SIMULATED)
 			return true;
 		if (CSID == ControlSystemChoices.ORTE && MSID == MonitoringSystemChoices.ORTE)
+			return true;
+		if (CSID == ControlSystemChoices.MPICH2 && MSID == MonitoringSystemChoices.MPICH2)
 			return true;
 		setErrorMessage("Sorry, that combination of control and monitoring systems it not valid.");
 		setValid(false);

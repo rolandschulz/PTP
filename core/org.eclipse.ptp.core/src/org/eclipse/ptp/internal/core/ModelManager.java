@@ -49,6 +49,9 @@ import org.eclipse.ptp.rtsystem.IMonitoringSystem;
 import org.eclipse.ptp.rtsystem.IRuntimeListener;
 import org.eclipse.ptp.rtsystem.IRuntimeProxy;
 import org.eclipse.ptp.rtsystem.JobRunConfiguration;
+import org.eclipse.ptp.rtsystem.mpich2.MPICH2ControlSystem;
+import org.eclipse.ptp.rtsystem.mpich2.MPICH2MonitoringSystem;
+import org.eclipse.ptp.rtsystem.mpich2.MPICH2ProxyRuntimeClient;
 import org.eclipse.ptp.rtsystem.ompi.OMPIControlSystem;
 import org.eclipse.ptp.rtsystem.ompi.OMPIMonitoringSystem;
 import org.eclipse.ptp.rtsystem.ompi.OMPIProxyRuntimeClient;
@@ -232,6 +235,30 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 				controlSystem = new OMPIControlSystem((OMPIProxyRuntimeClient)runtimeProxy);
 				monitor.worked(10);
 			}
+			else if(monitoringSystemID == MonitoringSystemChoices.MPICH2 && controlSystemID == ControlSystemChoices.MPICH2) {
+				/* load up the control and monitoring systems for OMPI */
+				monitor.subTask("Starting MPICH2 proxy runtime...");
+				runtimeProxy = new MPICH2ProxyRuntimeClient(this);
+				monitor.worked(10);
+				
+				if(!runtimeProxy.startup(monitor)) {
+					System.err.println("Failed to start up the proxy runtime.");
+					runtimeProxy = null;
+					if (monitor.isCanceled()) {
+						throw new CoreException(Status.CANCEL_STATUS);
+					}
+					throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, 
+							"There was an error starting the MPICH2 proxy runtime.  The path to 'ptp_mpich2_proxy' "+
+							"may have been incorrect. Try checking the console log or error logs for more detailed information.",
+							null));
+				}
+				monitor.subTask("Starting MPICH2 monitoring system...");
+				monitoringSystem = new MPICH2MonitoringSystem((MPICH2ProxyRuntimeClient)runtimeProxy);
+				monitor.worked(10);
+				monitor.subTask("Starting MPICH2 control system...");
+				controlSystem = new MPICH2ControlSystem((MPICH2ProxyRuntimeClient)runtimeProxy);
+				monitor.worked(10);
+			}
 			else {
 				throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, "Invalid monitoring/control system selected.  Set using the PTP preferences page.", null));
 			}
@@ -284,7 +311,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			IProgressMonitor subMonitor = new SubProgressMonitor(monitor, 1);
 			subMonitor.beginTask("", ne2.length);
 			subMonitor.setTaskName("Creating nodes...");
-			if(monitoringSystem instanceof OMPIMonitoringSystem) {
+			if(monitoringSystem instanceof OMPIMonitoringSystem || monitoringSystem instanceof MPICH2MonitoringSystem) {
 				int num_attribs = 5;
 				String[] keys = new String[] {
 					AttributeConstants.ATTRIB_NODE_NAME,
