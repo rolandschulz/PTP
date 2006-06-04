@@ -19,9 +19,9 @@ import org.eclipse.core.filebuffers.ITextFileBuffer;
 import org.eclipse.core.filebuffers.ITextFileBufferManager;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.photran.internal.core.f95modelparser.ILexer;
-import org.eclipse.photran.internal.core.f95modelparser.Terminal;
-import org.eclipse.photran.internal.core.f95modelparser.Token;
+import org.eclipse.photran.internal.core.f95refactoringparser.ILexer;
+import org.eclipse.photran.internal.core.f95refactoringparser.Terminal;
+import org.eclipse.photran.internal.core.f95refactoringparser.Token;
 
 
 /**

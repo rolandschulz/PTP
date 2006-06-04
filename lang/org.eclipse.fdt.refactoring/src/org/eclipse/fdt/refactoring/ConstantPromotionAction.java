@@ -1,5 +1,6 @@
 package org.eclipse.fdt.refactoring;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,10 +15,11 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.photran.internal.core.f95modelparser.FortranProcessor;
-import org.eclipse.photran.internal.core.f95modelparser.ILexer;
-import org.eclipse.photran.internal.core.f95modelparser.Terminal;
-import org.eclipse.photran.internal.core.f95modelparser.Token;
+import org.eclipse.photran.internal.core.f95refactoringparser.ILexer;
+import org.eclipse.photran.internal.core.f95refactoringparser.Terminal;
+import org.eclipse.photran.internal.core.f95refactoringparser.Token;
+import org.eclipse.photran.internal.core.f95refactoringparser.Lexer;
+import org.eclipse.photran.internal.core.f95refactoringparser.PreprocessingReader;
 import org.eclipse.swt.widgets.Display;
 
 /*
@@ -70,8 +72,13 @@ public class ConstantPromotionAction {
         	
         	for (int i = 0; i < fFiles.length; i++) {
         		try {
-        			IFile file = fFiles[i];
-        			ILexer scanner = FortranProcessor.createLexerFor(file.getContents(), file.getName());
+                    boolean isFixedForm = false;
+
+                    IFile file = fFiles[i];
+                    
+                    String filename = file.getName();                    
+                    InputStream in = file.getContents();
+                    ILexer scanner = Lexer.createLexer(new PreprocessingReader(in, filename), filename, isFixedForm);
         			final String[] constants = TextChanges.processConstants(scanner);
         			//showReplaceDialog(constants);
         			applyChanges(monitor, file, constants);
@@ -140,8 +147,13 @@ public class ConstantPromotionAction {
 		IFile[] files = getSelectedFiles(selection);
     	for (int i = 0; i < files.length; i++) {
     		try {
-    			IFile file = files[i];
-    			ILexer scanner = FortranProcessor.createLexerFor(file.getContents(), file.getName());
+                boolean isFixedForm = false;
+
+                IFile file = files[i];
+                
+                String filename = file.getName();                    
+                InputStream in = file.getContents();
+                ILexer scanner = Lexer.createLexer(new PreprocessingReader(in, filename), filename, isFixedForm);
     			final String[] constants = TextChanges.processConstants(scanner);
     			//showReplaceDialog(constants);
     			applyChanges(null, file, constants);

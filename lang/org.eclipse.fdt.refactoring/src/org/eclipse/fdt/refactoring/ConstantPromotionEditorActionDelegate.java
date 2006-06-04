@@ -14,12 +14,15 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.photran.internal.core.f95modelparser.FortranProcessor;
+import org.eclipse.photran.internal.core.f95refactoringparser.BuildParseTreeParserAction;
 import org.eclipse.photran.internal.core.f95refactoringparser.GenericParseTreeVisitor;
-import org.eclipse.photran.internal.core.f95modelparser.ILexer;
+import org.eclipse.photran.internal.core.f95refactoringparser.ILexer;
+import org.eclipse.photran.internal.core.f95refactoringparser.Lexer;
+import org.eclipse.photran.internal.core.f95refactoringparser.Parser;
+import org.eclipse.photran.internal.core.f95refactoringparser.PreprocessingReader;
 import org.eclipse.photran.internal.core.f95refactoringparser.ParseTreeNode;
-import org.eclipse.photran.internal.core.f95modelparser.Terminal;
-import org.eclipse.photran.internal.core.f95modelparser.Token;
+import org.eclipse.photran.internal.core.f95refactoringparser.Terminal;
+import org.eclipse.photran.internal.core.f95refactoringparser.Token;
 import org.eclipse.photran.internal.core.f95parser.symboltable.SymbolTable;
 import org.eclipse.photran.internal.core.f95parser.symboltable.SymbolTableType;
 import org.eclipse.photran.internal.core.f95parser.symboltable.SymbolTableTypeProcessor;
@@ -55,22 +58,15 @@ public class ConstantPromotionEditorActionDelegate implements IEditorActionDeleg
                 monitor.beginTask("Running constant replacement refactoring; please wait...", IProgressMonitor.UNKNOWN);
                 try
                 {
-                	/******
-                	   FortranProcessor processor = new FortranProcessor();
-                	   ParseTreeNode parseTree = processor.parse(
-                	       getActiveEditorInput(),
-                	       getActiveEditorFile().getName());
-                    // SymbolTable symTbl = processor.parseAndCreateSymbolTableFor(
-                    //SymbolTable symTbl = processor.createSymbolTableFromParseTree(ptRoot);
-                     * 
-                     * No longer able to get a ParseTreeNode from the FortranProcessor, just using lexer for now
-                     * 
-                     */
-                	   ILexer scanner = FortranProcessor.createLexerFor(
-                	       getActiveEditorInput(),
-                	       getActiveEditorFile().getName());
+                    final String filename = "<not a file>";
+                    final boolean isFixedForm = false;
+                    
+                    InputStream in = getActiveEditorInput();
+                    ILexer lexer = Lexer.createLexer(new PreprocessingReader(in, filename), filename, isFixedForm);
+//                    Parser parser = new Parser();
+//                    ParseTreeNode parseTree = (ParseTreeNode)parser.parse(lexer, BuildParseTreeParserAction.getInstance());
                    
-                	   final String[] constants = TextChanges.processConstants(scanner);
+                	final String[] constants = TextChanges.processConstants(lexer);
                     
             		   showReplaceDialog(constants);
             		   
