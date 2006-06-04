@@ -15,12 +15,17 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.text.DefaultLineTracker;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
+import org.eclipse.jface.text.ITextViewerExtension2;
+import org.eclipse.jface.text.MarginPainter;
 import org.eclipse.jface.text.rules.DefaultPartitioner;
 import org.eclipse.jface.text.rules.RuleBasedPartitionScanner;
+import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.photran.internal.ui.actions.FortranCommentActions;
 import org.eclipse.photran.internal.ui.preferences.FortranEditorPreferencePage;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -37,6 +42,7 @@ import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
  * @author joverbey
  * @author cheahcf
  * @author nchen
+ * @author crasmussen
  */
 public class FortranFreeFormEditor extends AbstractFortranEditor {
 	public static final String EDITOR_ID = "org.eclipse.photran.internal.ui.Editor.FortranEditor";
@@ -46,6 +52,11 @@ public class FortranFreeFormEditor extends AbstractFortranEditor {
 	private Composite fMainComposite;
 
 	private static final int MAX_LINES_FOR_LEXER_BASED_SCANNER = 1000;
+	
+	private static final int COLUMN_132_WIDTH = 132;
+	
+	private static final RGB light_gray = new RGB(176, 180, 185);
+
 
 	public FortranFreeFormEditor() {
 		super();
@@ -199,6 +210,7 @@ public class FortranFreeFormEditor extends AbstractFortranEditor {
 		fMainComposite = childComp;
 
 		createHorizontalRuler(fMainComposite);
+		createLightGrayLines();
 	}
 
 	// --- EVERYTHING BELOW IS FOR OUTLINING ---//
@@ -339,4 +351,19 @@ public class FortranFreeFormEditor extends AbstractFortranEditor {
 		fHRuler.moveAbove(null);
 
 	}
+
+	/**
+	 *  Display a light gray line between columns 132/133
+	 */
+	private void createLightGrayLines() {
+		ISourceViewer mySourceViewer = getSourceViewer();
+		if(mySourceViewer instanceof ITextViewerExtension2) {
+			ITextViewerExtension2 painter = (ITextViewerExtension2) mySourceViewer;
+			MarginPainter column132_133margin = new MarginPainter(getSourceViewer());
+			column132_133margin.setMarginRulerColumn(COLUMN_132_WIDTH);
+			column132_133margin.setMarginRulerColor(new Color(null, light_gray));
+			painter.addPainter(column132_133margin);
+		}
+	}
+
 }
