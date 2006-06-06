@@ -1,6 +1,5 @@
 package org.eclipse.fdt.refactoring;
 
-import java.util.List;
 import org.eclipse.cdt.core.model.ICContainer;
 import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.cdt.core.model.ICProject;
