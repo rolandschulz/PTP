@@ -11,10 +11,13 @@ import org.eclipse.core.filebuffers.ITextFileBuffer;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.photran.core.FortranCorePlugin;
 import org.eclipse.photran.internal.core.f95refactoringparser.ILexer;
 import org.eclipse.photran.internal.core.f95refactoringparser.Terminal;
 import org.eclipse.photran.internal.core.f95refactoringparser.Token;
@@ -72,12 +75,18 @@ public class ConstantPromotionAction {
         	
         	for (int i = 0; i < fFiles.length; i++) {
         		try {
-                    boolean isFixedForm = false;
-
                     IFile file = fFiles[i];
-                    
                     String filename = file.getName();                    
                     InputStream in = file.getContents();
+                    
+                    boolean isFixedForm = false;
+                    IContentType contentType = Platform.getContentTypeManager().findContentTypeFor(filename);
+                    if (contentType != null
+                    		&& contentType.getId().equals(FortranCorePlugin.FIXED_FORM_CONTENT_TYPE))
+                    {
+                    	isFixedForm = true;
+                    }
+                    
                     ILexer scanner = Lexer.createLexer(new PreprocessingReader(in, filename), filename, isFixedForm);
         			final String[] constants = TextChanges.processConstants(scanner);
         			//showReplaceDialog(constants);
@@ -147,12 +156,18 @@ public class ConstantPromotionAction {
 		IFile[] files = getSelectedFiles(selection);
     	for (int i = 0; i < files.length; i++) {
     		try {
-                boolean isFixedForm = false;
-
                 IFile file = files[i];
-                
                 String filename = file.getName();                    
                 InputStream in = file.getContents();
+                
+                boolean isFixedForm = false;
+                IContentType contentType = Platform.getContentTypeManager().findContentTypeFor(filename);
+                if (contentType != null
+                		&& contentType.getId().equals(FortranCorePlugin.FIXED_FORM_CONTENT_TYPE))
+                {
+                	isFixedForm = true;
+                }
+                
                 ILexer scanner = Lexer.createLexer(new PreprocessingReader(in, filename), filename, isFixedForm);
     			final String[] constants = TextChanges.processConstants(scanner);
     			//showReplaceDialog(constants);
