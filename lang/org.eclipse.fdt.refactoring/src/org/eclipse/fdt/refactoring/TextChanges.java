@@ -14,10 +14,12 @@ import java.util.ArrayList;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.filebuffers.FileBuffers;
 import org.eclipse.core.filebuffers.ITextFileBuffer;
 import org.eclipse.core.filebuffers.ITextFileBufferManager;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.photran.internal.core.f95refactoringparser.ILexer;
 import org.eclipse.photran.internal.core.f95refactoringparser.Terminal;
@@ -29,10 +31,14 @@ import org.eclipse.photran.internal.core.f95refactoringparser.Token;
  * getDocument and getTextBuffer copied from org.eclipse.ltk.internal.core.refactoring.
  */
 public class TextChanges {
-	private int fLine;
-	private int fColumn;
-	private int fLength;
-	private String fText;
+	private int fPrevLine = -1;
+	private int fExtraColumns = 0;
+
+	private IProgressMonitor fMonitor;
+	private IFile fFile;
+	private ITextFileBuffer fTextBuffer;
+	private IDocument fDocument;
+	private final boolean fDidConnect;
 	
 	public static IDocument getDocument(IFile file) throws CoreException {
 		ITextFileBufferManager manager= FileBuffers.getTextFileBufferManager();
@@ -49,6 +55,32 @@ public class TextChanges {
 		IPath path= file.getFullPath();
 		ITextFileBuffer buffer= manager.getTextFileBuffer(path);
 		return buffer;
+	}
+
+
+	public static String[] changeElements(String changeRepresentation) {
+		return changeRepresentation.split(":");
+	}
+	
+
+	public static String text(String[] elements) {
+		return elements[3].substring(8, elements[3].length() - 1);
+	}
+
+	
+	public static int line(String[] elements) {
+		return Integer.decode(elements[0]).intValue() - 1;
+	}
+	
+	
+	public static int column(String[] elements) {
+		return Integer.decode(elements[1]).intValue() - 1;
+
+	}
+	
+	
+	public static int length(String[] elements) {
+		return Integer.decode(elements[2]).intValue() - TextChanges.column(elements);
 	}
 
 	
@@ -101,29 +133,53 @@ public class TextChanges {
     }
     
 
-	public TextChanges(String changeRepresentation) {
-		String[] elements = changeRepresentation.split(":");
-		fLine = Integer.decode(elements[0]).intValue() - 1;
-		fColumn = Integer.decode(elements[1]).intValue() - 1;
-		fLength = Integer.decode(elements[2]).intValue() - fColumn;
-		fText = elements[3].substring(8, elements[3].length() - 1);
+	public TextChanges(IProgressMonitor monitor, IFile file) throws CoreException {
+		fMonitor = monitor;
+		fFile = file;
+		
+		ITextFileBufferManager manager= FileBuffers.getTextFileBufferManager();
+		IPath path= file.getFullPath();
+		fTextBuffer = manager.getTextFileBuffer(path);
+		
+		if (fTextBuffer == null) {
+			manager.connect(path, fMonitor);
+			fTextBuffer = manager.getTextFileBuffer(path);
+			fDidConnect = true;
+		} else {
+			fDidConnect = false;
+		}
+		fDocument = fTextBuffer.getDocument();
 	}
 
+
+	public void apply(String changeRepresentation) throws BadLocationException {
+		String[] elements = TextChanges.changeElements(changeRepresentation);
+		
+		int line = TextChanges.line(elements);
+		String text = TextChanges.text(elements);
+		String replacement = TextChanges.replacement(text);
+		
+		int column = Integer.decode(elements[1]).intValue() - 1;
+		int length = Integer.decode(elements[2]).intValue() - column;
+		
+		if (fPrevLine < line) {
+			fPrevLine = line;
+			fExtraColumns = 0;
+		}
+		
+		column += fExtraColumns;
+		int offset = column + fDocument.getLineOffset(line);
+		fDocument.replace(offset, length, replacement);
+		fExtraColumns += replacement.length() - length;
+	}
 	
-    public int line() {
-    	return fLine;
-    }
-
-    public int column() {
-    	return fColumn;
-    }
-
-    public int length() {
-    	return fLength;
-    }
-    
-    public String text() {
-    	return fText;
-    }
-    
+	public void commit() throws CoreException {
+	   	fTextBuffer.commit(fMonitor, true);
+	   	if (fDidConnect) {
+			ITextFileBufferManager fManager= FileBuffers.getTextFileBufferManager();
+			IPath path= fFile.getFullPath();
+			fManager.disconnect(path, fMonitor);
+	   	}
+	}
+	
 }

@@ -600,20 +600,21 @@ class ReplaceDialog extends Dialog {
 		if (fTargetIndex < fConstants.length) {
 			ITextEditor editor = (ITextEditor) fActiveEditor;
 			String target = fConstants[fTargetIndex];
-    		TextChanges ch = new TextChanges(target);
-    		String replacement = TextChanges.replacement(ch.text());
-			int line = ch.line();
+			String[] changeElements = TextChanges.changeElements(target);
+			String text = TextChanges.text(changeElements);
+    		String replacement = TextChanges.replacement(text);
+			int line = TextChanges.line(changeElements);
 
 			if (fPrevLine < line) {
     			fPrevLine = line;
     			fExtraColumns = 0;
     		}
 
-			int column = ch.column() + fExtraColumns;
+			int column = TextChanges.column(changeElements) + fExtraColumns;
 			
 			try {
 				fTargetOffset = column + editor.getDocumentProvider().getDocument(editor.getEditorInput()).getLineOffset(line);
-				fTargetLength = ch.length();
+				fTargetLength = TextChanges.length(changeElements);
 				editor.selectAndReveal(fTargetOffset, fTargetLength);
 			} catch (BadLocationException e) {
 				fTargetOffset = -1;
@@ -621,8 +622,7 @@ class ReplaceDialog extends Dialog {
 				return;
 			}
 		
-			String in = ch.text();
-			fFindField.setText(in);
+			fFindField.setText(text);
 			fReplaceField.setText(replacement);
 			fTargetIndex += 1;			
 		}

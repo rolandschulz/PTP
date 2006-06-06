@@ -1,13 +1,11 @@
 package org.eclipse.fdt.refactoring;
 
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.cdt.core.model.ITranslationUnit;
-import org.eclipse.core.filebuffers.ITextFileBuffer;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
@@ -15,12 +13,9 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.photran.core.FortranCorePlugin;
 import org.eclipse.photran.internal.core.f95refactoringparser.ILexer;
-import org.eclipse.photran.internal.core.f95refactoringparser.Terminal;
-import org.eclipse.photran.internal.core.f95refactoringparser.Token;
 import org.eclipse.photran.internal.core.f95refactoringparser.Lexer;
 import org.eclipse.photran.internal.core.f95refactoringparser.PreprocessingReader;
 import org.eclipse.swt.widgets.Display;
@@ -156,6 +151,8 @@ public class ConstantPromotionAction {
 		IFile[] files = getSelectedFiles(selection);
     	for (int i = 0; i < files.length; i++) {
     		try {
+    			//TODO - put up dialog box to save file (if dirty) or cancel
+
                 IFile file = files[i];
                 String filename = file.getName();                    
                 InputStream in = file.getContents();
@@ -201,26 +198,13 @@ public class ConstantPromotionAction {
 
     private void applyChanges(IProgressMonitor monitor, IFile file, final String[] changeList) {
     	try {
-    		int prevLine = -1;
-    		int extraColumns = 0;
+    		TextChanges changes = new TextChanges(monitor, file);
     		
-    		ITextFileBuffer textBuffer = TextChanges.getTextBuffer(file);
-    		IDocument doc = textBuffer.getDocument();
     	   	for (int i = 0; i < changeList.length; i++) {
-        		TextChanges ch = new TextChanges(changeList[i]);
-        		String replacement = TextChanges.replacement(ch.text());
-        		int line = ch.line();
-        		if (prevLine < line) {
-        			prevLine = line;
-        			extraColumns = 0;
-        		}
-        		int column = ch.column() + extraColumns;
-    			int offset = column + doc.getLineOffset(line);
-    			int length = ch.length();
-        		doc.replace(offset, length, replacement);
-        		extraColumns += replacement.length() - length;
+    	   		changes.apply(changeList[i]);
         	}
-    	   	textBuffer.commit(monitor, true);
+    	   	changes.commit();
+    	   	
     	} catch (Exception ex) {
     		System.out.println(ex);
     	}
