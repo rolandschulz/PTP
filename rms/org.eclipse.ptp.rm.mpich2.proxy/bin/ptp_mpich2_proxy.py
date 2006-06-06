@@ -39,7 +39,8 @@ from  ptplib   import  PTPProxy, ptp_print, to_ptp_string, from_ptp_string, \
                        RTEV_PATTR, RTEV_JOBSTATE, RTEV_PROCOUT, \
                        RTEV_ERROR_PROCS, RTEV_ERROR_PATTR, \
                        RTEV_ERROR_NODES, RTEV_ERROR_NATTR, \
-                       RTEV_ERROR_RUN, RTEV_ERROR_TERMINATE_JOB
+                       RTEV_ERROR_RUN, RTEV_ERROR_TERMINATE_JOB, \
+                       RTEV_ERROR_BASE
                        
 ptp_print(os.environ['PATH'])
 #
@@ -198,36 +199,37 @@ def do_input(fd):
     global exit
     line = fd.readline()
     if line == '':
-    	exit = 1
-    	return
+        exit = 1
+        return
     if line == '\n':
-    	sys.stdout.write('>>> ')
-    	sys.stdout.flush()
-    	return
+        sys.stdout.write('>>> ')
+        sys.stdout.flush()
+        return
+    res = ()
     line = line.rstrip(' \n').split(' ')
     if line[0] == 'exit' or line[0] == 'quit' or line[0] == 'q':
     	exit = 1
     elif line[0] == 'getnodes':
-    	getnodes([])
+    	res = getnodes([])
     elif line[0] == 'getnodeattr':
-    	getnodeattr([-1])
+    	res = getnodeattr([0, '-1', 'ATTRIB_NODE_NAME', 'ATTRIB_NODE_USER', 'ATTRIB_NODE_GROUP', 'ATTRIB_NODE_STATE', 'ATTRIB_NODE_MODE'])
     elif line[0] == 'listjobs':
-    	listjobs([])
+    	res = listjobs([])
     elif line[0] == 'listprocs':
     	if len(line) < 2:
     	    ptp_print('listprocs <jobid>')
     	else:
-    	    listprocs([line[1]])
+    	    res = listprocs([line[1]])
     elif line[0] == 'procattrs':
     	if len(line) < 2:
     	    ptp_print('procattrs <jobid>')
     	else:
-    	    procattrs([line[1]])
+    	    res = procattrs([line[1]])
     elif line[0] == 'kill':
     	if len(line) < 2:
     	    ptp_print('kill <jobid>')
     	else:
-    	    kill([line[1]])
+    	    res = kill([line[1]])
     elif line[0] == 'run':
     	if len(line) < 3:
     	    ptp_print('run <nprocs> <cmd> [<args>]')
@@ -243,9 +245,17 @@ def do_input(fd):
     	    args.append('progArg')
     	    args.append(line[pos])
     	    pos += 1
-    	run(args)
+    	res = run(args)
     else:
     	ptp_print('Unknown command: %s' % line[0])
+    
+    if len(res) == 2:   
+        if res[0] >= RTEV_ERROR_BASE:
+            ptp_print(res[1]);
+        else:
+            for v in res[1]:
+                ptp_print(str(v));
+
     sys.stdout.write('>>> ')
     sys.stdout.flush()
 
@@ -339,30 +349,31 @@ def startdaemon(args):
 def listjobs(args):
     conSock = open_mpd_console()
     if conSock == 0:
-    	return (0, 'Could not connect to MPD')
+    	return (RTEV_ERROR_BASE, 'Could not connect to MPD')
     msgToSend = { 'cmd' : 'mpdlistjobs' }
     conSock.send_dict_msg(msgToSend)
     msg = conSock.recv_dict_msg(timeout=5.0)
     if not msg:
     	conSock.close()
-    	return (0, 'No message recvd from MPD before timeout')
+    	return (RTEV_ERROR_BASE, 'No message recvd from MPD before timeout')
     if msg['cmd'] != 'local_mpdid':     # get full id of local mpd for filters later
     	conSock.close()
-    	return (0, 'Did not recv local_mpdid msg from local mpd; instead, recvd: %s' % msg)
-    jobids = Set()
+    	return (RTEV_ERROR_BASE, 'Did not recv local_mpdid msg from local mpd; instead, recvd: %s' % msg)
+    jobids = []
     done = 0
     while not done:
         msg = conSock.recv_dict_msg()
         if not msg.has_key('cmd'):
     	    conSock.close()
-            return (0, 'Invalid message: %s:' % (msg))
+            return (RTEV_ERROR_BASE, 'Invalid message: %s:' % (msg))
         if msg['cmd'] == 'mpdlistjobs_info':
-    	    jobids.add(make_jobid(msg['jobid']))
+    	    jid = make_jobid(msg['jobid'])
+            if jid not in jobids:
+                jobids.append(jid)
         else:  # mpdlistjobs_trailer
             done = 1
     conSock.close()
-    ptp_printjobids
-    return (1, jobids)
+    return (RTEV_OK, jobids)
 
 def listprocs(args):
     if len(args) != 1:
@@ -396,7 +407,6 @@ def listprocs(args):
         else:  # mpdlistjobs_trailer
             done = 1
     conSock.close()
-    ptp_printprocs
     return (RTEV_PROCS, procs)
 
 def procattrs(args):
