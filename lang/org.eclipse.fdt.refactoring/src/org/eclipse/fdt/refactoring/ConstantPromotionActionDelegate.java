@@ -25,7 +25,7 @@ public class ConstantPromotionActionDelegate implements IObjectActionDelegate {
 
 	public void run(IAction action) {
 		if (fAction == null) {
-			fAction = new ConstantPromotionAction();
+			fAction = new ConstantPromotionAction(fPart.getSite());
 		}
 		fAction.run(fSelection);
 	}

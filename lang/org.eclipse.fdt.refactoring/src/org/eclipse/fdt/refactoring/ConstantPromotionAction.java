@@ -13,19 +13,26 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jdt.internal.ui.refactoring.RefactoringSaveHelper;
+import org.eclipse.jdt.ui.actions.SelectionDispatchAction;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.photran.core.FortranCorePlugin;
 import org.eclipse.photran.internal.core.f95refactoringparser.ILexer;
 import org.eclipse.photran.internal.core.f95refactoringparser.Lexer;
 import org.eclipse.photran.internal.core.f95refactoringparser.PreprocessingReader;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IWorkbenchSite;
 
 /*
  * This code was inspired by org.eclipse.jdt.ui.actions.InferTypeArgumentsAction.java
  * and org.eclipse.cdt.debug.ui.internal.ui.action.AbstractDebugActionDelegate.java
+ * 
+ * Probably should copy from org.eclipse.jdt.internal.ui.actions.ExtractSuperTypeAction.java
+ * instead.
+ * 
  */
 
-public class ConstantPromotionAction {
+public class ConstantPromotionAction extends SelectionDispatchAction {
 	
 	/**
 	 * Background job for this action, or <code>null</code> if none.
@@ -55,6 +62,21 @@ public class ConstantPromotionAction {
 		return elements;
 	}
 	
+	/**
+	 * Creates a new extract super type action. The action requires that the
+	 * selection provided by the site's selection provider is of type
+	 * <code>org.eclipse.jface.viewers.IStructuredSelection</code>.
+	 * 
+	 * @param site
+	 *            the workbench site
+	 */
+	public ConstantPromotionAction(final IWorkbenchSite site) {
+		super(site);
+		//setText(RefactoringMessages.ExtractSuperTypeAction_label);
+		//PlatformUI.getWorkbench().getHelpSystem().setHelp(this, IJavaHelpContextIds.EXTRACT_SUPERTYPE_ACTION);
+	}
+
+
 	
 	class PromoteConstantsJob extends Job {
 		private static final String PROMOTE_CONSTANTS = "Promote Constants";
@@ -148,6 +170,9 @@ public class ConstantPromotionAction {
 	private void runInForeground(final IStructuredSelection selection) {
     	// monitor.beginTask("Running constant promotion refactoring; please wait...", IProgressMonitor.UNKNOWN);
     	
+		final RefactoringSaveHelper saveHelper= new RefactoringSaveHelper();
+		if (!saveHelper.saveEditors(getShell())) return;
+		
 		IFile[] files = getSelectedFiles(selection);
     	for (int i = 0; i < files.length; i++) {
     		try {
