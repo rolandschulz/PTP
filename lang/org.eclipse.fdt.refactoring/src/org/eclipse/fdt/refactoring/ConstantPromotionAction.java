@@ -50,7 +50,8 @@ public class ConstantPromotionAction extends SelectionDispatchAction {
 			Object object= list.get(i);
 			if (object instanceof ICElement)
 				if (object instanceof ITranslationUnit) {
-					if (((ITranslationUnit) object).getContentTypeId().equals("org.eclipse.photran.core.freeFormFortranSource")) {
+					if (((ITranslationUnit) object).getContentTypeId().equals("org.eclipse.photran.core.freeFormFortranSource")
+					 || ((ITranslationUnit) object).getContentTypeId().equals("org.eclipse.photran.core.fixedFormFortranSource")) {
 						elements[i] = (IFile) ((ICElement)object).getResource();
 					}
 				} else {
