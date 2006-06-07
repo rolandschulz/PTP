@@ -20,7 +20,7 @@
  * 29.06.2005 Jeff Overbey: Added Fortran INCLUDE and CPP directives
  */
  
-package org.eclipse.photran.internal.core.f95parser;
+package org.eclipse.photran.internal.core.f95modelparser;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -176,12 +176,12 @@ FortranInclude="INCLUDE"[^\r\n]*{LineTerminator}
 								  if (hollerithLength==0) throw new Exception("Lexer Error (line " + (getLine()+1) + ", col " + (getCol()+1) + "): Invalid length of hollerith literal: 0"); 
 								  yybegin(HOLLERITH); 
 								 }
+{Rcon1}							{ wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_RCON); }
+{Rcon2}/{NumDotLkahead}			{ wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_RCON); }
 {Dcon1}							{ wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_DCON); }
 {Dcon2}/{NumDotLkahead}			{ wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_DCON); }
 {Fcon}							{ wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_FCON); }
 {Pcon}							{ wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_PCON); }
-{Rcon1}							{ wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_RCON); }
-{Rcon2}/{NumDotLkahead}			{ wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_RCON); }
 {Xcon}							{ wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_XCON); }
 }
 

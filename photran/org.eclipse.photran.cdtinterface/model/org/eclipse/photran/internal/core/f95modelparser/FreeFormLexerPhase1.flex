@@ -15,7 +15,7 @@
  * INTERFACE OPERATOR (/) would tokenize correctly.)
  */
  
-package org.eclipse.photran.internal.core.f95parser;
+package org.eclipse.photran.internal.core.f95modelparser;
 import java.util.List;
 import java.util.LinkedList;
 
@@ -343,6 +343,8 @@ FortranInclude="INCLUDE"[^\r\n]*{LineTerminator}
 "WRITE"							{ wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_WRITE); }
 "WRITE"[ \t]*"="				{ wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_WRITEEQ); }
 {Bcon}							{ wantEos = true;                     return token(Terminal.T_BCON); }
+{Rcon1}							{ wantEos = true;                     return token(Terminal.T_RCON); }
+{Rcon2}/{NumDotLkahead}			{ wantEos = true;                     return token(Terminal.T_RCON); }
 {Dcon1}							{ wantEos = true;                     return token(Terminal.T_DCON); }
 {Dcon2}/{NumDotLkahead}			{ wantEos = true;                     return token(Terminal.T_DCON); }
 {Fcon}							{ wantEos = true;                     return token(Terminal.T_FCON); }
@@ -350,8 +352,6 @@ FortranInclude="INCLUDE"[^\r\n]*{LineTerminator}
 {Ident}							{ wantEos = true;                     return token(Terminal.T_IDENT); }
 {Ocon}							{ wantEos = true;                     return token(Terminal.T_OCON); }
 {Pcon}							{ wantEos = true;                     return token(Terminal.T_PCON); }
-{Rcon1}							{ wantEos = true;                     return token(Terminal.T_RCON); }
-{Rcon2}/{NumDotLkahead}			{ wantEos = true;                     return token(Terminal.T_RCON); }
 {Xcon}							{ wantEos = true;                     return token(Terminal.T_XCON); }
 {Xdop}							{ wantEos = true;                     return token(Terminal.T_XDOP); }
 {Zcon}							{ wantEos = true;                     return token(Terminal.T_ZCON); }
