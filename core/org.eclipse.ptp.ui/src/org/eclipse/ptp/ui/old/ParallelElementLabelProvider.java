@@ -112,7 +112,7 @@ public class ParallelElementLabelProvider extends LabelProvider implements IColo
 		if (element instanceof IPNode) {
 			IPNode node = (IPNode)element;
 			
-			if(node.hasChildren()) {
+			if(node.hasChildProcesses()) {
 				if (!node.isAllStop())
 					return NODE_RUNNING;
 				else

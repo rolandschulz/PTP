@@ -22,13 +22,13 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.ptp.core.IModelManager;
-import org.eclipse.ptp.core.IPElement;
+import org.eclipse.ptp.core.IModelPresentation;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPUniverse;
 import org.eclipse.ptp.core.PTPCorePlugin;
@@ -47,7 +47,7 @@ import org.eclipse.ui.PlatformUI;
  * 
  */
 public abstract class AbstractUIManager implements IManager {
-	protected IModelManager modelManager = null;
+	protected IModelPresentation modelPresentation = null;
 	protected String cur_set_id = EMPTY_ID;
 	protected List pListeners = new ArrayList(0);
 	protected List setListeners = new ArrayList(0);
@@ -56,7 +56,7 @@ public abstract class AbstractUIManager implements IManager {
 	 * 
 	 */
 	public AbstractUIManager() {
-		modelManager = PTPCorePlugin.getDefault().getModelManager();
+		modelPresentation = PTPCorePlugin.getDefault().getModelPresentation();
 	}
 
 	protected abstract class SafeNotifier implements ISafeRunnable {
@@ -230,7 +230,7 @@ public abstract class AbstractUIManager implements IManager {
 	 * @see org.eclipse.ptp.ui.IManager#findJob(java.lang.String)
 	 */
 	public IPJob findJob(String job_name) {
-		IPUniverse universe = modelManager.getUniverse();
+		IPUniverse universe = modelPresentation.getUniverse();
 		if (universe == null)
 			return null;
 		return universe.findJobByName(job_name);
@@ -239,19 +239,18 @@ public abstract class AbstractUIManager implements IManager {
 	 * @see org.eclipse.ptp.ui.IManager#findJobById(java.lang.String)
 	 */
 	public IPJob findJobById(String job_id) {
-		IPUniverse universe = modelManager.getUniverse();
+		IPUniverse universe = modelPresentation.getUniverse();
 		if (universe == null)
 			return null;
-		IPElement element = universe.findChild(job_id);
-		if (element instanceof IPJob)
-			return (IPJob) element;
-		return null;
+		// IPElement element = universe.findChild(job_id);
+		IPJob job = universe.findJobById(job_id);
+		return job;
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#removeJob(org.eclipse.ptp.core.IPJob)
 	 */
 	public void removeJob(IPJob job) {
-		IPUniverse universe = modelManager.getUniverse();
+		IPUniverse universe = modelPresentation.getUniverse();
 		if (universe != null) {
 			universe.deleteJob(job);
 		}
@@ -265,7 +264,7 @@ public abstract class AbstractUIManager implements IManager {
 				if (pmonitor == null)
 					pmonitor = new NullProgressMonitor();
 				try {
-					IPUniverse universe = modelManager.getUniverse();
+					IPUniverse universe = modelPresentation.getUniverse();
 					if (universe != null) {
 						IPJob[] jobs = universe.getJobs();
 						pmonitor.beginTask("Removing stopped jobs...", jobs.length);
@@ -295,7 +294,7 @@ public abstract class AbstractUIManager implements IManager {
 	 * @see org.eclipse.ptp.ui.IManager#hasStoppedJob()
 	 */
 	public boolean hasStoppedJob() {
-		IPUniverse universe = modelManager.getUniverse();
+		IPUniverse universe = modelPresentation.getUniverse();
 		if (universe == null)
 			return false;
 		

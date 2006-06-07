@@ -21,29 +21,31 @@ package org.eclipse.ptp.internal.core;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
+
 import org.eclipse.ptp.core.AttributeConstants;
 import org.eclipse.ptp.core.INodeEvent;
 import org.eclipse.ptp.core.INodeListener;
-import org.eclipse.ptp.core.IPElement;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPMachine;
-import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
+import org.eclipse.ptp.internal.core.elementcontrols.IPElementControl;
+import org.eclipse.ptp.internal.core.elementcontrols.IPMachineControl;
+import org.eclipse.ptp.internal.core.elementcontrols.IPNodeControl;
+import org.eclipse.ptp.internal.core.elementcontrols.IPProcessControl;
 
-public class PNode extends Parent implements IPNode {
+public class PNode extends Parent implements IPNodeControl {
 	protected String NAME_TAG = "node ";
 	protected List listeners = new ArrayList();
 
-	public PNode(IPElement mac, String name, String key, int nodeNumber) {
+	public PNode(IPElementControl mac, String name, String key, int nodeNumber) {
 		super(mac, name, key, P_NODE);
 		this.setAttribute(AttributeConstants.ATTRIB_NODE_NUMBER, new Integer(nodeNumber));
 	}
 	public IPMachine getMachine() {
-		IPElement current = this;
+		IPElementControl current = this;
 		do {
-			if (current instanceof IPMachine)
-				return (IPMachine) current;
+			if (current instanceof IPMachineControl)
+				return (IPMachineControl) current;
 		} while ((current = current.getParent()) != null);
 		return null;
 	}
@@ -55,17 +57,17 @@ public class PNode extends Parent implements IPNode {
 		return ((Integer) this.getAttribute(AttributeConstants.ATTRIB_NODE_NUMBER)).intValue();
 	}
 	public IPProcess[] getProcesses() {
-		return (IPProcess[]) getCollection().toArray(new IPProcess[size()]);
+		return (IPProcessControl[]) getCollection().toArray(new IPProcessControl[size()]);
 	}
 	public IPProcess[] getSortedProcesses() {
-		IPProcess[] processes = getProcesses();
+		IPProcessControl[] processes = (IPProcessControl[]) getProcesses();
 		sort(processes);
 		return processes;
 	}
 	public IPProcess findProcess(String processNumber) {
-		IPElement element = findChild(processNumber);
+		IPElementControl element = findChild(processNumber);
 		if (element != null)
-			return (IPProcess) element;
+			return (IPProcessControl) element;
 		return null;
 	}
 	/*
@@ -108,5 +110,25 @@ public class PNode extends Parent implements IPNode {
 	public String[] getAttributeKeys() {
 		return this.getAttributeKeys(AttributeConstants.ATTRIB_CLASS_NODE);
 	}
-
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.IPNode#getName()
+	 */
+	public String getName() {
+		return getElementName();
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.IPNode#getNumProcesses()
+	 */
+	public int getNumProcesses() {
+		return size();
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.IPNode#hasChildProcesses()
+	 */
+	public boolean hasChildProcesses() {
+		return getNumProcesses() > 0;
+	}	
 }

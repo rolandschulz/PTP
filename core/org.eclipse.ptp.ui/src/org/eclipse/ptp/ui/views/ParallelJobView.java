@@ -149,7 +149,7 @@ public class ParallelJobView extends AbstractParallelSetView {
 		jobTableViewer.setLabelProvider(new LabelProvider() {
 			public String getText(Object element) {
 				if (element instanceof IPJob) {
-					return ((IPJob) element).getElementName();
+					return ((IPJob) element).getName();
 				}
 				return "";
 			}

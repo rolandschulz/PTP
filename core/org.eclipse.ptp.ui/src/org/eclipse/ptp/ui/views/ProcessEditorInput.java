@@ -87,7 +87,7 @@ public class ProcessEditorInput implements IEditorInput {
 	 * @see org.eclipse.ui.IEditorInput#getName()
 	 */
 	public String getName() {
-		return process.getElementName();
+		return process.getName();
 	}
 	
 	/* (non-Javadoc)

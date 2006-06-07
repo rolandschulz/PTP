@@ -43,7 +43,7 @@ public abstract class AbstractParallelView extends ViewPart implements ISelectio
 	 * 
 	 */
 	public AbstractParallelView() {
-		PTPCorePlugin.getDefault().getModelManager().addParallelLaunchListener(this);
+		PTPCorePlugin.getDefault().getModelPresentation().addParallelLaunchListener(this);
 	}
     /* (non-Javadoc)
      * @see org.eclipse.jface.viewers.ISelectionProvider#addSelectionChangedListener(org.eclipse.jface.viewers.ISelectionChangedListener)
@@ -62,7 +62,7 @@ public abstract class AbstractParallelView extends ViewPart implements ISelectio
 	 */
 	public void dispose() {
 		listeners.clear();
-		PTPCorePlugin.getDefault().getModelManager().removeParallelLaunchListener(this);
+		PTPCorePlugin.getDefault().getModelPresentation().removeParallelLaunchListener(this);
 		super.dispose();
 	}
 	

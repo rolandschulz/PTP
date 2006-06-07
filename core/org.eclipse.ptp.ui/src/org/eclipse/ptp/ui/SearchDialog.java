@@ -27,12 +27,15 @@ package org.eclipse.ptp.ui;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.util.Assert;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.ptp.core.IPElement;
+import org.eclipse.ptp.core.IPNode;
+import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.internal.ui.search.IPSearchConstants;
 import org.eclipse.ptp.internal.ui.search.PSearchQuery;
 import org.eclipse.ptp.internal.ui.search.SelectionConverter;
@@ -282,15 +285,11 @@ public class SearchDialog extends Dialog implements IPSearchConstants {
 		int searchFor = SEARCH_NODE;
 		int limitTo = LIMIT_NUMBER;
 		
-		String pattern = String.valueOf(element.getID());		
-		switch (element.getElementType()) {
-		    case IPElement.P_NODE:
-		        searchFor = SEARCH_NODE;
-		        break;
-		    case IPElement.P_PROCESS:
-		        searchFor = SEARCH_PROCESS;
-		        break;
-		}
+		String pattern = String.valueOf(element.getID());
+		if (element instanceof IPNode)
+			searchFor = SEARCH_NODE;
+		else if (element instanceof IPProcess)
+			searchFor = SEARCH_PROCESS;
 		return new SearchPatternData(searchFor, limitTo, pattern, element);
 	}
 	

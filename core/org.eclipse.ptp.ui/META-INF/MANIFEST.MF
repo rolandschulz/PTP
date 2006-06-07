@@ -19,9 +19,9 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.editors,
  org.eclipse.ui.workbench.texteditor,
  org.eclipse.cdt.core,
- org.eclipse.cdt.managedbuilder.core,
  org.eclipse.cdt.ui,
- org.eclipse.ptp.core
+ org.eclipse.ptp.core,
+ org.eclipse.cdt.managedbuilder.core
 Eclipse-AutoStart: true
 Export-Package: org.eclipse.ptp.internal.ui,
  org.eclipse.ptp.ui,

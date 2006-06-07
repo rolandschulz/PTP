@@ -121,7 +121,7 @@ public class ParallelElementContentProvider implements ITreeContentProvider {
 		}
 
 		if (element instanceof IPNode) {
-			if (((IPNode)element).hasChildren())
+			if (((IPNode)element).hasChildProcesses())
 				return true;
 		}
 
@@ -151,20 +151,18 @@ public class ParallelElementContentProvider implements ITreeContentProvider {
 	
 	protected Object internalGetParent(Object element) {
 		if (element instanceof IPProcess)
-			return ((IPProcess)element).getParent();
+			return ((IPProcess)element).getParentProcess();
 		
 		return null;
 	}
 	
 	protected Object[] getPNodes(IPJob root) {
-	    return root.getSortedChildren();
+	    return root.getSortedNodes();
 	}
 	
 	protected Object[] getPProcesses(IPNode node) throws ParallelModeException {
-	    if (node.hasChildren())
-	        return NO_CHILDREN;
-	    
-	    return node.getSortedChildren();
+	    final IPProcess[] sortedProcesses = node.getSortedProcesses();
+		return sortedProcesses;
 	    /*
 	    IPProcess[] processes = node.getProcesses();
 	    List list = new ArrayList(processes.length);

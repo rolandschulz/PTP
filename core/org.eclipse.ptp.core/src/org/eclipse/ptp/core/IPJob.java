@@ -141,6 +141,21 @@ public interface IPJob extends IPElement {
 	public IPUniverse getUniverse();
 	
 	public IPProcess findProcessByTaskId(int taskId);
+
+	/**
+	 * @return
+	 */
+	public String getIDString();
+
+	/**
+	 * @return
+	 */
+	public String getName();
+
+	/**
+	 * @return
+	 */
+	public boolean isAllStop();
 	
 	/**
 	 * Searches for an attribute on the Element given a key.  

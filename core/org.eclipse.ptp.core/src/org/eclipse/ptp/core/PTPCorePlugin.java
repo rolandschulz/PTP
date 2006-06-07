@@ -20,17 +20,27 @@ package org.eclipse.ptp.core;
 
 import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.MissingResourceException;
-import java.util.Properties;
 import java.util.ResourceBundle;
+
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExtension;
+import org.eclipse.core.runtime.IExtensionPoint;
+import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ptp.internal.core.ModelManager;
+import org.eclipse.ptp.internal.rmsystem.NullResourceManager;
+import org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory;
+import org.eclipse.ptp.rmsystem.IResourceManager;
+import org.eclipse.ptp.rmsystem.IResourceManagerChangedListener;
+import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchPage;
@@ -42,16 +52,137 @@ import org.osgi.framework.BundleContext;
 public class PTPCorePlugin extends AbstractUIPlugin {
 	public static final String PLUGIN_ID = "org.eclipse.ptp.core";
 
-	private IModelManager modelManager = null;
-
 	// The shared instance.
 	private static PTPCorePlugin plugin;
 
+	public static void errorDialog(Shell shell, String title, IStatus s) {
+		errorDialog(shell, title, s.getMessage(), s);
+	}
+	
+	public static void errorDialog(Shell shell, String title, String message, IStatus s) {
+		if (s != null && message != null && message.equals(s.getMessage()))
+			message = null;
+
+		ErrorDialog.openError(shell, title, message, s);
+	}
+
+	public static void errorDialog(Shell shell, String title, String message, Throwable t) {
+		IStatus status;
+		if (t instanceof CoreException) {
+			status = ((CoreException)t).getStatus();
+		} else {
+			status = new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, "Error within PTP Core: ", t);
+			log(status);	
+		}
+		errorDialog(shell, title, message, status);
+	}
+
+	public static void errorDialog(final String title, final String message, final Throwable t) {
+		getDisplay().syncExec(new Runnable() {
+			public void run() {
+				errorDialog(getDisplay().getActiveShell(), title, message, t);
+			}
+		});
+	}
+	
+	public static IWorkbenchPage getActivePage() {
+		IWorkbenchWindow w = getActiveWorkbenchWindow();
+		if (w != null) {
+			return w.getActivePage();
+		}
+		return null;
+	}
+	/**
+	 * Returns the active workbench shell or <code>null</code> if none
+	 * 
+	 * @return the active workbench shell or <code>null</code> if none
+	 */
+	public static Shell getActiveWorkbenchShell() {
+		IWorkbenchWindow window = getActiveWorkbenchWindow();
+		if (window != null) {
+			return window.getShell();
+		}
+		return null;
+	}
+
+	public static IWorkbenchWindow getActiveWorkbenchWindow() {
+		return getDefault().getWorkbench().getActiveWorkbenchWindow();
+	}
+	
+	/**
+	 * Returns the shared instance.
+	 */
+	public static PTPCorePlugin getDefault() {
+		return plugin;
+	}
+
+	public static Display getDisplay() {
+		Display display= Display.getCurrent();
+		if (display == null) {
+			display= Display.getDefault();
+		}
+		return display;		
+	}
+	
+	/**
+	 * Returns the string from the plugin's resource bundle, or 'key' if not
+	 * found.
+	 */
+	public static String getResourceString(String key) {
+		ResourceBundle bundle = PTPCorePlugin.getDefault().getResourceBundle();
+		try {
+			return (bundle != null) ? bundle.getString(key) : key;
+		} catch (MissingResourceException e) {
+			return key;
+		}
+	}
+
+	public static String getUniqueIdentifier() {
+		if (getDefault() == null) {
+			// If the default instance is not yet initialized,
+			// return a static identifier. This identifier must
+			// match the plugin id defined in plugin.xml
+			return PLUGIN_ID;
+		}
+		return getDefault().getBundle().getSymbolicName();
+	}
+
+	public static void informationDialog(final String title, final String message) {
+		getDisplay().syncExec(new Runnable() {
+			public void run() {
+				MessageDialog.openInformation(getDisplay().getActiveShell(), title, message);
+			}
+		});
+	}
+
+	public static void log(IStatus status) {
+		getDefault().getLog().log(status);
+	}
+
+	public static void log(String msg) {
+		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, msg, null));
+	}
+
+	public static void log(Throwable e) {
+		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, "Internal Error", e));
+	}
+
+	public static void warningDialog(final String title, final String message) {
+		getDisplay().syncExec(new Runnable() {
+			public void run() {
+				MessageDialog.openWarning(getDisplay().getActiveShell(), title, message);
+			}
+		});
+	}
+
 	// Resource bundle.
 	private ResourceBundle resourceBundle;
-	
+
 	private IDGenerator IDGen;
 
+	private IResourceManagerFactory[] resourceManagerFactories;
+	private IResourceManager[] resourceManagers;
+	private IResourceManager currentResourceManager;
 	/**
 	 * The constructor.
 	 */
@@ -66,68 +197,22 @@ public class PTPCorePlugin extends AbstractUIPlugin {
 		}
 		IDGen = new IDGenerator();
 	}
+	public void addResourceManagerChangedListener(IResourceManagerChangedListener listener) {
+		// TODO
+	}		
+	public IResourceManager getCurrentResourceManager() {
+		return currentResourceManager;
+	}
+	/**
+	 * @return Returns the modelManager.
+	 */
+	public IModelPresentation getModelPresentation() {
+		return currentResourceManager.getModelPresentation();
+	}
 	
 	public int getNewID() {
 		return IDGen.getNewID();
 	}
-
-	/**
-	 * This method is called upon plug-in activation
-	 */
-	public void start(BundleContext context) throws Exception {
-		super.start(context);
-		modelManager = new ModelManager();
-	}
-
-	/**
-	 * This method is called when the plug-in is stopped
-	 */
-	public void stop(BundleContext context) throws Exception {
-		modelManager.shutdown();
-		super.stop(context);
-	}
-
-	/**
-	 * @return Returns the modelManager.
-	 */
-	public IModelManager getModelManager() {
-		return modelManager;
-	}
-
-	/**
-	 * Returns the shared instance.
-	 */
-	public static PTPCorePlugin getDefault() {
-		return plugin;
-	}
-
-	public void refreshParallelPluginActions() {
-		refreshPluginActions();
-	}
-
-	public static String getUniqueIdentifier() {
-		if (getDefault() == null) {
-			// If the default instance is not yet initialized,
-			// return a static identifier. This identifier must
-			// match the plugin id defined in plugin.xml
-			return PLUGIN_ID;
-		}
-		return getDefault().getBundle().getSymbolicName();
-	}
-
-	/**
-	 * Returns the string from the plugin's resource bundle, or 'key' if not
-	 * found.
-	 */
-	public static String getResourceString(String key) {
-		ResourceBundle bundle = PTPCorePlugin.getDefault().getResourceBundle();
-		try {
-			return (bundle != null) ? bundle.getString(key) : key;
-		} catch (MissingResourceException e) {
-			return key;
-		}
-	}
-
 	/**
 	 * Returns the plugin's resource bundle,
 	 */
@@ -135,86 +220,49 @@ public class PTPCorePlugin extends AbstractUIPlugin {
 		return resourceBundle;
 	}
 
-	public static IWorkbenchWindow getActiveWorkbenchWindow() {
-		return getDefault().getWorkbench().getActiveWorkbenchWindow();
-	}
+	public IResourceManagerFactory[] getResourceManagerFactories()
+	{
+		ArrayList configList = new ArrayList();
 
-	public static IWorkbenchPage getActivePage() {
-		IWorkbenchWindow w = getActiveWorkbenchWindow();
-		if (w != null) {
-			return w.getActivePage();
+		IExtensionRegistry registry = Platform.getExtensionRegistry();
+		IExtensionPoint extensionPoint = registry.getExtensionPoint("org.eclipse.ptp.core.resourcemanager");
+		final IExtension[] extensions = extensionPoint.getExtensions();
+		
+		for (int iext = 0; iext < extensions.length; ++iext) {
+			final IExtension ext = extensions[iext];
+			
+			IConfigurationElement[] elements = ext.getConfigurationElements();
+		
+			for (int i=0; i< elements.length; i++)
+			{
+				IConfigurationElement ce = elements[i];
+				try {
+					AbstractResourceManagerFactory factory = (AbstractResourceManagerFactory) ce.createExecutableExtension("class");
+					factory.setName(ce.getAttribute("name"));
+					factory.setId(ce.getAttribute("id"));
+					factory.setSupportLocal(Boolean.valueOf(ce.getAttribute("supportLocal")).booleanValue());
+					factory.setSupportRemote(Boolean.valueOf(ce.getAttribute("supportRemote")).booleanValue());
+					factory.setNeedPort(Boolean.valueOf(ce.getAttribute("needPort")).booleanValue());
+					configList.add(factory);
+				} catch (CoreException e) {
+					e.printStackTrace();
+				}
+			}
 		}
+		return (IResourceManagerFactory[]) configList.toArray(new IResourceManagerFactory[configList.size()]);
+	}
+	public IResourceManagerFactory getResourceManagerFactory(String id)
+	{
+		IResourceManagerFactory[] factories = getResourceManagerFactories();
+		for (int i=0; i<factories.length; i++)
+		{
+			if (factories[i].getId().equals(id)) return factories[i];
+		}
+		
 		return null;
 	}
-
-	/**
-	 * Returns the active workbench shell or <code>null</code> if none
-	 * 
-	 * @return the active workbench shell or <code>null</code> if none
-	 */
-	public static Shell getActiveWorkbenchShell() {
-		IWorkbenchWindow window = getActiveWorkbenchWindow();
-		if (window != null) {
-			return window.getShell();
-		}
-		return null;
-	}
-	public static void log(String msg) {
-		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, msg, null));
-	}
-	public static void log(IStatus status) {
-		getDefault().getLog().log(status);
-	}
-	public static void log(Throwable e) {
-		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, "Internal Error", e));
-	}
-	public static Display getDisplay() {
-		Display display= Display.getCurrent();
-		if (display == null) {
-			display= Display.getDefault();
-		}
-		return display;		
-	}		
-	public static void errorDialog(final String title, final String message, final Throwable t) {
-		getDisplay().syncExec(new Runnable() {
-			public void run() {
-				errorDialog(getDisplay().getActiveShell(), title, message, t);
-			}
-		});
-	}
-	public static void errorDialog(Shell shell, String title, String message, Throwable t) {
-		IStatus status;
-		if (t instanceof CoreException) {
-			status = ((CoreException)t).getStatus();
-		} else {
-			status = new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, "Error within PTP Core: ", t);
-			log(status);	
-		}
-		errorDialog(shell, title, message, status);
-	}
-	public static void errorDialog(Shell shell, String title, IStatus s) {
-		errorDialog(shell, title, s.getMessage(), s);
-	}
-	public static void errorDialog(Shell shell, String title, String message, IStatus s) {
-		if (s != null && message != null && message.equals(s.getMessage()))
-			message = null;
-
-		ErrorDialog.openError(shell, title, message, s);
-	}
-
-	public static void warningDialog(final String title, final String message) {
-		getDisplay().syncExec(new Runnable() {
-			public void run() {
-				MessageDialog.openWarning(getDisplay().getActiveShell(), title, message);
-			}
-		});
-	}
-	public static void informationDialog(final String title, final String message) {
-		getDisplay().syncExec(new Runnable() {
-			public void run() {
-				MessageDialog.openInformation(getDisplay().getActiveShell(), title, message);
-			}
-		});
+	public IResourceManager[] getResourceManagers() {
+		return resourceManagers;
 	}
 
 	public String locateFragmentFile(String fragment, String file) {		
@@ -235,7 +283,7 @@ public class PTPCorePlugin extends AbstractUIPlugin {
 			Bundle frag = frags[i];
 			URL path = frag.getEntry("/");
 			try {
-				URL local_path = Platform.asLocalURL(path);
+				URL local_path = FileLocator.toFileURL(path);
 				String str_path = local_path.getPath();
 				System.out.println("Testing fragment "+(i+1)+" with this OS/arch - path: '"+str_path+"'");
 				
@@ -276,5 +324,62 @@ public class PTPCorePlugin extends AbstractUIPlugin {
 		
 		/* guess we never found it.... */
 		return null;
+	}
+	
+	public void refreshParallelPluginActions() {
+		refreshPluginActions();
+	}
+	
+	public void removeResourceManagerChangedListener(IResourceManagerChangedListener listener) {
+		// TODO
+	}
+	
+	public void setCurrentResourceManager(IResourceManager rmManager) {
+		try {
+			currentResourceManager.stop();
+		} catch (CoreException e) {
+			log(e.getMessage());
+		}
+		
+		currentResourceManager = rmManager;
+		try {
+			currentResourceManager.start();
+		} catch (CoreException e) {
+			log(e.getMessage());
+		}		
+	}
+	
+	/**
+	 * This method is called upon plug-in activation
+	 */
+	public void start(BundleContext context) throws Exception {
+		super.start(context);
+		resourceManagerFactories = getResourceManagerFactories();
+		// TODO RMR this must be changed!
+		currentResourceManager = new NullResourceManager(new ModelManager());
+		resourceManagers = new IResourceManager[]{currentResourceManager};
+	}
+	
+	/**
+	 * This method is called when the plug-in is stopped
+	 */
+	public void stop(BundleContext context) throws Exception {
+		stopResourceManagers();
+		super.stop(context);
+	}
+	
+	/**
+	 * stops all of the resource managers.
+	 * 
+	 * @throws CoreException
+	 */
+	private void stopResourceManagers() throws CoreException {
+		for (int i = 0; i<resourceManagers.length; ++i) {
+			resourceManagers[i].stop();
+		}
+	}
+
+	public IModelManager getModelManager() {
+		return getCurrentResourceManager().getModelManager();
 	}
 }

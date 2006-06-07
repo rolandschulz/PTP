@@ -243,7 +243,7 @@ public class SimulationMonitoringSystem implements IMonitoringSystem {
 
 	/* get the nodes pertaining to a certain machine */
 	public String[] getNodes(IPMachine machine) {
-		String machineName = machine.getElementName();
+		String machineName = machine.getName();
 		/* find this machineName in the map - if it's there */
 		if (!nodeMap.containsKey(machineName))
 			return null;
@@ -270,7 +270,7 @@ public class SimulationMonitoringSystem implements IMonitoringSystem {
 	}
 
 	public String[] getNodeAttributes(IPNode node, String[] attribs) {
-		String nodeName = node.getElementName();
+		String nodeName = node.getName();
 		String[] retstr = new String[attribs.length];
 		
 		for(int i=0; i<attribs.length; i++) {

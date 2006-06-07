@@ -20,7 +20,6 @@ package org.eclipse.ptp.ui.views.old;
 
 import java.util.ArrayList;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.viewers.IOpenListener;
@@ -34,14 +33,12 @@ import org.eclipse.ptp.core.IPElement;
 import org.eclipse.ptp.core.IPMachine;
 import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
-import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPUniverse;
 import org.eclipse.ptp.ui.actions.old.ShowAllNodesAction;
 import org.eclipse.ptp.ui.actions.old.ShowProcessesAction;
 import org.eclipse.ptp.ui.actions.old.TerminateAllAction;
 import org.eclipse.ptp.ui.old.ParallelElementContentProvider;
 import org.eclipse.ptp.ui.old.ParallelElementLabelProvider;
-import org.eclipse.ptp.ui.old.UIMessage;
 import org.eclipse.ptp.ui.old.UIUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
@@ -242,13 +239,13 @@ public class ParallelProcessesView extends AbstractParallelView {
 
 	public Object[] getElements(Object parent) {
 		if (parent instanceof IPElement) {
-			switch (((IPElement) parent).getElementType()) {
-			case IPElement.P_UNIVERSE:
+			if (parent instanceof IPUniverse) {
 				return ((IPUniverse) parent).getSortedMachines();
-			case IPElement.P_MACHINE:
+			} else if (parent instanceof IPMachine) {
 				return ((IPMachine) parent).getSortedNodes();
-			case IPElement.P_NODE:
+			} else if (parent instanceof IPNode) {
 				return ((IPNode) parent).getSortedProcesses();
+			}
 			/*
 			 * case IPElement.P_ROOT: if (SHOW_PROCESS_ONLY) return
 			 * ((IPJob)parent).getSortedProcesses();
@@ -260,7 +257,6 @@ public class ParallelProcessesView extends AbstractParallelView {
 			 * case IPElement.P_NODE: return
 			 * ((IPNode)parent).getSortedProcesses();
 			 */
-			}
 		}
 		return null;
 	}
@@ -420,7 +416,7 @@ public class ParallelProcessesView extends AbstractParallelView {
 		IPProcess process = launchManager.getUniverse().findProcessByName(
 				String.valueOf(processNumber));
 		if (process != null) {
-			treeViewer.expandToLevel(process.getParent(), 1);
+			treeViewer.expandToLevel(process.getParentProcess(), 1);
 			treeViewer.setSelection(new StructuredSelection(process));
 			found = true;
 

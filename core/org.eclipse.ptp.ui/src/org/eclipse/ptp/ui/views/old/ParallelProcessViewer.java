@@ -208,7 +208,7 @@ public class ParallelProcessViewer extends AbstractTextEditor implements IProces
         IPProcess process = getProcess();
         if (process != null) {
             rankLabel.setText("Rank: " + process.getProcessNumber());
-            totalLabel.setText("Total: " + process.getParent().size());
+            totalLabel.setText("Total: " + process.getParentProcess().getNumChildProcesses());
             nodeLabel.setText("Node: " + ((IPNode) process.getNode()).getNodeNumber());
             pidLabel.setText("PID: " + process.getPid());
             statusLabel.setText("Status: " + process.getStatus());

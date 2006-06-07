@@ -5,24 +5,42 @@
 		point="org.eclipse.ui.views">
 		<category
 			name="%ParallelViewCategory.name"
-			id="org.parallel.ptp.ui.views">
+			id="org.eclipse.ptp.ui.views">
 		</category>
 		<view
 			name="%ParallelMachinesView.name"
 			icon="icons/parallel_perspective.gif"
-			category="org.parallel.ptp.ui.views"
+			category="org.eclipse.ptp.ui.views"
 			class="org.eclipse.ptp.ui.views.ParallelMachineView"
 			id="org.eclipse.ptp.ui.views.parallelMachineView">
 		</view>
 		<view
 			name="%ParallelJobsView.name"
 			icon="icons/parallel_perspective.gif"
-			category="org.parallel.ptp.ui.views"
+			category="org.eclipse.ptp.ui.views"
 			class="org.eclipse.ptp.ui.views.ParallelJobView"
 			id="org.eclipse.ptp.ui.views.parallelJobView">
 		</view>
+      <view
+            name="%ResourceManagersView.name"
+            icon="icons/rm/rm_view.gif"
+            category="org.eclipse.ptp.ui.views"
+            class="org.eclipse.ptp.ui.views.ResourceManagerView"
+            id="org.eclipse.ptp.ui.views.resourceManagerView">
+      </view>
 	</extension>
-	
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="org.eclipse.ptp.ui.PTPRunPerspective">
+         <view
+               ratio="0.4"
+               relative="org.eclipse.ptp.ui.views.ParallelJobView"
+               relationship="top"
+               id="org.eclipse.ptp.ui.views.ResourceManagerView">
+         </view>
+      </perspectiveExtension>
+   </extension>
 	<extension
 		point="org.eclipse.ui.editors">
 		<editor
@@ -75,6 +93,12 @@
             class="org.eclipse.ptp.ui.preferences.MPICH2PreferencesPage"
             id="org.eclipse.ptp.ui.preferences.mpich2PreferencesPage"
             name="%MPICH2preferencePage.name"/>
+      <page
+            name="%RMpreferencePage.name"
+            class="org.eclipse.ptp.ui.preferences.ResourceManagerPreferencesPage"
+            id="org.eclipse.ptp.ui.preferences.rmPreferencesPage"
+            category="org.eclipse.ptp.ui.preferences.ptpPreferencesPage">
+      </page>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">

@@ -18,46 +18,24 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.views.old;
 
-import java.util.ArrayList;
-
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.action.IToolBarManager;
-import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.viewers.IOpenListener;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.OpenEvent;
-import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.IPElement;
-import org.eclipse.ptp.core.IPMachine;
-import org.eclipse.ptp.core.IPNode;
-import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.IPJob;
+import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.IPUniverse;
-import org.eclipse.ptp.ui.actions.old.ShowAllNodesAction;
-import org.eclipse.ptp.ui.actions.old.ShowProcessesAction;
 import org.eclipse.ptp.ui.actions.old.TerminateAllAction;
-import org.eclipse.ptp.ui.old.ParallelElementContentProvider;
 import org.eclipse.ptp.ui.old.ParallelElementLabelProvider;
-import org.eclipse.ptp.ui.old.UIMessage;
-import org.eclipse.ptp.ui.old.UIUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Sash;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.part.DrillDownComposite;
 
 public class ParallelJobsView extends AbstractParallelView implements SelectionListener {
 	public static ParallelJobsView instance = null;
@@ -268,11 +246,11 @@ public class ParallelJobsView extends AbstractParallelView implements SelectionL
 
 	public Object[] getElements(Object parent) {
 		if (parent instanceof IPElement) {
-			switch (((IPElement) parent).getElementType()) {
-			case IPElement.P_UNIVERSE:
+			if (parent instanceof IPUniverse) {
 				return ((IPUniverse) parent).getSortedJobs();
-			case IPElement.P_JOB:
+			} else if (parent instanceof IPJob) {
 				return ((IPJob) parent).getSortedProcesses();
+			}
 			/*
 			 * case IPElement.P_UNIVERSE: return
 			 * ((IPUniverse)parent).getSortedMachines(); case
@@ -291,7 +269,6 @@ public class ParallelJobsView extends AbstractParallelView implements SelectionL
 			 * case IPElement.P_NODE: return
 			 * ((IPNode)parent).getSortedProcesses();
 			 */
-			}
 		}
 		return null;
 	}

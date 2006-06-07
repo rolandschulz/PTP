@@ -86,8 +86,8 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 
 	public final void initialize(IPJob job, int timeout) throws CoreException {
 		this.job = job;
-		job.setAttribute(TERMINATED_PROC_KEY, new BitList(job.size()));
-		job.setAttribute(SUSPENDED_PROC_KEY, new BitList(job.size()));
+		job.setAttribute(TERMINATED_PROC_KEY, new BitList(job.totalProcesses()));
+		job.setAttribute(SUSPENDED_PROC_KEY, new BitList(job.totalProcesses()));
 		commandQueue = new DebugCommandQueue(this, timeout);
 		commandQueue.start();
 		
@@ -279,7 +279,7 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 	}
 	public boolean isJobFinished() {
 		BitList terminatedTasks = (BitList) job.getAttribute(TERMINATED_PROC_KEY);
-		return (terminatedTasks.cardinality() == job.size());
+		return (terminatedTasks.cardinality() == job.totalProcesses());
 	}
 
 	//internal functions

@@ -18,15 +18,15 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.core;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+
 import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.ptp.core.AttributeConstants;
-import org.eclipse.ptp.core.IPElement;
 import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.internal.core.elementcontrols.IPElementControl;
 import org.eclipse.search.ui.ISearchPageScoreComputer;
 
-public abstract class PElement extends PlatformObject implements IPElement, Comparable {
+public abstract class PElement extends PlatformObject implements IPElementControl, Comparable {
 	protected HashMap[] attribClass = null;
 	protected HashMap elementAttribs = null;
 	
@@ -34,7 +34,7 @@ public abstract class PElement extends PlatformObject implements IPElement, Comp
 
 	private PElementInfo elementInfo = null;
 
-	protected PElement(IPElement parent, String name, String key, int type) {
+	protected PElement(IPElementControl parent, String name, String key, int type) {
 		attribClass = new HashMap[AttributeConstants.NUM_ATTRIB_CLASSES];
 		elementAttribs = new HashMap();
 		ID = PTPCorePlugin.getDefault().getNewID();
@@ -102,15 +102,15 @@ public abstract class PElement extends PlatformObject implements IPElement, Comp
 	/**
 	 * @return Returns the Parent.
 	 */
-	public IPElement getParent() {
-		return (IPElement)elementAttribs.get(AttributeConstants.ATTRIB_PARENT);
+	public IPElementControl getParent() {
+		return (IPElementControl)elementAttribs.get(AttributeConstants.ATTRIB_PARENT);
 	}
 
 	/**
 	 * @param parent
 	 *            The Parent to set.
 	 */
-	public void setParent(IPElement parent) {
+	public void setParent(IPElementControl parent) {
 		elementAttribs.put(AttributeConstants.ATTRIB_PARENT, parent);
 	}
 
@@ -140,9 +140,9 @@ public abstract class PElement extends PlatformObject implements IPElement, Comp
 	}
 
 	public int compareTo(Object obj) {
-		if (obj instanceof IPElement) {
+		if (obj instanceof IPElementControl) {
 			int my_rank = getID();
-			int his_rank = ((IPElement) obj).getID();
+			int his_rank = ((IPElementControl) obj).getID();
 			if (my_rank < his_rank)
 				return -1;
 			if (my_rank == his_rank)
@@ -158,7 +158,7 @@ public abstract class PElement extends PlatformObject implements IPElement, Comp
 		//if (!CoreUtils.PTP_SEARCHPAGE_ID.equals(pageId))
 			//return ISearchPageScoreComputer.UNKNOWN;
 
-		if (element instanceof IPElement)
+		if (element instanceof IPElementControl)
 			return 90;
 
 		return ISearchPageScoreComputer.LOWEST;

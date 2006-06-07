@@ -24,19 +24,22 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.ptp.core.AttributeConstants;
-import org.eclipse.ptp.core.IPElement;
 import org.eclipse.ptp.core.IPJob;
-import org.eclipse.ptp.core.IPMachine;
 import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.IPUniverse;
+import org.eclipse.ptp.internal.core.elementcontrols.IPElementControl;
+import org.eclipse.ptp.internal.core.elementcontrols.IPMachineControl;
+import org.eclipse.ptp.internal.core.elementcontrols.IPNodeControl;
+import org.eclipse.ptp.internal.core.elementcontrols.IPProcessControl;
+import org.eclipse.ptp.internal.core.elementcontrols.IPUniverseControl;
 
-public class PMachine extends Parent implements IPMachine {
+public class PMachine extends Parent implements IPMachineControl {
 	protected String NAME_TAG = "machine ";
 
 	protected String arch = "undefined";
 
-	public PMachine(IPUniverse uni, String name, int machineID) {
+	public PMachine(IPUniverseControl uni, String name, int machineID) {
 		super(uni, name, ""+machineID+"", P_MACHINE);
 		//System.out.println("Name is " + name + ", key is " + machineID);
 		//System.out.println("NAME_TAG = " + NAME_TAG + ", toString = "
@@ -54,7 +57,7 @@ public class PMachine extends Parent implements IPMachine {
 	}
 
 	public IPUniverse getUniverse() {
-		IPElement current = this;
+		IPElementControl current = this;
 		do {
 			if (current instanceof IPUniverse)
 				return (IPUniverse) current;
@@ -64,21 +67,21 @@ public class PMachine extends Parent implements IPMachine {
 
 	/* returns an array of the nodes that are comprised by this machine */
 	public synchronized IPNode[] getNodes() {
-		return (IPNode[]) getCollection().toArray(new IPNode[size()]);
+		return (IPNodeControl[]) getCollection().toArray(new IPNodeControl[size()]);
 	}
 
 	/* returns a list of the nodes comprised by this machine - but sorted */
 	public synchronized IPNode[] getSortedNodes() {
-		IPNode[] nodes = getNodes();
+		IPNodeControl[] nodes = (IPNodeControl[]) getNodes();
 		sort(nodes);
 		return nodes;
 	}
 
 	/* finds a node using a string identifier - returns null if none found */
 	public synchronized IPNode findNode(String nodeNumber) {
-		IPElement element = findChild(nodeNumber);
+		IPElementControl element = findChild(nodeNumber);
 		if (element != null)
-			return (IPNode) element;
+			return (IPNodeControl) element;
 		return null;
 	}
 
@@ -89,7 +92,7 @@ public class PMachine extends Parent implements IPMachine {
 			Object ob = it.next();
 			if (ob instanceof IPNode) {
 				IPNode node = (IPNode) ob;
-				if (node.getElementName().equals(nname))
+				if (node.getName().equals(nname))
 					return node;
 			}
 		}
@@ -103,11 +106,11 @@ public class PMachine extends Parent implements IPMachine {
 	 */
 	public synchronized IPProcess[] getProcesses() {
 		List array = new ArrayList(0);
-		IPNode[] nodes = getNodes();
+		IPNodeControl[] nodes = (IPNodeControl[]) getNodes();
 		for (int i = 0; i < nodes.length; i++)
 			array.addAll(nodes[i].getCollection());
 
-		return (IPProcess[]) array.toArray(new IPProcess[array.size()]);
+		return (IPProcessControl[]) array.toArray(new IPProcessControl[array.size()]);
 	}
 
 	/*
@@ -115,7 +118,7 @@ public class PMachine extends Parent implements IPMachine {
 	 * span multiple jobs)
 	 */
 	public synchronized IPProcess[] getSortedProcesses() {
-		IPProcess[] processes = getProcesses();
+		IPProcessControl[] processes = (IPProcessControl[]) getProcesses();
 		sort(processes);
 		return processes;
 	}
@@ -150,7 +153,7 @@ public class PMachine extends Parent implements IPMachine {
 		int counter = 0;
 		IPNode[] nodes = getNodes();
 		for (int i = 0; i < nodes.length; i++)
-			counter += nodes[i].size();
+			counter += nodes[i].getNumProcesses();
 
 		return counter;
 	}
@@ -191,6 +194,13 @@ public class PMachine extends Parent implements IPMachine {
 	
 	public String[] getAttributeKeys() {
 		return this.getAttributeKeys(AttributeConstants.ATTRIB_CLASS_MACHINE);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.IPMachine#getName()
+	 */
+	public String getName() {
+		return getElementName();
 	}
 
 }

@@ -54,7 +54,7 @@ public class ChangeMachineAction extends GotoDropDownAction {
 		    	IPMachine[] macs = ((MachineManager)pmView.getUIManager()).getMachines();
 
 		    	for (int i=0; i<macs.length; i++) {
-		    		addAction(dropDownMenuMgr, macs[i].getElementName(), macs[i].getIDString(), curMachineID);
+		    		addAction(dropDownMenuMgr, macs[i].getName(), macs[i].getIDString(), curMachineID);
 		    	}		
 		}
 	}

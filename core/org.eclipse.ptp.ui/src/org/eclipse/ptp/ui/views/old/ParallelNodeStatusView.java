@@ -27,7 +27,6 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
-import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
@@ -46,8 +45,6 @@ import org.eclipse.ptp.ui.actions.old.ShowAllNodesAction;
 import org.eclipse.ptp.ui.actions.old.ShowLegendAction;
 import org.eclipse.ptp.ui.actions.old.ShowMyAllocatedNodesAction;
 import org.eclipse.ptp.ui.actions.old.ShowMyUsedNodesAction;
-import org.eclipse.ptp.ui.actions.old.ShowProcessesAction;
-import org.eclipse.ptp.ui.actions.old.TerminateAllAction;
 import org.eclipse.ptp.ui.old.ParallelImages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -67,7 +64,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Decorations;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
@@ -385,7 +381,7 @@ public class ParallelNodeStatusView extends AbstractParallelView implements
 			for (int i = 0; i < displayElements.length; i++) {
 				IPNode somenode = (IPNode) displayElements[i];
 				if (filterSelection == USED_NODES) {
-					if (somenode != null && somenode.hasChildren()) {
+					if (somenode != null && somenode.hasChildProcesses()) {
 						IPProcess procs[] = somenode.getProcesses();
 						if (procs != null && procs.length > 0) {
 							tmpNodes[copied_elements] = displayElements[i];
@@ -614,7 +610,7 @@ public class ParallelNodeStatusView extends AbstractParallelView implements
 	}
 
 	public IPProcess[] getSortedProcessList(IPNode node) {
-		if (node == null || !node.hasChildren())
+		if (node == null || !node.hasChildProcesses())
 			return null;
 
 		IPProcess tmp[] = node.getProcesses();
@@ -948,7 +944,7 @@ public class ParallelNodeStatusView extends AbstractParallelView implements
 		if (mode == PROCESSES) {
 
 			IPNode somenode = systemNodeToIPNode("" + node + "");
-			if (somenode == null || !somenode.hasChildren()) {
+			if (somenode == null || !somenode.hasChildProcesses()) {
 				MessageBox mb = new MessageBox(this.getViewSite().getShell(),
 						SWT.ICON_ERROR | SWT.OK);
 				mb.setMessage("Unable to find node " + node + " or\n"
@@ -1152,7 +1148,7 @@ public class ParallelNodeStatusView extends AbstractParallelView implements
 			 * IPNode somenode =
 			 * systemNodeToIPNode(sysDescNodes[index].getNode());
 			 */
-			if (somenode != null && somenode.hasChildren()) {
+			if (somenode != null && somenode.hasChildProcesses()) {
 				/* so I have jobs on these nodes - are they running? */
 				IPProcess procs[] = somenode.getProcesses();
 				if (procs != null && procs.length > 0) {
@@ -1632,7 +1628,7 @@ public class ParallelNodeStatusView extends AbstractParallelView implements
 
 			IPNode somenode = (IPNode) displayElements[selected_node_num];
 
-			if (somenode != null && somenode.hasChildren()) {
+			if (somenode != null && somenode.hasChildProcesses()) {
 				IPProcess procs[] = getSortedProcessList(somenode);
 				for (int i = 0; i < procs.length; i++) {
 					item = new TableItem(BRtable, 0);
