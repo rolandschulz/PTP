@@ -20,12 +20,15 @@ package org.eclipse.ptp.internal.ui.search;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.DialogPage;
 import org.eclipse.jface.util.Assert;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.ptp.core.IPElement;
+import org.eclipse.ptp.core.IPNode;
+import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.search.ui.ISearchPage;
 import org.eclipse.search.ui.ISearchPageContainer;
 import org.eclipse.search.ui.NewSearchUI;
@@ -252,14 +255,11 @@ public class PSearchPage extends DialogPage implements ISearchPage, IPSearchCons
 		int searchFor = SEARCH_NODE;
 		int limitTo = LIMIT_NUMBER;
 		
-		String pattern = String.valueOf(element.getID());		
-		switch (element.getElementType()) {
-		    case IPElement.P_NODE:
-		        searchFor = SEARCH_NODE;
-		        break;
-		    case IPElement.P_PROCESS:
-		        searchFor = SEARCH_PROCESS;
-		        break;
+		String pattern = String.valueOf(element.getID());
+		if (element instanceof IPNode) {
+			searchFor = SEARCH_NODE;
+		} else if (element instanceof IPProcess) {
+			searchFor = SEARCH_PROCESS;
 		}
 		return new SearchPatternData(searchFor, limitTo, pattern, element);
 	}
@@ -394,15 +394,15 @@ public class PSearchPage extends DialogPage implements ISearchPage, IPSearchCons
 		private String pattern;
 		private IPElement element;
 
-		public SearchPatternData(int searchFor, int limitTo, String pattern, IPElement element) {
+		public SearchPatternData(int searchFor, int limitTo, String pattern, IPElement element2) {
 			setSearchFor(searchFor);
 			setLimitTo(limitTo);
 			setPattern(pattern);
-			setElement(element);
+			setElement(element2);
 		}
 
-		public void setElement(IPElement element) {
-			this.element= element;
+		public void setElement(IPElement element2) {
+			this.element= element2;
 		}
 
 		public IPElement getElement() {

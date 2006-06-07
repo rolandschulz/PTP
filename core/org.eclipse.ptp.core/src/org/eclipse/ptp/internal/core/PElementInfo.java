@@ -22,7 +22,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.ptp.core.IPElement;
+import org.eclipse.ptp.internal.core.elementcontrols.IPElementControl;
 
 /**
  *
@@ -30,36 +30,36 @@ import org.eclipse.ptp.core.IPElement;
 public class PElementInfo {
 	private Map fChildren = null;
 
-	protected IPElement element;
+	protected IPElementControl element;
 
-	public PElementInfo(IPElement element) {
+	public PElementInfo(IPElementControl element) {
 		this.element = element;
 		// Array list starts with size = 0
 		fChildren = new HashMap(0);
 	}
 
-	public IPElement getElement() {
+	public IPElementControl getElement() {
 		return element;
 	}
 
-	public void addChild(IPElement member) {
+	public void addChild(IPElementControl member) {
 		fChildren.put(member.getIDString(), member);
 	}
 
-	public void removeChild(IPElement member) {
+	public void removeChild(IPElementControl member) {
 		fChildren.remove(member.getIDString());
 	}
 
-	public IPElement findChild(String key) {
+	public IPElementControl findChild(String key) {
 		if (fChildren.containsKey(key))
-			return (IPElement) fChildren.get(key);
+			return (IPElementControl) fChildren.get(key);
 		return null;
 	}
 
-	public IPElement[] getChildren() {
+	public IPElementControl[] getChildren() {
 		synchronized (fChildren) {
-			return (IPElement[]) fChildren.values().toArray(
-					new IPElement[size()]);
+			return (IPElementControl[]) fChildren.values().toArray(
+					new IPElementControl[size()]);
 		}
 	}
 
@@ -69,7 +69,7 @@ public class PElementInfo {
 		}
 	}
 
-	public boolean includesChild(IPElement child) {
+	public boolean includesChild(IPElementControl child) {
 		if (fChildren.containsKey(child.getIDString()))
 			return true;
 		return false;

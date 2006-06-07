@@ -20,19 +20,21 @@ package org.eclipse.ptp.internal.core;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.ptp.core.AttributeConstants;
-import org.eclipse.ptp.core.IPElement;
-import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPMachine;
 import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.IPUniverse;
+import org.eclipse.ptp.internal.core.elementcontrols.IPElementControl;
+import org.eclipse.ptp.internal.core.elementcontrols.IPJobControl;
+import org.eclipse.ptp.internal.core.elementcontrols.IPNodeControl;
+import org.eclipse.ptp.internal.core.elementcontrols.IPProcessControl;
+import org.eclipse.ptp.internal.core.elementcontrols.IPUniverseControl;
 
-public class PJob extends Parent implements IPJob {
+public class PJob extends Parent implements IPJobControl {
 	protected String NAME_TAG = "root ";
 	protected boolean isDebugJob = false;
 	private ArrayList taskIdMap;
@@ -41,7 +43,7 @@ public class PJob extends Parent implements IPJob {
 	
 	final public static int STATE_NEW = 5000;
 
-	public PJob(IPUniverse uni, String name, String key, int jobNumber) {
+	public PJob(IPUniverseControl uni, String name, String key, int jobNumber) {
 		super(uni, name, key, P_JOB);
 		taskIdMap = new ArrayList();
 		this.setAttribute(AttributeConstants.ATTRIB_JOBID, new Integer(jobNumber));
@@ -92,7 +94,7 @@ public class PJob extends Parent implements IPJob {
 	}
 
 	public synchronized IPNode[] getSortedNodes() {
-		IPNode[] nodes = getNodes();
+		IPNodeControl[] nodes = (IPNodeControl[]) getNodes();
 		sort(nodes);
 		return nodes;
 	}
@@ -106,26 +108,26 @@ public class PJob extends Parent implements IPJob {
 			}
 		}
 
-		return (IPNode[]) array.toArray(new IPNode[array.size()]);
+		return (IPNodeControl[]) array.toArray(new IPNodeControl[array.size()]);
 	}
 
 	/*
 	 * returns all the processes in this job, which are the children of the job
 	 */
 	public synchronized IPProcess[] getProcesses() {
-		return (IPProcess[]) getCollection().toArray(new IPProcess[size()]);
+		return (IPProcessControl[]) getCollection().toArray(new IPProcessControl[size()]);
 	}
 
 	public synchronized IPProcess[] getSortedProcesses() {
-		IPProcess[] processes = getProcesses();
+		IPProcessControl[] processes = (IPProcessControl[]) getProcesses();
 		sort(processes);
 		return processes;
 	}
 
 	public synchronized IPProcess findProcess(String processNumber) {
-		IPElement element = findChild(processNumber);
+		IPElementControl element = findChild(processNumber);
 		if (element != null)
-			return (IPProcess) element;
+			return (IPProcessControl) element;
 		return null;
 	}
 
@@ -134,8 +136,8 @@ public class PJob extends Parent implements IPJob {
 		Iterator it = col.iterator();
 		while (it.hasNext()) {
 			Object ob = it.next();
-			if (ob instanceof IPProcess) {
-				IPProcess proc = (IPProcess) ob;
+			if (ob instanceof IPProcessControl) {
+				IPProcessControl proc = (IPProcessControl) ob;
 				if (proc.getElementName().equals(pname))
 					return proc;
 			}
@@ -164,7 +166,7 @@ public class PJob extends Parent implements IPJob {
 	}
 
 	public IPUniverse getUniverse() {
-		IPElement current = this;
+		IPElementControl current = this;
 		do {
 			if (current instanceof IPUniverse)
 				return (IPUniverse) current;
@@ -172,10 +174,10 @@ public class PJob extends Parent implements IPJob {
 		return null;
 	}
 	
-	public void addChild(IPElement member) {
+	public void addChild(IPElementControl member) {
 		super.addChild(member);
-		if (member instanceof IPProcess) {
-			IPProcess p = (IPProcess) member;
+		if (member instanceof IPProcessControl) {
+			IPProcessControl p = (IPProcessControl) member;
 			taskIdMap.add(p.getTaskId(), "" + p.getID() + "");
 		}
 	}
@@ -200,4 +202,7 @@ public class PJob extends Parent implements IPJob {
 		return this.getAttributeKeys(AttributeConstants.ATTRIB_CLASS_JOB);
 	}
 
+	public String getName() {
+		return getElementName();
+	}
 }

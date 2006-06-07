@@ -44,6 +44,10 @@ import org.eclipse.ptp.core.IParallelModelListener;
 import org.eclipse.ptp.core.MonitoringSystemChoices;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.PreferenceConstants;
+import org.eclipse.ptp.internal.core.elementcontrols.IPJobControl;
+import org.eclipse.ptp.internal.core.elementcontrols.IPNodeControl;
+import org.eclipse.ptp.internal.core.elementcontrols.IPProcessControl;
+import org.eclipse.ptp.internal.core.elementcontrols.IPUniverseControl;
 import org.eclipse.ptp.rtsystem.IControlSystem;
 import org.eclipse.ptp.rtsystem.IMonitoringSystem;
 import org.eclipse.ptp.rtsystem.IRuntimeListener;
@@ -66,7 +70,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 	// protected IPMachine machine = null;
 	protected IPJob processRoot = null;
 
-	protected IPUniverse universe = null;
+	protected IPUniverseControl universe = null;
 
 	//protected boolean isPerspectiveOpen = false;
 
@@ -424,7 +428,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 					if (subMonitor.isCanceled()) {
 						throw new CoreException(Status.CANCEL_STATUS);
 					}
-					IPProcess proc = new PProcess(job, ne[i]+"_process"+j, "" + j + "", "0", j, IPProcess.STARTING, "", "");
+					IPProcessControl proc = new PProcess(job, ne[i]+"_process"+j, "" + j + "", "0", j, IPProcess.STARTING, "", "");
 					job.addChild(proc);
 					subMonitor.worked(1);
 				}	
@@ -616,12 +620,12 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		
 		IProgressMonitor monitor = new NullProgressMonitor();		
 		
-		IPJob job = universe.findJobByName(ne);
+		IPJobControl job = (IPJobControl) universe.findJobByName(ne);
 		/* if it already existed, then destroy it first */
 		if (job != null) {
-			IPProcess[] procs = job.getProcesses();
+			IPProcessControl[] procs = (IPProcessControl[]) job.getProcesses();
 			for (int i = 0; i < procs.length; i++) {
-				IPNode node = procs[i].getNode();
+				IPNodeControl node = (IPNodeControl) procs[i].getNode();
 				node.removeChild(procs[i]);
 			}
 			job.removeChildren();
@@ -650,7 +654,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		}
 		
 		for (int j = 0; j < ne2.length; j++) {		
-			IPProcess proc;
+			IPProcessControl proc;
 			
 			proc = new PProcess(pjob, ne+"_process"+j, "" + j + "", "0", j, IPProcess.STARTING, "", "");
 			pjob.addChild(proc);
@@ -851,7 +855,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		 */
 		for (int i = 0; i < numProcesses; i++) {		
 			// System.out.println("process name = "+ne[j]);
-			IPProcess proc = new PProcess(job, jobName+"_process"+i, "" + i + "", "0", i, IPProcess.STARTING, "", "");
+			IPProcessControl proc = new PProcess(job, jobName+"_process"+i, "" + i + "", "0", i, IPProcess.STARTING, "", "");
 			job.addChild(proc);			
 		}	
 		

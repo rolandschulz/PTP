@@ -37,6 +37,7 @@ public class PRunPerspectiveFactory implements IPerspectiveFactory {
 		IFolderLayout folder1= layout.createFolder("topLeft", IPageLayout.LEFT, (float)0.25, editorArea);
 		folder1.addView(IPTPUIConstants.VIEW_PARALLELMACHINE);
 		folder1.addView(IPTPUIConstants.VIEW_PARALLELJOB);
+		folder1.addView(IPTPUIConstants.VIEW_RESOURCEMANAGER);
 
 		folder1.addPlaceholder(IPageLayout.ID_BOOKMARKS);
 		

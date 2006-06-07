@@ -146,6 +146,13 @@ public interface IPMachine extends IPElement {
 	public String getArch();
 	
 	/**
+	 * @return
+	 */
+	public String getName();
+
+	public String getIDString();
+	
+	/**
 	 * Searches for an attribute on the Element given a key.  
 	 * The resulting attribute Object is returned.  The returned may be null if the attribute
 	 * was not found.

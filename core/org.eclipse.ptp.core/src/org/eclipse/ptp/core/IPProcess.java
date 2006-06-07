@@ -76,5 +76,24 @@ public interface IPProcess extends IPElement {
 	 * @return A string array containing the keys
 	 */
 	public String[] getAttributeKeys();
+	
+	/**
+	 * @return
+	 */
+	public String getName();
+	
+	/**
+	 * @return
+	 */
+	public IPProcess getParentProcess();
+	
+	/**
+	 * @return
+	 */
+	public int getNumChildProcesses();
 
+	/**
+	 * @return
+	 */
+	public boolean isAllStop();
 }

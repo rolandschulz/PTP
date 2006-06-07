@@ -29,6 +29,8 @@ import java.util.Vector;
 import org.eclipse.ptp.core.AttributeConstants;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
+import org.eclipse.ptp.internal.core.elementcontrols.IPJobControl;
+import org.eclipse.ptp.internal.core.elementcontrols.IPProcessControl;
 import org.eclipse.ptp.rtsystem.IControlSystem;
 import org.eclipse.ptp.rtsystem.IRuntimeListener;
 import org.eclipse.ptp.rtsystem.JobRunConfiguration;
@@ -150,10 +152,11 @@ public class SimulationControlSystem implements IControlSystem {
 		return numJobs;
 	}
 
-	public void terminateJob(IPJob jobName) {
-		String tname = (String)jobName.getAttribute(AttributeConstants.ATTRIB_NAME);
+	public void terminateJob(IPJob jobIn) {
+		IPJobControl job = (IPJobControl) jobIn;
+		String tname = (String)job.getAttribute(AttributeConstants.ATTRIB_NAME);
 		
-		IPProcess[] ps = jobName.getProcesses();
+		IPProcess[] ps = job.getProcesses();
 		for(int i=0; i<ps.length; i++) {
 			ps[i].setTerminated(true);
 			if(ps[i] instanceof SimProcess) {
@@ -291,8 +294,10 @@ public class SimulationControlSystem implements IControlSystem {
 		return allvals;
 	}
 	
-	public String[] getProcessAttributes(IPProcess proc, String[] attribs)
+	public String[] getProcessAttributes(IPProcess procIn, String[] attribs)
 	{
+		IPProcessControl proc = (IPProcessControl) procIn;
+		
 		String procName = proc.getElementName();
 		
 		String[] retstr = new String[attribs.length];

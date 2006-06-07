@@ -31,6 +31,7 @@ public interface IPNode extends IPElement {
 	 * @return All Processes residing on this Node or <code>null</code> if there are none.
 	 */
 	public IPProcess[] getProcesses();
+	
 	/**
 	 * Returns a sorted array of all the Processes residing on this Node. May return <code>null</code> if there are none. How the Processes are sorted is left open to the implementer of this interface.
 	 * 
@@ -51,6 +52,10 @@ public interface IPNode extends IPElement {
 	 * @return The Process if found, else <code>null</code>
 	 */
 	public int getNodeNumberInt();
+	/**
+	 * @param processNumber
+	 * @return
+	 */
 	public IPProcess findProcess(String processNumber);
 	/**
 	 * Returns the parent Machine that this Node is contained within.
@@ -67,7 +72,7 @@ public interface IPNode extends IPElement {
 	public void fireEvent(INodeEvent event);
 	public void addNodeListener(INodeListener listener);
 	public void removerNodeListener(INodeListener listener);
-	
+
 	/**
 	 * Searches for an attribute on the Element given a key.  
 	 * The resulting attribute Object is returned.  The returned may be null if the attribute
@@ -77,7 +82,7 @@ public interface IPNode extends IPElement {
 	 * @return Object of the attribute or null if not found
 	 */
 	public Object getAttribute(String key);
-	
+
 	/**
 	 * Sets an attribute given a key and Object.
 	 * 
@@ -93,4 +98,28 @@ public interface IPNode extends IPElement {
 	 */
 	public String[] getAttributeKeys();
 
+	/**
+	 * @return
+	 */
+	public int getNumProcesses();
+
+	/**
+	 * @return
+	 */
+	public String getName();
+
+	/**
+	 * @return
+	 */
+	public String getIDString();
+
+	/**
+	 * @return
+	 */
+	public boolean isAllStop();
+
+	/**
+	 * @return
+	 */
+	public boolean hasChildProcesses();
 }

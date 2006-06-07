@@ -245,7 +245,7 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 			PlatformUI.getWorkbench().getProgressService().busyCursorWhile(new IRunnableWithProgress() {
 				public void run(IProgressMonitor monitor) throws InvocationTargetException {
 					try {
-						PTPCorePlugin.getDefault().getModelManager().refreshRuntimeSystems(monitor, force);
+						PTPCorePlugin.getDefault().getModelPresentation().refreshRuntimeSystems(monitor, force);
 					} catch (CoreException e) {
 						throw new InvocationTargetException(e);
 					}
@@ -267,7 +267,7 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 				public IStatus run(final IProgressMonitor monitor) {
 					if (!monitor.isCanceled()) {
 						try {
-							PTPCorePlugin.getDefault().getModelManager().refreshRuntimeSystems(monitor, force);
+							PTPCorePlugin.getDefault().getModelPresentation().refreshRuntimeSystems(monitor, force);
 						} catch (CoreException e) {
 							return e.getStatus();
 						}

@@ -18,17 +18,15 @@
  *******************************************************************************/
 package org.eclipse.ptp.core;
 
-import java.io.File;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.ptp.core.IParallelModelListener;
 import org.eclipse.ptp.rtsystem.IControlSystem;
 import org.eclipse.ptp.rtsystem.IMonitoringSystem;
 import org.eclipse.ptp.rtsystem.JobRunConfiguration;
 
-public interface IModelManager {
+public interface IModelManager extends IModelPresentation {
 	public static final int STATE_ERROR = -1;
 	public static final int STATE_RUN = 1;
 	public static final int STATE_EXIT = 3;
@@ -48,14 +46,8 @@ public interface IModelManager {
 	public int getControlSystemID();
 	public int getMonitoringSystemID();
 	//public boolean isParallelPerspectiveOpen();
-	public void refreshRuntimeSystems(IProgressMonitor monitor, boolean force) throws CoreException;
-	public void refreshRuntimeSystems(int controlSystemID, int monitoringSystemID, IProgressMonitor monitor) throws CoreException;
 	public void shutdown();
-	public IPUniverse getUniverse();
-	public void addParallelLaunchListener(IParallelModelListener listener);
-	public void removeParallelLaunchListener(IParallelModelListener listener);
 	public int getCurrentState();
-	public void abortJob(String jobName) throws CoreException;
 	public IPJob run(ILaunch launch, JobRunConfiguration jobRunConfig, IProgressMonitor pm) throws CoreException;
 	public void setPTPConfiguration(ILaunchConfiguration config);
 	public ILaunchConfiguration getPTPConfiguration();

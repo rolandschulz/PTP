@@ -18,23 +18,23 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.core;
 
-import java.io.File;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Vector;
 
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.core.AttributeConstants;
-import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPMachine;
 import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
-import org.eclipse.ptp.core.IPUniverse;
-import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.internal.core.elementcontrols.IPElementControl;
+import org.eclipse.ptp.internal.core.elementcontrols.IPJobControl;
+import org.eclipse.ptp.internal.core.elementcontrols.IPMachineControl;
+import org.eclipse.ptp.internal.core.elementcontrols.IPNodeControl;
+import org.eclipse.ptp.internal.core.elementcontrols.IPProcessControl;
+import org.eclipse.ptp.internal.core.elementcontrols.IPUniverseControl;
 
-public class PUniverse extends Parent implements IPUniverse {
+public class PUniverse extends Parent implements IPUniverseControl {
 	protected String NAME_TAG = "universe ";
 
 	public PUniverse() {
@@ -62,24 +62,17 @@ public class PUniverse extends Parent implements IPUniverse {
 		while (it.hasNext()) {
 			Object ob = it.next();
 
-			if (ob instanceof IPMachine)
-				m.add((IPMachine) ob);
+			if (ob instanceof IPMachineControl)
+				m.add((IPMachineControl) ob);
 		}
 
-		/* this wouldnt work, oddly enough so have to do a brute force approach */
-		// return (IPMachine[])(m.toArray());
-		Object[] o = m.toArray();
-		IPMachine[] mac = new IPMachine[o.length];
 
-		for (int i = 0; i < o.length; i++) {
-			mac[i] = (IPMachine) o[i];
-		}
-
+		IPMachineControl[] mac = (IPMachineControl[]) m.toArray(new IPMachineControl[0]);
 		return mac;
 	}
 
 	public synchronized IPMachine[] getSortedMachines() {
-		IPMachine[] macs = getMachines();
+		IPMachineControl[] macs = (IPMachineControl[]) getMachines();
 		sort(macs);
 
 		return macs;
@@ -92,9 +85,17 @@ public class PUniverse extends Parent implements IPUniverse {
 			Object ob = it.next();
 			if (ob instanceof IPMachine) {
 				IPMachine mac = (IPMachine) ob;
-				if (mac.getElementName().equals(mname))
+				if (mac.getName().equals(mname))
 					return mac;
 			}
+		}
+		return null;
+	}
+
+	public synchronized IPMachine findMachineById(String machine_id) {
+		IPElementControl element = findChild(machine_id);
+		if (element instanceof IPMachineControl) {
+			return (IPMachineControl) element;
 		}
 		return null;
 	}
@@ -150,21 +151,21 @@ public class PUniverse extends Parent implements IPUniverse {
 		while (it.hasNext()) {
 			Object ob = it.next();
 
-			if (ob instanceof IPJob)
-				m.add((IPJob) ob);
+			if (ob instanceof IPJobControl)
+				m.add((IPJobControl) ob);
 		}
 
 		Object[] o = m.toArray();
-		IPJob[] job = new IPJob[o.length];
+		IPJobControl[] job = new IPJobControl[o.length];
 		for (int i = 0; i < o.length; i++) {
-			job[i] = (IPJob) o[i];
+			job[i] = (IPJobControl) o[i];
 		}
 
 		return job;
 	}
 
 	public synchronized IPJob[] getSortedJobs() {
-		IPJob[] jobs = getJobs();
+		IPJobControl[] jobs = (IPJobControl[]) getJobs();
 		sort(jobs);
 		return jobs;
 	}
@@ -174,11 +175,19 @@ public class PUniverse extends Parent implements IPUniverse {
 		Iterator it = col.iterator();
 		while (it.hasNext()) {
 			Object ob = it.next();
-			if (ob instanceof IPJob) {
-				IPJob job = (IPJob) ob;
+			if (ob instanceof IPJobControl) {
+				IPJobControl job = (IPJobControl) ob;
 				if (job.getElementName().equals(jname))
 					return job;
 			}
+		}
+		return null;
+	}
+	
+	public synchronized IPJob findJobById(String job_id) {
+		IPElementControl element = findChild(job_id);
+		if (element instanceof IPJobControl) {
+			return (IPJobControl) element;
 		}
 		return null;
 	}
@@ -197,12 +206,13 @@ public class PUniverse extends Parent implements IPUniverse {
 		return null;
 	}
 	
-	public void deleteJob(IPJob job) {
+	public void deleteJob(IPJob jobIn) {
+		IPJobControl job = (IPJobControl) jobIn;
 		for (Iterator i=job.getCollection().iterator(); i.hasNext();) {
-			IPProcess process = (IPProcess)i.next();
+			IPProcessControl process = (IPProcessControl)i.next();
 			if (process == null)
 				continue;
-			IPNode node = process.getNode();
+			IPNodeControl node = (IPNodeControl) process.getNode();
 			if (node == null)
 				continue;
 			node.removeChild(process);

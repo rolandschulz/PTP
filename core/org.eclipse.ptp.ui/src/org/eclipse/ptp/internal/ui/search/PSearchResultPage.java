@@ -19,6 +19,7 @@
 package org.eclipse.ptp.internal.ui.search;
 
 import java.util.Arrays;
+
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;

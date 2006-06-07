@@ -93,7 +93,7 @@ public class OMPIMonitoringSystem implements IMonitoringSystem, IProxyRuntimeEve
 		if(proxyDead) {
 			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, "Monitoring system is shut down", null));
 		}
-		System.out.println("OMPIMonitoringSystem: getNodes(" + machine.getElementName() + ") called");
+		System.out.println("OMPIMonitoringSystem: getNodes(" + machine.getName() + ") called");
 
 		/* need to check if machineName is a valid machine name */
 
@@ -119,13 +119,13 @@ public class OMPIMonitoringSystem implements IMonitoringSystem, IProxyRuntimeEve
 		/* this is an error, so we'll return 1 empty node */
 		if(numNodes <= 0) {
 			String[] ne = new String[1];
-			ne[0] = new String(machine.getElementName()+"_node0");
+			ne[0] = new String(machine.getName()+"_node0");
 			return ne;
 		}
 		
 		String[] ne = new String[numNodes];
 		for(int i=0; i<numNodes; i++) {
-			ne[i] = new String(machine.getElementName()+"_node"+i);
+			ne[i] = new String(machine.getName()+"_node"+i);
 		}	
 		
 		return ne;
@@ -147,7 +147,7 @@ public class OMPIMonitoringSystem implements IMonitoringSystem, IProxyRuntimeEve
 		if(proxyDead) {
 			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, "Monitoring system is shut down", null));
 		}
-		System.out.println("ORTE Monitoring System: getNodeAttribute(" + node.getElementName() + ", "
+		System.out.println("ORTE Monitoring System: getNodeAttribute(" + node.getName() + ", "
 				+ attribs + ") called");
 		IPMachine machine = node.getMachine();
 		int machID = machine.getMachineNumberInt();

@@ -1,16 +1,11 @@
 package org.eclipse.ptp.rtsystem.ompi;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.URL;
 import java.util.BitSet;
-import java.util.Properties;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.core.ControlSystemChoices;
 import org.eclipse.ptp.core.IModelManager;

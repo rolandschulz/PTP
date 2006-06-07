@@ -30,7 +30,6 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.core.AttributeConstants;
 import org.eclipse.ptp.core.INodeEvent;
-import org.eclipse.ptp.core.IPElement;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
@@ -43,9 +42,11 @@ import org.eclipse.ptp.core.ProcessEvent;
 import org.eclipse.ptp.internal.core.OutputTextFile;
 import org.eclipse.ptp.internal.core.PElement;
 import org.eclipse.ptp.internal.core.PElementInfo;
+import org.eclipse.ptp.internal.core.elementcontrols.IPElementControl;
+import org.eclipse.ptp.internal.core.elementcontrols.IPNodeControl;
 import org.eclipse.search.ui.ISearchPageScoreComputer;
 
-public class SimProcess extends Process implements IPProcess, IPElement, Comparable {
+public class SimProcess extends Process implements IPProcess, IPElementControl, Comparable {
 	InputStream err;
 	InputStream in;
 	OutputStream out;
@@ -68,12 +69,12 @@ public class SimProcess extends Process implements IPProcess, IPElement, Compara
 	/*
 	 * the node that this process is running on, or was scheduled on / will be, etc
 	 */
-	protected IPNode node;
+	protected IPNodeControl node;
 	Thread procThread;
 	
 	final int numThreads = 1;
 
-	public SimProcess(IPElement element, String name, String key, String pid, int taskId, String status, String exitCode, String signalName) {
+	public SimProcess(IPElementControl element, String name, String key, String pid, int taskId, String status, String exitCode, String signalName) {
 		attribs = new HashMap();
 		ID = PTPCorePlugin.getDefault().getNewID();
 		attribs.put(AttributeConstants.ATTRIB_PARENT, element);
@@ -155,7 +156,7 @@ public class SimProcess extends Process implements IPProcess, IPElement, Compara
 			outputDirectory.mkdir();
 	}
 	public IPJob getJob() {
-		IPElement current = this;
+		IPElementControl current = this;
 		do {
 			if (current instanceof IPJob)
 				return (IPJob) current;
@@ -211,7 +212,7 @@ public class SimProcess extends Process implements IPProcess, IPElement, Compara
 		return isTerminated;
 	}
 	public void removeProcess() {
-		((IPNode) getParent()).removeChild(this);
+		((IPNodeControl) getParent()).removeChild(this);
 	}
 	public void setTerminated(boolean isTerminated) {
 		this.isTerminated = isTerminated;
@@ -248,9 +249,9 @@ public class SimProcess extends Process implements IPProcess, IPElement, Compara
 		return getStatus().startsWith(EXITED);
 	}
 	public void setNode(IPNode node) {
-		this.node = node;
+		this.node = (IPNodeControl) node;
 		if (node != null)
-			node.addChild(this);
+			this.node.addChild(this);
 	}
 	public IPNode getNode() {
 		return this.node;
@@ -258,13 +259,13 @@ public class SimProcess extends Process implements IPProcess, IPElement, Compara
 	public int getTaskId() {
 		return ((Integer) attribs.get(AttributeConstants.ATTRIB_TASKID)).intValue();
 	}
-	public void addChild(IPElement member) {
+	public void addChild(IPElementControl member) {
 		getElementInfo().addChild(member);
 	}
-	public void removeChild(IPElement member) {
+	public void removeChild(IPElementControl member) {
 		getElementInfo().removeChild(member);
 	}
-	public IPElement findChild(String key) {
+	public IPElementControl findChild(String key) {
 		return getElementInfo().findChild(key);
 	}
 	public void removeChildren() {
@@ -276,19 +277,19 @@ public class SimProcess extends Process implements IPProcess, IPElement, Compara
 			return info.getCollection();
 		return null;
 	}
-	public IPElement[] getChildren() {
+	public IPElementControl[] getChildren() {
 		PElementInfo info = getElementInfo();
 		if (info != null)
 			return info.getChildren();
-		return new IPElement[] {};
+		return new IPElementControl[] {};
 	}
-	public IPElement[] getSortedChildren() {
-		IPElement[] elements = getChildren();
+	public IPElementControl[] getSortedChildren() {
+		IPElementControl[] elements = getChildren();
 		sort(elements);
 		return elements;
 	}
 	public List getChildrenOfType(int type) {
-		IPElement[] children = getChildren();
+		IPElementControl[] children = getChildren();
 		int size = children.length;
 		ArrayList list = new ArrayList(size);
 		for (int i = 0; i < size; ++i) {
@@ -302,7 +303,7 @@ public class SimProcess extends Process implements IPProcess, IPElement, Compara
 	public boolean hasChildren() {
 		return getElementInfo().hasChildren();
 	}
-	private void quickSort(IPElement element[], int low, int high) {
+	private void quickSort(IPElementControl element[], int low, int high) {
 		int lo = low;
 		int hi = high;
 		int mid;
@@ -325,13 +326,13 @@ public class SimProcess extends Process implements IPProcess, IPElement, Compara
 				quickSort(element, lo, high);
 		}
 	}
-	private void swap(IPElement element[], int i, int j) {
-		IPElement tempElement;
+	private void swap(IPElementControl element[], int i, int j) {
+		IPElementControl tempElement;
 		tempElement = element[i];
 		element[i] = element[j];
 		element[j] = tempElement;
 	}
-	public void sort(IPElement element[]) {
+	public void sort(IPElementControl element[]) {
 		quickSort(element, 0, element.length - 1);
 	}
 	protected PElementInfo getElementInfo() {
@@ -371,14 +372,14 @@ public class SimProcess extends Process implements IPProcess, IPElement, Compara
 	/**
 	 * @return Returns the Parent.
 	 */
-	public IPElement getParent() {
-		return (IPElement) attribs.get(AttributeConstants.ATTRIB_PARENT);
+	public IPElementControl getParent() {
+		return (IPElementControl) attribs.get(AttributeConstants.ATTRIB_PARENT);
 	}
 	/**
 	 * @param parent
 	 *            The Parent to set.
 	 */
-	public void setParent(IPElement parent) {
+	public void setParent(IPElementControl parent) {
 		attribs.put(AttributeConstants.ATTRIB_PARENT, parent);
 	}
 	/**
@@ -405,9 +406,9 @@ public class SimProcess extends Process implements IPProcess, IPElement, Compara
 		return getElementInfo().size();
 	}
 	public int compareTo(Object obj) {
-		if (obj instanceof IPElement) {
+		if (obj instanceof IPElementControl) {
 			int my_rank = getID();
-			int his_rank = ((IPElement) obj).getID();
+			int his_rank = ((IPElementControl) obj).getID();
 			if (my_rank < his_rank)
 				return -1;
 			if (my_rank == his_rank)
@@ -421,7 +422,7 @@ public class SimProcess extends Process implements IPProcess, IPElement, Compara
 		//FIXME
 		//if (!CoreUtils.PTP_SEARCHPAGE_ID.equals(pageId))
 			//return ISearchPageScoreComputer.UNKNOWN;
-		if (element instanceof IPElement)
+		if (element instanceof IPElementControl)
 			return 90;
 		return ISearchPageScoreComputer.LOWEST;
 	}
@@ -483,5 +484,16 @@ public class SimProcess extends Process implements IPProcess, IPElement, Compara
 	}
 	public void setAttribute(int attr, String key, Object o) {
 		attribs.put(key, o);
+	}
+	public String getName() {
+		return getElementName();
+	}
+	
+	public IPProcess getParentProcess() {
+		return (IPProcess) getParent();
+	}
+	
+	public int getNumChildProcesses() {
+		return size();
 	}
 }

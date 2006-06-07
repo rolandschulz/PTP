@@ -26,19 +26,25 @@ import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.swt.graphics.Image;
 
-public class ParallelImages {	
+public class ParallelImages {
+
+	// ==== URLs for Icon Folders ==== 
+	
 	public final static URL ICONURL = PTPUIPlugin.getDefault().getBundle().getEntry("icons/");
 	public final static URL TOOLICONURL = PTPUIPlugin.getDefault().getBundle().getEntry("icons/tool/");
 	public final static URL PROCESSICONURL = PTPUIPlugin.getDefault().getBundle().getEntry("icons/process/");
 	public final static URL NODEICONURL = PTPUIPlugin.getDefault().getBundle().getEntry("icons/node/");
+	public final static URL RMICONURL = PTPUIPlugin.getDefault().getBundle().getEntry("icons/rm/");
 	
-    private static ImageRegistry imageRegistry = null;
-	
+	// ===== Icon Files =====
+
+	// CHANGE/DELETE SET
 	public static final String ICON_CHANGESET_NORMAL = "changeset_normal.gif";
 	public static final String ICON_CREATESET_NORMAL = "createset_normal.gif";
 	public static final String ICON_DELETESET_NORMAL = "deleteset_normal.gif";
 	public static final String ICON_DELETEELEMENT_NORMAL = "deleteelement_normal.gif";
 	
+	// MACHINE
 	public static final String ICON_MACHINE_NORMAL = "machine_normal.gif";
 	public static final String ICON_JOB_NORMAL = "job_normal.gif";
 	public static final String ICON_TERMINATE_ALL_DISABLE = "terminate_all_disable.gif";
@@ -47,10 +53,10 @@ public class ParallelImages {
 	public static final String ICON_DEBUGMODE_NORMAL = "debugmode_normal.gif";
 	public static final String ICON_REMOVEALLTERMINATED_NORMAL = "remove_all_terminated_normal.gif";
 
-	//SHOW LEGEND ICON
+	// SHOW LEGEND
 	public static final String ICON_SHOWLEGEND_ACTION_NORMAL =  "legend.gif";
 	
-	//NODE
+	// NODE
 	public static final String IMG_NODE_USER_ALLOC_EXCL = "node_user_excl.gif";
 	public static final String IMG_NODE_USER_ALLOC_EXCL_SEL = "node_user_excl_sel.gif";
 	public static final String IMG_NODE_USER_ALLOC_SHARED = "node_user_shared.gif";
@@ -72,7 +78,7 @@ public class ParallelImages {
 	public static final String IMG_NODE_UP = "node_up.gif";
 	public static final String IMG_NODE_UP_SEL = "node_up_sel.gif";
 	
-	//PROCESS
+	// PROCESS
 	public static final String IMG_PROC_ERROR = "proc_error.gif";
 	public static final String IMG_PROC_ERROR_SEL = "proc_error_sel.gif"; 
 	public static final String IMG_PROC_EXITED = "proc_exited.gif";
@@ -86,10 +92,23 @@ public class ParallelImages {
 	public static final String IMG_PROC_STOPPED = "proc_stopped.gif";
 	public static final String IMG_PROC_STOPPED_SEL = "proc_stopped_sel.gif";
 	
+	// RESOURCE MANAGERS
+	public static final String IMG_RM_OFF = "rm_off.gif";
+	public static final String IMG_RM_ON = "rm_on.gif";
+	public static final String IMG_RM_CURRENT = "rm_current.gif";
+	public static final String IMG_RM_ERROR = "rm_error.gif";
+	public static final String IMG_RM_START = "start.gif";
+	public static final String IMG_RM_STOP = "stop.gif";
+	
+	// ==== Image Descriptors ====
+	
+	// CHANGE/DELETE SET
 	public static final ImageDescriptor ID_ICON_CHANGESET_NORMAL = createImageDescriptor(TOOLICONURL, ICON_CHANGESET_NORMAL, ICON_CHANGESET_NORMAL);
 	public static final ImageDescriptor ID_ICON_CREATESET_NORMAL = createImageDescriptor(TOOLICONURL, ICON_CREATESET_NORMAL, ICON_CREATESET_NORMAL);
 	public static final ImageDescriptor ID_ICON_DELETESET_NORMAL = createImageDescriptor(TOOLICONURL, ICON_DELETESET_NORMAL, ICON_DELETESET_NORMAL);
 	public static final ImageDescriptor ID_ICON_DELETEELEMENT_NORMAL = createImageDescriptor(TOOLICONURL, ICON_DELETEELEMENT_NORMAL, ICON_DELETEELEMENT_NORMAL);
+
+	// MACHINE
 	public static final ImageDescriptor ID_ICON_MACHINE_NORMAL = createImageDescriptor(TOOLICONURL, ICON_MACHINE_NORMAL, ICON_MACHINE_NORMAL);
 	public static final ImageDescriptor ID_ICON_JOB_NORMAL = createImageDescriptor(TOOLICONURL, ICON_JOB_NORMAL, ICON_JOB_NORMAL);
 	public static final ImageDescriptor ID_ICON_TERMINATE_ALL_DISABLE = createImageDescriptor(TOOLICONURL, ICON_TERMINATE_ALL_DISABLE, ICON_TERMINATE_ALL_DISABLE);
@@ -98,8 +117,10 @@ public class ParallelImages {
 	public static final ImageDescriptor ID_ICON_DEBUGMODE_NORMAL = createImageDescriptor(TOOLICONURL, ICON_DEBUGMODE_NORMAL, ICON_DEBUGMODE_NORMAL);
 	public static final ImageDescriptor ID_ICON_REMOVEALLTERMINATED_NORMAL = createImageDescriptor(TOOLICONURL, ICON_REMOVEALLTERMINATED_NORMAL, ICON_REMOVEALLTERMINATED_NORMAL);
 
+	// SHOW LEGEND
 	public static final ImageDescriptor ID_ICON_SHOWLEGEND_ACTION_NORMAL = createImageDescriptor(TOOLICONURL, ICON_SHOWLEGEND_ACTION_NORMAL, ICON_SHOWLEGEND_ACTION_NORMAL);
 
+	// NODE
 	public static final ImageDescriptor ID_IMG_NODE_USER_ALLOC_EXCL = createImageDescriptor(NODEICONURL, IMG_NODE_USER_ALLOC_EXCL, IMG_NODE_USER_ALLOC_EXCL);
 	public static final ImageDescriptor ID_IMG_NODE_USER_ALLOC_EXCL_SEL = createImageDescriptor(NODEICONURL, IMG_NODE_USER_ALLOC_EXCL_SEL, IMG_NODE_USER_ALLOC_EXCL_SEL);
 	public static final ImageDescriptor ID_IMG_NODE_USER_ALLOC_SHARED = createImageDescriptor(NODEICONURL, IMG_NODE_USER_ALLOC_SHARED, IMG_NODE_USER_ALLOC_SHARED);
@@ -121,6 +142,7 @@ public class ParallelImages {
 	public static final ImageDescriptor ID_IMG_NODE_UP = createImageDescriptor(NODEICONURL, IMG_NODE_UP, IMG_NODE_UP);
 	public static final ImageDescriptor ID_IMG_NODE_UP_SEL = createImageDescriptor(NODEICONURL, IMG_NODE_UP_SEL, IMG_NODE_UP_SEL);
 
+	// PROCESS
 	public static final ImageDescriptor ID_IMG_PROC_ERROR = createImageDescriptor(PROCESSICONURL, IMG_PROC_ERROR, IMG_PROC_ERROR);
 	public static final ImageDescriptor ID_IMG_PROC_ERROR_SEL = createImageDescriptor(PROCESSICONURL, IMG_PROC_ERROR_SEL, IMG_PROC_ERROR_SEL);
 	public static final ImageDescriptor ID_IMG_PROC_EXITED = createImageDescriptor(PROCESSICONURL, IMG_PROC_EXITED, IMG_PROC_EXITED);
@@ -134,17 +156,57 @@ public class ParallelImages {
 	public static final ImageDescriptor ID_IMG_PROC_STOPPED = createImageDescriptor(PROCESSICONURL, IMG_PROC_STOPPED, IMG_PROC_STOPPED);
 	public static final ImageDescriptor ID_IMG_PROC_STOPPED_SEL = createImageDescriptor(PROCESSICONURL, IMG_PROC_STOPPED_SEL, IMG_PROC_STOPPED_SEL);
 	
-	public static final Image[][] nodeImages = { { getImage(ParallelImages.IMG_NODE_USER_ALLOC_EXCL), getImage(ParallelImages.IMG_NODE_USER_ALLOC_EXCL_SEL) },
-		{ getImage(ParallelImages.IMG_NODE_USER_ALLOC_SHARED), getImage(ParallelImages.IMG_NODE_USER_ALLOC_SHARED_SEL) }, { getImage(ParallelImages.IMG_NODE_OTHER_ALLOC_EXCL), getImage(ParallelImages.IMG_NODE_OTHER_ALLOC_EXCL_SEL) },
-		{ getImage(ParallelImages.IMG_NODE_OTHER_ALLOC_SHARED), getImage(ParallelImages.IMG_NODE_OTHER_ALLOC_SHARED_SEL) }, { getImage(ParallelImages.IMG_NODE_DOWN), getImage(ParallelImages.IMG_NODE_DOWN_SEL) },
-		{ getImage(ParallelImages.IMG_NODE_ERROR), getImage(ParallelImages.IMG_NODE_ERROR_SEL) }, { getImage(ParallelImages.IMG_NODE_EXITED), getImage(ParallelImages.IMG_NODE_EXITED_SEL) },
-		{ getImage(ParallelImages.IMG_NODE_RUNNING), getImage(ParallelImages.IMG_NODE_RUNNING_SEL) }, { getImage(ParallelImages.IMG_NODE_UNKNOWN), getImage(ParallelImages.IMG_NODE_UNKNOWN_SEL) },
-		{ getImage(ParallelImages.IMG_NODE_UP), getImage(ParallelImages.IMG_NODE_UP_SEL) } };
-	public static final Image[][] procImages = { { getImage(ParallelImages.IMG_PROC_ERROR), getImage(ParallelImages.IMG_PROC_ERROR_SEL) }, { getImage(ParallelImages.IMG_PROC_EXITED), getImage(ParallelImages.IMG_PROC_EXITED_SEL) },
-		{ getImage(ParallelImages.IMG_PROC_EXITED_SIGNAL), getImage(ParallelImages.IMG_PROC_EXITED_SIGNAL_SEL) }, { getImage(ParallelImages.IMG_PROC_RUNNING), getImage(ParallelImages.IMG_PROC_RUNNING_SEL) },
-		{ getImage(ParallelImages.IMG_PROC_STARTING), getImage(ParallelImages.IMG_PROC_STARTING_SEL) }, { getImage(ParallelImages.IMG_PROC_STOPPED), getImage(ParallelImages.IMG_PROC_STOPPED_SEL) } };
-	public static Image[] jobImages = { getImage(ParallelImages.ICON_RUNMODE_NORMAL), getImage(ParallelImages.ICON_DEBUGMODE_NORMAL), getImage(ParallelImages.ICON_TERMINATE_ALL_NORMAL) };
+	// RESOURCE MANAGERS
+	public static final ImageDescriptor ID_IMG_RM_OFF = createImageDescriptor(RMICONURL, IMG_RM_OFF, IMG_RM_OFF);
+	public static final ImageDescriptor ID_IMG_RM_ON = createImageDescriptor(RMICONURL, IMG_RM_ON, IMG_RM_ON);
+	public static final ImageDescriptor ID_IMG_RM_CURRENT = createImageDescriptor(RMICONURL, IMG_RM_CURRENT, IMG_RM_CURRENT);
+	public static final ImageDescriptor ID_IMG_RM_ERROR = createImageDescriptor(RMICONURL, IMG_RM_ERROR, IMG_RM_ERROR);
+	public static final ImageDescriptor ID_IMG_RM_START= createImageDescriptor(RMICONURL, IMG_RM_START, IMG_RM_START);
+	public static final ImageDescriptor ID_IMG_RM_STOP = createImageDescriptor(RMICONURL, IMG_RM_STOP, IMG_RM_STOP);
 	
+	// ==== Image Arrays ====
+	
+	// NODE
+	public static final Image[][] nodeImages = {
+		{ getImage(ParallelImages.IMG_NODE_USER_ALLOC_EXCL),	getImage(ParallelImages.IMG_NODE_USER_ALLOC_EXCL_SEL)    },
+		{ getImage(ParallelImages.IMG_NODE_USER_ALLOC_SHARED),	getImage(ParallelImages.IMG_NODE_USER_ALLOC_SHARED_SEL)  },
+		{ getImage(ParallelImages.IMG_NODE_OTHER_ALLOC_EXCL),	getImage(ParallelImages.IMG_NODE_OTHER_ALLOC_EXCL_SEL)   },
+		{ getImage(ParallelImages.IMG_NODE_OTHER_ALLOC_SHARED),	getImage(ParallelImages.IMG_NODE_OTHER_ALLOC_SHARED_SEL) },
+		{ getImage(ParallelImages.IMG_NODE_DOWN),				getImage(ParallelImages.IMG_NODE_DOWN_SEL)               },
+		{ getImage(ParallelImages.IMG_NODE_ERROR),				getImage(ParallelImages.IMG_NODE_ERROR_SEL)              },
+		{ getImage(ParallelImages.IMG_NODE_EXITED),				getImage(ParallelImages.IMG_NODE_EXITED_SEL)             },
+		{ getImage(ParallelImages.IMG_NODE_RUNNING),			getImage(ParallelImages.IMG_NODE_RUNNING_SEL)            },
+		{ getImage(ParallelImages.IMG_NODE_UNKNOWN),			getImage(ParallelImages.IMG_NODE_UNKNOWN_SEL)            },
+		{ getImage(ParallelImages.IMG_NODE_UP),					getImage(ParallelImages.IMG_NODE_UP_SEL)                 }              
+	};
+
+	// JOB
+	public static Image[] jobImages = {
+		getImage(ParallelImages.ICON_RUNMODE_NORMAL),
+		getImage(ParallelImages.ICON_DEBUGMODE_NORMAL),
+		getImage(ParallelImages.ICON_TERMINATE_ALL_NORMAL)
+	};
+	
+	// PROCESS
+	public static final Image[][] procImages = {
+		{ getImage(ParallelImages.IMG_PROC_ERROR), getImage(ParallelImages.IMG_PROC_ERROR_SEL)                 },
+		{ getImage(ParallelImages.IMG_PROC_EXITED), getImage(ParallelImages.IMG_PROC_EXITED_SEL)               },
+		{ getImage(ParallelImages.IMG_PROC_EXITED_SIGNAL), getImage(ParallelImages.IMG_PROC_EXITED_SIGNAL_SEL) },
+		{ getImage(ParallelImages.IMG_PROC_RUNNING), getImage(ParallelImages.IMG_PROC_RUNNING_SEL)             },
+		{ getImage(ParallelImages.IMG_PROC_STARTING), getImage(ParallelImages.IMG_PROC_STARTING_SEL)           },
+		{ getImage(ParallelImages.IMG_PROC_STOPPED), getImage(ParallelImages.IMG_PROC_STOPPED_SEL)             }
+	};
+	
+	// RESOURCE MANAGERS
+	public static Image[] rmImages = {
+		getImage(ParallelImages.IMG_RM_OFF),
+		getImage(ParallelImages.IMG_RM_ON),
+		getImage(ParallelImages.IMG_RM_CURRENT),
+		getImage(ParallelImages.IMG_RM_ERROR)
+	};
+	
+    private static ImageRegistry imageRegistry = null;
+
 	/** Get image
 	 * @param key
 	 * @return

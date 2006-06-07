@@ -23,7 +23,6 @@ import java.util.Map;
 import org.eclipse.ptp.core.AttributeConstants;
 import org.eclipse.ptp.core.INodeEvent;
 import org.eclipse.ptp.core.INodeListener;
-import org.eclipse.ptp.core.IPElement;
 import org.eclipse.ptp.core.IPMachine;
 import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
@@ -33,8 +32,6 @@ import org.eclipse.ptp.internal.ui.model.ElementHandler;
 import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.TableItem;
 
 /**
  * @author clement chu
@@ -49,7 +46,7 @@ public class MachineManager extends AbstractUIManager implements INodeListener {
 	 */
 	public void shutdown() {
 		clear();
-		modelManager = null;
+		modelPresentation = null;
 		super.shutdown();
 	}
 	/** Is no machine
@@ -89,7 +86,7 @@ public class MachineManager extends AbstractUIManager implements INodeListener {
 	 * @return machines
 	 */
 	public IPMachine[] getMachines() {
-		IPUniverse universe = modelManager.getUniverse();
+		IPUniverse universe = modelPresentation.getUniverse();
 		if (universe == null) {
 			return new IPMachine[0];
 		}
@@ -207,7 +204,7 @@ public class MachineManager extends AbstractUIManager implements INodeListener {
 				return IPTPUIConstants.NODE_UNKNOWN;
 			}
 			if (nodeState.equals(IPNode.NODE_STATE_UP)) {
-				if (node.size() > 0)
+				if (node.getNumProcesses() > 0)
 					return (node.isAllStop() ? IPTPUIConstants.NODE_EXITED : IPTPUIConstants.NODE_RUNNING);
 				if (node.getAttribute(AttributeConstants.ATTRIB_NODE_USER).equals(System.getProperty("user.name"))) {
 					String mode = (String) node.getAttribute(AttributeConstants.ATTRIB_NODE_MODE);
@@ -262,26 +259,25 @@ public class MachineManager extends AbstractUIManager implements INodeListener {
 	 * @return
 	 */
 	public IPMachine findMachine(String machine_name) {
-		return (IPMachine) modelManager.getUniverse().findMachineByName(machine_name);
+		return (IPMachine) modelPresentation.getUniverse().findMachineByName(machine_name);
 	}
+	
 	/** find machine by ID
 	 * @param machine_id machine ID
 	 * @return
 	 */
 	public IPMachine findMachineById(String machine_id) {
-		IPElement element = modelManager.getUniverse().findChild(machine_id);
-		if (element instanceof IPMachine)
-			return (IPMachine) element;
-		return null;
+		return modelPresentation.getUniverse().findMachineById(machine_id);
 	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#getName(java.lang.String)
 	 */
 	public String getName(String id) {
-		IPElement element = findMachineById(id);
-		if (element == null)
+		IPMachine machine = findMachineById(id);
+		if (machine == null)
 			return "";
-		return element.getElementName();
+		return machine.getName();
 	}
 	/** Add machine
 	 * @param mac machine
@@ -297,7 +293,7 @@ public class MachineManager extends AbstractUIManager implements INodeListener {
 			IElementSet set = elementHandler.getSetRoot();
 			for (int i = 0; i < total_element; i++) {
 				pNodes[i].addNodeListener(this);
-				set.add(new Element(set, pNodes[i].getIDString(), pNodes[i].getElementName()));
+				set.add(new Element(set, pNodes[i].getIDString(), pNodes[i].getName()));
 			}
 			elementHandler.add(set);
 			machineList.put(mac.getIDString(), elementHandler);

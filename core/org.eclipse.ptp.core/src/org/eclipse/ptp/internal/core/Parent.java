@@ -22,25 +22,25 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.eclipse.ptp.core.IPElement;
+import org.eclipse.ptp.internal.core.elementcontrols.IPElementControl;
 
 /**
  *  
  */
 public abstract class Parent extends PElement {
-	public Parent(IPElement parent, String name, String key, int type) {
+	public Parent(IPElementControl parent, String name, String key, int type) {
 		super(parent, name, key, type);
 	}
 
-	public void addChild(IPElement member) {
+	public void addChild(IPElementControl member) {
 		getElementInfo().addChild(member);
 	}
 
-	public void removeChild(IPElement member) {
+	public void removeChild(IPElementControl member) {
 		getElementInfo().removeChild(member);
 	}
 
-	public IPElement findChild(String key) {
+	public IPElementControl findChild(String key) {
 		return getElementInfo().findChild(key);
 	}
 
@@ -56,22 +56,22 @@ public abstract class Parent extends PElement {
 		return null;
 	}
 
-	public IPElement[] getChildren() {
+	public IPElementControl[] getChildren() {
 		PElementInfo info = getElementInfo();
 		if (info != null)
 			return info.getChildren();
 
-		return new IPElement[] {};
+		return new IPElementControl[] {};
 	}
 
-	public IPElement[] getSortedChildren() {
-		IPElement[] elements = getChildren();
+	public IPElementControl[] getSortedChildren() {
+		IPElementControl[] elements = getChildren();
 		sort(elements);
 		return elements;
 	}
 
 	public List getChildrenOfType(int type) {
-		IPElement[] children = getChildren();
+		IPElementControl[] children = getChildren();
 		int size = children.length;
 		ArrayList list = new ArrayList(size);
 		for (int i = 0; i < size; ++i) {
@@ -88,7 +88,7 @@ public abstract class Parent extends PElement {
 	}
 
 	public boolean isAllStop() {
-		IPElement[] elements = getChildren();
+		IPElementControl[] elements = getChildren();
 		for (int i = 0; i < elements.length; i++) {
 			if (!elements[i].isAllStop())
 				return false;
@@ -96,7 +96,7 @@ public abstract class Parent extends PElement {
 		return true;
 	}
 
-	private void quickSort(IPElement element[], int low, int high) {
+	private void quickSort(IPElementControl element[], int low, int high) {
 		int lo = low;
 		int hi = high;
 		int mid;
@@ -120,14 +120,14 @@ public abstract class Parent extends PElement {
 		}
 	}
 
-	private void swap(IPElement element[], int i, int j) {
-		IPElement tempElement;
+	private void swap(IPElementControl element[], int i, int j) {
+		IPElementControl tempElement;
 		tempElement = element[i];
 		element[i] = element[j];
 		element[j] = tempElement;
 	}
 
-	public void sort(IPElement element[]) {
+	public void sort(IPElementControl element[]) {
 		quickSort(element, 0, element.length - 1);
 	}
 }

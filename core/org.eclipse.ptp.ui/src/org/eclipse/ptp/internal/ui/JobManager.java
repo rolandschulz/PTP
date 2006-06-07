@@ -24,7 +24,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.ptp.core.IPElement;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.IPUniverse;
@@ -51,7 +50,7 @@ public class JobManager extends AbstractUIManager implements IProcessListener {
 	 */
 	public void shutdown() {
 		clear();
-		modelManager = null;
+		modelPresentation = null;
 		jobChangeListeners.clear();
 		jobChangeListeners = null;
 		super.shutdown();
@@ -103,7 +102,7 @@ public class JobManager extends AbstractUIManager implements IProcessListener {
 	 * @return jobs
 	 */
 	public IPJob[] getJobs() {
-		IPUniverse universe = modelManager.getUniverse();
+		IPUniverse universe = modelPresentation.getUniverse();
 		if (universe == null) {
 			return new IPJob[0];
 		}
@@ -226,10 +225,10 @@ public class JobManager extends AbstractUIManager implements IProcessListener {
 	 * @see org.eclipse.ptp.ui.IManager#getName(java.lang.String)
 	 */
 	public String getName(String id) {
-		IPElement element = findJobById(id);
-		if (element == null)
+		IPJob job = findJobById(id);
+		if (job == null)
 			return "";
-		return element.getElementName();
+		return job.getName();
 	}
 	/** Add a job
 	 * @param job
@@ -321,7 +320,7 @@ public class JobManager extends AbstractUIManager implements IProcessListener {
 	 * @throws CoreException
 	 */
 	public void terminateAll(String job_id) throws CoreException {
-		modelManager.abortJob(getName(job_id));
+		modelPresentation.abortJob(getName(job_id));
 	}
 	
 	/* (non-Javadoc)

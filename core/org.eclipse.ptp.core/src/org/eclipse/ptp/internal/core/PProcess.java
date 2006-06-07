@@ -26,7 +26,6 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.core.AttributeConstants;
 import org.eclipse.ptp.core.INodeEvent;
-import org.eclipse.ptp.core.IPElement;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
@@ -36,8 +35,12 @@ import org.eclipse.ptp.core.NodeEvent;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.core.ProcessEvent;
+import org.eclipse.ptp.internal.core.elementcontrols.IPElementControl;
+import org.eclipse.ptp.internal.core.elementcontrols.IPJobControl;
+import org.eclipse.ptp.internal.core.elementcontrols.IPNodeControl;
+import org.eclipse.ptp.internal.core.elementcontrols.IPProcessControl;
 
-public class PProcess extends Parent implements IPProcess {
+public class PProcess extends Parent implements IPProcessControl {
 	protected String NAME_TAG = "process ";
 	private String pid = null;
 	private String status = null;
@@ -52,9 +55,9 @@ public class PProcess extends Parent implements IPProcess {
 	/*
 	 * the node that this process is running on, or was scheduled on / will be, etc
 	 */
-	protected IPNode node;
+	protected IPNodeControl node;
 
-	public PProcess(IPElement element, String name, String key, String pid, int taskId, String status, String exitCode, String signalName) {
+	public PProcess(IPElementControl element, String name, String key, String pid, int taskId, String status, String exitCode, String signalName) {
 		super(element, name, key, P_PROCESS);
 		this.pid = pid;
 		this.setAttribute(AttributeConstants.ATTRIB_TASKID, new Integer(taskId));
@@ -77,10 +80,10 @@ public class PProcess extends Parent implements IPProcess {
 			outputDirectory.mkdir();
 	}
 	public IPJob getJob() {
-		IPElement current = this;
+		IPElementControl current = this;
 		do {
-			if (current instanceof IPJob)
-				return (IPJob) current;
+			if (current instanceof IPJobControl)
+				return (IPJobControl) current;
 		} while ((current = current.getParent()) != null);
 		return null;
 	}
@@ -127,7 +130,7 @@ public class PProcess extends Parent implements IPProcess {
 		return isTerminated;
 	}
 	public void removeProcess() {
-		((IPNode) getParent()).removeChild(this);
+		((IPNodeControl) getParent()).removeChild(this);
 	}
 	public void setTerminated(boolean isTerminated) {
 		this.isTerminated = isTerminated;
@@ -156,9 +159,9 @@ public class PProcess extends Parent implements IPProcess {
 		return (getStatus().startsWith(EXITED) || getStatus().startsWith(ERROR));
 	}
 	public void setNode(IPNode node) {
-		this.node = node;
+		this.node = (IPNodeControl) node;
 		if (node != null)
-			node.addChild(this);
+			this.node.addChild(this);
 	}
 	public IPNode getNode() {
 		return this.node;
@@ -193,5 +196,16 @@ public class PProcess extends Parent implements IPProcess {
 	public String[] getAttributeKeys() {
 		return this.getAttributeKeys(AttributeConstants.ATTRIB_CLASS_PROCESS);
 	}
-
+	
+	public String getName() {
+		return getElementName();
+	}
+	
+	public IPProcess getParentProcess() {
+		return (IPProcess) getParent();
+	}
+	
+	public int getNumChildProcesses() {
+		return size();
+	}
 }

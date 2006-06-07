@@ -19,10 +19,10 @@
 package org.eclipse.ptp.internal.ui.search;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.ptp.core.IModelManager;
+import org.eclipse.ptp.core.IModelPresentation;
 import org.eclipse.ptp.core.IPElement;
-import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.IPJob;
+import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.PTPCorePlugin;
 
 /**
@@ -32,12 +32,12 @@ public class MatchLocator implements IPSearchConstants {
     private PSearchPattern pattern = null;
     private PSearchResultCollector collector = null;
     private IProgressMonitor progressMonitor;
-    private IModelManager launchManager = null;
+    private IModelPresentation launchManager = null;
     
     public MatchLocator(PSearchPattern pattern, PSearchResultCollector collector) {
         this.pattern = pattern;
         this.collector = collector;
-        launchManager = PTPCorePlugin.getDefault().getModelManager();
+        launchManager = PTPCorePlugin.getDefault().getModelPresentation();
     }
     
 	public void setProgressMonitor(IProgressMonitor progressMonitor) {

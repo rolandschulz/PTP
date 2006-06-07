@@ -131,10 +131,4 @@ public class PSearchResultLabelProvider extends LabelProvider {
 
 		return "";
 	}	
-
-
-	private String getElementText(IPElement element){
-		IPElement parent = element.getParent();
-		return element.getElementName();
-	}	
 }

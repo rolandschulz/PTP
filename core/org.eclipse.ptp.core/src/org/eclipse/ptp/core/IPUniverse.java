@@ -29,7 +29,7 @@ package org.eclipse.ptp.core;
  * @see IPMachine
  * @see IPJob
  */
-public interface IPUniverse extends IPElement {
+public interface IPUniverse /*extends IPElement*/ {
 	/**
 	 * Returns all the Machines that are visible by this Universe, or null if
 	 * there are none.
@@ -58,6 +58,12 @@ public interface IPUniverse extends IPElement {
 	public IPMachine findMachineByName(String mname);
 
 	/**
+	 * @param machine_id
+	 * @return
+	 */
+	public IPMachine findMachineById(String machine_id);
+	
+	/**
 	 * Returns all the Jobs that are visible by this Universe, or null if there
 	 * are none.
 	 * 
@@ -73,6 +79,12 @@ public interface IPUniverse extends IPElement {
 	 *         none
 	 */
 	public IPJob[] getSortedJobs();
+
+	/**
+	 * @param job_id
+	 * @return
+	 */
+	public IPJob findJobById(String job_id);
 
 	/**
 	 * Given a Job name, returns a Job object if the Job can be found in this

@@ -70,10 +70,10 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 	public ParallelProcessView() {
 		super();
 		setDocumentProvider(new StorageDocumentProvider());
-		PTPCorePlugin.getDefault().getModelManager().addParallelLaunchListener(launchAdapter);
+		PTPCorePlugin.getDefault().getModelPresentation().addParallelLaunchListener(launchAdapter);
 	}
 	public void dispose() {
-		PTPCorePlugin.getDefault().getModelManager().removeParallelLaunchListener(launchAdapter);
+		PTPCorePlugin.getDefault().getModelPresentation().removeParallelLaunchListener(launchAdapter);
 		getProcess().removerProcessListener(this);
 		myForm.dispose();
 		toolkit.dispose();
@@ -168,8 +168,8 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 		IPProcess process = getProcess();
 		if (process != null) {
 			rankLabel.setText("Rank: " + process.getProcessNumber());
-			totalLabel.setText("Total: " + process.getParent().size());
-			nodeLabel.setText("Node: " + ((IPNode) process.getNode()).getNodeNumber());
+			totalLabel.setText("Total: " + process.getNode().getNumProcesses());
+			nodeLabel.setText("Node: " + process.getNode().getNodeNumber());
 			jobLabel.setText("Job: " + process.getJob().getJobNumber());
 			pidLabel.setText("PID: " + process.getPid());
 			statusLabel.setText("Status: " + process.getStatus());
