@@ -29,79 +29,75 @@
 /*
  * Session control
  */
-int DbgClntInit(int, char *, proxy_handler_funcs *, proxy_svr_helper_funcs *, proxy_svr_commands *);
-int DbgClntCreateSession(int, char *, int);
-int DbgClntStartSession(char **);
-int DbgClntQuit(void);
-int DbgClntIsShutdown(void);
-void DbgClntFinish(void);
+int		DbgClntInit(int, char *, proxy_handler_funcs *, proxy_svr_helper_funcs *, proxy_svr_commands *);
+int		DbgClntCreateSession(int, char *, int);
+int		DbgClntStartSession(char **);
+int		DbgClntQuit(void);
+int		DbgClntIsShutdown(void);
+void	DbgClntFinish(void);
 
 /*
  * Breakpoint operations
  */
-int DbgClntSetLineBreakpoint(char **);
-int DbgClntSetFuncBreakpoint(char **);
-int DbgClntDeleteBreakpoint(char **);
-int DbgClntEnableBreakpoint(char **);
-int DbgClntDisableBreakpoint(char **);
-int DbgClntConditionBreakpoint(char **);
-int DbgClntBreakpointAfter(char **);
-int DbgClntSetWatchpoint(char **);
+int		DbgClntSetLineBreakpoint(char **);
+int		DbgClntSetFuncBreakpoint(char **);
+int		DbgClntDeleteBreakpoint(char **);
+int		DbgClntEnableBreakpoint(char **);
+int		DbgClntDisableBreakpoint(char **);
+int		DbgClntConditionBreakpoint(char **);
+int		DbgClntBreakpointAfter(char **);
+int		DbgClntSetWatchpoint(char **);
 
 /*
  * Process control operations
  */
-int DbgClntGo(char **);
-int DbgClntStep(char **);
-int DbgClntTerminate(char **);
-int DbgClntSuspend(char **);
+int		DbgClntGo(char **);
+int		DbgClntStep(char **);
+int		DbgClntTerminate(char **);
+int		DbgClntSuspend(char **);
 
 /*
  * Stack frame operations
  */
-int DbgClntListStackframes(char **);
-int DbgClntSetCurrentStackframe(char **);
+int		DbgClntListStackframes(char **);
+int		DbgClntSetCurrentStackframe(char **);
+int		DbgClntStackInfoDepth(char **);
 
 /*
  * Expression/variable operations
  */
-int DbgClntEvaluateExpression(char **);
-int DbgClntGetType(char **);
-int DbgClntListLocalVariables(char **);
-int DbgClntListArguments(char **);
-int DbgClntListGlobalVariables(char **);
+int		DbgClntEvaluateExpression(char **);
+int		DbgClntGetType(char **);
+int		DbgClntListLocalVariables(char **);
+int		DbgClntListArguments(char **);
+int		DbgClntListGlobalVariables(char **);
 
 /**
- * clement added
  * Thread operations
  */
-int DbgClntListInfoThreads(char **);
-int DbgClntSetThreadSelect(char **);
-
-//clement added
-int DbgClntStackInfoDepth(char **);
+int		DbgClntListInfoThreads(char **);
+int		DbgClntSetThreadSelect(char **);
 
 /**
- * clement added
  * Thread operations
  */
-int DbgClntDataReadMemory(char **);
-int DbgClntDataWriteMemory(char **);
+int		DbgClntDataReadMemory(char **);
+int		DbgClntDataWriteMemory(char **);
 
 /*
  * Event Handling
  */
-int DbgClntProgress(void);
-void DbgClntRegisterReadFileHandler(int, int (*)(int, void *), void *);
-void DbgClntRegisterWriteFileHandler(int, int (*)(int, void *), void *);
-void DbgClntRegisterExceptFileHandler(int, int (*)(int, void *), void *);
-void DbgClntUnregisterFileHandler(int);
-void DbgClntRegisterEventHandler(void (*)(dbg_event *, void *), void *);
+int		DbgClntProgress(void);
+void	DbgClntRegisterReadFileHandler(int, int (*)(int, void *), void *);
+void	DbgClntRegisterWriteFileHandler(int, int (*)(int, void *), void *);
+void	DbgClntRegisterExceptFileHandler(int, int (*)(int, void *), void *);
+void	DbgClntUnregisterFileHandler(int);
+void	DbgClntRegisterEventHandler(void (*)(dbg_event *, void *), void *);
 
 /*
  * Error Handling
  */
-void		DbgClntSetError(int, char *);
+void	DbgClntSetError(int, char *);
 int		DbgClntGetError(void);
 char *	DbgClntGetErrorStr(void);
 
