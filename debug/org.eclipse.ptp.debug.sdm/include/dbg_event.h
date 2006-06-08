@@ -46,25 +46,25 @@
 #define DBGEV_OK			DBG_EV_OFFSET + 11
 #define DBGEV_ERROR			DBG_EV_OFFSET + 12
 #define DBGEV_SUSPEND		DBG_EV_OFFSET + 13
-#define DBGEV_THREADS		DBG_EV_OFFSET + 14 //clement added
-#define DBGEV_THREAD_SELECT	DBG_EV_OFFSET + 15 //clement added
-#define DBGEV_STACK_DEPTH	DBG_EV_OFFSET + 16 //clement added
-#define DBGEV_DATAR_MEM		DBG_EV_OFFSET + 17 //clement added
-#define DBGEV_DATAW_MEM		DBG_EV_OFFSET + 18 //clement added
+#define DBGEV_THREADS		DBG_EV_OFFSET + 14
+#define DBGEV_THREAD_SELECT	DBG_EV_OFFSET + 15
+#define DBGEV_STACK_DEPTH	DBG_EV_OFFSET + 16
+#define DBGEV_DATAR_MEM		DBG_EV_OFFSET + 17
+#define DBGEV_DATAW_MEM		DBG_EV_OFFSET + 18
 
 struct dbg_event {
-	int			event;
+	int				event;
 	bitset *		procs;
 	
 	/*
 	 * DBGEV_INIT
 	 */
-	int			num_servers;
+	int				num_servers;
 	
 	/*
 	 * DBGEV_BPHIT, DBGEV_BPSET
 	 */
-	int			bpid;
+	int				bpid;
 	
 	/*
 	 * DBGEV_BPSET
@@ -74,51 +74,50 @@ struct dbg_event {
 	/*
 	 * DBGEV_FRAMES, DBGEV_VARS, DBGEV_ARGS
 	 */
-	List *		list;
+	List *			list;
 	
 	/*
 	 * DBGEV_TYPE, DBGEV_DATA
 	 */
-	char *		type_desc;
+	char *			type_desc;
 	
 	/*
 	 * DBGEV_DATA
 	 */
-	AIF *		data;
+	AIF *			data;
 	
 	/*
 	 * DBGEV_SIGNAL
 	 */
-	char *		sig_name;
-	char *		sig_meaning;
-	int			thread_id;
+	char *			sig_name;
+	char *			sig_meaning;
+	int				thread_id;
 	
 	/*
 	 * DBGEV_EXIT
 	 */
-	int			exit_status;
+	int				exit_status;
 	
 	/*
 	 * DBGEV_ERROR
 	 */
-	int			error_code;
-	char *		error_msg;
+	int				error_code;
+	char *			error_msg;
 	
 	/*
 	 * DBGEV_STEP, DBGEV_SIGNAL, DBGEV_SUSPEND
 	 */
 	stackframe *	frame;
+	
 	/* 
-	 * clement added
 	 * DBGEV_STACK_DEPTH
 	 */
-	 int stack_depth;
+	 int			stack_depth;
 	 
 	 /*
-	  * clement added
 	  * Memory
 	  */
-	  memoryinfo * meminfo;
+	  memoryinfo *	meminfo;
 };
 typedef struct dbg_event dbg_event;
 
