@@ -40,11 +40,11 @@
 #define DBG_LISTLOCALVARIABLES_CMD		"LLV"
 #define DBG_LISTARGUMENTS_CMD			"LAR"
 #define DBG_LISTGLOBALVARIABLES_CMD		"LGV"
-#define DBG_LISTINFOTHREADS_CMD			"ITH" //clement added
-#define DBG_SETTHREADSELECT_CMD			"THS" //clement added
-#define DBG_STACKINFODEPTH_CMD			"SID" //clement added
-#define DBG_DATAREADMEMORY_CMD			"DRM" //clement added
-#define DBG_DATAWRITEMEMORY_CMD			"DWM" //clement added
+#define DBG_LISTINFOTHREADS_CMD			"ITH"
+#define DBG_SETTHREADSELECT_CMD			"THS"
+#define DBG_STACKINFODEPTH_CMD			"SID"
+#define DBG_DATAREADMEMORY_CMD			"DRM"
+#define DBG_DATAWRITEMEMORY_CMD			"DWM"
 
 #define DBG_STARTSESSION_FMT			"%s \"%s\" \"%s\""
 #define DBG_SETLINEBREAKPOINT_FMT		"%s %d \"%s\" %d"
@@ -54,7 +54,7 @@
 #define DBG_DISABLEBREAKPOINT_FMT		"%s %d"
 #define DBG_CONDITIONBREAKPOINT_FMT		"%s %d \"%s\""
 #define DBG_BREAKPOINTAFTER_FMT			"%s %d %d"
-#define DBG_SETWATCHPOINT_FMT				"%s %d \"%s\" %d %d \"%s\" %d"
+#define DBG_SETWATCHPOINT_FMT			"%s %d \"%s\" %d %d \"%s\" %d"
 #define DBG_GO_FMT						"%s"
 #define DBG_STEP_FMT					"%s %d %d"
 #define DBG_TERMINATE_FMT				"%s"
@@ -66,10 +66,10 @@
 #define DBG_LISTLOCALVARIABLES_FMT		"%s"
 #define DBG_LISTARGUMENTS_FMT			"%s %d"
 #define DBG_LISTGLOBALVARIABLES_FMT		"%s"
-#define DBG_LISTINFOTHREADS_FMT			"%s" //clement added
-#define DBG_SETTHREADSELECT_FMT			"%s %d" //clement added
-#define DBG_STACKINFODEPTH_FMT			"%s" //clement added
-#define DBG_DATAREADMEMORY_FMT			"%s %ld \"%s\" \"%s\" %d %d %d \"%s\"" //clement added
-#define DBG_DATAWRITEMEMORY_FMT			"%s %ld \"%s\" \"%s\" %d \"%s\"" //clement added
+#define DBG_LISTINFOTHREADS_FMT			"%s"
+#define DBG_SETTHREADSELECT_FMT			"%s %d"
+#define DBG_STACKINFODEPTH_FMT			"%s"
+#define DBG_DATAREADMEMORY_FMT			"%s %ld \"%s\" \"%s\" %d %d %d \"%s\""
+#define DBG_DATAWRITEMEMORY_FMT			"%s %ld \"%s\" \"%s\" %d \"%s\""
 
 #endif /* _DBG_PROXY_H_ */

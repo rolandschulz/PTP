@@ -45,7 +45,7 @@ static void HandleChild(int sig);
 static int WriteCommand(int fd, char *cmd);
 static char *ReadResponse(int fd);
 
-//#define DEBUG //clement added
+//#define DEBUG
 
 MISession *
 MISessionNew(void)

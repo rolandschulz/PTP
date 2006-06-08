@@ -26,7 +26,7 @@
 #include "bitset.h"
 #include "breakpoint.h"
 #include "stackframe.h"
-#include "memoryinfo.h" //clement added
+#include "memoryinfo.h"
 #include "dbg_error.h"
 #include "dbg_event.h"
 #include "list.h"
@@ -38,69 +38,65 @@
 /*
  * Session control
  */
-int DbgInit(session **, char *, char *, ...);
-int	DbgConnect(session *);
-int	DbgCreate(session *);
-void DbgRegisterEventHandler(session *, void (*)(dbg_event *, void *), void *);
-int DbgStartSession(session *, char *, char *, char *);
-int DbgQuit(session *);
+int		DbgInit(session **, char *, char *, ...);
+int		DbgConnect(session *);
+int		DbgCreate(session *);
+void	DbgRegisterEventHandler(session *, void (*)(dbg_event *, void *), void *);
+int		DbgStartSession(session *, char *, char *, char *);
+int		DbgQuit(session *);
 
 /*
  * Breakpoint operations
  */
-int DbgSetLineBreakpoint(session *s, bitset *set, int bpid, char *file, int line);
-int DbgSetFuncBreakpoint(session *s, bitset *set, int bpid, char *file, char *func);
-int DbgDeleteBreakpoint(session *s, bitset *set, int bpid);
+int		DbgSetLineBreakpoint(session *s, bitset *set, int bpid, char *file, int line);
+int		DbgSetFuncBreakpoint(session *s, bitset *set, int bpid, char *file, char *func);
+int		DbgDeleteBreakpoint(session *s, bitset *set, int bpid);
 
 /*
  * Process control operations
  */
-int DbgGo(session *s, bitset *set);
-int DbgStep(session *s, bitset *set, int count, int type);
-int DbgTerminate(session *s, bitset *set);
-int DbgSuspend(session *s, bitset *set);
+int		DbgGo(session *s, bitset *set);
+int		DbgStep(session *s, bitset *set, int count, int type);
+int		DbgTerminate(session *s, bitset *set);
+int		DbgSuspend(session *s, bitset *set);
 
 /*
  * Stack frame operations
  */
-int DbgListStackframes(session *s, bitset *set, int current);
-int DbgSetCurrentStackframe(session *s, bitset *set, int level);
+int		DbgListStackframes(session *s, bitset *set, int current);
+int		DbgSetCurrentStackframe(session *s, bitset *set, int level);
+int		DbgStackInfoDepth(session *s, bitset *set);
 
 /*
  * Expression/variable operations
  */
-int DbgEvaluateExpression(session *s, bitset *set, char *exp);
-int DbgGetType(session *s, bitset *set, char *exp);
-int DbgListLocalVariables(session *s, bitset *set);
-int DbgListArguments(session *s, bitset *set, int);
-int DbgListGlobalVariables(session *s, bitset *set);
+int		DbgEvaluateExpression(session *s, bitset *set, char *exp);
+int		DbgGetType(session *s, bitset *set, char *exp);
+int		DbgListLocalVariables(session *s, bitset *set);
+int		DbgListArguments(session *s, bitset *set, int);
+int		DbgListGlobalVariables(session *s, bitset *set);
 
 /**
- * clement added
  * Thread operations
  */
-int DbgListInfoThreads(session *s, bitset *set);
-int DbgSetThreadSelect(session *s, bitset *set, int);
-
-//clement added
-int DbgStackInfoDepth(session *s, bitset *set);
+int		DbgListInfoThreads(session *s, bitset *set);
+int		DbgSetThreadSelect(session *s, bitset *set, int);
 
 /**
- * clement added
  * Memory operations
  */
-int DbgDataReadMemory(session *s, bitset *set, long, char*, char*, int, int, int, char*);
-int DbgDataWriteMemory(session *s, bitset *set, long, char*, char*, int, char*);
+int		DbgDataReadMemory(session *s, bitset *set, long, char*, char*, int, int, int, char*);
+int		DbgDataWriteMemory(session *s, bitset *set, long, char*, char*, int, char*);
  
 /*
  * Event Handling
  */
-int DbgProgress(session *);
-void DbgRegisterReadFileHandler(session *s, int, int (*)(int, void *), void *);
-void DbgRegisterWriteFileHandler(session *s, int, int (*)(int, void *), void *);
-void DbgRegisterExceptFileHandler(session *s, int, int (*)(int, void *), void *);
-void DbgUnregisterFileHandler(session *s, int);
-void DbgRegisterEventHandler(session *s, void (*)(dbg_event *, void *), void *);
+int		DbgProgress(session *);
+void 	DbgRegisterReadFileHandler(session *s, int, int (*)(int, void *), void *);
+void 	DbgRegisterWriteFileHandler(session *s, int, int (*)(int, void *), void *);
+void 	DbgRegisterExceptFileHandler(session *s, int, int (*)(int, void *), void *);
+void 	DbgUnregisterFileHandler(session *s, int);
+void 	DbgRegisterEventHandler(session *s, void (*)(dbg_event *, void *), void *);
 
 /*
  * Error Handling

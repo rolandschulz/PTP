@@ -52,21 +52,21 @@ struct MIThreadInfo {
 	int current_thread_id;
 	List * thread_ids;
 };
-typedef struct MIThreadInfo MIThreadInfo; //clement added
+typedef struct MIThreadInfo MIThreadInfo;
 
 struct MIThreadSelectInfo {
 	int current_thread_id;
 	MIFrame * frame;
 };
-typedef struct MIThreadSelectInfo MIThreadSelectInfo; //clement added
+typedef struct MIThreadSelectInfo MIThreadSelectInfo;
 
 extern MIThreadInfo *MIThreadInfoNew(void);
 extern MIThreadSelectInfo *MIThreadSelectInfoNew(void);
 
-extern MIThreadInfo *MIGetInfoThreads(MICommand *cmd); //clement added
-extern MIThreadSelectInfo *MISetThreadSelectInfo(MICommand *cmd); //clement added
+extern MIThreadInfo *MIGetInfoThreads(MICommand *cmd);
+extern MIThreadSelectInfo *MISetThreadSelectInfo(MICommand *cmd);
 
-extern int MIGetStackInfoDepth(MICommand *cmd); //clement added
+extern int MIGetStackInfoDepth(MICommand *cmd);
 
 #endif /* _MIFRAME_H_ */
 
