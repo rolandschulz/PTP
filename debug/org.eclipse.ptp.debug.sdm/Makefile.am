@@ -72,6 +72,7 @@ libmi_a_SOURCES =		src/mi/MIParser.c \
 						src/mi/MISession.c \
 						src/mi/MIThreadCommand.c \
 						src/mi/MIMemory.c \
-						src/mi/MIMemoryCommand.c
+						src/mi/MIMemoryCommand.c \
+						src/mi/NonMICommand.c
 						
 libmi_a_CFLAGS =			-I./include -I$(UTILS)/include $(AM_CFLAGS) -g 
