@@ -22,11 +22,11 @@ import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.ptp.internal.ui.ParallelImages;
+import org.eclipse.ptp.ui.UIUtils;
 import org.eclipse.ptp.ui.actions.ParallelAction;
 import org.eclipse.ptp.ui.model.IElement;
-import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.ptp.ui.model.IElementHandler;
-import org.eclipse.ptp.ui.old.UIUtils;
+import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.ptp.ui.views.AbstractParallelElementView;
 
 /**
