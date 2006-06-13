@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+
+     <extension
+         point="org.eclipse.cdt.managedbuilder.ui.newWizardPages">
+      <wizardPage
+            ID="org.eclipse.ptp.pldt.wizards.wizardPages.MPIProjectWizardPage"
+            operationClass="org.eclipse.ptp.pldt.wizards.wizardPages.MPIProjectRunnable"
+            pageClass="org.eclipse.ptp.pldt.wizards.wizardPages.MPIProjectWizardPage"/>
+
+   </extension>
+
+</plugin>
