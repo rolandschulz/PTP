@@ -399,6 +399,21 @@ DbgDataWriteMemory(session *s, bitset *set, long offset, char* address, char* fo
 	return res;
 }
 
+int DbgListSignals(session *s, bitset *set, char* name) {
+	int		res;
+	char *	set_str = bitset_to_str(set);
+	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_LISTSIGNALS_CMD, DBG_LISTSIGNALS_FMT, set_str, name);
+	free(set_str);
+	return res;
+}
+int DbgSignalInfo(session *s, bitset *set, char* arg) {
+	int		res;
+	char *	set_str = bitset_to_str(set);
+	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_SIGNALINFO_CMD, DBG_SIGNALINFO_FMT, set_str, arg);
+	free(set_str);
+	return res;
+}
+
 int
 DbgQuit(session *s)
 {

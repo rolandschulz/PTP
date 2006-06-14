@@ -668,6 +668,40 @@ DbgClntDataWriteMemory(char **args)
 	return res;
 }
 
+int DbgClntListSignals(char **args) {
+	int			res;
+	char *		cmd;
+	bitset *	set; 
+
+	set = str_to_bitset(args[1]);
+	if (set == NULL) {
+		DbgSetError(DBGERR_PROCSET, NULL);
+		return DBGRES_ERR;
+	}
+	
+	asprintf(&cmd, "%s \"%s\"", DBG_LISTSIGNALS_CMD, args[2]);
+	res = ClntSendCommand(set, DBG_EV_WAITALL, cmd, NULL);
+	bitset_free(set);
+	
+	return res;
+}
+int DbgClntSignalInfo(char **args) {
+	int			res;
+	char *		cmd;
+	bitset *	set; 
+
+	set = str_to_bitset(args[1]);
+	if (set == NULL) {
+		DbgSetError(DBGERR_PROCSET, NULL);
+		return DBGRES_ERR;
+	}
+	
+	asprintf(&cmd, "%s \"%s\"", DBG_SIGNALINFO_CMD, args[2]);
+	res = ClntSendCommand(set, DBG_EV_WAITALL, cmd, NULL);
+	bitset_free(set);
+	
+	return res;
+}
 
 int 
 DbgClntQuit(void)
