@@ -41,6 +41,13 @@
             id="org.eclipse.ptp.debug.ui.views">
       </category>
       <view
+            name="%SignalsView.name"
+            icon="icons/signals_view.gif"
+            category="org.eclipse.ptp.debug.ui.views"
+            class="org.eclipse.ptp.debug.internal.ui.views.signals.SignalsView"
+            id="org.eclipse.ptp.debug.ui.views.SignalsView">
+      </view>
+      <view
             name="%ParallelDebugView.name"
             icon="icons/ptpdebug.gif"
             category="org.eclipse.ptp.debug.ui.views"
@@ -49,7 +56,7 @@
       </view>
       <view
             name="%ArrayView.name"
-            icon="icons/tool/ptparrayview.gif"
+            icon="icons/ptparrayview.gif"
             category="org.eclipse.debug.ui"
             class="org.eclipse.ptp.debug.internal.ui.views.array.ArrayView"
             id="org.eclipse.ptp.debug.ui.views.ArrayView">
@@ -309,6 +316,45 @@
          </action>
       </objectContribution>
       <!-- variable end -->
+      <!-- signal start -->
+      <objectContribution
+            objectClass="org.eclipse.ptp.debug.core.model.IPSignal"
+            id="org.eclipse.ptp.debug.ui.SignalActions">
+         <action
+               label="%SignalAction.label"
+               class="org.eclipse.ptp.debug.internal.ui.actions.SignalActionDelegate"
+               tooltip="%SignalAction.tooltip"
+               menubarPath="additions"
+               enablesFor="1"
+               id="org.eclipse.ptp.debug.internal.ui.actions.SignalActionDelegate">
+            <enablement>
+               <pluginState
+                     value="activated"
+                     id="org.eclipse.ptp.debug.ui">
+               </pluginState>
+            </enablement>
+         </action>
+         <action
+               label="%SignalPropertiesAction.label"
+               style="pulldown"
+               helpContextId="signal_properties_action_context"
+               class="org.eclipse.ptp.debug.internal.ui.actions.SignalPropertiesActionDelegate"
+               tooltip="%SignalPropertiesAction.tooltip"
+               enablesFor="1"
+               id="org.eclipse.ptp.debug.ui.SignalPropertiesAction">
+            <enablement>
+               <pluginState
+                     value="activated"
+                     id="org.eclipse.ptp.debug.ui">
+               </pluginState>
+            </enablement>
+         </action>
+      </objectContribution>
+      <objectContribution
+            objectClass="org.eclipse.ptp.debug.core.model.IResumeWithoutSignal"
+            id="org.eclipse.ptp.debug.ui.DebugTargetActions">
+      </objectContribution>
+      <!-- signal end -->      
    </extension>
 
   <!-- variable toolbar start //-->
@@ -418,6 +464,26 @@
             <instanceof value="org.eclipse.ptp.debug.internal.core.model.PTPMemoryBlockExtension"/>
          </enablement>
       </renderingBindings>
+   </extension>
+
+	<!-- Extension //-->
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="org.eclipse.ptp.debug.ui.PTPDebugPerspective">
+         <view
+               relative="org.eclipse.debug.ui.VariableView"
+               visible="false"
+               relationship="stack"
+               id="org.eclipse.ptp.debug.ui.SignalsView">
+         </view>
+         <viewShortcut
+               id="org.eclipse.ptp.debug.ui.SignalsView">
+         </viewShortcut>
+         <viewShortcut
+               id="org.eclipse.debug.ui.MemoryView">
+         </viewShortcut>
+      </perspectiveExtension>
    </extension>
 
 </plugin>

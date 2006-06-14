@@ -46,9 +46,10 @@ public class PTPDebugPerspectiveFactory implements IPerspectiveFactory {
 
 		IFolderLayout folder4= layout.createFolder("topRight", IPageLayout.RIGHT, (float)0.6, "topLeftUp");
 		folder4.addView(IDebugUIConstants.ID_BREAKPOINT_VIEW);
-		folder4.addView(IDebugUIConstants.ID_VARIABLE_VIEW);
-		folder4.addView(IPTPDebugUIConstants.ID_VIEW_ARRAY);
 		folder4.addView(IDebugUIConstants.ID_EXPRESSION_VIEW);
+		folder4.addView(IDebugUIConstants.ID_VARIABLE_VIEW);
+		folder4.addView(IPTPDebugUIConstants.ID_VIEW_SIGNAL);
+		folder4.addView(IPTPDebugUIConstants.ID_VIEW_ARRAY);
 
 		IFolderLayout folder3= layout.createFolder("topLeftDown", IPageLayout.BOTTOM, (float)0.6, "topLeftUp");
 		folder3.addView(IDebugUIConstants.ID_DEBUG_VIEW);
@@ -66,6 +67,7 @@ public class PTPDebugPerspectiveFactory implements IPerspectiveFactory {
 		layout.addShowViewShortcut(NewSearchUI.SEARCH_VIEW_ID);
 		layout.addShowViewShortcut(IPTPDebugUIConstants.ID_VIEW_PARALLELDEBUG);
 		layout.addShowViewShortcut(IPTPDebugUIConstants.ID_VIEW_ARRAY);
+		layout.addShowViewShortcut(IPTPDebugUIConstants.ID_VIEW_SIGNAL);
 		layout.addShowViewShortcut(IDebugUIConstants.ID_BREAKPOINT_VIEW);
 		layout.addShowViewShortcut(IDebugUIConstants.ID_VARIABLE_VIEW);
 		layout.addShowViewShortcut(IDebugUIConstants.ID_DEBUG_VIEW);
