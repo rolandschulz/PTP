@@ -31,14 +31,18 @@
 
 #include "signalinfo.h"
 
-static int getBoolean(char* value) {
+static int 
+getBoolean(char* value) 
+{
 	if (value != NULL && strncmp(value, "Yes", 3) == 0) {
 		return 1;
 	}
 	return 0;
 }
 
-void MIGetSigHandleList(MICommand *cmd, List** signals) {
+void 
+MIGetSigHandleList(MICommand *cmd, List** signals) 
+{
 	List *oobs;
 	MIOOBRecord *oob;
 	char *text = NULL;
@@ -51,7 +55,7 @@ void MIGetSigHandleList(MICommand *cmd, List** signals) {
 	*signals = NewList();
 
 	if (!cmd->completed || cmd->output == NULL || cmd->output->oobs == NULL)
-		return NULL;
+		return;
 
 	oobs = cmd->output->oobs;
 	for (SetList(oobs); (oob = (MIOOBRecord *)GetListElement(oobs)) != NULL; ) {

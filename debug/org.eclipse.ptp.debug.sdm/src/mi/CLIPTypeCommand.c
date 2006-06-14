@@ -24,7 +24,7 @@
 #include "MICommand.h"
 
 MICommand *
-MIPType(char *name) {
+CLIPType(char *name) {
 	MICommand * cmd;
 	cmd = MICommandNew("ptype", MIResultRecordDONE);
 	MICommandAddOption(cmd, name, NULL);
