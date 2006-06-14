@@ -356,6 +356,11 @@ MISessionProcessCommandsAndResponses(MISession *sess, fd_set *rfds, fd_set *wfds
 	{
 		sess->command = (MICommand *)RemoveFirst(sess->send_queue);
 #ifdef __gnu_linux__
+		/*
+		 * NOTE: this hack only works if gdb is started with the '-tty' argument (or
+		 * presumably if the 'tty' command is issued.) Without this, the only way to
+		 * interrupt a running process seems to be from the command line.
+		 */
 		if (strcmp(sess->command->command, "-exec-interrupt") == 0) {
 			kill(sess->pid, SIGINT);
 		} else if (WriteCommand(sess->in_fd, MICommandToString(sess->command)) < 0) {
