@@ -94,7 +94,9 @@ static int	GDBMIListStackframes(int);
 static int	GDBMISetCurrentStackframe(int);
 static int	GDBMIEvaluateExpression(char *);
 static int	GDBMIGetNativeType(char *);
+#ifdef notdef
 static int	GDBMIGetAIFType(char *);
+#endif
 static int	GDBMIGetLocalVariables(void);
 static int	GDBMIListArguments(int);
 static int	GDBMIGetInfoThread(void);
@@ -1286,7 +1288,7 @@ GetPtypeValue(char *exp)
 	MICommand* cmd;
 	char * type = NULL;
 	
-	cmd = MIPType(exp);
+	cmd = CLIPType(exp);
 	SendCommandWait(DebugSession, cmd);
 	type = MIGetDetailsType(cmd);
 	MICommandFree(cmd);
@@ -1621,6 +1623,7 @@ GDBMIGetNativeType(char *var)
 	return DBGRES_OK;
 }
 
+#ifdef notdef
 /*
 ** Find AIF type of variable.
 */
@@ -1645,6 +1648,7 @@ GDBMIGetAIFType(char *var)
 
 	return DBGRES_OK;
 }
+#endif
 
 static int
 GetAIFVar(char *var, AIF **val, char **type)
