@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionPoint;
@@ -31,6 +32,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.ui.ILaunchConfigurationTab;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.ptp.debug.internal.ui.PDebugModelPresentation;
 import org.eclipse.ptp.debug.internal.ui.UIDebugManager;
 import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.swt.widgets.Display;
@@ -305,5 +307,9 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 			return getActiveWorkbenchWindow().getShell();
 		}
 		return null;
-	}	
+	}
+	
+	public static PDebugModelPresentation getDebugModelPresentation() {
+		return PDebugModelPresentation.getDefault();
+	}
 }
