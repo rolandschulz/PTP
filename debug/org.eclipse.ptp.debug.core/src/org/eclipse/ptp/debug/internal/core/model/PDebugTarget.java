@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
+
 import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.core.IAddress;
 import org.eclipse.cdt.core.IAddressFactory;
@@ -33,7 +34,6 @@ import org.eclipse.cdt.debug.core.cdi.ICDIAddressLocation;
 import org.eclipse.cdt.debug.core.cdi.ICDIFunctionLocation;
 import org.eclipse.cdt.debug.core.cdi.ICDILineLocation;
 import org.eclipse.cdt.debug.core.model.ICModule;
-import org.eclipse.cdt.debug.core.model.ICSignal;
 import org.eclipse.cdt.debug.core.model.IDebuggerProcessSupport;
 import org.eclipse.cdt.debug.core.model.IDisassembly;
 import org.eclipse.cdt.debug.core.model.IPersistableRegisterGroup;
@@ -118,12 +118,14 @@ import org.eclipse.ptp.debug.core.model.IPDebugTarget;
 import org.eclipse.ptp.debug.core.model.IPGlobalVariable;
 import org.eclipse.ptp.debug.core.model.IPGlobalVariableManager;
 import org.eclipse.ptp.debug.core.model.IPLineBreakpoint;
+import org.eclipse.ptp.debug.core.model.IPSignal;
 import org.eclipse.ptp.debug.core.model.PDebugElementState;
 import org.eclipse.ptp.debug.core.sourcelookup.IPSourceLocator;
 import org.eclipse.ptp.debug.core.sourcelookup.ISourceLookupChangeListener;
 import org.eclipse.ptp.debug.core.sourcelookup.PDirectorySourceContainer;
 import org.eclipse.ptp.debug.internal.core.IPDebugInternalConstants;
 import org.eclipse.ptp.debug.internal.core.PGlobalVariableManager;
+import org.eclipse.ptp.debug.internal.core.PSignalManager;
 import org.eclipse.ptp.debug.internal.core.PTPMemoryBlockRetrievalExtension;
 import org.eclipse.ptp.debug.internal.core.sourcelookup.PSourceLookupParticipant;
 import org.eclipse.ptp.debug.internal.core.sourcelookup.PSourceManager;
@@ -141,6 +143,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPCDIE
 	private IPLaunch fLaunch;
 	private IPCDITargetConfiguration fConfig;
 	private PGlobalVariableManager fGlobalVariableManager;
+	private PSignalManager fSignalManager;
 	private IBinaryObject fBinaryFile;
 	private Boolean fIsLittleEndian = null;
 	private Preferences fPreferences = null;
@@ -167,6 +170,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPCDIE
 			setState(PDebugElementState.SUSPENDED);
 			setGlobalVariableManager(new PGlobalVariableManager(this));
 			setMemoryBlockRetrieval(new PTPMemoryBlockRetrievalExtension(this));
+			setSignalManager(new PSignalManager(this));
 			initialize();
 			DebugPlugin.getDefault().getLaunchManager().addLaunchListener(this);
 			DebugPlugin.getDefault().getExpressionManager().addExpressionListener(this);
@@ -866,12 +870,18 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPCDIE
 		}
 		return result;
 	}
-	public ICSignal[] getSignals() throws DebugException {
-		// TODO Not implement yet
-		return new ICSignal[0];
+	public IPSignal[] getSignals() throws DebugException {
+		PSignalManager sm = getSignalManager();
+		if (sm != null) {
+			return sm.getSignals();
+		}
+		return new IPSignal[0];
 	}
 	public boolean hasSignals() throws DebugException {
-		// TODO Not implement yet
+		PSignalManager sm = getSignalManager();
+		if (sm != null) {
+			return (sm.getSignals().length > 0);
+		}
 		return false;
 	}
 	public IAddress getBreakpointAddress(IPLineBreakpoint breakpoint) throws DebugException {
@@ -910,6 +920,16 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPCDIE
 	private void setGlobalVariableManager(PGlobalVariableManager globalVariableManager) {
 		fGlobalVariableManager = globalVariableManager;
 	}
+	protected void setSignalManager(PSignalManager sm) {
+		fSignalManager = sm;
+	}
+	protected PSignalManager getSignalManager() {
+		return fSignalManager;
+	}
+	protected void disposeSignalManager() {
+		fSignalManager.dispose();
+	}
+	
 	public boolean isPostMortem() {
 		return false;
 	}

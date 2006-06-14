@@ -19,14 +19,15 @@
 package org.eclipse.ptp.debug.core.cdi.model;
 
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
-
 /**
  * @author Clement chu
- * 
  */
-public interface IPCDIExecuteResume {
-	void resume(boolean passSignal) throws PCDIException;
-	void resume(IPCDILocation location) throws PCDIException;
-	void resume(IPCDISignal signal) throws PCDIException;	
+public interface IPCDISignalManagement {
+	/**
+	 * Returns the array of signals defined for this target.
+	 * 
+	 * @return the array of signals
+	 * @throws PCDIException on failure. Reasons include:
+	 */
+	IPCDISignal[] getSignals() throws PCDIException;
 }
-

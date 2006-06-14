@@ -16,17 +16,12 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.core.cdi.model;
-
-import org.eclipse.ptp.debug.core.cdi.PCDIException;
+package org.eclipse.ptp.debug.core.cdi.event;
 
 /**
- * @author Clement chu
- * 
+ * @author Clement
  */
-public interface IPCDIExecuteResume {
-	void resume(boolean passSignal) throws PCDIException;
-	void resume(IPCDILocation location) throws PCDIException;
-	void resume(IPCDISignal signal) throws PCDIException;	
-}
 
+public interface IPCDISignalChangedEvent extends IPCDIChangedEvent {
+	public String getName();
+}

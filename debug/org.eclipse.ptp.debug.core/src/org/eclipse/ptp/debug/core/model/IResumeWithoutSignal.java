@@ -16,17 +16,32 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.core.cdi.model;
+package org.eclipse.ptp.debug.core.model;
 
-import org.eclipse.ptp.debug.core.cdi.PCDIException;
+import org.eclipse.debug.core.DebugException;
 
 /**
- * @author Clement chu
- * 
+ * @author Clement
+ *
+ * Provides the ability to resume execution without giving a signal. 
+ * This is useful when the program stopped on account of a signal and would 
+ * ordinary see the signal when resumed. 
  */
-public interface IPCDIExecuteResume {
-	void resume(boolean passSignal) throws PCDIException;
-	void resume(IPCDILocation location) throws PCDIException;
-	void resume(IPCDISignal signal) throws PCDIException;	
+public interface IResumeWithoutSignal {
+	/**
+	 * Causes this element to resume its execution ignoring a signal.
+	 * Has no effect on an element that is not suspended because of a signal.
+	 * 
+	 * @exception DebugException on failure. Reasons include:
+	 */
+	public void resumeWithoutSignal() throws DebugException;
+
+	/**
+	 * Returns whether this element can currently be resumed without signal.
+	 *
+	 * @return whether this element can currently be resumed without signal
+	 */
+	boolean canResumeWithoutSignal();
 }
+
 
