@@ -103,10 +103,14 @@ extern MICommand *MIThreadSelect(int threadNum);
 extern MICommand *MIDataReadMemory(long, char*, char*, int, int, int, char*);
 extern MICommand *MIDataWriteMemory(long offset, char* address, char* format, int wordSize, char* value);
 
+#ifdef __APPLE__
+extern MICommand *MIPidInfo(void);
+#endif /* __APPLE__ */
+
 /*
  * Non-MI commands
  */
-extern MICommand *MIPType(char *name);
+extern MICommand *CLIPType(char *name);
 
 /*
  * signal commands
@@ -115,4 +119,3 @@ extern MICommand *CLIListSignals(char*);
 extern MICommand *CLISignalInfo(char*);
 
 #endif /* _MICOMMAND_H_ */
-

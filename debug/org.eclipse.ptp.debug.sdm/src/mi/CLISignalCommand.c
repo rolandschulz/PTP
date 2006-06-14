@@ -29,7 +29,8 @@
 #include "MIString.h"
 #include "MICommand.h"
 
-MICommand * CLIListSignals(char *name) {
+MICommand * 
+CLIListSignals(char *name) {
 	MICommand * cmd;
 	cmd = MICommandNew("info signals", MIResultRecordDONE);
 	if (name != NULL) {
@@ -38,7 +39,8 @@ MICommand * CLIListSignals(char *name) {
 	return cmd;
 }
 	
-MICommand * CLISignalInfo(char *arg) {
+MICommand * 
+CLISignalInfo(char *arg) {
 	MICommand * cmd;
 	cmd = MICommandNew("signal", MIResultRecordDONE);
 	MICommandAddOption(cmd, arg, NULL);
