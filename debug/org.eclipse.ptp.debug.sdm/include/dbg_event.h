@@ -25,6 +25,7 @@
 #include "breakpoint.h"
 #include "stackframe.h"
 #include "memoryinfo.h"
+#include "signalinfo.h"
 #include "bitset.h"
 #include "list.h"
 
@@ -51,6 +52,7 @@
 #define DBGEV_STACK_DEPTH	DBG_EV_OFFSET + 16
 #define DBGEV_DATAR_MEM		DBG_EV_OFFSET + 17
 #define DBGEV_DATAW_MEM		DBG_EV_OFFSET + 18
+#define DBGEV_SIGNALS		DBG_EV_OFFSET + 19
 
 struct dbg_event {
 	int				event;
@@ -72,7 +74,7 @@ struct dbg_event {
 	breakpoint *	bp;
 	
 	/*
-	 * DBGEV_FRAMES, DBGEV_VARS, DBGEV_ARGS
+	 * DBGEV_FRAMES, DBGEV_VARS, DBGEV_ARGS, DBGEV_SIGNALS
 	 */
 	List *			list;
 	
@@ -108,16 +110,15 @@ struct dbg_event {
 	 * DBGEV_STEP, DBGEV_SIGNAL, DBGEV_SUSPEND
 	 */
 	stackframe *	frame;
-	
 	/* 
 	 * DBGEV_STACK_DEPTH
 	 */
-	 int			stack_depth;
+	 int stack_depth;
 	 
 	 /*
 	  * Memory
 	  */
-	  memoryinfo *	meminfo;
+	  memoryinfo * meminfo;
 };
 typedef struct dbg_event dbg_event;
 

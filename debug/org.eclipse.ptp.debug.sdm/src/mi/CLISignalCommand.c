@@ -16,38 +16,31 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.external.core.commands;
-
-import org.eclipse.ptp.core.util.BitList;
-import org.eclipse.ptp.debug.core.IAbstractDebugger;
-import org.eclipse.ptp.debug.core.aif.IAIF;
-import org.eclipse.ptp.debug.core.cdi.PCDIException;
-
-/**
+ 
+ /**
  * @author Clement chu
  * 
  */
-public class EvaluteExpressionCommand extends AbstractDebugCommand {
-	private String varName = "";
-	
-	public EvaluteExpressionCommand(BitList tasks, String varName) {
-		super(tasks, false, true);
-		this.varName = varName;
-	}
-	public void execCommand(IAbstractDebugger debugger, int timeout) throws PCDIException {
-		setTimeout(timeout);
-		debugger.evaluateExpression(tasks, varName);
-	}
-	
-	public String getExpressionValue() throws PCDIException {
-		if (waitForReturn()) {
-			if (result instanceof IAIF) {
-				return ((IAIF)result).getValue().toString();
-			}
-		}
-		throw new PCDIException("Wrong type return on command: " + getName());
-	}
-	public String getName() {
-		return "Evaluate expression"; 
-	}
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include "MIString.h"
+#include "MICommand.h"
+
+MICommand * CLIListSignals(char *name) {
+	MICommand * cmd;
+	cmd = MICommandNew("info signals", MIResultRecordDONE);
+	if (name != NULL) {
+		MICommandAddOption(cmd, name, NULL);
+	}	
+	return cmd;
 }
+	
+MICommand * CLISignalInfo(char *arg) {
+	MICommand * cmd;
+	cmd = MICommandNew("signal", MIResultRecordDONE);
+	MICommandAddOption(cmd, arg, NULL);
+	return cmd;
+}	

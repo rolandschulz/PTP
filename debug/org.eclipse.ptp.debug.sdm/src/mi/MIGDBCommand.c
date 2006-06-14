@@ -40,3 +40,8 @@ MIGDBExit(void)
 	return MICommandNew("-gdb-exit", MIResultRecordEXIT);
 }
 
+MICommand * MIGDBShowEndian(void) {
+	MICommand * cmd = MICommandNew("-gdb-show", MIResultRecordDONE);
+	MICommandAddOption(cmd, "endian", NULL);
+	return cmd;
+}

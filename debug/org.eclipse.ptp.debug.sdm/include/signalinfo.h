@@ -17,25 +17,18 @@
  * LA-CC 04-115
  ******************************************************************************/
  
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#ifndef SIGNALINFO_H_
+#define SIGNALINFO_H_
 
-#include "MICommand.h"
+struct signalinfo {
+	char *name;
+	int stop;
+	int print;
+	int pass;
+	char *desc;
+};
+typedef struct signalinfo signalinfo;
 
-MICommand *
-MIInfoThreads(void)
-{
-	MICommand * cmd;
-	cmd = MICommandNew("info threads", MIResultRecordDONE);
-	return cmd;
-}
-
-MICommand *
-MIThreadSelect(int threadNum)
-{
-	MICommand * cmd;
-	cmd = MICommandNew("-thread-select", MIResultRecordDONE);
-	MICommandAddOption(cmd, MIIntToCString(threadNum), NULL);
-	return cmd;
-}
+extern signalinfo *NewSignalInfo(void);
+extern void FreeSignalInfo(signalinfo *);
+#endif /*SIGNALINFO_H_*/

@@ -67,6 +67,7 @@ public class Session implements IPCDISession, IPCDISessionObject {
 	VariableManager variableManager;
 	SourceManager sourceManager;
 	MemoryManager memoryManager;
+	SignalManager signalManager;
 	IPCDISessionConfiguration configuration;
 	IAbstractDebugger debugger = null;
 	IPJob job = null;
@@ -91,6 +92,7 @@ public class Session implements IPCDISession, IPCDISessionObject {
 		variableManager = new VariableManager(this);
 		sourceManager = new SourceManager(this);
 		memoryManager = new MemoryManager(this);
+		signalManager = new SignalManager(this);
 		//add observer
 		this.debugger.addDebuggerObserver(eventManager);
 	}
@@ -109,6 +111,8 @@ public class Session implements IPCDISession, IPCDISessionObject {
 		eventManager.shutdown();
 		sourceManager.shutdown();
 		processManager.shutdown();
+		memoryManager.shutdown();
+		signalManager.shutdown();
 	}
 	public IPLaunch getLaunch() {
 		return launch;
@@ -212,6 +216,9 @@ public class Session implements IPCDISession, IPCDISessionObject {
 	}
 	public MemoryManager getMemoryManager() {
 		return memoryManager;
+	}
+	public SignalManager getSignalManager() {
+		return signalManager;
 	}
 	public IPCDITarget[] getTargets() {
 		return getProcessManager().getCDITargets();

@@ -44,6 +44,7 @@ public interface IProxyDebugEvent extends IProxyEvent {
 	public static final int EVENT_DBG_STACK_INFO_DEPTH = DBG_EVENT_OFFSET + 16; //clement added
 	public static final int EVENT_DBG_DATA_READ_MEMORY = DBG_EVENT_OFFSET + 17; //clement added
 	public static final int EVENT_DBG_DATA_WRITE_MEMORY = DBG_EVENT_OFFSET + 18; //clement added
+	public static final int EVENT_DBG_SIGNALS = DBG_EVENT_OFFSET + 19; //clement added
 		
 	public BitList getBitSet();
 }

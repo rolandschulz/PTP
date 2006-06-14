@@ -73,7 +73,7 @@ static void *		AsyncFuncData;
 static int	SetAndCheckBreak(int, int, int, char *, char *, int, int);
 static int	GetStackframes(int, List **);
 static int	GetAIFVar(char *, AIF **, char **);
-static AIF *	ConvertVarToAIF(char *, MIVar *, int);
+static AIF * ConvertVarToAIF(char *, MIVar *, int);
 
 static int	GDBMIInit(void (*)(dbg_event *, void *), void *);
 static int	GDBMIProgress(void);
@@ -103,6 +103,8 @@ static int	GDBMIStackInfoDepth(void);
 static int	GDBMIDataReadMemory(long, char*, char*, int, int, int, char*);
 static int	GDBMIDataWriteMemory(long, char*, char*, int, char*);
 static int	GDBMIGetGlobalVariables(void);
+static int	GDBCLIListSignals(char*);
+static int	GDBCLISignalInfo(char*);
 static int	GDBMIQuit(void);
 
 static char* GetModifierType(char *);
@@ -141,6 +143,8 @@ dbg_backend_funcs	GDBMIBackend =
 	GDBMIStackInfoDepth,
 	GDBMIDataReadMemory,
 	GDBMIDataWriteMemory,
+	GDBCLIListSignals,
+	GDBCLISignalInfo,
 	GDBMIQuit
 };
 
@@ -1984,6 +1988,47 @@ GDBMIDataWriteMemory(long offset, char* address, char* format, int wordSize, cha
 //TODO
 	SaveEvent(NewDbgEvent(DBGEV_OK));
 	
+	return DBGRES_OK;
+}
+
+static int GDBCLIListSignals(char* name) {
+	MICommand *	cmd;
+	List *signals;
+	dbg_event *	e;
+	
+	CHECK_SESSION();
+	
+	cmd = CLIListSignals(name);
+	SendCommandWait(DebugSession, cmd);
+	if (!MICommandResultOK(cmd)) {
+		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
+		MICommandFree(cmd);
+		return DBGRES_ERR;
+	}
+	MIGetSigHandleList(cmd, &signals);
+	MICommandFree(cmd);
+
+	e = NewDbgEvent(DBGEV_SIGNALS);
+	e->list = signals;
+	
+	SaveEvent(e);
+	
+	return DBGRES_OK;
+}
+static int GDBCLISignalInfo(char* arg) {
+	MICommand *	cmd;
+
+	CHECK_SESSION();
+	
+	cmd = CLISignalInfo(arg);
+	SendCommandWait(DebugSession, cmd);
+	if (!MICommandResultOK(cmd)) {
+		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
+		MICommandFree(cmd);
+		return DBGRES_ERR;
+	}
+	MICommandFree(cmd);
+
 	return DBGRES_OK;
 }
 

@@ -45,16 +45,18 @@
 #define DBG_STACKINFODEPTH_CMD			"SID"
 #define DBG_DATAREADMEMORY_CMD			"DRM"
 #define DBG_DATAWRITEMEMORY_CMD			"DWM"
+#define DBG_LISTSIGNALS_CMD				"LSI"
+#define DBG_SIGNALINFO_CMD				"SIG"
 
 #define DBG_STARTSESSION_FMT			"%s \"%s\" \"%s\""
 #define DBG_SETLINEBREAKPOINT_FMT		"%s %d \"%s\" %d"
 #define DBG_SETFUNCBREAKPOINT_FMT		"%s %d \"%s\" \"%s\""
-#define DBG_DELETEBREAKPOINT_FMT		"%s %d"
-#define DBG_ENABLEBREAKPOINT_FMT		"%s %d"
-#define DBG_DISABLEBREAKPOINT_FMT		"%s %d"
-#define DBG_CONDITIONBREAKPOINT_FMT		"%s %d \"%s\""
-#define DBG_BREAKPOINTAFTER_FMT			"%s %d %d"
-#define DBG_SETWATCHPOINT_FMT			"%s %d \"%s\" %d %d \"%s\" %d"
+#define DBG_DELETEBREAKPOINT_FMT		"%s %d" //clement added
+#define DBG_ENABLEBREAKPOINT_FMT		"%s %d" //clement added
+#define DBG_DISABLEBREAKPOINT_FMT		"%s %d" //clement added
+#define DBG_CONDITIONBREAKPOINT_FMT		"%s %d \"%s\"" //clement added
+#define DBG_BREAKPOINTAFTER_FMT			"%s %d %d" //clement added
+#define DBG_SETWATCHPOINT_FMT			"%s %d \"%s\" %d %d \"%s\" %d" //clement added
 #define DBG_GO_FMT						"%s"
 #define DBG_STEP_FMT					"%s %d %d"
 #define DBG_TERMINATE_FMT				"%s"
@@ -71,5 +73,7 @@
 #define DBG_STACKINFODEPTH_FMT			"%s"
 #define DBG_DATAREADMEMORY_FMT			"%s %ld \"%s\" \"%s\" %d %d %d \"%s\""
 #define DBG_DATAWRITEMEMORY_FMT			"%s %ld \"%s\" \"%s\" %d \"%s\""
+#define DBG_LISTSIGNALS_FMT				"%s \"%s\""
+#define DBG_SIGNALINFO_FMT				"%s \"%s\""
 
 #endif /* _DBG_PROXY_H_ */

@@ -270,4 +270,32 @@ public class SourceManager extends Manager {
 	//public String getTypeName(Target target, String variable) throws PCDIException {
 		//return target.getDebugger().getVariableType(((Session)getSession()).createBitList(target.getTargetID()), variable);
 	//}
+	
+	public void setSourcePaths(Target target, String[] dirs) throws PCDIException {
+		/*
+		Session session = (Session)getSession();
+		MIEnvironmentDirectory dir = factory.createMIEnvironmentDirectory(true, dirs);
+		try {
+			session.getDebugger().postCommand(dir);
+			dir.getMIInfo();
+		} catch (MIException e) {
+			throw new MI2CDIException(e);
+		}
+		*/
+	}
+
+	public String[] getSourcePaths(Target target) throws PCDIException {
+		/*
+		Session session = (Session)getSession();
+		MIGDBShowDirectories dir = factory.createMIGDBShowDirectories();
+		try {
+			mi.postCommand(dir);
+			MIGDBShowDirectoriesInfo info = dir.getMIGDBShowDirectoriesInfo();
+			return info.getDirectories();
+		} catch (MIException e) {
+			throw new MI2CDIException(e);
+		}
+		*/
+		return new String[0];
+	}	
 }

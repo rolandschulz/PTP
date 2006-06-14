@@ -16,47 +16,28 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
- 
- /**
- * @author Clement chu
- * 
- */
- 
-#ifndef _MIMEMORY_H_
-#define _MIMEMORY_H_
 
-#include "list.h"
-#include "MICommand.h"
-#include "MIValue.h"
+package org.eclipse.ptp.debug.external.core.proxy.event;
 
-struct MIMemory {
-	char *addr;
-	char *ascii;
-	List *data;
-};
-typedef struct MIMemory	MIMemory;
+import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.external.core.proxy.ProxyDebugSignal;
 
-struct MIDataReadMemoryInfo {
-	char *addr;
-	long nextRow;
-	long prevRow;
-	long nextPage;
-	long prevPage;
-	long numBytes;
-	long totalBytes;
-	List *memories;
-};
-typedef struct MIDataReadMemoryInfo	MIDataReadMemoryInfo;
 
-extern MIMemory *MIMemoryNew(void);
-extern MIDataReadMemoryInfo *MIDataReadMemoryInfoNew(void);
-
-extern void MIMemoryFree(MIMemory *memory);
-extern void MIDataReadMemoryInfoFree(MIDataReadMemoryInfo *memoryInfo);
-
-extern MIMemory *MIMemoryParse(MIValue *tuple);
-extern List *MIMemoryDataParse(MIValue *miValue);
-
-extern MIDataReadMemoryInfo * MIGetDataReadMemoryInfo(MICommand *cmd);
-extern List * MIGetMemoryList(MIValue *miValue);
-#endif /* _MIMEMORY_H_ */
+public class ProxyDebugSignalsEvent extends AbstractProxyDebugEvent implements IProxyDebugEvent {
+	private ProxyDebugSignal[] signals;
+	
+	public ProxyDebugSignalsEvent(BitList set, ProxyDebugSignal[] signals) {
+		super(EVENT_DBG_SIGNALS, set);
+		this.signals = signals;
+	}
+	public ProxyDebugSignal[] getSignals() {
+		return signals;
+	}
+	public String toString() {
+		String res = "EVENT_DBG_SIGNALS " + this.getBitSet().toString();
+		for (int i = 0; i<signals.length; i++) {
+			res += "\n " + signals[i].toString();
+		}
+		return res;
+	}
+}

@@ -16,47 +16,35 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
- 
- /**
+package org.eclipse.ptp.debug.external.core.commands;
+
+import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.IAbstractDebugger;
+import org.eclipse.ptp.debug.core.cdi.PCDIException;
+
+/**
  * @author Clement chu
  * 
  */
- 
-#ifndef _MIMEMORY_H_
-#define _MIMEMORY_H_
-
-#include "list.h"
-#include "MICommand.h"
-#include "MIValue.h"
-
-struct MIMemory {
-	char *addr;
-	char *ascii;
-	List *data;
-};
-typedef struct MIMemory	MIMemory;
-
-struct MIDataReadMemoryInfo {
-	char *addr;
-	long nextRow;
-	long prevRow;
-	long nextPage;
-	long prevPage;
-	long numBytes;
-	long totalBytes;
-	List *memories;
-};
-typedef struct MIDataReadMemoryInfo	MIDataReadMemoryInfo;
-
-extern MIMemory *MIMemoryNew(void);
-extern MIDataReadMemoryInfo *MIDataReadMemoryInfoNew(void);
-
-extern void MIMemoryFree(MIMemory *memory);
-extern void MIDataReadMemoryInfoFree(MIDataReadMemoryInfo *memoryInfo);
-
-extern MIMemory *MIMemoryParse(MIValue *tuple);
-extern List *MIMemoryDataParse(MIValue *miValue);
-
-extern MIDataReadMemoryInfo * MIGetDataReadMemoryInfo(MICommand *cmd);
-extern List * MIGetMemoryList(MIValue *miValue);
-#endif /* _MIMEMORY_H_ */
+public class CLISignalInfoCommand extends AbstractDebugCommand {
+	private String arg = "";
+	
+	public CLISignalInfoCommand(BitList tasks, String arg) {
+		super(tasks, false, false);
+		this.arg = arg;
+	}
+	public void execCommand(IAbstractDebugger debugger, int timeout) throws PCDIException {
+		setTimeout(timeout);
+		debugger.getSignalInfo(tasks, arg);
+	}
+	public void waitFinish() throws PCDIException {
+		if (waitForReturn()) {
+			if (result == null) {
+				throw new PCDIException("No result found on command: " + getName());
+			}
+		}
+	}	
+	public String getName() {
+		return "CLI Signal Info"; 
+	}
+}
