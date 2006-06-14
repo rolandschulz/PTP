@@ -16,47 +16,32 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
- 
- /**
- * @author Clement chu
- * 
+package org.eclipse.ptp.debug.core.model;
+
+import org.eclipse.debug.core.DebugException;
+
+/**
+ * @author Clement
+ *
+ * Provides the ability to resume execution without giving a signal. 
+ * This is useful when the program stopped on account of a signal and would 
+ * ordinary see the signal when resumed. 
  */
- 
-#ifndef _MIMEMORY_H_
-#define _MIMEMORY_H_
+public interface IResumeWithoutSignal {
+	/**
+	 * Causes this element to resume its execution ignoring a signal.
+	 * Has no effect on an element that is not suspended because of a signal.
+	 * 
+	 * @exception DebugException on failure. Reasons include:
+	 */
+	public void resumeWithoutSignal() throws DebugException;
 
-#include "list.h"
-#include "MICommand.h"
-#include "MIValue.h"
+	/**
+	 * Returns whether this element can currently be resumed without signal.
+	 *
+	 * @return whether this element can currently be resumed without signal
+	 */
+	boolean canResumeWithoutSignal();
+}
 
-struct MIMemory {
-	char *addr;
-	char *ascii;
-	List *data;
-};
-typedef struct MIMemory	MIMemory;
 
-struct MIDataReadMemoryInfo {
-	char *addr;
-	long nextRow;
-	long prevRow;
-	long nextPage;
-	long prevPage;
-	long numBytes;
-	long totalBytes;
-	List *memories;
-};
-typedef struct MIDataReadMemoryInfo	MIDataReadMemoryInfo;
-
-extern MIMemory *MIMemoryNew(void);
-extern MIDataReadMemoryInfo *MIDataReadMemoryInfoNew(void);
-
-extern void MIMemoryFree(MIMemory *memory);
-extern void MIDataReadMemoryInfoFree(MIDataReadMemoryInfo *memoryInfo);
-
-extern MIMemory *MIMemoryParse(MIValue *tuple);
-extern List *MIMemoryDataParse(MIValue *miValue);
-
-extern MIDataReadMemoryInfo * MIGetDataReadMemoryInfo(MICommand *cmd);
-extern List * MIGetMemoryList(MIValue *miValue);
-#endif /* _MIMEMORY_H_ */

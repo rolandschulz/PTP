@@ -49,6 +49,7 @@ extern char *MICommandToString(MICommand *cmd);
  */
 extern MICommand *MIGDBSet(char *, char *);
 extern MICommand *MIGDBExit(void);
+extern MICommand *MIGDBShowEndian(void);
 
 /*
  * -exec-* commands
@@ -80,7 +81,7 @@ extern MICommand *MIStackListAllFrames(void);
 extern MICommand *MIStackListLocals(int vals);
 extern MICommand *MIStackListArguments(int vals, int low, int high);
 extern MICommand *MIStackListAllArguments(int vals);
-extern MICommand *MIStackInfoDepth();
+extern MICommand *MIStackInfoDepth(void);
 
 /*
  * -var-* commands
@@ -93,7 +94,7 @@ extern MICommand *MIVarEvaluateExpression(char *name);
 /*
  * -thread-* commands
  */
-extern MICommand *MIInfoThreads();
+extern MICommand *MIInfoThreads(void);
 extern MICommand *MIThreadSelect(int threadNum);
 
 /*
@@ -106,6 +107,12 @@ extern MICommand *MIDataWriteMemory(long offset, char* address, char* format, in
  * Non-MI commands
  */
 extern MICommand *MIPType(char *name);
+
+/*
+ * signal commands
+ */
+extern MICommand *CLIListSignals(char*);
+extern MICommand *CLISignalInfo(char*);
 
 #endif /* _MICOMMAND_H_ */
 

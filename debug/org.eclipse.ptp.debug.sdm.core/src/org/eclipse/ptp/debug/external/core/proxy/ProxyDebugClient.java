@@ -173,4 +173,11 @@ public class ProxyDebugClient extends AbstractProxyDebugClient {
 			};
 		sendCommand("DWM", procs, args);
 	}
+
+	public void debugListSignals(BitList procs, String name) throws IOException {
+		sendCommand("LSI", procs, name);
+	}
+	public void debugSignalInfo(BitList procs, String arg) throws IOException {
+		sendCommand("SIG", procs, arg);
+	}
 }

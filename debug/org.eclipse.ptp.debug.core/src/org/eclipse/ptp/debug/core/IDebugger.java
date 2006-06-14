@@ -116,4 +116,7 @@ public interface IDebugger {
 	 * @throws PCDIException
 	 */
 	public void setDataWriteMemoryCommand(BitList tasks, long offset, String address, int wordFormat, int wordSize, String value) throws PCDIException;
+
+	public void getListSignals(BitList tasks, String name) throws PCDIException;
+	public void getSignalInfo(BitList tasks, String arg) throws PCDIException;	
 }

@@ -35,10 +35,14 @@ import org.eclipse.ptp.debug.core.cdi.event.IPCDIEventListener;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIExitedEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIMemoryChangedEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIResumedEvent;
+import org.eclipse.ptp.debug.core.cdi.event.IPCDISignalChangedEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDISuspendedEvent;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIMemoryBlock;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDISignal;
 import org.eclipse.ptp.debug.external.core.PTPDebugExternalPlugin;
+import org.eclipse.ptp.debug.external.core.cdi.event.ChangedEvent;
 import org.eclipse.ptp.debug.external.core.cdi.event.MemoryChangedEvent;
+import org.eclipse.ptp.debug.external.core.cdi.event.SignalChangedEvent;
 import org.eclipse.ptp.debug.external.core.cdi.model.MemoryBlock;
 import org.eclipse.ptp.debug.external.core.cdi.model.Target;
 import org.eclipse.ptp.debug.external.core.cdi.model.Thread;
@@ -89,6 +93,23 @@ public class EventManager extends SessionObject implements IPCDIEventManager, Ob
 					
 				}
 			}
+			else if (event instanceof IPCDISignalChangedEvent) {
+				System.err.println("******* GOT IPCDISignalChangedEvent");
+				SignalChangedEvent sigEvent = (SignalChangedEvent)event;
+				String name = sigEvent.getName();
+				IPCDISignal signal = (IPCDISignal)event.getSource();
+				if (name == null || name.length() == 0) {
+					// Something change we do not know what
+					// Let the signal manager handle it with an update().
+					try {
+						SignalManager sMgr = session.getSignalManager();
+						sMgr.update((Target)signal.getTarget());
+					} catch (PCDIException e) {
+					}
+				} else {
+					cdiList.add(new ChangedEvent(session, event.getAllProcesses(), signal));
+				}
+			}
 		}
 		cdiList.add(event);
 		
@@ -125,6 +146,7 @@ public class EventManager extends SessionObject implements IPCDIEventManager, Ob
 	
 	boolean processSuspendedEvent(IPCDISuspendedEvent event) {
 		Session session = (Session)getSession();
+		SignalManager sigMgr = session.getSignalManager();
 		/*
 		VariableManager varMgr = session.getVariableManager();
 		ExpressionManager expMgr  = session.getExpressionManager();		
@@ -154,9 +176,12 @@ public class EventManager extends SessionObject implements IPCDIEventManager, Ob
 			} catch (PCDIException e1) {
 				PTPDebugExternalPlugin.log(e1);
 			}
-			/**
-			 * TODO not quite important
 			try {
+				if (sigMgr.isAutoUpdate()) {
+					sigMgr.update(currentTarget);
+				}
+				/**
+				 * TODO not quite important
 				if (varMgr.isAutoUpdate()) {
 					varMgr.update(currentTarget);
 				}
@@ -172,10 +197,10 @@ public class EventManager extends SessionObject implements IPCDIEventManager, Ob
 				if (memMgr.isAutoUpdate()) {
 					memMgr.update(currentTarget);
 				}
+				*/
 			} catch (PCDIException e) {
 				e.printStackTrace();
 			}
-			*/
 		}
 		return true;
 	}

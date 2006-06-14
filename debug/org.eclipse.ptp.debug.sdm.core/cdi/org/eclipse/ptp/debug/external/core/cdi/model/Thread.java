@@ -20,11 +20,12 @@ package org.eclipse.ptp.debug.external.core.cdi.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.eclipse.cdt.debug.core.cdi.model.ICDISignal;
+
 import org.eclipse.ptp.debug.core.cdi.IPCDICondition;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIBreakpoint;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDILocation;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDISignal;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIStackFrame;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIThread;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIThreadStorage;
@@ -236,7 +237,7 @@ public class Thread extends PObject implements IPCDIThread {
 		((Target)getTarget()).setCurrentThread(this);
 		getTarget().resume(location);
 	}
-	public void resume(ICDISignal signal) throws PCDIException {
+	public void resume(IPCDISignal signal) throws PCDIException {
 		((Target)getTarget()).setCurrentThread(this);
 		getTarget().resume(signal);
 	}
@@ -246,7 +247,7 @@ public class Thread extends PObject implements IPCDIThread {
 	public void signal() throws PCDIException {
 		resume(false);
 	}
-	public void signal(ICDISignal signal) throws PCDIException {
+	public void signal(IPCDISignal signal) throws PCDIException {
 		resume(signal);
 	}
 	public boolean equals(IPCDIThread thread) {

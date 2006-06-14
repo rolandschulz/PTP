@@ -61,6 +61,8 @@ static int svr_setthreadselect(dbg_backend *, char **);
 static int svr_stackinfodepth(dbg_backend *, char **);
 static int svr_datareadmemory(dbg_backend *, char **);
 static int svr_datawritememory(dbg_backend *, char **);
+static int svr_listsignals(dbg_backend *, char **);
+static int svr_signalinfo(dbg_backend *, char **);
 static int svr_quit(dbg_backend *, char **);
 
 static svr_cmd svr_cmd_tab[] =
@@ -89,6 +91,8 @@ static svr_cmd svr_cmd_tab[] =
 	{DBG_STACKINFODEPTH_CMD,		svr_stackinfodepth}, 
 	{DBG_DATAREADMEMORY_CMD,		svr_datareadmemory},
 	{DBG_DATAWRITEMEMORY_CMD,		svr_datawritememory},
+	{DBG_LISTSIGNALS_CMD,			svr_listsignals},
+	{DBG_SIGNALINFO_CMD,			svr_signalinfo},
 	{"QUI",							svr_quit},
 };
 
@@ -284,21 +288,25 @@ svr_setthreadselect(dbg_backend *db, char **args)
 }
 
 static int 
-svr_stackinfodepth(dbg_backend *db, char **args) 
-{
+svr_stackinfodepth(dbg_backend *db, char **args) {
 	return db->db_funcs->stackinfodepth();
 }
 
 static int 
-svr_datareadmemory(dbg_backend *db, char **args) 
-{
+svr_datareadmemory(dbg_backend *db, char **args)  {
 	return db->db_funcs->datareadmemory(atol(args[1]), args[2], args[3], atoi(args[4]), atoi(args[5]), atoi(args[6]), args[7]);
 }
 
 static int
-svr_datawritememory(dbg_backend *db, char **args) 
-{
+svr_datawritememory(dbg_backend *db, char **args) {
 	return db->db_funcs->datawritememory(atol(args[1]), args[2], args[3], atoi(args[4]), args[5]);
+}
+
+static int svr_listsignals(dbg_backend *db, char **args) {
+	return db->db_funcs->listsignals(args[1]);
+}
+static int svr_signalinfo(dbg_backend *db, char **args) {
+	return db->db_funcs->signalinfo(args[1]);
 }
 
 static int 

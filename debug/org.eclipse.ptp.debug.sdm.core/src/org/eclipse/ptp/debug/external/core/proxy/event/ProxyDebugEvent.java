@@ -20,6 +20,7 @@
 package org.eclipse.ptp.debug.external.core.proxy.event;
 
 import java.math.BigInteger;
+
 import org.eclipse.ptp.core.proxy.event.IProxyEvent;
 import org.eclipse.ptp.core.proxy.event.ProxyEvent;
 import org.eclipse.ptp.core.util.BitList;
@@ -36,6 +37,7 @@ import org.eclipse.ptp.debug.external.core.cdi.breakpoints.LineBreakpoint;
 import org.eclipse.ptp.debug.external.core.cdi.model.DataReadMemoryInfo;
 import org.eclipse.ptp.debug.external.core.cdi.model.LineLocation;
 import org.eclipse.ptp.debug.external.core.cdi.model.Memory;
+import org.eclipse.ptp.debug.external.core.proxy.ProxyDebugSignal;
 import org.eclipse.ptp.debug.external.core.proxy.ProxyDebugStackframe;
 
 public class ProxyDebugEvent extends ProxyEvent {
@@ -80,6 +82,15 @@ public class ProxyDebugEvent extends ProxyEvent {
 			}
 
 			evt = new ProxyDebugSignalEvent(set, decodeString(args[2]), decodeString(args[3]), sigTid, sigLoc);
+			break;
+			
+		case IProxyDebugEvent.EVENT_DBG_SIGNALS: // added by clement
+			int numSignals = Integer.parseInt(args[2]);
+			ProxyDebugSignal[] signals = new ProxyDebugSignal[numSignals];
+			for (int i = 0; i<numSignals; i++) {
+				signals[i] = new ProxyDebugSignal(decodeString(args[5*i+3]), toboolean(Integer.parseInt(args[5*i+4])), toboolean(Integer.parseInt(args[5*i+5])), toboolean(Integer.parseInt(args[5*i+6])), decodeString(args[5*i+7]));
+			}
+			evt = new ProxyDebugSignalsEvent(set, signals);
 			break;
 			
 		case IProxyDebugEvent.EVENT_DBG_EXIT:
@@ -240,5 +251,8 @@ public class ProxyDebugEvent extends ProxyEvent {
 	}
 	public static DataReadMemoryInfo toMemoryInfo(String addr, String nextRow, String prevRow, String nextPage, String prevPage, String numBytes, String totalBytes, Memory[] memories) {
 		return new DataReadMemoryInfo(decodeString(addr), Long.parseLong(nextRow), Long.parseLong(prevRow), Long.parseLong(nextPage), Long.parseLong(prevPage), Long.parseLong(numBytes), Long.parseLong(totalBytes), memories);
+	}
+	public static boolean toboolean(int value) {
+		return (value!=0);
 	}
 }

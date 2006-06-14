@@ -16,47 +16,42 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
- 
- /**
+package org.eclipse.ptp.debug.external.core.proxy;
+
+/**
  * @author Clement chu
- * 
  */
- 
-#ifndef _MIMEMORY_H_
-#define _MIMEMORY_H_
+public class ProxyDebugSignal {
+	private String name;
+	private boolean stop;
+	private boolean pass;
+	private boolean print;
+	private String desc;
+	
+	public ProxyDebugSignal(String name, boolean stop, boolean print, boolean pass, String desc) {
+		this.name = name;
+		this.stop = stop;
+		this.print = print;
+		this.pass = pass;
+		this.desc = desc;
+	}
 
-#include "list.h"
-#include "MICommand.h"
-#include "MIValue.h"
-
-struct MIMemory {
-	char *addr;
-	char *ascii;
-	List *data;
-};
-typedef struct MIMemory	MIMemory;
-
-struct MIDataReadMemoryInfo {
-	char *addr;
-	long nextRow;
-	long prevRow;
-	long nextPage;
-	long prevPage;
-	long numBytes;
-	long totalBytes;
-	List *memories;
-};
-typedef struct MIDataReadMemoryInfo	MIDataReadMemoryInfo;
-
-extern MIMemory *MIMemoryNew(void);
-extern MIDataReadMemoryInfo *MIDataReadMemoryInfoNew(void);
-
-extern void MIMemoryFree(MIMemory *memory);
-extern void MIDataReadMemoryInfoFree(MIDataReadMemoryInfo *memoryInfo);
-
-extern MIMemory *MIMemoryParse(MIValue *tuple);
-extern List *MIMemoryDataParse(MIValue *miValue);
-
-extern MIDataReadMemoryInfo * MIGetDataReadMemoryInfo(MICommand *cmd);
-extern List * MIGetMemoryList(MIValue *miValue);
-#endif /* _MIMEMORY_H_ */
+	public String getName() {
+		return name;
+	}
+	public boolean isStop() {
+		return stop;
+	}
+	public boolean isPrint() {
+		return print;
+	}
+	public boolean isPass() {
+		return pass;
+	}
+	public String getDescription(){
+		return desc;
+	}
+	public String toString() {
+		return getName() + " " + isStop() + " " + isPrint() + " " + isPass() + " " + getDescription();	
+	}
+}

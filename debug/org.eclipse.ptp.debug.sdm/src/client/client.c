@@ -100,6 +100,8 @@ static proxy_svr_commands command_tab[] = {
 	{DBG_STACKINFODEPTH_CMD,		DbgClntStackInfoDepth},
 	{DBG_DATAREADMEMORY_CMD,		DbgClntDataReadMemory},
 	{DBG_DATAWRITEMEMORY_CMD,		DbgClntDataWriteMemory},
+	{DBG_LISTSIGNALS_CMD,			DbgClntListSignals},
+	{DBG_SIGNALINFO_CMD,			DbgClntSignalInfo},
 	{NULL,							NULL}
 };
 

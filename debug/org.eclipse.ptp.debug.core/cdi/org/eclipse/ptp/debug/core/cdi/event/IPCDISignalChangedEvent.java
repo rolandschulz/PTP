@@ -16,47 +16,12 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
- 
- /**
- * @author Clement chu
- * 
+package org.eclipse.ptp.debug.core.cdi.event;
+
+/**
+ * @author Clement
  */
- 
-#ifndef _MIMEMORY_H_
-#define _MIMEMORY_H_
 
-#include "list.h"
-#include "MICommand.h"
-#include "MIValue.h"
-
-struct MIMemory {
-	char *addr;
-	char *ascii;
-	List *data;
-};
-typedef struct MIMemory	MIMemory;
-
-struct MIDataReadMemoryInfo {
-	char *addr;
-	long nextRow;
-	long prevRow;
-	long nextPage;
-	long prevPage;
-	long numBytes;
-	long totalBytes;
-	List *memories;
-};
-typedef struct MIDataReadMemoryInfo	MIDataReadMemoryInfo;
-
-extern MIMemory *MIMemoryNew(void);
-extern MIDataReadMemoryInfo *MIDataReadMemoryInfoNew(void);
-
-extern void MIMemoryFree(MIMemory *memory);
-extern void MIDataReadMemoryInfoFree(MIDataReadMemoryInfo *memoryInfo);
-
-extern MIMemory *MIMemoryParse(MIValue *tuple);
-extern List *MIMemoryDataParse(MIValue *miValue);
-
-extern MIDataReadMemoryInfo * MIGetDataReadMemoryInfo(MICommand *cmd);
-extern List * MIGetMemoryList(MIValue *miValue);
-#endif /* _MIMEMORY_H_ */
+public interface IPCDISignalChangedEvent extends IPCDIChangedEvent {
+	public String getName();
+}

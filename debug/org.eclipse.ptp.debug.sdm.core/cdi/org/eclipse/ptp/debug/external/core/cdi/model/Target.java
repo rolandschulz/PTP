@@ -21,6 +21,7 @@ package org.eclipse.ptp.debug.external.core.cdi.model;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.eclipse.cdt.debug.core.cdi.model.ICDIInstruction;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIMixedInstruction;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIRegister;
@@ -28,8 +29,11 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIRegisterDescriptor;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIRegisterGroup;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIRuntimeOptions;
 import org.eclipse.cdt.debug.core.cdi.model.ICDISharedLibrary;
-import org.eclipse.cdt.debug.core.cdi.model.ICDISignal;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.core.IPProcess;
+import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.aif.IAIF;
 import org.eclipse.ptp.debug.core.cdi.IPCDIAddressLocation;
@@ -47,19 +51,23 @@ import org.eclipse.ptp.debug.core.cdi.model.IPCDIGlobalVariableDescriptor;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDILineBreakpoint;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDILocation;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIMemoryBlock;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDISignal;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIStackFrame;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITargetConfiguration;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIThread;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIWatchpoint;
+import org.eclipse.ptp.debug.external.core.PTPDebugExternalPlugin;
 import org.eclipse.ptp.debug.external.core.cdi.ExpressionManager;
 import org.eclipse.ptp.debug.external.core.cdi.MemoryManager;
 import org.eclipse.ptp.debug.external.core.cdi.Session;
 import org.eclipse.ptp.debug.external.core.cdi.SessionObject;
+import org.eclipse.ptp.debug.external.core.cdi.SignalManager;
 import org.eclipse.ptp.debug.external.core.cdi.VariableManager;
 import org.eclipse.ptp.debug.external.core.cdi.model.variable.GlobalVariableDescriptor;
 import org.eclipse.ptp.debug.external.core.cdi.model.variable.Variable;
-import org.eclipse.ptp.debug.external.core.commands.EvaluteExpressionCommand;
+import org.eclipse.ptp.debug.external.core.commands.CLISignalInfoCommand;
+import org.eclipse.ptp.debug.external.core.commands.EvaluateExpressionCommand;
 import org.eclipse.ptp.debug.external.core.commands.GetInfoThreadsCommand;
 import org.eclipse.ptp.debug.external.core.commands.GoCommand;
 import org.eclipse.ptp.debug.external.core.commands.HaltCommand;
@@ -329,7 +337,7 @@ public class Target extends SessionObject implements IPCDITarget {
 	public void resume(IPCDILocation location) throws PCDIException {
 		resume(location);
 	}
-	public void resume(ICDISignal signal) throws PCDIException {
+	public void resume(IPCDISignal signal) throws PCDIException {
 		signal(signal);
 	}
 	public void resume(boolean passSignal) throws PCDIException {
@@ -385,14 +393,19 @@ public class Target extends SessionObject implements IPCDITarget {
 		throw new PCDIException("Not implement yet - jump(location)");
 	}
 	public void signal() throws PCDIException {
-		//TODO - implement signal
-		//getDebugger().singal();
-		throw new PCDIException("Not implement yet - signal");
+		Session session = (Session)getSession();
+		BitList tasks = session.createBitList(getTargetID());
+
+		CLISignalInfoCommand command = new CLISignalInfoCommand(tasks, "0");
+		session.getDebugger().postCommand(command);
 	}
-	public void signal(ICDISignal signal) throws PCDIException {
-		//TODO - implement signal(ICDISignal)
-		//getDebugger().singal(signal.getName());
-		throw new PCDIException("Not implement yet - signal(ICDISignal)");
+	public void signal(IPCDISignal signal) throws PCDIException {
+		Target target = (Target)signal.getTarget();
+		Session session = (Session)getSession();
+		BitList tasks = session.createBitList(target.getTargetID());
+		
+		CLISignalInfoCommand command = new CLISignalInfoCommand(tasks, signal.getName());
+		session.getDebugger().postCommand(command);
 	}
 	public String evaluateExpressionToString(IPCDIStackFrame frame, String expressionText) throws PCDIException {
 		//TODO - make sure using -data-evaluate-expression or -var-evaluate-expression
@@ -411,7 +424,7 @@ public class Target extends SessionObject implements IPCDITarget {
 			if (aif != null) {
 				return aif.getValue().toString();
 			}
-			EvaluteExpressionCommand command = new EvaluteExpressionCommand(session.createBitList(target.getTargetID()), expressionText);
+			EvaluateExpressionCommand command = new EvaluateExpressionCommand(session.createBitList(target.getTargetID()), expressionText);
 			session.getDebugger().postCommand(command);
 			return command.getExpressionValue();
 		} finally {
@@ -497,10 +510,13 @@ public class Target extends SessionObject implements IPCDITarget {
 		ExpressionManager expMgr = ((Session)getSession()).getExpressionManager();
 		expMgr.destroyAllExpressions(this);
 	}
-	public ICDISignal[] getSignals() throws PCDIException {
-		throw new PCDIException("Not implemented yet - Target: getSignals");
+	public IPCDISignal[] getSignals() throws PCDIException {
+		SignalManager sigMgr = ((Session)getSession()).getSignalManager();
+		return sigMgr.getSignals(this);
 	}
 	public void setSourcePaths(String[] srcPaths) throws PCDIException {
+		//SourceManager srcMgr = ((Session)getSession()).getSourceManager();
+		//srcMgr.setSourcePaths(this, srcPaths);
 		//throw new PCDIException("Not implemented yet - Target: setSourcePaths");
 	}
 	public String[] getSourcePaths() throws PCDIException {

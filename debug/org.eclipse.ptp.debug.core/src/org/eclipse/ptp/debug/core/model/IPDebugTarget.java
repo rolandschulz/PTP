@@ -20,12 +20,10 @@ package org.eclipse.ptp.debug.core.model;
 
 import org.eclipse.cdt.core.IAddress;
 import org.eclipse.cdt.debug.core.model.ICModule;
-import org.eclipse.cdt.debug.core.model.ICSignal;
 import org.eclipse.cdt.debug.core.model.IDisassembly;
 import org.eclipse.cdt.debug.core.model.IPersistableRegisterGroup;
 import org.eclipse.cdt.debug.core.model.IRegisterDescriptor;
 import org.eclipse.cdt.debug.core.model.IRestart;
-import org.eclipse.cdt.debug.core.model.IResumeWithoutSignal;
 import org.eclipse.cdt.debug.core.model.ISteppingModeTarget;
 import org.eclipse.cdt.debug.core.model.ITargetProperties;
 import org.eclipse.debug.core.DebugException;
@@ -42,7 +40,7 @@ public interface IPDebugTarget extends IDebugTarget, IExecFileInfo, IRestart, IR
 	public int getTargetID();
 	public boolean isLittleEndian();
 	public boolean hasSignals() throws DebugException;
-	public ICSignal[] getSignals() throws DebugException;
+	public IPSignal[] getSignals() throws DebugException;
 	public IDisassembly getDisassembly() throws DebugException;
 	public boolean isPostMortem();
 	public boolean hasModules() throws DebugException;

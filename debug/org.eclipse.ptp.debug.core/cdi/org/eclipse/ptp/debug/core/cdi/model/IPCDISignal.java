@@ -27,6 +27,10 @@ import org.eclipse.ptp.debug.core.cdi.PCDIException;
 public interface IPCDISignal extends IPCDIObject {
 	String getName();
 	String getDescription();
+	boolean isStop();
+	boolean isPrint();
+	boolean isPass();
+	
 	boolean isIgnore();
 	boolean isStopSet();
 	void signal() throws PCDIException ;

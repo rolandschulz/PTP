@@ -24,7 +24,6 @@
 #include <string.h>
 
 #include "dbg_event.h"
-#include "stackframe.h"
 #include "proxy_event.h"
 #include "args.h"
 
@@ -68,6 +67,24 @@ dbg_breakpoint_to_str(breakpoint *bp, char **result)
 	
 }
 
+static int dbg_signal_to_str(signalinfo *sig, char **result) {
+	char *name;
+	char *desc;
+	
+	if (sig == NULL) {
+		asprintf(result, "%s", NULL_STR);
+		return 0;
+	}
+
+	proxy_cstring_to_str(sig->name, &name);
+	proxy_cstring_to_str(sig->desc, &desc);	
+	asprintf(result, "%s %d %d %d %s", name, sig->stop, sig->print, sig->pass, desc);
+
+	free(name);
+	free(desc);
+	return 0;
+}
+
 static int
 dbg_stackframe_to_str(stackframe *sf, char **result)
 {
@@ -99,9 +116,11 @@ dbg_stackframes_to_str(List *lst, char **result)
 	return proxy_list_to_str(lst, (int (*)(void *, char **))dbg_stackframe_to_str, result);
 }
 
-static int 
-dbg_memory_to_str(memory *mem, char **result) 
-{
+static int dbg_signals_to_str(List *lst, char **result) {
+	return proxy_list_to_str(lst, (int (*)(void *, char **))dbg_signal_to_str, result);
+}
+
+static int dbg_memory_to_str(memory *mem, char **result) {
 	char * addr;
 	char * ascii;
 	char * data;
@@ -122,15 +141,11 @@ dbg_memory_to_str(memory *mem, char **result)
 	return 0;
 }
 
-static int 
-dbg_memories_to_str(List *lst, char **result) 
-{
+static int dbg_memories_to_str(List *lst, char **result) {
 	return proxy_list_to_str(lst, (int (*)(void *, char **))dbg_memory_to_str, result);
 }
 
-static int 
-dbg_memoryinfo_to_str(memoryinfo *meninfo, char **result) 
-{
+static int dbg_memoryinfo_to_str(memoryinfo *meninfo, char **result) {
 	char * addr;
 	char * memories;
 
@@ -203,7 +218,6 @@ DbgEventToStr(dbg_event *e, char **result)
 		asprintf(result, "%d %s %d %s", e->event, pstr, e->bpid, str);
 		free(str);
 		break;
-
 	case DBGEV_SIGNAL:
 		proxy_cstring_to_str(e->sig_name, &str);
 		proxy_cstring_to_str(e->sig_meaning, &str2);
@@ -212,6 +226,12 @@ DbgEventToStr(dbg_event *e, char **result)
 		free(str);
 		free(str2);
 		free(str3);
+		break;
+
+	case DBGEV_SIGNALS: // added by clement
+		dbg_signals_to_str(e->list, &str);
+		asprintf(result, "%d %s %s", e->event, pstr, str);
+		free(str);
 		break;
 
 	case DBGEV_EXIT:
@@ -359,6 +379,27 @@ dbg_str_to_stackframe(char **args, stackframe **frame)
 	return 0;
 }
 
+static int dbg_str_to_signal(char **args, signalinfo **sig) {
+	signalinfo *s;
+	
+	if (strcmp(args[0], NULL_STR) == 0) {
+		*sig = NULL;
+		return 0;
+	}
+	
+	s = NewSignalInfo();
+	if (proxy_str_to_cstring(args[0], &s->name) < 0 ||
+		proxy_str_to_int(args[1], &s->stop) < 0 ||
+		proxy_str_to_int(args[2], &s->print) < 0 ||
+		proxy_str_to_int(args[3], &s->pass) < 0 || 
+		proxy_str_to_cstring(args[4], &s->desc) < 0) {
+		FreeSignalInfo(s);
+		return -1;
+	}
+	*sig = s;
+	return 0;
+}
+
 static int
 dbg_str_to_stackframes(char **args, List **lst)
 {
@@ -377,6 +418,23 @@ dbg_str_to_stackframes(char **args, List **lst)
 		AddToList(*lst, (void *)sf);
 	}
 	
+	return 0;
+}
+
+static int dbg_str_to_signals(char **args, List **lst) {
+	int i;
+	int pos;
+	int count = atoi(args[0]);
+	signalinfo * sig;
+
+	*lst = NewList();	
+	for (i = 0, pos = 1; i < count; i++, pos += 5) {
+		if (dbg_str_to_signal(&args[pos], &sig) < 0) {
+			DestroyList(*lst, FreeSignalInfo);
+			return -1;
+		}
+		AddToList(*lst, (void *)sig);
+	}
 	return 0;
 }
 
@@ -558,13 +616,19 @@ DbgStrToEvent(char *str, dbg_event **ev)
 			dbg_str_to_breakpoint(&args[3], &e->bp)	< 0)
 			goto error_out;
 		break;
-	
+
 	case DBGEV_SIGNAL:
 		e = NewDbgEvent(DBGEV_SIGNAL);
 		if (proxy_str_to_cstring(args[2], &e->sig_name) < 0 ||
 			proxy_str_to_cstring(args[3], &e->sig_meaning) < 0 ||
 			proxy_str_to_int(args[4], &e->thread_id) < 0 ||
 			dbg_str_to_stackframe(&args[5], &e->frame) < 0)
+			goto error_out;
+		break;
+	
+	case DBGEV_SIGNALS: //added by clement
+		e = NewDbgEvent(DBGEV_SIGNALS);
+		if (dbg_str_to_signals(&args[2], &e->list) < 0)
 			goto error_out;
 		break;
 	
@@ -730,7 +794,6 @@ FreeDbgEvent(dbg_event *e) {
 		if (e->list != NULL)
 			DestroyList(e->list, free);
 		break;
-		
 	case DBGEV_SIGNAL:
 		if (e->list != NULL) {
 			free(e->sig_name);
@@ -738,6 +801,11 @@ FreeDbgEvent(dbg_event *e) {
 		}
 		break;
 		
+	case DBGEV_SIGNALS: //added by clement
+		if (e->list != NULL)
+			DestroyList(e->list, FreeSignalInfo);
+		break;
+
 	case DBGEV_BPSET:
 		if (e->bp != NULL)
 			FreeBreakpoint(e->bp);

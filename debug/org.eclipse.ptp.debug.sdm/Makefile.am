@@ -34,7 +34,7 @@ test_mi_CFLAGS =			-I./include -I./src/mi -I$(UTILS)/include $(AM_CFLAGS) -g
 test_mi_LDFLAGS = 		-g
 test_mi_LDADD =			libmi.a $(UTILS)/libutils.a
 
-noinst_HEADERS =			include/breakpoint.h include/dbg.h include/location.h include/stackframe.h include/memoryinfo.h
+noinst_HEADERS =		include/breakpoint.h include/dbg.h include/location.h include/stackframe.h include/memoryinfo.h include/signalinfo.h
 
 noinst_LIBRARIES =		libdbgclnt.a libdbgutils.a libmi.a
 
@@ -46,7 +46,8 @@ libdbgutils_a_SOURCES =	src/utils/error.c \
 						src/utils/stackframe.c \
 						src/utils/event.c \
 						src/utils/itimer.c \
-						src/utils/memoryinfo.c
+						src/utils/memoryinfo.c \
+						src/utils/signalinfo.c
 						
 libdbgutils_a_CFLAGS =	-I./include -I./libaif -I$(PROXY)/include -I$(UTILS)/include $(AM_CFLAGS) -g
 
@@ -73,6 +74,7 @@ libmi_a_SOURCES =		src/mi/MIParser.c \
 						src/mi/MIThreadCommand.c \
 						src/mi/MIMemory.c \
 						src/mi/MIMemoryCommand.c \
-						src/mi/NonMICommand.c
+						src/mi/MISigHandle.c \
+						src/mi/CLISignalCommand.c
 						
 libmi_a_CFLAGS =			-I./include -I$(UTILS)/include $(AM_CFLAGS) -g 

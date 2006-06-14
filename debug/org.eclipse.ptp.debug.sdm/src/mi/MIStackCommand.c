@@ -83,7 +83,7 @@ MIStackListAllArguments(int vals)
 }
 
 MICommand *
-MIStackInfoDepth()
+MIStackInfoDepth(void)
 {
 		MICommand * cmd;
 		cmd = MICommandNew("-stack-info-depth", MIResultRecordDONE);

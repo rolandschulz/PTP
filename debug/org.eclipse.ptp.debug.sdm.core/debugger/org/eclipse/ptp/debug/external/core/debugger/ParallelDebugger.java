@@ -20,6 +20,7 @@ package org.eclipse.ptp.debug.external.core.debugger;
 
 import java.io.IOException;
 import java.math.BigInteger;
+
 import org.eclipse.cdt.debug.core.cdi.ICDICondition;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
@@ -38,15 +39,18 @@ import org.eclipse.ptp.debug.core.cdi.model.IPCDIArgument;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIFunctionBreakpoint;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDILineBreakpoint;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDILocalVariable;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDISignal;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIStackFrame;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIWatchpoint;
 import org.eclipse.ptp.debug.external.core.AbstractDebugger;
+import org.eclipse.ptp.debug.external.core.cdi.model.Signal;
 import org.eclipse.ptp.debug.external.core.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.core.cdi.model.Target;
 import org.eclipse.ptp.debug.external.core.cdi.model.variable.Argument;
 import org.eclipse.ptp.debug.external.core.cdi.model.variable.LocalVariable;
 import org.eclipse.ptp.debug.external.core.proxy.ProxyDebugClient;
+import org.eclipse.ptp.debug.external.core.proxy.ProxyDebugSignal;
 import org.eclipse.ptp.debug.external.core.proxy.ProxyDebugStackframe;
 import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugEvent;
 import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugEventListener;
@@ -60,6 +64,7 @@ import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugInitEvent;
 import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugMemoryInfoEvent;
 import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugSetThreadSelectEvent;
 import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugSignalEvent;
+import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugSignalsEvent;
 import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugStackInfoDepthEvent;
 import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugStackframeEvent;
 import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugStepEvent;
@@ -406,7 +411,21 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			throw new PCDIException(e.getMessage());
 		}
 	}
-		
+	
+	public void getListSignals(BitList tasks, String name) throws PCDIException {
+		try {
+			proxy.debugListSignals(tasks, name);
+		} catch (IOException e) {
+			throw new PCDIException(e.getMessage());
+		}
+	}
+	public void getSignalInfo(BitList tasks, String arg) throws PCDIException {
+		try {
+			proxy.debugSignalInfo(tasks, arg);
+		} catch (IOException e) {
+			throw new PCDIException(e.getMessage());
+		}
+	}
 	
 	public synchronized void handleEvent(IProxyDebugEvent e) {
 		System.out.println("got debug event: " + e.toString());
@@ -532,6 +551,22 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			completeCommand(e.getBitSet(), IDebugCommand.OK);
 			handleProcessSignaledEvent(e.getBitSet(), sigEvent.getLocator(), sigEvent.getThreadID());
 			break;
+
+		case IProxyDebugEvent.EVENT_DBG_SIGNALS: // added by clement
+			ProxyDebugSignalsEvent signalsEvent = (ProxyDebugSignalsEvent)e;
+			IPCDISignal[] pcdiSignals = new IPCDISignal[0];
+			IPProcess[] sigProcs = getProcesses(e.getBitSet());
+			if (sigProcs.length > 0) {
+				int taskId = sigProcs[0].getTaskId();
+				IPCDITarget target = getSession().getTarget(taskId);
+				ProxyDebugSignal[] signals = signalsEvent.getSignals();
+				pcdiSignals = new IPCDISignal[signals.length];
+				for (int j=0; j<signals.length; j++) {
+					pcdiSignals[j] = new Signal((Target)target, signals[j].getName(), signals[j].isStop(), signals[j].isPrint(), signals[j].isPass(), signals[j].getDescription()); 
+				}
+			}
+			completeCommand(e.getBitSet(), pcdiSignals);
+			break;
 		
 		case IProxyDebugEvent.EVENT_DBG_THREADS:
 			ProxyDebugInfoThreadsEvent infoThreadsEvent = (ProxyDebugInfoThreadsEvent)e;
@@ -543,9 +578,9 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			Object[] objects = new Object[2];
 			objects[0] = new Integer(setThreadSelectEvent.getThreadId());
 			
-			IPProcess[] threadrocs = getProcesses(e.getBitSet());
-			if (threadrocs.length > 0) {
-				int taskId = threadrocs[0].getTaskId();
+			IPProcess[] threadProcs = getProcesses(e.getBitSet());
+			if (threadProcs.length > 0) {
+				int taskId = threadProcs[0].getTaskId();
 				IPCDITarget target = getSession().getTarget(taskId);
 				ProxyDebugStackframe frame = setThreadSelectEvent.getFrame();
 				int level = frame.getLevel();

@@ -124,7 +124,7 @@ public class MemoryManager extends Manager {
 	 * @return Long[] array of modified addresses.
 	 * @throws PCDIException
 	 */
-	BigInteger[] compareBlocks (MemoryBlock oldBlock, MemoryBlock newBlock) throws PCDIException {
+	BigInteger[] compareBlocks(MemoryBlock oldBlock, MemoryBlock newBlock) throws PCDIException {
 		byte[] oldBytes = oldBlock.getBytes();
 		byte[] newBytes = newBlock.getBytes();
 		List aList = new ArrayList(newBytes.length);
