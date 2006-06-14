@@ -75,6 +75,7 @@ libmi_a_SOURCES =		src/mi/MIParser.c \
 						src/mi/MIMemory.c \
 						src/mi/MIMemoryCommand.c \
 						src/mi/MISigHandle.c \
-						src/mi/CLISignalCommand.c
+						src/mi/CLISignalCommand.c \
+						src/mi/CLIPTypeCommand.c
 						
 libmi_a_CFLAGS =			-I./include -I$(UTILS)/include $(AM_CFLAGS) -g 
