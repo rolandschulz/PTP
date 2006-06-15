@@ -30,29 +30,30 @@
 typedef unsigned int	bits;
 
 struct bitset {
-	unsigned int		bs_nbits;	/* total number of bits in set */
+	unsigned int	bs_nbits;	/* total number of bits in set */
 	bits *			bs_bits;		/* actual bits (unused bits are always 0)*/
-	unsigned int		bs_size;		/* number of 'bits' objects */
+	unsigned int	bs_size;		/* number of 'bits' objects */
 };
 typedef struct bitset bitset;
 
-bitset *		bitset_new(int);
-void			bitset_free(bitset *);
-bitset *		bitset_copy(bitset *);
+bitset *	bitset_new(int);
+void		bitset_free(bitset *);
+bitset *	bitset_dup(bitset *);
+void		bitset_copy(bitset *, bitset *);
 int			bitset_isempty(bitset *);
-void			bitset_clear(bitset *);
-void			bitset_set(bitset *, int);
-void			bitset_unset(bitset *, int);
+void		bitset_clear(bitset *);
+void		bitset_set(bitset *, int);
+void		bitset_unset(bitset *, int);
 int			bitset_test(bitset *, int);
 int			bitset_firstset(bitset *);
-bitset *		bitset_and(bitset *, bitset *);
-void			bitset_andeq(bitset *, bitset *);
-bitset *		bitset_or(bitset *, bitset *);
-void			bitset_oreq(bitset *, bitset *);
-void			bitset_invert(bitset *);
+bitset *	bitset_and(bitset *, bitset *);
+void		bitset_andeq(bitset *, bitset *);
+bitset *	bitset_or(bitset *, bitset *);
+void		bitset_oreq(bitset *, bitset *);
+void		bitset_invert(bitset *);
 int			bitset_eq(bitset *, bitset *);
 char *		bitset_to_str(bitset *);
-bitset *		str_to_bitset(char *);
+bitset *	str_to_bitset(char *);
 int			bitset_size(bitset *);
 char *		bitset_to_set(bitset *);
 #endif /*_BITSET_H_*/
