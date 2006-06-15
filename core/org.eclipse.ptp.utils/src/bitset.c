@@ -48,12 +48,18 @@ bitset_free(bitset *b)
 	free(b);
 }
 
-bitset *	
-bitset_copy(bitset *b)
+void	
+bitset_copy(bitset *b1, bitset *b2)
+{
+	memcpy(b1->bs_bits, b2->bs_bits, MIN(SIZE_TO_BYTES(b1->bs_size), SIZE_TO_BYTES(b2->bs_size)));
+}
+
+bitset *
+bitset_dup(bitset *b)
 {
 	bitset *nb = bitset_new(b->bs_nbits);
 	
-	memcpy(nb->bs_bits, b->bs_bits, SIZE_TO_BYTES(b->bs_size));
+	bitset_copy(nb, b);
 	
 	return nb;
 }
@@ -90,10 +96,10 @@ bitset_and(bitset *b1, bitset *b2)
 	bitset *	nb;
 	
 	if (b1->bs_size > b2->bs_size) {
-		nb = bitset_copy(b1);
+		nb = bitset_dup(b1);
 		bitset_andeq(nb, b2);
 	} else {
-		nb = bitset_copy(b2);
+		nb = bitset_dup(b2);
 		bitset_andeq(nb, b1);
 	}
 	
@@ -130,10 +136,10 @@ bitset_or(bitset *b1, bitset *b2)
 	bitset *	nb;
 	
 	if (b1->bs_size > b2->bs_size) {
-		nb = bitset_copy(b1);
+		nb = bitset_dup(b1);
 		bitset_oreq(nb, b2);
 	} else {
-		nb = bitset_copy(b2);
+		nb = bitset_dup(b2);
 		bitset_oreq(nb, b1);
 	}
 	
@@ -159,7 +165,7 @@ void
 bitset_invert(bitset *b)
 {
 	int		i;
-	bits		mask;
+	bits	mask;
 	
 	for (i = 0; i < b->bs_size; i++)
 		b->bs_bits[i] = ~b->bs_bits[i];
@@ -321,7 +327,7 @@ str_to_bitset(char *str)
 	int			pos;
 	int			b;
 	char *		end;
-	bitset *		bp;
+	bitset *	bp;
 	
 	if (str == NULL)
 		return NULL;
@@ -391,7 +397,7 @@ bitset_to_set(bitset *b)
 	int			bit;
 	int			lower;
 	int			upper;
-	char			sep = 0;
+	char		sep = 0;
 	char *		str;
 	char *		s;
 	
