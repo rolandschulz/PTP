@@ -1995,7 +1995,9 @@ GDBMIDataWriteMemory(long offset, char* address, char* format, int wordSize, cha
 	return DBGRES_OK;
 }
 
-static int GDBCLIListSignals(char* name) {
+static int 
+GDBCLIListSignals(char* name) 
+{
 	MICommand *	cmd;
 	List *signals;
 	dbg_event *	e;
@@ -2019,7 +2021,10 @@ static int GDBCLIListSignals(char* name) {
 	
 	return DBGRES_OK;
 }
-static int GDBCLISignalInfo(char* arg) {
+
+static int 
+GDBCLISignalInfo(char* arg) 
+{
 	MICommand *	cmd;
 
 	CHECK_SESSION();

@@ -67,7 +67,9 @@ dbg_breakpoint_to_str(breakpoint *bp, char **result)
 	
 }
 
-static int dbg_signal_to_str(signalinfo *sig, char **result) {
+static int 
+dbg_signal_to_str(signalinfo *sig, char **result) 
+{
 	char *name;
 	char *desc;
 	
@@ -116,11 +118,15 @@ dbg_stackframes_to_str(List *lst, char **result)
 	return proxy_list_to_str(lst, (int (*)(void *, char **))dbg_stackframe_to_str, result);
 }
 
-static int dbg_signals_to_str(List *lst, char **result) {
+static int 
+dbg_signals_to_str(List *lst, char **result) 
+{
 	return proxy_list_to_str(lst, (int (*)(void *, char **))dbg_signal_to_str, result);
 }
 
-static int dbg_memory_to_str(memory *mem, char **result) {
+static int 
+dbg_memory_to_str(memory *mem, char **result) 
+{
 	char * addr;
 	char * ascii;
 	char * data;
@@ -141,11 +147,15 @@ static int dbg_memory_to_str(memory *mem, char **result) {
 	return 0;
 }
 
-static int dbg_memories_to_str(List *lst, char **result) {
+static int 
+dbg_memories_to_str(List *lst, char **result) 
+{
 	return proxy_list_to_str(lst, (int (*)(void *, char **))dbg_memory_to_str, result);
 }
 
-static int dbg_memoryinfo_to_str(memoryinfo *meninfo, char **result) {
+static int 
+dbg_memoryinfo_to_str(memoryinfo *meninfo, char **result) 
+{
 	char * addr;
 	char * memories;
 
@@ -379,7 +389,9 @@ dbg_str_to_stackframe(char **args, stackframe **frame)
 	return 0;
 }
 
-static int dbg_str_to_signal(char **args, signalinfo **sig) {
+static int 
+dbg_str_to_signal(char **args, signalinfo **sig) 
+{
 	signalinfo *s;
 	
 	if (strcmp(args[0], NULL_STR) == 0) {
@@ -421,7 +433,9 @@ dbg_str_to_stackframes(char **args, List **lst)
 	return 0;
 }
 
-static int dbg_str_to_signals(char **args, List **lst) {
+static int 
+dbg_str_to_signals(char **args, List **lst) 
+{
 	int i;
 	int pos;
 	int count = atoi(args[0]);
@@ -480,7 +494,9 @@ dbg_str_to_aif(char **args, AIF **res)
 	return 0;
 }
 
-static int dbg_str_to_memory_data(char **args, List **lst) {
+static int 
+dbg_str_to_memory_data(char **args, List **lst) 
+{
 	int	i;
 	int	count = atoi(args[0]);
 	char * str;
