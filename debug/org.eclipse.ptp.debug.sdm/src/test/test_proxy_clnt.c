@@ -46,7 +46,7 @@ event_callback(dbg_event *e, void *data)
 	
 	if (e->procs != NULL) {
 		if (sess_procs == NULL)
-			sess_procs = bitset_copy(e->procs);
+			sess_procs = bitset_dup(e->procs);
 		s = bitset_to_set(e->procs);
 		printf("%s ", s);
 		free(s);
@@ -122,7 +122,7 @@ wait_for_event(session *s, bitset *p)
 	printf("entering wait_for_event...\n");
 	
 	if (p != NULL)
-		procs_outstanding = bitset_copy(p);
+		procs_outstanding = bitset_dup(p);
 		
 	while (!completed) {
 		if (DbgProgress(s) < 0) {
