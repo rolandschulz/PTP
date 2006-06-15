@@ -39,6 +39,7 @@
 static List *			MISessionList = NULL;
 static struct timeval		MISessionDefaultSelectTimeout = {0, 1000};
 
+static void DoRRCallbacks(MISession *sess, MIResultRecord *rr);
 static void DoOOBAsyncCallbacks(MISession *sess, List *oobs);
 static void DoOOBStreamCallbacks(MISession *sess, List *oobs);
 static void HandleChild(int sig);
@@ -356,11 +357,6 @@ MISessionProcessCommandsAndResponses(MISession *sess, fd_set *rfds, fd_set *wfds
 	{
 		sess->command = (MICommand *)RemoveFirst(sess->send_queue);
 #ifdef __gnu_linux__
-		/*
-		 * NOTE: this hack only works if gdb is started with the '-tty' argument (or
-		 * presumably if the 'tty' command is issued.) Without this, the only way to
-		 * interrupt a running process seems to be from the command line.
-		 */
 		if (strcmp(sess->command->command, "-exec-interrupt") == 0) {
 			kill(sess->pid, SIGINT);
 		} else if (WriteCommand(sess->in_fd, MICommandToString(sess->command)) < 0) {
@@ -408,8 +404,10 @@ MISessionProcessCommandsAndResponses(MISession *sess, fd_set *rfds, fd_set *wfds
 			DoOOBAsyncCallbacks(sess, output->oobs);
 			DoOOBStreamCallbacks(sess, output->oobs);
 		}
-			
+
 		if (output->rr != NULL && sess->command != NULL) {
+			DoRRCallbacks(sess, output->rr);
+			
 			sess->command->completed = 1;
 			sess->command->output = output;
 			if (sess->command->callback != NULL)
@@ -429,6 +427,30 @@ MISessionCommandCompleted(MISession *sess)
 	return sess->command == NULL;
 }
 
+// "done" usually mean that gdb returns after some CLI command
+// The result record may contains informaton specific to oob.
+// This will happen when CLI-Command is use, for example
+// doing "run" will block and return a breakpointhit
+static void 
+DoRRCallbacks(MISession *sess, MIResultRecord *rr)
+{
+	MIResult *res;
+	MIValue *val;
+	
+	if (rr->resultClass == MIResultRecordDONE) {
+		for (SetList(rr->results); (res = (MIResult *)GetListElement(rr->results)); ) {
+			if (strcmp(res->variable, "reason") == 0) {
+				val = res->value;
+				if (val->type == MIValueTypeConst) {
+					if (sess->event_callback) {
+						sess->event_callback(MIEventCreateStoppedEvent(val->cstring, rr->results));
+					}
+				}
+			}
+		}
+	} 
+}
+
 /*
  * Process async callbacks. Removes records from oobs list.
  */
@@ -445,6 +467,7 @@ DoOOBAsyncCallbacks(MISession *sess, List *oobs)
 			case MIOOBRecordExecAsync:
 				if (sess->exec_callback != NULL)
 					sess->exec_callback(oob->class, oob->results);
+					
 				if (strcmp(oob->class, "stopped") == 0) {
 					int seen_reason = 0;
 					for (SetList(oob->results); (res = (MIResult *)GetListElement(oob->results)); ) {
