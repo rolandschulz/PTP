@@ -18,7 +18,7 @@
  ******************************************************************************/
 
 #ifdef __linux__
-#include <ctype.h>
+#include "compat.h"
 
 int
 digittoint(int c)

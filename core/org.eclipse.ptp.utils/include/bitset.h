@@ -31,29 +31,31 @@ typedef unsigned int	bits;
 
 struct bitset {
 	unsigned int	bs_nbits;	/* total number of bits in set */
-	bits *			bs_bits;		/* actual bits (unused bits are always 0)*/
-	unsigned int	bs_size;		/* number of 'bits' objects */
+	bits *			bs_bits;	/* actual bits (unused bits are always 0)*/
+	unsigned int	bs_size;	/* number of 'bits' objects */
 };
 typedef struct bitset bitset;
 
-bitset *	bitset_new(int);
-void		bitset_free(bitset *);
-bitset *	bitset_dup(bitset *);
-void		bitset_copy(bitset *, bitset *);
-int			bitset_isempty(bitset *);
-void		bitset_clear(bitset *);
-void		bitset_set(bitset *, int);
-void		bitset_unset(bitset *, int);
-int			bitset_test(bitset *, int);
-int			bitset_firstset(bitset *);
-bitset *	bitset_and(bitset *, bitset *);
-void		bitset_andeq(bitset *, bitset *);
-bitset *	bitset_or(bitset *, bitset *);
-void		bitset_oreq(bitset *, bitset *);
-void		bitset_invert(bitset *);
-int			bitset_eq(bitset *, bitset *);
-char *		bitset_to_str(bitset *);
-bitset *	str_to_bitset(char *);
-int			bitset_size(bitset *);
-char *		bitset_to_set(bitset *);
+bitset *	bitset_new(int num);						/* create a new bitset to contain 'num' bits */
+void		bitset_free(bitset *b);						/* dispose of a bitset */
+bitset *	bitset_dup(bitset *b);						/* create a copy of a bitset */
+void		bitset_copy(bitset *b1, bitset *b2);		/* copy bits from b2 to b1 */
+int			bitset_isempty(bitset *b);					/* test if all bits are 0 */
+void		bitset_clear(bitset *b);					/* set all bits to 0 */
+void		bitset_set(bitset *b, int n);				/* set bit 'n' (0 == LSB) to 1 */
+void		bitset_unset(bitset *b, int n);				/* set bit 'n' to 0 */
+int			bitset_test(bitset *b, int n);				/* return the value of bit 'n' */
+int			bitset_firstset(bitset *b);					/* find the first bit set to 1 (starting from LSB) */
+bitset *	bitset_and(bitset *b1, bitset *b2);			/* compute b3 = b1 & b2 */
+void		bitset_andeq(bitset *b1, bitset *b2);		/* compute b1 &= b2 */
+void		bitset_andeqnot(bitset *b1, bitset *b2);	/* compute b1 &= ~b2 */
+bitset *	bitset_or(bitset *b1, bitset *b2);			/* compute b3 = b1 | b2 */
+void		bitset_oreq(bitset *b1, bitset *b2);		/* compute b1 |= b2 */
+void		bitset_invert(bitset *b);					/* compute ~b */
+int			bitset_eq(bitset *b1, bitset *b2);			/* test if (b1 & b2) == b1 */
+int			bitset_compare(bitset *b1, bitset *b2);		/* test if (b1 & b2) != 0 */
+char *		bitset_to_str(bitset *b);					/* convert b to a portable string representation */
+bitset *	str_to_bitset(char *str);					/* convert a portable string represetation to a bitset */
+int			bitset_count(bitset *b);					/* return the number of bits in the set */
+char *		bitset_to_set(bitset *b);					/* convert b to set notation */
 #endif /*_BITSET_H_*/

@@ -128,6 +128,27 @@ bitset_andeq(bitset *b1, bitset *b2)
 }
 
 /*
+ * Compute b1 &= ~b2
+ * 
+ * If bitsets are different sizes, high bits are assumed
+ * to be 0.
+ */
+void
+bitset_andeqnot(bitset *b1, bitset *b2)
+{
+	int	i;
+	
+	for (i = 0; i < MIN(b1->bs_size, b2->bs_size); i++)
+		b1->bs_bits[i] &= ~b2->bs_bits[i];
+		
+	/*
+	 * Mask high bits (if any)
+	 */
+	for ( ; i < b1->bs_size; i++)
+		b1->bs_bits[i] = 0;
+}
+
+/*
  * Compute logical OR of bitsets
  */
 bitset *	
@@ -198,6 +219,24 @@ bitset_eq(bitset *b1, bitset *b2)
 			return 0;
 			
 	return 1;
+}
+
+/*
+ * Test if two bitsets share any bits
+ * 
+ * If bitsets are different sizes, high bits are assumed
+ * to be 0.
+ */
+int
+bitset_compare(bitset *b1, bitset *b2)
+{
+	int	i;
+	
+	for (i = 0; i < MIN(b1->bs_size, b2->bs_size); i++)
+		if ((b1->bs_bits[i] & b2->bs_bits[i]) != 0)
+			return 1;
+			
+	return 0;
 }
 
 /**
@@ -446,13 +485,13 @@ count_bits(bits b)
  * Number of bits in the set (as opposed to the total size of the set)
  */
 int
-bitset_size(bitset *b)
+bitset_count(bitset *b)
 {
 	int	i;
-	int	size = 0;
+	int	count = 0;
 	
 	for (i = 0; i < b->bs_size; i++)
-		size += count_bits(b->bs_bits[i]);
+		count += count_bits(b->bs_bits[i]);
 	
-	return size;
+	return count;
 }
