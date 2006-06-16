@@ -21,6 +21,7 @@
 #define _COMPAT_H_
 
 #include <sys/types.h>
+#include <ctype.h>
 
 #ifndef MAX
 #define MAX(a, b)		((a) < (b) ? (b) : (a))
