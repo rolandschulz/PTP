@@ -105,11 +105,11 @@ new_request(bitset *procs, int wait_type, void *data)
 
 	r = (active_request *)malloc(sizeof(active_request));
 	r->id = id++;
-	r->outstanding_procs = bitset_copy(procs);
+	r->outstanding_procs = bitset_dup(procs);
 	r->wait_type = wait_type;
 	r->data = data;
 	r->timer_state = TIMER_DISABLED;
-	r->events = HashCreate(bitset_size(procs));
+	r->events = HashCreate(bitset_count(procs));
 	AddToList(active_requests, (void *)r);
 
 	DEBUG_PRINT("created new request %d for %s\n", r->id, bitset_to_set(procs));
