@@ -36,14 +36,14 @@ struct MISession {
 	List *			send_queue;
 	char *			gdb_path;
 	struct timeval	select_timeout;
-	void				(*event_callback)(MIEvent *);
-	void				(*cmd_callback)(MIResultRecord *);
-	void				(*exec_callback)(char *, List *);
-	void				(*status_callback)(char *, List *);
-	void				(*notify_callback)(char *, List *);
-	void				(*console_callback)(char *);
-	void				(*log_callback)(char *);
-	void				(*target_callback)(char *);	
+	void			(*event_callback)(MIEvent *);
+	void			(*cmd_callback)(MIResultRecord *);
+	void			(*exec_callback)(char *, List *);
+	void			(*status_callback)(char *, List *);
+	void			(*notify_callback)(char *, List *);
+	void			(*console_callback)(char *);
+	void			(*log_callback)(char *);
+	void			(*target_callback)(char *);	
 };
 typedef struct MISession	MISession;
 
@@ -65,5 +65,5 @@ extern int MISessionCommandCompleted(MISession *sess);
 extern void MISessionProcessCommandsAndResponses(MISession *sess, fd_set *rfds, fd_set *wfds);
 extern void MISessionGetFds(MISession *sess, int *nfds, fd_set *rfds, fd_set *wfds, fd_set *efds);
 extern int MISessionProgress(MISession *sess);
-extern void ProcessMIOOBRecord(MISession *sess, MIResultRecord *);
+extern void ProcessCLIResultRecord(MIResultRecord *, void *);
 #endif /* _MISESSION_H_ */

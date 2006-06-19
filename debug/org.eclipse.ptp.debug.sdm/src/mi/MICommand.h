@@ -23,15 +23,18 @@
 #include "MIResultRecord.h"
 #include "MIOutput.h"
 
+struct MISession;
+
 struct MICommand {
-	char *			command;							/* command to execute */
-	char **			options;							/* command options */
-	int				num_options;						/* number of options for command */
-	int				opt_size;						/* allocated size of options */
-	int				completed;						/* command has been completed */
+	char *			command;								/* command to execute */
+	char **			options;								/* command options */
+	int				num_options;							/* number of options for command */
+	int				opt_size;								/* allocated size of options */
+	int				completed;								/* command has been completed */
 	int				expected_class;
-	MIOutput *		output;							/* result from completed command */
-	void			(*callback)(void *, MIResultRecord *);	/* command completed callback */
+	MIOutput *		output;									/* result from completed command */
+	void			(*callback)(MIResultRecord *, void *);	/* command completed callback */
+	void *			cb_data;								/* callback data */
 };
 typedef struct MICommand	MICommand;
 
@@ -41,7 +44,7 @@ extern void MICommandAddOption(MICommand *cmd, char *opt, char *arg);
 extern int MICommandCompleted(MICommand *cmd);
 extern int MICommandResultOK(MICommand *cmd);
 extern MIResultRecord *MICommandResult(MICommand *cmd);
-extern void MICommandRegisterCallback(MICommand *cmd, void (*callback)(void *, MIResultRecord *));
+extern void MICommandRegisterCallback(MICommand *cmd, void (*callback)(MIResultRecord *, void *), void *data);
 extern char *MICommandToString(MICommand *cmd);
 
 /*
@@ -100,8 +103,8 @@ extern MICommand *MIThreadSelect(int threadNum);
 /*
  * -data-* commands
  */
-extern MICommand *MIDataReadMemory(long, char*, char*, int, int, int, char*);
-extern MICommand *MIDataWriteMemory(long offset, char* address, char* format, int wordSize, char* value);
+extern MICommand *MIDataReadMemory(long, char *, char *, int, int, int, char *);
+extern MICommand *MIDataWriteMemory(long offset, char * address, char * format, int wordSize, char * value);
 
 #ifdef __APPLE__
 extern MICommand *MIPidInfo(void);
@@ -115,7 +118,8 @@ extern MICommand *CLIPType(char *name);
 /*
  * signal commands
  */
-extern MICommand *CLIListSignals(char*);
-extern MICommand *CLISignalInfo(char*);
+extern MICommand *CLIListSignals(char *);
+extern MICommand *CLISignalInfo(char *);
+extern MICommand *CLIHandle(char *);
 
 #endif /* _MICOMMAND_H_ */

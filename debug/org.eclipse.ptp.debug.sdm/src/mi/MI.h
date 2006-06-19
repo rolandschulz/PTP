@@ -30,6 +30,6 @@
 #include "MIArg.h"
 #include "MIError.h"
 #include "MIMemory.h"
-#include "MISigHandle.h"
+#include "CLISigHandle.h"
 
 #endif /* _MI_H_ */
