@@ -10,7 +10,7 @@
 #include "MIBreakpoint.h"
 
 void
-cmd_callback(void *sess, MIResultRecord *rr)
+cmd_callback(MIResultRecord *rr, void *sess)
 {
 	MIString *str = MIResultRecordToString(rr);
 	printf("res> %s\n", MIStringToCString(str));
@@ -57,21 +57,21 @@ int main(int argc, char *argv[])
 
 printf("help command\n");
 	cmd = MICommandNew("help", MIResultRecordDONE);
-	MICommandRegisterCallback(cmd, cmd_callback);
+	MICommandRegisterCallback(cmd, cmd_callback, sess);
 	sendcmd_wait(sess, cmd);
 	if (!MICommandResultOK(cmd))
 		fprintf(stderr, "command failed\n");
 	MICommandFree(cmd);
 printf("set command\n");	
 	cmd = MIGDBSet("confirm", "off");
-	MICommandRegisterCallback(cmd, cmd_callback);
+	MICommandRegisterCallback(cmd, cmd_callback, sess);
 	sendcmd_wait(sess, cmd);
 	if (!MICommandResultOK(cmd))
 		fprintf(stderr, "command failed\n");
 	MICommandFree(cmd);
 printf("break command\n");	
 	cmd = MIBreakInsert(0, 0, NULL, 0, "4", 0);
-	MICommandRegisterCallback(cmd, cmd_callback);
+	MICommandRegisterCallback(cmd, cmd_callback, sess);
 	sendcmd_wait(sess, cmd);
 	if (!MICommandResultOK(cmd))
 		fprintf(stderr, "command failed\n");
@@ -82,7 +82,7 @@ printf("break command\n");
 	MICommandFree(cmd);
 printf("quit command\n");		
 	cmd = MIGDBExit();
-	MICommandRegisterCallback(cmd, cmd_callback);
+	MICommandRegisterCallback(cmd, cmd_callback, sess);
 	sendcmd_wait(sess, cmd);
 	if (!MICommandResultOK(cmd))
 		fprintf(stderr, "command failed\n");

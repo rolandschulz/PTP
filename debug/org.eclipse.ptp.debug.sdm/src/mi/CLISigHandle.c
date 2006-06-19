@@ -27,7 +27,7 @@
 #include <string.h>
 
 #include "MIOOBRecord.h"
-#include "MISigHandle.h"
+#include "CLISigHandle.h"
 
 #include "signalinfo.h"
 
@@ -41,7 +41,7 @@ getBoolean(char* value)
 }
 
 void 
-MIGetSigHandleList(MICommand *cmd, List** signals) 
+CLIGetSigHandleList(MICommand *cmd, List** signals) 
 {
 	List *oobs;
 	MIOOBRecord *oob;

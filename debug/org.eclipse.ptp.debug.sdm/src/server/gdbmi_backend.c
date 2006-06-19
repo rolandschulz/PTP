@@ -2012,7 +2012,7 @@ GDBCLIListSignals(char* name)
 		MICommandFree(cmd);
 		return DBGRES_ERR;
 	}
-	MIGetSigHandleList(cmd, &signals);
+	CLIGetSigHandleList(cmd, &signals);
 	MICommandFree(cmd);
 
 	e = NewDbgEvent(DBGEV_SIGNALS);
@@ -2031,7 +2031,7 @@ GDBCLISignalInfo(char* arg)
 	CHECK_SESSION();
 	
 	cmd = CLISignalInfo(arg);
-	MICommandRegisterCallback(cmd, ProcessMIOOBRecord);	
+	MICommandRegisterCallback(cmd, ProcessCLIResultRecord, DebugSession);	
 	SendCommandWait(DebugSession, cmd);
 	if (!MICommandResultOK(cmd)) {
 		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());

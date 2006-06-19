@@ -22,12 +22,12 @@
  * 
  */
  
-#ifndef _MISIGHANDLE_H_
-#define _MISIGHANDLE_H_
+#ifndef _CLISIGHANDLE_H_
+#define _CLISIGHANDLE_H_
 
 #include "list.h"
 #include "MICommand.h"
 
-extern void MIGetSigHandleList(MICommand *cmd, List **signals);
+extern void CLIGetSigHandleList(MICommand *cmd, List **signals);
 
-#endif /* _MISIGHANDLE_H_ */
+#endif /* _CLISIGHANDLE_H_ */

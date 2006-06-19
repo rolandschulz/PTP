@@ -79,9 +79,10 @@ MICommandAddOption(MICommand *cmd, char *opt, char *arg)
 }
 
 void
-MICommandRegisterCallback(MICommand *cmd, void (*callback)(void *, MIResultRecord *))
+MICommandRegisterCallback(MICommand *cmd, void (*callback)(MIResultRecord *, void *), void *data)
 {
 	cmd->callback = callback;
+	cmd->cb_data = data;
 }
 
 int

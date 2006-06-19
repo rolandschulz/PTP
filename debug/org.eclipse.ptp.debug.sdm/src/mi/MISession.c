@@ -413,7 +413,7 @@ MISessionProcessCommandsAndResponses(MISession *sess, fd_set *rfds, fd_set *wfds
 			sess->command->completed = 1;
 			sess->command->output = output;
 			if (sess->command->callback != NULL)
-				sess->command->callback(sess, output->rr);
+				sess->command->callback(output->rr, sess->command->cb_data);
 		} else {
 			MIOutputFree(output);
 		}
@@ -430,14 +430,22 @@ MISessionCommandCompleted(MISession *sess)
 }
 
 /*
- *  "done" usually mean that gdb returns after some CLI command
- * The result record may contains informaton specific to oob.
- * This will happen when CLI-Command is use, for example
- * doing "run" will block and return a breakpointhit
+ * Used to process a result record after a CLI command has been
+ * issued if an MIEvent needs to be generated. 
+ * 
+ * In MI mode, GDB CLI commands append result information (after
+ * the "done" result class) to the result record. This function can be 
+ * passed to MICommandRegisterCallback() in order to automatically generate 
+ * an MIEvent when the CLI command completes.
+ * 
+ * NOTE: CLI commands DO NOT operate asychronously, so some commands will 
+ * block until the command is complete (e.g. "run"). This may cause a user
+ * interface to block.
  */
 void 
-ProcessMIOOBRecord(MISession *sess, MIResultRecord *rr)
+ProcessCLIResultRecord(MIResultRecord *rr, void *data)
 {
+	MISession *sess = (MISession *)data;
 	MIResult *res;
 	MIValue *val;
 
