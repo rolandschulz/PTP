@@ -53,6 +53,7 @@
 #define DBGEV_DATAR_MEM		DBG_EV_OFFSET + 17
 #define DBGEV_DATAW_MEM		DBG_EV_OFFSET + 18
 #define DBGEV_SIGNALS		DBG_EV_OFFSET + 19
+#define DBGEV_EXIT_SIGNAL	DBG_EV_OFFSET + 20
 
 struct dbg_event {
 	int				event;
@@ -89,7 +90,7 @@ struct dbg_event {
 	AIF *			data;
 	
 	/*
-	 * DBGEV_SIGNAL
+	 * DBGEV_SIGNAL, DBGEV_EXIT_SIGNAL
 	 */
 	char *			sig_name;
 	char *			sig_meaning;

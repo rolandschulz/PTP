@@ -58,6 +58,7 @@ struct dbg_backend_funcs {
 	int	(*datawritememory)(long, char*, char*, int, char*);
 	int (*listsignals)(char*);
 	int (*signalinfo)(char*);
+	int (*clihandle)(char*);
 	
 	int (*quit)(void);
 };

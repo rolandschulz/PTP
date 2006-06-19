@@ -63,6 +63,7 @@ static int svr_datareadmemory(dbg_backend *, char **);
 static int svr_datawritememory(dbg_backend *, char **);
 static int svr_listsignals(dbg_backend *, char **);
 static int svr_signalinfo(dbg_backend *, char **);
+static int svr_clihandle(dbg_backend *, char **);
 static int svr_quit(dbg_backend *, char **);
 
 static svr_cmd svr_cmd_tab[] =
@@ -93,6 +94,7 @@ static svr_cmd svr_cmd_tab[] =
 	{DBG_DATAWRITEMEMORY_CMD,		svr_datawritememory},
 	{DBG_LISTSIGNALS_CMD,			svr_listsignals},
 	{DBG_SIGNALINFO_CMD,			svr_signalinfo},
+	{DBG_CLIHANDLE_CMD,				svr_clihandle},
 	{"QUI",							svr_quit},
 };
 
@@ -302,11 +304,21 @@ svr_datawritememory(dbg_backend *db, char **args) {
 	return db->db_funcs->datawritememory(atol(args[1]), args[2], args[3], atoi(args[4]), args[5]);
 }
 
-static int svr_listsignals(dbg_backend *db, char **args) {
+static int 
+svr_listsignals(dbg_backend *db, char **args)
+{
 	return db->db_funcs->listsignals(args[1]);
 }
-static int svr_signalinfo(dbg_backend *db, char **args) {
+static int
+svr_signalinfo(dbg_backend *db, char **args)
+{
 	return db->db_funcs->signalinfo(args[1]);
+}
+
+static int
+svr_clihandle(dbg_backend *db, char **args)
+{
+	return db->db_funcs->clihandle(args[1]);
 }
 
 static int 

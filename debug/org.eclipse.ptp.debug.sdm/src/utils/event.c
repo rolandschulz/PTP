@@ -238,12 +238,20 @@ DbgEventToStr(dbg_event *e, char **result)
 		free(str3);
 		break;
 
-	case DBGEV_SIGNALS: // added by clement
+	case DBGEV_SIGNALS:
 		dbg_signals_to_str(e->list, &str);
 		asprintf(result, "%d %s %s", e->event, pstr, str);
 		free(str);
 		break;
-
+	
+	case DBGEV_EXIT_SIGNAL:
+		proxy_cstring_to_str(e->sig_name, &str);
+		proxy_cstring_to_str(e->sig_meaning, &str2);
+		asprintf(result, "%d %s %s %s", e->event, pstr, str, str2);
+		free(str);
+		free(str2);
+		break;
+	
 	case DBGEV_EXIT:
 		asprintf(result, "%d %s %d", e->event, pstr, e->exit_status);
 		break;
@@ -642,12 +650,18 @@ DbgStrToEvent(char *str, dbg_event **ev)
 			goto error_out;
 		break;
 	
-	case DBGEV_SIGNALS: //added by clement
+	case DBGEV_SIGNALS:
 		e = NewDbgEvent(DBGEV_SIGNALS);
 		if (dbg_str_to_signals(&args[2], &e->list) < 0)
 			goto error_out;
 		break;
 	
+	case DBGEV_EXIT_SIGNAL:
+		e = NewDbgEvent(DBGEV_EXIT_SIGNAL);
+		if (proxy_str_to_cstring(args[2], &e->sig_name) < 0 || proxy_str_to_cstring(args[3], &e->sig_meaning) < 0)
+			goto error_out;
+		break;
+
 	case DBGEV_EXIT:
 		e = NewDbgEvent(DBGEV_EXIT);
 		if (proxy_str_to_int(args[2], &e->exit_status) < 0)
@@ -816,8 +830,14 @@ FreeDbgEvent(dbg_event *e) {
 			free(e->sig_meaning);
 		}
 		break;
+	case DBGEV_EXIT_SIGNAL:
+		if (e->list != NULL) {
+			free(e->sig_name);
+			free(e->sig_meaning);
+		}
+		break;
 		
-	case DBGEV_SIGNALS: //added by clement
+	case DBGEV_SIGNALS:
 		if (e->list != NULL)
 			DestroyList(e->list, FreeSignalInfo);
 		break;

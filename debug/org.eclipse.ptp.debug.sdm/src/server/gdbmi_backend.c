@@ -107,6 +107,7 @@ static int	GDBMIDataWriteMemory(long, char*, char*, int, char*);
 static int	GDBMIGetGlobalVariables(void);
 static int	GDBCLIListSignals(char*);
 static int	GDBCLISignalInfo(char*);
+static int	GDBCLIHandle(char*);
 static int	GDBMIQuit(void);
 
 static char* GetModifierType(char *);
@@ -147,6 +148,7 @@ dbg_backend_funcs	GDBMIBackend =
 	GDBMIDataWriteMemory,
 	GDBCLIListSignals,
 	GDBCLISignalInfo,
+	GDBCLIHandle,
 	GDBMIQuit
 };
 
@@ -330,10 +332,9 @@ AsyncStop(void *data)
 		break;
 
 	case MIEventTypeInferiorSignalExit:
-		e = NewDbgEvent(DBGEV_SIGNAL);
+		e = NewDbgEvent(DBGEV_EXIT_SIGNAL);
 		e->sig_name = strdup(evt->sigName);
-		e->sig_meaning = strdup(evt->sigMeaning);
-		e->thread_id = evt->threadId;
+		e->sig_meaning = strdup(evt->sigMeaning);		
 		e->frame = NULL;
 		break;
 		
@@ -2030,6 +2031,7 @@ GDBCLISignalInfo(char* arg)
 	CHECK_SESSION();
 	
 	cmd = CLISignalInfo(arg);
+	MICommandRegisterCallback(cmd, ProcessMIOOBRecord);	
 	SendCommandWait(DebugSession, cmd);
 	if (!MICommandResultOK(cmd)) {
 		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
@@ -2037,10 +2039,27 @@ GDBCLISignalInfo(char* arg)
 		return DBGRES_ERR;
 	}
 	MICommandFree(cmd);
-
 	return DBGRES_OK;
 }
 
+static int
+GDBCLIHandle(char *arg)
+{
+	MICommand *cmd;
+		
+	CHECK_SESSION();
+	
+	cmd = CLIHandle(arg);
+	SendCommandWait(DebugSession, cmd);
+	if (!MICommandResultOK(cmd)) {
+		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
+		MICommandFree(cmd);
+		return DBGRES_ERR;
+	}
+	MICommandFree(cmd);
+	SaveEvent(NewDbgEvent(DBGEV_OK));
+	return DBGRES_OK;
+} 
 
 #if 0
 char tohex[] =	{'0', '1', '2', '3', '4', '5', '6', '7', 
