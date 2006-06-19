@@ -20,6 +20,8 @@ package org.eclipse.ptp.debug.external.core.cdi.model;
 
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDISignal;
+import org.eclipse.ptp.debug.external.core.cdi.Session;
+import org.eclipse.ptp.debug.external.core.cdi.SignalManager;
 
 /**
  * @author Clement chu
@@ -70,10 +72,14 @@ public class Signal extends PObject implements IPCDISignal {
 	public boolean isPrint() {
 		return print;
 	}
-	public void handle(boolean isIgnore, boolean isStop) {
+	public void handle(boolean isIgnore, boolean isStop) throws PCDIException {
+		SignalManager mgr = ((Session)getTarget().getSession()).getSignalManager();
+		mgr.handle(this, isIgnore, isStop);
+	}
+	public void setHandle(boolean isIgnore, boolean isStop) {
 		pass = !isIgnore;
 		stop = isStop;
-	}	
+	}
 
 	/**
 	 * @see org.eclipse.ptp.debug.core.cdi.IPCDISignal#isIgnore()

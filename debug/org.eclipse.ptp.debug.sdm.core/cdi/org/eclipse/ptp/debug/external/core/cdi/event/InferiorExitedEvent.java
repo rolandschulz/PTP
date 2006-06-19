@@ -25,9 +25,30 @@ import org.eclipse.ptp.debug.core.cdi.event.IPCDIExitedEvent;
 
 
 public class InferiorExitedEvent extends AbstractEvent implements IPCDIExitedEvent {
-	public InferiorExitedEvent(IPCDISession session, BitList tasks) {
+	private int exitStatus = -1;
+	private String signalName;
+	private String signalMeaning;
+	
+	public InferiorExitedEvent(IPCDISession session, BitList tasks, int exitStatus) {
 		super(session, tasks);
+		this.exitStatus = exitStatus;
 	}
+	public InferiorExitedEvent(IPCDISession session, BitList tasks, String signalName, String signalMeaning) {
+		super(session, tasks);
+		this.signalName = signalName;
+		this.signalMeaning = signalMeaning;
+	}
+	public String getSignalName() {
+		return this.signalName;
+	}
+	public String getSignalMeaning() {
+		return this.signalMeaning;
+	}
+	
+	public int getExitStatus() {
+		return exitStatus;
+	}
+	
 	public IPCDISessionObject getReason() {
 		return null;
 	}

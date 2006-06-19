@@ -87,7 +87,7 @@ public class MemoryManager extends Manager {
 			}
 		}
 		IPCDIEvent[] events = (IPCDIEvent[])eventList.toArray(new IPCDIEvent[0]);
-		target.getSession().getDebugger().fireEvents(events);
+		target.getSession().getEventManager().fireEvents(events);
 	}
 
 	/** update one Block.

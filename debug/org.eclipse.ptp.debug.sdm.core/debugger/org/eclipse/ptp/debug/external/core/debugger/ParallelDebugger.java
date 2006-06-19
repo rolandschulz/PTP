@@ -59,11 +59,13 @@ import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugBreakpointHitEv
 import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugBreakpointSetEvent;
 import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugDataEvent;
 import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugErrorEvent;
+import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugExitEvent;
 import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugInfoThreadsEvent;
 import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugInitEvent;
 import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugMemoryInfoEvent;
 import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugSetThreadSelectEvent;
 import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugSignalEvent;
+import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugSignalExitEvent;
 import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugSignalsEvent;
 import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugStackInfoDepthEvent;
 import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugStackframeEvent;
@@ -268,7 +270,6 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 		}
 	}
 	
-	
 	/**
 	 * list stack frames for first process in procs
 	 */
@@ -400,8 +401,8 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			throw new PCDIException(e.getMessage());
 		}
 	}
-	/**
-	 * stack info depth 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.IDebugger#getStackInfoDepth(org.eclipse.ptp.core.util.BitList)
 	 */
 	public void getStackInfoDepth(BitList tasks) throws PCDIException {
 		try {
@@ -411,7 +412,9 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			throw new PCDIException(e.getMessage());
 		}
 	}
-	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.IDebugger#getListSignals(org.eclipse.ptp.core.util.BitList, java.lang.String)
+	 */
 	public void getListSignals(BitList tasks, String name) throws PCDIException {
 		try {
 			proxy.debugListSignals(tasks, name);
@@ -419,9 +422,22 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			throw new PCDIException(e.getMessage());
 		}
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.IDebugger#getSignalInfo(org.eclipse.ptp.core.util.BitList, java.lang.String)
+	 */
 	public void getSignalInfo(BitList tasks, String arg) throws PCDIException {
 		try {
 			proxy.debugSignalInfo(tasks, arg);
+		} catch (IOException e) {
+			throw new PCDIException(e.getMessage());
+		}
+	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.IDebugger#cliHandle(org.eclipse.ptp.core.util.BitList, java.lang.String)
+	 */
+	public void cliHandle(BitList tasks, String arg) throws PCDIException {
+		try {
+			proxy.debugCLIHandle(tasks, arg);
 		} catch (IOException e) {
 			throw new PCDIException(e.getMessage());
 		}
@@ -543,7 +559,14 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			
 		case IProxyDebugEvent.EVENT_DBG_EXIT:
 			System.out.println("======================= EVENT_DBG_EXIT ====================");
-			handleProcessTerminatedEvent(e.getBitSet());
+			ProxyDebugExitEvent exitEvent = (ProxyDebugExitEvent)e;
+			handleProcessTerminatedEvent(e.getBitSet(), exitEvent.getExitStatus());
+			break;
+		
+		case IProxyDebugEvent.EVENT_DBG_EXIT_SIGNAL:
+			System.out.println("======================= EVENT_DBG_EXIT_SIGNAL ====================");
+			ProxyDebugSignalExitEvent exitSigEvent = (ProxyDebugSignalExitEvent)e;
+			handleProcessTerminatedEvent(e.getBitSet(), exitSigEvent.getSignalName(), exitSigEvent.getSignalMeaning());
 			break;
 			
 		case IProxyDebugEvent.EVENT_DBG_SIGNAL:
@@ -552,7 +575,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			handleProcessSignaledEvent(e.getBitSet(), sigEvent.getLocator(), sigEvent.getThreadID());
 			break;
 
-		case IProxyDebugEvent.EVENT_DBG_SIGNALS: // added by clement
+		case IProxyDebugEvent.EVENT_DBG_SIGNALS:
 			ProxyDebugSignalsEvent signalsEvent = (ProxyDebugSignalsEvent)e;
 			IPCDISignal[] pcdiSignals = new IPCDISignal[0];
 			IPProcess[] sigProcs = getProcesses(e.getBitSet());

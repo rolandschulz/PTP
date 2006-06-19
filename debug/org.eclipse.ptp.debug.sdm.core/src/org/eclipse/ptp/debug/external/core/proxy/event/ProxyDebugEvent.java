@@ -84,13 +84,17 @@ public class ProxyDebugEvent extends ProxyEvent {
 			evt = new ProxyDebugSignalEvent(set, decodeString(args[2]), decodeString(args[3]), sigTid, sigLoc);
 			break;
 			
-		case IProxyDebugEvent.EVENT_DBG_SIGNALS: // added by clement
+		case IProxyDebugEvent.EVENT_DBG_SIGNALS:
 			int numSignals = Integer.parseInt(args[2]);
 			ProxyDebugSignal[] signals = new ProxyDebugSignal[numSignals];
 			for (int i = 0; i<numSignals; i++) {
 				signals[i] = new ProxyDebugSignal(decodeString(args[5*i+3]), toboolean(Integer.parseInt(args[5*i+4])), toboolean(Integer.parseInt(args[5*i+5])), toboolean(Integer.parseInt(args[5*i+6])), decodeString(args[5*i+7]));
 			}
 			evt = new ProxyDebugSignalsEvent(set, signals);
+			break;
+			
+		case IProxyDebugEvent.EVENT_DBG_EXIT_SIGNAL:
+			evt = new ProxyDebugSignalExitEvent(set, decodeString(args[2]), decodeString(args[3]));
 			break;
 			
 		case IProxyDebugEvent.EVENT_DBG_EXIT:

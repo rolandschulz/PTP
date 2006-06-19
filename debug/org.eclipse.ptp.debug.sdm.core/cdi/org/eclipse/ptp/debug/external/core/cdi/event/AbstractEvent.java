@@ -33,6 +33,7 @@ import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIObject;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 
 
 public abstract class AbstractEvent implements IPCDIEvent {
@@ -73,7 +74,13 @@ public abstract class AbstractEvent implements IPCDIEvent {
 	public IPCDIObject getSource() {
 		return object;
 	}
-	public IPCDIObject getSource(int task_id) {
+	public IPCDIObject getSource(int task_id) {		
+		if (object == null) {
+			return getTarget(task_id);
+		}
+		return object;
+	}
+	public IPCDITarget getTarget(int task_id) {
 		if (containTask(task_id))
 			return session.getTarget(task_id);
 		return null;

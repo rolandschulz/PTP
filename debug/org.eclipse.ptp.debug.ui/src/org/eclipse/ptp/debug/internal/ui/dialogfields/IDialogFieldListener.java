@@ -16,10 +16,16 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.core.cdi.event;
+package org.eclipse.ptp.debug.internal.ui.dialogfields;
+
 /**
  * @author Clement chu
- * 
  */
-public interface IPCDIDebugExitedEvent extends IPCDIExitedEvent {}
+
+public interface IDialogFieldListener {
+	/**
+	 * The dialog field has changed.
+	 */
+	void dialogFieldChanged(DialogField field);
+}
 

@@ -188,7 +188,7 @@ public class PTPMemoryBlockExtension extends PDebugElement implements IMemoryBlo
 	public void handleDebugEvents(IPCDIEvent[] events) {
 		for(int i = 0; i < events.length; i++) {
 			IPCDIEvent event = events[i];
-			IPCDIObject source = event.getSource();
+			IPCDIObject source = event.getSource(getCDITarget().getTargetID());
 			if (source == null)
 				continue;
 			if (source.getTarget().equals(getCDITarget())) {

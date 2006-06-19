@@ -279,6 +279,15 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 	public void conditionBreakpoint(BitList tasks, int bpid, String expr) throws PCDIException {
 		//TODO
 	}
+	public void getListSignals(BitList tasks, String name) throws PCDIException {
+		//TODO
+	}
+	public void getSignalInfo(BitList tasks, String arg) throws PCDIException {
+		//TODO
+	}
+	public void cliHandle(BitList tasks, String arg) throws PCDIException {
+		//TODO
+	}
 	
 	//current support main function breakpoint only
 	public void setFunctionBreakpoint(final BitList tasks, final IPCDIFunctionBreakpoint bpt) throws PCDIException {
@@ -462,7 +471,7 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 		String state = qItem.getState();
 		//System.out.println("**** Event Update: " + state + ", tasks: " + qItem.getTasks().cardinality() + ", line: " + qItem.getLine());
 		if (state.equals(EXIT_STATE)) {
-			handleProcessTerminatedEvent(qItem.getTasks());
+			handleProcessTerminatedEvent(qItem.getTasks(), 0);
 		} else if (state.equals(HIT_BPT_STATE)) {
 			handleBreakpointHitEvent(qItem.getTasks(), qItem.getLine(), 0);
 			//handleBreakpointHitEvent(qItem.getTasks(), qItem.getLine(), qItem.getFile());

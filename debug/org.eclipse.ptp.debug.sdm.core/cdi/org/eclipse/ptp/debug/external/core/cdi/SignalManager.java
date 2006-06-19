@@ -26,9 +26,12 @@ import java.util.Map;
 
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
+import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDISignal;
+import org.eclipse.ptp.debug.external.core.cdi.event.SignalChangedEvent;
 import org.eclipse.ptp.debug.external.core.cdi.model.Signal;
 import org.eclipse.ptp.debug.external.core.cdi.model.Target;
+import org.eclipse.ptp.debug.external.core.commands.CLIHandleCommand;
 import org.eclipse.ptp.debug.external.core.commands.CLIListSignalsCommand;
 
 /**
@@ -126,17 +129,14 @@ public class SignalManager extends Manager {
 		}
 
 		Target target = (Target)sig.getTarget();
-/*
-		CLIHandle handle = factory.createCLIHandle(buffer.toString());
-		try {
-			miSession.postCommand(handle);
-			handle.getMIInfo();
-		} catch (MIException e) {
-			throw new MI2CDIException(e);
-		}
-*/		
-		sig.handle(isIgnore, isStop);
-//		miSession.fireEvent(new MISignalChangedEvent(miSession, sig.getName()));
+		Session session = (Session)getSession();
+		BitList tasks = session.createBitList(target.getTargetID());
+		
+		CLIHandleCommand command = new CLIHandleCommand(tasks, buffer.toString());
+		session.getDebugger().postCommand(command);
+		command.waitFinish();
+		sig.setHandle(isIgnore, isStop);
+		session.getEventManager().fireEvents(new IPCDIEvent[] { new SignalChangedEvent(session, tasks, sig, sig.getName()) });
 	}
 
 	public IPCDISignal[] getSignals(Target target) throws PCDIException {
@@ -152,6 +152,9 @@ public class SignalManager extends Manager {
 	}
 
 	public void update(Target target) throws PCDIException {
+		Session session = (Session)getSession();
+		BitList tasks = session.createBitList(target.getTargetID());
+
 		IPCDISignal[] new_sigs = createSignals(target);
 		List eventList = new ArrayList(new_sigs.length);
 		List signalsList = getSignalsList(target);
@@ -161,13 +164,13 @@ public class SignalManager extends Manager {
 				if (hasSignalChanged(sig, new_sigs[i])) {
 					// Fire ChangedEvent
 					((Signal)sig).setSignal(new_sigs[i]);
-					//eventList.add(new MISignalChangedEvent(miSession, miSigs[i].getName())); 
+					eventList.add(new SignalChangedEvent(session, tasks, new_sigs[i], new_sigs[i].getName())); 
 				}
 			} else {
 				signalsList.add(new Signal(target, new_sigs[i]));
 			}
 		}
-		//MIEvent[] events = (MIEvent[])eventList.toArray(new MIEvent[0]);
-		//miSession.fireEvents(events);
+		IPCDIEvent[] events = (IPCDIEvent[])eventList.toArray(new IPCDIEvent[0]);
+		session.getEventManager().fireEvents(events);
 	}
 } 

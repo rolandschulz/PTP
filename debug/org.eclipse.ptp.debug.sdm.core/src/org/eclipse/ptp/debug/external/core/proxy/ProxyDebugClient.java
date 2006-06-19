@@ -180,4 +180,7 @@ public class ProxyDebugClient extends AbstractProxyDebugClient {
 	public void debugSignalInfo(BitList procs, String arg) throws IOException {
 		sendCommand("SIG", procs, arg);
 	}
+	public void debugCLIHandle(BitList procs, String arg) throws IOException {
+		sendCommand("CHL", procs, arg);
+	}
 }

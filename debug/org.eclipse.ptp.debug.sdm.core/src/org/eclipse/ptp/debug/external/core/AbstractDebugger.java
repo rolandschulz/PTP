@@ -48,7 +48,7 @@ import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.debug.external.core.cdi.Session;
 import org.eclipse.ptp.debug.external.core.cdi.event.BreakpointCreatedEvent;
 import org.eclipse.ptp.debug.external.core.cdi.event.BreakpointHitEvent;
-import org.eclipse.ptp.debug.external.core.cdi.event.DebuggerExitedEvent;
+import org.eclipse.ptp.debug.external.core.cdi.event.DebuggerDestroyedEvent;
 import org.eclipse.ptp.debug.external.core.cdi.event.EndSteppingRangeEvent;
 import org.eclipse.ptp.debug.external.core.cdi.event.ErrorEvent;
 import org.eclipse.ptp.debug.external.core.cdi.event.InferiorExitedEvent;
@@ -154,12 +154,10 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 	}
 	public synchronized final void fireEvent(final IPCDIEvent event) {		
 		if (event != null) {
-			//FIXME - add item here or??
-			eventQueue.addItem(event);
 			BitList tasks = event.getAllProcesses();
 			System.out.println("***** Debugger event: " + event/* + " for tasks: " + showBitList(tasks)*/);
 			if (event instanceof IPCDIExitedEvent) {
-				setJobFinished(tasks, IPProcess.EXITED);
+				setJobFinished(tasks, (((IPCDIExitedEvent)event).getExitStatus()>-1)?IPProcess.EXITED:IPProcess.EXITED_SIGNALLED);
 			} else if (event instanceof IPCDIResumedEvent) {
 				setSuspendTasks(false, tasks);
 				setProcessStatus(tasks.toArray(), IPProcess.RUNNING);
@@ -188,6 +186,8 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 					postCommand(new StopDebuggerCommand());
 				}
 			}
+			//FIXME - add item here or??
+			eventQueue.addItem(event);
 		}
 	}	
 	private void setJobFinished(BitList tasks, String status) {
@@ -212,7 +212,7 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 
 	//event
 	public void handleStopDebuggerEvent() {
-		eventQueue.addItem(new DebuggerExitedEvent(getSession(), new BitList(0)));
+		eventQueue.addItem(new DebuggerDestroyedEvent(getSession(), new BitList(0)));
 		session.shutdown();
 	}
 	//not used breakpoint created event
@@ -235,8 +235,11 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 	public void handleProcessResumedEvent(BitList tasks, int type) {
 		fireEvent(new InferiorResumedEvent(getSession(), tasks, type));
 	}
-	public void handleProcessTerminatedEvent(BitList tasks) {
-		fireEvent(new InferiorExitedEvent(getSession(), tasks));
+	public void handleProcessTerminatedEvent(BitList tasks, int exitStatus) {
+		fireEvent(new InferiorExitedEvent(getSession(), tasks, exitStatus));
+	}
+	public void handleProcessTerminatedEvent(BitList tasks, String signalName, String signalMeaning) {
+		fireEvent(new InferiorExitedEvent(getSession(), tasks, signalName, signalMeaning));
 	}
 	public void handleProcessSignaledEvent(BitList tasks, IPCDILocator locator, int thread_id) {
 		fireEvent(new InferiorSignaledEvent(getSession(), tasks, locator, thread_id));
