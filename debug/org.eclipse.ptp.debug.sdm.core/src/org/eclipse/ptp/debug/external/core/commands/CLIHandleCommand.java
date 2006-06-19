@@ -16,31 +16,35 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.external.core.cdi.event;
+package org.eclipse.ptp.debug.external.core.commands;
 
 import org.eclipse.ptp.core.util.BitList;
-import org.eclipse.ptp.debug.core.cdi.IPCDISession;
-import org.eclipse.ptp.debug.core.cdi.event.IPCDISignalChangedEvent;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIObject;
+import org.eclipse.ptp.debug.core.IAbstractDebugger;
+import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
 /**
  * @author Clement chu
  * 
  */
-public class SignalChangedEvent extends ChangedEvent implements IPCDISignalChangedEvent {
-	String name;
+public class CLIHandleCommand extends AbstractDebugCommand {
+	private String arg = "";
 	
-	/** 
-	 * @param session
-	 * @param tasks
-	 * @param source IPCDISignal
-	 * @param name
-	 */
-	public SignalChangedEvent(IPCDISession session, BitList tasks, IPCDIObject source, String name) {
-		super(session, tasks, source);
-		this.name = name;
+	public CLIHandleCommand(BitList tasks, String arg) {
+		super(tasks, false, true);
+		this.arg = arg;
 	}
+	public void execCommand(IAbstractDebugger debugger, int timeout) throws PCDIException {
+		setTimeout(timeout);
+		debugger.cliHandle(tasks, arg);
+	}
+	public void waitFinish() throws PCDIException {
+		if (waitForReturn()) {
+			if (result == null) {
+				throw new PCDIException("No result found on command: " + getName());
+			}
+		}
+	}	
 	public String getName() {
-		return name;
+		return "CLI Handle"; 
 	}
 }

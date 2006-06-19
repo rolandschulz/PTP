@@ -21,6 +21,7 @@ package org.eclipse.ptp.debug.core.cdi.event;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIObject;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 
 /**
  * @author Clement chu
@@ -52,10 +53,16 @@ public interface IPCDIEvent {
 	 * @param task_id
 	 * @return
 	 */
-	public IPCDIObject getSource(int task_id);
+	public IPCDITarget getTarget(int task_id);
 	/** Get pcdi object
 	 * @return
 	 */
 	IPCDIObject getSource();
+	
+	/** Get source
+	 * @param task_id
+	 * @return
+	 */
+	IPCDIObject getSource(int task_id);
 }
 

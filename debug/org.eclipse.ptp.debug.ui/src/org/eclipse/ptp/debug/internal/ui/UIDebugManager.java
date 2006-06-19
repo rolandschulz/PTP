@@ -30,7 +30,7 @@ import org.eclipse.core.resources.IMarkerDelta;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.core.runtime.Preferences.PropertyChangeEvent;
@@ -60,7 +60,7 @@ import org.eclipse.ptp.debug.core.cdi.IPCDIErrorInfo;
 import org.eclipse.ptp.debug.core.cdi.IPCDILineLocation;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
-import org.eclipse.ptp.debug.core.cdi.event.IPCDIDebugExitedEvent;
+import org.eclipse.ptp.debug.core.cdi.event.IPCDIDebugDestroyedEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIErrorEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEventListener;
@@ -262,7 +262,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	public void fireDebugEvent(final IDebugActionEvent event) {
 		for (Iterator i = debugEventListeners.iterator(); i.hasNext();) {
 			final IDebugActionUpdateListener dListener = (IDebugActionUpdateListener) i.next();
-			Platform.run(new SafeNotifier() {
+			SafeRunner.run(new SafeNotifier() {
 				public void run() {
 					dListener.handleDebugActionEvent(event);
 				}
@@ -803,7 +803,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 				// System.out.println("-------------------- resume ------------------------");
 				cleanupDebugVariables(job);
 				fireResumeEvent(job, event.getAllProcesses());
-			} else if (event instanceof IPCDIDebugExitedEvent) {
+			} else if (event instanceof IPCDIDebugDestroyedEvent) {
 				condition = new Boolean(true);
 				annotationMgr.removeAnnotationGroup(job.getIDString());
 				//System.err.println("--- TESTING exit event and remove all annotation in job: " + job.getIDString());

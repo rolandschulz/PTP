@@ -117,6 +117,22 @@ public interface IDebugger {
 	 */
 	public void setDataWriteMemoryCommand(BitList tasks, long offset, String address, int wordFormat, int wordSize, String value) throws PCDIException;
 
+	/** Get the List of signals
+	 * @param tasks
+	 * @param name
+	 * @throws PCDIException
+	 */
 	public void getListSignals(BitList tasks, String name) throws PCDIException;
+	/** Pass Signal action
+	 * @param tasks
+	 * @param arg
+	 * @throws PCDIException
+	 */
 	public void getSignalInfo(BitList tasks, String arg) throws PCDIException;	
+	/** Handle CLI Command
+	 * @param tasks
+	 * @param arg
+	 * @throws PCDIException
+	 */
+	public void cliHandle(BitList tasks, String arg) throws PCDIException;	
 }

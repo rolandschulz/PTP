@@ -35,5 +35,6 @@ public interface IPCDISignal extends IPCDIObject {
 	boolean isStopSet();
 	void signal() throws PCDIException ;
 	void handle(boolean ignore, boolean stop) throws PCDIException;
+	void setHandle(boolean isIgnore, boolean isStop);	
 }
 

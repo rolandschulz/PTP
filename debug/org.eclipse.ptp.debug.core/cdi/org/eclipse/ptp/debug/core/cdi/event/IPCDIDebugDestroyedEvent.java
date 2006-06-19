@@ -16,31 +16,10 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.external.core.cdi.event;
-
-import org.eclipse.ptp.core.util.BitList;
-import org.eclipse.ptp.debug.core.cdi.IPCDISession;
-import org.eclipse.ptp.debug.core.cdi.event.IPCDISignalChangedEvent;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIObject;
-
+package org.eclipse.ptp.debug.core.cdi.event;
 /**
  * @author Clement chu
  * 
  */
-public class SignalChangedEvent extends ChangedEvent implements IPCDISignalChangedEvent {
-	String name;
-	
-	/** 
-	 * @param session
-	 * @param tasks
-	 * @param source IPCDISignal
-	 * @param name
-	 */
-	public SignalChangedEvent(IPCDISession session, BitList tasks, IPCDIObject source, String name) {
-		super(session, tasks, source);
-		this.name = name;
-	}
-	public String getName() {
-		return name;
-	}
-}
+public interface IPCDIDebugDestroyedEvent extends IPCDIDestroyedEvent {}
+

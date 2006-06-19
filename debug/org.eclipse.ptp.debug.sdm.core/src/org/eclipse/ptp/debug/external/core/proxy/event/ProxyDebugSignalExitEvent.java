@@ -16,31 +16,30 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.external.core.cdi.event;
+
+package org.eclipse.ptp.debug.external.core.proxy.event;
 
 import org.eclipse.ptp.core.util.BitList;
-import org.eclipse.ptp.debug.core.cdi.IPCDISession;
-import org.eclipse.ptp.debug.core.cdi.event.IPCDISignalChangedEvent;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIObject;
 
-/**
- * @author Clement chu
- * 
- */
-public class SignalChangedEvent extends ChangedEvent implements IPCDISignalChangedEvent {
-	String name;
+
+public class ProxyDebugSignalExitEvent extends AbstractProxyDebugEvent implements IProxyDebugEvent {
+	private String signalName;
+	private String signalMeaning;
 	
-	/** 
-	 * @param session
-	 * @param tasks
-	 * @param source IPCDISignal
-	 * @param name
-	 */
-	public SignalChangedEvent(IPCDISession session, BitList tasks, IPCDIObject source, String name) {
-		super(session, tasks, source);
-		this.name = name;
+	public ProxyDebugSignalExitEvent(BitList set, String signalName, String signalMeaning) {
+		super(EVENT_DBG_EXIT_SIGNAL, set);
+		this.signalName = signalName;
+		this.signalMeaning = signalMeaning;
 	}
-	public String getName() {
-		return name;
+
+	public String getSignalName() {
+		return this.signalName;
+	}
+	public String getSignalMeaning() {
+		return this.signalMeaning;
+	}
+
+	public String toString() {
+		return "EVENT_DBG_EXIT_SIGNAL " + this.getBitSet().toString() + " " + this.signalName + " " + this.signalMeaning;
 	}
 }

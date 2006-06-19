@@ -23,6 +23,7 @@
 package org.eclipse.ptp.debug.core;
 
 import java.util.Observer;
+
 import org.eclipse.cdt.core.IBinaryParser.IBinaryObject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -67,7 +68,8 @@ public interface IAbstractDebugger extends IDebugger {
 	public void handleSuspendEvent(BitList tasks, IPCDILocator locator, int thread_id);
 	public void handleProcessSignaledEvent(BitList tasks, IPCDILocator locator, int thread_id);
 	public void handleProcessResumedEvent(BitList tasks, int type);
-	public void handleProcessTerminatedEvent(BitList tasks);
+	public void handleProcessTerminatedEvent(BitList tasks, int exitStatus);
+	public void handleProcessTerminatedEvent(BitList tasks, String signalName, String signalMeaning);
 	public void handleErrorEvent(BitList tasks, String errMsg, int errCode);
 	
 	/* others */

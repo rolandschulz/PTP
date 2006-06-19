@@ -104,6 +104,7 @@ import org.eclipse.ptp.debug.core.cdi.event.IPCDISuspendedEvent;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIBreakpoint;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDILocation;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIObject;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDISignal;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITargetConfiguration;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIThread;
@@ -512,6 +513,9 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPCDIE
 				} else if (event instanceof IPCDIChangedEvent) {
 					if (source instanceof IPCDITarget) {
 						handleChangedEvent((IPCDIChangedEvent) event, source);
+					}
+					if (source instanceof IPCDISignal) {
+						getSignalManager().signalChanged((IPCDISignal)source);
 					}
 				} else if (event instanceof IPCDIRestartedEvent) {
 					if (source instanceof IPCDITarget) {

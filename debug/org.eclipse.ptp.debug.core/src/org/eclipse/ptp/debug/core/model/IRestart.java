@@ -16,31 +16,24 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.external.core.cdi.event;
+package org.eclipse.ptp.debug.core.model;
 
-import org.eclipse.ptp.core.util.BitList;
-import org.eclipse.ptp.debug.core.cdi.IPCDISession;
-import org.eclipse.ptp.debug.core.cdi.event.IPCDISignalChangedEvent;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIObject;
+import org.eclipse.debug.core.DebugException;
 
 /**
  * @author Clement chu
- * 
  */
-public class SignalChangedEvent extends ChangedEvent implements IPCDISignalChangedEvent {
-	String name;
-	
-	/** 
-	 * @param session
-	 * @param tasks
-	 * @param source IPCDISignal
-	 * @param name
+public interface IRestart {
+	/**
+	 * Returns whether this element can currently be restarted.
+	 *
+	 * @return whether this element can currently be restarted
 	 */
-	public SignalChangedEvent(IPCDISession session, BitList tasks, IPCDIObject source, String name) {
-		super(session, tasks, source);
-		this.name = name;
-	}
-	public String getName() {
-		return name;
-	}
+	public boolean canRestart();
+	/**
+	 * Causes this element to restart its execution.
+	 *
+	 * @exception DebugException on failure. Reasons include:
+	 */
+	public void restart() throws DebugException;
 }

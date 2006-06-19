@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.cdi;
 
+import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEventListener;
 
 /**
@@ -33,4 +34,9 @@ public interface IPCDIEventManager extends IPCDISessionObject {
 	 * @param listener
 	 */
 	void removeEventListener(IPCDIEventListener listener);
+	
+	/** Fire events
+	 * @param cdiEvents
+	 */
+	void fireEvents(IPCDIEvent[] cdiEvents);
 }

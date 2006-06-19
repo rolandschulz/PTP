@@ -354,7 +354,54 @@
             objectClass="org.eclipse.ptp.debug.core.model.IResumeWithoutSignal"
             id="org.eclipse.ptp.debug.ui.DebugTargetActions">
       </objectContribution>
-      <!-- signal end -->      
+      <!-- signal end -->
+
+      <!-- debug view start -->
+      <viewerContribution
+            targetID="org.eclipse.debug.ui.DebugView"
+            id="org.eclipse.cdt.debug.ui.debugview.popupMenu">
+         <action
+               label="%RestartAction.label"
+               icon="icons/tool/restart_normal.gif"
+               helpContextId="restart_action_context"
+               class="org.eclipse.ptp.debug.internal.ui.actions.RestartActionDelegate"
+               menubarPath="stepGroup"
+               enablesFor="1"
+               id="org.eclipse.ptp.debug.internal.ui.actions.RestartActionDelegate">
+            <selection class="org.eclipse.ptp.debug.core.model.IRestart"/>
+         </action>
+         <action
+               state="false"
+               style="toggle"
+               id="org.eclipse.ptp.debug.internal.ui.actions.ToggleInstructionStepModeActionDelegate"
+               class="org.eclipse.ptp.debug.internal.ui.actions.ToggleInstructionStepModeActionDelegate"
+               enablesFor="1"
+               icon="icons/tool/stepinto_normal.gif"
+               helpContextId="toggle_instruction_step_mode_action_context"
+               label="%ToggleInstructionStepModeAction.label"
+               menubarPath="renderGroup"
+               tooltip="%ToggleInstructionStepModeAction.tooltip">
+            <enablement>
+               <pluginState
+                     value="activated"
+                     id="org.eclipse.ptp.debug.ui">
+               </pluginState>
+            </enablement>
+         </action>
+         <action
+               helpContextId="signal_zero_action_context"
+               enablesFor="1"
+               label="%SignalZeroAction.label"
+               tooltip="%SignalZeroAction.tooltip"
+               icon="icons/elcl16/signal0_co_normal.gif"
+               class="org.eclipse.ptp.debug.internal.ui.actions.SignalZeroWorkbenchActionDelegate"
+               menubarPath="threadGroup"
+               id="org.eclipse.ptp.debug.internal.ui.actions.SignalZeroWorkbenchActionDelegate">
+            <selection class="org.eclipse.ptp.debug.core.model.IResumeWithoutSignal"/>
+         </action>
+      </viewerContribution>
+      <!-- debug view end -->
+
    </extension>
 
   <!-- variable toolbar start //-->
@@ -432,7 +479,12 @@
             name="%FilteringBreakpointPage.label"
             id="org.eclipse.ptp.debug.ui.propertypages.breakpoint.filtering"/>
        //-->
-   </extension>    
+      <page
+            objectClass="org.eclipse.ptp.debug.core.model.IPSignal"
+            class="org.eclipse.ptp.debug.internal.ui.propertypages.SignalPropertyPage"
+            name="%CommonSignalPage.label"
+            id="org.eclipse.ptp.debug.ui.propertypages.signal.common"/>
+   </extension>
 
    <extension
          point="org.eclipse.cdt.ui.textHovers">
@@ -466,7 +518,7 @@
       </renderingBindings>
    </extension>
 
-	<!-- Extension //-->
+   <!-- Extension //-->
    <extension
          point="org.eclipse.ui.perspectiveExtensions">
       <perspectiveExtension
@@ -484,6 +536,69 @@
                id="org.eclipse.debug.ui.MemoryView">
          </viewShortcut>
       </perspectiveExtension>
+   </extension>
+
+   <!-- Action sets //-->
+   <extension
+         point="org.eclipse.ui.actionSets">
+      <actionSet
+            label="%DebugActionSet.label"
+            id="org.eclipse.ptp.debug.ui.debugActionSet">
+         <menu
+               label="%RunMenu.label"
+               path="additions"
+               id="org.eclipse.ui.run">
+         </menu>
+         <action
+               id="org.eclipse.ptp.debug.ui.actions.ResumeAtLine"
+              class="org.eclipse.ptp.debug.internal.ui.actions.RetargetResumeAtLineAction"
+               disabledIcon="icons/tool/jump_co_disable.gif"
+               enablesFor="1"
+               icon="icons/tool/jump_co_normal.gif"
+               helpContextId="jump_to_line_action_context"
+               label="%GlobalJumpToLineAction.label"
+               menubarPath="org.eclipse.ui.run/stepGroup">
+            <enablement>
+               <pluginState
+                     value="activated"
+                     id="org.eclipse.ptp.debug.ui">
+               </pluginState>
+            </enablement>
+         </action>
+         <action
+               id="org.eclipse.ptp.debug.internal.ui.actions.SignalZeroWorkbenchActionDelegate"
+               class="org.eclipse.ptp.debug.internal.ui.actions.SignalZeroWorkbenchActionDelegate"
+               disabledIcon="icons/tool/signal0_co_disable.gif"
+               enablesFor="1"
+               icon="icons/tool/signal0_co_normal.gif"
+               helpContextId="resume_without_signal_action_context"
+               label="%SignalZeroAction.label"
+               menubarPath="org.eclipse.ui.run/stepGroup"
+               tooltip="%SignalZeroAction.tooltip">
+            <enablement>
+               <pluginState
+                     value="activated"
+                     id="org.eclipse.ptp.debug.ui">
+               </pluginState>
+            </enablement>
+         </action>
+         <action
+               id="org.eclipse.ptp.debug.ui.internal.actions.RestartActionDelegate"
+               class="org.eclipse.ptp.debug.internal.ui.actions.RestartActionDelegate"
+               disabledIcon="icons/tool/restart_disable.gif"
+               enablesFor="1"
+               icon="icons/tool/restart_normal.gif"
+               helpContextId="restart_action_context"
+               label="%RestartAction.label"
+               menubarPath="org.eclipse.ui.run/stepGroup">
+            <enablement>
+               <pluginState
+                     value="activated"
+                     id="org.eclipse.ptp.debug.ui">
+               </pluginState>
+            </enablement>
+         </action>
+      </actionSet>
    </extension>
 
 </plugin>

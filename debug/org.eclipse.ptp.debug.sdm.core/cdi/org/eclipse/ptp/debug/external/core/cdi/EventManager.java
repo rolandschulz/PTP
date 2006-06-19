@@ -67,9 +67,9 @@ public class EventManager extends SessionObject implements IPCDIEventManager, Ob
 		else if (event instanceof IPCDICreatedEvent) {
 		}
 		else if (event instanceof IPCDIChangedEvent) {
+			/*
 			if (event instanceof IPCDIMemoryChangedEvent) {
-				// We need to fire an event for all the register blocks
-				// that may contain the modified addresses.
+				// We need to fire an event for all the register blocks that may contain the modified addresses.
 				System.err.println("******* GOT IPCDIMemoryChangedEvent");
 				MemoryManager mgr = session.getMemoryManager();
 				try {
@@ -93,6 +93,8 @@ public class EventManager extends SessionObject implements IPCDIEventManager, Ob
 					
 				}
 			}
+			*/
+			/*
 			else if (event instanceof IPCDISignalChangedEvent) {
 				System.err.println("******* GOT IPCDISignalChangedEvent");
 				SignalChangedEvent sigEvent = (SignalChangedEvent)event;
@@ -110,6 +112,7 @@ public class EventManager extends SessionObject implements IPCDIEventManager, Ob
 					cdiList.add(new ChangedEvent(session, event.getAllProcesses(), signal));
 				}
 			}
+			*/
 		}
 		cdiList.add(event);
 		

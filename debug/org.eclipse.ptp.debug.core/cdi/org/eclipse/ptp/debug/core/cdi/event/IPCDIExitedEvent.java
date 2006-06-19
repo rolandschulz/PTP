@@ -25,6 +25,19 @@ import org.eclipse.ptp.debug.core.cdi.IPCDISessionObject;
  *
  */
 public interface IPCDIExitedEvent extends IPCDIDestroyedEvent {
+	/** Get signal name
+	 * @return signal name
+	 */
+	public String getSignalName();
+	/** Get signal meaning
+	 * @return signal meaning
+	 */
+	public String getSignalMeaning();
+	/** Get exit status
+	 * @return exit status
+	 */
+	public int getExitStatus();
+
 	/** Get pcid session object
 	 * @return
 	 */

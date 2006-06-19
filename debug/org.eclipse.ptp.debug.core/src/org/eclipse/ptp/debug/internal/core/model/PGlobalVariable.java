@@ -253,7 +253,7 @@ public class PGlobalVariable extends PVariable implements IPGlobalVariable {
 		for (int i = 0; i < events.length; i++) {
 			IPCDIEvent event = events[i];
 			if (event instanceof IPCDIResumedEvent) {
-				IPCDIObject source = event.getSource();
+				IPCDIObject source = event.getSource(getCDITarget().getTargetID());
 				if (source != null) {
 					IPCDITarget cdiTarget = source.getTarget();
 					if (getCDITarget().equals(cdiTarget)) {

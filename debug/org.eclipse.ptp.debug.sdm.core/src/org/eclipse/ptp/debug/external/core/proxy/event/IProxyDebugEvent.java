@@ -39,12 +39,13 @@ public interface IProxyDebugEvent extends IProxyEvent {
 	public static final int EVENT_DBG_OK = DBG_EVENT_OFFSET + 11;
 	public static final int EVENT_DBG_ERROR = DBG_EVENT_OFFSET + 12;
 	public static final int EVENT_DBG_SUSPEND = DBG_EVENT_OFFSET + 13;
-	public static final int EVENT_DBG_THREADS	= DBG_EVENT_OFFSET + 14; //clement added
-	public static final int EVENT_DBG_THREAD_SELECT = DBG_EVENT_OFFSET + 15; //clement added
-	public static final int EVENT_DBG_STACK_INFO_DEPTH = DBG_EVENT_OFFSET + 16; //clement added
-	public static final int EVENT_DBG_DATA_READ_MEMORY = DBG_EVENT_OFFSET + 17; //clement added
-	public static final int EVENT_DBG_DATA_WRITE_MEMORY = DBG_EVENT_OFFSET + 18; //clement added
-	public static final int EVENT_DBG_SIGNALS = DBG_EVENT_OFFSET + 19; //clement added
+	public static final int EVENT_DBG_THREADS	= DBG_EVENT_OFFSET + 14;
+	public static final int EVENT_DBG_THREAD_SELECT = DBG_EVENT_OFFSET + 15;
+	public static final int EVENT_DBG_STACK_INFO_DEPTH = DBG_EVENT_OFFSET + 16;
+	public static final int EVENT_DBG_DATA_READ_MEMORY = DBG_EVENT_OFFSET + 17;
+	public static final int EVENT_DBG_DATA_WRITE_MEMORY = DBG_EVENT_OFFSET + 18;
+	public static final int EVENT_DBG_SIGNALS = DBG_EVENT_OFFSET + 19;
+	public static final int EVENT_DBG_EXIT_SIGNAL = DBG_EVENT_OFFSET + 20;
 		
 	public BitList getBitSet();
 }
