@@ -3,12 +3,10 @@ package org.eclipse.photran.cdtinterface.core;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.core.dom.ICodeReaderFactory;
 import org.eclipse.cdt.core.dom.ast.ASTCompletionNode;
 import org.eclipse.cdt.core.dom.ast.IASTName;
 import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit;
-import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.cdt.core.model.IContributedModelBuilder;
 import org.eclipse.cdt.core.model.ILanguage;
 import org.eclipse.cdt.core.model.ITranslationUnit;
@@ -16,11 +14,8 @@ import org.eclipse.cdt.core.model.IWorkingCopy;
 import org.eclipse.cdt.internal.core.pdom.PDOM;
 import org.eclipse.cdt.internal.core.pdom.dom.IPDOMLinkageFactory;
 import org.eclipse.cdt.internal.core.pdom.dom.PDOMLinkage;
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.PlatformObject;
-import org.eclipse.photran.cdtinterface.core.pdom.FortranIASTTranslationUnitAdapter;
-import org.eclipse.photran.cdtinterface.core.pdom.PDOMFortranLinkage;
 import org.eclipse.photran.core.FortranCorePlugin;
 import org.eclipse.photran.internal.core.model.FortranModelBuilder;
 
