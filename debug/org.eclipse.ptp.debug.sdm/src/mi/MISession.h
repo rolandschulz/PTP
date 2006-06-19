@@ -65,5 +65,5 @@ extern int MISessionCommandCompleted(MISession *sess);
 extern void MISessionProcessCommandsAndResponses(MISession *sess, fd_set *rfds, fd_set *wfds);
 extern void MISessionGetFds(MISession *sess, int *nfds, fd_set *rfds, fd_set *wfds, fd_set *efds);
 extern int MISessionProgress(MISession *sess);
+extern void ProcessMIOOBRecord(MISession *sess, MIResultRecord *);
 #endif /* _MISESSION_H_ */
-

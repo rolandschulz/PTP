@@ -48,7 +48,7 @@ int 	DbgQuit(session *);
 /*
  * Breakpoint operations
  */
-int DbgSetLineBreakpoint(session *s, bitset *set, int bpid, char *file, int line);
+int		DbgSetLineBreakpoint(session *s, bitset *set, int bpid, char *file, int line);
 int 	DbgSetFuncBreakpoint(session *s, bitset *set, int bpid, char *file, char *func);
 int 	DbgDeleteBreakpoint(session *s, bitset *set, int bpid);
 
@@ -90,12 +90,6 @@ int DbgStackInfoDepth(session *s, bitset *set);
 int 	DbgDataReadMemory(session *s, bitset *set, long, char*, char*, int, int, int, char*);
 int 	DbgDataWriteMemory(session *s, bitset *set, long, char*, char*, int, char*);
 
-/**
- * Signal operations
- */
-int 	DbgListSignals(session *s, bitset *set, char*);
-int 	DbgSignalInfo(session *s, bitset *set, char*);
- 
 /*
  * Event Handling
  */
@@ -113,4 +107,15 @@ void	DbgSetError(int, char *);
 int		DbgGetError(void);
 char *	DbgGetErrorStr(void);
 
+/*
+ * CLI Handling
+ */
+int 	DbgCLIHandle(session *s, bitset *set, char*);
+
+/*
+ * Signal operations
+ */
+int 	DbgListSignals(session *s, bitset *set, char*);
+int 	DbgSignalInfo(session *s, bitset *set, char*);
+ 
 #endif /* _DBG_H_ */

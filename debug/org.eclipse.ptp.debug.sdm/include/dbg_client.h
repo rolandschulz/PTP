@@ -72,28 +72,18 @@ int 	DbgClntListArguments(char **);
 int 	DbgClntListGlobalVariables(char **);
 
 /**
- * clement added
  * Thread operations
  */
 int 	DbgClntListInfoThreads(char **);
 int 	DbgClntSetThreadSelect(char **);
 
-//clement added
 int 	DbgClntStackInfoDepth(char **);
 
 /**
- * clement added
  * Thread operations
  */
 int 	DbgClntDataReadMemory(char **);
 int 	DbgClntDataWriteMemory(char **);
-
-/**
- * clement added
- * Signal operations
- */
-int 	DbgClntListSignals(char **);
-int 	DbgClntSignalInfo(char **);
 
 /*
  * Event Handling
@@ -111,5 +101,16 @@ void 	DbgClntRegisterEventHandler(void (*)(dbg_event *, void *), void *);
 void	DbgClntSetError(int, char *);
 int		DbgClntGetError(void);
 char *	DbgClntGetErrorStr(void);
+
+/*
+ * CLI Handling
+ */
+int		DbgClntCLIHandle(char **);
+
+/**
+ * Signal operations
+ */
+int 	DbgClntListSignals(char **);
+int 	DbgClntSignalInfo(char **);
 
 #endif /* _DBG_CLIENT_H_ */

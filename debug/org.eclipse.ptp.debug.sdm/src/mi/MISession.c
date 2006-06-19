@@ -37,16 +37,15 @@
 #include "MIResult.h"
 
 static List *			MISessionList = NULL;
-static struct timeval		MISessionDefaultSelectTimeout = {0, 1000};
+static struct timeval	MISessionDefaultSelectTimeout = {0, 1000};
 
-static void DoRRCallbacks(MISession *sess, MIResultRecord *rr);
 static void DoOOBAsyncCallbacks(MISession *sess, List *oobs);
 static void DoOOBStreamCallbacks(MISession *sess, List *oobs);
 static void HandleChild(int sig);
 static int WriteCommand(int fd, char *cmd);
 static char *ReadResponse(int fd);
 
-//#define DEBUG
+#define DEBUG
 
 MISession *
 MISessionNew(void)
@@ -411,12 +410,10 @@ MISessionProcessCommandsAndResponses(MISession *sess, fd_set *rfds, fd_set *wfds
 		}
 
 		if (output->rr != NULL && sess->command != NULL) {
-			DoRRCallbacks(sess, output->rr);
-			
 			sess->command->completed = 1;
 			sess->command->output = output;
 			if (sess->command->callback != NULL)
-				sess->command->callback(output->rr);
+				sess->command->callback(sess, output->rr);
 		} else {
 			MIOutputFree(output);
 		}
@@ -438,12 +435,12 @@ MISessionCommandCompleted(MISession *sess)
  * This will happen when CLI-Command is use, for example
  * doing "run" will block and return a breakpointhit
  */
-static void 
-DoRRCallbacks(MISession *sess, MIResultRecord *rr)
+void 
+ProcessMIOOBRecord(MISession *sess, MIResultRecord *rr)
 {
 	MIResult *res;
 	MIValue *val;
-	
+
 	if (rr->resultClass == MIResultRecordDONE) {
 		for (SetList(rr->results); (res = (MIResult *)GetListElement(rr->results)); ) {
 			if (strcmp(res->variable, "reason") == 0) {

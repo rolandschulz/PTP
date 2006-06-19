@@ -31,7 +31,7 @@ struct MICommand {
 	int				completed;						/* command has been completed */
 	int				expected_class;
 	MIOutput *		output;							/* result from completed command */
-	void			(*callback)(MIResultRecord *);	/* command completed callback */
+	void			(*callback)(void *, MIResultRecord *);	/* command completed callback */
 };
 typedef struct MICommand	MICommand;
 
@@ -41,7 +41,7 @@ extern void MICommandAddOption(MICommand *cmd, char *opt, char *arg);
 extern int MICommandCompleted(MICommand *cmd);
 extern int MICommandResultOK(MICommand *cmd);
 extern MIResultRecord *MICommandResult(MICommand *cmd);
-extern void MICommandRegisterCallback(MICommand *cmd, void (*callback)(MIResultRecord *));
+extern void MICommandRegisterCallback(MICommand *cmd, void (*callback)(void *, MIResultRecord *));
 extern char *MICommandToString(MICommand *cmd);
 
 /*

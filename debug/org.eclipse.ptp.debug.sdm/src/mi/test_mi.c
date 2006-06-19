@@ -10,7 +10,7 @@
 #include "MIBreakpoint.h"
 
 void
-cmd_callback(MIResultRecord *rr)
+cmd_callback(void *sess, MIResultRecord *rr)
 {
 	MIString *str = MIResultRecordToString(rr);
 	printf("res> %s\n", MIStringToCString(str));
