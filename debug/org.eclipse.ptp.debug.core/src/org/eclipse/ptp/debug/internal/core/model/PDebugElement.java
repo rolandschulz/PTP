@@ -29,6 +29,7 @@
 package org.eclipse.ptp.debug.internal.core.model;
 
 import java.text.MessageFormat;
+
 import org.eclipse.cdt.debug.core.CDebugUtils;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.PlatformObject;
@@ -39,6 +40,7 @@ import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IDebugElement;
 import org.eclipse.debug.core.model.IDebugTarget;
+import org.eclipse.ptp.debug.core.IPDebugConstants;
 import org.eclipse.ptp.debug.core.PCDIDebugModel;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
@@ -47,7 +49,6 @@ import org.eclipse.ptp.debug.core.model.IPDebugElement;
 import org.eclipse.ptp.debug.core.model.IPDebugElementStatus;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
 import org.eclipse.ptp.debug.core.model.PDebugElementState;
-import org.eclipse.ptp.debug.internal.core.IPDebugInternalConstants;
 
 public abstract class PDebugElement extends PlatformObject implements IPDebugElement, IPDebugElementStatus {
 	private PDebugTarget fDebugTarget;
@@ -139,7 +140,7 @@ public abstract class PDebugElement extends PlatformObject implements IPDebugEle
 		throw new DebugException(new Status(IStatus.ERROR, PCDIDebugModel.getPluginIdentifier(), code, message, exception));
 	}
 	protected void infoMessage(Throwable e) {
-		IStatus newStatus = new Status(IStatus.INFO, PCDIDebugModel.getPluginIdentifier(), IPDebugInternalConstants.STATUS_CODE_INFO, e.getMessage(), null);
+		IStatus newStatus = new Status(IStatus.INFO, PCDIDebugModel.getPluginIdentifier(), IPDebugConstants.STATUS_CODE_INFO, e.getMessage(), null);
 		CDebugUtils.info(newStatus, getDebugTarget());
 	}
 	public Object getAdapter(Class adapter) {

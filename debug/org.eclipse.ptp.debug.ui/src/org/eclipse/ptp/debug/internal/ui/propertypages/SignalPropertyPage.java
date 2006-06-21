@@ -26,10 +26,10 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.ptp.debug.core.IPDebugConstants;
 import org.eclipse.ptp.debug.core.PCDIDebugModel;
 import org.eclipse.ptp.debug.core.PDebugUtils;
 import org.eclipse.ptp.debug.core.model.IPSignal;
-import org.eclipse.ptp.debug.internal.core.IPDebugInternalConstants;
 import org.eclipse.ptp.debug.internal.ui.dialogfields.SelectionButtonDialogField;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
@@ -146,8 +146,8 @@ public class SignalPropertyPage extends PropertyPage {
 	}
 
 	protected void failed(String message, Throwable e) {
-		MultiStatus ms = new MultiStatus(PCDIDebugModel.getPluginIdentifier(), IPDebugInternalConstants.STATUS_CODE_ERROR, message, null);
-		ms.add(new Status(IStatus.ERROR, PCDIDebugModel.getPluginIdentifier(), IPDebugInternalConstants.STATUS_CODE_ERROR, e.getMessage(), null));
+		MultiStatus ms = new MultiStatus(PCDIDebugModel.getPluginIdentifier(), IPDebugConstants.STATUS_CODE_ERROR, message, null);
+		ms.add(new Status(IStatus.ERROR, PCDIDebugModel.getPluginIdentifier(), IPDebugConstants.STATUS_CODE_ERROR, e.getMessage(), null));
 		PDebugUtils.error(ms, getSignal());
 	}
 }

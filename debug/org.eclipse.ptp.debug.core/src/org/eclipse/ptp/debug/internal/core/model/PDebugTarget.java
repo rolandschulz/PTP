@@ -75,6 +75,7 @@ import org.eclipse.debug.core.sourcelookup.ISourceLookupParticipant;
 import org.eclipse.debug.core.sourcelookup.containers.FolderSourceContainer;
 import org.eclipse.debug.core.sourcelookup.containers.ProjectSourceContainer;
 import org.eclipse.ptp.core.IPProcess;
+import org.eclipse.ptp.debug.core.IPDebugConstants;
 import org.eclipse.ptp.debug.core.PDebugUtils;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.cdi.IPCDIAddressLocation;
@@ -124,7 +125,6 @@ import org.eclipse.ptp.debug.core.model.PDebugElementState;
 import org.eclipse.ptp.debug.core.sourcelookup.IPSourceLocator;
 import org.eclipse.ptp.debug.core.sourcelookup.ISourceLookupChangeListener;
 import org.eclipse.ptp.debug.core.sourcelookup.PDirectorySourceContainer;
-import org.eclipse.ptp.debug.internal.core.IPDebugInternalConstants;
 import org.eclipse.ptp.debug.internal.core.PGlobalVariableManager;
 import org.eclipse.ptp.debug.internal.core.PSignalManager;
 import org.eclipse.ptp.debug.internal.core.PTPMemoryBlockRetrievalExtension;
@@ -697,14 +697,14 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPCDIE
 	private void handleErrorInfo(IPCDIErrorInfo info) {
 		setStatus(IPDebugElementStatus.ERROR, (info != null) ? info.getMessage() : null);
 		if (info != null) {
-			MultiStatus status = new MultiStatus(PTPDebugCorePlugin.getUniqueIdentifier(), IPDebugInternalConstants.STATUS_CODE_ERROR, CoreModelMessages.getString("CDebugTarget.1"), null);
+			MultiStatus status = new MultiStatus(PTPDebugCorePlugin.getUniqueIdentifier(), IPDebugConstants.STATUS_CODE_ERROR, CoreModelMessages.getString("PDebugTarget.1"), null);
 			StringTokenizer st = new StringTokenizer(info.getDetailMessage(), "\n\r");
 			while (st.hasMoreTokens()) {
 				String token = st.nextToken();
 				if (token.length() > 200) {
 					token = token.substring(0, 200);
 				}
-				status.add(new Status(IStatus.ERROR, status.getPlugin(), IPDebugInternalConstants.STATUS_CODE_ERROR, token, null));
+				status.add(new Status(IStatus.ERROR, status.getPlugin(), IPDebugConstants.STATUS_CODE_ERROR, token, null));
 			}
 			PDebugUtils.error(status, this);
 		}
