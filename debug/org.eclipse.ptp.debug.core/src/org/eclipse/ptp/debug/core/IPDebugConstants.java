@@ -32,7 +32,18 @@ package org.eclipse.ptp.debug.core;
  * Constant definitions for PTP debug plug-in.
  */
 public interface IPDebugConstants {
+	/**
+	 * Status handler codes.
+	 */
+	public static final int STATUS_CODE_QUESTION = 10000;
+	public static final int STATUS_CODE_INFO = 10001;
+	public static final int STATUS_CODE_ERROR = 10002;
 
+	/**
+	 * String preference for the common source containers.
+	 */
+	public static final String PREF_COMMON_SOURCE_CONTAINERS = PTPDebugCorePlugin.getUniqueIdentifier() + ".cDebug.common_source_containers";
+	
 	/**
 	 * C/C++ debug plug-in identifier (value
 	 * <code>"org.eclipse.ptp.debug.core"</code>).

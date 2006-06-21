@@ -27,6 +27,7 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
+
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -39,7 +40,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.ptp.debug.core.model.IPVariableManager;
 import org.eclipse.ptp.debug.core.sourcelookup.IPSourceLocation;
-import org.eclipse.ptp.debug.internal.core.IPDebugInternalConstants;
 import org.eclipse.ptp.debug.internal.core.PDebugConfiguration;
 import org.eclipse.ptp.debug.internal.core.PVariableManager;
 import org.eclipse.ptp.debug.internal.core.sourcelookup.CommonSourceLookupDirector;
@@ -182,7 +182,7 @@ public class PTPDebugCorePlugin extends Plugin {
 	private void initializeCommonSourceLookupDirector() {
 		if (fCommonSourceLookupDirector == null) {
 			fCommonSourceLookupDirector = new CommonSourceLookupDirector();
-			String newMemento = PTPDebugCorePlugin.getDefault().getPluginPreferences().getString(IPDebugInternalConstants.PREF_COMMON_SOURCE_CONTAINERS);
+			String newMemento = PTPDebugCorePlugin.getDefault().getPluginPreferences().getString(IPDebugConstants.PREF_COMMON_SOURCE_CONTAINERS);
 			if (newMemento.length() == 0) {
 				// Convert source locations to source containers
 				convertSourceLocations(fCommonSourceLookupDirector);

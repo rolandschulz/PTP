@@ -20,14 +20,14 @@ package org.eclipse.ptp.debug.internal.core.sourcelookup;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.sourcelookup.ISourceContainer;
+import org.eclipse.ptp.debug.core.IPDebugConstants;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
-import org.eclipse.ptp.debug.internal.core.IPDebugInternalConstants;
 
 public class CommonSourceLookupDirector extends PSourceLookupDirector {
 	public void setSourceContainers(ISourceContainer[] containers) {
 		try {
 			super.setSourceContainers(containers);
-			PTPDebugCorePlugin.getDefault().getPluginPreferences().setValue(IPDebugInternalConstants.PREF_COMMON_SOURCE_CONTAINERS, getMemento());
+			PTPDebugCorePlugin.getDefault().getPluginPreferences().setValue(IPDebugConstants.PREF_COMMON_SOURCE_CONTAINERS, getMemento());
 			PTPDebugCorePlugin.getDefault().savePluginPreferences();
 		} catch (CoreException e) {
 			PTPDebugCorePlugin.log(e.getStatus());
