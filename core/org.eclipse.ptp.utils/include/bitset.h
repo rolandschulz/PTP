@@ -21,7 +21,7 @@
 #define _BITSET_H_
 
 #define BIT_INDEX(bit)		((bit) >> 3) / (sizeof(bits))
-#define BIT_IN_OBJ(bit)		((bit) - ((BIT_INDEX((bit)) * sizeof(bits)) << 3))
+#define BIT_IN_OBJ(bit)		((bit) % (sizeof(bits) << 3))
 #define SIZE_TO_BYTES(size)	(sizeof(bits) * (size))
 
 /*
@@ -57,5 +57,6 @@ int			bitset_compare(bitset *b1, bitset *b2);		/* test if (b1 & b2) != 0 */
 char *		bitset_to_str(bitset *b);					/* convert b to a portable string representation */
 bitset *	str_to_bitset(char *str);					/* convert a portable string represetation to a bitset */
 int			bitset_count(bitset *b);					/* return the number of bits in the set */
+int			bitset_size(bitset *b);						/* number of bits this bitset can represent */
 char *		bitset_to_set(bitset *b);					/* convert b to set notation */
 #endif /*_BITSET_H_*/
