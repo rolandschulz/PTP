@@ -177,6 +177,11 @@ bitset_oreq(bitset *b1, bitset *b2)
 	
 	for (i = 0; i < MIN(b1->bs_size, b2->bs_size); i++)
 		b1->bs_bits[i] |= b2->bs_bits[i];
+		
+	/*
+	 * Mask out unused high bits
+	 */
+	b1->bs_bits[b1->bs_size-1] &= (1 << (BIT_IN_OBJ(b1->bs_nbits) + 1)) - 1;
 }
 
 /*
@@ -186,19 +191,14 @@ void
 bitset_invert(bitset *b)
 {
 	int		i;
-	bits	mask;
 	
 	for (i = 0; i < b->bs_size; i++)
 		b->bs_bits[i] = ~b->bs_bits[i];
 
 	/*
-	 * Fix unused high bits
+	 * Mask out unused high bits
 	 */
-	mask = 0;
-	for (i = 0; i <= BIT_IN_OBJ(b->bs_nbits-1); i++)
-		mask |= (1 << i);
-
-	b->bs_bits[b->bs_size-1] &= mask;	
+	b->bs_bits[b->bs_size-1] &= (1 << (BIT_IN_OBJ(b->bs_nbits) + 1)) - 1;	
 }
 
 /*
@@ -494,4 +494,13 @@ bitset_count(bitset *b)
 		count += count_bits(b->bs_bits[i]);
 	
 	return count;
+}
+
+/**
+ * Number of bits this set can represent
+ */
+int
+bitset_size(bitset *b)
+{
+	return b->bs_nbits;
 }
