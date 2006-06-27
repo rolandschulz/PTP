@@ -1,34 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.0"?>
-<plugin
-   id="org.eclipse.photran.cdtinterface"
-   name="Photran CDT Interface Plug-in"
-   version="3.0.0"
-   provider-name="University of Illinois at Urbana-Champaign and Los Alamos National Laboratory"
-   class="org.eclipse.photran.cdtinterface.CDTInterfacePlugin">
+<plugin>
 
-   <runtime>
-      <library name="fdtcdtinterface.jar">
-         <export name="*"/>
-      </library>
-   </runtime>
-
-   <requires>
-      <import plugin="org.eclipse.ui"/>
-      <import plugin="org.eclipse.core.runtime"/>
-      <import plugin="org.eclipse.jface"/>
-      <import plugin="org.eclipse.cdt.core"/>
-      <import plugin="org.eclipse.core.resources"/>
-      <import plugin="org.eclipse.photran.core"/>
-      <import plugin="org.eclipse.search"/>
-      <import plugin="org.eclipse.ui.console"/>
-      <import plugin="org.eclipse.cdt.ui"/>
-      <import plugin="org.eclipse.ui.ide"/>
-      <import plugin="org.eclipse.cdt.make.ui"/>
-      <import plugin="org.eclipse.cdt.managedbuilder.ui"/>
-   </requires>
-
-   <!--======================-->
+     <!--======================-->
    <!-- CDT Core Integration -->
    <!--======================-->
    <extension
