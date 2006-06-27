@@ -1,25 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.0"?>
-<plugin
-   id="org.eclipse.photran.core.intel"
-   name="%pluginName"
-   version="3.0.0"
-   provider-name="%providerName"
-   class="org.eclipse.photran.core.intel.IntelPlugin">
+<plugin>
 
-   <runtime>
-      <library name="photranIntel.jar">
-         <export name="*"/>
-      </library>
-   </runtime>
-
-   <requires>
-      <import plugin="org.eclipse.ui"/>
-      <import plugin="org.eclipse.core.runtime"/>
-      <import plugin="org.eclipse.core.resources"/>
-      <import plugin="org.eclipse.cdt.core"/>
-   </requires>
-   <extension
+     <extension
          id="IntelCompilerErrorParser"
          name="Photran Error Parser for Intel(R) Compilers"
          point="org.eclipse.cdt.core.ErrorParser">
