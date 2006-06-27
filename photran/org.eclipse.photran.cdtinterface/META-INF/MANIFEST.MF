@@ -1,0 +1,28 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Photran CDT Interface Plug-in
+Bundle-SymbolicName: org.eclipse.photran.cdtinterface; singleton:=true
+Bundle-Version: 3.1.0
+Bundle-ClassPath: cdtinterface.jar
+Bundle-Activator: org.eclipse.photran.cdtinterface.CDTInterfacePlugin
+Bundle-Vendor: University of Illinois at Urbana-Champaign and Los Alamos National Laboratory
+Bundle-Localization: plugin
+Export-Package: org.eclipse.photran.cdtinterface,
+ org.eclipse.photran.cdtinterface.core,
+ org.eclipse.photran.cdtinterface.core.pdom,
+ org.eclipse.photran.cdtinterface.ui,
+ org.eclipse.photran.internal.core.f95modelparser,
+ org.eclipse.photran.internal.core.model
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.jface,
+ org.eclipse.cdt.core,
+ org.eclipse.core.resources,
+ org.eclipse.photran.core,
+ org.eclipse.search,
+ org.eclipse.ui.console,
+ org.eclipse.cdt.ui,
+ org.eclipse.ui.ide,
+ org.eclipse.cdt.make.ui,
+ org.eclipse.cdt.managedbuilder.ui
+Eclipse-LazyStart: true
