@@ -1,0 +1,18 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: %pluginName
+Bundle-SymbolicName: org.eclipse.photran.managedbuilder.intel.ui; singleton:=true
+Bundle-Version: 3.1.0
+Bundle-ClassPath: intelui.jar
+Bundle-Activator: org.eclipse.photran.managedbuilder.intel.ui.IntelUiPlugin
+Bundle-Vendor: %providerName
+Bundle-Localization: plugin
+Export-Package: org.eclipse.photran.managedbuilder.intel.ui
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.photran.core.intel,
+ org.eclipse.cdt.managedbuilder.core,
+ org.eclipse.cdt.core,
+ org.eclipse.photran.core,
+ org.eclipse.photran.managedbuilder.core
+Eclipse-LazyStart: true

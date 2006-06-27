@@ -1,28 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.0"?>
-<plugin
-   id="org.eclipse.photran.managedbuilder.intel.ui"
-   name="%pluginName"
-   version="3.0.0"
-   provider-name="%providerName"
-   class="org.eclipse.photran.managedbuilder.intel.ui.IntelUiPlugin">
+<plugin>
 
-   <runtime>
-      <library name="intelui.jar">
-         <export name="*"/>
-      </library>
-   </runtime>
-
-   <requires>
-      <import plugin="org.eclipse.ui"/>
-      <import plugin="org.eclipse.core.runtime"/>
-      <import plugin="org.eclipse.photran.core.intel"/>
-      <import plugin="org.eclipse.cdt.managedbuilder.core"/>
-      <import plugin="org.eclipse.cdt.core"/>
-      <import plugin="org.eclipse.photran.core"/>
-      <import plugin="org.eclipse.photran.managedbuilder.core"/>
-   </requires>
-
+    
 <!-- Managed Make Builder Tool Specifications -->
    <extension
       id="cdt.managed.build.info"
