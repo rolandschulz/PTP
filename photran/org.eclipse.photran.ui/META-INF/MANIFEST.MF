@@ -1,0 +1,24 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Photran UI Plug-in
+Bundle-SymbolicName: org.eclipse.photran.ui; singleton:=true
+Bundle-Version: 3.1.0
+Bundle-ClassPath: photranui.jar
+Bundle-Activator: org.eclipse.photran.ui.FortranUIPlugin
+Bundle-Vendor: University of Illinois at Urbana-Champaign and Los Alamos National Laboratory
+Bundle-Localization: plugin
+Export-Package: org.eclipse.photran.internal.ui.actions,
+ org.eclipse.photran.internal.ui.editor,
+ org.eclipse.photran.internal.ui.preferences,
+ org.eclipse.photran.ui
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.jface.text,
+ org.eclipse.ui.editors,
+ org.eclipse.ui.workbench.texteditor,
+ org.eclipse.photran.core,
+ org.eclipse.cdt.core,
+ org.eclipse.cdt.ui,
+ org.eclipse.photran.cdtinterface,
+ org.eclipse.ui.views
+Eclipse-LazyStart: true
