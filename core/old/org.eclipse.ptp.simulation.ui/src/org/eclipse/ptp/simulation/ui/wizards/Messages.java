@@ -18,24 +18,22 @@
  *******************************************************************************/
 package org.eclipse.ptp.simulation.ui.wizards;
 
-import org.eclipse.ptp.rmsystem.SimulationResourceManagerFactory;
-import org.eclipse.ptp.ui.wizards.ConfigurationWizard;
-import org.eclipse.ptp.ui.wizards.ConfigurationWizardPage;
-import org.eclipse.ptp.ui.wizards.ConfigurationWizardPageFactory;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 
-public class SimulationConfigurationWizardPageFactory extends
-		ConfigurationWizardPageFactory {
+public class Messages {
+	private static final String BUNDLE_NAME = "org.eclipse.ptp.simulation.ui.wizards.messages"; //$NON-NLS-1$
 
-	public SimulationConfigurationWizardPageFactory() {
-		// no-op
+	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
+
+	private Messages() {
 	}
 
-	public ConfigurationWizardPage[] getPages(ConfigurationWizard wizard) {
-		return new ConfigurationWizardPage[]{new SimulationConfigurationWizardPage(wizard)};
+	public static String getString(String key) {
+		try {
+			return RESOURCE_BUNDLE.getString(key);
+		} catch (MissingResourceException e) {
+			return '!' + key + '!';
+		}
 	}
-
-	public Class getRMFactoryClass() {
-		return SimulationResourceManagerFactory.class;
-	}
-
 }

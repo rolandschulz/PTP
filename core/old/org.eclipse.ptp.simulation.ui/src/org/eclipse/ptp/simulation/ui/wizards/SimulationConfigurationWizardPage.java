@@ -45,9 +45,9 @@ public final class SimulationConfigurationWizardPage extends
 	private Text numNodesText;
 
 	public SimulationConfigurationWizardPage(ConfigurationWizard wizard) {
-		super(wizard, "Simulation Configuration Wizard Page");
-		setTitle("Simulation Configuration Wizard Page");
-		setDescription("Simulation Configuration Wizard Page");
+		super(wizard, Messages.getString("SimulationConfigurationWizardPage.name")); //$NON-NLS-1$
+		setTitle(Messages.getString("SimulationConfigurationWizardPage.title")); //$NON-NLS-1$
+		setDescription(Messages.getString("SimulationConfigurationWizardPage.description")); //$NON-NLS-1$
 	}
 
 	public void createControl(Composite parent) {
@@ -56,7 +56,7 @@ public final class SimulationConfigurationWizardPage extends
 		Composite container = new Composite(parent, SWT.NONE);
 		container.setLayout(new GridLayout(1, false));
 		Label label = new Label(container, SWT.NONE);
-		label.setText("Number of Machines:");
+		label.setText(Messages.getString("SimulationConfigurationWizardPage.NumberOfMachines")); //$NON-NLS-1$
 
 		final VerifyListener intTextVerifyListener = new VerifyListener() {
 			public void verifyText(VerifyEvent e) {
@@ -83,7 +83,7 @@ public final class SimulationConfigurationWizardPage extends
 			}});
 
 		final Label whichMachineLabel = new Label(container, SWT.NONE);
-		whichMachineLabel.setText("Set Number of Nodes for Which Machine:");
+		whichMachineLabel.setText(Messages.getString("SimulationConfigurationWizardPage.SetNumberOfNodesWhichMachine")); //$NON-NLS-1$
 
 		whichMachineCombo = new Combo(container, SWT.READ_ONLY);
 		whichMachineCombo.setLayoutData(new GridData(TEXT_WIDTH, SWT.DEFAULT));

@@ -8,7 +8,7 @@
             category="org.eclipse.ptp.ui.preferences.ptpPreferencesPage"
             class="org.eclipse.ptp.simulation.ui.preferences.SimulationPreferencePage"
             id="org.eclipse.ptp.simulation.ui.preferences.SimulationPreferencePage"
-            name="Simulation">
+            name="%SimulationPreferencePage.name">
       </page>
    </extension>
    <extension
