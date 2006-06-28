@@ -170,7 +170,7 @@ public class SimulationPreferencePage extends PreferencePage implements IWorkben
 		mcombo.addSelectionListener(listener);
 		
 		nodeLabel = new Label(bGroup, SWT.NONE);
-		nodeLabel.setText(CoreMessages.getResourceString("SimulationPreferencePage.NumNodesMachine_0")); //$NON-NLS-1$
+		nodeLabel.setText(CoreMessages.getResourceString("SimulationPreferencePage.NumNodesMachine#0")); //$NON-NLS-1$
 		nodeLabel.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
 		
 		nodeText = new Text(bGroup, SWT.BORDER | SWT.SINGLE);
@@ -234,7 +234,7 @@ public class SimulationPreferencePage extends PreferencePage implements IWorkben
 		mcombo.pack();
 		
 		sel = mcombo.getSelectionIndex();
-		nodeLabel.setText(CoreMessages.getResourceString("SimulationPreferencePage.NumNodesMachine")+(sel)+":"); //$NON-NLS-1$ //$NON-NLS-2$
+		nodeLabel.setText(CoreMessages.getResourceString("SimulationPreferencePage.NumNodesMachine#")+(sel)+":"); //$NON-NLS-1$ //$NON-NLS-2$
 		//nodeLabel.pack();
 		if(nodes != null)
 			nodeText.setText(""+nodes[sel]+""); //$NON-NLS-1$ //$NON-NLS-2$
