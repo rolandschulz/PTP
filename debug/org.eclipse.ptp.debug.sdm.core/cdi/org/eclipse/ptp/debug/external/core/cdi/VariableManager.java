@@ -185,7 +185,7 @@ public class VariableManager extends Manager {
 		ITypeAggregate aggrType = (ITypeAggregate)aggrValue.getType();
 		try {
 			int length = aggrValue.getChildrenNumber();
-			IPCDIVariable[] vars = new IPCDIVariable[length];			
+			IPCDIVariable[] vars = new IPCDIVariable[length];
 			for (int i=0; i<length; i++) {
 				IAIF newAIF = null;
 				IAIFValue aifValue = aggrValue.getValue(i);
@@ -219,6 +219,10 @@ public class VariableManager extends Manager {
 			IAIFValue aifValue = valuePointer.getValue();
 			if (aifValue instanceof IValueAggregate) {
 				return getVariables((IValueAggregate)aifValue, varDesc);
+			}
+			else {
+				AIF newAIF = new AIF(aifValue.getType(), aifValue);
+				return new IPCDIVariable[] { createVariable(createVariableDescriptor(varDesc, newAIF, "* " + varDesc.getName(), false)) };				
 			}
 		}
 		return new IPCDIVariable[0];

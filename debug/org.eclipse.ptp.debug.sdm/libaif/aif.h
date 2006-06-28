@@ -88,9 +88,10 @@ typedef double AIFDOUBLEST;
 #define AIF_RANGE		14
 #define AIF_ENUM		15
 #define AIF_BOOLEAN		16
-#define NUM_AIF_TYPES		17
+#define AIF_ADDRESS		17
+#define NUM_AIF_TYPES	18
 
-#define AIF_PTR_NIL		0
+#define AIF_PTR_NIL			0
 #define AIF_PTR_NORMAL		1
 #define AIF_PTR_NAME		2
 #define AIF_PTR_REFERENCE	3
@@ -223,22 +224,23 @@ typedef struct AIFFILE	AIFFILE;
 
 #include	"fds.h"
 
-#define AIF_ARRAY_TYPE(range, base)	TypeToFDS(AIF_ARRAY, (range), (base))
-#define AIF_BOOLEAN_TYPE()			TypeToFDS(AIF_BOOLEAN)
+#define AIF_ARRAY_TYPE(range, base)		TypeToFDS(AIF_ARRAY, (range), (base))
+#define AIF_BOOLEAN_TYPE()				TypeToFDS(AIF_BOOLEAN)
 #define AIF_CHARACTER_TYPE()			TypeToFDS(AIF_CHARACTER)
-#define AIF_ENUM_TYPE(sign)			TypeToFDS(AIF_ENUM, (sign))
-#define AIF_FLOATING_TYPE(len)		TypeToFDS(AIF_FLOATING, (len))
-#define AIF_FUNCTION_TYPE(base)		TypeToFDS(AIF_FUNCTION, (base))
-#define AIF_INTEGER_TYPE(sign, len)	TypeToFDS(AIF_INTEGER, (sign), (len))
+#define AIF_ENUM_TYPE(sign)				TypeToFDS(AIF_ENUM, (sign))
+#define AIF_FLOATING_TYPE(len)			TypeToFDS(AIF_FLOATING, (len))
+#define AIF_FUNCTION_TYPE(base)			TypeToFDS(AIF_FUNCTION, (base))
+#define AIF_INTEGER_TYPE(sign, len)		TypeToFDS(AIF_INTEGER, (sign), (len))
 #define AIF_NAME_TYPE(name, base)		TypeToFDS(AIF_NAME, (name), (base))
-#define AIF_POINTER_TYPE(base)		TypeToFDS(AIF_POINTER, (base))
+#define AIF_POINTER_TYPE(addr, base)	TypeToFDS(AIF_POINTER, (addr), (base))
 #define AIF_RANGE_TYPE(lo, hi, base)	TypeToFDS(AIF_RANGE, (lo), (hi), (base))
-#define AIF_REFERENCE_TYPE(ref)		TypeToFDS(AIF_REFERENCE, (ref))
-#define AIF_REGION_TYPE(name, base)	TypeToFDS(AIF_REGION, (name), (base))
+#define AIF_REFERENCE_TYPE(ref)			TypeToFDS(AIF_REFERENCE, (ref))
+#define AIF_REGION_TYPE(name, base)		TypeToFDS(AIF_REGION, (name), (base))
 #define AIF_STRING_TYPE()				TypeToFDS(AIF_STRING)
 #define AIF_STRUCT_TYPE()				TypeToFDS(AIF_STRUCT)
 #define AIF_UNION_TYPE()				TypeToFDS(AIF_UNION)
-#define AIF_VOID_TYPE(len)			TypeToFDS(AIF_VOID, (len))
+#define AIF_VOID_TYPE(len)				TypeToFDS(AIF_VOID, (len))
+#define AIF_ADDRESS_TYPE(len)			TypeToFDS(AIF_ADDRESS, (len))
 
 /*
  * AIF routines.
@@ -373,7 +375,7 @@ extern AIF *		NameAIF(AIF *, int);
 extern AIF *		NewAIF(int, int);
 extern AIF *		PointerNameToAIF(AIF *);
 extern AIF *		PointerReferenceToAIF(AIF *);
-extern AIF *		PointerToAIF(AIF *);
+extern AIF *		PointerToAIF(AIF *, AIF *);
 extern AIF *		ReferenceAIF(int); 
 extern AIF *		ShortToAIF(short);
 extern AIF *		StringToAIF(char *);
@@ -384,6 +386,7 @@ extern AIF *		UnsignedLongToAIF(unsigned long);
 extern AIF *		UnsignedLongLongToAIF(unsigned long long);
 #endif /* CC_HAS_LONG_LONG */
 extern AIF *		VoidToAIF(char *, int);
+extern AIF *		AddressToAIF(char *);
 
 #endif /* !_AIF_H */
 

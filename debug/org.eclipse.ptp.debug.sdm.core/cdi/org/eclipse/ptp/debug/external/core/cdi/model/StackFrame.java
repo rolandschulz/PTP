@@ -19,8 +19,8 @@
 package org.eclipse.ptp.debug.external.core.cdi.model;
 
 import java.math.BigInteger;
+
 import org.eclipse.ptp.core.util.BitList;
-import org.eclipse.ptp.debug.core.ExtFormat;
 import org.eclipse.ptp.debug.core.aif.AIFException;
 import org.eclipse.ptp.debug.core.aif.IAIFValue;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
@@ -49,12 +49,12 @@ public class StackFrame extends PObject implements IPCDIStackFrame {
 	IPCDILocalVariableDescriptor[] localDescs;
 	Locator fLocator;
 	int level = -1;
-	String addr = "";
+	BigInteger addr = BigInteger.ZERO;
 	String file = "";
 	int line = -1;
 	String func = "";
 
-	public StackFrame(Target target, int level, String file, String func, int line, String addr) {
+	public StackFrame(Target target, int level, String file, String func, int line, BigInteger addr) {
 		super(target);
 		this.level = level;
 		this.addr = addr;
@@ -122,10 +122,8 @@ public class StackFrame extends PObject implements IPCDIStackFrame {
 		return null;
 	}
 	public IPCDILocator getLocator() {
-		BigInteger bigAddr = BigInteger.ZERO;
 		if (fLocator == null) {
-			bigAddr = ExtFormat.getBigInteger(getAddress());
-			fLocator = new Locator(getFile(), getFunction(), getLine(), bigAddr);
+			fLocator = new Locator(getFile(), getFunction(), getLine(), addr);
 		}
 		return fLocator;
 		//return new Locator("", "", 0, bigAddr);
@@ -174,7 +172,7 @@ public class StackFrame extends PObject implements IPCDIStackFrame {
 	public int getLevel() {
 		return level;
 	}
-	public String getAddress() {
+	public BigInteger getAddress() {
 		return addr;
 	}
 	public String getFile() {

@@ -39,6 +39,7 @@
 #define FDS_REFERENCE_END			'/'
 #define FDS_REGION				'z'
 #define FDS_STRING				's'
+#define FDS_ADDRESS				'a'
 #define FDS_STRUCT_ACCESS_SEP		';'
 #define FDS_STRUCT_END			'}'
 #define FDS_STRUCT_FIELD_NAME_END	'='

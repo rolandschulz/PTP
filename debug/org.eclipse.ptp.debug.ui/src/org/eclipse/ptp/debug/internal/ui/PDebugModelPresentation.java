@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.cdt.core.IAddress;
-import org.eclipse.cdt.debug.core.model.IEnableDisableTarget;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
@@ -56,6 +55,7 @@ import org.eclipse.ptp.debug.core.cdi.IPCDISignalReceived;
 import org.eclipse.ptp.debug.core.cdi.IPCDIWatchpointScope;
 import org.eclipse.ptp.debug.core.cdi.IPCDIWatchpointTrigger;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDISignal;
+import org.eclipse.ptp.debug.core.model.IEnableDisableTarget;
 import org.eclipse.ptp.debug.core.model.IPAddressBreakpoint;
 import org.eclipse.ptp.debug.core.model.IPBreakpoint;
 import org.eclipse.ptp.debug.core.model.IPDebugElement;
@@ -64,6 +64,7 @@ import org.eclipse.ptp.debug.core.model.IPDebugTarget;
 import org.eclipse.ptp.debug.core.model.IPDummyStackFrame;
 import org.eclipse.ptp.debug.core.model.IPFunctionBreakpoint;
 import org.eclipse.ptp.debug.core.model.IPLineBreakpoint;
+import org.eclipse.ptp.debug.core.model.IPSignal;
 import org.eclipse.ptp.debug.core.model.IPStackFrame;
 import org.eclipse.ptp.debug.core.model.IPType;
 import org.eclipse.ptp.debug.core.model.IPValue;
@@ -215,8 +216,20 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		if (element instanceof IPBreakpoint) {
 			return getBreakpointImage((IPBreakpoint) element);
 		}
+		/*
+		 * TODO
+		if (element instanceof IPSignal) {
+			return getSignalImage((IPSignal)element);
+		}
+		*/
 		return super.getImage(element);
 	}
+	/*
+	 * TODO
+	protected Image getSignalImage(IPSignal signal) {
+		return PTPDebugUIPlugin.getImageDescriptorRegistry().get(PTPDebugImages.DESC_OBJS_SIGNAL);
+	}
+	*/	
 	/** Get breakpoint image
 	 * @param breakpoint
 	 * @return
@@ -272,7 +285,6 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 			baseText.append(getFormattedString(" <{0}>", ((IPDebugElementStatus) element).getMessage()));
 		}
 		if (element instanceof IAdaptable) {
-			// FIXME used IEnableDisableTarget - cdt
 			IEnableDisableTarget target = (IEnableDisableTarget) ((IAdaptable) element).getAdapter(IEnableDisableTarget.class);
 			if (target != null) {
 				if (!target.isEnabled()) {
@@ -334,10 +346,13 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		try {
 			/*
 			 * if (element instanceof ICModule) { label.append(getModuleText((ICModule)element, showQualified)); 
-			 * return label.toString(); } if (element instanceof ICSignal) {
-			 * label.append(getSignalText((ICSignal)element)); return label.toString(); } if (element instanceof IRegisterGroup) { label.append(((IRegisterGroup)element).getName()); return
-			 * label.toString(); } 
+			 * return label.toString(); }
+			 * if (element instanceof IRegisterGroup) { label.append(((IRegisterGroup)element).getName()); return label.toString(); } 
 			 */
+			if (element instanceof IPSignal) {
+				label.append(getSignalText((IPSignal)element)); 
+				return label.toString(); 
+			} 
 			if ( element instanceof IWatchExpression ) {
 				return getWatchExpressionText((IWatchExpression)element);
 			}
@@ -414,6 +429,16 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 	private Map getAttributes() {
 		return attributes;
 	}
+	protected String getSignalText(IPSignal signal) {
+		StringBuffer sb = new StringBuffer(PDebugUIMessages.getString("PTPDebugModelPresentation.signal"));
+		try {
+			String name = signal.getName();
+			sb.append( " \'" ).append( name ).append( '\'' );
+		}
+		catch( DebugException e ) {
+		}
+		return sb.toString();
+	}	
 	/** Get variable type name
 	 * @param type
 	 * @return

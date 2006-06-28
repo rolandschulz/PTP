@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.core.simulator2;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -325,7 +326,7 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 					IPCDITarget target = getSession().getTarget(taskArray[i]);
 					SimulateFrame[] frames = getSimProg(taskArray[i]).getSimStackFrames();
 				    for (int j=0; j<frames.length; j++) {
-				    	frameList.add(new StackFrame((Target)target, frames[j].getLevel(), frames[j].getFile(), frames[j].getFunc(), frames[j].getLine(), frames[j].getAddr()));
+				    	frameList.add(new StackFrame((Target)target, frames[j].getLevel(), frames[j].getFile(), frames[j].getFunc(), frames[j].getLine(), new BigInteger(frames[j].getAddr())));
 				    }
 				}
 				completeCommand(tasks, (IPCDIStackFrame[]) frameList.toArray(new IPCDIStackFrame[0]));
