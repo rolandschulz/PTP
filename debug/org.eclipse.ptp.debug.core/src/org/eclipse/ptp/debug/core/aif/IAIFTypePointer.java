@@ -21,5 +21,7 @@ package org.eclipse.ptp.debug.core.aif;
  * @author Clement chu
  * 
  */
-public interface IAIFTypePointer extends ITypeDerived {}
+public interface IAIFTypePointer extends ITypeDerived {
+	public IAIFTypeAddress getAddressType();
+}
 

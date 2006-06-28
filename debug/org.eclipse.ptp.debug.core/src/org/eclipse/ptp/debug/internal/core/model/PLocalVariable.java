@@ -192,8 +192,8 @@ public class PLocalVariable extends PVariable {
 							}
 						}
 					}
-					catch( PCDIException e ) {
-						requestFailed( e.getMessage(), e );
+					catch(PCDIException e) {
+						requestFailed(e.getMessage(), e);
 					}
 				}
 			}

@@ -16,10 +16,45 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.core.aif;
+package org.eclipse.ptp.debug.internal.core.aif;
+
+import java.math.BigInteger;
+import java.nio.ByteBuffer;
+
+import org.eclipse.ptp.debug.core.aif.AIFException;
+import org.eclipse.ptp.debug.core.aif.IAIFTypeAddress;
+import org.eclipse.ptp.debug.core.aif.IAIFValueAddress;
+
 /**
  * @author Clement chu
  * 
  */
-public interface IAIFValueString extends IAIFValue {}
+public class AIFValueAddress extends ValueIntegral implements IAIFValueAddress {
+	ByteBuffer byteBuffer;
 
+	public AIFValueAddress(IAIFTypeAddress type, byte[] data) {
+		super(type);
+		parse(data);
+	}
+	public String getValueString() throws AIFException {
+		if (result == null) {
+			result = "0x";
+			byte[] bytes = byteValue();
+			for (int i=0; i<bytes.length; i++) {
+				result += Integer.toHexString(0x0100 + (bytes[i] & 0x00FF)).substring(1);
+			}
+		}
+		return result;
+	}
+	public byte[] byteValue() throws AIFException {
+		return byteBuffer.array();
+	}	
+	protected void parse(byte[] data) {
+		size = type.sizeof();
+		byteBuffer = byteBuffer(data);
+	}
+	
+	public BigInteger getAddress() throws AIFException {
+		return bigIntegerValue(getValueString());
+	}
+}

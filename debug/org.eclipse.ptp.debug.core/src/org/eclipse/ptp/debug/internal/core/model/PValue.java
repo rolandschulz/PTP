@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+
 import org.eclipse.cdt.core.IAddress;
 import org.eclipse.cdt.core.IAddressFactory;
 import org.eclipse.debug.core.DebugException;
@@ -36,6 +37,7 @@ import org.eclipse.ptp.debug.core.aif.IAIFValueInt;
 import org.eclipse.ptp.debug.core.aif.IAIFValuePointer;
 import org.eclipse.ptp.debug.core.aif.IAIFValueReference;
 import org.eclipse.ptp.debug.core.aif.IAIFValueString;
+import org.eclipse.ptp.debug.core.aif.IValueAggregate;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIVariable;
 import org.eclipse.ptp.debug.core.model.IPDebugElementStatus;
@@ -247,19 +249,24 @@ public class PValue extends AbstractPValue {
 		return doubleValue;
 	}
 	private String getPointerValueString(IAIFValuePointer value) throws AIFException {
-		// TODO:IPF_TODO Workaround to solve incorrect handling of structures referenced by pointers or references
-		IAddressFactory factory = ((PDebugTarget) getDebugTarget()).getAddressFactory();
-		BigInteger pv = value.pointerValue();
-		if (pv == null)
-			return "";
-		IAddress address = factory.createAddress(pv);
-		if (address == null)
-			return "";
-		PVariableFormat format = getParentVariable().getFormat();
-		if (PVariableFormat.NATURAL.equals(format) || PVariableFormat.HEXADECIMAL.equals(format))
-			return address.toHexAddressString();
-		if (PVariableFormat.DECIMAL.equals(format))
-			return address.toString();
+		//IAIFValue baseValue = value.getValue();
+		//if (baseValue instanceof IValueAggregate) {//if base type is not primitive type display address;
+			IAddressFactory factory = ((PDebugTarget) getDebugTarget()).getAddressFactory();
+			BigInteger pv = value.pointerValue();
+			if (pv == null)
+				return "";
+			IAddress address = factory.createAddress(pv);
+			if (address == null)
+				return "";
+			PVariableFormat format = getParentVariable().getFormat();
+			if (PVariableFormat.NATURAL.equals(format) || PVariableFormat.HEXADECIMAL.equals(format))
+				return address.toHexAddressString();
+			if (PVariableFormat.DECIMAL.equals(format))
+				return address.toString();
+		//}
+		//else {
+			//return baseValue.getValueString();
+		//}
 		return null;
 	}
 	private String getWCharValueString(IAIFValueString value) throws AIFException {

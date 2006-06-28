@@ -16,10 +16,22 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.core.aif;
-/**
- * @author Clement chu
- * 
- */
-public interface IAIFValueString extends IAIFValue {}
+package org.eclipse.ptp.debug.internal.core.aif;
 
+import org.eclipse.ptp.debug.core.aif.AIFFactory;
+import org.eclipse.ptp.debug.core.aif.IAIFTypeAddress;
+
+public class AIFTypeAddress extends TypeIntegral implements IAIFTypeAddress {
+	int size = 0;
+	//char*: a4
+	public AIFTypeAddress(int size) {
+		super(false);
+		this.size = size;
+	}
+	public String toString() {
+		return AIFFactory.FDS_ADDRESS + super.toString();
+	}
+	public int sizeof() {
+		return size;
+	}	
+}

@@ -19,7 +19,6 @@
 package org.eclipse.ptp.debug.core.model;
 
 import org.eclipse.cdt.debug.core.model.ICastToArray;
-import org.eclipse.cdt.debug.core.model.IEnableDisableTarget;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IValueModification;
 import org.eclipse.debug.core.model.IVariable;

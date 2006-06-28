@@ -25,18 +25,11 @@ import org.eclipse.ptp.debug.core.aif.IAIFTypeString;
  * @author Clement chu
  * 
  */
-public class AIFTypeString extends TypeIntegral implements IAIFTypeString {
-	public AIFTypeString() {
-		this(true);
-	}
-	public AIFTypeString(boolean signed) {
-		super(signed);
-		System.out.println("======================= NEED TEST ====================");
-	}
+public class AIFTypeString extends AIFType implements IAIFTypeString {
 	public int sizeof() {
 		return AIFFactory.SIZE_INVALID;
 	}
 	public String toString() {
-		return "s";
+		return String.valueOf(AIFFactory.FDS_STRING);
 	}		
 }

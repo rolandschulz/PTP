@@ -35,9 +35,11 @@ public class ProxyDebugSignalsEvent extends AbstractProxyDebugEvent implements I
 	}
 	public String toString() {
 		String res = "EVENT_DBG_SIGNALS " + this.getBitSet().toString();
+		/*
 		for (int i = 0; i<signals.length; i++) {
 			res += "\n " + signals[i].toString();
 		}
+		*/
 		return res;
 	}
 }

@@ -17,9 +17,14 @@
  * LA-CC 04-115
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.aif;
+
+import java.math.BigInteger;
+
 /**
  * @author Clement chu
  * 
  */
-public interface IAIFValueString extends IAIFValue {}
+public interface IAIFValueAddress extends IValueIntegral {
+	BigInteger getAddress() throws AIFException;
+}
 

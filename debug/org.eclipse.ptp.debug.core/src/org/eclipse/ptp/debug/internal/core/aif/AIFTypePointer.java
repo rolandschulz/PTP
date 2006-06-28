@@ -21,21 +21,27 @@ package org.eclipse.ptp.debug.internal.core.aif;
 
 import org.eclipse.ptp.debug.core.aif.AIFFactory;
 import org.eclipse.ptp.debug.core.aif.IAIFType;
+import org.eclipse.ptp.debug.core.aif.IAIFTypeAddress;
 import org.eclipse.ptp.debug.core.aif.IAIFTypePointer;
 
 public class AIFTypePointer extends TypeDerived implements IAIFTypePointer {
-	//char*: ^c
+	private IAIFType addr;
+	//char*: ^a4c
 	//^%1/{s1 *|a=is4,b=^>1/,c=^>1/;;;}
 	//^%1/{s1 *|a=f8,b=^%2/{s *|a=f8,b=^>2/;;;},c=^>1/;;;}
-	public AIFTypePointer(IAIFType basetype) {
+	public AIFTypePointer(IAIFType addr, IAIFType basetype) {
 		super(basetype);
+		this.addr = addr;
 	}
 	public String toString() {
 		return AIFFactory.FDS_POINTER + super.toString();
 	}
 	public int sizeof() {
 		return super.sizeof() + 1;
-	}	
+	}
+	public IAIFTypeAddress getAddressType() {
+		return (IAIFTypeAddress)addr;
+	}
 	
 	public static void main(String[] args) {
 		IAIFType testType = AIFFactory.getAIFType("^%1/{s1 *|a=is4,b=^>1/,c=^>1/;;;}");
