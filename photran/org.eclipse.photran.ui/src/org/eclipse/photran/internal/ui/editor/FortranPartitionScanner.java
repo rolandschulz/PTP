@@ -3,6 +3,8 @@ package org.eclipse.photran.internal.ui.editor;
 import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
@@ -59,6 +61,39 @@ public final class FortranPartitionScanner implements IDocumentPartitioner {
 	private ArrayList partitions = null;
 
 	private boolean isFixedForm;
+    
+    private List terminalsToNotHighlight = Arrays
+                   .asList(new Terminal[] { Terminal.T_IDENT,
+                                            Terminal.T_ASTERISK,
+                                            Terminal.T_COLON,
+                                            Terminal.T_COMMA,
+                                            Terminal.T_EQEQ,
+                                            Terminal.T_EQGREATERTHAN,
+                                            Terminal.T_EQUALS,
+                                            Terminal.T_GREATERTHAN,
+                                            Terminal.T_GREATERTHANEQ,
+                                            Terminal.T_XIMPL,
+                                            Terminal.T_LESSTHAN,
+                                            Terminal.T_LESSTHANEQ,
+                                            Terminal.T_LPAREN,
+                                            Terminal.T_MINUS,
+                                            Terminal.T_PERCENT,
+                                            Terminal.T_PLUS,
+                                            Terminal.T_POW,
+                                            Terminal.T_RPAREN,
+                                            Terminal.T_SLASH,
+                                            Terminal.T_SLASHEQ,
+                                            Terminal.T_SLASHSLASH,
+                                            Terminal.T_UNDERSCORE,
+                                            Terminal.T_BCON,
+                                            Terminal.T_RCON,
+                                            Terminal.T_DCON,
+                                            Terminal.T_FCON,
+                                            Terminal.T_ICON,
+                                            Terminal.T_OCON,
+                                            Terminal.T_PCON,
+                                            Terminal.T_XCON,
+                                            Terminal.T_ZCON });
 
 	public static class Partition {
 		protected String contentType;
@@ -230,7 +265,8 @@ public final class FortranPartitionScanner implements IDocumentPartitioner {
 	private String mapTerminalToPartitionType(Terminal terminal) {
 		if (terminal == Terminal.T_SCON)
 			return F90_STRING_CONSTANTS_PARTITION;
-		if (terminal == Terminal.T_IDENT)
+		//if (terminal == Terminal.T_IDENT)
+        if (terminalsToNotHighlight.contains(terminal))
 			return F90_IDENTIFIER_PARTITION;
 		if (ListOfWordsToIndent.checkIfKeywordNeedsRightIndentation(terminal))
 			return F90_KEYWORD_PARTITION_WITH_INDENTATION_RIGHT;
