@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Simulation Core Plug-in
+Bundle-SymbolicName: org.eclipse.ptp.simulation.core;singleton:=true
+Bundle-Version: 1.0.0
+Bundle-Activator: org.eclipse.ptp.simulation.core.Activator
+Bundle-Vendor: Los Alamos National LAboratory
+Bundle-Localization: plugin
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.ptp.core
+Eclipse-LazyStart: true
