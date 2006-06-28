@@ -20,6 +20,7 @@ package org.eclipse.ptp.debug.internal.core.aif;
 
 import java.nio.ByteBuffer;
 import org.eclipse.ptp.debug.core.aif.AIFException;
+import org.eclipse.ptp.debug.core.aif.AIFFactory;
 import org.eclipse.ptp.debug.core.aif.IAIFTypeString;
 import org.eclipse.ptp.debug.core.aif.IAIFValueString;
 
@@ -27,26 +28,33 @@ import org.eclipse.ptp.debug.core.aif.IAIFValueString;
  * @author Clement chu
  * 
  */
-public class AIFValueString extends ValueIntegral implements IAIFValueString {
-	ByteBuffer byteBuffer;
-	
+public class AIFValueString extends AIFValue implements IAIFValueString {	
 	public AIFValueString(IAIFTypeString type, byte[] data) {
 		super(type);
 		parse(data);
 	}
 	protected void parse(byte[] data) {
-		byteBuffer = byteBuffer(data);
-		//TODO -- redo it
-		size = data.length;
+		parseSize(createByteArray(data, 0, 2));
+		byte[] newByte = createByteArray(data, 2, data.length-2);
+		result = new String(newByte);
 	}
 	public String getValueString() throws AIFException {
 		if (result == null) {
-			result = stringValue();
+			result = "";
 		}
 		return result;
 	}
-	private String stringValue() throws AIFException {
-		return new String(byteBuffer.array());
+	private void parseSize(byte[] bytes) {
+		String byteSize = "";
+		for (int i=0; i<bytes.length; i++) {
+			byteSize += Integer.toHexString(0x0100 + (bytes[i] & 0x00FF)).substring(1);
+		}
+		try {
+			size = Integer.parseInt(byteSize);
+		} catch (NumberFormatException e) {
+			size = 1;
+		}
+	}
 		/*
 		int len = data.get();
 		len <<= 8; //2^8
@@ -57,5 +65,4 @@ public class AIFValueString extends ValueIntegral implements IAIFValueString {
 		}
 		return new String(dst);
 		*/
-	}
 }

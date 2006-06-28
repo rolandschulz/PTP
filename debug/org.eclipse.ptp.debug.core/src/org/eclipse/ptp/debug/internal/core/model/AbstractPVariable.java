@@ -18,8 +18,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.model;
 
-import org.eclipse.cdt.debug.core.model.IEnableDisableTarget;
 import org.eclipse.debug.core.DebugException;
+import org.eclipse.ptp.debug.core.model.IEnableDisableTarget;
 import org.eclipse.ptp.debug.core.model.IPStackFrame;
 import org.eclipse.ptp.debug.core.model.IPVariable;
 

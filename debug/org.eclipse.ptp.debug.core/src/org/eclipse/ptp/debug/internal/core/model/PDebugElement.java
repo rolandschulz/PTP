@@ -30,7 +30,6 @@ package org.eclipse.ptp.debug.internal.core.model;
 
 import java.text.MessageFormat;
 
-import org.eclipse.cdt.debug.core.CDebugUtils;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.core.runtime.Status;
@@ -40,8 +39,10 @@ import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IDebugElement;
 import org.eclipse.debug.core.model.IDebugTarget;
+import org.eclipse.debug.core.model.IMemoryBlockRetrieval;
 import org.eclipse.ptp.debug.core.IPDebugConstants;
 import org.eclipse.ptp.debug.core.PCDIDebugModel;
+import org.eclipse.ptp.debug.core.PDebugUtils;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
@@ -141,7 +142,7 @@ public abstract class PDebugElement extends PlatformObject implements IPDebugEle
 	}
 	protected void infoMessage(Throwable e) {
 		IStatus newStatus = new Status(IStatus.INFO, PCDIDebugModel.getPluginIdentifier(), IPDebugConstants.STATUS_CODE_INFO, e.getMessage(), null);
-		CDebugUtils.info(newStatus, getDebugTarget());
+		PDebugUtils.info(newStatus, getDebugTarget());
 	}
 	public Object getAdapter(Class adapter) {
 		if (adapter.equals(IDebugElement.class))
@@ -156,6 +157,13 @@ public abstract class PDebugElement extends PlatformObject implements IPDebugEle
 			return getCDISession();
 		if (adapter.equals(IPDebugTarget.class))
 			return getDebugTarget();
+		if (adapter.equals(IDebugTarget.class))
+			return getDebugTarget();
+		if (adapter.equals(IMemoryBlockRetrieval.class))
+			return getDebugTarget().getAdapter(adapter);
+		if (adapter.equals(ILaunch.class))
+			return getDebugTarget().getLaunch();
+
 		return super.getAdapter(adapter);
 	}
 	protected void setStatus(int severity, String message) {

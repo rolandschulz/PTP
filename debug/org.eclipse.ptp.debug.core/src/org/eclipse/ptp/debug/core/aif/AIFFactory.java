@@ -19,6 +19,8 @@
 package org.eclipse.ptp.debug.core.aif;
 
 import java.util.Random;
+
+import org.eclipse.ptp.debug.internal.core.aif.AIFTypeAddress;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeArray;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeBool;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeChar;
@@ -35,6 +37,7 @@ import org.eclipse.ptp.debug.internal.core.aif.AIFTypeString;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeStruct;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeUnion;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeVoid;
+import org.eclipse.ptp.debug.internal.core.aif.AIFValueAddress;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValueArray;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValueBool;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValueChar;
@@ -69,6 +72,7 @@ public class AIFFactory {
 	public static final char FDS_VOID = 'v';
 	public static final char FDS_REFERENCE = '>';
 	public static final char FDS_NAMED = '%';
+	public static final char FDS_ADDRESS = 'a';
 
 	public static final int FDS_FLOAT_SIZE_POS = 1;
 	public static final int FDS_VOID_SIZE_POS = 1;
@@ -121,6 +125,8 @@ public class AIFFactory {
 			return new AIFValueArray((IAIFTypeArray)type, data);
 		} else if (type instanceof IAIFTypeEnum) {
 			return new AIFValueEnum((IAIFTypeEnum)type, data);		
+		} else if (type instanceof IAIFTypeAddress) {
+			return new AIFValueAddress((IAIFTypeAddress)type, data);
 		} else if (type instanceof IAIFTypePointer) {
 			return new AIFValuePointer(parent, (IAIFTypePointer)type, data);
 		} else if (type instanceof IAIFTypeNamed) {
@@ -228,9 +234,12 @@ public class AIFFactory {
 			System.out.println("        ======= reference: " + fmt);
 			int ref_end_pos = getEndPosFromStart(fmt, FDS_REFERENCE_END);
 			return new AIFTypeReference(extractFormat(fmt, 1, ref_end_pos));
+		case FDS_ADDRESS:
+			System.out.println("        ======= address: " + fmt);
+			return new AIFTypeAddress(Character.digit(fmt.charAt(1), 10));
 		case FDS_POINTER:
 			System.out.println("        ======= pointer: " + fmt);
-			return new AIFTypePointer(getAIFType(fmt.substring(1)));
+			return new AIFTypePointer(getAIFType(fmt.substring(1, 3)), getAIFType(fmt.substring(3)));
 		case FDS_VOID:
 			System.out.println("        ======= void: " + fmt);
 			int void_size = Character.digit(fmt.charAt(FDS_VOID_SIZE_POS), 10);
