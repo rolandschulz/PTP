@@ -193,10 +193,10 @@ TestAllConstructors()
 	anInt = IntToAIF(16);
 	AIFTest("subtest4", anInt, "integer: 16", flag);
 
-	aPointer = PointerToAIF(anInt);
+	aPointer = PointerToAIF(NULL, anInt);
 	AIFTest("subtest5", aPointer, "a pointer", flag);
 
-	aPointer = PointerToAIF(aPointer);
+	aPointer = PointerToAIF(NULL, aPointer);
 	AIFTest("subtest6", aPointer, "a double pointer", flag);
 
 	aStruct = EmptyStructToAIF("test_struct");
@@ -223,11 +223,11 @@ TestAllConstructors()
         aStruct = NameAIF(aStruct, 0);
         AIFAddFieldToStruct(aStruct, "value", IntToAIF(2));
         AIFAddFieldToStruct(aStruct, "next", AIFNull(aStruct));
-        aPointer = PointerToAIF(aStruct);
+        aPointer = PointerToAIF(NULL, aStruct);
         aStruct = EmptyStructToAIF("test_struct");
         AIFAddFieldToStruct(aStruct, "value", IntToAIF(1));
         AIFAddFieldToStruct(aStruct, "next", aPointer);
-        aPointer = PointerToAIF(aStruct);
+        aPointer = PointerToAIF(NULL, aStruct);
         AIFTest("subtest13", aPointer, "linked list 1 -> 2 ", flag);
 
 	/* test an array of structs. */
@@ -281,8 +281,8 @@ TestAllConstructors()
 	AIFTest("subtest19", aStruct, "same struct but the enum is set to another value", flag);
 
 	AIFSetEnum(anEnum, "const2");
-	aPointer = PointerToAIF(anEnum);
-	aPointer = PointerToAIF(aPointer);
+	aPointer = PointerToAIF(NULL, anEnum);
+	aPointer = PointerToAIF(NULL, aPointer);
 	AIFAddFieldToStruct(aStruct, "field2", aPointer);
 	AIFTest("subtest20", aStruct, "field2 is a pointer to a pointer to an enum", flag);
 
@@ -839,7 +839,7 @@ TestAllEPS()
 	//AIF_POINTER
 	printf("\n>>>>>>> POINTER\n");
 	a = IntToAIF(5); lo = IntToAIF(3); hi = IntToAIF(8);
-	a = PointerToAIF(a);
+	a = PointerToAIF(NULL, a);
 	_testEPS(lo, hi, a);
 	AIFFree(lo); AIFFree(hi);
 

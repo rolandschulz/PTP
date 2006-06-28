@@ -496,7 +496,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 					int line = frames[j].getLocator().getLineNumber();
 					BigInteger addr = frames[j].getLocator().getAddress();
 					System.out.println("frame " + level + " " + file + " " + func + " " + line + " " + addr);
-					pcdiFrames[j] = new StackFrame((Target)target, level, file, func, line, addr.toString(16));
+					pcdiFrames[j] = new StackFrame((Target)target, level, file, func, line, addr);
 				}
 			}
 			completeCommand(e.getBitSet(), pcdiFrames);
@@ -611,7 +611,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 				String func = frame.getLocator().getFunction();
 				int line = frame.getLocator().getLineNumber();
 				BigInteger addr = frame.getLocator().getAddress();
-				objects[1] = new StackFrame((Target)target, level, file, func, line, addr.toString(16));
+				objects[1] = new StackFrame((Target)target, level, file, func, line, addr);
 			}
 			completeCommand(e.getBitSet(), objects);
 			break;

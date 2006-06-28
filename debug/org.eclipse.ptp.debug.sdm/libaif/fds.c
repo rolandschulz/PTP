@@ -33,7 +33,7 @@ static char	_fds_type_str[NUM_AIF_TYPES][12] =
 
 	{ FDS_FLOATING, '%', 'd', '\0' },
 
-	{ FDS_POINTER, '%', 's', '\0' },
+	{ FDS_POINTER, '%', 's', '%', 's', '\0' },
 
 	{ FDS_ARRAY_START, '%', 's', FDS_ARRAY_END, '%', 's', '\0' },
 
@@ -61,7 +61,9 @@ static char	_fds_type_str[NUM_AIF_TYPES][12] =
 
 	{ FDS_ENUM_START, '%', 's', FDS_ID, FDS_ENUM_END, FDS_INTEGER, '%', 'c', '4', '\0' },
 
-	{ FDS_BOOLEAN, '\0' }
+	{ FDS_BOOLEAN, '\0' },
+	
+	{ FDS_ADDRESS, '%', 'd', '\0' }
 };
 
 static char _fds_array_end[] = {FDS_ARRAY_END, '\0'};
@@ -213,6 +215,10 @@ FDSType(char *str)
 
 	case FDS_STRING: /* string */
 		type = AIF_STRING;
+		break;
+
+	case FDS_ADDRESS: /* address */
+		type = AIF_ADDRESS;
 		break;
 
 	case FDS_VOID: /* void */
@@ -454,6 +460,7 @@ FDSTypeSize(char *type)
 		return rank * s * 2;
 
 	case FDS_STRING:
+	case FDS_ADDRESS:
 	default:
 		return -1;
 	}
@@ -513,6 +520,18 @@ TypeToFDS(int type, ...)
 		break;
 
 	case AIF_POINTER:
+		v3 = va_arg(args, char *);
+		if (v3 == NULL)
+			v3 = strdup("x");
+		else
+			v3 = strdup(v3);
+
+		v4 = strdup(va_arg(args, char *));		
+		snprintf(_fds_buf, BUFSIZ-1, _fds_type_str[type], v3, v4);
+		_aif_free(v3);
+		_aif_free(v4);
+		break;
+
 	case AIF_FUNCTION:
 		v3 = strdup(va_arg(args, char *));
 		snprintf(_fds_buf, BUFSIZ-1, _fds_type_str[type], v3);
@@ -528,6 +547,11 @@ TypeToFDS(int type, ...)
 		v1 = va_arg(args, int);
 		snprintf(_fds_buf, BUFSIZ-1, _fds_type_str[type], v3, v1 ? FDS_INTEGER_SIGNED : FDS_INTEGER_UNSIGNED);
 		_aif_free(v3);
+		break;
+
+	case AIF_ADDRESS:
+		v1 = va_arg(args, int);
+		snprintf(_fds_buf, BUFSIZ-1, _fds_type_str[type], v1);
 		break;
 
 	case AIF_STRING:

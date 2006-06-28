@@ -401,7 +401,86 @@
          </action>
       </viewerContribution>
       <!-- debug view end -->
-
+      
+      <!-- variable view start -->
+      <viewerContribution
+            targetID="org.eclipse.debug.ui.VariableView"
+            id="org.eclipse.debug.ui.variablesView.popupMenu">
+         <!--//
+         <action
+               helpContextId="remove_all_globals_action_context"
+               enablesFor="*"
+               label="%RemoveAllGlobalsAction.label"
+               tooltip="%RemoveAllGlobalsAction.tooltip"
+               icon="icons/rem_all_co.gif"
+               class="org.eclipse.ptp.debug.internal.ui.actions.RemoveAllGlobalsActionDelegate"
+               menubarPath="additions"
+               id="org.eclipse.ptp.debug.internal.ui.actions.RemoveAllGlobalsActionDelegate">
+            <enablement>
+               <pluginState
+                     value="activated"
+                     id="org.eclipse.ptp.debug.ui"/>
+            </enablement>
+         </action>
+         <action
+               helpContextId="remove_globals_action_context"
+               enablesFor="+"
+               label="%RemoveGlobalsAction.label"
+               tooltip="%RemoveGlobalsAction.tooltip"
+               icon="icons/rem_co.gif"
+               class="org.eclipse.ptp.debug.internal.ui.actions.RemoveGlobalsActionDelegate"
+               menubarPath="additions"
+               id="org.eclipse.ptp.debug.internal.ui.actions.RemoveGlobalsActionDelegate">
+            <enablement>
+               <pluginState
+                     value="activated"
+                     id="org.eclipse.ptp.debug.ui"/>
+            </enablement>
+         </action>
+         <action
+               helpContextId="add_globals_action_context"
+               enablesFor="1"
+               label="%AddGlobalsAction.label"
+               class="org.eclipse.ptp.debug.internal.ui.actions.AddGlobalsActionDelegate"
+               icon="icons/watch_globals.gif"
+               menubarPath="additions"
+               id="org.eclipse.ptp.debug.internal.ui.actions.AddGlobalsActionDelegate">
+            <enablement>
+               <pluginState
+                     value="activated"
+                     id="org.eclipse.ptp.debug.ui"/>
+            </enablement>
+         </action>
+         //-->
+         <action
+               label="%DisableVariablesAction.label"
+               icon="icons/disabled_co.gif"
+               helpContextId="disable_variables_action_context"
+               tooltip="%DisableVariablesAction.tooltip"
+               class="org.eclipse.ptp.debug.internal.ui.actions.DisableVariablesActionDelegate"
+               menubarPath="variableGroup"
+               enablesFor="2+"
+               id="org.eclipse.ptp.debug.internal.ui.actions.DisableVariablesActionDelegate">
+            <selection
+                  class="org.eclipse.ptp.debug.core.model.IPVariable">
+            </selection>
+         </action>
+         <action
+               label="%EnableVariablesAction.label"
+               icon="icons/enabled_co.gif"
+               helpContextId="enable_variables_action_context"
+               tooltip="%EnableVariablesAction.tooltip"
+               class="org.eclipse.ptp.debug.internal.ui.actions.EnableVariablesActionDelegate"
+               menubarPath="variableGroup"
+               enablesFor="2+"
+               id="org.eclipse.ptp.debug.internal.ui.actions.EnableVariablesActionDelegate">
+            <selection
+                  class="org.eclipse.ptp.debug.core.model.IPVariable">
+            </selection>
+         </action>
+      </viewerContribution>
+      <!-- variable view end -->
+      
    </extension>
 
   <!-- variable toolbar start //-->

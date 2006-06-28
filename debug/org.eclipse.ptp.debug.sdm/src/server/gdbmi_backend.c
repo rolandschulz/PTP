@@ -74,6 +74,7 @@ static int	SetAndCheckBreak(int, int, int, char *, char *, int, int);
 static int	GetStackframes(int, List **);
 static int	GetAIFVar(char *, AIF **, char **);
 static AIF * ConvertVarToAIF(char *, MIVar *, int);
+static AIF * GetPrimitiveTypeToAIF(int, char *); 
 
 static int	GDBMIInit(void (*)(dbg_event *, void *), void *);
 static int	GDBMIProgress(void);
@@ -111,11 +112,12 @@ static int	GDBCLIHandle(char*);
 static int	GDBMIQuit(void);
 
 static char* GetModifierType(char *);
-static int getSimpleTypeID(char*);
+static int getSimpleTypeID(char*, char*);
 static AIF* CreateNamed(AIF*, int);
 
 static char * GetPtypeValue(char *);
-static AIF * ComplexVarToAIF(MIVar *, int);
+static AIF * ComplexVarToAIF(char *, MIVar *, int);
+static AIF * GetAIFPointer(char *res, AIF *a);
 
 dbg_backend_funcs	GDBMIBackend =
 {
@@ -1236,6 +1238,7 @@ struct simple_type {
 #define ULONGLONG	8
 #define FLOAT		9
 #define DOUBLE		10
+#define STRING		11
 
 char* MODIFIERS[] = {
 	"const volatile",
@@ -1259,6 +1262,7 @@ struct simple_type simple_types[] = {
 #endif /* CC_HAS_LONG_LONG */
 	{ "float", FLOAT },
 	{ "double", DOUBLE },
+	{ "string", STRING },
 	{ NULL, 0 }
 };
 
@@ -1299,108 +1303,118 @@ GetPtypeValue(char *exp)
 static AIF *
 SimpleVarToAIF(char *exp, MIVar *var)
 {
-	int					len;
-	char *				p;
-	char *				res;
-	AIF *				a;
-	AIF *				av;
-	char * 				type;
-	int 				type_id;
+	int		len;
+	char	*p;
+	AIF		*a;
+	AIF		*av;
+	int		type_id;
+	char	*res;
 	
-	type = var->type;
-	if ( strcmp(type, "<text variable, no debug info>") == 0 ) {
-		DbgSetError(DBGERR_NOSYMS, "");
-		return NULL;
-	}
-
-	len = strlen(type);
-	if (type[len - 1] == ')') { /* function */
+	len = strlen(var->type);
+	if (var->type[len - 1] == ')') { /* function */
 		return MakeAIF("&/is4", exp);
 	} 
 	
-	if (strcmp(type, "void *") == 0) { /* void pointer */
+	if (strcmp(var->type, "void *") == 0) { /* void pointer */
 		av = VoidToAIF(0, 0);
-		a = PointerToAIF(av);
+		a = GetAIFPointer(GetVarValue(var->name), av);
 		AIFFree(av);
 		return a;
 	} 
 	
-	if (strncmp(type, "enum", 4) == 0) { /* enum */
-		if ((p = strchr(type, ' ')) != NULL) {
+	if (strncmp(var->type, "enum", 4) == 0) { /* enum */
+		if ((p = strchr(var->type, ' ')) != NULL) {
 			*p++ = '\0';
 			a = EmptyEnumToAIF(p);
 		} else
 			a = EmptyEnumToAIF(NULL);
 		return a;
 	}
-
-	type_id = getSimpleTypeID(type);
-	if (type_id == -1) {//try again with ptype
-		var->type = GetPtypeValue(exp);
-		type_id = getSimpleTypeID(var->type);
-	}		
-	if (type_id > -1) {
-		if ((res = GetVarValue(var->name)) == NULL) {
-			return NULL;
+	
+	if ((type_id = getSimpleTypeID(var->type, exp)) > -1) {
+		if ((res = GetVarValue(var->name)) != NULL) {
+			a = GetPrimitiveTypeToAIF(type_id, res);
 		}
-		
-		switch (type_id) {
-		case CHAR:
-			if ((p = strchr(res, ' ')) != NULL)
+	}
+	
+	if (a == NULL) {
+		DbgSetError(DBGERR_UNKNOWN_TYPE, "could not convert simple type");
+	}
+	return a;
+}	
+
+static AIF * 
+GetPrimitiveTypeToAIF(int type_id, char* res)
+{
+	AIF *a;
+	char *p;
+
+	switch (type_id) {
+	case STRING:
+	case CHAR:
+		if ((p = strchr(res, ' ')) != NULL) {
+			p++;
+			if (*p == '\'') { //character
+				p--;
 				*p = '\0';
-					a = CharToAIF((char)atoi(res));
-					break;
+				a = CharToAIF((char)atoi(res));
+			}
+			else { //string
+				a = StringToAIF(p);			
+			}
+		}
+		else {
+			a = CharToAIF((char)atoi(res));
+		}
+		break;
 				
-			case SHORT:
-				a = ShortToAIF((short)atoi(res));
-				break;
+	case SHORT:
+		a = ShortToAIF((short)atoi(res));
+		break;
 				
-			case USHORT:
-				a = UnsignedShortToAIF((unsigned short)atoi(res));
-				break;
+	case USHORT:
+		a = UnsignedShortToAIF((unsigned short)atoi(res));
+		break;
+		
+	case INT:
+		a = IntToAIF(atoi(res));
+		break;
+		
+	case UINT:
+		a = UnsignedIntToAIF((unsigned int)atoi(res));
+		break;
 				
-			case INT:
-				a = IntToAIF(atoi(res));
-				break;
-				
-			case UINT:
-				a = UnsignedIntToAIF((unsigned int)atoi(res));
-				break;
-				
-			case LONG:
-				a = LongToAIF(atol(res));
-				break;
-				
-			case ULONG:
-				a = UnsignedLongToAIF((unsigned long)atol(res));
-				break;
+	case LONG:
+		a = LongToAIF(atol(res));
+		break;
+		
+	case ULONG:
+		a = UnsignedLongToAIF((unsigned long)atol(res));
+		break;
 				
 #ifdef CC_HAS_LONG_LONG					
-			case LONGLONG:
-				a = LongLongToAIF(atoll(res));
-				break;
-				
-			case ULONGLONG:
-				a = UnsignedLongLongToAIF((unsigned long long)atoll(res));
-				break;
+	case LONGLONG:
+		a = LongLongToAIF(atoll(res));
+		break;
+		
+	case ULONGLONG:
+		a = UnsignedLongLongToAIF((unsigned long long)atoll(res));
+		break;
 #endif /* CC_HAS_LONG_LONG */
-			
-		case FLOAT:
-			a = FloatToAIF((float)atof(res));
-			break;
-			
-		case DOUBLE:
-			a = DoubleToAIF(atof(res));
-			break;				
-		}
-		return a;
+	
+	case FLOAT:
+		a = FloatToAIF((float)atof(res));
+		break;
+		
+	case DOUBLE:
+		a = DoubleToAIF(atof(res));
+		break;				
 	}
-	DbgSetError(DBGERR_UNKNOWN_TYPE, "could not convert simple type");
-	return NULL;
+	return a;
 }
 
 static int 
-getSimpleTypeID(char* type) 
+getSimpleTypeID(char* type, char* exp) 
 {
 	struct simple_type *	s;
 	
@@ -1409,6 +1423,9 @@ getSimpleTypeID(char* type)
 		if (strcmp(type, s->type_c) == 0) {
 			return s->type;
 		}
+	}
+	if (exp != NULL) {
+		return getSimpleTypeID(GetPtypeValue(exp), NULL);
 	}
 	return -1;	
 }
@@ -1533,42 +1550,65 @@ CreateArray(MIVar *var, int named)
 }
 
 static AIF *
-ConvertVarToAIF(char *exp, MIVar *var, int named)
+GetAIFPointer(char *res, AIF *i)
 {
-	AIF *		a;
-	MICommand *	cmd;
+	AIF *address;
+	char *p;
 	
-	if ( var->numchild == 0 ) {
-		if ( (a = SimpleVarToAIF(exp, var)) == NULL )
-			return NULL;
+	if (res == NULL) {
+		address = AIFNull(NULL);
 	}
 	else {
-		cmd = MIVarListChildren(var->name);
-		SendCommandWait(DebugSession, cmd);
-		if (!MICommandResultOK(cmd)) {
-			DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
-			MICommandFree(cmd);
-			return NULL;
+		if ((p = strchr(res, ' ')) != NULL) {
+			*p = '\0';
 		}
-		MIGetVarListChildrenInfo(var, cmd);
-		MICommandFree(cmd);
+		res += 2; //skip 0x
+		address = AddressToAIF(res);
+	}
+	return PointerToAIF(address, i);	
+}
 
-		a = ComplexVarToAIF(var, named);
-		if (a == NULL) {//try again with ptype
-			var->type = GetPtypeValue(exp);
-			a = ComplexVarToAIF(var, named);
-		}
-		if (a == NULL) {
-			DbgSetError(DBGERR_UNKNOWN_TYPE, "type not supported (yet)");
-		}
+static AIF *
+ConvertVarToAIF(char *exp, MIVar *var, int named)
+{
+	AIF 		*a;
+	MICommand	*cmd;
+
+	if (strcmp(var->type, "<text variable, no debug info>") == 0) {
+		DbgSetError(DBGERR_NOSYMS, "");
+		return NULL;
+	}
+	
+	if (var->numchild == 0) { //simple type
+		return SimpleVarToAIF(exp, var);
+	}
+	
+	//complex type	
+	cmd = MIVarListChildren(var->name);
+	SendCommandWait(DebugSession, cmd);
+	if (!MICommandResultOK(cmd)) {
+		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
+		MICommandFree(cmd);
+		return NULL;
+	}
+	MIGetVarListChildrenInfo(var, cmd);
+	MICommandFree(cmd);
+
+	a = ComplexVarToAIF(exp, var, named);
+	if (a == NULL) {
+		DbgSetError(DBGERR_UNKNOWN_TYPE, "type not supported (yet)");
 	}
 	return a;
 }
 
 static AIF * 
-ComplexVarToAIF(MIVar *var, int named) 
+ComplexVarToAIF(char *exp, MIVar *var, int named) 
 {
-	AIF * a;
+	AIF		*a;
+	char	*p;
+	char	*type;
+	int		type_id;
+	char	*res;
 
 	switch (var->type[strlen(var->type) - 1]) {
 	case ']': /* array */
@@ -1576,15 +1616,27 @@ ComplexVarToAIF(MIVar *var, int named)
 		break;
 
 	case '*': /* pointer */
-		if (strncmp(var->type, "struct", 6) == 0) {
+		res = GetVarValue(var->name); //get address
+		type = strdup(var->type);		
+		if (strncmp(type, "struct", 6) == 0) {
 			a = CreateStruct(var, named);
-		} else if (strncmp(var->type, "union", 5) == 0) {
+		} else if (strncmp(type, "union", 5) == 0) {
 			a = CreateUnion(var, named);
-		} else {
-			a = ConvertVarToAIF(var->children[0]->exp, var->children[0], named);
+		} else { //other types
+			p = strchr(type, '*');
+			p--;
+			*p = '\0';
+			if ((type_id = getSimpleTypeID(type, exp)) > -1) { //simple type including char *
+				a = GetPrimitiveTypeToAIF(type_id, res);
+			}
+			else {
+				a = ConvertVarToAIF(var->children[0]->exp, var->children[0], named);
+			}			
 		}
-		if (a != NULL)
-			a = PointerToAIF(a);
+		free(type);
+		if (a != NULL) {
+			a = GetAIFPointer(res, a);
+		}
 		break;
 					
 	default:
@@ -1592,9 +1644,12 @@ ComplexVarToAIF(MIVar *var, int named)
 			a = CreateStruct(var, named);
 		} else if (strncmp(var->type, "union", 5) == 0) {
 			a = CreateUnion(var, named);
-		} else {
-			return NULL;
 		}
+	}
+	
+	if (a == NULL) {//try again with ptype
+		var->type = GetPtypeValue(exp);
+		a = ComplexVarToAIF(NULL, var, named);
 	}
 	return a;
 }
