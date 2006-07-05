@@ -29,11 +29,15 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.events.VerifyListener;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 public final class SimulationConfigurationWizardPage extends
@@ -41,22 +45,28 @@ public final class SimulationConfigurationWizardPage extends
 	
 	private static final int TEXT_WIDTH = 50;
 	private SimulationRMConfiguration config;
-	private int whichMachine = 0;
 	private Combo whichMachineCombo;
 	private Text numNodesText;
+	private Text numMachinesText;
 
 	public SimulationConfigurationWizardPage(ConfigurationWizard wizard) {
 		super(wizard, Messages.getString("SimulationConfigurationWizardPage.name")); //$NON-NLS-1$
 		setTitle(Messages.getString("SimulationConfigurationWizardPage.title")); //$NON-NLS-1$
 		setDescription(Messages.getString("SimulationConfigurationWizardPage.description")); //$NON-NLS-1$
-	}
-
-	public void createControl(Composite parent) {
 		final ConfigurationWizard confWizard = getConfigurationWizard();
 		config = (SimulationRMConfiguration) confWizard.getConfiguration();
-		Composite container = new Composite(parent, SWT.NONE);
-		container.setLayout(new GridLayout(1, false));
-		Label label = new Label(container, SWT.NONE);
+		setPageComplete(false);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.wizards.ConfigurationWizardPage#createControl(org.eclipse.swt.widgets.Composite)
+	 */
+	public void createControl(Composite parent) {
+		System.out.println("In SimulationConfigurationWizardPage.createControl");
+		Group machineGroup = new Group(parent, SWT.SHADOW_ETCHED_IN);
+		machineGroup.setLayout(new GridLayout(1, false));
+		machineGroup.setText(Messages.getString("SimulationConfigurationWizardPage.SimulatedMachineSettings")); //$NON-NLS-1$
+		Label label = new Label(machineGroup, SWT.NONE);
 		label.setText(Messages.getString("SimulationConfigurationWizardPage.NumberOfMachines")); //$NON-NLS-1$
 
 		final VerifyListener intTextVerifyListener = new VerifyListener() {
@@ -73,7 +83,7 @@ public final class SimulationConfigurationWizardPage extends
 			}
 		};
 				
-		final Text numMachinesText = new Text(container, SWT.BORDER | SWT.SINGLE);
+		numMachinesText = new Text(machineGroup, SWT.BORDER | SWT.SINGLE);
 		numMachinesText.setLayoutData(new GridData(TEXT_WIDTH, SWT.DEFAULT));
 		/* only integers allowed */
 		numMachinesText.addVerifyListener(intTextVerifyListener);
@@ -83,11 +93,12 @@ public final class SimulationConfigurationWizardPage extends
 				validate();
 			}});
 
-		final Label whichMachineLabel = new Label(container, SWT.NONE);
+		final Label whichMachineLabel = new Label(machineGroup, SWT.NONE);
 		whichMachineLabel.setText(Messages.getString("SimulationConfigurationWizardPage.SetNumberOfNodesWhichMachine")); //$NON-NLS-1$
 
-		whichMachineCombo = new Combo(container, SWT.READ_ONLY);
-		whichMachineCombo.setLayoutData(new GridData(TEXT_WIDTH, SWT.DEFAULT));
+		int maxItemLength = getWhichMachineComboLength(machineGroup.getShell());
+		whichMachineCombo = new Combo(machineGroup, SWT.READ_ONLY);
+		whichMachineCombo.setLayoutData(new GridData(maxItemLength, SWT.DEFAULT));
 		whichMachineCombo.addSelectionListener(new SelectionListener(){
 			public void widgetDefaultSelected(SelectionEvent e) {
 				// no-op
@@ -96,29 +107,36 @@ public final class SimulationConfigurationWizardPage extends
 				setWhichMachine();
 			}});
 		
-		numNodesText = new Text(container, SWT.BORDER | SWT.SINGLE);
+		numNodesText = new Text(machineGroup, SWT.BORDER | SWT.SINGLE);
 		numNodesText.setLayoutData(new GridData(TEXT_WIDTH, SWT.DEFAULT));
 		/* only integers allowed */
 		numNodesText.addVerifyListener(intTextVerifyListener);
 		numNodesText.addModifyListener(new ModifyListener(){
 			public void modifyText(ModifyEvent e) {
-				setNumNodes(numNodesText.getText());
+				final int whichMachine = whichMachineCombo.getSelectionIndex();
+				setNumNodes(whichMachine, numNodesText.getText());
 				validate();
 			}});
 
-		setControl(container);
-		// don't enabe these until we have some number of machines
+		setControl(machineGroup);
+		// don't enable these until we have some number of machines
 		whichMachineCombo.setEnabled(false);
 		numNodesText.setEnabled(false);
-		setPageComplete(false);
 	}
 
-	private String[] getStringNumbers(int numMachines) {
+	private String[] getMachineNames(int numMachines) {
 		String[] strs = new String[numMachines];
 		for (int i=0; i<numMachines; ++i) {
-			strs[i] = Integer.toString(i);
+			strs[i] = Messages.getString("SimulationConfigurationWizardPage.Machine") + Integer.toString(i); //$NON-NLS-1$
 		}
 		return strs;
+	}
+
+	private int getWhichMachineComboLength(Shell shell) {
+		String maxItem = Messages.getString("SimulationConfigurationWizardPage.Machine") + "00000"; //$NON-NLS-1$ //$NON-NLS-2$
+		GC gc = new GC(shell);
+		Point point = gc.stringExtent(maxItem);
+		return point.x + TEXT_WIDTH;
 	}
 
 	private void setNumMachines(String nmStr) {
@@ -143,14 +161,14 @@ public final class SimulationConfigurationWizardPage extends
 		numNodesText.setEnabled(enabled);
 		
 		if (enabled) {
-			whichMachineCombo.setItems(getStringNumbers(numMachines));
-			whichMachine = 0;
+			whichMachineCombo.setItems(getMachineNames(numMachines));
+			final int whichMachine = 0;
 			whichMachineCombo.select(whichMachine);
 			numNodesText.setText(Integer.toString(config.getNumNodesPerMachine(whichMachine)));
 		}
 	}
 
-	private void setNumNodes(String nmStr) {
+	private void setNumNodes(int whichMachine, String nmStr) {
 		try {
 			int value = Integer.parseInt(nmStr);
 			if (value >= 0) {
@@ -166,7 +184,7 @@ public final class SimulationConfigurationWizardPage extends
 	}
 
 	private void setWhichMachine() {
-		whichMachine = whichMachineCombo.getSelectionIndex();
+		final int whichMachine = whichMachineCombo.getSelectionIndex();
 		numNodesText.setText(Integer.toString(config.getNumNodesPerMachine(whichMachine)));
 	}
 
