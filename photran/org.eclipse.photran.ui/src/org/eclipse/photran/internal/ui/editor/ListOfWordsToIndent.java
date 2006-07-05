@@ -7,6 +7,7 @@ import org.eclipse.photran.internal.core.f95modelparser.Terminal;
 /**
  * @author nchen
  * @author cheah
+ * @author spiros
  * 
  * This returns an hashtable of words that require indentation in Fortran The
  * FortranPartitionScanner class would then make use of it as it checks to see

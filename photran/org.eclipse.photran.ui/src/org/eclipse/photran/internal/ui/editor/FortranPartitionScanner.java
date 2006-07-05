@@ -37,6 +37,7 @@ import org.eclipse.swt.graphics.Color;
  * @author joverbey
  * @author nchen
  * @author cheahcf
+ * @author spiros
  */
 public final class FortranPartitionScanner implements IDocumentPartitioner {
 
@@ -164,18 +165,19 @@ public final class FortranPartitionScanner implements IDocumentPartitioner {
 					null, PreferenceConverter.getColor(store,
 							ColorPreferencePage.F90_KEYWORD_COLOR_PREF)), null,
 					SWT.BOLD)),
-			new Partition(
-					F90_KEYWORD_PARTITION_WITH_INDENTATION_RIGHT,
-					new TextAttribute(
-							new Color(null, PreferenceConverter.getColor(store,
-									ColorPreferencePage.F90_KEYWORD_COLOR_PREF)),
-							null, SWT.BOLD)),
-			new Partition(
-					F90_KEYWORD_PARTITION_WITH_INDENTATION_LEFT,
-					new TextAttribute(
-							new Color(null, PreferenceConverter.getColor(store,
-									ColorPreferencePage.F90_KEYWORD_COLOR_PREF)),
-							null, SWT.BOLD)) };
+//			new Partition(
+//					F90_KEYWORD_PARTITION_WITH_INDENTATION_RIGHT,
+//					new TextAttribute(
+//							new Color(null, PreferenceConverter.getColor(store,
+//									ColorPreferencePage.F90_KEYWORD_COLOR_PREF)),
+//							null, SWT.BOLD)),
+//			new Partition(
+//					F90_KEYWORD_PARTITION_WITH_INDENTATION_LEFT,
+//					new TextAttribute(
+//							new Color(null, PreferenceConverter.getColor(store,
+//									ColorPreferencePage.F90_KEYWORD_COLOR_PREF)),
+//							null, SWT.BOLD)) 
+                    };
 
 	IPropertyChangeListener colorPreferenceListener = new IPropertyChangeListener() {
 		/*
@@ -268,10 +270,10 @@ public final class FortranPartitionScanner implements IDocumentPartitioner {
 		//if (terminal == Terminal.T_IDENT)
         if (terminalsToNotHighlight.contains(terminal))
 			return F90_IDENTIFIER_PARTITION;
-		if (ListOfWordsToIndent.checkIfKeywordNeedsRightIndentation(terminal))
-			return F90_KEYWORD_PARTITION_WITH_INDENTATION_RIGHT;
-		if (ListOfWordsToIndent.checkIfKeywordNeedsLeftIndentation(terminal))
-			return F90_KEYWORD_PARTITION_WITH_INDENTATION_LEFT;
+//		if (ListOfWordsToIndent.checkIfKeywordNeedsRightIndentation(terminal))
+//			return F90_KEYWORD_PARTITION_WITH_INDENTATION_RIGHT;
+//		if (ListOfWordsToIndent.checkIfKeywordNeedsLeftIndentation(terminal))
+//			return F90_KEYWORD_PARTITION_WITH_INDENTATION_LEFT;
 		return F90_KEYWORD_PARTITION;
 	}
 
