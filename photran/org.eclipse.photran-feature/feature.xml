@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.photran_feature"
       label="Photran"
-      version="3.0.0"
+      version="3.1.0"
       provider-name="University of Illinois at Urbana-Champaign and Los Alamos National Laboratory"
       os="linux,macosx,solaris,win32"
       nl="en_US">
@@ -52,38 +52,38 @@
          id="org.eclipse.photran.core"
          download-size="0"
          install-size="0"
-         version="3.0.0"/>
+         version="3.1.0"/>
 
    <plugin
          id="org.eclipse.photran.managedbuilder.core"
          download-size="0"
          install-size="0"
-         version="3.0.0"
+         version="3.1.0"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.photran.managedbuilder.ui"
          download-size="0"
          install-size="0"
-         version="3.0.0"/>
+         version="3.1.0"/>
 
    <plugin
          id="org.eclipse.photran.cdtinterface"
          download-size="0"
          install-size="0"
-         version="3.0.0"/>
+         version="3.1.0"/>
 
    <plugin
          id="org.eclipse.photran.ui"
          download-size="0"
          install-size="0"
-         version="3.0.0"/>
+         version="3.1.0"/>
 
    <plugin
          id="org.eclipse.photran.refactoring"
          download-size="0"
          install-size="0"
-         version="3.0.0"
+         version="3.1.0"
          unpack="false"/>
 
 </feature>
