@@ -17,3 +17,4 @@ Require-Bundle: org.eclipse.ui.ide,
  org.eclipse.jdt.ui,
  org.eclipse.ui.editors
 Eclipse-AutoStart: true
+Bundle-ClassPath: fdtrefactoring.jar
