@@ -21,4 +21,4 @@ Export-Package: org.eclipse.ptp.pldt.common,
  org.eclipse.ptp.pldt.common.editorHelp,
  org.eclipse.ptp.pldt.common.util,
  org.eclipse.ptp.pldt.common.views
-Bundle-ClassPath: bin/
+Bundle-ClassPath: .
