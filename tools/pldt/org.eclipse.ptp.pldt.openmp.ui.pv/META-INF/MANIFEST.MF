@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: OpenMP Problems View Plug-in
+Bundle-Name: PTP PLDT OpenMP Problems View Plug-in
 Bundle-SymbolicName: org.eclipse.ptp.pldt.openmp.ui.pv; singleton:=true
 Bundle-Version: 1.0.0
 Bundle-Activator: org.eclipse.ptp.pldt.openmp.ui.pv.PvPlugin
@@ -18,3 +18,5 @@ Require-Bundle: org.eclipse.ui,
 Eclipse-AutoStart: true
 Export-Package: org.eclipse.ptp.pldt.openmp.ui.pv,
  org.eclipse.ptp.pldt.openmp.ui.pv.views
+Bundle-ClassPath: .
+Bundle-Vendor: IBM Research
