@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: OpenMP Plug-in
+Bundle-Name: PTP PLDT - OpenMP Tools Plug-in
 Bundle-SymbolicName: org.eclipse.ptp.pldt.openmp.core; singleton:=true
 Bundle-Version: 1.0.0
 Bundle-Activator: org.eclipse.ptp.pldt.openmp.core.OpenMPPlugin
@@ -18,3 +18,4 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ptp.pldt.openmp.analysis,
  org.eclipse.ptp.pldt.openmp.ui.pv
 Eclipse-AutoStart: true
+Bundle-ClassPath: .
