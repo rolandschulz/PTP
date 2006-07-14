@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: PTP Parallel Language Development Tools Help Plug-in
+Bundle-SymbolicName: org.eclipse.ptp.pldt.help; singleton:=true
+Bundle-Version: 1.0.0
+Bundle-ClassPath: .
+Bundle-Activator: org.eclipse.ptp.pldt.help.HelpPlugin
+Bundle-Vendor: IBM Research
+Bundle-Localization: plugin
+Export-Package: org.eclipse.ptp.pldt.help
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.help
+Eclipse-AutoStart: true
