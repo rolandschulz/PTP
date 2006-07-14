@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: PTP PLDT - MPI Tools Plug-in
 Bundle-SymbolicName: org.eclipse.ptp.pldt.mpi.core; singleton:=true
 Bundle-Version: 1.0.0
-Bundle-ClassPath: bin/
+Bundle-ClassPath: .
 Bundle-Activator: org.eclipse.ptp.pldt.mpi.core.MpiPlugin
 Bundle-Vendor: IBM Research
 Bundle-Localization: plugin
