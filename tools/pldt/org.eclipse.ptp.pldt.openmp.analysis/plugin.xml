@@ -1,30 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.0"?>
-<plugin
-   id="org.eclipse.ptp.pldt.openmp.analysis"
-   name="PTP OpenMP Analysis Plugin"
-   version="1.0.0"
-   provider-name="IBM Research">
+<plugin>
 
-   <runtime>
-      <library name="analysis.jar">
-         <export name="*"/>
-      </library>
-   </runtime>
-   <requires>
-      <import plugin="org.eclipse.core.resources"/>
-      <import plugin="org.eclipse.core.runtime"/>
-      <import plugin="org.eclipse.cdt.core"/>
-      <import plugin="org.eclipse.ui.workbench"/>
-      <import plugin="org.eclipse.jface"/>
-      <import plugin="org.eclipse.cdt.ui"/>
-      <import plugin="org.eclipse.jface.text"/>
-      <import plugin="org.eclipse.ui.workbench.texteditor"/>
-      <import plugin="org.eclipse.ui.editors"/>
-      <import plugin="org.eclipse.ui"/>
-
-   </requires>
-   <extension
+     <extension
          point="org.eclipse.ui.popupMenus">
       <viewerContribution
             id="org.eclipse.ptp.pldt.openmp.analysis.CEditorContribution"
