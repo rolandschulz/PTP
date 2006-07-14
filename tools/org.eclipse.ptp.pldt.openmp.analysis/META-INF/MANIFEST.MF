@@ -1,0 +1,26 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: PTP OpenMP Analysis Plugin
+Bundle-SymbolicName: org.eclipse.ptp.pldt.openmp.analysis; singleton:=true
+Bundle-Version: 1.0.0
+Bundle-ClassPath: .
+Bundle-Vendor: IBM Research
+Bundle-Localization: plugin
+Export-Package: org.eclipse.ptp.pldt.openmp.analysis,
+ org.eclipse.ptp.pldt.openmp.analysis.PAST,
+ org.eclipse.ptp.pldt.openmp.analysis.dictionary,
+ org.eclipse.ptp.pldt.openmp.analysis.ompcfg,
+ org.eclipse.ptp.pldt.openmp.analysis.ompcfg.factory,
+ org.eclipse.ptp.pldt.openmp.analysis.parser,
+ org.eclipse.ptp.pldt.openmp.analysis.textview
+Require-Bundle: org.eclipse.core.resources,
+ org.eclipse.core.runtime,
+ org.eclipse.cdt.core,
+ org.eclipse.ui.workbench,
+ org.eclipse.jface,
+ org.eclipse.cdt.ui,
+ org.eclipse.jface.text,
+ org.eclipse.ui.workbench.texteditor,
+ org.eclipse.ui.editors,
+ org.eclipse.ui
+Eclipse-AutoStart: true
