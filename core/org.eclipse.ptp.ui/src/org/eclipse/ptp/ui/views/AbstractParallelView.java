@@ -18,63 +18,82 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.views;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.ISelectionProvider;
-import org.eclipse.ptp.core.IParallelModelListener;
+import org.eclipse.ptp.core.IModelListener;
 import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.events.IModelErrorEvent;
+import org.eclipse.ptp.core.events.IModelEvent;
+import org.eclipse.ptp.core.events.IModelRuntimeNotifierEvent;
+import org.eclipse.ptp.core.events.IModelSysChangedEvent;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.part.ViewPart;
 /**
  * @author clement chu
  *
  */
-public abstract class AbstractParallelView extends ViewPart implements ISelectionProvider, IParallelModelListener {
+public abstract class AbstractParallelView extends ViewPart implements IModelListener {
 	protected final String DEFAULT_TITLE = "Parallel";
 
-	/**
-	 * store debug event listener
-	 */
-	protected List listeners = new ArrayList(0);
-	
 	/** Constructor to add paralell launch listener by default
 	 * 
 	 */
 	public AbstractParallelView() {
-		PTPCorePlugin.getDefault().getModelPresentation().addParallelLaunchListener(this);
+		PTPCorePlugin.getDefault().getModelPresentation().addModelListener(this);
 	}
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.viewers.ISelectionProvider#addSelectionChangedListener(org.eclipse.jface.viewers.ISelectionChangedListener)
-     */
-    public void addSelectionChangedListener(ISelectionChangedListener listener) {
-    	listeners.add(listener);
-    }
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.viewers.ISelectionProvider#removeSelectionChangedListener(org.eclipse.jface.viewers.ISelectionChangedListener)
-     */
-    public void removeSelectionChangedListener(ISelectionChangedListener listener) {
-    	listeners.remove(listener);
-    }	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.IWorkbenchPart#dispose()
 	 */
 	public void dispose() {
-		listeners.clear();
-		PTPCorePlugin.getDefault().getModelPresentation().removeParallelLaunchListener(this);
+		PTPCorePlugin.getDefault().getModelPresentation().removeModelListener(this);
 		super.dispose();
 	}
-	
+
 	/** Get Display
 	 * @return display
 	 */
 	protected Display getDisplay() {
 		return getViewSite().getShell().getDisplay();
 	}
+	public void asyncExec(Runnable r) {
+		getDisplay().asyncExec(r);
+	}
 	
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ISelectionProvider#getSelection()
-	 */
-	public abstract ISelection getSelection();	
+	public abstract void refresh(boolean all);
+	public abstract void rebuild();
+	public abstract void repaint(boolean all);
+	
+	public abstract ISelection getSelection();
+    
+	public void modelEvent(IModelEvent event) {
+		if (event instanceof IModelErrorEvent) {
+			refresh(true);
+		}
+		else if (event instanceof IModelRuntimeNotifierEvent) {
+			IModelRuntimeNotifierEvent runtimeEvent = (IModelRuntimeNotifierEvent)event;
+			switch (runtimeEvent.getStatus()) {
+			case IModelRuntimeNotifierEvent.RUNNING:
+				rebuild();
+				break;
+			case IModelRuntimeNotifierEvent.STARTED:
+				rebuild();
+				break;
+			case IModelRuntimeNotifierEvent.STOPPED:
+				break;
+			case IModelRuntimeNotifierEvent.ABORTED:
+				break;
+			}
+			refresh(true);
+		}
+		else if (event instanceof IModelSysChangedEvent) {
+			IModelSysChangedEvent sysEvent = (IModelSysChangedEvent)event;
+			switch (sysEvent.getType()) {
+			case IModelSysChangedEvent.MONITORING_SYS_CHANGED:
+				rebuild();
+				break;
+			case IModelSysChangedEvent.SYS_STATUS_CHANGED:
+				break;
+			}
+			refresh(true);			
+		}
+	}
 }

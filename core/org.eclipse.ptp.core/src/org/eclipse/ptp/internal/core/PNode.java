@@ -23,11 +23,11 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.ptp.core.AttributeConstants;
-import org.eclipse.ptp.core.INodeEvent;
 import org.eclipse.ptp.core.INodeListener;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPMachine;
 import org.eclipse.ptp.core.IPProcess;
+import org.eclipse.ptp.core.events.INodeEvent;
 import org.eclipse.ptp.internal.core.elementcontrols.IPElementControl;
 import org.eclipse.ptp.internal.core.elementcontrols.IPMachineControl;
 import org.eclipse.ptp.internal.core.elementcontrols.IPNodeControl;
@@ -35,8 +35,7 @@ import org.eclipse.ptp.internal.core.elementcontrols.IPProcessControl;
 
 public class PNode extends Parent implements IPNodeControl {
 	protected String NAME_TAG = "node ";
-	protected List listeners = new ArrayList();
-
+	
 	public PNode(IPElementControl mac, String name, String key, int nodeNumber) {
 		super(mac, name, key, P_NODE);
 		this.setAttribute(AttributeConstants.ATTRIB_NODE_NUMBER, new Integer(nodeNumber));
@@ -83,22 +82,6 @@ public class PNode extends Parent implements IPNodeControl {
 		}
 		return (IPJob[]) array.toArray(new IPJob[array.size()]);
 	}
-	public void fireEvent(INodeEvent event) {
-		for (Iterator i=listeners.iterator(); i.hasNext();) {
-			INodeListener listener = (INodeListener)i.next();
-			listener.nodeEvent(event);
-		}
-	}	
-	//Node Listener
-	public void addNodeListener(INodeListener listener) {
-		if (!listeners.contains(listener))
-			listeners.add(listener);
-	}
-	public void removerNodeListener(INodeListener listener) {
-		if (listeners.contains(listener))
-			listeners.remove(listener);
-	}	
-	
 	public Object getAttribute(String key) {
 		return this.getAttribute(AttributeConstants.ATTRIB_CLASS_NODE, key);
 	}

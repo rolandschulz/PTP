@@ -65,7 +65,7 @@ public class DeleteSetAction extends ParallelAction {
 					IElementSet lastSet = sets[sets.length-1];
 					view.selectSet(setManager.getSet(lastSet.getID()));
 					view.update();
-					view.refresh();
+					view.refresh(false);
 				}
 			}
 		}		

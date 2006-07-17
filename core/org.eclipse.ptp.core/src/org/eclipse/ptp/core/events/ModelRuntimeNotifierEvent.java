@@ -16,17 +16,30 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.ui.listeners;
+package org.eclipse.ptp.core.events;
 
 
 /**
  * @author Clement chu
  *
  */
-public interface IJobChangeListener {
-	/** Change job event
-	 * @param cur_job_id current job ID
-	 * @param pre_job_id previous job ID
-	 */
-	public void changeJobEvent(String cur_job_id, String pre_job_id);
+public class ModelRuntimeNotifierEvent extends ModelEvent implements IModelRuntimeNotifierEvent {
+	private int type = -1;
+	private int status = -1;
+	private String id = null;
+	
+	public ModelRuntimeNotifierEvent(String id, int type, int status) {
+		this.id = id;
+		this.type = type;
+		this.status = status;
+	}
+	public String getID() {
+		return id;
+	}
+	public int getStatus() {
+		return status;
+	}
+	public int getType() {
+		return type;
+	}
 }

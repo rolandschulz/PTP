@@ -18,16 +18,15 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.views;
 
-import java.util.Iterator;
 import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.core.runtime.Preferences.PropertyChangeEvent;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.ptp.ui.IManager;
 import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.PTPUIPlugin;
-import org.eclipse.ptp.ui.listeners.IPaintListener;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
@@ -45,7 +44,7 @@ import org.eclipse.swt.widgets.Composite;
  * @author clement chu
  * 
  */
-public abstract class AbstractParallelElementView extends AbstractParallelView implements IPaintListener, IIconCanvasActionListener, IToolTipProvider, IImageProvider, IContentProvider {
+public abstract class AbstractParallelElementView extends AbstractParallelView implements IIconCanvasActionListener, IToolTipProvider, IImageProvider, IContentProvider, ISelectionChangedListener {
 	protected IManager manager = null;
 	// Set
 	protected IElementSet cur_element_set = null;
@@ -54,7 +53,6 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	// title
 	protected final String EMPTY_TITLE = " ";
 	protected Color registerColor = null;
-
 	/**
 	 * update preference setting 
 	 */
@@ -83,7 +81,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 							}
 							canvas.resetCanvas();
 						}
-						updateView(null);
+						repaint(false);
 					}
 				});
 			}
@@ -96,7 +94,6 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	public void createPartControl(Composite parent) {
 		createView(parent);
 		setContentDescription(EMPTY_TITLE);
-		manager.addPaintListener(this);
 		registerColor = getDisplay().getSystemColor(SWT.COLOR_WIDGET_BORDER);
 	}
 	/** Set the color of registered element
@@ -117,11 +114,14 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	public IManager getUIManager() {
 		return manager;
 	}
+	public IElementHandler getElementHandler(String id) {
+		return manager.getElementHandler(id);
+	}
 	/** Get current element handler
 	 * @return IElementHandler
 	 */
 	public IElementHandler getCurrentElementHandler() {
-		return manager.getElementHandler(getCurrentID());
+		return getElementHandler(getCurrentID());
 	}
 	/** Change view title
 	 * @param title title
@@ -155,28 +155,17 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 		canvas.setImageProvider(this);
 		canvas.setToolTipProvider(this);
 		canvas.addActionListener(this);
+		canvas.addSelectionChangedListener(this);
 		PTPUIPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(propertyChangeListener);
+		getSite().setSelectionProvider(canvas);
 		return composite;
-	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ISelectionProvider#setSelection(org.eclipse.jface.viewers.ISelection)
-	 */
-	public void setSelection(ISelection selection) {
-		if (selection instanceof StructuredSelection) {
-			for (Iterator i = ((StructuredSelection) selection).iterator(); i.hasNext();) {
-				Object obj = i.next();
-				if (obj instanceof IElement) {
-					canvas.selectElement(((IElement) obj).getIDNum());
-				}
-			}
-		}
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.IWorkbenchPart#dispose()
 	 */
 	public void dispose() {
-		manager.removePaintListener(this);
 		canvas.removeActionListener(this);
+		canvas.removeSelectionChangedListener(this);
 		PTPUIPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(propertyChangeListener);
 		super.dispose();
 	}
@@ -185,14 +174,6 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	 */
 	public void setFocus() {
 		canvas.setFocus();
-	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ISelectionProvider#getSelection()
-	 */
-	public ISelection getSelection() {
-		if (cur_element_set == null)
-			return new StructuredSelection();
-		return new StructuredSelection(canvas.getSelectedElements());
 	}
 	/** Get current set ID
 	 * @return current set ID
@@ -205,7 +186,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	 * @param pre_set previous set
 	 */
 	public void fireChangeEvent(IElementSet cur_set, IElementSet pre_set) {
-		manager.fireEvent(IManager.CHANGE_SET_TYPE, null, cur_set, pre_set);
+		manager.fireSetEvent(IManager.CHANGE_SET_TYPE, null, cur_set, pre_set);
 	}
 	/** Select set
 	 * @param set Target set
@@ -226,19 +207,17 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	public IElementSet getCurrentSet() {
 		return cur_element_set;
 	}
+	public void rebuild() {
+		manager.clear();
+		initialView();
+	}
 	/** Refresh view
 	 * 
 	 */
-	public void refresh() {
-		refresh(null);
-	}
-	/** Refresh view
-	 * @param condition refresh condition
-	 */
-	public void refresh(final Object condition) {
+	public void refresh(final boolean all) {
 		getDisplay().asyncExec(new Runnable() {
 			public void run() {
-				updateView(condition);
+				repaint(all);
 				if (!canvas.isDisposed()) {
 					canvas.redraw();
 				}
@@ -246,12 +225,12 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 		});
 	}
 	// Set element info
-	/** Initial view
+	/** Initial view setting
 	 * 
 	 */
 	protected abstract void initialView();
 	// Set element to display
-	/** Initial elements
+	/** Initial elements setting
 	 * 
 	 */
 	protected abstract void initialElement();
@@ -272,10 +251,6 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	 * @param element Target element
 	 */
 	protected abstract void doubleClick(IElement element);
-	/** Update view
-	 * @param condition
-	 */
-	protected abstract void updateView(Object condition);
 	/** Get element image
 	 * @param index1 first array index
 	 * @param index2 second array index
@@ -292,15 +267,6 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	 * @return object represent of element
 	 */
 	protected abstract Object convertElementObject(IElement element);
-	/*******************************************************************************************************************************************************************************************************************************************************************************************************
-	 * Paint Listener
-	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.listeners.IPaintListener#repaint(java.lang.Object)
-	 */
-	public void repaint(Object condition) {
-		refresh(condition);
-	}
 	/*******************************************************************************************************************************************************************************************************************************************************************************************************
 	 * IContentProvider
 	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
@@ -360,8 +326,13 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	 * @see org.eclipse.ptp.ui.views.IIconCanvasActionListener#handleAction(int, int)
 	 */
 	public void handleAction(int type, int index) {
-		if (type == IIconCanvasActionListener.DOUBLE_CLICK_ACTION) {
-			doubleClick(canvas.getElement(index));
+		if (index > -1) {
+			IElement element = canvas.getElement(index);
+			switch (type) {
+				case IIconCanvasActionListener.DOUBLE_CLICK_ACTION:
+					doubleClick(element);
+					break;
+			}
 		}
 	}
 	/** Show ruler
@@ -373,7 +344,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 				if (!canvas.isDisposed()) {
 					canvas.setDisplayRuler(showRuler);
 				}
-				updateView(null);
+				repaint(false);
 			}
 		});
 	}
@@ -386,4 +357,12 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 		}
 		return false;
 	}
+	
+	public ISelection getSelection() {
+		return canvas.getSelection();
+	}
+	
+    public void selectionChanged(SelectionChangedEvent event) {
+    	
+    }
 }

@@ -16,31 +16,21 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.core;
-
+package org.eclipse.ptp.core.events;
 /**
+ * @author Clement chu
  *
  */
-public interface IParallelModelListener {
-	public void abort();
-
-	public void exit();
-
-	public void start();
-
-	public void stopped();
-
-	public void monitoringSystemChangeEvent(Object object);
+public interface IModelRuntimeNotifierEvent extends IModelEvent {
+	public final static int RUNNING = 0;
+	public final static int STARTED = 1;
+	public final static int ABORTED = 2;
+	public final static int STOPPED = 3;
 	
-	public void execStatusChangeEvent(Object object);
+	public final static int TYPE_JOB = 0;
+	public final static int TYPE_MACHINE = 1;
 
-	public void sysStatusChangeEvent(Object object);
-
-	public void processOutputEvent(Object object);
-
-	public void errorEvent(Object object);
-
-	public void updatedStatusEvent();
-
-	public void run(String arg);
+	public String getID();
+	public int getStatus();
+	public int getType();
 }

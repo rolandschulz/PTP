@@ -19,7 +19,7 @@
 package org.eclipse.ptp.ui;
 
 import org.eclipse.ptp.core.IPJob;
-import org.eclipse.ptp.ui.listeners.IPaintListener;
+import org.eclipse.ptp.ui.listeners.IJobChangedListener;
 import org.eclipse.ptp.ui.listeners.ISetListener;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
@@ -85,7 +85,7 @@ public interface IManager {
 	 * @param cur_set the current set
 	 * @param pre_set the previous set
 	 */
-	public void fireEvent(int eventType, IElement[] elements, IElementSet cur_set, IElementSet pre_set);
+	public void fireSetEvent(int eventType, IElement[] elements, IElementSet cur_set, IElementSet pre_set);
 	/** Add elements to set
 	 * @param elements selected elements
 	 * @param set Set
@@ -123,18 +123,27 @@ public interface IManager {
 	public void updateMatchElementSets(IElementSet targetSet, IElementHandler elementHandler);
 	
 	//paint listener
-	/** Add Paint listener
-	 * @param pListener IPaintListener
-	 */
+	/*
 	public void addPaintListener(IPaintListener pListener);
-	/** Remove Paint listener
-	 * @param pListener IPaintListener
-	 */
 	public void removePaintListener(IPaintListener pListener);
-	/** Fire Paint listener
-	 * @param condition paint or not
+	public void firePaintListener();
+	*/
+	
+	/** Add job listener
+	 * @param jobListener
 	 */
-	public void firePaintListener(Object condition);
+	public void addJobChangedListener(IJobChangedListener jobListener);
+	/** Remove job listener
+	 * @param jobListener
+	 */
+	public void removeJobChangedListener(IJobChangedListener jobListener);
+	/** Fire job listener
+	 * @param type
+	 * @param cur_jid
+	 * @param pre_jid
+	 */
+	public void fireJobChangedListener(String cur_jid, String pre_jid);
+
 	//job
 	/** Check is job existed
 	 * @param jid Job ID

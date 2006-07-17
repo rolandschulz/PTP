@@ -20,49 +20,36 @@ package org.eclipse.ptp.core;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-
 /**
  * @author rsqrd
- * 
  */
 public interface IModelPresentation {
-
+	public void addNodeListener(INodeListener listener);
+	public void removeNodeListener(INodeListener listener);
+	public void addProcessListener(IProcessListener listener);
+	public void removeProcessListener(IProcessListener listener);
+	public void addModelListener(IModelListener listener);
+	public void removeModelListener(IModelListener listener);
 	/**
 	 * @param jobName
 	 * @throws CoreException
 	 */
 	public void abortJob(String jobName) throws CoreException;
-
-	/**
-	 * @param listener
-	 */
-	public void addParallelLaunchListener(IParallelModelListener listener);
-
 	/**
 	 * @return
 	 */
 	public IPUniverse getUniverse();
-
 	/**
 	 * @param controlSystemID
 	 * @param monitoringSystemID
 	 * @param monitor
 	 * @throws CoreException
 	 */
-	public void refreshRuntimeSystems(int controlSystemID,
-			int monitoringSystemID, IProgressMonitor monitor)
-			throws CoreException;
-
+	public void refreshRuntimeSystems(int controlSystemID, int monitoringSystemID, IProgressMonitor monitor) throws CoreException;
 	/**
 	 * @param monitor
 	 * @param force
 	 * @throws CoreException
 	 */
-	public void refreshRuntimeSystems(IProgressMonitor monitor, boolean force)
-			throws CoreException;
-
-	/**
-	 * @param listener
-	 */
-	public void removeParallelLaunchListener(IParallelModelListener listener);
+	public void refreshRuntimeSystems(IProgressMonitor monitor, boolean force) throws CoreException;
 }

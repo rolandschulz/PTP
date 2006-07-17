@@ -20,11 +20,12 @@ package org.eclipse.ptp.ui.listeners;
 
 /**
  * @author Clement chu
- * @deprecated
+ *
  */
-public interface IPaintListener {
-	/** Repaint the view
-	 * 
+public interface IJobChangedListener {
+	/** Change job event
+	 * @param cur_job_id current job ID
+	 * @param pre_job_id previous job ID
 	 */
-	public void repaint();
+	public void jobChangedEvent(String cur_job_id, String pre_job_id);
 }

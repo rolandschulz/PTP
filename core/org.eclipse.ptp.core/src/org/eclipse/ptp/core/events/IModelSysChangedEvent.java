@@ -16,15 +16,18 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.ui.listeners;
+package org.eclipse.ptp.core.events;
+
+import org.eclipse.ptp.core.IPElement;
 
 /**
  * @author Clement chu
- * @deprecated
+ *
  */
-public interface IPaintListener {
-	/** Repaint the view
-	 * 
-	 */
-	public void repaint();
+public interface IModelSysChangedEvent extends IModelEvent {
+	public final static int MONITORING_SYS_CHANGED = 0;
+	public final static int SYS_STATUS_CHANGED = 1;
+	
+	public int getType();
+	public IPElement getElement();
 }

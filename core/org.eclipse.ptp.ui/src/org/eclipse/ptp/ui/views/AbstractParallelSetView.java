@@ -126,7 +126,7 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 		Menu menu = menuMgr.createContextMenu(canvas);
 		canvas.setMenu(menu);
 		// Be sure to register it so that other plug-ins can add actions.
-		getSite().registerContextMenu(menuMgr, this);
+		getSite().registerContextMenu(menuMgr, canvas);
 	}
 	/** Create context menu
 	 * @param manager
@@ -210,7 +210,7 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 					clipboard.add(elements);
 					selectSet(cur_element_set.getElementHandler().getSet(cur_element_set.getID()));
 					updateTitle();
-					refresh();
+					refresh(false);
 				}
 			}
 			break;
@@ -223,7 +223,7 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 					manager.addToSet(clipElements, cur_element_set.getID(), cur_element_set.getElementHandler());
 					selectSet(cur_element_set.getElementHandler().getSet(cur_element_set.getID()));					
 					update();
-					refresh();
+					refresh(false);
 				}
 			}
 			break;

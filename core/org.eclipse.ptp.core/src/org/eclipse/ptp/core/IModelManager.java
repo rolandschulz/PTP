@@ -27,19 +27,22 @@ import org.eclipse.ptp.rtsystem.IMonitoringSystem;
 import org.eclipse.ptp.rtsystem.JobRunConfiguration;
 
 public interface IModelManager extends IModelPresentation {
+	/*
 	public static final int STATE_ERROR = -1;
-	public static final int STATE_RUN = 1;
-	public static final int STATE_EXIT = 3;
-	public static final int STATE_ABORT = 2;
-	public static final int STATE_START = 0;
-	public static final int STATE_STOPPED = 4;
+	public static final int EVENT_ALL_PROCESSES_STOPPED = 6;
 	public static final int EVENT_PROCESS_OUTPUT = 1;
 	public static final int EVENT_EXEC_STATUS_CHANGE = 2;
-	public static final int EVENT_SYS_STATUS_CHANGE = 3;
-	public static final int EVENT_ERROR = 4;
-	public static final int EVENT_UPDATED_STATUS = 5;
-	public static final int EVENT_ALL_PROCESSES_STOPPED = 6;
-	public static final int EVENT_MONITORING_SYSTEM_CHANGE = 7;
+	
+	public static final int EVENT_RUNNING = 0;
+	public static final int EVENT_STARTING = 1;
+	public static final int EVENT_ABORTED = 2;
+	public static final int EVENT_STOPPED = 3;
+	public static final int EVENT_EXITED = 4;
+	public static final int EVENT_ERROR = 5;
+	public static final int EVENT_SYS_STATUS_CHANGE = 6;
+	public static final int EVENT_UPDATED_STATUS = 7;
+	public static final int EVENT_MONITORING_SYSTEM_CHANGE = 8;
+	*/
 
 	public IControlSystem getControlSystem();
 	public IMonitoringSystem getMonitoringSystem();
@@ -47,7 +50,6 @@ public interface IModelManager extends IModelPresentation {
 	public int getMonitoringSystemID();
 	//public boolean isParallelPerspectiveOpen();
 	public void shutdown();
-	public int getCurrentState();
 	public IPJob run(ILaunch launch, JobRunConfiguration jobRunConfig, IProgressMonitor pm) throws CoreException;
 	public void setPTPConfiguration(ILaunchConfiguration config);
 	public ILaunchConfiguration getPTPConfiguration();

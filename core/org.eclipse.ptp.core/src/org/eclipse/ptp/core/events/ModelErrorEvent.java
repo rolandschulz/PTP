@@ -16,15 +16,25 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.ui.listeners;
+package org.eclipse.ptp.core.events;
+
 
 /**
  * @author Clement chu
- * @deprecated
+ *
  */
-public interface IPaintListener {
-	/** Repaint the view
-	 * 
-	 */
-	public void repaint();
+public class ModelErrorEvent extends ModelEvent implements IModelErrorEvent {
+	private int type = -1;
+	private String reason = null;
+	
+	public ModelErrorEvent(int type, String reason) {
+		this.type = type;
+		this.reason = reason;
+	}
+	public String getReason() {
+		return reason;
+	}
+	public int getType() {
+		return type;
+	}
 }

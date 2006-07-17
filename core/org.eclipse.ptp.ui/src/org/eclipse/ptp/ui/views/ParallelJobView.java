@@ -32,6 +32,9 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
+import org.eclipse.ptp.core.IProcessListener;
+import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.events.IProcessEvent;
 import org.eclipse.ptp.internal.ui.JobManager;
 import org.eclipse.ptp.internal.ui.ParallelImages;
 import org.eclipse.ptp.internal.ui.actions.RemoveAllTerminatedAction;
@@ -59,7 +62,7 @@ import org.eclipse.swt.widgets.TableItem;
  * @author Clement chu
  * 
  */
-public class ParallelJobView extends AbstractParallelSetView {
+public class ParallelJobView extends AbstractParallelSetView implements IProcessListener {
 	private static ParallelJobView instance = null;
 	// selected element
 	protected String cur_selected_element_id = IManager.EMPTY_ID;
@@ -83,6 +86,11 @@ public class ParallelJobView extends AbstractParallelSetView {
 	public ParallelJobView() {
 		instance = this;
 		manager = PTPUIPlugin.getDefault().getJobManager();
+		PTPCorePlugin.getDefault().getModelPresentation().addProcessListener(this);
+	}
+	public void dispose() {
+		super.dispose();
+		PTPCorePlugin.getDefault().getModelPresentation().removeProcessListener(this);		
 	}
 	/** Get current view flag
 	 * @return flag of view
@@ -177,14 +185,23 @@ public class ParallelJobView extends AbstractParallelSetView {
 		jobTableViewer.setInput(manager);
 		jobTableViewer.getTable().addMouseListener(new MouseAdapter() {
 			public void mouseDown(MouseEvent e) {
-				Point point = new Point(e.x, e.y);
-				TableItem item = jobTableViewer.getTable().getItem(point);
-				if (item == null) {
+				ISelection selection = jobTableViewer.getSelection();
+				TableItem item = jobTableViewer.getTable().getItem(new Point(e.x, e.y));
+				if (item == null && !selection.isEmpty()) {
 					jobTableViewer.getTable().deselectAll();
 					changeJob((IPJob) null);
-				} else {
+				}
+				else if (item != null) {
 					IPJob job = manager.findJob(item.getText());
-					changeJob(job);
+					if (selection.isEmpty()) {
+						changeJob(job);
+					}
+					else {
+						String cur_id = getCurrentID();
+						if (cur_id == null || !cur_id.equals(job.getIDString())) {
+							changeJob(job);
+						}
+					}
 				}
 			}
 		});
@@ -312,12 +329,12 @@ public class ParallelJobView extends AbstractParallelSetView {
 	 * @param job
 	 */
 	protected void changeJob(final IPJob job) {
-		String cur_id = getCurrentID();
-		if (cur_id != null && job != null && cur_id.equals(job.getIDString()))
-			return;
+		//String cur_id = getCurrentID();
+		//if (cur_id != null && job != null && cur_id.equals(job.getIDString()))
+			//return;
 		selectJob((job == null ? IManager.EMPTY_ID : job.getIDString()));
 		update();
-		refresh();
+		refresh(false);
 	}
 	/** Update Job
 	 * 
@@ -341,20 +358,7 @@ public class ParallelJobView extends AbstractParallelSetView {
 			}
 		}
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#updateView(java.lang.Object)
-	 */
-	public void updateView(Object condition) {
-		if (condition != null) {
-			if (!jobTableViewer.getTable().isDisposed()) {
-				jobTableViewer.refresh(true);
-				update();
-			}
-		}
-	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.IParallelModelListener#run(java.lang.String)
-	 */
+	/*
 	public void run(final String arg) {
 		System.out.println("------------ job run: " + arg);
 		initialView();
@@ -367,79 +371,73 @@ public class ParallelJobView extends AbstractParallelSetView {
 				changeJob(job);
 			}
 		});
-		*/
+		*
 		refresh();
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.IParallelModelListener#start()
-	 */
 	public void start() {
 		System.out.println("------------ job start");
 		refresh();
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.IParallelModelListener#stopped()
-	 */
 	public void stopped() {
 		System.out.println("------------ job stop");
 		refresh();
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.IParallelModelListener#exit()
-	 */
 	public void exit() {
 		System.out.println("------------ job exit");
 		refresh();
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.IParallelModelListener#abort()
-	 */
 	public void abort() {
 		System.out.println("------------ job abort");
 		refresh();
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.IParallelModelListener#monitoringSystemChangeEvent(java.lang.Object)
-	 */
 	public void monitoringSystemChangeEvent(Object object) {
 		System.out.println("------------ job monitoringSystemChangeEvent");
 		manager.clear();
 		initialView();
 		refresh();
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.IParallelModelListener#execStatusChangeEvent(java.lang.Object)
-	 */
 	public void execStatusChangeEvent(Object object) {
 		System.out.println("------------ job execStatusChangeEvent");
 		refresh();
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.IParallelModelListener#sysStatusChangeEvent(java.lang.Object)
-	 */
 	public void sysStatusChangeEvent(Object object) {
 		System.out.println("------------ job sysStatusChangeEvent");
 		refresh();
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.IParallelModelListener#processOutputEvent(java.lang.Object)
-	 */
 	public void processOutputEvent(Object object) {
 		System.out.println("------------ job processOutputEvent");
 		refresh();
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.IParallelModelListener#errorEvent(java.lang.Object)
-	 */
 	public void errorEvent(Object object) {
 		System.out.println("------------ job errorEvent");
 		refresh();
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.IParallelModelListener#updatedStatusEvent()
-	 */
 	public void updatedStatusEvent() {
 		System.out.println("------------ job updatedStatusEvent");
 		refresh();
+	}
+	*/
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#updateView(java.lang.Object)
+	 */
+	public void repaint(boolean all) {
+		if (all) {
+			if (!jobTableViewer.getTable().isDisposed()) {
+				jobTableViewer.refresh(true);
+				update();
+			}
+		}
+	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.IProcessListener#processEvent(org.eclipse.ptp.core.events.IProcessEvent)
+	 */
+	public void processEvent(IProcessEvent event) {
+		// only redraw if the current set contain the process
+		IPProcess process = event.getProcess();
+		if (((JobManager) manager).isCurrentSetContainProcess(getCurrentID(), process.getIDString())) {
+			if (event.getType() != IProcessEvent.ADD_OUTPUT_TYPE)
+				refresh(false);
+		}
 	}
 }

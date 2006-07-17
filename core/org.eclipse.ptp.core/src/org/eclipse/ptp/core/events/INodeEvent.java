@@ -16,16 +16,18 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.core;
+package org.eclipse.ptp.core.events;
+
+import org.eclipse.ptp.core.IPNode;
+
 /**
  * @author Clement chu
  *
  */
 public interface INodeEvent {
-	public final static int STATUS_UPDATE_TYPE = 0;
-
-	public String getMachineID();
+	public final int STATUS_UPDATE_TYPE = 0;
+	
+	public IPNode getNode();
 	public String getInput();
 	public int getType();
-	public String getNodeID();	
 }

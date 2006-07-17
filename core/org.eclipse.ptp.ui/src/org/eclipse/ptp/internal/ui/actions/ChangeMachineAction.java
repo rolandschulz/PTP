@@ -102,7 +102,7 @@ public class ChangeMachineAction extends GotoDropDownAction {
 			ParallelMachineView pmView = ((ParallelMachineView)view);
 			pmView.selectMachine(id);			
 			pmView.update();
-			pmView.refresh();
+			pmView.refresh(false);
 		}
 	}
 	

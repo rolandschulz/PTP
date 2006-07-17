@@ -16,33 +16,27 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.core;
+package org.eclipse.ptp.core.events;
+
+import org.eclipse.ptp.core.IPElement;
+
+
 /**
  * @author Clement chu
  *
  */
-public class ProcessEvent implements IProcessEvent {
+public class ModelSysChangedEvent extends ModelEvent implements IModelSysChangedEvent {
 	private int type = -1;
-	private String input = null;
-	private String procID = null;
-	private String jid = null;
+	private IPElement element = null;
 	
-	public ProcessEvent(String jid, String procID, int type, String input) {
-		this.jid = jid;
-		this.procID = procID;
+	public ModelSysChangedEvent(int type, IPElement element) {
 		this.type = type;
-		this.input = input;
+		this.element = element;
 	}
-	public String getJobId() {
-		return jid;
-	}
-	public String getInput() {
-		return input;
+	public IPElement getElement() {
+		return element;
 	}
 	public int getType() {
 		return type;
-	}
-	public String getProcessID() {
-		return procID;
 	}
 }

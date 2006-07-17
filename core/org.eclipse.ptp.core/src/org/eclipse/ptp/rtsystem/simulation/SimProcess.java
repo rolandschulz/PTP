@@ -29,16 +29,16 @@ import java.util.List;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.core.AttributeConstants;
-import org.eclipse.ptp.core.INodeEvent;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
-import org.eclipse.ptp.core.IProcessEvent;
 import org.eclipse.ptp.core.IProcessListener;
-import org.eclipse.ptp.core.NodeEvent;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.PreferenceConstants;
-import org.eclipse.ptp.core.ProcessEvent;
+import org.eclipse.ptp.core.events.INodeEvent;
+import org.eclipse.ptp.core.events.IProcessEvent;
+import org.eclipse.ptp.core.events.NodeEvent;
+import org.eclipse.ptp.core.events.ProcessEvent;
 import org.eclipse.ptp.internal.core.OutputTextFile;
 import org.eclipse.ptp.internal.core.PElement;
 import org.eclipse.ptp.internal.core.PElementInfo;
@@ -174,24 +174,12 @@ public class SimProcess extends Process implements IPProcess, IPElementControl, 
 	}
 	public void setStatus(String status) {
 		this.status = status == null ? "unknown" : status;
-		if (status != null) {
-			fireEvent(new ProcessEvent(getJob().getIDString(), getIDString(), IProcessEvent.STATUS_CHANGE_TYPE, status));
-			if (node != null && status.equals(IPProcess.EXITED))
-				node.fireEvent(new NodeEvent(node.getMachine().getIDString(), node.getIDString(), INodeEvent.STATUS_UPDATE_TYPE, null));
-		}
 	}
 	public void setExitCode(String exitCode) {
 		this.exitCode = exitCode;
-		if (exitCode != null) {
-			fireEvent(new ProcessEvent(getJob().getIDString(), getIDString(), IProcessEvent.STATUS_EXIT_TYPE, exitCode));
-			if (node != null)
-				node.fireEvent(new NodeEvent(node.getMachine().getIDString(), node.getIDString(), INodeEvent.STATUS_UPDATE_TYPE, null));
-		}
 	}
 	public void setSignalName(String signalName) {
 		this.signalName = signalName;
-		if (signalName != null)
-			fireEvent(new ProcessEvent(getJob().getIDString(), getIDString(), IProcessEvent.STATUS_SIGNALNAME_TYPE, signalName));
 	}
 	public void setPid(String pid) {
 		this.pid = pid;
@@ -221,7 +209,6 @@ public class SimProcess extends Process implements IPProcess, IPElementControl, 
 		// outputList.add(output);
 		// outputList.add("random output from process: " + (counter++));
 		outputFile.write(output + "\n");
-		fireEvent(new ProcessEvent(getJob().getIDString(), getIDString(), IProcessEvent.ADD_OUTPUT_TYPE, output + "\n"));
 	}
 	public String getContents() {
 		// String[] array = new String[outputList.size()];

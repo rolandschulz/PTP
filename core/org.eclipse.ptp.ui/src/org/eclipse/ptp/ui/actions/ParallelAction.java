@@ -79,7 +79,7 @@ public abstract class ParallelAction extends Action {
      */
     public void run() {
     	ISelection selection = getViewPart().getSelection();
-    	if (selection != null && !selection.isEmpty() && selection instanceof IStructuredSelection) {
+    	if (!selection.isEmpty() && selection instanceof IStructuredSelection) {
         	Object[] objs = ((IStructuredSelection)selection).toArray();
         	IElement[] elements = new IElement[objs.length];
         	System.arraycopy(objs, 0, elements, 0, objs.length);

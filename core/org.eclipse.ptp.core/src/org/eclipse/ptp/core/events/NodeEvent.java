@@ -16,15 +16,31 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.ui.listeners;
+package org.eclipse.ptp.core.events;
+
+import org.eclipse.ptp.core.IPNode;
 
 /**
  * @author Clement chu
- * @deprecated
+ *
  */
-public interface IPaintListener {
-	/** Repaint the view
-	 * 
-	 */
-	public void repaint();
+public class NodeEvent implements INodeEvent {
+	private int type = -1;
+	private String input = null;
+	private IPNode n = null;
+	
+	public NodeEvent(IPNode n, int type, String input) {
+		this.n = n;
+		this.type = type;
+		this.input = input;
+	}
+	public String getInput() {
+		return input;
+	}
+	public int getType() {
+		return type;
+	}
+	public IPNode getNode() {
+		return n;
+	}
 }

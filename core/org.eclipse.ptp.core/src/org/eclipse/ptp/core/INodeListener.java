@@ -17,6 +17,9 @@
  * LA-CC 04-115
  *******************************************************************************/
 package org.eclipse.ptp.core;
+
+import org.eclipse.ptp.core.events.INodeEvent;
+
 /**
  * @author Clement chu
  *

@@ -20,20 +20,30 @@ package org.eclipse.ptp.ui.views;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.util.SafeRunnable;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.ISelectionProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.ptp.internal.ui.views.IconCanvas;
 import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
 
 /**
  * @author Clement chu
  * 
  */
-public class ElementIconCanvas extends IconCanvas {
+public class ElementIconCanvas extends IconCanvas implements ISelectionProvider {
 	private IElementSet cur_element_set = null;
+	private List listeners = new ArrayList();
+	private ISelection selection = null; 
 
 	/** Constructor
 	 * @param view 
@@ -51,8 +61,18 @@ public class ElementIconCanvas extends IconCanvas {
 	 * @see org.eclipse.swt.widgets.Widget#dispose()
 	 */
 	public void dispose() {
+		listeners.clear();
 		super.dispose();
 	}
+
+    public void addSelectionChangedListener(ISelectionChangedListener listener) {
+    	if (!listeners.contains(listener))
+    		listeners.add(listener);
+    }
+    public void removeSelectionChangedListener(ISelectionChangedListener listener) {
+    	if (listeners.contains(listener))
+    		listeners.remove(listener);
+    }	
 	/** Change set
 	 * @param e_set
 	 */
@@ -97,5 +117,30 @@ public class ElementIconCanvas extends IconCanvas {
 	 */
 	public IElement[] getSelectedElements() {
 		return getElements(getSelectedIndexes());
+	}
+	
+    public ISelection getSelection() {
+    	if (selection == null) {
+    		return StructuredSelection.EMPTY;
+    	}
+    	return selection;
+    }
+    public void setSelection(ISelection selection) {
+    	this.selection = selection;
+        final SelectionChangedEvent e = new SelectionChangedEvent(this, selection);
+        Object[] listenersArray = listeners.toArray();
+        
+        for (int i = 0; i < listenersArray.length; i++) {
+            final ISelectionChangedListener l = (ISelectionChangedListener) listenersArray[i];
+            SafeRunner.run(new SafeRunnable() {
+                public void run() {
+                    l.selectionChanged(e);
+                }
+            });
+		}    	
+    }
+	protected void handleMouseUp(Event event) {
+		super.handleMouseUp(event);
+		setSelection(new StructuredSelection(getSelectedElements()));
 	}
 }

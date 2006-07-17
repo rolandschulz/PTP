@@ -61,7 +61,7 @@ public class RemoveElementAction extends ParallelAction {
 					view.getUIManager().removeFromSet(elements, set.getID(), setManager);
 					view.selectSet(setManager.getSet(set.getID()));
 					view.updateTitle();
-					view.refresh();
+					view.refresh(false);
 				}
 			}
 		}		

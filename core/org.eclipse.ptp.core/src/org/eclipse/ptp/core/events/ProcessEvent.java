@@ -16,15 +16,32 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.ui.listeners;
+package org.eclipse.ptp.core.events;
+
+import org.eclipse.ptp.core.IPProcess;
+
 
 /**
  * @author Clement chu
- * @deprecated
+ *
  */
-public interface IPaintListener {
-	/** Repaint the view
-	 * 
-	 */
-	public void repaint();
+public class ProcessEvent implements IProcessEvent {
+	private int type = -1;
+	private String input = null;
+	private IPProcess p = null;
+	
+	public ProcessEvent(IPProcess p, int type, String input) {
+		this.p = p;
+		this.type = type;
+		this.input = input;
+	}
+	public IPProcess getProcess() {
+		return p;
+	}
+	public String getInput() {
+		return input;
+	}
+	public int getType() {
+		return type;
+	}
 }

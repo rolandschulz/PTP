@@ -18,6 +18,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.core;
 
+import org.eclipse.ptp.core.events.IProcessEvent;
+
 /**
  * 
  */
