@@ -20,7 +20,7 @@ package org.eclipse.ptp.debug.ui.events;
 
 /**
  * @author Clement chu
- *
+ * @deprecated
  */
 public class TerminatedDebugEvent extends DebugActionEvent implements ITerminatedDebugEvent {
 	/** Constructor

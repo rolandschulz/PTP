@@ -67,7 +67,7 @@ public class AddPVariableActionDelegate extends AbstractPVariableAction {
 		if (shell == null) {
 			shell = PTPDebugUIPlugin.getActiveWorkbenchShell();
 		}
-		final UIDebugManager uiManager = PTPDebugUIPlugin.getDefault().getUIDebugManager();
+		final UIDebugManager uiManager = PTPDebugUIPlugin.getUIDebugManager();
 		final Job job = new Job("Adding variables info.") {
 			public IStatus run(final IProgressMonitor monitor) {
 				if (!monitor.isCanceled()) {

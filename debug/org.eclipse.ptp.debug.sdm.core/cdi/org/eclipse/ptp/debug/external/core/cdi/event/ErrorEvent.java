@@ -30,7 +30,7 @@ public class ErrorEvent extends AbstractEvent implements IPCDIErrorEvent {
 	private int errCode;
 	
 	public ErrorEvent(IPCDISession session, BitList tasks, String message) {
-		this(session, tasks, message, DBG_WARNING);
+		this(session, tasks, message, DBG_NORMAL);
 	}
 	public ErrorEvent(IPCDISession session, BitList tasks, String message, int errCode) {
 		super(session, tasks);

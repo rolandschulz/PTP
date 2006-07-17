@@ -17,11 +17,15 @@
  * LA-CC 04-115
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.cdi;
+
+import org.eclipse.ptp.debug.core.cdi.model.IPCDILocator;
+
 /**
  * @author Clement chu
  * 
  */
-public interface IPCDIEndSteppingRange extends IPCDISessionObject {
-	public IPCDILineLocation getLineLocation();
+public interface IPCDIInferiorSignaled extends IPCDISessionObject {
+	IPCDILocator getLocator();
 }
+
 

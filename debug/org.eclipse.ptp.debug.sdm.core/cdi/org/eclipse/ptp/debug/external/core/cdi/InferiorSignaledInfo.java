@@ -16,12 +16,22 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.core.cdi;
-/**
- * @author Clement chu
- * 
- */
-public interface IPCDIEndSteppingRange extends IPCDISessionObject {
-	public IPCDILineLocation getLineLocation();
-}
+package org.eclipse.ptp.debug.external.core.cdi;
 
+import org.eclipse.ptp.debug.core.cdi.IPCDIInferiorSignaled;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDILocator;
+import org.eclipse.ptp.debug.external.core.cdi.event.InferiorSignaledEvent;
+
+public class InferiorSignaledInfo extends SessionObject implements IPCDIInferiorSignaled {
+	InferiorSignaledEvent event;
+	IPCDILocator loc;
+
+	public InferiorSignaledInfo(Session session, InferiorSignaledEvent e, IPCDILocator loc) {
+		super(session);
+		event = e;
+		this.loc = loc;
+	}
+	public IPCDILocator getLocator() {
+		return loc;
+	}
+}

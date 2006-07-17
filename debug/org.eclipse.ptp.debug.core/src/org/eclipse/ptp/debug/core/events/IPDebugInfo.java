@@ -16,12 +16,18 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.core.cdi;
+package org.eclipse.ptp.debug.core.events;
+
+import org.eclipse.ptp.core.IPJob;
+import org.eclipse.ptp.core.util.BitList;
+
 /**
- * @author Clement chu
- * 
+ * @author Clement
  */
-public interface IPCDIEndSteppingRange extends IPCDISessionObject {
-	public IPCDILineLocation getLineLocation();
+public interface IPDebugInfo {
+	public IPJob getJob();
+	public BitList getAllProcesses();
+	public BitList getAllRegisteredProcesses();
+	public BitList getAllUnregisteredProcesses();
 }
 

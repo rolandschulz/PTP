@@ -42,7 +42,7 @@ public class PCDIException extends CDIException {
 	 * @param msg
 	 */
 	public PCDIException(String msg) {
-		this(msg, IPCDIErrorEvent.DBG_ERROR);
+		this(msg, IPCDIErrorEvent.DBG_WARNING);
 	}
 	/** Constructor
 	 * @param msg
@@ -58,7 +58,7 @@ public class PCDIException extends CDIException {
 	 * @param details
 	 */
 	public PCDIException(String msg, String details) {
-		this(msg, details, IPCDIErrorEvent.DBG_ERROR);
+		this(msg, details, IPCDIErrorEvent.DBG_WARNING);
 	}
 	/** Constructor
 	 * @param e

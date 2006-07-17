@@ -18,37 +18,39 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.ui.actions;
 
-import org.eclipse.core.runtime.CoreException;
+import org.eclipse.debug.core.DebugPlugin;
+import org.eclipse.debug.core.model.IWatchExpression;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.window.Window;
 import org.eclipse.ptp.debug.internal.ui.PDebugImage;
+import org.eclipse.ptp.debug.internal.ui.views.variable.PVariableDialog;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
-import org.eclipse.ptp.debug.ui.views.ParallelDebugView;
-import org.eclipse.ptp.ui.model.IElement;
+
 /**
- * @author clement chu
- *
+ * @author Clement chu
  */
-public class UnregisterAction extends DebugAction {
-	public static final String name = "Unregister Selected Elements";
-	
+public class AddPExpressionAction extends Action {
+	public static final String name = "Add Expression";
+
 	/** Constructor
 	 * @param view
 	 */
-	public UnregisterAction(ParallelDebugView view) {
-		super(name, view);
-	    setImageDescriptor(PDebugImage.ID_ICON_UNREGISTER_NORMAL);
+	public AddPExpressionAction() {
+		super(name, IAction.AS_PUSH_BUTTON);
+	    setImageDescriptor(PDebugImage.ID_ICON_RESUME_NORMAL);
+	    setDisabledImageDescriptor(PDebugImage.ID_ICON_RESUME_DISABLE);
+	    setToolTipText(name);
+	    setId(name);
+	    setEnabled(false);
 	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.actions.ParallelAction#run(org.eclipse.ptp.ui.model.IElement[])
-	 */
-	public void run(IElement[] elements) {
-		if (validation(elements)) {
-			try {
-				view.unregisterSelectedElements();
-				view.refresh(false);
-			} catch (CoreException e) {
-				PTPDebugUIPlugin.errorDialog(getShell(), "Error", e.getStatus());				
-			}
+	
+	public void run() {
+		IWatchExpression watchExpression= DebugPlugin.getDefault().getExpressionManager().newWatchExpression("");
+		if (new PVariableDialog(PTPDebugUIPlugin.getShell(), watchExpression, false).open() == Window.OK) {
+			// if OK is selected, add the expression to the expression view and try to evaluate the expression.
+			DebugPlugin.getDefault().getExpressionManager().addExpression(watchExpression);
+			//watchExpression.setExpressionContext(getContext());
 		}
-	}	
+	}
 }

@@ -7,10 +7,7 @@ import java.util.List;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.Launch;
 import org.eclipse.debug.core.model.ISourceLocator;
-import org.eclipse.ptp.core.AttributeConstants;
 import org.eclipse.ptp.core.IPJob;
-import org.eclipse.ptp.core.util.BitList;
-import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
 import org.eclipse.ptp.debug.core.model.IPseudoProcess;
 
@@ -71,38 +68,9 @@ public class PLaunch extends Launch implements IPLaunch {
 	public void removeDebugProcess(int target_id) {
 		removeProcess(getDebugProcess(target_id));
 	}
-
-	public void removeDebugTargets(BitList tasks, boolean sendEvent) {
-		int[] taskArray = tasks.toArray();
-		for (int i=0; i<taskArray.length; i++) {
-			pJob.findProcessByTaskId(taskArray[i]).setAttribute(AttributeConstants.ATTRIB_ISREGISTERED, new Boolean(false));
-			IPDebugTarget debugTarget = getDebugTarget(taskArray[i]);
-			if (debugTarget != null) {
-				removeDebugTarget(debugTarget);
-				debugTarget.terminated();
-			}
-		}
-		if (sendEvent)
-			fireEvent(new PDebugTargetUnRegisterEvent(pJob, tasks));
-	}	
-	public void addDebugTargets(IPDebugTarget[] debugTargets, BitList tasks, boolean sendEvent) {
-		for (int i=0; i<debugTargets.length; i++) {
-			pJob.findProcessByTaskId(debugTargets[i].getTargetID()).setAttribute(AttributeConstants.ATTRIB_ISREGISTERED, new Boolean(true));
-			addDebugTarget(debugTargets[i]);
-		}
-		if (sendEvent)
-			fireEvent(new PDebugTargetRegisterEvent(pJob, tasks));
-	}
 	public boolean isTerminated() {
 		if (pJob != null)
 			return pJob.isAllStop();
 		return super.isTerminated();
-	}
-	public void fireEvent(IPLaunchEvent event) {
-		PTPDebugCorePlugin.getDebugModel().fireEvent(event);
-	}
-	
-	public void launchedStarted() {
-		fireEvent(new PLaunchStartedEvent(pJob));
 	}
 }

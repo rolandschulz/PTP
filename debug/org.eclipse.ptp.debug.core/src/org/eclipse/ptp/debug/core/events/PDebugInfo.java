@@ -16,32 +16,44 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.core.model;
+package org.eclipse.ptp.debug.core.events;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.core.IPJob;
+import org.eclipse.ptp.core.util.BitList;
 
 /**
- * @author Clement chu
- * 
+ * @author Clement
  */
-public interface IPVariableManager {
-	public void shutdown();
-	public void addVariable(IPJob job, String set_id, String variable, IProgressMonitor monitor) throws CoreException;
-	public void removeVariable(IPJob job, String variable, IProgressMonitor monitor) throws CoreException;
-	public void removeAllVariables(IPJob job);
-	public boolean hasVariable(IPJob job);
-	public String[] getVariables(IPJob job);
-	public void updateVariableResults(IPJob job, String set_id, IProgressMonitor monitor) throws CoreException;
-	public void updateVariableResults(IPJob job, String set_id, boolean force, IProgressMonitor monitor) throws CoreException;
-	public String getResultDisplay(IPJob job, int taskID);
-	public void cleanVariableResults(IPJob job);
-	public void addListener(IPVariableListener listener);
-	public void removeListener(IPVariableListener listener);
-
-	public interface IPVariableListener {
-		public void update(IPJob job);
+public class PDebugInfo implements IPDebugInfo {
+	private BitList allProcesses = null;
+	private BitList allRegProcesses = null;
+	private BitList allUnregProcesses = null;
+	private IPJob job = null;
+	
+	public PDebugInfo(IPDebugInfo info) {
+		this.job = info.getJob();
+		this.allProcesses = info.getAllProcesses();
+		this.allRegProcesses = info.getAllRegisteredProcesses();
+		this.allUnregProcesses = info.getAllUnregisteredProcesses();
 	}
+	public PDebugInfo(IPJob job, BitList allProcesses, BitList allRegProcesses, BitList allUnregProcesses) {
+		this.job = job;
+		this.allProcesses = allProcesses;
+		this.allRegProcesses = allRegProcesses;
+		this.allUnregProcesses = allUnregProcesses;
+	}
+	public BitList getAllProcesses() {
+		return allProcesses;
+	}
+	public BitList getAllRegisteredProcesses() {
+		return allRegProcesses;
+	}
+	public BitList getAllUnregisteredProcesses() {
+		return allUnregProcesses;
+	}
+	public IPJob getJob() {
+		return job;
+	}
+	
 }
 

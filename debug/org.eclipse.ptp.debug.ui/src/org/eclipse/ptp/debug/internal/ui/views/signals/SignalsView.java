@@ -156,7 +156,7 @@ public class SignalsView extends AbstractDebugEventHandlerView implements ISelec
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.cdt.debug.internal.ui.views.IDebugExceptionHandler#handleException(org.eclipse.debug.core.DebugException)
+	 * @see org.eclipse.ptp.debug.internal.ui.views.IDebugExceptionHandler#handleException(org.eclipse.debug.core.DebugException)
 	 */
 	public void handleException(DebugException e) {
 		showMessage(e.getMessage());

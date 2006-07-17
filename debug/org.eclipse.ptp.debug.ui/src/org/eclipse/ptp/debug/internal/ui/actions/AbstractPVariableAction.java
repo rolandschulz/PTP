@@ -20,11 +20,6 @@ package org.eclipse.ptp.debug.internal.ui.actions;
 
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.ptp.core.IPJob;
-import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
-import org.eclipse.ptp.debug.core.model.IPVariableManager.IPVariableListener;
-import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
-import org.eclipse.ptp.ui.listeners.IJobChangeListener;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.ui.IActionDelegate2;
 import org.eclipse.ui.IObjectActionDelegate;
@@ -36,7 +31,7 @@ import org.eclipse.ui.IWorkbenchPart;
  * @author Clement chu
  * 
  */
-public abstract class AbstractPVariableAction implements IObjectActionDelegate, IActionDelegate2, IViewActionDelegate, IPVariableListener, IJobChangeListener {
+public abstract class AbstractPVariableAction implements IObjectActionDelegate, IActionDelegate2, IViewActionDelegate {
 	protected IViewPart view = null;
 	protected IAction action = null;
 
@@ -45,6 +40,12 @@ public abstract class AbstractPVariableAction implements IObjectActionDelegate, 
 	 */
 	public void init(IViewPart view) {
 		this.view = view;
+	}
+	public IViewPart getView() {
+		return view;
+	}
+	public IAction getAction() {
+		return action;
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.IObjectActionDelegate#setActivePart(org.eclipse.jface.action.IAction, org.eclipse.ui.IWorkbenchPart)
@@ -56,37 +57,12 @@ public abstract class AbstractPVariableAction implements IObjectActionDelegate, 
 	 * @see org.eclipse.ui.IActionDelegate2#dispose()
 	 */
 	public void dispose() {
-		PTPDebugCorePlugin.getPVariableManager().removeListener(this);
-		PTPDebugUIPlugin.getDefault().getUIDebugManager().removeJobChangeListener(this);
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.IActionDelegate2#init(org.eclipse.jface.action.IAction)
 	 */
 	public void init(IAction action) {
 		this.action = action;
-		PTPDebugCorePlugin.getPVariableManager().addListener(this);
-		PTPDebugUIPlugin.getDefault().getUIDebugManager().addJobChangeListener(this);
-		setEnable();
-	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.model.IPVariableManager.IPVariableListener#update(org.eclipse.ptp.core.IPJob)
-	 */
-	public void update(IPJob job) {
-		if (PTPDebugUIPlugin.getDefault().getUIDebugManager().getCurrentJob().equals(job)) {
-			setEnable();
-		}
-	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.listeners.IJobChangeListener#changeJobEvent(java.lang.String, java.lang.String)
-	 */
-	public void changeJobEvent(String cur_job_id, String pre_job_id) {
-		if (cur_job_id == null || cur_job_id == "") {
-			if (action != null)
-				action.setEnabled(false);
-		}
-		else {
-			setEnable();
-		}
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.IActionDelegate2#runWithEvent(org.eclipse.jface.action.IAction, org.eclipse.swt.widgets.Event)
@@ -97,25 +73,5 @@ public abstract class AbstractPVariableAction implements IObjectActionDelegate, 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action.IAction, org.eclipse.jface.viewers.ISelection)
 	 */
-	public void selectionChanged(IAction action, ISelection selection) {}
-	protected static IPJob getCurrentRunningJob() {
-		IPJob job = PTPDebugUIPlugin.getDefault().getUIDebugManager().getCurrentJob();
-		return isRunning(job)?job:null;
-	}
-	/** Check if given job is running
-	 * @param job
-	 * @return true if job is running
-	 */
-	protected static boolean isRunning(IPJob job) {
-		return (job != null && !job.isAllStop());
-	}
-	/** Set this action enable / disable if current job is running and there is more than one variable added to list
-	 * 
-	 */
-	public void setEnable() {
-		if (action != null) {
-			IPJob job = getCurrentRunningJob();
-			action.setEnabled(job != null && PTPDebugCorePlugin.getPVariableManager().hasVariable(job));
-		}
-	}
+	public abstract void selectionChanged(IAction action, ISelection selection);
 }

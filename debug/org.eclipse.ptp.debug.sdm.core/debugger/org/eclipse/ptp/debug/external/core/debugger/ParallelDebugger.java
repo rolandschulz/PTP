@@ -515,7 +515,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			
 		case IProxyDebugEvent.EVENT_DBG_VARS:
 			if (this.currFrame == null) {
-				completeCommand(e.getBitSet(), new PCDIException("No stack frame selected", IPCDIErrorEvent.DBG_ERROR));
+				completeCommand(e.getBitSet(), new PCDIException("No stack frame selected", IPCDIErrorEvent.DBG_WARNING));
 				break;
 			}
 
@@ -537,7 +537,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			
 		case IProxyDebugEvent.EVENT_DBG_ARGS:
 			if (this.currFrame == null) {
-				completeCommand(e.getBitSet(), new PCDIException("No stack frame selected", IPCDIErrorEvent.DBG_ERROR));
+				completeCommand(e.getBitSet(), new PCDIException("No stack frame selected", IPCDIErrorEvent.DBG_WARNING));
 				break;
 			}
 
@@ -644,9 +644,9 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			return IPCDIErrorEvent.DBG_FATAL;
 		case IParallelDebuggerConstants.DBGERR_UNKNOWN_TYPE:
 		case IParallelDebuggerConstants.DBGERR_UNKNOWN_VARIABLE:
-			return IPCDIErrorEvent.DBG_WARNING;
+			return IPCDIErrorEvent.DBG_NORMAL;
 		default:
-			return IPCDIErrorEvent.DBG_ERROR;
+			return IPCDIErrorEvent.DBG_WARNING;
 		}
 	}
 	

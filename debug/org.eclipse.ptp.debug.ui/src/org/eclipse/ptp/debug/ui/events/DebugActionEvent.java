@@ -18,10 +18,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.ui.events;
 
-
 /**
  * @author Clement chu
- *
+ * @deprecated
  */
 public abstract class DebugActionEvent implements IDebugActionEvent {
 	private Object source = null;

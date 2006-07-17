@@ -22,6 +22,7 @@ import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.util.BitList;
 /**
  * @author Clement chu
+ * @deprecated
  * 
  */
 public class PDebugTargetRegisterEvent extends AbstractPLaunchEvent {

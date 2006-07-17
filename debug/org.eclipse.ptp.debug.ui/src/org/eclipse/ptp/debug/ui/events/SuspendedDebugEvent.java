@@ -21,7 +21,7 @@ package org.eclipse.ptp.debug.ui.events;
 
 /**
  * @author Clement chu
- *
+ * @deprecated
  */
 public class SuspendedDebugEvent extends DebugActionEvent implements IResumedDebugEvent {
 	/** Constructor

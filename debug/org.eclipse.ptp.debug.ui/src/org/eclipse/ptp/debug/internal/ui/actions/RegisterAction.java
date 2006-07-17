@@ -52,7 +52,7 @@ public class RegisterAction extends DebugAction {
 			}
 			try {
 				view.registerSelectedElements();
-				view.refresh();
+				view.refresh(false);
 			} catch (CoreException e) {
 				PTPDebugUIPlugin.errorDialog(getShell(), "Error", e.getStatus());				
 			}

@@ -16,12 +16,24 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.core.cdi;
+package org.eclipse.ptp.debug.core.events;
 /**
- * @author Clement chu
- * 
+ * @author Clement
  */
-public interface IPCDIEndSteppingRange extends IPCDISessionObject {
-	public IPCDILineLocation getLineLocation();
+public class PDebugSuspendInfo extends PDebugInfo implements IPDebugSuspendInfo {
+	private String filename;
+	private int lineNumber;
+	
+	public PDebugSuspendInfo(IPDebugInfo info, String filename, int lineNumber) {
+		super(info);
+		this.filename = filename;
+		this.lineNumber = lineNumber;
+	}
+	public String getFilename() {
+		return filename;
+	}
+	public int getLineNumber() {
+		return lineNumber;
+	}
 }
 

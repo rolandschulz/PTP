@@ -131,8 +131,6 @@ public class Session implements IPCDISession, IPCDISessionObject {
 			public void run(IProgressMonitor m) throws CoreException {
 				m.beginTask("", 3);
 				m.setTaskName("Creating debugging session...");
-				PTPDebugCorePlugin.getDebugModel().newJob(getJob().getIDString(), getTotalProcesses());				
-				launch.launchedStarted();
 				m.worked(1);
 				
 				boolean stopInMain = getLaunch().getLaunchConfiguration().getAttribute(IPTPLaunchConfigurationConstants.ATTR_STOP_IN_MAIN, false);
