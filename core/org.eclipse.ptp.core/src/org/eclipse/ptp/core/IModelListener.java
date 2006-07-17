@@ -16,15 +16,25 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.ui.listeners;
+package org.eclipse.ptp.core;
+
+import org.eclipse.ptp.core.events.IModelEvent;
 
 /**
- * @author Clement chu
- * @deprecated
+ *
  */
-public interface IPaintListener {
-	/** Repaint the view
-	 * 
-	 */
-	public void repaint();
+public interface IModelListener {
+	public void modelEvent(IModelEvent event);
+	/*
+	public void abort();
+	public void exit();
+	public void start();
+	public void stopped();
+	public void execStatusChangeEvent(Object object);
+	public void sysStatusChangeEvent(Object object);
+	public void processOutputEvent(Object object);
+	public void errorEvent(Object object);
+	public void updatedStatusEvent();
+	public void run(String arg);
+	*/
 }

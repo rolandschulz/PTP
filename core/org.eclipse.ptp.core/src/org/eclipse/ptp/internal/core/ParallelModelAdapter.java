@@ -18,41 +18,21 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.core;
 
-import org.eclipse.ptp.core.IParallelModelListener;
+import org.eclipse.ptp.core.IModelListener;
 
 /**
- *
+ * @deprecated 
  */
-public abstract class ParallelModelAdapter implements IParallelModelListener {
-	public void run(String arg) {
-	}
-
-	public void abort() {
-	}
-
-	public void exit() {
-	}
-
-	public void start() {
-	}
-
-	public void stopped() {
-	}
-
-	public void monitoringSystemChangeEvent(Object object) {
-	}
-	public void execStatusChangeEvent(Object object) {
-	}
-
-	public void sysStatusChangeEvent(Object object) {
-	}
-
-	public void processOutputEvent(Object object) {
-	}
-
-	public void errorEvent(Object object) {
-	}
-
-	public void updatedStatusEvent() {
-	}
+public abstract class ParallelModelAdapter implements IModelListener {
+	public void run(String arg) {}
+	public void abort() {}
+	public void exit() {}
+	public void start() {}
+	public void stopped() {}
+	public void monitoringSystemChangeEvent(Object object) {}
+	public void execStatusChangeEvent(Object object) {}
+	public void sysStatusChangeEvent(Object object) {}
+	public void processOutputEvent(Object object) {}
+	public void errorEvent(Object object) {}
+	public void updatedStatusEvent() {}
 }

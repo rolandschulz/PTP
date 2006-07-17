@@ -69,9 +69,6 @@ public interface IPNode extends IPElement {
 	 * @return Array of Jobs that have Processes running on this Node.
 	 */
 	public IPJob[] getJobs();
-	public void fireEvent(INodeEvent event);
-	public void addNodeListener(INodeListener listener);
-	public void removerNodeListener(INodeListener listener);
 
 	/**
 	 * Searches for an attribute on the Element given a key.  

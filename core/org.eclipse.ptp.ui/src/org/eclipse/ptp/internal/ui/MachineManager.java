@@ -21,8 +21,6 @@ package org.eclipse.ptp.internal.ui;
 import java.util.HashMap;
 import java.util.Map;
 import org.eclipse.ptp.core.AttributeConstants;
-import org.eclipse.ptp.core.INodeEvent;
-import org.eclipse.ptp.core.INodeListener;
 import org.eclipse.ptp.core.IPMachine;
 import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
@@ -37,7 +35,7 @@ import org.eclipse.ptp.ui.model.IElementSet;
  * @author clement chu
  * 
  */
-public class MachineManager extends AbstractUIManager implements INodeListener {
+public class MachineManager extends AbstractUIManager {
 	private Map machineList = new HashMap();
 	protected String cur_machine_id = EMPTY_ID;
 
@@ -292,7 +290,6 @@ public class MachineManager extends AbstractUIManager implements INodeListener {
 			IElementHandler elementHandler = new ElementHandler();
 			IElementSet set = elementHandler.getSetRoot();
 			for (int i = 0; i < total_element; i++) {
-				pNodes[i].addNodeListener(this);
 				set.add(new Element(set, pNodes[i].getIDString(), pNodes[i].getName()));
 			}
 			elementHandler.add(set);
@@ -313,15 +310,6 @@ public class MachineManager extends AbstractUIManager implements INodeListener {
 			setCurrentSetId(IElementHandler.SET_ROOT_ID);
 		}
 		return cur_machine_id;
-	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.INodeListener#nodeEvent(org.eclipse.ptp.core.INodeEvent)
-	 */
-	public void nodeEvent(INodeEvent event) {
-		// only redraw if the current set contain the node
-		if (isCurrentSetContainNode(event.getMachineID(), event.getNodeID())) {
-			firePaintListener(null);
-		}
 	}
 	/** Is current set contain node
 	 * @param mid machine ID

@@ -108,7 +108,7 @@ public class CreateSetAction extends GotoDropDownAction {
 			view.selectSet(setManager.getSet(setID));
 			//Need to deselect all elements manually
 			view.update();
-			view.refresh();
+			view.refresh(false);
 		}
 	}
 	

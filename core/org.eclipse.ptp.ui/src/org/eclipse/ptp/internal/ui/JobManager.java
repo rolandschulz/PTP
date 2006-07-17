@@ -18,21 +18,15 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.ui;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.IPUniverse;
-import org.eclipse.ptp.core.IProcessEvent;
-import org.eclipse.ptp.core.IProcessListener;
 import org.eclipse.ptp.internal.ui.model.Element;
 import org.eclipse.ptp.internal.ui.model.ElementHandler;
 import org.eclipse.ptp.ui.IPTPUIConstants;
-import org.eclipse.ptp.ui.listeners.IJobChangeListener;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
 
@@ -40,10 +34,9 @@ import org.eclipse.ptp.ui.model.IElementSet;
  * @author Clement chu
  * 
  */
-public class JobManager extends AbstractUIManager implements IProcessListener {
+public class JobManager extends AbstractUIManager {
 	protected Map jobList = new HashMap();
 	protected String cur_job_id = EMPTY_ID;
-	protected List jobChangeListeners = new ArrayList();
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#shutdown()
@@ -51,32 +44,7 @@ public class JobManager extends AbstractUIManager implements IProcessListener {
 	public void shutdown() {
 		clear();
 		modelPresentation = null;
-		jobChangeListeners.clear();
-		jobChangeListeners = null;
 		super.shutdown();
-	}
-	/** Add Job change listener
-	 * @param listener
-	 */
-	public void addJobChangeListener(IJobChangeListener listener) {
-		if (!jobChangeListeners.contains(listener))
-			jobChangeListeners.add(listener);
-	}
-	/** Remove Job change listener
-	 * @param listener
-	 */
-	public void removeJobChangeListener(IJobChangeListener listener) {
-		if (jobChangeListeners.contains(listener))
-			jobChangeListeners.remove(listener);
-	}
-	/** Fire job change event
-	 * @param cur_jid current job ID
-	 * @param pre_jid previous job ID
-	 */
-	public void fireJobChangeEvent(String cur_jid, String pre_jid) {
-		for (Iterator i = jobChangeListeners.iterator(); i.hasNext();) {
-			((IJobChangeListener) i.next()).changeJobEvent(cur_jid, pre_jid);
-		}
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#getElementHandler(java.lang.String)
@@ -126,7 +94,7 @@ public class JobManager extends AbstractUIManager implements IProcessListener {
 	public void setCurrentJobId(String job_id) {
 		String tmp_jod_id = cur_job_id;
 		cur_job_id = job_id;		
-		fireJobChangeEvent(job_id, tmp_jod_id);
+		fireJobChangedListener(job_id, tmp_jod_id);
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#getCurrentSetId()
@@ -243,7 +211,6 @@ public class JobManager extends AbstractUIManager implements IProcessListener {
 			IElementHandler elementHandler = new ElementHandler();
 			IElementSet set = elementHandler.getSetRoot();
 			for (int i = 0; i < total_element; i++) {
-				addProcessListener(pProcesses[i], job);
 				set.add(new Element(set, pProcesses[i].getIDString(), String.valueOf(pProcesses[i].getTaskId())));
 			}
 			elementHandler.add(set);
@@ -266,29 +233,33 @@ public class JobManager extends AbstractUIManager implements IProcessListener {
 		}
 		return last_job_id;
 	}
-	/*******************************************************************************************************************************************************************************************************************************************************************************************************
-	 * Process Listener
-	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
-	/** Add process listener
-	 * @param process
-	 * @param currentJob
+	/** Return set id
+	 * @param jid
+	 * @return
 	 */
-	public void addProcessListener(IPProcess process, IPJob currentJob) {
-		process.addProcessListener(this);
-	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.IProcessListener#processEvent(org.eclipse.ptp.core.IProcessEvent)
-	 */
-	public void processEvent(IProcessEvent event) {
-		// only redraw if the current set contain the process
-		if (isJobStop(event.getJobId()))
-			firePaintListener(new Boolean(true));
-		else {
-			if (isCurrentSetContainProcess(event.getJobId(), event.getProcessID())) {
-				if (event.getType() != IProcessEvent.ADD_OUTPUT_TYPE)
-					firePaintListener(null);
+	public String[] getSets(String jid) {
+		IElementHandler eHandler = getElementHandler(jid);
+		if (eHandler == null)
+			return new String[0];
+		
+		IElementSet[] eSets = eHandler.getSets();
+		String[] sets = new String[eSets.length];
+		for (int i=1; i<sets.length+1; i++) {
+			String tmp = eSets[i-1].getID();
+			if (tmp.equals(IElementHandler.SET_ROOT_ID)) {
+				continue;
+			}
+			if (i == sets.length) {
+				sets[i-1] = tmp;				
+			}
+			else {
+				sets[i] = tmp;				
 			}
 		}
+		if (sets.length > 0) {
+			sets[0] = IElementHandler.SET_ROOT_ID;
+		}
+		return sets;
 	}
 	/** Is current set contain process
 	 * @param jid job ID

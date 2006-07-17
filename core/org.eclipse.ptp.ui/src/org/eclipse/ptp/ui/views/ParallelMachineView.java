@@ -20,10 +20,11 @@ package org.eclipse.ptp.ui.views;
 
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.ptp.core.AttributeConstants;
-import org.eclipse.ptp.core.IPJob;
-import org.eclipse.ptp.core.IPMachine;
+import org.eclipse.ptp.core.INodeListener;
 import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
+import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.events.INodeEvent;
 import org.eclipse.ptp.internal.ui.MachineManager;
 import org.eclipse.ptp.internal.ui.ParallelImages;
 import org.eclipse.ptp.internal.ui.actions.ChangeMachineAction;
@@ -51,7 +52,7 @@ import org.eclipse.swt.widgets.TableItem;
  * @author clement chu
  * 
  */
-public class ParallelMachineView extends AbstractParallelSetView {
+public class ParallelMachineView extends AbstractParallelSetView implements INodeListener {
 	private static ParallelMachineView instance = null;
 	// actions
 	protected ParallelAction changeMachineAction = null;
@@ -73,6 +74,11 @@ public class ParallelMachineView extends AbstractParallelSetView {
 	public ParallelMachineView() {
 		instance = this;
 		manager = PTPUIPlugin.getDefault().getMachineManager();
+		PTPCorePlugin.getDefault().getModelPresentation().addNodeListener(this);
+	}
+	public void dispose() {
+		super.dispose();
+		PTPCorePlugin.getDefault().getModelPresentation().removeNodeListener(this);
 	}
 	/** Change view flag
 	 * @param view_flag view flag
@@ -111,7 +117,7 @@ public class ParallelMachineView extends AbstractParallelSetView {
 	protected void initialView() {
 		initialElement();
 		if (manager.size() > 0) {
-			refresh();
+			refresh(false);
 		}
 		update();
 	}
@@ -348,9 +354,7 @@ public class ParallelMachineView extends AbstractParallelSetView {
 			}
 		}
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.IParallelModelListener#run(java.lang.String)
-	 */
+	/*
 	public void run(String arg) {
 		System.out.println("------------ machine run - job " + arg);
 		IPJob job = ((MachineManager) manager).findJob(arg);
@@ -363,82 +367,58 @@ public class ParallelMachineView extends AbstractParallelSetView {
 		update();
 		refresh();
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#updateView(java.lang.Object)
-	 */
-	public void updateView(Object condition) {
-		updateLowerTextRegions();
-	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.IParallelModelListener#start()
-	 */
 	public void start() {
 		System.out.println("------------ machine start");
 		refresh();
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.IParallelModelListener#stopped()
-	 */
 	public void stopped() {
 		System.out.println("------------ machine stop");
 		refresh();
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.IParallelModelListener#exit()
-	 */
 	public void exit() {
 		System.out.println("------------ machine exit");
 		refresh();
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.IParallelModelListener#abort()
-	 */
 	public void abort() {
 		System.out.println("------------ machine abort");
 		refresh();
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.IParallelModelListener#monitoringSystemChangeEvent(java.lang.Object)
-	 */
 	public void monitoringSystemChangeEvent(Object object) {
 		System.out.println("------------ machine monitoringSystemChangeEvent");
 		manager.clear();
 		initialView();
 		refresh();
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.IParallelModelListener#execStatusChangeEvent(java.lang.Object)
-	 */
 	public void execStatusChangeEvent(Object object) {
 		System.out.println("------------ machine execStatusChangeEvent");
 		refresh();
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.IParallelModelListener#sysStatusChangeEvent(java.lang.Object)
-	 */
 	public void sysStatusChangeEvent(Object object) {
 		System.out.println("------------ machine sysStatusChangeEvent");
 		refresh();
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.IParallelModelListener#processOutputEvent(java.lang.Object)
-	 */
 	public void processOutputEvent(Object object) {
 		System.out.println("------------ machine processOutputEvent");
 		refresh();
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.IParallelModelListener#errorEvent(java.lang.Object)
-	 */
 	public void errorEvent(Object object) {
 		System.out.println("------------ machine errorEvent");
 		refresh();
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.IParallelModelListener#updatedStatusEvent()
-	 */
 	public void updatedStatusEvent() {
 		System.out.println("------------ machine updatedStatusEvent");
 		refresh();
+	}
+	*/
+
+	public void repaint(boolean all) {
+		updateLowerTextRegions();
+	}
+	public void nodeEvent(INodeEvent event) {
+		// only redraw if the current set contain the node
+		IPNode node = event.getNode();
+		if (((MachineManager) manager).isCurrentSetContainNode(node.getMachine().getIDString(), node.getIDString())) {
+			refresh(false);
+		}		
 	}
 }

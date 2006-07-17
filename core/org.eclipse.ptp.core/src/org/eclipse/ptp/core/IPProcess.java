@@ -43,8 +43,6 @@ public interface IPProcess extends IPElement {
 	public String[] getOutputs();
 	public void clearOutput();
 	public void addOutput(String output);
-	public void addProcessListener(IProcessListener listener);
-	public void removerProcessListener(IProcessListener listener);
 	/* returns the parent job that this process is encompassed by */
 	public IPJob getJob();
 	/* sets the node that this process is running on */

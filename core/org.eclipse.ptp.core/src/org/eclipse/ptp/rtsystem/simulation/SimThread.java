@@ -24,8 +24,8 @@ import java.util.List;
 import java.util.Observable;
 
 import org.eclipse.ptp.core.IPProcess;
-import org.eclipse.ptp.core.IProcessEvent;
-import org.eclipse.ptp.core.ProcessEvent;
+import org.eclipse.ptp.core.events.IProcessEvent;
+import org.eclipse.ptp.core.events.ProcessEvent;
 
 
 public class SimThread extends Observable {

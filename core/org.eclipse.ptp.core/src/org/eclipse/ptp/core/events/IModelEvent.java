@@ -16,33 +16,9 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.core;
+package org.eclipse.ptp.core.events;
 /**
  * @author Clement chu
  *
  */
-public class NodeEvent implements INodeEvent {
-	private int type = -1;
-	private String input = null;
-	private String nodeID = null;
-	private String mid = null;
-	
-	public NodeEvent(String mid, String nodeID, int type, String input) {
-		this.mid = mid;
-		this.nodeID = nodeID;
-		this.type = type;
-		this.input = input;
-	}
-	public String getMachineID() {
-		return mid;
-	}
-	public String getInput() {
-		return input;
-	}
-	public int getType() {
-		return type;
-	}
-	public String getNodeID() {
-		return nodeID;
-	}
-}
+public interface IModelEvent {}

@@ -22,11 +22,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.ptp.core.IModelPresentation;
 import org.eclipse.ptp.core.IPJob;
@@ -35,7 +34,7 @@ import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.internal.ui.model.ElementSet;
 import org.eclipse.ptp.ui.IManager;
 import org.eclipse.ptp.ui.PTPUIPlugin;
-import org.eclipse.ptp.ui.listeners.IPaintListener;
+import org.eclipse.ptp.ui.listeners.IJobChangedListener;
 import org.eclipse.ptp.ui.listeners.ISetListener;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
@@ -49,8 +48,9 @@ import org.eclipse.ui.PlatformUI;
 public abstract class AbstractUIManager implements IManager {
 	protected IModelPresentation modelPresentation = null;
 	protected String cur_set_id = EMPTY_ID;
-	protected List pListeners = new ArrayList(0);
+	//protected List pListeners = new ArrayList(0);
 	protected List setListeners = new ArrayList(0);
+	protected List jListeners = new ArrayList();
 
 	/** Constructor 
 	 * 
@@ -58,47 +58,41 @@ public abstract class AbstractUIManager implements IManager {
 	public AbstractUIManager() {
 		modelPresentation = PTPCorePlugin.getDefault().getModelPresentation();
 	}
-
 	protected abstract class SafeNotifier implements ISafeRunnable {
 		public void handleException(Throwable ex) {
 			PTPUIPlugin.log(ex);
 		}
 	}
-
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#shutdown()
 	 */
 	public void shutdown() {
-		pListeners.clear();
-		pListeners = null;
+		//pListeners.clear();
+		//pListeners = null;
+		setListeners.clear();
+		setListeners = null;
+		jListeners.clear();
+		jListeners = null;
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.IManager#addPaintListener(org.eclipse.ptp.ui.listeners.IPaintListener)
-	 */
+	/*
 	public void addPaintListener(IPaintListener pListener) {
 		if (!pListeners.contains(pListener))
 			pListeners.add(pListener);
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.IManager#removePaintListener(org.eclipse.ptp.ui.listeners.IPaintListener)
-	 */
 	public void removePaintListener(IPaintListener pListener) {
 		if (pListeners.contains(pListener))
 			pListeners.remove(pListener);
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.IManager#firePaintListener(java.lang.Object)
-	 */
-	public void firePaintListener(final Object condition) {
-		for (Iterator i = pListeners.iterator(); i.hasNext();) {
-			final IPaintListener pListener = (IPaintListener) i.next();
-			Platform.run(new SafeNotifier() {
-				public void run() {
-					pListener.repaint(condition);
+	public void firePaintListener() {
+		SafeRunner.run(new SafeNotifier() {
+			public void run() {
+				for (Iterator i = pListeners.iterator(); i.hasNext();) {
+					((IPaintListener) i.next()).repaint();
 				}
-			});
-		}
+			}
+		});
 	}
+	*/
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#addSetListener(org.eclipse.ptp.ui.listeners.ISetListener)
 	 */
@@ -116,10 +110,10 @@ public abstract class AbstractUIManager implements IManager {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#fireEvent(int, org.eclipse.ptp.ui.model.IElement[], org.eclipse.ptp.ui.model.IElementSet, org.eclipse.ptp.ui.model.IElementSet)
 	 */
-	public void fireEvent(final int eventType, final IElement[] elements, final IElementSet cur_set, final IElementSet pre_set) {
+	public void fireSetEvent(final int eventType, final IElement[] elements, final IElementSet cur_set, final IElementSet pre_set) {
 		for (Iterator i = setListeners.iterator(); i.hasNext();) {
 			final ISetListener setListener = (ISetListener) i.next();
-			Platform.run(new SafeNotifier() {
+			SafeRunner.run(new SafeNotifier() {
 				public void run() {
 					switch (eventType) {
 					case CREATE_SET_TYPE:
@@ -143,6 +137,33 @@ public abstract class AbstractUIManager implements IManager {
 		}
 	}
 	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.IManager#addJobListener(org.eclipse.ptp.ui.listeners.IJobListener)
+	 */
+	public void addJobChangedListener(IJobChangedListener jobListener) {
+		if (!jListeners.contains(jobListener))
+			jListeners.add(jobListener);
+	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.IManager#removeJobListener(org.eclipse.ptp.ui.listeners.IJobListener)
+	 */
+	public void removeJobChangedListener(IJobChangedListener jobListener) {
+		if (jListeners.contains(jobListener))
+			jListeners.remove(jobListener);
+	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.IManager#fireJobListener(int, java.lang.String, java.lang.String)
+	 */
+	public void fireJobChangedListener(final String cur_job_id, final String pre_job_id) {
+		for (Iterator i = jListeners.iterator(); i.hasNext();) {
+			final IJobChangedListener listener = (IJobChangedListener)i.next();
+			SafeRunner.run(new SafeNotifier() {
+				public void run() {
+					listener.jobChangedEvent(cur_job_id, pre_job_id);
+				}
+			});
+		}
+			
+	}	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#addToSet(org.eclipse.ptp.ui.model.IElement[], org.eclipse.ptp.ui.model.IElementSet)
 	 */
 	public void addToSet(IElement[] elements, IElementSet set) {
@@ -157,7 +178,7 @@ public abstract class AbstractUIManager implements IManager {
 		IElementSet set = elementHandler.getSet(setID);
 		addToSet(elements, set);
 		updateMatchElementSets(set, elementHandler);
-		fireEvent(ADD_ELEMENT_TYPE, elements, set, null);
+		fireSetEvent(ADD_ELEMENT_TYPE, elements, set, null);
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#createSet(org.eclipse.ptp.ui.model.IElement[], java.lang.String, java.lang.String, org.eclipse.ptp.ui.model.IElementHandler)
@@ -167,7 +188,7 @@ public abstract class AbstractUIManager implements IManager {
 		addToSet(elements, set);
 		elementHandler.add(set);
 		updateMatchElementSets(set, elementHandler);
-		fireEvent(CREATE_SET_TYPE, elements, set, null);
+		fireSetEvent(CREATE_SET_TYPE, elements, set, null);
 		return set.getID();
 	}
 	/* (non-Javadoc)
@@ -180,7 +201,7 @@ public abstract class AbstractUIManager implements IManager {
 			elementHandler.getSet(sets[i]).removeMatchSet(setID);
 		}
 		elementHandler.remove(setID);
-		fireEvent(DELETE_SET_TYPE, null, set, null);
+		fireSetEvent(DELETE_SET_TYPE, null, set, null);
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#removeFromSet(org.eclipse.ptp.ui.model.IElement[], java.lang.String, org.eclipse.ptp.ui.model.IElementHandler)
@@ -191,7 +212,7 @@ public abstract class AbstractUIManager implements IManager {
 			set.remove(elements[i]);
 		}
 		updateMatchElementSets(set, elementHandler);
-		fireEvent(REMOVE_ELEMENT_TYPE, elements, set, null);
+		fireSetEvent(REMOVE_ELEMENT_TYPE, elements, set, null);
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#updateMatchElementSets(org.eclipse.ptp.ui.model.IElementSet, org.eclipse.ptp.ui.model.IElementHandler)
@@ -278,7 +299,7 @@ public abstract class AbstractUIManager implements IManager {
 					}
 				} finally {
 					pmonitor.done();
-					firePaintListener(new Boolean(true));
+					//firePaintListener();
 				}
 			}
 		};
