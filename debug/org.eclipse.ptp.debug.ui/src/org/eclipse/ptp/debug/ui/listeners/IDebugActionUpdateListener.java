@@ -22,7 +22,7 @@ import org.eclipse.ptp.debug.ui.events.IDebugActionEvent;
 
 /**
  * @author Clement chu
- *
+ * @deprecated
  */
 public interface IDebugActionUpdateListener {
 	/** Handle debug action event

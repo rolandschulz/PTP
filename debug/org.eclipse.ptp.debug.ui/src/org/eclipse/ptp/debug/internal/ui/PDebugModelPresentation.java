@@ -113,7 +113,7 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 	 */
 	private UIDebugManager getUIDebugManager() {
 		if (uiDebugManager == null) {
-			uiDebugManager = PTPDebugUIPlugin.getDefault().getUIDebugManager();
+			uiDebugManager = PTPDebugUIPlugin.getUIDebugManager();
 		}
 		return uiDebugManager;
 	}

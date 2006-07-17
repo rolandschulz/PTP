@@ -18,32 +18,42 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.core.cdi;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
-
+import org.eclipse.cdt.debug.core.cdi.ICDILocator;
+import org.eclipse.ptp.core.PreferenceConstants;
+import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
+import org.eclipse.ptp.debug.core.cdi.IPCDIBreakpointHit;
+import org.eclipse.ptp.debug.core.cdi.IPCDIEndSteppingRange;
+import org.eclipse.ptp.debug.core.cdi.IPCDIErrorInfo;
 import org.eclipse.ptp.debug.core.cdi.IPCDIEventManager;
+import org.eclipse.ptp.debug.core.cdi.IPCDIInferiorSignaled;
+import org.eclipse.ptp.debug.core.cdi.IPCDILineLocation;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIChangedEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDICreatedEvent;
-import org.eclipse.ptp.debug.core.cdi.event.IPCDIDisconnectedEvent;
+import org.eclipse.ptp.debug.core.cdi.event.IPCDIDebugDestroyedEvent;
+import org.eclipse.ptp.debug.core.cdi.event.IPCDIDestroyedEvent;
+import org.eclipse.ptp.debug.core.cdi.event.IPCDIErrorEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEventListener;
-import org.eclipse.ptp.debug.core.cdi.event.IPCDIExitedEvent;
-import org.eclipse.ptp.debug.core.cdi.event.IPCDIMemoryChangedEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIResumedEvent;
-import org.eclipse.ptp.debug.core.cdi.event.IPCDISignalChangedEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDISuspendedEvent;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIMemoryBlock;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDISignal;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIBreakpoint;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDILocationBreakpoint;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDILocator;
+import org.eclipse.ptp.debug.core.events.IPDebugEvent;
+import org.eclipse.ptp.debug.core.events.IPDebugInfo;
+import org.eclipse.ptp.debug.core.events.PDebugErrorInfo;
+import org.eclipse.ptp.debug.core.events.PDebugEvent;
+import org.eclipse.ptp.debug.core.events.PDebugInfo;
+import org.eclipse.ptp.debug.core.events.PDebugSuspendInfo;
 import org.eclipse.ptp.debug.external.core.PTPDebugExternalPlugin;
-import org.eclipse.ptp.debug.external.core.cdi.event.ChangedEvent;
-import org.eclipse.ptp.debug.external.core.cdi.event.MemoryChangedEvent;
-import org.eclipse.ptp.debug.external.core.cdi.event.SignalChangedEvent;
-import org.eclipse.ptp.debug.external.core.cdi.model.MemoryBlock;
+import org.eclipse.ptp.debug.external.core.cdi.event.BreakpointHitEvent;
+import org.eclipse.ptp.debug.external.core.cdi.event.EndSteppingRangeEvent;
 import org.eclipse.ptp.debug.external.core.cdi.model.Target;
 import org.eclipse.ptp.debug.external.core.cdi.model.Thread;
 
@@ -54,19 +64,24 @@ public class EventManager extends SessionObject implements IPCDIEventManager, Ob
 		IPCDIEvent event = (IPCDIEvent) arg;
 
 		List cdiList = new ArrayList(1);		
-		Session session = (Session)getSession();		
 		if (event instanceof IPCDISuspendedEvent) {
 			processSuspendedEvent((IPCDISuspendedEvent)event);
+			fireSuspendEvent((IPCDISuspendedEvent)event);
 		}
 		else if (event instanceof IPCDIResumedEvent) {
+			fireResumeEvent((IPCDIResumedEvent)event);
 		}
-		else if (event instanceof IPCDIExitedEvent) {
+		else if (event instanceof IPCDIDestroyedEvent) {
+			fireDestroyEvent((IPCDIDestroyedEvent)event);
 		}
-		else if (event instanceof IPCDIDisconnectedEvent) {
+		else if (event instanceof IPCDIErrorEvent) {
+			fireErrorEvent((IPCDIErrorEvent)event);
 		}
 		else if (event instanceof IPCDICreatedEvent) {
+			fireCreateEvent((IPCDICreatedEvent)event);
 		}
 		else if (event instanceof IPCDIChangedEvent) {
+			fireChangeEvent((IPCDIChangedEvent)event);
 			/*
 			if (event instanceof IPCDIMemoryChangedEvent) {
 				// We need to fire an event for all the register blocks that may contain the modified addresses.
@@ -206,5 +221,107 @@ public class EventManager extends SessionObject implements IPCDIEventManager, Ob
 			}
 		}
 		return true;
+	}
+	
+	public IPDebugInfo getDebugInfo(IPCDIEvent event) {
+		return new PDebugInfo(event.getDebugJob(), event.getAllProcesses(), event.getAllRegisteredProcesses(), event.getAllUnregisteredProcesses());
+	}	
+	public void fireSuspendEvent(IPCDISuspendedEvent event) {
+		IPDebugInfo baseInfo = getDebugInfo(event);
+		int detail = IPDebugEvent.UNSPECIFIED;
+		
+		int lineNumber = 0;
+		String fileName = (String) baseInfo.getJob().getAttribute(PreferenceConstants.JOB_DEBUG_DIR) + "/";
+		if (event instanceof BreakpointHitEvent) {
+			IPCDIBreakpoint bpt = ((IPCDIBreakpointHit) ((IPCDISuspendedEvent) event).getReason()).getBreakpoint();
+			if (bpt instanceof IPCDILocationBreakpoint) {
+				IPCDILocator locator = ((IPCDILocationBreakpoint) bpt).getLocator();
+				lineNumber = locator.getLineNumber();
+				fileName += locator.getFile();
+			}
+			detail = IPDebugEvent.BREAKPOINT;
+		} 
+		else if (event instanceof EndSteppingRangeEvent) {
+			IPCDILineLocation lineLocation = ((IPCDIEndSteppingRange) ((IPCDISuspendedEvent) event).getReason()).getLineLocation();
+			if (lineLocation != null) {
+				lineNumber = lineLocation.getLineNumber();
+				fileName += lineLocation.getFile();
+			}
+			detail = IPDebugEvent.STEP_END;
+		}
+		else {
+			ICDILocator locator = ((IPCDIInferiorSignaled) ((IPCDISuspendedEvent) event).getReason()).getLocator();
+			if (locator != null) {
+				lineNumber = locator.getLineNumber();
+				fileName += locator.getFile();
+			}
+			detail = IPDebugEvent.UNSPECIFIED;
+		}
+		if (lineNumber == 0)
+			lineNumber = 1;
+		
+		PTPDebugCorePlugin.getDefault().fireDebugEvent(new PDebugEvent(getSession(), IPDebugEvent.SUSPEND, detail, new PDebugSuspendInfo(baseInfo, fileName, lineNumber)));
+	}
+	
+	public void fireResumeEvent(IPCDIResumedEvent event) {
+		IPDebugInfo baseInfo = getDebugInfo(event);
+		int detail = IPDebugEvent.UNSPECIFIED;
+
+		if (event.getType() != IPCDIResumedEvent.CONTINUE) {
+			switch (event.getType()) {
+			case IPCDIResumedEvent.STEP_INTO:
+			case IPCDIResumedEvent.STEP_INTO_INSTRUCTION:
+				detail = IPDebugEvent.STEP_INTO;
+				break;
+			case IPCDIResumedEvent.STEP_OVER:
+			case IPCDIResumedEvent.STEP_OVER_INSTRUCTION:
+				detail = IPDebugEvent.STEP_OVER;
+				break;
+			case IPCDIResumedEvent.STEP_RETURN:
+				detail = IPDebugEvent.STEP_RETURN;
+				break;
+			}
+			PTPDebugCorePlugin.getDefault().fireDebugEvent(new PDebugEvent(getSession(), IPDebugEvent.RESUME, detail, baseInfo));
+		}
+	}
+	public void fireDestroyEvent(IPCDIDestroyedEvent event) {
+		IPDebugInfo baseInfo = getDebugInfo(event);
+		int detail = IPDebugEvent.UNSPECIFIED;
+
+		if (event instanceof IPCDIDebugDestroyedEvent) {
+			detail = IPDebugEvent.DEBUGGER;
+		}
+		PTPDebugCorePlugin.getDefault().fireDebugEvent(new PDebugEvent(getSession(), IPDebugEvent.TERMINATE, detail, baseInfo));
+	}
+	public void fireErrorEvent(IPCDIErrorEvent event) {
+		IPDebugInfo baseInfo = getDebugInfo(event);
+		int detail = IPDebugEvent.UNSPECIFIED;
+
+		switch (event.getErrorCode()) {
+		case IPCDIErrorEvent.DBG_NORMAL:
+			detail = IPDebugEvent.ERR_NORMAL;
+			break;
+		case IPCDIErrorEvent.DBG_WARNING:
+			detail = IPDebugEvent.ERR_WARNING;
+			break;
+		case IPCDIErrorEvent.DBG_FATAL:
+			detail = IPDebugEvent.ERR_FATAL;
+			break;
+		}
+		
+		IPCDIErrorInfo errInfo = (IPCDIErrorInfo)event.getReason();
+		PTPDebugCorePlugin.getDefault().fireDebugEvent(new PDebugEvent(getSession(), IPDebugEvent.ERROR, detail, new PDebugErrorInfo(baseInfo, errInfo.getMessage(), errInfo.getDetailMessage())));
+	}
+	public void fireChangeEvent(IPCDIChangedEvent event) {
+		IPDebugInfo baseInfo = getDebugInfo(event);
+		int detail = IPDebugEvent.UNSPECIFIED;
+		
+		PTPDebugCorePlugin.getDefault().fireDebugEvent(new PDebugEvent(getSession(), IPDebugEvent.CHANGE, detail, baseInfo));
+	}
+	public void fireCreateEvent(IPCDICreatedEvent event) {
+		IPDebugInfo baseInfo = getDebugInfo(event);
+		int detail = IPDebugEvent.UNSPECIFIED;
+		
+		PTPDebugCorePlugin.getDefault().fireDebugEvent(new PDebugEvent(getSession(), IPDebugEvent.CREATE, detail, baseInfo));
 	}
 }

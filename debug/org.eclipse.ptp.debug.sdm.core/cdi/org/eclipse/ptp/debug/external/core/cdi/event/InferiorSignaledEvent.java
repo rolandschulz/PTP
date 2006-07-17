@@ -22,20 +22,17 @@ import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.IPCDISessionObject;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDILocator;
+import org.eclipse.ptp.debug.external.core.cdi.InferiorSignaledInfo;
+import org.eclipse.ptp.debug.external.core.cdi.Session;
 
 public class InferiorSignaledEvent extends AbstractSuspendEvent {
-	private IPCDILocator	loc;
+	private IPCDILocator loc;
 	
 	public InferiorSignaledEvent(IPCDISession session, BitList tasks, IPCDILocator loc, int thread_id) {
 		super(session, tasks, thread_id);
 		this.loc = loc;
 	}
-	
 	public IPCDISessionObject getReason() {
-		return null;
-	}
-	
-	public IPCDILocator getLocator() {
-		return this.loc;
+		return new InferiorSignaledInfo((Session) session, this, loc);
 	}
 }

@@ -48,14 +48,14 @@ public class Signal extends PObject implements IPCDISignal {
 	}
 
 	/**
-	 * @see org.eclipse.ptp.debug.core.cdi.IPCDISignal#getMeaning()
+	 * @see org.eclipse.ptp.debug.core.cdi.IPCDIInferiorSignaled#getMeaning()
 	 */
 	public String getDescription() {
 		return desc;
 	}
 
 	/**
-	 * @see org.eclipse.ptp.debug.core.cdi.IPCDISignal#getName()
+	 * @see org.eclipse.ptp.debug.core.cdi.IPCDIInferiorSignaled#getName()
 	 */
 	public String getName() {
 		return name;
@@ -82,14 +82,14 @@ public class Signal extends PObject implements IPCDISignal {
 	}
 
 	/**
-	 * @see org.eclipse.ptp.debug.core.cdi.IPCDISignal#isIgnore()
+	 * @see org.eclipse.ptp.debug.core.cdi.IPCDIInferiorSignaled#isIgnore()
 	 */
 	public boolean isIgnore() {
 		return !isPass();
 	}
 
 	/**
-	 * @see org.eclipse.ptp.debug.core.cdi.IPCDISignal#isStopSet()
+	 * @see org.eclipse.ptp.debug.core.cdi.IPCDIInferiorSignaled#isStopSet()
 	 */
 	public boolean isStopSet() {
 		return isStop();

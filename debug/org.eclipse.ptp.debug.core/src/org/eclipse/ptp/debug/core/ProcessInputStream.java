@@ -23,8 +23,9 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import org.eclipse.ptp.core.IPProcess;
-import org.eclipse.ptp.core.IProcessEvent;
 import org.eclipse.ptp.core.IProcessListener;
+import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.events.IProcessEvent;
 
 /**
  * @author Clement chu
@@ -39,7 +40,7 @@ public class ProcessInputStream extends InputStream implements IProcessListener 
     public ProcessInputStream(IPProcess process) {
     	this.process = process;
     	buffers = Collections.synchronizedList(new LinkedList());
-    	process.addProcessListener(this);
+		PTPCorePlugin.getDefault().getModelPresentation().addProcessListener(this);
     }
     public IPProcess getProcess() {
     	return process;
@@ -66,11 +67,11 @@ public class ProcessInputStream extends InputStream implements IProcessListener 
 		}
     }
     public void restart() {
-    	process.addProcessListener(this);
+		PTPCorePlugin.getDefault().getModelPresentation().addProcessListener(this);
     }
     public void close() {
     	addInput("");
-    	process.removerProcessListener(this);
+		PTPCorePlugin.getDefault().getModelPresentation().removeProcessListener(this);
     }
     public int read() {
     	synchronized (buffers) {
@@ -112,13 +113,15 @@ public class ProcessInputStream extends InputStream implements IProcessListener 
     }
     
 	public void processEvent(IProcessEvent event) {
-		switch (event.getType()) {
-		case IProcessEvent.STATUS_EXIT_TYPE:
-			close();
-			break;
-		case IProcessEvent.ADD_OUTPUT_TYPE:
-			addInput(event.getInput());
-			break;
+		if (event.getProcess().equals(process)) {
+			switch (event.getType()) {
+			case IProcessEvent.STATUS_EXIT_TYPE:
+				close();
+				break;
+			case IProcessEvent.ADD_OUTPUT_TYPE:
+				addInput(event.getInput());
+				break;
+			}
 		}
 	}
 }

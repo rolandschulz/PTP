@@ -240,7 +240,7 @@ public class PBreakpointPropertyPage extends FieldEditorPreferencePage implement
 	public PBreakpointPropertyPage() {
 		super(GRID);
 		noDefaultAndApplyButton();
-		uiDebugManager = PTPDebugUIPlugin.getDefault().getUIDebugManager();
+		uiDebugManager = PTPDebugUIPlugin.getUIDebugManager();
 		pBreakpointPreferenceStore = new PBreakpointPreferenceStore();
 	}
 	/* (non-Javadoc)

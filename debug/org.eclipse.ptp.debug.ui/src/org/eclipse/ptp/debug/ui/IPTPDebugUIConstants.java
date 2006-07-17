@@ -30,6 +30,7 @@ public interface IPTPDebugUIConstants {
 	public static final String ID_VIEW_PARALLELDEBUG = PREFIX + "views.parallelDebugView";
 	public static final String ID_VIEW_ARRAY = PREFIX + "views.ArrayView";
 	public static final String ID_VIEW_SIGNAL = PREFIX + "views.SignalsView";
+	public static final String ID_VIEW_VARIABLE = PREFIX + "views.PVariableView";
 	public static final String ID_BREAKPOINT_ORGANIZER = PREFIX + "pBreakpointSetOrganizer";
 	
 	public static final String ACTION_BREAKPOINT_PROPERTIES = PREFIX + "breakpointProperties";
@@ -41,6 +42,18 @@ public interface IPTPDebugUIConstants {
 	public static final String CURSET_ANN_INSTR_POINTER_CURRENT = PREFIX + "currentSetIP";
 	public static final String SET_ANN_INSTR_POINTER_CURRENT = PREFIX + "setIP";
 	
-    public static final String IUITABEMPTYGROUP = "emptygroup";
+	
+	public static final String THREAD_GROUP = "threadGroup";
+	public static final String STEP_GROUP = "stepGroup";
+	public static final String STEP_INTO_GROUP = "stepIntoGroup";
+	public static final String STEP_OVER_GROUP = "stepOverGroup";
+	public static final String STEP_RETURN_GROUP = "stepReturnGroup";
+	public static final String EMPTY_STEP_GROUP = "emptyStepGroup";	
+	public static final String REG_GROUP = "regGroup";	
+	public static final String UNREG_GROUP = "unregGroup";	
+
+	public static final String ADD_VAR_GROUP = "addVarGroup";	
+	
+	public static final String IUITABEMPTYGROUP = "emptygroup";
     public static final String IUITABVARIABLEGROUP = "variablegroup";	
 }

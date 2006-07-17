@@ -168,11 +168,11 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 					setJobFinished(tasks, IPProcess.ERROR);
 					postCommand(new StopDebuggerCommand());
 				break;
-				case IPCDIErrorEvent.DBG_ERROR:
+				case IPCDIErrorEvent.DBG_WARNING:
 					setJobFinished(tasks, IPProcess.ERROR);
 					postCommand(new KillCommand(tasks));
 				break;
-				case IPCDIErrorEvent.DBG_WARNING:
+				case IPCDIErrorEvent.DBG_NORMAL:
 					session.unregisterTargets(tasks.toArray(), true);
 				break;
 				}

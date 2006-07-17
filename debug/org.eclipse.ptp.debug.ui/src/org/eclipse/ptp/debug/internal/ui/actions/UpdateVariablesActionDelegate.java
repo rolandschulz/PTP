@@ -55,7 +55,7 @@ public class UpdateVariablesActionDelegate extends AbstractPVariableAction {
 			public IStatus run(final IProgressMonitor monitor) {
 				if (!monitor.isCanceled()) {
 					try {
-						UIDebugManager uiManager = PTPDebugUIPlugin.getDefault().getUIDebugManager();
+						UIDebugManager uiManager = PTPDebugUIPlugin.getUIDebugManager();
 						PTPDebugCorePlugin.getPVariableManager().updateVariableResults(uiManager.getCurrentJob(), uiManager.getCurrentSetId(), monitor);
 					} catch (CoreException e) {
 						return e.getStatus();
@@ -84,7 +84,7 @@ public class UpdateVariablesActionDelegate extends AbstractPVariableAction {
 			public IStatus run(final IProgressMonitor monitor) {
 				if (!monitor.isCanceled()) {
 					try {
-						UIDebugManager uiManager = PTPDebugUIPlugin.getDefault().getUIDebugManager();
+						UIDebugManager uiManager = PTPDebugUIPlugin.getUIDebugManager();
 						PTPDebugCorePlugin.getPVariableManager().updateVariableResults(uiManager.getCurrentJob(), uiManager.getCurrentSetId(), force, monitor);
 					} catch (CoreException e) {
 						return e.getStatus();

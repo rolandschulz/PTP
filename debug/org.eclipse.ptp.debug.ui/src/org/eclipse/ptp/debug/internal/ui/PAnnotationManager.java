@@ -46,14 +46,18 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.IAnnotationModel;
+import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.IPDebugEventListener;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
+import org.eclipse.ptp.debug.core.events.IPDebugEvent;
+import org.eclipse.ptp.debug.core.events.IPDebugInfo;
+import org.eclipse.ptp.debug.core.events.IPDebugSuspendInfo;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
 import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
-import org.eclipse.ptp.debug.ui.listeners.IRegListener;
 import org.eclipse.ptp.ui.IManager;
-import org.eclipse.ptp.ui.listeners.IJobChangeListener;
+import org.eclipse.ptp.ui.listeners.IJobChangedListener;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -65,6 +69,7 @@ import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.FileEditorInput;
+import org.eclipse.ui.progress.WorkbenchJob;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
 
@@ -72,7 +77,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
  * @author Clement chu
  * 
  */
-public class PAnnotationManager implements IRegListener, IJobChangeListener {
+public class PAnnotationManager implements IJobChangedListener, IPDebugEventListener {
 	private static PAnnotationManager instance = null;
 	protected UIDebugManager uiDebugManager = null;
 	private Map annotationMap = Collections.synchronizedMap(new HashMap());
@@ -82,8 +87,8 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 	 */
 	public PAnnotationManager(UIDebugManager uiDebugManager) {
 		this.uiDebugManager = uiDebugManager;
-		uiDebugManager.addRegListener(this);
-		uiDebugManager.addJobChangeListener(this);
+		uiDebugManager.addJobChangedListener(this);
+		PTPDebugCorePlugin.getDefault().addDebugEventListener(this);
 		// make sure every time created the same object reference
 		if (instance == null)
 			instance = this;
@@ -93,15 +98,15 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 	 */
 	public static PAnnotationManager getDefault() {
 		if (instance == null)
-			instance = new PAnnotationManager(PTPDebugUIPlugin.getDefault().getUIDebugManager());
+			instance = new PAnnotationManager(PTPDebugUIPlugin.getUIDebugManager());
 		return instance;
 	}
 	/** Clean all settings and listeners
 	 * 
 	 */
 	public void shutdown() {
-		uiDebugManager.removeRegListener(this);
-		uiDebugManager.removeJobChangeListener(this);
+		uiDebugManager.removeJobChangedListener(this);
+		PTPDebugCorePlugin.getDefault().removeDebugEventListener(this);
 		clearAllAnnotations();
 		annotationMap = null;
 	}
@@ -645,12 +650,6 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 		};
 		ResourcesPlugin.getWorkspace().run(runnable, null);
 	}
-	/***************************************************************************************************************************************************************************************************
-	 * Register listener
-	 **************************************************************************************************************************************************************************************************/
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.ui.listeners.IRegListener#register(org.eclipse.ptp.core.util.BitList)
-	 */
 	public void register(final BitList tasks) {
 		String job_id = uiDebugManager.getCurrentJobId();
 		final AnnotationGroup annotationGroup = getAnnotationGroup(job_id);
@@ -683,9 +682,6 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 			PTPDebugUIPlugin.log(e);
 		}
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.ui.listeners.IRegListener#unregister(org.eclipse.ptp.core.util.BitList)
-	 */
 	public void unregister(final BitList tasks) {
 		String job_id = uiDebugManager.getCurrentJobId();
 		final AnnotationGroup annotationGroup = getAnnotationGroup(job_id);
@@ -783,9 +779,21 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 	 * Job Change Listener
 	 **************************************************************************************************************************************************************************************************/
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.listeners.IJobChangeListener#changeJobEvent(java.lang.String, java.lang.String)
+	 * @see org.eclipse.ptp.ui.listeners.IJobListener#jobChangedEvent(java.lang.String, java.lang.String)
 	 */
-	public synchronized void changeJobEvent(String cur_job_id, String pre_job_id) {
+	public void jobChangedEvent(final String cur_job_id, final String pre_job_id) {
+		WorkbenchJob uiJob = new WorkbenchJob("Updating annotation...") {
+			public IStatus runInUIThread(IProgressMonitor monitor) {
+				doJobChangedEvent(cur_job_id, pre_job_id, monitor);
+				monitor.done();
+				return Status.OK_STATUS;
+			}
+		};
+		uiJob.setSystem(true);
+		uiJob.setPriority(Job.INTERACTIVE);
+		uiJob.schedule();
+	}
+	private void doJobChangedEvent(String cur_job_id, String pre_job_id, IProgressMonitor monitor) {
 		if (pre_job_id != null && !pre_job_id.equals(IManager.EMPTY_ID)) {
 			AnnotationGroup preAnnotationGroup = getAnnotationGroup(pre_job_id);
 			if (preAnnotationGroup != null) {
@@ -797,6 +805,79 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 			if (curAnnotationGroup != null) {
 				curAnnotationGroup.retrieveAllMarkers();
 			}
+		}		
+	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.IPDebugEventListener#handleDebugEvent(org.eclipse.ptp.debug.core.events.IPDebugEvent)
+	 */
+	public void handleDebugEvent(final IPDebugEvent event) {
+		WorkbenchJob uiJob = new WorkbenchJob("Updating annotation...") {
+			public IStatus runInUIThread(IProgressMonitor monitor) {
+				doHandleDebugEvent(event, monitor);
+				monitor.done();
+				return Status.OK_STATUS;
+			}
+		};
+		uiJob.setSystem(true);
+		uiJob.setPriority(Job.INTERACTIVE);
+		uiJob.schedule();
+	}
+	private void doHandleDebugEvent(IPDebugEvent event, IProgressMonitor monitor) {
+		IPDebugInfo info = event.getInfo();
+		IPJob job = info.getJob();
+		switch(event.getKind()) {
+			case IPDebugEvent.CREATE:
+				switch (event.getDetail()) {
+				case IPDebugEvent.REGISTER:
+					register(info.getAllRegisteredProcesses());
+					break;
+				}
+				break;
+			case IPDebugEvent.TERMINATE:
+				switch (event.getDetail()) {
+				case IPDebugEvent.DEBUGGER:
+					removeAnnotationGroup(job.getIDString());
+					break;
+				case IPDebugEvent.REGISTER:
+					unregister(info.getAllUnregisteredProcesses());
+					break;
+				default:
+					removeAnnotationAction(job, info.getAllProcesses());
+					break;
+				}
+				break;
+			case IPDebugEvent.RESUME:
+				removeAnnotationAction(job, info.getAllProcesses());
+				break;
+			case IPDebugEvent.SUSPEND:
+				IPDebugSuspendInfo susInfo = (IPDebugSuspendInfo)info; 
+				try {
+					addAnnotation(job.getIDString(), susInfo.getFilename(), susInfo.getLineNumber(), info.getAllUnregisteredProcesses(), false);
+					addAnnotation(job.getIDString(), susInfo.getFilename(), susInfo.getLineNumber(), info.getAllRegisteredProcesses(), true);
+				} catch (final CoreException e) {
+					PTPDebugUIPlugin.getDisplay().asyncExec(new Runnable() {
+						public void run() {
+							PTPDebugUIPlugin.errorDialog("Error", e);
+						}
+					});
+				}
+				break;
+			case IPDebugEvent.CHANGE:
+				break;
+			case IPDebugEvent.ERROR:
+				removeAnnotationAction(job, info.getAllProcesses());
+				break;
+		}
+	}	
+	private void removeAnnotationAction(IPJob job, BitList tasks) {
+		try {
+			removeAnnotation(job.getIDString(), tasks);
+		} catch (final CoreException e) {
+			PTPDebugUIPlugin.getDisplay().asyncExec(new Runnable() {
+				public void run() {
+					PTPDebugUIPlugin.errorDialog("Error", e);
+				}
+			});
 		}
 	}
 }

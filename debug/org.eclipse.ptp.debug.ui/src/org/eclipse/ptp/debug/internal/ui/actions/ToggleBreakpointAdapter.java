@@ -53,7 +53,7 @@ public class ToggleBreakpointAdapter implements IToggleBreakpointsTarget {
 	 * 
 	 */
 	public ToggleBreakpointAdapter() {
-		uiDebugManager = PTPDebugUIPlugin.getDefault().getUIDebugManager();
+		uiDebugManager = PTPDebugUIPlugin.getUIDebugManager();
 	}
 	
 	/* (non-Javadoc)

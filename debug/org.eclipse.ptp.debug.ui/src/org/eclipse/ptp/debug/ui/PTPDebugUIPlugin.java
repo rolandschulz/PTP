@@ -22,7 +22,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionPoint;
@@ -51,7 +50,7 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 	private static PTPDebugUIPlugin plugin;
 	//Resource bundle.
 	private ResourceBundle resourceBundle;
-	private UIDebugManager uiDebugManager = null;
+	private static UIDebugManager uiDebugManager = null;
 	protected Map fDebuggerPageMap;
 
 	/**
@@ -99,7 +98,7 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 		return plugin;
 	}
 
-	public UIDebugManager getUIDebugManager() {
+	public static UIDebugManager getUIDebugManager() {
 		return uiDebugManager;
 	}
 

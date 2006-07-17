@@ -18,8 +18,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.ui.views.signals;
 
-import org.eclipse.debug.internal.ui.PixelConverter;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.ptp.debug.internal.ui.PixelConverter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;

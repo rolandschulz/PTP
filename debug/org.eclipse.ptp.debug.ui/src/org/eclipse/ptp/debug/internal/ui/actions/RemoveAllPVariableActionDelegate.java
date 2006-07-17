@@ -44,7 +44,7 @@ public class RemoveAllPVariableActionDelegate extends AbstractPVariableAction {
 			return;
 
 		if (MessageDialog.openConfirm(shell, "Remove all variables", "Confirm to remove all variables?")) {
-			PTPDebugCorePlugin.getPVariableManager().removeAllVariables(PTPDebugUIPlugin.getDefault().getUIDebugManager().getCurrentJob());
+			PTPDebugCorePlugin.getPVariableManager().removeAllVariables(PTPDebugUIPlugin.getUIDebugManager().getCurrentJob());
 		}
 	}
 }

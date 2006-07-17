@@ -34,8 +34,9 @@ import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IStreamsProxy;
 import org.eclipse.ptp.core.IPProcess;
-import org.eclipse.ptp.core.IProcessEvent;
 import org.eclipse.ptp.core.IProcessListener;
+import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.events.IProcessEvent;
 import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
@@ -77,7 +78,7 @@ public class PseudoProcess implements IProcessListener, IPseudoProcess {
 		err = null;
 		in = new PseudoInputStream();
 		out = new PseudoOutputStream();
-		pproc.addProcessListener(this);
+		PTPCorePlugin.getDefault().getModelPresentation().addProcessListener(this);		
 
 		initializeAttributes(attributes);
 		fTerminated = true;
@@ -98,7 +99,7 @@ public class PseudoProcess implements IProcessListener, IPseudoProcess {
 	}
 	public void destroy() {
 		finished = true;
-		pproc.removerProcessListener(this);
+		PTPCorePlugin.getDefault().getModelPresentation().removeProcessListener(this);
 		((PseudoInputStream) in).destroy();
 		try {
 			((PseudoInputStream) in).close();
@@ -117,13 +118,15 @@ public class PseudoProcess implements IProcessListener, IPseudoProcess {
 		return out;
 	}
 	public void processEvent(IProcessEvent event) {
-		switch (event.getType()) {
-		case IProcessEvent.STATUS_EXIT_TYPE:
-			destroy();
-			break;
-		case IProcessEvent.ADD_OUTPUT_TYPE:
-			((PseudoInputStream) in).printString(event.getInput());
-			break;
+		if (event.getProcess().equals(pproc)) { 
+			switch (event.getType()) {
+			case IProcessEvent.STATUS_EXIT_TYPE:
+				destroy();
+				break;
+			case IProcessEvent.ADD_OUTPUT_TYPE:
+				((PseudoInputStream) in).printString(event.getInput());
+				break;
+			}
 		}
 	}
 	public void kill() throws DebugException {

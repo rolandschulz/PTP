@@ -50,6 +50,7 @@ public class PTPDebugPerspectiveFactory implements IPerspectiveFactory {
 		folder4.addView(IDebugUIConstants.ID_VARIABLE_VIEW);
 		folder4.addView(IPTPDebugUIConstants.ID_VIEW_SIGNAL);
 		folder4.addView(IPTPDebugUIConstants.ID_VIEW_ARRAY);
+		folder4.addView(IPTPDebugUIConstants.ID_VIEW_VARIABLE);
 
 		IFolderLayout folder3= layout.createFolder("topLeftDown", IPageLayout.BOTTOM, (float)0.6, "topLeftUp");
 		folder3.addView(IDebugUIConstants.ID_DEBUG_VIEW);
@@ -68,6 +69,7 @@ public class PTPDebugPerspectiveFactory implements IPerspectiveFactory {
 		layout.addShowViewShortcut(IPTPDebugUIConstants.ID_VIEW_PARALLELDEBUG);
 		layout.addShowViewShortcut(IPTPDebugUIConstants.ID_VIEW_ARRAY);
 		layout.addShowViewShortcut(IPTPDebugUIConstants.ID_VIEW_SIGNAL);
+		layout.addShowViewShortcut(IPTPDebugUIConstants.ID_VIEW_VARIABLE);
 		layout.addShowViewShortcut(IDebugUIConstants.ID_BREAKPOINT_VIEW);
 		layout.addShowViewShortcut(IDebugUIConstants.ID_VARIABLE_VIEW);
 		layout.addShowViewShortcut(IDebugUIConstants.ID_DEBUG_VIEW);
@@ -79,6 +81,8 @@ public class PTPDebugPerspectiveFactory implements IPerspectiveFactory {
 		// link - things we should do
 		layout.addShowInPart(IPTPDebugUIConstants.ID_VIEW_PARALLELDEBUG);
 		layout.addShowInPart(IPTPDebugUIConstants.ID_VIEW_ARRAY);
+		layout.addShowInPart(IPTPDebugUIConstants.ID_VIEW_SIGNAL);
+		layout.addShowInPart(IPTPDebugUIConstants.ID_VIEW_VARIABLE);
 		//layout.addShowInPart(IPageLayout.ID_RES_NAV);
 	}
 }

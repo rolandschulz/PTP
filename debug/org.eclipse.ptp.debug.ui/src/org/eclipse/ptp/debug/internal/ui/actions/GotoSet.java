@@ -63,7 +63,7 @@ public class GotoSet implements IViewActionDelegate {
 						view.selectSet(elementHandler.getSet(breakpoint.getSetId()));
 					}
 					view.update();
-					view.refresh();
+					view.refresh(false);
 				} catch (CoreException e) {
 					PTPDebugUIPlugin.log(e);
 				}
