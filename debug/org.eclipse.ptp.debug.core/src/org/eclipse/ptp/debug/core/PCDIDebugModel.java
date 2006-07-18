@@ -293,29 +293,19 @@ public class PCDIDebugModel {
 		};
 		ResourcesPlugin.getWorkspace().run(runnable, null);
 	}
-	public void updatePBreakpoints(final String set_id) throws CoreException {
-		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
-			public void run(IProgressMonitor monitor) throws CoreException {
-				new Job("Update breakpoint") {
-					protected IStatus run(IProgressMonitor pmonitor) {
-						IBreakpoint[] breakpoints = getPBreakpoints();
-						try {
-							for (int i = 0; i < breakpoints.length; i++) {
-								if (!(breakpoints[i] instanceof IPBreakpoint))
-									continue;
-								IPBreakpoint breakpoint = (IPBreakpoint) breakpoints[i];
-								breakpoint.setCurSetId(set_id);
-							}
-							return Status.OK_STATUS;
-						} catch (CoreException e) {
-							PTPDebugCorePlugin.log(e);
-						}
-						return Status.CANCEL_STATUS;
-					}
-				}.schedule();
+	public void updatePBreakpoints(String set_id, IProgressMonitor monitor) throws CoreException {
+		try {
+			IBreakpoint[] breakpoints = getPBreakpoints();
+			monitor.beginTask("Updating parallel breakpoint...", breakpoints.length);
+			for (int i = 0; i < breakpoints.length; i++) {
+				if (!(breakpoints[i] instanceof IPBreakpoint))
+					continue;
+				((IPBreakpoint) breakpoints[i]).setCurSetId(set_id);
+				monitor.worked(1);
 			}
-		};
-		ResourcesPlugin.getWorkspace().run(runnable, null);
+		} finally {
+			monitor.done();
+		}
 	}
 	public void newJob(IPJob job, int totalTasks) throws CoreException {
 		BitList rootTasks = new BitList(totalTasks);
@@ -382,11 +372,10 @@ public class PCDIDebugModel {
 			return (BitList)sets.get(set_id);
 		}
 	}
-
 	/***********************************************************************************************
 	 * Expression
 	 ***********************************************************************************************/
-	public String getValue(IPCDISession session, int taskID, String var, IProgressMonitor monitor) throws PCDIException {
+	public String getValue(IPCDISession session, int taskID, String var, IProgressMonitor monitor) {
 		try {
 			IAIF aif = session.getExpressionValue(taskID, var);
 			if (aif == null) {
@@ -395,13 +384,15 @@ public class PCDIDebugModel {
 			else {
 				return aif.getValue().getValueString();
 			}
+		} catch (PCDIException pe) {
+			return VALUE_ERROR;
 		} catch (AIFException e) {
 			return VALUE_ERROR;
 		} finally {
 			monitor.worked(1);
 		}
 	}
-	public String[] getValues(IPCDISession session, int taskID, String[] vars, IProgressMonitor monitor) throws PCDIException {
+	public String[] getValues(IPCDISession session, int taskID, String[] vars, IProgressMonitor monitor) {
 		String[] values = new String[vars.length];
 		for (int i=0; i<vars.length; i++) {
 			values[i] = getValue(session, taskID, vars[i], monitor);
