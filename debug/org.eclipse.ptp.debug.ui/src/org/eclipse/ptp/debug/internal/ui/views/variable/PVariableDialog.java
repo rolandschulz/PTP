@@ -20,7 +20,12 @@ package org.eclipse.ptp.debug.internal.ui.views.variable;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.debug.ui.PJobVariableManager;
+import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
+import org.eclipse.ptp.debug.ui.PJobVariableManager.VariableInfo;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyAdapter;
@@ -43,15 +48,22 @@ import org.eclipse.swt.widgets.Text;
  * @author Clement chu
  */
 public class PVariableDialog extends Dialog {
-	protected Text nameText = null;
+	public static final int NEW_MODE = 0;
+	public static final int EDIT_MODE = 1;
+	protected Text varText = null;
 	protected Table setTable = null;
 	protected Table varTable = null;
 	protected Button checkBtn = null;
 	protected PVariableView view = null;
+	protected int mode = NEW_MODE;
 
 	public PVariableDialog(PVariableView view) {
+		this(view, NEW_MODE);
+	}
+	public PVariableDialog(PVariableView view, int mode) {
 		super(view.getSite().getShell());
 		this.view = view;
+		this.mode = mode;
 	}
 	public void configureShell(Shell newShell) {
 		newShell.setText(PVariableMessages.getString("PVariablesDialog.title"));
@@ -96,6 +108,9 @@ public class PVariableDialog extends Dialog {
 		varTable.setLayoutData(gd);
 		varTable.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
+				if (((TableItem)e.item).getChecked()) {
+					varText.setText("");
+				}
 				updateButtons();
 			}
 		});
@@ -105,13 +120,14 @@ public class PVariableDialog extends Dialog {
 		comp2.setLayoutData(new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL));
 
 		new Label(comp2, SWT.NONE).setText(PVariableMessages.getString("PVariablesDialog.custVar"));
-		nameText = new Text(comp2, SWT.BORDER | SWT.NONE);
-		nameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		nameText.addKeyListener(new KeyAdapter() {
+		varText = new Text(comp2, SWT.BORDER | SWT.NONE);
+		varText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		varText.addKeyListener(new KeyAdapter() {
 			public void keyReleased(KeyEvent e) {
 				updateButtons();
 			}
 		});
+		varText.setFocus();
 	}
 	/** Create section for adding new variable
 	 * @param parent
@@ -165,13 +181,13 @@ public class PVariableDialog extends Dialog {
 	private void updateButtons() {
 		boolean enabled = true;
 		
-		if (!anyTableItemChecked(varTable)) {
-			if (nameText.getText() == null || nameText.getText().length() == 0) {
-				enabled = false;
-			}
-			else if (!anyTableItemChecked(setTable)) {
-				enabled = false;
-			}
+		String[] sets = getSelectedSets();
+		String var = getSelectedVariable();
+		if (var == null || var.length() == 0) {
+			enabled = false;
+		}
+		if (sets.length == 0) {
+			enabled = false;
 		}
 		getOkButton().setEnabled(enabled);
 	}
@@ -179,11 +195,27 @@ public class PVariableDialog extends Dialog {
 	 * 
 	 */
 	protected void initContent() {
+		VariableInfo varInfo = null;
+		if (mode == EDIT_MODE) {
+			ISelection selection = view.getSelection();
+			if (!selection.isEmpty() && selection instanceof IStructuredSelection) {
+				varInfo = (VariableInfo)((IStructuredSelection)selection).getFirstElement();
+				varText.setText(varInfo.getVar());
+				checkBtn.setSelection(varInfo.isEnable());
+			}
+		}
+
 		String[] sets = view.getUIManager().getSets(view.getUIManager().getCurrentJobId());
 		TableItem item = null;		
 		for (int i=0; i<sets.length; i++) {
 			item = new TableItem(setTable, SWT.NONE);
 			item.setText(sets[i]);
+			if (varInfo != null) {
+				String[] selectedSets = varInfo.getSets();
+				for (int j=0; j<selectedSets.length; j++) {
+					item.setChecked(selectedSets[j].equals(sets[i]));
+				}
+			}
 		}
 	}
 	/** Create vertical space
@@ -201,6 +233,14 @@ public class PVariableDialog extends Dialog {
 	 */
 	public Control createButtonBar(Composite parent) {
 		Control control = super.createButtonBar(parent);
+		switch(mode) {
+		case NEW_MODE:
+			getOkButton().setText("Create");
+			break;
+		case EDIT_MODE:
+			getOkButton().setText("Edit");
+			break;
+		}
 		getOkButton().setEnabled(false);
 		return control;
 	}
@@ -227,23 +267,55 @@ public class PVariableDialog extends Dialog {
 		return composite;
 	}
 	protected String[] getSelectedSets() {
-		TableItem[] items = setTable.getSelection();
+		TableItem[] items = setTable.getItems();
 		String[] sets = new String[items.length];
 		for (int i=0; i<items.length; i++) {
-			sets[i] = items[i].getText();
+			if (items[i].getChecked())
+				sets[i] = items[i].getText();
 		}
 		return sets;
+	}
+	protected String getSelectedAvailableVariable() {
+		TableItem[] items = varTable.getItems();
+		for (int i=0; i<items.length; i++) {
+			if (items[i].getChecked())
+				return items[i].getText();
+		}
+		return null;
+	}
+	protected String getSelectedVariable() {
+		String var = getSelectedAvailableVariable();
+		if (var == null) {
+			return varText.getText();
+		}
+		return var;
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.dialogs.Dialog#okPressed()
 	 */
 	protected void okPressed() {
 		PJobVariableManager jobMgr = view.getUIManager().getJobVariableManager();
-		if (varTable.getSelectionCount() > 0) {
-			jobMgr.addJobVariable(view.getUIManager().getCurrentJob(), getSelectedSets(), varTable.getSelection()[0].getText(), checkBtn.getSelection());
+		IPJob job = view.getUIManager().getCurrentJob();
+		String var = getSelectedVariable();
+		String[] sets = getSelectedSets();
+		boolean checked = checkBtn.getSelection();
+		
+		if (jobMgr.isContainVariable(job, var)) {
+			PTPDebugUIPlugin.errorDialog("Duplicate variable", "Variable (" + var + ") is added already.", null);
+			return;
 		}
-		else {
-			jobMgr.addJobVariable(view.getUIManager().getCurrentJob(), getSelectedSets(), nameText.getText(), checkBtn.getSelection());
+		
+		switch(mode) {
+		case NEW_MODE:
+			jobMgr.addJobVariable(job, sets, var, checked);
+			break;
+		case EDIT_MODE:
+			ISelection selection = view.getSelection();
+			if (!selection.isEmpty() && selection instanceof IStructuredSelection) {
+				VariableInfo varInfo = (VariableInfo)((IStructuredSelection)selection).getFirstElement();
+				jobMgr.changeJobVariable(varInfo.getJob(), job, sets, varInfo.getVar(), var, checked);
+			}
+			break;
 		}
 		super.okPressed();
 	}

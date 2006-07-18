@@ -779,12 +779,12 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 	 * Job Change Listener
 	 **************************************************************************************************************************************************************************************************/
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.listeners.IJobListener#jobChangedEvent(java.lang.String, java.lang.String)
+	 * @see org.eclipse.ptp.ui.listeners.IJobChangedListener#jobChangedEvent(int, java.lang.String, java.lang.String)
 	 */
-	public void jobChangedEvent(final String cur_job_id, final String pre_job_id) {
+	public void jobChangedEvent(final int type, final String cur_job_id, final String pre_job_id) {
 		WorkbenchJob uiJob = new WorkbenchJob("Updating annotation...") {
 			public IStatus runInUIThread(IProgressMonitor monitor) {
-				doJobChangedEvent(cur_job_id, pre_job_id, monitor);
+				doJobChangedEvent(type, cur_job_id, pre_job_id, monitor);
 				monitor.done();
 				return Status.OK_STATUS;
 			}
@@ -793,8 +793,8 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 		uiJob.setPriority(Job.INTERACTIVE);
 		uiJob.schedule();
 	}
-	private void doJobChangedEvent(String cur_job_id, String pre_job_id, IProgressMonitor monitor) {
-		if (pre_job_id != null && !pre_job_id.equals(IManager.EMPTY_ID)) {
+	private void doJobChangedEvent(int type, String cur_job_id, String pre_job_id, IProgressMonitor monitor) {
+		if (type == IJobChangedListener.REMOVED || (pre_job_id != null && !pre_job_id.equals(IManager.EMPTY_ID))) {
 			AnnotationGroup preAnnotationGroup = getAnnotationGroup(pre_job_id);
 			if (preAnnotationGroup != null) {
 				preAnnotationGroup.removeAllMarkers();

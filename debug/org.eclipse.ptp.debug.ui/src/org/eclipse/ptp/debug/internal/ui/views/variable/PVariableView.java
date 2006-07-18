@@ -26,11 +26,16 @@ import org.eclipse.debug.ui.AbstractDebugView;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.debug.internal.ui.UIDebugManager;
 import org.eclipse.ptp.debug.internal.ui.actions.AddPExpressionAction;
+import org.eclipse.ptp.debug.internal.ui.actions.DeletePExpressionAction;
+import org.eclipse.ptp.debug.internal.ui.actions.EditPExpressionAction;
 import org.eclipse.ptp.debug.internal.ui.views.AbstractPDebugEventHandler;
 import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
@@ -46,7 +51,7 @@ import org.eclipse.ui.progress.WorkbenchJob;
 /**
  * @author Clement chu
  */
-public class PVariableView extends AbstractDebugView implements IPropertyChangeListener, IJobChangedListener, ISetListener {
+public class PVariableView extends AbstractDebugView implements IJobChangedListener, ISetListener {
 	private AbstractPDebugEventHandler fEventHandler;
 	private UIDebugManager uiManager = null;
 	private PVariableViewer viewer = null;
@@ -56,7 +61,6 @@ public class PVariableView extends AbstractDebugView implements IPropertyChangeL
 	 */
 	protected Viewer createViewer(Composite parent) {
 		uiManager = PTPDebugUIPlugin.getUIDebugManager();
-		PTPDebugUIPlugin.getDefault().getPreferenceStore().addPropertyChangeListener(this);
 		
 		// add tree viewer
 		viewer = new PVariableViewer(parent, SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL);
@@ -66,6 +70,18 @@ public class PVariableView extends AbstractDebugView implements IPropertyChangeL
 		viewer.setUseHashlookup(true);
 		viewer.setInput(uiManager.getJobVariableManager());
 	
+		viewer.addDoubleClickListener(new IDoubleClickListener() {
+		    public void doubleClick(DoubleClickEvent event) {
+		    	if (!getSelection().isEmpty()) {
+		    		getAction(EditPExpressionAction.name).run();
+		    	}
+		    }
+		});
+		viewer.addSelectionChangedListener(new ISelectionChangedListener() {
+		    public void selectionChanged(SelectionChangedEvent event) {
+		    	updateActionsEnable();
+		    }
+		});
 		uiManager.addJobChangedListener(this);
 		uiManager.addSetListener(this);
 		setEventHandler(new PVariableViewEventHandler(this));
@@ -77,6 +93,9 @@ public class PVariableView extends AbstractDebugView implements IPropertyChangeL
 	}
 	public void refresh() {
 		viewer.refresh();
+	}
+	public ISelection getSelection() {
+		return viewer.getSelection();
 	}
 	/**
 	 * Sets the event handler for this view
@@ -99,17 +118,20 @@ public class PVariableView extends AbstractDebugView implements IPropertyChangeL
 	 */
 	protected void createActions() {
 		setAction(AddPExpressionAction.name, new AddPExpressionAction(this));
+		setAction(EditPExpressionAction.name, new EditPExpressionAction(this));
+		setAction(DeletePExpressionAction.name, new DeletePExpressionAction(this));
 
-		String cur_jid = uiManager.getCurrentJobId();
-		setActionsEnable(cur_jid != null && cur_jid.length() > 0);
+		updateActionsEnable();
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.debug.ui.AbstractDebugView#configureToolBar(org.eclipse.jface.action.IToolBarManager)
 	 */
 	protected void configureToolBar(IToolBarManager toolBarMgr) {
-		toolBarMgr.add(new Separator(IPTPDebugUIConstants.ADD_VAR_GROUP));
+		toolBarMgr.add(new Separator(IPTPDebugUIConstants.VAR_GROUP));
 
-		toolBarMgr.appendToGroup(IPTPDebugUIConstants.ADD_VAR_GROUP, getAction(AddPExpressionAction.name));		
+		toolBarMgr.appendToGroup(IPTPDebugUIConstants.VAR_GROUP, getAction(AddPExpressionAction.name));		
+		toolBarMgr.appendToGroup(IPTPDebugUIConstants.VAR_GROUP, getAction(EditPExpressionAction.name));		
+		toolBarMgr.appendToGroup(IPTPDebugUIConstants.VAR_GROUP, getAction(DeletePExpressionAction.name));		
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.debug.ui.AbstractDebugView#getHelpContextId()
@@ -123,18 +145,14 @@ public class PVariableView extends AbstractDebugView implements IPropertyChangeL
 	protected void fillContextMenu(IMenuManager menu) {
 		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 		menu.add(getAction(AddPExpressionAction.name));
+		menu.add(getAction(EditPExpressionAction.name));
+		menu.add(getAction(DeletePExpressionAction.name));
 		updateObjects();
-	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.util.IPropertyChangeListener#propertyChange(org.eclipse.jface.util.PropertyChangeEvent)
-	 */
-	public void propertyChange(PropertyChangeEvent event) {
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.IWorkbenchPart#dispose()
 	 */
 	public void dispose() {
-		PTPDebugUIPlugin.getDefault().getPreferenceStore().removePropertyChangeListener(this);
 		uiManager.removeSetListener(this);
 		uiManager.removeJobChangedListener(this);
 		super.dispose();
@@ -145,10 +163,10 @@ public class PVariableView extends AbstractDebugView implements IPropertyChangeL
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.listeners.IJobChangedListener#jobChangedEvent(java.lang.String, java.lang.String)
 	 */
-	public void jobChangedEvent(final String cur_job_id, final String pre_job_id) {
+	public void jobChangedEvent(final int type, final String cur_job_id, final String pre_job_id) {
 		WorkbenchJob uiJob = new WorkbenchJob("Updating annotation...") {
 			public IStatus runInUIThread(IProgressMonitor monitor) {
-				doJobChangedEvent(cur_job_id, pre_job_id, monitor);
+				doJobChangedEvent(type, cur_job_id, pre_job_id, monitor);
 				monitor.done();
 				return Status.OK_STATUS;
 			}
@@ -157,11 +175,28 @@ public class PVariableView extends AbstractDebugView implements IPropertyChangeL
 		uiJob.setPriority(Job.INTERACTIVE);
 		uiJob.schedule();		
 	}
-	private void doJobChangedEvent(String cur_job_id, String pre_job_id, IProgressMonitor monitor) {
-		setActionsEnable(cur_job_id != null && cur_job_id.length() > 0);
+
+	private void doJobChangedEvent(int type, String cur_job_id, String pre_job_id, IProgressMonitor monitor) {
+		switch (type) {
+		case IJobChangedListener.CHANGED:
+			break;
+		case IJobChangedListener.REMOVED:
+			if (pre_job_id != null) {
+				uiManager.getJobVariableManager().removeJobVariable(pre_job_id);
+				refresh();
+			}
+			break;
+		}
+		updateActionsEnable();
 	}
-	public void setActionsEnable(boolean enable) {
-		getAction(AddPExpressionAction.name).setEnabled(enable);
+	private boolean isCurrentJobAvailable() {
+		String cur_jid = uiManager.getCurrentJobId();
+		return (cur_jid != null && cur_jid.length() > 0);		
+	}
+	public void updateActionsEnable() {
+		getAction(AddPExpressionAction.name).setEnabled(isCurrentJobAvailable());
+		getAction(EditPExpressionAction.name).setEnabled(!getSelection().isEmpty());
+		getAction(DeletePExpressionAction.name).setEnabled(!getSelection().isEmpty());
 	}
 	public void deleteSetEvent(IElementSet set) {
 		refresh();

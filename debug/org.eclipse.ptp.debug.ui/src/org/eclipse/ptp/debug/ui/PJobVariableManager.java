@@ -25,13 +25,10 @@ import java.util.List;
 import java.util.Map;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.debug.core.PCDIDebugModel;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
-import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
 /**
  * @author Clement chu
@@ -47,7 +44,7 @@ public final class PJobVariableManager {
 	}
 	public String getResultDisplay(String jid, int taskID) {
 		JobVariable jobVariable = getJobVariable(jid);
-		if (jobVariable == null || jobVariable.hasVariables()) {
+		if (jobVariable == null || !jobVariable.hasVariables()) {
 			return "";
 		}
 		
@@ -65,7 +62,17 @@ public final class PJobVariableManager {
 	}
 	public boolean addJobVariable(IPJob job, String[] sets, String var) {
 		return addJobVariable(job, sets, var, true);
-	}	
+	}
+	public VariableInfo getVariableInfo(IPJob job, String var) {
+		JobVariable jobVariable = getJobVariable(job.getIDString());
+		if (jobVariable != null) {
+			return jobVariable.getVariableInfo(var);
+		}
+		return null;
+	}
+	public boolean isContainVariable(IPJob job, String var) {
+		return (getVariableInfo(job, var) != null);
+	}
 	public boolean addJobVariable(IPJob job, String[] sets, String var, boolean enable) {
 		JobVariable jobVariable = getJobVariable(job.getIDString());
 		if (jobVariable == null) {
@@ -84,21 +91,11 @@ public final class PJobVariableManager {
 		jobVariable.addVariableInfo(varInfo);
 		return true;
 	}	
-	public boolean changeJobVariable(String jid, String[] sets, String var, String newVar) {
-		JobVariable jobVariable = getJobVariable(jid);
-		if (jobVariable == null) {
+	public boolean changeJobVariable(IPJob job, IPJob newJob, String[] sets, String var, String newVar, boolean enable) {
+		if (!removeJobVariable(job.getIDString(), var)) {
 			return false;
 		}
-		VariableInfo varInfo = jobVariable.getVariableInfo(var);
-		if (varInfo == null) {
-			return false;
-		}
-		varInfo.changeVar(newVar);
-		varInfo.clearSets();
-		for (int i=0; i<sets.length; i++) {
-			varInfo.addSet(sets[i]);
-		}
-		return true;		
+		return addJobVariable(newJob, sets, newVar, enable);
 	}
 	public boolean deleteSet(String jid, String sid) {
 		JobVariable jobVariable = getJobVariable(jid);
@@ -165,14 +162,9 @@ public final class PJobVariableManager {
 				monitor.beginTask("Updating variables value...", (tasks.length * vars.length + 1));
 				for (int i=0; i<tasks.length; i++) {
 					if (!monitor.isCanceled()) {
-						try {
-							String[] texts = debugModel.getValues(session, tasks[i], vars, monitor);
-							jobVariable.storeValues(new Integer(tasks[i]), texts);
-							monitor.worked(1);
-						} catch (PCDIException e) {
-							monitor.done();
-							throw new CoreException(new Status(IStatus.ERROR, PTPDebugCorePlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));
-						}
+						String[] texts = debugModel.getValues(session, tasks[i], vars, monitor);
+						jobVariable.storeValues(new Integer(tasks[i]), texts);
+						monitor.worked(1);
 					}
 				}
 			}
@@ -220,7 +212,11 @@ public final class PJobVariableManager {
 			procValue.put(pid, texts);
 		}
 		public String[] getValues(Integer pid) {
-			return (String[])procValue.get(pid);
+			Object obj = procValue.get(pid);
+			if (obj == null || !(obj instanceof String[]))
+				return new String[0];
+			
+			return (String[])obj;
 		}
 		public void clearValues() {
 			procValue.clear();

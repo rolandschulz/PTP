@@ -16,48 +16,41 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.internal.ui.views.variable;
+package org.eclipse.ptp.debug.internal.ui.actions;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.ptp.debug.core.events.IPDebugEvent;
-import org.eclipse.ptp.debug.internal.ui.views.AbstractPDebugEventHandler;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.window.Window;
+import org.eclipse.ptp.debug.internal.ui.PDebugImage;
+import org.eclipse.ptp.debug.internal.ui.views.variable.PVariableDialog;
+import org.eclipse.ptp.debug.internal.ui.views.variable.PVariableView;
 
 /**
  * @author Clement chu
  */
-public class PVariableViewEventHandler extends AbstractPDebugEventHandler {
-	/**
-	 * Constructs a new event handler on the given view
-	 * 
-	 * @param view signals view
+public class EditPExpressionAction extends Action {
+	public static final String name = "Edit";
+	private PVariableView view = null;
+
+	/** Constructor
+	 * @param view
 	 */
-	public PVariableViewEventHandler(PVariableView view) {
-		super(view);
+	public EditPExpressionAction(PVariableView view) {
+		super(name, IAction.AS_PUSH_BUTTON);
+	    setImageDescriptor(PDebugImage.ID_ICON_STEPINTO_NORMAL);
+	    setDisabledImageDescriptor(PDebugImage.ID_ICON_STEPINTO_DISABLE);
+	    setToolTipText(name);
+	    setId(name);
+	    setEnabled(false);
+	    this.view = view;
 	}
-	public PVariableView getPView() {
-		return (PVariableView)getView();
-	}
-	public void refresh(boolean all) {
-		getPView().refresh();
-	}
-	protected void doHandleDebugEvent(IPDebugEvent event, IProgressMonitor monitor) {
-		switch(event.getKind()) {
-			case IPDebugEvent.CREATE:
-				switch (event.getDetail()) {
-				case IPDebugEvent.DEBUGGER:
-					getPView().updateActionsEnable();
-					refresh();
-					break;
-				}
-				break;
-			case IPDebugEvent.TERMINATE:
-				switch (event.getDetail()) {
-				case IPDebugEvent.DEBUGGER:
-					getPView().updateActionsEnable();
-					refresh();
-					break;
-				}
-				break;
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.action.Action#run()
+	 */
+	public void run() {
+		if (new PVariableDialog(view, PVariableDialog.EDIT_MODE).open() == Window.OK) {
+			view.refresh();
+			view.getUIManager().updateVariableValue(true);
 		}
 	}
 }
