@@ -70,7 +70,7 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 	public void createPartControl(Composite parent) {
 		super.createPartControl(parent);
 		IToolBarManager toolBarMgr = getViewSite().getActionBars().getToolBarManager();
-		createToolBarGroups(toolBarMgr);
+		createToolBarActionGroup(toolBarMgr);
 		createToolBarActions(toolBarMgr);
 		IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
 		createMenuActions(menuMgr);
@@ -78,16 +78,13 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 		initialView();
 		PTPUIPlugin.getDefault().refreshRuntimeSystem(true, false);
 	}
-	/** Create Toolbar menu
-	 * @param toolBarMgr 
-	 */
-	protected void createToolBarGroups(IToolBarManager toolBarMgr) {
+	protected void createToolBarActionGroup(IToolBarManager toolBarMgr) {
 		toolBarMgr.add(new Separator(IPTPUIConstants.IUINAVIGATORGROUP));
 		toolBarMgr.add(new Separator(IPTPUIConstants.IUIACTIONGROUP));
-		toolBarMgr.add(new Separator(IPTPUIConstants.IUISETGROUP));
+		toolBarMgr.add(new Separator(IPTPUIConstants.IUIEMPTYGROUP));
+
 		toolBarMgr.add(new Separator(IPTPUIConstants.IUISETGROUP));
 		toolBarMgr.add(new Separator(IPTPUIConstants.IUICHANGESETGROUP));
-		toolBarMgr.add(new Separator(IPTPUIConstants.IUIEMPTYGROUP));
 	}
 	/** Build-in Toolbar actions
 	 * @param toolBarMgr
@@ -97,6 +94,7 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 		deleteSetAction = new DeleteSetAction(this);
 		deleteProcessAction = new RemoveElementAction(this);
 		changeSetAction = new ChangeSetAction(this);
+		
 		toolBarMgr.appendToGroup(IPTPUIConstants.IUISETGROUP, createSetAction);
 		toolBarMgr.appendToGroup(IPTPUIConstants.IUISETGROUP, deleteSetAction);
 		toolBarMgr.appendToGroup(IPTPUIConstants.IUISETGROUP, deleteProcessAction);
