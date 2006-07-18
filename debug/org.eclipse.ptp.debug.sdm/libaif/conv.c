@@ -389,7 +389,7 @@ StringToAIF(char *i)
 /* Converts input buffer to hexadecimal display in output string.
  * String length is used since zero is legitimate.
  */
-static char* 
+static void 
 ByteToHex(char *out_string, char *in_string, int in_size)
 {
 	char hexchars[] = "0123456789ABCDEF";
@@ -406,7 +406,7 @@ ByteToHex(char *out_string, char *in_string, int in_size)
 /* Converts hexadecimal display to binary. String length is used
  * and only hexadecimal pairs are handled.
  */
-static char* 
+static void 
 HexToByte(char *out_string, char *in_string, int in_size)
 {
 	int i;
