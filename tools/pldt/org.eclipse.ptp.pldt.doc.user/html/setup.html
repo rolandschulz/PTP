@@ -55,8 +55,6 @@ correct the information.
 <p>The MPI information can be added to the project manually as follows.
 <ol>
 <li>Create a CDT project (e.g. Managed Make C Project)
-<li>Create a source file e.g. test.c with MPI artifacts 
-(see a small sample MPI program here: <a href="testMPI.c">testMPI.c</a>).
 
 <li>Set up the include paths etc:
 <br>Project Properties, C/C++ Build, Configuration Settings,
@@ -70,6 +68,10 @@ Tool Settings tab, GCC C Linker, Libraries
 <li>Under "Libraries (-l)"  add the symbol "mpi"  
 <li> Under "Library search path (-L)" add the path to the 'lib' dir in MPI dir.
 <br><img src="images/lib.gif">
+<li><b>MPI Build Command:</b> Note: If you have an MPI installed that requires a different
+build command, such as 'mpicc' instead of 'gcc', specify it here as well.
+Select the compiler tool on the left and modify the 'Command:' value.
+<br><img src="images/mpiBuildCommand.gif">
 </ol>
 <p>
 
