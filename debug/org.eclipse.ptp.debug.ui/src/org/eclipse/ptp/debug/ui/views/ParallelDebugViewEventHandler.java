@@ -113,6 +113,8 @@ public class ParallelDebugViewEventHandler extends AbstractPDebugEventHandler {
 					BitList ssource = (BitList)job.getAttribute(IAbstractDebugger.SUSPENDED_PROC_KEY);
 					BitList starget = (BitList)job.getAttribute(IAbstractDebugger.TERMINATED_PROC_KEY);
 					getPView().updateSuspendResumeButton(ssource, starget);
+
+					((UIDebugManager) getPView().getUIManager()).updateVariableValue();
 				}
 				refresh();
 				break;

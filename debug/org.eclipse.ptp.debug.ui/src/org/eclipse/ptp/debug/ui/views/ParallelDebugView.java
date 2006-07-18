@@ -42,7 +42,6 @@ import org.eclipse.ptp.debug.internal.ui.actions.UnregisterAction;
 import org.eclipse.ptp.debug.internal.ui.views.AbstractPDebugEventHandler;
 import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
-import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.actions.ParallelAction;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
@@ -119,14 +118,34 @@ public class ParallelDebugView extends ParallelJobView {
 	 */
 	protected void fillContextMenu(IMenuManager manager) {
 		super.fillContextMenu(manager);
-		manager.appendToGroup(IPTPUIConstants.IUIACTIONGROUP, resumeAction);
-		manager.appendToGroup(IPTPUIConstants.IUIACTIONGROUP, suspendAction);
-		manager.appendToGroup(IPTPUIConstants.IUIACTIONGROUP, terminateAction);
-		manager.appendToGroup(IPTPUIConstants.IUIACTIONGROUP, new Separator());
-		manager.appendToGroup(IPTPUIConstants.IUIACTIONGROUP, stepIntoAction);
-		manager.appendToGroup(IPTPUIConstants.IUIACTIONGROUP, stepOverAction);
-		manager.appendToGroup(IPTPUIConstants.IUIACTIONGROUP, stepReturnAction);
+		manager.add(new Separator(IPTPDebugUIConstants.THREAD_GROUP));
+		manager.add(new Separator(IPTPDebugUIConstants.STEP_GROUP));
+		manager.add(new GroupMarker(IPTPDebugUIConstants.STEP_INTO_GROUP));
+		manager.add(new GroupMarker(IPTPDebugUIConstants.STEP_OVER_GROUP));
+		manager.add(new GroupMarker(IPTPDebugUIConstants.STEP_RETURN_GROUP));
+		manager.add(new GroupMarker(IPTPDebugUIConstants.EMPTY_STEP_GROUP));
+		manager.add(new Separator(IPTPDebugUIConstants.REG_GROUP));
+
+		manager.appendToGroup(IPTPDebugUIConstants.THREAD_GROUP, resumeAction);
+		manager.appendToGroup(IPTPDebugUIConstants.THREAD_GROUP, suspendAction);
+		manager.appendToGroup(IPTPDebugUIConstants.THREAD_GROUP, terminateAction);
+		manager.appendToGroup(IPTPDebugUIConstants.STEP_INTO_GROUP, stepIntoAction);
+		manager.appendToGroup(IPTPDebugUIConstants.STEP_OVER_GROUP, stepOverAction);
+		manager.appendToGroup(IPTPDebugUIConstants.EMPTY_STEP_GROUP, stepReturnAction);
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.views.AbstractParallelSetView#createToolBarActionGroup(org.eclipse.jface.action.IToolBarManager)
+	 */
+	protected void createToolBarActionGroup(IToolBarManager toolBarMgr) {
+		toolBarMgr.add(new Separator(IPTPDebugUIConstants.THREAD_GROUP));
+		toolBarMgr.add(new Separator(IPTPDebugUIConstants.STEP_GROUP));
+		toolBarMgr.add(new GroupMarker(IPTPDebugUIConstants.STEP_INTO_GROUP));
+		toolBarMgr.add(new GroupMarker(IPTPDebugUIConstants.STEP_OVER_GROUP));
+		toolBarMgr.add(new GroupMarker(IPTPDebugUIConstants.STEP_RETURN_GROUP));
+		toolBarMgr.add(new GroupMarker(IPTPDebugUIConstants.EMPTY_STEP_GROUP));
+		toolBarMgr.add(new Separator(IPTPDebugUIConstants.REG_GROUP));
+		super.createToolBarActionGroup(toolBarMgr);
+	}	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.views.AbstractParallelSetView#createToolBarActions(org.eclipse.jface.action.IToolBarManager)
 	 */
@@ -139,15 +158,7 @@ public class ParallelDebugView extends ParallelJobView {
 		stepReturnAction = new StepReturnAction(this);
 		registerAction = new RegisterAction(this);
 		unregisterAction = new UnregisterAction(this);
-		toolBarMgr.add(new Separator(IPTPDebugUIConstants.THREAD_GROUP));
-		toolBarMgr.add(new Separator(IPTPDebugUIConstants.STEP_GROUP));
-		toolBarMgr.add(new GroupMarker(IPTPDebugUIConstants.STEP_INTO_GROUP));
-		toolBarMgr.add(new GroupMarker(IPTPDebugUIConstants.STEP_OVER_GROUP));
-		toolBarMgr.add(new GroupMarker(IPTPDebugUIConstants.STEP_RETURN_GROUP));
-		toolBarMgr.add(new GroupMarker(IPTPDebugUIConstants.EMPTY_STEP_GROUP));
-		toolBarMgr.add(new GroupMarker(IPTPDebugUIConstants.REG_GROUP));
-		toolBarMgr.add(new GroupMarker(IPTPDebugUIConstants.UNREG_GROUP));
-		
+				
 		toolBarMgr.appendToGroup(IPTPDebugUIConstants.THREAD_GROUP, resumeAction);
 		toolBarMgr.appendToGroup(IPTPDebugUIConstants.THREAD_GROUP, suspendAction);
 		toolBarMgr.appendToGroup(IPTPDebugUIConstants.THREAD_GROUP, terminateAction);
@@ -155,7 +166,7 @@ public class ParallelDebugView extends ParallelJobView {
 		toolBarMgr.appendToGroup(IPTPDebugUIConstants.STEP_OVER_GROUP, stepOverAction);
 		toolBarMgr.appendToGroup(IPTPDebugUIConstants.STEP_RETURN_GROUP, stepReturnAction);
 		toolBarMgr.appendToGroup(IPTPDebugUIConstants.REG_GROUP, registerAction);
-		toolBarMgr.appendToGroup(IPTPDebugUIConstants.UNREG_GROUP, unregisterAction);
+		toolBarMgr.appendToGroup(IPTPDebugUIConstants.REG_GROUP, unregisterAction);
 		
 		super.buildInToolBarActions(toolBarMgr);
 		//createOrientationActions();

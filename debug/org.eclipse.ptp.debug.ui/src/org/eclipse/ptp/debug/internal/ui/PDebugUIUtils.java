@@ -119,7 +119,7 @@ public class PDebugUIUtils {
 	 * @return
 	 */
 	static public String showBitList(BitList tasks) {
-		if (tasks == null) {
+		if (tasks == null || tasks.isEmpty()) {
 			return "";
 		}
 		return arrayToString(tasks.toArray());

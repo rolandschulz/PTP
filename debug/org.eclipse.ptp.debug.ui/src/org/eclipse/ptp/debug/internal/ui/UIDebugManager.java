@@ -51,6 +51,7 @@ import org.eclipse.ptp.debug.core.ProcessInputStream;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
+import org.eclipse.ptp.debug.ui.PJobVariableManager;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.internal.ui.JobManager;
 import org.eclipse.ptp.ui.OutputConsole;
@@ -69,6 +70,7 @@ import org.eclipse.ui.progress.WorkbenchJob;
 public class UIDebugManager extends JobManager implements IBreakpointListener {
 	//private final static int REG_TYPE = 1;
 	//private final static int UNREG_TYPE = 2;
+	private PJobVariableManager jobMgr = new PJobVariableManager();	
 	private PAnnotationManager annotationMgr = null;
 	private PCDIDebugModel debugModel = null;
 	private Map consoleWindows = new HashMap();
@@ -103,6 +105,9 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 		annotationMgr = new PAnnotationManager(this);
 		settingPreference();
 	}
+	public PJobVariableManager getJobVariableManager() {
+		return jobMgr;
+	}
 	/** Initial preference settings
 	 * 
 	 */
@@ -119,6 +124,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 		PTPDebugUIPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(propertyChangeListener);
 		DebugPlugin.getDefault().getBreakpointManager().removeBreakpointListener(this);
 		annotationMgr.shutdown();
+		jobMgr.shutdown();
 		super.shutdown();
 	}
 	/** Get value text for tooltip
@@ -230,6 +236,8 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 		}
 	}
 	/*
+	 * @deprecated
+	 * 
 	public synchronized void handleLaunchEvent(IPLaunchEvent event) {
 		IPJob job = event.getJob();
 		if (event instanceof PLaunchStartedEvent) {
@@ -535,6 +543,10 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 			} catch (CoreException e) {
 				PTPDebugUIPlugin.log(e);
 			}
+			String cur_job_id = getCurrentJobId();
+			if (cur_job_id != null && cur_job_id.length() > 0) {
+				getJobVariableManager().deleteSet(cur_job_id, cur_set.getID());
+			}		
 			break;
 		case CHANGE_SET_TYPE:
 			if (cur_set == null) {
@@ -547,7 +559,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 			} catch (CoreException e) {
 				PTPDebugUIPlugin.log(e);
 			}
-			updateDebugVariables();
+			updateVariableValue();
 			break;
 		case ADD_ELEMENT_TYPE:
 			BitList added_tasks = new BitList(cur_set.getElementHandler().getSetRoot().size());
@@ -733,43 +745,33 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 		super.removeJob(job);
 	}
 	
-	/** Clean up debug variables in given job
-	 * @param job
-	 */
-	protected void cleanupDebugVariables(IPJob job) {
-		//variableManager.cleanVariableResults(job);
+	/**********************************************************
+	 * Variable methods
+	 **********************************************************/
+	public void updateVariableValue() {
+		updateVariableValue(getCurrentJobId(), getCurrentSetId());
 	}
-	/** Update debug variables in current job
-	 * 
-	 */
-	protected void updateDebugVariables() {
-		if (prefAutoUpdateVarOnChange) {
-			updateDebugVariables(getCurrentJob());
-		}
+	public void updateVariableValue(String sid) {
+		updateVariableValue(getCurrentJobId(), sid);
 	}
-	/** Update debug variables in given job
-	 * @param job
-	 */
-	private void updateDebugVariables(IPJob job) {
-		/*
-		if (variableManager.hasVariable(job)) {
-			PTPDebugUIPlugin.getDisplay().syncExec(new Runnable() {
-				public void run() {
-					UpdateVariablesActionDelegate.doAction(null);
+	public void updateVariableValue(final String jid, final String sid) {
+		if (jid != null) {
+			Job uiJob = new Job("Updating variables...") {
+				protected IStatus run(IProgressMonitor monitor) {
+					try {
+						getJobVariableManager().updateJobVariableValues(jid, sid, monitor);
+					} catch (CoreException e) {
+						return e.getStatus();
+					}
+					return Status.OK_STATUS;
 				}
-			});
-		}
-		*/
-	}
-	/** Update debug variable when the debugger is suspendeds
-	 * @param job
-	 */
-	private void updateDebugVariablesOnSuspend(IPJob job) {
-		if (prefAutoUpdateVarOnSuspend) {
-			IPJob cur_job = getCurrentJob();
-			if (cur_job != null && cur_job.equals(job)) {
-				updateDebugVariables(job);
-			}
+			};
+			uiJob.setPriority(Job.INTERACTIVE);
+			PlatformUI.getWorkbench().getProgressService().showInDialog(PTPDebugUIPlugin.getActiveWorkbenchShell(), uiJob);
+			uiJob.schedule();
 		}
 	}
+	public void cleanVariableValue() {
+		getJobVariableManager().cleanupJobVariableValues();
+	}	
 }

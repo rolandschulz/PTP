@@ -50,7 +50,6 @@ public interface IPTPDebugUIConstants {
 	public static final String STEP_RETURN_GROUP = "stepReturnGroup";
 	public static final String EMPTY_STEP_GROUP = "emptyStepGroup";	
 	public static final String REG_GROUP = "regGroup";	
-	public static final String UNREG_GROUP = "unregGroup";	
 
 	public static final String ADD_VAR_GROUP = "addVarGroup";	
 	

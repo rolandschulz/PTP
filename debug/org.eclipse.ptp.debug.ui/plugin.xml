@@ -60,7 +60,14 @@
             category="org.eclipse.debug.ui"
             class="org.eclipse.ptp.debug.internal.ui.views.array.ArrayView"
             id="org.eclipse.ptp.debug.ui.views.ArrayView">
-      </view>      
+      </view>
+      <view
+            name="%PVariableView.name"
+            icon="icons/ptparrayview.gif"
+            category="org.eclipse.debug.ui"
+            class="org.eclipse.ptp.debug.internal.ui.views.variable.PVariableView"
+            id="org.eclipse.ptp.debug.ui.views.PVariableView">
+      </view>
    </extension>
 
    <extension
@@ -206,9 +213,6 @@
          <adapter
                type="org.eclipse.debug.ui.actions.IRunToLineTarget">
          </adapter>
-         <adapter
-               type="org.eclipse.debug.ui.actions.IResumeAtLineTarget">
-          </adapter>
       </factory>
       <factory
             class="org.eclipse.ptp.debug.internal.ui.actions.RetargettableActionAdapterFactory"
@@ -292,8 +296,9 @@
                enablesFor="1"
                id="org.eclipse.ptp.debug.internal.ui.actions.PBreakpointPropertiesAction">
          </action>
-      </objectContribution>
+      </objectContribution>      
       <!-- variable start -->
+      <!--
       <objectContribution
 			objectClass="org.eclipse.ptp.debug.core.model.IPVariable"
             id="org.eclipse.ptp.debug.ui.PVariableActions">
@@ -315,6 +320,7 @@
                id="org.eclipse.ptp.debug.internal.ui.actions.AddPVariableActionDelegate">
          </action>
       </objectContribution>
+      //-->
       <!-- variable end -->
       <!-- signal start -->
       <objectContribution
@@ -355,11 +361,10 @@
             id="org.eclipse.ptp.debug.ui.DebugTargetActions">
       </objectContribution>
       <!-- signal end -->
-
       <!-- debug view start -->
       <viewerContribution
             targetID="org.eclipse.debug.ui.DebugView"
-            id="org.eclipse.cdt.debug.ui.debugview.popupMenu">
+            id="org.eclipse.ptp.debug.ui.debugview.popupMenu">
          <action
                label="%RestartAction.label"
                icon="icons/tool/restart_normal.gif"
@@ -393,7 +398,6 @@
                enablesFor="1"
                label="%SignalZeroAction.label"
                tooltip="%SignalZeroAction.tooltip"
-               icon="icons/elcl16/signal0_co_normal.gif"
                class="org.eclipse.ptp.debug.internal.ui.actions.SignalZeroWorkbenchActionDelegate"
                menubarPath="threadGroup"
                id="org.eclipse.ptp.debug.internal.ui.actions.SignalZeroWorkbenchActionDelegate">
@@ -401,11 +405,10 @@
          </action>
       </viewerContribution>
       <!-- debug view end -->
-      
       <!-- variable view start -->
       <viewerContribution
             targetID="org.eclipse.debug.ui.VariableView"
-            id="org.eclipse.debug.ui.variablesView.popupMenu">
+            id="org.eclipse.ptp.debug.ui.variablesView.popupMenu">
          <!--//
          <action
                helpContextId="remove_all_globals_action_context"
@@ -451,10 +454,8 @@
                      id="org.eclipse.ptp.debug.ui"/>
             </enablement>
          </action>
-         //-->
          <action
                label="%DisableVariablesAction.label"
-               icon="icons/disabled_co.gif"
                helpContextId="disable_variables_action_context"
                tooltip="%DisableVariablesAction.tooltip"
                class="org.eclipse.ptp.debug.internal.ui.actions.DisableVariablesActionDelegate"
@@ -467,7 +468,6 @@
          </action>
          <action
                label="%EnableVariablesAction.label"
-               icon="icons/enabled_co.gif"
                helpContextId="enable_variables_action_context"
                tooltip="%EnableVariablesAction.tooltip"
                class="org.eclipse.ptp.debug.internal.ui.actions.EnableVariablesActionDelegate"
@@ -478,14 +478,15 @@
                   class="org.eclipse.ptp.debug.core.model.IPVariable">
             </selection>
          </action>
+         //-->
       </viewerContribution>
-      <!-- variable view end -->
-      
+      <!-- variable view end -->      
    </extension>
 
-  <!-- variable toolbar start //-->
    <extension
          point="org.eclipse.ui.viewActions">
+	  <!-- variable toolbar start //-->
+	  <!--
       <viewContribution
             targetID="org.eclipse.debug.ui.VariableView"
             id="org.eclipse.debug.ui.variablesView.toolbar">
@@ -539,8 +540,9 @@
                id="org.eclipse.ptp.debug.internal.ui.actions.AddPVariableActionDelegate">
          </action>
       </viewContribution>
+      //-->
+	  <!-- variable toolbar end //-->
    </extension>
-   <!-- variable toolbar end //-->
 
    <extension
          point="org.eclipse.ui.propertyPages">
@@ -614,6 +616,9 @@
          <viewShortcut
                id="org.eclipse.debug.ui.MemoryView">
          </viewShortcut>
+         <viewShortcut
+               id="org.eclipse.debug.ui.ExpressionView">
+         </viewShortcut>
       </perspectiveExtension>
    </extension>
 
@@ -630,7 +635,7 @@
          </menu>
          <action
                id="org.eclipse.ptp.debug.ui.actions.ResumeAtLine"
-              class="org.eclipse.ptp.debug.internal.ui.actions.RetargetResumeAtLineAction"
+               class="org.eclipse.ptp.debug.internal.ui.actions.RetargetResumeAtLineAction"
                disabledIcon="icons/tool/jump_co_disable.gif"
                enablesFor="1"
                icon="icons/tool/jump_co_normal.gif"

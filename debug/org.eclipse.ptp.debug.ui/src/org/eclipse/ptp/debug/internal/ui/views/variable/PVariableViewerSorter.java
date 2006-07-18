@@ -16,40 +16,14 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.internal.ui.actions;
+package org.eclipse.ptp.debug.internal.ui.views.variable;
 
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.window.Window;
-import org.eclipse.ptp.debug.internal.ui.PDebugImage;
-import org.eclipse.ptp.debug.internal.ui.views.variable.PVariableDialog;
-import org.eclipse.ptp.debug.internal.ui.views.variable.PVariableView;
+import org.eclipse.jface.viewers.ViewerSorter;
 
 /**
  * @author Clement chu
  */
-public class AddPExpressionAction extends Action {
-	public static final String name = "Add Expression";
-	private PVariableView view = null;
-
-	/** Constructor
-	 * @param view
-	 */
-	public AddPExpressionAction(PVariableView view) {
-		super(name, IAction.AS_PUSH_BUTTON);
-	    setImageDescriptor(PDebugImage.ID_ICON_RESUME_NORMAL);
-	    setDisabledImageDescriptor(PDebugImage.ID_ICON_RESUME_DISABLE);
-	    setToolTipText(name);
-	    setId(name);
-	    setEnabled(false);
-	    this.view = view;
-	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.action.Action#run()
-	 */
-	public void run() {
-		if (new PVariableDialog(view).open() == Window.OK) {
-			view.refresh();
-		}
-	}
+public class PVariableViewerSorter extends ViewerSorter {
+	
 }
+
