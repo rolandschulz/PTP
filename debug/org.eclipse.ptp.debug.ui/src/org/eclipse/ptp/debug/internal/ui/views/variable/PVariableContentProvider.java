@@ -16,35 +16,35 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.internal.ui.actions;
+package org.eclipse.ptp.debug.internal.ui.views.variable;
 
-import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
-import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
-import org.eclipse.swt.widgets.Shell;
+import java.util.ArrayList;
+import java.util.List;
+import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.ptp.debug.ui.PJobVariableManager;
+import org.eclipse.ptp.debug.ui.PJobVariableManager.JobVariable;
 
 /**
  * @author Clement chu
- * 
  */
-public class RemoveAllPVariableActionDelegate extends AbstractPVariableAction {
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
-	 */
-	public void run(IAction action) {
-		doAction(view.getViewSite().getShell());
-	}
-	
-	/** Take action to remove all ptp varaible in the current selected job
-	 * @param shell
-	 */
-	public static void doAction(Shell shell) {
-		if (getCurrentRunningJob() == null)
-			return;
-
-		if (MessageDialog.openConfirm(shell, "Remove all variables", "Confirm to remove all variables?")) {
-			PTPDebugCorePlugin.getPVariableManager().removeAllVariables(PTPDebugUIPlugin.getUIDebugManager().getCurrentJob());
+public class PVariableContentProvider implements IStructuredContentProvider {
+	public Object[] getElements(Object inputElement) {
+		if (inputElement instanceof PJobVariableManager) {
+			PJobVariableManager jobMgr = (PJobVariableManager)inputElement;
+			JobVariable[] jobVars = jobMgr.getJobVariables();
+			List elements = new ArrayList();
+			for (int i=0; i<jobVars.length; i++) {
+				elements.addAll(jobVars[i].getVariableList());
+			}
+			return elements.toArray();
 		}
+		return new Object[0];
+	}
+
+	public void dispose() {
+	}
+
+	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 	}
 }

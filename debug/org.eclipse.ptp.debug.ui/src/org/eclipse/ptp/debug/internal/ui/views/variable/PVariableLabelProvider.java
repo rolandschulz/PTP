@@ -16,38 +16,41 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.internal.ui.actions;
+package org.eclipse.ptp.debug.internal.ui.views.variable;
 
-import org.eclipse.jface.action.IAction;
-import org.eclipse.ptp.debug.internal.ui.dialogs.PTPVariablesDialog;
+import org.eclipse.jface.viewers.ITableLabelProvider;
+import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.ptp.debug.ui.PJobVariableManager.VariableInfo;
+import org.eclipse.swt.graphics.Image;
 
 /**
  * @author Clement chu
- * 
  */
-public class CreateVariableActionDelegate extends AbstractPVariableAction {
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IActionDelegate2#init(org.eclipse.jface.action.IAction)
-	 */
-	public void init(IAction action) {
-		super.init(action);
-		action.setEnabled(false);
+public class PVariableLabelProvider extends LabelProvider implements ITableLabelProvider {
+	public Image getColumnImage(Object element, int columnIndex) {
+		return null;
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
-	 */
-	public void run(IAction action) {
-		new PTPVariablesDialog(view.getViewSite().getShell()).open();		
-	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.listeners.IJobListener#jobChangedEvent(java.lang.String, java.lang.String)
-	 */
-	public void jobChangedEvent(String cur_job_id, String pre_job_id) {
-		action.setEnabled(!uiManager.isJobStop(cur_job_id));
-	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.listeners.IJobListener#jobRemovedEvent(java.lang.String)
-	 */
-	public void jobRemovedEvent(String job_id) {
+
+	public String getColumnText(Object element, int columnIndex) {
+		if (element instanceof VariableInfo) {
+			VariableInfo varInfo = (VariableInfo)element;
+			switch(columnIndex) {
+			case 0:
+				return varInfo.getVar();
+			case 1:
+				return varInfo.getJob().getElementName();
+			case 2:
+				String[] sets = varInfo.getSets();
+				String setsText = "";
+				for (int i=0; i<sets.length; i++) {
+					setsText += sets[i];
+					if (i < sets.length - 1)
+						setsText += ",";
+				}
+				return setsText;
+			}
+			//varInfo.isEnable();
+		}
+		return null;
 	}
 }
