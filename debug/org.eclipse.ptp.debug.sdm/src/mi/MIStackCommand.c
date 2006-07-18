@@ -83,6 +83,12 @@ MIStackListAllArguments(int vals)
 }
 
 MICommand *
+MIStackInfoFrame(void)
+{
+	return MICommandNew("-stack-info-frame", MIResultRecordDONE);
+}
+
+MICommand *
 MIStackInfoDepth(void)
 {
 		MICommand * cmd;
