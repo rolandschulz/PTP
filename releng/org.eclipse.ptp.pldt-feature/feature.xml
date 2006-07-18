@@ -50,44 +50,49 @@
          id="org.eclipse.ptp.pldt.common"
          download-size="0"
          install-size="0"
-         version="0.0.0"/>
+         version="1.0.0"
+         unpack="false"/>
 
    <plugin
          id="org.eclipse.ptp.pldt.help"
          download-size="0"
          install-size="0"
-         version="0.0.0"/>
+         version="1.0.0"
+         unpack="false"/>
 
    <plugin
          id="org.eclipse.ptp.pldt.mpi.core"
          download-size="0"
          install-size="0"
-         version="0.0.0"/>
+         version="1.0.0"
+         unpack="false"/>
 
    <plugin
          id="org.eclipse.ptp.pldt.openmp.analysis"
          download-size="0"
          install-size="0"
-         version="0.0.0"/>
+         version="1.0.0"
+         unpack="false"/>
 
    <plugin
          id="org.eclipse.ptp.pldt.openmp.core"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="1.0.0"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.ptp.pldt.openmp.ui.pv"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="1.0.0"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.ptp.pldt.wizards"
          download-size="0"
          install-size="0"
-         version="0.0.0"/>
+         version="1.0.0"
+         unpack="false"/>
 
 </feature>
