@@ -60,6 +60,7 @@ libmi_a_SOURCES =		src/mi/MIParser.c \
 						src/mi/MIString.c \
 						src/mi/MIBreakpoint.c \
 						src/mi/MIFrame.c \
+						src/mi/MIThread.c \
 						src/mi/MIArg.c \
 						src/mi/MIVar.c \
 						src/mi/MIEvent.c \
