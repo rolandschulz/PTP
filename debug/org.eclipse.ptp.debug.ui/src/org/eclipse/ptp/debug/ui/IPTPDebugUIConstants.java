@@ -51,7 +51,7 @@ public interface IPTPDebugUIConstants {
 	public static final String EMPTY_STEP_GROUP = "emptyStepGroup";	
 	public static final String REG_GROUP = "regGroup";	
 
-	public static final String ADD_VAR_GROUP = "addVarGroup";	
+	public static final String VAR_GROUP = "VarGroup";	
 	
 	public static final String IUITABEMPTYGROUP = "emptygroup";
     public static final String IUITABVARIABLEGROUP = "variablegroup";	

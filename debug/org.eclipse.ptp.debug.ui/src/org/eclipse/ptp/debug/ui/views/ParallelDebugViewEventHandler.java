@@ -114,7 +114,7 @@ public class ParallelDebugViewEventHandler extends AbstractPDebugEventHandler {
 					BitList starget = (BitList)job.getAttribute(IAbstractDebugger.TERMINATED_PROC_KEY);
 					getPView().updateSuspendResumeButton(ssource, starget);
 
-					((UIDebugManager) getPView().getUIManager()).updateVariableValue();
+					((UIDebugManager) getPView().getUIManager()).updateVariableValue(false);
 				}
 				refresh();
 				break;
@@ -122,12 +122,19 @@ public class ParallelDebugViewEventHandler extends AbstractPDebugEventHandler {
 				refresh();
 				break;
 			case IPDebugEvent.ERROR:
-				final IPDebugErrorInfo errInfo = (IPDebugErrorInfo)info;
-				PTPDebugUIPlugin.getDisplay().asyncExec(new Runnable() {
-					public void run() {
-						PTPDebugUIPlugin.errorDialog("Error", new Exception(errInfo.getMsg() + " on tasks: "+ PDebugUIUtils.showBitList(errInfo.getAllProcesses())));
-					}
-				});
+				switch (event.getDetail()) {
+				case IPDebugEvent.ERR_NORMAL:
+					break;
+				case IPDebugEvent.ERR_WARNING:
+				case IPDebugEvent.ERR_FATAL:
+					final IPDebugErrorInfo errInfo = (IPDebugErrorInfo)info;
+					PTPDebugUIPlugin.getDisplay().asyncExec(new Runnable() {
+						public void run() {
+							PTPDebugUIPlugin.errorDialog("Error", new Exception(errInfo.getMsg() + " on tasks: "+ PDebugUIUtils.showBitList(errInfo.getAllProcesses())));
+						}
+					});
+					break;
+				}
 				refresh();
 				break;
 		}

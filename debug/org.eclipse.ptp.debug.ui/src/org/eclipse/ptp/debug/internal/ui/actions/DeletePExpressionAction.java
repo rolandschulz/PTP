@@ -18,27 +18,29 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.ui.actions;
 
+import java.util.Iterator;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.window.Window;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ptp.debug.internal.ui.PDebugImage;
-import org.eclipse.ptp.debug.internal.ui.views.variable.PVariableDialog;
 import org.eclipse.ptp.debug.internal.ui.views.variable.PVariableView;
+import org.eclipse.ptp.debug.ui.PJobVariableManager.VariableInfo;
 
 /**
  * @author Clement chu
  */
-public class AddPExpressionAction extends Action {
-	public static final String name = "Add";
+public class DeletePExpressionAction extends Action {
+	public static final String name = "Delete";
 	private PVariableView view = null;
 
 	/** Constructor
 	 * @param view
 	 */
-	public AddPExpressionAction(PVariableView view) {
+	public DeletePExpressionAction(PVariableView view) {
 		super(name, IAction.AS_PUSH_BUTTON);
-	    setImageDescriptor(PDebugImage.ID_ICON_RESUME_NORMAL);
-	    setDisabledImageDescriptor(PDebugImage.ID_ICON_RESUME_DISABLE);
+	    setImageDescriptor(PDebugImage.ID_ICON_STEPOVER_NORMAL);
+	    setDisabledImageDescriptor(PDebugImage.ID_ICON_STEPOVER_DISABLE);
 	    setToolTipText(name);
 	    setId(name);
 	    setEnabled(false);
@@ -48,9 +50,17 @@ public class AddPExpressionAction extends Action {
 	 * @see org.eclipse.jface.action.Action#run()
 	 */
 	public void run() {
-		if (new PVariableDialog(view).open() == Window.OK) {
-			view.refresh();
-			view.getUIManager().updateVariableValue(true);
+		ISelection selection = view.getSelection();
+		if (!selection.isEmpty() && selection instanceof IStructuredSelection) {
+			IStructuredSelection structSelection = (IStructuredSelection)selection;
+			for (Iterator i=structSelection.iterator(); i.hasNext();) {
+				VariableInfo varInfo = (VariableInfo)i.next();
+				view.getUIManager().getJobVariableManager().removeJobVariable(varInfo.getJob().getIDString(), varInfo.getVar());		
+				view.refresh();
+				if (varInfo.getJob().getIDString().equals(view.getUIManager().getCurrentJobId())) {
+					view.getUIManager().cleanVariableValue();
+				}
+			}
 		}
 	}
 }
