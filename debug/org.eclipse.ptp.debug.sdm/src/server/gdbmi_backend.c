@@ -1058,7 +1058,7 @@ GetStackframes(int current, List **flist)
 	stackframe *	s;
 	
 	if (current)
-		cmd = MICommandNew("frame", MIResultRecordDONE);
+		cmd = MIStackInfoFrame();
 	else
 		cmd = MIStackListAllFrames();
 		
@@ -1072,9 +1072,8 @@ GetStackframes(int current, List **flist)
 	
 	if (current)
 		frames = MIGetFrameInfo(cmd);
-	else {
+	else
 		frames = MIGetStackListFramesInfo(cmd);
-	}
 			
 	MICommandFree(cmd);
 	
