@@ -122,13 +122,6 @@ public interface IManager {
 	 */
 	public void updateMatchElementSets(IElementSet targetSet, IElementHandler elementHandler);
 	
-	//paint listener
-	/*
-	public void addPaintListener(IPaintListener pListener);
-	public void removePaintListener(IPaintListener pListener);
-	public void firePaintListener();
-	*/
-	
 	/** Add job listener
 	 * @param jobListener
 	 */
@@ -137,13 +130,12 @@ public interface IManager {
 	 * @param jobListener
 	 */
 	public void removeJobChangedListener(IJobChangedListener jobListener);
-	/** Fire job listener
-	 * @param type
+	/** Fire job event when job is changed
+	 * @param type job change type or remove type
 	 * @param cur_jid
 	 * @param pre_jid
 	 */
-	public void fireJobChangedListener(String cur_jid, String pre_jid);
-
+	public void fireJobChangedEvent(int type, String cur_jid, String pre_jid);
 	//job
 	/** Check is job existed
 	 * @param jid Job ID

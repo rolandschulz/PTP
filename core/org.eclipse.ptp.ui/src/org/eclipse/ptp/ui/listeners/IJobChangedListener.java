@@ -23,9 +23,11 @@ package org.eclipse.ptp.ui.listeners;
  *
  */
 public interface IJobChangedListener {
+	public static final int CHANGED = 0;
+	public static final int REMOVED = 1;
 	/** Change job event
 	 * @param cur_job_id current job ID
 	 * @param pre_job_id previous job ID
 	 */
-	public void jobChangedEvent(String cur_job_id, String pre_job_id);
+	public void jobChangedEvent(int type, String cur_job_id, String pre_job_id);
 }
