@@ -5,9 +5,14 @@ Running the MPI Tools within the Parallel Language Development Tools
 </title>
 <body>
 <h1> Running the PTP MPI Tools Plug-in</h1>
+<p>To run the PTP PLDT MPI Tools, 
+create a project (e.g a Managed Make C project), and
+set the preferences and include paths as described in
+<a href="setup.html">Setup for PTP MPI Tools</a>.
+
 
 <ol>
-<li>Create a project (e.g a Managed Make C project) , and within the project, create a C file that includes MPI code. A sample is <a href="testMPI.c">testMPI.c</a> 
+<li>Within the project, create a C file that includes MPI code. A sample is <a href="testMPI.c">testMPI.c</a> 
 
 <p>Note: A sample C++ file with MPI calls 
 is <a href="helloMPI_cpp_style.cpp">helloMPI_cpp_style.cpp</a>.
@@ -18,12 +23,6 @@ is <a href="helloMPI_c_style.cpp">helloMPI_c_style.cpp</a>.
 </ul>
 <p>&nbsp;
 
-<li>Open the MPI Artifacts view
-- or, the view will be opened automatically when analysis is complete.
-<p>Window > Show View > Other... > PTP MPI Views > MPI Artifact View
-
-<p><img src="images/showView.gif">
-<p>&nbsp;
 
 <li>Select the source file to analyse, to find the MPI artifacts.
 <p>Click the MPI button 
@@ -34,7 +33,7 @@ It is
 populated with MPI artifacts found.
 <p><img src="images/mpiView.gif">
 <p>&nbsp;
-<li>Double click on any marker in the MPI Artifact View
+<li>Double click on any line in the MPI Artifact View
 to navigate the editor to that line in the source file.
 <p>&nbsp;
 <li>Hover over the MPI Artifact identified in the source file
@@ -45,7 +44,7 @@ function call, for example.
 Click on the column heading to sort.
 <li>Click the "Clear MPI Artifacts Markers" button 
 <img src="images/nompi.gif" border=1> in the tool bar to remove all
-the markers.
+the MPI artifacts.
 <li>You can run the analysis on another file and its markers
 will be added to the view.
 <li>You can run the analysis on more than one file (multiple selection)
@@ -77,7 +76,9 @@ a function name, a help view appears which shows additional information.
 
 </ol>
 <p>&nbsp;
-<p>That's all folks.
+<p>That concludes the description of the MPI features.
+<p>See also the <a href="setupOMP.html">OpenMP setup information</a>
+or the <a href="runOMP">OpenMP run information</a>.
 <p>&nbsp;<p>&nbsp;<p>&nbsp;
 <p><a href="#top">Back to Top</a> | <a href="toc.html">Back to Table of Contents</a>
 

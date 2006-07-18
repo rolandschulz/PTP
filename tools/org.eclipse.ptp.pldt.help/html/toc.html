@@ -11,35 +11,49 @@ tools to aid in MPI Programming and other parallel languages and tools.
 <li>Analysis of C and C++ code to determine the location of MPI and OpenMP Artifacts
 <li>"Artifact View" indicates locations of Artifacts found
 in source code
-<li>Navigation between the  Artifacts
-<li>Reference information about the MPI and OpenMP calls via F1 (Ctl-F1, Help on Linux/Mac)
+<li>Navigation to source code location of artifacts
+<li>Reference information about the MPI and OpenMP calls via F1 (Cntl-F1 on Linux; Help key on Mac)
 <li>Content assist via Cntl-Space
 <li>Hover help 
+<p>The above features for MPI were available in the PTP MPI Development tools.
+<br><font color="red"><b>New for PLDT 1.0.0:</b></font>
+<li>OpenMP features similar to MPI, as noted above
+<li>OpenMP problems view of common errors, OpenMP "show #pragma region" action.
+<li>MPI New project wizard automatically adds in the include paths etc.
+for MPI projects.
 </ul>
 <h2>
 Pre-requisites:
 </h2>
-<p>This plug-in requires the base Eclipse platform, the CDT, and MPI.
+<p>This plug-in requires the base Eclipse platform, the CDT, and MPI and/or OpenMP.
 <ul>
-<li><b>Eclipse</b> platform: Version  3.1 
+<li><b>Eclipse</b> platform: Version  3.2
 <li><b>CDT:</b>
-Version 3.0.x, or FDT/Photran (for C/C++ files.  Wherever CDT is mentioned, FDT projects and files,
+Version 3.1 for C/C++ files.  (Wherever CDT is mentioned, FDT projects and files,
 for C/C++, should also work)
 
 <li><b>MPI:</b>
 Get MPI and its header file, a version that runs on
-your system (e.g. MPICH2 for win32)
+your system (e.g. OpenMPI for Linux/Mac; MPICH2 for win32)
 <ul>
 <li>Make sure it's in your path 
 <li>You may need to install it in a directory such that there are no spaces in the path
 (that is, not in 'Program Files' etc.)
 </ul>
 <li><b>OpenMP:</b>
-The PTP OpenMP tools merely need the OpenMP header file, similar to the MPI
+The PTP PLDT OpenMP tools also  need the OpenMP header file, similar to the MPI
 pre-requisites above.
 
 </ul>
-<p>
+<p>Note that <i>running</i> MPI or OpenMP is not really required for the PLDT
+to function and provide analysis and help with MPI and OpenMP development.
+Just the header files are required in order to know which "artifacts" should
+be located.
+<p>To run the core part of PTP (Parallel Tools Platform, <a href="http://eclipse.org/ptp">http://eclipse.org/ptp</a>,
+to run and debug parallel programs), you need whatever runtime it requires.  Currently 
+(July 2006) this is OpenMPI, which is available for Linux and Mac Only.  
+But for PLDT, this is not required, and PLDT will work
+on Windows as well.
 
 
 <h2>Help Topics</h2>
