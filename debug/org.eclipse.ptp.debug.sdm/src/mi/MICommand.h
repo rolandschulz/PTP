@@ -84,6 +84,7 @@ extern MICommand *MIStackListAllFrames(void);
 extern MICommand *MIStackListLocals(int vals);
 extern MICommand *MIStackListArguments(int vals, int low, int high);
 extern MICommand *MIStackListAllArguments(int vals);
+extern MICommand *MIStackInfoFrame(void);
 extern MICommand *MIStackInfoDepth(void);
 
 /*
