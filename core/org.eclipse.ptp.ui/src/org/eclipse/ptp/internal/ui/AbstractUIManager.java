@@ -48,7 +48,6 @@ import org.eclipse.ui.PlatformUI;
 public abstract class AbstractUIManager implements IManager {
 	protected IModelPresentation modelPresentation = null;
 	protected String cur_set_id = EMPTY_ID;
-	//protected List pListeners = new ArrayList(0);
 	protected List setListeners = new ArrayList(0);
 	protected List jListeners = new ArrayList();
 
@@ -67,32 +66,11 @@ public abstract class AbstractUIManager implements IManager {
 	 * @see org.eclipse.ptp.ui.IManager#shutdown()
 	 */
 	public void shutdown() {
-		//pListeners.clear();
-		//pListeners = null;
 		setListeners.clear();
 		setListeners = null;
 		jListeners.clear();
 		jListeners = null;
 	}
-	/*
-	public void addPaintListener(IPaintListener pListener) {
-		if (!pListeners.contains(pListener))
-			pListeners.add(pListener);
-	}
-	public void removePaintListener(IPaintListener pListener) {
-		if (pListeners.contains(pListener))
-			pListeners.remove(pListener);
-	}
-	public void firePaintListener() {
-		SafeRunner.run(new SafeNotifier() {
-			public void run() {
-				for (Iterator i = pListeners.iterator(); i.hasNext();) {
-					((IPaintListener) i.next()).repaint();
-				}
-			}
-		});
-	}
-	*/
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#addSetListener(org.eclipse.ptp.ui.listeners.ISetListener)
 	 */
@@ -153,17 +131,17 @@ public abstract class AbstractUIManager implements IManager {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#fireJobListener(int, java.lang.String, java.lang.String)
 	 */
-	public void fireJobChangedListener(final String cur_job_id, final String pre_job_id) {
+	public void fireJobChangedEvent(final int type, final String cur_job_id, final String pre_job_id) {
 		for (Iterator i = jListeners.iterator(); i.hasNext();) {
 			final IJobChangedListener listener = (IJobChangedListener)i.next();
 			SafeRunner.run(new SafeNotifier() {
 				public void run() {
-					listener.jobChangedEvent(cur_job_id, pre_job_id);
+					listener.jobChangedEvent(type, cur_job_id, pre_job_id);
 				}
 			});
 		}
-			
-	}	/* (non-Javadoc)
+	}
+	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#addToSet(org.eclipse.ptp.ui.model.IElement[], org.eclipse.ptp.ui.model.IElementSet)
 	 */
 	public void addToSet(IElement[] elements, IElementSet set) {
@@ -274,6 +252,7 @@ public abstract class AbstractUIManager implements IManager {
 		IPUniverse universe = modelPresentation.getUniverse();
 		if (universe != null) {
 			universe.deleteJob(job);
+			fireJobChangedEvent(IJobChangedListener.REMOVED, null, job.getIDString());
 		}
 	}
 	/* (non-Javadoc)
@@ -299,7 +278,6 @@ public abstract class AbstractUIManager implements IManager {
 					}
 				} finally {
 					pmonitor.done();
-					//firePaintListener();
 				}
 			}
 		};

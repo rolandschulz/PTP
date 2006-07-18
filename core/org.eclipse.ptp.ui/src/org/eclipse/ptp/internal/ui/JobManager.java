@@ -27,6 +27,7 @@ import org.eclipse.ptp.core.IPUniverse;
 import org.eclipse.ptp.internal.ui.model.Element;
 import org.eclipse.ptp.internal.ui.model.ElementHandler;
 import org.eclipse.ptp.ui.IPTPUIConstants;
+import org.eclipse.ptp.ui.listeners.IJobChangedListener;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
 
@@ -94,7 +95,7 @@ public class JobManager extends AbstractUIManager {
 	public void setCurrentJobId(String job_id) {
 		String tmp_jod_id = cur_job_id;
 		cur_job_id = job_id;		
-		fireJobChangedListener(job_id, tmp_jod_id);
+		fireJobChangedEvent(IJobChangedListener.CHANGED, job_id, tmp_jod_id);
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#getCurrentSetId()
