@@ -41,7 +41,7 @@
       <import plugin="org.eclipse.ui.views"/>
       <import plugin="org.eclipse.ltk.core.refactoring"/>
       <import plugin="org.eclipse.ltk.ui.refactoring"/>
-      <import feature="org.eclipse.cdt" version="3.1.0.qualifier" match="equivalent"/>
+      <import feature="org.eclipse.cdt" version="3.1.0" match="equivalent"/>
       <import plugin="org.eclipse.cdt.core"/>
       <import plugin="org.eclipse.cdt.managedbuilder.core"/>
       <import plugin="org.eclipse.cdt.ui"/>
