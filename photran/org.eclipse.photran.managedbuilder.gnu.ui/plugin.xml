@@ -1068,11 +1068,14 @@
 			  id="xlf.fortran.compiler.option.misc.verbose"
 			  valueType="boolean">
 		  </option>
+
+<!-- CDT does not yet support multiple content types so comment out these inputType attributes for now
+            sourceContentType="org.eclipse.photran.core.fortranSource"
+            dependencyContentType="org.eclipse.cdt.core.fortranSource"
+-->
           <inputType
-              sourceContentType="org.eclipse.photran.core.fortranSource"
-		      sources="f,f90,f95,f03"
-              dependencyContentType="org.eclipse.cdt.core.fortranSource"
-              dependencyExtensions="f,f90,f95,f03"
+		      sources="f,f90,f95,f03,ftn,for,fpp,F,FOR,FTN,FPP,F90,F95,F03"
+              dependencyExtensions="f,f90,f95,f03,ftn,for,fpp,F,FOR,FTN,FPP,F90,F95,F03"
               dependencyCalculator="org.eclipse.photran.managedbuilder.core/org.eclipse.photran.managedbuilder.core.makegen.DefaultFortranDependencyCalculator"
               id="photran.managedbuild.tool.xlf.fortran.compiler.input">
           </inputType>
@@ -1371,7 +1374,7 @@
                <toolChain
                      archList="all"
                      osList="macosx"
-                     name="%ToolChainName.Dbg"
+                     name="%XLFToolChainName.Dbg"
                      targetTool="photran.managedbuild.tool.macosx.fortran.xlf.linker.macosx.exe.debug"
                      scannerConfigDiscoveryProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile"
                      id="photran.managedbuild.toolchain.xlf.fortran.macosx.exe.debug">
@@ -1436,7 +1439,7 @@
                <toolChain
                      archList="all"
                      osList="macosx"
-                     name="%ToolChainName.Rel"
+                     name="%XLFToolChainName.Rel"
                      targetTool="photran.managedbuild.tool.macosx.fortran.xlf.linker.macosx.exe.release"
                      scannerConfigDiscoveryProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile"
                      id="photran.managedbuild.toolchain.xlf.fortran.macosx.exe.release">
