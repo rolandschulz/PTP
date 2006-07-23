@@ -192,14 +192,14 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	 * @param set Target set
 	 */
 	public void selectSet(IElementSet set) {
+		cur_set_size = 0;
+		if (set != null) {
+			cur_set_size = set.size();
+			manager.setCurrentSetId(set.getID());
+		}
+		canvas.setElementSet(set);
 		fireChangeEvent(set, cur_element_set);
 		cur_element_set = set;
-		cur_set_size = 0;
-		if (cur_element_set != null) {
-			cur_set_size = cur_element_set.size();
-			manager.setCurrentSetId(cur_element_set.getID());
-		}
-		canvas.setElementSet(cur_element_set);
 	}
 	/** Get current set
 	 * @return current set
