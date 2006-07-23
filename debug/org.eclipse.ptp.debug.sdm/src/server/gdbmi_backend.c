@@ -1259,6 +1259,7 @@ struct simple_type simple_types[] = {
 	{ "long long int", LONGLONG },
 	{ "long long unsigned int", ULONGLONG },
 #endif /* CC_HAS_LONG_LONG */
+	{ "long", LONG },
 	{ "float", FLOAT },
 	{ "double", DOUBLE },
 	{ "string", STRING },
