@@ -47,7 +47,7 @@ public class DebugCommandQueue extends Thread {
 		cleanup();
 	}
 		
-	public void run()  {
+	public void run() {
 		while (!isTerminated) {
 			if (!waitForCommand()) {
 				break;
@@ -56,11 +56,14 @@ public class DebugCommandQueue extends Thread {
 				currentCommand = getCommand();
 				System.err.println("*** SEND COMMAND: " + currentCommand.getName() + ", tasks: " + debugger.showBitList(currentCommand.getTasks()));
 				currentCommand.execCommand(debugger, command_timeout);
-				currentCommand.waitForReturn();
 			} catch (PCDIException e) {
-				//System.err.println("----ERROR COMMAND: " + currentCommand.getName() + ", task: " + debugger.showBitList(currentCommand.getTasks()));
-				debugger.handleErrorEvent(currentCommand.getTasks(), e.getMessage(), e.getErrorCode());
-			} finally {
+				System.err.println("*** ERROR COMMAND ***");
+				if (currentCommand != null) {
+					debugger.handleErrorEvent(currentCommand.getTasks(), e.getMessage(), e.getErrorCode());
+					currentCommand.doFlush();
+				}
+			}
+			finally {
 				currentCommand = null;
 			}
 		}
@@ -90,14 +93,20 @@ public class DebugCommandQueue extends Thread {
 	public void addCommand(IDebugCommand command) {
 		synchronized (queue) {
 			if (!contains(command)) {
+				if (command.isWaitInQueue()) {
+					queue.add(command);
+				} 
+				else {
+					//jump the queue
+					queue.add(0, command);
+				}
 				if (command.canInterrupt() && currentCommand != null) {
-					setCommandReturn(null, null);
+					currentCommand.doFlush();
 					try {
 						//To make sure all events fired via AsbtractDebugger, so wait 0.5 sec here
 						queue.wait(500);
 					} catch (InterruptedException e) {}
 				}
-				queue.add(command);
 				queue.notifyAll();
 			}
 			else {
@@ -108,6 +117,8 @@ public class DebugCommandQueue extends Thread {
 	}
 	private boolean contains(IDebugCommand command) {
 		synchronized (queue) {
+			//if (currentCommand != null && currentCommand.compareTo(command) == 0)
+				//return true;
 			int size = queue.size();
 			if (size > 0) {
 				return (((IDebugCommand)queue.get(size-1)).compareTo(command) == 0);
@@ -115,32 +126,36 @@ public class DebugCommandQueue extends Thread {
 			return false;
 		}
 	}
-	public void flushCommands() {
+	public IDebugCommand[] getCommands() {
+		return (IDebugCommand[])queue.toArray(new IDebugCommand[0]);
+	}
+	public void doFlushCommands() {
 		synchronized (queue) {
-			IDebugCommand[] commands = (IDebugCommand[])queue.toArray(new IDebugCommand[0]);
-			for (int i=commands.length-1; i>-1; i--) {
-				commands[i].flush();
+			try {
+				IDebugCommand[] commands = getCommands();
+				for (int i=commands.length-1; i>-1; i--) {
+					commands[i].doFlush();
+				}
+			} finally {
+				queue.clear();
 			}
-			queue.clear();
 		}
 	}
 	public void setCommandReturn(BitList tasks, Object result) {
 		synchronized (queue) {
 			if (currentCommand != null) {
+				System.err.println("*** setCommandReturn ***: " + currentCommand.getName());
 				if (result == null) {
-					flushCommands();
-					currentCommand.flush();
-				} 
-				else {
-					currentCommand.setReturn(tasks, result);
+					doFlushCommands();
 				}
+				currentCommand.setReturn(tasks, result);					
 			}
 		}
 	}
 	public void cleanup() {
 		synchronized (queue) {
 			//queue.clear();
-			flushCommands();
+			doFlushCommands();
 		}
 	}
 }

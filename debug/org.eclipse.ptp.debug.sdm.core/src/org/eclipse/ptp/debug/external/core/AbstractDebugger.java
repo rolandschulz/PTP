@@ -83,7 +83,6 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 	public void completeCommand(BitList tasks, Object result) {
 		commandQueue.setCommandReturn(tasks, result);
 	}
-
 	public final void initialize(IPJob job, int timeout) throws CoreException {
 		this.job = job;
 		job.setAttribute(TERMINATED_PROC_KEY, new BitList(job.totalProcesses()));
@@ -101,7 +100,7 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		StartDebuggerCommand command = new StartDebuggerCommand(job);
 		postCommand(command);
 		try {
-			command.waitFnish();
+			command.waitForReturn();
 		} catch (PCDIException e) {
 			exit();
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugExternalPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));

@@ -31,20 +31,16 @@ public class StartDebuggerCommand extends AbstractDebugCommand {
 	private IPJob job = null;
 	
 	public StartDebuggerCommand(IPJob job) {
-		super(null, false, true);
+		super(null);
 		this.job = job;
 	}
-	public void execCommand(IAbstractDebugger debugger, int timeout) throws PCDIException {
-		int final_timeout = (job != null)?job.totalProcesses()*timeout:timeout;
-		setTimeout(final_timeout);
+	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
+		setTimeout((job != null)?job.totalProcesses()*timeout:timeout);
 		try {
 			debugger.startDebugger(job);
 		} catch (CoreException e) {
 			throw new PCDIException(e);
 		}
-	}
-	public void waitFnish() throws PCDIException {
-		waitForReturn();
 	}
 	public String getName() {
 		return "Start debugger"; 

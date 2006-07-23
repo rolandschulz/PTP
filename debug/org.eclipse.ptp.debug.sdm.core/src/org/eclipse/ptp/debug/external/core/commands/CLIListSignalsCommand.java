@@ -31,21 +31,19 @@ public class CLIListSignalsCommand extends AbstractDebugCommand {
 	private String name = "";
 	
 	public CLIListSignalsCommand(BitList tasks, String name) {
-		super(tasks, false, true);
+		super(tasks);
 		this.name = name;
 	}
-	public void execCommand(IAbstractDebugger debugger, int timeout) throws PCDIException {
-		setTimeout(timeout);
+	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
 		debugger.getListSignals(tasks, name);
 	}
 	
 	public IPCDISignal[] getInfoSignals() throws PCDIException {
-		if (waitForReturn()) {
-			if (result instanceof IPCDISignal[]) {
-				return (IPCDISignal[])result;
-			}
+		Object res = getResult();
+		if (res instanceof IPCDISignal[]) {
+			return (IPCDISignal[])res;
 		}
-		throw new PCDIException("Wrong type return on command: " + getName());
+		return new IPCDISignal[0];
 	}
 	public String getName() {
 		return "CLI List Signals"; 

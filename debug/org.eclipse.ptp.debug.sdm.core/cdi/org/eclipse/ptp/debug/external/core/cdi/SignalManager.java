@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
@@ -71,7 +70,7 @@ public class SignalManager extends Manager {
 		CLIListSignalsCommand command = new CLIListSignalsCommand(tasks, name);
 		session.getDebugger().postCommand(command);
 		IPCDISignal[] signals = command.getInfoSignals();
-		if (signals == null) {
+		if (signals.length == 0) {
 			throw new PCDIException("No signal found");
 		}
 		return signals;
@@ -134,9 +133,10 @@ public class SignalManager extends Manager {
 		
 		CLIHandleCommand command = new CLIHandleCommand(tasks, buffer.toString());
 		session.getDebugger().postCommand(command);
-		command.waitFinish();
-		sig.setHandle(isIgnore, isStop);
-		session.getEventManager().fireEvents(new IPCDIEvent[] { new SignalChangedEvent(session, tasks, sig, sig.getName()) });
+		if (command.isWaitForReturn()) {
+			sig.setHandle(isIgnore, isStop);
+			session.getEventManager().fireEvents(new IPCDIEvent[] { new SignalChangedEvent(session, tasks, sig, sig.getName()) });
+		}
 	}
 
 	public IPCDISignal[] getSignals(Target target) throws PCDIException {

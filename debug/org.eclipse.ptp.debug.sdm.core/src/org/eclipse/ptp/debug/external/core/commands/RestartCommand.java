@@ -28,10 +28,9 @@ import org.eclipse.ptp.debug.core.cdi.PCDIException;
  */
 public class RestartCommand extends AbstractDebugCommand {
 	public RestartCommand(BitList tasks) {
-		super(tasks, false, false);
+		super(tasks);
 	}
-	public void execCommand(IAbstractDebugger debugger, int timeout) throws PCDIException {
-		setTimeout(timeout);
+	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
 		debugger.restart();
 	}
 	public String getName() {

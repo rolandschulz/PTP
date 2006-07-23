@@ -49,16 +49,11 @@ public class DataWriteMemoryCommand extends AbstractDebugCommand {
 		this.value = value;
 		this.wordFormat = wordFormat;
 	}
-	public void execCommand(IAbstractDebugger debugger, int timeout) throws PCDIException {
-		setTimeout(timeout);
+	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
 		debugger.setDataWriteMemoryCommand(tasks, offset, address, wordFormat, wordSize, value);
-	}
-	
+	}	
 	public Object getDataWriteMemoryInfo() throws PCDIException {
-		if (waitForReturn()) {
-			return result;
-		}
-		throw new PCDIException("Wrong type return on command: " + getName());
+		return getResult();
 	}
 	public String getName() {
 		return "Data Write Memory"; 

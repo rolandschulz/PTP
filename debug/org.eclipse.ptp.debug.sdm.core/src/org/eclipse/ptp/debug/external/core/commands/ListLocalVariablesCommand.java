@@ -32,21 +32,19 @@ public class ListLocalVariablesCommand extends AbstractDebugCommand {
 	private IPCDIStackFrame frame = null;
 	
 	public ListLocalVariablesCommand(BitList tasks, IPCDIStackFrame frame) {
-		super(tasks, false, true);
+		super(tasks);
 		this.frame = frame;
 	}
-	public void execCommand(IAbstractDebugger debugger, int timeout) throws PCDIException {
-		setTimeout(timeout);
+	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
 		debugger.listLocalVariables(tasks, frame);
 	}
 	
 	public IPCDILocalVariable[] getLocalVariables() throws PCDIException {
-		if (waitForReturn()) {
-			if (result instanceof IPCDILocalVariable[]) {
-				return (IPCDILocalVariable[])result;
-			}
+		Object res = getResult();
+		if (res instanceof IPCDILocalVariable[]) {
+			return (IPCDILocalVariable[])res;
 		}
-		throw new PCDIException("Wrong type return on command: " + getName());
+		return new IPCDILocalVariable[0];
 	}
 	public String getName() {
 		return "List local variables"; 

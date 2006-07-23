@@ -28,21 +28,19 @@ import org.eclipse.ptp.debug.core.cdi.PCDIException;
  */
 public class GetInfoThreadsCommand extends AbstractDebugCommand {
 	public GetInfoThreadsCommand(BitList tasks) {
-		super(tasks, false, true);
+		super(tasks);
 	}
-	public void execCommand(IAbstractDebugger debugger, int timeout) throws PCDIException {
-		setTimeout(timeout);
+	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
 		debugger.getInfothreads(tasks);
 	}
 	
 	//first index is current thread id
 	public String[] getThreadIds() throws PCDIException {
-		if (waitForReturn()) {
-			if (result instanceof String[]) {
-				return (String[])result;
-			}
+		Object res = getResult();
+		if (res instanceof String[]) {
+			return (String[])result;
 		}
-		throw new PCDIException("Wrong type return on command: " + getName());
+		return new String[0];
 	}
 	public String getName() {
 		return "Get Info Thread"; 

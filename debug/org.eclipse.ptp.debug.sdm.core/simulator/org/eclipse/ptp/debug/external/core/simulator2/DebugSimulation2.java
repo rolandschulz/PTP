@@ -27,7 +27,6 @@ import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Random;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.util.BitList;
@@ -82,7 +81,7 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 		return bpt_id++;
 	}
 	public void connection() throws CoreException {
-		completeCommand(null, IDebugCommand.OK);
+		completeCommand(null, IDebugCommand.RETURN_OK);
 	}
 	public int getDebuggerPort() throws CoreException {
 		return 0;
@@ -121,7 +120,7 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 				if (!EVENT_BY_EACH_PROC) {
 					intQueue.startTimer();
 				}
-				completeCommand(null, IDebugCommand.OK);
+				completeCommand(null, IDebugCommand.RETURN_OK);
 			}
 		}).start();
 	}
@@ -140,7 +139,7 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 				}
 				intQueue.deleteObservers();
 				sim_list.clear();
-				completeCommand(null, IDebugCommand.OK);
+				completeCommand(null, IDebugCommand.RETURN_OK);
 			}
 		}).start();
 	}
@@ -198,7 +197,7 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 				for (int i=0; i<taskArray.length; i++) {
 					getSimProg(taskArray[i]).go();
 				}
-				completeCommand(tasks, IDebugCommand.OK);
+				completeCommand(tasks, IDebugCommand.RETURN_OK);
 			}
 		}).start();
 	}
@@ -210,7 +209,7 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 				for (int i=0; i<taskArray.length; i++) {
 					getSimProg(taskArray[i]).stopProgram();
 				}
-				completeCommand(tasks, IDebugCommand.OK);
+				completeCommand(tasks, IDebugCommand.RETURN_OK);
 			}
 		}).start();
 	}
@@ -221,7 +220,7 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 				for (int i=0; i<taskArray.length; i++) {
 					getSimProg(taskArray[i]).suspend();
 				}
-				completeCommand(tasks, IDebugCommand.OK);
+				completeCommand(tasks, IDebugCommand.RETURN_OK);
 			}
 		}).start();
 	}
@@ -232,7 +231,7 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 				for (int i=0; i<taskArray.length; i++) {
 					getSimProg(taskArray[i]).stepLine();
 				}
-				completeCommand(tasks, IDebugCommand.OK);
+				completeCommand(tasks, IDebugCommand.RETURN_OK);
 			}
 		}).start();
 	}
@@ -243,7 +242,7 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 				for (int i=0; i<taskArray.length; i++) {
 					getSimProg(taskArray[i]).stepOverLine();
 				}
-				completeCommand(tasks, IDebugCommand.OK);
+				completeCommand(tasks, IDebugCommand.RETURN_OK);
 			}
 		}).start();
 	}
@@ -254,7 +253,7 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 				for (int i=0; i<taskArray.length; i++) {
 					getSimProg(taskArray[i]).stepFinish();
 				}
-				completeCommand(tasks, IDebugCommand.OK);
+				completeCommand(tasks, IDebugCommand.RETURN_OK);
 			}
 		}).start();
 	}	
@@ -337,7 +336,7 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 	public void setCurrentStackFrame(final BitList tasks, final int level) throws PCDIException {
 		new Thread(new Runnable() {
 			public void run() {
-				completeCommand(tasks, IDebugCommand.OK);
+				completeCommand(tasks, IDebugCommand.RETURN_OK);
 			}
 		}).start();
 	}

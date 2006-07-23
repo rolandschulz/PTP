@@ -31,22 +31,15 @@ public abstract class AbstractBreakpointCommand extends AbstractDebugCommand {
 	IPCDIBreakpoint cdiBpt;
 	
 	public AbstractBreakpointCommand(BitList tasks, IPCDIBreakpoint cdiBpt) {
-		super(tasks, false, true);
+		super(tasks);
 		this.cdiBpt = cdiBpt;
 	}
-	public void waitFinish() throws PCDIException {
-		if (waitForReturn()) {
-			if (result == null) {
-				throw new PCDIException("No result found on command: " + getName());
-			}
-		}
-	}	
 	public IPCDIBreakpoint getBreakpoint() throws PCDIException {
-		waitFinish();
-		if (result instanceof IPCDIBreakpoint) {
-			return (IPCDIBreakpoint)result;
+		Object res = getResult();
+		if (res instanceof IPCDIBreakpoint) {
+			return (IPCDIBreakpoint)res;
 		}
-		throw new PCDIException("Wrong type return on command: " + getName());
+		return null;
 	}
 }
 

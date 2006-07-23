@@ -427,22 +427,20 @@ public class VariableManager extends Manager {
 			ListArgumentsCommand argCmd = new ListArgumentsCommand(tasks, frame, frame.getThread().getStackFrameCount());
 			session.getDebugger().postCommand(argCmd);
 			IPCDIArgument[] args = argCmd.getArguments();
-			if (args != null) {
-				for (int i = 0; i < args.length; i++) {
-					VariableDescriptor varDesc = (VariableDescriptor) args[i];
-					Thread thread = (Thread)varDesc.getThread();
-					String name = varDesc.getName();
-					String fName = varDesc.getQualifiedName();
-					int pos = varDesc.getPosition();
-					int depth = varDesc.getStackDepth();
-					IAIF aif = varDesc.getAIF();
-					if (aif == null) {
-						GetAIFCommand aifCmd = new GetAIFCommand(tasks, fName);
-						session.getDebugger().postCommand(aifCmd);
-						aif = aifCmd.getAIF();
-					}
-					argObjects.add(new ArgumentDescriptor(target, thread, frame, name, fName, pos, depth, aif));
+			for (int i = 0; i < args.length; i++) {
+				VariableDescriptor varDesc = (VariableDescriptor) args[i];
+				Thread thread = (Thread)varDesc.getThread();
+				String name = varDesc.getName();
+				String fName = varDesc.getQualifiedName();
+				int pos = varDesc.getPosition();
+				int depth = varDesc.getStackDepth();
+				IAIF aif = varDesc.getAIF();
+				if (aif == null) {
+					GetAIFCommand aifCmd = new GetAIFCommand(tasks, fName);
+					session.getDebugger().postCommand(aifCmd);
+					aif = aifCmd.getAIF();
 				}
+				argObjects.add(new ArgumentDescriptor(target, thread, frame, name, fName, pos, depth, aif));
 			}
 		} finally {
 			target.setCurrentThread(currentThread, false);
@@ -510,22 +508,20 @@ public class VariableManager extends Manager {
 			ListLocalVariablesCommand varCmd = new ListLocalVariablesCommand(tasks, currentFrame);
 			session.getDebugger().postCommand(varCmd);
 			IPCDILocalVariable[] vars = varCmd.getLocalVariables();
-			if (vars != null) {
-				for (int i = 0; i < vars.length; i++) {
-					VariableDescriptor varDesc = (VariableDescriptor)vars[i];
-					Thread thread = (Thread)varDesc.getThread();
-					String name = varDesc.getName();
-					String fName = varDesc.getQualifiedName();
-					int pos = varDesc.getPosition();
-					int depth = varDesc.getStackDepth();
-					IAIF aif = varDesc.getAIF();
-					if (aif == null) {
-						GetAIFCommand aifCmd = new GetAIFCommand(tasks, fName);
-						session.getDebugger().postCommand(aifCmd);
-						aif = aifCmd.getAIF();
-					}
-					varObjects.add(new LocalVariableDescriptor(target, thread, frame, name, fName, pos, depth, aif));
+			for (int i = 0; i < vars.length; i++) {
+				VariableDescriptor varDesc = (VariableDescriptor)vars[i];
+				Thread thread = (Thread)varDesc.getThread();
+				String name = varDesc.getName();
+				String fName = varDesc.getQualifiedName();
+				int pos = varDesc.getPosition();
+				int depth = varDesc.getStackDepth();
+				IAIF aif = varDesc.getAIF();
+				if (aif == null) {
+					GetAIFCommand aifCmd = new GetAIFCommand(tasks, fName);
+					session.getDebugger().postCommand(aifCmd);
+					aif = aifCmd.getAIF();
 				}
+				varObjects.add(new LocalVariableDescriptor(target, thread, frame, name, fName, pos, depth, aif));
 			}
 		} finally {
 			target.setCurrentThread(currentThread, false);

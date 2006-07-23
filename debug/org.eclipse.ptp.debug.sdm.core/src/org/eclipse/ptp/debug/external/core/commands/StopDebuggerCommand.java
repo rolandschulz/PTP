@@ -30,27 +30,26 @@ public class StopDebuggerCommand extends AbstractDebugCommand {
 	private boolean sendEvent = true;
 	
 	public StopDebuggerCommand(boolean sendEvent) {
-		super(null, false, true);
+		super(null);
 		this.sendEvent = sendEvent;
 	}
 	public StopDebuggerCommand() {
 		this(true);
 	}
-	public void execCommand(IAbstractDebugger debugger, int timeout) throws PCDIException {
-		setTimeout(timeout);
+	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
 		try {
 			debugger.stopDebugger();
 		} catch (CoreException e) {
 			throw new PCDIException(e);
 		}
-		waitFinish(debugger);
 	}
-	public void waitFinish(IAbstractDebugger debugger) throws PCDIException {
-		if (waitForReturn()) {
+	public boolean waitAfter(IAbstractDebugger debugger) throws PCDIException {
+		if (super.waitAfter(debugger)) {
 			if (sendEvent) {
 				debugger.handleStopDebuggerEvent();
 			}
 		}
+		return false;
 	}
 	public String getName() {
 		return "Stop debugger"; 

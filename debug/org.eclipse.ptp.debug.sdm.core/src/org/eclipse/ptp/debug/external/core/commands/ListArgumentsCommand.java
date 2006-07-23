@@ -33,22 +33,20 @@ public class ListArgumentsCommand extends AbstractDebugCommand {
 	private int depth = 0;
 	
 	public ListArgumentsCommand(BitList tasks, IPCDIStackFrame frame, int depth) {
-		super(tasks, false, true);
+		super(tasks);
 		this.frame = frame;
 		this.depth = depth;
 	}
-	public void execCommand(IAbstractDebugger debugger, int timeout) throws PCDIException {
-		setTimeout(timeout);
+	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
 		debugger.listArguments(tasks, frame, depth);
 	}
 	
 	public IPCDIArgument[] getArguments() throws PCDIException {
-		if (waitForReturn()) {
-			if (result instanceof IPCDIArgument[]) {
-				return (IPCDIArgument[])result;
-			}
+		Object res = getResult();
+		if (res instanceof IPCDIArgument[]) {
+			return (IPCDIArgument[])res;
 		}
-		throw new PCDIException("Wrong type return on command: " + getName());
+		return new IPCDIArgument[0];
 	}
 	public String getName() {
 		return "List arguments"; 

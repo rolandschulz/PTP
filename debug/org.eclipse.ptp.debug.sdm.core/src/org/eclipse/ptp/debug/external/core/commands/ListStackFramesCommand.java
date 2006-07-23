@@ -29,20 +29,18 @@ import org.eclipse.ptp.debug.core.cdi.model.IPCDIStackFrame;
  */
 public class ListStackFramesCommand extends AbstractDebugCommand {
 	public ListStackFramesCommand(BitList tasks) {
-		super(tasks, false, true);
+		super(tasks);
 	}
-	public void execCommand(IAbstractDebugger debugger, int timeout) throws PCDIException {
-		setTimeout(timeout);
+	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
 		debugger.listStackFrames(tasks);
 	}
 	
 	public IPCDIStackFrame[] getStackFrames() throws PCDIException {
-		if (waitForReturn()) {
-			if (result instanceof IPCDIStackFrame[]) {
-				return (IPCDIStackFrame[])result;
-			}
+		Object res = getResult();
+		if (res instanceof IPCDIStackFrame[]) {
+			return (IPCDIStackFrame[])res;
 		}
-		throw new PCDIException("Wrong type return on command: " + getName());
+		return new IPCDIStackFrame[0];
 	}
 	public String getName() {
 		return "List stack frames"; 

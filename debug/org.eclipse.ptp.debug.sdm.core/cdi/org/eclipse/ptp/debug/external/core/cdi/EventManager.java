@@ -24,6 +24,10 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 import org.eclipse.cdt.debug.core.cdi.ICDILocator;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.cdi.IPCDIBreakpointHit;
@@ -58,7 +62,8 @@ import org.eclipse.ptp.debug.external.core.cdi.model.Target;
 import org.eclipse.ptp.debug.external.core.cdi.model.Thread;
 
 public class EventManager extends SessionObject implements IPCDIEventManager, Observer {
-	List list = Collections.synchronizedList(new ArrayList(1));
+	List list = Collections.synchronizedList(new ArrayList());
+	protected final Object lock = new Object(); 
 
 	public void update(Observable o, Object arg) {
 		IPCDIEvent event = (IPCDIEvent) arg;
@@ -66,22 +71,7 @@ public class EventManager extends SessionObject implements IPCDIEventManager, Ob
 		List cdiList = new ArrayList(1);		
 		if (event instanceof IPCDISuspendedEvent) {
 			processSuspendedEvent((IPCDISuspendedEvent)event);
-			fireSuspendEvent((IPCDISuspendedEvent)event);
 		}
-		else if (event instanceof IPCDIResumedEvent) {
-			fireResumeEvent((IPCDIResumedEvent)event);
-		}
-		else if (event instanceof IPCDIDestroyedEvent) {
-			fireDestroyEvent((IPCDIDestroyedEvent)event);
-		}
-		else if (event instanceof IPCDIErrorEvent) {
-			fireErrorEvent((IPCDIErrorEvent)event);
-		}
-		else if (event instanceof IPCDICreatedEvent) {
-			fireCreateEvent((IPCDICreatedEvent)event);
-		}
-		else if (event instanceof IPCDIChangedEvent) {
-			fireChangeEvent((IPCDIChangedEvent)event);
 			/*
 			if (event instanceof IPCDIMemoryChangedEvent) {
 				// We need to fire an event for all the register blocks that may contain the modified addresses.
@@ -128,13 +118,12 @@ public class EventManager extends SessionObject implements IPCDIEventManager, Ob
 				}
 			}
 			*/
-		}
 		cdiList.add(event);
 		
 		// Fire the event;
-		IPCDIEvent[] cdiEvents = (IPCDIEvent[])cdiList.toArray(new IPCDIEvent[0]);
-		fireEvents(cdiEvents);
-	}
+		fireEvents((IPCDIEvent[])cdiList.toArray(new IPCDIEvent[0]));
+		fireDebugEvent(event);
+	}	
 	
 	public EventManager(Session session) {
 		super(session);
@@ -162,70 +151,116 @@ public class EventManager extends SessionObject implements IPCDIEventManager, Ob
 		}
 	}
 	
-	boolean processSuspendedEvent(IPCDISuspendedEvent event) {
-		Session session = (Session)getSession();
-		SignalManager sigMgr = session.getSignalManager();
-		/*
-		VariableManager varMgr = session.getVariableManager();
-		ExpressionManager expMgr  = session.getExpressionManager();		
-		BreakpointManager bpMgr = session.getBreakpointManager();
-		SourceManager srcMgr = session.getSourceManager();
-		MemoryManager memMgr = session.getMemoryManager();
-		*/
-		int[] procs = event.getAllRegisteredProcesses().toArray();
-		for (int i = 0; i < procs.length; i++) {
-			Target currentTarget = (Target) session.getTarget(procs[i]);
-			currentTarget.setSupended(true);
-			/*
-			if (processSharedLibEvent(event)) {
-				return false;
-			}
-			if (processBreakpointHitEvent(event)) {
-				return false;
-			}
-			*/
-			int threadId = event.getThreadId();
-			currentTarget.updateState(threadId);
-			try {
-				Thread cthread = (Thread)currentTarget.getCurrentThread();
-				if (cthread != null) {
-					cthread.getCurrentStackFrame();
-				}
-			} catch (PCDIException e1) {
-				PTPDebugExternalPlugin.log(e1);
-			}
-			try {
-				if (sigMgr.isAutoUpdate()) {
-					sigMgr.update(currentTarget);
-				}
-				/**
-				 * TODO not quite important
-				if (varMgr.isAutoUpdate()) {
-					varMgr.update(currentTarget);
-				}
-				if (expMgr.isAutoUpdate()) { 
-					expMgr.update(currentTarget);
-				}
-				//if (bpMgr.isAutoUpdate()) {
-					//bpMgr.update(currentTarget);
-				//}
-				if (srcMgr.isAutoUpdate()) {
-					srcMgr.update(currentTarget);
-				}
-				if (memMgr.isAutoUpdate()) {
-					memMgr.update(currentTarget);
-				}
+	boolean processSuspendedEvent(final IPCDISuspendedEvent event) {
+		final int[] procs = event.getAllRegisteredProcesses().toArray();
+		if (procs.length == 0) {
+			return true;
+		}
+		
+		Job aJob = new Job("Updating registered process...") {
+			protected IStatus run(IProgressMonitor monitor) {
+				monitor.beginTask("Updating registered process...", procs.length);
+				Session session = (Session)getSession();
+				SignalManager sigMgr = session.getSignalManager();
+				/*
+				VariableManager varMgr = session.getVariableManager();
+				ExpressionManager expMgr  = session.getExpressionManager();		
+				BreakpointManager bpMgr = session.getBreakpointManager();
+				SourceManager srcMgr = session.getSourceManager();
+				MemoryManager memMgr = session.getMemoryManager();
 				*/
-			} catch (PCDIException e) {
-				e.printStackTrace();
+				for (int i = 0; i < procs.length; i++) {
+					try {
+						Target currentTarget = (Target) session.getTarget(procs[i]);
+						currentTarget.setSupended(true);
+						/*
+						if (processSharedLibEvent(event)) {
+							return false;
+						}
+						if (processBreakpointHitEvent(event)) {
+							return false;
+						}
+						*/
+						int threadId = event.getThreadId();
+						currentTarget.updateState(threadId);
+						try {
+							Thread cthread = (Thread)currentTarget.getCurrentThread();
+							if (cthread != null) {
+								cthread.getCurrentStackFrame();
+							}
+						} catch (PCDIException e1) {
+							PTPDebugExternalPlugin.log(e1);
+						}
+						try {
+							if (sigMgr.isAutoUpdate()) {
+								sigMgr.update(currentTarget);
+							}
+							/**
+							 * TODO not quite important
+							if (varMgr.isAutoUpdate()) {
+								varMgr.update(currentTarget);
+							}
+							if (expMgr.isAutoUpdate()) { 
+								expMgr.update(currentTarget);
+							}
+							//if (bpMgr.isAutoUpdate()) {
+								//bpMgr.update(currentTarget);
+							//}
+							if (srcMgr.isAutoUpdate()) {
+								srcMgr.update(currentTarget);
+							}
+							if (memMgr.isAutoUpdate()) {
+								memMgr.update(currentTarget);
+							}
+							*/
+						} catch (PCDIException e) {
+							e.printStackTrace();
+						}
+					} finally {
+						monitor.worked(1);
+					}
+				}
+				monitor.done();
+				return Status.OK_STATUS;
 			}
+		};
+		aJob.setSystem(true);
+		aJob.setPriority(Job.INTERACTIVE);
+		aJob.schedule();
+		try {
+			//wait the job until finish
+			aJob.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
 		return true;
 	}
-	
-	public IPDebugInfo getDebugInfo(IPCDIEvent event) {
+	/***********************************************************************
+	 * Debug Event
+	 ***********************************************************************/
+	protected IPDebugInfo getDebugInfo(IPCDIEvent event) {
 		return new PDebugInfo(event.getDebugJob(), event.getAllProcesses(), event.getAllRegisteredProcesses(), event.getAllUnregisteredProcesses());
-	}	
+	}
+	protected void fireDebugEvent(IPCDIEvent event) {
+		if (event instanceof IPCDISuspendedEvent) {
+			fireSuspendEvent((IPCDISuspendedEvent)event);
+		}
+		else if (event instanceof IPCDIResumedEvent) {
+			fireResumeEvent((IPCDIResumedEvent)event);
+		}
+		else if (event instanceof IPCDIDestroyedEvent) {
+			fireDestroyEvent((IPCDIDestroyedEvent)event);
+		}
+		else if (event instanceof IPCDIErrorEvent) {
+			fireErrorEvent((IPCDIErrorEvent)event);
+		}
+		else if (event instanceof IPCDICreatedEvent) {
+			fireCreateEvent((IPCDICreatedEvent)event);
+		}
+		else if (event instanceof IPCDIChangedEvent) {
+			fireChangeEvent((IPCDIChangedEvent)event);
+		}		
+	}
 	public void fireSuspendEvent(IPCDISuspendedEvent event) {
 		IPDebugInfo baseInfo = getDebugInfo(event);
 		int detail = IPDebugEvent.UNSPECIFIED;

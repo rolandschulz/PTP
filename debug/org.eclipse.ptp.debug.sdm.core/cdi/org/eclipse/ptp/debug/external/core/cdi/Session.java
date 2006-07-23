@@ -150,6 +150,7 @@ public class Session implements IPCDISession, IPCDISessionObject {
 					throw new CoreException(new Status(IStatus.ERROR, PTPDebugExternalPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));			
 				} finally {
 					m.done();
+					//PTPDebugCorePlugin.getDebugModel().fireSessionEvent(getJob(), Session.this);
 				}
 			}
 		};
@@ -166,29 +167,16 @@ public class Session implements IPCDISession, IPCDISessionObject {
 		registerTargets(new int[] { procNum }, sendEvent, resumeTarget);
 	}
 	public void registerTargets(int[] procNums, boolean sendEvent, boolean resumeTarget) {
-		List targetList = new ArrayList();
-		for (int i = 0; i < procNums.length; i++) {
-			if (!processManager.containTarget(procNums[i])) {
-				targetList.add(new Target(this, procNums[i]));
-			}
-		}
-		IPCDITarget[] targets = (IPCDITarget[])targetList.toArray(new IPCDITarget[0]);
-		if (targets.length > 0) {
-			BitList regTasks = createEmptyBitList();
-			processManager.addTargets(targets, regTasks);
-			PTPDebugCorePlugin.getDebugModel().addNewDebugTargets(launch, regTasks, targets, file, resumeTarget, sendEvent);
-		}
+		BitList regTasks = createEmptyBitList();
+		IPCDITarget[] targets = processManager.addTargets(procNums, regTasks);
+		PTPDebugCorePlugin.getDebugModel().addNewDebugTargets(launch, regTasks, targets, file, resumeTarget, sendEvent);
 	}
 	public void unregisterTarget(int procNum, boolean sendEvent) {
 		unregisterTargets(new int[] { procNum }, sendEvent);
 	}
 	public void unregisterTargets(int[] procNums, boolean sendEvent) {
 		BitList unregTasks = createEmptyBitList();
-		for (int i = 0; i < procNums.length; i++) {
-			if (processManager.removeTarget(procNums[i])) {
-				unregTasks.set(procNums[i]);
-			}
-		}
+		processManager.removeTargets(procNums, unregTasks);
 		PTPDebugCorePlugin.getDebugModel().removeDebugTarget(launch, unregTasks, sendEvent);
 	}
 	public String getAttribute(String key) {

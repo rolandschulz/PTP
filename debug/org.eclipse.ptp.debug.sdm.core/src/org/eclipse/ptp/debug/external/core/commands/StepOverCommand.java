@@ -33,11 +33,10 @@ public class StepOverCommand extends AbstractDebugCommand {
 		this(tasks, 1);
 	}
 	public StepOverCommand(BitList tasks, int count) {
-		super(tasks, true, false);
+		super(tasks, false, false);
 		this.count = count;
 	}
-	public void execCommand(IAbstractDebugger debugger, int timeout) throws PCDIException {
-		setTimeout(timeout);
+	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
 		debugger.filterRunningTasks(tasks);
 		if (!tasks.isEmpty()) {
 			debugger.handleProcessResumedEvent(tasks, IPCDIResumedEvent.STEP_OVER);

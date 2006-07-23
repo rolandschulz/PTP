@@ -28,24 +28,15 @@ import org.eclipse.ptp.debug.core.cdi.PCDIException;
  */
 public class HaltCommand extends AbstractDebugCommand {
 	public HaltCommand(BitList tasks) {
-		super(tasks, false, true);
+		super(tasks, true, true, false);
 	}
-	public void execCommand(IAbstractDebugger debugger, int timeout) throws PCDIException {
-		setTimeout(timeout);
+	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
 		debugger.filterSuspendTasks(tasks);
 		if (!tasks.isEmpty()) {
 			debugger.halt(tasks);
-			waitFinish();
 		}
 		else {
-			cancelWaiting();
-		}
-	}
-	public void waitFinish() throws PCDIException {
-		if (waitForReturn()) {
-			if (!result.equals(OK)) {
-				throw new PCDIException("Wrong type return on command: " + getName());
-			}
+			doCancelWaiting();
 		}
 	}
 	public String getName() {

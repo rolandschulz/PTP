@@ -18,9 +18,11 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.core.cdi;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
@@ -60,16 +62,19 @@ public class ProcessManager extends Manager {
 	public int[] getRegisteredTargetIDs() {
 		return getRegisteredTargets().toArray();
 	}
-	public void addTargets(IPCDITarget[] targets, BitList regTasks) {
-		for (int i = 0; i<targets.length; i++) {
-			IPCDITarget target = targets[i];
-			Integer key = new Integer(target.getTargetID());
-			if (debugTargetMap.containsKey(key))
+	public IPCDITarget[] addTargets(int[] tasks, BitList regTasks) {
+		List targets = new ArrayList();
+		for (int i = 0; i<tasks.length; i++) {
+			Integer key = new Integer(tasks[i]);
+			if (containTarget(key))
 				continue;
 			
+			IPCDITarget target = new Target((Session)getSession(), tasks[i]);
+			targets.add(target);
 			debugTargetMap.put(key, target);
-			regTasks.set(target.getTargetID());
+			regTasks.set(tasks[i]);
 		}
+		return (IPCDITarget[])targets.toArray(new IPCDITarget[0]);
 	}
 	public boolean removeTarget(int target_id) {
 		Integer key = new Integer(target_id);
@@ -79,20 +84,17 @@ public class ProcessManager extends Manager {
 		debugTargetMap.remove(key);
 		return true;
 	}
-	public void removeTargets(int[] target_ids, BitList regTasks) {
+	public void removeTargets(int[] target_ids, BitList unregTasks) {
 		for (int i = 0; i<target_ids.length; i++) {
 			if (removeTarget(target_ids[i]))
-				regTasks.set(target_ids[i]);
+				unregTasks.set(target_ids[i]);
 		}
 	}
-	public void removeTargets(IPCDITarget[] targets, BitList regTasks) {
-		for (int i = 0; i<targets.length; i++) {
-			if (removeTarget(targets[i].getTargetID()))
-				regTasks.set(targets[i].getTargetID());
-		}
+	public boolean containTarget(Integer key) {
+		return debugTargetMap.containsKey(key);
 	}
 	public boolean containTarget(int target_id) {
-		return debugTargetMap.containsKey(new Integer(target_id));
+		return containTarget(new Integer(target_id));
 	}
 	public Target getTarget(int target_id) {
 		return (Target)debugTargetMap.get(new Integer(target_id));

@@ -31,21 +31,19 @@ public class GetAIFCommand extends AbstractDebugCommand {
 	private String varName = "";
 	
 	public GetAIFCommand(BitList tasks, String varName) {
-		super(tasks, false, true);
-		this.varName = varName;
+		super(tasks);
+		this.varName = "(" + varName + ")";
 	}
-	public void execCommand(IAbstractDebugger debugger, int timeout) throws PCDIException {
-		setTimeout(timeout);
+	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
 		debugger.getAIFValue(tasks, varName);
 	}
 	
 	public IAIF getAIF() throws PCDIException {
-		if (waitForReturn()) {
-			if (result instanceof IAIF) {
-				return (IAIF)result;
-			}
+		Object res = getResult();
+		if (res instanceof IAIF) {
+			return (IAIF)res;
 		}
-		throw new PCDIException("Wrong type return on command: " + getName());
+		throw new PCDIException("Cannot get AIF");
 	}
 	public String getName() {
 		return "Get AIF"; 
