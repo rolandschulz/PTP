@@ -26,20 +26,59 @@ import org.eclipse.ptp.debug.core.cdi.PCDIException;
  * 
  */
 public interface IDebugCommand extends Comparable {
-	public static final String OK = "OK";
+	public static final String RETURN_NOTHING = "Nothing";
+	public static final String RETURN_OK = "OK";
+	public static final String RETURN_FLUSH = "Flush";
+	public static final String RETURN_CANCEL = "Cancel";
+	public static final String RETURN_ERROR = "Error"; //tasks do not match
 	
+	/** Get the tasks of the command
+	 * @return tasks
+	 */
 	public BitList getTasks();
+	/** execuate command
+	 * @param debugger debugger to execute the command
+	 * @param timeout set the timeout for this command
+	 * @throws PCDIException
+	 */
 	public void execCommand(IAbstractDebugger debugger, int timeout) throws PCDIException;
-	public boolean isWaitForReturn();
-	public Object getReturn();
-	public void setReturn(BitList tasks, Object result);
-	public boolean waitForReturn() throws PCDIException;
+	/** Whether this command can be interrupted
+	 * @return true can be interrupted, otherwise not
+	 */
 	public boolean canInterrupt();
-	public void cancelWaiting();
+	/** Whether this command need to wait for return back
+	 * @return true is wait for return back, otherwise not
+	 */
+	public boolean isWaitForReturn();
+	/** Whether this command need to wait in command queue
+	 * @return true need to wait in command queue, otehrwise this command can jump the queue
+	 */
 	public boolean isWaitInQueue();
-	
-	public void flush();
-	
+	/** Set return back 
+	 * @param tasks update the tasks for this command
+	 * @param result return value
+	 */
+	public void setReturn(BitList tasks, Object result);
+	/** Cancel the waiting if the command is waiting in the command queue
+	 * 
+	 */
+	public void doCancelWaiting();
+	/** Wait the command for return back
+	 * @return true OK, otherwise not
+	 * @throws PCDIException
+	 */
+	public boolean waitForReturn() throws PCDIException;
+	/** Flush command
+	 * 
+	 */
+	public void doFlush();
+	/** Get command name
+	 * @return name of command
+	 */
 	public String getName();
+	/** Compare the command
+	 * @param obj compared object
+	 * @return 0 means equals, otherwise not equals
+	 */
+	public int compareTo(Object obj);
 }
-

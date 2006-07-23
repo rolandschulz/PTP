@@ -26,8 +26,6 @@ import java.util.Map;
 import org.eclipse.cdt.core.IBinaryParser.IBinaryObject;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspaceRunnable;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -35,6 +33,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.ptp.core.AttributeConstants;
@@ -122,56 +121,74 @@ public class PCDIDebugModel {
 		PTPDebugCorePlugin.getDefault().fireDebugEvent(new PDebugEvent(session, IPDebugEvent.CREATE, IPDebugEvent.DEBUGGER, info));
 	}
 	public void fireRegisterEvent(IPJob job, BitList tasks) {
-		IPDebugInfo info = new PDebugInfo(job, tasks, tasks, null);
-		PTPDebugCorePlugin.getDefault().fireDebugEvent(new PDebugEvent(getPCDISession(job.getIDString()), IPDebugEvent.CREATE, IPDebugEvent.REGISTER, info));
+		if (!tasks.isEmpty()) {
+			IPDebugInfo info = new PDebugInfo(job, tasks, tasks, null);
+			PTPDebugCorePlugin.getDefault().fireDebugEvent(new PDebugEvent(getPCDISession(job.getIDString()), IPDebugEvent.CREATE, IPDebugEvent.REGISTER, info));
+		}
 	}
 	public void fireUnregisterEvent(IPJob job, BitList tasks) {
-		IPDebugInfo info = new PDebugInfo(job, tasks, null, tasks);
-		PTPDebugCorePlugin.getDefault().fireDebugEvent(new PDebugEvent(getPCDISession(job.getIDString()), IPDebugEvent.TERMINATE, IPDebugEvent.REGISTER, info));
-	}
-	public void removeDebugTarget(IPLaunch launch, BitList tasks, boolean sendEvent) {
-		int[] taskArray = tasks.toArray();
-		for (int i=0; i<taskArray.length; i++) {
-			launch.getPJob().findProcessByTaskId(taskArray[i]).setAttribute(AttributeConstants.ATTRIB_ISREGISTERED, new Boolean(false));
-			IPDebugTarget debugTarget = launch.getDebugTarget(taskArray[i]);
-			if (debugTarget != null) {
-				launch.removeDebugTarget(debugTarget);
-				debugTarget.terminated();
-			}
+		if (!tasks.isEmpty()) {
+			IPDebugInfo info = new PDebugInfo(job, tasks, null, tasks);
+			PTPDebugCorePlugin.getDefault().fireDebugEvent(new PDebugEvent(getPCDISession(job.getIDString()), IPDebugEvent.TERMINATE, IPDebugEvent.REGISTER, info));
 		}
-		if (sendEvent)
-			fireUnregisterEvent(launch.getPJob(), tasks);
 	}
-	public void addNewDebugTargets(IPLaunch launch, BitList tasks, IPCDITarget[] targets, IBinaryObject file, boolean resumeTarget, boolean sendEvent) {
-		IPDebugTarget[] debugTargets = newDebugTargets(launch, targets, file, true, false, resumeTarget);
-		for (int i=0; i<debugTargets.length; i++) {
-			launch.getPJob().findProcessByTaskId(debugTargets[i].getTargetID()).setAttribute(AttributeConstants.ATTRIB_ISREGISTERED, new Boolean(true));
-			launch.addDebugTarget(debugTargets[i]);
-		}
-		if (sendEvent)
-			fireRegisterEvent(launch.getPJob(), tasks);
-	}
-	public IPDebugTarget[] newDebugTargets(final IPLaunch launch, final IPCDITarget[] cdiTargets, final IBinaryObject file, final boolean allowTerminate, final boolean allowDisconnect, final boolean resumeTarget) {
-		final IPDebugTarget[] targets = new IPDebugTarget[cdiTargets.length];
-		IWorkspaceRunnable r = new IWorkspaceRunnable() {
-			public void run(IProgressMonitor m) throws CoreException {
-				for (int i=0; i<targets.length; i++) {
-					targets[i] = new PDebugTarget(launch, cdiTargets[i], null, file, allowTerminate, allowDisconnect);
-					IPCDITargetConfiguration config = cdiTargets[i].getConfiguration();
-					if (config.supportsResume() && resumeTarget) {
-						targets[i].resume();
+	/**************************************************
+	 * Register / Unregister
+	 **************************************************/
+	public void removeDebugTarget(final IPLaunch launch, final BitList tasks, final boolean sendEvent) {
+		Job aJob = new Job("Creating new debug targets...") {
+			protected IStatus run(IProgressMonitor monitor) {
+				int[] taskArray = tasks.toArray();
+				for (int i=0; i<taskArray.length; i++) {
+					launch.getPJob().findProcessByTaskId(taskArray[i]).setAttribute(AttributeConstants.ATTRIB_ISREGISTERED, new Boolean(false));
+					IPDebugTarget debugTarget = launch.getDebugTarget(taskArray[i]);
+					if (debugTarget != null) {
+						launch.removeDebugTarget(debugTarget);
+						debugTarget.terminated();
 					}
 				}
+				if (sendEvent)
+					fireUnregisterEvent(launch.getPJob(), tasks);
+
+				return Status.OK_STATUS;
 			}
 		};
-		try {
-			ResourcesPlugin.getWorkspace().run(r, null);
-		} catch (CoreException e) {
-			PTPDebugCorePlugin.log(e);
-			return new IPDebugTarget[0];
-		}
-		return targets;
+		aJob.setSystem(true);
+		aJob.setPriority(Job.INTERACTIVE);
+		aJob.schedule();		
 	}
+	public void addNewDebugTargets(IPLaunch launch, BitList tasks, IPCDITarget[] targets, IBinaryObject file, boolean resumeTarget, boolean sendEvent) {
+		createDebugTargets(launch, tasks, targets, file, true, false, resumeTarget, sendEvent);
+	}
+	private void createDebugTargets(final IPLaunch launch, final BitList tasks, final IPCDITarget[] cdiTargets, final IBinaryObject file, final boolean allowTerminate, final boolean allowDisconnect, final boolean resumeTarget, final boolean sendEvent) {
+		Job aJob = new Job("Creating new debug targets...") {
+			protected IStatus run(IProgressMonitor monitor) {
+				for (int i=0; i<cdiTargets.length; i++) {
+					IPDebugTarget target = new PDebugTarget(launch, cdiTargets[i], null, file, allowTerminate, allowDisconnect);
+					IPCDITargetConfiguration config = cdiTargets[i].getConfiguration();
+					if (config.supportsResume() && resumeTarget) {
+						try {
+							target.resume();
+						} catch (DebugException e) {
+							PTPDebugCorePlugin.log(e);
+						}
+					}
+					launch.getPJob().findProcessByTaskId(target.getTargetID()).setAttribute(AttributeConstants.ATTRIB_ISREGISTERED, new Boolean(true));
+					launch.addDebugTarget(target);
+				}
+				if (sendEvent)
+					fireRegisterEvent(launch.getPJob(), tasks);
+
+				return Status.OK_STATUS;
+			}
+		};
+		aJob.setSystem(true);
+		aJob.setPriority(Job.INTERACTIVE);
+		aJob.schedule();
+	}
+	/**************************************************
+	 * Breakpoint
+	 **************************************************/
 	public IPLineBreakpoint[] lineBreakpointsExists(String sourceHandle, IResource resource, int lineNumber) throws CoreException {
 		IBreakpoint[] breakpoints = getPBreakpoints();
 		List foundBreakpoints = new ArrayList(0);
@@ -224,7 +241,7 @@ public class PCDIDebugModel {
 	public IBreakpoint[] getPBreakpoints() {
 		return DebugPlugin.getDefault().getBreakpointManager().getBreakpoints(getPluginIdentifier());
 	}
-	public IBreakpoint[] findPBreakpointsBySet(String job_id, String set_id) throws CoreException {
+	public IBreakpoint[] findPBreakpoints(String job_id, String set_id) throws CoreException {
 		List bptList = new ArrayList();
 		IBreakpoint[] breakpoints = getPBreakpoints();
 		for (int i = 0; i < breakpoints.length; i++) {
@@ -237,7 +254,7 @@ public class PCDIDebugModel {
 		}
 		return (IBreakpoint[]) bptList.toArray(new IBreakpoint[bptList.size()]);
 	}
-	public IPBreakpoint[] findPBreakpointsByJob(String job_id, boolean includeGlobal) throws CoreException {
+	public IPBreakpoint[] findPBreakpoints(String job_id, boolean includeGlobal) throws CoreException {
 		List bptList = new ArrayList();
 		IBreakpoint[] breakpoints = getPBreakpoints();
 		for (int i = 0; i < breakpoints.length; i++) {
@@ -251,47 +268,41 @@ public class PCDIDebugModel {
 		}
 		return (IPBreakpoint[]) bptList.toArray(new IPBreakpoint[bptList.size()]);
 	}
-	public void deletePBreakpointBySet(final String job_id, final String set_id) throws CoreException {
-		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
-			public void run(IProgressMonitor monitor) throws CoreException {
-				final IBreakpoint[] breakpoints = findPBreakpointsBySet(job_id, set_id);
-				if (breakpoints.length > 0) {
-					new Job("Remove breakpoint") {
-						protected IStatus run(IProgressMonitor pmonitor) {
-							try {
-								DebugPlugin.getDefault().getBreakpointManager().removeBreakpoints(breakpoints, true);
-								return Status.OK_STATUS;
-							} catch (CoreException e) {
-								PTPDebugCorePlugin.log(e);
-							}
-							return Status.CANCEL_STATUS;
-						}
-					}.schedule();
+	public void deletePBreakpoint(final String job_id, final String set_id) throws CoreException {
+		Job aJob = new Job("Deleting parallel breakpoint...") {
+			public IStatus run(IProgressMonitor monitor) {
+				try {
+					IBreakpoint[] breakpoints = findPBreakpoints(job_id, set_id);
+					if (breakpoints.length > 0) {
+						DebugPlugin.getDefault().getBreakpointManager().removeBreakpoints(breakpoints, true);
+					}
+				} catch (CoreException e) {
+					return e.getStatus();
 				}
+				return Status.OK_STATUS;
 			}
 		};
-		ResourcesPlugin.getWorkspace().run(runnable, null);
+		aJob.setSystem(true);
+		aJob.setPriority(Job.INTERACTIVE);
+		aJob.schedule();
 	}
-	public void deletePBreakpointBySet(final String job_id) throws CoreException {
-		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
-			public void run(IProgressMonitor monitor) throws CoreException {
-				final IBreakpoint[] breakpoints = findPBreakpointsByJob(job_id, false);
-				if (breakpoints.length > 0) {
-					new Job("Remove breakpoint") {
-						protected IStatus run(IProgressMonitor pmonitor) {
-							try {
-								DebugPlugin.getDefault().getBreakpointManager().removeBreakpoints(breakpoints, true);
-								return Status.OK_STATUS;
-							} catch (CoreException e) {
-								PTPDebugCorePlugin.log(e);
-							}
-							return Status.CANCEL_STATUS;
-						}
-					}.schedule();
+	public void deletePBreakpoint(final String job_id) throws CoreException {
+		Job aJob = new Job("Deleting parallel breakpoint...") {
+			public IStatus run(IProgressMonitor monitor) {
+				try {
+					IBreakpoint[] breakpoints = findPBreakpoints(job_id, false);
+					if (breakpoints.length > 0) {
+						DebugPlugin.getDefault().getBreakpointManager().removeBreakpoints(breakpoints, true);
+					}
+				} catch (CoreException e) {
+					return Status.CANCEL_STATUS;
 				}
+				return Status.OK_STATUS;
 			}
 		};
-		ResourcesPlugin.getWorkspace().run(runnable, null);
+		aJob.setSystem(true);
+		aJob.setPriority(Job.INTERACTIVE);
+		aJob.schedule();
 	}
 	public void updatePBreakpoints(String set_id, IProgressMonitor monitor) throws CoreException {
 		try {
@@ -307,6 +318,9 @@ public class PCDIDebugModel {
 			monitor.done();
 		}
 	}
+	/**************************************************
+	 * Debug Job
+	 **************************************************/
 	public void newJob(IPJob job, int totalTasks) throws CoreException {
 		BitList rootTasks = new BitList(totalTasks);
 		rootTasks.set(0, totalTasks);
@@ -336,8 +350,11 @@ public class PCDIDebugModel {
 		getJobSet(job.getIDString()).clearAllSets();
 		jobSets.remove(job.getIDString());
 	}
+	public boolean containsJobSet(String job_id) {
+		return jobSets.containsKey(job_id);
+	}
 	private JobSet getJobSet(String job_id) {
-		if (!jobSets.containsKey(job_id)) {
+		if (!containsJobSet(job_id)) {
 			jobSets.put(job_id, new JobSet());
 		}
 		return (JobSet)jobSets.get(job_id);
@@ -391,12 +408,5 @@ public class PCDIDebugModel {
 		} finally {
 			monitor.worked(1);
 		}
-	}
-	public String[] getValues(IPCDISession session, int taskID, String[] vars, IProgressMonitor monitor) {
-		String[] values = new String[vars.length];
-		for (int i=0; i<vars.length; i++) {
-			values[i] = getValue(session, taskID, vars[i], monitor);
-		}
-		return values;
 	}
 }

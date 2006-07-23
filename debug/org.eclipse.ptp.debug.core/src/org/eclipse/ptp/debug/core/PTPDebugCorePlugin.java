@@ -63,9 +63,9 @@ public class PTPDebugCorePlugin extends Plugin {
 	//private ListenerList fBreakpointListeners;
 	private CommonSourceLookupDirector fCommonSourceLookupDirector;
 	private static PCDIDebugModel debugModel = null;
+	private EventDispatchJob dispatchJob = new EventDispatchJob();
 	private ListenerList fEventListeners = new ListenerList();
 	private List fEventQueue = new ArrayList();
-	private EventDispatchJob fEventDispatchJob = new EventDispatchJob();
 	private boolean fShuttingDown= false;
 	private int fDispatching = 0;
 
@@ -276,6 +276,7 @@ public class PTPDebugCorePlugin extends Plugin {
 		/* guess we never found it.... */
 		return null;
 	}
+
 	private synchronized void setDispatching(boolean dispatching) {
 		if (dispatching) {
 			fDispatching++;
@@ -286,7 +287,7 @@ public class PTPDebugCorePlugin extends Plugin {
 	/**
 	 * Returns whether debug events are being dispatched
 	 */
-	private synchronized boolean isDispatching() {
+	public synchronized boolean isDispatching() {
 		return fDispatching > 0;
 	}
 	/**
@@ -296,7 +297,7 @@ public class PTPDebugCorePlugin extends Plugin {
 	 * @return whether this plug-in is in the process of 
 	 *  being shutdown
 	 */
-	private boolean isShuttingDown() {
+	public boolean isShuttingDown() {
 		return fShuttingDown;
 	}
 	/**
@@ -306,10 +307,9 @@ public class PTPDebugCorePlugin extends Plugin {
 	 * @param value whether this plug-in is in the process of 
 	 *  being shutdown
 	 */
-	private void setShuttingDown(boolean value) {
+	public void setShuttingDown(boolean value) {
 		fShuttingDown = value;
 	}
-	
 	private Object[] getEventListeners() {
 		return fEventListeners.getListeners();
 	}
@@ -325,8 +325,48 @@ public class PTPDebugCorePlugin extends Plugin {
 		synchronized (fEventQueue) {
 			fEventQueue.add(event);
 		}
-		fEventDispatchJob.schedule();
+		dispatchJob.schedule();
 	}
+	class EventDispatchJob extends Job {
+		private EventNotifier fNotifier = new EventNotifier();
+	    /**
+         * Creates a new event dispatch job.
+         */
+        public EventDispatchJob() {
+            super("EventDispatchJob"); 
+            setPriority(Job.INTERACTIVE);
+            setSystem(true);
+        }
+        /* (non-Javadoc)
+         * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.IProgressMonitor)
+         */
+        protected IStatus run(IProgressMonitor monitor) {
+            while (!fEventQueue.isEmpty()) {
+                IPDebugEvent event = null;
+	            synchronized (fEventQueue) {
+	                if (!fEventQueue.isEmpty()) {
+	                	event = (IPDebugEvent) fEventQueue.remove(0);
+	                }
+	            }
+	            if (event != null) {
+	                fNotifier.dispatch(event);
+	            }
+            }
+            return Status.OK_STATUS;
+        }
+        /* (non-Javadoc)
+         * @see org.eclipse.core.runtime.jobs.Job#shouldRun()
+         */
+        public boolean shouldRun() {
+            return shouldSchedule();
+        }
+        /* (non-Javadoc)
+         * @see org.eclipse.core.internal.jobs.InternalJob#shouldSchedule()
+         */
+        public boolean shouldSchedule() {
+            return !(isShuttingDown() || fEventListeners.isEmpty());
+        }		
+	}    
 	class EventNotifier implements ISafeRunnable {
 		private IPDebugEvent fEvent;
 		private IPDebugEventListener fListener;
@@ -358,47 +398,5 @@ public class PTPDebugCorePlugin extends Plugin {
 			fEvent = null;
 			fListener = null;			
 		}
-
-	}
-	class EventDispatchJob extends Job {
-		EventNotifier fNotifier = new EventNotifier();
-
-	    /**
-         * Creates a new event dispatch job.
-         */
-        public EventDispatchJob() {
-            super("PTPDebugCorePlugin"); 
-            setPriority(Job.INTERACTIVE);
-            setSystem(true);
-        }
-        /* (non-Javadoc)
-         * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.IProgressMonitor)
-         */
-        protected IStatus run(IProgressMonitor monitor) {
-            while (!fEventQueue.isEmpty()) {
-            	IPDebugEvent event = null;
-	            synchronized (fEventQueue) {
-	                if (!fEventQueue.isEmpty()) {
-	                    event = (IPDebugEvent) fEventQueue.remove(0);
-	                }
-	            }
-	            if (event != null) {
-	                fNotifier.dispatch(event);
-	            }
-            }
-            return Status.OK_STATUS;
-        }
-        /* (non-Javadoc)
-         * @see org.eclipse.core.runtime.jobs.Job#shouldRun()
-         */
-        public boolean shouldRun() {
-            return shouldSchedule();
-        }
-        /* (non-Javadoc)
-         * @see org.eclipse.core.internal.jobs.InternalJob#shouldSchedule()
-         */
-        public boolean shouldSchedule() {
-            return !(isShuttingDown() || fEventListeners.isEmpty());
-        }
 	}
 }
