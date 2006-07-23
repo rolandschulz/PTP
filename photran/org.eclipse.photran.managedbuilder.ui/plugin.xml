@@ -2,9 +2,36 @@
 <?eclipse version="3.2"?>
 <plugin>
 
-     <extension
+   <extension
          point="org.eclipse.ui.propertyPages">
       <page
+            objectClass="org.eclipse.core.resources.IProject"
+            adaptable="true"
+            name="%MngBuildProp.name"
+            class="org.eclipse.cdt.managedbuilder.ui.properties.BuildPropertyPage"
+            id="org.eclipse.cdt.managedbuilder.ui.properties.BuildProperties">
+         <filter
+               name="nature"
+               value="org.eclipse.cdt.managedbuilder.core.managedBuildNature">
+         </filter>
+      </page>
+      <page
+            objectClass="org.eclipse.core.resources.IFile"
+            adaptable="true"
+            name="%MngResourceProp.name"
+            class="org.eclipse.cdt.managedbuilder.ui.properties.ResourceBuildPropertyPage"
+            id="org.eclipse.cdt.managedbuilder.ui.properties.ResourceBuildProperties">
+	         <filter
+	               name="projectNature"
+	               value="org.eclipse.cdt.managedbuilder.core.managedBuildNature">
+	         </filter>
+      </page>
+
+      <!--
+          The specific IFile (below) property pages have been commented out in CDT?
+          They must be picked up by the IFile objectClass page above.
+       -->
+      <!--page
             objectClass="org.eclipse.core.resources.IFile"
             adaptable="true"
             name="%MngResourceProp.name"
@@ -27,7 +54,7 @@
             nameFilter="*.f95"
             class="org.eclipse.cdt.managedbuilder.ui.properties.ResourceBuildPropertyPage"
             id="org.eclipse.photran.managedbuilder.ui.properties.ResourceBuildProperties.f95">
-      </page>
+      </page-->
    </extension>
  
 </plugin>
