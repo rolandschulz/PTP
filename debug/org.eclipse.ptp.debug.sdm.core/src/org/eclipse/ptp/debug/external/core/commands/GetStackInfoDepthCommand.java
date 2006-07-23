@@ -28,20 +28,18 @@ import org.eclipse.ptp.debug.core.cdi.PCDIException;
  */
 public class GetStackInfoDepthCommand extends AbstractDebugCommand {
 	public GetStackInfoDepthCommand(BitList tasks) {
-		super(tasks, false, true);
+		super(tasks);
 	}
-	public void execCommand(IAbstractDebugger debugger, int timeout) throws PCDIException {
-		setTimeout(timeout);
+	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
 		debugger.getStackInfoDepth(tasks);
 	}
 	
 	public int getDepth() throws PCDIException {
-		if (waitForReturn()) {
-			if (result instanceof Integer) {
-				return ((Integer)result).intValue();
-			}
+		Object res = getResult();
+		if (res instanceof Integer) {
+			return ((Integer)res).intValue();
 		}
-		throw new PCDIException("Wrong type return on command: " + getName());
+		return 0;
 	}
 	public String getName() {
 		return "Get stack info depth"; 

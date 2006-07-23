@@ -21,7 +21,6 @@ package org.eclipse.ptp.debug.external.core.cdi;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.eclipse.core.resources.IMarkerDelta;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -129,8 +128,8 @@ public class BreakpointManager extends Manager implements IPCDIBreakpointManager
 			AbstractBreakpointCommand command = isEnable?getEnableBreakpointCommand(tasks, cdiBpt):getDisableBreakpointCommand(tasks, cdiBpt);
 			((Session) getSession()).getDebugger().postCommand(command);
 			try {
-				command.waitFinish();
-				cdiBpt.setEnabled(isEnable);
+				if (command.waitForReturn())
+					cdiBpt.setEnabled(isEnable);
 			} catch (PCDIException e) {
 				throw new CoreException(new Status(IStatus.ERROR, PTPDebugExternalPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));
 			}
@@ -143,8 +142,8 @@ public class BreakpointManager extends Manager implements IPCDIBreakpointManager
 			AbstractBreakpointCommand command = getDeleteBreakpointCommand(tasks, cdiBpt);
 			((Session) getSession()).getDebugger().postCommand(command);
 			try {
-				command.waitFinish();
-				removeBreakpoint(bpt);
+				if (command.waitForReturn())
+					removeBreakpoint(bpt);
 			} catch (PCDIException e) {
 				throw new CoreException(new Status(IStatus.ERROR, PTPDebugExternalPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));
 			}
@@ -190,7 +189,7 @@ public class BreakpointManager extends Manager implements IPCDIBreakpointManager
 	}
 	public void setInitialBreakpoints() throws CoreException {
 		String job_id = ((Session) getSession()).getJob().getIDString();
-		IPBreakpoint[] bpts = PTPDebugCorePlugin.getDebugModel().findPBreakpointsByJob(job_id, true);
+		IPBreakpoint[] bpts = PTPDebugCorePlugin.getDebugModel().findPBreakpoints(job_id, true);
 		for (int i = 0; i < bpts.length; i++) {
 			setBreakpoint(job_id, bpts[i]);
 		}
@@ -287,12 +286,14 @@ public class BreakpointManager extends Manager implements IPCDIBreakpointManager
 		// TODO - implement set exception point
 		// session.getDebugger().setExceptionpoint(watchpoint.getTasks(), access, read, expression);
 		// session.getDebugger().fireEvent(new BreakpointCreatedEvent(session, bkpt.getTasks()));
-		throw new PCDIException("Not implement yet - setExceptionpoint");
 		// return excp;
+		System.err.println("Not implement yet - setExceptionpoint");
+		throw new PCDIException("Not implement yet - setExceptionpoint");
 	}
 	public void setBreakpointPending(BitList tasks, boolean set) throws PCDIException {
 		// TODO - implement set setBreakpointPending
 		// session.getDebugger().setBreakpointPending(watchpoint.getTasks(), access, read, expression);
+		System.err.println("Not implement yet - setBreakpointPending");
 		throw new PCDIException("Not implement yet - setBreakpointPending");
 	}
 	public IPCDICondition createCondition(int ignoreCount, String expression, String[] tids) {

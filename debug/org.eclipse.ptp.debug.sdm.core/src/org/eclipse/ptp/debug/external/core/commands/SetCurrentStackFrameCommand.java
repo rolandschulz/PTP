@@ -33,13 +33,9 @@ public class SetCurrentStackFrameCommand extends AbstractDebugCommand {
 		super(tasks, false, true);
 		this.level = level;
 	}
-	public void execCommand(IAbstractDebugger debugger, int timeout) throws PCDIException {
-		setTimeout(timeout);
+	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
 		debugger.setCurrentStackFrame(tasks, level);
 	}
-	public void waitFinish() throws PCDIException {
-		waitForReturn();
-	}	
 	public String getName() {
 		return "Set current stack frame"; 
 	}

@@ -30,31 +30,30 @@ public class KillCommand extends AbstractDebugCommand {
 	private boolean sendEvent = true;
 	
 	public KillCommand(BitList tasks, boolean sendEvent) {
-		super(tasks, false, true);
+		super(tasks, true, true, false);
 		this.sendEvent = sendEvent;
 	}
 
 	public KillCommand(BitList tasks) {
 		this(tasks, true);
 	}
-	public void execCommand(IAbstractDebugger debugger, int timeout) throws PCDIException {
-		setTimeout(timeout);
+	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
 		debugger.filterTerminateTasks(tasks);
 		if (!tasks.isEmpty()) {
 			debugger.kill(tasks);
-			waitFinish(debugger);
 		}
 		else {
-			cancelWaiting();
+			doCancelWaiting();
 		}
 	}
-	public void waitFinish(IAbstractDebugger debugger) throws PCDIException {
-		if (waitForReturn()) {
+	public boolean waitAfter(IAbstractDebugger debugger) throws PCDIException {
+		if (super.waitAfter(debugger)) {
 			if (sendEvent) {
 				System.err.println("----send kill command");
 				debugger.handleProcessTerminatedEvent(tasks, 0);
 			}
 		}
+		return false;
 	}
 	public String getName() {
 		return "Kill"; 

@@ -20,7 +20,6 @@ package org.eclipse.ptp.debug.external.core.debugger;
 
 import java.io.IOException;
 import java.math.BigInteger;
-
 import org.eclipse.cdt.debug.core.cdi.ICDICondition;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
@@ -447,13 +446,13 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 		System.out.println("got debug event: " + e.toString());
 		switch (e.getEventID()) {
 		case IProxyDebugEvent.EVENT_DBG_OK:
-			completeCommand(e.getBitSet(), IDebugCommand.OK);
+			completeCommand(e.getBitSet(), IDebugCommand.RETURN_OK);
 			break;
 			
 		case IProxyDebugEvent.EVENT_DBG_INIT:
 			numServers = ((ProxyDebugInitEvent)e).getNumServers();
 			System.out.println("num servers = " + numServers);
-			completeCommand(e.getBitSet(), IDebugCommand.OK);
+			completeCommand(e.getBitSet(), IDebugCommand.RETURN_OK);
 			break;
 			
 		case IProxyDebugEvent.EVENT_DBG_BPHIT:
@@ -571,7 +570,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			
 		case IProxyDebugEvent.EVENT_DBG_SIGNAL:
 			ProxyDebugSignalEvent sigEvent = (ProxyDebugSignalEvent)e;
-			completeCommand(e.getBitSet(), IDebugCommand.OK);
+			completeCommand(e.getBitSet(), IDebugCommand.RETURN_OK);
 			handleProcessSignaledEvent(e.getBitSet(), sigEvent.getLocator(), sigEvent.getThreadID());
 			break;
 
@@ -627,12 +626,14 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			break;
 			
 		case IProxyDebugEvent.EVENT_DBG_ERROR:
-			System.err.println("======================= EVENT_DBG_ERROR ====================");
 			ProxyDebugErrorEvent errEvent = (ProxyDebugErrorEvent)e;
 			String errMsg = errEvent.getErrorMessage();
 			if (errMsg == null || errMsg.length() ==0)
 				errMsg = "Unknown Error";
+			
 			completeCommand(e.getBitSet(), new PCDIException(errMsg, getErrorCode(errEvent.getErrorCode())));
+			System.err.println("======================= EVENT_DBG_ERROR ====================: " + errMsg);
+			//completeCommand(e.getBitSet(), new PCDIException(errMsg, getErrorCode(errEvent.getErrorCode())));
 			break;
 		}
 	}

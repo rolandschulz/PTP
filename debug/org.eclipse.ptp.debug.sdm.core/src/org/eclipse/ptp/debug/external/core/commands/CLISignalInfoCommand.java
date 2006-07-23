@@ -33,17 +33,9 @@ public class CLISignalInfoCommand extends AbstractDebugCommand {
 		super(tasks, false, false);
 		this.arg = arg;
 	}
-	public void execCommand(IAbstractDebugger debugger, int timeout) throws PCDIException {
-		setTimeout(timeout);
+	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
 		debugger.getSignalInfo(tasks, arg);
 	}
-	public void waitFinish() throws PCDIException {
-		if (waitForReturn()) {
-			if (result == null) {
-				throw new PCDIException("No result found on command: " + getName());
-			}
-		}
-	}	
 	public String getName() {
 		return "CLI Signal Info"; 
 	}

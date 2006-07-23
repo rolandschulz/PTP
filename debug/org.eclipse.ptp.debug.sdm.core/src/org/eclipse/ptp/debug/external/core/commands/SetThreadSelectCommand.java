@@ -33,18 +33,16 @@ public class SetThreadSelectCommand extends AbstractDebugCommand {
 		super(tasks, false, true);
 		this.threadNum = threadNum;
 	}
-	public void execCommand(IAbstractDebugger debugger, int timeout) throws PCDIException {
-		setTimeout(timeout);
+	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
 		debugger.setThreadSelect(tasks, threadNum);
 	}
 	
 	public Object[] getThreadInfo() throws PCDIException {
-		if (waitForReturn()) {
-			if (result instanceof Object[]) {
-				return (Object[])result;
-			}
+		Object res = getResult();
+		if (res instanceof Object[]) {
+			return (Object[])res;
 		}
-		throw new PCDIException("Wrong type return on command: " + getName());
+		return new Object[0];
 	}
 	public String getName() {
 		return "Set Thread Select"; 

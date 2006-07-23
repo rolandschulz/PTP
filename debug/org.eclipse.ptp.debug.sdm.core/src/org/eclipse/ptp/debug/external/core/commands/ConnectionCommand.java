@@ -28,20 +28,15 @@ import org.eclipse.ptp.debug.core.cdi.PCDIException;
  */
 public class ConnectionCommand extends AbstractDebugCommand {
 	public ConnectionCommand() {
-		super(null, false, true);
+		super(null);
 	}
-	public void execCommand(IAbstractDebugger debugger, int timeout) throws PCDIException {
-		setTimeout(timeout);
+	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
 		try {
 			debugger.connection();
 		} catch (CoreException e) {
 			throw new PCDIException(e);
 		}
 	}
-	public void waitFinish() throws PCDIException {
-		waitForReturn();
-	}
-	
 	public String getName() {
 		return "Connaction"; 
 	}

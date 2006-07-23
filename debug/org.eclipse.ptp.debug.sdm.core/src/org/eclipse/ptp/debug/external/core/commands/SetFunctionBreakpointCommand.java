@@ -31,8 +31,7 @@ public class SetFunctionBreakpointCommand extends AbstractBreakpointCommand {
 	public SetFunctionBreakpointCommand(BitList tasks, IPCDIFunctionBreakpoint funcBpt) {
 		super(tasks, funcBpt);
 	}
-	public void execCommand(IAbstractDebugger debugger, int timeout) throws PCDIException {
-		setTimeout(timeout);
+	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
 		debugger.setFunctionBreakpoint(tasks, (IPCDIFunctionBreakpoint)cdiBpt);
 	}
 	public String getName() {

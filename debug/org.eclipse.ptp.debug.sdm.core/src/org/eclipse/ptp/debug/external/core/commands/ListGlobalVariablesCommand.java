@@ -29,19 +29,17 @@ import org.eclipse.ptp.debug.core.cdi.model.IPCDIGlobalVariable;
  */
 public class ListGlobalVariablesCommand extends AbstractDebugCommand {
 	public ListGlobalVariablesCommand(BitList tasks) {
-		super(tasks, false, true);
+		super(tasks);
 	}
-	public void execCommand(IAbstractDebugger debugger, int timeout) throws PCDIException {
-		setTimeout(timeout);
+	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
 		debugger.listGlobalVariables(tasks);
 	}
 	public IPCDIGlobalVariable[] getGlobalVariables() throws PCDIException {
-		if (waitForReturn()) {
-			if (result instanceof IPCDIGlobalVariable[]) {
-				return (IPCDIGlobalVariable[])result;
-			}
+		Object res = getResult();
+		if (res instanceof IPCDIGlobalVariable[]) {
+			return (IPCDIGlobalVariable[])res;
 		}
-		throw new PCDIException("Wrong type return on command: " + getName());
+		return new IPCDIGlobalVariable[0];
 	}
 	public String getName() {
 		return "List global variables"; 

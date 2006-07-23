@@ -172,13 +172,13 @@ public class Thread extends PObject implements IPCDIThread {
 		int level = getStackFrameCount() - frameLevel;
 		SetCurrentStackFrameCommand command = new SetCurrentStackFrameCommand(session.createBitList(target.getTargetID()), level);
 		session.getDebugger().postCommand(command);
-		command.waitFinish();
-		
-		currentFrame = stackframe;
-		if (doUpdate) {
-			VariableManager varMgr = session.getVariableManager();
-			if (varMgr.isAutoUpdate()) {
-				varMgr.update(target);
+		if (command.isWaitForReturn()) {
+			currentFrame = stackframe;
+			if (doUpdate) {
+				VariableManager varMgr = session.getVariableManager();
+				if (varMgr.isAutoUpdate()) {
+					varMgr.update(target);
+				}
 			}
 		}
 	}	

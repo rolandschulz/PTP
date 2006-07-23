@@ -31,21 +31,19 @@ public class EvaluateExpressionCommand extends AbstractDebugCommand {
 	private String varName = "";
 	
 	public EvaluateExpressionCommand(BitList tasks, String varName) {
-		super(tasks, false, true);
+		super(tasks);
 		this.varName = varName;
 	}
-	public void execCommand(IAbstractDebugger debugger, int timeout) throws PCDIException {
-		setTimeout(timeout);
+	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
 		debugger.evaluateExpression(tasks, varName);
 	}
 	
 	public String getExpressionValue() throws PCDIException {
-		if (waitForReturn()) {
-			if (result instanceof IAIF) {
-				return ((IAIF)result).getValue().toString();
-			}
+		Object res = getResult();
+		if (res instanceof IAIF) {
+			return ((IAIF)res).getValue().toString();
 		}
-		throw new PCDIException("Wrong type return on command: " + getName());
+		return "";
 	}
 	public String getName() {
 		return "Evaluate expression"; 

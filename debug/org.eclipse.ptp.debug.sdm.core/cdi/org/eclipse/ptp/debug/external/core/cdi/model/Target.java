@@ -21,7 +21,6 @@ package org.eclipse.ptp.debug.external.core.cdi.model;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.eclipse.cdt.debug.core.cdi.model.ICDIInstruction;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIMixedInstruction;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIRegister;
@@ -29,9 +28,6 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIRegisterDescriptor;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIRegisterGroup;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIRuntimeOptions;
 import org.eclipse.cdt.debug.core.cdi.model.ICDISharedLibrary;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IAbstractDebugger;
@@ -57,7 +53,6 @@ import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITargetConfiguration;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIThread;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIWatchpoint;
-import org.eclipse.ptp.debug.external.core.PTPDebugExternalPlugin;
 import org.eclipse.ptp.debug.external.core.cdi.ExpressionManager;
 import org.eclipse.ptp.debug.external.core.cdi.MemoryManager;
 import org.eclipse.ptp.debug.external.core.cdi.Session;
@@ -94,7 +89,6 @@ public class Target extends SessionObject implements IPCDITarget {
 		this.task_id = task_id;
 		currentThreads = noThreads;
 	}
-	
 	public IAbstractDebugger getDebugger() {
 		return ((Session)getSession()).getDebugger();
 	}
@@ -136,7 +130,7 @@ public class Target extends SessionObject implements IPCDITarget {
 			SetThreadSelectCommand command = new SetThreadSelectCommand(session.createBitList(getTargetID()), id);
 			session.getDebugger().postCommand(command);
 			Object[] objects = command.getThreadInfo();
-			if (objects == null || objects.length != 2) {
+			if (objects.length != 2) {
 				throw new PCDIException("Cannot SetThreadSelectCommand error");
 			}
 			
@@ -210,8 +204,7 @@ public class Target extends SessionObject implements IPCDITarget {
 		GetInfoThreadsCommand command = new GetInfoThreadsCommand(session.createBitList(getTargetID()));
 		session.getDebugger().postCommand(command);
 		String[] ids = command.getThreadIds();//first index is current thread id
-
-		if (ids != null && ids.length > 0) {
+		if (ids.length > 0) {
 			pthreads = new Thread[ids.length];
 			for (int i=0; i<ids.length; i++) {
 				pthreads[i] = new Thread(this, Integer.parseInt(ids[i]));

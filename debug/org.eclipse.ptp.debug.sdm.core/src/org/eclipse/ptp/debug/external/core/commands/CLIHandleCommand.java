@@ -30,20 +30,12 @@ public class CLIHandleCommand extends AbstractDebugCommand {
 	private String arg = "";
 	
 	public CLIHandleCommand(BitList tasks, String arg) {
-		super(tasks, false, true);
+		super(tasks);
 		this.arg = arg;
 	}
-	public void execCommand(IAbstractDebugger debugger, int timeout) throws PCDIException {
-		setTimeout(timeout);
+	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
 		debugger.cliHandle(tasks, arg);
 	}
-	public void waitFinish() throws PCDIException {
-		if (waitForReturn()) {
-			if (result == null) {
-				throw new PCDIException("No result found on command: " + getName());
-			}
-		}
-	}	
 	public String getName() {
 		return "CLI Handle"; 
 	}

@@ -37,7 +37,7 @@ public class DataReadMemoryCommand extends AbstractDebugCommand {
 	Character asChar;
 
 	public DataReadMemoryCommand(BitList tasks, long offset, String address, int wordFormat, int wordSize, int rows, int cols, Character asChar) {
-		super(tasks, false, true);
+		super(tasks);
 		this.offset = offset;
 		this.address = address;
 		this.wordFormat = wordFormat;
@@ -46,18 +46,15 @@ public class DataReadMemoryCommand extends AbstractDebugCommand {
 		this.cols = cols;
 		this.asChar = asChar;
 	}
-	public void execCommand(IAbstractDebugger debugger, int timeout) throws PCDIException {
-		setTimeout(timeout);
+	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
 		debugger.setDataReadMemoryCommand(tasks, offset, address, wordFormat, wordSize, rows, cols, asChar);
-	}
-	
+	}	
 	public DataReadMemoryInfo getDataReadMemoryInfo() throws PCDIException {
-		if (waitForReturn()) {
-			if (result instanceof DataReadMemoryInfo) {
-				return (DataReadMemoryInfo)result;
-			}
+		Object res = getResult();
+		if (res instanceof DataReadMemoryInfo) {
+			return (DataReadMemoryInfo)res;
 		}
-		throw new PCDIException("Wrong type return on command: " + getName());
+		return null;
 	}
 	public String getName() {
 		return "Data Read Memory"; 

@@ -34,8 +34,7 @@ public class ConditionBreakpointCommand extends AbstractBreakpointCommand {
 		super(tasks, cdiBpt);
 		this.expr = expr;
 	}
-	public void execCommand(IAbstractDebugger debugger, int timeout) throws PCDIException {
-		setTimeout(timeout);
+	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
 		debugger.conditionBreakpoint(tasks, ((IPCDIBreakpoint)cdiBpt).getBreakpointId(), expr);
 	}
 	public String getName() {

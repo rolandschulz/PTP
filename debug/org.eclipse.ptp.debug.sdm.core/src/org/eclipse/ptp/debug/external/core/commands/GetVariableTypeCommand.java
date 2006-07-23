@@ -30,21 +30,19 @@ public class GetVariableTypeCommand extends AbstractDebugCommand {
 	private String varName = "";
 	
 	public GetVariableTypeCommand(BitList tasks, String varName) {
-		super(tasks, false, true);
+		super(tasks);
 		this.varName = varName;
 	}
-	public void execCommand(IAbstractDebugger debugger, int timeout) throws PCDIException {
-		setTimeout(timeout);
+	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
 		debugger.getVariableType(tasks, varName);
 	}
 	
 	public String getVariableType() throws PCDIException {
-		if (waitForReturn()) {
-			if (result instanceof String) {
-				return (String)result;
-			}
+		Object res = getResult();
+		if (res instanceof String) {
+			return (String)res;
 		}
-		throw new PCDIException("Wrong type return on command: " + getName());
+		return "";
 	}
 	public String getName() {
 		return "Get Variable type"; 

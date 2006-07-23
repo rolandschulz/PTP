@@ -31,8 +31,7 @@ public class DisableBreakpointCommand extends AbstractBreakpointCommand{
 	public DisableBreakpointCommand(BitList tasks, IPCDIBreakpoint cdiBpt) {
 		super(tasks, cdiBpt);
 	}
-	public void execCommand(IAbstractDebugger debugger, int timeout) throws PCDIException {
-		setTimeout(timeout);
+	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
 		debugger.disableBreakpoint(tasks, ((IPCDIBreakpoint)cdiBpt).getBreakpointId());
 	}
 	public String getName() {

@@ -31,8 +31,7 @@ public class DeleteBreakpointCommand extends AbstractBreakpointCommand {
 	public DeleteBreakpointCommand(BitList tasks, IPCDIBreakpoint cdiBpt) {
 		super(tasks, cdiBpt);
 	}
-	public void execCommand(IAbstractDebugger debugger, int timeout) throws PCDIException {
-		setTimeout(timeout);
+	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
 		debugger.deleteBreakpoint(tasks, ((IPCDIBreakpoint)cdiBpt).getBreakpointId());		
 	}
 	public String getName() {

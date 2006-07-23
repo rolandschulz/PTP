@@ -26,9 +26,7 @@ import java.util.Map;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIExpression;
 import org.eclipse.ptp.debug.external.core.cdi.model.Expression;
-import org.eclipse.ptp.debug.external.core.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.core.cdi.model.Target;
-import org.eclipse.ptp.debug.external.core.cdi.model.variable.Variable;
 
 /**
  * @author Clement chu
