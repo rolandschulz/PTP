@@ -71,6 +71,16 @@ MIVarEvaluateExpression(char *name)
 }
 
 MICommand *
+MIDataEvaluateExpression(char *name)
+{
+	MICommand *	cmd;
+	
+	cmd = MICommandNew("-data-evaluate-expression", MIResultRecordDONE);
+	MICommandAddOption(cmd, name, NULL);
+	return cmd;
+}
+
+MICommand *
 MIPType(char *name) {
 	MICommand * cmd;
 	cmd = MICommandNew("ptype", MIResultRecordDONE);
