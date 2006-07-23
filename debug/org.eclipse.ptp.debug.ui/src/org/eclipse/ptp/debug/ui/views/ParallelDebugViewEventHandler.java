@@ -19,6 +19,8 @@
 package org.eclipse.ptp.debug.ui.views;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.util.BitList;
@@ -59,7 +61,7 @@ public class ParallelDebugViewEventHandler extends AbstractPDebugEventHandler {
 			case IPDebugEvent.CREATE:
 				switch (event.getDetail()) {
 				case IPDebugEvent.DEBUGGER:
-					((UIDebugManager) getPView().getUIManager()).defaultRegister((IPCDISession)event.getSource());
+					PTPDebugUIPlugin.getUIDebugManager().defaultRegister((IPCDISession)event.getSource());
 					break;
 				case IPDebugEvent.REGISTER:
 					IElementHandler elementHandler = getPView().getElementHandler(job.getIDString());
@@ -103,7 +105,7 @@ public class ParallelDebugViewEventHandler extends AbstractPDebugEventHandler {
 						BitList ttarget = (BitList) job.getAttribute(IAbstractDebugger.SUSPENDED_PROC_KEY);
 						getPView().updateTerminateButton(tsource, ttarget);
 					}
-					refresh();
+					refresh(true);
 					break;
 				}
 				break;
@@ -115,6 +117,10 @@ public class ParallelDebugViewEventHandler extends AbstractPDebugEventHandler {
 					getPView().updateSuspendResumeButton(ssource, starget);
 
 					((UIDebugManager) getPView().getUIManager()).updateVariableValue(false);
+					
+					if (event.getKind() == IPDebugEvent.SUSPEND) {
+						PTPDebugUIPlugin.getUIDebugManager().updateVariableValueOnSuspend();
+					}
 				}
 				refresh();
 				break;
@@ -130,12 +136,13 @@ public class ParallelDebugViewEventHandler extends AbstractPDebugEventHandler {
 					final IPDebugErrorInfo errInfo = (IPDebugErrorInfo)info;
 					PTPDebugUIPlugin.getDisplay().asyncExec(new Runnable() {
 						public void run() {
-							PTPDebugUIPlugin.errorDialog("Error", new Exception(errInfo.getMsg() + " on tasks: "+ PDebugUIUtils.showBitList(errInfo.getAllProcesses())));
+							IStatus status = new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "Error on tasks: "+ PDebugUIUtils.showBitList(errInfo.getAllProcesses()), null);
+							PTPDebugUIPlugin.errorDialog("Fatal Error", status);
 						}
 					});
 					break;
 				}
-				refresh();
+				refresh(true);
 				break;
 		}
 	}

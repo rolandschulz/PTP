@@ -18,11 +18,21 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.ui.views.variable;
 
+import java.util.ArrayList;
+import java.util.List;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.debug.core.DebugException;
+import org.eclipse.debug.core.model.IStackFrame;
+import org.eclipse.debug.core.model.IThread;
+import org.eclipse.debug.core.model.IVariable;
+import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ptp.core.IPJob;
+import org.eclipse.ptp.debug.core.model.IPDebugTarget;
 import org.eclipse.ptp.debug.ui.PJobVariableManager;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.debug.ui.PJobVariableManager.VariableInfo;
@@ -124,6 +134,12 @@ public class PVariableDialog extends Dialog {
 		varText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		varText.addKeyListener(new KeyAdapter() {
 			public void keyReleased(KeyEvent e) {
+				if (varText.getText().length() > 0) {
+					TableItem[] items = varTable.getItems();
+					for (int i=0; i<items.length; i++) {
+						items[i].setChecked(false);
+					}
+				}
 				updateButtons();
 			}
 		});
@@ -182,8 +198,8 @@ public class PVariableDialog extends Dialog {
 		boolean enabled = true;
 		
 		String[] sets = getSelectedSets();
-		String var = getSelectedVariable();
-		if (var == null || var.length() == 0) {
+		String[] vars = getSelectedVariables();
+		if (vars.length == 0) {
 			enabled = false;
 		}
 		if (sets.length == 0) {
@@ -217,6 +233,55 @@ public class PVariableDialog extends Dialog {
 				}
 			}
 		}
+
+		String[] vars = getAvailableVariables();
+		for (int i=0; i<vars.length; i++) {
+			item = new TableItem(varTable, SWT.NONE);
+			item.setText(vars[i]);
+			if (varInfo != null) {
+				item.setChecked(varInfo.getVar().equals(vars[i]));
+			}
+		}
+	}
+	/** Get variables from Debug View
+	 * @return variable names
+	 */
+	protected String[] getAvailableVariables() {
+		ISelection selection = view.getSite().getPage().getSelection(IDebugUIConstants.ID_DEBUG_VIEW);
+		if (selection.isEmpty()) {
+			return new String[0];
+		}
+		if (selection instanceof IStructuredSelection) {
+			Object target = ((IStructuredSelection)selection).getFirstElement();
+			try {
+				if (target instanceof IStackFrame) {
+					return getVariables((IStackFrame)target);
+				}
+				else if (target instanceof IThread) {
+					return getVariables(((IThread)target).getTopStackFrame());
+				}
+				else if (target instanceof IPDebugTarget) {
+					IThread[] threads = ((IPDebugTarget)target).getThreads();
+					if (threads.length > 0) {
+						return getVariables(threads[0].getTopStackFrame());
+					}
+				}
+			} catch (DebugException e) {
+				return new String[0];
+			}
+		}
+		return new String[0];
+	}
+	private String[] getVariables(IStackFrame frame) throws DebugException {
+		if (frame == null) 
+			return new String[0];
+		
+		IVariable[] vars = frame.getVariables();
+		String[] varTexts = new String[vars.length];
+		for (int j=0; j<vars.length; j++) {
+			varTexts[j] = vars[j].getName();
+		}
+		return varTexts;
 	}
 	/** Create vertical space
 	 * @param parent
@@ -267,28 +332,29 @@ public class PVariableDialog extends Dialog {
 		return composite;
 	}
 	protected String[] getSelectedSets() {
+		List sets = new ArrayList();
 		TableItem[] items = setTable.getItems();
-		String[] sets = new String[items.length];
 		for (int i=0; i<items.length; i++) {
 			if (items[i].getChecked())
-				sets[i] = items[i].getText();
+				sets.add(items[i].getText());
 		}
-		return sets;
+		return (String[])sets.toArray(new String[0]);
 	}
-	protected String getSelectedAvailableVariable() {
+	protected String[] getSelectedAvailableVariables() {
+		List vars = new ArrayList();
 		TableItem[] items = varTable.getItems();
 		for (int i=0; i<items.length; i++) {
 			if (items[i].getChecked())
-				return items[i].getText();
+				vars.add(items[i].getText());
 		}
-		return null;
+		return (String[])vars.toArray(new String[0]);
 	}
-	protected String getSelectedVariable() {
-		String var = getSelectedAvailableVariable();
-		if (var == null) {
-			return varText.getText();
+	protected String[] getSelectedVariables() {
+		String[] vars = getSelectedAvailableVariables();
+		if (vars.length == 0) {
+			return new String[] { varText.getText() };
 		}
-		return var;
+		return vars;
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.dialogs.Dialog#okPressed()
@@ -296,24 +362,31 @@ public class PVariableDialog extends Dialog {
 	protected void okPressed() {
 		PJobVariableManager jobMgr = view.getUIManager().getJobVariableManager();
 		IPJob job = view.getUIManager().getCurrentJob();
-		String var = getSelectedVariable();
+		String[] vars = getSelectedVariables();
 		String[] sets = getSelectedSets();
 		boolean checked = checkBtn.getSelection();
-		
-		if (jobMgr.isContainVariable(job, var)) {
-			PTPDebugUIPlugin.errorDialog("Duplicate variable", "Variable (" + var + ") is added already.", null);
-			return;
-		}
-		
+
 		switch(mode) {
 		case NEW_MODE:
-			jobMgr.addJobVariable(job, sets, var, checked);
+			//check duplicate variable
+			for (int i=0; i<vars.length; i++) {
+				if (jobMgr.isContainVariable(job, vars[i])) {
+					PTPDebugUIPlugin.errorDialog("Duplicate variable", new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "Variable (" + vars[i] + ") is added already.", null));
+					return;
+				}
+			}
+			for (int i=0; i<vars.length; i++) {
+				jobMgr.addJobVariable(job, sets, vars[i], checked);
+			}
 			break;
 		case EDIT_MODE:
 			ISelection selection = view.getSelection();
 			if (!selection.isEmpty() && selection instanceof IStructuredSelection) {
 				VariableInfo varInfo = (VariableInfo)((IStructuredSelection)selection).getFirstElement();
-				jobMgr.changeJobVariable(varInfo.getJob(), job, sets, varInfo.getVar(), var, checked);
+				jobMgr.removeJobVariable(varInfo.getJob().getIDString(), varInfo.getVar());
+				for (int i=0; i<vars.length; i++) {
+					jobMgr.addJobVariable(job, sets, vars[i], checked);
+				}
 			}
 			break;
 		}

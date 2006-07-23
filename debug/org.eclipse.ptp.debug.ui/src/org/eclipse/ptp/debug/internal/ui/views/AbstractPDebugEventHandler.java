@@ -73,7 +73,7 @@ public abstract class AbstractPDebugEventHandler implements IPDebugEventListener
 				return Status.OK_STATUS;
 			}
 		};
-		uiJob.setSystem(true);
+		uiJob.setSystem(false);
 		uiJob.setPriority(Job.INTERACTIVE);
 		uiJob.schedule();
 	}

@@ -239,14 +239,6 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 		errorDialog(getActiveWorkbenchShell(), title, s.getMessage(), s);
 	}
 	/** Show error dialog
-	 * @param title
-	 * @param message
-	 * @param s
-	 */
-	public static void errorDialog(String title, String message, IStatus s) {
-		errorDialog(getActiveWorkbenchShell(), title, message, s);
-	}
-	/** Show error dialog
 	 * @param shell
 	 * @param title
 	 * @param s
