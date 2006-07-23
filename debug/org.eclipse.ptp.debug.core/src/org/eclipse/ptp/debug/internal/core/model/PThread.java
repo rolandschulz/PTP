@@ -160,7 +160,7 @@ public class PThread extends PDebugElement implements IPThread, IRestart, IResum
 		try {
 			return getCDIThread().getStackFrames(lowFrame, highFrame);
 		} catch (PCDIException e) {
-			setStatus(IPDebugElementStatus.WARNING, MessageFormat.format(CoreModelMessages.getString("CThread.0"), new String[] { e.getMessage() }));
+			setStatus(IPDebugElementStatus.WARNING, MessageFormat.format(CoreModelMessages.getString("PThread.0"), new String[] { e.getMessage() }));
 			targetRequestFailed(e.getMessage(), null);
 		}
 		return new IPCDIStackFrame[0];
@@ -499,7 +499,7 @@ public class PThread extends PDebugElement implements IPThread, IRestart, IResum
 		try {
 			depth = getCDIThread().getStackFrameCount();
 		} catch (PCDIException e) {
-			setStatus(IPDebugElementStatus.WARNING, MessageFormat.format(CoreModelMessages.getString("CThread.1"), new String[] { e.getMessage() }));
+			setStatus(IPDebugElementStatus.WARNING, MessageFormat.format(CoreModelMessages.getString("PThread.1"), new String[] { e.getMessage() }));
 		}
 		return depth;
 	}
