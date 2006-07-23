@@ -437,7 +437,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 			break;
 		case DELETE_SET_TYPE:
 			try {
-				debugModel.deletePBreakpointBySet(getCurrentJobId(), cur_set.getID());
+				debugModel.deletePBreakpoint(getCurrentJobId(), cur_set.getID());
 			} catch (CoreException e) {
 				PTPDebugUIPlugin.log(e);
 			}
@@ -463,7 +463,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 				PTPDebugUIPlugin.log(e);
 			}
 
-			updateVariableValue(false);
+			updateVariableValueOnChange();
 			break;
 		case ADD_ELEMENT_TYPE:
 			BitList added_tasks = new BitList(cur_set.getElementHandler().getSetRoot().size());
@@ -639,7 +639,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	public void removeJob(IPJob job) {
 		if (job.isDebug()) {
 			try {
-				debugModel.deletePBreakpointBySet(job.getIDString());
+				debugModel.deletePBreakpoint(job.getIDString());
 			} catch (CoreException e) {
 				PTPDebugUIPlugin.log(e);
 			}
@@ -652,12 +652,16 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	/**********************************************************
 	 * Variable methods
 	 **********************************************************/
+	public void updateVariableValueOnSuspend() {
+		updateVariableValue(isAutoUpdateVarOnSuspend());
+	}
+	public void updateVariableValueOnChange() {
+		updateVariableValue(isAutoUpdateVarOnChange());
+	}
 	public void updateVariableValue(boolean force) {
-		if (force || isAutoUpdateVarOnChange()) {
+		cleanVariableValue();
+		if (force) {
 			updateVariableValue();
-		}
-		else {
-			cleanVariableValue();				
 		}
 	}
 	public void updateVariableValue() {

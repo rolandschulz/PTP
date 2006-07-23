@@ -26,6 +26,7 @@ import java.util.Map;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.core.IPJob;
+import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.debug.core.PCDIDebugModel;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
@@ -50,13 +51,8 @@ public final class PJobVariableManager {
 		
 		String[] values = jobVariable.getValues(new Integer(taskID));
 		String display = "";
-		if (values.length > 0) {
-			VariableInfo[] vars = jobVariable.getVariables();
-			for (int i=0; i<values.length; i++) {
-				if (vars[i].isEnable())
-				display += "<i>" + vars[i].getVar() + ":</i> ";
-				display += values[i] + "<br>"; 
-			}
+		for (int i=0; i<values.length; i++) {
+			display += values[i];
 		}
 		return display;
 	}
@@ -76,14 +72,14 @@ public final class PJobVariableManager {
 	public boolean addJobVariable(IPJob job, String[] sets, String var, boolean enable) {
 		JobVariable jobVariable = getJobVariable(job.getIDString());
 		if (jobVariable == null) {
-			jobVariable = new JobVariable();
+			jobVariable = new JobVariable(job);
 			jobMap.put(job.getIDString(), jobVariable);
 		}
+
 		if (var == null || jobVariable.getVariableInfo(var) != null) {
 			return false;
-		}		
-
-		VariableInfo varInfo = new VariableInfo(job, var);
+		}
+		VariableInfo varInfo = new VariableInfo(jobVariable, var);
 		for (int i=0; i<sets.length; i++) {
 			varInfo.addSet(sets[i]);
 		}
@@ -143,6 +139,17 @@ public final class PJobVariableManager {
 	private JobVariable getJobVariable(String jid) {
 		return (JobVariable)jobMap.get(jid);
 	}
+	private boolean containSetVar(JobVariable jobVariable, String sid, String[] vars) {
+		for (int i=0; i<vars.length; i++) {
+			VariableInfo info = jobVariable.getVariableInfo(vars[i]);
+			if (info != null) {
+				if (info.isSetExisted(sid)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 	public void cleanupJobVariableValues() {
 		for(Iterator i=jobMap.values().iterator(); i.hasNext();) {
 			JobVariable jobVar = (JobVariable)i.next();
@@ -150,21 +157,30 @@ public final class PJobVariableManager {
 		}		
 	}
 	public void updateJobVariableValues(String jid, String sid, IProgressMonitor monitor) throws CoreException {
-		cleanupJobVariableValues();
 		JobVariable jobVariable = getJobVariable(jid);
 		if (jobVariable != null) {
-			final String[] vars = jobVariable.getEnabledVariables();
-			
-			PCDIDebugModel debugModel = PTPDebugCorePlugin.getDebugModel();
-			IPCDISession session = debugModel.getPCDISession(jid);
-			if (session != null) {
-				int[] tasks = debugModel.getTasks(jid, sid).toArray();
-				monitor.beginTask("Updating variables value...", (tasks.length * vars.length + 1));
-				for (int i=0; i<tasks.length; i++) {
-					if (!monitor.isCanceled()) {
-						String[] texts = debugModel.getValues(session, tasks[i], vars, monitor);
-						jobVariable.storeValues(new Integer(tasks[i]), texts);
-						monitor.worked(1);
+			String[] vars = jobVariable.getEnabledVariables();
+			if (vars.length > 0) {
+				//only update when current set id contain in VariableInfo
+				if (containSetVar(jobVariable, sid, vars)) {
+					PCDIDebugModel debugModel = PTPDebugCorePlugin.getDebugModel();
+					IPCDISession session = debugModel.getPCDISession(jid);
+					if (session != null) {
+						int[] tasks = debugModel.getTasks(jid, sid).toArray();
+						monitor.beginTask("Updating variables value...", (tasks.length * vars.length + 1));
+						for (int i=0; i<tasks.length; i++) {
+							if (!monitor.isCanceled()) {
+								//check whether the process is terminated
+								IPProcess process = jobVariable.getJob().findProcessByTaskId(tasks[i]);
+								if (process != null && !process.isAllStop()) {
+									String[] valueText = new String[vars.length];
+									for (int j=0; j<vars.length; j++) {
+										valueText[j] = "<i>" + vars[j] + ": </i>" + debugModel.getValue(session, tasks[i], vars[j], monitor) + "<br>";
+									}
+									jobVariable.storeValues(new Integer(tasks[i]), valueText);
+								}
+							}
+						}
 					}
 				}
 			}
@@ -174,6 +190,14 @@ public final class PJobVariableManager {
 	public class JobVariable {
 		List variableList = new ArrayList();
 		Map procValue = new HashMap();
+		IPJob job = null;
+		
+		public JobVariable(IPJob job) {
+			this.job = job;
+		}
+		public IPJob getJob() {
+			return job;
+		}
 		
 		public List getVariableList() {
 			return variableList;
@@ -230,18 +254,21 @@ public final class PJobVariableManager {
 		}
 	}
 	public class VariableInfo {
-		private IPJob job;
-		private String var;
-		private boolean enable;
-		private List setList = new ArrayList();
+		JobVariable parent;
+		String var;
+		boolean enable;
+		List setList = new ArrayList();
 		
-		public VariableInfo(IPJob job, String var) {
-			this.job = job;
+		public VariableInfo(JobVariable parent, String var) {
+			this.parent = parent;
 			this.var = var;
 			this.enable = true;
 		}
+		public JobVariable getParent() {
+			return parent;
+		}
 		public IPJob getJob() {
-			return job;
+			return getParent().getJob();
 		}
 		public void changeVar(String var) {
 			this.var = var;
