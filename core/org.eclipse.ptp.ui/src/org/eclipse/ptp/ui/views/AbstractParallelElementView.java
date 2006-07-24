@@ -87,6 +87,11 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 			}
 		}
 	};
+	
+	public AbstractParallelElementView(IManager manager) {
+		super();
+		this.manager = manager;
+	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.IWorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
@@ -207,8 +212,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	public IElementSet getCurrentSet() {
 		return cur_element_set;
 	}
-	public void rebuild() {
-		manager.clear();
+	public void build() {
 		initialView();
 	}
 	/** Refresh view
@@ -362,7 +366,5 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 		return canvas.getSelection();
 	}
 	
-    public void selectionChanged(SelectionChangedEvent event) {
-    	
-    }
+    public void selectionChanged(SelectionChangedEvent event) {}
 }

@@ -28,6 +28,7 @@ import org.eclipse.ptp.core.events.INodeEvent;
 import org.eclipse.ptp.internal.ui.MachineManager;
 import org.eclipse.ptp.internal.ui.ParallelImages;
 import org.eclipse.ptp.internal.ui.actions.ChangeMachineAction;
+import org.eclipse.ptp.ui.IManager;
 import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.ui.actions.ParallelAction;
@@ -53,7 +54,6 @@ import org.eclipse.swt.widgets.TableItem;
  * 
  */
 public class ParallelMachineView extends AbstractParallelSetView implements INodeListener {
-	private static ParallelMachineView instance = null;
 	// actions
 	protected ParallelAction changeMachineAction = null;
 	// composite
@@ -71,10 +71,12 @@ public class ParallelMachineView extends AbstractParallelSetView implements INod
 	/** Constructor
 	 * 
 	 */
-	public ParallelMachineView() {
-		instance = this;
-		manager = PTPUIPlugin.getDefault().getMachineManager();
+	public ParallelMachineView(IManager manager) {
+		super(manager);
 		PTPCorePlugin.getDefault().getModelPresentation().addNodeListener(this);
+	}
+	public ParallelMachineView() {
+		this(PTPUIPlugin.getDefault().getMachineManager());
 	}
 	public void dispose() {
 		super.dispose();
@@ -120,14 +122,6 @@ public class ParallelMachineView extends AbstractParallelSetView implements INod
 			refresh(false);
 		}
 		update();
-	}
-	/** Get ParallelMachineView instance
-	 * @return instance
-	 */
-	public static ParallelMachineView getMachineViewInstance() {
-		if (instance == null)
-			instance = new ParallelMachineView();
-		return instance;
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#createView(org.eclipse.swt.widgets.Composite)

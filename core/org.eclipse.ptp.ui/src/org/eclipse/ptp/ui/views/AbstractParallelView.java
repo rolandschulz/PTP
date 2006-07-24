@@ -59,7 +59,7 @@ public abstract class AbstractParallelView extends ViewPart implements IModelLis
 	}
 	
 	public abstract void refresh(boolean all);
-	public abstract void rebuild();
+	public abstract void build();
 	public abstract void repaint(boolean all);
 	
 	public abstract ISelection getSelection();
@@ -72,10 +72,10 @@ public abstract class AbstractParallelView extends ViewPart implements IModelLis
 			IModelRuntimeNotifierEvent runtimeEvent = (IModelRuntimeNotifierEvent)event;
 			switch (runtimeEvent.getStatus()) {
 			case IModelRuntimeNotifierEvent.RUNNING:
-				rebuild();
+				build();
 				break;
 			case IModelRuntimeNotifierEvent.STARTED:
-				rebuild();
+				build();
 				break;
 			case IModelRuntimeNotifierEvent.STOPPED:
 				break;
@@ -88,7 +88,7 @@ public abstract class AbstractParallelView extends ViewPart implements IModelLis
 			IModelSysChangedEvent sysEvent = (IModelSysChangedEvent)event;
 			switch (sysEvent.getType()) {
 			case IModelSysChangedEvent.MONITORING_SYS_CHANGED:
-				rebuild();
+				build();
 				break;
 			case IModelSysChangedEvent.SYS_STATUS_CHANGED:
 				break;
