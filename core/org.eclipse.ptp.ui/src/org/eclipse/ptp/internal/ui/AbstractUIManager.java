@@ -238,6 +238,10 @@ public abstract class AbstractUIManager implements IManager {
 	 * @see org.eclipse.ptp.ui.IManager#findJobById(java.lang.String)
 	 */
 	public IPJob findJobById(String job_id) {
+		if (job_id == null) {
+			return null;
+		}
+		
 		IPUniverse universe = modelPresentation.getUniverse();
 		if (universe == null)
 			return null;

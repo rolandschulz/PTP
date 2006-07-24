@@ -203,19 +203,18 @@ public class JobManager extends AbstractUIManager {
 	 * @param job
 	 */
 	public void addJob(IPJob job) {
-		if (jobList.containsKey(job.getIDString()))
-			return;
-
-		IPProcess[] pProcesses = job.getSortedProcesses();
-		int total_element = pProcesses.length;
-		if (total_element > 0) {
-			IElementHandler elementHandler = new ElementHandler();
-			IElementSet set = elementHandler.getSetRoot();
-			for (int i = 0; i < total_element; i++) {
-				set.add(new Element(set, pProcesses[i].getIDString(), String.valueOf(pProcesses[i].getTaskId())));
+		if (!jobList.containsKey(job.getIDString())) {
+			IPProcess[] pProcesses = job.getSortedProcesses();
+			int total_element = pProcesses.length;
+			if (total_element > 0) {
+				IElementHandler elementHandler = new ElementHandler();
+				IElementSet set = elementHandler.getSetRoot();
+				for (int i = 0; i < total_element; i++) {
+					set.add(new Element(set, pProcesses[i].getIDString(), String.valueOf(pProcesses[i].getTaskId())));
+				}
+				elementHandler.add(set);
+				jobList.put(job.getIDString(), elementHandler);
 			}
-			elementHandler.add(set);
-			jobList.put(job.getIDString(), elementHandler);
 		}
 	}
 	/* (non-Javadoc)

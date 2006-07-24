@@ -63,7 +63,6 @@ import org.eclipse.swt.widgets.TableItem;
  * 
  */
 public class ParallelJobView extends AbstractParallelSetView implements IProcessListener {
-	private static ParallelJobView instance = null;
 	// selected element
 	protected String cur_selected_element_id = IManager.EMPTY_ID;
 	// composite
@@ -83,14 +82,16 @@ public class ParallelJobView extends AbstractParallelSetView implements IProcess
 	/** Constructor
 	 * 
 	 */
-	public ParallelJobView() {
-		instance = this;
-		manager = PTPUIPlugin.getDefault().getJobManager();
+	public ParallelJobView(IManager manager) {
+		super(manager);
 		PTPCorePlugin.getDefault().getModelPresentation().addProcessListener(this);
 	}
+	public ParallelJobView() {
+		this(PTPUIPlugin.getDefault().getJobManager());
+	}
 	public void dispose() {
-		super.dispose();
 		PTPCorePlugin.getDefault().getModelPresentation().removeProcessListener(this);		
+		super.dispose();
 	}
 	/** Get current view flag
 	 * @return flag of view
@@ -134,14 +135,6 @@ public class ParallelJobView extends AbstractParallelSetView implements IProcess
 	 */
 	public Image getImage(int index1, int index2) {
 		return ParallelImages.procImages[index1][index2];
-	}
-	/** Get ParallelJobView instance
-	 * @return instance
-	 */
-	public static ParallelJobView getJobViewInstance() {
-		if (instance == null)
-			instance = new ParallelJobView();
-		return instance;
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#createView(org.eclipse.swt.widgets.Composite)
@@ -193,7 +186,10 @@ public class ParallelJobView extends AbstractParallelSetView implements IProcess
 				}
 				else if (item != null) {
 					IPJob job = manager.findJob(item.getText());
-					if (selection.isEmpty()) {
+					if (job == null) {
+						changeJob((IPJob) null);
+					}
+					else if (selection.isEmpty()) {
 						changeJob(job);
 					}
 					else {
@@ -317,11 +313,10 @@ public class ParallelJobView extends AbstractParallelSetView implements IProcess
 	public void changeJob(final String job_id) {
 		getDisplay().syncExec(new Runnable() {
 			public void run() {
-				jobTableViewer.refresh(true);
 				IPJob job = manager.findJobById(job_id);
 				changeJob(job);
-				jobTableViewer.setSelection(job == null ? new StructuredSelection() : new StructuredSelection(job));
-				updateAction();
+				jobTableViewer.refresh(true);
+				jobTableViewer.setSelection(job == null ? new StructuredSelection() : new StructuredSelection(job), true);
 			}
 		});
 	}
@@ -334,7 +329,6 @@ public class ParallelJobView extends AbstractParallelSetView implements IProcess
 			//return;
 		selectJob((job == null ? IManager.EMPTY_ID : job.getIDString()));
 		update();
-		refresh(false);
 	}
 	/** Update Job
 	 * 
@@ -425,9 +419,9 @@ public class ParallelJobView extends AbstractParallelSetView implements IProcess
 		if (all) {
 			if (!jobTableViewer.getTable().isDisposed()) {
 				jobTableViewer.refresh(true);
-				update();
 			}
 		}
+		update();
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.IProcessListener#processEvent(org.eclipse.ptp.core.events.IProcessEvent)
@@ -438,6 +432,13 @@ public class ParallelJobView extends AbstractParallelSetView implements IProcess
 		if (((JobManager) manager).isCurrentSetContainProcess(getCurrentID(), process.getIDString())) {
 			if (event.getType() != IProcessEvent.ADD_OUTPUT_TYPE)
 				refresh(false);
+		}
+	}
+	public void setFocus() {
+		super.setFocus();
+		IPJob job = getCheckedJob();
+		if (job == null) {
+			changeJob((String)null);
 		}
 	}
 }

@@ -57,6 +57,9 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 	protected ParallelAction deleteProcessAction = null;
 	protected ParallelAction changeSetAction = null;
 
+	public AbstractParallelSetView(IManager manager) {
+		super(manager);
+	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.IWorkbenchPart#dispose()
 	 */
