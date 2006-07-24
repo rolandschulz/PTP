@@ -24,8 +24,8 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ptp.debug.internal.ui.PDebugImage;
+import org.eclipse.ptp.debug.internal.ui.PJobVariableManager.VariableInfo;
 import org.eclipse.ptp.debug.internal.ui.views.variable.PVariableView;
-import org.eclipse.ptp.debug.ui.PJobVariableManager.VariableInfo;
 
 /**
  * @author Clement chu

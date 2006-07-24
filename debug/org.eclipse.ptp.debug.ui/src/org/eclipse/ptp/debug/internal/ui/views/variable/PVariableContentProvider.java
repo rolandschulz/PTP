@@ -22,8 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.ptp.debug.ui.PJobVariableManager;
-import org.eclipse.ptp.debug.ui.PJobVariableManager.JobVariable;
+import org.eclipse.ptp.debug.internal.ui.PJobVariableManager;
+import org.eclipse.ptp.debug.internal.ui.PJobVariableManager.JobVariable;
 
 /**
  * @author Clement chu
