@@ -358,20 +358,20 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 		if (elementHandler == null)
 			return;
 		Job uiJob = new Job("Removing registered processes") {
-			protected IStatus run(IProgressMonitor pmonitor) {
+			protected IStatus run(IProgressMonitor monitor) {
 				IPCDISession session = getDebugSession(job_id);
 				if (session == null)
 					return Status.CANCEL_STATUS;
 				IElement[] registerElements = elementHandler.getRegisteredElements();
-				pmonitor.beginTask("Removing registering processes....", registerElements.length);
+				monitor.beginTask("Removing registering processes....", registerElements.length);
 				for (int i = 0; i < registerElements.length; i++) {
 					IPProcess proc = findProcess(job_id, registerElements[i].getID());
 					if (proc != null) {
 						unregisterProcess(session, proc, false);
 					}
-					pmonitor.worked(1);
+					monitor.worked(1);
 				}
-				pmonitor.done();
+				monitor.done();
 				return Status.OK_STATUS;
 			}
 		};

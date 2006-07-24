@@ -42,6 +42,7 @@ import org.eclipse.ptp.debug.internal.ui.actions.UnregisterAction;
 import org.eclipse.ptp.debug.internal.ui.views.AbstractPDebugEventHandler;
 import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
+import org.eclipse.ptp.ui.IManager;
 import org.eclipse.ptp.ui.actions.ParallelAction;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
@@ -56,7 +57,6 @@ import org.eclipse.ui.IActionBars;
  * 
  */
 public class ParallelDebugView extends ParallelJobView {
-	private static ParallelDebugView instance = null;
 	// actions
 	protected ParallelAction resumeAction = null;
 	protected ParallelAction suspendAction = null;
@@ -71,18 +71,20 @@ public class ParallelDebugView extends ParallelJobView {
 	/** Constructor
 	 * 
 	 */
+	public ParallelDebugView(IManager manager) {
+		super(manager);
+	}
 	public ParallelDebugView() {
-		instance = this;
-		manager = PTPDebugUIPlugin.getUIDebugManager();
+		this(PTPDebugUIPlugin.getUIDebugManager());
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.IWorkbenchPart#dispose()
 	 */
 	public void dispose() {
-		super.dispose();
 		if (getEventHandler() != null) {
 			getEventHandler().dispose();
 		}	
+		super.dispose();
 	}
 	/**
 	 * Sets the event handler for this view
@@ -104,14 +106,6 @@ public class ParallelDebugView extends ParallelJobView {
 	public void createView(Composite parent) {
 		super.createView(parent);
 		setEventHandler(new ParallelDebugViewEventHandler(this));
-	}
-	/** Get instance
-	 * @return
-	 */
-	public static ParallelDebugView getDebugViewInstance() {
-		if (instance == null)
-			instance = new ParallelDebugView();
-		return instance;
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.views.AbstractParallelSetView#fillContextMenu(org.eclipse.jface.action.IMenuManager)

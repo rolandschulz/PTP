@@ -49,21 +49,20 @@ public class GotoSet implements IViewActionDelegate {
 	public void run(IAction action) {
 		IPBreakpoint breakpoint = getPBreakpoint();
 		if (breakpoint != null) {
-			UIUtils.showView(IPTPDebugUIConstants.ID_VIEW_PARALLELDEBUG);
-			ParallelDebugView view = ParallelDebugView.getDebugViewInstance();
-			if (view != null) {
+			IViewPart view = PTPDebugUIPlugin.getActiveWorkbenchWindow().getActivePage().findView(IPTPDebugUIConstants.ID_VIEW_PARALLELDEBUG);
+			if (view instanceof ParallelDebugView) {
+				ParallelDebugView pview = (ParallelDebugView)view;
 				try {				
 					String jid = breakpoint.getJobId();
 					if (jid.equals(IPBreakpoint.GLOBAL))
 						jid = "";
 					
-					view.changeJob(jid);
-					IElementHandler elementHandler = view.getCurrentElementHandler();
+					pview.changeJob(jid);
+					IElementHandler elementHandler = pview.getCurrentElementHandler();
 					if (elementHandler != null) {
-						view.selectSet(elementHandler.getSet(breakpoint.getSetId()));
+						pview.selectSet(elementHandler.getSet(breakpoint.getSetId()));
 					}
-					view.update();
-					view.refresh(false);
+					pview.refresh(false);
 				} catch (CoreException e) {
 					PTPDebugUIPlugin.log(e);
 				}
