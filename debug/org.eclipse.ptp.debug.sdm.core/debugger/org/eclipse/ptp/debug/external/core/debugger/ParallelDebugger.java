@@ -631,8 +631,8 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			if (errMsg == null || errMsg.length() ==0)
 				errMsg = "Unknown Error";
 			
-			completeCommand(e.getBitSet(), new PCDIException(errMsg, getErrorCode(errEvent.getErrorCode())));
 			System.err.println("======================= EVENT_DBG_ERROR ====================: " + errMsg);
+			completeCommand(e.getBitSet(), new PCDIException(errMsg, getErrorCode(errEvent.getErrorCode())));
 			//completeCommand(e.getBitSet(), new PCDIException(errMsg, getErrorCode(errEvent.getErrorCode())));
 			break;
 		}
@@ -643,6 +643,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 		case IParallelDebuggerConstants.DBGERR_NOFILEDIR:
 		case IParallelDebuggerConstants.DBGERR_CHDIR:
 			return IPCDIErrorEvent.DBG_FATAL;
+		case IParallelDebuggerConstants.DBGERR_INPROGRESS:
 		case IParallelDebuggerConstants.DBGERR_UNKNOWN_TYPE:
 		case IParallelDebuggerConstants.DBGERR_UNKNOWN_VARIABLE:
 			return IPCDIErrorEvent.DBG_NORMAL;

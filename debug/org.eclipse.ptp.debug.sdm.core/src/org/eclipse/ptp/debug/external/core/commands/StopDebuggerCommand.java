@@ -30,7 +30,7 @@ public class StopDebuggerCommand extends AbstractDebugCommand {
 	private boolean sendEvent = true;
 	
 	public StopDebuggerCommand(boolean sendEvent) {
-		super(null);
+		super(null, true, true, false);
 		this.sendEvent = sendEvent;
 	}
 	public StopDebuggerCommand() {

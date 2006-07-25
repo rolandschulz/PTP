@@ -97,7 +97,7 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		procs = job.getSortedProcesses();
 		// Initialize state variables
 		
-		StartDebuggerCommand command = new StartDebuggerCommand(job);
+		StartDebuggerCommand command = new StartDebuggerCommand(job, timeout);
 		postCommand(command);
 		try {
 			command.waitForReturn();

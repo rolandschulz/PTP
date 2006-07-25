@@ -302,22 +302,20 @@ public class EventManager extends SessionObject implements IPCDIEventManager, Ob
 		IPDebugInfo baseInfo = getDebugInfo(event);
 		int detail = IPDebugEvent.UNSPECIFIED;
 
-		if (event.getType() != IPCDIResumedEvent.CONTINUE) {
-			switch (event.getType()) {
-			case IPCDIResumedEvent.STEP_INTO:
-			case IPCDIResumedEvent.STEP_INTO_INSTRUCTION:
-				detail = IPDebugEvent.STEP_INTO;
-				break;
-			case IPCDIResumedEvent.STEP_OVER:
-			case IPCDIResumedEvent.STEP_OVER_INSTRUCTION:
-				detail = IPDebugEvent.STEP_OVER;
-				break;
-			case IPCDIResumedEvent.STEP_RETURN:
-				detail = IPDebugEvent.STEP_RETURN;
-				break;
-			}
-			PTPDebugCorePlugin.getDefault().fireDebugEvent(new PDebugEvent(getSession(), IPDebugEvent.RESUME, detail, baseInfo));
+		switch (event.getType()) {
+		case IPCDIResumedEvent.STEP_INTO:
+		case IPCDIResumedEvent.STEP_INTO_INSTRUCTION:
+			detail = IPDebugEvent.STEP_INTO;
+			break;
+		case IPCDIResumedEvent.STEP_OVER:
+		case IPCDIResumedEvent.STEP_OVER_INSTRUCTION:
+			detail = IPDebugEvent.STEP_OVER;
+			break;
+		case IPCDIResumedEvent.STEP_RETURN:
+			detail = IPDebugEvent.STEP_RETURN;
+			break;
 		}
+		PTPDebugCorePlugin.getDefault().fireDebugEvent(new PDebugEvent(getSession(), IPDebugEvent.RESUME, detail, baseInfo));
 	}
 	public void fireDestroyEvent(IPCDIDestroyedEvent event) {
 		IPDebugInfo baseInfo = getDebugInfo(event);

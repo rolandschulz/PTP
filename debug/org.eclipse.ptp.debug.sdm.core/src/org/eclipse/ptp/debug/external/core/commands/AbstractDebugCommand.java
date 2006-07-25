@@ -25,7 +25,7 @@ import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIErrorEvent;
 
 
-/**
+/** This is an abstract class of debug command.  It contains all common actions and functions of all debug commands.
  * @author Clement chu
  * 
  */
@@ -38,15 +38,29 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 	protected boolean interrupt = false;
 	private boolean flush = false;
 	private boolean cancelled = false;
-	protected int timeout = 10000;
+	protected long timeout = 10000;
 	protected boolean waitInQueue = false;
 	
+	/** constructor
+	 * @param tasks
+	 */
 	public AbstractDebugCommand(BitList tasks) {
 		this(tasks, false, true);
 	}
+	/** constructor
+	 * @param tasks the tasks for this command
+	 * @param interrupt whether this command can interrupted or not
+	 * @param waitForReturn whether this command should wait for return value
+	 */
 	public AbstractDebugCommand(BitList tasks, boolean interrupt, boolean waitForReturn) {
 		this(tasks, interrupt, waitForReturn, true);
 	}
+	/** constructor
+	 * @param tasks the tasks for this command
+	 * @param interrupt whether this command can interrupted or not
+	 * @param waitForReturn whether this command should wait for return value
+	 * @param waitInQueue whether this command should be queuing or jump the queue (no need to wait to execuate)
+	 */
 	public AbstractDebugCommand(BitList tasks, boolean interrupt, boolean waitForReturn, boolean waitInQueue) {
 		this.tasks = tasks;
 		this.interrupt = interrupt;
@@ -69,17 +83,20 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 		return result;
 	}
 	//wait again for return back
-	protected void doWait() throws InterruptedException {
+	protected void doWait(long timeout) throws InterruptedException {
 		synchronized (lock) {
 			lock.wait(timeout);
 		}
 	}
 	protected boolean checkReturn() throws PCDIException {
 		Object result = getReturn();
-		if (result == null || result.equals(RETURN_NOTHING)) {
+		if (result == null) {
 			throw new PCDIException("Time out - Command " + getName());
 		}
-		if (getReturn() instanceof PCDIException) {
+		if (result.equals(RETURN_NOTHING)) {
+			throw new PCDIException("Unknown error - Command " + getName());
+		}
+		if (result instanceof PCDIException) {
 			throw (PCDIException)getReturn();
 		}
 		if (result.equals(RETURN_ERROR)) {
@@ -94,19 +111,22 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 		return true;
 	}
 	public boolean waitForReturn() throws PCDIException {
+		return waitForReturn(timeout);
+	}
+	public boolean waitForReturn(long timeout) throws PCDIException {
 		//no need to wait return back
 		if (!isWaitForReturn())
 			return true;
 
 		//start waiting
 		try {
-			doWait();
+			doWait(timeout);
 		} catch (InterruptedException e) {
 			throw new PCDIException(e);
 		}
 		return checkReturn();
 	}
-	protected void setTimeout(int timeout) {
+	protected void setTimeout(long timeout) {
 		this.timeout = timeout;
 	}
 	protected boolean isCanncelled() {
@@ -151,7 +171,7 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 		return -1;
 	}
 	
-	public void execCommand(IAbstractDebugger debugger, int timeout) throws PCDIException {
+	public void execCommand(IAbstractDebugger debugger, long timeout) throws PCDIException {
 		setTimeout(timeout);
 		execCommand(debugger);
 		waitAfter(debugger);
