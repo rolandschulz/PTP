@@ -30,12 +30,16 @@ import org.eclipse.ptp.debug.core.cdi.PCDIException;
 public class StartDebuggerCommand extends AbstractDebugCommand {
 	private IPJob job = null;
 	
-	public StartDebuggerCommand(IPJob job) {
+	public StartDebuggerCommand(IPJob job, int timeout) {
 		super(null);
 		this.job = job;
+		setTimeout(job.totalProcesses() * timeout);
+	}
+	public void execCommand(IAbstractDebugger debugger, long timeout) throws PCDIException {
+		execCommand(debugger);
+		waitAfter(debugger);		
 	}
 	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
-		setTimeout((job != null)?job.totalProcesses()*timeout:timeout);
 		try {
 			debugger.startDebugger(job);
 		} catch (CoreException e) {

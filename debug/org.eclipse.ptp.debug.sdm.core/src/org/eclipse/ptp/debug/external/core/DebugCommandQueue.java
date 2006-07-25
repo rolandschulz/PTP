@@ -144,10 +144,9 @@ public class DebugCommandQueue extends Thread {
 	public void setCommandReturn(BitList tasks, Object result) {
 		synchronized (queue) {
 			if (currentCommand != null) {
-				System.err.println("*** setCommandReturn ***: " + currentCommand.getName());
-				if (result == null) {
-					doFlushCommands();
-				}
+				//if (result == null) {
+					//doFlushCommands();
+				//}
 				currentCommand.setReturn(tasks, result);					
 			}
 		}
