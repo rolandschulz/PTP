@@ -165,10 +165,12 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPCDIE
 		initializePreferences();
 		setConfiguration((IPCDITargetConfiguration)cdiTarget.getConfiguration());
 		setThreadList(new ArrayList(5));
-		if (process.getStatus().equals(IPProcess.EXITED)) {
+		if (fCDITarget.isTerminated()) {
 			setState(PDebugElementState.TERMINATED);
 		} else {
-			setState(PDebugElementState.SUSPENDED);
+			setState(PDebugElementState.UNDEFINED);
+			if (fCDITarget.isSuspended())
+				setState(PDebugElementState.SUSPENDED);
 			setGlobalVariableManager(new PGlobalVariableManager(this));
 			setMemoryBlockRetrieval(new PTPMemoryBlockRetrievalExtension(this));
 			setSignalManager(new PSignalManager(this));
@@ -200,7 +202,8 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPCDIE
 	protected void initializeThreads(List debugEvents) {
 		IPCDIThread[] cdiThreads = new IPCDIThread[0];
 		try {
-			cdiThreads = getCDITarget().getThreads();
+			if (isSuspended())
+				cdiThreads = getCDITarget().getThreads();
 		} catch (PCDIException e) {
 			// ignore
 		}

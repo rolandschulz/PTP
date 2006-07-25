@@ -41,11 +41,17 @@ public interface IDebugCommand extends Comparable {
 	 * @param timeout set the timeout for this command
 	 * @throws PCDIException
 	 */
-	public void execCommand(IAbstractDebugger debugger, int timeout) throws PCDIException;
+	public void execCommand(IAbstractDebugger debugger, long timeout) throws PCDIException;
 	/** Whether this command can be interrupted
 	 * @return true can be interrupted, otherwise not
 	 */
 	public boolean canInterrupt();
+	/** Whether this command need to wait for return back
+	 * @param timeout special the time for finish
+	 * @return
+	 * @throws PCDIException
+	 */
+	public boolean waitForReturn(long timeout) throws PCDIException;
 	/** Whether this command need to wait for return back
 	 * @return true is wait for return back, otherwise not
 	 */
