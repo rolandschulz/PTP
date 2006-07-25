@@ -97,6 +97,9 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 			throw new PCDIException("Unknown error - Command " + getName());
 		}
 		if (result instanceof PCDIException) {
+			if (((PCDIException)result).getErrorCode() == IPCDIErrorEvent.DBG_NORMAL) {
+				return false;
+			}
 			throw (PCDIException)getReturn();
 		}
 		if (result.equals(RETURN_ERROR)) {
@@ -174,20 +177,7 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 	public void execCommand(IAbstractDebugger debugger, long timeout) throws PCDIException {
 		setTimeout(timeout);
 		execCommand(debugger);
-		waitAfter(debugger);
-	}
-	protected boolean waitAfter(IAbstractDebugger debugger) throws PCDIException {
-		try {
-			return waitForReturn();
-		} catch (PCDIException e) {
-			switch(e.getErrorCode()) {
-			case IPCDIErrorEvent.DBG_FATAL:
-			case IPCDIErrorEvent.DBG_WARNING:
-				debugger.handleErrorEvent(tasks, e.getMessage(), e.getErrorCode());
-				break;
-			}
-		}
-		return false;
+		waitForReturn();
 	}
 	public Object getResult() throws PCDIException {
 		if (getReturn() == null) {

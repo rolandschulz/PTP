@@ -37,7 +37,7 @@ public class StartDebuggerCommand extends AbstractDebugCommand {
 	}
 	public void execCommand(IAbstractDebugger debugger, long timeout) throws PCDIException {
 		execCommand(debugger);
-		waitAfter(debugger);		
+		waitForReturn();
 	}
 	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
 		try {

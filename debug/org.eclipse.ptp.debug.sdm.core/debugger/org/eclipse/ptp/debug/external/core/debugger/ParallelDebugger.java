@@ -631,7 +631,6 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			if (errMsg == null || errMsg.length() ==0)
 				errMsg = "Unknown Error";
 			
-			System.err.println("======================= EVENT_DBG_ERROR ====================: " + errMsg);
 			completeCommand(e.getBitSet(), new PCDIException(errMsg, getErrorCode(errEvent.getErrorCode())));
 			//completeCommand(e.getBitSet(), new PCDIException(errMsg, getErrorCode(errEvent.getErrorCode())));
 			break;
