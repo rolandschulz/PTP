@@ -18,12 +18,54 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.ui.views.variable;
 
+import org.eclipse.jface.viewers.ITableLabelProvider;
+import org.eclipse.jface.viewers.StructuredViewer;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
+import org.eclipse.ptp.debug.internal.ui.PJobVariableManager.VariableInfo;
 
 /**
  * @author Clement chu
  */
 public class PVariableViewerSorter extends ViewerSorter {
+	private boolean[] sortOrder = new boolean[] { false, false, false, false };
+	private int column = 0;
 	
+	public void setColumn(int column) {
+		this.column = column;
+		sortOrder[column] = !sortOrder[column];
+	}
+	public int getColumn() {
+		return column;
+	}
+	
+    public int compare(Viewer viewer, Object e1, Object e2) {
+    	if (!(e1 instanceof VariableInfo)) {
+    		return super.compare(viewer, e1, e2);
+    	}
+    	
+   		boolean isAccending = sortOrder[column];
+		switch (column) {
+		case 0:
+			if (isAccending) {
+				return ((VariableInfo)e1).isEnable()?1:-1;
+			}
+			else {
+				return ((VariableInfo)e2).isEnable()?1:-1;
+			}
+		default:
+	    	if (viewer instanceof StructuredViewer) {
+	    		ITableLabelProvider lprov = (ITableLabelProvider) ((StructuredViewer)viewer).getLabelProvider();
+				String name1= lprov.getColumnText(e1, column);
+				String name2= lprov.getColumnText(e2, column);
+				if (isAccending) {
+					return name1.compareTo(name2);
+				}
+				else {
+					return name2.compareTo(name1);
+				}
+	    	}
+		}
+    	return 0;
+    }
 }
-

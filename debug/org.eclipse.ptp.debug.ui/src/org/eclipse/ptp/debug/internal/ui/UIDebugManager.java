@@ -308,14 +308,24 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	/* (non-Javadoc)
 	 * @see org.eclipse.debug.core.IBreakpointListener#breakpointAdded(org.eclipse.debug.core.model.IBreakpoint)
 	 */
-	public void breakpointAdded(IBreakpoint breakpoint) {
+	public void breakpointAdded(final IBreakpoint breakpoint) {
 		if (PTPDebugUIPlugin.isPTPDebugPerspective()) {
 			if (breakpoint instanceof ICLineBreakpoint) {
-				try {
-					DebugPlugin.getDefault().getBreakpointManager().removeBreakpoint(breakpoint, true);
-				} catch (CoreException e) {
-					System.out.println("Err: " + e.getMessage());
-				}
+				//delete c breakpoint if the ptp debug perspective is active
+				Job uiJob = new Job("Removing CLine breakpoint...") {
+					protected IStatus run(IProgressMonitor monitor) {
+						try {
+							DebugPlugin.getDefault().getBreakpointManager().removeBreakpoint(breakpoint, true);
+						} catch (CoreException e) {
+							PTPDebugUIPlugin.log(e.getStatus());
+						}
+						return Status.OK_STATUS;
+					}
+				};
+				uiJob.setSystem(true);
+				uiJob.setPriority(Job.BUILD);
+				//set delete breakpoint job later to prevent the breakpoint didn't finished the completion of adding
+				uiJob.schedule(100);
 			}
 		}
 	}

@@ -16,45 +16,36 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.internal.ui.views.variable;
+package org.eclipse.ptp.debug.internal.ui.actions;
 
-import org.eclipse.jface.viewers.ITableLabelProvider;
-import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.ptp.debug.internal.ui.PJobVariableManager.VariableInfo;
-import org.eclipse.swt.graphics.Image;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
+import org.eclipse.ptp.debug.internal.ui.PDebugImage;
+import org.eclipse.ptp.debug.internal.ui.views.variable.PVariableView;
 
 /**
  * @author Clement chu
  */
-public class PVariableLabelProvider extends LabelProvider implements ITableLabelProvider, ICheckProvider {
-	public boolean isCheck(Object element) {
-		if (element instanceof VariableInfo) {
-			return ((VariableInfo)element).isEnable();
-		}
-		return false;
+public class UpdatePExpressionAction extends Action {
+	public static final String name = "Refresh variables";
+	private PVariableView view = null;
+
+	/** Constructor
+	 * @param view
+	 */
+	public UpdatePExpressionAction(PVariableView view) {
+		super(name, IAction.AS_PUSH_BUTTON);
+	    setImageDescriptor(PDebugImage.ID_ICON_SUSPEND_NORMAL);
+	    setDisabledImageDescriptor(PDebugImage.ID_ICON_SUSPEND_DISABLE);
+	    setToolTipText(name);
+	    setId(name);
+	    setEnabled(false);
+	    this.view = view;
 	}
-	public Image getColumnImage(Object element, int columnIndex) {
-		return null;
-	}
-	public String getColumnText(Object element, int columnIndex) {
-		if (element instanceof VariableInfo) {
-			VariableInfo varInfo = (VariableInfo)element;
-			switch(columnIndex) {
-			case 1:
-				return varInfo.getVar();
-			case 2:
-				return varInfo.getJob().getElementName();
-			case 3:
-				String[] sets = varInfo.getSets();
-				String setsText = "";
-				for (int i=0; i<sets.length; i++) {
-					setsText += sets[i];
-					if (i < sets.length - 1)
-						setsText += ",";
-				}
-				return setsText;
-			}
-		}
-		return null;
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.action.Action#run()
+	 */
+	public void run() {
+		view.getUIManager().updateVariableValue(true);
 	}
 }

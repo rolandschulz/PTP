@@ -136,19 +136,15 @@ public final class PJobVariableManager {
 		}
 		jobMap.clear();
 	}
-	private JobVariable getJobVariable(String jid) {
-		return (JobVariable)jobMap.get(jid);
-	}
-	private boolean containSetVar(JobVariable jobVariable, String sid, String[] vars) {
-		for (int i=0; i<vars.length; i++) {
-			VariableInfo info = jobVariable.getVariableInfo(vars[i]);
-			if (info != null) {
-				if (info.isSetExisted(sid)) {
-					return true;
-				}
-			}
+	public boolean hasVariables(String jid) {
+		JobVariable jobVariable = getJobVariable(jid);
+		if (jobVariable != null) {
+			return jobVariable.hasVariables();
 		}
 		return false;
+	}
+	private JobVariable getJobVariable(String jid) {
+		return (JobVariable)jobMap.get(jid);
 	}
 	public void cleanupJobVariableValues() {
 		for(Iterator i=jobMap.values().iterator(); i.hasNext();) {
@@ -159,26 +155,24 @@ public final class PJobVariableManager {
 	public void updateJobVariableValues(String jid, String sid, IProgressMonitor monitor) throws CoreException {
 		JobVariable jobVariable = getJobVariable(jid);
 		if (jobVariable != null) {
-			String[] vars = jobVariable.getEnabledVariables();
+			//only update when current set id contain in VariableInfo
+			String[] vars = jobVariable.getEnabledVariables(sid);
 			if (vars.length > 0) {
-				//only update when current set id contain in VariableInfo
-				if (containSetVar(jobVariable, sid, vars)) {
-					PCDIDebugModel debugModel = PTPDebugCorePlugin.getDebugModel();
-					IPCDISession session = debugModel.getPCDISession(jid);
-					if (session != null) {
-						int[] tasks = debugModel.getTasks(jid, sid).toArray();
-						monitor.beginTask("Updating variables value...", (tasks.length * vars.length + 1));
-						for (int i=0; i<tasks.length; i++) {
-							if (!monitor.isCanceled()) {
-								//check whether the process is terminated
-								IPProcess process = jobVariable.getJob().findProcessByTaskId(tasks[i]);
-								if (process != null && !process.isAllStop()) {
-									String[] valueText = new String[vars.length];
-									for (int j=0; j<vars.length; j++) {
-										valueText[j] = "<i>" + vars[j] + ": </i>" + debugModel.getValue(session, tasks[i], vars[j], monitor) + "<br>";
-									}
-									jobVariable.storeValues(new Integer(tasks[i]), valueText);
+				PCDIDebugModel debugModel = PTPDebugCorePlugin.getDebugModel();
+				IPCDISession session = debugModel.getPCDISession(jid);
+				if (session != null) {
+					int[] tasks = debugModel.getTasks(jid, sid).toArray();
+					monitor.beginTask("Updating variables value...", (tasks.length * vars.length + 1));
+					for (int i=0; i<tasks.length; i++) {
+						if (!monitor.isCanceled()) {
+							//check whether the process is terminated
+							IPProcess process = jobVariable.getJob().findProcessByTaskId(tasks[i]);
+							if (process != null && !process.isAllStop()) {
+								String[] valueText = new String[vars.length];
+								for (int j=0; j<vars.length; j++) {
+									valueText[j] = "<i>" + vars[j] + ": </i>" + debugModel.getValue(session, tasks[i], vars[j], monitor) + "<br>";
 								}
+								jobVariable.storeValues(new Integer(tasks[i]), valueText);
 							}
 						}
 					}
@@ -216,6 +210,18 @@ public final class PJobVariableManager {
 		public boolean hasVariables() {
 			return !variableList.isEmpty();
 		}
+		public String[] getEnabledVariables(String sid) {
+			List enVars = new ArrayList();
+			VariableInfo[] vars = getVariables();
+			for (int i=0; i<vars.length; i++) {
+				if (vars[i].isEnable()) {
+					if (vars[i].isSetExisted(sid)) {
+						enVars.add(vars[i].getVar());
+					}
+				}
+			}
+			return (String[])enVars.toArray(new String[0]);
+		}		
 		public String[] getEnabledVariables() {
 			List enVars = new ArrayList();
 			VariableInfo[] vars = getVariables();
