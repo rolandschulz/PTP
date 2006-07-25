@@ -304,6 +304,11 @@ public class PCDIDebugModel {
 		aJob.setPriority(Job.INTERACTIVE);
 		aJob.schedule();
 	}
+	/** Updating the set id of each breakpoint
+	 * @param set_id set id
+	 * @param monitor
+	 * @throws CoreException
+	 */
 	public void updatePBreakpoints(String set_id, IProgressMonitor monitor) throws CoreException {
 		try {
 			IBreakpoint[] breakpoints = getPBreakpoints();
