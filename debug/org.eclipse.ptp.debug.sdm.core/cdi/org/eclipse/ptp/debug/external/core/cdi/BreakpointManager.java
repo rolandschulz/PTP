@@ -378,6 +378,12 @@ public class BreakpointManager extends Manager implements IPCDIBreakpointManager
 						}
 					} catch (CoreException e) {
 						PTPDebugExternalPlugin.log(e.getStatus());
+						try {
+							//if the breakpoint cannot added to debugger, delete the UI breakpoint.
+							breakpoints[i].delete();
+						} catch (CoreException ce) {
+							ce.printStackTrace();
+						}
 					}
 				}
 			}
