@@ -42,9 +42,6 @@ public class PVariableContentProvider implements IStructuredContentProvider {
 		return new Object[0];
 	}
 
-	public void dispose() {
-	}
-
-	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-	}
+	public void dispose() {}
+	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
 }

@@ -26,16 +26,20 @@ import org.eclipse.debug.ui.AbstractDebugView;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.debug.internal.ui.UIDebugManager;
+import org.eclipse.ptp.debug.internal.ui.PJobVariableManager.VariableInfo;
 import org.eclipse.ptp.debug.internal.ui.actions.AddPExpressionAction;
 import org.eclipse.ptp.debug.internal.ui.actions.DeletePExpressionAction;
 import org.eclipse.ptp.debug.internal.ui.actions.EditPExpressionAction;
+import org.eclipse.ptp.debug.internal.ui.actions.UpdatePExpressionAction;
 import org.eclipse.ptp.debug.internal.ui.views.AbstractPDebugEventHandler;
 import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
@@ -51,10 +55,10 @@ import org.eclipse.ui.progress.WorkbenchJob;
 /**
  * @author Clement chu
  */
-public class PVariableView extends AbstractDebugView implements IJobChangedListener, ISetListener {
+public class PVariableView extends AbstractDebugView implements IJobChangedListener, ISetListener, ICheckStateListener {
 	private AbstractPDebugEventHandler fEventHandler;
 	private UIDebugManager uiManager = null;
-	private PVariableViewer viewer = null;
+	private PVariableCheckboxTableViewer viewer = null;
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.debug.ui.AbstractDebugView#createViewer(org.eclipse.swt.widgets.Composite)
@@ -63,12 +67,17 @@ public class PVariableView extends AbstractDebugView implements IJobChangedListe
 		uiManager = PTPDebugUIPlugin.getUIDebugManager();
 		
 		// add tree viewer
-		viewer = new PVariableViewer(parent, SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL);
-		viewer.setContentProvider(new PVariableContentProvider());
-		viewer.setLabelProvider(new PVariableLabelProvider());
+		viewer = new PVariableCheckboxTableViewer(parent, SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL);
+		PVariableContentProvider contentProvider = new PVariableContentProvider();
+		PVariableLabelProvider labelProvider = new PVariableLabelProvider();
+
+		viewer.setContentProvider(contentProvider);
+		viewer.setLabelProvider(labelProvider);
+		viewer.setCheckProvider(labelProvider);
 		viewer.setSorter(new PVariableViewerSorter());
 		viewer.setUseHashlookup(true);
 		viewer.setInput(uiManager.getJobVariableManager());
+		viewer.addCheckStateListener(this);
 	
 		viewer.addDoubleClickListener(new IDoubleClickListener() {
 		    public void doubleClick(DoubleClickEvent event) {
@@ -93,6 +102,7 @@ public class PVariableView extends AbstractDebugView implements IJobChangedListe
 	}
 	public void refresh() {
 		viewer.refresh();
+		updateActionsEnable();
 	}
 	public ISelection getSelection() {
 		return viewer.getSelection();
@@ -120,6 +130,7 @@ public class PVariableView extends AbstractDebugView implements IJobChangedListe
 		setAction(AddPExpressionAction.name, new AddPExpressionAction(this));
 		setAction(EditPExpressionAction.name, new EditPExpressionAction(this));
 		setAction(DeletePExpressionAction.name, new DeletePExpressionAction(this));
+		setAction(UpdatePExpressionAction.name, new UpdatePExpressionAction(this));
 
 		updateActionsEnable();
 	}
@@ -132,6 +143,7 @@ public class PVariableView extends AbstractDebugView implements IJobChangedListe
 		toolBarMgr.appendToGroup(IPTPDebugUIConstants.VAR_GROUP, getAction(AddPExpressionAction.name));		
 		toolBarMgr.appendToGroup(IPTPDebugUIConstants.VAR_GROUP, getAction(EditPExpressionAction.name));		
 		toolBarMgr.appendToGroup(IPTPDebugUIConstants.VAR_GROUP, getAction(DeletePExpressionAction.name));		
+		toolBarMgr.appendToGroup(IPTPDebugUIConstants.VAR_GROUP, getAction(UpdatePExpressionAction.name));		
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.debug.ui.AbstractDebugView#getHelpContextId()
@@ -147,6 +159,7 @@ public class PVariableView extends AbstractDebugView implements IJobChangedListe
 		menu.add(getAction(AddPExpressionAction.name));
 		menu.add(getAction(EditPExpressionAction.name));
 		menu.add(getAction(DeletePExpressionAction.name));
+		menu.add(getAction(UpdatePExpressionAction.name));
 		updateObjects();
 	}
 	/* (non-Javadoc)
@@ -155,6 +168,7 @@ public class PVariableView extends AbstractDebugView implements IJobChangedListe
 	public void dispose() {
 		uiManager.removeSetListener(this);
 		uiManager.removeJobChangedListener(this);
+		viewer.removeCheckStateListener(this);
 		super.dispose();
 		if (getEventHandler() != null) {
 			getEventHandler().dispose();
@@ -189,6 +203,9 @@ public class PVariableView extends AbstractDebugView implements IJobChangedListe
 		}
 		updateActionsEnable();
 	}
+	private boolean isEmpty() {
+		return (viewer.getTable().getItemCount()==0);
+	}
 	private boolean isCurrentJobAvailable() {
 		String cur_jid = uiManager.getCurrentJobId();
 		return (cur_jid != null && cur_jid.length() > 0);		
@@ -197,6 +214,7 @@ public class PVariableView extends AbstractDebugView implements IJobChangedListe
 		getAction(AddPExpressionAction.name).setEnabled(isCurrentJobAvailable());
 		getAction(EditPExpressionAction.name).setEnabled(!getSelection().isEmpty());
 		getAction(DeletePExpressionAction.name).setEnabled(!getSelection().isEmpty());
+		getAction(UpdatePExpressionAction.name).setEnabled(!isEmpty());
 	}
 	public void deleteSetEvent(IElementSet set) {
 		refresh();
@@ -205,4 +223,14 @@ public class PVariableView extends AbstractDebugView implements IJobChangedListe
 	public void createSetEvent(IElementSet set, IElement[] elements) {}
 	public void addElementsEvent(IElementSet set, IElement[] elements) {}
 	public void removeElementsEvent(IElementSet set, IElement[] elements) {}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.ICheckStateListener#checkStateChanged(org.eclipse.jface.viewers.CheckStateChangedEvent)
+	 */
+	public void checkStateChanged(CheckStateChangedEvent event) {
+		Object data = event.getElement();
+		if (data instanceof VariableInfo) {
+			((VariableInfo)data).setEnable(event.getChecked());
+		}
+	}
 }

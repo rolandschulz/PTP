@@ -241,7 +241,7 @@ public class PVariableDialog extends Dialog {
 			if (varInfo != null) {
 				item.setChecked(varInfo.getVar().equals(vars[i]));
 			}
-		}
+		}		
 	}
 	/** Get variables from Debug View
 	 * @return variable names
@@ -306,7 +306,7 @@ public class PVariableDialog extends Dialog {
 			getOkButton().setText("Edit");
 			break;
 		}
-		getOkButton().setEnabled(false);
+		updateButtons();
 		return control;
 	}
 	/* (non-Javadoc)
