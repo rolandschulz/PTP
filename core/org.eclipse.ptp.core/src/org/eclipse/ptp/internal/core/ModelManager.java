@@ -20,23 +20,18 @@ package org.eclipse.ptp.internal.core;
 
 import java.text.DateFormat;
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Preferences;
-import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
-import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.debug.internal.core.DebugCoreMessages;
+import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.ptp.core.AttributeConstants;
 import org.eclipse.ptp.core.ControlSystemChoices;
 import org.eclipse.ptp.core.IModelListener;
@@ -78,9 +73,9 @@ import org.eclipse.ptp.rtsystem.simulation.SimulationControlSystem;
 import org.eclipse.ptp.rtsystem.simulation.SimulationMonitoringSystem;
 
 public class ModelManager implements IModelManager, IRuntimeListener {
-	protected List modelListeners = new ArrayList();
-	protected List nodeListeners = new ArrayList();
-	protected List processListeners = new ArrayList();
+	protected ListenerList modelListeners = new ListenerList();
+	protected ListenerList nodeListeners = new ListenerList();
+	protected ListenerList processListeners = new ListenerList();
 
 	// protected IPMachine machine = null;
 	protected IPJob processRoot = null;
@@ -710,64 +705,55 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			runtimeProxy.shutdown();
 	}
 	public void addNodeListener(INodeListener listener) {
-		if (!nodeListeners.contains(listener))
-			nodeListeners.add(listener);
+		nodeListeners.add(listener);
 	}
 	public void removeNodeListener(INodeListener listener) {
-		if (nodeListeners.contains(listener))
-			nodeListeners.remove(listener);
+		nodeListeners.remove(listener);
 	}
 	public void addProcessListener(IProcessListener listener) {
-		if (!processListeners.contains(listener))
-			processListeners.add(listener);
+		processListeners.add(listener);
 	}
 	public void removeProcessListener(IProcessListener listener) {
-		if (processListeners.contains(listener))
-			processListeners.remove(listener);
+		processListeners.remove(listener);
 	}
 	public void addModelListener(IModelListener listener) {
-		if (!modelListeners.contains(listener))
-			modelListeners.add(listener);
+		modelListeners.add(listener);
 	}
 	public void removeModelListener(IModelListener listener) {
-		if (modelListeners.contains(listener))
-			modelListeners.remove(listener);
+		modelListeners.remove(listener);
 	}
 	public void fireEvent(final IProcessEvent event) {
-		SafeRunner.run(new ISafeRunnable() {
-			public void handleException(Throwable exception) {
-				DebugPlugin.log(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, "Exception in ProcessEvent notifier", exception));
-			}
-			public void run() {
-				for (Iterator i=processListeners.iterator(); i.hasNext();) {
-					((IProcessListener)i.next()).processEvent(event);
-				}
-			}
-		});
+        Object[] array = processListeners.getListeners();
+        for (int i = 0; i < array.length; i++) {
+            final IProcessListener l = (IProcessListener) array[i];
+            SafeRunnable.run(new SafeRunnable() {
+                public void run() {
+                    l.processEvent(event);
+                }
+            });
+        }
 	}
 	public void fireEvent(final INodeEvent event) {
-		SafeRunner.run(new ISafeRunnable() {
-			public void handleException(Throwable exception) {
-				DebugPlugin.log(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, "Exception in NodeEvent notifier", exception));
-			}
-			public void run() {
-				for (Iterator i=nodeListeners.iterator(); i.hasNext();) {
-					((INodeListener)i.next()).nodeEvent(event);
-				}
-			}
-		});
+        Object[] array = nodeListeners.getListeners();
+        for (int i = 0; i < array.length; i++) {
+            final INodeListener l = (INodeListener) array[i];
+            SafeRunnable.run(new SafeRunnable() {
+                public void run() {
+                    l.nodeEvent(event);
+                }
+            });
+        }
 	}	
 	public void fireEvent(final IModelEvent event) {
-		SafeRunner.run(new ISafeRunnable() {
-			public void handleException(Throwable exception) {
-				DebugPlugin.log(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, "Exception in ModelEvent notifier", exception));
-			}
-			public void run() {
-				for (Iterator i=modelListeners.iterator(); i.hasNext();) {
-					((IModelListener)i.next()).modelEvent(event);
-				}
-			}
-		});
+        Object[] array = modelListeners.getListeners();
+        for (int i = 0; i < array.length; i++) {
+            final IModelListener l = (IModelListener) array[i];
+            SafeRunnable.run(new SafeRunnable() {
+                public void run() {
+                    l.modelEvent(event);
+                }
+            });
+        }
 	}
 	/*
 	protected synchronized void fireState(int state, String arg) {

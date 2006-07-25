@@ -20,7 +20,7 @@ package org.eclipse.ptp.ui.views;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.eclipse.core.runtime.SafeRunner;
+import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.ISelection;
@@ -42,7 +42,7 @@ import org.eclipse.swt.widgets.Event;
  */
 public class ElementIconCanvas extends IconCanvas implements ISelectionProvider {
 	private IElementSet cur_element_set = null;
-	private List listeners = new ArrayList();
+	private ListenerList listeners = new ListenerList();
 	private ISelection selection = null; 
 
 	/** Constructor
@@ -66,12 +66,10 @@ public class ElementIconCanvas extends IconCanvas implements ISelectionProvider 
 	}
 
     public void addSelectionChangedListener(ISelectionChangedListener listener) {
-    	if (!listeners.contains(listener))
-    		listeners.add(listener);
+   		listeners.add(listener);
     }
     public void removeSelectionChangedListener(ISelectionChangedListener listener) {
-    	if (listeners.contains(listener))
-    		listeners.remove(listener);
+   		listeners.remove(listener);
     }	
 	/** Change set
 	 * @param e_set
@@ -127,17 +125,16 @@ public class ElementIconCanvas extends IconCanvas implements ISelectionProvider 
     }
     public void setSelection(ISelection selection) {
     	this.selection = selection;
-        final SelectionChangedEvent e = new SelectionChangedEvent(this, selection);
-        Object[] listenersArray = listeners.toArray();
-        
-        for (int i = 0; i < listenersArray.length; i++) {
-            final ISelectionChangedListener l = (ISelectionChangedListener) listenersArray[i];
-            SafeRunner.run(new SafeRunnable() {
+        final SelectionChangedEvent e = new SelectionChangedEvent(ElementIconCanvas.this, selection);
+        Object[] array = listeners.getListeners();
+        for (int i = 0; i < array.length; i++) {
+            final ISelectionChangedListener l = (ISelectionChangedListener) array[i];
+            SafeRunnable.run(new SafeRunnable() {
                 public void run() {
                     l.selectionChanged(e);
                 }
             });
-		}    	
+        }
     }
 	protected void handleMouseUp(Event event) {
 		super.handleMouseUp(event);

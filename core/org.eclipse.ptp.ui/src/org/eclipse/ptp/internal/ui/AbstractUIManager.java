@@ -19,14 +19,12 @@
 package org.eclipse.ptp.internal.ui;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.ISafeRunnable;
+import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.ptp.core.IModelPresentation;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPUniverse;
@@ -48,19 +46,14 @@ import org.eclipse.ui.PlatformUI;
 public abstract class AbstractUIManager implements IManager {
 	protected IModelPresentation modelPresentation = null;
 	protected String cur_set_id = EMPTY_ID;
-	protected List setListeners = new ArrayList(0);
-	protected List jListeners = new ArrayList();
+	protected ListenerList setListeners = new ListenerList();
+	protected ListenerList jListeners = new ListenerList();
 
 	/** Constructor 
 	 * 
 	 */
 	public AbstractUIManager() {
 		modelPresentation = PTPCorePlugin.getDefault().getModelPresentation();
-	}
-	protected abstract class SafeNotifier implements ISafeRunnable {
-		public void handleException(Throwable ex) {
-			PTPUIPlugin.log(ex);
-		}
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#shutdown()
@@ -75,23 +68,22 @@ public abstract class AbstractUIManager implements IManager {
 	 * @see org.eclipse.ptp.ui.IManager#addSetListener(org.eclipse.ptp.ui.listeners.ISetListener)
 	 */
 	public void addSetListener(ISetListener setListener) {
-		if (!setListeners.contains(setListener))
-			setListeners.add(setListener);
+		setListeners.add(setListener);
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#removeSetListener(org.eclipse.ptp.ui.listeners.ISetListener)
 	 */
 	public void removeSetListener(ISetListener setListener) {
-		if (setListeners.contains(setListener))
-			setListeners.remove(setListener);
+		setListeners.remove(setListener);
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#fireEvent(int, org.eclipse.ptp.ui.model.IElement[], org.eclipse.ptp.ui.model.IElementSet, org.eclipse.ptp.ui.model.IElementSet)
 	 */
 	public void fireSetEvent(final int eventType, final IElement[] elements, final IElementSet cur_set, final IElementSet pre_set) {
-		for (Iterator i = setListeners.iterator(); i.hasNext();) {
-			final ISetListener setListener = (ISetListener) i.next();
-			SafeRunner.run(new SafeNotifier() {
+        Object[] array = setListeners.getListeners();
+        for (int i = 0; i < array.length; i++) {
+            final ISetListener setListener = (ISetListener) array[i];
+			SafeRunner.run(new SafeRunnable() {
 				public void run() {
 					switch (eventType) {
 					case CREATE_SET_TYPE:
@@ -118,23 +110,22 @@ public abstract class AbstractUIManager implements IManager {
 	 * @see org.eclipse.ptp.ui.IManager#addJobListener(org.eclipse.ptp.ui.listeners.IJobListener)
 	 */
 	public void addJobChangedListener(IJobChangedListener jobListener) {
-		if (!jListeners.contains(jobListener))
-			jListeners.add(jobListener);
+		jListeners.add(jobListener);
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#removeJobListener(org.eclipse.ptp.ui.listeners.IJobListener)
 	 */
 	public void removeJobChangedListener(IJobChangedListener jobListener) {
-		if (jListeners.contains(jobListener))
-			jListeners.remove(jobListener);
+		jListeners.remove(jobListener);
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#fireJobListener(int, java.lang.String, java.lang.String)
 	 */
 	public void fireJobChangedEvent(final int type, final String cur_job_id, final String pre_job_id) {
-		for (Iterator i = jListeners.iterator(); i.hasNext();) {
-			final IJobChangedListener listener = (IJobChangedListener)i.next();
-			SafeRunner.run(new SafeNotifier() {
+        Object[] array = jListeners.getListeners();
+        for (int i = 0; i<array.length; i++) {
+			final IJobChangedListener listener = (IJobChangedListener)array[i];
+			SafeRunner.run(new SafeRunnable() {
 				public void run() {
 					listener.jobChangedEvent(type, cur_job_id, pre_job_id);
 				}
