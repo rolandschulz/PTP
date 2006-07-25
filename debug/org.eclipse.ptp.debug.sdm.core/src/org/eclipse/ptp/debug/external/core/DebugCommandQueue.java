@@ -54,14 +54,11 @@ public class DebugCommandQueue extends Thread {
 			}
 			try {
 				currentCommand = getCommand();
-				System.err.println("*** SEND COMMAND: " + currentCommand.getName() + ", tasks: " + debugger.showBitList(currentCommand.getTasks()));
+System.err.println("*** SEND COMMAND: " + currentCommand.getName() + ", tasks: " + debugger.showBitList(currentCommand.getTasks()));
 				currentCommand.execCommand(debugger, command_timeout);
 			} catch (PCDIException e) {
-				System.err.println("*** ERROR COMMAND ***");
-				if (currentCommand != null) {
-					debugger.handleErrorEvent(currentCommand.getTasks(), e.getMessage(), e.getErrorCode());
-					currentCommand.doFlush();
-				}
+				debugger.handleErrorEvent(currentCommand.getTasks(), e.getMessage(), e.getErrorCode());
+				currentCommand.doFlush();
 			}
 			finally {
 				currentCommand = null;
@@ -110,7 +107,7 @@ public class DebugCommandQueue extends Thread {
 				queue.notifyAll();
 			}
 			else {
-				//debugger.handleErrorEvent(command.getTasks(), "Duplicate in " + command.getName() + " command", IPCDIErrorEvent.DBG_WARNING);
+				//TODO how to deal with duplicate command
 				System.err.println("************ ERROR in DebugCommandQueue -- duplicate, cmd: " + currentCommand);
 			}
 		}
