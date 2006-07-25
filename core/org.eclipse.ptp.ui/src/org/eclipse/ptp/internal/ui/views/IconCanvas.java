@@ -20,14 +20,13 @@ package org.eclipse.ptp.internal.ui.views;
 
 import java.io.File;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.ptp.internal.ui.hover.IconHover;
 import org.eclipse.ptp.ui.hover.IIconInformationControl;
 import org.eclipse.ptp.ui.views.IContentProvider;
@@ -71,7 +70,7 @@ public class IconCanvas extends Canvas {
 	public final static int SW = 2;
 	public final static int NW = 3;
 	public final static int NE = 4;
-	protected List actionListeners = new ArrayList();
+	protected ListenerList actionListeners = new ListenerList();
 	protected IToolTipProvider toolTipProvider = null;
 	protected IImageProvider imageProvider = null;
 	protected IContentProvider contentProvider = null;
@@ -178,36 +177,43 @@ public class IconCanvas extends Canvas {
 	 * @param actionListener
 	 */
 	public void addActionListener(IIconCanvasActionListener actionListener) {
-		if (!actionListeners.contains(actionListener)) {
-			actionListeners.add(actionListener);
-		}
+		actionListeners.add(actionListener);
 	}
 	/** Remove action listener
 	 * @param actionListener
 	 */
 	public void removeActionListener(IIconCanvasActionListener actionListener) {
-		if (actionListeners.contains(actionListener)) {
-			actionListeners.remove(actionListener);
-		}
+		actionListeners.remove(actionListener);
 	}
 	/** Fire action
 	 * @param type type of action
 	 */
-	protected void fireAction(int type) {
-		int[] indexes = getSelectedIndexes();
-		for (Iterator i = actionListeners.iterator(); i.hasNext();) {
-			((IIconCanvasActionListener) i.next()).handleAction(type, indexes);
-		}
+	protected void fireAction(final int type) {
+        Object[] array = actionListeners.getListeners();
+        for (int i = 0; i < array.length; i++) {
+            final IIconCanvasActionListener l = (IIconCanvasActionListener) array[i];
+            SafeRunnable.run(new SafeRunnable() {
+                public void run() {
+                    l.handleAction(type, getSelectedIndexes());
+                }
+            });
+        }
 	}
 	/** Fire action
 	 * @param type type of action
 	 * @param index element index
 	 */
-	protected void fireAction(int type, int index) {
+	protected void fireAction(final int type, final int index) {
 		if (index > -1) {
-			for (Iterator i = actionListeners.iterator(); i.hasNext();) {
-				((IIconCanvasActionListener) i.next()).handleAction(type, index);
-			}
+	        Object[] array = actionListeners.getListeners();
+	        for (int i = 0; i < array.length; i++) {
+	            final IIconCanvasActionListener l = (IIconCanvasActionListener) array[i];
+	            SafeRunnable.run(new SafeRunnable() {
+	                public void run() {
+	                    l.handleAction(type, index);
+	                }
+	            });
+	        }
 		}
 	}
 	/** Reset canvas setting
