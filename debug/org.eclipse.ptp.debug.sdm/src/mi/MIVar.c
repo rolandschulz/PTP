@@ -189,6 +189,29 @@ MIGetVarEvaluateExpressionInfo(MICommand *cmd)
 }
 
 char *
+MIGetDataEvaluateExpressionInfo(MICommand *cmd)
+{
+	MIValue *		value;
+	MIResult *		result;
+	MIResultRecord *	rr;
+	char *			expr = NULL;
+
+	if (!cmd->completed || cmd->output == NULL || cmd->output->rr == NULL)
+		return NULL;
+
+	rr = cmd->output->rr;
+	for (SetList(rr->results); (result = (MIResult *)GetListElement(rr->results)) != NULL; ) {
+		value = result->value;
+		if (strcmp(result->variable, "value") == 0) {
+			if (value->type == MIValueTypeConst) {
+				expr = strdup(value->cstring);
+			}
+		}
+	}
+	return expr;
+}
+
+char *
 MIGetDetailsType(MICommand *cmd) {
 	List *oobs;
 	MIOOBRecord *oob;

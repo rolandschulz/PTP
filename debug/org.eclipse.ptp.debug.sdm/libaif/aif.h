@@ -386,7 +386,7 @@ extern AIF *		UnsignedLongToAIF(unsigned long);
 extern AIF *		UnsignedLongLongToAIF(unsigned long long);
 #endif /* CC_HAS_LONG_LONG */
 extern AIF *		VoidToAIF(char *, int);
-extern AIF *		AddressToAIF(char *);
+extern AIF *		AddressToAIF(char *, int);
 
 #endif /* !_AIF_H */
 

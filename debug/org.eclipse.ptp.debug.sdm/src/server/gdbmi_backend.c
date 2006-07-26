@@ -1273,18 +1273,33 @@ GetVarValue(char *var)
 	MICommand *	cmd = MIVarEvaluateExpression(var);
 	
 	SendCommandWait(DebugSession, cmd);
-	
 	if (!MICommandResultOK(cmd)) {
 		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
 		MICommandFree(cmd);
 		return NULL;
 	}
-		
-	res = MIGetVarEvaluateExpressionInfo(cmd);
-	
+	res = MIGetVarEvaluateExpressionInfo(cmd);	
 	MICommandFree(cmd);
 	
 	return res;
+}
+
+static int
+GetAddressLength()
+{
+	char * res;
+	
+	MICommand * cmd = MIDataEvaluateExpression("\"sizeof(char *)\"");
+	SendCommandWait(DebugSession, cmd);
+	if (!MICommandResultOK(cmd)) {
+		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
+		MICommandFree(cmd);
+		return NULL;
+	}
+	res = MIGetDataEvaluateExpressionInfo(cmd);	
+	MICommandFree(cmd);
+	
+	return atoi(res);
 }
 
 static char * 
@@ -1314,6 +1329,12 @@ SimpleVarToAIF(char *exp, MIVar *var)
 	if (var->type[len - 1] == ')') { /* function */
 		return MakeAIF("&/is4", exp);
 	} 
+
+	if (strcmp(var->type, "char *") == 0) { /* void pointer */
+		if ((res = GetVarValue(var->name)) != NULL) {
+			return GetAIFPointer(res, CharPointerToAIF(res));			
+		}
+	}
 	
 	if (strcmp(var->type, "void *") == 0) { /* void pointer */
 		av = VoidToAIF(0, 0);
@@ -1563,9 +1584,9 @@ GetAIFPointer(char *res, AIF *i)
 			*p = '\0';
 		}
 		res += 2; //skip 0x
-		address = AddressToAIF(res);
+		address = AddressToAIF(res, GetAddressLength());
 	}
-	return PointerToAIF(address, i);	
+	return PointerToAIF(address, i);
 }
 
 static AIF *
@@ -1622,11 +1643,13 @@ ComplexVarToAIF(char *exp, MIVar *var, int named)
 			a = CreateStruct(var, named);
 		} else if (strncmp(type, "union", 5) == 0) {
 			a = CreateUnion(var, named);
+		} else if (strncmp(type, "char *", 6) == 0) {//char pointer
+			a = CharPointerToAIF(res);
 		} else { //other types
 			p = strchr(type, '*');
 			p--;
 			*p = '\0';
-			if ((type_id = getSimpleTypeID(type, exp)) > -1) { //simple type including char *
+			if ((type_id = getSimpleTypeID(type, exp)) > -1) { //simple type
 				a = GetPrimitiveTypeToAIF(type_id, res);
 			}
 			else {
