@@ -356,6 +356,32 @@ PointerToAIF(AIF *addr, AIF *i)
 	return a;
 }
 
+AIF *
+CharPointerToAIF(char *i)
+{
+	AIF *	a;
+	int	length = strlen(i);
+
+	if ( length > 1 << (2 * BITSPERBYTE) )
+	{
+		SetAIFError(AIFERR_STRING, NULL);
+		return (AIF *)NULL;
+	}
+
+	ResetAIFError();
+
+	a = NewAIF(0, length+2);
+
+	AIF_FORMAT(a) = strdup(AIF_STRING_TYPE());
+
+	(AIF_DATA(a))[0] = (length >> 8) & 0xff;
+	(AIF_DATA(a))[1] = length & 0xff;
+
+	strncpy(AIF_DATA(a)+2, i, length);
+
+	return a;
+}
+
 /*
  * Convert a string (defined as a pointer to a null terminated array
  * of characters) to AIF format.
@@ -402,7 +428,20 @@ ByteToHex(char *out_string, char *in_string, int in_size)
 		*out_string++ = hexchars[ ch & 0xf]; /* [c%16]; */
 	}
 }
-
+/* Get default address format with size
+ * 
+ */
+static char * 
+GetDefaultAddress(int size)
+{
+	int i;
+	char addr[size];
+	
+	for (i=0; i<size; i++) {
+		addr[i] = '0';
+	}
+	return strdup(addr);
+}
 /* Converts hexadecimal display to binary. String length is used
  * and only hexadecimal pairs are handled.
  */
@@ -413,9 +452,10 @@ HexToByte(char *out_string, char *in_string, int in_size)
 	int h_value, c_value;
 	int byte_val = 0;
 	int in_len, def_len = 0;
-	char def_input[] = "00000000";
 	char *input;
-
+	char *def_input;
+	
+	def_input = GetDefaultAddress(in_size * 2);
 	if (in_size%2 != 0) {
 		out_string = strdup(def_input);
 		return;
@@ -436,7 +476,7 @@ HexToByte(char *out_string, char *in_string, int in_size)
 	input = strdup(def_input);
 	for (i=0; i<(in_size*2); i++) {
 		if ((h_value = *input++) >= '0' && h_value <= '9')
-			c_value = h_value -'0';
+			c_value = h_value - '0';
 		else
 			(c_value = 10 + (h_value & 0xf) - ('a' & 0xf));
 
@@ -446,30 +486,27 @@ HexToByte(char *out_string, char *in_string, int in_size)
 			*out_string++ = byte_val + c_value;
 	}
 }
-
 /*
  * Convert an address (defined as a pointer to a null terminated array
  * of characters) to AIF format.
  */
 AIF *
-AddressToAIF(char *addr)
+AddressToAIF(char *addr, int len)
 {
-	AIF *	a;
-	int in_size;
-	char *buf;
+	AIF * a;
+	char * buf;
 	
 	if (addr == NULL) {
-		addr = strdup("00000000");
+		addr = GetDefaultAddress(len * 2);
 	}
-	in_size = sizeof(addr);
-	buf = _aif_alloc(in_size);
+	buf = _aif_alloc(len);
 
-	a = NewAIF(0, in_size);
-	AIF_FORMAT(a) = strdup(AIF_ADDRESS_TYPE(in_size));
+	a = NewAIF(0, len);
+	AIF_FORMAT(a) = strdup(AIF_ADDRESS_TYPE(len));
 
 	//memcpy(AIF_DATA(a), &addr, in_size);
-	HexToByte(buf, addr, in_size);
-	memcpy(AIF_DATA(a), buf, in_size);
+	HexToByte(buf, addr, len);
+	memcpy(AIF_DATA(a), buf, len);
 	//char *hex;
 	//hex = _aif_alloc(in_size);
 	//ByteToHex(hex, AIF_DATA(a), in_size);
