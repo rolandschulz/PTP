@@ -435,8 +435,9 @@ static char *
 GetDefaultAddress(int size)
 {
 	int i;
-	char addr[size];
+	char *addr;
 	
+	addr = malloc(size);
 	for (i=0; i<size; i++) {
 		addr[i] = '0';
 	}
