@@ -435,12 +435,16 @@ static char *
 GetDefaultAddress(int size)
 {
 	int i;
-	char *addr;
-	
-	addr = malloc(size);
+	const char *pattern = "00";
+	char *addr = (char *)malloc(size*2 + 1);
+	//char addr[size*2];
+	//addr[0] = '\0';
+
 	for (i=0; i<size; i++) {
-		addr[i] = '0';
+		memcpy(&addr[i*2], pattern, 2);
+		//strcat(addr, pattern);
 	}
+	addr[size*2] = '\0';
 	return strdup(addr);
 }
 /* Converts hexadecimal display to binary. String length is used
@@ -456,7 +460,7 @@ HexToByte(char *out_string, char *in_string, int in_size)
 	char *input;
 	char *def_input;
 	
-	def_input = GetDefaultAddress(in_size * 2);
+	def_input = GetDefaultAddress(in_size);
 	if (in_size%2 != 0) {
 		out_string = strdup(def_input);
 		return;
@@ -498,21 +502,23 @@ AddressToAIF(char *addr, int len)
 	char * buf;
 	
 	if (addr == NULL) {
-		addr = GetDefaultAddress(len * 2);
+		addr = GetDefaultAddress(len);
 	}
-	buf = _aif_alloc(len);
 
 	a = NewAIF(0, len);
 	AIF_FORMAT(a) = strdup(AIF_ADDRESS_TYPE(len));
 
 	//memcpy(AIF_DATA(a), &addr, in_size);
+	buf = _aif_alloc(len);
 	HexToByte(buf, addr, len);
+/*
+	char *hex;
+	hex = _aif_alloc(len);
+	ByteToHex(hex, buf, len);
+	printf("---- Address hex: %s, %i\n", hex, len);
+	free(hex);
+*/
 	memcpy(AIF_DATA(a), buf, len);
-	//char *hex;
-	//hex = _aif_alloc(in_size);
-	//ByteToHex(hex, AIF_DATA(a), in_size);
-	//printf("---- Address hex: %s\n", hex);
-	//free(hex);
 	free(buf);
 	return a;
 }
