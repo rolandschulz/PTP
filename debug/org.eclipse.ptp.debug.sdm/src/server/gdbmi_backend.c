@@ -118,6 +118,7 @@ static AIF* CreateNamed(AIF*, int);
 static char * GetPtypeValue(char *);
 static AIF * ComplexVarToAIF(char *, MIVar *, int);
 static AIF * GetAIFPointer(char *res, AIF *a);
+static int GetAddressLength();
 
 dbg_backend_funcs	GDBMIBackend =
 {
@@ -1294,7 +1295,7 @@ GetAddressLength()
 	if (!MICommandResultOK(cmd)) {
 		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
 		MICommandFree(cmd);
-		return NULL;
+		return 0;
 	}
 	res = MIGetDataEvaluateExpressionInfo(cmd);	
 	MICommandFree(cmd);
