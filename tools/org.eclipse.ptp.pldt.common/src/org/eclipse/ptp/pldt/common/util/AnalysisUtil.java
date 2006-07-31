@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2005 IBM Corporation.
+ * Copyright (c) 2005,2006 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,60 +24,59 @@ import org.eclipse.core.runtime.content.IContentType;
  * 
  * 
  */
-public class AnalysisUtil
-{
-    /**
-     * 
-     */
-    private AnalysisUtil()
-    {
-        super();
-    }
+public class AnalysisUtil {
+ 
+	private AnalysisUtil() {
+		super();
+	}
 
-    /**
-     * Is the given filename a valid file for analysis processing? <br>
-     * Currently this means, is it a .c or .cpp etc file?
-     * 
-     * @param filename
-     * @return
-     */
-    public static boolean validForAnalysis(String filename)
-    {
-        int loc = filename.lastIndexOf(".");
-        if (loc <= 0) // if no dot, or filename is ".foo", not valid for analysis.
-            return false;
-        String ext = filename.substring(loc + 1);
-        ext = ext.toLowerCase();
-        boolean result = true;
-        if (ext.startsWith("c"))
-            result = true;
-        else result = false;
-        return result;
-    }
+	/**
+	 * Is the given filename a valid file for analysis processing? <br>
+	 * Currently this means, is it a .c or .cpp etc file? <br>
+	 * Don't pollute this with fortran info - currently fortran processing is in
+	 * a completely different action.
+	 * 
+	 * @param filename
+	 * @return
+	 */
+	public static boolean validForAnalysis(String filename) {
+		int loc = filename.lastIndexOf(".");
+		if (loc <= 0) // if no dot, or filename is ".foo", not valid for
+						// analysis.
+			return false;
+		String ext = filename.substring(loc + 1);
+		ext = ext.toLowerCase();
+		boolean result = true;
+		if (ext.startsWith("c")/* ||ext.startsWith("f") */) // c or fortran
+			result = true;
+		else
+			result = false;
+		return result;
+	}
 
+	/**
+	 * Given a C/C++ source, decide if it is C or C++.
+	 * 
+	 * @param file
+	 *            must be either C or CPP file
+	 * @return
+	 */
+	public static ParserLanguage getLanguageFromFile(IFile file) {
+		if (file == null) { // assume CPP
+			return ParserLanguage.CPP;
+		}
 
-    /**
-     * Given a C/C++ source, decide if it is C or C++.
-     * @param file must be either C or CPP file
-     * @return
-     */
-    public static ParserLanguage getLanguageFromFile(IFile file)
-    {
-        if (file == null) { // assume CPP
-            return ParserLanguage.CPP;
-        }
+		IProject project = file.getProject();
+		String lid = null;
+		IContentType type = CCorePlugin.getContentType(project, file.getFullPath().lastSegment());
+		if (type != null) {
+			lid = type.getId();
+		}
+		if (lid != null
+				&& (lid.equals(CCorePlugin.CONTENT_TYPE_CXXSOURCE) || lid.equals(CCorePlugin.CONTENT_TYPE_CXXHEADER))) {
+			return ParserLanguage.CPP;
+		}
 
-        IProject project = file.getProject();
-        String lid = null;
-        IContentType type = CCorePlugin.getContentType(project, file.getFullPath().lastSegment());
-        if (type != null) {
-            lid = type.getId();
-        }
-        if (lid != null
-                && (lid.equals(CCorePlugin.CONTENT_TYPE_CXXSOURCE) || lid.equals(CCorePlugin.CONTENT_TYPE_CXXHEADER))) {
-            return ParserLanguage.CPP;
-        }
-
-        return ParserLanguage.C;
-    }
+		return ParserLanguage.C;
+	}
 }
