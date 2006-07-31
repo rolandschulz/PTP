@@ -13,7 +13,8 @@
                id="org.eclipse.ptp.pldt.fortran.mpi.action1"
                label="Run MPI Fortran Analysis"
                style="push"
-               toolbarPath="mpiFtoolbarGroup"/>
+               toolbarPath="mpiFtoolbarGroup"
+               tooltip="Run MPI Fortran Analysis"/>
          <action
                icon="icons/sample.gif"
                id="org.eclipse.ptp.pldt.fortran.mpi.action2"
