@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.actionSets">
+      <actionSet
+            id="org.eclipse.ptp.pldt.fortran.mpi.actionSet1"
+            label="MPI Fortran Action Set"
+            visible="true">
+         <action
+               class="org.eclipse.ptp.pldt.fortran.mpi.actions.RunAnalyseFortranMPI"
+               icon="icons/sample.gif"
+               id="org.eclipse.ptp.pldt.fortran.mpi.action1"
+               label="Run MPI Fortran Analysis"
+               style="push"
+               toolbarPath="mpiFtoolbarGroup"/>
+         <action
+               icon="icons/sample.gif"
+               id="org.eclipse.ptp.pldt.fortran.mpi.action2"
+               label="Remove markers"
+               style="push"/>
+         <menu
+               id="mpiFmenu"
+               label="Fortran MPI Artifacts ">
+            <separator name="mpiFgroup"/>
+         </menu>
+      </actionSet>
+   </extension>
+
+</plugin>

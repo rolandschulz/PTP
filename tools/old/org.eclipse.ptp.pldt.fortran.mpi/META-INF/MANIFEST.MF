@@ -1,0 +1,19 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Fortran Mpi Plug-in
+Bundle-SymbolicName: org.eclipse.ptp.pldt.fortran.mpi;singleton:=true
+Bundle-Version: 1.0.0
+Bundle-Activator: org.eclipse.ptp.pldt.fortran.mpi.Activator
+Bundle-Localization: plugin
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.photran.core,
+ org.eclipse.photran.refactoring,
+ org.eclipse.core.resources,
+ org.eclipse.jface.text,
+ org.eclipse.ptp.pldt.common,
+ org.eclipse.cdt.core,
+ org.eclipse.cdt.ui
+Eclipse-LazyStart: true
+Import-Package: org.eclipse.core.filebuffers
+Export-Package: org.eclipse.ptp.pldt.fortran.mpi
