@@ -107,7 +107,8 @@ public class IconCanvas extends Canvas {
 	protected Color background = null;
 	protected Color foreground = null;
 	//font
-	protected final int font_size = 9;
+	protected final int DEFAULT_FONT_SIZE = 9;
+	protected int font_size = DEFAULT_FONT_SIZE;
 	//margin
 	protected final int margin_text = 2;
 	protected Color margin_color = null;
@@ -229,6 +230,7 @@ public class IconCanvas extends Canvas {
 		tempSelectedElements.clear();
 		resetMargin();
 		resetInfo();
+		getVerticalBar().setSelection(0);
 		calculateVerticalScrollBar();
 		redraw();
 	}
@@ -291,6 +293,19 @@ public class IconCanvas extends Canvas {
 		else {
 			e_offset_x = DEFAULT_OFFSET;
 		}
+	}
+	public void setFontSizeSmaller() {
+		setFontSize(font_size-1);
+	}
+	public void setFontSizeBigger() {
+		setFontSize(font_size+1);
+	}
+	public void setFontSize(int fontSize) {
+		if (fontSize < 5) {
+			SWT.error(SWT.ERROR_NULL_ARGUMENT);
+		}
+		this.font_size = fontSize;
+		changeFontSize(getDisplay());
 	}
 	/** Set icon spacing
 	 * @param e_spacing_x
@@ -2136,8 +2151,8 @@ public class IconCanvas extends Canvas {
 
 		//File normalFile = new File("D:/eclipse3.1/workspace/org.eclipse.ptp.ui/icons/node/node_running.gif");
 		//File selectedFile = new File("D:/eclipse3.1/workspace/org.eclipse.ptp.ui/icons/node/node_running_sel.gif");
-		File normalFile = new File("/home/clement/eclipse3.1.1/workspace/org.eclipse.ptp.ui/icons/node/node_running.gif");
-		File selectedFile = new File("/home/clement/eclipse3.1.1/workspace/org.eclipse.ptp.ui/icons/node/node_running_sel.gif");
+		File normalFile = new File("/home/Clement/eclipse/workspace/org.eclipse.ptp.ui/icons/node/node_running.gif");
+		File selectedFile = new File("/home/Clement/eclipse/workspace/org.eclipse.ptp.ui/icons/node/node_running_sel.gif");
 		
 		URL normalURL = null;
 		URL selectedlURL = null;
@@ -2148,9 +2163,11 @@ public class IconCanvas extends Canvas {
 			System.out.println("Cannot create the URL: " + e.getMessage());
 			return;
 		}
-		final Image normalImage = ImageDescriptor.createFromURL(normalURL).createImage();
+		final Image normalImage1 = ImageDescriptor.createFromURL(normalURL).createImage();
 		final Image selectedImage = ImageDescriptor.createFromURL(selectedlURL).createImage();
         
+		final Image normalImage = new Image(normalImage1.getDevice(), normalImage1.getImageData().scaledTo(8, 8));		
+
         IconCanvas iconCanvas = new IconCanvas(shell, SWT.NONE);
         iconCanvas.setTooltipWrap(false);
         iconCanvas.setContentProvider(new IContentProvider() {
@@ -2170,9 +2187,10 @@ public class IconCanvas extends Canvas {
         });
         iconCanvas.setToolTipProvider(new IToolTipProvider() {
         	public String[] toolTipText(Object obj) {
-        		if (obj.toString().indexOf("1") > -1) {
+        		//if (obj.toString().indexOf("1") > -1) {
         			return new String[] { ("Object: " + obj) };
-        		}
+        		//}
+        		/*
         		String[] texts = new String[2];
         		String contentText = "<u>Variables</u><br>";
         		contentText += "<ind>abc: <key>PrintStream</key><br>";
@@ -2191,6 +2209,7 @@ public class IconCanvas extends Canvas {
         		texts[0] = "abc\nObject: " + obj;
         		texts[1] = contentText;
         		return texts;
+        		*/
         	}
         });
         iconCanvas.setTotal(totalImage);

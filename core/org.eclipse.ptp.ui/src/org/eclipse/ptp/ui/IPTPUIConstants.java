@@ -44,6 +44,7 @@ public interface IPTPUIConstants {
     public static final String IUISETGROUP = "setgroup";
     public static final String IUICHANGESETGROUP = "changesetgroup";
     public static final String IUIVIEWGROUP = "viewgroup";
+    public static final String IUIZOOMGROUP = "zoomgroup";
     public static final String IUIEMPTYGROUP = "emptygroup";
     
 	public final static int NODE_USER_ALLOC_EXCL = 0;

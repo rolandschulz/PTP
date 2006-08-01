@@ -53,6 +53,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	// title
 	protected final String EMPTY_TITLE = " ";
 	protected Color registerColor = null;
+	
 	/**
 	 * update preference setting 
 	 */
@@ -81,7 +82,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 							}
 							canvas.resetCanvas();
 						}
-						repaint(false);
+						refresh(false);
 					}
 				});
 			}
@@ -348,7 +349,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 				if (!canvas.isDisposed()) {
 					canvas.setDisplayRuler(showRuler);
 				}
-				repaint(false);
+				refresh(false);
 			}
 		});
 	}

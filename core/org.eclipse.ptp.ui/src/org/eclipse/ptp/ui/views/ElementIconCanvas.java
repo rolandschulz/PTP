@@ -140,4 +140,8 @@ public class ElementIconCanvas extends IconCanvas implements ISelectionProvider 
 		super.handleMouseUp(event);
 		setSelection(new StructuredSelection(getSelectedElements()));
 	}
+	protected void doSelectionAll() {
+		super.doSelectionAll();
+		setSelection(new StructuredSelection(getSelectedElements()));
+	}
 }

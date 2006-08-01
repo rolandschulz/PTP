@@ -39,10 +39,12 @@ import org.eclipse.swt.widgets.Text;
  * 
  */
 public class PTPViewerPreferencesPage extends AbstractPerferencePage {
+	/*
 	private ViewIntFieldEditor iconSpacingXField = null;
 	private ViewIntFieldEditor iconSpacingYField = null;
 	private ViewIntFieldEditor iconWidthField = null;
 	private ViewIntFieldEditor iconHeightField = null;
+	*/
 	private ViewIntFieldEditor toolTipField = null;
 	private Button tooltipIsWrapButton = null;
 	private Button tooltipShowAllTimeButton = null;
@@ -203,6 +205,7 @@ public class PTPViewerPreferencesPage extends AbstractPerferencePage {
 	 * @param parent
 	 */
 	protected void createIconGroup(Composite parent) {
+		/*
 		Composite group = createGroupComposite(parent, 1, false, PreferenceMessages.getString("PTPViewerPreferencesPage.iconName"));
 		Composite compIcon = createComposite(group, 3);
 
@@ -210,13 +213,14 @@ public class PTPViewerPreferencesPage extends AbstractPerferencePage {
 		iconSpacingYField = new ViewIntFieldEditor(PreferenceMessages.getString("PTPViewerPreferencesPage.icon_spacing_y"), 1, 10, compIcon);
 
 		iconWidthField = new ViewIntFieldEditor(PreferenceMessages.getString("PTPViewerPreferencesPage.icon_width"), 12, 100, compIcon);
-		iconHeightField = new ViewIntFieldEditor(PreferenceMessages.getString("PTPViewerPreferencesPage.icon_height"), 12, 100, compIcon);		
+		iconHeightField = new ViewIntFieldEditor(PreferenceMessages.getString("PTPViewerPreferencesPage.icon_height"), 12, 100, compIcon);
+		*/		
 	}
 	/** Create view setting preferences
 	 * @param parent
 	 */
 	protected void createViewSettingPreferences(Composite parent) {
-		createIconGroup(parent);
+		//createIconGroup(parent);
 		createTooltipGroup(parent);
 	}
 	/* (non-Javadoc)
@@ -224,10 +228,12 @@ public class PTPViewerPreferencesPage extends AbstractPerferencePage {
 	 */
 	public void performDefaults() { 
 		IPreferenceStore store = getPreferenceStore();
+		/*
 		iconSpacingXField.setValue(store.getDefaultInt(IPTPUIConstants.VIEW_ICON_SPACING_X));
 		iconSpacingYField.setValue(store.getDefaultInt(IPTPUIConstants.VIEW_ICON_SPACING_Y));
 		iconWidthField.setValue(store.getDefaultInt(IPTPUIConstants.VIEW_ICON_WIDTH));
 		iconHeightField.setValue(store.getDefaultInt(IPTPUIConstants.VIEW_ICON_HEIGHT));
+		*/
 		toolTipField.setValue((int)store.getDefaultLong(IPTPUIConstants.VIEW_TOOLTIP_TIMEOUT));
 		tooltipIsWrapButton.setSelection(store.getDefaultBoolean(IPTPUIConstants.VIEW_TOOLTIP_ISWRAP));
 		tooltipShowAllTimeButton.setSelection(store.getDefaultBoolean(IPTPUIConstants.VIEW_TOOLTIP_SHOWALLTIME));
@@ -247,10 +253,12 @@ public class PTPViewerPreferencesPage extends AbstractPerferencePage {
 	 */
 	protected void setValues() {
 		IPreferenceStore store = getPreferenceStore();
+		/*
 		iconSpacingXField.setValue(store.getInt(IPTPUIConstants.VIEW_ICON_SPACING_X));
 		iconSpacingYField.setValue(store.getInt(IPTPUIConstants.VIEW_ICON_SPACING_Y));
 		iconWidthField.setValue(store.getInt(IPTPUIConstants.VIEW_ICON_WIDTH));
 		iconHeightField.setValue(store.getInt(IPTPUIConstants.VIEW_ICON_HEIGHT));
+		*/
 		toolTipField.setValue((int)store.getLong(IPTPUIConstants.VIEW_TOOLTIP_TIMEOUT));
 		tooltipIsWrapButton.setSelection(store.getBoolean(IPTPUIConstants.VIEW_TOOLTIP_ISWRAP));
 		tooltipShowAllTimeButton.setSelection(store.getBoolean(IPTPUIConstants.VIEW_TOOLTIP_SHOWALLTIME));
@@ -260,10 +268,12 @@ public class PTPViewerPreferencesPage extends AbstractPerferencePage {
 	 */
 	protected void storeValues() {
 		IPreferenceStore store = getPreferenceStore();
+		/*
 		store.setValue(IPTPUIConstants.VIEW_ICON_SPACING_X, iconSpacingXField.getValue());
 		store.setValue(IPTPUIConstants.VIEW_ICON_SPACING_Y, iconSpacingYField.getValue());
 		store.setValue(IPTPUIConstants.VIEW_ICON_WIDTH, iconWidthField.getValue());
 		store.setValue(IPTPUIConstants.VIEW_ICON_HEIGHT, iconHeightField.getValue());
+		*/
 		store.setValue(IPTPUIConstants.VIEW_TOOLTIP_TIMEOUT, (long)toolTipField.getValue());
 		store.setValue(IPTPUIConstants.VIEW_TOOLTIP_ISWRAP, tooltipIsWrapButton.getSelection());
 		store.setValue(IPTPUIConstants.VIEW_TOOLTIP_SHOWALLTIME, tooltipShowAllTimeButton.getSelection());
@@ -275,6 +285,7 @@ public class PTPViewerPreferencesPage extends AbstractPerferencePage {
 	public boolean isValid() {
 		setErrorMessage(null);
 		setMessage(null);
+		/*
 		if (!iconSpacingXField.isValid()) {
 			setErrorMessage(iconSpacingXField.getErrorMessage());
 			return false;
@@ -291,6 +302,7 @@ public class PTPViewerPreferencesPage extends AbstractPerferencePage {
 			setErrorMessage(iconHeightField.getErrorMessage());
 			return false;
 		}
+		*/
 		if (!toolTipField.isValid()) {
 			setErrorMessage(toolTipField.getErrorMessage());
 			return false;
