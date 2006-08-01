@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: PTP Parallel Language Development Tools Common Plug-in
 Bundle-SymbolicName: org.eclipse.ptp.pldt.common; singleton:=true
-Bundle-Version: 1.0.0
+Bundle-Version: 1.1.0
 Bundle-Activator: org.eclipse.ptp.pldt.common.CommonPlugin
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui,

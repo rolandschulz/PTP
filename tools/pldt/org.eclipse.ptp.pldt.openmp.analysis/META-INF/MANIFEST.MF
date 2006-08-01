@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: PTP OpenMP Analysis Plugin
 Bundle-SymbolicName: org.eclipse.ptp.pldt.openmp.analysis; singleton:=true
-Bundle-Version: 1.0.0
+Bundle-Version: 1.1.0
 Bundle-ClassPath: .
 Bundle-Vendor: IBM Research
 Bundle-Localization: plugin

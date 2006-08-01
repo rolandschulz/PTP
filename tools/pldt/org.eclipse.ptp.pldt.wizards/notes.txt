@@ -1,0 +1,37 @@
+
+
+plugin per mpi impl
+  - can have diff. configurations e.g. for mpich2 compiled w/intel, etc.
+     keeps the paths to the installation directory
+     could be part of the installation of mpich e.g.
+     part of the build process of the mpi installation? separate ./configure process?
+
+TODO: how to query what toolchain installed? NO
+       - query the plugin information (see above
+       - toolchain picks up info from the plugin
+       new mpi project, adds mpi toolchain. choose which mpi inst you want.
+       build looks at info, works out path to setup, and do build with correct toolchain option.
+       RUN - par. tools looks at current configuration selected and use that to launch pgm.
+       
+       resource mgr - launch job: sets path to mpi
+       
+       
+       do diff. builds on same mpi project?
+       - wiz page to select mpi inst for project (default selection)
+       - and project properties allows change.
+       - toolchain changes (e.g. mpi toolchain 
+       - might need a toolchain per version of mpi installation
+       (mpich, openMPI, POE)
+       plugin provided adds toolchain for the particular mpi installation
+       
+Launch config
+    parallel pgm
+    select project
+    automatically picks up which mpi is currently selected in that project, and use that
+    (that's what it was built with)
+    
+Could build with diff. versions of mpi (e.g. Debug and Release - keeps both these)
+    launch config allows slection between these configs
+    
+       
+  
