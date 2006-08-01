@@ -35,8 +35,8 @@ public class UpdatePExpressionAction extends Action {
 	 */
 	public UpdatePExpressionAction(PVariableView view) {
 		super(name, IAction.AS_PUSH_BUTTON);
-	    setImageDescriptor(PDebugImage.ID_ICON_SUSPEND_NORMAL);
-	    setDisabledImageDescriptor(PDebugImage.ID_ICON_SUSPEND_DISABLE);
+	    setImageDescriptor(PDebugImage.ID_ICON_VAR_REFRESH_NORMAL);
+	    //setDisabledImageDescriptor(PDebugImage.ID_ICON_VAR_REFRESH_DISABLE);
 	    setToolTipText(name);
 	    setId(name);
 	    setEnabled(false);

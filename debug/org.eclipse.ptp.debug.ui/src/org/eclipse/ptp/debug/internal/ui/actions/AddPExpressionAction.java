@@ -37,8 +37,8 @@ public class AddPExpressionAction extends Action {
 	 */
 	public AddPExpressionAction(PVariableView view) {
 		super(name, IAction.AS_PUSH_BUTTON);
-	    setImageDescriptor(PDebugImage.ID_ICON_RESUME_NORMAL);
-	    setDisabledImageDescriptor(PDebugImage.ID_ICON_RESUME_DISABLE);
+	    setImageDescriptor(PDebugImage.ID_ICON_VAR_ADD_NORMAL);
+	    //setDisabledImageDescriptor(PDebugImage.ID_ICON_VAR_ADD_DISABLE);
 	    setToolTipText(name);
 	    setId(name);
 	    setEnabled(false);
