@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: PTP PLDT  New Project Wizards Plug-In
 Bundle-SymbolicName: org.eclipse.ptp.pldt.wizards;singleton:=true
-Bundle-Version: 1.0.0
+Bundle-Version: 1.1.0
 Bundle-ClassPath: .
 Bundle-Activator: org.eclipse.ptp.pldt.wizards.MpiWizardsPlugin
 Bundle-Vendor: IBM Research
