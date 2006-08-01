@@ -43,6 +43,10 @@ public class ParallelImages {
 	public static final String ICON_CREATESET_NORMAL = "createset_normal.gif";
 	public static final String ICON_DELETESET_NORMAL = "deleteset_normal.gif";
 	public static final String ICON_DELETEELEMENT_NORMAL = "deleteelement_normal.gif";
+
+	//ZOOM
+	public static final String ICON_ZOOMIN_NORMAL = "zoomin_normal.gif";
+	public static final String ICON_ZOOMOUT_NORMAL = "zoomout_normal.gif";
 	
 	// MACHINE
 	public static final String ICON_MACHINE_NORMAL = "machine_normal.gif";
@@ -108,6 +112,10 @@ public class ParallelImages {
 	public static final ImageDescriptor ID_ICON_DELETESET_NORMAL = createImageDescriptor(TOOLICONURL, ICON_DELETESET_NORMAL, ICON_DELETESET_NORMAL);
 	public static final ImageDescriptor ID_ICON_DELETEELEMENT_NORMAL = createImageDescriptor(TOOLICONURL, ICON_DELETEELEMENT_NORMAL, ICON_DELETEELEMENT_NORMAL);
 
+	//ZOOM
+	public static final ImageDescriptor ID_ICON_ZOOMIN_NORMAL = createImageDescriptor(TOOLICONURL, ICON_ZOOMIN_NORMAL, ICON_ZOOMIN_NORMAL);
+	public static final ImageDescriptor ID_ICON_ZOOMOUT_NORMAL = createImageDescriptor(TOOLICONURL, ICON_ZOOMOUT_NORMAL, ICON_ZOOMOUT_NORMAL);
+
 	// MACHINE
 	public static final ImageDescriptor ID_ICON_MACHINE_NORMAL = createImageDescriptor(TOOLICONURL, ICON_MACHINE_NORMAL, ICON_MACHINE_NORMAL);
 	public static final ImageDescriptor ID_ICON_JOB_NORMAL = createImageDescriptor(TOOLICONURL, ICON_JOB_NORMAL, ICON_JOB_NORMAL);
@@ -168,16 +176,16 @@ public class ParallelImages {
 	
 	// NODE
 	public static final Image[][] nodeImages = {
-		{ getImage(ParallelImages.IMG_NODE_USER_ALLOC_EXCL),	getImage(ParallelImages.IMG_NODE_USER_ALLOC_EXCL_SEL)    },
-		{ getImage(ParallelImages.IMG_NODE_USER_ALLOC_SHARED),	getImage(ParallelImages.IMG_NODE_USER_ALLOC_SHARED_SEL)  },
-		{ getImage(ParallelImages.IMG_NODE_OTHER_ALLOC_EXCL),	getImage(ParallelImages.IMG_NODE_OTHER_ALLOC_EXCL_SEL)   },
-		{ getImage(ParallelImages.IMG_NODE_OTHER_ALLOC_SHARED),	getImage(ParallelImages.IMG_NODE_OTHER_ALLOC_SHARED_SEL) },
-		{ getImage(ParallelImages.IMG_NODE_DOWN),				getImage(ParallelImages.IMG_NODE_DOWN_SEL)               },
-		{ getImage(ParallelImages.IMG_NODE_ERROR),				getImage(ParallelImages.IMG_NODE_ERROR_SEL)              },
-		{ getImage(ParallelImages.IMG_NODE_EXITED),				getImage(ParallelImages.IMG_NODE_EXITED_SEL)             },
-		{ getImage(ParallelImages.IMG_NODE_RUNNING),			getImage(ParallelImages.IMG_NODE_RUNNING_SEL)            },
-		{ getImage(ParallelImages.IMG_NODE_UNKNOWN),			getImage(ParallelImages.IMG_NODE_UNKNOWN_SEL)            },
-		{ getImage(ParallelImages.IMG_NODE_UP),					getImage(ParallelImages.IMG_NODE_UP_SEL)                 }              
+		{ getImage(ParallelImages.IMG_NODE_USER_ALLOC_EXCL),	getImage(ParallelImages.IMG_NODE_USER_ALLOC_EXCL_SEL)		},
+		{ getImage(ParallelImages.IMG_NODE_USER_ALLOC_SHARED),	getImage(ParallelImages.IMG_NODE_USER_ALLOC_SHARED_SEL)		},
+		{ getImage(ParallelImages.IMG_NODE_OTHER_ALLOC_EXCL),	getImage(ParallelImages.IMG_NODE_OTHER_ALLOC_EXCL_SEL)		},
+		{ getImage(ParallelImages.IMG_NODE_OTHER_ALLOC_SHARED),	getImage(ParallelImages.IMG_NODE_OTHER_ALLOC_SHARED_SEL)	},
+		{ getImage(ParallelImages.IMG_NODE_DOWN),				getImage(ParallelImages.IMG_NODE_DOWN_SEL)					},
+		{ getImage(ParallelImages.IMG_NODE_ERROR),				getImage(ParallelImages.IMG_NODE_ERROR_SEL)					},
+		{ getImage(ParallelImages.IMG_NODE_EXITED),				getImage(ParallelImages.IMG_NODE_EXITED_SEL)				},
+		{ getImage(ParallelImages.IMG_NODE_RUNNING),			getImage(ParallelImages.IMG_NODE_RUNNING_SEL)				},
+		{ getImage(ParallelImages.IMG_NODE_UNKNOWN),			getImage(ParallelImages.IMG_NODE_UNKNOWN_SEL)				},
+		{ getImage(ParallelImages.IMG_NODE_UP),					getImage(ParallelImages.IMG_NODE_UP_SEL)					}              
 	};
 
 	// JOB
@@ -189,12 +197,12 @@ public class ParallelImages {
 	
 	// PROCESS
 	public static final Image[][] procImages = {
-		{ getImage(ParallelImages.IMG_PROC_ERROR), getImage(ParallelImages.IMG_PROC_ERROR_SEL)                 },
-		{ getImage(ParallelImages.IMG_PROC_EXITED), getImage(ParallelImages.IMG_PROC_EXITED_SEL)               },
-		{ getImage(ParallelImages.IMG_PROC_EXITED_SIGNAL), getImage(ParallelImages.IMG_PROC_EXITED_SIGNAL_SEL) },
-		{ getImage(ParallelImages.IMG_PROC_RUNNING), getImage(ParallelImages.IMG_PROC_RUNNING_SEL)             },
-		{ getImage(ParallelImages.IMG_PROC_STARTING), getImage(ParallelImages.IMG_PROC_STARTING_SEL)           },
-		{ getImage(ParallelImages.IMG_PROC_STOPPED), getImage(ParallelImages.IMG_PROC_STOPPED_SEL)             }
+		{ getImage(ParallelImages.IMG_PROC_ERROR),			getImage(ParallelImages.IMG_PROC_ERROR_SEL)				},
+		{ getImage(ParallelImages.IMG_PROC_EXITED),			getImage(ParallelImages.IMG_PROC_EXITED_SEL)			},
+		{ getImage(ParallelImages.IMG_PROC_EXITED_SIGNAL),	getImage(ParallelImages.IMG_PROC_EXITED_SIGNAL_SEL)		},
+		{ getImage(ParallelImages.IMG_PROC_RUNNING),		getImage(ParallelImages.IMG_PROC_RUNNING_SEL)			},
+		{ getImage(ParallelImages.IMG_PROC_STARTING),		getImage(ParallelImages.IMG_PROC_STARTING_SEL)			},
+		{ getImage(ParallelImages.IMG_PROC_STOPPED),		getImage(ParallelImages.IMG_PROC_STOPPED_SEL)			}
 	};
 	
 	// RESOURCE MANAGERS
