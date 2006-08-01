@@ -20,8 +20,8 @@ package org.eclipse.ptp.simulation.ui.wizards;
 
 import org.eclipse.ptp.rmsystem.SimulationRMConfiguration;
 import org.eclipse.ptp.simulation.internal.ui.Messages;
-import org.eclipse.ptp.ui.wizards.ConfigurationWizard;
-import org.eclipse.ptp.ui.wizards.ConfigurationWizardPage;
+import org.eclipse.ptp.ui.wizards.RMConfigurationWizard;
+import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -40,8 +40,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-public final class SimulationConfigurationWizardPage extends
-		ConfigurationWizardPage {
+public final class SimulationRMConfigurationWizardPage extends
+		RMConfigurationWizardPage {
 	
 	private static final int TEXT_WIDTH = 50;
 	private SimulationRMConfiguration config;
@@ -49,25 +49,25 @@ public final class SimulationConfigurationWizardPage extends
 	private Text numNodesText;
 	private Text numMachinesText;
 
-	public SimulationConfigurationWizardPage(ConfigurationWizard wizard) {
-		super(wizard, Messages.getString("SimulationConfigurationWizardPage.name")); //$NON-NLS-1$
-		setTitle(Messages.getString("SimulationConfigurationWizardPage.title")); //$NON-NLS-1$
-		setDescription(Messages.getString("SimulationConfigurationWizardPage.description")); //$NON-NLS-1$
-		final ConfigurationWizard confWizard = getConfigurationWizard();
+	public SimulationRMConfigurationWizardPage(RMConfigurationWizard wizard) {
+		super(wizard, Messages.getString("SimulationRMConfigurationWizardPage.name")); //$NON-NLS-1$
+		setTitle(Messages.getString("SimulationRMConfigurationWizardPage.title")); //$NON-NLS-1$
+		setDescription(Messages.getString("SimulationRMConfigurationWizardPage.description")); //$NON-NLS-1$
+		final RMConfigurationWizard confWizard = getConfigurationWizard();
 		config = (SimulationRMConfiguration) confWizard.getConfiguration();
 		setPageComplete(false);
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.wizards.ConfigurationWizardPage#createControl(org.eclipse.swt.widgets.Composite)
+	 * @see org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage#createControl(org.eclipse.swt.widgets.Composite)
 	 */
 	public void createControl(Composite parent) {
-		System.out.println("In SimulationConfigurationWizardPage.createControl");
+		System.out.println("In SimulationRMConfigurationWizardPage.createControl");
 		Group machineGroup = new Group(parent, SWT.SHADOW_ETCHED_IN);
 		machineGroup.setLayout(new GridLayout(1, false));
-		machineGroup.setText(Messages.getString("SimulationConfigurationWizardPage.SimulatedMachineSettings")); //$NON-NLS-1$
+		machineGroup.setText(Messages.getString("SimulationRMConfigurationWizardPage.SimulatedMachineSettings")); //$NON-NLS-1$
 		Label label = new Label(machineGroup, SWT.NONE);
-		label.setText(Messages.getString("SimulationConfigurationWizardPage.NumberOfMachines")); //$NON-NLS-1$
+		label.setText(Messages.getString("SimulationRMConfigurationWizardPage.NumberOfMachines")); //$NON-NLS-1$
 
 		final VerifyListener intTextVerifyListener = new VerifyListener() {
 			public void verifyText(VerifyEvent e) {
@@ -94,7 +94,7 @@ public final class SimulationConfigurationWizardPage extends
 			}});
 
 		final Label whichMachineLabel = new Label(machineGroup, SWT.NONE);
-		whichMachineLabel.setText(Messages.getString("SimulationConfigurationWizardPage.SetNumberOfNodesWhichMachine")); //$NON-NLS-1$
+		whichMachineLabel.setText(Messages.getString("SimulationRMConfigurationWizardPage.SetNumberOfNodesWhichMachine")); //$NON-NLS-1$
 
 		int maxItemLength = getWhichMachineComboLength(machineGroup.getShell());
 		whichMachineCombo = new Combo(machineGroup, SWT.READ_ONLY);
@@ -127,13 +127,13 @@ public final class SimulationConfigurationWizardPage extends
 	private String[] getMachineNames(int numMachines) {
 		String[] strs = new String[numMachines];
 		for (int i=0; i<numMachines; ++i) {
-			strs[i] = Messages.getString("SimulationConfigurationWizardPage.Machine") + Integer.toString(i); //$NON-NLS-1$
+			strs[i] = Messages.getString("SimulationRMConfigurationWizardPage.Machine") + Integer.toString(i); //$NON-NLS-1$
 		}
 		return strs;
 	}
 
 	private int getWhichMachineComboLength(Shell shell) {
-		String maxItem = Messages.getString("SimulationConfigurationWizardPage.Machine") + "00000"; //$NON-NLS-1$ //$NON-NLS-2$
+		String maxItem = Messages.getString("SimulationRMConfigurationWizardPage.Machine") + "00000"; //$NON-NLS-1$ //$NON-NLS-2$
 		GC gc = new GC(shell);
 		Point point = gc.stringExtent(maxItem);
 		return point.x + TEXT_WIDTH;

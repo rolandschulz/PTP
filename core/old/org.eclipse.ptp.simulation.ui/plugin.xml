@@ -14,7 +14,7 @@
    <extension
          point="org.eclipse.ptp.ui.rmconfiguration">
       <configurationWizard
-            class="org.eclipse.ptp.simulation.ui.wizards.SimulationConfigurationWizardPageFactory"
+            class="org.eclipse.ptp.simulation.ui.wizards.SimulationRMConfigurationWizardPageFactory"
             id="org.eclipse.ptp.simulation.ui.configurationWizard"/>
    </extension>
 

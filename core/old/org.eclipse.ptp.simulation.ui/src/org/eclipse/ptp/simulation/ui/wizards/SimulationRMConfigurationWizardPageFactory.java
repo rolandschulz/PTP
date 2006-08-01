@@ -19,19 +19,19 @@
 package org.eclipse.ptp.simulation.ui.wizards;
 
 import org.eclipse.ptp.rmsystem.SimulationResourceManagerFactory;
-import org.eclipse.ptp.ui.wizards.ConfigurationWizard;
-import org.eclipse.ptp.ui.wizards.ConfigurationWizardPage;
-import org.eclipse.ptp.ui.wizards.ConfigurationWizardPageFactory;
+import org.eclipse.ptp.ui.wizards.RMConfigurationWizard;
+import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage;
+import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPageFactory;
 
-public class SimulationConfigurationWizardPageFactory extends
-		ConfigurationWizardPageFactory {
+public class SimulationRMConfigurationWizardPageFactory extends
+		RMConfigurationWizardPageFactory {
 
-	public SimulationConfigurationWizardPageFactory() {
+	public SimulationRMConfigurationWizardPageFactory() {
 		// no-op
 	}
 
-	public ConfigurationWizardPage[] getPages(ConfigurationWizard wizard) {
-		return new ConfigurationWizardPage[]{new SimulationConfigurationWizardPage(wizard)};
+	public RMConfigurationWizardPage[] getPages(RMConfigurationWizard wizard) {
+		return new RMConfigurationWizardPage[]{new SimulationRMConfigurationWizardPage(wizard)};
 	}
 
 	public Class getRMFactoryClass() {
