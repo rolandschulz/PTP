@@ -74,7 +74,7 @@ Upload notes
 Once you've exported the feature and  
 zipped it up, try this command:
 
-		 scp zip_file.zip btibbitts@dev.eclipse.org:downloads/technology/ptp/builds
+		 scp zip_file.zip user@dev.eclipse.org:downloads/technology/ptp/builds
 
 where 'btibbitts' is your committer username and zip_file.zip is:
 
