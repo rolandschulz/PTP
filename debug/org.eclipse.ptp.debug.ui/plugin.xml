@@ -63,7 +63,7 @@
       </view>
       <view
             name="%PVariableView.name"
-            icon="icons/ptparrayview.gif"
+            icon="icons/ptpvariableview.gif"
             category="org.eclipse.debug.ui"
             class="org.eclipse.ptp.debug.internal.ui.views.variable.PVariableView"
             id="org.eclipse.ptp.debug.ui.views.PVariableView">

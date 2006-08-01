@@ -37,8 +37,15 @@ public class PDebugImage {
 	
     private static ImageRegistry imageRegistry = null;
     
+    //array view
 	public static final String ICON_ADD_VAR_NORMAL = "add_variable_normal.gif";
 	
+	//expression view
+	public static final String ICON_VAR_ADD_NORMAL = "var_add_normal.gif";
+	public static final String ICON_VAR_DELETE_NORMAL = "var_delete_normal.gif";
+	public static final String ICON_VAR_EDIT_NORMAL = "var_edit_normal.gif";
+	public static final String ICON_VAR_REFRESH_NORMAL = "var_refresh_normal.gif";
+
 	public static final String ICON_RESUME_DISABLE = "resume_disable.gif";
 	public static final String ICON_RESUME_NORMAL = "resume_normal.gif";
 	public static final String ICON_SUSPEND_DISABLE = "suspend_disable.gif";
@@ -84,8 +91,15 @@ public class PDebugImage {
 	public static final String IMG_DEBUG_OVER_BPT_FUNC_EN = "function_ovr.gif";
 	public static final String IMG_DEBUG_OVER_BPT_FUNC_DI = "function_ovr_disabled.gif";
 	
+	//array view
 	public static final ImageDescriptor ID_ICON_ADD_VAR_NORMAL = createImageDescriptor(TOOLICONURL, ICON_ADD_VAR_NORMAL, ICON_ADD_VAR_NORMAL);
 
+	//expression view
+	public static final ImageDescriptor ID_ICON_VAR_ADD_NORMAL = createImageDescriptor(TOOLICONURL, ICON_VAR_ADD_NORMAL, ICON_VAR_ADD_NORMAL);
+	public static final ImageDescriptor ID_ICON_VAR_DELETE_NORMAL = createImageDescriptor(TOOLICONURL, ICON_VAR_DELETE_NORMAL, ICON_VAR_DELETE_NORMAL);
+	public static final ImageDescriptor ID_ICON_VAR_EDIT_NORMAL = createImageDescriptor(TOOLICONURL, ICON_VAR_EDIT_NORMAL, ICON_VAR_EDIT_NORMAL);
+	public static final ImageDescriptor ID_ICON_VAR_REFRESH_NORMAL = createImageDescriptor(TOOLICONURL, ICON_VAR_REFRESH_NORMAL, ICON_VAR_REFRESH_NORMAL);
+	
 	public static final ImageDescriptor ID_ICON_RESUME_DISABLE = createImageDescriptor(TOOLICONURL, ICON_RESUME_DISABLE, ICON_RESUME_DISABLE);
 	public static final ImageDescriptor ID_ICON_RESUME_NORMAL = createImageDescriptor(TOOLICONURL, ICON_RESUME_NORMAL, ICON_RESUME_NORMAL);
 	public static final ImageDescriptor ID_ICON_SUSPEND_DISABLE = createImageDescriptor(TOOLICONURL, ICON_SUSPEND_DISABLE, ICON_SUSPEND_DISABLE);
