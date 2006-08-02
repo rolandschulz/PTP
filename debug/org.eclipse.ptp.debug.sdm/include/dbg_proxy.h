@@ -52,12 +52,12 @@
 #define DBG_STARTSESSION_FMT			"%s \"%s\" \"%s\""
 #define DBG_SETLINEBREAKPOINT_FMT		"%s %d \"%s\" %d"
 #define DBG_SETFUNCBREAKPOINT_FMT		"%s %d \"%s\" \"%s\""
-#define DBG_DELETEBREAKPOINT_FMT		"%s %d" //clement added
-#define DBG_ENABLEBREAKPOINT_FMT		"%s %d" //clement added
-#define DBG_DISABLEBREAKPOINT_FMT		"%s %d" //clement added
-#define DBG_CONDITIONBREAKPOINT_FMT		"%s %d \"%s\"" //clement added
-#define DBG_BREAKPOINTAFTER_FMT			"%s %d %d" //clement added
-#define DBG_SETWATCHPOINT_FMT			"%s %d \"%s\" %d %d \"%s\" %d" //clement added
+#define DBG_DELETEBREAKPOINT_FMT		"%s %d"
+#define DBG_ENABLEBREAKPOINT_FMT		"%s %d"
+#define DBG_DISABLEBREAKPOINT_FMT		"%s %d"
+#define DBG_CONDITIONBREAKPOINT_FMT		"%s %d \"%s\""
+#define DBG_BREAKPOINTAFTER_FMT			"%s %d %d"
+#define DBG_SETWATCHPOINT_FMT			"%s %d \"%s\" %d %d \"%s\" %d"
 #define DBG_GO_FMT						"%s"
 #define DBG_STEP_FMT					"%s %d %d"
 #define DBG_TERMINATE_FMT				"%s"
