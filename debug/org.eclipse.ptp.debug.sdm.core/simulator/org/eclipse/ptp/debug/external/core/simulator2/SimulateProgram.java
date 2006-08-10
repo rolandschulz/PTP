@@ -46,7 +46,7 @@ public class SimulateProgram extends Observable implements Runnable {
 	}
 	public SimulateFrame[] getSimStackFrames() {
 		int frameLength = DebugSimulation2.random(1, 3);
-		String addr = "0x" + DebugSimulation2.random(10000, 50000);
+		String addr = "" + DebugSimulation2.random(10000, 50000);
 		SimulateFrame[] frames = new SimulateFrame[frameLength];
 		for (int i=0; i<frames.length; i++) {
 			frames[i] = new SimulateFrame((i), file, file, (current_line-i), addr); 
