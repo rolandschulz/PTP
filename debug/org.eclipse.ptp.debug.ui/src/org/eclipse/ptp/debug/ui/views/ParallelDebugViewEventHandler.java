@@ -22,7 +22,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.core.IPJob;
-import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
@@ -33,6 +32,7 @@ import org.eclipse.ptp.debug.internal.ui.PDebugUIUtils;
 import org.eclipse.ptp.debug.internal.ui.UIDebugManager;
 import org.eclipse.ptp.debug.internal.ui.views.AbstractPDebugEventHandler;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
+import org.eclipse.ptp.debug.ui.model.DebugElement;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
 
@@ -67,8 +67,8 @@ public class ParallelDebugViewEventHandler extends AbstractPDebugEventHandler {
 					IElementHandler elementHandler = getPView().getElementHandler(job.getIDString());
 					int[] processes = info.getAllRegisteredProcesses().toArray();
 					for (int j = 0; j < processes.length; j++) {
-						IPProcess proc = job.findProcessByTaskId(processes[j]);
-						IElement element = elementHandler.getSetRoot().get(proc.getIDString());
+						//IPProcess proc = job.findProcessByTaskId(processes[j]);
+						IElement element = elementHandler.getSetRoot().get(String.valueOf(processes[j]));
 						element.setRegistered(true);
 						elementHandler.addRegisterElement(element);
 					}
@@ -92,8 +92,8 @@ public class ParallelDebugViewEventHandler extends AbstractPDebugEventHandler {
 					IElementHandler elementHandler = getPView().getElementHandler(job.getIDString());
 					int[] processes = info.getAllUnregisteredProcesses().toArray();
 					for (int j = 0; j < processes.length; j++) {
-						IPProcess proc = job.findProcessByTaskId(processes[j]);
-						IElement element = elementHandler.getSetRoot().get(proc.getIDString());
+						//IPProcess proc = job.findProcessByTaskId(processes[j]);
+						IElement element = elementHandler.getSetRoot().get(String.valueOf(processes[j]));
 						element.setRegistered(false);
 						elementHandler.removeRegisterElement(element);
 					}
@@ -117,7 +117,6 @@ public class ParallelDebugViewEventHandler extends AbstractPDebugEventHandler {
 					getPView().updateSuspendResumeButton(ssource, starget);
 
 					((UIDebugManager) getPView().getUIManager()).updateVariableValue(false);
-					
 					if (event.getKind() == IPDebugEvent.SUSPEND) {
 						PTPDebugUIPlugin.getUIDebugManager().updateVariableValueOnSuspend();
 					}
@@ -125,6 +124,22 @@ public class ParallelDebugViewEventHandler extends AbstractPDebugEventHandler {
 				refresh();
 				break;
 			case IPDebugEvent.CHANGE:
+				int detail = event.getDetail();
+				if (detail == IPDebugEvent.EVALUATION || detail == IPDebugEvent.CONTENT) {
+					int[] diffTasks = info.getAllProcesses().toArray();
+					IElementHandler elementHandler = getPView().getElementHandler(job.getIDString());
+					for (int j=0; j<diffTasks.length; j++) {
+						IElement element = elementHandler.getSetRoot().get(String.valueOf(diffTasks[j]));
+						if (element instanceof DebugElement) {
+							if (detail == IPDebugEvent.EVALUATION) {
+								((DebugElement)element).setType(DebugElement.VALUE_DIFF);
+							}
+							else {
+								((DebugElement)element).resetType();
+							}
+						}
+					}
+				}
 				refresh();
 				break;
 			case IPDebugEvent.ERROR:

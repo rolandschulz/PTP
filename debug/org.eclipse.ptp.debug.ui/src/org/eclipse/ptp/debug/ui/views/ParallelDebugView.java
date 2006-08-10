@@ -42,6 +42,7 @@ import org.eclipse.ptp.debug.internal.ui.actions.UnregisterAction;
 import org.eclipse.ptp.debug.internal.ui.views.AbstractPDebugEventHandler;
 import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
+import org.eclipse.ptp.debug.ui.model.DebugElement;
 import org.eclipse.ptp.ui.IManager;
 import org.eclipse.ptp.ui.actions.ParallelAction;
 import org.eclipse.ptp.ui.model.IElement;
@@ -49,6 +50,8 @@ import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.ptp.ui.views.IIconCanvasActionListener;
 import org.eclipse.ptp.ui.views.ParallelJobView;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IActionBars;
 
@@ -346,9 +349,21 @@ public class ParallelDebugView extends ParallelJobView {
     	if (!selection.isEmpty() && selection instanceof StructuredSelection) {
     		IElement element = (IElement)((StructuredSelection)selection).getFirstElement();
     		if (element.isRegistered()) {
-    			//TODO
-    			System.err.println(" TODO: selectionChanged in ParallelDebugView - focus on debug view");
+    			((UIDebugManager) manager).focusOnDebugTarget(getCheckedJob(), element.getIDNum());
     		}
     	}
     }
+	public void drawSpecial(Object obj, GC gc, int x_loc, int y_loc, int width, int height) {
+		super.drawSpecial(obj, gc, x_loc, y_loc, width, height);
+		if (cur_element_set != null && obj instanceof DebugElement) {
+			DebugElement element =  (DebugElement)obj;
+			switch(element.getType()) {
+			case DebugElement.VALUE_DIFF:
+				gc.setForeground(getDisplay().getSystemColor(SWT.COLOR_BLUE));
+				gc.drawLine(x_loc, y_loc, x_loc+width, y_loc+height);
+				gc.drawLine(x_loc, y_loc+height, x_loc+width, y_loc);
+				break;
+			}
+		}
+	}
 }
