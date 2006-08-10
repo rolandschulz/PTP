@@ -16,14 +16,10 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.internal.ui.model;
+package org.eclipse.ptp.ui.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.eclipse.ptp.ui.model.IContainer;
-import org.eclipse.ptp.ui.model.IElement;
-import org.eclipse.ptp.ui.model.IElementHandler;
-import org.eclipse.ptp.ui.model.IElementSet;
 /**
  * @author clement chu
  *

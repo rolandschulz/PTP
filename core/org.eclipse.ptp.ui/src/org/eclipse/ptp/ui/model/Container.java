@@ -16,13 +16,11 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.internal.ui.model;
+package org.eclipse.ptp.ui.model;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.ptp.ui.model.IContainer;
-import org.eclipse.ptp.ui.model.IElement;
 
 /**
  * @author clement chu
