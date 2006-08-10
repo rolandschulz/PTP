@@ -16,9 +16,8 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.internal.ui.model;
+package org.eclipse.ptp.ui.model;
 
-import org.eclipse.ptp.ui.model.IElement;
 
 
 /**
@@ -98,9 +97,9 @@ public class Element implements IElement, Cloneable, Comparable {
 	 * @return -1 if smaller than obj, 1 if bigger than obj, otherwise they equal
 	 */
 	public int compareTo(Object obj) {
-		if (obj instanceof Element) {
+		if (obj instanceof IElement) {
 			int my_rank = Integer.parseInt(id);
-			int his_rank = Integer.parseInt(((Element) obj).getID());
+			int his_rank = Integer.parseInt(((IElement) obj).getID());
 			if (my_rank < his_rank)
 				return -1;
 			if (my_rank == his_rank)

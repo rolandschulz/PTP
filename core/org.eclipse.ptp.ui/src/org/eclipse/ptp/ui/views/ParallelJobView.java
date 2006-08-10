@@ -241,7 +241,7 @@ public class ParallelJobView extends AbstractParallelSetView implements IProcess
 	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#doubleClick(org.eclipse.ptp.ui.model.IElement)
 	 */
 	public void doubleClick(IElement element) {
-		openProcessViewer(((JobManager) manager).findProcess(getCurrentID(), element.getID()));
+		openProcessViewer(((JobManager) manager).findProcess(getCurrentID(), element.getIDNum()));
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#convertElementObject(org.eclipse.ptp.ui.model.IElement)
@@ -250,14 +250,14 @@ public class ParallelJobView extends AbstractParallelSetView implements IProcess
 		if (element == null)
 			return null;
 		
-		return ((JobManager) manager).findProcess(getCurrentID(), element.getID());
+		return ((JobManager) manager).findProcess(getCurrentID(), element.getIDNum());
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.views.IContentProvider#getRulerIndex(java.lang.Object, int)
 	 */
 	public String getRulerIndex(Object obj, int index) {
 		if (obj instanceof IElement) {
-			return ((IElement)obj).getName();
+			return ((IElement)obj).getID();
 		}
 		return super.getRulerIndex(obj, index);
 	}

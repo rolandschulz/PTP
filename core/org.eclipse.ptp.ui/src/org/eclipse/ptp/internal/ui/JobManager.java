@@ -24,10 +24,11 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.IPUniverse;
-import org.eclipse.ptp.internal.ui.model.Element;
-import org.eclipse.ptp.internal.ui.model.ElementHandler;
 import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.listeners.IJobChangedListener;
+import org.eclipse.ptp.ui.model.Element;
+import org.eclipse.ptp.ui.model.ElementHandler;
+import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
 
@@ -111,8 +112,8 @@ public class JobManager extends AbstractUIManager {
 	 * @param proc_id process ID
 	 * @return status
 	 */
-	public String getProcessStatusText(String job_id, String proc_id) {
-		return getProcessStatusText(findProcess(job_id, proc_id));
+	public String getProcessStatusText(String job_id, int task_id) {
+		return getProcessStatusText(findProcess(job_id, task_id));
 	}
 	/** Get process status text
 	 * @param proc process
@@ -140,15 +141,15 @@ public class JobManager extends AbstractUIManager {
 	 * @see org.eclipse.ptp.ui.IManager#getStatus(java.lang.String)
 	 */
 	public int getStatus(String id) {
-		return getStatus(getCurrentJobId(), id);
+		return getStatus(getCurrentJobId(), Integer.parseInt(id));
 	}	
 	/** Get Status
 	 * @param job_id job ID
 	 * @param proc_id process ID
 	 * @return status 
 	 */
-	public int getStatus(String job_id, String proc_id) {
-		return getProcessStatus(findProcess(job_id, proc_id));
+	public int getStatus(String job_id, int task_id) {
+		return getProcessStatus(findProcess(job_id, task_id));
 	}
 	/** Get process status
 	 * @param proc process
@@ -177,18 +178,19 @@ public class JobManager extends AbstractUIManager {
 	 * @param id process ID
 	 * @return process
 	 */
-	public IPProcess findProcess(String job_id, String id) {
-		return findProcess(findJobById(job_id), id);
+	public IPProcess findProcess(String job_id, int task_id) {
+		return findProcess(findJobById(job_id), task_id);
 	}
 	/** Find process
 	 * @param job job
 	 * @param id process ID
 	 * @return
 	 */
-	public IPProcess findProcess(IPJob job, String id) {
+	public IPProcess findProcess(IPJob job, int task_id) {
 		if (job == null)
 			return null;
-		return job.findProcess(id);
+		return job.findProcessByTaskId(task_id);
+		//return job.findProcess(id);
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#getName(java.lang.String)
@@ -198,6 +200,15 @@ public class JobManager extends AbstractUIManager {
 		if (job == null)
 			return "";
 		return job.getName();
+	}
+	/** Create Element
+	 * @param set
+	 * @param key
+	 * @param name
+	 * @return
+	 */
+	protected IElement createElement(IElementSet set, String key, String name) {
+		return new Element(set, key, name);
 	}
 	/** Add a job
 	 * @param job
@@ -210,7 +221,8 @@ public class JobManager extends AbstractUIManager {
 				IElementHandler elementHandler = new ElementHandler();
 				IElementSet set = elementHandler.getSetRoot();
 				for (int i = 0; i < total_element; i++) {
-					set.add(new Element(set, pProcesses[i].getIDString(), String.valueOf(pProcesses[i].getTaskId())));
+					//task id for element key
+					set.add(createElement(set, String.valueOf(pProcesses[i].getTaskId()), pProcesses[i].getIDString()));
 				}
 				elementHandler.add(set);
 				jobList.put(job.getIDString(), elementHandler);

@@ -1745,7 +1745,7 @@ public class IconCanvas extends Canvas {
 	/** Get GC
 	 * @return
 	 */
-	protected GC getGC() {
+	public GC getGC() {
 		return getGC(SWT.NONE);
 	}
 	/** Get GC by creating a new
@@ -2142,7 +2142,7 @@ public class IconCanvas extends Canvas {
 	 * Self testing
 	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
 	public static void main(String[] args) {
-		final int totalImage = 500;
+		final int totalImage = 5000;
         final Display display = new Display();
         final Shell shell = new Shell(display);
         shell.setLocation(0, 0);
@@ -2164,11 +2164,17 @@ public class IconCanvas extends Canvas {
 			return;
 		}
 		final Image normalImage1 = ImageDescriptor.createFromURL(normalURL).createImage();
-		final Image selectedImage = ImageDescriptor.createFromURL(selectedlURL).createImage();
+		final Image selectedImage1 = ImageDescriptor.createFromURL(selectedlURL).createImage();
         
-		final Image normalImage = new Image(normalImage1.getDevice(), normalImage1.getImageData().scaledTo(8, 8));		
+		int w = 6;
+		int h = 6;
+		final Image normalImage = new Image(normalImage1.getDevice(), normalImage1.getImageData().scaledTo(w, h));		
+		final Image selectedImage = new Image(selectedImage1.getDevice(), selectedImage1.getImageData().scaledTo(w, h));		
 
         IconCanvas iconCanvas = new IconCanvas(shell, SWT.NONE);
+        iconCanvas.setIconSize(w, h);
+        iconCanvas.setFontSize(6);
+        iconCanvas.setIconSpace(1, 4);
         iconCanvas.setTooltipWrap(false);
         iconCanvas.setContentProvider(new IContentProvider() {
         	public Object getObject(int index) {
