@@ -27,9 +27,13 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
+import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.PCDIDebugModel;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
+import org.eclipse.ptp.debug.core.events.IPDebugEvent;
+import org.eclipse.ptp.debug.core.events.PDebugEvent;
+import org.eclipse.ptp.debug.core.events.PDebugInfo;
 
 /**
  * @author Clement chu
@@ -44,17 +48,28 @@ public final class PJobVariableManager {
 		return (JobVariable[])jobMap.values().toArray(new JobVariable[0]);
 	}
 	public String getResultDisplay(String jid, int taskID) {
+		StringBuffer display = new StringBuffer();
+
 		JobVariable jobVariable = getJobVariable(jid);
 		if (jobVariable == null || !jobVariable.hasVariables()) {
-			return "";
+			return display.toString();
 		}
 		
-		String[] values = jobVariable.getValues(new Integer(taskID));
-		String display = "";
-		for (int i=0; i<values.length; i++) {
-			display += values[i];
+		ValueList values = jobVariable.getValues(new Integer(taskID));
+		if (values == null) {
+			return display.toString();
 		}
-		return display;
+	
+		ValueInfo[] info = values.getValues();
+		for (int i=0; i<info.length; i++) {
+			display.append("<i>");
+			display.append(info[i].getVariable());
+			display.append("</i>");
+			display.append(" = ");
+			display.append(info[i].getValue());
+			display.append("<br>");
+		}
+		return display.toString();
 	}
 	public boolean addJobVariable(IPJob job, String[] sets, String var) {
 		return addJobVariable(job, sets, var, true);
@@ -149,7 +164,15 @@ public final class PJobVariableManager {
 	public void cleanupJobVariableValues() {
 		for(Iterator i=jobMap.values().iterator(); i.hasNext();) {
 			JobVariable jobVar = (JobVariable)i.next();
-			jobVar.clearValues();
+			if (jobVar != null) {
+				IPCDISession session = PTPDebugCorePlugin.getDebugModel().getPCDISession(jobVar.getJob().getIDString());
+				BitList taskList = jobVar.getDiffValueTasks();
+				if (taskList != null) {
+					PDebugInfo baseInfo = new PDebugInfo(jobVar.getJob(), taskList, null, null);						
+					PTPDebugCorePlugin.getDefault().fireDebugEvent(new PDebugEvent(session, IPDebugEvent.CHANGE, IPDebugEvent.CONTENT, baseInfo));
+				}
+				jobVar.clearValues();
+			}
 		}		
 	}
 	public void updateJobVariableValues(String jid, String sid, IProgressMonitor monitor) throws CoreException {
@@ -162,19 +185,30 @@ public final class PJobVariableManager {
 				IPCDISession session = debugModel.getPCDISession(jid);
 				if (session != null) {
 					int[] tasks = debugModel.getTasks(jid, sid).toArray();
-					monitor.beginTask("Updating variables value...", (tasks.length * vars.length + 1));
-					for (int i=0; i<tasks.length; i++) {
+					int length = tasks.length;
+					BitList taskList = new BitList((length>0)?tasks[tasks.length-1]+1:0);
+					
+					monitor.beginTask("Updating variables value...", (length * vars.length + 1));
+					for (int i=0; i<length; i++) {
 						if (!monitor.isCanceled()) {
 							//check whether the process is terminated
 							IPProcess process = jobVariable.getJob().findProcessByTaskId(tasks[i]);
 							if (process != null && !process.isAllStop()) {
-								String[] valueText = new String[vars.length];
+								ValueList values = new ValueList();
 								for (int j=0; j<vars.length; j++) {
-									valueText[j] = "<i>" + vars[j] + ": </i>" + debugModel.getValue(session, tasks[i], vars[j], monitor) + "<br>";
+									values.addValue(new ValueInfo(vars[j], debugModel.getValue(session, tasks[i], vars[j], monitor)));
 								}
-								jobVariable.storeValues(new Integer(tasks[i]), valueText);
+								jobVariable.storeValues(new Integer(tasks[i]), values);
+								if (jobVariable.getType() == JobVariable.TYPE_DIFF) {
+									taskList.set(tasks[i]);
+								}
 							}
 						}
+					}
+					if (!taskList.isEmpty()) {
+						jobVariable.setDiffValueTasks(taskList);
+						PDebugInfo baseInfo = new PDebugInfo(jobVariable.getJob(), taskList, null, null);						
+						PTPDebugCorePlugin.getDefault().fireDebugEvent(new PDebugEvent(session, IPDebugEvent.CHANGE, IPDebugEvent.EVALUATION, baseInfo));
 					}
 				}
 			}
@@ -182,9 +216,14 @@ public final class PJobVariableManager {
 		monitor.done();
 	}
 	public class JobVariable {
+		public static final int TYPE_DEFAULT = 0;
+		public static final int TYPE_DIFF = 1;
 		List variableList = new ArrayList();
 		Map procValue = new HashMap();
 		IPJob job = null;
+		Integer lastPID = null;
+		BitList diffValueTasks = null;
+		int type = TYPE_DEFAULT;
 		
 		public JobVariable(IPJob job) {
 			this.job = job;
@@ -192,7 +231,18 @@ public final class PJobVariableManager {
 		public IPJob getJob() {
 			return job;
 		}
-		
+		public BitList getDiffValueTasks() {
+			return diffValueTasks;
+		}
+		public void setDiffValueTasks(BitList diffValueTasks) {
+			this.diffValueTasks = diffValueTasks;
+		}
+		public int getType() {
+			return type;
+		}
+		public void setType(int type) {
+			this.type = type;
+		}
 		public List getVariableList() {
 			return variableList;
 		}
@@ -237,19 +287,30 @@ public final class PJobVariableManager {
 		}
 		public void removeVariable(VariableInfo varinfo) {
 			variableList.remove(varinfo);
+			lastPID = null;
 		}
-		public void storeValues(Integer pid, String[] texts) {
-			procValue.put(pid, texts);
+		public void storeValues(Integer pid, ValueList values) {
+			ValueList oldValues = (ValueList)procValue.remove(pid);
+			if (oldValues != null) {
+				oldValues.clean();
+				oldValues = null;
+			}
+			procValue.put(pid, values);
+			if (lastPID != null) {
+				if (values.compareTo(getValues(lastPID)) > 0) {
+					type = TYPE_DIFF;
+				}
+			}
+			lastPID = pid;
 		}
-		public String[] getValues(Integer pid) {
-			Object obj = procValue.get(pid);
-			if (obj == null || !(obj instanceof String[]))
-				return new String[0];
-			
-			return (String[])obj;
+		public ValueList getValues(Integer pid) {
+			return (ValueList)procValue.get(pid);
 		}
 		public void clearValues() {
 			procValue.clear();
+			type = TYPE_DEFAULT;
+			diffValueTasks = null;
+			lastPID = null;
 		}
 		public void clearVariables() {
 			variableList.clear();
@@ -303,5 +364,68 @@ public final class PJobVariableManager {
 		public void clearSets() {
 			setList.clear();
 		}
-	}	
+	}
+	public class ValueList implements Comparable {
+		List values = new ArrayList();
+		public void addValue(ValueInfo value) {
+			values.add(value);
+		}
+		public void removeValue(ValueInfo value) {
+			values.remove(value);
+		}
+		public ValueInfo[] getValues() {
+			return (ValueInfo[])values.toArray(new ValueInfo[0]);
+		}
+		public void clean() {
+			values.clear();
+		}
+		/** Compare the value list
+		 * @return 1 is different, 0 is the same, -1 is unknown  
+		 * 
+		 */
+		public int compareTo(Object obj) {
+			if (obj instanceof ValueList) {
+				ValueInfo[] curInfo = getValues();
+				ValueInfo[] refInfo = ((ValueList)obj).getValues();
+				for (int i=0; i<curInfo.length; i++) {
+					if (!curInfo[i].getValue().equals(refInfo[i].getValue())) {
+						return 1;
+					}
+				}
+				return 0;
+			}
+			return -1;
+		}
+	}
+	public class ValueInfo {
+		String variable = "";
+		String value = "";
+		int type = -1;
+		public ValueInfo(String variable, String value) {
+			this(variable, value, -1);
+		}
+		public ValueInfo(String variable, String value, int type) {
+			this.variable = variable;
+			this.value = value;
+			this.type = type;
+		}
+		public String getVariable() {
+			return variable;
+		}
+		public String getValue() {
+			return value;
+		}
+		public int getType() {
+			return type;
+		}
+		public void setVariable(String variable) {
+			this.variable = variable;
+		}
+		public void setValue(String value) {
+			this.value = value;
+		}
+		public void setType(int type) {
+			this.type = type;
+		}
+	}
 }

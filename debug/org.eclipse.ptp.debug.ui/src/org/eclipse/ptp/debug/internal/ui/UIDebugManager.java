@@ -32,14 +32,15 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.IBreakpointListener;
+import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IThread;
+import org.eclipse.debug.internal.ui.viewers.AsynchronousTreeViewer;
 import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.debug.ui.IDebugView;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
@@ -52,12 +53,13 @@ import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
+import org.eclipse.ptp.debug.ui.model.DebugElement;
 import org.eclipse.ptp.internal.ui.JobManager;
 import org.eclipse.ptp.ui.OutputConsole;
-import org.eclipse.ptp.ui.UIUtils;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
+import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.WorkbenchJob;
@@ -135,6 +137,10 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 		jobMgr.shutdown();
 		super.shutdown();
 	}
+	protected IElement createElement(IElementSet set, String key, String name) {
+		return new DebugElement(set, key, name);
+	}
+	
 	/** Get value text for tooltip
 	 * @param taskID
 	 * @return
@@ -276,7 +282,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 		for (int i = 0; i < elements.length; i++) {
 			// only unregister some registered elements
 			if (elements[i].isRegistered()) {
-				IPProcess process = findProcess(job, elements[i].getID());
+				IPProcess process = findProcess(job, elements[i].getIDNum());
 				if (process != null)
 					unregisterProcess(session, process, true);
 			}
@@ -296,7 +302,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 		for (int i = 0; i < elements.length; i++) {
 			// only register some unregistered elements
 			if (!elements[i].isRegistered()) {
-				IPProcess process = findProcess(job, elements[i].getID());
+				IPProcess process = findProcess(job, elements[i].getIDNum());
 				if (process != null && !process.isAllStop())
 					registerProcess(session, process, true);
 			}
@@ -374,7 +380,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 				IElement[] registerElements = elementHandler.getRegisteredElements();
 				monitor.beginTask("Removing registering processes....", registerElements.length);
 				for (int i = 0; i < registerElements.length; i++) {
-					IPProcess proc = findProcess(job_id, registerElements[i].getID());
+					IPProcess proc = findProcess(job_id, registerElements[i].getIDNum());
 					if (proc != null) {
 						unregisterProcess(session, proc, false);
 					}
@@ -409,12 +415,12 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 				for (int i = 0; i<registerElements.length; i++) {
 					if (curSet.contains(registerElements[i].getID())) {
 						if (curSet.isRootSet() || (preSet != null && !curSet.equals(preSet) && !preSet.contains(registerElements[i].getID()))) {
-							IPProcess proc = findProcess(job_id, registerElements[i].getID());
+							IPProcess proc = findProcess(job_id, registerElements[i].getIDNum());
 							if (proc != null)
 								registerProcess(session, proc, false);
 						}
 					} else {
-						IPProcess proc = findProcess(job_id, registerElements[i].getID());
+						IPProcess proc = findProcess(job_id, registerElements[i].getIDNum());
 						if (proc != null)
 							unregisterProcess(session, proc, false);
 					}
@@ -697,7 +703,6 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 		getJobVariableManager().cleanupJobVariableValues();
 	}
 	
-	
 	/******************************************************
 	 * TODO redevelop the focus on debug target on debug view 
 	 ******************************************************/
@@ -727,18 +732,59 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 		}
 		return null;
 	}
+	private TreeItem getTreeItem(TreeItem[] items, IDebugTarget target, IStackFrame frame) {
+		for (int i=0; i<items.length; i++) {
+			if (!items[i].getExpanded()) {
+				items[i].setExpanded(true);
+			}
+			Object obj = items[i].getData();
+			if (obj instanceof ILaunch) {
+				return getTreeItem(items[i].getItems(), target, frame);
+			}
+			else if (obj instanceof IDebugTarget) {
+				if (obj.equals(target)) {
+					return getTreeItem(items[i].getItems(), target, frame);
+				}
+				continue;
+			}
+			else if (obj instanceof IStackFrame) {
+				if (obj.equals(frame)) {
+					return items[i];
+				}
+			}
+			else {
+				return getTreeItem(items[i].getItems(), target, frame);
+			}
+			return items[i];
+		}
+		return null;
+	}
 	private void doOnFocusDebugView(Object selection) {
-		IViewPart part = UIUtils.findView(IDebugUIConstants.ID_DEBUG_VIEW);
+		IViewPart part = PTPDebugUIPlugin.getActiveWorkbenchWindow().getActivePage().findView(IDebugUIConstants.ID_DEBUG_VIEW);
 		if (part != null && part instanceof IDebugView) {
 			Viewer viewer = ((IDebugView)part).getViewer();
 			if (viewer != null) {
+				IDebugTarget target = null;
+				IStackFrame frame = null;
+				if (selection instanceof IDebugTarget) {
+					target = (IDebugTarget)selection;
+				}
+				else if (selection instanceof IStackFrame) {
+					frame = (IStackFrame)selection;
+					target = frame.getDebugTarget();
+				}
+				TreeItem item = getTreeItem(((AsynchronousTreeViewer)viewer).getTree().getItems(), target, frame);
+				if (item != null) {
+					item.getParent().setSelection(item);
+				}
 				//viewer.setSelection(new StructuredSelection(selection), true);
 				//Changed to TreeSelection since 3.2
-				//viewer.setSelection(new TreeSelection(getFocusTreePath(selection)), true);
-				part.setFocus();
+				//((AsynchronousViewer)viewer).setSelection(new TreeSelection(getFocusTreePath(selection)), true, true);
+				//part.setFocus();
 			}
 		}
 	}
+	/*
 	private TreePath getFocusTreePath(Object selection) {
 		if (selection instanceof IDebugTarget) {
 			return new TreePath(new Object[] { selection} ); 
@@ -748,6 +794,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 		}
 		return new TreePath(new Object[0]);
 	}
+	*/
 	public void focusOnDebugView(final Object selection) {
 		if (selection == null) {
 			return;
