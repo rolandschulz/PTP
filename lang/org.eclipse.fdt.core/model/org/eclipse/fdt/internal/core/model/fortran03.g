@@ -11,199 +11,7 @@ grammar Fortran03Parser;
 
 options {
     language=Java;
-    backtrack=true;
-    memoize=true;
 }
-
-tokens {
- PLUS = '+';
- QUESTION = '?';
- DOT = '.';
- STAR = '*';
- STARSTAR = '**';
- COLON = ':';
- COLONCOLON = '::';
- RPAREN = '(';
- LPAREN = ')';
- RBRACKET = '[';
- LBRACKET = ']';
- PERCENT = '%';
- SLASH = '/';
- SLASHSLASH = '//';
- COMMA = ',';
- EQUAL = '=';
- EQUAL_GREATER = '=>';
- DOT_TRUE = '.TRUE.';
- DOT_FALSE = '.FALSE.';
- DOT_EQ = '.EQ.';
- DOT_NE = '.NE.';
- DOT_LT = '.LT.';
- DOT_LE = '.LE.';
- DOT_GT = '.GT.';
- DOT_GE = '.GE.';
- EQUAL_EQ = '==';
- SLASH_EQ = '/=';
- LESSTHAN = '<';
- LESSTHAN_EQ = '<=';
- GREATERTHAN = '>';
- GREATERTHAN_EQ = '>=';
- DOT_NOT = '.NOT.';
- DOT_AND = '.AND.';
- DOT_OR = '.OR.';
- DOT_EQV = '.EQV.';
- DOT_NEQV = '.NEQV.';
- PROGRAM = 'PROGRAM';
- INTERFACE = 'INTERFACE';
- MODULE = 'MODULE';
- CONTAINS = 'CONTAINS';
- INTENT = 'INTENT';
- IN = 'IN';
- OUT = 'OUT';
- INOUT = 'INOUT';
- VALUE = 'VALUE';
- TYPE = 'TYPE';
- CLASS = 'CLASS';
- EXTENDS = 'EXTENDS';
- ABSTRACT = 'ABSTRACT';
- PUBLIC = 'PUBLIC';
- PRIVATE = 'PRIVATE';
- PROTECTED = 'PROTECTED';
- SEQUENCE = 'SEQUENCE';
- ENUM = 'ENUM';
- ENUMCOMMA = 'ENUMCOMMA';
- ENUMERATOR = 'ENUMERATOR';
- FINAL = 'FINAL';
- INTEGER = 'INTEGER';
- REAL = 'REAL';
- DOUBLE = 'DOUBLE';
- PRECISION = 'PRECISION';
- COMPLEX = 'COMPLEX';
- CHARACTER = 'CHARACTER';
- LOGICAL = 'LOGICAL';
- KIND = 'KIND';
- LEN = 'LEN';
- ASYNCHRONOUS = 'ASYNCHRONOUS';
- BIND = 'BIND';
- C = 'C';
- COMMON = 'COMMON';
- DATA = 'DATA';
- DIMENSION = 'DIMENSION';
- EQUIVALENCE = 'EQUIVALENCE';
- IMPLICIT = 'IMPLICIT';
- NONE = 'NONE';
- INTRINSIC = 'INTRINSIC';
- PARAMETER = 'PARAMETER';
- POINTER = 'POINTER';
- TARGET = 'TARGET';
- NULLIFY = 'NULLIFY';
- USE = 'USE';
- ONLY = 'ONLY';
- VOLATILE = 'VOLATILE';
- ASSOCIATE = 'ASSOCIATE';
- ALLOCATE = 'ALLOCATE';
- ALLOCATABLE = 'ALLOCATABLE';
- DEALLOCATE = 'DEALLOCATE';
- NAMELIST = 'NAMELIST';
- SAVE = 'SAVE';
- SOURCE = 'SOURCE';
- CASE = 'CASE';
- END = 'END';
- IMPORT = 'IMPORT';
- FUNCTION = 'FUNCTION';
- PROCEDURE = 'PROCEDURE';
- SUBROUTINE = 'SUBROUTINE';
- EXTERNAL = 'EXTERNAL';
- OPTIONAL = 'OPTIONAL';
- ELEMENTAL = 'ELEMENTAL';
- PURE = 'PURE';
- RECURSIVE = 'RECURSIVE';
- RESULT = 'RESULT';
- CALL = 'CALL';
- ENTRY = 'ENTRY';
- PASS = 'PASS';
- NOPASS = 'NOPASS';
- NON = 'NON';
- OPERATOR = 'OPERATOR';
- OVERRIDABLE = 'OVERRIDABLE';
- DEFERRED = 'DEFERRED';
- CYCLE = 'CYCLE';
- CONTINUE = 'CONTINUE';
- WAIT = 'WAIT';
- STOP = 'STOP';
- EXIT = 'EXIT';
- RETURN = 'RETURN';
- ASSIGNMENT = 'ASSIGNMENT';
- BLOCK = 'BLOCK';
- IS = 'IS';
- IF = 'IF';
- THEN = 'THEN';
- ELSE = 'ELSE';
- DO = 'DO';
- GO = 'GO';
- TO = 'TO';
- WHERE = 'WHERE';
- ELSEWHERE = 'ELSEWHERE';
- WHILE = 'WHILE';
- FORALL = 'FORALL';
- FORMAT = 'FORMAT';
- FMT = 'FMT';
- NML = 'NML';
- READ = 'READ';
- READWRITE = 'READWRITE';
- WRITE = 'WRITE';
- PRINT = 'PRINT';
- UNIT = 'UNIT';
- OPEN = 'OPEN';
- OPENED = 'OPENED';
- CLOSE = 'CLOSE';
- ADVANCE = 'ADVANCE';
- ACCESS = 'ACCESS';
- ACTION = 'ACTION';
- BACKSPACE = 'BACKSPACE';
- BLANK = 'BLANK';
- DECIMAL = 'DECIMAL';
- DEFAULT = 'DEFAULT';
- DELIM = 'DELIM';
- DIRECT = 'DIRECT';
- ENCODING = 'ENCODING';
- EOR = 'EOR';
- ERR = 'ERR';
- ERRMSG = 'ERRMSG';
- EXIST = 'EXIST';
- ENDFILE = 'ENDFILE';
- FILE = 'FILE';
- FLUSH = 'FLUSH';
- FORM = 'FORM';
- FORMATTED = 'FORMATTED';
- UNFORMATTED = 'UNFORMATTED';
- ID = 'ID';
- INQUIRE = 'INQUIRE';
- IOLENGTH = 'IOLENGTH';
- IOMSG = 'IOMSG';
- IOSTAT = 'IOSTAT';
- NAME = 'NAME';
- NAMED = 'NAMED';
- NEXTREC = 'NEXTREC';
- NUMBER = 'NUMBER';
- OPENED = 'OPENED';
- PAD = 'PAD';
- PENDING = 'PENDING'; 
- POS = 'POS';
- POSITION = 'POSITION';
- REC = 'REC';
- RECL = 'RECL';
- REWIND = 'REWIND';
- ROUND = 'ROUND';
- SELECT = 'SELECT';
- SEQUENTIAL = 'SEQUENTIAL';
- SIGN = 'SIGN';
- SIZE = 'SIZE';
- STAT = 'STAT';
- STATUS = 'STATUS';
- STREAM = 'STREAM';
- GENERIC = 'GENERIC';
-}
-
 
 /*
 Section 1:
@@ -375,34 +183,16 @@ keyword
 Section 3:
 */
 
-/* TODO: converted to terminal
-// R301
-character
-	:	alphanumeric_character
-	|	special_character
-	;
-*/
+// R301 character not used
 
-/* TODO: converted to terminal
-// R302
-alphanumeric_character
-	:	LETTER
-	|	DIGIT
-	|	UNDERSCORE
-	;
-*/
+// R302 alphanumeric_character converted to fragment
 
-/* TODO: converted to terminal
-R303  underscore                  : _
-*/
+// R303 underscore converted to fragment
 
-/* TODO: converted to terminal
 // R304
 name
-	:	LETTER
-		( ALPHANUMERIC_CHARACTER )*
+	:	T_IDENT
 	;
-*/
 
 // R305
 constant
@@ -524,14 +314,14 @@ signed_int_literal_constant
 // TODO: turn into terminal
 // R406
 int_literal_constant
-	:	digit_string
+	:	DIGIT_STRING
 		( kind_param )?
 	;
 
 // TODO: turn into terminal
 // R407
 kind_param
-	:	digit_string
+	:	DIGIT_STRING
 	|	scalar_int_constant_name
 	;
 
@@ -539,14 +329,10 @@ kind_param
 // R408
 signed_digit_string
 	:	( sign )?
-		digit_string
+		DIGIT_STRING
 	;
 
-// TODO: turn into terminal
-// R409
-digit_string
-	:	DIGIT ( DIGIT )*
-	;
+// R409 digit_string turned into fragment
 
 // R410
 sign
@@ -587,16 +373,16 @@ signed_real_literal_constant
 // R417
 real_literal_constant
     :   significand ( exponent_letter exponent )? ( kind_param )?
-    |   digit_string exponent_letter exponent ( kind_param )?
+    |   DIGIT_STRING exponent_letter exponent ( kind_param )?
     ;
 
 // R418
 significand
-	:	digit_string
+	:	DIGIT_STRING
 		DOT
-		( digit_string )?
+		( DIGIT_STRING )?
 	|	DOT
-		digit_string
+		DIGIT_STRING
 	;
 
 // R419
@@ -715,11 +501,15 @@ parent_type_name
     : name
     ;
 
+// R432
+private_or_sequence
+    :   private_components_stmt
+    |   sequence_stmt
+    ;
+
 // R433
 end_type_stmt
-	:	END
-		TYPE
-		( type_name )?
+	:	END TYPE ( type_name )?
 	;
 
 type_name
@@ -733,12 +523,7 @@ sequence_stmt
 
 // R435
 type_param_def_stmt
-	:	INTEGER
-		( kind_selector )?
-		COMMA
-		type_param_attr_spec
-		COLONCOLON
-		type_param_decl_list
+	:	INTEGER ( kind_selector )? COMMA type_param_attr_spec COLONCOLON type_param_decl_list
 	;
 
 // R436
@@ -1786,9 +1571,7 @@ primary
 	|	function_reference
 	|	type_param_inquiry
 	|	type_param_name
-	|	LPAREN
-		expr
-		RPAREN
+	|	LPAREN expr RPAREN
 	;
 
 // R702
@@ -3508,32 +3291,212 @@ char_literal_constant
     |    ( kind_param ) DOUBLE_QUOTE ( REP_CHAR )* DOUBLE_QUOTE
     ;
 
-// TODO: convert to terminal
-// R301
-character
-	:	ALPHANUMERIC_CHARACTER
-	|	SPECIAL_CHARACTER
+// R304
+T_IDENT
+	:	LETTER ( ALPHANUMERIC_CHARACTER )*
 	;
 
-// TODO: converted to terminal
-// R302
-ALPHANUMERIC_CHARACTER
-	:	LETTER
-	|	DIGIT
-	|	UNDERSCORE
-	;
 
-// TODO: converted to terminal
-// R303  underscore                  : _
+
+
+ PLUS : '+';
+ QUESTION : '?';
+ DOT : '.';
+ STAR : '*';
+ STARSTAR : '**';
+ COLON : ':';
+ COLONCOLON : '::';
+ RPAREN : ')';
+ LPAREN : '(';
+ RBRACKET : ']';
+ LBRACKET : '[';
+ PERCENT : '%';
+ SLASH : '/';
+ SLASHSLASH : '//';
+ COMMA : ',';
+ EQUAL : ':';
+ EQUAL_GREATER : ':>';
+ DOT_TRUE : '.TRUE.';
+ DOT_FALSE : '.FALSE.';
+ DOT_EQ : '.EQ.';
+ DOT_NE : '.NE.';
+ DOT_LT : '.LT.';
+ DOT_LE : '.LE.';
+ DOT_GT : '.GT.';
+ DOT_GE : '.GE.';
+ EQUAL_EQ : '==';
+ SLASH_EQ : '/=';
+ LESSTHAN : '<';
+ LESSTHAN_EQ : '<=';
+ GREATERTHAN : '>';
+ GREATERTHAN_EQ : '>=';
+ DOT_NOT : '.NOT.';
+ DOT_AND : '.AND.';
+ DOT_OR : '.OR.';
+ DOT_EQV : '.EQV.';
+ DOT_NEQV : '.NEQV.';
+ PROGRAM : 'PROGRAM';
+ INTERFACE : 'INTERFACE';
+ MODULE : 'MODULE';
+ CONTAINS : 'CONTAINS';
+ INTENT : 'INTENT';
+ IN : 'IN';
+ OUT : 'OUT';
+ INOUT : 'INOUT';
+ VALUE : 'VALUE';
+ TYPE : 'TYPE';
+ CLASS : 'CLASS';
+ EXTENDS : 'EXTENDS';
+ ABSTRACT : 'ABSTRACT';
+ PUBLIC : 'PUBLIC';
+ PRIVATE : 'PRIVATE';
+ PROTECTED : 'PROTECTED';
+ SEQUENCE : 'SEQUENCE';
+ ENUM : 'ENUM';
+ ENUMCOMMA : 'ENUMCOMMA';
+ ENUMERATOR : 'ENUMERATOR';
+ FINAL : 'FINAL';
+ INTEGER : 'INTEGER';
+ REAL : 'REAL';
+ DOUBLE : 'DOUBLE';
+ PRECISION : 'PRECISION';
+ COMPLEX : 'COMPLEX';
+ CHARACTER : 'CHARACTER';
+ LOGICAL : 'LOGICAL';
+ KIND : 'KIND';
+ LEN : 'LEN';
+ ASYNCHRONOUS : 'ASYNCHRONOUS';
+ BIND : 'BIND';
+ C : 'C';
+ COMMON : 'COMMON';
+ DATA : 'DATA';
+ DIMENSION : 'DIMENSION';
+ EQUIVALENCE : 'EQUIVALENCE';
+ IMPLICIT : 'IMPLICIT';
+ NONE : 'NONE';
+ INTRINSIC : 'INTRINSIC';
+ PARAMETER : 'PARAMETER';
+ POINTER : 'POINTER';
+ TARGET : 'TARGET';
+ NULLIFY : 'NULLIFY';
+ USE : 'USE';
+ ONLY : 'ONLY';
+ VOLATILE : 'VOLATILE';
+ ASSOCIATE : 'ASSOCIATE';
+ ALLOCATE : 'ALLOCATE';
+ ALLOCATABLE : 'ALLOCATABLE';
+ DEALLOCATE : 'DEALLOCATE';
+ NAMELIST : 'NAMELIST';
+ SAVE : 'SAVE';
+ SOURCE : 'SOURCE';
+ CASE : 'CASE';
+ END : 'END';
+ IMPORT : 'IMPORT';
+ FUNCTION : 'FUNCTION';
+ PROCEDURE : 'PROCEDURE';
+ SUBROUTINE : 'SUBROUTINE';
+ EXTERNAL : 'EXTERNAL';
+ OPTIONAL : 'OPTIONAL';
+ ELEMENTAL : 'ELEMENTAL';
+ PURE : 'PURE';
+ RECURSIVE : 'RECURSIVE';
+ RESULT : 'RESULT';
+ CALL : 'CALL';
+ ENTRY : 'ENTRY';
+ PASS : 'PASS';
+ NOPASS : 'NOPASS';
+ NON : 'NON';
+ OPERATOR : 'OPERATOR';
+ OVERRIDABLE : 'OVERRIDABLE';
+ DEFERRED : 'DEFERRED';
+ CYCLE : 'CYCLE';
+ CONTINUE : 'CONTINUE';
+ WAIT : 'WAIT';
+ STOP : 'STOP';
+ EXIT : 'EXIT';
+ RETURN : 'RETURN';
+ ASSIGNMENT : 'ASSIGNMENT';
+ BLOCK : 'BLOCK';
+ IS : 'IS';
+ IF : 'IF';
+ THEN : 'THEN';
+ ELSE : 'ELSE';
+ DO : 'DO';
+ GO : 'GO';
+ TO : 'TO';
+ WHERE : 'WHERE';
+ ELSEWHERE : 'ELSEWHERE';
+ WHILE : 'WHILE';
+ FORALL : 'FORALL';
+ FORMAT : 'FORMAT';
+ FMT : 'FMT';
+ NML : 'NML';
+ READ : 'READ';
+ READWRITE : 'READWRITE';
+ WRITE : 'WRITE';
+ PRINT : 'PRINT';
+ UNIT : 'UNIT';
+ OPEN : 'OPEN';
+ OPENED : 'OPENED';
+ CLOSE : 'CLOSE';
+ ADVANCE : 'ADVANCE';
+ ACCESS : 'ACCESS';
+ ACTION : 'ACTION';
+ BACKSPACE : 'BACKSPACE';
+ BLANK : 'BLANK';
+ DECIMAL : 'DECIMAL';
+ DEFAULT : 'DEFAULT';
+ DELIM : 'DELIM';
+ DIRECT : 'DIRECT';
+ ENCODING : 'ENCODING';
+ EOR : 'EOR';
+ ERR : 'ERR';
+ ERRMSG : 'ERRMSG';
+ EXIST : 'EXIST';
+ ENDFILE : 'ENDFILE';
+ FILE : 'FILE';
+ FLUSH : 'FLUSH';
+ FORM : 'FORM';
+ FORMATTED : 'FORMATTED';
+ UNFORMATTED : 'UNFORMATTED';
+ ID : 'ID';
+ INQUIRE : 'INQUIRE';
+ IOLENGTH : 'IOLENGTH';
+ IOMSG : 'IOMSG';
+ IOSTAT : 'IOSTAT';
+ NAME : 'NAME';
+ NAMED : 'NAMED';
+ NEXTREC : 'NEXTREC';
+ NUMBER : 'NUMBER';
+ PAD : 'PAD';
+ PENDING : 'PENDING'; 
+ POS : 'POS';
+ POSITION : 'POSITION';
+ REC : 'REC';
+ RECL : 'RECL';
+ REWIND : 'REWIND';
+ ROUND : 'ROUND';
+ SELECT : 'SELECT';
+ SEQUENTIAL : 'SEQUENTIAL';
+ SIGN : 'SIGN';
+ SIZE : 'SIZE';
+ STAT : 'STAT';
+ STATUS : 'STATUS';
+ STREAM : 'STREAM';
+ GENERIC : 'GENERIC';
+
+
+// R303  underscore
 fragment
 UNDERSCORE : '_' ;
 
-// TODO: convert to terminal
-// R304
-name
-	:	LETTER
-		( ALPHANUMERIC_CHARACTER )*
-	;
+// R409 digit_string
+fragment
+DIGIT_STRING : DIGIT+ ;
+
+// R302 alphanumeric_character
+fragment
+ALPHANUMERIC_CHARACTER : LETTER | DIGIT | UNDERSCORE ;
 
 fragment
 SPECIAL_CHARACTER
