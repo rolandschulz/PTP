@@ -181,7 +181,8 @@ bitset_oreq(bitset *b1, bitset *b2)
 	/*
 	 * Mask out unused high bits
 	 */
-	b1->bs_bits[b1->bs_size-1] &= (1 << (BIT_IN_OBJ(b1->bs_nbits-1) + 1)) - 1;
+	if (b1->bs_nbits % sizeof(bits) != 0)
+		b1->bs_bits[b1->bs_size-1] &= (1 << (BIT_IN_OBJ(b1->bs_nbits-1) + 1)) - 1;
 }
 
 /*
@@ -198,7 +199,8 @@ bitset_invert(bitset *b)
 	/*
 	 * Mask out unused high bits
 	 */
-	b->bs_bits[b->bs_size-1] &= (1 << (BIT_IN_OBJ(b->bs_nbits-1) + 1)) - 1;	
+	if (b->bs_nbits % sizeof(bits) != 0)
+		b->bs_bits[b->bs_size-1] &= (1 << (BIT_IN_OBJ(b->bs_nbits-1) + 1)) - 1;	
 }
 
 /*
