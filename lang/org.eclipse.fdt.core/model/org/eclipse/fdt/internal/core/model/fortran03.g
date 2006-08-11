@@ -54,37 +54,65 @@ tokens {
  PROGRAM = 'PROGRAM';
  INTERFACE = 'INTERFACE';
  MODULE = 'MODULE';
+ IN = 'IN';
+ OUT = 'OUT';
  TYPE = 'TYPE';
  CLASS = 'CLASS';
+ EXTENDS = 'EXTENDS';
+ INTEGER = 'INTEGER';
+ REAL = 'REAL';
+ DOUBLE = 'DOUBLE';
+ PRECISION = 'PRECISION';
+ COMPLEX = 'COMPLEX';
+ CHARACTER = 'CHARACTER';
+ LOGICAL = 'LOGICAL';
+ ASYNCHRONOUS = 'ASYNCHRONOUS';
+ BIND = 'BIND';
  COMMON = 'COMMON';
  DATA = 'DATA';
+ DIMENSION = 'DIMENSION';
+ EQUIVALENCE = 'EQUIVALENCE';
+ IMPLICIT = 'IMPLICIT';
+ INTRINSIC = 'INTRINSIC';
+ PARAMETER = 'PARAMETER';
+ POINTER = 'SAVE'
+ TARGET = 'TARGET';
+ USE = 'USE';
+ VOLATILE = 'VOLATILE';
  ALLOCATABLE = 'ALLOCATABLE';
  DEALLOCATE = 'DEALLOCATE';
- DIMENSION = 'DIMENSION';
  NAMELIST = 'NAMELIST';
  SAVE = 'SAVE';
- TARGET = 'TARGET';
  CASE = 'CASE';
  END = 'END';
- USE = 'USE';
  IMPORT = 'IMPORT';
  SUBROUTINE = 'SUBROUTINE';
  FUNCTION = 'FUNCTION';
+ RESULT = 'RESULT';
  CALL = 'CALL';
  ENTRY = 'ENTRY';
  PASS = 'PASS';
  NOPASS = 'NOPASS';
+ NON = 'NON';
+ OVERRIDABLE = 'OVERRIDABLE';
+ DEFERRED = 'DEFERRED';
  IF = 'IF';
  THEN = 'THEN';
  ELSE = 'ELSE';
  WHERE = 'WHERE';
  ELSEWHERE = 'ELSEWHERE';
+ FORALL = 'FORALL';
+ FORMAT = 'FORMAT';
+ READ = 'READ';
+ WRITE = 'WRITE';
+ PRINT = 'PRINT';
+ GENERIC = 'GENERIC';
 }
 
 
 /**
 Section 1:
- */
+
 
 
 /*****
@@ -393,6 +421,11 @@ type_param_value
 	|	COLON
 	;
 
+// - C101 shall be a scalar
+scalar_int_expr
+	:	int_expr
+	;
+
 /**
 C402  (R402) The type-param-value for a kind type parameter shall be an initialization expression.
  */
@@ -419,8 +452,8 @@ intrinsic_type_spec
 	;
 
 // R404
-kind-selector
-    : LPAREN ( KIND_EQ )? scalar-int-initialization-expr RPAREN
+kind_selector
+    : LPAREN ( KIND_EQ )? scalar_int_initialization_expr RPAREN
     ;
 
 /**
@@ -537,7 +570,7 @@ signed_real_literal_constant
 // R417
 real_literal_constant
     :   significand ( exponent_letter exponent )? ( kind_param )?
-    |   digit_string exponent_letter exponent ( kind-param )?
+    |   digit_string exponent_letter exponent ( kind_param )?
     ;
 
 // R418
@@ -660,8 +693,8 @@ C421 (R424) The length specified for a character statement function or for a sta
 
 // R427
 char_literal_constant
-    :    ( kind_param ) SINGLE_QUOTE ( rep-char )* SINGLE_QUOTE
-    |    ( kind_param ) SINGLE_QUOTE ( rep-char )* SINGLE_QUOTE
+    :    ( kind_param ) SINGLE_QUOTE ( rep_char )* SINGLE_QUOTE
+    |    ( kind_param ) SINGLE_QUOTE ( rep_char )* SINGLE_QUOTE
     ;
 
 /**
@@ -695,6 +728,14 @@ derived_type_def
 derived_type_stmt
     :    TYPE ( ( COMMA type_attr_spec_list )? COLONCOLON )? type_name
          ( LPAREN type_param_name_list RPAREN )?
+    ;
+
+type_attr_spec_list
+    :    type_attr_spec ( type_attr_spec )*
+    ;
+
+type_attr_name_list
+    :    type_attr_name ( type_attr_name )*
     ;
 
 // R431
@@ -756,6 +797,10 @@ end_type_stmt
 		TYPE
 		( type_name )?
 	;
+
+type_name
+    :    name
+    ;
 
 /**
 C431 (R433) If END TYPE is followed by a type-name, the type-name shall be the same as that in
@@ -1021,12 +1066,10 @@ C458 (R451) The procedure-name shall be the name of an accessible module procedu
      procedure that has an explicit interface.
  */
 
-
-/** TODO
-R452 generic_binding                : GENERIC
-
-                                          ( COMMA access_spec )? COLONCOLON generic_spec EQUAL_GREATER binding_name_list
- */
+// R452
+generic_binding
+    :    GENERIC ( COMMA access_spec )? COLONCOLON generic_spec EQUAL_GREATER binding_name_list
+    ;
 
 /**
 C459 (R452) Within the specification-part of a module, each generic-binding shall specify, either
@@ -1059,18 +1102,14 @@ C464 (R452) If generic-spec is dtio-generic-spec, the interface of each binding 
      9.5.3.7. The type of the dtv argument shall be type-name.
  */
 
-
-/** TODO
-R453 binding_attr                   : PASS ( LPAREN arg_name RPAREN )?
-
-                                | NOPASS
-
-                                | NON OVERRIDABLE
-
-                                | DEFERRED
-
-                                | access_spec
- */
+// R453
+binding_attr
+    : PASS ( LPAREN arg_name RPAREN )?
+    | NOPASS
+    | NON OVERRIDABLE
+    | DEFERRED
+    | access_spec
+    ;
 
 /**
 C465 (R453) The same binding-attr shall not appear more than once in a given binding-attr-list.
@@ -1133,15 +1172,15 @@ C475 (R454) A final subroutine shall not have a dummy argument with the same kin
      and rank as the dummy argument of another final subroutine of that type.
  */
 
+// R455
+derived_type_spec
+    : type_name ( LPAREN type_param_spec_list RPAREN )?
+    ;
 
-/** TODO
-R455 derived_type_spec              : type_name ( LPAREN type_param_spec_list RPAREN )?
- */
-
-
-/** TODO
-R456 type_param_spec                : ( keyword EQUAL )? type_param_value
- */
+// R456
+type_param_spec
+    : ( keyword EQUAL )? type_param_value
+    ;
 
 /**
 C476 (R455) type-name shall be the name of an accessible derived type.
@@ -1179,10 +1218,10 @@ structure_constructor
 		RPAREN
 	;
 
-
-/** TODO
-R458 component_spec                : ( keyword EQUAL )? component_data_source
- */
+// R458
+component_spec
+: ( keyword EQUAL )? component_data_source
+    ;
 
 // R459
 component_data_source
@@ -1263,10 +1302,10 @@ enumerator_def_stmt
 		enumerator_list
 	;
 
-
-/** TODO
-R463 enumerator                    : named_constant ( EQUAL scalar_int_initialization_expr )?
- */
+// R463
+enumerator
+    :    named_constant ( EQUAL scalar_int_initialization_expr )?
+    ;
 
 // R464
 end_enum_stmt
@@ -1292,11 +1331,11 @@ array_constructor
 	;
 
 
-/** TODO
-R466 ac_spec                 : type_spec COLONCOLON
-
-                               | (type_spec COLONCOLON)? ac_value_list
- */
+// R466
+ac_spec
+    : type_spec COLONCOLON
+    | (type_spec COLONCOLON)? ac_value_list
+    ;
 
 // R467
 left_square_bracket
@@ -1323,12 +1362,10 @@ ac_implied_do
 		RPAREN
 	;
 
-
-/** TODO
-R471  ac_implied_do_control   : ac_do_variable EQUAL scalar_int_expr COMMA scalar_int_expr
-
-                                           ( COMMA scalar_int_expr )?
- */
+// R471
+ac_implied_do_control
+    :    ac_do_variable EQUAL scalar_int_expr COMMA scalar_int_expr ( COMMA scalar_int_expr )?
+    ;
 
 // R472
 ac_do_variable
@@ -1407,15 +1444,9 @@ attr_spec
 	:	access_spec
 	|	ALLOCATABLE
 	|	ASYNCHRONOUS
-	|	DIMENSION
-		LPAREN
-		array_spec
-		RPAREN
+	|	DIMENSION LPAREN array_spec RPAREN
 	|	EXTERNAL
-	|	INTENT
-		LPAREN
-		intent_spec
-		RPAREN
+	|	INTENT LPAREN intent_spec RPAREN
 	|	INTRINSIC
 	|	language_binding_spec
 	|	OPTIONAL
@@ -1429,11 +1460,11 @@ attr_spec
 	;
 
 
-/** TODO
-R504  entity_decl             : object_name ( LPAREN array_spec RPAREN )? ( STAR char_length )? ( initialization )?
-
-                                | function_name ( STAR char_length )?
- */
+// R504
+entity_decl
+    : object_name ( LPAREN array_spec RPAREN )? ( STAR char_length )? ( initialization )?
+    | function_name ( STAR char_length )?
+    ;
 
 /**
 C504  (R504) If a type-param-value in a char-length in an entity-decl is not a colon or an asterisk, it
@@ -1639,10 +1670,9 @@ access_spec
 C539  (R508) An access-spec shall appear only in the specification-part of a module.
  */
 
-
-/** TODO
-R509  language_binding_spec is BIND LPAREN C ( COMMA NAME EQUAL scalar_char_initialization_expr )? RPAREN
- */
+// R509
+language_binding_spec
+    : BIND LPAREN C ( COMMA NAME EQUAL scalar_char_initialization_expr )? RPAREN
 
 /**
 C540  (R509) The scalar-char-initialization-expr shall be of default character kind.
@@ -1660,10 +1690,10 @@ array_spec
 C541  (R510)The maximum rank is seven.
  */
 
-
-/** TODO
-R511  explicit_shape_spec      : ( lower_bound COLON )? upper_bound
- */
+// R511
+explicit_shape_spec
+    : ( lower_bound COLON )? upper_bound
+    ;
 
 // R512
 lower_bound
@@ -1691,10 +1721,10 @@ deferred_shape_spec
 	:	COLON
 	;
 
-
-/** TODO
-R516  assumed_size_spec        : ( explicit_shape_spec_list COMMA )? ( lower_bound COLON )? STAR
- */
+// R516
+assumed_size_spec
+    : ( explicit_shape_spec_list COMMA )? ( lower_bound COLON )? STAR
+    ;
 
 /**
 C543  An assumed-size-spec shall not appear except as the declaration of the array bounds of a dummy
@@ -1815,12 +1845,11 @@ data_stmt_object
 	|	data_implied_do
 	;
 
-
-/** TODO
-R527 data_implied_do         : LPAREN data_i_do_object_list COMMA data_i_do_variable EQUAL
-
-                                         scalar_int_expr COMMA scalar_int_expr ( COMMA scalar_int_expr )? RPAREN
-*/
+// R527
+data_implied_do
+    : LPAREN data_i_do_object_list COMMA data_i_do_variable EQUAL
+         scalar_int_expr COMMA scalar_int_expr ( COMMA scalar_int_expr )? RPAREN
+    ;
 
 // R528
 data_i_do_object
@@ -1882,10 +1911,10 @@ C561 (R528) In an array-element or a scalar-structure-component that is a data-i
      be intrinsic.
  */
 
-
-/** TODO
-R530 data_stmt_value        : ( data_stmt_repeat STAR )? data_stmt_constant
- */
+// R530
+data_stmt_value
+    : ( data_stmt_repeat STAR )? data_stmt_constant
+    ;
 
 // R531
 data_stmt_repeat
@@ -1987,12 +2016,11 @@ pointer_stmt
 		pointer_decl_list
 	;
 
-
-/** TODO
-R541 pointer_decl           : object_name ( LPAREN deferred_shape_spec_list RPAREN )?
-
-                              | proc_entity_name
- */
+// R541
+pointer_decl
+    : object_name ( LPAREN deferred_shape_spec_list RPAREN )?
+    | proc_entity_name
+    ;
 
 /**
 C568 (R541) A proc-entity-name shall also be declared in a procedure-declaration-stmt.
@@ -2844,6 +2872,10 @@ int_initialization_expr
 	:	int_expr
 	;
 
+scalar_int_initialization_expr
+	:	int_initialization_expr
+	;
+
 /**
 C713 (R732) int-initialization-expr shall be an initialization expression.
  */
@@ -2868,14 +2900,12 @@ assignment_stmt
 C715 (R734) The variable in an assignment-stmt shall not be a whole assumed-size array.
  */
 
-
-/** TODO
-R735 pointer_assignment_stmt       is data_pointer_object ( LPAREN bounds_spec_list RPAREN )? EQUAL_GREATER data_target
-
-                               | data_pointer_object LPAREN bounds_remapping_list RPAREN EQUAL_GREATER data_target
-
-                               | proc_pointer_object EQUAL_GREATER proc_target
- */
+// R735
+pointer_assignment_stmt
+    :    data_pointer_object ( LPAREN bounds_spec_list RPAREN )? EQUAL_GREATER data_target
+    | data_pointer_object LPAREN bounds_remapping_list RPAREN EQUAL_GREATER data_target
+    | proc_pointer_object EQUAL_GREATER proc_target
+    ;
 
 // R736
 data_pointer_object
@@ -3066,20 +3096,20 @@ forall_construct
 		end_forall_stmt
 	;
 
+// R753
+forall_construct_stmt
+    :    ( forall_construct_name COLON )? FORALL forall_header
+    ;
 
-/** TODO
-R753 forall-construct-stmt     : ( forall-construct-name COLON )? FORALL forall-header
- */
+// R754
+forall_header
+    : LPAREN forall_triplet_spec_list ( COMMA scalar_mask_expr )? RPAREN
+    ;
 
-
-/** TODO
-R754 forall-header             : LPAREN forall-triplet-spec-list ( COMMA scalar-mask-expr )? RPAREN
- */
-
-
-/** TODO
-R755 forall-triplet-spec       : index-name EQUAL subscript COLON subscript ( COLON stride )?
- */
+// R755
+forall_triplet_spec
+    : index_name EQUAL subscript COLON subscript ( COLON stride )?
+    ;
 
 // R756
 forall_body_construct
@@ -3787,19 +3817,19 @@ close_stmt
 
 
 /** TODO
-R909 close-spec             : ( UNIT EQUAL )? file-unit-number
+R909 close_spec             : ( UNIT EQUAL )? file_unit_number
 
-                              | IOSTAT EQUAL scalar-int-variable
+                              | IOSTAT EQUAL scalar_int_variable
 
-                              | IOMSG EQUAL iomsg-variable
+                              | IOMSG EQUAL iomsg_variable
 
                               | ERR EQUAL LABEL
 
-                              | STATUS EQUAL scalar-default-char-expr
+                              | STATUS EQUAL scalar_default_char_expr
 */
 
 /**
-C906 (R909) No specifier shall appear more than once in a given close-spec-list.
+C906 (R909) No specifier shall appear more than once in a given close_spec_list.
  */
 
 /**
@@ -3812,69 +3842,45 @@ C908 (R909) The label used in the ERR= specifier shall be the statement label of
      statement that appears in the same scoping unit as the CLOSE statement.
  */
 
-
-/** TODO
-R910 read-stmt              : READ LPAREN io-control-spec-list RPAREN ( input-item-list )?
-
-                              | READ format ( COMMA input-item-list )?
-*/
+// R910
+read_stmt
+    :    READ LPAREN io_control_spec_list RPAREN ( input_item_list )?
+    |    READ format ( COMMA input_item_list )?
+    ;
 
 // R911
 write_stmt
-	:	WRITE
-		LPAREN
-		io_control_spec_list
-		RPAREN
-		( output_item_list )?
+	:	WRITE LPAREN io_control_spec_list RPAREN ( output_item_list )?
 	;
 
+// R912
+print_stmt
+    :    PRINT format ( COMMA output_item_list )?
+    ;
 
-/** TODO
-R912 print-stmt             : PRINT format ( COMMA output-item-list )?
-*/
-
-
-/** TODO
-R913 io-control-spec        : ( UNIT EQUAL )? io-unit
-
-                                | ( FMT EQUAL )? format
-
-                                | ( NML EQUAL )? namelist-group-name
-
-                                | ADVANCE EQUAL scalar-default-char-expr
-
-                                | ASYNCHRONOUS EQUAL scalar-char-initialization-expr
-
-                                | BLANK EQUAL scalar-default-char-expr
-
-                                | DECIMAL EQUAL scalar-default-char-expr
-
-                                | DELIM EQUAL scalar-default-char-expr
-
-                                | END EQUAL LABEL
-
-                                | EOR EQUAL LABEL
-
-                                | ERR EQUAL LABEL
-
-                                | ID EQUAL scalar-int-variable
-
-                                | IOMSG EQUAL iomsg-variable
-
-                                | IOSTAT EQUAL scalar-int-variable
-
-                                | PAD EQUAL scalar-default-char-expr
-
-                                | POS EQUAL scalar-int-expr
-
-                                | REC EQUAL scalar-int-expr
-
-                                | ROUND EQUAL scalar-default-char-expr
-
-                                | SIGN EQUAL scalar-default-char-expr
-
-                                | SIZE EQUAL scalar-int-variable
-*/
+// R913
+io_control_spec
+    :    ( UNIT EQUAL )? io_unit
+    | ( FMT EQUAL )? format
+    | ( NML EQUAL )? namelist_group_name
+    | ADVANCE EQUAL scalar_default_char_expr
+    | ASYNCHRONOUS EQUAL scalar_char_initialization_expr
+    | BLANK EQUAL scalar_default_char_expr
+    | DECIMAL EQUAL scalar_default_char_expr
+    | DELIM EQUAL scalar_default_char_expr
+    | END EQUAL LABEL
+    | EOR EQUAL LABEL
+    | ERR EQUAL LABEL
+    | ID EQUAL scalar_int_variable
+    | IOMSG EQUAL iomsg_variable
+    | IOSTAT EQUAL scalar_int_variable
+    | PAD EQUAL scalar_default_char_expr
+    | POS EQUAL scalar_int_expr
+    | REC EQUAL scalar_int_expr
+    | ROUND EQUAL scalar_default_char_expr
+    | SIGN EQUAL scalar_default_char_expr
+    | SIZE EQUAL scalar_int_variable
+    ;
 
 /**
 C909 (R913) No specifier shall appear more than once in a given io-control-spec-list.
@@ -4015,9 +4021,9 @@ io_implied_do_object
 
 
 /** TODO
-R919 io-implied-do-control    : do-variable EQUAL scalar-int-expr COMMA
+R919 io_implied_do_control    : do_variable EQUAL scalar_int_expr COMMA
 
-                                          scalar-int-expr ( COMMA scalar-int-expr )?
+                                          scalar_int_expr ( COMMA scalar_int_expr )?
 */
 
 /**
@@ -4208,77 +4214,77 @@ inquire_stmt
 
 
 /** TODO
-R930 inquire-spec             : ( UNIT EQUAL )? file-unit-number
+R930 inquire_spec             : ( UNIT EQUAL )? file_unit_number
 
-                                | FILE EQUAL file-name-expr
+                                | FILE EQUAL file_name_expr
 
-                                | ACCESS EQUAL scalar-default-char-variable
+                                | ACCESS EQUAL scalar_default_char_variable
 
-                                | ACTION EQUAL scalar-default-char-variable
+                                | ACTION EQUAL scalar_default_char_variable
 
-                                | ASYNCHRONOUS EQUAL scalar-default-char-variable
+                                | ASYNCHRONOUS EQUAL scalar_default_char_variable
 
-                                | BLANK EQUAL scalar-default-char-variable
+                                | BLANK EQUAL scalar_default_char_variable
 
-                                | DECIMAL EQUAL scalar-default-char-variable
+                                | DECIMAL EQUAL scalar_default_char_variable
 
-                                | DELIM EQUAL scalar-default-char-variable
+                                | DELIM EQUAL scalar_default_char_variable
 
-                                | DIRECT EQUAL scalar-default-char-variable
+                                | DIRECT EQUAL scalar_default_char_variable
 
-                                | ENCODING EQUAL scalar-default-char-variable
+                                | ENCODING EQUAL scalar_default_char_variable
 
                                 | ERR EQUAL LABEL
 
-                                | EXIST EQUAL scalar-default-logical-variable
+                                | EXIST EQUAL scalar_default_logical_variable
 
-                                | FORM EQUAL scalar-default-char-variable
+                                | FORM EQUAL scalar_default_char_variable
 
-                                | FORMATTED EQUAL scalar-default-char-variable
+                                | FORMATTED EQUAL scalar_default_char_variable
 
-                                | ID EQUAL scalar-int-variable
+                                | ID EQUAL scalar_int_variable
 
-                                | IOMSG EQUAL iomsg-variable
+                                | IOMSG EQUAL iomsg_variable
 
-                                | IOSTAT EQUAL scalar-int-variable
+                                | IOSTAT EQUAL scalar_int_variable
 
-                                | NAME EQUAL scalar-default-char-variable
+                                | NAME EQUAL scalar_default_char_variable
 
-                                | NAMED EQUAL scalar-default-logical-variable
+                                | NAMED EQUAL scalar_default_logical_variable
 
-                                | NEXTREC EQUAL scalar-int-variable
+                                | NEXTREC EQUAL scalar_int_variable
 
-                                | NUMBER EQUAL scalar-int-variable
+                                | NUMBER EQUAL scalar_int_variable
 
-                               | OPENED EQUAL scalar-default-logical-variable
+                               | OPENED EQUAL scalar_default_logical_variable
 
-                               | PAD EQUAL scalar-default-char-variable
+                               | PAD EQUAL scalar_default_char_variable
 
-                               | PENDING EQUAL scalar-default-logical-variable
+                               | PENDING EQUAL scalar_default_logical_variable
 
-                               | POS EQUAL scalar-int-variable
+                               | POS EQUAL scalar_int_variable
 
-                               | POSITION EQUAL scalar-default-char-variable
+                               | POSITION EQUAL scalar_default_char_variable
 
-                               | READ EQUAL scalar-default-char-variable
+                               | READ EQUAL scalar_default_char_variable
 
-                               | READWRITE EQUAL scalar-default-char-variable
+                               | READWRITE EQUAL scalar_default_char_variable
 
-                               | RECL EQUAL scalar-int-variable
+                               | RECL EQUAL scalar_int_variable
 
-                               | ROUND EQUAL scalar-default-char-variable
+                               | ROUND EQUAL scalar_default_char_variable
 
-                               | SEQUENTIAL EQUAL scalar-default-char-variable
+                               | SEQUENTIAL EQUAL scalar_default_char_variable
 
-                               | SIGN EQUAL scalar-default-char-variable
+                               | SIGN EQUAL scalar_default_char_variable
 
-                               | SIZE EQUAL scalar-int-variable
+                               | SIZE EQUAL scalar_int_variable
 
-                               | STREAM EQUAL scalar-default-char-variable
+                               | STREAM EQUAL scalar_default_char_variable
 
-                               | UNFORMATTED EQUAL scalar-default-char-variable
+                               | UNFORMATTED EQUAL scalar_default_char_variable
 
-                               | WRITE EQUAL scalar-default-char-variable
+                               | WRITE EQUAL scalar_default_char_variable
 */
 
 /**
@@ -5095,10 +5101,6 @@ function_stmt
 		( suffix )?
 	;
 
-end_function_stmt
-    :    END ( FUNCTION ( function_name )? )?
-    ;
-
 /**
 C1234 (R1224) If RESULT is specified, result-name shall not be the same as function-name and shall
       not be the same as the entry-name in any ENTRY statement in the subprogram.
@@ -5167,17 +5169,16 @@ C1242 (R1227) A prefix shall not specify ELEMENTAL if proc-language-binding-spec
       function-stmt or subroutine-stmt.
  */
 
+// R1229
+suffix
+    :    proc-language-binding-spec ( RESULT LPAREN result-name RPAREN )?
+    | RESULT LPAREN result-name RPAREN ( proc-language-binding-spec )?
+    ;
 
-/** TODO
-R1229 suffix                 : proc-language-binding-spec ( RESULT LPAREN result-name RPAREN )?
-
-                               | RESULT LPAREN result-name RPAREN ( proc-language-binding-spec )?
-*/
-
-
-/** TODO
-R1230 end-function-stmt      : END ( FUNCTION ( function-name )? )?
-*/
+// R1230
+end_function_stmt
+    : END ( FUNCTION ( function-name )? )?
+    ;
 
 /**
 C1243 (R1230) FUNCTION shall appear in the end-function-stmt of an internal or module function.
@@ -5205,12 +5206,11 @@ subroutine_subprogram
 		end_subroutine_stmt
 	;
 
-
-/** TODO
-R1232 subroutine-stmt        : ( prefix )? SUBROUTINE subroutine-name
-
-                                         ( LPAREN ( dummy-arg-list )? RPAREN ( proc-language-binding-spec )? )?
-*/
+// R1232
+subroutine_stmt
+    :     ( prefix )? SUBROUTINE subroutine_name
+          ( LPAREN ( dummy_arg_list )? RPAREN ( proc_language_binding_spec )? )?
+    ;
 
 /**
 C1247 (R1232) The prefix of a subroutine-stmt shall not contain a declaration-type-spec.
@@ -5222,10 +5222,10 @@ dummy_arg
 	|	STAR
 	;
 
-
-/** TODO
-R1234 end-subroutine-stmt          : END ( SUBROUTINE ( subroutine-name )? )?
-*/
+// R1234
+end_subroutine_stmt
+    :    END ( SUBROUTINE ( subroutine_name )? )?
+    ;
 
 /**
 C1248 (R1234) SUBROUTINE shall appear in the end-subroutine-stmt of an internal or module sub-
@@ -5499,3 +5499,6 @@ SINGLE_QUOTE : '\'' ;
 
 fragment
 DOUBLE_QUOTE : '\"' ;
+
+fragment
+LEN_EQ : 'LEN' EQUAL ;
