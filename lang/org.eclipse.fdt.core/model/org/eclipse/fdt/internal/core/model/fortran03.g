@@ -1,5 +1,4 @@
-
-/**
+/*
  * NOTES
  *
  * R303 underscore - added _ to rule (what happened to it?)
@@ -8,12 +7,15 @@
  */
 
 
-/**
- * TOKENS - removed from grammar
- */
+grammar Fortran03Parser;
+
+options {
+    language=Java;
+    backtrack=true;
+    memoize=true;
+}
 
 tokens {
- UNDERSCORE = '_';
  PLUS = '+';
  QUESTION = '?';
  DOT = '.';
@@ -21,7 +23,6 @@ tokens {
  STARSTAR = '**';
  COLON = ':';
  COLONCOLON = '::';
- KIND_EQ = ('KIND' '=');
  RPAREN = '(';
  LPAREN = ')';
  RBRACKET = '[';
@@ -32,8 +33,8 @@ tokens {
  COMMA = ',';
  EQUAL = '=';
  EQUAL_GREATER = '=>';
- DOT_TRUE = '.TRUE.'
- DOT_FALSE = '.FALSE.'
+ DOT_TRUE = '.TRUE.';
+ DOT_FALSE = '.FALSE.';
  DOT_EQ = '.EQ.';
  DOT_NE = '.NE.';
  DOT_LT = '.LT.';
@@ -54,6 +55,7 @@ tokens {
  PROGRAM = 'PROGRAM';
  INTERFACE = 'INTERFACE';
  MODULE = 'MODULE';
+ CONTAINS = 'CONTAINS';
  INTENT = 'INTENT';
  IN = 'IN';
  OUT = 'OUT';
@@ -65,7 +67,12 @@ tokens {
  ABSTRACT = 'ABSTRACT';
  PUBLIC = 'PUBLIC';
  PRIVATE = 'PRIVATE';
+ PROTECTED = 'PROTECTED';
  SEQUENCE = 'SEQUENCE';
+ ENUM = 'ENUM';
+ ENUMCOMMA = 'ENUMCOMMA';
+ ENUMERATOR = 'ENUMERATOR';
+ FINAL = 'FINAL';
  INTEGER = 'INTEGER';
  REAL = 'REAL';
  DOUBLE = 'DOUBLE';
@@ -73,26 +80,32 @@ tokens {
  COMPLEX = 'COMPLEX';
  CHARACTER = 'CHARACTER';
  LOGICAL = 'LOGICAL';
+ KIND = 'KIND';
+ LEN = 'LEN';
  ASYNCHRONOUS = 'ASYNCHRONOUS';
  BIND = 'BIND';
- C = 'BIND';
+ C = 'C';
  COMMON = 'COMMON';
  DATA = 'DATA';
  DIMENSION = 'DIMENSION';
  EQUIVALENCE = 'EQUIVALENCE';
  IMPLICIT = 'IMPLICIT';
+ NONE = 'NONE';
  INTRINSIC = 'INTRINSIC';
  PARAMETER = 'PARAMETER';
- POINTER = 'SAVE'
+ POINTER = 'POINTER';
  TARGET = 'TARGET';
+ NULLIFY = 'NULLIFY';
  USE = 'USE';
  ONLY = 'ONLY';
  VOLATILE = 'VOLATILE';
  ASSOCIATE = 'ASSOCIATE';
+ ALLOCATE = 'ALLOCATE';
  ALLOCATABLE = 'ALLOCATABLE';
  DEALLOCATE = 'DEALLOCATE';
  NAMELIST = 'NAMELIST';
  SAVE = 'SAVE';
+ SOURCE = 'SOURCE';
  CASE = 'CASE';
  END = 'END';
  IMPORT = 'IMPORT';
@@ -118,6 +131,7 @@ tokens {
  WAIT = 'WAIT';
  STOP = 'STOP';
  EXIT = 'EXIT';
+ RETURN = 'RETURN';
  ASSIGNMENT = 'ASSIGNMENT';
  BLOCK = 'BLOCK';
  IS = 'IS';
@@ -135,6 +149,7 @@ tokens {
  FMT = 'FMT';
  NML = 'NML';
  READ = 'READ';
+ READWRITE = 'READWRITE';
  WRITE = 'WRITE';
  PRINT = 'PRINT';
  UNIT = 'UNIT';
@@ -153,11 +168,12 @@ tokens {
  ENCODING = 'ENCODING';
  EOR = 'EOR';
  ERR = 'ERR';
+ ERRMSG = 'ERRMSG';
  EXIST = 'EXIST';
  ENDFILE = 'ENDFILE';
  FILE = 'FILE';
  FLUSH = 'FLUSH';
- FORM = 'FORM'
+ FORM = 'FORM';
  FORMATTED = 'FORMATTED';
  UNFORMATTED = 'UNFORMATTED';
  ID = 'ID';
@@ -174,7 +190,7 @@ tokens {
  PENDING = 'PENDING'; 
  POS = 'POS';
  POSITION = 'POSITION';
- REC = 'REC;
+ REC = 'REC';
  RECL = 'RECL';
  REWIND = 'REWIND';
  ROUND = 'ROUND';
@@ -182,31 +198,30 @@ tokens {
  SEQUENTIAL = 'SEQUENTIAL';
  SIGN = 'SIGN';
  SIZE = 'SIZE';
+ STAT = 'STAT';
  STATUS = 'STATUS';
  STREAM = 'STREAM';
  GENERIC = 'GENERIC';
 }
 
 
-/**
+/*
 Section 1:
  */
 
-/*****
+/*
 R101  xyz-list                     is xyz [ , xyz ] ...
-
 R102  xyz-name                     is name
-
 R103  scalar-xyz                   is xyz
-******/
+*/
 
-/**
+/*
 C101  (R103) scalar-xyz shall be scalar.
- */
+*/
 
-/**
+/*
 Section 2:
- */
+*/
 
 // R201
 program
@@ -361,54 +376,62 @@ action_stmt
 	|	computed_goto_stmt
 	;
 
-/**
+/*
 C201  (R208) An execution-part shall not contain an end-function-stmt, end-program-stmt, or end-
       subroutine-stmt.
- */
+*/
 
 // R215
 keyword
 	:	name
 	;
 
-/**
+/*
 Section 3:
- */
+*/
 
+/* TODO: converted to terminal
 // R301
 character
 	:	alphanumeric_character
 	|	special_character
 	;
+*/
 
+/* TODO: converted to terminal
 // R302
 alphanumeric_character
 	:	LETTER
 	|	DIGIT
 	|	UNDERSCORE
 	;
+*/
 
-
-/**
- * convert to terminal
+/* TODO: converted to terminal
 R303  underscore                  : _
- */
+*/
 
+/* TODO: converted to terminal
 // R304
 name
 	:	LETTER
-		( alphanumeric_character )*
+		( ALPHANUMERIC_CHARACTER )*
 	;
+*/
 
-/**
+/*
 C301  (R304) The maximum length of a name is 63 characters.
- */
+*/
 
 // R305
 constant
 	:	literal_constant
 	|	named_constant
 	;
+
+scalar_constant
+    :    constant
+    ;
 
 // R306
 literal_constant
@@ -430,18 +453,18 @@ int_constant
 	:	constant
 	;
 
-/**
+/*
 C302  (R308)int-constant shall be of type integer.
- */
+*/
 
 // R309
 char_constant
 	:	constant
 	;
 
-/**
+/*
 C303  (R309) char-constant shall be of type character.
- */
+*/
 
 // R310
 intrinsic_operator
@@ -469,7 +492,7 @@ extended_intrinsic_op
 	;
 
 
-/** TODO: Done - converted to terminal
+/* TODO: Done - converted to terminal
 R313  label                        is digit [ digit [ digit [ digit [ digit ] ] ] ]
  */
 
@@ -477,11 +500,11 @@ label_list
     :    LABEL ( LABEL )*
     ;
 
-/**
+/*
 C304  (R313) At least one digit in a label shall be nonzero.
  */
 
-/**
+/*
 Section 4:
  */
 
@@ -491,7 +514,7 @@ type_spec
 	|	derived_type_spec
 	;
 
-/**
+/*
 C401  (R401) The derived-type-spec shall not specify an abstract type (4.5.6).
  */
 
@@ -507,11 +530,15 @@ scalar_int_expr
 	:	int_expr
 	;
 
-/**
+scalar_expr
+    :    expr
+    ;
+
+/*
 C402  (R402) The type-param-value for a kind type parameter shall be an initialization expression.
  */
 
-/**
+/*
 C403  (R402) A colon may be used as a type-param-value only in the declaration of an entity or
       component that has the POINTER or ALLOCATABLE attribute.
  */
@@ -531,39 +558,43 @@ kind_selector
     : LPAREN ( KIND_EQ )? scalar_int_initialization_expr RPAREN
     ;
 
-/**
+/*
 C404  (R404) The value of scalar-int-initialization-expr shall be nonnegative and shall specify a rep-
       resentation method that exists on the processor.
  */
 
+// TODO: turn into terminal
 // R405
 signed_int_literal_constant
 	:	( sign )?
 		int_literal_constant
 	;
 
+// TODO: turn into terminal
 // R406
 int_literal_constant
 	:	digit_string
 		( kind_param )?
 	;
 
+// TODO: turn into terminal
 // R407
 kind_param
 	:	digit_string
 	|	scalar_int_constant_name
 	;
 
+// TODO: turn into terminal
 // R408
 signed_digit_string
 	:	( sign )?
 		digit_string
 	;
 
+// TODO: turn into terminal
 // R409
 digit_string
-	:	DIGIT
-		( DIGIT )*
+	:	DIGIT ( DIGIT )*
 	;
 
 // R410
@@ -572,15 +603,15 @@ sign
 	|	QUESTION
 	;
 
-/**
+/*
 C405  (R407) A scalar-int-constant-name shall be a named constant of type integer.
  */
 
-/**
+/*
 C406  (R407) The value of kind-param shall be nonnegative.
  */
 
-/**
+/*
 C407  (R406) The value of kind-param shall specify a representation method that exists on the pro-
       cessor.
  */
@@ -592,45 +623,35 @@ boz_literal_constant
 	|	HEX_CONSTANT
 	;
 
-/** TODO: Done - converted to terminal
+/* TODO: Done - converted to terminal
 R412 binary-constant              is B ' digit [ digit ] ... '
                                   or B " digit [ digit ] ... "
  */
 
-/**
+/*
 C408 (R412) digit shall have one of the values 0 or 1.
  */
 
 
-/** TODO: Done - converted to terminal
+/* TODO: Done - converted to terminal
 R413 octal-constant               is O ' digit [ digit ] ... '
                                   or O " digit [ digit ] ... "
  */
 
-/**
+/*
 C409 (R413) digit shall have one of the values 0 through 7.
  */
 
 
-/** TODO: Done - converted to terminal
-R414 hex-constant                 is Z ' hex-digit [ hex-digit ] ... '
-                                  or Z " hex-digit [ hex-digit ] ... "
-R415 hex-digit                    is DIGIT
+/* TODO: Done - converted to terminal
+R414 hex_constant  : 'Z' SINGLE_QUOTE hex_digit ( hex_digit )* SINGLE_QUOTE
+                   | 'Z' DOUBLE_QUOTE hex_digit ( hex_digit )* DOUBLE_QUOTE
+                   ;
 
-                                  or A
+R415 hex_digit     :  DIGIT | 'A' | 'B' | 'C' | 'D' | 'E' | 'F' ;
+*/
 
-                                  or B
-
-                                  or C
-
-                                  or D
-
-                                  or E
-
-                                  or F
- */
-
-/**
+/*
 C410 (R411) A boz-literal-constant shall appear only as a data-stmt-constant in a DATA statement, as
      the actual argument associated with the dummy argument A of the numeric intrinsic functions
      DBLE, REAL or INT, or as the actual argument associated with the X or Y dummy argument
@@ -668,11 +689,11 @@ exponent
 	:	signed_digit_string
 	;
 
-/**
+/*
 C411 (R417) If both kind-param and exponent-letter are present, exponent-letter shall be E.
  */
 
-/**
+/*
 C412 (R417) The value of kind-param shall specify an approximation method that exists on the
      processor.
  */
@@ -700,7 +721,7 @@ imag_part
 	|	named_constant
 	;
 
-/**
+/*
 C413 (R421) Each named constant in a complex literal constant shall be of type integer or real.
  */
 
@@ -735,41 +756,41 @@ scalar_int_literal_constant
     :    int_literal_constant
     ;
 
-/**
+/*
 C414 (R424) The value of scalar-int-initialization-expr shall be nonnegative and shall specify a rep-
      resentation method that exists on the processor.
  */
 
-/**
+/*
 C415 (R426) The scalar-int-literal-constant shall not include a kind-param.
  */
 
-/**
+/*
 C416 (R424 R425 R426) A type-param-value of * may be used only in the following ways:
  */
 
-/**
+/*
 C417 A function name shall not be declared with an asterisk type-param-value unless it is of type CHAR-
      ACTER and is the name of the result of an external function or the name of a dummy function.
  */
 
-/**
+/*
 C418 A function name declared with an asterisk type-param-value shall not be an array, a pointer, recursive, or pure.
  */
 
-/**
+/*
 C419 (R425) The optional comma in a length-selector is permitted only in a declaration-type-spec in a type-declaration-stmt.
  */
 
-/**
+/*
 C420 (R425) The optional comma in a length-selector is permitted only if no double-colon separator appears in the type-declaration-stmt.
  */
 
-/**
+/*
 C421 (R424) The length specified for a character statement function or for a statement function dummy argument of type character shall be an initialization expression.
  */
 
-/** TODO: made a terminal
+/* TODO: made a terminal
 // R427
 char_literal_constant
     :    ( kind_param ) SINGLE_QUOTE ( REP_CHAR )* SINGLE_QUOTE
@@ -777,19 +798,19 @@ char_literal_constant
     ;
  */
 
-/**
+/*
 C422 (R427) The value of kind-param shall specify a representation method that exists on the pro-
      cessor.
  */
 
-// TODO: made a terminal
+// TODO: make a terminal
 // R428
 logical_literal_constant
     :    DOT_TRUE ( kind_param )?
     |    DOT_FALSE ( kind_param )?
     ;
 
-/**
+/*
 C423 (R428) The value of kind-param shall specify a representation method that exists on the pro-
      cessor.
  */
@@ -834,29 +855,29 @@ parent_type_name
     : name
     ;
 
-/**
+/*
 C424 (R430) A derived type type-name shall not be DOUBLEPRECISION or the same as the name
      of any intrinsic type defined in this standard.
  */
 
-/**
+/*
 C425 (R430) The same type-attr-spec shall not appear more than once in a given derived-type-stmt.
  */
 
-/**
+/*
 C426 (R431) A parent-type-name shall be the name of an accessible extensible type (4.5.6).
  */
 
-/**
+/*
 C427 (R429) If the type definition contains or inherits (4.5.6.1) a deferred binding (4.5.4), ABSTRACT
      shall appear.
  */
 
-/**
+/*
 C428 (R429) If ABSTRACT appears, the type shall be extensible.
  */
 
-/**
+/*
 C429 (R429) If EXTENDS appears, SEQUENCE shall not appear.
  */
 
@@ -866,7 +887,7 @@ private_or_sequence
 	|	sequence_stmt
 	;
 
-/**
+/*
 C430 (R429) The same private-or-sequence shall not appear more than once in a given derived-type-
      def .
  */
@@ -882,7 +903,7 @@ type_name
     :    name
     ;
 
-/**
+/*
 C431 (R433) If END TYPE is followed by a type-name, the type-name shall be the same as that in
      the corresponding derived-type-stmt.
  */
@@ -892,12 +913,12 @@ sequence_stmt
 	:	SEQUENCE
 	;
 
-/**
+/*
 C432 (R438) If SEQUENCE appears, all derived types specified in component definitions shall be
      sequence types.
  */
 
-/**
+/*
 C433 (R429) If SEQUENCE appears, a type-bound-procedure-part shall not appear.
  */
 
@@ -916,6 +937,10 @@ type_param_decl
     :    type_param_name ( EQUAL scalar_int_initialization_expr )?
     ;
 
+type_param_decl_list
+    :    type_param_decl ( type_param_decl )*
+    ;
+
 type_param_name
     :    name
     ;
@@ -924,12 +949,12 @@ type_param_name_list
     : type_param_name ( type_param_name )?
     ;
 
-/**
+/*
 C434 (R435) A type-param-name in a type-param-def-stmt in a derived-type-def shall be one of the
      type-param-names in the derived-type-stmt of that derived-type-def .
  */
 
-/**
+/*
 C435 (R435) Each type-param-name in the derived-type-stmt in a derived-type-def shall appear as a
      type-param-name in a type-param-def-stmt in that derived-type-def .
  */
@@ -960,18 +985,27 @@ data_component_def_stmt
 // R441
 component_attr_spec
 	:	POINTER
-	|	DIMENSION
-		LPAREN
-		component_array_spec
-		RPAREN
+	|	DIMENSION LPAREN component_array_spec RPAREN
 	|	ALLOCATABLE
 	|	access_spec
 	;
+
+component_attr_spec_list
+    :    component_attr_spec ( component_attr_spec )*
+    ;
 
 // R442
 component_decl
     :    component_name ( LPAREN component_array_spec RPAREN )?
                         ( STAR char_length )? ( component_initialization )?
+    ;
+
+component_decl_list
+    :   component_decl ( component_decl )*
+    ;
+
+component_name
+    :    name
     ;
 
 // R443
@@ -992,62 +1026,62 @@ component_initialization
 		null_init
 	;
 
-/**
+/*
 C436 (R440) No component-attr-spec shall appear more than once in a given component-def-stmt.
  */
 
-/**
+/*
 C437 (R440) A component declared with the CLASS keyword (5.1.1.2) shall have the ALLOCATABLE
      or POINTER attribute.
  */
 
-/**
+/*
 C438 (R440) If the POINTER attribute is not specified for a component, the declaration-type-spec in
      the component-def-stmt shall specify an intrinsic type or a previously defined derived type.
  */
 
-/**
+/*
 C439 (R440) If the POINTER attribute is specified for a component, the declaration-type-spec in the
      component-def-stmt shall specify an intrinsic type or any accessible derived type including the
      type being defined.
  */
 
-/**
+/*
 C440 (R440) If the POINTER or ALLOCATABLE attribute is specified, each component-array-spec
      shall be a deferred-shape-spec-list.
  */
 
-/**
+/*
 C441 (R440) If neither the POINTER attribute nor the ALLOCATABLE attribute is specified, each
      component-array-spec shall be an explicit-shape-spec-list.
  */
 
-/**
+/*
 C442 (R443) Each bound in the explicit-shape-spec shall either be an initialization expression or be a
      specification expression that does not contain references to specification functions or any object
      designators other than named constants or subobjects thereof.
  */
 
-/**
+/*
 C443 (R440) A component shall not have both the ALLOCATABLE and the POINTER attribute.
  */
 
-/**
+/*
 C444 (R442) The * char-length option is permitted only if the type specified is character.
  */
 
-/**
+/*
 C445 (R439) Each type-param-value within a component-def-stmt shall either be a colon, be an ini-
      tialization expression, or be a specification expression that contains neither references to speci-
      fication functions nor any object designators other than named constants or subobjects thereof.
  */
 
-/**
+/*
 C446 (R440) If component-initialization appears, a double-colon separator shall appear before the
      component-decl-list.
  */
 
-/**
+/*
 C447 (R440) If => appears in component-initialization, POINTER shall appear in the component-
      attr-spec-list. If = appears in component-initialization, POINTER or ALLOCATABLE shall
      not appear in the component-attr-spec-list.
@@ -1068,35 +1102,39 @@ proc_component_def_stmt
 // R446
 proc_component_attr_spec
     :    POINTER
-    |    PASS ( LPAREN arg-name RPAREN )?
+    |    PASS ( LPAREN arg_name RPAREN )?
     |    NOPASS
     |    access_spec
     ;
 
-/**
+proc_component_attr_spec_list
+    :    proc_component_attr_spec ( proc_component_attr_spec )*
+    ;
+
+/*
 C448 (R445) The same proc-component-attr-spec shall not appear more than once in a given proc-
      component-def-stmt.
  */
 
-/**
+/*
 C449 (R445) POINTER shall appear in each proc-component-attr-spec-list.
  */
 
-/**
+/*
 C450 (R445) If the procedure pointer component has an implicit interface or has no arguments,
      NOPASS shall be specified.
  */
 
-/**
+/*
 C451 (R445) If PASS (arg-name) appears, the interface shall have a dummy argument named arg-
      name.
  */
 
-/**
+/*
 C452 (R445) PASS and NOPASS shall not both appear in the same proc-component-attr-spec-list.
  */
 
-/**
+/*
 C453 The passed-object dummy argument shall be a scalar, nonpointer, nonallocatable dummy data
      object with the same declared type as the type being defined; all of its length type parameters
      shall be assumed; it shall be polymorphic (5.1.1.2) if and only if the type being defined is
@@ -1108,7 +1146,7 @@ private_components_stmt
 	:	PRIVATE
 	;
 
-/**
+/*
 C454 (R447) A private-components-stmt is permitted only if the type definition is within the specifi-
      cation part of a module.
  */
@@ -1126,7 +1164,7 @@ binding_private_stmt
 	:	PRIVATE
 	;
 
-/**
+/*
 C455 (R448) A binding-private-stmt is permitted only if the type definition is within the specification
      part of a module.
  */
@@ -1145,15 +1183,15 @@ specific_binding
       binding_name ( EQUAL_GREATER procedure_name )?
     ;
 
-/**
+/*
 C456 (R451) If => procedure-name appears, the double-colon separator shall appear.
  */
 
-/**
+/*
 C457 (R451) If => procedure-name appears, interface-name shall not appear.
  */
 
-/**
+/*
 C458 (R451) The procedure-name shall be the name of an accessible module procedure or an external
      procedure that has an explicit interface.
  */
@@ -1163,33 +1201,33 @@ generic_binding
     :    GENERIC ( COMMA access_spec )? COLONCOLON generic_spec EQUAL_GREATER binding_name_list
     ;
 
-/**
+/*
 C459 (R452) Within the specification-part of a module, each generic-binding shall specify, either
      implicitly or explicitly, the same accessibility as every other generic-binding with that generic-
      spec in the same derived type.
  */
 
-/**
+/*
 C460 (R452) Each binding-name in binding-name-list shall be the name of a specific binding of the
      type.
  */
 
-/**
+/*
 C461 (R452) If generic-spec is not generic-name, each of its specific bindings shall have a passed-object
      dummy argument (4.5.3.3).
  */
 
-/**
+/*
 C462 (R452) If generic-spec is OPERATOR ( defined-operator ), the interface of each binding shall
      be as specified in 12.3.2.1.1.
  */
 
-/**
+/*
 C463 (R452) If generic-spec is ASSIGNMENT ( = ), the interface of each binding shall be as specified
      in 12.3.2.1.2.
  */
 
-/**
+/*
 C464 (R452) If generic-spec is dtio-generic-spec, the interface of each binding shall be as specified in
      9.5.3.7. The type of the dtv argument shall be type-name.
  */
@@ -1203,43 +1241,47 @@ binding_attr
     | access_spec
     ;
 
+binding_attr_list
+    :    binding_attr ( binding_attr )*
+    ;
+
 arg_name
     : name
     ;
 
-/**
+/*
 C465 (R453) The same binding-attr shall not appear more than once in a given binding-attr-list.
  */
 
-/**
+/*
 C466 (R451) If the interface of the binding has no dummy argument of the type being defined,
      NOPASS shall appear.
  */
 
-/**
+/*
 C467 (R451) If PASS (arg-name) appears, the interface of the binding shall have a dummy argument
      named arg-name.
  */
 
-/**
+/*
 C468 (R453) PASS and NOPASS shall not both appear in the same binding-attr-list.
  */
 
-/**
+/*
 C469 (R453) NON OVERRIDABLE and DEFERRED shall not both appear in the same binding-
      attr-list.
  */
 
-/**
+/*
 C470 (R453) DEFERRED shall appear if and only if interface-name appears.
  */
 
-/**
+/*
 C471 (R451) An overriding binding (4.5.6.2) shall have the DEFERRED attribute only if the binding
      it overrides is deferred.
  */
 
-/**
+/*
 C472 (R451) A binding shall not override an inherited binding (4.5.6.1) that has the NON OVER-
      RIDABLE attribute.
  */
@@ -1251,19 +1293,23 @@ final_binding
 		final_subroutine_name_list
 	;
 
-/**
+final_subroutine_name_list
+    :    name ( name )*
+    ;
+
+/*
 C473 (R454) A final-subroutine-name shall be the name of a module procedure with exactly one
      dummy argument. That argument shall be nonoptional and shall be a nonpointer, nonallocat-
      able, nonpolymorphic variable of the derived type being defined. All length type parameters of
      the dummy argument shall be assumed. The dummy argument shall not be INTENT(OUT).
  */
 
-/**
+/*
 C474 (R454) A final-subroutine-name shall not be one previously specified as a final subroutine for
      that type.
  */
 
-/**
+/*
 C475 (R454) A final subroutine shall not have a dummy argument with the same kind type parameters
      and rank as the dummy argument of another final subroutine of that type.
  */
@@ -1278,30 +1324,34 @@ type_param_spec
     : ( keyword EQUAL )? type_param_value
     ;
 
-/**
+type_param_spec_list
+    :    type_param_spec ( type_param_spec )*
+    ;
+
+/*
 C476 (R455) type-name shall be the name of an accessible derived type.
  */
 
-/**
+/*
 C477 (R455) type-param-spec-list shall appear only if the type is parameterized.
  */
 
-/**
+/*
 C478 (R455) There shall be at most one type-param-spec corresponding to each parameter of the type.
      If a type parameter does not have a default value, there shall be a type-param-spec corresponding
      to that type parameter.
  */
 
-/**
+/*
 C479 (R456) The keyword= may be omitted from a type-param-spec only if the keyword= has been
      omitted from each preceding type-param-spec in the type-param-spec-list.
  */
 
-/**
+/*
 C480 (R456) Each keyword shall be the name of a parameter of the type.
  */
 
-/**
+/*
 C481 (R456) An asterisk may be used as a type-param-value in a type-param-spec only in the decla-
      ration of a dummy argument or associate name or in the allocation of a dummy argument.
  */
@@ -1316,7 +1366,11 @@ structure_constructor
 
 // R458
 component_spec
-: ( keyword EQUAL )? component_data_source
+    :    ( keyword EQUAL )? component_data_source
+    ;
+
+component_spec_list
+    :    component_spec ( component_spec )*
     ;
 
 // R459
@@ -1326,51 +1380,51 @@ component_data_source
 	|	proc_target
 	;
 
-/**
+/*
 C482 (R457) The derived-type-spec shall not specify an abstract type (4.5.6).
  */
 
-/**
+/*
 C483 (R457) At most one component-spec shall be provided for a component.
  */
 
-/**
+/*
 C484 (R457) If a component-spec is provided for a component, no component-spec shall be provided
      for any component with which it is inheritance associated.
  */
 
-/**
+/*
 C485 (R457) A component-spec shall be provided for a component unless it has default initialization
      or is inheritance associated with another component for which a component-spec is provided or
      that has default initialization.
  */
 
-/**
+/*
 C486 (R458) The keyword= may be omitted from a component-spec only if the keyword= has been
      omitted from each preceding component-spec in the constructor.
  */
 
-/**
+/*
 C487 (R458) Each keyword shall be the name of a component of the type.
  */
 
-/**
+/*
 C488 (R457) The type name and all components of the type for which a component-spec appears shall
      be accessible in the scoping unit containing the structure constructor.
  */
 
-/**
+/*
 C489 (R457) If derived-type-spec is a type name that is the same as a generic name, the component-
      spec-list shall not be a valid actual-arg-spec-list for a function reference that is resolvable as a
      generic reference (12.4.4.1).
  */
 
-/**
+/*
 C490 (R459) A data-target shall correspond to a nonprocedure pointer component; a proc-target shall
      correspond to a procedure pointer component.
  */
 
-/**
+/*
 C491 (R459) A data-target shall have the same rank as its corresponding component.
  */
 
@@ -1403,13 +1457,17 @@ enumerator
     :    named_constant ( EQUAL scalar_int_initialization_expr )?
     ;
 
+enumerator_list
+    :   enumerator ( enumerator )*
+    ;
+
 // R464
 end_enum_stmt
 	:	END
 		ENUM
 	;
 
-/**
+/*
 C492 (R462) If = appears in an enumerator, a double-colon separator shall appear before the enu-
      merator-list.
  */
@@ -1466,33 +1524,33 @@ scalar_int_variable
     :    variable
     ;
 
-/**
+/*
 C493  (R472) ac-do-variable shall be a named variable.
  */
 
-/**
+/*
 C494  (R466) If type-spec is omitted, each ac-value expression in the array-constructor shall have the
       same type and kind type parameters.
  */
 
-/**
+/*
 C495  (R466) If type-spec specifies an intrinsic type, each ac-value expression in the array-constructor
       shall be of an intrinsic type that is in type conformance with a variable of type type-spec as
       specified in Table 7.8.
  */
 
-/**
+/*
 C496  (R466) If type-spec specifies a derived type, all ac-value expressions in the array-constructor
       shall be of that derived type and shall have the same kind type parameter values as specified by
       type-spec.
  */
 
-/**
+/*
 C497  (R470) The ac-do-variable of an ac-implied-do that is in another ac-implied-do shall not appear
       as the ac-do-variable of the containing ac-implied-do.
  */
 
-/**
+/*
 Section 5:
  */
 
@@ -1519,17 +1577,17 @@ declaration_type_spec
 		RPAREN
 	;
 
-/**
+/*
 C501  (R502) In a declaration-type-spec, every type-param-value that is not a colon or an asterisk shall
       be a specification-expr.
  */
 
-/**
+/*
 C502  (R502) In a declaration-type-spec that uses the CLASS keyword, derived-type-spec shall specify
       an extensible type.
  */
 
-/**
+/*
 C503  (R502) The TYPE(derived-type-spec) shall not specify an abstract type (4.5.6).
  */
 
@@ -1560,7 +1618,11 @@ entity_decl
     | function_name ( STAR char_length )?
     ;
 
-/**
+entity_decl_list
+    :    entity_decl ( entity_decl )*
+    ;
+
+/*
 C504  (R504) If a type-param-value in a char-length in an entity-decl is not a colon or an asterisk, it
       shall be a specification-expr.
  */
@@ -1570,7 +1632,11 @@ object_name
 	:	name
 	;
 
-/**
+object_name_list
+    :    object_name ( object_name )*
+    ;
+
+/*
 C505  (R505) The object-name shall be the name of a data object.
  */
 
@@ -1587,165 +1653,165 @@ null_init
 	:	function_reference
 	;
 
-/**
+/*
 C506 (R507) The function-reference shall be a reference to the NULL intrinsic function with no
      arguments.
  */
 
-/**
+/*
 C507 (R501) The same attr-spec shall not appear more than once in a given type-declaration-stmt.
  */
 
-/**
+/*
 C508 An entity shall not be explicitly given any attribute more than once in a scoping unit.
  */
 
-/**
+/*
 C509 (R501) An entity declared with the CLASS keyword shall be a dummy argument or have the
      ALLOCATABLE or POINTER attribute.
  */
 
-/**
+/*
 C510 (R501) An array that has the POINTER or ALLOCATABLE attribute shall be specified with
      an array-spec that is a deferred-shape-spec-list (5.1.2.5.3).
  */
 
-/**
+/*
 C511 (R501) An array-spec for an object-name that is a function result that does not have the AL-
      LOCATABLE or POINTER attribute shall be an explicit-shape-spec-list.
  */
 
-/**
+/*
 C512 (R501) If the POINTER attribute is specified, the ALLOCATABLE, TARGET, EXTERNAL,
      or INTRINSIC attribute shall not be specified.
  */
 
-/**
+/*
 C513 (R501) If the TARGET attribute is specified, the POINTER, EXTERNAL, INTRINSIC, or
      PARAMETER attribute shall not be specified.
  */
 
-/**
+/*
 C514 (R501) The PARAMETER attribute shall not be specified for a dummy argument, a pointer,
      an allocatable entity, a function, or an object in a common block.
  */
 
-/**
+/*
 C515 (R501) The INTENT, VALUE, and OPTIONAL attributes may be specified only for dummy
      arguments.
  */
 
-/**
+/*
 C516 (R501) The INTENT attribute shall not be specified for a dummy procedure without the
      POINTER attribute.
  */
 
-/**
+/*
 C517 (R501) The SAVE attribute shall not be specified for an object that is in a common block, a
      dummy argument, a procedure, a function result, an automatic data object, or an object with
      the PARAMETER attribute.
  */
 
-/**
+/*
 C518 An entity shall not have both the EXTERNAL attribute and the INTRINSIC attribute.
  */
 
-/**
+/*
 C519 (R501) An entity in an entity-decl-list shall not have the EXTERNAL or INTRINSIC attribute
      specified unless it is a function.
  */
 
-/**
+/*
 C520 (R504) The * char-length option is permitted only if the type specified is character.
  */
 
-/**
+/*
 C521 (R504) The function-name shall be the name of an external function, an intrinsic function, a
      function dummy procedure, or a statement function.
  */
 
-/**
+/*
 C522 (R501) The initialization shall appear if the statement contains a PARAMETER attribute
      (5.1.2.10).
  */
 
-/**
+/*
 C523 (R501) If initialization appears, a double-colon separator shall appear before the entity-decl-list.
  */
 
-/**
+/*
 C524 (R504)initialization shall not appear if object-name is a dummy argument, a function result, an
      object in a named common block unless the type declaration is in a block data program unit,
      an object in blank common, an allocatable variable, an external name, an intrinsic name, or an
      automatic object.
  */
 
-/**
+/*
 C525 (R504) If => appears in initialization, the object shall have the POINTER attribute. If =
      appears in initialization, the object shall not have the POINTER attribute.
  */
 
-/**
+/*
 C526 (R501) If the VOLATILE attribute is specified, the PARAMETER, INTRINSIC, EXTERNAL,
      or INTENT(IN) attribute shall not be specified.
  */
 
-/**
+/*
 C527 (R501) If the VALUE attribute is specified, the PARAMETER, EXTERNAL, POINTER,
      ALLOCATABLE, DIMENSION, VOLATILE, INTENT(INOUT), or INTENT(OUT) attribute
      shall not be specified.
  */
 
-/**
+/*
 C528 (R501) If the VALUE attribute is specified for a dummy argument of type character, the length
      parameter shall be omitted or shall be specified by an initialization expression with the value
       one.
  */
 
-/**
+/*
 C529  (R501) The VALUE attribute shall not be specified for a dummy procedure.
  */
 
-/**
+/*
 C530  (R501) The ALLOCATABLE, POINTER, or OPTIONAL attribute shall not be specified for a
       dummy argument of a procedure that has a proc-language-binding-spec.
  */
 
-/**
+/*
 C531  (R503) A language-binding-spec shall appear only in the specification part of a module.
  */
 
-/**
+/*
 C532  (R501) If a language-binding-spec is specified, the entity declared shall be an interoperable
       variable (15.2).
  */
 
-/**
+/*
 C533  (R501) If a language-binding-spec with a NAME= specifier appears, the entity-decl-list shall
       consist of a single entity-decl.
  */
 
-/**
+/*
 C534  (R503) The PROTECTED attribute is permitted only in the specification part of a module.
  */
 
-/**
+/*
 C535  (R501) The PROTECTED attribute is permitted only for a procedure pointer or named variable
       that is not in a common block.
  */
 
-/**
+/*
 C536  (R501) If the PROTECTED attribute is specified, the EXTERNAL, INTRINSIC, or PARAM-
       ETER attribute shall not be specified.
  */
 
-/**
+/*
 C537  A nonpointer object that has the PROTECTED attribute and is accessed by use association
       shall not appear in a variable definition context (16.5.7) or as the data-target or proc-target in
       a pointer-assignment-stmt.
  */
 
-/**
+/*
 C538  A pointer object that has the PROTECTED attribute and is accessed by use association shall
       not appear as
     (1)   A pointer-object in a pointer-assignment-stmt or nullify-stmt,
@@ -1760,7 +1826,7 @@ access_spec
 	|	PRIVATE
 	;
 
-/**
+/*
 C539  (R508) An access-spec shall appear only in the specification-part of a module.
  */
 
@@ -1769,7 +1835,7 @@ language_binding_spec
     : BIND LPAREN C ( COMMA name EQUAL scalar_char_initialization_expr )? RPAREN
     ;
 
-/**
+/*
 C540  (R509) The scalar-char-initialization-expr shall be of default character kind.
  */
 
@@ -1781,7 +1847,7 @@ array_spec
 	|	assumed_size_spec
 	;
 
-/**
+/*
 C541  (R510)The maximum rank is seven.
  */
 
@@ -1804,16 +1870,19 @@ upper_bound
 	:	specification_expr
 	;
 
-/**
+/*
 C542  (R511) An explicit-shape array whose bounds are not initialization expressions shall be a dummy
       argument, a function result, or an automatic array of a procedure.
  */
 
 // R514
 assumed_shape_spec
-	:	( lower_bound )?
-		COLON
+	:	( lower_bound )? COLON
 	;
+
+assumed_shape_spec_list
+    :    assumed_shape_spec ( assumed_shape_spec )*
+    ;
 
 // R515
 deferred_shape_spec
@@ -1825,12 +1894,12 @@ assumed_size_spec
     : ( explicit_shape_spec_list COMMA )? ( lower_bound COLON )? STAR
     ;
 
-/**
+/*
 C543  An assumed-size-spec shall not appear except as the declaration of the array bounds of a dummy
       data argument.
  */
 
-/**
+/*
 C544  An assumed-size array with INTENT (OUT) shall not be of a type for which default initialization
       is specified.
  */
@@ -1842,16 +1911,16 @@ intent_spec
 	|	INOUT
 	;
 
-/**
+/*
 C545 (R517) A nonpointer object with the INTENT (IN) attribute shall not appear in a variable
      definition context (16.5.7).
  */
 
-/**
+/*
 C546 (R517) A pointer object with the INTENT (IN) attribute shall not appear as
  */
 
-/**
+/*
 C547 (R503) (R1216) If the name of a generic intrinsic procedure is explicitly declared to have the
      INTRINSIC attribute, and it is also the generic name in one or more generic interfaces (12.3.2.1)
      accessible in the same scoping unit, the procedures in the interfaces and the specific intrinsic
@@ -1870,13 +1939,17 @@ access_id
 	|	generic_spec
 	;
 
-/**
+access_id_list
+    :    access_id ( access_id )*
+    ;
+
+/*
 C548 (R518) An access-stmt shall appear only in the specification-part of a module. Only one ac-
      cessibility statement with an omitted access-id-list is permitted in the specification-part of a
      module.
  */
 
-/**
+/*
 C549 (R519) Each use-name shall be the name of a named variable, procedure, derived type, named
      constant, or namelist group.
  */
@@ -1905,6 +1978,10 @@ entity_name
     :    name
     ;
 
+entity_name_list
+    :    entity_name ( entity_name )*
+    ;
+
 // R523
 bind_entity
 	:	entity_name
@@ -1919,17 +1996,17 @@ bind_entity_list
     :    bind_entity ( bind_entity )*
     ;
 
-/**
+/*
 C550 (R522) If any bind-entity in a bind-stmt is an entity-name, the bind-stmt shall appear in the
      specification part of a module and the entity shall be an interoperable variable (15.2.4, 15.2.5).
  */
 
-/**
+/*
 C551 (R522) If the language-binding-spec has a NAME= specifier, the bind-entity-list shall consist of
      a single bind-entity.
  */
 
-/**
+/*
 C552 (R522) If a bind-entity is a common block, each variable of the common block shall be interop-
      erable (15.2.4, 15.2.5).
  */
@@ -1954,6 +2031,10 @@ data_stmt_object
 	|	data_implied_do
 	;
 
+data_stmt_object_list
+    :    data_stmt_object ( data_stmt_object )*
+    ;
+
 // R527
 data_implied_do
     : LPAREN data_i_do_object_list COMMA data_i_do_variable EQUAL
@@ -1967,17 +2048,21 @@ data_i_do_object
 	|	data_implied_do
 	;
 
+data_i_do_object_list
+    :   data_i_do_object ( data_i_do_object )*
+    ;
+
 // R529
 data_i_do_variable
 	:	scalar_int_variable
 	;
 
-/**
+/*
 C553 (R526) In a variable that is a data-stmt-object, any subscript, section subscript, substring start-
      ing point, and substring ending point shall be an initialization expression.
  */
 
-/**
+/*
 C554 (R526) A variable whose designator is included in a data-stmt-object-list or a data-i-do-object-
      list shall not be: a dummy argument, made accessible by use association or host association, in
      a named common block unless the DATA statement is in a block data program unit, in a blank
@@ -1985,35 +2070,35 @@ C554 (R526) A variable whose designator is included in a data-stmt-object-list o
      variable.
  */
 
-/**
+/*
 C555 (R526) A data-i-do-object or a variable that appears as a data-stmt-object shall not be an object
      designator in which a pointer appears other than as the entire rightmost part-ref .
  */
 
-/**
+/*
 C556 (R529) The data-i-do-variable shall be a named variable.
  */
 
-/**
+/*
 C557 (R527) A scalar-int-expr of a data-implied-do shall involve as primaries only constants, subob-
      jects of constants, or DO variables of the containing data-implied-dos, and each operation shall
      be intrinsic.
  */
 
-/**
+/*
 C558 (R528) The array-element shall be a variable.
  */
 
-/**
+/*
 C559 (R528) The scalar-structure-component shall be a variable.
  */
 
-/**
+/*
 C560 (R528) The scalar-structure-component shall contain at least one part-ref that contains a sub-
      script-list.
  */
 
-/**
+/*
 C561 (R528) In an array-element or a scalar-structure-component that is a data-i-do-object, any sub-
      script shall be an expression whose primaries are either constants, subobjects of constants, or
      DO variables of this data-implied-do or the containing data-implied-dos, and each operation shall
@@ -2025,13 +2110,29 @@ data_stmt_value
     : ( data_stmt_repeat STAR )? data_stmt_constant
     ;
 
+data_stmt_value_list
+    :    data_stmt_value ( data_stmt_value )*
+    ;
+
 // R531
 data_stmt_repeat
 	:	scalar_int_constant
 	|	scalar_int_constant_subobject
 	;
 
-/**
+scalar_int_constant
+    :    int_constant
+    ;
+
+scalar_int_constant_subobject
+    :    int_constant
+    ;
+
+scalar_int_constant_name
+    :    name
+    ;
+
+/*
 C562 (R531) The data-stmt-repeat shall be positive or zero. If the data-stmt-repeat is a named con-
      stant, it shall have been declared previously in the scoping unit or made accessible by use
      association or host association.
@@ -2047,13 +2148,17 @@ data_stmt_constant
 	|	structure_constructor
 	;
 
-/**
+scalar_constant_subobject
+    :    scalar_constant
+    ;
+
+/*
 C563 (R532) If a DATA statement constant value is a named constant or a structure constructor, the
      named constant or derived type shall have been declared previously in the scoping unit or made
      accessible by use or host association.
  */
 
-/**
+/*
 C564 (R532) If a data-stmt-constant is a structure-constructor, it shall be an initialization expression.
  */
 
@@ -2062,7 +2167,7 @@ int_constant_subobject
 	:	constant_subobject
 	;
 
-/**
+/*
 C565 (R533) int-constant-subobject shall be of type integer.
  */
 
@@ -2071,11 +2176,11 @@ constant_subobject
 	:	designator
 	;
 
-/**
+/*
 C566 (R534) constant-subobject shall be a subobject of a constant.
  */
 
-/**
+/*
 C567 (R534) Any subscript, substring starting point, or substring ending point shall be an initializa-
      tion expression.
  */
@@ -2137,7 +2242,7 @@ proc_entity_name
     :    name
     ;
 
-/**
+/*
 C568 (R541) A proc-entity-name shall also be declared in a procedure-declaration-stmt.
  */
 
@@ -2157,21 +2262,23 @@ save_stmt
 saved_entity
 	:	object_name
 	|	proc_pointer_name
-	|	SLASH
-		common_block_name
-		SLASH
+	|	SLASH common_block_name SLASH
 	;
+
+saved_entity_list
+    :    saved_entity ( saved_entity )*
+    ;
 
 // R545
 proc_pointer_name
 	:	name
 	;
 
-/**
+/*
 C569 (R545) A proc-pointer-name shall be the name of a procedure pointer.
  */
 
-/**
+/*
 C570 (R543) If a SAVE statement with an omitted saved entity list occurs in a scoping unit, no other
      explicit occurrence of the SAVE attribute or SAVE statement is permitted in the same scoping
      unit.
@@ -2185,46 +2292,45 @@ target_stmt
 
 // R547
 value_stmt
-	:	VALUE
-		( COLONCOLON )?
-		dummy_arg_name_list
+	:	VALUE ( COLONCOLON )? dummy_arg_name_list
 	;
 
 // R548
 volatile_stmt
-	:	VOLATILE
-		( COLONCOLON )?
-		object_name_list
+	:	VOLATILE ( COLONCOLON )? object_name_list
 	;
 
 // R549
 implicit_stmt
-	:	IMPLICIT
-		implicit_spec_list
-	|	IMPLICIT
-		NONE
+	:	IMPLICIT implicit_spec_list
+	|	IMPLICIT NONE
 	;
 
 // R550
 implicit_spec
-	:	declaration_type_spec
-		LPAREN
-		letter_spec_list
-		RPAREN
+	:	declaration_type_spec LPAREN letter_spec_list RPAREN
 	;
 
+implicit_spec_list
+    :    implicit_spec ( implicit_spec )*
+    ;
+
 // R551
-letter_spec
+letter_spec 
     : LETTER ( QUESTION LETTER )?
     ;
 
-/**
+letter_spec_list
+    :    letter_spec ( letter_spec )*
+    ;
+
+/*
 C571 (R549) If IMPLICIT NONE is specified in a scoping unit, it shall precede any PARAMETER
      statements that appear in the scoping unit and there shall be no other IMPLICIT statements
      in the scoping unit.
  */
 
-/**
+/*
 C572 (R551) If the minus and second letter appear, the second letter shall follow the first letter
      alphabetically.
  */
@@ -2235,7 +2341,7 @@ namelist_stmt
          ( ( COMMA )? SLASH namelist_group_name SLASH namelist_group_object_list )*
     ;
 
-/**
+/*
 C573 (R552) The namelist-group-name shall not be a name made accessible by use association.
  */
 
@@ -2244,29 +2350,36 @@ namelist_group_object
 	:	variable_name
 	;
 
-/**
+namelist_group_object_list
+    :    namelist_group_object ( namelist_group_object )*
+    ;
+
+namelist_group_name
+    :    name
+    ;
+
+/*
 C574 (R553) A namelist-group-object shall not be an assumed-size array.
  */
 
-/**
+/*
 C575 (R552) A namelist-group-object shall not have the PRIVATE attribute if the namelist-group-
      name has the PUBLIC attribute.
  */
 
 // R554
 equivalence_stmt
-	:	EQUIVALENCE
-		equivalence_set_list
+	:	EQUIVALENCE equivalence_set_list
 	;
 
 // R555
 equivalence_set
-	:	LPAREN
-		equivalence_object
-		COMMA
-		equivalence_object_list
-		RPAREN
+	:	LPAREN equivalence_object COMMA equivalence_object_list RPAREN
 	;
+
+equivalence_set_list
+    :    equivalence_set ( equivalence_set )*
+    ;
 
 // R556
 equivalence_object
@@ -2275,7 +2388,11 @@ equivalence_object
 	|	substring
 	;
 
-/**
+equivalence_object_list
+    :    equivalence_object ( equivalence_object )
+    ;
+
+/*
 C576 (R556) An equivalence-object shall not be a designator with a base object that is a dummy
      argument, a pointer, an allocatable variable, a derived-type object that has an allocatable ulti-
      mate component, an object of a nonsequence derived type, an object of a derived type that has
@@ -2284,52 +2401,52 @@ C576 (R556) An equivalence-object shall not be a designator with a base object t
      has the BIND attribute, or a named constant.
  */
 
-/**
+/*
 C577 (R556) An equivalence-object shall not be a designator that has more than one part-ref .
  */
 
-/**
+/*
 C578 (R556) An equivalence-object shall not have the TARGET attribute.
  */
 
-/**
+/*
 C579 (R556) Each subscript or substring range expression in an equivalence-object shall be an integer
      initialization expression (7.1.7).
  */
 
-/**
+/*
 C580 (R555) If an equivalence-object is of type default integer, default real, double precision real,
      default complex, default logical, or numeric sequence type, all of the objects in the equivalence
      set shall be of these types.
  */
 
-/**
+/*
 C581 (R555) If an equivalence-object is of type default character or character sequence type, all of the
       objects in the equivalence set shall be of these types.
  */
 
-/**
+/*
 C582  (R555) If an equivalence-object is of a sequence derived type that is not a numeric sequence or
       character sequence type, all of the objects in the equivalence set shall be of the same type with
       the same type parameter values.
  */
 
-/**
+/*
 C583  (R555) If an equivalence-object is of an intrinsic type other than default integer, default real,
       double precision real, default complex, default logical, or default character, all of the objects in
       the equivalence set shall be of the same type with the same kind type parameter value.
  */
 
-/**
+/*
 C584  (R556) If an equivalence-object has the PROTECTED attribute, all of the objects in the equiv-
       alence set shall have the PROTECTED attribute.
  */
 
-/**
+/*
 C585  (R556) The name of an equivalence-object shall not be a name made accessible by use association.
  */
 
-/**
+/*
 C586  (R556) A substring shall not have length zero.
  */
 
@@ -2345,28 +2462,32 @@ common_block_object
     | proc_pointer_name
     ;
 
-/**
+common_block_object_list
+    :    common_block_object ( common_block_object )*
+    ;
+
+/*
 C587  (R558) Only one appearance of a given variable-name or proc-pointer-name is permitted in all
       common-block-object-lists within a scoping unit.
  */
 
-/**
+/*
 C588  (R558) A common-block-object shall not be a dummy argument, an allocatable variable, a
       derived-type object with an ultimate component that is allocatable, an automatic object, a
       function name, an entry name, a variable with the BIND attribute, or a result name.
  */
 
-/**
+/*
 C589  (R558) If a common-block-object is of a derived type, it shall be a sequence type (4.5.1) or a
       type with the BIND attribute and it shall have no default initialization.
  */
 
-/**
+/*
 C590  (R558) A variable-name or proc-pointer-name shall not be a name made accessible by use
       association.
  */
 
-/**
+/*
 Section 6:
  */
 
@@ -2375,7 +2496,7 @@ variable
 	:	designator
 	;
 
-/**
+/*
 C601  (R601) designator shall not be a constant or a subobject of a constant.
  */
 
@@ -2384,7 +2505,7 @@ variable_name
 	:	name
 	;
 
-/**
+/*
 C602  (R602) A variable-name shall be the name of a variable.
  */
 
@@ -2402,7 +2523,7 @@ logical_variable
 	:	variable
 	;
 
-/**
+/*
 C603  (R604) logical-variable shall be of type logical.
  */
 
@@ -2415,7 +2536,7 @@ scalar_default_logical_variable
 	:	variable
 	;
 
-/**
+/*
 C604  (R605) default-logical-variable shall be of type default logical.
  */
 
@@ -2424,7 +2545,7 @@ char_variable
 	:	variable
 	;
 
-/**
+/*
 C605  (R606) char-variable shall be of type character.
  */
 
@@ -2437,7 +2558,7 @@ scalar_default_char_variable
 	:	variable
 	;
 
-/**
+/*
 C606  (R607) default-char-variable shall be of type default character.
  */
 
@@ -2446,7 +2567,7 @@ int_variable
 	:	variable
 	;
 
-/**
+/*
 C607  (R608) int-variable shall be of type integer.
  */
 
@@ -2463,8 +2584,12 @@ parent_string
 	:	scalar_variable_name
 	|	array_element
 	|	scalar_structure_component
-	|	scalar_constant
+	|   scalar_constant
 	;
+
+scalar_variable_name
+    :    name
+    ;
 
 // R611
 substring_range
@@ -2473,7 +2598,7 @@ substring_range
 		( scalar_int_expr )?
 	;
 
-/**
+/*
 C608 (R610) parent-string shall be of type character.
  */
 
@@ -2487,29 +2612,33 @@ part_ref
     : part_name ( LPAREN section_subscript_list RPAREN )?
     ;
 
-/**
+part_name
+    :    name
+    ;
+
+/*
 C609 (R612) Each part-name except the rightmost shall be of derived type.
  */
 
-/**
+/*
 C610 (R612) Each part-name except the leftmost shall be the name of a component of the declared
      type of the preceding part-name.
  */
 
-/**
+/*
 C611 (R612) If the rightmost part-name is of abstract type, data-ref shall be polymorphic.
  */
 
-/**
+/*
 C612 (R612) The leftmost part-name shall be the name of a data object.
  */
 
-/**
+/*
 C613 (R613) If a section-subscript-list appears, the number of section-subscripts shall equal the rank
      of part-name.
  */
 
-/**
+/*
 C614 (R612) There shall not be more than one part-ref with nonzero rank. A part-name to the right
      of a part-ref with nonzero rank shall not have the ALLOCATABLE or POINTER attribute.
  */
@@ -2519,7 +2648,11 @@ structure_component
 	:	data_ref
 	;
 
-/**
+scalar_structure_component
+    :   data_ref
+    ;
+
+/*
 C615 (R614) There shall be more than one part-ref and the rightmost part-ref shall be of the form
      part-name.
  */
@@ -2531,7 +2664,7 @@ type_param_inquiry
 		type_param_name
 	;
 
-/**
+/*
 C616 (R615) The type-param-name shall be the name of a type parameter of the declared type of the
      object designated by the designator.
  */
@@ -2541,7 +2674,7 @@ array_element
 	:	data_ref
 	;
 
-/**
+/*
 C617 (R616) Every part-ref shall have rank zero and the last part-ref shall contain a subscript-list.
  */
 
@@ -2550,12 +2683,12 @@ array_section
     :    data_ref ( LPAREN substring_range RPAREN )?
     ;
 
-/**
+/*
 C618 (R617) Exactly one part-ref shall have nonzero rank, and either the final part-ref shall have a
      section-subscript-list with nonzero rank or another part-ref shall have nonzero rank.
  */
 
-/**
+/*
 C619 (R617) If a substring-range appears, the rightmost part-name shall be of type character.
  */
 
@@ -2570,6 +2703,10 @@ section_subscript
 	|	subscript_triplet
 	|	vector_subscript
 	;
+
+section_subscript_list
+    :    section_subscript ( section_subscript )*
+    ;
 
 // R620
 subscript_triplet
@@ -2586,11 +2723,11 @@ vector_subscript
 	:	int_expr
 	;
 
-/**
+/*
 C620 (R622) A vector-subscript shall be an integer array expression of rank one.
  */
 
-/**
+/*
 C621 (R620) The second subscript shall not be omitted from a subscript-triplet in the last dimension
      of an assumed-size array.
  */
@@ -2602,16 +2739,14 @@ allocate_stmt
 
 // R624
 alloc_opt
-	:	STAT
-		EQUAL
-		stat_variable
-	|	ERRMSG
-		EQUAL
-		errmsg_variable
-	|	SOURCE
-		EQUAL
-		source_expr
+	:	STAT EQUAL stat_variable
+	|	ERRMSG EQUAL errmsg_variable
+	|	SOURCE EQUAL source_expr
 	;
+
+alloc_opt_list
+    :    alloc_opt ( alloc_opt )*
+    ;
 
 // R625
 stat_variable
@@ -2633,15 +2768,27 @@ allocation
     : allocate_object ( LPAREN allocate_shape_spec_list RPAREN )?
     ;
 
+allocation_list
+    :    allocation ( allocation )*
+    ;
+
 // R629
 allocate_object
 	:	variable_name
 	|	structure_component
 	;
 
+allocate_object_list
+    :    allocate_object ( allocate_object )*
+    ;
+
 // R630
 allocate_shape_spec
     :    ( lower_bound_expr COLON )? upper_bound_expr
+    ;
+
+allocate_shape_spec_list
+    :    allocate_shape_spec ( allocate_shape_spec )*
     ;
 
 // R631
@@ -2654,58 +2801,58 @@ upper_bound_expr
 	:	scalar_int_expr
 	;
 
-/**
+/*
 C622  (R629) Each allocate-object shall be a nonprocedure pointer or an allocatable variable.
  */
 
-/**
+/*
 C623  (R623) If any allocate-object in the statement has a deferred type parameter, either type-spec or
       SOURCE= shall appear.
  */
 
-/**
+/*
 C624  (R623) If a type-spec appears, it shall specify a type with which each allocate-object is type
       compatible.
  */
 
-/**
+/*
 C625  (R623) If any allocate-object is unlimited polymorphic, either type-spec or SOURCE= shall
       appear.
  */
 
-/**
+/*
 C626  (R623) A type-param-value in a type-spec shall be an asterisk if and only if each allocate-object
       is a dummy argument for which the corresponding type parameter is assumed.
  */
 
-/**
+/*
 C627  (R623) If a type-spec appears, the kind type parameter values of each allocate-object shall be
       the same as the corresponding type parameter values of the type-spec.
  */
 
-/**
+/*
 C628  (R628) An allocate-shape-spec-list shall appear if and only if the allocate-object is an array.
  */
 
-/**
+/*
 C629  (R628) The number of allocate-shape-specs in an allocate-shape-spec-list shall be the same as
       the rank of the allocate-object.
  */
 
-/**
+/*
 C630  (R624) No alloc-opt shall appear more than once in a given alloc-opt-list.
  */
 
-/**
+/*
 C631  (R623) If SOURCE= appears, type-spec shall not appear and allocation-list shall contain only
       one allocate-object, which shall be type compatible (5.1.1.2) with source-expr.
  */
 
-/**
+/*
 C632  (R623) The source-expr shall be a scalar or have the same rank as allocate-object.
  */
 
-/**
+/*
 C633  (R623) Corresponding kind type parameters of allocate-object and source-expr shall have the
       same values.
  */
@@ -2725,7 +2872,11 @@ pointer_object
 	|	proc_pointer_name
 	;
 
-/**
+pointer_object_list
+    :    pointer_object ( pointer_object )*
+    ;
+
+/*
 C634  (R634) Each pointer-object shall have the POINTER attribute.
  */
 
@@ -2734,25 +2885,25 @@ deallocate_stmt
     :    DEALLOCATE LPAREN allocate_object_list ( COMMA dealloc_opt_list )? RPAREN
     ;
 
-/**
+/*
 C635  (R635) Each allocate-object shall be a nonprocedure pointer or an allocatable variable.
  */
 
 // R636
 dealloc_opt
-	:	STAT
-		EQUAL
-		stat_variable
-	|	ERRMSG
-		EQUAL
-		errmsg_variable
+	:	STAT EQUAL stat_variable
+	|	ERRMSG EQUAL errmsg_variable
 	;
 
-/**
+dealloc_opt_list
+    :    dealloc_opt ( dealloc_opt )*
+    ;
+
+/*
 C636  (R636) No dealloc-opt shall appear more than once in a given dealloc-opt-list.
  */
 
-/**
+/*
 Section 7:
  */
 
@@ -2770,11 +2921,11 @@ primary
 		RPAREN
 	;
 
-/**
+/*
 C701  (R701) The type-param-name shall be the name of a type parameter.
  */
 
-/**
+/*
 C702  (R701) The designator shall not be a whole assumed-size array.
  */
 
@@ -2788,7 +2939,7 @@ defined_unary_op
 	:	DOT LETTER ( LETTER )* DOT
 	;
 
-/**
+/*
 C703 (R703) A defined-unary-op shall not contain more than 63 letters and shall not be the same as
      any intrinsic-operator or logical-literal-constant.
  */
@@ -2907,7 +3058,7 @@ defined_binary_op
 	:	DOT LETTER ( LETTER )* DOT
 	;
 
-/**
+/*
 C704 (R723) A defined-binary-op shall not contain more than 63 letters and shall not be the same as
      any intrinsic-operator or logical-literal-constant.
  */
@@ -2917,7 +3068,7 @@ logical_expr
 	:	expr
 	;
 
-/**
+/*
 C705 (R724) logical-expr shall be of type logical.
  */
 
@@ -2926,7 +3077,7 @@ char_expr
 	:	expr
 	;
 
-/**
+/*
 C706 (R725) char-expr shall be of type character.
  */
 
@@ -2935,7 +3086,7 @@ default_char_expr
 	:	expr
 	;
 
-/**
+/*
 C707 (R726) default-char-expr shall be of type default character.
  */
 
@@ -2944,7 +3095,7 @@ int_expr
 	:	expr
 	;
 
-/**
+/*
 C708 (R727) int-expr shall be of type integer.
  */
 
@@ -2957,7 +3108,7 @@ scalar_numeric_expr
 	:	expr
 	;
 
-/**
+/*
 C709 (R728) numeric-expr shall be of type integer, real, or complex.
  */
 
@@ -2966,7 +3117,7 @@ specification_expr
 	:	scalar_int_expr
 	;
 
-/**
+/*
 C710 (R729) The scalar-int-expr shall be a restricted expression.
  */
 
@@ -2975,7 +3126,7 @@ initialization_expr
 	:	expr
 	;
 
-/**
+/*
 C711 (R730) initialization-expr shall be an initialization expression.
  */
 
@@ -2988,7 +3139,7 @@ scalar_char_initialization_expr
     :   char_expr
     ;
 
-/**
+/*
 C712 (R731) char-initialization-expr shall be an initialization expression.
  */
 
@@ -3001,7 +3152,7 @@ scalar_int_initialization_expr
 	:	int_initialization_expr
 	;
 
-/**
+/*
 C713 (R732) int-initialization-expr shall be an initialization expression.
  */
 
@@ -3014,7 +3165,7 @@ scalar_logical_initialization_expr
 	:	logical_expr
 	;
 
-/**
+/*
 C714 (R733) logical-initialization-expr shall be an initialization expression.
  */
 
@@ -3025,7 +3176,7 @@ assignment_stmt
 		expr
 	;
 
-/**
+/*
 C715 (R734) The variable in an assignment-stmt shall not be a whole assumed-size array.
  */
 
@@ -3046,36 +3197,36 @@ data_pointer_component_name
     :    name
     ;
 
-/**
+/*
 C716 (R735) If data-target is not unlimited polymorphic, data-pointer-object shall be type compatible
      (5.1.1.2) with it, and the corresponding kind type parameters shall be equal.
  */
 
-/**
+/*
 C717 (R735) If data-target is unlimited polymorphic, data-pointer-object shall be unlimited polymor-
      phic, of a sequence derived type, or of a type with the BIND attribute.
  */
 
-/**
+/*
 C718 (R735) If bounds-spec-list is specified, the number of bounds-specs shall equal the rank of data-
      pointer-object.
  */
 
-/**
+/*
 C719 (R735) If bounds-remapping-list is specified, the number of bounds-remappings shall equal the
      rank of data-pointer-object.
  */
 
-/**
+/*
 C720 (R735) If bounds-remapping-list is specified, data-target shall have rank one; otherwise, the
      ranks of data-pointer-object and data-target shall be the same.
  */
 
-/**
+/*
 C721 (R736) A variable-name shall have the POINTER attribute.
  */
 
-/**
+/*
 C722 (R736) A data-pointer-component-name shall be the name of a component of variable that is a
      data pointer.
  */
@@ -3107,12 +3258,12 @@ data_target
 	|	expr
 	;
 
-/**
+/*
 C723 (R739) A variable shall have either the TARGET or POINTER attribute, and shall not be an
      array section with a vector subscript.
  */
 
-/**
+/*
 C724 (R739) An expr shall be a reference to a function whose result is a data pointer.
  */
 
@@ -3131,7 +3282,7 @@ procedure_component_name
     :    name
     ;
 
-/**
+/*
 C725 (R741) the procedure-component-name shall be the name of a procedure pointer component of
      the declared type of variable.
  */
@@ -3143,16 +3294,16 @@ proc_target
 	|	proc_component_ref
 	;
 
-/**
+/*
 C726 (R742) An expr shall be a reference to a function whose result is a procedure pointer.
  */
 
-/**
+/*
 C727 (R742) A procedure-name shall be the name of an external, module, or dummy procedure, a
      specific intrinsic function listed in 13.6 and not marked with a bullet (·), or a procedure pointer.
  */
 
-/**
+/*
 C728 (R742) The proc-target shall not be a nonintrinsic elemental procedure.
  */
 
@@ -3225,11 +3376,11 @@ where_construct_name
     :   name
     ;
 
-/**
+/*
 C729 (R747) A where-assignment-stmt that is a defined assignment shall be elemental.
  */
 
-/**
+/*
 C730 (R744) If the where-construct-stmt is identified by a where-construct-name, the corresponding
      end-where-stmt shall specify the same where-construct-name. If the where-construct-stmt is
      not identified by a where-construct-name, the corresponding end-where-stmt shall not specify
@@ -3238,7 +3389,7 @@ C730 (R744) If the where-construct-stmt is identified by a where-construct-name,
      construct-name.
  */
 
-/**
+/*
 C731 (R746) A statement that is part of a where-body-construct shall not be a branch target statement.
  */
 
@@ -3298,41 +3449,41 @@ forall_construct_name
     :   name
     ;
 
-/**
+/*
 C732 (R758) If the forall-construct-stmt has a forall-construct-name, the end-forall-stmt shall have
      the same forall-construct-name. If the end-forall-stmt has a forall-construct-name, the forall-
       construct-stmt shall have the same forall-construct-name.
  */
 
-/**
+/*
 C733  (R754) The scalar-mask-expr shall be scalar and of type logical.
  */
 
-/**
+/*
 C734  (R754) Any procedure referenced in the scalar-mask-expr, including one referenced by a defined
       operation, shall be a pure procedure (12.6).
  */
 
-/**
+/*
 C735  (R755) The index-name shall be a named scalar variable of type integer.
  */
 
-/**
+/*
 C736  (R755) A subscript or stride in a forall-triplet-spec shall not contain a reference to any index-
       name in the forall-triplet-spec-list in which it appears.
  */
 
-/**
+/*
 C737  (R756) A statement in a forall-body-construct shall not define an index-name of the forall-
       construct.
  */
 
-/**
+/*
 C738  (R756) Any procedure referenced in a forall-body-construct, including one referenced by a defined
       operation, assignment, or finalization, shall be a pure procedure.
  */
 
-/**
+/*
 C739  (R756) A forall-body-construct shall not be a branch target.
  */
 
@@ -3343,7 +3494,7 @@ forall_stmt
 		forall_assignment_stmt
 	;
 
-/**
+/*
 Section 8:
  */
 
@@ -3387,7 +3538,7 @@ if_construct_name
     :    name
     ;
 
-/**
+/*
 C801  (R802) If the if-then-stmt of an if-construct specifies an if-construct-name, the corresponding
       end-if-stmt shall specify the same if-construct-name. If the if-then-stmt of an if-construct does
       not specify an if-construct-name, the corresponding end-if-stmt shall not specify an if-construct-
@@ -3404,7 +3555,7 @@ if_stmt
 		action_stmt
 	;
 
-/**
+/*
 C802  (R807) The action-stmt in the if-stmt shall not be an if-stmt, end-program-stmt, end-function-
       stmt, or end-subroutine-stmt.
  */
@@ -3437,7 +3588,7 @@ case_construct_name
     :   name
     ;
 
-/**
+/*
 C803  (R808) If the select-case-stmt of a case-construct specifies a case-construct-name, the corre-
       sponding end-select-stmt shall specify the same case-construct-name. If the select-case-stmt
       of a case-construct does not specify a case-construct-name, the corresponding end-select-stmt
@@ -3464,7 +3615,7 @@ case_selector
 	|	DEFAULT
 	;
 
-/**
+/*
 C804 (R808) No more than one of the selectors of one of the CASE statements shall be DEFAULT.
  */
 
@@ -3487,17 +3638,17 @@ case_value
 	|	scalar_logical_initialization_expr
 	;
 
-/**
+/*
 C805 (R808) For a given case-construct, each case-value shall be of the same type as case-expr. For
      character type, the kind type parameters shall be the same; character length differences are
      allowed.
  */
 
-/**
+/*
 C806 (R808) A case-value-range using a colon shall not be used if case-expr is of type logical.
  */
 
-/**
+/*
 C807 (R808) For a given case-construct, the case-value-ranges shall not overlap; that is, there shall
      be no possible value of the case-expr that matches more than one case-value-range.
  */
@@ -3537,12 +3688,12 @@ selector
 	|	variable
 	;
 
-/**
+/*
 C808 (R818) If selector is not a variable or is a variable that has a vector subscript, associate-name
      shall not appear in a variable definition context (16.5.7).
  */
 
-/**
+/*
 C809 (R818) An associate-name shall not be the same as another associate-name in the same associate-
      stmt.
  */
@@ -3554,7 +3705,7 @@ end_associate_stmt
 		( associate_construct_name )?
 	;
 
-/**
+/*
 C810 (R820) If the associate-stmt of an associate-construct specifies an associate-construct-name,
      the corresponding end-associate-stmt shall specify the same associate-construct-name. If the
      associate-stmt of an associate-construct does not specify an associate-construct-name, the cor-
@@ -3576,16 +3727,16 @@ select_construct_name
     :    name
     ;
 
-/**
+/*
 C811 (R822) If selector is not a named variable, associate-name => shall appear.
  */
 
-/**
+/*
 C812 (R822) If selector is not a variable or is a variable that has a vector subscript, associate-name
      shall not appear in a variable definition context (16.5.7).
  */
 
-/**
+/*
 C813 (R822) The selector in a select-type-stmt shall be polymorphic.
  */
 
@@ -3608,26 +3759,26 @@ type_guard_stmt
 		( select_construct_name )?
 	;
 
-/**
+/*
 C814 (R823) The type-spec shall specify that each length type parameter is assumed.
  */
 
-/**
+/*
 C815 (R823) The type-spec shall not specify a sequence derived type or a type with the BIND attribute.
  */
 
-/**
+/*
 C816 (R823) If selector is not unlimited polymorphic, the type-spec shall specify an extension of the
      declared type of selector.
  */
 
-/**
+/*
 C817 (R823) For a given select-type-construct, the same type and kind type parameter values shall
      not be specified in more than one TYPE IS type-guard-stmt and shall not be specified in more
      than one CLASS IS type-guard-stmt.
  */
 
-/**
+/*
 C818 (R823) For a given select-type-construct, there shall be at most one CLASS DEFAULT type-
      guard-stmt.
  */
@@ -3639,7 +3790,7 @@ end_select_type_stmt
 		( select_construct_name )?
 	;
 
-/**
+/*
 C819 (R821) If the select-type-stmt of a select-type-construct specifies a select-construct-name, the
      corresponding end-select-type-stmt shall specify the same select-construct-name. If the select-
      type-stmt of a select-type-construct does not specify a select-construct-name, the corresponding
@@ -3692,7 +3843,7 @@ do_variable
 	:	scalar_int_variable
 	;
 
-/**
+/*
 C820 (R831) The do-variable shall be a named scalar variable of type integer.
  */
 
@@ -3712,18 +3863,18 @@ end_do_stmt
 	:	END DO ( do_construct_name )?
 	;
 
-/**
+/*
 C821 (R826) If the do-stmt of a block-do-construct specifies a do-construct-name, the corresponding
      end-do shall be an end-do-stmt specifying the same do-construct-name. If the do-stmt of a
      block-do-construct does not specify a do-construct-name, the corresponding end-do shall not
      specify a do-construct-name.
  */
 
-/**
+/*
 C822 (R826) If the do-stmt is a nonlabel-do-stmt, the corresponding end-do shall be an end-do-stmt.
  */
 
-/**
+/*
 C823 (R826) If the do-stmt is a label-do-stmt, the corresponding end-do shall be identified with the
      same label.
  */
@@ -3751,13 +3902,13 @@ do_term_action_stmt
 	:	action_stmt
 	;
 
-/**
+/*
 C824  (R838) A do-term-action-stmt shall not be a continue-stmt, a goto-stmt, a return-stmt, a stop-
       stmt, an exit-stmt, a cycle-stmt, an end-function-stmt, an end-subroutine-stmt, an end-program-
       stmt, or an arithmetic-if-stmt.
  */
 
-/**
+/*
 C825  (R835) The do-term-action-stmt shall be identified with a label and the corresponding label-do-
       stmt shall refer to the same label.
  */
@@ -3787,13 +3938,13 @@ do_term_shared_stmt
 	:	action_stmt
 	;
 
-/**
+/*
 C826  (R842) A do-term-shared-stmt shall not be a goto-stmt, a return-stmt, a stop-stmt, an exit-
       stmt, a cycle-stmt, an end-function-stmt, an end-subroutine-stmt, an end-program-stmt, or an
       arithmetic-if-stmt.
  */
 
-/**
+/*
 C827  (R840) The do-term-shared-stmt shall be identified with a label and all of the label-do-stmts of
       the inner-shared-do-construct and outer-shared-do-construct shall refer to the same label.
  */
@@ -3803,7 +3954,7 @@ cycle_stmt
 	:	CYCLE ( do_construct_name )?
 	;
 
-/**
+/*
 C828  (R843) If a cycle-stmt refers to a do-construct-name, it shall be within the range of that do-
       construct; otherwise, it shall be within the range of at least one do-construct.
  */
@@ -3813,7 +3964,7 @@ exit_stmt
 	:	EXIT ( do_construct_name )?
 	;
 
-/**
+/*
 C829  (R844) If an exit-stmt refers to a do-construct-name, it shall be within the range of that do-
       construct; otherwise, it shall be within the range of at least one do-construct.
  */
@@ -3825,7 +3976,7 @@ goto_stmt
 		LABEL
 	;
 
-/**
+/*
 C830  (R845) The label shall be the statement label of a branch target statement that appears in the
       same scoping unit as the goto-stmt.
  */
@@ -3841,7 +3992,7 @@ computed_goto_stmt
 		scalar_int_expr
 	;
 
-/**
+/*
 C831  (R846 Each label in label-list shall be the statement label of a branch target statement that
       appears in the same scoping unit as the computed-goto-stmt.
  */
@@ -3859,12 +4010,12 @@ arithmetic_if_stmt
 		LABEL
 	;
 
-/**
+/*
 C832  (R847) Each label shall be the label of a branch target statement that appears in the same
       scoping unit as the arithmetic-if-stmt.
  */
 
-/**
+/*
 C833  (R847) The scalar-numeric-expr shall not be of type complex.
  */
 
@@ -3888,11 +4039,11 @@ scalar_char_constant
     :    char_constant
     ;
 
-/**
+/*
 C834  (R850) scalar-char-constant shall be of type default character.
  */
 
-/**
+/*
 Section 9:
  */
 
@@ -3913,11 +4064,11 @@ internal_file_variable
 	:	char_variable
 	;
 
-/**
+/*
 C901 (R903) The char-variable shall not be an array section with a vector subscript.
  */
 
-/**
+/*
 C902 (R903) The char-variable shall be of type default character, ASCII character, or ISO 10646
      character.
  */
@@ -3968,16 +4119,16 @@ iomsg_variable
 	:	scalar_default_char_variable
 	;
 
-/**
+/*
 C903 (R905) No specifier shall appear more than once in a given connect-spec-list.
  */
 
-/**
+/*
 C904 (R905) A file-unit-number shall be specified; if the optional characters UNIT= are omitted, the
      file-unit-number shall be the first item in the connect-spec-list.
  */
 
-/**
+/*
 C905 (R905) The label used in the ERR= specifier shall be the statement label of a branch target
      statement that appears in the same scoping unit as the OPEN statement.
  */
@@ -4000,16 +4151,16 @@ close_spec_list
     :    close_spec ( close_spec )*
     ;
 
-/**
+/*
 C906 (R909) No specifier shall appear more than once in a given close_spec_list.
  */
 
-/**
+/*
 C907 (R909) A file-unit-number shall be specified; if the optional characters UNIT= are omitted, the
      file-unit-number shall be the first item in the close-spec-list.
  */
 
-/**
+/*
 C908 (R909) The label used in the ERR= specifier shall be the statement label of a branch target
      statement that appears in the same scoping unit as the CLOSE statement.
  */
@@ -4058,100 +4209,100 @@ io_control_spec_list
     :    io_control_spec ( io_control_spec )*
     ;
 
-/**
+/*
 C909 (R913) No specifier shall appear more than once in a given io-control-spec-list.
  */
 
-/**
+/*
 C910 (R913) An io-unit shall be specified; if the optional characters UNIT= are omitted, the io-unit
      shall be the first item in the io-control-spec-list.
  */
 
-/**
+/*
 C911 (R913) A DELIM= or SIGN= specifier shall not appear in a read-stmt.
  */
 
-/**
+/*
 C912 (R913) A BLANK=, PAD=, END=, EOR=, or SIZE= specifier shall not appear in a write-stmt.
  */
 
-/**
+/*
 C913 (R913) The label in the ERR=, EOR=, or END= specifier shall be the statement label of a
      branch target statement that appears in the same scoping unit as the data transfer statement.
  */
 
-/**
+/*
 C914 (R913) A namelist-group-name shall be the name of a namelist group.
  */
 
-/**
+/*
 C915 (R913) A namelist-group-name shall not appear if an input-item-list or an output-item-list
      appears in the data transfer statement.
  */
 
-/**
+/*
 C916 (R913) An io-control-spec-list shall not contain both a format and a namelist-group-name.
  */
 
-/**
+/*
 C917 (R913) If format appears without a preceding FMT=, it shall be the second item in the io-
      control-spec-list and the first item shall be io-unit.
  */
 
-/**
+/*
 C918 (R913) If namelist-group-name appears without a preceding NML=, it shall be the second item
      in the io-control-spec-list and the first item shall be io-unit.
  */
 
-/**
+/*
 C919 (R913) If io-unit is not a file-unit-number, the io-control-spec-list shall not contain a REC=
      specifier or a POS= specifier.
  */
 
-/**
+/*
 C920 (R913) If the REC= specifier appears, an END= specifier shall not appear, a namelist-group-
      name shall not appear, and the format, if any, shall not be an asterisk.
  */
 
-/**
+/*
 C921 (R913) An ADVANCE= specifier may appear only in a formatted sequential or stream in-
      put/output statement with explicit format specification (10.1) whose control information list
      does not contain an internal-file-variable as the io-unit.
  */
 
-/**
+/*
 C922 (R913) If an EOR= specifier appears, an ADVANCE= specifier also shall appear.
  */
 
-/**
+/*
 C923 (R913) If a SIZE= specifier appears, an ADVANCE= specifier also shall appear.
  */
 
-/**
+/*
 C924 (R913) The scalar-char-initialization-expr in an ASYNCHRONOUS= specifier shall be of type
      default character and shall have the value YES or NO.
  */
 
-/**
+/*
 C925 (R913) An ASYNCHRONOUS= specifier with a value YES shall not appear unless io-unit is a
      file-unit-number.
  */
 
-/**
+/*
 C926 (R913) If an ID= specifier appears, an ASYNCHRONOUS= specifier with the value YES shall
      also appear.
  */
 
-/**
+/*
 C927 (R913) If a POS= specifier appears, the io-control-spec-list shall not contain a REC= specifier.
  */
 
-/**
+/*
 C928 (R913) If a DECIMAL=, BLANK=, PAD=, SIGN=, or ROUND= specifier appears, a format
      or namelist-group-name shall also appear.
  */
 
-/**
+/*
 C929 (R913) If a DELIM= specifier appears, either format shall be an asterisk or namelist-group-name
      shall appear.
  */
@@ -4163,7 +4314,7 @@ format
 	|	STAR
 	;
 
-/**
+/*
 C930 (R914) The label shall be the label of a FORMAT statement that appears in the same scoping
      unit as the statement containing the FMT= specifier.
  */
@@ -4176,6 +4327,7 @@ input_item
 
 input_item_list
     :    input_item ( input_item )*
+    ;
 
 // R916
 output_item
@@ -4207,24 +4359,24 @@ io_implied_do_control
     : do_variable EQUAL scalar_int_expr COMMA scalar_int_expr ( COMMA scalar_int_expr )?
     ;
 
-/**
+/*
 C931 (R915) A variable that is an input-item shall not be a whole assumed-size array.
  */
 
-/**
+/*
 C932 (R915) A variable that is an input-item shall not be a procedure pointer.
  */
 
-/**
+/*
 C933 (R919) The do-variable shall be a named scalar variable of type integer.
  */
 
-/**
+/*
 C934 (R918) In an input-item-list, an io-implied-do-object shall be an input-item. In an output-item-
      list, an io-implied-do-object shall be an output-item.
  */
 
-/**
+/*
 C935 (R916) An expression that is an output-item shall not have a value that is a procedure pointer.
  */
 
@@ -4240,12 +4392,12 @@ dtv_type_spec
 		RPAREN
 	;
 
-/**
+/*
 C936 (R920) If derived-type-spec specifies an extensible type, the CLASS keyword shall be used;
      otherwise, the TYPE keyword shall be used.
  */
 
-/**
+/*
 C937 (R920) All length type parameters of derived-type-spec shall be assumed.
  */
 
@@ -4269,16 +4421,16 @@ wait_spec_list
     :    wait_spec ( wait_spec )*
     ;
 
-/**
+/*
 C938 (R922) No specifier shall appear more than once in a given wait-spec-list.
  */
 
-/**
+/*
 C939 (R922) A file-unit-number shall be specified; if the optional characters UNIT= are omitted, the
      file-unit-number shall be the first item in the wait-spec-list.
  */
 
-/**
+/*
 C940 (R922) The label in the ERR=, EOR=, or END= specifier shall be the statement label of a
      branch target statement that appears in the same scoping unit as the WAIT statement.
  */
@@ -4325,16 +4477,16 @@ position_spec_list
     :    position_spec ( position_spec )*
     ;
 
-/**
+/*
 C941 (R926) No specifier shall appear more than once in a given position-spec-list.
  */
 
-/**
+/*
 C942 (R926) A file-unit-number shall be specified; if the optional characters UNIT= are omitted, the
      file-unit-number shall be the first item in the position-spec-list.
  */
 
-/**
+/*
 C943 (R926) The label in the ERR= specifier shall be the statement label of a branch target statement
      that appears in the same scoping unit as the file positioning statement.
  */
@@ -4357,16 +4509,16 @@ flush_spec_list
     :    flush_spec ( flush_spec )*
     ;
 
-/**
+/*
 C944 (R928) No specifier shall appear more than once in a given flush-spec-list.
  */
 
-/**
+/*
 C945 (R928) A file-unit-number shall be specified; if the optional characters UNIT= are omitted from
      the unit specifier, the file-unit-number shall be the first item in the flush-spec-list.
  */
 
-/**
+/*
 C946 (R928) The label in the ERR= specifier shall be the statement label of a branch target statement
      that appears in the same scoping unit as the flush statement.
  */
@@ -4421,25 +4573,25 @@ inquire_spec_list
     :    inquire_spec ( inquire_spec )*
     ;
 
-/**
+/*
 C947  (R930) No specifier shall appear more than once in a given inquire-spec-list.
  */
 
-/**
+/*
 C948  (R930) An inquire-spec-list shall contain one FILE= specifier or one UNIT= specifier, but not
       both.
  */
 
-/**
+/*
 C949  (R930) In the inquire by unit form of the INQUIRE statement, if the optional characters UNIT=
       are omitted, the file-unit-number shall be the first item in the inquire-spec-list.
  */
 
-/**
+/*
 C950  (R930) If an ID= specifier appears, a PENDING= specifier shall also appear.
  */
 
-/**
+/*
 Section 10:
  */
 
@@ -4453,11 +4605,11 @@ format_specification
 	:	LPAREN ( format_item_list )? RPAREN
 	;
 
-/**
+/*
 C1001 (R1001) The format-stmt shall be labeled.
  */
 
-/**
+/*
 C1002 (R1002) The comma used to separate format-items in a format-item-list may be omitted
  */
 
@@ -4473,18 +4625,18 @@ format_item_list
     :    format_item ( format_item )*
     ;
 
-/** TODO - inline it (in R1003)
+/* TODO - inline it (in R1003)
 // R1004
 r
 	:	int_literal_constant
 	;
  */
 
-/**
+/*
 C1003 (R1004) r shall be positive.
  */
 
-/**
+/*
 C1004 (R1004) r shall not have a kind parameter specified for it.
  */
 
@@ -4505,53 +4657,59 @@ data_edit_desc
     | 'DT' ( char_literal_constant )? ( LPAREN v_list RPAREN )?
     ;
 
-/** TODO: inlined w in R1005
+/* TODO: inlined w in R1005
 // R1006
 w
 	:	int_literal_constant
 	;
 */
 
-/** TODO: inlined m in R1005
+/* TODO: inlined m in R1005
 // R1007
 m
 	:	int_literal_constant
 	;
 */
 
-/** TODO: inlined d in R1005
+/* TODO: inlined d in R1005
 // R1008
 d
 	:	int_literal_constant
 	;
 */
 
-/** TODO: inlined e in R1005
+/* TODO: inlined e in R1005
 // R1009
 e
 	:	int_literal_constant
 	;
 */
 
+/* TODO: only need v_list
 // R1010
 v
 	:	signed_int_literal_constant
 	;
+*/
 
-/**
+v_list
+    :   signed_int_literal_constant ( signed_int_literal_constant )*
+    ;
+
+/*
 C1005 (R1009) e shall be positive.
  */
 
-/**
+/*
 C1006 (R1006) w shall be zero or positive for the I, B, O, Z, and F edit descriptors. w shall be positive
       for all other edit descriptors.
  */
 
-/**
+/*
 C1007 (R1005) w, m, d, e, and v shall not have kind parameters specified for them.
  */
 
-/**
+/*
 C1008 (R1005) The char-literal-constant in the DT edit descriptor shall not have a kind parameter
       specified for it.
  */
@@ -4562,20 +4720,20 @@ control_edit_desc
 	|	( int_literal_constant )? SLASH
 	|	COLON
 	|	sign_edit_desc
-	|	signed-int-literal-constant 'P'
+	|	signed_int_literal_constant 'P'
 	|	blank_interp_edit_desc
 	|	round_edit_desc
 	|	decimal_edit_desc
 	;
 
-/** TODO: inlined in R1011
+/* TODO: inlined in R1011
 // R1012
 k
 	:	signed_int_literal_constant
 	;
 */
 
-/**
+/*
 C1009 (R1012) k shall not have a kind parameter specified for it.
  */
 
@@ -4587,18 +4745,18 @@ position_edit_desc
 	|	int_literal_constant 'X'
 	;
 
-/** TODO: inlined in R1013
+/* TODO: inlined in R1013
 // R1014
 n
 	:	int_literal_constant
 	;
 */
 
-/**
+/*
 C1010 (R1014) n shall be positive.
  */
 
-/**
+/*
 C1011 (R1014) n shall not have a kind parameter specified for it.
  */
 
@@ -4636,11 +4794,11 @@ char_string_edit_desc
 	:	char_literal_constant
 	;
 
-/**
+/*
 C1012 (R1019) The char-literal-constant shall not have a kind parameter specified for it.
  */
 
-/**
+/*
 Section 11:
  */
 
@@ -4668,18 +4826,18 @@ program_name
     :    name
     ;
 
-/**
+/*
 C1101 (R1101) In a main-program, the execution-part shall not contain a RETURN statement or an
       ENTRY statement.
  */
 
-/**
+/*
 C1102 (R1101) The program-name may be included in the end-program-stmt only if the optional
       program-stmt is used and, if included, shall be identical to the program-name specified in the
       program-stmt.
  */
 
-/**
+/*
 C1103 (R1101) An automatic object shall not appear in the specification-part (R204) of a main program.
  */
 
@@ -4719,21 +4877,21 @@ module_subprogram
 	|	subroutine_subprogram
 	;
 
-/**
+/*
 C1104 (R1104) If the module-name is specified in the end-module-stmt, it shall be identical to the
       module-name specified in the module-stmt.
  */
 
-/**
+/*
 C1105 (R1104) A module specification-part shall not contain a stmt-function-stmt, an entry-stmt, or a
       format-stmt.
  */
 
-/**
+/*
 C1106 (R1104) An automatic object shall not appear in the specification-part of a module.
  */
 
-/**
+/*
 C1107 (R1104) If an object of a type for which component-initialization is specified (R444) appears
       in the specification-part of a module and does not have the ALLOCATABLE or POINTER
       attribute, the object shall have the SAVE attribute.
@@ -4778,38 +4936,42 @@ only
 	|	rename
 	;
 
+only_list
+    :    only ( only )*
+    ;
+
 // R1113
 only_use_name
 	:	use_name
 	;
 
-/**
+/*
 C1108 (R1109) If module-nature is INTRINSIC, module-name shall be the name of an intrinsic module.
  */
 
-/**
+/*
 C1109 (R1109) If module-nature is NON INTRINSIC, module-name shall be the name of a nonintrinsic
       module.
  */
 
-/**
+/*
 C1110 (R1109) A scoping unit shall not access an intrinsic module and a nonintrinsic module of the
       same name.
  */
 
-/**
+/*
 C1111 (R1111) OPERATOR(use-defined-operator) shall not identify a generic-binding.
  */
 
-/**
+/*
 C1112 (R1112) The generic-spec shall not identify a generic-binding.
  */
 
-/**
+/*
 C1113 (R1112) Each generic-spec shall be a public entity in the module.
  */
 
-/**
+/*
 C1114 (R1113) Each use-name shall be the name of a public entity in the module.
  */
 
@@ -4825,7 +4987,7 @@ use_defined_operator
 	|	defined_binary_op
 	;
 
-/**
+/*
 C1115 (R1115) Each use-defined-operator shall be a public entity in the module.
  */
 
@@ -4852,25 +5014,25 @@ block_data_name
     :    name
     ;
 
-/**
+/*
 C1116 (R1116) The block-data-name shall be included in the end-block-data-stmt only if it was provided
       in the block-data-stmt and, if included, shall be identical to the block-data-name in the block-
       data-stmt.
  */
 
-/**
+/*
 C1117 (R1116) A block-data specification-part shall contain only derived-type definitions and ASYN-
       CHRONOUS, BIND, COMMON, DATA, DIMENSION, EQUIVALENCE, IMPLICIT, INTRIN-
       SIC, PARAMETER, POINTER, SAVE, TARGET, USE, VOLATILE, and type declaration
       statements.
  */
 
-/**
+/*
 C1118 (R1116) A type declaration statement in a block-data specification-part shall not contain AL-
       LOCATABLE, EXTERNAL, or BIND attribute specifiers.
  */
 
-/**
+/*
 Section 12:
  */
 
@@ -4966,12 +5128,12 @@ import_name_list
     :    import_name ( import_name )*
     ;
 
-/**
+/*
 C1201 (R1201) An interface-block in a subprogram shall not contain an interface-body for a procedure
       defined by that subprogram.
  */
 
-/**
+/*
 C1202 (R1201) The generic-spec shall be included in the end-interface-stmt only if it is provided in the
       interface-stmt. If the end-interface-stmt includes generic-name, the interface-stmt shall specify
       the same generic-name. If the end-interface-stmt includes ASSIGNMENT(=), the interface-
@@ -4982,46 +5144,46 @@ C1202 (R1201) The generic-spec shall be included in the end-interface-stmt only 
       corresponding operator <, <=, >, >=, ==, or /=.
  */
 
-/**
+/*
 C1203 (R1203) If the interface-stmt is ABSTRACT INTERFACE, then the function-name in the
       function-stmt or the subroutine-name in the subroutine-stmt shall not be the same as a keyword
       that specifies an intrinsic type.
  */
 
-/**
+/*
 C1204 (R1202) A procedure-stmt is allowed only in an interface block that has a generic-spec.
  */
 
-/**
+/*
 C1205 (R1205) An interface-body of a pure procedure shall specify the intents of all dummy arguments
       except pointer, alternate return, and procedure arguments.
  */
 
-/**
+/*
 C1206 (R1205) An interface-body shall not contain an entry-stmt, data-stmt, format-stmt, or stmt-
       function-stmt.
  */
 
-/**
+/*
 C1207 (R1206) A procedure-name shall have an explicit interface and shall refer to an accessible pro-
       cedure pointer, external procedure, dummy procedure, or module procedure.
  */
 
-/**
+/*
 C1208 (R1206) If MODULE appears in a procedure-stmt, each procedure-name in that statement shall
       be accessible in the current scope as a module procedure.
  */
 
-/**
+/*
 C1209 (R1206) A procedure-name shall not specify a procedure that is specified previously in any
       procedure-stmt in any accessible interface with the same generic identifier.
  */
 
-/**
+/*
 C1210 (R1209) The IMPORT statement is allowed only in an interface-body.
  */
 
-/**
+/*
 C1211 (R1209) Each import-name shall be the name of an entity in the host scoping unit.
  */
 
@@ -5078,38 +5240,38 @@ interface_name
 	:	name
 	;
 
-/**
+/*
 C1212 (R1215) The name shall be the name of an abstract interface or of a procedure that has an
       explicit interface. If name is declared by a procedure-declaration-stmt it shall be previously
       declared. If name denotes an intrinsic procedure it shall be one that is listed in 13.6 and not
       marked with a bullet (·).
  */
 
-/**
+/*
 C1213 (R1215) The name shall not be the same as a keyword that specifies an intrinsic type.
  */
 
-/**
+/*
 C1214 If a procedure entity has the INTENT attribute or SAVE attribute, it shall also have the
       POINTER attribute.
  */
 
-/**
+/*
 C1215 (R1211) If a proc-interface describes an elemental procedure, each procedure-entity-name shall
       specify an external procedure.
  */
 
-/**
+/*
 C1216 (R1214) If => appears in proc-decl, the procedure entity shall have the POINTER attribute.
  */
 
-/**
+/*
 C1217 (R1211) If proc-language-binding-spec with a NAME= is specified, then proc-decl-list shall con-
       tain exactly one proc-decl, which shall neither have the POINTER attribute nor be a dummy
       procedure.
  */
 
-/**
+/*
 C1218 (R1211) If proc-language-binding-spec is specified, the proc-interface shall appear, it shall be an
       interface-name, and interface-name shall be declared with a proc-language-binding-spec.
  */
@@ -5129,7 +5291,7 @@ intrinsic_procedure_name_list
     :    intrinsic_procedure_name ( intrinsic_procedure_name )*
     ;
 
-/**
+/*
 C1219 (R1216) Each intrinsic-procedure-name shall be the name of an intrinsic procedure.
  */
 
@@ -5141,11 +5303,11 @@ function_reference
 		RPAREN
 	;
 
-/**
+/*
 C1220 (R1217) The procedure-designator shall designate a function.
  */
 
-/**
+/*
 C1221 (R1217) The actual-arg-spec-list shall not contain an alt-return-spec.
  */
 
@@ -5154,7 +5316,7 @@ call_stmt
     :    CALL procedure_designator ( LPAREN ( actual_arg_spec_list )? RPAREN )?
     ;
 
-/**
+/*
 C1222 (R1218) The procedure-designator shall designate a subroutine.
  */
 
@@ -5169,11 +5331,15 @@ binding_name
     :    name
     ;
 
-/**
+binding_name_list
+    :    binding_name ( binding_name )*
+    ;
+
+/*
 C1223 (R1219) A procedure-name shall be the name of a procedure or procedure pointer.
  */
 
-/**
+/*
 C1224 (R1219) A binding-name shall be a binding name (4.5.4) of the declared type of data-ref .
  */
 
@@ -5201,48 +5367,48 @@ alt_return_spec
 		LABEL
 	;
 
-/**
+/*
 C1225 (R1220) The keyword = shall not appear if the interface of the procedure is implicit in the
       scoping unit.
  */
 
-/**
+/*
 C1226 (R1220) The keyword = shall not be omitted from an actual-arg-spec unless it has been omitted
       from each preceding actual-arg-spec in the argument list.
  */
 
-/**
+/*
 C1227 (R1220) Each keyword shall be the name of a dummy argument in the explicit interface of the
       procedure.
  */
 
-/**
+/*
 C1228 (R1221) A nonintrinsic elemental procedure shall not be used as an actual argument.
  */
 
-/**
+/*
 C1229 (R1221) A procedure-name shall be the name of an external procedure, a dummy procedure, a
       module procedure, a procedure pointer, or a specific intrinsic function that is listed in 13.6 and
       not marked with a bullet(·).
  */
 
-/**
+/*
 C1230 (R1221) In a reference to a pure procedure, a procedure-name actual-arg shall be the name of a
       pure procedure (12.6).
  */
 
-/**
+/*
 C1231 (R1222) The label used in the alt-return-spec shall be the statement label of a branch target statement that
       appears in the same scoping unit as the call-stmt.
  */
 
-/**
+/*
 C1232 (R1221) If an actual argument is an array section or an assumed-shape array, and the corre-
       sponding dummy argument has either the VOLATILE or ASYNCHRONOUS attribute, that
       dummy argument shall be an assumed-shape array.
  */
 
-/**
+/*
 C1233 (R1221) If an actual argument is a pointer array, and the corresponding dummy argument
       has either the VOLATILE or ASYNCHRONOUS attribute, that dummy argument shall be an
       assumed-shape array or a pointer array.
@@ -5272,12 +5438,12 @@ function_name
     :    name
     ;
 
-/**
+/*
 C1234 (R1224) If RESULT is specified, result-name shall not be the same as function-name and shall
       not be the same as the entry-name in any ENTRY statement in the subprogram.
  */
 
-/**
+/*
 C1235 (R1224) If RESULT is specified, the function-name shall not appear in any specification state-
       ment in the scoping unit of the function subprogram.
  */
@@ -5287,17 +5453,17 @@ proc_language_binding_spec
 	:	language_binding_spec
 	;
 
-/**
+/*
 C1236 (R1225) A proc-language-binding-spec with a NAME= specifier shall not be specified in the
       function-stmt or subroutine-stmt of an interface body for an abstract interface or a dummy
       procedure.
  */
 
-/**
+/*
 C1237 (R1225) A proc-language-binding-spec shall not be specified for an internal procedure.
  */
 
-/**
+/*
 C1238 (R1225) If proc-language-binding-spec is specified for a procedure, each of the procedure's dummy
       arguments shall be a nonoptional interoperable variable (15.2.4, 15.2.5) or an interoperable
       procedure (15.2.6). If proc-language-binding-spec is specified for a function, the function result
@@ -5309,7 +5475,7 @@ dummy_arg_name
 	:	name
 	;
 
-/**
+/*
 C1239 (R1226) A dummy-arg-name shall be the name of a dummy argument.
  */
 
@@ -5327,15 +5493,15 @@ prefix_spec
 	|	ELEMENTAL
 	;
 
-/**
+/*
 C1240 (R1227) A prefix shall contain at most one of each prefix-spec.
  */
 
-/**
+/*
 C1241 (R1227) A prefix shall not specify both ELEMENTAL and RECURSIVE.
  */
 
-/**
+/*
 C1242 (R1227) A prefix shall not specify ELEMENTAL if proc-language-binding-spec appears in the
       function-stmt or subroutine-stmt.
  */
@@ -5346,24 +5512,28 @@ suffix
     | RESULT LPAREN result_name RPAREN ( proc_language_binding_spec )?
     ;
 
+result_name
+    :    name
+    ;
+
 // R1230
 end_function_stmt
     : END ( FUNCTION ( function_name )? )?
     ;
 
-/**
+/*
 C1243 (R1230) FUNCTION shall appear in the end-function-stmt of an internal or module function.
  */
 
-/**
+/*
 C1244 (R1223) An internal function subprogram shall not contain an ENTRY statement.
  */
 
-/**
+/*
 C1245 (R1223) An internal function subprogram shall not contain an internal-subprogram-part.
  */
 
-/**
+/*
 C1246 (R1230) If a function-name appears in the end-function-stmt, it shall be identical to the function-
       name specified in the function-stmt.
  */
@@ -5383,7 +5553,7 @@ subroutine_stmt
           ( LPAREN ( dummy_arg_list )? RPAREN ( proc_language_binding_spec )? )?
     ;
 
-/**
+/*
 C1247 (R1232) The prefix of a subroutine-stmt shall not contain a declaration-type-spec.
  */
 
@@ -5393,25 +5563,33 @@ dummy_arg
 	|	STAR
 	;
 
+dummy_arg_list
+    :    dummy_arg ( dummy_arg )*
+    ;
+
 // R1234
 end_subroutine_stmt
     :    END ( SUBROUTINE ( subroutine_name )? )?
     ;
 
-/**
+subroutine_name
+    :    name
+    ;
+
+/*
 C1248 (R1234) SUBROUTINE shall appear in the end-subroutine-stmt of an internal or module sub-
       routine.
  */
 
-/**
+/*
 C1249 (R1231) An internal subroutine subprogram shall not contain an ENTRY statement.
  */
 
-/**
+/*
 C1250 (R1231) An internal subroutine subprogram shall not contain an internal-subprogram-part.
  */
 
-/**
+/*
 C1251 (R1234) If a subroutine-name appears in the end-subroutine-stmt, it shall be identical to the
       subroutine-name specified in the subroutine-stmt.
  */
@@ -5421,32 +5599,36 @@ entry_stmt
     :    ENTRY entry_name ( LPAREN ( dummy_arg_list )? RPAREN ( suffix )? )?
     ;
 
-/**
+entry_name
+    :    name
+    ;
+
+/*
 C1252 (R1235) If RESULT is specified, the entry-name shall not appear in any specification or type-
       declaration statement in the scoping unit of the function program.
  */
 
-/**
+/*
 C1253 (R1235) An entry-stmt shall appear only in an external-subprogram or module-subprogram. An
       entry-stmt shall not appear within an executable-construct.
  */
 
-/**
+/*
 C1254 (R1235) RESULT shall appear only if the entry-stmt is in a function subprogram.
  */
 
-/**
+/*
 C1255 (R1235) Within the subprogram containing the entry-stmt, the entry-name shall not appear
       as a dummy argument in the FUNCTION or SUBROUTINE statement or in another ENTRY
       statement nor shall it appear in an EXTERNAL, INTRINSIC, or PROCEDURE statement.
  */
 
-/**
+/*
 C1256 (R1235) A dummy-arg shall not be an alternate return indicator if the ENTRY statement is in a function
       subprogram.
  */
 
-/**
+/*
 C1257 (R1235) If RESULT is specified, result-name shall not be the same as the function-name in the
       FUNCTION statement and shall not be the same as the entry-name in any ENTRY statement
       in the subprogram.
@@ -5457,11 +5639,11 @@ return_stmt
 	:	RETURN ( scalar_int_expr )?
 	;
 
-/**
+/*
 C1258 (R1236) The return-stmt shall be in the scoping unit of a function or subroutine subprogram.
  */
 
-/**
+/*
 C1259 (R1236) The scalar-int-expr is allowed only in the scoping unit of a subroutine subprogram.
  */
 
@@ -5480,7 +5662,7 @@ stmt_function_stmt
 		scalar_expr
 	;
 
-/**
+/*
 C1260 (R1238) The primaries of the scalar-expr shall be constants (literal and named), references to variables, references
       to functions and function dummy procedures, and intrinsic operations. If scalar-expr contains a reference to a
       function or a function dummy procedure, the reference shall not require an explicit interface, the function shall
@@ -5490,142 +5672,142 @@ C1260 (R1238) The primaries of the scalar-expr shall be constants (literal and n
       provided earlier in the scoping unit and shall not be the name of the statement function being defined.
  */
 
-/**
+/*
 C1261 (R1238) Named constants in scalar-expr shall have been declared earlier in the scoping unit or made accessible
       by use or host association. If array elements appear in scalar-expr, the array shall have been declared as an array
       earlier in the scoping unit or made accessible by use or host association.
  */
 
-/**
+/*
 C1262 (R1238) If a dummy-arg-name, variable, function reference, or dummy function reference is typed by the implicit
       typing rules, its appearance in any subsequent type declaration statement shall confirm this implied type and
       the values of any implied type parameters.
  */
 
-/**
+/*
 C1263 (R1238) The function-name and each dummy-arg-name shall be specified, explicitly or implicitly, to be scalar.
  */
 
-/**
+/*
 C1264 (R1238) A given dummy-arg-name shall not appear more than once in any dummy-arg-name-list.
  */
 
-/**
+/*
 C1265 (R1238) Each variable reference in scalar-expr may be either a reference to a dummy argument of the statement
       function or a reference to a variable accessible in the same scoping unit as the statement function statement.
  */
 
-/**
+/*
 C1266 The specification-part of a pure function subprogram shall specify that all its nonpointer dummy
       data objects have INTENT(IN).
  */
 
-/**
+/*
 C1267 The specification-part of a pure subroutine subprogram shall specify the intents of all its non-
       pointer dummy data objects.
  */
 
-/**
+/*
 C1268 A local variable declared in the specification-part or internal-subprogram-part of a pure subpro-
       gram shall not have the SAVE attribute.
  */
 
-/**
+/*
 C1269 The specification-part of a pure subprogram shall specify that all its dummy procedures are
       pure.
  */
 
-/**
+/*
 C1270 If a procedure that is neither an intrinsic procedure nor a statement function is used in a context
       that requires it to be pure, then its interface shall be explicit in the scope of that use. The
       interface shall specify that the procedure is pure.
  */
 
-/**
+/*
 C1271 All internal subprograms in a pure subprogram shall be pure.
  */
 
-/**
+/*
 C1272 In a pure subprogram any designator with a base object that is in common or accessed by
       host or use association, is a dummy argument of a pure function, is a dummy argument with
       INTENT (IN) of a pure subroutine, or an object that is storage associated with any such variable,
       shall not be used in the following contexts:
  */
 
-/**
+/*
 C1273 Any procedure referenced in a pure subprogram, including one referenced via a defined operation,
       assignment, or finalization, shall be pure.
  */
 
-/**
+/*
 C1274 A pure subprogram shall not contain a print-stmt, open-stmt, close-stmt, backspace-stmt, endfile-
       stmt, rewind-stmt, flush-stmt, wait-stmt, or inquire-stmt.
  */
 
-/**
+/*
 C1275 A pure subprogram shall not contain a read-stmt or write-stmt whose io-unit is a file-unit-number
       or *.
  */
 
-/**
+/*
 C1276 A pure subprogram shall not contain a stop-stmt.
  */
 
-/**
+/*
 C1277 All dummy arguments of an elemental procedure shall be scalar dummy data objects and shall
       not have the POINTER or ALLOCATABLE attribute.
  */
 
-/**
+/*
 C1278 The result variable of an elemental function shall be scalar and shall not have the POINTER or
       ALLOCATABLE attribute.
  */
 
-/**
+/*
 C1279 In the scoping unit of an elemental subprogram, an object designator with a dummy argument
       as the base object shall not appear in a specification-expr except as the argument to one of the
       intrinsic functions BIT SIZE, KIND, LEN, or the numeric inquiry functions (13.5.6).
  */
 
-/**
+/*
 Section 13:
  */
 
-/**
+/*
 Section 14:
  */
 
-/**
+/*
 Section 15:
  */
 
-/**
+/*
 C1501 (R429) A derived type with the BIND attribute shall not be a SEQUENCE type.
  */
 
-/**
+/*
 C1502 (R429) A derived type with the BIND attribute shall not have type parameters.
  */
 
-/**
+/*
 C1503 (R429) A derived type with the BIND attribute shall not have the EXTENDS attribute.
  */
 
-/**
+/*
 C1504 (R429) A derived type with the BIND attribute shall not have a type-bound-procedure-part.
  */
 
-/**
+/*
 C1505 (R429) Each component of a derived type with the BIND attribute shall be a nonpointer,
       nonallocatable data component with interoperable type and type parameters.
  */
 
-/**
+/*
 Section 16:
  */
 
 
-/**
+/*
 Lexer rules
  */
 
@@ -5658,11 +5840,40 @@ char_literal_constant
     |    ( kind_param ) DOUBLE_QUOTE ( REP_CHAR )* DOUBLE_QUOTE
     ;
 
-// TODO
-// R428
-logical_literal_constant
-    :    DOT_TRUE ( kind_param )?
-    |    DOT_FALSE ( kind_param )?
+// TODO: convert to terminal
+// R301
+character
+	:	ALPHANUMERIC_CHARACTER
+	|	SPECIAL_CHARACTER
+	;
+
+// TODO: converted to terminal
+// R302
+ALPHANUMERIC_CHARACTER
+	:	LETTER
+	|	DIGIT
+	|	UNDERSCORE
+	;
+
+// TODO: converted to terminal
+// R303  underscore                  : _
+fragment
+UNDERSCORE : '_' ;
+
+// TODO: convert to terminal
+// R304
+name
+	:	LETTER
+		( ALPHANUMERIC_CHARACTER )*
+	;
+
+fragment
+SPECIAL_CHARACTER
+    :    ' ' .. '/'
+    |    ':' .. '@'
+    |    '[' .. '^'
+    |    '`'
+    |    '{' .. '~'
     ;
 
 fragment
@@ -5691,3 +5902,6 @@ DOUBLE_QUOTE : '\"' ;
 
 fragment
 LEN_EQ : 'LEN' EQUAL ;
+
+fragment
+KIND_EQ : ('KIND' '=') ;
