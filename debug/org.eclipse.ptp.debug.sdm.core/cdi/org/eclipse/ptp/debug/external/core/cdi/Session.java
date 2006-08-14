@@ -18,8 +18,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.core.cdi;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 import org.eclipse.cdt.core.IBinaryParser.IBinaryObject;
 import org.eclipse.core.resources.IWorkspaceRunnable;
@@ -48,10 +46,10 @@ import org.eclipse.ptp.debug.external.core.cdi.model.Target;
 import org.eclipse.ptp.debug.external.core.commands.GetAIFCommand;
 import org.eclipse.ptp.debug.external.core.commands.GoCommand;
 import org.eclipse.ptp.debug.external.core.commands.HaltCommand;
-import org.eclipse.ptp.debug.external.core.commands.KillCommand;
 import org.eclipse.ptp.debug.external.core.commands.StepFinishCommand;
 import org.eclipse.ptp.debug.external.core.commands.StepIntoCommand;
 import org.eclipse.ptp.debug.external.core.commands.StepOverCommand;
+import org.eclipse.ptp.debug.external.core.commands.TerminateCommand;
 
 /**
  * @author Clement chu
@@ -73,12 +71,14 @@ public class Session implements IPCDISession, IPCDISessionObject {
 	IPJob job = null;
 	IPLaunch launch = null;
 	IBinaryObject file;
+	int no_of_process = 0;
 	
 	public Session(IAbstractDebugger debugger, IPJob job, IPLaunch launch, IBinaryObject file) throws CoreException {
 		this.debugger = debugger;
 		this.job = job;
 		this.launch = launch;
 		this.file = file;
+		this.no_of_process = job.totalProcesses();
 		commonSetup();
 		//job.setAttribute(PreferenceConstants.JOB_DEBUG_SESSION, this);
 	}
@@ -101,7 +101,7 @@ public class Session implements IPCDISession, IPCDISessionObject {
 		try {
 			debugger.exit();
 		} catch (CoreException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 		
 		DebugPlugin.getDefault().getLaunchManager().removeLaunch(launch);
@@ -244,14 +244,14 @@ public class Session implements IPCDISession, IPCDISessionObject {
 		return tasks;
 	}
 	public int getTotalProcesses() {
-		return job.totalProcesses();
+		return no_of_process;
 	}
 
 	public void terminate() throws PCDIException {
 		stop(createBitList());
 	}
 	public void stop(BitList tasks) throws PCDIException {
-		getDebugger().postCommand(new KillCommand(tasks));
+		getDebugger().postCommand(new TerminateCommand(tasks));
 	}
 	public void resume(BitList tasks) throws PCDIException {
 		getDebugger().postCommand(new GoCommand(tasks));

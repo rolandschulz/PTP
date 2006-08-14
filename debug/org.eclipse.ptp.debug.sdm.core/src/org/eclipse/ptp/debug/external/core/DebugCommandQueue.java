@@ -144,6 +144,7 @@ System.err.println("*** SEND COMMAND: " + currentCommand.getName() + ", tasks: "
 				//if (result == null) {
 					//doFlushCommands();
 				//}
+				System.err.println("*** SET COMMAND RETURN: " + currentCommand.getName() + ", result: " + result + ", tasks: " + debugger.showBitList(currentCommand.getTasks()));
 				currentCommand.setReturn(tasks, result);					
 			}
 		}

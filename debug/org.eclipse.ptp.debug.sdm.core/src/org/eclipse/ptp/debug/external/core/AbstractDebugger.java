@@ -56,7 +56,7 @@ import org.eclipse.ptp.debug.external.core.cdi.event.InferiorResumedEvent;
 import org.eclipse.ptp.debug.external.core.cdi.event.InferiorSignaledEvent;
 import org.eclipse.ptp.debug.external.core.cdi.event.SuspendEvent;
 import org.eclipse.ptp.debug.external.core.cdi.model.LineLocation;
-import org.eclipse.ptp.debug.external.core.commands.KillCommand;
+import org.eclipse.ptp.debug.external.core.commands.TerminateCommand;
 import org.eclipse.ptp.debug.external.core.commands.StartDebuggerCommand;
 import org.eclipse.ptp.debug.external.core.commands.StopDebuggerCommand;
 
@@ -102,30 +102,35 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		try {
 			command.waitForReturn();
 		} catch (PCDIException e) {
+			if (session != null) {
+				setJobFinished(session.createBitList(), IPProcess.ERROR);
+			}
 			exit();
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugExternalPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));
 		}
 	}
 	
 	public final void exit() throws CoreException {
-		//make sure all processes are finished
-		if (session != null && !isJobFinished()) {
-			setJobFinished(session.createBitList(), IPProcess.EXITED);
+		if (!isExited) {
+			//make sure all processes are finished
+			if (session != null && !isJobFinished()) {
+				setJobFinished(session.createBitList(), IPProcess.EXITED);
+			}
+	
+			isExited = true;
+			if (!eventThread.equals(Thread.currentThread())) {			
+				// Kill the event Thread.
+				try {
+					if (eventThread.isAlive()) {
+						eventThread.interrupt();
+						eventThread.join(5000);
+					}
+				} catch (InterruptedException e) {}		
+			}
+			deleteObservers();
+			commandQueue.setTerminated();
+			stopDebugger();
 		}
-
-		isExited = true;
-		if (!eventThread.equals(Thread.currentThread())) {			
-			// Kill the event Thread.
-			try {
-				if (eventThread.isAlive()) {
-					eventThread.interrupt();
-					eventThread.join(5000);
-				}
-			} catch (InterruptedException e) {}		
-		}
-		deleteObservers();
-		commandQueue.setTerminated();
-		stopDebugger();
 	}
 	public final IPCDISession getSession() {
 		return session;
@@ -168,8 +173,10 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 					postCommand(new StopDebuggerCommand());
 				break;
 				case IPCDIErrorEvent.DBG_WARNING:
-					setJobFinished(tasks, IPProcess.ERROR);
-					postCommand(new KillCommand(tasks));
+					if (!session.getJob().isAllStop()) {
+						setJobFinished(tasks, IPProcess.ERROR);
+						postCommand(new TerminateCommand(tasks));
+					}
 				break;
 				case IPCDIErrorEvent.DBG_NORMAL:
 					session.unregisterTargets(tasks.toArray(), true);
@@ -246,7 +253,7 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 	public void handleErrorEvent(BitList tasks, String errMsg, int errCode) {
 		System.err.println("----- debugger error: " + errMsg + " on Tasks: " + showBitList(tasks) +" ------------");
 		if (tasks == null || tasks.isEmpty() || errCode == IPCDIErrorEvent.DBG_FATAL) {
-			tasks = ((Session)session).createBitList();
+			tasks = session.createBitList();
 		}
 		fireEvent(new ErrorEvent(getSession(), tasks, errMsg, errCode));
 	}	
@@ -276,7 +283,7 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		return tasks;
 	}
 	public BitList filterTerminateTasks(BitList tasks) {//get not terminate tasks
-		removeTasks(tasks, (BitList) job.getAttribute(TERMINATED_PROC_KEY));		
+		removeTasks(tasks, (BitList) job.getAttribute(TERMINATED_PROC_KEY));
 		return tasks;
 	}
 	public boolean isJobFinished() {

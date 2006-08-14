@@ -175,7 +175,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 		}
 	}
 	public void kill(BitList tasks) throws PCDIException {
-		halt(tasks);
+		//halt(tasks);
 		try {
 			proxy.debugTerminate(tasks);
 		} catch (IOException e) {
@@ -494,7 +494,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 					String func = frames[j].getLocator().getFunction();
 					int line = frames[j].getLocator().getLineNumber();
 					BigInteger addr = frames[j].getLocator().getAddress();
-					System.out.println("frame " + level + " " + file + " " + func + " " + line + " " + addr);
+//System.out.println("frame " + level + " " + file + " " + func + " " + line + " " + addr);
 					pcdiFrames[j] = new StackFrame((Target)target, level, file, func, line, addr);
 				}
 			}
