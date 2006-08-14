@@ -825,16 +825,18 @@ FreeDbgEvent(dbg_event *e) {
 			DestroyList(e->list, free);
 		break;
 	case DBGEV_SIGNAL:
-		if (e->list != NULL) {
-			free(e->sig_name);
-			free(e->sig_meaning);
+		//if (e->list != NULL) {
+		if (e->frame != NULL) {
+			FreeStackframe(e->frame);
 		}
+		free(e->sig_name);
+		free(e->sig_meaning);
 		break;
 	case DBGEV_EXIT_SIGNAL:
-		if (e->list != NULL) {
-			free(e->sig_name);
-			free(e->sig_meaning);
-		}
+		//if (e->list != NULL) {
+		free(e->sig_name);
+		free(e->sig_meaning);
+		//}
 		break;
 		
 	case DBGEV_SIGNALS:
@@ -847,7 +849,6 @@ FreeDbgEvent(dbg_event *e) {
 			FreeBreakpoint(e->bp);
 		break;
 	}
-	
 	if (e->procs != NULL)
 		bitset_free(e->procs);
 
