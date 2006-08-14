@@ -350,7 +350,6 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 		}
 		return null;
 	}
-	
 	// called by debug view
 	/** Add annotation called from Debug View
 	 * @param editorPart
@@ -358,24 +357,34 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 	 * @throws CoreException
 	 */
 	public void addAnnotation(IEditorPart editorPart, IStackFrame stackFrame) throws CoreException {
-		ITextEditor textEditor = getTextEditor(editorPart);
-		if (textEditor == null)
-			throw new CoreException(Status.CANCEL_STATUS);
-		IFile file = getFile(textEditor.getEditorInput());
-		if (file == null)
-			throw new CoreException(Status.CANCEL_STATUS);
-		BitList tasks = getTasks(stackFrame);
-		if (tasks == null)
-			throw new CoreException(Status.CANCEL_STATUS);
-		IStackFrame tos = getTopStackFrame(stackFrame.getThread());
-		String type = (tos == null || stackFrame.equals(tos)) ? IPTPDebugUIConstants.REG_ANN_INSTR_POINTER_CURRENT : IPTPDebugUIConstants.REG_ANN_INSTR_POINTER_SECONDARY;
-		String job_id = uiDebugManager.getCurrentJobId();
-		AnnotationGroup annotationGroup = getAnnotationGroup(job_id);
-		if (annotationGroup == null)
-			annotationGroup = new AnnotationGroup();
-		synchronized (tasks) {
-			addAnnotation(annotationGroup, textEditor, file, stackFrame.getLineNumber(), tasks, type);
-			putAnnotationGroup(job_id, annotationGroup);
+		int lineNumber = stackFrame.getLineNumber();
+		if (lineNumber > -1) {
+			ITextEditor textEditor = getTextEditor(editorPart);
+			if (textEditor == null)
+				throw new CoreException(Status.CANCEL_STATUS);
+			IFile file = getFile(textEditor.getEditorInput());
+			if (file == null)
+				throw new CoreException(Status.CANCEL_STATUS);
+			BitList tasks = getTasks(stackFrame);
+			if (tasks == null)
+				throw new CoreException(Status.CANCEL_STATUS);
+			IStackFrame tos = getTopStackFrame(stackFrame.getThread());
+			String type = (tos == null || stackFrame.equals(tos)) ? IPTPDebugUIConstants.REG_ANN_INSTR_POINTER_CURRENT : IPTPDebugUIConstants.REG_ANN_INSTR_POINTER_SECONDARY;
+			String job_id = uiDebugManager.getCurrentJobId();
+			AnnotationGroup annotationGroup = getAnnotationGroup(job_id);
+			if (annotationGroup == null) {
+				annotationGroup = new AnnotationGroup();
+				putAnnotationGroup(job_id, annotationGroup);
+			}
+			synchronized (tasks) {
+				PInstructionPointerAnnotation annotation = findAnnotation(annotationGroup, tasks);
+				if (annotation == null) {
+					addAnnotation(annotationGroup, textEditor, file, lineNumber, tasks, type);
+				}
+				else {
+					textEditor.selectAndReveal(annotation.getPosition().getOffset(), 0);
+				}
+			}
 		}
 	}
 	// called by event
@@ -388,30 +397,33 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 	 * @throws CoreException
 	 */
 	public void addAnnotation(String job_id, String fullPathFileName, int lineNumber, BitList tasks, boolean isRegister) throws CoreException {
-		if (tasks.isEmpty())
-			return;
-		IFile file = findFile(fullPathFileName);
-		if (file == null)
-			throw new CoreException(Status.CANCEL_STATUS);
-		IEditorPart editorPart = getEditorPart(file);
-		if (editorPart == null)
-			throw new CoreException(Status.CANCEL_STATUS);
-		ITextEditor textEditor = getTextEditor(editorPart);
-		if (textEditor == null)
-			throw new CoreException(Status.CANCEL_STATUS);
-		String type = isRegister ? IPTPDebugUIConstants.REG_ANN_INSTR_POINTER_CURRENT : ((containsCurrentSet(tasks)) ? IPTPDebugUIConstants.CURSET_ANN_INSTR_POINTER_CURRENT : IPTPDebugUIConstants.SET_ANN_INSTR_POINTER_CURRENT);
-		AnnotationGroup annotationGroup = getAnnotationGroup(job_id);
-		if (annotationGroup == null)
-			annotationGroup = new AnnotationGroup();
-		synchronized (tasks) {
-			if (uiDebugManager.getCurrentJobId().equals(job_id)) {
-				addAnnotation(annotationGroup, textEditor, file, lineNumber, tasks, type);
+		if (lineNumber > -1) {
+			if (tasks.isEmpty())
+				return;
+			IFile file = findFile(fullPathFileName);
+			if (file == null)
+				throw new CoreException(Status.CANCEL_STATUS);
+			IEditorPart editorPart = getEditorPart(file);
+			if (editorPart == null)
+				throw new CoreException(Status.CANCEL_STATUS);
+			ITextEditor textEditor = getTextEditor(editorPart);
+			if (textEditor == null)
+				throw new CoreException(Status.CANCEL_STATUS);
+			String type = isRegister ? IPTPDebugUIConstants.REG_ANN_INSTR_POINTER_CURRENT : ((containsCurrentSet(tasks)) ? IPTPDebugUIConstants.CURSET_ANN_INSTR_POINTER_CURRENT : IPTPDebugUIConstants.SET_ANN_INSTR_POINTER_CURRENT);
+			AnnotationGroup annotationGroup = getAnnotationGroup(job_id);
+			if (annotationGroup == null) {
+				annotationGroup = new AnnotationGroup();
 				putAnnotationGroup(job_id, annotationGroup);
 			}
-			// remove marker if it is not in current job
-			//if (!uiDebugManager.getCurrentJobId().equals(job_id)) {
-				//annotationGroup.removeAllMarkers();
-			//}
+			synchronized (tasks) {
+				if (uiDebugManager.getCurrentJobId().equals(job_id)) {
+					addAnnotation(annotationGroup, textEditor, file, lineNumber, tasks, type);
+				}
+				// remove marker if it is not in current job
+				//if (!uiDebugManager.getCurrentJobId().equals(job_id)) {
+					//annotationGroup.removeAllMarkers();
+				//}
+			}
 		}
 	}
 	/** Is given tasks in the current set
