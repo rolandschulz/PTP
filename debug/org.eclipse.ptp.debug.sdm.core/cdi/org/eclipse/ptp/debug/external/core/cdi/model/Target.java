@@ -66,7 +66,7 @@ import org.eclipse.ptp.debug.external.core.commands.EvaluateExpressionCommand;
 import org.eclipse.ptp.debug.external.core.commands.GetInfoThreadsCommand;
 import org.eclipse.ptp.debug.external.core.commands.GoCommand;
 import org.eclipse.ptp.debug.external.core.commands.HaltCommand;
-import org.eclipse.ptp.debug.external.core.commands.KillCommand;
+import org.eclipse.ptp.debug.external.core.commands.TerminateCommand;
 import org.eclipse.ptp.debug.external.core.commands.SetThreadSelectCommand;
 import org.eclipse.ptp.debug.external.core.commands.StepIntoCommand;
 import org.eclipse.ptp.debug.external.core.commands.StepOverCommand;
@@ -426,7 +426,7 @@ public class Target extends SessionObject implements IPCDITarget {
 		}
 	}
 	public void terminate() throws PCDIException {
-		getDebugger().postCommand(new KillCommand(((Session)getSession()).createBitList(getTargetID())));
+		getDebugger().postCommand(new TerminateCommand(((Session)getSession()).createBitList(getTargetID())));
 	}
 	public boolean isTerminated() {
 		return getPProcess().isTerminated();

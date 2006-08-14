@@ -91,7 +91,7 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 	protected boolean checkReturn() throws PCDIException {
 		Object result = getReturn();
 		if (result == null) {
-			throw new PCDIException("Time out - Command " + getName());
+			throw new PCDIException("Time out - Command " + getName(), IPCDIErrorEvent.DBG_NORMAL);
 		}
 		if (result.equals(RETURN_NOTHING)) {
 			throw new PCDIException("Unknown error - Command " + getName());
