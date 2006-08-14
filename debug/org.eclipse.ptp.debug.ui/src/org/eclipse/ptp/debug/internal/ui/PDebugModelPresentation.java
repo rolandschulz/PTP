@@ -796,7 +796,8 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 	 */
 	public boolean addAnnotations(IEditorPart editorPart, IStackFrame stackFrame) {
 		try {
-			PAnnotationManager.getDefault().focusAnnotation(editorPart, stackFrame);
+			//PAnnotationManager.getDefault().focusAnnotation(editorPart, stackFrame);
+			PAnnotationManager.getDefault().addAnnotation(editorPart, stackFrame);
 			return true;
 		} catch (CoreException e) {
 			PTPDebugUIPlugin.log(e);
