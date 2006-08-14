@@ -94,6 +94,7 @@ extern MICommand *MIVarCreate(char *name, char *frame, char *expr);
 extern MICommand *MIVarDelete(char *name);
 extern MICommand *MIVarListChildren(char *name);
 extern MICommand *MIVarEvaluateExpression(char *name);
+extern MICommand *MIDataEvaluateExpression(char *name);
 
 /*
  * -thread-* commands
