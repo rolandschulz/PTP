@@ -44,17 +44,19 @@ options {k=1;}
 	;
 
 // R204
+// TODO putback
 specification_part
 options {k=1;}
 	:	('USE') => ( use_stmt )*
 		('IMPORT') => ( import_stmt )*
-		( implicit_part )?
+//		( implicit_part )?
 		( declaration_construct )*
 	;
 
 // R205
+// TODO putback
 implicit_part
-	:	( implicit_part_stmt )*
+	:	// ( implicit_part_stmt )*
 		implicit_stmt
 	;
 
@@ -102,9 +104,10 @@ internal_subprogram_part
 	;
 
 // R211
+// TODO putback
 internal_subprogram
 	:	function_subprogram
-	|	subroutine_subprogram
+//	|	subroutine_subprogram
 	;
 
 // R212
@@ -144,39 +147,39 @@ executable_construct
 	;
 
 // R214
+// TODO putback
 action_stmt
 options {k=1;}
 	:	('ALLOCATE') => allocate_stmt
-	|	assignment_stmt
-	|	('BACKSPACE') => backspace_stmt
-	|	('CALL') => call_stmt
-	|	('CLOSE') => close_stmt
-	|	('CONTINUE') => continue_stmt
-	|	('CYCLE') => cycle_stmt
-	|	('DEALLOCATE') => deallocate_stmt
-	|	('ENDFILE') => endfile_stmt
-	|	end_function_stmt
-	|	end_program_stmt
-	|	end_subroutine_stmt
-	|	('EXIT') => exit_stmt
-	|	('FLUSH') => flush_stmt
-	|	('FORALL') => forall_stmt
-	|	('GO' 'TO' Digit) => goto_stmt
-	|	('IF' '(' expr ')' action_stmt) => if_stmt
-	|	('INQUIRE') => inquire_stmt
-	|	('NULLIFY') => nullify_stmt
-	|	('OPEN') => open_stmt
-	|	pointer_assignment_stmt
-	|	('PRINT') => print_stmt
-	|	('READ') => read_stmt
-	|	('RETURN') => return_stmt
-	|	('REWIND') => rewind_stmt
-	|	('STOP') => stop_stmt
-	|	('WAIT') => wait_stmt
-	|	('WHERE') => where_stmt
-	|	('WRITE') => write_stmt
-	|	('IF' '(' expr LABEL) => arithmetic_if_stmt
-	|	('GO' 'TO' '(') => computed_goto_stmt
+//	|	assignment_stmt
+//	|	('BACKSPACE') => backspace_stmt
+//	|	('CALL') => call_stmt
+//	|	('CLOSE') => close_stmt
+//	|	('CONTINUE') => continue_stmt
+//	|	('CYCLE') => cycle_stmt
+//	|	('DEALLOCATE') => deallocate_stmt
+//	|	('ENDFILE') => endfile_stmt
+//	|	end_function_stmt
+//	|	end_program_stmt
+//	|	end_subroutine_stmt
+//	|	('EXIT') => exit_stmt
+//	|	('FLUSH') => flush_stmt
+//	|	('FORALL') => forall_stmt
+//	|	('GO' 'TO' Digit) => goto_stmt
+//	|	('IF' '(' expr ')' action_stmt) => if_stmt
+//	|	('INQUIRE') => inquire_stmt	|	('NULLIFY') => nullify_stmt
+//	|	('OPEN') => open_stmt
+//	|	pointer_assignment_stmt
+//	|	('PRINT') => print_stmt
+//	|	('READ') => read_stmt
+//	|	('RETURN') => return_stmt
+//	|	('REWIND') => rewind_stmt
+//	|	('STOP') => stop_stmt
+//	|	('WAIT') => wait_stmt
+//	|	('WHERE') => where_stmt
+//	|	('WRITE') => write_stmt
+//	|	('IF' '(' expr LABEL) => arithmetic_if_stmt
+//	|	('GO' 'TO' '(') => computed_goto_stmt
 	;
 
 // R215
@@ -209,8 +212,8 @@ scalar_constant
     :    constant
     ;
 
-// TODO putback
 // R306
+// TODO putback
 literal_constant
 	:	int_literal_constant
 //	|	real_literal_constant
@@ -304,7 +307,7 @@ kind_selector
     : '(' ('KIND' '=')? expr ')'
     ;
 
-// TODO: turn into terminal
+// TODO: turn into terminal (what about kind parameter)
 // R405
 signed_int_literal_constant
 	:	('+'|'-')? int_literal_constant
@@ -380,11 +383,12 @@ imag_part
 
 // R424
 // ERR_CHK 424 scalar_int_initialization_expr replaced by expr
+// TODO putback
 char_selector
     :    length_selector
-    |    '(' 'LEN' '=' type_param_value ',' 'KIND' '=' expr ')'
-    |    '(' type_param_value ',' ('KIND' '=')? expr ')'
-    |    '(' 'KIND' '=' expr ( ',' 'LEN' '=' type_param_value )? ')'
+//    |    '(' 'LEN' '=' type_param_value ',' 'KIND' '=' expr ')'
+//    |    '(' type_param_value ',' ('KIND' '=')? expr ')'
+//    |    '(' 'KIND' '=' expr ( ',' 'LEN' '=' type_param_value )? ')'
     ;
 
 // R425
@@ -423,12 +427,13 @@ logical_literal_constant
     ;
 
 // R429
+// TODO putback
 derived_type_def
 	:	derived_type_stmt
-		( type_param_def_stmt )*
-		( private_or_sequence )*
-		( component_part )?
-		( type_bound_procedure_part )?
+//		( type_param_def_stmt )*
+//		( private_or_sequence )*
+//		( component_part )?
+//		( type_bound_procedure_part )?
 		end_type_stmt
 	;
 
@@ -654,8 +659,10 @@ final_subroutine_name_list
     ;
 
 // R455
+// TODO putback
 derived_type_spec
-    : type_name ( '(' type_param_spec_list ')' )?
+    : type_name
+//      ( '(' type_param_spec_list ')' )?
     ;
 
 // R456
@@ -685,10 +692,11 @@ component_spec_list
     ;
 
 // R459
+// TODO putback
 component_data_source
 	:	expr
-	|	data_target
-	|	proc_target
+//	|	data_target
+//	|	proc_target
 	;
 
 // R460
@@ -739,9 +747,10 @@ array_constructor
 
 
 // R466
+// TODO putback
 ac_spec
     : type_spec '::'
-    | (type_spec '::')? ac_value_list
+//    | (type_spec '::')? ac_value_list
     ;
 
 // R467
@@ -755,9 +764,10 @@ right_square_bracket
 	;
 
 // R469
+// TODO putback
 ac_value
 	:	expr
-	|	ac_implied_do
+//	|	ac_implied_do
 	;
 
 ac_value_list
@@ -833,13 +843,16 @@ attr_spec
 
 
 // R504
+// TODO putback
 entity_decl
     : object_name ( '(' array_spec ')' )? ( '*' char_length )? ( initialization )?
-    | function_name ( '*' char_length )?
+//    | function_name ( '*' char_length )?
     ;
 
+// TODO putback
 entity_decl_list
-    :    entity_decl ( entity_decl )*
+    :    entity_decl
+//         ( entity_decl )*
     ;
 
 // R505
@@ -878,16 +891,19 @@ language_binding_spec
     ;
 
 // R510
+// TODO putback
 array_spec
 	:	explicit_shape_spec_list
-	|	assumed_shape_spec_list
-	|	deferred_shape_spec_list
-	|	assumed_size_spec
+//	|	assumed_shape_spec_list
+//	|	deferred_shape_spec_list
+//	|	assumed_size_spec
 	;
 
 // R511
+// TODO putback
 explicit_shape_spec
-    : ( lower_bound ':' )? upper_bound
+    : // ( lower_bound ':' )?
+      upper_bound
     ;
 
 explicit_shape_spec_list
@@ -922,7 +938,8 @@ deferred_shape_spec
 
 // R516
 assumed_size_spec
-    : ( explicit_shape_spec_list ',' )? ( lower_bound ':' )? '*'
+    : /*( explicit_shape_spec_list ',' )? ( lower_bound ':' )?*/
+       '*'
     ;
 
 // R517
@@ -940,7 +957,7 @@ access_stmt
 // R519
 access_id
 	:	use_name
-	|	generic_spec
+//	|	generic_spec
 	;
 
 access_id_list
@@ -1020,10 +1037,11 @@ data_implied_do
     ;
 
 // R528
+// TODO putback
 data_i_do_object
 	:	array_element
-	|	scalar_structure_component
-	|	data_implied_do
+//	|	scalar_structure_component
+//	|	data_implied_do
 	;
 
 data_i_do_object_list
@@ -1045,9 +1063,10 @@ data_stmt_value_list
     ;
 
 // R531
+// TODO putback
 data_stmt_repeat
 	:	scalar_int_constant
-	|	scalar_int_constant_subobject
+//	|	scalar_int_constant_subobject
 	;
 
 scalar_int_constant
@@ -1063,13 +1082,14 @@ scalar_int_constant_name
     ;
 
 // R532
+// TODO putback
 data_stmt_constant
 	:	scalar_constant
-	|	scalar_constant_subobject
-	|	signed_int_literal_constant
-	|	signed_real_literal_constant
-	|	null_init
-	|	structure_constructor
+//	|	scalar_constant_subobject
+//	|	signed_int_literal_constant
+//	|	signed_real_literal_constant
+//	|	null_init
+//	|	structure_constructor
 	;
 
 scalar_constant_subobject
@@ -1135,9 +1155,10 @@ pointer_decl_list
     ;
 
 // R541
+// TODO putback
 pointer_decl
     : object_name ( '(' deferred_shape_spec_list ')' )?
-    | proc_entity_name
+//    | proc_entity_name
     ;
 
 proc_entity_name
@@ -1159,8 +1180,8 @@ save_stmt
 // R544
 saved_entity
 	:	object_name
-	|	proc_pointer_name
-	|	'/' common_block_name '/'
+//	|	proc_pointer_name
+//	|	'/' common_block_name '/'
 	;
 
 saved_entity_list
@@ -1246,10 +1267,11 @@ equivalence_set_list
     ;
 
 // R556
+// TODO putback
 equivalence_object
 	:	variable_name
-	|	array_element
-	|	substring
+//	|	array_element
+//	|	substring
 	;
 
 equivalence_object_list
@@ -1265,7 +1287,7 @@ common_stmt
 // R558
 common_block_object
     : variable_name ( '(' explicit_shape_spec_list ')' )?
-    | proc_pointer_name
+//    | proc_pointer_name
     ;
 
 common_block_object_list
@@ -1287,12 +1309,13 @@ variable_name
 	;
 
 // R603
+// TODO putback
 designator
 	:	object_name
-	|	array_element
-	|	array_section
-	|	structure_component
-	|	substring
+//	|	array_element
+//	|	array_section
+//	|	structure_component
+//	|	substring
 	;
 
 // R604
@@ -1337,11 +1360,12 @@ substring
 	;
 
 // R610
+// TODO putback
 parent_string
 	:	scalar_variable_name
-	|	array_element
-	|	scalar_structure_component
-	|   scalar_constant
+//	|	array_element
+//	|	scalar_structure_component
+//	|   scalar_constant
 	;
 
 scalar_variable_name
@@ -1357,13 +1381,17 @@ substring_range
 	;
 
 // R612
+// TODO putback
 data_ref
-    : part_ref ( '%' part_ref )*
+    : part_ref
+//      ( '%' part_ref )*
     ;
 
 // R613
+// TODO putback
 part_ref
-    : part_name ( '(' section_subscript_list ')' )?
+    : part_name
+//      ( '(' section_subscript_list ')' )?
     ;
 
 part_name
@@ -1403,10 +1431,11 @@ subscript
 	;
 
 // R619
+// TODO putback
 section_subscript
 	:	subscript
-	|	subscript_triplet
-	|	vector_subscript
+//	|	subscript_triplet
+//	|	vector_subscript
 	;
 
 section_subscript_list
@@ -1469,9 +1498,10 @@ allocation_list
     ;
 
 // R629
+// TODO putback
 allocate_object
 	:	variable_name
-	|	structure_component
+//	|	structure_component
 	;
 
 allocate_object_list
@@ -1481,12 +1511,16 @@ allocate_object_list
 // R630
 // ERR_CHK 630a lower_bound_expr replaced by expr
 // ERR_CHK 630b upper_bound_expr replaced by expr
+// TODO putback
 allocate_shape_spec
-    :    ( expr ':' )? expr
+    :    ( expr ':' )?
+//          expr
     ;
 
+// TODO putback
 allocate_shape_spec_list
-    :    allocate_shape_spec ( allocate_shape_spec )*
+    :    allocate_shape_spec
+//         ( allocate_shape_spec )*
     ;
 
 // R631 inlined lower_bound_expr was scalar_int_expr
@@ -1502,10 +1536,11 @@ nullify_stmt
 	;
 
 // R634
+// TODO putback
 pointer_object
 	:	variable_name
-	|	structure_component
-	|	proc_pointer_name
+//	|	structure_component
+//	|	proc_pointer_name
 	;
 
 pointer_object_list
@@ -1534,13 +1569,13 @@ Section 7:
 // R701
 primary
 	:	constant
-	|	designator
-	|	array_constructor
-	|	structure_constructor
-	|	function_reference
-	|	type_param_inquiry
-	|	type_param_name
-	|	'(' expr ')'
+//	|	designator
+//	|	array_constructor
+//	|	structure_constructor
+//	|	function_reference
+//	|	type_param_inquiry
+//	|	type_param_name
+//	|	'(' expr ')'
 	;
 
 // R702
@@ -1597,7 +1632,7 @@ concat_op
 
 // R712
 level_4_expr
-    : ( level_3_expr rel_op )? level_3_expr
+    : /* ( level_3_expr rel_op )? */ level_3_expr
     ;
 
 // R713
@@ -1708,10 +1743,11 @@ assignment_stmt
 	;
 
 // R735
+// TODO putback
 pointer_assignment_stmt
     :    data_pointer_object ( '(' bounds_spec_list ')' )? '=>' data_target
-    | data_pointer_object '(' bounds_remapping_list ')' '=>' data_target
-    | proc_pointer_object '=>' proc_target
+//    | data_pointer_object '(' bounds_remapping_list ')' '=>' data_target
+//    | proc_pointer_object '=>' proc_target
     ;
 
 // R736
@@ -1749,9 +1785,10 @@ bounds_remapping_list
     ;
 
 // R739
+// TODO putback
 data_target
 	:	variable
-	|	expr
+//	|	expr
 	;
 
 // R740
@@ -1770,10 +1807,11 @@ procedure_component_name
     ;
 
 // R742
+// TODO putback
 proc_target
 	:	expr
-	|	procedure_name
-	|	proc_component_ref
+//	|	procedure_name
+//	|	proc_component_ref
 	;
 
 // R743
@@ -1799,10 +1837,11 @@ where_construct_stmt
     ;
 
 // R746
+// TODO putback
 where_body_construct
 	:	where_assignment_stmt
-	|	where_stmt
-	|	where_construct
+//	|	where_stmt
+//	|	where_construct
 	;
 
 // R747
@@ -1873,12 +1912,13 @@ forall_triplet_spec_list
     ;
 
 // R756
+// TODO putback
 forall_body_construct
 	:	forall_assignment_stmt
-	|	where_stmt
-	|	where_construct
-	|	forall_construct
-	|	forall_stmt
+//	|	where_stmt
+//	|	where_construct
+//	|	forall_construct
+//	|	forall_stmt
 	;
 
 // R757
@@ -2003,11 +2043,12 @@ case_selector
 	;
 
 // R814
+// TODO putback
 case_value_range
 	:	case_value
-	|	case_value ':'
-	|	':' case_value
-	|	case_value ':' case_value
+//	|	case_value ':'
+//	|	':' case_value
+//	|	case_value ':' case_value
 	;
 
 case_value_range_list
@@ -2050,9 +2091,10 @@ associate_name
     ;
 
 // R819
+// TODO putback
 selector
 	:	expr
-	|	variable
+//	|	variable
 	;
 
 // R820
@@ -2097,16 +2139,18 @@ type_guard_stmt
 	;
 
 // R824
+// TODO putback
 end_select_type_stmt
 	:	'END'
 		'SELECT'
-		( select_construct_name )?
+//		( select_construct_name )?
 	;
 
 // R825
+// TODO putback
 do_construct
 	:	block_do_construct
-	|	nonblock_do_construct
+//	|	nonblock_do_construct
 	;
 
 // R826
@@ -2166,15 +2210,17 @@ end_do_stmt
 	;
 
 // R835
+// TODO putback
 nonblock_do_construct
 	:	action_term_do_construct
-	|	outer_shared_do_construct
+//	|	outer_shared_do_construct
 	;
 
 // R836
+// TODO putback
 action_term_do_construct
 	:	label_do_stmt
-		do_body
+//		do_body
 		do_term_action_stmt
 	;
 
@@ -2189,21 +2235,26 @@ do_term_action_stmt
 	;
 
 // R839
+// TODO putback
 outer_shared_do_construct
 	:	label_do_stmt
-		do_body
+//		do_body
 		shared_term_do_construct
 	;
 
 // R840
+// TODO putback
 shared_term_do_construct
 	:	outer_shared_do_construct
-	|	inner_shared_do_construct
+//	|	inner_shared_do_construct
 	;
 
 // R841
+// TODO putback
 inner_shared_do_construct
-	:	label_do_stmt do_body do_term_shared_stmt
+	:	label_do_stmt
+//        do_body
+        do_term_shared_stmt
 	;
 
 // R842
@@ -2271,10 +2322,11 @@ Section 9:
  */
 
 // R901
+// TODO putback
 io_unit
 	:	file_unit_number
-	|	'*'
-	|	internal_file_variable
+//	|	'*'
+//	|	internal_file_variable
 	;
 
 // R902
@@ -2373,25 +2425,25 @@ print_stmt
 // ERR_CHK 913c scalar_char_initialization_expr replaced by expr
 io_control_spec
     :    ( 'UNIT' '=' )? io_unit
-    | ( 'FMT' '=' )? format
-    | ( 'NML' '=' )? namelist_group_name
-    | 'ADVANCE' '=' expr // scalar_default_char_expr
-    | 'ASYNCHRONOUS' '=' expr // scalar_char_initialization_expr
-    | 'BLANK' '=' expr // scalar_default_char_expr
-    | 'DECIMAL' '=' expr // scalar_default_char_expr
-    | 'DELIM' '=' expr // scalar_default_char_expr
-    | 'END' '=' LABEL
-    | 'EOR' '=' LABEL
-    | 'ERR' '=' LABEL
-    | 'ID' '=' scalar_int_variable
-    | 'IOMSG' '=' iomsg_variable
-    | 'IOSTAT' '=' scalar_int_variable
-    | 'PAD' '=' expr // scalar_default_char_expr
-    | 'POS' '=' expr // scalar_int_expr
-    | 'REC' '=' expr // scalar_int_expr
-    | 'ROUND' '=' expr // scalar_default_char_expr
-    | 'SIGN' '=' expr // scalar_default_char_expr
-    | 'SIZE' '=' scalar_int_variable
+//    | ( 'FMT' '=' )? format
+//    | ( 'NML' '=' )? namelist_group_name
+//    | 'ADVANCE' '=' expr // scalar_default_char_expr
+//    | 'ASYNCHRONOUS' '=' expr // scalar_char_initialization_expr
+//    | 'BLANK' '=' expr // scalar_default_char_expr
+//    | 'DECIMAL' '=' expr // scalar_default_char_expr
+//    | 'DELIM' '=' expr // scalar_default_char_expr
+//    | 'END' '=' LABEL
+//    | 'EOR' '=' LABEL
+//    | 'ERR' '=' LABEL
+//    | 'ID' '=' scalar_int_variable
+//    | 'IOMSG' '=' iomsg_variable
+//    | 'IOSTAT' '=' scalar_int_variable
+//    | 'PAD' '=' expr // scalar_default_char_expr
+//    | 'POS' '=' expr // scalar_int_expr
+//    | 'REC' '=' expr // scalar_int_expr
+//    | 'ROUND' '=' expr // scalar_default_char_expr
+//    | 'SIGN' '=' expr // scalar_default_char_expr
+//    | 'SIZE' '=' scalar_int_variable
     ;
 
 io_control_spec_list
@@ -2432,9 +2484,10 @@ io_implied_do
 	;
 
 // R918
+// TODO putback
 io_implied_do_object
 	:	input_item
-	|	output_item
+//	|	output_item
 	;
 
 io_implied_do_object_list
@@ -2612,20 +2665,21 @@ r
  */
 
 // R1005
+// TODO putback
 data_edit_desc
     : 'I' int_literal_constant ( '.' int_literal_constant )?
-    | 'B' int_literal_constant ( '.' int_literal_constant )?
-    | 'O' int_literal_constant ( '.' int_literal_constant )?
-    | 'Z' int_literal_constant ( '.' int_literal_constant )?
-    | 'F' int_literal_constant '.' int_literal_constant
-    | 'E' int_literal_constant '.' int_literal_constant ( 'E' int_literal_constant )?
-    | 'EN' int_literal_constant '.' int_literal_constant ( 'E' int_literal_constant )?
-    | 'ES' int_literal_constant '.' int_literal_constant ( 'E' int_literal_constant )?
-    | 'G' int_literal_constant '.' int_literal_constant ( 'E' int_literal_constant )?
-    | 'L' int_literal_constant
-    | 'A' ( int_literal_constant )?
-    | 'D' int_literal_constant '.' int_literal_constant
-    | 'DT' ( char_literal_constant )? ( '(' v_list ')' )?
+//    | 'B' int_literal_constant ( '.' int_literal_constant )?
+//    | 'O' int_literal_constant ( '.' int_literal_constant )?
+//    | 'Z' int_literal_constant ( '.' int_literal_constant )?
+//    | 'F' int_literal_constant '.' int_literal_constant
+//    | 'E' int_literal_constant '.' int_literal_constant ( 'E' int_literal_constant )?
+//    | 'EN' int_literal_constant '.' int_literal_constant ( 'E' int_literal_constant )?
+//    | 'ES' int_literal_constant '.' int_literal_constant ( 'E' int_literal_constant )?
+//    | 'G' int_literal_constant '.' int_literal_constant ( 'E' int_literal_constant )?
+//    | 'L' int_literal_constant
+//    | 'A' ( int_literal_constant )?
+//    | 'D' int_literal_constant '.' int_literal_constant
+//    | 'DT' ( char_literal_constant )? ( '(' v_list ')' )?
     ;
 
 /* TODO: inlined w in R1005
@@ -2743,9 +2797,9 @@ Section 11:
 // R1101
 main_program
 	:	( program_stmt )?
-		( specification_part )?
-		( execution_part )?
-		( internal_subprogram_part )?
+//		( specification_part )?
+//		( execution_part )?
+//		( internal_subprogram_part )?
 		end_program_stmt
 	;
 
@@ -2756,8 +2810,10 @@ program_stmt
 	;
 
 // R1103
+// TODO putback
 end_program_stmt
-    :    'END' ( 'PROGRAM' ( program_name )? )?
+    :    'END'
+//         ( 'PROGRAM' ( program_name )? )?
     ;
 
 program_name
@@ -2765,10 +2821,11 @@ program_name
     ;
 
 // R1104
+// TODO putback
 module
 	:	module_stmt
-		( specification_part )?
-		( module_subprogram_part )?
+//		( specification_part )?
+//		( module_subprogram_part )?
 		end_module_stmt
 	;
 
@@ -2780,7 +2837,7 @@ module_stmt
 
 // R1106
 end_module_stmt
-    :   'END' ( 'MODULE' ( module_name )? )?
+    :   'END' //( 'MODULE' ( module_name )? )?
     ;
 
 module_name
@@ -2795,9 +2852,10 @@ module_subprogram_part
 	;
 
 // R1108
+// TODO putback
 module_subprogram
 	:	function_subprogram
-	|	subroutine_subprogram
+//	|	subroutine_subprogram
 	;
 
 // R1109
@@ -2834,10 +2892,11 @@ use_name
     ;
 
 // R1112
+// TODO putback
 only
 	:	generic_spec
-	|	only_use_name
-	|	rename
+//	|	only_use_name
+//	|	rename
 	;
 
 only_list
@@ -2856,20 +2915,23 @@ only_use_name
 // R1116
 block_data
 	:	block_data_stmt
-		( specification_part )?
+//		( specification_part )?
 		end_block_data_stmt
 	;
 
 // R1117
+// TODO putback
 block_data_stmt
 	:	'BLOCK'
 		'DATA'
-		( block_data_name )?
+//		( block_data_name )?
 	;
 
 // R1118
+// TODO putback
 end_block_data_stmt
-    : 'END' ( 'BLOCK' 'DATA' ( block_data_name )? )?
+    : 'END'
+//       ( 'BLOCK' 'DATA' ( block_data_name )? )?
     ;
 
 block_data_name
@@ -2905,9 +2967,10 @@ end_interface_stmt
 	;
 
 // R1205
+// TODO putback
 interface_body
-	:	function_stmt ( specification_part )? end_function_stmt
-	|	subroutine_stmt ( specification_part )? end_subroutine_stmt
+	:	function_stmt // ( specification_part )? end_function_stmt
+//	|	subroutine_stmt ( specification_part )? end_subroutine_stmt
 	;
 
 // R1206
@@ -3038,10 +3101,11 @@ call_stmt
     ;
 
 // R1219
+// TODO putback
 procedure_designator
 	:	procedure_name
-	|	proc_component_ref
-	|	data_ref '%' binding_name
+//	|	proc_component_ref
+//	|	data_ref '%' binding_name
 	;
 
 binding_name
@@ -3062,12 +3126,13 @@ actual_arg_spec_list
     ;
 
 // R1221
+// TODO putback
 actual_arg
 	:	expr
-	|	variable
-	|	procedure_name
-	|	proc_component_ref
-	|	alt_return_spec
+//	|	variable
+//	|	procedure_name
+//	|	proc_component_ref
+//	|	alt_return_spec
 	;
 
 // R1222
@@ -3076,18 +3141,19 @@ alt_return_spec
 	;
 
 // R1223
+// TODO putback
 function_subprogram
 	:	function_stmt
-		( specification_part )?
-		( execution_part )?
-		( internal_subprogram_part )?
+//		( specification_part )?
+//		( execution_part )?
+//		( internal_subprogram_part )?
 		end_function_stmt
 	;
 
 // R1224
 function_stmt
-	:	( prefix )? 'FUNCTION' function_name
-		'(' ( dummy_arg_name_list )? ')' ( suffix )?
+	:	( prefix )? 'FUNCTION' // function_name
+//		'(' ( dummy_arg_name_list )? ')' ( suffix )?
 	;
 
 function_name
@@ -3118,9 +3184,10 @@ prefix_spec
 	;
 
 // R1229
+// TODO putback
 suffix
     :    proc_language_binding_spec ( 'RESULT' '(' result_name ')' )?
-    | 'RESULT' '(' result_name ')' ( proc_language_binding_spec )?
+//    | 'RESULT' '(' result_name ')' ( proc_language_binding_spec )?
     ;
 
 result_name
@@ -3128,16 +3195,19 @@ result_name
     ;
 
 // R1230
+// TODO putback
 end_function_stmt
-    : 'END' ( 'FUNCTION' ( function_name )? )?
+    : 'END'
+//       ( 'FUNCTION' ( function_name )? )?
     ;
 
 // R1231
+// TODO putback
 subroutine_subprogram
 	:	subroutine_stmt
-		( specification_part )?
-		( execution_part )?
-		( internal_subprogram_part )?
+//		( specification_part )?
+//		( execution_part )?
+//		( internal_subprogram_part )?
 		end_subroutine_stmt
 	;
 
@@ -3158,8 +3228,10 @@ dummy_arg_list
     ;
 
 // R1234
+// TODO putback
 end_subroutine_stmt
-    :    'END' ( 'SUBROUTINE' ( subroutine_name )? )?
+    :    'END'
+//         ( 'SUBROUTINE' ( subroutine_name )? )?
     ;
 
 subroutine_name
@@ -3167,8 +3239,10 @@ subroutine_name
     ;
 
 // R1235
+// TODO putback
 entry_stmt
-    :    'ENTRY' entry_name ( '(' ( dummy_arg_list )? ')' ( suffix )? )?
+    :    'ENTRY' entry_name
+//          ( '(' ( dummy_arg_list )? ')' ( suffix )? )?
     ;
 
 entry_name
@@ -3212,8 +3286,10 @@ INT_CONSTANT
 	;	
 
 // R313
+// TODO putback
 LABEL
-    :   Digit ( Digit ( Digit ( Digit ( Digit )? )? )? )?
+    :   Digit
+//        ( Digit ( Digit ( Digit ( Digit )? )? )? )?
     ;
 
 // R412
