@@ -1,7 +1,7 @@
 /*
  * NOTES
  *
- * R303, R406, R417, R427, R428 underscore - added _ to rule (what happened to it?)
+ * R303, R406, R417, R427, R428 underscore - added _ to rule (what happened to it?) * R410 sign - had '?' rather than '-'
  * R1209 import-stmt: MISSING a ]
  *
  */
@@ -131,7 +131,7 @@ specification_stmt
 	;
 
 // R213
-// TODO
+// TODO putback
 executable_construct
 	:	action_stmt
 //	|	associate_construct
@@ -161,7 +161,7 @@ options {k=1;}
 	|	('EXIT') => exit_stmt
 	|	('FLUSH') => flush_stmt
 	|	('FORALL') => forall_stmt
-	|	('GO' 'TO' DIGIT) => goto_stmt
+	|	('GO' 'TO' Digit) => goto_stmt
 	|	('IF' '(' expr ')' action_stmt) => if_stmt
 	|	('INQUIRE') => inquire_stmt
 	|	('NULLIFY') => nullify_stmt
@@ -192,7 +192,7 @@ Section 3:
 
 // R302 alphanumeric_character converted to fragment
 
-// R303 underscore converted to fragment
+// R303 underscore inlined
 
 // R304
 name
@@ -225,10 +225,7 @@ named_constant
 	:	name
 	;
 
-// R308
-int_constant
-	:	constant
-	;
+// R308 int_constant converted to terminal
 
 // R309
 char_constant
@@ -304,44 +301,31 @@ intrinsic_type_spec
 // R404
 // ERR_CHK 404 scalar_int_initialization_expr replaced by expr
 kind_selector
-    : '(' ( KIND_EQ )? expr ')'
+    : '(' ('KIND' '=')? expr ')'
     ;
 
 // TODO: turn into terminal
 // R405
 signed_int_literal_constant
-	:	( sign )?
-		int_literal_constant
+	:	('+'|'-')? int_literal_constant
 	;
 
-// TODO: turn into terminal
 // R406
 int_literal_constant
-	:	DIGIT_STRING
-		( '_' kind_param )?
+	:	INT_CONSTANT ('_' kind_param)?
 	;
 
-// TODO: turn into terminal
 // R407
 kind_param
-	:	DIGIT_STRING
+	:	Digit_String
 	|	scalar_int_constant_name
 	;
 
-// TODO: turn into terminal
-// R408
-signed_digit_string
-	:	( sign )?
-		DIGIT_STRING
-	;
+// R408 signed_digit_string inlined
 
-// R409 digit_string turned into fragment
+// R409 digit_string converted to fragment
 
-// R410
-sign
-	:	'+'
-	|	'?'
-	;
+// R410 sign inlined
 
 // R411
 boz_literal_constant
@@ -350,54 +334,30 @@ boz_literal_constant
 	|	HEX_CONSTANT
 	;
 
-/* TODO: Done - converted to terminal
-R412 binary-constant              is B ' digit [ digit ] ... '
-                                  or B " digit [ digit ] ... "
- */
+// R412 binary-constant converted to terminal
 
-/* TODO: Done - converted to terminal
-R413 octal-constant               is O ' digit [ digit ] ... '
-                                  or O " digit [ digit ] ... "
- */
+// R413 octal_constant converted to terminal
 
-/* TODO: Done - converted to terminal
-R414 hex_constant  : 'Z' SINGLE_QUOTE hex_digit ( hex_digit )* SINGLE_QUOTE
-                   | 'Z' DOUBLE_QUOTE hex_digit ( hex_digit )* DOUBLE_QUOTE
-                   ;
+// R414 hex_constant converted to terminal
 
-R415 hex_digit     :  DIGIT | 'A' | 'B' | 'C' | 'D' | 'E' | 'F' ;
-*/
+// R415 hex_digit inlined
 
 // R416
 signed_real_literal_constant
-	:	( sign )? real_literal_constant
+	:	('+'|'-')? real_literal_constant
 	;
 
-// R417
+// R417 modified to use terminal
 real_literal_constant
-    :   significand ( exponent_letter exponent )? ( '_' kind_param )?
-    |   DIGIT_STRING exponent_letter exponent ( '_' kind_param )?
+    :   REAL_CONSTANT ( '_' kind_param )?
+    |   DOUBLE_CONSTANT ( '_' kind_param )?
     ;
 
-// R418
-significand
-	:	DIGIT_STRING
-		'.'
-		( DIGIT_STRING )?
-	|	'.'
-		DIGIT_STRING
-	;
+// R418 significand converted to fragment
 
-// R419
-exponent_letter
-	:	'E'
-	|	'D'
-	;
+// R419 exponent_letter inlined in new Exponent
 
-// R420
-exponent
-	:	signed_digit_string
-	;
+// R420 exponent inlined in new Exponent
 
 // R421
 complex_literal_constant
@@ -422,20 +382,20 @@ imag_part
 // ERR_CHK 424 scalar_int_initialization_expr replaced by expr
 char_selector
     :    length_selector
-    |    '(' LEN_EQ type_param_value ',' KIND_EQ expr ')'
-    |    '(' type_param_value ',' ( KIND_EQ )? expr ')'
-    |    '(' KIND_EQ expr ( ',' LEN_EQ type_param_value )? ')'
+    |    '(' 'LEN' '=' type_param_value ',' 'KIND' '=' expr ')'
+    |    '(' type_param_value ',' ('KIND' '=')? expr ')'
+    |    '(' 'KIND' '=' expr ( ',' 'LEN' '=' type_param_value )? ')'
     ;
 
 // R425
 length_selector
 	:	'('
-		( LEN_EQ )?
+		('LEN' '=')?
 		type_param_value
 		')'
 	|	'*'
 		char_length
-		( ',' )?
+		(',')?
 	;
 
 // R426
@@ -452,8 +412,8 @@ scalar_int_literal_constant
 
 // R427
 char_literal_constant
-    :    ( kind_param '_' ) SINGLE_QUOTE ( REP_CHAR )* SINGLE_QUOTE
-    |    ( kind_param '_' ) DOUBLE_QUOTE ( REP_CHAR )* DOUBLE_QUOTE
+    :    ( kind_param '_' ) '\'' ( Rep_Char )* '\''
+    |    ( kind_param '_' ) '\"' ( Rep_Char )* '\"'
     ;
 
 // R428
@@ -1091,11 +1051,11 @@ data_stmt_repeat
 	;
 
 scalar_int_constant
-    :    int_constant
+    :    INT_CONSTANT
     ;
 
 scalar_int_constant_subobject
-    :    int_constant
+    :    INT_CONSTANT
     ;
 
 scalar_int_constant_name
@@ -1245,7 +1205,7 @@ implicit_spec_list
 
 // R551
 letter_spec 
-    : LETTER ( '?' LETTER )?
+    : Letter ( '?' Letter )?
     ;
 
 letter_spec_list
@@ -1590,7 +1550,7 @@ level_1_expr
 
 // R703
 defined_unary_op
-	:	'.' LETTER ( LETTER )* '.'
+	:	'.' Letter ( Letter )* '.'
 	;
 
 // R704
@@ -1704,12 +1664,12 @@ expr
 
 // R723
 defined_binary_op
-	:	'.' LETTER ( LETTER )* '.'
+	:	'.' Letter ( Letter )* '.'
 	;
 
 // created new rule to remove defined_unary_op or defined_binary_op ambiguity
 defined_unary_or_binary_op
-	:	'.' LETTER ( LETTER )* '.'
+	:	'.' Letter ( Letter )* '.'
 	;
 
 // R724 inlined logical_expr was expr
@@ -2299,7 +2259,7 @@ stop_stmt
 // R850
 stop_code
     : scalar_char_constant
-    | DIGIT ( DIGIT ( DIGIT ( DIGIT ( DIGIT )? )? )? )?
+    | Digit ( Digit ( Digit ( Digit ( Digit )? )? )? )?
     ;
 
 scalar_char_constant
@@ -2741,6 +2701,7 @@ n
 	;
 */
 
+// TODO convert to fragment
 // R1015
 sign_edit_desc
 	:	'SS'
@@ -3240,49 +3201,80 @@ stmt_function_stmt
 Lexer rules
  */
 
+// R304
+T_IDENT
+	:	Letter ( Alphanumeric_Character )*
+	;
+
+// R308
+INT_CONSTANT
+	:	Digit_String
+	;	
+
 // R313
 LABEL
-    :   DIGIT ( DIGIT ( DIGIT ( DIGIT ( DIGIT )? )? )? )?
+    :   Digit ( Digit ( Digit ( Digit ( Digit )? )? )? )?
     ;
 
 // R412
 BINARY_CONSTANT
-    : 'B' SINGLE_QUOTE DIGIT_2 ( DIGIT_2 )* SINGLE_QUOTE
-    | 'B' DOUBLE_QUOTE DIGIT_2 ( DIGIT_2 )* DOUBLE_QUOTE
+    : ('b'|'B') '\'' ('0'..'1')+ '\''
+    | ('b'|'B') '\"' ('0'..'1')+ '\"'
     ;
 
 // R413
 OCTAL_CONSTANT
-    : 'O' SINGLE_QUOTE DIGIT_8 ( DIGIT_8 )* SINGLE_QUOTE
-    | 'O' DOUBLE_QUOTE DIGIT_8 ( DIGIT_8 )* DOUBLE_QUOTE
+    : ('o'|'O') '\'' ('0'..'7')+ '\''
+    | ('o'|'O') '\"' ('0'..'7')+ '\"'
     ;
 
 // R414
 HEX_CONSTANT
-    : 'Z' SINGLE_QUOTE DIGIT_16 ( DIGIT_16 )* SINGLE_QUOTE
-    | 'Z' DOUBLE_QUOTE DIGIT_16 ( DIGIT_16 )* DOUBLE_QUOTE
+    : ('z'|'Z') '\'' (Digit|'a'..'f'|'A'..'F')+ '\''
+    | ('z'|'Z') '\"' (Digit|'a'..'f'|'A'..'F')+ '\"'
     ;
 
-// R304
-T_IDENT
-	:	LETTER ( ALPHANUMERIC_CHARACTER )*
-	;
+REAL_CONSTANT
+	:	Significand E_Exponent?
+	|	Digit_String  E_Exponent
+	;	
+
+DOUBLE_CONSTANT
+	:	Significand D_Exponent
+	|	Digit_String  D_Exponent
+	;	
+
+WS  :  (' '|'\r'|'\t'|'\u000C'|'\n') {channel=99;}
+    ;
 
 
-// R303  underscore
-fragment
-UNDERSCORE : '_' ;
+/*
+ * fragments
+ */
 
 // R409 digit_string
 fragment
-DIGIT_STRING : DIGIT+ ;
+Digit_String : Digit+ ;
+
+// R418 significand
+fragment
+Significand
+    :   Digit_String '.' ( Digit_String )?
+    |   '.' Digit_String
+    ;	
+
+fragment
+E_Exponent : ('e'|'E') ('+'|'-')? ('0'..'9')+ ;
+
+fragment
+D_Exponent : ('d'|'D') ('+'|'-')? ('0'..'9')+ ;
 
 // R302 alphanumeric_character
 fragment
-ALPHANUMERIC_CHARACTER : LETTER | DIGIT | UNDERSCORE ;
+Alphanumeric_Character : Letter | Digit | '_' ;
 
 fragment
-SPECIAL_CHARACTER
+Special_Character
     :    ' ' .. '/'
     |    ':' .. '@'
     |    '[' .. '^'
@@ -3291,31 +3283,10 @@ SPECIAL_CHARACTER
     ;
 
 fragment
-REP_CHAR : ' '..'~' ;
+Rep_Char : ' '..'~' ;
 
 fragment
-LETTER : ('a'..'z' | 'A'..'Z') ;
+Letter : ('a'..'z' | 'A'..'Z') ;
 
 fragment
-DIGIT : '0'..'9' ;
-
-fragment
-DIGIT_2 : '0'..'1' ;
-
-fragment
-DIGIT_8 : '0'..'7' ;
-
-fragment
-DIGIT_16 : (DIGIT | 'A'..'F') ;
-
-fragment
-SINGLE_QUOTE : '\'' ;
-
-fragment
-DOUBLE_QUOTE : '\"' ;
-
-fragment
-LEN_EQ : 'LEN' '=' ;
-
-fragment
-KIND_EQ : ('KIND' '=') ;
+Digit : '0'..'9' ;
