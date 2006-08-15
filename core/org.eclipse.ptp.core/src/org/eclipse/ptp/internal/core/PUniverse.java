@@ -93,49 +93,33 @@ public class PUniverse extends Parent implements IPUniverseControl {
 	}
 
 	public synchronized IPMachine findMachineById(String machine_id) {
-		IPElementControl element = findChild(machine_id);
-		if (element instanceof IPMachineControl) {
-			return (IPMachineControl) element;
-		}
-		return null;
-	}
-
-	public synchronized IPNode findNodeByName(String nname) {
 		Collection col = getCollection();
 		Iterator it = col.iterator();
 		while (it.hasNext()) {
 			Object ob = it.next();
 			if (ob instanceof IPMachine) {
-				IPNode node = ((IPMachine) ob).findNodeByName(nname);
-				if (node != null)
-					return node;
+				IPMachine mac = (IPMachine) ob;
+				if (mac.getMachineId().equals(machine_id))
+					return mac;
 			}
 		}
 		return null;
 	}
 	
-	public synchronized IPNode findNodeByHostname(String nname) {
+	public synchronized IPMachine findMachineByGlobalId(String machine_id) {
 		Collection col = getCollection();
 		Iterator it = col.iterator();
 		while (it.hasNext()) {
 			Object ob = it.next();
 			if (ob instanceof IPMachine) {
-				IPNode nodes[] = ((IPMachine)ob).getNodes();
-				for(int i=0; i<nodes.length; i++) {
-					String aname = (String)nodes[i].getAttribute(AttributeConstants.ATTRIB_NODE_NAME);
-					if(aname.equals(nname)) return nodes[i];
-					
-					/* what if the name is something like 'foo.bar.com' and later we just get 'foo' out of
-					 * the system?  maybe we should try and cut that up and say it's the same node.
-					 */
-					int idx = aname.indexOf('.');
-					if(idx > 0) aname = aname.substring(0, idx);
-					if(aname.equals(nname)) return nodes[i];
-				}
+				IPMachine mac = (IPMachine) ob;
+				if (mac.getIDString().equals(machine_id))
+					return mac;
 			}
 		}
 		return null;
 	}
+	
 
 	/*
 	 * there is a single collection but in this collection we keep two different

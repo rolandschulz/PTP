@@ -60,6 +60,12 @@
 #include "mca/rmgr/base/base.h"
 #include "opal/util/output.h"
 #include "opal/util/path.h"
+#include "orte/include/orte_constants.h"
+#include "orte/mca/errmgr/errmgr.h"
+#include "orte/runtime/runtime.h"
+#include "orte/mca/gpr/gpr.h"
+#include "orte/mca/ras/base/base.h"
+#include "orte/mca/rds/base/base.h"
 
 #ifdef HAVE_SYS_BPROC_H
 #include "orte/mca/soh/bproc/soh_bproc.h"
@@ -87,7 +93,6 @@
 #define RTEV_NATTR						RTEV_OFFSET + 8
 #define RTEV_NEWJOB						RTEV_OFFSET + 12
 #define RTEV_PROCOUT					RTEV_OFFSET + 13
-#define RTEV_NODECHANGE					RTEV_OFFSET + 14
 
 /*
  * RTEV_ERROR codes are used internally in the ORTE specific plugin
@@ -132,9 +137,9 @@ int ORTERun(char **);
 int ORTETerminateJob(char **);
 int ORTEGetProcesses(char **);
 int ORTEGetProcessAttribute(char **);
-int ORTEGetNodes(char **);
-int ORTEGetNodeAttribute(char **);
+int ORTEDiscover(char **);
 /*
+int ORTEGetNodes(char **);
 int OMPIGetJobs(char **);
 int OMPIGetMachines(char **);
 int OMPIGetNodemachineID(char **);
@@ -185,12 +190,13 @@ static proxy_svr_helper_funcs helper_funcs = {
 
 static proxy_svr_commands command_tab[] = {
 	{"STARTDAEMON", 	ORTEStartDaemon},
-	{"RUN",			ORTERun},
-	{"TERMJOB",		ORTETerminateJob},
+	{"DISCOVER",        ORTEDiscover},
+	{"RUN",				ORTERun},
+	{"TERMJOB",			ORTETerminateJob},
 	{"GETPROCS",		ORTEGetProcesses},
 	{"GETPATTR",	   	ORTEGetProcessAttribute},
-	{"GETNODES",		ORTEGetNodes},
-	{"GETNATTR",		ORTEGetNodeAttribute},
+	//{"GETNODES",		ORTEGetNodes},
+	//{"GETNATTR",		ORTEGetNodeAttribute},
 	/*
 	{"GETJOBS",		OMPIGetJobs},
 	{"GETMACHS",		OMPIGetMachines},
@@ -326,11 +332,11 @@ ORTEInit(char *universe_name)
 {
 	int rc;
 	char *str;
-	
+		
 	printf("ORTEInit (%s)\n", universe_name); fflush(stdout);
 	asprintf(&str, "OMPI_MCA_universe=%s", universe_name);
 	
-	printf("str = '%s'\n", str);
+	printf("str = '%s'\n", str); fflush(stdout);
 	/* this makes the orte_init() fail if the orte daemon isn't
 	 * running */
 	putenv("OMPI_MCA_orte_univ_exist=1");
@@ -344,6 +350,21 @@ ORTEInit(char *universe_name)
 	
 	if(ORTECheckErrorCode(RTEV_ERROR_ORTE_INIT, rc)) return 1;
 	
+	/* this code was given to me to put in here to force the system to populate the node segment
+	 * in ORTE.  It basically crashes us if we use our own universe name.  I'm leaving it here
+	 * because I think one day we might be able to find a way to use this right. */
+#if 0
+	{
+	orte_ras_base_module_t *module = NULL;
+  	orte_jobid_t jobid = 1;
+	printf("Calling RDS_base_query() . . .\n"); fflush(stdout);
+	orte_rds_base_query();
+	printf("Calling RAS_Base_allocate() . . .\n"); fflush(stdout);
+	orte_ras_base_allocate(jobid, &module);
+	printf("Success with BOTH!\n"); fflush(stdout);
+	}
+#endif
+	
 	is_orte_initialized = true;
 	
 	return 0;
@@ -356,7 +377,7 @@ bproc_notify_callback(orte_gpr_notify_data_t *data, void *cbdata)
 	size_t i, j, k;
 	orte_gpr_value_t **values, *value;
 	orte_gpr_keyval_t **keyvals;
-	char *res, *kv, *str1, *str2, *nodename;
+	char *res, *kv, *str1, *str2, *str3, *foo, *bar, *nodename;
 	int machID;
 	
 	printf("BPROC NOTIFY CALLBACK!\n"); fflush(stdout);
@@ -398,15 +419,22 @@ bproc_notify_callback(orte_gpr_notify_data_t *data, void *cbdata)
 					asprintf(&kv, "%s=%d", keyval->key, keyval->type);
 			}
 			
-			proxy_cstring_to_str(nodename, &str1);
-			proxy_cstring_to_str(kv, &str2);
-			asprintf(&res, "%d %d %s %s", RTEV_NODECHANGE, machID, str1, str2);
+			asprintf(&foo, "%s=%d", "Machine ID", 0);
+			asprintf(&bar, "%s=%s", "Node Number", nodename);
+			proxy_cstring_to_str(foo, &str1);
+			proxy_cstring_to_str(bar, &str2);
+			proxy_cstring_to_str(kv, &str3);
+			asprintf(&res, "%d %s %s %s", RTEV_NATTR, str1, str2, str3);
+			
         	proxy_svr_event_callback(orte_proxy, res);
         	free(res);
         	free(kv);
+        	free(foo);
+        	free(bar);
         	free(str1);
         	free(str2);
-        	}
+        	free(str3);
+        }
 		
 		free(nodename);
 	}
@@ -990,9 +1018,7 @@ ORTERun(char **args)
 		return PROXY_RES_OK;
 	}
 	
-	if (debug) {
-		printf("DeBUG!\n"); fflush(stdout);
-		
+	if (debug) {		
 		if (access(debug_exec_path, X_OK) < 0) {
 			printf("ERROR debug_exec_path = '%s' not found\n", debug_exec_path); fflush(stdout);
 			proxy_svr_event_callback(orte_proxy, ORTEErrorStr(RTEV_ERROR_ORTE_RUN, strerror(errno)));
@@ -1741,7 +1767,9 @@ get_num_nodes(int machid)
 	
 	rc = orte_gpr.get(ORTE_GPR_KEYS_OR|ORTE_GPR_TOKENS_OR,
                         ORTE_NODE_SEGMENT, NULL, NULL, &cnt, &values);
-                        
+        
+    //printf("RC = %d\n", rc); fflush(stdout);
+                   
 	if(rc != ORTE_SUCCESS) {
 		return 0;
 	}
@@ -1749,181 +1777,240 @@ get_num_nodes(int machid)
 	return cnt;
 }
 
-/* given a machine ID this generates an event which has a single int
- * return - the number of nodes associated with this machine
+/* one day ORTE will have the notion of number of machines.
+ * until then, we have only 1 machine
  */
-int
-ORTEGetNodes(char **args)
-{	
-	int				mid;
-	char *			res;
-	int				nodes;
-	
-	mid = atoi(args[1]);
-	nodes = get_num_nodes(mid);
-
-	asprintf(&res, "%d %d", RTEV_NODES, nodes);
-	
-	proxy_svr_event_callback(orte_proxy, res);
-	
-	free(res);
-	return PROXY_RES_OK;
+int get_num_machines()
+{
+	return 1;
 }
 
-/* given a machineID and a nodeID inside that machine we attempt to find the values associated
- * with the given keys.  the caller can pass any number of possible keys and the response
- * message will be in the same order.
+/*
+ * Initiates the discovery phase.
+ * This fires up some talks with ORTE to ask it about the machines
+ * it knows about, the nodes, and the attributes associated with
+ * those nodes.
  * 
- * the user can pass in a node ID they want info on or -1 if they want info on EVERY
- * machine contained in this machine
+ * even though there CAN be args, we don't use them at this time
  */
 int
-ORTEGetNodeAttribute(char **args)
-{
+ORTEDiscover(char **args)
+{	
+	int 			num_machines;
 	int				machid;
 	int				nodeid;
 	char *			res;
-	char *			str1;
-	char *			str2;
-	char *			str3;
-	int				last_arg;
+	int				num_nodes;
+	int				num_keys;
 	int				i;
-	char **			keys = NULL;
+	char **			internal_keys = NULL;
+	char **			external_keys = NULL;
 	char **			values = NULL;
 	int *			types = NULL;
 	int				tot_len;
 	char *			valstr = NULL;
 	int				values_len;
-	int				default_needed = 0;
+	char *			str1;
+	char *			str2;
+	char *			str3;
+	char *			str4;
+	char *			str5;
+	char *			str6;
+	char *			str7;
 	
-	machid = atoi(args[1]);
-	nodeid = atoi(args[2]);
+	/* first set up the keys we're interested in about the nodes we'll
+	 * discover */
+	 
+	/* how many keys do we send back? */
+	num_keys = 7;
+	internal_keys = (char**)malloc(num_keys*sizeof(char*));
+	external_keys = (char**)malloc(num_keys*sizeof(char*));
+	types = (int*)malloc((num_keys)*sizeof(int));
+	 
+
 	
-	/* run through the rest of the args, counting the keys */
-	i = 3;
-	while(args[i] != NULL) i++;
-	
-	last_arg = i;
-	
-	keys = (char**)malloc((last_arg - 3)*sizeof(char*));
-	values_len = last_arg - 3;
-	/* if they want to see ALL the processes then the requested values
-	 * have to be multipled by how many processes are in this job */
-	if(nodeid == -1) {
-		int numnodes = get_num_nodes(machid);
-		values_len = values_len * numnodes;
-		//printf("values_len = %d\n", values_len); fflush(stdout);
+	asprintf(&(internal_keys[0]), "%s", "machine_id");
+	asprintf(&(external_keys[0]), "%s", "Machine ID");
+	types[0] = PTP_UINT32;
+	asprintf(&(internal_keys[1]), "%s", "node_number");
+	asprintf(&(external_keys[1]), "%s", "Node Number");
+	types[1] = PTP_UINT32;
+	/* set up the keys we know about in ORTE and BPROC */
+	asprintf(&(internal_keys[2]), "%s", "orte-node-name");
+	asprintf(&(external_keys[2]), "%s", "Node Name");
+	types[2] = PTP_STRING;
+	asprintf(&(internal_keys[3]), "%s", "orte-node-bproc-user");
+	asprintf(&(external_keys[3]), "%s", "User Owner");
+	types[3] = PTP_STRING;
+	asprintf(&(internal_keys[4]), "%s", "orte-node-bproc-group");
+	asprintf(&(external_keys[4]), "%s", "Group Owner");
+	types[4] = PTP_STRING;
+	asprintf(&(internal_keys[5]), "%s", "orte-node-bproc-status");
+	asprintf(&(external_keys[5]), "%s", "Status");
+	types[5] = PTP_STRING;
+	asprintf(&(internal_keys[6]), "%s", "orte-node-bproc-mode");
+	asprintf(&(external_keys[6]), "%s", "Mode");
+	types[6] = PTP_UINT32;
+
+	for(i=0; i<num_keys; i++) {
+		printf("NODE ATTRIB KEYS[%d] = '%s' -> '%s'\n", i, internal_keys[i], external_keys[i]); fflush(stdout);
 	}
-	values = (char**)malloc(values_len * sizeof(char*));
-	types = (int*)malloc((last_arg - 3)*sizeof(int));
 	
-	default_needed = 0;
+	num_machines = get_num_machines();
+	printf("num machines = %d\n", num_machines); fflush(stdout);
 	
-	/* go through the args now, set up the key array */
-	for(i=3; i<last_arg; i++) {
-		if(!strcmp(args[i], ATTRIB_NODE_NAME)) {
-			asprintf(&(keys[i-3]), "%s", "orte-node-name");
-			types[i-3] = PTP_STRING;
-			default_needed++;
-		} else if(!strcmp(args[i], ATTRIB_NODE_USER)) {
-			asprintf(&(keys[i-3]), "%s", "orte-node-bproc-user");	
-			types[i-3] = PTP_STRING;
-			default_needed++;
-		} else if(!strcmp(args[i], ATTRIB_NODE_GROUP)) {
-			asprintf(&(keys[i-3]), "%s", "orte-node-bproc-group");
-			types[i-3] = PTP_STRING;
-			default_needed++;
-		} else if(!strcmp(args[i], ATTRIB_NODE_STATE)) {
-			asprintf(&(keys[i-3]), "%s", "orte-node-bproc-status");
-			types[i-3] = PTP_STRING;
-		} else if(!strcmp(args[i], ATTRIB_NODE_MODE)) {		
-			asprintf(&(keys[i-3]), "%s", "orte-node-bproc-mode");
-			types[i-3] = PTP_UINT32;
-		} else {
-			asprintf(&(keys[i-3]), "UNDEFINED");
-			types[i-3] = PTP_STRING;
+	for(machid = 0; machid < num_machines; machid++) {
+		num_nodes = get_num_nodes(machid);
+		printf("-> num nodes = %d\n", num_nodes); fflush(stdout);
+		
+		values_len = num_keys * num_nodes;
+		values = (char**)malloc(values_len * sizeof(char*));
+
+//		/* this is a horrible hack where if ORTE tells us there are 0 nodes we go ahead and 
+//		 * assume one.  I am an aweful person for having to put this in.  I think someone's
+//		 * going to revoke my license to program. */
+//		asprintf(&res, "%d %d", RTEV_NODES, num_nodes == 0 ? 1 : num_nodes);
+//	
+//		/* first send back how many nodes there are */
+//		proxy_svr_event_callback(orte_proxy, res);
+//	
+//		/* and then start sending back data about each of these nodes, asynchronously */
+//	
+//		free(res);
+
+		/* ok, for this machine (machID) we have some set of nodes.
+		 * let's send back information about these nodes that we can find out about */
+	
+
+
+		/* if we know of no nodes, then we better just try something out I guess for this
+		 * node.  this is a huge hack :( */
+		if(num_nodes == 0) {
+			char hostname[256];
+			gid_t gid;
+			struct group *grp;
+			struct passwd *pwd;
+        	char * status = "up";
+        	char * mode = "73";
+        	char * tmpstr;
+		
+			pwd = getpwuid(geteuid());
+			gid = getgid();
+			grp = getgrgid(gid);
+		
+			gethostname(hostname, 256);
+			printf("Hostname = '%s'\n", hostname); fflush(stdout);
+			printf("Username = '%s'\n", pwd->pw_name); fflush(stdout);
+			printf("Groupname = '%s'\n", grp->gr_name); fflush(stdout);
+		
+			/* 0 = machine 0 */
+			asprintf(&tmpstr, "%s=%d", external_keys[0], 0);
+			proxy_cstring_to_str(tmpstr, &str1);
+        	free(tmpstr);
+        	/* 0 = node 0 */
+			asprintf(&tmpstr, "%s=%d", external_keys[1], 0);
+			proxy_cstring_to_str(tmpstr, &str2);
+        	free(tmpstr);
+			asprintf(&tmpstr, "%s=%s", external_keys[2], hostname);
+        	proxy_cstring_to_str(tmpstr, &str3);
+        	free(tmpstr);
+        	asprintf(&tmpstr, "%s=%s", external_keys[3], pwd->pw_name);
+        	proxy_cstring_to_str(tmpstr, &str4);
+        	free(tmpstr);
+        	asprintf(&tmpstr, "%s=%s", external_keys[4], grp->gr_name);
+        	proxy_cstring_to_str(tmpstr, &str5);
+        	free(tmpstr);
+        	asprintf(&tmpstr, "%s=%s", external_keys[5], status);
+        	proxy_cstring_to_str(tmpstr, &str6);
+        	free(tmpstr);
+        	asprintf(&tmpstr, "%s=%s", external_keys[6], mode);
+        	proxy_cstring_to_str(tmpstr, &str7);
+        	free(tmpstr);
+       
+        	asprintf(&valstr, "%s %s %s %s %s %s %s", str1, str2, str3, str4, str5, str6, str7);
+        	
+        	free(str1);
+        	free(str2);
+        	free(str3);
+        	free(str4);
+        	free(str5); 
+        	free(str6);
+        	free(str7);
 		}
-	}
+		else if(tot_len != 0) {
+			int key_num = 0;
+		
+			/* nodeid = -1 means we want the attributes for ALL nodes */
+			nodeid = -1;
 	
-	for(i=3; i<last_arg; i++) {
-		printf("BEFORE CALL KEYS[%d] = '%s'\n", i-3, keys[i-3]); fflush(stdout);
-	}
+			if(get_node_attribute(machid, nodeid, internal_keys, types, values, num_keys)) {
+				/* error - so bail out */
+				res = ORTEErrorStr(RTEV_ERROR_NATTR, "error finding key on node or error getting keys");
+				proxy_svr_event_callback(orte_proxy, res);
 		
-	if(get_node_attribute(machid, nodeid, keys, types, values, last_arg-3)) {
-		/* error - so bail out */
-		res = ORTEErrorStr(RTEV_ERROR_NATTR, "error finding key on node or error getting keys");
-		proxy_svr_event_callback(orte_proxy, res);
-		
-		return PROXY_RES_OK;
-	}
-	/* else we're good, use the values */
-	
-	tot_len = 0;
-	for(i=0; i<values_len; i++) {
-		printf("AFTER CALL! VALS[%d] = '%s'\n", i, values[i]); fflush(stdout);
-		tot_len += strlen(values[i]);
-	}
-	
-	printf("totlen = %d\n", tot_len); fflush(stdout);
-	tot_len += values_len * 2; /* add on some for spaces and null, etc - little bit of extra here */
-	printf("totlen = %d\n", tot_len); fflush(stdout);
-	
-	if(tot_len == 0 && default_needed == 3) {
-		char hostname[256];
-		gid_t gid;
-		struct group *grp;
-		struct passwd *pwd;
-		
-		pwd = getpwuid(geteuid());
-		gid = getgid();
-		grp = getgrgid(gid);
-		
-		gethostname(hostname, 256);
-		printf("Hostname = '%s'\n", hostname); fflush(stdout);
-		printf("Username = '%s'\n", pwd->pw_name); fflush(stdout);
-		printf("Groupname = '%s'\n", grp->gr_name); fflush(stdout);
-		
-		proxy_cstring_to_str(hostname, &str1);
-		proxy_cstring_to_str(pwd->pw_name, &str2);
-		proxy_cstring_to_str(grp->gr_name, &str3);
-		asprintf(&valstr, "%s %s %s", str1, str2, str3);
-		free(str1);
-		free(str2);
-		free(str3);
-	}
-	else {
-		for(i=0; i<values_len; i++) {
-			proxy_cstring_to_str(values[i], &str2);
-			if (i > 0) {
-				str1 = valstr;
-				asprintf(&valstr, "%s %s", str1, str2);
-				free(str1);
-				free(str2);
-			} else {
-				valstr = str2;
+				return PROXY_RES_OK;
 			}
-
+			/* else we're good, use the values */
+	
+			tot_len = 0;
+			for(i=0; i<values_len; i++) {
+				printf("AFTER CALL! VALS[%d] = '%s'\n", i, values[i]); fflush(stdout);
+				tot_len += strlen(values[i]);
+			}
+	
+			printf("totlen = %d\n", tot_len); fflush(stdout);
+			tot_len += values_len * 2; /* add on some for spaces and null, etc - little bit of extra here */
+			printf("totlen = %d\n", tot_len); fflush(stdout);
+		
+			for(i=0; i<values_len; i++) {
+				proxy_cstring_to_str(values[i], &str2);
+				if (i > 0) {
+					str1 = valstr;
+					asprintf(&valstr, "%s %s=%s", str1, external_keys[key_num], str2);
+					free(str1);
+					free(str2);
+				} else {
+					valstr = str2;
+				}
+				key_num++;
+				if(key_num >= num_keys) key_num = 0;
+			}	
 		}
+		else {
+			/* error - so bail out */
+			res = ORTEErrorStr(RTEV_ERROR_NATTR, "error finding key on node or error getting keys");
+			proxy_svr_event_callback(orte_proxy, res);
+		
+			return PROXY_RES_OK;
+		}
+	
+		printf("valSTR = '%s'\n", valstr); fflush(stdout);
+	
+		asprintf(&res, "%d %s", RTEV_NATTR, valstr);
+		proxy_svr_event_callback(orte_proxy, res);
+		free(res);
+		
+		for(i=0; i<num_keys; i++) {
+			printf("Freeing #%d key.\n", i); fflush(stdout);
+			if(internal_keys[i] != NULL) free(internal_keys[i]);
+			if(external_keys[i] != NULL) free(external_keys[i]);
+		}
+	
+		for(i=0; i<values_len; i++) {
+			printf("Freeing #%d val.\n", i); fflush(stdout);
+			if(values[i] != NULL) free(values[i]);
+		}
+		
+		free(values);
+	
+		free(valstr);
 	}
 	
-	printf("valSTR = '%s'\n", valstr); fflush(stdout);
-	
-	asprintf(&res, "%d %s", RTEV_NATTR, valstr);
-	proxy_svr_event_callback(orte_proxy, res);
-	free(res);
+	printf("DISCOVERY PHASE: end\n"); fflush(stdout);
 
-	for(i=3; i<last_arg; i++) {
-		if(keys[i-3] != NULL) free(keys[i-3]);
-	}
-	
-	for(i=0; i<values_len; i++) {
-		if(values[i] != NULL) free(values[i]);
-	}
-	
-	free(keys);
-	free(values);
+	free(internal_keys);
+	free(external_keys);
 	free(types);
-	free(valstr);
 	
 	return PROXY_RES_OK;
 }
@@ -1939,22 +2026,23 @@ get_node_attribute(int machid, int node_num, char **input_keys, int *input_types
 	
 	/* ignore the machine ID until ORTE implements this part */
 	
-	#if 0
+#if 0
 	keys = (char**)malloc((input_num_keys + 1)* sizeof(char*));
 	for(i=0; i<input_num_keys; i++) {
 		keys[i] = strdup(input_keys[i]);
 	}
 	/* null terminated */
 	keys[input_num_keys] = NULL;
-	#endif
-	
-	rc = orte_gpr.get(ORTE_GPR_KEYS_OR | ORTE_GPR_TOKENS_OR,
-			ORTE_NODE_SEGMENT, NULL, NULL, &cnt, &values);
-	if(rc != ORTE_SUCCESS) {
+#endif
+
+	cnt = get_num_nodes(machid);
+	printf("number of nodes in get_node_attribute() = %d\n", (int)cnt); fflush(stdout);
+	if(cnt <= 0) {
 		printf("ERROR2: '%s'\n", ORTE_ERROR_NAME(rc));
 		ret = 1;
 		goto cleanup;
 	}
+	
 	
 	/* specified a proc bigger than any we know of in this job, bail out */
 	if(node_num != -1 && node_num >= cnt) {
@@ -1977,9 +2065,12 @@ get_node_attribute(int machid, int node_num, char **input_keys, int *input_types
 	printf("MAX = %d, MIN = %d\n", max, min); fflush(stdout);
 		
 	for(i=min; i<max; i++) {
+		printf("i = %d\n", i); fflush(stdout);
 		value = values[i];
 			
+		printf("looping j = 0 -> %d\n", input_num_keys); fflush(stdout);
 		for(j=0; j<input_num_keys; j++) {
+			printf("j = %d\n", j); fflush(stdout);
 			switch(input_types[j]) {
 				case PTP_STRING:
 					asprintf(&(input_values[((i-min) * input_num_keys) + j]), "%s", get_str_value(value, input_keys[j]));
@@ -2007,54 +2098,6 @@ cleanup:
 		
 	return ret;
 }
-
-///* given a nodeid and an attribute key this generates an event with
-// * the attribute's value.  sample attributes might be ATTRIB_NODE_STATE
-// * or ATTRIB_NODE_OS which might return up, down, booting, or error and
-// * linux, solaris, windows, osx, etc respectively
-// * EVENT RETURN:
-// *   type = GET_NODE_ATTRIBUTE
-// *   data = "key=value" (example "state=down", "user=ndebard")
-// */
-//int
-//OMPIGetNodeAttribute(char **args)
-//{
-//	int		nodeid = atoi(args[1]);
-//	char *	key = args[2];
-//	char *	val;
-//	
-//	val = get_node_attribute(nodeid, key);
-//	
-//	if (val == NULL) {
-//		asprintf(&res, "%d %s", RTEV_ERROR, "no such attribute");
-//	} else {
-//		asprintf(res, "%d %s=%s", RTEV_NODEATTR, key, val);
-//	}
-//	
-//	proxy_svr_event_callback(orte_proxy, res);
-//	
-//	free(res);	
-//	return PROXY_RES_OK;
-//}
-//
-///* perhaps we don't need this function.
-// * this takes a given nodeid and determines the machineID that it is
-// * contained within.  in theory this can be inferred by calling getMachines
-// * and getNodes(some_machine_id).  once the model is populated, we should
-// * have a relationship between the two but this MAY be helpful ... really
-// * it depends on whether we want helper functions at this level or up at
-// * the Java level - probably in my opinion we want them at the Java level 
-// * EVENT RETURN:
-// *   type = GET_NODE_MACHINE_ID
-// *   data = "nodeid=machineid" (example node 1000 owned by machine 4 -> "1000=4")
-// */ 
-//int
-//OMPIGetNodeMachineID(char **args)
-//{
-//	int nodeid = atoi(args[1]);
-//	
-//	return PROXY_RES_OK;
-//}
 
 int
 ORTEQuit(void)

@@ -92,7 +92,7 @@ public interface IControlSystem {
 	 * @throws CoreException 
 	 * @see org.eclipse.ptp.core.AttributeConstants
 	 */
-	public String[] getAllProcessesAttributes(IPJob job, String[] attribs) throws CoreException;
+	//public String[] getAllProcessesAttributes(IPJob job, String[] attribs) throws CoreException;
 	
 	/**
 	 * Gets the specified attributes for a specific process in a specific job.  The
@@ -105,7 +105,7 @@ public interface IControlSystem {
 	 * @return an array of the attribute values
 	 * @throws CoreException 
 	 */
-	public String[] getProcessAttributes(IPProcess proc, String[] attribs) throws CoreException;
+	//public String[] getProcessAttributes(IPProcess proc, String[] attribs) throws CoreException;
 
 	/**
 	 * Adds a listener to the control system.  The control system may fire {@link RuntimeEvent}s

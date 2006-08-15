@@ -35,10 +35,10 @@ import org.eclipse.ptp.internal.core.elementcontrols.IPProcessControl;
 
 public class PNode extends Parent implements IPNodeControl {
 	protected String NAME_TAG = "node ";
-	
-	public PNode(IPElementControl mac, String name, String key, int nodeNumber) {
+
+	public PNode(IPElementControl mac, String name, String key) {
 		super(mac, name, key, P_NODE);
-		this.setAttribute(AttributeConstants.ATTRIB_NODE_NUMBER, new Integer(nodeNumber));
+		this.setAttribute(AttributeConstants.ATTRIB_NODE_NUMBER, new Integer(key));
 	}
 	public IPMachine getMachine() {
 		IPElementControl current = this;

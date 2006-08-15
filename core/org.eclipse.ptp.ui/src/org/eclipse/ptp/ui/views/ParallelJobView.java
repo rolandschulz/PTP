@@ -30,11 +30,14 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.ptp.core.IModelListener;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.IProcessListener;
 import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.events.IModelEvent;
 import org.eclipse.ptp.core.events.IProcessEvent;
+import org.eclipse.ptp.core.events.ModelSysChangedEvent;
 import org.eclipse.ptp.internal.ui.JobManager;
 import org.eclipse.ptp.internal.ui.ParallelImages;
 import org.eclipse.ptp.internal.ui.actions.RemoveAllTerminatedAction;
@@ -62,7 +65,7 @@ import org.eclipse.swt.widgets.TableItem;
  * @author Clement chu
  * 
  */
-public class ParallelJobView extends AbstractParallelSetView implements IProcessListener {
+public class ParallelJobView extends AbstractParallelSetView implements IProcessListener, IModelListener {
 	// selected element
 	protected String cur_selected_element_id = IManager.EMPTY_ID;
 	// composite
@@ -394,8 +397,14 @@ public class ParallelJobView extends AbstractParallelSetView implements IProcess
 		System.out.println("------------ job execStatusChangeEvent");
 		refresh();
 	}
-	public void sysStatusChangeEvent(Object object) {
+	public void sysStatusChangeEvent() {
 		System.out.println("------------ job sysStatusChangeEvent");
+		refresh();
+	}
+	public void majorSystemChangeEvent() {
+		System.out.println("------------ job majorSystemChangeEvent");
+		manager.clear();
+		initialView();
 		refresh();
 	}
 	public void processOutputEvent(Object object) {
@@ -434,6 +443,16 @@ public class ParallelJobView extends AbstractParallelSetView implements IProcess
 				refresh(false);
 		}
 	}
+	
+	public void modelEvent(IModelEvent event) {
+		if(event instanceof ModelSysChangedEvent) {
+			if(((ModelSysChangedEvent)event).getType() == ModelSysChangedEvent.MAJOR_SYS_CHANGED) {
+				manager.clear();
+				initialView();
+			}
+		}
+	}
+	
 	public void setFocus() {
 		super.setFocus();
 		IPJob job = getCheckedJob();

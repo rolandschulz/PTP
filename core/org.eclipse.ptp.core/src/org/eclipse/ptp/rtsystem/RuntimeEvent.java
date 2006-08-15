@@ -20,21 +20,21 @@
 package org.eclipse.ptp.rtsystem;
 
 public class RuntimeEvent {
-	int eventNumber;
+	private int eventNumber;
+	private String text, alttext;
+	private String[] keys, values;
 
-	String text, alttext;
+	//public static final int EVENT_NODE_STATUS_CHANGE = 1;
 
-	public static final int EVENT_NODE_STATUS_CHANGE = 1;
+	public static final int EVENT_PROCESS_OUTPUT = 1;
 
-	public static final int EVENT_PROCESS_OUTPUT = 2;
+	public static final int EVENT_JOB_EXITED = 2;
 
-	public static final int EVENT_JOB_EXITED = 3;
+	public static final int EVENT_JOB_STATE_CHANGED = 3;
 
-	public static final int EVENT_JOB_STATE_CHANGED = 4;
-
-	public static final int EVENT_NEW_JOB = 5;
+	public static final int EVENT_NEW_JOB = 4;
 	
-	public static final int EVENT_NODE_GENERAL_CHANGE = 6;
+	public static final int EVENT_NODE_GENERAL_CHANGE = 5;
 
 	public RuntimeEvent(int eventNumber) {
 		this.eventNumber = eventNumber;
@@ -59,5 +59,21 @@ public class RuntimeEvent {
 	
 	public void setAltText(String text) {
 		this.alttext = text;
+	}
+	
+	public void setAttributeKeys(String[] keys) {
+		this.keys = keys;
+	}
+	
+	public String[] getAttributeKeys() {
+		return keys;
+	}
+	
+	public void setAttributeValues(String[] values) {
+		this.values = values;
+	}
+	
+	public String[] getAttributeValues() {
+		return values;
 	}
 }
