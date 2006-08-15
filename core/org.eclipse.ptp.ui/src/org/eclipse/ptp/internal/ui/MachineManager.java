@@ -114,27 +114,7 @@ public class MachineManager extends AbstractUIManager {
 	public void setCurrentSetId(String set_id) {
 		cur_set_id = set_id;
 	}
-	/** Convert attribute key to display name
-	 * 
-	 * @param key
-	 * @return name
-	 */
-	public String getNodeAttributeName(String key) {
-		if (key.equals(AttributeConstants.ATTRIB_NODE_NAME))
-			return "Name";
-		if (key.equals(AttributeConstants.ATTRIB_NODE_NUMBER))
-			return "Node #";
-		if (key.equals(AttributeConstants.ATTRIB_NODE_STATE))
-			return "State";
-		if (key.equals(AttributeConstants.ATTRIB_NODE_GROUP))
-			return "Group";
-		if (key.equals(AttributeConstants.ATTRIB_NODE_USER))
-			return "User";
-		if (key.equals(AttributeConstants.ATTRIB_NODE_MODE))
-			return "Mode";
-			
-		return "Unknown";
-	}
+	
 	/** Get node status text
 	 * @param node
 	 * @return status text
@@ -198,25 +178,32 @@ public class MachineManager extends AbstractUIManager {
 			String nodeState = (String)node.getAttribute(AttributeConstants.ATTRIB_NODE_STATE);
 			//System.out.println("nodestate = '"+nodeState+"'");
 			if(nodeState == null) {
-				System.out.println("null node state!");
 				return IPTPUIConstants.NODE_UNKNOWN;
 			}
 			if (nodeState.equals(IPNode.NODE_STATE_UP)) {
 				if (node.getNumProcesses() > 0)
 					return (node.isAllStop() ? IPTPUIConstants.NODE_EXITED : IPTPUIConstants.NODE_RUNNING);
-				if (node.getAttribute(AttributeConstants.ATTRIB_NODE_USER).equals(System.getProperty("user.name"))) {
-					String mode = (String) node.getAttribute(AttributeConstants.ATTRIB_NODE_MODE);
-					//System.out.println("Mode = '"+mode+"'");
-					if (mode.equals("64"))
-						return IPTPUIConstants.NODE_USER_ALLOC_EXCL;
-					else if (mode.equals("72") || mode.equals("73") || mode.equals("65"))
-						return IPTPUIConstants.NODE_USER_ALLOC_SHARED;
-				} else if (!node.getAttribute(AttributeConstants.ATTRIB_NODE_USER).equals("")) {
-					String mode = (String) node.getAttribute(AttributeConstants.ATTRIB_NODE_MODE);
-					if (mode.equals("64"))
-						return IPTPUIConstants.NODE_OTHER_ALLOC_EXCL;
-					else if (mode.equals("72") || mode.equals("73") || mode.equals("65"))
-						return IPTPUIConstants.NODE_OTHER_ALLOC_SHARED;
+				
+				String nodeUser = (String)node.getAttribute(AttributeConstants.ATTRIB_NODE_USER);
+				String mode = (String) node.getAttribute(AttributeConstants.ATTRIB_NODE_MODE);
+				
+				if(nodeUser != null) {
+					if(nodeUser.equals(System.getProperty("user.name"))) {
+						if(mode != null) {
+							//System.out.println("Mode = '"+mode+"'");
+							if (mode.equals("64"))
+								return IPTPUIConstants.NODE_USER_ALLOC_EXCL;
+							else if (mode.equals("72") || mode.equals("73") || mode.equals("65"))
+								return IPTPUIConstants.NODE_USER_ALLOC_SHARED;
+						}
+					} else if(nodeUser.equals("")) {
+						if(mode != null) {
+							if (mode.equals("64"))
+								return IPTPUIConstants.NODE_OTHER_ALLOC_EXCL;
+							else if (mode.equals("72") || mode.equals("73") || mode.equals("65"))
+								return IPTPUIConstants.NODE_OTHER_ALLOC_SHARED;
+						}
+					}
 				}
 				return IPTPUIConstants.NODE_UP;
 			} else if (nodeState.equals(IPNode.NODE_STATE_DOWN))
@@ -232,7 +219,8 @@ public class MachineManager extends AbstractUIManager {
 	 * @return status
 	 */
 	public int getStatus(String machine_id, String node_id) {
-		return getNodeStatus(findNode(machine_id, node_id));
+		IPNode node = findNode(machine_id, node_id);
+		return getNodeStatus(node);
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#getStatus(java.lang.String)
@@ -248,8 +236,10 @@ public class MachineManager extends AbstractUIManager {
 	 */
 	public IPNode findNode(String machine_id, String node_id) {
 		IPMachine machine = findMachineById(machine_id);
-		if (machine == null)
+		if (machine == null) {
+			System.out.println("\t*** POSSIBLE ERROR: Unable to find machine defined by ID "+machine_id+")");
 			return null;
+		}
 		return machine.findNode(node_id);
 	}
 	/** Find machine
@@ -265,7 +255,7 @@ public class MachineManager extends AbstractUIManager {
 	 * @return
 	 */
 	public IPMachine findMachineById(String machine_id) {
-		return modelPresentation.getUniverse().findMachineById(machine_id);
+		return modelPresentation.getUniverse().findMachineByGlobalId(machine_id);
 	}
 	
 	/* (non-Javadoc)

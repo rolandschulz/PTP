@@ -38,6 +38,7 @@ import org.eclipse.ptp.core.IModelListener;
 import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.INodeListener;
 import org.eclipse.ptp.core.IPJob;
+import org.eclipse.ptp.core.IPMachine;
 import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.IPUniverse;
@@ -45,6 +46,7 @@ import org.eclipse.ptp.core.IProcessListener;
 import org.eclipse.ptp.core.MonitoringSystemChoices;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.PreferenceConstants;
+import org.eclipse.ptp.internal.core.elementcontrols.IPElementControl;
 import org.eclipse.ptp.core.events.IModelEvent;
 import org.eclipse.ptp.core.events.IModelRuntimeNotifierEvent;
 import org.eclipse.ptp.core.events.IModelSysChangedEvent;
@@ -279,7 +281,12 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			monitor.worked(10);
 			try {
 				monitor.subTask("Setup the monitoring system...");
-				setupMS(new SubProgressMonitor(monitor, 150));
+				monitor.beginTask("", 1);
+				monitoringSystem.initiateDiscovery();
+				monitor.worked(1);
+				monitoringSystem.addRuntimeListener(this);
+				controlSystem.addRuntimeListener(this);		
+				monitor.done();
 			} catch (CoreException e) {
 				universe.removeChildren();
 				throw e;
@@ -293,151 +300,176 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 				monitor.done();
 		}
 	}
-	/* setup the monitoring system */
-	public void setupMS(IProgressMonitor monitor) throws CoreException {
-		String[] ne = monitoringSystem.getMachines();		
-		monitor.beginTask("", ne.length * 2);
-		for (int i = 0; i < ne.length; i++) {
-			monitor.setTaskName("Creating machines...");
-			if (monitor.isCanceled()) {
-				throw new CoreException(Status.CANCEL_STATUS);
-			}
 
-			String ids = ne[i].substring(new String("machine").length());
-			int machID = (new Integer(ids)).intValue();
-			
-			PMachine mac = new PMachine(universe, ne[i], machID);
-			universe.addChild(mac);
+//	/* setup the monitoring system */
+//	public void setupMS(IProgressMonitor monitor) throws CoreException {
+//		monitoringSystem.initiateDiscovery();
+//		
+//		
+//		
+//		String[] ne = monitoringSystem.getMachines();		
+//		monitor.beginTask("", ne.length * 2);
+//		for (int i = 0; i < ne.length; i++) {
+//			monitor.setTaskName("Creating machines...");
+//			if (monitor.isCanceled()) {
+//				throw new CoreException(Status.CANCEL_STATUS);
+//			}
+//
+//			String ids = ne[i].substring(new String("machine").length());
+//			int machID = (new Integer(ids)).intValue();
+//			
+//			PMachine mac = new PMachine(universe, ne[i], machID);
+//			universe.addChild(mac);
+//
+//			monitor.internalWorked(1);
+//			
+//			monitoringSystem.initiateDiscovery();
+//			
+////			String[] ne2 = monitoringSystem.getNodes(mac);
+////			System.out.println("MACHINE: " + ne[i]+" - #nodes = "+ne2.length);
+////			
+////			for(int j=0; j<ne2.length; j++) {
+////				PNode node = new PNode(mac, ne2[j], ""+j+"", j);
+////				mac.addChild(node);
+////			}
+//
+////			IProgressMonitor subMonitor = new SubProgressMonitor(monitor, 1);
+////			subMonitor.beginTask("", ne2.length);
+////			subMonitor.setTaskName("Creating nodes...");
+//			
+//			
+////			TAKEN OUT WHEN WE CHANGED THE MODEL
+////			if(monitoringSystem instanceof OMPIMonitoringSystem || monitoringSystem instanceof MPICH2MonitoringSystem) {
+////				int num_attribs = 5;
+////				String[] keys = new String[] {
+////					AttributeConstants.ATTRIB_NODE_NAME,
+////					AttributeConstants.ATTRIB_NODE_USER,
+////					AttributeConstants.ATTRIB_NODE_GROUP,
+////					AttributeConstants.ATTRIB_NODE_STATE,
+////					AttributeConstants.ATTRIB_NODE_MODE
+////				};
+////				String[] attribs = monitoringSystem.getAllNodesAttributes(mac, keys);
+////				if (attribs == null || attribs.length == 0) {
+////					return;
+////				}
+////
+////				for (int j = 0; j < attribs.length; j++)
+////					System.out.println("*** attribs[" + j + "] = " + attribs[j]);
+////
+////				for (int j = 0; j < ne2.length; j++) {
+////					if (subMonitor.isCanceled()) {
+////						throw new CoreException(Status.CANCEL_STATUS);
+////					}
+////					//node = new PNode(mac, ne2[j], "" + j + "", j);
+////					String nodename = ""+j+"";
+////					if(attribs.length > (j * num_attribs)) {
+////						nodename = attribs[(j * num_attribs)];
+////					}
+////					PNode node = new PNode(mac, ne2[j], "" + j + "", j);
+////					node.setAttribute(AttributeConstants.ATTRIB_NODE_NAME, nodename);
+////					System.out.println("NodeName According to ORTE = '"+node.getAttribute(AttributeConstants.ATTRIB_NODE_NAME)+"'");
+////					System.out.println("\t#attribs returned: "+attribs.length);
+////					
+////					if(attribs.length > (j * num_attribs) + 1) {
+////						node.setAttribute(AttributeConstants.ATTRIB_NODE_USER,
+////								attribs[(j * num_attribs) + 1]);
+////					}
+////					else {
+////						node.setAttribute(AttributeConstants.ATTRIB_NODE_USER, "UNKNOWN");
+////					}
+////					
+////					if(attribs.length > (j * num_attribs) + 2) {
+////						node.setAttribute(AttributeConstants.ATTRIB_NODE_GROUP,
+////								attribs[(j * num_attribs) + 2]);
+////					}
+////					else {
+////						node.setAttribute(AttributeConstants.ATTRIB_NODE_GROUP, "UNKNOWN");
+////					}
+////					
+////					if(attribs.length > (j * num_attribs) + 3) {
+////						node.setAttribute(AttributeConstants.ATTRIB_NODE_STATE,
+////							attribs[(j * num_attribs) + 3]);
+////					}
+////					else {
+////						node.setAttribute(AttributeConstants.ATTRIB_NODE_STATE, "up");
+////					}
+////					
+////					if(attribs.length > (j * num_attribs) + 4) {
+////						node.setAttribute(AttributeConstants.ATTRIB_NODE_MODE,
+////							attribs[(j * num_attribs) + 4]);
+////					}
+////					else {
+////						node.setAttribute(AttributeConstants.ATTRIB_NODE_MODE, "73");
+////					}					
+////					mac.addChild(node);
+////					subMonitor.worked(1);
+////				}
+////			}
+////			else if (monitoringSystem instanceof SimulationMonitoringSystem) {
+////				for(int j=0; j<ne2.length; j++) {
+////					if (subMonitor.isCanceled()) {
+////						throw new CoreException(Status.CANCEL_STATUS);
+////					}
+////					//System.out.println("node "+j);
+////					PNode node = new PNode(mac, ne2[j], ""+j+"", j);
+////					node.setAttribute(AttributeConstants.ATTRIB_NODE_NAME, 
+////							monitoringSystem.getNodeAttributes(node, new String[] {AttributeConstants.ATTRIB_NODE_NAME})[0]);
+////					node.setAttribute(AttributeConstants.ATTRIB_NODE_USER, 
+////							monitoringSystem.getNodeAttributes(node, new String[] {AttributeConstants.ATTRIB_NODE_USER})[0]);
+////					node.setAttribute(AttributeConstants.ATTRIB_NODE_GROUP, 
+////							monitoringSystem.getNodeAttributes(node, new String[] {AttributeConstants.ATTRIB_NODE_GROUP})[0]);
+////					node.setAttribute(AttributeConstants.ATTRIB_NODE_STATE, 
+////							monitoringSystem.getNodeAttributes(node, new String[] {AttributeConstants.ATTRIB_NODE_STATE})[0]);
+////					node.setAttribute(AttributeConstants.ATTRIB_NODE_MODE, 
+////							monitoringSystem.getNodeAttributes(node, new String[] {AttributeConstants.ATTRIB_NODE_MODE})[0]);
+////					
+////					mac.addChild(node);
+////				}
+////			}
+//		}
+//		ne = controlSystem.getJobs();
+//		if(ne != null) {
+//			for (int i = 0; i < ne.length; i++) {
+//				monitor.setTaskName("Creating jobs...");
+//				if (monitor.isCanceled()) {
+//					throw new CoreException(Status.CANCEL_STATUS);
+//				}
+//
+//				System.out.println("JOB: " + ne[i]);
+//				int x = 0;
+//				try {
+//					x = (new Integer(ne[i].substring(3))).intValue();
+//				} catch (NumberFormatException e) {
+//				}
+//				PJob job = new PJob(universe, ne[i], "" + (PJob.BASE_OFFSET + x) + "", x);
+//				universe.addChild(job);
+//				
+//				String[] ne2 = controlSystem.getProcesses(job);
+//				IProgressMonitor subMonitor = new SubProgressMonitor(monitor, 1);
+//				subMonitor.beginTask("", ne2.length);
+//				subMonitor.setTaskName("Creating processes...");
+//				for (int j = 0; j < ne2.length; j++) {		
+//					if (subMonitor.isCanceled()) {
+//						throw new CoreException(Status.CANCEL_STATUS);
+//					}
+//					IPProcessControl proc = new PProcess(job, ne[i]+"_process"+j, "" + j + "", "0", j, IPProcess.STARTING, "", "");
+//					job.addChild(proc);
+//					subMonitor.worked(1);
+//				}	
+//				try {
+//					getProcsStatusForNewJob(ne[i], job, new SubProgressMonitor(monitor, ne2.length));
+//				} catch (CoreException e) {
+//					universe.deleteJob(job);
+//					return;
+//				}
+//			}
+//		}
+//		monitor.worked(1);
+//		monitoringSystem.addRuntimeListener(this);
+//		controlSystem.addRuntimeListener(this);		
+//		monitor.done();
+//	}
 
-			monitor.internalWorked(1);
-			String[] ne2 = monitoringSystem.getNodes(mac);
-			System.out.println("MACHINE: " + ne[i]+" - #nodes = "+ne2.length);
-
-			IProgressMonitor subMonitor = new SubProgressMonitor(monitor, 1);
-			subMonitor.beginTask("", ne2.length);
-			subMonitor.setTaskName("Creating nodes...");
-			if(monitoringSystem instanceof OMPIMonitoringSystem || monitoringSystem instanceof MPICH2MonitoringSystem) {
-				int num_attribs = 5;
-				String[] keys = new String[] {
-					AttributeConstants.ATTRIB_NODE_NAME,
-					AttributeConstants.ATTRIB_NODE_USER,
-					AttributeConstants.ATTRIB_NODE_GROUP,
-					AttributeConstants.ATTRIB_NODE_STATE,
-					AttributeConstants.ATTRIB_NODE_MODE
-				};
-				String[] attribs = monitoringSystem.getAllNodesAttributes(mac, keys);
-				if (attribs == null || attribs.length == 0) {
-					return;
-				}
-
-				for (int j = 0; j < attribs.length; j++)
-					System.out.println("*** attribs[" + j + "] = " + attribs[j]);
-
-				for (int j = 0; j < ne2.length; j++) {
-					if (subMonitor.isCanceled()) {
-						throw new CoreException(Status.CANCEL_STATUS);
-					}
-					//node = new PNode(mac, ne2[j], "" + j + "", j);
-					String nodename = ""+j+"";
-					if(attribs.length > (j * num_attribs)) {
-						nodename = attribs[(j * num_attribs)];
-					}
-					PNode node = new PNode(mac, ne2[j], "" + j + "", j);
-					node.setAttribute(AttributeConstants.ATTRIB_NODE_NAME, nodename);
-					System.out.println("NodeName According to ORTE = '"+node.getAttribute(AttributeConstants.ATTRIB_NODE_NAME)+"'");
-					System.out.println("\t#attribs returned: "+attribs.length);
-					
-					if(attribs.length > (j * num_attribs) + 1) {
-						node.setAttribute(AttributeConstants.ATTRIB_NODE_USER, attribs[(j * num_attribs) + 1]);
-					}
-					else {
-						node.setAttribute(AttributeConstants.ATTRIB_NODE_USER, "UNKNOWN");
-					}
-					
-					if(attribs.length > (j * num_attribs) + 2) {
-						node.setAttribute(AttributeConstants.ATTRIB_NODE_GROUP, attribs[(j * num_attribs) + 2]);
-					}
-					else {
-						node.setAttribute(AttributeConstants.ATTRIB_NODE_GROUP, "UNKNOWN");
-					}
-					
-					if(attribs.length > (j * num_attribs) + 3) {
-						node.setAttribute(AttributeConstants.ATTRIB_NODE_STATE,
-							attribs[(j * num_attribs) + 3]);
-					}
-					else {
-						node.setAttribute(AttributeConstants.ATTRIB_NODE_STATE, "up");
-					}
-					
-					if(attribs.length > (j * num_attribs) + 4) {
-						node.setAttribute(AttributeConstants.ATTRIB_NODE_MODE,
-							attribs[(j * num_attribs) + 4]);
-					}
-					else {
-						node.setAttribute(AttributeConstants.ATTRIB_NODE_MODE, "73");
-					}					
-					mac.addChild(node);
-					subMonitor.worked(1);
-				}
-			}
-			else if (monitoringSystem instanceof SimulationMonitoringSystem) {
-				for(int j=0; j<ne2.length; j++) {
-					if (subMonitor.isCanceled()) {
-						throw new CoreException(Status.CANCEL_STATUS);
-					}
-					//System.out.println("node "+j);
-					PNode node = new PNode(mac, ne2[j], ""+j+"", j);
-					node.setAttribute(AttributeConstants.ATTRIB_NODE_NAME, monitoringSystem.getNodeAttributes(node, new String[] {AttributeConstants.ATTRIB_NODE_NAME})[0]);
-					node.setAttribute(AttributeConstants.ATTRIB_NODE_USER, monitoringSystem.getNodeAttributes(node, new String[] {AttributeConstants.ATTRIB_NODE_USER})[0]);
-					node.setAttribute(AttributeConstants.ATTRIB_NODE_GROUP, monitoringSystem.getNodeAttributes(node, new String[] {AttributeConstants.ATTRIB_NODE_GROUP})[0]);
-					node.setAttribute(AttributeConstants.ATTRIB_NODE_STATE, monitoringSystem.getNodeAttributes(node, new String[] {AttributeConstants.ATTRIB_NODE_STATE})[0]);
-					node.setAttribute(AttributeConstants.ATTRIB_NODE_MODE, monitoringSystem.getNodeAttributes(node, new String[] {AttributeConstants.ATTRIB_NODE_MODE})[0]);
-					mac.addChild(node);
-				}
-			}
-		}
-		ne = controlSystem.getJobs();
-		if(ne != null) {
-			for (int i = 0; i < ne.length; i++) {
-				monitor.setTaskName("Creating jobs...");
-				if (monitor.isCanceled()) {
-					throw new CoreException(Status.CANCEL_STATUS);
-				}
-
-				System.out.println("JOB: " + ne[i]);
-				int x = 0;
-				try {
-					x = (new Integer(ne[i].substring(3))).intValue();
-				} catch (NumberFormatException e) {
-				}
-				PJob job = new PJob(universe, ne[i], "" + (PJob.BASE_OFFSET + x) + "", x);
-				universe.addChild(job);
-				
-				String[] ne2 = controlSystem.getProcesses(job);
-				IProgressMonitor subMonitor = new SubProgressMonitor(monitor, 1);
-				subMonitor.beginTask("", ne2.length);
-				subMonitor.setTaskName("Creating processes...");
-				for (int j = 0; j < ne2.length; j++) {		
-					if (subMonitor.isCanceled()) {
-						throw new CoreException(Status.CANCEL_STATUS);
-					}
-					IPProcessControl proc = new PProcess(job, ne[i]+"_process"+j, "" + j + "", "0", j, IPProcess.STARTING, "", "");
-					job.addChild(proc);
-					subMonitor.worked(1);
-				}	
-				try {
-					getProcsStatusForNewJob(ne[i], job, new SubProgressMonitor(monitor, ne2.length));
-				} catch (CoreException e) {
-					universe.deleteJob(job);
-					return;
-				}
-			}
-		}
-		monitor.worked(1);
-		monitoringSystem.addRuntimeListener(this);
-		controlSystem.addRuntimeListener(this);		
-		monitor.done();
-	}
 	/* given a Job, this contacts the monitoring system and populates the runtime 
 	 * model with the processes that correspond to that Job
 	 */
@@ -456,7 +488,25 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			AttributeConstants.ATTRIB_PROCESS_PID,
 			AttributeConstants.ATTRIB_PROCESS_NODE_NAME
 		};
-		String[] attribs = controlSystem.getAllProcessesAttributes(job, keys);
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		// TODO: FIX ME!!!!!!!!!!!!!!!!!!!
+		
+		//String[] attribs = controlSystem.getAllProcessesAttributes(job, keys);
+		String[] attribs = null;
+		
+		
+		
+		
+		
 		for(int i=0; i<attribs.length; i++) 
 			System.out.println("*** attribs["+i+"] = "+attribs[i]);
 		
@@ -485,6 +535,12 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			// System.out.println("Process "+pname+" running on node:");
 			// System.out.println("\t"+nname);
 			// System.out.println("\tand that's running on machine: "+mname);
+			
+			
+			
+			
+			// TODO: Fix this next BLOCK!!!!!!!!
+			/*
 			IPNode node = universe.findNodeByName(nname);
 			if (node == null) {
 				node = universe.findNodeByHostname(attribs[(i * num_attribs) + 1]);
@@ -492,14 +548,24 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 					//TODO send error event??
 					throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, "No available node found.", null));
 				}
-			}
+			}*/
+			
+			
+			
+			
 				// System.out.println("**** THIS NODE IS WHERE THIS PROCESS IS RUNNING!");
 				/*
 				 * this sets the data member in both classes stating that
 				 * this process is running on this node and telling this
 				 * node that it now has a child process running on it.
 				 */
+			
+			// TODO: AND THIS TOO!!!
+			/*
 			proc.setNode(node);
+			*/
+			
+			
 			//String status = controlSystem.getProcessAttribute(job, proc, AttributeConstants.ATTRIB_PROCESS_STATUS);
 			//proc.setStatus(status);
 			monitor.worked(1);
@@ -536,8 +602,68 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		}
 		*/
 	}
-	public void runtimeNodeGeneralChange(String ne, String key, String value) {
-		System.out.println("ModelManager.runtimeNodeGeneralName - node '"+ne+", key='"+key+"', value='"+value+"'");
+
+	public void runtimeNodeGeneralChange(String[] keys, String[] values) {
+		boolean newEntity = false;
+		PMachine curmachine = null;
+		PNode curnode = null;
+		
+		System.out.println("ModelManager.runtimeNodeGeneralName - #keys = "+keys.length+", #values = "+values.length);
+		for(int i=0; i<keys.length; i++) {
+			String key = keys[i];
+			String value = values[i];
+			System.out.println("\tKEY/VALUE pair: "+key+" -> "+value);
+			
+			if(key.equals(AttributeConstants.ATTRIB_MACHINEID)) {
+				/* ok, so we're switching to this new machine.  Let's find it. */
+				curmachine = (PMachine)universe.findMachineById(value);
+				if(curmachine == null) {
+					System.out.println("\t\tUnknown machine ID, adding to the model.");
+					PMachine mac = new PMachine(universe, AttributeConstants.ATTRIB_MACHINE_NAME_PREFIX + value, value);
+					universe.addChild(mac);
+					/* now let's try and find it again, just to be sure we can... */
+					curmachine = (PMachine)universe.findMachineById(value);
+					if(curmachine == null) {
+						System.err.println("\t\t  !!! ERROR: Added new machine but STILL can't find it! :(");
+					}
+					newEntity = true;
+				}
+			}
+			/* we can only look for nodes if we've already found a machine . . . */
+			else if(curmachine != null && key.equals(AttributeConstants.ATTRIB_NODE_NUMBER)) {
+				/* ok so we've got a machine that's not null, and we think we have a node
+				 * number to look for in that machine.  So let's find it!
+				 */
+				curnode = (PNode)curmachine.findNodeByName(AttributeConstants.ATTRIB_NODE_NAME_PREFIX + value);
+				if(curnode == null) {
+					System.out.println("\t\tUnknown node number, adding to the model.");
+					PNode node = new PNode(curmachine, AttributeConstants.ATTRIB_NODE_NAME_PREFIX + value, value);
+					curmachine.addChild(node);
+					/* now let's try and find it again, just to be sure we can... */
+					curnode = (PNode)curmachine.findNodeByName(AttributeConstants.ATTRIB_NODE_NAME_PREFIX + value);
+					if(curnode == null) {
+						System.err.println("\t\t  !!! ERROR: Added new node but STILL can't find it! :(");
+						System.err.println("\t\t  !!! ERROR: Here are the nodes I know about on this Machine:");
+						IPNode[] nodes = curmachine.getNodes();
+						for(int j=0; j<nodes.length; j++) {
+							System.out.println("Node["+j+"] = "+nodes[j]);
+						}
+					}
+					newEntity = true;
+				}
+			}
+			else if(curmachine != null && curnode != null) {
+				curnode.setAttribute(key, value);
+			}
+			else {
+				System.err.println("\t!!! ERROR: Received key/value attribute pair but have no associated machine/node to assign it to.");
+			}
+		}
+		
+		if(newEntity) fireEvent(new ModelSysChangedEvent(IModelSysChangedEvent.MAJOR_SYS_CHANGED, null));
+		fireEvent(new ModelSysChangedEvent(IModelSysChangedEvent.SYS_STATUS_CHANGED, null));
+		
+		/*
 		IPNode n = universe.findNodeByName(ne);
 		if(n != null) {
 			System.out.print("\t before, val = "+n.getAttribute(key));
@@ -546,21 +672,9 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			fireEvent(new ModelSysChangedEvent(IModelSysChangedEvent.SYS_STATUS_CHANGED, n));
 			//fireEvent(n, EVENT_SYS_STATUS_CHANGE);
 		}
+		*/
 	}
-	public void runtimeNodeStatusChange(String ne) {
-		/* so let's find which node this is */
-		IPNode n = universe.findNodeByName(ne);
-		if (n != null) {
-			try {
-				n.setAttribute(AttributeConstants.ATTRIB_NODE_STATE, monitoringSystem.getNodeAttributes(n, new String[] {AttributeConstants.ATTRIB_NODE_STATE}));
-				fireEvent(new ModelSysChangedEvent(IModelSysChangedEvent.SYS_STATUS_CHANGED, n));
-				//fireEvent(n, EVENT_SYS_STATUS_CHANGE);
-			} catch(CoreException e) {
-				PTPCorePlugin.errorDialog("Fatal PTP Monitoring System Error", "The PTP Monitoring System is down.", null);
-				return;
-			}
-		}
-	}
+
 	public void runtimeProcessOutput(String ne, String output) {
 		IPProcess p = universe.findProcessByName(ne);
 		if (p != null) {
@@ -793,7 +907,10 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 				listener.execStatusChangeEvent(object);
 				break;
 			case EVENT_SYS_STATUS_CHANGE:
-				listener.sysStatusChangeEvent(object);
+				listener.sysStatusChangeEvent();
+				break;
+			case EVENT_MAJOR_SYSTEM_CHANGE:
+				listener.majorSystemChangeEvent();
 				break;
 			case EVENT_PROCESS_OUTPUT:
 				listener.processOutputEvent(object);

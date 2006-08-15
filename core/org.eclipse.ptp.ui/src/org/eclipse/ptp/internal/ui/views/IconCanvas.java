@@ -26,6 +26,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.ptp.internal.core.PNode;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.ptp.internal.ui.hover.IconHover;
 import org.eclipse.ptp.ui.hover.IIconInformationControl;
@@ -1579,6 +1580,7 @@ public class IconCanvas extends Canvas {
 				int index = findSelectedIndex(row_count, col_count);
 				if (index > -1 && index < total) {
 					Object obj = getObject(index);
+					
 					int x_loc = e_offset_x + ((col_count) * getElementWidth());
 					int y_loc = e_offset_y + ((row_count) * getElementHeight()) - verticalScrollOffset;
 					if (col_count == 0 && isDisplayRuler()) {

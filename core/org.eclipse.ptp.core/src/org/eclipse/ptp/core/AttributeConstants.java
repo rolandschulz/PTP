@@ -29,7 +29,8 @@ public interface AttributeConstants {
 	public static final int ATTRIB_CLASS_QUEUE = 6;
 	public static final int NUM_ATTRIB_CLASSES = 7;
 
-	public static final String ATTRIB_MACHINEID = "ATTRIB_MACHINEID";
+	public static final String ATTRIB_MACHINEID = "Machine ID";
+	public static final String ATTRIB_MACHINE_NAME_PREFIX = "Machine";
 	
 	public static final String ATTRIB_JOBID = "ATTRIB_JOBID";
 	
@@ -40,12 +41,13 @@ public interface AttributeConstants {
 	public static final String ATTRIB_ISREGISTERED = "ATTRIB_ISREGISTERED";
 	
 	/* node attributes */
-	public static final String ATTRIB_NODE_NAME = "ATTRIB_NODE_NAME";
-	public static final String ATTRIB_NODE_NUMBER = "ATTRIB_NODE_NUMBER";
-	public static final String ATTRIB_NODE_STATE = "ATTRIB_NODE_STATE";
-	public static final String ATTRIB_NODE_GROUP = "ATTRIB_NODE_GROUP";
-	public static final String ATTRIB_NODE_USER = "ATTRIB_NODE_USER";
-	public static final String ATTRIB_NODE_MODE = "ATTRIB_NODE_MODE";
+	public static final String ATTRIB_NODE_NUMBER = "Node Number";
+	public static final String ATTRIB_NODE_NAME = "Node Name";
+	public static final String ATTRIB_NODE_NAME_PREFIX = "Node";
+	public static final String ATTRIB_NODE_STATE = "Status";
+	public static final String ATTRIB_NODE_GROUP = "Group Owner";
+	public static final String ATTRIB_NODE_USER = "User Owner";
+	public static final String ATTRIB_NODE_MODE = "Mode";
 
 	/* process attributes */
 	public static final String ATTRIB_PROCESS_PID = "ATTRIB_PROCESS_PID";

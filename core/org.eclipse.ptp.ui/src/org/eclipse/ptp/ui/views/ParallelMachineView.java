@@ -20,11 +20,15 @@ package org.eclipse.ptp.ui.views;
 
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.ptp.core.AttributeConstants;
+import org.eclipse.ptp.core.IModelListener;
 import org.eclipse.ptp.core.INodeListener;
 import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.events.IModelEvent;
 import org.eclipse.ptp.core.events.INodeEvent;
+import org.eclipse.ptp.core.events.ModelRuntimeNotifierEvent;
+import org.eclipse.ptp.core.events.ModelSysChangedEvent;
 import org.eclipse.ptp.internal.ui.MachineManager;
 import org.eclipse.ptp.internal.ui.ParallelImages;
 import org.eclipse.ptp.internal.ui.actions.ChangeMachineAction;
@@ -53,7 +57,7 @@ import org.eclipse.swt.widgets.TableItem;
  * @author clement chu
  * 
  */
-public class ParallelMachineView extends AbstractParallelSetView implements INodeListener {
+public class ParallelMachineView extends AbstractParallelSetView implements INodeListener, IModelListener {
 	// actions
 	protected ParallelAction changeMachineAction = null;
 	// composite
@@ -335,7 +339,7 @@ public class ParallelMachineView extends AbstractParallelSetView implements INod
 		}
 		String[] keys = node.getAttributeKeys();
 		for (int i = 0; i < keys.length; i++) {
-			new TableItem(BLtable, SWT.NULL).setText(new String[] { ((MachineManager) manager).getNodeAttributeName(keys[i]), node.getAttribute(keys[i]).toString() });
+			new TableItem(BLtable, SWT.NULL).setText(new String[] { keys[i], node.getAttribute(keys[i]).toString() });
 		}
 		IPProcess procs[] = node.getSortedProcesses();
 		if (procs != null) {
@@ -387,8 +391,15 @@ public class ParallelMachineView extends AbstractParallelSetView implements INod
 		System.out.println("------------ machine execStatusChangeEvent");
 		refresh();
 	}
-	public void sysStatusChangeEvent(Object object) {
+	public void sysStatusChangeEvent() {
 		System.out.println("------------ machine sysStatusChangeEvent");
+		refresh();
+	}
+	
+	public void majorSystemChangeEvent() {
+		System.out.println("------------ machine majorSystemChangeEvent");
+		manager.clear();
+		initialView();
 		refresh();
 	}
 	public void processOutputEvent(Object object) {
@@ -411,8 +422,17 @@ public class ParallelMachineView extends AbstractParallelSetView implements INod
 	public void nodeEvent(INodeEvent event) {
 		// only redraw if the current set contain the node
 		IPNode node = event.getNode();
-		if (((MachineManager) manager).isCurrentSetContainNode(node.getMachine().getIDString(), node.getIDString())) {
+		if (node != null && ((MachineManager) manager).isCurrentSetContainNode(node.getMachine().getIDString(), node.getIDString())) {
 			refresh(false);
 		}		
+	}
+	
+	public void modelEvent(IModelEvent event) {
+		if(event instanceof ModelSysChangedEvent) {
+			if(((ModelSysChangedEvent)event).getType() == ModelSysChangedEvent.MAJOR_SYS_CHANGED) {
+				manager.clear();
+				initialView();
+			}
+		}
 	}
 }

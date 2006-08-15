@@ -63,6 +63,8 @@ public interface IPUniverse /*extends IPElement*/ {
 	 */
 	public IPMachine findMachineById(String machine_id);
 	
+	public IPMachine findMachineByGlobalId(String machin_id);
+	
 	/**
 	 * Returns all the Jobs that are visible by this Universe, or null if there
 	 * are none.
@@ -95,20 +97,6 @@ public interface IPUniverse /*extends IPElement*/ {
 	 * @return The Job object if found, else null
 	 */
 	public IPJob findJobByName(String jname);
-
-	/**
-	 * Given a Node name, returns the Node object located on one of the Machines
-	 * in this Universe. Returns null if the Node cannot be found. This method
-	 * traverses the Machines.
-	 * 
-	 * @param nname
-	 *            A name of a Job to search for in this Universe
-	 * @return The Node object if found, else null
-	 */
-	public IPNode findNodeByName(String nname);
-	
-	
-	public IPNode findNodeByHostname(String nname);
 
 	/**
 	 * Given a Process name, returns the Process object located on one of the

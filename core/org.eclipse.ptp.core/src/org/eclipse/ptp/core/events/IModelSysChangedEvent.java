@@ -27,6 +27,7 @@ import org.eclipse.ptp.core.IPElement;
 public interface IModelSysChangedEvent extends IModelEvent {
 	public final static int MONITORING_SYS_CHANGED = 0;
 	public final static int SYS_STATUS_CHANGED = 1;
+	public final static int MAJOR_SYS_CHANGED = 2;
 	
 	public int getType();
 	public IPElement getElement();

@@ -19,8 +19,6 @@
 package org.eclipse.ptp.rtsystem;
 
 public interface IRuntimeListener {
-	public void runtimeNodeStatusChange(String ID);
-
 	public void runtimeProcessOutput(String ID, String output);
 
 	public void runtimeJobExited(String ID);
@@ -29,5 +27,5 @@ public interface IRuntimeListener {
 
 	public void runtimeNewJob(String ID);
 	
-	public void runtimeNodeGeneralChange(String ID, String key, String value);
+	public void runtimeNodeGeneralChange(String[] keys, String[] values);
 }

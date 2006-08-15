@@ -19,9 +19,7 @@ import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener;
 import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeErrorEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeNewJobEvent;
-import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeNodeAttributeEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeNodesEvent;
-import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeProcessAttributeEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeProcessesEvent;
 
 public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRuntimeProxy, IProxyRuntimeEventListener {
@@ -49,6 +47,7 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
 		return ((ProxyRuntimeProcessesEvent)event).getNumProcs();
 	}
 	
+	/*
 	public String[] getProcessAttributesBlocking(int jobID, int procID, String[] keys) throws IOException {
 		setWaitEvent(IProxyRuntimeEvent.EVENT_RUNTIME_PROCATTR);
 		getProcessAttribute(jobID, procID, keys);
@@ -62,14 +61,18 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
 		IProxyRuntimeEvent event = waitForRuntimeEvent();
 		return ((ProxyRuntimeProcessAttributeEvent)event).getValues();
 	}
+	*/
 	
+	/*
 	public int getNumNodesBlocking(int machineID) throws IOException {
 		setWaitEvent(IProxyRuntimeEvent.EVENT_RUNTIME_NODES);
 		getNodes(machineID);
 		IProxyRuntimeEvent event = waitForRuntimeEvent();
 		return ((ProxyRuntimeNodesEvent)event).getNumNodes();
 	}
+	*/
 	
+	/*
 	public String[] getNodeAttributesBlocking(int machID, int nodeID, String[] keys) throws IOException {
 		setWaitEvent(IProxyRuntimeEvent.EVENT_RUNTIME_NODEATTR);
 		getNodeAttribute(machID, nodeID, keys);
@@ -83,6 +86,7 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
 		IProxyRuntimeEvent event = waitForRuntimeEvent();
 		return ((ProxyRuntimeNodeAttributeEvent)event).getValues();
 	}
+	*/
 	
 	public boolean startup(final IProgressMonitor monitor) {
 		System.out.println("OMPIProxyRuntimeClient - firing up proxy, waiting for connecting.  Please wait!  This can take a minute . . .");

@@ -38,8 +38,7 @@ public interface IPMachine extends IPElement {
 	 */
 	public IPNode[] getNodes();
 	
-	public String getMachineNumber();
-	public int getMachineNumberInt();
+	public String getMachineId();
 	
 	/**
 	 * Returns a sorted array of all the Nodes in this Machine. May return null

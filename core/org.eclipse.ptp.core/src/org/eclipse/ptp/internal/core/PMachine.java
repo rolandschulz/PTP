@@ -39,21 +39,16 @@ public class PMachine extends Parent implements IPMachineControl {
 
 	protected String arch = "undefined";
 
-	public PMachine(IPUniverseControl uni, String name, int machineID) {
-		super(uni, name, ""+machineID+"", P_MACHINE);
+	public PMachine(IPUniverseControl uni, String name, String machineID) {
+		super(uni, name, machineID, P_MACHINE);
 		//System.out.println("Name is " + name + ", key is " + machineID);
 		//System.out.println("NAME_TAG = " + NAME_TAG + ", toString = "
 		//		+ this.toString() + ", key# = " + this.getID());
-		this.setAttribute(AttributeConstants.ATTRIB_MACHINEID, new Integer(machineID));
+		this.setAttribute(AttributeConstants.ATTRIB_MACHINEID, machineID);
 	}
 
-	public String getMachineNumber() {
-		return ""+((Integer) this.getAttribute(AttributeConstants.ATTRIB_MACHINEID)).intValue()+"";
-	}
-	
-	public int getMachineNumberInt()
-	{
-		return ((Integer) this.getAttribute(AttributeConstants.ATTRIB_MACHINEID)).intValue();
+	public String getMachineId() {
+		return (String)this.getAttribute(AttributeConstants.ATTRIB_MACHINEID);
 	}
 
 	public IPUniverse getUniverse() {
