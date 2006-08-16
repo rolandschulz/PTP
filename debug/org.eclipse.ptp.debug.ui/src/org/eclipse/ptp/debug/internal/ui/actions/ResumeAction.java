@@ -54,6 +54,7 @@ public class ResumeAction extends DebugAction {
 		if (manager instanceof UIDebugManager) {
 			try {
 				((UIDebugManager)manager).resume();
+				setEnabled(false);
 			} catch (CoreException e) {
 				PTPDebugUIPlugin.errorDialog(getShell(), "Error", e.getStatus());				
 			}

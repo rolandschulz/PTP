@@ -55,6 +55,7 @@ public class StepOverAction extends StepAction {
 		if (manager instanceof UIDebugManager) {
 			try {
 				((UIDebugManager)manager).stepOver();
+				setEnabled(false);
 			} catch (CoreException e) {
 				PTPDebugUIPlugin.errorDialog(getShell(), "Error", e.getStatus());				
 			}

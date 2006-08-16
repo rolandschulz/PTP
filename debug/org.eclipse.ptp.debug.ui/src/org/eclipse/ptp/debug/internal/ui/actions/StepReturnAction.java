@@ -55,6 +55,7 @@ public class StepReturnAction extends StepAction {
 		if (manager instanceof UIDebugManager) {
 			try {
 				((UIDebugManager)manager).stepReturn();
+				setEnabled(false);
 			} catch (CoreException e) {
 				PTPDebugUIPlugin.errorDialog(getShell(), "Error", e.getStatus());				
 			}
