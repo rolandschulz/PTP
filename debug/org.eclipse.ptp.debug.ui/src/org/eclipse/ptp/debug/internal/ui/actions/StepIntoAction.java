@@ -55,6 +55,7 @@ public class StepIntoAction extends StepAction {
 		if (manager instanceof UIDebugManager) {
 			try {
 				((UIDebugManager)manager).stepInto();
+				setEnabled(false);
 			} catch (CoreException e) {
 				PTPDebugUIPlugin.errorDialog(getShell(), "Error", e.getStatus());				
 			}

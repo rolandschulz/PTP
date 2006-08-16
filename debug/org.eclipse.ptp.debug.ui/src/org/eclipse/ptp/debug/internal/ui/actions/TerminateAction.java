@@ -55,6 +55,7 @@ public class TerminateAction extends DebugAction {
 		if (manager instanceof UIDebugManager) {
 			try {
 				((UIDebugManager)manager).terminate();
+				setEnabled(false);
 			} catch (CoreException e) {
 				PTPDebugUIPlugin.errorDialog(getShell(), "Error", e.getStatus());				
 			}
