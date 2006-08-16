@@ -25,7 +25,7 @@
 
 struct List
 {
-	int					l_nel;
+	int						l_nel;
 	struct ListElement *	l_head;
 	struct ListElement *	l_scan;
 	struct ListElement **	l_tail;
@@ -34,7 +34,7 @@ typedef struct List	List;
 
 struct ListElement
 {
-	void *				l_value;
+	void *					l_value;
 	struct ListElement *	l_next;
 };
 typedef struct ListElement	ListElement;
@@ -48,6 +48,7 @@ extern void *	RemoveFirst(List *);
 extern void		DestroyList(List *, void (*)());
 extern void		SetList(List *);
 extern void *	GetListElement(List *);
+extern void *	GetFirstElement(List *);
 extern int		EmptyList(List *);
 extern int		InList(List *, void *);
 extern int		SizeOfList(List *);
