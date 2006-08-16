@@ -36,11 +36,14 @@ program_unit
 	;
 
 // R203
+// modified to factor out common optional prefix
 external_subprogram
-options {k=1;}
-	:	(( prefix )? 'FUNCTION') => function_subprogram
-	|	subroutine_subprogram
-	;
+        :       function_or_subroutine_subprogram
+        ;
+
+function_or_subroutine_subprogram
+        :       (prefix)? (function_subprogram_body | subroutine_subprogram_body)
+        ;
 
 // R204
 // TODO putback
@@ -103,11 +106,9 @@ internal_subprogram_part
 	;
 
 // R211
-// TODO putback
 internal_subprogram
-	:	function_subprogram
-//	|	subroutine_subprogram
-	;
+        :       function_or_subroutine_subprogram
+        ;
 
 // R212
 specification_stmt
@@ -1121,7 +1122,7 @@ intent_stmt
 	;
 
 dummy_arg_name_list
-    : dummy_arg_name ( dummy_arg_name )*
+    : dummy_arg_name ( ',' dummy_arg_name )*
     ;
 
 // R537
@@ -2837,9 +2838,9 @@ module_stmt
 // R1106
 end_module_stmt
 options {k=2;}
-	:	('END' 'MODULE') => 'END' 'MODULE' ( module_name )?
-	|	'END'
-	;
+        :       ('END' 'MODULE') => 'END' 'MODULE' ( module_name )?
+        |       'END'
+        ;
 
 module_name
     :    name
@@ -2853,11 +2854,9 @@ module_subprogram_part
 	;
 
 // R1108
-// TODO putback
 module_subprogram
-	:	function_subprogram
-//	|	subroutine_subprogram
-	;
+        :       function_or_subroutine_subprogram
+        ;
 
 // R1109
 use_stmt
@@ -2921,23 +2920,21 @@ block_data
 	;
 
 // R1117
-// TODO putback
 block_data_stmt
-	:	'BLOCK'
-		'DATA'
-//		( block_data_name )?
+	:	'BLOCK' 'DATA'
+		( block_data_name )?
 	;
 
 // R1118
-// TODO putback
 end_block_data_stmt
-    : 'END'
-//       ( 'BLOCK' 'DATA' ( block_data_name )? )?
-    ;
+options {k=3;}
+	:	('END' 'BLOCK' 'DATA') => 'END' 'BLOCK' 'DATA' ( block_data_name )?
+	|	'END'
+	;
 
 block_data_name
-    :    name
-    ;
+	:	T_IDENT
+	;
 
 /*
 Section 12:
@@ -2970,7 +2967,7 @@ end_interface_stmt
 // R1205
 // TODO putback
 interface_body
-	:	function_stmt // ( specification_part )? end_function_stmt
+	:	(prefix)? function_stmt_body // ( specification_part )? end_function_stmt
 //	|	subroutine_stmt ( specification_part )? end_subroutine_stmt
 	;
 
@@ -3143,8 +3140,9 @@ alt_return_spec
 
 // R1223
 // TODO putback
-function_subprogram
-	:	function_stmt
+// factored out optional prefix in function_stmt from function_subprogram
+function_subprogram_body
+	:	function_stmt_body
 //		( specification_part )?
 //		( execution_part )?
 //		( internal_subprogram_part )?
@@ -3152,14 +3150,15 @@ function_subprogram
 	;
 
 // R1224
-function_stmt
-	:	( prefix )? 'FUNCTION' // function_name
-//		'(' ( dummy_arg_name_list )? ')' ( suffix )?
+// factored out optional prefix from function_stmt
+function_stmt_body
+	:	'FUNCTION' function_name
+		'(' ( dummy_arg_name_list )? ')' ( suffix )?
 	;
 
 function_name
-    :    name
-    ;
+	:	T_IDENT
+	;
 
 // R1225
 proc_language_binding_spec
@@ -3168,7 +3167,7 @@ proc_language_binding_spec
 
 // R1226
 dummy_arg_name
-	:	name
+	:	T_IDENT
 	;
 
 // R1227
@@ -3196,16 +3195,17 @@ result_name
     ;
 
 // R1230
-// TODO putback
 end_function_stmt
-    : 'END'
-//       ( 'FUNCTION' ( function_name )? )?
-    ;
+options {k=2;}
+        :       ('END' 'FUNCTION') => 'END' 'FUNCTION' ( function_name )?
+        |       'END'
+        ;
 
 // R1231
 // TODO putback
-subroutine_subprogram
-	:	subroutine_stmt
+// factored out optional prefix in subroutine_stmt from subroutine_subprogram
+subroutine_subprogram_body
+	:	subroutine_stmt_body
 //		( specification_part )?
 //		( execution_part )?
 //		( internal_subprogram_part )?
@@ -3213,8 +3213,9 @@ subroutine_subprogram
 	;
 
 // R1232
-subroutine_stmt
-    :     ( prefix )? 'SUBROUTINE' subroutine_name
+// factored out optional prefix from subroutine_stmt
+subroutine_stmt_body
+    :     'SUBROUTINE' subroutine_name
           ( '(' ( dummy_arg_list )? ')' ( proc_language_binding_spec )? )?
     ;
 
@@ -3225,18 +3226,18 @@ dummy_arg
 	;
 
 dummy_arg_list
-    :    dummy_arg ( dummy_arg )*
+    :    dummy_arg ( ',' dummy_arg )*
     ;
 
 // R1234
-// TODO putback
 end_subroutine_stmt
-    :    'END'
-//         ( 'SUBROUTINE' ( subroutine_name )? )?
-    ;
+options {k=2;}
+        :       ( 'END' 'SUBROUTINE' ) => 'END' 'SUBROUTINE' ( subroutine_name )?
+        |       'END'
+        ;
 
 subroutine_name
-    :    name
+    :    T_IDENT
     ;
 
 // R1235
