@@ -1,4 +1,4 @@
-/*
+ /*
  * NOTES
  *
  * R303, R406, R417, R427, R428 underscore - added _ to rule (what happened to it?) * R410 sign - had '?' rather than '-'
@@ -29,8 +29,7 @@ program
 
 // R202
 program_unit
-options {k=1;}
-	:	('PROGRAM') => main_program
+	:	main_program
 	|	external_subprogram
 	|	module
 	|	block_data
@@ -2810,12 +2809,12 @@ program_stmt
 	;
 
 // R1103
-// TODO putback
 end_program_stmt
-    :    'END'
-//         ( 'PROGRAM' ( program_name )? )?
-    ;
-
+options {k=2;}
+	:	('END' 'PROGRAM') => 'END' 'PROGRAM' ( program_name )?
+	|	'END'
+	;
+	
 program_name
     :    name
     ;
@@ -2837,8 +2836,10 @@ module_stmt
 
 // R1106
 end_module_stmt
-    :   'END' //( 'MODULE' ( module_name )? )?
-    ;
+options {k=2;}
+	:	('END' 'MODULE') => 'END' 'MODULE' ( module_name )?
+	|	'END'
+	;
 
 module_name
     :    name
