@@ -230,6 +230,15 @@ GetListElement(List *l)
 	return le->l_value;
 }
 
+void *
+GetFirstElement(List *l)
+{
+	if ( l == (List *)NULL || l->l_head == (ListElement *) NULL)
+		return (void *)NULL;
+		
+	return l->l_head->l_value;
+}
+
 int
 EmptyList(List *l)
 {
