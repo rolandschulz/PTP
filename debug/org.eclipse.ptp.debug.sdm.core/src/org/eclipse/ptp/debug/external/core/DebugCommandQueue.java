@@ -98,11 +98,14 @@ System.err.println("*** SEND COMMAND: " + currentCommand.getName() + ", tasks: "
 					queue.add(0, command);
 				}
 				if (command.canInterrupt() && currentCommand != null) {
-					currentCommand.doFlush();
-					try {
-						//To make sure all events fired via AsbtractDebugger, so wait 0.5 sec here
-						queue.wait(500);
-					} catch (InterruptedException e) {}
+					//only do flush if the current command cannot interrupt
+					if (!currentCommand.canInterrupt()) { 
+						currentCommand.doFlush();
+						try {
+							//To make sure all events fired via AsbtractDebugger, so wait 0.5 sec here
+							queue.wait(500);
+						} catch (InterruptedException e) {}
+					}
 				}
 				queue.notifyAll();
 			}
