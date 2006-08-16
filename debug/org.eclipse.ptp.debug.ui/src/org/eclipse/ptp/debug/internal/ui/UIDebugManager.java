@@ -442,7 +442,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 		case CREATE_SET_TYPE:
 			BitList created_tasks = new BitList(cur_set.getElementHandler().getSetRoot().size());
 			for (int i = 0; i < elements.length; i++) {
-				created_tasks.set(convertToInt(elements[i].getName()));
+				created_tasks.set(convertToInt(elements[i].getID()));
 			}
 			try {
 				debugModel.createSet(getCurrentJobId(), cur_set.getID(), created_tasks);
@@ -483,7 +483,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 		case ADD_ELEMENT_TYPE:
 			BitList added_tasks = new BitList(cur_set.getElementHandler().getSetRoot().size());
 			for (int i = 0; i < elements.length; i++) {
-				added_tasks.set(convertToInt(elements[i].getName()));
+				added_tasks.set(convertToInt(elements[i].getID()));
 			}
 			try {
 				debugModel.addTasks(getCurrentJobId(), cur_set.getID(), added_tasks);
@@ -494,7 +494,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 		case REMOVE_ELEMENT_TYPE:
 			BitList removed_tasks = new BitList(cur_set.getElementHandler().getSetRoot().size());
 			for (int i = 0; i < elements.length; i++) {
-				removed_tasks.set(convertToInt(elements[i].getName()));
+				removed_tasks.set(convertToInt(elements[i].getID()));
 			}
 			try {
 				debugModel.removeTasks(getCurrentJobId(), cur_set.getID(), removed_tasks);
