@@ -23,5 +23,10 @@ public interface IResourceManagerChangedListener {
 	 * @param oldRmManager
 	 * @param newRmManager
 	 */
-	public void handleChanged(IResourceManager oldRmManager, IResourceManager newRmManager);
+	public void handleCurrentResourceManagerChanged(IResourceManager oldRmManager, IResourceManager newRmManager);
+	
+	/**
+	 * If resource managers were added or removed.
+	 */
+	public void handleResourceManagersAddedRemoved();
 }

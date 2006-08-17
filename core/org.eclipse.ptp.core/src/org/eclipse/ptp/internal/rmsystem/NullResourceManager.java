@@ -24,8 +24,8 @@ package org.eclipse.ptp.internal.rmsystem;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.IModelPresentation;
-import org.eclipse.ptp.internal.core.ModelManager;
 import org.eclipse.ptp.rmsystem.AbstractResourceManager;
+import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ptp.rtsystem.IControlSystem;
 
 /**
@@ -34,27 +34,28 @@ import org.eclipse.ptp.rtsystem.IControlSystem;
  */
 public class NullResourceManager extends AbstractResourceManager {
 	
-	private final ModelManager manager;
+	private final NullManager manager = new NullManager();
 
-	public NullResourceManager(ModelManager manager) {
-		super(null);
-		this.manager = manager;
+	public NullResourceManager() {
+		super(new NullResourceManagerFactory().createConfiguration());
 	}
-	
+
+	public NullResourceManager(IResourceManagerConfiguration configuration) {
+		super(configuration);
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManager#doStart()
 	 */
 	protected void doStart() throws CoreException {
-		// TODO Auto-generated method stub
-
+		// no-op
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManager#doStop()
 	 */
 	protected void doStop() throws CoreException {
-		// TODO Auto-generated method stub
-
+		// no-op
 	}
 
 	/* (non-Javadoc)

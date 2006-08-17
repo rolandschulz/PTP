@@ -24,12 +24,11 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
-import org.eclipse.core.runtime.Preferences;
+
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.core.AttributeConstants;
 import org.eclipse.ptp.core.IPMachine;
 import org.eclipse.ptp.core.IPNode;
-import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.rtsystem.IMonitoringSystem;
 import org.eclipse.ptp.rtsystem.IRuntimeListener;
 
@@ -48,30 +47,25 @@ public class SimulationMonitoringSystem implements IMonitoringSystem {
 	protected int numMachines = 1;
 	protected int[] numNodes;
 	
-	public SimulationMonitoringSystem() {
-		Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
-		int prefNumMachines = preferences.getInt(PreferenceConstants.SIMULATION_NUM_MACHINES);
-		System.out.println("User selected "+prefNumMachines+" simulated machines.");
-		if(prefNumMachines < 1) {
-			preferences.setValue(PreferenceConstants.SIMULATION_NUM_MACHINES, 1);
-			preferences.setValue(PreferenceConstants.SIMULATION_MACHINE_NODE_PREFIX + "0", 256);
-			prefNumMachines = 1;
-
-			PTPCorePlugin.getDefault().savePluginPreferences();
+	public SimulationMonitoringSystem(int numMachines, int[] numNodes) {
+		System.out.println("User selected "+numMachines+" simulated machines.");
+		if(numMachines < 1) {
+			this.numMachines = 1;
 
 			System.err.println("No existing / invalid number of machines to to simulate detected.  Default " + "number of machines set to 1.  Set using the PTP preferences -> simulation page.");
 			numNodes = new int[1];
 			numNodes[0] = 256;
 		}
 		else {
-			numNodes = new int[prefNumMachines];
-			for(int i=0; i<prefNumMachines; i++) {
-				int nn = preferences.getInt(PreferenceConstants.SIMULATION_MACHINE_NODE_PREFIX + ""+(i)+"");
-				System.out.println("SimPreferences: Machine "+(i)+" = "+nn+" nodes");
-				numNodes[i] = nn;
+			if (numMachines != numNodes.length) {
+				throw new IllegalArgumentException("the array numNodes must be of length numMachines");
+			}
+			for(int i=0; i<numMachines; i++) {
+				System.out.println("SimPreferences: Machine "+(i)+" = "+numNodes[i]+" nodes");
 			}
 		}
-		numMachines = prefNumMachines;
+		this.numMachines = numMachines;
+		this.numNodes = (int[]) numNodes.clone();
 	}
 	
 	public void startup() {
@@ -291,7 +285,7 @@ public class SimulationMonitoringSystem implements IMonitoringSystem {
 				s = (String) nodeGroupMap.get(nodeName);
 			}
 			
-			retstr[i] = new String(s);
+			retstr[i] = new String(s != null ? s : "");
 			//System.out.println("ret["+i+"] = '"+retstr[i]+"'");
 		}
 		
@@ -313,5 +307,10 @@ public class SimulationMonitoringSystem implements IMonitoringSystem {
 
 		
 		return allvals;
+	}
+
+	public void initiateDiscovery() throws CoreException {
+		// TODO Auto-generated method stub
+		
 	}
 }

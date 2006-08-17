@@ -21,12 +21,9 @@
  */
 package org.eclipse.ptp.rmsystem;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.ptp.core.IModelPresentation;
 import org.eclipse.ptp.rtsystem.IControlSystem;
 
@@ -34,17 +31,18 @@ import org.eclipse.ptp.rtsystem.IControlSystem;
  * @author rsqrd
  * 
  */
-public abstract class AbstractResourceManager implements IResourceManager {
+public abstract class AbstractResourceManager extends PlatformObject implements IResourceManager {
 	
-	private final List listeners = new ArrayList();
+	private final ListenerList listeners = new ListenerList();
 
 	private final IResourceManagerConfiguration config;
 
-	private IStatus status;
+	private ResourceManagerStatus status;
 	
 	public AbstractResourceManager(IResourceManagerConfiguration config)
 	{
 		this.config = config;
+		this.status = ResourceManagerStatus.INIT;
 	}
 	
 	/*
@@ -52,9 +50,19 @@ public abstract class AbstractResourceManager implements IResourceManager {
 	 * 
 	 * @see org.eclipse.ptp.rm.IResourceManager#addResourceManagerListener(org.eclipse.ptp.rm.IResourceManagerListener)
 	 */
-	public synchronized void addResourceManagerListener(IResourceManagerListener listener) {
-		if (!listeners.contains(listener))
-			listeners.add(listener);
+	public void addResourceManagerListener(IResourceManagerListener listener) {
+		listeners.add(listener);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.runtime.PlatformObject#getAdapter(java.lang.Class)
+	 */
+	public Object getAdapter(Class adapter) {
+		if (adapter.isInstance(this)) {
+			return this;
+		} else {
+			return super.getAdapter(adapter);
+		}
 	}
 
 	/**
@@ -71,6 +79,13 @@ public abstract class AbstractResourceManager implements IResourceManager {
 	 */
 	public abstract IControlSystem getControlSystem();
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManager#getDescription()
+	 */
+	public String getDescription() {
+		return config.getDescription();
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -78,12 +93,26 @@ public abstract class AbstractResourceManager implements IResourceManager {
 	 */
 	public abstract IModelPresentation getModelPresentation();
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManager#getName()
+	 */
+	public String getName() {
+		return config.getName();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManager#getStatus()
+	 */
+	public ResourceManagerStatus getStatus() {
+		return status;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.rm.IResourceManager#removeResourceManagerListener(org.eclipse.ptp.rm.IResourceManagerListener)
 	 */
-	public synchronized void removeResourceManagerListener(IResourceManagerListener listener) {
+	public void removeResourceManagerListener(IResourceManagerListener listener) {
 		listeners.remove(listener);
 	}
 
@@ -93,8 +122,11 @@ public abstract class AbstractResourceManager implements IResourceManager {
 	 * @see org.eclipse.ptp.rm.IResourceManager#start()
 	 */
 	public void start() throws CoreException {
-		doStart();
-		fireStarted();
+		if (!status.equals(ResourceManagerStatus.STARTED) &&
+				!status.equals(ResourceManagerStatus.ERROR)) {
+			doStart();
+			fireStarted();
+		}
 	}
 
 	/*
@@ -103,50 +135,35 @@ public abstract class AbstractResourceManager implements IResourceManager {
 	 * @see org.eclipse.ptp.rm.IResourceManager#stop()
 	 */
 	public void stop() throws CoreException {
-		getModelManager().shutdown();
-		doStop();
-		fireStopped();
-	}
-
-	public IStatus getStatus() {
-		return status;
-	}
-
-	protected void setStatus(IStatus status) {
-		final IStatus oldStatus = this.status;
-		this.status = status;
-		fireStatusChanged(oldStatus);
-	}
-
-	private void fireStatusChanged(IStatus oldStatus) {
-		// make a copy of the listener list in case one of the listeners
-		// wants to add or remove a listener
-		List tmpListeners = new ArrayList(listeners);
-		
-		for (Iterator tit = tmpListeners.iterator(); tit.hasNext(); ) {
-			IResourceManagerListener listener = (IResourceManagerListener) tit.next();
-			listener.handleStatusChanged(oldStatus, this);
+		if (status.equals(ResourceManagerStatus.STARTED)) {
+			doStop();
+			fireStopped();
 		}
 	}
 
 	private void fireStarted() {
-		// make a copy of the listener list in case one of the listeners
-		// wants to add or remove a listener
-		List tmpListeners = new ArrayList(listeners);
+		Object[] tmpListeners = listeners.getListeners();
 		
-		for (Iterator tit = tmpListeners.iterator(); tit.hasNext(); ) {
-			IResourceManagerListener listener = (IResourceManagerListener) tit.next();
+		for (int i = 0, n = tmpListeners.length; i < n; ++i) {
+			IResourceManagerListener listener = (IResourceManagerListener) tmpListeners[i];
 			listener.handleStarted(this);
 		}
 	}
 
-	private void fireStopped() {
-		// make a copy of the listener list in case one of the listeners
-		// wants to add or remove a listener
-		List tmpListeners = new ArrayList(listeners);
+	private void fireStatusChanged(ResourceManagerStatus oldStatus) {
+		Object[] tmpListeners = listeners.getListeners();
 		
-		for (Iterator tit = tmpListeners.iterator(); tit.hasNext(); ) {
-			IResourceManagerListener listener = (IResourceManagerListener) tit.next();
+		for (int i = 0, n = tmpListeners.length; i < n; ++i) {
+			IResourceManagerListener listener = (IResourceManagerListener) tmpListeners[i];
+			listener.handleStatusChanged(oldStatus, this);
+		}
+	}
+
+	private void fireStopped() {
+		Object[] tmpListeners = listeners.getListeners();
+		
+		for (int i = 0, n = tmpListeners.length; i < n; ++i) {
+			IResourceManagerListener listener = (IResourceManagerListener) tmpListeners[i];
 			listener.handleStopped(this);
 		}
 	}
@@ -160,5 +177,17 @@ public abstract class AbstractResourceManager implements IResourceManager {
 	 * @throws CoreException
 	 */
 	protected abstract void doStop() throws CoreException;
+
+	/**
+	 * @param status
+	 * @param fireEvent
+	 */
+	protected void setStatus(ResourceManagerStatus status, boolean fireEvent) {
+		final ResourceManagerStatus oldStatus = this.status;
+		this.status = status;
+		if (fireEvent) {
+			fireStatusChanged(oldStatus);
+		}
+	}
 
 }

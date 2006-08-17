@@ -21,12 +21,15 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.cdt.core,
  org.eclipse.cdt.ui,
  org.eclipse.ptp.core,
- org.eclipse.cdt.managedbuilder.core
-Eclipse-AutoStart: true
-Export-Package: org.eclipse.ptp.internal.ui,
- org.eclipse.ptp.ui,
+ org.eclipse.cdt.managedbuilder.core,
+ org.eclipse.ui.views
+Eclipse-LazyStart: true
+Export-Package: org.eclipse.ptp.ui,
  org.eclipse.ptp.ui.actions,
  org.eclipse.ptp.ui.listeners,
+ org.eclipse.ptp.ui.managers,
  org.eclipse.ptp.ui.model,
  org.eclipse.ptp.ui.preferences,
- org.eclipse.ptp.ui.views
+ org.eclipse.ptp.ui.utils,
+ org.eclipse.ptp.ui.views,
+ org.eclipse.ptp.ui.wizards

@@ -18,15 +18,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.rmsystem;
 
+import org.eclipse.ui.IMemento;
+
 public interface IResourceManagerConfiguration {
 	
-	/**
-	 * Returns the name of the resource manager.
-	 *
-	 * @return the name of the resource manager
-	 */
-	public String getName();
-
 	/**
 	 * Returns the description of the resource manager.
 	 *
@@ -35,24 +30,38 @@ public interface IResourceManagerConfiguration {
 	public String getDescription();
 
 	/**
+	 * Returns the name of the resource manager.
+	 *
+	 * @return the name of the resource manager
+	 */
+	public String getName();
+
+	/**
 	 * Returns the id of the resource manager
 	 *
 	 * @return the id of the resource manager
 	 */
 	public String getResourceManagerId();
+	
+	/**
+	 * Save the state of the configuration.
+	 * 
+	 * @param memento
+	 */
+	public void save(IMemento memento);
 
 	/**
-	 * Returns the resource manger host.
-	 *
-	 * @return the resource manger host
+	 * @param description
 	 */
-	public String getHost();
+	public void setDescription(String description);
 
 	/**
-	 * Returns the resource manger port.
-	 *
-	 * @return the resource manger port
+	 * @param name
 	 */
-	public int getPort();
+	public void setName(String name);
 
+	/**
+	 * 
+	 */
+	public void setDefaultNameAndDesc();
 }

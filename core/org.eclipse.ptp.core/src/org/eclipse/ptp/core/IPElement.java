@@ -18,7 +18,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.core;
 
-public interface IPElement {
+import org.eclipse.core.runtime.IAdaptable;
+
+public interface IPElement extends IAdaptable {
 
 	/**
 	 * Returns an int version of the ID for this Element

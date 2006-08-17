@@ -22,8 +22,6 @@ import java.text.MessageFormat;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
-import org.eclipse.ptp.core.PTPCorePlugin;
-
 public class CoreMessages {
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.internal.core.CoreMessages";
 

@@ -21,6 +21,8 @@
  */
 package org.eclipse.ptp.rmsystem;
 
+import org.eclipse.ui.IMemento;
+
 
 /**
  * @author rsqrd
@@ -35,51 +37,22 @@ public interface IResourceManagerFactory {
 	/**
 	 * 
 	 */
-	public void setName(String name);
-
-	/**
-	 * 
-	 */
 	public String getId();
-
-	/**
-	 * 
-	 */
-	public String setId(String id);
-
-	/**
-	 * 
-	 */
-	public boolean getSupportLocal();
-
-	/**
-	 * 
-	 */
-	public void setSupportLocal(boolean value);
-	
-	/**
-	 * 
-	 */
-	public boolean getSupportRemote();
-
-	/**
-	 * 
-	 */
-	public void setSupportRemote(boolean value);
-	
-	/**
-	 * 
-	 */
-	public boolean getNeedPort();
-
-	/**
-	 * 
-	 */
-	public void setNeedPort(boolean value);
 
 	/**
 	 * @param configuration
 	 * @return
 	 */
 	IResourceManager create(IResourceManagerConfiguration configuration);
+
+	/**
+	 * @param memento
+	 * @return
+	 */
+	public IResourceManagerConfiguration loadConfiguration(IMemento memento);
+	
+	/**
+	 * @return
+	 */
+	public IResourceManagerConfiguration createConfiguration();
 }

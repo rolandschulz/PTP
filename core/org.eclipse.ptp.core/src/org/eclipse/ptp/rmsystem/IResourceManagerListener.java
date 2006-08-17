@@ -21,7 +21,6 @@
  */
 package org.eclipse.ptp.rmsystem;
 
-import org.eclipse.core.runtime.IStatus;
 
 /**
  * @author rsqrd
@@ -42,5 +41,10 @@ public interface IResourceManagerListener {
 	 * @param oldStatus
 	 * @param manager
 	 */
-	public void handleStatusChanged(IStatus oldStatus, IResourceManager manager);
+	public void handleStatusChanged(ResourceManagerStatus oldStatus, IResourceManager manager);
+	
+	/**
+	 * @param resourceManger
+	 */
+	public void handleContentsChanged(IResourceManager resourceManger);
 }
