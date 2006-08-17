@@ -22,14 +22,20 @@
 package org.eclipse.ptp.rmsystem;
 
 
+
 /**
  * @author rsqrd
  * 
  */
+/**
+ * @author rsqrd
+ *
+ */
 public abstract class AbstractResourceManagerFactory implements
 		IResourceManagerFactory {
 
-	private final String name;
+	private String name;
+	private String id;
 
 	/**
 	 * @param name
@@ -54,4 +60,14 @@ public abstract class AbstractResourceManagerFactory implements
 		return name;
 	}
 
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerFactory#getId()
+	 */
+	public String getId() {
+		return this.id;
+	}
 }

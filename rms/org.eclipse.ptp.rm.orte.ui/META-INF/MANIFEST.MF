@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: OMPI Resource Manager UI Plug-in
+Bundle-SymbolicName: org.eclipse.ptp.orte.ui;singleton:=true
+Bundle-Version: 1.0.0
+Bundle-Activator: org.eclipse.ptp.orte.ui.Activator
+Bundle-Vendor: Los Alamos National Laboratory
+Bundle-Localization: plugin
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.ptp.core,
+ org.eclipse.ptp.ui
+Eclipse-LazyStart: true

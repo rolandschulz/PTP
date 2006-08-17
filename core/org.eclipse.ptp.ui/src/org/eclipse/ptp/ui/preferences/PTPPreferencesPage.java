@@ -19,8 +19,8 @@
 package org.eclipse.ptp.ui.preferences;
 
 import java.io.File;
+
 import org.eclipse.core.runtime.Preferences;
-import org.eclipse.debug.internal.ui.SWTUtil;
 import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.PreferencePage;
@@ -32,6 +32,7 @@ import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.internal.core.CoreMessages;
 import org.eclipse.ptp.ui.PTPUIPlugin;
+import org.eclipse.ptp.ui.utils.SWTUtil;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;

@@ -339,9 +339,6 @@ public class SimulationControlSystem implements IControlSystem {
 		while (i.hasNext()) {
 			IRuntimeListener listener = (IRuntimeListener) i.next();
 			switch (event.getEventNumber()) {
-			case RuntimeEvent.EVENT_NODE_STATUS_CHANGE:
-				listener.runtimeNodeStatusChange(ne);
-				break;
 			case RuntimeEvent.EVENT_PROCESS_OUTPUT:
 				listener.runtimeProcessOutput(ne, event.getText());
 				break;

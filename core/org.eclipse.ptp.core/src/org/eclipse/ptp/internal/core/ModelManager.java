@@ -21,12 +21,12 @@ package org.eclipse.ptp.internal.core;
 import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.util.Date;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.debug.core.ILaunch;
@@ -38,15 +38,12 @@ import org.eclipse.ptp.core.IModelListener;
 import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.INodeListener;
 import org.eclipse.ptp.core.IPJob;
-import org.eclipse.ptp.core.IPMachine;
 import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.IPUniverse;
 import org.eclipse.ptp.core.IProcessListener;
 import org.eclipse.ptp.core.MonitoringSystemChoices;
 import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.core.PreferenceConstants;
-import org.eclipse.ptp.internal.core.elementcontrols.IPElementControl;
 import org.eclipse.ptp.core.events.IModelEvent;
 import org.eclipse.ptp.core.events.IModelRuntimeNotifierEvent;
 import org.eclipse.ptp.core.events.IModelSysChangedEvent;
@@ -92,6 +89,10 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 
 	private int currentControlSystem = -1;
 	private int currentMonitoringSystem = -1;
+	private final int theMSChoiceID;
+	private final int theCSChoiceID;
+	private int numMachines = 1;
+	private int[] numNodes = new int[]{255};
 	
 	/*
 	public boolean isParallelPerspectiveOpen() {
@@ -104,38 +105,28 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 	public ILaunchConfiguration getPTPConfiguration() {
 		return config;
 	}
-	public ModelManager() {
-		//PTPCorePlugin.getDefault().addPerspectiveListener(perspectiveListener);
-		Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
-		int MSChoiceID = preferences.getInt(PreferenceConstants.MONITORING_SYSTEM_SELECTION);
-		String MSChoice = MonitoringSystemChoices.getMSNameByID(MSChoiceID);
-		int CSChoiceID = preferences.getInt(PreferenceConstants.CONTROL_SYSTEM_SELECTION);
-		String CSChoice = ControlSystemChoices.getCSNameByID(CSChoiceID);
+
+	public ModelManager(int theMSChoiceID, int theCSChoiceID) {
+		this.theMSChoiceID = theMSChoiceID;
+		String MSChoice = MonitoringSystemChoices.getMSNameByID(theMSChoiceID);
+		this.theCSChoiceID = theCSChoiceID;
+		String CSChoice = ControlSystemChoices.getCSNameByID(theCSChoiceID);
 
 		System.out.println("Your Control System Choice: '"+CSChoice+"'");
 		System.out.println("Your Monitoring System Choice: '"+MSChoice+"'");
 		
-		if(ControlSystemChoices.getCSArrayIndexByID(CSChoiceID) == -1 || MonitoringSystemChoices.getMSArrayIndexByID(MSChoiceID) == -1) {
-			int MSI = MonitoringSystemChoices.ORTE;
-			int CSI = ControlSystemChoices.ORTE;
-			Preferences p = PTPCorePlugin.getDefault().getPluginPreferences();
-			p.setValue(PreferenceConstants.MONITORING_SYSTEM_SELECTION, MSI);
-			p.setValue(PreferenceConstants.CONTROL_SYSTEM_SELECTION, CSI);
-			PTPCorePlugin.getDefault().savePluginPreferences();
-
-			//PTPCorePlugin.errorDialog("Default Runtime System Set", "No previous (or invalid) control or monitoring system selected.\n\nDefault systems set to Open Runtime Environment (ORTE).  To change, use the Window->Preferences->PTP preferences page.", null);
-			System.err.println("No previous (or invalid) control or monitoring system selected.\n\nDefault systems set to Open Runtime Environment (ORTE).  To change, use the Window->Preferences->PTP preferences page.");
-			
-			MSChoiceID = preferences.getInt(PreferenceConstants.MONITORING_SYSTEM_SELECTION);
-			MSChoice = MonitoringSystemChoices.getMSNameByID(MSChoiceID);
-			CSChoiceID = preferences.getInt(PreferenceConstants.CONTROL_SYSTEM_SELECTION);
-			CSChoice = ControlSystemChoices.getCSNameByID(CSChoiceID);
-
-			System.out.println("Your Control System Choice: '"+CSChoice+"'");
-			System.out.println("Your Monitoring System Choice: '"+MSChoice+"'");
+		if(ControlSystemChoices.getCSArrayIndexByID(theCSChoiceID) == -1 || MonitoringSystemChoices.getMSArrayIndexByID(theMSChoiceID) == -1) {
+			throw new IllegalArgumentException("Illegal Control System and/or Monitoring System choices.");
 		}
 		//refreshRuntimeSystems(CSChoiceID, MSChoiceID);
 	}
+	
+	public ModelManager(int numMachines, int numNodes[]) {
+		this(MonitoringSystemChoices.SIMULATED, ControlSystemChoices.SIMULATED);
+		this.numMachines = numMachines;
+		this.numNodes = (int[]) numNodes.clone();
+	}
+	
 	public IControlSystem getControlSystem() {
 		return controlSystem;
 	}
@@ -149,16 +140,13 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		return currentMonitoringSystem; 
 	}
 	public void refreshRuntimeSystems(IProgressMonitor monitor, boolean force) throws CoreException {
-		Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
-		int MSChoiceID = preferences.getInt(PreferenceConstants.MONITORING_SYSTEM_SELECTION);
-		int CSChoiceID = preferences.getInt(PreferenceConstants.CONTROL_SYSTEM_SELECTION);
 		int curMSID = getControlSystemID();
 		int curCSID = getMonitoringSystemID();
-		if(force || curMSID != MSChoiceID || curCSID != CSChoiceID) {
+		if(force || curMSID != theMSChoiceID || curCSID != theCSChoiceID) {
 			if (monitor == null) {
 				monitor = new NullProgressMonitor();
 			}
-			refreshRuntimeSystems(CSChoiceID, MSChoiceID, monitor);
+			refreshRuntimeSystems(theCSChoiceID, theMSChoiceID, monitor);
 		}
 	}
 	public void refreshRuntimeSystems(int controlSystemID, int monitoringSystemID, IProgressMonitor monitor) throws CoreException {
@@ -195,7 +183,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			if(monitoringSystemID == MonitoringSystemChoices.SIMULATED && controlSystemID == ControlSystemChoices.SIMULATED) {
 				/* load up the control and monitoring systems for the simulation */
 				monitor.subTask("Starting simulation...");
-				monitoringSystem = new SimulationMonitoringSystem();
+				monitoringSystem = new SimulationMonitoringSystem(numMachines, numNodes);
 				monitor.worked(10);
 				controlSystem = new SimulationControlSystem();
 				monitor.worked(10);
@@ -301,174 +289,6 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		}
 	}
 
-//	/* setup the monitoring system */
-//	public void setupMS(IProgressMonitor monitor) throws CoreException {
-//		monitoringSystem.initiateDiscovery();
-//		
-//		
-//		
-//		String[] ne = monitoringSystem.getMachines();		
-//		monitor.beginTask("", ne.length * 2);
-//		for (int i = 0; i < ne.length; i++) {
-//			monitor.setTaskName("Creating machines...");
-//			if (monitor.isCanceled()) {
-//				throw new CoreException(Status.CANCEL_STATUS);
-//			}
-//
-//			String ids = ne[i].substring(new String("machine").length());
-//			int machID = (new Integer(ids)).intValue();
-//			
-//			PMachine mac = new PMachine(universe, ne[i], machID);
-//			universe.addChild(mac);
-//
-//			monitor.internalWorked(1);
-//			
-//			monitoringSystem.initiateDiscovery();
-//			
-////			String[] ne2 = monitoringSystem.getNodes(mac);
-////			System.out.println("MACHINE: " + ne[i]+" - #nodes = "+ne2.length);
-////			
-////			for(int j=0; j<ne2.length; j++) {
-////				PNode node = new PNode(mac, ne2[j], ""+j+"", j);
-////				mac.addChild(node);
-////			}
-//
-////			IProgressMonitor subMonitor = new SubProgressMonitor(monitor, 1);
-////			subMonitor.beginTask("", ne2.length);
-////			subMonitor.setTaskName("Creating nodes...");
-//			
-//			
-////			TAKEN OUT WHEN WE CHANGED THE MODEL
-////			if(monitoringSystem instanceof OMPIMonitoringSystem || monitoringSystem instanceof MPICH2MonitoringSystem) {
-////				int num_attribs = 5;
-////				String[] keys = new String[] {
-////					AttributeConstants.ATTRIB_NODE_NAME,
-////					AttributeConstants.ATTRIB_NODE_USER,
-////					AttributeConstants.ATTRIB_NODE_GROUP,
-////					AttributeConstants.ATTRIB_NODE_STATE,
-////					AttributeConstants.ATTRIB_NODE_MODE
-////				};
-////				String[] attribs = monitoringSystem.getAllNodesAttributes(mac, keys);
-////				if (attribs == null || attribs.length == 0) {
-////					return;
-////				}
-////
-////				for (int j = 0; j < attribs.length; j++)
-////					System.out.println("*** attribs[" + j + "] = " + attribs[j]);
-////
-////				for (int j = 0; j < ne2.length; j++) {
-////					if (subMonitor.isCanceled()) {
-////						throw new CoreException(Status.CANCEL_STATUS);
-////					}
-////					//node = new PNode(mac, ne2[j], "" + j + "", j);
-////					String nodename = ""+j+"";
-////					if(attribs.length > (j * num_attribs)) {
-////						nodename = attribs[(j * num_attribs)];
-////					}
-////					PNode node = new PNode(mac, ne2[j], "" + j + "", j);
-////					node.setAttribute(AttributeConstants.ATTRIB_NODE_NAME, nodename);
-////					System.out.println("NodeName According to ORTE = '"+node.getAttribute(AttributeConstants.ATTRIB_NODE_NAME)+"'");
-////					System.out.println("\t#attribs returned: "+attribs.length);
-////					
-////					if(attribs.length > (j * num_attribs) + 1) {
-////						node.setAttribute(AttributeConstants.ATTRIB_NODE_USER,
-////								attribs[(j * num_attribs) + 1]);
-////					}
-////					else {
-////						node.setAttribute(AttributeConstants.ATTRIB_NODE_USER, "UNKNOWN");
-////					}
-////					
-////					if(attribs.length > (j * num_attribs) + 2) {
-////						node.setAttribute(AttributeConstants.ATTRIB_NODE_GROUP,
-////								attribs[(j * num_attribs) + 2]);
-////					}
-////					else {
-////						node.setAttribute(AttributeConstants.ATTRIB_NODE_GROUP, "UNKNOWN");
-////					}
-////					
-////					if(attribs.length > (j * num_attribs) + 3) {
-////						node.setAttribute(AttributeConstants.ATTRIB_NODE_STATE,
-////							attribs[(j * num_attribs) + 3]);
-////					}
-////					else {
-////						node.setAttribute(AttributeConstants.ATTRIB_NODE_STATE, "up");
-////					}
-////					
-////					if(attribs.length > (j * num_attribs) + 4) {
-////						node.setAttribute(AttributeConstants.ATTRIB_NODE_MODE,
-////							attribs[(j * num_attribs) + 4]);
-////					}
-////					else {
-////						node.setAttribute(AttributeConstants.ATTRIB_NODE_MODE, "73");
-////					}					
-////					mac.addChild(node);
-////					subMonitor.worked(1);
-////				}
-////			}
-////			else if (monitoringSystem instanceof SimulationMonitoringSystem) {
-////				for(int j=0; j<ne2.length; j++) {
-////					if (subMonitor.isCanceled()) {
-////						throw new CoreException(Status.CANCEL_STATUS);
-////					}
-////					//System.out.println("node "+j);
-////					PNode node = new PNode(mac, ne2[j], ""+j+"", j);
-////					node.setAttribute(AttributeConstants.ATTRIB_NODE_NAME, 
-////							monitoringSystem.getNodeAttributes(node, new String[] {AttributeConstants.ATTRIB_NODE_NAME})[0]);
-////					node.setAttribute(AttributeConstants.ATTRIB_NODE_USER, 
-////							monitoringSystem.getNodeAttributes(node, new String[] {AttributeConstants.ATTRIB_NODE_USER})[0]);
-////					node.setAttribute(AttributeConstants.ATTRIB_NODE_GROUP, 
-////							monitoringSystem.getNodeAttributes(node, new String[] {AttributeConstants.ATTRIB_NODE_GROUP})[0]);
-////					node.setAttribute(AttributeConstants.ATTRIB_NODE_STATE, 
-////							monitoringSystem.getNodeAttributes(node, new String[] {AttributeConstants.ATTRIB_NODE_STATE})[0]);
-////					node.setAttribute(AttributeConstants.ATTRIB_NODE_MODE, 
-////							monitoringSystem.getNodeAttributes(node, new String[] {AttributeConstants.ATTRIB_NODE_MODE})[0]);
-////					
-////					mac.addChild(node);
-////				}
-////			}
-//		}
-//		ne = controlSystem.getJobs();
-//		if(ne != null) {
-//			for (int i = 0; i < ne.length; i++) {
-//				monitor.setTaskName("Creating jobs...");
-//				if (monitor.isCanceled()) {
-//					throw new CoreException(Status.CANCEL_STATUS);
-//				}
-//
-//				System.out.println("JOB: " + ne[i]);
-//				int x = 0;
-//				try {
-//					x = (new Integer(ne[i].substring(3))).intValue();
-//				} catch (NumberFormatException e) {
-//				}
-//				PJob job = new PJob(universe, ne[i], "" + (PJob.BASE_OFFSET + x) + "", x);
-//				universe.addChild(job);
-//				
-//				String[] ne2 = controlSystem.getProcesses(job);
-//				IProgressMonitor subMonitor = new SubProgressMonitor(monitor, 1);
-//				subMonitor.beginTask("", ne2.length);
-//				subMonitor.setTaskName("Creating processes...");
-//				for (int j = 0; j < ne2.length; j++) {		
-//					if (subMonitor.isCanceled()) {
-//						throw new CoreException(Status.CANCEL_STATUS);
-//					}
-//					IPProcessControl proc = new PProcess(job, ne[i]+"_process"+j, "" + j + "", "0", j, IPProcess.STARTING, "", "");
-//					job.addChild(proc);
-//					subMonitor.worked(1);
-//				}	
-//				try {
-//					getProcsStatusForNewJob(ne[i], job, new SubProgressMonitor(monitor, ne2.length));
-//				} catch (CoreException e) {
-//					universe.deleteJob(job);
-//					return;
-//				}
-//			}
-//		}
-//		monitor.worked(1);
-//		monitoringSystem.addRuntimeListener(this);
-//		controlSystem.addRuntimeListener(this);		
-//		monitor.done();
-//	}
 
 	/* given a Job, this contacts the monitoring system and populates the runtime 
 	 * model with the processes that correspond to that Job
@@ -817,6 +637,8 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			controlSystem.shutdown();
 		if (runtimeProxy != null)
 			runtimeProxy.shutdown();
+		currentControlSystem = -1;
+		currentMonitoringSystem = -1;
 	}
 	public void addNodeListener(INodeListener listener) {
 		nodeListeners.add(listener);
@@ -869,65 +691,6 @@ public class ModelManager implements IModelManager, IRuntimeListener {
             });
         }
 	}
-	/*
-	protected synchronized void fireState(int state, String arg) {
-		Iterator i = modelListeners.iterator();
-		while (i.hasNext()) {
-			IParallelModelListener listener = (IParallelModelListener) i.next();
-			switch (state) {
-			case STATE_START:
-				listener.start();
-				System.out.println("++++++++++++ Started ++++++++++++++");
-				break;
-			case STATE_RUN:
-				listener.run(arg);
-				break;
-			case STATE_EXIT:
-				System.out.println("++++++++++++ Exit ++++++++++++++");
-				listener.exit();
-				break;
-			case STATE_ABORT:
-				listener.abort();
-				break;
-			case STATE_STOPPED:
-				System.out.println("++++++++++++ Stopped ++++++++++++++");
-				listener.stopped();
-			}
-		}
-	}
-	protected synchronized void fireEvent(Object object, int event) {
-		Iterator i = modelListeners.iterator();
-		while (i.hasNext()) {
-			IParallelModelListener listener = (IParallelModelListener) i.next();
-			switch (event) {
-			case EVENT_MONITORING_SYSTEM_CHANGE:
-				listener.monitoringSystemChangeEvent(object);
-				break;
-			case EVENT_EXEC_STATUS_CHANGE:
-				listener.execStatusChangeEvent(object);
-				break;
-			case EVENT_SYS_STATUS_CHANGE:
-				listener.sysStatusChangeEvent();
-				break;
-			case EVENT_MAJOR_SYSTEM_CHANGE:
-				listener.majorSystemChangeEvent();
-				break;
-			case EVENT_PROCESS_OUTPUT:
-				listener.processOutputEvent(object);
-				break;
-			case EVENT_ERROR:
-				listener.errorEvent(object);
-				break;
-			case EVENT_UPDATED_STATUS:
-				listener.updatedStatusEvent();
-				break;
-			case EVENT_ALL_PROCESSES_STOPPED:
-				listener.execStatusChangeEvent(object);
-				break;
-			}
-		}
-	}
-	*/
 	protected String renderLabel(String name) {
 		String format = CoreMessages.getResourceString("ModelManager.{0}_({1})");
 		String timestamp = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM).format(new Date(System.currentTimeMillis()));

@@ -21,6 +21,9 @@ package org.eclipse.ptp.core;
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
@@ -31,12 +34,17 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ptp.internal.core.ModelManager;
+import org.eclipse.ptp.internal.rmsystem.ModelManagerResourceManager;
 import org.eclipse.ptp.internal.rmsystem.NullResourceManager;
+import org.eclipse.ptp.internal.rmsystem.NullResourceManagerFactory;
+import org.eclipse.ptp.internal.rmsystem.ResourceManagerPersistence;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerChangedListener;
@@ -51,6 +59,8 @@ import org.osgi.framework.BundleContext;
 
 public class PTPCorePlugin extends AbstractUIPlugin {
 	public static final String PLUGIN_ID = "org.eclipse.ptp.core";
+
+	private static final NullResourceManager NULL_RESOURCE_MANAGER = new NullResourceManager();
 
 	// The shared instance.
 	private static PTPCorePlugin plugin;
@@ -181,8 +191,11 @@ public class PTPCorePlugin extends AbstractUIPlugin {
 	private IDGenerator IDGen;
 
 	private IResourceManagerFactory[] resourceManagerFactories;
-	private IResourceManager[] resourceManagers;
-	private IResourceManager currentResourceManager;
+	private IResourceManager[] resourceManagers = new IResourceManager[0];
+	private IResourceManager currentResourceManager = NULL_RESOURCE_MANAGER;
+
+	private final ListenerList listeners = new ListenerList();
+	
 	/**
 	 * The constructor.
 	 */
@@ -197,12 +210,26 @@ public class PTPCorePlugin extends AbstractUIPlugin {
 		}
 		IDGen = new IDGenerator();
 	}
+	
+	public synchronized void addResourceManager(IResourceManager addedManager) {
+		final HashSet rms = new HashSet(Arrays.asList(resourceManagers));
+		rms.add(addedManager);
+		resourceManagers = (IResourceManager[]) rms.toArray(new IResourceManager[rms.size()]);
+		fireResourceManagersAddedRemoved();
+	}
+	
 	public void addResourceManagerChangedListener(IResourceManagerChangedListener listener) {
-		// TODO
-	}		
+		listeners.add(listener);
+	}
+
 	public IResourceManager getCurrentResourceManager() {
 		return currentResourceManager;
 	}
+	
+	public IModelManager getModelManager() {
+		return getCurrentResourceManager().getModelManager();
+	}
+	
 	/**
 	 * @return Returns the modelManager.
 	 */
@@ -210,9 +237,10 @@ public class PTPCorePlugin extends AbstractUIPlugin {
 		return currentResourceManager.getModelPresentation();
 	}
 	
-	public int getNewID() {
+	public synchronized int getNewID() {
 		return IDGen.getNewID();
 	}
+
 	/**
 	 * Returns the plugin's resource bundle,
 	 */
@@ -222,8 +250,14 @@ public class PTPCorePlugin extends AbstractUIPlugin {
 
 	public IResourceManagerFactory[] getResourceManagerFactories()
 	{
-		ArrayList configList = new ArrayList();
+		if (resourceManagerFactories != null) {
+			return resourceManagerFactories;
+		}
+		
+		System.out.println("In getResourceManagerFactories");
 
+		final ArrayList factoryList = new ArrayList();
+	
 		IExtensionRegistry registry = Platform.getExtensionRegistry();
 		IExtensionPoint extensionPoint = registry.getExtensionPoint("org.eclipse.ptp.core.resourcemanager");
 		final IExtension[] extensions = extensionPoint.getExtensions();
@@ -231,26 +265,29 @@ public class PTPCorePlugin extends AbstractUIPlugin {
 		for (int iext = 0; iext < extensions.length; ++iext) {
 			final IExtension ext = extensions[iext];
 			
-			IConfigurationElement[] elements = ext.getConfigurationElements();
+			final IConfigurationElement[] elements = ext.getConfigurationElements();
 		
 			for (int i=0; i< elements.length; i++)
 			{
 				IConfigurationElement ce = elements[i];
 				try {
 					AbstractResourceManagerFactory factory = (AbstractResourceManagerFactory) ce.createExecutableExtension("class");
-					factory.setName(ce.getAttribute("name"));
 					factory.setId(ce.getAttribute("id"));
-					factory.setSupportLocal(Boolean.valueOf(ce.getAttribute("supportLocal")).booleanValue());
-					factory.setSupportRemote(Boolean.valueOf(ce.getAttribute("supportRemote")).booleanValue());
-					factory.setNeedPort(Boolean.valueOf(ce.getAttribute("needPort")).booleanValue());
-					configList.add(factory);
+					factoryList.add(factory);
+					System.out.println("retrieved factory: " + factory.getName() + ", " + factory.getId());
 				} catch (CoreException e) {
-					e.printStackTrace();
+					log(e);
 				}
 			}
 		}
-		return (IResourceManagerFactory[]) configList.toArray(new IResourceManagerFactory[configList.size()]);
+		resourceManagerFactories =
+			(IResourceManagerFactory[]) factoryList.toArray(
+					new IResourceManagerFactory[factoryList.size()]);
+
+		System.out.println("leaving getResourceManagerFactories");
+		return resourceManagerFactories;
 	}
+
 	public IResourceManagerFactory getResourceManagerFactory(String id)
 	{
 		IResourceManagerFactory[] factories = getResourceManagerFactories();
@@ -259,12 +296,13 @@ public class PTPCorePlugin extends AbstractUIPlugin {
 			if (factories[i].getId().equals(id)) return factories[i];
 		}
 		
-		return null;
-	}
-	public IResourceManager[] getResourceManagers() {
-		return resourceManagers;
+		return new NullResourceManagerFactory();
 	}
 
+	public synchronized IResourceManager[] getResourceManagers() {
+		return resourceManagers;
+	}
+	
 	public String locateFragmentFile(String fragment, String file) {		
 		Bundle[] frags = Platform.getFragments(Platform.getBundle(PTPCorePlugin.PLUGIN_ID));
 		String os = Platform.getOS();
@@ -330,44 +368,120 @@ public class PTPCorePlugin extends AbstractUIPlugin {
 		refreshPluginActions();
 	}
 	
+	public synchronized void removeResourceManager(IResourceManager removedManager) {
+		removeResourceManagers(new IResourceManager[]{removedManager});
+	}
+	
 	public void removeResourceManagerChangedListener(IResourceManagerChangedListener listener) {
-		// TODO
+		listeners.remove(listener);
 	}
-	
-	public void setCurrentResourceManager(IResourceManager rmManager) {
-		try {
-			currentResourceManager.stop();
-		} catch (CoreException e) {
-			log(e.getMessage());
+
+	public void removeResourceManagers(IResourceManager[] removedRMs) {
+		final HashSet rms = new HashSet(Arrays.asList(resourceManagers));
+		rms.removeAll(Arrays.asList(removedRMs));
+		resourceManagers = (IResourceManager[]) rms.toArray(new IResourceManager[rms.size()]);
+		if (!rms.contains(currentResourceManager)) {
+			setCurrentResourceManager(getDefaultResourceManager());
 		}
-		
-		currentResourceManager = rmManager;
-		try {
-			currentResourceManager.start();
-		} catch (CoreException e) {
-			log(e.getMessage());
-		}		
+		fireResourceManagersAddedRemoved();
 	}
 	
+	public synchronized void setCurrentResourceManager(IResourceManager rmManager) {
+		IResourceManager oldRmManager = currentResourceManager;
+		currentResourceManager = (rmManager != null ? rmManager : NULL_RESOURCE_MANAGER);
+		fireCurrentResourceManagerChanged(oldRmManager, currentResourceManager);
+	}
+
 	/**
 	 * This method is called upon plug-in activation
 	 */
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
+
 		resourceManagerFactories = getResourceManagerFactories();
-		// TODO RMR this must be changed!
-		currentResourceManager = new NullResourceManager(new ModelManager());
-		resourceManagers = new IResourceManager[]{currentResourceManager};
+		// TODO need to fix this
+		if (true) {
+			Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
+			int MSChoiceID = preferences.getInt(PreferenceConstants.MONITORING_SYSTEM_SELECTION);
+			String MSChoice = MonitoringSystemChoices.getMSNameByID(MSChoiceID);
+			int CSChoiceID = preferences.getInt(PreferenceConstants.CONTROL_SYSTEM_SELECTION);
+			String CSChoice = ControlSystemChoices.getCSNameByID(CSChoiceID);
+
+			System.out.println("Your Control System Choice: '"+CSChoice+"'");
+			System.out.println("Your Monitoring System Choice: '"+MSChoice+"'");
+			
+			if (ControlSystemChoices.getCSArrayIndexByID(CSChoiceID) == -1 ||
+					MonitoringSystemChoices.getMSArrayIndexByID(MSChoiceID) == -1) {
+				MSChoiceID = MonitoringSystemChoices.ORTE;
+				CSChoiceID = ControlSystemChoices.ORTE;
+
+				System.err.println("No previous (or invalid) control or monitoring system selected.\n\nDefault systems set to Open Runtime Environment (ORTE).  To change, use the Window->Preferences->PTP preferences page.");
+				
+				MSChoice = MonitoringSystemChoices.getMSNameByID(MSChoiceID);
+				CSChoice = ControlSystemChoices.getCSNameByID(CSChoiceID);
+
+				System.out.println("Your Default Control System Choice: '"+CSChoice+"'");
+				System.out.println("Your Default Monitoring System Choice: '"+MSChoice+"'");
+			}
+			setCurrentResourceManager(new ModelManagerResourceManager(
+					new ModelManager(MSChoiceID, CSChoiceID), null));
+			//currentResourceManager.start();
+		}
+		else {
+			loadResourceManagers();
+		}
 	}
-	
+
 	/**
 	 * This method is called when the plug-in is stopped
 	 */
 	public void stop(BundleContext context) throws Exception {
+		saveResourceManagers();
 		stopResourceManagers();
+		setCurrentResourceManager(NULL_RESOURCE_MANAGER);
+		listeners.clear();
 		super.stop(context);
 	}
+
+	private void fireCurrentResourceManagerChanged(IResourceManager oldRmManager,
+			IResourceManager newRmManager) {
+		final Object[] tmpListeners = listeners.getListeners();
+		for (int i=0, n = tmpListeners.length; i < n; ++i) {
+			IResourceManagerChangedListener listener =
+				(IResourceManagerChangedListener) tmpListeners[i]; 
+			listener.handleCurrentResourceManagerChanged(oldRmManager, newRmManager);
+		}
+	}
+
+	private void fireResourceManagersAddedRemoved() {
+		final Object[] tmpListeners = listeners.getListeners();
+		for (int i=0, n = tmpListeners.length; i < n; ++i) {
+			IResourceManagerChangedListener listener =
+				(IResourceManagerChangedListener) tmpListeners[i]; 
+			listener.handleResourceManagersAddedRemoved();
+		}
+	}
+
+	private IResourceManager getDefaultResourceManager() {
+		return NULL_RESOURCE_MANAGER;
+	}
 	
+	private File getResourceManagersFile() {
+		return getStateLocation().append("resourceManagers.xml").toFile();
+	}
+
+	private void loadResourceManagers() {
+		ResourceManagerPersistence rmp = new ResourceManagerPersistence();
+		rmp.loadResourceManagers(getResourceManagersFile(), getResourceManagerFactories());
+		resourceManagers = rmp.getResourceManagers();
+		setCurrentResourceManager(rmp.getSavedCurrentResourceManager());
+	}
+
+	private void saveResourceManagers() {
+		ResourceManagerPersistence.saveResourceManagers(getResourceManagersFile(),
+				resourceManagers, currentResourceManager);
+	}
+
 	/**
 	 * stops all of the resource managers.
 	 * 
@@ -379,7 +493,4 @@ public class PTPCorePlugin extends AbstractUIPlugin {
 		}
 	}
 
-	public IModelManager getModelManager() {
-		return getCurrentResourceManager().getModelManager();
-	}
 }

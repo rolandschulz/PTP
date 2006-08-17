@@ -23,11 +23,19 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdapterFactory;
+import org.eclipse.core.runtime.IAdapterManager;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExtension;
+import org.eclipse.core.runtime.IExtensionPoint;
+import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
@@ -38,9 +46,14 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.ptp.core.IPElement;
 import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.internal.ui.JobManager;
-import org.eclipse.ptp.internal.ui.MachineManager;
+import org.eclipse.ptp.internal.ui.adapters.PropertyAdapterFactory;
+import org.eclipse.ptp.rmsystem.IResourceManager;
+import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
+import org.eclipse.ptp.ui.managers.JobManager;
+import org.eclipse.ptp.ui.managers.MachineManager;
+import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPageFactory;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IPerspectiveListener;
@@ -60,6 +73,8 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 	private static PTPUIPlugin plugin;
 	//Resource bundle.
 	private ResourceBundle resourceBundle;
+
+	private final HashMap configurationWizardPageFactories = new HashMap();
 	
 	private MachineManager machineManager = null;
 	private JobManager jobManager = null;
@@ -72,10 +87,19 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 	}
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
+		registerAdapterFactories();
+		retrieveConfigurationWizardPageFactories();
 		machineManager = new MachineManager();
 		jobManager = new JobManager();
 	}
 
+	private void registerAdapterFactories() {
+		IAdapterManager manager = Platform.getAdapterManager();
+		IAdapterFactory factory = new PropertyAdapterFactory();
+		manager.registerAdapters(factory, IResourceManager.class);
+		manager.registerAdapters(factory, IPElement.class);
+	}
+	
 	public void stop(BundleContext context) throws Exception {
 		super.stop(context);
 		machineManager.shutdown();
@@ -85,6 +109,10 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 		plugin = null;
 		resourceBundle = null;
 		jobList.clear();
+	}
+	
+	public RMConfigurationWizardPageFactory getRMConfigurationWizardPageFactory(IResourceManagerFactory factory) {
+		return (RMConfigurationWizardPageFactory) configurationWizardPageFactories.get(factory.getClass().getName());
 	}
 	
 	public static String getUniqueIdentifier() {
@@ -97,6 +125,7 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 	public MachineManager getMachineManager() {
 		return machineManager;
 	}
+	
 	public JobManager getJobManager() {
 		return jobManager;
 	}
@@ -316,4 +345,34 @@ public class PTPUIPlugin extends AbstractUIPlugin {
         public void awake(IJobChangeEvent event) {}
         public void aboutToRun(IJobChangeEvent event) {}
     };
+
+    private void retrieveConfigurationWizardPageFactories() {
+
+    	System.out.println("In retrieveConfigurationWizardPageFactories");
+    	configurationWizardPageFactories.clear();
+    	
+    	IExtensionRegistry registry = Platform.getExtensionRegistry();
+		IExtensionPoint extensionPoint = registry.getExtensionPoint("org.eclipse.ptp.ui.rmconfiguration");
+		final IExtension[] extensions = extensionPoint.getExtensions();
+		
+		for (int iext = 0; iext < extensions.length; ++iext) {
+			final IExtension ext = extensions[iext];
+			
+			final IConfigurationElement[] elements = ext.getConfigurationElements();
+		
+			for (int i=0; i< elements.length; i++)
+			{
+				IConfigurationElement ce = elements[i];
+				try {
+					RMConfigurationWizardPageFactory factory = (RMConfigurationWizardPageFactory) ce.createExecutableExtension("class");
+					Class rmFactoryClass = factory.getRMFactoryClass();
+					configurationWizardPageFactories.put(rmFactoryClass.getName(), factory);
+					System.out.println("wizard page factory: " + factory + " for class: " + rmFactoryClass);
+				} catch (CoreException e) {
+					log(e);
+				}
+			}
+		}
+	   	System.out.println("leaving retrieveConfigurationWizardPageFactories");
+    }
 }

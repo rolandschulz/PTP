@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="org.eclipse.ptp.ui.preferences.ptpPreferencesPage"
+            class="org.eclipse.ptp.orte.ui.preferences.OMPIPreferencePage"
+            id="org.eclipse.ptp.orte.ui.preferences.OMPIPreferencePage"
+            name="Open RTE">
+      </page>
+   </extension>
+
+</plugin>

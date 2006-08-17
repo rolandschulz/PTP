@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.0"?>
 <plugin>
+   <extension-point id="rmconfiguration" name="Resource Manager Configuration Wizard Pages" schema="schema/rmconfiguration.exsd"/>
 	<extension
 		point="org.eclipse.ui.views">
 		<category
@@ -33,12 +34,6 @@
          point="org.eclipse.ui.perspectiveExtensions">
       <perspectiveExtension
             targetID="org.eclipse.ptp.ui.PTPRunPerspective">
-         <view
-               ratio="0.4"
-               relative="org.eclipse.ptp.ui.views.ParallelJobView"
-               relationship="top"
-               id="org.eclipse.ptp.ui.views.ResourceManagerView">
-         </view>
       </perspectiveExtension>
    </extension>
 	<extension
@@ -77,26 +72,9 @@
             category="org.eclipse.ptp.ui.preferences.ptpPreferencesPage">
       </page>-->
       <page
-            name="%OMPIpreferencePage.name"
-            class="org.eclipse.ptp.ui.preferences.OMPIPreferencesPage"
-            id="org.eclipse.ptp.ui.preferences.ompiPreferencesPage"
-            category="org.eclipse.ptp.ui.preferences.ptpPreferencesPage">
-      </page>
-      <page
             name="%ViewerpreferencePage.name"
             class="org.eclipse.ptp.ui.preferences.PTPViewerPreferencesPage"
             id="org.eclipse.ptp.ui.preferences.viewerPreferencesPage"
-            category="org.eclipse.ptp.ui.preferences.ptpPreferencesPage">
-      </page>
-      <page
-            category="org.eclipse.ptp.ui.preferences.ptpPreferencesPage"
-            class="org.eclipse.ptp.ui.preferences.MPICH2PreferencesPage"
-            id="org.eclipse.ptp.ui.preferences.mpich2PreferencesPage"
-            name="%MPICH2preferencePage.name"/>
-      <page
-            name="%RMpreferencePage.name"
-            class="org.eclipse.ptp.ui.preferences.ResourceManagerPreferencesPage"
-            id="org.eclipse.ptp.ui.preferences.rmPreferencesPage"
             category="org.eclipse.ptp.ui.preferences.ptpPreferencesPage">
       </page>
    </extension>
@@ -134,26 +112,45 @@
          //-->
       </actionSet>
    </extension>
-   
    <extension
-         id="org.eclipse.ptp.ui.PSearchPage"
-         name="PSearchPage"
-         point="org.eclipse.search.searchPages">
-      <page
-            showScopeSection="false"
-            label="%PSearchPage.label"
-            icon="icons/search.gif"
-            class="org.eclipse.ptp.internal.ui.search.PSearchPage"
-            sizeHint="360, 160"
-            id="org.eclipse.ptp.ui.PSearchPage">
-      </page>
+         point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            id="org.eclipse.ptp.ui.resourceManager.popupuMenu"
+            objectClass="org.eclipse.ptp.rmsystem.IResourceManagerMenuContribution">
+         <menu
+               id="org.eclipse.ptp.ui.resourceManager.popupSubMenu"
+               label="%ResourceManagersMenu.label"
+               path="additions">
+            <groupMarker name="content"/>
+            <separator name="additions"/>
+         </menu>
+         <action
+               class="org.eclipse.ptp.ui.actions.StopResourceManagersObjectActionDelegate"
+               enablesFor="+"
+               icon="icons/rm/stop.gif"
+               id="org.eclipse.ptp.ui.actions.stopResourceManagersAction"
+               label="%StopResourceManagersAction.label"
+               menubarPath="org.eclipse.ptp.ui.resourceManager.popupSubMenu/content"
+               />
+         <action
+               class="org.eclipse.ptp.ui.actions.StartResourceManagersObjectActionDelegate"
+               enablesFor="+"
+               icon="icons/rm/start.gif"
+               id="org.eclipse.ptp.ui.actions.startResourceManagersAction"
+               label="%StartResourceManagersAction.label"
+               menubarPath="org.eclipse.ptp.ui.resourceManager.popupSubMenu/content"
+               />
+        <!-- //-->
+          <action
+               class="org.eclipse.ptp.ui.actions.SetCurrentResourceManagerObjectActionDelegate"
+               enablesFor="1"
+               icon="icons/rm/rm_current.gif"
+               id="org.eclipse.ptp.ui.actions.setCurrentResourceManagerAction"
+               label="%SetCurrentResourceManagerAction.label"
+               menubarPath="org.eclipse.ptp.ui.resourceManager.popupSubMenu/content"
+               />
+        <!-- //-->
+      </objectContribution>
    </extension>
-   <extension
-         point="org.eclipse.search.searchResultViewPages">
-      <viewPage
-            class="org.eclipse.ptp.internal.ui.search.PSearchResultPage"
-            searchResultClass="org.eclipse.ptp.internal.ui.search.PSearchResult"
-            id="org.eclipse.ptp.ui.PSearchResultPage">
-      </viewPage>
-   </extension> 
+   
 </plugin>

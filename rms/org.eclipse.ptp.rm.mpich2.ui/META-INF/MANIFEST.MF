@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: MPICH2 Resource Manager UI Plug-in
+Bundle-SymbolicName: org.eclipse.ptp.mpich2.ui; singleton:=true
+Bundle-Version: 1.0.0
+Bundle-Activator: org.eclipse.ptp.mpich2.ui.Activator
+Bundle-Vendor: Los Alamos National Laboratory
+Bundle-Localization: plugin
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.ptp.core,
+ org.eclipse.debug.ui,
+ org.eclipse.ptp.ui
+Eclipse-LazyStart: true

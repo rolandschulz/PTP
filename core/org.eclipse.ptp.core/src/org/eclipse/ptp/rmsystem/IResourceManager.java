@@ -19,15 +19,12 @@
 package org.eclipse.ptp.rmsystem;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.IModelPresentation;
 import org.eclipse.ptp.rtsystem.IControlSystem;
 
-public interface IResourceManager {
-	
-	public static final int STATUS_OK = 0;
-	public static final int STATUS_ERROR = -1;
+public interface IResourceManager extends IAdaptable, IResourceManagerMenuContribution {
 	
 	/**
 	 * @param listener
@@ -37,27 +34,37 @@ public interface IResourceManager {
 	/**
 	 * @return
 	 */
-	public IControlSystem getControlSystem();
-
+	public IResourceManagerConfiguration getConfiguration();
+	
 	/**
 	 * @return
 	 */
-	public IModelPresentation getModelPresentation();
+	public IControlSystem getControlSystem();
+	
+	/**
+	 * @return
+	 */
+	public String getDescription();
 
 	/**
 	 * @return
 	 */
 	public IModelManager getModelManager();
-	
-	/**
-	 * @return
-	 */
-	public IResourceManagerConfiguration getConfiguration();
 
 	/**
 	 * @return
 	 */
-	public IStatus getStatus();
+	public IModelPresentation getModelPresentation();
+	
+	/**
+	 * @return
+	 */
+	public String getName();
+
+	/**
+	 * @return
+	 */
+	public ResourceManagerStatus getStatus();
 
 	/**
 	 * @param listener
