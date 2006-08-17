@@ -433,6 +433,9 @@ public class ParallelMachineView extends AbstractParallelSetView implements INod
 				manager.clear();
 				initialView();
 			}
+			else if(((ModelSysChangedEvent)event).getType() == ModelSysChangedEvent.SYS_STATUS_CHANGED) {
+				refresh(false);
+			}
 		}
 	}
 }
