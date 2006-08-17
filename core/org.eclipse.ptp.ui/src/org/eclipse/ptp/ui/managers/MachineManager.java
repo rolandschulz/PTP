@@ -187,6 +187,8 @@ public class MachineManager extends AbstractUIManager {
 				String nodeUser = (String)node.getAttribute(AttributeConstants.ATTRIB_NODE_USER);
 				String mode = (String) node.getAttribute(AttributeConstants.ATTRIB_NODE_MODE);
 				
+				//System.out.println("Node User = "+nodeUser);
+				
 				if(nodeUser != null) {
 					if(nodeUser.equals(System.getProperty("user.name"))) {
 						if(mode != null) {
@@ -196,9 +198,12 @@ public class MachineManager extends AbstractUIManager {
 							else if (mode.equals("72") || mode.equals("73") || mode.equals("65"))
 								return IPTPUIConstants.NODE_USER_ALLOC_SHARED;
 						}
-					} else if(nodeUser.equals("")) {
+					} else {
 						if(mode != null) {
-							if (mode.equals("64"))
+							if(nodeUser.equals("root") && mode.equals("73")) {
+								return IPTPUIConstants.NODE_UP;
+							}
+							else if (mode.equals("64"))
 								return IPTPUIConstants.NODE_OTHER_ALLOC_EXCL;
 							else if (mode.equals("72") || mode.equals("73") || mode.equals("65"))
 								return IPTPUIConstants.NODE_OTHER_ALLOC_SHARED;
@@ -220,7 +225,11 @@ public class MachineManager extends AbstractUIManager {
 	 */
 	public int getStatus(String machine_id, String node_id) {
 		IPNode node = findNode(machine_id, node_id);
-		return getNodeStatus(node);
+		int s = getNodeStatus(node);
+		
+		//System.out.println("getStatus("+machine_id+", "+node_id+") = "+s);
+		
+		return s;
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#getStatus(java.lang.String)
