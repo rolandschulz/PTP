@@ -398,26 +398,41 @@ bproc_notify_callback(orte_gpr_notify_data_t *data, void *cbdata)
 		
 		for(j=0; j<value->cnt; j++) {
 			orte_gpr_keyval_t *keyval = keyvals[j];
+			char *external_key;
 			
 			printf("--- BPROC CHANGE: key = %s\n", keyval->key); fflush(stdout);
 			
+			if(!strcmp(keyval->key, ORTE_NODE_NAME_KEY))
+				asprintf(&external_key, "%s", "Node Name");
+			else if(!strcmp(keyval->key, ORTE_SOH_BPROC_NODE_USER))
+				asprintf(&external_key, "%s", "User Owner");
+			else if(!strcmp(keyval->key, ORTE_SOH_BPROC_NODE_GROUP))
+				asprintf(&external_key, "%s", "Group Owner");
+			else if(!strcmp(keyval->key, ORTE_SOH_BPROC_NODE_STATUS) || !strcmp(keyval->key, ORTE_NODE_STATE_KEY))
+				asprintf(&external_key, "%s", "Status");
+			else if(!strcmp(keyval->key, ORTE_SOH_BPROC_NODE_MODE))
+				asprintf(&external_key, "%s", "Mode");
+			else
+				printf("******************* Unknown key type on bproc event - key = '%s'\n", keyval->key); fflush(stdout);
+					
 			switch(keyval->type) {
 				case ORTE_NODE_STATE:
 					printf("--- BPROC CHANGE: (state) val = %d\n", keyval->value.node_state); fflush(stdout);
-					asprintf(&kv, "%s=%d", keyval->key, keyval->value.node_state);
+					asprintf(&kv, "%s=%d", external_key, keyval->value.node_state);
 					break;
 				case ORTE_STRING:
 					printf("--- BPROC CHANGE: (str) val = %s\n", keyval->value.strptr); fflush(stdout);
-					asprintf(&kv, "%s=%s", keyval->key, keyval->value.strptr);
+					asprintf(&kv, "%s=%s", external_key, keyval->value.strptr);
 					break;
 				case ORTE_UINT32:
 					printf("--- BPROC CHANGE: (uint32) val = %d\n", keyval->value.ui32); fflush(stdout);
-					asprintf(&kv, "%s=%d", keyval->key, keyval->value.ui32);
+					asprintf(&kv, "%s=%d", external_key, keyval->value.ui32);
 					break;
 				default:
 					printf("--- BPROC CHANGE: unknown type %d\n", keyval->type); fflush(stdout);
-					asprintf(&kv, "%s=%d", keyval->key, keyval->type);
+					asprintf(&kv, "%s=%d", external_key, keyval->type);
 			}
+			
 			
 			asprintf(&foo, "%s=%d", "Machine ID", 0);
 			asprintf(&bar, "%s=%s", "Node Number", nodename);
@@ -429,6 +444,7 @@ bproc_notify_callback(orte_gpr_notify_data_t *data, void *cbdata)
         	proxy_svr_event_callback(orte_proxy, res);
         	free(res);
         	free(kv);
+			free(external_key);
         	free(foo);
         	free(bar);
         	free(str1);
@@ -1836,19 +1852,19 @@ ORTEDiscover(char **args)
 	asprintf(&(external_keys[1]), "%s", "Node Number");
 	types[1] = PTP_UINT32;
 	/* set up the keys we know about in ORTE and BPROC */
-	asprintf(&(internal_keys[2]), "%s", "orte-node-name");
+	asprintf(&(internal_keys[2]), "%s", ORTE_NODE_NAME_KEY);
 	asprintf(&(external_keys[2]), "%s", "Node Name");
 	types[2] = PTP_STRING;
-	asprintf(&(internal_keys[3]), "%s", "orte-node-bproc-user");
+	asprintf(&(internal_keys[3]), "%s", ORTE_SOH_BPROC_NODE_USER);
 	asprintf(&(external_keys[3]), "%s", "User Owner");
 	types[3] = PTP_STRING;
-	asprintf(&(internal_keys[4]), "%s", "orte-node-bproc-group");
+	asprintf(&(internal_keys[4]), "%s", ORTE_SOH_BPROC_NODE_GROUP);
 	asprintf(&(external_keys[4]), "%s", "Group Owner");
 	types[4] = PTP_STRING;
-	asprintf(&(internal_keys[5]), "%s", "orte-node-bproc-status");
+	asprintf(&(internal_keys[5]), "%s", ORTE_SOH_BPROC_NODE_STATUS);
 	asprintf(&(external_keys[5]), "%s", "Status");
 	types[5] = PTP_STRING;
-	asprintf(&(internal_keys[6]), "%s", "orte-node-bproc-mode");
+	asprintf(&(internal_keys[6]), "%s", ORTE_SOH_BPROC_NODE_MODE);
 	asprintf(&(external_keys[6]), "%s", "Mode");
 	types[6] = PTP_UINT32;
 
@@ -1937,7 +1953,8 @@ ORTEDiscover(char **args)
         	free(str6);
         	free(str7);
 		}
-		else if(tot_len != 0) {
+		else if(values_len != 0) {
+			char *tmpstr;
 			int key_num = 0;
 		
 			/* nodeid = -1 means we want the attributes for ALL nodes */
@@ -1954,7 +1971,7 @@ ORTEDiscover(char **args)
 	
 			tot_len = 0;
 			for(i=0; i<values_len; i++) {
-				printf("AFTER CALL! VALS[%d] = '%s'\n", i, values[i]); fflush(stdout);
+				//printf("AFTER CALL! VALS[%d] = '%s'\n", i, values[i]); fflush(stdout);
 				tot_len += strlen(values[i]);
 			}
 	
@@ -1962,15 +1979,22 @@ ORTEDiscover(char **args)
 			tot_len += values_len * 2; /* add on some for spaces and null, etc - little bit of extra here */
 			printf("totlen = %d\n", tot_len); fflush(stdout);
 		
+			asprintf(&valstr, "%s", "");
 			for(i=0; i<values_len; i++) {
-				proxy_cstring_to_str(values[i], &str2);
-				if (i > 0) {
+				//printf("values[%d] = %s\n", i, values[i]);
+				if(i == 0) {
+					asprintf(&tmpstr, "%s=%s", external_keys[key_num], values[i]);
+					proxy_cstring_to_str(tmpstr, &valstr);
+				}
+				else {
 					str1 = valstr;
-					asprintf(&valstr, "%s %s=%s", str1, external_keys[key_num], str2);
+					asprintf(&tmpstr, "%s=%s", external_keys[key_num], values[i]);
+					proxy_cstring_to_str(tmpstr, &str2);
+					asprintf(&valstr, "%s %s", str1, str2);
+					//printf("valstr = '%s'\n", valstr); fflush(stdout);
 					free(str1);
 					free(str2);
-				} else {
-					valstr = str2;
+					free(tmpstr);
 				}
 				key_num++;
 				if(key_num >= num_keys) key_num = 0;
@@ -1991,13 +2015,13 @@ ORTEDiscover(char **args)
 		free(res);
 		
 		for(i=0; i<num_keys; i++) {
-			printf("Freeing #%d key.\n", i); fflush(stdout);
+			//printf("Freeing #%d key.\n", i); fflush(stdout);
 			if(internal_keys[i] != NULL) free(internal_keys[i]);
 			if(external_keys[i] != NULL) free(external_keys[i]);
 		}
 	
 		for(i=0; i<values_len; i++) {
-			printf("Freeing #%d val.\n", i); fflush(stdout);
+			//printf("Freeing #%d val.\n", i); fflush(stdout);
 			if(values[i] != NULL) free(values[i]);
 		}
 		
@@ -2035,7 +2059,11 @@ get_node_attribute(int machid, int node_num, char **input_keys, int *input_types
 	keys[input_num_keys] = NULL;
 #endif
 
+	rc = orte_gpr.get(ORTE_GPR_KEYS_OR | ORTE_GPR_TOKENS_OR,
+			ORTE_NODE_SEGMENT, NULL, NULL, &cnt, &values);
 	cnt = get_num_nodes(machid);
+	
+	
 	printf("number of nodes in get_node_attribute() = %d\n", (int)cnt); fflush(stdout);
 	if(cnt <= 0) {
 		printf("ERROR2: '%s'\n", ORTE_ERROR_NAME(rc));
@@ -2065,21 +2093,32 @@ get_node_attribute(int machid, int node_num, char **input_keys, int *input_types
 	printf("MAX = %d, MIN = %d\n", max, min); fflush(stdout);
 		
 	for(i=min; i<max; i++) {
-		printf("i = %d\n", i); fflush(stdout);
+		//printf("i = %d\n", i); fflush(stdout);
 		value = values[i];
 			
-		printf("looping j = 0 -> %d\n", input_num_keys); fflush(stdout);
+		//printf("looping j = 0 -> %d\n", input_num_keys); fflush(stdout);
 		for(j=0; j<input_num_keys; j++) {
-			printf("j = %d\n", j); fflush(stdout);
-			switch(input_types[j]) {
-				case PTP_STRING:
-					asprintf(&(input_values[((i-min) * input_num_keys) + j]), "%s", get_str_value(value, input_keys[j]));
-					break;
-				case PTP_UINT32:
-					asprintf(&(input_values[((i-min) * input_num_keys) + j]), "%d", get_ui32_value(value, input_keys[j]));
-					break;
+			//printf("j = %d\n", j); fflush(stdout);
+			/* Open MPI does not have a notion of a machine ID or node number (though it does have node name), at least
+			 * at this time, at least as far as I know.  Therefore, we push these in here by hand.
+			 * It sucks, so figure out the right keys to search for if you know how to do it right */
+			if(!strcmp(input_keys[j], "machine_id")) {
+				asprintf(&(input_values[((i-min) * input_num_keys) + j]), "0");
 			}
-			printf("VALUES IN GET FUNC[%d][%d] = '%s'\n", i, j, input_values[((i-min) * input_num_keys) + j]); fflush(stdout);
+			else if(!strcmp(input_keys[j], "node_number")) {
+				asprintf(&(input_values[((i-min) * input_num_keys) + j]), "%d", i);
+			}
+			else {
+				switch(input_types[j]) {
+					case PTP_STRING:
+						asprintf(&(input_values[((i-min) * input_num_keys) + j]), "%s", get_str_value(value, input_keys[j]));
+						break;
+					case PTP_UINT32:
+						asprintf(&(input_values[((i-min) * input_num_keys) + j]), "%d", get_ui32_value(value, input_keys[j]));
+						break;
+				}
+			}
+			//printf("VALUES IN GET FUNC[%d][%d] = '%s'\n", i, j, input_values[((i-min) * input_num_keys) + j]); fflush(stdout);
 		}
 	}
 	
