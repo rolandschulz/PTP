@@ -92,12 +92,13 @@ public class OMPIMonitoringSystem implements IMonitoringSystem, IProxyRuntimeEve
     public synchronized void handleEvent(IProxyRuntimeEvent e) {
         //System.out.println("OMPIMonitoringSystem got event: " + e.toString());
     	if(e instanceof ProxyRuntimeNodeAttributeEvent) {
-    		System.out.println("runtime node attribute EVENT OMG!");
     		String[] keys = ((ProxyRuntimeNodeAttributeEvent)e).getKeys();
     		String[] vals = ((ProxyRuntimeNodeAttributeEvent)e).getValues();
+    		/*
     		for(int i=0; i<vals.length; i++) {
     			System.out.println(i+": "+keys[i]+" = "+vals[i]);
     		}
+    		*/
     		RuntimeEvent re = new RuntimeEvent(RuntimeEvent.EVENT_NODE_GENERAL_CHANGE);
     		re.setAttributeKeys(keys);
     		re.setAttributeValues(vals);

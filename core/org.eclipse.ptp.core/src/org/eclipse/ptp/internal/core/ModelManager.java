@@ -428,17 +428,20 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		PMachine curmachine = null;
 		PNode curnode = null;
 		
+		boolean one_node_changed = false;
+		PNode the_one_changed_node = null;
+		
 		System.out.println("ModelManager.runtimeNodeGeneralName - #keys = "+keys.length+", #values = "+values.length);
 		for(int i=0; i<keys.length; i++) {
 			String key = keys[i];
 			String value = values[i];
-			System.out.println("\tKEY/VALUE pair: "+key+" -> "+value);
+			//System.out.println("\tKEY/VALUE pair: "+key+" -> "+value);
 			
 			if(key.equals(AttributeConstants.ATTRIB_MACHINEID)) {
 				/* ok, so we're switching to this new machine.  Let's find it. */
 				curmachine = (PMachine)universe.findMachineById(value);
 				if(curmachine == null) {
-					System.out.println("\t\tUnknown machine ID, adding to the model.");
+					System.out.println("\t\tUnknown machine ID ("+value+"), adding to the model.");
 					PMachine mac = new PMachine(universe, AttributeConstants.ATTRIB_MACHINE_NAME_PREFIX + value, value);
 					universe.addChild(mac);
 					/* now let's try and find it again, just to be sure we can... */
@@ -456,7 +459,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 				 */
 				curnode = (PNode)curmachine.findNodeByName(AttributeConstants.ATTRIB_NODE_NAME_PREFIX + value);
 				if(curnode == null) {
-					System.out.println("\t\tUnknown node number, adding to the model.");
+					System.out.println("\t\tUnknown node number ("+value+"), adding to the model.");
 					PNode node = new PNode(curmachine, AttributeConstants.ATTRIB_NODE_NAME_PREFIX + value, value);
 					curmachine.addChild(node);
 					/* now let's try and find it again, just to be sure we can... */
@@ -471,6 +474,13 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 					}
 					newEntity = true;
 				}
+				if(the_one_changed_node == null) {
+					the_one_changed_node = curnode;
+					one_node_changed = true;
+				}
+				else {
+					one_node_changed = false;
+				}
 			}
 			else if(curmachine != null && curnode != null) {
 				curnode.setAttribute(key, value);
@@ -481,7 +491,13 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		}
 		
 		if(newEntity) fireEvent(new ModelSysChangedEvent(IModelSysChangedEvent.MAJOR_SYS_CHANGED, null));
-		fireEvent(new ModelSysChangedEvent(IModelSysChangedEvent.SYS_STATUS_CHANGED, null));
+		if(one_node_changed && the_one_changed_node != null) {
+			fireEvent(new NodeEvent(the_one_changed_node, INodeEvent.STATUS_UPDATE_TYPE, null));
+		}
+		/* ok more than 1 node changed, too complex let's just let them know to do a refresh */
+		else {
+			fireEvent(new ModelSysChangedEvent(IModelSysChangedEvent.SYS_STATUS_CHANGED, null));
+		}
 		
 		/*
 		IPNode n = universe.findNodeByName(ne);

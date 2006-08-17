@@ -32,7 +32,7 @@ public class ProxyRuntimeNodeAttributeEvent extends AbstractProxyRuntimeEvent im
 		this.values = new String[s];
 		for(int i=0; i<s; i++) {
 			String tmp = new String(ProxyEvent.decodeString(values[i+1]));
-			System.out.println("key=val node attribute pair : '"+tmp+"'");
+			//System.out.println("key=val node attribute pair : '"+tmp+"'");
 			String[] tmp2 = tmp.split("=");
 			/*
 			for(int j=0; j<tmp2.length; j++) {
