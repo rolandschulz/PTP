@@ -48,9 +48,8 @@ function_or_subroutine_subprogram
 // R204
 // TODO putback
 specification_part
-options {k=1;}
-	:	('USE') => ( use_stmt )*
-		('IMPORT') => ( import_stmt )*
+	:	( use_stmt )*
+		( import_stmt )*
 //		( implicit_part )?
 		( declaration_construct )*
 	;
@@ -71,17 +70,18 @@ implicit_part_stmt
 	;
 
 // R207
+// TODO putback
 declaration_construct
 	:	derived_type_def
 	|	entry_stmt
 	|	enum_def
 	|	format_stmt
-	|	interface_block
-	|	parameter_stmt
-	|	procedure_declaration_stmt
-	|	specification_stmt
+//	|	interface_block
+//	|	parameter_stmt
+//	|	procedure_declaration_stmt
+//	|	specification_stmt
 	|	type_declaration_stmt
-	|	stmt_function_stmt
+//	|	stmt_function_stmt
 	;
 
 // R208
@@ -444,15 +444,15 @@ derived_type_stmt
     ;
 
 type_attr_spec_list
-    :    type_attr_spec ( type_attr_spec )*
+    :    type_attr_spec ( ',' type_attr_spec )*
     ;
 
 type_attr_name
-    :    name
+    :    T_IDENT
     ;
 
 type_attr_name_list
-    :    type_attr_name ( type_attr_name )*
+    :    type_attr_name ( ',' type_attr_name )*
     ;
 
 // R431
@@ -709,18 +709,12 @@ enum_def
 
 // R461
 enum_def_stmt
-	:	'ENUMCOMMA'
-		'BIND'
-		'('
-		'C'
-		')'
+	:	'ENUM' ',' 'BIND' '(' 'C' ')'
 	;
 
 // R462
 enumerator_def_stmt
-	:	'ENUMERATOR'
-		( '::' )?
-		enumerator_list
+	:	'ENUMERATOR' ( '::' )? enumerator_list
 	;
 
 // R463
@@ -730,13 +724,12 @@ enumerator
     ;
 
 enumerator_list
-    :   enumerator ( enumerator )*
+    :   enumerator ( ',' enumerator )*
     ;
 
 // R464
 end_enum_stmt
-	:	'END'
-		'ENUM'
+	:	'END' 'ENUM'
 	;
 
 // R465
@@ -1136,7 +1129,7 @@ parameter_stmt
 	;
 
 named_constant_def_list
-    :    named_constant_def ( named_constant_def )*
+    :    named_constant_def ( ',' named_constant_def )*
     ;
 
 // R539
@@ -1589,8 +1582,9 @@ defined_unary_op
 	;
 
 // R704
+// TODO putback
 mult_operand
-    : level_1_expr ( power_op mult_operand )?
+    : level_1_expr /* ( power_op mult_operand )? */
     ;
 
 // R705
@@ -2654,15 +2648,10 @@ format_item
 	;
 
 format_item_list
-    :    format_item ( format_item )*
+    :    format_item ( ',' format_item )*
     ;
 
-/* TODO - inline it (in R1003)
-// R1004
-r
-	:	int_literal_constant
-	;
- */
+// R1004 r inlined in R1003 as int_literal_constant
 
 // R1005
 // TODO putback
@@ -2797,7 +2786,7 @@ Section 11:
 // R1101
 main_program
 	:	( program_stmt )?
-//		( specification_part )?
+		( specification_part )?
 //		( execution_part )?
 //		( internal_subprogram_part )?
 		end_program_stmt
@@ -3244,11 +3233,11 @@ subroutine_name
 // TODO putback
 entry_stmt
     :    'ENTRY' entry_name
-//          ( '(' ( dummy_arg_list )? ')' ( suffix )? )?
+          ( '(' ( dummy_arg_list )? ')' /*( suffix )? */ )?
     ;
 
 entry_name
-    :    name
+    :    T_IDENT
     ;
 
 // R1236
