@@ -87,6 +87,7 @@ public abstract class AbstractParallelView extends ViewPart implements IModelLis
 		else if (event instanceof IModelSysChangedEvent) {
 			IModelSysChangedEvent sysEvent = (IModelSysChangedEvent)event;
 			switch (sysEvent.getType()) {
+			case IModelSysChangedEvent.MAJOR_SYS_CHANGED:
 			case IModelSysChangedEvent.MONITORING_SYS_CHANGED:
 				build();
 				break;

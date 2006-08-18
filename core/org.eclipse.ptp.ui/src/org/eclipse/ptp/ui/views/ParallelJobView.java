@@ -35,9 +35,7 @@ import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.IProcessListener;
 import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.core.events.IModelEvent;
 import org.eclipse.ptp.core.events.IProcessEvent;
-import org.eclipse.ptp.core.events.ModelSysChangedEvent;
 import org.eclipse.ptp.internal.ui.ParallelImages;
 import org.eclipse.ptp.internal.ui.actions.RemoveAllTerminatedAction;
 import org.eclipse.ptp.internal.ui.actions.TerminateAllAction;
@@ -441,15 +439,6 @@ public class ParallelJobView extends AbstractParallelSetView implements IProcess
 		if (((JobManager) manager).isCurrentSetContainProcess(getCurrentID(), process.getIDString())) {
 			if (event.getType() != IProcessEvent.ADD_OUTPUT_TYPE)
 				refresh(false);
-		}
-	}
-	
-	public void modelEvent(IModelEvent event) {
-		if(event instanceof ModelSysChangedEvent) {
-			if(((ModelSysChangedEvent)event).getType() == ModelSysChangedEvent.MAJOR_SYS_CHANGED) {
-				manager.clear();
-				initialView();
-			}
 		}
 	}
 	
