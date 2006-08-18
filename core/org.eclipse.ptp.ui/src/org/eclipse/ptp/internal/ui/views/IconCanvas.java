@@ -26,7 +26,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.ptp.internal.core.PNode;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.ptp.internal.ui.hover.IconHover;
 import org.eclipse.ptp.ui.hover.IIconInformationControl;

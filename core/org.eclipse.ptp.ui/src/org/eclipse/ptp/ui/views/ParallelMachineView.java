@@ -25,10 +25,7 @@ import org.eclipse.ptp.core.INodeListener;
 import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.core.events.IModelEvent;
 import org.eclipse.ptp.core.events.INodeEvent;
-import org.eclipse.ptp.core.events.ModelRuntimeNotifierEvent;
-import org.eclipse.ptp.core.events.ModelSysChangedEvent;
 import org.eclipse.ptp.internal.ui.ParallelImages;
 import org.eclipse.ptp.internal.ui.actions.ChangeMachineAction;
 import org.eclipse.ptp.ui.IManager;
@@ -425,17 +422,5 @@ public class ParallelMachineView extends AbstractParallelSetView implements INod
 		if (node != null && ((MachineManager) manager).isCurrentSetContainNode(node.getMachine().getIDString(), node.getIDString())) {
 			refresh(false);
 		}		
-	}
-	
-	public void modelEvent(IModelEvent event) {
-		if(event instanceof ModelSysChangedEvent) {
-			if(((ModelSysChangedEvent)event).getType() == ModelSysChangedEvent.MAJOR_SYS_CHANGED) {
-				manager.clear();
-				initialView();
-			}
-			else if(((ModelSysChangedEvent)event).getType() == ModelSysChangedEvent.SYS_STATUS_CHANGED) {
-				refresh(false);
-			}
-		}
-	}
+	}	
 }
