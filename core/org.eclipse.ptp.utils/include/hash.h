@@ -44,7 +44,7 @@
 
 struct HashEntry
 {
-	unsigned int			h_hval;	/* actual hash value */
+	unsigned int		h_hval;	/* actual hash value */
 	void *				h_data;	/* entry data */
 	struct HashEntry *	h_next;	/* next in chain */
 };
@@ -53,12 +53,12 @@ typedef struct HashEntry	HashEntry;
 /* Data type for reentrant functions.  */
 struct Hash
 {
-    HashEntry **		table;		/* hash chain entries */
-    unsigned int		logsize;	/* log 2 number of chains in table */
-    unsigned int		size;		/* number of chains in table */
-    unsigned int		count;		/* number of entries in table */
-    unsigned int		mask;		/* mask used to compute chain */
-    unsigned int		scan;		/* used for scanning hash table */
+    HashEntry **	table;		/* hash chain entries */
+    unsigned int	logsize;	/* log 2 number of chains in table */
+    unsigned int	size;		/* number of chains in table */
+    unsigned int	count;		/* number of entries in table */
+    unsigned int	mask;		/* mask used to compute chain */
+    unsigned int	scan;		/* used for scanning hash table */
     HashEntry *		scan_entry;
 };
 typedef struct Hash	Hash;
