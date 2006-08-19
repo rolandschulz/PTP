@@ -290,23 +290,35 @@ HashInsert(Hash *htab, unsigned int idx, void *data)
 void
 HashRemove(Hash *htab, unsigned int idx)
 {
-	HashEntry *	h;
+	HashEntry *		h;
 	HashEntry **	hp;
 	
 	/*
 	** Find item.
 	*/
-	for ( hp = &htab->table[idx & htab->mask] ; (*hp)->h_hval != idx ; )
+	for ( hp = &htab->table[idx & htab->mask] ; *hp != NULL && (*hp)->h_hval != idx ; )
 		hp = &(*hp)->h_next;
 
+	/*
+	 * Found item?
+	 */
+	if (*hp == NULL)
+		return;
+		
+	/*
+	 * Update scan values
+	 */
+	if (htab->scan_entry != NULL && htab->scan_entry->h_hval == h->h_hval)
+		htab->scan_entry = htab->scan_entry->h_next;
+	
 	/*
 	** Remove item.
 	*/
 	h = *hp;
 	*hp = (*hp)->h_next;
-	
 	free(h);
-	--(htab->count);
+
+	htab->count--;
 }
 
 void
@@ -346,7 +358,7 @@ _hgrow(Hash *htab)
 
 	nsize = (unsigned int)(1 << ++htab->logsize);
 	nmask = nsize - 1;
-	ntab = (HashEntry **)malloc(htab->size * sizeof(HashEntry *));
+	ntab = (HashEntry **)malloc(nsize * sizeof(HashEntry *));
 
 	for ( i = 0 ; i < nsize ; i++ )
 		ntab[i] = (HashEntry *)NULL;
@@ -356,8 +368,8 @@ _hgrow(Hash *htab)
 	*/
 	for ( i = 0 ; i < htab->size ; i++ )
 	{
-		HashEntry *	h;
-		HashEntry *	h2;
+		HashEntry *		h;
+		HashEntry *		h2;
 		HashEntry **	hp;
 
 		for ( h = htab->table[i] ; h != (HashEntry *)NULL ; )
