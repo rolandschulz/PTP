@@ -95,6 +95,9 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 		return (IVariable[]) all.toArray(new IVariable[all.size()]);
 	}
 	protected synchronized List getVariables0() throws DebugException {
+		if (isDisposed()) {
+			return Collections.EMPTY_LIST;
+		}
 		PThread thread = (PThread) getThread();
 		if (thread.isSuspended()) {
 			if (fVariables == null) {
