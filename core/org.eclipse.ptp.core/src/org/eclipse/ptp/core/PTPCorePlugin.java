@@ -436,9 +436,15 @@ public class PTPCorePlugin extends AbstractUIPlugin {
 	 * This method is called when the plug-in is stopped
 	 */
 	public void stop(BundleContext context) throws Exception {
-		saveResourceManagers();
-		stopResourceManagers();
-		setCurrentResourceManager(NULL_RESOURCE_MANAGER);
+		// TODO I have to fix this
+		if (true) {
+			currentResourceManager.stop();
+		}
+		else {
+			saveResourceManagers();
+			stopResourceManagers();
+			setCurrentResourceManager(NULL_RESOURCE_MANAGER);
+		}
 		listeners.clear();
 		super.stop(context);
 	}
