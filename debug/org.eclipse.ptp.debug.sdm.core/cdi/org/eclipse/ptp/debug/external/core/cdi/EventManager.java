@@ -65,71 +65,81 @@ public class EventManager extends SessionObject implements IPCDIEventManager, Ob
 	List list = Collections.synchronizedList(new ArrayList());
 	protected final Object lock = new Object(); 
 
-	public void update(Observable o, Object arg) {
-		IPCDIEvent event = (IPCDIEvent) arg;
-
-		List cdiList = new ArrayList(1);		
-		if (event instanceof IPCDISuspendedEvent) {
-			processSuspendedEvent((IPCDISuspendedEvent)event);
-		}
-			/*
-			if (event instanceof IPCDIMemoryChangedEvent) {
-				// We need to fire an event for all the register blocks that may contain the modified addresses.
-				System.err.println("******* GOT IPCDIMemoryChangedEvent");
-				MemoryManager mgr = session.getMemoryManager();
-				try {
-					IPCDIMemoryBlock[] blocks = (IPCDIMemoryBlock[])mgr.getMemoryBlocks((Target)event.getSource());
-					MemoryChangedEvent memEvent = (MemoryChangedEvent)event;
-					BigInteger[] addresses = memEvent.getAddresses();
-					List new_addresses = new ArrayList(addresses.length);
-					for (int i=0; i<blocks.length; i++) {
-						if (blocks[i] instanceof MemoryBlock) {
-							MemoryBlock block = (MemoryBlock)blocks[i];
-							for (int j=0; j<addresses.length; j++) {
-								if (block.contains(addresses[j]) && (! blocks[i].isFrozen() || block.isDirty())) {
-									new_addresses.add(addresses[j]);
-								}
-							}
-							cdiList.add(new MemoryChangedEvent(session, event.getAllProcesses(), event.getSource(), (BigInteger[]) new_addresses.toArray(new BigInteger[new_addresses.size()])));
-							block.setDirty(false);
-						}	
-					}
-				} catch (PCDIException e) {
-					
-				}
-			}
-			*/
-			/*
-			else if (event instanceof IPCDISignalChangedEvent) {
-				System.err.println("******* GOT IPCDISignalChangedEvent");
-				SignalChangedEvent sigEvent = (SignalChangedEvent)event;
-				String name = sigEvent.getName();
-				IPCDISignal signal = (IPCDISignal)event.getSource();
-				if (name == null || name.length() == 0) {
-					// Something change we do not know what
-					// Let the signal manager handle it with an update().
-					try {
-						SignalManager sMgr = session.getSignalManager();
-						sMgr.update((Target)signal.getTarget());
-					} catch (PCDIException e) {
-					}
-				} else {
-					cdiList.add(new ChangedEvent(session, event.getAllProcesses(), signal));
-				}
-			}
-			*/
-		cdiList.add(event);
-		
-		// Fire the event;
-		fireEvents((IPCDIEvent[])cdiList.toArray(new IPCDIEvent[0]));
-		fireDebugEvent(event);
-	}	
-	
 	public EventManager(Session session) {
 		super(session);
 	}
 	public void shutdown() {
 		list.clear();
+	}
+
+	public void update(Observable o, Object arg) {
+		IPCDIEvent event = (IPCDIEvent) arg;
+		fireDebugEvent(event);
+		fireInternalEvent(event);
+	}
+	private void fireInternalEvent(final IPCDIEvent event) {
+		Job aJob = new Job("Updating registered process...") {
+			protected IStatus run(IProgressMonitor monitor) {
+				List cdiList = new ArrayList(1);
+				if (event instanceof IPCDISuspendedEvent) {
+					processSuspendedEvent((IPCDISuspendedEvent)event, monitor);
+				}
+				/*
+				if (event instanceof IPCDIMemoryChangedEvent) {
+					// We need to fire an event for all the register blocks that may contain the modified addresses.
+					System.err.println("******* GOT IPCDIMemoryChangedEvent");
+					MemoryManager mgr = session.getMemoryManager();
+					try {
+						IPCDIMemoryBlock[] blocks = (IPCDIMemoryBlock[])mgr.getMemoryBlocks((Target)event.getSource());
+						MemoryChangedEvent memEvent = (MemoryChangedEvent)event;
+						BigInteger[] addresses = memEvent.getAddresses();
+						List new_addresses = new ArrayList(addresses.length);
+						for (int i=0; i<blocks.length; i++) {
+							if (blocks[i] instanceof MemoryBlock) {
+								MemoryBlock block = (MemoryBlock)blocks[i];
+								for (int j=0; j<addresses.length; j++) {
+									if (block.contains(addresses[j]) && (! blocks[i].isFrozen() || block.isDirty())) {
+										new_addresses.add(addresses[j]);
+									}
+								}
+								cdiList.add(new MemoryChangedEvent(session, event.getAllProcesses(), event.getSource(), (BigInteger[]) new_addresses.toArray(new BigInteger[new_addresses.size()])));
+								block.setDirty(false);
+							}	
+						}
+					} catch (PCDIException e) {
+						
+					}
+				}
+				*/
+				/*
+				else if (event instanceof IPCDISignalChangedEvent) {
+					System.err.println("******* GOT IPCDISignalChangedEvent");
+					SignalChangedEvent sigEvent = (SignalChangedEvent)event;
+					String name = sigEvent.getName();
+					IPCDISignal signal = (IPCDISignal)event.getSource();
+					if (name == null || name.length() == 0) {
+						// Something change we do not know what
+						// Let the signal manager handle it with an update().
+						try {
+							SignalManager sMgr = session.getSignalManager();
+							sMgr.update((Target)signal.getTarget());
+						} catch (PCDIException e) {
+						}
+					} else {
+						cdiList.add(new ChangedEvent(session, event.getAllProcesses(), signal));
+					}
+				}
+				*/
+				cdiList.add(event);
+				// Fire the event;
+				fireEvents((IPCDIEvent[])cdiList.toArray(new IPCDIEvent[0]));
+				monitor.done();
+				return Status.OK_STATUS;
+			}
+		};
+		aJob.setSystem(true);
+		aJob.setPriority(Job.INTERACTIVE);
+		aJob.schedule();
 	}
 	public void addEventListener(IPCDIEventListener listener) {
 		if (!list.contains(listener))
@@ -147,92 +157,78 @@ public class EventManager extends SessionObject implements IPCDIEventManager, Ob
 			IPCDIEventListener[] listeners = (IPCDIEventListener[])list.toArray(new IPCDIEventListener[0]);
 			for (int i = 0; i < listeners.length; i++) {
 				listeners[i].handleDebugEvents(cdiEvents);
-			}			
+			}
 		}
 	}
 	
-	boolean processSuspendedEvent(final IPCDISuspendedEvent event) {
-		final int[] procs = event.getAllRegisteredProcesses().toArray();
+	boolean processSuspendedEvent(IPCDISuspendedEvent event, IProgressMonitor monitor) {
+		int[] procs = event.getAllRegisteredProcesses().toArray();
 		if (procs.length == 0) {
+			monitor.done();
 			return true;
 		}
-		
-		Job aJob = new Job("Updating registered process...") {
-			protected IStatus run(IProgressMonitor monitor) {
-				monitor.beginTask("Updating registered process...", procs.length);
-				Session session = (Session)getSession();
-				SignalManager sigMgr = session.getSignalManager();
+		monitor.beginTask("Updating registered process...", procs.length);
+		Session session = (Session)getSession();
+		SignalManager sigMgr = session.getSignalManager();
+		/*
+		VariableManager varMgr = session.getVariableManager();
+		ExpressionManager expMgr  = session.getExpressionManager();		
+		BreakpointManager bpMgr = session.getBreakpointManager();
+		SourceManager srcMgr = session.getSourceManager();
+		MemoryManager memMgr = session.getMemoryManager();
+		*/
+		for (int i = 0; i < procs.length; i++) {
+			try {
+				Target currentTarget = (Target) session.getTarget(procs[i]);
+				currentTarget.setSupended(true);
 				/*
-				VariableManager varMgr = session.getVariableManager();
-				ExpressionManager expMgr  = session.getExpressionManager();		
-				BreakpointManager bpMgr = session.getBreakpointManager();
-				SourceManager srcMgr = session.getSourceManager();
-				MemoryManager memMgr = session.getMemoryManager();
-				*/
-				for (int i = 0; i < procs.length; i++) {
-					try {
-						Target currentTarget = (Target) session.getTarget(procs[i]);
-						currentTarget.setSupended(true);
-						/*
-						if (processSharedLibEvent(event)) {
-							return false;
-						}
-						if (processBreakpointHitEvent(event)) {
-							return false;
-						}
-						*/
-						int threadId = event.getThreadId();
-						currentTarget.updateState(threadId);
-						try {
-							Thread cthread = (Thread)currentTarget.getCurrentThread();
-							if (cthread != null) {
-								cthread.getCurrentStackFrame();
-							}
-						} catch (PCDIException e1) {
-							PTPDebugExternalPlugin.log(e1);
-						}
-						try {
-							if (sigMgr.isAutoUpdate()) {
-								sigMgr.update(currentTarget);
-							}
-							/**
-							 * TODO not quite important
-							if (varMgr.isAutoUpdate()) {
-								varMgr.update(currentTarget);
-							}
-							if (expMgr.isAutoUpdate()) { 
-								expMgr.update(currentTarget);
-							}
-							//if (bpMgr.isAutoUpdate()) {
-								//bpMgr.update(currentTarget);
-							//}
-							if (srcMgr.isAutoUpdate()) {
-								srcMgr.update(currentTarget);
-							}
-							if (memMgr.isAutoUpdate()) {
-								memMgr.update(currentTarget);
-							}
-							*/
-						} catch (PCDIException e) {
-							e.printStackTrace();
-						}
-					} finally {
-						monitor.worked(1);
-					}
+				if (processSharedLibEvent(event)) {
+					return false;
 				}
-				monitor.done();
-				return Status.OK_STATUS;
+				if (processBreakpointHitEvent(event)) {
+					return false;
+				}
+				*/
+				int threadId = event.getThreadId();
+				currentTarget.updateState(threadId);
+				try {
+					Thread cthread = (Thread)currentTarget.getCurrentThread();
+					if (cthread != null) {
+						cthread.getCurrentStackFrame();
+					}
+				} catch (PCDIException e1) {
+					PTPDebugExternalPlugin.log(e1);
+				}
+				try {
+					if (sigMgr.isAutoUpdate()) {
+						sigMgr.update(currentTarget);
+					}
+					/**
+					 * TODO not quite important
+					if (varMgr.isAutoUpdate()) {
+						varMgr.update(currentTarget);
+					}
+					if (expMgr.isAutoUpdate()) { 
+						expMgr.update(currentTarget);
+					}
+					//if (bpMgr.isAutoUpdate()) {
+						//bpMgr.update(currentTarget);
+					//}
+					if (srcMgr.isAutoUpdate()) {
+						srcMgr.update(currentTarget);
+					}
+					if (memMgr.isAutoUpdate()) {
+						memMgr.update(currentTarget);
+					}
+					*/
+				} catch (PCDIException e) {
+					e.printStackTrace();
+				}
+			} finally {
+				monitor.worked(1);
 			}
-		};
-		aJob.setSystem(true);
-		aJob.setPriority(Job.INTERACTIVE);
-		aJob.schedule();
-		try {
-			//wait the job until finish
-			aJob.join();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
 		}
+		monitor.done();
 		return true;
 	}
 	/***********************************************************************
