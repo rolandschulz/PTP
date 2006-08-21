@@ -89,7 +89,10 @@ System.err.println("*** SEND COMMAND: " + currentCommand.getName() + ", tasks: "
 	}
 	public void addCommand(IDebugCommand command) {
 		synchronized (queue) {
-			if (!contains(command)) {
+			if (command == null) 
+				return;
+			
+			if (!isTerminated || !contains(command)) {
 				if (command.isWaitInQueue()) {
 					queue.add(command);
 				} 
@@ -110,6 +113,7 @@ System.err.println("*** SEND COMMAND: " + currentCommand.getName() + ", tasks: "
 				queue.notifyAll();
 			}
 			else {
+				command.doCancelWaiting();
 				//TODO how to deal with duplicate command
 				System.err.println("************ ERROR in DebugCommandQueue -- duplicate, cmd: " + currentCommand);
 			}
@@ -147,7 +151,7 @@ System.err.println("*** SEND COMMAND: " + currentCommand.getName() + ", tasks: "
 				//if (result == null) {
 					//doFlushCommands();
 				//}
-				System.err.println("*** SET COMMAND RETURN: " + currentCommand.getName() + ", result: " + result + ", tasks: " + debugger.showBitList(currentCommand.getTasks()));
+				System.err.println("*** SET COMMAND RETURN: " + currentCommand.getName() + ", result: " + result + ", tasks: " + debugger.showBitList(tasks));
 				currentCommand.setReturn(tasks, result);					
 			}
 		}
