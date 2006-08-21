@@ -356,7 +356,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 	 * @param stackFrame
 	 * @throws CoreException
 	 */
-	public void addAnnotation(IEditorPart editorPart, IStackFrame stackFrame) throws CoreException {
+	public synchronized void addAnnotation(IEditorPart editorPart, IStackFrame stackFrame) throws CoreException {
 		int lineNumber = stackFrame.getLineNumber();
 		if (lineNumber > -1) {
 			ITextEditor textEditor = getTextEditor(editorPart);
@@ -396,7 +396,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 	 * @param isRegister
 	 * @throws CoreException
 	 */
-	public void addAnnotation(String job_id, String fullPathFileName, int lineNumber, BitList tasks, boolean isRegister) throws CoreException {
+	public synchronized void addAnnotation(String job_id, String fullPathFileName, int lineNumber, BitList tasks, boolean isRegister) throws CoreException {
 		if (lineNumber > -1) {
 			if (tasks.isEmpty())
 				return;
