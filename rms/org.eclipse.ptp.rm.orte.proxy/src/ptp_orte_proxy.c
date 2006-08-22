@@ -1123,23 +1123,19 @@ static void iof_callback(
     size_t count)
 {
 	char *res, *str;
-	char line[1024];
+	char *line;
 	
-	printf("IO callback!  count = %d\n", (int)count); fflush(stdout);
     if(count > 0) {
-        fprintf(stdout, "[%lu,%lu,%lu] ", ORTE_NAME_ARGS(src_name));
+        line = (char *)malloc(count+1);
         strncpy((char*)line, (char*)data, count);
         if(line[count-1] == '\n') line[count-1] = '\0';
         line[count] = '\0';
-        //printf("STR = '%s'\n", str);
-        /* src_name->jobid = jobid
-         * src_name->vpid = processID */
-        //write(STDOUT_FILENO, data, count);
         proxy_cstring_to_str(line, &str);
         asprintf(&res, "%d %d %d %s", RTEV_PROCOUT, (int)src_name->jobid, (int)src_name->vpid, str);
         proxy_svr_event_callback(orte_proxy, res);
         free(res);
         free(str);
+        free(line);
     }
 }
 
