@@ -308,7 +308,7 @@ HashRemove(Hash *htab, unsigned int idx)
 	/*
 	 * Update scan values
 	 */
-	if (htab->scan_entry != NULL && htab->scan_entry->h_hval == h->h_hval)
+	if (htab->scan_entry == h)
 		htab->scan_entry = htab->scan_entry->h_next;
 	
 	/*
