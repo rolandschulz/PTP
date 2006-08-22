@@ -19,6 +19,8 @@
 
 package org.eclipse.ptp.rtsystem.proxy.event;
 
+import java.util.ArrayList;
+
 import org.eclipse.ptp.core.proxy.event.ProxyEvent;
 
 public class ProxyRuntimeNodeAttributeEvent extends AbstractProxyRuntimeEvent implements IProxyRuntimeEvent {
@@ -27,10 +29,9 @@ public class ProxyRuntimeNodeAttributeEvent extends AbstractProxyRuntimeEvent im
 
 	public ProxyRuntimeNodeAttributeEvent(String[] values) {
 		super(EVENT_RUNTIME_NODEATTR);
-		int s = values.length - 1;
-		this.keys = new String[s];
-		this.values = new String[s];
-		for(int i=0; i<s; i++) {
+		ArrayList k = new ArrayList(values.length - 1);
+		ArrayList v = new ArrayList(values.length - 1);
+		for(int i=0; i < values.length - 1; i++) {
 			String tmp = new String(ProxyEvent.decodeString(values[i+1]));
 			//System.out.println("key=val node attribute pair : '"+tmp+"'");
 			String[] tmp2 = tmp.split("=");
@@ -39,9 +40,15 @@ public class ProxyRuntimeNodeAttributeEvent extends AbstractProxyRuntimeEvent im
 				System.out.println("tmp2 = "+tmp2[j]);
 			}
 			*/
-			this.keys[i] = tmp2[0];
-			this.values[i] = tmp2[1];
+			if (tmp2.length == 2) {
+				k.add(tmp2[0]);
+				v.add(tmp2[1]);
+			} else {
+				System.out.println("Bad key=val node attribute pair : '"+tmp+"'");
+			}
 		}
+		this.keys = (String[]) k.toArray(new String[k.size()]);
+		this.values = (String[]) v.toArray(new String[v.size()]);
 	}
 	
 	public String[] getValues() {
