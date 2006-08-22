@@ -163,6 +163,14 @@ static int debug_find_jobid(int jobid);
 
 #ifdef HAVE_SYS_BPROC_H
 int ORTE_Subscribe_Bproc(void);
+#else
+/*
+ * Provide some fake values.
+ */
+#define ORTE_SOH_BPROC_NODE_USER	"ORTE_SOH_BPROC_NODE_USER"
+#define ORTE_SOH_BPROC_NODE_GROUP	"ORTE_SOH_BPROC_NODE_GROUP"
+#define ORTE_SOH_BPROC_NODE_STATUS	"ORTE_SOH_BPROC_NODE_STATUS"
+#define ORTE_SOH_BPROC_NODE_MODE	"ORTE_SOH_BPROC_NODE_MODE"
 #endif
 
 int 			orte_shutdown = 0;
@@ -1833,11 +1841,7 @@ ORTEDiscover(char **args)
 	 * discover */
 	 
 	/* how many keys do we send back? */
-#ifdef HAVE_SYS_BPROC_H
 	num_keys = 7;
-#else /* HAVE_SYS_BPROC_H */
-	num_keys = 3;
-#endif /* HAVE_SYS_BPROC_H */
 	internal_keys = (char**)malloc(num_keys*sizeof(char*));
 	external_keys = (char**)malloc(num_keys*sizeof(char*));
 	types = (int*)malloc((num_keys)*sizeof(int));
@@ -1854,9 +1858,7 @@ ORTEDiscover(char **args)
 	asprintf(&(internal_keys[2]), "%s", ORTE_NODE_NAME_KEY);
 	asprintf(&(external_keys[2]), "%s", "Node Name");
 	types[2] = PTP_STRING;
-#ifdef HAVE_SYS_BPROC_H
 	asprintf(&(internal_keys[3]), "%s", ORTE_SOH_BPROC_NODE_USER);
-	asprintf(&(external_keys[3]), "%s", "User Owner");
 	types[3] = PTP_STRING;
 	asprintf(&(internal_keys[4]), "%s", ORTE_SOH_BPROC_NODE_GROUP);
 	asprintf(&(external_keys[4]), "%s", "Group Owner");
@@ -1867,7 +1869,6 @@ ORTEDiscover(char **args)
 	asprintf(&(internal_keys[6]), "%s", ORTE_SOH_BPROC_NODE_MODE);
 	asprintf(&(external_keys[6]), "%s", "Mode");
 	types[6] = PTP_UINT32;
-#endif /* HAVE_SYS_BPROC_H */
 
 	for(i=0; i<num_keys; i++) {
 		printf("NODE ATTRIB KEYS[%d] = '%s' -> '%s'\n", i, internal_keys[i], external_keys[i]); fflush(stdout);
