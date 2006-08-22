@@ -129,7 +129,6 @@
 #define PTP_STRING				2
 
 int ORTEIsShutdown(void);
-int ORTEQuit(void);
 int ORTEInit(char *universe_name);
 
 int ORTEStartDaemon(char **);
@@ -138,6 +137,7 @@ int ORTETerminateJob(char **);
 int ORTEGetProcesses(char **);
 int ORTEGetProcessAttribute(char **);
 int ORTEDiscover(char **);
+int ORTEQuit(char **);
 /*
 int ORTEGetNodes(char **);
 int OMPIGetJobs(char **);
@@ -183,9 +183,7 @@ static proxy_handler_funcs handler_funcs = {
 
 static proxy_svr_helper_funcs helper_funcs = {
 	NULL,					// newconn() - can be used to reject connections
-	NULL,					// numservers() - if there are multiple servers, return the number
-	ORTEIsShutdown,			// shutdown_completed() - proxy will not complete until this returns true
-	ORTEQuit					// quit() - called when quit message received
+	NULL					// numservers() - if there are multiple servers, return the number
 };
 
 static proxy_svr_commands command_tab[] = {
@@ -195,6 +193,7 @@ static proxy_svr_commands command_tab[] = {
 	{"TERMJOB",			ORTETerminateJob},
 	{"GETPROCS",		ORTEGetProcesses},
 	{"GETPATTR",	   	ORTEGetProcessAttribute},
+	{"QUI",				ORTEQuit},
 	//{"GETNODES",		ORTEGetNodes},
 	//{"GETNATTR",		ORTEGetNodeAttribute},
 	/*
@@ -2141,7 +2140,7 @@ cleanup:
 }
 
 int
-ORTEQuit(void)
+ORTEQuit(char **args)
 {
 	char *res;
 	printf("ORTEQuit called!\n"); fflush(stdout);
@@ -2167,7 +2166,7 @@ server(char *name, char *host, int port)
 	proxy_svr_connect(orte_proxy, host, port);
 	printf("proxy_svr_connect returned.\n");
 	
-	while (ptp_signal_exit == 0) {
+	while (ptp_signal_exit == 0 && !ORTEIsShutdown()) {
 		if  ((ORTEProgress() != PROXY_RES_OK) ||
 			(proxy_svr_progress(orte_proxy) != PROXY_RES_OK))
 			break;

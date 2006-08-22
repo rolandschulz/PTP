@@ -102,12 +102,6 @@ proxy_clnt_sendcmd(proxy_clnt *pc, char *cmd, char *fmt, ...)
 	return res;
 }
 
-int 
-proxy_clnt_quit(proxy_clnt *pc)
-{
-	return proxy_clnt_sendcmd(pc, PROXY_QUIT_CMD, NULL);
-}
-
 void
 proxy_clnt_event_callback(proxy_clnt *pc, char *data)
 {

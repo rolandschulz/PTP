@@ -22,15 +22,13 @@
 
 #include <stdarg.h>
 
-#define PROXY_RES_OK			0
-#define PROXY_RES_ERR			-1
+#define PROXY_RES_OK		0
+#define PROXY_RES_ERR		-1
 
-#define PROXY_ERR_CLIENT		0
-#define PROXY_ERR_SERVER		1
+#define PROXY_ERR_CLIENT	0
+#define PROXY_ERR_SERVER	1
 #define PROXY_ERR_PROTO		2
-#define PROXY_ERR_SYSTEM		3
-
-#define PROXY_QUIT_CMD		"QUI"
+#define PROXY_ERR_SYSTEM	3
 
 struct proxy;
 struct proxy_clnt;
@@ -68,8 +66,6 @@ struct proxy_svr_helper_funcs {
 	 */
 	int (*newconn)(void);
 	int (*numservers)(void);
-	int (*shutdown_completed)(void);
-	int (*quit)(void);
 };
 typedef struct proxy_svr_helper_funcs	proxy_svr_helper_funcs;
 
@@ -89,9 +85,9 @@ struct proxy_svr_funcs {
 typedef struct proxy_svr_funcs	proxy_svr_funcs;
 
 struct proxy_clnt {
-	struct proxy *					proxy;
+	struct proxy *						proxy;
 	struct proxy_clnt_helper_funcs *	clnt_helper_funcs;
-	void *							clnt_data;
+	void *								clnt_data;
 };
 typedef struct proxy_clnt	proxy_clnt;
 
@@ -105,9 +101,9 @@ typedef struct proxy_svr	proxy_svr;
 	
 struct proxy {
 	char *							name;
-	struct proxy_handler_funcs *		handler_funcs;
-	struct proxy_clnt_funcs *			clnt_funcs;
-	struct proxy_svr_funcs *			svr_funcs;
+	struct proxy_handler_funcs *	handler_funcs;
+	struct proxy_clnt_funcs *		clnt_funcs;
+	struct proxy_svr_funcs *		svr_funcs;
 };
 typedef struct proxy	proxy;
 
@@ -131,7 +127,6 @@ extern int 		proxy_clnt_connect(proxy_clnt *);
 extern int 		proxy_clnt_create(proxy_clnt *);
 extern int 		proxy_clnt_progress(proxy_clnt *);
 extern int 		proxy_clnt_sendcmd(proxy_clnt *, char *, char *, ...);
-extern int 		proxy_clnt_quit(proxy_clnt *);
 extern void		proxy_clnt_event_callback(proxy_clnt *, char *);
 
 #endif /* _PROXY_H_*/

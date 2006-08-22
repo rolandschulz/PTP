@@ -21,9 +21,9 @@
  * Miscellaneous proxy functions.
  */
  
- #include <stdlib.h>
+#include <stdlib.h>
  
- #include "proxy.h"
+#include "proxy.h"
 
 extern proxy_svr_funcs 	proxy_tcp_svr_funcs;
 

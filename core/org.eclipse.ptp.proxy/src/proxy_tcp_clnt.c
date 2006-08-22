@@ -299,16 +299,14 @@ proxy_tcp_clnt_sendcmd(proxy_clnt *pc, char *cmd, char *fmt, va_list ap)
 		free(args);
 	} else 
 		request = strdup(cmd);
-		
-printf("tcp_clnt_send_cmd: <%s>\n", request);
 
 	if ( proxy_tcp_send_msg(conn, request, strlen(request)) < 0 )
 	{
-			proxy_set_error(PROXY_ERR_CLIENT, "connection unexpectedly terminated");
-			if (pc->proxy->handler_funcs->unregfile != NULL)
-				pc->proxy->handler_funcs->unregfile(conn->sess_sock);
-			free(request);
-			return PROXY_RES_ERR;
+		proxy_set_error(PROXY_ERR_CLIENT, "connection unexpectedly terminated");
+		if (pc->proxy->handler_funcs->unregfile != NULL)
+			pc->proxy->handler_funcs->unregfile(conn->sess_sock);
+		free(request);
+		return PROXY_RES_ERR;
 	}
 	
 	free(request);
