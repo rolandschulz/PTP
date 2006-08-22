@@ -61,10 +61,6 @@ proxy_svr_funcs proxy_tcp_svr_funcs =
 	proxy_tcp_svr_finish,
 };
 
-static int proxy_tcp_svr_quit(proxy_svr_helper_funcs *, char **);
-
-static int proxy_tcp_svr_shutdown;
-
 /*
  * Called when an event is received in response to a client debug command.
  * Sends the event to the proxy peer.
@@ -288,7 +284,6 @@ proxy_tcp_svr_finish(proxy_svr *svr)
  * Check for incoming messages or connection attempts.
  * 
  * @return	0	success
- * 			-1	server shutdown
  */
 static int
 proxy_tcp_svr_progress(proxy_svr *svr)
@@ -300,14 +295,7 @@ proxy_tcp_svr_progress(proxy_svr *svr)
 		proxy_tcp_svr_dispatch(conn, msg);
 		free(msg);
 	}
-	
-	if (proxy_tcp_svr_shutdown) {
-		if (conn->svr->svr_helper_funcs->shutdown_completed != NULL)
-			 return conn->svr->svr_helper_funcs->shutdown_completed() ? PROXY_RES_ERR : PROXY_RES_OK;
-		else
-			return PROXY_RES_ERR;
-	}
-		
+
 	return PROXY_RES_OK;
 }
 
@@ -321,23 +309,14 @@ proxy_tcp_svr_progress(proxy_svr *svr)
 static int
 proxy_tcp_svr_dispatch(proxy_tcp_conn *conn, char *msg)
 {
-	int					res;
 	int					i;
 	int					argc;
 	char *				p;
 	char **				args;
-	proxy_event *		e;
 	proxy_svr_commands * cmd;
 	
 	DEBUG_PRINT("SVR received <%s>\n", msg);
 
-	if (proxy_tcp_svr_shutdown) {
-		e = new_proxy_event(PROXY_EV_ERROR);
-		e->error_code = PROXY_ERR_SERVER;
-		e->error_msg = strdup("server is shutting down");
-		proxy_tcp_svr_event_callback(e, (void *)conn);
-	}
-	
 	/*
 	 * Convert msg into an array of arguments
 	 * Convert each argument from proxy str to a cstring (apart from first)
@@ -359,14 +338,10 @@ proxy_tcp_svr_dispatch(proxy_tcp_conn *conn, char *msg)
 		
 	args[i] = NULL;
                                
-	if (strcmp(args[0], PROXY_QUIT_CMD) == 0)
-		res = proxy_tcp_svr_quit(conn->svr->svr_helper_funcs, args);
-	else {
-		for (cmd = conn->svr->svr_commands; cmd->cmd_name != NULL; cmd++) {
-			if (strcmp(args[0], cmd->cmd_name) == 0) {
-				(void)cmd->cmd_func(args);
-				break;
-			}
+	for (cmd = conn->svr->svr_commands; cmd->cmd_name != NULL; cmd++) {
+		if (strcmp(args[0], cmd->cmd_name) == 0) {
+			(void)cmd->cmd_func(args);
+			break;
 		}
 	}
 	
@@ -384,17 +359,4 @@ proxy_tcp_svr_recv_msgs(int fd, void *data)
 	proxy_tcp_conn *		conn = (proxy_tcp_conn *)data;
 	
 	return proxy_tcp_recv_msgs(conn);
-}
-
-static int
-proxy_tcp_svr_quit(proxy_svr_helper_funcs *helper, char **args)
-{
-	int	res = PROXY_RES_OK;
-	
-	if (helper->quit != NULL)
-		res = helper->quit();
-	
-	proxy_tcp_svr_shutdown++;
-	
-	return res;
 }
