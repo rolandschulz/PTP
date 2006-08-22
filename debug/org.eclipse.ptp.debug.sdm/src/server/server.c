@@ -20,13 +20,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "dbg_mpi.h"
+#include "client_srv.h"
 #include "hash.h"
 #include "backend.h"
 #include "proxy.h"
 #include "proxy_tcp.h"
-
-static int	TaskID;
 
 extern int	svr_init(dbg_backend *, void (*)(dbg_event *, void *), void *, char **);
 extern int	svr_dispatch(dbg_backend *, char *);
@@ -36,68 +34,32 @@ extern int	svr_interrupt(dbg_backend *);
 static void
 event_callback(dbg_event *e, void *data)
 {
-	int		task_id = *((int *)data);
-	int		len;
-	char *	reply_buf;
-	unsigned int	hdr[2];
+	char *		msg;
 	
-	if (DbgEventToStr(e, &reply_buf) < 0)
-		reply_buf = strdup("ERROR");
-	
-	len = strlen(reply_buf);
-
-	hdr[0] = HashCompute(reply_buf, len);
-	hdr[1] = len;
-
-	DEBUG_PRINT("SVR[%d] about to send reply <(%d,%d),%s>\n", TaskID, hdr[0], hdr[1], reply_buf);
-	
-	MPI_Send(hdr, 2, MPI_UNSIGNED, task_id, 0, MPI_COMM_WORLD);
-	MPI_Send(reply_buf, strlen(reply_buf), MPI_CHAR, task_id, 0, MPI_COMM_WORLD);
-	
-	DEBUG_PRINT("SVR[%d] send complete\n", TaskID);
-	
-	free(reply_buf);
+	if (DbgEventToStr(e, &msg) < 0)
+		return;
+		
+	ClntSvrInsertMessage(msg);
 }
 
-/*
- * Receive and process a command from the client. Return the reponse to the client.
- * 
- * @return	0 for normal command dispatch
- * 			1 for server shutdown
- * 			-1 for other errors
- */
-static int
-do_commands(dbg_backend *dbgr, int client_task_id)
+static void
+do_normal_command(char *cmd, void *data)
 {
-	int			len;
-	int			flag;
-	int			ret = 0;
-	char *		cmd_buf;
-	MPI_Status	stat;
-
-	MPI_Iprobe(client_task_id, MPI_ANY_TAG, MPI_COMM_WORLD, &flag, &stat);
+	dbg_backend *	dbgr = (dbg_backend *)data;
 	
-	if (flag == 0)
-		return 0;
-		
-	if (stat.MPI_TAG == TAG_NORMAL) {
-		MPI_Get_count(&stat, MPI_CHAR, &len);
-		
-		cmd_buf = (char *)malloc(len + 1);
-		MPI_Recv(cmd_buf, len, MPI_CHAR, client_task_id, TAG_NORMAL, MPI_COMM_WORLD, &stat);
-		cmd_buf[len] = '\0';
+	DEBUG_PRINT("executing local command '%s'\n", cmd);
 	
-		DEBUG_PRINT("SVR[%d] received normal command <%s>\n", TaskID, cmd_buf);
-		ret = svr_dispatch(dbgr, cmd_buf);
-		
-		free(cmd_buf);
-	} else {
-		MPI_Recv(NULL, 0, MPI_CHAR, client_task_id, TAG_INTERRUPT, MPI_COMM_WORLD, &stat);
-		DEBUG_PRINT("SVR[%d] received interrupt\n", TaskID);
-		ret = svr_interrupt(dbgr);
-	}
+	(void)svr_dispatch(dbgr, cmd);
+}
 
-	return ret;
+static void
+do_int_command(void *data)
+{
+	dbg_backend *	dbgr = (dbg_backend *)data;
+	
+	DEBUG_PRINT("executing interrupt command\n");
+	
+	(void)svr_interrupt(dbgr);
 }
 
 void
@@ -138,38 +100,34 @@ setenviron(char *str, int val)
  * 
  */
 void
-server(int client_task_id, int my_task_id, int job_id, dbg_backend *dbgr)
+server(int nprocs, int my_id, int job_id, dbg_backend *dbgr)
 {
-	//int signal;
-	//char status;
-	//char **args;
-	char **env = NULL;
+	char **		env = NULL;
 	
-	DEBUG_PRINT("starting server on [%d]\n", my_task_id);
+	DEBUG_PRINT("starting server on [%d,%d,%d]\n", my_id, nprocs, job_id);
 	
 	if (job_id >= 0) {
 		env = (char **)malloc(4 * sizeof(char **));
 		asprintf(&env[0], "OMPI_MCA_ns_nds_jobid=%d", job_id);
-		asprintf(&env[1], "OMPI_MCA_ns_nds_vpid=%d", my_task_id);
-		asprintf(&env[2], "OMPI_MCA_ns_nds_num_procs=%d", client_task_id);
+		asprintf(&env[1], "OMPI_MCA_ns_nds_vpid=%d", my_id);
+		asprintf(&env[2], "OMPI_MCA_ns_nds_num_procs=%d", nprocs-1);
 		env[3] = NULL;
 	}
 	
-	//unpack_executable(&args);
+	ClntSvrInit(nprocs, my_id);
+	ClntSvrRegisterCompletionCallback(ClntSvrSendReply);
+	ClntSvrRegisterLocalCmdCallback(do_normal_command, (void *)dbgr);
+	ClntSvrRegisterInterruptCmdCallback(do_int_command, (void *)dbgr);
 	
-	//initalize_low();
-	
-	//signal = start_inferior(&args, &status);
-	//srand(my_task_id);
-	
-	TaskID = my_task_id;
-	
-	svr_init(dbgr, event_callback, (void *)&client_task_id, env);
+	svr_init(dbgr, event_callback, NULL, env);
 	
 	for (;;) {
-		do_commands(dbgr, client_task_id);
+		ClntSvrProgressCmds();
+		
 		if (svr_progress(dbgr) < 0)
 			break;
 	}
+	
+	ClntSvrFinish();
 }
 

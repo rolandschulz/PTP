@@ -247,7 +247,7 @@ WriteCommand(int fd, char *cmd)
 	int	len = strlen(cmd);
 
 #ifdef DEBUG
-	printf("gdb>>> %s\n", cmd);
+	printf("gdb>>> %s\n", cmd); fflush(stdout);
 #endif
 		
 	while (len > 0) {
@@ -325,7 +325,7 @@ ReadResponse(int fd)
 #ifdef DEBUG
 	if (n > 0)
 		p[n] = '\0';
-	printf("<<<gdb %s\n", res_buf);
+	printf("<<<gdb %s\n", res_buf); fflush(stdout);
 #endif
 
 	return res_buf;
@@ -362,6 +362,9 @@ MISessionProcessCommandsAndResponses(MISession *sess, fd_set *rfds, fd_set *wfds
 		 * interrupt a running process seems to be from the command line.
 		 */
 		if (strcmp(sess->command->command, "-exec-interrupt") == 0) {
+#ifdef DEBUG
+			printf("sending SIGINT to %d\n", sess->pid); fflush(stdout);			
+#endif /* DEBUG */
 			kill(sess->pid, SIGINT);
 		} else if (WriteCommand(sess->in_fd, MICommandToString(sess->command)) < 0) {
 			sess->in_fd = -1;

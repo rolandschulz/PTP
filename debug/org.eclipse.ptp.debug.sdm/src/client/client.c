@@ -70,8 +70,6 @@ static proxy_handler_funcs handler_funcs = {
 static proxy_svr_helper_funcs helper_funcs = {
 	new_connection,
 	server_count,
-	DbgClntIsShutdown,
-	DbgClntQuit
 };
 
 static proxy_svr_commands command_tab[] = { 
@@ -103,6 +101,7 @@ static proxy_svr_commands command_tab[] = {
 	{DBG_LISTSIGNALS_CMD,			DbgClntListSignals},
 	{DBG_SIGNALINFO_CMD,			DbgClntSignalInfo},
 	{DBG_CLIHANDLE_CMD,				DbgClntCLIHandle},
+	{DBG_QUIT_CMD,					DbgClntQuit},
 	{NULL,							NULL}
 };
 
@@ -111,15 +110,15 @@ client(int svr_num, int task_id, char *proxy, char *host, int port)
 {
 	num_servers = svr_num;
 	
-	if (DbgClntInit(svr_num, proxy, &handler_funcs, &helper_funcs, command_tab) != DBGRES_OK ||
+	if (DbgClntInit(svr_num, task_id, proxy, &handler_funcs, &helper_funcs, command_tab) != DBGRES_OK ||
 			DbgClntCreateSession(svr_num, host, port) != DBGRES_OK) {
 		fprintf(stderr, "%s\n", DbgGetErrorStr()); fflush(stderr);
-		DbgClntQuit(); //TODO fixme!
+		DbgClntQuit(NULL); //TODO fixme!
 		DbgClntProgress();
 		return;
 	}
 	
-	for (;;) {
+	while (!DbgClntIsShutdown()) {
 		if (DbgClntProgress() != DBGRES_OK)
 			break;
 	}

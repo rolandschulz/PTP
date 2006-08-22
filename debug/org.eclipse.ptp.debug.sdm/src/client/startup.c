@@ -18,7 +18,7 @@
  ******************************************************************************/
 
 #include <mpi.h>
-#include	<getopt.h>
+#include <getopt.h>
 #include <stdlib.h>
 #include <stdarg.h>
 
@@ -27,17 +27,17 @@
 #include "proxy_tcp.h"
 
 #define DEFAULT_BACKEND	"gdb-mi"
-#define DEFAULT_PROXY		"tcp"
+#define DEFAULT_PROXY	"tcp"
 
 extern void client(int, int, char *, char *, int);
 extern void server(int, int, int, dbg_backend *);
 
 static struct option longopts[] = {
-	{"debugger",			required_argument,	NULL,	'b'},
+	{"debugger",		required_argument,	NULL,	'b'},
 	{"debugger_path",	required_argument,	NULL, 	'e'}, 
 	{"proxy",			required_argument,	NULL, 	'P'}, 
-	{"port",				required_argument,	NULL, 	'p'}, 
-	{"host",				required_argument,	NULL, 	'h'}, 
+	{"port",			required_argument,	NULL, 	'p'}, 
+	{"host",			required_argument,	NULL, 	'h'}, 
 	{"jobid",			required_argument,	NULL, 	'j'},
 	{NULL,				0,					NULL,	0}
 };
@@ -68,8 +68,8 @@ error_msg(int rank, char *fmt, ...)
 int
 main(int argc, char *argv[])
 {
-	int 				rank;
-	int 				size;
+	int 			rank;
+	int 			size;
 	int				ch;
 	int				jobid = 0;
 	int				port = PROXY_TCP_PORT;
@@ -140,10 +140,14 @@ main(int argc, char *argv[])
 		return 1;
 	}
 	
+	/*
+	 * The client process *must* always have task id 'size' - 1 since it
+	 * does not control a debugged process.
+	 */
 	if (rank == size-1) {
-		client(size - 1, rank, proxy_str, host, port);
+		client(size, rank, proxy_str, host, port);
 	} else {
-		server(size - 1, rank, jobid, d);
+		server(size, rank, jobid, d);
 	}
 	
 	MPI_Finalize();

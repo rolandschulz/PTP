@@ -48,6 +48,7 @@
 #define DBG_LISTSIGNALS_CMD				"LSI"
 #define DBG_SIGNALINFO_CMD				"SIG"
 #define DBG_CLIHANDLE_CMD				"CHL"
+#define DBG_QUIT_CMD					"QUI"
 
 #define DBG_STARTSESSION_FMT			"%s \"%s\" \"%s\""
 #define DBG_SETLINEBREAKPOINT_FMT		"%s %d \"%s\" %d"
