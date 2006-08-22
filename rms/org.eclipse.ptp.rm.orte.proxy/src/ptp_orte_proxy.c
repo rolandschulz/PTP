@@ -1859,6 +1859,7 @@ ORTEDiscover(char **args)
 	asprintf(&(external_keys[2]), "%s", "Node Name");
 	types[2] = PTP_STRING;
 	asprintf(&(internal_keys[3]), "%s", ORTE_SOH_BPROC_NODE_USER);
+	asprintf(&(external_keys[4]), "%s", "User Owner");
 	types[3] = PTP_STRING;
 	asprintf(&(internal_keys[4]), "%s", ORTE_SOH_BPROC_NODE_GROUP);
 	asprintf(&(external_keys[4]), "%s", "Group Owner");
