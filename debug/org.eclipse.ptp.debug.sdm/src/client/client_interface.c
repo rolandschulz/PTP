@@ -431,7 +431,10 @@ DbgCLIHandle(session *s, bitset *set, char* arg)
 int
 DbgQuit(session *s)
 {
-	return proxy_clnt_quit(s->sess_proxy);
+	int		res;
+	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_QUIT_CMD, NULL);
+	return res;
+
 }
 
 /*

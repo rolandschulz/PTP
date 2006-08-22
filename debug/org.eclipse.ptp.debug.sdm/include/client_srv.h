@@ -23,10 +23,15 @@
 #include "bitset.h"
 #include "dbg_event.h"
 
-void ClntRegisterCallback(void (*)(dbg_event *, void *));
-void ClntInit(int);
-int ClntSendCommand(bitset *, int, char *, char *);
-int ClntSendInterrupt(bitset *);
-int ClntProgressCmds(void);
+void	ClntSvrRegisterCompletionCallback(void (*)(bitset *, char *, void *));
+void	ClntSvrRegisterLocalCmdCallback(void (*func)(char *, void *), void *data);
+void	ClntSvrRegisterInterruptCmdCallback(void (*func)(void *), void *data);
+void	ClntSvrInit(int, int);
+int		ClntSvrSendCommand(bitset *, int, char *, char *);
+int		ClntSvrSendInterrupt(bitset *);
+void	ClntSvrInsertMessage(char *);
+void	ClntSvrSendReply(bitset *, char *, void *);
+int		ClntSvrProgressCmds(void);
+void	ClntSvrFinish(void);
 
 #endif /* _CLIENT_SRV_H_ */
