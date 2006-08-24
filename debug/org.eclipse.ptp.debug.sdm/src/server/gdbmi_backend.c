@@ -163,8 +163,8 @@ dbg_backend_funcs	GDBMIBackend =
 	
 #define ERROR_TO_EVENT(e) \
 	e = NewDbgEvent(DBGEV_ERROR); \
-	e->error_code = DbgGetError(); \
-	e->error_msg = strdup(DbgGetErrorStr())
+	e->dbg_event_u.error_event.error_code = DbgGetError(); \
+	e->dbg_event_u.error_event.error_msg = strdup(DbgGetErrorStr())
 
 static char *
 GetLastErrorStr(void)
@@ -304,9 +304,12 @@ AsyncStop(void *data)
 		bpmap = FindLocalBP(evt->bkptno);
 		
 		if (!bpmap->temp) {
-			e = NewDbgEvent(DBGEV_BPHIT);
-			e->bpid = bpmap->remote;
-			e->thread_id = evt->threadId;
+			e = NewDbgEvent(DBGEV_SUSPEND);
+			e->dbg_event_u.suspend_event.reason = DBGEV_SUSPEND_BPHIT;
+			e->dbg_event_u.suspend_event.ev_u.bpid = bpmap->remote;
+			e->dbg_event_u.suspend_event.thread_id = evt->threadId;
+			e->dbg_event_u.suspend_event.frame = NULL;
+			e->dbg_event_u.suspend_event.changed_vars = NULL;
 			break;
 		}
 		
@@ -319,8 +322,10 @@ AsyncStop(void *data)
 			ERROR_TO_EVENT(e);
 		} else {
 			e = NewDbgEvent(DBGEV_SUSPEND);
-			e->thread_id = evt->threadId;
-			e->frame = frame;
+			e->dbg_event_u.suspend_event.reason = DBGEV_SUSPEND_INT;
+			e->dbg_event_u.suspend_event.thread_id = evt->threadId;
+			e->dbg_event_u.suspend_event.frame = frame;
+			e->dbg_event_u.suspend_event.changed_vars = NULL;
 		}
 		break;
 
@@ -328,34 +333,41 @@ AsyncStop(void *data)
 		if (get_current_frame(&frame) < 0) {
 			ERROR_TO_EVENT(e);
 		} else {
-			e = NewDbgEvent(DBGEV_STEP);
-			e->frame = frame;
-			e->thread_id = evt->threadId;
+			e = NewDbgEvent(DBGEV_SUSPEND);
+			e->dbg_event_u.suspend_event.reason = DBGEV_SUSPEND_STEP;
+			e->dbg_event_u.suspend_event.frame = frame;
+			e->dbg_event_u.suspend_event.thread_id = evt->threadId;
+			e->dbg_event_u.suspend_event.changed_vars = NULL;
 		}
 		break;
 
 	case MIEventTypeInferiorSignalExit:
-		e = NewDbgEvent(DBGEV_EXIT_SIGNAL);
-		e->sig_name = strdup(evt->sigName);
-		e->sig_meaning = strdup(evt->sigMeaning);		
-		e->frame = NULL;
+		e = NewDbgEvent(DBGEV_EXIT);
+		e->dbg_event_u.exit_event.reason = DBGEV_EXIT_SIGNAL;
+		e->dbg_event_u.exit_event.ev_u.sig = NewSignalInfo();
+		e->dbg_event_u.exit_event.ev_u.sig->name = strdup(evt->sigName);
+		e->dbg_event_u.exit_event.ev_u.sig->desc = strdup(evt->sigMeaning);
 		break;
 		
 	case MIEventTypeSignal:
 		if (get_current_frame(&frame) < 0) {
 			ERROR_TO_EVENT(e);
 		} else {
-			e = NewDbgEvent(DBGEV_SIGNAL);
-			e->sig_name = strdup(evt->sigName);
-			e->sig_meaning = strdup(evt->sigMeaning);
-			e->thread_id = evt->threadId;
-			e->frame = frame;
+			e = NewDbgEvent(DBGEV_SUSPEND);
+			e->dbg_event_u.suspend_event.reason = DBGEV_SUSPEND_SIGNAL;
+			e->dbg_event_u.suspend_event.ev_u.sig = NewSignalInfo();
+			e->dbg_event_u.suspend_event.ev_u.sig->name = strdup(evt->sigName);
+			e->dbg_event_u.suspend_event.ev_u.sig->desc = strdup(evt->sigMeaning);
+			e->dbg_event_u.suspend_event.thread_id = evt->threadId;
+			e->dbg_event_u.suspend_event.frame = frame;
+			e->dbg_event_u.suspend_event.changed_vars = NULL;
 		}
 		break;
 
 	case MIEventTypeInferiorExit:
 		e = NewDbgEvent(DBGEV_EXIT);
-		e->exit_status = evt->code;
+		e->dbg_event_u.exit_event.reason = DBGEV_EXIT_NORMAL;
+		e->dbg_event_u.exit_event.ev_u.exit_status = evt->code;
 		break;
 
 	default:
@@ -655,8 +667,8 @@ SetAndCheckBreak(int bpid, int isTemp, int isHard, char *where, char *condition,
 	bp->loc.line = bpt->line;
 	
 	e = NewDbgEvent(DBGEV_BPSET);
-	e->bpid = bpid;
-	e->bp = bp;
+	e->dbg_event_u.bpset_event.bpid = bpid;
+	e->dbg_event_u.bpset_event.bp = bp;
 	SaveEvent(e);
 	
 	DestroyList(bpts, MIBreakpointFree);
@@ -826,7 +838,9 @@ GDBMIBreakpointAfter(int bpid, int icount)
 /*
  * Set watch point
  */
-static int GDBMIWatchpoint(int bpid, char *expr, int isAccess, int isRead, char *condition, int ignoreCount) {
+static int 
+GDBMIWatchpoint(int bpid, char *expr, int isAccess, int isRead, char *condition, int ignoreCount) 
+{
 	dbg_event *		e;
 	MIBreakpoint *	bpt;
 	MICommand *		cmd;
@@ -872,8 +886,8 @@ static int GDBMIWatchpoint(int bpid, char *expr, int isAccess, int isRead, char 
 	}
 
 	e = NewDbgEvent(DBGEV_BPSET);
-	e->bpid = bpid;
-	e->bp = bp;
+	e->dbg_event_u.bpset_event.bpid = bpid;
+	e->dbg_event_u.bpset_event.bp = bp;
 	SaveEvent(e);
 	
 	DestroyList(bpts, MIBreakpointFree);
@@ -1117,7 +1131,7 @@ GDBMIListStackframes(int current)
 		return DBGRES_ERR;
 	
 	e = NewDbgEvent(DBGEV_FRAMES);
-	e->list = frames;	
+	e->dbg_event_u.list = frames;	
 	SaveEvent(e);
 	
 	return DBGRES_OK;
@@ -1215,8 +1229,8 @@ GDBMIEvaluateExpression(char *exp)
 		return DBGRES_ERR;
 		
 	e = NewDbgEvent(DBGEV_DATA);
-	e->data = a;
-	e->type_desc = type;
+	e->dbg_event_u.data_event.data = a;
+	e->dbg_event_u.data_event.type_desc = type;
 	SaveEvent(e);
 
 	return DBGRES_OK;
@@ -1694,7 +1708,7 @@ GDBMIGetNativeType(char *var)
 		return DBGRES_ERR;
 		
 	e = NewDbgEvent(DBGEV_TYPE);
-	e->type_desc = type;
+	e->dbg_event_u.type_desc = type;
 
 	SaveEvent(e);
 
@@ -1794,10 +1808,10 @@ GDBMIGetLocalVariables(void)
 	MICommandFree(cmd);
 	
 	e = NewDbgEvent(DBGEV_VARS);
-	e->list = NewList();
+	e->dbg_event_u.list = NewList();
 
 	for (SetList(args); (arg = (MIArg *)GetListElement(args)) != NULL; ) {
-		AddToList(e->list, (void *)strdup(arg->name));
+		AddToList(e->dbg_event_u.list, (void *)strdup(arg->name));
 	}
 	
 	DestroyList(args, MIArgFree);
@@ -1836,7 +1850,7 @@ GDBMIListArguments(int level)
 	MICommandFree(cmd);
 
 	e = NewDbgEvent(DBGEV_ARGS);
-	e->list = NewList();
+	e->dbg_event_u.list = NewList();
 
 	/*
  	 * Just look at first frame - we should only get
@@ -1845,7 +1859,7 @@ GDBMIListArguments(int level)
 	SetList(frames);
 	if ((frame = (MIFrame *)GetListElement(frames)) != NULL) {
 		for (SetList(frame->args); (arg = (MIArg *)GetListElement(frame->args)) != NULL; )
-			AddToList(e->list, (void *)strdup(arg->name));
+			AddToList(e->dbg_event_u.list, (void *)strdup(arg->name));
 	}
 	
 	DestroyList(frames, MIFrameFree);
@@ -1908,10 +1922,10 @@ GDBMIGetInfoThread(void)
 	MICommandFree(cmd);
 	
 	e = NewDbgEvent(DBGEV_THREADS);
-	e->thread_id = info->current_thread_id;
-	e->list = NewList();
+	e->dbg_event_u.threads_event.thread_id = info->current_thread_id;
+	e->dbg_event_u.threads_event.list = NewList();
 	for (SetList(info->thread_ids); (tid = (char *)GetListElement(info->thread_ids)) != NULL;) {
-		AddToList(e->list, (void *)strdup(tid));
+		AddToList(e->dbg_event_u.threads_event.list, (void *)strdup(tid));
 	}
 
 	DestroyList(info->thread_ids, free);
@@ -1955,8 +1969,8 @@ GDBMISetThreadSelect(int threadNum)
 	}
 	
 	e = NewDbgEvent(DBGEV_THREAD_SELECT);
-	e->thread_id = info->current_thread_id;
-	e->frame = s;
+	e->dbg_event_u.thread_select_event.thread_id = info->current_thread_id;
+	e->dbg_event_u.thread_select_event.frame = s;
 
 	MIFrameFree(info->frame);
 	free(info);
@@ -1985,7 +1999,7 @@ GDBMIStackInfoDepth()
 	MICommandFree(cmd);
 
 	e = NewDbgEvent(DBGEV_STACK_DEPTH);
-	e->stack_depth = depth;
+	e->dbg_event_u.stack_depth = depth;
 	SaveEvent(e);
 	
 	return DBGRES_OK;
@@ -2046,7 +2060,7 @@ GDBMIDataReadMemory(long offset, char* address, char* format, int wordSize, int 
 			}
 		}
 	}
-	e->meminfo = meminfo;
+	e->dbg_event_u.meminfo = meminfo;
 	MIDataReadMemoryInfoFree(info);
 
 	SaveEvent(e);
@@ -2095,7 +2109,7 @@ GDBCLIListSignals(char* name)
 	MICommandFree(cmd);
 
 	e = NewDbgEvent(DBGEV_SIGNALS);
-	e->list = signals;
+	e->dbg_event_u.list = signals;
 	
 	SaveEvent(e);
 	

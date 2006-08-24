@@ -61,8 +61,8 @@ session_event_handler(void *event, void *data)
 	case PROXY_EV_OK:
 		if (DbgStrToEvent(pe->event_data, &de) < 0) {
 			de = NewDbgEvent(DBGEV_ERROR);
-			de->error_code = DBGERR_PROXY_PROTO;
-			de->error_msg = strdup("");
+			de->dbg_event_u.error_event.error_code = DBGERR_PROXY_PROTO;
+			de->dbg_event_u.error_event.error_msg = strdup("");
 		}
 		break;
 
@@ -71,13 +71,13 @@ session_event_handler(void *event, void *data)
 		
 		switch (pe->error_code) {
 		case PROXY_ERR_CLIENT:
-			de->error_code = DBGERR_DEBUGGER;
-			de->error_msg = strdup(pe->error_msg);
+			de->dbg_event_u.error_event.error_code = DBGERR_DEBUGGER;
+			de->dbg_event_u.error_event.error_msg = strdup(pe->error_msg);
 			break;
 			
 		case PROXY_ERR_SYSTEM:
-			de->error_code = DBGERR_SYSTEM;
-			de->error_msg = strdup(pe->error_msg);
+			de->dbg_event_u.error_event.error_code = DBGERR_SYSTEM;
+			de->dbg_event_u.error_event.error_msg = strdup(pe->error_msg);
 			break;
 		}
 		break;
