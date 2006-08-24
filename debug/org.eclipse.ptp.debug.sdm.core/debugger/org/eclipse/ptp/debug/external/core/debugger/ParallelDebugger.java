@@ -455,21 +455,21 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			completeCommand(e.getBitSet(), IDebugCommand.RETURN_OK);
 			break;
 			
-		case IProxyDebugEvent.EVENT_DBG_BPHIT:
-			ProxyDebugBreakpointHitEvent bptHitEvent = (ProxyDebugBreakpointHitEvent)e;
-			handleBreakpointHitEvent(e.getBitSet(), bptHitEvent.getBreakpointId(), bptHitEvent.getThreadId());
-			break;
-			
 		case IProxyDebugEvent.EVENT_DBG_SUSPEND:
-			ProxyDebugSuspendEvent suspendEvent = (ProxyDebugSuspendEvent)e;
-			handleSuspendEvent(e.getBitSet(), suspendEvent.getLocator(), suspendEvent.getThreadId());
-			break;
-			
-		case IProxyDebugEvent.EVENT_DBG_STEP:
-			ProxyDebugStepEvent stepEvent = (ProxyDebugStepEvent)e;
-			handleEndSteppingEvent(e.getBitSet(), stepEvent.getFrame().getLocator().getLineNumber(), stepEvent.getFrame().getLocator().getFile(), stepEvent.getThreadId());
-			//LineLocation loc = new LineLocation(stepEvent.getFrame().getLocator().getFile(), stepEvent.getFrame().getLocator().getLineNumber());
-			//fireEvent(new EndSteppingRangeEvent(getSession(), e.getBitSet(), loc));
+			if (e instanceof ProxyDebugBreakpointHitEvent) {
+				ProxyDebugBreakpointHitEvent bptHitEvent = (ProxyDebugBreakpointHitEvent)e;
+				handleBreakpointHitEvent(e.getBitSet(), bptHitEvent.getBreakpointId(), bptHitEvent.getThreadId());
+			} else if (e instanceof ProxyDebugSuspendEvent) {
+				ProxyDebugSuspendEvent suspendEvent = (ProxyDebugSuspendEvent)e;
+				handleSuspendEvent(e.getBitSet(), suspendEvent.getLocator(), suspendEvent.getThreadId());
+			} else if (e instanceof ProxyDebugStepEvent) {
+				ProxyDebugStepEvent stepEvent = (ProxyDebugStepEvent)e;
+				handleEndSteppingEvent(e.getBitSet(), stepEvent.getFrame().getLocator().getLineNumber(), stepEvent.getFrame().getLocator().getFile(), stepEvent.getThreadId());
+			} else if (e instanceof ProxyDebugSignalEvent) {
+				ProxyDebugSignalEvent sigEvent = (ProxyDebugSignalEvent)e;
+				completeCommand(e.getBitSet(), IDebugCommand.RETURN_OK);
+				handleProcessSignaledEvent(e.getBitSet(), sigEvent.getLocator(), sigEvent.getThreadId());
+			}
 			break;	
 			
 		case IProxyDebugEvent.EVENT_DBG_BPSET:
@@ -557,23 +557,17 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			break;
 			
 		case IProxyDebugEvent.EVENT_DBG_EXIT:
-			System.out.println("======================= EVENT_DBG_EXIT ====================");
-			ProxyDebugExitEvent exitEvent = (ProxyDebugExitEvent)e;
-			handleProcessTerminatedEvent(e.getBitSet(), exitEvent.getExitStatus());
-			break;
-		
-		case IProxyDebugEvent.EVENT_DBG_EXIT_SIGNAL:
-			System.out.println("======================= EVENT_DBG_EXIT_SIGNAL ====================");
-			ProxyDebugSignalExitEvent exitSigEvent = (ProxyDebugSignalExitEvent)e;
-			handleProcessTerminatedEvent(e.getBitSet(), exitSigEvent.getSignalName(), exitSigEvent.getSignalMeaning());
+			if (e instanceof ProxyDebugExitEvent) {
+				System.out.println("======================= EVENT_DBG_EXIT ====================");
+				ProxyDebugExitEvent exitEvent = (ProxyDebugExitEvent)e;
+				handleProcessTerminatedEvent(e.getBitSet(), exitEvent.getExitStatus());
+			} else if (e instanceof ProxyDebugSignalExitEvent) {
+				System.out.println("======================= EVENT_DBG_EXIT_SIGNAL ====================");
+				ProxyDebugSignalExitEvent exitSigEvent = (ProxyDebugSignalExitEvent)e;
+				handleProcessTerminatedEvent(e.getBitSet(), exitSigEvent.getSignalName(), exitSigEvent.getSignalMeaning());
+			}
 			break;
 			
-		case IProxyDebugEvent.EVENT_DBG_SIGNAL:
-			ProxyDebugSignalEvent sigEvent = (ProxyDebugSignalEvent)e;
-			completeCommand(e.getBitSet(), IDebugCommand.RETURN_OK);
-			handleProcessSignaledEvent(e.getBitSet(), sigEvent.getLocator(), sigEvent.getThreadID());
-			break;
-
 		case IProxyDebugEvent.EVENT_DBG_SIGNALS:
 			ProxyDebugSignalsEvent signalsEvent = (ProxyDebugSignalsEvent)e;
 			IPCDISignal[] pcdiSignals = new IPCDISignal[0];

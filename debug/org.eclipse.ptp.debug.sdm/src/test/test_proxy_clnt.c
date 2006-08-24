@@ -56,8 +56,8 @@ event_callback(dbg_event *e, void *data)
 	
 	switch (e->event) {
 	case DBGEV_ERROR:
-		printf("error: %s\n", e->error_msg);
-		switch (e->error_code) {
+		printf("error: %s\n", e->dbg_event_u.error_event.error_msg);
+		switch (e->dbg_event_u.error_event.error_code) {
 		case DBGERR_NOBACKEND:
 			fatal++;
 			break;
@@ -71,30 +71,40 @@ event_callback(dbg_event *e, void *data)
 	case DBGEV_INIT:
 		printf("debugger initilized\n");
 		break;
-	case DBGEV_BPHIT:
-		printf("hit breakpoint %d\n", e->bpid);
+	case DBGEV_SUSPEND:
+		switch (e->dbg_event_u.suspend_event.reason) {
+		case DBGEV_SUSPEND_BPHIT:
+			printf("hit breakpoint %d\n", e->dbg_event_u.suspend_event.ev_u.bpid);
+			break;
+		case DBGEV_SUSPEND_INT:
+			printf("suspend completed\n");
+			break;
+		case DBGEV_SUSPEND_STEP:
+			printf("step completed\n");
+			break;
+		case DBGEV_SUSPEND_SIGNAL:
+			printf("received signal %s\n", e->dbg_event_u.suspend_event.ev_u.sig->name);
+			break;
+		}
 		break;
 	case DBGEV_BPSET:
 		printf("breakpoint set\n");
 		break;
-	case DBGEV_SUSPEND:
-		printf("suspend completed\n");
-		break;
-	case DBGEV_STEP:
-		printf("step completed\n");
-		break;
-	case DBGEV_SIGNAL:
-		printf("received signal %s\n", e->sig_name);
-		break;
 	case DBGEV_EXIT:
-		printf("exited with status %d\n", e->exit_status);
-		break;
+		switch (e->dbg_event_u.suspend_event.reason) {
+		case DBGEV_EXIT_NORMAL:
+			printf("exited with status %d\n", e->dbg_event_u.exit_event.ev_u.exit_status);
+			break;
+		case DBGEV_EXIT_SIGNAL:
+			printf("exited with signal %s\n", e->dbg_event_u.exit_event.ev_u.sig->name);
+			break;
+		}
 	case DBGEV_DATA:
-		printf("data is "); AIFPrint(stdout, 0, e->data); printf("\n");
+		printf("data is "); AIFPrint(stdout, 0, e->dbg_event_u.data_event.data); printf("\n");
 		break;
 	case DBGEV_FRAMES:
 		printf("got frames:\n");
-		for (SetList(e->list); (f = (stackframe *)GetListElement(e->list)) != NULL; ) {
+		for (SetList(e->dbg_event_u.list); (f = (stackframe *)GetListElement(e->dbg_event_u.list)) != NULL; ) {
 			printf(" #%d %s() at %s:%d\n", f->level, f->loc.func, f->loc.file, f->loc.line);
 		}
 		break;

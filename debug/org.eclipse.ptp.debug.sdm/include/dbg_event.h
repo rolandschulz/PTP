@@ -33,10 +33,9 @@
 #define DBG_EV_WAITSOME	100000
 
 #define DBG_EV_OFFSET		100
-#define DBGEV_BPHIT			DBG_EV_OFFSET + 0
-#define DBGEV_SIGNAL		DBG_EV_OFFSET + 1
 #define DBGEV_EXIT			DBG_EV_OFFSET + 2
-#define DBGEV_STEP			DBG_EV_OFFSET + 3
+#define 	DBGEV_EXIT_NORMAL	0
+#define 	DBGEV_EXIT_SIGNAL	1
 #define DBGEV_BPSET			DBG_EV_OFFSET + 4
 #define DBGEV_FRAMES		DBG_EV_OFFSET + 5
 #define DBGEV_DATA			DBG_EV_OFFSET + 6
@@ -47,79 +46,137 @@
 #define DBGEV_OK			DBG_EV_OFFSET + 11
 #define DBGEV_ERROR			DBG_EV_OFFSET + 12
 #define DBGEV_SUSPEND		DBG_EV_OFFSET + 13
+#define 	DBGEV_SUSPEND_BPHIT		0
+#define 	DBGEV_SUSPEND_SIGNAL	1
+#define 	DBGEV_SUSPEND_STEP		2
+#define 	DBGEV_SUSPEND_INT		3
 #define DBGEV_THREADS		DBG_EV_OFFSET + 14
 #define DBGEV_THREAD_SELECT	DBG_EV_OFFSET + 15
 #define DBGEV_STACK_DEPTH	DBG_EV_OFFSET + 16
 #define DBGEV_DATAR_MEM		DBG_EV_OFFSET + 17
 #define DBGEV_DATAW_MEM		DBG_EV_OFFSET + 18
 #define DBGEV_SIGNALS		DBG_EV_OFFSET + 19
-#define DBGEV_EXIT_SIGNAL	DBG_EV_OFFSET + 20
+
+struct dbg_suspend_event {
+	int	reason;
+	
+	union {
+		int				bpid;	/* DBGEV_SUSPEND_BPHIT */
+		signalinfo *	sig;	/* DBGEV_SUSPEND_SIGNAL */
+	} ev_u;
+	
+	int				thread_id;
+	stackframe *	frame;
+	
+	List *			changed_vars;
+};
+typedef struct dbg_suspend_event	dbg_suspend_event;
+
+struct dbg_exit_event {
+	int	reason;
+	
+	union {
+		int				exit_status;	/* DBGEV_EXIT_NORMAL */
+		signalinfo *	sig;			/* DBGEV_EXIT_SIGNAL */
+	} ev_u;
+};
+typedef struct dbg_exit_event	dbg_exit_event;
+
+struct dbg_error_event {
+	int		error_code;
+	char *	error_msg;
+};
+typedef struct dbg_error_event	dbg_error_event;
+
+struct dbg_bpset_event {
+	int				bpid;
+	breakpoint *	bp;
+};
+typedef struct dbg_bpset_event	dbg_bpset_event;
+	
+struct dbg_data_event {
+	char *	type_desc;
+	AIF *	data;
+};
+typedef struct dbg_data_event	dbg_data_event;
+
+struct dbg_threads_event {
+	List *	list;
+	int		thread_id;
+};
+typedef struct dbg_threads_event	dbg_threads_event;
+
+struct dbg_thread_select_event {
+	stackframe *	frame;
+	int				thread_id;
+};
+typedef struct dbg_thread_select_event	dbg_thread_select_event;
 
 struct dbg_event {
-	int				event;
-	bitset *		procs;
+	int			event;
+	bitset *	procs;
 	
-	/*
-	 * DBGEV_INIT
-	 */
-	int				num_servers;
+	union {
+		/*
+		 * DBGEV_INIT
+		 */
+		int					num_servers;
+		
+		/*
+		 * DBGEV_BPSET
+		 */
+		dbg_bpset_event		bpset_event;
+		
+		/*
+		 * DBGEV_FRAMES, DBGEV_VARS, DBGEV_ARGS, DBGEV_SIGNALS
+		 */
+		List *				list;
+		
+		/*
+		 * DBGEV_TYPE
+		 */
+		char *				type_desc;
+		
+		/*
+		 * DBGEV_DATA
+		 */
+		dbg_data_event		data_event;
+			
+		/*
+		 * DBGEV_EXIT
+		 */
+		dbg_exit_event		exit_event;
+		
+		/*
+		 * DBGEV_ERROR
+		 */
+		dbg_error_event		error_event;
 	
-	/*
-	 * DBGEV_BPHIT, DBGEV_BPSET
-	 */
-	int				bpid;
-	
-	/*
-	 * DBGEV_BPSET
-	 */
-	breakpoint *	bp;
-	
-	/*
-	 * DBGEV_FRAMES, DBGEV_VARS, DBGEV_ARGS, DBGEV_SIGNALS
-	 */
-	List *			list;
-	
-	/*
-	 * DBGEV_TYPE, DBGEV_DATA
-	 */
-	char *			type_desc;
-	
-	/*
-	 * DBGEV_DATA
-	 */
-	AIF *			data;
-	
-	/*
-	 * DBGEV_SIGNAL, DBGEV_EXIT_SIGNAL
-	 */
-	char *			sig_name;
-	char *			sig_meaning;
-	int				thread_id;
-	
-	/*
-	 * DBGEV_EXIT
-	 */
-	int				exit_status;
-	
-	/*
-	 * DBGEV_ERROR
-	 */
-	int				error_code;
-	char *			error_msg;
-	
-	/*
-	 * DBGEV_STEP, DBGEV_SIGNAL, DBGEV_SUSPEND
-	 */
-	stackframe *	frame;
-	/* 
-	 * DBGEV_STACK_DEPTH
-	 */
-	 int stack_depth;
-	 
-	 /*
-	  * Memory
-	  */
-	  memoryinfo * meminfo;
+		/*
+		 * DBGEV_SUSPEND
+		 */
+		dbg_suspend_event	suspend_event;
+		
+		/* 
+		 * DBGEV_STACK_DEPTH
+		 */
+		int					stack_depth;
+		 
+		/*
+		 * DBGEV_DATAR_MEM
+		 */
+		memoryinfo *		meminfo;
+		
+		/*
+		 * DBGEV_THREADS
+		 */
+		dbg_threads_event	threads_event;
+		
+		/*
+		 * DBGEV_THREAD_SELECT
+		 */
+		dbg_thread_select_event	thread_select_event;
+	} dbg_event_u;
 };
 typedef struct dbg_event dbg_event;
 

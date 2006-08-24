@@ -22,23 +22,17 @@ package org.eclipse.ptp.debug.external.core.proxy.event;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.external.core.proxy.ProxyDebugStackframe;
 
-public class ProxyDebugStepEvent extends AbstractProxyDebugEvent implements IProxyDebugEvent {
+public class ProxyDebugStepEvent extends AbstractProxyDebugSuspendEvent implements IProxyDebugEvent {
 	private ProxyDebugStackframe		frame;
-	private int thread_id = 0;
 	
-	public ProxyDebugStepEvent(BitList set, ProxyDebugStackframe frame, int thread_id) {
-		super(EVENT_DBG_STEP, set);
+	public ProxyDebugStepEvent(BitList set, ProxyDebugStackframe frame, int thread_id, String[] vars) {
+		super(set, null, thread_id, vars);
 		this.frame = frame;
-		this.thread_id = thread_id;
 	}
 	
 	public ProxyDebugStackframe getFrame() {
 		return this.frame;
 	}
-	public int getThreadId() {
-		return thread_id;
-	}
-	
 	public String toString() {
 		return "EVENT_DBG_STEP " + this.getBitSet().toString() + " " + this.frame.toString();
 	}
