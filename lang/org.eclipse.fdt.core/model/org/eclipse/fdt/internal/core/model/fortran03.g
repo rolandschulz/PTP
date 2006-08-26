@@ -213,9 +213,10 @@ name
 	;
 
 // R305
+// named_constant causes an ambiguity with variable is designator so removed from grammar
 constant
 	:	literal_constant
-	|	named_constant
+//	|	named_constant
 	;
 
 scalar_constant
@@ -234,9 +235,10 @@ literal_constant
 	;
 
 // R307
-named_constant
-	:	name
-	;
+// named_constant causes an ambiguity with variable is designator so removed from grammar
+// named_constant
+//	:	name
+//	;
 
 // R308 int_constant inlined as T_DIGIT_STRING
 
@@ -259,9 +261,9 @@ intrinsic_operator
 	;
 
 // R311
-// removed defined_unary_op or defined_binary_op ambiguity with defined_unary_or_binary_op
+// removed defined_unary_op or defined_binary_op ambiguity with T_DEFINED_OP
 defined_operator
-	:	defined_unary_or_binary_op
+	:	T_DEFINED_OP
 	|	extended_intrinsic_op
 	;
 
@@ -380,17 +382,19 @@ complex_literal_constant
 	;
 
 // R422
+// ERR_CHK 422 named_constant replaced by T_IDENT (
 real_part
 	:	signed_int_literal_constant
 	|	signed_real_literal_constant
-	|	named_constant
+	|	T_IDENT
 	;
 
 // R423
+// ERR_CHK 423 named_constant replaced by T_IDENT
 imag_part
 	:	signed_int_literal_constant
 	|	signed_real_literal_constant
-	|	named_constant
+	|	T_IDENT
 	;
 
 // R424
@@ -428,8 +432,7 @@ scalar_int_literal_constant
 
 // R427
 char_literal_constant
-    :    ( kind_param T_UNDERSCORE ) '\'' ( Rep_Char )* '\''
-    |    ( kind_param T_UNDERSCORE ) '\"' ( Rep_Char )* '\"'
+    :    ( kind_param T_UNDERSCORE )? T_CHAR_CONSTANT
     ;
 
 // R428
@@ -728,8 +731,9 @@ enumerator_def_stmt
 
 // R463
 // ERR_CHK 463 scalar_int_initialization_expr replaced by expr
+// ERR_CHK 463 named_constant replaced by T_IDENT
 enumerator
-    :    named_constant ( T_EQUALS expr )?
+    :    T_IDENT ( T_EQUALS expr )?
     ;
 
 enumerator_list
@@ -861,7 +865,7 @@ entity_decl_list
 
 // R505
 object_name
-	:	name
+	:	T_IDENT
 	;
 
 object_name_list
@@ -1148,8 +1152,9 @@ named_constant_def_list
 
 // R539
 // ERR_CHK 539 initialization_expr replaced by expr
+// ERR_CHK 539 named_constant replaced by T_IDENT
 named_constant_def
-	:	named_constant T_EQUALS expr
+	:	T_IDENT T_EQUALS expr
 	;
 
 // R540
@@ -1592,23 +1597,37 @@ level_1_expr
 
 // R703
 defined_unary_op
-	:	T_PERIOD Letter ( Letter )* T_PERIOD
+	:	T_DEFINED_OP
 	;
 
+// inserted as R704 functionality
+power_operand
+	: level_1_expr ( power_op power_operand )?
+	;	
+
 // R704
-// TODO putback
+// see power_operand
 mult_operand
-    : level_1_expr /* ( power_op mult_operand )? */
+//    : level_1_expr ( power_op mult_operand )?
+//    : power_operand
+    : power_operand ( mult_op power_operand )*
     ;
 
 // R705
+// moved leading optionals to mult_operand
 add_operand
-    : /* ( add_operand mult_op )? */ mult_operand
+//    : ( add_operand mult_op )? mult_operand
+//    : ( mult_operand mult_op )* mult_operand
+    : (add_op)? mult_operand ( add_op mult_operand )*
     ;
 
 // R706
+// moved leading optionals to add_operand
 level_2_expr
-    : ( /* ( level_2_expr )? */ add_op )? add_operand
+//    : ( ( level_2_expr )? add_op )? add_operand
+// check notes on how to remove this left recursion  (WARNING something like the following)
+//    : (add_op)? ( add_operand add_op )* add_operand
+    : add_operand ( concat_op add_operand )*
     ;
 
 // R707
@@ -1629,8 +1648,11 @@ add_op
 	;
 
 // R710
+// moved leading optional to level_2_expr
 level_3_expr
-    : /* ( level_3_expr concat_op )? */ level_2_expr
+//    : ( level_3_expr concat_op )? level_2_expr
+//    : ( level_2_expr concat_op )* level_2_expr
+    : level_2_expr ( rel_op level_2_expr )?
     ;
 
 // R711
@@ -1639,8 +1661,10 @@ concat_op
 	;
 
 // R712
+// moved leading optional to level_3_expr
 level_4_expr
-    : /* ( level_3_expr rel_op )? */ level_3_expr
+//    : ( level_3_expr rel_op )? level_3_expr
+    : level_3_expr
     ;
 
 // R713
@@ -1661,22 +1685,32 @@ rel_op
 
 // R714
 and_operand
-    :    ( not_op )? level_4_expr
+//    :    ( not_op )? level_4_expr
+    :    ( not_op )? level_4_expr ( and_op level_4_expr )*
     ;
 
 // R715
+// moved leading optional to or_operand
 or_operand
-    : /* ( or_operand and_op )? */ and_operand
+//    : ( or_operand and_op )? and_operand
+//    : ( and_operand and_op )* and_operand
+    : and_operand ( or_op and_operand )*
     ;
 
 // R716
+// moved leading optional to or_operand
 equiv_operand
-    : /* ( equiv_operand or_op )? */ or_operand
+//    : ( equiv_operand or_op )? or_operand
+//    : ( or_operand or_op )* or_operand
+    : or_operand ( equiv_op or_operand )*
     ;
 
 // R717
+// moved leading optional to equiv_operand
 level_5_expr
-    : /* ( level_5_expr equiv_op )? */ equiv_operand
+//    : ( level_5_expr equiv_op )? equiv_operand
+//    : ( equiv_operand equiv_op )* equiv_operand
+    : equiv_operand // ( defined_binary_op equiv_operand )*
     ;
 
 // R718
@@ -1701,18 +1735,16 @@ equiv_op
 	;
 
 // R722
+// moved leading optional to level_5_expr
 expr
-    : /* ( expr defined_binary_op )? */ level_5_expr
+//    : ( expr defined_binary_op )? level_5_expr
+//    : ( level_5_expr defined_binary_op )* level_5_expr
+    : level_5_expr
     ;
 
 // R723
 defined_binary_op
-	:	T_PERIOD Letter ( Letter )* T_PERIOD
-	;
-
-// created new rule to remove defined_unary_op or defined_binary_op ambiguity
-defined_unary_or_binary_op
-	:	T_PERIOD Letter ( Letter )* T_PERIOD
+	:	T_DEFINED_OP
 	;
 
 // R724 inlined logical_expr was expr
@@ -2891,12 +2923,12 @@ module_nature
 	;
 
 // R1111
-// inlined local_defined_operator with defined_unary_or_binary_op
-// inlined use_defined_operator with defined_unary_or_binary_op
+// inlined local_defined_operator with  T_DEFINED_OP 
+// inlined use_defined_operator with  T_DEFINED_OP 
 rename
 	:	local_name T_EQ_GT use_name
-	|	T_OPERATOR T_LPAREN defined_unary_or_binary_op T_RPAREN T_EQ_GT
-		T_OPERATOR T_LPAREN defined_unary_or_binary_op T_RPAREN
+	|	T_OPERATOR T_LPAREN T_DEFINED_OP T_RPAREN T_EQ_GT
+		T_OPERATOR T_LPAREN T_DEFINED_OP T_RPAREN
 	;
 
 rename_list
@@ -2928,9 +2960,9 @@ only_use_name
 	:	use_name
 	;
 
-// R1114 inlined local_defined_operator in R1111 as defined_unary_or_binary_op
+// R1114 inlined local_defined_operator in R1111 as T_DEFINED_OP
 
-// R1115 inlined use_defined_operator in R1111 as defined_unary_or_binary_op
+// R1115 inlined use_defined_operator in R1111 as T_DEFINED_OP
 
 // R1116
 block_data
@@ -3633,6 +3665,11 @@ T_ENDWHERE      :       'ENDWHERE'      ;
 
 T_END   : 'END'
         ;
+
+// Must come after .EQ. (for example) or will get matched first
+T_DEFINED_OP
+    :    '.' Letter+ '.'
+    ;
 
 // R304
 T_IDENT
