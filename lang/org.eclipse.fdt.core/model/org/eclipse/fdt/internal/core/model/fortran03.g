@@ -30,9 +30,9 @@ program
 // R202
 program_unit
 	:	main_program
-	|	external_subprogram
-	|	module
-	|	block_data
+//	|	external_subprogram
+//	|	module
+//	|	block_data
 	;
 
 // R203
@@ -46,41 +46,33 @@ function_or_subroutine_subprogram
         ;
 
 // R204
-// TODO putback
+// ERR_CHK 204 see ERR_CHK 204, implicit_part? removed (was after import_stmt*)
 specification_part
 	:	( use_stmt )*
 		( import_stmt )*
-//		( implicit_part )?
 		( declaration_construct )*
 	;
 
-// R205
-// TODO putback
-implicit_part
-	:	// ( implicit_part_stmt )*
-		implicit_stmt
-	;
+// R205 implicit_part removed from grammar (see ERR_CHK 207)
 
-// R206
-implicit_part_stmt
-	:	implicit_stmt
-	|	parameter_stmt
-	|	format_stmt
-	|	entry_stmt
-	;
+// R206 implicit_part_stmt removed from grammar (see ERR_CHK 207)
 
 // R207
+// ERR_CHK 207 implicit_stmt must precede all occurances of rules following it in text below
+// has been removed from grammar so must be done when reducing
+// TODO putback
 declaration_construct
-	:	derived_type_def
-	|	entry_stmt
-	|	enum_def
-	|	format_stmt
-	|	interface_block
+	:	entry_stmt
 	|	parameter_stmt
-	|	procedure_declaration_stmt
-	|	specification_stmt
-	|	type_declaration_stmt
-	|	stmt_function_stmt
+	|	format_stmt
+	|	implicit_stmt           // implicit_stmt must precede all occurances of the below
+//	|   derived_type_def
+//	|	enum_def
+//	|	interface_block
+//	|	procedure_declaration_stmt
+//	|	specification_stmt
+//	|	type_declaration_stmt
+//	|	stmt_function_stmt
 	;
 
 // R208
@@ -90,11 +82,12 @@ execution_part
 	;
 
 // R209
+// TODO putback
 execution_part_construct
 	:	executable_construct
-	|	format_stmt
+//	|	format_stmt
 	|	entry_stmt
-	|	data_stmt
+//	|	data_stmt
 	;
 
 // R210
@@ -110,75 +103,78 @@ internal_subprogram
         ;
 
 // R212
+// TODO putback
 specification_stmt
-	:	access_stmt
-	|	allocatable_stmt
-	|	asynchronous_stmt
-	|	bind_stmt
-	|	common_stmt
-	|	data_stmt
-	|	dimension_stmt
-	|	equivalence_stmt
-	|	external_stmt
-	|	intent_stmt
-	|	intrinsic_stmt
-	|	namelist_stmt
-	|	optional_stmt
-	|	pointer_stmt
-	|	protected_stmt
-	|	save_stmt
-	|	target_stmt
-	|	volatile_stmt
-	|	value_stmt
+	:	//access_stmt
+//	|	allocatable_stmt
+//	|	asynchronous_stmt
+//	|	bind_stmt
+//	|	common_stmt
+//	|	data_stmt
+//	|	dimension_stmt
+//	|	equivalence_stmt
+//	|	external_stmt
+intent_stmt
+//	|	intent_stmt
+//	|	intrinsic_stmt
+//	|	namelist_stmt
+//	|	optional_stmt
+//	|	pointer_stmt
+//	|	protected_stmt
+//	|	save_stmt
+//	|	target_stmt
+//	|	volatile_stmt
+//	|	value_stmt
 	;
 
 // R213
 // TODO putback
 executable_construct
 	:	action_stmt
-	|	associate_construct
-	|	case_construct
-	|	do_construct
-	|	forall_construct
+//	|	associate_construct
+//	|	case_construct
+//	|	do_construct
+//	|	forall_construct
 //	|	if_construct
-	|	select_type_construct
-	|	where_construct
+//	|	select_type_construct
+//	|	where_construct
 	;
 
 // R214
 // TODO putback
 action_stmt
-	:	allocate_stmt
-	|	assignment_stmt
-	|	backspace_stmt
-	|	call_stmt
-	|	close_stmt
+	:	//allocate_stmt
+assignment_stmt
+//	|	assignment_stmt
+//	|	backspace_stmt
+//	|	call_stmt
+//	|	close_stmt
 //	|	continue_stmt
-	|	cycle_stmt
-	|	deallocate_stmt
-	|	endfile_stmt
+//	|	cycle_stmt
+//	|	deallocate_stmt
+//	|	endfile_stmt
 //	|   end_func_prog_or_sub_stmt // normal end_function_stmt... removed
 //	|	end_function_stmt
 //	|	end_program_stmt
 //	|	end_subroutine_stmt
-	|	exit_stmt
-	|	flush_stmt
-	|	forall_stmt
-	|	goto_stmt
-	|	if_stmt
-	|	nullify_stmt
-	|	open_stmt
-	|	pointer_assignment_stmt
-	|	print_stmt
-	|	read_stmt
-	|	return_stmt
-	|	rewind_stmt
-	|	stop_stmt
-	|	wait_stmt
+//	|	exit_stmt
+//	|	flush_stmt
+//	|	forall_stmt
+//	|	goto_stmt
+//	|	if_stmt
+//	|	nullify_stmt
+//	|	open_stmt
+//	|	pointer_assignment_stmt
+//	|	print_stmt
+//	|	read_stmt
+//	|	return_stmt
+//	|	rewind_stmt
+//	|	stop_stmt
+//	|	wait_stmt
 //	|	where_stmt
-	|	write_stmt
-	|	arithmetic_if_stmt
-	|	computed_goto_stmt
+//	|	write_stmt
+//	|	arithmetic_if_stmt
+//	|	computed_goto_stmt
 	;
 
 //end_func_prog_or_sub_stmt
@@ -227,7 +223,7 @@ scalar_constant
 // TODO putback
 literal_constant
 	:	int_literal_constant
-//	|	real_literal_constant
+	|	real_literal_constant
 //	|	complex_literal_constant
 //	|	logical_literal_constant
 //	|	char_literal_constant
@@ -408,9 +404,10 @@ char_selector
     ;
 
 // R425
+// TODO putback
 length_selector
 	:	T_LPAREN
-		(T_LEN_EQUALS)?
+//		(T_LEN_EQUALS)?
 		type_param_value
 		T_RPAREN
 	|	T_ASTERISK
@@ -672,9 +669,10 @@ final_subroutine_name_list
     ;
 
 // R455
+// TODO putback
 derived_type_spec
     : T_IDENT
-      ( T_LPAREN type_param_spec_list T_RPAREN )?
+//      ( T_LPAREN type_param_spec_list T_RPAREN )?
     ;
 
 // R456
@@ -755,10 +753,10 @@ array_constructor
 
 
 // R466
-// TODO putback
+// refactored to remove optional from lhs
 ac_spec
-    : type_spec T_COLON_COLON
-//    | (type_spec T_COLON_COLON)? ac_value_list
+    : type_spec T_COLON_COLON (ac_value_list)?
+    | ac_value_list
     ;
 
 // R467
@@ -908,10 +906,9 @@ array_spec
 	;
 
 // R511
-// TODO putback
+// refactored to remove conditional from lhs and inlined lower_bound and upper_bound
 explicit_shape_spec
-    : // ( lower_bound T_COLON )?
-      upper_bound
+    : expr ( T_COLON expr )?
     ;
 
 explicit_shape_spec_list
@@ -1472,21 +1469,28 @@ vector_subscript
 	;
 
 // R623
+// TODO putback
 allocate_stmt
-    :    T_ALLOCATE T_LPAREN ( type_spec T_COLON_COLON )? allocation_list ( T_COMMA alloc_opt_list )? T_RPAREN
+    :    T_ALLOCATE // T_LPAREN ( type_spec T_COLON_COLON )? allocation_list ( T_COMMA alloc_opt_list )? T_RPAREN
     ;
 
 // R624
 // ERR_CHK 624 source_expr replaced by expr
+// TODO putback
+/*
 alloc_opt
 	:	T_STAT_EQUALS stat_variable
 	|	T_ERRMSG_EQUALS errmsg_variable
 	|	T_SOURCE_EQUALS expr
 	;
+*/
 
+// TODO putback
+/*
 alloc_opt_list
     :    alloc_opt ( T_COMMA alloc_opt )*
     ;
+*/
 
 // R625
 stat_variable
@@ -1560,19 +1564,26 @@ pointer_object_list
     ;
 
 // R635
+// TODO putback
 deallocate_stmt
-    :    T_DEALLOCATE T_LPAREN allocate_object_list ( T_COMMA dealloc_opt_list )? T_RPAREN
+    :    T_DEALLOCATE // T_LPAREN allocate_object_list ( T_COMMA dealloc_opt_list )? T_RPAREN
     ;
 
 // R636
+// TODO putback
+/*
 dealloc_opt
 	:	T_STAT_EQUALS stat_variable
 	|	T_ERRMSG_EQUALS errmsg_variable
 	;
+*/
 
+// TODO putback
+/*
 dealloc_opt_list
     :    dealloc_opt ( T_COMMA dealloc_opt )*
     ;
+*/
 
 /*
 Section 7:
@@ -1581,13 +1592,13 @@ Section 7:
 // R701
 primary
 	:	constant
-//	|	designator
-//	|	array_constructor
+	|	designator
+	|	array_constructor
 //	|	structure_constructor
 //	|	function_reference
 //	|	type_param_inquiry
 //	|	type_param_name
-//	|	T_LPAREN expr T_RPAREN
+	|	T_LPAREN expr T_RPAREN
 	;
 
 // R702
@@ -1710,7 +1721,7 @@ equiv_operand
 level_5_expr
 //    : ( level_5_expr equiv_op )? equiv_operand
 //    : ( equiv_operand equiv_op )* equiv_operand
-    : equiv_operand // ( defined_binary_op equiv_operand )*
+    : equiv_operand ( defined_binary_op equiv_operand )*
     ;
 
 // R718
@@ -2198,14 +2209,17 @@ block_do_construct
 	;
 
 // R827
+// TODO putback
 do_stmt
 	:	label_do_stmt
-	|	nonlabel_do_stmt
+//	|	nonlabel_do_stmt
 	;
 
 // R828
+// TODO putback
 label_do_stmt
-    :    ( do_construct_name T_COLON )? T_DO label ( loop_control )?
+: 'DO' 'ENDDO'
+//    :    ( do_construct_name T_COLON )? T_DO label ( loop_control )?
     ;
 
 do_construct_name
@@ -2396,26 +2410,27 @@ open_stmt
 // ERR_CHK 905a scalar_default_char_expr replaced by expr
 // ERR_CHK 905b scalar_int_expr replaced by expr
 // ERR_CHK 905c file_name_expr replaced by expr
+// TODO putback
 connect_spec
     : ( T_UNIT_EQUALS )? file_unit_number
-    | T_ACCESS_EQUALS expr // scalar_default_char_expr
-    | T_ACTION_EQUALS expr // scalar_default_char_expr
-    | T_ASYNCHRONOUS_EQUALS expr // scalar_default_char_expr
-    | T_BLANK_EQUALS expr // scalar_default_char_expr
-    | T_DECIMAL_EQUALS expr // scalar_default_char_expr
-    | T_DELIM_EQUALS expr // scalar_default_char_expr
-    | T_ENCODING_EQUALS expr // scalar_default_char_expr
-    | T_ERR_EQUALS label
-    | T_FILE_EQUALS expr // file_name_expr
-    | T_FORM_EQUALS expr // scalar_default_char_expr
-    | T_IOMSG_EQUALS iomsg_variable
-    | T_IOSTAT_EQUALS scalar_int_variable
-    | T_PAD_EQUALS expr // scalar_default_char_expr
-    | T_POSITION_EQUALS expr // scalar_default_char_expr
-    | T_RECL_EQUALS expr // scalar_int_expr
-    | T_ROUND_EQUALS expr // scalar_default_char_expr
-    | T_SIGN_EQUALS expr // scalar_default_char_expr
-    | T_STATUS_EQUALS expr // scalar_default_char_expr
+//    | T_ACCESS_EQUALS expr // scalar_default_char_expr
+//    | T_ACTION_EQUALS expr // scalar_default_char_expr
+//    | T_ASYNCHRONOUS_EQUALS expr // scalar_default_char_expr
+//    | T_BLANK_EQUALS expr // scalar_default_char_expr
+//    | T_DECIMAL_EQUALS expr // scalar_default_char_expr
+//    | T_DELIM_EQUALS expr // scalar_default_char_expr
+//    | T_ENCODING_EQUALS expr // scalar_default_char_expr
+//    | T_ERR_EQUALS label
+//    | T_FILE_EQUALS expr // file_name_expr
+//    | T_FORM_EQUALS expr // scalar_default_char_expr
+//    | T_IOMSG_EQUALS iomsg_variable
+//    | T_IOSTAT_EQUALS scalar_int_variable
+//    | T_PAD_EQUALS expr // scalar_default_char_expr
+//    | T_POSITION_EQUALS expr // scalar_default_char_expr
+//    | T_RECL_EQUALS expr // scalar_int_expr
+//    | T_ROUND_EQUALS expr // scalar_default_char_expr
+//    | T_SIGN_EQUALS expr // scalar_default_char_expr
+//    | T_STATUS_EQUALS expr // scalar_default_char_expr
     ;
 
 connect_spec_list
@@ -2438,12 +2453,13 @@ close_stmt
 
 // R909
 // ERR_CHK 909 scalar_default_char_expr replaced by expr
+// TODO putback
 close_spec
     : ( T_UNIT_EQUALS )? file_unit_number
-    | T_IOSTAT_EQUALS scalar_int_variable
-    | T_IOMSG_EQUALS iomsg_variable
-    | T_ERR_EQUALS label
-    | T_STATUS_EQUALS expr
+//    | T_IOSTAT_EQUALS scalar_int_variable
+//    | T_IOMSG_EQUALS iomsg_variable
+//    | T_ERR_EQUALS label
+//    | T_STATUS_EQUALS expr
     ;
 
 close_spec_list
@@ -2451,46 +2467,56 @@ close_spec_list
     ;
 
 // R910
+// TODO putback
+/*
 read_stmt
     :    T_READ T_LPAREN io_control_spec_list T_RPAREN ( input_item_list )?
     |    T_READ format ( T_COMMA input_item_list )?
     ;
+*/
 
 // R911
+// TODO putback
+/*
 write_stmt
 	:	T_WRITE T_LPAREN io_control_spec_list T_RPAREN ( output_item_list )?
 	;
+*/
 
 // R912
+// TODO putback
+/*
 print_stmt
     :    T_PRINT format ( T_COMMA output_item_list )?
     ;
+*/
 
 // R913
 // ERR_CHK 913a scalar_default_char_expr replaced by expr
 // ERR_CHK 913b scalar_int_expr replaced by expr
 // ERR_CHK 913c scalar_char_initialization_expr replaced by expr
+// TODO putback
 io_control_spec
     :    ( T_UNIT_EQUALS )? io_unit
 //    | ( T_FMT_EQUALS )? format
 //    | ( T_NML_EQUALS )? namelist_group_name
-    | T_ADVANCE_EQUALS expr // scalar_default_char_expr
-    | T_ASYNCHRONOUS_EQUALS expr // scalar_char_initialization_expr
-    | T_BLANK_EQUALS expr // scalar_default_char_expr
-    | T_DECIMAL_EQUALS expr // scalar_default_char_expr
-    | T_DELIM_EQUALS expr // scalar_default_char_expr
+//    | T_ADVANCE_EQUALS expr // scalar_default_char_expr
+//    | T_ASYNCHRONOUS_EQUALS expr // scalar_char_initialization_expr
+//    | T_BLANK_EQUALS expr // scalar_default_char_expr
+//    | T_DECIMAL_EQUALS expr // scalar_default_char_expr
+//    | T_DELIM_EQUALS expr // scalar_default_char_expr
 //    | T_END_EQUALS label
-    | T_EOR_EQUALS label
-    | T_ERR_EQUALS label
-    | T_ID_EQUALS scalar_int_variable
-    | T_IOMSG_EQUALS iomsg_variable
-    | T_IOSTAT_EQUALS scalar_int_variable
-    | T_PAD_EQUALS expr // scalar_default_char_expr
-    | T_POS_EQUALS expr // scalar_int_expr
-    | T_REC_EQUALS expr // scalar_int_expr
-    | T_ROUND_EQUALS expr // scalar_default_char_expr
-    | T_SIGN_EQUALS expr // scalar_default_char_expr
-    | T_SIZE_EQUALS scalar_int_variable
+//    | T_EOR_EQUALS label
+//    | T_ERR_EQUALS label
+//    | T_ID_EQUALS scalar_int_variable
+//    | T_IOMSG_EQUALS iomsg_variable
+//    | T_IOSTAT_EQUALS scalar_int_variable
+//    | T_PAD_EQUALS expr // scalar_default_char_expr
+//    | T_POS_EQUALS expr // scalar_int_expr
+//    | T_REC_EQUALS expr // scalar_int_expr
+//    | T_ROUND_EQUALS expr // scalar_default_char_expr
+//    | T_SIGN_EQUALS expr // scalar_default_char_expr
+//    | T_SIZE_EQUALS scalar_int_variable
     ;
 
 io_control_spec_list
@@ -2517,14 +2543,20 @@ input_item_list
     ;
 
 // R916
+// TODO putback
+/*
 output_item
 	:	expr
 	|	io_implied_do
 	;
+*/
 
+// TODO putback
+/*
 output_item_list
     :    output_item ( T_COMMA output_item )*
     ;
+*/
 
 // R917
 io_implied_do
@@ -2570,11 +2602,11 @@ wait_stmt
 wait_spec
     : ( T_UNIT_EQUALS )? file_unit_number
 //    | T_END_EQUALS label
-    | T_EOR_EQUALS label
-    | T_ERR_EQUALS label
-    | T_ID_EQUALS scalar_int_variable
-    | T_IOMSG_EQUALS iomsg_variable
-    | T_IOSTAT_EQUALS scalar_int_variable
+//    | T_EOR_EQUALS label
+//    | T_ERR_EQUALS label
+//    | T_ID_EQUALS scalar_int_variable
+//    | T_IOMSG_EQUALS iomsg_variable
+//    | T_IOSTAT_EQUALS scalar_int_variable
     ;
 
 wait_spec_list
@@ -2582,16 +2614,22 @@ wait_spec_list
     ;
 
 // R923
+// TODO putback
+/*
 backspace_stmt
 	:	T_BACKSPACE file_unit_number
 	|	T_BACKSPACE T_LPAREN position_spec_list T_RPAREN
 	;
+*/
 
 // R924
+// TODO putback
+/*
 endfile_stmt
 	:	t_end_file file_unit_number
 	|	t_end_file T_LPAREN position_spec_list T_RPAREN
 	;
+*/
 
 t_end_file
 options {k=2;}
@@ -2600,17 +2638,21 @@ options {k=2;}
 	;
 
 // R925
+// TODO putback
+/*
 rewind_stmt
 	:	T_REWIND file_unit_number
 	|	T_REWIND T_LPAREN position_spec_list T_RPAREN
 	;
+*/
 
 // R926
+// TODO putback
 position_spec
     : ( T_UNIT_EQUALS )? file_unit_number
-    | T_IOMSG_EQUALS iomsg_variable
-    | T_IOSTAT_EQUALS scalar_int_variable
-    | T_ERR_EQUALS label
+//    | T_IOMSG_EQUALS iomsg_variable
+//    | T_IOSTAT_EQUALS scalar_int_variable
+//    | T_ERR_EQUALS label
     ;
 
 position_spec_list
@@ -2618,17 +2660,21 @@ position_spec_list
     ;
 
 // R927
+// TODO putback
+/*
 flush_stmt
 	:	T_FLUSH file_unit_number
 	|	T_FLUSH T_LPAREN flush_spec_list T_RPAREN
 	;
+*/
 
 // R928
+// TODO putback
 flush_spec
     : ( T_UNIT_EQUALS )? file_unit_number
-    | T_IOSTAT_EQUALS scalar_int_variable
-    | T_IOMSG_EQUALS iomsg_variable
-    | T_ERR_EQUALS label
+//    | T_IOSTAT_EQUALS scalar_int_variable
+//    | T_IOMSG_EQUALS iomsg_variable
+//    | T_ERR_EQUALS label
     ;
 
 flush_spec_list
@@ -2636,50 +2682,52 @@ flush_spec_list
     ;
 
 // R929
+// TODO putback
 inquire_stmt
 	:	T_INQUIRE T_LPAREN inquire_spec_list T_RPAREN
-	|	T_INQUIRE T_LPAREN T_IOLENGTH_EQUALS scalar_int_variable T_RPAREN output_item_list
+//	|	T_INQUIRE T_LPAREN T_IOLENGTH_EQUALS scalar_int_variable T_RPAREN output_item_list
 	;
 
 // R930
 // ERR_CHK 930 file_name_expr replaced by expr
+// TODO putback
 inquire_spec
     : ( T_UNIT_EQUALS )? file_unit_number
-    | T_FILE_EQUALS expr
-    | T_ACCESS_EQUALS scalar_default_char_variable
-    | T_ACTION_EQUALS scalar_default_char_variable
-    | T_ASYNCHRONOUS_EQUALS scalar_default_char_variable
-    | T_BLANK_EQUALS scalar_default_char_variable
-    | T_DECIMAL_EQUALS scalar_default_char_variable
-    | T_DELIM_EQUALS scalar_default_char_variable
-    | T_DIRECT_EQUALS scalar_default_char_variable
-    | T_ENCODING_EQUALS scalar_default_char_variable
-    | T_ERR_EQUALS label
-    | T_EXIST_EQUALS scalar_default_logical_variable
-    | T_FORM_EQUALS scalar_default_char_variable
-    | T_FORMATTED_EQUALS scalar_default_char_variable
-    | T_ID_EQUALS scalar_int_variable
-    | T_IOMSG_EQUALS iomsg_variable
-    | T_IOSTAT_EQUALS scalar_int_variable
-    | T_NAME_EQUALS scalar_default_char_variable
-    | T_NAMED_EQUALS scalar_default_logical_variable
-    | T_NEXTREC_EQUALS scalar_int_variable
-    | T_NUMBER_EQUALS scalar_int_variable
-    | T_OPENED_EQUALS scalar_default_logical_variable
-    | T_PAD_EQUALS scalar_default_char_variable
-    | T_PENDING_EQUALS scalar_default_logical_variable
-    | T_POS_EQUALS scalar_int_variable
-    | T_POSITION_EQUALS scalar_default_char_variable
-    | T_READ_EQUALS scalar_default_char_variable
-    | T_READWRITE_EQUALS scalar_default_char_variable
-    | T_RECL_EQUALS scalar_int_variable
-    | T_ROUND_EQUALS scalar_default_char_variable
-    | T_SEQUENTIAL_EQUALS scalar_default_char_variable
-    | T_SIGN_EQUALS scalar_default_char_variable
-    | T_SIZE_EQUALS scalar_int_variable
-    | T_STREAM_EQUALS scalar_default_char_variable
-    | T_UNFORMATTED_EQUALS scalar_default_char_variable
-    | T_WRITE_EQUALS scalar_default_char_variable
+//    | T_FILE_EQUALS expr
+//    | T_ACCESS_EQUALS scalar_default_char_variable
+//    | T_ACTION_EQUALS scalar_default_char_variable
+//    | T_ASYNCHRONOUS_EQUALS scalar_default_char_variable
+//    | T_BLANK_EQUALS scalar_default_char_variable
+//    | T_DECIMAL_EQUALS scalar_default_char_variable
+//    | T_DELIM_EQUALS scalar_default_char_variable
+//    | T_DIRECT_EQUALS scalar_default_char_variable
+//    | T_ENCODING_EQUALS scalar_default_char_variable
+//    | T_ERR_EQUALS label
+//    | T_EXIST_EQUALS scalar_default_logical_variable
+//    | T_FORM_EQUALS scalar_default_char_variable
+//    | T_FORMATTED_EQUALS scalar_default_char_variable
+//    | T_ID_EQUALS scalar_int_variable
+//    | T_IOMSG_EQUALS iomsg_variable
+//    | T_IOSTAT_EQUALS scalar_int_variable
+//    | T_NAME_EQUALS scalar_default_char_variable
+//    | T_NAMED_EQUALS scalar_default_logical_variable
+//    | T_NEXTREC_EQUALS scalar_int_variable
+//    | T_NUMBER_EQUALS scalar_int_variable
+//    | T_OPENED_EQUALS scalar_default_logical_variable
+//    | T_PAD_EQUALS scalar_default_char_variable
+//    | T_PENDING_EQUALS scalar_default_logical_variable
+//    | T_POS_EQUALS scalar_int_variable
+//    | T_POSITION_EQUALS scalar_default_char_variable
+//    | T_READ_EQUALS scalar_default_char_variable
+//    | T_READWRITE_EQUALS scalar_default_char_variable
+//    | T_RECL_EQUALS scalar_int_variable
+//    | T_ROUND_EQUALS scalar_default_char_variable
+//    | T_SEQUENTIAL_EQUALS scalar_default_char_variable
+//    | T_SIGN_EQUALS scalar_default_char_variable
+//    | T_SIZE_EQUALS scalar_int_variable
+//    | T_STREAM_EQUALS scalar_default_char_variable
+//    | T_UNFORMATTED_EQUALS scalar_default_char_variable
+//    | T_WRITE_EQUALS scalar_default_char_variable
     ;
 
 inquire_spec_list
@@ -2781,9 +2829,9 @@ control_edit_desc
 	|	T_COLON
 //	|	sign_edit_desc
 //	|	signed_int_literal_constant 'P'
-	|	blank_interp_edit_desc
-	|	round_edit_desc
-	|	decimal_edit_desc
+//	|	blank_interp_edit_desc
+//	|	round_edit_desc
+//	|	decimal_edit_desc
 	;
 
 /* TODO: inlined in R1011
@@ -2817,12 +2865,17 @@ n
 //	;
 
 // R1016
+// TODO putback
+/*
 blank_interp_edit_desc
 	:	'BN'
 	|	'BZ'
 	;
+*/
 
 // R1017
+// TODO putback
+/*
 round_edit_desc
 	:	'RU'
 	|	'RD'
@@ -2831,12 +2884,16 @@ round_edit_desc
 	|	'RC'
 	|	'RP'
 	;
+*/
 
 // R1018
+// TODO putback
+/*
 decimal_edit_desc
 	:	'DC'
 	|	'DP'
 	;
+*/
 
 // R1019
 char_string_edit_desc
@@ -2852,7 +2909,7 @@ Section 11:
 main_program
 	:	( program_stmt )?
 		specification_part
-//		( execution_part )?
+		( execution_part )?
 //		( internal_subprogram_part )?
 		end_program_stmt
 	;
@@ -3573,53 +3630,53 @@ T_WRITE         :       'WRITE'         ;
 //
 // line breaks are OK before equals
 //
-T_FILE_EQUALS   : 'FILE' '='    ;
-T_ACCESS_EQUALS : 'ACCESS' '='  ;
-T_ACTION_EQUALS : 'ACTION' '='  ;
-T_ADVANCE_EQUALS: 'ADVANCE' '=' ;
-T_ASYNCHRONOUS_EQUALS: 'ASYNCHRONOUS' '=' ;
-T_BLANK_EQUALS  : 'BLANK' '='   ;
-T_DECIMAL_EQUALS: 'DECIMAL' '=' ;
-T_DELIM_EQUALS  : 'DELIM' '='   ;
-T_DIRECT_EQUALS : 'DIRECT' '='  ;
-T_ENCODING_EQUALS: 'ENCODING' '=' ;
-//T_END_EQUALS    : 'END' '='     ;
-T_EOR_EQUALS    : 'EOR' '='     ;
-T_ERR_EQUALS    : 'ERR' '='     ;
-T_ERRMSG_EQUALS : 'ERRMSG' '='  ;
-T_EXIST_EQUALS  : 'EXIST' '='   ;
-T_FORM_EQUALS   : 'FORM' '='    ;
-T_FORMATTED_EQUALS: 'FORMATTED' '=' ;
-T_ID_EQUALS     : 'ID' '='      ;
-T_IOLENGTH_EQUALS: 'IOLENGTH' '=' ;
-T_IOMSG_EQUALS  : 'IOMSG' '='   ;
-T_IOSTAT_EQUALS : 'IOSTAT' '='  ;
+//T_FILE_EQUALS   : 'FILE' '='    ;
+//T_ACCESS_EQUALS : 'ACCESS' '='  ;
+//T_ACTION_EQUALS : 'ACTION' '='  ;
+//T_ADVANCE_EQUALS: 'ADVANCE' '=' ;
+//T_ASYNCHRONOUS_EQUALS: 'ASYNCHRONOUS' '=' ;
+//T_BLANK_EQUALS  : 'BLANK' '='   ;
+//T_DECIMAL_EQUALS: 'DECIMAL' '=' ;
+//T_DELIM_EQUALS  : 'DELIM' '='   ;
+//T_DIRECT_EQUALS : 'DIRECT' '='  ;
+//T_ENCODING_EQUALS: 'ENCODING' '=' ;
+////T_END_EQUALS    : 'END' '='     ;
+//T_EOR_EQUALS    : 'EOR' '='     ;
+//T_ERR_EQUALS    : 'ERR' '='     ;
+//T_ERRMSG_EQUALS : 'ERRMSG' '='  ;
+//T_EXIST_EQUALS  : 'EXIST' '='   ;
+//T_FORM_EQUALS   : 'FORM' '='    ;
+//T_FORMATTED_EQUALS: 'FORMATTED' '=' ;
+//T_ID_EQUALS     : 'ID' '='      ;
+//T_IOLENGTH_EQUALS: 'IOLENGTH' '=' ;
+//T_IOMSG_EQUALS  : 'IOMSG' '='   ;
+//T_IOSTAT_EQUALS : 'IOSTAT' '='  ;
 T_KIND_EQUALS   : 'KIND' '='    ;
-T_LEN_EQUALS    : 'LEN' '='     ;
-T_NAME_EQUALS   : 'NAME' '='    ;
-T_NAMED_EQUALS  : 'NAMED' '='   ;
-T_NEXTREC_EQUALS: 'NEXTREC' '=' ;
-T_NML_EQUALS    : 'NML' '='     ;
-T_NUMBER_EQUALS : 'NUMBER' '='  ;
-T_OPENED_EQUALS : 'OPENED' '='  ;
-T_PAD_EQUALS    : 'PAD' '='     ;
-T_PENDING_EQUALS: 'PENDING' '=' ;
-T_POS_EQUALS    : 'POS' '='     ;
-T_POSITION_EQUALS: 'POSITION' '=' ;
-T_READ_EQUALS   : 'READ' '='    ;
-T_READWRITE_EQUALS: 'READWRITE' '=' ;
-T_REC_EQUALS    : 'REC' '='     ;
-T_RECL_EQUALS   : 'RECL' '='    ;
-T_ROUND_EQUALS  : 'ROUND' '='   ;
-T_SEQUENTIAL_EQUALS: 'SEQUENTIAL' '=' ;
-T_SIGN_EQUALS   : 'SIGN' '='    ;
-T_SIZE_EQUALS   : 'SIZE' '='    ;
-T_SOURCE_EQUALS : 'SOURCE' '='  ;
-T_STAT_EQUALS   : 'STAT' '='    ;
-T_STATUS_EQUALS : 'STATUS' '='  ;
-T_STREAM_EQUALS : 'STREAM' '='  ;
-T_WRITE_EQUALS  : 'WRITE' '='   ;
-T_UNFORMATTED_EQUALS: 'UNFORMATTED' '=' ;
+//T_LEN_EQUALS    : 'LEN' '='     ;
+//T_NAME_EQUALS   : 'NAME' '='    ;
+//T_NAMED_EQUALS  : 'NAMED' '='   ;
+//T_NEXTREC_EQUALS: 'NEXTREC' '=' ;
+//T_NML_EQUALS    : 'NML' '='     ;
+//T_NUMBER_EQUALS : 'NUMBER' '='  ;
+//T_OPENED_EQUALS : 'OPENED' '='  ;
+//T_PAD_EQUALS    : 'PAD' '='     ;
+//T_PENDING_EQUALS: 'PENDING' '=' ;
+//T_POS_EQUALS    : 'POS' '='     ;
+//T_POSITION_EQUALS: 'POSITION' '=' ;
+//T_READ_EQUALS   : 'READ' '='    ;
+//T_READWRITE_EQUALS: 'READWRITE' '=' ;
+//T_REC_EQUALS    : 'REC' '='     ;
+//T_RECL_EQUALS   : 'RECL' '='    ;
+//T_ROUND_EQUALS  : 'ROUND' '='   ;
+//T_SEQUENTIAL_EQUALS: 'SEQUENTIAL' '=' ;
+//T_SIGN_EQUALS   : 'SIGN' '='    ;
+//T_SIZE_EQUALS   : 'SIZE' '='    ;
+//T_SOURCE_EQUALS : 'SOURCE' '='  ;
+//T_STAT_EQUALS   : 'STAT' '='    ;
+//T_STATUS_EQUALS : 'STATUS' '='  ;
+//T_STREAM_EQUALS : 'STREAM' '='  ;
+//T_WRITE_EQUALS  : 'WRITE' '='   ;
+//T_UNFORMATTED_EQUALS: 'UNFORMATTED' '=' ;
 T_UNIT_EQUALS   : 'UNIT' '='    ;
 
 //T_EDIT_BN	: 'BN'  ;
