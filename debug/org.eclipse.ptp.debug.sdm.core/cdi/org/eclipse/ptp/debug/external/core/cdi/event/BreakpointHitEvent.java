@@ -32,8 +32,8 @@ import org.eclipse.ptp.debug.external.core.cdi.Session;
 public class BreakpointHitEvent extends AbstractSuspendEvent {
 	IPCDIBreakpoint breakpoint;
 
-	public BreakpointHitEvent(IPCDISession session, BitList tasks, IPCDIBreakpoint bp, int thread_id) {
-		super(session, tasks, thread_id);
+	public BreakpointHitEvent(IPCDISession session, BitList tasks, IPCDIBreakpoint bp, int thread_id, String[] varchanges) {
+		super(session, tasks, thread_id, varchanges);
 		breakpoint = bp;
 	}
 	public IPCDISessionObject getReason() {

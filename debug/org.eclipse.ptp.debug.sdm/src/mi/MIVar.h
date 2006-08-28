@@ -41,14 +41,30 @@ struct MIVar {
 };
 typedef struct MIVar	MIVar;
 
+/**
+ * Represents a set variable object.
+ */
+struct MIVarChange {
+	char *	name;
+	int		in_scope;
+	int		type_changed;
+};
+typedef struct MIVarChange	MIVarChange;
+
 extern MIVar *MIVarNew(void);
 extern void MIVarFree(MIVar *var);
+
+extern MIVarChange *MIVarChangeNew(void);
+extern void MIVarChangeFree(MIVarChange *var);
+
 extern MIVar *MIVarParse(List *results);
 extern MIVar *MIGetVarCreateInfo(MICommand *cmd);
 extern void MIGetVarListChildrenInfo(MIVar *var, MICommand *cmd);
 extern char *MIGetVarEvaluateExpressionInfo(MICommand *cmd);
 extern char *MIGetDataEvaluateExpressionInfo(MICommand *cmd);
 extern char *MIGetDetailsType(MICommand *cmd);
+
+extern void MIGetVarUpdateInfo(MICommand *cmd, List **varchanges);
 #endif /* _MIVAR_H_ */
 
 

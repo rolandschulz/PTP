@@ -19,17 +19,15 @@
 
 package org.eclipse.ptp.debug.external.core.proxy;
 
-import org.eclipse.ptp.debug.core.ExtFormat;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDILocator;
-import org.eclipse.ptp.debug.external.core.cdi.Locator;
 
 public class ProxyDebugStackframe {
 	private int			level;
 	private IPCDILocator	loc;
 	
-	public ProxyDebugStackframe(int level, String file, String func, int line, String addr) {
+	public ProxyDebugStackframe(int level, IPCDILocator locator) {
 		this.level = level;
-		this.loc = new Locator(file, func, line, ExtFormat.getBigInteger(addr));
+		this.loc = locator;
 	}
 	
 	public int getLevel() {

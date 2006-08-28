@@ -24,7 +24,6 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.aif.AIF;
 import org.eclipse.ptp.debug.core.aif.AIFException;
 import org.eclipse.ptp.debug.core.aif.AIFFactory;
@@ -46,6 +45,7 @@ import org.eclipse.ptp.debug.core.cdi.model.IPCDIStackFrame;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIThread;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIThreadStorageDescriptor;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIVariable;
+import org.eclipse.ptp.debug.external.core.cdi.event.VarChangedEvent;
 import org.eclipse.ptp.debug.external.core.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.core.cdi.model.Target;
 import org.eclipse.ptp.debug.external.core.cdi.model.Thread;
@@ -59,7 +59,6 @@ import org.eclipse.ptp.debug.external.core.cdi.model.variable.ThreadStorage;
 import org.eclipse.ptp.debug.external.core.cdi.model.variable.ThreadStorageDescriptor;
 import org.eclipse.ptp.debug.external.core.cdi.model.variable.Variable;
 import org.eclipse.ptp.debug.external.core.cdi.model.variable.VariableDescriptor;
-import org.eclipse.ptp.debug.external.core.commands.GetAIFCommand;
 import org.eclipse.ptp.debug.external.core.commands.ListArgumentsCommand;
 import org.eclipse.ptp.debug.external.core.commands.ListGlobalVariablesCommand;
 import org.eclipse.ptp.debug.external.core.commands.ListLocalVariablesCommand;
@@ -98,10 +97,12 @@ public class VariableManager extends Manager {
 			if (vars[i].getName().equals(varName)) {
 				return vars[i];
 			}
+			/*
 			Variable v = vars[i].getChild(varName);
 			if (v != null) {
 				return v;
 			}
+			*/
 		}
 		return null;
 	}
@@ -422,10 +423,8 @@ public class VariableManager extends Manager {
 		target.setCurrentThread(frame.getThread(), false);
 		((Thread)frame.getThread()).setCurrentStackFrame(frame, false);
 		try {
-			Session session = (Session)getSession();
-			BitList tasks = session.createBitList(target.getTargetID());
-			ListArgumentsCommand argCmd = new ListArgumentsCommand(tasks, frame, frame.getThread().getStackFrameCount());
-			session.getDebugger().postCommand(argCmd);
+			ListArgumentsCommand argCmd = new ListArgumentsCommand(target.getTask(), frame, frame.getThread().getStackFrameCount());
+			target.getDebugger().postCommand(argCmd);
 			IPCDIArgument[] args = argCmd.getArguments();
 			for (int i = 0; i < args.length; i++) {
 				VariableDescriptor varDesc = (VariableDescriptor) args[i];
@@ -434,13 +433,15 @@ public class VariableManager extends Manager {
 				String fName = varDesc.getQualifiedName();
 				int pos = varDesc.getPosition();
 				int depth = varDesc.getStackDepth();
+				/*
 				IAIF aif = varDesc.getAIF();
 				if (aif == null) {
 					GetAIFCommand aifCmd = new GetAIFCommand(tasks, fName);
 					session.getDebugger().postCommand(aifCmd);
 					aif = aifCmd.getAIF();
 				}
-				argObjects.add(new ArgumentDescriptor(target, thread, frame, name, fName, pos, depth, aif));
+				*/
+				argObjects.add(new ArgumentDescriptor(target, thread, frame, name, fName, pos, depth, null));
 			}
 		} finally {
 			target.setCurrentThread(currentThread, false);
@@ -478,11 +479,10 @@ public class VariableManager extends Manager {
 		if (global == null) {
 			String name = varDesc.getQualifiedName();
 			Target target = (Target)varDesc.getTarget();
-			Session session = (Session)getSession();
-			ListGlobalVariablesCommand varCmd = new ListGlobalVariablesCommand(session.createBitList(target.getTargetID()));
-			session.getDebugger().postCommand(varCmd);
+			ListGlobalVariablesCommand varCmd = new ListGlobalVariablesCommand(target.getTask());
+			target.getDebugger().postCommand(varCmd);
 			IPCDIGlobalVariable[] vars = varCmd.getGlobalVariables();
-			System.out.println(" ++++++++++++++++ listGlobalVariables: " + vars.length + " ++++++++++++++++");
+			System.err.println(" ++++++++++++++++ listGlobalVariables: " + vars.length + " ++++++++++++++++");
 			for (int i = 0; i < vars.length; i++) {
 				if (name.equals(vars[i].getQualifiedName())) {
 					global = new GlobalVariable(varDesc);
@@ -503,10 +503,8 @@ public class VariableManager extends Manager {
 		((Thread)frame.getThread()).setCurrentStackFrame(frame, false);
 		
 		try {
-			Session session = (Session)getSession();
-			BitList tasks = session.createBitList(target.getTargetID());
-			ListLocalVariablesCommand varCmd = new ListLocalVariablesCommand(tasks, currentFrame);
-			session.getDebugger().postCommand(varCmd);
+			ListLocalVariablesCommand varCmd = new ListLocalVariablesCommand(target.getTask(), currentFrame);
+			target.getDebugger().postCommand(varCmd);
 			IPCDILocalVariable[] vars = varCmd.getLocalVariables();
 			for (int i = 0; i < vars.length; i++) {
 				VariableDescriptor varDesc = (VariableDescriptor)vars[i];
@@ -515,13 +513,15 @@ public class VariableManager extends Manager {
 				String fName = varDesc.getQualifiedName();
 				int pos = varDesc.getPosition();
 				int depth = varDesc.getStackDepth();
+				/*
 				IAIF aif = varDesc.getAIF();
 				if (aif == null) {
 					GetAIFCommand aifCmd = new GetAIFCommand(tasks, fName);
 					session.getDebugger().postCommand(aifCmd);
 					aif = aifCmd.getAIF();
 				}
-				varObjects.add(new LocalVariableDescriptor(target, thread, frame, name, fName, pos, depth, aif));
+				*/
+				varObjects.add(new LocalVariableDescriptor(target, thread, frame, name, fName, pos, depth, null));
 			}
 		} finally {
 			target.setCurrentThread(currentThread, false);
@@ -572,27 +572,37 @@ public class VariableManager extends Manager {
 		throw new PCDIException("cdi.VariableManager.Unknown_variable_object");
 	}
 	public void destroyVariable(Variable variable) throws PCDIException {
+		/*
 		Target target = (Target)variable.getTarget();
-		List varList = getVariablesList(target);
-		if (varList.contains(variable)) {
-			removeVar(target, variable);
-		}
-		//TODO --fire var deleted event?? 
+		VarDeletedEvent del = new VarDeletedEvent(target.getSession(), target.getTask(), null, variable.getName());
+		target.getDebugger().fireEvent(del);
+		*/
 	}
 	public void destroyAllVariables(Target target) throws PCDIException {
+		/*
 		Variable[] variables = getVariables(target);
 		for (int i = 0; i < variables.length; ++i) {
-			removeVar(target, variables[i]);
-			//TODO --fire var deleted event?? 
+			VarDeletedEvent del = new VarDeletedEvent(target.getSession(), target.getTask(), null, variables[i].getName());
+			target.getDebugger().fireEvent(del);
 		}
+		*/
 	}
-	public void update(Target target) throws PCDIException {
+	private boolean isMatchName(String vartext, String[] changedVars) {
+		for (int j=0; j<changedVars.length; j++) {
+			if (changedVars[j].equals(vartext)) {
+				return true;
+			}
+		}
+		return false;
+	}		
+	public void update(Target target, String[] changedVars) throws PCDIException {
 		int highLevel = 0;
 		int lowLevel = 0;
-		List eventList = new ArrayList();
-		Variable[] vars = getVariables(target);
 		IPCDIStackFrame[] frames = null;
 		StackFrame currentStack = null;
+		List eventList = new ArrayList();
+		Variable[] vars = getVariables(target);
+	
 		Thread currentThread = (Thread)target.getCurrentThread();
 		if (currentThread != null) {
 			currentStack = currentThread.getCurrentStackFrame();
@@ -608,28 +618,29 @@ public class VariableManager extends Manager {
 			}
 			frames = currentThread.getStackFrames(0, highLevel);
 		}
-		Session session = (Session)target.getSession();
-		for (int i = 0; i < vars.length; i++) {
-			Variable variable = vars[i];
-			if (isVariableNeedsToBeUpdate(variable, currentStack, frames, lowLevel)) {
-				//String varName = variable.getName();
-				//TODO how to implement ?
-				variable.setUpdated(true);
-				//eventList.add(new ChangedEvent(session, session.createBitList(target.getTargetID()), variable));
+
+		for (int i = 0; i<vars.length; i++) {
+			if (isVariableNeedsToBeUpdate(vars[i], currentStack, frames, lowLevel)) {
+				vars[i].setUpdated(true);
+				String varName = vars[i].getName();
+				if (isMatchName("("+varName+")", changedVars)) {
+					eventList.add(new VarChangedEvent(target.getSession(), target.getTask(), vars[i], varName));
+				}
 			} else {
-				variable.setUpdated(false);
+				vars[i].setUpdated(false);
 			}
 		}
 		IPCDIEvent[] events = (IPCDIEvent[]) eventList.toArray(new IPCDIEvent[0]);
-		((EventManager)session.getEventManager()).fireEvents(events);		
-		//throw new PCDIException("Not implement yet - VariableManager: update");
+		target.getDebugger().fireEvents(events);
 	}
+	public void update(Target target) throws PCDIException {}
+	/*
 	public void update(Variable variable) throws PCDIException {
 		Target target = (Target)variable.getTarget();
 		List eventList = new ArrayList();
 		update(target, variable, eventList);
 		IPCDIEvent[] events = (IPCDIEvent[]) eventList.toArray(new IPCDIEvent[0]);
-		((EventManager)((Session)getSession()).getEventManager()).fireEvents(events);		
+		((Session)getSession()).getDebugger().fireEvents(events);		
 	}
 	public void update(Target target, Variable variable, List eventList) throws PCDIException {
 		//String varName = variable.getName();
@@ -637,6 +648,7 @@ public class VariableManager extends Manager {
 		//variable.setUpdated(true);
 		throw new PCDIException("Not implement yet - VariableManager: update");
 	}
+	*/
 	boolean isVariableNeedsToBeUpdate(Variable variable, IPCDIStackFrame current, IPCDIStackFrame[] frames, int lowLevel) throws PCDIException {
 		IPCDIStackFrame varStack = variable.getStackFrame();
 		boolean inScope = false;

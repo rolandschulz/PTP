@@ -19,20 +19,27 @@
 package org.eclipse.ptp.debug.external.core.cdi.event;
 
 import org.eclipse.ptp.core.util.BitList;
-import org.eclipse.ptp.debug.core.cdi.IPCDILineLocation;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
-import org.eclipse.ptp.debug.core.cdi.IPCDISessionObject;
-import org.eclipse.ptp.debug.external.core.cdi.EndSteppingRangeInfo;
-import org.eclipse.ptp.debug.external.core.cdi.Session;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIObject;
 
-public class EndSteppingRangeEvent extends AbstractSuspendEvent {
-	IPCDILineLocation lineLoc;
-
-	public EndSteppingRangeEvent(IPCDISession session, BitList tasks, IPCDILineLocation loc, int thread_id, String[] varchanges) {
-		super(session, tasks, thread_id, varchanges);
-		lineLoc = loc;
+/**
+ * @author Clement chu
+ * 
+ */
+public class VarDeletedEvent extends DestroyedEvent {
+	String name;
+	
+	/** 
+	 * @param session
+	 * @param tasks
+	 * @param source IPCDIVariable
+	 * @param name var name
+	 */
+	public VarDeletedEvent(IPCDISession session, BitList tasks, IPCDIObject source, String name) {
+		super(session, tasks, source);
+		this.name = name;
 	}
-	public IPCDISessionObject getReason() {
-		return new EndSteppingRangeInfo((Session) session, this, lineLoc);
+	public String getName() {
+		return name;
 	}
 }

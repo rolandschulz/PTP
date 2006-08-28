@@ -28,7 +28,7 @@ import org.eclipse.ptp.debug.core.cdi.PCDIException;
  */
 public class HaltCommand extends AbstractDebugCommand {
 	public HaltCommand(BitList tasks) {
-		super(tasks, true, true, false);
+		super(tasks, true, false, false);
 	}
 	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
 		debugger.filterSuspendTasks(tasks);

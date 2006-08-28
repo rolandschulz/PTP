@@ -25,7 +25,6 @@ import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.ExtFormat;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
@@ -87,7 +86,7 @@ public class MemoryManager extends Manager {
 			}
 		}
 		IPCDIEvent[] events = (IPCDIEvent[])eventList.toArray(new IPCDIEvent[0]);
-		target.getSession().getEventManager().fireEvents(events);
+		target.getDebugger().fireEvents(events);
 	}
 
 	/** update one Block.
@@ -103,14 +102,12 @@ public class MemoryManager extends Manager {
 		// Update the block MIDataReadMemoryInfo.
 		block.setDataReadMemoryInfo(newBlock.getDataReadMemoryInfo());
 		Target target = (Target)block.getTarget();
-		Session session = (Session)target.getSession();
-		BitList tasks = session.createBitList(target.getTargetID());
 		if (array.length > 0 || newAddress) {
 			if (aList != null) {
-				aList.add(new MemoryChangedEvent(session, tasks, target, array));
+				aList.add(new MemoryChangedEvent(target.getSession(), target.getTask(), block, array));
 			} else {
 				// fire right away.
-				session.getDebugger().fireEvent(new MemoryChangedEvent(session, tasks, target, array));
+				target.getDebugger().fireEvent(new MemoryChangedEvent(target.getSession(), target.getTask(), block, array));
 			}
 		}
 		return array;
@@ -163,11 +160,8 @@ public class MemoryManager extends Manager {
 	 * Post a -data-read-memory to gdb/mi.
 	 */
 	DataReadMemoryInfo createDataReadMemoryInfo(Target target, String exp, int units, int wordSize) throws PCDIException {
-		Session session = (Session)getSession();
-		BitList tasks = session.createBitList(target.getTargetID());
-
-		DataReadMemoryCommand command = new DataReadMemoryCommand(tasks, 0, exp, ExtFormat.HEXADECIMAL, wordSize, 1, units, null);
-		session.getDebugger().postCommand(command);
+		DataReadMemoryCommand command = new DataReadMemoryCommand(target.getTask(), 0, exp, ExtFormat.HEXADECIMAL, wordSize, 1, units, null);
+		target.getDebugger().postCommand(command);
 		DataReadMemoryInfo info = command.getDataReadMemoryInfo();
 		if (info == null) {
 			throw new PCDIException("No data memory info found");

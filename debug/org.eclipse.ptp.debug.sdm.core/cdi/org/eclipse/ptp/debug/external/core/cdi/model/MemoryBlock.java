@@ -19,7 +19,6 @@
 package org.eclipse.ptp.debug.external.core.cdi.model;
 
 import java.math.BigInteger;
-import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.ExtFormat;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIMemoryBlock;
@@ -251,14 +250,12 @@ public class MemoryBlock extends PObject implements IPCDIMemoryBlock {
 		}
 		
 		Target target = (Target)getTarget();
-		Session session = (Session)target.getSession();
-		BitList tasks = session.createBitList(target.getTargetID());
 		for (int i = 0; i < bytes.length; i++) {
 			long l = new Byte(bytes[i]).longValue() & 0xff;
 			String value = "0x" + Long.toHexString(l);
 System.err.println("----------- DataWriteMemoryCommand is called --------------");
-			DataWriteMemoryCommand command = new DataWriteMemoryCommand(tasks, offset + i, expression, ExtFormat.HEXADECIMAL, 1, value);
-			session.getDebugger().postCommand(command);
+			DataWriteMemoryCommand command = new DataWriteMemoryCommand(target.getTask(), offset + i, expression, ExtFormat.HEXADECIMAL, 1, value);
+			target.getDebugger().postCommand(command);
 			if (command.getDataWriteMemoryInfo() == null) {
 				throw new PCDIException("No response");
 			}

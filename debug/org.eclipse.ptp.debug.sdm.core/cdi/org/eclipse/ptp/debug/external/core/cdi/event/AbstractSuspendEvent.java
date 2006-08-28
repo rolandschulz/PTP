@@ -28,14 +28,19 @@ import org.eclipse.ptp.debug.core.cdi.event.IPCDISuspendedEvent;
  */
 public abstract class AbstractSuspendEvent extends AbstractEvent implements IPCDISuspendedEvent {
 	private int thread_id = 0;
+	private String[] var_changes = new String[0];
 	
-	public AbstractSuspendEvent(IPCDISession session, BitList tasks, int thread_id) {
+	public AbstractSuspendEvent(IPCDISession session, BitList tasks, int thread_id, String[] var_changes) {
 		super(session, tasks);
 		this.thread_id = thread_id;
+		this.var_changes = var_changes;
 	}
 	
 	public int getThreadId() {
 		return thread_id;
+	}
+	public String[] getVarChanges() {
+		return var_changes;
 	}
 }
 

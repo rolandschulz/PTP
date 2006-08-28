@@ -71,7 +71,6 @@ public class EventManager extends SessionObject implements IPCDIEventManager, Ob
 	public void shutdown() {
 		list.clear();
 	}
-
 	public void update(Observable o, Object arg) {
 		IPCDIEvent event = (IPCDIEvent) arg;
 		fireDebugEvent(event);
@@ -83,6 +82,9 @@ public class EventManager extends SessionObject implements IPCDIEventManager, Ob
 				List cdiList = new ArrayList(1);
 				if (event instanceof IPCDISuspendedEvent) {
 					processSuspendedEvent((IPCDISuspendedEvent)event, monitor);
+				}
+				else if (event instanceof IPCDIChangedEvent) {
+					System.out.println("asdasd");
 				}
 				/*
 				if (event instanceof IPCDIMemoryChangedEvent) {
@@ -170,8 +172,8 @@ public class EventManager extends SessionObject implements IPCDIEventManager, Ob
 		monitor.beginTask("Updating registered process...", procs.length);
 		Session session = (Session)getSession();
 		SignalManager sigMgr = session.getSignalManager();
-		/*
 		VariableManager varMgr = session.getVariableManager();
+		/*
 		ExpressionManager expMgr  = session.getExpressionManager();		
 		BreakpointManager bpMgr = session.getBreakpointManager();
 		SourceManager srcMgr = session.getSourceManager();
@@ -203,11 +205,11 @@ public class EventManager extends SessionObject implements IPCDIEventManager, Ob
 					if (sigMgr.isAutoUpdate()) {
 						sigMgr.update(currentTarget);
 					}
+					if (varMgr.isAutoUpdate()) {
+						varMgr.update(currentTarget, event.getVarChanges());
+					}
 					/**
 					 * TODO not quite important
-					if (varMgr.isAutoUpdate()) {
-						varMgr.update(currentTarget);
-					}
 					if (expMgr.isAutoUpdate()) { 
 						expMgr.update(currentTarget);
 					}

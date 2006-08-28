@@ -262,9 +262,8 @@ public class SourceManager extends Manager {
 		}
 	}
 	public IAIF getAIF(Target target, String variable) throws PCDIException {
-		Session session = (Session)getSession();
-		GetAIFCommand command = new GetAIFCommand(session.createBitList(target.getTargetID()), variable);
-		session.getDebugger().postCommand(command);
+		GetAIFCommand command = new GetAIFCommand(target.getTask(), variable);
+		target.getDebugger().postCommand(command);
 		return command.getAIF();
 	}
 	//public String getTypeName(Target target, String variable) throws PCDIException {

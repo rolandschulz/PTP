@@ -28,8 +28,8 @@ import org.eclipse.ptp.debug.external.core.cdi.Session;
 public class InferiorSignaledEvent extends AbstractSuspendEvent {
 	private IPCDILocator loc;
 	
-	public InferiorSignaledEvent(IPCDISession session, BitList tasks, IPCDILocator loc, int thread_id) {
-		super(session, tasks, thread_id);
+	public InferiorSignaledEvent(IPCDISession session, BitList tasks, IPCDILocator loc, int thread_id, String[] varchanges) {
+		super(session, tasks, thread_id, varchanges);
 		this.loc = loc;
 	}
 	public IPCDISessionObject getReason() {

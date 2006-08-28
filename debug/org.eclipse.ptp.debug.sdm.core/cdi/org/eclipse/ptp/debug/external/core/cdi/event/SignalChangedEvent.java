@@ -34,7 +34,7 @@ public class SignalChangedEvent extends ChangedEvent implements IPCDISignalChang
 	 * @param session
 	 * @param tasks
 	 * @param source IPCDISignal
-	 * @param name
+	 * @param name signal name
 	 */
 	public SignalChangedEvent(IPCDISession session, BitList tasks, IPCDIObject source, String name) {
 		super(session, tasks, source);

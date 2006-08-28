@@ -32,6 +32,7 @@ import org.eclipse.ptp.debug.external.core.cdi.model.PObject;
 import org.eclipse.ptp.debug.external.core.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.core.cdi.model.Target;
 import org.eclipse.ptp.debug.external.core.cdi.model.Thread;
+import org.eclipse.ptp.debug.external.core.commands.GetAIFCommand;
 
 /**
  * @author Clement chu
@@ -59,8 +60,8 @@ public abstract class VariableDescriptor extends PObject implements IPCDIVariabl
 		fName = desc.getName();
 		fFullName = desc.fFullName;
 		fType = desc.fType;
-		aif = desc.getAIF();
 		try {
+			aif = desc.getAIF();
 			fStackFrame = (StackFrame)desc.getStackFrame();
 			fThread = (Thread)desc.getThread();
 		} catch (PCDIException e) {
@@ -82,7 +83,12 @@ public abstract class VariableDescriptor extends PObject implements IPCDIVariabl
 		stackdepth = depth;
 		this.aif = aif;
 	}
-	public IAIF getAIF() {
+	public IAIF getAIF() throws PCDIException {
+		if (aif == null) {
+			GetAIFCommand aifCmd = new GetAIFCommand(getTarget().getTask(), fFullName);
+			getTarget().getDebugger().postCommand(aifCmd);
+			aif = aifCmd.getAIF();
+		}
 		return aif;
 	}
 	public void setAIF(IAIF aif) {
