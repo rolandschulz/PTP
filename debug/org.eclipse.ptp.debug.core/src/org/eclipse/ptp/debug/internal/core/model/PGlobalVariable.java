@@ -61,6 +61,9 @@ public class PGlobalVariable extends PVariable implements IPGlobalVariable {
 			}
 			return null;
 		}		
+		public void setAIF(IAIF aif) {
+			getCDIVariableObject().setAIF(aif);
+		}		
 		public IInternalVariable createShadow(int start, int length) throws DebugException {
 			IInternalVariable iv = null;
 			try {
@@ -118,7 +121,9 @@ public class PGlobalVariable extends PVariable implements IPGlobalVariable {
 					synchronized (this) {
 						if (fType == null) {
 							try {
-								fType = new PType(varObject.getAIF().getType());
+								IAIF aif = varObject.getAIF();
+								if (aif != null)
+									fType = new PType(aif.getType());
 							} catch (PCDIException e) {
 								requestFailed(e.getMessage(), null);
 							}
@@ -184,6 +189,7 @@ public class PGlobalVariable extends PVariable implements IPGlobalVariable {
 			if (fValue instanceof AbstractPValue) {
 				((AbstractPValue) fValue).dispose();
 				fValue = PValueFactory.NULL_VALUE;
+				setAIF(null);
 			}
 		}
 		public boolean isChanged() {

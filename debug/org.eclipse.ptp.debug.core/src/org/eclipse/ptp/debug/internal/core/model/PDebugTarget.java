@@ -628,8 +628,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPCDIE
 		if (source instanceof IPCDITarget) {
 			suspendThreads(event);
 		}
-		// We need this for debuggers that don't have notifications
-		// for newly created threads.
+		// We need this for debuggers that don't have notifications for newly created threads.
 		else if (source instanceof IPCDIThread) {
 			PThread thread = findThread((IPCDIThread) source);
 			if (thread != null && newThreads.contains(thread)) {

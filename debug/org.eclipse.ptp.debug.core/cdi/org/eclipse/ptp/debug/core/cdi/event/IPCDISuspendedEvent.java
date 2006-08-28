@@ -33,5 +33,10 @@ public interface IPCDISuspendedEvent extends IPCDIEvent {
 	 * @return
 	 */
 	int getThreadId();
+	
+	/** Get changed variable name
+	 * @return changed variable names
+	 */
+	String[] getVarChanges();
 }
 

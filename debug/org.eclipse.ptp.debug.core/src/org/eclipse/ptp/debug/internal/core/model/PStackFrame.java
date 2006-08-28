@@ -26,7 +26,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-
 import org.eclipse.cdt.core.IAddress;
 import org.eclipse.cdt.core.IAddressFactory;
 import org.eclipse.cdt.debug.core.cdi.CDIException;
@@ -120,6 +119,7 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 		while (index < fVariables.size()) {
 			IPCDIVariableDescriptor varObject = findVariable(locals, (PVariable) fVariables.get(index));
 			if (varObject != null) {
+				//((PVariable) fVariables.get(index)).setAIF(varObject.getAIF());
 				locals.remove(varObject);
 				index++;
 			} else {

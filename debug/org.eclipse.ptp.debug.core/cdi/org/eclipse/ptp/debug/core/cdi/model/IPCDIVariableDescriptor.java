@@ -28,6 +28,7 @@ import org.eclipse.ptp.debug.core.cdi.PCDIException;
 public interface IPCDIVariableDescriptor extends IPCDIObject {
 	String getName();
 	IAIF getAIF() throws PCDIException;
+	void setAIF(IAIF aif);
 	String getTypeName() throws PCDIException;
 	int sizeof() throws PCDIException;
 	String getQualifiedName() throws PCDIException;
