@@ -18,11 +18,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.core.cdi.model.variable;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.eclipse.ptp.debug.core.aif.IAIF;
+import org.eclipse.ptp.debug.core.aif.ITypeAggregate;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDILocalVariable;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIVariable;
 import org.eclipse.ptp.debug.external.core.cdi.ExpressionManager;
@@ -32,14 +30,13 @@ import org.eclipse.ptp.debug.external.core.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.core.cdi.model.Target;
 import org.eclipse.ptp.debug.external.core.cdi.model.Thread;
 import org.eclipse.ptp.debug.external.core.commands.GetAIFCommand;
-import org.eclipse.ptp.debug.external.core.commands.ListLocalVariablesCommand;
 
 /**
  * @author Clement chu
  * 
  */
 public abstract class Variable extends VariableDescriptor implements IPCDIVariable {
-	public IPCDIVariable[] children = new IPCDIVariable[0];
+	//public IPCDIVariable[] children = new IPCDIVariable[0];
 	String editable = null;
 	String language;
 	boolean isFake = false;
@@ -57,6 +54,7 @@ public abstract class Variable extends VariableDescriptor implements IPCDIVariab
 	public boolean isUpdated() {
 		return isUpdated;
 	}
+	/*
 	public void update() throws PCDIException {
 		Session session = (Session)getTarget().getSession();
 		VariableManager mgr = session.getVariableManager();
@@ -76,25 +74,25 @@ public abstract class Variable extends VariableDescriptor implements IPCDIVariab
 		}
 		return null;
 	}
+	*/
 	void setIsFake(boolean f) {
 		isFake = f;
 	}
 	boolean isFake() {
 		return isFake;
 	}
+	/*
 	public IPCDIVariable[] getChildren() throws PCDIException {
 		// Use the default timeout.
 		return getChildren(-1);
 	}
-	//TODO - dunno whether it implemented correctly or not
 	public IPCDIVariable[] getChildren(int timeout) throws PCDIException {
 		List varList = new ArrayList(1);
 		Target target = (Target)getTarget();
-		Session session = (Session)target.getSession();
 		
 		String name = getQualifiedName();
-		ListLocalVariablesCommand command = new ListLocalVariablesCommand(session.createBitList(target.getTargetID()), getStackFrame());
-		session.getDebugger().postCommand(command);
+		ListLocalVariablesCommand command = new ListLocalVariablesCommand(target.getTask(), getStackFrame());
+		target.getDebugger().postCommand(command);
 		IPCDILocalVariable[] vars = command.getLocalVariables();
 		for (int i = 0; i < vars.length; i++) {
 			if (name.equals(vars[i].getQualifiedName())) {
@@ -103,12 +101,15 @@ public abstract class Variable extends VariableDescriptor implements IPCDIVariab
 		}
 		return (IPCDIVariable[])varList.toArray(new IPCDIVariable[0]);
 	}
-
+	*/
 	protected abstract Variable createVariable(Target target, Thread thread, StackFrame frame, String name, String fullName, int pos, int depth, IAIF aif);
 	
 	public int getChildrenNumber() throws PCDIException {
-		//FIXME no child number provided
-		return 1;
+		IAIF aif = getAIF();
+		if (aif.getType() instanceof ITypeAggregate) {
+			return ((ITypeAggregate)aif.getType()).getNumberOfChildren();
+		}
+		return 0;
 	}
 
 	/*
@@ -218,9 +219,8 @@ public abstract class Variable extends VariableDescriptor implements IPCDIVariab
 	public String getTypeName() throws PCDIException {
 		if (aif == null) {
 			Target target = (Target)getTarget();
-			Session session = (Session)target.getSession();
-			GetAIFCommand command = new GetAIFCommand(session.createBitList(target.getTargetID()), getName());
-			session.getDebugger().postCommand(command);
+			GetAIFCommand command = new GetAIFCommand(target.getTask(), getName());
+			target.getDebugger().postCommand(command);
 			aif = command.getAIF();
 		}
 		return aif.getDescription();

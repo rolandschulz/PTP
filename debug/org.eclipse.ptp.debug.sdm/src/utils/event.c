@@ -830,22 +830,33 @@ FreeDbgEvent(dbg_event *e) {
 	case DBGEV_SUSPEND:
 		switch (e->dbg_event_u.suspend_event.reason) {
 		case DBGEV_SUSPEND_SIGNAL:
-			FreeSignalInfo(e->dbg_event_u.suspend_event.ev_u.sig);
+			if (e->dbg_event_u.suspend_event.ev_u.sig != NULL)
+				FreeSignalInfo(e->dbg_event_u.suspend_event.ev_u.sig);
+			break;
+		case DBGEV_SUSPEND_INT:
+		case DBGEV_SUSPEND_STEP:
 			break;
 			
 		case DBGEV_SUSPEND_BPHIT:
-		case DBGEV_SUSPEND_STEP:
-		case DBGEV_SUSPEND_INT:
 			break;
 		}
 		
 		if (e->dbg_event_u.suspend_event.frame != NULL)
 			FreeStackframe(e->dbg_event_u.suspend_event.frame);
+		if (e->dbg_event_u.suspend_event.changed_vars != NULL)
+			DestroyList(e->dbg_event_u.suspend_event.changed_vars, free);
+
 		break;
 			
 	case DBGEV_EXIT:
-		if (e->dbg_event_u.suspend_event.reason == DBGEV_EXIT_SIGNAL)
-			FreeSignalInfo(e->dbg_event_u.exit_event.ev_u.sig);
+		switch (e->dbg_event_u.suspend_event.reason) {
+			case DBGEV_EXIT_SIGNAL:
+				if (e->dbg_event_u.suspend_event.ev_u.sig != NULL)
+					FreeSignalInfo(e->dbg_event_u.suspend_event.ev_u.sig);
+				break;
+			case DBGEV_EXIT_NORMAL:
+				break;
+		}
 		break;
 		
 	case DBGEV_FRAMES:
@@ -880,11 +891,12 @@ FreeDbgEvent(dbg_event *e) {
 			FreeMemoryInfo(e->dbg_event_u.meminfo);
 		break;
 
+	case DBGEV_ARGS:
 	case DBGEV_VARS:
 		if (e->dbg_event_u.list != NULL)
 			DestroyList(e->dbg_event_u.list, free);
 		break;
-		
+
 	case DBGEV_SIGNALS:
 		if (e->dbg_event_u.list != NULL)
 			DestroyList(e->dbg_event_u.list, FreeSignalInfo);

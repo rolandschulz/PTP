@@ -60,6 +60,18 @@ struct bpmap {
 	struct bpentry *	maps;
 };
 
+struct varinfo {
+	char * name; //variable name
+	MIVar *mivar;
+};
+typedef struct varinfo	varinfo;
+
+struct varmap {
+	int nels; // number of elements currently in map
+	int size; // total size of map
+	struct varinfo * maps;
+};
+
 static MISession *	DebugSession;
 static dbg_event *	LastEvent;
 static void			(*EventCallback)(dbg_event *, void *);
@@ -67,6 +79,7 @@ static void *		EventCallbackData;
 static int			ServerExit;
 static int			Started;
 static struct bpmap	BPMap = { 0, 0, NULL };
+static struct varmap VARMap = { 0, 0, NULL };
 static int			(*AsyncFunc)(void *) = NULL;
 static void *		AsyncFuncData;
 
@@ -119,6 +132,8 @@ static char * GetPtypeValue(char *);
 static AIF * ComplexVarToAIF(char *, MIVar *, int);
 static AIF * GetAIFPointer(char *res, AIF *a);
 static int GetAddressLength();
+static List * GetChangedVariables();
+static void RemoveAllMaps();
 
 dbg_backend_funcs	GDBMIBackend =
 {
@@ -226,7 +241,6 @@ RemoveBPMap(bpentry *bp)
 {
 	int				i;
 	struct bpentry *	map;
-	
 	for (i = 0; i < BPMap.nels; i++) {
 		map = &BPMap.maps[i];
 		if (map == bp) {
@@ -244,14 +258,12 @@ FindLocalBP(int local)
 {
 	int				i;
 	struct bpentry *	map;
-	
 	for (i = 0; i < BPMap.nels; i++) {
 		map = &BPMap.maps[i];
 		if (map->local == local) {
 			return map;
 		}
 	}
-
 	return NULL;
 }
 
@@ -260,15 +272,31 @@ FindRemoteBP(int remote)
 {
 	int				i;
 	struct bpentry *	map;
-	
 	for (i = 0; i < BPMap.nels; i++) {
 		map = &BPMap.maps[i];
 		if (map->remote == remote) {
 			return map;
 		}
 	}
-
 	return NULL;
+}
+
+static void
+RemoveAllBPMap()
+{
+	int				i;
+	struct bpentry *	map;
+	int length = BPMap.nels;
+	for (i = 0; i < length; i++) {
+		map = &BPMap.maps[i];
+		if (map == NULL)
+			return;
+
+		map->remote = -1;
+		map->local = -1;
+		map->temp = 0;
+		BPMap.nels--;
+	}
 }
 
 static int
@@ -301,6 +329,7 @@ AsyncStop(void *data)
 	switch ( evt->type )
 	{
 	case MIEventTypeBreakpointHit:
+	printf("$$$$$$$$$$$$$$$$$$$$ MIEventTypeBreakpointHit \n");
 		bpmap = FindLocalBP(evt->bkptno);
 		
 		if (!bpmap->temp) {
@@ -318,6 +347,7 @@ AsyncStop(void *data)
 		RemoveBPMap(bpmap);
 
 	case MIEventTypeSuspended:
+	printf("$$$$$$$$$$$$$$$$$$$$ MIEventTypeSuspended \n");
 		if (get_current_frame(&frame) < 0) {
 			ERROR_TO_EVENT(e);
 		} else {
@@ -325,31 +355,25 @@ AsyncStop(void *data)
 			e->dbg_event_u.suspend_event.reason = DBGEV_SUSPEND_INT;
 			e->dbg_event_u.suspend_event.thread_id = evt->threadId;
 			e->dbg_event_u.suspend_event.frame = frame;
-			e->dbg_event_u.suspend_event.changed_vars = NULL;
+			e->dbg_event_u.suspend_event.changed_vars = GetChangedVariables();
 		}
 		break;
 
 	case MIEventTypeSteppingRange:
+	printf("$$$$$$$$$$$$$$$$$$$$ MIEventTypeSteppingRange \n");
 		if (get_current_frame(&frame) < 0) {
 			ERROR_TO_EVENT(e);
 		} else {
 			e = NewDbgEvent(DBGEV_SUSPEND);
 			e->dbg_event_u.suspend_event.reason = DBGEV_SUSPEND_STEP;
-			e->dbg_event_u.suspend_event.frame = frame;
 			e->dbg_event_u.suspend_event.thread_id = evt->threadId;
-			e->dbg_event_u.suspend_event.changed_vars = NULL;
+			e->dbg_event_u.suspend_event.frame = frame;
+			e->dbg_event_u.suspend_event.changed_vars = GetChangedVariables();
 		}
 		break;
 
-	case MIEventTypeInferiorSignalExit:
-		e = NewDbgEvent(DBGEV_EXIT);
-		e->dbg_event_u.exit_event.reason = DBGEV_EXIT_SIGNAL;
-		e->dbg_event_u.exit_event.ev_u.sig = NewSignalInfo();
-		e->dbg_event_u.exit_event.ev_u.sig->name = strdup(evt->sigName);
-		e->dbg_event_u.exit_event.ev_u.sig->desc = strdup(evt->sigMeaning);
-		break;
-		
 	case MIEventTypeSignal:
+	printf("$$$$$$$$$$$$$$$$$$$$ MIEventTypeSignal \n");
 		if (get_current_frame(&frame) < 0) {
 			ERROR_TO_EVENT(e);
 		} else {
@@ -360,14 +384,26 @@ AsyncStop(void *data)
 			e->dbg_event_u.suspend_event.ev_u.sig->desc = strdup(evt->sigMeaning);
 			e->dbg_event_u.suspend_event.thread_id = evt->threadId;
 			e->dbg_event_u.suspend_event.frame = frame;
-			e->dbg_event_u.suspend_event.changed_vars = NULL;
+			e->dbg_event_u.suspend_event.changed_vars = GetChangedVariables();
 		}
 		break;
-
+		
+	case MIEventTypeInferiorSignalExit:
+	printf("$$$$$$$$$$$$$$$$$$$$ MIEventTypeInferiorSignalExit \n");
+		e = NewDbgEvent(DBGEV_EXIT);
+		e->dbg_event_u.exit_event.reason = DBGEV_EXIT_SIGNAL;
+		e->dbg_event_u.exit_event.ev_u.sig = NewSignalInfo();
+		e->dbg_event_u.exit_event.ev_u.sig->name = strdup(evt->sigName);
+		e->dbg_event_u.exit_event.ev_u.sig->desc = strdup(evt->sigMeaning);
+		RemoveAllMaps();
+		break;
+		
 	case MIEventTypeInferiorExit:
+	printf("$$$$$$$$$$$$$$$$$$$$ MIEventTypeInferiorExit \n");
 		e = NewDbgEvent(DBGEV_EXIT);
 		e->dbg_event_u.exit_event.reason = DBGEV_EXIT_NORMAL;
 		e->dbg_event_u.exit_event.ev_u.exit_status = evt->code;
+		RemoveAllMaps();
 		break;
 
 	default:
@@ -379,9 +415,8 @@ AsyncStop(void *data)
 	
 	if (EventCallback != NULL)
 		EventCallback(e, EventCallbackData);
-		
+
 	FreeDbgEvent(e);
-	
 	return DBGRES_OK;
 }
 
@@ -435,6 +470,180 @@ SendCommandWait(MISession *sess, MICommand *cmd)
 	do {
 		MISessionProgress(sess);
 	} while (!MISessionCommandCompleted(sess));
+}
+
+/**** Variable ****/
+static varinfo *
+AddVARMap(char *name)
+{
+	int				i;
+	struct varinfo *map;
+	MICommand *cmd;
+	MIVar *mivar;
+	
+	if (VARMap.size == 0) {
+		VARMap.maps = (struct varinfo *)malloc(sizeof(struct varinfo) * 100);
+		VARMap.size = 100;
+		
+		for (i = 0; i < VARMap.size; i++) {
+			map = &VARMap.maps[i];
+			map->name = NULL; 
+			map->mivar = NULL;
+		}
+	}
+	
+	if (VARMap.nels == VARMap.size) {
+		i = VARMap.size;
+		VARMap.size *= 2;
+		VARMap.maps = (struct varinfo *)realloc(VARMap.maps, sizeof(struct varinfo) * VARMap.size);
+		
+		for (; i < VARMap.size; i++) {
+			map = &VARMap.maps[i];
+			map->name = NULL; 
+			map->mivar = NULL;
+		}
+	}
+	
+	for (i = 0; i < VARMap.size; i++) {
+		map = &VARMap.maps[i];
+		if (map->name == NULL) {
+			cmd = MIVarCreate("-", "*", name);
+			SendCommandWait(DebugSession, cmd);
+			if (!MICommandResultOK(cmd)) {
+				MICommandFree(cmd);
+				return NULL;
+			}
+			mivar = MIGetVarCreateInfo(cmd);
+			MICommandFree(cmd);
+			
+			map->name = strdup(name);
+			map->mivar = mivar;
+			VARMap.nels++;
+			return map;
+		}
+	}
+	return NULL;
+}
+
+static varinfo *
+FindVARByName(char *name) 
+{
+	int				i;
+	struct varinfo *map;
+	for (i = 0; i < VARMap.nels; i++) {
+		map = &VARMap.maps[i];
+		if (map != NULL && strcmp(map->name, name) == 0) {
+			return map;
+		}
+	}
+	return NULL;
+}
+
+static varinfo *
+FindVARByMIName(char *mi_name) 
+{
+	int				i;
+	struct varinfo *map;
+	for (i = 0; i < VARMap.nels; i++) {
+		map = &VARMap.maps[i];
+		if (map != NULL && strcmp(map->mivar->name, mi_name) == 0) {
+			return map;
+		}
+	}
+	return NULL;
+}
+
+static void
+RemoveVARMap(varinfo *map)
+{
+	MICommand *cmd;
+	if (map != NULL) {
+		if (map->name != NULL) {
+			free(map->name);
+			map->name = NULL;
+		}
+		if (map->mivar != NULL) {
+			cmd = MIVarDelete(map->mivar->name);
+			SendCommandWait(DebugSession, cmd);
+			MICommandFree(cmd);
+			MIVarFree(map->mivar);
+			map->mivar = NULL;
+		}
+		VARMap.nels--;
+	}
+}
+
+static void
+RemoveVARMapByName(char *name)
+{
+	struct varinfo *map;	
+	map = FindVARByName(name);
+	RemoveVARMap(map);
+}
+
+static void
+RemoveVARMapByMIName(char *mi_name)
+{
+	struct varinfo *map;
+	map = FindVARByMIName(mi_name);
+	RemoveVARMap(map);
+}
+
+static void
+RemoveAllVARMap()
+{
+	int				i;
+	struct varinfo *map;
+	int length = VARMap.nels;
+	for (i = 0; i < length; i++) {
+		map = &VARMap.maps[i];
+		if (map == NULL)
+			return;
+			
+		RemoveVARMap(map);
+	}	
+}
+
+static void
+RemoveAllMaps()
+{
+	RemoveAllBPMap();
+	RemoveAllVARMap();
+}
+
+static List * 
+GetChangedVariables()
+{
+	MICommand *cmd;	
+	List *changes;
+	List *changedVars;
+	MIVarChange *var;
+	struct varinfo *map;
+	
+	cmd = MIVarUpdate("*");
+	SendCommandWait(DebugSession, cmd);
+	if (!MICommandResultOK(cmd)) {
+		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
+		MICommandFree(cmd);
+		return NewList();
+	}
+	MIGetVarUpdateInfo(cmd, &changes);
+	MICommandFree(cmd);
+	
+	changedVars = NewList();
+	for (SetList(changes); (var = (MIVarChange *)GetListElement(changes)) != NULL; ) {
+		map = FindVARByMIName(var->name);
+		if (map != NULL) {
+			if (var->in_scope == 1) {
+				AddToList(changedVars, (void *)strdup(map->name));
+			}
+			else {
+				RemoveVARMap(map);
+			}				
+		}
+	}
+	DestroyList(changes, MIVarChangeFree);
+	return changedVars;
 }
 
 /*
@@ -1748,12 +1957,20 @@ static int
 GetAIFVar(char *var, AIF **val, char **type)
 {
 	AIF *		res;
-	MIVar *		mivar;
-	MICommand *	cmd;
+	struct varinfo *map;
+
+	map = FindVARByName(var);
+	if (map == NULL) {
+		map = AddVARMap(var);		
+	}
+	if (map == NULL) {
+		DbgSetError(DBGERR_UNKNOWN_VARIABLE, GetLastErrorStr());
+		return DBGRES_ERR;
+	}
 	
+	/*
 	cmd = MIVarCreate("-", "*", var);
 	SendCommandWait(DebugSession, cmd);
-	
 	if (!MICommandResultOK(cmd)) {
 		DbgSetError(DBGERR_UNKNOWN_VARIABLE, GetLastErrorStr());
 		MICommandFree(cmd);
@@ -1761,22 +1978,20 @@ GetAIFVar(char *var, AIF **val, char **type)
 	}
 	mivar = MIGetVarCreateInfo(cmd);
 	MICommandFree(cmd);
+	*/
 	
-	if ( (res = ConvertVarToAIF(var, mivar, 0)) == NULL ) {
+	if ( (res = ConvertVarToAIF(var, map->mivar, 0)) == NULL ) {
 		return DBGRES_ERR;
 	}
-
-	*type = strdup(mivar->type);
+	*type = strdup(map->mivar->type);
 	*val = res;
 
+	/*
 	cmd = MIVarDelete(mivar->name);
-	
 	SendCommandWait(DebugSession, cmd);
-	
 	MICommandFree(cmd);
-	
 	MIVarFree(mivar);
-
+	*/
 	return DBGRES_OK;
 }
 

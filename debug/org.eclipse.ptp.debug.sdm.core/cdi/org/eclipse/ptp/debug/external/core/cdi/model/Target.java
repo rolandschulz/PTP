@@ -66,10 +66,10 @@ import org.eclipse.ptp.debug.external.core.commands.EvaluateExpressionCommand;
 import org.eclipse.ptp.debug.external.core.commands.GetInfoThreadsCommand;
 import org.eclipse.ptp.debug.external.core.commands.GoCommand;
 import org.eclipse.ptp.debug.external.core.commands.HaltCommand;
-import org.eclipse.ptp.debug.external.core.commands.TerminateCommand;
 import org.eclipse.ptp.debug.external.core.commands.SetThreadSelectCommand;
 import org.eclipse.ptp.debug.external.core.commands.StepIntoCommand;
 import org.eclipse.ptp.debug.external.core.commands.StepOverCommand;
+import org.eclipse.ptp.debug.external.core.commands.TerminateCommand;
 
 /**
  * @author Clement chu
@@ -83,17 +83,22 @@ public class Target extends SessionObject implements IPCDITarget {
 	String fEndian = null;
 	boolean suspended = true;
 	private int task_id = -1;
+	private BitList task = null;
 	
 	public Target(Session session, int task_id) {
 		super(session);
 		this.task_id = task_id;
+		task = session.createBitList(task_id);
 		currentThreads = noThreads;
 	}
 	public IAbstractDebugger getDebugger() {
-		return ((Session)getSession()).getDebugger();
+		return getSession().getDebugger();
 	}
 	public void setConfiguration(IPCDITargetConfiguration configuration) {
 		fConfiguration = configuration;
+	}
+	public BitList getTask() {
+		return task;
 	}
 	public IPCDITarget getTarget() {
 		return this;
@@ -127,8 +132,8 @@ public class Target extends SessionObject implements IPCDITarget {
 		}
 		final Session session = (Session) getSession();
 		if (currentThreadId != id) {
-			SetThreadSelectCommand command = new SetThreadSelectCommand(session.createBitList(getTargetID()), id);
-			session.getDebugger().postCommand(command);
+			SetThreadSelectCommand command = new SetThreadSelectCommand(getTask(), id);
+			getDebugger().postCommand(command);
 			Object[] objects = command.getThreadInfo();
 			if (objects.length != 2) {
 				throw new PCDIException("Cannot SetThreadSelectCommand error");
@@ -200,9 +205,8 @@ public class Target extends SessionObject implements IPCDITarget {
 	}
 	private Thread[] getPThreads() throws PCDIException {
 		Thread[] pthreads = noThreads;
-		final Session session = (Session)getSession();
-		GetInfoThreadsCommand command = new GetInfoThreadsCommand(session.createBitList(getTargetID()));
-		session.getDebugger().postCommand(command);
+		GetInfoThreadsCommand command = new GetInfoThreadsCommand(getTask());
+		getDebugger().postCommand(command);
 		String[] ids = command.getThreadIds();//first index is current thread id
 		if (ids.length > 0) {
 			pthreads = new Thread[ids.length];
@@ -256,7 +260,7 @@ public class Target extends SessionObject implements IPCDITarget {
 		stepInto(1);
 	}
 	public void stepInto(int count) throws PCDIException {
-		getDebugger().postCommand(new StepIntoCommand(((Session)getSession()).createBitList(getTargetID()), count));
+		getDebugger().postCommand(new StepIntoCommand(getTask(), count));
 	}
 	public void stepIntoInstruction() throws PCDIException {
 		stepIntoInstruction(1);
@@ -270,7 +274,7 @@ public class Target extends SessionObject implements IPCDITarget {
 		stepOver(1);
 	}
 	public void stepOver(int count) throws PCDIException {
-		getDebugger().postCommand(new StepOverCommand(((Session)getSession()).createBitList(getTargetID()), count));
+		getDebugger().postCommand(new StepOverCommand(getTask(), count));
 	}
 	public void stepOverInstruction() throws PCDIException {
 		stepOverInstruction(1);
@@ -318,7 +322,7 @@ public class Target extends SessionObject implements IPCDITarget {
 		throw new PCDIException("Not implement yet - stepUntil(location)");
 	}
 	public void suspend() throws PCDIException {
-		getDebugger().postCommand(new HaltCommand(((Session)getSession()).createBitList(getTargetID())));
+		getDebugger().postCommand(new HaltCommand(getTask()));
 		//getDebugger().suspend(((Session)getSession()).createBitList(getTargetID()));
 	}
 	public void disconnect() throws PCDIException {
@@ -351,7 +355,7 @@ public class Target extends SessionObject implements IPCDITarget {
 		}
 	}
 	public void continuation() throws PCDIException {
-		getDebugger().postCommand(new GoCommand(((Session)getSession()).createBitList(getTargetID())));
+		getDebugger().postCommand(new GoCommand(getTask()));
 		//getDebugger().resume(((Session)getSession()).createBitList(getTargetID()));
 	}
 	public void jump(IPCDILocation location) throws PCDIException {
@@ -386,19 +390,12 @@ public class Target extends SessionObject implements IPCDITarget {
 		throw new PCDIException("Not implement yet - jump(location)");
 	}
 	public void signal() throws PCDIException {
-		Session session = (Session)getSession();
-		BitList tasks = session.createBitList(getTargetID());
-
-		CLISignalInfoCommand command = new CLISignalInfoCommand(tasks, "0");
-		session.getDebugger().postCommand(command);
+		CLISignalInfoCommand command = new CLISignalInfoCommand(getTask(), "0");
+		getDebugger().postCommand(command);
 	}
 	public void signal(IPCDISignal signal) throws PCDIException {
-		Target target = (Target)signal.getTarget();
-		Session session = (Session)getSession();
-		BitList tasks = session.createBitList(target.getTargetID());
-		
-		CLISignalInfoCommand command = new CLISignalInfoCommand(tasks, signal.getName());
-		session.getDebugger().postCommand(command);
+		CLISignalInfoCommand command = new CLISignalInfoCommand(getTask(), signal.getName());
+		getDebugger().postCommand(command);
 	}
 	public String evaluateExpressionToString(IPCDIStackFrame frame, String expressionText) throws PCDIException {
 		//TODO - make sure using -data-evaluate-expression or -var-evaluate-expression
@@ -417,8 +414,8 @@ public class Target extends SessionObject implements IPCDITarget {
 			if (aif != null) {
 				return aif.getValue().toString();
 			}
-			EvaluateExpressionCommand command = new EvaluateExpressionCommand(session.createBitList(target.getTargetID()), expressionText);
-			session.getDebugger().postCommand(command);
+			EvaluateExpressionCommand command = new EvaluateExpressionCommand(getTask(), expressionText);
+			getDebugger().postCommand(command);
 			return command.getExpressionValue();
 		} finally {
 			target.setCurrentThread(currentThread, false);
@@ -426,7 +423,7 @@ public class Target extends SessionObject implements IPCDITarget {
 		}
 	}
 	public void terminate() throws PCDIException {
-		getDebugger().postCommand(new TerminateCommand(((Session)getSession()).createBitList(getTargetID())));
+		getDebugger().postCommand(new TerminateCommand(getTask()));
 	}
 	public boolean isTerminated() {
 		return getPProcess().isTerminated();
@@ -444,16 +441,16 @@ public class Target extends SessionObject implements IPCDITarget {
 		return null;
 	}
 	public IPCDILineBreakpoint setLineBreakpoint(int type, IPCDILineLocation location, IPCDICondition condition, boolean deferred) throws PCDIException {
-		return getSession().getBreakpointManager().setLineBreakpoint(getSession().createBitList(getTargetID()), type, location, condition, deferred);
+		return getSession().getBreakpointManager().setLineBreakpoint(getTask(), type, location, condition, deferred);
 	}
 	public IPCDIFunctionBreakpoint setFunctionBreakpoint(int type, IPCDIFunctionLocation location, IPCDICondition condition, boolean deferred) throws PCDIException {		
-		return getSession().getBreakpointManager().setFunctionBreakpoint(getSession().createBitList(getTargetID()), type, location, condition, deferred);
+		return getSession().getBreakpointManager().setFunctionBreakpoint(getTask(), type, location, condition, deferred);
 	}
 	public IPCDIAddressBreakpoint setAddressBreakpoint(int type, IPCDIAddressLocation location, IPCDICondition condition, boolean deferred) throws PCDIException {
-		return getSession().getBreakpointManager().setAddressBreakpoint(getSession().createBitList(getTargetID()), type, location, condition, deferred);
+		return getSession().getBreakpointManager().setAddressBreakpoint(getTask(), type, location, condition, deferred);
 	}
 	public IPCDIWatchpoint setWatchpoint(int type, int watchType, String expression, IPCDICondition condition) throws PCDIException {
-		return getSession().getBreakpointManager().setWatchpoint(getSession().createBitList(getTargetID()), type, watchType, expression, condition);
+		return getSession().getBreakpointManager().setWatchpoint(getTask(), type, watchType, expression, condition);
 	}
 	public IPCDIExceptionpoint setExceptionBreakpoint(String clazz, boolean stopOnThrow, boolean stopOnCatch) throws PCDIException {
 		throw new PCDIException("Not implemented yet setExceptionBreakpoint");

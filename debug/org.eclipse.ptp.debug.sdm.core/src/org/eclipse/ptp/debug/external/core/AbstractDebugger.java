@@ -225,18 +225,21 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 	public void handleBreakpointCreatedEvent(BitList tasks) {
 		fireEvent(new BreakpointCreatedEvent(getSession(), tasks));
 	}
-	public void handleBreakpointHitEvent(BitList tasks, int bpid, int thread_id) {
+	public void handleBreakpointHitEvent(BitList tasks, int bpid, int thread_id, String[] varchanges) {
 		IPCDIBreakpoint bpt = ((Session)getSession()).getBreakpointManager().findCDIBreakpoint(bpid);
 		if (bpt != null) {
-			fireEvent(new BreakpointHitEvent(getSession(), tasks, bpt, thread_id));
+			fireEvent(new BreakpointHitEvent(getSession(), tasks, bpt, thread_id, varchanges));
 		}
 	}
-	public void handleSuspendEvent(BitList tasks, IPCDILocator locator, int thread_id) {
-		fireEvent(new SuspendEvent(getSession(), tasks, locator, thread_id));
+	public void handleSuspendEvent(BitList tasks, IPCDILocator locator, int thread_id, String[] varchanges) {
+		fireEvent(new SuspendEvent(getSession(), tasks, locator, thread_id, varchanges));
 	}
-	public void handleEndSteppingEvent(BitList tasks, int lineNumber, String filename, int thread_id) {
+	public void handleEndSteppingEvent(BitList tasks, int lineNumber, String filename, int thread_id, String[] varchanges) {
 		LineLocation loc = new LineLocation(filename, lineNumber);
-		fireEvent(new EndSteppingRangeEvent(getSession(), tasks, loc, thread_id));
+		fireEvent(new EndSteppingRangeEvent(getSession(), tasks, loc, thread_id, varchanges));
+	}
+	public void handleProcessSignaledEvent(BitList tasks, IPCDILocator locator, int thread_id, String[] varchanges) {
+		fireEvent(new InferiorSignaledEvent(getSession(), tasks, locator, thread_id, varchanges));
 	}
 	public void handleProcessResumedEvent(BitList tasks, int type) {
 		fireEvent(new InferiorResumedEvent(getSession(), tasks, type));
@@ -246,9 +249,6 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 	}
 	public void handleProcessTerminatedEvent(BitList tasks, String signalName, String signalMeaning) {
 		fireEvent(new InferiorExitedEvent(getSession(), tasks, signalName, signalMeaning));
-	}
-	public void handleProcessSignaledEvent(BitList tasks, IPCDILocator locator, int thread_id) {
-		fireEvent(new InferiorSignaledEvent(getSession(), tasks, locator, thread_id));
 	}
 	public void handleErrorEvent(BitList tasks, String errMsg, int errCode) {
 		System.err.println("----- debugger error: " + errMsg + " on Tasks: " + showBitList(tasks) +" ------------");

@@ -71,6 +71,16 @@ MIVarEvaluateExpression(char *name)
 }
 
 MICommand *
+MIVarUpdate(char *name)
+{
+	MICommand *	cmd;
+	
+	cmd = MICommandNew("-var-update", MIResultRecordDONE);
+	MICommandAddOption(cmd, name, NULL);
+	return cmd;
+}
+
+MICommand *
 MIDataEvaluateExpression(char *name)
 {
 	MICommand *	cmd;

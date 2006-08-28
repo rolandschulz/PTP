@@ -20,7 +20,6 @@ package org.eclipse.ptp.debug.external.core.cdi.model;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.eclipse.ptp.debug.core.cdi.IPCDICondition;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIBreakpoint;
@@ -93,10 +92,9 @@ public class Thread extends PObject implements IPCDIThread {
 			IPCDIThread currentThread = (IPCDIThread)target.getCurrentThread();
 			target.setCurrentThread(this, false);
 
-			Session session = (Session) target.getSession();			
 			try {
-				ListStackFramesCommand command = new ListStackFramesCommand(session.createBitList(target.getTargetID()));
-				session.getDebugger().postCommand(command);
+				ListStackFramesCommand command = new ListStackFramesCommand(target.getTask());
+				target.getDebugger().postCommand(command);
 				IPCDIStackFrame[] frames = command.getStackFrames();
 				for (int i = 0; i < frames.length; i++) {
 					frames[i].setThread(this);
@@ -126,15 +124,14 @@ public class Thread extends PObject implements IPCDIThread {
 			IPCDIThread currentThread = (IPCDIThread)target.getCurrentThread();
 			target.setCurrentThread(this, false);
 
-			final Session session = (Session) target.getSession();
-			GetStackInfoDepthCommand command = new GetStackInfoDepthCommand(session.createBitList(target.getTargetID()));
+			GetStackInfoDepthCommand command = new GetStackInfoDepthCommand(target.getTask());
 			try {
-				session.getDebugger().postCommand(command);
+				target.getDebugger().postCommand(command);
 				stackdepth = command.getDepth();
 			} catch (PCDIException e) {
 				// First try fails, retry. gdb patches up the corrupt frame
 				// so retry should give us a frame count that is safe.
-				session.getDebugger().postCommand(command);
+				target.getDebugger().postCommand(command);
 				stackdepth = command.getDepth();
 				if (stackdepth > 0) {
 					stackdepth--;
@@ -168,14 +165,13 @@ public class Thread extends PObject implements IPCDIThread {
 			}
 		}
 		Target target = (Target)getTarget();
-		Session session = (Session) target.getSession();
 		int level = getStackFrameCount() - frameLevel;
-		SetCurrentStackFrameCommand command = new SetCurrentStackFrameCommand(session.createBitList(target.getTargetID()), level);
-		session.getDebugger().postCommand(command);
+		SetCurrentStackFrameCommand command = new SetCurrentStackFrameCommand(target.getTask(), level);
+		target.getDebugger().postCommand(command);
 		if (command.isWaitForReturn()) {
 			currentFrame = stackframe;
 			if (doUpdate) {
-				VariableManager varMgr = session.getVariableManager();
+				VariableManager varMgr = ((Session)target.getSession()).getVariableManager();
 				if (varMgr.isAutoUpdate()) {
 					varMgr.update(target);
 				}

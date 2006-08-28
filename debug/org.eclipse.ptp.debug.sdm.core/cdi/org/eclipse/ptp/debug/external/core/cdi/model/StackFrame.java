@@ -19,8 +19,6 @@
 package org.eclipse.ptp.debug.external.core.cdi.model;
 
 import java.math.BigInteger;
-
-import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.aif.AIFException;
 import org.eclipse.ptp.debug.core.aif.IAIFValue;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
@@ -73,12 +71,10 @@ public class StackFrame extends PObject implements IPCDIStackFrame {
 		}
 		else {
 			Target target = (Target)getTarget();
-			Session session = (Session)target.getSession();
-			BitList tasks = session.createBitList(target.getTargetID());
 			for (int i=0; i<argDescs.length; i++) {
 				ArgumentDescriptor argDesc = (ArgumentDescriptor)argDescs[i];
-				GetAIFCommand command = new GetAIFCommand(tasks, argDesc.getQualifiedName());
-				session.getDebugger().postCommand(command);
+				GetAIFCommand command = new GetAIFCommand(target.getTask(), argDesc.getQualifiedName());
+				target.getDebugger().postCommand(command);
 				argDesc.setAIF(command.getAIF());
 			}
 		}
@@ -92,12 +88,10 @@ public class StackFrame extends PObject implements IPCDIStackFrame {
 		}
 		else {
 			Target target = (Target)getTarget();
-			Session session = (Session)target.getSession();
-			BitList tasks = session.createBitList(target.getTargetID());
 			for (int i=0; i<localDescs.length; i++) {
 				LocalVariableDescriptor localDesc = (LocalVariableDescriptor)localDescs[i];
-				GetAIFCommand command = new GetAIFCommand(tasks, localDesc.getQualifiedName());
-				session.getDebugger().postCommand(command);
+				GetAIFCommand command = new GetAIFCommand(target.getTask(), localDesc.getQualifiedName());
+				target.getDebugger().postCommand(command);
 				localDesc.setAIF(command.getAIF());
 			}
 		}
@@ -161,12 +155,12 @@ public class StackFrame extends PObject implements IPCDIStackFrame {
 	protected void finish() throws PCDIException {
 		((Thread)getThread()).setCurrentStackFrame(this, false);
 		Target target = (Target)getTarget();
-		target.getDebugger().postCommand(new StepFinishCommand(((Session)target.getSession()).createBitList(target.getTargetID())));
+		target.getDebugger().postCommand(new StepFinishCommand(target.getTask()));
 	}	
 	protected void execReturn(String value) throws PCDIException {
 		((Thread)getThread()).setCurrentStackFrame(this, false);
 		Target target = (Target)getTarget();
-		target.getDebugger().postCommand(new StepFinishCommand(((Session)target.getSession()).createBitList(target.getTargetID())));
+		target.getDebugger().postCommand(new StepFinishCommand(target.getTask()));
 	}
 
 	public int getLevel() {

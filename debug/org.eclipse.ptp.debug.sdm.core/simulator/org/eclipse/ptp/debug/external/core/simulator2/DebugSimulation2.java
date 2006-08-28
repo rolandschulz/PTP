@@ -473,10 +473,10 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 		if (state.equals(EXIT_STATE)) {
 			handleProcessTerminatedEvent(qItem.getTasks(), 0);
 		} else if (state.equals(HIT_BPT_STATE)) {
-			handleBreakpointHitEvent(qItem.getTasks(), qItem.getLine(), 0);
+			handleBreakpointHitEvent(qItem.getTasks(), qItem.getLine(), 0, new String[0]);
 			//handleBreakpointHitEvent(qItem.getTasks(), qItem.getLine(), qItem.getFile());
 		} else if (state.equals(STEP_END_STATE)) {
-			handleEndSteppingEvent(qItem.getTasks(), qItem.getLine(), qItem.getFile(), 0);
+			handleEndSteppingEvent(qItem.getTasks(), qItem.getLine(), qItem.getFile(), 0, new String[0]);
 		}
 	}
 	public static int convertInt(String s_id) {

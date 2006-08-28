@@ -62,6 +62,21 @@ MIVarFree(MIVar *var)
 	free(var);
 }
 
+MIVarChange * MIVarChangeNew(void) {
+	MIVarChange *varchange = (MIVarChange *)malloc(sizeof(MIVarChange));
+	
+	varchange->name = NULL;
+	varchange->in_scope = 0;
+	varchange->type_changed = 0;
+	return varchange;
+}
+
+void MIVarChangeFree(MIVarChange *varchange) {
+	if (varchange->name != NULL)
+		free(varchange->name);
+	free(varchange);
+}
+
 MIVar *
 MIVarParse(List *results)
 {
@@ -246,4 +261,81 @@ MIGetDetailsType(MICommand *cmd) {
 		}
 	}
 	return NULL;
+}
+
+void
+MIGetVarUpdateParseValue(MIValue* tuple, List* aList)
+{
+	MIResult * result;
+	char * str;
+	char * var;
+	MIValue * value;
+	MIVarChange * varchange;
+	List * results = tuple->results;
+	
+	if (results != NULL) {
+		for (SetList(results); (result = (MIResult *)GetListElement(results)) != NULL; ) {
+			var = result->variable;
+			value = result->value;
+
+			if (value != NULL && value->type == MIValueTypeConst) {
+				str = value->cstring;
+			}
+
+			if (strcmp(var, "name") == 0) {
+				varchange = MIVarChangeNew();
+				varchange->name = strdup(str);
+				AddToList(aList, (void *)varchange);
+			} else if (strcmp(var, "in_scope") == 0) {
+				if (varchange != NULL) {
+					varchange->in_scope = (strcmp(str, "true")==0)?1:0;
+				}
+			} else if (strcmp(var, "type_changed") == 0) {
+				if (varchange != NULL) {
+					varchange->type_changed = (strcmp(str, "true")==0)?1:0;
+				}
+			}
+		}
+	}
+}
+
+void
+MIGetVarUpdateParseList(List* miList, List* aList)
+{
+	MIValue* value;
+	if (miList != NULL) {
+		for (SetList(miList); (value = (MIValue *)GetListElement(miList)) != NULL;) {
+			if (value->type == MIValueTypeTuple) {
+				MIGetVarUpdateParseValue(value, aList);
+			}
+			else if (value->type == MIValueTypeList) {
+				MIGetVarUpdateParseList(value->values, aList);
+			}
+		}
+	}
+}
+
+void
+MIGetVarUpdateInfo(MICommand *cmd, List** varchanges)
+{
+	MIValue *		value;
+	MIResult *		result;
+	MIResultRecord *	rr;
+	*varchanges = NewList();
+
+	if (!cmd->completed || cmd->output == NULL || cmd->output->rr == NULL)
+		return;
+
+	rr = cmd->output->rr;
+	for (SetList(rr->results); (result = (MIResult *)GetListElement(rr->results)) != NULL; ) {
+		value = result->value;
+		if (strcmp(result->variable, "changelist") == 0) {
+			if (value->type == MIValueTypeConst) {
+				MIGetVarUpdateParseValue(value, *varchanges);
+			}
+			else if (value->type == MIValueTypeList) {
+				MIGetVarUpdateParseList(value->values, *varchanges);
+			}
+		}
+	}
 }

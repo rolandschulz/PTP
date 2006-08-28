@@ -31,6 +31,12 @@ import org.eclipse.ptp.debug.core.cdi.model.IPCDIObject;
 public class MemoryChangedEvent extends ChangedEvent implements IPCDIMemoryChangedEvent {
 	BigInteger[] addrs;
 	
+	/**
+	 * @param session
+	 * @param tasks
+	 * @param source IPCDIMemoryBlock
+	 * @param addrs
+	 */
 	public MemoryChangedEvent(IPCDISession session, BitList tasks, IPCDIObject source, BigInteger[] addrs) {
 		super(session, tasks, source);
 		this.addrs = addrs;
