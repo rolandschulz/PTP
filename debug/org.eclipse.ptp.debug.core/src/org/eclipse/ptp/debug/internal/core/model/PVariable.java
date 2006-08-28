@@ -60,7 +60,8 @@ public abstract class PVariable extends AbstractPVariable implements IPCDIEventL
 		boolean isEditable() throws DebugException;
 		boolean isArgument();
 		int sizeof();
-		IAIF getAIF() throws DebugException; 
+		IAIF getAIF() throws DebugException;
+		void setAIF(IAIF aif);
 		void invalidateValue();
 		void preserve();
 	}
@@ -88,7 +89,7 @@ public abstract class PVariable extends AbstractPVariable implements IPCDIEventL
 			createOriginal(cdiVariableObject);
 		}
 		fIsEnabled = !isBookkeepingEnabled();
-		setStatus(IPDebugElementStatus.ERROR, MessageFormat.format(CoreModelMessages.getString("CVariable.1"), new String[] { errorMessage })); //$NON-NLS-1$
+		setStatus(IPDebugElementStatus.ERROR, MessageFormat.format(CoreModelMessages.getString("PVariable.1"), new String[] { errorMessage })); //$NON-NLS-1$
 		getCDISession().getEventManager().addEventListener(this);
 	}
 	public IPCDIVariable getCDIVariable() throws DebugException {
@@ -102,6 +103,14 @@ public abstract class PVariable extends AbstractPVariable implements IPCDIEventL
 			return null;
 		IInternalVariable iv = getCurrentInternalVariable();
 		return (iv != null) ? iv.getAIF() : null;
+	}
+	public void setAIF(IAIF aif) throws DebugException {
+		if (isDisposed())
+			return;
+		IInternalVariable iv = getCurrentInternalVariable();
+		if (iv != null) {
+			iv.setAIF(aif);
+		}
 	}
 	public IPType getType() throws DebugException {
 		if (isDisposed())
@@ -194,7 +203,7 @@ public abstract class PVariable extends AbstractPVariable implements IPCDIEventL
 		}
 	}
 	public void setValue(IValue value) throws DebugException {
-		notSupported(CoreModelMessages.getString("CVariable.3"));
+		notSupported(CoreModelMessages.getString("PVariable.3"));
 	}
 	public boolean supportsValueModification() {
 		try {
