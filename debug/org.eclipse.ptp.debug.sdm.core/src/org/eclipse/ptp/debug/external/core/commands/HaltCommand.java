@@ -39,7 +39,7 @@ public class HaltCommand extends AbstractDebugCommand {
 			doCancelWaiting();
 		}
 	}
-	public String getName() {
+	public String getCommandName() {
 		return "Halt"; 
 	}
 }

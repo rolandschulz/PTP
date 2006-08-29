@@ -34,7 +34,7 @@ public class SetWatchpointCommand extends AbstractBreakpointCommand {
 	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
 		debugger.setWatchpoint(tasks, (IPCDIWatchpoint)cdiBpt);
 	}
-	public String getName() {
+	public String getCommandName() {
 		return "Set watchpoint"; 
 	}
 }

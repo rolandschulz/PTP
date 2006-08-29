@@ -36,13 +36,13 @@ public class GetInfoThreadsCommand extends AbstractDebugCommand {
 	
 	//first index is current thread id
 	public String[] getThreadIds() throws PCDIException {
-		Object res = getResult();
+		Object res = getResultValue();
 		if (res instanceof String[]) {
 			return (String[])result;
 		}
 		return new String[0];
 	}
-	public String getName() {
+	public String getCommandName() {
 		return "Get Info Thread"; 
 	}
 }

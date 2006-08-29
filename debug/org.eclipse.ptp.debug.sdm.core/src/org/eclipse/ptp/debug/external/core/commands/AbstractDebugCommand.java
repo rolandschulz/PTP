@@ -91,10 +91,10 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 	protected boolean checkReturn() throws PCDIException {
 		Object result = getReturn();
 		if (result == null) {
-			throw new PCDIException("Time out - Command " + getName(), IPCDIErrorEvent.DBG_NORMAL);
+			throw new PCDIException("Time out - Command " + getCommandName(), IPCDIErrorEvent.DBG_NORMAL);
 		}
 		if (result.equals(RETURN_NOTHING)) {
-			throw new PCDIException("Unknown error - Command " + getName());
+			throw new PCDIException("Unknown error - Command " + getCommandName());
 		}
 		if (result instanceof PCDIException) {
 			if (((PCDIException)result).getErrorCode() == IPCDIErrorEvent.DBG_NORMAL) {
@@ -103,10 +103,10 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 			throw (PCDIException)getReturn();
 		}
 		if (result.equals(RETURN_ERROR)) {
-			throw new PCDIException("Tasks do not match with <" + getName() + "> command.");
+			throw new PCDIException("Tasks do not match with <" + getCommandName() + "> command.");
 		}
 		if (result.equals(RETURN_CANCEL)) {
-			throw new PCDIException("Cancelled - command " + getName());
+			throw new PCDIException("Cancelled - command " + getCommandName());
 		}
 		if (result.equals(RETURN_FLUSH)) {
 			return false;
@@ -164,7 +164,7 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 	}
 	public int compareTo(Object obj) {
 		if (obj instanceof IDebugCommand) {
-			if (!getName().equals(((IDebugCommand) obj).getName()))
+			if (!getCommandName().equals(((IDebugCommand) obj).getCommandName()))
 				return -1;
 			
 			BitList cpyTasks = getTasks().copy();
@@ -179,7 +179,7 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 		execCommand(debugger);
 		waitForReturn();
 	}
-	public Object getResult() throws PCDIException {
+	public Object getResultValue() throws PCDIException {
 		if (getReturn() == null) {
 			waitForReturn();
 		}

@@ -50,13 +50,13 @@ public class DataReadMemoryCommand extends AbstractDebugCommand {
 		debugger.setDataReadMemoryCommand(tasks, offset, address, wordFormat, wordSize, rows, cols, asChar);
 	}	
 	public DataReadMemoryInfo getDataReadMemoryInfo() throws PCDIException {
-		Object res = getResult();
+		Object res = getResultValue();
 		if (res instanceof DataReadMemoryInfo) {
 			return (DataReadMemoryInfo)res;
 		}
 		return null;
 	}
-	public String getName() {
+	public String getCommandName() {
 		return "Data Read Memory"; 
 	}	
 }

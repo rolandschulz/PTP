@@ -39,13 +39,13 @@ public class EvaluateExpressionCommand extends AbstractDebugCommand {
 	}
 	
 	public String getExpressionValue() throws PCDIException {
-		Object res = getResult();
+		Object res = getResultValue();
 		if (res instanceof IAIF) {
 			return ((IAIF)res).getValue().toString();
 		}
 		return "";
 	}
-	public String getName() {
+	public String getCommandName() {
 		return "Evaluate expression"; 
 	}
 }

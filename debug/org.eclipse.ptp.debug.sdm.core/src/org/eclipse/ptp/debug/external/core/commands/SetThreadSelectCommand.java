@@ -38,13 +38,13 @@ public class SetThreadSelectCommand extends AbstractDebugCommand {
 	}
 	
 	public Object[] getThreadInfo() throws PCDIException {
-		Object res = getResult();
+		Object res = getResultValue();
 		if (res instanceof Object[]) {
 			return (Object[])res;
 		}
 		return new Object[0];
 	}
-	public String getName() {
+	public String getCommandName() {
 		return "Set Thread Select"; 
 	}
 }

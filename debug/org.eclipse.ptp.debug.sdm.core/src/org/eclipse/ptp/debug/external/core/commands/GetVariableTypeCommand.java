@@ -38,13 +38,13 @@ public class GetVariableTypeCommand extends AbstractDebugCommand {
 	}
 	
 	public String getVariableType() throws PCDIException {
-		Object res = getResult();
+		Object res = getResultValue();
 		if (res instanceof String) {
 			return (String)res;
 		}
 		return "";
 	}
-	public String getName() {
+	public String getCommandName() {
 		return "Get Variable type"; 
 	}
 }

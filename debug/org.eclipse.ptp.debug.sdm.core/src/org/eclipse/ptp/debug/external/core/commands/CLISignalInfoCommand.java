@@ -36,7 +36,7 @@ public class CLISignalInfoCommand extends AbstractDebugCommand {
 	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
 		debugger.getSignalInfo(tasks, arg);
 	}
-	public String getName() {
+	public String getCommandName() {
 		return "CLI Signal Info"; 
 	}
 }

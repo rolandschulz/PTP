@@ -43,7 +43,7 @@ public class StepOverCommand extends AbstractDebugCommand {
 			debugger.stepOver(tasks, count);
 		}
 	}
-	public String getName() {
+	public String getCommandName() {
 		return "Step over"; 
 	}
 }

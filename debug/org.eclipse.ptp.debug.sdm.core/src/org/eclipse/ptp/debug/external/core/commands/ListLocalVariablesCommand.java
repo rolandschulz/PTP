@@ -40,13 +40,13 @@ public class ListLocalVariablesCommand extends AbstractDebugCommand {
 	}
 	
 	public IPCDILocalVariable[] getLocalVariables() throws PCDIException {
-		Object res = getResult();
+		Object res = getResultValue();
 		if (res instanceof IPCDILocalVariable[]) {
 			return (IPCDILocalVariable[])res;
 		}
 		return new IPCDILocalVariable[0];
 	}
-	public String getName() {
+	public String getCommandName() {
 		return "List local variables"; 
 	}
 }

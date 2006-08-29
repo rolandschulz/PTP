@@ -34,7 +34,7 @@ public class DeleteBreakpointCommand extends AbstractBreakpointCommand {
 	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
 		debugger.deleteBreakpoint(tasks, ((IPCDIBreakpoint)cdiBpt).getBreakpointId());		
 	}
-	public String getName() {
+	public String getCommandName() {
 		return "Delete breakpoint"; 
 	}
 }

@@ -34,7 +34,7 @@ public class DisableBreakpointCommand extends AbstractBreakpointCommand{
 	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
 		debugger.disableBreakpoint(tasks, ((IPCDIBreakpoint)cdiBpt).getBreakpointId());
 	}
-	public String getName() {
+	public String getCommandName() {
 		return "Disable breakpoint"; 
 	}
 }
