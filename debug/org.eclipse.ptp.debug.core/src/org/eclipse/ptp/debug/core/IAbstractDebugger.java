@@ -77,6 +77,8 @@ public interface IAbstractDebugger extends IDebugger {
 	public BitList filterSuspendTasks(BitList tasks);
 	public BitList filterTerminateTasks(BitList tasks);
 	public boolean isJobFinished();
+	public BitList getSuspendedProc();
+	public BitList getTerminatedProc();
 	
 	/* Command */
 	public void postCommand(IDebugCommand command);
