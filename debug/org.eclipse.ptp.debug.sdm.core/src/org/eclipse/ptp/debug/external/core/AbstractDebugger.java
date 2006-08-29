@@ -75,7 +75,9 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		initialize(job, timeout);
 		return session;
 	}	
-	
+	public IDebugCommand getCurrentCommand() {
+		return commandQueue.getCurrentCommand();
+	}
 	public void postCommand(IDebugCommand command) {
 		if (!isExited)
 			commandQueue.addCommand(command);

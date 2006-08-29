@@ -48,6 +48,7 @@ import org.eclipse.ptp.debug.external.core.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.core.cdi.model.Target;
 import org.eclipse.ptp.debug.external.core.cdi.model.variable.Argument;
 import org.eclipse.ptp.debug.external.core.cdi.model.variable.LocalVariable;
+import org.eclipse.ptp.debug.external.core.commands.TerminateCommand;
 import org.eclipse.ptp.debug.external.core.proxy.ProxyDebugClient;
 import org.eclipse.ptp.debug.external.core.proxy.ProxyDebugSignal;
 import org.eclipse.ptp.debug.external.core.proxy.ProxyDebugStackframe;
@@ -467,8 +468,14 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 				handleEndSteppingEvent(e.getBitSet(), stepEvent.getFrame().getLocator().getLineNumber(), stepEvent.getFrame().getLocator().getFile(), stepEvent.getThreadId(), stepEvent.getChangedVars());
 			} else if (e instanceof ProxyDebugSignalEvent) {
 				ProxyDebugSignalEvent sigEvent = (ProxyDebugSignalEvent)e;
-				//completeCommand(e.getBitSet(), IDebugCommand.RETURN_OK);
-				handleProcessSignaledEvent(e.getBitSet(), sigEvent.getLocator(), sigEvent.getThreadId(), sigEvent.getChangedVars());
+				IDebugCommand cmd = getCurrentCommand();
+				if (cmd != null && cmd instanceof TerminateCommand) {
+					completeCommand(e.getBitSet(), IDebugCommand.RETURN_OK);
+				}
+				else {
+					//send signal if the current command is not terminate command.
+					handleProcessSignaledEvent(e.getBitSet(), sigEvent.getLocator(), sigEvent.getThreadId(), sigEvent.getChangedVars());
+				}
 			}
 			break;	
 			
