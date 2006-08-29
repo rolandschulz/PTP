@@ -156,6 +156,9 @@ System.err.println("*** SEND COMMAND: " + currentCommand.getName() + ", tasks: "
 			}
 		}
 	}
+	public IDebugCommand getCurrentCommand() {
+		return currentCommand;
+	}
 	public void cleanup() {
 		synchronized (queue) {
 			//queue.clear();

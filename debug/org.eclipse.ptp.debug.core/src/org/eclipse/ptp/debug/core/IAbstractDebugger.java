@@ -81,7 +81,7 @@ public interface IAbstractDebugger extends IDebugger {
 	/* Command */
 	public void postCommand(IDebugCommand command);
 	public void completeCommand(BitList tasks, Object result);
-	
+	public IDebugCommand getCurrentCommand();
 	
 	/* debug purpose */
 	public String showBitList(BitList tasks);
