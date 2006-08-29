@@ -53,6 +53,11 @@ public class TerminateCommand extends AbstractDebugCommand {
 			if (!tmpTasks.isEmpty()) {
 				debugger.halt(tmpTasks);
 				waitForReturn();
+				tmpTasks.andNot(debugger.getSuspendedProc());
+				while (!tmpTasks.isEmpty()) {//checked for all tmpTasks are suspended 
+					waitForReturn();
+					tmpTasks.andNot(debugger.getSuspendedProc());
+				}
 			}
 			debugger.kill(tasks);
 		}
@@ -60,7 +65,7 @@ public class TerminateCommand extends AbstractDebugCommand {
 			doCancelWaiting();
 		}
 	}
-	public String getName() {
+	public String getCommandName() {
 		return "Terminate"; 
 	}
 }

@@ -36,7 +36,7 @@ public class SetCurrentStackFrameCommand extends AbstractDebugCommand {
 	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
 		debugger.setCurrentStackFrame(tasks, level);
 	}
-	public String getName() {
+	public String getCommandName() {
 		return "Set current stack frame"; 
 	}
 }

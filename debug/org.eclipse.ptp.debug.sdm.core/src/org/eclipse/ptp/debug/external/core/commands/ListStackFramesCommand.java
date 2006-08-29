@@ -36,13 +36,13 @@ public class ListStackFramesCommand extends AbstractDebugCommand {
 	}
 	
 	public IPCDIStackFrame[] getStackFrames() throws PCDIException {
-		Object res = getResult();
+		Object res = getResultValue();
 		if (res instanceof IPCDIStackFrame[]) {
 			return (IPCDIStackFrame[])res;
 		}
 		return new IPCDIStackFrame[0];
 	}
-	public String getName() {
+	public String getCommandName() {
 		return "List stack frames"; 
 	}
 }

@@ -42,13 +42,13 @@ public class ListArgumentsCommand extends AbstractDebugCommand {
 	}
 	
 	public IPCDIArgument[] getArguments() throws PCDIException {
-		Object res = getResult();
+		Object res = getResultValue();
 		if (res instanceof IPCDIArgument[]) {
 			return (IPCDIArgument[])res;
 		}
 		return new IPCDIArgument[0];
 	}
-	public String getName() {
+	public String getCommandName() {
 		return "List arguments"; 
 	}
 }

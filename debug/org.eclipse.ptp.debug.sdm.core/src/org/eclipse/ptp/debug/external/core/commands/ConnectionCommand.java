@@ -37,7 +37,7 @@ public class ConnectionCommand extends AbstractDebugCommand {
 			throw new PCDIException(e);
 		}
 	}
-	public String getName() {
+	public String getCommandName() {
 		return "Connaction"; 
 	}
 }

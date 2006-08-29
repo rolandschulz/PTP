@@ -53,9 +53,9 @@ public class DataWriteMemoryCommand extends AbstractDebugCommand {
 		debugger.setDataWriteMemoryCommand(tasks, offset, address, wordFormat, wordSize, value);
 	}	
 	public Object getDataWriteMemoryInfo() throws PCDIException {
-		return getResult();
+		return getResultValue();
 	}
-	public String getName() {
+	public String getCommandName() {
 		return "Data Write Memory"; 
 	}	
 }

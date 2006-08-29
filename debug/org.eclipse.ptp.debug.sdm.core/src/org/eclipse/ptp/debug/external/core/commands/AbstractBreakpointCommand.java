@@ -35,7 +35,7 @@ public abstract class AbstractBreakpointCommand extends AbstractDebugCommand {
 		this.cdiBpt = cdiBpt;
 	}
 	public IPCDIBreakpoint getBreakpoint() throws PCDIException {
-		Object res = getResult();
+		Object res = getResultValue();
 		if (res instanceof IPCDIBreakpoint) {
 			return (IPCDIBreakpoint)res;
 		}

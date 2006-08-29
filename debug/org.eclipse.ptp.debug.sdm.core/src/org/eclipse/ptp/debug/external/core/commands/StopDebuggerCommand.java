@@ -52,7 +52,7 @@ public class StopDebuggerCommand extends AbstractDebugCommand {
 			throw new PCDIException(e);
 		}
 	}
-	public String getName() {
+	public String getCommandName() {
 		return "Stop debugger"; 
 	}
 }

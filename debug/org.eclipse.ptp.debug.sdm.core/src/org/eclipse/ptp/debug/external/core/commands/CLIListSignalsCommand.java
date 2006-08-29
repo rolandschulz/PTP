@@ -39,13 +39,13 @@ public class CLIListSignalsCommand extends AbstractDebugCommand {
 	}
 	
 	public IPCDISignal[] getInfoSignals() throws PCDIException {
-		Object res = getResult();
+		Object res = getResultValue();
 		if (res instanceof IPCDISignal[]) {
 			return (IPCDISignal[])res;
 		}
 		return new IPCDISignal[0];
 	}
-	public String getName() {
+	public String getCommandName() {
 		return "CLI List Signals"; 
 	}
 }

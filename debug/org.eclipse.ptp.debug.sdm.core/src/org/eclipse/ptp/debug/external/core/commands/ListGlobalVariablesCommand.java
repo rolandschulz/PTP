@@ -35,13 +35,13 @@ public class ListGlobalVariablesCommand extends AbstractDebugCommand {
 		debugger.listGlobalVariables(tasks);
 	}
 	public IPCDIGlobalVariable[] getGlobalVariables() throws PCDIException {
-		Object res = getResult();
+		Object res = getResultValue();
 		if (res instanceof IPCDIGlobalVariable[]) {
 			return (IPCDIGlobalVariable[])res;
 		}
 		return new IPCDIGlobalVariable[0];
 	}
-	public String getName() {
+	public String getCommandName() {
 		return "List global variables"; 
 	}
 }

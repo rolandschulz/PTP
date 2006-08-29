@@ -37,7 +37,7 @@ public class ConditionBreakpointCommand extends AbstractBreakpointCommand {
 	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
 		debugger.conditionBreakpoint(tasks, ((IPCDIBreakpoint)cdiBpt).getBreakpointId(), expr);
 	}
-	public String getName() {
+	public String getCommandName() {
 		return "Condition breakpoint"; 
 	}
 }

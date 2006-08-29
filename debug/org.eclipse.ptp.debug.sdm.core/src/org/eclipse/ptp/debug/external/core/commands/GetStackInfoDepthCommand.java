@@ -35,13 +35,13 @@ public class GetStackInfoDepthCommand extends AbstractDebugCommand {
 	}
 	
 	public int getDepth() throws PCDIException {
-		Object res = getResult();
+		Object res = getResultValue();
 		if (res instanceof Integer) {
 			return ((Integer)res).intValue();
 		}
 		return 0;
 	}
-	public String getName() {
+	public String getCommandName() {
 		return "Get stack info depth"; 
 	}
 }

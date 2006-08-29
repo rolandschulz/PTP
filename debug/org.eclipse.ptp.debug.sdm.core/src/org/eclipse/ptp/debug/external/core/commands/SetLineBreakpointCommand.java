@@ -34,7 +34,7 @@ public class SetLineBreakpointCommand extends AbstractBreakpointCommand {
 	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
 		debugger.setLineBreakpoint(tasks, (IPCDILineBreakpoint)cdiBpt);
 	}
-	public String getName() {
+	public String getCommandName() {
 		return "Set line breakpoint"; 
 	}
 }

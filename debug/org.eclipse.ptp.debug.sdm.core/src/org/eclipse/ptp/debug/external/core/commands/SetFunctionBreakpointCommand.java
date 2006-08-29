@@ -34,7 +34,7 @@ public class SetFunctionBreakpointCommand extends AbstractBreakpointCommand {
 	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
 		debugger.setFunctionBreakpoint(tasks, (IPCDIFunctionBreakpoint)cdiBpt);
 	}
-	public String getName() {
+	public String getCommandName() {
 		return "Set function breakpoint"; 
 	}
 }

@@ -36,7 +36,7 @@ public class CLIHandleCommand extends AbstractDebugCommand {
 	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
 		debugger.cliHandle(tasks, arg);
 	}
-	public String getName() {
+	public String getCommandName() {
 		return "CLI Handle"; 
 	}
 }

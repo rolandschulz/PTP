@@ -54,9 +54,6 @@ public class Signal extends PObject implements IPCDISignal {
 		return desc;
 	}
 
-	/**
-	 * @see org.eclipse.ptp.debug.core.cdi.IPCDIInferiorSignaled#getName()
-	 */
 	public String getName() {
 		return name;
 	}

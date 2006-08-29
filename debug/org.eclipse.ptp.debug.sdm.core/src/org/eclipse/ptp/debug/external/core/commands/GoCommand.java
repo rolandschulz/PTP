@@ -38,7 +38,7 @@ public class GoCommand extends AbstractDebugCommand {
 			debugger.go(tasks);
 		}
 	}
-	public String getName() {
+	public String getCommandName() {
 		return "Go"; 
 	}
 }
