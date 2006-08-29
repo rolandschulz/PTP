@@ -81,7 +81,7 @@ public interface IDebugCommand extends Comparable {
 	/** Get command name
 	 * @return name of command
 	 */
-	public String getName();
+	public String getCommandName();
 	/** Compare the command
 	 * @param obj compared object
 	 * @return 0 means equals, otherwise not equals

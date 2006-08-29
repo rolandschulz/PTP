@@ -54,7 +54,7 @@ public class DebugCommandQueue extends Thread {
 			}
 			try {
 				currentCommand = getCommand();
-System.err.println("*** SEND COMMAND: " + currentCommand.getName() + ", tasks: " + debugger.showBitList(currentCommand.getTasks()));
+System.err.println("*** SEND COMMAND: " + currentCommand.getCommandName() + ", tasks: " + debugger.showBitList(currentCommand.getTasks()));
 				currentCommand.execCommand(debugger, command_timeout);
 			} catch (PCDIException e) {
 				debugger.handleErrorEvent(currentCommand.getTasks(), e.getMessage(), e.getErrorCode());
@@ -151,7 +151,7 @@ System.err.println("*** SEND COMMAND: " + currentCommand.getName() + ", tasks: "
 				//if (result == null) {
 					//doFlushCommands();
 				//}
-				System.err.println("*** SET COMMAND RETURN: " + currentCommand.getName() + ", result: " + result + ", tasks: " + debugger.showBitList(tasks));
+				System.err.println("*** SET COMMAND RETURN: " + currentCommand.getCommandName() + ", result: " + result + ", tasks: " + debugger.showBitList(tasks));
 				currentCommand.setReturn(tasks, result);					
 			}
 		}

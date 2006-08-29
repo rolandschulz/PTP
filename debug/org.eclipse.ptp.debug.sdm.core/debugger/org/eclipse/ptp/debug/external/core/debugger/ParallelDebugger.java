@@ -470,7 +470,9 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 				ProxyDebugSignalEvent sigEvent = (ProxyDebugSignalEvent)e;
 				IDebugCommand cmd = getCurrentCommand();
 				if (cmd != null && cmd instanceof TerminateCommand) {
-					completeCommand(e.getBitSet(), IDebugCommand.RETURN_OK);
+					//set suspended process
+					setSuspendTasks(true, e.getBitSet());
+					cmd.doFlush();
 				}
 				else {
 					//send signal if the current command is not terminate command.

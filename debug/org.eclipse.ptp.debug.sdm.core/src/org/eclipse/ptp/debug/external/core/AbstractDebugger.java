@@ -153,11 +153,6 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 			}
 		}
 	}
-	private synchronized void setProcessStatus(int[] tasks, String state) {
-		for (int i = 0; i < tasks.length; i++) {
-			getProcess(tasks[i]).setStatus(state);
-		}
-	}
 	public synchronized final void fireEvent(final IPCDIEvent event) {		
 		if (event != null) {
 			BitList tasks = event.getAllProcesses();
@@ -188,7 +183,6 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 				setSuspendTasks(true, tasks);
 				setProcessStatus(tasks.toArray(), IPProcess.STOPPED);
 			}
-			//eventQueue.addItem(event);
 			if (event instanceof IPCDIExitedEvent) {
 				if (isJobFinished()) {
 					postCommand(new StopDebuggerCommand());
@@ -198,15 +192,6 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 			eventQueue.addItem(event);
 		}
 	}	
-	private void setJobFinished(BitList tasks, String status) {
-		if (tasks == null || tasks.isEmpty()) {
-			tasks = session.createBitList();
-		}
-		setSuspendTasks(false, tasks);
-		setTerminateTasks(true, tasks);
-		session.unregisterTargets(tasks.toArray(), true);
-		setProcessStatus(tasks.toArray(), status);
-	}
 	public final void notifyObservers(Object arg) {
 		setChanged();
 		super.notifyObservers(arg);
@@ -216,6 +201,40 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 	}
 	public final boolean isExited() {
 		return isExited;
+	}
+	protected void setJobFinished(BitList tasks, String status) {
+		if (tasks == null || tasks.isEmpty()) {
+			tasks = session.createBitList();
+		}
+		setSuspendTasks(false, tasks);
+		setTerminateTasks(true, tasks);
+		session.unregisterTargets(tasks.toArray(), true);
+		setProcessStatus(tasks.toArray(), status);
+	}
+	protected void setTerminateTasks(boolean isAdd, BitList tasks) {
+		BitList terminatedTasks = getTerminatedProc();
+		if (isAdd)
+			terminatedTasks = addTasks(terminatedTasks, tasks);
+		else
+			removeTasks(terminatedTasks, tasks);
+	}
+	protected void setSuspendTasks(boolean isAdd, BitList tasks) {
+		BitList suspendedTasks = getSuspendedProc();
+		if (isAdd)
+			suspendedTasks = addTasks(suspendedTasks, tasks);			
+		else
+			removeTasks(suspendedTasks, tasks);
+	}	
+	protected synchronized void setProcessStatus(int[] tasks, String state) {
+		for (int i = 0; i < tasks.length; i++) {
+			getProcess(tasks[i]).setStatus(state);
+		}
+	}
+	public BitList getSuspendedProc() {
+		return (BitList) job.getAttribute(IAbstractDebugger.SUSPENDED_PROC_KEY);
+	}
+	public BitList getTerminatedProc() {
+		return (BitList) job.getAttribute(IAbstractDebugger.TERMINATED_PROC_KEY);		
 	}
 
 	//event
@@ -271,6 +290,7 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		return processes;
 	}
 
+	//filter process
 	public BitList filterRunningTasks(BitList tasks) {//get suspend tasks
 		removeTasks(tasks, (BitList) job.getAttribute(TERMINATED_PROC_KEY));
 		BitList suspendedTasks = (BitList) job.getAttribute(SUSPENDED_PROC_KEY);
@@ -305,20 +325,6 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 	private void removeTasks(BitList curTasks, BitList newTasks) {
 		curTasks.andNot(newTasks);
 	}
-	private void setTerminateTasks(boolean isAdd, BitList tasks) {
-		BitList terminatedTasks = (BitList) job.getAttribute(TERMINATED_PROC_KEY);
-		if (isAdd)
-			terminatedTasks = addTasks(terminatedTasks, tasks);
-		else
-			removeTasks(terminatedTasks, tasks);
-	}
-	private void setSuspendTasks(boolean isAdd, BitList tasks) {
-		BitList suspendedTasks = (BitList) job.getAttribute(IAbstractDebugger.SUSPENDED_PROC_KEY);
-		if (isAdd)
-			suspendedTasks = addTasks(suspendedTasks, tasks);			
-		else
-			removeTasks(suspendedTasks, tasks);
-	}	
 
 	public String showBitList(BitList tasks) {
 		if (tasks == null) {
