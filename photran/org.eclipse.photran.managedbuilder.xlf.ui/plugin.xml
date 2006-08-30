@@ -173,7 +173,7 @@
 
       <tool
             natureFilter="cnature"
-            name="%ToolName.linker.xlf.fortran"
+            name="%ToolName.linker.macosx.xlf.fortran"
             outputFlag="-o"
             command="xlf95"
             commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}"
