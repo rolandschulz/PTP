@@ -338,12 +338,10 @@ AsyncStop(void *data)
 			e->dbg_event_u.suspend_event.ev_u.bpid = bpmap->remote;
 			e->dbg_event_u.suspend_event.thread_id = evt->threadId;
 			e->dbg_event_u.suspend_event.frame = NULL;
-			e->dbg_event_u.suspend_event.changed_vars = NULL;
+			e->dbg_event_u.suspend_event.changed_vars = GetChangedVariables();
 			break;
 		}
-		
 		/* else must be a temporary breakpoint drop through... */
-
 		RemoveBPMap(bpmap);
 
 	case MIEventTypeSuspended:
@@ -847,7 +845,6 @@ SetAndCheckBreak(int bpid, int isTemp, int isHard, char *where, char *condition,
 		MICommandFree(cmd);
 		return DBGRES_ERR;
 	}
-
 	bpts = MIBreakpointGetBreakInsertInfo(cmd);
 	MICommandFree(cmd);
 			
