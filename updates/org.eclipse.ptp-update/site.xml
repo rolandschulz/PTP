@@ -1,19 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<site mirrorsURL="http://www.eclipse.org/downloads/download.php?file=/technology/ptp/update-site/&amp;format=xml">
+<site
+      mirrorsURL="http://www.eclipse.org/downloads/download.php?file=/technology/ptp/update-site/&amp;format=xml">
    <description url="http://download.eclipse.org/technology/ptp/update-site/">
       Parallel Tools Platform update site
    </description>
-   <feature url="features/org.eclipse.fdt_1.0.0.jar" id="org.eclipse.fdt" version="1.0.0">
+   <feature url="features/org.eclipse.ptp.mpi_1.0.0.jar" id="org.eclipse.ptp.mpi" version="1.0.0">
+      <category name="MPI Development Tools"/>
+   </feature>
+   <feature url="features/org.eclipse.fdt_1.1.0.200606201516.jar" id="org.eclipse.fdt" version="1.1.0.200606201516">
+      <category name="Fortran Development Tools"/>
+   </feature>
+   <feature url="features/org.eclipse.photran_3.1.0.200606201516.jar" id="org.eclipse.photran" version="3.1.0.200606201516" os="linux,macosx,solaris,win32" nl="en_US">
       <category name="Fortran Development Tools"/>
    </feature>
    <category-def name="Fortran Development Tools" label="FDT">
       <description>
-         Provides a Fortran editor and toolchains that support various Fortran compilers
+         Provides tools for Fortran development
       </description>
    </category-def>
-   <feature url="features/org.eclipse.ptp.mpi_1.0.0.jar" id="org.eclipse.ptp.mpi" version="1.0.0">
-      <category name="MPI Development Tools"/>
-   </feature>
    <category-def name="MPI Development Tools" label="MDT">
       <description>
          Tools to assist in the development of MPI programs
