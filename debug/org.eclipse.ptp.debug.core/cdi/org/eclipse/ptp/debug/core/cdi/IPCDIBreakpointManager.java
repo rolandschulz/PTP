@@ -20,12 +20,7 @@ package org.eclipse.ptp.debug.core.cdi;
 
 import java.math.BigInteger;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.ptp.core.util.BitList;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIAddressBreakpoint;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIBreakpoint;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIFunctionBreakpoint;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDILineBreakpoint;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIWatchpoint;
 import org.eclipse.ptp.debug.core.model.IPBreakpoint;
 
 /**
@@ -78,7 +73,6 @@ public interface IPCDIBreakpointManager {
 	 * @throws CoreException
 	 */
 	public void setConditionBreakpoint(String job_id, IPBreakpoint bpt) throws CoreException;
-	
 	/** Set line breakpoint
 	 * @param tasks processes to set a line breakpoint
 	 * @param type hardware or temporary breakpoint
@@ -88,7 +82,7 @@ public interface IPCDIBreakpointManager {
 	 * @return PCDI line breakpoint
 	 * @throws PCDIException
 	 */
-	public IPCDILineBreakpoint setLineBreakpoint(BitList tasks, int type, IPCDILineLocation location, IPCDICondition condition, boolean deferred) throws PCDIException;
+	//public IPCDILineBreakpoint setLineBreakpoint(BitList tasks, int type, IPCDILineLocation location, IPCDICondition condition, boolean deferred) throws PCDIException;
 	/** Set function breakpoint
 	 * @param tasks processes to set a function breakpoint
 	 * @param type hardware or temporary breakpoint
@@ -98,7 +92,7 @@ public interface IPCDIBreakpointManager {
 	 * @return PCDI function breakpoint
 	 * @throws PCDIException
 	 */
-	public IPCDIFunctionBreakpoint setFunctionBreakpoint(BitList tasks, int type, IPCDIFunctionLocation location, IPCDICondition condition, boolean deferred) throws PCDIException;
+	//public IPCDIFunctionBreakpoint setFunctionBreakpoint(BitList tasks, int type, IPCDIFunctionLocation location, IPCDICondition condition, boolean deferred) throws PCDIException;
 	/** Set address breakpoint
 	 * @param tasks processes to set a function breakpoint
 	 * @param type hardware or temporary breakpoint
@@ -108,7 +102,7 @@ public interface IPCDIBreakpointManager {
 	 * @return
 	 * @throws PCDIException
 	 */
-	public IPCDIAddressBreakpoint setAddressBreakpoint(BitList tasks, int type, IPCDIAddressLocation location, IPCDICondition condition, boolean deferred) throws PCDIException;
+	//public IPCDIAddressBreakpoint setAddressBreakpoint(BitList tasks, int type, IPCDIAddressLocation location, IPCDICondition condition, boolean deferred) throws PCDIException;
 	/** Set watch point
 	 * @param tasks processes to set a function breakpoint
 	 * @param type hardware or temporary breakpoint
@@ -118,7 +112,7 @@ public interface IPCDIBreakpointManager {
 	 * @return PCDI watch point
 	 * @throws PCDIException
 	 */
-	public IPCDIWatchpoint setWatchpoint(BitList tasks, int type, int watchType, String expression, IPCDICondition condition) throws PCDIException;
+	//public IPCDIWatchpoint setWatchpoint(BitList tasks, int type, int watchType, String expression, IPCDICondition condition) throws PCDIException;
 	
 	/** Create breakpoint condition
 	 * @param ignoreCount the number of ignoring

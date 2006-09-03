@@ -33,6 +33,7 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 	protected final Object lock = new Object(); 
 	
 	protected BitList tasks = null;
+	protected BitList check_tasks = null;
 	protected Object result = null;
 	protected boolean waitForReturn = false;
 	protected boolean interrupt = false;
@@ -40,6 +41,7 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 	private boolean cancelled = false;
 	protected long timeout = 10000;
 	protected boolean waitInQueue = false;
+	private boolean canWaitMore = false; 
 	
 	/** constructor
 	 * @param tasks
@@ -66,6 +68,7 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 		this.interrupt = interrupt;
 		this.waitForReturn = waitForReturn;
 		this.waitInQueue = waitInQueue;
+		this.check_tasks = (tasks != null)?tasks.copy():null;
 	}
 	public boolean isWaitInQueue() {
 		return waitInQueue;
@@ -81,12 +84,6 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 	}
 	protected Object getReturn() {
 		return result;
-	}
-	//wait again for return back
-	protected void doWait(long timeout) throws InterruptedException {
-		synchronized (lock) {
-			lock.wait(timeout);
-		}
 	}
 	protected boolean checkReturn() throws PCDIException {
 		Object result = getReturn();
@@ -113,17 +110,25 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 		}		
 		return true;
 	}
+	//wait again for return back
+	protected void doWait(long timeout) throws InterruptedException {
+		synchronized (lock) {
+			lock.wait(timeout);
+		}
+	}
 	public boolean waitForReturn() throws PCDIException {
 		return waitForReturn(timeout);
 	}
 	public boolean waitForReturn(long timeout) throws PCDIException {
 		//no need to wait return back
-		if (!isWaitForReturn())
+		if (!isWaitForReturn() || result != null)
 			return true;
 
 		//start waiting
 		try {
-			doWait(timeout);
+			do {
+				doWait(timeout);
+			} while (canWaitMore);
 		} catch (InterruptedException e) {
 			throw new PCDIException(e);
 		}
@@ -150,16 +155,26 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 			lock.notifyAll();
 		}
 	}
-	public void setReturn(BitList tasks, Object result) {
+	public void setReturn(BitList return_tasks, Object result) {
 		synchronized (lock) {
-			/*
-			if (this.tasks != null && tasks != null) {
-				tasks.andNot(this.tasks);
+			if (check_tasks != null && return_tasks != null) {
+				//check whether return tasks is same as command tasks
+				check_tasks.andNot(return_tasks);
+				if (check_tasks.isEmpty()) {
+					this.result = result;
+					lock.notifyAll();
+				}
+				else {
+					//if return tasks is not equal to command tasks, wait again
+					canWaitMore = true;
+					lock.notifyAll();
+					canWaitMore = false;
+				}
 			}
-			this.result = (tasks==null || tasks.isEmpty())?RETURN_ERROR:result;
-			*/
-			this.result = result;
-			lock.notifyAll();
+			else {
+				this.result = result;
+				lock.notifyAll();
+			}
 		}
 	}
 	public int compareTo(Object obj) {
@@ -173,17 +188,33 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 		}
 		return -1;
 	}
-	
-	public void execCommand(IAbstractDebugger debugger, long timeout) throws PCDIException {
-		setTimeout(timeout);
-		execCommand(debugger);
-		waitForReturn();
-	}
 	public Object getResultValue() throws PCDIException {
 		if (getReturn() == null) {
 			waitForReturn();
 		}
 		return getReturn();
+	}	
+	protected BitList suspendRunningTasks(IAbstractDebugger debugger) throws PCDIException {
+		BitList tmpTasks = tasks.copy();
+		debugger.filterSuspendTasks(tmpTasks);
+		if (!tmpTasks.isEmpty()) {
+			IDebugCommand cmd = new HaltCommand(tmpTasks, true);
+			debugger.postInterruptCommand(cmd);
+			try {
+				cmd.execCommand(debugger, timeout);
+			} finally {
+				debugger.postInterruptCommand(null);
+			}
+		}
+		return tmpTasks;
+	}
+	protected void resumeSuspendedTasks(IAbstractDebugger debugger, BitList suspendedTasks) throws PCDIException {
+		debugger.go(suspendedTasks);
+	}
+	public void execCommand(IAbstractDebugger debugger, long timeout) throws PCDIException {
+		setTimeout(timeout);
+		execCommand(debugger);
+		waitForReturn();
 	}
 	protected abstract void execCommand(IAbstractDebugger debugger) throws PCDIException;
 }

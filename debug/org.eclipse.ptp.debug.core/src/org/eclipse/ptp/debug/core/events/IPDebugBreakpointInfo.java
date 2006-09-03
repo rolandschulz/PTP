@@ -16,25 +16,11 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.external.core.commands;
-
-import org.eclipse.ptp.core.util.BitList;
-import org.eclipse.ptp.debug.core.IAbstractDebugger;
-import org.eclipse.ptp.debug.core.cdi.PCDIException;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIFunctionBreakpoint;
-
+package org.eclipse.ptp.debug.core.events;
 /**
- * @author Clement chu
- * 
+ * @author Clement
  */
-public class SetFunctionBreakpointCommand extends AbstractBreakpointCommand {
-	public SetFunctionBreakpointCommand(BitList tasks, IPCDIFunctionBreakpoint funcBpt, boolean ignoreCheck) {
-		super(tasks, funcBpt, ignoreCheck);
-	}
-	public void exec(IAbstractDebugger debugger) throws PCDIException {
-		debugger.setFunctionBreakpoint(tasks, (IPCDIFunctionBreakpoint)cdiBpt);
-	}
-	public String getCommandName() {
-		return "Set function breakpoint"; 
-	}
+public interface IPDebugBreakpointInfo extends IPDebugInfo {
+	public int getBreakpointID();
 }
+

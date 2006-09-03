@@ -29,9 +29,6 @@ import org.eclipse.cdt.core.IAddressFactory;
 import org.eclipse.cdt.core.IBinaryParser.IBinaryObject;
 import org.eclipse.cdt.core.IBinaryParser.ISymbol;
 import org.eclipse.cdt.debug.core.cdi.CDIException;
-import org.eclipse.cdt.debug.core.cdi.ICDIAddressLocation;
-import org.eclipse.cdt.debug.core.cdi.ICDIFunctionLocation;
-import org.eclipse.cdt.debug.core.cdi.ICDILineLocation;
 import org.eclipse.cdt.debug.core.model.ICModule;
 import org.eclipse.cdt.debug.core.model.IDebuggerProcessSupport;
 import org.eclipse.cdt.debug.core.model.IDisassembly;
@@ -77,12 +74,9 @@ import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.debug.core.IPDebugConstants;
 import org.eclipse.ptp.debug.core.PDebugUtils;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
-import org.eclipse.ptp.debug.core.cdi.IPCDIAddressLocation;
 import org.eclipse.ptp.debug.core.cdi.IPCDIBreakpointHit;
 import org.eclipse.ptp.debug.core.cdi.IPCDIEndSteppingRange;
 import org.eclipse.ptp.debug.core.cdi.IPCDIErrorInfo;
-import org.eclipse.ptp.debug.core.cdi.IPCDIFunctionLocation;
-import org.eclipse.ptp.debug.core.cdi.IPCDILineLocation;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.IPCDISessionConfiguration;
 import org.eclipse.ptp.debug.core.cdi.IPCDISessionObject;
@@ -101,8 +95,6 @@ import org.eclipse.ptp.debug.core.cdi.event.IPCDIExitedEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIRestartedEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIResumedEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDISuspendedEvent;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIBreakpoint;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDILocation;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIObject;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDISignal;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
@@ -537,8 +529,8 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPCDIE
 			return;
 		}
 		changeState(PDebugElementState.RESTARTING);
-		IPCDILocation location = (IPCDILocation)getCDITarget().createFunctionLocation("", "main");
-		setInternalTemporaryBreakpoint(location);
+		//IPCDILocation location = (IPCDILocation)getCDITarget().createFunctionLocation("", "main");
+		//setInternalTemporaryBreakpoint(location);
 		try {
 			getCDITarget().restart();
 		} catch (PCDIException e) {
@@ -782,6 +774,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPCDIE
 			((PExpression) expression).dispose();
 		}
 	}
+	/*
 	public void setInternalTemporaryBreakpoint(IPCDILocation location) throws DebugException {
 		try {
 			if (location instanceof ICDIFunctionLocation) {
@@ -798,6 +791,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPCDIE
 			targetRequestFailed(e.getMessage(), null);
 		}
 	}
+	*/
 	protected IThread getCurrentThread() throws DebugException {
 		IThread[] threads = getThreads();
 		for (int i = 0; i < threads.length; ++i) {

@@ -56,9 +56,9 @@ import org.eclipse.ptp.debug.external.core.cdi.event.InferiorResumedEvent;
 import org.eclipse.ptp.debug.external.core.cdi.event.InferiorSignaledEvent;
 import org.eclipse.ptp.debug.external.core.cdi.event.SuspendEvent;
 import org.eclipse.ptp.debug.external.core.cdi.model.LineLocation;
-import org.eclipse.ptp.debug.external.core.commands.TerminateCommand;
 import org.eclipse.ptp.debug.external.core.commands.StartDebuggerCommand;
 import org.eclipse.ptp.debug.external.core.commands.StopDebuggerCommand;
+import org.eclipse.ptp.debug.external.core.commands.TerminateCommand;
 
 public abstract class AbstractDebugger extends Observable implements IAbstractDebugger {
 	protected Queue eventQueue = null;
@@ -74,9 +74,15 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		session = new Session(this, job, launch, exe);
 		initialize(job, timeout);
 		return session;
-	}	
+	}
 	public IDebugCommand getCurrentCommand() {
 		return commandQueue.getCurrentCommand();
+	}
+	public IDebugCommand getInterruptCommand() {
+		return commandQueue.getInterruptCommand();
+	}
+	public void postInterruptCommand(IDebugCommand command) {
+		commandQueue.setInterruptCommand(command);
 	}
 	public void postCommand(IDebugCommand command) {
 		if (!isExited)
@@ -242,9 +248,8 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		eventQueue.addItem(new DebuggerDestroyedEvent(getSession(), new BitList(0)));
 		session.shutdown();
 	}
-	//not used breakpoint created event
-	public void handleBreakpointCreatedEvent(BitList tasks) {
-		fireEvent(new BreakpointCreatedEvent(getSession(), tasks));
+	public void handleBreakpointCreatedEvent(BitList tasks, IPCDIBreakpoint cdiBpt) {
+		fireEvent(new BreakpointCreatedEvent(getSession(), tasks, cdiBpt));
 	}
 	public void handleBreakpointHitEvent(BitList tasks, int bpid, int thread_id, String[] varchanges) {
 		IPCDIBreakpoint bpt = ((Session)getSession()).getBreakpointManager().findCDIBreakpoint(bpid);
@@ -326,7 +331,8 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		curTasks.andNot(newTasks);
 	}
 
-	public String showBitList(BitList tasks) {
+	/* debug purpose */
+	public static String showBitList(BitList tasks) {
 		if (tasks == null) {
 			return "";
 		}

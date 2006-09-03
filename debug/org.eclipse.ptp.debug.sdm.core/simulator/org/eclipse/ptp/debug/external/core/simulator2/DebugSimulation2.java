@@ -479,6 +479,7 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 			handleEndSteppingEvent(qItem.getTasks(), qItem.getLine(), qItem.getFile(), 0, new String[0]);
 		}
 	}
+	
 	public static int convertInt(String s_id) {
 		try {
 			return Integer.parseInt(s_id);

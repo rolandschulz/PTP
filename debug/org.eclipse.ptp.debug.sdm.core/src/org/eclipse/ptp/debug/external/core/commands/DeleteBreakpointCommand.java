@@ -28,10 +28,10 @@ import org.eclipse.ptp.debug.core.cdi.model.IPCDIBreakpoint;
  * 
  */
 public class DeleteBreakpointCommand extends AbstractBreakpointCommand {
-	public DeleteBreakpointCommand(BitList tasks, IPCDIBreakpoint cdiBpt) {
-		super(tasks, cdiBpt);
+	public DeleteBreakpointCommand(BitList tasks, IPCDIBreakpoint cdiBpt, boolean ignoreCheck) {
+		super(tasks, cdiBpt, ignoreCheck);
 	}
-	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
+	public void exec(IAbstractDebugger debugger) throws PCDIException {
 		debugger.deleteBreakpoint(tasks, ((IPCDIBreakpoint)cdiBpt).getBreakpointId());		
 	}
 	public String getCommandName() {
