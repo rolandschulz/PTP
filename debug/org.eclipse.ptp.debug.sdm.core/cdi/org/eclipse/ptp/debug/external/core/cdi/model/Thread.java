@@ -20,9 +20,7 @@ package org.eclipse.ptp.debug.external.core.cdi.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.eclipse.ptp.debug.core.cdi.IPCDICondition;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIBreakpoint;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDILocation;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDISignal;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIStackFrame;
@@ -253,6 +251,7 @@ public class Thread extends PObject implements IPCDIThread {
 		}
 		return super.equals(thread);
 	}
+	/*
 	public IPCDIBreakpoint[] getBreakpoints() throws PCDIException {
 		Target target = (Target)getTarget();
 		IPCDIBreakpoint[] bps = target.getBreakpoints();
@@ -277,6 +276,7 @@ public class Thread extends PObject implements IPCDIThread {
 		}
 		return (IPCDIBreakpoint[]) list.toArray(new IPCDIBreakpoint[list.size()]);
 	}
+	*/
 	public IPCDIThreadStorageDescriptor[] getThreadStorageDescriptors() throws PCDIException {
 		Session session = (Session)getTarget().getSession();
 		VariableManager varMgr = session.getVariableManager();

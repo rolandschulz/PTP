@@ -36,17 +36,27 @@ public class DebugCommandQueue extends Thread {
 	private IDebugCommand currentCommand = null;
 	private IAbstractDebugger debugger = null;
 	private int command_timeout = 10000;
+	private IDebugCommand interruptCommand = null;
 	
 	public DebugCommandQueue(IAbstractDebugger debugger, int timeout) {
 		this.debugger = debugger;
 		this.command_timeout = timeout;
 		queue = Collections.synchronizedList(new LinkedList());
 	}
+	public int getCommandTimeout() {
+		return command_timeout;
+	}
 	public void setTerminated() {
 		isTerminated = true;
 		cleanup();
 	}
-		
+	public void setInterruptCommand(IDebugCommand interruptCommand) {
+		this.interruptCommand = interruptCommand;
+	}
+	public IDebugCommand getInterruptCommand() {
+		return interruptCommand;
+	}
+
 	public void run() {
 		while (!isTerminated) {
 			if (!waitForCommand()) {
@@ -54,7 +64,7 @@ public class DebugCommandQueue extends Thread {
 			}
 			try {
 				currentCommand = getCommand();
-System.err.println("*** SEND COMMAND: " + currentCommand.getCommandName() + ", tasks: " + debugger.showBitList(currentCommand.getTasks()));
+System.err.println("*** SEND COMMAND: " + currentCommand.getCommandName() + ", tasks: " + AbstractDebugger.showBitList(currentCommand.getTasks()));
 				currentCommand.execCommand(debugger, command_timeout);
 			} catch (PCDIException e) {
 				debugger.handleErrorEvent(currentCommand.getTasks(), e.getMessage(), e.getErrorCode());
@@ -78,7 +88,7 @@ System.err.println("*** SEND COMMAND: " + currentCommand.getCommandName() + ", t
 		}
 	}
 
-	public IDebugCommand getCommand() throws PCDIException {
+	private IDebugCommand getCommand() throws PCDIException {
 		synchronized (queue) {
 			IDebugCommand command = (IDebugCommand)queue.remove(0);
 			if (command == null)
@@ -151,7 +161,7 @@ System.err.println("*** SEND COMMAND: " + currentCommand.getCommandName() + ", t
 				//if (result == null) {
 					//doFlushCommands();
 				//}
-				System.err.println("*** SET COMMAND RETURN: " + currentCommand.getCommandName() + ", result: " + result + ", tasks: " + debugger.showBitList(tasks));
+				System.err.println("*** SET COMMAND RETURN: " + currentCommand.getCommandName() + ", result: " + result + ", tasks: " + AbstractDebugger.showBitList(tasks));
 				currentCommand.setReturn(tasks, result);					
 			}
 		}

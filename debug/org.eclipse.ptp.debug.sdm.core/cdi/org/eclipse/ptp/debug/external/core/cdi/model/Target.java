@@ -37,14 +37,9 @@ import org.eclipse.ptp.debug.core.cdi.IPCDICondition;
 import org.eclipse.ptp.debug.core.cdi.IPCDIFunctionLocation;
 import org.eclipse.ptp.debug.core.cdi.IPCDILineLocation;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIAddressBreakpoint;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIBreakpoint;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIExceptionpoint;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIExpression;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIFunctionBreakpoint;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIGlobalVariable;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIGlobalVariableDescriptor;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDILineBreakpoint;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDILocation;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIMemoryBlock;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDISignal;
@@ -52,7 +47,6 @@ import org.eclipse.ptp.debug.core.cdi.model.IPCDIStackFrame;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITargetConfiguration;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIThread;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIWatchpoint;
 import org.eclipse.ptp.debug.external.core.cdi.ExpressionManager;
 import org.eclipse.ptp.debug.external.core.cdi.MemoryManager;
 import org.eclipse.ptp.debug.external.core.cdi.Session;
@@ -440,6 +434,7 @@ public class Target extends SessionObject implements IPCDITarget {
 	public Process getProcess() {
 		return null;
 	}
+	/*
 	public IPCDILineBreakpoint setLineBreakpoint(int type, IPCDILineLocation location, IPCDICondition condition, boolean deferred) throws PCDIException {
 		return getSession().getBreakpointManager().setLineBreakpoint(getTask(), type, location, condition, deferred);
 	}
@@ -464,6 +459,7 @@ public class Target extends SessionObject implements IPCDITarget {
 	public void deleteAllBreakpoints() throws PCDIException {
 		throw new PCDIException("Not implemented yet - Target: deleteAllBreakpoints");
 	}
+	*/
 	public IPCDICondition createCondition(int ignoreCount, String expression) {
 		return createCondition(ignoreCount, expression, null);
 	}

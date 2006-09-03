@@ -18,17 +18,13 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.cdi.model;
 
-import org.eclipse.ptp.debug.core.cdi.IPCDIAddressLocation;
-import org.eclipse.ptp.debug.core.cdi.IPCDICondition;
-import org.eclipse.ptp.debug.core.cdi.IPCDIFunctionLocation;
-import org.eclipse.ptp.debug.core.cdi.IPCDILineLocation;
-import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
 /**
  * @author Clement chu
  * 
  */
 public interface IPCDIBreakpointManagement {
+	/*
 	IPCDILineBreakpoint setLineBreakpoint(int type, IPCDILineLocation location, IPCDICondition condition, boolean deferred) throws PCDIException;		
 	IPCDIFunctionBreakpoint setFunctionBreakpoint(int type, IPCDIFunctionLocation location, IPCDICondition condition, boolean deferred) throws PCDIException;
 	IPCDIAddressBreakpoint setAddressBreakpoint(int type, IPCDIAddressLocation location, IPCDICondition condition, boolean deferred) throws PCDIException;		
@@ -37,4 +33,5 @@ public interface IPCDIBreakpointManagement {
 	IPCDIBreakpoint[] getBreakpoints() throws PCDIException;
 	void deleteBreakpoints(IPCDIBreakpoint[] breakpoints) throws PCDIException;
 	void deleteAllBreakpoints() throws PCDIException;
+	*/
 }

@@ -48,17 +48,7 @@ public class TerminateCommand extends AbstractDebugCommand {
 	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
 		debugger.filterTerminateTasks(tasks);
 		if (!tasks.isEmpty()) {
-			BitList tmpTasks = tasks.copy();
-			debugger.filterSuspendTasks(tmpTasks);
-			if (!tmpTasks.isEmpty()) {
-				debugger.halt(tmpTasks);
-				waitForReturn();
-				tmpTasks.andNot(debugger.getSuspendedProc());
-				while (!tmpTasks.isEmpty()) {//checked for all tmpTasks are suspended 
-					waitForReturn();
-					tmpTasks.andNot(debugger.getSuspendedProc());
-				}
-			}
+			suspendRunningTasks(debugger);
 			debugger.kill(tasks);
 		}
 		else {

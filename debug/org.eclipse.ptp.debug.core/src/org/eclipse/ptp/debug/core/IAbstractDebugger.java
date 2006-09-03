@@ -23,7 +23,6 @@
 package org.eclipse.ptp.debug.core;
 
 import java.util.Observer;
-
 import org.eclipse.cdt.core.IBinaryParser.IBinaryObject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -33,6 +32,7 @@ import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.core.util.Queue;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIBreakpoint;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDILocator;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 
@@ -62,7 +62,7 @@ public interface IAbstractDebugger extends IDebugger {
 	
 	/* event */
 	public void handleStopDebuggerEvent();
-	public void handleBreakpointCreatedEvent(BitList tasks);
+	public void handleBreakpointCreatedEvent(BitList tasks, IPCDIBreakpoint cdiBpt);
 	public void handleBreakpointHitEvent(BitList tasks, int bpid, int thread_id, String[] varchanges);
 	public void handleEndSteppingEvent(BitList tasks, int lineNumber, String filename, int thread_id, String[] varchanges);
 	public void handleSuspendEvent(BitList tasks, IPCDILocator locator, int thread_id, String[] varchanges);
@@ -81,10 +81,9 @@ public interface IAbstractDebugger extends IDebugger {
 	public BitList getTerminatedProc();
 	
 	/* Command */
+	public void postInterruptCommand(IDebugCommand command);
 	public void postCommand(IDebugCommand command);
 	public void completeCommand(BitList tasks, Object result);
 	public IDebugCommand getCurrentCommand();
-	
-	/* debug purpose */
-	public String showBitList(BitList tasks);
+	public IDebugCommand getInterruptCommand();
 }

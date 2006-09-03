@@ -31,10 +31,15 @@ package org.eclipse.ptp.debug.external.core.cdi.event;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDICreatedEvent;
-
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIBreakpoint;
 
 public class BreakpointCreatedEvent extends AbstractEvent implements IPCDICreatedEvent {
-	public BreakpointCreatedEvent(IPCDISession session, BitList tasks) {
+	IPCDIBreakpoint cdiBpt = null;
+	
+	public BreakpointCreatedEvent(IPCDISession session, BitList tasks, IPCDIBreakpoint cdiBpt) {
 		super(session, tasks);
+	}
+	public IPCDIBreakpoint getCDIBreakpoint() {
+		return cdiBpt;
 	}
 }

@@ -48,7 +48,6 @@ import org.eclipse.ptp.debug.external.core.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.core.cdi.model.Target;
 import org.eclipse.ptp.debug.external.core.cdi.model.variable.Argument;
 import org.eclipse.ptp.debug.external.core.cdi.model.variable.LocalVariable;
-import org.eclipse.ptp.debug.external.core.commands.TerminateCommand;
 import org.eclipse.ptp.debug.external.core.proxy.ProxyDebugClient;
 import org.eclipse.ptp.debug.external.core.proxy.ProxyDebugSignal;
 import org.eclipse.ptp.debug.external.core.proxy.ProxyDebugStackframe;
@@ -108,9 +107,8 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 	*/
 	
 	private ProxyDebugClient	proxy;
-	private int					numServers;
 	private int					bpId = 0;
-	private IPCDIStackFrame		currFrame = null;
+	protected IPCDIStackFrame currFrame = null;
 
 	private String join(String[] strs, String delim) {
 		StringBuffer buf = new StringBuffer();
@@ -442,7 +440,24 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			throw new PCDIException(e.getMessage());
 		}
 	}
+	protected int getErrorCode(int internalErrorCode) {
+		switch (internalErrorCode) {
+		case IParallelDebuggerConstants.DBGERR_DEBUGGER:
+		case IParallelDebuggerConstants.DBGERR_NOFILEDIR:
+		case IParallelDebuggerConstants.DBGERR_CHDIR:
+			return IPCDIErrorEvent.DBG_FATAL;
+		case IParallelDebuggerConstants.DBGERR_INPROGRESS:
+		case IParallelDebuggerConstants.DBGERR_UNKNOWN_TYPE:
+		case IParallelDebuggerConstants.DBGERR_UNKNOWN_VARIABLE:
+			return IPCDIErrorEvent.DBG_NORMAL;
+		default:
+			return IPCDIErrorEvent.DBG_WARNING;
+		}
+	}
 	
+	/************************************
+	 * Debug handle event
+	 ***********************************/
 	public synchronized void handleEvent(IProxyDebugEvent e) {
 		System.out.println("got debug event: " + e.toString());
 		switch (e.getEventID()) {
@@ -451,7 +466,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			break;
 			
 		case IProxyDebugEvent.EVENT_DBG_INIT:
-			numServers = ((ProxyDebugInitEvent)e).getNumServers();
+			int numServers = ((ProxyDebugInitEvent)e).getNumServers();
 			System.out.println("num servers = " + numServers);
 			completeCommand(e.getBitSet(), IDebugCommand.RETURN_OK);
 			break;
@@ -468,11 +483,10 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 				handleEndSteppingEvent(e.getBitSet(), stepEvent.getFrame().getLocator().getLineNumber(), stepEvent.getFrame().getLocator().getFile(), stepEvent.getThreadId(), stepEvent.getChangedVars());
 			} else if (e instanceof ProxyDebugSignalEvent) {
 				ProxyDebugSignalEvent sigEvent = (ProxyDebugSignalEvent)e;
-				IDebugCommand cmd = getCurrentCommand();
-				if (cmd != null && cmd instanceof TerminateCommand) {
-					//set suspended process
-					setSuspendTasks(true, e.getBitSet());
-					cmd.doFlush();
+				
+				IDebugCommand cmd = getInterruptCommand();
+				if (cmd != null) {
+					cmd.setReturn(e.getBitSet(), IDebugCommand.RETURN_OK);
 				}
 				else {
 					//send signal if the current command is not terminate command.
@@ -484,7 +498,6 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 		case IProxyDebugEvent.EVENT_DBG_BPSET:
 			ProxyDebugBreakpointSetEvent bpEvt = (ProxyDebugBreakpointSetEvent)e;
 			completeCommand(e.getBitSet(), bpEvt.getBreakpoint());
-			//updateBreakpointInfo(bpEvt.getBreakpointId(), e.getBitSet(), bpEvt.getBreakpoint());
 			break;
 			
 		case IProxyDebugEvent.EVENT_DBG_FRAMES:
@@ -638,21 +651,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			//completeCommand(e.getBitSet(), new PCDIException(errMsg, getErrorCode(errEvent.getErrorCode())));
 			break;
 		}
-	}
-	private int getErrorCode(int internalErrorCode) {
-		switch (internalErrorCode) {
-		case IParallelDebuggerConstants.DBGERR_DEBUGGER:
-		case IParallelDebuggerConstants.DBGERR_NOFILEDIR:
-		case IParallelDebuggerConstants.DBGERR_CHDIR:
-			return IPCDIErrorEvent.DBG_FATAL;
-		case IParallelDebuggerConstants.DBGERR_INPROGRESS:
-		case IParallelDebuggerConstants.DBGERR_UNKNOWN_TYPE:
-		case IParallelDebuggerConstants.DBGERR_UNKNOWN_VARIABLE:
-			return IPCDIErrorEvent.DBG_NORMAL;
-		default:
-			return IPCDIErrorEvent.DBG_WARNING;
-		}
-	}
+	}	
 	
 	/*
 	 * Keep two data structures:

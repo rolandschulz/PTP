@@ -19,9 +19,9 @@
 package org.eclipse.ptp.debug.external.core.commands;
 
 import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIBreakpoint;
-
 
 /**
  * @author Clement chu
@@ -29,17 +29,35 @@ import org.eclipse.ptp.debug.core.cdi.model.IPCDIBreakpoint;
  */
 public abstract class AbstractBreakpointCommand extends AbstractDebugCommand {
 	IPCDIBreakpoint cdiBpt;
+	boolean ignoreCheck = false;
 	
-	public AbstractBreakpointCommand(BitList tasks, IPCDIBreakpoint cdiBpt) {
-		super(tasks);
+	public AbstractBreakpointCommand(BitList tasks, IPCDIBreakpoint cdiBpt, boolean ignoreCheck) {
+		super(tasks, false, true, true);
 		this.cdiBpt = cdiBpt;
+		this.ignoreCheck = ignoreCheck;
 	}
-	public IPCDIBreakpoint getBreakpoint() throws PCDIException {
+	public IPCDIBreakpoint getPCDIBreakpoint() throws PCDIException {
 		Object res = getResultValue();
 		if (res instanceof IPCDIBreakpoint) {
 			return (IPCDIBreakpoint)res;
 		}
 		return null;
 	}
+	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
+		if (ignoreCheck) {
+			exec(debugger);
+		}
+		else {
+			BitList susTasks = suspendRunningTasks(debugger);
+			exec(debugger);
+			if (!susTasks.isEmpty()) {
+				try {
+					getPCDIBreakpoint();
+				} finally {
+					resumeSuspendedTasks(debugger, susTasks);
+				}
+			}
+		}
+	}
+	protected abstract void exec(IAbstractDebugger debugger) throws PCDIException;
 }
-

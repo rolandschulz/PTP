@@ -83,9 +83,6 @@ public class EventManager extends SessionObject implements IPCDIEventManager, Ob
 				if (event instanceof IPCDISuspendedEvent) {
 					processSuspendedEvent((IPCDISuspendedEvent)event, monitor);
 				}
-				else if (event instanceof IPCDIChangedEvent) {
-					System.out.println("asdasd");
-				}
 				/*
 				if (event instanceof IPCDIMemoryChangedEvent) {
 					// We need to fire an event for all the register blocks that may contain the modified addresses.
@@ -175,7 +172,6 @@ public class EventManager extends SessionObject implements IPCDIEventManager, Ob
 		VariableManager varMgr = session.getVariableManager();
 		/*
 		ExpressionManager expMgr  = session.getExpressionManager();		
-		BreakpointManager bpMgr = session.getBreakpointManager();
 		SourceManager srcMgr = session.getSourceManager();
 		MemoryManager memMgr = session.getMemoryManager();
 		*/
@@ -352,7 +348,7 @@ public class EventManager extends SessionObject implements IPCDIEventManager, Ob
 	public void fireCreateEvent(IPCDICreatedEvent event) {
 		IPDebugInfo baseInfo = getDebugInfo(event);
 		int detail = IPDebugEvent.UNSPECIFIED;
-		
+
 		PTPDebugCorePlugin.getDefault().fireDebugEvent(new PDebugEvent(getSession(), IPDebugEvent.CREATE, detail, baseInfo));
 	}
 }

@@ -28,10 +28,10 @@ import org.eclipse.ptp.debug.core.cdi.model.IPCDIWatchpoint;
  * 
  */
 public class SetWatchpointCommand extends AbstractBreakpointCommand {
-	public SetWatchpointCommand(BitList tasks, IPCDIWatchpoint watchpt) {
-		super(tasks, watchpt);
+	public SetWatchpointCommand(BitList tasks, IPCDIWatchpoint watchpt, boolean ignoreCheck) {
+		super(tasks, watchpt, ignoreCheck);
 	}
-	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
+	public void exec(IAbstractDebugger debugger) throws PCDIException {
 		debugger.setWatchpoint(tasks, (IPCDIWatchpoint)cdiBpt);
 	}
 	public String getCommandName() {

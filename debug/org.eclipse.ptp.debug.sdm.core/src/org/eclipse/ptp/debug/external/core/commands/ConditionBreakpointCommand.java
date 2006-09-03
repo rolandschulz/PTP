@@ -30,11 +30,11 @@ import org.eclipse.ptp.debug.core.cdi.model.IPCDIBreakpoint;
 public class ConditionBreakpointCommand extends AbstractBreakpointCommand {
 	String expr = "";
 	
-	public ConditionBreakpointCommand(BitList tasks, IPCDIBreakpoint cdiBpt, String expr) {
-		super(tasks, cdiBpt);
+	public ConditionBreakpointCommand(BitList tasks, IPCDIBreakpoint cdiBpt, String expr, boolean ignoreCheck) {
+		super(tasks, cdiBpt, ignoreCheck);
 		this.expr = expr;
 	}
-	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
+	public void exec(IAbstractDebugger debugger) throws PCDIException {
 		debugger.conditionBreakpoint(tasks, ((IPCDIBreakpoint)cdiBpt).getBreakpointId(), expr);
 	}
 	public String getCommandName() {
