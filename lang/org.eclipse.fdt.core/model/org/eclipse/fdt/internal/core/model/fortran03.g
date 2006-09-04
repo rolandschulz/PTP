@@ -4,6 +4,7 @@
  * R303, R406, R417, R427, R428 underscore - added _ to rule (what happened to it?) * R410 sign - had '?' rather than '-'
  * R1209 import-stmt: MISSING a ]
  *
+ * check comments regarding deleted for correctness
  */
 
 
@@ -209,10 +210,10 @@ name
 	;
 
 // R305
-// named_constant causes an ambiguity with variable is designator so removed from grammar
+// T_IDENT inlined as named_constant 
 constant
 	:	literal_constant
-//	|	named_constant
+	|	T_IDENT
 	;
 
 scalar_constant
@@ -220,27 +221,31 @@ scalar_constant
     ;
 
 // R306
-// TODO putback
 literal_constant
 	:	int_literal_constant
 	|	real_literal_constant
-//	|	complex_literal_constant
-//	|	logical_literal_constant
-//	|	char_literal_constant
-//	|	boz_literal_constant
+	|	complex_literal_constant
+	|	logical_literal_constant
+	|	char_literal_constant
+	|	boz_literal_constant
 	;
 
-// R307
-// named_constant causes an ambiguity with variable is designator so removed from grammar
-// named_constant
-//	:	name
-//	;
+// R307 named_constant was name inlined as T_IDENT
 
-// R308 int_constant inlined as T_DIGIT_STRING
+// R308
+// C302 R308 int_constant shall be of type integer
+// inlined integer portion of constant
+int_constant
+	:	T_IDENT
+	|	int_literal_constant
+	;
 
 // R309
+// C303 R309 char_constant shall be of type character
+// inlined character portion of constant
 char_constant
-	:	constant
+	:	T_IDENT
+	|	char_literal_constant
 	;
 
 // R310
@@ -329,9 +334,10 @@ int_literal_constant
 	;
 
 // R407
+// T_IDENT inlined for scalar_int_constant_name
 kind_param
 	:	T_DIGIT_STRING
-	|	scalar_int_constant_name
+	|	T_IDENT
 	;
 
 // R408 signed_digit_string inlined
@@ -378,7 +384,7 @@ complex_literal_constant
 	;
 
 // R422
-// ERR_CHK 422 named_constant replaced by T_IDENT (
+// ERR_CHK 422 named_constant replaced by T_IDENT
 real_part
 	:	signed_int_literal_constant
 	|	signed_real_literal_constant
@@ -429,7 +435,10 @@ scalar_int_literal_constant
 
 // R427
 char_literal_constant
-    :    ( kind_param T_UNDERSCORE )? T_CHAR_CONSTANT
+options {k=2;}
+	:	(T_DIGIT_STRING T_UNDERSCORE) => T_DIGIT_STRING T_UNDERSCORE T_CHAR_CONSTANT
+	|	(T_IDENT T_UNDERSCORE) => T_IDENT T_UNDERSCORE T_CHAR_CONSTANT
+    |   T_CHAR_CONSTANT
     ;
 
 // R428
@@ -781,8 +790,9 @@ ac_value_list
     ;
 
 // R470
+// TODO putback
 ac_implied_do
-	:	T_LPAREN ac_value_list T_COMMA ac_implied_do_control T_RPAREN
+	:	T_LPAREN ac_value_list //T_COMMA ac_implied_do_control T_RPAREN
 	;
 
 // R471
@@ -849,10 +859,10 @@ attr_spec
 
 
 // R504
-// TODO putback
+// T_IDENT inlined for object_name and function_name
+// T_IDENT ( T_ASTERISK char_length )? (second alt) subsumed in first alt
 entity_decl
-    : object_name ( T_LPAREN array_spec T_RPAREN )? ( T_ASTERISK char_length )? ( initialization )?
-//    | T_IDENT ( T_ASTERISK char_length )?
+    : T_IDENT ( T_LPAREN array_spec T_RPAREN )? ( T_ASTERISK char_length )? ( initialization )?
     ;
 
 // TODO putback
@@ -963,6 +973,7 @@ access_stmt
     ;
 
 // R519
+// TODO putback
 access_id
 	:	use_name
 //	|	generic_spec
@@ -1039,21 +1050,23 @@ data_stmt_object_list
 
 // R527
 // ERR_CHK 527 scalar_int_expr replaced by expr
+// TODO putback
 data_implied_do
-    : T_LPAREN data_i_do_object_list T_COMMA data_i_do_variable T_EQUALS
-         expr T_COMMA expr ( T_COMMA expr )? T_RPAREN
+    : T_LPAREN data_i_do_object_list // T_COMMA data_i_do_variable T_EQUALS
+//         expr T_COMMA expr ( T_COMMA expr )? T_RPAREN
     ;
 
 // R528
 // TODO putback
+// data_ref inlined for scalar_structure_component and array_element
 data_i_do_object
-	:	array_element
-//	|	scalar_structure_component
+	:	data_ref
 //	|	data_implied_do
 	;
 
+// TODO putback
 data_i_do_object_list
-    :   data_i_do_object ( T_COMMA data_i_do_object )*
+    :   data_i_do_object //( T_COMMA data_i_do_object )*
     ;
 
 // R529
@@ -1078,11 +1091,11 @@ data_stmt_repeat
 	;
 
 scalar_int_constant
-    :    T_DIGIT_STRING
+    :    int_constant
     ;
 
 scalar_int_constant_subobject
-    :    T_DIGIT_STRING
+    :    int_constant
     ;
 
 scalar_int_constant_name
@@ -1164,14 +1177,9 @@ pointer_decl_list
     ;
 
 // R541
-// TODO putback
+// T_IDENT inlined as object_name and proc_entity_name (removing second alt)
 pointer_decl
-    : object_name ( T_LPAREN deferred_shape_spec_list T_RPAREN )?
-//    | proc_entity_name
-    ;
-
-proc_entity_name
-    :    name
+    :    T_IDENT ( T_LPAREN deferred_shape_spec_list T_RPAREN )?
     ;
 
 // R542
@@ -1187,10 +1195,10 @@ save_stmt
     ;
 
 // R544
+// T_IDENT inlined for object_name, proc_pointer_name (removing second alt), and common_block_name
 saved_entity
-	:	object_name
-//	|	proc_pointer_name
-//	|	T_SLASH common_block_name T_SLASH
+	:	T_IDENT
+	|	T_SLASH T_IDENT T_SLASH
 	;
 
 saved_entity_list
@@ -1277,9 +1285,11 @@ equivalence_set_list
 
 // R556
 // TODO putback
+// T_IDENT inlined for variable_name
+// data_ref inlined for array_element
+// data_ref can be T_IDENT so T_IDENT deleted (removing second alt)
 equivalence_object
-	:	variable_name
-//	|	array_element
+	:	data_ref
 //	|	substring
 	;
 
@@ -1312,6 +1322,10 @@ variable
 	:	designator
 	;
 
+part_deref
+	:	T_PERCENT part_ref
+	;
+
 // R602
 variable_name
 	:	name
@@ -1320,7 +1334,11 @@ variable_name
 // R603
 // TODO putback
 designator
-	:	object_name
+	:	T_IDENT T_LPAREN section_subscript_list T_RPAREN
+		part_deref ( T_LPAREN substring_range T_RPAREN )?
+	|	T_IDENT part_deref
+//	|	T_IDENT
+	|	char_literal_constant T_LPAREN substring_range T_RPAREN
 //	|	array_element
 //	|	array_section
 //	|	structure_component
@@ -1362,20 +1380,37 @@ int_variable
 
 // R609
 substring
-	:	parent_string
-		T_LPAREN
-		substring_range
-		T_RPAREN
+	:	parent_string T_LPAREN substring_range T_RPAREN
 	;
 
 // R610
-// TODO putback
+// C608 parent_string shall be of type character
+// T_IDENT inlined for scalar_variable_name
+// data_ref inlined for scalar_structure_component and array_element
+// data_ref can be a T_IDENT so T_IDENT deleted
+// scalar_constant replaced by char_literal_constant as T_IDENT covered by data_ref and must be character
 parent_string
-	:	scalar_variable_name
-//	|	array_element
-//	|	scalar_structure_component
-//	|   scalar_constant
+	:	data_ref
+	|	T_CHAR_CONSTANT
+	|	T_IDENT T_UNDERSCORE T_CHAR_CONSTANT
+	|	T_DIGIT_STRING T_UNDERSCORE T_CHAR_CONSTANT
 	;
+
+// R610
+// C608 parent_string shall be of type character
+// T_IDENT inlined for scalar_variable_name
+// data_ref inlined for scalar_structure_component and array_element
+// scalar_constant replaced by char_literal_constant as T_IDENT covered by data_ref
+// REMOVED because produces java error in parser (bug in code generation)
+//parent_string
+//options {k=2;}
+//	:	T_IDENT
+//	|	T_CHAR_CONSTANT
+//	|	(T_IDENT T_LPAREN) => data_ref
+//	|	(T_IDENT T_PERCENT) => data_ref
+//	|	(T_IDENT T_UNDERSCORE) => T_IDENT T_UNDERSCORE T_CHAR_CONSTANT
+//	|	T_DIGIT_STRING T_UNDERSCORE T_CHAR_CONSTANT
+//	;
 
 scalar_variable_name
     :    name
@@ -1390,21 +1425,17 @@ substring_range
 	;
 
 // R612
-// TODO putback
 data_ref
-    : part_ref
-//      ( T_PERCENT part_ref )*
+    : part_ref ( T_PERCENT part_ref )*
     ;
 
 // R613
-// TODO putback
+// T_IDENT inlined for part_name
+// TODO make sure this predicate is OK
 part_ref
-    : part_name
-//      ( T_LPAREN section_subscript_list T_RPAREN )?
-    ;
-
-part_name
-    :    name
+options {k=2;}
+    : T_IDENT
+    | (T_IDENT T_LPAREN) => T_IDENT T_LPAREN section_subscript_list T_RPAREN
     ;
 
 // R614
@@ -1440,21 +1471,19 @@ subscript
 	;
 
 // R619
-// TODO putback
+// expr inlined for subscript and vector_subscript (thus deleted option 3)
+// refactored first optional expr from subscript_triplet
 section_subscript
-	:	subscript
-//	|	subscript_triplet
-//	|	vector_subscript
+	:	expr ( T_COLON ( expr )? ( T_COLON stride )? )?
+	|	T_COLON ( expr )? ( T_COLON stride )?
 	;
 
 section_subscript_list
     :    section_subscript ( T_COMMA section_subscript )*
     ;
 
-// R620
-subscript_triplet
-    : ( subscript )? T_COLON ( subscript )? ( T_COLON stride )?
-    ;
+// R620 subscript_triplet inlined in R619
+// expr inlined for subscript
 
 // R621
 // ERR_CHK 621 scalar_int_expr replaced by expr
@@ -1590,8 +1619,9 @@ Section 7:
  */
 
 // R701
+// constant replaced by literal_constant as T_IDENT covered by designator
 primary
-	:	constant
+	:	literal_constant
 	|	designator
 	|	array_constructor
 //	|	structure_constructor
@@ -1802,9 +1832,10 @@ pointer_assignment_stmt
     ;
 
 // R736
+// TODO putback
 data_pointer_object
-	:	variable_name
-	|	variable T_PERCENT data_pointer_component_name
+	:	T_IDENT
+//	|	variable T_PERCENT data_pointer_component_name
 	;
 
 data_pointer_component_name
@@ -1974,9 +2005,10 @@ forall_body_construct
 	;
 
 // R757
+// TODO putback
 forall_assignment_stmt
 	:	assignment_stmt
-	|	pointer_assignment_stmt
+//	|	pointer_assignment_stmt
 	;
 
 // R758
@@ -2570,8 +2602,9 @@ io_implied_do_object
 //	|	output_item
 	;
 
+// TODO putback
 io_implied_do_object_list
-    :    io_implied_do_object ( T_COMMA io_implied_do_object )*
+    :    io_implied_do_object //( T_COMMA io_implied_do_object )*
     ;
 
 // R919
