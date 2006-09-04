@@ -281,7 +281,6 @@ MIGetVarUpdateParseValue(MIValue* tuple, List* aList)
 			if (value != NULL && value->type == MIValueTypeConst) {
 				str = value->cstring;
 			}
-
 			if (strcmp(var, "name") == 0) {
 				varchange = MIVarChangeNew();
 				varchange->name = strdup(str);
@@ -300,25 +299,31 @@ MIGetVarUpdateParseValue(MIValue* tuple, List* aList)
 }
 
 void
-MIGetVarUpdateParseList(List* miList, List* aList)
+MIGetVarUpdateParser(MIValue* miVal, List *varchanges)
 {
 	MIValue* value;
-	if (miList != NULL) {
-		for (SetList(miList); (value = (MIValue *)GetListElement(miList)) != NULL;) {
-			if (value->type == MIValueTypeTuple) {
-				MIGetVarUpdateParseValue(value, aList);
-			}
-			else if (value->type == MIValueTypeList) {
-				MIGetVarUpdateParseList(value->values, aList);
+	MIResult* result;
+
+	if (miVal->type == MIValueTypeTuple) {
+		MIGetVarUpdateParseValue(miVal, varchanges);
+	}
+	else if (miVal->type == MIValueTypeList) {
+		if (EmptyList(miVal->values)) {
+			for (SetList(miVal->results); (result = (MIResult *)GetListElement(miVal->results)) != NULL;) {
+				MIGetVarUpdateParser(result->value, varchanges);
 			}
 		}
-	}
+		else {
+			for (SetList(miVal->values); (value = (MIValue *)GetListElement(miVal->values)) != NULL;) {
+				MIGetVarUpdateParser(value, varchanges);
+			}
+		}
+	}	
 }
 
 void
 MIGetVarUpdateInfo(MICommand *cmd, List** varchanges)
 {
-	MIValue *		value;
 	MIResult *		result;
 	MIResultRecord *	rr;
 	*varchanges = NewList();
@@ -327,15 +332,9 @@ MIGetVarUpdateInfo(MICommand *cmd, List** varchanges)
 		return;
 
 	rr = cmd->output->rr;
-	for (SetList(rr->results); (result = (MIResult *)GetListElement(rr->results)) != NULL; ) {
-		value = result->value;
+	for (SetList(rr->results); (result = (MIResult *)GetListElement(rr->results)) != NULL;) {
 		if (strcmp(result->variable, "changelist") == 0) {
-			if (value->type == MIValueTypeConst) {
-				MIGetVarUpdateParseValue(value, *varchanges);
-			}
-			else if (value->type == MIValueTypeList) {
-				MIGetVarUpdateParseList(value->values, *varchanges);
-			}
+			MIGetVarUpdateParser(result->value, *varchanges);
 		}
 	}
 }
