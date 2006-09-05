@@ -33,6 +33,7 @@ import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.aif.IAIF;
+import org.eclipse.ptp.debug.core.cdi.IPCDIBreakpointManager;
 import org.eclipse.ptp.debug.core.cdi.IPCDIEventManager;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.IPCDISessionConfiguration;
@@ -184,7 +185,7 @@ public class Session implements IPCDISession, IPCDISessionObject {
 	public ProcessManager getProcessManager() {
 		return processManager;
 	}
-	public BreakpointManager getBreakpointManager() {
+	public IPCDIBreakpointManager getBreakpointManager() {
 		return breakpointManager;
 	}
 	public IPCDIEventManager getEventManager() {

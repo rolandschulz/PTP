@@ -109,13 +109,15 @@ public class BreakpointManager extends SessionObject implements IPCDIBreakpointM
 		return null;
 	}
 	public IPCDIBreakpoint findCDIBreakpoint(IPBreakpoint bpt) {
-		return (IPCDIBreakpoint) breakMap.get(bpt);
+		synchronized (breakMap) {
+			return (IPCDIBreakpoint) breakMap.get(bpt);
+		}
 	}
 	public IPCDIBreakpoint findCDIBreakpoint(int bpid) {
-		return (IPCDIBreakpoint) cdiBreakIDMap.get(new Integer(bpid));
+		synchronized (cdiBreakIDMap) {
+			return (IPCDIBreakpoint) cdiBreakIDMap.get(new Integer(bpid));
+		}
 	}
-	
-	
 	
 	public void setConditionBreakpoint(String job_id, IPBreakpoint bpt) throws CoreException {
 		deleteBreakpoint(job_id, bpt);
