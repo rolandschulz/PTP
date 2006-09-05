@@ -88,6 +88,9 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 	protected boolean checkReturn() throws PCDIException {
 		Object result = getReturn();
 		if (result == null) {
+			if (check_tasks != null && !check_tasks.isEmpty()) {
+				throw new PCDIException("Incomplete - Command " + getCommandName());
+			}
 			throw new PCDIException("Time out - Command " + getCommandName(), IPCDIErrorEvent.DBG_NORMAL);
 		}
 		if (result.equals(RETURN_NOTHING)) {
