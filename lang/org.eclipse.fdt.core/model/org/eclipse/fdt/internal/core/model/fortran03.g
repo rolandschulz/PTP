@@ -67,12 +67,12 @@ declaration_construct
 	|	parameter_stmt
 	|	format_stmt
 	|	implicit_stmt           // implicit_stmt must precede all occurances of the below
-//	|   derived_type_def
-//	|	enum_def
-//	|	interface_block
-//	|	procedure_declaration_stmt
+	|	derived_type_def
+	|	enum_def
+	|	interface_block
+	|	procedure_declaration_stmt
 //	|	specification_stmt
-//	|	type_declaration_stmt
+	|	type_declaration_stmt
 //	|	stmt_function_stmt
 	;
 
@@ -86,7 +86,7 @@ execution_part
 // TODO putback
 execution_part_construct
 	:	executable_construct
-//	|	format_stmt
+	|	format_stmt
 	|	entry_stmt
 //	|	data_stmt
 	;
@@ -104,36 +104,34 @@ internal_subprogram
         ;
 
 // R212
-// TODO putback
 specification_stmt
-	:	//access_stmt
-//	|	allocatable_stmt
-//	|	asynchronous_stmt
-//	|	bind_stmt
-//	|	common_stmt
-//	|	data_stmt
-//	|	dimension_stmt
-//	|	equivalence_stmt
-//	|	external_stmt
-intent_stmt
-//	|	intent_stmt
-//	|	intrinsic_stmt
-//	|	namelist_stmt
-//	|	optional_stmt
-//	|	pointer_stmt
-//	|	protected_stmt
-//	|	save_stmt
-//	|	target_stmt
-//	|	volatile_stmt
-//	|	value_stmt
+	:	access_stmt
+	|	allocatable_stmt
+	|	asynchronous_stmt
+	|	bind_stmt
+	|	common_stmt
+	|	data_stmt
+	|	dimension_stmt
+	|	equivalence_stmt
+	|	external_stmt
+	|	intent_stmt
+	|	intrinsic_stmt
+	|	namelist_stmt
+	|	optional_stmt
+	|	pointer_stmt
+	|	protected_stmt
+	|	save_stmt
+	|	target_stmt
+	|	volatile_stmt
+	|	value_stmt
 	;
 
 // R213
 // TODO putback
 executable_construct
 	:	action_stmt
-//	|	associate_construct
-//	|	case_construct
+	|	associate_construct
+	|	case_construct
 //	|	do_construct
 //	|	forall_construct
 //	|	if_construct
@@ -944,10 +942,9 @@ access_stmt
 
 // R519
 // T_IDENT inlined for use_name
-// TODO putback
+// generic_spec can be T_IDENT so T_IDENT deleted
 access_id
-	:	T_IDENT
-//	|	generic_spec
+	:	generic_spec
 	;
 
 access_id_list
@@ -1371,10 +1368,6 @@ parent_string
 //	|	(T_IDENT T_UNDERSCORE) => T_IDENT T_UNDERSCORE T_CHAR_CONSTANT
 //	|	T_DIGIT_STRING T_UNDERSCORE T_CHAR_CONSTANT
 //	;
-
-scalar_variable_name
-    :    name
-    ;
 
 // R611
 // ERR_CHK 611 scalar_int_expr replaced by expr
@@ -1831,10 +1824,9 @@ bounds_remapping_list
     ;
 
 // R739
-// TODO putback
+// expr can be designator (via primary) so variable deleted
 data_target
-	:	variable
-//	|	expr
+	:	expr
 	;
 
 // R740
@@ -1852,11 +1844,10 @@ proc_component_ref
 
 // R742
 // T_IDENT inlined for procedure_name
-// TODO putback
+// expr can be designator can be T_IDENT so T_IDENT deleted
+// proc_component_ref is variable T_PERCENT T_IDENT can be designator so deleted
 proc_target
 	:	expr
-//	|	T_IDENT
-//	|	proc_component_ref
 	;
 
 // R743
@@ -2126,10 +2117,9 @@ association
 	;
 
 // R819
-// TODO putback
+// expr can be designator (via primary) so variable deleted
 selector
 	:	expr
-//	|	variable
 	;
 
 // R820
@@ -2984,11 +2974,10 @@ rename_list
 
 // R1112
 // T_IDENT inlined for only_use_name
-// TODO putback
+// generic_spec can be T_IDENT so T_IDENT deleted
 only
 	:	generic_spec
-//	|	T_IDENT
-//	|	rename
+	|	rename
 	;
 
 only_list
@@ -3155,10 +3144,10 @@ call_stmt
 
 // R1219
 // T_IDENT inlined for procedure_name and binding_name
+// proc_component_ref is variable T_PERCENT T_IDENT can be designator so deleted
 // TODO putback
 procedure_designator
 	:	T_IDENT
-//	|	proc_component_ref
 //	|	data_ref T_PERCENT T_IDENT
 	;
 
@@ -3173,13 +3162,12 @@ actual_arg_spec_list
 
 // R1221
 // T_IDENT inlined for procedure_name
-// TODO putback
+// expr can be designator (via primary) so variable deleted
+// designator can be T_IDENT so T_IDENT deleted
+// proc_component_ref is variable T_PERCENT T_IDENT can be designator so deleted
 actual_arg
 	:	expr
-//	|	variable
-//	|	T_IDENT
-//	|	proc_component_ref
-//	|	alt_return_spec
+	|	alt_return_spec
 	;
 
 // R1222
