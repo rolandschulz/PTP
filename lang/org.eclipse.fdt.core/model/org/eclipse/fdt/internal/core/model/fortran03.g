@@ -459,34 +459,28 @@ derived_type_def
 	;
 
 // R430
+// generic_name_list substituted for type_param_name_list
 derived_type_stmt
     :    T_TYPE ( ( T_COMMA type_attr_spec_list )? T_COLON_COLON )? T_IDENT
-         ( T_LPAREN type_param_name_list T_RPAREN )?
+         ( T_LPAREN generic_name_list T_RPAREN )?
     ;
 
 type_attr_spec_list
     :    type_attr_spec ( T_COMMA type_attr_spec )*
     ;
 
-type_attr_name
-    :    T_IDENT
-    ;
-
-type_attr_name_list
-    :    type_attr_name ( T_COMMA type_attr_name )*
+generic_name_list
+    :    T_IDENT ( T_COMMA T_IDENT )*
     ;
 
 // R431
+// T_IDENT inlined for parent_type_name
 type_attr_spec
 	:	access_spec
-	|	T_EXTENDS T_LPAREN parent_type_name T_RPAREN
+	|	T_EXTENDS T_LPAREN T_IDENT T_RPAREN
 	|	T_ABSTRACT
 	|	T_BIND_LPAREN_C T_RPAREN
 	;
-
-parent_type_name
-    : name
-    ;
 
 // R432
 private_or_sequence
@@ -513,20 +507,13 @@ type_param_def_stmt
 
 // R436
 // ERR_CHK 436 scalar_int_initialization_expr replaced by expr
+// T_IDENT inlined for type_param_name
 type_param_decl
-    :    type_param_name ( T_EQUALS expr )?
+    :    T_IDENT ( T_EQUALS expr )?
     ;
 
 type_param_decl_list
     :    type_param_decl ( T_COMMA type_param_decl )*
-    ;
-
-type_param_name
-    :    T_IDENT
-    ;
-
-type_param_name_list
-    : type_param_name ( T_COMMA type_param_name )?
     ;
 
 // R437
@@ -565,17 +552,14 @@ component_attr_spec_list
     ;
 
 // R442
+// T_IDENT inlined as component_name
 component_decl
-    :    component_name ( T_LPAREN component_array_spec T_RPAREN )?
-                        ( T_ASTERISK char_length )? ( component_initialization )?
+    :    T_IDENT ( T_LPAREN component_array_spec T_RPAREN )?
+                 ( T_ASTERISK char_length )? ( component_initialization )?
     ;
 
 component_decl_list
     :   component_decl ( T_COMMA component_decl )*
-    ;
-
-component_name
-    :    name
     ;
 
 // R443
@@ -604,9 +588,10 @@ proc_component_def_stmt
 	;
 
 // R446
+// T_IDENT inlined for arg_name
 proc_component_attr_spec
     :    T_POINTER
-    |    T_PASS ( T_LPAREN arg_name T_RPAREN )?
+    |    T_PASS ( T_LPAREN T_IDENT T_RPAREN )?
     |    T_NOPASS
     |    access_spec
     ;
@@ -638,20 +623,23 @@ proc_binding_stmt
 	;
 
 // R451
+// T_IDENT inlined for interface_name, binding_name and procedure_name
 specific_binding
-    : T_PROCEDURE ( T_LPAREN interface_name T_RPAREN )?
+    : T_PROCEDURE ( T_LPAREN T_IDENT T_RPAREN )?
       ( ( T_COMMA binding_attr_list )? T_COLON_COLON )?
-      binding_name ( T_EQ_GT procedure_name )?
+      T_IDENT ( T_EQ_GT T_IDENT )?
     ;
 
 // R452
+// generic_name_list substituted for binding_name_list
 generic_binding
-    :    T_GENERIC ( T_COMMA access_spec )? T_COLON_COLON generic_spec T_EQ_GT binding_name_list
+    :    T_GENERIC ( T_COMMA access_spec )? T_COLON_COLON generic_spec T_EQ_GT generic_name_list
     ;
 
 // R453
+// T_IDENT inlined for arg_name
 binding_attr
-    : T_PASS ( T_LPAREN arg_name T_RPAREN )?
+    : T_PASS ( T_LPAREN T_IDENT T_RPAREN )?
     | T_NOPASS
     | T_NON_OVERRIDABLE
     | T_DEFERRED
@@ -662,20 +650,11 @@ binding_attr_list
     :    binding_attr ( T_COMMA binding_attr )*
     ;
 
-arg_name
-    : name
-    ;
-
 // R454
+// generic_name_list substituted for final_subroutine_name_list
 final_binding
-	:	T_FINAL
-		( T_COLON_COLON )?
-		final_subroutine_name_list
+	:	T_FINAL ( T_COLON_COLON )? generic_name_list
 	;
-
-final_subroutine_name_list
-    :    name ( T_COMMA name )*
-    ;
 
 // R455
 // TODO putback
@@ -865,20 +844,11 @@ entity_decl
     : T_IDENT ( T_LPAREN array_spec T_RPAREN )? ( T_ASTERISK char_length )? ( initialization )?
     ;
 
-// TODO putback
 entity_decl_list
-    :    entity_decl
-         ( T_COMMA entity_decl )*
+    :    entity_decl ( T_COMMA entity_decl )*
     ;
 
-// R505
-object_name
-	:	T_IDENT
-	;
-
-object_name_list
-    :    object_name ( T_COMMA object_name )*
-    ;
+// R505 object_name inlined as T_IDENT
 
 // R506
 // ERR_CHK 506 initialization_expr replaced by expr
@@ -973,9 +943,10 @@ access_stmt
     ;
 
 // R519
+// T_IDENT inlined for use_name
 // TODO putback
 access_id
-	:	use_name
+	:	T_IDENT
 //	|	generic_spec
 	;
 
@@ -984,16 +955,18 @@ access_id_list
     ;
 
 // R520
+// T_IDENT inlined for object_name
 allocatable_stmt
-    : T_ALLOCATABLE ( T_COLON_COLON )? object_name ( T_LPAREN deferred_shape_spec_list T_RPAREN )?
-         ( T_COMMA object_name ( T_LPAREN deferred_shape_spec_list T_RPAREN )? )*
+    : T_ALLOCATABLE ( T_COLON_COLON )? T_IDENT ( T_LPAREN deferred_shape_spec_list T_RPAREN )?
+         ( T_COMMA T_IDENT ( T_LPAREN deferred_shape_spec_list T_RPAREN )? )*
     ;
 
 // R521
+// generic_name_list substituted for object_name_list
 asynchronous_stmt
 	:	T_ASYNCHRONOUS
 		( T_COLON_COLON )?
-		object_name_list
+		generic_name_list
 	;
 
 // R522
@@ -1003,23 +976,12 @@ bind_stmt
 		bind_entity_list
 	;
 
-entity_name
-    :    name
-    ;
-
-entity_name_list
-    :    entity_name ( T_COMMA entity_name )*
-    ;
-
 // R523
+// T_IDENT inlined for entity_name and common_block_name
 bind_entity
-	:	entity_name
-	|	T_SLASH common_block_name T_SLASH
+	:	T_IDENT
+	|	T_SLASH T_IDENT T_SLASH
 	;
-
-common_block_name
-    :    name
-    ;
 
 bind_entity_list
     :    bind_entity ( T_COMMA bind_entity )*
@@ -1098,10 +1060,6 @@ scalar_int_constant_subobject
     :    int_constant
     ;
 
-scalar_int_constant_name
-    :    name
-    ;
-
 // R532
 // TODO putback
 data_stmt_constant
@@ -1128,27 +1086,22 @@ constant_subobject
 	;
 
 // R535
+// T_IDENT inlined for array_name
 dimension_stmt
-    :    T_DIMENSION ( T_COLON_COLON )? array_name T_LPAREN array_spec T_RPAREN
-             ( T_COMMA array_name T_LPAREN array_spec T_RPAREN )*
-    ;
-
-array_name
-    :    name
+    :    T_DIMENSION ( T_COLON_COLON )? T_IDENT T_LPAREN array_spec T_RPAREN
+             ( T_COMMA T_IDENT T_LPAREN array_spec T_RPAREN )*
     ;
 
 // R536
+// generic_name_list substituted for dummy_arg_name_list
 intent_stmt
-	:	T_INTENT T_LPAREN intent_spec T_RPAREN ( T_COLON_COLON )? dummy_arg_name_list
+	:	T_INTENT T_LPAREN intent_spec T_RPAREN ( T_COLON_COLON )? generic_name_list
 	;
 
-dummy_arg_name_list
-    : dummy_arg_name ( T_COMMA dummy_arg_name )*
-    ;
-
 // R537
+// generic_name_list substituted for dummy_arg_name_list
 optional_stmt
-	:	T_OPTIONAL ( T_COLON_COLON )? dummy_arg_name_list
+	:	T_OPTIONAL ( T_COLON_COLON )? generic_name_list
 	;
 
 // R538
@@ -1183,10 +1136,9 @@ pointer_decl
     ;
 
 // R542
+// generic_name_list substituted for entity_name_list
 protected_stmt
-	:	T_PROTECTED
-		( T_COLON_COLON )?
-		entity_name_list
+	:	T_PROTECTED ( T_COLON_COLON )? generic_name_list
 	;
 
 // R543
@@ -1205,25 +1157,25 @@ saved_entity_list
     :    saved_entity ( T_COMMA saved_entity )*
     ;
 
-// R545
-proc_pointer_name
-	:	name
-	;
+// R545 proc_pointer_name was name inlined as T_IDENT
 
 // R546
+// T_IDENT inlined for object_name
 target_stmt
-    : T_TARGET ( T_COLON_COLON )? object_name ( T_LPAREN array_spec T_RPAREN )?
-             ( T_COMMA object_name ( T_LPAREN array_spec T_RPAREN )? )*
+    : T_TARGET ( T_COLON_COLON )? T_IDENT ( T_LPAREN array_spec T_RPAREN )?
+             ( T_COMMA T_IDENT ( T_LPAREN array_spec T_RPAREN )? )*
     ;
 
 // R547
+// generic_name_list substituted for dummy_arg_name_list
 value_stmt
-	:	T_VALUE ( T_COLON_COLON )? dummy_arg_name_list
+	:	T_VALUE ( T_COLON_COLON )? generic_name_list
 	;
 
 // R548
+// generic_name_list substituted for object_name_list
 volatile_stmt
-	:	T_VOLATILE ( T_COLON_COLON )? object_name_list
+	:	T_VOLATILE ( T_COLON_COLON )? generic_name_list
 	;
 
 // R549
@@ -1251,22 +1203,17 @@ letter_spec_list
     ;
 
 // R552
+// T_IDENT inlined for namelist_group_name
 namelist_stmt
-    : T_NAMELIST T_SLASH namelist_group_name T_SLASH namelist_group_object_list
-         ( ( T_COMMA )? T_SLASH namelist_group_name T_SLASH namelist_group_object_list )*
+    : T_NAMELIST T_SLASH T_IDENT T_SLASH namelist_group_object_list
+         ( ( T_COMMA )? T_SLASH T_IDENT T_SLASH namelist_group_object_list )*
     ;
 
-// R553
-namelist_group_object
-	:	variable_name
-	;
+// R553 namelist_group_object was variable_name inlined as T_IDENT
 
+// T_IDENT inlined for namelist_group_object
 namelist_group_object_list
-    :    namelist_group_object ( T_COMMA namelist_group_object )*
-    ;
-
-namelist_group_name
-    :    name
+    :    T_IDENT ( T_COMMA T_IDENT )*
     ;
 
 // R554
@@ -1298,15 +1245,17 @@ equivalence_object_list
     ;
 
 // R557
+// T_IDENT inlined for common_block_name
 common_stmt
-    : T_COMMON ( T_SLASH ( common_block_name )? T_SLASH )? common_block_object_list
-         ( ( T_COMMA )? T_SLASH ( common_block_name )? T_SLASH common_block_object_list )*
+    : T_COMMON ( T_SLASH ( T_IDENT )? T_SLASH )? common_block_object_list
+         ( ( T_COMMA )? T_SLASH ( T_IDENT )? T_SLASH common_block_object_list )*
     ;
 
 // R558
+// T_IDENT inlined for variable_name and proc_pointer_name
+// T_IDENT covered by first alt so second deleted
 common_block_object
-    : variable_name ( T_LPAREN explicit_shape_spec_list T_RPAREN )?
-//    | proc_pointer_name
+    : T_IDENT ( T_LPAREN explicit_shape_spec_list T_RPAREN )?
     ;
 
 common_block_object_list
@@ -1322,10 +1271,7 @@ variable
 	:	designator
 	;
 
-// R602
-variable_name
-	:	name
-	;
+// R602 variable_name was name inlined as T_IDENT
 
 // R603
 //  :   object-name             // T_IDENT is a data-ref
@@ -1468,41 +1414,29 @@ options {k=1;}
 	|	{ /* empty */ }
     ;
 
-// R614
-structure_component
-	:	data_ref
-	;
-
-scalar_structure_component
-    :   data_ref
-    ;
+// R614 structure_component inlined as data_ref
 
 // R615
+// T_IDENT inlined for type_param_name
 type_param_inquiry
 	:	designator
 		T_PERCENT
-		type_param_name
+		T_IDENT
 	;
 
-// R616
-array_element
-	:	data_ref
-	;
+// R616 array_element inlined as data_ref
 
 // R617 array_section inlined in R603
 
-// R618
+// R618 subscript inlined as expr
 // ERR_CHK 618 scalar_int_expr replaced by expr
-subscript
-	:	expr
-	;
 
 // R619
-// expr inlined for subscript and vector_subscript (thus deleted option 3)
+// expr inlined for subscript, vector_subscript, and stride (thus deleted option 3)
 // refactored first optional expr from subscript_triplet
 section_subscript
-	:	expr ( T_COLON ( expr )? ( T_COLON stride )? )?
-	|	T_COLON ( expr )? ( T_COLON stride )?
+	:	expr ( T_COLON ( expr )? ( T_COLON expr )? )?
+	|	T_COLON ( expr )? ( T_COLON expr )?
 	;
 
 section_subscript_list
@@ -1510,19 +1444,19 @@ section_subscript_list
     ;
 
 // R620 subscript_triplet inlined in R619
-// expr inlined for subscript
+// inlined expr as subscript and stride in subscript_triplet
 
-// R621
+// R621 stride inlined as expr
 // ERR_CHK 621 scalar_int_expr replaced by expr
-stride
-	:	expr
-	;
 
 // R622
 // ERR_CHK 622 int_expr replaced by expr
 vector_subscript
 	:	expr
 	;
+
+// R622 inlined vector_subscript as expr in R619
+// ERR_CHK 622 int_expr replaced by expr
 
 // R623
 // TODO putback
@@ -1570,10 +1504,13 @@ allocation_list
     ;
 
 // R629
+// T_IDENT inlined for variable_name
+// data_ref inlined for structure_component
+// data_ref can be a T_IDENT so T_IDENT deleted
 // TODO putback
 allocate_object
-	:	variable_name
-//	|	structure_component
+	:	T_IDENT
+//	|	data_ref
 	;
 
 allocate_object_list
@@ -1608,11 +1545,11 @@ nullify_stmt
 	;
 
 // R634
-// TODO putback
+// T_IDENT inlined for variable_name and proc_pointer_name
+// data_ref inlined for structure_component
+// data_ref can be a T_IDENT so T_IDENT deleted
 pointer_object
-	:	variable_name
-//	|	structure_component
-//	|	proc_pointer_name
+	:	data_ref
 	;
 
 pointer_object_list
@@ -1647,6 +1584,10 @@ Section 7:
 
 // R701
 // constant replaced by literal_constant as T_IDENT covered by designator
+// T_IDENT inlined for type_param_name
+// data_ref in designator can be a T_IDENT so T_IDENT deleted
+// TODO putback
+// TODO what about char_literal_constant in designator
 primary
 	:	literal_constant
 	|	designator
@@ -1654,7 +1595,6 @@ primary
 //	|	structure_constructor
 //	|	function_reference
 //	|	type_param_inquiry
-//	|	type_param_name
 	|	T_LPAREN expr T_RPAREN
 	;
 
@@ -1859,15 +1799,12 @@ pointer_assignment_stmt
     ;
 
 // R736
+// T_IDENT inlined for variable_name and data_pointer_component_name
 // TODO putback
 data_pointer_object
 	:	T_IDENT
-//	|	variable T_PERCENT data_pointer_component_name
+//	|	variable T_PERCENT T_IDENT
 	;
-
-data_pointer_component_name
-    :    name
-    ;
 
 // R737
 // ERR_CHK 737 lower_bound_expr replaced by expr
@@ -1901,25 +1838,24 @@ data_target
 	;
 
 // R740
+// T_IDENT inlined for proc_pointer_name
 proc_pointer_object
-	:	proc_pointer_name
+	:	T_IDENT
 	|	proc_component_ref
 	;
 
 // R741
+// T_IDENT inlined for procedure_component_name
 proc_component_ref
-	:	variable T_PERCENT procedure_component_name
+	:	variable T_PERCENT T_IDENT
 	;
 
-procedure_component_name
-    :    name
-    ;
-
 // R742
+// T_IDENT inlined for procedure_name
 // TODO putback
 proc_target
 	:	expr
-//	|	procedure_name
+//	|	T_IDENT
 //	|	proc_component_ref
 	;
 
@@ -2009,12 +1945,10 @@ forall_header
     ;
 
 // R755
+// T_IDENT inlined for index_name
+// expr inlined for subscript and stride
 forall_triplet_spec
-    : index_name T_EQUALS subscript T_COLON subscript ( T_COLON stride )?
-    ;
-
-index_name
-    :    name
+    : T_IDENT T_EQUALS expr T_COLON expr ( T_COLON expr )?
     ;
 
 forall_triplet_spec_list
@@ -2186,13 +2120,10 @@ association_list
     ;
 
 // R818
+// T_IDENT inlined for associate_name
 association
-	:	associate_name T_EQ_GT selector
+	:	T_IDENT T_EQ_GT selector
 	;
-
-associate_name
-    :    name
-    ;
 
 // R819
 // TODO putback
@@ -2214,9 +2145,10 @@ select_type_construct
     ;
 
 // R822
+// T_IDENT inlined for select_construct_name and associate_name
 select_type_stmt
-    : ( select_construct_name T_COLON )? select_type
-         T_LPAREN ( associate_name T_EQ_GT )? selector T_RPAREN
+    : ( T_IDENT T_COLON )? select_type
+         T_LPAREN ( T_IDENT T_EQ_GT )? selector T_RPAREN
     ;
 
 select_type
@@ -2225,32 +2157,30 @@ options {k=2;}
     | T_SELECTTYPE
     ;
 
-select_construct_name
-    :    name
-    ;
-
 // R823
+// T_IDENT inlined for select_construct_name
 type_guard_stmt
 	:	T_TYPE_IS T_LPAREN
 		type_spec
 		T_RPAREN
-		( select_construct_name )?
+		( T_IDENT )?
 	|	T_CLASS_IS T_LPAREN
 		type_spec
 		T_RPAREN
-		( select_construct_name )?
+		( T_IDENT )?
 	|	T_CLASS	T_DEFAULT
-		( select_construct_name )?
+		( T_IDENT )?
 	;
 
 // R824
+// T_IDENT inlined for select_construct_name
 // TODO putback see R811 for potential ambiguity
 end_select_type_stmt
 options {k=2;}
 	:	(T_END T_SELECT) => T_END T_SELECT
-//		( select_construct_name )?
+//		( T_IDENT )?
 	| T_ENDSELECT
-//		( select_construct_name )?
+//		( T_IDENT )?
 	;
 
 // R825
@@ -2275,19 +2205,17 @@ do_stmt
 	;
 
 // R828
+// T_IDENT inlined for do_construct_name
 // TODO putback
 label_do_stmt
 : 'DO' 'ENDDO'
-//    :    ( do_construct_name T_COLON )? T_DO label ( loop_control )?
-    ;
-
-do_construct_name
-    :    name
+//    :    ( T_IDENT T_COLON )? T_DO label ( loop_control )?
     ;
 
 // R829
+// T_IDENT inlined for do_construct_name
 nonlabel_do_stmt
-    :    ( do_construct_name T_COLON )? T_DO ( loop_control )?
+    :    ( T_IDENT T_COLON )? T_DO ( loop_control )?
     ;
 
 // R830
@@ -2315,10 +2243,11 @@ end_do
 	;
 
 // R834
+// T_IDENT inlined for do_construct_name
 end_do_stmt
 options {k=2;}
-	: (T_END T_DO) => T_END T_DO ( do_construct_name )?
-	| T_ENDDO ( do_construct_name )?
+	: (T_END T_DO) => T_END T_DO ( T_IDENT )?
+	| T_ENDDO ( T_IDENT )?
 	;
 
 // R835
@@ -2375,13 +2304,15 @@ do_term_shared_stmt
 	;
 
 // R843
+// T_IDENT inlined for do_construct_name
 cycle_stmt
-	:	T_CYCLE ( do_construct_name )?
+	:	T_CYCLE ( T_IDENT )?
 	;
 
 // R844
+// T_IDENT inlined for do_construct_name
 exit_stmt
-	:	T_EXIT ( do_construct_name )?
+	:	T_EXIT ( T_IDENT )?
 	;
 
 // R845
@@ -2554,11 +2485,12 @@ print_stmt
 // ERR_CHK 913a scalar_default_char_expr replaced by expr
 // ERR_CHK 913b scalar_int_expr replaced by expr
 // ERR_CHK 913c scalar_char_initialization_expr replaced by expr
+// T_IDENT inlined for namelist_group_name
 // TODO putback
 io_control_spec
     :    ( T_UNIT_EQUALS )? io_unit
 //    | ( T_FMT_EQUALS )? format
-//    | ( T_NML_EQUALS )? namelist_group_name
+//    | ( T_NML_EQUALS )? T_IDENT
 //    | T_ADVANCE_EQUALS expr // scalar_default_char_expr
 //    | T_ASYNCHRONOUS_EQUALS expr // scalar_char_initialization_expr
 //    | T_BLANK_EQUALS expr // scalar_default_char_expr
@@ -2975,23 +2907,21 @@ main_program
 	;
 
 // R1102
+// T_IDENT inlined for program_name
 program_stmt
 	:	T_PROGRAM
-		program_name
+		T_IDENT
 	;
 
 // R1103
+// T_IDENT inlined for program_name
 end_program_stmt
 options {k=2;}
-	:	(T_END T_PROGRAM) => T_END T_PROGRAM ( program_name )?
-    |	T_ENDPROGRAM ( program_name )?
+	:	(T_END T_PROGRAM) => T_END T_PROGRAM ( T_IDENT )?
+    |	T_ENDPROGRAM ( T_IDENT )?
     |	T_END
 	;
 	
-program_name
-    :    T_IDENT
-    ;
-
 // R1104
 // TODO putback
 // specification_part made non-optional to remove END ambiguity (as can be empty)
@@ -3040,10 +2970,10 @@ module_nature
 	;
 
 // R1111
-// inlined local_defined_operator with  T_DEFINED_OP 
-// inlined use_defined_operator with  T_DEFINED_OP 
+// T_DEFINED_OP inlined for local_defined_operator and use_defined_operator
+// T_IDENT inlined for local_name and use_name
 rename
-	:	local_name T_EQ_GT use_name
+	:	T_IDENT T_EQ_GT T_IDENT
 	|	T_OPERATOR T_LPAREN T_DEFINED_OP T_RPAREN T_EQ_GT
 		T_OPERATOR T_LPAREN T_DEFINED_OP T_RPAREN
 	;
@@ -3052,19 +2982,12 @@ rename_list
     :    rename ( T_COMMA rename )*
     ;
 
-local_name
-    :    name
-    ;
-
-use_name
-    :    name
-    ;
-
 // R1112
+// T_IDENT inlined for only_use_name
 // TODO putback
 only
 	:	generic_spec
-//	|	only_use_name
+//	|	T_IDENT
 //	|	rename
 	;
 
@@ -3072,10 +2995,7 @@ only_list
     :    only ( T_COMMA only )*
     ;
 
-// R1113
-only_use_name
-	:	use_name
-	;
+// R1113 only_use_name was use_name inlined as T_IDENT
 
 // R1114 inlined local_defined_operator in R1111 as T_DEFINED_OP
 
@@ -3143,29 +3063,19 @@ interface_body
 	;
 
 // R1206
+// generic_name_list substituted for procedure_name_list
 procedure_stmt
-	:	( T_MODULE )? T_PROCEDURE procedure_name_list
+	:	( T_MODULE )? T_PROCEDURE generic_name_list
 	;
 
-procedure_name
-    :    name
-    ;
-
-procedure_name_list
-    :    procedure_name ( T_COMMA procedure_name )*
-    ;
-
 // R1207
+// T_IDENT inlined for generic_name
 generic_spec
-	:	generic_name
+	:	T_IDENT
 	|	T_OPERATOR T_LPAREN defined_operator T_RPAREN
 	|	T_ASSIGNMENT T_LPAREN T_EQUALS T_RPAREN
 	|	dtio_generic_spec
 	;
-
-generic_name
-    :   name
-    ;
 
 // R1208
 dtio_generic_spec
@@ -3176,30 +3086,16 @@ dtio_generic_spec
 	;
 
 // R1209
+// generic_name_list substituted for import_name_list
 import_stmt
-    :    T_IMPORT ( ( T_COLON_COLON )? import_name_list )?
-    ;
-
-import_name
-    :    name
-    ;
-
-import_name_list
-    :    import_name ( T_COMMA import_name )*
+    :    T_IMPORT ( ( T_COLON_COLON )? generic_name_list )?
     ;
 
 // R1210
+// generic_name_list substituted for external_name_list
 external_stmt
-	:	T_EXTERNAL ( T_COLON_COLON )? external_name_list
+	:	T_EXTERNAL ( T_COLON_COLON )? generic_name_list
 	;
-
-external_name
-    :    name
-    ;
-
-external_name_list
-    :    external_name ( T_COMMA external_name )*
-    ;
 
 // R1211
 procedure_declaration_stmt
@@ -3208,8 +3104,9 @@ procedure_declaration_stmt
     ;
 
 // R1212
+// T_IDENT inlined for interface_name
 proc_interface
-	:	interface_name
+	:	T_IDENT
 	|	declaration_type_spec
 	;
 
@@ -3224,37 +3121,24 @@ proc_attr_spec
 	;
 
 // R1214
+// T_IDENT inlined for procedure_entity_name
 proc_decl
-    :    procedure_entity_name ( T_EQ_GT null_init )?
-    ;
-
-procedure_entity_name
-    :    name
+    :    T_IDENT ( T_EQ_GT null_init )?
     ;
 
 proc_decl_list
     :    proc_decl ( T_COMMA proc_decl )*
     ;
 
-// R1215
-interface_name
-	:	name
-	;
+// R1215 interface_name was name inlined as T_IDENT
 
 // R1216
+// generic_name_list substituted for intrinsic_procedure_name_list
 intrinsic_stmt
 	:	T_INTRINSIC
 		( T_COLON_COLON )?
-		intrinsic_procedure_name_list
+		generic_name_list
 	;
-
-intrinsic_procedure_name
-    : name
-    ;
-
-intrinsic_procedure_name_list
-    :    intrinsic_procedure_name ( T_COMMA intrinsic_procedure_name )*
-    ;
 
 // R1217
 function_reference
@@ -3270,20 +3154,13 @@ call_stmt
     ;
 
 // R1219
+// T_IDENT inlined for procedure_name and binding_name
 // TODO putback
 procedure_designator
-	:	procedure_name
+	:	T_IDENT
 //	|	proc_component_ref
-//	|	data_ref T_PERCENT binding_name
+//	|	data_ref T_PERCENT T_IDENT
 	;
-
-binding_name
-    :    name
-    ;
-
-binding_name_list
-    :    binding_name ( T_COMMA binding_name )*
-    ;
 
 // R1220
 actual_arg_spec
@@ -3295,11 +3172,12 @@ actual_arg_spec_list
     ;
 
 // R1221
+// T_IDENT inlined for procedure_name
 // TODO putback
 actual_arg
 	:	expr
 //	|	variable
-//	|	procedure_name
+//	|	T_IDENT
 //	|	proc_component_ref
 //	|	alt_return_spec
 	;
@@ -3323,9 +3201,10 @@ function_subprogram_body
 
 // R1224
 // factored out optional prefix from function_stmt
+// generic_name_list substituted for dummy_arg_name_list
 function_stmt_body
 	:	T_FUNCTION T_IDENT
-		T_LPAREN ( dummy_arg_name_list )? T_RPAREN ( suffix )?
+		T_LPAREN ( generic_name_list )? T_RPAREN ( suffix )?
 	;
 
 // R1225
@@ -3333,10 +3212,7 @@ proc_language_binding_spec
 	:	language_binding_spec
 	;
 
-// R1226
-dummy_arg_name
-	:	T_IDENT
-	;
+// R1226 dummy_arg_name was name inlined as T_IDENT
 
 // R1227
 prefix
@@ -3390,8 +3266,9 @@ subroutine_stmt_body
     ;
 
 // R1233
+// T_IDENT inlined for dummy_arg_name
 dummy_arg
-	:	dummy_arg_name
+	:	T_IDENT
 	|	T_ASTERISK
 	;
 
@@ -3431,18 +3308,20 @@ contains_stmt
 
 // R1238
 // ERR_CHK 1239 scalar_expr replaced by expr
+// generic_name_list substituted for dummy_arg_name_list
 stmt_function_stmt
-	:	T_IDENT
-		T_LPAREN
-		( dummy_arg_name_list )?
-		T_RPAREN
-		T_EQUALS
-		expr
+	:	T_IDENT T_LPAREN ( generic_name_list )? T_RPAREN T_EQUALS expr
 	;
 
 /*
  * Lexer rules
  */
+
+// R427 from char-literal-constant
+T_CHAR_CONSTANT
+        : '\'' ( Rep_Char )* '\''
+        | '\"' ( Rep_Char )* '\"'
+        ;
 
 T_DIGIT_STRING
 	:	Digit_String
@@ -3465,12 +3344,6 @@ HEX_CONSTANT
     : ('z'|'Z') '\'' (Digit|'a'..'f'|'A'..'F')+ '\''
     | ('z'|'Z') '\"' (Digit|'a'..'f'|'A'..'F')+ '\"'
     ;
-
-// R427 from char-literal-constant
-T_CHAR_CONSTANT
-        : '\'' ( Rep_Char )* '\''
-        | '\"' ( Rep_Char )* '\"'
-        ;
 
 REAL_CONSTANT
 	:	Significand E_Exponent?
