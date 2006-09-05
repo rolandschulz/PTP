@@ -1322,27 +1322,40 @@ variable
 	:	designator
 	;
 
-part_deref
-	:	T_PERCENT part_ref
-	;
-
 // R602
 variable_name
 	:	name
 	;
 
 // R603
-// TODO putback
-designator
-	:	T_IDENT T_LPAREN section_subscript_list T_RPAREN
-		part_deref ( T_LPAREN substring_range T_RPAREN )?
-	|	T_IDENT part_deref
-//	|	T_IDENT
-	|	char_literal_constant T_LPAREN substring_range T_RPAREN
-//	|	array_element
-//	|	array_section
-//	|	structure_component
+//  :   object-name             // T_IDENT is a data-ref
+//	|	array-element           // R616 is data-ref
+//	|	array-section           // R617 is data-ref [ (substring-range) ] 
+//	|	structure-component     // R614 is data-ref
 //	|	substring
+// TODO check to see if substring is covered, see NOTE 6.3
+designator
+	:	data_ref_opt_rng
+	|	char_literal_constant T_LPAREN substring_range T_RPAREN
+	;
+
+// R612
+data_ref_opt_rng
+	:	part_ref part_deref_chain_opt_rng
+	;
+
+part_deref_chain_opt_rng : part_deref_opt_rng ;
+
+part_deref_opt_rng
+options {k=1;}
+	:	(T_PERCENT) => T_PERCENT part_deref_suffix_opt_rng
+	|	(T_LPAREN)  => T_LPAREN substring_range T_RPAREN
+	|	{ /* empty */ }
+	;
+
+part_deref_suffix_opt_rng
+	:	 T_IDENT part_deref
+	|	 T_IDENT T_LPAREN section_subscript_list T_RPAREN part_deref_opt_rng
 	;
 
 // R604
@@ -1389,11 +1402,12 @@ substring
 // data_ref inlined for scalar_structure_component and array_element
 // data_ref can be a T_IDENT so T_IDENT deleted
 // scalar_constant replaced by char_literal_constant as T_IDENT covered by data_ref and must be character
+// TODO putback
 parent_string
-	:	data_ref
+	:	'data_ref'
 	|	T_CHAR_CONSTANT
-	|	T_IDENT T_UNDERSCORE T_CHAR_CONSTANT
-	|	T_DIGIT_STRING T_UNDERSCORE T_CHAR_CONSTANT
+//	|	T_IDENT T_UNDERSCORE T_CHAR_CONSTANT
+//	|	T_DIGIT_STRING T_UNDERSCORE T_CHAR_CONSTANT
 	;
 
 // R610
@@ -1426,16 +1440,32 @@ substring_range
 
 // R612
 data_ref
-    : part_ref ( T_PERCENT part_ref )*
-    ;
+	:	part_ref part_deref_chain
+	;
+
+part_deref_chain : part_deref ;
+
+part_deref
+options {k=1;}
+	:	(T_PERCENT) => T_PERCENT part_deref_suffix
+	|	{ /* empty */ }
+	;
+
+part_deref_suffix
+	:	 T_IDENT part_deref
+	|	 T_IDENT T_LPAREN section_subscript_list T_RPAREN part_deref
+	;
 
 // R613
 // T_IDENT inlined for part_name
-// TODO make sure this predicate is OK
 part_ref
-options {k=2;}
-    : T_IDENT
-    | (T_IDENT T_LPAREN) => T_IDENT T_LPAREN section_subscript_list T_RPAREN
+	:	T_IDENT part_ref_suffix
+	;
+
+part_ref_suffix
+options {k=1;}
+	:	(T_LPAREN) => T_LPAREN section_subscript_list T_RPAREN
+	|	{ /* empty */ }
     ;
 
 // R614
@@ -1459,10 +1489,7 @@ array_element
 	:	data_ref
 	;
 
-// R617
-array_section
-    :    data_ref ( T_LPAREN substring_range T_RPAREN )?
-    ;
+// R617 array_section inlined in R603
 
 // R618
 // ERR_CHK 618 scalar_int_expr replaced by expr
