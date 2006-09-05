@@ -264,7 +264,7 @@ MIGetDetailsType(MICommand *cmd) {
 }
 
 void
-MIGetVarUpdateParseValue(MIValue* tuple, List* aList)
+MIGetVarUpdateParseValue(MIValue* tuple, List* varchanges)
 {
 	MIResult * result;
 	char * str;
@@ -274,17 +274,24 @@ MIGetVarUpdateParseValue(MIValue* tuple, List* aList)
 	List * results = tuple->results;
 	
 	if (results != NULL) {
-		for (SetList(results); (result = (MIResult *)GetListElement(results)) != NULL; ) {
+		for (SetList(results); (result = (MIResult *)GetListElement(results)) != NULL;) {
 			var = result->variable;
 			value = result->value;
 
-			if (value != NULL && value->type == MIValueTypeConst) {
+			//this code is for mac
+			if (value->type == MIValueTypeTuple) {
+				MIGetVarUpdateParseValue(value, varchanges);
+				continue;
+			}
+			
+			if (value->type == MIValueTypeConst) {
 				str = value->cstring;
 			}
+			
 			if (strcmp(var, "name") == 0) {
 				varchange = MIVarChangeNew();
 				varchange->name = strdup(str);
-				AddToList(aList, (void *)varchange);
+				AddToList(varchanges, (void *)varchange);
 			} else if (strcmp(var, "in_scope") == 0) {
 				if (varchange != NULL) {
 					varchange->in_scope = (strcmp(str, "true")==0)?1:0;
