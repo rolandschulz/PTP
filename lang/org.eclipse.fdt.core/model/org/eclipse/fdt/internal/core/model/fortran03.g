@@ -29,22 +29,21 @@ program
 	;
 
 // R202
+// backtracking needed to resolve prefix (e.g., REAL) ambiguity with main_program (REAL)
 program_unit
+options {backtrack=true;}
 	:	main_program
-//	|	external_subprogram
-//	|	module
-//	|	block_data
+	|	external_subprogram
+	|	module
+	|	block_data
 	;
 
 // R203
-// modified to factor out common optional prefix
+// modified to factor optional prefix
 external_subprogram
-        :       function_or_subroutine_subprogram
-        ;
-
-function_or_subroutine_subprogram
-        :       (prefix)? (function_subprogram_body | subroutine_subprogram_body)
-        ;
+	:	(prefix)? function_subprogram
+	|	subroutine_subprogram
+	;
 
 // R204
 // ERR_CHK 204 see ERR_CHK 204, implicit_part? removed (was after import_stmt*)
@@ -71,7 +70,7 @@ declaration_construct
 	|	enum_def
 	|	interface_block
 	|	procedure_declaration_stmt
-//	|	specification_stmt
+	|	specification_stmt
 	|	type_declaration_stmt
 //	|	stmt_function_stmt
 	;
@@ -91,26 +90,29 @@ execution_part_construct
 //	|	data_stmt
 	;
 
-// R210
+// R210 T_CONTAINS inlined for contains_stmt
 internal_subprogram_part
-	:	contains_stmt
+	:	T_CONTAINS
 		internal_subprogram
 		( internal_subprogram )*
 	;
 
 // R211
+// modified to factor optional prefix
 internal_subprogram
-        :       function_or_subroutine_subprogram
-        ;
+	:	(prefix)? function_subprogram
+	|	subroutine_subprogram
+	;
 
 // R212
+// TODO putback
 specification_stmt
 	:	access_stmt
 	|	allocatable_stmt
 	|	asynchronous_stmt
-	|	bind_stmt
+//	|	bind_stmt
 	|	common_stmt
-	|	data_stmt
+//	|	data_stmt
 	|	dimension_stmt
 	|	equivalence_stmt
 	|	external_stmt
@@ -140,40 +142,40 @@ executable_construct
 	;
 
 // R214
+// T_CONTINUE inlined for continue_stmt
 // TODO putback
 action_stmt
-	:	//allocate_stmt
-assignment_stmt
-//	|	assignment_stmt
+	:	allocate_stmt
+	|	assignment_stmt
 //	|	backspace_stmt
-//	|	call_stmt
-//	|	close_stmt
-//	|	continue_stmt
-//	|	cycle_stmt
-//	|	deallocate_stmt
+	|	call_stmt
+	|	close_stmt
+	|	T_CONTINUE
+	|	cycle_stmt
+	|	deallocate_stmt
 //	|	endfile_stmt
 //	|   end_func_prog_or_sub_stmt // normal end_function_stmt... removed
 //	|	end_function_stmt
 //	|	end_program_stmt
 //	|	end_subroutine_stmt
-//	|	exit_stmt
+	|	exit_stmt
 //	|	flush_stmt
-//	|	forall_stmt
-//	|	goto_stmt
+	|	forall_stmt
+	|	goto_stmt
 //	|	if_stmt
-//	|	nullify_stmt
+	|	nullify_stmt
 //	|	open_stmt
 //	|	pointer_assignment_stmt
 //	|	print_stmt
 //	|	read_stmt
 //	|	return_stmt
 //	|	rewind_stmt
-//	|	stop_stmt
-//	|	wait_stmt
-//	|	where_stmt
+	|	stop_stmt
+	|	wait_stmt
+	|	where_stmt
 //	|	write_stmt
 //	|	arithmetic_if_stmt
-//	|	computed_goto_stmt
+	|	computed_goto_stmt
 	;
 
 //end_func_prog_or_sub_stmt
@@ -408,10 +410,9 @@ char_selector
     ;
 
 // R425
-// TODO putback
 length_selector
 	:	T_LPAREN
-//		(T_LEN_EQUALS)?
+		(T_LEN_EQUALS)?
 		type_param_value
 		T_RPAREN
 	|	T_ASTERISK
@@ -604,8 +605,9 @@ private_components_stmt
 	;
 
 // R448
+// T_CONTAINS inlined for contains_stmt
 type_bound_procedure_part
-	:	contains_stmt ( binding_private_stmt )? proc_binding_stmt ( proc_binding_stmt )*
+	:	T_CONTAINS ( binding_private_stmt )? proc_binding_stmt ( proc_binding_stmt )*
 	;
 
 // R449
@@ -1344,7 +1346,7 @@ substring
 // T_IDENT inlined for scalar_variable_name
 // data_ref inlined for scalar_structure_component and array_element
 // data_ref can be a T_IDENT so T_IDENT deleted
-// scalar_constant replaced by char_literal_constant as T_IDENT covered by data_ref and must be character
+// scalar_constant replaced by char_literal_constant as T_IDENT can be data_ref and must be character
 // TODO putback
 parent_string
 	:	'data_ref'
@@ -1357,7 +1359,7 @@ parent_string
 // C608 parent_string shall be of type character
 // T_IDENT inlined for scalar_variable_name
 // data_ref inlined for scalar_structure_component and array_element
-// scalar_constant replaced by char_literal_constant as T_IDENT covered by data_ref
+// scalar_constant replaced by char_literal_constant as T_IDENT can be data_ref
 // REMOVED because produces java error in parser (bug in code generation)
 //parent_string
 //options {k=2;}
@@ -1409,13 +1411,8 @@ options {k=1;}
 
 // R614 structure_component inlined as data_ref
 
-// R615
+// R615 type_param_inquiry inlined in R701 then deleted as can be designator
 // T_IDENT inlined for type_param_name
-type_param_inquiry
-	:	designator
-		T_PERCENT
-		T_IDENT
-	;
 
 // R616 array_element inlined as data_ref
 
@@ -1576,9 +1573,10 @@ Section 7:
  */
 
 // R701
-// constant replaced by literal_constant as T_IDENT covered by designator
+// constant replaced by literal_constant as T_IDENT can be designator
 // T_IDENT inlined for type_param_name
 // data_ref in designator can be a T_IDENT so T_IDENT deleted
+// type_param_inquiry is designator T_PERCENT T_IDENT can be designator so deleted
 // TODO putback
 // TODO what about char_literal_constant in designator
 primary
@@ -1587,7 +1585,6 @@ primary
 	|	array_constructor
 //	|	structure_constructor
 //	|	function_reference
-//	|	type_param_inquiry
 	|	T_LPAREN expr T_RPAREN
 	;
 
@@ -1784,19 +1781,25 @@ assignment_stmt
 	;
 
 // R735
+// data_pointer_object must be (T_IDENT | variable T_PERCENT T_IDENT)
 // TODO putback
 pointer_assignment_stmt
-    :    data_pointer_object ( T_LPAREN bounds_spec_list T_RPAREN )? T_EQ_GT data_target
+    :    T_IDENT ( T_LPAREN bounds_spec_list T_RPAREN )? T_EQ_GT data_target
+//    :    data_pointer_object ( T_LPAREN bounds_spec_list T_RPAREN )? T_EQ_GT data_target
 //    | data_pointer_object T_LPAREN bounds_remapping_list T_RPAREN T_EQ_GT data_target
 //    | proc_pointer_object T_EQ_GT proc_target
     ;
 
 // R736
 // T_IDENT inlined for variable_name and data_pointer_component_name
-// TODO putback
+// variable (as designator) can end in T_PERCENT T_IDENT so variable used alone
+// then variable can be T_IDENT so T_IDENT deleted
+// ERR_CHK 736 must be (T_IDENT | variable T_PERCENT T_IDENT) (no (substring-range))
+// C722 (R736) A data-pointer-component-name shall be the name of a component of variable that is a data pointer
+// could be inlined in R735
+// see R740 and R741 as they seem to work
 data_pointer_object
-	:	T_IDENT
-//	|	variable T_PERCENT T_IDENT
+	:	variable
 	;
 
 // R737
@@ -2227,9 +2230,10 @@ do_block
 	;
 
 // R833
+// T_CONTINUE inlined for continue_stmt
 end_do
 	:	end_do_stmt
-	|	continue_stmt
+	|	T_CONTINUE
 	;
 
 // R834
@@ -2338,10 +2342,7 @@ arithmetic_if_stmt
 		label
 	;
 
-// R848
-continue_stmt
-	:	T_CONTINUE
-	;
+// R848 continue_stmt inlined as T_CONTINUE
 
 // R849
 stop_stmt
@@ -2366,7 +2367,7 @@ Section 9:
 // TODO putback
 io_unit
 	:	file_unit_number
-//	|	T_ASTERISK
+	|	T_ASTERISK
 //	|	internal_file_variable
 	;
 
@@ -2433,13 +2434,12 @@ close_stmt
 
 // R909
 // ERR_CHK 909 scalar_default_char_expr replaced by expr
-// TODO putback
 close_spec
     : ( T_UNIT_EQUALS )? file_unit_number
-//    | T_IOSTAT_EQUALS scalar_int_variable
-//    | T_IOMSG_EQUALS iomsg_variable
-//    | T_ERR_EQUALS label
-//    | T_STATUS_EQUALS expr
+    | T_IOSTAT_EQUALS scalar_int_variable
+    | T_IOMSG_EQUALS iomsg_variable
+    | T_ERR_EQUALS label
+    | T_STATUS_EQUALS expr
     ;
 
 close_spec_list
@@ -2525,19 +2525,14 @@ input_item_list
 
 // R916
 // TODO putback
-/*
 output_item
 	:	expr
-	|	io_implied_do
+//	|	io_implied_do
 	;
-*/
 
-// TODO putback
-/*
 output_item_list
     :    output_item ( T_COMMA output_item )*
     ;
-*/
 
 // R917
 io_implied_do
@@ -2621,20 +2616,17 @@ options {k=2;}
 
 // R925
 // TODO putback
-/*
 rewind_stmt
-	:	T_REWIND file_unit_number
+	:	T_REWIND //file_unit_number
 	|	T_REWIND T_LPAREN position_spec_list T_RPAREN
 	;
-*/
 
 // R926
-// TODO putback
 position_spec
     : ( T_UNIT_EQUALS )? file_unit_number
-//    | T_IOMSG_EQUALS iomsg_variable
-//    | T_IOSTAT_EQUALS scalar_int_variable
-//    | T_ERR_EQUALS label
+    | T_IOMSG_EQUALS iomsg_variable
+    | T_IOSTAT_EQUALS scalar_int_variable
+    | T_ERR_EQUALS label
     ;
 
 position_spec_list
@@ -2643,20 +2635,17 @@ position_spec_list
 
 // R927
 // TODO putback
-/*
 flush_stmt
-	:	T_FLUSH file_unit_number
+	:	T_FLUSH // file_unit_number
 	|	T_FLUSH T_LPAREN flush_spec_list T_RPAREN
 	;
-*/
 
 // R928
-// TODO putback
 flush_spec
     : ( T_UNIT_EQUALS )? file_unit_number
-//    | T_IOSTAT_EQUALS scalar_int_variable
-//    | T_IOMSG_EQUALS iomsg_variable
-//    | T_ERR_EQUALS label
+    | T_IOSTAT_EQUALS scalar_int_variable
+    | T_IOMSG_EQUALS iomsg_variable
+    | T_ERR_EQUALS label
     ;
 
 flush_spec_list
@@ -2664,10 +2653,9 @@ flush_spec_list
     ;
 
 // R929
-// TODO putback
 inquire_stmt
 	:	T_INQUIRE T_LPAREN inquire_spec_list T_RPAREN
-//	|	T_INQUIRE T_LPAREN T_IOLENGTH_EQUALS scalar_int_variable T_RPAREN output_item_list
+	|	T_INQUIRE T_LPAREN T_IOLENGTH_EQUALS scalar_int_variable T_RPAREN output_item_list
 	;
 
 // R930
@@ -2675,8 +2663,8 @@ inquire_stmt
 // TODO putback
 inquire_spec
     : ( T_UNIT_EQUALS )? file_unit_number
-//    | T_FILE_EQUALS expr
-//    | T_ACCESS_EQUALS scalar_default_char_variable
+    | T_FILE_EQUALS expr
+    | T_ACCESS_EQUALS scalar_default_char_variable
 //    | T_ACTION_EQUALS scalar_default_char_variable
 //    | T_ASYNCHRONOUS_EQUALS scalar_default_char_variable
 //    | T_BLANK_EQUALS scalar_default_char_variable
@@ -2892,7 +2880,7 @@ main_program
 	:	( program_stmt )?
 		specification_part
 		( execution_part )?
-//		( internal_subprogram_part )?
+		( internal_subprogram_part )?
 		end_program_stmt
 	;
 
@@ -2913,12 +2901,11 @@ options {k=2;}
 	;
 	
 // R1104
-// TODO putback
 // specification_part made non-optional to remove END ambiguity (as can be empty)
 module
 	:	module_stmt
 		specification_part
-//		( module_subprogram_part )?
+		( module_subprogram_part )?
 		end_module_stmt
 	;
 
@@ -2935,17 +2922,19 @@ options {k=2;}
         |       T_END
         ;
 
-// R1107
+// R1107 T_CONTAINS inlined for contains_stmt
 module_subprogram_part
-	:	contains_stmt
+	:	T_CONTAINS
 		module_subprogram
 		( module_subprogram )*
 	;
 
 // R1108
+// modified to factor optional prefix
 module_subprogram
-        :       function_or_subroutine_subprogram
-        ;
+	:	(prefix)? function_subprogram
+	|	subroutine_subprogram
+	;
 
 // R1109
 use_stmt
@@ -2991,9 +2980,10 @@ only_list
 // R1115 inlined use_defined_operator in R1111 as T_DEFINED_OP
 
 // R1116
+// specification_part made non-optional to remove END ambiguity (as can be empty)
 block_data
 	:	block_data_stmt
-//		( specification_part )?
+		specification_part
 		end_block_data_stmt
 	;
 
@@ -3045,10 +3035,10 @@ options {k=2;}
 	;
 
 // R1205
-// TODO putback
+// specification_part made non-optional to remove END ambiguity (as can be empty)
 interface_body
-	:	(prefix)? function_stmt_body /* ( specification_part )? */ end_function_stmt
-//	|	subroutine_stmt ( specification_part )? end_subroutine_stmt
+	:	(prefix)? function_stmt specification_part end_function_stmt
+	|	subroutine_stmt specification_part end_subroutine_stmt
 	;
 
 // R1206
@@ -3145,10 +3135,13 @@ call_stmt
 // R1219
 // T_IDENT inlined for procedure_name and binding_name
 // proc_component_ref is variable T_PERCENT T_IDENT can be designator so deleted
+// data_ref can end in T_PERCENT T_IDENT so data_ref used alone
+// data_ref can be T_IDENT so T_IDENT deleted
+// ERR_CHK 736 must be (T_IDENT | data_ref T_PERCENT T_IDENT) (no (substring-range))
 // TODO putback
 procedure_designator
-	:	T_IDENT
-//	|	data_ref T_PERCENT T_IDENT
+//	:	data_ref
+	:	data_ref T_PERCENT T_IDENT
 	;
 
 // R1220
@@ -3176,21 +3169,20 @@ alt_return_spec
 	;
 
 // R1223
-// TODO putback
-// 1. factored out optional prefix in function_stmt from function_subprogram
+// 1. left factored optional prefix in function_stmt from function_subprogram
 // 2. specification_part made non-optional to remove END ambiguity (as can be empty)
-function_subprogram_body
-	:	function_stmt_body
+function_subprogram
+	:	function_stmt
 		specification_part
-//		( execution_part )?
-//		( internal_subprogram_part )?
+		( execution_part )?
+		( internal_subprogram_part )?
 		end_function_stmt
 	;
 
 // R1224
-// factored out optional prefix from function_stmt
+// left factored optional prefix from function_stmt
 // generic_name_list substituted for dummy_arg_name_list
-function_stmt_body
+function_stmt
 	:	T_FUNCTION T_IDENT
 		T_LPAREN ( generic_name_list )? T_RPAREN ( suffix )?
 	;
@@ -3203,23 +3195,32 @@ proc_language_binding_spec
 // R1226 dummy_arg_name was name inlined as T_IDENT
 
 // R1227
+// C1240 (R1227) A prefix shall contain at most one of each prefix-spec
+// C1241 (R1227) A prefix shall not specify both ELEMENTAL AND RECURSIVE
 prefix
-	:	prefix_spec ( prefix_spec )*
+	:	prefix_spec ( prefix_spec (prefix_spec)? )?
+	;
+
+t_prefix
+	:	t_prefix_spec ( t_prefix_spec (t_prefix_spec)? )?
 	;
 
 // R1228
 prefix_spec
 	:	declaration_type_spec
-	|	T_RECURSIVE
+	|	t_prefix_spec
+	;
+
+t_prefix_spec
+	:	T_RECURSIVE
 	|	T_PURE
 	|	T_ELEMENTAL
 	;
 
 // R1229
-// TODO putback
 suffix
-    :    proc_language_binding_spec ( T_RESULT T_LPAREN result_name T_RPAREN )?
-//    | T_RESULT T_LPAREN result_name T_RPAREN ( proc_language_binding_spec )?
+    :	proc_language_binding_spec ( T_RESULT T_LPAREN result_name T_RPAREN )?
+	|	T_RESULT T_LPAREN result_name T_RPAREN ( proc_language_binding_spec )?
     ;
 
 result_name
@@ -3235,21 +3236,18 @@ options {k=2;}
 	;
 
 // R1231
-// TODO putback
-// 1. factored out optional prefix in subroutine_stmt from subroutine_subprogram
-// 2. specification_part made non-optional to remove END ambiguity (as can be empty)
-subroutine_subprogram_body
-	:	subroutine_stmt_body
+// specification_part made non-optional to remove END ambiguity (as can be empty)
+subroutine_subprogram
+	:	subroutine_stmt
 		specification_part
-//		( execution_part )?
-//		( internal_subprogram_part )?
+		( execution_part )?
+		( internal_subprogram_part )?
 		end_subroutine_stmt
 	;
 
 // R1232
-// factored out optional prefix from subroutine_stmt
-subroutine_stmt_body
-    :     T_SUBROUTINE T_IDENT
+subroutine_stmt
+    :     (t_prefix)? T_SUBROUTINE T_IDENT
           ( T_LPAREN ( dummy_arg_list )? T_RPAREN ( proc_language_binding_spec )? )?
     ;
 
@@ -3273,10 +3271,9 @@ options {k=2;}
     ;
 
 // R1235
-// TODO putback
 entry_stmt
     :    T_ENTRY entry_name
-          ( T_LPAREN ( dummy_arg_list )? T_RPAREN /*( suffix )? */ )?
+          ( T_LPAREN ( dummy_arg_list )? T_RPAREN ( suffix )? )?
     ;
 
 entry_name
@@ -3289,10 +3286,7 @@ return_stmt
 	:	T_RETURN ( expr )?
 	;
 
-// R1237
-contains_stmt
-	:	T_CONTAINS
-	;
+// R1237 contains_stmt inlined as T_CONTAINS
 
 // R1238
 // ERR_CHK 1239 scalar_expr replaced by expr
@@ -3551,8 +3545,8 @@ T_WRITE         :       'WRITE'         ;
 //
 // line breaks are OK before equals
 //
-//T_FILE_EQUALS   : 'FILE' '='    ;
-//T_ACCESS_EQUALS : 'ACCESS' '='  ;
+T_FILE_EQUALS   : 'FILE' '='    ;
+T_ACCESS_EQUALS : 'ACCESS' '='  ;
 //T_ACTION_EQUALS : 'ACTION' '='  ;
 //T_ADVANCE_EQUALS: 'ADVANCE' '=' ;
 //T_ASYNCHRONOUS_EQUALS: 'ASYNCHRONOUS' '=' ;
@@ -3563,17 +3557,17 @@ T_WRITE         :       'WRITE'         ;
 //T_ENCODING_EQUALS: 'ENCODING' '=' ;
 ////T_END_EQUALS    : 'END' '='     ;
 //T_EOR_EQUALS    : 'EOR' '='     ;
-//T_ERR_EQUALS    : 'ERR' '='     ;
+T_ERR_EQUALS    : 'ERR' '='     ;
 //T_ERRMSG_EQUALS : 'ERRMSG' '='  ;
 //T_EXIST_EQUALS  : 'EXIST' '='   ;
 //T_FORM_EQUALS   : 'FORM' '='    ;
 //T_FORMATTED_EQUALS: 'FORMATTED' '=' ;
 //T_ID_EQUALS     : 'ID' '='      ;
-//T_IOLENGTH_EQUALS: 'IOLENGTH' '=' ;
-//T_IOMSG_EQUALS  : 'IOMSG' '='   ;
-//T_IOSTAT_EQUALS : 'IOSTAT' '='  ;
+T_IOLENGTH_EQUALS: 'IOLENGTH' '=' ;
+T_IOMSG_EQUALS  : 'IOMSG' '='   ;
+T_IOSTAT_EQUALS : 'IOSTAT' '='  ;
 T_KIND_EQUALS   : 'KIND' '='    ;
-//T_LEN_EQUALS    : 'LEN' '='     ;
+T_LEN_EQUALS    : 'LEN' '='     ;
 //T_NAME_EQUALS   : 'NAME' '='    ;
 //T_NAMED_EQUALS  : 'NAMED' '='   ;
 //T_NEXTREC_EQUALS: 'NEXTREC' '=' ;
@@ -3594,7 +3588,7 @@ T_KIND_EQUALS   : 'KIND' '='    ;
 //T_SIZE_EQUALS   : 'SIZE' '='    ;
 //T_SOURCE_EQUALS : 'SOURCE' '='  ;
 //T_STAT_EQUALS   : 'STAT' '='    ;
-//T_STATUS_EQUALS : 'STATUS' '='  ;
+T_STATUS_EQUALS : 'STATUS' '='  ;
 //T_STREAM_EQUALS : 'STREAM' '='  ;
 //T_WRITE_EQUALS  : 'WRITE' '='   ;
 //T_UNFORMATTED_EQUALS: 'UNFORMATTED' '=' ;
