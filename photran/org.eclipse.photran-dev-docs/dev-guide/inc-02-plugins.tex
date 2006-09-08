@@ -4,82 +4,77 @@ Photran is actually a collection of several Eclipse plug-ins.
 The following projects comprise Photran as it is distributed to users.
 
 \begin{itemize}
-\item{org.eclipse.photran.core
 
-	This is the Photran Core plug-in.  It
-	contains all of the ``behind the scenes'' functionality that
-	supports Fortran-specific things in the user interface:
-\begin{itemize}
-	\item{IAdditionalLanguage for Fortran (i.e., the means
-              of adding Fortran to the list of languages recognized
-              by the CDT)}
-	\item{Error parsers for Fortran compilers}
-	\item{Fortran model builder and model elements}
-	\item{Interface to Fortran parser (stored in f95parser.jar)}
-	\item{Symbol table}
-	\item{Module database (and Berkeley DB Java Edition)}
-	\item{Refactorings, source printing, program manipulation}
-	\item{Non-UI (parsing and model building) preferences}
-\end{itemize}}
-
-\item{org.eclipse.photran.managedbuilder.core, org.eclipse.photran.managedbuilder.ui
-
-	This is the Managed Build system.
-	Craig Rasmussen (LANL) is handling it.}
-
-\item{org.eclipse.photran.cdtinterface
-
-	This contains icons for all of the \texttt{FortranElement}s, i.e.,
-	the icons used in the Outline and Make Projects views, and
-	provides a method which returns \texttt{ImageDescriptor}s for them.}
-
-\item{org.eclipse.photran.ui
-
-	This contains the Fortran-specific components of the user interface:
-\begin{itemize}
-	\item{Editor}
-	\item{Preference pages}
-\end{itemize}}
-
-\item{org.eclipse.photran-feature
+\item org.eclipse.photran-feature
 
 	This is the Eclipse feature for Photran, used to build the Zip
 	file distributed to users.  (A feature is a grouping of related
-	plug-ins; in our case, all of the plug-ins listed above.)}
+	plug-ins.)
 
-\end{itemize}
+\item org.eclipse.photran.cdtinterface
+
+	This contains all of the components (core and user interface) related
+	to integration with the CDT.  It includes
+	\begin{itemize}
+	\item ILanguage for Fortran (i.e., the means
+              of adding Fortran to the list of languages recognized
+              by the CDT)
+	\item Fortran model builder, model elements, and icons for the Outline and Projects views
+	\item Fortran perspective, Fortran Projects view, and new project wizards
+	\end{itemize}
+
+\item org.eclipse.photran.core
+
+	This is the Photran Core plug-in.  It
+	contains most of the Fortran-specific ``behind the scenes'' functionality:
+	\begin{itemize}
+	\item Error parsers for Fortran compilers
+	\item Workspace preferences
+	\end{itemize}
+
+\item org.eclipse.photran.managedbuilder.core,
+      org.eclipse.photran.managedbuilder.gnu.ui,
+      org.eclipse.photran.managedbuilder.ui
+
+	Support for Managed Build projects using the GNU toolchain.
+	Managed by Craig Rasmussen at LANL.
+
+\item org.eclipse.photran.core.intel,
+      org.eclipse.photran.intel-feature,
+      org.eclipse.photran.managedbuilder.intel.ui
+
+	Support for Managed Build projects using Intel toolchains.
+	Maintained by Intel.
+
+\item org.eclipse.photran.refactoring
+
+	Fortran parser, refactoring engine, and refactoring UI.  Not very useful yet.
+
+\item org.eclipse.photran.ui
+
+	This contains the Fortran-specific components of the user interface:
+	\begin{itemize}
+	\item Editor
+	\item Preference pages
+	\end{itemize}
 
 \noindent The following projects are in CVS but are not included directly in the
 Photran distribution:
 
-\begin{itemize}
-\item{org.eclipse.photran-cdt-patches
+\item org.eclipse.photran-dev-docs
 
-	This contains CDT language extensibility/neutrality patches.}
+	Photran developer documentation.
+	Contains the LaTeX source for this document, the materials from our
+	presentation at EclipseCon 2006 on adding a new language to the CDT,
+	and various other documentation notes.
 
-\item{org.eclipse.photran-dev-docs
-
-	This contains developer documentation, including this manual.}
-
-\item{org.eclipse.photran-parser
-
-	This contains the Fortran 95 parser, which is exported to
-	f95parser.jar and stored in the Core plug-in.
-	Note that this plug-in is not included directly in Photran
-	and is not (should not be) referenced by any other plug-ins,
-	since the parser is referenced through the JAR file
-	(see parser description below).}
-
-\item{org.eclipse.photran.tests
+\item org.eclipse.photran.tests
 
 	This contains JUnit tests for the parser, symbol table builder,
-	source printer, program editor, refactorings, etc.}
+	source printer, program editor, refactorings, etc.
 
-\item{org.eclipse.photran.xyzsamplelang
+\item org.eclipse.photran-misc
 
-	This was my proof-of-concept for adding an additional language to
-	the CDT.  It is completely independent of Photran.  It does
-        not exist in the new Photran CVS repository and will soon be
-        superceded by the Eightbol project.}
+	No longer relevant.
 
 \end{itemize}
