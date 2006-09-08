@@ -1,8 +1,11 @@
-% Getting the Photran 3.0 Sources from CVS
+% Getting the Photran Sources from CVS
 
-\textit{Updated 3/13/06 to correspond to Photran 3.2/CDT 3.2 sources}
+\textit{Updated 9/8/06}
 
-\hspace{1em}\textbf{Part I.  Check out the CDT sources from CVS}
+\hspace{1em}\textbf{Part~I.  Check out the CDT sources from CVS}
+
+If you already have the latest version of CDT installed and do not need
+to edit the CDT source code, Part~I can be skipped.
 
 \begin{enumerate}
 \item  In Eclipse, switch to the CVS Repository Exploring perspective.
@@ -34,25 +37,25 @@
 \item  Expand org.eclipse.cdt-build
 %\item  Right click and check out all of the org.eclipse.cdt.* packages
 \item  Under org.eclipse.cdt-build, right click and check out all of the org.eclipse.cdt.* packages
-    EXCEPT for the ones ending in "tests" (why bother testing?)
+    (it is OK to skip the ones ending in "tests")
 \item  Do the same with org.eclipse.cdt-core, org.eclipse.cdt-debug,
     org.eclipse.cdt-doc, and org.eclipse.cdt-launch
 \item You now have the CDT source code.  Make sure it compiles successfully
     (lots of warnings, but no errors).
 
 \vspace{.5em}
-\noindent\textbf{Part II.  Check out the Photran source and the CDT patches}
+\noindent\textbf{Part II.  Check out the Photran sources from CVS}
 
 \item In Eclipse, switch to the CVS Repository Exploring perspective.
 \item Right-click the CVS Repositories view; choose New, Repository Location
 \item Enter the following information, then click Finish: \\
-\textit{If you are a Photran committer:}
+\textit{If you are a Photran committer:} \\
 \begin{tabular}{ll}
         Host name:       & dev.eclipse.org \\
         Repository path: & /cvsroot/technology \\
         Connection type: & extssh \\
         Username/passwd: & (your eclipse.org committer username and password) \\
-\textit{Otherwise:}
+\textit{Otherwise:} \\
         Host name:       & dev.eclipse.org \\
         Repository path: & /cvsroot/technology \\
         Connection type: & pserver \\
@@ -62,29 +65,9 @@
 \item Expand the node for dev.eclipse.org:/home/technology,
     then expand HEAD (in the CVS Repositories view), then expand
     org.eclipse.photran
-\item{Right-click and check out all of the projects under org.eclipse.photran
-    EXCEPT org.eclipse.photran-parser.
-    You only need this project if you will be regenerating the parser from the
-    grammar.  (The parser is included in the org.eclipse.photran.core plug-in
-    as a JAR file.  This way, the parser does not have to be recompiled
-    every time you rebuild Photran.)}
+\item Right-click and check out all of the projects under org.eclipse.photran
 
-The sources will NOT compile at this point; you must complete the following...
-
-\vspace{.5em}
-\noindent\textbf{Part III.  Patch the CDT sources}
-
-\item Go to a bash prompt.  Change to your Eclipse workspace directory
-    (the one containing all of the org.eclipse.cdt and
-    org.eclipse.photran projects).
-%\item \texttt{cd org.eclipse.photran-misc/photran30-cdt30-patches}
-\item \texttt{cd org.eclipse.photran-misc/photran32-cdt32-patches}
-\item Run ./install
-\item{Go back into Eclipse.  Refresh all of the org.eclipse.cdt packages.
-    (Click the first, shift-click the last, right-click, choose Refresh.)}
-
-%The sources should all compile (albeit with about 640 warnings).
-The sources should all compile.
+The sources should all compile (albeit with about 2700 warnings).
 
 \end{enumerate}
 
