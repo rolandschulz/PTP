@@ -22,6 +22,8 @@ import java.text.MessageFormat;
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IValue;
+import org.eclipse.debug.internal.ui.views.variables.VariablesView;
+import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.ptp.debug.core.IPDebugConstants;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.aif.IAIF;
@@ -267,7 +269,6 @@ public abstract class PVariable extends AbstractPVariable implements IPCDIEventL
 				continue;
 			IPCDITarget target = source.getTarget();
 			if (target.equals(getCDITarget())) {
-				// TODO - not implement ICDIChangedEvent yet
 				if (event instanceof IPCDIChangedEvent) {
 					if (source instanceof IPCDIVariable && iv.isSameVariable((IPCDIVariable) source)) {
 						handleChangedEvent((IPCDIChangedEvent) event);
@@ -343,7 +344,7 @@ public abstract class PVariable extends AbstractPVariable implements IPCDIEventL
 		return oldExpression;
 	}
 	public void dispose() {
-		// Hack: do not destroy local variables
+		//TODO whether Hack: do not destroy local variables
 		internalDispose(false);
 		setDisposed(true);
 	}

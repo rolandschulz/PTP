@@ -70,37 +70,21 @@ public interface IPCDISession extends ICommonActions {
 	Process getSessionProcess() throws PCDIException;
 	
 	/** Register process to Debug View
-	 * @param procNum process number
+	 * @param tasks process ids
 	 * @param sendEvent true to send event to UI
 	 * @param resumeTarget true to resume this process
 	 */
-	public void registerTarget(int procNum, boolean sendEvent, boolean resumeTarget);
+	public void registerTargets(BitList tasks, boolean sendEvent, boolean resumeTarget);
 	/** Register processes to Debug View
-	 * @param procNums a number of processes
-	 * @param sendEvent true to send event to UI
-	 * @param resumeTarget true to resume this process
-	 */
-	public void registerTargets(int[] procNums, boolean sendEvent, boolean resumeTarget);
-	/** Register process to Debug View
-	 * @param procNum process number
+	 * @param tasks process ids
 	 * @param sendEvent true to send event to UI
 	 */
-	public void registerTarget(int procNum, boolean sendEvent);
-	/** Register processes to Debug View
-	 * @param procNums a number of processes
-	 * @param sendEvent true to send event to UI
-	 */
-	public void registerTargets(int[] procNums, boolean sendEvent);
+	public void registerTargets(BitList tasks, boolean sendEvent);
 	/** Unregister process to Debug View
-	 * @param procNums process number
+	 * @param tasks process ids
 	 * @param sendEvent true to send event to UI
 	 */
-	public void unregisterTarget(int procNum, boolean sendEvent);
-	/** Unregister processes to Debug View
-	 * @param procNums a number of processes
-	 * @param sendEvent true to send event to UI
-	 */
-	public void unregisterTargets(int[] targets, boolean sendEvent);
+	public void unregisterTargets(BitList tasks, boolean sendEvent);
 	/** Get Job
 	 * @return
 	 */

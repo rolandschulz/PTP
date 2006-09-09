@@ -168,7 +168,7 @@ public class PLocalVariable extends PVariable {
 				if (cdiVariable != null)
 					cdiVariable.setValue(expression);
 				else
-					requestFailed(CoreModelMessages.getString("CModificationVariable.0"), null);
+					requestFailed(CoreModelMessages.getString("PModificationVariable.0"), null);
 			} catch (PCDIException e) {
 				targetRequestFailed(e.getMessage(), null);
 			}

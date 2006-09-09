@@ -16,29 +16,11 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.core.model;
-
-import org.eclipse.cdt.core.IAddress;
-import org.eclipse.cdt.debug.core.model.IJumpToAddress;
-import org.eclipse.cdt.debug.core.model.IJumpToLine;
-import org.eclipse.cdt.debug.core.model.IRunToAddress;
-import org.eclipse.cdt.debug.core.model.IRunToLine;
-import org.eclipse.debug.core.DebugException;
-import org.eclipse.debug.core.model.IStackFrame;
-import org.eclipse.debug.core.model.IValue;
-
+package org.eclipse.ptp.debug.core.events;
 /**
- * @author Clement chu
- * 
+ * @author Clement
  */
-public interface IPStackFrame extends IRunToLine, IRunToAddress, IJumpToLine, IJumpToAddress, IPDebugElement, IStackFrame {
-	public IAddress getAddress();
-	public String getFile();
-	public String getFunction();
-	public int getFrameLineNumber();
-	public int getLevel();
-	public IValue evaluateExpression(String expression) throws DebugException;
-	public String evaluateExpressionToString(String expression) throws DebugException;
-	boolean canEvaluate();
-	public int getTargetID();
+public interface IPDebugRegisterInfo extends IPDebugInfo {
+	public boolean isRefresh();
 }
+

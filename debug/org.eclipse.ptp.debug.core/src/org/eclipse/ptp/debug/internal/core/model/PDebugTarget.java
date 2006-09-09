@@ -29,6 +29,7 @@ import org.eclipse.cdt.core.IAddressFactory;
 import org.eclipse.cdt.core.IBinaryParser.IBinaryObject;
 import org.eclipse.cdt.core.IBinaryParser.ISymbol;
 import org.eclipse.cdt.debug.core.cdi.CDIException;
+import org.eclipse.cdt.debug.core.cdi.model.ICDITargetConfiguration2;
 import org.eclipse.cdt.debug.core.model.ICModule;
 import org.eclipse.cdt.debug.core.model.IDebuggerProcessSupport;
 import org.eclipse.cdt.debug.core.model.IDisassembly;
@@ -473,7 +474,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPCDIE
 	public void handleDebugEvents(IPCDIEvent[] events) {
 		for (int i = 0; i < events.length; i++) {
 			IPCDIEvent event = events[i];
-
 			if (!event.containTask(getTargetID()))
 				return;
 			IPCDIObject source = event.getSource(getTargetID());
@@ -617,6 +617,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPCDIE
 		skipBreakpoints(false);
 		List newThreads = refreshThreads();
 		if (source instanceof IPCDITarget) {
+			//if (!(this.getConfiguration() instanceof ICDITargetConfiguration2) || !((ICDITargetConfiguration2)this.getConfiguration()).supportsThreadControl())
 			suspendThreads(event);
 		}
 		// We need this for debuggers that don't have notifications for newly created threads.

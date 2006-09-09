@@ -82,8 +82,8 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 	public IThread getThread() {
 		return fThread;
 	}
-	public String getTargetID() {
-		return String.valueOf(getCDITarget().getTargetID());
+	public int getTargetID() {
+		return getCDITarget().getTargetID();
 	}
 	public IVariable[] getVariables() throws DebugException {
 		IPGlobalVariable[] globals = getGlobals();
@@ -106,8 +106,10 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 				while (it.hasNext()) {
 					fVariables.add(PVariableFactory.createLocalVariable(this, (IPCDIVariableDescriptor) it.next()));
 				}
-			} else if (refreshVariables()) {
-				updateVariables();
+			} else {
+				if (refreshVariables()) {
+					updateVariables();	
+				}
 			}
 			setRefreshVariables(false);
 		}

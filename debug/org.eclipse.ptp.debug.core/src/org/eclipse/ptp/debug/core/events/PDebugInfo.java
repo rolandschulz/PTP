@@ -54,6 +54,5 @@ public class PDebugInfo implements IPDebugInfo {
 	public IPJob getJob() {
 		return job;
 	}
-	
 }
 
