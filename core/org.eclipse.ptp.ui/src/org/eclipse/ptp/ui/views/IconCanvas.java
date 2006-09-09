@@ -16,7 +16,7 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.internal.ui.views;
+package org.eclipse.ptp.ui.views;
 
 import java.io.File;
 import java.net.URL;
@@ -29,10 +29,6 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.ptp.internal.ui.hover.IconHover;
 import org.eclipse.ptp.ui.hover.IIconInformationControl;
-import org.eclipse.ptp.ui.views.IContentProvider;
-import org.eclipse.ptp.ui.views.IIconCanvasActionListener;
-import org.eclipse.ptp.ui.views.IImageProvider;
-import org.eclipse.ptp.ui.views.IToolTipProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.accessibility.ACC;
 import org.eclipse.swt.accessibility.Accessible;
@@ -995,11 +991,11 @@ public class IconCanvas extends Canvas {
 				}
 				selection.y = actualScrollStart_y - verticalScrollOffset;
 				if (!isSelect)
-					clearSelection(index);
+					unselectElement(index);
 				if (!isSelected(index - max_col))
-					selectElement(index - max_col);
+					autoSelectUnselectElement(index - max_col);
 				else
-					clearSelection(index);
+					unselectElement(index);
 				redraw(index, index - max_col);
 			}
 		}
@@ -1018,11 +1014,11 @@ public class IconCanvas extends Canvas {
 				}
 				selection.y = actualScrollStart_y - verticalScrollOffset;
 				if (!isSelect)
-					clearSelection(index);
+					unselectElement(index);
 				if (!isSelected(index + max_col))
-					selectElement(index + max_col);
+					autoSelectUnselectElement(index + max_col);
 				else
-					clearSelection(index);
+					unselectElement(index);
 				redraw(index, index + max_col);
 			}
 		}
@@ -1043,11 +1039,11 @@ public class IconCanvas extends Canvas {
 				selection.y = actualScrollStart_y - verticalScrollOffset;
 			}
 			if (!isSelect)
-				clearSelection(index);
+				unselectElement(index);
 			if (!isSelected(index - 1))
-				selectElement(index - 1);
+				autoSelectUnselectElement(index - 1);
 			else
-				clearSelection(index);
+				unselectElement(index);
 			redraw(index - 1, index);
 		}
 	}
@@ -1067,11 +1063,11 @@ public class IconCanvas extends Canvas {
 				selection.y = actualScrollStart_y - verticalScrollOffset;
 			}
 			if (!isSelect)
-				clearSelection(index);
+				unselectElement(index);
 			if (!isSelected(index + 1))
-				selectElement(index + 1);
+				autoSelectUnselectElement(index + 1);
 			else
-				clearSelection(index);
+				unselectElement(index);
 			redraw(index, index + 1);
 		}
 	}
@@ -1087,7 +1083,7 @@ public class IconCanvas extends Canvas {
 				selection.x = start_pos_x;
 				if (!isSelect) {
 					selectedElements.clear(index);
-					selectElement(start_index);
+					autoSelectUnselectElement(start_index);
 				}
 				else {
 					selectElements(start_index, index);
@@ -1109,7 +1105,7 @@ public class IconCanvas extends Canvas {
 				int end_counter = total - index;
 				selection.x = (end_counter + 1) * getElementWidth() + e_offset_x;
 				if (!isSelect)
-					selectElement(index + end_counter);
+					autoSelectUnselectElement(index + end_counter);
 				else
 					selectElements(index, index + end_counter);
 				redraw(index, index + end_counter);
@@ -1119,7 +1115,7 @@ public class IconCanvas extends Canvas {
 				if (end_index > -1) {
 					selection.x = end_pos_x;
 					if (!isSelect)
-						selectElement(end_index);
+						autoSelectUnselectElement(end_index);
 					else
 						selectElements(index, end_index);
 					redraw(index, end_index);
@@ -1488,12 +1484,12 @@ public class IconCanvas extends Canvas {
 			end_count = start_index - 1;
 		} else if (start_index < end_index) {
 			if (start_index == -1) {
-				selectElement(end_index);
+				autoSelectUnselectElement(end_index);
 				return true;
 			}
 		} else {// equals
 			if (start_index > -1) {
-				selectElement(start_index);
+				autoSelectUnselectElement(start_index);
 				return true;
 			}
 			return false;
@@ -1503,10 +1499,17 @@ public class IconCanvas extends Canvas {
 		}
 		return true;
 	}
+	/** unselect all elements
+	 * 
+	 */
+	public void unselectAllElements() {
+		selectedElements.clear();
+		tempSelectedElements.clear();
+	}
 	/** Select element
 	 * @param index Element index
 	 */
-	public void selectElement(int index) {
+	public void autoSelectUnselectElement(int index) {
 		if (isSelected(index)) {
 			selectedElements.clear(index);
 		} else {
@@ -1520,11 +1523,17 @@ public class IconCanvas extends Canvas {
 	public boolean isSelected(int index) {
 		return selectedElements.get(index);
 	}
-	/** Clear selected element
+	/** unselect element
 	 * @param index Target element index
 	 */
-	public void clearSelection(int index) {
+	public void unselectElement(int index) {
 		selectedElements.clear(index);
+	}
+	/** select element
+	 * @param index
+	 */
+	public void selectElement(int index) {
+		selectedElements.set(index);
 	}
 	/** Select elements 
 	 * @param from_index
@@ -1541,7 +1550,7 @@ public class IconCanvas extends Canvas {
 	public void selectElements(int from_index, int to_index, boolean checkStatus) {
 		for (int index = from_index; index < to_index + 1; index++) {
 			if (checkStatus)
-				selectElement(index);
+				autoSelectUnselectElement(index);
 			else
 				selectedElements.set(index);
 		}

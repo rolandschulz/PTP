@@ -28,7 +28,6 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.ptp.internal.ui.views.IconCanvas;
 import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.ui.model.IElement;
@@ -135,6 +134,12 @@ public class ElementIconCanvas extends IconCanvas implements ISelectionProvider 
                 }
             });
         }
+    }
+    public void setCurrentSelection(boolean sendEvent) {
+    	selection = new StructuredSelection(getSelectedElements());
+    	if (sendEvent) {
+    		setSelection(selection);
+    	}
     }
 	protected void handleMouseUp(Event event) {
 		super.handleMouseUp(event);
