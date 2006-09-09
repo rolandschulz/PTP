@@ -105,13 +105,13 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		procs = job.getSortedProcesses();
 		// Initialize state variables
 		
-		StartDebuggerCommand command = new StartDebuggerCommand(job, timeout);
+		StartDebuggerCommand command = new StartDebuggerCommand(session.createBitList(), job);
 		postCommand(command);
 		try {
 			command.waitForReturn();
 		} catch (PCDIException e) {
 			if (session != null) {
-				setJobFinished(session.createBitList(), IPProcess.ERROR);
+				setJobFinished(command.getTasks(), IPProcess.ERROR);
 			}
 			exit();
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugExternalPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));
@@ -173,7 +173,7 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 				switch (errEvent.getErrorCode()) {
 				case IPCDIErrorEvent.DBG_FATAL:
 					setJobFinished(tasks, IPProcess.ERROR);
-					postCommand(new StopDebuggerCommand());
+					postCommand(new StopDebuggerCommand(getSession().createBitList()));
 				break;
 				case IPCDIErrorEvent.DBG_WARNING:
 					if (!session.getJob().isAllStop()) {
@@ -182,7 +182,7 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 					}
 				break;
 				case IPCDIErrorEvent.DBG_NORMAL:
-					session.unregisterTargets(tasks.toArray(), true);
+					session.unregisterTargets(tasks.copy(), true);
 				break;
 				}
 			} else if (event instanceof IPCDISuspendedEvent) {
@@ -191,7 +191,7 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 			}
 			if (event instanceof IPCDIExitedEvent) {
 				if (isJobFinished()) {
-					postCommand(new StopDebuggerCommand());
+					postCommand(new StopDebuggerCommand(getSession().createBitList()));
 				}
 			}
 			//FIXME - add item here or??
@@ -214,8 +214,8 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		}
 		setSuspendTasks(false, tasks);
 		setTerminateTasks(true, tasks);
-		session.unregisterTargets(tasks.toArray(), true);
 		setProcessStatus(tasks.toArray(), status);
+		session.unregisterTargets(tasks, true);
 	}
 	protected void setTerminateTasks(boolean isAdd, BitList tasks) {
 		BitList terminatedTasks = getTerminatedProc();

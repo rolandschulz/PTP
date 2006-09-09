@@ -50,6 +50,9 @@ public class DataWriteMemoryCommand extends AbstractDebugCommand {
 		this.wordFormat = wordFormat;
 	}
 	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
+		exec(debugger);
+	}
+	public void exec(IAbstractDebugger debugger) throws PCDIException {
 		debugger.setDataWriteMemoryCommand(tasks, offset, address, wordFormat, wordSize, value);
 	}	
 	public Object getDataWriteMemoryInfo() throws PCDIException {

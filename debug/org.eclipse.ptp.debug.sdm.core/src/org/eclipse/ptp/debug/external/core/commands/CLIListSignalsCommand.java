@@ -35,9 +35,11 @@ public class CLIListSignalsCommand extends AbstractDebugCommand {
 		this.name = name;
 	}
 	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
-		debugger.getListSignals(tasks, name);
+		exec(debugger);
 	}
-	
+	public void exec(IAbstractDebugger debugger) throws PCDIException {
+		debugger.getListSignals(tasks, name);
+	}	
 	public IPCDISignal[] getInfoSignals() throws PCDIException {
 		Object res = getResultValue();
 		if (res instanceof IPCDISignal[]) {

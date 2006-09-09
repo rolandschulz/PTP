@@ -36,9 +36,11 @@ public class ListLocalVariablesCommand extends AbstractDebugCommand {
 		this.frame = frame;
 	}
 	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
+		exec(debugger);
+	}
+	public void exec(IAbstractDebugger debugger) throws PCDIException {
 		debugger.listLocalVariables(tasks, frame);
 	}
-	
 	public IPCDILocalVariable[] getLocalVariables() throws PCDIException {
 		Object res = getResultValue();
 		if (res instanceof IPCDILocalVariable[]) {

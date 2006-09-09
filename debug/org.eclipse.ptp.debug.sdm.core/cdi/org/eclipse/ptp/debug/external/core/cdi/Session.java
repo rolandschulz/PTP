@@ -157,27 +157,16 @@ public class Session implements IPCDISession, IPCDISessionObject {
 		ResourcesPlugin.getWorkspace().run(r, monitor);
 	}	
 	
-	public void registerTarget(int procNum, boolean sendEvent) {
-		registerTarget(procNum, sendEvent, false);
+	public void registerTargets(BitList tasks, boolean refresh) {
+		registerTargets(tasks, refresh, false);
 	}
-	public void registerTargets(int[] procNums, boolean sendEvent) {
-		registerTargets(procNums, sendEvent, false);
+	public void registerTargets(BitList tasks, boolean refresh, boolean resumeTarget) {
+		IPCDITarget[] targets = processManager.addTargets(tasks);
+		PTPDebugCorePlugin.getDebugModel().addNewDebugTargets(launch, tasks, targets, file, resumeTarget, refresh);
 	}
-	public void registerTarget(int procNum, boolean sendEvent, boolean resumeTarget) {
-		registerTargets(new int[] { procNum }, sendEvent, resumeTarget);
-	}
-	public void registerTargets(int[] procNums, boolean sendEvent, boolean resumeTarget) {
-		BitList regTasks = createEmptyBitList();
-		IPCDITarget[] targets = processManager.addTargets(procNums, regTasks);
-		PTPDebugCorePlugin.getDebugModel().addNewDebugTargets(launch, regTasks, targets, file, resumeTarget, sendEvent);
-	}
-	public void unregisterTarget(int procNum, boolean sendEvent) {
-		unregisterTargets(new int[] { procNum }, sendEvent);
-	}
-	public void unregisterTargets(int[] procNums, boolean sendEvent) {
-		BitList unregTasks = createEmptyBitList();
-		processManager.removeTargets(procNums, unregTasks);
-		PTPDebugCorePlugin.getDebugModel().removeDebugTarget(launch, unregTasks, sendEvent);
+	public void unregisterTargets(BitList tasks, boolean refresh) {
+		processManager.removeTargets(tasks);
+		PTPDebugCorePlugin.getDebugModel().removeDebugTarget(launch, tasks, refresh);
 	}
 	public String getAttribute(String key) {
 		return props.getProperty(key);

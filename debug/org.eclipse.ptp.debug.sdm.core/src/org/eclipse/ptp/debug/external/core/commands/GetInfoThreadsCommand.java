@@ -31,9 +31,11 @@ public class GetInfoThreadsCommand extends AbstractDebugCommand {
 		super(tasks);
 	}
 	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
+		exec(debugger);
+	}
+	public void exec(IAbstractDebugger debugger) throws PCDIException {
 		debugger.getInfothreads(tasks);
 	}
-	
 	//first index is current thread id
 	public String[] getThreadIds() throws PCDIException {
 		Object res = getResultValue();

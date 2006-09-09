@@ -20,6 +20,7 @@ package org.eclipse.ptp.debug.external.core.commands;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.core.IPJob;
+import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
@@ -30,16 +31,14 @@ import org.eclipse.ptp.debug.core.cdi.PCDIException;
 public class StartDebuggerCommand extends AbstractDebugCommand {
 	private IPJob job = null;
 	
-	public StartDebuggerCommand(IPJob job, int timeout) {
-		super(null);
+	public StartDebuggerCommand(BitList tasks, IPJob job) {
+		super(tasks);
 		this.job = job;
-		setTimeout(job.totalProcesses() * timeout);
-	}
-	public void execCommand(IAbstractDebugger debugger, long timeout) throws PCDIException {
-		execCommand(debugger);
-		waitForReturn();
 	}
 	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
+		exec(debugger);
+	}
+	public void exec(IAbstractDebugger debugger) throws PCDIException {
 		try {
 			debugger.startDebugger(job);
 		} catch (CoreException e) {

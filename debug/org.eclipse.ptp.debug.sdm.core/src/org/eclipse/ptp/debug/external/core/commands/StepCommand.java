@@ -26,20 +26,19 @@ import org.eclipse.ptp.debug.core.cdi.PCDIException;
  * @author Clement chu
  * 
  */
-public class CLIHandleCommand extends AbstractDebugCommand {
-	private String arg = "";
-	
-	public CLIHandleCommand(BitList tasks, String arg) {
-		super(tasks);
-		this.arg = arg;
+public abstract class StepCommand extends AbstractDebugCommand {
+	protected int count = 0;
+
+	public StepCommand(BitList tasks, int count) {
+		super(tasks, false, false);
+		this.count = count;
 	}
 	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
-		exec(debugger);
+		debugger.filterRunningTasks(tasks);
+		if (!tasks.isEmpty()) {
+			debugger.handleProcessResumedEvent(tasks, getEventType());
+			exec(debugger);
+		}
 	}
-	public void exec(IAbstractDebugger debugger) throws PCDIException {
-		debugger.cliHandle(tasks, arg);
-	}
-	public String getCommandName() {
-		return "CLI Handle"; 
-	}
+	protected abstract int getEventType();
 }

@@ -62,17 +62,17 @@ public class ProcessManager extends Manager {
 	public int[] getRegisteredTargetIDs() {
 		return getRegisteredTargets().toArray();
 	}
-	public IPCDITarget[] addTargets(int[] tasks, BitList regTasks) {
+	public IPCDITarget[] addTargets(BitList tasks) {
 		List targets = new ArrayList();
-		for (int i = 0; i<tasks.length; i++) {
-			Integer key = new Integer(tasks[i]);
+		int[] ids = tasks.toArray();
+		for (int i = 0; i<ids.length; i++) {
+			Integer key = new Integer(ids[i]);
 			if (containTarget(key))
 				continue;
 			
-			IPCDITarget target = new Target((Session)getSession(), tasks[i]);
+			IPCDITarget target = new Target((Session)getSession(), ids[i]);
 			targets.add(target);
 			debugTargetMap.put(key, target);
-			regTasks.set(tasks[i]);
 		}
 		return (IPCDITarget[])targets.toArray(new IPCDITarget[0]);
 	}
@@ -84,10 +84,12 @@ public class ProcessManager extends Manager {
 		debugTargetMap.remove(key);
 		return true;
 	}
-	public void removeTargets(int[] target_ids, BitList unregTasks) {
-		for (int i = 0; i<target_ids.length; i++) {
-			if (removeTarget(target_ids[i]))
-				unregTasks.set(target_ids[i]);
+	public void removeTargets(BitList tasks) {
+		int[] ids = tasks.toArray();
+		for (int i = 0; i<ids.length; i++) {
+			if (!removeTarget(ids[i])) {
+				tasks.clear(ids[i]);
+			}
 		}
 	}
 	public boolean containTarget(Integer key) {

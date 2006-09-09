@@ -36,24 +36,21 @@ public class TerminateCommand extends AbstractDebugCommand {
 	public TerminateCommand(BitList tasks) {
 		this(tasks, true);
 	}
-	public void execCommand(IAbstractDebugger debugger, long timeout) throws PCDIException {
-		setTimeout(timeout);
-		execCommand(debugger);
-		if (waitForReturn()) {
-			if (sendEvent) {
-				debugger.handleProcessTerminatedEvent(tasks, 0);
-			}
-		}
-	}
 	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
 		debugger.filterTerminateTasks(tasks);
 		if (!tasks.isEmpty()) {
 			suspendRunningTasks(debugger);
-			debugger.kill(tasks);
+			exec(debugger);
+			if (sendEvent) {
+				debugger.handleProcessTerminatedEvent(tasks, 0);
+			}
 		}
 		else {
 			doCancelWaiting();
 		}
+	}
+	public void exec(IAbstractDebugger debugger) throws PCDIException {
+		debugger.kill(tasks);
 	}
 	public String getCommandName() {
 		return "Terminate"; 

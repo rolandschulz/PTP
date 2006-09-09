@@ -37,6 +37,7 @@ public abstract class AbstractBreakpointCommand extends AbstractDebugCommand {
 		this.ignoreCheck = ignoreCheck;
 	}
 	public IPCDIBreakpoint getPCDIBreakpoint() throws PCDIException {
+		presetTimeout();
 		Object res = getResultValue();
 		if (res instanceof IPCDIBreakpoint) {
 			return (IPCDIBreakpoint)res;
@@ -59,5 +60,4 @@ public abstract class AbstractBreakpointCommand extends AbstractDebugCommand {
 			}
 		}
 	}
-	protected abstract void exec(IAbstractDebugger debugger) throws PCDIException;
 }

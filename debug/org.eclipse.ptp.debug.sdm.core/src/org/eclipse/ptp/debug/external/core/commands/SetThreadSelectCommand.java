@@ -34,9 +34,11 @@ public class SetThreadSelectCommand extends AbstractDebugCommand {
 		this.threadNum = threadNum;
 	}
 	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
-		debugger.setThreadSelect(tasks, threadNum);
+		exec(debugger);
 	}
-	
+	public void exec(IAbstractDebugger debugger) throws PCDIException {
+		debugger.setThreadSelect(tasks, threadNum);
+	}	
 	public Object[] getThreadInfo() throws PCDIException {
 		Object res = getResultValue();
 		if (res instanceof Object[]) {

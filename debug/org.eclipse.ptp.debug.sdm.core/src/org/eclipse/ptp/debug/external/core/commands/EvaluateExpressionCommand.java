@@ -35,9 +35,11 @@ public class EvaluateExpressionCommand extends AbstractDebugCommand {
 		this.varName = varName;
 	}
 	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
+		exec(debugger);
+	}
+	public void exec(IAbstractDebugger debugger) throws PCDIException {
 		debugger.evaluateExpression(tasks, varName);
 	}
-	
 	public String getExpressionValue() throws PCDIException {
 		Object res = getResultValue();
 		if (res instanceof IAIF) {

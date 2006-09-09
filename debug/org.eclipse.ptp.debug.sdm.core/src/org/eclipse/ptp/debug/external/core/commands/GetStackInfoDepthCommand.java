@@ -31,9 +31,11 @@ public class GetStackInfoDepthCommand extends AbstractDebugCommand {
 		super(tasks);
 	}
 	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
+		exec(debugger);
+	}
+	public void exec(IAbstractDebugger debugger) throws PCDIException {
 		debugger.getStackInfoDepth(tasks);
 	}
-	
 	public int getDepth() throws PCDIException {
 		Object res = getResultValue();
 		if (res instanceof Integer) {
