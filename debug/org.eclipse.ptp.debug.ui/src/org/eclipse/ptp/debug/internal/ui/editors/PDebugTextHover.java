@@ -126,7 +126,7 @@ public class PDebugTextHover implements ICEditorTextHover, ITextHoverExtension, 
 	 * @param value
 	 * @throws DebugException
 	 */
-	private static void appendVariable(StringBuffer buffer, String taskID, String expression, String value) throws DebugException {
+	private static void appendVariable(StringBuffer buffer, int taskID, String expression, String value) throws DebugException {
 		if (value.length() > MAX_HOVER_INFO_SIZE)
 			value = value.substring(0, MAX_HOVER_INFO_SIZE) + " ...";
 		buffer.append("<p>");

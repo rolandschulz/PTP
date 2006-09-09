@@ -19,13 +19,27 @@
 package org.eclipse.ptp.debug.ui.views;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.debug.core.model.IDebugTarget;
+import org.eclipse.debug.core.model.IStackFrame;
+import org.eclipse.debug.core.model.IThread;
+import org.eclipse.debug.internal.ui.viewers.AsynchronousTreeViewer;
+import org.eclipse.debug.ui.AbstractDebugView;
+import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.TreePath;
+import org.eclipse.jface.viewers.TreeSelection;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.util.BitList;
@@ -51,9 +65,15 @@ import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.ptp.ui.views.IIconCanvasActionListener;
 import org.eclipse.ptp.ui.views.ParallelJobView;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.progress.WorkbenchJob;
 
 /**
  * @author clement chu
@@ -71,6 +91,19 @@ public class ParallelDebugView extends ParallelJobView {
 	protected ParallelAction unregisterAction = null;
 	protected AbstractPDebugEventHandler fEventHandler;
 	
+	private MouseAdapter debugViewMouseAdapter = new MouseAdapter() {
+		public void mouseUp(MouseEvent event) {
+			Object test = event.getSource();
+			if (test instanceof Tree) {
+				TreeItem[] items = ((Tree)test).getSelection();
+				Object[] targets = new Object[items.length];
+				for (int i=0; i<items.length; i++) {
+					targets[i] = items[i].getData();
+				}
+				selectElements(targets);
+			}
+		}
+	};
 	/** Constructor
 	 * 
 	 */
@@ -86,9 +119,42 @@ public class ParallelDebugView extends ParallelJobView {
 	public void dispose() {
 		if (getEventHandler() != null) {
 			getEventHandler().dispose();
-		}	
+		}
+		Viewer viewer = getDebugViewer();
+		if (viewer != null) {
+			viewer.getControl().removeMouseListener(debugViewMouseAdapter);
+		}
 		super.dispose();
 	}
+	private Viewer getDebugViewer() {
+		IViewPart part = getViewSite().getPage().findView(IDebugUIConstants.ID_DEBUG_VIEW);
+		//IViewPart part = PTPDebugUIPlugin.getActiveWorkbenchWindow().getActivePage().findView(IDebugUIConstants.ID_DEBUG_VIEW);
+		if (part != null && part instanceof AbstractDebugView) {
+			return ((AbstractDebugView)part).getViewer();
+		}
+		return null;
+	}
+	
+	private void selectElements(final Object[] objects) {
+        SafeRunnable.run(new SafeRunnable() {
+            public void run() {
+				if (!canvas.isDisposed()) {
+					canvas.unselectAllElements();
+					for (int i=0; i<objects.length; i++) {
+						Object obj = objects[i];
+						int id = ((UIDebugManager) manager).getSelectedRegisteredTasks(obj);
+						if (id > -1) {
+							if (!canvas.isSelected(id))
+								canvas.selectElement(id);
+						}
+					}
+					canvas.redraw();
+					canvas.setCurrentSelection(false);
+				}
+			}
+		});
+	}
+		
 	/**
 	 * Sets the event handler for this view
 	 * 
@@ -96,7 +162,7 @@ public class ParallelDebugView extends ParallelJobView {
 	 */
 	protected void setEventHandler(AbstractPDebugEventHandler eventHandler) {
 		this.fEventHandler = eventHandler;
-	}	
+	}
 	/**
 	 * Returns the event handler for this view
 	 * 
@@ -109,6 +175,10 @@ public class ParallelDebugView extends ParallelJobView {
 	public void createView(Composite parent) {
 		super.createView(parent);
 		setEventHandler(new ParallelDebugViewEventHandler(this));
+		Viewer viewer = getDebugViewer();
+		if (viewer != null) {
+			viewer.getControl().addMouseListener(debugViewMouseAdapter);
+		}
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.views.AbstractParallelSetView#fillContextMenu(org.eclipse.jface.action.IMenuManager)
@@ -347,9 +417,12 @@ public class ParallelDebugView extends ParallelJobView {
     	super.selectionChanged(event);
     	ISelection selection = event.getSelection();
     	if (!selection.isEmpty() && selection instanceof StructuredSelection) {
-    		IElement element = (IElement)((StructuredSelection)selection).getFirstElement();
-    		if (element.isRegistered()) {
-    			((UIDebugManager) manager).focusOnDebugTarget(getCheckedJob(), element.getIDNum());
+    		StructuredSelection structSelection = (StructuredSelection)selection;
+    		if (structSelection.size() == 1) {
+	    		IElement element = (IElement)structSelection.getFirstElement();
+	    		if (element.isRegistered()) {
+	    			focusOnDebugTarget(getCheckedJob(), element.getIDNum());
+	    		}
     		}
     	}
     }
@@ -365,5 +438,76 @@ public class ParallelDebugView extends ParallelJobView {
 				break;
 			}
 		}
+	}
+	
+	/******************************************************
+	 * the focus on debug target on debug view 
+	 ******************************************************/
+	public void focusOnDebugTarget(IPJob job, int task_id) {
+		Object debugObj = ((UIDebugManager) manager).getDebugObject(job, task_id);
+		if (debugObj != null) {
+			focusOnDebugView(debugObj);
+		}
+	}
+	private void expendDebugView(AsynchronousTreeViewer asynViewer, Object selection) {
+		TreePath[] treePaths = asynViewer.getTreePaths(selection);
+		if (treePaths.length == 0) {
+			if (selection instanceof IStackFrame) {
+				expendDebugView(asynViewer, ((IStackFrame)selection).getLaunch());
+			}
+			else if (selection instanceof IThread) {
+				expendDebugView(asynViewer, ((IThread)selection).getLaunch());
+			}
+			else if (selection instanceof IDebugTarget) {
+				expendDebugView(asynViewer, ((IDebugTarget)selection).getLaunch());
+			}
+		}
+		if (treePaths.length > 0) {
+			asynViewer.expand(new TreeSelection(treePaths[0]));
+		}
+	}
+	private void doOnFocusDebugView(final Object selection) {
+		IViewPart part = PTPDebugUIPlugin.getActiveWorkbenchWindow().getActivePage().findView(IDebugUIConstants.ID_DEBUG_VIEW);
+		if (part != null && part instanceof AbstractDebugView) {
+			Viewer viewer = ((AbstractDebugView)part).getViewer();
+			if (viewer instanceof AsynchronousTreeViewer) {
+				AsynchronousTreeViewer asynViewer = (AsynchronousTreeViewer)viewer;
+				expendDebugView(asynViewer, selection);
+				focusOnDebugTarget(asynViewer, selection);
+			}
+		}
+	}
+	private void focusOnDebugView(final Object selection) {
+		if (selection == null) {
+			return;
+		}
+		if (PTPDebugUIPlugin.getDisplay().getThread() == Thread.currentThread()) {
+			doOnFocusDebugView(selection);
+		} else {
+			WorkbenchJob job = new WorkbenchJob("Focus on Debug View") {
+				public IStatus runInUIThread(IProgressMonitor monitor) {
+					doOnFocusDebugView(selection);
+					return Status.OK_STATUS;
+				}
+			};
+			job.setPriority(Job.INTERACTIVE);
+			job.setSystem(true);
+			job.schedule();
+		}
+	}
+	private void focusOnDebugTarget(final AsynchronousTreeViewer asynViewer, final Object selection) {
+		WorkbenchJob job = new WorkbenchJob("Focus on Debug Target") {
+			public IStatus runInUIThread(IProgressMonitor monitor) {
+				final TreePath[] treePaths = asynViewer.getTreePaths(selection);
+				if (treePaths.length > 0) {
+   					asynViewer.setSelection(new TreeSelection(treePaths[0]), true, true);
+   					selectElements(new Object[] { selection });
+    			}
+                return Status.OK_STATUS;
+            }
+        };
+        job.setSystem(true);
+        job.setPriority(Job.DECORATE);
+        job.schedule();
 	}
 }

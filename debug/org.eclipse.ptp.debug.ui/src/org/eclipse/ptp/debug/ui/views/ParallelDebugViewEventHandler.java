@@ -28,6 +28,7 @@ import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.events.IPDebugErrorInfo;
 import org.eclipse.ptp.debug.core.events.IPDebugEvent;
 import org.eclipse.ptp.debug.core.events.IPDebugInfo;
+import org.eclipse.ptp.debug.core.events.IPDebugRegisterInfo;
 import org.eclipse.ptp.debug.internal.ui.PDebugUIUtils;
 import org.eclipse.ptp.debug.internal.ui.UIDebugManager;
 import org.eclipse.ptp.debug.internal.ui.views.AbstractPDebugEventHandler;
@@ -62,26 +63,29 @@ public class ParallelDebugViewEventHandler extends AbstractPDebugEventHandler {
 				switch (event.getDetail()) {
 				case IPDebugEvent.DEBUGGER:
 					PTPDebugUIPlugin.getUIDebugManager().defaultRegister((IPCDISession)event.getSource());
+					refresh();
 					break;
 				case IPDebugEvent.REGISTER:
-					IElementHandler elementHandler = getPView().getElementHandler(job.getIDString());
+					boolean refresh = true;
+					if (info instanceof IPDebugRegisterInfo) {
+						refresh = ((IPDebugRegisterInfo)info).isRefresh();
+					}
 					int[] processes = info.getAllRegisteredProcesses().toArray();
-					for (int j = 0; j < processes.length; j++) {
-						//IPProcess proc = job.findProcessByTaskId(processes[j]);
-						IElement element = elementHandler.getSetRoot().get(String.valueOf(processes[j]));
-						element.setRegistered(true);
-						elementHandler.addRegisterElement(element);
+					if (refresh) {
+						IElementHandler elementHandler = getPView().getElementHandler(job.getIDString());
+						for (int j=0; j<processes.length; j++) {
+							//IPProcess proc = job.findProcessByTaskId(processes[j]);
+							IElement element = elementHandler.getSetRoot().get(String.valueOf(processes[j]));
+							element.setRegistered(true);
+							elementHandler.addRegisterElement(element);
+						}
+						refresh();
 					}
-					//focus on the registered debug target.  If registered targets are more than one, focus on the first one.
-					//TODO
-					/*
 					if (processes.length > 0) {
-						focusOnDebugTarget(job, processes[0]);				
+						getPView().focusOnDebugTarget(job, processes[0]);
 					}
-					*/
 					break;
 				}
-				refresh();
 				break;
 			case IPDebugEvent.TERMINATE:
 				switch (event.getDetail()) {
@@ -89,15 +93,21 @@ public class ParallelDebugViewEventHandler extends AbstractPDebugEventHandler {
 					refresh(true);
 					break;
 				case IPDebugEvent.REGISTER:
-					IElementHandler elementHandler = getPView().getElementHandler(job.getIDString());
-					int[] processes = info.getAllUnregisteredProcesses().toArray();
-					for (int j = 0; j < processes.length; j++) {
-						//IPProcess proc = job.findProcessByTaskId(processes[j]);
-						IElement element = elementHandler.getSetRoot().get(String.valueOf(processes[j]));
-						element.setRegistered(false);
-						elementHandler.removeRegisterElement(element);
+					boolean refresh = true;
+					if (info instanceof IPDebugRegisterInfo) {
+						refresh = ((IPDebugRegisterInfo)info).isRefresh();
 					}
-					refresh();
+					int[] processes = info.getAllUnregisteredProcesses().toArray();
+					if (refresh) {
+						IElementHandler elementHandler = getPView().getElementHandler(job.getIDString());
+						for (int j = 0; j < processes.length; j++) {
+							//IPProcess proc = job.findProcessByTaskId(processes[j]);
+							IElement element = elementHandler.getSetRoot().get(String.valueOf(processes[j]));
+							element.setRegistered(false);
+							elementHandler.removeRegisterElement(element);
+						}
+						refresh();
+					}
 					break;
 				default:
 					if (job.getIDString().equals(getPView().getCurrentID())) {
