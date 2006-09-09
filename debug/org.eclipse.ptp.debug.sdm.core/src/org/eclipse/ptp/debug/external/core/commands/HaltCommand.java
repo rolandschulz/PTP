@@ -36,11 +36,14 @@ public class HaltCommand extends AbstractDebugCommand {
 	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
 		debugger.filterSuspendTasks(tasks);
 		if (!tasks.isEmpty()) {
-			debugger.halt(tasks);
+			exec(debugger);
 		}
 		else {
 			doCancelWaiting();
 		}
+	}
+	public void exec(IAbstractDebugger debugger) throws PCDIException {
+		debugger.halt(tasks);
 	}
 	public String getCommandName() {
 		return "Halt"; 

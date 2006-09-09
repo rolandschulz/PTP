@@ -34,9 +34,11 @@ public class GetVariableTypeCommand extends AbstractDebugCommand {
 		this.varName = varName;
 	}
 	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
+		exec(debugger);
+	}
+	public void exec(IAbstractDebugger debugger) throws PCDIException {
 		debugger.getVariableType(tasks, varName);
 	}
-	
 	public String getVariableType() throws PCDIException {
 		Object res = getResultValue();
 		if (res instanceof String) {

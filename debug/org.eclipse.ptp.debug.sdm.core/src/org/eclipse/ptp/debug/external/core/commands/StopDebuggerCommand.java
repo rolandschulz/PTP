@@ -19,6 +19,7 @@
 package org.eclipse.ptp.debug.external.core.commands;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
@@ -29,23 +30,20 @@ import org.eclipse.ptp.debug.core.cdi.PCDIException;
 public class StopDebuggerCommand extends AbstractDebugCommand {
 	private boolean sendEvent = true;
 	
-	public StopDebuggerCommand(boolean sendEvent) {
-		super(null, true, true, false);
+	public StopDebuggerCommand(BitList tasks, boolean sendEvent) {
+		super(tasks, true, true, false);
 		this.sendEvent = sendEvent;
 	}
-	public StopDebuggerCommand() {
-		this(true);
-	}
-	public void execCommand(IAbstractDebugger debugger, long timeout) throws PCDIException {
-		setTimeout(timeout);
-		execCommand(debugger);
-		if (waitForReturn()) {
-			if (sendEvent) {
-				debugger.handleStopDebuggerEvent();
-			}
-		}
+	public StopDebuggerCommand(BitList tasks) {
+		this(tasks, true);
 	}
 	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
+		exec(debugger);
+		if (sendEvent) {
+			debugger.handleStopDebuggerEvent();
+		}
+	}
+	protected void exec(IAbstractDebugger debugger) throws PCDIException {
 		try {
 			debugger.stopDebugger();
 		} catch (CoreException e) {

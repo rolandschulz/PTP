@@ -38,9 +38,11 @@ public class ListArgumentsCommand extends AbstractDebugCommand {
 		this.depth = depth;
 	}
 	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
-		debugger.listArguments(tasks, frame, depth);
+		exec(debugger);
 	}
-	
+	public void exec(IAbstractDebugger debugger) throws PCDIException {
+		debugger.listArguments(tasks, frame, depth);
+	}	
 	public IPCDIArgument[] getArguments() throws PCDIException {
 		Object res = getResultValue();
 		if (res instanceof IPCDIArgument[]) {

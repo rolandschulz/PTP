@@ -32,9 +32,11 @@ public class ListStackFramesCommand extends AbstractDebugCommand {
 		super(tasks);
 	}
 	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
-		debugger.listStackFrames(tasks);
+		exec(debugger);
 	}
-	
+	public void exec(IAbstractDebugger debugger) throws PCDIException {
+		debugger.listStackFrames(tasks);
+	}		
 	public IPCDIStackFrame[] getStackFrames() throws PCDIException {
 		Object res = getResultValue();
 		if (res instanceof IPCDIStackFrame[]) {

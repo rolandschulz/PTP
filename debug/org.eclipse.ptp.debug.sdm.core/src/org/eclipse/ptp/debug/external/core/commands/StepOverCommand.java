@@ -27,23 +27,20 @@ import org.eclipse.ptp.debug.core.cdi.event.IPCDIResumedEvent;
  * @author Clement chu
  * 
  */
-public class StepOverCommand extends AbstractDebugCommand {
-	private int count = 1;
+public class StepOverCommand extends StepCommand {
 	public StepOverCommand(BitList tasks) {
 		this(tasks, 1);
 	}
 	public StepOverCommand(BitList tasks, int count) {
-		super(tasks, false, false);
-		this.count = count;
-	}
-	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
-		debugger.filterRunningTasks(tasks);
-		if (!tasks.isEmpty()) {
-			debugger.handleProcessResumedEvent(tasks, IPCDIResumedEvent.STEP_OVER);
-			debugger.stepOver(tasks, count);
-		}
+		super(tasks, count);
 	}
 	public String getCommandName() {
 		return "Step over"; 
+	}
+	protected void exec(IAbstractDebugger debugger) throws PCDIException {
+		debugger.stepInto(tasks, count);
+	}
+	protected int getEventType() {
+		return IPCDIResumedEvent.STEP_OVER;
 	}
 }

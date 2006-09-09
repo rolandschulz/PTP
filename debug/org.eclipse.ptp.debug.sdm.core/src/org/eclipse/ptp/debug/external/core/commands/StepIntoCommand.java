@@ -27,23 +27,20 @@ import org.eclipse.ptp.debug.core.cdi.event.IPCDIResumedEvent;
  * @author Clement chu
  * 
  */
-public class StepIntoCommand extends AbstractDebugCommand {
-	private int count = 1;
+public class StepIntoCommand extends StepCommand {
 	public StepIntoCommand(BitList tasks) {
 		this(tasks, 1);
 	}
 	public StepIntoCommand(BitList tasks, int count) {
-		super(tasks, false, false);
-		this.count = count;
-	}
-	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
-		debugger.filterRunningTasks(tasks);
-		if (!tasks.isEmpty()) {
-			debugger.handleProcessResumedEvent(tasks, IPCDIResumedEvent.STEP_INTO);
-			debugger.stepInto(tasks, count);
-		}
+		super(tasks, count);
 	}
 	public String getCommandName() {
 		return "Step Into"; 
+	}
+	protected void exec(IAbstractDebugger debugger) throws PCDIException {
+		debugger.stepInto(tasks, count);
+	}
+	protected int getEventType() {
+		return IPCDIResumedEvent.STEP_INTO;
 	}
 }

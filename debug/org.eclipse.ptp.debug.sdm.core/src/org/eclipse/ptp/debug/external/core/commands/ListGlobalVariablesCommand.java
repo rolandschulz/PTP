@@ -32,6 +32,9 @@ public class ListGlobalVariablesCommand extends AbstractDebugCommand {
 		super(tasks);
 	}
 	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
+		exec(debugger);
+	}
+	public void exec(IAbstractDebugger debugger) throws PCDIException {
 		debugger.listGlobalVariables(tasks);
 	}
 	public IPCDIGlobalVariable[] getGlobalVariables() throws PCDIException {
