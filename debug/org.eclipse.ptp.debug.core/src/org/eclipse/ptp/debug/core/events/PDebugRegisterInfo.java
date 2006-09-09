@@ -16,29 +16,26 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.core.model;
+package org.eclipse.ptp.debug.core.events;
 
-import org.eclipse.cdt.core.IAddress;
-import org.eclipse.cdt.debug.core.model.IJumpToAddress;
-import org.eclipse.cdt.debug.core.model.IJumpToLine;
-import org.eclipse.cdt.debug.core.model.IRunToAddress;
-import org.eclipse.cdt.debug.core.model.IRunToLine;
-import org.eclipse.debug.core.DebugException;
-import org.eclipse.debug.core.model.IStackFrame;
-import org.eclipse.debug.core.model.IValue;
+import org.eclipse.ptp.core.IPJob;
+import org.eclipse.ptp.core.util.BitList;
 
 /**
- * @author Clement chu
- * 
+ * @author Clement
  */
-public interface IPStackFrame extends IRunToLine, IRunToAddress, IJumpToLine, IJumpToAddress, IPDebugElement, IStackFrame {
-	public IAddress getAddress();
-	public String getFile();
-	public String getFunction();
-	public int getFrameLineNumber();
-	public int getLevel();
-	public IValue evaluateExpression(String expression) throws DebugException;
-	public String evaluateExpressionToString(String expression) throws DebugException;
-	boolean canEvaluate();
-	public int getTargetID();
+public class PDebugRegisterInfo extends PDebugInfo implements IPDebugRegisterInfo {
+	private boolean refresh;
+	
+	public PDebugRegisterInfo(IPJob job, BitList allProcesses, BitList allRegProcesses, BitList allUnregProcesses, boolean refresh) {
+		super(job, allProcesses, allRegProcesses, allUnregProcesses);
+		this.refresh = refresh;
+	}
+	public PDebugRegisterInfo(IPDebugInfo info, boolean refresh) {
+		super(info);
+		this.refresh = refresh;
+	}
+	public boolean isRefresh() {
+		return refresh;
+	}
 }

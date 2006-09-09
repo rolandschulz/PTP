@@ -50,6 +50,7 @@ import org.eclipse.ptp.debug.core.events.IPDebugEvent;
 import org.eclipse.ptp.debug.core.events.IPDebugInfo;
 import org.eclipse.ptp.debug.core.events.PDebugEvent;
 import org.eclipse.ptp.debug.core.events.PDebugInfo;
+import org.eclipse.ptp.debug.core.events.PDebugRegisterInfo;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.debug.core.model.IPBreakpoint;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
@@ -120,22 +121,22 @@ public class PCDIDebugModel {
 		IPDebugInfo info = new PDebugInfo(job, null, null, null);
 		PTPDebugCorePlugin.getDefault().fireDebugEvent(new PDebugEvent(session, IPDebugEvent.CREATE, IPDebugEvent.DEBUGGER, info));
 	}
-	public void fireRegisterEvent(IPJob job, BitList tasks) {
+	public void fireRegisterEvent(IPJob job, BitList tasks, boolean refresh) {
 		if (!tasks.isEmpty()) {
-			IPDebugInfo info = new PDebugInfo(job, tasks, tasks, null);
+			IPDebugInfo info = new PDebugRegisterInfo(job, tasks, tasks, null, refresh);
 			PTPDebugCorePlugin.getDefault().fireDebugEvent(new PDebugEvent(getPCDISession(job.getIDString()), IPDebugEvent.CREATE, IPDebugEvent.REGISTER, info));
 		}
 	}
-	public void fireUnregisterEvent(IPJob job, BitList tasks) {
+	public void fireUnregisterEvent(IPJob job, BitList tasks, boolean refresh) {
 		if (!tasks.isEmpty()) {
-			IPDebugInfo info = new PDebugInfo(job, tasks, null, tasks);
+			IPDebugInfo info = new PDebugRegisterInfo(job, tasks, null, tasks, refresh);
 			PTPDebugCorePlugin.getDefault().fireDebugEvent(new PDebugEvent(getPCDISession(job.getIDString()), IPDebugEvent.TERMINATE, IPDebugEvent.REGISTER, info));
 		}
 	}
 	/**************************************************
 	 * Register / Unregister
 	 **************************************************/
-	public void removeDebugTarget(final IPLaunch launch, final BitList tasks, final boolean sendEvent) {
+	public void removeDebugTarget(final IPLaunch launch, final BitList tasks, final boolean refresh) {
 		Job aJob = new Job("Creating new debug targets...") {
 			protected IStatus run(IProgressMonitor monitor) {
 				int[] taskArray = tasks.toArray();
@@ -147,9 +148,7 @@ public class PCDIDebugModel {
 						debugTarget.terminated();
 					}
 				}
-				if (sendEvent)
-					fireUnregisterEvent(launch.getPJob(), tasks);
-
+				fireUnregisterEvent(launch.getPJob(), tasks, refresh);
 				return Status.OK_STATUS;
 			}
 		};
@@ -157,12 +156,11 @@ public class PCDIDebugModel {
 		aJob.setPriority(Job.INTERACTIVE);
 		aJob.schedule();		
 	}
-	public void addNewDebugTargets(IPLaunch launch, BitList tasks, IPCDITarget[] targets, IBinaryObject file, boolean resumeTarget, boolean sendEvent) {
-		createDebugTargets(launch, tasks, targets, file, true, false, resumeTarget, sendEvent);
-	}
-	private void createDebugTargets(final IPLaunch launch, final BitList tasks, final IPCDITarget[] cdiTargets, final IBinaryObject file, final boolean allowTerminate, final boolean allowDisconnect, final boolean resumeTarget, final boolean sendEvent) {
+	public void addNewDebugTargets(final IPLaunch launch, final BitList tasks, final IPCDITarget[] cdiTargets, final IBinaryObject file, final boolean resumeTarget, final boolean refresh) {
 		Job aJob = new Job("Creating new debug targets...") {
 			protected IStatus run(IProgressMonitor monitor) {
+				boolean allowTerminate = true;
+				boolean allowDisconnect = false;
 				for (int i=0; i<cdiTargets.length; i++) {
 					IPDebugTarget target = new PDebugTarget(launch, cdiTargets[i], null, file, allowTerminate, allowDisconnect);
 					IPCDITargetConfiguration config = cdiTargets[i].getConfiguration();
@@ -176,9 +174,7 @@ public class PCDIDebugModel {
 					launch.getPJob().findProcessByTaskId(target.getTargetID()).setAttribute(AttributeConstants.ATTRIB_ISREGISTERED, new Boolean(true));
 					launch.addDebugTarget(target);
 				}
-				if (sendEvent)
-					fireRegisterEvent(launch.getPJob(), tasks);
-
+				fireRegisterEvent(launch.getPJob(), tasks, refresh);
 				return Status.OK_STATUS;
 			}
 		};

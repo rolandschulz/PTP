@@ -24,7 +24,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-
 import org.eclipse.cdt.core.IAddress;
 import org.eclipse.cdt.core.IAddressFactory;
 import org.eclipse.debug.core.DebugException;
@@ -156,6 +155,8 @@ public class PValue extends AbstractPValue {
 				return processUnderlyingValue(((IAIFValueReference) aifValue).getParent());
 			else if (aifValue instanceof IAIFValueString)
 				return getWCharValueString((IAIFValueString) aifValue);
+			else if (aifValue instanceof IValueAggregate)
+				return "{...}";
 			else
 				return aifValue.getValueString();
 		}
