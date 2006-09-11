@@ -23,4 +23,4 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.cdt.core,
  org.eclipse.cdt.debug.core,
  org.eclipse.search
-Eclipse-AutoStart: true
+Eclipse-LazyStart: true
