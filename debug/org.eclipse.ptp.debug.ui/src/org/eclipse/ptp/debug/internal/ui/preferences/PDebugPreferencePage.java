@@ -46,10 +46,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
-
 /**
  * @author Clement chu
- *
  */
 public class PDebugPreferencePage extends AbstractPerferencePage {
 	private Button fPathsButton = null;
@@ -57,28 +55,32 @@ public class PDebugPreferencePage extends AbstractPerferencePage {
 	private IntegerFieldEditor commandTimeoutField = null;
 	private Button updateVariableOnSuspendButton = null;
 	private Button updateVariableOnChangeButton = null;
+	protected class WidgetListener implements IPropertyChangeListener {
+		public void propertyChange(PropertyChangeEvent event) {
+			setValid(isValid());
+		}
+	}
+	protected WidgetListener listener = new WidgetListener();
 	
-    protected class WidgetListener implements IPropertyChangeListener {
-    	public void propertyChange(PropertyChangeEvent event) {
-	    	setValid(isValid());	
-	    }
-    }
-    protected WidgetListener listener = new WidgetListener();
-    
-	/** Constructor
-	 * 
+	private IPreferenceStore ptpPreferenceStore;
+		
+	/**
+	 * Constructor
 	 */
 	public PDebugPreferencePage() {
 		super();
-		setPreferenceStore(PTPDebugUIPlugin.getDefault().getPreferenceStore());		
+		setPreferenceStore(PTPDebugUIPlugin.getDefault().getPreferenceStore());
 		setDescription(PreferenceMessages.getString("PDebugPreferencePage.desc"));
+		ptpPreferenceStore = PTPDebugCorePlugin.getDefault().getPTPPreferenceStore();
 	}
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.jface.preference.PreferencePage#createContents(org.eclipse.swt.widgets.Composite)
 	 */
 	protected Control createContents(Composite parent) {
-		//TODO ignored help
-		//getWorkbench().getHelpSystem().setHelp(getControl(), IPDebugHelpContextIds.P_DEBUG_PREFERENCE_PAGE);
+		// TODO ignored help
+		// getWorkbench().getHelpSystem().setHelp(getControl(), IPDebugHelpContextIds.P_DEBUG_PREFERENCE_PAGE);
 		Composite composite = new Composite(parent, SWT.NULL);
 		GridLayout layout = new GridLayout(1, false);
 		layout.numColumns = 1;
@@ -98,11 +100,15 @@ public class PDebugPreferencePage extends AbstractPerferencePage {
 		setValues();
 		return composite;
 	}
-	/** Create other debug settings
+	/**
+	 * Create other debug settings
+	 * 
 	 * @param parent
 	 */
 	protected void createOtherDebugSetting(Composite parent) {}
-	/** Create view preference settings
+	/**
+	 * Create view preference settings
+	 * 
 	 * @param parent
 	 */
 	protected void createViewSettingPreferences(Composite parent) {
@@ -119,7 +125,9 @@ public class PDebugPreferencePage extends AbstractPerferencePage {
 			}
 		});
 	}
-	/** Create communication preference settings
+	/**
+	 * Create communication preference settings
+	 * 
 	 * @param parent
 	 */
 	protected void createCommunicationPreferences(Composite parent) {
@@ -129,17 +137,20 @@ public class PDebugPreferencePage extends AbstractPerferencePage {
 		GridData data = new GridData(GridData.FILL_HORIZONTAL);
 		data.horizontalSpan = 2;
 		spacingComposite.setLayoutData(data);
-		
 		commandTimeoutField = new IntegerFieldEditor(IPDebugConstants.PREF_PTP_DEBUG_COMM_TIMEOUT, PreferenceMessages.getString("PDebugPreferencePage.command_timeout"), spacingComposite);
+		commandTimeoutField.setPreferenceStore(getPTPCorePreferenceStore());
 		commandTimeoutField.setValidateStrategy(StringFieldEditor.VALIDATE_ON_KEY_STROKE);
 		commandTimeoutField.setValidRange(IPDebugConstants.MIN_REQUEST_TIMEOUT, IPDebugConstants.MAX_REQUEST_TIMEOUT);
 		String minValue = Integer.toString(IPDebugConstants.MIN_REQUEST_TIMEOUT);
 		String maxValue = Integer.toString(IPDebugConstants.MAX_REQUEST_TIMEOUT);
-		commandTimeoutField.setErrorMessage(MessageFormat.format(PreferenceMessages.getString("PDebugPreferencePage.timeoutError"), new String[]{ minValue, maxValue }));
+		commandTimeoutField.setErrorMessage(MessageFormat.format(PreferenceMessages.getString("PDebugPreferencePage.timeoutError"), new String[] { minValue, maxValue }));
 		commandTimeoutField.setEmptyStringAllowed(false);
 		commandTimeoutField.setPropertyChangeListener(listener);
+		commandTimeoutField.load();
 	}
-	/** Create variable preference settings
+	/**
+	 * Create variable preference settings
+	 * 
 	 * @param parent
 	 */
 	protected void createVariablesPreferences(Composite parent) {
@@ -147,30 +158,36 @@ public class PDebugPreferencePage extends AbstractPerferencePage {
 		updateVariableOnSuspendButton = createCheckButton(comp, PreferenceMessages.getString("PDebugPreferencePage.updateVariableOnSuspend"));
 		updateVariableOnChangeButton = createCheckButton(comp, PreferenceMessages.getString("PDebugPreferencePage.updateVariableOnChange"));
 	}
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.jface.preference.PreferencePage#performDefaults()
 	 */
-	public void performDefaults() { 
+	public void performDefaults() {
 		IPreferenceStore store = getPreferenceStore();
 		fPathsButton.setSelection(store.getDefaultBoolean(IPDebugConstants.PREF_SHOW_FULL_PATHS));
 		fRegisteredProcessButton.setSelection(store.getDefaultBoolean(IPDebugConstants.PREF_PTP_DEBUG_REGISTER_PROC_0));
 		commandTimeoutField.setStringValue(String.valueOf(store.getDefaultInt(IPDebugConstants.PREF_PTP_DEBUG_COMM_TIMEOUT)));
 		updateVariableOnSuspendButton.setSelection(store.getDefaultBoolean(IPDebugConstants.PREF_UPDATE_VARIABLES_ON_SUSPEND));
 		updateVariableOnChangeButton.setSelection(store.getDefaultBoolean(IPDebugConstants.PREF_UPDATE_VARIABLES_ON_CHANGE));
+		commandTimeoutField.loadDefault();
 		super.performDefaults();
 	}
-	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.jface.preference.IPreferencePage#performOk()
 	 */
 	public boolean performOk() {
 		storeValues();
 		PTPDebugUIPlugin.getDefault().savePluginPreferences();
+		PTPDebugCorePlugin.getDefault().savePluginPreferences();
 		refreshView();
 		return true;
 	}
-	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.ui.preferences.AbstractPerferencePage#setValues()
 	 */
 	protected void setValues() {
@@ -182,6 +199,19 @@ public class PDebugPreferencePage extends AbstractPerferencePage {
 		updateVariableOnChangeButton.setSelection(store.getBoolean(IPDebugConstants.PREF_UPDATE_VARIABLES_ON_CHANGE));
 	}
 	/* (non-Javadoc)
+	 * @see org.eclipse.jface.dialogs.DialogPage#dispose()
+	 */
+	public void dispose() {
+		commandTimeoutField.dispose();
+		fPathsButton.dispose();
+		fRegisteredProcessButton.dispose();
+		updateVariableOnSuspendButton.dispose();
+		updateVariableOnChangeButton.dispose();
+		super.dispose();
+	}	
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.ui.preferences.AbstractPerferencePage#storeValues()
 	 */
 	protected void storeValues() {
@@ -191,8 +221,11 @@ public class PDebugPreferencePage extends AbstractPerferencePage {
 		store.setValue(IPDebugConstants.PREF_PTP_DEBUG_COMM_TIMEOUT, commandTimeoutField.getIntValue());
 		store.setValue(IPDebugConstants.PREF_UPDATE_VARIABLES_ON_SUSPEND, updateVariableOnSuspendButton.getSelection());
 		store.setValue(IPDebugConstants.PREF_UPDATE_VARIABLES_ON_CHANGE, updateVariableOnChangeButton.getSelection());
+		commandTimeoutField.store();
 	}
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.jface.preference.IPreferencePage#isValid()
 	 */
 	public boolean isValid() {
@@ -204,32 +237,35 @@ public class PDebugPreferencePage extends AbstractPerferencePage {
 		}
 		return true;
 	}
-	
-    /** Refresh debug breakpoint view
-     * 
-     */
-    protected void refreshView() {
-    	IWorkbenchPage[] pages = getPages();
-    	for (int i=0; i<pages.length; i++) {
+	/**
+	 * Refresh debug breakpoint view
+	 */
+	protected void refreshView() {
+		IWorkbenchPage[] pages = getPages();
+		for (int i = 0; i < pages.length; i++) {
 			IViewPart part = pages[i].findView(IDebugUIConstants.ID_BREAKPOINT_VIEW);
 			if (part != null) {
-				IDebugView adapter = (IDebugView)part.getAdapter(IDebugView.class);
-				if (adapter != null) {				
+				IDebugView adapter = (IDebugView) part.getAdapter(IDebugView.class);
+				if (adapter != null) {
 					Viewer viewer = adapter.getViewer();
 					IDebugModelPresentation pres = adapter.getPresentation(PTPDebugCorePlugin.getUniqueIdentifier());
 					if (pres != null) {
-						pres.setAttribute(PDebugModelPresentation.DISPLAY_FULL_PATHS, fPathsButton.getSelection()?Boolean.TRUE:Boolean.FALSE);
+						pres.setAttribute(PDebugModelPresentation.DISPLAY_FULL_PATHS, fPathsButton.getSelection() ? Boolean.TRUE : Boolean.FALSE);
 					}
 					if (viewer instanceof StructuredViewer) {
-						final StructuredViewer structViewer = (StructuredViewer)viewer;
-						BusyIndicator.showWhile( structViewer.getControl().getDisplay(), new Runnable() {
+						final StructuredViewer structViewer = (StructuredViewer) viewer;
+						BusyIndicator.showWhile(structViewer.getControl().getDisplay(), new Runnable() {
 							public void run() {
 								structViewer.refresh();
 							}
-						} );
+						});
 					}
 				}
 			}
-    	}
-	}    
+		}
+	}
+		
+	protected IPreferenceStore getPTPCorePreferenceStore() {
+		return ptpPreferenceStore;
+	}	
 }

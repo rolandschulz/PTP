@@ -124,7 +124,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	 * @see org.eclipse.ptp.ui.IManager#shutdown()
 	 */
 	public void shutdown() {
-		PTPDebugUIPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(propertyChangeListener);
+		PTPDebugUIPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(propertyChangeListener);
 		DebugPlugin.getDefault().getBreakpointManager().removeBreakpointListener(this);
 		annotationMgr.shutdown();
 		jobMgr.shutdown();
