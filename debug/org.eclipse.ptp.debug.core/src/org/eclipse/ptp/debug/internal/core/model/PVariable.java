@@ -22,8 +22,6 @@ import java.text.MessageFormat;
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IValue;
-import org.eclipse.debug.internal.ui.views.variables.VariablesView;
-import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.ptp.debug.core.IPDebugConstants;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.aif.IAIF;
