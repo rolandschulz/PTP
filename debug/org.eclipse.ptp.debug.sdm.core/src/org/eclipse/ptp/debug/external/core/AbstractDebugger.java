@@ -95,7 +95,7 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		this.job = job;
 		job.setAttribute(TERMINATED_PROC_KEY, new BitList(job.totalProcesses()));
 		job.setAttribute(SUSPENDED_PROC_KEY, new BitList(job.totalProcesses()));
-		commandQueue = new DebugCommandQueue(this, timeout);
+		commandQueue = new DebugCommandQueue(this);
 		commandQueue.start();
 		
 		isExited = false;

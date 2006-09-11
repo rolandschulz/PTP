@@ -46,7 +46,7 @@ public class DataReadMemoryCommand extends AbstractDebugCommand {
 		this.cols = cols;
 		this.asChar = asChar;
 	}
-	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
+	public void preExecCommand(IAbstractDebugger debugger) throws PCDIException {
 		exec(debugger);
 	}
 	public void exec(IAbstractDebugger debugger) throws PCDIException {

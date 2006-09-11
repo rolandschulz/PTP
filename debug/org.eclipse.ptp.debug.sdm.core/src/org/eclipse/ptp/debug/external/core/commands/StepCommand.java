@@ -33,7 +33,7 @@ public abstract class StepCommand extends AbstractDebugCommand {
 		super(tasks, false, false);
 		this.count = count;
 	}
-	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
+	public void preExecCommand(IAbstractDebugger debugger) throws PCDIException {
 		debugger.filterRunningTasks(tasks);
 		if (!tasks.isEmpty()) {
 			debugger.handleProcessResumedEvent(tasks, getEventType());

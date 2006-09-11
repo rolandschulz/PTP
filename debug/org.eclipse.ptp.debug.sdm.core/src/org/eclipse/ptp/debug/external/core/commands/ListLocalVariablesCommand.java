@@ -35,7 +35,7 @@ public class ListLocalVariablesCommand extends AbstractDebugCommand {
 		super(tasks);
 		this.frame = frame;
 	}
-	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
+	public void preExecCommand(IAbstractDebugger debugger) throws PCDIException {
 		exec(debugger);
 	}
 	public void exec(IAbstractDebugger debugger) throws PCDIException {

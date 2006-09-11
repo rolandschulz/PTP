@@ -21,6 +21,7 @@ package org.eclipse.ptp.debug.external.core.commands;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.IDebugCommand;
+import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIErrorEvent;
 
@@ -39,7 +40,7 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 	protected boolean interrupt = false;
 	private boolean flush = false;
 	private boolean cancelled = false;
-	protected long timeout = 10000;
+	protected long timeout = 20000;
 	protected boolean waitInQueue = false;
 	private boolean canWaitMore = false; 
 	
@@ -73,6 +74,7 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 		this.interrupt = interrupt;
 		this.waitForReturn = waitForReturn;
 		this.waitInQueue = waitInQueue;
+		presetTimeout(PTPDebugCorePlugin.getDefault().getCommandTimeout());
 	}
 	public boolean isWaitInQueue() {
 		return waitInQueue;
@@ -92,7 +94,7 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 	protected boolean checkReturn() throws PCDIException {
 		Object result = getReturn();
 		if (result == null) {
-			if (!check_tasks.isEmpty()) {
+			if (check_tasks != null && !check_tasks.isEmpty()) {
 				throw new PCDIException("Incomplete - Command " + getCommandName());
 			}
 			throw new PCDIException("Time out - Command " + getCommandName(), IPCDIErrorEvent.DBG_NORMAL);
@@ -124,7 +126,6 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 		}
 	}
 	public boolean waitForReturn() throws PCDIException {
-		presetTimeout();
 		return waitForReturn(timeout);
 	}
 	public boolean waitForReturn(long timeout) throws PCDIException {
@@ -133,6 +134,7 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 			return true;
 
 		//start waiting
+		System.err.println("==================== cmd will timeout after: " + timeout);
 		try {
 			do {
 				doWait(timeout);
@@ -161,21 +163,22 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 	public void doFlush() {
 		setReturn(RETURN_FLUSH);
 	}
+	private void setCheckTasks() {
+		if (check_tasks == null) {
+			check_tasks = tasks.copy();
+		}
+	}
 	public void setReturn(Object result) {
 		synchronized (lock) {
-			if (check_tasks == null) {
-				check_tasks = tasks.copy();
-			}
+			setCheckTasks();
 			this.result = result;
 			lock.notifyAll();
 		}
 	}
 	public void setReturn(BitList return_tasks, Object result) {
 		synchronized (lock) {
+			setCheckTasks();
 			if (return_tasks != null) {
-				if (check_tasks == null) {
-					check_tasks = tasks.copy();
-				}
 				//check whether return tasks is same as command tasks
 				check_tasks.andNot(return_tasks);
 				if (check_tasks.isEmpty()) {
@@ -208,7 +211,6 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 	}
 	public Object getResultValue() throws PCDIException {
 		if (getReturn() == null) {
-			presetTimeout();
 			waitForReturn();
 		}
 		return getReturn();
@@ -220,7 +222,7 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 			IDebugCommand cmd = new HaltCommand(tmpTasks, true);
 			debugger.postInterruptCommand(cmd);
 			try {
-				cmd.execCommand(debugger, timeout);
+				cmd.execCommand(debugger);
 			} finally {
 				debugger.postInterruptCommand(null);
 			}
@@ -230,15 +232,15 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 	protected void resumeSuspendedTasks(IAbstractDebugger debugger, BitList suspendedTasks) throws PCDIException {
 		debugger.go(suspendedTasks);
 	}
-	public void execCommand(IAbstractDebugger debugger, long timeout) throws PCDIException {
-		this.timeout = timeout;
-		execCommand(debugger);
+	public synchronized void execCommand(IAbstractDebugger debugger) throws PCDIException {
+		preExecCommand(debugger);
 		waitForReturn();
 	}
-	protected void presetTimeout() {
-		setTimeout(timeout * tasks.cardinality());
+	protected void presetTimeout(int timeout) {
+		int size = tasks.cardinality();
+		setTimeout(timeout * (size>0?size:1));
 	}
 	
-	protected abstract void execCommand(IAbstractDebugger debugger) throws PCDIException;
+	protected abstract void preExecCommand(IAbstractDebugger debugger) throws PCDIException;
 	protected abstract void exec(IAbstractDebugger debugger) throws PCDIException;
 }

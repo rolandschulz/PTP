@@ -31,7 +31,7 @@ public class ListGlobalVariablesCommand extends AbstractDebugCommand {
 	public ListGlobalVariablesCommand(BitList tasks) {
 		super(tasks);
 	}
-	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
+	public void preExecCommand(IAbstractDebugger debugger) throws PCDIException {
 		exec(debugger);
 	}
 	public void exec(IAbstractDebugger debugger) throws PCDIException {

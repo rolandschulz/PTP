@@ -49,7 +49,7 @@ public class DataWriteMemoryCommand extends AbstractDebugCommand {
 		this.value = value;
 		this.wordFormat = wordFormat;
 	}
-	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
+	public void preExecCommand(IAbstractDebugger debugger) throws PCDIException {
 		exec(debugger);
 	}
 	public void exec(IAbstractDebugger debugger) throws PCDIException {

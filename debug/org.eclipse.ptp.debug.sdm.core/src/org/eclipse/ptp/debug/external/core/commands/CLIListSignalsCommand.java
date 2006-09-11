@@ -34,7 +34,7 @@ public class CLIListSignalsCommand extends AbstractDebugCommand {
 		super(tasks);
 		this.name = name;
 	}
-	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
+	public void preExecCommand(IAbstractDebugger debugger) throws PCDIException {
 		exec(debugger);
 	}
 	public void exec(IAbstractDebugger debugger) throws PCDIException {
