@@ -37,7 +37,7 @@ public class StopDebuggerCommand extends AbstractDebugCommand {
 	public StopDebuggerCommand(BitList tasks) {
 		this(tasks, true);
 	}
-	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
+	public void preExecCommand(IAbstractDebugger debugger) throws PCDIException {
 		exec(debugger);
 		if (sendEvent) {
 			debugger.handleStopDebuggerEvent();

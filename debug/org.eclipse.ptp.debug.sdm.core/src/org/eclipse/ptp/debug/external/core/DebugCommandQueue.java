@@ -35,16 +35,11 @@ public class DebugCommandQueue extends Thread {
 	private boolean isTerminated = false;
 	private IDebugCommand currentCommand = null;
 	private IAbstractDebugger debugger = null;
-	private int command_timeout = 10000;
 	private IDebugCommand interruptCommand = null;
 	
-	public DebugCommandQueue(IAbstractDebugger debugger, int timeout) {
+	public DebugCommandQueue(IAbstractDebugger debugger) {
 		this.debugger = debugger;
-		this.command_timeout = timeout;
 		queue = Collections.synchronizedList(new LinkedList());
-	}
-	public int getCommandTimeout() {
-		return command_timeout;
 	}
 	public void setTerminated() {
 		isTerminated = true;
@@ -65,7 +60,7 @@ public class DebugCommandQueue extends Thread {
 			try {
 				currentCommand = getCommand();
 System.err.println("*** SEND COMMAND: " + currentCommand.getCommandName() + ", tasks: " + AbstractDebugger.showBitList(currentCommand.getTasks()));
-				currentCommand.execCommand(debugger, command_timeout);
+				currentCommand.execCommand(debugger);
 			} catch (PCDIException e) {
 				debugger.handleErrorEvent(currentCommand.getTasks(), e.getMessage(), e.getErrorCode());
 				currentCommand.doFlush();
@@ -78,10 +73,11 @@ System.err.println("*** SEND COMMAND: " + currentCommand.getCommandName() + ", t
 	private boolean waitForCommand() {
 		synchronized (queue) {
 			try {
-				while (currentCommand != null || queue.isEmpty()) {
+				if (currentCommand != null || queue.isEmpty()) {
 					queue.wait();
 				}
 			} catch (InterruptedException e) {
+				e.printStackTrace();
 				return false;
 			}
 			return true;

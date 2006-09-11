@@ -33,7 +33,7 @@ public class HaltCommand extends AbstractDebugCommand {
 	public HaltCommand(BitList tasks, boolean waitEvent) {
 		super(tasks, false, waitEvent, false);
 	}
-	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
+	public void preExecCommand(IAbstractDebugger debugger) throws PCDIException {
 		debugger.filterSuspendTasks(tasks);
 		if (!tasks.isEmpty()) {
 			exec(debugger);

@@ -34,7 +34,7 @@ public class EvaluateExpressionCommand extends AbstractDebugCommand {
 		super(tasks);
 		this.varName = varName;
 	}
-	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
+	public void preExecCommand(IAbstractDebugger debugger) throws PCDIException {
 		exec(debugger);
 	}
 	public void exec(IAbstractDebugger debugger) throws PCDIException {

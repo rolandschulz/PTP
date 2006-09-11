@@ -33,7 +33,7 @@ public class SetThreadSelectCommand extends AbstractDebugCommand {
 		super(tasks, false, true);
 		this.threadNum = threadNum;
 	}
-	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
+	public void preExecCommand(IAbstractDebugger debugger) throws PCDIException {
 		exec(debugger);
 	}
 	public void exec(IAbstractDebugger debugger) throws PCDIException {

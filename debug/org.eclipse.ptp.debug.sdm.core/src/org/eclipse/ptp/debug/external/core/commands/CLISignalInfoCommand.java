@@ -33,7 +33,7 @@ public class CLISignalInfoCommand extends AbstractDebugCommand {
 		super(tasks, false, false);
 		this.arg = arg;
 	}
-	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
+	public void preExecCommand(IAbstractDebugger debugger) throws PCDIException {
 		exec(debugger);
 	}
 	public void exec(IAbstractDebugger debugger) throws PCDIException {

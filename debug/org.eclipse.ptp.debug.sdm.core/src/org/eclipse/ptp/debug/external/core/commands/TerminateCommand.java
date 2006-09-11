@@ -36,7 +36,7 @@ public class TerminateCommand extends AbstractDebugCommand {
 	public TerminateCommand(BitList tasks) {
 		this(tasks, true);
 	}
-	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
+	public void preExecCommand(IAbstractDebugger debugger) throws PCDIException {
 		debugger.filterTerminateTasks(tasks);
 		if (!tasks.isEmpty()) {
 			suspendRunningTasks(debugger);

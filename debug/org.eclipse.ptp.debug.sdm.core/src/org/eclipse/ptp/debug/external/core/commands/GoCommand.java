@@ -31,7 +31,7 @@ public class GoCommand extends AbstractDebugCommand {
 	public GoCommand(BitList tasks) {
 		super(tasks, false, false);
 	}
-	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
+	public void preExecCommand(IAbstractDebugger debugger) throws PCDIException {
 		debugger.filterRunningTasks(tasks);
 		if (!tasks.isEmpty()) {
 			exec(debugger);
