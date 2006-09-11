@@ -44,6 +44,7 @@ import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.DebugException;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ptp.debug.core.events.IPDebugEvent;
 import org.eclipse.ptp.debug.core.sourcelookup.IPSourceLocation;
 import org.eclipse.ptp.debug.internal.core.PDebugConfiguration;
@@ -68,7 +69,7 @@ public class PTPDebugCorePlugin extends Plugin {
 	private List fEventQueue = new ArrayList();
 	private boolean fShuttingDown= false;
 	private int fDispatching = 0;
-
+	
 	public PTPDebugCorePlugin() {
 		super();
 		plugin = this;
@@ -88,6 +89,11 @@ public class PTPDebugCorePlugin extends Plugin {
 		}
 		return getDefault().getBundle().getSymbolicName();
 	}
+	
+	public IPreferenceStore getPTPPreferenceStore() {
+		return new PTPPreferenceStore(getPluginPreferences());
+	}
+	
 	public static void log(Throwable t) {
 		Throwable top = t;
 		if (t instanceof DebugException) {
@@ -178,12 +184,15 @@ public class PTPDebugCorePlugin extends Plugin {
 		// setSessionManager(new SessionManager());
 	}
 	public void stop(BundleContext context) throws Exception {
-		setShuttingDown(true);
-		//disposeBreakpointListenersList();
-		//resetBreakpointsInstallCount();
-		debugModel.shutdown();
-		disposeCommonSourceLookupDirector();
-		super.stop(context);
+		try {
+			setShuttingDown(true);
+			//disposeBreakpointListenersList();
+			//resetBreakpointsInstallCount();
+			disposeCommonSourceLookupDirector();
+			debugModel.shutdown();
+		} finally {
+			super.stop(context);
+		}
 	}
 	private void initializeCommonSourceLookupDirector() {
 		if (fCommonSourceLookupDirector == null) {
@@ -398,5 +407,9 @@ public class PTPDebugCorePlugin extends Plugin {
 			fEvent = null;
 			fListener = null;			
 		}
+	}
+	
+	public int getCommandTimeout() {
+		return getPluginPreferences().getInt(IPDebugConstants.PREF_PTP_DEBUG_COMM_TIMEOUT);
 	}
 }
