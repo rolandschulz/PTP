@@ -40,11 +40,9 @@ public interface IDebugCommand extends Comparable {
 	 * 
 	 * @param debugger
 	 *            debugger to execute the command
-	 * @param timeout
-	 *            set the timeout for this command
 	 * @throws PCDIException
 	 */
-	public void execCommand(IAbstractDebugger debugger, long timeout) throws PCDIException;
+	public void execCommand(IAbstractDebugger debugger) throws PCDIException;
 	/**
 	 * Whether this command can be interrupted
 	 * 
