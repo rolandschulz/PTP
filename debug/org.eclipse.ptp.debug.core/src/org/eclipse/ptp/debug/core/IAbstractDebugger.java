@@ -29,7 +29,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.util.BitList;
-import org.eclipse.ptp.core.util.Queue;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIBreakpoint;
@@ -52,7 +51,7 @@ public interface IAbstractDebugger extends IDebugger {
 	public void fireEvents(IPCDIEvent[] events);
 	public void fireEvent(IPCDIEvent event);
 	public void notifyObservers(Object arg);
-	public Queue getEventQueue();
+	//public Queue getEventQueue();
 	
 	/* Miscellaneous */
 	public IPCDISession getSession();
