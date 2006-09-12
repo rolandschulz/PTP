@@ -134,11 +134,13 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 			return true;
 
 		//start waiting
-		System.err.println("==================== cmd will timeout after: " + timeout);
 		try {
-			do {
-				doWait(timeout);
-			} while (canWaitMore);
+			synchronized (lock) {
+				do {
+					canWaitMore = false;
+					doWait(timeout);
+				} while (canWaitMore);
+			}
 		} catch (InterruptedException e) {
 			throw new PCDIException(e);
 		}
@@ -189,7 +191,6 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 					//if return tasks is not equal to command tasks, wait again
 					canWaitMore = true;
 					lock.notifyAll();
-					canWaitMore = false;
 				}
 			}
 			else {
@@ -240,7 +241,6 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 		int size = tasks.cardinality();
 		setTimeout(timeout * (size>0?size:1));
 	}
-	
 	protected abstract void preExecCommand(IAbstractDebugger debugger) throws PCDIException;
 	protected abstract void exec(IAbstractDebugger debugger) throws PCDIException;
 }
