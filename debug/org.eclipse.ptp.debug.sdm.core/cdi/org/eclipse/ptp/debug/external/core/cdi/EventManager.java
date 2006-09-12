@@ -278,7 +278,10 @@ public class EventManager extends SessionObject implements IPCDIEventManager, Ob
 		}
 		else if (event instanceof IPCDIChangedEvent) {
 			fireChangeEvent((IPCDIChangedEvent)event);
-		}		
+		}
+		else if (event instanceof IPCDIDestroyedEvent) {
+			getSession().shutdown();
+		}
 	}
 	public void fireSuspendEvent(IPCDISuspendedEvent event) {
 		IPDebugInfo baseInfo = getDebugInfo(event);

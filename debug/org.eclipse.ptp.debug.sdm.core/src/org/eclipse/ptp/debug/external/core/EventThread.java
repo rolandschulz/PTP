@@ -18,30 +18,58 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.core;
 
-import org.eclipse.ptp.core.util.Queue;
+import java.util.ArrayList;
+import java.util.List;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 
-public class EventThread extends Thread {
+public class EventThread {
+	private List fEventQueue = new ArrayList();
+	private EventDispatchJob dispatchJob = new EventDispatchJob(); 
+
 	IAbstractDebugger dbg;
 	
-	public EventThread(IAbstractDebugger d) {
-		super("IDebugger Event Thread");
-		dbg = d;
+	public EventThread(IAbstractDebugger dbg) {
+		this.dbg = dbg;
 	}
-	
-	public void run() {
-		Queue eventQueue = dbg.getEventQueue();
-		while (!dbg.isExited()) {
-			IPCDIEvent event = null;
-			try {
-				event = (IPCDIEvent) eventQueue.removeItem();
-			} catch (InterruptedException e) {
-				//e.printStackTrace();
-			}
-			if (event != null) {
-				dbg.notifyObservers(event);
-			}
+	public void cancelJob() {
+		dispatchJob.cancel();
+	}
+	public void fireDebugEvent(IPCDIEvent event) {
+		synchronized (fEventQueue) {
+			fEventQueue.add(event);
 		}
+		dispatchJob.schedule();
 	}
+	class EventDispatchJob extends Job {
+	    /**
+         * Creates a new event dispatch job.
+         */
+        public EventDispatchJob() {
+            super("EventDispatchJob"); 
+            setPriority(Job.INTERACTIVE);
+            setSystem(true);
+        }
+        /* (non-Javadoc)
+         * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.IProgressMonitor)
+         */
+        protected IStatus run(IProgressMonitor monitor) {
+            while (!dbg.isExited() && !fEventQueue.isEmpty()) {
+            	IPCDIEvent event = null;
+	            synchronized (fEventQueue) {
+	                if (!fEventQueue.isEmpty()) {
+	                	event = (IPCDIEvent) fEventQueue.remove(0);
+	                }
+	            }
+	            if (event != null) {
+					dbg.notifyObservers(event);
+	            }
+            }
+            return Status.OK_STATUS;
+        }
+	}    
 }
