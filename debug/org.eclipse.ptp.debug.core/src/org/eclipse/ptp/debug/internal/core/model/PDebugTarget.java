@@ -29,7 +29,6 @@ import org.eclipse.cdt.core.IAddressFactory;
 import org.eclipse.cdt.core.IBinaryParser.IBinaryObject;
 import org.eclipse.cdt.core.IBinaryParser.ISymbol;
 import org.eclipse.cdt.debug.core.cdi.CDIException;
-import org.eclipse.cdt.debug.core.cdi.model.ICDITargetConfiguration2;
 import org.eclipse.cdt.debug.core.model.ICModule;
 import org.eclipse.cdt.debug.core.model.IDebuggerProcessSupport;
 import org.eclipse.cdt.debug.core.model.IDisassembly;
@@ -160,9 +159,11 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPCDIE
 		if (fCDITarget.isTerminated()) {
 			setState(PDebugElementState.TERMINATED);
 		} else {
-			setState(PDebugElementState.UNDEFINED);
 			if (fCDITarget.isSuspended())
 				setState(PDebugElementState.SUSPENDED);
+			else
+				setState(PDebugElementState.UNDEFINED);
+
 			setGlobalVariableManager(new PGlobalVariableManager(this));
 			setMemoryBlockRetrieval(new PTPMemoryBlockRetrievalExtension(this));
 			setSignalManager(new PSignalManager(this));

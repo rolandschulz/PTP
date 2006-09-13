@@ -74,16 +74,21 @@ public class EventManager extends SessionObject implements IPCDIEventManager, Ob
 	public void update(Observable o, Object arg) {
 		IPCDIEvent event = (IPCDIEvent) arg;
 		fireDebugEvent(event);
-		fireInternalEvent(event);
+		fireEventRegistered(event);
 	}
-	private void fireInternalEvent(final IPCDIEvent event) {
+	private void fireEventRegistered(final IPCDIEvent event) {
 		Job aJob = new Job("Updating registered process...") {
 			protected IStatus run(IProgressMonitor monitor) {
-				List cdiList = new ArrayList(1);
+				int[] procs = event.getAllRegisteredProcesses().toArray();
+				if (procs.length == 0) {
+					monitor.done();
+					return Status.OK_STATUS;
+				}
+
 				if (event instanceof IPCDISuspendedEvent) {
-					processSuspendedEvent((IPCDISuspendedEvent)event, monitor);
+					processSuspendedEvent((IPCDISuspendedEvent)event, procs, monitor);
 				} else if (event instanceof IPCDIResumedEvent) {
-					processRunningEvent((IPCDIResumedEvent)event, monitor);
+					processRunningEvent((IPCDIResumedEvent)event, procs, monitor);
 				}
 				/*
 				if (event instanceof IPCDIMemoryChangedEvent) {
@@ -111,8 +116,6 @@ public class EventManager extends SessionObject implements IPCDIEventManager, Ob
 						
 					}
 				}
-				*/
-				/*
 				else if (event instanceof IPCDISignalChangedEvent) {
 					System.err.println("******* GOT IPCDISignalChangedEvent");
 					SignalChangedEvent sigEvent = (SignalChangedEvent)event;
@@ -131,9 +134,8 @@ public class EventManager extends SessionObject implements IPCDIEventManager, Ob
 					}
 				}
 				*/
-				cdiList.add(event);
 				// Fire the event;
-				fireEvents((IPCDIEvent[])cdiList.toArray(new IPCDIEvent[0]));
+				fireEvents(new IPCDIEvent[] { event } );
 				monitor.done();
 				return Status.OK_STATUS;
 			}
@@ -161,13 +163,7 @@ public class EventManager extends SessionObject implements IPCDIEventManager, Ob
 			}
 		}
 	}
-	
-	boolean processSuspendedEvent(IPCDISuspendedEvent event, IProgressMonitor monitor) {
-		int[] procs = event.getAllRegisteredProcesses().toArray();
-		if (procs.length == 0) {
-			monitor.done();
-			return true;
-		}
+	boolean processSuspendedEvent(IPCDISuspendedEvent event, int[] procs, IProgressMonitor monitor) {
 		monitor.beginTask("Suspending registered process...", procs.length);
 		Session session = (Session)getSession();
 		SignalManager sigMgr = session.getSignalManager();
@@ -189,17 +185,12 @@ public class EventManager extends SessionObject implements IPCDIEventManager, Ob
 					return false;
 				}
 				*/
-				int threadId = event.getThreadId();
-				currentTarget.updateState(threadId);
+				currentTarget.updateState(event.getThreadId());
 				try {
 					Thread cthread = (Thread)currentTarget.getCurrentThread();
 					if (cthread != null) {
 						cthread.getCurrentStackFrame();
 					}
-				} catch (PCDIException e1) {
-					PTPDebugExternalPlugin.log(e1);
-				}
-				try {
 					if (sigMgr.isAutoUpdate()) {
 						sigMgr.update(currentTarget);
 					}
@@ -222,7 +213,7 @@ public class EventManager extends SessionObject implements IPCDIEventManager, Ob
 					}
 					*/
 				} catch (PCDIException e) {
-					e.printStackTrace();
+					PTPDebugExternalPlugin.log(e);
 				}
 			} finally {
 				monitor.worked(1);
@@ -234,12 +225,7 @@ public class EventManager extends SessionObject implements IPCDIEventManager, Ob
 	/**
 	 * Do any processing of before a running event.
 	 */
-	boolean processRunningEvent(IPCDIResumedEvent event, IProgressMonitor monitor) {
-		int[] procs = event.getAllRegisteredProcesses().toArray();
-		if (procs.length == 0) {
-			monitor.done();
-			return true;
-		}
+	boolean processRunningEvent(IPCDIResumedEvent event, int[] procs, IProgressMonitor monitor) {
 		monitor.beginTask("Resuming registered process...", procs.length);
 		Session session = (Session)getSession();
 		
