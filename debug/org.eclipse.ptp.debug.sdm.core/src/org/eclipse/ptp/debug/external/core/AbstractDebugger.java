@@ -36,7 +36,6 @@ import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.IDebugCommand;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
-import org.eclipse.ptp.debug.core.cdi.event.IPCDIDestroyedEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIErrorEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIExitedEvent;

@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-
 import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.cdt.debug.core.model.IJumpToAddress;
 import org.eclipse.cdt.debug.core.model.IJumpToLine;
@@ -77,8 +76,14 @@ public class PThread extends PDebugElement implements IPThread, IRestart, IResum
 
 	public PThread(PDebugTarget target, IPCDIThread cdiThread) {
 		super(target);
-		setState(cdiThread.isSuspended() ? PDebugElementState.SUSPENDED : PDebugElementState.RESUMED);
 		setCDIThread(cdiThread);
+		if (cdiThread.isSuspended()) {
+			setState(PDebugElementState.SUSPENDED);
+			setCurrent(true);
+		}
+		else {
+			setState(PDebugElementState.RESUMED);
+		}
 		fConfig = (IPCDITargetConfiguration)getCDITarget().getConfiguration();
 		initialize();
 		getCDISession().getEventManager().addEventListener(this);
@@ -138,8 +143,7 @@ public class PThread extends PDebugElement implements IPThread, IRestart, IResum
 						if (!PStackFrame.equalFrame(newTopFrame, oldTopFrame)) {
 							disposeStackFrames(0, fStackFrames.size());
 							addStackFrames(frames, 0, frames.length);
-						} else // we are in the same frame
-						{
+						} else {// we are in the same frame
 							updateStackFrames(frames, 0, fStackFrames, frames.length);
 						}
 					}
@@ -203,6 +207,8 @@ public class PThread extends PDebugElement implements IPThread, IRestart, IResum
 		return (c.isEmpty()) ? null : (IStackFrame) c.get(0);
 	}
 	public String getName() throws DebugException {
+		if (getCDIThread() == null)
+			return "";
 		return getCDIThread().toString();
 	}
 	public IBreakpoint[] getBreakpoints() {
