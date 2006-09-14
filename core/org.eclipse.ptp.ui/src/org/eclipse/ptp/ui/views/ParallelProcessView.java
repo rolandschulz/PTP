@@ -20,6 +20,7 @@ package org.eclipse.ptp.ui.views;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.core.IModelListener;
+import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.IProcessListener;
 import org.eclipse.ptp.core.PTPCorePlugin;
@@ -160,13 +161,25 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 	}
 	public void initialText() {
 		IPProcess process = getProcess();
+		
+		rankLabel.setText("Rank: N/A");
+		totalLabel.setText("Total: N/A");
+		nodeLabel.setText("Node: N/A");
+		pidLabel.setText("PID: N/A");
+		statusLabel.setText("Status: N/A");
+		outputText.setText("N/A");
+		
 		if (process != null) {
 			rankLabel.setText("Rank: " + process.getProcessNumber());
-			totalLabel.setText("Total: " + process.getNode().getNumProcesses());
-			nodeLabel.setText("Node: " + process.getNode().getNodeNumber());
 			jobLabel.setText("Job: " + process.getJob().getJobNumber());
 			pidLabel.setText("PID: " + process.getPid());
 			statusLabel.setText("Status: " + process.getStatus());
+			
+			IPNode node = process.getNode();
+			if (node != null) {
+				totalLabel.setText("Total: " + node.getNumProcesses());
+				nodeLabel.setText("Node: " + node.getNodeNumber());
+			}
 			
 			/*
 			if (process.getExitCode() != null)
@@ -178,13 +191,6 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 			// for (int i=0; i<outputs.length; i++)
 			// outputText.append(outputs[i] + "\n");
 			outputText.setText(process.getContents());
-		} else {
-			rankLabel.setText("Rank: N/A");
-			totalLabel.setText("Total: N/A");
-			nodeLabel.setText("Node: N/A");
-			pidLabel.setText("PID: N/A");
-			statusLabel.setText("Status: N/A");
-			outputText.setText("N/A");
 		}
 	}
 	
