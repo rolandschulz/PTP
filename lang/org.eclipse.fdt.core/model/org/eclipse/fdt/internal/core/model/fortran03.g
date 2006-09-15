@@ -105,7 +105,6 @@ internal_subprogram
 	;
 
 // R212
-// TODO putback
 specification_stmt
 	:	access_stmt
 	|	allocatable_stmt
@@ -145,15 +144,15 @@ executable_construct
 // T_CONTINUE inlined for continue_stmt
 // TODO putback
 action_stmt
-	:	//allocate_stmt
-assignment_stmt
-//	|	assignment_stmt
+options {backtrack=true;}
+	:	allocate_stmt
+	|	assignment_stmt
 //	|	backspace_stmt
 //	|	call_stmt
 //	|	close_stmt
 	|	T_CONTINUE T_EOS
 //	|	cycle_stmt
-//	|	deallocate_stmt
+	|	deallocate_stmt
 //	|	endfile_stmt
 //	|   end_func_prog_or_sub_stmt // normal end_function_stmt... removed
 //	|	end_function_stmt
@@ -166,7 +165,7 @@ assignment_stmt
 //	|	if_stmt
 //	|	nullify_stmt
 //	|	open_stmt
-//	|	pointer_assignment_stmt
+	|	pointer_assignment_stmt
 //	|	print_stmt
 //	|	read_stmt
 //	|	return_stmt
@@ -766,7 +765,6 @@ ac_value_list
     ;
 
 // R470
-// TODO putback
 ac_implied_do
 	:	T_LPAREN ac_value_list T_COMMA ac_implied_do_control T_RPAREN
 	;
@@ -1007,29 +1005,25 @@ data_stmt_object_list
 
 // R527
 // ERR_CHK 527 scalar_int_expr replaced by expr
-// TODO putback
+// data_i_do_variable replaced by T_IDENT
 data_implied_do
-    : T_LPAREN data_i_do_object_list // T_COMMA data_i_do_variable T_EQUALS
-//         expr T_COMMA expr ( T_COMMA expr )? T_RPAREN
+    : T_LPAREN data_i_do_object_list T_COMMA T_IDENT T_EQUALS
+      expr T_COMMA expr ( T_COMMA expr )? T_RPAREN
     ;
 
 // R528
-// TODO putback
 // data_ref inlined for scalar_structure_component and array_element
 data_i_do_object
 	:	data_ref
-//	|	data_implied_do
+	|	data_implied_do
 	;
 
-// TODO putback
 data_i_do_object_list
-    :   data_i_do_object //( T_COMMA data_i_do_object )*
+    :   data_i_do_object ( T_COMMA data_i_do_object )*
     ;
 
-// R529
-data_i_do_variable
-	:	scalar_int_variable
-	;
+// R529 data_i_do_variable was scalar_int_variable inlined as T_IDENT
+// C556 (R529) The data-i-do-variable shall be a named variable.
 
 // R530
 data_stmt_value
@@ -1056,6 +1050,10 @@ scalar_int_constant_subobject
     ;
 
 // R532
+// scalar_constant_subobject replaced by designator
+// scalar_constant replaced by literal_constant as designator can be T_IDENT
+// then literal_constant inlined (except for signed portion)
+// designator 
 // TODO putback
 data_stmt_constant
 	:	scalar_constant
@@ -1066,22 +1064,13 @@ data_stmt_constant
 //	|	structure_constructor
 	;
 
-scalar_constant_subobject
-    :    scalar_constant
-    ;
+// R533 int_constant_subobject was constant_subobject inlined as designator in R531
 
-// R533
-int_constant_subobject
-	:	constant_subobject
-	;
-
-// R534
-constant_subobject
-	:	designator
-	;
+// R534 constant_subobject inlined as designator in R533
+// C566 (R534) constant-subobject shall be a subobject of a constant.
 
 // R535
-// T_IDENT inlined for array_name
+// array_name replaced by T_IDENT
 dimension_stmt
     :    T_DIMENSION ( T_COLON_COLON )? T_IDENT T_LPAREN array_spec T_RPAREN
              ( T_COMMA T_IDENT T_LPAREN array_spec T_RPAREN )* T_EOS
@@ -1276,13 +1265,14 @@ variable
 //	|	substring
 // TODO check to see if substring is covered, see NOTE 6.3
 designator
-	:	data_ref_opt_rng
+options {backtrack=true;}
+	:	T_IDENT data_ref_opt_rng
 	|	char_literal_constant T_LPAREN substring_range T_RPAREN
 	;
 
 // R612
 data_ref_opt_rng
-	:	part_ref part_deref_chain_opt_rng
+	:	part_ref_suffix part_deref_chain_opt_rng
 	;
 
 part_deref_chain_opt_rng : part_deref_opt_rng ;
@@ -1445,28 +1435,22 @@ vector_subscript
 // ERR_CHK 622 int_expr replaced by expr
 
 // R623
-// TODO putback
 allocate_stmt
-    :    T_ALLOCATE //T_LPAREN ( type_spec T_COLON_COLON )? allocation_list ( T_COMMA alloc_opt_list )? T_RPAREN T_EOS
+    :    T_ALLOCATE T_LPAREN ( type_spec T_COLON_COLON )? allocation_list ( T_COMMA alloc_opt_list )? T_RPAREN T_EOS
     ;
 
 // R624
 // ERR_CHK 624 source_expr replaced by expr
-// TODO putback
-/*
+// TODO putback getting the grammar correct for now, fix lexer later
 alloc_opt
-	:	T_STAT_EQUALS stat_variable
-	|	T_ERRMSG_EQUALS errmsg_variable
-	|	T_SOURCE_EQUALS expr
+	:	/* T_STAT */ T_NE T_EQUALS stat_variable
+	|	/* T_ERRMSG */ T_LT T_EQUALS errmsg_variable
+	|	/* T_SOURCE */ T_GT T_EQUALS expr
 	;
-*/
 
-// TODO putback
-/*
 alloc_opt_list
     :    alloc_opt ( T_COMMA alloc_opt )*
     ;
-*/
 
 // R625
 stat_variable
@@ -1493,10 +1477,10 @@ allocation_list
 // T_IDENT inlined for variable_name
 // data_ref inlined for structure_component
 // data_ref can be a T_IDENT so T_IDENT deleted
-// TODO putback
+// TODO putback data_ref (causes problem in part_deref stuff)
 allocate_object
 	:	T_IDENT
-//	|	data_ref
+//	:	data_ref
 	;
 
 allocate_object_list
@@ -1506,10 +1490,8 @@ allocate_object_list
 // R630
 // ERR_CHK 630a lower_bound_expr replaced by expr
 // ERR_CHK 630b upper_bound_expr replaced by expr
-// TODO putback
 allocate_shape_spec
-    :    ( expr T_COLON )?
-//          expr
+    :    expr ( T_COLON expr )?
     ;
 
 // TODO putback
@@ -1543,26 +1525,21 @@ pointer_object_list
     ;
 
 // R635
-// TODO putback
 deallocate_stmt
-    :    T_DEALLOCATE // T_LPAREN allocate_object_list ( T_COMMA dealloc_opt_list )? T_RPAREN T_EOS
+    :    T_DEALLOCATE T_LPAREN allocate_object_list ( T_COMMA dealloc_opt_list )? T_RPAREN T_EOS
     ;
 
 // R636
-// TODO putback
-/*
+// TODO putback, fix lexer later
 dealloc_opt
-	:	T_STAT_EQUALS stat_variable
-	|	T_ERRMSG_EQUALS errmsg_variable
+	:	/* T_STAT */ T_NE T_EQUALS stat_variable
+	|	/* T_ERRMSG */ T_LT T_EQUALS errmsg_variable
 	;
-*/
 
-// TODO putback
-/*
 dealloc_opt_list
     :    dealloc_opt ( T_COMMA dealloc_opt )*
     ;
-*/
+
 
 /*
 Section 7:
@@ -1777,26 +1754,20 @@ assignment_stmt
 	;
 
 // R735
-// data_pointer_object must be (T_IDENT | variable T_PERCENT T_IDENT)
 // TODO putback
-// TODO putback data_pointer_object replaced by T_IDENT
 pointer_assignment_stmt
-    :    T_IDENT ( T_LPAREN bounds_spec_list T_RPAREN )? T_EQ_GT data_target
-//    :    data_pointer_object ( T_LPAREN bounds_spec_list T_RPAREN )? T_EQ_GT data_target
-//    | data_pointer_object T_LPAREN bounds_remapping_list T_RPAREN T_EQ_GT data_target
+    :    data_pointer_object ( T_LPAREN bounds_spec_list T_RPAREN )? T_EQ_GT data_target T_EOS
+//    | data_pointer_object T_LPAREN bounds_remapping_list T_RPAREN T_EQ_GT data_target T_EOS
 //    | proc_pointer_object T_EQ_GT proc_target T_EOS
     ;
 
 // R736
 // T_IDENT inlined for variable_name and data_pointer_component_name
-// variable (as designator) can end in T_PERCENT T_IDENT so variable used alone
-// then variable can be T_IDENT so T_IDENT deleted
-// ERR_CHK 736 must be (T_IDENT | variable T_PERCENT T_IDENT) (no (substring-range))
-// C722 (R736) A data-pointer-component-name shall be the name of a component of variable that is a data pointer
-// could be inlined in R735
-// see R740 and R741 as they seem to work
+// variable replaced by designator
 data_pointer_object
-	:	variable
+options {backtrack=true;}
+	:	T_IDENT
+	|	designator T_PERCENT T_IDENT
 	;
 
 // R737
@@ -1831,15 +1802,17 @@ data_target
 
 // R740
 // T_IDENT inlined for proc_pointer_name
+// proc_component_ref replaced by designator T_PERCENT T_IDENT
 proc_pointer_object
 	:	T_IDENT
-	|	proc_component_ref
+	|	designator T_PERCENT T_IDENT
 	;
 
 // R741
 // T_IDENT inlined for procedure_component_name
+// designator inlined for variable
 proc_component_ref
-	:	variable T_PERCENT T_IDENT
+	:	designator T_PERCENT T_IDENT
 	;
 
 // R742
@@ -1958,8 +1931,9 @@ forall_body_construct
 // R757
 // TODO putback
 forall_assignment_stmt
+options {backtrack=true;}
 	:	assignment_stmt
-//	|	pointer_assignment_stmt
+	|	pointer_assignment_stmt
 	;
 
 // R758
@@ -3174,14 +3148,17 @@ call_stmt
 
 // R1219
 // T_IDENT inlined for procedure_name and binding_name
-// proc_component_ref is variable T_PERCENT T_IDENT can be designator so deleted
-// data_ref can end in T_PERCENT T_IDENT so data_ref used alone
-// data_ref can be T_IDENT so T_IDENT deleted
+// proc_component_ref is variable T_PERCENT T_IDENT (variable is designator)
+// data_ref subset of designator so data_ref T_PERCENT T_IDENT deleted
+// inlined designator from R603
 // ERR_CHK 736 must be (T_IDENT | data_ref T_PERCENT T_IDENT) (no (substring-range))
-// TODO putback
+//R1219 procedure-designator            is procedure-name
+//                                      or proc-component-ref
+//                                      or data-ref % binding-name
 procedure_designator
-//	:	data_ref
-	:	data_ref T_PERCENT T_IDENT
+options {backtrack=true;}
+	:	T_IDENT
+	|	designator T_PERCENT T_IDENT
 	;
 
 // R1220
