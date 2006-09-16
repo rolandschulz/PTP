@@ -147,35 +147,35 @@ action_stmt
 options {backtrack=true;}
 	:	allocate_stmt
 	|	assignment_stmt
-//	|	backspace_stmt
-//	|	call_stmt
-//	|	close_stmt
+	|	backspace_stmt
+	|	call_stmt
+	|	close_stmt
 	|	T_CONTINUE T_EOS
-//	|	cycle_stmt
+	|	cycle_stmt
 	|	deallocate_stmt
-//	|	endfile_stmt
+	|	endfile_stmt
 //	|   end_func_prog_or_sub_stmt // normal end_function_stmt... removed
 //	|	end_function_stmt
 //	|	end_program_stmt
 //	|	end_subroutine_stmt
-//	|	exit_stmt
-//	|	flush_stmt
-//	|	forall_stmt
-//	|	goto_stmt
-//	|	if_stmt
-//	|	nullify_stmt
-//	|	open_stmt
+	|	exit_stmt
+	|	flush_stmt
+	|	forall_stmt
+	|	goto_stmt
+	|	if_stmt
+	|	nullify_stmt
+	|	open_stmt
 	|	pointer_assignment_stmt
-//	|	print_stmt
-//	|	read_stmt
-//	|	return_stmt
-//	|	rewind_stmt
-//	|	stop_stmt
-//	|	wait_stmt
-//	|	where_stmt
-//	|	write_stmt
-//	|	arithmetic_if_stmt
-//	|	computed_goto_stmt
+	|	print_stmt
+	|	read_stmt
+	|	return_stmt
+	|	rewind_stmt
+	|	stop_stmt
+	|	wait_stmt
+	|	where_stmt
+	|	write_stmt
+	|	arithmetic_if_stmt
+	|	computed_goto_stmt
 	;
 
 //end_func_prog_or_sub_stmt
@@ -413,7 +413,7 @@ char_selector
 // TODO putback
 length_selector
 	:	T_LPAREN
-//		(T_LEN_EQUALS)?
+		(T_EQ /* T_LEN */ T_EQUALS)?
 		type_param_value
 		T_RPAREN
 	|	T_ASTERISK
@@ -916,6 +916,7 @@ deferred_shape_spec
 	;
 
 // R516
+// putback
 assumed_size_spec
     : /*( explicit_shape_spec_list T_COMMA )? ( lower_bound T_COLON )?*/
        T_ASTERISK
@@ -927,7 +928,7 @@ intent_spec
 options {k=2;}
 	:	T_IN
 	|	T_OUT
-    |   (T_IN T_OUT) => T_IN T_OUT
+	|   (T_IN T_OUT) => T_IN T_OUT
 	|	T_INOUT
 	;
 
@@ -1808,19 +1809,18 @@ proc_pointer_object
 	|	designator T_PERCENT T_IDENT
 	;
 
-// R741
+// R741 proc_component_ref inlined as designator T_PERCENT T_IDENT in R740, R742, R1219, and R1221
 // T_IDENT inlined for procedure_component_name
 // designator inlined for variable
-proc_component_ref
-	:	designator T_PERCENT T_IDENT
-	;
 
 // R742
 // T_IDENT inlined for procedure_name
 // expr can be designator can be T_IDENT so T_IDENT deleted
 // proc_component_ref is variable T_PERCENT T_IDENT can be designator so deleted
+// putback above may be true because can't be character-type % id
 proc_target
 	:	expr
+//	|	designator T_PERCENT T_IDENT
 	;
 
 // R743
@@ -2352,9 +2352,8 @@ internal_file_variable
 	;
 
 // R904
-// TODO putback
 open_stmt
-	:	T_OPEN T_LPAREN /* connect_spec_list */ T_RPAREN T_EOS
+	:	T_OPEN T_LPAREN connect_spec_list T_RPAREN T_EOS
 	;
 
 // R905
@@ -2362,9 +2361,8 @@ open_stmt
 // ERR_CHK 905b scalar_int_expr replaced by expr
 // ERR_CHK 905c file_name_expr replaced by expr
 // TODO putback
-/*
 connect_spec
-    : ( T_UNIT_EQUALS )? file_unit_number
+    : ( T_EQ /* T_UNIT */ T_EQUALS )? file_unit_number
 //    | T_ACCESS_EQUALS expr // scalar_default_char_expr
 //    | T_ACTION_EQUALS expr // scalar_default_char_expr
 //    | T_ASYNCHRONOUS_EQUALS expr // scalar_default_char_expr
@@ -2372,7 +2370,7 @@ connect_spec
 //    | T_DECIMAL_EQUALS expr // scalar_default_char_expr
 //    | T_DELIM_EQUALS expr // scalar_default_char_expr
 //    | T_ENCODING_EQUALS expr // scalar_default_char_expr
-//    | T_ERR_EQUALS label
+    | T_LE /* T_ERR */ T_EQUALS label
 //    | T_FILE_EQUALS expr // file_name_expr
 //    | T_FORM_EQUALS expr // scalar_default_char_expr
 //    | T_IOMSG_EQUALS iomsg_variable
@@ -2384,14 +2382,10 @@ connect_spec
 //    | T_SIGN_EQUALS expr // scalar_default_char_expr
 //    | T_STATUS_EQUALS expr // scalar_default_char_expr
     ;
-*/
 
-/*
-// TODO putback
 connect_spec_list
     :    connect_spec ( T_COMMA connect_spec )*
     ;
-*/
 
 // inlined scalar_default_char_expr
 
@@ -2403,55 +2397,41 @@ iomsg_variable
 	;
 
 // R908
-// TODO putback
 close_stmt
-	:	T_CLOSE T_LPAREN /* close_spec_list */ T_RPAREN T_EOS
+	:	T_CLOSE T_LPAREN close_spec_list T_RPAREN T_EOS
 	;
 
 // R909
 // ERR_CHK 909 scalar_default_char_expr replaced by expr
 // TODO putback
-/*
 close_spec
-    : ( T_UNIT_EQUALS )? file_unit_number
-//    | T_IOSTAT_EQUALS scalar_int_variable
-//    | T_IOMSG_EQUALS iomsg_variable
-//    | T_ERR_EQUALS label
-//    | T_STATUS_EQUALS expr
+    : ( T_GE /* T_UNIT */ T_EQUALS )? file_unit_number
+    | T_NE /* T_IOSTAT */ T_EQUALS scalar_int_variable
+    | T_LT /* T_IOMSG */ T_EQUALS iomsg_variable
+    | T_GT /* T_ERR */ T_EQUALS label
+    | T_EQ /* T_STATUS */ T_EQUALS expr
     ;
-*/
 
-/*
-// TODO putback
 close_spec_list
     :    close_spec ( T_COMMA close_spec )*
     ;
-*/
 
 // R910
-// TODO putback
-/*
 read_stmt
-    :    T_READ T_LPAREN io_control_spec_list T_RPAREN ( input_item_list )? T_EOS
-    |    T_READ format ( T_COMMA input_item_list )? T_EOS
+options {k=2;}
+    :    (T_READ T_LPAREN) => T_READ T_LPAREN io_control_spec_list T_RPAREN ( input_item_list )? T_EOS
+    |    (T_READ) => T_READ format ( T_COMMA input_item_list )? T_EOS
     ;
-*/
 
 // R911
-// TODO putback
-/*
 write_stmt
 	:	T_WRITE T_LPAREN io_control_spec_list T_RPAREN ( output_item_list )? T_EOS
 	;
-*/
 
 // R912
-// TODO putback
-/*
 print_stmt
     :    T_PRINT format ( T_COMMA output_item_list )? T_EOS
     ;
-*/
 
 // R913
 // ERR_CHK 913a scalar_default_char_expr replaced by expr
@@ -2459,10 +2439,9 @@ print_stmt
 // ERR_CHK 913c scalar_char_initialization_expr replaced by expr
 // T_IDENT inlined for namelist_group_name
 // TODO putback
-/*
 io_control_spec
-    :    ( T_UNIT_EQUALS )? io_unit
-//    | ( T_FMT_EQUALS )? format
+    :    ( T_EQ /* T_UNIT */ T_EQUALS )? io_unit
+//    | ( T_LE /* T_FMT */ T_EQUALS )? format
 //    | ( T_NML_EQUALS )? T_IDENT
 //    | T_ADVANCE_EQUALS expr // scalar_default_char_expr
 //    | T_ASYNCHRONOUS_EQUALS expr // scalar_char_initialization_expr
@@ -2482,14 +2461,10 @@ io_control_spec
 //    | T_SIGN_EQUALS expr // scalar_default_char_expr
 //    | T_SIZE_EQUALS scalar_int_variable
     ;
-*/
 
-/*
-// TODO putback
 io_control_spec_list
     :    io_control_spec ( T_COMMA io_control_spec )*
     ;
-*/
 
 // R914
 // ERR_CHK 914 default_char_expr replaced by expr
@@ -2557,122 +2532,96 @@ dtv_type_spec
 	;
 
 // R921
-// TODO putback
 wait_stmt
-	:	T_WAIT T_LPAREN /* wait_spec_list */ T_RPAREN T_EOS
+	:	T_WAIT T_LPAREN wait_spec_list T_RPAREN T_EOS
 	;
 
 // R922
 // TODO putback
-/*
 wait_spec
-    : ( T_UNIT_EQUALS )? file_unit_number
-//    | T_END_EQUALS label
-//    | T_EOR_EQUALS label
-//    | T_ERR_EQUALS label
-//    | T_ID_EQUALS scalar_int_variable
-//    | T_IOMSG_EQUALS iomsg_variable
-//    | T_IOSTAT_EQUALS scalar_int_variable
+    : ( T_EQ /* T_UNIT */ T_EQUALS )? file_unit_number
+    | T_NE /* T_END */ T_EQUALS label
+    | T_LT /* T_EOR */ T_EQUALS label
+    | T_LE /* T_ERR */ T_EQUALS label
+    | T_GT /* T_ID */ T_EQUALS scalar_int_variable
+    | T_GE /* T_IOMSG */ T_EQUALS iomsg_variable
+    | T_TRUE /* T_IOSTAT */ T_EQUALS scalar_int_variable
     ;
-*/
 
-/*
-// TODO putback
 wait_spec_list
     :    wait_spec ( T_COMMA wait_spec )*
     ;
-*/
 
 // R923
-// TODO putback
-/*
 backspace_stmt
-	:	T_BACKSPACE file_unit_number T_EOS
-	|	T_BACKSPACE T_LPAREN position_spec_list T_RPAREN T_EOS
+options {k=2;}
+	:	(T_BACKSPACE T_LPAREN) => T_BACKSPACE T_LPAREN position_spec_list T_RPAREN T_EOS
+	|	(T_BACKSPACE) => T_BACKSPACE file_unit_number T_EOS
 	;
-*/
 
 // R924
-// TODO putback
-/*
 endfile_stmt
-	:	t_end_file file_unit_number T_EOS
-	|	t_end_file T_LPAREN position_spec_list T_RPAREN T_EOS
-	;
-*/
-
-t_end_file
-options {k=2;}
-	: (T_END T_FILE) => T_END T_FILE
-	| T_ENDFILE
+options {k=3;}
+	:	(T_END T_FILE T_LPAREN) => T_END T_FILE T_LPAREN position_spec_list T_RPAREN T_EOS
+	|	(T_ENDFILE T_LPAREN) => T_ENDFILE T_LPAREN position_spec_list T_RPAREN T_EOS
+	|	(T_END T_FILE) => T_END T_FILE file_unit_number T_EOS
+	|	(T_ENDFILE) => T_ENDFILE file_unit_number T_EOS
 	;
 
 // R925
-// TODO putback
 rewind_stmt
-	:	T_REWIND //file_unit_number T_EOS
-	|	T_REWIND T_LPAREN /* position_spec_list */ T_RPAREN T_EOS
+options {k=2;}
+	:	(T_REWIND T_LPAREN) => T_REWIND T_LPAREN position_spec_list T_RPAREN T_EOS
+	|	(T_REWIND) => T_REWIND file_unit_number T_EOS
 	;
 
 // R926
 // TODO putback
-/*
 position_spec
-    : ( T_UNIT_EQUALS )? file_unit_number
-//    | T_IOMSG_EQUALS iomsg_variable
-//    | T_IOSTAT_EQUALS scalar_int_variable
-//    | T_ERR_EQUALS label
+    : ( T_EQ /* T_UNIT */ T_EQUALS )? file_unit_number
+    | T_NE /* T_IOMSG */ T_EQUALS iomsg_variable
+    | T_LT /* T_IOSTAT */ T_EQUALS scalar_int_variable
+    | T_LE /* T_ERR */ T_EQUALS label
     ;
-*/
 
-/*
-// TODO putback
 position_spec_list
     :    position_spec ( T_COMMA position_spec )*
     ;
-*/
 
 // R927
-// TODO putback
 flush_stmt
-	:	T_FLUSH // file_unit_number T_EOS
-	|	T_FLUSH T_LPAREN /* flush_spec_list */ T_RPAREN T_EOS
+options {k=2;}
+	:	(T_FLUSH T_LPAREN) => T_FLUSH T_LPAREN flush_spec_list T_RPAREN T_EOS
+	|	(T_FLUSH) => T_FLUSH file_unit_number T_EOS
 	;
 
 // R928
 // TODO putback
-/*
 flush_spec
-    : ( T_UNIT_EQUALS )? file_unit_number
-//    | T_IOSTAT_EQUALS scalar_int_variable
-//    | T_IOMSG_EQUALS iomsg_variable
-//    | T_ERR_EQUALS label
+    : ( T_EQ /* T_UNIT */ T_EQUALS )? file_unit_number
+    | T_NE /* T_IOSTAT */ T_EQUALS scalar_int_variable
+    | T_LT /* T_IOMSG */ T_EQUALS iomsg_variable
+    | T_LE /* T_ERR */ T_EQUALS label
     ;
-*/
 
-/*
-// TODO putback
 flush_spec_list
     :    flush_spec ( T_COMMA flush_spec )*
     ;
-*/
 
 // R929
 // TODO putback
-/*
 inquire_stmt
 	:	T_INQUIRE T_LPAREN inquire_spec_list T_RPAREN T_EOS
-//	|	T_INQUIRE T_LPAREN T_IOLENGTH_EQUALS scalar_int_variable T_RPAREN output_item_list T_EOS
+	|	T_INQUIRE T_LPAREN T_NOT /* T_IOLENGTH */ T_EQUALS scalar_int_variable T_RPAREN output_item_list T_EOS
 	;
-*/
+
 
 // R930
 // ERR_CHK 930 file_name_expr replaced by expr
 // TODO putback
-/*
 inquire_spec
-    : ( T_UNIT_EQUALS )? file_unit_number
-//    | T_FILE_EQUALS expr
+    : ( T_EQ /* T_UNIT */ T_EQUALS )? file_unit_number
+    | T_LE /* T_FILE */ T_EQUALS expr
 //    | T_ACCESS_EQUALS scalar_default_char_variable
 //    | T_ACTION_EQUALS scalar_default_char_variable
 //    | T_ASYNCHRONOUS_EQUALS scalar_default_char_variable
@@ -2708,14 +2657,10 @@ inquire_spec
 //    | T_UNFORMATTED_EQUALS scalar_default_char_variable
 //    | T_WRITE_EQUALS scalar_default_char_variable
     ;
-*/
 
-/*
-// TODO putback
 inquire_spec_list
     :    inquire_spec ( T_COMMA inquire_spec )*
     ;
-*/
 
 /*
 Section 10:
@@ -2727,164 +2672,96 @@ format_stmt
 	;
 
 // R1002
-// TODO putback
 format_specification
-	:	T_LPAREN //( format_item_list )? T_RPAREN
+	:	T_LPAREN ( format_item_list )? T_RPAREN
 	;
 
 // R1003
-// TODO putback
+// r replaced by int_literal_constant replaced by char_literal_constant replaced by T_CHAR_CONSTANT
+// char_string_edit_desc replaced by T_CHAR_CONSTANT
 format_item
-	:	( int_literal_constant )? // data_edit_desc
-//	|	control_edit_desc
-//	|	char_string_edit_desc
-//	|	( int_literal_constant )? T_LPAREN format_item_list T_RPAREN
+	:	T_DIGIT_STRING data_edit_desc
+	|	data_plus_control_edit_desc
+	|	T_CHAR_CONSTANT
+	|	(T_DIGIT_STRING)? T_LPAREN format_item_list T_RPAREN
 	;
 
 format_item_list
     :    format_item ( T_COMMA format_item )*
     ;
 
-// R1004 r inlined in R1003 as int_literal_constant
+// R1004 r inlined in R1003 and R1011 as int_literal_constant (then as DIGIT_STRING)
+// C1004 (R1004) r shall not have a kind parameter associated with it
 
 // R1005
-// TODO putback
-//data_edit_desc
-//    : 'I' int_literal_constant ( T_PERIOD int_literal_constant )?
-//    | 'B' int_literal_constant ( T_PERIOD int_literal_constant )?
-//    | 'O' int_literal_constant ( T_PERIOD int_literal_constant )?
-//    | 'Z' int_literal_constant ( T_PERIOD int_literal_constant )?
-//    | 'F' int_literal_constant T_PERIOD int_literal_constant
-//    | 'E' int_literal_constant T_PERIOD int_literal_constant ( 'E' int_literal_constant )?
-//    | 'EN' int_literal_constant T_PERIOD int_literal_constant ( 'E' int_literal_constant )?
-//    | 'ES' int_literal_constant T_PERIOD int_literal_constant ( 'E' int_literal_constant )?
-//    | 'G' int_literal_constant T_PERIOD int_literal_constant ( 'E' int_literal_constant )?
-//    | 'L' int_literal_constant
-//    | 'A' ( int_literal_constant )?
-//    | 'D' int_literal_constant T_PERIOD int_literal_constant
-//    | 'DT' ( char_literal_constant )? ( T_LPAREN v_list T_RPAREN )?
-//    ;
-
-/* TODO: inlined w in R1005
-// R1006
-w
-	:	int_literal_constant
-	;
-*/
-
-/* TODO: inlined m in R1005
-// R1007
-m
-	:	int_literal_constant
-	;
-*/
-
-/* TODO: inlined d in R1005
-// R1008
-d
-	:	int_literal_constant
-	;
-*/
-
-/* TODO: inlined e in R1005
-// R1009
-e
-	:	int_literal_constant
-	;
-*/
-
-/* TODO: only need v_list
-// R1010
-v
-	:	signed_int_literal_constant
-	;
-*/
-
-v_list
-    :   signed_int_literal_constant ( T_COMMA signed_int_literal_constant )*
+// w,m,d,e replaced by int_literal_constant replaced by T_DIGIT_STRING
+// char_literal_constant replaced by T_CHAR_CONSTANT
+// ERR_CHK 1005 matching T_ID_OR_OTHER with alternatives will have to be done here
+data_edit_desc
+    : T_ID_OR_OTHER /* {'I','B','O','Z','F','E','EN','ES','G','L','A','D'} */ 
+      T_DIGIT_STRING ( T_PERIOD T_DIGIT_STRING )?
+      ( T_ID_OR_OTHER /* is 'E' */ T_DIGIT_STRING )?
+    | T_ID_OR_OTHER /* is 'DT' */ T_CHAR_CONSTANT ( T_LPAREN v_list T_RPAREN )?
+    | T_ID_OR_OTHER /* {'A','DT'},{'X','P' from control_edit_desc} */
     ;
 
-// R1011
-// TODO putback
-control_edit_desc
-	:	//position_edit_desc
-	|	( int_literal_constant )? T_SLASH
+data_plus_control_edit_desc
+	:	T_ID_OR_OTHER /* {'I','B','O','Z','F','E','EN','ES','G','L','A','D'},{T','TL','TR'} */ 
+		    T_DIGIT_STRING ( T_PERIOD T_DIGIT_STRING )?
+		    ( T_ID_OR_OTHER /* is 'E' */ T_DIGIT_STRING )?
+	|	T_ID_OR_OTHER /* is 'DT' */ T_CHAR_CONSTANT ( T_LPAREN v_list T_RPAREN )?
+	|	T_ID_OR_OTHER /* {'A','DT'},{'BN','BZ','RU','RD','RZ','RN','RC','RP','DC','DP'} */
+// following only from control_edit_desc
+	|	( T_DIGIT_STRING )? T_SLASH
 	|	T_COLON
-//	|	sign_edit_desc
-//	|	signed_int_literal_constant 'P'
-//	|	blank_interp_edit_desc
-//	|	round_edit_desc
-//	|	decimal_edit_desc
+	|	(T_PLUS|T_MINUS) T_DIGIT_STRING T_ID_OR_OTHER /* is 'P' */
 	;
 
-/* TODO: inlined in R1011
-// R1012
-k
-	:	signed_int_literal_constant
-	;
-*/
+// R1006 w inlined in R1005 as int_literal_constant replaced by T_DIGIT_STRING
 
-// R1013
-//position_edit_desc
-//	:	'T' int_literal_constant
-//	|	'TL' int_literal_constant
-//	|	'TR' int_literal_constant
-//	|	int_literal_constant 'X'
-//	;
+// R1007 m inlined in R1005 as int_literal_constant replaced by T_DIGIT_STRING
 
-/* TODO: inlined in R1013
-// R1014
-n
-	:	int_literal_constant
-	;
-*/
+// R1008 d inlined in R1005 as int_literal_constant replaced by T_DIGIT_STRING
 
-// TODO convert to fragment
-// R1015
-//sign_edit_desc
-//	:	'SS'
-//	|	'SP'
-//	|	'S'
-//	;
+// R1009 e inlined in R1005 as int_literal_constant replaced by T_DIGIT_STRING
 
-// R1016
-// TODO putback
-/*
-blank_interp_edit_desc
-	:	'BN'
-	|	'BZ'
-	;
-*/
+// R1010 v inlined as signed_int_literal_constant in v_list replaced by (T_PLUS or T_MINUS) T_DIGIT_STRING
 
-// R1017
-// TODO putback
-/*
-round_edit_desc
-	:	'RU'
-	|	'RD'
-	|	'RZ'
-	|	'RN'
-	|	'RC'
-	|	'RP'
-	;
-*/
+v_list
+    :   (T_PLUS|T_MINUS)? T_DIGIT_STRING ( T_COMMA (T_PLUS|T_MINUS)? T_DIGIT_STRING )*
+    ;
 
-// R1018
-// TODO putback
-/*
-decimal_edit_desc
-	:	'DC'
-	|	'DP'
-	;
-*/
+// R1011 control_edit_desc inlined/combined in R1005 and data_plus_control_edit_desc
+// r replaced by int_literal_constant replaced by T_DIGIT_STRING
+// k replaced by signed_int_literal_constant replaced by (T_PLUS|T_MINUS)? T_DIGIT_STRING
+// position_edit_desc inlined
+// sign_edit_desc replaced by T_ID_OR_OTHER was {'SS','SP','S'}
+// blank_interp_edit_desc replaced by T_ID_OR_OTHER was {'BN','BZ'}
+// round_edit_desc replaced by T_ID_OR_OTHER was {'RU','RD','RZ','RN','RC','RP'}
+// decimal_edit_desc replaced by T_ID_OR_OTHER was {'DC','DP'}
+// leading T_ID_OR_OTHER alternates combined with data_edit_desc in data_plus_control_edit_desc
 
-// R1019
-char_string_edit_desc
-	:	char_literal_constant
-	;
+// R1012 k inlined in R1011 as signed_int_literal_constant
+// C1009 (R1012) k shall not have a kind parameter specified for it
+
+// R1013 position_edit_desc inlined in R1011
+// n in R1013 was replaced by int_literal_constant replaced by T_DIGIT_STRING
+
+// R1014 n inlined in R1013 as int_literal_constant (is T_DIGIT_STRING, see C1010)
+// C1010 (R1014) n shall not have a kind parameter specified for it
+
+// R1015 sign_edit_desc inlined in R1011 as T_ID_OR_OTHER was {'SS','SP','S'}
+
+// R1016 blank_interp_edit_desc inlined in R1011 as T_ID_OR_OTHER was {'BN','BZ'}
+
+// R1017 round_edit_desc inlined in R1011 as T_ID_OR_OTHER was {'RU','RD','RZ','RN','RC','RP'}
+
+// R1018 decimal_edit_desc inlined in R1011 as T_ID_OR_OTHER was {'DC','DP'}
+
+// R1019 char_string_edit_desc was char_literal_constant inlined in R1003 as T_CHAR_CONSTANT
 
 /*
-Section 11:
+ * Section 11:
  */
 
 // R1101
@@ -2909,8 +2786,8 @@ program_stmt
 end_program_stmt
 options {k=2;}
 	:	(T_END T_PROGRAM) => T_END T_PROGRAM ( T_IDENT )? T_EOS
-    |	T_ENDPROGRAM ( T_IDENT )? T_EOS
-    |	T_END T_EOS
+	|	T_ENDPROGRAM ( T_IDENT )? T_EOS
+	|	T_END T_EOS
 	;
 	
 // R1104
@@ -3174,16 +3051,13 @@ actual_arg_spec_list
 // T_IDENT inlined for procedure_name
 // expr can be designator (via primary) so variable deleted
 // designator can be T_IDENT so T_IDENT deleted
-// proc_component_ref is variable T_PERCENT T_IDENT can be designator so deleted
+// proc_component_ref is variable T_PERCENT T_IDENT so optional T_PERCENT T_IDENT added to expr
 actual_arg
-	:	expr
-	|	alt_return_spec
+	:	expr (T_PERCENT T_IDENT)?
+	|	T_ASTERISK label
 	;
 
-// R1222
-alt_return_spec
-	:	T_ASTERISK label
-	;
+// R1222 alt_return_spec inlined as T_ASTERISK label in R1221
 
 // R1223
 // 1. left factored optional prefix in function_stmt from function_subprogram
@@ -3289,10 +3163,9 @@ options {k=2;}
 
 // R1235
 // T_INDENT inlined for entry_name
-// TODO putback
 entry_stmt
     :    T_ENTRY T_IDENT
-          ( T_LPAREN ( dummy_arg_list )? T_RPAREN /* ( suffix )? */ )? T_EOS
+          ( T_LPAREN ( dummy_arg_list )? T_RPAREN ( suffix )? )? T_EOS
     ;
 
 // R1236
@@ -3669,6 +3542,11 @@ T_END   : 'END'
 T_DEFINED_OP
     :    '.' Letter+ '.'
     ;
+
+// used to catch edit descriptors and other situations
+T_ID_OR_OTHER
+	:	'ID_OR_OTHER'
+	;
 
 // R304
 T_IDENT
