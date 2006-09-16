@@ -160,10 +160,13 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 		return flush;
 	}
 	public void doCancelWaiting() {
+		command_finish = true;
 		setReturn(RETURN_CANCEL);
 	}
 	public void doFlush() {
+		command_finish = true;
 		setReturn(RETURN_FLUSH);
+System.err.println("---- do flush: " + getCommandName());		
 	}
 	private void setCheckTasks() {
 		if (check_tasks == null) {
@@ -215,7 +218,15 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 			waitForReturn();
 		}
 		return getReturn();
-	}	
+	}
+	protected void suspendedBeforeExecCommand(IAbstractDebugger debugger) throws PCDIException {
+		if (debugger.isSuspendTasks(tasks.copy())) {
+			exec(debugger);
+		}
+		else {
+			doFlush();
+		}		
+	}
 	protected BitList suspendRunningTasks(IAbstractDebugger debugger) throws PCDIException {
 		BitList tmpTasks = tasks.copy();
 		debugger.filterSuspendTasks(tmpTasks);
