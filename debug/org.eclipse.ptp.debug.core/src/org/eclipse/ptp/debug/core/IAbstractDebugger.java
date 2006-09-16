@@ -72,6 +72,7 @@ public interface IAbstractDebugger extends IDebugger {
 	public void handleErrorEvent(BitList tasks, String errMsg, int errCode);
 	
 	/* others */
+	public boolean isSuspendTasks(BitList tasks);
 	public BitList filterRunningTasks(BitList tasks);
 	public BitList filterSuspendTasks(BitList tasks);
 	public BitList filterTerminateTasks(BitList tasks);
