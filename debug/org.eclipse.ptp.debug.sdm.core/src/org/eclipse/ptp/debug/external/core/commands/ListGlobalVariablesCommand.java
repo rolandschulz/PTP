@@ -32,7 +32,7 @@ public class ListGlobalVariablesCommand extends AbstractDebugCommand {
 		super(tasks);
 	}
 	public void preExecCommand(IAbstractDebugger debugger) throws PCDIException {
-		exec(debugger);
+		suspendedBeforeExecCommand(debugger);
 	}
 	public void exec(IAbstractDebugger debugger) throws PCDIException {
 		debugger.listGlobalVariables(tasks);

@@ -94,7 +94,6 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		job.setAttribute(TERMINATED_PROC_KEY, new BitList(job.totalProcesses()));
 		job.setAttribute(SUSPENDED_PROC_KEY, new BitList(job.totalProcesses()));
 		commandQueue = new DebugCommandQueue(this);
-		commandQueue.start();
 		
 		isExited = false;
 		eventThread = new EventThread(this);
@@ -120,21 +119,9 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 			if (session != null && !isJobFinished()) {
 				setJobFinished(session.createBitList(), IPProcess.EXITED);
 			}
-	
 			isExited = true;
-			eventThread.cancelJob();
-			/*
-			if (!eventThread.equals(Thread.currentThread())) {			
-				// Kill the event Thread.
-				try {
-					if (eventThread.isAlive()) {
-						eventThread.interrupt();
-						eventThread.join(5000);
-					}
-				} catch (InterruptedException e) {}		
-			}
-			*/
 			deleteObservers();
+			eventThread.cancelJob();
 			commandQueue.setTerminated();
 			stopDebugger();
 		}
@@ -164,6 +151,9 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 			System.out.println("***** Debugger event: " + event/* + " for tasks: " + showBitList(tasks)*/);
 			if (event instanceof IPCDIExitedEvent) {
 				setJobFinished(tasks, (((IPCDIExitedEvent)event).getExitStatus()>-1)?IPProcess.EXITED:IPProcess.EXITED_SIGNALLED);
+				if (isJobFinished()) {
+					postStopDebugger();
+				}				
 			} else if (event instanceof IPCDIResumedEvent) {
 				setSuspendTasks(false, tasks);
 				setProcessStatus(tasks.toArray(), IPProcess.RUNNING);
@@ -172,7 +162,7 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 				switch (errEvent.getErrorCode()) {
 				case IPCDIErrorEvent.DBG_FATAL:
 					setJobFinished(tasks, IPProcess.ERROR);
-					postCommand(new StopDebuggerCommand(getSession().createBitList()));
+					postStopDebugger();
 				break;
 				case IPCDIErrorEvent.DBG_WARNING:
 					if (!session.getJob().isAllStop()) {
@@ -190,13 +180,17 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 			}
 			else if (event instanceof IPCDIExitedEvent) {
 				if (isJobFinished()) {
-					postCommand(new StopDebuggerCommand(getSession().createBitList()));
+					postStopDebugger();
 				}
 			}
 			//FIXME - add item here or??
 			eventThread.fireDebugEvent(event);
 		}
-	}	
+	}
+	private void postStopDebugger() {
+		postCommand(new StopDebuggerCommand(getSession().createBitList()));
+		commandQueue.setTerminated();
+	}
 	public final void notifyObservers(Object arg) {
 		setChanged();
 		super.notifyObservers(arg);
@@ -290,6 +284,14 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		return processes;
 	}
 
+	/** Check if given tasks are suspened or not
+	 * @param tasks
+	 * @return
+	 */
+	public boolean isSuspendTasks(BitList tasks) {
+		tasks.andNot(getSuspendedProc());
+		return tasks.isEmpty();
+	}
 	//filter process
 	public BitList filterRunningTasks(BitList tasks) {//get suspend tasks
 		removeTasks(tasks, (BitList) job.getAttribute(TERMINATED_PROC_KEY));

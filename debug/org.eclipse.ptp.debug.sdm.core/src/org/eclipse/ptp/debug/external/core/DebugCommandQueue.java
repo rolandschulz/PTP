@@ -18,9 +18,12 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.core;
 
-import java.util.Collections;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.IDebugCommand;
@@ -30,16 +33,21 @@ import org.eclipse.ptp.debug.core.cdi.PCDIException;
  * @author Clement chu
  * 
  */
-public class DebugCommandQueue extends Thread {
-	private List queue = null;
+public class DebugCommandQueue extends Job {
+	private List queue = new ArrayList();
 	private boolean isTerminated = false;
 	private IDebugCommand currentCommand = null;
 	private IAbstractDebugger debugger = null;
 	private IDebugCommand interruptCommand = null;
 	
 	public DebugCommandQueue(IAbstractDebugger debugger) {
+        super("Debug Command Queue"); 
 		this.debugger = debugger;
-		queue = Collections.synchronizedList(new LinkedList());
+        setPriority(Job.INTERACTIVE);
+        setSystem(true);
+	}
+	public boolean isTerminated() {
+		return isTerminated;
 	}
 	public void setTerminated() {
 		isTerminated = true;
@@ -52,13 +60,14 @@ public class DebugCommandQueue extends Thread {
 		return interruptCommand;
 	}
 
-	public void run() {
-		while (!isTerminated) {
-			if (!waitForCommand()) {
-				break;
-			}
+    protected IStatus run(IProgressMonitor monitor) {
+        while (!queue.isEmpty()) {
 			try {
 				currentCommand = getCommand();
+	        	if (isTerminated) {
+	        		currentCommand.doFlush();
+	        		break;
+	        	}
 System.err.println("*** SEND COMMAND: " + currentCommand.getCommandName() + ", tasks: " + AbstractDebugger.showBitList(currentCommand.getTasks()));
 				currentCommand.execCommand(debugger);
 			} catch (PCDIException e) {
@@ -68,8 +77,11 @@ System.err.println("*** SEND COMMAND: " + currentCommand.getCommandName() + ", t
 			finally {
 				currentCommand = null;
 			}
-		}
-	}
+        }
+        return Status.OK_STATUS;
+    }
+	
+	/*
 	private boolean waitForCommand() {
 		synchronized (queue) {
 			try {
@@ -83,15 +95,15 @@ System.err.println("*** SEND COMMAND: " + currentCommand.getCommandName() + ", t
 			return true;
 		}
 	}
+	*/
 
 	private IDebugCommand getCommand() throws PCDIException {
-		synchronized (queue) {
-			IDebugCommand command = (IDebugCommand)queue.remove(0);
-			if (command == null)
-				throw new PCDIException("No DebugCommand found");
-			
-			return command;
-		}
+        synchronized (queue) {
+            if (!queue.isEmpty()) {
+            	return (IDebugCommand) queue.remove(0);
+            }
+        }
+		throw new PCDIException("No DebugCommand found");
 	}
 	public void addCommand(IDebugCommand command) {
 		synchronized (queue) {
@@ -99,6 +111,8 @@ System.err.println("*** SEND COMMAND: " + currentCommand.getCommandName() + ", t
 				return;
 			
 			if (!isTerminated || !contains(command)) {
+				System.err.println("************ DebugCommandQueue -- Add cmd: " + command.getCommandName());
+
 				if (command.isWaitInQueue()) {
 					queue.add(command);
 				} 
@@ -108,20 +122,21 @@ System.err.println("*** SEND COMMAND: " + currentCommand.getCommandName() + ", t
 				}
 				if (command.canInterrupt() && currentCommand != null) {
 					//only do flush if the current command cannot interrupt
-					if (!currentCommand.canInterrupt()) { 
+					if (!currentCommand.canInterrupt()) {
 						currentCommand.doFlush();
-						try {
-							//To make sure all events fired via AsbtractDebugger, so wait 0.5 sec here
-							queue.wait(500);
-						} catch (InterruptedException e) {}
 					}
 				}
-				queue.notifyAll();
+				schedule();
 			}
 			else {
-				command.doCancelWaiting();
-				//TODO how to deal with duplicate command
-				System.err.println("************ ERROR in DebugCommandQueue -- duplicate, cmd: " + currentCommand);
+				command.doFlush();
+				if (isTerminated) {
+					System.err.println("************ ERROR in DebugCommandQueue -- debugger is terminated, cmd: " + command.getCommandName());
+				}
+				else {
+					//TODO how to deal with duplicate command
+					System.err.println("************ ERROR in DebugCommandQueue -- duplicate, cmd: " + command.getCommandName());
+				}
 			}
 		}
 	}
@@ -154,11 +169,8 @@ System.err.println("*** SEND COMMAND: " + currentCommand.getCommandName() + ", t
 	public void setCommandReturn(BitList tasks, Object result) {
 		synchronized (queue) {
 			if (currentCommand != null) {
-				//if (result == null) {
-					//doFlushCommands();
-				//}
-				System.err.println("*** SET COMMAND RETURN: " + currentCommand.getCommandName() + ", result: " + result + ", tasks: " + AbstractDebugger.showBitList(tasks));
-				currentCommand.setReturn(tasks, result);					
+System.err.println("*** SET COMMAND RETURN: " + currentCommand.getCommandName() + ", result: " + result + ", tasks: " + AbstractDebugger.showBitList(tasks));
+				currentCommand.setReturn(tasks, result);		
 			}
 		}
 	}

@@ -41,7 +41,7 @@ public abstract class AbstractBreakpointCommand extends AbstractDebugCommand {
 		if (res instanceof IPCDIBreakpoint) {
 			return (IPCDIBreakpoint)res;
 		}
-		return null;
+		throw new PCDIException("Cannot create created");
 	}
 	public void preExecCommand(IAbstractDebugger debugger) throws PCDIException {
 		if (ignoreCheck) {

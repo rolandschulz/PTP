@@ -166,7 +166,6 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 	public void doFlush() {
 		command_finish = true;
 		setReturn(RETURN_FLUSH);
-System.err.println("---- do flush: " + getCommandName());		
 	}
 	private void setCheckTasks() {
 		if (check_tasks == null) {
