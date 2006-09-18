@@ -96,7 +96,6 @@ System.err.println("*** SEND COMMAND: " + currentCommand.getCommandName() + ", t
 		}
 	}
 	*/
-
 	private IDebugCommand getCommand() throws PCDIException {
         synchronized (queue) {
             if (!queue.isEmpty()) {

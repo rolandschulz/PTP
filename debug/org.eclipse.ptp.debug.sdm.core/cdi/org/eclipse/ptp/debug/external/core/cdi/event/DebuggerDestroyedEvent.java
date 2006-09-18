@@ -28,15 +28,14 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.core.cdi.event;
 
-import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.IPCDISessionObject;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIDebugDestroyedEvent;
 import org.eclipse.ptp.debug.external.core.PTPDebugExternalPlugin;
 
 public class DebuggerDestroyedEvent extends AbstractEvent implements IPCDIDebugDestroyedEvent {
-	public DebuggerDestroyedEvent(IPCDISession session, BitList tasks) {
-		super(session, tasks);
+	public DebuggerDestroyedEvent(IPCDISession session) {
+		super(session, session.createBitList());
 	}
 	public IPCDISessionObject getReason() {
 		PTPDebugExternalPlugin.getDefault().getLogger().finer("");

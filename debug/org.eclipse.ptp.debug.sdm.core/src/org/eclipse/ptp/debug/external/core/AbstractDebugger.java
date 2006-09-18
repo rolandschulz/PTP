@@ -178,18 +178,12 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 				setSuspendTasks(true, tasks);
 				setProcessStatus(tasks.toArray(), IPProcess.STOPPED);
 			}
-			else if (event instanceof IPCDIExitedEvent) {
-				if (isJobFinished()) {
-					postStopDebugger();
-				}
-			}
 			//FIXME - add item here or??
 			eventThread.fireDebugEvent(event);
 		}
 	}
 	private void postStopDebugger() {
 		postCommand(new StopDebuggerCommand(getSession().createBitList()));
-		commandQueue.setTerminated();
 	}
 	public final void notifyObservers(Object arg) {
 		setChanged();
@@ -235,7 +229,7 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 
 	//event
 	public void handleStopDebuggerEvent() {
-		fireEvent(new DebuggerDestroyedEvent(getSession(), new BitList(0)));
+		fireEvent(new DebuggerDestroyedEvent(getSession()));
 	}
 	public void handleBreakpointCreatedEvent(BitList tasks, IPCDIBreakpoint cdiBpt) {
 		fireEvent(new BreakpointCreatedEvent(getSession(), tasks, cdiBpt));
