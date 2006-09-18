@@ -121,7 +121,7 @@ public class BreakpointManager extends SessionObject implements IPCDIBreakpointM
 	
 	public void setConditionBreakpoint(String job_id, IPBreakpoint bpt) throws CoreException {
 		deleteBreakpoint(job_id, bpt);
-		setBreakpoint(job_id, bpt);
+		setBreakpoint(job_id, bpt, false);
 	}
 	public void setEnableBreakpoint(String job_id, IPBreakpoint bpt) throws CoreException {
 		BitList tasks = PTPDebugCorePlugin.getDebugModel().getTasks(job_id, bpt.getSetId());
@@ -152,15 +152,15 @@ public class BreakpointManager extends SessionObject implements IPCDIBreakpointM
 			}
 		}
 	}
-	public void setBreakpoint(String job_id, IPBreakpoint bpt) throws CoreException {
+	public void setBreakpoint(String job_id, IPBreakpoint bpt, boolean ignoreCheck) throws CoreException {
 		BitList tasks = PTPDebugCorePlugin.getDebugModel().getTasks(job_id, bpt.getSetId());
 		try {
-			setBreakpoint(tasks, bpt);
+			setBreakpoint(tasks, bpt, ignoreCheck);
 		} catch (PCDIException e) {
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugExternalPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));
 		}
 	}
-	private void setBreakpoint(BitList tasks, IPBreakpoint bpt) throws CoreException, PCDIException {
+	private void setBreakpoint(BitList tasks, IPBreakpoint bpt, boolean ignoreCheck) throws CoreException, PCDIException {
 		IPCDIBreakpoint cdiBpt = null;
 		if (bpt instanceof IPLineBreakpoint) {
 			cdiBpt = createCDILocationBreakpoint(tasks, IPCDIBreakpoint.REGULAR, getLocation(bpt), getCondition(bpt), bpt.isEnabled());			
@@ -182,13 +182,13 @@ public class BreakpointManager extends SessionObject implements IPCDIBreakpointM
 		else {
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugExternalPlugin.getUniqueIdentifier(), IStatus.ERROR, "This is not ptp breakpoint supported", null));
 		}
-		postBreakpointCommand(tasks, cdiBpt, bpt);
+		postBreakpointCommand(tasks, cdiBpt, bpt, ignoreCheck);
 	}
 	public void setInitialBreakpoints() throws CoreException {
 		String job_id = ((Session) getSession()).getJob().getIDString();
 		IPBreakpoint[] bpts = PTPDebugCorePlugin.getDebugModel().findPBreakpoints(job_id, true);
 		for (int i = 0; i < bpts.length; i++) {
-			setBreakpoint(job_id, bpts[i]);
+			setBreakpoint(job_id, bpts[i], true);
 		}
 	}
 	private IPCDICondition getCondition(IPBreakpoint breakpoint) throws CoreException {
@@ -281,9 +281,6 @@ public class BreakpointManager extends SessionObject implements IPCDIBreakpointM
 		return new AddressBreakpoint(type, location, condition);
 	}
 	/** command * */
-	private void postBreakpointCommand(BitList tasks, IPCDIBreakpoint cdiBpt, IPBreakpoint bpt) throws PCDIException {
-		postBreakpointCommand(tasks, cdiBpt, bpt, false);
-	}
 	private void postBreakpointCommand(BitList tasks, IPCDIBreakpoint cdiBpt, IPBreakpoint bpt, boolean ignoreCheck) throws PCDIException {
 		AbstractBreakpointCommand command = getSetBreakpointCommand(tasks, cdiBpt, ignoreCheck);
 		if (command == null) {
@@ -326,7 +323,7 @@ public class BreakpointManager extends SessionObject implements IPCDIBreakpointM
 					try {
 						String bp_job_id = ((IPBreakpoint)breakpoints[i]).getJobId(); 
 						if (bp_job_id.equals(job_id) || bp_job_id.equals(IPBreakpoint.GLOBAL)) {
-							setBreakpoint(job_id, (IPBreakpoint)breakpoints[i]);
+							setBreakpoint(job_id, (IPBreakpoint)breakpoints[i], false);
 						}
 					} catch (CoreException e) {
 						PTPDebugExternalPlugin.log(e.getStatus());

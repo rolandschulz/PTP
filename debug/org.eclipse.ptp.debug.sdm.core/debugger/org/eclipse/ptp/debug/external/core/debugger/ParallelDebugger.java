@@ -577,17 +577,17 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			completeCommand(e.getBitSet(), pcdiArgs);			
 			//completeCommand(e.getBitSet(), (IPCDIArgument[]) argList.toArray(new IPCDIArgument[0]));			
 			break;
-			
+
+		case IProxyDebugEvent.EVENT_DBG_EXIT_SIGNAL:
+			System.out.println("======================= EVENT_DBG_EXIT_SIGNAL ====================");
+			ProxyDebugSignalExitEvent exitSigEvent = (ProxyDebugSignalExitEvent)e;
+			handleProcessTerminatedEvent(e.getBitSet(), exitSigEvent.getSignalName(), exitSigEvent.getSignalMeaning());
+			break;
+
 		case IProxyDebugEvent.EVENT_DBG_EXIT:
-			if (e instanceof ProxyDebugExitEvent) {
-				System.out.println("======================= EVENT_DBG_EXIT ====================");
-				ProxyDebugExitEvent exitEvent = (ProxyDebugExitEvent)e;
-				handleProcessTerminatedEvent(e.getBitSet(), exitEvent.getExitStatus());
-			} else if (e instanceof ProxyDebugSignalExitEvent) {
-				System.out.println("======================= EVENT_DBG_EXIT_SIGNAL ====================");
-				ProxyDebugSignalExitEvent exitSigEvent = (ProxyDebugSignalExitEvent)e;
-				handleProcessTerminatedEvent(e.getBitSet(), exitSigEvent.getSignalName(), exitSigEvent.getSignalMeaning());
-			}
+			System.out.println("======================= EVENT_DBG_EXIT ====================");
+			ProxyDebugExitEvent exitEvent = (ProxyDebugExitEvent)e;
+			handleProcessTerminatedEvent(e.getBitSet(), exitEvent.getExitStatus());
 			break;
 			
 		case IProxyDebugEvent.EVENT_DBG_SIGNALS:

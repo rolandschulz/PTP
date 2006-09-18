@@ -218,7 +218,7 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 		}
 		return getReturn();
 	}
-	protected void suspendedBeforeExecCommand(IAbstractDebugger debugger) throws PCDIException {
+	protected void checkBeforeExecCommand(IAbstractDebugger debugger) throws PCDIException {
 		if (debugger.isSuspendTasks(tasks.copy())) {
 			exec(debugger);
 		}

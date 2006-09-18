@@ -38,7 +38,7 @@ public class ListArgumentsCommand extends AbstractDebugCommand {
 		this.depth = depth;
 	}
 	public void preExecCommand(IAbstractDebugger debugger) throws PCDIException {
-		suspendedBeforeExecCommand(debugger);
+		checkBeforeExecCommand(debugger);
 	}
 	public void exec(IAbstractDebugger debugger) throws PCDIException {
 		debugger.listArguments(tasks, frame, depth);

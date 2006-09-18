@@ -253,8 +253,12 @@ public class EventManager extends SessionObject implements IPCDIEventManager, Ob
 		else if (event instanceof IPCDIResumedEvent) {
 			fireResumeEvent((IPCDIResumedEvent)event);
 		}
+		else if (event instanceof IPCDIDebugDestroyedEvent) {
+			fireDestroyEvent((IPCDIDestroyedEvent)event, IPDebugEvent.DEBUGGER);
+			getSession().shutdown();
+		}
 		else if (event instanceof IPCDIDestroyedEvent) {
-			fireDestroyEvent((IPCDIDestroyedEvent)event);
+			fireDestroyEvent((IPCDIDestroyedEvent)event, IPDebugEvent.UNSPECIFIED);
 		}
 		else if (event instanceof IPCDIErrorEvent) {
 			fireErrorEvent((IPCDIErrorEvent)event);
@@ -264,9 +268,6 @@ public class EventManager extends SessionObject implements IPCDIEventManager, Ob
 		}
 		else if (event instanceof IPCDIChangedEvent) {
 			fireChangeEvent((IPCDIChangedEvent)event);
-		}
-		else if (event instanceof IPCDIDestroyedEvent) {
-			getSession().shutdown();
 		}
 	}
 	public void fireSuspendEvent(IPCDISuspendedEvent event) {
@@ -325,13 +326,10 @@ public class EventManager extends SessionObject implements IPCDIEventManager, Ob
 		}
 		PTPDebugCorePlugin.getDefault().fireDebugEvent(new PDebugEvent(getSession(), IPDebugEvent.RESUME, detail, baseInfo));
 	}
-	public void fireDestroyEvent(IPCDIDestroyedEvent event) {
-		IPDebugInfo baseInfo = getDebugInfo(event);
-		int detail = IPDebugEvent.UNSPECIFIED;
 
-		if (event instanceof IPCDIDebugDestroyedEvent) {
-			detail = IPDebugEvent.DEBUGGER;
-		}
+	public void fireDestroyEvent(IPCDIDestroyedEvent event, int detail) {
+		IPDebugInfo baseInfo = getDebugInfo(event);
+
 		PTPDebugCorePlugin.getDefault().fireDebugEvent(new PDebugEvent(getSession(), IPDebugEvent.TERMINATE, detail, baseInfo));
 	}
 	public void fireErrorEvent(IPCDIErrorEvent event) {
