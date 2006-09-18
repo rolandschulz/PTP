@@ -183,6 +183,7 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		}
 	}
 	private void postStopDebugger() {
+		commandQueue.setTerminated(false);
 		postCommand(new StopDebuggerCommand(getSession().createBitList()));
 	}
 	public final void notifyObservers(Object arg) {

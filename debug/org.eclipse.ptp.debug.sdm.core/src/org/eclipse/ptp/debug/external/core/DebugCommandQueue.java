@@ -49,9 +49,12 @@ public class DebugCommandQueue extends Job {
 	public boolean isTerminated() {
 		return isTerminated;
 	}
-	public void setTerminated() {
+	public void setTerminated(boolean removeInterrupt) {
 		isTerminated = true;
-		cleanup();
+		cleanup(removeInterrupt);		
+	}
+	public void setTerminated() {
+		setTerminated(true);
 	}
 	public void setInterruptCommand(IDebugCommand interruptCommand) {
 		this.interruptCommand = interruptCommand;
@@ -59,7 +62,6 @@ public class DebugCommandQueue extends Job {
 	public IDebugCommand getInterruptCommand() {
 		return interruptCommand;
 	}
-
     protected IStatus run(IProgressMonitor monitor) {
         while (!queue.isEmpty()) {
 			try {
@@ -80,7 +82,6 @@ System.err.println("*** SEND COMMAND: " + currentCommand.getCommandName() + ", t
         }
         return Status.OK_STATUS;
     }
-	
 	/*
 	private boolean waitForCommand() {
 		synchronized (queue) {
@@ -153,18 +154,6 @@ System.err.println("*** SEND COMMAND: " + currentCommand.getCommandName() + ", t
 	public IDebugCommand[] getCommands() {
 		return (IDebugCommand[])queue.toArray(new IDebugCommand[0]);
 	}
-	public void doFlushCommands() {
-		synchronized (queue) {
-			try {
-				IDebugCommand[] commands = getCommands();
-				for (int i=commands.length-1; i>-1; i--) {
-					commands[i].doFlush();
-				}
-			} finally {
-				queue.clear();
-			}
-		}
-	}
 	public void setCommandReturn(BitList tasks, Object result) {
 		synchronized (queue) {
 			if (currentCommand != null) {
@@ -176,10 +165,25 @@ System.err.println("*** SET COMMAND RETURN: " + currentCommand.getCommandName() 
 	public IDebugCommand getCurrentCommand() {
 		return currentCommand;
 	}
-	public void cleanup() {
+	public void doFlushCommands(boolean removeInterrupt) {
 		synchronized (queue) {
-			//queue.clear();
-			doFlushCommands();
+			IDebugCommand[] commands = getCommands();
+			for (int i=commands.length-1; i>-1; i--) {
+				if (removeInterrupt || !commands[i].canInterrupt()) {
+					removeCommand(commands[i]);
+				}
+			}
+		}
+	}
+	private void removeCommand(IDebugCommand command) {
+		synchronized (queue) {
+			command.doFlush();
+			queue.remove(command);
+		}
+	}
+	private void cleanup(boolean removeInterrupt) {
+		synchronized (queue) {
+			doFlushCommands(removeInterrupt);
 		}
 	}
 }
