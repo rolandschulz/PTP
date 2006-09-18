@@ -58,9 +58,10 @@ public interface IPCDIBreakpointManager {
 	/** Add breakpoint with given PTP breakpoint and job
 	 * @param job_id
 	 * @param bpt
+	 * @param ignoreCheck
 	 * @throws CoreException
 	 */
-	public void setBreakpoint(String job_id, IPBreakpoint bpt) throws CoreException;
+	public void setBreakpoint(String job_id, IPBreakpoint bpt, boolean ignoreCheck) throws CoreException;
 	/** Set enable breakpoint with given PTP breakpoint and job
 	 * @param job_id
 	 * @param bpt

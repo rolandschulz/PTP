@@ -123,14 +123,20 @@ public class PCDIDebugModel {
 	}
 	public void fireRegisterEvent(IPJob job, BitList tasks, boolean refresh) {
 		if (!tasks.isEmpty()) {
-			IPDebugInfo info = new PDebugRegisterInfo(job, tasks, tasks, null, refresh);
-			PTPDebugCorePlugin.getDefault().fireDebugEvent(new PDebugEvent(getPCDISession(job.getIDString()), IPDebugEvent.CREATE, IPDebugEvent.REGISTER, info));
+			IPCDISession session = getPCDISession(job.getIDString());
+			if (session != null) {
+				IPDebugInfo info = new PDebugRegisterInfo(job, tasks, tasks, null, refresh);
+				PTPDebugCorePlugin.getDefault().fireDebugEvent(new PDebugEvent(session, IPDebugEvent.CREATE, IPDebugEvent.REGISTER, info));
+			}
 		}
 	}
 	public void fireUnregisterEvent(IPJob job, BitList tasks, boolean refresh) {
 		if (!tasks.isEmpty()) {
-			IPDebugInfo info = new PDebugRegisterInfo(job, tasks, null, tasks, refresh);
-			PTPDebugCorePlugin.getDefault().fireDebugEvent(new PDebugEvent(getPCDISession(job.getIDString()), IPDebugEvent.TERMINATE, IPDebugEvent.REGISTER, info));
+			IPCDISession session = getPCDISession(job.getIDString());
+			if (session != null) {
+				IPDebugInfo info = new PDebugRegisterInfo(job, tasks, null, tasks, refresh);
+				PTPDebugCorePlugin.getDefault().fireDebugEvent(new PDebugEvent(session, IPDebugEvent.TERMINATE, IPDebugEvent.REGISTER, info));
+			}
 		}
 	}
 	/**************************************************
