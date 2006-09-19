@@ -523,6 +523,16 @@ AddVARMap(char *name)
 	return NULL;
 }
 
+static void
+GetParentMiVar(char *mi_name)
+{
+	char* p;
+	p = strchr(mi_name, '.');
+	if (p != NULL) {
+		*p = '\0';
+	}
+}
+
 static varinfo *
 FindVARByName(char *name) 
 {
@@ -541,6 +551,7 @@ static varinfo *
 FindVARByMIName(char *mi_name) 
 {
 	int				i;
+	GetParentMiVar(mi_name);
 	struct varinfo *map;
 	for (i = 0; i < VARMap.nels; i++) {
 		map = &VARMap.maps[i];
@@ -1884,10 +1895,12 @@ ComplexVarToAIF(char *exp, MIVar *var, int named)
 		break;
 					
 	default:
-		if (strncmp(var->type, "struct", 6) == 0) { /* struct */
-			a = CreateStruct(var, named);
-		} else if (strncmp(var->type, "union", 5) == 0) {
+		if (strncmp(var->type, "union", 5) == 0) {
 			a = CreateUnion(var, named);
+		}
+		else {
+			//if (strncmp(var->type, "struct", 6) == 0) { /* struct */
+			a = CreateStruct(var, named);
 		}
 	}
 	
