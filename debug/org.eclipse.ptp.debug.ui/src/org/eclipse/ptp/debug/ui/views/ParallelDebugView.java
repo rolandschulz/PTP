@@ -136,6 +136,8 @@ public class ParallelDebugView extends ParallelJobView {
 	}
 	
 	private void selectElements(final Object[] objects) {
+		/*
+		 * FIXME does not work if create a new set.  Currently we can task id to identify icon, but viewer is using order 
         SafeRunnable.run(new SafeRunnable() {
             public void run() {
 				if (!canvas.isDisposed()) {
@@ -153,6 +155,7 @@ public class ParallelDebugView extends ParallelJobView {
 				}
 			}
 		});
+		*/
 	}
 		
 	/**
