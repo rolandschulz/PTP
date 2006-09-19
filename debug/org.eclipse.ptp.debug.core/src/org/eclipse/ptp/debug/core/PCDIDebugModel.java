@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import org.eclipse.cdt.core.IBinaryParser.IBinaryObject;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
@@ -67,11 +66,12 @@ public class PCDIDebugModel {
 	private final String VALUE_UNKNOWN = "Unkwnon";
 	private final String VALUE_ERROR = "Error in getting value";
 
-	private Map jobSets = new HashMap();
-	private Map sessions = new HashMap();
-
+	private final String SESSION_KEY = "session_key";
+	private DebugJobStorage jobStorage = new DebugJobStorage("Job");
+	private DebugJobStorage sessionStorage = new DebugJobStorage("Session");
+	
 	public void shutdown() {
-		for (Iterator i=sessions.values().iterator(); i.hasNext();) {
+		for (Iterator i=sessionStorage.getJobValueIterator(); i.hasNext();) {
 			IPSession pSession = (IPSession)i.next();
 			if (pSession != null) {
 				IPJob job = pSession.getJob();
@@ -87,19 +87,19 @@ public class PCDIDebugModel {
 				}
 			}
 		}
-		sessions.clear();
-		jobSets.clear();
+		jobStorage.closeDebugJobStorage();
+		sessionStorage.closeDebugJobStorage();
 	}
 	public void shutdownSession(IPJob job) {
 		if (job != null) {
-			IPSession pSession = (IPSession)sessions.remove(job.getIDString());
+			IPSession pSession = (IPSession)sessionStorage.removeValue(job.getIDString(), SESSION_KEY);
 			if (pSession != null) {
 				pSession.getPCDISession().shutdown();
 			}
 		}
 	}
-	public IPCDISession getPCDISession(String jid) {
-		IPSession pSession = (IPSession)sessions.get(jid);
+	public IPCDISession getPCDISession(String job_id) {
+		IPSession pSession = (IPSession)sessionStorage.getValue(job_id, SESSION_KEY);
 		if (pSession != null) {
 			return pSession.getPCDISession();
 		}
@@ -108,8 +108,9 @@ public class PCDIDebugModel {
 	public IPSession createDebuggerSession(IAbstractDebugger debugger, IPLaunch launch, IBinaryObject exe, int timeout, IProgressMonitor monitor) throws CoreException {
 		IPSession pSession = new PSession(debugger.createDebuggerSession(launch, exe, timeout, monitor));
 		IPJob job = launch.getPJob();
-		sessions.put(job.getIDString(), pSession);
-		newJob(job, job.totalProcesses());
+		sessionStorage.addValue(job.getIDString(), SESSION_KEY, pSession);
+		
+		newJob(job, pSession.getPCDISession().createBitList());
 		fireSessionEvent(job, pSession.getPCDISession());
 		pSession.getPCDISession().start(monitor);
 		return pSession;
@@ -327,74 +328,27 @@ public class PCDIDebugModel {
 	}
 	/**************************************************
 	 * Debug Job
-	 **************************************************/
-	public void newJob(IPJob job, int totalTasks) throws CoreException {
-		BitList rootTasks = new BitList(totalTasks);
-		rootTasks.set(0, totalTasks);
+	 **************************************************/	
+	public void newJob(IPJob job, BitList rootTasks) throws CoreException {
 		createSet(job.getIDString(), PreferenceConstants.SET_ROOT_ID, rootTasks);
 	}
 	public void createSet(String job_id, String set_id, BitList tasks) throws CoreException {
-		JobSet jobSet = getJobSet(job_id);
-		jobSet.createSet(set_id, tasks);
+		jobStorage.addValue(job_id, set_id, tasks);
 	}
 	public void addTasks(String job_id, String set_id, BitList tasks) throws CoreException {
-		JobSet jobSet = getJobSet(job_id);
-		jobSet.addTasks(set_id, tasks);
+		getTasks(job_id, set_id).or(tasks); // add tasks
 	}
 	public void removeTasks(String job_id, String set_id, BitList tasks) throws CoreException {
-		JobSet jobSet = getJobSet(job_id);
-		jobSet.removeTasks(set_id, tasks);
+		getTasks(job_id, set_id).andNot(tasks); // remove tasks
 	}
 	public void deleteSet(String job_id, String set_id) throws CoreException {
-		JobSet jobSet = getJobSet(job_id);
-		jobSet.deleteSet(set_id);
+		jobStorage.removeValue(job_id, set_id);
 	}
 	public BitList getTasks(String job_id, String set_id) throws CoreException {
-		JobSet jobSet = getJobSet(job_id);
-		return jobSet.getTasks(set_id).copy();
+		return ((BitList)jobStorage.getValue(job_id, set_id)).copy();
 	}
 	public void deleteJob(IPJob job) {
-		getJobSet(job.getIDString()).clearAllSets();
-		jobSets.remove(job.getIDString());
-	}
-	public boolean containsJobSet(String job_id) {
-		return jobSets.containsKey(job_id);
-	}
-	private JobSet getJobSet(String job_id) {
-		if (!containsJobSet(job_id)) {
-			jobSets.put(job_id, new JobSet());
-		}
-		return (JobSet)jobSets.get(job_id);
-	}
-	private class JobSet {
-		private Map sets = new HashMap();
-		public void clearAllSets() {
-			sets.clear();
-		}
-		public void createSet(String set_id, BitList tasks) throws CoreException {
-			if (sets.containsKey(set_id))
-				throw new CoreException(new Status(IStatus.ERROR, getPluginIdentifier(), IStatus.ERROR, "The set [" + set_id + "] is already existed.", null));
-				
-			sets.put(set_id, tasks);
-		}
-		public void addTasks(String set_id, BitList tasks) throws CoreException {
-			getTasks(set_id).or(tasks);
-		}
-		public void removeTasks(String set_id, BitList tasks) throws CoreException {
-			getTasks(set_id).andNot(tasks);
-		}
-		public void deleteSet(String set_id) throws CoreException {
-			if (!sets.containsKey(set_id))
-				throw new CoreException(new Status(IStatus.ERROR, getPluginIdentifier(), IStatus.ERROR, "The set [" + set_id + "] is not found.", null));
-
-			sets.remove(set_id);
-		}
-		public BitList getTasks(String set_id) throws CoreException {
-			if (!sets.containsKey(set_id))
-				throw new CoreException(new Status(IStatus.ERROR, getPluginIdentifier(), IStatus.ERROR, "The set [" + set_id + "] is not found.", null));
-
-			return (BitList)sets.get(set_id);
-		}
+		jobStorage.removeJobStorage(job.getIDString());
 	}
 	/***********************************************************************************************
 	 * Expression
