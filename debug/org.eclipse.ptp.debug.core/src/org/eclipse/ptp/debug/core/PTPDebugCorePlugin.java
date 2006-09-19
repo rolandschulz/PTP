@@ -190,6 +190,7 @@ public class PTPDebugCorePlugin extends Plugin {
 			//resetBreakpointsInstallCount();
 			disposeCommonSourceLookupDirector();
 			debugModel.shutdown();
+			DebugJobStorage.removeDebugStorages();
 		} finally {
 			super.stop(context);
 		}
