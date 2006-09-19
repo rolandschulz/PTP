@@ -61,7 +61,7 @@ public abstract class VariableDescriptor extends PObject implements IPCDIVariabl
 		fFullName = desc.fFullName;
 		fType = desc.fType;
 		try {
-			//aif = desc.getAIF();
+			aif = desc.getAIF();
 			fStackFrame = (StackFrame)desc.getStackFrame();
 			fThread = (Thread)desc.getThread();
 		} catch (PCDIException e) {
