@@ -201,10 +201,6 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 		cur_set_size = 0;
 		if (set != null) {
 			cur_set_size = set.size();
-			//do nothing if set is no changed
-			if (cur_element_set != null && cur_element_set.getID().equals(set.getID())) {
-				return;
-			}
 			manager.setCurrentSetId(set.getID());
 		}
 		canvas.setElementSet(set);
