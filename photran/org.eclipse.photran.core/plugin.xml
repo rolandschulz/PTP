@@ -55,11 +55,11 @@
       </errorparser>
    </extension>
    <extension
-         id="FErrorParser"
-         name="Photran Error Parser for F"
+         id="NAGErrorParser"
+         name="Photran Error Parser for NAG Fortran"
          point="org.eclipse.cdt.core.ErrorParser">
       <errorparser
-            class="org.eclipse.photran.internal.errorparsers.FErrorParser">
+            class="org.eclipse.photran.internal.errorparsers.NAGErrorParser">
       </errorparser>
    </extension>
    <extension

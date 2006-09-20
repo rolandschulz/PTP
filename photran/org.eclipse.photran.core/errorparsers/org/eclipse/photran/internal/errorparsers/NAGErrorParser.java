@@ -5,13 +5,13 @@ import org.eclipse.cdt.core.IMarkerGenerator;
 import org.eclipse.core.resources.IFile;
  
 /**
- * F Error Parser -- An error parser for F
+ * NAG Error Parser -- An error parser for NAG Fortran (and F)
  *
  * Error: f.f95, line 44: Oops, you blew it!
  *
  * @author Walt Brainerd
  */
-public class FErrorParser implements IErrorParser
+public class NAGErrorParser implements IErrorParser
 {
      private String fileNameString;
      private int lineNumber;
