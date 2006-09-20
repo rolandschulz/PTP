@@ -16,17 +16,19 @@ import org.eclipse.photran.internal.ui.preferences.ColorPreferencePage;
 import org.eclipse.photran.ui.FortranUIPlugin;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.widgets.Display;
 
 public class FortranKeywordRuleBasedScanner extends RuleBasedScanner {
-	private final class FortranWordDetector implements IWordDetector {
-		public boolean isWordStart(char c) {
-			return Character.isJavaIdentifierStart(c);
-		}
+    private final class FortranWordDetector implements IWordDetector {
+        public boolean isWordStart(char c) {
+            return Character.isJavaIdentifierStart(c) || c == '.';
+        }
 
-		public boolean isWordPart(char c) {
-			return Character.isJavaIdentifierPart(c);
-		}
-	}
+        public boolean isWordPart(char c) {
+            return Character.isJavaIdentifierPart(c) || c == '.';
+        }
+    }
 
 	private static String[] fgKeywords = { "ACCESS", "ACTION", "ADVANCE",
 			" ALLOCATABLE ", " ALLOCATE ", " ASSIGN ", " ASSIGNMENT ",
@@ -54,6 +56,8 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner {
 			" SUBROUTINE ", " TARGET ", " THEN ", " TO ", " TYPE ",
 			" UNFORMATTED ", " UNIT ", " USE ", " VOLATILE ", " WHERE ",
 			" WHILE ", " WRITE " };
+    
+    private static String[] fgTextualOperators = { ".EQ.", ".EQV.", ".FALSE.", ".GE.", ".GT.", ".LE.", ".NE.", ".NEQV.", ".NOT.", ".OR.", ".TRUE." };
 
 	private static String[] fgIntrinsics = { " ABS ", " ACHAR ", " ACOS ",
 			" ADJUSTL ", " ADJUSTR ", " AIMAG ", " AINT ", " ALL ",
@@ -97,9 +101,13 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner {
 			null, PreferenceConverter.getColor(store,
 					ColorPreferencePage.F90_COMMENT_COLOR_PREF))));
 
-	Token F90_IDENTIFIER_COLOR = new Token(new TextAttribute(new Color(
-			null, PreferenceConverter.getColor(store,
-					ColorPreferencePage.F90_IDENTIFIER_COLOR_PREF))));
+    Token F90_IDENTIFIER_COLOR = new Token(new TextAttribute(new Color(
+            null, PreferenceConverter.getColor(store,
+                    ColorPreferencePage.F90_IDENTIFIER_COLOR_PREF))));
+
+    Token F90_INTRINSIC_COLOR = new Token(new TextAttribute(new Color(
+            null, PreferenceConverter.getColor(store,
+                    ColorPreferencePage.F90_INTRINSIC_COLOR_PREF)), null, SWT.ITALIC));
 
 	Token F90_KEYWORD_COLOR = new Token(new TextAttribute(new Color(
 			null, PreferenceConverter.getColor(store,
@@ -120,21 +128,21 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner {
 	};
 
 	public FortranKeywordRuleBasedScanner() {
-		FortranUIPlugin.getDefault().getPreferenceStore()
-				.addPropertyChangeListener(colorPreferenceListener);
+		FortranUIPlugin.getDefault().getPreferenceStore().addPropertyChangeListener(colorPreferenceListener);
 
-		IRule[] rules = new IRule[3];
-		// Add rule for processing instructions
-		rules[0] = new MultiLineRule("\"", "\"", F90_STRING_CONSTANTS_COLOR);
-		// Add generic whitespace rule.
-		rules[1] = new EndOfLineRule("!", F90_COMMENT_COLOR);
-		WordRule rule = new WordRule(new FortranWordDetector(),
-				F90_IDENTIFIER_COLOR);
-
-		createWordRules(rule);
-
-		rules[2] = rule;
-		setRules(rules);
+        IRule[] rules = new IRule[4];
+        // Add rule for processing instructions
+        rules[0] = new MultiLineRule("\"", "\"", F90_STRING_CONSTANTS_COLOR);
+        rules[1] = new MultiLineRule("'", "'", F90_STRING_CONSTANTS_COLOR);
+        // Add generic whitespace rule.
+        rules[2] = new EndOfLineRule("!", F90_COMMENT_COLOR);
+        
+        WordRule rule = new WordRule(new FortranWordDetector(), F90_IDENTIFIER_COLOR);
+        createSpecialWordRules(rule);
+        rules[3] = rule;
+        
+        setRules(rules);
+        setDefaultReturnToken(new Token(new TextAttribute(new Color(Display.getCurrent(), new RGB(0, 0, 0))))); // Punctuation, numbers, etc.
 	}
 
 	protected void updateColorPreferences() {
@@ -144,29 +152,37 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner {
 		F90_STRING_CONSTANTS_COLOR.setData(new TextAttribute(new Color(null,
 				PreferenceConverter.getColor(store,
 						ColorPreferencePage.F90_STRING_CONSTANTS_COLOR_PREF))));
-		F90_IDENTIFIER_COLOR.setData(new TextAttribute(new Color(null,
-				PreferenceConverter.getColor(store,
-						ColorPreferencePage.F90_IDENTIFIER_COLOR_PREF))));
+        F90_IDENTIFIER_COLOR.setData(new TextAttribute(new Color(null,
+                                                                PreferenceConverter.getColor(store,
+                                                                        ColorPreferencePage.F90_IDENTIFIER_COLOR_PREF))));
+        F90_INTRINSIC_COLOR.setData(new TextAttribute(new Color(null,
+                                                                PreferenceConverter.getColor(store,
+                                                                        ColorPreferencePage.F90_INTRINSIC_COLOR_PREF))));
 		F90_COMMENT_COLOR.setData(new TextAttribute(new Color(null,
 				PreferenceConverter.getColor(store,
 						ColorPreferencePage.F90_COMMENT_COLOR_PREF))));
 	}
 
-	private void createWordRules(WordRule rule) {
-		for (int i = 0; i < fgKeywords.length; i++) {
-			rule.addWord(fgKeywords[i].toLowerCase().trim(), F90_KEYWORD_COLOR);
-			rule.addWord(fgKeywords[i].trim(), F90_KEYWORD_COLOR);
-		}
-		for (int i = 0; i < fgIntrinsics.length; i++) {
-			rule.addWord(fgIntrinsics[i].toLowerCase().trim(),
-					F90_KEYWORD_COLOR);
-			rule.addWord(fgIntrinsics[i].trim(), F90_KEYWORD_COLOR);
-		}
-		for (int i = 0; i < fgTypes.length; i++) {
-			rule.addWord(fgTypes[i].toLowerCase().trim(), F90_KEYWORD_COLOR);
-			rule.addWord(fgTypes[i].trim(), F90_KEYWORD_COLOR);
-		}
-		for (int i = 0; i < fgPreprocessor.length; i++)
-			rule.addWord(fgPreprocessor[i].trim(), F90_KEYWORD_COLOR);
-	}
+    private void createSpecialWordRules(WordRule rule) {
+        // If a word appears more than once (e.g., "real" or "len"), the LAST rule assigned to it will apply
+        for (int i = 0; i < fgTextualOperators.length; i++) {
+            rule.addWord(fgTextualOperators[i].toLowerCase().trim(), F90_KEYWORD_COLOR);
+            rule.addWord(fgTextualOperators[i].trim(), F90_KEYWORD_COLOR);
+        }
+        for (int i = 0; i < fgPreprocessor.length; i++) {
+            rule.addWord(fgPreprocessor[i].trim(), F90_KEYWORD_COLOR);
+        }
+        for (int i = 0; i < fgIntrinsics.length; i++) {
+            rule.addWord(fgIntrinsics[i].toLowerCase().trim(), F90_INTRINSIC_COLOR);
+            rule.addWord(fgIntrinsics[i].trim(), F90_INTRINSIC_COLOR);
+        }
+        for (int i = 0; i < fgTypes.length; i++) {
+            rule.addWord(fgTypes[i].toLowerCase().trim(), F90_KEYWORD_COLOR);
+            rule.addWord(fgTypes[i].trim(), F90_KEYWORD_COLOR);
+        }
+        for (int i = 0; i < fgKeywords.length; i++) {
+            rule.addWord(fgKeywords[i].toLowerCase().trim(), F90_KEYWORD_COLOR);
+            rule.addWord(fgKeywords[i].trim(), F90_KEYWORD_COLOR);
+        }
+  }
 }

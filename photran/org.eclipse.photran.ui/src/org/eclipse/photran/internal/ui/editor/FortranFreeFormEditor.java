@@ -51,7 +51,7 @@ public class FortranFreeFormEditor extends AbstractFortranEditor {
 
 	private Composite fMainComposite;
 
-	private static final int MAX_LINES_FOR_LEXER_BASED_SCANNER = 1000;
+	static final int MAX_LINES_FOR_LEXER_BASED_SCANNER = -1;
 	
 	private static final int COLUMN_132_WIDTH = 132;
 	

@@ -25,6 +25,8 @@ public class ColorPreferencePage extends FieldEditorPreferencePage implements
 
     public static final String F90_IDENTIFIER_COLOR_PREF = "__fortran_identifier_color_pref";
 
+    public static final String F90_INTRINSIC_COLOR_PREF = "__fortran_intrinsic_color_pref";
+
     public static final String F90_KEYWORD_COLOR_PREF = "__fortran_keyword_color_pref";
 
     public static final String F90_COMMENT_COLOR_PREF = "__fortran_comment__color_pref";
@@ -43,11 +45,10 @@ public class ColorPreferencePage extends FieldEditorPreferencePage implements
      */
     public void createFieldEditors()
     {
-        addField(new ColorFieldEditor(F90_IDENTIFIER_COLOR_PREF, "Identifiers",
-            getFieldEditorParent()));
+        addField(new ColorFieldEditor(F90_IDENTIFIER_COLOR_PREF, "Identifiers", getFieldEditorParent()));
+        addField(new ColorFieldEditor(F90_INTRINSIC_COLOR_PREF, "Intrinsics", getFieldEditorParent()));
         addField(new ColorFieldEditor(F90_KEYWORD_COLOR_PREF, "Keywords", getFieldEditorParent()));
-        addField(new ColorFieldEditor(F90_STRING_CONSTANTS_COLOR_PREF, "Strings",
-            getFieldEditorParent()));
+        addField(new ColorFieldEditor(F90_STRING_CONSTANTS_COLOR_PREF, "Strings", getFieldEditorParent()));
         addField(new ColorFieldEditor(F90_COMMENT_COLOR_PREF, "Other", getFieldEditorParent()));
 
     }
@@ -58,11 +59,17 @@ public class ColorPreferencePage extends FieldEditorPreferencePage implements
      */
     public static void setDefaultColors()
     {
-        final IPreferenceStore store = FortranUIPlugin.getDefault().getPreferenceStore();
-        PreferenceConverter.setDefault(store, F90_COMMENT_COLOR_PREF, new RGB(63, 95, 191));
-        PreferenceConverter.setDefault(store, F90_IDENTIFIER_COLOR_PREF, new RGB(0, 0, 0));
-        PreferenceConverter.setDefault(store, F90_KEYWORD_COLOR_PREF, new RGB(127, 0, 85));
-        PreferenceConverter.setDefault(store, F90_STRING_CONSTANTS_COLOR_PREF, new RGB(42, 0, 255));
+        final IPreferenceStore store = FortranUIPlugin.getDefault()
+                        .getPreferenceStore();
+        // PreferenceConverter.setDefault(store, F90_COMMENT_COLOR_PREF, new RGB(63, 95, 191));
+        // PreferenceConverter.setDefault(store, F90_IDENTIFIER_COLOR_PREF, new RGB(0, 0, 0));
+        // PreferenceConverter.setDefault(store, F90_KEYWORD_COLOR_PREF, new RGB(127, 0, 85));
+        // PreferenceConverter.setDefault(store, F90_STRING_CONSTANTS_COLOR_PREF, new RGB(42, 0, 255));
+        PreferenceConverter.setDefault(store, F90_COMMENT_COLOR_PREF,          new RGB(63,  127, 95));
+        PreferenceConverter.setDefault(store, F90_IDENTIFIER_COLOR_PREF,       new RGB(0,   0,   192));
+        PreferenceConverter.setDefault(store, F90_INTRINSIC_COLOR_PREF,        new RGB(96,  0,   192));
+        PreferenceConverter.setDefault(store, F90_KEYWORD_COLOR_PREF,          new RGB(127, 0,   85));
+        PreferenceConverter.setDefault(store, F90_STRING_CONSTANTS_COLOR_PREF, new RGB(42,  0,   255));
     }
 
     /*
@@ -78,7 +85,8 @@ public class ColorPreferencePage extends FieldEditorPreferencePage implements
     {
         return (event.getProperty().equals(F90_COMMENT_COLOR_PREF)
             || event.getProperty().equals(F90_IDENTIFIER_COLOR_PREF)
-            || event.getProperty().equals(F90_KEYWORD_COLOR_PREF) || event.getProperty().equals(
-            F90_STRING_CONSTANTS_COLOR_PREF));
+            || event.getProperty().equals(F90_INTRINSIC_COLOR_PREF)
+            || event.getProperty().equals(F90_KEYWORD_COLOR_PREF)
+            || event.getProperty().equals(F90_STRING_CONSTANTS_COLOR_PREF));
     }
 }

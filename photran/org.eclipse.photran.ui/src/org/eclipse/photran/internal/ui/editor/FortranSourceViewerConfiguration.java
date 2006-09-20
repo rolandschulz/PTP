@@ -6,19 +6,14 @@ import java.util.List;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IAutoEditStrategy;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
-import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.photran.internal.ui.editor.FortranPartitionScanner.Partition;
 import org.eclipse.photran.internal.ui.preferences.FortranEditorPreferencePage;
 import org.eclipse.photran.ui.FortranUIPlugin;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.widgets.Display;
 
 /**
  * The source viewer configuration for the Fortran editor.
@@ -125,7 +120,7 @@ public class FortranSourceViewerConfiguration extends SourceViewerConfiguration 
 	public IPresentationReconciler getPresentationReconciler(
 			ISourceViewer sourceViewer) {
 		reconciler = new PresentationReconciler();
-		if (editor.getLinesOfCode() <= 1000) {
+		if (editor.getLinesOfCode() <= FortranFreeFormEditor.MAX_LINES_FOR_LEXER_BASED_SCANNER) {
 			Partition[] partitionTypes = FortranPartitionScanner
 					.getPartitionTypes();
 			for (int i = 0; i < partitionTypes.length; i++) {
@@ -147,11 +142,8 @@ public class FortranSourceViewerConfiguration extends SourceViewerConfiguration 
 	}
 
 	private FortranKeywordRuleBasedScanner getTagScanner() {
-		if (scanner == null) {
-			scanner = new FortranKeywordRuleBasedScanner();
-			scanner.setDefaultReturnToken(new Token(new TextAttribute(
-					new Color(Display.getCurrent(), new RGB(200, 0, 0)))));
-		}
-		return scanner;
+        if (scanner == null)
+            scanner = new FortranKeywordRuleBasedScanner();
+        return scanner;
 	}
 }
