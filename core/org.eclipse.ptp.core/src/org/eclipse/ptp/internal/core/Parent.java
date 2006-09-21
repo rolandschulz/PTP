@@ -20,6 +20,7 @@ package org.eclipse.ptp.internal.core;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.ptp.internal.core.elementcontrols.IPElementControl;
@@ -53,7 +54,7 @@ public abstract class Parent extends PElement {
 		if (info != null)
 			return info.getCollection();
 
-		return null;
+		return Collections.EMPTY_LIST;
 	}
 
 	public IPElementControl[] getChildren() {
@@ -62,12 +63,6 @@ public abstract class Parent extends PElement {
 			return info.getChildren();
 
 		return new IPElementControl[] {};
-	}
-
-	public IPElementControl[] getSortedChildren() {
-		IPElementControl[] elements = getChildren();
-		sort(elements);
-		return elements;
 	}
 
 	public List getChildrenOfType(int type) {

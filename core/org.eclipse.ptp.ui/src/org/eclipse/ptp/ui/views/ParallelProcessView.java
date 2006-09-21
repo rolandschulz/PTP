@@ -20,6 +20,7 @@ package org.eclipse.ptp.ui.views;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.core.IModelListener;
+import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.IProcessListener;
@@ -171,7 +172,15 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 		
 		if (process != null) {
 			rankLabel.setText("Rank: " + process.getProcessNumber());
-			jobLabel.setText("Job: " + process.getJob().getJobNumber());
+			final IPJob job = process.getJob();
+			final String jobNumber;
+			if (job == null) {
+				jobNumber = "none";
+			}
+			else {
+				jobNumber = job.getJobNumber();
+			}
+			jobLabel.setText("Job: " + jobNumber);
 			pidLabel.setText("PID: " + process.getPid());
 			statusLabel.setText("Status: " + process.getStatus());
 			

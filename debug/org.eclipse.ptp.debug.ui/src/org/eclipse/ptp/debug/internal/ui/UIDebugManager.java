@@ -218,6 +218,8 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	 * @return
 	 */
 	public IPCDISession getDebugSession(IPJob job) {
+		if (job == null)
+			return null;
 		return debugModel.getPCDISession(job.getIDString());
 	}
 	/** Convert string to integer

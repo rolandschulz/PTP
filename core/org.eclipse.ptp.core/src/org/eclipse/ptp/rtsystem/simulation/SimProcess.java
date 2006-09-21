@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -201,7 +202,9 @@ public class SimProcess extends Process implements IPProcess, IPElementControl, 
 		return isTerminated;
 	}
 	public void removeProcess() {
-		((IPNodeControl) getParent()).removeChild(this);
+		final IPNodeControl parent = (IPNodeControl) getParent();
+		if (parent != null)
+			parent.removeChild(this);
 	}
 	public void setTerminated(boolean isTerminated) {
 		this.isTerminated = isTerminated;
@@ -263,18 +266,13 @@ public class SimProcess extends Process implements IPProcess, IPElementControl, 
 		PElementInfo info = getElementInfo();
 		if (info != null)
 			return info.getCollection();
-		return null;
+		return Collections.EMPTY_LIST;
 	}
 	public IPElementControl[] getChildren() {
 		PElementInfo info = getElementInfo();
 		if (info != null)
 			return info.getChildren();
 		return new IPElementControl[] {};
-	}
-	public IPElementControl[] getSortedChildren() {
-		IPElementControl[] elements = getChildren();
-		sort(elements);
-		return elements;
 	}
 	public List getChildrenOfType(int type) {
 		IPElementControl[] children = getChildren();

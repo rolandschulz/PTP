@@ -66,8 +66,9 @@ public class PJob extends Parent implements IPJobControl {
 		IPNode[] nodes = getNodes();
 		List array = new ArrayList(0);
 		for (int i = 0; i < nodes.length; i++) {
-			if (!array.contains(nodes[i].getMachine())) {
-				array.add(nodes[i].getMachine());
+			final IPMachine machine = nodes[i].getMachine();
+			if (machine != null && !array.contains(machine)) {
+				array.add(machine);
 			}
 		}
 
@@ -103,8 +104,9 @@ public class PJob extends Parent implements IPJobControl {
 		IPProcess[] processes = getProcesses();
 		List array = new ArrayList(0);
 		for (int i = 0; i < processes.length; i++) {
-			if (!array.contains(processes[i].getNode())) {
-				array.add(processes[i].getNode());
+			final IPNode node = processes[i].getNode();
+			if (node != null && !array.contains(node)) {
+				array.add(node);
 			}
 		}
 

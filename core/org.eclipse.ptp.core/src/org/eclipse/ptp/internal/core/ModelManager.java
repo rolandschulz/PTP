@@ -585,7 +585,8 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			IPProcessControl[] procs = (IPProcessControl[]) job.getProcesses();
 			for (int i = 0; i < procs.length; i++) {
 				IPNodeControl node = (IPNodeControl) procs[i].getNode();
-				node.removeChild(procs[i]);
+				if (node != null)
+					node.removeChild(procs[i]);
 			}
 			job.removeChildren();
 			universe.removeChild(job);

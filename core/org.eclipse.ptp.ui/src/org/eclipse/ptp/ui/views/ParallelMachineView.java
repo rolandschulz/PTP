@@ -22,6 +22,8 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.ptp.core.AttributeConstants;
 import org.eclipse.ptp.core.IModelListener;
 import org.eclipse.ptp.core.INodeListener;
+import org.eclipse.ptp.core.IPJob;
+import org.eclipse.ptp.core.IPMachine;
 import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.PTPCorePlugin;
@@ -345,7 +347,15 @@ public class ParallelMachineView extends AbstractParallelSetView implements INod
 				int proc_state = ((MachineManager) manager).getProcStatus(procs[i].getStatus());
 				item = new TableItem(BRtable, SWT.NULL);
 				item.setImage(ParallelImages.procImages[proc_state][0]);
-				item.setText("Process " + procs[i].getProcessNumber() + ", Job " + procs[i].getJob().getJobNumber());
+				final IPJob job = procs[i].getJob();
+				final String jobNumber;
+				if (job == null) {
+					jobNumber = "none";
+				}
+				else {
+					jobNumber = job.getJobNumber();
+				}
+				item.setText("Process " + procs[i].getProcessNumber() + ", Job " + jobNumber);
 			}
 		}
 	}
@@ -419,7 +429,16 @@ public class ParallelMachineView extends AbstractParallelSetView implements INod
 	public void nodeEvent(INodeEvent event) {
 		// only redraw if the current set contain the node
 		IPNode node = event.getNode();
-		if (node != null && ((MachineManager) manager).isCurrentSetContainNode(node.getMachine().getIDString(), node.getIDString())) {
+		final IPMachine machine = node.getMachine();
+		final String idString;
+		if (machine == null) {
+			idString = "none";
+		}
+		else {
+			idString = machine.getIDString();
+		}
+		if (node != null && ((MachineManager) manager).isCurrentSetContainNode(idString,
+				node.getIDString())) {
 			refresh(false);
 		}		
 	}	
