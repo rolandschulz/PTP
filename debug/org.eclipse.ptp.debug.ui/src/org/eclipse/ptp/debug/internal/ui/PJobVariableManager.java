@@ -75,6 +75,8 @@ public final class PJobVariableManager {
 		return addJobVariable(job, sets, var, true);
 	}
 	public VariableInfo getVariableInfo(IPJob job, String var) {
+		if (job == null)
+			return null;
 		JobVariable jobVariable = getJobVariable(job.getIDString());
 		if (jobVariable != null) {
 			return jobVariable.getVariableInfo(var);

@@ -76,8 +76,9 @@ public class PNode extends Parent implements IPNodeControl {
 		IPProcess[] processes = getProcesses();
 		List array = new ArrayList(0);
 		for (int i = 0; i < processes.length; i++) {
-			if (!array.contains(processes[i].getJob())) {
-				array.add(processes[i].getJob());
+			final IPJob job = processes[i].getJob();
+			if (job != null && !array.contains(job)) {
+				array.add(job);
 			}
 		}
 		return (IPJob[]) array.toArray(new IPJob[array.size()]);

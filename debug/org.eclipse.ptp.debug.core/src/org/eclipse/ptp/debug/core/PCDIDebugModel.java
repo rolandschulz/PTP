@@ -37,6 +37,7 @@ import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.ptp.core.AttributeConstants;
 import org.eclipse.ptp.core.IPJob;
+import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.aif.AIFException;
@@ -148,7 +149,12 @@ public class PCDIDebugModel {
 			protected IStatus run(IProgressMonitor monitor) {
 				int[] taskArray = tasks.toArray();
 				for (int i=0; i<taskArray.length; i++) {
-					launch.getPJob().findProcessByTaskId(taskArray[i]).setAttribute(AttributeConstants.ATTRIB_ISREGISTERED, new Boolean(false));
+					final IPJob pjob = launch.getPJob();
+					final IPProcess process = pjob.findProcessByTaskId(taskArray[i]);
+					if (process != null) {
+						process.setAttribute(AttributeConstants.ATTRIB_ISREGISTERED,
+							new Boolean(false));
+					}
 					IPDebugTarget debugTarget = launch.getDebugTarget(taskArray[i]);
 					if (debugTarget != null) {
 						launch.removeDebugTarget(debugTarget);
@@ -178,7 +184,12 @@ public class PCDIDebugModel {
 							PTPDebugCorePlugin.log(e);
 						}
 					}
-					launch.getPJob().findProcessByTaskId(target.getTargetID()).setAttribute(AttributeConstants.ATTRIB_ISREGISTERED, new Boolean(true));
+					final IPJob pjob = launch.getPJob();
+					final IPProcess process = pjob.findProcessByTaskId(target.getTargetID());
+					if (process != null) {
+						process.setAttribute(AttributeConstants.ATTRIB_ISREGISTERED,
+								new Boolean(true));
+					}
 					launch.addDebugTarget(target);
 				}
 				fireRegisterEvent(launch.getPJob(), tasks, refresh);

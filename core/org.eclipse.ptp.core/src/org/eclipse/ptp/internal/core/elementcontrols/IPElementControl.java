@@ -110,9 +110,9 @@ public interface IPElementControl extends IPElement, ISearchPageScoreComputer {
 
 	/**
 	 * Returns an Element array of the children of this Element. If this Element
-	 * does not yet have any children, then null is returned.
+	 * does not yet have any children, then an empty array is returned.
 	 * 
-	 * @return An Element array of the children of this Element, null if there
+	 * @return An Element array of the children of this Element, an empty array if there
 	 *         are none
 	 */
 	public IPElementControl[] getChildren();
@@ -180,20 +180,10 @@ public interface IPElementControl extends IPElement, ISearchPageScoreComputer {
 	public boolean isAllStop();
 
 	/**
-	 * Returns a sorted Element array of this Element's children. Left open to
-	 * the implementer of this interface as to how the sorting is done and what
-	 * the sorting is performed on.
-	 * 
-	 * @return Sorted Element array of the children of this Element, null if
-	 *         there are none
-	 */
-	public IPElementControl[] getSortedChildren();
-
-	/**
-	 * Returns the children of this Element as a Collection or null if there are
+	 * Returns the children of this Element as a Collection or an empty collection if there are
 	 * no children.
 	 * 
-	 * @return The children of this Element or null if there are none
+	 * @return The children of this Element or an empty collection if there are none
 	 */
 	public Collection getCollection();
 

@@ -108,14 +108,6 @@ public class JobManager extends AbstractUIManager {
 		cur_set_id = set_id;
 	}
 	/** Get process status text
-	 * @param job_id job ID
-	 * @param proc_id process ID
-	 * @return status
-	 */
-	public String getProcessStatusText(String job_id, int task_id) {
-		return getProcessStatusText(findProcess(job_id, task_id));
-	}
-	/** Get process status text
 	 * @param proc process
 	 * @return status
 	 */
