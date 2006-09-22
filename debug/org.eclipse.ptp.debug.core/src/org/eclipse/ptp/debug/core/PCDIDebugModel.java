@@ -282,7 +282,7 @@ public class PCDIDebugModel {
 		}
 		return (IPBreakpoint[]) bptList.toArray(new IPBreakpoint[bptList.size()]);
 	}
-	public void deletePBreakpoint(final String job_id, final String set_id) throws CoreException {
+	public void deletePBreakpoint(final String job_id, final String set_id) {
 		Job aJob = new Job("Deleting parallel breakpoint...") {
 			public IStatus run(IProgressMonitor monitor) {
 				try {
@@ -300,7 +300,7 @@ public class PCDIDebugModel {
 		aJob.setPriority(Job.INTERACTIVE);
 		aJob.schedule();
 	}
-	public void deletePBreakpoint(final String job_id) throws CoreException {
+	public void deletePBreakpoint(final String job_id) {
 		Job aJob = new Job("Deleting parallel breakpoint...") {
 			public IStatus run(IProgressMonitor monitor) {
 				try {
@@ -309,7 +309,7 @@ public class PCDIDebugModel {
 						DebugPlugin.getDefault().getBreakpointManager().removeBreakpoints(breakpoints, true);
 					}
 				} catch (CoreException e) {
-					return Status.CANCEL_STATUS;
+					return e.getStatus();
 				}
 				return Status.OK_STATUS;
 			}
@@ -340,22 +340,22 @@ public class PCDIDebugModel {
 	/**************************************************
 	 * Debug Job
 	 **************************************************/	
-	public void newJob(IPJob job, BitList rootTasks) throws CoreException {
+	public void newJob(IPJob job, BitList rootTasks) {
 		createSet(job.getIDString(), PreferenceConstants.SET_ROOT_ID, rootTasks);
 	}
-	public void createSet(String job_id, String set_id, BitList tasks) throws CoreException {
+	public void createSet(String job_id, String set_id, BitList tasks) {
 		jobStorage.addValue(job_id, set_id, tasks);
 	}
-	public void addTasks(String job_id, String set_id, BitList tasks) throws CoreException {
+	public void addTasks(String job_id, String set_id, BitList tasks) {
 		getTasks(job_id, set_id).or(tasks); // add tasks
 	}
-	public void removeTasks(String job_id, String set_id, BitList tasks) throws CoreException {
+	public void removeTasks(String job_id, String set_id, BitList tasks) {
 		getTasks(job_id, set_id).andNot(tasks); // remove tasks
 	}
-	public void deleteSet(String job_id, String set_id) throws CoreException {
+	public void deleteSet(String job_id, String set_id) {
 		jobStorage.removeValue(job_id, set_id);
 	}
-	public BitList getTasks(String job_id, String set_id) throws CoreException {
+	public BitList getTasks(String job_id, String set_id) {
 		return ((BitList)jobStorage.getValue(job_id, set_id)).copy();
 	}
 	public void deleteJob(IPJob job) {
