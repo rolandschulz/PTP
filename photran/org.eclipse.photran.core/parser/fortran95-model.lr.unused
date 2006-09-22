@@ -1,0 +1,121 @@
+grammarFileSystemPath=/home/joverbey/photran/photran3-workspace/org.eclipse.photran.core/parser/fortran95.bnf
+
+leftAssocString=
+rightAssocString=
+precChainsString=
+
+explicitResolutions=shift T_COMMA instead of reducing by xIoControlSpecList \
+reduce by xSFVarName instead of reducing by xSFDummyArgName
+
+eclipseFolder=
+directory=/home/joverbey/photran/photran3-workspace/org.eclipse.photran.core/parser/org/eclipse/photran/internal/core/parser
+
+pkgOrNamespace=org.eclipse.photran.internal.core.parser
+
+userImports=\
+import java.util.List;\
+import java.util.Map;\
+import java.util.HashMap;\
+import java.util.Iterator;\
+import org.eclipse.photran.internal.core.f95parser.*;\
+import org.eclipse.photran.internal.core.model.FortranElement;\
+import org.eclipse.cdt.core.model.CModelException;
+
+userClassInsert=\
+private class M\
+{\
+    private Map/*<FortranElement, FortranElementInfo>*/ allElements = new HashMap();\
+\
+    public Map/*<FortranElement, FortranElementInfo>*/ getAllElements()\
+    {\
+        return allElements;\
+    }\
+\
+    public List/*<FortranElement>*/list(List list, FortranElement node)\
+    {\
+        if (list == null) list = new LinkedList();\
+        if (node != null) list.add(node);\
+        return list;\
+    }\
+\
+    public List/*<FortranElement>*/list(FortranElement node)\
+    {\
+        return list(new LinkedList(), node);\
+    }\
+\
+    public FortranElement mainProgram(Token nameToken, List/*<FortranElement>*/children)\
+    {\
+        FortranElement e = new FortranElement.MainProgram(null, nameToken);\
+        reparent(children, e);\
+        return newElement(e);\
+    }\
+\
+    public FortranElement module(Token nameToken, List/*<FortranElement>*/children)\
+    {\
+        FortranElement e = new FortranElement.Module(null, nameToken);\
+        reparent(children, e);\
+        return newElement(e);\
+    }\
+\
+    public FortranElement functionSubprogram(Token nameToken)\
+    {\
+        return newElement(new FortranElement.Function(null, nameToken));\
+    }\
+\
+    public FortranElement subroutineSubprogram(Token nameToken)\
+    {\
+        return newElement(new FortranElement.Subroutine(null, nameToken));\
+    }\
+\
+    public FortranElement blockData(Token nameToken)\
+    {\
+        return newElement(new FortranElement.BlockData(null, nameToken));\
+    }\
+\
+    private void reparent(List children, FortranElement parent)\
+    {\
+        if (children == null) return;\
+\
+        //try\
+        //{\
+            Iterator it = children.iterator();\
+            while (it.hasNext())\
+            {\
+                FortranElement c = (FortranElement)it.next();\
+                c.setParent(parent);\
+                //parent.addChild(c);\
+                //if (parent instanceof Parent) ((Parent)parent).addChild(c);\
+            }\
+        //}\
+        //catch (CModelException x)\
+        //{\
+        //    x.printStackTrace();\
+        //}\
+    }\
+\
+    private FortranElement newElement(FortranElement e)\
+    {\
+        try { allElements.put(e, e.getElementInfo()); }\
+        catch (CModelException x) {;}\
+        return e;\
+    }\
+}\
+\
+protected M m = new M();
+
+initUserCode=
+deinitUserCode=
+syntaxErrorUserCode=
+parserFor=Fortran 95
+notes=
+defaultUserValueType=
+superType=
+
+shouldRemoveEpsilonProductions=true
+debuggable=false
+incremental=false
+pluggableParserActions=true
+
+[types]
+
+[code]
