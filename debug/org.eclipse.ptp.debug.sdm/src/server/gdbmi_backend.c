@@ -1458,18 +1458,19 @@ struct simple_type {
 	int		type;
 };
 
-#define CHAR			0
-#define SHORT		1
-#define USHORT		2
-#define INT			3
-#define UINT			4
-#define LONG			5
-#define ULONG		6
-#define LONGLONG		7
-#define ULONGLONG	8
-#define FLOAT		9
-#define DOUBLE		10
-#define STRING		11
+#define OTHER		0
+#define CHAR		1
+#define SHORT		2
+#define USHORT		3
+#define INT			4
+#define UINT		5
+#define LONG		6
+#define ULONG		7
+#define LONGLONG	8
+#define ULONGLONG	9
+#define FLOAT		10
+#define DOUBLE		11
+#define STRING		12
 
 char* MODIFIERS[] = {
 	"const volatile",
@@ -1661,6 +1662,10 @@ GetPrimitiveTypeToAIF(int type_id, char* res)
 		
 	case DOUBLE:
 		a = DoubleToAIF(atof(res));
+		break;
+		
+	default://other type
+		a = CharPointerToAIF(res);
 		break;				
 	}
 	return a;
@@ -1679,6 +1684,10 @@ getSimpleTypeID(char* type, char* exp)
 	}
 	if (exp != NULL) {
 		return getSimpleTypeID(GetPtypeValue(exp), NULL);
+	}
+	//check whether it is struct
+	if (strncmp(type, "struct", 6) == 0) { /* struct */
+		return 0;
 	}
 	return -1;	
 }
@@ -1886,7 +1895,7 @@ ComplexVarToAIF(char *exp, MIVar *var, int named)
 			}
 			else {
 				a = ConvertVarToAIF(var->children[0]->exp, var->children[0], named);
-			}			
+			}
 		}
 		free(type);
 		if (a != NULL) {
