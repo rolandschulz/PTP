@@ -434,12 +434,8 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 		String set_id = uiDebugManager.getCurrentSetId();
 		if (set_id.equals(IElementHandler.SET_ROOT_ID))
 			return true;
-		try {
-			BitList tasks = PTPDebugCorePlugin.getDebugModel().getTasks(uiDebugManager.getCurrentJobId(), set_id);
-			return (tasks != null && tasks.intersects(aTasks));
-		} catch (CoreException e) {
-			return false;
-		}
+		BitList tasks = PTPDebugCorePlugin.getDebugModel().getTasks(uiDebugManager.getCurrentJobId(), set_id);
+		return (tasks != null && tasks.intersects(aTasks));
 	}
 	// generic
 	/** Add annotation
@@ -630,47 +626,49 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 	 * @param preSet previous set
 	 * @throws CoreException
 	 */
-	public void updateAnnotation(final IElementSet currentSet, final IElementSet preSet) throws CoreException {
-		final AnnotationGroup annotationGroup = getAnnotationGroup(uiDebugManager.getCurrentJobId());
-		if (annotationGroup == null)
-			return;
+	public void updateAnnotation(final IElementSet currentSet, final IElementSet preSet) {
 		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
 			public void run(IProgressMonitor monitor) throws CoreException {
 				new Job("Update Annotation") {
 					protected IStatus run(IProgressMonitor pmonitor) {
-						try {
-							BitList tasks = PTPDebugCorePlugin.getDebugModel().getTasks(uiDebugManager.getCurrentJobId(), currentSet.getID());
-							for (Iterator i = annotationGroup.getAnnotationIterator(); i.hasNext();) {
-								PInstructionPointerAnnotation annotation = (PInstructionPointerAnnotation) i.next();
-								// change icon for unregistered processes only if the set is changed
-								if (!isRegisterType(annotation.getType())) {
-									// if all the tasks in current is not match the unregistered tasks, display SET_ANN
-									// simply only display SET_ANN when the current set only contain registered tasks
-									if (currentSet.isRootSet())
-										changeAnnotationType(annotation, IPTPDebugUIConstants.CURSET_ANN_INSTR_POINTER_CURRENT);
-									else
-										changeAnnotationType(annotation, annotation.contains(tasks) ? IPTPDebugUIConstants.CURSET_ANN_INSTR_POINTER_CURRENT : IPTPDebugUIConstants.SET_ANN_INSTR_POINTER_CURRENT);
-								}
-							}
-						} catch (CoreException e) {
+						AnnotationGroup annotationGroup = getAnnotationGroup(uiDebugManager.getCurrentJobId());
+						if (annotationGroup == null)
 							return Status.CANCEL_STATUS;
+
+						BitList tasks = PTPDebugCorePlugin.getDebugModel().getTasks(uiDebugManager.getCurrentJobId(), currentSet.getID());
+						for (Iterator i = annotationGroup.getAnnotationIterator(); i.hasNext();) {
+							PInstructionPointerAnnotation annotation = (PInstructionPointerAnnotation) i.next();
+							// change icon for unregistered processes only if the set is changed
+							if (!isRegisterType(annotation.getType())) {
+								// if all the tasks in current is not match the unregistered tasks, display SET_ANN
+								// simply only display SET_ANN when the current set only contain registered tasks
+								if (currentSet.isRootSet())
+									changeAnnotationType(annotation, IPTPDebugUIConstants.CURSET_ANN_INSTR_POINTER_CURRENT);
+								else
+									changeAnnotationType(annotation, annotation.contains(tasks) ? IPTPDebugUIConstants.CURSET_ANN_INSTR_POINTER_CURRENT : IPTPDebugUIConstants.SET_ANN_INSTR_POINTER_CURRENT);
+							}
 						}
 						return Status.OK_STATUS;
 					}
 				}.schedule();
 			}
 		};
-		ResourcesPlugin.getWorkspace().run(runnable, null);
+		try {
+			ResourcesPlugin.getWorkspace().run(runnable, null);
+		} catch (CoreException e) {
+			PTPDebugUIPlugin.log(e);
+		}
 	}
 	public void register(final BitList tasks) {
-		String job_id = uiDebugManager.getCurrentJobId();
-		final AnnotationGroup annotationGroup = getAnnotationGroup(job_id);
-		if (annotationGroup == null)
-			return;
 		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
 			public void run(IProgressMonitor monitor) throws CoreException {
 				new Job("Update Annotation") {
 					protected IStatus run(IProgressMonitor pmonitor) {
+						String job_id = uiDebugManager.getCurrentJobId();
+						AnnotationGroup annotationGroup = getAnnotationGroup(job_id);
+						if (annotationGroup == null)
+							return Status.CANCEL_STATUS;
+
 						PInstructionPointerAnnotation annotation = findAnnotation(annotationGroup, tasks);
 						if (annotation != null) {
 							boolean isRegister = isRegisterType(annotation.getType());
@@ -680,7 +678,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 								else // unregister annotation
 									removeFromExistedAnnotation(annotationGroup, annotation, tasks, isRegister);
 							} catch (CoreException e) {
-								return Status.CANCEL_STATUS;
+								return e.getStatus();
 							}
 						}
 						return Status.OK_STATUS;
@@ -695,14 +693,15 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 		}
 	}
 	public void unregister(final BitList tasks) {
-		String job_id = uiDebugManager.getCurrentJobId();
-		final AnnotationGroup annotationGroup = getAnnotationGroup(job_id);
-		if (annotationGroup == null)
-			return;
 		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
 			public void run(IProgressMonitor monitor) throws CoreException {
 				new Job("Update Annotation") {
 					protected IStatus run(IProgressMonitor pmonitor) {
+						String job_id = uiDebugManager.getCurrentJobId();
+						AnnotationGroup annotationGroup = getAnnotationGroup(job_id);
+						if (annotationGroup == null)
+							return Status.CANCEL_STATUS;
+
 						PInstructionPointerAnnotation annotation = findAnnotation(annotationGroup, tasks);
 						if (annotation != null) {
 							boolean isRegister = isRegisterType(annotation.getType());
@@ -712,7 +711,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 								else // unregister annotation
 									addToExistedAnnotation(annotationGroup, annotation, tasks, isRegister);
 							} catch (CoreException e) {
-								return Status.CANCEL_STATUS;
+								return e.getStatus();
 							}
 						}
 						return Status.OK_STATUS;
