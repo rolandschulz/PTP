@@ -17,185 +17,33 @@ public class Token extends AbstractParseTreeNode implements ParserSymbol
     /**
      * The Terminal that this token is an instance of
      */
-    protected Terminal terminal;
-
-    /**
-     * Returns the Terminal that this token is an instance of
-     */
-    public Terminal getTerminal() { return terminal; }
-
-    /**
-     * Sets the Terminal that this token is an instance of
-     */
-    public void setTerminal(Terminal value) { terminal = value; }
-
-    /**
-     * The filename in which the token occurred
-     */
-    protected String filename;
-
-    /**
-     * Returns the filename in which the token occurred
-     */
-    public String getFilename() { return filename; }
-
-    /**
-     * Sets the filename in which the token occurred
-     */
-    public void setFilename(String value) { filename = value; }
-
-    /**
-     * The line number on which the token starts (1=first line, 2=second, etc.)
-     */
-    protected int startLine;
-
-    /**
-     * Returns the line number on which the token starts (1=first line, 2=second, etc.)
-     */
-    public int getStartLine() { return startLine; }
-
-    /**
-     * Sets the line number on which the token starts (1=first line, 2=second, etc.)
-     */
-    public void setStartLine(int value) { startLine = value; }
-
-    /**
-     * The column number on which the token starts (1=first column, 2=second, etc.)
-     */
-    protected int startCol;
-
-    /**
-     * Returns the column number on which the token starts (1=first column, 2=second, etc.)
-     */
-    public int getStartCol() { return startCol; }
-
-    /**
-     * Sets the column number on which the token starts (1=first column, 2=second, etc.)
-     */
-    public void setStartCol(int value) { startCol = value; }
-
-    /**
-     * The line number on which the token ends (1=first line, 2=second, etc.)
-     */
-    protected int endLine;
-
-    /**
-     * Returns the line number on which the token ends (1=first line, 2=second, etc.)
-     */
-    public int getEndLine() { return endLine; }
-
-    /**
-     * Sets the line number on which the token ends (1=first line, 2=second, etc.)
-     */
-    public void setEndLine(int value) { endLine = value; }
-
-    /**
-     * The column number on which the token ends (1=first column, 2=second, etc.)
-     */
-    protected int endCol;
-
-    /**
-     * Returns the column number on which the token ends (1=first column, 2=second, etc.)
-     */
-    public int getEndCol() { return endCol; }
-
-    /**
-     * Sets the column number on which the token ends (1=first column, 2=second, etc.)
-     */
-    public void setEndCol(int value) { endCol = value; }
-
-    /**
-     * The start of the token, as a character offset in the file
-     * 0=first character, 1=second, etc.
-     */
-    protected int offset;
-
-    /**
-     * Returns the start of the token, as a character offset in the file
-     * 0=first character, 1=second, etc.
-     */
-    public int getOffset() { return offset; }
-
-    /**
-     * Sets the start of the token, as a character offset in the file
-     * 0=first character, 1=second, etc.
-     */
-    public void setOffset(int value) { offset = value; }
-
-    /**
-     * The length of the token text, in characters
-     */
-    protected int length;
-
-    /**
-     * Returns the length of the token text, in characters
-     */
-    public int getLength() { return length; }
-
-    /**
-     * Sets the length of the token text, in characters
-     */
-    public void setLength(int value) { length = value; }
+    protected Terminal terminal = null;
 
     /**
      * The token text
      */
-    protected String text;
-
-    /**
-     * Returns the token text
-     */
-    public String getText() { return text; }
-
-    /**
-     * Sets the token text
-     */
-    public void setText(String value) { text = value; }
+    protected String text = "";
 
     /**
      * Whitespace and whitetext appearing before this token that should be associated with this token
      */
-    protected String whiteBefore;
-
-    /**
-     * Returns whitespace and whitetext appearing before this token that should be associated with this token
-     */
-    public String getWhiteBefore() { return whiteBefore; }
-
-    /**
-     * Sets whitespace and whitetext appearing before this token that should be associated with this token
-     */
-    public void setWhiteBefore(String value) { whiteBefore = value; }
+    protected String whiteBefore = "";
 
     /**
      * Whitespace and whitetext appearing after this token that should be associated with this token, not the next
      */
-    protected String whiteAfter;
-
-    /**
-     * Returns whitespace and whitetext appearing after this token that should be associated with this token, not the next
-     */
-    public String getWhiteAfter() { return whiteAfter; }
-
-    /**
-     * Sets whitespace and whitetext appearing after this token that should be associated with this token, not the next
-     */
-    public void setWhiteAfter(String value) { whiteAfter = value; }
+    protected String whiteAfter = "";
 
     public Token()
     {
     }
 
-    public Token(Terminal theTerminal, String theText, int theOffset, int theLength, int theStartLine, int theStartCol, int theEndLine, int theEndCol)
+    public Token(Terminal terminal, String whiteBefore, String tokenText, String whiteAfter)
     {
-        terminal = theTerminal;
-        text = theText;
-        offset = theOffset;
-        length = theLength;
-        startLine = theStartLine;
-        startCol = theStartCol;
-        endLine = theEndLine;
-        endCol = theEndCol;
+        this.terminal    = terminal;
+        this.whiteBefore = whiteBefore == null ? "" : whiteBefore;
+        this.text   = tokenText   == null ? "" : tokenText;
+        this.whiteAfter  = whiteAfter  == null ? "" : whiteAfter;
     }
 
     /**
@@ -216,11 +64,6 @@ public class Token extends AbstractParseTreeNode implements ParserSymbol
     /**
      * See AbstractParseTreeNode
      */
-    public String toString(int numSpaces) { return indent(numSpaces) + getDescription() + "\n"; }
-
-    /**
-     * See AbstractParseTreeNode
-     */
     public void visitTopDownUsing(ASTVisitor visitor) { ; }
 
     /**
@@ -228,8 +71,59 @@ public class Token extends AbstractParseTreeNode implements ParserSymbol
      */
     public void visitBottomUpUsing(ASTVisitor visitor) { ; }
 
-    public String toString()
+    /**
+     * See AbstractParseTreeNode
+     */
+    public String toString(int numSpaces) { return indent(numSpaces) + getDescription() + "\n"; }
+    
+    public String toString() { return getDescription(); }
+    
+    ///////////////////////////////////////////////////////////////////////////
+    // Accessor/mutator methods
+    ///////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Returns the Terminal that this token is an instance of
+     */
+    public Terminal getTerminal() { return terminal; }
+
+    /**
+     * Sets the Terminal that this token is an instance of
+     */
+    public void setTerminal(Terminal value) { terminal = value; }
+
+    /**
+     * Returns the token text
+     */
+    public String getText() { return text; }
+
+    /**
+     * Sets the token text
+     */
+    public void setText(String value) { text = value == null ? "" : value; }
+
+    /**
+     * Returns whitespace and whitetext appearing before this token that should be associated with this token
+     */
+    public String getWhiteBefore() { return whiteBefore; }
+
+    /**
+     * Sets whitespace and whitetext appearing before this token that should be associated with this token
+     */
+    public void setWhiteBefore(String value) { whiteBefore = value == null ? "" : value; }
+
+    /**
+     * Returns whitespace and whitetext appearing after this token that should be associated with this token, not the next
+     */
+    public String getWhiteAfter() { return whiteAfter; }
+
+    /**
+     * Sets whitespace and whitetext appearing after this token that should be associated with this token, not the next
+     */
+    public void setWhiteAfter(String value) { whiteAfter = value == null ? "" : value; }
+
+    public String getCompleteText()
     {
-        return getDescription();
+        return whiteBefore + text + whiteAfter;
     }
 }

@@ -40,8 +40,7 @@ class FixedFormLexerPhase2 implements ILexer
             }
         };
 
-        FixedFormLexerPhase1 phase1 = new FixedFormLexerPhase1(prepassReader, prepass);
-        freeLexer2 = new FreeFormLexerPhase2(phase1, filename);
+        freeLexer2 = new FreeFormLexerPhase2(new FixedFormLexerPhase1(prepassReader, prepass, filename));
     }
 
     public Token yylex() throws Exception
@@ -56,18 +55,28 @@ class FixedFormLexerPhase2 implements ILexer
                 || (nextToken.getTerminal() == Terminal.T_ICON)
                 || (nextToken.getTerminal() == Terminal.T_UNDERSCORE))
             {
-                t.setEndLine(nextToken.getEndLine());
-                t.setEndCol(nextToken.getEndCol());
+                //t.setEndLine(nextToken.getEndLine());
+                //t.setEndCol(nextToken.getEndCol());
                 t.setText(t.getText() + nextToken.getText());
-                t.setLength(t.getText().length());
+                //t.setLength(t.getTokenText().length());
                 nextToken = freeLexer2.yylex();
             }
         }
         return t;
     }
 
-    public void setFilename(String filename)
+    public String getFilename()
     {
-        freeLexer2.setFilename(filename);
+        return freeLexer2.getFilename();
+    }
+
+    public int getLastTokenLine()
+    {
+        return freeLexer2.getLastTokenLine();
+    }
+
+    public int getLastTokenCol()
+    {
+        return freeLexer2.getLastTokenCol();
     }
 }

@@ -211,7 +211,7 @@ public class Parser
      */
     protected ParsingTable parsingTable;
 
-    protected String getErrorMessage() { return "Syntax error (" + lookaheadToken.getFilename() + ", line " + lookaheadToken.getStartLine() + ", column " + lookaheadToken.getStartCol() + ": Unexpected " + lookaheadToken.getTerminal().getDescription() + " \"" + lookaheadToken.getText() + "\""; }
+    protected String getErrorMessage() { return "Syntax error (" + lexer.getFilename() + ", line " + lexer.getLastTokenLine() + ", column " + lexer.getLastTokenCol() + ": Unexpected " + lookaheadToken.getTerminal().getDescription() + " \"" + lookaheadToken.getText() + "\""; }
 
     /**
      * Retrieve the parser's current state (an integer)

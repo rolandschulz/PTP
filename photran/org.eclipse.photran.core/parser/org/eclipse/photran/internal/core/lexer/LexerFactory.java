@@ -17,7 +17,7 @@ public final class LexerFactory
     
     public static ILexer createFreeFormLexer(InputStream in, String filename)
     {
-        return new FreeFormLexerPhase2(new FreeFormLexerPhase1(in), filename);
+        return new FreeFormLexerPhase2(new FreeFormLexerPhase1(in, filename));
     }
     
     public static ILexer createFixedFormLexer(InputStream in, String filename)

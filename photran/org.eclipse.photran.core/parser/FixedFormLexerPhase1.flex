@@ -62,6 +62,17 @@ import org.eclipse.photran.internal.core.parser.Terminal;
     
 	private Token token(Terminal terminal)
 	{
+		return new Token(terminal,
+		                 "",
+		                 terminal == Terminal.T_SCON || terminal == Terminal.T_HCON
+		                     ? stringBuffer.toString()
+		                     : yytext(),
+		                 "");
+	}
+
+	/*
+	private Token token(Terminal terminal)
+	{
 		Token t = new Token();
 		t.setTerminal(terminal);
 		t.setFilename(this.filename);
@@ -77,6 +88,7 @@ import org.eclipse.photran.internal.core.parser.Terminal;
 
 		return t;
 	}
+	*/
 
 	private StringBuffer stringBuffer = null;
 	private int hollerithLength = 0;
@@ -84,10 +96,27 @@ import org.eclipse.photran.internal.core.parser.Terminal;
 	private boolean wantEos = false;
 	
 	private String filename = "<stdin>";
-	public void setFilename(String fn)
+    
+	public FixedFormLexerPhase1(java.io.InputStream in, FixedFormLexerPrepass _prepass, String filename)
 	{
-		filename = fn;
+	    this(in, _prepass);
+	    this.filename = filename;
 	}
+	
+    public String getFilename()
+    {
+        return filename;
+    }
+
+    public int getLastTokenLine()
+    {
+        return 0;
+    }
+
+    public int getLastTokenCol()
+    {
+        return 0;
+    }
 	
 //	private List/*<NonTreeToken>*/ nonTreeTokens = new LinkedList();
 //    public List/*<NonTreeToken>*/ getNonTreeTokens()

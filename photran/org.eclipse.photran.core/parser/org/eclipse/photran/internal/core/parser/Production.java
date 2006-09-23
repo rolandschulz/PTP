@@ -15,7 +15,7 @@ public abstract class Production
 
     abstract void reduce(Parser parser);
 
-    public abstract int getNamedIndex(String name);
+    public int getNamedIndex(String name) { return -1; }
 
     public String toString()
     {

@@ -95,7 +95,7 @@ public class ErrorRecovery
             parser.getStateStack().add(new Integer(-999));
 
             // Finally, shift the resume token and go to a state where the parser will reduce by this error production
-            parser.shiftAndGoToState(1078);
+            parser.shiftAndGoToState(1221);
             return true;
         }
     }
@@ -126,7 +126,7 @@ public class ErrorRecovery
             parser.getStateStack().add(new Integer(-999));
 
             // Finally, shift the resume token and go to a state where the parser will reduce by this error production
-            parser.shiftAndGoToState(1493);
+            parser.shiftAndGoToState(1517);
             return true;
         }
     }
@@ -157,7 +157,7 @@ public class ErrorRecovery
             parser.getStateStack().add(new Integer(-999));
 
             // Finally, shift the resume token and go to a state where the parser will reduce by this error production
-            parser.shiftAndGoToState(1429);
+            parser.shiftAndGoToState(1434);
             return true;
         }
     }
@@ -188,7 +188,7 @@ public class ErrorRecovery
             parser.getStateStack().add(new Integer(-999));
 
             // Finally, shift the resume token and go to a state where the parser will reduce by this error production
-            parser.shiftAndGoToState(2028);
+            parser.shiftAndGoToState(2030);
             return true;
         }
     }
@@ -219,7 +219,7 @@ public class ErrorRecovery
             parser.getStateStack().add(new Integer(-999));
 
             // Finally, shift the resume token and go to a state where the parser will reduce by this error production
-            parser.shiftAndGoToState(1619);
+            parser.shiftAndGoToState(1625);
             return true;
         }
     }

@@ -35,6 +35,15 @@ import org.eclipse.photran.internal.core.parser.Terminal;
 %{
 	private Token token(Terminal terminal)
 	{
+		return new Token(terminal,
+		                 "",
+		                 terminal == Terminal.T_SCON ? stringBuffer.toString() : yytext(),
+		                 "");
+	}
+
+	/*
+	private Token token(Terminal terminal)
+	{
 		Token t = new Token();
 		t.setTerminal(terminal);
 		t.setFilename(getCurrentFilename());
@@ -72,6 +81,7 @@ import org.eclipse.photran.internal.core.parser.Terminal;
 
 		return t;
 	}
+	*/
 
 	//public static void main(String[] args) throws Exception
 	//{
@@ -81,7 +91,26 @@ import org.eclipse.photran.internal.core.parser.Terminal;
 	
 	private String filename = "<stdin>";
     
-	public void setFilename(String filename) { this.filename = filename; }
+	public FreeFormLexerPhase1(java.io.InputStream in, String filename)
+	{
+	    this(in);
+	    this.filename = filename;
+	}
+
+    public String getFilename()
+    {
+        return filename;
+    }
+
+    public int getLastTokenLine()
+    {
+        return 0;
+    }
+
+    public int getLastTokenCol()
+    {
+        return 0;
+    }
 	
 	private void startInclude() throws FileNotFoundException
 	{

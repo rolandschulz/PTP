@@ -35,7 +35,10 @@ class FreeFormLexerPhase2 implements ILexer
     private ILexer yylex;
     private Vector tokenStream = new Vector();
     private ListIterator tokenIt = tokenStream.listIterator();
-
+    
+    private Token lastToken = null;
+    private int lastTokenLine = 1, lastTokenCol = 1;
+    
     private int firstTokenPos = 0;
     private int idPos = -1;
     private VarDeclIdPosPair varDeclIdPosPair = null;
@@ -46,8 +49,6 @@ class FreeFormLexerPhase2 implements ILexer
     private int[] parenDepth;
     private boolean[] retainAsKeyword;
     
-    private String filename = "<stdin>";
-
     /**
      * Map token IDs to rules that determine (based on context) the contexts
      * in which those tokens should be keywords.
@@ -75,21 +76,10 @@ class FreeFormLexerPhase2 implements ILexer
      * @param phase1Lexer  the phase 1 lexer to read tokens from
      * @param filename  the name of the file being read
      */
-    public FreeFormLexerPhase2(ILexer phase1Lexer, String filename)
+    public FreeFormLexerPhase2(ILexer phase1Lexer)
     {
       yylex = phase1Lexer;
-      this.filename = filename;
-      yylex.setFilename(filename);  // Phase 1 should know the filename too
       buildAdditionalRules();
-    }
-
-    /**
-     * Sets the name of the file being read
-     * @param filename  the filename of the input file (for error reporting)
-     */
-    public void setFilename(String filename)
-    {
-        this.filename = filename;
     }
     
     /**
@@ -105,9 +95,28 @@ class FreeFormLexerPhase2 implements ILexer
             processNextStatement();
         
         if (tokenIt.hasNext())
-            return (Token)tokenIt.next();
+        {
+            updateLastLineAndCol(lastToken.getCompleteText());
+            lastToken = (Token)tokenIt.next();
+            return lastToken;
+        }
         else
             return null;
+    }
+
+    private static final String EOL = System.getProperty("line.terminator");
+    private static final int EOL_LEN = EOL.length();
+
+    private void updateLastLineAndCol(String textAdded)
+    {
+        int lastIndex = 0, nextIndex;
+        while ((nextIndex = textAdded.indexOf(EOL, lastIndex)) > 0)
+        {
+            lastTokenLine++;
+            lastTokenCol = 1;
+            lastIndex = nextIndex + EOL_LEN;
+        }
+        lastTokenCol += textAdded.length() - lastIndex;
     }
 
     /**
@@ -168,11 +177,7 @@ class FreeFormLexerPhase2 implements ILexer
         do
         {
             t = yylex.yylex();
-            if (t != null)
-            {
-                t.setFilename(filename);
-                tokenStream.add(t);
-            }
+            if (t != null) tokenStream.add(t);
             // if (t != null) { System.out.print(t.id + ":"); }
         }
         while (t != null && t.getTerminal() != Terminal.T_EOS && t.getTerminal() != Terminal.END_OF_INPUT);
@@ -1259,38 +1264,39 @@ class FreeFormLexerPhase2 implements ILexer
             Token t = (Token)tokenStream.elementAt(i);
             Token afterT = (i < tokenStream.size()-1 ? (Token)tokenStream.elementAt(i+1) : null);
             String textWithoutEquals = t.getText().substring(0, t.getText().length()-1).trim();
-            int numCharsRemoved = t.getText().length() - textWithoutEquals.length();
+            //int numCharsRemoved = t.getTokenText().length() - textWithoutEquals.length();
 
-            if (afterT != null && afterT.getTerminal() == Terminal.T_EQUALS && afterT.getStartCol() == t.getEndCol()+1)
+            //if (afterT != null && afterT.getTerminal() == Terminal.T_EQUALS && afterT.getStartCol() == t.getEndCol()+1)
+            if (afterT != null && afterT.getTerminal() == Terminal.T_EQUALS && t.getWhiteAfter().equals("") && afterT.getWhiteBefore().equals(""))
             {
                 // split "xyz=" "=" into "xyz" "=="
                 afterT.setTerminal(Terminal.T_EQEQ);
-                afterT.setStartCol(afterT.getStartCol()-1);
-                afterT.setOffset(afterT.getOffset()-1);
-                afterT.setLength(afterT.getLength()+1);
+                //afterT.setStartCol(afterT.getStartCol()-1);
+                //afterT.setOffset(afterT.getOffset()-1);
+                //afterT.setLength(afterT.getLength()+1);
                 afterT.setText("==");
     
                 t.setText(textWithoutEquals);
-                t.setEndCol(t.getEndCol() - numCharsRemoved);
-                t.setLength(t.getLength() - numCharsRemoved);
+                //t.setEndCol(t.getEndCol() - numCharsRemoved);
+                //t.setLength(t.getLength() - numCharsRemoved);
             }
             else
             {
                 // split "xyz=" into "xyz" "="
                 Token eq = new Token();
                 eq.setTerminal(Terminal.T_EQUALS);
-                eq.setFilename(t.getFilename());
-                eq.setStartLine(t.getEndLine());
-                eq.setStartCol(t.getEndCol());
-                eq.setEndLine(t.getEndLine());
-                eq.setEndCol(t.getEndCol());
-                eq.setOffset(t.getOffset() + t.getLength() - 1);
-                eq.setLength(1);
+                //eq.setFilename(t.getFilename());
+                //eq.setStartLine(t.getEndLine());
+                //eq.setStartCol(t.getEndCol());
+                //eq.setEndLine(t.getEndLine());
+                //eq.setEndCol(t.getEndCol());
+                //eq.setOffset(t.getOffset() + t.getLength() - 1);
+                //eq.setLength(1);
                 eq.setText("=");
     
                 t.setText(textWithoutEquals);
-                t.setEndCol(t.getEndCol() - numCharsRemoved);
-                t.setLength(t.getLength() - numCharsRemoved);
+                //t.setEndCol(t.getEndCol() - numCharsRemoved);
+                //t.setLength(t.getLength() - numCharsRemoved);
     
                 tokenStream.insertElementAt(eq, i+j+1);
             }
@@ -1308,34 +1314,34 @@ class FreeFormLexerPhase2 implements ILexer
             int starPos = t.getText().indexOf("*");
             String textBeforeStar = t.getText().substring(0, starPos);
             String textAfterStar = t.getText().substring(starPos+1, t.getText().length());
-            int numCharsRemoved = t.getText().length() - textAfterStar.length() - 1;
+            //int numCharsRemoved = t.getTokenText().length() - textAfterStar.length() - 1;
 
             // split "integer*3" into "integer" "*" "3"
             Token star = new Token();
             star.setTerminal(Terminal.T_ASTERISK);
-            star.setFilename(t.getFilename());
-            star.setStartLine(t.getEndLine());
-            star.setEndLine(t.getEndLine());
-            star.setStartCol(t.getEndCol() - textAfterStar.length());
-            star.setEndCol(t.getEndCol() - textAfterStar.length());
-            star.setOffset(t.getOffset() + textBeforeStar.length());
-            star.setLength(1);
+            //star.setFilename(t.getFilename());
+            //star.setStartLine(t.getEndLine());
+            //star.setEndLine(t.getEndLine());
+            //star.setStartCol(t.getEndCol() - textAfterStar.length());
+            //star.setEndCol(t.getEndCol() - textAfterStar.length());
+            //star.setOffset(t.getOffset() + textBeforeStar.length());
+            //star.setLength(1);
             star.setText("*");
 
             Token num = new Token();
             num.setTerminal(Terminal.T_ICON);
-            num.setFilename(t.getFilename());
-            num.setStartLine(star.getEndLine());
-            num.setStartCol(star.getEndCol() + 1);
-            num.setEndLine(num.getStartLine());
-            num.setEndCol(num.getStartCol() + textAfterStar.length() - 1);
-            num.setOffset(star.getOffset() + 1);
-            num.setLength(textAfterStar.length());
+            //num.setFilename(t.getFilename());
+            //num.setStartLine(star.getEndLine());
+            //num.setStartCol(star.getEndCol() + 1);
+            //num.setEndLine(num.getStartLine());
+            //num.setEndCol(num.getStartCol() + textAfterStar.length() - 1);
+            //num.setOffset(star.getOffset() + 1);
+            //num.setLength(textAfterStar.length());
             num.setText(textAfterStar);
 
             t.setText(textBeforeStar);
-            t.setEndCol(t.getEndCol() - numCharsRemoved);
-            t.setLength(t.getLength() - numCharsRemoved);
+            //t.setEndCol(t.getEndCol() - numCharsRemoved);
+            //t.setLength(t.getLength() - numCharsRemoved);
 
             tokenStream.insertElementAt(star, i+(2*j)+1);
             tokenStream.insertElementAt(num, i+(2*j)+2);
@@ -1473,5 +1479,20 @@ class FreeFormLexerPhase2 implements ILexer
         s.print("   ");
       }
       s.println();
+    }
+
+    public String getFilename()
+    {
+        return yylex.getFilename();
+    }
+
+    public int getLastTokenLine()
+    {
+        return lastTokenLine;
+    }
+
+    public int getLastTokenCol()
+    {
+        return lastTokenCol;
     }
 }

@@ -1,3 +1,4 @@
 #!/bin/bash
 jflex -d org/eclipse/photran/internal/core/lexer FixedFormLexerPhase1.flex
 jflex -d org/eclipse/photran/internal/core/lexer FreeFormLexerPhase1.flex
+rm -f org/eclipse/photran/internal/core/lexer/*~
