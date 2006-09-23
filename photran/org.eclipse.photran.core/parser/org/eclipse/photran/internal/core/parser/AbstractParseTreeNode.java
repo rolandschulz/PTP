@@ -1,4 +1,4 @@
-package org.eclipse.photran.internal.core.parser;
+package org.eclipse.photran.internal.core.parser; import org.eclipse.photran.internal.core.lexer.*;
 
 /**
  * Common superclass for <code>Token</code>s and <code>ParseTreeNode</code>s, the two types of

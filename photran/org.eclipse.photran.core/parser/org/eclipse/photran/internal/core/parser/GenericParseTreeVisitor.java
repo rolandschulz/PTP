@@ -1,6 +1,4 @@
-package org.eclipse.photran.internal.core.parser;
-
-import org.eclipse.photran.internal.core.lexer.Token;
+package org.eclipse.photran.internal.core.parser; import org.eclipse.photran.internal.core.lexer.*;
 
 /**
  * Represents a Visitor for a parse tree, albeit one that cares more about whether it's visiting a

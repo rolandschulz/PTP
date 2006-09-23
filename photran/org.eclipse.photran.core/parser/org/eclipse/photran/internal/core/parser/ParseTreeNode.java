@@ -1,10 +1,8 @@
-package org.eclipse.photran.internal.core.parser;
+package org.eclipse.photran.internal.core.parser; import org.eclipse.photran.internal.core.lexer.*;
 
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-
-import org.eclipse.photran.internal.core.lexer.Token;
 
 public class ParseTreeNode extends AbstractParseTreeNode
 {
