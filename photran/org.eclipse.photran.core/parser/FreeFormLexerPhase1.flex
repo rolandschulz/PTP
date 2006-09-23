@@ -79,30 +79,33 @@ import org.eclipse.photran.internal.core.parser.Terminal;
 	//	Parser.parse(l);
 	//}
 	
-	public void setFilename(String filename) {;}
+	private String filename = "<stdin>";
+    
+	public void setFilename(String filename) { this.filename = filename; }
 	
 	private void startInclude() throws FileNotFoundException
 	{
-	  //GRRRRR, yypushStream is in the JFlex docs but is not actually implemented in v1.4.1!
-	  
-	  if (!(this.zzReader instanceof PreprocessingReader))
-	    throw new Error("The reader passed to a Fortran lexer must be a PreprocessingReader");
-
-	  ((PreprocessingReader)zzReader).pushReader(extractFilenameFromFortranInclude(yytext()));
-	}
-	
-	private String extractFilenameFromFortranInclude(String fortranInclude)
-	{
-	  String removeInclude = fortranInclude.substring(7);
-	  return removeInclude.trim().replaceAll("\"", "");
+//	  //GRRRRR, yypushStream is in the JFlex docs but is not actually implemented in v1.4.1!
+//	  
+//	  if (!(this.zzReader instanceof PreprocessingReader))
+//	    throw new Error("The reader passed to a Fortran lexer must be a PreprocessingReader");
+//
+//	  ((PreprocessingReader)zzReader).pushReader(extractFilenameFromFortranInclude(yytext()));
+//	}
+//	
+//	private String extractFilenameFromFortranInclude(String fortranInclude)
+//	{
+//	  String removeInclude = fortranInclude.substring(7);
+//	  return removeInclude.trim().replaceAll("\"", "");
 	}
 	
 	private String getCurrentFilename()
 	{
-	  if (!(this.zzReader instanceof PreprocessingReader))
-	    throw new Error("The reader passed to a Fortran lexer must be a PreprocessingReader");
-
-	  return ((PreprocessingReader)zzReader).currentFilename();
+//	  if (!(this.zzReader instanceof PreprocessingReader))
+//	    throw new Error("The reader passed to a Fortran lexer must be a PreprocessingReader");
+//
+//	  return ((PreprocessingReader)zzReader).currentFilename();
+	  return filename;
 	}
 
 	private StringBuffer stringBuffer = null;

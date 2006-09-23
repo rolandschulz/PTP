@@ -54,20 +54,20 @@ class FreeFormLexerPhase2 implements ILexer
      */
     HashMap/*<Terminal, LinkedList<Rule>>*/ rules = new HashMap();
 
-    /**
-     * Creates a new scanner.
-     * There is also java.io.Reader version of this constructor.
-     *
-     * @param   in  the java.io.Inputstream to read input from.
-     * @param filename  the name of the file being read
-     */
-    public FreeFormLexerPhase2(PreprocessingReader reader, String filename)
-    {
-      yylex = new FreeFormLexerPhase1(reader);
-      this.filename = filename;
-      yylex.setFilename(filename);  // Phase 1 should know the filename too
-      buildAdditionalRules();
-    }
+//    /**
+//     * Creates a new scanner.
+//     * There is also java.io.Reader version of this constructor.
+//     *
+//     * @param   in  the java.io.Inputstream to read input from.
+//     * @param filename  the name of the file being read
+//     */
+//    public FreeFormLexerPhase2(PreprocessingReader reader, String filename)
+//    {
+//      yylex = new FreeFormLexerPhase1(reader);
+//      this.filename = filename;
+//      yylex.setFilename(filename);  // Phase 1 should know the filename too
+//      buildAdditionalRules();
+//    }
 
     /**
      * Creates a new scanner.

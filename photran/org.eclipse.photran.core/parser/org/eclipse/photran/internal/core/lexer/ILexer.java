@@ -1,5 +1,8 @@
 package org.eclipse.photran.internal.core.lexer;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 import org.eclipse.photran.internal.core.lexer.Token;
 
 /**
