@@ -251,15 +251,6 @@
             id="intel.linux.fortran.compiler.category.optimization">
          </optionCategory>
          <option
-            defaultValue="true"
-            name="%Option.intel.fortran.optimize.prefetch"
-            category="intel.linux.fortran.compiler.category.optimization"
-            command=""
-            commandFalse="-prefetch-"
-            valueType="boolean"
-            id="intel.linux.fortran.compiler.optimization.prefetch">
-         </option>
-         <option
             defaultValue="false"
             name="%Option.intel.fortran.optimize.buffio"
             category="intel.linux.fortran.compiler.category.optimization"
@@ -857,48 +848,6 @@
                id="diags.autoparallelizer.3">
             </enumeratedOptionValue>
          </option>
-         <option
-            name="%Option.intel.fortran.diags.vecreport"
-            category="intel.linux.fortran.compiler.category.diags"
-            valueType="enumerated"
-            id="intel.linux.fortran.compiler.diags.vectorizer">
-            <enumeratedOptionValue
-               name="%Option.intel.fortran.diags.vec.none"
-               isDefault="true"
-               command=""
-               id="diags.vectorizer.none">
-            </enumeratedOptionValue>
-            <enumeratedOptionValue
-               name="%Option.intel.fortran.diags.vec.0"
-               command="-vec-report0"
-               id="diags.vectorizer.0">
-            </enumeratedOptionValue>
-            <enumeratedOptionValue
-               name="%Option.intel.fortran.diags.vec.1"
-               command="-vec-report1"
-               id="diags.vectorizer.1">
-            </enumeratedOptionValue>
-            <enumeratedOptionValue
-               name="%Option.intel.fortran.diags.vec.2"
-               command="-vec-report2"
-               id="diags.vectorizer.2">
-            </enumeratedOptionValue>
-            <enumeratedOptionValue
-               name="%Option.intel.fortran.diags.vec.3"
-               command="-vec-report3"
-               id="diags.vectorizer.3">
-            </enumeratedOptionValue>
-            <enumeratedOptionValue
-               name="%Option.intel.fortran.diags.vec.4"
-               command="-vec-report4"
-               id="diags.vectorizer.4">
-            </enumeratedOptionValue>
-            <enumeratedOptionValue
-               name="%Option.intel.fortran.diags.vec.5"
-               command="-vec-report5"
-               id="diags.vectorizer.5">
-            </enumeratedOptionValue>
-         </option>
 
 <!-- Data -->
 
@@ -1151,15 +1100,6 @@
             command="-fltconsistency"
             valueType="boolean"
             id="intel.linux.fortran.compiler.fp.fltconsistency">
-         </option>
-         <option
-            defaultValue="true"
-            name="%Option.intel.fortran.fp.fpport"
-            category="intel.linux.fortran.compiler.category.fp"
-            command=""
-            commandFalse="-no-fp-port"
-            valueType="boolean"
-            id="intel.linux.fortran.compiler.fp.fpport">
          </option>
          <option
             defaultValue="false"
@@ -1455,6 +1395,15 @@
             defaultValue="false">
          </option>
          <option
+            defaultValue="true"
+            name="%Option.intel.fortran.optimize.prefetch"
+            category="intel.linux.fortran.compiler.category.optimization"
+            command=""
+            commandFalse="-prefetch-"
+            valueType="boolean"
+            id="intel.linux.fortran.compiler.optimization.prefetch">
+         </option>
+         <option
             name="%Option.intel.fortran.optimize.forintelprocessor"
             category="intel.linux.fortran.compiler.category.optimization"
             valueType="enumerated"
@@ -1544,6 +1493,57 @@
                command="-xP"
                id="intel.cg.reqprsctt">
             </enumeratedOptionValue>
+         </option>
+         <option
+            name="%Option.intel.fortran.diags.vecreport"
+            category="intel.linux.fortran.compiler.category.diags"
+            valueType="enumerated"
+            id="intel.linux.fortran.compiler.diags.vectorizer">
+            <enumeratedOptionValue
+               name="%Option.intel.fortran.diags.vec.none"
+               isDefault="true"
+               command=""
+               id="diags.vectorizer.none">
+            </enumeratedOptionValue>
+            <enumeratedOptionValue
+               name="%Option.intel.fortran.diags.vec.0"
+               command="-vec-report0"
+               id="diags.vectorizer.0">
+            </enumeratedOptionValue>
+            <enumeratedOptionValue
+               name="%Option.intel.fortran.diags.vec.1"
+               command="-vec-report1"
+               id="diags.vectorizer.1">
+            </enumeratedOptionValue>
+            <enumeratedOptionValue
+               name="%Option.intel.fortran.diags.vec.2"
+               command="-vec-report2"
+               id="diags.vectorizer.2">
+            </enumeratedOptionValue>
+            <enumeratedOptionValue
+               name="%Option.intel.fortran.diags.vec.3"
+               command="-vec-report3"
+               id="diags.vectorizer.3">
+            </enumeratedOptionValue>
+            <enumeratedOptionValue
+               name="%Option.intel.fortran.diags.vec.4"
+               command="-vec-report4"
+               id="diags.vectorizer.4">
+            </enumeratedOptionValue>
+            <enumeratedOptionValue
+               name="%Option.intel.fortran.diags.vec.5"
+               command="-vec-report5"
+               id="diags.vectorizer.5">
+            </enumeratedOptionValue>
+         </option>
+         <option
+            defaultValue="true"
+            name="%Option.intel.fortran.fp.fpport"
+            category="intel.linux.fortran.compiler.category.fp"
+            command=""
+            commandFalse="-no-fp-port"
+            valueType="boolean"
+            id="intel.linux.fortran.compiler.fp.fpport">
          </option>
          <option
             defaultValue="false"
@@ -1649,13 +1649,6 @@
                      defaultValue="true"
                      superClass="intel.linux.fortran.compiler.general.debug">
                   </option>
-<!-- Would like to default -fp to true in the debug configuration however, there appears to be a bug in handling of the optionCategory...try a later CDT version or HEAD to see if it is fixed.
-                  <option
-                     id="intel.linux.fortran.compiler.exe.x86.debug.optimization.fp"
-                     defaultValue="true"
-                     superClass="intel.linux.fortran.compiler.optimization.fp">
-                  </option>
--->
                   <option
                      id="intel.linux.fortran.compiler.exe.x86.debug.optimization.inline.expand"
                      defaultValue="inl.exp.none"
