@@ -6,7 +6,7 @@ package org.eclipse.photran.internal.core.parser; import org.eclipse.photran.int
 /**
  * <SFDataRef> ::= Name:<Name> tpercent:T_PERCENT Name2:<Name>  :production410
  * <SFDataRef> ::= Name:<Name> tlparen:T_LPAREN SectionSubscriptList:<SectionSubscriptList> trparen:T_RPAREN  :production411
- * <SFDataRef> ::= SFDataRef:<SFDataRef> ( tlparen:T_LPAREN SectionSubscriptList:<SectionSubscriptList> trparen:T_RPAREN )? tpercent:T_PERCENT Name:<Name>  :production412
+ * <SFDataRef> ::= @:<SFDataRef> ( tlparen:T_LPAREN SectionSubscriptList:<SectionSubscriptList> trparen:T_RPAREN )? tpercent:T_PERCENT Name:<Name>  :production412
  */
 public class ASTSFDataRefNode extends ParseTreeNode
 {
@@ -15,39 +15,64 @@ public class ASTSFDataRefNode extends ParseTreeNode
         super(nonterminal, production);
     }
 
-    public ASTNameNode getASTName()
+    public int count()
     {
-        return (ASTNameNode)this.getChild("Name");
+        ParseTreeNode node = this;
+        int count = 1;
+        while (node.getChild("@") != null)
+        {
+            count++;
+            node = node.getChild("@");
+        }
+        return count;
     }
 
-    public Token getASTTpercent()
+    public ASTNameNode getASTName(int index)
     {
-        return this.getChildToken("tpercent");
+        ASTSFDataRefNode node = this;
+        for (int i = 0; i < index; i++)
+            node = (ASTSFDataRefNode)node.getChild("@");
+        return (ASTNameNode)node.getChild("Name");
     }
 
-    public ASTNameNode getASTName2()
+    public Token getASTTpercent(int index)
     {
-        return (ASTNameNode)this.getChild("Name2");
+        ASTSFDataRefNode node = this;
+        for (int i = 0; i < index; i++)
+            node = (ASTSFDataRefNode)node.getChild("@");
+        return node.getChildToken("tpercent");
     }
 
-    public Token getASTTlparen()
+    public ASTNameNode getASTName2(int index)
     {
-        return this.getChildToken("tlparen");
+        ASTSFDataRefNode node = this;
+        for (int i = 0; i < index; i++)
+            node = (ASTSFDataRefNode)node.getChild("@");
+        return (ASTNameNode)node.getChild("Name2");
     }
 
-    public ASTSectionSubscriptListNode getASTSectionSubscriptList()
+    public Token getASTTlparen(int index)
     {
-        return (ASTSectionSubscriptListNode)this.getChild("SectionSubscriptList");
+        ASTSFDataRefNode node = this;
+        for (int i = 0; i < index; i++)
+            node = (ASTSFDataRefNode)node.getChild("@");
+        return node.getChildToken("tlparen");
     }
 
-    public Token getASTTrparen()
+    public ASTSectionSubscriptListNode getASTSectionSubscriptList(int index)
     {
-        return this.getChildToken("trparen");
+        ASTSFDataRefNode node = this;
+        for (int i = 0; i < index; i++)
+            node = (ASTSFDataRefNode)node.getChild("@");
+        return (ASTSectionSubscriptListNode)node.getChild("SectionSubscriptList");
     }
 
-    public ASTSFDataRefNode getASTSFDataRef()
+    public Token getASTTrparen(int index)
     {
-        return (ASTSFDataRefNode)this.getChild("SFDataRef");
+        ASTSFDataRefNode node = this;
+        for (int i = 0; i < index; i++)
+            node = (ASTSFDataRefNode)node.getChild("@");
+        return node.getChildToken("trparen");
     }
 
     protected void visitThisNodeUsing(ASTVisitor visitor) { visitor.visitASTSFDataRefNode(this); }

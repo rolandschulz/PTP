@@ -7,6 +7,7 @@ import java.util.ListIterator;
 import java.util.Vector;
 import java.util.regex.Pattern;
 
+import org.eclipse.photran.core.util.LineCol;
 import org.eclipse.photran.internal.core.parser.Parser;
 import org.eclipse.photran.internal.core.parser.Terminal;
 
@@ -100,10 +101,10 @@ class FreeFormLexerPhase2 implements ILexer
         
         if (tokenIt.hasNext())
         {
-            //if (lastToken != null) updateLastLineAndCol(lastToken.getCompleteText());
             lastToken = (Token)tokenIt.next();
             lastTokenLine = ((Integer)lineIt.next()).intValue();
             lastTokenCol = ((Integer)colIt.next()).intValue();
+            if (LexerFactory.AssociateLineCol) lastToken.setAdapter(LineCol.class, new LineCol(lastTokenLine, lastTokenCol));
             return lastToken;
         }
         else return null;

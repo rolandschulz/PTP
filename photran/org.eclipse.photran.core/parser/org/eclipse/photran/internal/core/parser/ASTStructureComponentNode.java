@@ -5,7 +5,7 @@ package org.eclipse.photran.internal.core.parser; import org.eclipse.photran.int
 
 /**
  * <StructureComponent> ::= VariableName:<VariableName> FieldSelector:<FieldSelector>  :production413
- * <StructureComponent> ::= StructureComponent:<StructureComponent> FieldSelector:<FieldSelector>  :production414
+ * <StructureComponent> ::= @:<StructureComponent> FieldSelector:<FieldSelector>  :production414
  */
 public class ASTStructureComponentNode extends ParseTreeNode
 {
@@ -14,19 +14,32 @@ public class ASTStructureComponentNode extends ParseTreeNode
         super(nonterminal, production);
     }
 
-    public ASTVariableNameNode getASTVariableName()
+    public int count()
     {
-        return (ASTVariableNameNode)this.getChild("VariableName");
+        ParseTreeNode node = this;
+        int count = 1;
+        while (node.getChild("@") != null)
+        {
+            count++;
+            node = node.getChild("@");
+        }
+        return count;
     }
 
-    public ASTFieldSelectorNode getASTFieldSelector()
+    public ASTVariableNameNode getASTVariableName(int index)
     {
-        return (ASTFieldSelectorNode)this.getChild("FieldSelector");
+        ASTStructureComponentNode node = this;
+        for (int i = 0; i < index; i++)
+            node = (ASTStructureComponentNode)node.getChild("@");
+        return (ASTVariableNameNode)node.getChild("VariableName");
     }
 
-    public ASTStructureComponentNode getASTStructureComponent()
+    public ASTFieldSelectorNode getASTFieldSelector(int index)
     {
-        return (ASTStructureComponentNode)this.getChild("StructureComponent");
+        ASTStructureComponentNode node = this;
+        for (int i = 0; i < index; i++)
+            node = (ASTStructureComponentNode)node.getChild("@");
+        return (ASTFieldSelectorNode)node.getChild("FieldSelector");
     }
 
     protected void visitThisNodeUsing(ASTVisitor visitor) { visitor.visitASTStructureComponentNode(this); }

@@ -1015,12 +1015,12 @@
 # R612
 <DataRef> ::=
     <Name>
-  | <DataRef> ( T_LPAREN <SectionSubscriptList> T_RPAREN )? T_PERCENT <Name>
+  | @:<DataRef> ( T_LPAREN <SectionSubscriptList> T_RPAREN )? T_PERCENT <Name>
 
 <SFDataRef> ::=
     <Name> T_PERCENT <Name>
   | <Name> T_LPAREN <SectionSubscriptList> T_RPAREN
-  | <SFDataRef> ( T_LPAREN <SectionSubscriptList> T_RPAREN )? T_PERCENT <Name>
+  | @:<SFDataRef> ( T_LPAREN <SectionSubscriptList> T_RPAREN )? T_PERCENT <Name>
 
 
 # R613 chain rule deleted;
@@ -1028,7 +1028,7 @@
 # R614
 <StructureComponent> ::=
     <VariableName> <FieldSelector>
-  | <StructureComponent> <FieldSelector>
+  | @:<StructureComponent> <FieldSelector>
 
 <FieldSelector> ::=
     T_LPAREN <SectionSubscriptList> T_RPAREN T_PERCENT <Name>
@@ -1103,7 +1103,7 @@
 
 <AllocateObject> ::=
     <VariableName>
-  | <AllocateObject> <FieldSelector>
+  | @:<AllocateObject> <FieldSelector>
 
 
 # R626
@@ -1133,7 +1133,7 @@
     <Name> T_LPAREN <SFExprList> T_RPAREN T_PERCENT <Name>
   | <Name> T_LPAREN <SFDummyArgNameList> T_RPAREN T_PERCENT <Name>
   | <Name> T_PERCENT <Name>
-  | <PointerField> <FieldSelector>
+  | @:<PointerField> <FieldSelector>
 
 
 # R631
@@ -1271,11 +1271,11 @@
 
 # R735 - JO - Macro substituted
 <AssignmentStmt> ::=
-    <LblDef> <Name>                                                                                                                                  T_EQUALS <Expr> T_EOS
-  | <LblDef> <Name> T_LPAREN <SFExprList>         T_RPAREN                                                                                          T_EQUALS <Expr> T_EOS
+    <LblDef> <Name>                                                                                                                                T_EQUALS <Expr> T_EOS
+  | <LblDef> <Name> T_LPAREN <SFExprList>         T_RPAREN                                                                                         T_EQUALS <Expr> T_EOS
   | <LblDef> <Name> T_LPAREN <SFExprList>         T_RPAREN                                                                    <SubstringRange>     T_EQUALS <Expr> T_EOS
   | <LblDef> <Name> T_LPAREN <SFDummyArgNameList> T_RPAREN                                                                    <SubstringRange>     T_EQUALS <Expr> T_EOS
-  | <LblDef> <Name>                                         T_PERCENT <DataRef> ( T_LPAREN <SectionSubscriptList> T_RPAREN ( <SubstringRange> )? )? T_EQUALS <Expr> T_EOS
+  | <LblDef> <Name>                                        T_PERCENT <DataRef> ( T_LPAREN <SectionSubscriptList> T_RPAREN ( <SubstringRange> )? )? T_EQUALS <Expr> T_EOS
   | <LblDef> <Name> T_LPAREN <SFExprList>         T_RPAREN T_PERCENT <DataRef> ( T_LPAREN <SectionSubscriptList> T_RPAREN ( <SubstringRange> )? )? T_EQUALS <Expr> T_EOS
   | <LblDef> <Name> T_LPAREN <SFDummyArgNameList> T_RPAREN T_PERCENT <DataRef> ( T_LPAREN <SectionSubscriptList> T_RPAREN ( <SubstringRange> )? )? T_EQUALS <Expr> T_EOS
 

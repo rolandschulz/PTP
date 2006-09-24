@@ -7,7 +7,7 @@ package org.eclipse.photran.internal.core.parser; import org.eclipse.photran.int
  * <PointerField> ::= Name:<Name> tlparen:T_LPAREN SFExprList:<SFExprList> trparen:T_RPAREN tpercent:T_PERCENT Name2:<Name>  :production448
  * <PointerField> ::= Name:<Name> tlparen:T_LPAREN SFDummyArgNameList:<SFDummyArgNameList> trparen:T_RPAREN tpercent:T_PERCENT Name2:<Name>  :production449
  * <PointerField> ::= Name:<Name> tpercent:T_PERCENT Name2:<Name>  :production450
- * <PointerField> ::= PointerField:<PointerField> FieldSelector:<FieldSelector>  :production451
+ * <PointerField> ::= @:<PointerField> FieldSelector:<FieldSelector>  :production451
  */
 public class ASTPointerFieldNode extends ParseTreeNode
 {
@@ -16,49 +16,80 @@ public class ASTPointerFieldNode extends ParseTreeNode
         super(nonterminal, production);
     }
 
-    public ASTNameNode getASTName()
+    public int count()
     {
-        return (ASTNameNode)this.getChild("Name");
+        ParseTreeNode node = this;
+        int count = 1;
+        while (node.getChild("@") != null)
+        {
+            count++;
+            node = node.getChild("@");
+        }
+        return count;
     }
 
-    public Token getASTTlparen()
+    public ASTNameNode getASTName(int index)
     {
-        return this.getChildToken("tlparen");
+        ASTPointerFieldNode node = this;
+        for (int i = 0; i < index; i++)
+            node = (ASTPointerFieldNode)node.getChild("@");
+        return (ASTNameNode)node.getChild("Name");
     }
 
-    public ASTSFExprListNode getASTSFExprList()
+    public Token getASTTlparen(int index)
     {
-        return (ASTSFExprListNode)this.getChild("SFExprList");
+        ASTPointerFieldNode node = this;
+        for (int i = 0; i < index; i++)
+            node = (ASTPointerFieldNode)node.getChild("@");
+        return node.getChildToken("tlparen");
     }
 
-    public Token getASTTrparen()
+    public ASTSFExprListNode getASTSFExprList(int index)
     {
-        return this.getChildToken("trparen");
+        ASTPointerFieldNode node = this;
+        for (int i = 0; i < index; i++)
+            node = (ASTPointerFieldNode)node.getChild("@");
+        return (ASTSFExprListNode)node.getChild("SFExprList");
     }
 
-    public Token getASTTpercent()
+    public Token getASTTrparen(int index)
     {
-        return this.getChildToken("tpercent");
+        ASTPointerFieldNode node = this;
+        for (int i = 0; i < index; i++)
+            node = (ASTPointerFieldNode)node.getChild("@");
+        return node.getChildToken("trparen");
     }
 
-    public ASTNameNode getASTName2()
+    public Token getASTTpercent(int index)
     {
-        return (ASTNameNode)this.getChild("Name2");
+        ASTPointerFieldNode node = this;
+        for (int i = 0; i < index; i++)
+            node = (ASTPointerFieldNode)node.getChild("@");
+        return node.getChildToken("tpercent");
     }
 
-    public ASTSFDummyArgNameListNode getASTSFDummyArgNameList()
+    public ASTNameNode getASTName2(int index)
     {
-        return (ASTSFDummyArgNameListNode)this.getChild("SFDummyArgNameList");
+        ASTPointerFieldNode node = this;
+        for (int i = 0; i < index; i++)
+            node = (ASTPointerFieldNode)node.getChild("@");
+        return (ASTNameNode)node.getChild("Name2");
     }
 
-    public ASTPointerFieldNode getASTPointerField()
+    public ASTSFDummyArgNameListNode getASTSFDummyArgNameList(int index)
     {
-        return (ASTPointerFieldNode)this.getChild("PointerField");
+        ASTPointerFieldNode node = this;
+        for (int i = 0; i < index; i++)
+            node = (ASTPointerFieldNode)node.getChild("@");
+        return (ASTSFDummyArgNameListNode)node.getChild("SFDummyArgNameList");
     }
 
-    public ASTFieldSelectorNode getASTFieldSelector()
+    public ASTFieldSelectorNode getASTFieldSelector(int index)
     {
-        return (ASTFieldSelectorNode)this.getChild("FieldSelector");
+        ASTPointerFieldNode node = this;
+        for (int i = 0; i < index; i++)
+            node = (ASTPointerFieldNode)node.getChild("@");
+        return (ASTFieldSelectorNode)node.getChild("FieldSelector");
     }
 
     protected void visitThisNodeUsing(ASTVisitor visitor) { visitor.visitASTPointerFieldNode(this); }

@@ -121,7 +121,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("ProgramUnit"))
@@ -693,7 +693,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("BodyConstruct"))
@@ -1474,7 +1474,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("SpecificationPartConstruct"))
@@ -1525,7 +1525,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("ModuleSubprogramPartConstruct"))
@@ -1729,7 +1729,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("BlockDataBodyConstruct"))
@@ -2623,7 +2623,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("InternalSubprogram"))
@@ -8580,7 +8580,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("DerivedTypeBodyConstruct"))
@@ -9839,7 +9839,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tcomma"))
@@ -10140,7 +10140,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tcomma"))
@@ -11403,7 +11403,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tcomma"))
@@ -11765,7 +11765,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tcomma"))
@@ -11821,7 +11821,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tcomma"))
@@ -12705,7 +12705,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tcomma"))
@@ -13986,7 +13986,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tcomma"))
@@ -16245,7 +16245,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tcomma"))
@@ -16347,7 +16347,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tcomma"))
@@ -16740,7 +16740,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tcomma"))
@@ -17450,7 +17450,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tcomma"))
@@ -17876,7 +17876,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tcomma"))
@@ -18413,7 +18413,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tcomma"))
@@ -18996,7 +18996,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tcomma"))
@@ -19524,7 +19524,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tcomma"))
@@ -19965,7 +19965,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tcomma"))
@@ -20452,7 +20452,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tcomma"))
@@ -20985,7 +20985,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tcomma"))
@@ -21381,7 +21381,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tcomma"))
@@ -21658,7 +21658,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("DataStmtSet"))
@@ -21711,7 +21711,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tcomma"))
@@ -21874,7 +21874,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tcomma"))
@@ -22250,7 +22250,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tcomma"))
@@ -22490,7 +22490,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tcomma"))
@@ -23094,7 +23094,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tcomma"))
@@ -23387,7 +23387,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tslash"))
@@ -23455,7 +23455,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tcomma"))
@@ -23520,7 +23520,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tcomma"))
@@ -23789,7 +23789,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tcomma"))
@@ -23957,7 +23957,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tcomma"))
@@ -24277,7 +24277,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tcomma"))
@@ -24333,7 +24333,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("Comblock"))
@@ -24391,7 +24391,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tcomma"))
@@ -25078,16 +25078,16 @@ public class Productions extends AbstractProductions
         private static Production409Production singletonInstance = null;
         public static final Production409Production getInstance() { if (singletonInstance == null) singletonInstance = new Production409Production(); return singletonInstance; }
 
-        public String getDescription() { return "<DataRef> ::= DataRef:<DataRef> tpercent:T_PERCENT Name:<Name>  :production409"; }
+        public String getDescription() { return "<DataRef> ::= @:<DataRef> tpercent:T_PERCENT Name:<Name>  :production409"; }
 
         /**
-         * Reduce by <DataRef> ::= DataRef:<DataRef> tpercent:T_PERCENT Name:<Name>  :production409
+         * Reduce by <DataRef> ::= @:<DataRef> tpercent:T_PERCENT Name:<Name>  :production409
          */
         void reduce(Parser parser)
         {
             ArrayList valueStack = parser.getValueStack();
 
-            // Reduce by <DataRef> ::= DataRef:<DataRef> tpercent:T_PERCENT Name:<Name>  :production409
+            // Reduce by <DataRef> ::= @:<DataRef> tpercent:T_PERCENT Name:<Name>  :production409
             ASTNameNode v3 = (ASTNameNode)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
             Token v2 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
             ASTDataRefNode v1 = (ASTDataRefNode)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
@@ -25101,7 +25101,7 @@ public class Productions extends AbstractProductions
 
         /**
          * This method is called when the parser is about to reduce by
-         * <DataRef> ::= DataRef:<DataRef> tpercent:T_PERCENT Name:<Name>  :production409
+         * <DataRef> ::= @:<DataRef> tpercent:T_PERCENT Name:<Name>  :production409
          */
         protected ASTDataRefNode userAction(ASTDataRefNode v1, Token v2, ASTNameNode v3)
         {
@@ -25117,7 +25117,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals("DataRef"))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tlparen"))
@@ -25146,16 +25146,16 @@ public class Productions extends AbstractProductions
         private static Production4092Production singletonInstance = null;
         public static final Production4092Production getInstance() { if (singletonInstance == null) singletonInstance = new Production4092Production(); return singletonInstance; }
 
-        public String getDescription() { return "<DataRef> ::= DataRef:<DataRef> <DataRef@17> tpercent:T_PERCENT Name:<Name>  :production4092"; }
+        public String getDescription() { return "<DataRef> ::= @:<DataRef> <DataRef@17> tpercent:T_PERCENT Name:<Name>  :production4092"; }
 
         /**
-         * Reduce by <DataRef> ::= DataRef:<DataRef> <DataRef@17> tpercent:T_PERCENT Name:<Name>  :production4092
+         * Reduce by <DataRef> ::= @:<DataRef> <DataRef@17> tpercent:T_PERCENT Name:<Name>  :production4092
          */
         void reduce(Parser parser)
         {
             ArrayList valueStack = parser.getValueStack();
 
-            // Reduce by <DataRef> ::= DataRef:<DataRef> <DataRef@17> tpercent:T_PERCENT Name:<Name>  :production4092
+            // Reduce by <DataRef> ::= @:<DataRef> <DataRef@17> tpercent:T_PERCENT Name:<Name>  :production4092
             ASTNameNode v6 = (ASTNameNode)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
             Token v5 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
             Token v4 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
@@ -25172,7 +25172,7 @@ public class Productions extends AbstractProductions
 
         /**
          * This method is called when the parser is about to reduce by
-         * <DataRef> ::= DataRef:<DataRef> <DataRef@17> tpercent:T_PERCENT Name:<Name>  :production4092
+         * <DataRef> ::= @:<DataRef> <DataRef@17> tpercent:T_PERCENT Name:<Name>  :production4092
          */
         protected ASTDataRefNode userAction(ASTDataRefNode v1, Token v2, ASTSectionSubscriptListNode v3, Token v4, Token v5, ASTNameNode v6)
         {
@@ -25188,7 +25188,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals("DataRef"))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tlparen"))
@@ -25334,16 +25334,16 @@ public class Productions extends AbstractProductions
         private static Production412Production singletonInstance = null;
         public static final Production412Production getInstance() { if (singletonInstance == null) singletonInstance = new Production412Production(); return singletonInstance; }
 
-        public String getDescription() { return "<SFDataRef> ::= SFDataRef:<SFDataRef> tpercent:T_PERCENT Name:<Name>  :production412"; }
+        public String getDescription() { return "<SFDataRef> ::= @:<SFDataRef> tpercent:T_PERCENT Name:<Name>  :production412"; }
 
         /**
-         * Reduce by <SFDataRef> ::= SFDataRef:<SFDataRef> tpercent:T_PERCENT Name:<Name>  :production412
+         * Reduce by <SFDataRef> ::= @:<SFDataRef> tpercent:T_PERCENT Name:<Name>  :production412
          */
         void reduce(Parser parser)
         {
             ArrayList valueStack = parser.getValueStack();
 
-            // Reduce by <SFDataRef> ::= SFDataRef:<SFDataRef> tpercent:T_PERCENT Name:<Name>  :production412
+            // Reduce by <SFDataRef> ::= @:<SFDataRef> tpercent:T_PERCENT Name:<Name>  :production412
             ASTNameNode v3 = (ASTNameNode)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
             Token v2 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
             ASTSFDataRefNode v1 = (ASTSFDataRefNode)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
@@ -25357,7 +25357,7 @@ public class Productions extends AbstractProductions
 
         /**
          * This method is called when the parser is about to reduce by
-         * <SFDataRef> ::= SFDataRef:<SFDataRef> tpercent:T_PERCENT Name:<Name>  :production412
+         * <SFDataRef> ::= @:<SFDataRef> tpercent:T_PERCENT Name:<Name>  :production412
          */
         protected ASTSFDataRefNode userAction(ASTSFDataRefNode v1, Token v2, ASTNameNode v3)
         {
@@ -25373,7 +25373,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals("SFDataRef"))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tlparen"))
@@ -25402,16 +25402,16 @@ public class Productions extends AbstractProductions
         private static Production4122Production singletonInstance = null;
         public static final Production4122Production getInstance() { if (singletonInstance == null) singletonInstance = new Production4122Production(); return singletonInstance; }
 
-        public String getDescription() { return "<SFDataRef> ::= SFDataRef:<SFDataRef> <SFDataRef@18> tpercent:T_PERCENT Name:<Name>  :production4122"; }
+        public String getDescription() { return "<SFDataRef> ::= @:<SFDataRef> <SFDataRef@18> tpercent:T_PERCENT Name:<Name>  :production4122"; }
 
         /**
-         * Reduce by <SFDataRef> ::= SFDataRef:<SFDataRef> <SFDataRef@18> tpercent:T_PERCENT Name:<Name>  :production4122
+         * Reduce by <SFDataRef> ::= @:<SFDataRef> <SFDataRef@18> tpercent:T_PERCENT Name:<Name>  :production4122
          */
         void reduce(Parser parser)
         {
             ArrayList valueStack = parser.getValueStack();
 
-            // Reduce by <SFDataRef> ::= SFDataRef:<SFDataRef> <SFDataRef@18> tpercent:T_PERCENT Name:<Name>  :production4122
+            // Reduce by <SFDataRef> ::= @:<SFDataRef> <SFDataRef@18> tpercent:T_PERCENT Name:<Name>  :production4122
             ASTNameNode v6 = (ASTNameNode)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
             Token v5 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
             Token v4 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
@@ -25428,7 +25428,7 @@ public class Productions extends AbstractProductions
 
         /**
          * This method is called when the parser is about to reduce by
-         * <SFDataRef> ::= SFDataRef:<SFDataRef> <SFDataRef@18> tpercent:T_PERCENT Name:<Name>  :production4122
+         * <SFDataRef> ::= @:<SFDataRef> <SFDataRef@18> tpercent:T_PERCENT Name:<Name>  :production4122
          */
         protected ASTSFDataRefNode userAction(ASTSFDataRefNode v1, Token v2, ASTSectionSubscriptListNode v3, Token v4, Token v5, ASTNameNode v6)
         {
@@ -25444,7 +25444,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals("SFDataRef"))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tlparen"))
@@ -25524,16 +25524,16 @@ public class Productions extends AbstractProductions
         private static Production414Production singletonInstance = null;
         public static final Production414Production getInstance() { if (singletonInstance == null) singletonInstance = new Production414Production(); return singletonInstance; }
 
-        public String getDescription() { return "<StructureComponent> ::= StructureComponent:<StructureComponent> FieldSelector:<FieldSelector>  :production414"; }
+        public String getDescription() { return "<StructureComponent> ::= @:<StructureComponent> FieldSelector:<FieldSelector>  :production414"; }
 
         /**
-         * Reduce by <StructureComponent> ::= StructureComponent:<StructureComponent> FieldSelector:<FieldSelector>  :production414
+         * Reduce by <StructureComponent> ::= @:<StructureComponent> FieldSelector:<FieldSelector>  :production414
          */
         void reduce(Parser parser)
         {
             ArrayList valueStack = parser.getValueStack();
 
-            // Reduce by <StructureComponent> ::= StructureComponent:<StructureComponent> FieldSelector:<FieldSelector>  :production414
+            // Reduce by <StructureComponent> ::= @:<StructureComponent> FieldSelector:<FieldSelector>  :production414
             ASTFieldSelectorNode v2 = (ASTFieldSelectorNode)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
             ASTStructureComponentNode v1 = (ASTStructureComponentNode)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
@@ -25546,7 +25546,7 @@ public class Productions extends AbstractProductions
 
         /**
          * This method is called when the parser is about to reduce by
-         * <StructureComponent> ::= StructureComponent:<StructureComponent> FieldSelector:<FieldSelector>  :production414
+         * <StructureComponent> ::= @:<StructureComponent> FieldSelector:<FieldSelector>  :production414
          */
         protected ASTStructureComponentNode userAction(ASTStructureComponentNode v1, ASTFieldSelectorNode v2)
         {
@@ -25558,7 +25558,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals("StructureComponent"))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("FieldSelector"))
@@ -25942,7 +25942,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tcomma"))
@@ -26896,7 +26896,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tcomma"))
@@ -27151,7 +27151,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tcomma"))
@@ -27217,16 +27217,16 @@ public class Productions extends AbstractProductions
         private static Production442Production singletonInstance = null;
         public static final Production442Production getInstance() { if (singletonInstance == null) singletonInstance = new Production442Production(); return singletonInstance; }
 
-        public String getDescription() { return "<AllocateObject> ::= AllocateObject:<AllocateObject> FieldSelector:<FieldSelector>  :production442"; }
+        public String getDescription() { return "<AllocateObject> ::= @:<AllocateObject> FieldSelector:<FieldSelector>  :production442"; }
 
         /**
-         * Reduce by <AllocateObject> ::= AllocateObject:<AllocateObject> FieldSelector:<FieldSelector>  :production442
+         * Reduce by <AllocateObject> ::= @:<AllocateObject> FieldSelector:<FieldSelector>  :production442
          */
         void reduce(Parser parser)
         {
             ArrayList valueStack = parser.getValueStack();
 
-            // Reduce by <AllocateObject> ::= AllocateObject:<AllocateObject> FieldSelector:<FieldSelector>  :production442
+            // Reduce by <AllocateObject> ::= @:<AllocateObject> FieldSelector:<FieldSelector>  :production442
             ASTFieldSelectorNode v2 = (ASTFieldSelectorNode)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
             ASTAllocateObjectNode v1 = (ASTAllocateObjectNode)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
@@ -27239,7 +27239,7 @@ public class Productions extends AbstractProductions
 
         /**
          * This method is called when the parser is about to reduce by
-         * <AllocateObject> ::= AllocateObject:<AllocateObject> FieldSelector:<FieldSelector>  :production442
+         * <AllocateObject> ::= @:<AllocateObject> FieldSelector:<FieldSelector>  :production442
          */
         protected ASTAllocateObjectNode userAction(ASTAllocateObjectNode v1, ASTFieldSelectorNode v2)
         {
@@ -27251,7 +27251,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals("AllocateObject"))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("FieldSelector"))
@@ -27491,7 +27491,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tcomma"))
@@ -27801,16 +27801,16 @@ public class Productions extends AbstractProductions
         private static Production451Production singletonInstance = null;
         public static final Production451Production getInstance() { if (singletonInstance == null) singletonInstance = new Production451Production(); return singletonInstance; }
 
-        public String getDescription() { return "<PointerField> ::= PointerField:<PointerField> FieldSelector:<FieldSelector>  :production451"; }
+        public String getDescription() { return "<PointerField> ::= @:<PointerField> FieldSelector:<FieldSelector>  :production451"; }
 
         /**
-         * Reduce by <PointerField> ::= PointerField:<PointerField> FieldSelector:<FieldSelector>  :production451
+         * Reduce by <PointerField> ::= @:<PointerField> FieldSelector:<FieldSelector>  :production451
          */
         void reduce(Parser parser)
         {
             ArrayList valueStack = parser.getValueStack();
 
-            // Reduce by <PointerField> ::= PointerField:<PointerField> FieldSelector:<FieldSelector>  :production451
+            // Reduce by <PointerField> ::= @:<PointerField> FieldSelector:<FieldSelector>  :production451
             ASTFieldSelectorNode v2 = (ASTFieldSelectorNode)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
             ASTPointerFieldNode v1 = (ASTPointerFieldNode)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
@@ -27823,7 +27823,7 @@ public class Productions extends AbstractProductions
 
         /**
          * This method is called when the parser is about to reduce by
-         * <PointerField> ::= PointerField:<PointerField> FieldSelector:<FieldSelector>  :production451
+         * <PointerField> ::= @:<PointerField> FieldSelector:<FieldSelector>  :production451
          */
         protected ASTPointerFieldNode userAction(ASTPointerFieldNode v1, ASTFieldSelectorNode v2)
         {
@@ -27835,7 +27835,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals("PointerField"))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("FieldSelector"))
@@ -44784,7 +44784,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tcomma"))
@@ -48081,7 +48081,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tcomma"))
@@ -49163,7 +49163,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tcomma"))
@@ -50115,7 +50115,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tcomma"))
@@ -51261,7 +51261,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tcomma"))
@@ -52381,7 +52381,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tcomma"))
@@ -53131,7 +53131,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tcomma"))
@@ -53529,7 +53529,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tcomma"))
@@ -53585,7 +53585,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tcomma"))
@@ -55357,7 +55357,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tcomma"))
@@ -55960,7 +55960,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tcomma"))
@@ -60835,7 +60835,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tcomma"))
@@ -60937,7 +60937,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tcomma"))
@@ -64294,7 +64294,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tcomma"))
@@ -64826,7 +64826,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tcomma"))
@@ -65190,7 +65190,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tcomma"))
@@ -65829,7 +65829,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tcomma"))
@@ -65885,7 +65885,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tcomma"))
@@ -65987,7 +65987,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tcomma"))
@@ -67391,7 +67391,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tcomma"))
@@ -67447,7 +67447,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tcomma"))
@@ -67690,7 +67690,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("PrefixSpec"))
@@ -69107,7 +69107,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tcomma"))
@@ -69163,7 +69163,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tcomma"))
@@ -70855,7 +70855,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals(""))
+            if (name.equals("@"))
                 return 0;
             else
                 if (name.equals("tcomma"))

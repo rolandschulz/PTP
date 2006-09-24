@@ -1,5 +1,6 @@
 package org.eclipse.photran.internal.core.parser; import org.eclipse.photran.internal.core.lexer.*;
 
+import java.lang.ref.WeakReference;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -34,7 +35,7 @@ public class ParseTreeNode extends AbstractParseTreeNode
 
         if (children == null) children = new LinkedList/*<AbstractParseTreeNode>*/();
         children.add(child);
-        child.parent = this;
+        child.parentRef = new WeakReference/*<ParseTreeNode>*/(this);
     }
 
     /**
@@ -58,7 +59,7 @@ public class ParseTreeNode extends AbstractParseTreeNode
                 {
                     Token t = (Token)o;
                     children.add(t);
-                    t.parent = this;
+                    t.parentRef = new WeakReference/*<ParseTreeNode>*/(this);
                 }
             }
         }

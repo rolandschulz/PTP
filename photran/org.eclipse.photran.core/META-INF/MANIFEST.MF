@@ -8,6 +8,7 @@ Bundle-Activator: org.eclipse.photran.core.FortranCorePlugin
 Bundle-Vendor: University of Illinois at Urbana-Champaign and Los Alamos National Laboratory
 Bundle-Localization: plugin
 Export-Package: org.eclipse.photran.core,
+ org.eclipse.photran.core.util,
  org.eclipse.photran.internal.core.lexer,
  org.eclipse.photran.internal.core.parser,
  org.eclipse.photran.internal.core.preferences,

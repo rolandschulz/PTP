@@ -1,5 +1,7 @@
 package org.eclipse.photran.internal.core.parser; import org.eclipse.photran.internal.core.lexer.*;
 
+import java.lang.ref.WeakReference;
+
 /**
  * Common superclass for <code>Token</code>s and <code>ParseTreeNode</code>s, the two types of
  * objects that can appear in a parse tree
@@ -18,11 +20,11 @@ public abstract class AbstractParseTreeNode
 
     public abstract String toString(int indentLevel);
 
-    protected ParseTreeNode parent = null;
+    protected WeakReference/*<ParseTreeNode>*/ parentRef = null;
 
     public ParseTreeNode getParent()
     {
-        return parent;
+        return parentRef == null ? null : (ParseTreeNode)parentRef.get();
     }
 
     protected String indent(int numSpaces)

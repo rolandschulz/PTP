@@ -5,7 +5,7 @@ package org.eclipse.photran.internal.core.parser; import org.eclipse.photran.int
 
 /**
  * <DataRef> ::= Name:<Name>  :production408
- * <DataRef> ::= DataRef:<DataRef> ( tlparen:T_LPAREN SectionSubscriptList:<SectionSubscriptList> trparen:T_RPAREN )? tpercent:T_PERCENT Name:<Name>  :production409
+ * <DataRef> ::= @:<DataRef> ( tlparen:T_LPAREN SectionSubscriptList:<SectionSubscriptList> trparen:T_RPAREN )? tpercent:T_PERCENT Name:<Name>  :production409
  */
 public class ASTDataRefNode extends ParseTreeNode
 {
@@ -14,34 +14,56 @@ public class ASTDataRefNode extends ParseTreeNode
         super(nonterminal, production);
     }
 
-    public ASTNameNode getASTName()
+    public int count()
     {
-        return (ASTNameNode)this.getChild("Name");
+        ParseTreeNode node = this;
+        int count = 1;
+        while (node.getChild("@") != null)
+        {
+            count++;
+            node = node.getChild("@");
+        }
+        return count;
     }
 
-    public ASTDataRefNode getASTDataRef()
+    public ASTNameNode getASTName(int index)
     {
-        return (ASTDataRefNode)this.getChild("DataRef");
+        ASTDataRefNode node = this;
+        for (int i = 0; i < index; i++)
+            node = (ASTDataRefNode)node.getChild("@");
+        return (ASTNameNode)node.getChild("Name");
     }
 
-    public Token getASTTlparen()
+    public Token getASTTlparen(int index)
     {
-        return this.getChildToken("tlparen");
+        ASTDataRefNode node = this;
+        for (int i = 0; i < index; i++)
+            node = (ASTDataRefNode)node.getChild("@");
+        return node.getChildToken("tlparen");
     }
 
-    public ASTSectionSubscriptListNode getASTSectionSubscriptList()
+    public ASTSectionSubscriptListNode getASTSectionSubscriptList(int index)
     {
-        return (ASTSectionSubscriptListNode)this.getChild("SectionSubscriptList");
+        ASTDataRefNode node = this;
+        for (int i = 0; i < index; i++)
+            node = (ASTDataRefNode)node.getChild("@");
+        return (ASTSectionSubscriptListNode)node.getChild("SectionSubscriptList");
     }
 
-    public Token getASTTrparen()
+    public Token getASTTrparen(int index)
     {
-        return this.getChildToken("trparen");
+        ASTDataRefNode node = this;
+        for (int i = 0; i < index; i++)
+            node = (ASTDataRefNode)node.getChild("@");
+        return node.getChildToken("trparen");
     }
 
-    public Token getASTTpercent()
+    public Token getASTTpercent(int index)
     {
-        return this.getChildToken("tpercent");
+        ASTDataRefNode node = this;
+        for (int i = 0; i < index; i++)
+            node = (ASTDataRefNode)node.getChild("@");
+        return node.getChildToken("tpercent");
     }
 
     protected void visitThisNodeUsing(ASTVisitor visitor) { visitor.visitASTDataRefNode(this); }

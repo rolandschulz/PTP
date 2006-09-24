@@ -5,7 +5,7 @@ package org.eclipse.photran.internal.core.parser; import org.eclipse.photran.int
 
 /**
  * <AllocateObject> ::= VariableName:<VariableName>  :production441
- * <AllocateObject> ::= AllocateObject:<AllocateObject> FieldSelector:<FieldSelector>  :production442
+ * <AllocateObject> ::= @:<AllocateObject> FieldSelector:<FieldSelector>  :production442
  */
 public class ASTAllocateObjectNode extends ParseTreeNode
 {
@@ -14,19 +14,32 @@ public class ASTAllocateObjectNode extends ParseTreeNode
         super(nonterminal, production);
     }
 
-    public ASTVariableNameNode getASTVariableName()
+    public int count()
     {
-        return (ASTVariableNameNode)this.getChild("VariableName");
+        ParseTreeNode node = this;
+        int count = 1;
+        while (node.getChild("@") != null)
+        {
+            count++;
+            node = node.getChild("@");
+        }
+        return count;
     }
 
-    public ASTAllocateObjectNode getASTAllocateObject()
+    public ASTVariableNameNode getASTVariableName(int index)
     {
-        return (ASTAllocateObjectNode)this.getChild("AllocateObject");
+        ASTAllocateObjectNode node = this;
+        for (int i = 0; i < index; i++)
+            node = (ASTAllocateObjectNode)node.getChild("@");
+        return (ASTVariableNameNode)node.getChild("VariableName");
     }
 
-    public ASTFieldSelectorNode getASTFieldSelector()
+    public ASTFieldSelectorNode getASTFieldSelector(int index)
     {
-        return (ASTFieldSelectorNode)this.getChild("FieldSelector");
+        ASTAllocateObjectNode node = this;
+        for (int i = 0; i < index; i++)
+            node = (ASTAllocateObjectNode)node.getChild("@");
+        return (ASTFieldSelectorNode)node.getChild("FieldSelector");
     }
 
     protected void visitThisNodeUsing(ASTVisitor visitor) { visitor.visitASTAllocateObjectNode(this); }

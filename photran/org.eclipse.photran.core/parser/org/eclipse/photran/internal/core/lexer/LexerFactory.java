@@ -13,6 +13,8 @@ import java.io.InputStream;
  */
 public final class LexerFactory
 {
+    public static boolean AssociateLineCol = false;
+    
     private LexerFactory() {;}
     
     public static ILexer createFreeFormLexer(InputStream in, String filename)
