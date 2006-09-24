@@ -49,17 +49,20 @@ class FixedFormLexerPrepass {
 	
 	public int getLine(int absCharPos) {
 		if (absCharPos<0) return 0;
-		return lineMapping.get(absCharPos);
+        int lastCharPos = lineMapping.length() - 1;
+        return lineMapping.get(Math.min(absCharPos, lastCharPos));
 	}
 	
 	public int getColumn(int absCharPos) {
 		if (absCharPos<0) return 0;
-		return columnMapping.get(absCharPos);
+        int lastCharPos = lineMapping.length() - 1;
+		return columnMapping.get(Math.min(absCharPos, lastCharPos));
 	}
 	
 	public int getOffset(int absCharPos) {
 		if (absCharPos<0) return absCharPos;
-		return offsetMapping.get(absCharPos);
+        int lastCharPos = lineMapping.length() - 1;
+		return offsetMapping.get(Math.min(absCharPos, lastCharPos));
 	}
 
 	public int read() throws Exception {

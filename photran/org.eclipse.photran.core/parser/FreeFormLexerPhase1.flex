@@ -33,8 +33,20 @@ import org.eclipse.photran.internal.core.parser.Terminal;
 %ignorecase
 %type Token
 %{
+	private int lastTokenLine = 1, lastTokenCol = 1;
+	
 	private Token token(Terminal terminal)
 	{
+		if (terminal == Terminal.T_SCON)
+		{
+			lastTokenLine = sbLine;
+			lastTokenCol = sbCol;
+		}
+		else
+		{
+			lastTokenLine = yyline+1;
+			lastTokenCol = yycolumn+1;
+		}
 		return new Token(terminal,
 		                 "",
 		                 terminal == Terminal.T_SCON ? stringBuffer.toString() : yytext(),
@@ -93,7 +105,7 @@ import org.eclipse.photran.internal.core.parser.Terminal;
     
 	public FreeFormLexerPhase1(java.io.InputStream in, String filename)
 	{
-	    this(in);
+	    this(new LineAppendingInputStream(in));
 	    this.filename = filename;
 	}
 
@@ -104,12 +116,12 @@ import org.eclipse.photran.internal.core.parser.Terminal;
 
     public int getLastTokenLine()
     {
-        return 0;
+        return lastTokenLine;
     }
 
     public int getLastTokenCol()
     {
-        return 0;
+        return lastTokenCol;
     }
 	
 	private void startInclude() throws FileNotFoundException

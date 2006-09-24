@@ -34,7 +34,11 @@ class FreeFormLexerPhase2 implements ILexer
 {
     private ILexer yylex;
     private Vector tokenStream = new Vector();
+    private Vector lineNumbers = new Vector();
+    private Vector colNumbers = new Vector();
     private ListIterator tokenIt = tokenStream.listIterator();
+    private ListIterator lineIt = lineNumbers.listIterator();
+    private ListIterator colIt = colNumbers.listIterator();
     
     private Token lastToken = null;
     private int lastTokenLine = 1, lastTokenCol = 1;
@@ -96,28 +100,44 @@ class FreeFormLexerPhase2 implements ILexer
         
         if (tokenIt.hasNext())
         {
-            updateLastLineAndCol(lastToken.getCompleteText());
+            //if (lastToken != null) updateLastLineAndCol(lastToken.getCompleteText());
             lastToken = (Token)tokenIt.next();
+            lastTokenLine = ((Integer)lineIt.next()).intValue();
+            lastTokenCol = ((Integer)colIt.next()).intValue();
             return lastToken;
         }
-        else
-            return null;
+        else return null;
     }
 
-    private static final String EOL = System.getProperty("line.terminator");
-    private static final int EOL_LEN = EOL.length();
-
-    private void updateLastLineAndCol(String textAdded)
-    {
-        int lastIndex = 0, nextIndex;
-        while ((nextIndex = textAdded.indexOf(EOL, lastIndex)) > 0)
-        {
-            lastTokenLine++;
-            lastTokenCol = 1;
-            lastIndex = nextIndex + EOL_LEN;
-        }
-        lastTokenCol += textAdded.length() - lastIndex;
-    }
+////    private static final String EOL = System.getProperty("line.separator");
+////    private static final int EOL_LEN = System.getProperty("line.separator").length();
+//
+//    private void updateLastLineAndCol(String textAdded)
+//    {
+////        int lastIndex = 0, nextIndex;
+////        while ((nextIndex = textAdded.indexOf(EOL, lastIndex)) > 0)
+////        {
+////            lastTokenLine++;
+////            lastTokenCol = 1;
+////            lastIndex = nextIndex + EOL_LEN;
+////        }
+////        lastTokenCol += textAdded.length() - lastIndex;
+//        
+//        for (int i = 0, len = textAdded.length(); i < len; i++)
+//        {
+//            if (textAdded.charAt(i) == '\r')
+//            {
+//                lastTokenLine++;
+//                lastTokenCol = 1;
+//            }
+//            else if (textAdded.charAt(i) == '\n' && i > 0 && textAdded.charAt(i-1) != '\r')
+//            {
+//                lastTokenLine++;
+//                lastTokenCol = 1;
+//            }
+//            else lastTokenCol++;
+//        }
+//    }
 
     /**
      * Read a statement into <code>tokenStream</code> using the JFlex lexer,
@@ -165,6 +185,8 @@ class FreeFormLexerPhase2 implements ILexer
 //        System.out.println();
         
         tokenIt = tokenStream.listIterator();
+        lineIt = lineNumbers.listIterator();
+        colIt = colNumbers.listIterator();
     }
 
     /**
@@ -174,10 +196,17 @@ class FreeFormLexerPhase2 implements ILexer
     {
         Token t;
         tokenStream.clear();
+        lineNumbers.clear();
+        colNumbers.clear();
         do
         {
             t = yylex.yylex();
-            if (t != null) tokenStream.add(t);
+            if (t != null)
+            {
+                tokenStream.add(t);
+                lineNumbers.add(new Integer(yylex.getLastTokenLine()));
+                colNumbers.add(new Integer(yylex.getLastTokenCol()));
+            }
             // if (t != null) { System.out.print(t.id + ":"); }
         }
         while (t != null && t.getTerminal() != Terminal.T_EOS && t.getTerminal() != Terminal.END_OF_INPUT);
@@ -1298,7 +1327,10 @@ class FreeFormLexerPhase2 implements ILexer
                 //t.setEndCol(t.getEndCol() - numCharsRemoved);
                 //t.setLength(t.getLength() - numCharsRemoved);
     
+                // i+j since we might have inserted some equal signs earlier, 1 to insert after
                 tokenStream.insertElementAt(eq, i+j+1);
+                lineNumbers.insertElementAt(lineNumbers.get(i+j), i+j+1);
+                colNumbers.insertElementAt(new Integer(((Integer)colNumbers.get(i+j)).intValue()+textWithoutEquals.length()), i+j+1);
             }
         }
 
@@ -1343,8 +1375,14 @@ class FreeFormLexerPhase2 implements ILexer
             //t.setEndCol(t.getEndCol() - numCharsRemoved);
             //t.setLength(t.getLength() - numCharsRemoved);
 
+            // i+(2*j) since we might have inserted some asterisks and integers earlier, 1 to insert after
             tokenStream.insertElementAt(star, i+(2*j)+1);
+            lineNumbers.insertElementAt(lineNumbers.get(i+(2*j)), i+(2*j)+1);
+            colNumbers.insertElementAt(new Integer(((Integer)colNumbers.get(i+(2*j))).intValue()+textBeforeStar.length()), i+(2*j)+1);
+            
             tokenStream.insertElementAt(num, i+(2*j)+2);
+            lineNumbers.insertElementAt(lineNumbers.get(i+(2*j)+1), i+(2*j)+2);
+            colNumbers.insertElementAt(new Integer(((Integer)colNumbers.get(i+(2*j)+1)).intValue()+textBeforeStar.length()+1), i+(2*j)+2);
         }
     }
 

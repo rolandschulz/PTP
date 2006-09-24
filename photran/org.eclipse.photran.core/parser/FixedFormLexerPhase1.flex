@@ -44,7 +44,7 @@ import org.eclipse.photran.internal.core.parser.Terminal;
 	private FixedFormLexerPrepass prepass;
     
     public FixedFormLexerPhase1(InputStream in, FixedFormLexerPrepass _prepass) {
-		this(in);
+		this(new LineAppendingInputStream(in));
 		prepass=_prepass;
     }
     
@@ -60,8 +60,12 @@ import org.eclipse.photran.internal.core.parser.Terminal;
       return prepass.getColumn(yychar);
     }
     
+    private int lastTokenLine = 1, lastTokenCol = 1;
+    
 	private Token token(Terminal terminal)
 	{
+		lastTokenLine = prepass.getLine(yychar)+1;
+		lastTokenCol = prepass.getColumn(yychar)+1;
 		return new Token(terminal,
 		                 "",
 		                 terminal == Terminal.T_SCON || terminal == Terminal.T_HCON
@@ -110,12 +114,12 @@ import org.eclipse.photran.internal.core.parser.Terminal;
 
     public int getLastTokenLine()
     {
-        return 0;
+        return lastTokenLine;
     }
 
     public int getLastTokenCol()
     {
-        return 0;
+        return lastTokenCol;
     }
 	
 //	private List/*<NonTreeToken>*/ nonTreeTokens = new LinkedList();

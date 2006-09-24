@@ -40,7 +40,8 @@ class FixedFormLexerPhase2 implements ILexer
             }
         };
 
-        freeLexer2 = new FreeFormLexerPhase2(new FixedFormLexerPhase1(prepassReader, prepass, filename));
+        FixedFormLexerPhase1 fixedLexer1 = new FixedFormLexerPhase1(prepassReader, prepass, filename);
+        freeLexer2 = new FreeFormLexerPhase2(fixedLexer1);
     }
 
     public Token yylex() throws Exception
