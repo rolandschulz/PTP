@@ -30,14 +30,11 @@ public class ParseTreeNode extends AbstractParseTreeNode
 
     public void addChild(AbstractParseTreeNode child)
     {
-        if (child == null)
-            return;
-        else
-        {
-            if (children == null) children = new LinkedList/*<AbstractParseTreeNode>*/();
-            children.add(child);
-            child.parent = this;
-        }
+        if (child == null) child = EMPTY;
+
+        if (children == null) children = new LinkedList/*<AbstractParseTreeNode>*/();
+        children.add(child);
+        child.parent = this;
     }
 
     /**
@@ -78,14 +75,12 @@ public class ParseTreeNode extends AbstractParseTreeNode
         return children == null ? false : children.remove(childToRemove);
     }
     
-    public ParseTreeNode getFirstChild()
-    {
-        return (ParseTreeNode)(children == null || children.size() < 1 ? null : children.getFirst());
-    }
-    
     public ParseTreeNode getChild(int index)
     {
-        return (ParseTreeNode)(children == null || children.size() <= index || index < 0 ? null : children.get(index));
+        if (children == null || index < 0 || index >= children.size() || children.get(index) == EMPTY)
+            return null;
+        else
+            return (ParseTreeNode)children.get(index);
     }
     
     public ParseTreeNode getChild(String name)
@@ -95,7 +90,10 @@ public class ParseTreeNode extends AbstractParseTreeNode
     
     public Token getChildToken(int index)
     {
-        return (Token)(children == null || children.size() <= index || index < 0 ? null : children.get(index));
+        if (children == null || index < 0 || index >= children.size() || children.get(index) == EMPTY)
+            return null;
+        else
+            return (Token)children.get(index);
     }
     
     public Token getChildToken(String name)
@@ -220,4 +218,27 @@ public class ParseTreeNode extends AbstractParseTreeNode
         
         return sb.toString();
     }
+    
+    // -------------------------------------------------------------------------------------------
+    
+    private static final class EmptyNode extends AbstractParseTreeNode
+    {
+        private EmptyNode() {}
+
+        public void visitBottomUpUsing(ASTVisitor visitor) {}
+        public void visitTopDownUsing(ASTVisitor visitor) {}
+        public void visitUsing(ParseTreeVisitor visitor) {}
+        public void visitUsing(GenericParseTreeVisitor visitor) {}
+        
+        public String toString(int numSpaces)
+        {
+            StringBuffer sb = new StringBuffer();
+            sb.append(indent(numSpaces));
+            sb.append("(empty node)");
+            sb.append("\n");
+            return sb.toString();
+        }
+    }
+    
+    public static final AbstractParseTreeNode EMPTY = new EmptyNode();
 }
