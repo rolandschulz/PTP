@@ -8,6 +8,11 @@ package org.eclipse.photran.internal.core.parser; import org.eclipse.photran.int
  */
 public class ASTVisitor
 {
+    public void visitToken(Token token)
+    {
+        ;
+    }
+
     public void visitASTFormatStmtNode(ASTFormatStmtNode node)
     {
         ;

@@ -68,12 +68,12 @@ public class Token extends AbstractParseTreeNode implements ParserSymbol, IAdapt
     /**
      * See AbstractParseTreeNode
      */
-    public void visitTopDownUsing(ASTVisitor visitor) { ; }
+    public void visitTopDownUsing(ASTVisitor visitor) { visitor.visitToken(this); }
 
     /**
      * See AbstractParseTreeNode
      */
-    public void visitBottomUpUsing(ASTVisitor visitor) { ; }
+    public void visitBottomUpUsing(ASTVisitor visitor) { visitor.visitToken(this); }
 
     /**
      * See AbstractParseTreeNode
@@ -145,6 +145,4 @@ public class Token extends AbstractParseTreeNode implements ParserSymbol, IAdapt
     {
         return whiteBefore + text + whiteAfter;
     }
-    
-    public Object binding = null; // TODO: temporary (use getAdapter version instead)
 }
