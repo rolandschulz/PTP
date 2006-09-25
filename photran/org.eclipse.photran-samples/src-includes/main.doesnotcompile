@@ -1,0 +1,6 @@
+! Compilers have all sorts of trouble with this...
+! gfortran segfaulted, and ifort does not allow it
+program p
+    include "inc.h"
+    print i
+end program p
