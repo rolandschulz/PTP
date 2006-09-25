@@ -141,8 +141,10 @@ executable_construct
 	;
 
 // R214
+// C201 (R208) An execution-part shall not contain an end-function-stmt, end-program-stmt, or
+//             end-subroutine-stmt.  (But they can be in a branch target statement, which
+//             is not in the grammar, so the end-xxx-stmts deleted.)
 // T_CONTINUE inlined for continue_stmt
-// TODO putback
 action_stmt
 options {backtrack=true;}
 	:	allocate_stmt
@@ -154,10 +156,6 @@ options {backtrack=true;}
 	|	cycle_stmt
 	|	deallocate_stmt
 	|	endfile_stmt
-//	|   end_func_prog_or_sub_stmt // normal end_function_stmt... removed
-//	|	end_function_stmt
-//	|	end_program_stmt
-//	|	end_subroutine_stmt
 	|	exit_stmt
 	|	flush_stmt
 	|	forall_stmt
@@ -177,17 +175,6 @@ options {backtrack=true;}
 	|	arithmetic_if_stmt
 	|	computed_goto_stmt
 	;
-
-//end_func_prog_or_sub_stmt
-//options {k=2;}
-//	: T_END
-//	| (T_END T_FUNCTION) => T_END T_FUNCTION T_IDENT?
-//	| T_ENDFUNCTION T_IDENT?
-//	| (T_END T_PROGRAM) => T_END T_PROGRAM T_IDENT?
-//	| T_ENDPROGRAM T_IDENT?
-//	| (T_END T_SUBROUTINE) => T_END T_SUBROUTINE T_IDENT?
-//	| T_ENDSUBROUTINE T_IDENT?
-//	;
 
 // R215
 keyword
@@ -400,25 +387,17 @@ imag_part
 	;
 
 // R424
-// ERR_CHK 424 scalar_int_initialization_expr replaced by expr
-// TODO putback
+// ERR_CHK 424a scalar_int_initialization_expr replaced by expr
+// ERR_CHK 424b match identifiers with 'KIND =' expr / 'LEN = ' type_param_value,
+//              note, expr replaced by (isa) type_param_value
 char_selector
-    :    length_selector
-//    |    T_LPAREN T_LEN_EQUALS type_param_value T_COMMA T_KIND_EQUALS expr T_RPAREN
-//    |    T_LPAREN type_param_value T_COMMA (T_KIND_EQUALS)? expr T_RPAREN
-//    |    T_LPAREN T_KIND_EQUALS expr ( T_COMMA T_LEN_EQUALS type_param_value )? T_RPAREN
-    ;
-
-// R425
-length_selector
-	:	T_LPAREN
-		(T_IDENT /* 'LEN' */ T_EQUALS)?
-		type_param_value
-		T_RPAREN
-	|	T_ASTERISK
-		char_length
-		(T_COMMA)?
+	:	T_ASTERISK char_length (T_COMMA)?
+	|	T_LPAREN T_IDENT /* {'LEN','KIND'} */ T_EQUALS type_param_value
+                ( T_COMMA T_IDENT /* {'LEN','KIND'} */ T_EQUALS type_param_value )? T_RPAREN
+	|	T_LPAREN type_param_value ( T_COMMA (T_IDENT /* 'KIND' */ T_EQUALS)? expr )? T_RPAREN
 	;
+
+// R425 length_selector inlined in (and combined with) R424
 
 // R426
 char_length
@@ -429,48 +408,72 @@ char_length
 	;
 
 scalar_int_literal_constant
-    :    int_literal_constant
-    ;
+	:	int_literal_constant
+	;
 
 // R427
 char_literal_constant
 options {k=2;}
 	:	(T_DIGIT_STRING T_UNDERSCORE) => T_DIGIT_STRING T_UNDERSCORE T_CHAR_CONSTANT
 	|	(T_IDENT T_UNDERSCORE) => T_IDENT T_UNDERSCORE T_CHAR_CONSTANT
-    |   T_CHAR_CONSTANT
+	|	T_CHAR_CONSTANT
     ;
 
 // R428
 logical_literal_constant
-    :    T_TRUE ( T_UNDERSCORE kind_param )?
-    |    T_FALSE ( T_UNDERSCORE kind_param )?
-    ;
+	:	T_TRUE ( T_UNDERSCORE kind_param )?
+	|	T_FALSE ( T_UNDERSCORE kind_param )?
+	;
 
 // R429
-// TODO putback
+//	( component_part )? inlined as ( component_def_stmt )*
 derived_type_def
 	:	derived_type_stmt
-		( type_param_def_stmt )*
+		type_param_or_comp_def_stmt_list  // matches T_INTEGER possibilities in component_def_stmt
 		( private_or_sequence )*
-//		( component_part )?
+	  { /* ERR_CHK 429
+	     * if private_or_sequence present, component_def_stmt in type_param_or_comp_def_stmt_list
+	     * is an error
+	     */
+	  }
+		( component_def_stmt )*
 		( type_bound_procedure_part )?
 		end_type_stmt
+	;
+
+// Includes:
+//    ( type_param_def_stmt)*
+//    ( component_def_stmt )* if starts with T_INTEGER (could be a parse error)
+type_param_or_comp_def_stmt_list
+options {k=1;}
+	:	(T_INTEGER) => (kind_selector)? T_COMMA type_param_or_comp_def_stmt
+			type_param_or_comp_def_stmt_list
+	|
+		{ /* ERR_CHK R435
+		   * type_param_def_stmt(s) must precede component_def_stmt(s)
+		   */
+		}
+	;
+
+type_param_or_comp_def_stmt
+	:	type_param_attr_spec T_COLON_COLON type_param_decl_list T_EOS // see R435
+	|	component_attr_spec_list T_COLON_COLON component_decl_list T_EOS // see R440
 	;
 
 // R430
 // generic_name_list substituted for type_param_name_list
 derived_type_stmt
-    :    T_TYPE ( ( T_COMMA type_attr_spec_list )? T_COLON_COLON )? T_IDENT
-         ( T_LPAREN generic_name_list T_RPAREN )? T_EOS
-    ;
+	:	T_TYPE ( ( T_COMMA type_attr_spec_list )? T_COLON_COLON )? T_IDENT
+		( T_LPAREN generic_name_list T_RPAREN )? T_EOS
+	;
 
 type_attr_spec_list
-    :    type_attr_spec ( T_COMMA type_attr_spec )*
-    ;
+	:	type_attr_spec ( T_COMMA type_attr_spec )*
+	;
 
 generic_name_list
-    :    T_IDENT ( T_COMMA T_IDENT )*
-    ;
+	:	T_IDENT ( T_COMMA T_IDENT )*
+	;
 
 // R431
 // T_IDENT inlined for parent_type_name
@@ -499,10 +502,7 @@ sequence_stmt
 	:	T_SEQUENCE T_EOS
 	;
 
-// R435
-type_param_def_stmt
-	:	T_INTEGER ( kind_selector )? T_COMMA type_param_attr_spec T_COLON_COLON type_param_decl_list T_EOS
-	;
+// R435 type_param_def_stmt inlined in type_param_or_comp_def_stmt_list
 
 // R436
 // ERR_CHK 436 scalar_int_initialization_expr replaced by expr
@@ -521,10 +521,7 @@ type_param_attr_spec
 	|	T_LEN
 	;
 
-// R438
-component_part
-	:	( component_def_stmt )*
-	;
+// R438 component_part inlined as ( component_def_stmt )* in R429
 
 // R439
 component_def_stmt
@@ -567,6 +564,7 @@ component_array_spec
 	|	deferred_shape_spec_list
 	;
 
+// deferred_shape_spec replaced by T_COLON
 deferred_shape_spec_list
     :    T_COLON ( T_COMMA T_COLON )*
     ;
@@ -658,10 +656,8 @@ final_binding
 	;
 
 // R455
-// TODO putback
 derived_type_spec
-    : T_IDENT
-//      ( T_LPAREN type_param_spec_list T_RPAREN )?
+    : T_IDENT ( T_LPAREN type_param_spec_list T_RPAREN )?
     ;
 
 // R456
@@ -692,11 +688,9 @@ component_spec_list
 
 // R459
 // data_target isa expr so data_target deleted
-// check to see if proc_target is also
-// TODO putback
+// expr isa proc_target so expr deleted
 component_data_source
-	:	expr
-//	|	proc_target
+	:	proc_target
 	;
 
 // R460
@@ -871,13 +865,19 @@ language_binding_spec
     ;
 
 // R510
-// TODO putback
+// ERR_CHK 510 T_ASTERISK must not appear in any but the last dimension
+// array-spec grammar was changed to make it easier to parse (less ambiguous)
 array_spec
-	:	explicit_shape_spec_list
-//	|	assumed_shape_spec_list
-//	|	deferred_shape_spec_list
-//	|	assumed_size_spec
+	:	T_COLON ( T_COMMA array_spec )?			// assumed shape
+	|	T_ASTERISK ( T_COMMA array_spec )?		// assumed_size
+	|	expr (upper_bound_spec)? ( T_COMMA array_spec )?// explicit shape (if no upper_spec)
 	;
+
+upper_bound_spec
+	:	T_COLON			// assumed shape
+	|	T_COLON T_ASTERISK	// assumed size
+	|	T_COLON expr		// explicit shape
+	;	
 
 // R511
 // refactored to remove conditional from lhs and inlined lower_bound and upper_bound
@@ -893,26 +893,14 @@ explicit_shape_spec_list
 
 // R513 upper_bound was specification_expr inlined as expr
 
-// R514
-// lower_bound replaced by expr
-assumed_shape_spec
-	:	( expr )? T_COLON
-	;
-
-assumed_shape_spec_list
-    :    assumed_shape_spec ( T_COMMA assumed_shape_spec )*
-    ;
+// R514 assumed_shape_spec was ( lower_bound )? T_COLON not used in R510 array_spec
 
 // R515 deferred_shape_spec inlined as T_COLON in deferred_shape_spec_list
 
 // R516
-// lower_bound replaced by expr
-// putback
+// ERR_CHK R516 last dimension of array_spec must be ( T_ASTERISK | expr T_COLON T_ASTERISK )
 assumed_size_spec
-    : T_ASTERISK
-    | expr T_COLON T_ASTERISK
-//    | explicit_shape_spec_list T_COMMA T_ASTERISK
-//    | explicit_shape_spec_list T_COMMA lower_bound T_COLON T_ASTERISK
+    : array_spec
     ;
 
 // R517
@@ -1027,18 +1015,12 @@ data_stmt_value_list
     :    data_stmt_value ( T_COMMA data_stmt_value )*
     ;
 
-// R531
-// TODO putback
-data_stmt_repeat
-	:	scalar_int_constant
-//	|	scalar_int_constant_subobject
-	;
+// R531 data_stmt_repeat inlined as (int_literal_constant | designator) in R530
+// ERRCHK 531 int_constant shall be a scalar_int_constant
+// scalar_int_constant replaced by int_constant replaced by int_literal_constant as T_IDENT covered by designator
+// scalar_int_constant_subobject replaced by designator
 
 scalar_int_constant
-    :    int_constant
-    ;
-
-scalar_int_constant_subobject
     :    int_constant
     ;
 
@@ -1316,39 +1298,20 @@ int_variable
 	;
 
 // R609
+// C608 (R610) parent_string shall be of type character
+// fix for ambiguity in data_ref allows it to match T_LPAREN substring_range T_RPAREN,
+// so required T_LPAREN substring_range T_RPAREN made optional
+// ERR_CHK 609 insure final () is (substring-range)
 substring
-	:	parent_string T_LPAREN substring_range T_RPAREN
+	:	data_ref (T_LPAREN substring_range T_RPAREN)?
+	|	char_literal_constant T_LPAREN substring_range T_RPAREN
 	;
 
-// R610
-// C608 parent_string shall be of type character
+// R610 parent_string inlined in R609 as (data_ref | char_literal_constant)
 // T_IDENT inlined for scalar_variable_name
 // data_ref inlined for scalar_structure_component and array_element
-// data_ref can be a T_IDENT so T_IDENT deleted
-// scalar_constant replaced by char_literal_constant as T_IDENT can be data_ref and must be character
-// TODO putback
-parent_string
-	:	'data_ref'
-	|	T_CHAR_CONSTANT
-//	|	T_IDENT T_UNDERSCORE T_CHAR_CONSTANT
-//	|	T_DIGIT_STRING T_UNDERSCORE T_CHAR_CONSTANT
-	;
-
-// R610
-// C608 parent_string shall be of type character
-// T_IDENT inlined for scalar_variable_name
-// data_ref inlined for scalar_structure_component and array_element
-// scalar_constant replaced by char_literal_constant as T_IDENT can be data_ref
-// REMOVED because produces java error in parser (bug in code generation)
-//parent_string
-//options {k=2;}
-//	:	T_IDENT
-//	|	T_CHAR_CONSTANT
-//	|	(T_IDENT T_LPAREN) => data_ref
-//	|	(T_IDENT T_PERCENT) => data_ref
-//	|	(T_IDENT T_UNDERSCORE) => T_IDENT T_UNDERSCORE T_CHAR_CONSTANT
-//	|	T_DIGIT_STRING T_UNDERSCORE T_CHAR_CONSTANT
-//	;
+// data_ref isa T_IDENT so T_IDENT deleted
+// scalar_constant replaced by char_literal_constant as data_ref isa T_IDENT and must be character
 
 // R611
 // ERR_CHK 611 scalar_int_expr replaced by expr
@@ -1429,7 +1392,9 @@ vector_subscript
 
 // R623
 allocate_stmt
-    :    T_ALLOCATE T_LPAREN ( type_spec T_COLON_COLON )? allocation_list ( T_COMMA alloc_opt_list )? T_RPAREN T_EOS
+options {backtrack=true;}
+    :    T_ALLOCATE T_LPAREN type_spec T_COLON_COLON allocation_list ( T_COMMA alloc_opt_list )? T_RPAREN T_EOS
+    |    T_ALLOCATE T_LPAREN allocation_list ( T_COMMA alloc_opt_list )? T_RPAREN T_EOS
     ;
 
 // R624
@@ -1536,6 +1501,7 @@ dealloc_opt_list
 // type_param_inquiry is designator T_PERCENT T_IDENT can be designator so deleted
 // TODO putback
 // TODO what about char_literal_constant in designator
+// TODO what about designator ending in T_PERCENT T_IDENT
 primary
 	:	literal_constant
 	|	designator
@@ -1797,10 +1763,11 @@ proc_pointer_object
 // designator inlined for variable
 
 // R742
+// ERR_CHK 736 insure ( expr | designator ending in T_PERCENT T_IDENT)
 // T_IDENT inlined for procedure_name
-// expr can be designator can be T_IDENT so T_IDENT deleted
+// T_IDENT isa expr so T_IDENT deleted
 // proc_component_ref is variable T_PERCENT T_IDENT can be designator so deleted
-// putback above may be true because can't be character-type % id
+// putback deletion above may be true because can't be character-type % id
 proc_target
 	:	expr
 //	|	designator T_PERCENT T_IDENT
@@ -2923,18 +2890,19 @@ call_stmt
     ;
 
 // R1219
+// ERR_CHK 1219 must be (T_IDENT | designator T_PERCENT T_IDENT)
 // T_IDENT inlined for procedure_name and binding_name
 // proc_component_ref is variable T_PERCENT T_IDENT (variable is designator)
 // data_ref subset of designator so data_ref T_PERCENT T_IDENT deleted
 // inlined designator from R603
-// ERR_CHK 736 must be (T_IDENT | data_ref T_PERCENT T_IDENT) (no (substring-range))
 //R1219 procedure-designator            is procedure-name
 //                                      or proc-component-ref
 //                                      or data-ref % binding-name
+// TODO putback
 procedure_designator
-options {backtrack=true;}
 	:	T_IDENT
-	|	designator T_PERCENT T_IDENT
+//	|	designator
+//	|	designator T_PERCENT T_IDENT
 	;
 
 // R1220
@@ -2947,12 +2915,15 @@ actual_arg_spec_list
     ;
 
 // R1221
+// ERR_CHK 1221 insure ( expr | designator ending in T_PERCENT T_IDENT)
 // T_IDENT inlined for procedure_name
-// expr can be designator (via primary) so variable deleted
-// designator can be T_IDENT so T_IDENT deleted
-// proc_component_ref is variable T_PERCENT T_IDENT so optional T_PERCENT T_IDENT added to expr
+// expr isa designator (via primary) so variable deleted
+// designator isa T_IDENT so T_IDENT deleted
+// proc_component_ref is variable T_PERCENT T_IDENT can be designator so deleted
+// TODO putback tied up with abiguities at 1350 (?) and 2949, maybe ok with backtracking
 actual_arg
-	:	expr (T_PERCENT T_IDENT)?
+	:	expr
+//	|	designator //T_PERCENT T_IDENT
 	|	T_ASTERISK label
 	;
 
