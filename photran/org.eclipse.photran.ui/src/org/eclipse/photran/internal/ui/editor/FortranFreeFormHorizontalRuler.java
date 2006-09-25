@@ -2,8 +2,10 @@ package org.eclipse.photran.internal.ui.editor;
 
 import org.eclipse.jface.text.source.IVerticalRuler;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 
 /**
@@ -16,7 +18,14 @@ import org.eclipse.swt.widgets.Composite;
  * Zenil - org.zen.xhtml.editor
  */
 public class FortranFreeFormHorizontalRuler extends AbstractHorizontalRuler {
-	/**
+
+    protected static RGB DARK_GRAY = new RGB(0x80, 0x80, 0x80);
+    protected static RGB LIGHT_GRAY = new RGB(0xDD, 0xDD, 0xDD);
+    
+    protected static Color fDarkGrayColor = new Color(null, DARK_GRAY);
+    protected static Color fLightGrayColor = new Color(null, LIGHT_GRAY);
+
+    /**
 	 * Construct the Horizontal ruler
 	 * @param ruler 
 	 * @param the parent control
@@ -63,7 +72,7 @@ public class FortranFreeFormHorizontalRuler extends AbstractHorizontalRuler {
 				fWidth - fStyledText.getVerticalBar().getSize().x
 						- verticalRulerWidth, height);
 
-		g.setForeground(fBlackColor);
+		g.setForeground(fDarkGrayColor);
 
 		fDisplayText = ruler(maxChars, fStyledText.getHorizontalPixel());
 
@@ -100,9 +109,8 @@ public class FortranFreeFormHorizontalRuler extends AbstractHorizontalRuler {
 		g.drawString(fDisplayText, 0 - rem + verticalRulerWidth, 0, true);
 
 		//Draw the rectangular pointer
-		g.setBackground(fGrayColor);
-		g.fillRectangle(x + verticalRulerWidth, 0, g.getFontMetrics()
-				.getAverageCharWidth(), height);
+		g.setBackground(fLightGrayColor);
+		g.fillRectangle(x + verticalRulerWidth, 0, g.getFontMetrics().getAverageCharWidth(), height);
 
 		g.setForeground(fBlackColor);
 
@@ -111,8 +119,7 @@ public class FortranFreeFormHorizontalRuler extends AbstractHorizontalRuler {
 		int index = column;
 
 		//Highlight the character on which cursor is present
-		c = (index < 0 || index >= fDisplayText.length()) ? ' ' : fDisplayText
-				.charAt(index);
+		c = (index < 0 || index >= fDisplayText.length()) ? ' ' : fDisplayText.charAt(index);
 		g.drawString(String.valueOf(c), x + verticalRulerWidth, 0, true);
 	}
 
