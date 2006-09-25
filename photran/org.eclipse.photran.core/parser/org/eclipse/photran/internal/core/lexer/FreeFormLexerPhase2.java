@@ -1303,8 +1303,8 @@ class FreeFormLexerPhase2 implements ILexer
             else
             {
                 // split "xyz=" into "xyz" "="
-                Token eq = new Token();
-                eq.setTerminal(Terminal.T_EQUALS);
+                Token eq = new Token(Terminal.T_EQUALS, "=");
+                //eq.setTerminal(Terminal.T_EQUALS);
                 //eq.setFilename(t.getFilename());
                 //eq.setStartLine(t.getEndLine());
                 //eq.setStartCol(t.getEndCol());
@@ -1312,7 +1312,7 @@ class FreeFormLexerPhase2 implements ILexer
                 //eq.setEndCol(t.getEndCol());
                 //eq.setOffset(t.getOffset() + t.getLength() - 1);
                 //eq.setLength(1);
-                eq.setText("=");
+                //eq.setText("=");
     
                 t.setText(tokenText);
                 t.setWhiteAfter(whiteAfter);
@@ -1345,8 +1345,8 @@ class FreeFormLexerPhase2 implements ILexer
             //int numCharsRemoved = t.getTokenText().length() - textAfterStar.length() - 1;
 
             // split "integer*3" into "integer" "*" "3"
-            Token star = new Token();
-            star.setTerminal(Terminal.T_ASTERISK);
+            Token star = new Token(Terminal.T_ASTERISK, "*");
+            //star.setTerminal(Terminal.T_ASTERISK);
             //star.setFilename(t.getFilename());
             //star.setStartLine(t.getEndLine());
             //star.setEndLine(t.getEndLine());
@@ -1354,10 +1354,10 @@ class FreeFormLexerPhase2 implements ILexer
             //star.setEndCol(t.getEndCol() - textAfterStar.length());
             //star.setOffset(t.getOffset() + textBeforeStar.length());
             //star.setLength(1);
-            star.setText("*");
+            //star.setText("*");
 
-            Token num = new Token();
-            num.setTerminal(Terminal.T_ICON);
+            Token num = new Token(Terminal.T_ICON, textAfterStar);
+            //num.setTerminal(Terminal.T_ICON);
             //num.setFilename(t.getFilename());
             //num.setStartLine(star.getEndLine());
             //num.setStartCol(star.getEndCol() + 1);
@@ -1365,7 +1365,7 @@ class FreeFormLexerPhase2 implements ILexer
             //num.setEndCol(num.getStartCol() + textAfterStar.length() - 1);
             //num.setOffset(star.getOffset() + 1);
             //num.setLength(textAfterStar.length());
-            num.setText(textAfterStar);
+            //num.setText(textAfterStar);
 
             t.setText(textBeforeStar);
             //t.setEndCol(t.getEndCol() - numCharsRemoved);

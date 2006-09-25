@@ -25032,16 +25032,16 @@ public class Productions extends AbstractProductions
         private static Production408Production singletonInstance = null;
         public static final Production408Production getInstance() { if (singletonInstance == null) singletonInstance = new Production408Production(); return singletonInstance; }
 
-        public String getDescription() { return "<DataRef> ::= Name:<Name>  :production408"; }
+        public String getDescription() { return "<DataRef> ::= varName:<Name>  :production408"; }
 
         /**
-         * Reduce by <DataRef> ::= Name:<Name>  :production408
+         * Reduce by <DataRef> ::= varName:<Name>  :production408
          */
         void reduce(Parser parser)
         {
             ArrayList valueStack = parser.getValueStack();
 
-            // Reduce by <DataRef> ::= Name:<Name>  :production408
+            // Reduce by <DataRef> ::= varName:<Name>  :production408
             ASTNameNode v1 = (ASTNameNode)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
             // Run the user's code for this production
@@ -25053,7 +25053,7 @@ public class Productions extends AbstractProductions
 
         /**
          * This method is called when the parser is about to reduce by
-         * <DataRef> ::= Name:<Name>  :production408
+         * <DataRef> ::= varName:<Name>  :production408
          */
         protected ASTDataRefNode userAction(ASTNameNode v1)
         {
@@ -25064,7 +25064,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals("Name"))
+            if (name.equals("varName"))
                 return 0;
             else
                 return -1;
@@ -25078,16 +25078,16 @@ public class Productions extends AbstractProductions
         private static Production409Production singletonInstance = null;
         public static final Production409Production getInstance() { if (singletonInstance == null) singletonInstance = new Production409Production(); return singletonInstance; }
 
-        public String getDescription() { return "<DataRef> ::= @:<DataRef> tpercent:T_PERCENT Name:<Name>  :production409"; }
+        public String getDescription() { return "<DataRef> ::= @:<DataRef> tpercent:T_PERCENT componentName:<Name>  :production409"; }
 
         /**
-         * Reduce by <DataRef> ::= @:<DataRef> tpercent:T_PERCENT Name:<Name>  :production409
+         * Reduce by <DataRef> ::= @:<DataRef> tpercent:T_PERCENT componentName:<Name>  :production409
          */
         void reduce(Parser parser)
         {
             ArrayList valueStack = parser.getValueStack();
 
-            // Reduce by <DataRef> ::= @:<DataRef> tpercent:T_PERCENT Name:<Name>  :production409
+            // Reduce by <DataRef> ::= @:<DataRef> tpercent:T_PERCENT componentName:<Name>  :production409
             ASTNameNode v3 = (ASTNameNode)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
             Token v2 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
             ASTDataRefNode v1 = (ASTDataRefNode)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
@@ -25101,7 +25101,7 @@ public class Productions extends AbstractProductions
 
         /**
          * This method is called when the parser is about to reduce by
-         * <DataRef> ::= @:<DataRef> tpercent:T_PERCENT Name:<Name>  :production409
+         * <DataRef> ::= @:<DataRef> tpercent:T_PERCENT componentName:<Name>  :production409
          */
         protected ASTDataRefNode userAction(ASTDataRefNode v1, Token v2, ASTNameNode v3)
         {
@@ -25132,7 +25132,7 @@ public class Productions extends AbstractProductions
                             if (name.equals("tpercent"))
                                 return 4;
                             else
-                                if (name.equals("Name"))
+                                if (name.equals("componentName"))
                                     return 5;
                                 else
                                     return -1;
@@ -25146,16 +25146,16 @@ public class Productions extends AbstractProductions
         private static Production4092Production singletonInstance = null;
         public static final Production4092Production getInstance() { if (singletonInstance == null) singletonInstance = new Production4092Production(); return singletonInstance; }
 
-        public String getDescription() { return "<DataRef> ::= @:<DataRef> <DataRef@17> tpercent:T_PERCENT Name:<Name>  :production4092"; }
+        public String getDescription() { return "<DataRef> ::= @:<DataRef> <DataRef@17> tpercent:T_PERCENT componentName:<Name>  :production4092"; }
 
         /**
-         * Reduce by <DataRef> ::= @:<DataRef> <DataRef@17> tpercent:T_PERCENT Name:<Name>  :production4092
+         * Reduce by <DataRef> ::= @:<DataRef> <DataRef@17> tpercent:T_PERCENT componentName:<Name>  :production4092
          */
         void reduce(Parser parser)
         {
             ArrayList valueStack = parser.getValueStack();
 
-            // Reduce by <DataRef> ::= @:<DataRef> <DataRef@17> tpercent:T_PERCENT Name:<Name>  :production4092
+            // Reduce by <DataRef> ::= @:<DataRef> <DataRef@17> tpercent:T_PERCENT componentName:<Name>  :production4092
             ASTNameNode v6 = (ASTNameNode)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
             Token v5 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
             Token v4 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
@@ -25172,7 +25172,7 @@ public class Productions extends AbstractProductions
 
         /**
          * This method is called when the parser is about to reduce by
-         * <DataRef> ::= @:<DataRef> <DataRef@17> tpercent:T_PERCENT Name:<Name>  :production4092
+         * <DataRef> ::= @:<DataRef> <DataRef@17> tpercent:T_PERCENT componentName:<Name>  :production4092
          */
         protected ASTDataRefNode userAction(ASTDataRefNode v1, Token v2, ASTSectionSubscriptListNode v3, Token v4, Token v5, ASTNameNode v6)
         {
@@ -25203,7 +25203,7 @@ public class Productions extends AbstractProductions
                             if (name.equals("tpercent"))
                                 return 4;
                             else
-                                if (name.equals("Name"))
+                                if (name.equals("componentName"))
                                     return 5;
                                 else
                                     return -1;
@@ -25217,16 +25217,16 @@ public class Productions extends AbstractProductions
         private static Production410Production singletonInstance = null;
         public static final Production410Production getInstance() { if (singletonInstance == null) singletonInstance = new Production410Production(); return singletonInstance; }
 
-        public String getDescription() { return "<SFDataRef> ::= Name:<Name> tpercent:T_PERCENT Name2:<Name>  :production410"; }
+        public String getDescription() { return "<SFDataRef> ::= varName:<Name> tpercent:T_PERCENT componentName:<Name>  :production410"; }
 
         /**
-         * Reduce by <SFDataRef> ::= Name:<Name> tpercent:T_PERCENT Name2:<Name>  :production410
+         * Reduce by <SFDataRef> ::= varName:<Name> tpercent:T_PERCENT componentName:<Name>  :production410
          */
         void reduce(Parser parser)
         {
             ArrayList valueStack = parser.getValueStack();
 
-            // Reduce by <SFDataRef> ::= Name:<Name> tpercent:T_PERCENT Name2:<Name>  :production410
+            // Reduce by <SFDataRef> ::= varName:<Name> tpercent:T_PERCENT componentName:<Name>  :production410
             ASTNameNode v3 = (ASTNameNode)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
             Token v2 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
             ASTNameNode v1 = (ASTNameNode)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
@@ -25240,7 +25240,7 @@ public class Productions extends AbstractProductions
 
         /**
          * This method is called when the parser is about to reduce by
-         * <SFDataRef> ::= Name:<Name> tpercent:T_PERCENT Name2:<Name>  :production410
+         * <SFDataRef> ::= varName:<Name> tpercent:T_PERCENT componentName:<Name>  :production410
          */
         protected ASTSFDataRefNode userAction(ASTNameNode v1, Token v2, ASTNameNode v3)
         {
@@ -25253,13 +25253,13 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals("Name"))
+            if (name.equals("varName"))
                 return 0;
             else
                 if (name.equals("tpercent"))
                     return 1;
                 else
-                    if (name.equals("Name2"))
+                    if (name.equals("componentName"))
                         return 2;
                     else
                         return -1;
@@ -25273,16 +25273,16 @@ public class Productions extends AbstractProductions
         private static Production411Production singletonInstance = null;
         public static final Production411Production getInstance() { if (singletonInstance == null) singletonInstance = new Production411Production(); return singletonInstance; }
 
-        public String getDescription() { return "<SFDataRef> ::= Name:<Name> tlparen:T_LPAREN SectionSubscriptList:<SectionSubscriptList> trparen:T_RPAREN  :production411"; }
+        public String getDescription() { return "<SFDataRef> ::= varName:<Name> tlparen:T_LPAREN SectionSubscriptList:<SectionSubscriptList> trparen:T_RPAREN  :production411"; }
 
         /**
-         * Reduce by <SFDataRef> ::= Name:<Name> tlparen:T_LPAREN SectionSubscriptList:<SectionSubscriptList> trparen:T_RPAREN  :production411
+         * Reduce by <SFDataRef> ::= varName:<Name> tlparen:T_LPAREN SectionSubscriptList:<SectionSubscriptList> trparen:T_RPAREN  :production411
          */
         void reduce(Parser parser)
         {
             ArrayList valueStack = parser.getValueStack();
 
-            // Reduce by <SFDataRef> ::= Name:<Name> tlparen:T_LPAREN SectionSubscriptList:<SectionSubscriptList> trparen:T_RPAREN  :production411
+            // Reduce by <SFDataRef> ::= varName:<Name> tlparen:T_LPAREN SectionSubscriptList:<SectionSubscriptList> trparen:T_RPAREN  :production411
             Token v4 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
             ASTSectionSubscriptListNode v3 = (ASTSectionSubscriptListNode)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
             Token v2 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
@@ -25297,7 +25297,7 @@ public class Productions extends AbstractProductions
 
         /**
          * This method is called when the parser is about to reduce by
-         * <SFDataRef> ::= Name:<Name> tlparen:T_LPAREN SectionSubscriptList:<SectionSubscriptList> trparen:T_RPAREN  :production411
+         * <SFDataRef> ::= varName:<Name> tlparen:T_LPAREN SectionSubscriptList:<SectionSubscriptList> trparen:T_RPAREN  :production411
          */
         protected ASTSFDataRefNode userAction(ASTNameNode v1, Token v2, ASTSectionSubscriptListNode v3, Token v4)
         {
@@ -25311,7 +25311,7 @@ public class Productions extends AbstractProductions
 
         public int getNamedIndex(String name)
         {
-            if (name.equals("Name"))
+            if (name.equals("varName"))
                 return 0;
             else
                 if (name.equals("tlparen"))
@@ -25334,16 +25334,16 @@ public class Productions extends AbstractProductions
         private static Production412Production singletonInstance = null;
         public static final Production412Production getInstance() { if (singletonInstance == null) singletonInstance = new Production412Production(); return singletonInstance; }
 
-        public String getDescription() { return "<SFDataRef> ::= @:<SFDataRef> tpercent:T_PERCENT Name:<Name>  :production412"; }
+        public String getDescription() { return "<SFDataRef> ::= @:<SFDataRef> tpercent:T_PERCENT componentName:<Name>  :production412"; }
 
         /**
-         * Reduce by <SFDataRef> ::= @:<SFDataRef> tpercent:T_PERCENT Name:<Name>  :production412
+         * Reduce by <SFDataRef> ::= @:<SFDataRef> tpercent:T_PERCENT componentName:<Name>  :production412
          */
         void reduce(Parser parser)
         {
             ArrayList valueStack = parser.getValueStack();
 
-            // Reduce by <SFDataRef> ::= @:<SFDataRef> tpercent:T_PERCENT Name:<Name>  :production412
+            // Reduce by <SFDataRef> ::= @:<SFDataRef> tpercent:T_PERCENT componentName:<Name>  :production412
             ASTNameNode v3 = (ASTNameNode)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
             Token v2 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
             ASTSFDataRefNode v1 = (ASTSFDataRefNode)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
@@ -25357,7 +25357,7 @@ public class Productions extends AbstractProductions
 
         /**
          * This method is called when the parser is about to reduce by
-         * <SFDataRef> ::= @:<SFDataRef> tpercent:T_PERCENT Name:<Name>  :production412
+         * <SFDataRef> ::= @:<SFDataRef> tpercent:T_PERCENT componentName:<Name>  :production412
          */
         protected ASTSFDataRefNode userAction(ASTSFDataRefNode v1, Token v2, ASTNameNode v3)
         {
@@ -25388,7 +25388,7 @@ public class Productions extends AbstractProductions
                             if (name.equals("tpercent"))
                                 return 4;
                             else
-                                if (name.equals("Name"))
+                                if (name.equals("componentName"))
                                     return 5;
                                 else
                                     return -1;
@@ -25402,16 +25402,16 @@ public class Productions extends AbstractProductions
         private static Production4122Production singletonInstance = null;
         public static final Production4122Production getInstance() { if (singletonInstance == null) singletonInstance = new Production4122Production(); return singletonInstance; }
 
-        public String getDescription() { return "<SFDataRef> ::= @:<SFDataRef> <SFDataRef@18> tpercent:T_PERCENT Name:<Name>  :production4122"; }
+        public String getDescription() { return "<SFDataRef> ::= @:<SFDataRef> <SFDataRef@18> tpercent:T_PERCENT componentName:<Name>  :production4122"; }
 
         /**
-         * Reduce by <SFDataRef> ::= @:<SFDataRef> <SFDataRef@18> tpercent:T_PERCENT Name:<Name>  :production4122
+         * Reduce by <SFDataRef> ::= @:<SFDataRef> <SFDataRef@18> tpercent:T_PERCENT componentName:<Name>  :production4122
          */
         void reduce(Parser parser)
         {
             ArrayList valueStack = parser.getValueStack();
 
-            // Reduce by <SFDataRef> ::= @:<SFDataRef> <SFDataRef@18> tpercent:T_PERCENT Name:<Name>  :production4122
+            // Reduce by <SFDataRef> ::= @:<SFDataRef> <SFDataRef@18> tpercent:T_PERCENT componentName:<Name>  :production4122
             ASTNameNode v6 = (ASTNameNode)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
             Token v5 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
             Token v4 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
@@ -25428,7 +25428,7 @@ public class Productions extends AbstractProductions
 
         /**
          * This method is called when the parser is about to reduce by
-         * <SFDataRef> ::= @:<SFDataRef> <SFDataRef@18> tpercent:T_PERCENT Name:<Name>  :production4122
+         * <SFDataRef> ::= @:<SFDataRef> <SFDataRef@18> tpercent:T_PERCENT componentName:<Name>  :production4122
          */
         protected ASTSFDataRefNode userAction(ASTSFDataRefNode v1, Token v2, ASTSectionSubscriptListNode v3, Token v4, Token v5, ASTNameNode v6)
         {
@@ -25459,7 +25459,7 @@ public class Productions extends AbstractProductions
                             if (name.equals("tpercent"))
                                 return 4;
                             else
-                                if (name.equals("Name"))
+                                if (name.equals("componentName"))
                                     return 5;
                                 else
                                     return -1;

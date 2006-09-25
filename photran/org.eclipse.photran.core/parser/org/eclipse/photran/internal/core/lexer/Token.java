@@ -47,16 +47,17 @@ public class Token extends AbstractParseTreeNode implements ParserSymbol, IAdapt
     // Constructors
     ///////////////////////////////////////////////////////////////////////////
     
-    public Token()
-    {
-    }
-
     public Token(Terminal terminal, String whiteBefore, String tokenText, String whiteAfter)
     {
         this.terminal    = terminal;
         this.whiteBefore = whiteBefore == null ? "" : whiteBefore;
         this.text   = tokenText   == null ? "" : tokenText;
         this.whiteAfter  = whiteAfter  == null ? "" : whiteAfter;
+    }
+    
+    public Token(Terminal terminal, String tokenText)
+    {
+        this(terminal, null, tokenText, null);
     }
     
     ///////////////////////////////////////////////////////////////////////////

@@ -4,8 +4,8 @@ package org.eclipse.photran.internal.core.parser; import org.eclipse.photran.int
 
 
 /**
- * <DataRef> ::= Name:<Name>  :production408
- * <DataRef> ::= @:<DataRef> ( tlparen:T_LPAREN SectionSubscriptList:<SectionSubscriptList> trparen:T_RPAREN )? tpercent:T_PERCENT Name:<Name>  :production409
+ * <DataRef> ::= varName:<Name>  :production408
+ * <DataRef> ::= @:<DataRef> ( tlparen:T_LPAREN SectionSubscriptList:<SectionSubscriptList> trparen:T_RPAREN )? tpercent:T_PERCENT componentName:<Name>  :production409
  */
 public class ASTDataRefNode extends ParseTreeNode
 {
@@ -26,12 +26,12 @@ public class ASTDataRefNode extends ParseTreeNode
         return count;
     }
 
-    public ASTNameNode getASTName(int index)
+    public ASTNameNode getASTVarName(int index)
     {
         ASTDataRefNode node = this;
         for (int i = 0; i < index; i++)
             node = (ASTDataRefNode)node.getChild("@");
-        return (ASTNameNode)node.getChild("Name");
+        return (ASTNameNode)node.getChild("varName");
     }
 
     public Token getASTTlparen(int index)
@@ -64,6 +64,14 @@ public class ASTDataRefNode extends ParseTreeNode
         for (int i = 0; i < index; i++)
             node = (ASTDataRefNode)node.getChild("@");
         return node.getChildToken("tpercent");
+    }
+
+    public ASTNameNode getASTComponentName(int index)
+    {
+        ASTDataRefNode node = this;
+        for (int i = 0; i < index; i++)
+            node = (ASTDataRefNode)node.getChild("@");
+        return (ASTNameNode)node.getChild("componentName");
     }
 
     protected void visitThisNodeUsing(ASTVisitor visitor) { visitor.visitASTDataRefNode(this); }

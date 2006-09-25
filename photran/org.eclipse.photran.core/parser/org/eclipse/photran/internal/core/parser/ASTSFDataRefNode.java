@@ -4,9 +4,9 @@ package org.eclipse.photran.internal.core.parser; import org.eclipse.photran.int
 
 
 /**
- * <SFDataRef> ::= Name:<Name> tpercent:T_PERCENT Name2:<Name>  :production410
- * <SFDataRef> ::= Name:<Name> tlparen:T_LPAREN SectionSubscriptList:<SectionSubscriptList> trparen:T_RPAREN  :production411
- * <SFDataRef> ::= @:<SFDataRef> ( tlparen:T_LPAREN SectionSubscriptList:<SectionSubscriptList> trparen:T_RPAREN )? tpercent:T_PERCENT Name:<Name>  :production412
+ * <SFDataRef> ::= varName:<Name> tpercent:T_PERCENT componentName:<Name>  :production410
+ * <SFDataRef> ::= varName:<Name> tlparen:T_LPAREN SectionSubscriptList:<SectionSubscriptList> trparen:T_RPAREN  :production411
+ * <SFDataRef> ::= @:<SFDataRef> ( tlparen:T_LPAREN SectionSubscriptList:<SectionSubscriptList> trparen:T_RPAREN )? tpercent:T_PERCENT componentName:<Name>  :production412
  */
 public class ASTSFDataRefNode extends ParseTreeNode
 {
@@ -27,12 +27,12 @@ public class ASTSFDataRefNode extends ParseTreeNode
         return count;
     }
 
-    public ASTNameNode getASTName(int index)
+    public ASTNameNode getASTVarName(int index)
     {
         ASTSFDataRefNode node = this;
         for (int i = 0; i < index; i++)
             node = (ASTSFDataRefNode)node.getChild("@");
-        return (ASTNameNode)node.getChild("Name");
+        return (ASTNameNode)node.getChild("varName");
     }
 
     public Token getASTTpercent(int index)
@@ -43,12 +43,12 @@ public class ASTSFDataRefNode extends ParseTreeNode
         return node.getChildToken("tpercent");
     }
 
-    public ASTNameNode getASTName2(int index)
+    public ASTNameNode getASTComponentName(int index)
     {
         ASTSFDataRefNode node = this;
         for (int i = 0; i < index; i++)
             node = (ASTSFDataRefNode)node.getChild("@");
-        return (ASTNameNode)node.getChild("Name2");
+        return (ASTNameNode)node.getChild("componentName");
     }
 
     public Token getASTTlparen(int index)

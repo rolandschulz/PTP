@@ -1014,13 +1014,13 @@
 
 # R612
 <DataRef> ::=
-    <Name>
-  | @:<DataRef> ( T_LPAREN <SectionSubscriptList> T_RPAREN )? T_PERCENT <Name>
+    varName:<Name>
+  | @:<DataRef> ( T_LPAREN <SectionSubscriptList> T_RPAREN )? T_PERCENT componentName:<Name>
 
 <SFDataRef> ::=
-    <Name> T_PERCENT <Name>
-  | <Name> T_LPAREN <SectionSubscriptList> T_RPAREN
-  | @:<SFDataRef> ( T_LPAREN <SectionSubscriptList> T_RPAREN )? T_PERCENT <Name>
+    varName:<Name> T_PERCENT componentName:<Name>
+  | varName:<Name> T_LPAREN <SectionSubscriptList> T_RPAREN
+  | @:<SFDataRef> ( T_LPAREN <SectionSubscriptList> T_RPAREN )? T_PERCENT componentName:<Name>
 
 
 # R613 chain rule deleted;
