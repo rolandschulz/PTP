@@ -34,7 +34,6 @@ public class FortranSourceViewerConfiguration extends SourceViewerConfiguration 
 
 	FortranSourceViewerConfiguration(AbstractFortranEditor editor) {
 		this.editor = editor;
-
 	}
 
 	// ----- TABS AND SPACES PREFERENCES ---------------------------------------
@@ -119,7 +118,7 @@ public class FortranSourceViewerConfiguration extends SourceViewerConfiguration 
 	 */
 	public IPresentationReconciler getPresentationReconciler(ISourceViewer sourceViewer) {
 		reconciler = new PresentationReconciler();
-		if (editor instanceof FortranFixedFormEditor || editor.getLinesOfCode() <= FortranFreeFormEditor.MAX_LINES_FOR_LEXER_BASED_SCANNER) {
+		if (/*editor instanceof FortranFixedFormEditor ||*/ editor.getLinesOfCode() <= FortranFreeFormEditor.MAX_LINES_FOR_LEXER_BASED_SCANNER) {
 			Partition[] partitionTypes = FortranPartitionScanner.getPartitionTypes();
 			for (int i = 0; i < partitionTypes.length; i++) {
 				Partition p = partitionTypes[i];
@@ -139,7 +138,7 @@ public class FortranSourceViewerConfiguration extends SourceViewerConfiguration 
 
 	private FortranKeywordRuleBasedScanner getTagScanner() {
         if (scanner == null)
-            scanner = new FortranKeywordRuleBasedScanner();
+            scanner = new FortranKeywordRuleBasedScanner(this.editor instanceof FortranFixedFormEditor);
         return scanner;
 	}
 }

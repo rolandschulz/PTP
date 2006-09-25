@@ -4,7 +4,9 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.rules.EndOfLineRule;
+import org.eclipse.jface.text.rules.ICharacterScanner;
 import org.eclipse.jface.text.rules.IRule;
+import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.IWordDetector;
 import org.eclipse.jface.text.rules.MultiLineRule;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
@@ -127,19 +129,84 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner {
 		}
 	};
 
-	public FortranKeywordRuleBasedScanner() {
+	public FortranKeywordRuleBasedScanner(boolean isFixedForm) {
 		FortranUIPlugin.getDefault().getPreferenceStore().addPropertyChangeListener(colorPreferenceListener);
 
-        IRule[] rules = new IRule[4];
-        // Add rule for processing instructions
-        rules[0] = new MultiLineRule("\"", "\"", F90_STRING_CONSTANTS_COLOR);
-        rules[1] = new MultiLineRule("'", "'", F90_STRING_CONSTANTS_COLOR);
-        // Add generic whitespace rule.
-        rules[2] = new EndOfLineRule("!", F90_COMMENT_COLOR);
-        
-        WordRule rule = new WordRule(new FortranWordDetector(), F90_IDENTIFIER_COLOR);
+        IRule[] rules = new IRule[isFixedForm ? 7 : 4];
+        int i = 0;
+
+        rules[i++] = new MultiLineRule("\"", "\"", F90_STRING_CONSTANTS_COLOR);
+        rules[i++] = new MultiLineRule("'", "'", F90_STRING_CONSTANTS_COLOR);
+
+        rules[i++] = new EndOfLineRule("!", F90_COMMENT_COLOR);
+        if (isFixedForm)
+        {
+            EndOfLineRule c1 = new EndOfLineRule("c", F90_COMMENT_COLOR);
+            c1.setColumnConstraint(0);
+            rules[i++] = c1;
+            
+            EndOfLineRule c2 = new EndOfLineRule("C", F90_COMMENT_COLOR);
+            c2.setColumnConstraint(0);
+            rules[i++] = c2;
+            
+            IRule c3 = new IRule()
+            {
+                public IToken evaluate(ICharacterScanner scanner)
+                {
+                    IToken result = Token.UNDEFINED;
+                    scanner.read();
+                    if (scanner.getColumn() > 72)
+                    {
+                        result = F90_COMMENT_COLOR;
+                        do scanner.read(); while (scanner.getColumn() > 72);
+                    }
+                    scanner.unread();
+                    return result;
+                }
+            };
+            rules[i++] = c3;
+        }
+                
+        WordRule rule = isFixedForm
+            ? new WordRule(new FortranWordDetector(), F90_IDENTIFIER_COLOR)
+              {
+                 private StringBuffer fBuffer= new StringBuffer();
+
+                 public IToken evaluate(ICharacterScanner scanner)
+                 {
+//                    int c= scanner.read();
+//                    boolean canStart = fDetector.isWordStart((char)c) && scanner.getColumn() >= 7;
+//                    scanner.unread();
+//                    return canStart ? super.evaluate(scanner) : Token.UNDEFINED;
+
+                    int c= scanner.read();
+                    if (fDetector.isWordStart((char) c) && scanner.getColumn() > 6) {
+                        fBuffer.setLength(0);
+                        do {
+                            fBuffer.append((char) c);
+                            c= scanner.read();
+                        } while (c != ICharacterScanner.EOF
+                                 && fDetector.isWordPart((char) c)
+                                 && scanner.getColumn() <= 72);
+                        scanner.unread();
+
+                        IToken token= (IToken) fWords.get(fBuffer.toString());
+                        if (token != null)
+                            return token;
+
+                        if (fDefaultToken.isUndefined())
+                            unreadBuffer(scanner);
+
+                        return fDefaultToken;
+                    }
+
+                    scanner.unread();
+                    return Token.UNDEFINED;
+                 }
+              }
+            : new WordRule(new FortranWordDetector(), F90_IDENTIFIER_COLOR);
         createSpecialWordRules(rule);
-        rules[3] = rule;
+        rules[i++] = rule;
         
         setRules(rules);
         setDefaultReturnToken(new Token(new TextAttribute(new Color(Display.getCurrent(), new RGB(0, 0, 0))))); // Punctuation, numbers, etc.

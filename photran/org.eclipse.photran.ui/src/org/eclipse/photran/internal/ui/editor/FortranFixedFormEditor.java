@@ -13,6 +13,8 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.jface.text.ITextViewerExtension2;
 import org.eclipse.jface.text.MarginPainter;
+import org.eclipse.jface.text.rules.DefaultPartitioner;
+import org.eclipse.jface.text.rules.RuleBasedPartitionScanner;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.photran.internal.ui.actions.FortranCommentActions;
@@ -67,12 +69,31 @@ public class FortranFixedFormEditor extends AbstractFortranEditor {
 		super.doSetInput(input);
 		IDocument document = this.getDocumentProvider().getDocument(input);
 		
-		if (document != null) {
-			IDocumentPartitioner partitioner = new FortranPartitionScanner(input.getName(), true);
-			partitioner.connect(document);
-			document.setDocumentPartitioner(partitioner);
-			configureTabConverter(); // prepare a new TabConverter for the document
-		}
+//		if (document != null) {
+//			IDocumentPartitioner partitioner = new FortranPartitionScanner(input.getName(), true);
+//			partitioner.connect(document);
+//			document.setDocumentPartitioner(partitioner);
+//			configureTabConverter(); // prepare a new TabConverter for the document
+//		}
+
+        if (document != null) {
+            linesOfCode = document.getNumberOfLines();
+            if (document.getNumberOfLines() > FortranFreeFormEditor.MAX_LINES_FOR_LEXER_BASED_SCANNER) {
+                RuleBasedPartitionScanner sScanner = new RuleBasedPartitionScanner();
+                IDocumentPartitioner partitioner = new DefaultPartitioner(
+                        sScanner,
+                        new String[] { FortranPartitionScanner.F90_STRING_CONSTANTS_PARTITION });
+                partitioner.connect(document);
+                document.setDocumentPartitioner(partitioner);
+            } else {
+                IDocumentPartitioner partitioner = new FortranPartitionScanner(
+                        input.getName(), false);
+                partitioner.connect(document);
+                document.setDocumentPartitioner(partitioner);
+            }
+            configureTabConverter(); // prepare a new TabConverter for the
+            // document
+        }
 	}
 
 	// --- RESPOND TO PREFERENCE CHANGES ---//
