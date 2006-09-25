@@ -21,7 +21,7 @@ class FixedFormLexerPhase2 implements ILexer
 
     private Token nextToken = null;
 
-    public FixedFormLexerPhase2(InputStream in, String filename)
+    public FixedFormLexerPhase2(InputStream in, String filename, int options)
     {
         final FixedFormLexerPrepass prepass = new FixedFormLexerPrepass(in);
         InputStream prepassReader = new InputStream()
@@ -41,7 +41,7 @@ class FixedFormLexerPhase2 implements ILexer
         };
 
         FixedFormLexerPhase1 fixedLexer1 = new FixedFormLexerPhase1(prepassReader, prepass, filename);
-        freeLexer2 = new FreeFormLexerPhase2(fixedLexer1);
+        freeLexer2 = new FreeFormLexerPhase2(fixedLexer1, options);
     }
 
     public Token yylex() throws Exception
@@ -79,5 +79,15 @@ class FixedFormLexerPhase2 implements ILexer
     public int getLastTokenCol()
     {
         return freeLexer2.getLastTokenCol();
+    }
+    
+    public int getLastTokenOffset()
+    {
+        return freeLexer2.getLastTokenOffset();
+    }
+    
+    public int getLastTokenLength()
+    {
+        return freeLexer2.getLastTokenLength();
     }
 }

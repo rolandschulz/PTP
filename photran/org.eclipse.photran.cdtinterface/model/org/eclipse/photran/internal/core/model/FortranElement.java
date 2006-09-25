@@ -7,8 +7,10 @@ import org.eclipse.cdt.core.model.ISourceReference;
 import org.eclipse.cdt.internal.core.model.Parent;
 import org.eclipse.cdt.internal.core.model.SourceManipulation;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.photran.internal.core.f95modelparser.Token;
 import org.eclipse.photran.cdtinterface.CDTInterfacePlugin;
+import org.eclipse.photran.core.util.LineCol;
+import org.eclipse.photran.core.util.OffsetLength;
+import org.eclipse.photran.internal.core.lexer.Token;
 
 /**
  * Photran inherits from its CDT heritage the C Model, which is a tree representing a C workspace.
@@ -78,9 +80,14 @@ public abstract class FortranElement extends SourceManipulation // Parent
 
         if (identifier != null)
         {
-            setIdPos(identifier.getOffset(), identifier.getLength());
-            setPos(identifier.getOffset(), identifier.getLength());
-            setLines(identifier.getStartLine(), identifier.getEndLine());
+            LineCol pos = (LineCol)identifier.getAdapter(LineCol.class);
+            OffsetLength ol = (OffsetLength)identifier.getAdapter(OffsetLength.class);
+            if (pos != null && ol != null)
+            {
+                setIdPos(ol.getOffset(), ol.getLength());
+                setPos(ol.getOffset(), ol.getLength());
+                setLines(pos.getLine(), pos.getLine());
+            }
         }
     }
 
@@ -109,7 +116,7 @@ public abstract class FortranElement extends SourceManipulation // Parent
      */
 	public FortranElement(Parent parent, String name) //, int type)
     {
-		super(parent, name == null ? "" : name, -1); //type);
+		super(parent, name == null ? "(anonymous)" : name, -1); //type);
 	}
 
 	public Object getAdapter(Class required)

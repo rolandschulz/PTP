@@ -28,9 +28,16 @@ The following projects comprise Photran as it is distributed to users.
 	This is the Photran Core plug-in.  It
 	contains most of the Fortran-specific ``behind the scenes'' functionality:
 	\begin{itemize}
+	\item Utility classes
 	\item Error parsers for Fortran compilers
+	\item Fortran 95 parser
 	\item Workspace preferences
 	\end{itemize}
+
+\item org.eclipse.photran.core.analysis
+
+	Beginnings of analysis support (scope, bindings, etc.) for Fortran, mainly as a basis
+	for refactoring.
 
 \item org.eclipse.photran.managedbuilder.core,
       org.eclipse.photran.managedbuilder.gnu.ui,
@@ -46,9 +53,11 @@ The following projects comprise Photran as it is distributed to users.
 	Support for Managed Build projects using Intel toolchains.
 	Maintained by Intel.
 
-\item org.eclipse.photran.refactoring
+\item org.eclipse.photran.refactoring.core,
+      org.eclipse.photran.refactoring.ui,
+      org.eclipse.photran.refactoring-feature
 
-	Fortran parser, refactoring engine, and refactoring UI.  Not very useful yet.
+	Support for refactoring Fortran.  In progress.
 
 \item org.eclipse.photran.ui
 
@@ -57,6 +66,13 @@ The following projects comprise Photran as it is distributed to users.
 	\item Editor
 	\item Preference pages
 	\end{itemize}
+
+\noindent The following projects contain JUnit tests for like-named
+plug-ins, but they are not included in the actual Photran distribution:
+
+\item org.eclipse.photran.cdtinterface.tests
+\item org.eclipse.photran.core.tests
+\item org.eclipse.photran.refactoring.tests
 
 \noindent The following projects are in CVS but are not included directly in the
 Photran distribution:
@@ -67,11 +83,6 @@ Photran distribution:
 	Contains the LaTeX source for this document, the materials from our
 	presentation at EclipseCon 2006 on adding a new language to the CDT,
 	and various other documentation notes.
-
-\item org.eclipse.photran.tests
-
-	This contains JUnit tests for the parser, symbol table builder,
-	source printer, program editor, refactorings, etc.
 
 \item org.eclipse.photran-misc
 

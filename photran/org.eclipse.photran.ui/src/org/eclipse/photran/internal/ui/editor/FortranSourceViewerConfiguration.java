@@ -98,7 +98,7 @@ public class FortranSourceViewerConfiguration extends SourceViewerConfiguration 
 	public IAutoEditStrategy[] getAutoEditStrategies(ISourceViewer sourceViewer, String contentType) {
 
 		
-		return new IAutoEditStrategy[] {new FortranAutoIndentStrategy(editor instanceof FortranFreeFormEditor)};
+		return new IAutoEditStrategy[] {/*new FortranAutoIndentStrategy(editor instanceof FortranFreeFormEditor)*/};
 	}
 
 	// ----- SYNTAX HIGHLIGHTING -----------------------------------------------
@@ -117,24 +117,20 @@ public class FortranSourceViewerConfiguration extends SourceViewerConfiguration 
 	 * 
 	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getPresentationReconciler(org.eclipse.jface.text.source.ISourceViewer)
 	 */
-	public IPresentationReconciler getPresentationReconciler(
-			ISourceViewer sourceViewer) {
+	public IPresentationReconciler getPresentationReconciler(ISourceViewer sourceViewer) {
 		reconciler = new PresentationReconciler();
-		if (editor.getLinesOfCode() <= FortranFreeFormEditor.MAX_LINES_FOR_LEXER_BASED_SCANNER) {
-			Partition[] partitionTypes = FortranPartitionScanner
-					.getPartitionTypes();
+		if (editor instanceof FortranFixedFormEditor || editor.getLinesOfCode() <= FortranFreeFormEditor.MAX_LINES_FOR_LEXER_BASED_SCANNER) {
+			Partition[] partitionTypes = FortranPartitionScanner.getPartitionTypes();
 			for (int i = 0; i < partitionTypes.length; i++) {
 				Partition p = partitionTypes[i];
-				FortranDamagerRepairer dr = new FortranDamagerRepairer(p
-						.getTokenScanner());
+				FortranDamagerRepairer dr = new FortranDamagerRepairer(p.getTokenScanner());
 				reconciler.setDamager(dr, p.getContentType());
 				reconciler.setRepairer(dr, p.getContentType());
 			}
 			// return reconciler;
 			// reconciler = new PresentationReconciler();
 		} else {
-			DefaultDamagerRepairer dr1 = new DefaultDamagerRepairer(
-					getTagScanner());
+			DefaultDamagerRepairer dr1 = new DefaultDamagerRepairer(getTagScanner());
 			reconciler.setDamager(dr1, IDocument.DEFAULT_CONTENT_TYPE);
 			reconciler.setRepairer(dr1, IDocument.DEFAULT_CONTENT_TYPE);
 		}

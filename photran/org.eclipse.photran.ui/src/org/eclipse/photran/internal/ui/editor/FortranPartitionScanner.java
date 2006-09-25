@@ -18,11 +18,12 @@ import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.photran.internal.core.f95modelparser.ILexer;
-import org.eclipse.photran.internal.core.f95modelparser.Lexer;
-import org.eclipse.photran.internal.core.f95modelparser.Terminal;
-import org.eclipse.photran.internal.core.f95modelparser.Token;
-import org.eclipse.photran.internal.core.model.FortranModelBuilder;
+import org.eclipse.photran.core.util.OffsetLength;
+import org.eclipse.photran.internal.core.lexer.ILexer;
+import org.eclipse.photran.internal.core.lexer.LexerFactory;
+import org.eclipse.photran.internal.core.lexer.LexerOptions;
+import org.eclipse.photran.internal.core.lexer.Token;
+import org.eclipse.photran.internal.core.parser.Terminal;
 import org.eclipse.photran.internal.ui.preferences.ColorPreferencePage;
 import org.eclipse.photran.ui.FortranUIPlugin;
 import org.eclipse.swt.SWT;
@@ -232,8 +233,6 @@ public final class FortranPartitionScanner implements IDocumentPartitioner
     {
 		this.filename = filename;
 		this.isFixedForm = isFixedForm;
-        
-        FortranModelBuilder.forceFormat(filename, isFixedForm);
 
 		FortranUIPlugin.getDefault().getPreferenceStore().addPropertyChangeListener(colorPreferenceListener);
 	}
@@ -357,17 +356,20 @@ public final class FortranPartitionScanner implements IDocumentPartitioner
         
         try
         {
-            ILexer lexer = Lexer.createLexer(new ByteArrayInputStream(doc.get().getBytes()), this.filename, isFixedForm);
-            Token token;
-            Terminal terminal;
-            for (token = null, terminal = null; (terminal = (token = lexer.yylex()).getTerminal()) != Terminal.END_OF_INPUT;)
+            ILexer lexer = LexerFactory.createLexer(new ByteArrayInputStream(doc.get().getBytes()),
+                                                    this.filename,
+                                                    (isFixedForm ? LexerOptions.FIXED_FORM : LexerOptions.FREE_FORM) | LexerOptions.ASSOCIATE_OFFSET_LENGTH);
+            Token token = null;
+            Terminal terminal = null;
+            while ((terminal = (token = lexer.yylex()).getTerminal()) != Terminal.END_OF_INPUT)
             {
                 // JO: The fixed form lexer puts these in the stream out of order, and they don't really matter to us
                 // anyway since they're just whitespace
                 if (terminal == Terminal.T_EOS) continue;
 
-                int offset = token.getOffset();
-                int length = token.getLength();
+                OffsetLength ol = (OffsetLength)token.getAdapter(OffsetLength.class);
+                int offset = ol.getOffset();
+                int length = ol.getLength();
                 String type = mapTerminalToPartitionType(terminal);
                 
                 // we know that the parser is initialized and is scanning! but is it not returning the right offsets or the right types
@@ -383,8 +385,9 @@ public final class FortranPartitionScanner implements IDocumentPartitioner
         {
             e.printStackTrace();
         }
-        catch (Exception e1)
+        catch (Exception e)
         {
+            e.printStackTrace();
             // Ignore lexer exceptions (e.g., unterminated string constant)
             // e1.printStackTrace();
         }

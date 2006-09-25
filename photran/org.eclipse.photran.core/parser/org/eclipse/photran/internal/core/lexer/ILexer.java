@@ -14,4 +14,8 @@ public interface ILexer
     int getLastTokenLine();
 
     int getLastTokenCol();
+    
+    int getLastTokenOffset();
+    
+    int getLastTokenLength();
 }

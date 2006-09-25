@@ -6,7 +6,6 @@ public final class LineCol
 
     public LineCol(int line, int col)
     {
-        super();
         this.line = line;
         this.col = col;
     }

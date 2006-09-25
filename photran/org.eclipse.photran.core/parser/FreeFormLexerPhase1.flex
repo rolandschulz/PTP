@@ -33,67 +33,46 @@ import org.eclipse.photran.internal.core.parser.Terminal;
 %ignorecase
 %type Token
 %{
-	private int lastTokenLine = 1, lastTokenCol = 1;
+	private StringBuffer whiteBeforeSB = new StringBuffer();
+	private int lastTokenLine = 1, lastTokenCol = 1, lastTokenOffset = 0, lastTokenLength = 0;
+	private Token lastToken = null;
+	private StringBuffer whiteAfterSB = new StringBuffer();
+	
+	private void storeNonTreeToken()
+	{
+		whiteBeforeSB.append(yytext());
+	}
 	
 	private Token token(Terminal terminal)
 	{
+		if (terminal == Terminal.END_OF_INPUT && lastToken != null)
+		{
+			lastToken.setWhiteAfter(lastToken.getWhiteAfter() + whiteBeforeSB.toString());
+			whiteBeforeSB = new StringBuffer();
+		}
+		
 		if (terminal == Terminal.T_SCON)
 		{
 			lastTokenLine = sbLine;
 			lastTokenCol = sbCol;
+			lastTokenOffset = sbOffset;
+			lastTokenLength = stringBuffer.toString().length();
 		}
 		else
 		{
 			lastTokenLine = yyline+1;
 			lastTokenCol = yycolumn+1;
+			lastTokenOffset = yychar;
+			lastTokenLength = yylength();
 		}
-		return new Token(terminal,
-		                 "",
+		lastToken = new Token(terminal,
+		                 whiteBeforeSB.toString(),
 		                 terminal == Terminal.T_SCON ? stringBuffer.toString() : yytext(),
-		                 "");
+		                 whiteAfterSB.toString());
+		whiteBeforeSB = new StringBuffer();
+		whiteAfterSB = new StringBuffer();
+		return lastToken;
 	}
-
-	/*
-	private Token token(Terminal terminal)
-	{
-		Token t = new Token();
-		t.setTerminal(terminal);
-		t.setFilename(getCurrentFilename());
-
-		if (terminal == Terminal.T_SCON)
-		{
-			String sbText = stringBuffer.toString();
-			t.setOffset(sbOffset);
-			t.setLength(sbText.length());
-			t.setText(sbText);
-			t.setStartLine(sbLine);
-			t.setStartCol(sbCol);
-		}
-		else
-		{
-			t.setOffset(yychar);
-			t.setLength(yylength());
-			t.setText(yytext());
-			t.setStartLine(yyline+1);
-			t.setStartCol(yycolumn+1);
-		}
-
-		// Iterate through the string to determine the ending line and column
-		t.setEndLine(t.getStartLine());
-		t.setEndCol(t.getStartCol()-1);
-		for (int i = 0; i < t.getLength(); i++)
-		{
-			if (t.getText().charAt(i) == '\n')
-			{
-				t.setEndLine(t.getEndLine()+1);
-				t.setEndCol(1);
-			}
-			else t.setEndCol(t.getEndCol()+1);
-		}
-
-		return t;
-	}
-	*/
 
 	//public static void main(String[] args) throws Exception
 	//{
@@ -122,6 +101,16 @@ import org.eclipse.photran.internal.core.parser.Terminal;
     public int getLastTokenCol()
     {
         return lastTokenCol;
+    }
+    
+    public int getLastTokenOffset()
+    {
+    	return lastTokenOffset;
+    }
+    
+    public int getLastTokenLength()
+    {
+        return lastTokenLength;
     }
 	
 	private void startInclude() throws FileNotFoundException
@@ -156,22 +145,6 @@ import org.eclipse.photran.internal.core.parser.Terminal;
 	private int sbOffset = -1;
 	private int sbLine = -1;
 	private int sbCol = -1;
-	
-//	private List/*<NonTreeToken>*/ nonTreeTokens = new LinkedList();
-//    public List/*<NonTreeToken>*/ getNonTreeTokens()
-//    {
-//    	return nonTreeTokens;
-//    }
-//
-	private void storeNonTreeToken()
-	{
-//		nonTreeTokens.add(new NonTreeToken(
-//		                        getCurrentFilename(),
-//		                        yychar,     // int offset
-//		                        yyline+1,   // int row
-//		                        yycolumn+1, // int col
-//		                        yytext()));
-	}
 %}
 
 LineTerminator = \r\n|\n|\r
@@ -217,15 +190,16 @@ CppIfndef="#ifndef"[^\r\n]*{LineTerminator}
 CppIf="#if"[^\r\n]*{LineTerminator}
 CppElse="#else"[^\r\n]*{LineTerminator}
 CppElif="#elif"[^\r\n]*{LineTerminator}
+CppEndIf="#endif"[^\r\n]*{LineTerminator}
 CppInclude="#include"[^\r\n]*{LineTerminator}
 CppDefine="#define"[^\r\n]*{LineTerminator}
 CppUndef="#undef"[^\r\n]*{LineTerminator}
 CppLine="#line"[^\r\n]*{LineTerminator}
 CppError="#error"[^\r\n]*{LineTerminator}
 CppPragma="#pragma"[^\r\n]*{LineTerminator}
-CppDirective={CppIfdef}|{CppIfndef}|{CppIf}|{CppElse}|{CppElif}|{CppInclude}|{CppDefine}|{CppUndef}|{CppLine}|{CppError}|{CppPragma}
+CppDirective={CppIfdef}|{CppIfndef}|{CppIf}|{CppElse}|{CppElif}|{CppEndIf}|{CppInclude}|{CppDefine}|{CppUndef}|{CppLine}|{CppError}|{CppPragma}
 
-FortranInclude="INCLUDE"[^\r\n]*{LineTerminator}
+FortranInclude="INCLUDE"[^=(%\r\n]*{LineTerminator}
 
 %state IMPLICIT
 %state QUOTED
@@ -435,11 +409,11 @@ FortranInclude="INCLUDE"[^\r\n]*{LineTerminator}
 								  sbCol = yycolumn+1;
 								  yybegin(DBLQUOTED); }
 {Comment}						{ storeNonTreeToken(); }
-{WhiteSpace}					{ }
+{WhiteSpace}					{ storeNonTreeToken(); }
 {CppDirective}					{ storeNonTreeToken(); }
 {FortranInclude}				{ storeNonTreeToken(); startInclude(); }
 {LineContinuation}				{ storeNonTreeToken(); }
-{LineTerminator}|";"			{ boolean b = wantEos; wantEos = false; if (b) return token(Terminal.T_EOS); }
+{LineTerminator}|";"			{ boolean b = wantEos; wantEos = false; if (b) return token(Terminal.T_EOS); else storeNonTreeToken(); }
 <<EOF>>							{ wantEos = false; yybegin(YYINITIAL); return token(Terminal.END_OF_INPUT); }
 }
 
@@ -454,26 +428,26 @@ FortranInclude="INCLUDE"[^\r\n]*{LineTerminator}
 }
 
 <QUOTED> {
-"''"							{ stringBuffer.append('\''); }
+"''"							{ stringBuffer.append("''"); }
 "'"								{ stringBuffer.append('\'');
 								  yybegin(YYINITIAL);
 								  wantEos = true;
 								  return token(Terminal.T_SCON); }
 [^\n\r&']+						{ stringBuffer.append( yytext() ); }
-{LineContinuation}				{ }
+{LineContinuation}				{ stringBuffer.append( yytext() ); }
 "&"								{ stringBuffer.append( yytext() ); }
 [\n\r]							{ throw new Exception("Lexer Error (" + getCurrentFilename() + ", line " + (yyline+1) + ", col " + (yycolumn+1) + "): String literal spans multiple lines without continuation"); }
 <<EOF>>							{ throw new Exception("Lexer Error (" + getCurrentFilename() + ", line " + (yyline+1) + ", col " + (yycolumn+1) + "): End of file encountered before string literal terminated"); }
 }
 
 <DBLQUOTED> {
-\"\"							{ stringBuffer.append('\"'); }
+\"\"							{ stringBuffer.append("\"\""); }
 \"								{ stringBuffer.append('\"');
 								  yybegin(YYINITIAL);
 								  wantEos = true;
 								  return token(Terminal.T_SCON); }
 [^\n\r&\"]+						{ stringBuffer.append( yytext() ); }
-{LineContinuation}				{ }
+{LineContinuation}				{ stringBuffer.append( yytext() ); }
 "&"								{ stringBuffer.append( yytext() ); }
 [\n\r]							{ throw new Exception("Lexer Error (" + getCurrentFilename() + ", line " + (yyline+1) + ", col " + (yycolumn+1) + "): String literal spans multiple lines without continuation"); }
 <<EOF>>							{ throw new Exception("Lexer Error (" + getCurrentFilename() + ", line " + (yyline+1) + ", col " + (yycolumn+1) + "): End of file encountered before string literal terminated"); }

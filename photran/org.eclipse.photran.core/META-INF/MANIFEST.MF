@@ -9,10 +9,9 @@ Bundle-Vendor: University of Illinois at Urbana-Champaign and Los Alamos Nationa
 Bundle-Localization: plugin
 Export-Package: org.eclipse.photran.core,
  org.eclipse.photran.core.util,
- org.eclipse.photran.internal.core.lexer,
- org.eclipse.photran.internal.core.parser,
- org.eclipse.photran.internal.core.preferences,
- org.eclipse.photran.internal.errorparsers
+ org.eclipse.photran.internal.core.lexer;x-friends:="org.eclipse.photran.core.analysis,org.eclipse.photran.cdtinterface,org.eclipse.photran.ui,org.eclipse.photran.core.tests,org.eclipse.photran.cdtinterface.tests,org.eclipse.photran.refactoring.core,org.eclipse.photran.refactoring.tests",
+ org.eclipse.photran.internal.core.parser;x-friends:="org.eclipse.photran.core.analysis,org.eclipse.photran.cdtinterface,org.eclipse.photran.ui,org.eclipse.photran.core.tests,org.eclipse.photran.cdtinterface.tests,org.eclipse.photran.refactoring.core,org.eclipse.photran.refactoring.tests",
+ org.eclipse.photran.internal.core.preferences;x-friends:="org.eclipse.photran.ui,org.eclipse.photran.cdtinterface"
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.cdt.core,
  org.eclipse.core.resources,

@@ -1,6 +1,8 @@
 package org.eclipse.photran.internal.core.parser; import org.eclipse.photran.internal.core.lexer.*;
 
+import java.io.PrintStream;
 import java.lang.ref.WeakReference;
+
 
 /**
  * Common superclass for <code>Token</code>s and <code>ParseTreeNode</code>s, the two types of
@@ -10,6 +12,31 @@ import java.lang.ref.WeakReference;
  */
 public abstract class AbstractParseTreeNode
 {
+    ///////////////////////////////////////////////////////////////////////////
+    // Constants
+    ///////////////////////////////////////////////////////////////////////////
+    
+    protected static final int INDENT_SIZE = 4;
+    
+    ///////////////////////////////////////////////////////////////////////////
+    // Fields
+    ///////////////////////////////////////////////////////////////////////////
+    
+    protected WeakReference/*<ParseTreeNode>*/ parentRef = null;
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Accessor/Mutator Methods
+    ///////////////////////////////////////////////////////////////////////////
+
+    public ParseTreeNode getParent()
+    {
+        return parentRef == null ? null : (ParseTreeNode)parentRef.get();
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Visitor Support
+    ///////////////////////////////////////////////////////////////////////////
+    
     public abstract void visitTopDownUsing(ASTVisitor visitor);
     
     public abstract void visitBottomUpUsing(ASTVisitor visitor);
@@ -18,14 +45,16 @@ public abstract class AbstractParseTreeNode
 
     public abstract void visitUsing(GenericParseTreeVisitor visitor);
 
-    public abstract String toString(int indentLevel);
-
-    protected WeakReference/*<ParseTreeNode>*/ parentRef = null;
-
-    public ParseTreeNode getParent()
+    ///////////////////////////////////////////////////////////////////////////
+    // Debugging Output
+    ///////////////////////////////////////////////////////////////////////////
+    
+    public String toString()
     {
-        return parentRef == null ? null : (ParseTreeNode)parentRef.get();
+        return toString(0);
     }
+    
+    public abstract String toString(int indentLevel);
 
     protected String indent(int numSpaces)
     {
@@ -34,4 +63,10 @@ public abstract class AbstractParseTreeNode
             sb.append(' ');
         return sb.toString();
     }
+    
+    ///////////////////////////////////////////////////////////////////////////
+    // Source Code Reproduction
+    ///////////////////////////////////////////////////////////////////////////
+    
+    public abstract void printOn(PrintStream out);
 }

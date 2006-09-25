@@ -12,10 +12,11 @@ import org.eclipse.cdt.core.model.IContributedModelBuilder;
 import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.cdt.internal.core.model.Parent;
 import org.eclipse.cdt.internal.core.model.TranslationUnit;
-import org.eclipse.photran.core.ASTFactory;
 import org.eclipse.photran.core.FortranCorePlugin;
-import org.eclipse.photran.internal.core.lexer.LexerOptions;
-import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
+import org.eclipse.photran.internal.core.f95modelparser.FortranProcessor;
+import org.eclipse.photran.internal.core.f95modelparser.SemanticError;
+import org.eclipse.photran.internal.core.f95modelparser.SyntaxError;
+import org.eclipse.photran.internal.core.f95modelparser.Token;
 import org.eclipse.photran.internal.core.preferences.FortranPreferences;
 import org.eclipse.photran.internal.core.preferences.FortranShowParseTreePreference;
 
@@ -32,19 +33,25 @@ import org.eclipse.photran.internal.core.preferences.FortranShowParseTreePrefere
  * 
  * @author joverbey
  */
-public class FortranModelBuilder implements IContributedModelBuilder
+public final class FortranModelBuilder implements IContributedModelBuilder
 {
     private TranslationUnit translationUnit;
-    private Map newElements;
-    private boolean isFixedForm;
 
-    public FortranModelBuilder(ITranslationUnit tu, boolean isFixedForm)
+    private Map newElements;
+    
+    private static Map/*<String,Boolean>*/ formatAssociations = new HashMap();
+    
+    public static void forceFormat(String filename, boolean isFixedFormat)
+    {
+        formatAssociations.put(filename, Boolean.valueOf(isFixedFormat));
+    }
+
+    public FortranModelBuilder(ITranslationUnit tu)
     {
     	if (!(tu instanceof ITranslationUnit)) throw new Error("Unexpected subclass of ITranslationUnit");
     	
         this.translationUnit = (TranslationUnit)tu;
         this.newElements = new HashMap();
-        this.isFixedForm = isFixedForm;
     }
 
     public void parse(boolean quickParseMode) throws Exception
@@ -56,19 +63,13 @@ public class FortranModelBuilder implements IContributedModelBuilder
 
         try
         {
-            int lexerOptions = (isFixedForm ? LexerOptions.FIXED_FORM : LexerOptions.FREE_FORM)
-                               | LexerOptions.ASSOCIATE_LINE_COL
-                               | LexerOptions.ASSOCIATE_OFFSET_LENGTH;
-            ASTExecutableProgramNode ast = (ASTExecutableProgramNode)ASTFactory.buildAST(inputStream,
-                                                                                         filename,
-                                                                                         lexerOptions);
-            if (isParseTreeModelEnabled())
-                ast.visitUsing(new FortranParseTreeModelBuildingVisitor(translationUnit, this));
-            else
-                ast.visitUsing(new FortranModelBuildingVisitor(translationUnit, this));
+            FortranProcessor processor = new FortranProcessor();
+
+            // Note that formatAssociations.get(filename) may return null, which is fine
+            Map newElts = processor.parseForModel(inputStream, filename, (Boolean)formatAssociations.get(filename), translationUnit);
             
-            //FortranElement note = new FortranElement.UnknownNode(translationUnit, isFixedForm ? "<Fixed Form Source>" : "<Free Form Source>");
-            //this.addF90Element(note);
+            FortranElement note = new FortranElement.UnknownNode(translationUnit, processor.lastParseWasFixedForm() ? "<Fixed Form Source>" : "<Free Form Source>");
+            this.addF90Element(note);
 
             /* For whatever reason, we have to only set the *parent* while we
              * parse, then go back through (now) and traverse the model in
@@ -77,7 +78,12 @@ public class FortranModelBuilder implements IContributedModelBuilder
              * BuildModelParserAction.java) doesn't work.
              */
             //newElements.putAll(newElts);
-            this.addF90Elements(newElements);
+            this.addF90Elements(newElts);
+        }
+        catch (SyntaxError e)
+        {
+            createParseFailureNode(translationUnit, e.getErrorToken());
+            wasSuccessful = false;
         }
         catch (Exception e)
         {
@@ -86,12 +92,7 @@ public class FortranModelBuilder implements IContributedModelBuilder
         }
 
         // From CDT: important to know if the unit has parse errors or not
-        setIsStructureKnown(wasSuccessful);
-    }
-
-    public void setIsStructureKnown(boolean isStructureKnown)
-    {
-        translationUnit.setIsStructureKnown(isStructureKnown);
+        translationUnit.setIsStructureKnown(wasSuccessful);
     }
 
     private boolean isParseTreeModelEnabled()
@@ -102,26 +103,26 @@ public class FortranModelBuilder implements IContributedModelBuilder
 
     // --NODE CREATION METHODS-------------------------------------------
 
-//    private FortranElement createParseFailureNode(Parent parent, Token errorToken)
-//        throws CModelException
-//    {
-//
-//        StringBuffer errorMessage = new StringBuffer();
-//        errorMessage.append("Error: Unexpected ");
-//        errorMessage.append(errorToken.getTerminal().getDescription());
-//        errorMessage.append(" \"");
-//        errorMessage.append(errorToken.getText());
-//        errorMessage.append("\"");
-//        FortranElement element = new FortranElement.ErrorNode(parent, errorMessage.toString());
-//        element.setIdPos(errorToken.getOffset(), errorToken.getLength());
-//        element.setPos(errorToken.getOffset(), errorToken.getLength());
-//        element.setLines(errorToken.getStartLine(), errorToken.getEndLine());
-//
-//        parent.addChild(element);
-//        this.newElements.put(element, element.getElementInfo());
-//        return element;
-//
-//    }
+    private FortranElement createParseFailureNode(Parent parent, Token errorToken)
+        throws CModelException
+    {
+
+        StringBuffer errorMessage = new StringBuffer();
+        errorMessage.append("Error: Unexpected ");
+        errorMessage.append(errorToken.getTerminal().getDescription());
+        errorMessage.append(" \"");
+        errorMessage.append(errorToken.getText());
+        errorMessage.append("\"");
+        FortranElement element = new FortranElement.ErrorNode(parent, errorMessage.toString());
+        element.setIdPos(errorToken.getOffset(), errorToken.getLength());
+        element.setPos(errorToken.getOffset(), errorToken.getLength());
+        element.setLines(errorToken.getStartLine(), errorToken.getEndLine());
+
+        parent.addChild(element);
+        this.newElements.put(element, element.getElementInfo());
+        return element;
+
+    }
 
     private FortranElement createParseFailureNode(Parent parent, String errorMessage)
         throws CModelException
@@ -134,24 +135,24 @@ public class FortranModelBuilder implements IContributedModelBuilder
 
     }
 
-//    private FortranElement createSemanticFailureNode(Parent parent, SemanticError e)
-//        throws CModelException
-//    {
-//
-//        StringBuffer errorMessage = new StringBuffer();
-//        errorMessage.append(e.getMessage());
-//        Token errorToken = e.getErrorToken();
-//        if (errorToken == null) errorToken = new Token();
-//        FortranElement element = new FortranElement.ErrorNode(parent, errorMessage.toString());
-//        element.setIdPos(errorToken.getOffset(), errorToken.getLength());
-//        element.setPos(errorToken.getOffset(), errorToken.getLength());
-//        element.setLines(errorToken.getStartLine(), errorToken.getEndLine());
-//
-//        parent.addChild(element);
-//        this.newElements.put(element, element.getElementInfo());
-//        return element;
-//
-//    }
+    private FortranElement createSemanticFailureNode(Parent parent, SemanticError e)
+        throws CModelException
+    {
+
+        StringBuffer errorMessage = new StringBuffer();
+        errorMessage.append(e.getMessage());
+        Token errorToken = e.getErrorToken();
+        if (errorToken == null) errorToken = new Token();
+        FortranElement element = new FortranElement.ErrorNode(parent, errorMessage.toString());
+        element.setIdPos(errorToken.getOffset(), errorToken.getLength());
+        element.setPos(errorToken.getOffset(), errorToken.getLength());
+        element.setLines(errorToken.getStartLine(), errorToken.getEndLine());
+
+        parent.addChild(element);
+        this.newElements.put(element, element.getElementInfo());
+        return element;
+
+    }
 
     /**
      * Called by the <code>FortranModelBuildingVisitor</code> to add nodes to the model
@@ -159,7 +160,7 @@ public class FortranModelBuilder implements IContributedModelBuilder
      * @return
      * @throws CModelException
      */
-    public FortranElement addF90Element(FortranElement element) throws CModelException
+    FortranElement addF90Element(FortranElement element) throws CModelException
     {
         if (element.getParent() == null) element.setParent(translationUnit);
             

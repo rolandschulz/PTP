@@ -1,5 +1,6 @@
 package org.eclipse.photran.internal.core.lexer;
 
+import java.io.PrintStream;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IAdaptable;
@@ -16,20 +17,24 @@ import org.eclipse.photran.internal.core.parser.Terminal;
  */
 public class Token extends AbstractParseTreeNode implements ParserSymbol, IAdaptable
 {
+    ///////////////////////////////////////////////////////////////////////////
+    // Fields
+    ///////////////////////////////////////////////////////////////////////////
+    
     /**
      * The Terminal that this token is an instance of
      */
     protected Terminal terminal = null;
 
     /**
-     * The token text
-     */
-    protected String text = "";
-
-    /**
      * Whitespace and whitetext appearing before this token that should be associated with this token
      */
     protected String whiteBefore = "";
+
+    /**
+     * The token text
+     */
+    protected String text = "";
 
     /**
      * Whitespace and whitetext appearing after this token that should be associated with this token, not the next
@@ -38,6 +43,10 @@ public class Token extends AbstractParseTreeNode implements ParserSymbol, IAdapt
     
     protected Map/*<Class, Object>*/ adapters = new ObjectMap/*<Class, Object>*/();
 
+    ///////////////////////////////////////////////////////////////////////////
+    // Constructors
+    ///////////////////////////////////////////////////////////////////////////
+    
     public Token()
     {
     }
@@ -49,41 +58,9 @@ public class Token extends AbstractParseTreeNode implements ParserSymbol, IAdapt
         this.text   = tokenText   == null ? "" : tokenText;
         this.whiteAfter  = whiteAfter  == null ? "" : whiteAfter;
     }
-
-    /**
-     * Returns a string describing the token
-     */
-    public String getDescription() { return terminal.getDescription() + ": \"" + text + "\""; }
-
-    /**
-     * See AbstractParseTreeNode
-     */
-    public void visitUsing(ParseTreeVisitor visitor) { ; }
-
-    /**
-     * See AbstractParseTreeNode
-     */
-    public void visitUsing(GenericParseTreeVisitor visitor) { visitor.visitToken(this); }
-
-    /**
-     * See AbstractParseTreeNode
-     */
-    public void visitTopDownUsing(ASTVisitor visitor) { visitor.visitToken(this); }
-
-    /**
-     * See AbstractParseTreeNode
-     */
-    public void visitBottomUpUsing(ASTVisitor visitor) { visitor.visitToken(this); }
-
-    /**
-     * See AbstractParseTreeNode
-     */
-    public String toString(int numSpaces) { return indent(numSpaces) + getDescription() + "\n"; }
-    
-    public String toString() { return getDescription(); }
     
     ///////////////////////////////////////////////////////////////////////////
-    // Accessor/mutator methods
+    // Accessor/Mutator Methods
     ///////////////////////////////////////////////////////////////////////////
 
     /**
@@ -126,6 +103,10 @@ public class Token extends AbstractParseTreeNode implements ParserSymbol, IAdapt
      */
     public void setWhiteAfter(String value) { whiteAfter = value == null ? "" : value; }
     
+    ///////////////////////////////////////////////////////////////////////////
+    // Adapter/Property Support
+    ///////////////////////////////////////////////////////////////////////////
+    
     public Object getAdapter(Class adapter)
     {
         return adapters.get(adapter);
@@ -141,8 +122,37 @@ public class Token extends AbstractParseTreeNode implements ParserSymbol, IAdapt
         return adapters;
     }
 
-    public String getCompleteText()
+    ///////////////////////////////////////////////////////////////////////////
+    // Visitor Support
+    ///////////////////////////////////////////////////////////////////////////
+
+    public void visitTopDownUsing(ASTVisitor visitor) { visitor.visitToken(this); }
+
+    public void visitBottomUpUsing(ASTVisitor visitor) { visitor.visitToken(this); }
+
+    public void visitUsing(ParseTreeVisitor visitor) { ; }
+
+    public void visitUsing(GenericParseTreeVisitor visitor) { visitor.visitToken(this); }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Debugging Output
+    ///////////////////////////////////////////////////////////////////////////
+    
+    public String toString(int numSpaces) { return indent(numSpaces) + getDescription() + "\n"; }
+
+    /**
+     * Returns a string describing the token
+     */
+    public String getDescription() { return terminal.getDescription() + ": \"" + text + "\""; }
+    
+    ///////////////////////////////////////////////////////////////////////////
+    // Source Code Reproduction
+    ///////////////////////////////////////////////////////////////////////////
+    
+    public void printOn(PrintStream out)
     {
-        return whiteBefore + text + whiteAfter;
+        out.print(whiteBefore);
+        out.print(text);
+        out.print(whiteAfter);
     }
 }

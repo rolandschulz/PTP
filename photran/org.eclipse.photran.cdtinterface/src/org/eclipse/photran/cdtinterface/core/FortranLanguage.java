@@ -30,7 +30,7 @@ public class FortranLanguage extends PlatformObject implements ILanguage
     
     public Collection getRegisteredContentTypeIds()
     {
-        return Arrays.asList(new String[]{FortranCorePlugin.FIXED_FORM_CONTENT_TYPE, FortranCorePlugin.FREE_FORM_CONTENT_TYPE});
+        return Arrays.asList(new String[] { FortranCorePlugin.FIXED_FORM_CONTENT_TYPE, FortranCorePlugin.FREE_FORM_CONTENT_TYPE });
     }
 
 	public String getId()
@@ -40,7 +40,7 @@ public class FortranLanguage extends PlatformObject implements ILanguage
 
 	public IContributedModelBuilder createModelBuilder(ITranslationUnit tu)
 	{
-		return new FortranModelBuilder(tu);
+		return new FortranModelBuilder(tu, tu.getContentTypeId().equals(FortranCorePlugin.FIXED_FORM_CONTENT_TYPE));
 	}
 
 	public Object getAdapter(Class adapter)
@@ -71,7 +71,7 @@ public class FortranLanguage extends PlatformObject implements ILanguage
     
     public IASTTranslationUnit getASTTranslationUnit(ITranslationUnit file, int style)
     {
-        System.out.println("getASTTranslationUnit");
+        //System.out.println("getASTTranslationUnit");
         
 //        //IResource resource = file.getResource();
 //        ICProject project = file.getCProject();
@@ -102,7 +102,7 @@ public class FortranLanguage extends PlatformObject implements ILanguage
 	
 	public ASTCompletionNode getCompletionNode(IWorkingCopy workingCopy, int offset)
 	{
-		System.out.println("getCompletionNode");
+		//System.out.println("getCompletionNode");
 		
 		return null;
 	}

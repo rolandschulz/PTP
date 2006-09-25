@@ -6,6 +6,8 @@ sed -e "s/Yylex/ILexer/g; s/getNextToken/yylex/g" Parser.java >Parser.java.x
 mv -f Parser.java.x Parser.java
 sed -e "s/abstract int getActionRow();/int getActionRow() { return -9999; }/g;" Terminal.java >Terminal.java.x
 mv -f Terminal.java.x Terminal.java
+sed -e "s/public class ASTExecutableProgramNode extends ParseTreeNode/public class ASTExecutableProgramNode extends ParseTreeNode implements IFortranAST/g; s/package org.eclipse.photran.internal.core.parser;/package org.eclipse.photran.internal.core.parser; import org.eclipse.photran.core.IFortranAST;/g" ASTExecutableProgramNode.java >ASTExecutableProgramNode.java.x
+mv -f ASTExecutableProgramNode.java.x ASTExecutableProgramNode.java
 for file in *.java; do
   sed -e "s/package org.eclipse.photran.internal.core.parser;/package org.eclipse.photran.internal.core.parser; import org.eclipse.photran.internal.core.lexer.*;/g" $file >$file.x
   mv -f $file.x $file

@@ -60,12 +60,14 @@ import org.eclipse.photran.internal.core.parser.Terminal;
       return prepass.getColumn(yychar);
     }
     
-    private int lastTokenLine = 1, lastTokenCol = 1;
+    private int lastTokenLine = 1, lastTokenCol = 1, lastTokenOffset = 0, lastTokenLength = 0;
     
 	private Token token(Terminal terminal)
 	{
 		lastTokenLine = prepass.getLine(yychar)+1;
 		lastTokenCol = prepass.getColumn(yychar)+1;
+		lastTokenOffset = prepass.getOffset(yychar);
+		lastTokenLength = prepass.getOffset(yychar+yylength()-1)-prepass.getOffset(yychar)+1;
 		return new Token(terminal,
 		                 "",
 		                 terminal == Terminal.T_SCON || terminal == Terminal.T_HCON
@@ -121,7 +123,17 @@ import org.eclipse.photran.internal.core.parser.Terminal;
     {
         return lastTokenCol;
     }
-	
+    
+    public int getLastTokenOffset()
+    {
+    	return lastTokenOffset;
+    }
+    
+    public int getLastTokenLength()
+    {
+        return lastTokenLength;
+    }
+
 //	private List/*<NonTreeToken>*/ nonTreeTokens = new LinkedList();
 //    public List/*<NonTreeToken>*/ getNonTreeTokens()
 //    {
@@ -178,15 +190,16 @@ CppIfndef="#ifndef"[^\r\n]*{LineTerminator}
 CppIf="#if"[^\r\n]*{LineTerminator}
 CppElse="#else"[^\r\n]*{LineTerminator}
 CppElif="#elif"[^\r\n]*{LineTerminator}
+CppEndIf="#endif"[^\r\n]*{LineTerminator}
 CppInclude="#include"[^\r\n]*{LineTerminator}
 CppDefine="#define"[^\r\n]*{LineTerminator}
 CppUndef="#undef"[^\r\n]*{LineTerminator}
 CppLine="#line"[^\r\n]*{LineTerminator}
 CppError="#error"[^\r\n]*{LineTerminator}
 CppPragma="#pragma"[^\r\n]*{LineTerminator}
-CppDirective={CppIfdef}|{CppIfndef}|{CppIf}|{CppElse}|{CppElif}|{CppInclude}|{CppDefine}|{CppUndef}|{CppLine}|{CppError}|{CppPragma}
+CppDirective={CppIfdef}|{CppIfndef}|{CppIf}|{CppElse}|{CppElif}|{CppEndIf}|{CppInclude}|{CppDefine}|{CppUndef}|{CppLine}|{CppError}|{CppPragma}
 
-FortranInclude="INCLUDE"[^\r\n]*{LineTerminator}
+FortranInclude="INCLUDE"[^=(%\r\n]*{LineTerminator}
 
 %state IMPLICIT
 %state QUOTED
@@ -409,7 +422,7 @@ FortranInclude="INCLUDE"[^\r\n]*{LineTerminator}
 								}
 {CppDirective}					{ storeNonTreeToken(); }
 {FortranInclude}				{ storeNonTreeToken(); }
-{LineTerminator}				{ yybegin(YYINITIAL); boolean b = wantEos; wantEos = false; if (b) return token(Terminal.T_EOS); }
+{LineTerminator}				{ yybegin(YYINITIAL); boolean b = wantEos; wantEos = false; if (b) return token(Terminal.T_EOS); else storeNonTreeToken(); }
 <<EOF>>							{ wantEos = false; yybegin(YYSTANDARD); return token(Terminal.END_OF_INPUT); }
 .								{ 	yypushback(1); 
 									int state=yystate();

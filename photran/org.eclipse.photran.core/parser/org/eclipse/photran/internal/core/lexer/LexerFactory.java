@@ -6,6 +6,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.CoreException;
+
 /**
  * A collection of (static) factory methods for creating Fortran lexers.
  * 
@@ -13,26 +16,23 @@ import java.io.InputStream;
  */
 public final class LexerFactory
 {
-    public static boolean AssociateLineCol = false;
-    
     private LexerFactory() {;}
     
-    public static ILexer createFreeFormLexer(InputStream in, String filename)
+    public static ILexer createLexer(InputStream in, String filename, int options) throws FileNotFoundException
     {
-        return new FreeFormLexerPhase2(new FreeFormLexerPhase1(in, filename));
+        if ((options & LexerOptions.FIXED_FORM) != 0)
+            return new FixedFormLexerPhase2(in, filename, options);
+        else
+            return new FreeFormLexerPhase2(new FreeFormLexerPhase1(in, filename), options);
     }
     
-    public static ILexer createFixedFormLexer(InputStream in, String filename)
+    public static ILexer createLexer(File file, int options) throws FileNotFoundException
     {
-        return new FixedFormLexerPhase2(in, filename);
+        return createLexer(new BufferedInputStream(new FileInputStream(file)), file.getAbsolutePath(), options);
     }
     
-    public static ILexer createLexer(File file, boolean isFixedForm) throws FileNotFoundException
+    public static ILexer createLexer(IFile file, int options) throws FileNotFoundException, CoreException
     {
-        String filename = file.getAbsolutePath();
-        InputStream in = new BufferedInputStream(new FileInputStream(file));
-        return isFixedForm
-            ? createFixedFormLexer(in, filename)
-            : createFreeFormLexer(in, filename);
+        return createLexer(file.getContents(), file.getName(), options);
     }
 }

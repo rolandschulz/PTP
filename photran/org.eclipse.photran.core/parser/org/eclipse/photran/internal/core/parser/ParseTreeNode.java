@@ -1,5 +1,6 @@
 package org.eclipse.photran.internal.core.parser; import org.eclipse.photran.internal.core.lexer.*;
 
+import java.io.PrintStream;
 import java.lang.ref.WeakReference;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -7,26 +8,68 @@ import java.util.List;
 
 public class ParseTreeNode extends AbstractParseTreeNode
 {
-    private Nonterminal root;
-    private Production production;
-
-    private LinkedList/*<AbstractParseTreeNode>*/ children;
-
-    public Nonterminal getRootNonterminal()
+    ///////////////////////////////////////////////////////////////////////////
+    // Inner Classes
+    ///////////////////////////////////////////////////////////////////////////
+    
+    private static final class EmptyNode extends AbstractParseTreeNode
     {
-        return root;
+        private EmptyNode() {}
+
+        public void visitBottomUpUsing(ASTVisitor visitor) {}
+        public void visitTopDownUsing(ASTVisitor visitor) {}
+        public void visitUsing(ParseTreeVisitor visitor) {}
+        public void visitUsing(GenericParseTreeVisitor visitor) {}
+        
+        public String toString(int numSpaces)
+        {
+            StringBuffer sb = new StringBuffer();
+            sb.append(indent(numSpaces));
+            sb.append("(empty node)");
+            sb.append("\n");
+            return sb.toString();
+        }
+
+        public void printOn(PrintStream out) {}
+    }
+    
+    ///////////////////////////////////////////////////////////////////////////
+    // Constants
+    ///////////////////////////////////////////////////////////////////////////
+    
+    public static final AbstractParseTreeNode EMPTY = new EmptyNode();
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Fields
+    ///////////////////////////////////////////////////////////////////////////
+    
+    private Nonterminal nonterminal;
+    private Production production;
+    private LinkedList/*<AbstractParseTreeNode>*/ children;
+    
+    ///////////////////////////////////////////////////////////////////////////
+    // Constructor
+    ///////////////////////////////////////////////////////////////////////////
+    
+    public ParseTreeNode(Nonterminal nonterminal, Production production)
+    {
+        this.nonterminal = nonterminal;
+        this.production = production;
+        this.children = null;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Accessor/Mutator Methods
+    ///////////////////////////////////////////////////////////////////////////
+
+    public Nonterminal getNonterminal()
+    {
+        return nonterminal;
     }
     
     public Production getProduction()
     {
         return production;
-    }
-    
-    public ParseTreeNode(Nonterminal root, Production production)
-    {
-        this.root = root;
-        this.production = production;
-        this.children = null;
     }
 
     public void addChild(AbstractParseTreeNode child)
@@ -135,7 +178,9 @@ public class ParseTreeNode extends AbstractParseTreeNode
         return children == null ? new NullIterator() : children.iterator();
     }
 
-    // -------------------------------------------------------------------------------------------
+    ///////////////////////////////////////////////////////////////////////////
+    // Visitor Support
+    ///////////////////////////////////////////////////////////////////////////
 
     public void visitTopDownUsing(ASTVisitor visitor)
     {
@@ -161,6 +206,11 @@ public class ParseTreeNode extends AbstractParseTreeNode
         visitThisNodeUsing(visitor);
     }
     
+    public void visitOnlyThisNodeUsing(ASTVisitor visitor)
+    {
+        visitThisNodeUsing(visitor);
+    }
+    
     protected void visitThisNodeUsing(ASTVisitor visitor)
     {
         ;
@@ -168,7 +218,7 @@ public class ParseTreeNode extends AbstractParseTreeNode
     
     public void visitUsing(ParseTreeVisitor visitor)
     {
-        root.visitParseTreeNodeUsing(this, visitor);
+        nonterminal.visitParseTreeNodeUsing(this, visitor);
 
         visitor.preparingToVisitChildrenOf(this);
         Iterator it = children.iterator();
@@ -194,20 +244,15 @@ public class ParseTreeNode extends AbstractParseTreeNode
         visitor.doneVisitingChildrenOf(this);
     }
 
-    // -------------------------------------------------------------------------------------------
-    
-    private static final int INDENT_SIZE = 4;
-    
-    public String toString()
-    {
-        return toString(0);
-    }
+    ///////////////////////////////////////////////////////////////////////////
+    // Debugging Output
+    ///////////////////////////////////////////////////////////////////////////
     
     public String toString(int numSpaces)
     {
         StringBuffer sb = new StringBuffer();
         sb.append(indent(numSpaces));
-        sb.append(root.getDescription());
+        sb.append(nonterminal.getDescription());
         sb.append("\n");
 
         Iterator it = children.iterator();
@@ -220,26 +265,17 @@ public class ParseTreeNode extends AbstractParseTreeNode
         return sb.toString();
     }
     
-    // -------------------------------------------------------------------------------------------
+    ///////////////////////////////////////////////////////////////////////////
+    // Source Code Reproduction
+    ///////////////////////////////////////////////////////////////////////////
     
-    private static final class EmptyNode extends AbstractParseTreeNode
+    public void printOn(PrintStream out)
     {
-        private EmptyNode() {}
-
-        public void visitBottomUpUsing(ASTVisitor visitor) {}
-        public void visitTopDownUsing(ASTVisitor visitor) {}
-        public void visitUsing(ParseTreeVisitor visitor) {}
-        public void visitUsing(GenericParseTreeVisitor visitor) {}
-        
-        public String toString(int numSpaces)
+        Iterator it = children.iterator();
+        while (it.hasNext())
         {
-            StringBuffer sb = new StringBuffer();
-            sb.append(indent(numSpaces));
-            sb.append("(empty node)");
-            sb.append("\n");
-            return sb.toString();
+            AbstractParseTreeNode n = (AbstractParseTreeNode)it.next(); 
+            n.printOn(out);
         }
     }
-    
-    public static final AbstractParseTreeNode EMPTY = new EmptyNode();
 }
