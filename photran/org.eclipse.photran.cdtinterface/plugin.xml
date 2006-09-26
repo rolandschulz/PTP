@@ -182,4 +182,16 @@
                tooltip="New Compiled Language Project"/>
       </actionSet>
    </extension>
+   
+   <!--=============================-->
+   <!-- ActionSet-part associations -->
+   <!--=============================-->
+   <extension
+         point="org.eclipse.ui.actionSetPartAssociations">
+      <actionSetPartAssociation
+            targetID="org.eclipse.cdt.ui.SearchActionSet">
+         <part id="org.eclipse.photran.ui.FortranView"/>
+         <part id="org.eclipse.search.SearchResultView"/>
+      </actionSetPartAssociation>
+   </extension>
 </plugin>

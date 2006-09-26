@@ -9,4 +9,5 @@ import org.eclipse.cdt.internal.ui.cview.CView;
  */
 public class FortranView extends CView
 {
+    public static final String FORTRAN_VIEW_ID = "org.eclipse.photran.ui.FortranView";
 }

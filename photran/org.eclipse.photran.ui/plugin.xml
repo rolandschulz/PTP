@@ -173,7 +173,7 @@
 	        targetID="#FortranEditorContextMenu" 
 	        id="org.eclipse.photran.ui.NavigationContribution">
 	     <action 
-	           label="Open Declaration"
+	           label="&amp;Open Declaration"
 	           class="org.eclipse.photran.internal.ui.actions.FortranOpenDeclarationActionDelegate" 
 	           menubarPath="group.open" 
 	           id="org.eclipse.photran.ui.OpenDeclarationMenuAction"/>
@@ -261,22 +261,9 @@
    <extension
          point="org.eclipse.ui.actionSetPartAssociations">
       <actionSetPartAssociation
-            targetID="org.eclipse.cdt.ui.SearchActionSet">
-         <part
-               id="org.eclipse.photran.ui.FortranView">
-         </part>
-         <part
-               id="org.eclipse.photran.ui.editor.FortranEditor">
-         </part>
-         <part
-               id="org.eclipse.search.SearchResultView">
-         </part>
-      </actionSetPartAssociation>
-      <actionSetPartAssociation
             targetID="org.eclipse.ui.edit.text.actionSet.annotationNavigation">
-         <part
-               id="org.eclipse.photran.ui.editor.FortranEditor">
-         </part>
+         <part id="org.eclipse.photran.ui.editor.FreeFormFortranEditor"/>
+         <part id="org.eclipse.photran.ui.editor.FixedFormFortranEditor"/>
       </actionSetPartAssociation>      
    </extension>
 

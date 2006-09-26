@@ -11,7 +11,6 @@
  *******************************************************************************/
 package org.eclipse.photran.cdtinterface.ui;
 
-import org.eclipse.cdt.internal.ui.wizards.CWizardRegistry;
 import org.eclipse.cdt.ui.CUIPlugin;
 import org.eclipse.search.ui.NewSearchUI;
 import org.eclipse.ui.IFolderLayout;
@@ -41,7 +40,7 @@ public class FortranPerspectiveFactory implements IPerspectiveFactory
  		String editorArea = layout.getEditorArea();
 		
 		IFolderLayout folder1= layout.createFolder("topLeft", IPageLayout.LEFT, (float)0.25, editorArea); //$NON-NLS-1$
-		folder1.addView("org.eclipse.photran.ui.FortranView");
+		folder1.addView(FortranView.FORTRAN_VIEW_ID);
 		folder1.addView(IPageLayout.ID_RES_NAV);
 		folder1.addPlaceholder(IPageLayout.ID_BOOKMARKS);
 		
@@ -66,12 +65,12 @@ public class FortranPerspectiveFactory implements IPerspectiveFactory
 		// views - standard workbench
 		layout.addShowViewShortcut(IPageLayout.ID_OUTLINE);
 		layout.addShowViewShortcut(IPageLayout.ID_PROBLEM_VIEW);
-		layout.addShowViewShortcut(CUIPlugin.CVIEW_ID);
+		layout.addShowViewShortcut(FortranView.FORTRAN_VIEW_ID);
 		layout.addShowViewShortcut(IPageLayout.ID_RES_NAV);
 		layout.addShowViewShortcut(IPageLayout.ID_PROP_SHEET);
 
 		// link - things we should do
-		layout.addShowInPart(CUIPlugin.CVIEW_ID);
+		layout.addShowInPart(FortranView.FORTRAN_VIEW_ID);
 		layout.addShowInPart(IPageLayout.ID_RES_NAV);
 		
 		addFortranWizardShortcuts(layout);
