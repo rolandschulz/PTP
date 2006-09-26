@@ -1,48 +1,37 @@
 package org.eclipse.photran.internal.core.preferences;
 
-import org.eclipse.core.runtime.Preferences;
+import org.eclipse.photran.core.FortranCorePlugin;
 
-/**
- * Parent class for preferences which hold a <code>boolean</code> value.
- * 
- * This should be eliminated and <code>FortranPreference</code> parameterized by type once we
- * start using Java 5.
- * 
- * @author joverbey
- */
-public abstract class FortranBooleanPreference extends FortranPreference
+public final class FortranBooleanPreference extends FortranPreference
 {
-    /**
-     * @return the default value for this preference
-     */
-    public boolean getDefaultValue()
+    private boolean defaultValue;
+    
+    public FortranBooleanPreference(String name, boolean defaultValue)
     {
-        return false;
+        super("boolean", name);
+        this.defaultValue = defaultValue;
     }
-
-    /**
-     * Sets the default value for this preference
-     * @param preferences
-     */
-    public void setDefault(Preferences preferences)
+    
+    public void setDefault()
     {
-        preferences.setDefault(getName(), getDefaultValue());
+        getPreferenceStore().setDefault(getName(), defaultValue);
     }
 
     /**
      * Sets the value of this preference
      * @param preferences
      */
-    public void setValue(Preferences preferences, boolean value)
+    public void setValue(boolean value)
     {
-        preferences.setValue(getName(), value);
+        getPreferenceStore().setValue(getName(), value);
+        savePreferenceStore();
     }
 
     /**
      * @return the value of this preference
      */
-    public boolean getValue(Preferences preferences)
+    public boolean getValue()
     {
-        return preferences.getBoolean(getName());
+        return getPreferenceStore().getBoolean(getName());
     }
 }

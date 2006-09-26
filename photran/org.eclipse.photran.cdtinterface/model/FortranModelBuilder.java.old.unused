@@ -18,7 +18,7 @@ import org.eclipse.photran.internal.core.f95modelparser.SemanticError;
 import org.eclipse.photran.internal.core.f95modelparser.SyntaxError;
 import org.eclipse.photran.internal.core.f95modelparser.Token;
 import org.eclipse.photran.internal.core.preferences.FortranPreferences;
-import org.eclipse.photran.internal.core.preferences.FortranShowParseTreePreference;
+import org.eclipse.photran.internal.core.preferences.ShowParseTreePreference;
 
 /**
  * The Fortran model builder calls a <code>FortranModelBuildingVisitor</code> to create the model

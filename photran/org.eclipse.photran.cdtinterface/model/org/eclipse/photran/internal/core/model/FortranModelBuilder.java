@@ -13,11 +13,9 @@ import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.cdt.internal.core.model.Parent;
 import org.eclipse.cdt.internal.core.model.TranslationUnit;
 import org.eclipse.photran.core.ASTFactory;
-import org.eclipse.photran.core.FortranCorePlugin;
 import org.eclipse.photran.internal.core.lexer.LexerOptions;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 import org.eclipse.photran.internal.core.preferences.FortranPreferences;
-import org.eclipse.photran.internal.core.preferences.FortranShowParseTreePreference;
 
 /**
  * The Fortran model builder calls a <code>FortranModelBuildingVisitor</code> to create the model
@@ -96,8 +94,7 @@ public class FortranModelBuilder implements IContributedModelBuilder
 
     private boolean isParseTreeModelEnabled()
     {
-        FortranShowParseTreePreference pref = FortranPreferences.SHOW_PARSE_TREE;
-        return pref.getValue(FortranCorePlugin.getDefault().getPluginPreferences());
+        return FortranPreferences.SHOW_PARSE_TREE.getValue();
     }
 
     // --NODE CREATION METHODS-------------------------------------------

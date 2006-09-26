@@ -29,6 +29,15 @@ public class FixedFormFortranEditor extends AbstractFortranEditor
 
     protected ITokenScanner getTokenScanner()
     {
-        return new FortranKeywordRuleBasedScanner(true);
+        return new FortranKeywordRuleBasedScanner(true, getSourceViewer());
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    // Utility Methods
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+
+    public boolean isFixedForm()
+    {
+        return false;
     }
 }

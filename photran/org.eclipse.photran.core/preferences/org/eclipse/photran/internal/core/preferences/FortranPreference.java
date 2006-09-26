@@ -1,6 +1,7 @@
 package org.eclipse.photran.internal.core.preferences;
 
 import org.eclipse.core.runtime.Preferences;
+import org.eclipse.photran.core.FortranCorePlugin;
 
 /**
  * Parent class for preferences that should be set in the Core and/or UI plug-ins.
@@ -11,28 +12,39 @@ import org.eclipse.core.runtime.Preferences;
  * 
  * @author joverbey
  */
-public abstract class FortranPreference
+abstract class FortranPreference
 {
+    private final String prefix, suffix;
+    private final Preferences preferences;
+    
+    public FortranPreference(String prefix, String suffix)
+    {
+        this.prefix = prefix;
+        this.suffix = suffix;
+        this.preferences = FortranCorePlugin.getDefault().getPluginPreferences();
+    }
+    
+    protected Preferences getPreferenceStore()
+    {
+        return preferences;
+    }
+
+    protected void savePreferenceStore()
+    {
+        FortranCorePlugin.getDefault().savePluginPreferences();
+    }
+
     /**
      * @return the name of this preference, e.g., <code>org.eclipse.photran.core.myPreference</code>
      */
-    public abstract String getName();
+    public final String getName()
+    {
+        return prefix + "." + suffix;
+    }
 
     /**
-     * @return <code>true</code> iff the preference should be stored in the core plugin's
-     *         preferences
-     */
-    public abstract boolean shouldSetInCore();
-
-    /**
-     * @return <code>true</code> iff the preference should be stored in the UI plugin's
-     *         preferences
-     */
-    public abstract boolean shouldSetInUI();
-
-    /**
-     * Sets the default value for this preference
+     * Sets the default value of this preference
      * @param preferences
      */
-    public abstract void setDefault(Preferences preferences);
+    public abstract void setDefault();
 }

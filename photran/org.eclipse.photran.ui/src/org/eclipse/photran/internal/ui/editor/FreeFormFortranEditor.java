@@ -29,6 +29,15 @@ public final class FreeFormFortranEditor extends AbstractFortranEditor
 
     protected ITokenScanner getTokenScanner()
     {
-        return new FortranKeywordRuleBasedScanner(false);
+        return new FortranKeywordRuleBasedScanner(false, getSourceViewer());
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    // Utility Methods
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+
+    public boolean isFixedForm()
+    {
+        return false;
     }
 }

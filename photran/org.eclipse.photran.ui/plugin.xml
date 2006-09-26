@@ -149,8 +149,15 @@
        </context>
    </extension>
 
-   <!-- Block-comment (Ctrl+/) support in editor -->
-   <!-- For menubarPath, see class ITextEditorActionConstants -->
+   <!-- Commands, key bindings, and popup menu entries
+   
+        - Comment/Uncomment (Ctrl+/)
+        - Open Declaration (F3 or Ctrl+F3)
+        
+        Each command should have its ID declared as a constant in AbstractFortranEditor, and
+        it must be set up in AbstractFortranEditor#createActions().
+        
+        For menubarPath, see class ITextEditorActionConstants -->
 
    <extension point="org.eclipse.ui.popupMenus">
 	  <viewerContribution 
@@ -162,14 +169,15 @@
 	           menubarPath="group.edit" 
 	           id="org.eclipse.photran.ui.BlockCommentMenuAction"/>
 	  </viewerContribution>
-   </extension>
-   <extension
-            point="org.eclipse.ui.bindings">
-        <key
-            sequence="Ctrl+/"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            contextId="org.eclipse.photran.ui.FortranEditorContext"
-            commandId="org.eclipse.photran.ui.CommentCommand"/>
+	  <viewerContribution 
+	        targetID="#FortranEditorContextMenu" 
+	        id="org.eclipse.photran.ui.NavigationContribution">
+	     <action 
+	           label="Open Declaration"
+	           class="org.eclipse.photran.internal.ui.actions.FortranOpenDeclarationActionDelegate" 
+	           menubarPath="group.open" 
+	           id="org.eclipse.photran.ui.OpenDeclarationMenuAction"/>
+	  </viewerContribution>
    </extension>
    <extension
          point="org.eclipse.ui.commands">
@@ -184,6 +192,42 @@
             id="org.eclipse.photran.ui.CommentCommand"
             name="Photran Block Comment">
       </command>
+      <category
+            name="Navigation"
+            description="Navigation"
+            id="org.eclipse.photran.ui.NavigationCategory">
+      </category>
+      <command
+            categoryId="org.eclipse.photran.ui.NavigationCategory"
+            description="Open Declaration"
+            id="org.eclipse.photran.ui.OpenDeclarationCommand"
+            name="Open Declaration">
+      </command>
+   </extension>
+   <extension
+            point="org.eclipse.ui.bindings">
+      <!--  win32:  M1=CTRL,    M2=SHIFT, M3=ALT, M4=-
+            carbon: M1=COMMAND, M2=SHIFT, M3=ALT, M4=CTRL -->
+        <key
+            sequence="M1+/"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            contextId="org.eclipse.photran.ui.FortranEditorContext"
+            commandId="org.eclipse.photran.ui.CommentCommand"/>
+        <key
+            sequence="M1+M2+/"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            contextId="org.eclipse.photran.ui.FortranEditorContext"
+            commandId="org.eclipse.photran.ui.CommentCommand"/>
+        <key
+            sequence="F3"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            contextId="org.eclipse.photran.ui.FortranEditorContext"
+            commandId="org.eclipse.photran.ui.OpenDeclarationCommand"/>
+        <key
+            sequence="M1+F3"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            contextId="org.eclipse.photran.ui.FortranEditorContext"
+            commandId="org.eclipse.photran.ui.OpenDeclarationCommand"/>
    </extension>
 
    <!-- Define toggling a breakpoint as the default double-click action -->
@@ -247,22 +291,10 @@
             id="org.eclipse.photran.ui.MainFortranPreferencePage">
       </page>
       <page
-            name="Parser"
-            category="org.eclipse.photran.ui.MainFortranPreferencePage"
-            class="org.eclipse.photran.internal.ui.preferences.FortranParserPreferencePage"
-            id="org.eclipse.photran.ui.FortranParserPreferencePage">
-      </page>
-      <page
             name="Editor"
             category="org.eclipse.photran.ui.MainFortranPreferencePage"
-            class="org.eclipse.photran.internal.ui.preferences.FortranEditorPreferencePage"
+            class="org.eclipse.photran.internal.ui.preferences.EditorPreferencePage"
             id="org.eclipse.photran.ui.FortranEditorPreferencePage">
-      </page>
-      <page
-            name="Colors"
-            category="org.eclipse.photran.ui.FortranEditorPreferencePage"
-            class="org.eclipse.photran.internal.ui.preferences.ColorPreferencePage"
-            id="org.eclipse.photran.ui.ColorPreferencePage">
       </page>
    </extension>
 </plugin>

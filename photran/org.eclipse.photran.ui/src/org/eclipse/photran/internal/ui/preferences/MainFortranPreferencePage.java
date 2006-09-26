@@ -1,29 +1,28 @@
 package org.eclipse.photran.internal.ui.preferences;
 
-import org.eclipse.jface.preference.FieldEditorPreferencePage;
-import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.eclipse.jface.preference.BooleanFieldEditor;
+import org.eclipse.photran.internal.core.preferences.FortranPreferences;
 
 /**
- * Top-level Fortran preference page, which doesn't show anything
+ * Top-level Fortran preference page
  * 
  * @author joverbey
  */
-public class MainFortranPreferencePage
-    extends FieldEditorPreferencePage
-    implements IWorkbenchPreferencePage
+public class MainFortranPreferencePage extends AbstractFortranPreferencePage
 {
-    public MainFortranPreferencePage()
+    protected void setDescription()
     {
-        super(FieldEditorPreferencePage.GRID);
-        setDescription("");
+    }
+
+    protected void initializeDefaults()
+    {
+        FortranPreferences.SHOW_PARSE_TREE.setDefault();
     }
 
     protected void createFieldEditors()
     {
-    }
-
-    public void init(IWorkbench workbench)
-    {
+        addField(new BooleanFieldEditor(FortranPreferences.SHOW_PARSE_TREE.getName(),
+                                        "(Debugging) Show entire parse tree rather than Outline view",
+                                        getFieldEditorParent()));
     }
 }

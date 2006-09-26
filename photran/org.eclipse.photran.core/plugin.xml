@@ -129,11 +129,4 @@
 		  priority="high"/>
   </extension>
 
-<!-- =======================-->
-<!-- Preference Initializer -->
-<!-- =======================-->
-   <extension point="org.eclipse.core.runtime.preferences">
-      <initializer class="org.eclipse.photran.core.FortranCorePreferenceInitializer"/>
-   </extension>
-
 </plugin>

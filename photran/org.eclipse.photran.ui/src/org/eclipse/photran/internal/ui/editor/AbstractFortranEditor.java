@@ -30,8 +30,9 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.photran.internal.core.preferences.FortranPreferences;
 import org.eclipse.photran.internal.ui.actions.FortranBlockCommentActionDelegate;
-import org.eclipse.photran.internal.ui.preferences.ColorPreferencePage;
+import org.eclipse.photran.internal.ui.actions.FortranOpenDeclarationActionDelegate;
 import org.eclipse.photran.ui.FortranUIPlugin;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
@@ -64,6 +65,7 @@ public abstract class AbstractFortranEditor extends TextEditor implements ISelec
     private static String CONTEXT_MENU_ID = "#FortranEditorContextMenu";
     
     private static String BLOCK_COMMENT_COMMAND_ID = "org.eclipse.photran.ui.CommentCommand";
+    private static String OPEN_DECLARATION_COMMAND_ID = "org.eclipse.photran.ui.OpenDeclarationCommand";
     
     private static final RGB VERTICAL_LINE_COLOR = new RGB(176, 180, 185);
 
@@ -154,14 +156,19 @@ public abstract class AbstractFortranEditor extends TextEditor implements ISelec
     protected void createActions()
     {
         super.createActions();
-        IAction action = new FortranBlockCommentActionDelegate(this);
-        action.setActionDefinitionId(BLOCK_COMMENT_COMMAND_ID);
-        setAction(BLOCK_COMMENT_COMMAND_ID, action);
-        markAsStateDependentAction(BLOCK_COMMENT_COMMAND_ID, true);
-        markAsSelectionDependentAction(BLOCK_COMMENT_COMMAND_ID, true);      
+        createAction(new FortranBlockCommentActionDelegate(this), BLOCK_COMMENT_COMMAND_ID);
+        createAction(new FortranOpenDeclarationActionDelegate(this), OPEN_DECLARATION_COMMAND_ID);
     }
 
-    // /////////////////////////////////////////////////////////////////////////////////////////////
+    private void createAction(IAction action, String id)
+    {
+        action.setActionDefinitionId(id);
+        setAction(id, action);
+        markAsStateDependentAction(id, true);
+        markAsSelectionDependentAction(id, true);      
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
     // Syntax Highlighting
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -265,8 +272,8 @@ public abstract class AbstractFortranEditor extends TextEditor implements ISelec
 
     protected abstract int[] getColumnsToDrawVerticalLinesOn();
 
-    // /////////////////////////////////////////////////////////////////////////////////////////////
-    // Preference Page Support (mostly copied from CDT???)
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    // Preference Page Support
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
@@ -275,8 +282,8 @@ public abstract class AbstractFortranEditor extends TextEditor implements ISelec
      */
     protected boolean affectsTextPresentation(PropertyChangeEvent event)
     {
-        return (ColorPreferencePage.respondToPreferenceChange(event)
-                || super.affectsTextPresentation(event));
+        return FortranPreferences.respondToPreferenceChange(event.getProperty())
+               || super.affectsTextPresentation(event);
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -446,4 +453,10 @@ public abstract class AbstractFortranEditor extends TextEditor implements ISelec
         if (moveCursor)
             resetHighlightRange();
     }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    // Utility Methods
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+
+    public abstract boolean isFixedForm();
 }

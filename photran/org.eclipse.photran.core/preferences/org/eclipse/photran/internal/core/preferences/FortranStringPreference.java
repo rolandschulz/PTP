@@ -1,45 +1,35 @@
 package org.eclipse.photran.internal.core.preferences;
 
-import org.eclipse.core.runtime.Preferences;
-
-/**
- * Parent class for preferences which hold a <code>String</code> value.
- * 
- * This should be eliminated ando <code>FortranPreference</code> parameterized by type once we
- * start using Java 5.
- * 
- * @author joverbey
- */
-public abstract class FortranStringPreference extends FortranPreference
+public final class FortranStringPreference extends FortranPreference
 {
-    /**
-     * @return the default value for this preference
-     */
-    public abstract String getDefaultValue();
-
-    /**
-     * Sets the default value for this preference
-     * @param preferences
-     */
-    public void setDefault(Preferences preferences)
+    private String defaultValue;
+    
+    public FortranStringPreference(String name, String defaultValue)
     {
-        preferences.setDefault(getName(), getDefaultValue());
+        super("string", name);
+        this.defaultValue = defaultValue;
+    }
+    
+    public void setDefault()
+    {
+        getPreferenceStore().setDefault(getName(), defaultValue);
     }
 
     /**
      * Sets the value of this preference
      * @param preferences
      */
-    public void setValue(Preferences preferences, String value)
+    public void setValue(String value)
     {
-        preferences.setValue(getName(), value);
+        getPreferenceStore().setValue(getName(), value);
+        savePreferenceStore();
     }
 
     /**
      * @return the value of this preference
      */
-    public String getValue(Preferences preferences)
+    public String getValue()
     {
-        return preferences.getString(getName());
+        return getPreferenceStore().getString(getName());
     }
 }

@@ -4,9 +4,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.core.commands.IHandler;
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.text.Assert;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.BadPartitioningException;
@@ -18,68 +15,38 @@ import org.eclipse.jface.text.IPositionUpdater;
 import org.eclipse.jface.text.IRewriteTarget;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.Position;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.photran.internal.ui.actions.FortranBlockCommentActionDelegate.Edit.EditFactory;
 import org.eclipse.photran.internal.ui.editor.AbstractFortranEditor;
-import org.eclipse.ui.IEditorActionDelegate;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 /**
  * Action supporting block commenting in the Fortran editor
  * 
- * @author cheahcf  from org.eclipse.cdt.internal.ui.actions
+ * @author cheahcf based on org.eclipse.cdt.internal.ui.actions
+ * @author joverbey made FortranEditorActionDelegate
  */
-public class FortranBlockCommentActionDelegate extends Action implements IEditorActionDelegate
+public class FortranBlockCommentActionDelegate extends FortranEditorActionDelegate
 {
-    private AbstractFortranEditor fEditor;
+    public FortranBlockCommentActionDelegate() { super(); }
     
-    public FortranBlockCommentActionDelegate() {}
-    public FortranBlockCommentActionDelegate(AbstractFortranEditor ed) { fEditor = ed; }
+    public FortranBlockCommentActionDelegate(AbstractFortranEditor ed) { super(ed); }
 
-    public void setActiveEditor(IAction action, IEditorPart targetEditor)
-    {
-        fEditor = targetEditor instanceof AbstractFortranEditor ? (AbstractFortranEditor)targetEditor : null;
-    }
-
-    public void selectionChanged(IAction action, ISelection selection)
-    {
-        ;
-    }
-
-    public void run(IAction action)
-    {
-        run();
-    }
-    
     public void run()
     {
-        ITextEditor editor = fEditor;
-
-        ITextSelection selection = getCurrentSelection();
-
-        IDocumentProvider docProvider = editor.getDocumentProvider();
-        IEditorInput input = editor.getEditorInput();
-        if (docProvider == null || input == null) return;
-
-        IDocument document = docProvider.getDocument(input);
+        ITextEditor editor = getFortranEditor();
+        ITextSelection selection = getEditorSelection();
+        IDocument document = getEditorIDocument();
         if (document == null) return;
 
         IRewriteTarget target = (IRewriteTarget)editor.getAdapter(IRewriteTarget.class);
-        if (target != null)
-        {
-            target.beginCompoundChange();
-        }
+        if (target != null) target.beginCompoundChange();
 
         Edit.EditFactory factory = new Edit.EditFactory(document);
 
         try
         {
             runInternal(selection, factory);
-
         }
         catch (BadLocationException e)
         {
@@ -89,11 +56,7 @@ public class FortranBlockCommentActionDelegate extends Action implements IEditor
         finally
         {
             factory.release();
-
-            if (target != null)
-            {
-                target.endCompoundChange();
-            }
+            if (target != null) target.endCompoundChange();
         }
     }
 
@@ -105,32 +68,11 @@ public class FortranBlockCommentActionDelegate extends Action implements IEditor
      */
     protected void executeEdits(List edits) throws BadLocationException
     {
-
         for (Iterator it = edits.iterator(); it.hasNext();)
         {
             Edit edit = (Edit)it.next();
             edit.perform();
         }
-    }
-
-    /**
-     * Returns the editor's selection, or <code>null</code> if no selection can be obtained or the editor is <code>null</code>.
-     * 
-     * @return the selection of the action's editor, or <code>null</code>
-     */
-    protected ITextSelection getCurrentSelection()
-    {
-        ITextEditor editor = fEditor;
-        if (editor != null)
-        {
-            ISelectionProvider provider = editor.getSelectionProvider();
-            if (provider != null)
-            {
-                ISelection selection = provider.getSelection();
-                if (selection instanceof ITextSelection) return (ITextSelection)selection;
-            }
-        }
-        return null;
     }
 
     /**
@@ -148,37 +90,33 @@ public class FortranBlockCommentActionDelegate extends Action implements IEditor
         int selectionOffset = selection.getStartLine();
         int selectionEndOffset = selection.getEndLine();
         List edits = new LinkedList();
-        IDocumentProvider dp = fEditor.getDocumentProvider();
-        IDocument doc = dp.getDocument(fEditor.getEditorInput());
+        IDocumentProvider dp = getFortranEditor().getDocumentProvider();
+        IDocument doc = dp.getDocument(getFortranEditor().getEditorInput());
 
         for (int i = selectionOffset; i <= selectionEndOffset; i++)
         {
-
             int eff;
             eff = doc.getLineOffset(i);
             if (doc.getChar(eff) == '!')
-            {
                 edits.add(factory.createEdit(eff, 1, ""));
-            }
             else
-            {
                 edits.add(factory.createEdit(eff, 0, "!"));
-            }
-
         }
         executeEdits(edits);
 
         if (selectionEndOffset == doc.getNumberOfLines() - 1)
         {
             // case when lines get to the end
-            fEditor.selectAndReveal(selection.getOffset(), selection.getLength());
-            fEditor.selectAndReveal(doc.getLineOffset(selectionOffset), doc.getLineOffset(selectionEndOffset) - doc.getLineOffset(selectionOffset)
-                + doc.getLineLength(doc.getLineLength(doc.getNumberOfLines())));
+            getFortranEditor().selectAndReveal(selection.getOffset(), selection.getLength());
+            getFortranEditor().selectAndReveal(doc.getLineOffset(selectionOffset),
+                                               doc.getLineOffset(selectionEndOffset)
+                                               - doc.getLineOffset(selectionOffset)
+                                               + doc.getLineLength(doc.getLineLength(doc.getNumberOfLines())));
         }
         else
         {
             // normal case
-            fEditor.selectAndReveal(doc.getLineOffset(selectionOffset), doc.getLineOffset(selectionEndOffset + 1) - doc.getLineOffset(selectionOffset));
+            getFortranEditor().selectAndReveal(doc.getLineOffset(selectionOffset), doc.getLineOffset(selectionEndOffset + 1) - doc.getLineOffset(selectionOffset));
         }
     }
 
@@ -188,7 +126,6 @@ public class FortranBlockCommentActionDelegate extends Action implements IEditor
      */
     static class Edit extends DocumentEvent
     {
-
         /**
          * Factory for edits which manages the creation, installation and destruction of position categories, position updaters etc. on a certain document. Once a factory
          * has been obtained, <code>Edit</code> objects can be obtained from it which will be linked to the document by positions of one position category.

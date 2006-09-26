@@ -1,8 +1,6 @@
 package org.eclipse.photran.ui;
 
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.photran.internal.ui.preferences.ColorPreferencePage;
-import org.eclipse.photran.internal.ui.preferences.FortranEditorPreferencePage;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -66,7 +64,5 @@ public class FortranUIPlugin extends AbstractUIPlugin
      */
     protected void initializeDefaultPluginPreferences()
     {
-        ColorPreferencePage.setDefaultColors();
-        FortranEditorPreferencePage.setDefaultSpaces();
     }
 }
