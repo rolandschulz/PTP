@@ -1,13 +1,10 @@
-package org.eclipse.photran.internal.ui.editor;
+package org.eclipse.photran.internal.ui.old_editor;
 
 import org.eclipse.cdt.core.model.IWorkingCopy;
 import org.eclipse.cdt.internal.ui.editor.CContentOutlinePage;
-import org.eclipse.cdt.internal.ui.editor.CEditorMessages;
-import org.eclipse.cdt.internal.ui.editor.ICEditorActionDefinitionIds;
 import org.eclipse.cdt.ui.CUIPlugin;
 import org.eclipse.cdt.ui.IWorkingCopyManager;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.text.DefaultLineTracker;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
@@ -17,7 +14,6 @@ import org.eclipse.jface.text.rules.DefaultPartitioner;
 import org.eclipse.jface.text.rules.RuleBasedPartitionScanner;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.photran.internal.ui.actions.FortranCommentActions;
 import org.eclipse.photran.internal.ui.preferences.FortranEditorPreferencePage;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
@@ -281,13 +277,13 @@ public class FortranFreeFormEditor extends AbstractFortranEditor {
 	 */
 	protected void createActions() {
 		super.createActions();
-		Action action = new FortranCommentActions(CEditorMessages
-				.getResourceBundle(), "AddBlockComment.", this); //$NON-NLS-1$
-		action
-				.setActionDefinitionId(ICEditorActionDefinitionIds.ADD_BLOCK_COMMENT);
-		setAction("AddBlockComment", action); //$NON-NLS-1$
-		markAsStateDependentAction("AddBlockComment", true); //$NON-NLS-1$
-		markAsSelectionDependentAction("AddBlockComment", true); //$NON-NLS-1$      
+//		Action action = new FortranBlockCommentAction(CEditorMessages
+//				.getResourceBundle(), "AddBlockComment.", this); //$NON-NLS-1$
+//		action
+//				.setActionDefinitionId(ICEditorActionDefinitionIds.ADD_BLOCK_COMMENT);
+//		setAction("AddBlockComment", action); //$NON-NLS-1$
+//		markAsStateDependentAction("AddBlockComment", true); //$NON-NLS-1$
+//		markAsSelectionDependentAction("AddBlockComment", true); //$NON-NLS-1$      
 	}
 
 	// --FOLDING

@@ -9,6 +9,7 @@ Bundle-Vendor: University of Illinois at Urbana-Champaign and Los Alamos Nationa
 Bundle-Localization: plugin
 Export-Package: org.eclipse.photran.internal.ui.actions,
  org.eclipse.photran.internal.ui.editor,
+ org.eclipse.photran.internal.ui.old_editor,
  org.eclipse.photran.internal.ui.preferences,
  org.eclipse.photran.ui
 Require-Bundle: org.eclipse.ui,

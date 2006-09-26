@@ -1,4 +1,4 @@
-package org.eclipse.photran.internal.ui.editor;
+package org.eclipse.photran.internal.ui.old_editor;
 
 import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;

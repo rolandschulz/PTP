@@ -1,9 +1,10 @@
-package org.eclipse.photran.internal.ui.editor;
+package org.eclipse.photran.internal.ui.old_editor;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.text.DefaultIndentLineAutoEditStrategy;
 import org.eclipse.jface.text.IAutoEditStrategy;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
@@ -11,7 +12,7 @@ import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
-import org.eclipse.photran.internal.ui.editor.FortranPartitionScanner.Partition;
+import org.eclipse.photran.internal.ui.old_editor.FortranPartitionScanner.Partition;
 import org.eclipse.photran.internal.ui.preferences.FortranEditorPreferencePage;
 import org.eclipse.photran.ui.FortranUIPlugin;
 
@@ -44,35 +45,35 @@ public class FortranSourceViewerConfiguration extends SourceViewerConfiguration 
 	 * and any new files that the user opens.
 	 */
 	
-	//TODO: This can be an issue for fixed form that expects all tabs to be spaces.
-	// And should not be left as tabs regardless of the preferences
-	// A solution would be to have 2 sourceviewerconfigurations
-	public String[] getIndentPrefixes(ISourceViewer sourceViewer,
-			String contentType) {
-		List list = new ArrayList();
-		// prefix[0] is either '\t' or ' ' x tabWidth, depending on useSpaces
-		int tabWidth = getPreferenceStore().getInt(
-				FortranEditorPreferencePage.TAB_WIDTH_PREF);
-		boolean useSpaces = getPreferenceStore().getBoolean(
-				FortranEditorPreferencePage.SPACES_FOR_TABS_PREF);
-		for (int i = 0; i <= tabWidth; i++) {
-			StringBuffer prefix = new StringBuffer();
-			if (useSpaces) {
-				for (int j = 0; j + i < tabWidth; j++)
-					prefix.append(' ');
-				if (i != 0)
-					prefix.append('\t');
-			} else {
-				for (int j = 0; j < i; j++)
-					prefix.append(' ');
-				if (i != tabWidth)
-					prefix.append('\t');
-			}
-			list.add(prefix.toString());
-		}
-		list.add(""); //$NON-NLS-1$
-		return (String[]) list.toArray(new String[list.size()]);
-	}
+	// TODO: This can be an issue for fixed form that expects all tabs to be spaces.
+    // And should not be left as tabs regardless of the preferences
+    // A solution would be to have 2 sourceviewerconfigurations
+    public String[] getIndentPrefixes(ISourceViewer sourceViewer, String contentType)
+    {
+        List list = new ArrayList();
+        // prefix[0] is either '\t' or ' ' x tabWidth, depending on useSpaces
+        int tabWidth = getPreferenceStore().getInt(FortranEditorPreferencePage.TAB_WIDTH_PREF);
+        boolean useSpaces = getPreferenceStore().getBoolean(FortranEditorPreferencePage.SPACES_FOR_TABS_PREF);
+        for (int i = 0; i <= tabWidth; i++)
+        {
+            StringBuffer prefix = new StringBuffer();
+            if (useSpaces)
+            {
+                for (int j = 0; j + i < tabWidth; j++)
+                    prefix.append(' ');
+                if (i != 0) prefix.append('\t');
+            }
+            else
+            {
+                for (int j = 0; j < i; j++)
+                    prefix.append(' ');
+                if (i != tabWidth) prefix.append('\t');
+            }
+            list.add(prefix.toString());
+        }
+        list.add(""); //$NON-NLS-1$
+        return (String[])list.toArray(new String[list.size()]);
+    }
 
 	/*
 	 *  (non-Javadoc)
@@ -97,7 +98,10 @@ public class FortranSourceViewerConfiguration extends SourceViewerConfiguration 
 	public IAutoEditStrategy[] getAutoEditStrategies(ISourceViewer sourceViewer, String contentType) {
 
 		
-		return new IAutoEditStrategy[] {/*new FortranAutoIndentStrategy(editor instanceof FortranFreeFormEditor)*/};
+		return new IAutoEditStrategy[] {
+            /*new FortranAutoIndentStrategy(editor instanceof FortranFreeFormEditor)*/
+            new DefaultIndentLineAutoEditStrategy()
+        };
 	}
 
 	// ----- SYNTAX HIGHLIGHTING -----------------------------------------------

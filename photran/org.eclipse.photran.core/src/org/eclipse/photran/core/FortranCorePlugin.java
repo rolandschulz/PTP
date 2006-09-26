@@ -1,6 +1,8 @@
 package org.eclipse.photran.core;
 
 import org.eclipse.core.runtime.Plugin;
+import org.eclipse.photran.internal.core.parser.ParsingTable;
+import org.eclipse.photran.internal.core.parser.Productions;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -30,6 +32,9 @@ public class FortranCorePlugin extends Plugin
     public void start(BundleContext context) throws Exception
     {
         super.start(context);
+        
+        // Loading the huge stuff now so the user doesn't have to wait when they first open a file
+        new ParsingTable(Productions.getInstance());
     }
 
     /**

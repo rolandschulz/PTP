@@ -2,7 +2,107 @@
 <?eclipse version="3.2"?>
 <plugin>
 
-     <!--==========================================-->
+   <!--==========================================-->
+   <!-- Free Form and Fixed Form Fortran Editors -->   
+   <!--==========================================-->
+   <!--extension
+         point="org.eclipse.ui.editors"
+         id="org.eclipse.photran.ui.FortranEditor"-->
+         
+      <!-- Since freeFormFortranSource and fixedFormFortranSource are "sub-content types" of fortranSource,
+           we will bind both editors to the fortranSource content type; however, whichever content type
+           binding is given first will be "tighter" and used as the default.
+           That way, fixed form files will open in the fixed form editor by default, but they can also
+           be opened in the free form editor (right click, and choose Open With).  Similarly, free form files
+           can be opened in the fixed form editor. -->
+      <!--editor
+            default="true"
+            name="Fortran Editor (Free Format)"
+            icon="icons/full/obj16/f_file_obj.gif"
+            class="org.eclipse.photran.internal.ui.old_editor.FortranFreeFormEditor"
+            contributorClass="org.eclipse.photran.internal.ui.old_editor.FortranEditorActionContributor"
+            symbolicFontName="org.eclipse.cdt.ui.editors.textfont"
+            id="org.eclipse.photran.ui.editor.FortranEditor">
+         <contentTypeBinding
+            contentTypeId="org.eclipse.photran.core.freeFormFortranSource" />
+         <contentTypeBinding
+            contentTypeId="org.eclipse.photran.core.fortranSource" />
+      </editor>
+      <editor
+            default="true"
+            name="Fortran Editor (Fixed Format)"
+            icon="icons/full/obj16/f_file_obj.gif"
+            class="org.eclipse.photran.internal.ui.old_editor.FortranFixedFormEditor"
+            contributorClass="org.eclipse.photran.internal.ui.old_editor.FortranEditorActionContributor"
+            symbolicFontName="org.eclipse.cdt.ui.editors.textfont"
+            id="org.eclipse.photran.ui.editor.FortranFixedFormEditor">
+         <contentTypeBinding
+            contentTypeId="org.eclipse.photran.core.fixedFormFortranSource" />
+         <contentTypeBinding
+            contentTypeId="org.eclipse.photran.core.fortranSource" />
+      </editor>
+      <editor
+            class="org.eclipse.photran.internal.ui.editor.AbstractFortranEditor"
+            contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
+            extensions="f90"
+            icon="icons/sample.gif"
+            id="org.eclipse.photran.ui.editors.AbstractFortranEditor"
+            name="Fortran Editor"/>
+   </extension-->
+   
+   <!-- Set default double-click action in editor -->
+   <!--extension
+         point="org.eclipse.ui.editorActions">
+      <editorContribution
+            targetID="org.eclipse.photran.ui.editor.FortranEditor"
+            id="org.eclipse.ui.texteditor.ruler.actions">
+         <action
+               label="Set Bookmark"
+               helpContextId="org.eclipse.ui.bookmark_action_context"
+               class="org.eclipse.ui.texteditor.BookmarkRulerAction"
+               actionID="RulerDoubleClick"
+               id="org.eclipse.ui.texteditor.BookmarkRulerAction">
+         </action>
+      </editorContribution>
+   </extension-->
+   
+   <!-- Block-comment (Ctrl+/) support in editor - cheahcf -->
+   <!--extension
+            point="org.eclipse.ui.bindings">
+        <key
+            sequence="Ctrl+/"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+             contextId="org.eclipse.photran.ui.FEditorScope"
+               commandId = "org.eclipse.cdt.ui.edit.text.c.add.block.comment"/>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            name="Source Editing"
+            description="Source Editing"
+            id="org.eclipse.photran.ui.category.source">
+      </category>
+            <command
+            categoryId="org.eclipse.photran.ui.category.source"
+            description="Remove block comments in Photran"
+            id="org.eclipse.cdt.ui.edit.text.c.add.block.comment"
+            name="Photran Block Comment">
+              </command>
+   </extension-->
+
+   <!-- Define a Fortran Editor context -->   
+   <!--extension
+            point="org.eclipse.ui.contexts">
+          <context
+            name="Fortran Editor"
+            parentId="org.eclipse.ui.textEditorScope"
+            description="Editting Fortran Editor"
+            id="org.eclipse.photran.ui.FEditorScope">
+       </context>
+   </extension-->
+   
+   
+   <!--==========================================-->
    <!-- Free Form and Fixed Form Fortran Editors -->   
    <!--==========================================-->
    <extension
@@ -19,35 +119,48 @@
             default="true"
             name="Fortran Editor (Free Format)"
             icon="icons/full/obj16/f_file_obj.gif"
-            class="org.eclipse.photran.internal.ui.editor.FortranFreeFormEditor"
-            contributorClass="org.eclipse.photran.internal.ui.editor.FortranEditorActionContributor"
-            symbolicFontName="org.eclipse.cdt.ui.editors.textfont"
-            id="org.eclipse.photran.ui.editor.FortranEditor">
+            class="org.eclipse.photran.internal.ui.editor.FreeFormFortranEditor"
+            id="org.eclipse.photran.ui.FreeFormFortranEditor">
          <contentTypeBinding
-            contentTypeId="org.eclipse.photran.core.freeFormFortranSource" />
+              contentTypeId="org.eclipse.photran.core.freeFormFortranSource" />
          <contentTypeBinding
-            contentTypeId="org.eclipse.photran.core.fortranSource" />
+              contentTypeId="org.eclipse.photran.core.fortranSource" />
       </editor>
       <editor
             default="true"
             name="Fortran Editor (Fixed Format)"
             icon="icons/full/obj16/f_file_obj.gif"
-            class="org.eclipse.photran.internal.ui.editor.FortranFixedFormEditor"
-            contributorClass="org.eclipse.photran.internal.ui.editor.FortranEditorActionContributor"
-            symbolicFontName="org.eclipse.cdt.ui.editors.textfont"
-            id="org.eclipse.photran.ui.editor.FortranFixedFormEditor">
+            class="org.eclipse.photran.internal.ui.editor.FixedFormFortranEditor"
+            id="org.eclipse.photran.ui.FixedFormFortranEditor">
          <contentTypeBinding
-            contentTypeId="org.eclipse.photran.core.fixedFormFortranSource" />
+              contentTypeId="org.eclipse.photran.core.fixedFormFortranSource" />
          <contentTypeBinding
-            contentTypeId="org.eclipse.photran.core.fortranSource" />
+              contentTypeId="org.eclipse.photran.core.fortranSource" />
       </editor>
    </extension>
    
-   <!-- Set default double-click action in editor -->
-   <extension
+   <!-- Define a Fortran Editor context -->   
+
+   <!-- Block-comment (Ctrl+/) support in editor -->
+   <!-- For menubarPath, see class ITextEditorActionConstants -->
+
+   <extension point="org.eclipse.ui.popupMenus">
+	  <viewerContribution 
+	        targetID="#FortranEditorContextMenu" 
+	        id="org.eclipse.photran.ui.BlockCommentEditorContribution">
+	     <action 
+	           label="Comment/Uncomment" 
+	           class="org.eclipse.photran.internal.ui.actions.FortranBlockCommentActionDelegate" 
+	           menubarPath="group.edit" 
+	           id="org.eclipse.photran.ui.BlockCommentMenuAction"/>
+	  </viewerContribution>
+   </extension>
+   
+   <!-- Defing setting bookmark as default double-click action -->
+   <!--extension
          point="org.eclipse.ui.editorActions">
       <editorContribution
-            targetID="org.eclipse.photran.ui.editor.FortranEditor"
+            targetID="org.eclipse.photran.ui.FreeFormFortranEditor"
             id="org.eclipse.ui.texteditor.ruler.actions">
          <action
                label="Set Bookmark"
@@ -57,42 +170,18 @@
                id="org.eclipse.ui.texteditor.BookmarkRulerAction">
          </action>
       </editorContribution>
-   </extension>
-   
-   <!-- Block-comment (Ctrl+/) support in editor - cheahcf -->
-   <extension
-   		 point="org.eclipse.ui.bindings">
-   	 <key
-            sequence="Ctrl+/"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-         	contextId="org.eclipse.photran.ui.FEditorScope"
-   			commandId = "org.eclipse.cdt.ui.edit.text.c.add.block.comment"/>
-   </extension>
-   <extension
-         point="org.eclipse.ui.commands">
-      <category
-            name="Source Editing"
-            description="Source Editing"
-            id="org.eclipse.photran.ui.category.source">
-      </category>
-            <command
-            categoryId="org.eclipse.photran.ui.category.source"
-            description="Remove block comments in Photran"
-            id="org.eclipse.cdt.ui.edit.text.c.add.block.comment"
-            name="Photran Block Comment">
-     	 	</command>
-   </extension>
-
-   <!-- Define a Fortran Editor context -->   
-   <extension
-   		 point="org.eclipse.ui.contexts">
-   	   <context
-            name="Fortran Editor"
-            parentId="org.eclipse.ui.textEditorScope"
-            description="Editting Fortran Editor"
-            id="org.eclipse.photran.ui.FEditorScope">
-       </context>
-   </extension>
+      <editorContribution
+            targetID="org.eclipse.photran.ui.FixedFormFortranEditor"
+            id="org.eclipse.ui.texteditor.ruler.actions">
+         <action
+               label="Set Bookmark"
+               helpContextId="org.eclipse.ui.bookmark_action_context"
+               class="org.eclipse.ui.texteditor.BookmarkRulerAction"
+               actionID="RulerDoubleClick"
+               id="org.eclipse.ui.texteditor.BookmarkRulerAction">
+         </action>
+      </editorContribution>
+   </extension-->
    
    <!--=============================-->
    <!-- Actionset-part associations -->
@@ -127,25 +216,25 @@
       <page
             name="Fortran"
             class="org.eclipse.photran.internal.ui.preferences.MainFortranPreferencePage"
-            id="org.eclipse.photran.internal.ui.preferences.MainFortranPreferencePage">
+            id="org.eclipse.photran.ui.MainFortranPreferencePage">
       </page>
       <page
             name="Parser"
-            category="org.eclipse.photran.internal.ui.preferences.MainFortranPreferencePage"
+            category="org.eclipse.photran.ui.MainFortranPreferencePage"
             class="org.eclipse.photran.internal.ui.preferences.FortranParserPreferencePage"
-            id="org.eclipse.photran.ui.preferences.FortranParserPreferencePage">
+            id="org.eclipse.photran.ui.FortranParserPreferencePage">
       </page>
       <page
             name="Editor"
-            category="org.eclipse.photran.internal.ui.preferences.MainFortranPreferencePage"
+            category="org.eclipse.photran.ui.MainFortranPreferencePage"
             class="org.eclipse.photran.internal.ui.preferences.FortranEditorPreferencePage"
-            id="org.eclipse.photran.internal.ui.preferences.FortranEditorPreferencePage">
+            id="org.eclipse.photran.ui.FortranEditorPreferencePage">
       </page>
       <page
             name="Colors"
-            category="org.eclipse.photran.internal.ui.preferences.FortranEditorPreferencePage"
+            category="org.eclipse.photran.ui.FortranEditorPreferencePage"
             class="org.eclipse.photran.internal.ui.preferences.ColorPreferencePage"
-            id="org.eclipse.photran.internal.ui.preferences.ColorPreferencePage">
+            id="org.eclipse.photran.ui.ColorPreferencePage">
       </page>
    </extension>
 </plugin>

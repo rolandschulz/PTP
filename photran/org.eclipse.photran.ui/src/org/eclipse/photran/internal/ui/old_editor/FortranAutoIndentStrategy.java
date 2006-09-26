@@ -9,7 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     QNX Software System
  *******************************************************************************/
-package org.eclipse.photran.internal.ui.editor;
+package org.eclipse.photran.internal.ui.old_editor;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DefaultIndentLineAutoEditStrategy;
