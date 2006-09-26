@@ -140,6 +140,14 @@
    </extension>
    
    <!-- Define a Fortran Editor context -->   
+   <extension
+            point="org.eclipse.ui.contexts">
+          <context
+            name="Fortran Editor"
+            parentId="org.eclipse.ui.textEditorScope"
+            id="org.eclipse.photran.ui.FortranEditorContext">
+       </context>
+   </extension>
 
    <!-- Block-comment (Ctrl+/) support in editor -->
    <!-- For menubarPath, see class ITextEditorActionConstants -->
@@ -155,36 +163,56 @@
 	           id="org.eclipse.photran.ui.BlockCommentMenuAction"/>
 	  </viewerContribution>
    </extension>
-   
-   <!-- Defing setting bookmark as default double-click action -->
-   <!--extension
+   <extension
+            point="org.eclipse.ui.bindings">
+        <key
+            sequence="Ctrl+/"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            contextId="org.eclipse.photran.ui.FortranEditorContext"
+            commandId="org.eclipse.photran.ui.CommentCommand"/>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            name="Source Editing"
+            description="Source Editing"
+            id="org.eclipse.photran.ui.SourceEditingCategory">
+      </category>
+      <command
+            categoryId="org.eclipse.photran.ui.SourceEditingCategory"
+            description="Comment/Uncomment"
+            id="org.eclipse.photran.ui.CommentCommand"
+            name="Photran Block Comment">
+      </command>
+   </extension>
+
+   <!-- Define toggling a breakpoint as the default double-click action -->
+   <extension
          point="org.eclipse.ui.editorActions">
       <editorContribution
             targetID="org.eclipse.photran.ui.FreeFormFortranEditor"
-            id="org.eclipse.ui.texteditor.ruler.actions">
+            id="org.eclipse.photran.ui.FreeFormBreakpointRulerAction">
          <action
-               label="Set Bookmark"
-               helpContextId="org.eclipse.ui.bookmark_action_context"
-               class="org.eclipse.ui.texteditor.BookmarkRulerAction"
+               label="Toggle Breakpoint"
+               class="org.eclipse.cdt.debug.internal.ui.actions.ManageBreakpointRulerActionDelegate"
                actionID="RulerDoubleClick"
-               id="org.eclipse.ui.texteditor.BookmarkRulerAction">
+               id="org.eclipse.cdt.debug.ui.CEditor.ManageBreakpointRulerAction">
          </action>
       </editorContribution>
       <editorContribution
             targetID="org.eclipse.photran.ui.FixedFormFortranEditor"
-            id="org.eclipse.ui.texteditor.ruler.actions">
+            id="org.eclipse.photran.ui.FixedFormBreakpointRulerAction">
          <action
-               label="Set Bookmark"
-               helpContextId="org.eclipse.ui.bookmark_action_context"
-               class="org.eclipse.ui.texteditor.BookmarkRulerAction"
+               label="Toggle Breakpoint"
+               class="org.eclipse.cdt.debug.internal.ui.actions.ManageBreakpointRulerActionDelegate"
                actionID="RulerDoubleClick"
-               id="org.eclipse.ui.texteditor.BookmarkRulerAction">
+               id="org.eclipse.cdt.debug.ui.CEditor.ManageBreakpointRulerAction">
          </action>
       </editorContribution>
-   </extension-->
+   </extension>
    
    <!--=============================-->
-   <!-- Actionset-part associations -->
+   <!-- ActionSet-part associations -->
    <!--=============================-->
    <extension
          point="org.eclipse.ui.actionSetPartAssociations">

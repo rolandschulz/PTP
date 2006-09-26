@@ -63,7 +63,7 @@ public abstract class AbstractFortranEditor extends TextEditor implements ISelec
     
     private static String CONTEXT_MENU_ID = "#FortranEditorContextMenu";
     
-    private static String BLOCK_COMMENT_ACTION_ID = "org.eclipse.photran.ui.BlockCommentCommand";
+    private static String BLOCK_COMMENT_COMMAND_ID = "org.eclipse.photran.ui.CommentCommand";
     
     private static final RGB VERTICAL_LINE_COLOR = new RGB(176, 180, 185);
 
@@ -155,10 +155,10 @@ public abstract class AbstractFortranEditor extends TextEditor implements ISelec
     {
         super.createActions();
         IAction action = new FortranBlockCommentActionDelegate(this);
-        action.setActionDefinitionId(BLOCK_COMMENT_ACTION_ID);
-        setAction(BLOCK_COMMENT_ACTION_ID, action);
-        //markAsStateDependentAction(BLOCK_COMMENT_ACTION_ID, true);
-        //markAsSelectionDependentAction(BLOCK_COMMENT_ACTION_ID, true);      
+        action.setActionDefinitionId(BLOCK_COMMENT_COMMAND_ID);
+        setAction(BLOCK_COMMENT_COMMAND_ID, action);
+        markAsStateDependentAction(BLOCK_COMMENT_COMMAND_ID, true);
+        markAsSelectionDependentAction(BLOCK_COMMENT_COMMAND_ID, true);      
     }
 
     // /////////////////////////////////////////////////////////////////////////////////////////////
