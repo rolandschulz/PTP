@@ -670,8 +670,14 @@ type_param_spec_list
     ;
 
 // R457
+// inlined derived_type_spec (R662) to remove ambiguity using backtracking
 structure_constructor
-	:	derived_type_spec
+options {backtrack=true;}
+    : T_IDENT T_LPAREN type_param_spec_list T_RPAREN
+		T_LPAREN
+		( component_spec_list )?
+		T_RPAREN
+    | T_IDENT
 		T_LPAREN
 		( component_spec_list )?
 		T_RPAREN
@@ -739,6 +745,7 @@ array_constructor
 // R466
 // refactored to remove optional from lhs
 ac_spec
+options {backtrack=true;}
     : type_spec T_COLON_COLON (ac_value_list)?
     | ac_value_list
     ;
@@ -1238,30 +1245,12 @@ variable
 //	|	array-section           // R617 is data-ref [ (substring-range) ] 
 //	|	structure-component     // R614 is data-ref
 //	|	substring
+// (substring-range) may be matched in data-ref
 // TODO check to see if substring is covered, see NOTE 6.3
 designator
 options {backtrack=true;}
-	:	T_IDENT data_ref_opt_rng
+	:	data_ref (T_LPAREN substring_range T_RPAREN)?
 	|	char_literal_constant T_LPAREN substring_range T_RPAREN
-	;
-
-// R612
-data_ref_opt_rng
-	:	part_ref_suffix part_deref_chain_opt_rng
-	;
-
-part_deref_chain_opt_rng : part_deref_opt_rng ;
-
-part_deref_opt_rng
-options {k=1;}
-	:	(T_PERCENT) => T_PERCENT part_deref_suffix_opt_rng
-	|	(T_LPAREN)  => T_LPAREN substring_range T_RPAREN
-	|	{ /* empty */ }
-	;
-
-part_deref_suffix_opt_rng
-	:	 T_IDENT part_deref
-	|	 T_IDENT T_LPAREN section_subscript_list T_RPAREN part_deref_opt_rng
 	;
 
 // R604
@@ -1301,7 +1290,7 @@ int_variable
 // C608 (R610) parent_string shall be of type character
 // fix for ambiguity in data_ref allows it to match T_LPAREN substring_range T_RPAREN,
 // so required T_LPAREN substring_range T_RPAREN made optional
-// ERR_CHK 609 insure final () is (substring-range)
+// ERR_CHK 609 ensure final () is (substring-range)
 substring
 	:	data_ref (T_LPAREN substring_range T_RPAREN)?
 	|	char_literal_constant T_LPAREN substring_range T_RPAREN
@@ -1323,33 +1312,18 @@ substring_range
 
 // R612
 data_ref
-	:	part_ref part_deref_chain
-	;
-
-part_deref_chain : part_deref ;
-
-part_deref
-options {k=1;}
-	:	(T_PERCENT) => T_PERCENT part_deref_suffix
-	|	{ /* empty */ }
-	;
-
-part_deref_suffix
-	:	 T_IDENT part_deref
-	|	 T_IDENT T_LPAREN section_subscript_list T_RPAREN part_deref
+options {backtrack=true;}
+	:	part_ref ( T_PERCENT part_ref )*
 	;
 
 // R613
 // T_IDENT inlined for part_name
+// with k=2, this path is chosen over T_LPAREN substring_range T_RPAREN
 part_ref
-	:	T_IDENT part_ref_suffix
+options {k=2;}
+	:	 (T_IDENT T_LPAREN) => T_IDENT T_LPAREN section_subscript_list T_RPAREN
+	|	 T_IDENT
 	;
-
-part_ref_suffix
-options {k=1;}
-	:	(T_LPAREN) => T_LPAREN section_subscript_list T_RPAREN
-	|	{ /* empty */ }
-    ;
 
 // R614 structure_component inlined as data_ref
 
@@ -1706,18 +1680,17 @@ assignment_stmt
 // R735
 // TODO putback
 pointer_assignment_stmt
-    :    data_pointer_object ( T_LPAREN bounds_spec_list T_RPAREN )? T_EQ_GT data_target T_EOS
+    :    data_pointer_object /* ( T_LPAREN bounds_spec_list T_RPAREN )? */ T_EQ_GT data_target T_EOS
 //    | data_pointer_object T_LPAREN bounds_remapping_list T_RPAREN T_EQ_GT data_target T_EOS
 //    | proc_pointer_object T_EQ_GT proc_target T_EOS
     ;
 
 // R736
+// ERR_CHK 736 ensure ( T_IDENT | designator ending in T_PERCENT T_IDENT)
 // T_IDENT inlined for variable_name and data_pointer_component_name
 // variable replaced by designator
 data_pointer_object
-options {backtrack=true;}
-	:	T_IDENT
-	|	designator T_PERCENT T_IDENT
+	:	designator
 	;
 
 // R737
@@ -1751,11 +1724,11 @@ data_target
 	;
 
 // R740
+// ERR_CHK 740 ensure ( T_IDENT | ends in T_PERCENT T_IDENT )
 // T_IDENT inlined for proc_pointer_name
-// proc_component_ref replaced by designator T_PERCENT T_IDENT
+// proc_component_ref replaced by designator T_PERCENT T_IDENT replaced by designator
 proc_pointer_object
-	:	T_IDENT
-	|	designator T_PERCENT T_IDENT
+	:	designator
 	;
 
 // R741 proc_component_ref inlined as designator T_PERCENT T_IDENT in R740, R742, R1219, and R1221
@@ -1763,14 +1736,12 @@ proc_pointer_object
 // designator inlined for variable
 
 // R742
-// ERR_CHK 736 insure ( expr | designator ending in T_PERCENT T_IDENT)
+// ERR_CHK 736 ensure ( expr | designator ending in T_PERCENT T_IDENT)
 // T_IDENT inlined for procedure_name
 // T_IDENT isa expr so T_IDENT deleted
 // proc_component_ref is variable T_PERCENT T_IDENT can be designator so deleted
-// putback deletion above may be true because can't be character-type % id
 proc_target
 	:	expr
-//	|	designator T_PERCENT T_IDENT
 	;
 
 // R743
@@ -2877,6 +2848,7 @@ intrinsic_stmt
 	;
 
 // R1217
+// C1220 (R1217) The procedure-designator shall designate a function.
 function_reference
 	:	procedure_designator
 		T_LPAREN
@@ -2885,6 +2857,7 @@ function_reference
 	;
 
 // R1218
+// C1222 (R1218) The procedure-designator shall designate a subroutine.
 call_stmt
     :    T_CALL procedure_designator ( T_LPAREN ( actual_arg_spec_list )? T_RPAREN )? T_EOS
     ;
@@ -2900,9 +2873,7 @@ call_stmt
 //                                      or data-ref % binding-name
 // TODO putback
 procedure_designator
-	:	T_IDENT
-//	|	designator
-//	|	designator T_PERCENT T_IDENT
+	:	designator 'PROCEDURE_DESIGNATOR_PROBLEM'
 	;
 
 // R1220
@@ -2915,15 +2886,13 @@ actual_arg_spec_list
     ;
 
 // R1221
-// ERR_CHK 1221 insure ( expr | designator ending in T_PERCENT T_IDENT)
+// ERR_CHK 1221 ensure ( expr | designator ending in T_PERCENT T_IDENT)
 // T_IDENT inlined for procedure_name
 // expr isa designator (via primary) so variable deleted
 // designator isa T_IDENT so T_IDENT deleted
 // proc_component_ref is variable T_PERCENT T_IDENT can be designator so deleted
-// TODO putback tied up with abiguities at 1350 (?) and 2949, maybe ok with backtracking
 actual_arg
 	:	expr
-//	|	designator //T_PERCENT T_IDENT
 	|	T_ASTERISK label
 	;
 
