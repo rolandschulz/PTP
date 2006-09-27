@@ -55,7 +55,6 @@ import org.eclipse.ptp.debug.internal.ui.actions.UnregisterAction;
 import org.eclipse.ptp.debug.internal.ui.views.AbstractPDebugEventHandler;
 import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
-import org.eclipse.ptp.debug.ui.model.DebugElement;
 import org.eclipse.ptp.ui.IManager;
 import org.eclipse.ptp.ui.actions.ParallelAction;
 import org.eclipse.ptp.ui.model.IElement;
@@ -63,8 +62,6 @@ import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.ptp.ui.views.IIconCanvasActionListener;
 import org.eclipse.ptp.ui.views.ParallelJobView;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IViewPart;
@@ -420,6 +417,7 @@ public class ParallelDebugView extends ParallelJobView {
     		}
     	}
     }
+    /*
 	public void drawSpecial(Object obj, GC gc, int x_loc, int y_loc, int width, int height) {
 		super.drawSpecial(obj, gc, x_loc, y_loc, width, height);
 		if (cur_element_set != null && obj instanceof DebugElement) {
@@ -433,6 +431,7 @@ public class ParallelDebugView extends ParallelJobView {
 			}
 		}
 	}
+	*/
 	
 	/******************************************************
 	 * the focus on debug target on debug view 
@@ -441,6 +440,24 @@ public class ParallelDebugView extends ParallelJobView {
 		Object debugObj = ((UIDebugManager) manager).getDebugObject(job, task_id);
 		if (debugObj != null) {
 			focusOnDebugView(debugObj);
+		}
+	}
+	private void focusOnDebugView(final Object selection) {
+		if (selection == null) {
+			return;
+		}
+		if (PTPDebugUIPlugin.getDisplay().getThread() == Thread.currentThread()) {
+			doOnFocusDebugView(selection);
+		} else {
+			WorkbenchJob job = new WorkbenchJob("Focus on Debug View") {
+				public IStatus runInUIThread(IProgressMonitor monitor) {
+					doOnFocusDebugView(selection);
+					return Status.OK_STATUS;
+				}
+			};
+			job.setPriority(Job.INTERACTIVE);
+			job.setSystem(true);
+			job.schedule();
 		}
 	}
 	private void expendDebugView(AsynchronousTreeViewer asynViewer, Object selection) {
@@ -468,34 +485,16 @@ public class ParallelDebugView extends ParallelJobView {
 			focusOnDebugTarget(asynViewer, selection);
 		}
 	}
-	private void focusOnDebugView(final Object selection) {
-		if (selection == null) {
-			return;
-		}
-		if (PTPDebugUIPlugin.getDisplay().getThread() == Thread.currentThread()) {
-			doOnFocusDebugView(selection);
-		} else {
-			WorkbenchJob job = new WorkbenchJob("Focus on Debug View") {
-				public IStatus runInUIThread(IProgressMonitor monitor) {
-					doOnFocusDebugView(selection);
-					return Status.OK_STATUS;
-				}
-			};
-			job.setPriority(Job.INTERACTIVE);
-			job.setSystem(true);
-			job.schedule();
-		}
-	}
 	private void focusOnDebugTarget(final AsynchronousTreeViewer asynViewer, final Object selection) {
 		WorkbenchJob job = new WorkbenchJob("Focus on Debug Target") {
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				final TreePath[] treePaths = asynViewer.getTreePaths(selection);
 				if (treePaths.length > 0) {
-   					asynViewer.setSelection(new TreeSelection(treePaths[0]), true, true);
+					asynViewer.setSelection(new TreeSelection(treePaths[0]), true, true);
    					//selectElements(new Object[] { selection });
-    			}
-                return Status.OK_STATUS;
-            }
+				}
+				return Status.OK_STATUS;
+			}
         };
         job.setSystem(true);
         job.setPriority(Job.DECORATE);

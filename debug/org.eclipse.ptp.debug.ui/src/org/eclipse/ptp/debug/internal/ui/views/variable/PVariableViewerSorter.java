@@ -22,7 +22,7 @@ import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
-import org.eclipse.ptp.debug.internal.ui.PJobVariableManager.VariableInfo;
+import org.eclipse.ptp.debug.internal.ui.PJobVariableManager.JobVariable;
 
 /**
  * @author Clement chu
@@ -38,9 +38,8 @@ public class PVariableViewerSorter extends ViewerSorter {
 	public int getColumn() {
 		return column;
 	}
-	
     public int compare(Viewer viewer, Object e1, Object e2) {
-    	if (!(e1 instanceof VariableInfo)) {
+    	if (!(e1 instanceof JobVariable)) {
     		return super.compare(viewer, e1, e2);
     	}
     	
@@ -48,10 +47,10 @@ public class PVariableViewerSorter extends ViewerSorter {
 		switch (column) {
 		case 0:
 			if (isAccending) {
-				return ((VariableInfo)e1).isEnable()?1:-1;
+				return ((JobVariable)e1).isEnable()?1:-1;
 			}
 			else {
-				return ((VariableInfo)e2).isEnable()?1:-1;
+				return ((JobVariable)e2).isEnable()?1:-1;
 			}
 		default:
 	    	if (viewer instanceof StructuredViewer) {

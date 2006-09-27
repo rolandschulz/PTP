@@ -20,8 +20,12 @@ package org.eclipse.ptp.debug.internal.ui.actions;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.ptp.debug.internal.ui.PDebugImage;
+import org.eclipse.ptp.debug.internal.ui.PJobVariableManager.JobVariable;
 import org.eclipse.ptp.debug.internal.ui.views.variable.PVariableDialog;
 import org.eclipse.ptp.debug.internal.ui.views.variable.PVariableView;
 
@@ -48,9 +52,17 @@ public class EditPExpressionAction extends Action {
 	 * @see org.eclipse.jface.action.Action#run()
 	 */
 	public void run() {
-		if (new PVariableDialog(view, PVariableDialog.EDIT_MODE).open() == Window.OK) {
-			view.refresh();
-			view.getUIManager().updateVariableValue(true);
-		}
+		ISelection selection = view.getSelection();
+		if (!selection.isEmpty() && selection instanceof IStructuredSelection) {
+			JobVariable jVar = (JobVariable)((IStructuredSelection)selection).getFirstElement();
+			if (!jVar.getJob().getIDString().equals(view.getUIManager().getCurrentJobId())) {
+				MessageDialog.openError(view.getViewSite().getShell(), "Not allow editing", "Selected item does not belong to current Job");
+				return;
+			}
+			if (new PVariableDialog(view, PVariableDialog.EDIT_MODE).open() == Window.OK) {
+				view.refresh();
+				view.getUIManager().updateVariableValue(true);
+			}
+		}		
 	}
 }

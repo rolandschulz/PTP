@@ -16,23 +16,36 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.internal.ui.views.variable;
+package org.eclipse.ptp.debug.internal.ui.actions;
 
-import org.eclipse.jface.viewers.IStructuredContentProvider;
-import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.ptp.debug.internal.ui.PJobVariableManager;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
+import org.eclipse.ptp.debug.internal.ui.PDebugImage;
+import org.eclipse.ptp.debug.internal.ui.views.variable.PVariableView;
 
 /**
  * @author Clement chu
  */
-public class PVariableContentProvider implements IStructuredContentProvider {
-	public Object[] getElements(Object inputElement) {
-		if (inputElement instanceof PJobVariableManager) {
-			return ((PJobVariableManager)inputElement).getVariableStorage().getJobValues();
-		}
-		return new Object[0];
-	}
+public class CompareValueAction extends Action {
+	public static final String name = "Compare value";
+	private PVariableView view = null;
 
-	public void dispose() {}
-	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
+	/** Constructor
+	 * @param view
+	 */
+	public CompareValueAction(PVariableView view) {
+		super(name, IAction.AS_PUSH_BUTTON);
+	    setImageDescriptor(PDebugImage.ID_ICON_VAR_COMPARE_NORMAL);
+	    //setDisabledImageDescriptor(PDebugImage.ID_ICON_VAR_REFRESH_DISABLE);
+	    setToolTipText(name);
+	    setId(name);
+	    setEnabled(false);
+	    this.view = view;
+	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.action.Action#run()
+	 */
+	public void run() {
+		view.getUIManager().updateVariableValue(true);
+	}
 }
