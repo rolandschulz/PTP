@@ -18,7 +18,6 @@ import org.eclipse.jface.text.Position;
 import org.eclipse.photran.internal.ui.actions.FortranBlockCommentActionDelegate.Edit.EditFactory;
 import org.eclipse.photran.internal.ui.editor.AbstractFortranEditor;
 import org.eclipse.ui.texteditor.IDocumentProvider;
-import org.eclipse.ui.texteditor.ITextEditor;
 
 /**
  * Action supporting block commenting in the Fortran editor
@@ -34,9 +33,9 @@ public class FortranBlockCommentActionDelegate extends FortranEditorActionDelega
 
     public void run()
     {
-        ITextEditor editor = getFortranEditor();
-        ITextSelection selection = getEditorSelection();
-        IDocument document = getEditorIDocument();
+        AbstractFortranEditor editor = getFortranEditor();
+        ITextSelection selection = editor.getSelection();
+        IDocument document = editor.getIDocument();
         if (document == null) return;
 
         IRewriteTarget target = (IRewriteTarget)editor.getAdapter(IRewriteTarget.class);

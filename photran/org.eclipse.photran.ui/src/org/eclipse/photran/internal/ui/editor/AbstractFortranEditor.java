@@ -7,6 +7,7 @@ import org.eclipse.cdt.internal.ui.editor.CContentOutlinePage;
 import org.eclipse.cdt.internal.ui.editor.CTextEditorActionConstants;
 import org.eclipse.cdt.ui.CUIPlugin;
 import org.eclipse.cdt.ui.IWorkingCopyManager;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -15,6 +16,7 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.jface.text.IRegion;
+import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.ITextViewerExtension2;
 import org.eclipse.jface.text.MarginPainter;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
@@ -28,8 +30,13 @@ import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.photran.core.ASTFactory;
+import org.eclipse.photran.core.IFortranAST;
+import org.eclipse.photran.core.util.OffsetLength;
+import org.eclipse.photran.internal.core.lexer.LexerOptions;
 import org.eclipse.photran.internal.core.preferences.FortranPreferences;
 import org.eclipse.photran.internal.ui.actions.FortranBlockCommentActionDelegate;
 import org.eclipse.photran.internal.ui.actions.FortranOpenDeclarationActionDelegate;
@@ -40,7 +47,9 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPartService;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -459,4 +468,66 @@ public abstract class AbstractFortranEditor extends TextEditor implements ISelec
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
     public abstract boolean isFixedForm();
+    
+    public IFile getIFile()
+    {
+        IEditorInput input = getEditorInput();
+        return (input != null && input instanceof IFileEditorInput ? ((IFileEditorInput)input).getFile() : null);
+    }
+
+    public IDocument getIDocument()
+    {
+        IEditorInput input = getEditorInput();
+        return input == null ? null : getDocumentProvider().getDocument(input);
+    }
+    
+    public ITextSelection getSelection()
+    {
+        ISelectionProvider provider = getSelectionProvider();
+        if (provider == null) return null;
+        
+        ISelection sel = provider.getSelection();
+        if (!(sel instanceof ITextSelection)) return null;
+        
+        return (ITextSelection)sel;
+    }
+    
+    public OffsetLength getSelectionOffsetLength()
+    {
+        ITextSelection sel = getSelection();
+        return sel == null ? null : new OffsetLength(sel.getOffset(), sel.getLength());
+    }
+    
+    public Shell getShell()
+    {
+        return getSite().getShell();
+    }
+    
+    public IFortranAST parseContents(int lexerOptions)
+    {
+        try
+        {
+            lexerOptions = (isFixedForm() ? LexerOptions.FIXED_FORM : LexerOptions.FREE_FORM) | lexerOptions;
+            return ASTFactory.buildAST(getIFile(), lexerOptions);
+        }
+        catch (Exception e)
+        {
+            return null;
+        }
+    }
+    
+    public void forceOutlineViewUpdate()
+    {
+        //  //     ///     ////   //  //    ///
+        //  //   //  //   //      // //    /////
+        //////   //////   //      ////      ///
+        //  //   //  //   //      // //
+        //  //   //  //    ////   //  //    //
+        
+        IDocument doc = getIDocument();
+        doc.set(" " + doc.get());
+        doSave(null);
+        doc.set(doc.get().substring(1));
+        doSave(null);
+    }
 }

@@ -70,17 +70,17 @@ public class Parser
      * The userActions field refers to an instance of the ParserUserActions
      * class, which contains all of the user code
      */
-    protected AbstractProductions productions;
+    protected Productions productions;
 
     /**
      * The entrypoint to the parser.
      */
-    public Object parse(ILexer lexicalAnalyzer, AbstractProductions productionsToPlugIn) throws Exception
+    public ASTExecutableProgramNode parse(ILexer lexicalAnalyzer) throws Exception
     {
+        productions = Productions.getInstance();
         errorRecovery = new ErrorRecovery(this);
         lexer = lexicalAnalyzer;
-        productions = productionsToPlugIn;
-        parsingTable = new ParsingTable(productionsToPlugIn);
+        parsingTable = ParsingTable.getInstance();
 
         // Initialize the parsing stacks
         symbolStack = new ArrayList();
@@ -107,7 +107,7 @@ public class Parser
         // Return the value from the last piece of user code
         // executed in a completed parse (the value associated with the
         // start symbol), or null if parsing failed.
-        return (error || valueStack.isEmpty()) ? null : (Object)valueStack.get(valueStack.size()-1);
+        return (error || valueStack.isEmpty()) ? null : (ASTExecutableProgramNode)valueStack.get(valueStack.size()-1);
     }
 
     void readNextToken() throws Exception
@@ -204,7 +204,7 @@ public class Parser
     /**
      * Retrieve the object containing all of the user code
      */
-    AbstractProductions getProductions() { return productions; }
+    Productions getProductions() { return productions; }
 
     /**
      * Stores the parsing table

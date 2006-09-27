@@ -23,7 +23,7 @@ superType=
 shouldRemoveEpsilonProductions=true
 debuggable=false
 incremental=false
-pluggableParserActions=true
+pluggableParserActions=false
 
 [types]
 

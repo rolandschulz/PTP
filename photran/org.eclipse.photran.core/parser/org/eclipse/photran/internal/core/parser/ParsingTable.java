@@ -8,11 +8,14 @@ package org.eclipse.photran.internal.core.parser; import org.eclipse.photran.int
  */
 public class ParsingTable
 {
-    private AbstractProductions pr;
+    private static ParsingTable singletonInstance = null;
+    public static final ParsingTable getInstance() { if (singletonInstance == null) singletonInstance = new ParsingTable(); return singletonInstance; }
 
-    public ParsingTable(AbstractProductions productions)
+    private Productions pr;
+
+    public ParsingTable()
     {
-        pr = productions;
+        pr = Productions.getInstance();
     }
     protected static final short ACTION_MASK = (short)0xc000;
     protected static final short VALUE_MASK = (short)0x3fff;

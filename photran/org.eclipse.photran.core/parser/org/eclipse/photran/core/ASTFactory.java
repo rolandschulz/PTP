@@ -20,7 +20,7 @@ public class ASTFactory
     
     public static IFortranAST buildAST(ILexer lexer) throws Exception
     {
-        return (IFortranAST)new Parser().parse(lexer, Productions.getInstance());
+        return (IFortranAST)FortranCorePlugin.getParser().parse(lexer);
     }
     
     public static IFortranAST buildAST(InputStream in, String filename, int lexerOptions) throws Exception

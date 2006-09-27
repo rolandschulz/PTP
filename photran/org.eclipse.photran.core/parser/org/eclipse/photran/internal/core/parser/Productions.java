@@ -8,7 +8,7 @@ import java.util.ArrayList;
 /**
  * Enumerates the productions in the grammar being parsed
  */
-public class Productions extends AbstractProductions
+public class Productions
 {
     private Productions() {;} // Singleton
     private static Productions singletonInstance = null;
