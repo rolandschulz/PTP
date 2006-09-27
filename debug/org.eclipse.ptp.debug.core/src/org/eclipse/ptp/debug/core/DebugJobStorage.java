@@ -35,12 +35,19 @@ public class DebugJobStorage {
 	private Map jobMap;
 	
 	public DebugJobStorage(String name) {
-		this.name = name;
 		jobMap = new HashMap();
-		addDebugStorage(name, this);
+		if (containsKey(name)) {
+			this.name = name + "1";
+			addDebugStorage(this.name, this);
+			throw new IllegalArgumentException("Key: " + name + " is already defined.");
+		}
+		else {
+			this.name = name;
+			addDebugStorage(this.name, this);
+		}
 	}
 	public void closeDebugJobStorage() {
-		for (Iterator i=getJobValueIterator(); i.hasNext();) {
+		for (Iterator i=jobMap.values().iterator(); i.hasNext();) {
 			((Storage)i.next()).clean();
 		}
 		jobMap.clear();
@@ -69,6 +76,20 @@ public class DebugJobStorage {
 				values.addAll(((Storage)i.next()).getValues());
 			}
 			return values.iterator();
+		}
+	}
+	public Object[] getJobValues() {
+		synchronized (jobMap) {
+			List values = new ArrayList();
+			for (Iterator i=jobMap.values().iterator(); i.hasNext();) {
+				values.addAll(((Storage)i.next()).getValues());
+			}
+			return values.toArray(new Object[0]);
+		}
+	}
+	public Object[] getValues(String job_id) {
+		synchronized (jobMap) {
+			return getJobStorage(job_id).getValues().toArray(new Object[0]);
 		}
 	}
 	public Iterator getValueIterator(String job_id) {
@@ -136,6 +157,11 @@ public class DebugJobStorage {
 	/***************************
 	 * static functions
 	 ***************************/
+	public static boolean containsKey(String name) {
+		synchronized (storages) {
+			return storages.containsKey(name);
+		}
+	}
 	public static DebugJobStorage getDebugStorage(String name) {
 		synchronized (storages) {
 			return (DebugJobStorage)storages.get(name);
