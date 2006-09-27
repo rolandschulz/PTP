@@ -46,7 +46,7 @@ external_subprogram
 	;
 
 // R204
-// ERR_CHK 204 see ERR_CHK 204, implicit_part? removed (was after import_stmt*)
+// ERR_CHK 204 see ERR_CHK 207, implicit_part? removed (was after import_stmt*)
 specification_part
 	:	( use_stmt )*
 		( import_stmt )*
@@ -693,10 +693,11 @@ component_spec_list
     ;
 
 // R459
+// is (expr | data-target | proc-target)
 // data_target isa expr so data_target deleted
-// expr isa proc_target so expr deleted
+// proc_target isa expr so proc_target deleted
 component_data_source
-	:	proc_target
+	:	expr
 	;
 
 // R460
@@ -855,8 +856,9 @@ initialization
 	;
 
 // R507
+// C506 The function-reference shall be a reference to the NULL intrinsic function with no arguments.
 null_init
-	:	function_reference
+	:	T_IDENT /* 'NULL' */ T_LPAREN T_RPAREN
 	;
 
 // R508
@@ -1014,8 +1016,20 @@ data_i_do_object_list
 // C556 (R529) The data-i-do-variable shall be a named variable.
 
 // R530
+// ERR_CHK R530 designator is scalar-constant or integer constant when followed by '*'
+// data_stmt_repeat inlined from R531
+// structure_constructure covers null_init if 'NULL()' so null_init deleted
 data_stmt_value
-    : ( data_stmt_repeat T_ASTERISK )? data_stmt_constant
+options {backtrack=true;}
+	:	designator (T_ASTERISK data_stmt_constant)?
+	|	int_literal_constant (T_ASTERISK data_stmt_constant)?
+	|	( T_PLUS | T_MINUS ) int_literal_constant
+	|	signed_real_literal_constant
+	|	complex_literal_constant
+	|	logical_literal_constant
+	|	char_literal_constant
+	|	boz_literal_constant
+	|	structure_constructor // is null_init if 'NULL()'
     ;
 
 data_stmt_value_list
@@ -1035,15 +1049,17 @@ scalar_int_constant
 // scalar_constant_subobject replaced by designator
 // scalar_constant replaced by literal_constant as designator can be T_IDENT
 // then literal_constant inlined (except for signed portion)
-// designator 
-// TODO putback
+// structure_constructure covers null_init if 'NULL()' so null_init deleted
 data_stmt_constant
-	:	scalar_constant
-//	|	scalar_constant_subobject
-//	|	signed_int_literal_constant
-//	|	signed_real_literal_constant
-//	|	null_init
-//	|	structure_constructor
+options {backtrack=true;}
+	:	designator
+	|	signed_int_literal_constant
+	|	signed_real_literal_constant
+	|	complex_literal_constant
+	|	logical_literal_constant
+	|	char_literal_constant
+	|	boz_literal_constant
+	|	structure_constructor // is null_init if 'NULL()'
 	;
 
 // R533 int_constant_subobject was constant_subobject inlined as designator in R531
@@ -1197,13 +1213,12 @@ equivalence_set_list
     ;
 
 // R556
-// TODO putback
 // T_IDENT inlined for variable_name
 // data_ref inlined for array_element
-// data_ref can be T_IDENT so T_IDENT deleted (removing second alt)
+// data_ref isa T_IDENT so T_IDENT deleted (removing first alt)
+// substring isa data_ref so data_ref deleted (removing second alt)
 equivalence_object
-	:	data_ref
-//	|	substring
+	:	substring
 	;
 
 equivalence_object_list
@@ -1240,13 +1255,13 @@ variable
 // R602 variable_name was name inlined as T_IDENT
 
 // R603
-//  :   object-name             // T_IDENT is a data-ref
+//  :   object-name             // T_IDENT (data-ref isa T_IDENT)
 //	|	array-element           // R616 is data-ref
 //	|	array-section           // R617 is data-ref [ (substring-range) ] 
 //	|	structure-component     // R614 is data-ref
 //	|	substring
 // (substring-range) may be matched in data-ref
-// TODO check to see if substring is covered, see NOTE 6.3
+// this rule is now identical to substring
 designator
 options {backtrack=true;}
 	:	data_ref (T_LPAREN substring_range T_RPAREN)?
@@ -1400,11 +1415,9 @@ allocation_list
 // R629
 // T_IDENT inlined for variable_name
 // data_ref inlined for structure_component
-// data_ref can be a T_IDENT so T_IDENT deleted
-// TODO putback data_ref (causes problem in part_deref stuff)
+// data_ref isa T_IDENT so T_IDENT deleted
 allocate_object
-	:	T_IDENT
-//	:	data_ref
+	:	data_ref
 	;
 
 allocate_object_list
@@ -1418,10 +1431,8 @@ allocate_shape_spec
     :    expr ( T_COLON expr )?
     ;
 
-// TODO putback
 allocate_shape_spec_list
-    :    allocate_shape_spec
-//         ( T_COMMA allocate_shape_spec )*
+    :    allocate_shape_spec ( T_COMMA allocate_shape_spec )*
     ;
 
 // R631 inlined lower_bound_expr was scalar_int_expr
@@ -1473,15 +1484,13 @@ dealloc_opt_list
 // T_IDENT inlined for type_param_name
 // data_ref in designator can be a T_IDENT so T_IDENT deleted
 // type_param_inquiry is designator T_PERCENT T_IDENT can be designator so deleted
-// TODO putback
-// TODO what about char_literal_constant in designator
-// TODO what about designator ending in T_PERCENT T_IDENT
 primary
+options {backtrack=true;}
 	:	literal_constant
 	|	designator
 	|	array_constructor
-//	|	structure_constructor
-//	|	function_reference
+	|	structure_constructor
+	|	function_reference
 	|	T_LPAREN expr T_RPAREN
 	;
 
@@ -1678,11 +1687,17 @@ assignment_stmt
 	;
 
 // R735
-// TODO putback
+// ERR_TEST 735 ensure that part_ref in data_ref doesn't capture the T_LPAREN
+// data_pointer_object and proc_pointer_object replaced by designator
+// data_target and proc_target replaced by expr
+// third alt covered by first alt so proc_pointer_object assignment deleted
+// designator (R603), minus the substring part is data_ref, so designator replaced by data_ref,
+// see NOTE 6.10 for why array-section does not have pointer attribute
 pointer_assignment_stmt
-    :    data_pointer_object /* ( T_LPAREN bounds_spec_list T_RPAREN )? */ T_EQ_GT data_target T_EOS
-//    | data_pointer_object T_LPAREN bounds_remapping_list T_RPAREN T_EQ_GT data_target T_EOS
-//    | proc_pointer_object T_EQ_GT proc_target T_EOS
+options {backtrack=true;}
+    : data_ref T_EQ_GT expr T_EOS
+    | data_ref T_LPAREN bounds_spec_list T_RPAREN T_EQ_GT expr T_EOS
+    | data_ref T_LPAREN bounds_remapping_list T_RPAREN T_EQ_GT expr T_EOS
     ;
 
 // R736
@@ -1717,11 +1732,8 @@ bounds_remapping_list
     :    bounds_remapping ( T_COMMA bounds_remapping )*
     ;
 
-// R739
+// R739 data_target inlined as expr in R459 and R735
 // expr can be designator (via primary) so variable deleted
-data_target
-	:	expr
-	;
 
 // R740
 // ERR_CHK 740 ensure ( T_IDENT | ends in T_PERCENT T_IDENT )
@@ -1735,14 +1747,11 @@ proc_pointer_object
 // T_IDENT inlined for procedure_component_name
 // designator inlined for variable
 
-// R742
+// R742 proc_target inlined as expr in R459 and R735
 // ERR_CHK 736 ensure ( expr | designator ending in T_PERCENT T_IDENT)
 // T_IDENT inlined for procedure_name
 // T_IDENT isa expr so T_IDENT deleted
 // proc_component_ref is variable T_PERCENT T_IDENT can be designator so deleted
-proc_target
-	:	expr
-	;
 
 // R743
 // ERR_CHK 743 mask_expr replaced by expr
@@ -2859,7 +2868,8 @@ function_reference
 // R1218
 // C1222 (R1218) The procedure-designator shall designate a subroutine.
 call_stmt
-    :    T_CALL procedure_designator ( T_LPAREN ( actual_arg_spec_list )? T_RPAREN )? T_EOS
+    :    T_CALL procedure_designator
+         ( T_LPAREN ( actual_arg_spec_list )? T_RPAREN )? T_EOS
     ;
 
 // R1219
@@ -2867,13 +2877,12 @@ call_stmt
 // T_IDENT inlined for procedure_name and binding_name
 // proc_component_ref is variable T_PERCENT T_IDENT (variable is designator)
 // data_ref subset of designator so data_ref T_PERCENT T_IDENT deleted
-// inlined designator from R603
+// designator (R603), minus the substring part is data_ref, so designator replaced by data_ref
 //R1219 procedure-designator            is procedure-name
 //                                      or proc-component-ref
 //                                      or data-ref % binding-name
-// TODO putback
 procedure_designator
-	:	designator 'PROCEDURE_DESIGNATOR_PROBLEM'
+	:	data_ref
 	;
 
 // R1220
