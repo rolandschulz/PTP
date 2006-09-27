@@ -161,29 +161,26 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
     // Constants - Words to highlight
     ///////////////////////////////////////////////////////////////////////////
     
-    private static String[] fgKeywords = { "ACCESS", "ACTION", "ADVANCE", " ALLOCATABLE ", " ALLOCATE ", " ASSIGN ", " ASSIGNMENT ", " ASSOCIATE ", " ASYNCHRONOUS ",
-        " BACKSPACE ", " BIND ", " BLANK ", " BLOCK ", " CALL ", " CASE ", " CLOSE ", " CLASS ", " COMMON ", " CONTAINS ", " CONTINUE ", " CYCLE ", " DATA ",
-        " DEALLOCATE ", " DEFAULT ", " DELIM ", " DIMENSION ", " DIRECT ", " DO ", " DOUBLE ", " DOUBLEPRECISION ", " ELSE ", " ELSEWHERE ", " END ", " ENDDO ",
-        " ENDFILE ", " ENDIF ", " ENTRY ", " EOR ", " EQUIVALENCE ", " ERR ", " EXIST ", " EXIT ", " EXTENDS ", " EXTENSIBLE ", " EXTERNAL ", " FILE ", " FMT ",
-        " FLUSH ", " FORALL ", " FORM ", " FORMAT ", " FORMATTED ", " FUNCTION ", " GO ", " IF ", " IMPLICIT ", " IN ", " INOUT ", " INCLUDE ", " INQUIRE ", " INTENT ",
-        " INTERFACE ", " INTRINSIC ", " IOLENGTH ", " IOSTAT ", " INSTRINSIC ", " KIND ", " LEN ", " MODULE ", " NAME ", " NAMED ", " NAMELIST ", " NEXTREC ", " NML ",
-        " NONE ", " NON_OVERRIDABLE ", " NOPASS ", " NULLIFY ", " NUMBER ", " ONLY ", " OPEN ", " OPENED ", " OPERATOR ", " OPTIONAL ", " OUT ", " PAD ", " PARAMETER ",
-        " PASS ", " PAUSE ", " POINTER ", " POSITION ", " PRECISION ", " PRINT ", " PRIVATE ", " PROCEDURE ", " PROGRAM ", " PROTECTED ", " PUBLIC ", " READ ",
-        " READWRITE ", " REC ", " RECL ", " RECURSIVE ", " RESULT ", " RETURN ", " REWIND ", " SAVE ", " SELECT ", " SEQUENCE ", " SEQUENTIAL ", " SIZE ", " STAT ",
-        " STATUS ", " STOP ", " SUBROUTINE ", " TARGET ", " THEN ", " TO ", " TYPE ", " UNFORMATTED ", " UNIT ", " USE ", " VOLATILE ", " WHERE ", " WHILE ", " WRITE " };
+    private static String[] fgKeywords = { "ACCESS", "ACTION", "ADVANCE", "ALLOCATABLE", "ALLOCATE", "ASSIGN", "ASSIGNMENT", "ASSOCIATE", "ASYNCHRONOUS", "BACKSPACE",
+        "BIND", "BLANK", "BLOCK", "CALL", "CASE", "CLOSE", "CLASS", "COMMON", "CONTAINS", "CONTINUE", "CYCLE", "DATA", "DEALLOCATE", "DEFAULT", "DELIM", "DIMENSION",
+        "DIRECT", "DO", "DOUBLE", "DOUBLEPRECISION", "ELSE", "ELSEWHERE", "END", "ENDDO", "ENDFILE", "ENDIF", "ENTRY", "EOR", "EQUIVALENCE", "ERR", "EXIST", "EXIT",
+        "EXTENDS", "EXTENSIBLE", "EXTERNAL", "FILE", "FMT", "FLUSH", "FORALL", "FORM", "FORMAT", "FORMATTED", "FUNCTION", "GO", "IF", "IMPLICIT", "IN", "INOUT",
+        "INCLUDE", "INQUIRE", "INTENT", "INTERFACE", "INTRINSIC", "IOLENGTH", "IOSTAT", "INSTRINSIC", "KIND", "LEN", "MODULE", "NAME", "NAMED", "NAMELIST", "NEXTREC",
+        "NML", "NONE", "NON_OVERRIDABLE", "NOPASS", "NULLIFY", "NUMBER", "ONLY", "OPEN", "OPENED", "OPERATOR", "OPTIONAL", "OUT", "PAD", "PARAMETER", "PASS", "PAUSE",
+        "POINTER", "POSITION", "PRECISION", "PRINT", "PRIVATE", "PROCEDURE", "PROGRAM", "PROTECTED", "PUBLIC", "READ", "READWRITE", "REC", "RECL", "RECURSIVE", "RESULT",
+        "RETURN", "REWIND", "SAVE", "SELECT", "SEQUENCE", "SEQUENTIAL", "SIZE", "STAT", "STATUS", "STOP", "SUBROUTINE", "TARGET", "THEN", "TO", "TYPE", "UNFORMATTED",
+        "UNIT", "USE", "VOLATILE", "WHERE", "WHILE", "WRITE" };
 
     private static String[] fgTextualOperators = { ".EQ.", ".EQV.", ".FALSE.", ".GE.", ".GT.", ".LE.", ".NE.", ".NEQV.", ".NOT.", ".OR.", ".TRUE." };
 
-    private static String[] fgIntrinsics = { " ABS ", " ACHAR ", " ACOS ", " ADJUSTL ", " ADJUSTR ", " AIMAG ", " AINT ", " ALL ", " ALLOCATED ", " AND ", " ANINT ",
-        " ANY ", " ASIN ", " ASSOCIATED ", " ATAN ", " ATAN2 ", " BIT_SIZE ", " BTEST ", " CEILING ", " CHAR ", " CMPLX ", " CONJG ", " COS ", " COSH ", " COUNT ",
-        " CSHIFT ", " DATE_AND_TIME ", " DBLE ", " DIGITS ", " DIM ", " DOT_PRODUCT ", " DPROD ", " EOSHIFT ", " EPSILON ", " EQV ", " EXP ", " EXPONENT ", " FALSE ",
-        " FLOOR ", " FRACTION ", " HUGE ", " IACHAR ", " IAND ", " IBCLR ", " IBITS ", " IBSET ", " ICHAR ", " IEOR ", " INDEX ", " INT ", " IOR ", " ISHFT ",
-        " ISHFTC ", " KIND ", " LBOUND ", " LEN ", " LEN_TRIM ", " LGE ", " LGT ", " LLE ", " LLT ", " LOG ", " LOG10 ", " LOGICAL ", " MATMUL ", " MAX ",
-        " MAXEXPONENT ", " MAXLOC ", " MAXVAL ", " MERGE ", " MIN ", " MINEXPONENT ", " MINLOC ", " MINVAL ", " MOD ", " MODULO ", " MVBITS ", " NEAREST ", " NEQV ",
-        " NINT ", " NOT ", " OR ", " PACK ", " PRECISION ", " PRESENT ", " PRODUCT ", " RADIX ", " RANDOM_NUMBER ", " RANDOM_SEED ", " RANGE ", " REAL ", " REPEAT ",
-        " RESHAPE ", " RRSPACING ", " SCALE ", " SCAN ", " SELECTED_INT_KIND ", " SELECTED_REAL_KIND ", " SET_EXPONENT ", " SHAPE ", " SIGN ", " SIN ", " SINH ",
-        " SIZE ", " SPACING ", " SPREAD ", " SQRT ", " SUM ", " SYSTEM_CLOCK ", " TAN ", " TANH ", " TINY ", " TRANSFER ", " TRANSPOSE ", " TRIM ", " TRUE ", " UBOUND ",
-        " UNPACK ", " VERIFY " };
+    private static String[] fgIntrinsics = { "ABS", "ACHAR", "ACOS", "ADJUSTL", "ADJUSTR", "AIMAG", "AINT", "ALL", "ALLOCATED", "AND", "ANINT", "ANY", "ASIN",
+        "ASSOCIATED", "ATAN", "ATAN2", "BIT_SIZE", "BTEST", "CEILING", "CHAR", "CMPLX", "CONJG", "COS", "COSH", "COUNT", "CSHIFT", "DATE_AND_TIME", "DBLE", "DIGITS",
+        "DIM", "DOT_PRODUCT", "DPROD", "EOSHIFT", "EPSILON", "EQV", "EXP", "EXPONENT", "FALSE", "FLOOR", "FRACTION", "HUGE", "IACHAR", "IAND", "IBCLR", "IBITS", "IBSET",
+        "ICHAR", "IEOR", "INDEX", "INT", "IOR", "ISHFT", "ISHFTC", "KIND", "LBOUND", "LEN", "LEN_TRIM", "LGE", "LGT", "LLE", "LLT", "LOG", "LOG10", "LOGICAL", "MATMUL",
+        "MAX", "MAXEXPONENT", "MAXLOC", "MAXVAL", "MERGE", "MIN", "MINEXPONENT", "MINLOC", "MINVAL", "MOD", "MODULO", "MVBITS", "NEAREST", "NEQV", "NINT", "NOT", "OR",
+        "PACK", "PRECISION", "PRESENT", "PRODUCT", "RADIX", "RANDOM_NUMBER", "RANDOM_SEED", "RANGE", "REAL", "REPEAT", "RESHAPE", "RRSPACING", "SCALE", "SCAN",
+        "SELECTED_INT_KIND", "SELECTED_REAL_KIND", "SET_EXPONENT", "SHAPE", "SIGN", "SIN", "SINH", "SIZE", "SPACING", "SPREAD", "SQRT", "SUM", "SYSTEM_CLOCK", "TAN",
+        "TANH", "TINY", "TRANSFER", "TRANSPOSE", "TRIM", "TRUE", "UBOUND", "UNPACK", "VERIFY" };
 
     private static String[] fgTypes = { "REAL", "INTEGER", "CHARACTER", "LOGICAL", "COMPLEX" };
 
@@ -259,27 +256,27 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
         // If a word appears more than once (e.g., "real" or "len"), the LAST rule assigned to it will apply
         for (int i = 0; i < fgTextualOperators.length; i++)
         {
-            rule.addWord(fgTextualOperators[i].toLowerCase().trim(), colorKeywords);
-            rule.addWord(fgTextualOperators[i].trim(), colorKeywords);
+            rule.addWord(fgTextualOperators[i].toLowerCase(), colorKeywords);
+            rule.addWord(fgTextualOperators[i], colorKeywords);
         }
         for (int i = 0; i < fgPreprocessor.length; i++)
         {
-            rule.addWord(fgPreprocessor[i].trim(), colorKeywords);
+            rule.addWord(fgPreprocessor[i], colorKeywords);
         }
         for (int i = 0; i < fgIntrinsics.length; i++)
         {
-            rule.addWord(fgIntrinsics[i].toLowerCase().trim(), colorIntrinsics);
-            rule.addWord(fgIntrinsics[i].trim(), colorIntrinsics);
+            rule.addWord(fgIntrinsics[i].toLowerCase(), colorIntrinsics);
+            rule.addWord(fgIntrinsics[i], colorIntrinsics);
         }
         for (int i = 0; i < fgTypes.length; i++)
         {
-            rule.addWord(fgTypes[i].toLowerCase().trim(), colorKeywords);
-            rule.addWord(fgTypes[i].trim(), colorKeywords);
+            rule.addWord(fgTypes[i].toLowerCase(), colorKeywords);
+            rule.addWord(fgTypes[i], colorKeywords);
         }
         for (int i = 0; i < fgKeywords.length; i++)
         {
-            rule.addWord(fgKeywords[i].toLowerCase().trim(), colorKeywords);
-            rule.addWord(fgKeywords[i].trim(), colorKeywords);
+            rule.addWord(fgKeywords[i].toLowerCase(), colorKeywords);
+            rule.addWord(fgKeywords[i], colorKeywords);
         }
     }
 }
