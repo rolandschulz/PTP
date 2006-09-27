@@ -33,7 +33,6 @@ import org.eclipse.ptp.debug.internal.ui.PDebugUIUtils;
 import org.eclipse.ptp.debug.internal.ui.UIDebugManager;
 import org.eclipse.ptp.debug.internal.ui.views.AbstractPDebugEventHandler;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
-import org.eclipse.ptp.debug.ui.model.DebugElement;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
 
@@ -134,6 +133,7 @@ public class ParallelDebugViewEventHandler extends AbstractPDebugEventHandler {
 				refresh();
 				break;
 			case IPDebugEvent.CHANGE:
+				/*
 				int detail = event.getDetail();
 				if (detail == IPDebugEvent.EVALUATION || detail == IPDebugEvent.CONTENT) {
 					int[] diffTasks = info.getAllProcesses().toArray();
@@ -150,6 +150,7 @@ public class ParallelDebugViewEventHandler extends AbstractPDebugEventHandler {
 						}
 					}
 				}
+				*/
 				refresh();
 				break;
 			case IPDebugEvent.ERROR:

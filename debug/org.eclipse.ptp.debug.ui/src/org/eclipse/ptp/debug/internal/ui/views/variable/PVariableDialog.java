@@ -34,7 +34,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
 import org.eclipse.ptp.debug.internal.ui.PJobVariableManager;
-import org.eclipse.ptp.debug.internal.ui.PJobVariableManager.VariableInfo;
+import org.eclipse.ptp.debug.internal.ui.PJobVariableManager.JobVariable;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.swt.SWT;
@@ -196,13 +196,10 @@ public class PVariableDialog extends Dialog {
 	}
 	private void updateButtons() {
 		boolean enabled = true;
-		
-		String[] sets = getSelectedSets();
-		String[] vars = getSelectedVariables();
-		if (vars.length == 0) {
+		if (getSelectedVariables().length == 0) {
 			enabled = false;
 		}
-		if (sets.length == 0) {
+		if (getSelectedSets().length == 0) {
 			enabled = false;
 		}
 		getOkButton().setEnabled(enabled);
@@ -211,13 +208,13 @@ public class PVariableDialog extends Dialog {
 	 * 
 	 */
 	protected void initContent() {
-		VariableInfo varInfo = null;
+		JobVariable jVar = null;
 		if (mode == EDIT_MODE) {
 			ISelection selection = view.getSelection();
 			if (!selection.isEmpty() && selection instanceof IStructuredSelection) {
-				varInfo = (VariableInfo)((IStructuredSelection)selection).getFirstElement();
-				varText.setText(varInfo.getVar());
-				checkBtn.setSelection(varInfo.isEnable());
+				jVar = (JobVariable)((IStructuredSelection)selection).getFirstElement();
+				varText.setText(jVar.getVar());
+				checkBtn.setSelection(jVar.isEnable());
 			}
 		}
 
@@ -226,8 +223,8 @@ public class PVariableDialog extends Dialog {
 		for (int i=0; i<sets.length; i++) {
 			item = new TableItem(setTable, SWT.NONE);
 			item.setText(sets[i]);
-			if (varInfo != null) {
-				String[] selectedSets = varInfo.getSets();
+			if (jVar != null) {
+				String[] selectedSets = jVar.getSets();
 				for (int j=0; j<selectedSets.length; j++) {
 					item.setChecked(selectedSets[j].equals(sets[i]));
 				}
@@ -238,8 +235,8 @@ public class PVariableDialog extends Dialog {
 		for (int i=0; i<vars.length; i++) {
 			item = new TableItem(varTable, SWT.NONE);
 			item.setText(vars[i]);
-			if (varInfo != null) {
-				item.setChecked(varInfo.getVar().equals(vars[i]));
+			if (jVar != null) {
+				item.setChecked(jVar.getVar().equals(vars[i]));
 			}
 		}		
 	}
@@ -352,7 +349,9 @@ public class PVariableDialog extends Dialog {
 	protected String[] getSelectedVariables() {
 		String[] vars = getSelectedAvailableVariables();
 		if (vars.length == 0) {
-			return new String[] { varText.getText() };
+			if (varText.getText().length() > 0) {
+				return new String[] { varText.getText() };
+			}
 		}
 		return vars;
 	}
@@ -376,16 +375,16 @@ public class PVariableDialog extends Dialog {
 				}
 			}
 			for (int i=0; i<vars.length; i++) {
-				jobMgr.addJobVariable(job, sets, vars[i], checked);
+				jobMgr.addJobVariable(job, vars[i], sets, checked);
 			}
 			break;
 		case EDIT_MODE:
 			ISelection selection = view.getSelection();
 			if (!selection.isEmpty() && selection instanceof IStructuredSelection) {
-				VariableInfo varInfo = (VariableInfo)((IStructuredSelection)selection).getFirstElement();
-				jobMgr.removeJobVariable(varInfo.getJob().getIDString(), varInfo.getVar());
+				JobVariable varInfo = (JobVariable)((IStructuredSelection)selection).getFirstElement();
+				jobMgr.removeJobVariable(job.getIDString(), varInfo.getVar());
 				for (int i=0; i<vars.length; i++) {
-					jobMgr.addJobVariable(job, sets, vars[i], checked);
+					jobMgr.addJobVariable(job, vars[i], sets, checked);
 				}
 			}
 			break;

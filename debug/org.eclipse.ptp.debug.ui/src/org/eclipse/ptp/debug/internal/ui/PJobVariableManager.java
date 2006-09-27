@@ -19,415 +19,293 @@
 package org.eclipse.ptp.debug.internal.ui;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.core.IPJob;
-import org.eclipse.ptp.core.IPProcess;
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.DebugJobStorage;
 import org.eclipse.ptp.debug.core.PCDIDebugModel;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
-import org.eclipse.ptp.debug.core.events.IPDebugEvent;
-import org.eclipse.ptp.debug.core.events.PDebugEvent;
-import org.eclipse.ptp.debug.core.events.PDebugInfo;
 
 /**
  * @author Clement chu
  */
 public final class PJobVariableManager {
-	private Map jobMap = new HashMap();
+	private DebugJobStorage variableStorage = new DebugJobStorage("Variable");
+	private DebugJobStorage varProcStorage = new DebugJobStorage("Variable_Process");
+	private final String PROCESS_KEY = "process_key";
 	
 	public void shutdown() {
-		removeAllJobVariables();
+		cleanupJobVariableValues();
+		varProcStorage.closeDebugJobStorage();
+		variableStorage.closeDebugJobStorage();
 	}
-	public JobVariable[] getJobVariables() {
-		return (JobVariable[])jobMap.values().toArray(new JobVariable[0]);
-	}
-	public String getResultDisplay(String jid, int taskID) {
+	public String getResultDisplay(String job_id, int task_id) {
 		StringBuffer display = new StringBuffer();
 
-		JobVariable jobVariable = getJobVariable(jid);
-		if (jobVariable == null || !jobVariable.hasVariables()) {
+		ProcessValue procVal = (ProcessValue)varProcStorage.getValue(job_id, PROCESS_KEY);
+		if (procVal == null) {
 			return display.toString();
 		}
-		
-		ValueList values = jobVariable.getValues(new Integer(taskID));
-		if (values == null) {
-			return display.toString();
-		}
-	
-		ValueInfo[] info = values.getValues();
-		for (int i=0; i<info.length; i++) {
+		VariableValue[] values = procVal.getValues(task_id);
+		for (int i=0; i<values.length; i++) {
 			display.append("<i>");
-			display.append(info[i].getVariable());
+			display.append(values[i].getVar());
 			display.append("</i>");
 			display.append(" = ");
-			display.append(info[i].getValue());
+			display.append(values[i].getVal());
 			display.append("<br>");
 		}
 		return display.toString();
 	}
-	public boolean addJobVariable(IPJob job, String[] sets, String var) {
-		return addJobVariable(job, sets, var, true);
-	}
-	public VariableInfo getVariableInfo(IPJob job, String var) {
-		if (job == null)
-			return null;
-		JobVariable jobVariable = getJobVariable(job.getIDString());
-		if (jobVariable != null) {
-			return jobVariable.getVariableInfo(var);
-		}
-		return null;
+	public DebugJobStorage getVariableStorage() {
+		return variableStorage;
 	}
 	public boolean isContainVariable(IPJob job, String var) {
-		return (getVariableInfo(job, var) != null);
+		return (variableStorage.getValue(job.getIDString(), var) != null);
 	}
-	public boolean addJobVariable(IPJob job, String[] sets, String var, boolean enable) {
-		JobVariable jobVariable = getJobVariable(job.getIDString());
-		if (jobVariable == null) {
-			jobVariable = new JobVariable(job);
-			jobMap.put(job.getIDString(), jobVariable);
-		}
-
-		if (var == null || jobVariable.getVariableInfo(var) != null) {
-			return false;
-		}
-		VariableInfo varInfo = new VariableInfo(jobVariable, var);
-		for (int i=0; i<sets.length; i++) {
-			varInfo.addSet(sets[i]);
-		}
-		varInfo.setEnable(enable);
-		jobVariable.addVariableInfo(varInfo);
-		return true;
-	}	
-	public boolean changeJobVariable(IPJob job, IPJob newJob, String[] sets, String var, String newVar, boolean enable) {
-		if (!removeJobVariable(job.getIDString(), var)) {
-			return false;
-		}
-		return addJobVariable(newJob, sets, newVar, enable);
+	public void addJobVariable(IPJob job, String var, String[] sets) {
+		addJobVariable(job, var, sets, true);
 	}
-	public boolean deleteSet(String jid, String sid) {
-		JobVariable jobVariable = getJobVariable(jid);
-		if (jobVariable == null) {
-			return false;
+	public void addJobVariable(IPJob job, String var, String[] sets, boolean enable) {
+		JobVariable jVar = (JobVariable)variableStorage.getValue(job.getIDString(), var);
+		if (jVar == null) {
+			jVar = new JobVariable(job, var, sets, enable);
 		}
-		VariableInfo[] varInfos = jobVariable.getVariables();
-		for (int i=0; i<varInfos.length; i++) {
-			varInfos[i].removeSet(sid);
+		else {
+			jVar.setSets(sets);
+			jVar.setEnable(enable);
 		}
-		return true;
+		variableStorage.addValue(job.getIDString(), var, jVar);
+		createProcessValue(job);
 	}
-	public boolean removeJobVariable(String jid, String var) {
-		JobVariable jobVariable = getJobVariable(jid);
-		if (jobVariable == null) {
-			return false;
-		}
-		VariableInfo varInfo = jobVariable.getVariableInfo(var);
-		if (varInfo == null) {
-			return false;
-		}
-		varInfo.clearSets();
-		jobVariable.removeVariable(varInfo);
-		if (!jobVariable.hasVariables()) {
-			jobMap.remove(jid);
-		}
-		return true;
-	}
-	public boolean removeJobVariable(String jid) {
-		JobVariable jobVariable = getJobVariable(jid);
-		if (jobVariable == null) {
-			return false;
-		}
-		jobVariable.clearAll();
-		jobMap.remove(jid);
-		return true;
-	}
-	public void removeAllJobVariables() {
-		for(Iterator i=jobMap.values().iterator(); i.hasNext();) {
-			JobVariable jobVar = (JobVariable)i.next();
-			jobVar.clearAll();
-		}
-		jobMap.clear();
-	}
-	public boolean hasVariables(String jid) {
-		JobVariable jobVariable = getJobVariable(jid);
-		if (jobVariable != null) {
-			return jobVariable.hasVariables();
-		}
-		return false;
-	}
-	private JobVariable getJobVariable(String jid) {
-		return (JobVariable)jobMap.get(jid);
-	}
-	public void cleanupJobVariableValues() {
-		for(Iterator i=jobMap.values().iterator(); i.hasNext();) {
-			JobVariable jobVar = (JobVariable)i.next();
-			if (jobVar != null) {
-				IPCDISession session = PTPDebugCorePlugin.getDebugModel().getPCDISession(jobVar.getJob().getIDString());
-				BitList taskList = jobVar.getDiffValueTasks();
-				if (taskList != null) {
-					PDebugInfo baseInfo = new PDebugInfo(jobVar.getJob(), taskList, null, null);						
-					PTPDebugCorePlugin.getDefault().fireDebugEvent(new PDebugEvent(session, IPDebugEvent.CHANGE, IPDebugEvent.CONTENT, baseInfo));
-				}
-				jobVar.clearValues();
-			}
+	private void createProcessValue(IPJob job) {
+		ProcessValue procVal = (ProcessValue)varProcStorage.getValue(job.getIDString(), PROCESS_KEY);
+		if (procVal == null) {
+			procVal = new ProcessValue(job.totalProcesses());
+			varProcStorage.addValue(job.getIDString(), PROCESS_KEY, procVal);
 		}		
 	}
-	public void updateJobVariableValues(String jid, String sid, IProgressMonitor monitor) throws CoreException {
-		JobVariable jobVariable = getJobVariable(jid);
-		if (jobVariable != null) {
+	public JobVariable[] getJobVariables(String job_id) {
+		return (JobVariable[])variableStorage.getValues(job_id);
+	}
+	public void changeJobVariable(IPJob job, IPJob newJob, String[] sets, String var, String newVar, boolean enable) {
+		removeJobVariable(job.getIDString(), var);
+		addJobVariable(newJob, newVar, sets, enable);
+	}
+	public void deleteSet(String job_id, String set_id) {
+		List removeVars = new ArrayList();
+		for (Iterator i=variableStorage.getValueIterator(job_id); i.hasNext();) {
+			JobVariable jVar = (JobVariable)i.next();
+			if (jVar.containSet(set_id)) {
+				jVar.removeSet(set_id);
+				if (jVar.getSetSize() == 0) {
+					removeVars.add(jVar.getVar());
+				}
+			}
+		}
+		for (Iterator i=removeVars.iterator(); i.hasNext();) {
+			variableStorage.removeValue(job_id, (String)i.next());
+		}
+	}
+	public boolean deleteSet(String job_id, String var, String set_id) {
+		JobVariable jVar = (JobVariable)variableStorage.getValue(job_id, var);
+		if (jVar == null) {
+			return false;
+		}
+		if (!jVar.containSet(set_id)) {
+			return false;
+		}
+		jVar.removeSet(set_id);
+		if (jVar.getSetSize() == 0) {
+			variableStorage.removeValue(job_id, jVar.getVar());
+		}
+		return true;
+	}
+	public void removeJobVariable(String job_id, String var) {
+		variableStorage.removeValue(job_id, var);
+	}
+	public void removeJobVariables(String job_id) {
+		variableStorage.removeJobStorage(job_id);
+	}
+	public void cleanupJobVariableValues() {
+		for (Iterator i=varProcStorage.getJobValueIterator(); i.hasNext();) {
+			ProcessValue procVal = (ProcessValue)i.next();
+			if (procVal != null) {
+				procVal.cleanAllValues();
+			}
+		}
+	}
+	public String[] getVariables(String job_id, String set_id, boolean enable) {
+		List vars = new ArrayList();
+		for (Iterator i=variableStorage.getValueIterator(job_id); i.hasNext();) {
+			JobVariable jVar = (JobVariable)i.next();
+			if (jVar.isEnable() == enable && jVar.containSet(set_id)) {
+				vars.add(jVar.getVar());
+			}
+		}
+		return (String[])vars.toArray(new String[0]);
+	}
+	public void updateJobVariableValues(String job_id, String set_id, IProgressMonitor monitor) throws CoreException {
+		ProcessValue procVal = (ProcessValue)varProcStorage.getValue(job_id, PROCESS_KEY);
+		if (procVal != null) {
 			//only update when current set id contain in VariableInfo
-			String[] vars = jobVariable.getEnabledVariables(sid);
+			String[] vars = getVariables(job_id, set_id, true);
 			if (vars.length > 0) {
 				PCDIDebugModel debugModel = PTPDebugCorePlugin.getDebugModel();
-				IPCDISession session = debugModel.getPCDISession(jid);
+				IPCDISession session = debugModel.getPCDISession(job_id);
 				if (session != null) {
-					int[] tasks = debugModel.getTasks(jid, sid).toArray();
+					//get suspended tasks only in given job and given set
+					int[] tasks = session.getDebugger().filterRunningTasks(debugModel.getTasks(job_id, set_id)).toArray();
 					int length = tasks.length;
-					BitList taskList = new BitList((length>0)?tasks[tasks.length-1]+1:0);
 					
 					monitor.beginTask("Updating variables value...", (length * vars.length + 1));
 					for (int i=0; i<length; i++) {
 						if (!monitor.isCanceled()) {
-							//check whether the process is terminated
-							IPProcess process = jobVariable.getJob().findProcessByTaskId(tasks[i]);
-							if (process != null && !process.isAllStop()) {
-								ValueList values = new ValueList();
-								for (int j=0; j<vars.length; j++) {
-									values.addValue(new ValueInfo(vars[j], debugModel.getValue(session, tasks[i], vars[j], monitor)));
-								}
-								jobVariable.storeValues(new Integer(tasks[i]), values);
-								if (jobVariable.getType() == JobVariable.TYPE_DIFF) {
-									taskList.set(tasks[i]);
-								}
+							VariableValue[] values = new VariableValue[vars.length];
+							for (int j=0; j<vars.length; j++) {
+								String val = debugModel.getValue(session, tasks[i], vars[j], monitor);
+								values[j] = new VariableValue(vars[j], val);
 							}
+							procVal.setValues(tasks[i], values);
 						}
-					}
-					if (!taskList.isEmpty()) {
-						jobVariable.setDiffValueTasks(taskList);
-						PDebugInfo baseInfo = new PDebugInfo(jobVariable.getJob(), taskList, null, null);						
-						PTPDebugCorePlugin.getDefault().fireDebugEvent(new PDebugEvent(session, IPDebugEvent.CHANGE, IPDebugEvent.EVALUATION, baseInfo));
 					}
 				}
 			}
 		}
 		monitor.done();
 	}
+	
 	public class JobVariable {
-		public static final int TYPE_DEFAULT = 0;
-		public static final int TYPE_DIFF = 1;
-		List variableList = new ArrayList();
-		Map procValue = new HashMap();
-		IPJob job = null;
-		Integer lastPID = null;
-		BitList diffValueTasks = null;
-		int type = TYPE_DEFAULT;
+		IPJob job;
+		String var;
+		String[] sets = new String[0];
+		boolean enable = false;
 		
-		public JobVariable(IPJob job) {
+		public JobVariable(IPJob job, String var, String[] sets, boolean enable) {
 			this.job = job;
+			this.var = var;
+			this.sets = sets;
+			this.enable = enable;
 		}
 		public IPJob getJob() {
 			return job;
 		}
-		public BitList getDiffValueTasks() {
-			return diffValueTasks;
-		}
-		public void setDiffValueTasks(BitList diffValueTasks) {
-			this.diffValueTasks = diffValueTasks;
-		}
-		public int getType() {
-			return type;
-		}
-		public void setType(int type) {
-			this.type = type;
-		}
-		public List getVariableList() {
-			return variableList;
-		}
-		public VariableInfo getVariableInfo(String var) {
-			VariableInfo[] vars = getVariables();
-			for (int i=0; i<vars.length; i++) {
-				if (vars[i].getVar().equals(var))
-					return vars[i];
-			}
-			return null;
-		}
-		public void addVariableInfo(VariableInfo varInfo) {
-			variableList.add(varInfo);
-		}
-		public boolean hasVariables() {
-			return !variableList.isEmpty();
-		}
-		public String[] getEnabledVariables(String sid) {
-			List enVars = new ArrayList();
-			VariableInfo[] vars = getVariables();
-			for (int i=0; i<vars.length; i++) {
-				if (vars[i].isEnable()) {
-					if (vars[i].isSetExisted(sid)) {
-						enVars.add(vars[i].getVar());
-					}
-				}
-			}
-			return (String[])enVars.toArray(new String[0]);
-		}		
-		public String[] getEnabledVariables() {
-			List enVars = new ArrayList();
-			VariableInfo[] vars = getVariables();
-			for (int i=0; i<vars.length; i++) {
-				if (vars[i].isEnable()) {
-					enVars.add(vars[i].getVar());
-				}
-			}
-			return (String[])enVars.toArray(new String[0]);
-		}
-		public VariableInfo[] getVariables() {
-			return (VariableInfo[])variableList.toArray(new VariableInfo[0]);
-		}
-		public void removeVariable(VariableInfo varinfo) {
-			variableList.remove(varinfo);
-			lastPID = null;
-		}
-		public void storeValues(Integer pid, ValueList values) {
-			ValueList oldValues = (ValueList)procValue.remove(pid);
-			if (oldValues != null) {
-				oldValues.clean();
-				oldValues = null;
-			}
-			procValue.put(pid, values);
-			if (lastPID != null) {
-				if (values.compareTo(getValues(lastPID)) > 0) {
-					type = TYPE_DIFF;
-				}
-			}
-			lastPID = pid;
-		}
-		public ValueList getValues(Integer pid) {
-			return (ValueList)procValue.get(pid);
-		}
-		public void clearValues() {
-			procValue.clear();
-			type = TYPE_DEFAULT;
-			diffValueTasks = null;
-			lastPID = null;
-		}
-		public void clearVariables() {
-			variableList.clear();
-		}
-		public void clearAll() {
-			clearVariables();
-			clearValues();
-		}
-	}
-	public class VariableInfo {
-		JobVariable parent;
-		String var;
-		boolean enable;
-		List setList = new ArrayList();
-		
-		public VariableInfo(JobVariable parent, String var) {
-			this.parent = parent;
-			this.var = var;
-			this.enable = true;
-		}
-		public JobVariable getParent() {
-			return parent;
-		}
-		public IPJob getJob() {
-			return getParent().getJob();
-		}
-		public void changeVar(String var) {
-			this.var = var;
-		}
 		public String getVar() {
 			return var;
+		}
+		public String[] getSets() {
+			return sets;
 		}
 		public boolean isEnable() {
 			return enable;
 		}
+		public boolean containSet(String set_id) {
+			for (int i=0; i<sets.length; i++) {
+				if (sets[i].equals(set_id)) {
+					return true;
+				}
+			}
+			return false;
+		}
+		public void addSet(String set_id) {
+			String[] newSets = new String[sets.length + 1];
+			System.arraycopy(sets, 0, newSets, 0, sets.length);
+			newSets[sets.length] = set_id;
+			setSets(newSets);
+		}
+		public void removeSet(String set_id) {
+			String[] newSets = new String[sets.length - 1];
+			for (int i=0,j=0; i<sets.length; i++) {
+				if (!sets[i].equals(set_id)) {
+					newSets[j] = sets[i];
+					j++;
+				}
+			}
+			setSets(newSets);
+		}
+		public int getSetSize() {
+			return sets.length;
+		}
+		public void setVar(String var) {
+			this.var = var;
+		}
+		public void setSets(String[] sets) {
+			this.sets = sets;
+		}
 		public void setEnable(boolean enable) {
 			this.enable = enable;
 		}
-		public String[] getSets() {
-			return (String[])setList.toArray(new String[0]);
+	}
+	class VariableValue {
+		String var;
+		String val;
+		
+		VariableValue(String var, String val) {
+			this.var = var;
+			this.val = val;
 		}
-		public void addSet(String sid) {
-			setList.add(sid);
+		String getVar() {
+			return var;
 		}
-		public void removeSet(String sid) {
-			setList.remove(sid);
+		String getVal() {
+			return val;
 		}
-		public boolean isSetExisted(String sid) {
-			return setList.contains(sid);
+		void setVar(String var) {
+			this.var = var;
 		}
-		public void clearSets() {
-			setList.clear();
+		void setVal(String val) {
+			this.val = val;
 		}
 	}
-	public class ValueList implements Comparable {
-		List values = new ArrayList();
-		public void addValue(ValueInfo value) {
-			values.add(value);
+	class ProcessValue {
+		int total = 0;
+		Object[] processValues = new Object[0];
+		
+		ProcessValue(int total) {
+			this.total = total;
+			processValues = new Object[total];
 		}
-		public void removeValue(ValueInfo value) {
-			values.remove(value);
+		void checkValidTask(int task_id) {
+			if (task_id > processValues.length)
+				throw new IllegalArgumentException("Invalid task id"); 
 		}
-		public ValueInfo[] getValues() {
-			return (ValueInfo[])values.toArray(new ValueInfo[0]);
+		void setValues(int task_id, VariableValue[] values) {
+			checkValidTask(task_id);
+			processValues[task_id] = values;
 		}
-		public void clean() {
-			values.clear();
-		}
-		/** Compare the value list
-		 * @return 1 is different, 0 is the same, -1 is unknown  
-		 * 
-		 */
-		public int compareTo(Object obj) {
-			if (obj instanceof ValueList) {
-				ValueInfo[] curInfo = getValues();
-				ValueInfo[] refInfo = ((ValueList)obj).getValues();
-				for (int i=0; i<curInfo.length; i++) {
-					if (!curInfo[i].getValue().equals(refInfo[i].getValue())) {
-						return 1;
-					}
-				}
-				return 0;
+		VariableValue[] getValues(int task_id) {
+			checkValidTask(task_id);
+			Object object = processValues[task_id];
+			if (object instanceof VariableValue[]) {
+				return (VariableValue[])object;
 			}
-			return -1;
+			return new VariableValue[0];
 		}
-	}
-	public class ValueInfo {
-		String variable = "";
-		String value = "";
-		int type = -1;
-		public ValueInfo(String variable, String value) {
-			this(variable, value, -1);
+		void addValue(int task_id, VariableValue value) {
+			VariableValue[] values = getValues(task_id);
+			VariableValue[] newValues = new VariableValue[values.length + 1];
+			if (values.length > 0) {
+				System.arraycopy(values, 0, newValues, 0, values.length);
+			}
+			newValues[values.length] = value;
+			setValues(task_id, newValues);
 		}
-		public ValueInfo(String variable, String value, int type) {
-			this.variable = variable;
-			this.value = value;
-			this.type = type;
+		void updateValue(int task_id, VariableValue value) {
+			VariableValue[] values = getValues(task_id);
+			for (int i=0; i<values.length; i++) {
+				if (values[i].getVar().equals(value.getVar())) {
+					values[i].setVal(value.getVal());
+				}
+			}
 		}
-		public String getVariable() {
-			return variable;
+		void cleanValues(int task_id) {
+			processValues[task_id] = null;
 		}
-		public String getValue() {
-			return value;
-		}
-		public int getType() {
-			return type;
-		}
-		public void setVariable(String variable) {
-			this.variable = variable;
-		}
-		public void setValue(String value) {
-			this.value = value;
-		}
-		public void setType(int type) {
-			this.type = type;
+		void cleanAllValues() {
+			processValues = new Object[total]; 
 		}
 	}
 }

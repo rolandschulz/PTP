@@ -24,7 +24,7 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ptp.debug.internal.ui.PDebugImage;
-import org.eclipse.ptp.debug.internal.ui.PJobVariableManager.VariableInfo;
+import org.eclipse.ptp.debug.internal.ui.PJobVariableManager.JobVariable;
 import org.eclipse.ptp.debug.internal.ui.views.variable.PVariableView;
 
 /**
@@ -54,10 +54,10 @@ public class DeletePExpressionAction extends Action {
 		if (!selection.isEmpty() && selection instanceof IStructuredSelection) {
 			IStructuredSelection structSelection = (IStructuredSelection)selection;
 			for (Iterator i=structSelection.iterator(); i.hasNext();) {
-				VariableInfo varInfo = (VariableInfo)i.next();
-				view.getUIManager().getJobVariableManager().removeJobVariable(varInfo.getJob().getIDString(), varInfo.getVar());		
+				JobVariable jVar = (JobVariable)i.next();
+				view.getUIManager().getJobVariableManager().removeJobVariable(jVar.getJob().getIDString(), jVar.getVar());		
 				view.refresh();
-				if (varInfo.getJob().getIDString().equals(view.getUIManager().getCurrentJobId())) {
+				if (jVar.getJob().getIDString().equals(view.getUIManager().getCurrentJobId())) {
 					view.getUIManager().cleanVariableValue();
 				}
 			}

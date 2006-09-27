@@ -35,8 +35,9 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.debug.internal.ui.UIDebugManager;
-import org.eclipse.ptp.debug.internal.ui.PJobVariableManager.VariableInfo;
+import org.eclipse.ptp.debug.internal.ui.PJobVariableManager.JobVariable;
 import org.eclipse.ptp.debug.internal.ui.actions.AddPExpressionAction;
+import org.eclipse.ptp.debug.internal.ui.actions.CompareValueAction;
 import org.eclipse.ptp.debug.internal.ui.actions.DeletePExpressionAction;
 import org.eclipse.ptp.debug.internal.ui.actions.EditPExpressionAction;
 import org.eclipse.ptp.debug.internal.ui.actions.UpdatePExpressionAction;
@@ -131,6 +132,7 @@ public class PVariableView extends AbstractDebugView implements IJobChangedListe
 		setAction(EditPExpressionAction.name, new EditPExpressionAction(this));
 		setAction(DeletePExpressionAction.name, new DeletePExpressionAction(this));
 		setAction(UpdatePExpressionAction.name, new UpdatePExpressionAction(this));
+		setAction(CompareValueAction.name, new CompareValueAction(this));
 
 		updateActionsEnable();
 	}
@@ -143,7 +145,9 @@ public class PVariableView extends AbstractDebugView implements IJobChangedListe
 		toolBarMgr.appendToGroup(IPTPDebugUIConstants.VAR_GROUP, getAction(AddPExpressionAction.name));		
 		toolBarMgr.appendToGroup(IPTPDebugUIConstants.VAR_GROUP, getAction(EditPExpressionAction.name));		
 		toolBarMgr.appendToGroup(IPTPDebugUIConstants.VAR_GROUP, getAction(DeletePExpressionAction.name));		
-		toolBarMgr.appendToGroup(IPTPDebugUIConstants.VAR_GROUP, getAction(UpdatePExpressionAction.name));		
+		toolBarMgr.appendToGroup(IPTPDebugUIConstants.VAR_GROUP, getAction(UpdatePExpressionAction.name));
+		toolBarMgr.add(new Separator());
+		toolBarMgr.appendToGroup(IPTPDebugUIConstants.VAR_GROUP, getAction(CompareValueAction.name));
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.debug.ui.AbstractDebugView#getHelpContextId()
@@ -160,6 +164,8 @@ public class PVariableView extends AbstractDebugView implements IJobChangedListe
 		menu.add(getAction(EditPExpressionAction.name));
 		menu.add(getAction(DeletePExpressionAction.name));
 		menu.add(getAction(UpdatePExpressionAction.name));
+		menu.add(new Separator());
+		menu.add(getAction(CompareValueAction.name));
 		updateObjects();
 	}
 	/* (non-Javadoc)
@@ -193,10 +199,11 @@ public class PVariableView extends AbstractDebugView implements IJobChangedListe
 	private void doJobChangedEvent(int type, String cur_job_id, String pre_job_id, IProgressMonitor monitor) {
 		switch (type) {
 		case IJobChangedListener.CHANGED:
+			refresh();
 			break;
 		case IJobChangedListener.REMOVED:
 			if (pre_job_id != null) {
-				uiManager.getJobVariableManager().removeJobVariable(pre_job_id);
+				uiManager.getJobVariableManager().removeJobVariables(pre_job_id);
 				refresh();
 			}
 			break;
@@ -215,6 +222,7 @@ public class PVariableView extends AbstractDebugView implements IJobChangedListe
 		getAction(EditPExpressionAction.name).setEnabled(!getSelection().isEmpty());
 		getAction(DeletePExpressionAction.name).setEnabled(!getSelection().isEmpty());
 		getAction(UpdatePExpressionAction.name).setEnabled(!isEmpty());
+		getAction(CompareValueAction.name).setEnabled(!getSelection().isEmpty());
 	}
 	public void deleteSetEvent(IElementSet set) {
 		refresh();
@@ -229,8 +237,8 @@ public class PVariableView extends AbstractDebugView implements IJobChangedListe
 	 */
 	public void checkStateChanged(CheckStateChangedEvent event) {
 		Object data = event.getElement();
-		if (data instanceof VariableInfo) {
-			((VariableInfo)data).setEnable(event.getChecked());
+		if (data instanceof JobVariable) {
+			((JobVariable)data).setEnable(event.getChecked());
 		}
 	}
 }
