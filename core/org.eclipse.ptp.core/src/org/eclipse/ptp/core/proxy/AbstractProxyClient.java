@@ -33,10 +33,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.proxy.event.IProxyEvent;
 import org.eclipse.ptp.core.proxy.event.IProxyEventListener;
 import org.eclipse.ptp.core.proxy.event.ProxyConnectedEvent;
@@ -231,7 +227,7 @@ public abstract class AbstractProxyClient {
 					System.out.println("event thread IOException . . .");
 				} 
 				System.out.println("event thread exiting...");
-				fireProxyEvent(new ProxyDisconnectedEvent(!query_have_shut_down()));
+				//fireProxyEvent(new ProxyDisconnectedEvent(!query_have_shut_down()));
 			}
 		};
 		eventThread.start();
