@@ -204,51 +204,6 @@ public class MPICH2ControlSystem implements IControlSystem, IProxyRuntimeEventLi
 		
 		return ne;
 	}
-	
-	public String[] getAllProcessesAttributes(IPJob job, String[] attribs) throws CoreException
-	{
-		if(proxyDead) {
-			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, "Control system is shut down", null));
-		}
-		
-		String[] values = null;
-		
-		try {
-			int jobID = job.getJobNumberInt();
-			values = proxy.getAllProcessesAttribuesBlocking(jobID, attribs);
-		} catch(IOException e) {
-			e.printStackTrace();
-		}
-		
-		return values;
-	}
-	
-	public String[] getProcessAttributes(IPProcess proc, String[] attrib) throws CoreException
-	{
-		if(proxyDead) {
-			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, "Control system is shut down", null));
-		}
-		
-		String[] values = null;
-		
-		IPJob job = proc.getJob();
-		
-		try {
-			int jobID = job.getJobNumberInt();
-			int procID = proc.getTaskId();
-			values = proxy.getProcessAttributesBlocking(jobID, procID, attrib);
-		} catch(IOException e) {
-			e.printStackTrace();
-			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, "Control system is shut down, proxy exception", null));
-		}
-		
-		/* this part is hacked right now until we get this out of ORTE */
-		//if(attrib.equals(AttributeConstants.ATTRIB_PROCESS_NODE_NAME)) {
-		//	return "machine0_node0";
-		//}
-		
-		return values;
-	}
 
 	public void addRuntimeListener(IRuntimeListener listener) {
 		listeners.add(listener);
@@ -265,9 +220,6 @@ public class MPICH2ControlSystem implements IControlSystem, IProxyRuntimeEventLi
 		while (i.hasNext()) {
 			IRuntimeListener listener = (IRuntimeListener) i.next();
 			switch (event.getEventNumber()) {
-			case RuntimeEvent.EVENT_NODE_STATUS_CHANGE:
-				listener.runtimeNodeStatusChange(ID);
-				break;
 			case RuntimeEvent.EVENT_PROCESS_OUTPUT:
 				listener.runtimeProcessOutput(ID, event.getText());
 				break;
