@@ -54,41 +54,6 @@ public class MPICH2ProxyRuntimeClient extends ProxyRuntimeClient implements IRun
 		return ((ProxyRuntimeProcessesEvent)event).getNumProcs();
 	}
 	
-	public String[] getProcessAttributesBlocking(int jobID, int procID, String[] keys) throws IOException {
-		setWaitEvent(IProxyRuntimeEvent.EVENT_RUNTIME_PROCATTR);
-		getProcessAttribute(jobID, procID, keys);
-		IProxyRuntimeEvent event = waitForRuntimeEvent();
-		return ((ProxyRuntimeProcessAttributeEvent)event).getValues();
-	}
-	
-	public String[] getAllProcessesAttribuesBlocking(int jobID, String[] keys) throws IOException {
-		setWaitEvent(IProxyRuntimeEvent.EVENT_RUNTIME_PROCATTR);
-		getProcessAttribute(jobID, -1, keys);
-		IProxyRuntimeEvent event = waitForRuntimeEvent();
-		return ((ProxyRuntimeProcessAttributeEvent)event).getValues();
-	}
-	
-	public int getNumNodesBlocking(int machineID) throws IOException {
-		setWaitEvent(IProxyRuntimeEvent.EVENT_RUNTIME_NODES);
-		getNodes(machineID);
-		IProxyRuntimeEvent event = waitForRuntimeEvent();
-		return ((ProxyRuntimeNodesEvent)event).getNumNodes();
-	}
-	
-	public String[] getNodeAttributesBlocking(int machID, int nodeID, String[] keys) throws IOException {
-		setWaitEvent(IProxyRuntimeEvent.EVENT_RUNTIME_NODEATTR);
-		getNodeAttribute(machID, nodeID, keys);
-		IProxyRuntimeEvent event = waitForRuntimeEvent();
-		return ((ProxyRuntimeNodeAttributeEvent)event).getValues();
-	}
-	
-	public String[] getAllNodesAttributesBlocking(int machID, String[] keys) throws IOException {
-		setWaitEvent(IProxyRuntimeEvent.EVENT_RUNTIME_NODEATTR);
-		getNodeAttribute(machID, -1, keys);
-		IProxyRuntimeEvent event = waitForRuntimeEvent();
-		return ((ProxyRuntimeNodeAttributeEvent)event).getValues();
-	}
-	
 	public boolean startup(final IProgressMonitor monitor) {
 		System.out.println("MPICH2ProxyRuntimeClient - firing up proxy, waiting for connecting.  Please wait!  This can take a minute . . .");
 		
