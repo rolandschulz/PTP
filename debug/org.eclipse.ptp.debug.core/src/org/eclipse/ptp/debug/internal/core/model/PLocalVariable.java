@@ -147,7 +147,14 @@ public class PLocalVariable extends PVariable {
 			invalidate(destroy);
 		}
 		public boolean isSameVariable(IPCDIVariable cdiVar) {
-			return (fCDIVariable != null) ? fCDIVariable.equals(cdiVar) : false;
+			if (fCDIVariable == null) 
+				return false;
+			
+			if (fCDIVariable.getFullName().equals(cdiVar.getFullName())) {
+				return true;
+			}
+			return false;
+			//return (fCDIVariable != null) ? fCDIVariable.equals(cdiVar) : false;
 		}
 		public int sizeof() {
 			if (getCDIVariableObject() != null) {

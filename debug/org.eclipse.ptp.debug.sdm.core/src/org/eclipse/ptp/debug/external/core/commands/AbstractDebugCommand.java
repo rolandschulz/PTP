@@ -175,6 +175,7 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 	public void setReturn(Object result) {
 		synchronized (lock) {
 			setCheckTasks();
+			canWaitMore = false;
 			this.result = result;
 			lock.notifyAll();
 		}
@@ -186,6 +187,7 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 				//check whether return tasks is same as command tasks
 				check_tasks.andNot(return_tasks);
 				if (check_tasks.isEmpty()) {
+					canWaitMore = false;
 					this.result = result;
 					lock.notifyAll();
 				}
@@ -196,6 +198,7 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 				}
 			}
 			else {
+				canWaitMore = false;
 				this.result = result;
 				lock.notifyAll();
 			}

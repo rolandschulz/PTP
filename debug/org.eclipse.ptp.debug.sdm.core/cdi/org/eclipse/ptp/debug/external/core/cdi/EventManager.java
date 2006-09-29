@@ -145,11 +145,11 @@ public class EventManager extends SessionObject implements IPCDIEventManager, Ob
 		aJob.schedule();
 	}
 	public void addEventListener(IPCDIEventListener listener) {
-		if (!list.contains(listener))
+		//if (!list.contains(listener))
 			list.add(listener);
 	}
 	public void removeEventListener(IPCDIEventListener listener) {
-		if (list.contains(listener))
+		//if (list.contains(listener))
 			list.remove(listener);
 	}
 	public void removeEventListeners() {

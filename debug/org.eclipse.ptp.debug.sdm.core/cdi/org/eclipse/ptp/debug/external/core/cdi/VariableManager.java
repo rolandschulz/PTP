@@ -87,22 +87,32 @@ public class VariableManager extends Manager {
 		}
 		return variablesList;
 	}
-	public Variable getVariable(int task_id, String varName) {
+	public Variable getVariable(int task_id, String name) {
 		Target target = (Target)((Session)getSession()).getTarget(task_id);
-		return getVariable(target, varName);
+		return getVariable(target, name);
 	}
-	public Variable getVariable(Target target, String varName) {
+	/** Get variable
+	 * @param target
+	 * @param name mivar name
+	 * @return
+	 */
+	public Variable getVariable(Target target, String name) {
+		/* FIXME later
+		 * Current varName: var1.subvar1.subsubvar1
+		 * find out all variables including their children.
+		 */
 		Variable[] vars = getVariables(target);
 		for (int i = 0; i < vars.length; i++) {
-			if (vars[i].getName().equals(varName)) {
+			if (vars[i].getFullName().equals(name)) {
 				return vars[i];
 			}
-			/*
-			Variable v = vars[i].getChild(varName);
+			Variable v = vars[i].getChild(name);
 			if (v != null) {
 				return v;
 			}
-			*/
+			if (name.startsWith(vars[i].getName())) {
+				return vars[i];
+			}
 		}
 		return null;
 	}
@@ -174,7 +184,7 @@ public class VariableManager extends Manager {
 		synchronized (varList) {
 			for (Iterator iterator = varList.iterator(); iterator.hasNext();) {
 				Variable variable = (Variable)iterator.next();
-				if (variable.getName().equals(varName)) {
+				if (variable.getFullName().equals(varName)) {
 					iterator.remove();
 					return variable;
 				}
@@ -202,7 +212,14 @@ public class VariableManager extends Manager {
 				else {
 					newAIF = new AIF(aifValue.getType(), aggrValue.getValue(i));
 				}
-				vars[i] = createVariable(createVariableDescriptor(varDesc, newAIF, aggrType.getField(i), false));				
+				String name = aggrType.getField(i);
+				String fname = varDesc.getFullName() + "." + name;
+				
+				vars[i] = getVariable(createVariableDescriptor(varDesc, newAIF, name, fname));
+			}
+			//Set children
+			if (varDesc instanceof Variable) {
+				((Variable)varDesc).setChildren(vars);
 			}
 			return vars;
 		} catch (AIFException e) {
@@ -223,10 +240,25 @@ public class VariableManager extends Manager {
 			}
 			else {
 				AIF newAIF = new AIF(aifValue.getType(), aifValue);
-				return new IPCDIVariable[] { createVariable(createVariableDescriptor(varDesc, newAIF, "* " + varDesc.getName(), false)) };				
+				String name = varDesc.getName();
+				String fname = varDesc.getFullName();
+				
+				return new IPCDIVariable[] { getVariable(createVariableDescriptor(varDesc, newAIF, "* " + name, fname)) };
 			}
 		}
 		return new IPCDIVariable[0];
+	}
+	private Variable getVariable(VariableDescriptor varDesc) throws PCDIException {
+		if (varDesc instanceof ArgumentDescriptor) {
+			return new Argument((ArgumentDescriptor)varDesc);
+		} else if (varDesc instanceof LocalVariableDescriptor) {
+			return new LocalVariable((LocalVariableDescriptor)varDesc);
+		} else if (varDesc instanceof GlobalVariableDescriptor) {
+			return new GlobalVariable((GlobalVariableDescriptor)varDesc);
+		} else if (varDesc instanceof ThreadStorageDescriptor) {
+			throw new PCDIException("VariableManager.Unknown_variable_object: createThreadStorage");
+		}
+		throw new PCDIException("VariableManager.Unknown_variable_object");					
 	}
 
 	public IPCDIVariable[] getVariablesAsArray(VariableDescriptor varDesc, int start, int length) throws PCDIException {
@@ -239,14 +271,17 @@ public class VariableManager extends Manager {
 				boolean hasMoreDim = parentArrayValue.hasMoreDimension(values);
 				IPCDIVariable[] vars = new IPCDIVariable[values.length];
 				for (int i=0; i<values.length; i++) {
+					String name = varDesc.getName() + "[" + i + "]";
+					String fname = varDesc.getFullName() + "[" + i + "]";
 					if (hasMoreDim) {
 						IAIF newAIF = AIFFactory.createAIFIndexedArray(parentArrayValue, i);
-						vars[i] = createVariable(getVariableDescriptorAsArray(varDesc, newAIF, "["+i+"]", start, ((Object[])values[i]).length));
+						vars[i] = createVariable(getVariableDescriptorAsArray(varDesc, newAIF, name, fname, start, ((Object[])values[i]).length));
 					}
 					else {
 						IAIFValue aifValue = (IAIFValue)values[i];
 						IAIF newAIF = new AIF(aifValue.getType(), aifValue);
-						vars[i] = createVariable(getVariableDescriptorAsArray(varDesc, newAIF, "["+i+"]", 0, 1));
+						//FIXME
+						vars[i] = createVariable(getVariableDescriptorAsArray(varDesc, newAIF, name, fname, 0, 1));
 					}
 				}
 				return vars;
@@ -256,25 +291,22 @@ public class VariableManager extends Manager {
 		}
 		return new IPCDIVariable[0];
 	}
-	private VariableDescriptor createVariableDescriptor(VariableDescriptor varDesc, IAIF aif, String eName, boolean extName) throws PCDIException {
+	private VariableDescriptor createVariableDescriptor(VariableDescriptor varDesc, IAIF aif, String name, String fname) throws PCDIException {
 		Target target = (Target)varDesc.getTarget();
 		Thread thread = (Thread)varDesc.getThread();
 		StackFrame frame = (StackFrame)varDesc.getStackFrame();
-		
-		String name = extName?(varDesc.getName() + eName) : eName;
-		String fullName = extName?(varDesc.getFullName() + eName) : eName;
 		
 		int pos = varDesc.getPosition();
 		int depth = varDesc.getStackDepth();
 		
 		if (varDesc instanceof ArgumentDescriptor || varDesc instanceof Argument) {
-			return new ArgumentDescriptor(target, thread, frame, name, fullName, pos, depth, aif);
+			return new ArgumentDescriptor(target, thread, frame, name, fname, pos, depth, aif);
 		} else if (varDesc instanceof LocalVariableDescriptor || varDesc instanceof LocalVariable) {
-			return new LocalVariableDescriptor(target, thread, frame, name, fullName, pos, depth, aif);
+			return new LocalVariableDescriptor(target, thread, frame, name, fname, pos, depth, aif);
 		} else if (varDesc instanceof GlobalVariableDescriptor || varDesc instanceof GlobalVariable) {
-			return new GlobalVariableDescriptor(target, thread, frame, name, fullName, pos, depth, aif);
+			return new GlobalVariableDescriptor(target, thread, frame, name, fname, pos, depth, aif);
 		} else if (varDesc instanceof ThreadStorageDescriptor || varDesc instanceof ThreadStorage) {
-			return new ThreadStorageDescriptor(target, thread, frame, name, fullName, pos, depth, aif);
+			return new ThreadStorageDescriptor(target, thread, frame, name, fname, pos, depth, aif);
 		} else {
 			throw new PCDIException("VariableManager.Unknown_variable_object");			
 		}	
@@ -301,8 +333,8 @@ public class VariableManager extends Manager {
 			throw new PCDIException("VariableManager.Unknown_variable_object");			
 		}	
 	}
-	public VariableDescriptor getVariableDescriptorAsArray(VariableDescriptor varDesc, IAIF aif, String eName, int start, int length) throws PCDIException {
-		VariableDescriptor vo = createVariableDescriptor(varDesc, aif, eName, true);
+	public VariableDescriptor getVariableDescriptorAsArray(VariableDescriptor varDesc, IAIF aif, String name, String fname, int start, int length) throws PCDIException {
+		VariableDescriptor vo = createVariableDescriptor(varDesc, aif, name, fname);
 		vo.setCastingArrayStart(start);
 		vo.setCastingArrayEnd(length);
 		return vo;
@@ -569,9 +601,10 @@ public class VariableManager extends Manager {
 		return new IPCDIThreadStorageDescriptor[0];
 	}
 	public ThreadStorage createThreadStorage(ThreadStorageDescriptor desc) throws PCDIException {
-		throw new PCDIException("cdi.VariableManager.Unknown_variable_object");
+		throw new PCDIException("VariableManager.Unknown_variable_object: createThreadStorage");
 	}
 	public void destroyVariable(Variable variable) throws PCDIException {
+		//TODO:  implement Delete MI Var
 		/*
 		Target target = (Target)variable.getTarget();
 		VarDeletedEvent del = new VarDeletedEvent(target.getSession(), target.getTask(), null, variable.getName());
@@ -579,6 +612,7 @@ public class VariableManager extends Manager {
 		*/
 	}
 	public void destroyAllVariables(Target target) throws PCDIException {
+		/* TODO:  implement Delete ALL MI Var
 		/*
 		Variable[] variables = getVariables(target);
 		for (int i = 0; i < variables.length; ++i) {
@@ -587,20 +621,13 @@ public class VariableManager extends Manager {
 		}
 		*/
 	}
-	private boolean isMatchName(String vartext, String[] changedVars) {
-		for (int j=0; j<changedVars.length; j++) {
-			if (changedVars[j].equals(vartext)) {
-				return true;
-			}
-		}
-		return false;
-	}		
 	public void update(Target target, String[] changedVars) throws PCDIException {
+		List eventList = new ArrayList();
+		/*
 		int highLevel = 0;
 		int lowLevel = 0;
 		IPCDIStackFrame[] frames = null;
 		StackFrame currentStack = null;
-		List eventList = new ArrayList();
 		Variable[] vars = getVariables(target);
 	
 		Thread currentThread = (Thread)target.getCurrentThread();
@@ -622,12 +649,15 @@ public class VariableManager extends Manager {
 		for (int i = 0; i<vars.length; i++) {
 			if (isVariableNeedsToBeUpdate(vars[i], currentStack, frames, lowLevel)) {
 				vars[i].setUpdated(true);
-				String varName = vars[i].getName();
-				if (isMatchName("("+varName+")", changedVars)) {
-					eventList.add(new VarChangedEvent(target.getSession(), target.getTask(), vars[i], varName));
-				}
 			} else {
 				vars[i].setUpdated(false);
+			}
+		}
+		*/
+		for (int j=0; j<changedVars.length; j++) {
+			Variable matchVar = getVariable(target, changedVars[j]);
+			if (matchVar != null) {
+				eventList.add(new VarChangedEvent(target.getSession(), target.getTask(), matchVar, changedVars[j]));
 			}
 		}
 		IPCDIEvent[] events = (IPCDIEvent[]) eventList.toArray(new IPCDIEvent[0]);

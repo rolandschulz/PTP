@@ -36,7 +36,7 @@ import org.eclipse.ptp.debug.external.core.commands.GetAIFCommand;
  * 
  */
 public abstract class Variable extends VariableDescriptor implements IPCDIVariable {
-	//public IPCDIVariable[] children = new IPCDIVariable[0];
+	public IPCDIVariable[] children = new IPCDIVariable[0];
 	String editable = null;
 	String language;
 	boolean isFake = false;
@@ -51,6 +51,10 @@ public abstract class Variable extends VariableDescriptor implements IPCDIVariab
 	public void setUpdated(boolean update) {
 		isUpdated = update;
 	}
+	public void setChildren(IPCDIVariable[] children) {
+		if (children != null)
+			this.children = children;
+	}
 	public boolean isUpdated() {
 		return isUpdated;
 	}
@@ -60,10 +64,11 @@ public abstract class Variable extends VariableDescriptor implements IPCDIVariab
 		VariableManager mgr = session.getVariableManager();
 		mgr.update(this);
 	}
+	*/
 	public Variable getChild(String name) {
 		for (int i = 0; i < children.length; i++) {
 			Variable variable = (Variable) children[i];
-			if (name.equals(variable.getName())) {
+			if (name.equals(variable.getFullName())) {
 				return variable;
 			}
 			// Look also in the grandchildren.
@@ -71,21 +76,22 @@ public abstract class Variable extends VariableDescriptor implements IPCDIVariab
 			if (grandChild != null) {
 				return grandChild;
 			}
+			if (name.startsWith(variable.getFullName())) {
+				return variable;
+			}
 		}
 		return null;
 	}
-	*/
 	void setIsFake(boolean f) {
 		isFake = f;
 	}
 	boolean isFake() {
 		return isFake;
 	}
-	/*
-	public IPCDIVariable[] getChildren() throws PCDIException {
-		// Use the default timeout.
-		return getChildren(-1);
+	public IPCDIVariable[] getChildren() {
+		return children;
 	}
+	/*
 	public IPCDIVariable[] getChildren(int timeout) throws PCDIException {
 		List varList = new ArrayList(1);
 		Target target = (Target)getTarget();
