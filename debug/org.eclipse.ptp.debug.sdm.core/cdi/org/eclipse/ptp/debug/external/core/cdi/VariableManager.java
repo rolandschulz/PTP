@@ -110,7 +110,8 @@ public class VariableManager extends Manager {
 			if (v != null) {
 				return v;
 			}
-			if (name.startsWith(vars[i].getName())) {
+			//added "." to make sure the parent var name
+			if (name.startsWith(vars[i].getName() + ".")) {
 				return vars[i];
 			}
 		}

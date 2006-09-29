@@ -76,7 +76,7 @@ public abstract class Variable extends VariableDescriptor implements IPCDIVariab
 			if (grandChild != null) {
 				return grandChild;
 			}
-			if (name.startsWith(variable.getFullName())) {
+			if (name.startsWith(variable.getFullName()+".")) {
 				return variable;
 			}
 		}
