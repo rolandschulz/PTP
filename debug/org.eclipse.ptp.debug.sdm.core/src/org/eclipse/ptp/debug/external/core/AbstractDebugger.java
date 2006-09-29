@@ -138,7 +138,7 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 	public final void deleteAllObservers() {
 		this.deleteObservers();
 	}
-	public final void fireEvents(IPCDIEvent[] events) {
+	public synchronized final void fireEvents(IPCDIEvent[] events) {
 		if (events != null && events.length > 0) {
 			for (int i = 0; i < events.length; i++) {
 				fireEvent(events[i]);
@@ -283,12 +283,12 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 	 * @param tasks
 	 * @return
 	 */
-	public boolean isSuspendTasks(BitList tasks) {
+	public synchronized boolean isSuspendTasks(BitList tasks) {
 		tasks.andNot(getSuspendedProc());
 		return tasks.isEmpty();
 	}
 	//filter process
-	public BitList filterRunningTasks(BitList tasks) {//get suspend tasks
+	public synchronized BitList filterRunningTasks(BitList tasks) {//get suspend tasks
 		removeTasks(tasks, (BitList) job.getAttribute(TERMINATED_PROC_KEY));
 		BitList suspendedTasks = (BitList) job.getAttribute(SUSPENDED_PROC_KEY);
 		//if the case is in startup, there is no suspended tasks
@@ -296,12 +296,12 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 			tasks.and(suspendedTasks);
 		return tasks;
 	}
-	public BitList filterSuspendTasks(BitList tasks) {//get running tasks
+	public synchronized BitList filterSuspendTasks(BitList tasks) {//get running tasks
 		removeTasks(tasks, (BitList) job.getAttribute(TERMINATED_PROC_KEY));
 		removeTasks(tasks, (BitList) job.getAttribute(SUSPENDED_PROC_KEY));
 		return tasks;
 	}
-	public BitList filterTerminateTasks(BitList tasks) {//get not terminate tasks
+	public synchronized BitList filterTerminateTasks(BitList tasks) {//get not terminate tasks
 		removeTasks(tasks, (BitList) job.getAttribute(TERMINATED_PROC_KEY));
 		return tasks;
 	}

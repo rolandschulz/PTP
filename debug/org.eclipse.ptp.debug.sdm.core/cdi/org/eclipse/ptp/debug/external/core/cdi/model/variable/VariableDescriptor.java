@@ -52,7 +52,7 @@ public abstract class VariableDescriptor extends PObject implements IPCDIVariabl
 
 	String qualifiedName = null;
 	String fFullName = null;
-	protected IAIFType fType = null;
+	IAIFType fType = null;
 	IAIF aif = null;
 	
 	public VariableDescriptor(VariableDescriptor desc) {

@@ -32,7 +32,7 @@ public class GetAIFCommand extends AbstractDebugCommand {
 	
 	public GetAIFCommand(BitList tasks, String varName) {
 		super(tasks);
-		this.varName = "(" + varName + ")";
+		this.varName = varName;
 	}
 	public void preExecCommand(IAbstractDebugger debugger) throws PCDIException {
 		checkBeforeExecCommand(debugger);

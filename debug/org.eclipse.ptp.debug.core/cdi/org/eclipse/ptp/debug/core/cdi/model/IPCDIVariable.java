@@ -31,7 +31,8 @@ public interface IPCDIVariable  extends IPCDIVariableDescriptor {
 	void setValue(IAIF aif) throws PCDIException;
 	void dispose() throws PCDIException;
 	boolean equals(IPCDIVariable variable);
-	//public IPCDIVariable[] getChildren() throws PCDIException;
+	public void setChildren(IPCDIVariable[] children);
+	public IPCDIVariable[] getChildren();
 }
 
 
