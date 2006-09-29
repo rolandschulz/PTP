@@ -471,12 +471,36 @@ SendCommandWait(MISession *sess, MICommand *cmd)
 }
 
 /**** Variable ****/
+static MIVar*
+CreateMIVar(char *name) {
+	MICommand *cmd;
+	MIVar *mivar;
+
+	cmd = MIVarCreate("-", "*", name);
+	SendCommandWait(DebugSession, cmd);
+	if (!MICommandResultOK(cmd)) {
+		DbgSetError(DBGERR_UNKNOWN_VARIABLE, GetLastErrorStr());
+		MICommandFree(cmd);
+		return NULL;
+	}
+	mivar = MIGetVarCreateInfo(cmd);
+	MICommandFree(cmd);
+	return mivar;
+}
+static void
+DeleteMIVar(char *name) {
+	MICommand *cmd;
+
+	cmd = MIVarDelete(name);
+	SendCommandWait(DebugSession, cmd);
+	MICommandFree(cmd);
+}
+
 static varinfo *
 AddVARMap(char *name)
 {
 	int				i;
 	struct varinfo *map;
-	MICommand *cmd;
 	MIVar *mivar;
 	
 	if (VARMap.size == 0) {
@@ -505,15 +529,10 @@ AddVARMap(char *name)
 	for (i = 0; i < VARMap.size; i++) {
 		map = &VARMap.maps[i];
 		if (map->name == NULL) {
-			cmd = MIVarCreate("-", "*", name);
-			SendCommandWait(DebugSession, cmd);
-			if (!MICommandResultOK(cmd)) {
-				MICommandFree(cmd);
+			mivar = CreateMIVar(name);
+			if (mivar == NULL) {
 				return NULL;
 			}
-			mivar = MIGetVarCreateInfo(cmd);
-			MICommandFree(cmd);
-			
 			map->name = strdup(name);
 			map->mivar = mivar;
 			VARMap.nels++;
@@ -551,7 +570,7 @@ static varinfo *
 FindVARByMIName(char *mi_name) 
 {
 	int				i;
-	GetParentMiVar(mi_name);
+	
 	struct varinfo *map;
 	for (i = 0; i < VARMap.nels; i++) {
 		map = &VARMap.maps[i];
@@ -572,9 +591,7 @@ RemoveVARMap(varinfo *map)
 			map->name = NULL;
 		}
 		if (map->mivar != NULL) {
-			cmd = MIVarDelete(map->mivar->name);
-			SendCommandWait(DebugSession, cmd);
-			MICommandFree(cmd);
+			DeleteMIVar(map->mivar->name);
 			MIVarFree(map->mivar);
 			map->mivar = NULL;
 		}
@@ -628,6 +645,9 @@ GetChangedVariables()
 	List *changedVars;
 	MIVarChange *var;
 	struct varinfo *map;
+	char *pch;
+	char *mi_name;
+	MIString *str1;
 	
 	cmd = MIVarUpdate("*");
 	SendCommandWait(DebugSession, cmd);
@@ -641,15 +661,40 @@ GetChangedVariables()
 	
 	changedVars = NewList();
 	for (SetList(changes); (var = (MIVarChange *)GetListElement(changes)) != NULL; ) {
-		map = FindVARByMIName(var->name);
-		if (map != NULL) {
-			if (var->in_scope == 1) {
-				AddToList(changedVars, (void *)strdup(map->name));
+		mi_name = strdup(var->name);
+		
+		pch = strchr(mi_name, '.');
+		if (pch != NULL) {
+			*pch = '\0';
+		}
+		
+		map = FindVARByMIName(mi_name);
+		if (var->in_scope == 1) {
+			if (map != NULL) {
+				pch = strchr(var->name, '.');
+				if (pch == NULL) {
+					AddToList(changedVars, (void *)strdup(map->name));
+				}
+				else {
+					//append varname with parent
+					str1 = MIStringNew(strdup(map->name));
+					if (pch != NULL) {
+						MIStringAppend(str1, MIStringNew(pch));
+					}
+					AddToList(changedVars, (void *)strdup(str1->buf));
+					MIStringFree(str1);
+				}
+			}
+		}
+		else {
+			if (map != NULL && pch == NULL) {
+				RemoveVARMap(map);
 			}
 			else {
-				RemoveVARMap(map);
-			}				
+				DeleteMIVar(var->name);
+			}
 		}
+		free(mi_name);
 	}
 	DestroyList(changes, MIVarChangeFree);
 	return changedVars;
@@ -1977,16 +2022,27 @@ GetAIFVar(char *var, AIF **val, char **type)
 {
 	AIF *		res;
 	struct varinfo *map;
-
-	map = FindVARByName(var);
-	if (map == NULL) {
-		map = AddVARMap(var);		
-	}
-	if (map == NULL) {
-		DbgSetError(DBGERR_UNKNOWN_VARIABLE, GetLastErrorStr());
-		return DBGRES_ERR;
-	}
+	MIVar *mivar;
+	char *pch;
 	
+	pch = strchr(var, '.');
+	if (pch == NULL) {
+		map = FindVARByName(var);
+		if (map == NULL) {
+			map = AddVARMap(var);		
+		}
+		if (map == NULL) {
+			DbgSetError(DBGERR_UNKNOWN_VARIABLE, GetLastErrorStr());
+			return DBGRES_ERR;
+		}
+		mivar = map->mivar;
+	}
+	else {
+		mivar = CreateMIVar(var);
+		if (mivar == NULL) {
+			return DBGRES_ERR;
+		}
+	}
 	/*
 	cmd = MIVarCreate("-", "*", var);
 	SendCommandWait(DebugSession, cmd);
@@ -1999,10 +2055,10 @@ GetAIFVar(char *var, AIF **val, char **type)
 	MICommandFree(cmd);
 	*/
 	
-	if ( (res = ConvertVarToAIF(var, map->mivar, 0)) == NULL ) {
+	if ( (res = ConvertVarToAIF(var, mivar, 0)) == NULL ) {
 		return DBGRES_ERR;
 	}
-	*type = strdup(map->mivar->type);
+	*type = strdup(mivar->type);
 	*val = res;
 
 	/*
@@ -2011,6 +2067,10 @@ GetAIFVar(char *var, AIF **val, char **type)
 	MICommandFree(cmd);
 	MIVarFree(mivar);
 	*/
+	if (pch != NULL) {
+		DeleteMIVar(mivar->name);
+		MIVarFree(mivar);
+	}
 	return DBGRES_OK;
 }
 
