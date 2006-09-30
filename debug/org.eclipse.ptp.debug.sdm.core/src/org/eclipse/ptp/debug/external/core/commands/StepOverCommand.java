@@ -38,7 +38,7 @@ public class StepOverCommand extends StepCommand {
 		return "Step over"; 
 	}
 	protected void exec(IAbstractDebugger debugger) throws PCDIException {
-		debugger.stepInto(tasks, count);
+		debugger.stepOver(tasks, count);
 	}
 	protected int getEventType() {
 		return IPCDIResumedEvent.STEP_OVER;
