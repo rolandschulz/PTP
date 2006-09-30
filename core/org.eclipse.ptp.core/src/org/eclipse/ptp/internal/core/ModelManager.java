@@ -139,7 +139,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 	public int getMonitoringSystemID() { 
 		return currentMonitoringSystem; 
 	}
-	public void refreshRuntimeSystems(IProgressMonitor monitor, boolean force) throws CoreException {
+	public synchronized void refreshRuntimeSystems(IProgressMonitor monitor, boolean force) throws CoreException {
 		int curMSID = getControlSystemID();
 		int curCSID = getMonitoringSystemID();
 		if(force || curMSID != theMSChoiceID || curCSID != theCSChoiceID) {
@@ -149,7 +149,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			refreshRuntimeSystems(theCSChoiceID, theMSChoiceID, monitor);
 		}
 	}
-	public void refreshRuntimeSystems(int controlSystemID, int monitoringSystemID, IProgressMonitor monitor) throws CoreException {
+	public synchronized void refreshRuntimeSystems(int controlSystemID, int monitoringSystemID, IProgressMonitor monitor) throws CoreException {
 		System.err.println("refreshRuntimeSystems");
 		try {
 			monitor.beginTask("Refreshing runtime system...", 200);
