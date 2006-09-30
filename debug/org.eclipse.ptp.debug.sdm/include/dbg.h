@@ -80,9 +80,7 @@ int 	DbgListGlobalVariables(session *s, bitset *set);
  */
 int 	DbgListInfoThreads(session *s, bitset *set);
 int 	DbgSetThreadSelect(session *s, bitset *set, int);
-
-//clement added
-int DbgStackInfoDepth(session *s, bitset *set);
+int		DbgStackInfoDepth(session *s, bitset *set);
 
 /**
  * Memory operations
