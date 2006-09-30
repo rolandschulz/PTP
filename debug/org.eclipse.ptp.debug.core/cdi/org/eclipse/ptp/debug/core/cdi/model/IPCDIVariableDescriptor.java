@@ -38,4 +38,5 @@ public interface IPCDIVariableDescriptor extends IPCDIObject {
 	boolean equals(IPCDIVariableDescriptor varDesc);
 	IPCDIVariable[] getVariablesAsArray(int start, int length) throws PCDIException;
 	IPCDIVariable[] getVariables() throws PCDIException;
+	String getMIName();
 }

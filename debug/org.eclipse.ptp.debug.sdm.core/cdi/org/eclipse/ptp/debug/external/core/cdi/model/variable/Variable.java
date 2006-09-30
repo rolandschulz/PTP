@@ -67,17 +67,17 @@ public abstract class Variable extends VariableDescriptor implements IPCDIVariab
 	*/
 	public Variable getChild(String name) {
 		for (int i = 0; i < children.length; i++) {
-			Variable variable = (Variable) children[i];
-			if (name.equals(variable.getFullName())) {
-				return variable;
+			Variable var = (Variable) children[i];
+			if (name.equals(var.getMIName())) {
+				return var;
 			}
 			// Look also in the grandchildren.
-			Variable grandChild = variable.getChild(name);
+			Variable grandChild = var.getChild(name);
 			if (grandChild != null) {
 				return grandChild;
 			}
-			if (name.startsWith(variable.getFullName()+".")) {
-				return variable;
+			if (name.startsWith(var.getMIName()+".")) {
+				return var;
 			}
 		}
 		return null;

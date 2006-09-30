@@ -201,7 +201,7 @@ public class PLocalVariable extends PVariable {
 								}
 							}
 							else {
-								fValue = PValueFactory.createValue(getVariable());
+								fValue = PValueFactory.createValue(getVariable(), aif);
 							}
 						}
 					} catch (PCDIException e) {

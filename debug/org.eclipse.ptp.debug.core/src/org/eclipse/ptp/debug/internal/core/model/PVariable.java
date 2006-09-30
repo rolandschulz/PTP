@@ -352,6 +352,8 @@ public abstract class PVariable extends AbstractPVariable implements IPCDIEventL
 	}
 	public boolean equals(Object obj) {
 		if (obj instanceof PVariable) {
+			if (isDisposed() != ((PVariable)obj).isDisposed())
+				return false;
 			IInternalVariable iv = getOriginal();
 			return (iv != null) ? iv.equals(((PVariable) obj).getOriginal()) : false;
 		}
