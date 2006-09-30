@@ -35,7 +35,8 @@ import org.eclipse.ptp.debug.core.cdi.PCDIException;
  */
 public class DebugCommandQueue extends Job {
 	private List queue = new ArrayList();
-	private boolean isTerminated = false;
+	private boolean terminated = false;
+	private boolean stopAddCommand = false;
 	private IDebugCommand currentCommand = null;
 	private IAbstractDebugger debugger = null;
 	private IDebugCommand interruptCommand = null;
@@ -46,27 +47,28 @@ public class DebugCommandQueue extends Job {
         setPriority(Job.INTERACTIVE);
         setSystem(true);
 	}
-	public boolean isTerminated() {
-		return isTerminated;
+	public synchronized boolean isTerminated() {
+		return terminated;
 	}
-	public void setTerminated(boolean removeInterrupt) {
-		isTerminated = true;
-		cleanup(removeInterrupt);		
+	public synchronized void setTerminated() {
+		terminated = true;
+		cleanup(false);
 	}
-	public void setTerminated() {
-		setTerminated(true);
+	public synchronized void setStopAddCommand(boolean stopAddCommand) {
+		this.stopAddCommand = stopAddCommand;
+		cleanup(false);
 	}
-	public void setInterruptCommand(IDebugCommand interruptCommand) {
+	public synchronized void setInterruptCommand(IDebugCommand interruptCommand) {
 		this.interruptCommand = interruptCommand;
 	}
-	public IDebugCommand getInterruptCommand() {
+	public synchronized IDebugCommand getInterruptCommand() {
 		return interruptCommand;
 	}
     protected IStatus run(IProgressMonitor monitor) {
         while (!queue.isEmpty()) {
 			try {
 				currentCommand = getCommand();
-	        	if (isTerminated) {
+	        	if (terminated) {
 	        		currentCommand.doFlush();
 	        		break;
 	        	}
@@ -110,7 +112,7 @@ System.err.println("*** SEND COMMAND: " + currentCommand.getCommandName() + ", t
 			if (command == null) 
 				return;
 			
-			if (!isTerminated || !contains(command)) {
+			if (!stopAddCommand && !terminated && !contains(command)) {
 				System.err.println("************ DebugCommandQueue -- Add cmd: " + command.getCommandName());
 
 				if (command.isWaitInQueue()) {
@@ -120,18 +122,20 @@ System.err.println("*** SEND COMMAND: " + currentCommand.getCommandName() + ", t
 					//jump the queue
 					queue.add(0, command);
 				}
+				/*
 				if (command.canInterrupt() && currentCommand != null) {
 					//only do flush if the current command cannot interrupt
 					if (!currentCommand.canInterrupt()) {
 						currentCommand.doFlush();
 					}
 				}
+				*/
 				schedule();
 			}
 			else {
 				command.doFlush();
-				if (isTerminated) {
-					System.err.println("************ ERROR in DebugCommandQueue -- debugger is terminated, cmd: " + command.getCommandName());
+				if (stopAddCommand || terminated) {
+					System.err.println("************ ERROR in DebugCommandQueue -- debugger is terminated or stoped to add command, cmd: " + command.getCommandName());
 				}
 				else {
 					//TODO how to deal with duplicate command
