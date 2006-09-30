@@ -542,16 +542,6 @@ AddVARMap(char *name)
 	return NULL;
 }
 
-static void
-GetParentMiVar(char *mi_name)
-{
-	char* p;
-	p = strchr(mi_name, '.');
-	if (p != NULL) {
-		*p = '\0';
-	}
-}
-
 static varinfo *
 FindVARByName(char *name) 
 {
@@ -584,7 +574,6 @@ FindVARByMIName(char *mi_name)
 static void
 RemoveVARMap(varinfo *map)
 {
-	MICommand *cmd;
 	if (map != NULL) {
 		if (map->name != NULL) {
 			free(map->name);
@@ -637,6 +626,41 @@ RemoveAllMaps()
 	RemoveAllVARMap();
 }
 
+static char*
+GetParentVar(char *var_name)
+{
+	char *pch;
+	char *name;
+	
+	name = strdup(var_name);
+	pch = strchr(name, '.');
+	if (pch != NULL) {
+		*pch = '\0';
+	}
+	return name;
+}
+/*
+ * name1 = var1.subvar1, name2 = var2
+ * return: var2.subvar1
+ */
+static char*
+replaceName(char *name1, char* name2)
+{
+	char *pch;
+	char *name;
+	MIString *str1;
+	
+	pch = strchr(name1, '.');
+	//append name2 to name1
+	str1 = MIStringNew(strdup(name2));
+	if (pch != NULL) {
+		MIStringAppend(str1, MIStringNew(pch));
+	}
+	name = strdup(str1->buf);
+	MIStringFree(str1);
+	return name;
+}
+
 static List * 
 GetChangedVariables()
 {
@@ -647,7 +671,7 @@ GetChangedVariables()
 	struct varinfo *map;
 	char *pch;
 	char *mi_name;
-	MIString *str1;
+	char *replaced_name;
 	
 	cmd = MIVarUpdate("*");
 	SendCommandWait(DebugSession, cmd);
@@ -661,29 +685,14 @@ GetChangedVariables()
 	
 	changedVars = NewList();
 	for (SetList(changes); (var = (MIVarChange *)GetListElement(changes)) != NULL; ) {
-		mi_name = strdup(var->name);
-		
-		pch = strchr(mi_name, '.');
-		if (pch != NULL) {
-			*pch = '\0';
-		}
+		mi_name = GetParentVar(var->name);
 		
 		map = FindVARByMIName(mi_name);
 		if (var->in_scope == 1) {
 			if (map != NULL) {
-				pch = strchr(var->name, '.');
-				if (pch == NULL) {
-					AddToList(changedVars, (void *)strdup(map->name));
-				}
-				else {
-					//append varname with parent
-					str1 = MIStringNew(strdup(map->name));
-					if (pch != NULL) {
-						MIStringAppend(str1, MIStringNew(pch));
-					}
-					AddToList(changedVars, (void *)strdup(str1->buf));
-					MIStringFree(str1);
-				}
+				replaced_name = replaceName(var->name, map->name);
+				AddToList(changedVars, (void *)strdup(replaced_name));
+				free(replaced_name);
 			}
 		}
 		else {
@@ -2023,25 +2032,25 @@ GetAIFVar(char *var, AIF **val, char **type)
 	AIF *		res;
 	struct varinfo *map;
 	MIVar *mivar;
-	char *pch;
+	int deleteMIVar = 0;
 	
-	pch = strchr(var, '.');
-	if (pch == NULL) {
+	//check whether var is a child of mivar or call from array expression 
+	if (strchr(var, '.') != NULL || strchr(var, '@') != NULL) {
+		mivar = CreateMIVar(var);
+		deleteMIVar = 1;
+		if (mivar == NULL) {
+			return DBGRES_ERR;
+		}
+	} else {
 		map = FindVARByName(var);
 		if (map == NULL) {
-			map = AddVARMap(var);		
+			map = AddVARMap(var);
 		}
 		if (map == NULL) {
 			DbgSetError(DBGERR_UNKNOWN_VARIABLE, GetLastErrorStr());
 			return DBGRES_ERR;
 		}
 		mivar = map->mivar;
-	}
-	else {
-		mivar = CreateMIVar(var);
-		if (mivar == NULL) {
-			return DBGRES_ERR;
-		}
 	}
 	/*
 	cmd = MIVarCreate("-", "*", var);
@@ -2067,7 +2076,7 @@ GetAIFVar(char *var, AIF **val, char **type)
 	MICommandFree(cmd);
 	MIVarFree(mivar);
 	*/
-	if (pch != NULL) {
+	if (deleteMIVar == 1) {
 		DeleteMIVar(mivar->name);
 		MIVarFree(mivar);
 	}
