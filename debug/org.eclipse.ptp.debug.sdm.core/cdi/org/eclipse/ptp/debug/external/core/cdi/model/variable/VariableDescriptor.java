@@ -52,15 +52,16 @@ public abstract class VariableDescriptor extends PObject implements IPCDIVariabl
 
 	String qualifiedName = null;
 	String fFullName = null;
+	String miName = null;
 	IAIFType fType = null;
 	IAIF aif = null;
 	
 	public VariableDescriptor(VariableDescriptor desc) {
 		super((Target)desc.getTarget());
 		fName = desc.getName();
-		fFullName = desc.fFullName;
-		fType = desc.fType;
+		fFullName = desc.getFullName();
 		try {
+			fType = desc.getType();
 			aif = desc.getAIF();
 			fStackFrame = (StackFrame)desc.getStackFrame();
 			fThread = (Thread)desc.getThread();
@@ -71,8 +72,8 @@ public abstract class VariableDescriptor extends PObject implements IPCDIVariabl
 		castingIndex = desc.getCastingArrayStart();
 		castingLength = desc.getCastingArrayEnd();
 		castingTypes = desc.getCastingTypes();
+		miName = desc.getMIName();
 	}
-	
 	public VariableDescriptor(Target target, Thread thread, StackFrame stack, String n, String fn, int pos, int depth, IAIF aif) {
 		super(target);
 		fName = n;
@@ -82,6 +83,13 @@ public abstract class VariableDescriptor extends PObject implements IPCDIVariabl
 		position = pos;
 		stackdepth = depth;
 		this.aif = aif;
+		this.miName = fn;
+	}
+	public void setMIName(String name) {
+		this.miName = name;
+	}
+	public String getMIName() {
+		return miName;
 	}
 	public IAIF getAIF() throws PCDIException {
 		if (aif == null) {

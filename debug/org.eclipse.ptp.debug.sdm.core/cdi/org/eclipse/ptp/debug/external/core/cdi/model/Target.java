@@ -401,12 +401,11 @@ public class Target extends SessionObject implements IPCDITarget {
 		try {
 			Session session = (Session) target.getSession();
 			Variable var = session.getVariableManager().getVariable(target, expressionText);
-			if (var == null) {
-				return null;
-			}
-			IAIF aif = var.getAIF();
-			if (aif != null) {
-				return aif.getValue().toString();
+			if (var != null) {
+				IAIF aif = var.getAIF();
+				if (aif != null) {
+					return aif.getValue().toString();
+				}
 			}
 			EvaluateExpressionCommand command = new EvaluateExpressionCommand(getTask(), expressionText);
 			getDebugger().postCommand(command);
