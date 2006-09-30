@@ -36,6 +36,7 @@ import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.IDebugCommand;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
+import org.eclipse.ptp.debug.core.cdi.event.IPCDIDebugDestroyedEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIErrorEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIExitedEvent;
@@ -149,7 +150,10 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		if (event != null) {
 			BitList tasks = event.getAllProcesses();
 			System.out.println("***** Debugger event: " + event/* + " for tasks: " + showBitList(tasks)*/);
-			if (event instanceof IPCDIExitedEvent) {
+			if (event instanceof IPCDIDebugDestroyedEvent) {
+				commandQueue.setTerminated();
+			}
+			else if (event instanceof IPCDIExitedEvent) {
 				setJobFinished(tasks, (((IPCDIExitedEvent)event).getExitStatus()>-1)?IPProcess.EXITED:IPProcess.EXITED_SIGNALLED);
 				if (isJobFinished()) {
 					postStopDebugger();
@@ -183,8 +187,8 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		}
 	}
 	private void postStopDebugger() {
-		commandQueue.setTerminated(false);
 		postCommand(new StopDebuggerCommand(getSession().createBitList()));
+		commandQueue.setStopAddCommand(true);
 	}
 	public final void notifyObservers(Object arg) {
 		setChanged();
