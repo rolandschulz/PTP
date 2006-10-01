@@ -27,7 +27,6 @@ public class AIF implements IAIF {
 		this.aifType = aifType;
 		this.aifValue = aifValue;
 	}
-	
 	public AIF(String fds, byte[] data) {
 		aifType = AIFFactory.getAIFType(fds);
 		aifValue = AIFFactory.getAIFValue(null, aifType, data);

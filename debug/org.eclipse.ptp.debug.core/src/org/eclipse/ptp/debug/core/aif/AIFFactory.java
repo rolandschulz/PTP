@@ -106,7 +106,10 @@ public class AIFFactory {
 	
 	public static final IAIFType UNKNOWNTYPE = new AIFTypeIncomplete();
 	public static final IAIFValue UNKNOWNVALUE = new AIFValueUnknown(UNKNOWNTYPE);
-		
+	
+	public static IAIF UNKNOWNAIF() {
+		return new AIF(UNKNOWNTYPE, UNKNOWNVALUE);
+	}
 	public static IAIFValue getAIFValue(IValueParent parent, IAIFType type, byte[] data) {
 		if (data == null || data.length < 0) {
 			return new AIFValueUnknown(type);

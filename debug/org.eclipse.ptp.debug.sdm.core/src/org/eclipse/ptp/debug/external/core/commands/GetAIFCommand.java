@@ -20,6 +20,7 @@ package org.eclipse.ptp.debug.external.core.commands;
 
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IAbstractDebugger;
+import org.eclipse.ptp.debug.core.aif.AIFFactory;
 import org.eclipse.ptp.debug.core.aif.IAIF;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
@@ -41,11 +42,15 @@ public class GetAIFCommand extends AbstractDebugCommand {
 		debugger.getAIFValue(tasks, varName);
 	}
 	public IAIF getAIF() throws PCDIException {
-		Object res = getResultValue();
-		if (res instanceof IAIF) {
-			return (IAIF)res;
+		try {
+			Object res = getResultValue();
+			if (res instanceof IAIF) {
+				return (IAIF)res;
+			}
+			throw new PCDIException("Unknown aif: " + res);
+		} catch (PCDIException e) {
+			return AIFFactory.UNKNOWNAIF();//unknown aif
 		}
-		throw new PCDIException("Cannot get AIF");
 	}
 	public String getCommandName() {
 		return "Get AIF"; 
