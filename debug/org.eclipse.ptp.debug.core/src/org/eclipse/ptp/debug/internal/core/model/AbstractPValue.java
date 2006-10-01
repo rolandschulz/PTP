@@ -50,7 +50,7 @@ public abstract class AbstractPValue extends PDebugElement implements IPValue {
 		return fParent;
 	}
 	public String evaluateAsExpression(IPStackFrame frame) {
-		String valueString = null;
+		String valueString = "";
 		AbstractPVariable parent = getParentVariable();
 		if (parent != null) {
 			if (frame != null && frame.canEvaluate()) {
