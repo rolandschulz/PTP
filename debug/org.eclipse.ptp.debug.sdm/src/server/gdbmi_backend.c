@@ -1558,7 +1558,7 @@ GetVarValue(char *var)
 {
 	char *		res;
 	MICommand *	cmd = MIVarEvaluateExpression(var);
-	
+
 	SendCommandWait(DebugSession, cmd);
 	if (!MICommandResultOK(cmd)) {
 		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
@@ -1607,11 +1607,11 @@ SimpleVarToAIF(char *exp, MIVar *var)
 {
 	int		len;
 	char	*p;
-	AIF		*a;
+	AIF *	a = NULL;
 	AIF		*av;
 	int		type_id;
 	char	*res;
-	
+
 	len = strlen(var->type);
 	if (var->type[len - 1] == ')') { /* function */
 		return MakeAIF("&/is4", exp);
@@ -1639,7 +1639,7 @@ SimpleVarToAIF(char *exp, MIVar *var)
 		return a;
 	}
 	
-	if ((type_id = getSimpleTypeID(var->type, exp)) > -1) {
+	if ((type_id = getSimpleTypeID(var->type, exp)) >  -1) {
 		if ((res = GetVarValue(var->name)) != NULL) {
 			a = GetPrimitiveTypeToAIF(type_id, res);
 		}
@@ -1654,7 +1654,7 @@ SimpleVarToAIF(char *exp, MIVar *var)
 static AIF * 
 GetPrimitiveTypeToAIF(int type_id, char* res)
 {
-	AIF *a;
+	AIF *a = NULL;
 	char *p;
 
 	switch (type_id) {
@@ -1830,7 +1830,6 @@ CreateUnion(MIVar *var, int named)
 		if (i == var->numchild - 1)
 			AIFSetUnion(a, v->exp, ac);
 	}
-	
 	return a;
 }
 
@@ -1887,7 +1886,7 @@ GetAIFPointer(char *res, AIF *i)
 static AIF *
 ConvertVarToAIF(char *exp, MIVar *var, int named)
 {
-	AIF 		*a;
+	AIF *	a = NULL;
 	MICommand	*cmd;
 
 	if (strcmp(var->type, "<text variable, no debug info>") == 0) {
@@ -1920,7 +1919,7 @@ ConvertVarToAIF(char *exp, MIVar *var, int named)
 static AIF * 
 ComplexVarToAIF(char *exp, MIVar *var, int named) 
 {
-	AIF		*a;
+	AIF 	*a;
 	char	*p;
 	char	*type;
 	int		type_id;
@@ -1932,28 +1931,32 @@ ComplexVarToAIF(char *exp, MIVar *var, int named)
 		break;
 
 	case '*': /* pointer */
-		res = GetVarValue(var->name); //get address
-		type = strdup(var->type);		
-		if (strncmp(type, "struct", 6) == 0) {
-			a = CreateStruct(var, named);
-		} else if (strncmp(type, "union", 5) == 0) {
-			a = CreateUnion(var, named);
-		} else if (strncmp(type, "char *", 6) == 0) {//char pointer
-			a = CharPointerToAIF(res);
-		} else { //other types
-			p = strchr(type, '*');
-			p--;
-			*p = '\0';
-			if ((type_id = getSimpleTypeID(type, exp)) > -1) { //simple type
-				a = GetPrimitiveTypeToAIF(type_id, res);
+		if ((res = GetVarValue(var->name)) != NULL) { //get address
+			type = strdup(var->type);
+			if (strncmp(type, "struct", 6) == 0) {
+				a = CreateStruct(var, named);
+			} else if (strncmp(type, "union", 5) == 0) {
+				a = CreateUnion(var, named);
+			} else if (strncmp(type, "char *", 6) == 0) {//char pointer
+				a = CharPointerToAIF(res);
+			} else { //other types
+				p = strchr(type, '*');
+				p--;
+				*p = '\0';
+				if ((type_id = getSimpleTypeID(type, exp)) > -1) { //simple type
+					a = GetPrimitiveTypeToAIF(type_id, res);
+				}
+				else {
+					a = ConvertVarToAIF(var->children[0]->exp, var->children[0], named);
+				}
 			}
-			else {
-				a = ConvertVarToAIF(var->children[0]->exp, var->children[0], named);
+			free(type);
+			if (a != NULL) {
+				a = GetAIFPointer(res, a);
 			}
 		}
-		free(type);
-		if (a != NULL) {
-			a = GetAIFPointer(res, a);
+		else {
+			return NULL;
 		}
 		break;
 					
