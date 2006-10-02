@@ -397,7 +397,6 @@ AsyncStop(void *data)
 		break;
 		
 	case MIEventTypeInferiorExit:
-	printf("$$$$$$$$$$$$$$$$$$$$ MIEventTypeInferiorExit \n");
 		e = NewDbgEvent(DBGEV_EXIT);
 		e->dbg_event_u.exit_event.reason = DBGEV_EXIT_NORMAL;
 		e->dbg_event_u.exit_event.ev_u.exit_status = evt->code;
@@ -1641,20 +1640,17 @@ SimpleVarToAIF(char *exp, MIVar *var)
 	
 	if ((type_id = getSimpleTypeID(var->type, exp)) >  -1) {
 		if ((res = GetVarValue(var->name)) != NULL) {
-			a = GetPrimitiveTypeToAIF(type_id, res);
+			return GetPrimitiveTypeToAIF(type_id, res);
 		}
 	}
-	
-	if (a == NULL) {
-		DbgSetError(DBGERR_UNKNOWN_TYPE, "could not convert simple type");
-	}
-	return a;
+	//DbgSetError(DBGERR_UNKNOWN_TYPE, "Could not convert simple type");
+	return VoidToAIF(0, 0);
 }	
 
 static AIF * 
 GetPrimitiveTypeToAIF(int type_id, char* res)
 {
-	AIF *a = NULL;
+	AIF *a;
 	char *p;
 
 	switch (type_id) {
@@ -1871,7 +1867,7 @@ GetAIFPointer(char *res, AIF *i)
 	char *p;
 	
 	if (res == NULL) {
-		address = AIFNull(NULL);
+		address = VoidToAIF(0, 0);
 	}
 	else {
 		if ((p = strchr(res, ' ')) != NULL) {
@@ -1931,7 +1927,10 @@ ComplexVarToAIF(char *exp, MIVar *var, int named)
 		break;
 
 	case '*': /* pointer */
-		if ((res = GetVarValue(var->name)) != NULL) { //get address
+		if ((res = GetVarValue(var->name)) == NULL) {
+			a = VoidToAIF(0, 0);
+		}
+		else {//get address
 			type = strdup(var->type);
 			if (strncmp(type, "struct", 6) == 0) {
 				a = CreateStruct(var, named);
@@ -1954,9 +1953,6 @@ ComplexVarToAIF(char *exp, MIVar *var, int named)
 			if (a != NULL) {
 				a = GetAIFPointer(res, a);
 			}
-		}
-		else {
-			return NULL;
 		}
 		break;
 					
@@ -2066,7 +2062,6 @@ GetAIFVar(char *var, AIF **val, char **type)
 	mivar = MIGetVarCreateInfo(cmd);
 	MICommandFree(cmd);
 	*/
-	
 	if ( (res = ConvertVarToAIF(var, mivar, 0)) == NULL ) {
 		return DBGRES_ERR;
 	}
