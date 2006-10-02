@@ -150,7 +150,8 @@ System.err.println("*** SEND COMMAND: " + currentCommand.getCommandName() + ", t
 				//return true;
 			int size = queue.size();
 			if (size > 0) {
-				return (((IDebugCommand)queue.get(size-1)).compareTo(command) == 0);
+				//return (((IDebugCommand)queue.get(size-1)).compareTo(command) == 0);
+				return (((IDebugCommand)queue.get(size-1)).equals(command));
 			}
 			return false;
 		}
