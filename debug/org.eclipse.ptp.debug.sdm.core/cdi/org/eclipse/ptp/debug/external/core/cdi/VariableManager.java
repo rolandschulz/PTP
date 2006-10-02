@@ -491,7 +491,7 @@ public class VariableManager extends Manager {
 					aif = aifCmd.getAIF();
 				}
 				*/
-				argObjects.add(new ArgumentDescriptor(target, thread, frame, name, fName, pos, depth, null));
+				//argObjects.add(new ArgumentDescriptor(target, thread, frame, name, fName, pos, depth, null));
 			}
 		} finally {
 			target.setCurrentThread(currentThread, false);
