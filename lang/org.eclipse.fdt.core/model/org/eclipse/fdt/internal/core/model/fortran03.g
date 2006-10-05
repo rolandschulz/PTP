@@ -5,6 +5,10 @@
  * R1209 import-stmt: MISSING a ]
  *
  * check comments regarding deleted for correctness
+ *
+ * TODO add (label)? to all statements...
+ *    finished: continue-stmt, end-do-stmt
+ *
  */
 
 
@@ -60,7 +64,6 @@ specification_part
 // R207
 // ERR_CHK 207 implicit_stmt must precede all occurances of rules following it in text below
 // has been removed from grammar so must be done when reducing
-// TODO putback
 declaration_construct
 	:	entry_stmt
 	|	parameter_stmt
@@ -72,7 +75,7 @@ declaration_construct
 	|	procedure_declaration_stmt
 	|	specification_stmt
 	|	type_declaration_stmt
-//	|	stmt_function_stmt
+	|	stmt_function_stmt
 	;
 
 // R208
@@ -128,16 +131,16 @@ specification_stmt
 	;
 
 // R213
-// TODO putback
 executable_construct
+options {backtrack=true;}
 	:	action_stmt
 	|	associate_construct
 	|	case_construct
-//	|	do_construct
-//	|	forall_construct
-//	|	if_construct
+	|	do_construct
+	|	forall_construct
+	|	if_construct
 	|	select_type_construct
-//	|	where_construct
+	|	where_construct
 	;
 
 // R214
@@ -145,6 +148,8 @@ executable_construct
 //             end-subroutine-stmt.  (But they can be in a branch target statement, which
 //             is not in the grammar, so the end-xxx-stmts deleted.)
 // T_CONTINUE inlined for continue_stmt
+// TODO continue-stmt is ambiguous with same in end-do, check for label and if
+// label matches do-stmt label, then match end-do there
 action_stmt
 options {backtrack=true;}
 	:	allocate_stmt
@@ -152,7 +157,7 @@ options {backtrack=true;}
 	|	backspace_stmt
 	|	call_stmt
 	|	close_stmt
-	|	T_CONTINUE T_EOS
+	|	(label)? T_CONTINUE T_EOS
 	|	cycle_stmt
 	|	deallocate_stmt
 	|	endfile_stmt
@@ -1778,11 +1783,11 @@ where_construct_stmt
 
 // R746
 // assignment_stmt inlined for where_assignment_stmt
-// TODO putback
 where_body_construct
+options {backtrack=true;}
 	:	assignment_stmt
-//	|	where_stmt
-//	|	where_construct
+	|	where_stmt
+	|	where_construct
 	;
 
 // R747 where_assignment_stmt inlined as assignment_stmt in R743 and R746
@@ -1849,13 +1854,13 @@ forall_triplet_spec_list
     ;
 
 // R756
-// TODO putback
 forall_body_construct
+options {backtrack=true;}
 	:	forall_assignment_stmt
 	|	where_stmt
-//	|	where_construct
+	|	where_construct
 	|	forall_construct
-//	|	forall_stmt
+	|	forall_stmt
 	;
 
 // R757
@@ -2071,14 +2076,14 @@ type_guard_stmt
 end_select_type_stmt
 options {k=2;}
 	:	(T_END T_SELECT) => T_END T_SELECT ( T_IDENT )? T_EOS
-	| T_ENDSELECT ( T_IDENT )? T_EOS
+	|	T_ENDSELECT ( T_IDENT )? T_EOS
 	;
 
 // R825
-// TODO putback
+// deleted second alternative, nonblock_do_construct, to reduce backtracking, see comments for R835 on how
+// termination of nested loops must be handled.
 do_construct
 	:	block_do_construct
-//	|	nonblock_do_construct
 	;
 
 // R826
@@ -2102,11 +2107,8 @@ label_do_stmt
 	:	( T_IDENT T_COLON )? T_DO T_DIGIT_STRING ( loop_control )? T_EOS
 	;
 
-// R829
+// R829 inlined in R827
 // T_IDENT inlined for do_construct_name
-nonlabel_do_stmt
-	:	( T_IDENT T_COLON )? T_DO ( loop_control )? T_EOS
-	;
 
 // R830
 // ERR_CHK 830a scalar_int_expr replaced by expr
@@ -2125,9 +2127,14 @@ do_variable
 
 // R833
 // T_CONTINUE inlined for continue_stmt
+// TODO continue-stmt is ambiguous with same in action statement, check there for label and if
+// label matches do-stmt label, then match end-do
+// do_term_action_stmt added to allow block_do_construct to cover nonblock_do_construct as well
+// TODO putback
 end_do
-	:	end_do_stmt
-	|	T_CONTINUE T_EOS
+	:	(label)? end_do_stmt
+//	|	(label)? T_CONTINUE T_EOS
+	|	do_term_action_stmt
 	;
 
 // R834
@@ -2138,53 +2145,32 @@ options {k=2;}
 	| T_ENDDO ( T_IDENT )? T_EOS
 	;
 
-// R835
-// TODO putback
-nonblock_do_construct
-	:	action_term_do_construct
-//	|	outer_shared_do_construct
+// R835 nonblock_do_construct deleted as it was combined with block_do_construct to reduce backtracking
+// Second alternative, outer_shared_do_construct (nested loops sharing a termination label) is ambiguous
+// with do_construct in do_body, so deleted.  Loop termination will have to be coordinated with
+// the scanner to unwind nested loops sharing a common termination statement (see do_term_action_stmt).
+
+// R836 action_term_do_construct deleted because nonblock_do_construct combined with block_do_construct
+// to reduce backtracking
+
+// R837 do_body deleted because nonblock_do_construct combined with block_do_construct
+// to reduce backtracking
+
+// R838
+// C826 (R842) A do-term-shared-stmt shall not be a goto-stmt, a return-stmt, a stop-stmt, an exit-stmt, a cyle-stmt, an end-function-stmt, an end-subroutine-stmt, an end-program-stmt, or an arithmetic-if-stmt.
+// TODO need interaction with scanner to have this extra terminal emitted when do label matched
+// TODO need interaction with scanner to terminate shared terminal action statements (see R835).
+do_term_action_stmt
+	:	T_LABEL_DO_TERMINAL action_stmt
 	;
 
-// R836
-// ERR_CHK 836 last statement in do_body must be an action_stmt
-// do_term_action_stmt deleted because ambiguous with termination of do_body
-action_term_do_construct
-	:	label_do_stmt
-		do_body
-		/* do_term_action_stmt deleted */
-	;
+// R839 outer_shared_do_construct removed because it caused ambiguity in R835 (see comment in R835)
 
-// R837
-do_body
-	:	( execution_part_construct )*
-	;
+// R840 shared_term_do_construct deleted (see comments for R839 and R835)
 
-// R838 do_term_action_stmt was action_stmt inlined in R836 then deleted
+// R841 inner_shared_do_construct deleted (see comments for R839 and R835)
 
-// R839
-outer_shared_do_construct
-	:	label_do_stmt
-		do_body
-		shared_term_do_construct
-	;
-
-// R840
-// TODO putback
-shared_term_do_construct
-	:	outer_shared_do_construct
-//	|	inner_shared_do_construct
-	;
-
-// R841
-// ERR_CHK 841 last statement in do_body must be an action_stmt
-// do_term_shared_stmt deleted because ambiguous with termination of do_body
-inner_shared_do_construct
-	:	label_do_stmt
-		do_body
-		/* do_term_shared_stmt deleted */
-	;
-
-// R842 do_term_shared_stmt was action_stmt inlined in R841 then deleted
+// R842 do_term_shared_stmt deleted (see comments for R839 and R835)
 
 // R843
 // T_IDENT inlined for do_construct_name
@@ -2637,6 +2623,7 @@ options {k=2;}
 	;
 	
 // R1104
+// C1104 (R1104) A module specification-part shall not contain a stmt-function-stmt, an entry-stmt or a format-stmt
 // specification_part made non-optional to remove END ambiguity (as can be empty)
 module
 	:	module_stmt
@@ -3027,8 +3014,10 @@ return_stmt
 // R1238
 // ERR_CHK 1239 scalar_expr replaced by expr
 // generic_name_list substituted for dummy_arg_name_list
+// TODO Hopefully scanner and parser can help work together here to work around ambiguity.
+//      Need scanner to send special token if it sees what?
 stmt_function_stmt
-	:	T_IDENT T_LPAREN ( generic_name_list )? T_RPAREN T_EQUALS expr T_EOS
+	:	T_STMT_FUNCTION T_IDENT T_LPAREN ( generic_name_list )? T_RPAREN T_EQUALS expr T_EOS
 	;
 
 
@@ -3321,6 +3310,16 @@ T_DEFINED_OP
 // used to catch edit descriptors and other situations
 T_ID_OR_OTHER
 	:	'ID_OR_OTHER'
+	;
+
+// extra, context-sensitive terminals that require communication between parser and scanner
+
+T_LABEL_DO_TERMINAL
+	:	'LABEL_DO_TERMINAL'
+	;
+
+T_STMT_FUNCTION 
+	:	'STMT_FUNCTION'
 	;
 
 // R304
