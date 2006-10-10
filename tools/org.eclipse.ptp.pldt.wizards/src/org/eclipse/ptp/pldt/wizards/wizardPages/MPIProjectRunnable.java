@@ -35,7 +35,7 @@ import org.eclipse.jface.util.Assert;
  *
  */
 public class MPIProjectRunnable implements Runnable {
-	private static final boolean traceOn=true;
+	private static final boolean traceOn=false;
 
 	/**
 	 * Take the info from the MPI project wizard page and fix up the project include paths etc.
@@ -43,26 +43,26 @@ public class MPIProjectRunnable implements Runnable {
 	 * @see java.lang.Runnable#run()
 	 */
 	public void run() {
-		System.out.println("=============================== MPIProjectRunnable.run()...");
+		if(traceOn)System.out.println("=============================== MPIProjectRunnable.run()...");
  
 		String pageID = MPIProjectWizardPage.PAGE_ID;
 		String propID=MPIProjectWizardPage.DO_MPI_INCLUDES;
 		Object obj = MBSCustomPageManager.getPageProperty(pageID, propID);
-		boolean doMpiIncludes=true;
+		boolean doMpiIncludes=MPIProjectWizardPage.getDefaultUseMpiIncludes();
 		if(obj!=null)
-		    doMpiIncludes=Boolean.getBoolean((String)obj);
+		    doMpiIncludes=Boolean.valueOf((String)obj);
 		if(!doMpiIncludes) {
-			System.out.println("Do not save MPI info in this project.");
+			if(traceOn)System.out.println("Do not save MPI info in this project.");
 			return;
 		}
 		MBSCustomPageData pData = MBSCustomPageManager.getPageData(pageID);
 		NewCProjectWizard wiz = (NewCProjectWizard) pData.getWizardPage().getWizard();
 		IProject proj = wiz.getNewProject();
-		System.out.println("Project: " + proj.getName());
+		if(traceOn)System.out.println("Project: " + proj.getName());
 
 		propID = MPIProjectWizardPage.INCLUDE_PATH_PROP_ID;
 		String newIncludePath = getNewPropValue(pageID, propID,"c:/mpich2/include");
-		System.out.println("Got prop: "+propID+"="+newIncludePath);
+		if(traceOn)System.out.println("Got prop: "+propID+"="+newIncludePath);
 		
 		propID = MPIProjectWizardPage.LIB_PROP_ID;
 		String newLib=getNewPropValue(pageID,propID,"lib");
@@ -70,12 +70,16 @@ public class MPIProjectRunnable implements Runnable {
 		propID=MPIProjectWizardPage.LIBRARY_SEARCH_PATH_PROP_ID;
 		String newLibSearchPath=getNewPropValue(pageID,propID,"c:/mpich2/lib");
 		
+		propID=MPIProjectWizardPage.MPI_BUILD_COMMAND_PROP_ID;
+		String mpiBuildCommand=getNewPropValue(pageID,propID,"mpicc");
+		
+		
 		
 		
 		IManagedBuildInfo info = null;
 		try {
 			info = ManagedBuildManager.getBuildInfo(proj);
-			System.out.println("Build info: " + info);
+			if(traceOn)System.out.println("Build info: " + info);
 		} catch (Exception e) {
 			System.out.println("MPIProjectRunnable.run(), "+e.getMessage());
 			e.printStackTrace();
@@ -91,16 +95,18 @@ public class MPIProjectRunnable implements Runnable {
 
 		for (int i = 0; i < configs.length; i++) {
 			IConfiguration cf = configs[i];
-			System.out.println("Config " + i + ": " + cf.getName());
+			if(traceOn)System.out.println("Config " + i + ": " + cf.getName());
 			addIncludePath(cf, newIncludePath);
 			addLinkerOpt(cf,newLib,newLibSearchPath);
+			setBuildCommand(cf,mpiBuildCommand);
 		}
-		System.out.println("Runnable, newIncludePath: "+newIncludePath);
-		System.out.println("   newLib: "+newLib+"  newLibSrchPth: "+newLibSearchPath);
+		if(traceOn)System.out.println("Runnable, newIncludePath: "+newIncludePath);
+		if(traceOn)System.out.println("   newLib: "+newLib+"  newLibSrchPth: "+newLibSearchPath);
+		if(traceOn)System.out.println("   buildCmd: "+mpiBuildCommand);
 		// ManagedBuildManger.saveBuildInfo(...) assures that the
 		// values are persisted in the build model, otherwise they will
 		// be lost when you shut down Eclipse.
-		System.out.println("ManagedBuildManager.saveBuildInfo...");
+		if(traceOn)System.out.println("ManagedBuildManager.saveBuildInfo...");
 		ManagedBuildManager.saveBuildInfo(proj, true);
 
 	}
@@ -122,7 +128,7 @@ public class MPIProjectRunnable implements Runnable {
 			newValue = obj.toString();
 			msg="";
 		}
-		System.out.println("propID=" + propID + "  value=" + newValue+msg);
+		if(traceOn)System.out.println("propID=" + propID + "  value=" + newValue+msg);
 		return newValue;
 	}
 
@@ -176,6 +182,16 @@ public class MPIProjectRunnable implements Runnable {
 		option=cfTool.getOptionById(optPathsID);
 		addOptionValue(cf, cfTool, option, libPath);
 		}
+	
+	private void setBuildCommand(IConfiguration cf, String buildCmd) {
+		System.out.println("build cmd: "+buildCmd);
+		ITool compiler = cf.getToolFromInputExtension("c");
+		ITool linker=cf.getToolFromInputExtension("o");
+		compiler.setToolCommand(buildCmd);
+		linker.setToolCommand(buildCmd);
+		
+		int foo=0;
+	}
 	
 	/**
 	 * Add a value to a multi-valued tool option<br>
@@ -234,10 +250,10 @@ public class MPIProjectRunnable implements Runnable {
 	 * @param proj the (managed) project for which print all this stuff.
 	 */
 	private void showOptions(IManagedProject proj) {
-		System.out.println("Managed Project: "+proj.getName());
+		if(traceOn)System.out.println("Managed Project: "+proj.getName());
 		Path p;
-		System.out.println("Path.SEPARATOR="+Path.SEPARATOR);
-		System.out.println("Path.DEVICE_SEPARATOR="+Path.DEVICE_SEPARATOR);
+		if(traceOn)System.out.println("Path.SEPARATOR="+Path.SEPARATOR);
+		if(traceOn)System.out.println("Path.DEVICE_SEPARATOR="+Path.DEVICE_SEPARATOR);
 		IConfiguration[] configs = proj.getConfigurations();
 		try {
 			for (int i = 0; i < configs.length; i++) {
@@ -250,6 +266,14 @@ public class MPIProjectRunnable implements Runnable {
 				for (int k = 0; k < allTools.length; k++) {
 					ITool tool = allTools[k];
 					System.out.println("  Tool " + k + ": " + tool.getName());
+					String cmdLinePattern=tool.getCommandLinePattern();
+					//boolean rc=tool.setToolCommand("foo");
+					String toolCmd=tool.getToolCommand();
+					String toolID=tool.getId();//"cdt.managedbuild.tool.gnu.c.compiler.cygwin.exe.debug.244391908"
+					                           //"cdt.managedbuild.tool.gnu.c.linker.cygwin.exe.debug.107078755"
+					System.out.println("  cmd="+toolCmd+"  toolID="+toolID);
+					
+					
 					IOption[] options = tool.getOptions();
 
 					for (int j = 0; j < options.length; j++) {
