@@ -38,7 +38,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 /**
- * Page for collecting info about MPI project
+ * Wizard Page for collecting info about MPI project
  * @author Beth Tibbitts
  * 
  */
@@ -66,13 +66,16 @@ public class MPIProjectWizardPage extends MBSCustomPage {
 	 * store in MBSPageData (with this ID) what the library search path is.
 	 */
 	public static final String LIBRARY_SEARCH_PATH_PROP_ID = "libPath";
-	public static final String MPI_BUILD_COMMAND_PROP_ID = "mpiBuildCommand";
+	
+	public static final String MPI_COMPILE_COMMAND_PROP_ID = "mpiCompileCommand";
+	public static final String MPI_LINK_COMMAND_PROP_ID = "mpiLinkCommand";
 	
 
 	private String currentMpiIncludePath;
 	private String currentLibName;
 	private String currentLibPath;
-	private String currentMpiBuildCommand;
+	private String currentMpiCompileCommand;
+	private String currentMpiLinkCommand;
 
 	private String defaultMpiIncludePath;
 	private String defaultMpiLibName;
@@ -82,31 +85,32 @@ public class MPIProjectWizardPage extends MBSCustomPage {
 	private Text includePathField;
 	private Text libNameField;
 	private Text libPathField;
-	private Text mpiBuildCmdField;
+	private Text mpiCompileCommandField, mpiLinkCommandField;
 	
-	private Label includePathLabel, libLabel, libPathLabel, mpiBuildCommandLabel;
+	private Label includePathLabel, libLabel, libPathLabel, mpiCompileCommandLabel, mpiLinkCommandLabel;
 
 
 	private Button browseButton;
 	private Button browseButton2;
 
 	private Button useDefaultsButton;
-	private Button useMpiIncludesButton;
+	private Button useMpiProjectSettingsButton;
 	private static boolean defaultUseMpiIncludes=false;
 
 	private IPreferenceStore preferenceStore;
 
 	private static final int SIZING_TEXT_FIELD_WIDTH = 250;
 	/**
-	 * By default we do NOT use MPI includes in a new project.<br>
+	 * By default we do NOT use MPI project settings in a new project.<br>
 	 * Only set MPI includes (etc) if user selects it on this page.
 	 */
-	private boolean useMpiIncludes=false;
+	private boolean useMpiProjectSettings=false;
 	private String desc = "MPI Project Page";
 
 	/**
 	 * The CDT new project wizard page for MPI projects.  
 	 * Adds the include paths and libary information for an MPI project.
+	 * This page shows up after the other CDT new project wizard pages.
 	 * 
 	 */
 	public MPIProjectWizardPage() {
@@ -121,12 +125,10 @@ public class MPIProjectWizardPage extends MBSCustomPage {
 		// overwrite them if the user changes them.
 		defaultMpiIncludePath = preferenceStore.getString(MpiIDs.MPI_INCLUDES);
 		setDefaultOtherNames(defaultMpiIncludePath);
-		// BRT what if the default mpi path is empty?
-		currentMpiIncludePath = defaultMpiIncludePath;
-		currentMpiBuildCommand=defaultMpiBuildCommand;
 		// the following sets what will be remembered when we leave the page.
-		setCurrentMpiIncludePath(currentMpiIncludePath);
-		setCurrentMpiBuildCommand(currentMpiBuildCommand);
+		setCurrentMpiIncludePath(defaultMpiIncludePath);
+		setCurrentMpiCompileCommand(defaultMpiBuildCommand);
+		setCurrentMpiLinkCommand(defaultMpiBuildCommand);
 
 	}
 
@@ -162,7 +164,7 @@ public class MPIProjectWizardPage extends MBSCustomPage {
 		setCurrentMpiIncludePath(defaultMpiIncludePath);
 		
 		defaultMpiBuildCommand="mpicc";
-		setCurrentMpiBuildCommand(defaultMpiBuildCommand);
+		setCurrentMpiCompileCommand(defaultMpiBuildCommand);
 		
 	}
 
@@ -199,9 +201,13 @@ public class MPIProjectWizardPage extends MBSCustomPage {
 		currentMpiIncludePath = path;
 		MBSCustomPageManager.addPageProperty(pageID, LIBRARY_SEARCH_PATH_PROP_ID, path);
 	}
-	private void setCurrentMpiBuildCommand(String buildCommand) {
-		currentMpiBuildCommand = buildCommand;
-		MBSCustomPageManager.addPageProperty(pageID, MPI_BUILD_COMMAND_PROP_ID, buildCommand);
+	private void setCurrentMpiCompileCommand(String buildCommand) {
+		currentMpiCompileCommand = buildCommand;
+		MBSCustomPageManager.addPageProperty(pageID, MPI_COMPILE_COMMAND_PROP_ID, buildCommand);
+	}
+	private void setCurrentMpiLinkCommand(String buildCommand) {
+		currentMpiLinkCommand = buildCommand;
+		MBSCustomPageManager.addPageProperty(pageID, MPI_LINK_COMMAND_PROP_ID, buildCommand);
 	}
 
 
@@ -215,16 +221,16 @@ public class MPIProjectWizardPage extends MBSCustomPage {
 	}
 
 	/**
-	 * Return the path on the "mpi include path" field.
+	 * Return the path in one of the path fields.
 	 * 
 	 * @return String
 	 */
-	private String getPathFromIncludePathField() {
+	private String getPathFromPathField(Text textField) {
 		URI fieldURI;
 		try {
-			fieldURI = new URI(includePathField.getText());
+			fieldURI = new URI(textField.getText());
 		} catch (URISyntaxException e) {
-			return includePathField.getText();
+			return textField.getText();
 		}
 		return fieldURI.getPath();
 	}
@@ -238,18 +244,27 @@ public class MPIProjectWizardPage extends MBSCustomPage {
 		System.out.println("APWP.updateLocationField to " + selectedPath);
 		includePathField.setText(selectedPath);
 	}
+	/**
+	 * Update the lib path field based on the selected path.
+	 * 
+	 * @param selectedPath
+	 */
+	private void updateLibPathField(String selectedPath) {
+		System.out.println("APWP.updateLocationField to " + selectedPath);
+		libPathField.setText(selectedPath);
+	}
 
 	/**
 	 * Open an appropriate directory browser and get selected directory <br>
-	 * BRT note: can we use the dialog that CDT uses here? Allows direct typing.
+	 * TODO: can we use the dialog that CDT uses here? Allows direct typing.
 	 */
 	private void handleLocationBrowseButtonPressed() {
 
 		String selectedDirectory = null;
-		String dirName = getPathFromIncludePathField();
+		String dirName = getPathFromPathField(includePathField);
 
 		DirectoryDialog dialog = new DirectoryDialog(includePathField.getShell());
-		dialog.setMessage("MPI Include path directory:");
+		dialog.setMessage("MPI Include path:");
 
 		dialog.setFilterPath(dirName);
 
@@ -259,9 +274,30 @@ public class MPIProjectWizardPage extends MBSCustomPage {
 			updateIncludePathField(selectedDirectory);
 
 			includePathField.setText(selectedDirectory);
-			System.out.println("Directory found via browse: " + selectedDirectory);
+			if(traceOn)System.out.println("Directory found via browse: " + selectedDirectory);
 			// set value to where we can find it in the runnable later
 			setCurrentMpiIncludePath(selectedDirectory);
+		}
+	}
+	private void handleLocationBrowseButton2Pressed() {
+
+		String selectedDirectory = null;
+		String dirName = getPathFromPathField(libPathField);
+
+		DirectoryDialog dialog = new DirectoryDialog(libPathField.getShell());
+		dialog.setMessage("MPI library search path:");
+
+		dialog.setFilterPath(dirName);
+
+		selectedDirectory = dialog.open();
+
+		if (selectedDirectory != null) {
+			updateLibPathField(selectedDirectory);
+
+			libPathField.setText(selectedDirectory);
+			if(traceOn)System.out.println("Directory found via browse: " + selectedDirectory);
+			// set value to where we can find it in the runnable later
+			setCurrentMpiLibPath(selectedDirectory);
 		}
 	}
 
@@ -320,7 +356,7 @@ public class MPIProjectWizardPage extends MBSCustomPage {
 		// how do we know when next/finish button pushed? we don't.
 		
 		libLabel=new Label(composite, SWT.NONE);
-		libLabel.setText("Lib name:");
+		libLabel.setText("Library name:");
 		libLabel.setToolTipText("Library name:");
 		
 		libNameField=new Text(composite,SWT.BORDER);
@@ -363,24 +399,41 @@ public class MPIProjectWizardPage extends MBSCustomPage {
 		browseButton2.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				if(traceOn)System.out.println("Browse button pressed. DO SOMETHING HERE.");
-				//handleLocationBrowseButton2Pressed();
+				handleLocationBrowseButton2Pressed();
 
 			}
 		});
-		mpiBuildCommandLabel= new Label(composite,SWT.NONE);
-		mpiBuildCommandLabel.setText("MPI build command: ");
-		mpiBuildCmdField=new Text(composite,SWT.BORDER);
+		mpiCompileCommandLabel= new Label(composite,SWT.NONE);
+		mpiCompileCommandLabel.setText("MPI compile command: ");
+		mpiCompileCommandField=new Text(composite,SWT.BORDER);
 		GridData gd3 = new GridData(GridData.FILL_HORIZONTAL);
 		gd3.widthHint=SIZING_TEXT_FIELD_WIDTH;
 		gd3.horizontalSpan=2;
-		mpiBuildCmdField.setLayoutData(gd3);
-		mpiBuildCmdField.setText(defaultMpiBuildCommand);
-		mpiBuildCmdField.addModifyListener(new ModifyListener() {
+		mpiCompileCommandField.setLayoutData(gd3);
+		mpiCompileCommandField.setText(defaultMpiBuildCommand);
+		mpiCompileCommandField.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
-				setCurrentMpiBuildCommand(mpiBuildCmdField.getText());
-				if(traceOn)System.out.println("mpiBuildCmdField.modifyText(): " + currentMpiBuildCommand);
+				setCurrentMpiCompileCommand(mpiCompileCommandField.getText());
+				if(traceOn)System.out.println("mpiCompileCommandField.modifyText(): " + currentMpiCompileCommand);
 			}
 		});
+		(new Label(composite,SWT.NONE)).setText(" ");//spacer
+		
+		mpiLinkCommandLabel= new Label(composite,SWT.NONE);
+		mpiLinkCommandLabel.setText("MPI link command: ");
+		mpiLinkCommandField=new Text(composite,SWT.BORDER);
+		GridData gd4 = new GridData(GridData.FILL_HORIZONTAL);
+		gd4.widthHint=SIZING_TEXT_FIELD_WIDTH;
+		gd4.horizontalSpan=2;
+		mpiLinkCommandField.setLayoutData(gd3);
+		mpiLinkCommandField.setText(defaultMpiBuildCommand);
+		mpiLinkCommandField.addModifyListener(new ModifyListener() {
+			public void modifyText(ModifyEvent e) {
+				setCurrentMpiLinkCommand(mpiLinkCommandField.getText());
+				if(traceOn)System.out.println("mpiLinkCommandField.modifyText(): " + currentMpiLinkCommand);
+			}
+		});
+		(new Label(composite,SWT.NONE)).setText(" ");//spacer
 		
 	}
 
@@ -402,25 +455,33 @@ public class MPIProjectWizardPage extends MBSCustomPage {
 		group.setLayout(layout);
 		group.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
-		useMpiIncludesButton = new Button(group, SWT.CHECK | SWT.RIGHT);
-		useMpiIncludesButton.setText("Add MPI project settings to this project");
+		useMpiProjectSettingsButton = new Button(group, SWT.CHECK | SWT.RIGHT);
+		useMpiProjectSettingsButton.setText("Add MPI project settings to this project");
 		GridData gd=new GridData();
 		gd.horizontalSpan=columns;
-		useMpiIncludesButton.setLayoutData(gd);
-		useMpiIncludesButton.setSelection(useMpiIncludes);
-		useMpiIncludesButton.addSelectionListener(new SelectionAdapter() {
+		useMpiProjectSettingsButton.setLayoutData(gd);
+		useMpiProjectSettingsButton.setSelection(useMpiProjectSettings);
+		useMpiProjectSettingsButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				useMpiIncludes = useMpiIncludesButton.getSelection();
+				useMpiProjectSettings = useMpiProjectSettingsButton.getSelection();
 				// set value so we can read it later
-				MBSCustomPageManager.addPageProperty(pageID, DO_MPI_INCLUDES, Boolean.toString(useMpiIncludes));
-				setUserAreaEnabled(useMpiIncludes);
-				useDefaultsButton.setEnabled(useMpiIncludes);
+				MBSCustomPageManager.addPageProperty(pageID, DO_MPI_INCLUDES, Boolean.toString(useMpiProjectSettings));
+				
+				useDefaultsButton.setEnabled(useMpiProjectSettings);
+				if(useMpiProjectSettings) {
+				  boolean useDefaults=useDefaultsButton.getSelection();
+				  setUserAreaEnabled(!useDefaults);
+				}
+				else
+					setUserAreaEnabled(false);
+				
 			}
 		});
 
 		useDefaultsButton = new Button(group, SWT.CHECK | SWT.RIGHT);
 		useDefaultsButton.setText("Use default information");
 		useDefaultsButton.setSelection(defaultEnabled);
+		useDefaultsButton.setEnabled(false);
 		GridData buttonData = new GridData();
 		buttonData.horizontalSpan = columns;
 		useDefaultsButton.setLayoutData(buttonData);
@@ -429,13 +490,27 @@ public class MPIProjectWizardPage extends MBSCustomPage {
 			public void widgetSelected(SelectionEvent e) {
 				boolean useDefaults = useDefaultsButton.getSelection();
 
-				if (useDefaults) { // CHANGING to use default MPI locn now...
+				if (useDefaults) { 
+					// reset all fields and values back to the defaults
 					includePathField.setText(defaultMpiIncludePath);
 					setCurrentMpiIncludePath(defaultMpiIncludePath);
+					
+					libPathField.setText(defaultMpiLibName);
+					setCurrentMpiLibName(defaultMpiLibName);
+					
+					libNameField.setText(defaultMpiLibName);
+					setCurrentMpiLibName(defaultMpiLibName);
+					
+					libPathField.setText(defaultMpiLibPath);
+					setCurrentMpiLibPath(defaultMpiLibPath);
+					
+					mpiCompileCommandField.setText(defaultMpiBuildCommand);
+					setCurrentMpiCompileCommand(defaultMpiBuildCommand);
+					
+					mpiLinkCommandField.setText(defaultMpiBuildCommand);
+					setCurrentMpiLinkCommand(defaultMpiBuildCommand);
 				}
-
 				setUserAreaEnabled(!useDefaults);
-
 			}
 		});
 
@@ -543,6 +618,7 @@ public class MPIProjectWizardPage extends MBSCustomPage {
 	 * @param enabled
 	 */
 	private void setUserAreaEnabled(boolean enabled) {
+		
 		includePathField.setEnabled(enabled);
 		browseButton.setEnabled(enabled);
 		browseButton2.setEnabled(enabled);
@@ -553,8 +629,10 @@ public class MPIProjectWizardPage extends MBSCustomPage {
 		libPathLabel.setEnabled(enabled);
 		libLabel.setEnabled(enabled);
 		
-		mpiBuildCommandLabel.setEnabled(enabled);
-		mpiBuildCmdField.setEnabled(enabled);
+		mpiCompileCommandLabel.setEnabled(enabled);
+		mpiCompileCommandField.setEnabled(enabled);
+		mpiLinkCommandLabel.setEnabled(enabled);
+		mpiLinkCommandField.setEnabled(enabled);
 	}
 	
 	/**

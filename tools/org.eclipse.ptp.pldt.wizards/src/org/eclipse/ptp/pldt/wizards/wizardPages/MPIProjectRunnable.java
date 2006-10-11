@@ -70,8 +70,11 @@ public class MPIProjectRunnable implements Runnable {
 		propID=MPIProjectWizardPage.LIBRARY_SEARCH_PATH_PROP_ID;
 		String newLibSearchPath=getNewPropValue(pageID,propID,"c:/mpich2/lib");
 		
-		propID=MPIProjectWizardPage.MPI_BUILD_COMMAND_PROP_ID;
-		String mpiBuildCommand=getNewPropValue(pageID,propID,"mpicc");
+		propID=MPIProjectWizardPage.MPI_COMPILE_COMMAND_PROP_ID;
+		String mpiCompileCommand=getNewPropValue(pageID,propID,"mpicc");
+		
+		propID=MPIProjectWizardPage.MPI_LINK_COMMAND_PROP_ID;
+		String mpiLinkCommand=getNewPropValue(pageID,propID,"mpicc");
 		
 		
 		
@@ -98,11 +101,14 @@ public class MPIProjectRunnable implements Runnable {
 			if(traceOn)System.out.println("Config " + i + ": " + cf.getName());
 			addIncludePath(cf, newIncludePath);
 			addLinkerOpt(cf,newLib,newLibSearchPath);
-			setBuildCommand(cf,mpiBuildCommand);
+			setCompileCommand(cf,mpiCompileCommand);
+			setLinkCommand(cf,mpiLinkCommand);
+			
 		}
 		if(traceOn)System.out.println("Runnable, newIncludePath: "+newIncludePath);
 		if(traceOn)System.out.println("   newLib: "+newLib+"  newLibSrchPth: "+newLibSearchPath);
-		if(traceOn)System.out.println("   buildCmd: "+mpiBuildCommand);
+		if(traceOn)System.out.println("   compileCmd: "+mpiCompileCommand);
+		if(traceOn)System.out.println("   linkCmd: "+mpiLinkCommand);
 		// ManagedBuildManger.saveBuildInfo(...) assures that the
 		// values are persisted in the build model, otherwise they will
 		// be lost when you shut down Eclipse.
@@ -183,14 +189,17 @@ public class MPIProjectRunnable implements Runnable {
 		addOptionValue(cf, cfTool, option, libPath);
 		}
 	
-	private void setBuildCommand(IConfiguration cf, String buildCmd) {
-		System.out.println("build cmd: "+buildCmd);
+	private void setCompileCommand(IConfiguration cf, String buildCmd) {
+		if(traceOn)System.out.println("compile cmd: "+buildCmd);
 		ITool compiler = cf.getToolFromInputExtension("c");
-		ITool linker=cf.getToolFromInputExtension("o");
 		compiler.setToolCommand(buildCmd);
+		
+	}
+	private void setLinkCommand(IConfiguration cf, String buildCmd) {
+		if(traceOn)System.out.println("link cmd: "+buildCmd);
+		ITool linker=cf.getToolFromInputExtension("o");
 		linker.setToolCommand(buildCmd);
 		
-		int foo=0;
 	}
 	
 	/**
@@ -251,7 +260,6 @@ public class MPIProjectRunnable implements Runnable {
 	 */
 	private void showOptions(IManagedProject proj) {
 		if(traceOn)System.out.println("Managed Project: "+proj.getName());
-		Path p;
 		if(traceOn)System.out.println("Path.SEPARATOR="+Path.SEPARATOR);
 		if(traceOn)System.out.println("Path.DEVICE_SEPARATOR="+Path.DEVICE_SEPARATOR);
 		IConfiguration[] configs = proj.getConfigurations();
@@ -266,7 +274,6 @@ public class MPIProjectRunnable implements Runnable {
 				for (int k = 0; k < allTools.length; k++) {
 					ITool tool = allTools[k];
 					System.out.println("  Tool " + k + ": " + tool.getName());
-					String cmdLinePattern=tool.getCommandLinePattern();
 					//boolean rc=tool.setToolCommand("foo");
 					String toolCmd=tool.getToolCommand();
 					String toolID=tool.getId();//"cdt.managedbuild.tool.gnu.c.compiler.cygwin.exe.debug.244391908"
@@ -342,7 +349,6 @@ public class MPIProjectRunnable implements Runnable {
 	 * @return
 	 */
 	private String[] add(String[] includePaths, String mpiIncludePath) {
-		// TODO assure it doesn't already exist
 		int len = includePaths.length;
 		String newPaths[] = new String[len + 1];
 		System.arraycopy(includePaths, 0, newPaths, 0, len);
