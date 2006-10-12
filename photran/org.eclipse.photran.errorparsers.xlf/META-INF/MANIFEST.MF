@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Xlf Plug-in
+Bundle-SymbolicName: org.eclipse.photran.errorparsers.xlf; singleton:=true
+Bundle-Version: 1.0.0
+Bundle-Activator: org.eclipse.photran.errorparsers.xlf.Activator
+Bundle-Localization: plugin
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.core.resources,
+ org.eclipse.cdt.core
+Eclipse-LazyStart: true
+Export-Package: org.eclipse.photran.errorparsers.xlf
