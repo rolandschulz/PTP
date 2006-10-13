@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2005 IBM Corporation.
+ * Copyright (c) 2005, 2006 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -40,14 +40,33 @@ public class ArtifactMarkingVisitor implements IResourceDeltaVisitor, IResourceV
     private static final boolean traceOn = false;
     protected String markerID_;
     protected ArtifactManager artifactManager_;
+    private boolean removeMarkers;
     
-    public ArtifactMarkingVisitor(String markerId)
+    /**
+     * Construction that allows specification of whether or not to removed old
+     * markers on this resource before creating new ones
+     * @param markerId
+     * @param removeMarkers
+     */
+    public ArtifactMarkingVisitor(String markerId, boolean removeMarkers)
     {
         this.markerID_ = markerId;
+        this.removeMarkers=removeMarkers;
         this.artifactManager_=ArtifactManager.getManager(markerID_);
         if(artifactManager_==null){
         	System.out.println("no manager yet!");
         }
+    }    
+    
+    /**
+     * Constructor that uses the default behavior that WILL remove old markers
+     * on the resource before creating new ones.  (This is the former behavior,
+     * now the default behavior)
+     * @param markerID 
+     */
+    public ArtifactMarkingVisitor(String markerID)
+    {
+      this(markerID, true);
     }
 
     /**
@@ -77,7 +96,9 @@ public class ArtifactMarkingVisitor implements IResourceDeltaVisitor, IResourceV
         try {
             if (traceOn) System.out.println("ArtifactMarkingVisitor.visitFile: " + resource.getName());
             // first clear existing markers (not: not doing anything ArtifactManager now.)
-            removeMarkers(resource, this.markerID_);
+            if(removeMarkers) {
+            	removeMarkers(resource, this.markerID_);
+            }
             int numArtifacts=artifactManager_.getArtifacts().length;
             if(traceOn)System.out.println("numArtifacts: "+numArtifacts);
             
