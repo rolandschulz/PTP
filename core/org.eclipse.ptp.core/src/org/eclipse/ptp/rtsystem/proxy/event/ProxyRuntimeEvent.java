@@ -22,9 +22,12 @@ package org.eclipse.ptp.rtsystem.proxy.event;
 import org.eclipse.ptp.core.proxy.event.IProxyEvent;
 import org.eclipse.ptp.core.proxy.event.ProxyErrorEvent;
 import org.eclipse.ptp.core.proxy.event.ProxyEvent;
+import org.eclipse.ptp.core.util.BitList;
 
 public class ProxyRuntimeEvent extends ProxyEvent {
 	public static IProxyEvent toEvent(String str) {
+		int jobid;
+		int nprocs;
 		IProxyRuntimeEvent evt = null;
 		String[] args = str.split(" ");
 		
@@ -41,23 +44,42 @@ public class ProxyRuntimeEvent extends ProxyEvent {
 			break;
 
 		case IProxyRuntimeEvent.EVENT_RUNTIME_JOBSTATE:
-			int jobid = Integer.parseInt(args[1]);
+			jobid = Integer.parseInt(args[1]);
 			int state = Integer.parseInt(args[2]);
 			evt = new ProxyRuntimeJobStateEvent(jobid, state);
 			break;
 
 		case IProxyRuntimeEvent.EVENT_RUNTIME_NEWJOB:
-			int njobid = Integer.parseInt(args[1]);
-			evt = new ProxyRuntimeNewJobEvent(njobid);
+			jobid = Integer.parseInt(args[1]);
+			evt = new ProxyRuntimeNewJobEvent(jobid);
 			break;
 		
 		case IProxyRuntimeEvent.EVENT_RUNTIME_PROCS:
-			int nprocs = Integer.parseInt(args[1]);
+			nprocs = Integer.parseInt(args[1]);
 			evt = new ProxyRuntimeProcessesEvent(nprocs);
 			break;
 		
 		case IProxyRuntimeEvent.EVENT_RUNTIME_PROCATTR:
-			evt = new ProxyRuntimeProcessAttributeEvent(args);
+			jobid = Integer.parseInt(args[1]);
+			BitList cprocs = decodeBitSet(args[2]);
+			String kv = decodeString(args[3]);
+			nprocs = Integer.parseInt(args[4]);
+			
+			int[] dprocs;
+			String[] kvs;
+			
+			if (nprocs > 0) {
+				dprocs = new int[nprocs];
+				kvs = new String[nprocs];
+				for (int i = 0; i < nprocs; i++) {
+					dprocs[i] = Integer.parseInt(args[2 * i + 5]);
+					kvs[i] = decodeString(args[2 * i + 6]);
+				}
+			} else {
+				dprocs = null;
+				kvs = null;
+			}
+			evt = new ProxyRuntimeProcessAttributeEvent(jobid, cprocs, kv, dprocs, kvs);
 			break;
 		
 		case IProxyRuntimeEvent.EVENT_RUNTIME_NODES:
