@@ -138,28 +138,25 @@ int ORTEGetProcesses(char **);
 int ORTEGetProcessAttribute(char **);
 int ORTEDiscover(char **);
 int ORTEQuit(char **);
-/*
-int ORTEGetNodes(char **);
-int OMPIGetJobs(char **);
-int OMPIGetMachines(char **);
-int OMPIGetNodemachineID(char **);
-*/
 
-struct debug_job {
-	int	debugger_jobid; // job ID of debugger
-	int app_jobid; // job ID that will be used by program when it starts
+struct ptp_job {
+	int	debug_jobid; // job ID of debugger or -1 if not a debug job
+	int jobid; // job ID that will be used by program when it starts
 	int	num_procs; // number of procs requested for program (debugger uses num_procs+1)
 };
-typedef struct debug_job debug_job;
+typedef struct ptp_job ptp_job;
 
-int get_node_attribute(int machid, int node_num, char **input_keys, int *input_types, char **input_values, int input_num_keys);
-int get_proc_attribute(orte_jobid_t jobid, int proc_num, char **input_keys, int *input_types, char **input_values, int input_num_keys);
+static int get_node_attribute(int machid, int node_num, char **input_keys, int *input_types, char **input_values, int input_num_keys);
+static int get_proc_attribute(orte_jobid_t jobid, int proc_num, char **input_keys, int *input_types, char **input_values, int input_num_keys);
 static void job_state_callback(orte_jobid_t jobid, orte_proc_state_t state);
 static int orte_console_send_command(orte_daemon_cmd_flag_t usercmd);
 static void iof_callback(orte_process_name_t* src_name, orte_iof_base_tag_t src_tag, void* cbdata, const unsigned char* data, size_t count);
-static void debug_add_job(int app_jobid, int debug_jobid);
-static void debug_remove_job(int jobid);
-static int debug_find_jobid(int jobid);
+static void add_job(int jobid, int debug_jobid);
+static void remove_job(int jobid);
+static void remove_debug_job(int jobid);
+static ptp_job *find_job(int jobid);
+static char *orte_get_process_attrib(char **);
+static int get_num_procs(orte_jobid_t jobid);
 
 #ifdef HAVE_SYS_BPROC_H
 int ORTE_Subscribe_Bproc(void);
@@ -178,7 +175,7 @@ proxy_svr *	orte_proxy;
 int			is_orte_initialized = 0;
 pid_t		orted_pid = 0;
 List *		eventList;
-List *		debugJobs;
+List *		jobList;
 int			ptp_signal_exit;
 RETSIGTYPE	(*saved_signals[NSIG])(int);
 
@@ -195,27 +192,20 @@ static proxy_svr_helper_funcs helper_funcs = {
 };
 
 static proxy_svr_commands command_tab[] = {
-	{"STARTDAEMON", 	ORTEStartDaemon},
-	{"DISCOVER",        ORTEDiscover},
-	{"RUN",				ORTERun},
-	{"TERMJOB",			ORTETerminateJob},
-	{"GETPROCS",		ORTEGetProcesses},
-	{"GETPATTR",	   	ORTEGetProcessAttribute},
-	{"QUI",				ORTEQuit},
-	//{"GETNODES",		ORTEGetNodes},
-	//{"GETNATTR",		ORTEGetNodeAttribute},
-	/*
-	{"GETJOBS",		OMPIGetJobs},
-	{"GETMACHS",		OMPIGetMachines},
-	{"GETNMID",		OMPIGetNodemachineID},
-	*/
+	{"STARTDAEMON",	ORTEStartDaemon},
+	{"DISCOVER",    ORTEDiscover},
+	{"RUN",			ORTERun},
+	{"TERMJOB",		ORTETerminateJob},
+	{"GETPROCS",	ORTEGetProcesses},
+	{"GETPATTR",	ORTEGetProcessAttribute},
+	{"QUI",			ORTEQuit},
 	{NULL,			NULL},
 };
 
 static struct option longopts[] = {
 	{"proxy",			required_argument,	NULL, 	'P'}, 
-	{"port",				required_argument,	NULL, 	'p'}, 
-	{"host",				required_argument,	NULL, 	'h'}, 
+	{"port",			required_argument,	NULL, 	'p'}, 
+	{"host",			required_argument,	NULL, 	'h'}, 
 	{NULL,				0,					NULL,	0}
 };
 
@@ -377,8 +367,173 @@ ORTEInit(char *universe_name)
 	return 0;
 }
 
+static void 
+job_proc_notify_callback(orte_gpr_notify_data_t *data, void *cbdata)
+{
+	int						len;
+	size_t					i;
+	size_t					j;
+	size_t					k;
+	orte_gpr_value_t **		values;
+	orte_gpr_value_t *		value;
+	orte_gpr_keyval_t **	keyvals;
+	ptp_job *				job = (ptp_job *)cbdata;
+	char *					str1;
+	char *					str2;
+	char *					res;
+	char *					kv = NULL;
+	char *					vpid = NULL;
+	
+	values = (orte_gpr_value_t**)(data->values)->addr;
+	
+	for(i=0, k=0; k<data->cnt && i < (data->values)->size; i++) {
+		if(values[i] == NULL) continue;
+		
+		k++;
+		value = values[i];
+		keyvals = value->keyvals;
+		
+		len = strlen(ORTE_VPID_KEY);
+		
+		if (strlen(value->tokens[1]) <= len
+			|| strncmp(value->tokens[1], ORTE_VPID_KEY, len) != 0)
+			continue;
+			
+		asprintf(&vpid, "%s", value->tokens[1]+len+1);
+		
+		for(j=0; j<value->cnt; j++) {
+			orte_gpr_keyval_t *keyval = keyvals[j];
+			char *external_key = NULL;
+			
+			if (!strcmp(keyval->key, ORTE_NODE_NAME_KEY))
+				asprintf(&external_key, "%s", ATTRIB_PROCESS_NODE_NAME);
+			else if (!strcmp(keyval->key, ORTE_PROC_PID_KEY))
+				asprintf(&external_key, "%s", ATTRIB_PROCESS_PID);
+			else
+				external_key = strdup(keyval->key);
+
+			if (external_key != NULL) {					
+				switch(keyval->type) {
+					case ORTE_STRING:
+						asprintf(&kv, "%s=%s", external_key, keyval->value.strptr);
+						break;
+					case ORTE_UINT32:
+						asprintf(&kv, "%s=%d", external_key, keyval->value.ui32);
+						break;
+					case ORTE_PID:
+						asprintf(&kv, "%s=%d", external_key, keyval->value.pid);
+						break;
+					default:
+						asprintf(&kv, "%s=<unknown type>%d", external_key, keyval->type);
+						break;
+				}
+	
+				if (kv != NULL) {
+					if (job != NULL) {
+						proxy_cstring_to_str("", &str1);
+						proxy_cstring_to_str(kv, &str2);
+						asprintf(&res, "%d %d 0:0 %s 1 %s %s", RTEV_PATTR, job->jobid, str1, vpid, str2);
+						
+			        	proxy_svr_event_callback(orte_proxy, res);
+			        	
+			        	free(str1);
+			        	free(str2);
+			        	free(res);
+					}
+					free(kv);
+				}
+				
+				free(external_key);
+	        }
+		}
+		
+		free(vpid);
+	}
+}
+
+static int
+orte_subscribe_proc(ptp_job * job, int procid)
+{
+	int							i;
+	int							rc;
+	char *						jobid_str;
+	orte_gpr_subscription_t 	sub;
+	orte_gpr_subscription_t *	subs;
+	orte_gpr_value_t			value;
+	orte_gpr_value_t *			values;
+	
+	rc = orte_ns.convert_jobid_to_string(&jobid_str, job->jobid);
+	if(rc != ORTE_SUCCESS) {
+		printf("ERROR: '%s'\n", ORTE_ERROR_NAME(rc)); fflush(stdout);
+		return -1;
+	}
+		
+	OBJ_CONSTRUCT(&sub, orte_gpr_subscription_t);
+	sub.action = ORTE_GPR_NOTIFY_VALUE_CHG;
+	
+	OBJ_CONSTRUCT(&value, orte_gpr_value_t);
+	values = &value;
+	sub.values = &values;
+	sub.cnt = 1; /* number of values */
+	value.addr_mode = ORTE_GPR_TOKENS_XAND | ORTE_GPR_KEYS_OR;
+	asprintf(&value.segment, "%s-%s", ORTE_JOB_SEGMENT, jobid_str);
+	
+	value.cnt = 3; /* number of keyvals */
+	value.keyvals = (orte_gpr_keyval_t**)malloc(value.cnt * sizeof(orte_gpr_keyval_t*));
+	
+	i = 0;
+	
+	value.keyvals[i] = OBJ_NEW(orte_gpr_keyval_t);
+	value.keyvals[i++]->key = strdup(ORTE_NODE_NAME_KEY);
+
+	value.keyvals[i] = OBJ_NEW(orte_gpr_keyval_t);
+	value.keyvals[i++]->key = strdup(ORTE_PROC_PID_KEY);
+	
+	value.keyvals[i] = OBJ_NEW(orte_gpr_keyval_t);
+	value.keyvals[i++]->key = strdup(ORTE_PROC_NAME_KEY);
+
+	/* any token */
+	value.tokens = NULL;
+	value.num_tokens = 0;
+	
+	sub.cbfunc = job_proc_notify_callback;
+	sub.user_tag = (void *)job;
+	
+	subs = &sub;
+	rc = orte_gpr.subscribe(1, &subs, 0, NULL);
+	
+	if(ORTECheckErrorCode(RTEV_ERROR_ORTE_BPROC_SUBSCRIBE, rc)) return 1;
+	
+	return 0;
+}
+
+int 
+ORTE_Subscribe_Job(orte_jobid_t jobid)
+{
+	int			i;
+	int			num_procs;
+	ptp_job *	job;
+	
+	num_procs = get_num_procs(jobid);
+	
+	if (num_procs == 0) {
+		printf("no processes for job\n"); fflush(stdout);
+		return -1;
+	}
+	
+	printf("subscribing %d procs\n", num_procs); fflush(stdout);
+	
+	for (i = 0; i < num_procs; i++) {
+		job = find_job(jobid);
+		if (job != NULL)
+			orte_subscribe_proc(job, i);
+	}
+		
+	return 0;
+}
+
 #ifdef HAVE_SYS_BPROC_H
-void 
+static void 
 bproc_notify_callback(orte_gpr_notify_data_t *data, void *cbdata)
 {
 	size_t i, j, k;
@@ -651,14 +806,19 @@ ORTEProgress(void)
 int
 ORTETerminateJob(char **args)
 {
-	int rc;
-	int jobid = atoi(args[1]);
+	int			rc;
+	int			jobid = atoi(args[1]);
+	ptp_job *	j;
 	
 	rc = orte_rmgr.terminate_job(jobid);
 	if(ORTECheckErrorCode(RTEV_ERROR_TERMINATE_JOB, rc)) return 1;
 	
-	if ((jobid = debug_find_jobid(jobid)) >= 0) {
-		rc = orte_rmgr.terminate_job(jobid);
+	if ((j = find_job(jobid)) != NULL) {
+		if (j->debug_jobid < 0)
+			rc = orte_rmgr.terminate_job(j->jobid);
+		else
+			rc = orte_rmgr.terminate_job(j->debug_jobid);
+		
 		if(ORTECheckErrorCode(RTEV_ERROR_TERMINATE_JOB, rc)) return 1;
 	}
 	
@@ -666,38 +826,51 @@ ORTETerminateJob(char **args)
 }
 
 static void
-debug_add_job(int app_jobid, int debug_jobid)
+add_job(int jobid, int debug_jobid)
 {
-	debug_job *	djob = (debug_job *)malloc(sizeof(debug_job));
-    djob->app_jobid = app_jobid;
-    djob->debugger_jobid = debug_jobid;
-    AddToList(debugJobs, (void *)djob);
+	ptp_job *	j = (ptp_job *)malloc(sizeof(ptp_job));
+    j->jobid = jobid;
+    j->debug_jobid = debug_jobid;
+    AddToList(jobList, (void *)j);
 }
 
 static void
-debug_remove_job(int jobid)
+remove_job(int jobid)
 {
-	debug_job *	djob;
-	printf("remove debug job %d\n", jobid); fflush(stdout);
-	for (SetList(debugJobs); (djob = (debug_job *)GetListElement(debugJobs)) != NULL; ) {
-		if (djob->debugger_jobid == jobid) {
-			RemoveFromList(debugJobs, (void *)djob);
+	ptp_job *	j;
+
+	for (SetList(jobList); (j = (ptp_job *)GetListElement(jobList)) != NULL; ) {
+		if (j->jobid == jobid) {
+			RemoveFromList(jobList, (void *)j);
 			break;
 		}
 	}
 }
 
-static int
-debug_find_jobid(int jobid)
+static void
+remove_debug_job(int jobid)
 {
-	debug_job *	djob;
-	
-	for (SetList(debugJobs); (djob = (debug_job *)GetListElement(debugJobs)) != NULL; ) {
-		if (djob->app_jobid == jobid) {
-			return djob->debugger_jobid;
+	ptp_job *	j;
+ 
+ 	for (SetList(jobList); (j = (ptp_job *)GetListElement(jobList)) != NULL; ) {
+		if (j->debug_jobid == jobid) {
+			RemoveFromList(jobList, (void *)j);
+			break;
 		}
 	}
-	return -1;
+}
+
+static ptp_job *
+find_job(int jobid)
+{
+	ptp_job *	j;
+	
+	for (SetList(jobList); (j = (ptp_job *)GetListElement(jobList)) != NULL; ) {
+		if (j->jobid == jobid) {
+			return j;
+		}
+	}
+	return NULL;
 }
 
 /*
@@ -752,12 +925,13 @@ debug_job_state_callback(orte_jobid_t jobid, orte_proc_state_t state)
 	switch(state) {
 		case ORTE_PROC_STATE_TERMINATED:
 		case ORTE_PROC_STATE_ABORTED:
-           	debug_remove_job(jobid);
+           	remove_debug_job(jobid);
     			break;
 	}
 }
 
-static void debug_wireup_stdin(orte_jobid_t jobid)
+static void 
+debug_wireup_stdin(orte_jobid_t jobid)
 {
 	int rc;
 	orte_process_name_t* name;
@@ -771,7 +945,8 @@ static void debug_wireup_stdin(orte_jobid_t jobid)
 	}
 }
 
-static void debug_callback(orte_gpr_notify_data_t *data, void *cbdata)
+static void 
+debug_callback(orte_gpr_notify_data_t *data, void *cbdata)
 {   
 	orte_rmgr_cb_fn_t cbfunc = (orte_rmgr_cb_fn_t)cbdata;
 	orte_gpr_value_t **values, *value;
@@ -832,7 +1007,7 @@ static void debug_callback(orte_gpr_notify_data_t *data, void *cbdata)
 	}
 }
 
-int
+static int
 debug_allocate(orte_app_context_t** app_context, size_t num_context, orte_jobid_t* jobid, orte_rmgr_cb_fn_t cbfunc)
 {
 	int rc;
@@ -886,16 +1061,16 @@ debug_allocate(orte_app_context_t** app_context, size_t num_context, orte_jobid_
 	return ORTE_SUCCESS;
 }
 
-int
-debug_spawn(char *debug_path, int argc, char **argv, orte_app_context_t** app_context, size_t num_context, orte_jobid_t* jobid)
+static int
+debug_spawn(char *debug_path, int argc, char **argv, orte_app_context_t** app_context, size_t num_context, orte_jobid_t* app_jobid, orte_jobid_t* debug_jobid)
 {
-	int					i;
-	int					rc;
-	orte_jobid_t			debug_jobid;
-	orte_jobid_t			app_jobid;
+	int						i;
+	int						rc;
+	orte_jobid_t			jid1;
+	orte_jobid_t			jid2;
 	orte_app_context_t **	debug_context;
 
-	if ((rc = debug_allocate(app_context, num_context, &app_jobid, debug_app_job_state_callback)) != ORTE_SUCCESS)
+	if ((rc = debug_allocate(app_context, num_context, &jid1, debug_app_job_state_callback)) != ORTE_SUCCESS)
 		return rc;
 
 	debug_context = malloc(sizeof(orte_app_context_t *));
@@ -918,7 +1093,7 @@ debug_spawn(char *debug_path, int argc, char **argv, orte_app_context_t** app_co
 	debug_context[0]->argv[i++] = NULL;
 	debug_context[0]->argc = i;
 
-	if ((rc = debug_allocate(debug_context, num_context, &debug_jobid, debug_job_state_callback)) != ORTE_SUCCESS) {
+	if ((rc = debug_allocate(debug_context, num_context, &jid2, debug_job_state_callback)) != ORTE_SUCCESS) {
 		// TODO free debug_context...
 		return rc;
 	}
@@ -926,14 +1101,13 @@ debug_spawn(char *debug_path, int argc, char **argv, orte_app_context_t** app_co
 	/*
 	 * launch the debugger
 	 */
-	if (ORTE_SUCCESS != (rc = orte_rmgr.launch(debug_jobid))) {
+	if (ORTE_SUCCESS != (rc = orte_rmgr.launch(jid2))) {
 		ORTE_ERROR_LOG(rc);
 		return rc;
 	}
     	
-	*jobid = app_jobid;
-    
-    debug_add_job(app_jobid, debug_jobid);
+	*app_jobid = jid1;
+	*debug_jobid = jid2;
     
 	return ORTE_SUCCESS;
 }
@@ -942,25 +1116,26 @@ debug_spawn(char *debug_path, int argc, char **argv, orte_app_context_t** app_co
 int
 ORTERun(char **args)
 {
-	int					rc;
-	int					i;
-	int					a;
-	int					num_procs = 0;
-	int					debug = 0;
-	int					num_apps;
-	int					num_args = 0;
-	int					num_env = 0;
-	int					debug_argc = 0;
-	char *				res;
-	char *				full_path;
+	int						rc;
+	int						i;
+	int						a;
+	int						num_procs = 0;
+	int						debug = 0;
+	int						num_apps;
+	int						num_args = 0;
+	int						num_env = 0;
+	int						debug_argc = 0;
+	char *					res;
+	char *					full_path;
 	char	 *				pgm_name = NULL;
 	char	 *				cwd = NULL;
-	char *				exec_path = NULL;
-	char *				debug_exec_path;
-	char **				debug_args;
-	char **				env = NULL;
+	char *					exec_path = NULL;
+	char *					debug_exec_path;
+	char **					debug_args;
+	char **					env = NULL;
 	orte_app_context_t **	apps;
 	orte_jobid_t			jobid = ORTE_JOBID_MAX;
+	orte_jobid_t			debug_jobid = -1;
 
 	for (i = 1; args[i] != NULL; i += 2) {
 		if (strcmp(args[i], "execName") == 0) {
@@ -1096,13 +1271,15 @@ ORTERun(char **args)
 	if (!debug)
 		rc = orte_rmgr.spawn(apps, num_apps, &jobid, job_state_callback);
 	else
-		rc = debug_spawn(debug_exec_path, debug_argc, debug_args, apps, num_apps, &jobid);
+		rc = debug_spawn(debug_exec_path, debug_argc, debug_args, apps, num_apps, &jobid, &debug_jobid);
 
 	printf("SPAWNED [error code %d = '%s'], now unlocking\n", rc, ORTE_ERROR_NAME(rc)); fflush(stdout);
 	
 	if(ORTECheckErrorCode(RTEV_ERROR_ORTE_RUN, rc)) return 1;
 
 	printf("NEW JOBID = %d\n", (int)jobid); fflush(stdout);
+	
+    add_job(jobid, debug_jobid);
 	
 	asprintf(&res, "%d %d", RTEV_NEWJOB, (int)jobid);
 	printf("res = '%s'\n", res); fflush(stdout);
@@ -1119,10 +1296,13 @@ ORTERun(char **args)
 	
 	printf("Returning from ORTERun\n"); fflush(stdout);
 	
+	ORTE_Subscribe_Job(jobid);
+	
 	return PROXY_RES_OK;
 }
 
-static void iof_callback(
+static void 
+iof_callback(
     orte_process_name_t* src_name,
     orte_iof_base_tag_t src_tag,
     void* cbdata,
@@ -1153,7 +1333,7 @@ struct orte_job_record {
 
 struct orte_job_record *head = NULL;
 
-int 
+static int 
 orte_job_record_started(orte_jobid_t jobid)
 {
 	struct orte_job_record *cur = NULL;
@@ -1169,7 +1349,7 @@ orte_job_record_started(orte_jobid_t jobid)
 	return 0; /* guess we didn't find it and we're at the end */
 }
 
-void
+static void
 orte_job_record_start(orte_jobid_t jobid)
 {
 	struct orte_job_record *cur = NULL;
@@ -1207,7 +1387,7 @@ orte_job_record_start(orte_jobid_t jobid)
     	}
 }
 
-void
+static void
 orte_job_record_end(orte_jobid_t jobid)
 {
 	struct orte_job_record *cur = NULL;
@@ -1259,49 +1439,51 @@ job_state_callback(orte_jobid_t jobid, orte_proc_state_t state)
 	//printf("job_state_callback(%d)\n", jobid); fflush(stdout);
 	switch(state) {
 		case ORTE_PROC_STATE_INIT:
-			printf("    state = ORTE_PROC_STATE_INIT\n");
+			printf("    state = ORTE_PROC_STATE_INIT\n"); fflush(stdout);
 			if(!orte_job_record_started(jobid)) {
 				orte_job_record_start(jobid);
 			}
 			break;
 		case ORTE_PROC_STATE_LAUNCHED:
-			printf("    state = ORTE_PROC_STATE_LAUNCHED\n");
+			printf("    state = ORTE_PROC_STATE_LAUNCHED\n"); fflush(stdout);
 			if(!orte_job_record_started(jobid)) {
 				orte_job_record_start(jobid);
 			}
 			break;
 		case ORTE_PROC_STATE_AT_STG1:
-			printf("    state = ORTE_PROC_STATE_AT_STG1\n");
+			printf("    state = ORTE_PROC_STATE_AT_STG1\n"); fflush(stdout);
 			if(!orte_job_record_started(jobid)) {
 				orte_job_record_start(jobid);
 			}
 			break;
 		case ORTE_PROC_STATE_AT_STG2:
-			printf("    state = ORTE_PROC_STATE_AT_STG2\n");
+			printf("    state = ORTE_PROC_STATE_AT_STG2\n"); fflush(stdout);
 			if(!orte_job_record_started(jobid)) {
 				orte_job_record_start(jobid);
 			}
 			break;
 		case ORTE_PROC_STATE_RUNNING:
-			printf("    state = ORTE_PROC_STATE_RUNNING\n");
+			printf("    state = ORTE_PROC_STATE_RUNNING\n"); fflush(stdout);
 			if(!orte_job_record_started(jobid)) {
 				orte_job_record_start(jobid);
 			}
 			break;
 		case ORTE_PROC_STATE_AT_STG3:
-			printf("    state = ORTE_PROC_STATE_AT_STG3\n");
+			printf("    state = ORTE_PROC_STATE_AT_STG3\n"); fflush(stdout);
 			break;
 		case ORTE_PROC_STATE_FINALIZED:
-			printf("    state = ORTE_PROC_STATE_FINALIZED\n");
+			printf("    state = ORTE_PROC_STATE_FINALIZED\n"); fflush(stdout);
 			break;
 		case ORTE_PROC_STATE_TERMINATED:
-			printf("    state = ORTE_PROC_STATE_TERMINATED\n");
+			printf("    state = ORTE_PROC_STATE_TERMINATED\n"); fflush(stdout);
 			if(orte_job_record_started(jobid)) {
 				orte_job_record_end(jobid);
 			}
+			remove_job(jobid);
 			break;
 		case ORTE_PROC_STATE_ABORTED:
-			printf("    state = ORTE_PROC_STATE_ABORTED\n");
+			printf("    state = ORTE_PROC_STATE_ABORTED\n"); fflush(stdout);
+			remove_job(jobid);
 			break;
 	}
 	
@@ -1353,23 +1535,15 @@ ompi_sendcmd(orte_daemon_cmd_flag_t usercmd)
 }
 #endif
 
-static int orte_console_send_command(orte_daemon_cmd_flag_t usercmd)
+static int 
+orte_console_send_command(orte_daemon_cmd_flag_t usercmd)
 {
     orte_buffer_t *cmd;
     orte_daemon_cmd_flag_t command;
     orte_process_name_t    seed = {0,0,0};
     int rc;
 
-	//printf("ompi_sendcmd 1\n"); fflush(stdout);
-	/*
-    if(!daemon_is_active) {
-        opal_show_help("help-orteconsole.txt", "orteconsole:no-daemon-started", false);
-        return ORTE_SUCCESS;
-    }*/
-    //printf("ompi_sendcmd 2\n"); fflush(stdout);
-
     cmd = OBJ_NEW(orte_buffer_t);
-    //printf("ompi_sendcmd 3\n"); fflush(stdout);
     if (NULL == cmd) {
         ORTE_ERROR_LOG(ORTE_ERROR);
         return ORTE_ERROR;
@@ -1377,18 +1551,14 @@ static int orte_console_send_command(orte_daemon_cmd_flag_t usercmd)
 
     command = usercmd;
 	
-	//printf("ompi_sendcmd 4\n"); fflush(stdout);
     rc = orte_dps.pack(cmd, &command, 1, ORTE_DAEMON_CMD);
-    //printf("ompi_sendcmd 5\n"); fflush(stdout);
     if ( ORTE_SUCCESS != rc ) {
         ORTE_ERROR_LOG(rc);
         OBJ_RELEASE(cmd);
         return rc;
     } 
 
-	//printf("ompi_sendcmd 6\n"); fflush(stdout);
     rc = orte_rml.send_buffer(&seed, cmd, ORTE_RML_TAG_DAEMON, 0);
-    //printf("ompi_sendcmd 7\n"); fflush(stdout);
     if ( 0 > rc ) {
         ORTE_ERROR_LOG(ORTE_ERR_COMM_FAILURE);
         OBJ_RELEASE(cmd);
@@ -1396,43 +1566,9 @@ static int orte_console_send_command(orte_daemon_cmd_flag_t usercmd)
     }
 
     OBJ_RELEASE(cmd);
-    //printf("ompi_sendcmd 8\n"); fflush(stdout);
 
     return ORTE_SUCCESS;
 }
-
-
-/* JOB RELATED FUNCTIONS */
-
-/* get a dump of all the jobs known in the universe, this will return
- * an event with a list of jobIDs
- * EVENT RETURN:
- *   type = GET_JOBS
- *   data = [99,195,4555] <-- job IDs 
- * 
- * NOTE: we assume there are unlikely to be many jobs running simultaneously,
- * we can return this as a list of id's.
- */
-//int
-//OMPIGetJobs(char **args)
-//{
-//	char *	res;
-//	char *	str;
-//	int		n;
-//	int *	jobs
-//	
-//	n = get_jobs(&jobs);
-//	intarray_to_str(n, jobs, &str);
-//	
-//	asprintf(&res, "%d %s", RTEV_JOBS, str);
-//	proxy_svr_event_callback(orte_proxy, res);
-//	
-//	free(str);
-//	free(res);
-//	
-//	return PROXY_RES_OK;
-//}
-//
 
 int
 get_num_procs(orte_jobid_t jobid)
@@ -1473,7 +1609,8 @@ cleanup:
 	return ret;
 }
 
-/* given a jobid (valid from OMPIGetJobs()) we request the number of processes
+/* 
+ * given a jobid (valid from OMPIGetJobs()) we request the number of processes
  * associated with this job.  A simple int response is sent back.
  */
 int 
@@ -1500,15 +1637,16 @@ ORTEGetProcesses(char **args)
 	return PROXY_RES_OK;
 }
 
-/* given a jobID and a processID inside that job we attempt to find the values associated
+/* 
+ * given a jobID and a processID inside that job we attempt to find the values associated
  * with the given keys.  the caller can pass any number of possible keys and the response
  * message will be in the same order.
  * 
  * the user can pass in a process ID they want info on or -1 if they want info on EVERY
  * process contained in this job
  */
-int
-ORTEGetProcessAttribute(char **args)
+static char *
+orte_get_process_attrib(char **args)
 {
 	int				jobid;
 	int				procid;
@@ -1572,7 +1710,7 @@ ORTEGetProcessAttribute(char **args)
 		res = ORTEErrorStr(RTEV_ERROR_PATTR, "error finding key on process or error getting keys");
 		proxy_svr_event_callback(orte_proxy, res);
 		
-		return PROXY_RES_OK;
+		return NULL;
 	}
 	/* else we're good, use the values */
 	
@@ -1599,11 +1737,7 @@ ORTEGetProcessAttribute(char **args)
 	printf("valSTR = '%s'\n", valstr);
 	
 	asprintf(&res, "%d %s", RTEV_PATTR, valstr);
-	
-	proxy_svr_event_callback(orte_proxy, res);
-	
-	free(res);
-	
+		
 	for(i=3; i<last_arg; i++) {
 		if(keys[i-3] != NULL) free(keys[i-3]);
 	}
@@ -1616,6 +1750,20 @@ ORTEGetProcessAttribute(char **args)
 	free(types);
 	free(valstr);
 	
+	return res;
+}
+
+int
+ORTEGetProcessAttribute(char **args)
+{
+	char *	res;
+	
+	res = orte_get_process_attrib(args);
+	
+	proxy_svr_event_callback(orte_proxy, res);
+	
+	free(res);
+
 	return PROXY_RES_OK;
 }
 
@@ -1623,7 +1771,8 @@ ORTEGetProcessAttribute(char **args)
 ** Very inefficient! Probably better to build a data structure
 ** from keyvals, then work with that.
 */
-int get_ui32_value(orte_gpr_value_t *value, char *key)
+static int 
+get_ui32_value(orte_gpr_value_t *value, char *key)
 {
         int k;
 
@@ -1639,7 +1788,8 @@ int get_ui32_value(orte_gpr_value_t *value, char *key)
 /*
 ** Ditto.
 */
-char *get_str_value(orte_gpr_value_t *value, char *key)
+static char *
+get_str_value(orte_gpr_value_t *value, char *key)
 {
         int k;
 
@@ -1652,7 +1802,7 @@ char *get_str_value(orte_gpr_value_t *value, char *key)
         return "";
 }
 
-int
+static int
 get_proc_attribute(orte_jobid_t jobid, int proc_num, char **input_keys, int *input_types, char **input_values, int input_num_keys)
 {
 	char **keys;;
@@ -1742,40 +1892,7 @@ cleanup:
 	return ret;
 }
 
-//
-///* MONITORING RELATED FUNCTIONS */
-//
-///* generates an event which returns a list of all the machineIDs know to
-// * the universe.
-// * EVENT RETURN:
-// *   type = GET_MACHINES
-// *   data = [2,3,4,5] <--- those are machine IDs
-// * 
-// * NOTE: we assume there are unlikely to be many machines,
-// * so we can return this as a list of id's.
-// */
-//int
-//OMPIGetMachines(char **args)
-//{
-//	char *	res;
-//	char *	str;
-//	int		n;
-//	int *	machines
-//	
-//	n = get_machines(&machines);
-//	intarray_to_str(n, machines, &res);
-//	
-//	asprintf(&res, "%d %s", RTEV_MACHINES, str);
-//	proxy_svr_event_callback(orte_proxy, res);
-//	
-//	free(str);
-//	free(res);
-//
-//	return PROXY_RES_OK;
-//}
-//
-
-int
+static int
 get_num_nodes(int machid)
 {
 	int rc;
@@ -1796,10 +1913,12 @@ get_num_nodes(int machid)
 	return cnt;
 }
 
-/* one day ORTE will have the notion of number of machines.
+/* 
+ * one day ORTE will have the notion of number of machines.
  * until then, we have only 1 machine
  */
-int get_num_machines()
+static int 
+get_num_machines()
 {
 	return 1;
 }
@@ -2042,7 +2161,7 @@ ORTEDiscover(char **args)
 	return PROXY_RES_OK;
 }
 
-int
+static int
 get_node_attribute(int machid, int node_num, char **input_keys, int *input_types, char **input_values, int input_num_keys)
 {
 	int rc;
@@ -2160,7 +2279,7 @@ server(char *name, char *host, int port)
 	int rc;
 	
 	eventList = NewList();
-	debugJobs = NewList();
+	jobList = NewList();
 	
 	if (proxy_svr_init(name, &handler_funcs, &helper_funcs, command_tab, &orte_proxy) != PROXY_RES_OK)
 		return 0;
