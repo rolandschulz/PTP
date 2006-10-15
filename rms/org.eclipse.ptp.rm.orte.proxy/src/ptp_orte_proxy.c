@@ -110,13 +110,16 @@
 
 /*
  * Attribute names must EXACTLY match org.eclipse.ptp.core.AttributeConstants
+ * 
+ * TODO: Replace with new attribute system
  */
-#define ATTRIB_NODE_NAME			"ATTRIB_NODE_NAME"
-#define ATTRIB_NODE_NUMBER			"ATTRIB_NODE_NUMBER"
-#define ATTRIB_NODE_STATE			"ATTRIB_NODE_STATE"
-#define ATTRIB_NODE_GROUP			"ATTRIB_NODE_GROUP"
-#define ATTRIB_NODE_USER			"ATTRIB_NODE_USER"
-#define ATTRIB_NODE_MODE			"ATTRIB_NODE_MODE"
+#define ATTRIB_MACHINEID			"Machine ID"
+#define ATTRIB_NODE_NAME			"Node Name"
+#define ATTRIB_NODE_NUMBER			"Node Number"
+#define ATTRIB_NODE_STATE			"Status"
+#define ATTRIB_NODE_GROUP			"Group Owner"
+#define ATTRIB_NODE_USER			"User Owner"
+#define ATTRIB_NODE_MODE			"Mode"
 #define ATTRIB_PROCESS_PID			"ATTRIB_PROCESS_PID"
 #define ATTRIB_PROCESS_EXIT_CODE	"ATTRIB_PROCESS_EXIT_CODE"
 #define ATTRIB_PROCESS_STATUS		"ATTRIB_PROCESS_STATUS"
@@ -170,7 +173,7 @@ int ORTE_Subscribe_Bproc(void);
 #define ORTE_SOH_BPROC_NODE_MODE	"ORTE_SOH_BPROC_NODE_MODE"
 #endif
 
-int 			orte_shutdown = 0;
+int 		orte_shutdown = 0;
 proxy_svr *	orte_proxy;
 int			is_orte_initialized = 0;
 pid_t		orted_pid = 0;
@@ -180,9 +183,9 @@ int			ptp_signal_exit;
 RETSIGTYPE	(*saved_signals[NSIG])(int);
 
 static proxy_handler_funcs handler_funcs = {
-	RegisterFileHandler,		// regfile() - call to register a file handler
+	RegisterFileHandler,	// regfile() - call to register a file handler
 	UnregisterFileHandler,	// unregfile() - called to unregister file handler
-	RegisterEventHandler,		// regeventhandler() - called to register the proxy event handler
+	RegisterEventHandler,	// regeventhandler() - called to register the proxy event handler
 	CallEventHandlers
 };
 
@@ -367,6 +370,13 @@ ORTEInit(char *universe_name)
 	return 0;
 }
 
+/*
+ * This callback gets invoked when any attributes of a process get changed.
+ * 
+ * There appears to be a bug in ORTE that causes it to get called with the 
+ * same arguments multiple times. The number of times equals the number of 
+ * processes in the job.
+ */
 static void 
 job_proc_notify_callback(orte_gpr_notify_data_t *data, void *cbdata)
 {
@@ -451,6 +461,9 @@ job_proc_notify_callback(orte_gpr_notify_data_t *data, void *cbdata)
 	}
 }
 
+/*
+ * Subscribe to attribute changes for 'procid' in 'job'.
+ */
 static int
 orte_subscribe_proc(ptp_job * job, int procid)
 {
@@ -507,6 +520,11 @@ orte_subscribe_proc(ptp_job * job, int procid)
 	return 0;
 }
 
+/*
+ * Subscribe to all processes in a job. 
+ * 
+ * It would be nice if there was a more efficient way of doing this.
+ */
 int 
 ORTE_Subscribe_Job(orte_jobid_t jobid)
 {
@@ -533,6 +551,11 @@ ORTE_Subscribe_Job(orte_jobid_t jobid)
 }
 
 #ifdef HAVE_SYS_BPROC_H
+/*
+ * This callback gets invoked when any of the bproc specific state of health attributes
+ * change. These are all node-related events, so this is really the monitoring
+ * functions for bproc support.
+ */
 static void 
 bproc_notify_callback(orte_gpr_notify_data_t *data, void *cbdata)
 {
@@ -565,15 +588,15 @@ bproc_notify_callback(orte_gpr_notify_data_t *data, void *cbdata)
 			printf("--- BPROC CHANGE: key = %s\n", keyval->key); fflush(stdout);
 			
 			if(!strcmp(keyval->key, ORTE_NODE_NAME_KEY))
-				asprintf(&external_key, "%s", "Node Name");
+				asprintf(&external_key, "%s", ATTRIB_NODE_NAME);
 			else if(!strcmp(keyval->key, ORTE_SOH_BPROC_NODE_USER))
-				asprintf(&external_key, "%s", "User Owner");
+				asprintf(&external_key, "%s", ATTRIB_NODE_USER);
 			else if(!strcmp(keyval->key, ORTE_SOH_BPROC_NODE_GROUP))
-				asprintf(&external_key, "%s", "Group Owner");
+				asprintf(&external_key, "%s", ATTRIB_NODE_GROUP);
 			else if(!strcmp(keyval->key, ORTE_SOH_BPROC_NODE_STATUS) || !strcmp(keyval->key, ORTE_NODE_STATE_KEY))
-				asprintf(&external_key, "%s", "Status");
+				asprintf(&external_key, "%s", ATTRIB_NODE_STATE);
 			else if(!strcmp(keyval->key, ORTE_SOH_BPROC_NODE_MODE))
-				asprintf(&external_key, "%s", "Mode");
+				asprintf(&external_key, "%s", ATTRIB_NODE_MODE);
 			else
 				printf("******************* Unknown key type on bproc event - key = '%s'\n", keyval->key); fflush(stdout);
 					
@@ -596,8 +619,9 @@ bproc_notify_callback(orte_gpr_notify_data_t *data, void *cbdata)
 			}
 			
 			
-			asprintf(&foo, "%s=%d", "Machine ID", 0);
-			asprintf(&bar, "%s=%s", "Node Number", nodename);
+			asprintf(&foo, "%s=%d", ATTRIB_MACHIINEID, 0);
+			asprintf(&bar, "%s=%s", ATTRIB_NODE_NUMBER, nodename); /* for bproc the node number is the same as the name */
+			asprintf(&bar, "%s=%s", ATTRIB_NODE_NAME, nodename);
 			proxy_cstring_to_str(foo, &str1);
 			proxy_cstring_to_str(bar, &str2);
 			proxy_cstring_to_str(kv, &str3);
@@ -618,6 +642,9 @@ bproc_notify_callback(orte_gpr_notify_data_t *data, void *cbdata)
 	}
 }
 
+/*
+ * Subscribe to the bproc specific attribute changes.
+ */
 int 
 ORTE_Subscribe_Bproc(void)
 {
@@ -674,7 +701,9 @@ ORTE_Subscribe_Bproc(void)
 }
 #endif
 
-/* this finalizes the registry */
+/* 
+ *  finalize the registry 
+ */
 int
 ORTEFinalize(void)
 {
@@ -689,7 +718,9 @@ ORTEFinalize(void)
 	return 0;
 }
 
-/* this tells the daemon to exit */
+/* 
+ * tell the daemon to exit 
+ */
 int
 ORTEShutdown(void)
 {
@@ -710,8 +741,9 @@ ORTEIsShutdown(void)
 	return orte_shutdown != 0;
 }
 
-/* this is the event progress bit.  we'll have to figure out how to hook
- * this in correctly */
+/* 
+ * Check for events and call appropriate progress hooks.
+ */
 int
 ORTEProgress(void)
 {
@@ -794,15 +826,15 @@ ORTEProgress(void)
 	
 	/* only run the progress of the ORTE code if we've initted the ORTE daemon */
 	if(ORTEInitialized()) {
-		//printf("Open event_loop - calling now . . .\n"); fflush(stdout);
 		opal_event_loop(OPAL_EVLOOP_ONCE);
-		//printf("Open event loop - returned cleanly!\n"); fflush(stdout);
 	}
 	
 	return PROXY_RES_OK;
 }
 
-/* terminate a job, given a jobid */
+/* 
+ * terminate a job, given a jobid 
+ */
 int
 ORTETerminateJob(char **args)
 {
@@ -1060,7 +1092,14 @@ debug_allocate(orte_app_context_t** app_context, size_t num_context, orte_jobid_
 	
 	return ORTE_SUCCESS;
 }
-
+/*
+ * Debug spawner. To spawn a debug job, two process allocations must be made. 
+ * This first is for the application and the second for the debugger (which is
+ * an MPI program). We then launch the debugger, and let it deal with starting
+ * the application processes.
+ * 
+ * This will need to be modified to support attaching.
+ */
 static int
 debug_spawn(char *debug_path, int argc, char **argv, orte_app_context_t** app_context, size_t num_context, orte_jobid_t* app_jobid, orte_jobid_t* debug_jobid)
 {
@@ -1301,6 +1340,13 @@ ORTERun(char **args)
 	return PROXY_RES_OK;
 }
 
+/*
+ * This callback is invoked when there is I/O available from a
+ * process. It gets forwarded to Eclipse.
+ * 
+ * This needs to be modified to avoid flooding Eclipse with
+ * events.
+ */
 static void 
 iof_callback(
     orte_process_name_t* src_name,
@@ -1423,6 +1469,11 @@ orte_job_record_end(orte_jobid_t jobid)
 	}
 }
 
+/*
+ * This callback is invoked when there is a job state change. We are mainly
+ * interested in when a job is running and when it terminates so the process
+ * icons can be updated appropriately.
+ */
 static void
 job_state_callback(orte_jobid_t jobid, orte_proc_state_t state)
 {
@@ -1487,9 +1538,7 @@ job_state_callback(orte_jobid_t jobid, orte_proc_state_t state)
 			break;
 	}
 	
-//	printf("A!\n"); fflush(stdout);
 	asprintf(&res, "%d %d %d", RTEV_JOBSTATE, jobid, state);
-//	printf("B!\n"); fflush(stdout);
 	AddToList(eventList, (void *)res);
 	printf("state callback retrning!\n"); fflush(stdout);
 }
@@ -1535,6 +1584,11 @@ ompi_sendcmd(orte_daemon_cmd_flag_t usercmd)
 }
 #endif
 
+/*
+ * Send a command to the ORTE daemon.
+ * 
+ * Currently only used to request the daemon to exit.
+ */
 static int 
 orte_console_send_command(orte_daemon_cmd_flag_t usercmd)
 {
@@ -1570,6 +1624,9 @@ orte_console_send_command(orte_daemon_cmd_flag_t usercmd)
     return ORTE_SUCCESS;
 }
 
+/*
+ * Find the number of processes started for a particular job.
+ */
 int
 get_num_procs(orte_jobid_t jobid)
 {
@@ -1856,8 +1913,6 @@ get_proc_attribute(orte_jobid_t jobid, int proc_num, char **input_keys, int *inp
 		max = proc_num + 1;
 	}
 	
-	//printf("MAX = %d, MIN = %d\n", max, min); fflush(stdout);
-		
 	for(i=min; i<max; i++) {
 		value = values[i];
 			
@@ -1870,7 +1925,6 @@ get_proc_attribute(orte_jobid_t jobid, int proc_num, char **input_keys, int *inp
 					asprintf(&(input_values[((i-min) * input_num_keys) + j]), "%d", get_ui32_value(value, input_keys[j]));
 					break;
 			}
-			//printf("VALUES IN GET FUNC[%d][%d] = '%s'\n", i, j, input_values[((i-min) * input_num_keys) + j]); fflush(stdout);
 		}
 	}
 	
@@ -1965,64 +2019,41 @@ ORTEDiscover(char **args)
 	external_keys = (char**)malloc(num_keys*sizeof(char*));
 	types = (int*)malloc((num_keys)*sizeof(int));
 	 
-
-	
 	asprintf(&(internal_keys[0]), "%s", "machine_id");
-	asprintf(&(external_keys[0]), "%s", "Machine ID");
+	asprintf(&(external_keys[0]), "%s", ATTRIB_MACHINEID);
 	types[0] = PTP_UINT32;
 	asprintf(&(internal_keys[1]), "%s", "node_number");
-	asprintf(&(external_keys[1]), "%s", "Node Number");
+	asprintf(&(external_keys[1]), "%s", ATTRIB_NODE_NUMBER);
 	types[1] = PTP_UINT32;
 	/* set up the keys we know about in ORTE and BPROC */
 	asprintf(&(internal_keys[2]), "%s", ORTE_NODE_NAME_KEY);
-	asprintf(&(external_keys[2]), "%s", "Node Name");
+	asprintf(&(external_keys[2]), "%s", ATTRIB_NODE_NAME);
 	types[2] = PTP_STRING;
 	asprintf(&(internal_keys[3]), "%s", ORTE_SOH_BPROC_NODE_USER);
-	asprintf(&(external_keys[3]), "%s", "User Owner");
+	asprintf(&(external_keys[3]), "%s", ATTRIB_NODE_USER);
 	types[3] = PTP_STRING;
 	asprintf(&(internal_keys[4]), "%s", ORTE_SOH_BPROC_NODE_GROUP);
-	asprintf(&(external_keys[4]), "%s", "Group Owner");
+	asprintf(&(external_keys[4]), "%s", ATTRIB_NODE_GROUP);
 	types[4] = PTP_STRING;
 	asprintf(&(internal_keys[5]), "%s", ORTE_SOH_BPROC_NODE_STATUS);
-	asprintf(&(external_keys[5]), "%s", "Status");
+	asprintf(&(external_keys[5]), "%s", ATTRIB_NODE_STATE);
 	types[5] = PTP_STRING;
 	asprintf(&(internal_keys[6]), "%s", ORTE_SOH_BPROC_NODE_MODE);
-	asprintf(&(external_keys[6]), "%s", "Mode");
+	asprintf(&(external_keys[6]), "%s", ATTRIB_NODE_MODE);
 	types[6] = PTP_UINT32;
 
-	for(i=0; i<num_keys; i++) {
-		printf("NODE ATTRIB KEYS[%d] = '%s' -> '%s'\n", i, internal_keys[i], external_keys[i]); fflush(stdout);
-	}
-	
 	num_machines = get_num_machines();
-	printf("num machines = %d\n", num_machines); fflush(stdout);
 	
 	for(machid = 0; machid < num_machines; machid++) {
 		num_nodes = get_num_nodes(machid);
-		printf("-> num nodes = %d\n", num_nodes); fflush(stdout);
 		
 		values_len = num_keys * num_nodes;
 		values = (char**)malloc(values_len * sizeof(char*));
 
-//		/* this is a horrible hack where if ORTE tells us there are 0 nodes we go ahead and 
-//		 * assume one.  I am an aweful person for having to put this in.  I think someone's
-//		 * going to revoke my license to program. */
-//		asprintf(&res, "%d %d", RTEV_NODES, num_nodes == 0 ? 1 : num_nodes);
-//	
-//		/* first send back how many nodes there are */
-//		proxy_svr_event_callback(orte_proxy, res);
-//	
-//		/* and then start sending back data about each of these nodes, asynchronously */
-//	
-//		free(res);
-
-		/* ok, for this machine (machID) we have some set of nodes.
-		 * let's send back information about these nodes that we can find out about */
-	
-
-
-		/* if we know of no nodes, then we better just try something out I guess for this
-		 * node.  this is a huge hack :( */
+		/* 
+		 * if we know of no nodes, then we better just try something out I guess for this
+		 * node.  this is a huge hack :( 
+		 */
 		if(num_nodes == 0) {
 			char hostname[256];
 			gid_t gid;
@@ -2074,8 +2105,7 @@ ORTEDiscover(char **args)
         	free(str5); 
         	free(str6);
         	free(str7);
-		}
-		else if(values_len != 0) {
+		} else if (values_len != 0) {
 			char *tmpstr;
 			int key_num = 0;
 		
@@ -2093,17 +2123,13 @@ ORTEDiscover(char **args)
 	
 			tot_len = 0;
 			for(i=0; i<values_len; i++) {
-				//printf("AFTER CALL! VALS[%d] = '%s'\n", i, values[i]); fflush(stdout);
 				tot_len += strlen(values[i]);
 			}
 	
-			printf("totlen = %d\n", tot_len); fflush(stdout);
 			tot_len += values_len * 2; /* add on some for spaces and null, etc - little bit of extra here */
-			printf("totlen = %d\n", tot_len); fflush(stdout);
 		
 			asprintf(&valstr, "%s", "");
 			for(i=0; i<values_len; i++) {
-				//printf("values[%d] = %s\n", i, values[i]);
 				if(i == 0) {
 					asprintf(&tmpstr, "%s=%s", external_keys[key_num], values[i]);
 					proxy_cstring_to_str(tmpstr, &valstr);
@@ -2113,7 +2139,6 @@ ORTEDiscover(char **args)
 					asprintf(&tmpstr, "%s=%s", external_keys[key_num], values[i]);
 					proxy_cstring_to_str(tmpstr, &str2);
 					asprintf(&valstr, "%s %s", str1, str2);
-					//printf("valstr = '%s'\n", valstr); fflush(stdout);
 					free(str1);
 					free(str2);
 					free(tmpstr);
@@ -2121,8 +2146,7 @@ ORTEDiscover(char **args)
 				key_num++;
 				if(key_num >= num_keys) key_num = 0;
 			}	
-		}
-		else {
+		} else {
 			/* error - so bail out */
 			res = ORTEErrorStr(RTEV_ERROR_NATTR, "error finding key on node or error getting keys");
 			proxy_svr_event_callback(orte_proxy, res);
@@ -2130,25 +2154,20 @@ ORTEDiscover(char **args)
 			return PROXY_RES_OK;
 		}
 	
-		printf("valSTR = '%s'\n", valstr); fflush(stdout);
-	
 		asprintf(&res, "%d %s", RTEV_NATTR, valstr);
 		proxy_svr_event_callback(orte_proxy, res);
 		free(res);
 		
 		for(i=0; i<num_keys; i++) {
-			//printf("Freeing #%d key.\n", i); fflush(stdout);
 			if(internal_keys[i] != NULL) free(internal_keys[i]);
 			if(external_keys[i] != NULL) free(external_keys[i]);
 		}
 	
 		for(i=0; i<values_len; i++) {
-			//printf("Freeing #%d val.\n", i); fflush(stdout);
 			if(values[i] != NULL) free(values[i]);
 		}
 		
 		free(values);
-	
 		free(valstr);
 	}
 	
@@ -2169,6 +2188,18 @@ get_node_attribute(int machid, int node_num, char **input_keys, int *input_types
 	orte_gpr_value_t **values;
 	orte_gpr_value_t *value;
 	int i, ret, j, min, max;
+#ifndef HAVE_SYS_BPROC_H
+	gid_t gid;
+	struct group *grp;
+	struct passwd *pwd;
+	char * status = "up";
+	char * mode = "73";
+
+	pwd = getpwuid(geteuid());
+	gid = getgid();
+	grp = getgrgid(gid);
+#endif
+
 	
 	/* ignore the machine ID until ORTE implements this part */
 	
@@ -2186,9 +2217,7 @@ get_node_attribute(int machid, int node_num, char **input_keys, int *input_types
 	cnt = get_num_nodes(machid);
 	
 	
-	printf("number of nodes in get_node_attribute() = %d\n", (int)cnt); fflush(stdout);
 	if(cnt <= 0) {
-		printf("ERROR2: '%s'\n", ORTE_ERROR_NAME(rc));
 		ret = 1;
 		goto cleanup;
 	}
@@ -2197,7 +2226,6 @@ get_node_attribute(int machid, int node_num, char **input_keys, int *input_types
 	/* specified a proc bigger than any we know of in this job, bail out */
 	if(node_num != -1 && node_num >= cnt) {
 		ret = 1;
-		//printf("BIGGER!  QUIT!\n"); fflush(stdout);
 		goto cleanup;
 	}
 	
@@ -2212,25 +2240,28 @@ get_node_attribute(int machid, int node_num, char **input_keys, int *input_types
 		max = node_num + 1;
 	}
 	
-	printf("MAX = %d, MIN = %d\n", max, min); fflush(stdout);
-		
 	for(i=min; i<max; i++) {
-		//printf("i = %d\n", i); fflush(stdout);
 		value = values[i];
 			
-		//printf("looping j = 0 -> %d\n", input_num_keys); fflush(stdout);
 		for(j=0; j<input_num_keys; j++) {
-			//printf("j = %d\n", j); fflush(stdout);
 			/* Open MPI does not have a notion of a machine ID or node number (though it does have node name), at least
 			 * at this time, at least as far as I know.  Therefore, we push these in here by hand.
 			 * It sucks, so figure out the right keys to search for if you know how to do it right */
-			if(!strcmp(input_keys[j], "machine_id")) {
+			if (!strcmp(input_keys[j], "machine_id")) {
 				asprintf(&(input_values[((i-min) * input_num_keys) + j]), "0");
-			}
-			else if(!strcmp(input_keys[j], "node_number")) {
+			} else if (!strcmp(input_keys[j], "node_number")) {
 				asprintf(&(input_values[((i-min) * input_num_keys) + j]), "%d", i);
-			}
-			else {
+#ifndef HAVE_SYS_BPROC_H
+			} else if (!strcmp(input_keys[j], ORTE_SOH_BPROC_NODE_USER)) {
+				asprintf(&(input_values[((i-min) * input_num_keys) + j]), "%s", pwd->pw_name);
+			} else if (!strcmp(input_keys[j], ORTE_SOH_BPROC_NODE_GROUP)) {
+				asprintf(&(input_values[((i-min) * input_num_keys) + j]), "%s", grp->gr_name);
+			} else if (!strcmp(input_keys[j], ORTE_SOH_BPROC_NODE_STATUS)) {
+				asprintf(&(input_values[((i-min) * input_num_keys) + j]), "%s", status);
+			} else if (!strcmp(input_keys[j], ORTE_SOH_BPROC_NODE_MODE)) {
+				asprintf(&(input_values[((i-min) * input_num_keys) + j]), "%s", mode);
+#endif
+			} else {
 				switch(input_types[j]) {
 					case PTP_STRING:
 						asprintf(&(input_values[((i-min) * input_num_keys) + j]), "%s", get_str_value(value, input_keys[j]));
@@ -2240,7 +2271,6 @@ get_node_attribute(int machid, int node_num, char **input_keys, int *input_types
 						break;
 				}
 			}
-			//printf("VALUES IN GET FUNC[%d][%d] = '%s'\n", i, j, input_values[((i-min) * input_num_keys) + j]); fflush(stdout);
 		}
 	}
 	
