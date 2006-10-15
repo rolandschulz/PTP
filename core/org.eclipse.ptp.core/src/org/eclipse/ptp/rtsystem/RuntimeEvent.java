@@ -19,10 +19,14 @@
 
 package org.eclipse.ptp.rtsystem;
 
+import org.eclipse.ptp.core.util.BitList;
+
 public class RuntimeEvent {
 	private int eventNumber;
 	private String text, alttext;
 	private String[] keys, values;
+	private BitList procsList;
+	private int[] procArray;
 
 	//public static final int EVENT_NODE_STATUS_CHANGE = 1;
 
@@ -35,6 +39,8 @@ public class RuntimeEvent {
 	public static final int EVENT_NEW_JOB = 4;
 	
 	public static final int EVENT_NODE_GENERAL_CHANGE = 5;
+	
+	public static final int EVENT_PROCESS_ATTRIB_CHANGE = 6;
 
 	public RuntimeEvent(int eventNumber) {
 		this.eventNumber = eventNumber;
@@ -75,5 +81,21 @@ public class RuntimeEvent {
 	
 	public String[] getAttributeValues() {
 		return values;
+	}
+	
+	public void setProcList(BitList procs) {
+		this.procsList = procs;
+	}
+	
+	public BitList getProcList() {
+		return procsList;
+	}
+	
+	public void setProcArray(int[] procs) {
+		this.procArray = procs;
+	}
+	
+	public int[] getProcArray() {
+		return this.procArray;
 	}
 }

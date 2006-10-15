@@ -20,24 +20,49 @@
 package org.eclipse.ptp.rtsystem.proxy.event;
 
 import org.eclipse.ptp.core.proxy.event.ProxyEvent;
+import org.eclipse.ptp.core.util.BitList;
 
 public class ProxyRuntimeProcessAttributeEvent extends AbstractProxyRuntimeEvent implements IProxyRuntimeEvent {
-	private String[]	values;
+	private int			jobid;
+	private BitList		commProcs;
+	private String		keyValue;
+	private int[]		diffProcs;
+	private String[]	keyValues;
 
-	public ProxyRuntimeProcessAttributeEvent(String[] values) {
+	public ProxyRuntimeProcessAttributeEvent(int jobid, BitList commProcs, String kv, int[] diffProcs, String[] kvs) {
 		super(EVENT_RUNTIME_PROCATTR);
-		int s = values.length - 1;
-		this.values = new String[s];
-		for(int i=0; i<s; i++) {
-			this.values[i] = new String(ProxyEvent.decodeString(values[i+1]));
-		}
+		this.jobid = jobid;
+		this.commProcs = commProcs;
+		this.keyValue = kv;
+		this.diffProcs = diffProcs;
+		this.keyValues = kvs;
 	}
 	
-	public String[] getValues() {
-		return this.values;
+	public int getJobID() {
+		return this.jobid;
+	}
+	
+	public BitList getCommProcs() {
+		return this.commProcs;
+	}
+	
+	public String getKeyValue() {
+		return this.keyValue;
+	}
+	
+	public int[] getDiffProcs() {
+		return this.diffProcs;
+	}
+	
+	public String[] getKeyValues() {
+		return this.keyValues;
 	}
 	
 	public String toString() {
-		return "EVENT_RUNTIME_PROCATTR " + this.values;
+		String res = "EVENT_RUNTIME_PROCATTR job=" + this.jobid + " {" + this.commProcs.toString() + "}:<" + this.keyValue + "> ";
+		for (int i = 0; i < this.diffProcs.length; i++) {
+			res += " [" + this.diffProcs[i] + "]:<" + this.keyValues[i] + ">";
+		}
+		return res;
 	}
 }

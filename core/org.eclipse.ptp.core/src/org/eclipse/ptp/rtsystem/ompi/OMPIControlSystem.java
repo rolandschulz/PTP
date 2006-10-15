@@ -41,6 +41,7 @@ import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener;
 import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeDisconnectedEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeErrorEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeJobStateEvent;
+import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeProcessAttributeEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeProcessOutputEvent;
 
 public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventListener {
@@ -276,6 +277,9 @@ public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventList
 			case RuntimeEvent.EVENT_NEW_JOB:
 				listener.runtimeNewJob(ID);
 				break;
+			case RuntimeEvent.EVENT_PROCESS_ATTRIB_CHANGE:
+				listener.runtimeProcAttrChange(ID, event.getProcList(), event.getText(), event.getProcArray(), event.getAttributeValues());
+				break;
 			}
 		}
 	}
@@ -288,35 +292,40 @@ public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventList
 
     public synchronized void handleEvent(IProxyRuntimeEvent e) {
         if(e instanceof ProxyRuntimeJobStateEvent) {
-        		RuntimeEvent re = new RuntimeEvent(RuntimeEvent.EVENT_JOB_STATE_CHANGED);
-        		int state = ((ProxyRuntimeJobStateEvent)e).getJobState();
-        		String stateStr = IPProcess.ERROR;
-        		
-        		switch(state) {
-        			case 1: case 3:
-        				stateStr = IPProcess.STARTING;
-        				break;
-        			case 4:
-        				stateStr = IPProcess.RUNNING;
-        				break;
-        			case 8: case 9:
-        				stateStr = IPProcess.EXITED;
-        		}
-        		
-        		re.setText(stateStr);
-        		fireEvent("job"+((ProxyRuntimeJobStateEvent)e).getJobID(), re);
-        }
-        else if(e instanceof ProxyRuntimeProcessOutputEvent) {
-        		RuntimeEvent re = new RuntimeEvent(RuntimeEvent.EVENT_PROCESS_OUTPUT);
-        		int jobID = ((ProxyRuntimeProcessOutputEvent)e).getJobID();
-        		int procID = ((ProxyRuntimeProcessOutputEvent)e).getProcessID();
-        		String text = ((ProxyRuntimeProcessOutputEvent)e).getText();
-        		
-        		re.setText(text);
-        		fireEvent("job"+jobID+"_process"+procID, re);
-        }
-		
-        else if(e instanceof ProxyRuntimeErrorEvent) {
+    		RuntimeEvent re = new RuntimeEvent(RuntimeEvent.EVENT_JOB_STATE_CHANGED);
+    		int state = ((ProxyRuntimeJobStateEvent)e).getJobState();
+    		String stateStr = IPProcess.ERROR;
+    		
+    		switch(state) {
+    			case 1: case 3:
+    				stateStr = IPProcess.STARTING;
+    				break;
+    			case 4:
+    				stateStr = IPProcess.RUNNING;
+    				break;
+    			case 8: case 9:
+    				stateStr = IPProcess.EXITED;
+    		}
+    		
+    		re.setText(stateStr);
+    		fireEvent("job"+((ProxyRuntimeJobStateEvent)e).getJobID(), re);
+        } else if(e instanceof ProxyRuntimeProcessOutputEvent) {
+			RuntimeEvent re = new RuntimeEvent(RuntimeEvent.EVENT_PROCESS_OUTPUT);
+			int jobID = ((ProxyRuntimeProcessOutputEvent)e).getJobID();
+			int procID = ((ProxyRuntimeProcessOutputEvent)e).getProcessID();
+			String text = ((ProxyRuntimeProcessOutputEvent)e).getText();
+			
+			re.setText(text);
+			fireEvent("job"+jobID+"_process"+procID, re);
+        } else if (e instanceof ProxyRuntimeProcessAttributeEvent) {
+			RuntimeEvent re = new RuntimeEvent(RuntimeEvent.EVENT_PROCESS_ATTRIB_CHANGE);
+			int jobID = ((ProxyRuntimeProcessAttributeEvent)e).getJobID();
+			re.setProcList(((ProxyRuntimeProcessAttributeEvent)e).getCommProcs());
+			re.setText(((ProxyRuntimeProcessAttributeEvent)e).getKeyValue());
+			re.setProcArray(((ProxyRuntimeProcessAttributeEvent)e).getDiffProcs());
+			re.setAttributeValues(((ProxyRuntimeProcessAttributeEvent)e).getKeyValues());
+			fireEvent("job"+jobID, re);
+        } else if(e instanceof ProxyRuntimeErrorEvent) {
 			System.err.println("Fatal error from proxy: '"+((ProxyRuntimeErrorEvent)e).getErrorMessage()+"'");
 			int errorCode = ((ProxyRuntimeErrorEvent)e).getErrorCode();
 			String errorMsg = ((ProxyRuntimeErrorEvent)e).getErrorMessage();

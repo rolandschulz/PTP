@@ -18,6 +18,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.rtsystem;
 
+import org.eclipse.ptp.core.util.BitList;
+
 public interface IRuntimeListener {
 	public void runtimeProcessOutput(String ID, String output);
 
@@ -28,4 +30,6 @@ public interface IRuntimeListener {
 	public void runtimeNewJob(String ID);
 	
 	public void runtimeNodeGeneralChange(String[] keys, String[] values);
+	
+	public void runtimeProcAttrChange(String nejob, BitList cprocs, String kv, int[] dprocs, String[] kvs);
 }

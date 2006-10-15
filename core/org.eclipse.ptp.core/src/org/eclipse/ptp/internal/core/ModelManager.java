@@ -53,6 +53,7 @@ import org.eclipse.ptp.core.events.ModelRuntimeNotifierEvent;
 import org.eclipse.ptp.core.events.ModelSysChangedEvent;
 import org.eclipse.ptp.core.events.NodeEvent;
 import org.eclipse.ptp.core.events.ProcessEvent;
+import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.internal.core.elementcontrols.IPJobControl;
 import org.eclipse.ptp.internal.core.elementcontrols.IPNodeControl;
 import org.eclipse.ptp.internal.core.elementcontrols.IPProcessControl;
@@ -288,116 +289,6 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 				monitor.done();
 		}
 	}
-
-
-	/* given a Job, this contacts the monitoring system and populates the runtime 
-	 * model with the processes that correspond to that Job
-	 */
-	private void getProcsStatusForNewJob(String nejob, IPJob job, IProgressMonitor monitor) throws CoreException {
-		//String[] ne = controlSystem.getProcesses(job);
-		//IPProcess procs[] = job.getSortedProcesses();
-		//if(procs == null) return;
-		int numProcs = job.totalProcesses();
-		
-		if(numProcs <= 0) return;
-		
-		System.out.println("getProcsStatusForNewJob:" + nejob + " - #procs = " + numProcs);
-		
-		int num_attribs = 2;
-		String[] keys = new String[] {
-			AttributeConstants.ATTRIB_PROCESS_PID,
-			AttributeConstants.ATTRIB_PROCESS_NODE_NAME
-		};
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		// TODO: FIX ME!!!!!!!!!!!!!!!!!!!
-		
-		//String[] attribs = controlSystem.getAllProcessesAttributes(job, keys);
-		//rmr String[] attribs = null;
-		String[] attribs = new String[num_attribs*numProcs+2];
-		
-		
-		
-		
-		
-		for(int i=0; i<attribs.length; i++) 
-			System.out.println("*** attribs["+i+"] = "+attribs[i]);
-		
-		monitor.beginTask("", numProcs);
-		monitor.setTaskName("Initialing the processes...");
-		for (int i = 0; i < numProcs; i++) {
-			if (monitor.isCanceled()) {
-				throw new CoreException(Status.CANCEL_STATUS);
-			}
-			
-			IPProcess proc = job.findProcessByName(nejob+"_process"+i);
-			if(proc == null) {
-				System.err.println("*** ERROR: Unable to find process #"+i+" on job "+nejob);
-				continue;
-			}
-			
-			//String[] vals = controlSystem.getProcessAttributes(job, proc, AttributeConstants.ATTRIB_PROCESS_PID + " " + AttributeConstants.ATTRIB_PROCESS_NODE_NAME);	
-			proc.setPid(attribs[i * num_attribs]);
-			String nname = attribs[(i * num_attribs) + 1];
-			if("localhost".equals(nname)) nname = "0";
-
-			/* this is a hack until I get this working correctly w/ the monitoring system! */
-			nname = new String("machine0_node"+nname);		
-			//String nname = controlSystem.getProcessAttribute(job, proc, AttributeConstants.ATTRIB_PROCESS_NODE_NAME);
-			//String mname = monitoringSystem.getNodeMachineName(nname);
-			// System.out.println("Process "+pname+" running on node:");
-			// System.out.println("\t"+nname);
-			// System.out.println("\tand that's running on machine: "+mname);
-			
-			
-			
-			
-			// TODO: Fix this next BLOCK!!!!!!!!
-			/*
-			IPNode node = universe.findNodeByName(nname);
-			if (node == null) {
-				node = universe.findNodeByHostname(attribs[(i * num_attribs) + 1]);
-				if (node == null) {
-					//TODO send error event??
-					throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, "No available node found.", null));
-				}
-			}*/
-			
-			
-			
-			
-				// System.out.println("**** THIS NODE IS WHERE THIS PROCESS IS RUNNING!");
-				/*
-				 * this sets the data member in both classes stating that
-				 * this process is running on this node and telling this
-				 * node that it now has a child process running on it.
-				 */
-			
-			// TODO: AND THIS TOO!!!
-			/*
-			proc.setNode(node);
-			*/
-			
-			
-			//String status = controlSystem.getProcessAttribute(job, proc, AttributeConstants.ATTRIB_PROCESS_STATUS);
-			//proc.setStatus(status);
-			monitor.worked(1);
-		}
-		if (monitor.isCanceled()) {
-			throw new CoreException(Status.CANCEL_STATUS);
-		}
-		monitor.done();
-		fireEvent(new ModelRuntimeNotifierEvent(job.getIDString(), IModelRuntimeNotifierEvent.TYPE_JOB, IModelRuntimeNotifierEvent.RUNNING));
-		//fireState(EVENT_RUNNING, job.getIDString());
-	}
 	private void refreshJobStatus(String nejob) {
 		// System.out.println("refreshJobStatus("+nejob+")");
 		System.err.println("TODO: refreshJobStatus("+nejob+") called - finish this.");
@@ -614,35 +505,48 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			IPProcessControl proc = new PProcess(pjob, ne+"_process"+j, "" + j + "", "0", j, IPProcess.STARTING, "", "");
 			pjob.addChild(proc);
 		}	
-		
-		try {
-			getProcsStatusForNewJob(ne, pjob, new SubProgressMonitor(monitor, ne2.length));
-		} catch (CoreException e) {
-			universe.deleteJob(job);
-			return;
-		}
-		//fireEvent(job, EVENT_UPDATED_STATUS);
 	}
-	/*
-	private IPerspectiveListener perspectiveListener = new IPerspectiveListener() {
-		public void perspectiveOpened(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
-			if (perspective.getId().equals(CoreUtils.PPerspectiveFactory_ID)) {
-				isPerspectiveOpen = true;
+
+	/* 
+	 * Update model when process attributes change
+	 */
+	public void runtimeProcAttrChange(String nejob, BitList cprocs, String kv, int[] dprocs, String[] kvs) {
+		IPJob job = universe.findJobByName(nejob);
+		if (job != null) {
+			/* 
+			 * First deal with common processes
+			 */
+			
+			/*
+			 * Now deal with different processes
+			 */
+			for (int i = 0; i < dprocs.length; i++) {
+				IPProcess proc = job.findProcessByName(nejob+"_process"+dprocs[i]);
+				String[] attr = kvs[i].split("=");
+				if (attr.length == 2 && proc != null) {
+					if (attr[0].equals(AttributeConstants.ATTRIB_PROCESS_PID)) {
+						System.err.println("setting pid[" + proc.getName() + "]=" + attr[1]);
+						proc.setPid(attr[1]);
+					} else if (attr[0].equals(AttributeConstants.ATTRIB_PROCESS_NODE_NAME)) {
+						// TODO: Fix this node name crap
+						String nname;
+						if ("localhost".equals(attr[1])) 
+							nname = new String("Node0");
+						else
+							nname = new String("Node" + attr[1]);
+						IPNode node = universe.getMachines()[0].findNodeByName(nname);
+						if (node != null) {
+							System.err.println("setting node[" + proc.getName() + "]=" + node);
+							proc.setNode(node);
+						}
+
+					}
+				}
 			}
 		}
-		public void perspectiveActivated(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
-			System.out.println("PERSPECTIVE: Active: " + perspective.getId());
-			if (perspective.getId().equals(CoreUtils.PPerspectiveFactory_ID)) {
-				isPerspectiveOpen = true;
-				System.out.println("MYPERSPECTIVE: Active: " + perspective.getId());
-			}
-		}
-		public void perspectiveChanged(IWorkbenchPage page, IPerspectiveDescriptor perspective, String changeId) {
-			if (perspective.getId().equals(CoreUtils.PPerspectiveFactory_ID))
-				System.out.println("PERSPECTIVE: Changed: " + perspective.getId());
-		}
-	};
-	*/
+		
+		//fireEvent(new ModelSysChangedEvent(IModelSysChangedEvent.SYS_STATUS_CHANGED, null));
+	}
 
 	public void shutdown() {
 		//PTPCorePlugin.getDefault().removePerspectiveListener(perspectiveListener);
@@ -780,15 +684,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			IPProcessControl proc = new PProcess(job, jobName+"_process"+i, "" + i + "", "0", i, IPProcess.STARTING, "", "");
 			job.addChild(proc);			
 		}	
-		try {
-			monitor.internalWorked(0);
-			monitor.subTask("Setting process status...");
-			getProcsStatusForNewJob(jobName, job, new SubProgressMonitor(monitor, numProcesses));
-		} catch (CoreException e) {
-			controlSystem.terminateJob(job);
-			universe.deleteJob(job);
-			throw e;
-		}
+
 		return job;
 	}
 }
