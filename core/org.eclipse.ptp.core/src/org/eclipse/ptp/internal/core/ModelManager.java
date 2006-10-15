@@ -327,80 +327,48 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		for(int i=0; i<keys.length; i++) {
 			String key = keys[i];
 			String value = values[i];
-			//System.out.println("\tKEY/VALUE pair: "+key+" -> "+value);
-			
-			if(key.equals(AttributeConstants.ATTRIB_MACHINEID)) {
+			if (key.equals(AttributeConstants.ATTRIB_MACHINEID)) {
 				/* ok, so we're switching to this new machine.  Let's find it. */
 				curmachine = (PMachine)universe.findMachineById(value);
 				if(curmachine == null) {
 					System.out.println("\t\tUnknown machine ID ("+value+"), adding to the model.");
-					PMachine mac = new PMachine(universe, AttributeConstants.ATTRIB_MACHINE_NAME_PREFIX + value, value);
-					universe.addChild(mac);
-					/* now let's try and find it again, just to be sure we can... */
-					curmachine = (PMachine)universe.findMachineById(value);
-					if(curmachine == null) {
-						System.err.println("\t\t  !!! ERROR: Added new machine but STILL can't find it! :(");
-					}
+					curmachine = new PMachine(universe, AttributeConstants.ATTRIB_MACHINE_NAME_PREFIX + value, value);
+					universe.addChild(curmachine);
 					newEntity = true;
 				}
-			}
-			/* we can only look for nodes if we've already found a machine . . . */
-			else if(curmachine != null && key.equals(AttributeConstants.ATTRIB_NODE_NUMBER)) {
+			} else if (curmachine != null && key.equals(AttributeConstants.ATTRIB_NODE_NUMBER)) {
 				/* ok so we've got a machine that's not null, and we think we have a node
 				 * number to look for in that machine.  So let's find it!
 				 */
 				curnode = (PNode)curmachine.findNodeByName(AttributeConstants.ATTRIB_NODE_NAME_PREFIX + value);
 				if(curnode == null) {
 					System.out.println("\t\tUnknown node number ("+value+"), adding to the model.");
-					PNode node = new PNode(curmachine, AttributeConstants.ATTRIB_NODE_NAME_PREFIX + value, value);
-					curmachine.addChild(node);
-					/* now let's try and find it again, just to be sure we can... */
-					curnode = (PNode)curmachine.findNodeByName(AttributeConstants.ATTRIB_NODE_NAME_PREFIX + value);
-					if(curnode == null) {
-						System.err.println("\t\t  !!! ERROR: Added new node but STILL can't find it! :(");
-						System.err.println("\t\t  !!! ERROR: Here are the nodes I know about on this Machine:");
-						IPNode[] nodes = curmachine.getNodes();
-						for(int j=0; j<nodes.length; j++) {
-							System.out.println("Node["+j+"] = "+nodes[j]);
-						}
-					}
+					curnode = new PNode(curmachine, AttributeConstants.ATTRIB_NODE_NAME_PREFIX + value, value);
+					curmachine.addChild(curnode);
 					newEntity = true;
 				}
-				if(the_one_changed_node == null) {
+				if (the_one_changed_node == null) {
 					the_one_changed_node = curnode;
 					one_node_changed = true;
-				}
-				else {
+				} else {
 					one_node_changed = false;
 				}
-			}
-			else if(curmachine != null && curnode != null) {
+			} else if (curmachine != null && curnode != null) {
 				curnode.setAttribute(key, value);
-			}
-			else {
+			} else {
 				System.err.println("\t!!! ERROR: Received key/value attribute pair but have no associated machine/node to assign it to.");
 			}
 		}
 		
-		if(newEntity) fireEvent(new ModelSysChangedEvent(IModelSysChangedEvent.MAJOR_SYS_CHANGED, null));
-		if(one_node_changed && the_one_changed_node != null) {
-			fireEvent(new NodeEvent(the_one_changed_node, INodeEvent.STATUS_UPDATE_TYPE, null));
+		if (newEntity) {
+			fireEvent(new ModelSysChangedEvent(IModelSysChangedEvent.MAJOR_SYS_CHANGED, null));
 		}
-		/* ok more than 1 node changed, too complex let's just let them know to do a refresh */
-		else {
+		if (one_node_changed && the_one_changed_node != null) {
+			fireEvent(new NodeEvent(the_one_changed_node, INodeEvent.STATUS_UPDATE_TYPE, null));
+		} else {
+			/* ok more than 1 node changed, too complex let's just let them know to do a refresh */
 			fireEvent(new ModelSysChangedEvent(IModelSysChangedEvent.SYS_STATUS_CHANGED, null));
 		}
-		
-		/*
-		IPNode n = universe.findNodeByName(ne);
-		if(n != null) {
-			System.out.print("\t before, val = "+n.getAttribute(key));
-			n.setAttribute(key, value);
-			System.out.println("\t after, val = "+n.getAttribute(key));
-			fireEvent(new ModelSysChangedEvent(IModelSysChangedEvent.SYS_STATUS_CHANGED, n));
-			//fireEvent(n, EVENT_SYS_STATUS_CHANGE);
-		}
-		*/
 	}
 
 	public void runtimeProcessOutput(String ne, String output) {
@@ -528,18 +496,15 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 						System.err.println("setting pid[" + proc.getName() + "]=" + attr[1]);
 						proc.setPid(attr[1]);
 					} else if (attr[0].equals(AttributeConstants.ATTRIB_PROCESS_NODE_NAME)) {
-						// TODO: Fix this node name crap
-						String nname;
-						if ("localhost".equals(attr[1])) 
-							nname = new String("Node0");
-						else
-							nname = new String("Node" + attr[1]);
-						IPNode node = universe.getMachines()[0].findNodeByName(nname);
-						if (node != null) {
-							System.err.println("setting node[" + proc.getName() + "]=" + node);
-							proc.setNode(node);
+						IPNode[] nodes = universe.getMachines()[0].getNodes();
+						for (int j = 0; j < nodes.length; j++) {
+							IPNode node = nodes[j];
+							if (node.getAttribute(AttributeConstants.ATTRIB_NODE_NAME).equals(attr[1])) {
+								System.err.println("setting node[" + proc.getName() + "]=" + attr[1] + "(" + node.getNodeNumber() + ")");
+								proc.setNode(node);
+								break;
+							}
 						}
-
 					}
 				}
 			}
