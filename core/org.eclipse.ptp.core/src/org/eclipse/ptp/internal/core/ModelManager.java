@@ -496,13 +496,18 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 						System.err.println("setting pid[" + proc.getName() + "]=" + attr[1]);
 						proc.setPid(attr[1]);
 					} else if (attr[0].equals(AttributeConstants.ATTRIB_PROCESS_NODE_NAME)) {
-						IPNode[] nodes = universe.getMachines()[0].getNodes();
-						for (int j = 0; j < nodes.length; j++) {
-							IPNode node = nodes[j];
-							if (node.getAttribute(AttributeConstants.ATTRIB_NODE_NAME).equals(attr[1])) {
-								System.err.println("setting node[" + proc.getName() + "]=" + attr[1] + "(" + node.getNodeNumber() + ")");
-								proc.setNode(node);
-								break;
+						if (attr[1].equals("localhost")) {
+							IPNode node = universe.getMachines()[0].findNodeByName(AttributeConstants.ATTRIB_NODE_NAME_PREFIX + "0");
+							proc.setNode(node);
+						} else {
+							IPNode[] nodes = universe.getMachines()[0].getNodes();
+							for (int j = 0; j < nodes.length; j++) {
+								IPNode node = nodes[j];
+								if (node.getAttribute(AttributeConstants.ATTRIB_NODE_NAME).equals(attr[1])) {
+									System.err.println("setting node[" + proc.getName() + "]=" + attr[1] + "(" + node.getNodeNumber() + ")");
+									proc.setNode(node);
+									break;
+								}
 							}
 						}
 					}
