@@ -271,10 +271,10 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			try {
 				monitor.subTask("Setup the monitoring system...");
 				monitor.beginTask("", 1);
-				monitoringSystem.initiateDiscovery();
-				monitor.worked(1);
 				monitoringSystem.addRuntimeListener(this);
 				controlSystem.addRuntimeListener(this);		
+				monitor.worked(1);
+				monitoringSystem.initiateDiscovery();
 				monitor.done();
 			} catch (CoreException e) {
 				universe.removeChildren();
