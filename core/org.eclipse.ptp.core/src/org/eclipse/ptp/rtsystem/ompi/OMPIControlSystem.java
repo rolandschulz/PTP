@@ -291,7 +291,7 @@ public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventList
 	}
 
     public synchronized void handleEvent(IProxyRuntimeEvent e) {
-        if(e instanceof ProxyRuntimeJobStateEvent) {
+        if (e instanceof ProxyRuntimeJobStateEvent) {
     		RuntimeEvent re = new RuntimeEvent(RuntimeEvent.EVENT_JOB_STATE_CHANGED);
     		int state = ((ProxyRuntimeJobStateEvent)e).getJobState();
     		String stateStr = IPProcess.ERROR;
@@ -309,7 +309,7 @@ public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventList
     		
     		re.setText(stateStr);
     		fireEvent("job"+((ProxyRuntimeJobStateEvent)e).getJobID(), re);
-        } else if(e instanceof ProxyRuntimeProcessOutputEvent) {
+        } else if (e instanceof ProxyRuntimeProcessOutputEvent) {
 			RuntimeEvent re = new RuntimeEvent(RuntimeEvent.EVENT_PROCESS_OUTPUT);
 			int jobID = ((ProxyRuntimeProcessOutputEvent)e).getJobID();
 			int procID = ((ProxyRuntimeProcessOutputEvent)e).getProcessID();
@@ -325,7 +325,7 @@ public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventList
 			re.setProcArray(((ProxyRuntimeProcessAttributeEvent)e).getDiffProcs());
 			re.setAttributeValues(((ProxyRuntimeProcessAttributeEvent)e).getKeyValues());
 			fireEvent("job"+jobID, re);
-        } else if(e instanceof ProxyRuntimeErrorEvent) {
+        } else if (e instanceof ProxyRuntimeErrorEvent) {
 			System.err.println("Fatal error from proxy: '"+((ProxyRuntimeErrorEvent)e).getErrorMessage()+"'");
 			int errorCode = ((ProxyRuntimeErrorEvent)e).getErrorCode();
 			String errorMsg = ((ProxyRuntimeErrorEvent)e).getErrorMessage();
@@ -334,22 +334,19 @@ public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventList
 					"Error message: \""+errorMsg+"\"\n\n"+
 					"Control System is now disabled.", null);
 			proxyDead = true;
-		}
-        
-        	else if(e instanceof ProxyRuntimeDisconnectedEvent) {
-        		boolean is_error = ((ProxyRuntimeDisconnectedEvent)e).wasError();
-        		System.out.println("Proxy Disconnected.");
-        		proxyDead = true;
-        		if(is_error) {
-        			PTPCorePlugin.errorDialog("Fatal PTP Control System Error",
-        					"There was a fatal PTP Control System error.  The proxy "+
-        					"server disconnected with an error.\n\n"+
-        					"Control System is now disabled.", null);
-        		}
-        		//PTPCorePlugin.errorDialog("Fatal PTP Control System Error",
-        		//		"The "
-        		
-        	}
-        	
+		} else if (e instanceof ProxyRuntimeDisconnectedEvent) {
+    		boolean is_error = ((ProxyRuntimeDisconnectedEvent)e).wasError();
+    		System.out.println("Proxy Disconnected.");
+    		proxyDead = true;
+    		if(is_error) {
+    			PTPCorePlugin.errorDialog("Fatal PTP Control System Error",
+    					"There was a fatal PTP Control System error.  The proxy "+
+    					"server disconnected with an error.\n\n"+
+    					"Control System is now disabled.", null);
+    		}
+    		//PTPCorePlugin.errorDialog("Fatal PTP Control System Error",
+    		//		"The "
+    		
+    	}
     }
 }
