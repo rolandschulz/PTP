@@ -463,9 +463,12 @@ static void
 SendCommandWait(MISession *sess, MICommand *cmd)
 {
 	MISessionSendCommand(sess, cmd);
-	
 	do {
 		MISessionProgress(sess);
+		if (sess->out_fd == -1) {
+			printf("------------------- SendCommandWait sess->out_fd = -1\n");
+			break;
+		}
 	} while (!MISessionCommandCompleted(sess));
 }
 
@@ -675,7 +678,8 @@ GetChangedVariables()
 	cmd = MIVarUpdate("*");
 	SendCommandWait(DebugSession, cmd);
 	if (!MICommandResultOK(cmd)) {
-		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
+		printf("------------------- GetChangedVariables error\n");
+		DbgSetError(DBGERR_INPROGRESS, GetLastErrorStr());
 		MICommandFree(cmd);
 		return NewList();
 	}
@@ -1350,7 +1354,8 @@ GetStackframes(int current, List **flist)
 	SendCommandWait(DebugSession, cmd);
 	
 	if (!MICommandResultOK(cmd)) {
-		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
+		printf("------------------- GetStackframes error\n");
+		DbgSetError(DBGERR_INPROGRESS, GetLastErrorStr());
 		MICommandFree(cmd);
 		return DBGRES_ERR;
 	}
@@ -1564,9 +1569,8 @@ GetVarValue(char *var)
 		MICommandFree(cmd);
 		return NULL;
 	}
-	res = MIGetVarEvaluateExpressionInfo(cmd);	
+	res = MIGetVarEvaluateExpressionInfo(cmd);
 	MICommandFree(cmd);
-	
 	return res;
 }
 
@@ -2214,11 +2218,12 @@ GDBMIGetInfoThread(void)
 	
 	cmd = MIInfoThreads();
 	SendCommandWait(DebugSession, cmd);
-//	if (!MICommandResultOK(cmd)) {
-//		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
-//		MICommandFree(cmd);
-//		return DBGRES_ERR;
-//	}
+	if (!MICommandResultOK(cmd)) {
+		printf("------------------- GDBMIGetInfoThread error\n");		
+		DbgSetError(DBGERR_INPROGRESS, GetLastErrorStr());
+		MICommandFree(cmd);
+		return DBGRES_ERR;
+	}
 	info = MIGetInfoThreads(cmd);
 	MICommandFree(cmd);
 	
@@ -2292,7 +2297,8 @@ GDBMIStackInfoDepth()
 	cmd = MIStackInfoDepth();
 	SendCommandWait(DebugSession, cmd);
 	if (!MICommandResultOK(cmd)) {
-		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
+		printf("------------------- GDBMIStackInfoDepth error\n");		
+		DbgSetError(DBGERR_INPROGRESS, GetLastErrorStr());
 		MICommandFree(cmd);
 		return DBGRES_ERR;
 	}
