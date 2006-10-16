@@ -1128,7 +1128,7 @@ debug_spawn(char *debug_path, int argc, char **argv, orte_app_context_t** app_co
 	for (i = 0; i < argc; i++) {
 		debug_context[0]->argv[i] = strdup(argv[i]);
 	}
-	asprintf(&debug_context[0]->argv[i++], "--jobid=%d", (int)app_jobid);
+	asprintf(&debug_context[0]->argv[i++], "--jobid=%d", jid1);
 	debug_context[0]->argv[i++] = NULL;
 	debug_context[0]->argc = i;
 
