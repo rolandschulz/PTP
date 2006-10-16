@@ -75,50 +75,10 @@ import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugVarsEvent;
 
 
 public class ParallelDebugger extends AbstractDebugger implements IDebugger, IProxyDebugEventListener {
-	/**
-	private HashMap				bpMap = new HashMap();
-	private ArrayList			bpArray = new ArrayList();
-	private class BreakpointMapping {
-		private IPCDIBreakpoint		bpObject;
-		private BitList				bpSet;
-		private int					bpId;
-		public BreakpointMapping(int bpid, BitList set, IPCDIBreakpoint bpt) {
-			this.bpId = bpid;
-			this.bpSet = set;
-			this.bpObject = bpt;
-		}
-		public int getBreakpointId() {
-			return this.bpId;
-		}
-		public BitList getBreakpointProcs() {
-			return this.bpSet;
-		}
-		public IPCDIBreakpoint getBreakpoint() {
-			return this.bpObject;
-		}	
-		public void updateProcs(BitList set) {
-			if (this.bpSet != null) {
-				this.bpSet.or(set);
-			} else {
-				this.bpSet = set;
-			}
-		}
-	}
-	*/
-	
 	private ProxyDebugClient	proxy;
 	private int					bpId = 0;
-	protected IPCDIStackFrame currFrame = null;
+	protected IPCDIStackFrame	currFrame = null;
 
-	private String join(String[] strs, String delim) {
-		StringBuffer buf = new StringBuffer();
-		for (int i = 0; i < strs.length; i++) {
-			if (i > 0)
-				buf.append(delim);
-			buf.append(strs[i]);
-		}
-		return buf.toString();
-	}
 	public int getDebuggerPort() throws CoreException {
 		proxy = new ProxyDebugClient();
 		try {
@@ -516,7 +476,6 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 					String func = frames[j].getLocator().getFunction();
 					int line = frames[j].getLocator().getLineNumber();
 					BigInteger addr = frames[j].getLocator().getAddress();
-//System.out.println("frame " + level + " " + file + " " + func + " " + line + " " + addr);
 					pcdiFrames[j] = new StackFrame((Target)target, level, file, func, line, addr);
 				}
 			}
@@ -652,43 +611,6 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			break;
 		}
 	}	
-	
-	/*
-	 * Keep two data structures:
-	 * 
-	 * 1. A HashMap that is indexed by the actual breakpoint object that contains lists of
-	 * breakpoint id/procset tuples associated with the object. This is used to delete a breakpoint 
-	 * based on a breakpoint object. See the deleteBreakpoint() method.
-	 * 
-	 * 2. An ArrayList that is indexed by breakpoint id that contains the breakpoint 
-	 * object/procset combination associated with the breakpoint id. This is used to look up the breakpoint
-	 * object when a BPHIT event arrives.
-	 * 
-	 * ASSUMPTIONS: There is a one-to-one mapping between breakpoint id and breakpoint object. This is
-	 * achieved by generating a new breakpoint id every time a breakpoint is set.
-	 * 
-	 */
-	/*
-	private void updateBreakpointInfo(int bpid, BitList bpset, IPCDIBreakpoint bpt) {
-		BreakpointMapping bp = (BreakpointMapping) bpMap.get(bpt);
-		
-		if (bp == null) {
-			bp = new BreakpointMapping(bpid, bpset, bpt);
-			bpMap.put(bpt, bp);
-		} else
-			bp.updateProcs(bpset);
-		
-		if (bpid >= bpArray.size() || bpArray.get(bpid) == null) {
-			bpArray.add(bpid, bp);
-		}
-	}
-	private BreakpointMapping findBreakpointInfo(int bpid) {
-		return (BreakpointMapping)bpArray.get(bpid);
-	}
-	private BreakpointMapping findBreakpointInfo(IPCDIBreakpoint bpt) {
-		return (BreakpointMapping)bpMap.get(bpt);
-	}
-	*/
 
 	private int newBreakpointId() {
 		return this.bpId++;
