@@ -653,8 +653,17 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			// System.out.println("process name = "+ne[j]);
 			IPProcessControl proc = new PProcess(job, jobName+"_process"+i, "" + i + "", "0", i, IPProcess.STARTING, "", "");
 			job.addChild(proc);			
-		}	
+		}
 
+		/*
+		 * This is needed for debug jobs because the runtimeJobStateChanged event is
+		 * not generated (the debugger manages the process/job state) and as a consequence the
+		 * UI JobManager listener is never called.
+		 */
+		if (debug) {
+			refreshJobStatus(jobName);
+			fireEvent(new ModelRuntimeNotifierEvent(job.getIDString(), IModelRuntimeNotifierEvent.TYPE_JOB, IModelRuntimeNotifierEvent.STARTED));
+		}
 		return job;
 	}
 }
