@@ -162,28 +162,30 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 				setSuspendTasks(false, tasks);
 				setProcessStatus(tasks.toArray(), IPProcess.RUNNING);
 			} else if (event instanceof IPCDIErrorEvent) {
-				IPCDIErrorEvent errEvent = (IPCDIErrorEvent)event;
-				switch (errEvent.getErrorCode()) {
-				case IPCDIErrorEvent.DBG_FATAL:
-					setJobFinished(tasks, IPProcess.ERROR);
-					postStopDebugger();
-				break;
-				case IPCDIErrorEvent.DBG_WARNING:
-					if (!session.getJob().isAllStop()) {
-						setJobFinished(tasks, IPProcess.ERROR);
-						postCommand(new TerminateCommand(tasks));
-					}
-				break;
-				case IPCDIErrorEvent.DBG_NORMAL:
-					session.unregisterTargets(tasks.copy(), true);
-				break;
-				}
+				handleException(tasks, ((IPCDIErrorEvent)event).getErrorCode());
 			} else if (event instanceof IPCDISuspendedEvent) {
 				setSuspendTasks(true, tasks);
 				setProcessStatus(tasks.toArray(), IPProcess.STOPPED);
 			}
 			//FIXME - add item here or??
 			eventThread.fireDebugEvent(event);
+		}
+	}
+	protected void handleException(BitList tasks, int err_code) {
+		switch (err_code) {
+			case IPCDIErrorEvent.DBG_FATAL:
+				setJobFinished(tasks, IPProcess.ERROR);
+				postStopDebugger();
+			break;
+			case IPCDIErrorEvent.DBG_WARNING:
+				if (!session.getJob().isAllStop()) {
+					setJobFinished(tasks, IPProcess.ERROR);
+					postCommand(new TerminateCommand(tasks));
+				}
+			break;
+			case IPCDIErrorEvent.DBG_NORMAL:
+				session.unregisterTargets(tasks.copy(), true);
+			break;
 		}
 	}
 	private void postStopDebugger() {
