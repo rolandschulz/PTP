@@ -41,7 +41,7 @@ public abstract class AbstractBreakpointCommand extends AbstractDebugCommand {
 		if (res instanceof IPCDIBreakpoint) {
 			return (IPCDIBreakpoint)res;
 		}
-		throw new PCDIException("Cannot create created");
+		throw new PCDIException("Cannot get breakpoint");
 	}
 	public void preExecCommand(IAbstractDebugger debugger) throws PCDIException {
 		if (ignoreCheck) {
@@ -51,11 +51,7 @@ public abstract class AbstractBreakpointCommand extends AbstractDebugCommand {
 			BitList susTasks = suspendRunningTasks(debugger);
 			exec(debugger);
 			if (!susTasks.isEmpty()) {
-				try {
-					getPCDIBreakpoint();
-				} finally {
-					resumeSuspendedTasks(debugger, susTasks);
-				}
+				resumeSuspendedTasks(debugger, susTasks);
 			}
 		}
 	}
