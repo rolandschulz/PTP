@@ -671,7 +671,6 @@ GetChangedVariables()
 	List *changedVars;
 	MIVarChange *var;
 	struct varinfo *map;
-	char *pch;
 	char *mi_name;
 	char *replaced_name;
 	
@@ -681,7 +680,7 @@ GetChangedVariables()
 		printf("------------------- GetChangedVariables error\n");
 		DbgSetError(DBGERR_INPROGRESS, GetLastErrorStr());
 		MICommandFree(cmd);
-		return NewList();
+		return NULL;
 	}
 	MIGetVarUpdateInfo(cmd, &changes);
 	MICommandFree(cmd);
@@ -699,7 +698,7 @@ GetChangedVariables()
 			}
 		}
 		else {
-			if (map != NULL && pch == NULL) {
+			if (map != NULL) {
 				RemoveVARMap(map);
 			}
 			else {
