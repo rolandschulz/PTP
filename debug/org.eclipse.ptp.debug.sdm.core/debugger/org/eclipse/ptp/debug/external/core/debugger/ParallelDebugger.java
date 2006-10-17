@@ -406,7 +406,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 		case IParallelDebuggerConstants.DBGERR_NOFILEDIR:
 		case IParallelDebuggerConstants.DBGERR_CHDIR:
 			return IPCDIErrorEvent.DBG_FATAL;
-		case IParallelDebuggerConstants.DBGERR_INPROGRESS:
+		//case IParallelDebuggerConstants.DBGERR_INPROGRESS:
 		case IParallelDebuggerConstants.DBGERR_UNKNOWN_TYPE:
 		case IParallelDebuggerConstants.DBGERR_UNKNOWN_VARIABLE:
 			return IPCDIErrorEvent.DBG_NORMAL;
