@@ -51,6 +51,7 @@ public abstract class AbstractBreakpointCommand extends AbstractDebugCommand {
 			BitList susTasks = suspendRunningTasks(debugger);
 			exec(debugger);
 			if (!susTasks.isEmpty()) {
+				waitForReturn();
 				resumeSuspendedTasks(debugger, susTasks);
 			}
 		}
