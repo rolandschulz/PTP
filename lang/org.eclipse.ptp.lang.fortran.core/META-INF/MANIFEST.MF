@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: FDT Fortran Core Plug-in
+Bundle-SymbolicName: org.eclipse.fdt.fortran.core;singleton:=true
+Bundle-Version: 1.0.0
+Bundle-Activator: org.eclipse.fdt.fortran.core.Activator
+Bundle-Localization: plugin
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.cdt.core
+Eclipse-LazyStart: true
+Bundle-Vendor: Los Alamos National Laboratory
+Export-Package: org.eclipse.fdt.fortran.core

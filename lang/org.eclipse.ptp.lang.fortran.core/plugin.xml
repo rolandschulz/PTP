@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension
+         point="org.eclipse.core.contenttype.contentTypes">
+      <content-type
+            base-type="org.eclipse.core.runtime.text"
+            id="FortranSource"
+            name="Fortran Source File"
+            priority="high"/>
+      <file-association
+            content-type="org.eclipse.fdt.csharp.core.FortranSource"
+            file-extensions="for"/>
+   </extension>
+   <extension
+         point="org.eclipse.cdt.core.language">
+      <language
+            class="org.eclipse.fdt.fortran.core.FortranLanguage"
+            id="fortran"
+            name="Fortran">
+         <contentType id="org.eclipse.fdt.fortran.core.FortranSource"/>
+      </language>
+   </extension>
+
+</plugin>
