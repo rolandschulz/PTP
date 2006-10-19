@@ -89,14 +89,3 @@ MIDataEvaluateExpression(char *name)
 	MICommandAddOption(cmd, name, NULL);
 	return cmd;
 }
-
-/**
- * moved to CLIPTypeCommand.c 
-MICommand *
-MIPType(char *name) {
-	MICommand * cmd;
-	cmd = MICommandNew("ptype", MIResultRecordDONE);
-	MICommandAddOption(cmd, name, NULL);
-	return cmd;
-}
-*/
