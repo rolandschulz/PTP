@@ -8,3 +8,4 @@ autom4te.cache
 *.a
 bitset_test
 .libs
+.gdb_history
