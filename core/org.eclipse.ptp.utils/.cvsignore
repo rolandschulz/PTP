@@ -6,3 +6,5 @@ Makefile
 config.h
 autom4te.cache
 *.a
+bitset_test
+.libs
