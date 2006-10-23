@@ -80,11 +80,10 @@ public class ParallelDebugViewEventHandler extends AbstractPDebugEventHandler {
 						}
 						refresh();
 					}
-					/*
+					
 					if (processes.length > 0) {
 						getPView().focusOnDebugTarget(job, processes[0]);
 					}
-					*/
 					break;
 				}
 				break;

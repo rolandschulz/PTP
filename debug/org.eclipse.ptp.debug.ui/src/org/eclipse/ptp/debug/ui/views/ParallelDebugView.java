@@ -436,11 +436,16 @@ public class ParallelDebugView extends ParallelJobView {
 	/******************************************************
 	 * the focus on debug target on debug view 
 	 ******************************************************/
-	public void focusOnDebugTarget(IPJob job, int task_id) {
-		Object debugObj = ((UIDebugManager) manager).getDebugObject(job, task_id);
-		if (debugObj != null) {
-			focusOnDebugView(debugObj);
-		}
+	public void focusOnDebugTarget(final IPJob job, final int task_id) {
+		final UIDebugManager uimanager = ((UIDebugManager) manager);
+		WorkbenchJob workjob = new WorkbenchJob("Focus on Debug View") {
+			public IStatus runInUIThread(IProgressMonitor monitor) {
+				focusOnDebugView(uimanager.getDebugObject(job, task_id));
+				return Status.OK_STATUS;
+			}
+		};
+		workjob.setPriority(Job.DECORATE);
+		workjob.schedule();
 	}
 	private void focusOnDebugView(final Object selection) {
 		if (selection == null) {
@@ -477,7 +482,7 @@ public class ParallelDebugView extends ParallelJobView {
 			asynViewer.expand(new TreeSelection(treePaths[0]));
 		}
 	}
-	private void doOnFocusDebugView(final Object selection) {
+	private void doOnFocusDebugView(Object selection) {
 		Viewer viewer = getDebugViewer();
 		if (viewer instanceof AsynchronousTreeViewer) {
 			AsynchronousTreeViewer asynViewer = (AsynchronousTreeViewer)viewer;
