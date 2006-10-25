@@ -1,9 +1,11 @@
 /* config.h.in.  Generated from configure.in by autoheader.  */
 
 #ifdef DEBUG
-#define DEBUG_PRINT(format, ...)	printf(format, __VA_ARGS__); fflush(stdout)
+#define DEBUG_PRINTF(format, ...)	printf(format, __VA_ARGS__); fflush(stdout)
+#define DEBUG_PRINTS(str)			printf("%s\n", (str)); fflush(stdout)
 #else /* DEBUG */
-#define DEBUG_PRINT(format, ...)
+#define DEBUG_PRINTF(format, ...)
+#define DEBUG_PRINTS(str)
 #endif /* DEBUG */
 
 /* Define to 1 if you have the <dlfcn.h> header file. */
