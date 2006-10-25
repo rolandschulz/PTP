@@ -122,11 +122,6 @@ MISessionStartLocal(MISession *sess, char *prog)
 		return -1;
 	}
 	
-	if (fcntl(p1[0], F_SETFL, O_NONBLOCK) < 0) {
-		MISetError(MI_ERROR_SYSTEM, strerror(errno));
-		return -1;
-	}
-	
 	sess->in_fd = p2[1];
 	sess->out_fd = p1[0];
 	sess->exited = 0;
@@ -228,7 +223,7 @@ MISessionSendCommand(MISession *sess, MICommand *cmd)
 		MISetError(MI_ERROR_SESSION, "");
 		return -1;
 	}
-	
+
 	AddToList(sess->send_queue, (void *)cmd);
 	
 	return 0;
@@ -352,8 +347,9 @@ MISessionProcessCommandsAndResponses(MISession *sess, fd_set *rfds, fd_set *wfds
 	if (sess->in_fd != -1
 		&& !EmptyList(sess->send_queue)
 		&& sess->command == NULL
-		&& FD_ISSET(sess->in_fd, wfds))
-	{
+		&& (wfds == NULL || FD_ISSET(sess->in_fd, wfds))
+	)
+	{	
 		sess->command = (MICommand *)RemoveFirst(sess->send_queue);
 #ifdef __gnu_linux__
 		/*
@@ -563,6 +559,15 @@ MISessionGetFds(MISession *sess, int *nfds, fd_set *rfds, fd_set *wfds, fd_set *
 {
 	int			n = 0;
 	
+	if (rfds != NULL)
+		FD_ZERO(rfds);
+		
+	if (wfds != NULL)
+		FD_ZERO(wfds);
+	
+	if (efds != NULL)
+		FD_ZERO(efds);
+	
 	if (sess->pid != -1) {
 		if (wfds != NULL && sess->in_fd != -1) {
 			FD_SET(sess->in_fd, wfds);
@@ -582,31 +587,46 @@ MISessionGetFds(MISession *sess, int *nfds, fd_set *rfds, fd_set *wfds, fd_set *
 
 /*
  * Default progress command if none supplied.
+ * 
+ * Don't select on write fds. This will almost always return immediately,
+ * so the timeout is never used. The end result is a busy wait that
+ * consumes gobs of CPU.
+ * 
+ * Also, we make a copy of sess->select_timeout as some select()
+ * functions will modify it.
  */
 int
 MISessionProgress(MISession *sess)
 {
-	int		n;
-	int		nfds;
-	fd_set	rfds;
-	fd_set	wfds;
+	int				n;
+	int				nfds;
+	fd_set			rfds;
+	struct timeval	tv = sess->select_timeout;
 	
-	FD_ZERO(&rfds);
-	FD_ZERO(&wfds);
-	
-	MISessionGetFds(sess, &nfds, &rfds, &wfds, NULL);
-	
-	n = select(nfds, &rfds, &wfds, NULL, &sess->select_timeout);
-	
-	if (n == 0)
-		return 0;
+	MISessionGetFds(sess, &nfds, &rfds, NULL, NULL);
+
+	for ( ;; ) {
+		n = select(nfds, &rfds, NULL, NULL, &tv);
 		
-	if (n < 0) {
-		MISetError(MI_ERROR_SYSTEM, strerror(errno));
-		return -1;
+		if (n < 0) {
+			if (errno == EINTR)
+				continue;
+				
+			MISetError(MI_ERROR_SYSTEM, strerror(errno));
+			return -1;
+		}
+		
+		break;
 	}
-	
-	MISessionProcessCommandsAndResponses(sess, &rfds, &wfds);
+
+	/*
+	 * Return if there is nothing to do
+	 */
+	if (n == 0 && EmptyList(sess->send_queue)) {
+		return 0;
+	}
+			
+	MISessionProcessCommandsAndResponses(sess, &rfds, NULL);
 	
 	return n;
 }
