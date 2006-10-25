@@ -24,6 +24,8 @@
 #define _GNU_SOURCE
 #endif /* __gnu_linux__ */
 
+#include "config.h"
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
@@ -42,10 +44,6 @@
 #include "list.h"
 
 #include "MI.h"
-
-//#define DEBUG
-
-#define MI_TIMEOUT_MS		10000
 
 struct bpentry {
 	int local;
@@ -92,7 +90,7 @@ static AIF * GetPrimitiveTypeToAIF(int, char *);
 static int	GDBMIInit(void (*)(dbg_event *, void *), void *);
 static int	GDBMIProgress(void);
 static int	GDBMIInterrupt(void);
-static int	GDBMIStartSession(char *, char *, char *, char *, char **, char **);
+static int	GDBMIStartSession(char *, char *, char *, char *, char **, char **, long);
 static int	GDBMISetLineBreakpoint(int, int, int, char *, int, char*, int, int);
 static int	GDBMISetFuncBreakpoint(int, int, int, char *, char *, char*, int, int);
 static int	GDBMIDeleteBreakpoint(int);
@@ -329,7 +327,6 @@ AsyncStop(void *data)
 	switch ( evt->type )
 	{
 	case MIEventTypeBreakpointHit:
-	printf("$$$$$$$$$$$$$$$$$$$$ MIEventTypeBreakpointHit \n");
 		bpmap = FindLocalBP(evt->bkptno);
 		
 		if (!bpmap->temp) {
@@ -345,7 +342,6 @@ AsyncStop(void *data)
 		RemoveBPMap(bpmap);
 
 	case MIEventTypeSuspended:
-	printf("$$$$$$$$$$$$$$$$$$$$ MIEventTypeSuspended \n");
 		if (get_current_frame(&frame) < 0) {
 			ERROR_TO_EVENT(e);
 		} else {
@@ -358,7 +354,6 @@ AsyncStop(void *data)
 		break;
 
 	case MIEventTypeSteppingRange:
-	printf("$$$$$$$$$$$$$$$$$$$$ MIEventTypeSteppingRange \n");
 		if (get_current_frame(&frame) < 0) {
 			ERROR_TO_EVENT(e);
 		} else {
@@ -371,7 +366,6 @@ AsyncStop(void *data)
 		break;
 
 	case MIEventTypeSignal:
-	printf("$$$$$$$$$$$$$$$$$$$$ MIEventTypeSignal \n");
 		if (get_current_frame(&frame) < 0) {
 			ERROR_TO_EVENT(e);
 		} else {
@@ -387,7 +381,6 @@ AsyncStop(void *data)
 		break;
 		
 	case MIEventTypeInferiorSignalExit:
-	printf("$$$$$$$$$$$$$$$$$$$$ MIEventTypeInferiorSignalExit \n");
 		e = NewDbgEvent(DBGEV_EXIT);
 		e->dbg_event_u.exit_event.reason = DBGEV_EXIT_SIGNAL;
 		e->dbg_event_u.exit_event.ev_u.sig = NewSignalInfo();
@@ -466,7 +459,7 @@ SendCommandWait(MISession *sess, MICommand *cmd)
 	do {
 		MISessionProgress(sess);
 		if (sess->out_fd == -1) {
-			printf("------------------- SendCommandWait sess->out_fd = -1\n");
+			DEBUG_PRINTS("------------------- SendCommandWait sess->out_fd = -1\n");
 			break;
 		}
 	} while (!MISessionCommandCompleted(sess));
@@ -677,7 +670,7 @@ GetChangedVariables()
 	cmd = MIVarUpdate("*");
 	SendCommandWait(DebugSession, cmd);
 	if (!MICommandResultOK(cmd)) {
-		printf("------------------- GetChangedVariables error\n");
+		DEBUG_PRINTS("------------------- GetChangedVariables error\n");
 		DbgSetError(DBGERR_INPROGRESS, GetLastErrorStr());
 		MICommandFree(cmd);
 		return NULL;
@@ -715,7 +708,7 @@ GetChangedVariables()
  * Start GDB session
  */	
 static int
-GDBMIStartSession(char *gdb_path, char *prog, char *path, char *work_dir, char **args, char **env)
+GDBMIStartSession(char *gdb_path, char *prog, char *path, char *work_dir, char **args, char **env, long timeout)
 {
 	char *		prog_path;
 	char **		e;
@@ -756,7 +749,7 @@ GDBMIStartSession(char *gdb_path, char *prog, char *path, char *work_dir, char *
 	
 	sess = MISessionNew();
 	
-	MISessionSetTimeout(sess, 0, MI_TIMEOUT_MS);
+	MISessionSetTimeout(sess, 0, timeout);
 	
 	MISessionSetGDBPath(sess, gdb_path);
 	
@@ -1353,7 +1346,7 @@ GetStackframes(int current, List **flist)
 	SendCommandWait(DebugSession, cmd);
 	
 	if (!MICommandResultOK(cmd)) {
-		printf("------------------- GetStackframes error\n");
+		DEBUG_PRINTS("------------------- GetStackframes error\n");
 		DbgSetError(DBGERR_INPROGRESS, GetLastErrorStr());
 		MICommandFree(cmd);
 		return DBGRES_ERR;
@@ -2218,7 +2211,7 @@ GDBMIGetInfoThread(void)
 	cmd = MIInfoThreads();
 	SendCommandWait(DebugSession, cmd);
 	if (!MICommandResultOK(cmd)) {
-		printf("------------------- GDBMIGetInfoThread error\n");		
+		DEBUG_PRINTS("------------------- GDBMIGetInfoThread error\n");		
 		DbgSetError(DBGERR_INPROGRESS, GetLastErrorStr());
 		MICommandFree(cmd);
 		return DBGRES_ERR;
@@ -2296,7 +2289,7 @@ GDBMIStackInfoDepth()
 	cmd = MIStackInfoDepth();
 	SendCommandWait(DebugSession, cmd);
 	if (!MICommandResultOK(cmd)) {
-		printf("------------------- GDBMIStackInfoDepth error\n");		
+		DEBUG_PRINTS("------------------- GDBMIStackInfoDepth error\n");		
 		DbgSetError(DBGERR_INPROGRESS, GetLastErrorStr());
 		MICommandFree(cmd);
 		return DBGRES_ERR;
@@ -2380,7 +2373,7 @@ GDBMIDataWriteMemory(long offset, char* address, char* format, int wordSize, cha
 	
 	CHECK_SESSION();
 	
-	//printf("----- gdbmi_sevrer: GDBMIDataWriteMemory called ---------\n");	
+	//DEBUG_PRINTS("----- gdbmi_sevrer: GDBMIDataWriteMemory called ---------\n");	
 	cmd = MIDataWriteMemory(offset, address, format, wordSize, value);
 	SendCommandWait(DebugSession, cmd);
 	if (!MICommandResultOK(cmd)) {
