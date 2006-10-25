@@ -38,13 +38,18 @@
 #include "list.h"
 
 #define SHUTDOWN_CANCELLED	0
-#define SHUTDOWN_STARTED		1
+#define SHUTDOWN_STARTED	1
 #define SHUTDOWN_COMPLETED	2
 
 static int				dbg_shutdown;
 static bitset *			dbg_procs = NULL;
 static proxy_svr *		dbg_proxy;
-static struct timeval	TIMEOUT = { 0, 1000 };
+/*
+ * The TIMEOUT determines how often the debugger polls progress routines.
+ * Too often and it uses too much CPU, too few and things will slow down...
+ */
+#define CLIENT_TIMEOUT	50000
+#define SERVER_TIMEOUT	50000
 
 /**
  * A send command is completed. Process the result and 
@@ -152,7 +157,7 @@ DbgClntStartSession(char **args)
 	char *	buf;
 	char **	ap;
 	
-	asprintf(&cmd, "%s %s \"%s\"", DBG_STARTSESSION_CMD, args[1], args[2]);
+	asprintf(&cmd, "%s %ld %s \"%s\"", DBG_STARTSESSION_CMD, SERVER_TIMEOUT, args[1], args[2]);
 	
 	for (ap = &args[3]; *ap != NULL; ap++) {
 		asprintf(&buf, "%s \"%s\"", cmd, *ap);
@@ -756,7 +761,7 @@ DbgClntProgress(void)
 	fd_set			efds;
 	int				res;
 	int				nfds = 0;
-	struct timeval	tv;
+	struct timeval	tv = { 0, CLIENT_TIMEOUT };
 	handler *		h;
 
 	/***********************************
@@ -782,8 +787,6 @@ DbgClntProgress(void)
 				nfds = h->fd;
 		}
 	}
-	
-	tv = TIMEOUT;
 	
 	for ( ;; ) {
 		res = select(nfds+1, &rfds, &wfds, &efds, &tv);
