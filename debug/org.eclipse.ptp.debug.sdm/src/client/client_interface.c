@@ -31,7 +31,12 @@
 #include "bitset.h"
 #include "handler.h"
 
-static struct timeval	TIMEOUT = { 0, 1000 };
+/*
+ * The TIMEOUT determines how often the debugger polls progress routines.
+ * Too often and it uses too much CPU, too few and things will slow down...
+ */
+#define CLIENT_TIMEOUT	50000
+#define SERVER_TIMEOUT	50000
 
 static void session_event_handler(void *, void *);
 
@@ -135,7 +140,7 @@ DbgCreate(session *s)
 int
 DbgStartSession(session *s, char *dir, char *prog, char *args)
 {
-	return proxy_clnt_sendcmd(s->sess_proxy, DBG_STARTSESSION_CMD, DBG_STARTSESSION_FMT, dir, prog, args);
+	return proxy_clnt_sendcmd(s->sess_proxy, DBG_STARTSESSION_CMD, DBG_STARTSESSION_FMT, SERVER_TIMEOUT, dir, prog, args);
 }
 
 /*
@@ -448,7 +453,7 @@ DbgProgress(session *s)
 	fd_set			efds;
 	int				res;
 	int				nfds = 0;
-	struct timeval	tv;
+	struct timeval	tv = { 0, CLIENT_TIMEOUT };
 	handler *		h;
 
 	/*
@@ -470,8 +475,6 @@ DbgProgress(session *s)
 				nfds = h->fd;
 		}
 	}
-	
-	tv = TIMEOUT;
 	
 	for ( ;; ) {
 		res = select(nfds+1, &rfds, &wfds, &efds, &tv);
