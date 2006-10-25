@@ -278,18 +278,24 @@ ORTEStartDaemon(char **args)
 				free(res);
 				
 				/* spawn the daemon */
-				printf("Starting execv now!\n"); fflush(stdout);
+				printf("CHILD: Starting execvp now!\n"); fflush(stdout);
 				errno = 0;
 
 				setsid();
 				ret = execvp("orted", orted_args);
 
 				FreeArgs(orted_args);
+				
+				if (ret != 0) {
+					printf("CHILD: error return from execvp, ret = %d, errno = %d\n", ret, errno); fflush(stdout);
+					printf("CHILD: PATH = %s\n", getenv("PATH")); fflush(stdout);
+					_exit(ret);
+				}
 			}
 			break;
 	    /* parent */
 	    default:
-	    		printf("PARENT: orted_pid = %d\n", orted_pid); fflush(stdout);
+	    	printf("PARENT: orted_pid = %d\n", orted_pid); fflush(stdout);
 			/* sleep - letting the daemon get started up */
 			sleep(1);
 			wait(&ret);
@@ -298,7 +304,7 @@ ORTEStartDaemon(char **args)
 	}
 
 	if (ret != 0) {
-		printf("Start daemon returning ERROR.\n");
+		printf("Start daemon returning ERROR, orted_pid = %d.\n", orted_pid); fflush(stdout);
 		res = ORTEErrorStr(RTEV_ERROR_ORTE_INIT, "initialization failed");
 		proxy_svr_event_callback(orte_proxy, res);
 		return 0;
@@ -2361,7 +2367,7 @@ server(char *name, char *host, int port)
 		printf("###### SIGNAL: %s\n", msg1);
 		printf("###### Shutting down ORTEd\n");
 		ORTEShutdown();
-		asprintf(&msg, "ptp_orte_proxy received signal %s (%s).  Exit was requried and performed cleanly.", msg1, msg2);
+		asprintf(&msg, "ptp_orte_proxy received signal %s (%s).  Exit was required and performed cleanly.", msg1, msg2);
 		proxy_svr_event_callback(orte_proxy, ORTEErrorStr(RTEV_ERROR_SIGNAL, msg));
 		free(msg);
 		free(msg1);
