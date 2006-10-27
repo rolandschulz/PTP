@@ -338,7 +338,7 @@ static int
 AsyncStop(void *data)
 {
 	dbg_event *	e;
-	//stackframe *	frame;
+	stackframe *	frame;
 	bpentry * bpmap;
 	MIEvent *	evt = (MIEvent *)data;
 
@@ -360,42 +360,42 @@ AsyncStop(void *data)
 		RemoveBPMap(bpmap);
 
 	case MIEventTypeSuspended:
-		//if (get_current_frame(&frame) < 0) {
-			//ERROR_TO_EVENT(e);
-		//} else {
+		if (get_current_frame(&frame) < 0) {
+			ERROR_TO_EVENT(e);
+		} else {
 			e = NewDbgEvent(DBGEV_SUSPEND);
 			e->dbg_event_u.suspend_event.reason = DBGEV_SUSPEND_INT;
 			e->dbg_event_u.suspend_event.thread_id = evt->threadId;
-			e->dbg_event_u.suspend_event.frame = ConvertMIFrameToStackframe(evt->frame);
+			e->dbg_event_u.suspend_event.frame = frame;
 			e->dbg_event_u.suspend_event.changed_vars = GetChangedVariables();
-		//}
+		}
 		break;
 
 	case MIEventTypeSteppingRange:
-		//if (get_current_frame(&frame) < 0) {
-			//ERROR_TO_EVENT(e);
-		//} else {
+		if (get_current_frame(&frame) < 0) {
+			ERROR_TO_EVENT(e);
+		} else {
 			e = NewDbgEvent(DBGEV_SUSPEND);
 			e->dbg_event_u.suspend_event.reason = DBGEV_SUSPEND_STEP;
 			e->dbg_event_u.suspend_event.thread_id = evt->threadId;
-			e->dbg_event_u.suspend_event.frame = ConvertMIFrameToStackframe(evt->frame);
+			e->dbg_event_u.suspend_event.frame = frame;
 			e->dbg_event_u.suspend_event.changed_vars = GetChangedVariables();
-		//}
+		}
 		break;
 
 	case MIEventTypeSignal:
-		//if (get_current_frame(&frame) < 0) {
-			//ERROR_TO_EVENT(e);
-		//} else {
+		if (get_current_frame(&frame) < 0) {
+			ERROR_TO_EVENT(e);
+		} else {
 			e = NewDbgEvent(DBGEV_SUSPEND);
 			e->dbg_event_u.suspend_event.reason = DBGEV_SUSPEND_SIGNAL;
 			e->dbg_event_u.suspend_event.ev_u.sig = NewSignalInfo();
 			e->dbg_event_u.suspend_event.ev_u.sig->name = strdup(evt->sigName);
 			e->dbg_event_u.suspend_event.ev_u.sig->desc = strdup(evt->sigMeaning);
 			e->dbg_event_u.suspend_event.thread_id = evt->threadId;
-			e->dbg_event_u.suspend_event.frame = ConvertMIFrameToStackframe(evt->frame);
+			e->dbg_event_u.suspend_event.frame = frame;
 			e->dbg_event_u.suspend_event.changed_vars = GetChangedVariables();
-		//}
+		}
 		break;
 		
 	case MIEventTypeInferiorSignalExit:
