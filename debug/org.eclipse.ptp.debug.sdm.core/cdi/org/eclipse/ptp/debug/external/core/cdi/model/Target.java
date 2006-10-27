@@ -21,6 +21,7 @@ package org.eclipse.ptp.debug.external.core.cdi.model;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.eclipse.cdt.debug.core.cdi.model.ICDIInstruction;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIMixedInstruction;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIRegister;
@@ -53,6 +54,8 @@ import org.eclipse.ptp.debug.external.core.cdi.Session;
 import org.eclipse.ptp.debug.external.core.cdi.SessionObject;
 import org.eclipse.ptp.debug.external.core.cdi.SignalManager;
 import org.eclipse.ptp.debug.external.core.cdi.VariableManager;
+import org.eclipse.ptp.debug.external.core.cdi.event.ThreadCreatedEvent;
+import org.eclipse.ptp.debug.external.core.cdi.event.ThreadExitedEvent;
 import org.eclipse.ptp.debug.external.core.cdi.model.variable.GlobalVariableDescriptor;
 import org.eclipse.ptp.debug.external.core.cdi.model.variable.Variable;
 import org.eclipse.ptp.debug.external.core.commands.CLISignalInfoCommand;
@@ -155,7 +158,7 @@ public class Target extends SessionObject implements IPCDITarget {
 	}
 	public synchronized void updateState(int newThreadId) {
 		Thread[] oldThreads = currentThreads;
-		currentThreadId = newThreadId;
+		currentThreadId = newThreadId;		
 		try {
 			currentThreads = getPThreads();
 		} catch (PCDIException e) {
@@ -178,8 +181,14 @@ public class Target extends SessionObject implements IPCDITarget {
 			}
 		}
 		if (!cList.isEmpty()) {
-			//TODO - thread created event?
+			ThreadCreatedEvent[] events = new ThreadCreatedEvent[cList.size()];
+			for (int j=0; j<events.length; j++) {
+				int id = ((Integer)cList.get(j)).intValue();
+				events[j] = new ThreadCreatedEvent(getSession(), getTask(), getThread(id), id);
+			}
+			getDebugger().fireEvents(events);
 		}
+		//Fire destroryd event for old threads
 		List dList = new ArrayList(oldThreads.length);
 		for (int i = 0; i < oldThreads.length; i++) {
 			boolean found = false;
@@ -194,7 +203,12 @@ public class Target extends SessionObject implements IPCDITarget {
 			}
 		}
 		if (!dList.isEmpty()) {
-			//TODO - thread created event?
+			ThreadExitedEvent[] events = new ThreadExitedEvent[dList.size()];
+			for (int j=0; j<events.length; j++) {
+				int id = ((Integer)dList.get(j)).intValue();
+				events[j] = new ThreadExitedEvent(getSession(), getTask(), getThread(id), id);
+			}
+			getDebugger().fireEvents(events);
 		}
 	}
 	private Thread[] getPThreads() throws PCDIException {
@@ -234,7 +248,7 @@ public class Target extends SessionObject implements IPCDITarget {
 		}
 		return currentThreads;
 	}
-	public IPCDIThread getThread(int tid) throws PCDIException {
+	public IPCDIThread getThread(int tid) {
 		Thread th = null;
 		if (currentThreads != null) {
 			for (int i = 0; i < currentThreads.length; i++) {
