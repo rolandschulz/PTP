@@ -60,6 +60,9 @@
 #endif /* ORTE_MINOR_VERSION == 0 */
 
 #include "orte/tools/orted/orted.h"
+#if ORTE_MINOR_VERSION != 0
+#include "orte/tools/orteconsole/orteconsole.h"
+#endif /* ORTE_MINOR_VERSION != 0 */
 
 #include "orte/mca/iof/iof.h"
 #include "orte/mca/rmgr/rmgr.h"
@@ -149,7 +152,9 @@ typedef struct ptp_job ptp_job;
 static int get_node_attribute(int machid, int node_num, char **input_keys, int *input_types, char **input_values, int input_num_keys);
 static int get_proc_attribute(orte_jobid_t jobid, int proc_num, char **input_keys, int *input_types, char **input_values, int input_num_keys);
 static void job_state_callback(orte_jobid_t jobid, orte_proc_state_t state);
+#if ORTE_MINOR_VERSION == 0
 static int orte_console_send_command(orte_daemon_cmd_flag_t usercmd);
+#endif /* ORTE_MINOR_VERSION == 0 */
 static void iof_callback(orte_process_name_t* src_name, orte_iof_base_tag_t src_tag, void* cbdata, const unsigned char* data, size_t count);
 static void add_job(int jobid, int debug_jobid);
 static void remove_job(int jobid);
@@ -319,8 +324,10 @@ ORTEStartDaemon(char **args)
 #ifdef HAVE_SYS_BPROC_H
 	ORTE_Subscribe_Bproc();
 #endif
-		
+
+#if ORTE_MINOR_VERSION == 0
 	orte_rmgr.query();
+#endif /* ORTE_MINOR_VERSION == 0 */
 	
 	printf("Start daemon returning OK.\n");
 	asprintf(&res, "%d", RTEV_OK);
@@ -416,8 +423,15 @@ job_proc_notify_callback(orte_gpr_notify_data_t *data, void *cbdata)
 		
 		for(j=0; j<value->cnt; j++) {
 			orte_gpr_keyval_t *keyval = keyvals[j];
+#if ORTE_MINOR_VERSION == 0
+			orte_data_type_t dt = keyval->type;
+#else /* ORTE_MINOR_VERSION == 0 */
+			orte_data_type_t dt = keyval->value->type;
+#endif /* ORTE_MINOR_VERSION == 0 */
 			char *external_key = NULL;
-			
+			char * tmp_str = NULL;
+			int tmp_int;
+
 			if (!strcmp(keyval->key, ORTE_NODE_NAME_KEY))
 				asprintf(&external_key, "%s", ATTRIB_PROCESS_NODE_NAME);
 			else if (!strcmp(keyval->key, ORTE_PROC_PID_KEY))
@@ -426,18 +440,36 @@ job_proc_notify_callback(orte_gpr_notify_data_t *data, void *cbdata)
 				external_key = strdup(keyval->key);
 
 			if (external_key != NULL) {					
-				switch(keyval->type) {
+				switch(dt) {
 					case ORTE_STRING:
-						asprintf(&kv, "%s=%s", external_key, keyval->value.strptr);
+#if ORTE_MINOR_VERSION == 0
+						tmp_str = keyval->value.strptr;
+#else /* ORTE_MINOR_VERSION == 0 */
+						if( orte_dss.get( (void **) &tmp_str, keyval->value, ORTE_STRING) != ORTE_SUCCESS )
+							break;
+#endif /* ORTE_MINOR_VERSION == 0 */
+						asprintf(&kv, "%s=%s", external_key, tmp_str);
 						break;
 					case ORTE_UINT32:
-						asprintf(&kv, "%s=%d", external_key, keyval->value.ui32);
+#if ORTE_MINOR_VERSION == 0
+						tmp_int = keyval->value.ui32;
+#else /* ORTE_MINOR_VERSION == 0 */
+						if( orte_dss.get( (void **) &tmp_int, keyval->value, ORTE_UINT32) != ORTE_SUCCESS )
+							break;
+#endif /* ORTE_MINOR_VERSION == 0 */
+						asprintf(&kv, "%s=%d", external_key, tmp_int);
 						break;
 					case ORTE_PID:
-						asprintf(&kv, "%s=%d", external_key, keyval->value.pid);
+#if ORTE_MINOR_VERSION == 0
+						tmp_int = keyval->value.pid;
+#else /* ORTE_MINOR_VERSION == 0 */
+						if( orte_dss.get( (void **) &tmp_int, keyval->value, ORTE_PID) != ORTE_SUCCESS )
+							break;
+#endif /* ORTE_MINOR_VERSION == 0 */
+						asprintf(&kv, "%s=%d", external_key, tmp_int);
 						break;
 					default:
-						asprintf(&kv, "%s=<unknown type>%d", external_key, keyval->type);
+						asprintf(&kv, "%s=<unknown type>%d", external_key, dt);
 						break;
 				}
 	
@@ -454,6 +486,7 @@ job_proc_notify_callback(orte_gpr_notify_data_t *data, void *cbdata)
 			        	free(res);
 					}
 					free(kv);
+					kv = NULL;
 				}
 				
 				free(external_key);
@@ -1587,6 +1620,7 @@ ompi_sendcmd(orte_daemon_cmd_flag_t usercmd)
 }
 #endif
 
+#if ORTE_MINOR_VERSION == 0
 /*
  * Send a command to the ORTE daemon.
  * 
@@ -1626,6 +1660,7 @@ orte_console_send_command(orte_daemon_cmd_flag_t usercmd)
 
     return ORTE_SUCCESS;
 }
+#endif /* ORTE_MINOR_VERSION == 0 */
 
 /*
  * Find the number of processes started for a particular job.
