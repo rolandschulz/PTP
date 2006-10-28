@@ -70,6 +70,9 @@
 #include "orte/mca/rml/rml.h"
 #include "orte/mca/rmgr/base/base.h"
 #include "orte/mca/gpr/gpr.h"
+#if ORTE_MINOR_VERSION != 0
+#include "orte/mca/pls/pls.h"
+#endif /* ORTE_MINOR_VERSION != 0 */
 
 #ifdef HAVE_SYS_BPROC_H
 #include "orte/mca/soh/bproc/soh_bproc.h"
@@ -878,14 +881,26 @@ ORTETerminateJob(char **args)
 	int			jobid = atoi(args[1]);
 	ptp_job *	j;
 	
+#if ORTE_MINOR_VERSION == 0
 	rc = orte_rmgr.terminate_job(jobid);
+#else /* ORTE_MINOR_VERSION == 0 */
+	rc = orte_pls.terminate_job(jobid);
+#endif /* ORTE_MINOR_VERSION == 0 */
 	if(ORTECheckErrorCode(RTEV_ERROR_TERMINATE_JOB, rc)) return 1;
 	
 	if ((j = find_job(jobid)) != NULL) {
 		if (j->debug_jobid < 0)
+#if ORTE_MINOR_VERSION == 0
 			rc = orte_rmgr.terminate_job(j->jobid);
+#else /* ORTE_MINOR_VERSION == 0 */
+			rc = orte_pls.terminate_job(jobid);
+#endif /* ORTE_MINOR_VERSION == 0 */
 		else
+#if ORTE_MINOR_VERSION == 0
 			rc = orte_rmgr.terminate_job(j->debug_jobid);
+#else /* ORTE_MINOR_VERSION == 0 */
+			rc = orte_pls.terminate_job(jobid);
+#endif /* ORTE_MINOR_VERSION == 0 */
 		
 		if(ORTECheckErrorCode(RTEV_ERROR_TERMINATE_JOB, rc)) return 1;
 	}
