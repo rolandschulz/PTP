@@ -48,36 +48,33 @@
 #include <args.h>
 #include <signal.h>
 
-#include "include/orte_constants.h"
-#include "mca/errmgr/errmgr.h"
-#include "runtime/runtime.h"
-#include "mca/gpr/gpr.h"
-#include "orte/mca/iof/iof.h"
-#include "mca/rmgr/rmgr.h"
-#include "mca/base/base.h"
-#include "mca/errmgr/errmgr.h"
-#include "mca/rml/rml.h"
-#include "mca/rmgr/base/base.h"
 #include "opal/util/output.h"
 #include "opal/util/path.h"
-#include "orte/include/orte_constants.h"
+#include "opal/event/event.h"
+#include "opal/threads/condition.h"
+
+#if ORTE_MINOR_VERSION == 0
+#include "include/orte_constants.h"
+#else /* ORTE_MINOR_VERSION == 0 */
+#include "orte/orte_constants.h"
+#endif /* ORTE_MINOR_VERSION == 0 */
+
+#include "orte/tools/orted/orted.h"
+
+#include "orte/mca/iof/iof.h"
+#include "orte/mca/rmgr/rmgr.h"
 #include "orte/mca/errmgr/errmgr.h"
-#include "orte/runtime/runtime.h"
+#include "orte/mca/rml/rml.h"
+#include "orte/mca/rmgr/base/base.h"
 #include "orte/mca/gpr/gpr.h"
-#include "orte/mca/ras/base/base.h"
-#include "orte/mca/rds/base/base.h"
 
 #ifdef HAVE_SYS_BPROC_H
 #include "orte/mca/soh/bproc/soh_bproc.h"
 #endif
-//#include "mca/pls/base/base.h"
- 
-#include "event/event.h"
 
-#include "threads/condition.h"
-#include "tools/orted/orted.h"
+#include "orte/runtime/runtime.h"
 
-#define DEFAULT_PROXY			"tcp"
+#define DEFAULT_PROXY		"tcp"
 #define DEFAULT_ORTED_ARGS	"orted --scope public --seed --persistent"
 
 /*
