@@ -17,38 +17,6 @@
  * LA-CC 04-115
  ******************************************************************************/
 
-#include "orte_config.h" 
-
-#define ORTE_VERSION_1_0	(ORTE_MAJOR_VERSION == 1 && ORTE_MINOR_VERSION == 0)
-
-#if ORTE_VERSION_1_0
-#define ORTE_QUERY()									orte_rmgr.query()
-#define ORTE_LAUNCH_JOB(jobid)							orte_rmgr.launch(jobid)
-#define ORTE_TERMINATE_JOB(jobid)						orte_rmgr.terminate_job(jobid)
-#define ORTE_SETUP_JOB(app_context,num_context,jobid)	orte_rmgr.create(app_context,num_context,jobid)
-#define ORTE_SUBSCRIBE(jobid,cbfunc,cbdata,cond)		orte_rmgr_base_proc_stage_gate_subscribe(jobid,cbfunc,cbdata,cond)
-#define ORTE_SPAWN(apps,num_apps,jobid,cbfunc)			orte_rmgr.spawn(apps,num_apps,jobid,cbfunc)
-#define ORTE_PACK(buf,cmd,num,type)						orte_dps.pack(buf,cmd,num,type)
-#define ORTE_NOTIFY_ALL									ORTE_STAGE_GATE_ALL
-#else /* ORTE_VERSION_1_0 */
-#define ORTE_QUERY()									orte_rds.query()
-#define ORTE_LAUNCH_JOB(jobid)							orte_pls.launch_job(jobid)
-#define ORTE_TERMINATE_JOB(jobid)						orte_pls.terminate_job(jobid)
-#define ORTE_SETUP_JOB(app_context,num_context,jobid)	orte_rmgr.setup_job(app_context,num_context,jobid)
-#define ORTE_SUBSCRIBE(jobid,cbfunc,cbdata,cond)		orte_smr.job_stage_gate_subscribe(jobid,cbfunc,cbdata,cond)
-#define ORTE_PACK(buf,cmd,num,type)						orte_dss.pack(buf,cmd,num,type)
-#define ORTE_NOTIFY_ALL									ORTE_PROC_STATE_ALL
-#endif /* ORTE_VERSION_1_0 */
-
-/*
- * Need to undef these if we include
- * two config.h files
- */
-#undef PACKAGE_BUGREPORT
-#undef PACKAGE_NAME
-#undef PACKAGE_STRING
-#undef PACKAGE_TARNAME
-#undef PACKAGE_VERSION
 #include "config.h"
 
 #include <getopt.h>
@@ -69,41 +37,16 @@
 #include <args.h>
 #include <signal.h>
 
-#include "opal/util/output.h"
-#include "opal/util/path.h"
-#include "opal/event/event.h"
-#include "opal/threads/condition.h"
-
-#if ORTE_VERSION_1_0
-#include "include/orte_constants.h"
-#else /* ORTE_VERSION_1_0 */
-#include "orte/orte_constants.h"
-#endif /* ORTE_VERSION_1_0 */
-
-#include "orte/tools/orted/orted.h"
-
-#include "orte/mca/iof/iof.h"
-#include "orte/mca/rmgr/rmgr.h"
-#include "orte/mca/errmgr/errmgr.h"
-#include "orte/mca/rml/rml.h"
-#include "orte/mca/gpr/gpr.h"
-#if ORTE_VERSION_1_0
-#include "orte/mca/rmgr/base/base.h"
-#else /* ORTE_VERSION_1_0 */
-#include "orte/mca/pls/pls.h"
-#include "orte/mca/rds/rds.h"
-#include "orte/mca/ras/ras.h"
-#include "orte/mca/rmaps/rmaps.h"
-#include "orte/mca/smr/smr.h"
-#include "orte/mca/rmgr/base/rmgr_private.h"
-#include "orte/mca/odls/odls.h"
-#endif /* ORTE_VERSION_1_0 */
-
-#ifdef HAVE_SYS_BPROC_H
-#include "orte/mca/soh/bproc/soh_bproc.h"
-#endif
-
-#include "orte/runtime/runtime.h"
+/*
+ * Need to undef these if we include
+ * two config.h files
+ */
+#undef PACKAGE_BUGREPORT
+#undef PACKAGE_NAME
+#undef PACKAGE_STRING
+#undef PACKAGE_TARNAME
+#undef PACKAGE_VERSION
+#include "orte_fixup.h"
 
 #define DEFAULT_PROXY		"tcp"
 #define DEFAULT_ORTED_ARGS	"orted --scope public --seed --persistent"
@@ -240,19 +183,6 @@ static struct option longopts[] = {
 	{NULL,				0,					NULL,	0}
 };
 
-#if !ORTE_VERSION_1_0
-static int 
-ORTE_SPAWN(orte_app_context_t **apps, int num_apps, orte_jobid_t *jobid, void (*cbfunc)(orte_jobid_t, orte_proc_state_t))
-{
-	int			rc;
-	opal_list_t	attr;
-	OBJ_CONSTRUCT(&attr, opal_list_t);
-	rc = orte_rmgr.spawn_job(apps, num_apps, jobid, 0, NULL, cbfunc, ORTE_PROC_STATE_ALL, &attr);
-	OBJ_DESTRUCT(&attr);
-	return rc;
-}
-#endif /* !ORTE_VERSION_1_0 */
-
 char *
 ORTEErrorStr(int type, char *msg)
 {
@@ -288,7 +218,6 @@ ORTECheckErrorCode(int type, int rc)
 	return 0;
 }
 
-//jstring jompi_bin_path, jstring jorted_path, jstring jorted_bin, jobjectArray array
 int
 ORTEStartDaemon(char **args)
 {
@@ -460,14 +389,8 @@ job_proc_notify_callback(orte_gpr_notify_data_t *data, void *cbdata)
 		
 		for(j=0; j<value->cnt; j++) {
 			orte_gpr_keyval_t *keyval = keyvals[j];
-#if ORTE_VERSION_1_0
-			orte_data_type_t dt = keyval->type;
-#else /* ORTE_VERSION_1_0 */
-			orte_data_type_t dt = keyval->value->type;
-#endif /* ORTE_VERSION_1_0 */
 			char *external_key = NULL;
 			char * tmp_str = NULL;
-			int tmp_int;
 
 			if (!strcmp(keyval->key, ORTE_NODE_NAME_KEY))
 				asprintf(&external_key, "%s", ATTRIB_PROCESS_NODE_NAME);
@@ -477,36 +400,19 @@ job_proc_notify_callback(orte_gpr_notify_data_t *data, void *cbdata)
 				external_key = strdup(keyval->key);
 
 			if (external_key != NULL) {					
-				switch(dt) {
+				switch(ORTE_KEYVALUE_TYPE(keyval)) {
 					case ORTE_STRING:
-#if ORTE_VERSION_1_0
-						tmp_str = keyval->value.strptr;
-#else /* ORTE_VERSION_1_0 */
-						if( orte_dss.get( (void **) &tmp_str, keyval->value, ORTE_STRING) != ORTE_SUCCESS )
-							break;
-#endif /* ORTE_VERSION_1_0 */
-						asprintf(&kv, "%s=%s", external_key, tmp_str);
+						if ((tmp_str = ORTE_GET_STRING_VALUE(keyval)) != NULL);
+							asprintf(&kv, "%s=%s", external_key, tmp_str);
 						break;
 					case ORTE_UINT32:
-#if ORTE_VERSION_1_0
-						tmp_int = keyval->value.ui32;
-#else /* ORTE_VERSION_1_0 */
-						if( orte_dss.get( (void **) &tmp_int, keyval->value, ORTE_UINT32) != ORTE_SUCCESS )
-							break;
-#endif /* ORTE_VERSION_1_0 */
-						asprintf(&kv, "%s=%d", external_key, tmp_int);
+						asprintf(&kv, "%s=%d", external_key, ORTE_GET_UINT32_VALUE(keyval));
 						break;
 					case ORTE_PID:
-#if ORTE_VERSION_1_0
-						tmp_int = keyval->value.pid;
-#else /* ORTE_VERSION_1_0 */
-						if( orte_dss.get( (void **) &tmp_int, keyval->value, ORTE_PID) != ORTE_SUCCESS )
-							break;
-#endif /* ORTE_VERSION_1_0 */
-						asprintf(&kv, "%s=%d", external_key, tmp_int);
+						asprintf(&kv, "%s=%d", external_key, ORTE_GET_PID_VALUE(keyval));
 						break;
 					default:
-						asprintf(&kv, "%s=<unknown type>%d", external_key, dt);
+						asprintf(&kv, "%s=<unknown type>%d", external_key, ORTE_KEYVALUE_TYPE(keyval));
 						break;
 				}
 	
@@ -798,7 +704,6 @@ int
 ORTEShutdown(void)
 {
 	printf("ORTEShutdown() called.  Telling daemon to turn off.\n"); fflush(stdout);
-	//ompi_sendcmd(ORTE_DAEMON_EXIT_CMD);
 	orte_console_send_command(ORTE_DAEMON_EXIT_CMD);
 	printf("ORTEShutdown() - told ORTEd to exit.\n"); fflush(stdout);
 	orte_shutdown++;
@@ -1117,9 +1022,6 @@ debug_allocate(orte_app_context_t** app_context, size_t num_context, orte_jobid_
 {
 	int rc;
 	orte_process_name_t* name;
-#if !ORTE_VERSION_1_0
-	opal_list_t attributes;
-#endif /* !ORTE_VERSION_1_0 */
 
 	/* 
 	 * Initialize job segment and allocate resources
@@ -1130,29 +1032,10 @@ debug_allocate(orte_app_context_t** app_context, size_t num_context, orte_jobid_
 		return rc;
 	}
 	
-#if ORTE_VERSION_1_0	
-	if (ORTE_SUCCESS != (rc = orte_rmgr.allocate(*jobid))) {
+	if (ORTE_SUCCESS != (rc = ORTE_ALLOCATE_AND_MAP(*jobid))) {
 		ORTE_ERROR_LOG(rc);
 		return rc;
 	}
-	
-	if (ORTE_SUCCESS != (rc = orte_rmgr.map(*jobid))) {
-		ORTE_ERROR_LOG(rc);
-		return rc;
-	}
-#else /* ORTE_VERSION_1_0 */
-	OBJ_CONSTRUCT(&attributes, opal_list_t);
-	
-	if (ORTE_SUCCESS != (rc = orte_ras.allocate_job(*jobid, &attributes))) {
-		ORTE_ERROR_LOG(rc);
-		return rc;
-	}
-	
-	if (ORTE_SUCCESS != (rc = orte_rmaps.map_job(*jobid, &attributes))) {
-		ORTE_ERROR_LOG(rc);
-		return rc;
-	}
-#endif /* ORTE_VERSION_1_0 */
 
 	/* 
 	 * setup I/O forwarding
@@ -1171,13 +1054,11 @@ debug_allocate(orte_app_context_t** app_context, size_t num_context, orte_jobid_
 	/* 
 	 * setup callback
 	 */
-#if !ORTE_VERSION_1_0
     /* setup the launch system's stage gate counters and subscriptions */
-    if (ORTE_SUCCESS != (rc = orte_rmgr_base_proc_stage_gate_init(*jobid))) {
+    if (ORTE_SUCCESS != (rc = ORTE_STAGE_GATE_INIT(*jobid))) {
         ORTE_ERROR_LOG(rc);
         return rc;
     } 
-#endif /* !ORTE_VERSION_1_0 */
 
 	if(NULL != cbfunc) {
 		rc = ORTE_SUBSCRIBE(*jobid, debug_callback, (void*)cbfunc, ORTE_NOTIFY_ALL);
@@ -1188,10 +1069,6 @@ debug_allocate(orte_app_context_t** app_context, size_t num_context, orte_jobid_
 	}
 
 	orte_ns.free_name(&name);
-	
-#if !ORTE_VERSION_1_0
-	OBJ_DESTRUCT(&attributes);
-#endif /* !ORTE_VERSION_1_0 */
 
 	return ORTE_SUCCESS;
 }
@@ -1654,47 +1531,6 @@ job_state_callback(orte_jobid_t jobid, orte_proc_state_t state)
 	printf("state callback retrning!\n"); fflush(stdout);
 }
 
-#if 0
-/* this is an internal function we'll call from within this, consider
- * it 'private' */
-static int 
-ompi_sendcmd(orte_daemon_cmd_flag_t usercmd)
-{
-	orte_buffer_t *cmd;
-	orte_daemon_cmd_flag_t command;
-	int rc;
-	orte_process_name_t seed={0,0,0};
-
-	printf("ompi_sendcmd 1\n"); fflush(stdout);
-	cmd = OBJ_NEW(orte_buffer_t);
-	printf("ompi_sendcmd 2\n"); fflush(stdout);
-	
-	if (NULL == cmd) {
-		fprintf(stderr, "console: comm failure\n");
-		return 1;
-	}
-	command = usercmd;
-	
-	printf("ompi_sendcmd 3\n"); fflush(stdout);
-	if (ORTE_SUCCESS != (rc = orte_dps.pack(cmd, &command, 1, ORTE_DAEMON_CMD))) {
-		ORTE_ERROR_LOG(rc);
-		return 1;
-	}
-	
-	printf("ompi_sendcmd 4\n"); fflush(stdout);
-	if (0 > orte_rml.send_buffer(&seed, cmd, ORTE_RML_TAG_DAEMON, 0)) {
-		ORTE_ERROR_LOG(ORTE_ERR_COMM_FAILURE);
-		return 1;
-	}
-	
-	printf("ompi_sendcmd 5\n"); fflush(stdout);
-	OBJ_RELEASE(cmd);
-	printf("ompi_sendcmd 6\n"); fflush(stdout);
-	
-	return 0;
-}
-#endif
-
 /*
  * Send a command to the ORTE daemon.
  * 
@@ -1743,11 +1579,7 @@ get_num_procs(orte_jobid_t jobid)
 {
 	char *keys[2];
 	int rc, ret;
-#if ORTE_VERSION_1_0
-	size_t cnt;
-#else /* ORTE_VERSION_1_0 */
-	orte_std_cntr_t cnt;
-#endif /* ORTE_VERSION_1_0 */
+	ORTE_STD_CNTR_TYPE cnt;
 	char *segment = NULL;
 	char *jobid_str = NULL;
 	orte_gpr_value_t **values;
@@ -1946,18 +1778,11 @@ static int
 get_ui32_value(orte_gpr_value_t *value, char *key)
 {
     int k;
-    int	tmp_int;
 
     for(k=0; k<value->cnt; k++) {
         orte_gpr_keyval_t* keyval = value->keyvals[k];
         if (strcmp(key, keyval->key) == 0) {
-#if ORTE_VERSION_1_0
-            tmp_int = keyval->value.ui32;
-#else /* ORTE_VERSION_1_0 */
-            if( orte_dss.get( (void **) &tmp_int, keyval->value, ORTE_UINT32) != ORTE_SUCCESS )
-				return -1;
-#endif /* ORTE_VERSION_1_0 */
-			return tmp_int;
+			return ORTE_GET_UINT32_VALUE(keyval);
         }
     }
 
@@ -1976,12 +1801,8 @@ get_str_value(orte_gpr_value_t *value, char *key)
     for(k=0; k<value->cnt; k++) {
 		orte_gpr_keyval_t* keyval = value->keyvals[k];
         if (strcmp(key, keyval->key) == 0) {
-#if ORTE_VERSION_1_0
-            tmp_str = keyval->value.strptr;
-#else /* ORTE_VERSION_1_0 */
-            if( orte_dss.get( (void **) &tmp_str, keyval->value, ORTE_STRING) != ORTE_SUCCESS )
-				return "";
-#endif /* ORTE_VERSION_1_0 */
+            if ((tmp_str = ORTE_GET_STRING_VALUE(keyval)) == NULL)
+            	return "";
 			return tmp_str;
         }
 	}
@@ -1995,11 +1816,7 @@ get_proc_attribute(orte_jobid_t jobid, int proc_num, char **input_keys, int *inp
 	char **keys;
 	int rc;
 
-#if ORTE_VERSION_1_0
-	size_t cnt;
-#else /* ORTE_VERSION_1_0 */
-	orte_std_cntr_t cnt;
-#endif /* ORTE_VERSION_1_0 */
+	ORTE_STD_CNTR_TYPE cnt;
 	char *segment = NULL;
 	char *jobid_str = NULL;
 	orte_gpr_value_t **values;
@@ -2084,18 +1901,12 @@ static int
 get_num_nodes(int machid)
 {
 	int rc;
-#if ORTE_VERSION_1_0
-	size_t cnt;
-#else /* ORTE_VERSION_1_0 */
-	orte_std_cntr_t cnt;
-#endif /* ORTE_VERSION_1_0 */
+	ORTE_STD_CNTR_TYPE cnt;
 	orte_gpr_value_t **values;
 	
 	/* we're going to ignore machine ID until ORTE implements that */
 	
 	rc = orte_gpr.get(ORTE_GPR_KEYS_OR|ORTE_GPR_TOKENS_OR, ORTE_NODE_SEGMENT, NULL, NULL, &cnt, &values);
-        
-    //printf("RC = %d\n", rc); fflush(stdout);
                    
 	if(rc != ORTE_SUCCESS) {
 		return 0;
@@ -2321,11 +2132,7 @@ static int
 get_node_attribute(int machid, int node_num, char **input_keys, int *input_types, char **input_values, int input_num_keys)
 {
 	int rc;
-#if ORTE_VERSION_1_0
-	size_t cnt;
-#else /* ORTE_VERSION_1_0 */
-	orte_std_cntr_t cnt;
-#endif /* ORTE_VERSION_1_0 */
+	ORTE_STD_CNTR_TYPE cnt;
 	orte_gpr_value_t **values;
 	orte_gpr_value_t *value;
 	int i, ret, j, min, max;
