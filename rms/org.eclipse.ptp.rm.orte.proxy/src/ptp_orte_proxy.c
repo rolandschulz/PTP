@@ -28,6 +28,7 @@
 #define ORTE_SETUP_JOB(app_context,num_context,jobid)	orte_rmgr.create(app_context,num_context,jobid)
 #define ORTE_SUBSCRIBE(jobid,cbfunc,cbdata,cond)		orte_rmgr_base_proc_stage_gate_subscribe(jobid,cbfunc,cbdata,cond)
 #define ORTE_SPAWN(apps,num_apps,jobid,cbfunc)			orte_rmgr.spawn(apps,num_apps,jobid,cbfunc)
+#define ORTE_PACK(buf,cmd,num,type)						orte_dps.pack(buf,cmd,num,type)
 #define ORTE_NOTIFY_ALL									ORTE_STAGE_GATE_ALL
 #else /* ORTE_VERSION_1_0 */
 #define ORTE_QUERY()									orte_rds.query()
@@ -35,6 +36,7 @@
 #define ORTE_TERMINATE_JOB(jobid)						orte_pls.terminate_job(jobid)
 #define ORTE_SETUP_JOB(app_context,num_context,jobid)	orte_rmgr.setup_job(app_context,num_context,jobid)
 #define ORTE_SUBSCRIBE(jobid,cbfunc,cbdata,cond)		orte_smr.job_stage_gate_subscribe(jobid,cbfunc,cbdata,cond)
+#define ORTE_PACK(buf,cmd,num,type)						orte_dss.pack(buf,cmd,num,type)
 #define ORTE_NOTIFY_ALL									ORTE_PROC_STATE_ALL
 #endif /* ORTE_VERSION_1_0 */
 
@@ -79,9 +81,6 @@
 #endif /* ORTE_VERSION_1_0 */
 
 #include "orte/tools/orted/orted.h"
-#if !ORTE_VERSION_1_0
-#include "orte/tools/orteconsole/orteconsole.h"
-#endif /* !ORTE_VERSION_1_0 */
 
 #include "orte/mca/iof/iof.h"
 #include "orte/mca/rmgr/rmgr.h"
@@ -97,6 +96,7 @@
 #include "orte/mca/rmaps/rmaps.h"
 #include "orte/mca/smr/smr.h"
 #include "orte/mca/rmgr/base/rmgr_private.h"
+#include "orte/mca/odls/odls.h"
 #endif /* ORTE_VERSION_1_0 */
 
 #ifdef HAVE_SYS_BPROC_H
@@ -180,9 +180,7 @@ typedef struct ptp_job ptp_job;
 static int get_node_attribute(int machid, int node_num, char **input_keys, int *input_types, char **input_values, int input_num_keys);
 static int get_proc_attribute(orte_jobid_t jobid, int proc_num, char **input_keys, int *input_types, char **input_values, int input_num_keys);
 static void job_state_callback(orte_jobid_t jobid, orte_proc_state_t state);
-#if ORTE_VERSION_1_0
 static int orte_console_send_command(orte_daemon_cmd_flag_t usercmd);
-#endif /* ORTE_VERSION_1_0 */
 static void iof_callback(orte_process_name_t* src_name, orte_iof_base_tag_t src_tag, void* cbdata, const unsigned char* data, size_t count);
 static void add_job(int jobid, int debug_jobid);
 static void remove_job(int jobid);
@@ -1697,7 +1695,6 @@ ompi_sendcmd(orte_daemon_cmd_flag_t usercmd)
 }
 #endif
 
-#if ORTE_VERSION_1_0
 /*
  * Send a command to the ORTE daemon.
  * 
@@ -1718,8 +1715,8 @@ orte_console_send_command(orte_daemon_cmd_flag_t usercmd)
     }
 
     command = usercmd;
-	
-    rc = orte_dps.pack(cmd, &command, 1, ORTE_DAEMON_CMD);
+
+    rc = ORTE_PACK(cmd, &command, 1, ORTE_DAEMON_CMD);
     if ( ORTE_SUCCESS != rc ) {
         ORTE_ERROR_LOG(rc);
         OBJ_RELEASE(cmd);
@@ -1737,7 +1734,6 @@ orte_console_send_command(orte_daemon_cmd_flag_t usercmd)
 
     return ORTE_SUCCESS;
 }
-#endif /* ORTE_VERSION_1_0 */
 
 /*
  * Find the number of processes started for a particular job.
@@ -1747,7 +1743,11 @@ get_num_procs(orte_jobid_t jobid)
 {
 	char *keys[2];
 	int rc, ret;
+#if ORTE_VERSION_1_0
 	size_t cnt;
+#else /* ORTE_VERSION_1_0 */
+	orte_std_cntr_t cnt;
+#endif /* ORTE_VERSION_1_0 */
 	char *segment = NULL;
 	char *jobid_str = NULL;
 	orte_gpr_value_t **values;
@@ -1945,15 +1945,23 @@ ORTEGetProcessAttribute(char **args)
 static int 
 get_ui32_value(orte_gpr_value_t *value, char *key)
 {
-        int k;
+    int k;
+    int	tmp_int;
 
-        for(k=0; k<value->cnt; k++) {
-                orte_gpr_keyval_t* keyval = value->keyvals[k];
-                if (strcmp(key, keyval->key) == 0)
-                        return keyval->value.ui32;
+    for(k=0; k<value->cnt; k++) {
+        orte_gpr_keyval_t* keyval = value->keyvals[k];
+        if (strcmp(key, keyval->key) == 0) {
+#if ORTE_VERSION_1_0
+            tmp_int = keyval->value.ui32;
+#else /* ORTE_VERSION_1_0 */
+            if( orte_dss.get( (void **) &tmp_int, keyval->value, ORTE_UINT32) != ORTE_SUCCESS )
+				return -1;
+#endif /* ORTE_VERSION_1_0 */
+			return tmp_int;
         }
+    }
 
-        return -1;
+    return -1;
 }
 
 /*
@@ -1962,23 +1970,36 @@ get_ui32_value(orte_gpr_value_t *value, char *key)
 static char *
 get_str_value(orte_gpr_value_t *value, char *key)
 {
-        int k;
+    int		k;
+    char *	tmp_str;
 
-        for(k=0; k<value->cnt; k++) {
-                orte_gpr_keyval_t* keyval = value->keyvals[k];
-                if (strcmp(key, keyval->key) == 0)
-                        return keyval->value.strptr;
+    for(k=0; k<value->cnt; k++) {
+		orte_gpr_keyval_t* keyval = value->keyvals[k];
+        if (strcmp(key, keyval->key) == 0) {
+#if ORTE_VERSION_1_0
+            tmp_str = keyval->value.strptr;
+#else /* ORTE_VERSION_1_0 */
+            if( orte_dss.get( (void **) &tmp_str, keyval->value, ORTE_STRING) != ORTE_SUCCESS )
+				return "";
+#endif /* ORTE_VERSION_1_0 */
+			return tmp_str;
         }
+	}
 
-        return "";
+    return "";
 }
 
 static int
 get_proc_attribute(orte_jobid_t jobid, int proc_num, char **input_keys, int *input_types, char **input_values, int input_num_keys)
 {
-	char **keys;;
+	char **keys;
 	int rc;
+
+#if ORTE_VERSION_1_0
 	size_t cnt;
+#else /* ORTE_VERSION_1_0 */
+	orte_std_cntr_t cnt;
+#endif /* ORTE_VERSION_1_0 */
 	char *segment = NULL;
 	char *jobid_str = NULL;
 	orte_gpr_value_t **values;
@@ -2063,13 +2084,16 @@ static int
 get_num_nodes(int machid)
 {
 	int rc;
+#if ORTE_VERSION_1_0
 	size_t cnt;
+#else /* ORTE_VERSION_1_0 */
+	orte_std_cntr_t cnt;
+#endif /* ORTE_VERSION_1_0 */
 	orte_gpr_value_t **values;
 	
 	/* we're going to ignore machine ID until ORTE implements that */
 	
-	rc = orte_gpr.get(ORTE_GPR_KEYS_OR|ORTE_GPR_TOKENS_OR,
-                        ORTE_NODE_SEGMENT, NULL, NULL, &cnt, &values);
+	rc = orte_gpr.get(ORTE_GPR_KEYS_OR|ORTE_GPR_TOKENS_OR, ORTE_NODE_SEGMENT, NULL, NULL, &cnt, &values);
         
     //printf("RC = %d\n", rc); fflush(stdout);
                    
@@ -2297,7 +2321,11 @@ static int
 get_node_attribute(int machid, int node_num, char **input_keys, int *input_types, char **input_values, int input_num_keys)
 {
 	int rc;
+#if ORTE_VERSION_1_0
 	size_t cnt;
+#else /* ORTE_VERSION_1_0 */
+	orte_std_cntr_t cnt;
+#endif /* ORTE_VERSION_1_0 */
 	orte_gpr_value_t **values;
 	orte_gpr_value_t *value;
 	int i, ret, j, min, max;
@@ -2311,7 +2339,7 @@ get_node_attribute(int machid, int node_num, char **input_keys, int *input_types
 	pwd = getpwuid(geteuid());
 	gid = getgid();
 	grp = getgrgid(gid);
-#endif
+#endif /* HAVE_SYS_BPROC_H */
 
 	
 	/* ignore the machine ID until ORTE implements this part */
@@ -2325,8 +2353,7 @@ get_node_attribute(int machid, int node_num, char **input_keys, int *input_types
 	keys[input_num_keys] = NULL;
 #endif
 
-	rc = orte_gpr.get(ORTE_GPR_KEYS_OR | ORTE_GPR_TOKENS_OR,
-			ORTE_NODE_SEGMENT, NULL, NULL, &cnt, &values);
+	rc = orte_gpr.get(ORTE_GPR_KEYS_OR | ORTE_GPR_TOKENS_OR, ORTE_NODE_SEGMENT, NULL, NULL, &cnt, &values);
 	cnt = get_num_nodes(machid);
 	
 	
