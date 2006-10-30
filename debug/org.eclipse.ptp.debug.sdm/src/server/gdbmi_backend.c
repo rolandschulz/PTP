@@ -70,6 +70,7 @@ struct varmap {
 	struct varinfo * maps;
 };
 
+static char *		GDB_Version;
 static MISession *	DebugSession;
 static dbg_event *	LastEvent;
 static void			(*EventCallback)(dbg_event *, void *);
@@ -360,9 +361,13 @@ AsyncStop(void *data)
 		RemoveBPMap(bpmap);
 
 	case MIEventTypeSuspended:
-		if (get_current_frame(&frame) < 0) {
-			ERROR_TO_EVENT(e);
-		} else {
+		frame = ConvertMIFrameToStackframe(evt->frame);
+		if (frame == NULL) {
+			if (get_current_frame(&frame) < 0) {
+				ERROR_TO_EVENT(e);
+			}
+		}
+		if (frame != NULL) {
 			e = NewDbgEvent(DBGEV_SUSPEND);
 			e->dbg_event_u.suspend_event.reason = DBGEV_SUSPEND_INT;
 			e->dbg_event_u.suspend_event.thread_id = evt->threadId;
@@ -372,9 +377,13 @@ AsyncStop(void *data)
 		break;
 
 	case MIEventTypeSteppingRange:
-		if (get_current_frame(&frame) < 0) {
-			ERROR_TO_EVENT(e);
-		} else {
+		frame = ConvertMIFrameToStackframe(evt->frame);
+		if (frame == NULL) {
+			if (get_current_frame(&frame) < 0) {
+				ERROR_TO_EVENT(e);
+			}
+		}
+		if (frame != NULL) {
 			e = NewDbgEvent(DBGEV_SUSPEND);
 			e->dbg_event_u.suspend_event.reason = DBGEV_SUSPEND_STEP;
 			e->dbg_event_u.suspend_event.thread_id = evt->threadId;
@@ -384,9 +393,13 @@ AsyncStop(void *data)
 		break;
 
 	case MIEventTypeSignal:
-		if (get_current_frame(&frame) < 0) {
-			ERROR_TO_EVENT(e);
-		} else {
+		frame = ConvertMIFrameToStackframe(evt->frame);
+		if (frame == NULL) {
+			if (get_current_frame(&frame) < 0) {
+				ERROR_TO_EVENT(e);
+			}
+		}
+		if (frame != NULL) {
 			e = NewDbgEvent(DBGEV_SUSPEND);
 			e->dbg_event_u.suspend_event.reason = DBGEV_SUSPEND_SIGNAL;
 			e->dbg_event_u.suspend_event.ev_u.sig = NewSignalInfo();
@@ -453,6 +466,7 @@ GDBMIInit(void (*event_callback)(dbg_event *, void *), void *data)
 	EventCallbackData = data;
 	DebugSession = NULL;
 	LastEvent = NULL;
+	GDB_Version = NULL;
 	ServerExit = 0;
 		
 	signal(SIGTERM, SIG_IGN);
@@ -793,7 +807,14 @@ GDBMIStartSession(char *gdb_path, char *prog, char *path, char *work_dir, char *
 	MISessionRegisterEventCallback(sess, AsyncCallback);
 	
 	DebugSession = sess;
-
+	
+	cmd = MIGDBVersion();
+	SendCommandWait(sess, cmd);
+	if (MICommandResultOK(cmd)) {
+		GDB_Version = MIGetGDBVersion(cmd);
+	}
+	MICommandFree(cmd);
+	
 	Started = 0;
 	SaveEvent(NewDbgEvent(DBGEV_OK));
 
@@ -1356,8 +1377,15 @@ GetStackframes(int current, List **flist)
 	MICommand *	cmd;
 	stackframe *	s;
 	
-	if (current)
-		cmd = MIStackInfoFrame();
+	if (current) {
+		//temporary checking gdb version
+		if (strncmp(GDB_Version, "6.5", 3) == 0) {
+			cmd = MIStackInfoFrame();
+		}
+		else {
+			cmd = CLIFrame();
+		}
+	}
 	else
 		cmd = MIStackListAllFrames();
 		

@@ -21,28 +21,50 @@
  * @author Clement chu
  * 
  */
-
+ 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "MIString.h"
-#include "MICommand.h"
+#include "MIValue.h"
+#include "MIResult.h"
+#include "MIMemory.h"
+#include "MIOOBRecord.h"
 
-MICommand * 
-CLIListSignals(char *name) {
-	MICommand * cmd;
-	cmd = MICommandNew("info signals", MIResultRecordDONE);
-	if (name != NULL) {
-		MICommandAddOption(cmd, name, NULL);
-	}	
-	return cmd;
-}
+char * 
+MIGetGDBVersion(MICommand *cmd)
+{
+	List *oobs;
+	MIOOBRecord *oob;
+	char *text;
+	char * pch;
 	
-MICommand * 
-CLISignalInfo(char *arg) {
-	MICommand * cmd;
-	cmd = MICommandNew("signal", MIResultRecordDONE);
-	MICommandAddOption(cmd, arg, NULL);
-	return cmd;
-}	
+	if (!cmd->completed || cmd->output == NULL || cmd->output->oobs == NULL) {
+		return NULL;
+	}
+
+	if (cmd->output->rr != NULL && cmd->output->rr->resultClass == MIResultRecordERROR) {
+		return NULL;
+	}
+
+	oobs = cmd->output->oobs;
+	for (SetList(oobs); (oob = (MIOOBRecord *)GetListElement(oobs)) != NULL; ) {
+		text = oob->cstring;
+		if (*text == '\0') {
+			continue;
+		}
+		while (*text == ' ') {
+			*text++;
+		}
+
+		if (strncmp(text, "GNU gdb", 7) == 0) {
+			text += 8; //bypass "GUN gdb "
+			pch = strchr(text, '\\');
+			if (pch != NULL) {
+				*pch = '\0';
+				return strdup(text);
+			}
+		}
+	}
+	return NULL;
+}

@@ -24,8 +24,49 @@
 #include "MICommand.h"
 
 MICommand *
+CLIHandle(char *arg) {
+	MICommand * cmd;
+	cmd = MICommandNew("handle", MIResultRecordDONE);
+	MICommandAddOption(cmd, arg, NULL);
+	return cmd;
+}
+
+MICommand *
 CLIInfoThreads(void) {
 	MICommand * cmd;
 	cmd = MICommandNew("info threads", MIResultRecordDONE);
 	return cmd;
 }
+
+MICommand *
+CLIPType(char *name) {
+	MICommand * cmd;
+	cmd = MICommandNew("ptype", MIResultRecordDONE);
+	MICommandAddOption(cmd, name, NULL);
+	return cmd;
+}
+
+MICommand * 
+CLIListSignals(char *name) {
+	MICommand * cmd;
+	cmd = MICommandNew("info signals", MIResultRecordDONE);
+	if (name != NULL) {
+		MICommandAddOption(cmd, name, NULL);
+	}	
+	return cmd;
+}
+	
+MICommand * 
+CLISignalInfo(char *arg) {
+	MICommand * cmd;
+	cmd = MICommandNew("signal", MIResultRecordDONE);
+	MICommandAddOption(cmd, arg, NULL);
+	return cmd;
+}	
+
+MICommand * 
+CLIFrame(void) {
+	MICommand * cmd;
+	cmd = MICommandNew("frame", MIResultRecordDONE);
+	return cmd;
+}	

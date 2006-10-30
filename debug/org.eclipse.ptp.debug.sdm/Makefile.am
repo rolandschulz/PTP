@@ -75,10 +75,8 @@ libmi_a_SOURCES =		src/mi/MIParser.c \
 						src/mi/MIThreadCommand.c \
 						src/mi/MIMemory.c \
 						src/mi/MIMemoryCommand.c \
-						src/mi/CLISigHandle.c \
-						src/mi/CLIHandleCommand.c \
-						src/mi/CLISignalCommand.c \
-						src/mi/CLIPTypeCommand.c \
-						src/mi/CLIInfoThreadsCommand.c
+						src/mi/MIGDB.c \
+						src/mi/CLICommand.c \
+						src/mi/CLISigHandle.c
 						
 libmi_a_CFLAGS =			-I./include -I$(UTILS)/include $(AM_CFLAGS) -g 
