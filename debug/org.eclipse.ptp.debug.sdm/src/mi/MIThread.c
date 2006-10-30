@@ -33,11 +33,11 @@
 #include "MIThread.h"
 #include "MIOOBRecord.h"
 
-MIThreadInfo *
-MIThreadInfoNew(void) 
+MIInfoThreadsInfo *
+MIInfoThreadsInfoNew(void) 
 {
-	MIThreadInfo * info;
-	info = (MIThreadInfo *)malloc(sizeof(MIThreadInfo));
+	MIInfoThreadsInfo * info;
+	info = (MIInfoThreadsInfo *)malloc(sizeof(MIInfoThreadsInfo));
 	info->current_thread_id = 0;
 	info->thread_ids = NULL;
 	return info;
@@ -53,27 +53,39 @@ MIThreadSelectInfoNew(void)
 	return info;
 }
 
-MIThreadInfo *
-MIGetInfoThreads(MICommand *cmd) 
+MIInfoThreadsInfo *
+MIGetInfoThreadsInfo(MICommand *cmd) 
 {
 	List *oobs;
 	MIOOBRecord *oob;
-	MIThreadInfo * info = MIThreadInfoNew();
+	MIInfoThreadsInfo * info = MIInfoThreadsInfoNew();
 	char * text = NULL;
 	char * id = NULL;
 
+	printf("&&&&&&&&&&&&&&& text A\n");
 	if (!cmd->completed || cmd->output == NULL || cmd->output->oobs == NULL) {
+		if (cmd->output == NULL) {
+			printf("&&&&&&&&&&&&&&& text A1 output NULL\n");
+		}
+		else if (cmd->output->oobs == NULL) {
+			printf("&&&&&&&&&&&&&&& text A1 output->oobs NULL\n");
+		}
 		return info;
 	}
 
+	printf("&&&&&&&&&&&&&&& text B\n");
 	if (cmd->output->rr != NULL && cmd->output->rr->resultClass == MIResultRecordERROR) {
+	printf("&&&&&&&&&&&&&&& text B1\n");
 		return info;
 	}
 
 	oobs = cmd->output->oobs;
 	info->thread_ids = NewList();
+	printf("&&&&&&&&&&&&&&& text C\n");
 	for (SetList(oobs); (oob = (MIOOBRecord *)GetListElement(oobs)) != NULL; ) {
 		text = oob->cstring;
+		printf("&&&&&&&&&&&&&&& text: %s\n", text);
+		
 		if (*text == '\0') {
 			continue;
 		}
@@ -84,10 +96,12 @@ MIGetInfoThreads(MICommand *cmd)
 			text += 2;//escape "* ";
 			if (isdigit(*text)) {
 				info->current_thread_id = strtol(text, &text, 10);
+				printf("&&&&&&&&&&&&&&& id: %d\n", info->current_thread_id);
 			}
 			continue;
 		}
 		if (isdigit(*text)) {
+			printf("&&&&&&&&&&&&&&& text2: %s\n", text);
 			if (info->thread_ids == NULL)
 				info->thread_ids = NewList();
 
@@ -98,6 +112,7 @@ MIGetInfoThreads(MICommand *cmd)
 			}
 		}
 	}
+	printf("&&&&&&&&&&&&&&& text C1\n");
 	return info;
 }
 

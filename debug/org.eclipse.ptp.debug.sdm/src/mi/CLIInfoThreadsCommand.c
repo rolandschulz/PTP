@@ -13,37 +13,19 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * LA-CC 04-115
  ******************************************************************************/
  
- /*
-  * Based on the QNX Java implementation of the MI interface
-  */
-
-#ifndef _MITHREAD_H_
-#define _MITHREAD_H_
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "MICommand.h"
-#include "MIValue.h"
-#include "MIFrame.h"
 
-struct MIInfoThreadsInfo {
-	int current_thread_id;
-	List * thread_ids;
-};
-typedef struct MIInfoThreadsInfo MIInfoThreadsInfo;
-
-struct MIThreadSelectInfo {
-	int current_thread_id;
-	MIFrame * frame;
-};
-typedef struct MIThreadSelectInfo MIThreadSelectInfo;
-
-extern MIInfoThreadsInfo *MIInfoThreadsInfoNew(void);
-extern MIThreadSelectInfo *MIThreadSelectInfoNew(void);
-extern MIInfoThreadsInfo *MIGetInfoThreadsInfo(MICommand *cmd);
-extern MIThreadSelectInfo *MISetThreadSelectInfo(MICommand *cmd);
-
-#endif /* _MITHREAD_H_ */
-
+MICommand *
+CLIInfoThreads(void) {
+	MICommand * cmd;
+	cmd = MICommandNew("info threads", MIResultRecordDONE);
+	return cmd;
+}
