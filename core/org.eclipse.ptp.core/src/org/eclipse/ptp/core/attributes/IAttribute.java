@@ -20,6 +20,43 @@ package org.eclipse.ptp.core.attributes;
 
 public interface IAttribute extends Comparable {
 
+	/**
+	 * @author rsqrd
+	 *
+	 */
+	public static class IllegalValue extends Exception {
+	
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 2366875582524976226L;
+	
+		public IllegalValue(String message) {
+			super(message);
+		}
+	
+		public IllegalValue(String message, Throwable cause) {
+			super(message, cause);
+		}
+	
+		public IllegalValue(Throwable cause) {
+			super(cause);
+		}
+	
+	}
+
+	/**
+	 * Creates a new attribute of the same type given the string representation.
+	 * 
+	 * @param string
+	 * @return a new attribute of the same type.
+	 * @throws IllegalValue
+	 */
+	IAttribute create(String string) throws IllegalValue;
+	
+	/**
+	 * @return the description object associated with this attribute
+	 */
 	IAttributeDescription getDescription();
 	
 	/**

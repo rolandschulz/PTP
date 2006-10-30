@@ -18,7 +18,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.attributes;
 
-
 public final class MutableDoubleAttribute extends AbstractAttribute implements IMutableAttribute {
 
 	private Double value;
@@ -28,6 +27,24 @@ public final class MutableDoubleAttribute extends AbstractAttribute implements I
 		this.value = Double.valueOf(value);
 	}
 
+	public MutableDoubleAttribute(IAttributeDescription description, String string)
+	throws IllegalValue {
+		super(description);
+		try {
+			this.value = Double.valueOf(string);
+		}
+		catch (NumberFormatException e) {
+			throw new IAttribute.IllegalValue(e);
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.attributes.IAttribute#create(java.lang.String)
+	 */
+	public IAttribute create(String string) throws IllegalValue {
+		return new MutableDoubleAttribute(getDescription(), string);
+	}
+	
 	public boolean equals(Object obj) {
 		if (obj instanceof MutableDoubleAttribute) {
 			MutableDoubleAttribute attr = (MutableDoubleAttribute) obj;
@@ -39,7 +56,7 @@ public final class MutableDoubleAttribute extends AbstractAttribute implements I
 	public String getStringRep() {
 		return value.toString();
 	}
-	
+
 	public double getValue() {
 		return value.doubleValue();
 	}
@@ -58,12 +75,12 @@ public final class MutableDoubleAttribute extends AbstractAttribute implements I
 		}
 	}
 
-	public void setValue(String string) throws IllegalValue {
+	public void setValue(String string) throws IAttribute.IllegalValue {
 		try {
 			value = Double.valueOf(string);
 		}
 		catch (NumberFormatException e) {
-			throw new IllegalValue(e);
+			throw new IAttribute.IllegalValue(e);
 		}
 	}
 

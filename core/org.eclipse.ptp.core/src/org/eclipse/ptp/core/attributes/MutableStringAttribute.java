@@ -21,10 +21,20 @@ package org.eclipse.ptp.core.attributes;
 public final class MutableStringAttribute extends AbstractAttribute implements IMutableAttribute {
 
 	private StringBuffer value;
+	public MutableStringAttribute(IAttributeDescription description, String string) {
+		this(description, new StringBuffer(string));
+	}
 	
 	public MutableStringAttribute(IAttributeDescription description, StringBuffer value) {
 		super(description);
 		this.value = value;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.attributes.IAttribute#create(java.lang.String)
+	 */
+	public IAttribute create(String string) throws IllegalValue {
+		return new MutableStringAttribute(getDescription(), string);
 	}
 
 	public boolean equals(Object obj) {
@@ -51,7 +61,7 @@ public final class MutableStringAttribute extends AbstractAttribute implements I
 		return true;
 	}
 
-	public void setValue(String string) throws IllegalValue {
+	public void setValue(String string) throws IAttribute.IllegalValue {
 		this.value.replace(0, this.value.length(), string);
 	}
 

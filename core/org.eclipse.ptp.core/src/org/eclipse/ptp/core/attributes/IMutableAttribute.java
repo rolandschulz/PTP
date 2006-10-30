@@ -21,31 +21,6 @@ package org.eclipse.ptp.core.attributes;
 public interface IMutableAttribute extends IAttribute {
 	
 	/**
-	 * @author rsqrd
-	 *
-	 */
-	public static class IllegalValue extends Exception {
-
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 2366875582524976226L;
-
-		public IllegalValue(String message) {
-			super(message);
-		}
-
-		public IllegalValue(Throwable cause) {
-			super(cause);
-		}
-
-		public IllegalValue(String message, Throwable cause) {
-			super(message, cause);
-		}
-
-	}
-
-	/**
 	 * Is the string a parsable to a valid
 	 * attribute of this type?
 	 * 
@@ -56,7 +31,7 @@ public interface IMutableAttribute extends IAttribute {
 		
 	/**
 	 * @param string
-	 * @throws IllegalValue
+	 * @throws IAttribute.IllegalValue
 	 */
-	void setValue(String string) throws IllegalValue;
+	void setValue(String string) throws IAttribute.IllegalValue;
 }

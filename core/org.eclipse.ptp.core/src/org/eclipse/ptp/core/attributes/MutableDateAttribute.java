@@ -30,7 +30,7 @@ public final class MutableDateAttribute extends AbstractAttribute implements
 
 	private static DateFormat[] dateFormats = null;
 
-	public static void main(String[] args) throws IllegalValue {
+	public static void main(String[] args) throws IAttribute.IllegalValue {
 		Calendar cal = Calendar.getInstance();
 		MutableDateAttribute mda = new MutableDateAttribute(
 				new AttributeDescription("name", "desc"), cal);
@@ -67,8 +67,8 @@ public final class MutableDateAttribute extends AbstractAttribute implements
 	}
 
 	protected final DateFormat outputDateFormat;
-	protected Calendar value;
 
+	protected Calendar value;
 	public MutableDateAttribute(IAttributeDescription description, Calendar value) {
 		this(description, value, DateFormat.getDateTimeInstance());
 	}
@@ -92,6 +92,26 @@ public final class MutableDateAttribute extends AbstractAttribute implements
 		this.value.setTime(date);
 	}
 
+	public MutableDateAttribute(IAttributeDescription description, String string)
+	throws IllegalValue {
+		super(description);
+		this.outputDateFormat = DateFormat.getDateTimeInstance();
+		final Date date = parseString(string);
+		if (date == null) {
+			throw new IllegalValue("Unable to parse \"" + string
+					+ "\" into a date");
+		}
+		this.value = Calendar.getInstance();
+		this.value.setTime(date);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.attributes.IAttribute#create(java.lang.String)
+	 */
+	public IAttribute create(String string) throws IllegalValue {
+		return new MutableDateAttribute(getDescription(), string);
+	}
+
 	public boolean equals(Object obj) {
 		if (obj instanceof MutableDateAttribute) {
 			MutableDateAttribute attr = (MutableDateAttribute) obj;
@@ -99,7 +119,7 @@ public final class MutableDateAttribute extends AbstractAttribute implements
 		}
 		return false;
 	}
-
+	
 	public Calendar getCalendar() {
 		return (Calendar) value.clone();
 	}
@@ -107,7 +127,7 @@ public final class MutableDateAttribute extends AbstractAttribute implements
 	public Date getDate() {
 		return value.getTime();
 	}
-	
+
 	public String getStringRep() {
 		return outputDateFormat.format(value.getTime());
 	}
@@ -124,10 +144,10 @@ public final class MutableDateAttribute extends AbstractAttribute implements
 		return true;
 	}
 
-	public void setValue(String string) throws IllegalValue {
+	public void setValue(String string) throws IAttribute.IllegalValue {
 		final Date date = parseString(string);
 		if (date == null) {
-			throw new IllegalValue("Unable to parse \"" + string
+			throw new IAttribute.IllegalValue("Unable to parse \"" + string
 					+ "\" into a date");
 		}
 		value.setTime(date);

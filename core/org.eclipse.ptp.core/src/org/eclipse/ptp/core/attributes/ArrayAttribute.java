@@ -77,6 +77,13 @@ public final class ArrayAttribute extends AbstractAttribute {
 		this.attributes = (IAttribute[]) attributes.clone();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.attributes.IAttribute#create(java.lang.String)
+	 */
+	public IAttribute create(String string) throws IllegalValue {
+		throw new IllegalValue("Cannot create an ArrayAttribute from a String representation.");
+	}
+
 	public boolean equals(Object obj) {
 		if (obj instanceof ArrayAttribute) {
 			ArrayAttribute attr = (ArrayAttribute) obj;

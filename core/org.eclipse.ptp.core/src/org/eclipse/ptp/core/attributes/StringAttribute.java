@@ -27,6 +27,10 @@ public final class StringAttribute extends AbstractAttribute {
 		this.value = value;
 	}
 
+	public IAttribute create(String string) {
+		return new StringAttribute(getDescription(), string);
+	}
+
 	public boolean equals(Object obj) {
 		if (obj instanceof StringAttribute) {
 			StringAttribute attr = (StringAttribute) obj;

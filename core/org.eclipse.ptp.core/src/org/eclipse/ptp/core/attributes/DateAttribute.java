@@ -29,10 +29,10 @@ public final class DateAttribute implements IAttribute {
 	public DateAttribute(IAttributeDescription description, Calendar value) {
 		this(description, value, DateFormat.getDateTimeInstance());
 	}
-
+	
 	public DateAttribute(IAttributeDescription description, Calendar value,
 			DateFormat outputDateFormat) {
-		this.value = new MutableDateAttribute(description, value, outputDateFormat);
+		this(new MutableDateAttribute(description, value, outputDateFormat));
 	}
 
 	public DateAttribute(IAttributeDescription description, Date date) {
@@ -41,12 +41,25 @@ public final class DateAttribute implements IAttribute {
 
 	public DateAttribute(IAttributeDescription description, Date date,
 			DateFormat outputDateFormat) {
-		value = new MutableDateAttribute(description, date, outputDateFormat);
+		this(new MutableDateAttribute(description, date, outputDateFormat));
+	}
+
+	public DateAttribute(IAttributeDescription description, String string) throws IllegalValue {
+		this(new MutableDateAttribute(description, string));
+	}
+
+	private DateAttribute(MutableDateAttribute mda) {
+		this.value = mda;
 	}
 
 	public int compareTo(Object arg0) {
 		DateAttribute attr = (DateAttribute) arg0;
 		return value.compareTo(attr.value);
+	}
+
+	public IAttribute create(String string) throws IllegalValue {
+		MutableDateAttribute mda = new MutableDateAttribute(getDescription(), string);
+		return new DateAttribute(mda);
 	}
 
 	public boolean equals(Object obj) {

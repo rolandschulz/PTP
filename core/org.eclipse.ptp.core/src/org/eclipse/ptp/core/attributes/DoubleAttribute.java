@@ -27,6 +27,20 @@ public final class DoubleAttribute extends AbstractAttribute {
 		this.value = Double.valueOf(value);
 	}
 
+	public DoubleAttribute(IAttributeDescription description, String string) throws IllegalValue {
+		super(description);
+		try {
+			this.value = Double.valueOf(string);
+		}
+		catch (NumberFormatException e) {
+			throw new IllegalValue(e);
+		}
+	}
+
+	public IAttribute create(String string) throws IllegalValue {
+		return new DoubleAttribute(getDescription(), string);
+	}
+
 	public boolean equals(Object obj) {
 		if (obj instanceof DoubleAttribute) {
 			DoubleAttribute attr = (DoubleAttribute) obj;
