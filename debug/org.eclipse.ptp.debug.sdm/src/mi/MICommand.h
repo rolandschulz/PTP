@@ -53,6 +53,7 @@ extern char *MICommandToString(MICommand *cmd);
 extern MICommand *MIGDBSet(char *, char *);
 extern MICommand *MIGDBExit(void);
 extern MICommand *MIGDBShowEndian(void);
+extern MICommand *MIGDBVersion(void);
 
 /*
  * -exec-* commands
@@ -86,6 +87,7 @@ extern MICommand *MIStackListArguments(int vals, int low, int high);
 extern MICommand *MIStackListAllArguments(int vals);
 extern MICommand *MIStackInfoFrame(void);
 extern MICommand *MIStackInfoDepth(void);
+extern MICommand *CLIFrame(void);
 
 /*
  * -var-* commands
