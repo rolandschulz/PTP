@@ -18,7 +18,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.attributes;
 
-
 public final class MutableIntegerAttribute extends AbstractAttribute implements IMutableAttribute {
 
 	private Integer value;
@@ -26,6 +25,24 @@ public final class MutableIntegerAttribute extends AbstractAttribute implements 
 	public MutableIntegerAttribute(IAttributeDescription description, int value) {
 		super(description);
 		this.value = Integer.valueOf(value);
+	}
+
+	public MutableIntegerAttribute(IAttributeDescription description, String string)
+	throws IllegalValue {
+		super(description);
+		try {
+			this.value = Integer.valueOf(string);
+		}
+		catch (NumberFormatException e) {
+			throw new IllegalValue(e);
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.attributes.IAttribute#create(java.lang.String)
+	 */
+	public IAttribute create(String string) throws IllegalValue {
+		return new MutableIntegerAttribute(getDescription(), string);
 	}
 
 	public boolean equals(Object obj) {
@@ -58,12 +75,12 @@ public final class MutableIntegerAttribute extends AbstractAttribute implements 
 		}
 	}
 
-	public void setValue(String string) throws IllegalValue {
+	public void setValue(String string) throws IAttribute.IllegalValue {
 		try {
 			value = Integer.valueOf(string);
 		}
 		catch (NumberFormatException e) {
-			throw new IllegalValue(e);
+			throw new IAttribute.IllegalValue(e);
 		}
 	}
 

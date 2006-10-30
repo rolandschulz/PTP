@@ -27,6 +27,23 @@ public final class IntegerAttribute extends AbstractAttribute {
 		this.value = Integer.valueOf(value);
 	}
 
+	public IntegerAttribute(IAttributeDescription description, String string) throws IllegalValue {
+		super(description);
+		try {
+			this.value = Integer.valueOf(string);
+		}
+		catch (NumberFormatException e) {
+			throw new IllegalValue(e);
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.attributes.IAttribute#create(java.lang.String)
+	 */
+	public IAttribute create(String string) throws IllegalValue {
+		return new IntegerAttribute(getDescription(), string);
+	}
+
 	public boolean equals(Object obj) {
 		if (obj instanceof IntegerAttribute) {
 			IntegerAttribute attr = (IntegerAttribute) obj;
