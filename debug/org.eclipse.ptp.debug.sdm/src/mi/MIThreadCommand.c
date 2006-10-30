@@ -23,6 +23,7 @@
 
 #include "MICommand.h"
 
+/*
 MICommand *
 MIInfoThreads(void)
 {
@@ -30,6 +31,7 @@ MIInfoThreads(void)
 	cmd = MICommandNew("info threads", MIResultRecordDONE);
 	return cmd;
 }
+*/
 
 MICommand *
 MIThreadSelect(int threadNum)

@@ -2224,11 +2224,11 @@ GDBMIGetInfoThread(void)
 	MICommand *	cmd;
 	dbg_event *	e;
 	char *		tid;
-	MIThreadInfo *	info;
+	MIInfoThreadsInfo *	info;
 	
 	CHECK_SESSION();
 	
-	cmd = MIInfoThreads();
+	cmd = CLIInfoThreads();
 	SendCommandWait(DebugSession, cmd);
 	if (!MICommandResultOK(cmd)) {
 		DEBUG_PRINTS("------------------- GDBMIGetInfoThread error\n");		
@@ -2236,7 +2236,7 @@ GDBMIGetInfoThread(void)
 		MICommandFree(cmd);
 		return DBGRES_ERR;
 	}
-	info = MIGetInfoThreads(cmd);
+	info = MIGetInfoThreadsInfo(cmd);
 	MICommandFree(cmd);
 	
 	e = NewDbgEvent(DBGEV_THREADS);

@@ -86,6 +86,7 @@ MICommand *
 MIStackInfoFrame(void)
 {
 	return MICommandNew("-stack-info-frame", MIResultRecordDONE);
+	//return MICommandNew("frame", MIResultRecordDONE);
 }
 
 MICommand *

@@ -100,7 +100,7 @@ extern MICommand *MIVarUpdate(char *name);
 /*
  * -thread-* commands
  */
-extern MICommand *MIInfoThreads(void);
+extern MICommand *CLIInfoThreads(void);
 extern MICommand *MIThreadSelect(int threadNum);
 
 /*
