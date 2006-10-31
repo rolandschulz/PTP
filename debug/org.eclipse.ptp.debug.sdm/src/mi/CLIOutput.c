@@ -27,7 +27,7 @@
 #include <string.h>
 
 #include "MIOOBRecord.h"
-#include "CLISigHandle.h"
+#include "CLIOutput.h"
 
 #include "signalinfo.h"
 
@@ -110,4 +110,138 @@ CLIGetSigHandleList(MICommand *cmd, List** signals)
 			AddToList(*signals, (void *)sig);			
 		}
 	}
+}
+
+double 
+CLIGetGDBVersion(MICommand *cmd)
+{
+	List *oobs;
+	MIOOBRecord *oob;
+	char *text;
+	char * pch;
+	
+	if (!cmd->completed || cmd->output == NULL || cmd->output->oobs == NULL) {
+		return -1.0;
+	}
+
+	if (cmd->output->rr != NULL && cmd->output->rr->resultClass == MIResultRecordERROR) {
+		return -1.0;
+	}
+
+	oobs = cmd->output->oobs;
+	for (SetList(oobs); (oob = (MIOOBRecord *)GetListElement(oobs)) != NULL; ) {
+		text = oob->cstring;
+		if (*text == '\0') {
+			continue;
+		}
+		while (*text == ' ') {
+			*text++;
+		}
+
+		if (strncmp(text, "GNU gdb", 7) == 0) {
+			text += 8; //bypass "GUN gdb "
+			pch = strchr(text, '\\');
+			if (pch != NULL) {
+				*pch = '\0';
+				return atof(strdup(text));
+			}
+		}
+	}
+	return -1.0;
+}
+
+char *
+CLIGetPTypeInfo(MICommand *cmd) {
+	List *oobs;
+	MIOOBRecord *oob;
+	char *text = NULL;
+	char *p = NULL;
+
+	if (!cmd->completed || cmd->output == NULL || cmd->output->oobs == NULL)
+		return NULL;
+
+	oobs = cmd->output->oobs;
+	for (SetList(oobs); (oob = (MIOOBRecord *)GetListElement(oobs)) != NULL; ) {
+		text = oob->cstring;
+		if (*text == '\0') {
+			continue;
+		}
+		while (*text == ' ') {
+			*text++;
+		}
+
+		if (strncmp(text, "type", 4) == 0) {
+			text += 7; //bypass " = "
+			p = strchr(text, '{');
+			if (p != NULL) {
+				*p-- = '\0';//remove the whitespace before {
+				return strdup(text);
+			}
+			p = strchr(text, '\\');
+			if (p != NULL) {
+				*p = '\0';
+				return strdup(text);
+			}
+		}
+	}
+	return NULL;
+}
+
+CLIInfoThreadsInfo *
+CLIInfoThreadsInfoNew(void) 
+{
+	CLIInfoThreadsInfo * info;
+	info = (CLIInfoThreadsInfo *)malloc(sizeof(CLIInfoThreadsInfo));
+	info->current_thread_id = 1;
+	info->thread_ids = NULL;
+	return info;
+}
+
+CLIInfoThreadsInfo *
+CLIGetInfoThreadsInfo(MICommand *cmd) 
+{
+	List *oobs;
+	MIOOBRecord *oob;
+	CLIInfoThreadsInfo * info = CLIInfoThreadsInfoNew();
+	char * text = NULL;
+	char * id = NULL;
+
+	if (!cmd->completed || cmd->output == NULL || cmd->output->oobs == NULL) {
+		return info;
+	}
+
+	if (cmd->output->rr != NULL && cmd->output->rr->resultClass == MIResultRecordERROR) {
+		return info;
+	}
+
+	oobs = cmd->output->oobs;
+	info->thread_ids = NewList();
+	for (SetList(oobs); (oob = (MIOOBRecord *)GetListElement(oobs)) != NULL; ) {
+		text = oob->cstring;
+		
+		if (*text == '\0') {
+			continue;
+		}
+		while (*text == ' ') {
+			*text++;
+		}
+		if (strncmp(text, "*", 1) == 0) {
+			text += 2;//escape "* ";
+			if (isdigit(*text)) {
+				info->current_thread_id = strtol(text, &text, 10);
+			}
+			continue;
+		}
+		if (isdigit(*text)) {
+			if (info->thread_ids == NULL)
+				info->thread_ids = NewList();
+
+			id = strchr(text, ' ');
+			if (id != NULL) {
+				*id = '\0';
+				AddToList(info->thread_ids, (void *)strdup(text));
+			}
+		}
+	}
+	return info;
 }

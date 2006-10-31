@@ -85,13 +85,15 @@ MIStackListAllArguments(int vals)
 MICommand *
 MIStackInfoFrame(void)
 {
-	return MICommandNew("-stack-info-frame", MIResultRecordDONE);
+	MICommand * cmd;
+	cmd = MICommandNew("-stack-info-frame", MIResultRecordDONE);
+	return cmd;
 }
 
 MICommand *
 MIStackInfoDepth(void)
 {
-		MICommand * cmd;
-		cmd = MICommandNew("-stack-info-depth", MIResultRecordDONE);
-		return cmd;
+	MICommand * cmd;
+	cmd = MICommandNew("-stack-info-depth", MIResultRecordDONE);
+	return cmd;
 }

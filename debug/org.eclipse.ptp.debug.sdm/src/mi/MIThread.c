@@ -33,16 +33,6 @@
 #include "MIThread.h"
 #include "MIOOBRecord.h"
 
-MIInfoThreadsInfo *
-MIInfoThreadsInfoNew(void) 
-{
-	MIInfoThreadsInfo * info;
-	info = (MIInfoThreadsInfo *)malloc(sizeof(MIInfoThreadsInfo));
-	info->current_thread_id = 1;
-	info->thread_ids = NULL;
-	return info;
-}
-
 MIThreadSelectInfo *
 MIThreadSelectInfoNew(void) 
 {
@@ -50,55 +40,6 @@ MIThreadSelectInfoNew(void)
 	info = (MIThreadSelectInfo *)malloc(sizeof(MIThreadSelectInfo));
 	info->current_thread_id = 0;
 	info->frame = NULL;
-	return info;
-}
-
-MIInfoThreadsInfo *
-MIGetInfoThreadsInfo(MICommand *cmd) 
-{
-	List *oobs;
-	MIOOBRecord *oob;
-	MIInfoThreadsInfo * info = MIInfoThreadsInfoNew();
-	char * text = NULL;
-	char * id = NULL;
-
-	if (!cmd->completed || cmd->output == NULL || cmd->output->oobs == NULL) {
-		return info;
-	}
-
-	if (cmd->output->rr != NULL && cmd->output->rr->resultClass == MIResultRecordERROR) {
-		return info;
-	}
-
-	oobs = cmd->output->oobs;
-	info->thread_ids = NewList();
-	for (SetList(oobs); (oob = (MIOOBRecord *)GetListElement(oobs)) != NULL; ) {
-		text = oob->cstring;
-		
-		if (*text == '\0') {
-			continue;
-		}
-		while (*text == ' ') {
-			*text++;
-		}
-		if (strncmp(text, "*", 1) == 0) {
-			text += 2;//escape "* ";
-			if (isdigit(*text)) {
-				info->current_thread_id = strtol(text, &text, 10);
-			}
-			continue;
-		}
-		if (isdigit(*text)) {
-			if (info->thread_ids == NULL)
-				info->thread_ids = NewList();
-
-			id = strchr(text, ' ');
-			if (id != NULL) {
-				*id = '\0';
-				AddToList(info->thread_ids, (void *)strdup(text));
-			}
-		}
-	}
 	return info;
 }
 

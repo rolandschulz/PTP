@@ -226,43 +226,6 @@ MIGetDataEvaluateExpressionInfo(MICommand *cmd)
 	return expr;
 }
 
-char *
-MIGetDetailsType(MICommand *cmd) {
-	List *oobs;
-	MIOOBRecord *oob;
-	char *text = NULL;
-	char *p = NULL;
-
-	if (!cmd->completed || cmd->output == NULL || cmd->output->oobs == NULL)
-		return NULL;
-
-	oobs = cmd->output->oobs;
-	for (SetList(oobs); (oob = (MIOOBRecord *)GetListElement(oobs)) != NULL; ) {
-		text = oob->cstring;
-		if (*text == '\0') {
-			continue;
-		}
-		while (*text == ' ') {
-			*text++;
-		}
-
-		if (strncmp(text, "type", 4) == 0) {
-			text += 7; //bypass " = "
-			p = strchr(text, '{');
-			if (p != NULL) {
-				*p-- = '\0';//remove the whitespace before {
-				return strdup(text);
-			}
-			p = strchr(text, '\\');
-			if (p != NULL) {
-				*p = '\0';
-				return strdup(text);
-			}
-		}
-	}
-	return NULL;
-}
-
 void
 MIGetVarUpdateParseValue(MIValue* tuple, List* varchanges)
 {
