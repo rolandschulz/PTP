@@ -79,6 +79,7 @@
 #define ORTE_SUBSCRIBE(jobid,cbfunc,cbdata,cond)		orte_smr.job_stage_gate_subscribe(jobid,cbfunc,cbdata,cond)
 #define ORTE_PACK(buf,cmd,num,type)						orte_dss.pack(buf,cmd,num,type)
 #define ORTE_STAGE_GATE_INIT(jobid)						orte_rmgr_base_proc_stage_gate_init(jobid)
+#define ORTE_GET_VPID_RANGE(jobid, start, range)		orte_rmgr.get_vpid_range(jobid, start, range)
 #define ORTE_KEYVALUE_TYPE(keyval)						(keyval)->value->type
 #define ORTE_NOTIFY_ALL									ORTE_PROC_STATE_ALL
 #define ORTE_STD_CNTR_TYPE								orte_std_cntr_t
@@ -107,6 +108,16 @@ static int
 ORTE_STAGE_GATE_INIT(orte_jobid_t jobid)
 {
 	return ORTE_SUCCESS;
+}
+
+static int get_num_procs(orte_jobid_t jobid);
+
+static int
+ORTE_GET_VPID_RANGE(orte_jobid_t jobid, int *start, int *range)
+{
+	*start = 0;
+	*range = get_num_procs(jobid);
+	return 0;
 }
 #else /* ORTE_VERSION_1_0 */
 static int
