@@ -22,49 +22,22 @@
  * 
  */
  
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#ifndef _CLISIGHANDLE_H_
+#define _CLISIGHANDLE_H_
 
-#include "MIValue.h"
-#include "MIResult.h"
-#include "MIMemory.h"
-#include "MIOOBRecord.h"
+#include "list.h"
+#include "MICommand.h"
 
-char * 
-MIGetGDBVersion(MICommand *cmd)
-{
-	List *oobs;
-	MIOOBRecord *oob;
-	char *text;
-	char * pch;
-	
-	if (!cmd->completed || cmd->output == NULL || cmd->output->oobs == NULL) {
-		return NULL;
-	}
+struct CLIInfoThreadsInfo {
+	int current_thread_id;
+	List * thread_ids;
+};
+typedef struct CLIInfoThreadsInfo CLIInfoThreadsInfo;
 
-	if (cmd->output->rr != NULL && cmd->output->rr->resultClass == MIResultRecordERROR) {
-		return NULL;
-	}
+extern void CLIGetSigHandleList(MICommand *cmd, List **signals);
+extern double CLIGetGDBVersion(MICommand *cmd);
+extern char *CLIGetPTypeInfo(MICommand *cmd);
+extern CLIInfoThreadsInfo *CLIInfoThreadsInfoNew(void);
+extern CLIInfoThreadsInfo *CLIGetInfoThreadsInfo(MICommand *cmd);
 
-	oobs = cmd->output->oobs;
-	for (SetList(oobs); (oob = (MIOOBRecord *)GetListElement(oobs)) != NULL; ) {
-		text = oob->cstring;
-		if (*text == '\0') {
-			continue;
-		}
-		while (*text == ' ') {
-			*text++;
-		}
-
-		if (strncmp(text, "GNU gdb", 7) == 0) {
-			text += 8; //bypass "GUN gdb "
-			pch = strchr(text, '\\');
-			if (pch != NULL) {
-				*pch = '\0';
-				return strdup(text);
-			}
-		}
-	}
-	return NULL;
-}
+#endif /* _CLISIGHANDLE_H_ */

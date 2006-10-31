@@ -28,21 +28,13 @@
 #include "MIValue.h"
 #include "MIFrame.h"
 
-struct MIInfoThreadsInfo {
-	int current_thread_id;
-	List * thread_ids;
-};
-typedef struct MIInfoThreadsInfo MIInfoThreadsInfo;
-
 struct MIThreadSelectInfo {
 	int current_thread_id;
 	MIFrame * frame;
 };
 typedef struct MIThreadSelectInfo MIThreadSelectInfo;
 
-extern MIInfoThreadsInfo *MIInfoThreadsInfoNew(void);
 extern MIThreadSelectInfo *MIThreadSelectInfoNew(void);
-extern MIInfoThreadsInfo *MIGetInfoThreadsInfo(MICommand *cmd);
 extern MIThreadSelectInfo *MISetThreadSelectInfo(MICommand *cmd);
 
 #endif /* _MITHREAD_H_ */

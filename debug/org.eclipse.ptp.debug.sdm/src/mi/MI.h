@@ -31,6 +31,6 @@
 #include "MIArg.h"
 #include "MIError.h"
 #include "MIMemory.h"
-#include "CLISigHandle.h"
+#include "CLIOutput.h"
 
 #endif /* _MI_H_ */

@@ -70,7 +70,7 @@ struct varmap {
 	struct varinfo * maps;
 };
 
-static char *		GDB_Version;
+static double		GDB_Version;
 static MISession *	DebugSession;
 static dbg_event *	LastEvent;
 static void			(*EventCallback)(dbg_event *, void *);
@@ -466,7 +466,7 @@ GDBMIInit(void (*event_callback)(dbg_event *, void *), void *data)
 	EventCallbackData = data;
 	DebugSession = NULL;
 	LastEvent = NULL;
-	GDB_Version = NULL;
+	GDB_Version = -1.0;
 	ServerExit = 0;
 		
 	signal(SIGTERM, SIG_IGN);
@@ -811,7 +811,7 @@ GDBMIStartSession(char *gdb_path, char *prog, char *path, char *work_dir, char *
 	cmd = MIGDBVersion();
 	SendCommandWait(sess, cmd);
 	if (MICommandResultOK(cmd)) {
-		GDB_Version = MIGetGDBVersion(cmd);
+		GDB_Version = CLIGetGDBVersion(cmd);
 	}
 	MICommandFree(cmd);
 	
@@ -1378,8 +1378,8 @@ GetStackframes(int current, List **flist)
 	stackframe *	s;
 	
 	if (current) {
-		//temporary checking gdb version
-		if (strncmp(GDB_Version, "6.5", 3) == 0) {
+		//checking gdb version
+		if (GDB_Version > 6.3) {
 			cmd = MIStackInfoFrame();
 		}
 		else {
@@ -1640,7 +1640,7 @@ GetPtypeValue(char *exp)
 	
 	cmd = CLIPType(exp);
 	SendCommandWait(DebugSession, cmd);
-	type = MIGetDetailsType(cmd);
+	type = CLIGetPTypeInfo(cmd);
 	MICommandFree(cmd);
 	return type;
 }
@@ -2252,7 +2252,7 @@ GDBMIGetInfoThread(void)
 	MICommand *	cmd;
 	dbg_event *	e;
 	char *		tid;
-	MIInfoThreadsInfo *	info;
+	CLIInfoThreadsInfo *	info;
 	
 	CHECK_SESSION();
 	
@@ -2264,7 +2264,7 @@ GDBMIGetInfoThread(void)
 		MICommandFree(cmd);
 		return DBGRES_ERR;
 	}
-	info = MIGetInfoThreadsInfo(cmd);
+	info = CLIGetInfoThreadsInfo(cmd);
 	MICommandFree(cmd);
 	
 	e = NewDbgEvent(DBGEV_THREADS);
