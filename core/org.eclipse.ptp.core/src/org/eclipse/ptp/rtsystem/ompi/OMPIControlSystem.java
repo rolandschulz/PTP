@@ -297,9 +297,10 @@ public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventList
     		String stateStr = IPProcess.ERROR;
     		
     		switch(state) {
-    			case 1: case 3:
+    			case 1:
     				stateStr = IPProcess.STARTING;
     				break;
+    			case 3: 
     			case 4:
     				stateStr = IPProcess.RUNNING;
     				break;
