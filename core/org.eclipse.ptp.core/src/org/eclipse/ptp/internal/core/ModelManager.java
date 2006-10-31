@@ -430,6 +430,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		}
 		//refreshJobStatus(ne);
 	}
+	// Not currently called
 	public void runtimeNewJob(String ne) {
 		if(!controlSystem.isHealthy()) {
 			PTPCorePlugin.errorDialog("Fatal PTP Control System Error", "The PTP Control System is down.", null);
@@ -468,7 +469,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			PTPCorePlugin.errorDialog("Fatal PTP Control System Error", "The PTP Control System is down.", null);
 			return;
 		}
-		
+
 		for (int j = 0; j < ne2.length; j++) {		
 			IPProcessControl proc = new PProcess(pjob, ne+"_process"+j, "" + j + "", "0", j, IPProcess.STARTING, "", "");
 			pjob.addChild(proc);
