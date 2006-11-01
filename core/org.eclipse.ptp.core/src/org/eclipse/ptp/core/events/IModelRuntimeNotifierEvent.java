@@ -29,6 +29,7 @@ public interface IModelRuntimeNotifierEvent extends IModelEvent {
 	
 	public final static int TYPE_JOB = 0;
 	public final static int TYPE_MACHINE = 1;
+	public final static int TYPE_RESOURCEMANAGER = 2;
 
 	public String getID();
 	public int getStatus();

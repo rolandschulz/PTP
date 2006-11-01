@@ -24,6 +24,7 @@ package org.eclipse.ptp.rmsystem;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.PlatformObject;
+import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.ptp.core.IModelPresentation;
 import org.eclipse.ptp.rtsystem.IControlSystem;
 
@@ -145,17 +146,25 @@ public abstract class AbstractResourceManager extends PlatformObject implements 
 		Object[] tmpListeners = listeners.getListeners();
 		
 		for (int i = 0, n = tmpListeners.length; i < n; ++i) {
-			IResourceManagerListener listener = (IResourceManagerListener) tmpListeners[i];
-			listener.handleStarted(this);
+			final IResourceManagerListener listener = (IResourceManagerListener) tmpListeners[i];
+			SafeRunnable.run(new SafeRunnable() {
+				public void run() {
+					listener.handleStarted(AbstractResourceManager.this);
+				}
+			});
 		}
 	}
 
-	private void fireStatusChanged(ResourceManagerStatus oldStatus) {
+	private void fireStatusChanged(final ResourceManagerStatus oldStatus) {
 		Object[] tmpListeners = listeners.getListeners();
 		
 		for (int i = 0, n = tmpListeners.length; i < n; ++i) {
-			IResourceManagerListener listener = (IResourceManagerListener) tmpListeners[i];
-			listener.handleStatusChanged(oldStatus, this);
+			final IResourceManagerListener listener = (IResourceManagerListener) tmpListeners[i];
+			SafeRunnable.run(new SafeRunnable() {
+				public void run() {
+					listener.handleStatusChanged(oldStatus, AbstractResourceManager.this);
+				}
+			});
 		}
 	}
 
@@ -163,8 +172,12 @@ public abstract class AbstractResourceManager extends PlatformObject implements 
 		Object[] tmpListeners = listeners.getListeners();
 		
 		for (int i = 0, n = tmpListeners.length; i < n; ++i) {
-			IResourceManagerListener listener = (IResourceManagerListener) tmpListeners[i];
-			listener.handleStopped(this);
+			final IResourceManagerListener listener = (IResourceManagerListener) tmpListeners[i];
+			SafeRunnable.run(new SafeRunnable() {
+				public void run() {
+					listener.handleStopped(AbstractResourceManager.this);
+				}
+			});
 		}
 	}
 

@@ -94,6 +94,7 @@ public class ModelManagerResourceManager extends AbstractResourceManager impleme
 	public void modelEvent(IModelEvent event) {
 		if (event instanceof IModelRuntimeNotifierEvent) {
 			IModelRuntimeNotifierEvent runtimeEvent = (IModelRuntimeNotifierEvent)event;
+			int eventType = runtimeEvent.getType();
 			switch (runtimeEvent.getStatus()) {
 			case IModelRuntimeNotifierEvent.RUNNING:
 				setStatus(ResourceManagerStatus.STARTED, false);
@@ -101,14 +102,18 @@ public class ModelManagerResourceManager extends AbstractResourceManager impleme
 			case IModelRuntimeNotifierEvent.STARTED:
 				setStatus(ResourceManagerStatus.STARTED, false);
 				break;
-			case IModelRuntimeNotifierEvent.STOPPED:
-				manager.removeModelListener(this);
-				setStatus(ResourceManagerStatus.STOPPED, false);
-				break;
-			case IModelRuntimeNotifierEvent.ABORTED:
-				manager.removeModelListener(this);
-				setStatus(ResourceManagerStatus.STOPPED, false);
-				break;
+			}
+			if (eventType == IModelRuntimeNotifierEvent.TYPE_RESOURCEMANAGER) {
+				switch (runtimeEvent.getStatus()) {
+				case IModelRuntimeNotifierEvent.STOPPED:
+					manager.removeModelListener(this);
+					setStatus(ResourceManagerStatus.STOPPED, false);
+					break;
+				case IModelRuntimeNotifierEvent.ABORTED:
+					manager.removeModelListener(this);
+					setStatus(ResourceManagerStatus.STOPPED, false);
+					break;
+				}
 			}
 		}
 		else if (event instanceof IModelSysChangedEvent) {
