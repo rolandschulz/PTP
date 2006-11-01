@@ -417,18 +417,14 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 					}
 				}
 			}
-			if (state.equals("exited")) {
+			if (state.equals("running")) {
+				fireEvent(new ModelRuntimeNotifierEvent(job.getIDString(), IModelRuntimeNotifierEvent.TYPE_JOB, IModelRuntimeNotifierEvent.RUNNING));
+			} else if (state.equals("exited")) {
 				fireEvent(new ModelRuntimeNotifierEvent(job.getIDString(), IModelRuntimeNotifierEvent.TYPE_JOB, IModelRuntimeNotifierEvent.STOPPED));
-				//fireEvent(job.getIDString(), EVENT_EXITED);
-			}
-			else if (state.equals("starting")) {
-				//cannot get this fire because job is null.  this method is called faster then creating the job.
-				System.err.println("starting");
+			} else if (state.equals("starting")) {
 				fireEvent(new ModelRuntimeNotifierEvent(job.getIDString(), IModelRuntimeNotifierEvent.TYPE_JOB, IModelRuntimeNotifierEvent.STARTED));
-				//fireEvent(job.getIDString(), EVENT_STARTING);				
 			}
 		}
-		//refreshJobStatus(ne);
 	}
 	// Not currently called
 	public void runtimeNewJob(String ne) {
@@ -480,6 +476,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 	 * Update model when process attributes change
 	 */
 	public void runtimeProcAttrChange(String nejob, BitList cprocs, String kv, int[] dprocs, String[] kvs) {
+		System.out.println("*********** PROC ATTRIBUTE CHANGE: (job = "+nejob+")");
 		IPJob job = universe.findJobByName(nejob);
 		if (job != null) {
 			/* 
