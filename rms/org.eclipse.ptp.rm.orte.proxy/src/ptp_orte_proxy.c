@@ -97,7 +97,10 @@
 #define ATTRIB_PROCESS_SIGNAL		"ATTRIB_PROCESS_SIGNAL"
 #define ATTRIB_PROCESS_NODE_NAME	"ATTRIB_PROCESS_NODE_NAME"
 
-#define JOB_STATE_NEW				5000
+#define JOB_STATE_INIT             1
+#define JOB_STATE_RUNNING          2
+#define JOB_STATE_TERMINATED       3
+#define JOB_STATE_ERROR            4
 
 #define PTP_UINT32				1
 #define PTP_STRING				2
@@ -1291,7 +1294,7 @@ ORTERun(char **args)
 	/*
 	 * Fake a job state event
 	 */
-	asprintf(&res, "%d %d %d", RTEV_JOBSTATE, jobid, ORTE_PROC_STATE_INIT);
+	asprintf(&res, "%d %d %d", RTEV_JOBSTATE, jobid, JOB_STATE_INIT);
 	AddToList(eventList, (void *)res);
 	
 	/*
@@ -1308,6 +1311,8 @@ ORTERun(char **args)
 	 */
 	if (debug) {
 #if !ORTE_VERSION_1_0
+		char *					kv;
+		char *					str;
 		orte_job_map_t *		map;
 		opal_list_item_t *		item;
 		opal_list_item_t *		item2;
@@ -1316,10 +1321,6 @@ ORTERun(char **args)
 		       
 		rc = orte_rmaps.get_job_map(&map, jobid);
 		if (rc == ORTE_SUCCESS) {
-			opal_list_item_t *	item;
-			char *				kv;
-			char *				str;
-			
 	        for (item =  opal_list_get_first(&map->nodes);
 	             item != opal_list_get_end(&map->nodes);
 	             item =  opal_list_get_next(item)) {
@@ -1328,10 +1329,10 @@ ORTERun(char **args)
                  item2 != opal_list_get_end(&node->procs);
                  item2 = opal_list_get_next(item2)) {
                 proc = (orte_mapped_proc_t*)item2;
-	                asprintf(&kv, "%s=%s", ATTRIB_PROCESS_NODE_NAME, node->node_name);
+	                asprintf(&kv, "%s=%s", ATTRIB_PROCESS_NODE_NAME, node->nodename);
 	                proxy_cstring_to_str(kv, &str);
 	            	free(kv);
-	                asprintf(&res, "%d %d 0:0 1:0 1 %d %s", RTEV_PATTR, jobid, vpid, str);
+	                asprintf(&res, "%d %d 0:0 1:0 1 %d %s", RTEV_PATTR, jobid, i, str);
 			        AddToList(eventList, (void *)res);
 	            }
 	        }
@@ -1482,11 +1483,12 @@ orte_job_record_end(orte_jobid_t jobid)
  * icons can be updated appropriately.
  */
 static void
-job_state_callback(orte_jobid_t jobid, orte_proc_state_t state)
+job_state_callback(orte_jobid_t jobid, orte_proc_state_t proc_state)
 {
-	char *				res;
+	int		state;
+	char *	res;
 	
-	printf("JOB STATE CALLBACK: %d\n", state); fflush(stdout);
+	printf("JOB STATE CALLBACK: %d\n", proc_state); fflush(stdout);
 		
 	/* not sure yet how we want to handle this callback, what events
 	 * we want to generate, but here are the states that I know of
@@ -1494,23 +1496,28 @@ job_state_callback(orte_jobid_t jobid, orte_proc_state_t state)
 	 * with each of these states.  We'll want to come in here and
 	 * generate events where appropriate */
 	
-	switch (state) {
-		case ORTE_PROC_STATE_AT_STG1:
-		case ORTE_PROC_STATE_RUNNING:
+	switch (proc_state) {
+		case ORTE_JOB_STATE_AT_STG1:
+		case ORTE_JOB_STATE_RUNNING:
+			state = JOB_STATE_RUNNING;
 			break;
 			
-		case ORTE_PROC_STATE_TERMINATED:
-		case ORTE_PROC_STATE_ABORTED:
+		case ORTE_JOB_STATE_TERMINATED:
+		case ORTE_JOB_STATE_ABORTED:
 			if (orte_job_record_started(jobid)) {
 				orte_job_record_end(jobid);
 			}
 			remove_job(jobid);
+			state = JOB_STATE_TERMINATED;
 			break;
 
-		default:
-			/*
-			 * Ignore unused events
-			 */
+#if !ORTE_VERSION_1_0
+		case ORTE_JOB_STATE_FAILED_TO_START:
+			state = JOB_STATE_ERROR;
+			break;
+#endif /* !ORTE_VERSION_1_0 */
+			
+		default: /* ignore others */
 			return;
 	}
 	
@@ -2229,7 +2236,13 @@ ORTEQuit(char **args)
 	printf("ORTEQuit called!\n"); fflush(stdout);
 	ORTEShutdown();
 	asprintf(&res, "%d", RTEV_OK);
-	AddToList(eventList, (void *)res);
+	
+	/*
+	 * Send event immediately for QUIT
+	 */
+	proxy_svr_event_callback(orte_proxy, res);
+	free(res);
+	
 	return PROXY_RES_OK;
 }
 
