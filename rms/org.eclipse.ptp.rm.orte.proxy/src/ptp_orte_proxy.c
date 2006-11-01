@@ -111,28 +111,21 @@ int ORTEInit(char *universe_name);
 int ORTEStartDaemon(char **);
 int ORTERun(char **);
 int ORTETerminateJob(char **);
-int ORTEGetProcesses(char **);
-int ORTEGetProcessAttribute(char **);
 int ORTEDiscover(char **);
 int ORTEQuit(char **);
 
 struct ptp_job {
-	int	debug_jobid; // job ID of debugger or -1 if not a debug job
-	int jobid; // job ID that will be used by program when it starts
-	int	num_procs; // number of procs requested for program (debugger uses num_procs+1)
+	int ptp_jobid;		// job ID as known by PTP */
+	int	debug_jobid;	// job ID of debugger or -1 if not a debug job
+	int orte_jobid;		// job ID that will be used by program when it starts
+	int	num_procs;		// number of procs requested for program (debugger uses num_procs+1)
 };
 typedef struct ptp_job ptp_job;
 
 static int get_node_attribute(int machid, int node_num, char **input_keys, int *input_types, char **input_values, int input_num_keys);
-static int get_proc_attribute(orte_jobid_t jobid, int proc_num, char **input_keys, int *input_types, char **input_values, int input_num_keys);
 static void job_state_callback(orte_jobid_t jobid, orte_proc_state_t state);
 static int orte_console_send_command(orte_daemon_cmd_flag_t usercmd);
 static void iof_callback(orte_process_name_t* src_name, orte_iof_base_tag_t src_tag, void* cbdata, const unsigned char* data, size_t count);
-static void add_job(int jobid, int debug_jobid);
-static void remove_job(int jobid);
-static void remove_debug_job(int jobid);
-static ptp_job *find_job(int jobid);
-static char *orte_get_process_attrib(char **);
 static void orte_job_record_start(orte_jobid_t jobid);
 static void orte_job_record_end(orte_jobid_t jobid);
 static int orte_job_record_started(orte_jobid_t jobid);
@@ -175,8 +168,6 @@ static proxy_svr_commands command_tab[] = {
 	{"DISCOVER",    ORTEDiscover},
 	{"RUN",			ORTERun},
 	{"TERMJOB",		ORTETerminateJob},
-	{"GETPROCS",	ORTEGetProcesses},
-	{"GETPATTR",	ORTEGetProcessAttribute},
 	{"QUI",			ORTEQuit},
 	{NULL,			NULL},
 };
@@ -187,6 +178,77 @@ static struct option longopts[] = {
 	{"host",			required_argument,	NULL, 	'h'}, 
 	{NULL,				0,					NULL,	0}
 };
+
+#define JOBID_PTP	0
+#define JOBID_ORTE	1
+#define JOBID_DEBUG	2
+
+/*
+ * Select correct jobid
+ */
+static int
+get_jobid(ptp_job *j, int which)
+{
+	if (j == NULL)
+		return -1;
+	switch (which) {
+	case JOBID_PTP:
+		return j->ptp_jobid;
+	case JOBID_ORTE:
+		return j->orte_jobid;
+	case JOBID_DEBUG:
+		return j->debug_jobid;
+	}
+	return -1;
+}
+
+/*
+ * Keep a list of the jobs that we have created. If they are
+ * debug jobs, keep the debug jobid as well.
+ */
+static void
+add_job(int ptp_jobid, int orte_jobid, int debug_jobid)
+{
+	ptp_job *	j = (ptp_job *)malloc(sizeof(ptp_job));
+	j->ptp_jobid = ptp_jobid;
+    j->orte_jobid = orte_jobid;
+    j->debug_jobid = debug_jobid;
+    AddToList(jobList, (void *)j);
+}
+
+/*
+ * Remove job from the list when it terminates. If debug is true, 
+ * lookup the job using the debug jobid.
+ */
+static void
+remove_job(int jobid, int which)
+{
+	ptp_job *	j;
+	
+	for (SetList(jobList); (j = (ptp_job *)GetListElement(jobList)) != NULL; ) {
+		if (get_jobid(j, which) == jobid) {
+			RemoveFromList(jobList, (void *)j);
+			break;
+		}
+	}
+}
+
+/*
+ * Find a job on the list. If debug is true, find the
+ * job using the debug jobid.
+ */
+static ptp_job *
+find_job(int jobid, int which)
+{
+	ptp_job *	j;
+	
+	for (SetList(jobList); (j = (ptp_job *)GetListElement(jobList)) != NULL; ) {
+		if (get_jobid(j, which) == jobid) {
+			return j;
+		}
+	}
+	return NULL;
+}
 
 char *
 ORTEErrorStr(int type, char *msg)
@@ -418,7 +480,7 @@ job_proc_notify_callback(orte_gpr_notify_data_t *data, void *cbdata)
 					if (job != NULL) {
 						proxy_cstring_to_str("", &str1);
 						proxy_cstring_to_str(kv, &str2);
-						asprintf(&res, "%d %d 0:0 %s 1 %s %s", RTEV_PATTR, job->jobid, str1, vpid, str2);
+						asprintf(&res, "%d %d 0:0 %s 1 %s %s", RTEV_PATTR, job->ptp_jobid, str1, vpid, str2);
 			        	AddToList(eventList, (void *)res);
 			        	free(str1);
 			        	free(str2);
@@ -450,7 +512,7 @@ orte_subscribe_proc(ptp_job * job, int procid)
 	orte_gpr_value_t *			values;
 	orte_process_name_t			proc;
 	
-	rc = orte_ns.convert_jobid_to_string(&jobid_str, job->jobid);
+	rc = orte_ns.convert_jobid_to_string(&jobid_str, job->orte_jobid);
 	if(rc != ORTE_SUCCESS) {
 		printf("ERROR: '%s'\n", ORTE_ERROR_NAME(rc)); fflush(stdout);
 		return -1;
@@ -481,7 +543,7 @@ orte_subscribe_proc(ptp_job * job, int procid)
 	value.keyvals[i++]->key = strdup(ORTE_PROC_NAME_KEY);
 
 	proc.cellid = 0;
-	proc.jobid = job->jobid;
+	proc.jobid = job->orte_jobid;
 	proc.vpid = procid;
 	
 	orte_schema.get_proc_tokens(&value.tokens, &value.num_tokens, &proc); /* TODO: what frees tokens? */
@@ -516,7 +578,7 @@ ORTE_Subscribe_Job(orte_jobid_t jobid)
 		return -1;
 	}
 	
-	job = find_job(jobid);
+	job = find_job(jobid, JOBID_ORTE);
 	if (job != NULL) {
 		printf("subscribing %d procs\n", vpid_range); fflush(stdout);
 		
@@ -815,12 +877,9 @@ ORTETerminateJob(char **args)
 	int			jobid = atoi(args[1]);
 	ptp_job *	j;
 	
-	rc = ORTE_TERMINATE_JOB(jobid);
-	if(ORTECheckErrorCode(RTEV_ERROR_TERMINATE_JOB, rc)) return 1;
-	
-	if ((j = find_job(jobid)) != NULL) {
+	if ((j = find_job(jobid, JOBID_PTP)) != NULL) {
 		if (j->debug_jobid < 0)
-			rc = ORTE_TERMINATE_JOB(j->jobid);
+			rc = ORTE_TERMINATE_JOB(j->orte_jobid);
 		else
 			rc = ORTE_TERMINATE_JOB(j->debug_jobid);
 		
@@ -828,54 +887,6 @@ ORTETerminateJob(char **args)
 	}
 	
 	return PROXY_RES_OK;
-}
-
-static void
-add_job(int jobid, int debug_jobid)
-{
-	ptp_job *	j = (ptp_job *)malloc(sizeof(ptp_job));
-    j->jobid = jobid;
-    j->debug_jobid = debug_jobid;
-    AddToList(jobList, (void *)j);
-}
-
-static void
-remove_job(int jobid)
-{
-	ptp_job *	j;
-
-	for (SetList(jobList); (j = (ptp_job *)GetListElement(jobList)) != NULL; ) {
-		if (j->jobid == jobid) {
-			RemoveFromList(jobList, (void *)j);
-			break;
-		}
-	}
-}
-
-static void
-remove_debug_job(int jobid)
-{
-	ptp_job *	j;
- 
- 	for (SetList(jobList); (j = (ptp_job *)GetListElement(jobList)) != NULL; ) {
-		if (j->debug_jobid == jobid) {
-			RemoveFromList(jobList, (void *)j);
-			break;
-		}
-	}
-}
-
-static ptp_job *
-find_job(int jobid)
-{
-	ptp_job *	j;
-	
-	for (SetList(jobList); (j = (ptp_job *)GetListElement(jobList)) != NULL; ) {
-		if (j->jobid == jobid) {
-			return j;
-		}
-	}
-	return NULL;
 }
 
 /*
@@ -903,18 +914,40 @@ debug_app_job_state_callback(orte_jobid_t jobid, orte_proc_state_t state)
 }
 
 /*
- * job_state_callback for the debugger. Detects debugger exit and cleans up
- * job id map.
+ * job_state_callback for the debugger. Detects debugger start and exit and notifies the
+ * UI. Cleans up job id map.
  */
 static void
 debug_job_state_callback(orte_jobid_t jobid, orte_proc_state_t state)
 {
+	int				app_jobid;
+	int				job_state;
+	char *			res;
+	ptp_job	*		j;
+	
+	if ((j = find_job(jobid, JOBID_DEBUG)) == NULL)
+		return;
+	
+	app_jobid = j->ptp_jobid;
+	
 	switch(state) {
+#if !ORTE_VERSION_1_0
+		case ORTE_JOB_STATE_AT_STG2:
+#endif /* !ORTE_VERSION_1_0 */
+		case ORTE_JOB_STATE_RUNNING:
+			job_state = JOB_STATE_RUNNING;
+			break;
 		case ORTE_PROC_STATE_TERMINATED:
 		case ORTE_PROC_STATE_ABORTED:
-           	remove_debug_job(jobid);
-    			break;
+			job_state = JOB_STATE_TERMINATED;
+           	remove_job(jobid, JOBID_DEBUG);
+    		break;
+    	default:
+    		return;
 	}
+	
+	asprintf(&res, "%d %d %d", RTEV_JOBSTATE, app_jobid, job_state);
+	AddToList(eventList, (void *)res);
 }
 
 static void 
@@ -1125,6 +1158,7 @@ ORTERun(char **args)
 	int						num_args = 0;
 	int						num_env = 0;
 	int						debug_argc = 0;
+	int						ptpid = 0;
 	char *					res;
 	char *					full_path;
 	char	 *				pgm_name = NULL;
@@ -1138,7 +1172,9 @@ ORTERun(char **args)
 	orte_jobid_t			debug_jobid = -1;
 
 	for (i = 1; args[i] != NULL; i += 2) {
-		if (strcmp(args[i], "execName") == 0) {
+		if (strcmp(args[i], "jobID") == 0) {
+			ptpid = atoi(args[i+1]);
+		} else if (strcmp(args[i], "execName") == 0) {
 			pgm_name = args[i+1];
 		} else if (strcmp(args[i], "pathToExec") == 0) {
 			exec_path = args[i+1];
@@ -1285,16 +1321,12 @@ ORTERun(char **args)
 
 	printf("NEW JOBID = %d\n", (int)jobid); fflush(stdout);
 	
-    add_job(jobid, debug_jobid);
-	
-	asprintf(&res, "%d %d", RTEV_NEWJOB, (int)jobid);
-	printf("res = '%s'\n", res); fflush(stdout);
-	AddToList(eventList, (void *)res);
+    add_job(ptpid, jobid, debug_jobid);
 	
 	/*
 	 * Fake a job state event
 	 */
-	asprintf(&res, "%d %d %d", RTEV_JOBSTATE, jobid, JOB_STATE_INIT);
+	asprintf(&res, "%d %d %d", RTEV_JOBSTATE, ptpid, JOB_STATE_INIT);
 	AddToList(eventList, (void *)res);
 	
 	/*
@@ -1332,7 +1364,7 @@ ORTERun(char **args)
 	                asprintf(&kv, "%s=%s", ATTRIB_PROCESS_NODE_NAME, node->nodename);
 	                proxy_cstring_to_str(kv, &str);
 	            	free(kv);
-	                asprintf(&res, "%d %d 0:0 1:0 1 %d %s", RTEV_PATTR, jobid, proc->rank, str);
+	                asprintf(&res, "%d %d 0:0 1:0 1 %d %s", RTEV_PATTR, ptpid, proc->rank, str);
 			        AddToList(eventList, (void *)res);
 	            }
 	        }
@@ -1368,15 +1400,18 @@ iof_callback(
 	char *line;
 	
     if(count > 0) {
-        line = (char *)malloc(count+1);
-        strncpy((char*)line, (char*)data, count);
-        if(line[count-1] == '\n') line[count-1] = '\0';
-        line[count] = '\0';
-        proxy_cstring_to_str(line, &str);
-        asprintf(&res, "%d %d %d %s", RTEV_PROCOUT, (int)src_name->jobid, (int)src_name->vpid, str);
-        AddToList(eventList, (void *)res);
-        free(str);
-        free(line);
+    	ptp_job *	j = find_job((int)src_name->jobid, JOBID_ORTE);
+    	if (j != NULL) {
+	        line = (char *)malloc(count+1);
+	        strncpy((char*)line, (char*)data, count);
+	        if(line[count-1] == '\n') line[count-1] = '\0';
+	        line[count] = '\0';
+	        proxy_cstring_to_str(line, &str);
+	        asprintf(&res, "%d %d %d %s", RTEV_PROCOUT, j->ptp_jobid, (int)src_name->vpid, str);
+	        AddToList(eventList, (void *)res);
+	        free(str);
+	        free(line);
+    	}
     }
 }
 
@@ -1485,8 +1520,9 @@ orte_job_record_end(orte_jobid_t jobid)
 static void
 job_state_callback(orte_jobid_t jobid, orte_proc_state_t proc_state)
 {
-	int		state;
-	char *	res;
+	int			state;
+	char *		res;
+	ptp_job *	j = find_job(jobid, JOBID_ORTE);
 	
 	printf("JOB STATE CALLBACK: %d\n", proc_state); fflush(stdout);
 		
@@ -1511,7 +1547,7 @@ job_state_callback(orte_jobid_t jobid, orte_proc_state_t proc_state)
 			if (orte_job_record_started(jobid)) {
 				orte_job_record_end(jobid);
 			}
-			remove_job(jobid);
+			remove_job(jobid, JOBID_ORTE);
 			state = JOB_STATE_TERMINATED;
 			break;
 
@@ -1525,8 +1561,10 @@ job_state_callback(orte_jobid_t jobid, orte_proc_state_t proc_state)
 			return;
 	}
 	
-	asprintf(&res, "%d %d %d", RTEV_JOBSTATE, jobid, state);
-	AddToList(eventList, (void *)res);
+	if (j != NULL) {
+		asprintf(&res, "%d %d %d", RTEV_JOBSTATE, j->ptp_jobid, state);
+		AddToList(eventList, (void *)res);
+	}
 	printf("state callback returning!\n"); fflush(stdout);
 }
 
@@ -1613,163 +1651,6 @@ cleanup:
 }
 #endif /* ORTE_VERSION_1_0 */
 
-/* 
- * given a jobid (valid from OMPIGetJobs()) we request the number of processes
- * associated with this job.  A simple int response is sent back.
- */
-int 
-ORTEGetProcesses(char **args)
-{
-	int				jobid;
-	int				procs;
-	int				start;
-	char *			res;
-	
-	jobid = atoi(args[1]);
-	
-	if (ORTE_SUCCESS != ORTE_GET_VPID_RANGE((orte_jobid_t)jobid, &start, &procs)) {
-		res = ORTEErrorStr(RTEV_ERROR_PROCS, "no such jobid or error retrieving processes on job");
-	} else {
-		asprintf(&res, "%d %d", RTEV_PROCS, procs);
-	}
-	
-	AddToList(eventList, (void *)res);
-	
-	return PROXY_RES_OK;
-}
-
-/* 
- * given a jobID and a processID inside that job we attempt to find the values associated
- * with the given keys.  the caller can pass any number of possible keys and the response
- * message will be in the same order.
- * 
- * the user can pass in a process ID they want info on or -1 if they want info on EVERY
- * process contained in this job
- */
-static char *
-orte_get_process_attrib(char **args)
-{
-	int				jobid;
-	int				procid;
-	char *			res;
-	char *			str1;
-	char *			str2;
-	int				last_arg;
-	int				i;
-	char **			keys = NULL;
-	char **			values = NULL;
-	int *			types = NULL;
-	int				tot_len;
-	char *			valstr = NULL;
-	int				values_len;
-	
-	printf("ORTEGetProcessAttribute!\n"); fflush(stdout);
-	
-	jobid = atoi(args[1]);
-	procid = atoi(args[2]);
-	
-	printf("\tjobid = %d, procid = %d\n", jobid, procid);
-	
-	/* run through the rest of the args, counting the keys */
-	i = 3;
-	while(args[i] != NULL) i++;
-	
-	last_arg = i;
-
-	keys = (char**)malloc((last_arg - 3)*sizeof(char*));
-	values_len = last_arg - 3;
-	/* if they want to see ALL the processes then the requested values
-	 * have to be multipled by how many processes are in this job */
-	if(procid == -1) {
-		int numprocs;
-		int	start;
-		if (ORTE_SUCCESS != ORTE_GET_VPID_RANGE((orte_jobid_t)jobid, &start, &numprocs)) {
-			res = ORTEErrorStr(RTEV_ERROR_PATTR, "error finding number of procs");
-			AddToList(eventList, (void *)res);
-			return NULL;
-		}
-		values_len = values_len * numprocs;
-	}
-	values = (char**)malloc(values_len * sizeof(char*));
-	types = (int*)malloc((last_arg - 3)*sizeof(int));
-	
-	/* go through the args now, set up the key array */
-	for(i=3; i<last_arg; i++) {
-		if(!strcmp(args[i], ATTRIB_PROCESS_PID)) {
-			asprintf(&(keys[i-3]), "%s", ORTE_PROC_PID_KEY);
-			types[i-3] = PTP_UINT32;
-		} else if(!strcmp(args[i], ATTRIB_PROCESS_NODE_NAME)) {
-			asprintf(&(keys[i-3]), "%s", ORTE_NODE_NAME_KEY);
-			types[i-3] = PTP_STRING;
-		} else {
-			asprintf(&(keys[i-3]), "UNDEFINED");
-			types[i-3] = PTP_STRING;
-		}
-	}
-	
-	for(i=3; i<last_arg; i++) {
-		printf("BEFORE CALL KEYS[%d] = '%s'\n", i-3, keys[i-3]); fflush(stdout);
-	}
-		
-	if(get_proc_attribute(jobid, procid, keys, types, values, last_arg-3)) {
-		/* error - so bail out */
-		res = ORTEErrorStr(RTEV_ERROR_PATTR, "error finding key on process or error getting keys");
-		AddToList(eventList, (void *)res);
-		return NULL;
-	}
-	/* else we're good, use the values */
-	
-	tot_len = 0;
-	for(i=0; i<values_len; i++) {
-		printf("AFTER CALL! VALS[%d] = '%s'\n", i, values[i]); fflush(stdout);
-		tot_len += strlen(values[i]);
-	}
-	
-	tot_len += values_len * 2; /* add on some for spaces and null, etc - little bit of extra here */
-	printf("totlen = %d\n", tot_len);
-	
-	for(i=0; i<values_len; i++) {
-		proxy_cstring_to_str(values[i], &str1);
-		if (i > 0) {
-			str2 = valstr;
-			asprintf(&valstr, "%s %s", str2, str1);
-			free(str1);
-			free(str2);
-		} else
-			valstr = str1;
-	}
-	
-	printf("valSTR = '%s'\n", valstr);
-	
-	asprintf(&res, "%d %s", RTEV_PATTR, valstr);
-		
-	for(i=3; i<last_arg; i++) {
-		if(keys[i-3] != NULL) free(keys[i-3]);
-	}
-	for(i=0; i<values_len; i++) {
-		if(values[i] != NULL) free(values[i]);
-	}
-		
-	free(keys);
-	free(values);
-	free(types);
-	free(valstr);
-	
-	return res;
-}
-
-int
-ORTEGetProcessAttribute(char **args)
-{
-	char *	res;
-	
-	res = orte_get_process_attrib(args);
-	
-	AddToList(eventList, (void *)res);
-	
-	return PROXY_RES_OK;
-}
-
 /*
 ** Very inefficient! Probably better to build a data structure
 ** from keyvals, then work with that.
@@ -1808,92 +1689,6 @@ get_str_value(orte_gpr_value_t *value, char *key)
 	}
 
     return "";
-}
-
-static int
-get_proc_attribute(orte_jobid_t jobid, int proc_num, char **input_keys, int *input_types, char **input_values, int input_num_keys)
-{
-	char **keys;
-	int rc;
-
-	ORTE_STD_CNTR_TYPE cnt;
-	char *segment = NULL;
-	char *jobid_str = NULL;
-	orte_gpr_value_t **values;
-	orte_gpr_value_t *value;
-	int i, ret, j, min, max;
-	
-	keys = (char**)malloc((input_num_keys + 1)* sizeof(char*));
-	for(i=0; i<input_num_keys; i++) {
-		keys[i] = strdup(input_keys[i]);
-	}
-	/* null terminated */
-	keys[input_num_keys] = NULL;
-	
-	rc = orte_ns.convert_jobid_to_string(&jobid_str, jobid);
-	if(rc != ORTE_SUCCESS) {
-		printf("ERROR: '%s'\n", ORTE_ERROR_NAME(rc));
-		ret = 1;
-		goto cleanup;
-	}
-	
-	asprintf(&segment, "%s-%s", ORTE_JOB_SEGMENT, jobid_str);
-	
-	rc = orte_gpr.get(ORTE_GPR_KEYS_OR | ORTE_GPR_TOKENS_OR, segment, NULL, keys, &cnt, &values);
-	if(rc != ORTE_SUCCESS) {
-		printf("ERROR2: '%s'\n", ORTE_ERROR_NAME(rc));
-		ret = 1;
-		goto cleanup;
-	}
-	
-	/* specified a proc bigger than any we know of in this job, bail out */
-	if(proc_num != -1 && proc_num >= cnt) {
-		ret = 1;
-		goto cleanup;
-	}
-	
-	/* they want a full dump */
-	if(proc_num == -1) {
-		min = 0;
-		max = cnt;
-	}
-	/* they were looking for a specific process - quick and dirty */
-	else {
-		min = proc_num;
-		max = proc_num + 1;
-	}
-	
-	for(i=min; i<max; i++) {
-		value = values[i];
-			
-		for(j=0; j<input_num_keys; j++) {
-			switch(input_types[j]) {
-				case PTP_STRING:
-					asprintf(&(input_values[((i-min) * input_num_keys) + j]), "%s", get_str_value(value, input_keys[j]));
-					break;
-				case PTP_UINT32:
-					asprintf(&(input_values[((i-min) * input_num_keys) + j]), "%d", get_ui32_value(value, input_keys[j]));
-					break;
-			}
-		}
-	}
-	
-	/* success */
-	ret = 0;
-	
-cleanup:
-	if(keys != NULL) {
-		for(i=0; i<input_num_keys; i++) {
-			if(keys[i] != NULL) free(keys[i]);
-		}
-		free(keys);
-	}
-	if(jobid_str != NULL)
-		free(jobid_str);
-	if(segment != NULL)
-		free(segment);
-		
-	return ret;
 }
 
 static int
