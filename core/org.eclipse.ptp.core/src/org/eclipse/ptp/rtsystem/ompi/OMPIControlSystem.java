@@ -31,7 +31,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.core.proxy.event.ProxyDisconnectedEvent;
 import org.eclipse.ptp.rtsystem.IControlSystem;
 import org.eclipse.ptp.rtsystem.IRuntimeListener;
 import org.eclipse.ptp.rtsystem.JobRunConfiguration;
@@ -65,9 +64,8 @@ public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventList
 		proxy.addRuntimeEventListener(this);
 	}
 	
-	/* returns the new job name that it started - unique */
-	public int run(JobRunConfiguration jobRunConfig) throws CoreException {
-		int jobID = -1;
+	/* launches the job */
+	public void run(int jobID, JobRunConfiguration jobRunConfig) throws CoreException {
 		System.out.println("JAVA OMPI: run() with args:\n"+jobRunConfig.toString());
 		
 		if(proxyDead) {
@@ -75,6 +73,9 @@ public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventList
 		}
 
 		List argList = new ArrayList();
+		
+		argList.add("jobID");
+		argList.add(Integer.toString(jobID));
 		
 		argList.add("execName");
 		argList.add(jobRunConfig.getExecName());
@@ -123,13 +124,11 @@ public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventList
 		}
 		
 		try {
-			jobID = proxy.runJob((String[])argList.toArray(new String[0]));
+			proxy.runJob((String[])argList.toArray(new String[0]));
 		} catch(IOException e) {
 			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, 
 				"Control system is shut down, proxy exception.  The proxy may have crashed or been killed.", null));
 		}
-		
-		return jobID;
 	}
 
 	public void terminateJob(IPJob job) throws CoreException {
@@ -177,79 +176,6 @@ public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventList
 		return (String[])a;
 	}
 
-	/* get the processes pertaining to a certain job */
-	public String[] getProcesses(IPJob job) throws CoreException 
-	{
-		if(proxyDead) {
-			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, "Control system is shut down", null));
-		}
-		
-		int jobID = job.getJobNumberInt();
-		int numProcs = -1;
-		
-		/* need to check is jobName is a valid job name */
-		try {
-			numProcs = proxy.getJobProcesses(jobID);
-		} catch(IOException e) {
-			e.printStackTrace();
-		}
-		
-		if(numProcs <= 0) return null;
-
-		String[] ne = new String[numProcs];
-		
-		for(int i=0; i<numProcs; i++) {
-			ne[i] = new String("job"+jobID+"_process"+i);
-		}
-		
-		return ne;
-	}
-	
-//	public String[] getAllProcessesAttributes(IPJob job, String[] attribs) throws CoreException
-//	{
-//		if(proxyDead) {
-//			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, "Control system is shut down", null));
-//		}
-//		
-//		String[] values = null;
-//		
-//		try {
-//			int jobID = job.getJobNumberInt();
-//			values = proxy.getAllProcessesAttribuesBlocking(jobID, attribs);
-//		} catch(IOException e) {
-//			e.printStackTrace();
-//		}
-//		
-//		return values;
-//	}
-//	
-//	public String[] getProcessAttributes(IPProcess proc, String[] attrib) throws CoreException
-//	{
-//		if(proxyDead) {
-//			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, "Control system is shut down", null));
-//		}
-//		
-//		String[] values = null;
-//		
-//		IPJob job = proc.getJob();
-//		
-//		try {
-//			int jobID = job.getJobNumberInt();
-//			int procID = proc.getTaskId();
-//			values = proxy.getProcessAttributesBlocking(jobID, procID, attrib);
-//		} catch(IOException e) {
-//			e.printStackTrace();
-//			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, "Control system is shut down, proxy exception", null));
-//		}
-//		
-//		/* this part is hacked right now until we get this out of ORTE */
-//		//if(attrib.equals(AttributeConstants.ATTRIB_PROCESS_NODE_NAME)) {
-//		//	return "machine0_node0";
-//		//}
-//		
-//		return values;
-//	}
-
 	public void addRuntimeListener(IRuntimeListener listener) {
 		listeners.add(listener);
 	}
@@ -267,9 +193,6 @@ public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventList
 			switch (event.getEventNumber()) {
 			case RuntimeEvent.EVENT_PROCESS_OUTPUT:
 				listener.runtimeProcessOutput(ID, event.getText());
-				break;
-			case RuntimeEvent.EVENT_JOB_EXITED:
-				listener.runtimeJobExited(ID);
 				break;
 			case RuntimeEvent.EVENT_JOB_STATE_CHANGED:
 				listener.runtimeJobStateChanged(ID, event.getText());
@@ -351,9 +274,6 @@ public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventList
     					"server disconnected with an error.\n\n"+
     					"Control System is now disabled.", null);
     		}
-    		//PTPCorePlugin.errorDialog("Fatal PTP Control System Error",
-    		//		"The "
-    		
     	}
     }
 }

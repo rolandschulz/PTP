@@ -63,7 +63,7 @@ public class SimulationControlSystem implements IControlSystem {
 	}
 	
 	/* returns the new job name that it started - unique */
-	public int run(JobRunConfiguration jobRunConfig) {
+	public void run(int jobID, JobRunConfiguration jobRunConfig) {
 		/*
 		if (spawned_app_state != null
 				&& (spawned_app_state.equals(IPProcess.STARTING) || spawned_app_state
@@ -75,7 +75,7 @@ public class SimulationControlSystem implements IControlSystem {
 		*/
 
 		numJobs++;
-		final String s = new String("job" + numJobs);
+		final String s = new String("job" + jobID);
 		
 		SimJobState ss = new SimJobState();
 		ss.jobname = s;
@@ -148,8 +148,6 @@ public class SimulationControlSystem implements IControlSystem {
 		runningAppFinishThread = new Thread(runningAppFinishRunnable);
 		runningAppFinishThread.start();
 		*/
-
-		return numJobs;
 	}
 
 	public void terminateJob(IPJob jobIn) {
@@ -188,28 +186,6 @@ public class SimulationControlSystem implements IControlSystem {
 		while (it.hasNext()) {
 			String key = (String) it.next();
 			ne[i++] = new String(key);
-		}
-
-		return ne;
-	}
-
-	/* get the processes pertaining to a certain job */
-	public String[] getProcesses(IPJob job) {
-		String jobName = job.toString();
-		System.out.println("getProcesses("+jobName+")");
-		/* find this machineName in the map - if it's there */
-		if (!processMap.containsKey(jobName)) {
-			System.out.println("getProcesses - null - can't find this job!");
-			return null;
-		}
-
-		int n = ((Integer) (processMap.get(jobName))).intValue();
-
-		String[] ne = new String[n];
-
-		for (int i = 0; i < ne.length; i++) {
-			/* prepend this node name with the machine name */
-			ne[i] = new String(jobName + "_process" + i);
 		}
 
 		return ne;

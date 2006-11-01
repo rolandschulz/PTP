@@ -18,17 +18,12 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.core;
 
-import java.text.DateFormat;
-import java.text.MessageFormat;
-import java.util.Date;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.jface.util.SafeRunnable;
@@ -54,8 +49,6 @@ import org.eclipse.ptp.core.events.ModelSysChangedEvent;
 import org.eclipse.ptp.core.events.NodeEvent;
 import org.eclipse.ptp.core.events.ProcessEvent;
 import org.eclipse.ptp.core.util.BitList;
-import org.eclipse.ptp.internal.core.elementcontrols.IPJobControl;
-import org.eclipse.ptp.internal.core.elementcontrols.IPNodeControl;
 import org.eclipse.ptp.internal.core.elementcontrols.IPProcessControl;
 import org.eclipse.ptp.internal.core.elementcontrols.IPUniverseControl;
 import org.eclipse.ptp.rtsystem.IControlSystem;
@@ -77,11 +70,8 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 	protected ListenerList nodeListeners = new ListenerList();
 	protected ListenerList processListeners = new ListenerList();
 
-	// protected IPMachine machine = null;
 	protected IPJob processRoot = null;
 	protected IPUniverseControl universe = null;
-
-	//protected boolean isPerspectiveOpen = false;
 
 	protected ILaunchConfiguration config = null;
 	protected IControlSystem controlSystem = null;
@@ -95,11 +85,8 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 	private int numMachines = 1;
 	private int[] numNodes = new int[]{255};
 	
-	/*
-	public boolean isParallelPerspectiveOpen() {
-		return isPerspectiveOpen;
-	}
-	*/
+	private int jobID = 1;
+	
 	public void setPTPConfiguration(ILaunchConfiguration config) {
 		this.config = config;
 	}
@@ -119,7 +106,6 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		if(ControlSystemChoices.getCSArrayIndexByID(theCSChoiceID) == -1 || MonitoringSystemChoices.getMSArrayIndexByID(theMSChoiceID) == -1) {
 			throw new IllegalArgumentException("Illegal Control System and/or Monitoring System choices.");
 		}
-		//refreshRuntimeSystems(CSChoiceID, MSChoiceID);
 	}
 	
 	public ModelManager(int numMachines, int numNodes[]) {
@@ -289,32 +275,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 				monitor.done();
 		}
 	}
-	private void refreshJobStatus(String nejob) {
-		// System.out.println("refreshJobStatus("+nejob+")");
-		System.err.println("TODO: refreshJobStatus("+nejob+") called - finish this.");
-		/*
-		IPJob job = universe.findJobByName(nejob);
-		if (job != null) {
-			IPProcess[] procs = job.getProcesses();
-			if (procs != null) {
-				for (int i = 0; i < procs.length; i++) {
-					String status = controlSystem.getProcessAttribute(job, procs[i], AttributeConstants.ATTRIB_PROCESS_STATUS);
-					// System.out.println("Status = "+status+" on process -
-					// "+procName);
-					procs[i].setStatus(status);
-					String signal = controlSystem.getProcessAttribute(job, procs[i], AttributeConstants.ATTRIB_PROCESS_SIGNAL);
-					String exitCode = controlSystem.getProcessAttribute(job, procs[i], AttributeConstants.ATTRIB_PROCESS_EXIT_CODE);
-					if (!signal.equals(""))
-						procs[i].setSignalName(signal);
-					if (!exitCode.equals(""))
-						procs[i].setExitCode(exitCode);
-				}
-			}
-			fireEvent(job, EVENT_UPDATED_STATUS);
-		}
-		*/
-	}
-
+	
 	public void runtimeNodeGeneralChange(String[] keys, String[] values) {
 		boolean newEntity = false;
 		PMachine curmachine = null;
@@ -378,25 +339,9 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			fireEvent(new ProcessEvent(p, IProcessEvent.ADD_OUTPUT_TYPE, output + "\n"));
 		}
 	}
+	
 	public void runtimeJobExited(String ne) {
-		refreshJobStatus(ne);
-		IPJob job = universe.findJobByName(ne);
-		if (job != null) {
-			//fireEvent(job, AEVENT_ALL_PROCESSES_STOPPED);
-			//fireState(EVENT_STOPPED, job.getIDString());			
-			System.err.println("stopped in runtimeJobExited()");
-			fireEvent(new ModelRuntimeNotifierEvent(job.getIDString(), IModelRuntimeNotifierEvent.TYPE_JOB, IModelRuntimeNotifierEvent.STOPPED));
-		}
-		clearUsedMemory();
-		/*
-		 * process.setExitCode(pdes[i].getExitCode());
-		 * process.setSignalName(pdes[i].getSignalName());
-		 * process.setStatus(pdes[i].getStatus()); fireEvent(process,
-		 * EVENT_EXEC_STATUS_CHANGE); if (process.getParent().isAllStop()) {
-		 * fireEvent(process.getParent(), ALL_PROCESSES_STOPPED); if
-		 * (processRoot.isAllStop()) { fireState(STATE_STOPPED);
-		 * clearUsedMemory(); } }
-		 */
+		// not used
 	}
 
 	public void runtimeJobStateChanged(String nejob, String state) {
@@ -426,50 +371,9 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			}
 		}
 	}
-	// Not currently called
+
 	public void runtimeNewJob(String ne) {
-		if(!controlSystem.isHealthy()) {
-			PTPCorePlugin.errorDialog("Fatal PTP Control System Error", "The PTP Control System is down.", null);
-			return;
-		}
-		
-		IProgressMonitor monitor = new NullProgressMonitor();		
-		
-		IPJobControl job = (IPJobControl) universe.findJobByName(ne);
-		/* if it already existed, then destroy it first */
-		if (job != null) {
-			IPProcessControl[] procs = (IPProcessControl[]) job.getProcesses();
-			for (int i = 0; i < procs.length; i++) {
-				IPNodeControl node = (IPNodeControl) procs[i].getNode();
-				if (node != null)
-					node.removeChild(procs[i]);
-			}
-			job.removeChildren();
-			universe.removeChild(job);
-		}
-
-		PJob pjob;
-
-		int x = 0;
-		try {
-			x = (new Integer(ne.substring(3))).intValue();
-		} catch (NumberFormatException e) {
-		}
-		pjob = new PJob(universe, ne, "" + (PJob.BASE_OFFSET + x) + "", x);
-		universe.addChild(pjob);
-		
-		String[] ne2;
-		try {
-			ne2 = controlSystem.getProcesses(pjob);
-		} catch(CoreException e) {
-			PTPCorePlugin.errorDialog("Fatal PTP Control System Error", "The PTP Control System is down.", null);
-			return;
-		}
-
-		for (int j = 0; j < ne2.length; j++) {		
-			IPProcessControl proc = new PProcess(pjob, ne+"_process"+j, "" + j + "", "0", j, IPProcess.STARTING, "", "");
-			pjob.addChild(proc);
-		}	
+		// not used
 	}
 
 	/* 
@@ -512,13 +416,9 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 				}
 			}
 		}
-		
-		//fireEvent(new ModelSysChangedEvent(IModelSysChangedEvent.SYS_STATUS_CHANGED, null));
 	}
 
 	public void shutdown() {
-		//PTPCorePlugin.getDefault().removePerspectiveListener(perspectiveListener);
-		//perspectiveListener = null;
 		modelListeners.clear();
 		modelListeners = null;
 		if(monitoringSystem != null)
@@ -559,6 +459,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
             });
         }
 	}
+	
 	public void fireEvent(final INodeEvent event) {
         Object[] array = nodeListeners.getListeners();
         for (int i = 0; i < array.length; i++) {
@@ -569,7 +470,8 @@ public class ModelManager implements IModelManager, IRuntimeListener {
                 }
             });
         }
-	}	
+	}
+	
 	public void fireEvent(final IModelEvent event) {
         Object[] array = modelListeners.getListeners();
         for (int i = 0; i < array.length; i++) {
@@ -581,11 +483,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
             });
         }
 	}
-	protected String renderLabel(String name) {
-		String format = CoreMessages.getResourceString("ModelManager.{0}_({1})");
-		String timestamp = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM).format(new Date(System.currentTimeMillis()));
-		return MessageFormat.format(format, new String[] { name, timestamp });
-	}
+
 	public void abortJob(String jobName) throws CoreException {
 		/* we have a job name, so let's find it in the Universe - if it exists */
 		IPJob j = getUniverse().findJobByName(jobName);
@@ -599,22 +497,22 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			PTPCorePlugin.errorDialog("Fatal PTP Control System Error", "The PTP Control System is down.", null);
 			return;
 		}
-		System.out.println("***** NEED TO REFRESH JOB STATUS HERE in abortJob() of ModelManager ONCE WE KNOW THE JOBID!");
-		refreshJobStatus(jobName);
+
 		System.err.println("aborted");
 		fireEvent(new ModelRuntimeNotifierEvent(j.getIDString(), IModelRuntimeNotifierEvent.TYPE_JOB, IModelRuntimeNotifierEvent.ABORTED));
-		//fireState(EVENT_ABORTED, j.getIDString());
 	}
-	//protected IPJob myjob = null;
+	
 	public IPJob run(final ILaunch launch, final JobRunConfiguration jobRunConfig, IProgressMonitor monitor) throws CoreException {
 		monitor.setTaskName("Creating the job...");
-		int jobID = controlSystem.run(jobRunConfig);
-		if (jobID < 0)
-			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, "cannot create a job.", null));
 		
-		System.out.println("ModelManager.run() - new JobID = "+jobID);
-		return newJob(jobID, jobRunConfig.getNumberOfProcesses(), jobRunConfig.isDebug(), monitor);
+		IPJob job = newJob(jobRunConfig.getNumberOfProcesses(), jobRunConfig.isDebug(), monitor);
+		System.out.println("ModelManager.run() - new JobID = "+job.getJobNumberInt());
+
+		controlSystem.run(job.getJobNumberInt(), jobRunConfig);
+		
+		return job;
 	}
+	
 	protected void clearUsedMemory() {
 		System.out.println("********** clearUsedMemory");
 		Runtime rt = Runtime.getRuntime();
@@ -630,7 +528,11 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 	public IPUniverse getUniverse() {
 		return universe;
 	}
-	private IPJob newJob(int jobID, int numProcesses, boolean debug, IProgressMonitor monitor) throws CoreException {
+	private int newJobID() {
+		return this.jobID++;
+	}
+	private IPJob newJob(int numProcesses, boolean debug, IProgressMonitor monitor) throws CoreException {
+		int jobID = newJobID();
 		String jobName = "job"+jobID;
 		System.out.println("MODEL MANAGER: newJob("+jobID+")");
 		PJob job = new PJob(universe, jobName, "" + (PJob.BASE_OFFSET + jobID) + "", jobID);		
@@ -648,7 +550,6 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		 * need to run getProcsStatusForNewJob() to fill in the status later
 		 */
 		for (int i = 0; i < numProcesses; i++) {		
-			// System.out.println("process name = "+ne[j]);
 			IPProcessControl proc = new PProcess(job, jobName+"_process"+i, "" + i + "", "0", i, IPProcess.STARTING, "", "");
 			job.addChild(proc);			
 		}
@@ -659,7 +560,6 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		 * UI JobManager listener is never called.
 		 */
 		if (debug) {
-			refreshJobStatus(jobName);
 			fireEvent(new ModelRuntimeNotifierEvent(job.getIDString(), IModelRuntimeNotifierEvent.TYPE_JOB, IModelRuntimeNotifierEvent.STARTED));
 		}
 		return job;

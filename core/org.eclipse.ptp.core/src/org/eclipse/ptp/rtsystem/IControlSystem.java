@@ -44,12 +44,13 @@ public interface IControlSystem {
 	 * about how the user wants to run the job, such as the program name, number of
 	 * processes, etc.
 	 * 
+	 * @param jobID	the jobID for this run 
 	 * @param jobRunConfig the configuration information about the job
 	 * @return the job identifier of the created job or -1 on error
 	 * @throws CoreException 
 	 * @see JobRunConfiguration
 	 */
-	public int run(JobRunConfiguration jobRunConfig) throws CoreException;
+	public void run(int jobID, JobRunConfiguration jobRunConfig) throws CoreException;
 
 	/**
 	 * Terminates a running job.  The {@link IPJob} contains the job identifier used to 
@@ -68,44 +69,6 @@ public interface IControlSystem {
 	 * @throws CoreException 
 	 */
 	public String[] getJobs() throws CoreException;
-
-	/**
-	 * Returns an array of {@link String}s of the form [ "jobXprocessA", "jobXprocessB" ] where
-	 * each process is part of the specified job.
-	 * 
-	 * @param job the job to look for processes on 
-	 * @return the names of the processes
-	 * @throws CoreException 
-	 */
-	public String[] getProcesses(IPJob job) throws CoreException;
-	
-	/**
-	 * Gets the specified attributes for all processes of the specified job.  The
-	 * attributes are space separated in a string of the form "PID NODE_NUMBER".  The
-	 * attributes are defined in {@link org.eclipse.ptp.core.AttributeConstants}.  The return array has a size
-	 * of num_procs * num_attribs and is of the form [ proc0attrib0, proc0attrib1, ... proc0attribN,
-	 * proc1attrib0 ...]
-	 * 
-	 * @param job the job to get process attributes from
-	 * @param array of attribs to fetch
-	 * @return an array of the attribute values for each process
-	 * @throws CoreException 
-	 * @see org.eclipse.ptp.core.AttributeConstants
-	 */
-	//public String[] getAllProcessesAttributes(IPJob job, String[] attribs) throws CoreException;
-	
-	/**
-	 * Gets the specified attributes for a specific process in a specific job.  The
-	 * attributes are space separated in a string of the form "PID NODE_NUMBER".  The
-	 * attributes are defined in {@link org.eclipse.ptp.core.AttributeConstants}.  The
-	 * return array's length is equal to the number of attributes requested.
-	 * 
-	 * @param proc the process contained in the job to get the process attributes from
-	 * @param array of attribs to fetch
-	 * @return an array of the attribute values
-	 * @throws CoreException 
-	 */
-	//public String[] getProcessAttributes(IPProcess proc, String[] attribs) throws CoreException;
 
 	/**
 	 * Adds a listener to the control system.  The control system may fire {@link RuntimeEvent}s

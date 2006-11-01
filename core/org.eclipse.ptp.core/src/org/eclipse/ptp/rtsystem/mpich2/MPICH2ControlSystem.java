@@ -66,8 +66,7 @@ public class MPICH2ControlSystem implements IControlSystem, IProxyRuntimeEventLi
 	}
 	
 	/* returns the new job name that it started - unique */
-	public int run(JobRunConfiguration jobRunConfig) throws CoreException {
-		int jobID = -1;
+	public void run(int jobID, JobRunConfiguration jobRunConfig) throws CoreException {
 		System.out.println("JAVA MPICH2: run() with args:\n"+jobRunConfig.toString());
 		
 		if(proxyDead) {
@@ -75,6 +74,9 @@ public class MPICH2ControlSystem implements IControlSystem, IProxyRuntimeEventLi
 		}
 
 		List argList = new ArrayList();
+		
+		argList.add("jobID");
+		argList.add(Integer.toString(jobID));
 		
 		argList.add("execName");
 		argList.add(jobRunConfig.getExecName());
@@ -123,13 +125,11 @@ public class MPICH2ControlSystem implements IControlSystem, IProxyRuntimeEventLi
 		}
 		
 		try {
-			jobID = proxy.runJob((String[])argList.toArray(new String[0]));
+			proxy.runJob((String[])argList.toArray(new String[0]));
 		} catch(IOException e) {
 			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, 
 				"Control system is shut down, proxy exception.  The proxy may have crashed or been killed.", null));
 		}
-		
-		return jobID;
 	}
 
 	public void terminateJob(IPJob job) throws CoreException {
@@ -175,34 +175,6 @@ public class MPICH2ControlSystem implements IControlSystem, IProxyRuntimeEventLi
 		if(a == null) return null;
 		if(a.length == 0) return null;
 		return (String[])a;
-	}
-
-	/* get the processes pertaining to a certain job */
-	public String[] getProcesses(IPJob job) throws CoreException 
-	{
-		if(proxyDead) {
-			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, "Control system is shut down", null));
-		}
-		
-		int jobID = job.getJobNumberInt();
-		int numProcs = -1;
-		
-		/* need to check is jobName is a valid job name */
-		try {
-			numProcs = proxy.getJobProcesses(jobID);
-		} catch(IOException e) {
-			e.printStackTrace();
-		}
-		
-		if(numProcs <= 0) return null;
-
-		String[] ne = new String[numProcs];
-		
-		for(int i=0; i<numProcs; i++) {
-			ne[i] = new String("job"+jobID+"_process"+i);
-		}
-		
-		return ne;
 	}
 
 	public void addRuntimeListener(IRuntimeListener listener) {
