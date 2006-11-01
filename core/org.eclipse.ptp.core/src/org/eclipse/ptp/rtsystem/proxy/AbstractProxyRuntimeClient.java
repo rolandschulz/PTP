@@ -54,7 +54,6 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 	
 	public void handleEvent(IProxyEvent event) {
 		IProxyRuntimeEvent e = null;
-		System.out.println("AbstractProxyRuntimeClient.handleEvent() got event " + event);
 		if (listeners == null) {
 			System.out.println("AbstractProxyRuntimeClient.handleEvent() no listeners!");
 			return;

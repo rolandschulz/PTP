@@ -94,9 +94,8 @@ public class NullManager implements IModelManager {
 			// no-op
 		}
 
-		public int run(JobRunConfiguration jobRunConfig) throws CoreException {
+		public void run(int jobID, JobRunConfiguration jobRunConfig) throws CoreException {
 			// no-op
-			return 0;
 		}
 
 		public void shutdown() {

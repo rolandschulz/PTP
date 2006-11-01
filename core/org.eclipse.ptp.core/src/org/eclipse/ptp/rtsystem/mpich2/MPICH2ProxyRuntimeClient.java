@@ -1,16 +1,11 @@
 package org.eclipse.ptp.rtsystem.mpich2;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.URL;
 import java.util.BitSet;
-import java.util.Properties;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.core.ControlSystemChoices;
 import org.eclipse.ptp.core.IModelManager;
@@ -24,10 +19,6 @@ import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener;
 import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeErrorEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeNewJobEvent;
-import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeNodeAttributeEvent;
-import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeNodesEvent;
-import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeProcessAttributeEvent;
-import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeProcessesEvent;
 
 public class MPICH2ProxyRuntimeClient extends ProxyRuntimeClient implements IRuntimeProxy, IProxyRuntimeEventListener {
 	protected Queue events = new Queue();
@@ -45,13 +36,6 @@ public class MPICH2ProxyRuntimeClient extends ProxyRuntimeClient implements IRun
 		run(args);
 		IProxyRuntimeEvent event = waitForRuntimeEvent();
 		return ((ProxyRuntimeNewJobEvent)event).getJobID();
-	}
-	
-	public int getJobProcesses(int jobID) throws IOException {
-		setWaitEvent(IProxyRuntimeEvent.EVENT_RUNTIME_PROCS);
-		getProcesses(jobID);
-		IProxyRuntimeEvent event = waitForRuntimeEvent();
-		return ((ProxyRuntimeProcessesEvent)event).getNumProcs();
 	}
 	
 	public boolean startup(final IProgressMonitor monitor) {

@@ -18,9 +18,6 @@ import org.eclipse.ptp.rtsystem.proxy.ProxyRuntimeClient;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener;
 import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeErrorEvent;
-import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeNewJobEvent;
-import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeNodesEvent;
-import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeProcessesEvent;
 
 public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRuntimeProxy, IProxyRuntimeEventListener {
 	protected Queue events = new Queue();
@@ -33,60 +30,9 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
 		this.modelManager = modelManager;
 	}
 	
-	public int runJob(String[] args) throws IOException {
-		setWaitEvent(IProxyRuntimeEvent.EVENT_RUNTIME_NEWJOB);
+	public void runJob(String[] args) throws IOException {
 		run(args);
-		IProxyRuntimeEvent event = waitForRuntimeEvent();
-		return ((ProxyRuntimeNewJobEvent)event).getJobID();
 	}
-	
-	public int getJobProcesses(int jobID) throws IOException {
-		setWaitEvent(IProxyRuntimeEvent.EVENT_RUNTIME_PROCS);
-		getProcesses(jobID);
-		IProxyRuntimeEvent event = waitForRuntimeEvent();
-		return ((ProxyRuntimeProcessesEvent)event).getNumProcs();
-	}
-	
-	/*
-	public String[] getProcessAttributesBlocking(int jobID, int procID, String[] keys) throws IOException {
-		setWaitEvent(IProxyRuntimeEvent.EVENT_RUNTIME_PROCATTR);
-		getProcessAttribute(jobID, procID, keys);
-		IProxyRuntimeEvent event = waitForRuntimeEvent();
-		return ((ProxyRuntimeProcessAttributeEvent)event).getValues();
-	}
-	
-	public String[] getAllProcessesAttribuesBlocking(int jobID, String[] keys) throws IOException {
-		setWaitEvent(IProxyRuntimeEvent.EVENT_RUNTIME_PROCATTR);
-		getProcessAttribute(jobID, -1, keys);
-		IProxyRuntimeEvent event = waitForRuntimeEvent();
-		return ((ProxyRuntimeProcessAttributeEvent)event).getValues();
-	}
-	*/
-	
-	/*
-	public int getNumNodesBlocking(int machineID) throws IOException {
-		setWaitEvent(IProxyRuntimeEvent.EVENT_RUNTIME_NODES);
-		getNodes(machineID);
-		IProxyRuntimeEvent event = waitForRuntimeEvent();
-		return ((ProxyRuntimeNodesEvent)event).getNumNodes();
-	}
-	*/
-	
-	/*
-	public String[] getNodeAttributesBlocking(int machID, int nodeID, String[] keys) throws IOException {
-		setWaitEvent(IProxyRuntimeEvent.EVENT_RUNTIME_NODEATTR);
-		getNodeAttribute(machID, nodeID, keys);
-		IProxyRuntimeEvent event = waitForRuntimeEvent();
-		return ((ProxyRuntimeNodeAttributeEvent)event).getValues();
-	}
-	
-	public String[] getAllNodesAttributesBlocking(int machID, String[] keys) throws IOException {
-		setWaitEvent(IProxyRuntimeEvent.EVENT_RUNTIME_NODEATTR);
-		getNodeAttribute(machID, -1, keys);
-		IProxyRuntimeEvent event = waitForRuntimeEvent();
-		return ((ProxyRuntimeNodeAttributeEvent)event).getValues();
-	}
-	*/
 	
 	public boolean startup(final IProgressMonitor monitor) {
 		System.out.println("OMPIProxyRuntimeClient - firing up proxy, waiting for connecting.  Please wait!  This can take a minute . . .");
