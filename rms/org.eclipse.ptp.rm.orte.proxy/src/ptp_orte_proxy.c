@@ -1328,11 +1328,11 @@ ORTERun(char **args)
 				for (item2 = opal_list_get_first(&node->procs);
                  item2 != opal_list_get_end(&node->procs);
                  item2 = opal_list_get_next(item2)) {
-                proc = (orte_mapped_proc_t*)item2;
+                	proc = (orte_mapped_proc_t*)item2;
 	                asprintf(&kv, "%s=%s", ATTRIB_PROCESS_NODE_NAME, node->nodename);
 	                proxy_cstring_to_str(kv, &str);
 	            	free(kv);
-	                asprintf(&res, "%d %d 0:0 1:0 1 %d %s", RTEV_PATTR, jobid, i, str);
+	                asprintf(&res, "%d %d 0:0 1:0 1 %d %s", RTEV_PATTR, jobid, proc->rank, str);
 			        AddToList(eventList, (void *)res);
 	            }
 	        }
@@ -1497,7 +1497,11 @@ job_state_callback(orte_jobid_t jobid, orte_proc_state_t proc_state)
 	 * generate events where appropriate */
 	
 	switch (proc_state) {
+#if ORTE_VERSION_1_0
 		case ORTE_JOB_STATE_AT_STG1:
+#else /* ORTE_VERSION_1_0 */
+		case ORTE_JOB_STATE_AT_STG2:
+#endif /* ORTE_VERSION_1_0 */
 		case ORTE_JOB_STATE_RUNNING:
 			state = JOB_STATE_RUNNING;
 			break;

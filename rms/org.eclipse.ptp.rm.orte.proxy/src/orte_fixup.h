@@ -78,7 +78,6 @@
 #define ORTE_SETUP_JOB(app_context,num_context,jobid)	orte_rmgr.setup_job(app_context,num_context,jobid)
 #define ORTE_SUBSCRIBE(jobid,cbfunc,cbdata,cond)		orte_smr.job_stage_gate_subscribe(jobid,cbfunc,cbdata,cond)
 #define ORTE_PACK(buf,cmd,num,type)						orte_dss.pack(buf,cmd,num,type)
-#define ORTE_STAGE_GATE_INIT(jobid)						orte_rmgr_base_proc_stage_gate_init(jobid)
 #define ORTE_GET_VPID_RANGE(jobid, start, range)		orte_rmgr.get_vpid_range(jobid, start, range)
 #define ORTE_KEYVALUE_TYPE(keyval)						(keyval)->value->type
 #define ORTE_NOTIFY_ALL									ORTE_PROC_STATE_ALL
@@ -188,4 +187,65 @@ ORTE_GET_PID_VALUE(orte_gpr_keyval_t *keyval)
 		
 	return tmp_int;
 }
+
+static int 
+ORTE_STAGE_GATE_INIT(orte_jobid_t jobid)
+{
+    orte_buffer_t cmd;
+    orte_buffer_t rsp;
+    orte_std_cntr_t count;
+    orte_rmgr_cmd_t command=ORTE_RMGR_SETUP_GATES_CMD;
+    int rc;
+
+    /* construct command */
+    OBJ_CONSTRUCT(&cmd, orte_buffer_t);
+
+    /* pack the command */
+    if (ORTE_SUCCESS != (rc = orte_dss.pack(&cmd, &command, 1, ORTE_RMGR_CMD))) {
+        ORTE_ERROR_LOG(rc);
+        OBJ_DESTRUCT(&cmd);
+        return rc;
+    }
+
+    /* pack the jobid */
+    if(ORTE_SUCCESS != (rc = orte_dss.pack(&cmd, &jobid, 1, ORTE_JOBID))) {
+        ORTE_ERROR_LOG(rc);
+        OBJ_DESTRUCT(&cmd);
+        return rc;
+    }
+
+    /* send the command */
+    if(0 > (rc = orte_rml.send_buffer(ORTE_RML_NAME_SEED, &cmd, ORTE_RML_TAG_RMGR, 0))) {
+        ORTE_ERROR_LOG(rc);
+        OBJ_DESTRUCT(&cmd);
+        return rc;
+    }
+    
+    OBJ_DESTRUCT(&cmd);
+    /* wait for response */
+    
+    OBJ_CONSTRUCT(&rsp, orte_buffer_t);
+    if(0 > (rc = orte_rml.recv_buffer(ORTE_RML_NAME_SEED, &rsp, ORTE_RML_TAG_RMGR))) {
+        ORTE_ERROR_LOG(rc);
+        OBJ_DESTRUCT(&rsp);
+        return rc;
+    }
+
+    /* get the returned command */
+    count = 1;
+    if (ORTE_SUCCESS != (rc = orte_dss.unpack(&rsp, &command, &count, ORTE_RMGR_CMD))) {
+        ORTE_ERROR_LOG(rc);
+        OBJ_DESTRUCT(&rsp);
+        return rc;
+    }
+    /* and check it to ensure valid comm */
+    if (ORTE_RMGR_SETUP_GATES_CMD != command) {
+        OBJ_DESTRUCT(&rsp);
+        ORTE_ERROR_LOG(ORTE_ERR_COMM_FAILURE);
+        return ORTE_ERR_COMM_FAILURE;    
+    }
+        
+    OBJ_DESTRUCT(&rsp);
+    return rc; 
+} 
 #endif /* !ORTE_VERSION_1_0 */
