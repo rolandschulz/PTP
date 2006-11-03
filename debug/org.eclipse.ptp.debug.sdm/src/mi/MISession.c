@@ -336,10 +336,10 @@ ReadResponse(int fd)
  * for writing.
  */
 void
-MISessionProcessCommandsAndResponses(MISession *sess, fd_set *rfds, fd_set *wfds)
+MISessionProcessCommandsAndResponses(MISession *sess, fd_set *rfds, fd_set *wfds, MIOutput *output)
 {
 	char *		str;
-	MIOutput *	output;
+	//MIOutput *	output;
 	
 	if (sess->pid == -1)
 		return;
@@ -378,7 +378,9 @@ MISessionProcessCommandsAndResponses(MISession *sess, fd_set *rfds, fd_set *wfds
 			return;
 		}
 		
-		output = MIParse(str);	
+		//output = MIParse(str);
+		MIParse(str, output);
+			
 			
 		/*
 		 * The output can consist of:
@@ -414,7 +416,9 @@ MISessionProcessCommandsAndResponses(MISession *sess, fd_set *rfds, fd_set *wfds
 			if (sess->command->callback != NULL)
 				sess->command->callback(output->rr, sess->command->cb_data);
 		} else {
-			MIOutputFree(output);
+			if (sess->command == NULL) {
+				MIOutputFree(output);
+			}
 		}
 
 		if (sess->command != NULL && sess->command->completed)
@@ -596,7 +600,7 @@ MISessionGetFds(MISession *sess, int *nfds, fd_set *rfds, fd_set *wfds, fd_set *
  * functions will modify it.
  */
 int
-MISessionProgress(MISession *sess)
+MISessionProgress(MISession *sess, MIOutput *output)
 {
 	int				n;
 	int				nfds;
@@ -626,7 +630,7 @@ MISessionProgress(MISession *sess)
 		return 0;
 	}
 			
-	MISessionProcessCommandsAndResponses(sess, &rfds, NULL);
+	MISessionProcessCommandsAndResponses(sess, &rfds, NULL, output);
 	
 	return n;
 }
