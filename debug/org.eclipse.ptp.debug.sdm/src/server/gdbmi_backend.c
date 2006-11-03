@@ -488,8 +488,9 @@ static void
 SendCommandWait(MISession *sess, MICommand *cmd)
 {
 	MISessionSendCommand(sess, cmd);
+	MIOutput *output = MIOutputNew();
 	do {
-		MISessionProgress(sess);
+		MISessionProgress(sess, output);
 		if (sess->out_fd == -1) {
 			DEBUG_PRINTS("------------------- SendCommandWait sess->out_fd = -1\n");
 			break;
@@ -812,6 +813,7 @@ GDBMIStartSession(char *gdb_path, char *prog, char *path, char *work_dir, char *
 	SendCommandWait(sess, cmd);
 	if (MICommandResultOK(cmd)) {
 		GDB_Version = CLIGetGDBVersion(cmd);
+		printf("------------------- gdb version: %f\n", GDB_Version);
 	}
 	MICommandFree(cmd);
 	
@@ -859,7 +861,7 @@ GDBMIProgress(void)
 	if (DebugSession == NULL)
 		return 0;
 	
-	MISessionProgress(DebugSession);
+	MISessionProgress(DebugSession, MIOutputNew());
 	
 	/*
 	 * Do any extra async functions. We can call gdbmi safely here

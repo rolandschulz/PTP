@@ -128,12 +128,11 @@ char *secondaryPrompt = ">"; //$NON-NLS-1$
  * @return MIOutput
  * @see MIOutput
  */
- MIOutput *
- MIParse(char *buffer) 
+ void
+ MIParse(char *buffer, MIOutput *mi) 
  {
-	MIOutput *mi = MIOutputNew();
-	MIResultRecord *rr = NULL;
-	List *oobs = NULL;
+	//MIResultRecord *rr = NULL;
+	//List *oobs = NULL;
 	int id = -1;
 	char *s;
 	char *token;
@@ -155,22 +154,28 @@ char *secondaryPrompt = ">"; //$NON-NLS-1$
 		if (*token != '\0') {
 			if (*token == '^') {
 				token++;
-				rr = processMIResultRecord(token, id);
+				//rr = processMIResultRecord(token, id);
+				mi->rr = processMIResultRecord(token, id);
 			} else if (strncmp(token, primaryPrompt, strlen(primaryPrompt)) == 0) {
 				//break; // Do nothing.
 			} else {
 				MIOOBRecord *band = processMIOOBRecord(token, id);
 				if (band != NULL) {
+					if (mi->oobs == NULL)
+						mi->oobs = NewList();
+					AddToList(mi->oobs, (void *)band);
+					/*
 					if (oobs == NULL)
 						oobs = NewList();
 					AddToList(oobs, (void *)band);
+					*/
 				}
 			}
 		}
 	}
-	mi->oobs = oobs;
-	mi->rr = rr;
-	return mi;
+	//mi->oobs = oobs;
+	//mi->rr = rr;
+	//return mi;
 }
 
 /**
