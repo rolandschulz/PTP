@@ -28,7 +28,6 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.internal.core.CoreMessages;
-import org.eclipse.ptp.mpich2.ui.Activator;
 import org.eclipse.ptp.ui.utils.SWTUtil;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -61,7 +60,7 @@ public class MPICH2PreferencePage extends PreferencePage implements IWorkbenchPr
 	private boolean loading = true;
 
 	public MPICH2PreferencePage() {
-		setPreferenceStore(Activator.getDefault().getPreferenceStore());
+		setPreferenceStore(PTPCorePlugin.getDefault().getPreferenceStore());
 	}
 
 	protected class WidgetListener extends SelectionAdapter implements ModifyListener, IPropertyChangeListener 
@@ -146,7 +145,7 @@ public class MPICH2PreferencePage extends PreferencePage implements IWorkbenchPr
 	
 	private void loadSaved()
 	{
-		Preferences preferences = Activator.getDefault().getPluginPreferences();
+		Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
 		
 		proxyServerFile = preferences.getString(PreferenceConstants.MPICH2_PROXY_PATH);
 		/* if they don't have the ptp_mpich2_proxy path set, let's try and give them a default that might help */
@@ -181,12 +180,12 @@ public class MPICH2PreferencePage extends PreferencePage implements IWorkbenchPr
 	public boolean performOk() 
 	{
 		store();
-		Preferences preferences = Activator.getDefault().getPluginPreferences();
+		Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
 
 		preferences.setValue(PreferenceConstants.MPICH2_PROXY_PATH, proxyServerFile);
 		preferences.setValue(PreferenceConstants.MPICH2_LAUNCH_MANUALLY, fManualButton.getSelection());
 
-		Activator.getDefault().savePluginPreferences();
+		PTPCorePlugin.getDefault().savePluginPreferences();
 
 		return true;
 	}

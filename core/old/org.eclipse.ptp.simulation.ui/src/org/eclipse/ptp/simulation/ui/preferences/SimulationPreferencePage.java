@@ -31,7 +31,6 @@ import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.internal.core.CoreMessages;
 import org.eclipse.ptp.rtsystem.simulation.SimulationControlSystem;
 import org.eclipse.ptp.rtsystem.simulation.SimulationMonitoringSystem;
-import org.eclipse.ptp.simulation.ui.Activator;
 import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -64,7 +63,7 @@ public class SimulationPreferencePage extends PreferencePage implements IWorkben
 	protected int nodes[];
 
 	public SimulationPreferencePage() {
-		setPreferenceStore(Activator.getDefault().getPreferenceStore());
+		setPreferenceStore(PTPCorePlugin.getDefault().getPreferenceStore());
 	}
 
 	protected class WidgetListener extends SelectionAdapter implements ModifyListener, IPropertyChangeListener
@@ -170,7 +169,7 @@ public class SimulationPreferencePage extends PreferencePage implements IWorkben
 		mcombo.addSelectionListener(listener);
 		
 		nodeLabel = new Label(bGroup, SWT.NONE);
-		nodeLabel.setText(CoreMessages.getResourceString("SimulationPreferencePage.NumNodesMachine#0")); //$NON-NLS-1$
+		nodeLabel.setText(CoreMessages.getResourceString("SimulationPreferencePage.NumNodesMachine_0")); //$NON-NLS-1$
 		nodeLabel.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
 		
 		nodeText = new Text(bGroup, SWT.BORDER | SWT.SINGLE);
@@ -234,7 +233,7 @@ public class SimulationPreferencePage extends PreferencePage implements IWorkben
 		mcombo.pack();
 		
 		sel = mcombo.getSelectionIndex();
-		nodeLabel.setText(CoreMessages.getResourceString("SimulationPreferencePage.NumNodesMachine#")+(sel)+":"); //$NON-NLS-1$ //$NON-NLS-2$
+		nodeLabel.setText(CoreMessages.getResourceString("SimulationPreferencePage.NumNodesMachine")+(sel)+":"); //$NON-NLS-1$ //$NON-NLS-2$
 		//nodeLabel.pack();
 		if(nodes != null)
 			nodeText.setText(""+nodes[sel]+""); //$NON-NLS-1$ //$NON-NLS-2$
@@ -246,7 +245,7 @@ public class SimulationPreferencePage extends PreferencePage implements IWorkben
 	
 	private void loadSaved()
 	{
-		Preferences preferences = Activator.getDefault().getPluginPreferences();
+		Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
 		
 		int numMachines = preferences.getInt(PreferenceConstants.SIMULATION_NUM_MACHINES);
 		if(numMachines < 1) numMachines = 1;
@@ -282,12 +281,12 @@ public class SimulationPreferencePage extends PreferencePage implements IWorkben
 	{
 		int nmacs = spin.getSelection();
 		
-		Preferences preferences = Activator.getDefault().getPluginPreferences();		
+		Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();		
 		preferences.setValue(PreferenceConstants.SIMULATION_NUM_MACHINES, nmacs);
 		for(int i=0; i<nmacs; i++) {
 			preferences.setValue(PreferenceConstants.SIMULATION_MACHINE_NODE_PREFIX + ""+i+"", nodes[i]); //$NON-NLS-1$ //$NON-NLS-2$
 		}
-		Activator.getDefault().savePluginPreferences();
+		PTPCorePlugin.getDefault().savePluginPreferences();
 
 		IModelManager manager = PTPCorePlugin.getDefault().getModelManager();
 		if (manager.getMonitoringSystem() instanceof SimulationMonitoringSystem && manager.getControlSystem() instanceof SimulationControlSystem) {
