@@ -1,3 +1,5 @@
+package org.eclipse.ptp.lang.fortran.core.parser;
+
 import java.io.*;
 import org.antlr.runtime.*;
 
