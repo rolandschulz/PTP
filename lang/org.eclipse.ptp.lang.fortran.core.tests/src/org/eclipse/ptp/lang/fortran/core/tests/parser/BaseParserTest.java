@@ -1,15 +1,15 @@
 /**
  * 
  */
-package org.eclipse.fdt.fortran.core.tests.parser;
+package org.eclipse.ptp.lang.fortran.core.tests.parser;
 
 import junit.framework.TestCase;
 
 import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.CharStream;
 import org.antlr.runtime.CommonTokenStream;
-import org.eclipse.fdt.fortran.core.parser.Fortran;
-import org.eclipse.fdt.fortran.core.parser.FortranLexer;
+import org.eclipse.ptp.lang.fortran.core.parser.FortranLexer;
+import org.eclipse.ptp.lang.fortran.core.parser.FortranParser;
 
 /**
  * @author CraigERasmussen
@@ -21,7 +21,7 @@ public class BaseParserTest extends TestCase {
 		CharStream input = new ANTLRStringStream(code);
 		FortranLexer lexer = new FortranLexer(input);
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
-		Fortran parser = new Fortran(tokens);
+		FortranParser parser = new FortranParser(tokens);
 //		parser.compilationUnit();
 	}
 	
