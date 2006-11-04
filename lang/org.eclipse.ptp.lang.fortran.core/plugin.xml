@@ -9,16 +9,16 @@
             name="Fortran Source File"
             priority="high"/>
       <file-association
-            content-type="org.eclipse.fdt.csharp.core.FortranSource"
+            content-type="org.eclipse.ptp.lang.fortran.core.FortranSource"
             file-extensions="for"/>
    </extension>
    <extension
          point="org.eclipse.cdt.core.language">
       <language
-            class="org.eclipse.fdt.fortran.core.FortranLanguage"
+            class="org.eclipse.ptp.lang.fortran.core.FortranLanguage"
             id="fortran"
             name="Fortran">
-         <contentType id="org.eclipse.fdt.fortran.core.FortranSource"/>
+         <contentType id="org.eclipse.ptp.lang.fortran.core.FortranSource"/>
       </language>
    </extension>
 
