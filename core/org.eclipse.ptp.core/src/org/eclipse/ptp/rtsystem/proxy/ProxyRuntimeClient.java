@@ -30,6 +30,10 @@ public class ProxyRuntimeClient extends AbstractProxyRuntimeClient {
         super.sendCommand(cmd);
     }
     
+    public void initialize() throws IOException {
+    	sendCommand("STARTDAEMON");
+    }
+    
     public void initiateDiscovery() throws IOException {
     	sendCommand("DISCOVER");
     }
@@ -41,41 +45,4 @@ public class ProxyRuntimeClient extends AbstractProxyRuntimeClient {
 	public void terminateJob(int jobId) throws IOException {
 		sendCommand("TERMJOB", Integer.toString(jobId));
 	}
-	
-	public void getJobs() throws IOException {
-		sendCommand("GETJOBS");
-	}
-	
-	public void getProcesses(int jobId) throws IOException {
-		sendCommand("GETPROCS", Integer.toString(jobId));
-	}
-	
-	/*
-	public void getProcessAttribute(int jobId, int procId, String[] keys) throws IOException {
-		sendCommand("GETPATTR", Integer.toString(jobId), Integer.toString(procId), keys);
-	}
-	
-	public void getNodeAttribute(int machID, int nodeID, String[] keys) throws IOException {
-		sendCommand("GETNATTR", Integer.toString(machID), Integer.toString(nodeID), keys);
-	}
-	*/
-	
-	/*
-	public void getMachines() throws IOException {
-		sendCommand("GETMACHS");
-	}
-	*/
-	
-	/*
-	public void getNodes(int machId) throws IOException {
-		sendCommand("GETNODES", Integer.toString(machId));
-	}
-	*/
-
-	/*
-	public void getNodeMachineID(int nodeId) throws IOException {
-		sendCommand("GETNMID", Integer.toString(nodeId));
-	}
-	*/
-
 }

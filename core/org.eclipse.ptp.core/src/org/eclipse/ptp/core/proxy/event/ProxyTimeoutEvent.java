@@ -19,12 +19,13 @@
 
 package org.eclipse.ptp.core.proxy.event;
 
-public interface IProxyEvent {
-	public static final int EVENT_OK = 0;
-	public static final int EVENT_ERROR = 1;
-	public static final int EVENT_CONNECTED = 2;
-	public static final int EVENT_DISCONNECTED = 3;
-	public static final int EVENT_TIMEOUT = 4;
+public class ProxyTimeoutEvent extends AbstractProxyEvent implements IProxyEvent {
+	
+	public ProxyTimeoutEvent() {
+		super(EVENT_TIMEOUT);
+	}
 
-	public int getEventID();
+	public String toString() {
+		return "EVENT_TIMEOUT";
+	}
 }
