@@ -21,6 +21,7 @@ package org.eclipse.ptp.core.proxy;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.channels.ServerSocketChannel;
@@ -39,6 +40,7 @@ import org.eclipse.ptp.core.proxy.event.ProxyConnectedEvent;
 import org.eclipse.ptp.core.proxy.event.ProxyDisconnectedEvent;
 import org.eclipse.ptp.core.proxy.event.ProxyEvent;
 import org.eclipse.ptp.core.proxy.event.ProxyOKEvent;
+import org.eclipse.ptp.core.proxy.event.ProxyTimeoutEvent;
 import org.eclipse.ptp.core.util.BitList;
 
 public abstract class AbstractProxyClient {
@@ -168,12 +170,18 @@ public abstract class AbstractProxyClient {
 		sessionCreate(0);
 	}
 	
-	public void sessionCreate(int port) throws IOException {
-		System.out.println("sessionCreate("+port+")");
+	public void sessionCreate(int timeout) throws IOException {
+		sessionCreate(0, timeout);
+	}
+	
+	public void sessionCreate(int port, int timeout) throws IOException {
+		System.out.println("sessionCreate("+port+","+timeout+")");
 		sessSvrSock = ServerSocketChannel.open();
 		InetSocketAddress isa = new InetSocketAddress(port);
 		System.out.println("bind("+isa.toString()+")");
 		sessSvrSock.socket().bind(isa);
+		if (timeout > 0)
+			sessSvrSock.socket().setSoTimeout(timeout);
 		sessPort = sessSvrSock.socket().getLocalPort();
 		sessHost = sessSvrSock.socket().getLocalSocketAddress().toString();
 		System.out.println("port=" + sessPort);
@@ -185,6 +193,8 @@ public abstract class AbstractProxyClient {
 					sessConnected = true;
 					fireProxyEvent(new ProxyConnectedEvent());
 					startEventThread();
+				} catch (SocketTimeoutException e) {
+					fireProxyEvent(new ProxyTimeoutEvent());
 				} catch (IOException e) {
 					// TODO: what happens if the accept() fails?
 					System.out.println("accept failed... :(");
