@@ -346,6 +346,17 @@ public abstract class RuntimeResourceManager extends AbstractResourceManager
 		}
 	}
 
+	public void stop() throws CoreException {
+		modelListeners.clear();
+		if(monitoringSystem != null)
+			monitoringSystem.shutdown();
+		if(controlSystem != null)
+			controlSystem.shutdown();
+		if (runtimeProxy != null)
+			runtimeProxy.shutdown();
+		super.stop();
+	}
+
 	private synchronized void addMachine(String ID, IPMachineControl machine) {
 		machines.put(ID, machine);
 	}
