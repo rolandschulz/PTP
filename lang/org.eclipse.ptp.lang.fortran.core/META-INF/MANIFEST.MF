@@ -1,8 +1,8 @@
-Manifest-Version: 1.0
+Manifest-Version: 2.0
 Bundle-ManifestVersion: 2
 Bundle-Name: FDT Fortran Core Plug-in
 Bundle-SymbolicName: org.eclipse.ptp.lang.fortran.core;singleton:=true
-Bundle-Version: 1.0.0
+Bundle-Version: 2.0.0
 Bundle-Activator: org.eclipse.ptp.lang.fortran.core.Activator
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.core.runtime,
