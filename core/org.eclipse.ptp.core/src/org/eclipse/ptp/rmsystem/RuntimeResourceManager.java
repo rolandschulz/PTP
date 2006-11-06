@@ -347,7 +347,6 @@ public abstract class RuntimeResourceManager extends AbstractResourceManager
 	}
 
 	public void stop() throws CoreException {
-		modelListeners.clear();
 		if(monitoringSystem != null)
 			monitoringSystem.shutdown();
 		if(controlSystem != null)
