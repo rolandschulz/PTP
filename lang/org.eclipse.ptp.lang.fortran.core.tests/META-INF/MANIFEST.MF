@@ -1,12 +1,12 @@
-Manifest-Version: 1.0
+Manifest-Version: 2.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Fortran Core Tests Plug-in
 Bundle-SymbolicName: org.eclipse.ptp.lang.fortran.core.tests
-Bundle-Version: 1.0.0
+Bundle-Version: 2.0.0
 Bundle-Activator: org.eclipse.ptp.lang.fortran.core.tests.Activator
 Bundle-Vendor: Eclipse.org
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.core.runtime,
- org.eclipse.ptp.lang.fortran.core,
- org.junit
+ org.junit,
+ org.eclipse.ptp.lang.fortran.core
 Eclipse-LazyStart: true
