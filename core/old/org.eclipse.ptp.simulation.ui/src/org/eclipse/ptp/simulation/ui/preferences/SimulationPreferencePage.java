@@ -288,10 +288,6 @@ public class SimulationPreferencePage extends PreferencePage implements IWorkben
 		}
 		PTPCorePlugin.getDefault().savePluginPreferences();
 
-		IModelManager manager = PTPCorePlugin.getDefault().getModelManager();
-		if (manager.getMonitoringSystem() instanceof SimulationMonitoringSystem && manager.getControlSystem() instanceof SimulationControlSystem) {
-			PTPUIPlugin.getDefault().refreshRuntimeSystem(true, true);	
-		}
 		return true;
 	}
 	

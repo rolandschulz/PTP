@@ -16,10 +16,13 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.internal.core.elementcontrols;
+package org.eclipse.ptp.core;
 
-import org.eclipse.ptp.core.IPMachine;
-
-public interface IPMachineControl extends IPElementControl, IPMachine {
-
+public interface IModelModifier {
+	public void addNodeListener(INodeListener listener);
+	public void removeNodeListener(INodeListener listener);
+	public void addProcessListener(IProcessListener listener);
+	public void removeProcessListener(IProcessListener listener);
+	public void addModelListener(IModelListener listener);
+	public void removeModelListener(IModelListener listener);
 }

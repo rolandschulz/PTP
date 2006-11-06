@@ -8,7 +8,6 @@ import java.util.BitSet;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.core.ControlSystemChoices;
-import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.MonitoringSystemChoices;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.PreferenceConstants;
@@ -23,12 +22,10 @@ import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeNewJobEvent;
 public class MPICH2ProxyRuntimeClient extends ProxyRuntimeClient implements IRuntimeProxy, IProxyRuntimeEventListener {
 	protected Queue events = new Queue();
 	protected BitSet waitEvents = new BitSet();
-	protected IModelManager modelManager;
 	
-	public MPICH2ProxyRuntimeClient(IModelManager modelManager) {
+	public MPICH2ProxyRuntimeClient() {
 		super();
 		super.addRuntimeEventListener(this);
-		this.modelManager = modelManager;
 	}
 	
 	public int runJob(String[] args) throws IOException {

@@ -19,6 +19,7 @@
 package org.eclipse.ptp.internal.core;
 
 import java.io.File;
+
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.core.AttributeConstants;
@@ -27,12 +28,10 @@ import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.PreferenceConstants;
-import org.eclipse.ptp.core.events.IProcessEvent;
-import org.eclipse.ptp.core.events.ProcessEvent;
-import org.eclipse.ptp.internal.core.elementcontrols.IPElementControl;
-import org.eclipse.ptp.internal.core.elementcontrols.IPJobControl;
-import org.eclipse.ptp.internal.core.elementcontrols.IPNodeControl;
-import org.eclipse.ptp.internal.core.elementcontrols.IPProcessControl;
+import org.eclipse.ptp.core.elementcontrols.IPElementControl;
+import org.eclipse.ptp.core.elementcontrols.IPJobControl;
+import org.eclipse.ptp.core.elementcontrols.IPNodeControl;
+import org.eclipse.ptp.core.elementcontrols.IPProcessControl;
 
 public class PProcess extends Parent implements IPProcessControl {
 	protected String NAME_TAG = "process ";
@@ -117,7 +116,7 @@ public class PProcess extends Parent implements IPProcessControl {
 	public void removeProcess() {
 		final IPNodeControl parent = (IPNodeControl) getParent();
 		if (parent != null)
-			parent.removeChild(this);
+			parent.removeProcess(this);
 	}
 	public void setTerminated(boolean isTerminated) {
 		this.isTerminated = isTerminated;
@@ -147,7 +146,7 @@ public class PProcess extends Parent implements IPProcessControl {
 	public void setNode(IPNode node) {
 		this.node = (IPNodeControl) node;
 		if (node != null)
-			this.node.addChild(this);
+			this.node.addProcess(this);
 	}
 	public IPNode getNode() {
 		return this.node;

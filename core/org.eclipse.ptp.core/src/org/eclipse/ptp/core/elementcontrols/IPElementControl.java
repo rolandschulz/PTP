@@ -16,9 +16,7 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.internal.core.elementcontrols;
-
-import java.util.Collection;
+package org.eclipse.ptp.core.elementcontrols;
 
 import org.eclipse.ptp.core.IPElement;
 import org.eclipse.search.ui.ISearchPageScoreComputer;
@@ -66,6 +64,11 @@ public interface IPElementControl extends IPElement, ISearchPageScoreComputer {
 	public static final int P_PROCESS = 14;
 	
 	/**
+	 * Element tag for Process Elements
+	 */
+	public static final int P_RESOURCE_MANAGER = 15;
+	
+	/**
 	 * Searches for an attribute on the Element given an attribute class and key.  
 	 * The resulting attribute Object is returned.  The returned may be null if the attribute
 	 * was not found.
@@ -109,15 +112,6 @@ public interface IPElementControl extends IPElement, ISearchPageScoreComputer {
 	public int getElementType();
 
 	/**
-	 * Returns an Element array of the children of this Element. If this Element
-	 * does not yet have any children, then an empty array is returned.
-	 * 
-	 * @return An Element array of the children of this Element, an empty array if there
-	 *         are none
-	 */
-	public IPElementControl[] getChildren();
-
-	/**
 	 * If this Element has a parent then this method returns it, else it returns
 	 * null.
 	 * 
@@ -129,40 +123,6 @@ public interface IPElementControl extends IPElement, ISearchPageScoreComputer {
 	 * public IPUniverse getPUniverse(); public IPMachine getPMachine(); public
 	 * IPJob getPRoot();
 	 */
-
-	/**
-	 * Adds an Element as a child of this Element creating a parent-child
-	 * relationship between the two.
-	 * 
-	 * @param member
-	 *            The Element to add as a child to this Element
-	 */
-	public void addChild(IPElementControl member);
-
-	/**
-	 * Locate a child Element of this Element and remove it as a child, breaking
-	 * the parent-child relationship between the two. If the proposed child
-	 * member is not found as a child of this Element then no action is taken.
-	 * 
-	 * @param member
-	 *            The Element to remove as a child of this Element
-	 */
-	public void removeChild(IPElementControl member);
-
-	/**
-	 * Remove all children Elements from this Element.
-	 */
-	public void removeChildren();
-
-	/**
-	 * Finds an child Element of this Element by searching by the name of the
-	 * Element. If found, the Element object is returned, else null is returned.
-	 * 
-	 * @param elementName
-	 *            The name of the child Element to find
-	 * @return The Element object if found, else null
-	 */
-	public IPElementControl findChild(String elementName);
 
 	/**
 	 * Returns the number of children of this Element.
@@ -178,14 +138,6 @@ public interface IPElementControl extends IPElement, ISearchPageScoreComputer {
 	 * @return I have no idea, T/F obviously though :)
 	 */
 	public boolean isAllStop();
-
-	/**
-	 * Returns the children of this Element as a Collection or an empty collection if there are
-	 * no children.
-	 * 
-	 * @return The children of this Element or an empty collection if there are none
-	 */
-	public Collection getCollection();
 
 	/**
 	 * Returns true if this Element has children Elements, else returns false.

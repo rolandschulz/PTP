@@ -28,104 +28,32 @@ import org.eclipse.ptp.core.IPMachine;
 import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.IPUniverse;
-import org.eclipse.ptp.internal.core.elementcontrols.IPElementControl;
-import org.eclipse.ptp.internal.core.elementcontrols.IPJobControl;
-import org.eclipse.ptp.internal.core.elementcontrols.IPNodeControl;
-import org.eclipse.ptp.internal.core.elementcontrols.IPProcessControl;
-import org.eclipse.ptp.internal.core.elementcontrols.IPUniverseControl;
+import org.eclipse.ptp.core.elementcontrols.IPElementControl;
+import org.eclipse.ptp.core.elementcontrols.IPJobControl;
+import org.eclipse.ptp.core.elementcontrols.IPNodeControl;
+import org.eclipse.ptp.core.elementcontrols.IPProcessControl;
+import org.eclipse.ptp.core.elementcontrols.IPQueueControl;
 
 public class PJob extends Parent implements IPJobControl {
-	protected String NAME_TAG = "root ";
-	protected boolean isDebugJob = false;
+	final public static int BASE_OFFSET = 10000;
+	final public static int STATE_NEW = 5000;
 	private ArrayList taskIdMap;
 
-	final public static int BASE_OFFSET = 10000;
+	protected String NAME_TAG = "root ";
 	
-	final public static int STATE_NEW = 5000;
+	protected boolean isDebugJob = false;
 
-	public PJob(IPUniverseControl uni, String name, String key, int jobNumber) {
-		super(uni, name, key, P_JOB);
+	public PJob(IPQueueControl queue, String name, String key, int jobNumber) {
+		super(queue, name, key, P_JOB);
 		taskIdMap = new ArrayList();
 		this.setAttribute(AttributeConstants.ATTRIB_JOBID, new Integer(jobNumber));
 	}
 	
-	public boolean isDebug() {
-		return isDebugJob;
+	public void addProcess(IPProcessControl p) {
+		addChild(p);
+		taskIdMap.add(p.getTaskId(), "" + p.getID() + "");
 	}
 	
-	public void setDebug() {
-		isDebugJob = true;
-	}
-
-	/*
-	 * returns the Machines that this job is running on. this is accomplished by
-	 * drilling down to the processes, finding the nodes they are running on,
-	 * and then seeing which machines those nodes are part of
-	 */
-	public IPMachine[] getMachines() {
-		IPNode[] nodes = getNodes();
-		List array = new ArrayList(0);
-		for (int i = 0; i < nodes.length; i++) {
-			final IPMachine machine = nodes[i].getMachine();
-			if (machine != null && !array.contains(machine)) {
-				array.add(machine);
-			}
-		}
-
-		return (IPMachine[]) array.toArray(new IPMachine[array.size()]);
-	}
-
-	public String getJobNumber() {
-		return ""+((Integer) this.getAttribute(AttributeConstants.ATTRIB_JOBID)).intValue()+"";
-		/*
-		int i = getID();
-		System.out.println("get job number - ID = "+i+", offset = "+BASE_OFFSET);
-		return "" + (i - BASE_OFFSET) + "";
-		*/
-		/*
-		 * String s = getKey(); int i = -1; try { i = (new
-		 * Integer(s)).intValue(); } catch(NumberFormatException e) { } if(i !=
-		 * -1) { return ""+(i - BASE_OFFSET)+""; } else return "";
-		 */
-	}
-	
-	public int getJobNumberInt()
-	{
-		return ((Integer) this.getAttribute(AttributeConstants.ATTRIB_JOBID)).intValue();
-	}
-
-	public synchronized IPNode[] getSortedNodes() {
-		IPNodeControl[] nodes = (IPNodeControl[]) getNodes();
-		sort(nodes);
-		return nodes;
-	}
-
-	public synchronized IPNode[] getNodes() {
-		IPProcess[] processes = getProcesses();
-		List array = new ArrayList(0);
-		for (int i = 0; i < processes.length; i++) {
-			final IPNode node = processes[i].getNode();
-			if (node != null && !array.contains(node)) {
-				array.add(node);
-			}
-		}
-
-		return (IPNodeControl[]) array.toArray(new IPNodeControl[array.size()]);
-	}
-
-	/*
-	 * returns all the processes in this job, which are the children of the job
-	 */
-	public synchronized IPProcess[] getProcesses() {
-		return (IPProcessControl[]) getCollection().toArray(new IPProcessControl[size()]);
-	}
-
-	public synchronized IPProcess[] getSortedProcesses() {
-		IPProcessControl[] processes = (IPProcessControl[]) getProcesses();
-		sort(processes);
-		return processes;
-	}
-
 	public synchronized IPProcess findProcess(String processNumber) {
 		IPElementControl element = findChild(processNumber);
 		if (element != null)
@@ -147,43 +75,6 @@ public class PJob extends Parent implements IPJobControl {
 		return null;
 	}
 
-	/*
-	 * returns the number of nodes that this job is running on by counting each
-	 * node that each process in this job is running on
-	 */
-	public int totalNodes() {
-		return getNodes().length;
-	}
-
-	public int totalProcesses() {
-		return size();
-	}
-
-	public void removeAllProcesses() {
-		IPProcess[] processes = getProcesses();
-		for (int i = 0; i < processes.length; i++)
-			processes[i].clearOutput();
-
-		removeChildren();
-	}
-
-	public IPUniverse getUniverse() {
-		IPElementControl current = this;
-		do {
-			if (current instanceof IPUniverse)
-				return (IPUniverse) current;
-		} while ((current = current.getParent()) != null);
-		return null;
-	}
-	
-	public void addChild(IPElementControl member) {
-		super.addChild(member);
-		if (member instanceof IPProcessControl) {
-			IPProcessControl p = (IPProcessControl) member;
-			taskIdMap.add(p.getTaskId(), "" + p.getID() + "");
-		}
-	}
-
 	public synchronized IPProcess findProcessByTaskId(int taskId) {
 		String procNumber = (String) taskIdMap.get(taskId);
 		if (procNumber == null)
@@ -196,15 +87,128 @@ public class PJob extends Parent implements IPJobControl {
 		return this.getAttribute(AttributeConstants.ATTRIB_CLASS_JOB, key);
 	}
 
-	public void setAttribute(String key, Object o) {
-		this.setAttribute(AttributeConstants.ATTRIB_CLASS_JOB, key, o);
-	}
-	
 	public String[] getAttributeKeys() {
 		return this.getAttributeKeys(AttributeConstants.ATTRIB_CLASS_JOB);
 	}
 
+	public String getJobNumber() {
+		return ""+((Integer) this.getAttribute(AttributeConstants.ATTRIB_JOBID)).intValue()+"";
+		/*
+		int i = getID();
+		System.out.println("get job number - ID = "+i+", offset = "+BASE_OFFSET);
+		return "" + (i - BASE_OFFSET) + "";
+		*/
+		/*
+		 * String s = getKey(); int i = -1; try { i = (new
+		 * Integer(s)).intValue(); } catch(NumberFormatException e) { } if(i !=
+		 * -1) { return ""+(i - BASE_OFFSET)+""; } else return "";
+		 */
+	}
+
+	public int getJobNumberInt()
+	{
+		return ((Integer) this.getAttribute(AttributeConstants.ATTRIB_JOBID)).intValue();
+	}
+
+	/*
+	 * returns the Machines that this job is running on. this is accomplished by
+	 * drilling down to the processes, finding the nodes they are running on,
+	 * and then seeing which machines those nodes are part of
+	 */
+	public IPMachine[] getMachines() {
+		IPNode[] nodes = getNodes();
+		List array = new ArrayList(0);
+		for (int i = 0; i < nodes.length; i++) {
+			final IPMachine machine = nodes[i].getMachine();
+			if (machine != null && !array.contains(machine)) {
+				array.add(machine);
+			}
+		}
+
+		return (IPMachine[]) array.toArray(new IPMachine[array.size()]);
+	}
+
 	public String getName() {
 		return getElementName();
+	}
+
+	public synchronized IPNode[] getNodes() {
+		IPProcess[] processes = getProcesses();
+		List array = new ArrayList(0);
+		for (int i = 0; i < processes.length; i++) {
+			final IPNode node = processes[i].getNode();
+			if (node != null && !array.contains(node)) {
+				array.add(node);
+			}
+		}
+
+		return (IPNodeControl[]) array.toArray(new IPNodeControl[array.size()]);
+	}
+
+	/*
+	 * returns all the processes in this job, which are the children of the job
+	 */
+	public synchronized IPProcessControl[] getProcessControls() {
+		return (IPProcessControl[]) getCollection().toArray(new IPProcessControl[size()]);
+	}
+
+	/*
+	 * returns all the processes in this job, which are the children of the job
+	 */
+	public IPProcess[] getProcesses() {
+		return getProcessControls();
+	}
+
+	public synchronized IPNode[] getSortedNodes() {
+		IPNodeControl[] nodes = (IPNodeControl[]) getNodes();
+		sort(nodes);
+		return nodes;
+	}
+
+	public synchronized IPProcess[] getSortedProcesses() {
+		IPProcessControl[] processes = (IPProcessControl[]) getProcesses();
+		sort(processes);
+		return processes;
+	}
+
+	public IPUniverse getUniverse() {
+		IPElementControl current = this;
+		do {
+			if (current instanceof IPUniverse)
+				return (IPUniverse) current;
+		} while ((current = current.getParent()) != null);
+		return null;
+	}
+	
+	public boolean isDebug() {
+		return isDebugJob;
+	}
+
+	public void removeAllProcesses() {
+		IPProcess[] processes = getProcesses();
+		for (int i = 0; i < processes.length; i++)
+			processes[i].clearOutput();
+
+		removeChildren();
+	}
+	
+	public void setAttribute(String key, Object o) {
+		this.setAttribute(AttributeConstants.ATTRIB_CLASS_JOB, key, o);
+	}
+
+	public void setDebug() {
+		isDebugJob = true;
+	}
+	
+	/*
+	 * returns the number of nodes that this job is running on by counting each
+	 * node that each process in this job is running on
+	 */
+	public int totalNodes() {
+		return getNodes().length;
+	}
+
+	public int totalProcesses() {
+		return size();
 	}
 }

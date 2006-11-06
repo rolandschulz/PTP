@@ -15,9 +15,11 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.ptp.core.IModelPresentation;
+import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.IPElement;
 import org.eclipse.ptp.core.IPMachine;
+import org.eclipse.ptp.core.IPQueue;
+import org.eclipse.ptp.core.IPUniverse;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.internal.ui.ParallelImages;
 import org.eclipse.ptp.rmsystem.IResourceManager;
@@ -27,6 +29,8 @@ import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
 import org.eclipse.ptp.rmsystem.IResourceManagerListener;
 import org.eclipse.ptp.rmsystem.IResourceManagerMenuContribution;
 import org.eclipse.ptp.rmsystem.ResourceManagerStatus;
+import org.eclipse.ptp.rmsystem.events.IResourceManagerAddedRemovedEvent;
+import org.eclipse.ptp.rmsystem.events.IResourceManagerContentsChangedEvent;
 import org.eclipse.ptp.ui.UIMessage;
 import org.eclipse.ptp.ui.actions.AddResourceManagerAction;
 import org.eclipse.ptp.ui.actions.RemoveResourceManagersAction;
@@ -73,23 +77,6 @@ public class ResourceManagerView extends ViewPart implements
 
 	}
 
-	public class RMWrapper implements IResourceManagerMenuContribution {
-
-		private final IResourceManager rm;
-
-		public RMWrapper(IResourceManager rm) {
-			this.rm = rm;
-		}
-
-		public Object getAdapter(Class adapter) {
-			if (adapter.isInstance(rm)) {
-				return rm;
-			} else {
-				return rm.getAdapter(adapter);
-			}
-		}
-	}
-
 	public class TheContentProvider implements ITreeContentProvider {
 
 		private final HashMap parents = new HashMap();
@@ -112,36 +99,25 @@ public class ResourceManagerView extends ViewPart implements
 				if (!rm.getStatus().equals(ResourceManagerStatus.STARTED)) {
 					return new Object[0];
 				}
-				final IModelPresentation modelPresentation = rm.getModelPresentation();
-				IPMachine[] machines = modelPresentation != null ? modelPresentation.getUniverse().getMachines()
-						: new IPMachine[0];
+				IPMachine[] machines = rm.getMachines();
+				IPQueue[] queues = rm.getQueues();
 				return new Object[] {
 						makeChildContainer(parentElement,
 								UIMessage.getResourceString("ResourceManagerView.Machines"), machines), //$NON-NLS-1$
 						makeChildContainer(parentElement,
-								UIMessage.getResourceString("ResourceManagerView.Queues"), new Object[0]) }; //$NON-NLS-1$
+								UIMessage.getResourceString("ResourceManagerView.Queues"), queues) }; //$NON-NLS-1$
 			}
 			return null;
 		}
 
 		public Object[] getElements(Object inputElement) {
-			final PTPCorePlugin ptpCorePlugin = PTPCorePlugin.getDefault();
-			final IResourceManager currentResourceManager = ptpCorePlugin.getCurrentResourceManager();
+			final IPUniverse universe = PTPCorePlugin.getDefault().getUniverse();
 
-			// We need to wrap the current resource manager, so that the same
-			// object
-			// does not appear in the tree more than once. This confuses the
-			// tree viewer.
-			currentRMWrapper = new RMWrapper(currentResourceManager);
-
-			final ChildContainer current = makeChildContainer(
-					null,
-					UIMessage.getResourceString("ResourceManagerView.CurrentResourceManager"), new RMWrapper[] { currentRMWrapper }); //$NON-NLS-1$
-			final IResourceManager[] resourceManagers = ptpCorePlugin.getResourceManagers();
+			final IResourceManager[] resourceManagers = universe.getResourceManagers();
 			final ChildContainer root = makeChildContainer(
 					null,
 					UIMessage.getResourceString("ResourceManagerView.ResourceManagers"), resourceManagers); //$NON-NLS-1$
-			return new Object[] { current, root };
+			return new Object[] { root };
 		}
 
 		public Object getParent(Object element) {
@@ -219,9 +195,6 @@ public class ResourceManagerView extends ViewPart implements
 		}
 
 		public Image getImage(Object element) {
-			if (element == currentRMWrapper) {
-				element = currentRMWrapper.rm;
-			}
 			if (element instanceof IResourceManager) {
 				ResourceManagerStatus status = ((IResourceManager) element).getStatus();
 				if (status.equals(ResourceManagerStatus.STARTED))
@@ -236,13 +209,14 @@ public class ResourceManagerView extends ViewPart implements
 		}
 
 		public String getText(Object element) {
-			if (element == currentRMWrapper) {
-				element = currentRMWrapper.rm;
-			}
 			if (element instanceof IResourceManager) {
 				IResourceManagerConfiguration configuration = ((IResourceManager) element).getConfiguration();
-				IResourceManagerFactory factory = PTPCorePlugin.getDefault().getResourceManagerFactory(
-						configuration.getResourceManagerId());
+				final IModelManager modelManager = PTPCorePlugin.getDefault().getModelManager();
+				final String resourceManagerId = configuration.getResourceManagerId();
+				if (resourceManagerId == null)
+					return configuration.getName();
+				IResourceManagerFactory factory = modelManager.getResourceManagerFactory(
+						resourceManagerId);
 				return configuration.getName() + " (" + factory.getName() + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			if (element instanceof ChildContainer) {
@@ -267,14 +241,12 @@ public class ResourceManagerView extends ViewPart implements
 
 	private AddResourceManagerAction addResourceManagerAction;
 
-	private RMWrapper currentRMWrapper;
-
 	public void createPartControl(Composite parent) {
 		viewer = new TreeViewer(parent, SWT.MULTI);
 		viewer.setContentProvider(new TheContentProvider());
 		viewer.setLabelProvider(new TheLabelProvider());
 
-		viewer.setInput(PTPCorePlugin.getDefault().getResourceManagers());
+		viewer.setInput(PTPCorePlugin.getDefault().getUniverse().getResourceManagers());
 
 		// -----------------------------
 		// Enable right-click popup menu
@@ -289,28 +261,24 @@ public class ResourceManagerView extends ViewPart implements
 		// ----------------------------------------------------------------------
 		getSite().setSelectionProvider(viewer);
 
-		PTPCorePlugin.getDefault().addResourceManagerChangedListener(this);
+		PTPCorePlugin.getDefault().getModelManager().addResourceManagerChangedListener(this);
 	}
 
 	public void dispose() {
-		PTPCorePlugin.getDefault().removeResourceManagerChangedListener(this);
+		PTPCorePlugin.getDefault().getModelManager().removeResourceManagerChangedListener(this);
 		super.dispose();
 	}
 
-	public void handleContentsChanged(IResourceManager resourceManager) {
+	public void handleContentsChanged(IResourceManagerContentsChangedEvent event) {
+		IResourceManager resourceManager = event.getSource();
 		viewer.refresh(resourceManager);
 		refreshViewer(resourceManager);
 	}
 
-	public void handleCurrentResourceManagerChanged(
-			IResourceManager oldRmManager, IResourceManager newRmManager) {
-		viewer.refresh();
-	}
-
-	public void handleResourceManagersAddedRemoved() {
+	public void handleResourceManagersAddedRemoved(IResourceManagerAddedRemovedEvent event) {
 		// Let the content provider register and unregister
 		// to the added and removed resource managers
-		viewer.setInput(PTPCorePlugin.getDefault().getResourceManagers());
+		viewer.setInput(PTPCorePlugin.getDefault().getUniverse().getResourceManagers());
 	}
 
 	public void handleStarted(IResourceManager resourceManager) {
@@ -385,34 +353,12 @@ public class ResourceManagerView extends ViewPart implements
 
 		viewer.refresh(resourceManager);
 
-		// We needed to wrap the current resource manager, so that the same
-		// object
-		// does not appear in the tree more than once. This would confuse the
-		// tree viewer.
-		// Now we have to make sure that if this resourceManager is the current
-		// one then
-		// we must also refresh the wrapper.
-
-		if (currentRMWrapper.rm == resourceManager) {
-			viewer.refresh(currentRMWrapper);
-		}
 	}
 
 	private void updateViewer(IResourceManager resourceManager) {
 
 		viewer.update(resourceManager, null);
 
-		// We needed to wrap the current resource manager, so that the same
-		// object
-		// does not appear in the tree more than once. This would confuse the
-		// tree viewer.
-		// Now we have to make sure that if this resourceManager is the current
-		// one then
-		// we must also update the wrapper.
-
-		if (currentRMWrapper.rm == resourceManager) {
-			viewer.update(currentRMWrapper, null);
-		}
 	}
 
 }

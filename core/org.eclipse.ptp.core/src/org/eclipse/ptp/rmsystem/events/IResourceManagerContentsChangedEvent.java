@@ -16,33 +16,27 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.core;
+package org.eclipse.ptp.rmsystem.events;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-/**
- * @author rsqrd
- */
-/**
- * @author rsqrd
- *
- */
-public interface IModelPresentation extends IModelModifier {
+import org.eclipse.ptp.rmsystem.IResourceManager;
+
+public interface IResourceManagerContentsChangedEvent {
+	
+	static int MACHINE = 101;
+	static int QUEUE = 102;
 	
 	/**
-	 * @param jobName
-	 * @throws CoreException
+	 * @return the source of the event
 	 */
-	public void abortJob(String jobName) throws CoreException;
-	/**
-	 * @return
-	 */
-	public IPUniverse getUniverse();
+	IResourceManager getSource();
 
 	/**
-	 * @param monitor
-	 * @param force
-	 * @throws CoreException
+	 * @return an array of the ids of the changed elements
 	 */
-	public void refreshRuntimeSystems(IProgressMonitor monitor, boolean force) throws CoreException;
+	int[] getChangedElementIds();
+	
+	/**
+	 * @return the class of the changed elements, MACHINE, QUEUE
+	 */
+	int getChangedElementClass();
 }

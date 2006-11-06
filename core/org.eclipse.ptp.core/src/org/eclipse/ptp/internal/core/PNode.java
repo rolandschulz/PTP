@@ -19,19 +19,16 @@
 package org.eclipse.ptp.internal.core;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.ptp.core.AttributeConstants;
-import org.eclipse.ptp.core.INodeListener;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPMachine;
 import org.eclipse.ptp.core.IPProcess;
-import org.eclipse.ptp.core.events.INodeEvent;
-import org.eclipse.ptp.internal.core.elementcontrols.IPElementControl;
-import org.eclipse.ptp.internal.core.elementcontrols.IPMachineControl;
-import org.eclipse.ptp.internal.core.elementcontrols.IPNodeControl;
-import org.eclipse.ptp.internal.core.elementcontrols.IPProcessControl;
+import org.eclipse.ptp.core.elementcontrols.IPElementControl;
+import org.eclipse.ptp.core.elementcontrols.IPMachineControl;
+import org.eclipse.ptp.core.elementcontrols.IPNodeControl;
+import org.eclipse.ptp.core.elementcontrols.IPProcessControl;
 
 public class PNode extends Parent implements IPNodeControl {
 	protected String NAME_TAG = "node ";
@@ -40,6 +37,11 @@ public class PNode extends Parent implements IPNodeControl {
 		super(mac, name, key, P_NODE);
 		this.setAttribute(AttributeConstants.ATTRIB_NODE_NUMBER, new Integer(key));
 	}
+	
+	public void addProcess(IPProcessControl process) {
+		addChild(process);
+	}
+	
 	public IPMachine getMachine() {
 		IPElementControl current = this;
 		do {
@@ -48,16 +50,24 @@ public class PNode extends Parent implements IPNodeControl {
 		} while ((current = current.getParent()) != null);
 		return null;
 	}
+	
 	public String getNodeNumber() {
 		return ""+((Integer) this.getAttribute(AttributeConstants.ATTRIB_NODE_NUMBER)).intValue()+"";
 	}
+	
 	public int getNodeNumberInt()
 	{
 		return ((Integer) this.getAttribute(AttributeConstants.ATTRIB_NODE_NUMBER)).intValue();
 	}
-	public IPProcess[] getProcesses() {
+	
+	public IPProcessControl[] getProcessControls() {
 		return (IPProcessControl[]) getCollection().toArray(new IPProcessControl[size()]);
 	}
+	
+	public IPProcess[] getProcesses() {
+		return getProcessControls();
+	}
+	
 	public IPProcess[] getSortedProcesses() {
 		IPProcessControl[] processes = (IPProcessControl[]) getProcesses();
 		sort(processes);
@@ -114,5 +124,9 @@ public class PNode extends Parent implements IPNodeControl {
 	 */
 	public boolean hasChildProcesses() {
 		return getNumProcesses() > 0;
+	}
+	
+	public void removeProcess(IPProcessControl process) {
+		removeProcess(process);
 	}	
 }

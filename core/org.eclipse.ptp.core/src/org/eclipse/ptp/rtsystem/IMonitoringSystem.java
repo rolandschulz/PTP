@@ -19,11 +19,7 @@
 
 package org.eclipse.ptp.rtsystem;
 
-import java.io.IOException;
-
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.ptp.core.IPMachine;
-import org.eclipse.ptp.core.IPNode;
 
 /**
  * A Monitoring System is a portion of a runtime system that handles status and information about

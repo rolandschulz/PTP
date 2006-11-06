@@ -23,75 +23,17 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.ptp.internal.core.elementcontrols.IPElementControl;
+import org.eclipse.ptp.core.elementcontrols.IPElementControl;
 
 /**
  *  
  */
 public abstract class Parent extends PElement {
-	public Parent(IPElementControl parent, String name, String key, int type) {
-		super(parent, name, key, type);
+	public static void sort(IPElementControl element[]) {
+		quickSort(element, 0, element.length - 1);
 	}
 
-	public void addChild(IPElementControl member) {
-		getElementInfo().addChild(member);
-	}
-
-	public void removeChild(IPElementControl member) {
-		getElementInfo().removeChild(member);
-	}
-
-	public IPElementControl findChild(String key) {
-		return getElementInfo().findChild(key);
-	}
-
-	public void removeChildren() {
-		getElementInfo().removeChildren();
-	}
-
-	public Collection getCollection() {
-		PElementInfo info = getElementInfo();
-		if (info != null)
-			return info.getCollection();
-
-		return Collections.EMPTY_LIST;
-	}
-
-	public IPElementControl[] getChildren() {
-		PElementInfo info = getElementInfo();
-		if (info != null)
-			return info.getChildren();
-
-		return new IPElementControl[] {};
-	}
-
-	public List getChildrenOfType(int type) {
-		IPElementControl[] children = getChildren();
-		int size = children.length;
-		ArrayList list = new ArrayList(size);
-		for (int i = 0; i < size; ++i) {
-			PElement elt = (PElement) children[i];
-			if (elt.getElementType() == type) {
-				list.add(elt);
-			}
-		}
-		return list;
-	}
-
-	public boolean hasChildren() {
-		return getElementInfo().hasChildren();
-	}
-
-	public boolean isAllStop() {
-		IPElementControl[] elements = getChildren();
-		for (int i = 0; i < elements.length; i++) {
-			if (!elements[i].isAllStop())
-				return false;
-		}
-		return true;
-	}
-
-	private void quickSort(IPElementControl element[], int low, int high) {
+	private static void quickSort(IPElementControl element[], int low, int high) {
 		int lo = low;
 		int hi = high;
 		int mid;
@@ -115,14 +57,72 @@ public abstract class Parent extends PElement {
 		}
 	}
 
-	private void swap(IPElementControl element[], int i, int j) {
+	private static void swap(IPElementControl element[], int i, int j) {
 		IPElementControl tempElement;
 		tempElement = element[i];
 		element[i] = element[j];
 		element[j] = tempElement;
 	}
 
-	public void sort(IPElementControl element[]) {
-		quickSort(element, 0, element.length - 1);
+	public Parent(IPElementControl parent, String name, String key, int type) {
+		super(parent, name, key, type);
+	}
+
+	public boolean hasChildren() {
+		return getElementInfo().hasChildren();
+	}
+
+	public boolean isAllStop() {
+		IPElementControl[] elements = getChildren();
+		for (int i = 0; i < elements.length; i++) {
+			if (!elements[i].isAllStop())
+				return false;
+		}
+		return true;
+	}
+
+	protected void addChild(IPElementControl member) {
+		getElementInfo().addChild(member);
+	}
+
+	protected IPElementControl findChild(String key) {
+		return getElementInfo().findChild(key);
+	}
+
+	protected IPElementControl[] getChildren() {
+		PElementInfo info = getElementInfo();
+		if (info != null)
+			return info.getChildren();
+
+		return new IPElementControl[] {};
+	}
+
+	protected List getChildrenOfType(int type) {
+		IPElementControl[] children = getChildren();
+		int size = children.length;
+		ArrayList list = new ArrayList(size);
+		for (int i = 0; i < size; ++i) {
+			PElement elt = (PElement) children[i];
+			if (elt.getElementType() == type) {
+				list.add(elt);
+			}
+		}
+		return list;
+	}
+
+	protected Collection getCollection() {
+		PElementInfo info = getElementInfo();
+		if (info != null)
+			return info.getCollection();
+
+		return Collections.EMPTY_LIST;
+	}
+
+	protected void removeChild(IPElementControl member) {
+		getElementInfo().removeChild(member);
+	}
+
+	protected void removeChildren() {
+		getElementInfo().removeChildren();
 	}
 }

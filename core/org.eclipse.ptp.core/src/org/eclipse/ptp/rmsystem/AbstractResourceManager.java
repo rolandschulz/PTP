@@ -22,30 +22,65 @@
 package org.eclipse.ptp.rmsystem;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.ISafeRunnable;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
-import org.eclipse.core.runtime.PlatformObject;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.util.SafeRunnable;
-import org.eclipse.ptp.core.IModelPresentation;
-import org.eclipse.ptp.rtsystem.IControlSystem;
+import org.eclipse.ptp.core.IModelListener;
+import org.eclipse.ptp.core.INodeListener;
+import org.eclipse.ptp.core.IProcessListener;
+import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.elementcontrols.IPMachineControl;
+import org.eclipse.ptp.core.elementcontrols.IPQueueControl;
+import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
+import org.eclipse.ptp.core.events.IModelEvent;
+import org.eclipse.ptp.core.events.INodeEvent;
+import org.eclipse.ptp.core.events.IProcessEvent;
+import org.eclipse.ptp.internal.core.PElement;
+import org.eclipse.ptp.rmsystem.events.ResourceManagerContentsChangedEvent;
+import org.eclipse.swt.widgets.Display;
 
 /**
  * @author rsqrd
  * 
  */
-public abstract class AbstractResourceManager extends PlatformObject implements IResourceManager {
+public abstract class AbstractResourceManager extends PElement implements IResourceManager {
 	
 	private final ListenerList listeners = new ListenerList();
 
 	private final IResourceManagerConfiguration config;
 
 	private ResourceManagerStatus status;
+
+	protected final Display display;
+
+	protected final ListenerList modelListeners = new ListenerList();
+
+	protected final ListenerList nodeListeners = new ListenerList();
+
+	protected final ListenerList processListeners = new ListenerList();
 	
-	public AbstractResourceManager(IResourceManagerConfiguration config)
+	public AbstractResourceManager(IPUniverseControl universe, IResourceManagerConfiguration config)
 	{
+		super(universe, config.getName(), config.getResourceManagerId(), P_RESOURCE_MANAGER);
+		this.display = PTPCorePlugin.getDisplay();
 		this.config = config;
 		this.status = ResourceManagerStatus.INIT;
 	}
 	
+	public void addModelListener(IModelListener listener) {
+		modelListeners.add(listener);
+	}
+
+	public void addNodeListener(INodeListener listener) {
+		nodeListeners.add(listener);
+	}
+
+	public void addProcessListener(IProcessListener listener) {
+		processListeners.add(listener);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -53,6 +88,20 @@ public abstract class AbstractResourceManager extends PlatformObject implements 
 	 */
 	public void addResourceManagerListener(IResourceManagerListener listener) {
 		listeners.add(listener);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManager#dispose()
+	 */
+	public void dispose() {
+		modelListeners.clear();
+		nodeListeners.clear();
+		processListeners.clear();
+		SafeRunnable.run(new SafeRunnable(){
+			public void run() throws Exception {
+				stop();
+			}});
+		doDispose();
 	}
 
 	/* (non-Javadoc)
@@ -73,26 +122,12 @@ public abstract class AbstractResourceManager extends PlatformObject implements 
 		return config;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rm.IResourceManager#getControlSystem()
-	 */
-	public abstract IControlSystem getControlSystem();
-
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.IResourceManager#getDescription()
 	 */
 	public String getDescription() {
 		return config.getDescription();
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rm.IResourceManager#getModeManager()
-	 */
-	public abstract IModelPresentation getModelPresentation();
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.IResourceManager#getName()
@@ -108,6 +143,36 @@ public abstract class AbstractResourceManager extends PlatformObject implements 
 		return status;
 	}
 
+	public boolean hasChildren() {
+		return getMachines().length > 0 || getQueues().length > 0;
+	}
+	
+	public boolean isAllStop() {
+		IPMachineControl[] machines = getMachineControls();
+		for (int i = 0; i < machines.length; i++) {
+			if (!machines[i].isAllStop())
+				return false;
+		}
+		IPQueueControl[] queues = getQueueControls();
+		for (int i = 0; i < queues.length; i++) {
+			if (!queues[i].isAllStop())
+				return false;
+		}
+		return true;
+	}
+
+	public void removeModelListener(IModelListener listener) {
+		modelListeners.remove(listener);
+	}
+
+	public void removeNodeListener(INodeListener listener) {
+		nodeListeners.remove(listener);
+	}
+
+	public void removeProcessListener(IProcessListener listener) {
+		processListeners.remove(listener);
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -126,6 +191,7 @@ public abstract class AbstractResourceManager extends PlatformObject implements 
 		if (!status.equals(ResourceManagerStatus.STARTED) &&
 				!status.equals(ResourceManagerStatus.ERROR)) {
 			doStart();
+			setStatus(ResourceManagerStatus.STARTED, false);
 			fireStarted();
 		}
 	}
@@ -138,11 +204,112 @@ public abstract class AbstractResourceManager extends PlatformObject implements 
 	public void stop() throws CoreException {
 		if (status.equals(ResourceManagerStatus.STARTED)) {
 			doStop();
+			setStatus(ResourceManagerStatus.STOPPED, false);
 			fireStopped();
 		}
 	}
 
-	private void fireStarted() {
+	private void fireContentsChanged(final ResourceManagerContentsChangedEvent event) {
+		Object[] tmpListeners = listeners.getListeners();
+			
+		for (int i = 0, n = tmpListeners.length; i < n; ++i) {
+			final IResourceManagerListener listener = (IResourceManagerListener) tmpListeners[i];
+			listener.handleContentsChanged(event);
+			SafeRunnable.run(new SafeRunnable() {
+				public void run() {
+					listener.handleContentsChanged(event);
+				}
+			});
+		}
+	}
+
+	/**
+	 * 
+	 */
+	protected abstract void doDispose();
+
+	/**
+	 * @throws CoreException
+	 */
+	protected abstract void doStart() throws CoreException;
+
+	/**
+	 * @throws CoreException
+	 */
+	protected abstract void doStop() throws CoreException;
+
+	/**
+	 * @param event
+	 */
+	protected void fireEvent(final IModelEvent event) {
+		Object[] array = modelListeners.getListeners();
+		for (int i = 0; i < array.length; i++) {
+			final IModelListener l = (IModelListener) array[i];
+			final SafeRunnable safeRunnable = new SafeRunnable() {
+				public void run() {
+					l.modelEvent(event);
+				}
+			};
+			safeRunAsyncInUIThread(safeRunnable);
+		}
+	}
+
+	/**
+	 * @param event
+	 */
+	protected void fireEvent(final INodeEvent event) {
+		Object[] array = nodeListeners.getListeners();
+		for (int i = 0; i < array.length; i++) {
+			final INodeListener l = (INodeListener) array[i];
+			final SafeRunnable safeRunnable = new SafeRunnable() {
+				public void run() {
+					l.nodeEvent(event);
+				}
+			};
+			safeRunAsyncInUIThread(safeRunnable);
+		}
+	}
+
+	protected void fireEvent(final IProcessEvent event) {
+		Object[] array = processListeners.getListeners();
+		for (int i = 0; i < array.length; i++) {
+			final IProcessListener l = (IProcessListener) array[i];
+			final SafeRunnable safeRunnable = new SafeRunnable() {
+				public void run() {
+					l.processEvent(event);
+				}
+			};
+			safeRunAsyncInUIThread(safeRunnable);
+		}
+	}
+
+	protected void fireMachinesChanged(int[] ids) {
+		try {
+			ResourceManagerContentsChangedEvent event = 
+				new ResourceManagerContentsChangedEvent(this,
+					ResourceManagerContentsChangedEvent.MACHINE, ids);
+			fireContentsChanged(event);
+			
+		} catch (CoreException e) {
+			// Shouldn't happen
+			e.printStackTrace();
+		}
+	}
+
+	protected void fireQueuesChanged(int[] ids) {
+		try {
+			ResourceManagerContentsChangedEvent event = 
+				new ResourceManagerContentsChangedEvent(this,
+					ResourceManagerContentsChangedEvent.QUEUE, ids);
+			fireContentsChanged(event);
+			
+		} catch (CoreException e) {
+			// Shouldn't happen
+			e.printStackTrace();
+		}
+	}
+
+	protected void fireStarted() {
 		Object[] tmpListeners = listeners.getListeners();
 		
 		for (int i = 0, n = tmpListeners.length; i < n; ++i) {
@@ -155,7 +322,7 @@ public abstract class AbstractResourceManager extends PlatformObject implements 
 		}
 	}
 
-	private void fireStatusChanged(final ResourceManagerStatus oldStatus) {
+	protected void fireStatusChanged(final ResourceManagerStatus oldStatus) {
 		Object[] tmpListeners = listeners.getListeners();
 		
 		for (int i = 0, n = tmpListeners.length; i < n; ++i) {
@@ -168,7 +335,7 @@ public abstract class AbstractResourceManager extends PlatformObject implements 
 		}
 	}
 
-	private void fireStopped() {
+	protected void fireStopped() {
 		Object[] tmpListeners = listeners.getListeners();
 		
 		for (int i = 0, n = tmpListeners.length; i < n; ++i) {
@@ -182,14 +349,16 @@ public abstract class AbstractResourceManager extends PlatformObject implements 
 	}
 
 	/**
-	 * @throws CoreException
+	 * Makes sure that the safeRunnable is ran in the UI thread. 
+	 * @param safeRunnable
 	 */
-	protected abstract void doStart() throws CoreException;
-
-	/**
-	 * @throws CoreException
-	 */
-	protected abstract void doStop() throws CoreException;
+	protected void safeRunAsyncInUIThread(final ISafeRunnable safeRunnable) {
+		display.asyncExec(new Runnable() {
+			public void run() {
+				SafeRunnable.run(safeRunnable);
+			}
+		});
+	}
 
 	/**
 	 * @param status
@@ -201,6 +370,12 @@ public abstract class AbstractResourceManager extends PlatformObject implements 
 		if (fireEvent) {
 			fireStatusChanged(oldStatus);
 		}
+	}
+
+	protected CoreException makeCoreException(String string) {
+		IStatus status = new Status(Status.ERROR, PTPCorePlugin.getUniqueIdentifier(),
+				Status.ERROR, string, null);
+		return new CoreException(status);
 	}
 
 }

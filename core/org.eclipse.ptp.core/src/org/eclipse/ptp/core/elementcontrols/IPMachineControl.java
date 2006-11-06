@@ -16,33 +16,19 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.core;
+package org.eclipse.ptp.core.elementcontrols;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-/**
- * @author rsqrd
- */
-/**
- * @author rsqrd
- *
- */
-public interface IModelPresentation extends IModelModifier {
-	
-	/**
-	 * @param jobName
-	 * @throws CoreException
-	 */
-	public void abortJob(String jobName) throws CoreException;
-	/**
-	 * @return
-	 */
-	public IPUniverse getUniverse();
+import org.eclipse.ptp.core.IPMachine;
 
-	/**
-	 * @param monitor
-	 * @param force
-	 * @throws CoreException
+public interface IPMachineControl extends IPElementControl, IPMachine {
+
+	/*
+	 * helper function to get all the processes running on this machine - doing
+	 * so by looking at all the processes on each of the nodes comprised by this
+	 * machine
 	 */
-	public void refreshRuntimeSystems(IProgressMonitor monitor, boolean force) throws CoreException;
+	public IPProcessControl[] getProcessControls();
+
+	public void addNode(IPNodeControl curnode);
+
 }

@@ -18,59 +18,170 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.core;
 
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
-import java.util.Vector;
 
-import org.eclipse.ptp.core.AttributeConstants;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPMachine;
-import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
-import org.eclipse.ptp.internal.core.elementcontrols.IPElementControl;
-import org.eclipse.ptp.internal.core.elementcontrols.IPJobControl;
-import org.eclipse.ptp.internal.core.elementcontrols.IPMachineControl;
-import org.eclipse.ptp.internal.core.elementcontrols.IPNodeControl;
-import org.eclipse.ptp.internal.core.elementcontrols.IPProcessControl;
-import org.eclipse.ptp.internal.core.elementcontrols.IPUniverseControl;
+import org.eclipse.ptp.core.IPQueue;
+import org.eclipse.ptp.core.elementcontrols.IPJobControl;
+import org.eclipse.ptp.core.elementcontrols.IPMachineControl;
+import org.eclipse.ptp.core.elementcontrols.IPNodeControl;
+import org.eclipse.ptp.core.elementcontrols.IPProcessControl;
+import org.eclipse.ptp.core.elementcontrols.IPQueueControl;
+import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 
 public class PUniverse extends Parent implements IPUniverseControl {
 	protected String NAME_TAG = "universe ";
-
 	public PUniverse() {
 		/* '1' because this is the only universe */
 		super(null, "TheUniverse", "" + 1 + "", P_UNIVERSE);
 		// setOutputStore();
 	}
 
-	/*
-	 * public String getOutputStoreDirectory() { return outputDirPath; } public
-	 * int getStoreLine() { return storeLine; }
-	 */
-
-	/*
-	 * there is a single collection but in this collection we keep two different
-	 * kinds of classes - they are the machines and the jobs. So we have to go
-	 * through the entire collection pulling out the right class and return an
-	 * array of them
-	 */
-	public synchronized IPMachine[] getMachines() {
-		Collection col = getCollection();
-		Iterator it = col.iterator();
-		Vector m = new Vector();
-
-		while (it.hasNext()) {
-			Object ob = it.next();
-
-			if (ob instanceof IPMachineControl)
-				m.add((IPMachineControl) ob);
-		}
-
-
-		IPMachineControl[] mac = (IPMachineControl[]) m.toArray(new IPMachineControl[0]);
-		return mac;
+	public synchronized void addResourceManager(IResourceManager addedManager) {
+		addChild(addedManager);
 	}
 
+	public synchronized void addResourceManagers(IResourceManager[] addedManagers) {
+		for (int i=0; i<addedManagers.length; ++i) {
+			addResourceManager(addedManagers[i]);
+		}
+	}
+
+	public void deleteJob(IPJob jobIn) {
+		IPJobControl job = (IPJobControl) jobIn;
+		IPProcessControl[] processes = job.getProcessControls();
+		for (int i = 0; i < processes.length; ++i) {
+			IPProcessControl process = processes[i];
+			if (process == null)
+				continue;
+			IPNodeControl node = (IPNodeControl) process.getNode();
+			if (node == null)
+				continue;
+			node.removeProcess(process);
+		}
+		job.removeAllProcesses();
+		removeChild(job);
+	}
+
+	public synchronized IPJob findJobById(String job_id) {
+		for (Iterator rit = getCollection().iterator(); rit.hasNext(); ) {
+			IResourceManager resourceManager = (IResourceManager) rit.next();
+			IPQueueControl[] queueus = resourceManager.getQueueControls();
+			for (int j = 0; j < queueus.length; ++j) {
+				IPJobControl job = queueus[j].getJobControl(job_id);
+				if (job != null) {
+					return job;
+				}
+			}
+		}
+		return null;
+	}
+	
+	public synchronized IPJob findJobByName(String jname) {
+		for (Iterator rit = getCollection().iterator(); rit.hasNext(); ) {
+			IResourceManager resourceManager = (IResourceManager) rit.next();
+			IPQueueControl[] queueus = resourceManager.getQueueControls();
+			for (int i = 0; i < queueus.length; ++i) {
+				IPJobControl[] jobs = queueus[i].getJobControls();
+				for (int j = 0; j < jobs.length; ++j) {
+					if (jobs[i].getElementName().equals(jname))
+						return jobs[i];
+				}
+			}
+		}
+		return null;
+	}
+	
+
+	public synchronized IPMachine findMachineByGlobalId(String machine_id) {
+		for (Iterator rit = getCollection().iterator(); rit.hasNext(); ) {
+			IResourceManager resourceManager = (IResourceManager) rit.next();
+			IPMachineControl[] machines = resourceManager.getMachineControls();
+			for (int i = 0; i < machines.length; ++i) {
+				if (machines[i].getIDString().equals(machine_id))
+					return machines[i];
+			}
+		}
+		return null;
+	}
+
+	public synchronized IPMachine findMachineById(String machine_id) {
+		for (Iterator rit = getCollection().iterator(); rit.hasNext(); ) {
+			IResourceManager resourceManager = (IResourceManager) rit.next();
+			IPMachineControl[] machines = resourceManager.getMachineControls();
+			for (int i = 0; i < machines.length; ++i) {
+				if (machines[i].getMachineId().equals(machine_id))
+					return machines[i];
+			}
+		}
+		return null;
+	}
+
+	public synchronized IPMachine findMachineByName(String mname) {
+		for (Iterator rit = getCollection().iterator(); rit.hasNext(); ) {
+			IResourceManager resourceManager = (IResourceManager) rit.next();
+			IPMachine[] machines = resourceManager.getMachines();
+			for (int i = 0; i < machines.length; ++i) {
+				if (machines[i].getName().equals(mname))
+					return machines[i];
+			}
+		}
+		return null;
+	}
+	
+	public synchronized IPProcess findProcessByName(String pname) {
+		IPJob[] jobs = getJobs();
+		for (int i=0; i<jobs.length; ++i) {
+			IPProcess proc = jobs[i].findProcessByName(pname);
+			if (proc != null)
+				return proc;
+		}
+		return null;
+	}
+
+	/*
+	 */
+	public synchronized IPJob[] getJobs() {
+		ArrayList jobs = new ArrayList();
+		for (Iterator rit = getCollection().iterator(); rit.hasNext(); ) {
+			IResourceManager resourceManager = (IResourceManager) rit.next();
+			IPQueue[] queueus = resourceManager.getQueues();
+			for (int j = 0; j < queueus.length; ++j) {
+				IPJob[] qjobs = queueus[j].getJobs();
+				jobs.addAll(Arrays.asList(qjobs));
+			}
+		}
+		return (IPJob[]) jobs.toArray(new IPJobControl[0]);
+	}
+	
+	public synchronized IPMachine[] getMachines() {
+		ArrayList machines = new ArrayList();
+		for (Iterator rit = getCollection().iterator(); rit.hasNext(); ) {
+			IResourceManager resourceManager = (IResourceManager) rit.next();
+			IPMachineControl[] rmMachines = resourceManager.getMachineControls();
+			machines.addAll(Arrays.asList(rmMachines));
+		}
+		return (IPMachine[]) machines.toArray(new IPMachineControl[0]);
+	}
+
+	/**
+	 * @return all of the resource managers
+	 */
+	public synchronized IResourceManager[] getResourceManagers() {
+		return (IResourceManager[]) getCollection().toArray(new IResourceManager[0]);
+	}
+	
+	public synchronized IPJob[] getSortedJobs() {
+		IPJobControl[] jobs = (IPJobControl[]) getJobs();
+		sort(jobs);
+		return jobs;
+	}
+	
 	public synchronized IPMachine[] getSortedMachines() {
 		IPMachineControl[] macs = (IPMachineControl[]) getMachines();
 		sort(macs);
@@ -78,130 +189,13 @@ public class PUniverse extends Parent implements IPUniverseControl {
 		return macs;
 	}
 
-	public synchronized IPMachine findMachineByName(String mname) {
-		Collection col = getCollection();
-		Iterator it = col.iterator();
-		while (it.hasNext()) {
-			Object ob = it.next();
-			if (ob instanceof IPMachine) {
-				IPMachine mac = (IPMachine) ob;
-				if (mac.getName().equals(mname))
-					return mac;
-			}
-		}
-		return null;
+	public synchronized void removeResourceManager(IResourceManager removedManager) {
+		removeChild(removedManager);
 	}
 
-	public synchronized IPMachine findMachineById(String machine_id) {
-		Collection col = getCollection();
-		Iterator it = col.iterator();
-		while (it.hasNext()) {
-			Object ob = it.next();
-			if (ob instanceof IPMachine) {
-				IPMachine mac = (IPMachine) ob;
-				if (mac.getMachineId().equals(machine_id))
-					return mac;
-			}
+	public void removeResourceManagers(IResourceManager[] removedRMs) {
+		for (int i=0; i<removedRMs.length; ++i) {
+			removeResourceManager(removedRMs[i]);
 		}
-		return null;
-	}
-	
-	public synchronized IPMachine findMachineByGlobalId(String machine_id) {
-		Collection col = getCollection();
-		Iterator it = col.iterator();
-		while (it.hasNext()) {
-			Object ob = it.next();
-			if (ob instanceof IPMachine) {
-				IPMachine mac = (IPMachine) ob;
-				if (mac.getIDString().equals(machine_id))
-					return mac;
-			}
-		}
-		return null;
-	}
-	
-
-	/*
-	 * there is a single collection but in this collection we keep two different
-	 * kinds of classes - they are the machines and the jobs. So we have to go
-	 * through the entire collection pulling out the right class and return an
-	 * array of them
-	 */
-	public synchronized IPJob[] getJobs() {
-		Collection col = getCollection();
-		Iterator it = col.iterator();
-		Vector m = new Vector();
-
-		while (it.hasNext()) {
-			Object ob = it.next();
-
-			if (ob instanceof IPJobControl)
-				m.add((IPJobControl) ob);
-		}
-
-		Object[] o = m.toArray();
-		IPJobControl[] job = new IPJobControl[o.length];
-		for (int i = 0; i < o.length; i++) {
-			job[i] = (IPJobControl) o[i];
-		}
-
-		return job;
-	}
-
-	public synchronized IPJob[] getSortedJobs() {
-		IPJobControl[] jobs = (IPJobControl[]) getJobs();
-		sort(jobs);
-		return jobs;
-	}
-
-	public synchronized IPJob findJobByName(String jname) {
-		Collection col = getCollection();
-		Iterator it = col.iterator();
-		while (it.hasNext()) {
-			Object ob = it.next();
-			if (ob instanceof IPJobControl) {
-				IPJobControl job = (IPJobControl) ob;
-				if (job.getElementName().equals(jname))
-					return job;
-			}
-		}
-		return null;
-	}
-	
-	public synchronized IPJob findJobById(String job_id) {
-		IPElementControl element = findChild(job_id);
-		if (element instanceof IPJobControl) {
-			return (IPJobControl) element;
-		}
-		return null;
-	}
-
-	public synchronized IPProcess findProcessByName(String pname) {
-		Collection col = getCollection();
-		Iterator it = col.iterator();
-		while (it.hasNext()) {
-			Object ob = it.next();
-			if (ob instanceof IPJob) {
-				IPProcess proc = ((IPJob) ob).findProcessByName(pname);
-				if (proc != null)
-					return proc;
-			}
-		}
-		return null;
-	}
-	
-	public void deleteJob(IPJob jobIn) {
-		IPJobControl job = (IPJobControl) jobIn;
-		for (Iterator i=job.getCollection().iterator(); i.hasNext();) {
-			IPProcessControl process = (IPProcessControl)i.next();
-			if (process == null)
-				continue;
-			IPNodeControl node = (IPNodeControl) process.getNode();
-			if (node == null)
-				continue;
-			node.removeChild(process);
-		}
-		job.removeAllProcesses();
-		removeChild(job);
 	}
 }

@@ -121,13 +121,6 @@ public interface IPMachine extends IPElement {
 	public IPUniverse getUniverse();
 
 	/**
-	 * Gets all the Jobs that are on this Machine.
-	 * 
-	 * @return The Jobs on this Machine
-	 */
-	public IPJob[] getJobs();
-
-	/**
 	 * Sets the architecture of this machine. At this time there are no
 	 * standards for how this String should be formatted and the String is
 	 * really only used for printing out information about this Machine.

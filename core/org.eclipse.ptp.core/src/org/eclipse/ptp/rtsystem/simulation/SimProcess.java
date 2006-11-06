@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Preferences;
@@ -37,18 +38,16 @@ import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.IProcessListener;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.PreferenceConstants;
-import org.eclipse.ptp.core.events.INodeEvent;
+import org.eclipse.ptp.core.elementcontrols.IPElementControl;
+import org.eclipse.ptp.core.elementcontrols.IPNodeControl;
+import org.eclipse.ptp.core.elementcontrols.IPProcessControl;
 import org.eclipse.ptp.core.events.IProcessEvent;
-import org.eclipse.ptp.core.events.NodeEvent;
-import org.eclipse.ptp.core.events.ProcessEvent;
 import org.eclipse.ptp.internal.core.OutputTextFile;
 import org.eclipse.ptp.internal.core.PElement;
 import org.eclipse.ptp.internal.core.PElementInfo;
-import org.eclipse.ptp.internal.core.elementcontrols.IPElementControl;
-import org.eclipse.ptp.internal.core.elementcontrols.IPNodeControl;
 import org.eclipse.search.ui.ISearchPageScoreComputer;
 
-public class SimProcess extends Process implements IPProcess, IPElementControl, Comparable {
+public class SimProcess extends Process implements IPProcessControl, IPElementControl, Comparable {
 	InputStream err;
 	InputStream in;
 	OutputStream out;
@@ -204,7 +203,7 @@ public class SimProcess extends Process implements IPProcess, IPElementControl, 
 	public void removeProcess() {
 		final IPNodeControl parent = (IPNodeControl) getParent();
 		if (parent != null)
-			parent.removeChild(this);
+			parent.removeProcess(this);
 	}
 	public void setTerminated(boolean isTerminated) {
 		this.isTerminated = isTerminated;
@@ -242,7 +241,7 @@ public class SimProcess extends Process implements IPProcess, IPElementControl, 
 	public void setNode(IPNode node) {
 		this.node = (IPNodeControl) node;
 		if (node != null)
-			this.node.addChild(this);
+			this.node.addProcess(this);
 	}
 	public IPNode getNode() {
 		return this.node;
@@ -256,17 +255,8 @@ public class SimProcess extends Process implements IPProcess, IPElementControl, 
 	public void removeChild(IPElementControl member) {
 		getElementInfo().removeChild(member);
 	}
-	public IPElementControl findChild(String key) {
-		return getElementInfo().findChild(key);
-	}
 	public void removeChildren() {
 		getElementInfo().removeChildren();
-	}
-	public Collection getCollection() {
-		PElementInfo info = getElementInfo();
-		if (info != null)
-			return info.getCollection();
-		return Collections.EMPTY_LIST;
 	}
 	public IPElementControl[] getChildren() {
 		PElementInfo info = getElementInfo();

@@ -36,8 +36,6 @@ import org.eclipse.ui.XMLMemento;
 
 public class ResourceManagerPersistence {
 
-	private static final String TAG_CURRENT_RESOURCEMANAGER = "CurrentResourceManager";
-
 	private static final String TAG_RESOURCEMANAGER_INDEX = "ResourceManagerIndex";
 
 	private static final String TAG_RESOURCEMANAGERS = "ResourceManagers";
@@ -51,11 +49,10 @@ public class ResourceManagerPersistence {
 	private static final String TAG_RESOURCEMANGER_RUNNING = "IsRunning";
 
 	public static void saveResourceManagers(File file,
-			IResourceManager[] resourceManagers,
-			IResourceManager currentResourceManager) {
-		System.out.println("In saveResourceManagers");
+			IResourceManager[] resourceManagers) {
+		System.out.println("In saveResourceManagers to file, " + file.getAbsolutePath());
 		XMLMemento memento = XMLMemento.createWriteRoot(TAG_RESOURCEMANAGERS);
-		saveResourceManagers(memento, resourceManagers, currentResourceManager);
+		saveResourceManagers(memento, resourceManagers);
 		FileWriter writer = null;
 		try {
 			writer = new FileWriter(file);
@@ -75,13 +72,8 @@ public class ResourceManagerPersistence {
 	}
 
 	private static void saveResourceManagers(XMLMemento memento,
-			IResourceManager[] resourceManagers,
-			IResourceManager currentResourceManager) {
-		int currentResourceManagerIndex = -1;
+			IResourceManager[] resourceManagers) {
 		for (int i = 0; i < resourceManagers.length; ++i) {
-			if (currentResourceManager == resourceManagers[i]) {
-				currentResourceManagerIndex = i;
-			}
 			IMemento child = memento.createChild(TAG_RESOURCEMANGER);
 			child.putString(
 					TAG_RESOURCEMANGER_ID,
@@ -92,8 +84,6 @@ public class ResourceManagerPersistence {
 			IMemento grandchild = child.createChild(TAG_RESOURCEMANGER_CONFIGURATION);
 			resourceManagers[i].getConfiguration().save(grandchild);
 		}
-		memento.putInteger(TAG_CURRENT_RESOURCEMANAGER,
-				currentResourceManagerIndex);
 	}
 
 	private IResourceManager[] resourceManagers = new IResourceManager[0];
@@ -108,11 +98,17 @@ public class ResourceManagerPersistence {
 		return savedCurrentResourceManager;
 	}
 
+	/**
+	 * Loads and, if necessary, starts saved resource managers.
+	 * @param file
+	 * @param factories
+	 */
 	public void loadResourceManagers(File file,
 			IResourceManagerFactory[] factories) {
 		FileReader reader = null;
 		try {
 			reader = new FileReader(file);
+			// Loads and, if necessary, starts saved resource managers.
 			loadResourceManagers(XMLMemento.createReadRoot(reader), factories);
 		} catch (FileNotFoundException e) {
 			// ignored... no ResourceManager items exist yet.
@@ -139,6 +135,11 @@ public class ResourceManagerPersistence {
 		return null;
 	}
 
+	/**
+	 * Loads and, if necessary, starts saved resource managers.
+	 * @param memento
+	 * @param factories
+	 */
 	private void loadResourceManagers(XMLMemento memento,
 			IResourceManagerFactory[] factories) {
 		IMemento[] children = memento.getChildren(TAG_RESOURCEMANGER);
@@ -159,6 +160,7 @@ public class ResourceManagerPersistence {
 				if (configuration != null) {
 					tmpRMs[index] = factory.create(configuration);
 					if (tmpRMs[index] != null) {
+						// start the resource manager if it was running when saved.
 						if (isRunning) {
 							try {
 								tmpRMs[index].start();
@@ -172,15 +174,7 @@ public class ResourceManagerPersistence {
 			}
 		}
 
-		int savedCurrentRMIndex = memento.getInteger(TAG_CURRENT_RESOURCEMANAGER).intValue();
-		if (savedCurrentRMIndex >= 0) {
-			setSavedCurrentResourceManager(tmpRMs[savedCurrentRMIndex]);
-		}
 		resourceManagers = (IResourceManager[]) rms.toArray(new IResourceManager[rms.size()]);
-	}
-
-	private void setSavedCurrentResourceManager(IResourceManager manager) {
-		savedCurrentResourceManager = manager;
 	}
 
 }
