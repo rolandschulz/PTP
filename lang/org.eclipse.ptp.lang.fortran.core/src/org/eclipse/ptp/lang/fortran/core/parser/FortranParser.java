@@ -206,6 +206,8 @@ public class FortranParser extends Parser {
     public static final int T_INTERFACE=118;
     public static final int T_AND=56;
     public static final int T_EXIT=99;
+    
+    public boolean hasErrorOccurred = false;
 
         public FortranParser(TokenStream input) {
             super(input);
@@ -216,7 +218,10 @@ public class FortranParser extends Parser {
     public String[] getTokenNames() { return tokenNames; }
     public String getGrammarFileName() { return "FortranParser.g"; }
 
-
+    public void reportError(RecognitionException re) {
+        super.reportError(re);
+        hasErrorOccurred = true;
+    }
 
     // $ANTLR start program
     // FortranParser.g:31:1: program : program_unit ( program_unit )* ;
