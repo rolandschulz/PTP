@@ -1,2 +1,2 @@
-MODULE mod ;
-END MODULE mod ;
+MoDuLe mod
+eND MODULE mod
