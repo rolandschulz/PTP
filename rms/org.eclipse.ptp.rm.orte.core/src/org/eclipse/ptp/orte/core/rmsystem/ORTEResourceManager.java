@@ -85,13 +85,11 @@ public class ORTEResourceManager extends RuntimeResourceManager {
 	}
 
 	protected void doDispose() {
-		// TODO Auto-generated method stub
-
+		// do nothing
 	}
 
 	protected void doStop() throws CoreException {
-		// TODO Auto-generated method stub
-
+		// do nothing
 	}
 
 }
