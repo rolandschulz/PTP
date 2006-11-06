@@ -483,13 +483,8 @@ public abstract class RuntimeResourceManager extends AbstractResourceManager
 	}
 
 	protected void doDispose() {
-		modelListeners.clear();
-		if(monitoringSystem != null)
-			monitoringSystem.shutdown();
-		if(controlSystem != null)
-			controlSystem.shutdown();
-		if (runtimeProxy != null)
-			runtimeProxy.shutdown();
+		// stop should be called by super.dispose(), so there is
+		// nothing left to do.
 	}
 
 	protected void doStart() throws CoreException {

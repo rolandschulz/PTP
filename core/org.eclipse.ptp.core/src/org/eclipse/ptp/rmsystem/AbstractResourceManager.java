@@ -55,11 +55,11 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 
 	protected final Display display;
 
-	protected final ListenerList modelListeners = new ListenerList();
+	private final ListenerList modelListeners = new ListenerList();
 
-	protected final ListenerList nodeListeners = new ListenerList();
+	private final ListenerList nodeListeners = new ListenerList();
 
-	protected final ListenerList processListeners = new ListenerList();
+	private final ListenerList processListeners = new ListenerList();
 	
 	public AbstractResourceManager(IPUniverseControl universe, IResourceManagerConfiguration config)
 	{
