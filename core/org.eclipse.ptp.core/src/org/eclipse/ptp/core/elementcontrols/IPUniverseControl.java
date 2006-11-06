@@ -16,33 +16,27 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.core;
+package org.eclipse.ptp.core.elementcontrols;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.ptp.core.IPUniverse;
+import org.eclipse.ptp.rmsystem.IResourceManager;
+
 /**
- * @author rsqrd
- */
-/**
+ * Adds the internal functionality of an IPElement to an IPUniverse
+ * 
  * @author rsqrd
  *
  */
-public interface IModelPresentation extends IModelModifier {
-	
-	/**
-	 * @param jobName
-	 * @throws CoreException
-	 */
-	public void abortJob(String jobName) throws CoreException;
-	/**
-	 * @return
-	 */
-	public IPUniverse getUniverse();
+public interface IPUniverseControl extends IPUniverse, IPElementControl {
 
-	/**
-	 * @param monitor
-	 * @param force
-	 * @throws CoreException
-	 */
-	public void refreshRuntimeSystems(IProgressMonitor monitor, boolean force) throws CoreException;
+	public void removeResourceManager(IResourceManager removedManager);
+
+	public void removeResourceManagers(IResourceManager[] removedRMs);
+
+	public void addResourceManager(IResourceManager addedManager);
+
+	public void addResourceManagers(IResourceManager[] addedManagers);
+
+	public IResourceManager[] getResourceManagers();
+	
 }

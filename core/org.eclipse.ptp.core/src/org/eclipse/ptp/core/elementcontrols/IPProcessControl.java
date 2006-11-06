@@ -16,7 +16,7 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.internal.core.elementcontrols;
+package org.eclipse.ptp.core.elementcontrols;
 
 import org.eclipse.ptp.core.IPProcess;
 

@@ -19,38 +19,55 @@
 package org.eclipse.ptp.core;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.ptp.rtsystem.IControlSystem;
-import org.eclipse.ptp.rtsystem.IMonitoringSystem;
-import org.eclipse.ptp.rtsystem.JobRunConfiguration;
+import org.eclipse.ptp.rmsystem.IResourceManager;
+import org.eclipse.ptp.rmsystem.IResourceManagerChangedListener;
+import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
 
 public interface IModelManager extends IModelPresentation {
-	/*
-	public static final int STATE_ERROR = -1;
-	public static final int EVENT_ALL_PROCESSES_STOPPED = 6;
-	public static final int EVENT_PROCESS_OUTPUT = 1;
-	public static final int EVENT_EXEC_STATUS_CHANGE = 2;
-	
-	public static final int EVENT_RUNNING = 0;
-	public static final int EVENT_STARTING = 1;
-	public static final int EVENT_ABORTED = 2;
-	public static final int EVENT_STOPPED = 3;
-	public static final int EVENT_EXITED = 4;
-	public static final int EVENT_ERROR = 5;
-	public static final int EVENT_SYS_STATUS_CHANGE = 6;
-	public static final int EVENT_UPDATED_STATUS = 7;
-	public static final int EVENT_MONITORING_SYSTEM_CHANGE = 8;
-	*/
 
-	public IControlSystem getControlSystem();
-	public IMonitoringSystem getMonitoringSystem();
-	public int getControlSystemID();
-	public int getMonitoringSystemID();
-	//public boolean isParallelPerspectiveOpen();
-	public void shutdown();
-	public IPJob run(ILaunch launch, JobRunConfiguration jobRunConfig, IProgressMonitor pm) throws CoreException;
-	public void setPTPConfiguration(ILaunchConfiguration config);
+	public void addResourceManager(IResourceManager addedManager);
+	
+	public void addResourceManagerChangedListener(IResourceManagerChangedListener listener);
+	
+	public void addResourceManagers(IResourceManager[] addedManagers);
 	public ILaunchConfiguration getPTPConfiguration();
+
+	/**
+	 * @return
+	 */
+	public IResourceManagerFactory[] getResourceManagerFactories();
+
+	/**
+	 * Find the resource manager factory corresponding to the supplied ID.
+	 * @param id
+	 * @return the requested resource manager factory
+	 */
+	public IResourceManagerFactory getResourceManagerFactory(String id);
+
+	/**
+	 * Loads and, if necessary, starts saved resource managers.
+	 * @throws CoreException
+	 */
+	public void loadResourceManagers() throws CoreException;
+	public void removeResourceManager(IResourceManager removedManager);
+	public void removeResourceManagerChangedListener(IResourceManagerChangedListener listener);
+	public void removeResourceManagers(IResourceManager[] removedRMs);
+	
+	public void saveResourceManagers();
+
+	public void setPTPConfiguration(ILaunchConfiguration config);
+
+	public void shutdown() throws CoreException;
+
+	public void start() throws CoreException;
+
+	/**
+	 * stops all of the resource managers.
+	 * 
+	 * @throws CoreException
+	 */
+	public void stopResourceManagers() throws CoreException;
+
+
 }

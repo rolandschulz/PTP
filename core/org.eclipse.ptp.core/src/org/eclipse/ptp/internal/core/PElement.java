@@ -23,16 +23,16 @@ import java.util.HashMap;
 import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.ptp.core.AttributeConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.internal.core.elementcontrols.IPElementControl;
+import org.eclipse.ptp.core.elementcontrols.IPElementControl;
 import org.eclipse.search.ui.ISearchPageScoreComputer;
 
 public abstract class PElement extends PlatformObject implements IPElementControl, Comparable {
-	protected HashMap[] attribClass = null;
-	protected HashMap elementAttribs = null;
-	
-	protected int ID = -1;
-
 	private PElementInfo elementInfo = null;
+	protected HashMap[] attribClass = null;
+	
+	protected HashMap elementAttribs = null;
+
+	protected int ID = -1;
 
 	protected PElement(IPElementControl parent, String name, String key, int type) {
 		attribClass = new HashMap[AttributeConstants.NUM_ATTRIB_CLASSES];
@@ -42,101 +42,6 @@ public abstract class PElement extends PlatformObject implements IPElementContro
 		elementAttribs.put(AttributeConstants.ATTRIB_NAME, name);
 		elementAttribs.put(AttributeConstants.ATTRIB_TYPE, new Integer(type));
 		attribClass[AttributeConstants.ATTRIB_CLASS_ELEMENT] = elementAttribs;
-	}
-
-	protected PElementInfo getElementInfo() {
-		if (elementInfo == null)
-			elementInfo = new PElementInfo(this);
-		return elementInfo;
-	}
-
-	public Object getAttribute(int attr_class, String key) {
-		if (attr_class < 0 || attr_class >= AttributeConstants.NUM_ATTRIB_CLASSES)
-			return null;
-		HashMap attribs = attribClass[attr_class];
-		if (attribs == null)
-			return null;
-		return attribs.get(key);
-	}
-
-	public void setAttribute(int attr_class, String key, Object o) {
-		if (attr_class < 0 || attr_class >= AttributeConstants.NUM_ATTRIB_CLASSES)
-			return;
-		HashMap attribs = attribClass[attr_class];
-		if (attribs == null)
-			attribs = new HashMap();
-		attribs.put(key, o);
-		attribClass[attr_class] = attribs;
-	}
-	
-	public String[] getAttributeKeys(int attr_class) {
-		if (attr_class < 0 || attr_class >= AttributeConstants.NUM_ATTRIB_CLASSES)
-			return new String[]{};
-		HashMap attribs = attribClass[attr_class];
-		if (attribs == null)
-			return new String[]{};
-		return (String[])attribs.keySet().toArray(new String[0]);
-	}
-	
-	public String getElementName() {
-		// return NAME_TAG + getKey();
-		return (String)elementAttribs.get(AttributeConstants.ATTRIB_NAME);
-	}
-
-	public int getID() {
-		return ID;
-	}
-	
-	public String getIDString() {
-		return ""+ID+"";
-	}
-
-	/**
-	 * @param name
-	 *            The Name to set.
-	 */
-	public void setElementName(String name) {
-		elementAttribs.put(AttributeConstants.ATTRIB_NAME, name);
-	}
-
-	/**
-	 * @return Returns the Parent.
-	 */
-	public IPElementControl getParent() {
-		return (IPElementControl)elementAttribs.get(AttributeConstants.ATTRIB_PARENT);
-	}
-
-	/**
-	 * @param parent
-	 *            The Parent to set.
-	 */
-	public void setParent(IPElementControl parent) {
-		elementAttribs.put(AttributeConstants.ATTRIB_PARENT, parent);
-	}
-
-	/**
-	 * @return Returns the Type.
-	 */
-	public int getElementType() {
-		Integer i = (Integer)elementAttribs.get(AttributeConstants.ATTRIB_TYPE);
-		if(i == null) return P_TYPE_ERROR;
-		else return i.intValue();
-	}
-
-	/**
-	 * @param type
-	 *            The Type to set.
-	 */
-	public void setElementType(int type) {
-		elementAttribs.put(AttributeConstants.ATTRIB_TYPE, new Integer(type));
-	}
-
-	public String toString() {
-		return getElementName();
-	}
-
-	public int size() {
-		return getElementInfo().size();
 	}
 
 	public int compareTo(Object obj) {
@@ -162,5 +67,100 @@ public abstract class PElement extends PlatformObject implements IPElementContro
 			return 90;
 
 		return ISearchPageScoreComputer.LOWEST;
+	}
+
+	public Object getAttribute(int attr_class, String key) {
+		if (attr_class < 0 || attr_class >= AttributeConstants.NUM_ATTRIB_CLASSES)
+			return null;
+		HashMap attribs = attribClass[attr_class];
+		if (attribs == null)
+			return null;
+		return attribs.get(key);
+	}
+	
+	public String[] getAttributeKeys(int attr_class) {
+		if (attr_class < 0 || attr_class >= AttributeConstants.NUM_ATTRIB_CLASSES)
+			return new String[]{};
+		HashMap attribs = attribClass[attr_class];
+		if (attribs == null)
+			return new String[]{};
+		return (String[])attribs.keySet().toArray(new String[0]);
+	}
+	
+	public String getElementName() {
+		// return NAME_TAG + getKey();
+		return (String)elementAttribs.get(AttributeConstants.ATTRIB_NAME);
+	}
+
+	/**
+	 * @return Returns the Type.
+	 */
+	public int getElementType() {
+		Integer i = (Integer)elementAttribs.get(AttributeConstants.ATTRIB_TYPE);
+		if(i == null) return P_TYPE_ERROR;
+		else return i.intValue();
+	}
+	
+	public int getID() {
+		return ID;
+	}
+
+	public String getIDString() {
+		return ""+ID+"";
+	}
+
+	/**
+	 * @return Returns the Parent.
+	 */
+	public IPElementControl getParent() {
+		return (IPElementControl)elementAttribs.get(AttributeConstants.ATTRIB_PARENT);
+	}
+
+	public void setAttribute(int attr_class, String key, Object o) {
+		if (attr_class < 0 || attr_class >= AttributeConstants.NUM_ATTRIB_CLASSES)
+			return;
+		HashMap attribs = attribClass[attr_class];
+		if (attribs == null)
+			attribs = new HashMap();
+		attribs.put(key, o);
+		attribClass[attr_class] = attribs;
+	}
+
+	public int size() {
+		return getElementInfo().size();
+	}
+
+	public String toString() {
+		return getElementName();
+	}
+
+	protected PElementInfo getElementInfo() {
+		if (elementInfo == null)
+			elementInfo = new PElementInfo(this);
+		return elementInfo;
+	}
+
+	/**
+	 * @param name
+	 *            The Name to set.
+	 */
+	protected void setElementName(String name) {
+		elementAttribs.put(AttributeConstants.ATTRIB_NAME, name);
+	}
+
+	/**
+	 * @param type
+	 *            The Type to set.
+	 */
+	protected void setElementType(int type) {
+		elementAttribs.put(AttributeConstants.ATTRIB_TYPE, new Integer(type));
+	}
+
+	/**
+	 * @param parent
+	 *            The Parent to set.
+	 */
+	protected void setParent(IPElementControl parent) {
+		elementAttribs.put(AttributeConstants.ATTRIB_PARENT, parent);
 	}
 }

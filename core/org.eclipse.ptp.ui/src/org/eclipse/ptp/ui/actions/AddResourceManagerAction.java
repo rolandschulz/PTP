@@ -43,7 +43,7 @@ public class AddResourceManagerAction extends Action {
 	}
 
 	public void run() {
-		final IResourceManagerFactory[] resourceManagerFactories = PTPCorePlugin.getDefault().getResourceManagerFactories();
+		final IResourceManagerFactory[] resourceManagerFactories = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFactories();
 		if (resourceManagerFactories.length == 0) {
 			MessageBox dialog = new MessageBox(shell, SWT.OK | SWT.ICON_INFORMATION);
 			dialog.setText("No Resource Managers Factories");

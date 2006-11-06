@@ -288,7 +288,7 @@ public class RMConfigurationWizard extends Wizard {
 			config.setDefaultNameAndDesc();
 		}
 		IResourceManager rm = resourceManagerFactory.create(config);
-		PTPCorePlugin.getDefault().addResourceManager(rm);
+		PTPCorePlugin.getDefault().getModelManager().addResourceManager(rm);
 		Arrays.fill(configs, null);
 		return true;
 	}

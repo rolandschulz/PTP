@@ -21,7 +21,6 @@ package org.eclipse.ptp.launch.internal;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.core.resources.IContainer;
@@ -39,12 +38,13 @@ import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
-import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
+import org.eclipse.ptp.core.IPUniverse;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.debug.core.launch.PLaunch;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.internal.ui.LaunchMessages;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rtsystem.JobRunConfiguration;
 
 /**
@@ -57,8 +57,11 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
     public static final String START_NODE = HYPHEN + "o";
     public static final String PROG_NAME = HYPHEN + HYPHEN;
 
-    protected IModelManager getLaunchManager() {
-        return PTPCorePlugin.getDefault().getModelManager();
+    protected IResourceManager getLaunchManager() {
+    	IPUniverse universe = PTPCorePlugin.getDefault().getUniverse();
+    	// FIXME need to choose RM from GUI
+    	IResourceManager rm = universe.getResourceManagers()[0];
+        return rm;
     }
     
     protected IWorkspaceRoot getWorkspaceRoot() {

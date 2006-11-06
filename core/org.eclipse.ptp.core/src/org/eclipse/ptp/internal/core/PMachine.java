@@ -19,57 +19,36 @@
 package org.eclipse.ptp.internal.core;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.ptp.core.AttributeConstants;
-import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.IPUniverse;
-import org.eclipse.ptp.internal.core.elementcontrols.IPElementControl;
-import org.eclipse.ptp.internal.core.elementcontrols.IPMachineControl;
-import org.eclipse.ptp.internal.core.elementcontrols.IPNodeControl;
-import org.eclipse.ptp.internal.core.elementcontrols.IPProcessControl;
-import org.eclipse.ptp.internal.core.elementcontrols.IPUniverseControl;
+import org.eclipse.ptp.core.elementcontrols.IPElementControl;
+import org.eclipse.ptp.core.elementcontrols.IPMachineControl;
+import org.eclipse.ptp.core.elementcontrols.IPNodeControl;
+import org.eclipse.ptp.core.elementcontrols.IPProcessControl;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 
 public class PMachine extends Parent implements IPMachineControl {
 	protected String NAME_TAG = "machine ";
 
 	protected String arch = "undefined";
 
-	public PMachine(IPUniverseControl uni, String name, String machineID) {
-		super(uni, name, machineID, P_MACHINE);
+	public PMachine(IResourceManager rm, String name, String machineID) {
+		super(rm, name, machineID, P_MACHINE);
 		//System.out.println("Name is " + name + ", key is " + machineID);
 		//System.out.println("NAME_TAG = " + NAME_TAG + ", toString = "
 		//		+ this.toString() + ", key# = " + this.getID());
 		this.setAttribute(AttributeConstants.ATTRIB_MACHINEID, machineID);
 	}
 
-	public String getMachineId() {
-		return (String)this.getAttribute(AttributeConstants.ATTRIB_MACHINEID);
-	}
-
-	public IPUniverse getUniverse() {
-		IPElementControl current = this;
-		do {
-			if (current instanceof IPUniverse)
-				return (IPUniverse) current;
-		} while ((current = current.getParent()) != null);
-		return null;
-	}
-
-	/* returns an array of the nodes that are comprised by this machine */
-	public synchronized IPNode[] getNodes() {
-		return (IPNodeControl[]) getCollection().toArray(new IPNodeControl[size()]);
-	}
-
-	/* returns a list of the nodes comprised by this machine - but sorted */
-	public synchronized IPNode[] getSortedNodes() {
-		IPNodeControl[] nodes = (IPNodeControl[]) getNodes();
-		sort(nodes);
-		return nodes;
+	public synchronized void addNode(IPNodeControl curnode) {
+		addChild(curnode);
 	}
 
 	/* finds a node using a string identifier - returns null if none found */
@@ -94,18 +73,63 @@ public class PMachine extends Parent implements IPMachineControl {
 		return null;
 	}
 
+	/* returns a string representation of the architecture of this machine */
+	public String getArch() {
+		return arch;
+	}
+
+	public Object getAttribute(String key) {
+		return this.getAttribute(AttributeConstants.ATTRIB_CLASS_MACHINE, key);
+	}
+
+	public String[] getAttributeKeys() {
+		return this.getAttributeKeys(AttributeConstants.ATTRIB_CLASS_MACHINE);
+	}
+
+	public String getMachineId() {
+		return (String)this.getAttribute(AttributeConstants.ATTRIB_MACHINEID);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.IPMachine#getName()
+	 */
+	public String getName() {
+		return getElementName();
+	}
+
+	/* returns an array of the nodes that are comprised by this machine */
+	public synchronized IPNode[] getNodes() {
+		return (IPNodeControl[]) getCollection().toArray(new IPNodeControl[size()]);
+	}
+
 	/*
 	 * helper function to get all the processes running on this machine - doing
 	 * so by looking at all the processes on each of the nodes comprised by this
 	 * machine
 	 */
-	public synchronized IPProcess[] getProcesses() {
+	public synchronized IPProcessControl[] getProcessControls() {
 		List array = new ArrayList(0);
 		IPNodeControl[] nodes = (IPNodeControl[]) getNodes();
 		for (int i = 0; i < nodes.length; i++)
-			array.addAll(nodes[i].getCollection());
+			array.addAll(Arrays.asList(nodes[i].getProcessControls()));
 
 		return (IPProcessControl[]) array.toArray(new IPProcessControl[array.size()]);
+	}
+
+	/*
+	 * helper function to get all the processes running on this machine - doing
+	 * so by looking at all the processes on each of the nodes comprised by this
+	 * machine
+	 */
+	public IPProcess[] getProcesses() {
+		return getProcessControls();
+	}
+
+	/* returns a list of the nodes comprised by this machine - but sorted */
+	public synchronized IPNode[] getSortedNodes() {
+		IPNodeControl[] nodes = (IPNodeControl[]) getNodes();
+		sort(nodes);
+		return nodes;
 	}
 
 	/*
@@ -118,6 +142,15 @@ public class PMachine extends Parent implements IPMachineControl {
 		return processes;
 	}
 
+	public IPUniverse getUniverse() {
+		IPElementControl current = this;
+		do {
+			if (current instanceof IPUniverse)
+				return (IPUniverse) current;
+		} while ((current = current.getParent()) != null);
+		return null;
+	}
+	
 	/*
 	 * removes all the processes assocated with this machine. NOTE: this can
 	 * remove processes from multiple jobs. the children of this machine, the
@@ -129,6 +162,15 @@ public class PMachine extends Parent implements IPMachineControl {
 			processes[i].clearOutput();
 
 		removeChildren();
+	}
+
+	/* sets the architecture of this machine, which is merely a string */
+	public void setArch(String arch) {
+		this.arch = arch;
+	}
+	
+	public void setAttribute(String key, Object o) {
+		this.setAttribute(AttributeConstants.ATTRIB_CLASS_MACHINE, key, o);
 	}
 
 	/*
@@ -151,52 +193,6 @@ public class PMachine extends Parent implements IPMachineControl {
 			counter += nodes[i].getNumProcesses();
 
 		return counter;
-	}
-
-	/*
-	 * returns all the jobs that are running on this machine. this is
-	 * accomplished by looking at all the processes running on the nodes and
-	 * finding the unique set of jobs that those processes belong to
-	 */
-	public synchronized IPJob[] getJobs() {
-		IPProcess[] processes = getProcesses();
-		List array = new ArrayList(0);
-		for (int i = 0; i < processes.length; i++) {
-			final IPJob job = processes[i].getJob();
-			if (job != null && !array.contains(job)) {
-				array.add(job);
-			}
-		}
-		return (IPJob[]) array.toArray(new IPJob[array.size()]);
-	}
-
-	/* returns a string representation of the architecture of this machine */
-	public String getArch() {
-		return arch;
-	}
-
-	/* sets the architecture of this machine, which is merely a string */
-	public void setArch(String arch) {
-		this.arch = arch;
-	}
-	
-	public Object getAttribute(String key) {
-		return this.getAttribute(AttributeConstants.ATTRIB_CLASS_MACHINE, key);
-	}
-
-	public void setAttribute(String key, Object o) {
-		this.setAttribute(AttributeConstants.ATTRIB_CLASS_MACHINE, key, o);
-	}
-	
-	public String[] getAttributeKeys() {
-		return this.getAttributeKeys(AttributeConstants.ATTRIB_CLASS_MACHINE);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.IPMachine#getName()
-	 */
-	public String getName() {
-		return getElementName();
 	}
 
 }

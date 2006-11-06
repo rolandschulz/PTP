@@ -21,6 +21,8 @@
  */
 package org.eclipse.ptp.rmsystem;
 
+import org.eclipse.ptp.rmsystem.events.IResourceManagerContentsChangedEvent;
+
 
 /**
  * @author rsqrd
@@ -44,7 +46,7 @@ public interface IResourceManagerListener {
 	public void handleStatusChanged(ResourceManagerStatus oldStatus, IResourceManager manager);
 	
 	/**
-	 * @param resourceManger
+	 * @param event
 	 */
-	public void handleContentsChanged(IResourceManager resourceManger);
+	public void handleContentsChanged(IResourceManagerContentsChangedEvent event);
 }

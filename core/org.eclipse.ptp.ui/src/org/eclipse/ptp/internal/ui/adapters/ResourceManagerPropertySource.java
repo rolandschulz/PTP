@@ -21,8 +21,8 @@ package org.eclipse.ptp.internal.ui.adapters;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.IPMachine;
-import org.eclipse.ptp.core.IPUniverse;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
@@ -59,23 +59,23 @@ public class ResourceManagerPropertySource implements IPropertySource {
 
 	public Object getPropertyValue(Object id) {
 		if ("name".equals(id)) {
-			return resourceManager.getConfiguration().getName();
+			return resourceManager.getName();
 		}
 		if ("description".equals(id)) {
 			return resourceManager.getConfiguration().getDescription();
 		}
 		if ("type".equals(id)) {
 			final String resourceManagerId = resourceManager.getConfiguration().getResourceManagerId();
-			final PTPCorePlugin plugin = PTPCorePlugin.getDefault();
-			IResourceManagerFactory factory = plugin.getResourceManagerFactory(resourceManagerId);
+			final IModelManager modelManager = PTPCorePlugin.getDefault().getModelManager();
+			IResourceManagerFactory factory = modelManager.getResourceManagerFactory(
+					resourceManagerId);
 			return factory.getName();
 		}
 		if ("status".equals(id)) {
 			return resourceManager.getStatus().toString();
 		}
 		if ("machines".equals(id)) {
-			final IPUniverse universe = resourceManager.getModelPresentation().getUniverse();
-			final IPMachine[] machines = universe.getMachines();
+			final IPMachine[] machines = resourceManager.getMachines();
 			return Integer.toString(machines.length);
 		}
 		

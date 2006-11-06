@@ -16,33 +16,20 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.core;
+package org.eclipse.ptp.core.elementcontrols;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-/**
- * @author rsqrd
- */
-/**
- * @author rsqrd
- *
- */
-public interface IModelPresentation extends IModelModifier {
+import org.eclipse.ptp.core.IPJob;
+
+public interface IPJobControl extends IPElementControl, IPJob {
+
+	/**
+	 * Removes all Processes from this Job. <br>
+	 * TODO: <i>LOOK AT THIS, THIS MAY BE INAPPROPRIATE HERE</i>
+	 */
+	public void removeAllProcesses();
 	
-	/**
-	 * @param jobName
-	 * @throws CoreException
-	 */
-	public void abortJob(String jobName) throws CoreException;
-	/**
-	 * @return
-	 */
-	public IPUniverse getUniverse();
+	public IPProcessControl[] getProcessControls();
 
-	/**
-	 * @param monitor
-	 * @param force
-	 * @throws CoreException
-	 */
-	public void refreshRuntimeSystems(IProgressMonitor monitor, boolean force) throws CoreException;
+	public void addProcess(IPProcessControl p);
+
 }

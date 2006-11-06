@@ -30,57 +30,6 @@ package org.eclipse.ptp.core;
  */
 public interface IPJob extends IPElement {
 	/**
-	 * Returns the Job number of this Job as a String.
-	 * 
-	 * @return The Job number of this Job
-	 */
-	public String getJobNumber();
-	
-	public int getJobNumberInt();
-	
-	/**
-	 * Returns true/false regarding whether this Job is a debug job 
-	 * 
-	 * @return True if this job is a debug job
-	 */
-	public boolean isDebug();
-	
-	/**
-	 * Sets this job to be a debug job
-	 *
-	 */
-	public void setDebug();
-
-	/**
-	 * Returns an array of the Processes comprised by this Job. Might return
-	 * <code>null</code> if no Processes have yet been assigned.
-	 * 
-	 * @return The Processes in this Job.
-	 */
-	public IPProcess[] getProcesses();
-
-	/**
-	 * Returns a sorted array of the Processes comprised by this Job. Might
-	 * return <code>null</code> if no Processes have yet been assigned.
-	 * 
-	 * @return
-	 */
-	public IPProcess[] getSortedProcesses();
-
-	/**
-	 * Returns the number of Processes in this Job.
-	 * 
-	 * @return The number of Processes in this Job.
-	 */
-	public int totalProcesses();
-
-	/**
-	 * Removes all Processes from this Job. <br>
-	 * TODO: <i>LOOK AT THIS, THIS MAY BE INAPPROPRIATE HERE</i>
-	 */
-	public void removeAllProcesses();
-
-	/**
 	 * Find a Process in this Job by the Process number. Returns the Process
 	 * object if found, else returns <code>null</code>.
 	 * 
@@ -90,7 +39,7 @@ public interface IPJob extends IPElement {
 	 * @see IPProcess
 	 */
 	public IPProcess findProcess(String processNumber);
-
+	
 	/**
 	 * Finds a Process in this Job by the Process's name. Returns the Process
 	 * object if found, else returns <code>null</code>.
@@ -100,29 +49,39 @@ public interface IPJob extends IPElement {
 	 * @return The Process object if found, else <code>null</code>
 	 */
 	public IPProcess findProcessByName(String pname);
+	
+	public IPProcess findProcessByTaskId(int taskId);
+	
+	/**
+	 * Searches for an attribute on the Element given a key.  
+	 * The resulting attribute Object is returned.  The returned may be null if the attribute
+	 * was not found.
+	 * 
+	 * @param key String key of the attribute to look for
+	 * @return Object of the attribute or null if not found
+	 */
+	public Object getAttribute(String key);
 
 	/**
-	 * Returns an array of the Nodes that this Job has Processes on.
+	 * Get all the keys of all job attributes.
 	 * 
-	 * @return The Nodes that this Job has Processes on
+	 * @return A string array containing the keys
 	 */
-	public IPNode[] getNodes();
+	public String[] getAttributeKeys();
 
 	/**
-	 * Returns a sorted array of the Nodes that this Job has Processes on.
-	 * 
-	 * @return The Nodes that this Job has Processes on
+	 * @return
 	 */
-	public IPNode[] getSortedNodes();
+	public String getIDString();
 
 	/**
-	 * Returns the number of Nodes that this Job has Processes on. This may not
-	 * be the same size as the number of Processes if some Processes are
-	 * residing on the same Node as others.
+	 * Returns the Job number of this Job as a String.
 	 * 
-	 * @return The number of Nodes that this Job has Processes on
+	 * @return The Job number of this Job
 	 */
-	public int totalNodes();
+	public String getJobNumber();
+
+	public int getJobNumberInt();
 
 	/**
 	 * Returns an array of the Machines that this Job has Processes on. For most
@@ -134,38 +93,60 @@ public interface IPJob extends IPElement {
 	public IPMachine[] getMachines();
 
 	/**
-	 * Returns the Universe that this Job resides within.
-	 * 
-	 * @return The Universe that this Job resides within
-	 */
-	public IPUniverse getUniverse();
-	
-	public IPProcess findProcessByTaskId(int taskId);
-
-	/**
-	 * @return
-	 */
-	public String getIDString();
-
-	/**
 	 * @return
 	 */
 	public String getName();
 
 	/**
+	 * Returns an array of the Nodes that this Job has Processes on.
+	 * 
+	 * @return The Nodes that this Job has Processes on
+	 */
+	public IPNode[] getNodes();
+
+	/**
+	 * Returns an array of the Processes comprised by this Job. Might return
+	 * <code>null</code> if no Processes have yet been assigned.
+	 * 
+	 * @return The Processes in this Job.
+	 */
+	public IPProcess[] getProcesses();
+
+	/**
+	 * Returns a sorted array of the Nodes that this Job has Processes on.
+	 * 
+	 * @return The Nodes that this Job has Processes on
+	 */
+	public IPNode[] getSortedNodes();
+
+	/**
+	 * Returns a sorted array of the Processes comprised by this Job. Might
+	 * return <code>null</code> if no Processes have yet been assigned.
+	 * 
+	 * @return
+	 */
+	public IPProcess[] getSortedProcesses();
+	
+	/**
+	 * Returns the Universe that this Job resides within.
+	 * 
+	 * @return The Universe that this Job resides within
+	 */
+	public IPUniverse getUniverse();
+
+	/**
 	 * @return
 	 */
 	public boolean isAllStop();
-	
+
 	/**
-	 * Searches for an attribute on the Element given a key.  
-	 * The resulting attribute Object is returned.  The returned may be null if the attribute
-	 * was not found.
+	 * Returns true/false regarding whether this Job is a debug job 
 	 * 
-	 * @param key String key of the attribute to look for
-	 * @return Object of the attribute or null if not found
+	 * @return True if this job is a debug job
 	 */
-	public Object getAttribute(String key);
+	public boolean isDebug();
+
+	public void removeAllProcesses();
 	
 	/**
 	 * Sets an attribute given a key and Object.
@@ -176,10 +157,25 @@ public interface IPJob extends IPElement {
 	public void setAttribute(String key, Object o);
 	
 	/**
-	 * Get all the keys of all job attributes.
-	 * 
-	 * @return A string array containing the keys
+	 * Sets this job to be a debug job
+	 *
 	 */
-	public String[] getAttributeKeys();
+	public void setDebug();
+	
+	/**
+	 * Returns the number of Nodes that this Job has Processes on. This may not
+	 * be the same size as the number of Processes if some Processes are
+	 * residing on the same Node as others.
+	 * 
+	 * @return The number of Nodes that this Job has Processes on
+	 */
+	public int totalNodes();
+
+	/**
+	 * Returns the number of Processes in this Job.
+	 * 
+	 * @return The number of Processes in this Job.
+	 */
+	public int totalProcesses();
 
 }

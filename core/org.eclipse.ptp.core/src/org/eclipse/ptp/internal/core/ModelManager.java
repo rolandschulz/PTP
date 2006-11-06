@@ -18,470 +18,87 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.core;
 
+import java.io.File;
+import java.util.ArrayList;
+
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExtension;
+import org.eclipse.core.runtime.IExtensionPoint;
+import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.debug.core.ILaunch;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.jface.util.SafeRunnable;
-import org.eclipse.ptp.core.AttributeConstants;
-import org.eclipse.ptp.core.ControlSystemChoices;
 import org.eclipse.ptp.core.IModelListener;
 import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.INodeListener;
 import org.eclipse.ptp.core.IPJob;
-import org.eclipse.ptp.core.IPNode;
-import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.IPUniverse;
 import org.eclipse.ptp.core.IProcessListener;
-import org.eclipse.ptp.core.MonitoringSystemChoices;
 import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
 import org.eclipse.ptp.core.events.IModelEvent;
 import org.eclipse.ptp.core.events.IModelRuntimeNotifierEvent;
-import org.eclipse.ptp.core.events.IModelSysChangedEvent;
 import org.eclipse.ptp.core.events.INodeEvent;
 import org.eclipse.ptp.core.events.IProcessEvent;
 import org.eclipse.ptp.core.events.ModelRuntimeNotifierEvent;
-import org.eclipse.ptp.core.events.ModelSysChangedEvent;
-import org.eclipse.ptp.core.events.NodeEvent;
-import org.eclipse.ptp.core.events.ProcessEvent;
-import org.eclipse.ptp.core.util.BitList;
-import org.eclipse.ptp.internal.core.elementcontrols.IPProcessControl;
-import org.eclipse.ptp.internal.core.elementcontrols.IPUniverseControl;
+import org.eclipse.ptp.internal.rmsystem.ResourceManagerPersistence;
+import org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory;
+import org.eclipse.ptp.rmsystem.IResourceManager;
+import org.eclipse.ptp.rmsystem.IResourceManagerChangedListener;
+import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
+import org.eclipse.ptp.rmsystem.IResourceManagerListener;
+import org.eclipse.ptp.rmsystem.ResourceManagerStatus;
+import org.eclipse.ptp.rmsystem.events.IResourceManagerAddedRemovedEvent;
+import org.eclipse.ptp.rmsystem.events.IResourceManagerContentsChangedEvent;
+import org.eclipse.ptp.rmsystem.events.ResourceManagerAddedRemovedEvent;
 import org.eclipse.ptp.rtsystem.IControlSystem;
 import org.eclipse.ptp.rtsystem.IMonitoringSystem;
-import org.eclipse.ptp.rtsystem.IRuntimeListener;
 import org.eclipse.ptp.rtsystem.IRuntimeProxy;
-import org.eclipse.ptp.rtsystem.JobRunConfiguration;
-import org.eclipse.ptp.rtsystem.mpich2.MPICH2ControlSystem;
-import org.eclipse.ptp.rtsystem.mpich2.MPICH2MonitoringSystem;
-import org.eclipse.ptp.rtsystem.mpich2.MPICH2ProxyRuntimeClient;
-import org.eclipse.ptp.rtsystem.ompi.OMPIControlSystem;
-import org.eclipse.ptp.rtsystem.ompi.OMPIMonitoringSystem;
-import org.eclipse.ptp.rtsystem.ompi.OMPIProxyRuntimeClient;
-import org.eclipse.ptp.rtsystem.simulation.SimulationControlSystem;
-import org.eclipse.ptp.rtsystem.simulation.SimulationMonitoringSystem;
 
-public class ModelManager implements IModelManager, IRuntimeListener {
+public class ModelManager implements IModelManager, IResourceManagerChangedListener,
+IResourceManagerListener {
+	private final ListenerList resourceManagerListeners = new ListenerList();
+	private IResourceManagerFactory[] resourceManagerFactories;
+	private final IModelListener rmModelListener;
+	private final INodeListener rmNodeListener;
+
+	private final IProcessListener rmProcessListener;
 	protected ListenerList modelListeners = new ListenerList();
 	protected ListenerList nodeListeners = new ListenerList();
 	protected ListenerList processListeners = new ListenerList();
-
+	// protected IPMachine machine = null;
 	protected IPJob processRoot = null;
-	protected IPUniverseControl universe = null;
-
+	protected IPUniverseControl universe = new PUniverse();
 	protected ILaunchConfiguration config = null;
 	protected IControlSystem controlSystem = null;
 	protected IMonitoringSystem monitoringSystem = null;
 	protected IRuntimeProxy runtimeProxy = null;
 
-	private int currentControlSystem = -1;
-	private int currentMonitoringSystem = -1;
-	private final int theMSChoiceID;
-	private final int theCSChoiceID;
-	private int numMachines = 1;
-	private int[] numNodes = new int[]{255};
-	
-	private int jobID = 1;
-	
-	public void setPTPConfiguration(ILaunchConfiguration config) {
-		this.config = config;
-	}
-	public ILaunchConfiguration getPTPConfiguration() {
-		return config;
-	}
+	public ModelManager() {
 
-	public ModelManager(int theMSChoiceID, int theCSChoiceID) {
-		this.theMSChoiceID = theMSChoiceID;
-		String MSChoice = MonitoringSystemChoices.getMSNameByID(theMSChoiceID);
-		this.theCSChoiceID = theCSChoiceID;
-		String CSChoice = ControlSystemChoices.getCSNameByID(theCSChoiceID);
+		// Forward resource manager events to the ModelManager's listeners
+		rmModelListener = new IModelListener(){
+			public void modelEvent(IModelEvent event) {
+				fireEvent(event);
+			}
+		};
 
-		System.out.println("Your Control System Choice: '"+CSChoice+"'");
-		System.out.println("Your Monitoring System Choice: '"+MSChoice+"'");
-		
-		if(ControlSystemChoices.getCSArrayIndexByID(theCSChoiceID) == -1 || MonitoringSystemChoices.getMSArrayIndexByID(theMSChoiceID) == -1) {
-			throw new IllegalArgumentException("Illegal Control System and/or Monitoring System choices.");
-		}
-	}
-	
-	public ModelManager(int numMachines, int numNodes[]) {
-		this(MonitoringSystemChoices.SIMULATED, ControlSystemChoices.SIMULATED);
-		this.numMachines = numMachines;
-		this.numNodes = (int[]) numNodes.clone();
-	}
-	
-	public IControlSystem getControlSystem() {
-		return controlSystem;
-	}
-	public int getControlSystemID() { 
-		return currentControlSystem; 
-	}
-	public IMonitoringSystem getMonitoringSystem() {
-		return monitoringSystem;
-	}
-	public int getMonitoringSystemID() { 
-		return currentMonitoringSystem; 
-	}
-	public synchronized void refreshRuntimeSystems(IProgressMonitor monitor, boolean force) throws CoreException {
-		int curMSID = getControlSystemID();
-		int curCSID = getMonitoringSystemID();
-		if(force || curMSID != theMSChoiceID || curCSID != theCSChoiceID) {
-			if (monitor == null) {
-				monitor = new NullProgressMonitor();
+		// Forward resource manager events to the ModelManager's listeners
+		rmNodeListener = new INodeListener(){
+			public void nodeEvent(INodeEvent event) {
+				fireEvent(event);
 			}
-			refreshRuntimeSystems(theCSChoiceID, theMSChoiceID, monitor);
-		}
-	}
-	public synchronized void refreshRuntimeSystems(int controlSystemID, int monitoringSystemID, IProgressMonitor monitor) throws CoreException {
-		System.err.println("refreshRuntimeSystems");
-		try {
-			monitor.beginTask("Refreshing runtime system...", 200);
-			/*
-			 * Shutdown runtime if it is already active
-			 */
-			System.out.println("SHUTTING DOWN CONTROL/MONITORING/PROXY systems where appropriate");
-			if (controlSystem != null) {
-				monitor.subTask("Shutting down control system...");
-				controlSystem.shutdown();
-				controlSystem = null;
-				monitor.worked(10);
-			}
-			if (monitoringSystem != null) {
-				monitor.subTask("Shutting down monitor system...");
-				monitoringSystem.shutdown();
-				monitoringSystem = null;
-				monitor.worked(10);
-			}
-			if (runtimeProxy != null) {
-				monitor.subTask("Shutting down runtime proxy...");
-				runtimeProxy.shutdown();
-				runtimeProxy = null;
-				monitor.worked(10);
-			}
-			if (monitor.isCanceled()) {
-				throw new CoreException(Status.CANCEL_STATUS);
-			}
-			monitor.worked(10);
-	
-			if(monitoringSystemID == MonitoringSystemChoices.SIMULATED && controlSystemID == ControlSystemChoices.SIMULATED) {
-				/* load up the control and monitoring systems for the simulation */
-				monitor.subTask("Starting simulation...");
-				monitoringSystem = new SimulationMonitoringSystem(numMachines, numNodes);
-				monitor.worked(10);
-				controlSystem = new SimulationControlSystem();
-				monitor.worked(10);
-				runtimeProxy = null;
-			}
-			else if(monitoringSystemID == MonitoringSystemChoices.ORTE && controlSystemID == ControlSystemChoices.ORTE) {
-				/* load up the control and monitoring systems for OMPI */
-				monitor.subTask("Starting OMPI proxy runtime...");
-				runtimeProxy = new OMPIProxyRuntimeClient(this);
-				monitor.worked(10);
-				
-				if(!runtimeProxy.startup(monitor)) {
-					System.err.println("Failed to start up the proxy runtime.");
-					runtimeProxy = null;
-					if (monitor.isCanceled()) {
-						throw new CoreException(Status.CANCEL_STATUS);
-					}
-					//PTPCorePlugin.errorDialog("Failed to start OMPI proxy runtime",
-					//	"There was an error starting the OMPI proxy runtime.  The path to 'ptp_orte_proxy' or 'orted' "+
-					//	"may have been incorrect.  The 'orted' binary MUST be in your PATH to be found by 'ptp_orte_proxy'.  "+
-					//	"Try checking the console log or error logs for more detailed information.\n\nDefaulting to "+
-					//	"Simulation mode.  To change this, use the PTP preferences page.", null);
-					
-					/*
-					int MSI = MonitoringSystemChoices.SIMULATED;
-					int CSI = ControlSystemChoices.SIMULATED;
-					Preferences p = PTPCorePlugin.getDefault().getPluginPreferences();
-					p.setValue(PreferenceConstants.MONITORING_SYSTEM_SELECTION, MSI);
-					p.setValue(PreferenceConstants.CONTROL_SYSTEM_SELECTION, CSI);
-					PTPCorePlugin.getDefault().savePluginPreferences();
-					if(!(monitoringSystem instanceof SimulationMonitoringSystem) || 
-					   !(controlSystem instanceof SimulationControlSystem)) {
-						refreshRuntimeSystems(ControlSystemChoices.SIMULATED, MonitoringSystemChoices.SIMULATED, monitor);
-					}
-					*/
-					throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, 
-							"There was an error starting the OMPI proxy runtime.  The path to 'ptp_orte_proxy' or 'orted' "+
-							"may have been incorrect.  The 'orted' binary MUST be in your PATH to be found by 'ptp_orte_proxy'.  "+
-							"Try checking the console log or error logs for more detailed information.",
-							null));
-				}
-				monitor.subTask("Starting OMPI monitoring system...");
-				monitoringSystem = new OMPIMonitoringSystem((OMPIProxyRuntimeClient)runtimeProxy);
-				monitor.worked(10);
-				monitor.subTask("Starting OMPI control system...");
-				controlSystem = new OMPIControlSystem((OMPIProxyRuntimeClient)runtimeProxy);
-				monitor.worked(10);
-			}
-			else if(monitoringSystemID == MonitoringSystemChoices.MPICH2 && controlSystemID == ControlSystemChoices.MPICH2) {
-				/* load up the control and monitoring systems for OMPI */
-				monitor.subTask("Starting MPICH2 proxy runtime...");
-				runtimeProxy = new MPICH2ProxyRuntimeClient(this);
-				monitor.worked(10);
-				
-				if(!runtimeProxy.startup(monitor)) {
-					System.err.println("Failed to start up the proxy runtime.");
-					runtimeProxy = null;
-					if (monitor.isCanceled()) {
-						throw new CoreException(Status.CANCEL_STATUS);
-					}
-					throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, 
-							"There was an error starting the MPICH2 proxy runtime.  The path to 'ptp_mpich2_proxy' "+
-							"may have been incorrect. Try checking the console log or error logs for more detailed information.",
-							null));
-				}
-				monitor.subTask("Starting MPICH2 monitoring system...");
-				monitoringSystem = new MPICH2MonitoringSystem((MPICH2ProxyRuntimeClient)runtimeProxy);
-				monitor.worked(10);
-				monitor.subTask("Starting MPICH2 control system...");
-				controlSystem = new MPICH2ControlSystem((MPICH2ProxyRuntimeClient)runtimeProxy);
-				monitor.worked(10);
-			}
-			else {
-				throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, "Invalid monitoring/control system selected.  Set using the PTP preferences page.", null));
-			}
-	
-			universe = new PUniverse();
-			monitor.subTask("Starting up monitor system...");
-			monitoringSystem.startup();
-			monitor.worked(10);
-			monitor.subTask("Starting up control system...");
-			controlSystem.startup();
-			monitor.worked(10);
-			try {
-				monitor.subTask("Setup the monitoring system...");
-				monitor.beginTask("", 1);
-				monitoringSystem.addRuntimeListener(this);
-				controlSystem.addRuntimeListener(this);		
-				monitor.worked(1);
-				monitoringSystem.initiateDiscovery();
-				monitor.done();
-			} catch (CoreException e) {
-				universe.removeChildren();
-				throw e;
-			}
-			monitor.worked(10);
-			fireEvent(new ModelSysChangedEvent(IModelSysChangedEvent.MONITORING_SYS_CHANGED, null));
-			currentControlSystem = controlSystemID;
-			currentMonitoringSystem = monitoringSystemID;
-		} finally {
-			if (!monitor.isCanceled())
-				monitor.done();
-		}
-	}
-	
-	public void runtimeNodeGeneralChange(String[] keys, String[] values) {
-		boolean newEntity = false;
-		PMachine curmachine = null;
-		PNode curnode = null;
-		
-		boolean one_node_changed = false;
-		PNode the_one_changed_node = null;
-		
-		System.out.println("ModelManager.runtimeNodeGeneralName - #keys = "+keys.length+", #values = "+values.length);
-		for(int i=0; i<keys.length; i++) {
-			String key = keys[i];
-			String value = values[i];
-			if (key.equals(AttributeConstants.ATTRIB_MACHINEID)) {
-				/* ok, so we're switching to this new machine.  Let's find it. */
-				curmachine = (PMachine)universe.findMachineById(value);
-				if(curmachine == null) {
-					System.out.println("\t\tUnknown machine ID ("+value+"), adding to the model.");
-					curmachine = new PMachine(universe, AttributeConstants.ATTRIB_MACHINE_NAME_PREFIX + value, value);
-					universe.addChild(curmachine);
-					newEntity = true;
-				}
-			} else if (curmachine != null && key.equals(AttributeConstants.ATTRIB_NODE_NUMBER)) {
-				/* ok so we've got a machine that's not null, and we think we have a node
-				 * number to look for in that machine.  So let's find it!
-				 */
-				curnode = (PNode)curmachine.findNodeByName(AttributeConstants.ATTRIB_NODE_NAME_PREFIX + value);
-				if(curnode == null) {
-					System.out.println("\t\tUnknown node number ("+value+"), adding to the model.");
-					curnode = new PNode(curmachine, AttributeConstants.ATTRIB_NODE_NAME_PREFIX + value, value);
-					curmachine.addChild(curnode);
-					newEntity = true;
-				}
-				if (the_one_changed_node == null) {
-					the_one_changed_node = curnode;
-					one_node_changed = true;
-				} else {
-					one_node_changed = false;
-				}
-			} else if (curmachine != null && curnode != null) {
-				curnode.setAttribute(key, value);
-			} else {
-				System.err.println("\t!!! ERROR: Received key/value attribute pair but have no associated machine/node to assign it to.");
-			}
-		}
-		
-		if (newEntity) {
-			fireEvent(new ModelSysChangedEvent(IModelSysChangedEvent.MAJOR_SYS_CHANGED, null));
-		}
-		if (one_node_changed && the_one_changed_node != null) {
-			fireEvent(new NodeEvent(the_one_changed_node, INodeEvent.STATUS_UPDATE_TYPE, null));
-		} else {
-			/* ok more than 1 node changed, too complex let's just let them know to do a refresh */
-			fireEvent(new ModelSysChangedEvent(IModelSysChangedEvent.SYS_STATUS_CHANGED, null));
-		}
-	}
+		};
 
-	public void runtimeProcessOutput(String ne, String output) {
-		IPProcess p = universe.findProcessByName(ne);
-		if (p != null) {
-			p.addOutput(output);
-			fireEvent(new ProcessEvent(p, IProcessEvent.ADD_OUTPUT_TYPE, output + "\n"));
-		}
-	}
-	
-	public void runtimeJobExited(String ne) {
-		// not used
-	}
-
-	public void runtimeJobStateChanged(String nejob, String state) {
-		System.out.println("*********** JOB STATE CHANGE: "+state+" (job = "+nejob+")");
-		IPJob job = universe.findJobByName(nejob);
-		if (job != null) {
-			IPProcess[] procs = job.getProcesses();
-			if (procs != null) {
-				for (int i = 0; i < procs.length; i++) {
-					procs[i].setStatus(state);
-					fireEvent(new ProcessEvent(procs[i], IProcessEvent.STATUS_CHANGE_TYPE, procs[i].getStatus()));
-					if (procs[i].getStatus().equals(IPProcess.EXITED)) {
-						IPNode node = procs[i].getNode();
-						//FIXME why node can be null???
-						if (node != null) {
-							fireEvent(new NodeEvent(node, INodeEvent.STATUS_UPDATE_TYPE, null));
-						}
-					}
-				}
+		// Forward resource manager events to the ModelManager's listeners
+		rmProcessListener = new IProcessListener(){
+			public void processEvent(IProcessEvent event) {
+				fireEvent(event);
 			}
-			if (state.equals("running")) {
-				fireEvent(new ModelRuntimeNotifierEvent(job.getIDString(), IModelRuntimeNotifierEvent.TYPE_JOB, IModelRuntimeNotifierEvent.RUNNING));
-			} else if (state.equals("exited")) {
-				fireEvent(new ModelRuntimeNotifierEvent(job.getIDString(), IModelRuntimeNotifierEvent.TYPE_JOB, IModelRuntimeNotifierEvent.STOPPED));
-			} else if (state.equals("starting")) {
-				fireEvent(new ModelRuntimeNotifierEvent(job.getIDString(), IModelRuntimeNotifierEvent.TYPE_JOB, IModelRuntimeNotifierEvent.STARTED));
-			}
-		}
-	}
-
-	public void runtimeNewJob(String ne) {
-		// not used
-	}
-
-	/* 
-	 * Update model when process attributes change
-	 */
-	public void runtimeProcAttrChange(String nejob, BitList cprocs, String kv, int[] dprocs, String[] kvs) {
-		System.out.println("*********** PROC ATTRIBUTE CHANGE: (job = "+nejob+")");
-		IPJob job = universe.findJobByName(nejob);
-		if (job != null) {
-			/* 
-			 * First deal with common processes
-			 */
-			
-			/*
-			 * Now deal with different processes
-			 */
-			for (int i = 0; i < dprocs.length; i++) {
-				IPProcess proc = job.findProcessByName(nejob+"_process"+dprocs[i]);
-				String[] attr = kvs[i].split("=");
-				if (attr.length == 2 && proc != null) {
-					if (attr[0].equals(AttributeConstants.ATTRIB_PROCESS_PID)) {
-						System.err.println("setting pid[" + proc.getName() + "]=" + attr[1]);
-						proc.setPid(attr[1]);
-					} else if (attr[0].equals(AttributeConstants.ATTRIB_PROCESS_NODE_NAME)) {
-						if (attr[1].equals("localhost")) {
-							IPNode node = universe.getMachines()[0].findNodeByName(AttributeConstants.ATTRIB_NODE_NAME_PREFIX + "0");
-							proc.setNode(node);
-						} else {
-							IPNode[] nodes = universe.getMachines()[0].getNodes();
-							for (int j = 0; j < nodes.length; j++) {
-								IPNode node = nodes[j];
-								if (node.getAttribute(AttributeConstants.ATTRIB_NODE_NAME).equals(attr[1])) {
-									System.err.println("setting node[" + proc.getName() + "]=" + attr[1] + "(" + node.getNodeNumber() + ")");
-									proc.setNode(node);
-									break;
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-
-	public void shutdown() {
-		modelListeners.clear();
-		modelListeners = null;
-		if(monitoringSystem != null)
-			monitoringSystem.shutdown();
-		if(controlSystem != null)
-			controlSystem.shutdown();
-		if (runtimeProxy != null)
-			runtimeProxy.shutdown();
-		currentControlSystem = -1;
-		currentMonitoringSystem = -1;
-	}
-	public void addNodeListener(INodeListener listener) {
-		nodeListeners.add(listener);
-	}
-	public void removeNodeListener(INodeListener listener) {
-		nodeListeners.remove(listener);
-	}
-	public void addProcessListener(IProcessListener listener) {
-		processListeners.add(listener);
-	}
-	public void removeProcessListener(IProcessListener listener) {
-		processListeners.remove(listener);
-	}
-	public void addModelListener(IModelListener listener) {
-		modelListeners.add(listener);
-	}
-	public void removeModelListener(IModelListener listener) {
-		modelListeners.remove(listener);
-	}
-	public void fireEvent(final IProcessEvent event) {
-        Object[] array = processListeners.getListeners();
-        for (int i = 0; i < array.length; i++) {
-            final IProcessListener l = (IProcessListener) array[i];
-            SafeRunnable.run(new SafeRunnable() {
-                public void run() {
-                    l.processEvent(event);
-                }
-            });
-        }
-	}
-	
-	public void fireEvent(final INodeEvent event) {
-        Object[] array = nodeListeners.getListeners();
-        for (int i = 0; i < array.length; i++) {
-            final INodeListener l = (INodeListener) array[i];
-            SafeRunnable.run(new SafeRunnable() {
-                public void run() {
-                    l.nodeEvent(event);
-                }
-            });
-        }
-	}
-	
-	public void fireEvent(final IModelEvent event) {
-        Object[] array = modelListeners.getListeners();
-        for (int i = 0; i < array.length; i++) {
-            final IModelListener l = (IModelListener) array[i];
-            SafeRunnable.run(new SafeRunnable() {
-                public void run() {
-                    l.modelEvent(event);
-                }
-            });
-        }
+		};
 	}
 
 	public void abortJob(String jobName) throws CoreException {
@@ -502,66 +119,313 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		fireEvent(new ModelRuntimeNotifierEvent(j.getIDString(), IModelRuntimeNotifierEvent.TYPE_JOB, IModelRuntimeNotifierEvent.ABORTED));
 	}
 	
-	public IPJob run(final ILaunch launch, final JobRunConfiguration jobRunConfig, IProgressMonitor monitor) throws CoreException {
-		monitor.setTaskName("Creating the job...");
-		
-		IPJob job = newJob(jobRunConfig.getNumberOfProcesses(), jobRunConfig.isDebug(), monitor);
-		System.out.println("ModelManager.run() - new JobID = "+job.getJobNumberInt());
-
-		controlSystem.run(job.getJobNumberInt(), jobRunConfig);
-		
-		return job;
+	public void addModelListener(IModelListener listener) {
+		modelListeners.add(listener);
 	}
 	
-	protected void clearUsedMemory() {
-		System.out.println("********** clearUsedMemory");
-		Runtime rt = Runtime.getRuntime();
-		long isFree = rt.freeMemory();
-		long wasFree;
-		do {
-			wasFree = isFree;
-			rt.gc();
-			isFree = rt.freeMemory();
-		} while (isFree > wasFree);
-		rt.runFinalization();
+	public void addNodeListener(INodeListener listener) {
+		nodeListeners.add(listener);
 	}
+	public void addProcessListener(IProcessListener listener) {
+		processListeners.add(listener);
+	}
+	
+	public void addResourceManager(IResourceManager addedManager) {
+		// begin forwarding of events to the ModelManager
+		addRMListeners(addedManager);
+		universe.addResourceManager(addedManager);
+		IResourceManagerAddedRemovedEvent event = new ResourceManagerAddedRemovedEvent(this,
+				addedManager, IResourceManagerAddedRemovedEvent.ADDED);
+		fireResourceManagersAddedRemoved(event);
+	}
+	
+	public void addResourceManagerChangedListener(IResourceManagerChangedListener listener) {
+		resourceManagerListeners.add(listener);
+	}
+	
+	public void addResourceManagers(IResourceManager[] addedManagers) {
+		// begin forwarding of events to the ModelManager
+		for (int i=0; i<addedManagers.length; ++i) {
+			addRMListeners(addedManagers[i]);
+		}
+		universe.addResourceManagers(addedManagers);
+		IResourceManagerAddedRemovedEvent event = new ResourceManagerAddedRemovedEvent(this,
+				addedManagers, IResourceManagerAddedRemovedEvent.ADDED);
+		fireResourceManagersAddedRemoved(event);
+	}
+	
+	public ILaunchConfiguration getPTPConfiguration() {
+		return config;
+	}
+
+	public IResourceManagerFactory[] getResourceManagerFactories()
+	{
+		if (resourceManagerFactories != null) {
+			return resourceManagerFactories;
+		}
+		
+		System.out.println("In getResourceManagerFactories");
+	
+		final ArrayList factoryList = new ArrayList();
+	
+		IExtensionRegistry registry = Platform.getExtensionRegistry();
+		IExtensionPoint extensionPoint = registry.getExtensionPoint("org.eclipse.ptp.core.resourcemanager");
+		final IExtension[] extensions = extensionPoint.getExtensions();
+		
+		for (int iext = 0; iext < extensions.length; ++iext) {
+			final IExtension ext = extensions[iext];
+			
+			final IConfigurationElement[] elements = ext.getConfigurationElements();
+		
+			for (int i=0; i< elements.length; i++)
+			{
+				IConfigurationElement ce = elements[i];
+				try {
+					AbstractResourceManagerFactory factory = (AbstractResourceManagerFactory) ce.createExecutableExtension("class");
+					factory.setId(ce.getAttribute("id"));
+					factoryList.add(factory);
+					System.out.println("retrieved factory: " + factory.getName() + ", " + factory.getId());
+				} catch (CoreException e) {
+					PTPCorePlugin.log(e);
+				}
+			}
+		}
+		resourceManagerFactories =
+			(IResourceManagerFactory[]) factoryList.toArray(
+					new IResourceManagerFactory[factoryList.size()]);
+	
+		System.out.println("leaving getResourceManagerFactories");
+		return resourceManagerFactories;
+	}
+	/**
+	 * Find the resource manager factory corresponding to the supplied ID.
+	 * @param id
+	 * @return the requested resource manager factory
+	 */
+	public IResourceManagerFactory getResourceManagerFactory(String id)
+	{
+		IResourceManagerFactory[] factories = getResourceManagerFactories();
+		for (int i=0; i<factories.length; i++)
+		{
+			if (factories[i].getId().equals(id)) return factories[i];
+		}
+		
+		throw new RuntimeException("Unable to find resource manager factory");
+	}
+
 	public IPUniverse getUniverse() {
 		return universe;
 	}
-	private int newJobID() {
-		return this.jobID++;
+	public void handleContentsChanged(IResourceManagerContentsChangedEvent event) {
+		// TODO Auto-generated method stub
+		
 	}
-	private IPJob newJob(int numProcesses, boolean debug, IProgressMonitor monitor) throws CoreException {
-		int jobID = newJobID();
-		String jobName = "job"+jobID;
-		System.out.println("MODEL MANAGER: newJob("+jobID+")");
-		PJob job = new PJob(universe, jobName, "" + (PJob.BASE_OFFSET + jobID) + "", jobID);		
-		if (debug)
-			job.setDebug();
-		
-		universe.addChild(job);
-		if (monitor == null) {
-			monitor = new NullProgressMonitor();
-		}
-		
-		monitor.beginTask("", numProcesses);
-		monitor.setTaskName("Creating processes....");
-		/* we know that we succeeded, so we can create this many procs in the job.  we just
-		 * need to run getProcsStatusForNewJob() to fill in the status later
-		 */
-		for (int i = 0; i < numProcesses; i++) {		
-			IPProcessControl proc = new PProcess(job, jobName+"_process"+i, "" + i + "", "0", i, IPProcess.STARTING, "", "");
-			job.addChild(proc);			
-		}
 
-		/*
-		 * This is needed for debug jobs because the runtimeJobStateChanged event is
-		 * not generated (the debugger manages the process/job state) and as a consequence the
-		 * UI JobManager listener is never called.
-		 */
-		if (debug) {
-			fireEvent(new ModelRuntimeNotifierEvent(job.getIDString(), IModelRuntimeNotifierEvent.TYPE_JOB, IModelRuntimeNotifierEvent.STARTED));
+	public void handleResourceManagersAddedRemoved(IResourceManagerAddedRemovedEvent event) {
+		if (event.getType() == IResourceManagerAddedRemovedEvent.ADDED) {
+			IResourceManager[] rms = event.getResourceManagers();
+			for (int i=0; i < rms.length; ++i) {
+				rms[i].addResourceManagerListener(this);
+			}
 		}
-		return job;
+		else if (event.getType() == IResourceManagerAddedRemovedEvent.REMOVED) {
+			IResourceManager[] rms = event.getResourceManagers();
+			for (int i=0; i < rms.length; ++i) {
+				rms[i].removeResourceManagerListener(this);
+			}
+		}
 	}
+
+	public void handleStarted(IResourceManager resourceManager) {
+		// TODO Auto-generated method stub
+		
+	}
+	public void handleStatusChanged(ResourceManagerStatus oldStatus, IResourceManager manager) {
+		// TODO Auto-generated method stub
+		
+	}
+	public void handleStopped(IResourceManager resourceManager) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.IModelManager#loadResourceManagers()
+	 */
+	public void loadResourceManagers() {
+		ResourceManagerPersistence rmp = new ResourceManagerPersistence();
+		// Loads and, if necessary, starts saved resource managers.
+		rmp.loadResourceManagers(getResourceManagersFile(), getResourceManagerFactories());
+		IResourceManager[] resourceManagers = rmp.getResourceManagers();
+		addResourceManagers(resourceManagers);
+	}
+	
+	public synchronized void refreshRuntimeSystems(IProgressMonitor monitor, boolean force) throws CoreException {
+		IResourceManager[] rms = universe.getResourceManagers();
+		for (int i=0; i < rms.length; ++i) {
+			rms[i].refreshRuntimeSystems(monitor, force);
+		}
+	}
+	public void removeModelListener(IModelListener listener) {
+		modelListeners.remove(listener);
+	}
+	
+	public void removeNodeListener(INodeListener listener) {
+		nodeListeners.remove(listener);
+	}	
+	
+	public void removeProcessListener(IProcessListener listener) {
+		processListeners.remove(listener);
+	}
+	
+	public void removeResourceManager(IResourceManager removedManager) {
+		universe.removeResourceManager(removedManager);
+		// discontinue forwarding of events to the ModelManager
+		removeRMListeners(removedManager);
+	}
+	
+	public void removeResourceManagerChangedListener(IResourceManagerChangedListener listener) {
+		resourceManagerListeners.remove(listener);
+	}
+	
+	public void removeResourceManagers(IResourceManager[] removedRMs) {
+		universe.removeResourceManagers(removedRMs);
+		IResourceManagerAddedRemovedEvent event = new ResourceManagerAddedRemovedEvent(this,
+				removedRMs,	IResourceManagerAddedRemovedEvent.REMOVED);
+		fireResourceManagersAddedRemoved(event);
+		// discontinue forwarding of events to the ModelManager
+		for (int i=0; i<removedRMs.length; ++i) {
+			removeRMListeners(removedRMs[i]);
+		}
+	}
+	
+	public void saveResourceManagers() {
+		ResourceManagerPersistence.saveResourceManagers(getResourceManagersFile(),
+				universe.getResourceManagers());
+	}
+	
+	public void setPTPConfiguration(ILaunchConfiguration config) {
+		this.config = config;
+	}
+	
+	public void shutdown() throws CoreException {
+		saveResourceManagers();
+		stopResourceManagers();
+		shutdownResourceManagers();
+
+		// discontinue forwarding of events to the ModelManager
+		IResourceManager[] resourceManagers = universe.getResourceManagers();
+		for (int i = 0; i<resourceManagers.length; ++i) {
+			removeRMListeners(resourceManagers[i]);
+		}
+		resourceManagerListeners.clear();
+		modelListeners.clear();
+		nodeListeners.clear();
+		processListeners.clear();
+	}
+	
+	public void start() throws CoreException {
+		
+		// FIXME need to fix this
+		if (false) {
+			loadResourceManagers();
+		}
+	}
+	
+	/**
+	 * stops all of the resource managers.
+	 * 
+	 * @throws CoreException
+	 */
+	public void stopResourceManagers() throws CoreException {
+		IResourceManager[] resourceManagers = universe.getResourceManagers();
+		for (int i = 0; i<resourceManagers.length; ++i) {
+			resourceManagers[i].stop();
+		}
+	}
+
+	/**
+	 * shuts down all of the resource managers.
+	 */
+	public void shutdownResourceManagers() {
+		IResourceManager[] resourceManagers = universe.getResourceManagers();
+		for (int i = 0; i<resourceManagers.length; ++i) {
+			resourceManagers[i].dispose();
+		}
+	}
+	
+	/**
+	 * Forward resource manager events to the ModelManager's listeners
+	 * @param manager
+	 */
+	private void addRMListeners(IResourceManager manager) {
+		manager.addModelListener(rmModelListener);
+		manager.addNodeListener(rmNodeListener);
+		manager.addProcessListener(rmProcessListener);
+	}
+	
+	private void fireEvent(final IModelEvent event) {
+        Object[] array = modelListeners.getListeners();
+        for (int i = 0; i < array.length; i++) {
+            final IModelListener l = (IModelListener) array[i];
+            SafeRunnable.run(new SafeRunnable() {
+                public void run() {
+                    l.modelEvent(event);
+                }
+            });
+        }
+	}
+	
+	private void fireEvent(final INodeEvent event) {
+        Object[] array = nodeListeners.getListeners();
+        for (int i = 0; i < array.length; i++) {
+            final INodeListener l = (INodeListener) array[i];
+            SafeRunnable.run(new SafeRunnable() {
+                public void run() {
+                    l.nodeEvent(event);
+                }
+            });
+        }
+	}
+	
+	private void fireEvent(final IProcessEvent event) {
+        Object[] array = processListeners.getListeners();
+        for (int i = 0; i < array.length; i++) {
+            final IProcessListener l = (IProcessListener) array[i];
+            SafeRunnable.run(new SafeRunnable() {
+                public void run() {
+                    l.processEvent(event);
+                }
+            });
+        }
+	}
+
+	private void fireResourceManagersAddedRemoved(final IResourceManagerAddedRemovedEvent event) {
+		final Object[] tmpListeners = resourceManagerListeners.getListeners();
+		for (int i=0, n = tmpListeners.length; i < n; ++i) {
+			final IResourceManagerChangedListener listener =
+				(IResourceManagerChangedListener) tmpListeners[i]; 
+			SafeRunnable.run(new SafeRunnable() {
+				public void run() {
+					listener.handleResourceManagersAddedRemoved(event);
+				}
+			});
+		}
+	}
+	
+	private File getResourceManagersFile() {
+		final PTPCorePlugin plugin = PTPCorePlugin.getDefault();
+		return plugin.getStateLocation().append("resourceManagers.xml").toFile();
+	}
+	
+	/**
+	 * Forward resource manager events to the ModelManager's listeners
+	 * @param manager
+	 */
+	private void removeRMListeners(IResourceManager manager) {
+		manager.removeModelListener(rmModelListener);
+		manager.removeNodeListener(rmNodeListener);
+		manager.removeProcessListener(rmProcessListener);
+	}
+
 }

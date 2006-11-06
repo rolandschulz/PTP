@@ -16,16 +16,41 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.internal.core.elementcontrols;
+package org.eclipse.ptp.rmsystem.events;
 
-import org.eclipse.ptp.core.IPUniverse;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 
-/**
- * Adds the internal functionality of an IPElement to an IPUniverse
- * 
- * @author rsqrd
- *
- */
-public interface IPUniverseControl extends IPUniverse, IPElementControl {
-	// nothing added
+public class ResourceManagerAddedRemovedEvent implements
+		IResourceManagerAddedRemovedEvent {
+
+	private final Object source;
+	private final IResourceManager[] rms;
+	private final int type;
+
+	public ResourceManagerAddedRemovedEvent(Object source, IResourceManager rm,
+			int type) {
+		this.source = source;
+		this.rms = new IResourceManager[] { rm };
+		this.type = type;
+	}
+
+	public ResourceManagerAddedRemovedEvent(Object source, IResourceManager[] rms,
+			int type) {
+		this.source = source;
+		this.rms = (IResourceManager[]) rms.clone();
+		this.type = type;
+	}
+
+	public IResourceManager[] getResourceManagers() {
+		return (IResourceManager[]) rms.clone();
+	}
+
+	public Object getSource() {
+		return source;
+	}
+
+	public int getType() {
+		return type;
+	}
+
 }

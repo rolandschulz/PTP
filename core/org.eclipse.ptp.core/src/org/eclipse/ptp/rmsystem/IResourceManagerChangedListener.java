@@ -18,15 +18,12 @@
  *******************************************************************************/
 package org.eclipse.ptp.rmsystem;
 
+import org.eclipse.ptp.rmsystem.events.IResourceManagerAddedRemovedEvent;
+
 public interface IResourceManagerChangedListener {
 	/**
-	 * @param oldRmManager
-	 * @param newRmManager
-	 */
-	public void handleCurrentResourceManagerChanged(IResourceManager oldRmManager, IResourceManager newRmManager);
-	
-	/**
 	 * If resource managers were added or removed.
+	 * @param event 
 	 */
-	public void handleResourceManagersAddedRemoved();
+	public void handleResourceManagersAddedRemoved(IResourceManagerAddedRemovedEvent event);
 }

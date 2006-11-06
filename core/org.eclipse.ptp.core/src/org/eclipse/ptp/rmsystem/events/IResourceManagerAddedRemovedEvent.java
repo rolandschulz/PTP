@@ -16,33 +16,16 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.core;
+package org.eclipse.ptp.rmsystem.events;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-/**
- * @author rsqrd
- */
-/**
- * @author rsqrd
- *
- */
-public interface IModelPresentation extends IModelModifier {
-	
-	/**
-	 * @param jobName
-	 * @throws CoreException
-	 */
-	public void abortJob(String jobName) throws CoreException;
-	/**
-	 * @return
-	 */
-	public IPUniverse getUniverse();
+import org.eclipse.ptp.rmsystem.IResourceManager;
 
-	/**
-	 * @param monitor
-	 * @param force
-	 * @throws CoreException
-	 */
-	public void refreshRuntimeSystems(IProgressMonitor monitor, boolean force) throws CoreException;
+public interface IResourceManagerAddedRemovedEvent {
+
+	public static int ADDED = 403;
+	public static int REMOVED = 404;
+	public IResourceManager[] getResourceManagers();
+	public Object getSource();
+	public int getType();
+
 }

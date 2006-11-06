@@ -16,10 +16,19 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.internal.core.elementcontrols;
+package org.eclipse.ptp.core;
 
-import org.eclipse.ptp.core.IPJob;
 
-public interface IPJobControl extends IPElementControl, IPJob {
+public interface IPQueue extends IPElement {
 
+	/**
+	 * @param job_id
+	 * @return
+	 */
+	IPJob getJob(String job_id);
+	
+	/**
+	 * @return
+	 */
+	IPJob[] getJobs();
 }

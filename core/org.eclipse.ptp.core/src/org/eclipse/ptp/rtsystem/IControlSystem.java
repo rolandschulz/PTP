@@ -21,8 +21,6 @@ package org.eclipse.ptp.rtsystem;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.core.IPJob;
-import org.eclipse.ptp.core.IPProcess;
-import org.eclipse.ptp.rtsystem.JobRunConfiguration;
 
 /**
  * A Control System is a portion of a runtime system that handles controlling jobs.  This includes

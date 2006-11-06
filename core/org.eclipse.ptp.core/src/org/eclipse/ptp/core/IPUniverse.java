@@ -19,6 +19,9 @@
 
 package org.eclipse.ptp.core;
 
+import org.eclipse.ptp.rmsystem.IResourceManager;
+
+
 /**
  * A Universe represents a user's view of the world. It is comprised of a set of
  * Machines and Jobs. This class has helper methods to get access to those sets
@@ -110,4 +113,7 @@ public interface IPUniverse /*extends IPElement*/ {
 	public IPProcess findProcessByName(String pname);
 	
 	public void deleteJob(IPJob job);
+	
+	public IResourceManager[] getResourceManagers();
+
 }

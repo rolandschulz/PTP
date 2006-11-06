@@ -20,56 +20,110 @@ package org.eclipse.ptp.rmsystem;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.ptp.core.IModelManager;
-import org.eclipse.ptp.core.IModelPresentation;
-import org.eclipse.ptp.rtsystem.IControlSystem;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.debug.core.ILaunch;
+import org.eclipse.ptp.core.IModelModifier;
+import org.eclipse.ptp.core.IPJob;
+import org.eclipse.ptp.core.IPMachine;
+import org.eclipse.ptp.core.IPQueue;
+import org.eclipse.ptp.core.elementcontrols.IPElementControl;
+import org.eclipse.ptp.core.elementcontrols.IPMachineControl;
+import org.eclipse.ptp.core.elementcontrols.IPQueueControl;
+import org.eclipse.ptp.rtsystem.JobRunConfiguration;
 
-public interface IResourceManager extends IAdaptable, IResourceManagerMenuContribution {
+public interface IResourceManager extends IPElementControl,
+IAdaptable, IResourceManagerMenuContribution, IModelModifier {
+	
+	/**
+	 * @param id
+	 * @throws CoreException
+	 */
+	public void abortJob(String id) throws CoreException;
 	
 	/**
 	 * @param listener
 	 */
 	public void addResourceManagerListener(IResourceManagerListener listener);
-
+	
+	/**
+	 * 
+	 */
+	public void dispose();
+	
 	/**
 	 * @return
 	 */
 	public IResourceManagerConfiguration getConfiguration();
-	
-	/**
-	 * @return
-	 */
-	public IControlSystem getControlSystem();
-	
+
 	/**
 	 * @return
 	 */
 	public String getDescription();
-
-	/**
-	 * @return
-	 */
-	public IModelManager getModelManager();
-
-	/**
-	 * @return
-	 */
-	public IModelPresentation getModelPresentation();
 	
+	/**
+	 * @param ID
+	 * @return
+	 */
+	public IPMachine getMachine(String ID);
+
+	/**
+	 * @return
+	 */
+	public IPMachineControl[] getMachineControls();
+
+	/**
+	 * @return
+	 */
+	public IPMachine[] getMachines();
+
 	/**
 	 * @return
 	 */
 	public String getName();
 
 	/**
+	 * @param id
+	 * @return
+	 */
+	public IPQueue getQueue(int id);
+
+	/**
+	 * @return
+	 */
+	public IPQueueControl[] getQueueControls();
+
+	/**
+	 * @return
+	 */
+	public IPQueue[] getQueues();
+
+	/**
 	 * @return
 	 */
 	public ResourceManagerStatus getStatus();
-
+	
+	/**
+	 * @param monitor
+	 * @param force
+	 * @throws CoreException
+	 */
+	public void refreshRuntimeSystems(IProgressMonitor monitor,
+			boolean force) throws CoreException;
+	
 	/**
 	 * @param listener
 	 */
 	public void removeResourceManagerListener(IResourceManagerListener listener);
+	
+	/**
+	 * @param launch
+	 * @param jobRunConfig
+	 * @param pm
+	 * @return
+	 * @throws CoreException
+	 */
+	public IPJob run(ILaunch launch, JobRunConfiguration jobRunConfig,
+			IProgressMonitor pm) throws CoreException;
 
 	/**
 	 * 

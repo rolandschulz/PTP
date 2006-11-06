@@ -16,10 +16,26 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.internal.core.elementcontrols;
+package org.eclipse.ptp.core.elementcontrols;
 
-import org.eclipse.ptp.core.IPNode;
+import org.eclipse.ptp.core.IPQueue;
 
-public interface IPNodeControl extends IPElementControl, IPNode {
-
+public interface IPQueueControl extends IPQueue, IPElementControl {
+	/**
+	 * @param job
+	 */
+	void addJob(IPJobControl job);
+	/**
+	 * @param job
+	 */
+	void removeJob(IPJobControl job);
+	/**
+	 * @param ID
+	 * @return
+	 */
+	public IPJobControl getJobControl(String ID);
+	/**
+	 * @return
+	 */
+	IPJobControl[] getJobControls();
 }

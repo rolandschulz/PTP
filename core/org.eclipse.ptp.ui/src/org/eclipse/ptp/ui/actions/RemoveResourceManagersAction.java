@@ -36,7 +36,7 @@ public class RemoveResourceManagersAction extends Action {
 	}
 
 	public void run() {
-		PTPCorePlugin.getDefault().removeResourceManagers(selectedRMManagers);
+		PTPCorePlugin.getDefault().getModelManager().removeResourceManagers(selectedRMManagers);
 	}
 
 	public void selectionChanged(IAction action, ISelection selection) {
