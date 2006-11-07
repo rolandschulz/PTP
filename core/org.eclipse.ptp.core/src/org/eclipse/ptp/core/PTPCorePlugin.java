@@ -19,7 +19,6 @@
 package org.eclipse.ptp.core;
 
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
@@ -34,18 +33,13 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.dialogs.ProgressMonitorDialog;
-import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
 import org.eclipse.ptp.internal.core.ModelManager;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
-import org.eclipse.ptp.rmsystem.MPICH2ResourceManager;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -374,34 +368,10 @@ public class PTPCorePlugin extends AbstractUIPlugin {
 	}
 
 	private void setMPICH2ResourceManager(final IPUniverseControl universe) {
-		IResourceManagerConfiguration config = new IResourceManagerConfiguration(){
-
-			public String getDescription() {
-				return "MPICH2 Resource Manager";
-			}
-
-			public String getName() {
-				return "MPICH";
-			}
-
-			public String getResourceManagerId() {
-				return null;
-			}
-
-			public void save(IMemento memento) {
-			}
-
-			public void setDefaultNameAndDesc() {
-				// TODO Auto-generated method stub
-				
-			}
-
-			public void setDescription(String description) {
-			}
-
-			public void setName(String name) {
-			}};
-		modelManager.addResourceManager(new MPICH2ResourceManager(universe, config));
+		IResourceManagerFactory factory = getModelManager().getResourceManagerFactory("org.eclipse.ptp.mpich2.core.resourcemanager");
+		IResourceManagerConfiguration config = factory.createConfiguration();
+		final IResourceManager resourceManager = factory.create(config);
+		modelManager.addResourceManager(resourceManager);
 	}
 
 	private void setORTEResourceManager(final IPUniverseControl universe) {
