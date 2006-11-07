@@ -18,9 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.orte.core.rmsystem;
 
-import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory;
 import org.eclipse.ptp.rmsystem.IResourceManager;
@@ -42,10 +40,8 @@ public class ORTEResourceManagerFactory extends AbstractResourceManagerFactory {
 	}
 
 	public IResourceManagerConfiguration createConfiguration() {
-		final PTPCorePlugin plugin = PTPCorePlugin.getDefault();
-		Preferences preferences = plugin.getPluginPreferences();
-		String proxyPath = preferences.getString(PreferenceConstants.ORTE_PROXY_PATH);
-		boolean launchManually = preferences.getBoolean(PreferenceConstants.ORTE_LAUNCH_MANUALLY);
+		String proxyPath = "";
+		boolean launchManually = false;
 		ORTEResourceManagerConfiguration config = new ORTEResourceManagerConfiguration(this,
 				proxyPath, launchManually);
 		return config;

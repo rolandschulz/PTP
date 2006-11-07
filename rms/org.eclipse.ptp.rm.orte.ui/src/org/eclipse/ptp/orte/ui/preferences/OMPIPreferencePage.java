@@ -26,8 +26,7 @@ import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.core.PreferenceConstants;
-import org.eclipse.ptp.internal.core.CoreMessages;
+import org.eclipse.ptp.orte.ui.internal.ui.Messages;
 import org.eclipse.ptp.ui.utils.SWTUtil;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -108,7 +107,7 @@ public class OMPIPreferencePage extends PreferencePage implements IWorkbenchPref
 		Group bGroup = new Group(parent, SWT.SHADOW_ETCHED_IN);
 		bGroup.setLayout(createGridLayout(1, true, 10, 10));
 		bGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
-		bGroup.setText(CoreMessages.getResourceString("OMPIPreferencesPage.group_proxy"));
+		bGroup.setText(Messages.getString("OMPIPreferencesPage.group_proxy"));
 		
 		new Label(bGroup, SWT.WRAP).setText("Enter the path to the PTP ORTE proxy server.");
 		
@@ -116,16 +115,16 @@ public class OMPIPreferencePage extends PreferencePage implements IWorkbenchPref
 		orteserver.setLayout(createGridLayout(3, false, 0, 0));
 		orteserver.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 5));
 		
-		new Label(orteserver, SWT.NONE).setText(CoreMessages
-				.getResourceString("OMPIPreferencesPage.orteServer_text"));
+		new Label(orteserver, SWT.NONE).setText(Messages
+				.getString("OMPIPreferencesPage.orteServer_text"));
 		orteServerText = new Text(orteserver, SWT.SINGLE | SWT.BORDER);
 		orteServerText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		orteServerText.addModifyListener(listener);
-		browseButton = SWTUtil.createPushButton(orteserver, CoreMessages
-				.getResourceString("PTPPreferencesPage.browseButton"), null);
+		browseButton = SWTUtil.createPushButton(orteserver, Messages
+				.getString("OMPIPreferencesPage.browseButton"), null);
 		browseButton.addSelectionListener(listener);
 		
-		fManualButton = createCheckButton(parent, CoreMessages.getResourceString("OMPIPreferencesPage.manual"));
+		fManualButton = createCheckButton(parent, Messages.getString("OMPIPreferencesPage.manual"));
 
 	}
 	protected Button createCheckButton(Composite parent, String label) {
@@ -152,6 +151,10 @@ public class OMPIPreferencePage extends PreferencePage implements IWorkbenchPref
 		if(orteServerFile.equals("")) {
 			orteServerFile = PTPCorePlugin.getDefault().locateFragmentFile("org.eclipse.ptp.orte", "ptp_orte_proxy");
         }
+		
+		if (orteServerFile == null) {
+			orteServerFile = "";
+		}
 		
 		orteServerText.setText(orteServerFile);
 		fManualButton.setSelection(preferences.getBoolean(PreferenceConstants.ORTE_LAUNCH_MANUALLY));
@@ -196,8 +199,8 @@ public class OMPIPreferencePage extends PreferencePage implements IWorkbenchPref
 	protected void handlePathBrowseButtonSelected() 
 	{
 		FileDialog dialog = new FileDialog(getShell());
-		dialog.setText(CoreMessages
-				.getResourceString("OMPIPreferencesPage.Select_ORTE_PROXY_FILE"));
+		dialog.setText(Messages
+				.getString("OMPIPreferencesPage.Select_ORTE_PROXY_FILE"));
 		String correctPath = getFieldContent(orteServerText.getText());
 		if (correctPath != null) {
 			File path = new File(correctPath);
@@ -215,16 +218,16 @@ public class OMPIPreferencePage extends PreferencePage implements IWorkbenchPref
 	{
 		String name = getFieldContent(orteServerText.getText());
 		if (name == null) {
-			setErrorMessage(CoreMessages
-					.getResourceString("OMPIPreferencesPage.Incorrect_server_file"));
+			setErrorMessage(Messages
+					.getString("OMPIPreferencesPage.Incorrect_server_file"));
 			//setValid(false);
 			//return false;
 		}
 		else {
 			File path = new File(name);
 			if (!path.exists() || !path.isFile()) {
-				setErrorMessage(CoreMessages
-					.getResourceString("OMPIPreferencesPage.Incorrect_server_file"));
+				setErrorMessage(Messages
+					.getString("OMPIPreferencesPage.Incorrect_server_file"));
 				//setValid(false);
 				//return false;
 			}

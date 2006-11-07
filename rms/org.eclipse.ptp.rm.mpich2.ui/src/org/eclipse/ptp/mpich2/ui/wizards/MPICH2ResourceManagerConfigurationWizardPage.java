@@ -16,7 +16,7 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.orte.ui.wizards;
+package org.eclipse.ptp.mpich2.ui.wizards;
 
 import java.io.File;
 
@@ -25,8 +25,8 @@ import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.orte.core.rmsystem.ORTEResourceManagerConfiguration;
-import org.eclipse.ptp.orte.ui.preferences.PreferenceConstants;
+import org.eclipse.ptp.mpich2.core.rmsystem.MPICH2ResourceManagerConfiguration;
+import org.eclipse.ptp.mpich2.ui.preferences.PreferenceConstants;
 import org.eclipse.ptp.ui.utils.SWTUtil;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizard;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage;
@@ -44,7 +44,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-public final class ORTEResourceManagerConfigurationWizardPage extends
+public final class MPICH2ResourceManagerConfigurationWizardPage extends
 		RMConfigurationWizardPage {
 	
 	protected class WidgetListener extends SelectionAdapter implements ModifyListener, IPropertyChangeListener 
@@ -70,7 +70,7 @@ public final class ORTEResourceManagerConfigurationWizardPage extends
 	}
 
 	public static final String EMPTY_STRING = "";
-	private ORTEResourceManagerConfiguration config;
+	private MPICH2ResourceManagerConfiguration config;
 	private String serverFile = EMPTY_STRING;
 	private boolean loading = true;
 	private boolean isValid;
@@ -79,15 +79,15 @@ public final class ORTEResourceManagerConfigurationWizardPage extends
 	protected Button fManualButton = null;
 	protected WidgetListener listener = new WidgetListener();
 	
-	public ORTEResourceManagerConfigurationWizardPage(RMConfigurationWizard wizard) {
-		super(wizard, "ORTE Configuration Wizard Page");
-		setTitle("ORTE Configuration Wizard Page");
-		setDescription("ORTE Configuration Wizard Page");
+	public MPICH2ResourceManagerConfigurationWizardPage(RMConfigurationWizard wizard) {
+		super(wizard, "MPICH2 Configuration Wizard Page");
+		setTitle("MPICH2 Configuration Wizard Page");
+		setDescription("MPICH2 Configuration Wizard Page");
 		
-		System.out.println("in ORTEResourceManagerConfigurationWizardPage");
+		System.out.println("in MPICH2ResourceManagerConfigurationWizardPage");
 		
 		final RMConfigurationWizard confWizard = getConfigurationWizard();
-		config = (ORTEResourceManagerConfiguration) confWizard.getConfiguration();
+		config = (MPICH2ResourceManagerConfiguration) confWizard.getConfiguration();
 		setPageComplete(false);
 		isValid = false;
 	}
@@ -96,12 +96,12 @@ public final class ORTEResourceManagerConfigurationWizardPage extends
 	 * @see org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage#createControl(org.eclipse.swt.widgets.Composite)
 	 */
 	public void createControl(Composite parent) {
-		System.out.println("In ORTEResourceManagerConfigurationWizardPage.createControl");
+		System.out.println("In MPICH2ResourceManagerConfigurationWizardPage.createControl");
 		Composite composite = new Composite(parent, SWT.NONE);
 		composite.setLayout(createGridLayout(1, true, 0, 0));
 		composite.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
 
-		createORTEContents(composite);
+		createMPICH2Contents(composite);
 		
 		loading = true;
 		loadSaved();
@@ -111,7 +111,7 @@ public final class ORTEResourceManagerConfigurationWizardPage extends
 
 		setControl(composite);
 		
-		System.out.println("leaving ORTEResourceManagerConfigurationWizardPage.createControl");
+		System.out.println("leaving MPICH2ResourceManagerConfigurationWizardPage.createControl");
 	}
 
 	private void store() 
@@ -122,41 +122,41 @@ public final class ORTEResourceManagerConfigurationWizardPage extends
 	public boolean performOk() 
 	{
 		store();
-		config.setOrteServerFile(serverFile);
+		config.setServerFile(serverFile);
 		config.setManualLaunch(fManualButton.getSelection());
 		return true;
 	}
 
-	private void createORTEContents(Composite parent) {
+	private void createMPICH2Contents(Composite parent) {
 		Group bGroup = new Group(parent, SWT.SHADOW_ETCHED_IN);
 		bGroup.setLayout(createGridLayout(1, true, 10, 10));
 		bGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
 		bGroup.setText("Open Runtime Environment PTP Proxy Server");
 		
-		new Label(bGroup, SWT.WRAP).setText("Enter the path to the PTP ORTE proxy server.");
+		new Label(bGroup, SWT.WRAP).setText("Enter the path to the PTP MPICH2 proxy server.");
 		
 		Composite orteserver = new Composite(bGroup, SWT.NONE);
 		orteserver.setLayout(createGridLayout(3, false, 0, 0));
 		orteserver.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 5));
 		
-		new Label(orteserver, SWT.NONE).setText("ORTE|PTP proxy server file:");
+		new Label(orteserver, SWT.NONE).setText("MPICH2|PTP proxy server file:");
 		serverText = new Text(orteserver, SWT.SINGLE | SWT.BORDER);
 		serverText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		serverText.addModifyListener(listener);
 		browseButton = SWTUtil.createPushButton(orteserver, "Browse", null);
 		browseButton.addSelectionListener(listener);
 		
-		fManualButton = createCheckButton(parent, "Launch ORTE server manually");
+		fManualButton = createCheckButton(parent, "Launch MPICH2 server manually");
 	}
 
 	private void loadSaved()
 	{
 		Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
 		
-		serverFile = preferences.getString(PreferenceConstants.ORTE_PROXY_PATH);
-		/* if they don't have the ptp_orte_proxy path set, let's try and give them a default that might help */
+		serverFile = preferences.getString(PreferenceConstants.MPICH2_PROXY_PATH);
+		/* if they don't have the ptp_mpich2_proxy path set, let's try and give them a default that might help */
 		if(serverFile.equals("")) {
-			serverFile = PTPCorePlugin.getDefault().locateFragmentFile("org.eclipse.ptp.orte", "ptp_orte_proxy");
+			serverFile = PTPCorePlugin.getDefault().locateFragmentFile("org.eclipse.ptp.mpich2.proxy", "ptp_mpich2_proxy.py");
 	    }
 		
 		System.out.println("serverFile: " + serverFile);
@@ -166,13 +166,13 @@ public final class ORTEResourceManagerConfigurationWizardPage extends
 			return;
 		}
 		serverText.setText(serverFile);
-		fManualButton.setSelection(preferences.getBoolean(PreferenceConstants.ORTE_LAUNCH_MANUALLY));
+		fManualButton.setSelection(preferences.getBoolean(PreferenceConstants.MPICH2_LAUNCH_MANUALLY));
 	}
 
 	private void setValid(boolean b) {
 		isValid = b;
 		setPageComplete(isValid);
-		System.out.println("setValid(" + isValid + ")");
+		//System.out.println("setValid(" + isValid + ")");
 	}
 
 	protected Button createButton(Composite parent, String label, int type) {
@@ -215,7 +215,7 @@ public final class ORTEResourceManagerConfigurationWizardPage extends
 	protected void handlePathBrowseButtonSelected() 
 	{
 		FileDialog dialog = new FileDialog(getShell());
-		dialog.setText("Select ORTE|PTP Proxy server file");
+		dialog.setText("Select MPICH2|PTP Proxy server file");
 		String correctPath = getFieldContent(serverText.getText());
 		if (correctPath != null) {
 			File path = new File(correctPath);
@@ -229,18 +229,18 @@ public final class ORTEResourceManagerConfigurationWizardPage extends
 			serverText.setText(selectedPath);
 	}
 
-	protected boolean isValidORTEdSetting() 
+	protected boolean isValidMPICH2dSetting() 
 	{
 		String name = getFieldContent(serverText.getText());
 		if (name == null) {
-			setErrorMessage("Invalid ORTE|PTP proxy server file");
+			setErrorMessage("Invalid MPICH2|PTP proxy server file");
 			//setValid(false);
 			return false;
 		}
 		else {
 			File path = new File(name);
 			if (!path.exists() || !path.isFile()) {
-				setErrorMessage("Invalid ORTE|PTP proxy server file");
+				setErrorMessage("Invalid MPICH2|PTP proxy server file");
 				//setValid(false);
 				return false;
 			}
@@ -266,7 +266,7 @@ public final class ORTEResourceManagerConfigurationWizardPage extends
 		setErrorMessage(null);
 		setMessage(null);
 	
-		if (!isValidORTEdSetting())
+		if (!isValidMPICH2dSetting())
 			return;
 	
 		performOk();

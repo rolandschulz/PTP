@@ -16,24 +16,25 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.orte.ui.internal.ui;
+package org.eclipse.ptp.mpich2.ui.wizards;
 
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
+import org.eclipse.ptp.mpich2.core.rmsystem.MPICH2ResourceManagerFactory;
+import org.eclipse.ptp.ui.wizards.RMConfigurationWizard;
+import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage;
+import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPageFactory;
 
-public class Messages {
-	private static final String BUNDLE_NAME = "org.eclipse.ptp.orte.ui.internal.ui.Messages"; //$NON-NLS-1$
+public class MPICH2ResourceManagerConfigurationWizardPageFactory extends
+		RMConfigurationWizardPageFactory {
 
-	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
-
-	private Messages() {
+	public MPICH2ResourceManagerConfigurationWizardPageFactory() {
+		// no-op
 	}
 
-	public static String getString(String key) {
-		try {
-			return RESOURCE_BUNDLE.getString(key);
-		} catch (MissingResourceException e) {
-			return '!' + key + '!';
-		}
+	public RMConfigurationWizardPage[] getPages(RMConfigurationWizard wizard) {
+		return new RMConfigurationWizardPage[]{new MPICH2ResourceManagerConfigurationWizardPage(wizard)};
+	}
+
+	public Class getRMFactoryClass() {
+		return MPICH2ResourceManagerFactory.class;
 	}
 }

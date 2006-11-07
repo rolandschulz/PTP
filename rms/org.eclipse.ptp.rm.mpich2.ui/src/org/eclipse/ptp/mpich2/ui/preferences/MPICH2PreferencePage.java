@@ -26,8 +26,7 @@ import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.core.PreferenceConstants;
-import org.eclipse.ptp.internal.core.CoreMessages;
+import org.eclipse.ptp.mpich2.ui.internal.ui.Messages;
 import org.eclipse.ptp.ui.utils.SWTUtil;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -108,7 +107,7 @@ public class MPICH2PreferencePage extends PreferencePage implements IWorkbenchPr
 		Group bGroup = new Group(parent, SWT.SHADOW_ETCHED_IN);
 		bGroup.setLayout(createGridLayout(1, true, 10, 10));
 		bGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
-		bGroup.setText(CoreMessages.getResourceString("MPICH2PreferencesPage.group_proxy"));
+		bGroup.setText(Messages.getString("MPICH2PreferencesPage.group_proxy"));
 		
 		new Label(bGroup, SWT.WRAP).setText("Enter the path to the PTP MPICH2 proxy server.");
 		
@@ -116,16 +115,16 @@ public class MPICH2PreferencePage extends PreferencePage implements IWorkbenchPr
 		server.setLayout(createGridLayout(3, false, 0, 0));
 		server.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 5));
 		
-		new Label(server, SWT.NONE).setText(CoreMessages
-				.getResourceString("MPICH2PreferencesPage.server_text"));
+		new Label(server, SWT.NONE).setText(Messages
+				.getString("MPICH2PreferencesPage.server_text"));
 		proxyServerText = new Text(server, SWT.SINGLE | SWT.BORDER);
 		proxyServerText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		proxyServerText.addModifyListener(listener);
-		browseButton = SWTUtil.createPushButton(server, CoreMessages
-				.getResourceString("PTPPreferencesPage.browseButton"), null);
+		browseButton = SWTUtil.createPushButton(server, Messages
+				.getString("MPICH2PreferencesPage.browseButton"), null);
 		browseButton.addSelectionListener(listener);
 		
-		fManualButton = createCheckButton(parent, CoreMessages.getResourceString("MPICH2PreferencesPage.manual"));
+		fManualButton = createCheckButton(parent, Messages.getString("MPICH2PreferencesPage.manual"));
 
 	}
 	protected Button createCheckButton(Composite parent, String label) {
@@ -152,6 +151,10 @@ public class MPICH2PreferencePage extends PreferencePage implements IWorkbenchPr
 		if(proxyServerFile.equals("")) {
 			proxyServerFile = PTPCorePlugin.getDefault().locateFragmentFile("org.eclipse.ptp.mpich2.proxy", "ptp_mpich2_proxy.py");
         }
+		
+		if (proxyServerFile == null) {
+			proxyServerFile = "";
+		}
 		
 		proxyServerText.setText(proxyServerFile);
 		fManualButton.setSelection(preferences.getBoolean(PreferenceConstants.MPICH2_LAUNCH_MANUALLY));
@@ -196,8 +199,8 @@ public class MPICH2PreferencePage extends PreferencePage implements IWorkbenchPr
 	protected void handlePathBrowseButtonSelected() 
 	{
 		FileDialog dialog = new FileDialog(getShell());
-		dialog.setText(CoreMessages
-				.getResourceString("MPICH2PreferencesPage.Select_MPICH2_PROXY_FILE"));
+		dialog.setText(Messages
+				.getString("MPICH2PreferencesPage.Select_MPICH2_PROXY_FILE"));
 		String correctPath = getFieldContent(proxyServerText.getText());
 		if (correctPath != null) {
 			File path = new File(correctPath);
@@ -215,16 +218,16 @@ public class MPICH2PreferencePage extends PreferencePage implements IWorkbenchPr
 	{
 		String name = getFieldContent(proxyServerText.getText());
 		if (name == null) {
-			setErrorMessage(CoreMessages
-					.getResourceString("MPICH2PreferencesPage.Incorrect_server_file"));
+			setErrorMessage(Messages
+					.getString("MPICH2PreferencesPage.Incorrect_server_file"));
 			//setValid(false);
 			//return false;
 		}
 		else {
 			File path = new File(name);
 			if (!path.exists() || !path.isFile()) {
-				setErrorMessage(CoreMessages
-					.getResourceString("MPICH2PreferencesPage.Incorrect_server_file"));
+				setErrorMessage(Messages
+					.getString("MPICH2PreferencesPage.Incorrect_server_file"));
 				//setValid(false);
 				//return false;
 			}

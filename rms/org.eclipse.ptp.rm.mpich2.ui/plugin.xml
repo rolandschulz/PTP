@@ -11,5 +11,11 @@
             name="MPICH 2">
       </page>
    </extension>
+   <extension
+         point="org.eclipse.ptp.ui.rmconfiguration">
+      <configurationWizard
+            class="org.eclipse.ptp.mpich2.ui.wizards.MPICH2ResourceManagerConfigurationWizardPageFactory"
+            id="org.eclipse.ptp.mpich2.ui.configurationWizard"/>
+   </extension>
 
 </plugin>

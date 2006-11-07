@@ -16,13 +16,13 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.orte.ui.internal.ui;
+package org.eclipse.ptp.mpich2.ui.internal.ui;
 
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 public class Messages {
-	private static final String BUNDLE_NAME = "org.eclipse.ptp.orte.ui.internal.ui.Messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "org.eclipse.ptp.mpich2.ui.internal.ui.Messages"; //$NON-NLS-1$
 
 	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
 

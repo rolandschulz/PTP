@@ -10,5 +10,6 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.ptp.core,
  org.eclipse.debug.ui,
- org.eclipse.ptp.ui
+ org.eclipse.ptp.ui,
+ org.eclipse.ptp.mpich2.core
 Eclipse-LazyStart: true
