@@ -14,12 +14,11 @@ package org.eclipse.ptp.pldt.common;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.plugin.*;
-import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 
