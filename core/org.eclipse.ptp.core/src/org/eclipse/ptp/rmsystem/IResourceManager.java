@@ -126,9 +126,10 @@ IAdaptable, IResourceManagerMenuContribution, IModelModifier {
 			IProgressMonitor pm) throws CoreException;
 
 	/**
+	 * @param monitor TODO
 	 * 
 	 */
-	public void start() throws CoreException;
+	public void start(IProgressMonitor monitor) throws CoreException;
 
 	/**
 	 * 

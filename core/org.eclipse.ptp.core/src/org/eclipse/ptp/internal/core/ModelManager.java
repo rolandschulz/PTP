@@ -27,6 +27,7 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -57,6 +58,7 @@ import org.eclipse.ptp.rmsystem.events.ResourceManagerAddedRemovedEvent;
 import org.eclipse.ptp.rtsystem.IControlSystem;
 import org.eclipse.ptp.rtsystem.IMonitoringSystem;
 import org.eclipse.ptp.rtsystem.IRuntimeProxy;
+import org.eclipse.swt.widgets.Display;
 
 public class ModelManager implements IModelManager, IResourceManagerChangedListener,
 IResourceManagerListener {
@@ -66,6 +68,7 @@ IResourceManagerListener {
 	private final INodeListener rmNodeListener;
 
 	private final IProcessListener rmProcessListener;
+	private final Display display;
 	protected ListenerList modelListeners = new ListenerList();
 	protected ListenerList nodeListeners = new ListenerList();
 	protected ListenerList processListeners = new ListenerList();
@@ -78,6 +81,8 @@ IResourceManagerListener {
 	protected IRuntimeProxy runtimeProxy = null;
 
 	public ModelManager() {
+
+		this.display = PTPCorePlugin.getDisplay();
 
 		// Forward resource manager events to the ModelManager's listeners
 		rmModelListener = new IModelListener(){
@@ -252,10 +257,11 @@ IResourceManagerListener {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.IModelManager#loadResourceManagers()
 	 */
-	public void loadResourceManagers() {
+	public void loadResourceManagers(IProgressMonitor monitor) {
 		ResourceManagerPersistence rmp = new ResourceManagerPersistence();
 		// Loads and, if necessary, starts saved resource managers.
-		rmp.loadResourceManagers(getResourceManagersFile(), getResourceManagerFactories());
+		rmp.loadResourceManagers(getResourceManagersFile(), getResourceManagerFactories(),
+				monitor);
 		IResourceManager[] resourceManagers = rmp.getResourceManagers();
 		addResourceManagers(resourceManagers);
 	}
@@ -324,14 +330,20 @@ IResourceManagerListener {
 		processListeners.clear();
 	}
 	
-	public void start() throws CoreException {
-		
-		// FIXME need to fix this
-		if (false) {
-			loadResourceManagers();
+	/**
+	 * shuts down all of the resource managers.
+	 */
+	public void shutdownResourceManagers() {
+		IResourceManager[] resourceManagers = universe.getResourceManagers();
+		for (int i = 0; i<resourceManagers.length; ++i) {
+			resourceManagers[i].dispose();
 		}
 	}
 	
+	public void start(IProgressMonitor monitor) throws CoreException {
+		loadResourceManagers(monitor);
+	}
+
 	/**
 	 * stops all of the resource managers.
 	 * 
@@ -341,16 +353,6 @@ IResourceManagerListener {
 		IResourceManager[] resourceManagers = universe.getResourceManagers();
 		for (int i = 0; i<resourceManagers.length; ++i) {
 			resourceManagers[i].stop();
-		}
-	}
-
-	/**
-	 * shuts down all of the resource managers.
-	 */
-	public void shutdownResourceManagers() {
-		IResourceManager[] resourceManagers = universe.getResourceManagers();
-		for (int i = 0; i<resourceManagers.length; ++i) {
-			resourceManagers[i].dispose();
 		}
 	}
 	
@@ -405,7 +407,7 @@ IResourceManagerListener {
 		for (int i=0, n = tmpListeners.length; i < n; ++i) {
 			final IResourceManagerChangedListener listener =
 				(IResourceManagerChangedListener) tmpListeners[i]; 
-			SafeRunnable.run(new SafeRunnable() {
+			safeRunAsyncInUIThread(new SafeRunnable() {
 				public void run() {
 					listener.handleResourceManagersAddedRemoved(event);
 				}
@@ -426,6 +428,18 @@ IResourceManagerListener {
 		manager.removeModelListener(rmModelListener);
 		manager.removeNodeListener(rmNodeListener);
 		manager.removeProcessListener(rmProcessListener);
+	}
+
+	/**
+	 * Makes sure that the safeRunnable is ran in the UI thread. 
+	 * @param safeRunnable
+	 */
+	protected void safeRunAsyncInUIThread(final ISafeRunnable safeRunnable) {
+		display.asyncExec(new Runnable() {
+			public void run() {
+				SafeRunnable.run(safeRunnable);
+			}
+		});
 	}
 
 }

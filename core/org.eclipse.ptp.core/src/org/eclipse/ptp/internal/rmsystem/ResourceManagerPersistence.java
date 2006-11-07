@@ -26,6 +26,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.SubProgressMonitor;
+import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
@@ -102,14 +106,18 @@ public class ResourceManagerPersistence {
 	 * Loads and, if necessary, starts saved resource managers.
 	 * @param file
 	 * @param factories
+	 * @param monitor TODO
 	 */
 	public void loadResourceManagers(File file,
-			IResourceManagerFactory[] factories) {
+			IResourceManagerFactory[] factories, IProgressMonitor monitor) {
+		if (monitor == null) {
+			monitor = new NullProgressMonitor();
+		}
 		FileReader reader = null;
 		try {
 			reader = new FileReader(file);
 			// Loads and, if necessary, starts saved resource managers.
-			loadResourceManagers(XMLMemento.createReadRoot(reader), factories);
+			loadResourceManagers(XMLMemento.createReadRoot(reader), factories, monitor);
 		} catch (FileNotFoundException e) {
 			// ignored... no ResourceManager items exist yet.
 		} catch (Exception e) {
@@ -139,42 +147,52 @@ public class ResourceManagerPersistence {
 	 * Loads and, if necessary, starts saved resource managers.
 	 * @param memento
 	 * @param factories
+	 * @param monitor TODO
 	 */
 	private void loadResourceManagers(XMLMemento memento,
-			IResourceManagerFactory[] factories) {
+			IResourceManagerFactory[] factories, final IProgressMonitor monitor) {
 		IMemento[] children = memento.getChildren(TAG_RESOURCEMANGER);
+		monitor.beginTask("load Resource Managers", children.length);
 
-		IResourceManager[] tmpRMs = new IResourceManager[children.length];
-		ArrayList rms = new ArrayList(tmpRMs.length);
+		try {
+			final IResourceManager[] tmpRMs = new IResourceManager[children.length];
+			ArrayList rms = new ArrayList(tmpRMs.length);
 
-		for (int i = 0; i < children.length; ++i) {
-			String resourceManagerId = children[i].getString(TAG_RESOURCEMANGER_ID);
-			int index = children[i].getInteger(TAG_RESOURCEMANAGER_INDEX).intValue();
-			String isRunningRep = children[i].getString(TAG_RESOURCEMANGER_RUNNING);
-			boolean isRunning = "true".equalsIgnoreCase(isRunningRep);
-			IResourceManagerFactory factory = getResourceManagerFactory(
-					factories, resourceManagerId);
-			if (factory != null) {
-				final IMemento grandchild = children[i].getChild(TAG_RESOURCEMANGER_CONFIGURATION);
-				IResourceManagerConfiguration configuration = factory.loadConfiguration(grandchild);
-				if (configuration != null) {
-					tmpRMs[index] = factory.create(configuration);
-					if (tmpRMs[index] != null) {
-						// start the resource manager if it was running when saved.
-						if (isRunning) {
-							try {
-								tmpRMs[index].start();
-							} catch (CoreException e) {
-								PTPCorePlugin.log(e);
+			for (int i = 0; i < children.length; ++i) {
+				String resourceManagerId = children[i].getString(TAG_RESOURCEMANGER_ID);
+				final int index = children[i].getInteger(TAG_RESOURCEMANAGER_INDEX).intValue();
+				String isRunningRep = children[i].getString(TAG_RESOURCEMANGER_RUNNING);
+				boolean isRunning = "true".equalsIgnoreCase(isRunningRep);
+				IResourceManagerFactory factory = getResourceManagerFactory(
+						factories, resourceManagerId);
+				if (factory != null) {
+					final IMemento grandchild = children[i].getChild(TAG_RESOURCEMANGER_CONFIGURATION);
+					IResourceManagerConfiguration configuration = factory.loadConfiguration(grandchild);
+					if (configuration != null) {
+						tmpRMs[index] = factory.create(configuration);
+						if (tmpRMs[index] != null) {
+							// start the resource manager if it was running when saved.
+							if (isRunning) {
+								SafeRunnable.run(new SafeRunnable(){
+									public void run() throws Exception {
+										tmpRMs[index].start(new SubProgressMonitor(monitor, 1));
+									}
+								});
 							}
+							else {
+								monitor.worked(1);
+							}
+							rms.add(tmpRMs[index]);
 						}
-						rms.add(tmpRMs[index]);
 					}
 				}
 			}
-		}
 
-		resourceManagers = (IResourceManager[]) rms.toArray(new IResourceManager[rms.size()]);
+			resourceManagers = (IResourceManager[]) rms.toArray(new IResourceManager[rms.size()]);
+		}
+		finally {
+			monitor.done();
+		}
 	}
 
 }

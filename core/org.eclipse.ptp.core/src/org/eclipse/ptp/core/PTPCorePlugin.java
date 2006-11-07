@@ -19,18 +19,24 @@
 package org.eclipse.ptp.core;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
 import org.eclipse.ptp.internal.core.ModelManager;
 import org.eclipse.ptp.rmsystem.IResourceManager;
@@ -296,8 +302,32 @@ public class PTPCorePlugin extends AbstractUIPlugin {
 		super.start(context);
 
 		modelManager = new ModelManager();
+		
 		// FIXME need to fix this
 		if (true) {
+			new Job("Loading Resource Managers"){
+
+				protected IStatus run(IProgressMonitor monitor) {
+					try {
+						//Thread.sleep(5000);
+						modelManager.start(monitor);
+						//Thread.sleep(5000);
+					} catch (CoreException e) {
+						// log(e);
+						return e.getStatus();
+//					} catch (InterruptedException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//						return Status.CANCEL_STATUS;
+					}
+					if (monitor.isCanceled()) {
+						return Status.CANCEL_STATUS;
+					}
+					return Status.OK_STATUS;
+				}
+			}.schedule();
+		}
+		else {
 			Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
 			int MSChoiceID = preferences.getInt(PreferenceConstants.MONITORING_SYSTEM_SELECTION);
 			String MSChoice = MonitoringSystemChoices.getMSNameByID(MSChoiceID);
