@@ -18,6 +18,7 @@ import org.eclipse.cdt.managedbuilder.ui.wizards.MBSCustomPage;
 import org.eclipse.cdt.managedbuilder.ui.wizards.MBSCustomPageManager;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ptp.pldt.mpi.core.MpiIDs;
@@ -35,7 +36,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.PlatformUI;
 
 /**
  * Wizard Page for collecting info about MPI project
@@ -89,7 +92,6 @@ public class MPIProjectWizardPage extends MBSCustomPage {
 	
 	private Label includePathLabel, libLabel, libPathLabel, mpiCompileCommandLabel, mpiLinkCommandLabel;
 
-
 	private Button browseButton;
 	private Button browseButton2;
 
@@ -116,6 +118,9 @@ public class MPIProjectWizardPage extends MBSCustomPage {
 	public MPIProjectWizardPage() {
 		super(PAGE_ID);
 
+		//CommonPlugin.log(IStatus.ERROR,"Test error");
+		//CommonPlugin.log(IStatus.WARNING,"Test warning");
+		
 		// access the preference store from the MPI plugin
 		preferenceStore = MpiPlugin.getDefault().getPreferenceStore();
 		String mip=preferenceStore.getString(MpiIDs.MPI_INCLUDES);
@@ -124,12 +129,29 @@ public class MPIProjectWizardPage extends MBSCustomPage {
 		// Set the defaults here in the wizard page constructor and just
 		// overwrite them if the user changes them.
 		defaultMpiIncludePath = preferenceStore.getString(MpiIDs.MPI_INCLUDES);
+		if(defaultMpiIncludePath.length()==0) {
+			// warn if no MPI preferences have been set
+			showNoPrefs();
+		}
 		setDefaultOtherNames(defaultMpiIncludePath);
 		// the following sets what will be remembered when we leave the page.
 		setCurrentMpiIncludePath(defaultMpiIncludePath);
 		setCurrentMpiCompileCommand(defaultMpiBuildCommand);
-		setCurrentMpiLinkCommand(defaultMpiBuildCommand);
+		setCurrentMpiLinkCommand(defaultMpiBuildCommand);		
+	}
 
+	/**
+	 * Warn user that the MPI project preferences aren't set, and thus the new project wizard will not be very useful.
+	 * <br>
+	 * TODO: do we need a "do not show this message again" setting?
+	 */
+	private void showNoPrefs() {
+		Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+		StringBuffer buf=new StringBuffer("No MPI Preferences set; ");
+		buf.append("Default project setting will be more useful if MPI preferences are set first. ");
+		buf.append("\nUse Window > Preferences and select Parallel Language Development Tools, which may be under PTP preferences.");
+		buf.append("You can cancel out of new project wizard to enter MPI preferences now.");
+		MessageDialog.openWarning(shell, "No MPI Preferences set", buf.toString());
 	}
 
 	/**
@@ -161,11 +183,10 @@ public class MPIProjectWizardPage extends MBSCustomPage {
 		String temp=path.toString();
 		temp=stripTrailingSeparator(temp);
 		defaultMpiIncludePath=temp;
-		setCurrentMpiIncludePath(defaultMpiIncludePath);
-		
+		setCurrentMpiIncludePath(defaultMpiIncludePath);	
+			
 		defaultMpiBuildCommand="mpicc";
 		setCurrentMpiCompileCommand(defaultMpiBuildCommand);
-		
 	}
 
 	/**
@@ -307,6 +328,7 @@ public class MPIProjectWizardPage extends MBSCustomPage {
 	 * @return the string without any trailing separator
 	 */
 	private String stripTrailingSeparator(String str) {
+		if(str.length()==0)return str;
 		char lastChar = str.charAt(str.length() - 1);
 		// BRT how to find ; vs : in a platform-independent manner?
 		if (lastChar == Path.DEVICE_SEPARATOR|| lastChar== ';') {
