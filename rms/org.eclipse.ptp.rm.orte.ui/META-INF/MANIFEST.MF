@@ -9,5 +9,8 @@ Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.ptp.core,
- org.eclipse.ptp.ui
+ org.eclipse.ptp.ui,
+ org.eclipse.ptp.orte.core
 Eclipse-LazyStart: true
+Export-Package: org.eclipse.ptp.orte.ui,
+ org.eclipse.ptp.orte.ui.preferences

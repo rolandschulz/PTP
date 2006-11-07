@@ -6,11 +6,7 @@ import java.io.InputStreamReader;
 import java.util.BitSet;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Preferences;
-import org.eclipse.ptp.core.ControlSystemChoices;
-import org.eclipse.ptp.core.MonitoringSystemChoices;
 import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.core.util.Queue;
 import org.eclipse.ptp.rtsystem.IRuntimeProxy;
 import org.eclipse.ptp.rtsystem.proxy.ProxyRuntimeClient;
@@ -21,9 +17,13 @@ import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeErrorEvent;
 public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRuntimeProxy, IProxyRuntimeEventListener {
 	protected Queue events = new Queue();
 	protected BitSet waitEvents = new BitSet();
+	private final String proxyPath;
+	private final boolean launchManually;
 	
-	public OMPIProxyRuntimeClient() {
+	public OMPIProxyRuntimeClient(String proxyPath, boolean launchManually) {
 		super();
+		this.proxyPath = proxyPath;
+		this.launchManually = launchManually;
 		super.addRuntimeEventListener(this);
 	}
 	
@@ -34,38 +34,13 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
 	public boolean startup(final IProgressMonitor monitor) {
 		System.out.println("OMPIProxyRuntimeClient - firing up proxy, waiting for connecting.  Please wait!  This can take a minute . . .");
 		
-		Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
-		String proxyPath = preferences.getString(PreferenceConstants.ORTE_PROXY_PATH);
 		System.out.println("ORTE_SERVER path = '"+proxyPath+"'");
 		
-		/* if they don't have the ptp_orte_proxy path set, let's try and give them a default that might help */
-		if(proxyPath.equals("")) {
-			proxyPath = PTPCorePlugin.getDefault().locateFragmentFile("org.eclipse.ptp.orte", "ptp_orte_proxy");
-			if(proxyPath != null) preferences.setValue(PreferenceConstants.ORTE_PROXY_PATH, proxyPath);
-			else {
-				String err = "Could not find the ORTE server ('ptp_orte_proxy' binary).  "+
-					"File not found in the fragment directory or developer directories.  "+
-					"Defaulting to Simulation Mode.";
-				System.err.println(err);
-				//PTPCorePlugin.errorDialog("ORTE Server Start Failure", err, null);
-
-				int MSI = MonitoringSystemChoices.SIMULATED;
-				int CSI = ControlSystemChoices.SIMULATED;
-							
-				preferences.setValue(PreferenceConstants.MONITORING_SYSTEM_SELECTION, MSI);
-				preferences.setValue(PreferenceConstants.CONTROL_SYSTEM_SELECTION, CSI);
-
-				PTPCorePlugin.getDefault().savePluginPreferences();
-			
-				return false;
-			}
-        }
-
-		final String proxyPath2 = preferences.getString(PreferenceConstants.ORTE_PROXY_PATH);
+		final String proxyPath2 = proxyPath;
 		try {
 			setWaitEvent(IProxyRuntimeEvent.EVENT_RUNTIME_CONNECTED);
 			sessionCreate();
-			if (preferences.getBoolean(PreferenceConstants.ORTE_LAUNCH_MANUALLY)) {
+			if (launchManually) {
 				monitor.subTask("Waiting for manual lauch of ptp_orte_proxy on port "+getSessionPort()+"...");
 			} else {
 				Thread runThread = new Thread("Proxy Server Thread") {

@@ -19,6 +19,7 @@
 package org.eclipse.ptp.core;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerChangedListener;
@@ -47,9 +48,10 @@ public interface IModelManager extends IModelPresentation {
 
 	/**
 	 * Loads and, if necessary, starts saved resource managers.
+	 * @param monitor TODO
 	 * @throws CoreException
 	 */
-	public void loadResourceManagers() throws CoreException;
+	public void loadResourceManagers(IProgressMonitor monitor) throws CoreException;
 	public void removeResourceManager(IResourceManager removedManager);
 	public void removeResourceManagerChangedListener(IResourceManagerChangedListener listener);
 	public void removeResourceManagers(IResourceManager[] removedRMs);
@@ -60,7 +62,7 @@ public interface IModelManager extends IModelPresentation {
 
 	public void shutdown() throws CoreException;
 
-	public void start() throws CoreException;
+	public void start(IProgressMonitor monitor) throws CoreException;
 
 	/**
 	 * stops all of the resource managers.

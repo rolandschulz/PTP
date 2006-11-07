@@ -32,60 +32,6 @@ final public class ORTEResourceManagerConfiguration implements IResourceManagerC
 	private static final String TAG_PROXY_PATH = "proxyPath"; //$NON-NLS-1$
 	private static final String TAG_LAUNCH_MANUALLY = "launchManually"; //$NON-NLS-1$
 
-	private String description;
-	private String name;
-	private final String factoryId;
-	private final String orteServerFile;
-	private final boolean launchManually;
-
-	public ORTEResourceManagerConfiguration(ORTEResourceManagerFactory factory,
-			String orteServerFile, boolean launchManually) {
-		this(factory, "", "", orteServerFile, launchManually);
-		setDefaultNameAndDesc();
-	}
-	
-	public ORTEResourceManagerConfiguration(ORTEResourceManagerFactory factory, String name, String desc,
-			String orteServerFile, boolean launchManually) {
-		this.factoryId = factory.getId();
-		this.name = name;
-		this.description = desc;
-		this.orteServerFile = orteServerFile;
-		this.launchManually = launchManually;
-	}
-	
-	public String getDescription() {
-		return this.description;
-	}
-
-	public String getName() {
-		return this.name;
-	}
-
-	public String getResourceManagerId() {
-		return this.factoryId;
-	}
-	
-	public void save(IMemento memento) {
-		memento.putString(TAG_FACTORY_ID, getResourceManagerId());
-		memento.putString(TAG_NAME, name);
-		memento.putString(TAG_DESCRIPTION, description);
-		memento.putString(TAG_PROXY_PATH, orteServerFile);
-		memento.putString(TAG_LAUNCH_MANUALLY, Boolean.toString(launchManually));
-	}
-
-	public void setDefaultNameAndDesc() {
-		this.name = "ORTE";
-		this.description = "ORTE Resource Manager";
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
 	public static IResourceManagerConfiguration load(ORTEResourceManagerFactory factory,
 			IMemento memento) {
 		String factoryId = memento.getString(TAG_FACTORY_ID);
@@ -103,5 +49,75 @@ final public class ORTEResourceManagerConfiguration implements IResourceManagerC
 				name, desc, orteServerFile, launchManually);
 		
 		return config;
+	}
+	private String description;
+	private String name;
+	private final String factoryId;
+	private String orteServerFile;
+
+	private boolean launchManually;
+	
+	public ORTEResourceManagerConfiguration(ORTEResourceManagerFactory factory,
+			String orteServerFile, boolean launchManually) {
+		this(factory, "", "", orteServerFile, launchManually);
+		setDefaultNameAndDesc();
+	}
+	
+	public ORTEResourceManagerConfiguration(ORTEResourceManagerFactory factory, String name, String desc,
+			String orteServerFile, boolean launchManually) {
+		this.factoryId = factory.getId();
+		this.name = name;
+		this.description = desc;
+		this.orteServerFile = orteServerFile;
+		this.launchManually = launchManually;
+	}
+
+	public String getDescription() {
+		return this.description;
+	}
+
+	public String getName() {
+		return this.name;
+	}
+	
+	public String getOrteServerFile() {
+		return orteServerFile;
+	}
+
+	public String getResourceManagerId() {
+		return this.factoryId;
+	}
+
+	public boolean isLaunchManually() {
+		return launchManually;
+	}
+
+	public void save(IMemento memento) {
+		memento.putString(TAG_FACTORY_ID, getResourceManagerId());
+		memento.putString(TAG_NAME, name);
+		memento.putString(TAG_DESCRIPTION, description);
+		memento.putString(TAG_PROXY_PATH, orteServerFile);
+		memento.putString(TAG_LAUNCH_MANUALLY, Boolean.toString(launchManually));
+	}
+
+	public void setDefaultNameAndDesc() {
+		this.name = "ORTE";
+		this.description = "ORTE Resource Manager";
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public void setManualLaunch(boolean launchManually) {
+		this.launchManually = launchManually;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public void setOrteServerFile(String orteServerFile) {
+		this.orteServerFile = orteServerFile;
 	}
 }

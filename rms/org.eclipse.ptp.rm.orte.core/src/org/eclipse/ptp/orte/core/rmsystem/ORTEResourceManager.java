@@ -35,13 +35,20 @@ public class ORTEResourceManager extends RuntimeResourceManager {
 	public ORTEResourceManager(IPUniverseControl universe,
 			IResourceManagerConfiguration config) {
 		super(universe, config);
-		// TODO Auto-generated constructor stub
+		if (config instanceof ORTEResourceManagerConfiguration) {
+			ORTEResourceManagerConfiguration oConfig = (ORTEResourceManagerConfiguration) config;
+			System.out.println("ctor ORTEResourceManager: " + oConfig.getOrteServerFile());
+		}
 	}
 
 	protected void doStartRuntime(IProgressMonitor monitor) throws CoreException {
+		ORTEResourceManagerConfiguration config = (ORTEResourceManagerConfiguration) getConfiguration();
+		String serverFile = config.getOrteServerFile();
+		boolean launchManually = config.isLaunchManually();
 		/* load up the control and monitoring systems for OMPI */
 		monitor.subTask("Starting OMPI proxy runtime...");
-		OMPIProxyRuntimeClient runtimeProxy = new OMPIProxyRuntimeClient();
+		OMPIProxyRuntimeClient runtimeProxy = new OMPIProxyRuntimeClient(serverFile,
+				launchManually);
 		setRuntimeProxy(runtimeProxy);
 		monitor.worked(10);
 		

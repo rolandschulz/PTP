@@ -11,5 +11,11 @@
             name="Open RTE">
       </page>
    </extension>
+   <extension
+         point="org.eclipse.ptp.ui.rmconfiguration">
+      <configurationWizard
+            class="org.eclipse.ptp.orte.ui.wizards.ORTEResourceManagerConfigurationWizardPageFactory"
+            id="org.eclipse.ptp.orte.ui.configurationWizard"/>
+   </extension>
 
 </plugin>

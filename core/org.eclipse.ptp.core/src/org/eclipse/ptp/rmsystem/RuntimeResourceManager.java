@@ -18,7 +18,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.rmsystem;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -75,13 +77,24 @@ public abstract class RuntimeResourceManager extends AbstractResourceManager
 			removeChildren();
 		}
 		
-		public synchronized IPJob getJob(String ID) {
-			return getJobControl(ID);
+		public synchronized IPJob getJob(String name) {
+			return getJobControl(name);
 		}
 
-		public synchronized IPJobControl getJobControl(String ID) {
-			IPJobControl job = (IPJobControl) findChild(ID);
-			return job;
+		public synchronized IPJobControl getJobControl(String name) {
+			//IPJobControl job = (IPJobControl) findChild(ID);
+			//return job;
+			Collection col = getCollection();
+			Iterator it = col.iterator();
+			while (it.hasNext()) {
+				Object ob = it.next();
+				if (ob instanceof IPJobControl) {
+					IPJobControl job = (IPJobControl) ob;
+					if (job.getElementName().equals(name))
+						return job;
+				}
+			}
+			return null;
 		}
 
 		public synchronized IPJobControl[] getJobControls() {
@@ -353,6 +366,9 @@ public abstract class RuntimeResourceManager extends AbstractResourceManager
 			controlSystem.shutdown();
 		if (runtimeProxy != null)
 			runtimeProxy.shutdown();
+		monitoringSystem = null;
+		controlSystem = null;
+		runtimeProxy = null;
 		super.stop();
 	}
 
@@ -487,8 +503,8 @@ public abstract class RuntimeResourceManager extends AbstractResourceManager
 		// nothing left to do.
 	}
 
-	protected void doStart() throws CoreException {
-		refreshRuntimeSystems(new NullProgressMonitor(), true);
+	protected void doStart(IProgressMonitor monitor) throws CoreException {
+		refreshRuntimeSystems(monitor, true);
 	}
 
 	protected abstract void doStartRuntime(IProgressMonitor monitor) throws CoreException;

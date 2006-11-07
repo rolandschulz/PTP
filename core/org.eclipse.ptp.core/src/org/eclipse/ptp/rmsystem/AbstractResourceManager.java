@@ -22,9 +22,11 @@
 package org.eclipse.ptp.rmsystem;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.ptp.core.IModelListener;
@@ -187,10 +189,13 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	 * 
 	 * @see org.eclipse.ptp.rm.IResourceManager#start()
 	 */
-	public void start() throws CoreException {
+	public void start(IProgressMonitor monitor) throws CoreException {
 		if (!status.equals(ResourceManagerStatus.STARTED) &&
 				!status.equals(ResourceManagerStatus.ERROR)) {
-			doStart();
+			if (monitor == null) {
+				monitor = new NullProgressMonitor();
+			}
+			doStart(monitor);
 			setStatus(ResourceManagerStatus.STARTED, false);
 			fireStarted();
 		}
@@ -229,9 +234,10 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	protected abstract void doDispose();
 
 	/**
+	 * @param monitor TODO
 	 * @throws CoreException
 	 */
-	protected abstract void doStart() throws CoreException;
+	protected abstract void doStart(IProgressMonitor monitor) throws CoreException;
 
 	/**
 	 * @throws CoreException
