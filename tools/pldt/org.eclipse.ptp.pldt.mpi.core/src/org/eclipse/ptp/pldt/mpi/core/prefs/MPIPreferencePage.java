@@ -14,6 +14,7 @@ package org.eclipse.ptp.pldt.mpi.core.prefs;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PathEditor;
+import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ptp.pldt.mpi.core.MpiIDs;
 import org.eclipse.ptp.pldt.mpi.core.MpiPlugin;
@@ -29,6 +30,7 @@ public class MPIPreferencePage extends FieldEditorPreferencePage implements IWor
 {
     private static final String MPI_INCLUDES_PREFERENCE_LABEL  = "MPI include paths:";
     private static final String MPI_INCLUDES_PREFERENCE_BROWSE = "Please choose a directory:";
+    private static final String MPI_BUILD_COMMAND_LABEL = "MPI build command:";
 
     public MPIPreferencePage()
     {
@@ -65,6 +67,8 @@ public class MPIPreferencePage extends FieldEditorPreferencePage implements IWor
 
     public void init(IWorkbench workbench)
     {
+    	IPreferenceStore store = MpiPlugin.getDefault().getPreferenceStore();
+    	store.setDefault(MpiIDs.MPI_BUILD_CMD, "mpicc");
     }
 
     protected void createFieldEditors()
@@ -72,5 +76,8 @@ public class MPIPreferencePage extends FieldEditorPreferencePage implements IWor
         PathEditor pathEditor = new PathEditor(MpiIDs.MPI_INCLUDES, MPI_INCLUDES_PREFERENCE_LABEL,
                 MPI_INCLUDES_PREFERENCE_BROWSE, getFieldEditorParent());
         addField(pathEditor);
+        
+        StringFieldEditor sed = new StringFieldEditor(MpiIDs.MPI_BUILD_CMD, MPI_BUILD_COMMAND_LABEL,getFieldEditorParent());
+        addField(sed);
     }
 }
