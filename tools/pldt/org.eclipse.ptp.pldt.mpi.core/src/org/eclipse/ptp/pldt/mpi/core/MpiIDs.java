@@ -35,10 +35,13 @@ public interface MpiIDs
 
     // preference page name for MPI Includes field label
     static public final String MPI_INCLUDES    = "MPI Includes";
+    // preference setting for default mpi build command
+	String MPI_BUILD_CMD = "mpiBuildCommand";
 
     // marker attribute for the extra info saved for each marker/artifact
     String CONSTRUCT_TYPE  = "constructType";
     
     // id for MPI Artifact view
     String MPI_VIEW_ID = "org.eclipse.ptp.pldt.mpi.core.views.MPITableView";
+
 }
