@@ -1,3 +1,14 @@
+/**********************************************************************
+ * Copyright (c) 2005, 2006 IBM Corporation.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     IBM Corporation - initial API and implementation
+ *******************************************************************************/
+
 package org.eclipse.ptp.pldt.common;
 
 import java.util.MissingResourceException;
@@ -5,13 +16,17 @@ import java.util.ResourceBundle;
 
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.plugin.*;
+import org.eclipse.core.runtime.ILog;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.osgi.framework.BundleContext;
 
 
 
 /**
- * The main plugin class to be used in the desktop.
+ * The main plugin class for PLDT
+ * @author Beth Tibbitts
  */
 public class CommonPlugin extends AbstractUIPlugin {
 
@@ -99,5 +114,18 @@ public class CommonPlugin extends AbstractUIPlugin {
         } catch (MissingResourceException e) {
             return key;
         }
+    }
+
+    /**
+     * Write to the ".log" file
+     * @param type type of log entry, e.g. IStatus.ERROR, IStatus.WARNING, etc.
+     * @param msg the message to be displayed
+     */
+    public static void log(int type, String msg) {
+    	String pluginID=getDefault().getBundle().getSymbolicName();
+    	Exception exc = null;// ignore exception for now
+		IStatus status = new Status(type, pluginID, type, msg,exc);
+		getDefault().getLog().log(status);
+
     }
 }
