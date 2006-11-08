@@ -9,12 +9,9 @@
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.ptp.pldt.openmp.core;//*****************************************************************************
+package org.eclipse.ptp.pldt.openmp.core;
 
-//Function: A way to use old code base to get information to view
-//Author: Donald P Pazel
-//Created: Feb. 1, 2006
-//*****************************************************************************
+
 
 import java.util.LinkedList;
 import java.util.List;
@@ -22,7 +19,11 @@ import java.util.List;
 import org.eclipse.ptp.pldt.common.Artifact;
 import org.eclipse.ptp.pldt.common.ScanReturn;
 
-
+/**
+ * Save specific information on OpenMP artifacts and problems
+ * 
+ * @author Donald P Pazel
+ */
 public class OpenMPScanReturn extends ScanReturn
 {
     private LinkedList problems_ = new LinkedList(); // of OpenMPError
