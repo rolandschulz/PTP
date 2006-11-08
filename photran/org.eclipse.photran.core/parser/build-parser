@@ -1,6 +1,6 @@
 #!/bin/bash
 cd /home/joverbey/ludwig-workspace/bz.over.ludwig.ui.cmdline
-./ludwig java2 acst /home/joverbey/photran/photran3-workspace/org.eclipse.photran.core/parser/fortran95.lr
+./ludwig /home/joverbey/photran/photran3-workspace/org.eclipse.photran.core/parser/fortran95.lalr acst
 cd /home/joverbey/photran/photran3-workspace/org.eclipse.photran.core/parser/org/eclipse/photran/internal/core/parser
 sed -e "s/Yylex/ILexer/g; s/getNextToken/yylex/g" Parser.java >Parser.java.x
 mv -f Parser.java.x Parser.java

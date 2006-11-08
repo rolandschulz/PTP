@@ -1,0 +1,22 @@
+grammarFileSystemPath=/home/joverbey/photran/photran3-workspace/org.eclipse.photran.core/parser/fortran95.bnf
+
+language=java2
+
+leftAssocString=
+rightAssocString=
+precChainsString=
+explicitResolutions=shift T_COMMA instead of reducing by xIoControlSpecList \
+reduce by xSFVarName instead of reducing by xSFDummyArgName
+
+eclipseFolder=
+directory=/home/joverbey/photran/photran3-workspace/org.eclipse.photran.core/parser/org/eclipse/photran/internal/core/parser
+
+pkgOrNamespace=org.eclipse.photran.internal.core.parser
+
+parserFor=Fortran 95
+notes=
+
+shouldRemoveEpsilonProductions=true
+debuggable=false
+incremental=false
+pluggableParserActions=false
