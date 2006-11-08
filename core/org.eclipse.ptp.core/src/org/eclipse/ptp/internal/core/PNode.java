@@ -127,6 +127,6 @@ public class PNode extends Parent implements IPNodeControl {
 	}
 	
 	public void removeProcess(IPProcessControl process) {
-		removeProcess(process);
+		removeChild(process);
 	}	
 }

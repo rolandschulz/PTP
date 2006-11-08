@@ -22,20 +22,26 @@ import org.eclipse.ptp.core.IPQueue;
 
 public interface IPQueueControl extends IPQueue, IPElementControl {
 	/**
-	 * @param job
-	 */
-	void addJob(IPJobControl job);
-	/**
-	 * @param job
-	 */
-	void removeJob(IPJobControl job);
-	/**
 	 * @param ID
 	 * @return
 	 */
 	public IPJobControl getJobControl(String ID);
 	/**
+	 * @param job
+	 */
+	void addJob(IPJobControl job);
+	/**
+	 * @param job_id
+	 * @return
+	 */
+	IPJobControl findJobById(String job_id);
+	/**
 	 * @return
 	 */
 	IPJobControl[] getJobControls();
+	
+	/**
+	 * @param job
+	 */
+	void removeJob(IPJobControl job);
 }

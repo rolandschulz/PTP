@@ -73,7 +73,7 @@ public class PUniverse extends Parent implements IPUniverseControl {
 			IResourceManager resourceManager = (IResourceManager) rit.next();
 			IPQueueControl[] queueus = resourceManager.getQueueControls();
 			for (int j = 0; j < queueus.length; ++j) {
-				IPJobControl job = queueus[j].getJobControl(job_id);
+				IPJobControl job = queueus[j].findJobById(job_id);
 				if (job != null) {
 					return job;
 				}
@@ -89,8 +89,8 @@ public class PUniverse extends Parent implements IPUniverseControl {
 			for (int i = 0; i < queueus.length; ++i) {
 				IPJobControl[] jobs = queueus[i].getJobControls();
 				for (int j = 0; j < jobs.length; ++j) {
-					if (jobs[i].getElementName().equals(jname))
-						return jobs[i];
+					if (jobs[j].getElementName().equals(jname))
+						return jobs[j];
 				}
 			}
 		}
