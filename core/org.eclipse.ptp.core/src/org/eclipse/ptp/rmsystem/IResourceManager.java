@@ -27,6 +27,7 @@ import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPMachine;
 import org.eclipse.ptp.core.IPQueue;
 import org.eclipse.ptp.core.elementcontrols.IPElementControl;
+import org.eclipse.ptp.core.elementcontrols.IPJobControl;
 import org.eclipse.ptp.core.elementcontrols.IPMachineControl;
 import org.eclipse.ptp.core.elementcontrols.IPQueueControl;
 import org.eclipse.ptp.rtsystem.JobRunConfiguration;
@@ -51,6 +52,12 @@ IAdaptable, IResourceManagerMenuContribution, IModelModifier {
 	 */
 	public void dispose();
 	
+	/**
+	 * @param job_id
+	 * @return
+	 */
+	public IPJobControl findJobById(String job_id);
+
 	/**
 	 * @return
 	 */
@@ -112,10 +119,15 @@ IAdaptable, IResourceManagerMenuContribution, IModelModifier {
 			boolean force) throws CoreException;
 	
 	/**
+	 * @param job
+	 */
+	public void removeJob(IPJob job);
+	
+	/**
 	 * @param listener
 	 */
 	public void removeResourceManagerListener(IResourceManagerListener listener);
-	
+
 	/**
 	 * @param launch
 	 * @param jobRunConfig

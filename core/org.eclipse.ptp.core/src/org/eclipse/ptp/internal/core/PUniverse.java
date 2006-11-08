@@ -65,23 +65,27 @@ public class PUniverse extends Parent implements IPUniverseControl {
 			node.removeProcess(process);
 		}
 		job.removeAllProcesses();
-		removeChild(job);
+		for (Iterator rit = getCollection().iterator(); rit.hasNext(); ) {
+			IResourceManager resourceManager = (IResourceManager) rit.next();
+			IPJobControl foundJob = resourceManager.findJobById(job.getIDString());
+			if (foundJob != null) {
+				resourceManager.removeJob(job);
+				return;
+			}
+		}
 	}
 
 	public synchronized IPJob findJobById(String job_id) {
 		for (Iterator rit = getCollection().iterator(); rit.hasNext(); ) {
 			IResourceManager resourceManager = (IResourceManager) rit.next();
-			IPQueueControl[] queueus = resourceManager.getQueueControls();
-			for (int j = 0; j < queueus.length; ++j) {
-				IPJobControl job = queueus[j].findJobById(job_id);
-				if (job != null) {
-					return job;
-				}
+			IPJob job = resourceManager.findJobById(job_id);
+			if (job != null) {
+				return job;
 			}
 		}
 		return null;
 	}
-	
+
 	public synchronized IPJob findJobByName(String jname) {
 		for (Iterator rit = getCollection().iterator(); rit.hasNext(); ) {
 			IResourceManager resourceManager = (IResourceManager) rit.next();
