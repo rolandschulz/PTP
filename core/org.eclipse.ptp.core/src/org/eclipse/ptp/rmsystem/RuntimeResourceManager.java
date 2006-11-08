@@ -82,8 +82,6 @@ public abstract class RuntimeResourceManager extends AbstractResourceManager
 		}
 
 		public synchronized IPJobControl getJobControl(String name) {
-			//IPJobControl job = (IPJobControl) findChild(ID);
-			//return job;
 			Collection col = getCollection();
 			Iterator it = col.iterator();
 			while (it.hasNext()) {
@@ -107,6 +105,11 @@ public abstract class RuntimeResourceManager extends AbstractResourceManager
 
 		public synchronized void removeJob(IPJobControl job) {
 			removeChild(job);
+		}
+
+		public IPJobControl findJobById(String job_id) {
+			IPJobControl job = (IPJobControl) findChild(job_id);
+			return job;
 		}
 	}
 
