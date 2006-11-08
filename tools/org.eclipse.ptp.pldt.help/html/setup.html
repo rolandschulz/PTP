@@ -20,10 +20,11 @@ Under PTP, Parallel Language Development Tools, MPI...
 Development Tools" section in the preferences will be included without it.)
 
 <p>Add the path to MPI include paths  - this tells PLDT what symbols to look
-for in the MPI Artifact view.
-<br><img src="images/includeMPI.gif">
-<p>Note: by doing this first, PLDT will find the include path
-for the MPI New Project wizard automatically.
+for in the MPI Artifact view.  You can also specify the default MPI build command.
+These values will make the MPI New Project Wizard page make more
+accurate predictions of settings for new projects.
+<br><img src="images/pldt-prefs1.png">
+
 
 
 <h2 id="project">Add MPI Include paths to each project</h2>
@@ -42,17 +43,18 @@ you should see the "MPI Project Settings" wizard page.
 <br>
 <img src="images/mpiWizard.gif">
 <p>If you have configured the Preferences as described above,
-the MPI include paths should be automatically included.
-To <i>not</i> include the paths in the build configuration,
-uncheck the first box "Add MPI Include paths to this project".
-If the include paths for this project should be different,
-or if PLDT's estimation of the lib path location is incorrect,
-uncheck the "Use default MPI include and lib information" and
+the MPI include paths and other settings should be automatically included.
+To <i>not</i> include the settings in the build configuration,
+uncheck the first box "Add MPI project settings to this project".
+If you want MPI settings but the settings for this project should be different,
+uncheck the "Use default information" and
 correct the information.
 
 
 <h2 id="manual">Add the Build Information Manually</h2>
-<p>The MPI information can be added to the project manually as follows.
+<p>If the new project wizard isn't used as described 
+above to set the MPI information for a project,
+the MPI information can be added to the project manually as follows.
 <ol>
 <li>Create a CDT project (e.g. Managed Make C Project)
 
@@ -71,6 +73,7 @@ Tool Settings tab, GCC C Linker, Libraries
 <li><b>MPI Build Command:</b> Note: If you have an MPI installed that requires a different
 build command, such as 'mpicc' instead of 'gcc', specify it here as well.
 Select the compiler tool on the left and modify the 'Command:' value.
+You probably also need to do the same for the linker tool.
 <br><img src="images/mpiBuildCommand.gif">
 </ol>
 <p>

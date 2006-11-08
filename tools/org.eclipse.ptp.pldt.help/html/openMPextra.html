@@ -19,6 +19,7 @@ specific functions uniquely for OpenMP development:
 <ul>
 <li><a href="#pragma">Show #pragma regions</a></li>
 <li><a href="#concur">Show concurrency</a></li>
+<li><a href="#prob">Show Common OpenMP problems</a></li>
 </ul>
 
 
@@ -37,18 +38,38 @@ encompasses is selected and shown in grey in the editor.
 
 
 <h2 id="concur">Show concurrency</h2>
+<p><img src="images/ptp-openMPshowConcurrencymenu.gif"> 
+Select a statement, e.g. the statement highlighted in grey above.
+Select the context menu on the highlighted statement, and click "Show Concurrency"
+as indicated above.  The results are shown below:
 <p><img src="images/ptp-openMPshowConcurrency.gif"> 
 <p>Above are the screen-shot results of an analysis, perhaps on a not so real, 
 but at least interesting example.  
-Select a statement, e.g. the statement highlighted in grey above.
-Select the context menu on the highlighted statement, and click "Show concurrency."
-Other statments will be highlighted in yellow.
+After indicating via the context menu the statement upon which
+the "Show Concurrency" action is to be executed,
+other statements will be highlighted in yellow.
 The meaning is the following:
 The gray selected statement is analysed for the following: which 
 statements can execute concurrently to it.  
 The result includes all highlighted statements between the two barriers.  But because of the conditional jump around the lower barrier, execution could also reach the top of the loop - hitting the condition and the loop increment, as well as the first statement in the loop body.  All of those statements are highlighted as well. If correct, this example would usefully point out a bug  - being that the second barrier should be outside that if statement!
 
 
+<h2 id="prob">Show Common OpenMP Problems</h2>
+<p><img src="images/ptp-openMPproblems.gif"> 
+<p>Along with the analysis for finding OpenMP artifacts,
+common problems are also located, and shown in the OpenMP Problems view.
+<p>Types of problems recognized include:
+<!--  problems identified in PASTSemanticCheck.java -->
+<ul>
+<li>Parallel directive dynamically inside another parallel, establishes single thread context</li>
+<li>For directive embedded within critical, ordered, or master extents</li>
+<li>For directive embedded within another parallel for or parallel sections</li>
+<li>Parallel directive dynamically inside another parallel, establishes single thread context</li>
+<li>For directive embedded within another for, sections, or single directive</li>
+<li>Barrier directive not permitted in region extent of for, ordered, sections, single, master, and critical</li>
+<li>Master directive not permitted in dynamic extent of for, sections, or single directives</li>
+<li>Ordered directive not permitted in dynamic extent of critical region</li>
+</ul>
 <p>&nbsp;<p>&nbsp;<p>&nbsp;
 <p><a href="#top">Back to Top</a> | <a href="toc.html">Back to Table of Contents</a>
 
