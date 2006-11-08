@@ -125,24 +125,24 @@ public abstract class RuntimeResourceManager extends AbstractResourceManager
 		super(universe, config);
 	}
 
-	public void abortJob(String jobName) throws CoreException {
+	public boolean abortJob(String jobName) throws CoreException {
 		/* we have a job name, so let's find it in the ResourceManager - if it exists */
 		IPJob j = localQueue.getJob(jobName);
-		if(j == null) {
-			System.err.println("ERROR: tried to delete a job that was not found '"+jobName+"'");
-			return;
+		if (j == null) {
+			return false;
 		}
 		try {
 			controlSystem.terminateJob(j);
 		} catch(CoreException e) {
 			PTPCorePlugin.errorDialog("Fatal PTP Control System Error",
 					"The PTP Control System is down.", null);
-			return;
+			return false;
 		}
 
 		System.err.println("aborted");
 		fireEvent(new ModelRuntimeNotifierEvent(j.getIDString(),
 				IModelRuntimeNotifierEvent.TYPE_JOB, IModelRuntimeNotifierEvent.ABORTED));
+		return true;
 	}
 
 	public void dispose() {

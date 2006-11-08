@@ -39,6 +39,8 @@ import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPUniverse;
 import org.eclipse.ptp.core.IProcessListener;
 import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.elementcontrols.IPJobControl;
+import org.eclipse.ptp.core.elementcontrols.IPQueueControl;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
 import org.eclipse.ptp.core.events.IModelEvent;
 import org.eclipse.ptp.core.events.IModelRuntimeNotifierEvent;
@@ -76,9 +78,6 @@ IResourceManagerListener {
 	protected IPJob processRoot = null;
 	protected IPUniverseControl universe = new PUniverse();
 	protected ILaunchConfiguration config = null;
-	protected IControlSystem controlSystem = null;
-	protected IMonitoringSystem monitoringSystem = null;
-	protected IRuntimeProxy runtimeProxy = null;
 
 	public ModelManager() {
 
@@ -107,21 +106,13 @@ IResourceManagerListener {
 	}
 
 	public void abortJob(String jobName) throws CoreException {
-		/* we have a job name, so let's find it in the Universe - if it exists */
-		IPJob j = getUniverse().findJobByName(jobName);
-		if(j == null) {
-			System.err.println("ERROR: tried to delete a job that was not found '"+jobName+"'");
-			return;
+		IResourceManager[] resourceManagers = universe.getResourceManagers();
+		for (int i=0; i< resourceManagers.length; ++i) {
+			boolean found = resourceManagers[i].abortJob(jobName);
+			if (found) {
+				return;
+			}
 		}
-		try {
-			controlSystem.terminateJob(j);
-		} catch(CoreException e) {
-			PTPCorePlugin.errorDialog("Fatal PTP Control System Error", "The PTP Control System is down.", null);
-			return;
-		}
-
-		System.err.println("aborted");
-		fireEvent(new ModelRuntimeNotifierEvent(j.getIDString(), IModelRuntimeNotifierEvent.TYPE_JOB, IModelRuntimeNotifierEvent.ABORTED));
 	}
 	
 	public void addModelListener(IModelListener listener) {
