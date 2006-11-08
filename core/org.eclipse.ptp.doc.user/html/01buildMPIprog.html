@@ -20,6 +20,8 @@
 <p>To create a new MPI project in C using the managed build facility,
 Select File -> New -> Project ...  The New Project dialog opens.
 <br>Select C -> Managed Make C Project.
+<p><b>Note: </b> for automatic setup of MPI project information,
+see the PTP PLDT (Parallel Language Development Tools) help.
 
 <br><img src="images/newProject.gif">
 <br>Click Next.
@@ -42,14 +44,29 @@ and tries to build with the new file.  Since the file is empty,
 you will see errors in the Problems view, and in the Console view.
 <br><img src="images/newFileErrors.gif">
 <p>Enter a program in the editor.
-(If you have the PTP MPI Tools installed, a sample program is available 
+(If you have the PTP PLDT installed, a sample program is available 
 in the PTP MPI tools help, available as: 
-<a href="../../org.eclipse.ptp.mpi.help/html/testMPI.c">testMPI.c</a>
+<a href="../../org.eclipse.ptp.pldt.help/html/testMPI.c">testMPI.c</a>)
 <!--  TODO I don't think that relative URL will work in installed plug-in --> 
+<p>A sample "hello world" type MPI program is also a good
+first test program:
+<pre>
+#include &lt;stdio.h&gt;
+#include &lt;mpi.h&gt;
+int main(int argc, char *argv[]) {
+    int rank;
+    MPI_Init(&argc, &argv);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    printf(“my rank=%d\n”, rank);
+    MPI_Finalize();
+    return 0;
+}
 
+</pre>
 <p>Save your program.  The program will be compiled automatically by
 the managed build system.
-<p>You will probably see several errors.  
+<p>You may see several errors, if you haven't set up the
+MPI information for your project.
 The first error may be that an include file isn't found.
 <br><img src="images/errorInclude.gif">
 <br>(If you hover the mouse cursor over the red "X"

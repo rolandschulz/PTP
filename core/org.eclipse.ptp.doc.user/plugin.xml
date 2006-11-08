@@ -6,7 +6,7 @@
 <plugin
    id="org.eclipse.ptp.help"
    name="PTP Help Plug-in"
-   version="1.0.0"
+   version="1.1.0"
    provider-name="IBM Research"
    class="org.eclipse.ptp.help.HelpPlugin">
 
