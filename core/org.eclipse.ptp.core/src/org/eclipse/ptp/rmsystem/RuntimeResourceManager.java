@@ -125,7 +125,7 @@ public abstract class RuntimeResourceManager extends AbstractResourceManager
 		super(universe, config);
 	}
 
-	public boolean abortJob(String jobName) throws CoreException {
+	public synchronized boolean abortJob(String jobName) throws CoreException {
 		/* we have a job name, so let's find it in the ResourceManager - if it exists */
 		IPJob j = localQueue.getJob(jobName);
 		if (j == null) {
@@ -149,6 +149,17 @@ public abstract class RuntimeResourceManager extends AbstractResourceManager
 		super.dispose();
 	}
 
+	public synchronized IPJobControl findJobById(String job_id) {
+		IPQueueControl[] queueus = getQueueControls();
+		for (int j = 0; j < queueus.length; ++j) {
+			IPJobControl job = queueus[j].findJobById(job_id);
+			if (job != null) {
+				return job;
+			}
+		}
+		return null;
+	}
+	
 	public synchronized IPMachine getMachine(String ID) {
 		return (IPMachine) machines.get(ID);
 	}
@@ -185,6 +196,10 @@ public abstract class RuntimeResourceManager extends AbstractResourceManager
 			monitor = new NullProgressMonitor();
 		}
 		refreshRuntimeSystems(monitor);
+	}
+
+	public void removeJob(IPJob job) {
+		localQueue.removeJob((IPJobControl) job);
 	}
 
 	public IPJob run(ILaunch launch, JobRunConfiguration jobRunConfig,
