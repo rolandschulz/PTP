@@ -35,10 +35,11 @@ public interface IResourceManager extends IPElementControl,
 IAdaptable, IResourceManagerMenuContribution, IModelModifier {
 	
 	/**
-	 * @param id
+	 * @param name
+	 * @return whether the job was found and aborted
 	 * @throws CoreException
 	 */
-	public void abortJob(String id) throws CoreException;
+	public boolean abortJob(String name) throws CoreException;
 	
 	/**
 	 * @param listener
