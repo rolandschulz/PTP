@@ -262,6 +262,8 @@ public abstract class RuntimeResourceManager extends AbstractResourceManager
 							AttributeConstants.ATTRIB_MACHINE_NAME_PREFIX + value, value);
 					addMachine(value, curmachine);
 					newEntity = true;
+					
+					fireMachinesChanged(new int[]{curmachine.getID()});
 				}
 			} else if (curmachine != null && key.equals(AttributeConstants.ATTRIB_NODE_NUMBER)) {
 				/* ok so we've got a machine that's not null, and we think we have a node

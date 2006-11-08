@@ -114,10 +114,7 @@ public class ResourceManagerView extends ViewPart implements
 			final IPUniverse universe = PTPCorePlugin.getDefault().getUniverse();
 
 			final IResourceManager[] resourceManagers = universe.getResourceManagers();
-			final ChildContainer root = makeChildContainer(
-					null,
-					UIMessage.getResourceString("ResourceManagerView.ResourceManagers"), resourceManagers); //$NON-NLS-1$
-			return new Object[] { root };
+			return resourceManagers;
 		}
 
 		public Object getParent(Object element) {
