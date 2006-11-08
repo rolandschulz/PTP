@@ -219,8 +219,7 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 			
 		for (int i = 0, n = tmpListeners.length; i < n; ++i) {
 			final IResourceManagerListener listener = (IResourceManagerListener) tmpListeners[i];
-			listener.handleContentsChanged(event);
-			SafeRunnable.run(new SafeRunnable() {
+			safeRunAsyncInUIThread(new SafeRunnable() {
 				public void run() {
 					listener.handleContentsChanged(event);
 				}
