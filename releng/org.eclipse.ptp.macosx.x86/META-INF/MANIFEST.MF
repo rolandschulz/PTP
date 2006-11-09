@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: MacOSX x86 Fragment
+Bundle-SymbolicName: org.eclipse.ptp.macosx.x86
+Bundle-Version: 1.1.0
+Fragment-Host: org.eclipse.ptp.core;bundle-version="1.0.0"
+Bundle-Localization: plugin
+Bundle-Vendor: Eclipse.org
