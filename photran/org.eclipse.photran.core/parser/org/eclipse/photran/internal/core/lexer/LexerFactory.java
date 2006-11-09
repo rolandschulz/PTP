@@ -22,7 +22,9 @@ public final class LexerFactory
     {
         if ((options & LexerOptions.FIXED_FORM) != 0)
             return new FixedFormLexerPhase2(in, filename, options);
-        else
+        else if ((options & LexerOptions.FREE_FORM) != 0)
+            return new FreeFormLexerPhase2(new FreeFormLexerPhase1(in, filename), options);
+        else // FIXME: JEFF: Automatically detect lexer type from filename extension
             return new FreeFormLexerPhase2(new FreeFormLexerPhase1(in, filename), options);
     }
     

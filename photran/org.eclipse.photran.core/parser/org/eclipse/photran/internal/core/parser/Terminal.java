@@ -20,89 +20,305 @@ public abstract class Terminal extends TerminalOrNonterminal
 
     int getNumberOfSymbolsOnValueStack() { return 1; }
 
-    public static class TGreaterthaneqTerminal extends Terminal
+    public static class TWriteeqTerminal extends Terminal
     {
-        private TGreaterthaneqTerminal() {;} // Singleton
-        private static TGreaterthaneqTerminal singletonInstance = null;
-        public static final TGreaterthaneqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TGreaterthaneqTerminal(); return singletonInstance; }
+        private TWriteeqTerminal() {;} // Singleton
+        private static TWriteeqTerminal singletonInstance = null;
+        public static final TWriteeqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TWriteeqTerminal(); return singletonInstance; }
 
-        public String getDescription() { return "T_GREATERTHANEQ"; }
+        public String getDescription() { return "T_WRITEEQ"; }
 
         int getActionRow() { return 0; }
     }
-    public static final Terminal.TGreaterthaneqTerminal T_GREATERTHANEQ = TGreaterthaneqTerminal.getInstance();
+    public static final Terminal.TWriteeqTerminal T_WRITEEQ = TWriteeqTerminal.getInstance();
 
-    public static class TNotTerminal extends Terminal
+    public static class TResultTerminal extends Terminal
     {
-        private TNotTerminal() {;} // Singleton
-        private static TNotTerminal singletonInstance = null;
-        public static final TNotTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TNotTerminal(); return singletonInstance; }
+        private TResultTerminal() {;} // Singleton
+        private static TResultTerminal singletonInstance = null;
+        public static final TResultTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TResultTerminal(); return singletonInstance; }
 
-        public String getDescription() { return "T_NOT"; }
+        public String getDescription() { return "T_RESULT"; }
 
         int getActionRow() { return 1; }
     }
-    public static final Terminal.TNotTerminal T_NOT = TNotTerminal.getInstance();
+    public static final Terminal.TResultTerminal T_RESULT = TResultTerminal.getInstance();
 
-    public static class TRecleqTerminal extends Terminal
+    public static class TEndsubroutineTerminal extends Terminal
     {
-        private TRecleqTerminal() {;} // Singleton
-        private static TRecleqTerminal singletonInstance = null;
-        public static final TRecleqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TRecleqTerminal(); return singletonInstance; }
+        private TEndsubroutineTerminal() {;} // Singleton
+        private static TEndsubroutineTerminal singletonInstance = null;
+        public static final TEndsubroutineTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TEndsubroutineTerminal(); return singletonInstance; }
 
-        public String getDescription() { return "T_RECLEQ"; }
+        public String getDescription() { return "T_ENDSUBROUTINE"; }
 
         int getActionRow() { return 2; }
     }
-    public static final Terminal.TRecleqTerminal T_RECLEQ = TRecleqTerminal.getInstance();
+    public static final Terminal.TEndsubroutineTerminal T_ENDSUBROUTINE = TEndsubroutineTerminal.getInstance();
 
-    public static class TSlasheqTerminal extends Terminal
+    public static class TEndblockdataTerminal extends Terminal
     {
-        private TSlasheqTerminal() {;} // Singleton
-        private static TSlasheqTerminal singletonInstance = null;
-        public static final TSlasheqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TSlasheqTerminal(); return singletonInstance; }
+        private TEndblockdataTerminal() {;} // Singleton
+        private static TEndblockdataTerminal singletonInstance = null;
+        public static final TEndblockdataTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TEndblockdataTerminal(); return singletonInstance; }
 
-        public String getDescription() { return "T_SLASHEQ"; }
+        public String getDescription() { return "T_ENDBLOCKDATA"; }
 
         int getActionRow() { return 3; }
     }
-    public static final Terminal.TSlasheqTerminal T_SLASHEQ = TSlasheqTerminal.getInstance();
+    public static final Terminal.TEndblockdataTerminal T_ENDBLOCKDATA = TEndblockdataTerminal.getInstance();
 
-    public static class TOutTerminal extends Terminal
+    public static class TDoubleTerminal extends Terminal
     {
-        private TOutTerminal() {;} // Singleton
-        private static TOutTerminal singletonInstance = null;
-        public static final TOutTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TOutTerminal(); return singletonInstance; }
+        private TDoubleTerminal() {;} // Singleton
+        private static TDoubleTerminal singletonInstance = null;
+        public static final TDoubleTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TDoubleTerminal(); return singletonInstance; }
 
-        public String getDescription() { return "T_OUT"; }
+        public String getDescription() { return "T_DOUBLE"; }
 
         int getActionRow() { return 4; }
     }
-    public static final Terminal.TOutTerminal T_OUT = TOutTerminal.getInstance();
+    public static final Terminal.TDoubleTerminal T_DOUBLE = TDoubleTerminal.getInstance();
 
-    public static class TUnderscoreTerminal extends Terminal
+    public static class TFileTerminal extends Terminal
     {
-        private TUnderscoreTerminal() {;} // Singleton
-        private static TUnderscoreTerminal singletonInstance = null;
-        public static final TUnderscoreTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TUnderscoreTerminal(); return singletonInstance; }
+        private TFileTerminal() {;} // Singleton
+        private static TFileTerminal singletonInstance = null;
+        public static final TFileTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TFileTerminal(); return singletonInstance; }
 
-        public String getDescription() { return "T_UNDERSCORE"; }
+        public String getDescription() { return "T_FILE"; }
 
         int getActionRow() { return 5; }
     }
-    public static final Terminal.TUnderscoreTerminal T_UNDERSCORE = TUnderscoreTerminal.getInstance();
+    public static final Terminal.TFileTerminal T_FILE = TFileTerminal.getInstance();
 
-    public static class TIconTerminal extends Terminal
+    public static class TEndfileTerminal extends Terminal
     {
-        private TIconTerminal() {;} // Singleton
-        private static TIconTerminal singletonInstance = null;
-        public static final TIconTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TIconTerminal(); return singletonInstance; }
+        private TEndfileTerminal() {;} // Singleton
+        private static TEndfileTerminal singletonInstance = null;
+        public static final TEndfileTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TEndfileTerminal(); return singletonInstance; }
 
-        public String getDescription() { return "T_ICON"; }
+        public String getDescription() { return "T_ENDFILE"; }
 
         int getActionRow() { return 6; }
     }
-    public static final Terminal.TIconTerminal T_ICON = TIconTerminal.getInstance();
+    public static final Terminal.TEndfileTerminal T_ENDFILE = TEndfileTerminal.getInstance();
+
+    public static class TLessthaneqTerminal extends Terminal
+    {
+        private TLessthaneqTerminal() {;} // Singleton
+        private static TLessthaneqTerminal singletonInstance = null;
+        public static final TLessthaneqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TLessthaneqTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_LESSTHANEQ"; }
+
+        int getActionRow() { return 7; }
+    }
+    public static final Terminal.TLessthaneqTerminal T_LESSTHANEQ = TLessthaneqTerminal.getInstance();
+
+    public static class TBackspaceTerminal extends Terminal
+    {
+        private TBackspaceTerminal() {;} // Singleton
+        private static TBackspaceTerminal singletonInstance = null;
+        public static final TBackspaceTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TBackspaceTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_BACKSPACE"; }
+
+        int getActionRow() { return 8; }
+    }
+    public static final Terminal.TBackspaceTerminal T_BACKSPACE = TBackspaceTerminal.getInstance();
+
+    public static class TPconTerminal extends Terminal
+    {
+        private TPconTerminal() {;} // Singleton
+        private static TPconTerminal singletonInstance = null;
+        public static final TPconTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TPconTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_PCON"; }
+
+        int getActionRow() { return 9; }
+    }
+    public static final Terminal.TPconTerminal T_PCON = TPconTerminal.getInstance();
+
+    public static class TForallTerminal extends Terminal
+    {
+        private TForallTerminal() {;} // Singleton
+        private static TForallTerminal singletonInstance = null;
+        public static final TForallTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TForallTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_FORALL"; }
+
+        int getActionRow() { return 10; }
+    }
+    public static final Terminal.TForallTerminal T_FORALL = TForallTerminal.getInstance();
+
+    public static class TSelectcaseTerminal extends Terminal
+    {
+        private TSelectcaseTerminal() {;} // Singleton
+        private static TSelectcaseTerminal singletonInstance = null;
+        public static final TSelectcaseTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TSelectcaseTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_SELECTCASE"; }
+
+        int getActionRow() { return 11; }
+    }
+    public static final Terminal.TSelectcaseTerminal T_SELECTCASE = TSelectcaseTerminal.getInstance();
+
+    public static class TMinusTerminal extends Terminal
+    {
+        private TMinusTerminal() {;} // Singleton
+        private static TMinusTerminal singletonInstance = null;
+        public static final TMinusTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TMinusTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_MINUS"; }
+
+        int getActionRow() { return 12; }
+    }
+    public static final Terminal.TMinusTerminal T_MINUS = TMinusTerminal.getInstance();
+
+    public static class TWriteTerminal extends Terminal
+    {
+        private TWriteTerminal() {;} // Singleton
+        private static TWriteTerminal singletonInstance = null;
+        public static final TWriteTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TWriteTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_WRITE"; }
+
+        int getActionRow() { return 13; }
+    }
+    public static final Terminal.TWriteTerminal T_WRITE = TWriteTerminal.getInstance();
+
+    public static class TNoneTerminal extends Terminal
+    {
+        private TNoneTerminal() {;} // Singleton
+        private static TNoneTerminal singletonInstance = null;
+        public static final TNoneTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TNoneTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_NONE"; }
+
+        int getActionRow() { return 14; }
+    }
+    public static final Terminal.TNoneTerminal T_NONE = TNoneTerminal.getInstance();
+
+    public static class TCommonTerminal extends Terminal
+    {
+        private TCommonTerminal() {;} // Singleton
+        private static TCommonTerminal singletonInstance = null;
+        public static final TCommonTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TCommonTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_COMMON"; }
+
+        int getActionRow() { return 15; }
+    }
+    public static final Terminal.TCommonTerminal T_COMMON = TCommonTerminal.getInstance();
+
+    public static class TCycleTerminal extends Terminal
+    {
+        private TCycleTerminal() {;} // Singleton
+        private static TCycleTerminal singletonInstance = null;
+        public static final TCycleTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TCycleTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_CYCLE"; }
+
+        int getActionRow() { return 16; }
+    }
+    public static final Terminal.TCycleTerminal T_CYCLE = TCycleTerminal.getInstance();
+
+    public static class TIostateqTerminal extends Terminal
+    {
+        private TIostateqTerminal() {;} // Singleton
+        private static TIostateqTerminal singletonInstance = null;
+        public static final TIostateqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TIostateqTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_IOSTATEQ"; }
+
+        int getActionRow() { return 17; }
+    }
+    public static final Terminal.TIostateqTerminal T_IOSTATEQ = TIostateqTerminal.getInstance();
+
+    public static class TEqeqTerminal extends Terminal
+    {
+        private TEqeqTerminal() {;} // Singleton
+        private static TEqeqTerminal singletonInstance = null;
+        public static final TEqeqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TEqeqTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_EQEQ"; }
+
+        int getActionRow() { return 18; }
+    }
+    public static final Terminal.TEqeqTerminal T_EQEQ = TEqeqTerminal.getInstance();
+
+    public static class TAsteriskTerminal extends Terminal
+    {
+        private TAsteriskTerminal() {;} // Singleton
+        private static TAsteriskTerminal singletonInstance = null;
+        public static final TAsteriskTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TAsteriskTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_ASTERISK"; }
+
+        int getActionRow() { return 19; }
+    }
+    public static final Terminal.TAsteriskTerminal T_ASTERISK = TAsteriskTerminal.getInstance();
+
+    public static class TEndeqTerminal extends Terminal
+    {
+        private TEndeqTerminal() {;} // Singleton
+        private static TEndeqTerminal singletonInstance = null;
+        public static final TEndeqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TEndeqTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_ENDEQ"; }
+
+        int getActionRow() { return 20; }
+    }
+    public static final Terminal.TEndeqTerminal T_ENDEQ = TEndeqTerminal.getInstance();
+
+    public static class TPublicTerminal extends Terminal
+    {
+        private TPublicTerminal() {;} // Singleton
+        private static TPublicTerminal singletonInstance = null;
+        public static final TPublicTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TPublicTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_PUBLIC"; }
+
+        int getActionRow() { return 21; }
+    }
+    public static final Terminal.TPublicTerminal T_PUBLIC = TPublicTerminal.getInstance();
+
+    public static class TElseTerminal extends Terminal
+    {
+        private TElseTerminal() {;} // Singleton
+        private static TElseTerminal singletonInstance = null;
+        public static final TElseTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TElseTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_ELSE"; }
+
+        int getActionRow() { return 22; }
+    }
+    public static final Terminal.TElseTerminal T_ELSE = TElseTerminal.getInstance();
+
+    public static class TFconTerminal extends Terminal
+    {
+        private TFconTerminal() {;} // Singleton
+        private static TFconTerminal singletonInstance = null;
+        public static final TFconTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TFconTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_FCON"; }
+
+        int getActionRow() { return 23; }
+    }
+    public static final Terminal.TFconTerminal T_FCON = TFconTerminal.getInstance();
+
+    public static class TEndmoduleTerminal extends Terminal
+    {
+        private TEndmoduleTerminal() {;} // Singleton
+        private static TEndmoduleTerminal singletonInstance = null;
+        public static final TEndmoduleTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TEndmoduleTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_ENDMODULE"; }
+
+        int getActionRow() { return 24; }
+    }
+    public static final Terminal.TEndmoduleTerminal T_ENDMODULE = TEndmoduleTerminal.getInstance();
 
     public static class TPauseTerminal extends Terminal
     {
@@ -112,129 +328,21 @@ public abstract class Terminal extends TerminalOrNonterminal
 
         public String getDescription() { return "T_PAUSE"; }
 
-        int getActionRow() { return 7; }
+        int getActionRow() { return 25; }
     }
     public static final Terminal.TPauseTerminal T_PAUSE = TPauseTerminal.getInstance();
 
-    public static class TEqgreaterthanTerminal extends Terminal
+    public static class TXdopTerminal extends Terminal
     {
-        private TEqgreaterthanTerminal() {;} // Singleton
-        private static TEqgreaterthanTerminal singletonInstance = null;
-        public static final TEqgreaterthanTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TEqgreaterthanTerminal(); return singletonInstance; }
+        private TXdopTerminal() {;} // Singleton
+        private static TXdopTerminal singletonInstance = null;
+        public static final TXdopTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TXdopTerminal(); return singletonInstance; }
 
-        public String getDescription() { return "T_EQGREATERTHAN"; }
+        public String getDescription() { return "T_XDOP"; }
 
-        int getActionRow() { return 8; }
+        int getActionRow() { return 26; }
     }
-    public static final Terminal.TEqgreaterthanTerminal T_EQGREATERTHAN = TEqgreaterthanTerminal.getInstance();
-
-    public static class TReadwriteeqTerminal extends Terminal
-    {
-        private TReadwriteeqTerminal() {;} // Singleton
-        private static TReadwriteeqTerminal singletonInstance = null;
-        public static final TReadwriteeqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TReadwriteeqTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_READWRITEEQ"; }
-
-        int getActionRow() { return 9; }
-    }
-    public static final Terminal.TReadwriteeqTerminal T_READWRITEEQ = TReadwriteeqTerminal.getInstance();
-
-    public static class TDataTerminal extends Terminal
-    {
-        private TDataTerminal() {;} // Singleton
-        private static TDataTerminal singletonInstance = null;
-        public static final TDataTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TDataTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_DATA"; }
-
-        int getActionRow() { return 10; }
-    }
-    public static final Terminal.TDataTerminal T_DATA = TDataTerminal.getInstance();
-
-    public static class TEnddoTerminal extends Terminal
-    {
-        private TEnddoTerminal() {;} // Singleton
-        private static TEnddoTerminal singletonInstance = null;
-        public static final TEnddoTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TEnddoTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_ENDDO"; }
-
-        int getActionRow() { return 11; }
-    }
-    public static final Terminal.TEnddoTerminal T_ENDDO = TEnddoTerminal.getInstance();
-
-    public static class TRparenTerminal extends Terminal
-    {
-        private TRparenTerminal() {;} // Singleton
-        private static TRparenTerminal singletonInstance = null;
-        public static final TRparenTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TRparenTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_RPAREN"; }
-
-        int getActionRow() { return 12; }
-    }
-    public static final Terminal.TRparenTerminal T_RPAREN = TRparenTerminal.getInstance();
-
-    public static class TAdvanceeqTerminal extends Terminal
-    {
-        private TAdvanceeqTerminal() {;} // Singleton
-        private static TAdvanceeqTerminal singletonInstance = null;
-        public static final TAdvanceeqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TAdvanceeqTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_ADVANCEEQ"; }
-
-        int getActionRow() { return 13; }
-    }
-    public static final Terminal.TAdvanceeqTerminal T_ADVANCEEQ = TAdvanceeqTerminal.getInstance();
-
-    public static class TSubroutineTerminal extends Terminal
-    {
-        private TSubroutineTerminal() {;} // Singleton
-        private static TSubroutineTerminal singletonInstance = null;
-        public static final TSubroutineTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TSubroutineTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_SUBROUTINE"; }
-
-        int getActionRow() { return 14; }
-    }
-    public static final Terminal.TSubroutineTerminal T_SUBROUTINE = TSubroutineTerminal.getInstance();
-
-    public static class TSequenceTerminal extends Terminal
-    {
-        private TSequenceTerminal() {;} // Singleton
-        private static TSequenceTerminal singletonInstance = null;
-        public static final TSequenceTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TSequenceTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_SEQUENCE"; }
-
-        int getActionRow() { return 15; }
-    }
-    public static final Terminal.TSequenceTerminal T_SEQUENCE = TSequenceTerminal.getInstance();
-
-    public static class TNumbereqTerminal extends Terminal
-    {
-        private TNumbereqTerminal() {;} // Singleton
-        private static TNumbereqTerminal singletonInstance = null;
-        public static final TNumbereqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TNumbereqTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_NUMBEREQ"; }
-
-        int getActionRow() { return 16; }
-    }
-    public static final Terminal.TNumbereqTerminal T_NUMBEREQ = TNumbereqTerminal.getInstance();
-
-    public static class TEntryTerminal extends Terminal
-    {
-        private TEntryTerminal() {;} // Singleton
-        private static TEntryTerminal singletonInstance = null;
-        public static final TEntryTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TEntryTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_ENTRY"; }
-
-        int getActionRow() { return 17; }
-    }
-    public static final Terminal.TEntryTerminal T_ENTRY = TEntryTerminal.getInstance();
+    public static final Terminal.TXdopTerminal T_XDOP = TXdopTerminal.getInstance();
 
     public static class TEndTerminal extends Terminal
     {
@@ -244,33 +352,9 @@ public abstract class Terminal extends TerminalOrNonterminal
 
         public String getDescription() { return "T_END"; }
 
-        int getActionRow() { return 18; }
+        int getActionRow() { return 27; }
     }
     public static final Terminal.TEndTerminal T_END = TEndTerminal.getInstance();
-
-    public static class TPowTerminal extends Terminal
-    {
-        private TPowTerminal() {;} // Singleton
-        private static TPowTerminal singletonInstance = null;
-        public static final TPowTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TPowTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_POW"; }
-
-        int getActionRow() { return 19; }
-    }
-    public static final Terminal.TPowTerminal T_POW = TPowTerminal.getInstance();
-
-    public static class TFormatTerminal extends Terminal
-    {
-        private TFormatTerminal() {;} // Singleton
-        private static TFormatTerminal singletonInstance = null;
-        public static final TFormatTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TFormatTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_FORMAT"; }
-
-        int getActionRow() { return 20; }
-    }
-    public static final Terminal.TFormatTerminal T_FORMAT = TFormatTerminal.getInstance();
 
     public static class TPureTerminal extends Terminal
     {
@@ -280,177 +364,9 @@ public abstract class Terminal extends TerminalOrNonterminal
 
         public String getDescription() { return "T_PURE"; }
 
-        int getActionRow() { return 21; }
-    }
-    public static final Terminal.TPureTerminal T_PURE = TPureTerminal.getInstance();
-
-    public static class TReceqTerminal extends Terminal
-    {
-        private TReceqTerminal() {;} // Singleton
-        private static TReceqTerminal singletonInstance = null;
-        public static final TReceqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TReceqTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_RECEQ"; }
-
-        int getActionRow() { return 22; }
-    }
-    public static final Terminal.TReceqTerminal T_RECEQ = TReceqTerminal.getInstance();
-
-    public static class TExisteqTerminal extends Terminal
-    {
-        private TExisteqTerminal() {;} // Singleton
-        private static TExisteqTerminal singletonInstance = null;
-        public static final TExisteqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TExisteqTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_EXISTEQ"; }
-
-        int getActionRow() { return 23; }
-    }
-    public static final Terminal.TExisteqTerminal T_EXISTEQ = TExisteqTerminal.getInstance();
-
-    public static class TPointerTerminal extends Terminal
-    {
-        private TPointerTerminal() {;} // Singleton
-        private static TPointerTerminal singletonInstance = null;
-        public static final TPointerTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TPointerTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_POINTER"; }
-
-        int getActionRow() { return 24; }
-    }
-    public static final Terminal.TPointerTerminal T_POINTER = TPointerTerminal.getInstance();
-
-    public static class TEqvTerminal extends Terminal
-    {
-        private TEqvTerminal() {;} // Singleton
-        private static TEqvTerminal singletonInstance = null;
-        public static final TEqvTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TEqvTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_EQV"; }
-
-        int getActionRow() { return 25; }
-    }
-    public static final Terminal.TEqvTerminal T_EQV = TEqvTerminal.getInstance();
-
-    public static class TOpenedeqTerminal extends Terminal
-    {
-        private TOpenedeqTerminal() {;} // Singleton
-        private static TOpenedeqTerminal singletonInstance = null;
-        public static final TOpenedeqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TOpenedeqTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_OPENEDEQ"; }
-
-        int getActionRow() { return 26; }
-    }
-    public static final Terminal.TOpenedeqTerminal T_OPENEDEQ = TOpenedeqTerminal.getInstance();
-
-    public static class TDeallocateTerminal extends Terminal
-    {
-        private TDeallocateTerminal() {;} // Singleton
-        private static TDeallocateTerminal singletonInstance = null;
-        public static final TDeallocateTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TDeallocateTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_DEALLOCATE"; }
-
-        int getActionRow() { return 27; }
-    }
-    public static final Terminal.TDeallocateTerminal T_DEALLOCATE = TDeallocateTerminal.getInstance();
-
-    public static class TAllocateTerminal extends Terminal
-    {
-        private TAllocateTerminal() {;} // Singleton
-        private static TAllocateTerminal singletonInstance = null;
-        public static final TAllocateTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TAllocateTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_ALLOCATE"; }
-
         int getActionRow() { return 28; }
     }
-    public static final Terminal.TAllocateTerminal T_ALLOCATE = TAllocateTerminal.getInstance();
-
-    public static class TProcedureTerminal extends Terminal
-    {
-        private TProcedureTerminal() {;} // Singleton
-        private static TProcedureTerminal singletonInstance = null;
-        public static final TProcedureTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TProcedureTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_PROCEDURE"; }
-
-        int getActionRow() { return 29; }
-    }
-    public static final Terminal.TProcedureTerminal T_PROCEDURE = TProcedureTerminal.getInstance();
-
-    public static class TNeqvTerminal extends Terminal
-    {
-        private TNeqvTerminal() {;} // Singleton
-        private static TNeqvTerminal singletonInstance = null;
-        public static final TNeqvTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TNeqvTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_NEQV"; }
-
-        int getActionRow() { return 30; }
-    }
-    public static final Terminal.TNeqvTerminal T_NEQV = TNeqvTerminal.getInstance();
-
-    public static class TAssignmentTerminal extends Terminal
-    {
-        private TAssignmentTerminal() {;} // Singleton
-        private static TAssignmentTerminal singletonInstance = null;
-        public static final TAssignmentTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TAssignmentTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_ASSIGNMENT"; }
-
-        int getActionRow() { return 31; }
-    }
-    public static final Terminal.TAssignmentTerminal T_ASSIGNMENT = TAssignmentTerminal.getInstance();
-
-    public static class TPrivateTerminal extends Terminal
-    {
-        private TPrivateTerminal() {;} // Singleton
-        private static TPrivateTerminal singletonInstance = null;
-        public static final TPrivateTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TPrivateTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_PRIVATE"; }
-
-        int getActionRow() { return 32; }
-    }
-    public static final Terminal.TPrivateTerminal T_PRIVATE = TPrivateTerminal.getInstance();
-
-    public static class TImplicitTerminal extends Terminal
-    {
-        private TImplicitTerminal() {;} // Singleton
-        private static TImplicitTerminal singletonInstance = null;
-        public static final TImplicitTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TImplicitTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_IMPLICIT"; }
-
-        int getActionRow() { return 33; }
-    }
-    public static final Terminal.TImplicitTerminal T_IMPLICIT = TImplicitTerminal.getInstance();
-
-    public static class TInquireTerminal extends Terminal
-    {
-        private TInquireTerminal() {;} // Singleton
-        private static TInquireTerminal singletonInstance = null;
-        public static final TInquireTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TInquireTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_INQUIRE"; }
-
-        int getActionRow() { return 34; }
-    }
-    public static final Terminal.TInquireTerminal T_INQUIRE = TInquireTerminal.getInstance();
-
-    public static class TDelimeqTerminal extends Terminal
-    {
-        private TDelimeqTerminal() {;} // Singleton
-        private static TDelimeqTerminal singletonInstance = null;
-        public static final TDelimeqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TDelimeqTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_DELIMEQ"; }
-
-        int getActionRow() { return 35; }
-    }
-    public static final Terminal.TDelimeqTerminal T_DELIMEQ = TDelimeqTerminal.getInstance();
+    public static final Terminal.TPureTerminal T_PURE = TPureTerminal.getInstance();
 
     public static class TWhereTerminal extends Terminal
     {
@@ -460,9 +376,93 @@ public abstract class Terminal extends TerminalOrNonterminal
 
         public String getDescription() { return "T_WHERE"; }
 
-        int getActionRow() { return 36; }
+        int getActionRow() { return 29; }
     }
     public static final Terminal.TWhereTerminal T_WHERE = TWhereTerminal.getInstance();
+
+    public static class TEntryTerminal extends Terminal
+    {
+        private TEntryTerminal() {;} // Singleton
+        private static TEntryTerminal singletonInstance = null;
+        public static final TEntryTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TEntryTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_ENTRY"; }
+
+        int getActionRow() { return 30; }
+    }
+    public static final Terminal.TEntryTerminal T_ENTRY = TEntryTerminal.getInstance();
+
+    public static class TContainsTerminal extends Terminal
+    {
+        private TContainsTerminal() {;} // Singleton
+        private static TContainsTerminal singletonInstance = null;
+        public static final TContainsTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TContainsTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_CONTAINS"; }
+
+        int getActionRow() { return 31; }
+    }
+    public static final Terminal.TContainsTerminal T_CONTAINS = TContainsTerminal.getInstance();
+
+    public static class TToTerminal extends Terminal
+    {
+        private TToTerminal() {;} // Singleton
+        private static TToTerminal singletonInstance = null;
+        public static final TToTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TToTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_TO"; }
+
+        int getActionRow() { return 32; }
+    }
+    public static final Terminal.TToTerminal T_TO = TToTerminal.getInstance();
+
+    public static class TOptionalTerminal extends Terminal
+    {
+        private TOptionalTerminal() {;} // Singleton
+        private static TOptionalTerminal singletonInstance = null;
+        public static final TOptionalTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TOptionalTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_OPTIONAL"; }
+
+        int getActionRow() { return 33; }
+    }
+    public static final Terminal.TOptionalTerminal T_OPTIONAL = TOptionalTerminal.getInstance();
+
+    public static class TAllocatableTerminal extends Terminal
+    {
+        private TAllocatableTerminal() {;} // Singleton
+        private static TAllocatableTerminal singletonInstance = null;
+        public static final TAllocatableTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TAllocatableTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_ALLOCATABLE"; }
+
+        int getActionRow() { return 34; }
+    }
+    public static final Terminal.TAllocatableTerminal T_ALLOCATABLE = TAllocatableTerminal.getInstance();
+
+    public static class TCommaTerminal extends Terminal
+    {
+        private TCommaTerminal() {;} // Singleton
+        private static TCommaTerminal singletonInstance = null;
+        public static final TCommaTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TCommaTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_COMMA"; }
+
+        int getActionRow() { return 35; }
+    }
+    public static final Terminal.TCommaTerminal T_COMMA = TCommaTerminal.getInstance();
+
+    public static class TSizeeqTerminal extends Terminal
+    {
+        private TSizeeqTerminal() {;} // Singleton
+        private static TSizeeqTerminal singletonInstance = null;
+        public static final TSizeeqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TSizeeqTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_SIZEEQ"; }
+
+        int getActionRow() { return 36; }
+    }
+    public static final Terminal.TSizeeqTerminal T_SIZEEQ = TSizeeqTerminal.getInstance();
 
     public static class TBlankeqTerminal extends Terminal
     {
@@ -476,785 +476,17 @@ public abstract class Terminal extends TerminalOrNonterminal
     }
     public static final Terminal.TBlankeqTerminal T_BLANKEQ = TBlankeqTerminal.getInstance();
 
-    public static class TReturnTerminal extends Terminal
+    public static class TEndselectTerminal extends Terminal
     {
-        private TReturnTerminal() {;} // Singleton
-        private static TReturnTerminal singletonInstance = null;
-        public static final TReturnTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TReturnTerminal(); return singletonInstance; }
+        private TEndselectTerminal() {;} // Singleton
+        private static TEndselectTerminal singletonInstance = null;
+        public static final TEndselectTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TEndselectTerminal(); return singletonInstance; }
 
-        public String getDescription() { return "T_RETURN"; }
+        public String getDescription() { return "T_ENDSELECT"; }
 
         int getActionRow() { return 38; }
     }
-    public static final Terminal.TReturnTerminal T_RETURN = TReturnTerminal.getInstance();
-
-    public static class TNeTerminal extends Terminal
-    {
-        private TNeTerminal() {;} // Singleton
-        private static TNeTerminal singletonInstance = null;
-        public static final TNeTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TNeTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_NE"; }
-
-        int getActionRow() { return 39; }
-    }
-    public static final Terminal.TNeTerminal T_NE = TNeTerminal.getInstance();
-
-    public static class TElseTerminal extends Terminal
-    {
-        private TElseTerminal() {;} // Singleton
-        private static TElseTerminal singletonInstance = null;
-        public static final TElseTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TElseTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_ELSE"; }
-
-        int getActionRow() { return 40; }
-    }
-    public static final Terminal.TElseTerminal T_ELSE = TElseTerminal.getInstance();
-
-    public static class TOpenTerminal extends Terminal
-    {
-        private TOpenTerminal() {;} // Singleton
-        private static TOpenTerminal singletonInstance = null;
-        public static final TOpenTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TOpenTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_OPEN"; }
-
-        int getActionRow() { return 41; }
-    }
-    public static final Terminal.TOpenTerminal T_OPEN = TOpenTerminal.getInstance();
-
-    public static class TEndsubroutineTerminal extends Terminal
-    {
-        private TEndsubroutineTerminal() {;} // Singleton
-        private static TEndsubroutineTerminal singletonInstance = null;
-        public static final TEndsubroutineTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TEndsubroutineTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_ENDSUBROUTINE"; }
-
-        int getActionRow() { return 42; }
-    }
-    public static final Terminal.TEndsubroutineTerminal T_ENDSUBROUTINE = TEndsubroutineTerminal.getInstance();
-
-    public static class TAllocatableTerminal extends Terminal
-    {
-        private TAllocatableTerminal() {;} // Singleton
-        private static TAllocatableTerminal singletonInstance = null;
-        public static final TAllocatableTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TAllocatableTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_ALLOCATABLE"; }
-
-        int getActionRow() { return 43; }
-    }
-    public static final Terminal.TAllocatableTerminal T_ALLOCATABLE = TAllocatableTerminal.getInstance();
-
-    public static class TWriteeqTerminal extends Terminal
-    {
-        private TWriteeqTerminal() {;} // Singleton
-        private static TWriteeqTerminal singletonInstance = null;
-        public static final TWriteeqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TWriteeqTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_WRITEEQ"; }
-
-        int getActionRow() { return 44; }
-    }
-    public static final Terminal.TWriteeqTerminal T_WRITEEQ = TWriteeqTerminal.getInstance();
-
-    public static class TXimplTerminal extends Terminal
-    {
-        private TXimplTerminal() {;} // Singleton
-        private static TXimplTerminal singletonInstance = null;
-        public static final TXimplTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TXimplTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_xImpl"; }
-
-        int getActionRow() { return 45; }
-    }
-    public static final Terminal.TXimplTerminal T_XIMPL = TXimplTerminal.getInstance();
-
-    public static class TUseTerminal extends Terminal
-    {
-        private TUseTerminal() {;} // Singleton
-        private static TUseTerminal singletonInstance = null;
-        public static final TUseTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TUseTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_USE"; }
-
-        int getActionRow() { return 46; }
-    }
-    public static final Terminal.TUseTerminal T_USE = TUseTerminal.getInstance();
-
-    public static class TAccesseqTerminal extends Terminal
-    {
-        private TAccesseqTerminal() {;} // Singleton
-        private static TAccesseqTerminal singletonInstance = null;
-        public static final TAccesseqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TAccesseqTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_ACCESSEQ"; }
-
-        int getActionRow() { return 47; }
-    }
-    public static final Terminal.TAccesseqTerminal T_ACCESSEQ = TAccesseqTerminal.getInstance();
-
-    public static class TOrTerminal extends Terminal
-    {
-        private TOrTerminal() {;} // Singleton
-        private static TOrTerminal singletonInstance = null;
-        public static final TOrTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TOrTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_OR"; }
-
-        int getActionRow() { return 48; }
-    }
-    public static final Terminal.TOrTerminal T_OR = TOrTerminal.getInstance();
-
-    public static class TDimensionTerminal extends Terminal
-    {
-        private TDimensionTerminal() {;} // Singleton
-        private static TDimensionTerminal singletonInstance = null;
-        public static final TDimensionTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TDimensionTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_DIMENSION"; }
-
-        int getActionRow() { return 49; }
-    }
-    public static final Terminal.TDimensionTerminal T_DIMENSION = TDimensionTerminal.getInstance();
-
-    public static class TStatuseqTerminal extends Terminal
-    {
-        private TStatuseqTerminal() {;} // Singleton
-        private static TStatuseqTerminal singletonInstance = null;
-        public static final TStatuseqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TStatuseqTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_STATUSEQ"; }
-
-        int getActionRow() { return 50; }
-    }
-    public static final Terminal.TStatuseqTerminal T_STATUSEQ = TStatuseqTerminal.getInstance();
-
-    public static class TBlockTerminal extends Terminal
-    {
-        private TBlockTerminal() {;} // Singleton
-        private static TBlockTerminal singletonInstance = null;
-        public static final TBlockTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TBlockTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_BLOCK"; }
-
-        int getActionRow() { return 51; }
-    }
-    public static final Terminal.TBlockTerminal T_BLOCK = TBlockTerminal.getInstance();
-
-    public static class TFileTerminal extends Terminal
-    {
-        private TFileTerminal() {;} // Singleton
-        private static TFileTerminal singletonInstance = null;
-        public static final TFileTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TFileTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_FILE"; }
-
-        int getActionRow() { return 52; }
-    }
-    public static final Terminal.TFileTerminal T_FILE = TFileTerminal.getInstance();
-
-    public static class TIntentTerminal extends Terminal
-    {
-        private TIntentTerminal() {;} // Singleton
-        private static TIntentTerminal singletonInstance = null;
-        public static final TIntentTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TIntentTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_INTENT"; }
-
-        int getActionRow() { return 53; }
-    }
-    public static final Terminal.TIntentTerminal T_INTENT = TIntentTerminal.getInstance();
-
-    public static class TTargetTerminal extends Terminal
-    {
-        private TTargetTerminal() {;} // Singleton
-        private static TTargetTerminal singletonInstance = null;
-        public static final TTargetTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TTargetTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_TARGET"; }
-
-        int getActionRow() { return 54; }
-    }
-    public static final Terminal.TTargetTerminal T_TARGET = TTargetTerminal.getInstance();
-
-    public static class TProgramTerminal extends Terminal
-    {
-        private TProgramTerminal() {;} // Singleton
-        private static TProgramTerminal singletonInstance = null;
-        public static final TProgramTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TProgramTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_PROGRAM"; }
-
-        int getActionRow() { return 55; }
-    }
-    public static final Terminal.TProgramTerminal T_PROGRAM = TProgramTerminal.getInstance();
-
-    public static class TFmteqTerminal extends Terminal
-    {
-        private TFmteqTerminal() {;} // Singleton
-        private static TFmteqTerminal singletonInstance = null;
-        public static final TFmteqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TFmteqTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_FMTEQ"; }
-
-        int getActionRow() { return 56; }
-    }
-    public static final Terminal.TFmteqTerminal T_FMTEQ = TFmteqTerminal.getInstance();
-
-    public static class TOnlyTerminal extends Terminal
-    {
-        private TOnlyTerminal() {;} // Singleton
-        private static TOnlyTerminal singletonInstance = null;
-        public static final TOnlyTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TOnlyTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_ONLY"; }
-
-        int getActionRow() { return 57; }
-    }
-    public static final Terminal.TOnlyTerminal T_ONLY = TOnlyTerminal.getInstance();
-
-    public static class TCallTerminal extends Terminal
-    {
-        private TCallTerminal() {;} // Singleton
-        private static TCallTerminal singletonInstance = null;
-        public static final TCallTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TCallTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_CALL"; }
-
-        int getActionRow() { return 58; }
-    }
-    public static final Terminal.TCallTerminal T_CALL = TCallTerminal.getInstance();
-
-    public static class TCaseTerminal extends Terminal
-    {
-        private TCaseTerminal() {;} // Singleton
-        private static TCaseTerminal singletonInstance = null;
-        public static final TCaseTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TCaseTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_CASE"; }
-
-        int getActionRow() { return 59; }
-    }
-    public static final Terminal.TCaseTerminal T_CASE = TCaseTerminal.getInstance();
-
-    public static class TWriteTerminal extends Terminal
-    {
-        private TWriteTerminal() {;} // Singleton
-        private static TWriteTerminal singletonInstance = null;
-        public static final TWriteTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TWriteTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_WRITE"; }
-
-        int getActionRow() { return 60; }
-    }
-    public static final Terminal.TWriteTerminal T_WRITE = TWriteTerminal.getInstance();
-
-    public static class TPercentTerminal extends Terminal
-    {
-        private TPercentTerminal() {;} // Singleton
-        private static TPercentTerminal singletonInstance = null;
-        public static final TPercentTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TPercentTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_PERCENT"; }
-
-        int getActionRow() { return 61; }
-    }
-    public static final Terminal.TPercentTerminal T_PERCENT = TPercentTerminal.getInstance();
-
-    public static class TXdopTerminal extends Terminal
-    {
-        private TXdopTerminal() {;} // Singleton
-        private static TXdopTerminal singletonInstance = null;
-        public static final TXdopTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TXdopTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_XDOP"; }
-
-        int getActionRow() { return 62; }
-    }
-    public static final Terminal.TXdopTerminal T_XDOP = TXdopTerminal.getInstance();
-
-    public static class TOperatorTerminal extends Terminal
-    {
-        private TOperatorTerminal() {;} // Singleton
-        private static TOperatorTerminal singletonInstance = null;
-        public static final TOperatorTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TOperatorTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_OPERATOR"; }
-
-        int getActionRow() { return 63; }
-    }
-    public static final Terminal.TOperatorTerminal T_OPERATOR = TOperatorTerminal.getInstance();
-
-    public static class TEoreqTerminal extends Terminal
-    {
-        private TEoreqTerminal() {;} // Singleton
-        private static TEoreqTerminal singletonInstance = null;
-        public static final TEoreqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TEoreqTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_EOREQ"; }
-
-        int getActionRow() { return 64; }
-    }
-    public static final Terminal.TEoreqTerminal T_EOREQ = TEoreqTerminal.getInstance();
-
-    public static class TRecursiveTerminal extends Terminal
-    {
-        private TRecursiveTerminal() {;} // Singleton
-        private static TRecursiveTerminal singletonInstance = null;
-        public static final TRecursiveTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TRecursiveTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_RECURSIVE"; }
-
-        int getActionRow() { return 65; }
-    }
-    public static final Terminal.TRecursiveTerminal T_RECURSIVE = TRecursiveTerminal.getInstance();
-
-    public static class TXconTerminal extends Terminal
-    {
-        private TXconTerminal() {;} // Singleton
-        private static TXconTerminal singletonInstance = null;
-        public static final TXconTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TXconTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_XCON"; }
-
-        int getActionRow() { return 66; }
-    }
-    public static final Terminal.TXconTerminal T_XCON = TXconTerminal.getInstance();
-
-    public static class TErreqTerminal extends Terminal
-    {
-        private TErreqTerminal() {;} // Singleton
-        private static TErreqTerminal singletonInstance = null;
-        public static final TErreqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TErreqTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_ERREQ"; }
-
-        int getActionRow() { return 67; }
-    }
-    public static final Terminal.TErreqTerminal T_ERREQ = TErreqTerminal.getInstance();
-
-    public static class TIntrinsicTerminal extends Terminal
-    {
-        private TIntrinsicTerminal() {;} // Singleton
-        private static TIntrinsicTerminal singletonInstance = null;
-        public static final TIntrinsicTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TIntrinsicTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_INTRINSIC"; }
-
-        int getActionRow() { return 68; }
-    }
-    public static final Terminal.TIntrinsicTerminal T_INTRINSIC = TIntrinsicTerminal.getInstance();
-
-    public static class TEndblockTerminal extends Terminal
-    {
-        private TEndblockTerminal() {;} // Singleton
-        private static TEndblockTerminal singletonInstance = null;
-        public static final TEndblockTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TEndblockTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_ENDBLOCK"; }
-
-        int getActionRow() { return 69; }
-    }
-    public static final Terminal.TEndblockTerminal T_ENDBLOCK = TEndblockTerminal.getInstance();
-
-    public static class TActioneqTerminal extends Terminal
-    {
-        private TActioneqTerminal() {;} // Singleton
-        private static TActioneqTerminal singletonInstance = null;
-        public static final TActioneqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TActioneqTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_ACTIONEQ"; }
-
-        int getActionRow() { return 70; }
-    }
-    public static final Terminal.TActioneqTerminal T_ACTIONEQ = TActioneqTerminal.getInstance();
-
-    public static class TEndfunctionTerminal extends Terminal
-    {
-        private TEndfunctionTerminal() {;} // Singleton
-        private static TEndfunctionTerminal singletonInstance = null;
-        public static final TEndfunctionTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TEndfunctionTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_ENDFUNCTION"; }
-
-        int getActionRow() { return 71; }
-    }
-    public static final Terminal.TEndfunctionTerminal T_ENDFUNCTION = TEndfunctionTerminal.getInstance();
-
-    public static class TNameeqTerminal extends Terminal
-    {
-        private TNameeqTerminal() {;} // Singleton
-        private static TNameeqTerminal singletonInstance = null;
-        public static final TNameeqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TNameeqTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_NAMEEQ"; }
-
-        int getActionRow() { return 72; }
-    }
-    public static final Terminal.TNameeqTerminal T_NAMEEQ = TNameeqTerminal.getInstance();
-
-    public static class TBackspaceTerminal extends Terminal
-    {
-        private TBackspaceTerminal() {;} // Singleton
-        private static TBackspaceTerminal singletonInstance = null;
-        public static final TBackspaceTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TBackspaceTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_BACKSPACE"; }
-
-        int getActionRow() { return 73; }
-    }
-    public static final Terminal.TBackspaceTerminal T_BACKSPACE = TBackspaceTerminal.getInstance();
-
-    public static class TUniteqTerminal extends Terminal
-    {
-        private TUniteqTerminal() {;} // Singleton
-        private static TUniteqTerminal singletonInstance = null;
-        public static final TUniteqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TUniteqTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_UNITEQ"; }
-
-        int getActionRow() { return 74; }
-    }
-    public static final Terminal.TUniteqTerminal T_UNITEQ = TUniteqTerminal.getInstance();
-
-    public static class TNoneTerminal extends Terminal
-    {
-        private TNoneTerminal() {;} // Singleton
-        private static TNoneTerminal singletonInstance = null;
-        public static final TNoneTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TNoneTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_NONE"; }
-
-        int getActionRow() { return 75; }
-    }
-    public static final Terminal.TNoneTerminal T_NONE = TNoneTerminal.getInstance();
-
-    public static class TBconTerminal extends Terminal
-    {
-        private TBconTerminal() {;} // Singleton
-        private static TBconTerminal singletonInstance = null;
-        public static final TBconTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TBconTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_BCON"; }
-
-        int getActionRow() { return 76; }
-    }
-    public static final Terminal.TBconTerminal T_BCON = TBconTerminal.getInstance();
-
-    public static class TElseifTerminal extends Terminal
-    {
-        private TElseifTerminal() {;} // Singleton
-        private static TElseifTerminal singletonInstance = null;
-        public static final TElseifTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TElseifTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_ELSEIF"; }
-
-        int getActionRow() { return 77; }
-    }
-    public static final Terminal.TElseifTerminal T_ELSEIF = TElseifTerminal.getInstance();
-
-    public static class TLogicalTerminal extends Terminal
-    {
-        private TLogicalTerminal() {;} // Singleton
-        private static TLogicalTerminal singletonInstance = null;
-        public static final TLogicalTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TLogicalTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_LOGICAL"; }
-
-        int getActionRow() { return 78; }
-    }
-    public static final Terminal.TLogicalTerminal T_LOGICAL = TLogicalTerminal.getInstance();
-
-    public static class TEqeqTerminal extends Terminal
-    {
-        private TEqeqTerminal() {;} // Singleton
-        private static TEqeqTerminal singletonInstance = null;
-        public static final TEqeqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TEqeqTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_EQEQ"; }
-
-        int getActionRow() { return 79; }
-    }
-    public static final Terminal.TEqeqTerminal T_EQEQ = TEqeqTerminal.getInstance();
-
-    public static class TRewindTerminal extends Terminal
-    {
-        private TRewindTerminal() {;} // Singleton
-        private static TRewindTerminal singletonInstance = null;
-        public static final TRewindTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TRewindTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_REWIND"; }
-
-        int getActionRow() { return 80; }
-    }
-    public static final Terminal.TRewindTerminal T_REWIND = TRewindTerminal.getInstance();
-
-    public static class TPositioneqTerminal extends Terminal
-    {
-        private TPositioneqTerminal() {;} // Singleton
-        private static TPositioneqTerminal singletonInstance = null;
-        public static final TPositioneqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TPositioneqTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_POSITIONEQ"; }
-
-        int getActionRow() { return 81; }
-    }
-    public static final Terminal.TPositioneqTerminal T_POSITIONEQ = TPositioneqTerminal.getInstance();
-
-    public static class TPrintTerminal extends Terminal
-    {
-        private TPrintTerminal() {;} // Singleton
-        private static TPrintTerminal singletonInstance = null;
-        public static final TPrintTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TPrintTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_PRINT"; }
-
-        int getActionRow() { return 82; }
-    }
-    public static final Terminal.TPrintTerminal T_PRINT = TPrintTerminal.getInstance();
-
-    public static class TComplexTerminal extends Terminal
-    {
-        private TComplexTerminal() {;} // Singleton
-        private static TComplexTerminal singletonInstance = null;
-        public static final TComplexTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TComplexTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_COMPLEX"; }
-
-        int getActionRow() { return 83; }
-    }
-    public static final Terminal.TComplexTerminal T_COMPLEX = TComplexTerminal.getInstance();
-
-    public static class TNullifyTerminal extends Terminal
-    {
-        private TNullifyTerminal() {;} // Singleton
-        private static TNullifyTerminal singletonInstance = null;
-        public static final TNullifyTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TNullifyTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_NULLIFY"; }
-
-        int getActionRow() { return 84; }
-    }
-    public static final Terminal.TNullifyTerminal T_NULLIFY = TNullifyTerminal.getInstance();
-
-    public static class TSelectTerminal extends Terminal
-    {
-        private TSelectTerminal() {;} // Singleton
-        private static TSelectTerminal singletonInstance = null;
-        public static final TSelectTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TSelectTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_SELECT"; }
-
-        int getActionRow() { return 85; }
-    }
-    public static final Terminal.TSelectTerminal T_SELECT = TSelectTerminal.getInstance();
-
-    public static class TThenTerminal extends Terminal
-    {
-        private TThenTerminal() {;} // Singleton
-        private static TThenTerminal singletonInstance = null;
-        public static final TThenTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TThenTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_THEN"; }
-
-        int getActionRow() { return 86; }
-    }
-    public static final Terminal.TThenTerminal T_THEN = TThenTerminal.getInstance();
-
-    public static class TCloseTerminal extends Terminal
-    {
-        private TCloseTerminal() {;} // Singleton
-        private static TCloseTerminal singletonInstance = null;
-        public static final TCloseTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TCloseTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_CLOSE"; }
-
-        int getActionRow() { return 87; }
-    }
-    public static final Terminal.TCloseTerminal T_CLOSE = TCloseTerminal.getInstance();
-
-    public static class TSlashrparenTerminal extends Terminal
-    {
-        private TSlashrparenTerminal() {;} // Singleton
-        private static TSlashrparenTerminal singletonInstance = null;
-        public static final TSlashrparenTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TSlashrparenTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_SLASHRPAREN"; }
-
-        int getActionRow() { return 88; }
-    }
-    public static final Terminal.TSlashrparenTerminal T_SLASHRPAREN = TSlashrparenTerminal.getInstance();
-
-    public static class TFileeqTerminal extends Terminal
-    {
-        private TFileeqTerminal() {;} // Singleton
-        private static TFileeqTerminal singletonInstance = null;
-        public static final TFileeqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TFileeqTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_FILEEQ"; }
-
-        int getActionRow() { return 89; }
-    }
-    public static final Terminal.TFileeqTerminal T_FILEEQ = TFileeqTerminal.getInstance();
-
-    public static class TStateqTerminal extends Terminal
-    {
-        private TStateqTerminal() {;} // Singleton
-        private static TStateqTerminal singletonInstance = null;
-        public static final TStateqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TStateqTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_STATEQ"; }
-
-        int getActionRow() { return 90; }
-    }
-    public static final Terminal.TStateqTerminal T_STATEQ = TStateqTerminal.getInstance();
-
-    public static class THconTerminal extends Terminal
-    {
-        private THconTerminal() {;} // Singleton
-        private static THconTerminal singletonInstance = null;
-        public static final THconTerminal getInstance() { if (singletonInstance == null) singletonInstance = new THconTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_HCON"; }
-
-        int getActionRow() { return 91; }
-    }
-    public static final Terminal.THconTerminal T_HCON = THconTerminal.getInstance();
-
-    public static class TAndTerminal extends Terminal
-    {
-        private TAndTerminal() {;} // Singleton
-        private static TAndTerminal singletonInstance = null;
-        public static final TAndTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TAndTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_AND"; }
-
-        int getActionRow() { return 92; }
-    }
-    public static final Terminal.TAndTerminal T_AND = TAndTerminal.getInstance();
-
-    public static class TEndfileTerminal extends Terminal
-    {
-        private TEndfileTerminal() {;} // Singleton
-        private static TEndfileTerminal singletonInstance = null;
-        public static final TEndfileTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TEndfileTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_ENDFILE"; }
-
-        int getActionRow() { return 93; }
-    }
-    public static final Terminal.TEndfileTerminal T_ENDFILE = TEndfileTerminal.getInstance();
-
-    public static class TLeTerminal extends Terminal
-    {
-        private TLeTerminal() {;} // Singleton
-        private static TLeTerminal singletonInstance = null;
-        public static final TLeTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TLeTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_LE"; }
-
-        int getActionRow() { return 94; }
-    }
-    public static final Terminal.TLeTerminal T_LE = TLeTerminal.getInstance();
-
-    public static class TCommonTerminal extends Terminal
-    {
-        private TCommonTerminal() {;} // Singleton
-        private static TCommonTerminal singletonInstance = null;
-        public static final TCommonTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TCommonTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_COMMON"; }
-
-        int getActionRow() { return 95; }
-    }
-    public static final Terminal.TCommonTerminal T_COMMON = TCommonTerminal.getInstance();
-
-    public static class TIolengtheqTerminal extends Terminal
-    {
-        private TIolengtheqTerminal() {;} // Singleton
-        private static TIolengtheqTerminal singletonInstance = null;
-        public static final TIolengtheqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TIolengtheqTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_IOLENGTHEQ"; }
-
-        int getActionRow() { return 96; }
-    }
-    public static final Terminal.TIolengtheqTerminal T_IOLENGTHEQ = TIolengtheqTerminal.getInstance();
-
-    public static class TDoubleTerminal extends Terminal
-    {
-        private TDoubleTerminal() {;} // Singleton
-        private static TDoubleTerminal singletonInstance = null;
-        public static final TDoubleTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TDoubleTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_DOUBLE"; }
-
-        int getActionRow() { return 97; }
-    }
-    public static final Terminal.TDoubleTerminal T_DOUBLE = TDoubleTerminal.getInstance();
-
-    public static class TSlashTerminal extends Terminal
-    {
-        private TSlashTerminal() {;} // Singleton
-        private static TSlashTerminal singletonInstance = null;
-        public static final TSlashTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TSlashTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_SLASH"; }
-
-        int getActionRow() { return 98; }
-    }
-    public static final Terminal.TSlashTerminal T_SLASH = TSlashTerminal.getInstance();
-
-    public static class TNamelistTerminal extends Terminal
-    {
-        private TNamelistTerminal() {;} // Singleton
-        private static TNamelistTerminal singletonInstance = null;
-        public static final TNamelistTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TNamelistTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_NAMELIST"; }
-
-        int getActionRow() { return 99; }
-    }
-    public static final Terminal.TNamelistTerminal T_NAMELIST = TNamelistTerminal.getInstance();
-
-    public static class TEndeqTerminal extends Terminal
-    {
-        private TEndeqTerminal() {;} // Singleton
-        private static TEndeqTerminal singletonInstance = null;
-        public static final TEndeqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TEndeqTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_ENDEQ"; }
-
-        int getActionRow() { return 100; }
-    }
-    public static final Terminal.TEndeqTerminal T_ENDEQ = TEndeqTerminal.getInstance();
-
-    public static class TSconTerminal extends Terminal
-    {
-        private TSconTerminal() {;} // Singleton
-        private static TSconTerminal singletonInstance = null;
-        public static final TSconTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TSconTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_SCON"; }
-
-        int getActionRow() { return 101; }
-    }
-    public static final Terminal.TSconTerminal T_SCON = TSconTerminal.getInstance();
-
-    public static class TDconTerminal extends Terminal
-    {
-        private TDconTerminal() {;} // Singleton
-        private static TDconTerminal singletonInstance = null;
-        public static final TDconTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TDconTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_DCON"; }
-
-        int getActionRow() { return 102; }
-    }
-    public static final Terminal.TDconTerminal T_DCON = TDconTerminal.getInstance();
+    public static final Terminal.TEndselectTerminal T_ENDSELECT = TEndselectTerminal.getInstance();
 
     public static class TAssignTerminal extends Terminal
     {
@@ -1264,189 +496,69 @@ public abstract class Terminal extends TerminalOrNonterminal
 
         public String getDescription() { return "T_ASSIGN"; }
 
-        int getActionRow() { return 103; }
+        int getActionRow() { return 39; }
     }
     public static final Terminal.TAssignTerminal T_ASSIGN = TAssignTerminal.getInstance();
 
-    public static class TDoubleprecisionTerminal extends Terminal
+    public static class TGoTerminal extends Terminal
     {
-        private TDoubleprecisionTerminal() {;} // Singleton
-        private static TDoubleprecisionTerminal singletonInstance = null;
-        public static final TDoubleprecisionTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TDoubleprecisionTerminal(); return singletonInstance; }
+        private TGoTerminal() {;} // Singleton
+        private static TGoTerminal singletonInstance = null;
+        public static final TGoTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TGoTerminal(); return singletonInstance; }
 
-        public String getDescription() { return "T_DOUBLEPRECISION"; }
+        public String getDescription() { return "T_GO"; }
 
-        int getActionRow() { return 104; }
+        int getActionRow() { return 40; }
     }
-    public static final Terminal.TDoubleprecisionTerminal T_DOUBLEPRECISION = TDoubleprecisionTerminal.getInstance();
+    public static final Terminal.TGoTerminal T_GO = TGoTerminal.getInstance();
 
-    public static class TParameterTerminal extends Terminal
+    public static class TPositioneqTerminal extends Terminal
     {
-        private TParameterTerminal() {;} // Singleton
-        private static TParameterTerminal singletonInstance = null;
-        public static final TParameterTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TParameterTerminal(); return singletonInstance; }
+        private TPositioneqTerminal() {;} // Singleton
+        private static TPositioneqTerminal singletonInstance = null;
+        public static final TPositioneqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TPositioneqTerminal(); return singletonInstance; }
 
-        public String getDescription() { return "T_PARAMETER"; }
+        public String getDescription() { return "T_POSITIONEQ"; }
 
-        int getActionRow() { return 105; }
+        int getActionRow() { return 41; }
     }
-    public static final Terminal.TParameterTerminal T_PARAMETER = TParameterTerminal.getInstance();
+    public static final Terminal.TPositioneqTerminal T_POSITIONEQ = TPositioneqTerminal.getInstance();
 
-    public static class TContainsTerminal extends Terminal
+    public static class TRewindTerminal extends Terminal
     {
-        private TContainsTerminal() {;} // Singleton
-        private static TContainsTerminal singletonInstance = null;
-        public static final TContainsTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TContainsTerminal(); return singletonInstance; }
+        private TRewindTerminal() {;} // Singleton
+        private static TRewindTerminal singletonInstance = null;
+        public static final TRewindTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TRewindTerminal(); return singletonInstance; }
 
-        public String getDescription() { return "T_CONTAINS"; }
+        public String getDescription() { return "T_REWIND"; }
 
-        int getActionRow() { return 106; }
+        int getActionRow() { return 42; }
     }
-    public static final Terminal.TContainsTerminal T_CONTAINS = TContainsTerminal.getInstance();
+    public static final Terminal.TRewindTerminal T_REWIND = TRewindTerminal.getInstance();
 
-    public static class TReadeqTerminal extends Terminal
+    public static class TBlockTerminal extends Terminal
     {
-        private TReadeqTerminal() {;} // Singleton
-        private static TReadeqTerminal singletonInstance = null;
-        public static final TReadeqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TReadeqTerminal(); return singletonInstance; }
+        private TBlockTerminal() {;} // Singleton
+        private static TBlockTerminal singletonInstance = null;
+        public static final TBlockTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TBlockTerminal(); return singletonInstance; }
 
-        public String getDescription() { return "T_READEQ"; }
+        public String getDescription() { return "T_BLOCK"; }
 
-        int getActionRow() { return 107; }
+        int getActionRow() { return 43; }
     }
-    public static final Terminal.TReadeqTerminal T_READEQ = TReadeqTerminal.getInstance();
+    public static final Terminal.TBlockTerminal T_BLOCK = TBlockTerminal.getInstance();
 
-    public static class TToTerminal extends Terminal
+    public static class TCloseTerminal extends Terminal
     {
-        private TToTerminal() {;} // Singleton
-        private static TToTerminal singletonInstance = null;
-        public static final TToTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TToTerminal(); return singletonInstance; }
+        private TCloseTerminal() {;} // Singleton
+        private static TCloseTerminal singletonInstance = null;
+        public static final TCloseTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TCloseTerminal(); return singletonInstance; }
 
-        public String getDescription() { return "T_TO"; }
+        public String getDescription() { return "T_CLOSE"; }
 
-        int getActionRow() { return 108; }
+        int getActionRow() { return 44; }
     }
-    public static final Terminal.TToTerminal T_TO = TToTerminal.getInstance();
-
-    public static class TFormeqTerminal extends Terminal
-    {
-        private TFormeqTerminal() {;} // Singleton
-        private static TFormeqTerminal singletonInstance = null;
-        public static final TFormeqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TFormeqTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_FORMEQ"; }
-
-        int getActionRow() { return 109; }
-    }
-    public static final Terminal.TFormeqTerminal T_FORMEQ = TFormeqTerminal.getInstance();
-
-    public static class TCommaTerminal extends Terminal
-    {
-        private TCommaTerminal() {;} // Singleton
-        private static TCommaTerminal singletonInstance = null;
-        public static final TCommaTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TCommaTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_COMMA"; }
-
-        int getActionRow() { return 110; }
-    }
-    public static final Terminal.TCommaTerminal T_COMMA = TCommaTerminal.getInstance();
-
-    public static class TFormattedeqTerminal extends Terminal
-    {
-        private TFormattedeqTerminal() {;} // Singleton
-        private static TFormattedeqTerminal singletonInstance = null;
-        public static final TFormattedeqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TFormattedeqTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_FORMATTEDEQ"; }
-
-        int getActionRow() { return 111; }
-    }
-    public static final Terminal.TFormattedeqTerminal T_FORMATTEDEQ = TFormattedeqTerminal.getInstance();
-
-    public static class TGreaterthanTerminal extends Terminal
-    {
-        private TGreaterthanTerminal() {;} // Singleton
-        private static TGreaterthanTerminal singletonInstance = null;
-        public static final TGreaterthanTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TGreaterthanTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_GREATERTHAN"; }
-
-        int getActionRow() { return 112; }
-    }
-    public static final Terminal.TGreaterthanTerminal T_GREATERTHAN = TGreaterthanTerminal.getInstance();
-
-    public static class TInterfaceTerminal extends Terminal
-    {
-        private TInterfaceTerminal() {;} // Singleton
-        private static TInterfaceTerminal singletonInstance = null;
-        public static final TInterfaceTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TInterfaceTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_INTERFACE"; }
-
-        int getActionRow() { return 113; }
-    }
-    public static final Terminal.TInterfaceTerminal T_INTERFACE = TInterfaceTerminal.getInstance();
-
-    public static class TFunctionTerminal extends Terminal
-    {
-        private TFunctionTerminal() {;} // Singleton
-        private static TFunctionTerminal singletonInstance = null;
-        public static final TFunctionTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TFunctionTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_FUNCTION"; }
-
-        int getActionRow() { return 114; }
-    }
-    public static final Terminal.TFunctionTerminal T_FUNCTION = TFunctionTerminal.getInstance();
-
-    public static class TPrecisionTerminal extends Terminal
-    {
-        private TPrecisionTerminal() {;} // Singleton
-        private static TPrecisionTerminal singletonInstance = null;
-        public static final TPrecisionTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TPrecisionTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_PRECISION"; }
-
-        int getActionRow() { return 115; }
-    }
-    public static final Terminal.TPrecisionTerminal T_PRECISION = TPrecisionTerminal.getInstance();
-
-    public static class TMinusTerminal extends Terminal
-    {
-        private TMinusTerminal() {;} // Singleton
-        private static TMinusTerminal singletonInstance = null;
-        public static final TMinusTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TMinusTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_MINUS"; }
-
-        int getActionRow() { return 116; }
-    }
-    public static final Terminal.TMinusTerminal T_MINUS = TMinusTerminal.getInstance();
-
-    public static class TInoutTerminal extends Terminal
-    {
-        private TInoutTerminal() {;} // Singleton
-        private static TInoutTerminal singletonInstance = null;
-        public static final TInoutTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TInoutTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_INOUT"; }
-
-        int getActionRow() { return 117; }
-    }
-    public static final Terminal.TInoutTerminal T_INOUT = TInoutTerminal.getInstance();
-
-    public static class TEndmoduleTerminal extends Terminal
-    {
-        private TEndmoduleTerminal() {;} // Singleton
-        private static TEndmoduleTerminal singletonInstance = null;
-        public static final TEndmoduleTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TEndmoduleTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_ENDMODULE"; }
-
-        int getActionRow() { return 118; }
-    }
-    public static final Terminal.TEndmoduleTerminal T_ENDMODULE = TEndmoduleTerminal.getInstance();
+    public static final Terminal.TCloseTerminal T_CLOSE = TCloseTerminal.getInstance();
 
     public static class TContinueTerminal extends Terminal
     {
@@ -1456,129 +568,33 @@ public abstract class Terminal extends TerminalOrNonterminal
 
         public String getDescription() { return "T_CONTINUE"; }
 
-        int getActionRow() { return 119; }
+        int getActionRow() { return 45; }
     }
     public static final Terminal.TContinueTerminal T_CONTINUE = TContinueTerminal.getInstance();
 
-    public static class TResultTerminal extends Terminal
+    public static class TDeallocateTerminal extends Terminal
     {
-        private TResultTerminal() {;} // Singleton
-        private static TResultTerminal singletonInstance = null;
-        public static final TResultTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TResultTerminal(); return singletonInstance; }
+        private TDeallocateTerminal() {;} // Singleton
+        private static TDeallocateTerminal singletonInstance = null;
+        public static final TDeallocateTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TDeallocateTerminal(); return singletonInstance; }
 
-        public String getDescription() { return "T_RESULT"; }
+        public String getDescription() { return "T_DEALLOCATE"; }
 
-        int getActionRow() { return 120; }
+        int getActionRow() { return 46; }
     }
-    public static final Terminal.TResultTerminal T_RESULT = TResultTerminal.getInstance();
+    public static final Terminal.TDeallocateTerminal T_DEALLOCATE = TDeallocateTerminal.getInstance();
 
-    public static class TEndprogramTerminal extends Terminal
+    public static class TNamedeqTerminal extends Terminal
     {
-        private TEndprogramTerminal() {;} // Singleton
-        private static TEndprogramTerminal singletonInstance = null;
-        public static final TEndprogramTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TEndprogramTerminal(); return singletonInstance; }
+        private TNamedeqTerminal() {;} // Singleton
+        private static TNamedeqTerminal singletonInstance = null;
+        public static final TNamedeqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TNamedeqTerminal(); return singletonInstance; }
 
-        public String getDescription() { return "T_ENDPROGRAM"; }
+        public String getDescription() { return "T_NAMEDEQ"; }
 
-        int getActionRow() { return 121; }
+        int getActionRow() { return 47; }
     }
-    public static final Terminal.TEndprogramTerminal T_ENDPROGRAM = TEndprogramTerminal.getInstance();
-
-    public static class TInTerminal extends Terminal
-    {
-        private TInTerminal() {;} // Singleton
-        private static TInTerminal singletonInstance = null;
-        public static final TInTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TInTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_IN"; }
-
-        int getActionRow() { return 122; }
-    }
-    public static final Terminal.TInTerminal T_IN = TInTerminal.getInstance();
-
-    public static class TEndwhereTerminal extends Terminal
-    {
-        private TEndwhereTerminal() {;} // Singleton
-        private static TEndwhereTerminal singletonInstance = null;
-        public static final TEndwhereTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TEndwhereTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_ENDWHERE"; }
-
-        int getActionRow() { return 123; }
-    }
-    public static final Terminal.TEndwhereTerminal T_ENDWHERE = TEndwhereTerminal.getInstance();
-
-    public static class TPublicTerminal extends Terminal
-    {
-        private TPublicTerminal() {;} // Singleton
-        private static TPublicTerminal singletonInstance = null;
-        public static final TPublicTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TPublicTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_PUBLIC"; }
-
-        int getActionRow() { return 124; }
-    }
-    public static final Terminal.TPublicTerminal T_PUBLIC = TPublicTerminal.getInstance();
-
-    public static class TNextreceqTerminal extends Terminal
-    {
-        private TNextreceqTerminal() {;} // Singleton
-        private static TNextreceqTerminal singletonInstance = null;
-        public static final TNextreceqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TNextreceqTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_NEXTRECEQ"; }
-
-        int getActionRow() { return 125; }
-    }
-    public static final Terminal.TNextreceqTerminal T_NEXTRECEQ = TNextreceqTerminal.getInstance();
-
-    public static class TSizeeqTerminal extends Terminal
-    {
-        private TSizeeqTerminal() {;} // Singleton
-        private static TSizeeqTerminal singletonInstance = null;
-        public static final TSizeeqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TSizeeqTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_SIZEEQ"; }
-
-        int getActionRow() { return 126; }
-    }
-    public static final Terminal.TSizeeqTerminal T_SIZEEQ = TSizeeqTerminal.getInstance();
-
-    public static class TEndifTerminal extends Terminal
-    {
-        private TEndifTerminal() {;} // Singleton
-        private static TEndifTerminal singletonInstance = null;
-        public static final TEndifTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TEndifTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_ENDIF"; }
-
-        int getActionRow() { return 127; }
-    }
-    public static final Terminal.TEndifTerminal T_ENDIF = TEndifTerminal.getInstance();
-
-    public static class TLeneqTerminal extends Terminal
-    {
-        private TLeneqTerminal() {;} // Singleton
-        private static TLeneqTerminal singletonInstance = null;
-        public static final TLeneqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TLeneqTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_LENEQ"; }
-
-        int getActionRow() { return 128; }
-    }
-    public static final Terminal.TLeneqTerminal T_LENEQ = TLeneqTerminal.getInstance();
-
-    public static class TEqTerminal extends Terminal
-    {
-        private TEqTerminal() {;} // Singleton
-        private static TEqTerminal singletonInstance = null;
-        public static final TEqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TEqTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_EQ"; }
-
-        int getActionRow() { return 129; }
-    }
-    public static final Terminal.TEqTerminal T_EQ = TEqTerminal.getInstance();
+    public static final Terminal.TNamedeqTerminal T_NAMEDEQ = TNamedeqTerminal.getInstance();
 
     public static class TEosTerminal extends Terminal
     {
@@ -1588,21 +604,45 @@ public abstract class Terminal extends TerminalOrNonterminal
 
         public String getDescription() { return "T_EOS"; }
 
-        int getActionRow() { return 130; }
+        int getActionRow() { return 48; }
     }
     public static final Terminal.TEosTerminal T_EOS = TEosTerminal.getInstance();
 
-    public static class TOptionalTerminal extends Terminal
+    public static class TStateqTerminal extends Terminal
     {
-        private TOptionalTerminal() {;} // Singleton
-        private static TOptionalTerminal singletonInstance = null;
-        public static final TOptionalTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TOptionalTerminal(); return singletonInstance; }
+        private TStateqTerminal() {;} // Singleton
+        private static TStateqTerminal singletonInstance = null;
+        public static final TStateqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TStateqTerminal(); return singletonInstance; }
 
-        public String getDescription() { return "T_OPTIONAL"; }
+        public String getDescription() { return "T_STATEQ"; }
 
-        int getActionRow() { return 131; }
+        int getActionRow() { return 49; }
     }
-    public static final Terminal.TOptionalTerminal T_OPTIONAL = TOptionalTerminal.getInstance();
+    public static final Terminal.TStateqTerminal T_STATEQ = TStateqTerminal.getInstance();
+
+    public static class TSlashTerminal extends Terminal
+    {
+        private TSlashTerminal() {;} // Singleton
+        private static TSlashTerminal singletonInstance = null;
+        public static final TSlashTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TSlashTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_SLASH"; }
+
+        int getActionRow() { return 50; }
+    }
+    public static final Terminal.TSlashTerminal T_SLASH = TSlashTerminal.getInstance();
+
+    public static class TEndtypeTerminal extends Terminal
+    {
+        private TEndtypeTerminal() {;} // Singleton
+        private static TEndtypeTerminal singletonInstance = null;
+        public static final TEndtypeTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TEndtypeTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_ENDTYPE"; }
+
+        int getActionRow() { return 51; }
+    }
+    public static final Terminal.TEndtypeTerminal T_ENDTYPE = TEndtypeTerminal.getInstance();
 
     public static class TLessthanTerminal extends Terminal
     {
@@ -1612,57 +652,9 @@ public abstract class Terminal extends TerminalOrNonterminal
 
         public String getDescription() { return "T_LESSTHAN"; }
 
-        int getActionRow() { return 132; }
+        int getActionRow() { return 52; }
     }
     public static final Terminal.TLessthanTerminal T_LESSTHAN = TLessthanTerminal.getInstance();
-
-    public static class TIfTerminal extends Terminal
-    {
-        private TIfTerminal() {;} // Singleton
-        private static TIfTerminal singletonInstance = null;
-        public static final TIfTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TIfTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_IF"; }
-
-        int getActionRow() { return 133; }
-    }
-    public static final Terminal.TIfTerminal T_IF = TIfTerminal.getInstance();
-
-    public static class TOconTerminal extends Terminal
-    {
-        private TOconTerminal() {;} // Singleton
-        private static TOconTerminal singletonInstance = null;
-        public static final TOconTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TOconTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_OCON"; }
-
-        int getActionRow() { return 134; }
-    }
-    public static final Terminal.TOconTerminal T_OCON = TOconTerminal.getInstance();
-
-    public static class TStopTerminal extends Terminal
-    {
-        private TStopTerminal() {;} // Singleton
-        private static TStopTerminal singletonInstance = null;
-        public static final TStopTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TStopTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_STOP"; }
-
-        int getActionRow() { return 135; }
-    }
-    public static final Terminal.TStopTerminal T_STOP = TStopTerminal.getInstance();
-
-    public static class TLparenTerminal extends Terminal
-    {
-        private TLparenTerminal() {;} // Singleton
-        private static TLparenTerminal singletonInstance = null;
-        public static final TLparenTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TLparenTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_LPAREN"; }
-
-        int getActionRow() { return 136; }
-    }
-    public static final Terminal.TLparenTerminal T_LPAREN = TLparenTerminal.getInstance();
 
     public static class TDirecteqTerminal extends Terminal
     {
@@ -1672,69 +664,1077 @@ public abstract class Terminal extends TerminalOrNonterminal
 
         public String getDescription() { return "T_DIRECTEQ"; }
 
-        int getActionRow() { return 137; }
+        int getActionRow() { return 53; }
     }
     public static final Terminal.TDirecteqTerminal T_DIRECTEQ = TDirecteqTerminal.getInstance();
 
-    public static class TPconTerminal extends Terminal
+    public static class TSlashrparenTerminal extends Terminal
     {
-        private TPconTerminal() {;} // Singleton
-        private static TPconTerminal singletonInstance = null;
-        public static final TPconTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TPconTerminal(); return singletonInstance; }
+        private TSlashrparenTerminal() {;} // Singleton
+        private static TSlashrparenTerminal singletonInstance = null;
+        public static final TSlashrparenTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TSlashrparenTerminal(); return singletonInstance; }
 
-        public String getDescription() { return "T_PCON"; }
+        public String getDescription() { return "T_SLASHRPAREN"; }
+
+        int getActionRow() { return 54; }
+    }
+    public static final Terminal.TSlashrparenTerminal T_SLASHRPAREN = TSlashrparenTerminal.getInstance();
+
+    public static class TCharacterTerminal extends Terminal
+    {
+        private TCharacterTerminal() {;} // Singleton
+        private static TCharacterTerminal singletonInstance = null;
+        public static final TCharacterTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TCharacterTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_CHARACTER"; }
+
+        int getActionRow() { return 55; }
+    }
+    public static final Terminal.TCharacterTerminal T_CHARACTER = TCharacterTerminal.getInstance();
+
+    public static class TFunctionTerminal extends Terminal
+    {
+        private TFunctionTerminal() {;} // Singleton
+        private static TFunctionTerminal singletonInstance = null;
+        public static final TFunctionTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TFunctionTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_FUNCTION"; }
+
+        int getActionRow() { return 56; }
+    }
+    public static final Terminal.TFunctionTerminal T_FUNCTION = TFunctionTerminal.getInstance();
+
+    public static class TNameeqTerminal extends Terminal
+    {
+        private TNameeqTerminal() {;} // Singleton
+        private static TNameeqTerminal singletonInstance = null;
+        public static final TNameeqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TNameeqTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_NAMEEQ"; }
+
+        int getActionRow() { return 57; }
+    }
+    public static final Terminal.TNameeqTerminal T_NAMEEQ = TNameeqTerminal.getInstance();
+
+    public static class TInquireTerminal extends Terminal
+    {
+        private TInquireTerminal() {;} // Singleton
+        private static TInquireTerminal singletonInstance = null;
+        public static final TInquireTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TInquireTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_INQUIRE"; }
+
+        int getActionRow() { return 58; }
+    }
+    public static final Terminal.TInquireTerminal T_INQUIRE = TInquireTerminal.getInstance();
+
+    public static class TNumbereqTerminal extends Terminal
+    {
+        private TNumbereqTerminal() {;} // Singleton
+        private static TNumbereqTerminal singletonInstance = null;
+        public static final TNumbereqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TNumbereqTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_NUMBEREQ"; }
+
+        int getActionRow() { return 59; }
+    }
+    public static final Terminal.TNumbereqTerminal T_NUMBEREQ = TNumbereqTerminal.getInstance();
+
+    public static class TRparenTerminal extends Terminal
+    {
+        private TRparenTerminal() {;} // Singleton
+        private static TRparenTerminal singletonInstance = null;
+        public static final TRparenTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TRparenTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_RPAREN"; }
+
+        int getActionRow() { return 60; }
+    }
+    public static final Terminal.TRparenTerminal T_RPAREN = TRparenTerminal.getInstance();
+
+    public static class TEndforallTerminal extends Terminal
+    {
+        private TEndforallTerminal() {;} // Singleton
+        private static TEndforallTerminal singletonInstance = null;
+        public static final TEndforallTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TEndforallTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_ENDFORALL"; }
+
+        int getActionRow() { return 61; }
+    }
+    public static final Terminal.TEndforallTerminal T_ENDFORALL = TEndforallTerminal.getInstance();
+
+    public static class TBconTerminal extends Terminal
+    {
+        private TBconTerminal() {;} // Singleton
+        private static TBconTerminal singletonInstance = null;
+        public static final TBconTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TBconTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_BCON"; }
+
+        int getActionRow() { return 62; }
+    }
+    public static final Terminal.TBconTerminal T_BCON = TBconTerminal.getInstance();
+
+    public static class TLogicalTerminal extends Terminal
+    {
+        private TLogicalTerminal() {;} // Singleton
+        private static TLogicalTerminal singletonInstance = null;
+        public static final TLogicalTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TLogicalTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_LOGICAL"; }
+
+        int getActionRow() { return 63; }
+    }
+    public static final Terminal.TLogicalTerminal T_LOGICAL = TLogicalTerminal.getInstance();
+
+    public static class TNeTerminal extends Terminal
+    {
+        private TNeTerminal() {;} // Singleton
+        private static TNeTerminal singletonInstance = null;
+        public static final TNeTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TNeTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_NE"; }
+
+        int getActionRow() { return 64; }
+    }
+    public static final Terminal.TNeTerminal T_NE = TNeTerminal.getInstance();
+
+    public static class TPadeqTerminal extends Terminal
+    {
+        private TPadeqTerminal() {;} // Singleton
+        private static TPadeqTerminal singletonInstance = null;
+        public static final TPadeqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TPadeqTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_PADEQ"; }
+
+        int getActionRow() { return 65; }
+    }
+    public static final Terminal.TPadeqTerminal T_PADEQ = TPadeqTerminal.getInstance();
+
+    public static class TEqvTerminal extends Terminal
+    {
+        private TEqvTerminal() {;} // Singleton
+        private static TEqvTerminal singletonInstance = null;
+        public static final TEqvTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TEqvTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_EQV"; }
+
+        int getActionRow() { return 66; }
+    }
+    public static final Terminal.TEqvTerminal T_EQV = TEqvTerminal.getInstance();
+
+    public static class TRecleqTerminal extends Terminal
+    {
+        private TRecleqTerminal() {;} // Singleton
+        private static TRecleqTerminal singletonInstance = null;
+        public static final TRecleqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TRecleqTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_RECLEQ"; }
+
+        int getActionRow() { return 67; }
+    }
+    public static final Terminal.TRecleqTerminal T_RECLEQ = TRecleqTerminal.getInstance();
+
+    public static class TEndprogramTerminal extends Terminal
+    {
+        private TEndprogramTerminal() {;} // Singleton
+        private static TEndprogramTerminal singletonInstance = null;
+        public static final TEndprogramTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TEndprogramTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_ENDPROGRAM"; }
+
+        int getActionRow() { return 68; }
+    }
+    public static final Terminal.TEndprogramTerminal T_ENDPROGRAM = TEndprogramTerminal.getInstance();
+
+    public static class TDimensionTerminal extends Terminal
+    {
+        private TDimensionTerminal() {;} // Singleton
+        private static TDimensionTerminal singletonInstance = null;
+        public static final TDimensionTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TDimensionTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_DIMENSION"; }
+
+        int getActionRow() { return 69; }
+    }
+    public static final Terminal.TDimensionTerminal T_DIMENSION = TDimensionTerminal.getInstance();
+
+    public static class TThenTerminal extends Terminal
+    {
+        private TThenTerminal() {;} // Singleton
+        private static TThenTerminal singletonInstance = null;
+        public static final TThenTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TThenTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_THEN"; }
+
+        int getActionRow() { return 70; }
+    }
+    public static final Terminal.TThenTerminal T_THEN = TThenTerminal.getInstance();
+
+    public static class TDelimeqTerminal extends Terminal
+    {
+        private TDelimeqTerminal() {;} // Singleton
+        private static TDelimeqTerminal singletonInstance = null;
+        public static final TDelimeqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TDelimeqTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_DELIMEQ"; }
+
+        int getActionRow() { return 71; }
+    }
+    public static final Terminal.TDelimeqTerminal T_DELIMEQ = TDelimeqTerminal.getInstance();
+
+    public static class TXimplTerminal extends Terminal
+    {
+        private TXimplTerminal() {;} // Singleton
+        private static TXimplTerminal singletonInstance = null;
+        public static final TXimplTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TXimplTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_xImpl"; }
+
+        int getActionRow() { return 72; }
+    }
+    public static final Terminal.TXimplTerminal T_XIMPL = TXimplTerminal.getInstance();
+
+    public static class TLtTerminal extends Terminal
+    {
+        private TLtTerminal() {;} // Singleton
+        private static TLtTerminal singletonInstance = null;
+        public static final TLtTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TLtTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_LT"; }
+
+        int getActionRow() { return 73; }
+    }
+    public static final Terminal.TLtTerminal T_LT = TLtTerminal.getInstance();
+
+    public static class TEndwhereTerminal extends Terminal
+    {
+        private TEndwhereTerminal() {;} // Singleton
+        private static TEndwhereTerminal singletonInstance = null;
+        public static final TEndwhereTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TEndwhereTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_ENDWHERE"; }
+
+        int getActionRow() { return 74; }
+    }
+    public static final Terminal.TEndwhereTerminal T_ENDWHERE = TEndwhereTerminal.getInstance();
+
+    public static class TSubroutineTerminal extends Terminal
+    {
+        private TSubroutineTerminal() {;} // Singleton
+        private static TSubroutineTerminal singletonInstance = null;
+        public static final TSubroutineTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TSubroutineTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_SUBROUTINE"; }
+
+        int getActionRow() { return 75; }
+    }
+    public static final Terminal.TSubroutineTerminal T_SUBROUTINE = TSubroutineTerminal.getInstance();
+
+    public static class TCallTerminal extends Terminal
+    {
+        private TCallTerminal() {;} // Singleton
+        private static TCallTerminal singletonInstance = null;
+        public static final TCallTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TCallTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_CALL"; }
+
+        int getActionRow() { return 76; }
+    }
+    public static final Terminal.TCallTerminal T_CALL = TCallTerminal.getInstance();
+
+    public static class TUseTerminal extends Terminal
+    {
+        private TUseTerminal() {;} // Singleton
+        private static TUseTerminal singletonInstance = null;
+        public static final TUseTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TUseTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_USE"; }
+
+        int getActionRow() { return 77; }
+    }
+    public static final Terminal.TUseTerminal T_USE = TUseTerminal.getInstance();
+
+    public static class TRconTerminal extends Terminal
+    {
+        private TRconTerminal() {;} // Singleton
+        private static TRconTerminal singletonInstance = null;
+        public static final TRconTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TRconTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_RCON"; }
+
+        int getActionRow() { return 78; }
+    }
+    public static final Terminal.TRconTerminal T_RCON = TRconTerminal.getInstance();
+
+    public static class TFormeqTerminal extends Terminal
+    {
+        private TFormeqTerminal() {;} // Singleton
+        private static TFormeqTerminal singletonInstance = null;
+        public static final TFormeqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TFormeqTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_FORMEQ"; }
+
+        int getActionRow() { return 79; }
+    }
+    public static final Terminal.TFormeqTerminal T_FORMEQ = TFormeqTerminal.getInstance();
+
+    public static class TFmteqTerminal extends Terminal
+    {
+        private TFmteqTerminal() {;} // Singleton
+        private static TFmteqTerminal singletonInstance = null;
+        public static final TFmteqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TFmteqTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_FMTEQ"; }
+
+        int getActionRow() { return 80; }
+    }
+    public static final Terminal.TFmteqTerminal T_FMTEQ = TFmteqTerminal.getInstance();
+
+    public static class TDataTerminal extends Terminal
+    {
+        private TDataTerminal() {;} // Singleton
+        private static TDataTerminal singletonInstance = null;
+        public static final TDataTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TDataTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_DATA"; }
+
+        int getActionRow() { return 81; }
+    }
+    public static final Terminal.TDataTerminal T_DATA = TDataTerminal.getInstance();
+
+    public static class TOpenTerminal extends Terminal
+    {
+        private TOpenTerminal() {;} // Singleton
+        private static TOpenTerminal singletonInstance = null;
+        public static final TOpenTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TOpenTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_OPEN"; }
+
+        int getActionRow() { return 82; }
+    }
+    public static final Terminal.TOpenTerminal T_OPEN = TOpenTerminal.getInstance();
+
+    public static class TCaseTerminal extends Terminal
+    {
+        private TCaseTerminal() {;} // Singleton
+        private static TCaseTerminal singletonInstance = null;
+        public static final TCaseTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TCaseTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_CASE"; }
+
+        int getActionRow() { return 83; }
+    }
+    public static final Terminal.TCaseTerminal T_CASE = TCaseTerminal.getInstance();
+
+    public static class TAssignmentTerminal extends Terminal
+    {
+        private TAssignmentTerminal() {;} // Singleton
+        private static TAssignmentTerminal singletonInstance = null;
+        public static final TAssignmentTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TAssignmentTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_ASSIGNMENT"; }
+
+        int getActionRow() { return 84; }
+    }
+    public static final Terminal.TAssignmentTerminal T_ASSIGNMENT = TAssignmentTerminal.getInstance();
+
+    public static class TRealTerminal extends Terminal
+    {
+        private TRealTerminal() {;} // Singleton
+        private static TRealTerminal singletonInstance = null;
+        public static final TRealTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TRealTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_REAL"; }
+
+        int getActionRow() { return 85; }
+    }
+    public static final Terminal.TRealTerminal T_REAL = TRealTerminal.getInstance();
+
+    public static class TReceqTerminal extends Terminal
+    {
+        private TReceqTerminal() {;} // Singleton
+        private static TReceqTerminal singletonInstance = null;
+        public static final TReceqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TReceqTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_RECEQ"; }
+
+        int getActionRow() { return 86; }
+    }
+    public static final Terminal.TReceqTerminal T_RECEQ = TReceqTerminal.getInstance();
+
+    public static class TIconTerminal extends Terminal
+    {
+        private TIconTerminal() {;} // Singleton
+        private static TIconTerminal singletonInstance = null;
+        public static final TIconTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TIconTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_ICON"; }
+
+        int getActionRow() { return 87; }
+    }
+    public static final Terminal.TIconTerminal T_ICON = TIconTerminal.getInstance();
+
+    public static class TModuleTerminal extends Terminal
+    {
+        private TModuleTerminal() {;} // Singleton
+        private static TModuleTerminal singletonInstance = null;
+        public static final TModuleTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TModuleTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_MODULE"; }
+
+        int getActionRow() { return 88; }
+    }
+    public static final Terminal.TModuleTerminal T_MODULE = TModuleTerminal.getInstance();
+
+    public static class TFormatTerminal extends Terminal
+    {
+        private TFormatTerminal() {;} // Singleton
+        private static TFormatTerminal singletonInstance = null;
+        public static final TFormatTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TFormatTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_FORMAT"; }
+
+        int getActionRow() { return 89; }
+    }
+    public static final Terminal.TFormatTerminal T_FORMAT = TFormatTerminal.getInstance();
+
+    public static class TBlockdataTerminal extends Terminal
+    {
+        private TBlockdataTerminal() {;} // Singleton
+        private static TBlockdataTerminal singletonInstance = null;
+        public static final TBlockdataTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TBlockdataTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_BLOCKDATA"; }
+
+        int getActionRow() { return 90; }
+    }
+    public static final Terminal.TBlockdataTerminal T_BLOCKDATA = TBlockdataTerminal.getInstance();
+
+    public static class TZconTerminal extends Terminal
+    {
+        private TZconTerminal() {;} // Singleton
+        private static TZconTerminal singletonInstance = null;
+        public static final TZconTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TZconTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_ZCON"; }
+
+        int getActionRow() { return 91; }
+    }
+    public static final Terminal.TZconTerminal T_ZCON = TZconTerminal.getInstance();
+
+    public static class TUniteqTerminal extends Terminal
+    {
+        private TUniteqTerminal() {;} // Singleton
+        private static TUniteqTerminal singletonInstance = null;
+        public static final TUniteqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TUniteqTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_UNITEQ"; }
+
+        int getActionRow() { return 92; }
+    }
+    public static final Terminal.TUniteqTerminal T_UNITEQ = TUniteqTerminal.getInstance();
+
+    public static class TPrecisionTerminal extends Terminal
+    {
+        private TPrecisionTerminal() {;} // Singleton
+        private static TPrecisionTerminal singletonInstance = null;
+        public static final TPrecisionTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TPrecisionTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_PRECISION"; }
+
+        int getActionRow() { return 93; }
+    }
+    public static final Terminal.TPrecisionTerminal T_PRECISION = TPrecisionTerminal.getInstance();
+
+    public static class TInoutTerminal extends Terminal
+    {
+        private TInoutTerminal() {;} // Singleton
+        private static TInoutTerminal singletonInstance = null;
+        public static final TInoutTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TInoutTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_INOUT"; }
+
+        int getActionRow() { return 94; }
+    }
+    public static final Terminal.TInoutTerminal T_INOUT = TInoutTerminal.getInstance();
+
+    public static class TElementalTerminal extends Terminal
+    {
+        private TElementalTerminal() {;} // Singleton
+        private static TElementalTerminal singletonInstance = null;
+        public static final TElementalTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TElementalTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_ELEMENTAL"; }
+
+        int getActionRow() { return 95; }
+    }
+    public static final Terminal.TElementalTerminal T_ELEMENTAL = TElementalTerminal.getInstance();
+
+    public static class TEoreqTerminal extends Terminal
+    {
+        private TEoreqTerminal() {;} // Singleton
+        private static TEoreqTerminal singletonInstance = null;
+        public static final TEoreqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TEoreqTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_EOREQ"; }
+
+        int getActionRow() { return 96; }
+    }
+    public static final Terminal.TEoreqTerminal T_EOREQ = TEoreqTerminal.getInstance();
+
+    public static class TOrTerminal extends Terminal
+    {
+        private TOrTerminal() {;} // Singleton
+        private static TOrTerminal singletonInstance = null;
+        public static final TOrTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TOrTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_OR"; }
+
+        int getActionRow() { return 97; }
+    }
+    public static final Terminal.TOrTerminal T_OR = TOrTerminal.getInstance();
+
+    public static class TIntegerTerminal extends Terminal
+    {
+        private TIntegerTerminal() {;} // Singleton
+        private static TIntegerTerminal singletonInstance = null;
+        public static final TIntegerTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TIntegerTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_INTEGER"; }
+
+        int getActionRow() { return 98; }
+    }
+    public static final Terminal.TIntegerTerminal T_INTEGER = TIntegerTerminal.getInstance();
+
+    public static class TFalseTerminal extends Terminal
+    {
+        private TFalseTerminal() {;} // Singleton
+        private static TFalseTerminal singletonInstance = null;
+        public static final TFalseTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TFalseTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_FALSE"; }
+
+        int getActionRow() { return 99; }
+    }
+    public static final Terminal.TFalseTerminal T_FALSE = TFalseTerminal.getInstance();
+
+    public static class TEquivalenceTerminal extends Terminal
+    {
+        private TEquivalenceTerminal() {;} // Singleton
+        private static TEquivalenceTerminal singletonInstance = null;
+        public static final TEquivalenceTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TEquivalenceTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_EQUIVALENCE"; }
+
+        int getActionRow() { return 100; }
+    }
+    public static final Terminal.TEquivalenceTerminal T_EQUIVALENCE = TEquivalenceTerminal.getInstance();
+
+    public static class TStatuseqTerminal extends Terminal
+    {
+        private TStatuseqTerminal() {;} // Singleton
+        private static TStatuseqTerminal singletonInstance = null;
+        public static final TStatuseqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TStatuseqTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_STATUSEQ"; }
+
+        int getActionRow() { return 101; }
+    }
+    public static final Terminal.TStatuseqTerminal T_STATUSEQ = TStatuseqTerminal.getInstance();
+
+    public static class TTypeTerminal extends Terminal
+    {
+        private TTypeTerminal() {;} // Singleton
+        private static TTypeTerminal singletonInstance = null;
+        public static final TTypeTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TTypeTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_TYPE"; }
+
+        int getActionRow() { return 102; }
+    }
+    public static final Terminal.TTypeTerminal T_TYPE = TTypeTerminal.getInstance();
+
+    public static class TReturnTerminal extends Terminal
+    {
+        private TReturnTerminal() {;} // Singleton
+        private static TReturnTerminal singletonInstance = null;
+        public static final TReturnTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TReturnTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_RETURN"; }
+
+        int getActionRow() { return 103; }
+    }
+    public static final Terminal.TReturnTerminal T_RETURN = TReturnTerminal.getInstance();
+
+    public static class TSelectTerminal extends Terminal
+    {
+        private TSelectTerminal() {;} // Singleton
+        private static TSelectTerminal singletonInstance = null;
+        public static final TSelectTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TSelectTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_SELECT"; }
+
+        int getActionRow() { return 104; }
+    }
+    public static final Terminal.TSelectTerminal T_SELECT = TSelectTerminal.getInstance();
+
+    public static class TElseifTerminal extends Terminal
+    {
+        private TElseifTerminal() {;} // Singleton
+        private static TElseifTerminal singletonInstance = null;
+        public static final TElseifTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TElseifTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_ELSEIF"; }
+
+        int getActionRow() { return 105; }
+    }
+    public static final Terminal.TElseifTerminal T_ELSEIF = TElseifTerminal.getInstance();
+
+    public static class TIdentTerminal extends Terminal
+    {
+        private TIdentTerminal() {;} // Singleton
+        private static TIdentTerminal singletonInstance = null;
+        public static final TIdentTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TIdentTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_IDENT"; }
+
+        int getActionRow() { return 106; }
+    }
+    public static final Terminal.TIdentTerminal T_IDENT = TIdentTerminal.getInstance();
+
+    public static class TGeTerminal extends Terminal
+    {
+        private TGeTerminal() {;} // Singleton
+        private static TGeTerminal singletonInstance = null;
+        public static final TGeTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TGeTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_GE"; }
+
+        int getActionRow() { return 107; }
+    }
+    public static final Terminal.TGeTerminal T_GE = TGeTerminal.getInstance();
+
+    public static class TPowTerminal extends Terminal
+    {
+        private TPowTerminal() {;} // Singleton
+        private static TPowTerminal singletonInstance = null;
+        public static final TPowTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TPowTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_POW"; }
+
+        int getActionRow() { return 108; }
+    }
+    public static final Terminal.TPowTerminal T_POW = TPowTerminal.getInstance();
+
+    public static class TParameterTerminal extends Terminal
+    {
+        private TParameterTerminal() {;} // Singleton
+        private static TParameterTerminal singletonInstance = null;
+        public static final TParameterTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TParameterTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_PARAMETER"; }
+
+        int getActionRow() { return 109; }
+    }
+    public static final Terminal.TParameterTerminal T_PARAMETER = TParameterTerminal.getInstance();
+
+    public static class TEndinterfaceTerminal extends Terminal
+    {
+        private TEndinterfaceTerminal() {;} // Singleton
+        private static TEndinterfaceTerminal singletonInstance = null;
+        public static final TEndinterfaceTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TEndinterfaceTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_ENDINTERFACE"; }
+
+        int getActionRow() { return 110; }
+    }
+    public static final Terminal.TEndinterfaceTerminal T_ENDINTERFACE = TEndinterfaceTerminal.getInstance();
+
+    public static class TIntentTerminal extends Terminal
+    {
+        private TIntentTerminal() {;} // Singleton
+        private static TIntentTerminal singletonInstance = null;
+        public static final TIntentTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TIntentTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_INTENT"; }
+
+        int getActionRow() { return 111; }
+    }
+    public static final Terminal.TIntentTerminal T_INTENT = TIntentTerminal.getInstance();
+
+    public static class TOutTerminal extends Terminal
+    {
+        private TOutTerminal() {;} // Singleton
+        private static TOutTerminal singletonInstance = null;
+        public static final TOutTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TOutTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_OUT"; }
+
+        int getActionRow() { return 112; }
+    }
+    public static final Terminal.TOutTerminal T_OUT = TOutTerminal.getInstance();
+
+    public static class TExisteqTerminal extends Terminal
+    {
+        private TExisteqTerminal() {;} // Singleton
+        private static TExisteqTerminal singletonInstance = null;
+        public static final TExisteqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TExisteqTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_EXISTEQ"; }
+
+        int getActionRow() { return 113; }
+    }
+    public static final Terminal.TExisteqTerminal T_EXISTEQ = TExisteqTerminal.getInstance();
+
+    public static class TNullifyTerminal extends Terminal
+    {
+        private TNullifyTerminal() {;} // Singleton
+        private static TNullifyTerminal singletonInstance = null;
+        public static final TNullifyTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TNullifyTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_NULLIFY"; }
+
+        int getActionRow() { return 114; }
+    }
+    public static final Terminal.TNullifyTerminal T_NULLIFY = TNullifyTerminal.getInstance();
+
+    public static class TEqTerminal extends Terminal
+    {
+        private TEqTerminal() {;} // Singleton
+        private static TEqTerminal singletonInstance = null;
+        public static final TEqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TEqTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_EQ"; }
+
+        int getActionRow() { return 115; }
+    }
+    public static final Terminal.TEqTerminal T_EQ = TEqTerminal.getInstance();
+
+    public static class TPrintTerminal extends Terminal
+    {
+        private TPrintTerminal() {;} // Singleton
+        private static TPrintTerminal singletonInstance = null;
+        public static final TPrintTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TPrintTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_PRINT"; }
+
+        int getActionRow() { return 116; }
+    }
+    public static final Terminal.TPrintTerminal T_PRINT = TPrintTerminal.getInstance();
+
+    public static class TStopTerminal extends Terminal
+    {
+        private TStopTerminal() {;} // Singleton
+        private static TStopTerminal singletonInstance = null;
+        public static final TStopTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TStopTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_STOP"; }
+
+        int getActionRow() { return 117; }
+    }
+    public static final Terminal.TStopTerminal T_STOP = TStopTerminal.getInstance();
+
+    public static class TDefaultTerminal extends Terminal
+    {
+        private TDefaultTerminal() {;} // Singleton
+        private static TDefaultTerminal singletonInstance = null;
+        public static final TDefaultTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TDefaultTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_DEFAULT"; }
+
+        int getActionRow() { return 118; }
+    }
+    public static final Terminal.TDefaultTerminal T_DEFAULT = TDefaultTerminal.getInstance();
+
+    public static class TSequenceTerminal extends Terminal
+    {
+        private TSequenceTerminal() {;} // Singleton
+        private static TSequenceTerminal singletonInstance = null;
+        public static final TSequenceTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TSequenceTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_SEQUENCE"; }
+
+        int getActionRow() { return 119; }
+    }
+    public static final Terminal.TSequenceTerminal T_SEQUENCE = TSequenceTerminal.getInstance();
+
+    public static class TUnformattedeqTerminal extends Terminal
+    {
+        private TUnformattedeqTerminal() {;} // Singleton
+        private static TUnformattedeqTerminal singletonInstance = null;
+        public static final TUnformattedeqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TUnformattedeqTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_UNFORMATTEDEQ"; }
+
+        int getActionRow() { return 120; }
+    }
+    public static final Terminal.TUnformattedeqTerminal T_UNFORMATTEDEQ = TUnformattedeqTerminal.getInstance();
+
+    public static class TOperatorTerminal extends Terminal
+    {
+        private TOperatorTerminal() {;} // Singleton
+        private static TOperatorTerminal singletonInstance = null;
+        public static final TOperatorTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TOperatorTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_OPERATOR"; }
+
+        int getActionRow() { return 121; }
+    }
+    public static final Terminal.TOperatorTerminal T_OPERATOR = TOperatorTerminal.getInstance();
+
+    public static class TErreqTerminal extends Terminal
+    {
+        private TErreqTerminal() {;} // Singleton
+        private static TErreqTerminal singletonInstance = null;
+        public static final TErreqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TErreqTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_ERREQ"; }
+
+        int getActionRow() { return 122; }
+    }
+    public static final Terminal.TErreqTerminal T_ERREQ = TErreqTerminal.getInstance();
+
+    public static class TSconTerminal extends Terminal
+    {
+        private TSconTerminal() {;} // Singleton
+        private static TSconTerminal singletonInstance = null;
+        public static final TSconTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TSconTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_SCON"; }
+
+        int getActionRow() { return 123; }
+    }
+    public static final Terminal.TSconTerminal T_SCON = TSconTerminal.getInstance();
+
+    public static class TIfTerminal extends Terminal
+    {
+        private TIfTerminal() {;} // Singleton
+        private static TIfTerminal singletonInstance = null;
+        public static final TIfTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TIfTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_IF"; }
+
+        int getActionRow() { return 124; }
+    }
+    public static final Terminal.TIfTerminal T_IF = TIfTerminal.getInstance();
+
+    public static class TAdvanceeqTerminal extends Terminal
+    {
+        private TAdvanceeqTerminal() {;} // Singleton
+        private static TAdvanceeqTerminal singletonInstance = null;
+        public static final TAdvanceeqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TAdvanceeqTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_ADVANCEEQ"; }
+
+        int getActionRow() { return 125; }
+    }
+    public static final Terminal.TAdvanceeqTerminal T_ADVANCEEQ = TAdvanceeqTerminal.getInstance();
+
+    public static class TExternalTerminal extends Terminal
+    {
+        private TExternalTerminal() {;} // Singleton
+        private static TExternalTerminal singletonInstance = null;
+        public static final TExternalTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TExternalTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_EXTERNAL"; }
+
+        int getActionRow() { return 126; }
+    }
+    public static final Terminal.TExternalTerminal T_EXTERNAL = TExternalTerminal.getInstance();
+
+    public static class TPrivateTerminal extends Terminal
+    {
+        private TPrivateTerminal() {;} // Singleton
+        private static TPrivateTerminal singletonInstance = null;
+        public static final TPrivateTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TPrivateTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_PRIVATE"; }
+
+        int getActionRow() { return 127; }
+    }
+    public static final Terminal.TPrivateTerminal T_PRIVATE = TPrivateTerminal.getInstance();
+
+    public static class TNextreceqTerminal extends Terminal
+    {
+        private TNextreceqTerminal() {;} // Singleton
+        private static TNextreceqTerminal singletonInstance = null;
+        public static final TNextreceqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TNextreceqTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_NEXTRECEQ"; }
+
+        int getActionRow() { return 128; }
+    }
+    public static final Terminal.TNextreceqTerminal T_NEXTRECEQ = TNextreceqTerminal.getInstance();
+
+    public static class TEqgreaterthanTerminal extends Terminal
+    {
+        private TEqgreaterthanTerminal() {;} // Singleton
+        private static TEqgreaterthanTerminal singletonInstance = null;
+        public static final TEqgreaterthanTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TEqgreaterthanTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_EQGREATERTHAN"; }
+
+        int getActionRow() { return 129; }
+    }
+    public static final Terminal.TEqgreaterthanTerminal T_EQGREATERTHAN = TEqgreaterthanTerminal.getInstance();
+
+    public static class TSlashslashTerminal extends Terminal
+    {
+        private TSlashslashTerminal() {;} // Singleton
+        private static TSlashslashTerminal singletonInstance = null;
+        public static final TSlashslashTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TSlashslashTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_SLASHSLASH"; }
+
+        int getActionRow() { return 130; }
+    }
+    public static final Terminal.TSlashslashTerminal T_SLASHSLASH = TSlashslashTerminal.getInstance();
+
+    public static class TPlusTerminal extends Terminal
+    {
+        private TPlusTerminal() {;} // Singleton
+        private static TPlusTerminal singletonInstance = null;
+        public static final TPlusTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TPlusTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_PLUS"; }
+
+        int getActionRow() { return 131; }
+    }
+    public static final Terminal.TPlusTerminal T_PLUS = TPlusTerminal.getInstance();
+
+    public static class TEndfunctionTerminal extends Terminal
+    {
+        private TEndfunctionTerminal() {;} // Singleton
+        private static TEndfunctionTerminal singletonInstance = null;
+        public static final TEndfunctionTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TEndfunctionTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_ENDFUNCTION"; }
+
+        int getActionRow() { return 132; }
+    }
+    public static final Terminal.TEndfunctionTerminal T_ENDFUNCTION = TEndfunctionTerminal.getInstance();
+
+    public static class TTargetTerminal extends Terminal
+    {
+        private TTargetTerminal() {;} // Singleton
+        private static TTargetTerminal singletonInstance = null;
+        public static final TTargetTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TTargetTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_TARGET"; }
+
+        int getActionRow() { return 133; }
+    }
+    public static final Terminal.TTargetTerminal T_TARGET = TTargetTerminal.getInstance();
+
+    public static class TPercentTerminal extends Terminal
+    {
+        private TPercentTerminal() {;} // Singleton
+        private static TPercentTerminal singletonInstance = null;
+        public static final TPercentTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TPercentTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_PERCENT"; }
+
+        int getActionRow() { return 134; }
+    }
+    public static final Terminal.TPercentTerminal T_PERCENT = TPercentTerminal.getInstance();
+
+    public static class TReadwriteeqTerminal extends Terminal
+    {
+        private TReadwriteeqTerminal() {;} // Singleton
+        private static TReadwriteeqTerminal singletonInstance = null;
+        public static final TReadwriteeqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TReadwriteeqTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_READWRITEEQ"; }
+
+        int getActionRow() { return 135; }
+    }
+    public static final Terminal.TReadwriteeqTerminal T_READWRITEEQ = TReadwriteeqTerminal.getInstance();
+
+    public static class TPointerTerminal extends Terminal
+    {
+        private TPointerTerminal() {;} // Singleton
+        private static TPointerTerminal singletonInstance = null;
+        public static final TPointerTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TPointerTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_POINTER"; }
+
+        int getActionRow() { return 136; }
+    }
+    public static final Terminal.TPointerTerminal T_POINTER = TPointerTerminal.getInstance();
+
+    public static class TIolengtheqTerminal extends Terminal
+    {
+        private TIolengtheqTerminal() {;} // Singleton
+        private static TIolengtheqTerminal singletonInstance = null;
+        public static final TIolengtheqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TIolengtheqTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_IOLENGTHEQ"; }
+
+        int getActionRow() { return 137; }
+    }
+    public static final Terminal.TIolengtheqTerminal T_IOLENGTHEQ = TIolengtheqTerminal.getInstance();
+
+    public static class TOpenedeqTerminal extends Terminal
+    {
+        private TOpenedeqTerminal() {;} // Singleton
+        private static TOpenedeqTerminal singletonInstance = null;
+        public static final TOpenedeqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TOpenedeqTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_OPENEDEQ"; }
 
         int getActionRow() { return 138; }
     }
-    public static final Terminal.TPconTerminal T_PCON = TPconTerminal.getInstance();
+    public static final Terminal.TOpenedeqTerminal T_OPENEDEQ = TOpenedeqTerminal.getInstance();
 
-    public static class TSaveTerminal extends Terminal
+    public static class TLeTerminal extends Terminal
     {
-        private TSaveTerminal() {;} // Singleton
-        private static TSaveTerminal singletonInstance = null;
-        public static final TSaveTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TSaveTerminal(); return singletonInstance; }
+        private TLeTerminal() {;} // Singleton
+        private static TLeTerminal singletonInstance = null;
+        public static final TLeTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TLeTerminal(); return singletonInstance; }
 
-        public String getDescription() { return "T_SAVE"; }
+        public String getDescription() { return "T_LE"; }
 
         int getActionRow() { return 139; }
     }
-    public static final Terminal.TSaveTerminal T_SAVE = TSaveTerminal.getInstance();
+    public static final Terminal.TLeTerminal T_LE = TLeTerminal.getInstance();
 
-    public static class TGtTerminal extends Terminal
+    public static class TEnddoTerminal extends Terminal
     {
-        private TGtTerminal() {;} // Singleton
-        private static TGtTerminal singletonInstance = null;
-        public static final TGtTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TGtTerminal(); return singletonInstance; }
+        private TEnddoTerminal() {;} // Singleton
+        private static TEnddoTerminal singletonInstance = null;
+        public static final TEnddoTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TEnddoTerminal(); return singletonInstance; }
 
-        public String getDescription() { return "T_GT"; }
+        public String getDescription() { return "T_ENDDO"; }
 
         int getActionRow() { return 140; }
     }
-    public static final Terminal.TGtTerminal T_GT = TGtTerminal.getInstance();
+    public static final Terminal.TEnddoTerminal T_ENDDO = TEnddoTerminal.getInstance();
 
-    public static class TForallTerminal extends Terminal
+    public static class TGotoTerminal extends Terminal
     {
-        private TForallTerminal() {;} // Singleton
-        private static TForallTerminal singletonInstance = null;
-        public static final TForallTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TForallTerminal(); return singletonInstance; }
+        private TGotoTerminal() {;} // Singleton
+        private static TGotoTerminal singletonInstance = null;
+        public static final TGotoTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TGotoTerminal(); return singletonInstance; }
 
-        public String getDescription() { return "T_FORALL"; }
+        public String getDescription() { return "T_GOTO"; }
 
         int getActionRow() { return 141; }
     }
-    public static final Terminal.TForallTerminal T_FORALL = TForallTerminal.getInstance();
+    public static final Terminal.TGotoTerminal T_GOTO = TGotoTerminal.getInstance();
 
-    public static class TLessthaneqTerminal extends Terminal
+    public static class TInTerminal extends Terminal
     {
-        private TLessthaneqTerminal() {;} // Singleton
-        private static TLessthaneqTerminal singletonInstance = null;
-        public static final TLessthaneqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TLessthaneqTerminal(); return singletonInstance; }
+        private TInTerminal() {;} // Singleton
+        private static TInTerminal singletonInstance = null;
+        public static final TInTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TInTerminal(); return singletonInstance; }
 
-        public String getDescription() { return "T_LESSTHANEQ"; }
+        public String getDescription() { return "T_IN"; }
 
         int getActionRow() { return 142; }
     }
-    public static final Terminal.TLessthaneqTerminal T_LESSTHANEQ = TLessthaneqTerminal.getInstance();
+    public static final Terminal.TInTerminal T_IN = TInTerminal.getInstance();
 
     public static class TReadTerminal extends Terminal
     {
@@ -1748,17 +1748,65 @@ public abstract class Terminal extends TerminalOrNonterminal
     }
     public static final Terminal.TReadTerminal T_READ = TReadTerminal.getInstance();
 
-    public static class TModuleTerminal extends Terminal
+    public static class TColonTerminal extends Terminal
     {
-        private TModuleTerminal() {;} // Singleton
-        private static TModuleTerminal singletonInstance = null;
-        public static final TModuleTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TModuleTerminal(); return singletonInstance; }
+        private TColonTerminal() {;} // Singleton
+        private static TColonTerminal singletonInstance = null;
+        public static final TColonTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TColonTerminal(); return singletonInstance; }
 
-        public String getDescription() { return "T_MODULE"; }
+        public String getDescription() { return "T_COLON"; }
 
         int getActionRow() { return 144; }
     }
-    public static final Terminal.TModuleTerminal T_MODULE = TModuleTerminal.getInstance();
+    public static final Terminal.TColonTerminal T_COLON = TColonTerminal.getInstance();
+
+    public static class TLeneqTerminal extends Terminal
+    {
+        private TLeneqTerminal() {;} // Singleton
+        private static TLeneqTerminal singletonInstance = null;
+        public static final TLeneqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TLeneqTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_LENEQ"; }
+
+        int getActionRow() { return 145; }
+    }
+    public static final Terminal.TLeneqTerminal T_LENEQ = TLeneqTerminal.getInstance();
+
+    public static class TNotTerminal extends Terminal
+    {
+        private TNotTerminal() {;} // Singleton
+        private static TNotTerminal singletonInstance = null;
+        public static final TNotTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TNotTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_NOT"; }
+
+        int getActionRow() { return 146; }
+    }
+    public static final Terminal.TNotTerminal T_NOT = TNotTerminal.getInstance();
+
+    public static class TDconTerminal extends Terminal
+    {
+        private TDconTerminal() {;} // Singleton
+        private static TDconTerminal singletonInstance = null;
+        public static final TDconTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TDconTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_DCON"; }
+
+        int getActionRow() { return 147; }
+    }
+    public static final Terminal.TDconTerminal T_DCON = TDconTerminal.getInstance();
+
+    public static class TEndifTerminal extends Terminal
+    {
+        private TEndifTerminal() {;} // Singleton
+        private static TEndifTerminal singletonInstance = null;
+        public static final TEndifTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TEndifTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_ENDIF"; }
+
+        int getActionRow() { return 148; }
+    }
+    public static final Terminal.TEndifTerminal T_ENDIF = TEndifTerminal.getInstance();
 
     public static class TEqualsTerminal extends Terminal
     {
@@ -1768,525 +1816,21 @@ public abstract class Terminal extends TerminalOrNonterminal
 
         public String getDescription() { return "T_EQUALS"; }
 
-        int getActionRow() { return 145; }
+        int getActionRow() { return 149; }
     }
     public static final Terminal.TEqualsTerminal T_EQUALS = TEqualsTerminal.getInstance();
 
-    public static class TNmleqTerminal extends Terminal
+    public static class TAllocateTerminal extends Terminal
     {
-        private TNmleqTerminal() {;} // Singleton
-        private static TNmleqTerminal singletonInstance = null;
-        public static final TNmleqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TNmleqTerminal(); return singletonInstance; }
+        private TAllocateTerminal() {;} // Singleton
+        private static TAllocateTerminal singletonInstance = null;
+        public static final TAllocateTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TAllocateTerminal(); return singletonInstance; }
 
-        public String getDescription() { return "T_NMLEQ"; }
-
-        int getActionRow() { return 146; }
-    }
-    public static final Terminal.TNmleqTerminal T_NMLEQ = TNmleqTerminal.getInstance();
-
-    public static class TNullTerminal extends Terminal
-    {
-        private TNullTerminal() {;} // Singleton
-        private static TNullTerminal singletonInstance = null;
-        public static final TNullTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TNullTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_NULL"; }
-
-        int getActionRow() { return 147; }
-    }
-    public static final Terminal.TNullTerminal T_NULL = TNullTerminal.getInstance();
-
-    public static class TSequentialeqTerminal extends Terminal
-    {
-        private TSequentialeqTerminal() {;} // Singleton
-        private static TSequentialeqTerminal singletonInstance = null;
-        public static final TSequentialeqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TSequentialeqTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_SEQUENTIALEQ"; }
-
-        int getActionRow() { return 148; }
-    }
-    public static final Terminal.TSequentialeqTerminal T_SEQUENTIALEQ = TSequentialeqTerminal.getInstance();
-
-    public static class TTypeTerminal extends Terminal
-    {
-        private TTypeTerminal() {;} // Singleton
-        private static TTypeTerminal singletonInstance = null;
-        public static final TTypeTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TTypeTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_TYPE"; }
-
-        int getActionRow() { return 149; }
-    }
-    public static final Terminal.TTypeTerminal T_TYPE = TTypeTerminal.getInstance();
-
-    public static class TColonTerminal extends Terminal
-    {
-        private TColonTerminal() {;} // Singleton
-        private static TColonTerminal singletonInstance = null;
-        public static final TColonTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TColonTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_COLON"; }
+        public String getDescription() { return "T_ALLOCATE"; }
 
         int getActionRow() { return 150; }
     }
-    public static final Terminal.TColonTerminal T_COLON = TColonTerminal.getInstance();
-
-    public static class TEndinterfaceTerminal extends Terminal
-    {
-        private TEndinterfaceTerminal() {;} // Singleton
-        private static TEndinterfaceTerminal singletonInstance = null;
-        public static final TEndinterfaceTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TEndinterfaceTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_ENDINTERFACE"; }
-
-        int getActionRow() { return 151; }
-    }
-    public static final Terminal.TEndinterfaceTerminal T_ENDINTERFACE = TEndinterfaceTerminal.getInstance();
-
-    public static class TExternalTerminal extends Terminal
-    {
-        private TExternalTerminal() {;} // Singleton
-        private static TExternalTerminal singletonInstance = null;
-        public static final TExternalTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TExternalTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_EXTERNAL"; }
-
-        int getActionRow() { return 152; }
-    }
-    public static final Terminal.TExternalTerminal T_EXTERNAL = TExternalTerminal.getInstance();
-
-    public static class TLparenslashTerminal extends Terminal
-    {
-        private TLparenslashTerminal() {;} // Singleton
-        private static TLparenslashTerminal singletonInstance = null;
-        public static final TLparenslashTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TLparenslashTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_LPARENSLASH"; }
-
-        int getActionRow() { return 153; }
-    }
-    public static final Terminal.TLparenslashTerminal T_LPARENSLASH = TLparenslashTerminal.getInstance();
-
-    public static class TDefaultTerminal extends Terminal
-    {
-        private TDefaultTerminal() {;} // Singleton
-        private static TDefaultTerminal singletonInstance = null;
-        public static final TDefaultTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TDefaultTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_DEFAULT"; }
-
-        int getActionRow() { return 154; }
-    }
-    public static final Terminal.TDefaultTerminal T_DEFAULT = TDefaultTerminal.getInstance();
-
-    public static class TBlockdataTerminal extends Terminal
-    {
-        private TBlockdataTerminal() {;} // Singleton
-        private static TBlockdataTerminal singletonInstance = null;
-        public static final TBlockdataTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TBlockdataTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_BLOCKDATA"; }
-
-        int getActionRow() { return 155; }
-    }
-    public static final Terminal.TBlockdataTerminal T_BLOCKDATA = TBlockdataTerminal.getInstance();
-
-    public static class TEndtypeTerminal extends Terminal
-    {
-        private TEndtypeTerminal() {;} // Singleton
-        private static TEndtypeTerminal singletonInstance = null;
-        public static final TEndtypeTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TEndtypeTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_ENDTYPE"; }
-
-        int getActionRow() { return 156; }
-    }
-    public static final Terminal.TEndtypeTerminal T_ENDTYPE = TEndtypeTerminal.getInstance();
-
-    public static class TSlashslashTerminal extends Terminal
-    {
-        private TSlashslashTerminal() {;} // Singleton
-        private static TSlashslashTerminal singletonInstance = null;
-        public static final TSlashslashTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TSlashslashTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_SLASHSLASH"; }
-
-        int getActionRow() { return 157; }
-    }
-    public static final Terminal.TSlashslashTerminal T_SLASHSLASH = TSlashslashTerminal.getInstance();
-
-    public static class TGeTerminal extends Terminal
-    {
-        private TGeTerminal() {;} // Singleton
-        private static TGeTerminal singletonInstance = null;
-        public static final TGeTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TGeTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_GE"; }
-
-        int getActionRow() { return 158; }
-    }
-    public static final Terminal.TGeTerminal T_GE = TGeTerminal.getInstance();
-
-    public static class TSelectcaseTerminal extends Terminal
-    {
-        private TSelectcaseTerminal() {;} // Singleton
-        private static TSelectcaseTerminal singletonInstance = null;
-        public static final TSelectcaseTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TSelectcaseTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_SELECTCASE"; }
-
-        int getActionRow() { return 159; }
-    }
-    public static final Terminal.TSelectcaseTerminal T_SELECTCASE = TSelectcaseTerminal.getInstance();
-
-    public static class TFalseTerminal extends Terminal
-    {
-        private TFalseTerminal() {;} // Singleton
-        private static TFalseTerminal singletonInstance = null;
-        public static final TFalseTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TFalseTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_FALSE"; }
-
-        int getActionRow() { return 160; }
-    }
-    public static final Terminal.TFalseTerminal T_FALSE = TFalseTerminal.getInstance();
-
-    public static class TIostateqTerminal extends Terminal
-    {
-        private TIostateqTerminal() {;} // Singleton
-        private static TIostateqTerminal singletonInstance = null;
-        public static final TIostateqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TIostateqTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_IOSTATEQ"; }
-
-        int getActionRow() { return 161; }
-    }
-    public static final Terminal.TIostateqTerminal T_IOSTATEQ = TIostateqTerminal.getInstance();
-
-    public static class ErrorTerminal extends Terminal
-    {
-        private ErrorTerminal() {;} // Singleton
-        private static ErrorTerminal singletonInstance = null;
-        public static final ErrorTerminal getInstance() { if (singletonInstance == null) singletonInstance = new ErrorTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "%error"; }
-
-        int getActionRow() { return 162; }
-    }
-    public static final Terminal.ErrorTerminal ERROR = ErrorTerminal.getInstance();
-
-    public static class TIntegerTerminal extends Terminal
-    {
-        private TIntegerTerminal() {;} // Singleton
-        private static TIntegerTerminal singletonInstance = null;
-        public static final TIntegerTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TIntegerTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_INTEGER"; }
-
-        int getActionRow() { return 163; }
-    }
-    public static final Terminal.TIntegerTerminal T_INTEGER = TIntegerTerminal.getInstance();
-
-    public static class TElementalTerminal extends Terminal
-    {
-        private TElementalTerminal() {;} // Singleton
-        private static TElementalTerminal singletonInstance = null;
-        public static final TElementalTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TElementalTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_ELEMENTAL"; }
-
-        int getActionRow() { return 164; }
-    }
-    public static final Terminal.TElementalTerminal T_ELEMENTAL = TElementalTerminal.getInstance();
-
-    public static class TDoTerminal extends Terminal
-    {
-        private TDoTerminal() {;} // Singleton
-        private static TDoTerminal singletonInstance = null;
-        public static final TDoTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TDoTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_DO"; }
-
-        int getActionRow() { return 165; }
-    }
-    public static final Terminal.TDoTerminal T_DO = TDoTerminal.getInstance();
-
-    public static class TAsteriskTerminal extends Terminal
-    {
-        private TAsteriskTerminal() {;} // Singleton
-        private static TAsteriskTerminal singletonInstance = null;
-        public static final TAsteriskTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TAsteriskTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_ASTERISK"; }
-
-        int getActionRow() { return 166; }
-    }
-    public static final Terminal.TAsteriskTerminal T_ASTERISK = TAsteriskTerminal.getInstance();
-
-    public static class TEndforallTerminal extends Terminal
-    {
-        private TEndforallTerminal() {;} // Singleton
-        private static TEndforallTerminal singletonInstance = null;
-        public static final TEndforallTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TEndforallTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_ENDFORALL"; }
-
-        int getActionRow() { return 167; }
-    }
-    public static final Terminal.TEndforallTerminal T_ENDFORALL = TEndforallTerminal.getInstance();
-
-    public static class TCharacterTerminal extends Terminal
-    {
-        private TCharacterTerminal() {;} // Singleton
-        private static TCharacterTerminal singletonInstance = null;
-        public static final TCharacterTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TCharacterTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_CHARACTER"; }
-
-        int getActionRow() { return 168; }
-    }
-    public static final Terminal.TCharacterTerminal T_CHARACTER = TCharacterTerminal.getInstance();
-
-    public static class TEndselectTerminal extends Terminal
-    {
-        private TEndselectTerminal() {;} // Singleton
-        private static TEndselectTerminal singletonInstance = null;
-        public static final TEndselectTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TEndselectTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_ENDSELECT"; }
-
-        int getActionRow() { return 169; }
-    }
-    public static final Terminal.TEndselectTerminal T_ENDSELECT = TEndselectTerminal.getInstance();
-
-    public static class TKindeqTerminal extends Terminal
-    {
-        private TKindeqTerminal() {;} // Singleton
-        private static TKindeqTerminal singletonInstance = null;
-        public static final TKindeqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TKindeqTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_KINDEQ"; }
-
-        int getActionRow() { return 170; }
-    }
-    public static final Terminal.TKindeqTerminal T_KINDEQ = TKindeqTerminal.getInstance();
-
-    public static class TGoTerminal extends Terminal
-    {
-        private TGoTerminal() {;} // Singleton
-        private static TGoTerminal singletonInstance = null;
-        public static final TGoTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TGoTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_GO"; }
-
-        int getActionRow() { return 171; }
-    }
-    public static final Terminal.TGoTerminal T_GO = TGoTerminal.getInstance();
-
-    public static class TPadeqTerminal extends Terminal
-    {
-        private TPadeqTerminal() {;} // Singleton
-        private static TPadeqTerminal singletonInstance = null;
-        public static final TPadeqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TPadeqTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_PADEQ"; }
-
-        int getActionRow() { return 172; }
-    }
-    public static final Terminal.TPadeqTerminal T_PADEQ = TPadeqTerminal.getInstance();
-
-    public static class TEquivalenceTerminal extends Terminal
-    {
-        private TEquivalenceTerminal() {;} // Singleton
-        private static TEquivalenceTerminal singletonInstance = null;
-        public static final TEquivalenceTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TEquivalenceTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_EQUIVALENCE"; }
-
-        int getActionRow() { return 173; }
-    }
-    public static final Terminal.TEquivalenceTerminal T_EQUIVALENCE = TEquivalenceTerminal.getInstance();
-
-    public static class TCycleTerminal extends Terminal
-    {
-        private TCycleTerminal() {;} // Singleton
-        private static TCycleTerminal singletonInstance = null;
-        public static final TCycleTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TCycleTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_CYCLE"; }
-
-        int getActionRow() { return 174; }
-    }
-    public static final Terminal.TCycleTerminal T_CYCLE = TCycleTerminal.getInstance();
-
-    public static class TRconTerminal extends Terminal
-    {
-        private TRconTerminal() {;} // Singleton
-        private static TRconTerminal singletonInstance = null;
-        public static final TRconTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TRconTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_RCON"; }
-
-        int getActionRow() { return 175; }
-    }
-    public static final Terminal.TRconTerminal T_RCON = TRconTerminal.getInstance();
-
-    public static class TPlusTerminal extends Terminal
-    {
-        private TPlusTerminal() {;} // Singleton
-        private static TPlusTerminal singletonInstance = null;
-        public static final TPlusTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TPlusTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_PLUS"; }
-
-        int getActionRow() { return 176; }
-    }
-    public static final Terminal.TPlusTerminal T_PLUS = TPlusTerminal.getInstance();
-
-    public static class TNamedeqTerminal extends Terminal
-    {
-        private TNamedeqTerminal() {;} // Singleton
-        private static TNamedeqTerminal singletonInstance = null;
-        public static final TNamedeqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TNamedeqTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_NAMEDEQ"; }
-
-        int getActionRow() { return 177; }
-    }
-    public static final Terminal.TNamedeqTerminal T_NAMEDEQ = TNamedeqTerminal.getInstance();
-
-    public static class TZconTerminal extends Terminal
-    {
-        private TZconTerminal() {;} // Singleton
-        private static TZconTerminal singletonInstance = null;
-        public static final TZconTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TZconTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_ZCON"; }
-
-        int getActionRow() { return 178; }
-    }
-    public static final Terminal.TZconTerminal T_ZCON = TZconTerminal.getInstance();
-
-    public static class TFconTerminal extends Terminal
-    {
-        private TFconTerminal() {;} // Singleton
-        private static TFconTerminal singletonInstance = null;
-        public static final TFconTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TFconTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_FCON"; }
-
-        int getActionRow() { return 179; }
-    }
-    public static final Terminal.TFconTerminal T_FCON = TFconTerminal.getInstance();
-
-    public static class TLtTerminal extends Terminal
-    {
-        private TLtTerminal() {;} // Singleton
-        private static TLtTerminal singletonInstance = null;
-        public static final TLtTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TLtTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_LT"; }
-
-        int getActionRow() { return 180; }
-    }
-    public static final Terminal.TLtTerminal T_LT = TLtTerminal.getInstance();
-
-    public static class TIdentTerminal extends Terminal
-    {
-        private TIdentTerminal() {;} // Singleton
-        private static TIdentTerminal singletonInstance = null;
-        public static final TIdentTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TIdentTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_IDENT"; }
-
-        int getActionRow() { return 181; }
-    }
-    public static final Terminal.TIdentTerminal T_IDENT = TIdentTerminal.getInstance();
-
-    public static class TElsewhereTerminal extends Terminal
-    {
-        private TElsewhereTerminal() {;} // Singleton
-        private static TElsewhereTerminal singletonInstance = null;
-        public static final TElsewhereTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TElsewhereTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_ELSEWHERE"; }
-
-        int getActionRow() { return 182; }
-    }
-    public static final Terminal.TElsewhereTerminal T_ELSEWHERE = TElsewhereTerminal.getInstance();
-
-    public static class TExitTerminal extends Terminal
-    {
-        private TExitTerminal() {;} // Singleton
-        private static TExitTerminal singletonInstance = null;
-        public static final TExitTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TExitTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_EXIT"; }
-
-        int getActionRow() { return 183; }
-    }
-    public static final Terminal.TExitTerminal T_EXIT = TExitTerminal.getInstance();
-
-    public static class TWhileTerminal extends Terminal
-    {
-        private TWhileTerminal() {;} // Singleton
-        private static TWhileTerminal singletonInstance = null;
-        public static final TWhileTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TWhileTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_WHILE"; }
-
-        int getActionRow() { return 184; }
-    }
-    public static final Terminal.TWhileTerminal T_WHILE = TWhileTerminal.getInstance();
-
-    public static class TEndblockdataTerminal extends Terminal
-    {
-        private TEndblockdataTerminal() {;} // Singleton
-        private static TEndblockdataTerminal singletonInstance = null;
-        public static final TEndblockdataTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TEndblockdataTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_ENDBLOCKDATA"; }
-
-        int getActionRow() { return 185; }
-    }
-    public static final Terminal.TEndblockdataTerminal T_ENDBLOCKDATA = TEndblockdataTerminal.getInstance();
-
-    public static class TGotoTerminal extends Terminal
-    {
-        private TGotoTerminal() {;} // Singleton
-        private static TGotoTerminal singletonInstance = null;
-        public static final TGotoTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TGotoTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_GOTO"; }
-
-        int getActionRow() { return 186; }
-    }
-    public static final Terminal.TGotoTerminal T_GOTO = TGotoTerminal.getInstance();
-
-    public static class TRealTerminal extends Terminal
-    {
-        private TRealTerminal() {;} // Singleton
-        private static TRealTerminal singletonInstance = null;
-        public static final TRealTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TRealTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_REAL"; }
-
-        int getActionRow() { return 187; }
-    }
-    public static final Terminal.TRealTerminal T_REAL = TRealTerminal.getInstance();
-
-    public static class TUnformattedeqTerminal extends Terminal
-    {
-        private TUnformattedeqTerminal() {;} // Singleton
-        private static TUnformattedeqTerminal singletonInstance = null;
-        public static final TUnformattedeqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TUnformattedeqTerminal(); return singletonInstance; }
-
-        public String getDescription() { return "T_UNFORMATTEDEQ"; }
-
-        int getActionRow() { return 188; }
-    }
-    public static final Terminal.TUnformattedeqTerminal T_UNFORMATTEDEQ = TUnformattedeqTerminal.getInstance();
+    public static final Terminal.TAllocateTerminal T_ALLOCATE = TAllocateTerminal.getInstance();
 
     public static class TTrueTerminal extends Terminal
     {
@@ -2296,9 +1840,465 @@ public abstract class Terminal extends TerminalOrNonterminal
 
         public String getDescription() { return "T_TRUE"; }
 
-        int getActionRow() { return 189; }
+        int getActionRow() { return 151; }
     }
     public static final Terminal.TTrueTerminal T_TRUE = TTrueTerminal.getInstance();
+
+    public static class TUnderscoreTerminal extends Terminal
+    {
+        private TUnderscoreTerminal() {;} // Singleton
+        private static TUnderscoreTerminal singletonInstance = null;
+        public static final TUnderscoreTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TUnderscoreTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_UNDERSCORE"; }
+
+        int getActionRow() { return 152; }
+    }
+    public static final Terminal.TUnderscoreTerminal T_UNDERSCORE = TUnderscoreTerminal.getInstance();
+
+    public static class TXconTerminal extends Terminal
+    {
+        private TXconTerminal() {;} // Singleton
+        private static TXconTerminal singletonInstance = null;
+        public static final TXconTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TXconTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_XCON"; }
+
+        int getActionRow() { return 153; }
+    }
+    public static final Terminal.TXconTerminal T_XCON = TXconTerminal.getInstance();
+
+    public static class TNamelistTerminal extends Terminal
+    {
+        private TNamelistTerminal() {;} // Singleton
+        private static TNamelistTerminal singletonInstance = null;
+        public static final TNamelistTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TNamelistTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_NAMELIST"; }
+
+        int getActionRow() { return 154; }
+    }
+    public static final Terminal.TNamelistTerminal T_NAMELIST = TNamelistTerminal.getInstance();
+
+    public static class TImplicitTerminal extends Terminal
+    {
+        private TImplicitTerminal() {;} // Singleton
+        private static TImplicitTerminal singletonInstance = null;
+        public static final TImplicitTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TImplicitTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_IMPLICIT"; }
+
+        int getActionRow() { return 155; }
+    }
+    public static final Terminal.TImplicitTerminal T_IMPLICIT = TImplicitTerminal.getInstance();
+
+    public static class TRecursiveTerminal extends Terminal
+    {
+        private TRecursiveTerminal() {;} // Singleton
+        private static TRecursiveTerminal singletonInstance = null;
+        public static final TRecursiveTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TRecursiveTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_RECURSIVE"; }
+
+        int getActionRow() { return 156; }
+    }
+    public static final Terminal.TRecursiveTerminal T_RECURSIVE = TRecursiveTerminal.getInstance();
+
+    public static class TOconTerminal extends Terminal
+    {
+        private TOconTerminal() {;} // Singleton
+        private static TOconTerminal singletonInstance = null;
+        public static final TOconTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TOconTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_OCON"; }
+
+        int getActionRow() { return 157; }
+    }
+    public static final Terminal.TOconTerminal T_OCON = TOconTerminal.getInstance();
+
+    public static class TEndblockTerminal extends Terminal
+    {
+        private TEndblockTerminal() {;} // Singleton
+        private static TEndblockTerminal singletonInstance = null;
+        public static final TEndblockTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TEndblockTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_ENDBLOCK"; }
+
+        int getActionRow() { return 158; }
+    }
+    public static final Terminal.TEndblockTerminal T_ENDBLOCK = TEndblockTerminal.getInstance();
+
+    public static class ErrorTerminal extends Terminal
+    {
+        private ErrorTerminal() {;} // Singleton
+        private static ErrorTerminal singletonInstance = null;
+        public static final ErrorTerminal getInstance() { if (singletonInstance == null) singletonInstance = new ErrorTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "%error"; }
+
+        int getActionRow() { return 159; }
+    }
+    public static final Terminal.ErrorTerminal ERROR = ErrorTerminal.getInstance();
+
+    public static class TAccesseqTerminal extends Terminal
+    {
+        private TAccesseqTerminal() {;} // Singleton
+        private static TAccesseqTerminal singletonInstance = null;
+        public static final TAccesseqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TAccesseqTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_ACCESSEQ"; }
+
+        int getActionRow() { return 160; }
+    }
+    public static final Terminal.TAccesseqTerminal T_ACCESSEQ = TAccesseqTerminal.getInstance();
+
+    public static class TSlasheqTerminal extends Terminal
+    {
+        private TSlasheqTerminal() {;} // Singleton
+        private static TSlasheqTerminal singletonInstance = null;
+        public static final TSlasheqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TSlasheqTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_SLASHEQ"; }
+
+        int getActionRow() { return 161; }
+    }
+    public static final Terminal.TSlasheqTerminal T_SLASHEQ = TSlasheqTerminal.getInstance();
+
+    public static class TComplexTerminal extends Terminal
+    {
+        private TComplexTerminal() {;} // Singleton
+        private static TComplexTerminal singletonInstance = null;
+        public static final TComplexTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TComplexTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_COMPLEX"; }
+
+        int getActionRow() { return 162; }
+    }
+    public static final Terminal.TComplexTerminal T_COMPLEX = TComplexTerminal.getInstance();
+
+    public static class TOnlyTerminal extends Terminal
+    {
+        private TOnlyTerminal() {;} // Singleton
+        private static TOnlyTerminal singletonInstance = null;
+        public static final TOnlyTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TOnlyTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_ONLY"; }
+
+        int getActionRow() { return 163; }
+    }
+    public static final Terminal.TOnlyTerminal T_ONLY = TOnlyTerminal.getInstance();
+
+    public static class TProcedureTerminal extends Terminal
+    {
+        private TProcedureTerminal() {;} // Singleton
+        private static TProcedureTerminal singletonInstance = null;
+        public static final TProcedureTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TProcedureTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_PROCEDURE"; }
+
+        int getActionRow() { return 164; }
+    }
+    public static final Terminal.TProcedureTerminal T_PROCEDURE = TProcedureTerminal.getInstance();
+
+    public static class TIntrinsicTerminal extends Terminal
+    {
+        private TIntrinsicTerminal() {;} // Singleton
+        private static TIntrinsicTerminal singletonInstance = null;
+        public static final TIntrinsicTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TIntrinsicTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_INTRINSIC"; }
+
+        int getActionRow() { return 165; }
+    }
+    public static final Terminal.TIntrinsicTerminal T_INTRINSIC = TIntrinsicTerminal.getInstance();
+
+    public static class TFormattedeqTerminal extends Terminal
+    {
+        private TFormattedeqTerminal() {;} // Singleton
+        private static TFormattedeqTerminal singletonInstance = null;
+        public static final TFormattedeqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TFormattedeqTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_FORMATTEDEQ"; }
+
+        int getActionRow() { return 166; }
+    }
+    public static final Terminal.TFormattedeqTerminal T_FORMATTEDEQ = TFormattedeqTerminal.getInstance();
+
+    public static class TKindeqTerminal extends Terminal
+    {
+        private TKindeqTerminal() {;} // Singleton
+        private static TKindeqTerminal singletonInstance = null;
+        public static final TKindeqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TKindeqTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_KINDEQ"; }
+
+        int getActionRow() { return 167; }
+    }
+    public static final Terminal.TKindeqTerminal T_KINDEQ = TKindeqTerminal.getInstance();
+
+    public static class TSequentialeqTerminal extends Terminal
+    {
+        private TSequentialeqTerminal() {;} // Singleton
+        private static TSequentialeqTerminal singletonInstance = null;
+        public static final TSequentialeqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TSequentialeqTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_SEQUENTIALEQ"; }
+
+        int getActionRow() { return 168; }
+    }
+    public static final Terminal.TSequentialeqTerminal T_SEQUENTIALEQ = TSequentialeqTerminal.getInstance();
+
+    public static class TElsewhereTerminal extends Terminal
+    {
+        private TElsewhereTerminal() {;} // Singleton
+        private static TElsewhereTerminal singletonInstance = null;
+        public static final TElsewhereTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TElsewhereTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_ELSEWHERE"; }
+
+        int getActionRow() { return 169; }
+    }
+    public static final Terminal.TElsewhereTerminal T_ELSEWHERE = TElsewhereTerminal.getInstance();
+
+    public static class TDoubleprecisionTerminal extends Terminal
+    {
+        private TDoubleprecisionTerminal() {;} // Singleton
+        private static TDoubleprecisionTerminal singletonInstance = null;
+        public static final TDoubleprecisionTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TDoubleprecisionTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_DOUBLEPRECISION"; }
+
+        int getActionRow() { return 170; }
+    }
+    public static final Terminal.TDoubleprecisionTerminal T_DOUBLEPRECISION = TDoubleprecisionTerminal.getInstance();
+
+    public static class TSaveTerminal extends Terminal
+    {
+        private TSaveTerminal() {;} // Singleton
+        private static TSaveTerminal singletonInstance = null;
+        public static final TSaveTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TSaveTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_SAVE"; }
+
+        int getActionRow() { return 171; }
+    }
+    public static final Terminal.TSaveTerminal T_SAVE = TSaveTerminal.getInstance();
+
+    public static class TProgramTerminal extends Terminal
+    {
+        private TProgramTerminal() {;} // Singleton
+        private static TProgramTerminal singletonInstance = null;
+        public static final TProgramTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TProgramTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_PROGRAM"; }
+
+        int getActionRow() { return 172; }
+    }
+    public static final Terminal.TProgramTerminal T_PROGRAM = TProgramTerminal.getInstance();
+
+    public static class TDoTerminal extends Terminal
+    {
+        private TDoTerminal() {;} // Singleton
+        private static TDoTerminal singletonInstance = null;
+        public static final TDoTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TDoTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_DO"; }
+
+        int getActionRow() { return 173; }
+    }
+    public static final Terminal.TDoTerminal T_DO = TDoTerminal.getInstance();
+
+    public static class TFileeqTerminal extends Terminal
+    {
+        private TFileeqTerminal() {;} // Singleton
+        private static TFileeqTerminal singletonInstance = null;
+        public static final TFileeqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TFileeqTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_FILEEQ"; }
+
+        int getActionRow() { return 174; }
+    }
+    public static final Terminal.TFileeqTerminal T_FILEEQ = TFileeqTerminal.getInstance();
+
+    public static class TActioneqTerminal extends Terminal
+    {
+        private TActioneqTerminal() {;} // Singleton
+        private static TActioneqTerminal singletonInstance = null;
+        public static final TActioneqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TActioneqTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_ACTIONEQ"; }
+
+        int getActionRow() { return 175; }
+    }
+    public static final Terminal.TActioneqTerminal T_ACTIONEQ = TActioneqTerminal.getInstance();
+
+    public static class TLparenslashTerminal extends Terminal
+    {
+        private TLparenslashTerminal() {;} // Singleton
+        private static TLparenslashTerminal singletonInstance = null;
+        public static final TLparenslashTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TLparenslashTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_LPARENSLASH"; }
+
+        int getActionRow() { return 176; }
+    }
+    public static final Terminal.TLparenslashTerminal T_LPARENSLASH = TLparenslashTerminal.getInstance();
+
+    public static class TWhileTerminal extends Terminal
+    {
+        private TWhileTerminal() {;} // Singleton
+        private static TWhileTerminal singletonInstance = null;
+        public static final TWhileTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TWhileTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_WHILE"; }
+
+        int getActionRow() { return 177; }
+    }
+    public static final Terminal.TWhileTerminal T_WHILE = TWhileTerminal.getInstance();
+
+    public static class TReadeqTerminal extends Terminal
+    {
+        private TReadeqTerminal() {;} // Singleton
+        private static TReadeqTerminal singletonInstance = null;
+        public static final TReadeqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TReadeqTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_READEQ"; }
+
+        int getActionRow() { return 178; }
+    }
+    public static final Terminal.TReadeqTerminal T_READEQ = TReadeqTerminal.getInstance();
+
+    public static class TInterfaceTerminal extends Terminal
+    {
+        private TInterfaceTerminal() {;} // Singleton
+        private static TInterfaceTerminal singletonInstance = null;
+        public static final TInterfaceTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TInterfaceTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_INTERFACE"; }
+
+        int getActionRow() { return 179; }
+    }
+    public static final Terminal.TInterfaceTerminal T_INTERFACE = TInterfaceTerminal.getInstance();
+
+    public static class TGreaterthaneqTerminal extends Terminal
+    {
+        private TGreaterthaneqTerminal() {;} // Singleton
+        private static TGreaterthaneqTerminal singletonInstance = null;
+        public static final TGreaterthaneqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TGreaterthaneqTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_GREATERTHANEQ"; }
+
+        int getActionRow() { return 180; }
+    }
+    public static final Terminal.TGreaterthaneqTerminal T_GREATERTHANEQ = TGreaterthaneqTerminal.getInstance();
+
+    public static class TNeqvTerminal extends Terminal
+    {
+        private TNeqvTerminal() {;} // Singleton
+        private static TNeqvTerminal singletonInstance = null;
+        public static final TNeqvTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TNeqvTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_NEQV"; }
+
+        int getActionRow() { return 181; }
+    }
+    public static final Terminal.TNeqvTerminal T_NEQV = TNeqvTerminal.getInstance();
+
+    public static class TNullTerminal extends Terminal
+    {
+        private TNullTerminal() {;} // Singleton
+        private static TNullTerminal singletonInstance = null;
+        public static final TNullTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TNullTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_NULL"; }
+
+        int getActionRow() { return 182; }
+    }
+    public static final Terminal.TNullTerminal T_NULL = TNullTerminal.getInstance();
+
+    public static class TLparenTerminal extends Terminal
+    {
+        private TLparenTerminal() {;} // Singleton
+        private static TLparenTerminal singletonInstance = null;
+        public static final TLparenTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TLparenTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_LPAREN"; }
+
+        int getActionRow() { return 183; }
+    }
+    public static final Terminal.TLparenTerminal T_LPAREN = TLparenTerminal.getInstance();
+
+    public static class TNmleqTerminal extends Terminal
+    {
+        private TNmleqTerminal() {;} // Singleton
+        private static TNmleqTerminal singletonInstance = null;
+        public static final TNmleqTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TNmleqTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_NMLEQ"; }
+
+        int getActionRow() { return 184; }
+    }
+    public static final Terminal.TNmleqTerminal T_NMLEQ = TNmleqTerminal.getInstance();
+
+    public static class TGtTerminal extends Terminal
+    {
+        private TGtTerminal() {;} // Singleton
+        private static TGtTerminal singletonInstance = null;
+        public static final TGtTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TGtTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_GT"; }
+
+        int getActionRow() { return 185; }
+    }
+    public static final Terminal.TGtTerminal T_GT = TGtTerminal.getInstance();
+
+    public static class TGreaterthanTerminal extends Terminal
+    {
+        private TGreaterthanTerminal() {;} // Singleton
+        private static TGreaterthanTerminal singletonInstance = null;
+        public static final TGreaterthanTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TGreaterthanTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_GREATERTHAN"; }
+
+        int getActionRow() { return 186; }
+    }
+    public static final Terminal.TGreaterthanTerminal T_GREATERTHAN = TGreaterthanTerminal.getInstance();
+
+    public static class THconTerminal extends Terminal
+    {
+        private THconTerminal() {;} // Singleton
+        private static THconTerminal singletonInstance = null;
+        public static final THconTerminal getInstance() { if (singletonInstance == null) singletonInstance = new THconTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_HCON"; }
+
+        int getActionRow() { return 187; }
+    }
+    public static final Terminal.THconTerminal T_HCON = THconTerminal.getInstance();
+
+    public static class TAndTerminal extends Terminal
+    {
+        private TAndTerminal() {;} // Singleton
+        private static TAndTerminal singletonInstance = null;
+        public static final TAndTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TAndTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_AND"; }
+
+        int getActionRow() { return 188; }
+    }
+    public static final Terminal.TAndTerminal T_AND = TAndTerminal.getInstance();
+
+    public static class TExitTerminal extends Terminal
+    {
+        private TExitTerminal() {;} // Singleton
+        private static TExitTerminal singletonInstance = null;
+        public static final TExitTerminal getInstance() { if (singletonInstance == null) singletonInstance = new TExitTerminal(); return singletonInstance; }
+
+        public String getDescription() { return "T_EXIT"; }
+
+        int getActionRow() { return 189; }
+    }
+    public static final Terminal.TExitTerminal T_EXIT = TExitTerminal.getInstance();
 
     public static class EndOfInputTerminal extends Terminal
     {
