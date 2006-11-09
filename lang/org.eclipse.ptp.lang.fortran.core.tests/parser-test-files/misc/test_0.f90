@@ -1,0 +1,8 @@
+PROGRAM TEST_0;
+  IMPLICIT NONE;
+  INTEGER(4) :: N;
+  INTEGER(4) :: M;
+
+  M = 4;
+  N = 4;
+END PROGRAM TEST_0;

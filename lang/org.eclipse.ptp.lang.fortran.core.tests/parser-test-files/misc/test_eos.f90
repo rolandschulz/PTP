@@ -1,0 +1,11 @@
+PROGRAM EOS
+
+  INTEGER :: A;
+
+  INTEGER :: B
+
+  A = 1;
+
+  B = A
+
+END PROGRAM EOS

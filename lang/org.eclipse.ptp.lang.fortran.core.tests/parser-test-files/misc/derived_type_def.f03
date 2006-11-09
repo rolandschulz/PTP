@@ -1,0 +1,4 @@
+TYPE, PRIVATE :: boo
+END TYPE boo
+
+END
