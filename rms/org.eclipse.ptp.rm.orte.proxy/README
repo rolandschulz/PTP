@@ -7,14 +7,14 @@ it will be run on.
 1. Make sure you have checked out the fragment corresponding to your architecture. 
    For example, if you're on a Linux x86 machine, you should have the fragment:
 
-		org.eclipse.ptp.orte.linux.x86
+		org.eclipse.ptp.linux.x86
 
-2. Run this following command to configure the project and set the prefix to
-   the appropriate fragment directory:
+2. Run the following command IN THE FRAGMENT DIRECTORY to configure, build and 
+   install the project:
    
-   		sh SETUP
+   		sh BUILD
 
-3. You are now able to use 'make' and 'make install', either from
+3. You can also use 'make' and 'make install' from this directory, either from
    the command line, or from the 'Make Targets' view in Eclipse to 
    build and install the executable into the fragment directory.
 
