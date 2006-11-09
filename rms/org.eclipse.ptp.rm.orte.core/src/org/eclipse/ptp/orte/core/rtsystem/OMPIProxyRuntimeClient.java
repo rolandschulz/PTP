@@ -45,8 +45,10 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
 			} else {
 				Thread runThread = new Thread("Proxy Server Thread") {
 					public void run() {
-						String cmd = proxyPath2 + " --port="+getSessionPort();
-						System.out.println("RUNNING PROXY SERVER COMMAND: '"+cmd+"'");
+						String[] cmd = new String[2];
+						cmd[0] = proxyPath2;
+						cmd[1] = "--port="+getSessionPort();
+						System.out.println("RUNNING PROXY SERVER COMMAND: '"+cmd[0]+" "+cmd[1]+"'");
 						
 						try {
 							Process process = Runtime.getRuntime().exec(cmd);
