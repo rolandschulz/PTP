@@ -23,6 +23,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -84,40 +85,58 @@ public class StartResourceManagersObjectActionDelegate implements
 				return;
 			}
 			
-			final IRunnableWithProgress op = new IRunnableWithProgress() {
+			if (true) {
+				new Job("Starting Resource Manager"){
 
-				public void run(final IProgressMonitor monitor) {
-					safeRunAsyncInUIThread(new SafeRunnable() {
-						public void run() throws Exception {
-							try {
-								rmManager.start(monitor);
-							} catch (CoreException e) {
-								final String message = "Unable to start ResourceManager \""
-									+ rmManager.getConfiguration().getName() + "\"";
-								Status status = new Status(Status.ERROR, PTPUIPlugin.PLUGIN_ID, 1,
-										message, e);
-								if (false) {
-									ErrorDialog dlg = new ErrorDialog(targetShell,
-											"Error Starting Resource Manager", message, status,
-											IStatus.ERROR);
-									dlg.open();
-									PTPUIPlugin.log(status);
-								}
-								else {
-									throw new CoreException(status);
+					protected IStatus run(IProgressMonitor monitor) {
+						try {
+							rmManager.start(monitor);
+						} catch (CoreException e) {
+							return e.getStatus();
+						}
+						if (monitor.isCanceled()) {
+							return Status.CANCEL_STATUS;
+						}
+						return Status.OK_STATUS;
+					}
+				}.schedule();
+			}
+			else {
+				final IRunnableWithProgress op = new IRunnableWithProgress() {
+
+					public void run(final IProgressMonitor monitor) {
+						safeRunAsyncInUIThread(new SafeRunnable() {
+							public void run() throws Exception {
+								try {
+									rmManager.start(monitor);
+								} catch (CoreException e) {
+									final String message = "Unable to start ResourceManager \""
+										+ rmManager.getConfiguration().getName() + "\"";
+									Status status = new Status(Status.ERROR, PTPUIPlugin.PLUGIN_ID, 1,
+											message, e);
+									if (false) {
+										ErrorDialog dlg = new ErrorDialog(targetShell,
+												"Error Starting Resource Manager", message, status,
+												IStatus.ERROR);
+										dlg.open();
+										PTPUIPlugin.log(status);
+									}
+									else {
+										throw new CoreException(status);
+									}
 								}
 							}
-						}
-					});
-				}
-			};
-			
-			SafeRunnable.run(new SafeRunnable(){
+						});
+					}
+				};
 
-				public void run() throws Exception {
-					new ProgressMonitorDialog(targetShell).run(true, true, op);
-				}
-			});
+				SafeRunnable.run(new SafeRunnable(){
+
+					public void run() throws Exception {
+						new ProgressMonitorDialog(targetShell).run(true, true, op);
+					}
+				});
+			}
 		}
 	}
 

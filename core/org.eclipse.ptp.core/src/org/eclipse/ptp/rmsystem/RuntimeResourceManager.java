@@ -25,7 +25,9 @@ import java.util.Iterator;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.ptp.core.AttributeConstants;
 import org.eclipse.ptp.core.IPJob;
@@ -195,7 +197,14 @@ public abstract class RuntimeResourceManager extends AbstractResourceManager
 		if (monitor == null) {
 			monitor = new NullProgressMonitor();
 		}
-		refreshRuntimeSystems(monitor);
+		monitor.beginTask("Refresh Runtime Systems", 10);
+		SubProgressMonitor subMonitor = new SubProgressMonitor(monitor, 10);
+		try {
+			refreshRuntimeSystems(subMonitor);
+		}
+		finally {
+			monitor.done();
+		}
 	}
 
 	public void removeJob(IPJob job) {
@@ -469,42 +478,62 @@ public abstract class RuntimeResourceManager extends AbstractResourceManager
 				controlSystem.shutdown();
 				controlSystem = null;
 				monitor.worked(10);
+				if (monitor.isCanceled()) {
+					throw new OperationCanceledException("refresh runtime systems -- cancled");
+				}
 			}
 			if (monitoringSystem != null) {
 				monitor.subTask("Shutting down monitor system...");
 				monitoringSystem.shutdown();
 				monitoringSystem = null;
 				monitor.worked(10);
+				if (monitor.isCanceled()) {
+					throw new OperationCanceledException("refresh runtime systems -- cancled");
+				}
 			}
 			if (runtimeProxy != null) {
 				monitor.subTask("Shutting down runtime proxy...");
 				runtimeProxy.shutdown();
 				runtimeProxy = null;
 				monitor.worked(10);
-			}
-			if (monitor.isCanceled()) {
-				throw new CoreException(Status.CANCEL_STATUS);
+				if (monitor.isCanceled()) {
+					throw new OperationCanceledException("refresh runtime systems -- cancled");
+				}
 			}
 			monitor.worked(10);
 	
 			/* load up the control and monitoring systems for the simulation */
-			doStartRuntime(monitor);
+			SubProgressMonitor subMonitor = new SubProgressMonitor(monitor, 10);
+			doStartRuntime(subMonitor);
+
+			if (monitor.isCanceled()) {
+				throw new OperationCanceledException("refresh runtime systems -- cancled");
+			}
 	
 			clearContents();
 			
 			monitor.subTask("Starting up monitor system...");
 			monitoringSystem.startup();
+			if (monitor.isCanceled()) {
+				throw new OperationCanceledException("refresh runtime systems -- cancled");
+			}
 			monitor.worked(10);
 			monitor.subTask("Starting up control system...");
 			controlSystem.startup();
+			if (monitor.isCanceled()) {
+				throw new OperationCanceledException("refresh runtime systems -- cancled");
+			}
 			monitor.worked(10);
 			try {
 				monitor.subTask("Setup the monitoring system...");
 				monitor.beginTask("", 1);
 				monitoringSystem.addRuntimeListener(this);
-				controlSystem.addRuntimeListener(this);		
+				controlSystem.addRuntimeListener(this);	
 				monitor.worked(1);
 				monitoringSystem.initiateDiscovery();
+				if (monitor.isCanceled()) {
+					throw new OperationCanceledException("refresh runtime systems -- cancled");
+				}
 				monitor.done();
 			} catch (CoreException e) {
 				clearContents();

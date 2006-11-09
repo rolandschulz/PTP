@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.ptp.core.IModelListener;
 import org.eclipse.ptp.core.INodeListener;
@@ -190,14 +191,24 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	 * @see org.eclipse.ptp.rm.IResourceManager#start()
 	 */
 	public void start(IProgressMonitor monitor) throws CoreException {
+		monitor.beginTask("Starting Resource Manager " + getName(), 10);
 		if (!status.equals(ResourceManagerStatus.STARTED) &&
 				!status.equals(ResourceManagerStatus.ERROR)) {
 			if (monitor == null) {
 				monitor = new NullProgressMonitor();
 			}
-			doStart(monitor);
+			SubProgressMonitor subMonitor = new SubProgressMonitor(monitor, 10);
+			try {
+				doStart(subMonitor);
+			}
+			finally {
+				monitor.done();
+			}
 			setStatus(ResourceManagerStatus.STARTED, false);
 			fireStarted();
+		}
+		else {
+			monitor.done();
 		}
 	}
 
@@ -319,7 +330,7 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 		
 		for (int i = 0, n = tmpListeners.length; i < n; ++i) {
 			final IResourceManagerListener listener = (IResourceManagerListener) tmpListeners[i];
-			SafeRunnable.run(new SafeRunnable() {
+			safeRunAsyncInUIThread(new SafeRunnable() {
 				public void run() {
 					listener.handleStarted(AbstractResourceManager.this);
 				}
@@ -332,7 +343,7 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 		
 		for (int i = 0, n = tmpListeners.length; i < n; ++i) {
 			final IResourceManagerListener listener = (IResourceManagerListener) tmpListeners[i];
-			SafeRunnable.run(new SafeRunnable() {
+			safeRunAsyncInUIThread(new SafeRunnable() {
 				public void run() {
 					listener.handleStatusChanged(oldStatus, AbstractResourceManager.this);
 				}
@@ -345,7 +356,7 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 		
 		for (int i = 0, n = tmpListeners.length; i < n; ++i) {
 			final IResourceManagerListener listener = (IResourceManagerListener) tmpListeners[i];
-			SafeRunnable.run(new SafeRunnable() {
+			safeRunAsyncInUIThread(new SafeRunnable() {
 				public void run() {
 					listener.handleStopped(AbstractResourceManager.this);
 				}
