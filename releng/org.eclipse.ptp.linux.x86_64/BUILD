@@ -4,7 +4,7 @@
 #
 export KNOWN_FRAGMENTS="\
 	org.eclipse.ptp.debug.sdm\
-	org.eclipse.ptp.orte"
+	org.eclipse.ptp.orte.proxy"
 	
 export PARENT=`dirname $PWD`
 export FRAGMENT=`basename $PWD`
