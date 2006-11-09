@@ -3,7 +3,5 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
-	<classpathentry kind="lib" path="/Users/rasmussn/Languages/compilers/antlr/antlr-3.0b4/lib/antlr-3.0b4.jar"/>
-	<classpathentry kind="lib" path="/Users/rasmussn/Languages/compilers/antlr/antlr-3.0b4/lib/stringtemplate-2.3b9.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
