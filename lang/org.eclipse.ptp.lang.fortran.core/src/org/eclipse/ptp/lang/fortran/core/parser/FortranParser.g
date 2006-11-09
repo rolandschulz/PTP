@@ -19,6 +19,15 @@ options {
     tokenVocab=FortranLexer;
 }
 
+@members {
+	public boolean hasErrorOccurred = false;
+
+    public void reportError(RecognitionException re) {
+        super.reportError(re);
+        hasErrorOccurred = true;
+    }
+}// end members
+
 /*
  * Section 1:
  */
@@ -313,6 +322,7 @@ intrinsic_type_spec
 // ERR_CHK 404 scalar_int_initialization_expr replaced by expr
 kind_selector
     : T_LPAREN (T_IDENT /* 'KIND' */ T_EQUALS)? expr T_RPAREN
+//     : T_LPAREN (T_KIND T_EQUALS)? expr T_RPAREN
     ;
 
 // TODO: turn into terminal (what about kind parameter)
@@ -2743,10 +2753,11 @@ program_stmt
 // T_IDENT inlined for program_name
 end_program_stmt
 options {k=2;}
-	:	(T_END T_PROGRAM) => T_END T_PROGRAM ( T_IDENT )? T_EOS
-	|	T_ENDPROGRAM ( T_IDENT )? T_EOS
-	|	T_END T_EOS
+	:	(T_END T_PROGRAM) => T_END T_PROGRAM ( T_IDENT )? end_of_stmt
+	|	T_ENDPROGRAM ( T_IDENT )? end_of_stmt
+	|	T_END end_of_stmt
 	;
+
 	
 // R1104
 // C1104 (R1104) A module specification-part shall not contain a stmt-function-stmt, an entry-stmt or a format-stmt
@@ -2763,12 +2774,13 @@ module_stmt
 	:	T_MODULE ( T_IDENT )? T_EOS
 	;
 
+
 // R1106
 end_module_stmt
 options {k=2;}
-        :       (T_END T_MODULE) => T_END T_MODULE ( T_IDENT )? T_EOS
-        |       T_ENDMODULE ( T_IDENT )? T_EOS
-        |       T_END T_EOS
+        :       (T_END T_MODULE) => T_END T_MODULE ( T_IDENT )? end_of_stmt
+        |       T_ENDMODULE ( T_IDENT )? end_of_stmt
+        |       T_END end_of_stmt
         ;
 
 // R1107
@@ -2847,11 +2859,11 @@ options {k=2;}
 // R1118
 end_block_data_stmt
 options {k=2;}
-	:   (T_END T_BLOCK) => T_END T_BLOCK T_DATA ( T_IDENT )? T_EOS
-	|   (T_ENDBLOCK T_DATA) => T_ENDBLOCK T_DATA ( T_IDENT )? T_EOS
-	|   (T_END T_BLOCKDATA) => T_END T_BLOCKDATA ( T_IDENT )? T_EOS
-	|   T_ENDBLOCKDATA ( T_IDENT )? T_EOS
-	|	T_END T_EOS
+	:   (T_END T_BLOCK) => T_END T_BLOCK T_DATA ( T_IDENT )? end_of_stmt
+	|   (T_ENDBLOCK T_DATA) => T_ENDBLOCK T_DATA ( T_IDENT )? end_of_stmt
+	|   (T_END T_BLOCKDATA) => T_END T_BLOCKDATA ( T_IDENT )? end_of_stmt
+	|   T_ENDBLOCKDATA ( T_IDENT )? end_of_stmt
+	|	T_END end_of_stmt
 	;
 
 /*
@@ -3075,9 +3087,9 @@ result_name
 // R1230
 end_function_stmt
 options {k=2;}
-	: (T_END T_FUNCTION) => T_END T_FUNCTION ( T_IDENT )? T_EOS
-	| T_ENDFUNCTION ( T_IDENT )? T_EOS
-	| T_END T_EOS
+	: (T_END T_FUNCTION) => T_END T_FUNCTION ( T_IDENT )? end_of_stmt
+	| T_ENDFUNCTION ( T_IDENT )? end_of_stmt
+	| T_END end_of_stmt
 	;
 
 // R1231
@@ -3110,9 +3122,9 @@ dummy_arg_list
 // R1234
 end_subroutine_stmt
 options {k=2;}
-    : (T_END T_SUBROUTINE) => T_END T_SUBROUTINE ( T_IDENT )? T_EOS
-    | T_ENDSUBROUTINE ( T_IDENT )? T_EOS
-    | T_END T_EOS
+    : (T_END T_SUBROUTINE) => T_END T_SUBROUTINE ( T_IDENT )? end_of_stmt
+    | T_ENDSUBROUTINE ( T_IDENT )? end_of_stmt
+    | T_END end_of_stmt
     ;
 
 // R1235
@@ -3138,3 +3150,12 @@ return_stmt
 stmt_function_stmt
 	:	T_STMT_FUNCTION T_IDENT T_LPAREN ( generic_name_list )? T_RPAREN T_EQUALS expr T_EOS
 	;
+
+// added this to have a way to match the T_EOS and EOF combinations
+end_of_stmt 
+options {k=2;}
+    : EOF
+    | (T_EOS EOF) => T_EOS EOF
+    | T_EOS
+    ;
+
