@@ -11,6 +11,9 @@
 
 package org.eclipse.ptp.pldt.wizards.wizardPages;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.cdt.managedbuilder.core.BuildException;
 import org.eclipse.cdt.managedbuilder.core.IConfiguration;
 import org.eclipse.cdt.managedbuilder.core.IManagedBuildInfo;
@@ -43,8 +46,6 @@ public class MPIProjectRunnable implements Runnable {
 	 * @see java.lang.Runnable#run()
 	 */
 	public void run() {
-		if(traceOn)System.out.println("=============================== MPIProjectRunnable.run()...");
- 
 		String pageID = MPIProjectWizardPage.PAGE_ID;
 		String propID=MPIProjectWizardPage.DO_MPI_INCLUDES;
 		Object obj = MBSCustomPageManager.getPageProperty(pageID, propID);
@@ -75,10 +76,7 @@ public class MPIProjectRunnable implements Runnable {
 		
 		propID=MPIProjectWizardPage.MPI_LINK_COMMAND_PROP_ID;
 		String mpiLinkCommand=getNewPropValue(pageID,propID,"mpicc");
-		
-		
-		
-		
+ 
 		IManagedBuildInfo info = null;
 		try {
 			info = ManagedBuildManager.getBuildInfo(proj);
@@ -149,6 +147,7 @@ public class MPIProjectRunnable implements Runnable {
 	 */
 	private void addIncludePath(IConfiguration cf, String newIncludePath) {
 
+		// note: could be > 1 path in 'newIncludePath'
 		String ext = "c";
 		ITool cfTool = cf.getToolFromInputExtension(ext);
 
@@ -163,6 +162,7 @@ public class MPIProjectRunnable implements Runnable {
 			System.out.println("MPIProjectRunnable, problem getting include paths: "+e.getMessage());
 			e.printStackTrace();
 		}
+		
 		String[] newIncludePaths = add(includePaths, newIncludePath);
 		ManagedBuildManager.setOption(cf, cfTool, option, newIncludePaths);
 
@@ -218,12 +218,15 @@ public class MPIProjectRunnable implements Runnable {
 			switch (type) {
 			case IOption.INCLUDE_PATH:
 				valueList = option.getIncludePaths();
+				valueList = add(valueList,value);
 				break;
 			case IOption.LIBRARIES:
 				valueList = option.getLibraries();
+				valueList=addNotPath(valueList, value);
 				break;
 			case IOption.STRING_LIST:// this is type for library search path
 				valueList = option.getStringListValue();
+				valueList=addNotPath(valueList,value);
 				break;
 			default:
 				System.out.println("Wizard runnable postprocessing, can't get type of option for " + option.getName());
@@ -232,7 +235,7 @@ public class MPIProjectRunnable implements Runnable {
 			}
 
 			// add the new one to the list of old ones
-			valueList = add(valueList, value);
+			//valueList = add(valueList, value);
 			// update the option in the managed builder options
 			ManagedBuildManager.setOption(cf, tool, option, valueList);
 
@@ -342,18 +345,46 @@ public class MPIProjectRunnable implements Runnable {
 	}
 
 	/**
-	 * Add an include path to the list of include paths
+	 * Add one or more paths to the list of paths
 	 * 
-	 * @param includePaths
-	 * @param mpiIncludePath
+	 * @param includePaths the existing list of paths to add to
+	 * @param newPath the new path to add; may be >1 directory, with path delimiter
+	 * @return the merged list
+	 */
+	private String[] add(String[] includePaths, String newPath) {
+		String pathSep=java.io.File.pathSeparator;  // semicolon for windows, colon for Mac/Linux
+		List<String> newPathList = new ArrayList<String>();
+		String path;
+		for (int i = 0; i < includePaths.length; i++) {
+			path = includePaths[i];
+			newPathList.add(path);
+		}
+		String[] newPathArray=newPath.split(pathSep);
+		for (int i = 0; i < newPathArray.length; i++) {
+			path = newPathArray[i];
+			newPathList.add(path);
+		}
+		
+		String[] newArray=(String[])newPathList.toArray(new String[0]);
+		return newArray;
+		
+		/*
+
+		*/
+	}
+
+	/**
+	 * Add a single string to an array of strings
+	 * @param strList
+	 * @param newStr
 	 * @return
 	 */
-	private String[] add(String[] includePaths, String mpiIncludePath) {
-		int len = includePaths.length;
-		String newPaths[] = new String[len + 1];
-		System.arraycopy(includePaths, 0, newPaths, 0, len);
-		newPaths[len] = mpiIncludePath;
-		return newPaths;
+	private String[] addNotPath(String[] strList, String newStr) {
+		int len = strList.length;
+		String newList[] = new String[len + 1];
+		System.arraycopy(strList, 0, newList, 0, len);
+		newList[len] = newStr;
+		return newList;
 	}
 
 }
