@@ -41,12 +41,13 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
 
 /**
- * Wizard Page for collecting info about MPI project
+ * Wizard Page for collecting info about MPI project - appended to end of
+ * "New Managed Make C project" wizard
  * @author Beth Tibbitts
  * 
  */
 public class MPIProjectWizardPage extends MBSCustomPage {
-	private static final boolean traceOn=true;
+	private static final boolean traceOn=false;
 
 	private Composite composite;
 	public static final String PAGE_ID="org.eclipse.ptp.pldt.wizards.wizardPages.MPIProjectWizardPage";
@@ -72,7 +73,6 @@ public class MPIProjectWizardPage extends MBSCustomPage {
 	
 	public static final String MPI_COMPILE_COMMAND_PROP_ID = "mpiCompileCommand";
 	public static final String MPI_LINK_COMMAND_PROP_ID = "mpiLinkCommand";
-	
 
 	private String currentMpiIncludePath;
 	private String currentLibName;
@@ -111,7 +111,7 @@ public class MPIProjectWizardPage extends MBSCustomPage {
 
 	/**
 	 * The CDT new project wizard page for MPI projects.  
-	 * Adds the include paths and libary information for an MPI project.
+	 * Adds the include paths, library information, etc. for an MPI project.
 	 * This page shows up after the other CDT new project wizard pages.
 	 * 
 	 */
@@ -136,6 +136,8 @@ public class MPIProjectWizardPage extends MBSCustomPage {
 		setDefaultOtherNames(defaultMpiIncludePath);
 		// the following sets what will be remembered when we leave the page.
 		setCurrentMpiIncludePath(defaultMpiIncludePath);
+		
+		defaultMpiBuildCommand=preferenceStore.getString(MpiIDs.MPI_BUILD_CMD);
 		setCurrentMpiCompileCommand(defaultMpiBuildCommand);
 		setCurrentMpiLinkCommand(defaultMpiBuildCommand);		
 	}
@@ -170,7 +172,15 @@ public class MPIProjectWizardPage extends MBSCustomPage {
 	private void setDefaultOtherNames(String mpiIncludePath) {
 		defaultMpiLibName="mpi";
 		setCurrentMpiLibName(defaultMpiLibName);
-		IPath path = Path.fromOSString(mpiIncludePath);
+		
+		// if >1 path in mpi include path, use just the first
+		// one to guess at the libpath
+		String tempPath=mpiIncludePath;
+		int sepLoc=tempPath.indexOf(java.io.File.pathSeparatorChar);
+		if(-1!=sepLoc) {
+			tempPath=mpiIncludePath.substring(0, sepLoc);
+		}
+		IPath path = Path.fromOSString(tempPath);
 		path=path.removeLastSegments(1);
 		path=path.addTrailingSeparator();
 
@@ -185,7 +195,6 @@ public class MPIProjectWizardPage extends MBSCustomPage {
 		defaultMpiIncludePath=temp;
 		setCurrentMpiIncludePath(defaultMpiIncludePath);	
 			
-		defaultMpiBuildCommand="mpicc";
 		setCurrentMpiCompileCommand(defaultMpiBuildCommand);
 	}
 
@@ -262,7 +271,7 @@ public class MPIProjectWizardPage extends MBSCustomPage {
 	 * @param selectedPath
 	 */
 	private void updateIncludePathField(String selectedPath) {
-		System.out.println("APWP.updateLocationField to " + selectedPath);
+		if(traceOn)System.out.println("MPWP.updateLocationField to " + selectedPath);
 		includePathField.setText(selectedPath);
 	}
 	/**
@@ -271,7 +280,7 @@ public class MPIProjectWizardPage extends MBSCustomPage {
 	 * @param selectedPath
 	 */
 	private void updateLibPathField(String selectedPath) {
-		System.out.println("APWP.updateLocationField to " + selectedPath);
+		if(traceOn)System.out.println("MPWP.updateLocationField to " + selectedPath);
 		libPathField.setText(selectedPath);
 	}
 
@@ -330,8 +339,7 @@ public class MPIProjectWizardPage extends MBSCustomPage {
 	private String stripTrailingSeparator(String str) {
 		if(str.length()==0)return str;
 		char lastChar = str.charAt(str.length() - 1);
-		// BRT how to find ; vs : in a platform-independent manner?
-		if (lastChar == Path.DEVICE_SEPARATOR|| lastChar== ';') {
+		if (lastChar == java.io.File.pathSeparatorChar) {
 			String temp = str.substring(0, str.length() - 1);
 			return temp;
 		}
@@ -376,6 +384,7 @@ public class MPIProjectWizardPage extends MBSCustomPage {
 		});
 
 		// how do we know when next/finish button pushed? we don't.
+		// we just store all info where we can find it when the MPIProjectRunnable runs after all the wizard pages are done.
 		
 		libLabel=new Label(composite, SWT.NONE);
 		libLabel.setText("Library name:");
@@ -635,7 +644,7 @@ public class MPIProjectWizardPage extends MBSCustomPage {
 
 	/**
 	 * Enable/disable "user area" which is the place user can type and make
-	 * changes (includePathField, and its label and button)
+	 * changes (includePathField, its label and button, etc.)
 	 * 
 	 * @param enabled
 	 */
