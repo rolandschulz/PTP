@@ -247,45 +247,6 @@ public class PTPDebugCorePlugin extends Plugin {
 		}
 		return logger;
 	}
-	public String locateFragmentFile(String dir, String file) {
-		Bundle[] frags = Platform.getFragments(Platform.getBundle(PTPDebugCorePlugin.PLUGIN_ID));
-		String os = Platform.getOS();
-		String arch = Platform.getOSArch();
-		String os_arch = os+"."+arch;
-		System.out.println("OS = '"+os+"', Architecture = '"+arch+"', OS_ARCH combo = '"+os_arch+"'");
-		String ptp_version = (String)getDefault().getBundle().getHeaders().get("Bundle-Version");
-		System.out.println("PTP Version = "+ptp_version);
-		
-		for(int i=0; i<frags.length; i++) {
-			Bundle frag = frags[i];
-			URL path = frag.getEntry("/");
-			try {
-				URL local_path = Platform.asLocalURL(path);
-				String str_path = local_path.getPath();
-				System.out.println("Fragment "+i+" path: '"+str_path+"'");
-				
-				/* OK so now we know where the absolute path of this fragment is -
-				 * but is this the fragment for the machine we're running on?
-				 */
-				int idx = str_path.indexOf(os_arch);
-				if(idx > 0) {
-					/* found it!  This is the right fragment for our OS & arch */
-					System.out.println("\tCorrect fragment for our OS & arch");
-					String file_path = str_path + dir + "/" + file;
-					System.out.println("\tSearching for file in '"+file_path+"'");
-					File f = new File(file_path);
-					if(f.exists()) {
-						System.out.println("\t\t**** FOUND IT!");
-						return file_path;
-					}
-				}
-
-			} catch(Exception e) { }
-		}
-		
-		/* guess we never found it.... */
-		return null;
-	}
 
 	private synchronized void setDispatching(boolean dispatching) {
 		if (dispatching) {

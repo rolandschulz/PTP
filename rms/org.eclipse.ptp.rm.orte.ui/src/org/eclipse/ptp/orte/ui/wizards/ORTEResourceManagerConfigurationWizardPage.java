@@ -156,7 +156,7 @@ public final class ORTEResourceManagerConfigurationWizardPage extends
 		serverFile = preferences.getString(PreferenceConstants.ORTE_PROXY_PATH);
 		/* if they don't have the ptp_orte_proxy path set, let's try and give them a default that might help */
 		if(serverFile.equals("")) {
-			serverFile = PTPCorePlugin.getDefault().locateFragmentFile("org.eclipse.ptp.orte", "ptp_orte_proxy");
+			serverFile = PTPCorePlugin.getDefault().locateFragmentFile("org.eclipse.ptp", "ptp_orte_proxy");
 	    }
 		
 		System.out.println("serverFile: " + serverFile);

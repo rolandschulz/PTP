@@ -149,7 +149,7 @@ public class OMPIPreferencePage extends PreferencePage implements IWorkbenchPref
 		orteServerFile = preferences.getString(PreferenceConstants.ORTE_PROXY_PATH);
 		/* if they don't have the ptp_orte_proxy path set, let's try and give them a default that might help */
 		if(orteServerFile.equals("")) {
-			orteServerFile = PTPCorePlugin.getDefault().locateFragmentFile("org.eclipse.ptp.orte", "ptp_orte_proxy");
+			orteServerFile = PTPCorePlugin.getDefault().locateFragmentFile("org.eclipse.ptp", "ptp_orte_proxy");
         }
 		
 		if (orteServerFile == null) {
