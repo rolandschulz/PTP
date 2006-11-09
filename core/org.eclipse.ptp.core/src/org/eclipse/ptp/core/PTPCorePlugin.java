@@ -28,16 +28,11 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
 import org.eclipse.ptp.internal.core.ModelManager;
-import org.eclipse.ptp.rmsystem.IResourceManager;
-import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
-import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchPage;
@@ -296,67 +291,20 @@ public class PTPCorePlugin extends AbstractUIPlugin {
 		super.start(context);
 
 		modelManager = new ModelManager();
-		
-		// FIXME need to fix this
-		if (true) {
-			new Job("Loading Resource Managers"){
+		new Job("Starting Model Manager"){
 
-				protected IStatus run(IProgressMonitor monitor) {
-					try {
-						//Thread.sleep(5000);
-						modelManager.start(monitor);
-						//Thread.sleep(5000);
-					} catch (CoreException e) {
-						// log(e);
-						return e.getStatus();
-//					} catch (InterruptedException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//						return Status.CANCEL_STATUS;
-					}
-					if (monitor.isCanceled()) {
-						return Status.CANCEL_STATUS;
-					}
-					return Status.OK_STATUS;
+			protected IStatus run(IProgressMonitor monitor) {
+				try {
+					modelManager.start(monitor);
+				} catch (CoreException e) {
+					return e.getStatus();
 				}
-			}.schedule();
-		}
-		else {
-			Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
-			int MSChoiceID = preferences.getInt(PreferenceConstants.MONITORING_SYSTEM_SELECTION);
-			String MSChoice = MonitoringSystemChoices.getMSNameByID(MSChoiceID);
-			int CSChoiceID = preferences.getInt(PreferenceConstants.CONTROL_SYSTEM_SELECTION);
-			String CSChoice = ControlSystemChoices.getCSNameByID(CSChoiceID);
-
-			System.out.println("Your Control System Choice: '"+CSChoice+"'");
-			System.out.println("Your Monitoring System Choice: '"+MSChoice+"'");
-			
-			if (ControlSystemChoices.getCSArrayIndexByID(CSChoiceID) == -1 ||
-					MonitoringSystemChoices.getMSArrayIndexByID(MSChoiceID) == -1) {
-				MSChoiceID = MonitoringSystemChoices.ORTE;
-				CSChoiceID = ControlSystemChoices.ORTE;
-
-				System.err.println("No previous (or invalid) control or monitoring system selected.\n\nDefault systems set to Open Runtime Environment (ORTE).  To change, use the Window->Preferences->PTP preferences page.");
-				
-				MSChoice = MonitoringSystemChoices.getMSNameByID(MSChoiceID);
-				CSChoice = ControlSystemChoices.getCSNameByID(CSChoiceID);
-
-				System.out.println("Your Default Control System Choice: '"+CSChoice+"'");
-				System.out.println("Your Default Monitoring System Choice: '"+MSChoice+"'");
+				if (monitor.isCanceled()) {
+					return Status.CANCEL_STATUS;
+				}
+				return Status.OK_STATUS;
 			}
-			
-			final IPUniverseControl universe = (IPUniverseControl) modelManager.getUniverse();
-
-			switch (MSChoiceID) {
-			case MonitoringSystemChoices.ORTE:
-				setORTEResourceManager(universe);
-				break;
-			case MonitoringSystemChoices.MPICH2:
-				setMPICH2ResourceManager(universe);
-			default:
-				break;
-			}
-		}
+		}.schedule();
 	}
 
 	/**
@@ -365,20 +313,6 @@ public class PTPCorePlugin extends AbstractUIPlugin {
 	public void stop(BundleContext context) throws Exception {
 		modelManager.shutdown();
 		super.stop(context);
-	}
-
-	private void setMPICH2ResourceManager(final IPUniverseControl universe) {
-		IResourceManagerFactory factory = getModelManager().getResourceManagerFactory("org.eclipse.ptp.mpich2.core.resourcemanager");
-		IResourceManagerConfiguration config = factory.createConfiguration();
-		final IResourceManager resourceManager = factory.create(config);
-		modelManager.addResourceManager(resourceManager);
-	}
-
-	private void setORTEResourceManager(final IPUniverseControl universe) {
-		IResourceManagerFactory factory = getModelManager().getResourceManagerFactory("org.eclipse.ptp.orte.core.resourcemanager");
-		IResourceManagerConfiguration config = factory.createConfiguration();
-		final IResourceManager resourceManager = factory.create(config);
-		modelManager.addResourceManager(resourceManager);
 	}
 
 }

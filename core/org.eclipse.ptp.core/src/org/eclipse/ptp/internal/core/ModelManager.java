@@ -30,6 +30,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.ptp.core.IModelListener;
@@ -39,14 +41,10 @@ import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPUniverse;
 import org.eclipse.ptp.core.IProcessListener;
 import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.core.elementcontrols.IPJobControl;
-import org.eclipse.ptp.core.elementcontrols.IPQueueControl;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
 import org.eclipse.ptp.core.events.IModelEvent;
-import org.eclipse.ptp.core.events.IModelRuntimeNotifierEvent;
 import org.eclipse.ptp.core.events.INodeEvent;
 import org.eclipse.ptp.core.events.IProcessEvent;
-import org.eclipse.ptp.core.events.ModelRuntimeNotifierEvent;
 import org.eclipse.ptp.internal.rmsystem.ResourceManagerPersistence;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory;
 import org.eclipse.ptp.rmsystem.IResourceManager;
@@ -57,9 +55,6 @@ import org.eclipse.ptp.rmsystem.ResourceManagerStatus;
 import org.eclipse.ptp.rmsystem.events.IResourceManagerAddedRemovedEvent;
 import org.eclipse.ptp.rmsystem.events.IResourceManagerContentsChangedEvent;
 import org.eclipse.ptp.rmsystem.events.ResourceManagerAddedRemovedEvent;
-import org.eclipse.ptp.rtsystem.IControlSystem;
-import org.eclipse.ptp.rtsystem.IMonitoringSystem;
-import org.eclipse.ptp.rtsystem.IRuntimeProxy;
 import org.eclipse.swt.widgets.Display;
 
 public class ModelManager implements IModelManager, IResourceManagerChangedListener,
@@ -248,7 +243,7 @@ IResourceManagerListener {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.IModelManager#loadResourceManagers()
 	 */
-	public void loadResourceManagers(IProgressMonitor monitor) {
+	public void loadResourceManagers(IProgressMonitor monitor) throws CoreException {
 		ResourceManagerPersistence rmp = new ResourceManagerPersistence();
 		// Loads and, if necessary, starts saved resource managers.
 		rmp.loadResourceManagers(getResourceManagersFile(), getResourceManagerFactories(),
@@ -332,7 +327,14 @@ IResourceManagerListener {
 	}
 	
 	public void start(IProgressMonitor monitor) throws CoreException {
-		loadResourceManagers(monitor);
+		monitor.beginTask("Starting Model Manager", 10);
+		try {
+			SubProgressMonitor subMonitor = new SubProgressMonitor(monitor, 10);
+			loadResourceManagers(subMonitor);
+		}
+		finally {
+			monitor.done();
+		}
 	}
 
 	/**

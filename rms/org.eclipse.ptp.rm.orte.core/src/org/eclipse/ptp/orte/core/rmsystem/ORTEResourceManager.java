@@ -21,6 +21,7 @@ package org.eclipse.ptp.orte.core.rmsystem;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
@@ -42,53 +43,49 @@ public class ORTEResourceManager extends RuntimeResourceManager {
 	}
 
 	protected void doStartRuntime(IProgressMonitor monitor) throws CoreException {
-		ORTEResourceManagerConfiguration config = (ORTEResourceManagerConfiguration) getConfiguration();
-		String serverFile = config.getOrteServerFile();
-		boolean launchManually = config.isLaunchManually();
-		/* load up the control and monitoring systems for OMPI */
-		monitor.subTask("Starting OMPI proxy runtime...");
-		OMPIProxyRuntimeClient runtimeProxy = new OMPIProxyRuntimeClient(serverFile,
-				launchManually);
-		setRuntimeProxy(runtimeProxy);
-		monitor.worked(10);
-		
-		if(!runtimeProxy.startup(monitor)) {
-			System.err.println("Failed to start up the proxy runtime.");
-			runtimeProxy = null;
-			setRuntimeProxy(runtimeProxy);
+		monitor.beginTask("Starting OMPI proxy runtime...", 30);
+		try {
+			ORTEResourceManagerConfiguration config = (ORTEResourceManagerConfiguration) getConfiguration();
+			String serverFile = config.getOrteServerFile();
+			boolean launchManually = config.isLaunchManually();
+			/* load up the control and monitoring systems for OMPI */
+			OMPIProxyRuntimeClient runtimeProxy = new OMPIProxyRuntimeClient(serverFile,
+					launchManually);
 			if (monitor.isCanceled()) {
-				throw new CoreException(Status.CANCEL_STATUS);
+				throw new OperationCanceledException();
 			}
-			//PTPCorePlugin.errorDialog("Failed to start OMPI proxy runtime",
-			//	"There was an error starting the OMPI proxy runtime.  The path to 'ptp_orte_proxy' or 'orted' "+
-			//	"may have been incorrect.  The 'orted' binary MUST be in your PATH to be found by 'ptp_orte_proxy'.  "+
-			//	"Try checking the console log or error logs for more detailed information.\n\nDefaulting to "+
-			//	"Simulation mode.  To change this, use the PTP preferences page.", null);
-			
-			/*
-			int MSI = MonitoringSystemChoices.SIMULATED;
-			int CSI = ControlSystemChoices.SIMULATED;
-			Preferences p = PTPCorePlugin.getDefault().getPluginPreferences();
-			p.setValue(PreferenceConstants.MONITORING_SYSTEM_SELECTION, MSI);
-			p.setValue(PreferenceConstants.CONTROL_SYSTEM_SELECTION, CSI);
-			PTPCorePlugin.getDefault().savePluginPreferences();
-			if(!(monitoringSystem instanceof SimulationMonitoringSystem) || 
-			   !(controlSystem instanceof SimulationControlSystem)) {
-				refreshRuntimeSystems(ControlSystemChoices.SIMULATED, MonitoringSystemChoices.SIMULATED, monitor);
+			setRuntimeProxy(runtimeProxy);
+			monitor.worked(10);
+
+			if(!runtimeProxy.startup(monitor)) {
+				System.err.println("Failed to start up the proxy runtime.");
+				runtimeProxy = null;
+				setRuntimeProxy(runtimeProxy);
+				if (monitor.isCanceled()) {
+					throw new OperationCanceledException();
+				}
+				throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, 
+						"There was an error starting the OMPI proxy runtime.  The path to 'ptp_orte_proxy' or 'orted' "+
+						"may have been incorrect.  The 'orted' binary MUST be in your PATH to be found by 'ptp_orte_proxy'.  "+
+						"Try checking the console log or error logs for more detailed information.",
+						null));
 			}
-			*/
-			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, 
-					"There was an error starting the OMPI proxy runtime.  The path to 'ptp_orte_proxy' or 'orted' "+
-					"may have been incorrect.  The 'orted' binary MUST be in your PATH to be found by 'ptp_orte_proxy'.  "+
-					"Try checking the console log or error logs for more detailed information.",
-					null));
+			monitor.subTask("Starting OMPI monitoring system...");
+			setMonitoringSystem(new OMPIMonitoringSystem(runtimeProxy));
+			if (monitor.isCanceled()) {
+				throw new OperationCanceledException();
+			}
+			monitor.worked(10);
+			monitor.subTask("Starting OMPI control system...");
+			setControlSystem(new OMPIControlSystem(runtimeProxy));
+			if (monitor.isCanceled()) {
+				throw new OperationCanceledException();
+			}
+			monitor.worked(10);
 		}
-		monitor.subTask("Starting OMPI monitoring system...");
-		setMonitoringSystem(new OMPIMonitoringSystem(runtimeProxy));
-		monitor.worked(10);
-		monitor.subTask("Starting OMPI control system...");
-		setControlSystem(new OMPIControlSystem(runtimeProxy));
-		monitor.worked(10);
+		finally {
+			monitor.done();
+		}
 	}
 
 	protected void doDispose() {

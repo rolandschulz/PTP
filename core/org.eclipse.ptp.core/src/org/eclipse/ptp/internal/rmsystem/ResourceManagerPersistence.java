@@ -27,15 +27,21 @@ import java.util.ArrayList;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
+import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
 import org.eclipse.ptp.rmsystem.ResourceManagerStatus;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IMemento;
+import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.XMLMemento;
 
 public class ResourceManagerPersistence {
@@ -107,9 +113,10 @@ public class ResourceManagerPersistence {
 	 * @param file
 	 * @param factories
 	 * @param monitor TODO
+	 * @throws CoreException 
 	 */
 	public void loadResourceManagers(File file,
-			IResourceManagerFactory[] factories, IProgressMonitor monitor) {
+			IResourceManagerFactory[] factories, IProgressMonitor monitor) throws CoreException {
 		if (monitor == null) {
 			monitor = new NullProgressMonitor();
 		}
@@ -120,8 +127,6 @@ public class ResourceManagerPersistence {
 			loadResourceManagers(XMLMemento.createReadRoot(reader), factories, monitor);
 		} catch (FileNotFoundException e) {
 			// ignored... no ResourceManager items exist yet.
-		} catch (Exception e) {
-			PTPCorePlugin.log(e);
 		} finally {
 			try {
 				if (reader != null) {
@@ -148,12 +153,13 @@ public class ResourceManagerPersistence {
 	 * @param memento
 	 * @param factories
 	 * @param monitor TODO
+	 * @throws CoreException 
 	 */
 	private void loadResourceManagers(XMLMemento memento,
-			IResourceManagerFactory[] factories, final IProgressMonitor monitor) {
+			IResourceManagerFactory[] factories, final IProgressMonitor monitor) throws CoreException {
 		IMemento[] children = memento.getChildren(TAG_RESOURCEMANGER);
-		monitor.beginTask("load Resource Managers", children.length);
-
+		ArrayList statuses = new ArrayList();
+		monitor.beginTask("Loading the Resource Managers", children.length);
 		try {
 			final IResourceManager[] tmpRMs = new IResourceManager[children.length];
 			ArrayList rms = new ArrayList(tmpRMs.length);
@@ -165,7 +171,10 @@ public class ResourceManagerPersistence {
 				boolean isRunning = "true".equalsIgnoreCase(isRunningRep);
 				IResourceManagerFactory factory = getResourceManagerFactory(
 						factories, resourceManagerId);
-				if (factory != null) {
+				if (factory == null) {
+					monitor.worked(1);
+				}
+				else {
 					final IMemento grandchild = children[i].getChild(TAG_RESOURCEMANGER_CONFIGURATION);
 					IResourceManagerConfiguration configuration = factory.loadConfiguration(grandchild);
 					if (configuration != null) {
@@ -173,11 +182,11 @@ public class ResourceManagerPersistence {
 						if (tmpRMs[index] != null) {
 							// start the resource manager if it was running when saved.
 							if (isRunning) {
-								SafeRunnable.run(new SafeRunnable(){
-									public void run() throws Exception {
-										tmpRMs[index].start(new SubProgressMonitor(monitor, 1));
-									}
-								});
+								try {
+									tmpRMs[index].start(new SubProgressMonitor(monitor, 1));
+								} catch (CoreException e) {
+									statuses.add(e.getStatus());
+								}
 							}
 							else {
 								monitor.worked(1);
@@ -189,6 +198,11 @@ public class ResourceManagerPersistence {
 			}
 
 			resourceManagers = (IResourceManager[]) rms.toArray(new IResourceManager[rms.size()]);
+			if (statuses.size() > 0) {
+				throw new CoreException(new MultiStatus(PTPCorePlugin.PLUGIN_ID,
+						MultiStatus.ERROR, (IStatus[])statuses.toArray(new IStatus[0]),
+						"loading resource managers", null));
+			}
 		}
 		finally {
 			monitor.done();

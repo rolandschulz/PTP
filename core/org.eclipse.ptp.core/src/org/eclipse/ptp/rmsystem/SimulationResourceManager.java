@@ -45,16 +45,21 @@ public class SimulationResourceManager extends RuntimeResourceManager {
 	}
 
 	protected void doStartRuntime(IProgressMonitor monitor) {
-		final SimulationRMConfiguration simConfig = getSimulationRMConfiguration();
-		numMachines = simConfig.getNumMachines();
-		numNodes = (int[]) simConfig.getNumNodesPerMachines().clone();
-		/* load up the control and monitoring systems for the simulation */
-		monitor.subTask("Starting simulation...");
-		setMonitoringSystem(new SimulationMonitoringSystem(numMachines, numNodes));
-		monitor.worked(10);
-		setControlSystem(new SimulationControlSystem());
-		monitor.worked(10);
-		setRuntimeProxy((IRuntimeProxy)null);
+		monitor.beginTask("Starting simulation...", 20);
+		try {
+			final SimulationRMConfiguration simConfig = getSimulationRMConfiguration();
+			numMachines = simConfig.getNumMachines();
+			numNodes = (int[]) simConfig.getNumNodesPerMachines().clone();
+			/* load up the control and monitoring systems for the simulation */
+			setMonitoringSystem(new SimulationMonitoringSystem(numMachines, numNodes));
+			monitor.worked(10);
+			setControlSystem(new SimulationControlSystem());
+			monitor.worked(10);
+			setRuntimeProxy((IRuntimeProxy)null);
+		}
+		finally {
+			monitor.done();
+		}
 	}
 
 	protected void doStop() throws CoreException {

@@ -21,6 +21,7 @@ package org.eclipse.ptp.mpich2.core.rmsystem;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
@@ -39,35 +40,49 @@ public class MPICH2ResourceManager extends RuntimeResourceManager {
 
 	protected void doStartRuntime(IProgressMonitor monitor)
 			throws CoreException {
-		MPICH2ResourceManagerConfiguration config =
-			(MPICH2ResourceManagerConfiguration) getConfiguration();
-		String serverFile = config.getServerFile();
-		boolean launchManually = config.isLaunchManually();
-		/* load up the control and monitoring systems for OMPI */
-		monitor.subTask("Starting MPICH2 proxy runtime...");
-		MPICH2ProxyRuntimeClient runtimeProxy = new MPICH2ProxyRuntimeClient(serverFile,
-				launchManually);
-		setRuntimeProxy(runtimeProxy);
-		monitor.worked(10);
-		
-		if(!runtimeProxy.startup(monitor)) {
-			System.err.println("Failed to start up the proxy runtime.");
-			runtimeProxy = null;
-			setRuntimeProxy(runtimeProxy);
+		monitor.beginTask("Starting MPICH2 proxy runtime...", 30);
+		try {
+			MPICH2ResourceManagerConfiguration config =
+				(MPICH2ResourceManagerConfiguration) getConfiguration();
+			String serverFile = config.getServerFile();
+			boolean launchManually = config.isLaunchManually();
+			/* load up the control and monitoring systems for OMPI */
+			MPICH2ProxyRuntimeClient runtimeProxy = new MPICH2ProxyRuntimeClient(serverFile,
+					launchManually);
 			if (monitor.isCanceled()) {
-				throw new CoreException(Status.CANCEL_STATUS);
+				throw new OperationCanceledException();
 			}
-			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, 
-					"There was an error starting the MPICH2 proxy runtime.  The path to 'ptp_mpich2_proxy' "+
-					"may have been incorrect. Try checking the console log or error logs for more detailed information.",
-					null));
+			setRuntimeProxy(runtimeProxy);
+			monitor.worked(10);
+
+			if(!runtimeProxy.startup(monitor)) {
+				System.err.println("Failed to start up the proxy runtime.");
+				runtimeProxy = null;
+				setRuntimeProxy(runtimeProxy);
+				if (monitor.isCanceled()) {
+					throw new OperationCanceledException();
+				}
+				throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, 
+						"There was an error starting the MPICH2 proxy runtime.  The path to 'ptp_mpich2_proxy' "+
+						"may have been incorrect. Try checking the console log or error logs for more detailed information.",
+						null));
+			}
+			monitor.subTask("Starting MPICH2 monitoring system...");
+			setMonitoringSystem(new MPICH2MonitoringSystem(runtimeProxy));
+			if (monitor.isCanceled()) {
+				throw new OperationCanceledException();
+			}
+			monitor.worked(10);
+			monitor.subTask("Starting MPICH2 control system...");
+			setControlSystem(new MPICH2ControlSystem(runtimeProxy));
+			if (monitor.isCanceled()) {
+				throw new OperationCanceledException();
+			}
+			monitor.worked(10);
 		}
-		monitor.subTask("Starting MPICH2 monitoring system...");
-		setMonitoringSystem(new MPICH2MonitoringSystem(runtimeProxy));
-		monitor.worked(10);
-		monitor.subTask("Starting MPICH2 control system...");
-		setControlSystem(new MPICH2ControlSystem(runtimeProxy));
-		monitor.worked(10);
+		finally {
+			monitor.done();
+		}
 	}
 
 	protected void doStop() throws CoreException {
