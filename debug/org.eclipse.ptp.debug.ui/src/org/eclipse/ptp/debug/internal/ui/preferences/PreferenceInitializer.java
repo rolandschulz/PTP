@@ -20,8 +20,8 @@ package org.eclipse.ptp.debug.internal.ui.preferences;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.debug.core.IPDebugConstants;
-import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 
 /**
@@ -36,7 +36,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 	public void initializeDefaultPreferences() {
 		IPreferenceStore store = PTPDebugUIPlugin.getDefault().getPreferenceStore();
 
-		String debuggerFile = PTPDebugCorePlugin.getDefault().locateFragmentFile("bin", "sdm");
+		String debuggerFile = PTPCorePlugin.getDefault().locateFragmentFile("org.eclipse.ptp", "sdm");
 		if (debuggerFile != null)
 			store.setDefault(IPDebugConstants.PREF_PTP_DEBUGGER_FILE, debuggerFile);
  
