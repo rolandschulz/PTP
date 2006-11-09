@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Linux x86_64 Fragment
+Bundle-SymbolicName: org.eclipse.ptp.linux.x86_64
+Bundle-Version: 1.0.0
+Fragment-Host: org.eclipse.ptp.core;bundle-version="1.1.0"
+Bundle-Localization: plugin
+Bundle-Vendor: Eclipse.org
