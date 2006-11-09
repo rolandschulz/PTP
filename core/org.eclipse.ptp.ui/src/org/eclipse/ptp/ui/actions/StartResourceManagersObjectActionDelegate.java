@@ -20,23 +20,16 @@ package org.eclipse.ptp.ui.actions;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.dialogs.ProgressMonitorDialog;
-import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerMenuContribution;
 import org.eclipse.ptp.rmsystem.ResourceManagerStatus;
-import org.eclipse.ptp.ui.PTPUIPlugin;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IActionDelegate2;
@@ -85,71 +78,20 @@ public class StartResourceManagersObjectActionDelegate implements
 				return;
 			}
 			
-			if (true) {
-				new Job("Starting Resource Manager"){
+			new Job("Starting Resource Manager"){
 
-					protected IStatus run(IProgressMonitor monitor) {
-						try {
-							rmManager.start(monitor);
-						} catch (CoreException e) {
-							return e.getStatus();
-						}
-						if (monitor.isCanceled()) {
-							return Status.CANCEL_STATUS;
-						}
-						return Status.OK_STATUS;
+				protected IStatus run(IProgressMonitor monitor) {
+					try {
+						rmManager.start(monitor);
+					} catch (CoreException e) {
+						return e.getStatus();
 					}
-				}.schedule();
-			}
-			else {
-				final IRunnableWithProgress op = new IRunnableWithProgress() {
-
-					public void run(final IProgressMonitor monitor) {
-						safeRunAsyncInUIThread(new SafeRunnable() {
-							public void run() throws Exception {
-								try {
-									rmManager.start(monitor);
-								} catch (CoreException e) {
-									final String message = "Unable to start ResourceManager \""
-										+ rmManager.getConfiguration().getName() + "\"";
-									Status status = new Status(Status.ERROR, PTPUIPlugin.PLUGIN_ID, 1,
-											message, e);
-									if (false) {
-										ErrorDialog dlg = new ErrorDialog(targetShell,
-												"Error Starting Resource Manager", message, status,
-												IStatus.ERROR);
-										dlg.open();
-										PTPUIPlugin.log(status);
-									}
-									else {
-										throw new CoreException(status);
-									}
-								}
-							}
-						});
+					if (monitor.isCanceled()) {
+						return Status.CANCEL_STATUS;
 					}
-				};
-
-				SafeRunnable.run(new SafeRunnable(){
-
-					public void run() throws Exception {
-						new ProgressMonitorDialog(targetShell).run(true, true, op);
-					}
-				});
-			}
+					return Status.OK_STATUS;
+				}
+			}.schedule();
 		}
-	}
-
-	/**
-	 * Makes sure that the safeRunnable is ran in the UI thread. 
-	 * @param safeRunnable
-	 */
-	protected void safeRunAsyncInUIThread(final ISafeRunnable safeRunnable) {
-		Display display = targetShell.getDisplay();
-		display.asyncExec(new Runnable() {
-			public void run() {
-				SafeRunnable.run(safeRunnable);
-			}
-		});
 	}
 }

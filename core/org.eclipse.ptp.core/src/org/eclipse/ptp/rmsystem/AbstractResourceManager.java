@@ -369,11 +369,20 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	 * @param safeRunnable
 	 */
 	protected void safeRunAsyncInUIThread(final ISafeRunnable safeRunnable) {
-		display.asyncExec(new Runnable() {
-			public void run() {
-				SafeRunnable.run(safeRunnable);
+		if (display.isDisposed()) {
+			try {
+				safeRunnable.run();
+			} catch (Exception e) {
+				PTPCorePlugin.log(e);
 			}
-		});
+		}
+		else {
+			display.asyncExec(new Runnable() {
+				public void run() {
+					SafeRunnable.run(safeRunnable);
+				}
+			});
+		}
 	}
 
 	/**
