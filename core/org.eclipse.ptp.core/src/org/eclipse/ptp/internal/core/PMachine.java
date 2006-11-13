@@ -124,6 +124,13 @@ public class PMachine extends Parent implements IPMachineControl {
 	public IPProcess[] getProcesses() {
 		return getProcessControls();
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.IPMachine#getResourceManager()
+	 */
+	public IResourceManager getResourceManager() {
+		return (IResourceManager) getParent();
+	}
 
 	/* returns a list of the nodes comprised by this machine - but sorted */
 	public synchronized IPNode[] getSortedNodes() {
