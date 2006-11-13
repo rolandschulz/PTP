@@ -18,6 +18,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.core;
 
+import org.eclipse.ptp.rmsystem.IResourceManager;
+
 /**
  * Interface class for a model of a machine. Machines are comprised of nodes
  * which may have processes running on them. The Machine model is intented to be
@@ -168,5 +170,10 @@ public interface IPMachine extends IPElement {
 	 * @return A string array containing the keys
 	 */
 	public String[] getAttributeKeys();
+
+	/**
+	 * @return the machine's parent resource manager
+	 */
+	public IResourceManager getResourceManager();
 
 }

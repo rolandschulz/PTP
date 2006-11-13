@@ -287,7 +287,8 @@ public class MachineManager extends AbstractUIManager {
 		IPMachine machine = findMachineById(id);
 		if (machine == null)
 			return "";
-		return machine.getName();
+		IResourceManager rm = machine.getResourceManager();
+		return rm.getName() + ": " + machine.getName();
 	}
 	/** Add machine
 	 * @param mac machine
