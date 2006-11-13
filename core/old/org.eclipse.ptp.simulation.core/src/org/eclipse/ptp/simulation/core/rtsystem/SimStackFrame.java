@@ -16,7 +16,7 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.rtsystem.simulation;
+package org.eclipse.ptp.simulation.core.rtsystem;
 
 public class SimStackFrame {
 

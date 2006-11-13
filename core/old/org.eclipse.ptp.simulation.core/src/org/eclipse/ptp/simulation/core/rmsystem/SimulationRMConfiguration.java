@@ -19,10 +19,12 @@
 /**
  * 
  */
-package org.eclipse.ptp.rmsystem;
+package org.eclipse.ptp.simulation.core.rmsystem;
 
 import java.util.Arrays;
 
+import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
+import org.eclipse.ptp.rmsystem.Messages;
 import org.eclipse.ui.IMemento;
 
 public class SimulationRMConfiguration implements IResourceManagerConfiguration {

@@ -22,6 +22,8 @@ package org.eclipse.ptp.core;
  *
  */
 public class ParallelModeException extends Exception {
+	private static final long serialVersionUID = 2411029487858970656L;
+
 	public ParallelModeException(String msg) {
 		super(msg);
 	}

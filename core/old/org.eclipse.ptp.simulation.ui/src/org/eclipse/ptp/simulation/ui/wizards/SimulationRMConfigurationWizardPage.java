@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.simulation.ui.wizards;
 
-import org.eclipse.ptp.rmsystem.SimulationRMConfiguration;
+import org.eclipse.ptp.simulation.core.rmsystem.SimulationRMConfiguration;
 import org.eclipse.ptp.simulation.internal.ui.Messages;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizard;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage;

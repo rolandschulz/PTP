@@ -16,7 +16,7 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.rtsystem.simulation;
+package org.eclipse.ptp.simulation.core.rtsystem;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,8 +24,6 @@ import java.util.List;
 import java.util.Observable;
 
 import org.eclipse.ptp.core.IPProcess;
-import org.eclipse.ptp.core.events.IProcessEvent;
-import org.eclipse.ptp.core.events.ProcessEvent;
 
 
 public class SimThread extends Observable {

@@ -17,15 +17,15 @@
  * LA-CC 04-115
  *******************************************************************************/
 
-package org.eclipse.ptp.rtsystem.simulation;
+package org.eclipse.ptp.simulation.core.rtsystem;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.ptp.core.AttributeConstants;
 import org.eclipse.ptp.core.IPMachine;
 import org.eclipse.ptp.core.IPNode;
@@ -33,7 +33,7 @@ import org.eclipse.ptp.rtsystem.IMonitoringSystem;
 import org.eclipse.ptp.rtsystem.IRuntimeListener;
 
 public class SimulationMonitoringSystem implements IMonitoringSystem {
-	protected List listeners = new ArrayList(2);
+	protected ListenerList listeners = new ListenerList();
 	protected HashMap nodeMap;
 
 	protected HashMap nodeUserMap;
@@ -310,7 +310,24 @@ public class SimulationMonitoringSystem implements IMonitoringSystem {
 	}
 
 	public void initiateDiscovery() throws CoreException {
-		// TODO Auto-generated method stub
+		ArrayList keyList = new ArrayList();
+		ArrayList valueList = new ArrayList();
+		for (int im = 0; im < numMachines; ++im) {
+			keyList.add(AttributeConstants.ATTRIB_MACHINEID);
+			valueList.add(Integer.toString(im));
+			for (int in = 0; in < numNodes[im]; ++in) {
+				keyList.add(AttributeConstants.ATTRIB_NODE_NUMBER);
+				valueList.add(Integer.toString(in));
+			}
+		}
+
+		String[] keys = (String[]) keyList.toArray(new String[0]);
+		String[] values = (String[]) valueList.toArray(new String[0]);
 		
+		Object[] tmpListeners = listeners.getListeners();
+		for (int i=0; i<tmpListeners.length; ++i) {
+			IRuntimeListener l = (IRuntimeListener) tmpListeners[i];
+			l.runtimeNodeGeneralChange(keys, values);
+		}
 	}
 }

@@ -26,7 +26,7 @@
  * Contributors:
  *     QNX Software Systems - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.rtsystem.simulation;
+package org.eclipse.ptp.simulation.core.rtsystem;
  
 import java.util.Collections;
 import java.util.LinkedList;

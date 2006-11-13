@@ -84,7 +84,7 @@ public final class MPICH2ResourceManagerConfigurationWizardPage extends
 		setTitle("MPICH2 Configuration Wizard Page");
 		setDescription("MPICH2 Configuration Wizard Page");
 		
-		System.out.println("in MPICH2ResourceManagerConfigurationWizardPage");
+		//System.out.println("in MPICH2ResourceManagerConfigurationWizardPage");
 		
 		final RMConfigurationWizard confWizard = getConfigurationWizard();
 		config = (MPICH2ResourceManagerConfiguration) confWizard.getConfiguration();
@@ -96,7 +96,7 @@ public final class MPICH2ResourceManagerConfigurationWizardPage extends
 	 * @see org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage#createControl(org.eclipse.swt.widgets.Composite)
 	 */
 	public void createControl(Composite parent) {
-		System.out.println("In MPICH2ResourceManagerConfigurationWizardPage.createControl");
+		//System.out.println("In MPICH2ResourceManagerConfigurationWizardPage.createControl");
 		Composite composite = new Composite(parent, SWT.NONE);
 		composite.setLayout(createGridLayout(1, true, 0, 0));
 		composite.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
@@ -111,7 +111,7 @@ public final class MPICH2ResourceManagerConfigurationWizardPage extends
 
 		setControl(composite);
 		
-		System.out.println("leaving MPICH2ResourceManagerConfigurationWizardPage.createControl");
+		//System.out.println("leaving MPICH2ResourceManagerConfigurationWizardPage.createControl");
 	}
 
 	private void store() 
@@ -159,7 +159,7 @@ public final class MPICH2ResourceManagerConfigurationWizardPage extends
 			serverFile = PTPCorePlugin.getDefault().locateFragmentFile("org.eclipse.ptp.mpich2.proxy", "ptp_mpich2_proxy.py");
 	    }
 		
-		System.out.println("serverFile: " + serverFile);
+		//System.out.println("serverFile: " + serverFile);
 		if (serverFile == null || serverFile.equals("")) {
 			serverFile = "";
 			setValid(false);
@@ -172,7 +172,6 @@ public final class MPICH2ResourceManagerConfigurationWizardPage extends
 	private void setValid(boolean b) {
 		isValid = b;
 		setPageComplete(isValid);
-		//System.out.println("setValid(" + isValid + ")");
 	}
 
 	protected Button createButton(Composite parent, String label, int type) {

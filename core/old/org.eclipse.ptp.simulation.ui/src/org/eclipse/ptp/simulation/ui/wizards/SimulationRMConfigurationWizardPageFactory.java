@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.simulation.ui.wizards;
 
-import org.eclipse.ptp.rmsystem.SimulationResourceManagerFactory;
+import org.eclipse.ptp.simulation.core.rmsystem.SimulationResourceManagerFactory;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizard;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPageFactory;

@@ -4,7 +4,7 @@
    <extension
          point="org.eclipse.ptp.core.resourcemanager">
       <resourcemanager
-            class="org.eclipse.ptp.rmsystem.SimulationResourceManagerFactory"
+            class="org.eclipse.ptp.simulation.core.rmsystem.SimulationResourceManagerFactory"
             id="org.eclipse.ptp.simulation.core.resourcemanager"/>
    </extension>
 

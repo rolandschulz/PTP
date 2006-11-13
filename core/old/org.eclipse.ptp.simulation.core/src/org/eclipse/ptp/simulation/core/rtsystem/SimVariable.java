@@ -16,23 +16,29 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
+package org.eclipse.ptp.simulation.core.rtsystem;
 
-package org.eclipse.ptp.rtsystem.simulation;
+public class SimVariable {
 
-public class SimJobState {
-	public String jobname = null;
+	String vName;
+	String vType;
+	String vValue;
 	
-	public String machine_name = null;
+	public SimVariable(String name, String type, String value) {
+		vName = name;
+		vType = type;
+		vValue = value;
+	}
 	
-	public String spawned_app_state = null;
-
-	public int spawned_num_procs = 0;
-
-	public int spawned_procs_per_node = 0;
-
-	public int spawned_first_node = 0;
-
-	public String spawned_app_signal = new String("");
-
-	public String spawned_app_exit_code = new String("");
+	public String getName() {
+		return vName;
+	}
+	
+	public String getValue() {
+		return vValue;
+	}
+	
+	public String getType() {
+		return vType;
+	}
 }

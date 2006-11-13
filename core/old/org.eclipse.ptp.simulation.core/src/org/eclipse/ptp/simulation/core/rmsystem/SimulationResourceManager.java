@@ -16,14 +16,16 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.rmsystem;
+package org.eclipse.ptp.simulation.core.rmsystem;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
+import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
+import org.eclipse.ptp.rmsystem.RuntimeResourceManager;
 import org.eclipse.ptp.rtsystem.IRuntimeProxy;
-import org.eclipse.ptp.rtsystem.simulation.SimulationControlSystem;
-import org.eclipse.ptp.rtsystem.simulation.SimulationMonitoringSystem;
+import org.eclipse.ptp.simulation.core.rtsystem.SimulationControlSystem;
+import org.eclipse.ptp.simulation.core.rtsystem.SimulationMonitoringSystem;
 
 public class SimulationResourceManager extends RuntimeResourceManager {
 

@@ -84,7 +84,7 @@ public final class ORTEResourceManagerConfigurationWizardPage extends
 		setTitle("ORTE Configuration Wizard Page");
 		setDescription("ORTE Configuration Wizard Page");
 		
-		System.out.println("in ORTEResourceManagerConfigurationWizardPage");
+		//System.out.println("in ORTEResourceManagerConfigurationWizardPage");
 		
 		final RMConfigurationWizard confWizard = getConfigurationWizard();
 		config = (ORTEResourceManagerConfiguration) confWizard.getConfiguration();
@@ -96,7 +96,7 @@ public final class ORTEResourceManagerConfigurationWizardPage extends
 	 * @see org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage#createControl(org.eclipse.swt.widgets.Composite)
 	 */
 	public void createControl(Composite parent) {
-		System.out.println("In ORTEResourceManagerConfigurationWizardPage.createControl");
+		//System.out.println("In ORTEResourceManagerConfigurationWizardPage.createControl");
 		Composite composite = new Composite(parent, SWT.NONE);
 		composite.setLayout(createGridLayout(1, true, 0, 0));
 		composite.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
@@ -111,7 +111,7 @@ public final class ORTEResourceManagerConfigurationWizardPage extends
 
 		setControl(composite);
 		
-		System.out.println("leaving ORTEResourceManagerConfigurationWizardPage.createControl");
+		//System.out.println("leaving ORTEResourceManagerConfigurationWizardPage.createControl");
 	}
 
 	private void store() 
@@ -159,7 +159,7 @@ public final class ORTEResourceManagerConfigurationWizardPage extends
 			serverFile = PTPCorePlugin.getDefault().locateFragmentFile("org.eclipse.ptp", "ptp_orte_proxy");
 	    }
 		
-		System.out.println("serverFile: " + serverFile);
+		//System.out.println("serverFile: " + serverFile);
 		if (serverFile == null || serverFile.equals("")) {
 			serverFile = "";
 			setValid(false);
@@ -172,7 +172,6 @@ public final class ORTEResourceManagerConfigurationWizardPage extends
 	private void setValid(boolean b) {
 		isValid = b;
 		setPageComplete(isValid);
-		System.out.println("setValid(" + isValid + ")");
 	}
 
 	protected Button createButton(Composite parent, String label, int type) {

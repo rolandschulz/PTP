@@ -25,6 +25,7 @@ import org.eclipse.ptp.core.IPMachine;
 import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.IPUniverse;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.model.Element;
 import org.eclipse.ptp.ui.model.ElementHandler;
@@ -90,6 +91,18 @@ public class MachineManager extends AbstractUIManager {
 		}
 		return universe.getSortedMachines();
 	}
+	
+	/** Get Resource Managers
+	 * @return
+	 */
+	public IResourceManager[] getResourceManagers() {
+		IPUniverse universe = modelPresentation.getUniverse();
+		if (universe == null) {
+			return new IResourceManager[0];
+		}
+		return universe.getResourceManagers();
+	}
+	
 	/** Get current machine ID
 	 * @return current machine ID
 	 */
