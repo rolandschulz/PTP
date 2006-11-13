@@ -22,6 +22,7 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.ptp.core.IPMachine;
 import org.eclipse.ptp.internal.ui.ParallelImages;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.ui.actions.GotoAction;
 import org.eclipse.ptp.ui.actions.GotoDropDownAction;
 import org.eclipse.ptp.ui.managers.MachineManager;
@@ -50,12 +51,20 @@ public class ChangeMachineAction extends GotoDropDownAction {
 	protected void createDropDownMenu(MenuManager dropDownMenuMgr) {
 		if (view instanceof ParallelMachineView) {
 			ParallelMachineView pmView = (ParallelMachineView)view;
-		    	String curMachineID = pmView.getCurrentID();	
-		    	IPMachine[] macs = ((MachineManager)pmView.getUIManager()).getMachines();
+			String curMachineID = pmView.getCurrentID();	
+			final MachineManager machineManager = ((MachineManager)pmView.getUIManager());
+			IResourceManager[] rms = machineManager.getResourceManagers();
+			for (int ir=0; ir<rms.length; ++ir) {
+				
+				MenuManager cascadingRMMenu = new MenuManager(rms[ir].getName());
+				dropDownMenuMgr.add(cascadingRMMenu);
+				
+				IPMachine[] macs = rms[ir].getMachines();
 
-		    	for (int i=0; i<macs.length; i++) {
-		    		addAction(dropDownMenuMgr, macs[i].getName(), macs[i].getIDString(), curMachineID);
-		    	}		
+				for (int i=0; i<macs.length; i++) {
+					addAction(cascadingRMMenu, macs[i].getName(), macs[i].getIDString(), curMachineID);
+				}		
+			}
 		}
 	}
 	
