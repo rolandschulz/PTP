@@ -197,25 +197,28 @@ public class JobManager extends AbstractUIManager {
 	 * @see org.eclipse.ptp.ui.IManager#getName(java.lang.String)
 	 */
 	public String getName(String id) {
-		IPJob job = findJobById(id);
-		IPQueue queue;
-		IResourceManager rm;
-		String queueName;
-		if (job == null) {
-			queue = getQueue();
-			if (queue != null) {
-				rm = queue.getResourceManager();
-				queueName = rm.getName() + ": " + queue.getName();
-				return queueName + ": ";
-			}
-			else {
-				return "";
-			}
+		final IPJob job = findJobById(id);
+		final IPQueue queue;
+		final String jobName;
+		if (job != null) {
+			jobName = job.getName();
+			// get the queue from the selected job
+			queue = job.getQueue();
 		}
-		queue = job.getQueue();
-		rm = queue.getResourceManager();
-		queueName = rm.getName() + ": " + queue.getName();
-		return queueName + ": " + job.getName();
+		else {
+			jobName = "";
+			// get the currently selected queue
+			queue = getQueue();
+		}
+		final String queueName;
+		if (queue != null) {
+			final IResourceManager rm = queue.getResourceManager();
+			queueName = rm.getName() + ": " + queue.getName() + ": ";
+		}
+		else {
+			queueName = "";
+		}
+		return queueName + jobName;
 	}
 	
 	/** Create Element
