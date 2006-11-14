@@ -37,12 +37,14 @@ import org.eclipse.ptp.core.IProcessListener;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.events.IProcessEvent;
 import org.eclipse.ptp.internal.ui.ParallelImages;
+import org.eclipse.ptp.internal.ui.actions.ChangeQueueAction;
 import org.eclipse.ptp.internal.ui.actions.RemoveAllTerminatedAction;
 import org.eclipse.ptp.internal.ui.actions.TerminateAllAction;
 import org.eclipse.ptp.ui.IManager;
 import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.ui.actions.ParallelAction;
+import org.eclipse.ptp.ui.managers.AbstractUIManager;
 import org.eclipse.ptp.ui.managers.JobManager;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
@@ -79,6 +81,7 @@ public class ParallelJobView extends AbstractParallelSetView implements IProcess
 	public static final String JOB_VIEW = "1";
 	public static final String PRO_VIEW = "2";
 	protected String current_view = BOTH_VIEW;
+	private ChangeQueueAction changeQueueAction;
 
 	/** Constructor
 	 * 
@@ -130,6 +133,7 @@ public class ParallelJobView extends AbstractParallelSetView implements IProcess
 	 */
 	protected void initialView() {
 		initialElement();
+		update();
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#getImage(int, int)
@@ -170,8 +174,8 @@ public class ParallelJobView extends AbstractParallelSetView implements IProcess
 		jobTableViewer.setContentProvider(new IStructuredContentProvider() {
 			public void dispose() {}
 			public Object[] getElements(Object inputElement) {
-				if (inputElement instanceof JobManager)
-					return ((JobManager) inputElement).getJobs();
+				if (inputElement instanceof AbstractUIManager)
+					return ((JobManager) inputElement).getJobsFromCurrentQueue();
 				return new Object[0];
 			}
 			public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
@@ -236,13 +240,16 @@ public class ParallelJobView extends AbstractParallelSetView implements IProcess
 	protected void createToolBarActions(IToolBarManager toolBarMgr) {
 		terminateAllAction = new TerminateAllAction(this);
 		toolBarMgr.appendToGroup(IPTPUIConstants.IUIACTIONGROUP, terminateAllAction);
+		changeQueueAction = new ChangeQueueAction(this);
+		toolBarMgr.appendToGroup(IPTPUIConstants.IUINAVIGATORGROUP, changeQueueAction);
 		super.buildInToolBarActions(toolBarMgr);
 	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#doubleClick(org.eclipse.ptp.ui.model.IElement)
 	 */
 	public void doubleClick(IElement element) {
-		openProcessViewer(((JobManager) manager).findProcess(getCurrentID(), element.getIDNum()));
+		openProcessViewer(getJobManager().findProcess(getCurrentID(), element.getIDNum()));
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#convertElementObject(org.eclipse.ptp.ui.model.IElement)
@@ -251,7 +258,7 @@ public class ParallelJobView extends AbstractParallelSetView implements IProcess
 		if (element == null)
 			return null;
 		
-		return ((JobManager) manager).findProcess(getCurrentID(), element.getIDNum());
+		return getJobManager().findProcess(getCurrentID(), element.getIDNum());
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.views.IContentProvider#getRulerIndex(java.lang.Object, int)
@@ -290,13 +297,13 @@ public class ParallelJobView extends AbstractParallelSetView implements IProcess
 	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#getCurrentID()
 	 */
 	public String getCurrentID() {
-		return ((JobManager) manager).getCurrentJobId();
+		return getJobManager().getCurrentJobId();
 	}
 	/** Change job
 	 * @param job_id Target job ID
 	 */
 	protected void selectJob(String job_id) {
-		((JobManager) manager).setCurrentJobId(job_id);
+		getJobManager().setCurrentJobId(job_id);
 		updateJob();
 	}
 	/** Get selected job
@@ -343,6 +350,7 @@ public class ParallelJobView extends AbstractParallelSetView implements IProcess
 	 */
 	protected void updateAction() {
 		super.updateAction();
+		changeQueueAction.setEnabled(getJobManager().getQueues().length > 0);
 		if (terminateAllAction != null) {
 			ISelection selection = jobTableViewer.getSelection();
 			if (selection.isEmpty()) {
@@ -436,10 +444,14 @@ public class ParallelJobView extends AbstractParallelSetView implements IProcess
 	public void processEvent(IProcessEvent event) {
 		// only redraw if the current set contain the process
 		IPProcess process = event.getProcess();
-		if (((JobManager) manager).isCurrentSetContainProcess(getCurrentID(), process.getIDString())) {
+		if (getJobManager().isCurrentSetContainProcess(getCurrentID(), process.getIDString())) {
 			if (event.getType() != IProcessEvent.ADD_OUTPUT_TYPE)
 				refresh(false);
 		}
+	}
+	
+	private JobManager getJobManager() {
+		return ((JobManager) manager);
 	}
 	
 	public void setFocus() {
@@ -448,5 +460,15 @@ public class ParallelJobView extends AbstractParallelSetView implements IProcess
 		if (job == null) {
 			changeJob((String)null);
 		}
+	}
+	
+	public void selectQueue(String id) {
+		JobManager jobManager = getJobManager();
+		jobManager.setCurrentQueueId(id);
+		updateJob();
+	}
+	
+	public String getQueueID() {
+		return getJobManager().getQueueID();
 	}
 }

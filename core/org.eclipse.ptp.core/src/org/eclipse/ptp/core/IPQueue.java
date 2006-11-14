@@ -18,6 +18,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.core;
 
+import org.eclipse.ptp.rmsystem.IResourceManager;
+
 
 public interface IPQueue extends IPElement {
 
@@ -31,4 +33,14 @@ public interface IPQueue extends IPElement {
 	 * @return
 	 */
 	IPJob[] getJobs();
+	
+	/**
+	 * @return
+	 */
+	String getName();
+
+	/**
+	 * @return
+	 */
+	IResourceManager getResourceManager();
 }

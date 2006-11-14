@@ -34,6 +34,7 @@ import org.eclipse.ptp.ui.IManager;
 import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.ui.actions.ParallelAction;
+import org.eclipse.ptp.ui.managers.AbstractUIManager;
 import org.eclipse.ptp.ui.managers.MachineManager;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
@@ -310,7 +311,7 @@ public class ParallelMachineView extends AbstractParallelSetView implements INod
 	 */
 	protected void updateAction() {
 		super.updateAction();
-		changeMachineAction.setEnabled(((MachineManager) manager).getMachines().length > 0);
+		changeMachineAction.setEnabled(((AbstractUIManager) manager).getResourceManagers().length > 0);
 	}
 	/** Clean lower text regions information
 	 * 

@@ -27,8 +27,10 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.ptp.core.IModelPresentation;
 import org.eclipse.ptp.core.IPJob;
+import org.eclipse.ptp.core.IPQueue;
 import org.eclipse.ptp.core.IPUniverse;
 import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.ui.IManager;
 import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.ui.listeners.IJobChangedListener;
@@ -304,5 +306,22 @@ public abstract class AbstractUIManager implements IManager {
 	 */
 	public int getStatus(IElement element) {
 		return getStatus(element.getID());
+	}
+	/** Get Resource Managers
+	 * @return
+	 */
+	public IResourceManager[] getResourceManagers() {
+		IPUniverse universe = modelPresentation.getUniverse();
+		if (universe == null) {
+			return new IResourceManager[0];
+		}
+		return universe.getResourceManagers();
+	}
+	public IPQueue[] getQueues() {
+		IPUniverse universe = modelPresentation.getUniverse();
+		if (universe == null) {
+			return new IPQueue[0];
+		}
+		return universe.getQueues();
 	}		
 }

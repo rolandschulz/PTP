@@ -70,6 +70,9 @@ public abstract class RuntimeResourceManager extends AbstractResourceManager
 			super(RuntimeResourceManager.this, "localQueue", "0", 0);
 		}
 		
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.core.elementcontrols.IPQueueControl#addJob(org.eclipse.ptp.core.elementcontrols.IPJobControl)
+		 */
 		public synchronized void addJob(IPJobControl job) {
 			addChild(job);
 		}
@@ -78,10 +81,24 @@ public abstract class RuntimeResourceManager extends AbstractResourceManager
 			removeChildren();
 		}
 		
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.core.elementcontrols.IPQueueControl#findJobById(java.lang.String)
+		 */
+		public IPJobControl findJobById(String job_id) {
+			IPJobControl job = (IPJobControl) findChild(job_id);
+			return job;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.core.IPQueue#getJob(java.lang.String)
+		 */
 		public synchronized IPJob getJob(String name) {
 			return getJobControl(name);
 		}
 
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.core.elementcontrols.IPQueueControl#getJobControl(java.lang.String)
+		 */
 		public synchronized IPJobControl getJobControl(String name) {
 			Collection col = getCollection();
 			Iterator it = col.iterator();
@@ -96,21 +113,39 @@ public abstract class RuntimeResourceManager extends AbstractResourceManager
 			return null;
 		}
 
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.core.elementcontrols.IPQueueControl#getJobControls()
+		 */
 		public synchronized IPJobControl[] getJobControls() {
 			return (IPJobControl[]) getCollection().toArray(new IPJobControl[0]);
 		}
 
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.core.IPQueue#getJobs()
+		 */
 		public synchronized IPJob[] getJobs() {
 			return getJobControls();
 		}
 
-		public synchronized void removeJob(IPJobControl job) {
-			removeChild(job);
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.core.IPQueue#getName()
+		 */
+		public String getName() {
+			return getElementName();
 		}
 
-		public IPJobControl findJobById(String job_id) {
-			IPJobControl job = (IPJobControl) findChild(job_id);
-			return job;
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.core.IPQueue#getResourceManager()
+		 */
+		public IResourceManager getResourceManager() {
+			return RuntimeResourceManager.this;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.core.elementcontrols.IPQueueControl#removeJob(org.eclipse.ptp.core.elementcontrols.IPJobControl)
+		 */
+		public synchronized void removeJob(IPJobControl job) {
+			removeChild(job);
 		}
 	}
 
@@ -151,9 +186,9 @@ public abstract class RuntimeResourceManager extends AbstractResourceManager
 	}
 
 	public synchronized IPJobControl findJobById(String job_id) {
-		IPQueueControl[] queueus = getQueueControls();
-		for (int j = 0; j < queueus.length; ++j) {
-			IPJobControl job = queueus[j].findJobById(job_id);
+		IPQueueControl[] queues = getQueueControls();
+		for (int j = 0; j < queues.length; ++j) {
+			IPJobControl job = queues[j].findJobById(job_id);
 			if (job != null) {
 				return job;
 			}
@@ -161,6 +196,19 @@ public abstract class RuntimeResourceManager extends AbstractResourceManager
 		return null;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManager#findQueueById(java.lang.String)
+	 */
+	public synchronized IPQueue findQueueById(String id) {
+		IPQueueControl[] queues = getQueueControls();
+		for (int j = 0; j < queues.length; ++j) {
+			if (queues[j].getIDString().equals(id)) {
+				return queues[j];
+			}
+		}
+		return null;
+	}
+
 	public synchronized IPMachine getMachine(String ID) {
 		return (IPMachine) machines.get(ID);
 	}

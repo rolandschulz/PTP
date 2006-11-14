@@ -138,6 +138,9 @@ public class PUniverse extends Parent implements IPUniverseControl {
 		return null;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.IPUniverse#findProcessByName(java.lang.String)
+	 */
 	public synchronized IPProcess findProcessByName(String pname) {
 		IPJob[] jobs = getJobs();
 		for (int i=0; i<jobs.length; ++i) {
@@ -148,6 +151,34 @@ public class PUniverse extends Parent implements IPUniverseControl {
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.IPUniverse#findQueueById(java.lang.String)
+	 */
+	public IPQueue findQueueById(String id) {
+		for (Iterator rit = getCollection().iterator(); rit.hasNext(); ) {
+			IResourceManager resourceManager = (IResourceManager) rit.next();
+			IPQueue[] queues = resourceManager.getQueues();
+			for (int i = 0; i < queues.length; ++i) {
+				if (queues[i].getIDString().equals(id))
+					return queues[i];
+			}
+		}
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.IPUniverse#findResourceManagerById(java.lang.String)
+	 */
+	public synchronized IResourceManager findResourceManagerById(String id) {
+		for (Iterator rit = getCollection().iterator(); rit.hasNext(); ) {
+			IResourceManager resourceManager = (IResourceManager) rit.next();
+			if (resourceManager.getIDString().equals(id)) {
+				return resourceManager;
+			}
+		}
+		return null;
+	}
+	
 	/*
 	 */
 	public synchronized IPJob[] getJobs() {
@@ -162,7 +193,7 @@ public class PUniverse extends Parent implements IPUniverseControl {
 		}
 		return (IPJob[]) jobs.toArray(new IPJobControl[0]);
 	}
-	
+
 	public synchronized IPMachine[] getMachines() {
 		ArrayList machines = new ArrayList();
 		for (Iterator rit = getCollection().iterator(); rit.hasNext(); ) {
@@ -172,20 +203,33 @@ public class PUniverse extends Parent implements IPUniverseControl {
 		}
 		return (IPMachine[]) machines.toArray(new IPMachineControl[0]);
 	}
-
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.IPUniverse#getQueues()
+	 */
+	public IPQueue[] getQueues() {
+		ArrayList queues = new ArrayList();
+		for (Iterator rit = getCollection().iterator(); rit.hasNext(); ) {
+			IResourceManager resourceManager = (IResourceManager) rit.next();
+			IPQueue[] rmQueues = resourceManager.getQueues();
+			queues.addAll(Arrays.asList(rmQueues));
+		}
+		return (IPQueue[]) queues.toArray(new IPQueue[0]);
+	}
+	
 	/**
 	 * @return all of the resource managers
 	 */
 	public synchronized IResourceManager[] getResourceManagers() {
 		return (IResourceManager[]) getCollection().toArray(new IResourceManager[0]);
 	}
-	
+
 	public synchronized IPJob[] getSortedJobs() {
 		IPJobControl[] jobs = (IPJobControl[]) getJobs();
 		sort(jobs);
 		return jobs;
 	}
-	
+
 	public synchronized IPMachine[] getSortedMachines() {
 		IPMachineControl[] macs = (IPMachineControl[]) getMachines();
 		sort(macs);

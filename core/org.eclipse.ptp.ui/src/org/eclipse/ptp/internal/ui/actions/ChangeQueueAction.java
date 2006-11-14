@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005 The Regents of the University of California. 
+ * Copyright (c) 2006 The Regents of the University of California. 
  * This material was produced under U.S. Government contract W-7405-ENG-36 
  * for Los Alamos National Laboratory, which is operated by the University 
  * of California for the U.S. Department of Energy. The U.S. Government has 
@@ -20,51 +20,48 @@ package org.eclipse.ptp.internal.ui.actions;
 
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.MenuManager;
-import org.eclipse.ptp.core.IPMachine;
+import org.eclipse.ptp.core.IPQueue;
 import org.eclipse.ptp.internal.ui.ParallelImages;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.ui.actions.GotoAction;
 import org.eclipse.ptp.ui.actions.GotoDropDownAction;
 import org.eclipse.ptp.ui.managers.AbstractUIManager;
-import org.eclipse.ptp.ui.managers.MachineManager;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.views.AbstractParallelElementView;
-import org.eclipse.ptp.ui.views.ParallelMachineView;
+import org.eclipse.ptp.ui.views.ParallelJobView;
 
 /**
- * @author Clement chu
+ * @author Randy M. Roberts (rsqrd)
  *
  */
-public class ChangeMachineAction extends GotoDropDownAction {
-	public static final String name = "Machine";
+public class ChangeQueueAction extends GotoDropDownAction {
+	public static final String name = "Queue";
     
 	/** Constructor
 	 * @param view
 	 */
-	public ChangeMachineAction(AbstractParallelElementView view) {
+	public ChangeQueueAction(AbstractParallelElementView view) {
 		super(name, view);
-	    setImageDescriptor(ParallelImages.ID_ICON_MACHINE_NORMAL);
+	    setImageDescriptor(ParallelImages.ID_IMG_RM_ON);
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.actions.GotoDropDownAction#createDropDownMenu(org.eclipse.jface.action.MenuManager)
 	 */
 	protected void createDropDownMenu(MenuManager dropDownMenuMgr) {
-		if (view instanceof ParallelMachineView) {
-			ParallelMachineView pmView = (ParallelMachineView)view;
-			String curMachineID = pmView.getCurrentID();	
-			final AbstractUIManager machineManager = ((AbstractUIManager)pmView.getUIManager());
-			IResourceManager[] rms = machineManager.getResourceManagers();
+		if (view instanceof ParallelJobView) {
+			ParallelJobView pmView = (ParallelJobView)view;
+			String curQueueID = pmView.getQueueID();
+			final AbstractUIManager jobManager = ((AbstractUIManager)pmView.getUIManager());
+			IResourceManager[] rms = jobManager.getResourceManagers();
 			for (int ir=0; ir<rms.length; ++ir) {
-				
-				MenuManager cascadingRMMenu = new MenuManager(rms[ir].getName());
-				dropDownMenuMgr.add(cascadingRMMenu);
-				
-				IPMachine[] macs = rms[ir].getMachines();
-
-				for (int i=0; i<macs.length; i++) {
-					addAction(cascadingRMMenu, macs[i].getName(), macs[i].getIDString(), curMachineID);
-				}		
+				MenuManager cascade = new MenuManager(rms[ir].getName());
+				dropDownMenuMgr.add(cascade);
+				IPQueue[] queues = rms[ir].getQueues();
+				for (int iq=0; iq<queues.length; ++iq) {
+					addAction(cascade, queues[iq].getName(), queues[iq].getIDString(),
+							curQueueID);
+				}
 			}
 		}
 	}
@@ -72,8 +69,10 @@ public class ChangeMachineAction extends GotoDropDownAction {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.actions.GotoDropDownAction#addAction(org.eclipse.jface.action.MenuManager, java.lang.String, java.lang.String, java.lang.String)
 	 */
-	protected void addAction(MenuManager dropDownMenuMgr, String machine_name, String id, String curID) {
-		IAction action = new InternalMachineAction(machine_name, id, getViewPart(), this);
+	protected void addAction(MenuManager dropDownMenuMgr, String queueName,
+			String id, String curID) {
+		IAction action = new InternalQueueAction(queueName, id,
+				getViewPart(), this);
 		action.setChecked(curID.equals(id));
 		action.setEnabled(true);
 		dropDownMenuMgr.add(action);
@@ -88,15 +87,16 @@ public class ChangeMachineAction extends GotoDropDownAction {
 	 * @see org.eclipse.jface.action.IAction#run()
 	 */
 	public void run() {
-		if (view instanceof ParallelMachineView) {
-			ParallelMachineView pmView = ((ParallelMachineView)view);
-			IPMachine[] macs = ((MachineManager)pmView.getUIManager()).getMachines();
-			for (int i=0; i<macs.length; i++) {
-		    		if (pmView.getCurrentID().equals(macs[i].getIDString())) {
-		    			if (i + 1 < macs.length)
-		    				run(null, macs[i+1].getIDString());
+		if (view instanceof ParallelJobView) {
+			ParallelJobView pmView = ((ParallelJobView)view);
+			final AbstractUIManager manager = ((AbstractUIManager)pmView.getUIManager());
+			IPQueue[] queues = manager.getQueues();
+			for (int i=0; i<queues.length; i++) {
+		    		if (pmView.getQueueID().equals(queues[i].getIDString())) {
+		    			if (i + 1 < queues.length)
+		    				run(null, queues[i+1].getIDString());
 		    			else
-		    				run(null, macs[0].getIDString());
+		    				run(null, queues[0].getIDString());
 		    			
 		    			break;
 		    		}
@@ -108,22 +108,27 @@ public class ChangeMachineAction extends GotoDropDownAction {
 	 * @see org.eclipse.ptp.ui.actions.GotoDropDownAction#run(org.eclipse.ptp.ui.model.IElement[], java.lang.String)
 	 */
 	public void run(IElement[] elements, String id) {
-		if (view instanceof ParallelMachineView) {
-			ParallelMachineView pmView = ((ParallelMachineView)view);
-			pmView.selectMachine(id);			
+		if (view instanceof ParallelJobView) {
+			ParallelJobView pmView = ((ParallelJobView)view);
+			pmView.selectQueue(id);			
 			pmView.update();
-			pmView.refresh(false);
+			pmView.refresh(true);
 		}
 	}
 	
-	/** Inner internal machine action
-	 * @author clement
+	/** Inner internal queue action
+	 * @author rsqrd
 	 *
 	 */
-	private class InternalMachineAction extends GotoAction {
-		public InternalMachineAction(String name, String id, AbstractParallelElementView view, GotoDropDownAction action) {
+	private class InternalQueueAction extends GotoAction {
+		public InternalQueueAction(String name, String id,
+				AbstractParallelElementView view, GotoDropDownAction action) {
 			super(name, id, view, action);
-		    setImageDescriptor(ParallelImages.ID_ICON_MACHINE_NORMAL);
+		    setImageDescriptor(ParallelImages.ID_IMG_RM_ON);
+		}
+
+		public void run(IElement[] elements) {
+			super.run(elements);
 		}		
 	}
 }

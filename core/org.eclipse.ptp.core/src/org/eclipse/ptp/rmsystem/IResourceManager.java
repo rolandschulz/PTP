@@ -59,15 +59,21 @@ IAdaptable, IResourceManagerMenuContribution, IModelModifier {
 	public IPJobControl findJobById(String job_id);
 
 	/**
+	 * @param id
 	 * @return
 	 */
-	public IResourceManagerConfiguration getConfiguration();
+	public IPQueue findQueueById(String id);
 
 	/**
 	 * @return
 	 */
-	public String getDescription();
+	public IResourceManagerConfiguration getConfiguration();
 	
+	/**
+	 * @return
+	 */
+	public String getDescription();
+
 	/**
 	 * @param ID
 	 * @return
@@ -104,7 +110,7 @@ IAdaptable, IResourceManagerMenuContribution, IModelModifier {
 	 * @return
 	 */
 	public IPQueue[] getQueues();
-
+	
 	/**
 	 * @return
 	 */
@@ -122,7 +128,7 @@ IAdaptable, IResourceManagerMenuContribution, IModelModifier {
 	 * @param job
 	 */
 	public void removeJob(IPJob job);
-	
+
 	/**
 	 * @param listener
 	 */

@@ -178,4 +178,9 @@ public interface IPJob extends IPElement {
 	 */
 	public int totalProcesses();
 
+	/**
+	 * @return
+	 */
+	public IPQueue getQueue();
+
 }
