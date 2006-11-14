@@ -51,6 +51,7 @@ import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.internal.ui.adapters.PropertyAdapterFactory;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
+import org.eclipse.ptp.ui.managers.AbstractUIManager;
 import org.eclipse.ptp.ui.managers.JobManager;
 import org.eclipse.ptp.ui.managers.MachineManager;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPageFactory;
@@ -76,8 +77,8 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 
 	private final HashMap configurationWizardPageFactories = new HashMap();
 	
-	private MachineManager machineManager = null;
-	private JobManager jobManager = null;
+	private AbstractUIManager machineManager = null;
+	private AbstractUIManager jobManager = null;
 
 	private List jobList = Collections.synchronizedList(new ArrayList());
 	
@@ -122,11 +123,11 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 		return getDefault().getBundle().getSymbolicName();
 	}	
 	
-	public MachineManager getMachineManager() {
+	public AbstractUIManager getMachineManager() {
 		return machineManager;
 	}
 	
-	public JobManager getJobManager() {
+	public AbstractUIManager getJobManager() {
 		return jobManager;
 	}
 

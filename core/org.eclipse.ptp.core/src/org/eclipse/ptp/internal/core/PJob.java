@@ -24,9 +24,11 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.ptp.core.AttributeConstants;
+import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPMachine;
 import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
+import org.eclipse.ptp.core.IPQueue;
 import org.eclipse.ptp.core.IPUniverse;
 import org.eclipse.ptp.core.elementcontrols.IPElementControl;
 import org.eclipse.ptp.core.elementcontrols.IPJobControl;
@@ -210,5 +212,9 @@ public class PJob extends Parent implements IPJobControl {
 
 	public int totalProcesses() {
 		return size();
+	}
+
+	public IPQueue getQueue() {
+		return (IPQueueControl) getParent();
 	}
 }

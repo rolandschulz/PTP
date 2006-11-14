@@ -23,6 +23,7 @@ import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.ptp.internal.ui.ParallelImages;
 import org.eclipse.ptp.ui.IManager;
 import org.eclipse.ptp.ui.actions.ParallelAction;
+import org.eclipse.ptp.ui.managers.AbstractUIManager;
 import org.eclipse.ptp.ui.managers.JobManager;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.views.AbstractParallelElementView;
@@ -53,7 +54,7 @@ public class TerminateAllAction extends ParallelAction {
 	 */
 	public void run() {
 		IManager manager = view.getUIManager();
-		if (manager instanceof JobManager) {
+		if (manager instanceof AbstractUIManager) {
 			try {
 				((JobManager)manager).terminateAll();
 			} catch (CoreException e) {

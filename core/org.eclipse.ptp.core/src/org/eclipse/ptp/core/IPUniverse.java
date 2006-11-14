@@ -33,57 +33,7 @@ import org.eclipse.ptp.rmsystem.IResourceManager;
  * @see IPJob
  */
 public interface IPUniverse /*extends IPElement*/ {
-	/**
-	 * Returns all the Machines that are visible by this Universe, or null if
-	 * there are none.
-	 * 
-	 * @return An array of all Machines in this Universe, null if there are none
-	 */
-	public IPMachine[] getMachines();
-
-	/**
-	 * Returns all the Machines that are visible by this Universe sorted by
-	 * their name, or null if there are none.
-	 * 
-	 * @return A sorted array of all Machines in this Universe, null if there
-	 *         are none
-	 */
-	public IPMachine[] getSortedMachines();
-
-	/**
-	 * Given a Machine name, returns the Machine object if it can be found in
-	 * this Universe. Returns null if it cannot be found.
-	 * 
-	 * @param mname
-	 *            A name of a Machine to search for in this Universe
-	 * @return The Machine object if found, else null
-	 */
-	public IPMachine findMachineByName(String mname);
-
-	/**
-	 * @param machine_id
-	 * @return
-	 */
-	public IPMachine findMachineById(String machine_id);
-	
-	public IPMachine findMachineByGlobalId(String machin_id);
-	
-	/**
-	 * Returns all the Jobs that are visible by this Universe, or null if there
-	 * are none.
-	 * 
-	 * @return An array of all Jobs in this Universe, null if there are none
-	 */
-	public IPJob[] getJobs();
-
-	/**
-	 * Returns all the Jobs that are visible bythis Universe sorted by their
-	 * name, or null if there are none.
-	 * 
-	 * @return A sorted array of all Jobs in this Universe, null if there are
-	 *         none
-	 */
-	public IPJob[] getSortedJobs();
+	public void deleteJob(IPJob job);
 
 	/**
 	 * @param job_id
@@ -101,6 +51,24 @@ public interface IPUniverse /*extends IPElement*/ {
 	 */
 	public IPJob findJobByName(String jname);
 
+	public IPMachine findMachineByGlobalId(String machin_id);
+	
+	/**
+	 * @param machine_id
+	 * @return
+	 */
+	public IPMachine findMachineById(String machine_id);
+	
+	/**
+	 * Given a Machine name, returns the Machine object if it can be found in
+	 * this Universe. Returns null if it cannot be found.
+	 * 
+	 * @param mname
+	 *            A name of a Machine to search for in this Universe
+	 * @return The Machine object if found, else null
+	 */
+	public IPMachine findMachineByName(String mname);
+
 	/**
 	 * Given a Process name, returns the Process object located on one of the
 	 * Machines in this Universe. Returns null if the Node cannot be found. This
@@ -111,9 +79,61 @@ public interface IPUniverse /*extends IPElement*/ {
 	 * @return The Process object if found, else null
 	 */
 	public IPProcess findProcessByName(String pname);
+
+	/**
+	 * @param id
+	 * @return
+	 */
+	public IPQueue findQueueById(String id);
+
+	/**
+	 * @param id
+	 * @return
+	 */
+	public IResourceManager findResourceManagerById(String id);
+
+	/**
+	 * Returns all the Jobs that are visible by this Universe, or null if there
+	 * are none.
+	 * 
+	 * @return An array of all Jobs in this Universe, null if there are none
+	 */
+	public IPJob[] getJobs();
 	
-	public void deleteJob(IPJob job);
+	/**
+	 * Returns all the Machines that are visible by this Universe, or null if
+	 * there are none.
+	 * 
+	 * @return An array of all Machines in this Universe, null if there are none
+	 */
+	public IPMachine[] getMachines();
 	
+	/**
+	 * @return
+	 */
+	public IPQueue[] getQueues();
+	
+	/**
+	 * @return
+	 */
 	public IResourceManager[] getResourceManagers();
+
+	/**
+	 * Returns all the Jobs that are visible bythis Universe sorted by their
+	 * name, or null if there are none.
+	 * 
+	 * @return A sorted array of all Jobs in this Universe, null if there are
+	 *         none
+	 */
+	public IPJob[] getSortedJobs();
+
+	/**
+	 * Returns all the Machines that are visible by this Universe sorted by
+	 * their name, or null if there are none.
+	 * 
+	 * @return A sorted array of all Machines in this Universe, null if there
+	 *         are none
+	 */
+	public IPMachine[] getSortedMachines();
 
 }

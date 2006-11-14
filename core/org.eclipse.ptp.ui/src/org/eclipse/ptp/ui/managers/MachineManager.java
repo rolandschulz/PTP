@@ -20,6 +20,7 @@ package org.eclipse.ptp.ui.managers;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import org.eclipse.ptp.core.AttributeConstants;
 import org.eclipse.ptp.core.IPMachine;
 import org.eclipse.ptp.core.IPNode;
@@ -39,7 +40,6 @@ import org.eclipse.ptp.ui.model.IElementSet;
 public class MachineManager extends AbstractUIManager {
 	private Map machineList = new HashMap();
 	protected String cur_machine_id = EMPTY_ID;
-
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#shutdown()
 	 */
@@ -89,18 +89,7 @@ public class MachineManager extends AbstractUIManager {
 		if (universe == null) {
 			return new IPMachine[0];
 		}
-		return universe.getSortedMachines();
-	}
-	
-	/** Get Resource Managers
-	 * @return
-	 */
-	public IResourceManager[] getResourceManagers() {
-		IPUniverse universe = modelPresentation.getUniverse();
-		if (universe == null) {
-			return new IResourceManager[0];
-		}
-		return universe.getResourceManagers();
+		return universe.getMachines();
 	}
 	
 	/** Get current machine ID
