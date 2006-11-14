@@ -18,7 +18,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.managers;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
@@ -44,25 +47,24 @@ public class JobManager extends AbstractUIManager {
 	protected String cur_job_id = EMPTY_ID;
 	protected String cur_queue_id = EMPTY_ID;
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.IManager#shutdown()
+	/** Add a job
+	 * @param job
 	 */
-	public void shutdown() {
-		clear();
-		modelPresentation = null;
-		super.shutdown();
-	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.IManager#getElementHandler(java.lang.String)
-	 */
-	public IElementHandler getElementHandler(String id) {
-		return (IElementHandler) jobList.get(id);
-	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.IManager#size()
-	 */
-	public int size() {
-		return jobList.size();
+	public void addJob(IPJob job) {
+		if (!jobList.containsKey(job.getIDString())) {
+			IPProcess[] pProcesses = job.getSortedProcesses();
+			int total_element = pProcesses.length;
+			if (total_element > 0) {
+				IElementHandler elementHandler = new ElementHandler();
+				IElementSet set = elementHandler.getSetRoot();
+				for (int i = 0; i < total_element; i++) {
+					//task id for element key
+					set.add(createElement(set, String.valueOf(pProcesses[i].getTaskId()), pProcesses[i].getIDString()));
+				}
+				elementHandler.add(set);
+				jobList.put(job.getIDString(), elementHandler);
+			}
+		}
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#clear()
@@ -72,84 +74,96 @@ public class JobManager extends AbstractUIManager {
 			jobList.clear();
 		}
 	}
-	/** Get Jobs
-	 * @return jobs
+	/** Find process
+	 * @param job job
+	 * @param id process ID
+	 * @return
 	 */
-	public IPJob[] getJobs() {
-		IPUniverse universe = modelPresentation.getUniverse();
-		if (universe == null) {
-			return new IPJob[0];
-		}
-		return universe.getJobs();
+	public IPProcess findProcess(IPJob job, int task_id) {
+		if (job == null)
+			return null;
+		return job.findProcessByTaskId(task_id);
+		//return job.findProcess(id);
 	}
-	
+	/** Find process
+	 * @param job_id job ID
+	 * @param id process ID
+	 * @return process
+	 */
+	public IPProcess findProcess(String job_id, int task_id) {
+		return findProcess(findJobById(job_id), task_id);
+	}
 	/** Get current job
 	 * @return curretn job
 	 */
 	public IPJob getCurrentJob() {
 		return findJobById(getCurrentJobId());
 	}
+	
 	/** Get current job ID
 	 * @return current job ID
 	 */
 	public String getCurrentJobId() {
 		return cur_job_id;
 	}
-	/** Set current job ID
-	 * @param job_id Job ID
-	 */
-	public void setCurrentJobId(String job_id) {
-		String tmp_jod_id = cur_job_id;
-		cur_job_id = job_id;		
-		fireJobChangedEvent(IJobChangedListener.CHANGED, job_id, tmp_jod_id);
-	}
-	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#getCurrentSetId()
 	 */
 	public String getCurrentSetId() {
 		return cur_set_id;
 	}
-	
-	public void setCurrentSetId(String set_id) {
-		cur_set_id = set_id;
-	}
-	
-	/** Get process status text
-	 * @param proc process
-	 * @return status
-	 */
-	public String getProcessStatusText(IPProcess proc) {
-		switch (getProcessStatus(proc)) {
-		case IPTPUIConstants.PROC_STARTING:
-			return "Starting";
-		case IPTPUIConstants.PROC_RUNNING:
-			return "Running";
-		case IPTPUIConstants.PROC_EXITED:
-			return "Exited";
-		case IPTPUIConstants.PROC_EXITED_SIGNAL:
-			return "Exited Signal";
-		case IPTPUIConstants.PROC_STOPPED:
-			return "Stopped";
-		case IPTPUIConstants.PROC_ERROR:
-			return "Error";
-		default:
-			return "Error";
-		}
-	}
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.IManager#getStatus(java.lang.String)
+	 * @see org.eclipse.ptp.ui.IManager#getElementHandler(java.lang.String)
 	 */
-	public int getStatus(String id) {
-		return getStatus(getCurrentJobId(), Integer.parseInt(id));
-	}	
-	/** Get Status
-	 * @param job_id job ID
-	 * @param proc_id process ID
-	 * @return status 
+	public IElementHandler getElementHandler(String id) {
+		return (IElementHandler) jobList.get(id);
+	}
+	
+	/** Get Jobs
+	 * @return jobs
 	 */
-	public int getStatus(String job_id, int task_id) {
-		return getProcessStatus(findProcess(job_id, task_id));
+	public IPJob[] getJobs() {
+		IPUniverse universe = getUniverse();
+		if (universe == null) {
+			return new IPJob[0];
+		}
+		return universe.getJobs();
+	}
+	
+	public IPJob[] getJobsFromCurrentQueue() {
+		IPQueue queue = getCurrentQueue();
+		if (queue != null) {
+			return queue.getJobs();
+		}
+		return new IPJob[0];
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.IManager#getName(java.lang.String)
+	 */
+	public String getName(String id) {
+		final IPJob job = findJobById(id);
+		final IPQueue queue;
+		final String jobName;
+		if (job != null) {
+			jobName = job.getName();
+			// get the queue from the selected job
+			queue = job.getQueue();
+		}
+		else {
+			jobName = "";
+			// get the currently selected queue
+			queue = getCurrentQueue();
+		}
+		final String queueName;
+		if (queue != null) {
+			final IResourceManager rm = queue.getResourceManager();
+			queueName = rm.getName() + ": " + queue.getName() + ": ";
+		}
+		else {
+			queueName = "";
+		}
+		return queueName + jobName;
 	}
 	/** Get process status
 	 * @param proc process
@@ -172,119 +186,32 @@ public class JobManager extends AbstractUIManager {
 				return IPTPUIConstants.PROC_ERROR;
 		}
 		return IPTPUIConstants.PROC_ERROR;
-	}
-	/** Find process
-	 * @param job_id job ID
-	 * @param id process ID
-	 * @return process
+	}	
+	/** Get process status text
+	 * @param proc process
+	 * @return status
 	 */
-	public IPProcess findProcess(String job_id, int task_id) {
-		return findProcess(findJobById(job_id), task_id);
-	}
-	/** Find process
-	 * @param job job
-	 * @param id process ID
-	 * @return
-	 */
-	public IPProcess findProcess(IPJob job, int task_id) {
-		if (job == null)
-			return null;
-		return job.findProcessByTaskId(task_id);
-		//return job.findProcess(id);
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.IManager#getName(java.lang.String)
-	 */
-	public String getName(String id) {
-		final IPJob job = findJobById(id);
-		final IPQueue queue;
-		final String jobName;
-		if (job != null) {
-			jobName = job.getName();
-			// get the queue from the selected job
-			queue = job.getQueue();
-		}
-		else {
-			jobName = "";
-			// get the currently selected queue
-			queue = getQueue();
-		}
-		final String queueName;
-		if (queue != null) {
-			final IResourceManager rm = queue.getResourceManager();
-			queueName = rm.getName() + ": " + queue.getName() + ": ";
-		}
-		else {
-			queueName = "";
-		}
-		return queueName + jobName;
-	}
-	
-	/** Create Element
-	 * @param set
-	 * @param key
-	 * @param name
-	 * @return
-	 */
-	protected IElement createElement(IElementSet set, String key, String name) {
-		return new Element(set, key, name);
-	}
-	/** Add a job
-	 * @param job
-	 */
-	public void addJob(IPJob job) {
-		if (!jobList.containsKey(job.getIDString())) {
-			IPProcess[] pProcesses = job.getSortedProcesses();
-			int total_element = pProcesses.length;
-			if (total_element > 0) {
-				IElementHandler elementHandler = new ElementHandler();
-				IElementSet set = elementHandler.getSetRoot();
-				for (int i = 0; i < total_element; i++) {
-					//task id for element key
-					set.add(createElement(set, String.valueOf(pProcesses[i].getTaskId()), pProcesses[i].getIDString()));
-				}
-				elementHandler.add(set);
-				jobList.put(job.getIDString(), elementHandler);
-			}
+	public String getProcessStatusText(IPProcess proc) {
+		switch (getProcessStatus(proc)) {
+		case IPTPUIConstants.PROC_STARTING:
+			return "Starting";
+		case IPTPUIConstants.PROC_RUNNING:
+			return "Running";
+		case IPTPUIConstants.PROC_EXITED:
+			return "Exited";
+		case IPTPUIConstants.PROC_EXITED_SIGNAL:
+			return "Exited Signal";
+		case IPTPUIConstants.PROC_STOPPED:
+			return "Stopped";
+		case IPTPUIConstants.PROC_ERROR:
+			return "Error";
+		default:
+			return "Error";
 		}
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.IManager#initial()
-	 */
-	public String initial() {
-		IPJob[] jobs = getJobs();
-		for (int j = 0; j < jobs.length; j++) {
-			addJob(jobs[j]);
-		}
-		
-		String last_job_id = EMPTY_ID;
-		if (cur_queue_id.equals(EMPTY_ID)) {
-			IPQueue[] queues = getQueues();
-			for (int iq=0; iq<queues.length && cur_queue_id.equals(EMPTY_ID); ++iq) {
-				jobs = queues[iq].getJobs();
-				if (jobs.length > 0) {
-					// focus on last job
-					final IPJob lastJob = jobs[jobs.length - 1];
-					cur_queue_id = lastJob.getQueue().getIDString();
-					last_job_id = lastJob.getIDString();
-				}
-			}
-		}
-		else
-		{
-			IPQueue queue = getQueue();
-			jobs = queue.getJobs();
-			if (jobs.length > 0) {
-				// focus on last job
-				final IPJob lastJob = jobs[jobs.length - 1];
-				last_job_id = lastJob.getIDString();
-			}
-		}
-		setCurrentSetId(IElementHandler.SET_ROOT_ID);
-		return last_job_id;
+	public String getQueueID() {
+		return cur_queue_id;
 	}
-	
 	/** Return set id
 	 * @param jid
 	 * @return
@@ -313,6 +240,50 @@ public class JobManager extends AbstractUIManager {
 		}
 		return sets;
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.IManager#getStatus(java.lang.String)
+	 */
+	public int getStatus(String id) {
+		return getStatus(getCurrentJobId(), Integer.parseInt(id));
+	}
+	
+	/** Get Status
+	 * @param job_id job ID
+	 * @param proc_id process ID
+	 * @return status 
+	 */
+	public int getStatus(String job_id, int task_id) {
+		return getProcessStatus(findProcess(job_id, task_id));
+	}
+	
+	public String initial() {
+		IPJob[] jobs = getJobs();
+		for (int j = 0; j < jobs.length; j++) {
+			addJob(jobs[j]);
+		}
+		
+		String last_job_id = EMPTY_ID;
+		final LinkedList queues = new LinkedList(Arrays.asList(getQueues()));
+		final IPQueue curQueue = getCurrentQueue();
+		// move the current Queue to the front of the list
+		if (curQueue != null) {
+			queues.remove(curQueue);
+			queues.add(0, curQueue);
+		}
+		// loop until we find a job or run out of queues
+		for (Iterator qit = queues.iterator(); qit.hasNext() && last_job_id.equals(EMPTY_ID); ) {
+			final IPQueue q = (IPQueue) qit.next();
+			jobs = q.getJobs();
+			if (jobs.length > 0) {
+				// focus on last job
+				final IPJob lastJob = jobs[jobs.length - 1];
+				cur_queue_id = q.getIDString();
+				last_job_id = lastJob.getIDString();
+			}
+		}
+		setCurrentSetId(IElementHandler.SET_ROOT_ID);
+		return last_job_id;
+	}
 	/** Is current set contain process
 	 * @param jid job ID
 	 * @param processID process ID
@@ -329,6 +300,47 @@ public class JobManager extends AbstractUIManager {
 			return false;
 		return set.contains(processID);
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.IManager#removeJob(org.eclipse.ptp.core.IPJob)
+	 */
+	public void removeJob(IPJob job) {
+		jobList.remove(job.getIDString());
+		super.removeJob(job);
+	}
+	
+	/** Set current job ID
+	 * @param job_id Job ID
+	 */
+	public void setCurrentJobId(String job_id) {
+		String tmp_jod_id = cur_job_id;
+		cur_job_id = job_id;		
+		fireJobChangedEvent(IJobChangedListener.CHANGED, job_id, tmp_jod_id);
+	}
+	public void setCurrentQueueId(String id) {
+		if (!cur_queue_id.equals(id)) {
+			cur_queue_id = id;
+			setCurrentJobId(EMPTY_ID);
+		}
+	}
+	public void setCurrentSetId(String set_id) {
+		cur_set_id = set_id;
+	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.IManager#shutdown()
+	 */
+	public void shutdown() {
+		clear();
+		modelPresentation = null;
+		super.shutdown();
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.IManager#size()
+	 */
+	public int size() {
+		return jobList.size();
+	}
+
 	/*******************************************************************************************************************************************************************************************************************************************************************************************************
 	 * terminate action
 	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
@@ -338,6 +350,7 @@ public class JobManager extends AbstractUIManager {
 	public void terminateAll() throws CoreException {
 		terminateAll(getCurrentJobId());
 	}
+	
 	/** terminate all processes in given job
 	 * @param job_id job ID
 	 * @throws CoreException
@@ -345,48 +358,50 @@ public class JobManager extends AbstractUIManager {
 	public void terminateAll(String job_id) throws CoreException {
 		modelPresentation.abortJob(getName(job_id));
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.IManager#removeJob(org.eclipse.ptp.core.IPJob)
-	 */
-	public void removeJob(IPJob job) {
-		jobList.remove(job.getIDString());
-		super.removeJob(job);
+	private IPQueue getCurrentQueue() {
+		final IPQueue queue;
+		if (cur_queue_id.equals(EMPTY_ID)) {
+			IPUniverse universe = getUniverse();
+			IPJob job = universe.findJobById(cur_job_id);
+			if (job == null) {
+				queue = null;
+			}
+			else {
+				queue = job.getQueue();
+			}
+		}
+		else {
+			queue = getQueue(cur_queue_id);
+		}
+		if (queue == null) {
+			cur_queue_id = EMPTY_ID;
+		}
+		else {
+			cur_queue_id = queue.getIDString();
+		}
+		return queue;
 	}
-
-	private IPQueue getQueue() {
-		IPUniverse universe = modelPresentation.getUniverse();
+	
+	private IPQueue getQueue(String id) {
+		IPUniverse universe = getUniverse();
 		if (universe == null) {
 			return null;
 		}
-		if (cur_queue_id.equals(EMPTY_ID)) {
-			IPJob job = universe.findJobById(cur_job_id);
-			if (job == null) {
-				return null;
-			}
-			IPQueue queue = job.getQueue();
-			cur_queue_id = queue.getIDString();
-			return queue;
-		}
-		return universe.findQueueById(cur_queue_id);
+		return universe.findQueueById(id);
 	}
 	
-	public void setCurrentQueueId(String id) {
-		if (!cur_queue_id.equals(id)) {
-			cur_queue_id = id;
-			setCurrentJobId(EMPTY_ID);
-		}
-	}
-	public String getQueueID() {
-		return cur_queue_id;
+	private IPUniverse getUniverse() {
+		return modelPresentation.getUniverse();
 	}
 	
-	public IPJob[] getJobsFromCurrentQueue() {
-		IPQueue queue = getQueue();
-		if (queue != null) {
-			return queue.getJobs();
-		}
-		return new IPJob[0];
+	/** Create Element
+	 * @param set
+	 * @param key
+	 * @param name
+	 * @return
+	 */
+	protected IElement createElement(IElementSet set, String key, String name) {
+		return new Element(set, key, name);
 	}
 	
 }
