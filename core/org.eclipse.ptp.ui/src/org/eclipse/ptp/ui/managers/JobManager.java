@@ -198,11 +198,24 @@ public class JobManager extends AbstractUIManager {
 	 */
 	public String getName(String id) {
 		IPJob job = findJobById(id);
-		if (job == null)
-			return "";
-		final IPQueue queue = job.getQueue();
-		final IResourceManager rm = queue.getResourceManager();
-		return rm.getName() + ": " + queue.getName() + ": " + job.getName();
+		IPQueue queue;
+		IResourceManager rm;
+		String queueName;
+		if (job == null) {
+			queue = getQueue();
+			if (queue != null) {
+				rm = queue.getResourceManager();
+				queueName = rm.getName() + ": " + queue.getName();
+				return queueName + ": ";
+			}
+			else {
+				return "";
+			}
+		}
+		queue = job.getQueue();
+		rm = queue.getResourceManager();
+		queueName = rm.getName() + ": " + queue.getName();
+		return queueName + ": " + job.getName();
 	}
 	
 	/** Create Element
@@ -245,7 +258,7 @@ public class JobManager extends AbstractUIManager {
 		String last_job_id = EMPTY_ID;
 		if (cur_queue_id.equals(EMPTY_ID)) {
 			IPQueue[] queues = getQueues();
-			for (int iq=0; iq<queues.length; ++iq) {
+			for (int iq=0; iq<queues.length && cur_queue_id.equals(EMPTY_ID); ++iq) {
 				jobs = queues[iq].getJobs();
 				if (jobs.length > 0) {
 					// focus on last job

@@ -112,6 +112,7 @@ public class ChangeQueueAction extends GotoDropDownAction {
 			ParallelJobView pmView = ((ParallelJobView)view);
 			pmView.selectQueue(id);			
 			pmView.update();
+			pmView.updateTitle();
 			pmView.refresh(true);
 		}
 	}
