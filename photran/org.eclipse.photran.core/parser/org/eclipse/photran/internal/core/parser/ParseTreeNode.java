@@ -119,6 +119,14 @@ public class ParseTreeNode extends AbstractParseTreeNode
         return children == null ? false : children.remove(childToRemove);
     }
     
+    public boolean removeChild(int index)
+    {
+        if (children == null) return false;
+        
+        children.remove(index);
+        return true;
+    }
+    
     public ParseTreeNode getChild(int index)
     {
         if (children == null || index < 0 || index >= children.size() || children.get(index) == EMPTY)

@@ -13,12 +13,17 @@ public final class OffsetLength
     public boolean contains(OffsetLength other)
     {
         return this.offset <= other.offset
-            && other.end() <= this.end();
+            && other.getPositionPastEnd() <= this.getPositionPastEnd();
     }
-    
-    protected int end()
+
+    public boolean isOnOrAfter(int targetOffset)
     {
-        return offset + length;
+        return this.offset >= targetOffset;
+    }
+
+    public boolean isBefore(int targetOffset)
+    {
+        return this.offset < targetOffset;
     }
 
     public int getOffset()
@@ -34,6 +39,11 @@ public final class OffsetLength
     public int getLength()
     {
         return length;
+    }
+
+    public int getPositionPastEnd()
+    {
+        return offset + length;
     }
 
     public void setLength(int length)
