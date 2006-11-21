@@ -16,19 +16,34 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.external.core.cdi.model.variable;
 
-import org.eclipse.ptp.debug.core.cdi.model.IPCDILocalVariableDescriptor;
-import org.eclipse.ptp.debug.external.core.cdi.model.StackFrame;
-import org.eclipse.ptp.debug.external.core.cdi.model.Target;
-import org.eclipse.ptp.debug.external.core.cdi.model.Thread;
+package org.eclipse.ptp.debug.external.core.proxy.event;
 
-/**
- * @author Clement chu
- *
- */
-public class LocalVariableDescriptor extends VariableDescriptor implements IPCDILocalVariableDescriptor {
-	public LocalVariableDescriptor(Target target, Thread thread, StackFrame frame, String n, String fn, int pos, int depth) {
-		super(target, thread, frame, n, fn, pos, depth);
+import org.eclipse.ptp.core.util.BitList;
+
+
+public class ProxyDebugVarUpdatedEvent extends AbstractProxyDebugEvent implements IProxyDebugEvent {
+	private String[] vars;
+	
+	public ProxyDebugVarUpdatedEvent(BitList set, String[] vars) {
+		super(EVENT_DBG_VAR_UPDATE, set);
+		this.vars = vars;
+	}
+	
+	public String[] getVarUpdates() {
+		return this.vars;
+	}
+	
+	public String toString() {
+		String res = "EVENT_DBG_VAR_UPDATE " + this.getBitSet().toString() + " {";
+
+		for (int i = 0; i < vars.length; i++) {
+			if (i > 0)
+				res += ", ";
+			res += vars[i];
+		}
+		
+		res += "}";
+		return res;
 	}
 }

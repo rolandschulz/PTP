@@ -23,13 +23,15 @@ import org.eclipse.debug.core.model.IExpression;
 import org.eclipse.debug.core.model.IValue;
 import org.eclipse.ptp.debug.core.IPDebugConstants;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
-import org.eclipse.ptp.debug.core.aif.IAIF;
+import org.eclipse.ptp.debug.core.aif.IAIFValue;
+import org.eclipse.ptp.debug.core.aif.IAIFValueArray;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIResumedEvent;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIExpression;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIObject;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIVariable;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIVariableDescriptor;
 import org.eclipse.ptp.debug.core.model.IPStackFrame;
 import org.eclipse.ptp.debug.core.model.IPType;
@@ -121,9 +123,22 @@ public class PExpression extends PLocalVariable implements IExpression {
 		if (fValue.equals(PValueFactory.NULL_VALUE)) {
 			if (frame.isSuspended()) {
 				try {
-					IAIF aif = fCDIExpression.getAIF(frame.getCDIStackFrame());
-					if (aif != null) {
-						fValue = PValueFactory.createValue(this, aif);
+					IPCDIVariable variable = fCDIExpression.getCDIVariable(frame.getCDIStackFrame());
+					if (variable != null) {
+						IAIFValue aifValue = variable.getValue();
+						if (aifValue != null) {
+							if (aifValue instanceof IAIFValueArray) {
+								IPType type = new PType(aifValue.getType());
+								if (type != null && type.isArray()) {
+									int[] dims = type.getArrayDimensions();
+									if (dims.length > 0 && dims[0] > 0)
+										fValue = PValueFactory.createIndexedValue(this, variable, 0, dims[0]);
+								}
+							}
+						}
+						else {
+							fValue = PValueFactory.createValue(this, variable);
+						}
 					}
 				} catch (PCDIException e) {
 					targetRequestFailed(e.getMessage(), null);
@@ -144,7 +159,7 @@ public class PExpression extends PLocalVariable implements IExpression {
 	protected void resetValue() {
 		if (fValue instanceof AbstractPValue) {
 			((AbstractPValue) fValue).reset();
-		}
+		} 
 		fValue = PValueFactory.NULL_VALUE;
 	}
 	/* (non-Javadoc)
@@ -180,7 +195,7 @@ public class PExpression extends PLocalVariable implements IExpression {
 		if (fType == null) {
 			synchronized (this) {
 				if (fType == null) {
-					fType = new PType(((AbstractPValue) fValue).getAIF().getType());
+					fType = ((AbstractPValue)fValue).getType();
 				}
 			}
 		}

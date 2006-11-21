@@ -21,32 +21,27 @@ package org.eclipse.ptp.debug.external.core.commands;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDILocalVariable;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIStackFrame;
 
 /**
  * @author Clement chu
  * 
  */
 public class ListLocalVariablesCommand extends AbstractDebugCommand {
-	private IPCDIStackFrame frame = null;
-	
-	public ListLocalVariablesCommand(BitList tasks, IPCDIStackFrame frame) {
+	public ListLocalVariablesCommand(BitList tasks) {
 		super(tasks);
-		this.frame = frame;
 	}
 	public void preExecCommand(IAbstractDebugger debugger) throws PCDIException {
 		checkBeforeExecCommand(debugger);
 	}
 	public void exec(IAbstractDebugger debugger) throws PCDIException {
-		debugger.listLocalVariables(tasks, frame);
+		debugger.listLocalVariables(tasks);
 	}
-	public IPCDILocalVariable[] getLocalVariables() throws PCDIException {
+	public String[] getLocalVariables() throws PCDIException {
 		Object res = getResultValue();
-		if (res instanceof IPCDILocalVariable[]) {
-			return (IPCDILocalVariable[])res;
+		if (res instanceof String[]) {
+			return (String[])res;
 		}
-		return new IPCDILocalVariable[0];
+		return new String[0];
 	}
 	public String getCommandName() {
 		return "List local variables"; 

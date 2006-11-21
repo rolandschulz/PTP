@@ -20,6 +20,8 @@
 **
 */
 
+//#define DEBUG
+
 #ifdef __gnu_linux__
 #define _GNU_SOURCE
 #endif /* __gnu_linux__ */
@@ -83,7 +85,7 @@ static int			(*AsyncFunc)(void *) = NULL;
 static void *		AsyncFuncData;
 
 static int	SetAndCheckBreak(int, int, int, char *, char *, int, int);
-static int	GetStackframes(int, List **);
+static int	GetStackframes(int, int, int, List **);
 static int	GetAIFVar(char *, AIF **, char **);
 static AIF * ConvertVarToAIF(char *, MIVar *, int);
 static AIF * GetPrimitiveTypeToAIF(int, char *); 
@@ -103,15 +105,12 @@ static int	GDBMIWatchpoint(int, char *, int, int, char *, int);
 static int	GDBMIGo(void);
 static int	GDBMIStep(int, int);
 static int	GDBMITerminate(void);
-static int	GDBMIListStackframes(int);
+static int	GDBMIListStackframes(int, int);
 static int	GDBMISetCurrentStackframe(int);
 static int	GDBMIEvaluateExpression(char *);
 static int	GDBMIGetNativeType(char *);
-#ifdef notdef
-static int	GDBMIGetAIFType(char *);
-#endif
 static int	GDBMIGetLocalVariables(void);
-static int	GDBMIListArguments(int);
+static int	GDBMIListArguments(int, int);
 static int	GDBMIGetInfoThread(void);
 static int	GDBMISetThreadSelect(int);
 static int	GDBMIStackInfoDepth(void);
@@ -122,6 +121,12 @@ static int	GDBCLIListSignals(char*);
 static int	GDBCLISignalInfo(char*);
 static int	GDBCLIHandle(char*);
 static int	GDBMIQuit(void);
+static int	GDBMIDataEvaluateExpression(char*);
+static int	GDBMIVarCreate(char*);
+static int	GDBMIVarDelete(char*);
+static int	GDBMIVarUpdate(char*);
+static int	GDBGetAIFType(char *, int);
+static int	GDBGetAIFValue(char *);
 
 static char* GetModifierType(char *);
 static int getSimpleTypeID(char*, char*);
@@ -133,6 +138,9 @@ static AIF * GetAIFPointer(char *res, AIF *a);
 static int GetAddressLength();
 static List * GetChangedVariables();
 static void RemoveAllMaps();
+
+static char * GetAIFType(MIVar *, char *);
+
 
 dbg_backend_funcs	GDBMIBackend =
 {
@@ -166,6 +174,12 @@ dbg_backend_funcs	GDBMIBackend =
 	GDBCLIListSignals,
 	GDBCLISignalInfo,
 	GDBCLIHandle,
+	GDBMIDataEvaluateExpression,
+	GDBMIVarCreate,
+	GDBMIVarDelete,
+	GDBMIVarUpdate,
+	GDBGetAIFType,
+	GDBGetAIFValue,
 	GDBMIQuit
 };
 
@@ -321,7 +335,7 @@ get_current_frame(stackframe **frame)
 {
 	List *	frames;
 	
-	if (GetStackframes(1, &frames) != DBGRES_OK)
+	if (GetStackframes(1, 0, 0, &frames) != DBGRES_OK)
 		return -1;
 
 	if (EmptyList(frames)) {
@@ -354,7 +368,7 @@ AsyncStop(void *data)
 			e->dbg_event_u.suspend_event.ev_u.bpid = bpmap->remote;
 			e->dbg_event_u.suspend_event.thread_id = evt->threadId;
 			e->dbg_event_u.suspend_event.frame = NULL;
-			e->dbg_event_u.suspend_event.changed_vars = GetChangedVariables();
+			//e->dbg_event_u.suspend_event.changed_vars = GetChangedVariables();
 			break;
 		}
 		/* else must be a temporary breakpoint drop through... */
@@ -372,7 +386,7 @@ AsyncStop(void *data)
 			e->dbg_event_u.suspend_event.reason = DBGEV_SUSPEND_INT;
 			e->dbg_event_u.suspend_event.thread_id = evt->threadId;
 			e->dbg_event_u.suspend_event.frame = frame;
-			e->dbg_event_u.suspend_event.changed_vars = GetChangedVariables();
+			//e->dbg_event_u.suspend_event.changed_vars = GetChangedVariables();
 		}
 		break;
 
@@ -388,7 +402,7 @@ AsyncStop(void *data)
 			e->dbg_event_u.suspend_event.reason = DBGEV_SUSPEND_STEP;
 			e->dbg_event_u.suspend_event.thread_id = evt->threadId;
 			e->dbg_event_u.suspend_event.frame = frame;
-			e->dbg_event_u.suspend_event.changed_vars = GetChangedVariables();
+			//e->dbg_event_u.suspend_event.changed_vars = GetChangedVariables();
 		}
 		break;
 
@@ -407,7 +421,7 @@ AsyncStop(void *data)
 			e->dbg_event_u.suspend_event.ev_u.sig->desc = strdup(evt->sigMeaning);
 			e->dbg_event_u.suspend_event.thread_id = evt->threadId;
 			e->dbg_event_u.suspend_event.frame = frame;
-			e->dbg_event_u.suspend_event.changed_vars = GetChangedVariables();
+			//e->dbg_event_u.suspend_event.changed_vars = GetChangedVariables();
 		}
 		break;
 		
@@ -813,7 +827,9 @@ GDBMIStartSession(char *gdb_path, char *prog, char *path, char *work_dir, char *
 	SendCommandWait(sess, cmd);
 	if (MICommandResultOK(cmd)) {
 		GDB_Version = CLIGetGDBVersion(cmd);
+#ifdef DEBUG		
 		printf("------------------- gdb version: %f\n", GDB_Version);
+#endif
 	}
 	MICommandFree(cmd);
 	
@@ -1372,15 +1388,15 @@ GDBMISetCurrentStackframe(int level)
 }
 
 static int
-GetStackframes(int current, List **flist)
+GetStackframes(int current, int low, int high, List **flist)
 {
 	List *		frames;
 	MIFrame *	f;
 	MICommand *	cmd;
 	stackframe *	s;
 	
+	//checking gdb version
 	if (current) {
-		//checking gdb version
 		if (GDB_Version > 6.3) {
 			cmd = MIStackInfoFrame();
 		}
@@ -1388,9 +1404,14 @@ GetStackframes(int current, List **flist)
 			cmd = CLIFrame();
 		}
 	}
-	else
-		cmd = MIStackListAllFrames();
-		
+	else {
+		if (low == 0 && high == 0) {
+			cmd = MIStackListAllFrames();
+		}
+		else {
+			cmd = MIStackListFrames(low, high);
+		}
+	}
 	SendCommandWait(DebugSession, cmd);
 	
 	if (!MICommandResultOK(cmd)) {
@@ -1437,14 +1458,14 @@ GetStackframes(int current, List **flist)
 ** List current or all stack frames.
 */
 static int
-GDBMIListStackframes(int current)
+GDBMIListStackframes(int low, int high)
 {
 	dbg_event *	e;
 	List *		frames;
 	
 	CHECK_SESSION()
 
-	if (GetStackframes(current, &frames) != DBGRES_OK)
+	if (GetStackframes(0, low, high, &frames) != DBGRES_OK)
 		return DBGRES_ERR;
 	
 	e = NewDbgEvent(DBGEV_FRAMES);
@@ -2048,8 +2069,9 @@ GDBMIGetNativeType(char *var)
 /*
 ** Find AIF type of variable.
 */
+/*
 static int
-GDBMIGetAIFType(char *var)
+GDBGetAIFType(char *var)
 {
 	dbg_event *	e;
 	AIF *		a;
@@ -2069,6 +2091,7 @@ GDBMIGetAIFType(char *var)
 
 	return DBGRES_OK;
 }
+*/
 #endif
 
 static int
@@ -2172,7 +2195,7 @@ GDBMIGetLocalVariables(void)
 ** List arguments.
 */
 static int
-GDBMIListArguments(int level)
+GDBMIListArguments(int low, int high)
 {
 	dbg_event *	e;
 	MICommand *	cmd;
@@ -2182,7 +2205,7 @@ GDBMIListArguments(int level)
 
 	CHECK_SESSION()
 
-	cmd = MIStackListArguments(0, level, level);
+	cmd = MIStackListArguments(0, low, high);
 
 	SendCommandWait(DebugSession, cmd);
 	
@@ -2199,9 +2222,10 @@ GDBMIListArguments(int level)
 	e = NewDbgEvent(DBGEV_ARGS);
 	e->dbg_event_u.list = NewList();
 
-	/*
+	/* 
  	 * Just look at first frame - we should only get
  	 * one anyway...
+ 	 * ****** If frame is more than one, no arg needs *****
  	 */ 
 	SetList(frames);
 	if ((frame = (MIFrame *)GetListElement(frames)) != NULL) {
@@ -2462,7 +2486,6 @@ GDBCLIListSignals(char* name)
 
 	e = NewDbgEvent(DBGEV_SIGNALS);
 	e->dbg_event_u.list = signals;
-	
 	SaveEvent(e);
 	
 	return DBGRES_OK;
@@ -2503,6 +2526,418 @@ GDBCLIHandle(char *arg)
 	}
 	MICommandFree(cmd);
 	SaveEvent(NewDbgEvent(DBGEV_OK));
+	return DBGRES_OK;
+} 
+
+static char * 
+GetPrimitiveType(char *type, char *exp)
+{
+	switch (getSimpleTypeID(type, exp)) {
+		case STRING:
+		case CHAR:
+			return strdup(AIF_CHARACTER_TYPE());
+		case SHORT:
+			return strdup(AIF_INTEGER_TYPE(1, sizeof(short)));
+		case USHORT:
+			return strdup(AIF_INTEGER_TYPE(0, sizeof(unsigned short)));
+		case INT:
+			return strdup(AIF_INTEGER_TYPE(1, sizeof(int)));
+		case UINT:
+			return strdup(AIF_INTEGER_TYPE(0, sizeof(unsigned int)));
+		case LONG:
+			return strdup(AIF_INTEGER_TYPE(1, sizeof(long)));
+		case ULONG:
+			return strdup(AIF_INTEGER_TYPE(0, sizeof(unsigned long)));
+		#ifdef CC_HAS_LONG_LONG				
+			case LONGLONG:
+				return strdup(AIF_INTEGER_TYPE(1, sizeof(long long)));
+			case ULONGLONG:
+				return strdup(AIF_INTEGER_TYPE(0, sizeof(unsigned long long)));
+		#endif /* CC_HAS_LONG_LONG */
+		case FLOAT:
+			return strdup(AIF_FLOATING_TYPE(sizeof(float)));
+		case DOUBLE:
+			return strdup(AIF_FLOATING_TYPE(sizeof(double)));
+		default://other type
+			return strdup(AIF_VOID_TYPE(0));
+			//return NULL;
+			//return strdup(AIF_STRING_TYPE());
+			//strdup(AIF_POINTER_TYPE(strdup(AIF_ADDRESS_TYPE(GetAddressLength())), strdup(AIF_VOID_TYPE(0))));
+	}
+}
+static char *
+GetStructType(MIVar *var, char *exp)
+{
+	MIVar *v;
+	int i;
+	char *type;
+	char *p_type;
+	char *pch;
+	char *struct_name = strdup(var->type);
+
+	if ((pch = strchr(struct_name, ' ')) != NULL) {
+		pch++;
+		p_type = FDSStructInit(pch);
+	}
+	else {
+		p_type = FDSStructInit(struct_name);
+	}
+	free(struct_name);
+
+	if (var->children != NULL) {
+		for (i=0; i<var->numchild; i++) {
+			v = var->children[i];
+			type = FDSAddFieldToStruct(p_type, v->exp, GetAIFType(v, v->exp));
+			free(p_type);
+			p_type = type;
+		}
+	}
+	type = strdup(p_type);
+	free(p_type);
+	return type;
+}
+static char * 
+GetSimpleType(MIVar *var, char *exp)
+{
+	if (var->type[strlen(var->type) - 1] == ')') { /* function */
+		return strdup("&/is4");
+	} 
+	if (strcmp(var->type, "char *") == 0) { /* char pointer */
+		return strdup(AIF_POINTER_TYPE(strdup(AIF_ADDRESS_TYPE(GetAddressLength())), strdup(AIF_STRING_TYPE())));
+	}
+	if (strcmp(var->type, "void *") == 0) { /* void pointer */
+		return strdup(AIF_POINTER_TYPE(strdup(AIF_ADDRESS_TYPE(GetAddressLength())), strdup(AIF_VOID_TYPE(0))));
+	} 
+	if (strncmp(var->type, "enum", 4) == 0) { /* enum */
+		if (var->type[4] == ' ') {
+			return FDSEnumInit(&var->type[5]);
+		}
+		return FDSEnumInit(NULL);
+	}
+	return GetPrimitiveType(var->type, NULL);
+}
+static char * 
+GetArrayType(MIVar *var, char *exp)
+{
+	char *type = NULL;
+	char *pch;
+	char *btype;
+
+	if ((pch = strchr(var->type, '[')) != NULL) {
+		if (var->children != NULL) {//get first array info
+			btype = GetAIFType(var->children[0], exp);
+		}
+		else {
+			*pch = '\0';
+			while (var->type[strlen(var->type) - 1] == ' ') {//remove whilespace
+				var->type[strlen(var->type) - 1] = '\0';
+			}
+			//*(--pch) = '\0';
+			btype = GetAIFType(var, exp);
+		}
+		type = FDSArrayInit(0, var->numchild-1, btype);
+	}
+	free(btype);
+	return type;
+}
+static char *
+GetUnionType(MIVar *var, char *exp)
+{
+	MIVar *v;
+	int i;
+	char *type;
+	char *p_type;
+	char *union_name = NULL;
+
+	if (var->type[5] == ' ') {
+		union_name = strdup(&var->type[6]);
+	}
+	p_type = FDSUnionInit(union_name);
+	if (union_name != NULL)
+		free(union_name);
+
+	if (var->children != NULL) {
+		for (i=0; i<var->numchild; i++) {
+			v = var->children[i];
+			type = FDSAddFieldToUnion(p_type, v->exp, GetAIFType(v, v->exp));
+			free(p_type);
+			p_type = type;
+		}
+	}
+	type = strdup(p_type);
+	free(p_type);
+	return type;
+}
+static char *
+GetPointerType(MIVar *var, char *exp)
+{
+	char *btype = NULL;
+	char *ptype;
+	
+	if (var->children != NULL) {
+		var->type[strlen(var->type) - 1] = '\0'; //remove pointer
+		while (var->type[strlen(var->type) - 1] == ' ') {//remove whilespace
+			var->type[strlen(var->type) - 1] = '\0';
+		}
+
+		if (var->type[strlen(var->type) - 1] == '*') {//pointer
+			//hack miname
+			var->name = strdup(var->children[0]->exp);
+			btype = strdup(AIF_POINTER_TYPE(strdup(AIF_ADDRESS_TYPE(GetAddressLength())), strdup("")));
+		}
+		else if (strncmp(var->type, "char", 4) == 0) { //char pointer
+			//hack miname
+			var->name = strdup(var->children[0]->exp);
+			btype = strdup(AIF_STRING_TYPE());
+		} 
+		else if (strncmp(var->type, "union", 5) == 0) { //union
+			btype = GetUnionType(var, exp);
+		}
+		else {
+			if (var->numchild == 1) {
+				//hack miname
+				var->name = strdup(var->children[0]->exp);
+				btype = GetPrimitiveType(var->type, NULL);
+			}
+			if (btype == NULL) {//struct
+				btype = GetStructType(var, exp);
+			}
+		}
+	}
+	if (btype == NULL)
+		btype = strdup("");
+	
+	ptype = strdup(AIF_POINTER_TYPE(strdup(AIF_ADDRESS_TYPE(GetAddressLength())), btype));
+	free(btype);
+	return ptype;
+}
+static char * 
+GetComplexType(MIVar *var, char *exp)
+{
+	switch (var->type[strlen(var->type) - 1]) {
+	case ']':
+		return GetArrayType(var, exp);
+	case '*':
+		return GetPointerType(var, exp);
+	default:
+		if (strncmp(var->type, "union", 5) == 0) {
+			return GetUnionType(var, exp);
+		}
+		return GetStructType(var, exp);
+	}
+}
+static char *
+GetAIFType(MIVar *var, char *exp)
+{
+	if (strcmp(var->type, "<text variable, no debug info>") == 0) {
+		DbgSetError(DBGERR_NOSYMS, "");
+		return NULL;
+	}
+	if (var->numchild == 0) {
+		return GetSimpleType(var, exp);
+	}
+	return GetComplexType(var, exp);
+}
+static char *
+GetAIFValue(char *res)
+{
+	return NULL;
+}
+static MIVar *
+GetChildrenMIVar(char *mivar_name)
+{
+	MICommand *cmd;
+	MIVar *mivar;
+
+	cmd = MIVarInfoType(mivar_name);
+	SendCommandWait(DebugSession, cmd);
+	if (!MICommandResultOK(cmd)) {
+		DbgSetError(DBGERR_UNKNOWN_VARIABLE, GetLastErrorStr());
+		MICommandFree(cmd);
+		return NULL;
+	}
+	mivar = MIGetVarInfoType(cmd);
+	mivar->name = strdup(mivar_name);
+	MICommandFree(cmd);
+
+	cmd = MIVarListChildren(mivar_name);
+
+	SendCommandWait(DebugSession, cmd);
+	if (!MICommandResultOK(cmd)) {
+		DbgSetError(DBGERR_UNKNOWN_VARIABLE, GetLastErrorStr());
+		MICommandFree(cmd);
+		return NULL;
+	}
+	MIGetVarListChildrenInfo(mivar, cmd);
+	MICommandFree(cmd);
+	return mivar;	
+}
+static MIVar *
+GetMIVar(char *var_name)
+{
+	MICommand *cmd;
+	MIVar *mivar;
+
+	cmd = MIVarCreate("-", "*", var_name);
+	SendCommandWait(DebugSession, cmd);
+	if (!MICommandResultOK(cmd)) {
+		DbgSetError(DBGERR_UNKNOWN_VARIABLE, GetLastErrorStr());
+		MICommandFree(cmd);
+		return NULL;
+	}
+	mivar = MIGetVarCreateInfo(cmd);
+	MICommandFree(cmd);
+	return mivar;
+}
+static int
+GDBGetAIFType(char *var_name, int forChildren)
+{
+	MIVar *mivar;
+	char *type;
+	dbg_event *	e;
+
+	CHECK_SESSION();
+		
+	mivar = forChildren?GetChildrenMIVar(var_name):GetMIVar(var_name);
+	if (mivar == NULL) {
+		return DBGRES_ERR; 
+	}	
+
+	if ((type = GetAIFType(mivar, var_name)) == NULL) {
+		DbgSetError(DBGERR_UNKNOWN_TYPE, "type not supported (yet)");
+		MIVarFree(mivar);
+		return DBGRES_ERR; 
+	}
+#ifdef DEBUG		
+	printf("---------------------- GDBGetAIFType found type: %s\n", type);
+#endif
+		
+	e = NewDbgEvent(DBGEV_AIF_TYPE);
+	e->dbg_event_u.aif_event.var_name = strdup(mivar->name);
+	e->dbg_event_u.aif_event.aif_type = type;
+
+	MIVarFree(mivar);
+	SaveEvent(e);
+
+	return DBGRES_OK;
+}
+static int
+GDBGetAIFValue(char *var_name)
+{
+	char *res;
+	dbg_event *	e;
+
+	CHECK_SESSION();
+
+	e = NewDbgEvent(DBGEV_AIF_VALUE);
+	if ((res = GetVarValue(var_name)) == NULL) {
+		DEBUG_PRINTS("------------------- GDBGetAIFValue error\n");
+		res = strdup("Error..");
+	}
+#ifdef DEBUG		
+	printf("---------------------- GDBGetAIFValue found value: %s\n", res);
+#endif
+	e->dbg_event_u.aif_data = res;
+	SaveEvent(e);
+
+	return DBGRES_OK;
+}
+static int
+GDBMIDataEvaluateExpression(char *arg)
+{
+	MICommand *cmd;
+	dbg_event *	e;
+	char *res = NULL;
+		
+	CHECK_SESSION();
+	
+	cmd = MIDataEvaluateExpression(arg);
+	SendCommandWait(DebugSession, cmd);
+		
+	if (MICommandResultOK(cmd)) {
+		res = MIGetDataEvaluateExpressionInfo(cmd);
+	}
+	if (res == NULL) {
+		res = strdup("No value found.");
+	}
+	MICommandFree(cmd);
+
+	e = NewDbgEvent(DBGEV_DATA_EVA_EX);
+	e->dbg_event_u.data_expression = res;
+	SaveEvent(e);
+
+	return DBGRES_OK;
+}
+static int
+GDBMIVarCreate(char *name)
+{
+	MIVar *mivar;
+	dbg_event *	e;
+
+	CHECK_SESSION();
+	
+	mivar = GetMIVar(name);
+
+	e = NewDbgEvent(DBGEV_VAR_CREATE);
+	e->dbg_event_u.type_desc = strdup(mivar->name);
+	MIVarFree(mivar);
+	SaveEvent(e);
+	
+	return DBGRES_OK;
+} 
+static int
+GDBMIVarDelete(char *name)
+{
+	MICommand *cmd;
+		
+	CHECK_SESSION();
+	
+	cmd = MIVarDelete(name);
+	SendCommandWait(DebugSession, cmd);
+	if (!MICommandResultOK(cmd)) {
+		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
+		MICommandFree(cmd);
+		return DBGRES_ERR;
+	}
+	MICommandFree(cmd);
+	SaveEvent(NewDbgEvent(DBGEV_OK));
+	return DBGRES_OK;
+} 
+static int
+GDBMIVarUpdate(char *name)
+{
+	MICommand *cmd;
+	List *miVarUpdateList;
+	MIVarChange *var;
+	dbg_event *	e;
+		
+	CHECK_SESSION();
+
+	cmd = MIVarUpdate(name);
+	SendCommandWait(DebugSession, cmd);
+
+	e = NewDbgEvent(DBGEV_VARS);
+	e->dbg_event_u.list = NewList();
+	if (!MICommandResultOK(cmd)) {
+		DEBUG_PRINTS("------------------- GDBMIVarUpdate error\n");
+		MICommandFree(cmd);
+		SaveEvent(e);
+		return DBGRES_OK;
+	}
+	MIGetVarUpdateInfo(cmd, &miVarUpdateList);
+	MICommandFree(cmd);
+	
+	for (SetList(miVarUpdateList); (var = (MIVarChange *)GetListElement(miVarUpdateList)) != NULL;) {
+		if (var->in_scope == 1) {
+			AddToList(e->dbg_event_u.list, (void *)strdup(var->name));
+		}
+		else {
+			GDBMIVarDelete(var->name);
+		}
+	}
+	DestroyList(miVarUpdateList, MIVarChangeFree);
+	SaveEvent(e);
+
 	return DBGRES_OK;
 } 
 

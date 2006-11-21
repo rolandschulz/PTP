@@ -66,6 +66,13 @@ static int svr_signalinfo(dbg_backend *, char **);
 static int svr_clihandle(dbg_backend *, char **);
 static int svr_quit(dbg_backend *, char **);
 
+static int svr_dataevaluateexpression(dbg_backend *, char **);
+static int svr_variablecreate(dbg_backend *, char **);
+static int svr_variabledelete(dbg_backend *, char **);
+static int svr_variableupdate(dbg_backend *, char **);
+static int svr_getaiftype(dbg_backend *, char **);
+static int svr_getaifvalue(dbg_backend *, char **);
+
 static svr_cmd svr_cmd_tab[] =
 {
 	{DBG_STARTSESSION_CMD,			svr_start_session},
@@ -95,6 +102,12 @@ static svr_cmd svr_cmd_tab[] =
 	{DBG_LISTSIGNALS_CMD,			svr_listsignals},
 	{DBG_SIGNALINFO_CMD,			svr_signalinfo},
 	{DBG_CLIHANDLE_CMD,				svr_clihandle},
+	{DBG_DATAEVALUATEEXPRESSION_CMD,svr_dataevaluateexpression},
+	{DBG_VARIABLECREATE_CMD,		svr_variablecreate},
+	{DBG_VARIABLEDELETE_CMD,		svr_variabledelete},
+	{DBG_VARIABLEUPDATE_CMD,		svr_variableupdate},
+	{DBG_GETAIFTYPE_CMD,			svr_getaiftype},
+	{DBG_GETAIFVALUE_CMD,			svr_getaifvalue},
 	{"QUI",							svr_quit},
 };
 
@@ -238,7 +251,7 @@ svr_terminate(dbg_backend *db, char **args)
 static int 
 svr_liststackframes(dbg_backend *db, char **args)
 {
-	return db->db_funcs->liststackframes(atoi(args[1]));
+	return db->db_funcs->liststackframes(atoi(args[1]), atoi(args[2]));
 }
 
 static int 
@@ -268,7 +281,7 @@ svr_listlocalvariables(dbg_backend *db, char **args)
 static int 
 svr_listarguments(dbg_backend *db, char **args)
 {
-	return db->db_funcs->listarguments(atoi(args[1]));
+	return db->db_funcs->listarguments(atoi(args[1]), atoi(args[2]));
 }
 
 static int 
@@ -325,4 +338,35 @@ static int
 svr_quit(dbg_backend *db, char **args)
 {
 	return db->db_funcs->quit();
+}
+
+static int
+svr_dataevaluateexpression(dbg_backend *db, char **args)
+{
+	return db->db_funcs->dataevaluateexpression(args[1]);
+}
+static int
+svr_variablecreate(dbg_backend *db, char **args)
+{
+	return db->db_funcs->variablecreate(args[1]);
+}
+static int
+svr_variabledelete(dbg_backend *db, char **args)
+{
+	return db->db_funcs->variabledelete(args[1]);
+}
+static int
+svr_variableupdate(dbg_backend *db, char **args)
+{
+	return db->db_funcs->variableupdate(args[1]);
+}
+static int
+svr_getaiftype(dbg_backend *db, char **args)
+{
+	return db->db_funcs->getaiftype(args[1], atoi(args[2]));
+}
+static int
+svr_getaifvalue(dbg_backend *db, char **args)
+{
+	return db->db_funcs->getaifvalue(args[1]);
 }

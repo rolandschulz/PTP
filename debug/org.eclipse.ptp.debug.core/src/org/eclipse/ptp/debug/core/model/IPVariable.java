@@ -22,17 +22,13 @@ import org.eclipse.cdt.debug.core.model.ICastToArray;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IValueModification;
 import org.eclipse.debug.core.model.IVariable;
-import org.eclipse.ptp.debug.core.aif.IAIF;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIVariable;
 
 /**
  * @author Clement chu
  * 
  */
 public interface IPVariable extends IVariable, IPDebugElement, IFormatSupport, ICastToArray, IValueModification, IEnableDisableTarget {
-	IAIF getAIF() throws DebugException;
 	IPType getType() throws DebugException;
 	boolean isArgument();
-	IPCDIVariable getCDIVariable() throws DebugException;
 }
 

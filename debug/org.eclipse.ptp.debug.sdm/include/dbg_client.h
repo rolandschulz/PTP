@@ -113,4 +113,11 @@ int		DbgClntCLIHandle(char **);
 int 	DbgClntListSignals(char **);
 int 	DbgClntSignalInfo(char **);
 
+int 	DbgClntDataEvaluateExpression(char **);
+int 	DbgClntVariableCreate(char **);
+int 	DbgClntVariableDelete(char **);
+int 	DbgClntVariableUpdate(char **);
+int 	DbgClntGetAIFType(char **);
+int 	DbgClntGetAIFValue(char **);
+
 #endif /* _DBG_CLIENT_H_ */

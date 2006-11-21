@@ -19,7 +19,9 @@
 package org.eclipse.ptp.debug.internal.core.model;
 
 import org.eclipse.debug.core.DebugException;
-import org.eclipse.ptp.debug.core.aif.IAIF;
+import org.eclipse.ptp.debug.core.aif.IAIFType;
+import org.eclipse.ptp.debug.core.aif.IAIFValue;
+import org.eclipse.ptp.debug.core.aif.IAIFValueArray;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIResumedEvent;
@@ -53,17 +55,6 @@ public class PGlobalVariable extends PVariable implements IPGlobalVariable {
 			setCDIVariableObject(varObject);
 			setCDIVariable((varObject instanceof IPCDIVariable) ? (IPCDIVariable) varObject : null);
 		}
-		public IAIF getAIF() throws DebugException {
-			try {
-				return getCDIVariableObject().getAIF();
-			} catch (PCDIException e) {
-				requestFailed(e.getMessage(), null);
-			}
-			return null;
-		}		
-		public void setAIF(IAIF aif) {
-			getCDIVariableObject().setAIF(aif);
-		}		
 		public IInternalVariable createShadow(int start, int length) throws DebugException {
 			IInternalVariable iv = null;
 			try {
@@ -82,7 +73,7 @@ public class PGlobalVariable extends PVariable implements IPGlobalVariable {
 			}
 			return iv;
 		}
-		public synchronized IPCDIVariable getCDIVariable() throws DebugException {
+		private synchronized IPCDIVariable getCDIVariable() throws DebugException {
 			if (fCDIVariable == null) {
 				try {
 					fCDIVariable = getCDITarget().createGlobalVariable((IPCDIGlobalVariableDescriptor) getCDIVariableObject());
@@ -114,18 +105,16 @@ public class PGlobalVariable extends PVariable implements IPGlobalVariable {
 			}
 			return fQualifiedName;
 		}
-		public IPType getType() throws DebugException {
+		public PType getType() throws DebugException {
 			if (fType == null) {
 				IPCDIVariableDescriptor varObject = getCDIVariableObject();
 				if (varObject != null) {
 					synchronized (this) {
 						if (fType == null) {
 							try {
-								IAIF aif = varObject.getAIF();
-								if (aif != null)
-									fType = new PType(aif.getType());
+								fType = new PType(varObject.getType());
 							} catch (PCDIException e) {
-								requestFailed(e.getMessage(), null);
+								requestFailed(e.getMessage(), null);								
 							}
 						}
 					}
@@ -171,7 +160,7 @@ public class PGlobalVariable extends PVariable implements IPGlobalVariable {
 				if (cdiVariable != null)
 					cdiVariable.setValue(expression);
 				else
-					requestFailed(CoreModelMessages.getString("CModificationVariable.0"), null);
+					requestFailed(CoreModelMessages.getString("PModificationVariable.0"), null);
 			} catch (PCDIException e) {
 				targetRequestFailed(e.getMessage(), null);
 			}
@@ -180,7 +169,27 @@ public class PGlobalVariable extends PVariable implements IPGlobalVariable {
 			if (fValue.equals(PValueFactory.NULL_VALUE)) {
 				IPCDIVariable var = getCDIVariable();
 				if (var != null) {
-					fValue = PValueFactory.createValue(getVariable());
+					try {  
+						IAIFValue aifValue = var.getValue();
+						if (aifValue != null) {
+							IAIFType aifType = aifValue.getType();
+							if (aifValue instanceof IAIFValueArray && aifType != null) {
+								IPType type = new PType(aifType);
+								if (type.isArray()) {
+									int[] dims = type.getArrayDimensions();
+									if (dims.length > 0 && dims[0] > 0)
+										fValue = PValueFactory.createIndexedValue(getVariable(), var, 0, dims[0] );
+								}
+							}
+							else {
+								fValue = PValueFactory.createValue( getVariable(), var);
+							}
+							//if (getCDITarget().getConfiguration() instanceof IPCDITargetConfiguration2 && ((IPCDITargetConfiguration2)getCDITarget().getConfiguration()).supportsRuntimeTypeIdentification())
+								//fType = null; // When the debugger supports RTTI getting a new value may also mean a new type.
+						}
+					} catch (PCDIException e) {
+						requestFailed(e.getMessage(), e);
+					}
 				}
 			}
 			return fValue;
@@ -189,7 +198,8 @@ public class PGlobalVariable extends PVariable implements IPGlobalVariable {
 			if (fValue instanceof AbstractPValue) {
 				((AbstractPValue) fValue).dispose();
 				fValue = PValueFactory.NULL_VALUE;
-				setAIF(null);
+				if (fCDIVariable != null)
+					fCDIVariable.resetValue();
 			}
 		}
 		public boolean isChanged() {

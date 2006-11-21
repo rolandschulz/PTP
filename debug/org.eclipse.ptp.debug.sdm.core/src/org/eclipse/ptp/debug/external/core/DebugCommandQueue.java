@@ -44,7 +44,7 @@ public class DebugCommandQueue extends Job {
 	public DebugCommandQueue(IAbstractDebugger debugger) {
         super("Debug Command Queue"); 
 		this.debugger = debugger;
-        setPriority(Job.INTERACTIVE);
+        setPriority(Job.SHORT);
         setSystem(true);
 	}
 	public synchronized boolean isTerminated() {
@@ -113,12 +113,19 @@ System.err.println("*** SEND COMMAND: " + currentCommand.getCommandName() + ", t
 				return;
 			
 			if (!stopAddCommand && !terminated && !contains(command)) {
-				System.err.println("************ DebugCommandQueue -- Add cmd: " + command.getCommandName());
-
+				if (currentCommand != null && currentCommand.canInterrupt()) {
+					if (!command.canInterrupt()) {
+						command.doFlush();
+						return;
+					}
+				}				
+				
 				if (command.isWaitInQueue()) {
 					queue.add(command);
+					//addCommandByPriority(command);
 				} 
 				else {
+					System.err.println("************ DebugCommandQueue -- Add cmd JUMP: " + command.getCommandName());
 					//jump the queue
 					queue.add(0, command);
 				}
@@ -142,6 +149,21 @@ System.err.println("*** SEND COMMAND: " + currentCommand.getCommandName() + ", t
 					System.err.println("************ ERROR in DebugCommandQueue -- duplicate, cmd: " + command.getCommandName());
 				}
 			}
+		}
+	}
+	private void addCommandByPriority(IDebugCommand command) {
+		synchronized (queue) {
+			if (command.getPriority() > IDebugCommand.PRIORITY_L) {
+				for (int i=0; i<queue.size(); i++) {
+					if (((IDebugCommand)queue.get(i)).getPriority() < command.getPriority()) {
+						System.err.println("************ DebugCommandQueue -- add cmd INSERT: " + command.getCommandName());
+						queue.add(i, command);
+						return;
+					}
+				}
+			}
+			System.err.println("************ DebugCommandQueue -- add cmd LAST: " + command.getCommandName());
+			queue.add(command);
 		}
 	}
 	private boolean contains(IDebugCommand command) {

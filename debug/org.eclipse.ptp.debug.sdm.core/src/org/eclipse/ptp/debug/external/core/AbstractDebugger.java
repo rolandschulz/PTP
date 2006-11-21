@@ -199,38 +199,38 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 	public final boolean isExited() {
 		return isExited;
 	}
-	protected void setJobFinished(BitList tasks, String status) {
+	protected synchronized void setJobFinished(BitList tasks, String status) {
 		if (tasks == null || tasks.isEmpty()) {
 			tasks = session.createBitList();
 		}
 		setSuspendTasks(false, tasks);
 		setTerminateTasks(true, tasks);
 		setProcessStatus(tasks.toArray(), status);
-		session.unregisterTargets(tasks, true);
+		session.unregisterTargets(tasks.copy(), true);
 	}
-	protected void setTerminateTasks(boolean isAdd, BitList tasks) {
+	protected synchronized void setTerminateTasks(boolean isAdd, BitList tasks) {
 		BitList terminatedTasks = getTerminatedProc();
 		if (isAdd)
 			terminatedTasks = addTasks(terminatedTasks, tasks);
 		else
 			removeTasks(terminatedTasks, tasks);
 	}
-	protected void setSuspendTasks(boolean isAdd, BitList tasks) {
+	protected synchronized void setSuspendTasks(boolean isAdd, BitList tasks) {
 		BitList suspendedTasks = getSuspendedProc();
 		if (isAdd)
 			suspendedTasks = addTasks(suspendedTasks, tasks);			
 		else
 			removeTasks(suspendedTasks, tasks);
 	}	
-	protected synchronized void setProcessStatus(int[] tasks, String state) {
+	protected void setProcessStatus(int[] tasks, String state) {
 		for (int i = 0; i < tasks.length; i++) {
 			getProcess(tasks[i]).setStatus(state);
 		}
 	}
-	public BitList getSuspendedProc() {
+	public synchronized BitList getSuspendedProc() {
 		return (BitList) job.getAttribute(IAbstractDebugger.SUSPENDED_PROC_KEY);
 	}
-	public BitList getTerminatedProc() {
+	public synchronized BitList getTerminatedProc() {
 		return (BitList) job.getAttribute(IAbstractDebugger.TERMINATED_PROC_KEY);		
 	}
 
@@ -289,35 +289,38 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 	 * @param tasks
 	 * @return
 	 */
-	public synchronized boolean isSuspendTasks(BitList tasks) {
-		tasks.andNot(getSuspendedProc());
+	public synchronized boolean isSuspended(BitList tasks) {
+		removeTasks(tasks, getSuspendedProc());
+		return tasks.isEmpty();
+	}
+	public synchronized boolean isTerminated(BitList tasks) {
+		removeTasks(tasks, getTerminatedProc());
 		return tasks.isEmpty();
 	}
 	//filter process
 	public synchronized BitList filterRunningTasks(BitList tasks) {//get suspend tasks
-		removeTasks(tasks, (BitList) job.getAttribute(TERMINATED_PROC_KEY));
-		BitList suspendedTasks = (BitList) job.getAttribute(SUSPENDED_PROC_KEY);
+		removeTasks(tasks, getTerminatedProc());
+		BitList suspendedTasks = getSuspendedProc();
 		//if the case is in startup, there is no suspended tasks
 		if (suspendedTasks.cardinality() > 0)
 			tasks.and(suspendedTasks);
 		return tasks;
 	}
 	public synchronized BitList filterSuspendTasks(BitList tasks) {//get running tasks
-		removeTasks(tasks, (BitList) job.getAttribute(TERMINATED_PROC_KEY));
-		removeTasks(tasks, (BitList) job.getAttribute(SUSPENDED_PROC_KEY));
+		removeTasks(tasks, getTerminatedProc());
+		removeTasks(tasks, getSuspendedProc());
 		return tasks;
 	}
 	public synchronized BitList filterTerminateTasks(BitList tasks) {//get not terminate tasks
-		removeTasks(tasks, (BitList) job.getAttribute(TERMINATED_PROC_KEY));
+		removeTasks(tasks, getTerminatedProc());
 		return tasks;
 	}
-	public boolean isJobFinished() {
-		BitList terminatedTasks = (BitList) job.getAttribute(TERMINATED_PROC_KEY);
-		return (terminatedTasks.cardinality() == job.totalProcesses());
+	public synchronized boolean isJobFinished() {
+		return (getTerminatedProc().cardinality() == job.totalProcesses());
 	}
 
 	//internal functions
-	private BitList addTasks(BitList curTasks, BitList newTasks) {
+	private synchronized BitList addTasks(BitList curTasks, BitList newTasks) {
 		if (curTasks.size() < newTasks.size()) {
 			newTasks.or(curTasks);
 			return newTasks.copy();
@@ -325,7 +328,7 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		curTasks.or(newTasks);
 		return curTasks;
 	}
-	private void removeTasks(BitList curTasks, BitList newTasks) {
+	private synchronized void removeTasks(BitList curTasks, BitList newTasks) {
 		curTasks.andNot(newTasks);
 	}
 

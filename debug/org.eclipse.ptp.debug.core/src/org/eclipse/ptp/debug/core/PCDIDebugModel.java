@@ -145,7 +145,7 @@ public class PCDIDebugModel {
 	 * Register / Unregister
 	 **************************************************/
 	public void removeDebugTarget(final IPLaunch launch, final BitList tasks, final boolean refresh) {
-		Job aJob = new Job("Creating new debug targets...") {
+		Job aJob = new Job("Removing the debug targets...") {
 			protected IStatus run(IProgressMonitor monitor) {
 				int[] taskArray = tasks.toArray();
 				for (int i=0; i<taskArray.length; i++) {

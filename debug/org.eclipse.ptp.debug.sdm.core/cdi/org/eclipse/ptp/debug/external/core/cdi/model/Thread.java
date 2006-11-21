@@ -33,6 +33,7 @@ import org.eclipse.ptp.debug.external.core.cdi.model.variable.ThreadStorageDescr
 import org.eclipse.ptp.debug.external.core.commands.GetStackInfoDepthCommand;
 import org.eclipse.ptp.debug.external.core.commands.ListStackFramesCommand;
 import org.eclipse.ptp.debug.external.core.commands.SetCurrentStackFrameCommand;
+import org.eclipse.ptp.debug.external.core.proxy.ProxyDebugStackframe;
 
 /**
  * @author Clement chu
@@ -71,6 +72,11 @@ public class Thread extends PObject implements IPCDIThread {
 		}
 		return str;
 	}
+	public void updateState() {
+		try {
+			getCurrentStackFrame();
+		} catch (PCDIException e) {}
+	}
 	public StackFrame getCurrentStackFrame() throws PCDIException {
 		if (currentFrame == null) {
 			IPCDIStackFrame[] frames = getStackFrames(0, 0);
@@ -89,15 +95,12 @@ public class Thread extends PObject implements IPCDIThread {
 			Target target = (Target)getTarget();
 			IPCDIThread currentThread = (IPCDIThread)target.getCurrentThread();
 			target.setCurrentThread(this, false);
-
+			ListStackFramesCommand command = new ListStackFramesCommand(target.getTask());
 			try {
-				ListStackFramesCommand command = new ListStackFramesCommand(target.getTask());
 				target.getDebugger().postCommand(command);
-				IPCDIStackFrame[] frames = command.getStackFrames();
+				ProxyDebugStackframe[] frames = command.getStackFrames();
 				for (int i = 0; i < frames.length; i++) {
-					frames[i].setThread(this);
-					frames[i].setLevel(depth - frames[i].getLevel());
-					currentFrames.add(frames[i]);
+					currentFrames.add(new StackFrame(this, depth - frames[i].getLevel(), frames[i].getLocator(), null));
 				}
 			} finally {
 				target.setCurrentThread(currentThread, false);
@@ -129,6 +132,7 @@ public class Thread extends PObject implements IPCDIThread {
 			} catch (PCDIException e) {
 				// First try fails, retry. gdb patches up the corrupt frame
 				// so retry should give us a frame count that is safe.
+				command = new GetStackInfoDepthCommand(target.getTask());
 				target.getDebugger().postCommand(command);
 				stackdepth = command.getDepth();
 				if (stackdepth > 0) {
@@ -142,10 +146,47 @@ public class Thread extends PObject implements IPCDIThread {
 	}
 	public IPCDIStackFrame[] getStackFrames(int low, int high) throws PCDIException {
 		if (currentFrames == null || currentFrames.size() < high) {
+			currentFrames = new ArrayList();
+			Target target = (Target)getTarget();
+			IPCDIThread currentThread = target.getCurrentThread();
+			target.setCurrentThread(this, false);
+			try {
+				int depth = getStackFrameCount();
+				int upperBound;
+				if (high < depth) {
+					upperBound = Math.min(depth, STACKFRAME_DEFAULT_DEPTH);
+				}
+				else {
+					upperBound = depth;
+				}
+
+				ListStackFramesCommand command = new ListStackFramesCommand(target.getTask(), 0, upperBound);
+				target.getDebugger().postCommand(command);
+				ProxyDebugStackframe[] frames = command.getStackFrames();
+				for (int i = 0; i < frames.length; i++) {
+					currentFrames.add(new StackFrame(this, depth - frames[i].getLevel(), frames[i].getLocator(), null));
+				}
+			} finally {
+				target.setCurrentThread(currentThread, false);
+			}
+			if (currentFrame == null) {
+				for (int i=0; i<currentFrames.size(); i++) {
+					StackFrame f = (StackFrame)currentFrames.get(i);
+					if (f.getLevel() == 0) {
+						currentFrame = f;
+					}
+				}
+			}
+		}
+		List list = ((high - low + 1) <= currentFrames.size()) ? currentFrames.subList(low, high + 1) : currentFrames;
+		return (IPCDIStackFrame[])list.toArray(noStack);
+		/* old design
+		if (currentFrames == null || currentFrames.size() < high) {
 			getStackFrames();
 		}
 		List list = ((high - low + 1) <= currentFrames.size()) ? currentFrames.subList(low, high + 1) : currentFrames;
 		return (IPCDIStackFrame[])list.toArray(noStack);
+		*/
 	}
 	public void setCurrentStackFrame(StackFrame stackframe, boolean doUpdate) throws PCDIException {
 		int frameLevel = 0;
@@ -162,6 +203,7 @@ public class Thread extends PObject implements IPCDIThread {
 				}
 			}
 		}
+		
 		Target target = (Target)getTarget();
 		int level = getStackFrameCount() - frameLevel;
 		SetCurrentStackFrameCommand command = new SetCurrentStackFrameCommand(target.getTask(), level);
@@ -169,6 +211,12 @@ public class Thread extends PObject implements IPCDIThread {
 		if (command.isWaitForReturn()) {
 			currentFrame = stackframe;
 			if (doUpdate) {
+				/*
+				RegisterManager regMgr = ((Session)target.getSession()).getRegisterManager();
+				if (regMgr.isAutoUpdate()) {
+					regMgr.update(target);
+				}
+				*/
 				VariableManager varMgr = ((Session)target.getSession()).getVariableManager();
 				if (varMgr.isAutoUpdate()) {
 					varMgr.update(target);

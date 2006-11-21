@@ -18,7 +18,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.core.cdi.model.variable;
 
-import org.eclipse.ptp.debug.core.aif.IAIF;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIArgumentDescriptor;
 import org.eclipse.ptp.debug.external.core.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.core.cdi.model.Target;
@@ -29,7 +28,7 @@ import org.eclipse.ptp.debug.external.core.cdi.model.Thread;
  *
  */
 public class ArgumentDescriptor extends LocalVariableDescriptor implements IPCDIArgumentDescriptor {
-	public ArgumentDescriptor(Target target, Thread thread, StackFrame frame, String n, String fn, int pos, int depth, IAIF aif) {
-		super(target, thread, frame, n, fn, pos, depth, aif);
+	public ArgumentDescriptor(Target target, Thread thread, StackFrame frame, String n, String fn, int pos, int depth) {
+		super(target, thread, frame, n, fn, pos, depth);
 	}
 }

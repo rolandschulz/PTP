@@ -21,34 +21,32 @@ package org.eclipse.ptp.debug.external.core.commands;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIArgument;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIStackFrame;
 
 /**
  * @author Clement chu
  * 
  */
 public class ListArgumentsCommand extends AbstractDebugCommand {
-	private IPCDIStackFrame frame = null;
-	private int depth = 0;
+	int low = 0;
+	int high = 0;
 	
-	public ListArgumentsCommand(BitList tasks, IPCDIStackFrame frame, int depth) {
+	public ListArgumentsCommand(BitList tasks, int low, int high) {
 		super(tasks);
-		this.frame = frame;
-		this.depth = depth;
+		this.low = low;
+		this.high = high;
 	}
 	public void preExecCommand(IAbstractDebugger debugger) throws PCDIException {
 		checkBeforeExecCommand(debugger);
 	}
 	public void exec(IAbstractDebugger debugger) throws PCDIException {
-		debugger.listArguments(tasks, frame, depth);
+		debugger.listArguments(tasks, low, high);
 	}	
-	public IPCDIArgument[] getArguments() throws PCDIException {
+	public String[] getArguments() throws PCDIException {
 		Object res = getResultValue();
-		if (res instanceof IPCDIArgument[]) {
-			return (IPCDIArgument[])res;
+		if (res instanceof String[]) {
+			return (String[])res;
 		}
-		return new IPCDIArgument[0];
+		return new String[0];
 	}
 	public String getCommandName() {
 		return "List arguments"; 

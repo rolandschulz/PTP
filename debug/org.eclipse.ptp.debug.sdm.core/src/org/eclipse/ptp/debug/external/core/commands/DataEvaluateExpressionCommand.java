@@ -16,19 +16,39 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.external.core.cdi.model.variable;
+package org.eclipse.ptp.debug.external.core.commands;
 
-import org.eclipse.ptp.debug.core.cdi.model.IPCDILocalVariableDescriptor;
-import org.eclipse.ptp.debug.external.core.cdi.model.StackFrame;
-import org.eclipse.ptp.debug.external.core.cdi.model.Target;
-import org.eclipse.ptp.debug.external.core.cdi.model.Thread;
+import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.IAbstractDebugger;
+import org.eclipse.ptp.debug.core.cdi.PCDIException;
+import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugDataExpValueEvent;
 
 /**
  * @author Clement chu
- *
+ * 
  */
-public class LocalVariableDescriptor extends VariableDescriptor implements IPCDILocalVariableDescriptor {
-	public LocalVariableDescriptor(Target target, Thread thread, StackFrame frame, String n, String fn, int pos, int depth) {
-		super(target, thread, frame, n, fn, pos, depth);
+public class DataEvaluateExpressionCommand extends AbstractDebugCommand {
+	private String expression = "";
+	
+	public DataEvaluateExpressionCommand(BitList tasks, String expression) {
+		super(tasks);
+		setPriority(PRIORITY_L);
+		this.expression = expression;
+	}
+	public void preExecCommand(IAbstractDebugger debugger) throws PCDIException {
+		exec(debugger);
+	}
+	public void exec(IAbstractDebugger debugger) throws PCDIException {
+		debugger.dataEvaluateExpression(tasks, expression);
+	}
+	public String getExpressionValue() throws PCDIException {
+		Object res = getResultValue();
+		if (res instanceof ProxyDebugDataExpValueEvent) {
+			return ((ProxyDebugDataExpValueEvent)res).getValue();
+		}
+		return "";
+	}
+	public String getCommandName() {
+		return "Data Evaluate expression: " + expression; 
 	}
 }

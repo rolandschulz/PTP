@@ -101,6 +101,12 @@ static proxy_svr_commands command_tab[] = {
 	{DBG_LISTSIGNALS_CMD,			DbgClntListSignals},
 	{DBG_SIGNALINFO_CMD,			DbgClntSignalInfo},
 	{DBG_CLIHANDLE_CMD,				DbgClntCLIHandle},
+	{DBG_DATAEVALUATEEXPRESSION_CMD,DbgClntDataEvaluateExpression},
+	{DBG_VARIABLECREATE_CMD,		DbgClntVariableCreate},
+	{DBG_VARIABLEDELETE_CMD,		DbgClntVariableDelete},
+	{DBG_VARIABLEUPDATE_CMD,		DbgClntVariableUpdate},
+	{DBG_GETAIFTYPE_CMD,			DbgClntGetAIFType},
+	{DBG_GETAIFVALUE_CMD,			DbgClntGetAIFValue},
 	{DBG_QUIT_CMD,					DbgClntQuit},
 	{NULL,							NULL}
 };

@@ -20,7 +20,6 @@ package org.eclipse.ptp.debug.core.model;
 
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IValue;
-import org.eclipse.ptp.debug.core.aif.IAIF;
 
 /**
  * @author Clement chu
@@ -28,7 +27,5 @@ import org.eclipse.ptp.debug.core.aif.IAIF;
  */
 public interface IPValue extends IValue, IPDebugElement {
 	IPType getType() throws DebugException;
-	IAIF getAIF() throws DebugException;
-	public void setAIF(IAIF aif);
 	String evaluateAsExpression(IPStackFrame frame);
 }

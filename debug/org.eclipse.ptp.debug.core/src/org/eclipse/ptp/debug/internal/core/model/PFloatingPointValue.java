@@ -18,10 +18,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.model;
 
-import org.eclipse.debug.core.DebugException;
 import org.eclipse.ptp.debug.core.aif.AIFException;
 import org.eclipse.ptp.debug.core.aif.IAIFValue;
 import org.eclipse.ptp.debug.core.aif.IAIFValueFloat;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIVariable;
 
 /**
  * @author clement CHU
@@ -30,19 +30,20 @@ import org.eclipse.ptp.debug.core.aif.IAIFValueFloat;
 public class PFloatingPointValue extends PValue {
 	private Number fFloatingPointValue;
 
-	public PFloatingPointValue(PVariable parent) {
-		super(parent);
+	public PFloatingPointValue(PVariable parent, IPCDIVariable variable) {
+		super(parent, variable);
 	}
 	public Number getFloatingPointValue() throws AIFException {
 		if (fFloatingPointValue == null) {
-			IAIFValue cdiValue = null;
-			try {
-				cdiValue = getUnderlyingValue();
-			} catch (DebugException e) {
-				throw new AIFException(e.getMessage());
-			}
-			if (cdiValue instanceof IAIFValueFloat) {
-				fFloatingPointValue = new Float(((IAIFValueFloat)cdiValue).getValueString());
+			IAIFValue aifValue = getUnderlyingValue();
+			if (aifValue instanceof IAIFValueFloat) {
+				IAIFValueFloat floatValue = (IAIFValueFloat)aifValue;
+				if (floatValue.isDouble()) {
+					fFloatingPointValue = new Double(floatValue.doubleValue());
+				}
+				else if (floatValue.isFloat()) {
+					fFloatingPointValue = new Float(floatValue.floatValue());
+				}
 			}
 		}
 		return fFloatingPointValue;

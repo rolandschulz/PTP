@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.cdi.model;
 
-import org.eclipse.ptp.debug.core.aif.IAIF;
+import org.eclipse.ptp.debug.core.aif.IAIFValue;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
 /**
@@ -28,11 +28,15 @@ import org.eclipse.ptp.debug.core.cdi.PCDIException;
 public interface IPCDIVariable  extends IPCDIVariableDescriptor {
 	boolean isEditable() throws PCDIException;
 	void setValue(String expression) throws PCDIException;
-	void setValue(IAIF aif) throws PCDIException;
+	void setValue(IAIFValue fValue) throws PCDIException;
 	void dispose() throws PCDIException;
 	boolean equals(IPCDIVariable variable);
-	public void setChildren(IPCDIVariable[] children);
-	public IPCDIVariable[] getChildren();
+
+	int getChildrenNumber() throws PCDIException;
+	IAIFValue getValue() throws PCDIException;
+	IPCDIVariable[] getChildren() throws PCDIException;
+	IPCDIVariable[] getChildren(int findex, int psize) throws PCDIException;
+	void resetValue();
 }
 
 

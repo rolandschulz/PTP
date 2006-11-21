@@ -44,7 +44,9 @@ public class AIFTypePointer extends TypeDerived implements IAIFTypePointer {
 	}
 	
 	public static void main(String[] args) {
-		IAIFType testType = AIFFactory.getAIFType("^%1/{s1 *|a=is4,b=^>1/,c=^>1/;;;}");
+		//IAIFType testType = AIFFactory.getAIFType("^%1/{s1 *|a=is4,b=^>1/,c=^>1/;;;}");
+		IAIFType testType = AIFFactory.getAIFType("^a4^a4");
+		System.out.println("----: " + ((IAIFTypePointer)testType).getBaseType());
 		System.out.println("----: " + testType);
 		System.out.println("----: " + testType.sizeof());
 	}

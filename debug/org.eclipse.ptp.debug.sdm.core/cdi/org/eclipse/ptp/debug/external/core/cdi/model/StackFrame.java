@@ -19,7 +19,6 @@
 package org.eclipse.ptp.debug.external.core.cdi.model;
 
 import java.math.BigInteger;
-import org.eclipse.ptp.debug.core.aif.AIFException;
 import org.eclipse.ptp.debug.core.aif.IAIFValue;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIArgument;
@@ -34,7 +33,6 @@ import org.eclipse.ptp.debug.external.core.cdi.Session;
 import org.eclipse.ptp.debug.external.core.cdi.VariableManager;
 import org.eclipse.ptp.debug.external.core.cdi.model.variable.ArgumentDescriptor;
 import org.eclipse.ptp.debug.external.core.cdi.model.variable.LocalVariableDescriptor;
-import org.eclipse.ptp.debug.external.core.commands.GetAIFCommand;
 import org.eclipse.ptp.debug.external.core.commands.StepFinishCommand;
 
 /**
@@ -46,19 +44,38 @@ public class StackFrame extends PObject implements IPCDIStackFrame {
 	IPCDIArgumentDescriptor[] argDescs;
 	IPCDILocalVariableDescriptor[] localDescs;
 	Locator fLocator;
+	
 	int level = -1;
 	BigInteger addr = BigInteger.ZERO;
+	String func = "";
 	String file = "";
 	int line = -1;
-	String func = "";
+	//since gdb 6.4
+	String fullname = "";
+	Argument[] args = new Argument[0];
 
-	public StackFrame(Target target, int level, String file, String func, int line, BigInteger addr) {
-		super(target);
+	public StackFrame(Thread thread, int level, IPCDILocator locator, Argument[] args) {
+		super((Target)thread.getTarget());
+		this.pthread = thread;
+		this.fLocator = (Locator)locator;
+		this.level = level;
+		this.addr = fLocator.getAddress();
+		this.file = fLocator.getFile();
+		this.line = fLocator.getLineNumber();
+		this.func = fLocator.getFunction();
+		if (args != null) 
+			this.args = args;
+	}
+	public StackFrame(Thread thread, int level, String file, String func, int line, BigInteger addr, Argument[] args) {
+		super((Target)thread.getTarget());
+		this.pthread = thread;
 		this.level = level;
 		this.addr = addr;
 		this.file = file;
 		this.line = line;
 		this.func = func;
+		if (args != null) 
+			this.args = args;
 	}
 	public IPCDIThread getThread() {
 		return pthread;
@@ -69,6 +86,7 @@ public class StackFrame extends PObject implements IPCDIStackFrame {
 			VariableManager mgr = session.getVariableManager();
 			argDescs = mgr.getArgumentDescriptors(this);
 		}
+		/*
 		else {
 			Target target = (Target)getTarget();
 			for (int i=0; i<argDescs.length; i++) {
@@ -78,6 +96,7 @@ public class StackFrame extends PObject implements IPCDIStackFrame {
 				argDesc.setAIF(command.getAIF());
 			}
 		}
+		*/
 		return argDescs;
 	}
 	public IPCDILocalVariableDescriptor[] getLocalVariableDescriptors() throws PCDIException {
@@ -86,6 +105,7 @@ public class StackFrame extends PObject implements IPCDIStackFrame {
 			VariableManager mgr = session.getVariableManager();
 			localDescs = mgr.getLocalVariableDescriptors(this);
 		}
+		/*
 		else {
 			Target target = (Target)getTarget();
 			for (int i=0; i<localDescs.length; i++) {
@@ -95,6 +115,7 @@ public class StackFrame extends PObject implements IPCDIStackFrame {
 				localDesc.setAIF(command.getAIF());
 			}
 		}
+		*/
 		return localDescs;
 	}
 	public IPCDIArgument createArgument(IPCDIArgumentDescriptor varDesc) throws PCDIException {
@@ -139,23 +160,23 @@ public class StackFrame extends PObject implements IPCDIStackFrame {
 		return super.equals(stackframe);
 	}
 	public void stepReturn() throws PCDIException {
-		try {
-			finish();
-		} catch (PCDIException e) {
-			throw new PCDIException(e.getMessage());
-		}
+		finish();
 	}
 	public void stepReturn(IAIFValue value) throws PCDIException {
+		throw new PCDIException ("----StackFrame - stepReturn not implemented yet");
+		/*
 		try {
 			execReturn(value.getValueString());
 		} catch (AIFException e) {
 			throw new PCDIException(e.getMessage());
 		}
+		*/
 	}
 	protected void finish() throws PCDIException {
 		((Thread)getThread()).setCurrentStackFrame(this, false);
 		Target target = (Target)getTarget();
 		target.getDebugger().postCommand(new StepFinishCommand(target.getTask()));
+		//FIXME need to wait response?
 	}	
 	protected void execReturn(String value) throws PCDIException {
 		((Thread)getThread()).setCurrentStackFrame(this, false);
@@ -178,11 +199,20 @@ public class StackFrame extends PObject implements IPCDIStackFrame {
 	public String getFunction() {
 		return func;
 	}
-	
-	public void setThread(IPCDIThread thread) {
-		this.pthread = thread;
-	}
-	public void setLevel(int level) {
-		this.level = level;
+
+	public class Argument {
+		String name;
+		String value;
+
+		public Argument(String name, String value) {
+			this.name = name;
+			this.value = value;
+		}
+		public String getName() {
+			return name;
+		}
+		public String getValue() {
+			return value;
+		}
 	}
 }

@@ -201,7 +201,7 @@ do_test(session *s, char *dir, char *exe)
 	
 	itimer_mark(t, "suspend");
 		
-	if (DbgListStackframes(s, p1, 0) < 0) {
+	if (DbgListStackframes(s, p1, 0, 1) < 0) {
 		fprintf(stderr, "error: %s\n", DbgGetErrorStr());
 		return 1;
 	}
@@ -233,7 +233,7 @@ do_test(session *s, char *dir, char *exe)
 	
 	itimer_mark(t, "evaluate");
 
-	if (DbgListStackframes(s, p1, 1) < 0) {
+	if (DbgListStackframes(s, p1, 1, 1) < 0) {
 		fprintf(stderr, "error: %s\n", DbgGetErrorStr());
 		return 1;
 	}

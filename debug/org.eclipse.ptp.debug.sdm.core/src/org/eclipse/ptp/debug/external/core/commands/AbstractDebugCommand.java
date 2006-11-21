@@ -44,7 +44,8 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 	protected boolean waitInQueue = false;
 	private boolean canWaitMore = false; 
 	
-	private boolean command_finish = false;
+	protected boolean command_finish = false;
+	protected int priority = PRIORITY_M;
 	
 	/** constructor
 	 * @param tasks
@@ -54,7 +55,7 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 	}
 	/** constructor
 	 * @param tasks the tasks for this command
-	 * @param interrupt whether this command can interrupted or not
+	 * @param interrupt whether this command can interrupt other commands or not
 	 * @param waitForReturn whether this command should wait for return value
 	 */
 	public AbstractDebugCommand(BitList tasks, boolean interrupt, boolean waitForReturn) {
@@ -62,7 +63,7 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 	}
 	/** constructor
 	 * @param tasks the tasks for this command
-	 * @param interrupt whether this command can interrupted or not
+	 * @param interrupt whether this command can interrupt other commands or not
 	 * @param waitForReturn whether this command should wait for return value
 	 * @param waitInQueue whether this command should be queuing or jump the queue (no need to wait to execuate)
 	 */
@@ -75,6 +76,12 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 		this.waitForReturn = waitForReturn;
 		this.waitInQueue = waitInQueue;
 		presetTimeout(PTPDebugCorePlugin.getDefault().getCommandTimeout());
+	}
+	public int getPriority() {
+		return priority;
+	}
+	public void setPriority(int priority) {
+		this.priority = priority;
 	}
 	public boolean isWaitInQueue() {
 		return waitInQueue;
@@ -153,6 +160,9 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 	public void setTimeout(long timeout) {
 		this.timeout = timeout;
 	}
+	public boolean isFisinhed() {
+		return command_finish;
+	}
 	protected boolean isCanncelled() {
 		return cancelled;
 	}
@@ -161,10 +171,12 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 	}
 	public void doCancelWaiting() {
 		command_finish = true;
+		cancelled = true;
 		setReturn(RETURN_CANCEL);
 	}
 	public void doFlush() {
 		command_finish = true;
+		flush = true;
 		setReturn(RETURN_FLUSH);
 	}
 	private void setCheckTasks() {
@@ -220,9 +232,29 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 			waitForReturn();
 		}
 		return getReturn();
+	} 
+	protected void waitSuspendExecCommand(IAbstractDebugger debugger) throws PCDIException {
+		if (!debugger.isSuspended(tasks.copy())) {
+			try {
+				wait(2000);
+				//wait again if tasks are not suspended
+				if (!debugger.isSuspended(tasks.copy())) {
+					wait(2000);
+				}
+			} catch (InterruptedException e) {
+				throw new PCDIException(e);
+			}
+		}
+		//if tasks are still not suspended, then cancel it
+		if (command_finish || !debugger.isSuspended(tasks.copy())) {
+			doFlush();
+		}
+		else {
+			exec(debugger);
+		}
 	}
 	protected void checkBeforeExecCommand(IAbstractDebugger debugger) throws PCDIException {
-		if (debugger.isSuspendTasks(tasks.copy())) {
+		if (debugger.isSuspended(tasks.copy())) {
 			exec(debugger);
 		}
 		else {

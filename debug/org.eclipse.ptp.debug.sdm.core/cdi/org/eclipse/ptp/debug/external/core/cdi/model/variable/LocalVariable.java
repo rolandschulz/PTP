@@ -18,20 +18,23 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.core.cdi.model.variable;
 
-import org.eclipse.ptp.debug.core.aif.IAIF;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDILocalVariable;
 import org.eclipse.ptp.debug.external.core.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.core.cdi.model.Target;
 import org.eclipse.ptp.debug.external.core.cdi.model.Thread;
 
+/**
+ * @author Clement chu
+ * 
+ */
 public class LocalVariable extends Variable implements IPCDILocalVariable {
 	public LocalVariable(LocalVariableDescriptor obj) {
 		super(obj);
 	}
-	public LocalVariable(Target target, Thread thread, StackFrame frame, String name, String fullName, int pos, int depth, IAIF aif) {
-		super(target, thread, frame, name, fullName, pos, depth, aif);
+	public LocalVariable(Target target, Thread thread, StackFrame frame, String name, String fullName, int pos, int depth, String keyName) {
+		super(target, thread, frame, name, fullName, pos, depth, keyName);
 	}
-	protected Variable createVariable(Target target, Thread thread, StackFrame frame, String name, String fullName, int pos, int depth, IAIF aif) {
-		return new LocalVariable(target, thread, frame, name, fullName, pos, depth, aif);
+	protected Variable createVariable(Target target, Thread thread, StackFrame frame, String name, String fullName, int pos, int depth, String keyName) {
+		return new LocalVariable(target, thread, frame, name, fullName, pos, depth, keyName);
 	}
 }

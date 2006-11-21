@@ -350,7 +350,39 @@ DbgEventToStr(dbg_event *e, char **result)
 		free(str);
 		free(str2);
 		break;
+	
+	case DBGEV_AIF_TYPE:
+		proxy_cstring_to_str(e->dbg_event_u.aif_event.var_name, &str);
+		proxy_cstring_to_str(e->dbg_event_u.aif_event.aif_type, &str2);
+		asprintf(result, "%d %s %s %s", e->event, pstr, str, str2);
+		free(str);
+		free(str2);
+		break;
+
+	case DBGEV_AIF_VALUE:
+		proxy_cstring_to_str(e->dbg_event_u.aif_data, &str);
+		asprintf(result, "%d %s %s", e->event, pstr, str);
+		free(str);
+		break;
+
+	case DBGEV_DATA_EVA_EX:
+		proxy_cstring_to_str(e->dbg_event_u.data_expression, &str);
+		asprintf(result, "%d %s %s", e->event, pstr, str);
+		free(str);
+		break;
 		
+	case DBGEV_VAR_UPDATE:
+		dbg_cstring_list_to_str(e->dbg_event_u.list, &str);
+		asprintf(result, "%d %s %s", e->event, pstr, str);
+		free(str);
+		break;
+			
+	case DBGEV_VAR_CREATE:
+		proxy_cstring_to_str(e->dbg_event_u.type_desc, &str);
+		asprintf(result, "%d %s %s", e->event, pstr, str);
+		free(str);
+		break;
+
 	default:
 		res = -1;
 		break;
@@ -786,6 +818,37 @@ DbgStrToEvent(char *str, dbg_event **ev)
 			goto error_out;
 		break;
 
+	case DBGEV_AIF_TYPE:
+		e = NewDbgEvent(DBGEV_AIF_TYPE);
+		if (proxy_str_to_cstring(*ap++, &e->dbg_event_u.aif_event.var_name) < 0 || 
+			proxy_str_to_cstring(*ap++, &e->dbg_event_u.aif_event.aif_type) < 0) 
+			goto error_out;
+		break;
+
+	case DBGEV_AIF_VALUE:
+		e = NewDbgEvent(DBGEV_AIF_VALUE);
+		if (proxy_str_to_cstring(*ap++, &e->dbg_event_u.aif_data) < 0)
+			goto error_out;
+		break;
+
+	case DBGEV_DATA_EVA_EX:
+		e = NewDbgEvent(DBGEV_DATA_EVA_EX);
+		if (proxy_str_to_cstring(*ap++, &e->dbg_event_u.data_expression) < 0)
+			goto error_out;
+		break;
+
+	case DBGEV_VAR_UPDATE:
+		e = NewDbgEvent(DBGEV_VAR_UPDATE);
+		if (dbg_str_to_cstring_list(&ap, &e->dbg_event_u.list) < 0)
+			goto error_out;
+		break;
+
+	case DBGEV_VAR_CREATE:
+		e = NewDbgEvent(DBGEV_VAR_CREATE);
+		if (proxy_str_to_cstring(*ap++, &e->dbg_event_u.type_desc) < 0)
+			goto error_out;
+		break;
+
 	default:
 		goto error_out;
 	}
@@ -891,6 +954,7 @@ FreeDbgEvent(dbg_event *e) {
 			FreeMemoryInfo(e->dbg_event_u.meminfo);
 		break;
 
+	case DBGEV_VAR_UPDATE:
 	case DBGEV_ARGS:
 	case DBGEV_VARS:
 		if (e->dbg_event_u.list != NULL)
@@ -905,6 +969,28 @@ FreeDbgEvent(dbg_event *e) {
 	case DBGEV_BPSET:
 		if (e->dbg_event_u.bpset_event.bp != NULL)
 			FreeBreakpoint(e->dbg_event_u.bpset_event.bp);
+		break;
+
+	case DBGEV_AIF_TYPE:
+		if (e->dbg_event_u.aif_event.var_name != NULL)
+			free(e->dbg_event_u.aif_event.var_name);
+		if (e->dbg_event_u.aif_event.aif_type != NULL)
+			free(e->dbg_event_u.aif_event.aif_type);
+		break;
+
+	case DBGEV_AIF_VALUE:
+		if (e->dbg_event_u.aif_data != NULL)
+			free(e->dbg_event_u.aif_data);
+		break;
+
+	case DBGEV_DATA_EVA_EX:
+		if (e->dbg_event_u.data_expression != NULL)
+			free(e->dbg_event_u.data_expression);
+		break;
+
+	case DBGEV_VAR_CREATE:
+		if (e->dbg_event_u.type_desc != NULL)
+			free(e->dbg_event_u.type_desc);
 		break;
 	}
 	

@@ -114,8 +114,8 @@ public class ProxyDebugClient extends AbstractProxyDebugClient {
 		sendCommand("HLT", procs);
 	}
 
-	public void debugListStackframes(BitList procs, int current) throws IOException {
-		sendCommand("LSF", procs, Integer.toString(current));
+	public void debugListStackframes(BitList procs, int low, int high) throws IOException {
+		sendCommand("LSF", procs, Integer.toString(low), Integer.toString(high));
 	}
 
 	public void debugSetCurrentStackframe(BitList procs, int level) throws IOException {
@@ -134,14 +134,13 @@ public class ProxyDebugClient extends AbstractProxyDebugClient {
 		sendCommand("LLV", procs);
 	}
 
-	public void debugListArguments(BitList procs, int level) throws IOException {
-		sendCommand("LAR", procs, Integer.toString(level));
+	public void debugListArguments(BitList procs, int low, int high) throws IOException {
+		sendCommand("LAR", procs, Integer.toString(low), Integer.toString(low));
 	}
 
 	public void debugListGlobalVariables(BitList procs) throws IOException {
 		sendCommand("LGV", procs);
 	}
-
 
 	public void debugListInfoThreads(BitList procs) throws IOException {
 		sendCommand("ITH", procs);
@@ -182,5 +181,24 @@ public class ProxyDebugClient extends AbstractProxyDebugClient {
 	}
 	public void debugCLIHandle(BitList procs, String arg) throws IOException {
 		sendCommand("CHL", procs, arg);
+	}
+
+	public void debugDataEvaluateExpression(BitList procs, String expr) throws IOException {
+		sendCommand("DEE", procs, expr);
+	}
+	public void debugVariableCreate(BitList procs, String name) throws IOException {
+		sendCommand("VCR", procs, name);
+	}
+	public void debugVariableDelete(BitList procs, String name) throws IOException {
+		sendCommand("VDE", procs, name);
+	}
+	public void debugVariableUpdate(BitList procs, String name) throws IOException {
+		sendCommand("VUP", procs, name);
+	}
+	public void debugGetAIFType(BitList procs, String name, boolean forChildren) throws IOException {
+		sendCommand("GAT", procs, name, Integer.toString(forChildren?1:0));
+	}
+	public void debugGetAIFValue(BitList procs, String name) throws IOException {
+		sendCommand("GAV", procs, name);
 	}
 }

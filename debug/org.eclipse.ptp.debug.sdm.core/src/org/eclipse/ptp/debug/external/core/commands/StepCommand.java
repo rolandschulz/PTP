@@ -30,7 +30,7 @@ public abstract class StepCommand extends AbstractDebugCommand {
 	protected int count = 0;
 
 	public StepCommand(BitList tasks, int count) {
-		super(tasks, false, false);
+		super(tasks, true, false);
 		this.count = count;
 	}
 	public void preExecCommand(IAbstractDebugger debugger) throws PCDIException {

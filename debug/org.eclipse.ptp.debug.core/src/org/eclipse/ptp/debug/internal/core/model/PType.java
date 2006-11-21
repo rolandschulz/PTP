@@ -23,7 +23,6 @@ import org.eclipse.ptp.debug.core.aif.IAIFTypeArray;
 import org.eclipse.ptp.debug.core.aif.IAIFTypeChar;
 import org.eclipse.ptp.debug.core.aif.IAIFTypeFloat;
 import org.eclipse.ptp.debug.core.aif.IAIFTypePointer;
-import org.eclipse.ptp.debug.core.aif.IAIFTypeRange;
 import org.eclipse.ptp.debug.core.aif.IAIFTypeReference;
 import org.eclipse.ptp.debug.core.aif.IAIFTypeStruct;
 import org.eclipse.ptp.debug.core.aif.ITypeIntegral;
@@ -36,8 +35,8 @@ import org.eclipse.ptp.debug.core.model.IPType;
 public class PType implements IPType {
 	private IAIFType fAIFType;
 
-	public PType(IAIFType cdiType) {
-		setAIFType(cdiType);
+	public PType(IAIFType aifType) {
+		setAIFType(aifType);
 	}
 	public String getName() {
 		return (fAIFType != null) ? fAIFType.toString() : null;
@@ -51,8 +50,8 @@ public class PType implements IPType {
 		if (type instanceof IAIFTypeArray) {
 			dims = new int[((IAIFTypeArray)type).getDimension()];
 			for (int i=0; i<dims.length; i++) {
-				IAIFTypeRange range = ((IAIFTypeArray) type).getRange(i);
-				dims[i] = range.getUpper() - range.getLower() + 1;
+				IAIFTypeArray dim_arrType = ((IAIFTypeArray) type).getAIFTypeArray(i);
+				dims[i] = dim_arrType.getRange();
 			}
 		}
 		return dims;

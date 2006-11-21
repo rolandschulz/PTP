@@ -24,6 +24,9 @@ import org.eclipse.ptp.debug.core.cdi.PCDIException;
  * @author Clement chu
  */
 public interface IDebugCommand extends Comparable {
+	public static final int PRIORITY_L = 1;
+	public static final int PRIORITY_M = 2;
+	public static final int PRIORITY_H = 3;
 	public static final String RETURN_NOTHING = "Nothing";
 	public static final String RETURN_OK = "OK";
 	public static final String RETURN_FLUSH = "Flush";
@@ -35,6 +38,11 @@ public interface IDebugCommand extends Comparable {
 	 * @return tasks
 	 */
 	public BitList getTasks();
+	/** 
+	 * Get the priority of the command
+	 * @return priority
+	 */
+	public int getPriority();
 	/**
 	 * execuate command
 	 * 
@@ -90,7 +98,9 @@ public interface IDebugCommand extends Comparable {
 	 * @throws PCDIException
 	 */
 	public boolean waitForReturn() throws PCDIException;
-	/** Set time out for command
+	/**
+	 * Set time out for command
+	 * 
 	 * @param timeout
 	 */
 	public void setTimeout(long timeout);
