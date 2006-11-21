@@ -118,21 +118,18 @@ static MIValue *processMIList(char **buffer);
 static char *translateCString(char **buffer);
 
 char *primaryPrompt = "(gdb)"; //$NON-NLS-1$
-//char *cliPrompt = primaryPrompt;
 char *secondaryPrompt = ">"; //$NON-NLS-1$
 
 /**
  * Point of entry to create an AST for MI.
  *
  * @param buffer Output from MI Channel.
- * @return MIOutput
+ * @param mi MIOutput
  * @see MIOutput
  */
  void
  MIParse(char *buffer, MIOutput *mi) 
  {
-	//MIResultRecord *rr = NULL;
-	//List *oobs = NULL;
 	int id = -1;
 	char *s;
 	char *token;
@@ -154,7 +151,6 @@ char *secondaryPrompt = ">"; //$NON-NLS-1$
 		if (*token != '\0') {
 			if (*token == '^') {
 				token++;
-				//rr = processMIResultRecord(token, id);
 				mi->rr = processMIResultRecord(token, id);
 			} else if (strncmp(token, primaryPrompt, strlen(primaryPrompt)) == 0) {
 				//break; // Do nothing.
@@ -164,18 +160,10 @@ char *secondaryPrompt = ">"; //$NON-NLS-1$
 					if (mi->oobs == NULL)
 						mi->oobs = NewList();
 					AddToList(mi->oobs, (void *)band);
-					/*
-					if (oobs == NULL)
-						oobs = NewList();
-					AddToList(oobs, (void *)band);
-					*/
 				}
 			}
 		}
 	}
-	//mi->oobs = oobs;
-	//mi->rr = rr;
-	//return mi;
 }
 
 /**

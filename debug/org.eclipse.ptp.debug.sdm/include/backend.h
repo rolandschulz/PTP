@@ -44,12 +44,12 @@ struct dbg_backend_funcs {
 	int (*go)(void);
 	int (*step)(int, int);
 	int (*terminate)(void);
-	int (*liststackframes)(int);
+	int (*liststackframes)(int, int);
 	int (*setcurrentstackframe)(int);
 	int (*evaluateexpression)(char *);
 	int (*gettype)(char *);
 	int (*listlocalvariables)(void);
-	int (*listarguments)(int);
+	int (*listarguments)(int, int);
 	int (*listglobalvariables)(void);
 	int (*listinfothreads)(void);
 	int (*setthreadselect)(int);
@@ -59,7 +59,12 @@ struct dbg_backend_funcs {
 	int (*listsignals)(char*);
 	int (*signalinfo)(char*);
 	int (*clihandle)(char*);
-	
+	int (*dataevaluateexpression)(char*);
+	int (*variablecreate)(char*);
+	int (*variabledelete)(char*);
+	int (*variableupdate)(char*);
+	int (*getaiftype)(char*, int);
+	int (*getaifvalue)(char*);
 	int (*quit)(void);
 };
 typedef struct dbg_backend_funcs	dbg_backend_funcs;

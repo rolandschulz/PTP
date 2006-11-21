@@ -16,19 +16,26 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.external.core.cdi.model.variable;
+package org.eclipse.ptp.debug.internal.core.aif;
 
-import org.eclipse.ptp.debug.core.cdi.model.IPCDILocalVariableDescriptor;
-import org.eclipse.ptp.debug.external.core.cdi.model.StackFrame;
-import org.eclipse.ptp.debug.external.core.cdi.model.Target;
-import org.eclipse.ptp.debug.external.core.cdi.model.Thread;
+import org.eclipse.ptp.debug.core.aif.AIFException;
+import org.eclipse.ptp.debug.core.aif.AIFFactory;
+import org.eclipse.ptp.debug.core.aif.IAIFType;
 
-/**
- * @author Clement chu
- *
- */
-public class LocalVariableDescriptor extends VariableDescriptor implements IPCDILocalVariableDescriptor {
-	public LocalVariableDescriptor(Target target, Thread thread, StackFrame frame, String n, String fn, int pos, int depth) {
-		super(target, thread, frame, n, fn, pos, depth);
+public class AIFValueDummy extends AIFValue {
+	String value;
+	
+	public AIFValueDummy(IAIFType type, String value) {
+		super(type);
+		this.value = value;
+		size = AIFFactory.NO_SIZE;
+	}
+	protected void parse(byte[] data) {}
+	
+	public String getValueString() throws AIFException {
+		if (result == null) {
+			result = value;
+		}
+		return result;
 	}
 }

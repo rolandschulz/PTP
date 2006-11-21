@@ -39,7 +39,7 @@ public class GetAIFCommand extends AbstractDebugCommand {
 		checkBeforeExecCommand(debugger);
 	}
 	public void exec(IAbstractDebugger debugger) throws PCDIException {
-		debugger.getAIFValue(tasks, varName);
+		debugger.getAIF(tasks, varName);
 	}
 	public IAIF getAIF() throws PCDIException {
 		try {

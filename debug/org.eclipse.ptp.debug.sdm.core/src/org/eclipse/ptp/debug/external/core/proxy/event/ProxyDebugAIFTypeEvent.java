@@ -16,19 +16,30 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.external.core.cdi.model.variable;
 
-import org.eclipse.ptp.debug.core.cdi.model.IPCDILocalVariableDescriptor;
-import org.eclipse.ptp.debug.external.core.cdi.model.StackFrame;
-import org.eclipse.ptp.debug.external.core.cdi.model.Target;
-import org.eclipse.ptp.debug.external.core.cdi.model.Thread;
+package org.eclipse.ptp.debug.external.core.proxy.event;
 
-/**
- * @author Clement chu
- *
- */
-public class LocalVariableDescriptor extends VariableDescriptor implements IPCDILocalVariableDescriptor {
-	public LocalVariableDescriptor(Target target, Thread thread, StackFrame frame, String n, String fn, int pos, int depth) {
-		super(target, thread, frame, n, fn, pos, depth);
+import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.aif.IAIFType;
+
+
+public class ProxyDebugAIFTypeEvent extends AbstractProxyDebugEvent implements IProxyDebugEvent {
+	private String varname;
+	private IAIFType type;
+	
+	public ProxyDebugAIFTypeEvent(BitList set, String varname, IAIFType type) {
+		super(EVENT_DBG_AIF_TYPE, set);
+		this.varname = varname;
+		this.type = type;
+	}
+	public String getName() {
+		return varname;
+	}
+	public IAIFType getType() {
+		return this.type;
+	}
+	
+	public String toString() {
+		return "EVENT_DBG_AIF_TYPE " + this.getBitSet().toString() + " - var: " + this.varname + ", type: " + this.type.toString();
 	}
 }

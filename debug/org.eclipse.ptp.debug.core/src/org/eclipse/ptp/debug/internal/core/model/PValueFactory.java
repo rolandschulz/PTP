@@ -23,8 +23,7 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.IVariable;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
-import org.eclipse.ptp.debug.core.aif.IAIF;
-import org.eclipse.ptp.debug.core.aif.IAIFValueArray;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIVariable;
 import org.eclipse.ptp.debug.core.model.IPStackFrame;
 import org.eclipse.ptp.debug.core.model.IPType;
 import org.eclipse.ptp.debug.core.model.IPValue;
@@ -63,10 +62,6 @@ public class PValueFactory {
 		public Object getAdapter(Class adapter) {
 			return null;
 		}
-		public IAIF getAIF() {
-			return null;
-		}
-		public void setAIF(IAIF aif) {}
 		public IPType getType() throws DebugException {
 			return null;
 		}
@@ -80,19 +75,24 @@ public class PValueFactory {
 			return null;
 		}
 	};
-
-	static public IPValue createValue(PVariable parent, IAIF aif) {
-		IPValue pValue = new PValue(parent);
-		pValue.setAIF(aif);
-		return pValue;
+	static public IPValue createValue(PVariable parent, IPCDIVariable cdiVariable) {
+		//TODO:  may ignore this checking
+		/*
+		try {
+			if (cdiVariable.getType() instanceof IAIFTypeFloat) {
+				return new PFloatingPointValue(parent, cdiVariable);			
+			}
+		} catch (PCDIException e) {}
+		*/
+		return new PValue(parent, cdiVariable);
 	}
-	static public PIndexedValue createIndexedValue(AbstractPVariable parent, IAIFValueArray aifArray, int start, int length) {
-		return new PIndexedValue(parent, aifArray, start, length);
-	}
-	static public IPValue createValue(PVariable parent) {
-		return new PValue(parent);
+	static public PIndexedValue createIndexedValue(AbstractPVariable parent, IPCDIVariable cdiVariable, int start, int length) {
+		return new PIndexedValue(parent, cdiVariable, start, length);
 	}
 	static public IPValue createValueWithError(PVariable parent, String message) {
 		return new PValue(parent, message);
+	}
+	static public IPValue createGlobalValue(PVariable parent, IPCDIVariable cdiVariable) {
+		return new PGlobalValue(parent, cdiVariable);
 	}
 }

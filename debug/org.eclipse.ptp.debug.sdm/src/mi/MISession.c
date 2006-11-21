@@ -317,9 +317,9 @@ ReadResponse(int fd)
 		p = &res_buf[len];
 	}
 	
-#ifdef DEBUG
 	if (n > 0)
 		p[n] = '\0';
+#ifdef DEBUG
 	printf("<<<gdb %s\n", res_buf); fflush(stdout);
 #endif
 
@@ -339,7 +339,6 @@ void
 MISessionProcessCommandsAndResponses(MISession *sess, fd_set *rfds, fd_set *wfds, MIOutput *output)
 {
 	char *		str;
-	//MIOutput *	output;
 	
 	if (sess->pid == -1)
 		return;
@@ -351,6 +350,7 @@ MISessionProcessCommandsAndResponses(MISession *sess, fd_set *rfds, fd_set *wfds
 	)
 	{	
 		sess->command = (MICommand *)RemoveFirst(sess->send_queue);
+
 #ifdef __gnu_linux__
 		/*
 		 * NOTE: this hack only works if gdb is started with the '-tty' argument (or
@@ -378,9 +378,7 @@ MISessionProcessCommandsAndResponses(MISession *sess, fd_set *rfds, fd_set *wfds
 			return;
 		}
 		
-		//output = MIParse(str);
 		MIParse(str, output);
-			
 			
 		/*
 		 * The output can consist of:
@@ -618,8 +616,7 @@ MISessionProgress(MISession *sess, MIOutput *output)
 				
 			MISetError(MI_ERROR_SYSTEM, strerror(errno));
 			return -1;
-		}
-		
+		}		
 		break;
 	}
 
@@ -629,7 +626,6 @@ MISessionProgress(MISession *sess, MIOutput *output)
 	if (n == 0 && EmptyList(sess->send_queue)) {
 		return 0;
 	}
-			
 	MISessionProcessCommandsAndResponses(sess, &rfds, NULL, output);
 	
 	return n;

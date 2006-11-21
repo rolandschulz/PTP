@@ -448,7 +448,7 @@ DbgClntListStackframes(char **args)
 		return DBGRES_ERR;
 	}
 	
-	asprintf(&cmd, "%s %s", DBG_LISTSTACKFRAMES_CMD, args[2]);
+	asprintf(&cmd, "%s %s %s", DBG_LISTSTACKFRAMES_CMD, args[2], args[3]);
 	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, cmd, NULL);
 	
 	free(cmd);
@@ -558,7 +558,7 @@ DbgClntListArguments(char **args)
 		return DBGRES_ERR;
 	}
 	
-	asprintf(&cmd, "%s %s", DBG_LISTARGUMENTS_CMD, args[2]);
+	asprintf(&cmd, "%s %s %s", DBG_LISTARGUMENTS_CMD, args[2], args[3]);
 	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, cmd, NULL);
 	
 	free(cmd);
@@ -880,4 +880,119 @@ void
 DbgClntUnregisterFileHandler(int fd)
 {
 	UnregisterFileHandler(fd);
+}
+
+int 
+DbgClntDataEvaluateExpression(char **args)
+{
+	int			res;
+	char *		cmd;
+	bitset *	set; 
+
+	set = str_to_bitset(args[1]);
+	if (set == NULL) {
+		DbgSetError(DBGERR_PROCSET, NULL);
+		return DBGRES_ERR;
+	}
+	
+	asprintf(&cmd, "%s \"%s\"", DBG_DATAEVALUATEEXPRESSION_CMD, args[2]);
+	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, cmd, NULL);
+	bitset_free(set);
+	
+	return res;
+}
+int 
+DbgClntVariableCreate(char **args)
+{
+	int			res;
+	char *		cmd;
+	bitset *	set; 
+
+	set = str_to_bitset(args[1]);
+	if (set == NULL) {
+		DbgSetError(DBGERR_PROCSET, NULL);
+		return DBGRES_ERR;
+	}
+	
+	asprintf(&cmd, "%s \"%s\"", DBG_VARIABLECREATE_CMD, args[2]);
+	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, cmd, NULL);
+	bitset_free(set);
+	
+	return res;
+}
+int 
+DbgClntVariableDelete(char **args)
+{
+	int			res;
+	char *		cmd;
+	bitset *	set; 
+
+	set = str_to_bitset(args[1]);
+	if (set == NULL) {
+		DbgSetError(DBGERR_PROCSET, NULL);
+		return DBGRES_ERR;
+	}
+	
+	asprintf(&cmd, "%s \"%s\"", DBG_VARIABLEDELETE_CMD, args[2]);
+	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, cmd, NULL);
+	bitset_free(set);
+	
+	return res;
+}
+int 
+DbgClntVariableUpdate(char **args)
+{
+	int			res;
+	char *		cmd;
+	bitset *	set; 
+
+	set = str_to_bitset(args[1]);
+	if (set == NULL) {
+		DbgSetError(DBGERR_PROCSET, NULL);
+		return DBGRES_ERR;
+	}
+	
+	asprintf(&cmd, "%s \"%s\"", DBG_VARIABLEUPDATE_CMD, args[2]);
+	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, cmd, NULL);
+	bitset_free(set);
+	
+	return res;
+}
+int 
+DbgClntGetAIFType(char **args)
+{
+	int			res;
+	char *		cmd;
+	bitset *	set; 
+
+	set = str_to_bitset(args[1]);
+	if (set == NULL) {
+		DbgSetError(DBGERR_PROCSET, NULL);
+		return DBGRES_ERR;
+	}
+	
+	asprintf(&cmd, "%s \"%s\" %s", DBG_GETAIFTYPE_CMD, args[2], args[3]);
+	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, cmd, NULL);
+	bitset_free(set);
+	
+	return res;
+}
+int 
+DbgClntGetAIFValue(char **args)
+{
+	int			res;
+	char *		cmd;
+	bitset *	set; 
+
+	set = str_to_bitset(args[1]);
+	if (set == NULL) {
+		DbgSetError(DBGERR_PROCSET, NULL);
+		return DBGRES_ERR;
+	}
+	
+	asprintf(&cmd, "%s \"%s\"", DBG_GETAIFVALUE_CMD, args[2]);
+	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, cmd, NULL);
+	bitset_free(set);
+	
+	return res;
 }

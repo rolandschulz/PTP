@@ -19,9 +19,6 @@
 package org.eclipse.ptp.debug.internal.core.model;
 
 import org.eclipse.debug.core.DebugException;
-import org.eclipse.ptp.debug.core.aif.AIFException;
-import org.eclipse.ptp.debug.core.aif.IAIF;
-import org.eclipse.ptp.debug.core.aif.IAIFValue;
 import org.eclipse.ptp.debug.core.model.IPStackFrame;
 import org.eclipse.ptp.debug.core.model.IPValue;
 
@@ -31,20 +28,10 @@ import org.eclipse.ptp.debug.core.model.IPValue;
  */
 public abstract class AbstractPValue extends PDebugElement implements IPValue {
 	private AbstractPVariable fParent = null;
-	private IAIF aif = null;
 
 	public AbstractPValue(AbstractPVariable parent) {
 		super((PDebugTarget) parent.getDebugTarget());
 		fParent = parent;
-	}
-	public IAIF getAIF() throws DebugException {
-		if (aif == null) {
-			aif = fParent.getAIF();
-		}
-		return aif;
-	}
-	public void setAIF(IAIF aif) {
-		this.aif = aif;
 	}
 	public AbstractPVariable getParentVariable() {
 		return fParent;
@@ -54,16 +41,10 @@ public abstract class AbstractPValue extends PDebugElement implements IPValue {
 		AbstractPVariable parent = getParentVariable();
 		if (parent != null) {
 			if (frame != null && frame.canEvaluate()) {
-				if (aif != null) {
-					try {
-						return processUnderlyingValue(aif.getValue());
-					} catch (AIFException e) {
-						valueString = e.getMessage();
-					}
-				}
 				try {
 					valueString = frame.evaluateExpressionToString(parent.getExpressionString());
-				} catch (DebugException e) {
+				}
+				catch( DebugException e ) {
 					valueString = e.getMessage();
 				}
 			}
@@ -74,6 +55,4 @@ public abstract class AbstractPValue extends PDebugElement implements IPValue {
 	abstract public void dispose();
 	abstract protected void reset();
 	abstract protected void preserve();
-	
-	protected abstract String processUnderlyingValue(IAIFValue aifValue) throws AIFException;
 }

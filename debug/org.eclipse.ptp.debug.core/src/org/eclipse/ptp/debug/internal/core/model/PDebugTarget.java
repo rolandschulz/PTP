@@ -70,7 +70,6 @@ import org.eclipse.debug.core.sourcelookup.ISourceLookupDirector;
 import org.eclipse.debug.core.sourcelookup.ISourceLookupParticipant;
 import org.eclipse.debug.core.sourcelookup.containers.FolderSourceContainer;
 import org.eclipse.debug.core.sourcelookup.containers.ProjectSourceContainer;
-import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.debug.core.IPDebugConstants;
 import org.eclipse.ptp.debug.core.PDebugUtils;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
@@ -131,7 +130,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPCDIE
 	private ArrayList fThreads;
 	private IProcess fDebuggeeProcess = null;
 	private IPCDITarget fCDITarget;
-	private IPProcess process;
 	private IPLaunch fLaunch;
 	private IPCDITargetConfiguration fConfig;
 	private PGlobalVariableManager fGlobalVariableManager;
@@ -149,7 +147,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPCDIE
 		super(null);
 		fLaunch = launch;
 		fCDITarget = cdiTarget;
-		process = cdiTarget.getPProcess();
 		setDebugTarget(this);
 		setProcess(debuggeeProcess);
 		setExecFile(file);

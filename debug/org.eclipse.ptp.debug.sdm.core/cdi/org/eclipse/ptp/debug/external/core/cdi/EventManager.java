@@ -195,7 +195,7 @@ public class EventManager extends SessionObject implements IPCDIEventManager, Ob
 						sigMgr.update(currentTarget);
 					}
 					if (varMgr.isAutoUpdate()) {
-						varMgr.update(currentTarget, event.getVarChanges());
+						varMgr.update(currentTarget);
 					}
 					/**
 					 * TODO not quite important

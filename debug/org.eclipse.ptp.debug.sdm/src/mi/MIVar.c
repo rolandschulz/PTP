@@ -308,3 +308,12 @@ MIGetVarUpdateInfo(MICommand *cmd, List** varchanges)
 		}
 	}
 }
+
+MIVar *
+MIGetVarInfoType(MICommand *cmd)
+{
+	if (!cmd->completed || cmd->output == NULL || cmd->output->rr == NULL)
+		return NULL;
+
+	return MIVarParse(cmd->output->rr->results);
+}

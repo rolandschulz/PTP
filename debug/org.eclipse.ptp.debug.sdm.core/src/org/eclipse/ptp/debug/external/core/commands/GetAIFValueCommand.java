@@ -16,19 +16,38 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.external.core.cdi.model.variable;
+package org.eclipse.ptp.debug.external.core.commands;
 
-import org.eclipse.ptp.debug.core.cdi.model.IPCDILocalVariableDescriptor;
-import org.eclipse.ptp.debug.external.core.cdi.model.StackFrame;
-import org.eclipse.ptp.debug.external.core.cdi.model.Target;
-import org.eclipse.ptp.debug.external.core.cdi.model.Thread;
+import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.IAbstractDebugger;
+import org.eclipse.ptp.debug.core.cdi.PCDIException;
+import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugAIFValueEvent;
 
 /**
  * @author Clement chu
- *
+ * 
  */
-public class LocalVariableDescriptor extends VariableDescriptor implements IPCDILocalVariableDescriptor {
-	public LocalVariableDescriptor(Target target, Thread thread, StackFrame frame, String n, String fn, int pos, int depth) {
-		super(target, thread, frame, n, fn, pos, depth);
+public class GetAIFValueCommand extends AbstractDebugCommand {
+	private String keyVarName = "";
+	
+	public GetAIFValueCommand(BitList tasks, String keyVarName) {
+		super(tasks);
+		this.keyVarName = keyVarName;
+	}
+	public void preExecCommand(IAbstractDebugger debugger) throws PCDIException {
+		checkBeforeExecCommand(debugger);
+	}
+	public void exec(IAbstractDebugger debugger) throws PCDIException {
+		debugger.getAIFValue(tasks, keyVarName);
+	}
+	public String getAIFValue() throws PCDIException {
+		Object res = getResultValue();
+		if (res instanceof ProxyDebugAIFValueEvent) {
+			return ((ProxyDebugAIFValueEvent)res).getValue();
+		}
+		throw new PCDIException("No value found.");
+	}
+	public String getCommandName() {
+		return "Get AIF Value: " + keyVarName; 
 	}
 }

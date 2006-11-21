@@ -29,6 +29,7 @@ import org.eclipse.cdt.core.IAddressFactory;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IVariable;
 import org.eclipse.ptp.debug.core.aif.AIFException;
+import org.eclipse.ptp.debug.core.aif.IAIFType;
 import org.eclipse.ptp.debug.core.aif.IAIFValue;
 import org.eclipse.ptp.debug.core.aif.IAIFValueChar;
 import org.eclipse.ptp.debug.core.aif.IAIFValueFloat;
@@ -36,6 +37,8 @@ import org.eclipse.ptp.debug.core.aif.IAIFValueInt;
 import org.eclipse.ptp.debug.core.aif.IAIFValuePointer;
 import org.eclipse.ptp.debug.core.aif.IAIFValueReference;
 import org.eclipse.ptp.debug.core.aif.IAIFValueString;
+import org.eclipse.ptp.debug.core.aif.ITypeAggregate;
+import org.eclipse.ptp.debug.core.aif.ITypeDerived;
 import org.eclipse.ptp.debug.core.aif.IValueAggregate;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIVariable;
@@ -52,9 +55,11 @@ public class PValue extends AbstractPValue {
 	private String fValueString = null;
 	private List fVariables = Collections.EMPTY_LIST;
 	private PType fType;
+	private IPCDIVariable fVariable;
 
-	protected PValue(PVariable parent) {
+	protected PValue(PVariable parent, IPCDIVariable variable) {
 		super(parent);
+		fVariable = variable;		
 	}
 	protected PValue(PVariable parent, String message) {
 		super(parent);
@@ -66,8 +71,8 @@ public class PValue extends AbstractPValue {
 	public String getValueString() throws DebugException {
 		if (fValueString == null && getUnderlyingValue() != null) {
 			resetStatus();
-			IPStackFrame cframe = getParentVariable().getStackFrame();
-			boolean isSuspended = (cframe == null) ? getCDITarget().isSuspended() : cframe.isSuspended();
+			IPStackFrame pframe = getParentVariable().getStackFrame();
+			boolean isSuspended = (pframe == null) ? getCDITarget().isSuspended() : pframe.isSuspended();
 			if (isSuspended) {
 				try {
 					fValueString = processUnderlyingValue(getUnderlyingValue());
@@ -94,7 +99,7 @@ public class PValue extends AbstractPValue {
 				fVariables = new ArrayList(vars.size());
 				Iterator it = vars.iterator();
 				while (it.hasNext()) {
-					fVariables.add(PVariableFactory.createLocalVariable(this, (IPCDIVariable) it.next()));
+					fVariables.add(PVariableFactory.createLocalVariable(this, (IPCDIVariable)it.next()));
 				}
 				resetStatus();
 			} catch (DebugException e) {
@@ -105,21 +110,40 @@ public class PValue extends AbstractPValue {
 	}
 	public boolean hasVariables() throws DebugException {
 		try {
-			IAIFValue value = getUnderlyingValue();
-			if (value != null)
-				return value.getChildrenNumber() > 0;
-		} catch (AIFException e) {
+			IPCDIVariable var = getCurrentVariable();
+			if (var != null) {
+				//return var.getChildrenNumber()>0;
+				IAIFType type = var.getType();
+				if (type instanceof ITypeAggregate) {
+					return true;
+				}
+				if (type instanceof ITypeDerived) {
+					return true;
+				}
+			}
+		} catch (PCDIException e) {
 			targetRequestFailed(e.getMessage(), null);
 		}
 		return false;
 	}
-	public IAIFValue getUnderlyingValue() throws DebugException {
-		return getAIF().getValue();
+	public IPCDIVariable getCurrentVariable() {
+		return fVariable;
+	}
+	public IAIFValue getUnderlyingValue() {
+		try {
+			return getCurrentVariable().getValue();
+		} catch (PCDIException e) {
+			return null;
+		}
 	}
 	protected List getCDIVariables() throws DebugException {
-		IPCDIVariable[] vars = new IPCDIVariable[0];
+		IPCDIVariable[] vars = null;
 		try {
-			vars = getParentVariable().getCDIVariable().getVariables();
+			IPCDIVariable var = getCurrentVariable();
+			vars = var.getChildren();
+			if (vars == null) {
+				vars = new IPCDIVariable[0];
+			}
 		} catch (PCDIException e) {
 			requestFailed(e.getMessage(), e);
 		}
@@ -129,6 +153,10 @@ public class PValue extends AbstractPValue {
 		if (changed) {
 			fValueString = null;
 			resetStatus();
+		}
+		else {
+			//if (getCDITarget().getConfiguration() instanceof IPCDITargetConfiguration2 && ((IPCDITargetConfiguration2)getCDITarget().getConfiguration()).supportsPassiveVariableUpdate())
+				//fValueString = null;
 		}
 		Iterator it = fVariables.iterator();
 		while (it.hasNext()) {
@@ -319,19 +347,17 @@ public class PValue extends AbstractPValue {
 		}
 	}
 	public IPType getType() throws DebugException {
-		IAIFValue cdiValue = getUnderlyingValue();
+		IAIFValue aifValue = getUnderlyingValue();
 		if (fType == null) {
-			if (cdiValue != null) {
+			if (aifValue != null) {
 				synchronized (this) {
 					if (fType == null) {
-						fType = new PType(cdiValue.getType());
+						fType = new PType(aifValue.getType());
 					}
 				}
 			}
 		}
 		return fType;
-		// AbstractCVariable var = getParentVariable();
-		// return ( var instanceof CVariable ) ? ((CVariable)var).getType() : null;
 	}
 	protected void preserve() {
 		setChanged(false);

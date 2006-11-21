@@ -19,7 +19,6 @@
 package org.eclipse.ptp.debug.core.aif;
 
 import java.util.Random;
-
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeAddress;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeArray;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeBool;
@@ -42,6 +41,7 @@ import org.eclipse.ptp.debug.internal.core.aif.AIFValueArray;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValueBool;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValueChar;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValueClass;
+import org.eclipse.ptp.debug.internal.core.aif.AIFValueDummy;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValueEnum;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValueFloat;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValueInt;
@@ -107,6 +107,9 @@ public class AIFFactory {
 	public static final IAIFType UNKNOWNTYPE = new AIFTypeIncomplete();
 	public static final IAIFValue UNKNOWNVALUE = new AIFValueUnknown(UNKNOWNTYPE);
 	
+	public static IAIFValue createAIFValueDummy(IAIFType type, String value) {
+		return new AIFValueDummy(type, value);
+	}
 	public static IAIF UNKNOWNAIF() {
 		return new AIF(UNKNOWNTYPE, UNKNOWNVALUE);
 	}
@@ -249,8 +252,8 @@ public class AIFFactory {
 			return new AIFTypeVoid(void_size);
 		case FDS_ARRAY:
 			System.out.println("        ======= array: " + fmt);
-			int array_end_pos = getEndPosFromLast(fmt, SIGN_CLOSE)+1;
-			return new AIFTypeArray(extractFormat(fmt, 0, array_end_pos), getAIFType(fmt.substring(array_end_pos)));
+			int array_end_pos = getEndPosFromStart(fmt, SIGN_CLOSE);
+			return new AIFTypeArray(extractFormat(fmt, 1, array_end_pos), getAIFType(fmt.substring(array_end_pos+1)));
 		case FDS_NAMED:
 			System.out.println("        ======= named: " + fmt);
 			int named_end_pos = getEndPosFromStart(fmt, FDS_NAMED_END);

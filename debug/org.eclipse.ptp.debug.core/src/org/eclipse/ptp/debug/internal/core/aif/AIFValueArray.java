@@ -23,7 +23,6 @@ import org.eclipse.ptp.debug.core.aif.AIFException;
 import org.eclipse.ptp.debug.core.aif.AIFFactory;
 import org.eclipse.ptp.debug.core.aif.IAIFType;
 import org.eclipse.ptp.debug.core.aif.IAIFTypeArray;
-import org.eclipse.ptp.debug.core.aif.IAIFTypeRange;
 import org.eclipse.ptp.debug.core.aif.IAIFValue;
 import org.eclipse.ptp.debug.core.aif.IAIFValueArray;
 
@@ -69,9 +68,9 @@ public class AIFValueArray extends ValueDerived implements IAIFValueArray {
 	}
 	private Object[] parseRange(ByteBuffer dataBuf, int dim_pos, IAIFType baseType, int dimension) {
 		IAIFTypeArray arrType = (IAIFTypeArray)type;
-		IAIFTypeRange range = arrType.getRange(dim_pos-1);
-		int lower = range.getLower();
-		int upper = range.getUpper();
+		IAIFTypeArray dim_arrType = arrType.getAIFTypeArray(dim_pos-1);
+		int lower = dim_arrType.getLow();
+		int upper = dim_arrType.getHigh();
 		int inner_length = upper-lower+1;
 		Object[] innerValues = new Object[inner_length];
 		

@@ -33,7 +33,4 @@ public interface IPCDIStackFrame extends IPCDIExecuteStepReturn, IPCDIObject  {
 	IPCDIThread getThread();
 	int getLevel();
 	boolean equals(IPCDIStackFrame stackframe);
-	
-	void setThread(IPCDIThread thread);
-	void setLevel(int level);
 }

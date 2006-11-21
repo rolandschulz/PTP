@@ -21,30 +21,38 @@ package org.eclipse.ptp.debug.external.core.commands;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
-import org.eclipse.ptp.debug.core.cdi.event.IPCDIResumedEvent;
+import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugAIFTypeEvent;
 
 /**
  * @author Clement chu
  * 
  */
-public class GoCommand extends AbstractDebugCommand {
-	public GoCommand(BitList tasks) {
-		super(tasks, true, false);
+public class GetAIFTypeCommand extends AbstractDebugCommand {
+	private String keyVarName = "";
+	private boolean forChildren = false;
+	
+	public GetAIFTypeCommand(BitList tasks, String keyVarName, boolean forChildren) {
+		super(tasks);
+		this.keyVarName = keyVarName;
+		this.forChildren = forChildren;
+	}
+	public GetAIFTypeCommand(BitList tasks, String keyVarName) {
+		this(tasks, keyVarName, false);
 	}
 	public void preExecCommand(IAbstractDebugger debugger) throws PCDIException {
-		debugger.filterRunningTasks(tasks);
-		if (!tasks.isEmpty()) {
-			exec(debugger);
-		}
-		else {
-			doCancelWaiting();
-		}
+		checkBeforeExecCommand(debugger);
 	}
 	public void exec(IAbstractDebugger debugger) throws PCDIException {
-		debugger.handleProcessResumedEvent(tasks, IPCDIResumedEvent.CONTINUE);
-		debugger.go(tasks);
-	}	
+		debugger.getAIFType(tasks, keyVarName, forChildren);
+	}
+	public ProxyDebugAIFTypeEvent getAIFType() throws PCDIException {
+		Object res = getResultValue();
+		if (res instanceof ProxyDebugAIFTypeEvent) {
+			return (ProxyDebugAIFTypeEvent)res;
+		}
+		throw new PCDIException("No type found.");
+	}
 	public String getCommandName() {
-		return "Go"; 
+		return "Get AIF Type"; 
 	}
 }

@@ -280,12 +280,12 @@ DbgSuspend(session *s, bitset *set)
  * Stack frame operations
  */
 int 
-DbgListStackframes(session *s, bitset *set, int current)
+DbgListStackframes(session *s, bitset *set, int low, int depth)
 {
 	int		res;
 	char *	set_str = bitset_to_str(set);
 	
-	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_LISTSTACKFRAMES_CMD, DBG_LISTSTACKFRAMES_FMT, set_str, current);
+	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_LISTSTACKFRAMES_CMD, DBG_LISTSTACKFRAMES_FMT, set_str, low, depth);
 	free(set_str);
 	return res;
 }
@@ -335,11 +335,11 @@ DbgListLocalVariables(session *s, bitset *set)
 }
 
 int 
-DbgListArguments(session *s, bitset *set, int level)
+DbgListArguments(session *s, bitset *set, int low, int high)
 {
 	int		res;
 	char *	set_str = bitset_to_str(set);
-	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_LISTARGUMENTS_CMD, DBG_LISTARGUMENTS_FMT, set_str, level);
+	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_LISTARGUMENTS_CMD, DBG_LISTARGUMENTS_FMT, set_str, low, high);
 	free(set_str);
 	return res;
 }
@@ -440,6 +440,61 @@ DbgQuit(session *s)
 	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_QUIT_CMD, NULL);
 	return res;
 
+}
+
+int
+DbgDataEvaluateExpression(session *s, bitset *set, char* arg)
+{
+	int		res;
+	char *	set_str = bitset_to_str(set);
+	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_DATAEVALUATEEXPRESSION_CMD, DBG_DATAEVALUATEEXPRESSION_FMT, set_str, arg);
+	free(set_str);
+	return res;
+}
+int
+DbgVariableCreate(session *s, bitset *set, char* arg)
+{
+	int		res;
+	char *	set_str = bitset_to_str(set);
+	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_VARIABLECREATE_CMD, DBG_VARIABLECREATE_FMT, set_str, arg);
+	free(set_str);
+	return res;
+}
+int
+DbgVariableDelete(session *s, bitset *set, char* arg)
+{
+	int		res;
+	char *	set_str = bitset_to_str(set);
+	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_VARIABLEDELETE_CMD, DBG_VARIABLEDELETE_FMT, set_str, arg);
+	free(set_str);
+	return res;
+}
+int
+DbgVariableUpdate(session *s, bitset *set, char* arg)
+{
+	int		res;
+	char *	set_str = bitset_to_str(set);
+	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_VARIABLEUPDATE_CMD, DBG_VARIABLEUPDATE_FMT, set_str, arg);
+	free(set_str);
+	return res;
+}
+int
+DbgGetAIFType(session *s, bitset *set, char* arg, int children)
+{
+	int		res;
+	char *	set_str = bitset_to_str(set);
+	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_GETAIFTYPE_CMD, DBG_GETAIFTYPE_FMT, set_str, arg, children);
+	free(set_str);
+	return res;
+}
+int
+DbgGetAIFValue(session *s, bitset *set, char* arg)
+{
+	int		res;
+	char *	set_str = bitset_to_str(set);
+	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_GETAIFVALUE_CMD, DBG_GETAIFVALUE_FMT, set_str, arg);
+	free(set_str);
+	return res;
 }
 
 /*

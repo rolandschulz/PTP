@@ -18,10 +18,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.model;
 
+import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.debug.core.DebugException;
-import org.eclipse.ptp.debug.core.aif.IAIF;
-import org.eclipse.ptp.debug.core.aif.IAIFValue;
-import org.eclipse.ptp.debug.core.aif.IAIFValueArray;
+import org.eclipse.ptp.debug.core.aif.IAIFType;
+import org.eclipse.ptp.debug.core.aif.IAIFTypeArray;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIArgumentDescriptor;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDILocalVariableDescriptor;
@@ -49,17 +49,6 @@ public class PLocalVariable extends PVariable {
 			setCDIVariableObject(varObject);
 			setCDIVariable((varObject instanceof IPCDIVariable) ? (IPCDIVariable) varObject : null);
 		}
-		public IAIF getAIF() throws DebugException {
-			try {
-				return getCDIVariableObject().getAIF();
-			} catch (PCDIException e) {
-				requestFailed(e.getMessage(), null);
-			}
-			return null;
-		}
-		public void setAIF(IAIF aif) {
-			getCDIVariableObject().setAIF(aif);
-		}
 		public IInternalVariable createShadow(int start, int length) throws DebugException {
 			IInternalVariable iv = null;
 			try {
@@ -78,11 +67,12 @@ public class PLocalVariable extends PVariable {
 			}
 			return iv;
 		}
-		public synchronized IPCDIVariable getCDIVariable() throws DebugException {
+		private synchronized IPCDIVariable getCDIVariable() throws DebugException {
 			if (fCDIVariable == null) {
 				try {
-					fCDIVariable = ((PStackFrame) getStackFrame()).getCDIStackFrame().createLocalVariable((IPCDILocalVariableDescriptor)getCDIVariableObject());
-				} catch (PCDIException e) {
+					fCDIVariable = ((PStackFrame)getStackFrame()).getCDIStackFrame().createLocalVariable((IPCDILocalVariableDescriptor)getCDIVariableObject());
+				}
+				catch(PCDIException e) {
 					requestFailed(e.getMessage(), null);
 				}
 			}
@@ -110,18 +100,16 @@ public class PLocalVariable extends PVariable {
 			}
 			return fQualifiedName;
 		}
-		public IPType getType() throws DebugException {
+		public PType getType() throws DebugException {
 			if (fType == null) {
 				IPCDIVariableDescriptor varObject = getCDIVariableObject();
 				if (varObject != null) {
 					synchronized (this) {
 						if (fType == null) {
 							try {
-								IAIF aif = varObject.getAIF();
-								if (aif != null) {
-									fType = new PType(aif.getType());
-								}
-							} catch (PCDIException e) {
+								fType = new PType(varObject.getType());
+							}
+							catch(CDIException e) {
 								requestFailed(e.getMessage(), null);
 							}
 						}
@@ -137,7 +125,7 @@ public class PLocalVariable extends PVariable {
 			} catch (PCDIException e) {
 				logError(e.getMessage());
 			}
-			invalidateValue();
+			invalidateValue();			
 			setCDIVariable(null);
 			if (fType != null)
 				fType.dispose();
@@ -147,14 +135,7 @@ public class PLocalVariable extends PVariable {
 			invalidate(destroy);
 		}
 		public boolean isSameVariable(IPCDIVariable cdiVar) {
-			if (fCDIVariable == null) 
-				return false;
-			
-			if (fCDIVariable.getFullName().equals(cdiVar.getFullName())) {
-				return true;
-			}
-			return false;
-			//return (fCDIVariable != null) ? fCDIVariable.equals(cdiVar) : false;
+			return (fCDIVariable != null) ? fCDIVariable.equals(cdiVar) : false;
 		}
 		public int sizeof() {
 			if (getCDIVariableObject() != null) {
@@ -185,25 +166,21 @@ public class PLocalVariable extends PVariable {
 				IPCDIVariable var = getCDIVariable();
 				if (var != null) {
 					try {
-						IAIF aif = var.getAIF();
-						if (aif != null) {
-							IAIFValue aifValue = aif.getValue();
-							if (aifValue instanceof IAIFValueArray) {
-								IPType type = new PType(aifValue.getType());
-								if (type.isArray()) {
-									IAIFValueArray aifValueArray = (IAIFValueArray)aifValue;
-									int[] dims = type.getArrayDimensions();
-									if (dims.length > 0) {
-										int cur_dim = aifValueArray.getCurrentDimensionPosition();
-										if (dims[cur_dim] > 0)
-											fValue = PValueFactory.createIndexedValue(getVariable(), aifValueArray, 0, dims[cur_dim]);
-									}
-								}
-							}
-							else {
-								fValue = PValueFactory.createValue(getVariable(), aif);
+						IAIFType aifType = var.getType();
+						if (aifType != null && aifType instanceof IAIFTypeArray) {
+							IPType type = new PType(aifType);
+							if (type.isArray()) {
+								int[] dims = type.getArrayDimensions();
+								//int cur_dim = aifValueArray.getCurrentDimensionPosition();
+								if (dims.length > 0 && dims[0] > 0)
+									fValue = PValueFactory.createIndexedValue(getVariable(), var, 0, dims[0]);
 							}
 						}
+						else {
+							fValue = PValueFactory.createValue(getVariable(), var);
+						}
+						//if (getCDITarget().getConfiguration() instanceof IPCDITargetConfiguration2 && ((IPCDITargetConfiguration2)getCDITarget().getConfiguration()).supportsRuntimeTypeIdentification())
+							//fType = null; // When the debugger supports RTTI getting a new value may also mean a new type.
 					} catch (PCDIException e) {
 						requestFailed(e.getMessage(), null);
 					}
@@ -215,7 +192,8 @@ public class PLocalVariable extends PVariable {
 			if (fValue instanceof AbstractPValue) {
 				((AbstractPValue) fValue).dispose();
 				fValue = PValueFactory.NULL_VALUE;
-				setAIF(null);
+				if (fCDIVariable != null)
+					fCDIVariable.resetValue();
 			}
 		}
 		public boolean isChanged() {

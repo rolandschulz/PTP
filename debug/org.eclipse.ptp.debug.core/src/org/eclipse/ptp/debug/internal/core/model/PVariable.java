@@ -24,7 +24,6 @@ import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IValue;
 import org.eclipse.ptp.debug.core.IPDebugConstants;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
-import org.eclipse.ptp.debug.core.aif.IAIF;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIChangedEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEventListener;
@@ -46,9 +45,8 @@ public abstract class PVariable extends AbstractPVariable implements IPCDIEventL
 	interface IInternalVariable {
 		IInternalVariable createShadow(int start, int length) throws DebugException;
 		IInternalVariable createShadow(String type) throws DebugException;
-		IPCDIVariable getCDIVariable() throws DebugException;
+		PType getType() throws DebugException;
 		String getQualifiedName() throws DebugException;
-		IPType getType() throws DebugException;
 		IPValue getValue() throws DebugException;
 		void setValue(String expression) throws DebugException;
 		boolean isChanged();
@@ -60,8 +58,6 @@ public abstract class PVariable extends AbstractPVariable implements IPCDIEventL
 		boolean isEditable() throws DebugException;
 		boolean isArgument();
 		int sizeof();
-		IAIF getAIF() throws DebugException;
-		void setAIF(IAIF aif);
 		void invalidateValue();
 		void preserve();
 	}
@@ -91,26 +87,6 @@ public abstract class PVariable extends AbstractPVariable implements IPCDIEventL
 		fIsEnabled = !isBookkeepingEnabled();
 		setStatus(IPDebugElementStatus.ERROR, MessageFormat.format(CoreModelMessages.getString("PVariable.1"), new String[] { errorMessage })); //$NON-NLS-1$
 		getCDISession().getEventManager().addEventListener(this);
-	}
-	public IPCDIVariable getCDIVariable() throws DebugException {
-		if (isDisposed())
-			return null;
-		IInternalVariable iv = getCurrentInternalVariable();
-		return (iv != null) ? iv.getCDIVariable() : null;
-	}
-	public IAIF getAIF() throws DebugException {
-		if (isDisposed())
-			return null;
-		IInternalVariable iv = getCurrentInternalVariable();
-		return (iv != null) ? iv.getAIF() : null;
-	}
-	public void setAIF(IAIF aif) throws DebugException {
-		if (isDisposed())
-			return;
-		IInternalVariable iv = getCurrentInternalVariable();
-		if (iv != null) {
-			iv.setAIF(aif);
-		}
 	}
 	public IPType getType() throws DebugException {
 		if (isDisposed())

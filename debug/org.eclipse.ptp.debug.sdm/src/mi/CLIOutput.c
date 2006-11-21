@@ -179,7 +179,7 @@ CLIGetPTypeInfo(MICommand *cmd) {
 			text += 7; //bypass " = "
 			p = strchr(text, '{');
 			if (p != NULL) {
-				*p-- = '\0';//remove the whitespace before {
+				*(--p) = '\0';//remove the whitespace before {
 				return strdup(text);
 			}
 			p = strchr(text, '\\');

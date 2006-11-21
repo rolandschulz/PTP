@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.cdi.model;
 
-import org.eclipse.ptp.debug.core.aif.IAIF;
+import org.eclipse.ptp.debug.core.aif.IAIFType;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
 /**
@@ -27,16 +27,19 @@ import org.eclipse.ptp.debug.core.cdi.PCDIException;
  */
 public interface IPCDIVariableDescriptor extends IPCDIObject {
 	String getName();
-	String getFullName();
-	IAIF getAIF() throws PCDIException;
-	void setAIF(IAIF aif);
+	IAIFType getType() throws PCDIException;
 	String getTypeName() throws PCDIException;
 	int sizeof() throws PCDIException;
 	String getQualifiedName() throws PCDIException;
 	IPCDIVariableDescriptor getVariableDescriptorAsArray(int start, int length) throws PCDIException;
 	IPCDIVariableDescriptor getVariableDescriptorAsType(String type) throws PCDIException;
 	boolean equals(IPCDIVariableDescriptor varDesc);
-	IPCDIVariable[] getVariablesAsArray(int start, int length) throws PCDIException;
-	IPCDIVariable[] getVariables() throws PCDIException;
-	String getMIName();
+
+	void setCastingArrayStart(int start);
+	int getCastingArrayStart();
+	void setCastingArrayEnd(int end);
+	int getCastingArrayEnd();
+	
+	//IPCDIVariable[] getVariablesAsArray(int start, int length) throws PCDIException;
+	//IPCDIVariable[] getVariables() throws PCDIException;
 }
