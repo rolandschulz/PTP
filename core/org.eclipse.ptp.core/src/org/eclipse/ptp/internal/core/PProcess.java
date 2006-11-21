@@ -52,8 +52,7 @@ public class PProcess extends Parent implements IPProcessControl {
 	public PProcess(IPElementControl element, String name, String key, String pid, int taskId, String status, String exitCode, String signalName) {
 		super(element, name, key, P_PROCESS);
 		if (element == null) {
-			throw new IllegalArgumentException("Process, " + name +
-					", was created with a null parent.");
+			throw new IllegalArgumentException("Process, " + name + ", was created with a null parent.");
 		}
 		this.pid = pid;
 		this.setAttribute(AttributeConstants.ATTRIB_TASKID, new Integer(taskId));
@@ -87,7 +86,15 @@ public class PProcess extends Parent implements IPProcessControl {
 		return "" + getTaskId() + "";
 	}
 	public void setStatus(String status) {
-		this.status = status == null ? "unknown" : status;
+		if (status == null) {
+			status = "unknown";
+		}
+		if (!isTerminated)
+			this.status = status;
+
+		if (this.status.equals(ERROR) || this.status.startsWith(EXITED)) {
+			isTerminated = true;
+		}
 	}
 	public void setExitCode(String exitCode) {
 		this.exitCode = exitCode;
