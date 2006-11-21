@@ -350,7 +350,9 @@ public class ParallelJobView extends AbstractParallelSetView implements IProcess
 	 */
 	protected void updateAction() {
 		super.updateAction();
-		changeQueueAction.setEnabled(getJobManager().getQueues().length > 0);
+		if (changeQueueAction != null) {
+			changeQueueAction.setEnabled(getJobManager().getQueues().length > 0);
+		}
 		if (terminateAllAction != null) {
 			ISelection selection = jobTableViewer.getSelection();
 			if (selection.isEmpty()) {
