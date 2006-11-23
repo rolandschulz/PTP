@@ -41,7 +41,9 @@ MIStackListFrames(int low, int high)
 	MICommand *	cmd;
 	
 	cmd = MICommandNew("-stack-list-frames", MIResultRecordDONE);
-	MICommandAddOption(cmd, MIIntToCString(low), MIIntToCString(high));
+	//MICommandAddOption(cmd, MIIntToCString(low), MIIntToCString(high));
+	MICommandAddOption(cmd, MIIntToCString(low), NULL);
+	MICommandAddOption(cmd, MIIntToCString(high), NULL);
 	return cmd;
 }
 
