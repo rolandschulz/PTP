@@ -24,11 +24,12 @@ package org.eclipse.ptp.debug.core.aif;
 public interface IAIFTypeArray extends ITypeDerived {
 	public int getDimension();
 	public boolean isDimensionArray();
-	public IAIFTypeArray getAIFTypeArray(int range);
+	public IAIFTypeArray getAIFTypeArray(int dim_pos);
 	public String toString(int range);
 	public int getLow();
 	public int getHigh();
 	public int getRange();
+	public IAIFType getFoundationType();
 	//public IAIFTypeRange[] getRanges();
 	//public IAIFTypeRange getRange(int index);
 	//public int getLower(int index);

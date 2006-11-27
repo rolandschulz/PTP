@@ -19,10 +19,13 @@
 package org.eclipse.ptp.debug.internal.core.aif;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 import org.eclipse.ptp.debug.core.aif.AIFException;
 import org.eclipse.ptp.debug.core.aif.AIFFactory;
 import org.eclipse.ptp.debug.core.aif.IAIFType;
 import org.eclipse.ptp.debug.core.aif.IAIFTypeArray;
+import org.eclipse.ptp.debug.core.aif.IAIFTypeString;
 import org.eclipse.ptp.debug.core.aif.IAIFValue;
 import org.eclipse.ptp.debug.core.aif.IAIFValueArray;
 
@@ -31,6 +34,90 @@ import org.eclipse.ptp.debug.core.aif.IAIFValueArray;
  * 
  */
 public class AIFValueArray extends ValueDerived implements IAIFValueArray {
+	List arrays = new ArrayList();
+	
+	public AIFValueArray(IAIFTypeArray type, ByteBuffer buffer) {
+		super(type);
+		parse(buffer);
+		setParent(this);
+	}
+	protected void parse(ByteBuffer buffer) {
+		IAIFTypeArray arrType = (IAIFTypeArray)type;
+		int dim = arrType.getDimension();
+		IAIFType foundationType = arrType.getFoundationType();
+		for (int i=0; i<dim; i++) {
+			IAIFTypeArray ch_arrType = arrType.getAIFTypeArray(i);
+			int range = ch_arrType.getRange();
+			IAIFValue[] values = new IAIFValue[range];
+			for (int j=0; j<range; j++) {
+				values[j] = AIFFactory.getAIFValue(null, foundationType, buffer);
+				size += values[j].sizeof();
+			}
+			arrays.add(values);
+		}
+	}
+	public IAIFValue[] getValues(int dim_pos) {
+		if (dim_pos < 0 || dim_pos > arrays.size() - 1) 
+			return new IAIFValue[0];
+		
+		return (IAIFValue[])arrays.get(dim_pos);
+	}
+	public String getValueString() throws AIFException {
+		if (result == null) {
+			result = getString();
+		}
+		return result;
+	}
+	private String getString() {
+		String content = "";
+		int dimension = arrays.size();
+		for (int i=0; i<dimension; i++) {
+			content += "[";
+			IAIFValue[] values = getValues(i);
+			for (int j=0; j<values.length; j++) {
+				content += values[j].toString();
+				if (j < (values.length - 1)) {
+					content += ",";
+				}
+			}
+			content += "]";
+		}
+		return content; 
+	}
+	public AIFValueArray(IAIFTypeArray type, byte[] data) {
+		super(type);
+		parse(data);
+		setParent(this);
+	}
+	protected void parse(byte[] data) {
+		ByteBuffer buffer = byteBuffer(data);
+		IAIFTypeArray arrType = (IAIFTypeArray)type;
+		int dim = arrType.getDimension();
+		IAIFType foundationType = arrType.getFoundationType();
+		int type_size = foundationType.sizeof();
+		for (int i=0; i<dim; i++) {
+			IAIFTypeArray ch_arrType = arrType.getAIFTypeArray(i);
+			int range = ch_arrType.getRange();
+			IAIFValue[] values = new IAIFValue[range];
+			for (int j=0; j<range; j++) {
+				if (foundationType instanceof IAIFTypeString) {
+					type_size = AIFValueString.getSize(buffer);
+				}
+				byte[] dst = new byte[type_size];
+				for (int h=0; h<dst.length; h++) {
+					if (!buffer.hasRemaining()) {
+						break;
+					}
+					dst[h] = buffer.get();
+				}
+				values[j] = AIFFactory.getAIFValue(null, foundationType, dst);
+				size += ((IAIFValue)values[j]).sizeof();
+			}
+			arrays.add(values);
+		}
+	}
+	
+	/*
 	private Object[] values;
 	private int current_dimension_position = 0;
 	private int current_position = 0;
@@ -40,11 +127,6 @@ public class AIFValueArray extends ValueDerived implements IAIFValueArray {
 		setParent(parentArray);
 		current_dimension_position = parentArray.getCurrentDimensionPosition()+1;
 		current_position = current_pos;
-	}
-	public AIFValueArray(IAIFTypeArray type, byte[] data) {
-		super(type);
-		parse(data);
-		setParent(this);
 	}
 	public int getChildrenNumber() throws AIFException {
 		return getCurrentValues().length;
@@ -144,6 +226,7 @@ public class AIFValueArray extends ValueDerived implements IAIFValueArray {
 			return false;
 		return (objs[0] instanceof Object[]);
 	}
+	*/
 	/*
 	public String toString() {
 		String output = "[";

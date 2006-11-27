@@ -37,7 +37,7 @@ public class AIFTypePointer extends TypeDerived implements IAIFTypePointer {
 		return AIFFactory.FDS_POINTER + super.toString();
 	}
 	public int sizeof() {
-		return super.sizeof() + 1;
+		return super.sizeof() + getAddressType().sizeof() + 1;
 	}
 	public IAIFTypeAddress getAddressType() {
 		return (IAIFTypeAddress)addr;

@@ -26,8 +26,13 @@ import org.eclipse.ptp.debug.core.aif.IAIFTypeString;
  * 
  */
 public class AIFTypeString extends AIFType implements IAIFTypeString {
+	int size = AIFFactory.SIZE_INVALID;
+	
 	public int sizeof() {
-		return AIFFactory.SIZE_INVALID;
+		return size;
+	}
+	public void setSizeof(int size) {
+		this.size = size;
 	}
 	public String toString() {
 		return String.valueOf(AIFFactory.FDS_STRING);

@@ -54,6 +54,12 @@ public class AIFTypeArray extends TypeDerived implements IAIFTypeArray {
 	public int getRange() {
 		return (high-low) + 1;
 	}
+	public IAIFType getFoundationType() {
+		if (basetype instanceof IAIFTypeArray) {
+			return ((IAIFTypeArray)basetype).getFoundationType();
+		}
+		return basetype;
+	}
 	public int getDimension() {
 		if (dimension == 0) {
 			dimension = 1;
@@ -66,14 +72,14 @@ public class AIFTypeArray extends TypeDerived implements IAIFTypeArray {
 	public boolean isDimensionArray() {
 		return (basetype instanceof IAIFTypeArray);
 	}
-	public IAIFTypeArray getAIFTypeArray(int range) {
-		if (range == 0)
+	public IAIFTypeArray getAIFTypeArray(int dim_pos) {
+		if (dim_pos == 0)
 			return this;
 
-		if (range < 0 || range > getDimension()-1)
+		if (dim_pos < 0 || dim_pos > getDimension()-1)
 			return null;
 
-		return ((IAIFTypeArray)basetype).getAIFTypeArray(range-1);
+		return ((IAIFTypeArray)basetype).getAIFTypeArray(dim_pos-1);
 	}
 	public int sizeof() {
 		return size;
@@ -85,13 +91,15 @@ public class AIFTypeArray extends TypeDerived implements IAIFTypeArray {
 		return "[r" + low + ".." + high + "U]" + basetype.toString();
 	}
 	public static void main(String[] args) {
-		String fmt = "[r0..2is4]is4";
+		String fmt = "[r0..2is4][r0..5is4][r0..5is4][r0..5is4][r0..5is4]is4";
 		IAIFType type = AIFFactory.getAIFType(fmt);
 		if (type instanceof IAIFTypeArray) {
-			System.err.println("type: " + ((IAIFTypeArray)type).getDimension());
+			System.err.println("dim: " + ((IAIFTypeArray)type).getDimension());
+			System.err.println("base: " + ((IAIFTypeArray)type).getBaseType());
+			System.err.println("foundation: " + ((IAIFTypeArray)type).getFoundationType());
 		}
-		System.err.println("type: " + type.sizeof());
-		System.err.println("type: " + ((IAIFTypeArray)type).getAIFTypeArray(0));
+		System.err.println("size: " + type.sizeof());
+		System.err.println("1st: " + ((IAIFTypeArray)type).getAIFTypeArray(0));
 	}
 	
 	/*

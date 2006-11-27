@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.aif;
 
+import java.nio.ByteBuffer;
 import org.eclipse.ptp.debug.core.aif.AIFException;
 import org.eclipse.ptp.debug.core.aif.AIFFactory;
 import org.eclipse.ptp.debug.core.aif.IAIFTypeEnum;
@@ -31,6 +32,16 @@ import org.eclipse.ptp.debug.core.aif.IAIFValueEnum;
 public class AIFValueEnum extends ValueIntegral implements IAIFValueEnum {
 	IAIFValue value;
 	
+	public AIFValueEnum(IAIFTypeEnum type, ByteBuffer buffer) {
+		super(type);
+		parse(buffer);
+	}
+	protected void parse(ByteBuffer buffer) {
+		IAIFTypeEnum pType = (IAIFTypeEnum)type;
+		value = AIFFactory.getAIFValue(null, pType.getBaseType(), buffer);
+		size = value.sizeof();
+	}
+
 	public AIFValueEnum(IAIFTypeEnum type, byte[] data) {
 		super(type);
 		parse(data);

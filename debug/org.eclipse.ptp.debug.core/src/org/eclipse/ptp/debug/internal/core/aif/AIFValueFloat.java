@@ -31,13 +31,17 @@ import org.eclipse.ptp.debug.core.aif.IAIFValueFloat;
 public class AIFValueFloat extends ValueParent implements IAIFValueFloat {
 	ByteBuffer byteBuffer;
 	
-	public AIFValueFloat(IAIFTypeFloat type, byte[] data) {
+	public AIFValueFloat(IAIFTypeFloat type, ByteBuffer buffer) {
 		super(type);
-		parse(data);
+		parse(buffer);
 	}
-	protected void parse(byte[] data) {
-		byteBuffer = byteBuffer(data);
-		size = data.length;
+	protected void parse(ByteBuffer buffer) {
+		byte[] dst = new byte[type.sizeof()]; 
+		for (int i=0; i<dst.length; i++) {
+			dst[i] = buffer.get();
+		}
+		byteBuffer = ByteBuffer.wrap(dst, 0, dst.length);
+		size = type.sizeof();
 	}
 	public String getValueString() throws AIFException {
 		if (result == null) {
@@ -78,6 +82,15 @@ public class AIFValueFloat extends ValueParent implements IAIFValueFloat {
 	}
 	public boolean isFloat() {
 		return (type.sizeof() == 4);
+	}
+
+	public AIFValueFloat(IAIFTypeFloat type, byte[] data) {
+		super(type);
+		parse(data);
+	}
+	protected void parse(byte[] data) {
+		byteBuffer = byteBuffer(data);
+		size = data.length;
 	}
 	/*
 	public double doubleValue() throws PCDIException {

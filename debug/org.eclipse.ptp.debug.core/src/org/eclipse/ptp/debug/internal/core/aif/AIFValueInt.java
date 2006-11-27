@@ -28,14 +28,19 @@ import org.eclipse.ptp.debug.core.aif.IAIFValueInt;
 public class AIFValueInt extends ValueIntegral implements IAIFValueInt {
 	ByteBuffer byteBuffer;
 	
-	public AIFValueInt(IAIFTypeInt type, byte[] data) {
+	public AIFValueInt(IAIFTypeInt type, ByteBuffer buffer) {
 		super(type);
-		parse(data);
+		parse(buffer);
 	}
-	protected void parse(byte[] data) {
-		byteBuffer = byteBuffer(data);
-		size = data.length;		
+	protected void parse(ByteBuffer buffer) {
+		byte[] dst = new byte[type.sizeof()]; 
+		for (int i=0; i<dst.length; i++) {
+			dst[i] = buffer.get();
+		}
+		byteBuffer = ByteBuffer.wrap(dst, 0, dst.length);
+		size = type.sizeof();
 	}
+
 	public String getValueString() throws AIFException {
 		if (result == null) {
 			result = getString();
@@ -94,5 +99,13 @@ public class AIFValueInt extends ValueIntegral implements IAIFValueInt {
 		} finally {
 			byteBuffer.rewind();			
 		}
+	}
+	public AIFValueInt(IAIFTypeInt type, byte[] data) {
+		super(type);
+		parse(data);
+	}
+	protected void parse(byte[] data) {
+		byteBuffer = byteBuffer(data);
+		size = data.length;		
 	}
 }
