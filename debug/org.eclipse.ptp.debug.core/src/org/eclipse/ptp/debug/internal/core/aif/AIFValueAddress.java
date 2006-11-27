@@ -30,31 +30,33 @@ import org.eclipse.ptp.debug.core.aif.IAIFValueAddress;
  * 
  */
 public class AIFValueAddress extends ValueIntegral implements IAIFValueAddress {
-	ByteBuffer byteBuffer;
+	String addr = "";
 
+	public AIFValueAddress(IAIFTypeAddress type, ByteBuffer buffer) {
+		super(type);
+		parse(buffer);
+	}
+	protected void parse(ByteBuffer buffer) {
+		size = type.sizeof();
+		for (int i=0; i<size; i++) {
+			addr += Integer.toHexString(0x0100 + (buffer.get() & 0x00FF)).substring(1);
+		}
+	}
+	public String getValueString() throws AIFException {
+		if (result == null) {
+			result = "0x" + addr;
+		}
+		return result;
+	}
+	public BigInteger getAddress() throws AIFException {
+		return bigIntegerValue(getValueString());
+	}
 	public AIFValueAddress(IAIFTypeAddress type, byte[] data) {
 		super(type);
 		parse(data);
 	}
-	public String getValueString() throws AIFException {
-		if (result == null) {
-			result = "0x";
-			byte[] bytes = byteValue();
-			for (int i=0; i<bytes.length; i++) {
-				result += Integer.toHexString(0x0100 + (bytes[i] & 0x00FF)).substring(1);
-			}
-		}
-		return result;
-	}
-	public byte[] byteValue() throws AIFException {
-		return byteBuffer.array();
-	}	
 	protected void parse(byte[] data) {
 		size = type.sizeof();
-		byteBuffer = byteBuffer(data);
-	}
-	
-	public BigInteger getAddress() throws AIFException {
-		return bigIntegerValue(getValueString());
+		//byteBuffer = byteBuffer(data);
 	}
 }

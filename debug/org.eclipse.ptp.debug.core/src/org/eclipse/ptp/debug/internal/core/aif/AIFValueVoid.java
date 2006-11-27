@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.aif;
 
+import java.nio.ByteBuffer;
 import org.eclipse.ptp.debug.core.aif.AIFException;
 import org.eclipse.ptp.debug.core.aif.IAIFType;
 
@@ -26,6 +27,24 @@ import org.eclipse.ptp.debug.core.aif.IAIFType;
  * 
  */
 public class AIFValueVoid extends AIFValue {
+	public AIFValueVoid(IAIFType type, ByteBuffer buffer) {
+		super(type);
+		parse(buffer);
+	}
+	protected void parse(ByteBuffer buffer) {
+		size = type.sizeof();
+	}	
+	public String getValueString() throws AIFException {
+		if (result == null) {
+			if (size == 0) {
+				result = "(No value)";
+			}
+			else  {
+				result = "";
+			}
+		}
+		return result;
+	}
 	public AIFValueVoid(IAIFType type, byte[] data) {
 		super(type);
 		parse(data);
@@ -33,7 +52,4 @@ public class AIFValueVoid extends AIFValue {
 	protected void parse(byte[] data) {
 		size = data.length;
 	}	
-	public String getValueString() throws AIFException {
-		return "";
-	}
 }

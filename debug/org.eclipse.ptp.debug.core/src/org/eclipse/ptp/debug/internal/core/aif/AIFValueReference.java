@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.aif;
 
+import java.nio.ByteBuffer;
 import org.eclipse.ptp.debug.core.aif.AIFException;
 import org.eclipse.ptp.debug.core.aif.IAIFTypeReference;
 import org.eclipse.ptp.debug.core.aif.IAIFValueNamed;
@@ -31,16 +32,16 @@ import org.eclipse.ptp.debug.core.aif.IValueParent;
 public class AIFValueReference extends ValueParent implements IAIFValueReference {
 	private String name = null;
 	
-	public AIFValueReference(IValueParent parent, IAIFTypeReference type, byte[] data) {
+	public AIFValueReference(IValueParent parent, IAIFTypeReference type, ByteBuffer buffer) {
 		super(parent, type);
-		parse(data);
+		parse(buffer);
 		this.name = type.getName();
+	}
+	protected void parse(ByteBuffer buffer) {
+		size = type.sizeof();
 	}
 	public String getName() {
 		return name;
-	}
-	protected void parse(byte[] data) {
-		size = data.length;
 	}
 	public String getValueString() throws AIFException {
 		if (result == null) {
@@ -60,5 +61,14 @@ public class AIFValueReference extends ValueParent implements IAIFValueReference
 
 		parent = parent.getParent();
 		return getParent();
+	}
+
+	public AIFValueReference(IValueParent parent, IAIFTypeReference type, byte[] data) {
+		super(parent, type);
+		parse(data);
+		this.name = type.getName();
+	}
+	protected void parse(byte[] data) {
+		size = data.length;
 	}
 }

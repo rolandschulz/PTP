@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.aif;
 
+import java.nio.ByteBuffer;
 import org.eclipse.ptp.debug.core.aif.AIFFactory;
 import org.eclipse.ptp.debug.core.aif.IAIFType;
 import org.eclipse.ptp.debug.core.aif.IAIFTypeUnion;
@@ -31,10 +32,23 @@ import org.eclipse.ptp.debug.core.aif.IValueParent;
  * 
  */
 public class AIFValueUnion extends ValueAggregate implements IAIFValueUnion {
+	public AIFValueUnion(IValueParent parent, IAIFTypeUnion type, ByteBuffer buffer) {
+		super(parent, type, buffer);
+	}
+	protected void parse(ByteBuffer buffer) {
+		ITypeAggregate typeAggregate = (ITypeAggregate)getType();
+		int length = typeAggregate.getNumberOfChildren();
+		for (int i=0; i<length; i++) {
+			IAIFType aifType = typeAggregate.getType(i);
+			IAIFValue val = AIFFactory.getAIFValue(getParent(), aifType, buffer);
+			values.add(val);
+			size += val.sizeof();
+		}
+	}	
+
 	public AIFValueUnion(IValueParent parent, IAIFTypeUnion type, byte[] data) {
 		super(parent, type, data);
 	}
-	
 	protected void parse(byte[] data) {
 		size = data.length;
 		ITypeAggregate typeAggregate = (ITypeAggregate)getType();

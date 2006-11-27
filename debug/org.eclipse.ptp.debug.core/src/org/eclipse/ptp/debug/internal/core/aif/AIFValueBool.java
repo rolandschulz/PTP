@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.aif;
 
+import java.nio.ByteBuffer;
 import org.eclipse.ptp.debug.core.aif.AIFException;
 import org.eclipse.ptp.debug.core.aif.IAIFTypeBool;
 import org.eclipse.ptp.debug.core.aif.IAIFValueBool;
@@ -29,9 +30,13 @@ import org.eclipse.ptp.debug.core.aif.IAIFValueBool;
 public class AIFValueBool extends ValueIntegral implements IAIFValueBool {
 	boolean boolValue;
 	
-	public AIFValueBool(IAIFTypeBool type, byte[] data) {
+	public AIFValueBool(IAIFTypeBool type, ByteBuffer buffer) {
 		super(type);
-		parse(data);
+		parse(buffer);
+	}
+	protected void parse(ByteBuffer buffer) {
+		boolValue = (buffer.get()>0);
+		size = type.sizeof();
 	}
 	public String getValueString() throws AIFException {
 		if (result == null) {
@@ -39,11 +44,15 @@ public class AIFValueBool extends ValueIntegral implements IAIFValueBool {
 		}
 		return result;
 	}
+	public boolean booleanValue() throws AIFException {
+		return boolValue;
+	}
+	public AIFValueBool(IAIFTypeBool type, byte[] data) {
+		super(type);
+		parse(data);
+	}
 	protected void parse(byte[] data) {
 		boolValue = (data[0]>0);
 		size = data.length;
-	}
-	public boolean booleanValue() throws AIFException {
-		return boolValue;
 	}
 }

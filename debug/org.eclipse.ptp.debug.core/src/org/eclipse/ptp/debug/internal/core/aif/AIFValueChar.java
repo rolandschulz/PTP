@@ -19,16 +19,20 @@
 
 package org.eclipse.ptp.debug.internal.core.aif;
 
+import java.nio.ByteBuffer;
 import org.eclipse.ptp.debug.core.aif.AIFException;
 import org.eclipse.ptp.debug.core.aif.IAIFTypeChar;
 import org.eclipse.ptp.debug.core.aif.IAIFValueChar;
 
 public class AIFValueChar extends ValueIntegral implements IAIFValueChar {
 	byte byteValue;
-	
-	public AIFValueChar(IAIFTypeChar type, byte[] data) {
+
+	public AIFValueChar(IAIFTypeChar type, ByteBuffer buffer) {
 		super(type);
-		parse(data);
+	}
+	protected void parse(ByteBuffer buffer) {
+		byteValue = buffer.get();
+		size = type.sizeof();
 	}
 	public String getValueString() throws AIFException {
 		if (result == null) {
@@ -36,16 +40,12 @@ public class AIFValueChar extends ValueIntegral implements IAIFValueChar {
 		}
 		return result;
 	}
-	protected void parse(byte[] data) {
-		byteValue = data[0];
-		size = data.length;
-	}
 	public char charValue() throws AIFException {
 		return (char)byteValue();
 	}
 	public byte byteValue() throws AIFException {
 		return byteValue;
-	}
+	}	
 	public String toString() {
 		try {
 			char charValue = charValue();
@@ -54,6 +54,16 @@ public class AIFValueChar extends ValueIntegral implements IAIFValueChar {
 			return "err: " + e.getMessage();
 		}
 	}
+
+	public AIFValueChar(IAIFTypeChar type, byte[] data) {
+		super(type);
+		parse(data);
+	}
+	protected void parse(byte[] data) {
+		byteValue = data[0];
+		size = data.length;
+	}
+
 	/*
 	public String toString() {
 		String ch = ""+(char)val+"";

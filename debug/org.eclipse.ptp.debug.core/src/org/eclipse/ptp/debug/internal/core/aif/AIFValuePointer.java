@@ -19,6 +19,7 @@
 package org.eclipse.ptp.debug.internal.core.aif;
 
 import java.math.BigInteger;
+import java.nio.ByteBuffer;
 import org.eclipse.ptp.debug.core.aif.AIFException;
 import org.eclipse.ptp.debug.core.aif.AIFFactory;
 import org.eclipse.ptp.debug.core.aif.IAIFTypePointer;
@@ -35,10 +36,33 @@ public class AIFValuePointer extends ValueDerived implements IAIFValuePointer {
 	IAIFValue value;
 	IAIFValue addrValue;
 	
-	public AIFValuePointer(IValueParent parent, IAIFTypePointer type, byte[] data) {
+	public AIFValuePointer(IValueParent parent, IAIFTypePointer type, ByteBuffer buffer) {
 		super(parent, type);
-		parse(data);
+		parse(buffer);
 	}
+	protected void parse(ByteBuffer buffer) {
+		int marker = buffer.get();
+		IAIFTypePointer pType = (IAIFTypePointer)type;
+
+		switch (marker) {
+		case 0:
+			value = AIFFactory.UNKNOWNVALUE;
+			break;
+		case 1:
+			addrValue = AIFFactory.getAIFValue(null, pType.getAddressType(), buffer);
+			value = AIFFactory.getAIFValue(getParent(), pType.getBaseType(), buffer);
+			break;
+		case 2:
+			break;
+		case 3:
+			break;
+		default:
+			value = AIFFactory.UNKNOWNVALUE;
+			break;
+		}
+		size = addrValue.sizeof() + value.sizeof();
+	}
+
 	/**
 	 * Get the children number of pointer.  Return 1 if the base type is primitive 
 	 * 
@@ -50,12 +74,25 @@ public class AIFValuePointer extends ValueDerived implements IAIFValuePointer {
 		}
 		return children;
 	}
-	
 	public String getValueString() throws AIFException {
 		if (result == null) {
 			result = value.getValueString();
 		}
 		return result;
+	}
+	public BigInteger pointerValue() throws AIFException {
+		return ValueIntegral.bigIntegerValue(addrValue.getValueString());
+	}
+	public IAIFValue getValue() {
+		if (value instanceof IAIFValueNamed) {
+			return ((IAIFValueNamed)value).getValue();
+		}
+		return value;
+	}
+
+	public AIFValuePointer(IValueParent parent, IAIFTypePointer type, byte[] data) {
+		super(parent, type);
+		parse(data);
 	}
 	protected void parse(byte[] data) {
 System.err.println("------- total: " + data.length);
@@ -67,8 +104,13 @@ System.err.println("------- total: " + data.length);
 			value = AIFFactory.UNKNOWNVALUE;
 			break;
 		case 1:
-			addrValue = AIFFactory.getAIFValue(null, pType.getAddressType(), createByteArray(data, 1, pType.getAddressType().sizeof()));
-			byte[] newByte = createByteArray(data, pType.getAddressType().sizeof()+1, data.length-addrValue.sizeof()-1);
+			int addr_size = pType.getAddressType().sizeof();
+			if (data.length < addr_size) {
+				value = AIFFactory.UNKNOWNVALUE;
+				break;
+			}
+			addrValue = AIFFactory.getAIFValue(null, pType.getAddressType(), createByteArray(data, 1, addr_size));
+			byte[] newByte = createByteArray(data, addr_size+1, data.length-addrValue.sizeof()-1);
 			value = AIFFactory.getAIFValue(getParent(), pType.getBaseType(), newByte);
 			break;
 		case 2:
@@ -80,17 +122,5 @@ System.err.println("------- total: " + data.length);
 			break;
 		}
 		size = value.sizeof();
-System.err.println("--------------- pointer value: " + value.toString());
-	}
-	
-	public BigInteger pointerValue() throws AIFException {
-		return ValueIntegral.bigIntegerValue(addrValue.getValueString());
-	}
-	
-	public IAIFValue getValue() {
-		if (value instanceof IAIFValueNamed) {
-			return ((IAIFValueNamed)value).getValue();
-		}
-		return value;
 	}
 }
