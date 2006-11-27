@@ -70,7 +70,7 @@ public interface IDebugger {
 	public void variableCreate(BitList tasks, String varname) throws PCDIException;
 	public void variableDelete(BitList tasks, String varname) throws PCDIException;
 	public void variableUpdate(BitList tasks, String varname) throws PCDIException;
-	public void getAIFType(BitList tasks, String expr, boolean forChildren) throws PCDIException;	
+	public void getPartialAIF(BitList tasks, String expr, boolean listChildren) throws PCDIException;	
 	public void getAIFValue(BitList tasks, String expr) throws PCDIException;	
 
 	/* Execution Control */
