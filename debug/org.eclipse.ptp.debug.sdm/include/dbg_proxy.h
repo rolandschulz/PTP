@@ -53,7 +53,7 @@
 #define DBG_VARIABLECREATE_CMD			"VCR"
 #define DBG_VARIABLEDELETE_CMD			"VDE"
 #define DBG_VARIABLEUPDATE_CMD			"VUP"
-#define DBG_GETAIFTYPE_CMD				"GAT"
+#define DBG_GETPARTIALAIF_CMD			"GPA"
 #define DBG_GETAIFVALUE_CMD				"GAV"
 
 #define DBG_STARTSESSION_FMT			"%s %ld \"%s\" \"%s\""
@@ -88,7 +88,7 @@
 #define DBG_VARIABLECREATE_FMT			"%s \"%s\""
 #define DBG_VARIABLEDELETE_FMT			"%s \"%s\""
 #define DBG_VARIABLEUPDATE_FMT			"%s \"%s\""
-#define DBG_GETAIFTYPE_FMT				"%s \"%s\" %d"
+#define DBG_GETPARTIALAIF_FMT			"%s \"%s\" %d"
 #define DBG_GETAIFVALUE_FMT				"%s \"%s\""
 
 #endif /* _DBG_PROXY_H_ */

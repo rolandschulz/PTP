@@ -70,7 +70,7 @@ static int svr_dataevaluateexpression(dbg_backend *, char **);
 static int svr_variablecreate(dbg_backend *, char **);
 static int svr_variabledelete(dbg_backend *, char **);
 static int svr_variableupdate(dbg_backend *, char **);
-static int svr_getaiftype(dbg_backend *, char **);
+static int svr_getpartialaif(dbg_backend *, char **);
 static int svr_getaifvalue(dbg_backend *, char **);
 
 static svr_cmd svr_cmd_tab[] =
@@ -106,7 +106,7 @@ static svr_cmd svr_cmd_tab[] =
 	{DBG_VARIABLECREATE_CMD,		svr_variablecreate},
 	{DBG_VARIABLEDELETE_CMD,		svr_variabledelete},
 	{DBG_VARIABLEUPDATE_CMD,		svr_variableupdate},
-	{DBG_GETAIFTYPE_CMD,			svr_getaiftype},
+	{DBG_GETPARTIALAIF_CMD,			svr_getpartialaif},
 	{DBG_GETAIFVALUE_CMD,			svr_getaifvalue},
 	{"QUI",							svr_quit},
 };
@@ -361,9 +361,9 @@ svr_variableupdate(dbg_backend *db, char **args)
 	return db->db_funcs->variableupdate(args[1]);
 }
 static int
-svr_getaiftype(dbg_backend *db, char **args)
+svr_getpartialaif(dbg_backend *db, char **args)
 {
-	return db->db_funcs->getaiftype(args[1], atoi(args[2]));
+	return db->db_funcs->getpartialaif(args[1], atoi(args[2]));
 }
 static int
 svr_getaifvalue(dbg_backend *db, char **args)

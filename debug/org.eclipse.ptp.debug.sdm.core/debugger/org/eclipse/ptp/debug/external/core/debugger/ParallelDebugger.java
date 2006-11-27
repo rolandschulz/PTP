@@ -57,6 +57,7 @@ import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugExitEvent;
 import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugInfoThreadsEvent;
 import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugInitEvent;
 import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugMemoryInfoEvent;
+import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugPartialAIFEvent;
 import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugSetThreadSelectEvent;
 import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugSignalEvent;
 import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugSignalExitEvent;
@@ -423,9 +424,9 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			throw new PCDIException(e.getMessage());
 		}
 	}
-	public void getAIFType(BitList tasks, String expr, boolean forChildren) throws PCDIException {
+	public void getPartialAIF(BitList tasks, String expr, boolean listChildren) throws PCDIException {
 		try {
-			proxy.debugGetAIFType(tasks, expr, forChildren);
+			proxy.debugGetPartialAIF(tasks, expr, listChildren);
 		} catch (IOException e) {
 			throw new PCDIException(e.getMessage());
 		}
@@ -598,6 +599,10 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 
 		case IProxyDebugEvent.EVENT_DBG_VAR_CREATE:
 			completeCommand(e.getBitSet(), ((ProxyDebugVarCreatedEvent)e).getName());
+			break;
+
+		case IProxyDebugEvent.EVENT_DBG_PARTIAL_AIF:
+			completeCommand(e.getBitSet(), (ProxyDebugPartialAIFEvent)e);
 			break;
 		}
 	}	

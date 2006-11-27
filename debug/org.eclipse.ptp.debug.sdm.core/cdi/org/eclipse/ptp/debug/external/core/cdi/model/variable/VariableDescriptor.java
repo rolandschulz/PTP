@@ -19,7 +19,9 @@
 package org.eclipse.ptp.debug.external.core.cdi.model.variable;
 
 import org.eclipse.ptp.debug.core.aif.AIFFactory;
+import org.eclipse.ptp.debug.core.aif.IAIF;
 import org.eclipse.ptp.debug.core.aif.IAIFType;
+import org.eclipse.ptp.debug.core.aif.IAIFValue;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIStackFrame;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIThread;
@@ -30,7 +32,7 @@ import org.eclipse.ptp.debug.external.core.cdi.model.PObject;
 import org.eclipse.ptp.debug.external.core.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.core.cdi.model.Target;
 import org.eclipse.ptp.debug.external.core.cdi.model.Thread;
-import org.eclipse.ptp.debug.external.core.commands.GetAIFTypeCommand;
+import org.eclipse.ptp.debug.external.core.commands.GetPartialAIFCommand;
 
 /**
  * @author Clement chu
@@ -52,6 +54,7 @@ public abstract class VariableDescriptor extends PObject implements IPCDIVariabl
 	String fFullName = null;
 	String fTypename = null;
 	IAIFType fType = null;
+	IAIFValue fValue = null;
 	String sizeof = null;
 	
 	String keyName = null;
@@ -154,12 +157,16 @@ public abstract class VariableDescriptor extends PObject implements IPCDIVariabl
 		if (fType == null) {
 			Target target = (Target)getTarget();
 			try {
-				GetAIFTypeCommand command = new GetAIFTypeCommand(target.getTask(), getQualifiedName());
+				GetPartialAIFCommand command = new GetPartialAIFCommand(target.getTask(), getQualifiedName());
 				target.getDebugger().postCommand(command);
-				fType = command.getAIFType().getType();
-				keyName = command.getAIFType().getName();
+				IAIF aif = command.getPartialAIF();
+				keyName = command.getName();
+				fType = aif.getType();
+				fValue = aif.getValue();
+				fTypename = aif.getDescription();
 			} catch (PCDIException e) {
 				fType = AIFFactory.UNKNOWNTYPE;
+				fValue = AIFFactory.UNKNOWNVALUE;
 			}
 		}
 		return fType;

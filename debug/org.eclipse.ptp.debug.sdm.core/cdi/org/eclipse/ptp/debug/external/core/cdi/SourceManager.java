@@ -18,13 +18,12 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.core.cdi;
 
-import org.eclipse.ptp.debug.core.aif.AIFFactory;
-import org.eclipse.ptp.debug.core.aif.IAIFType;
+import org.eclipse.ptp.debug.core.aif.IAIF;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.external.core.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.core.cdi.model.Target;
 import org.eclipse.ptp.debug.external.core.cdi.model.Thread;
-import org.eclipse.ptp.debug.external.core.commands.GetAIFTypeCommand;
+import org.eclipse.ptp.debug.external.core.commands.GetAIFCommand;
 
 /**
  * @author Clement chu
@@ -39,23 +38,23 @@ public class SourceManager extends Manager {
 	}
 	public void shutdown() {}
 	
-	public IAIFType getDetailAIFTypeFromVariable(StackFrame frame, String keyName) throws PCDIException {
+	public IAIF getDetailAIFFromVariable(StackFrame frame, String name) throws PCDIException {
 		Target target = (Target)frame.getTarget();
 		Thread currentThread = (Thread)target.getCurrentThread();
 		StackFrame currentFrame = currentThread.getCurrentStackFrame();
 		target.setCurrentThread(frame.getThread(), false);
 		((Thread)frame.getThread()).setCurrentStackFrame(frame, false);
 		try {
-			return getAIFType(target, keyName);
+			return getAIF(target, name);
 		} finally {
 			target.setCurrentThread(currentThread, false);
 			currentThread.setCurrentStackFrame(currentFrame, false);
 		}
 	}
-	public IAIFType getAIFType(Target target, String keyName) throws PCDIException {
-		GetAIFTypeCommand command = new GetAIFTypeCommand(target.getTask(), keyName);
+	public IAIF getAIF(Target target, String name) throws PCDIException {
+		GetAIFCommand command = new GetAIFCommand(target.getTask(), name);
 		target.getDebugger().postCommand(command);
-		return command.getAIFType().getType();
+		return command.getAIF();
 	}
 	
 	public void setSourcePaths(Target target, String[] dirs) throws PCDIException {

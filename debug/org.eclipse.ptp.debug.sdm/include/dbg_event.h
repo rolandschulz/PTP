@@ -62,6 +62,7 @@
 #define DBGEV_VAR_UPDATE	DBG_EV_OFFSET + 22
 #define DBGEV_AIF_TYPE		DBG_EV_OFFSET + 23
 #define DBGEV_AIF_VALUE		DBG_EV_OFFSET + 24
+#define DBGEV_PARTIAL_AIF	DBG_EV_OFFSET + 25
 
 
 struct dbg_suspend_event {
@@ -124,6 +125,13 @@ struct dbg_aif_event {
 	char *	aif_type;
 };
 typedef struct dbg_aif_event	dbg_aif_event;
+
+struct dbg_partial_aif_event {
+	AIF *	data;
+	char *	type_desc;
+	char *	name;
+};
+typedef struct dbg_partial_aif_event dbg_partial_aif_event;
 
 struct dbg_event {
 	int			event;
@@ -205,6 +213,11 @@ struct dbg_event {
 		 */
 		char * data_expression;
 		
+		/*
+		 * DBGEV_PARTIAL_AIF
+		 */
+		dbg_partial_aif_event partial_aif_event;
+
 	} dbg_event_u;
 };
 typedef struct dbg_event dbg_event;

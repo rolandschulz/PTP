@@ -18,8 +18,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.core.cdi.model;
 
-import org.eclipse.ptp.debug.core.aif.IAIFType;
-import org.eclipse.ptp.debug.core.aif.IAIFValue;
+import org.eclipse.ptp.debug.core.aif.AIFFactory;
+import org.eclipse.ptp.debug.core.aif.IAIF;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIExpression;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIStackFrame;
@@ -36,7 +36,6 @@ public class Expression extends PObject implements IPCDIExpression {
 	private static int ID_COUNT = 0;
 	private int id;
 	String fExpression;
-	IAIFType fType;
 
 	public Expression(Target target, String ex) {
 		super(target);
@@ -53,23 +52,20 @@ public class Expression extends PObject implements IPCDIExpression {
 		}
 		return false;
 	}
-	public IAIFType getType(IPCDIStackFrame frame) throws PCDIException {
+	public IAIF getAIF(IPCDIStackFrame frame) throws PCDIException {
 		IPCDIVariable var = getCDIVariable(frame);
 		if (var == null) {
 			Target target = (Target)getTarget();
 			Session session = (Session) (target.getSession());
 			SourceManager sourceMgr = session.getSourceManager();
-			return sourceMgr.getAIFType(target, getExpressionText());
+			return sourceMgr.getAIF(target, getExpressionText());
 		}
-		return var.getType();
+		return AIFFactory.UNKNOWNAIF();
 	}
 	public IPCDIVariable getCDIVariable(IPCDIStackFrame frame) throws PCDIException {
 		Session session = (Session)getTarget().getSession();
 		ExpressionManager mgr = session.getExpressionManager();
 		return mgr.createVariable((StackFrame)frame, getExpressionText());
-	}
-	public IAIFValue getValue(IPCDIStackFrame frame) throws PCDIException {
-		return getCDIVariable(frame).getValue();
 	}
 	public void dispose() throws PCDIException {
 		Session session = (Session) getTarget().getSession();
