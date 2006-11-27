@@ -959,7 +959,7 @@ DbgClntVariableUpdate(char **args)
 	return res;
 }
 int 
-DbgClntGetAIFType(char **args)
+DbgClntGetPartialAIF(char **args)
 {
 	int			res;
 	char *		cmd;
@@ -971,7 +971,7 @@ DbgClntGetAIFType(char **args)
 		return DBGRES_ERR;
 	}
 	
-	asprintf(&cmd, "%s \"%s\" %s", DBG_GETAIFTYPE_CMD, args[2], args[3]);
+	asprintf(&cmd, "%s \"%s\" %s", DBG_GETPARTIALAIF_CMD, args[2], args[3]);
 	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, cmd, NULL);
 	bitset_free(set);
 	

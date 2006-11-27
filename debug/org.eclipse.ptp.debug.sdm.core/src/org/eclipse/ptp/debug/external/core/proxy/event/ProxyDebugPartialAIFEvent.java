@@ -16,42 +16,37 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.external.core.commands;
+
+package org.eclipse.ptp.debug.external.core.proxy.event;
 
 import org.eclipse.ptp.core.util.BitList;
-import org.eclipse.ptp.debug.core.IAbstractDebugger;
-import org.eclipse.ptp.debug.core.aif.AIFFactory;
 import org.eclipse.ptp.debug.core.aif.IAIF;
-import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
-/**
- * @author Clement chu
- * 
- */
-public class GetAIFCommand extends AbstractDebugCommand {
-	private String varName = "";
-	public GetAIFCommand(BitList tasks, String varName) {
-		super(tasks);
-		this.varName = varName;
+
+public class ProxyDebugPartialAIFEvent extends AbstractProxyDebugEvent implements IProxyDebugEvent {
+	private IAIF data;
+	private String name;
+	
+	public ProxyDebugPartialAIFEvent(BitList set, IAIF data, String name) {
+		super(EVENT_DBG_PARTIAL_AIF, set);
+		this.data = data;
+		this.name = name;
 	}
-	public void preExecCommand(IAbstractDebugger debugger) throws PCDIException {
-		checkBeforeExecCommand(debugger);
+	public IAIF getData() {
+		return this.data;
 	}
-	public void exec(IAbstractDebugger debugger) throws PCDIException {
-		debugger.getAIF(tasks, varName);
+	public String getName() {
+		return name;
 	}
-	public IAIF getAIF() throws PCDIException {
-		try {
-			Object res = getResultValue();
-			if (res instanceof IAIF) {
-				return (IAIF)res;
-			}
-			throw new PCDIException("Unknown aif: " + res);
-		} catch (PCDIException e) {
-			return AIFFactory.UNKNOWNAIF();//unknown aif
-		}
-	}
-	public String getCommandName() {
-		return "Get AIF: " + varName;
+	
+	public String toString() {
+		String res = "EVENT_DBG_PARTIAL_AIF " + this.getBitSet().toString();
+		if (this.data != null)
+			res += " " + this.data.toString();
+		else
+			res += " AIFNULL";
+		
+		res += ", name: " + name;
+		return res;
 	}
 }

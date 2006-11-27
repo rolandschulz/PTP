@@ -479,11 +479,11 @@ DbgVariableUpdate(session *s, bitset *set, char* arg)
 	return res;
 }
 int
-DbgGetAIFType(session *s, bitset *set, char* arg, int children)
+DbgGetPartialAIF(session *s, bitset *set, char* arg, int listChildren)
 {
 	int		res;
 	char *	set_str = bitset_to_str(set);
-	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_GETAIFTYPE_CMD, DBG_GETAIFTYPE_FMT, set_str, arg, children);
+	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_GETPARTIALAIF_CMD, DBG_GETPARTIALAIF_FMT, set_str, arg, listChildren);
 	free(set_str);
 	return res;
 }

@@ -20,12 +20,16 @@ package org.eclipse.ptp.debug.external.core.cdi.model.variable;
 
 import org.eclipse.ptp.debug.core.aif.AIFException;
 import org.eclipse.ptp.debug.core.aif.AIFFactory;
+import org.eclipse.ptp.debug.core.aif.IAIF;
 import org.eclipse.ptp.debug.core.aif.IAIFType;
 import org.eclipse.ptp.debug.core.aif.IAIFTypeArray;
 import org.eclipse.ptp.debug.core.aif.IAIFTypePointer;
+import org.eclipse.ptp.debug.core.aif.IAIFTypeReference;
 import org.eclipse.ptp.debug.core.aif.IAIFValue;
+import org.eclipse.ptp.debug.core.aif.IAIFValueArray;
 import org.eclipse.ptp.debug.core.aif.ITypeAggregate;
 import org.eclipse.ptp.debug.core.aif.ITypeDerived;
+import org.eclipse.ptp.debug.core.aif.IValueAggregate;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIVariable;
@@ -38,16 +42,14 @@ import org.eclipse.ptp.debug.external.core.cdi.event.VarChangedEvent;
 import org.eclipse.ptp.debug.external.core.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.core.cdi.model.Target;
 import org.eclipse.ptp.debug.external.core.cdi.model.Thread;
-import org.eclipse.ptp.debug.external.core.commands.GetAIFTypeCommand;
 import org.eclipse.ptp.debug.external.core.commands.GetAIFValueCommand;
-import org.eclipse.ptp.debug.external.core.commands.VariableCreateCommand;
+import org.eclipse.ptp.debug.external.core.commands.GetPartialAIFCommand;
 
 /**
  * @author Clement chu
  * 
  */
 public abstract class Variable extends VariableDescriptor implements IPCDIVariable {
-	IAIFValue value;
 	public IPCDIVariable[] children = new IPCDIVariable[0];
 	String editable = null;
 	String language;
@@ -75,14 +77,6 @@ public abstract class Variable extends VariableDescriptor implements IPCDIVariab
 		VariableManager mgr = session.getVariableManager();
 		mgr.update(this);
 	}
-	public String getKeyName() throws PCDIException {
-		if (keyName == null) {
-			VariableCreateCommand command = new VariableCreateCommand(getTarget().getTask(), getQualifiedName());
-			getTarget().getDebugger().postCommand(command);
-			keyName = command.getKeyName();
-		}
-		return keyName;
-	}
 	public Variable getChild(String name) {
 		for (int i = 0; i < children.length; i++) {
 			Variable var = (Variable) children[i];
@@ -105,23 +99,37 @@ public abstract class Variable extends VariableDescriptor implements IPCDIVariab
 	boolean isFake() {
 		return isFake;
 	}
+	public String getKeyName() throws PCDIException {
+		if (keyName == null) {
+			throw new PCDIException("No key name found");
+		}
+		return keyName;
+	}
 	public IPCDIVariable[] getChildren() throws PCDIException {
-		System.err.println("-------------------------------- Variable: getChildren() --------------");
-		String key = getKeyName();
+		String key = keyName;
 		String fn = getFullName();
 		boolean childFake = false;
-
+		
 		Target target = (Target)getTarget();
-		GetAIFTypeCommand command = new GetAIFTypeCommand(target.getTask(), key, true);
+		GetPartialAIFCommand command = new GetPartialAIFCommand(target.getTask(), key==null?getQualifiedName():key, true);
 		target.getDebugger().postCommand(command);
-		IAIFType type = command.getAIFType().getType();
-		String ch_key = command.getAIFType().getName();
+		
+		IAIF aif = command.getPartialAIF();
+		String ch_key = command.getName();
+
+		IAIFType type = aif.getType();
+		IAIFValue value = aif.getValue();
+		fTypename = aif.getDescription();
+		if (key == null) {
+			key = keyName = ch_key;
+		}
 
 		if (type instanceof ITypeDerived) {
 			IAIFType baseType = ((ITypeDerived)type).getBaseType();
 			if (type instanceof IAIFTypeArray) {
-				IAIFTypeArray arrayType = (IAIFTypeArray)type;
-				children = new Variable[arrayType.getRange()];
+				//always get from 0
+				IAIFValue[] values = ((IAIFValueArray)value).getValues(0);
+				children = new Variable[values.length];
 				for (int i=0; i<children.length; i++) {
 					int index = castingIndex + i;
 					String ch_fn = "(" + fn + ")[" + index + "]";
@@ -130,6 +138,7 @@ public abstract class Variable extends VariableDescriptor implements IPCDIVariab
 					Variable v = createVariable((Target)getTarget(), (Thread)getThread(), (StackFrame)getStackFrame(), ch_n, ch_fn, getPosition(), getStackDepth(), ch_k);					
 					v.setIsFake(childFake);
 					v.fType = baseType;
+					v.fValue = values[i];
 					children[i] = v;
 				}
 			}
@@ -144,6 +153,7 @@ public abstract class Variable extends VariableDescriptor implements IPCDIVariab
 						Variable v = createVariable((Target)getTarget(), (Thread)getThread(), (StackFrame)getStackFrame(), ch_n, ch_fn, getPosition(), getStackDepth(), ch_k);
 						v.setIsFake(childFake);
 						v.fType = aggrType.getType(i);
+						v.fValue = ((IValueAggregate)value).getValue(i);
 						children[i] = v;
 					}
 				}
@@ -154,20 +164,23 @@ public abstract class Variable extends VariableDescriptor implements IPCDIVariab
 					String ch_k = key + "." + ch_key;
 					Variable v = createVariable((Target)getTarget(), (Thread)getThread(), (StackFrame)getStackFrame(), ch_n, ch_fn, getPosition(), getStackDepth(), ch_k);
 					v.setIsFake(childFake);
-					v.fType = baseType;
-					children[0] = v;
+					v.fType = type;
+					v.fValue = value;
+					children[0] = v;					
 				}
 			}
 		}
-		/*
 		else if (type instanceof IAIFTypeReference) {
-			String childName = ((IAIFTypeReference)type).getName();
 			children = new Variable[1];
-			fn = "(" + fn + ")->" + childName;
-			Variable v = createVariable((Target)getTarget(), (Thread)getThread(), (StackFrame)getStackFrame(), childName, fn, getPosition(), getStackDepth(), childName);
+			String ch_fn = "(" + fn + ")->" + ((IAIFTypeReference)type).getName();
+			String ch_n = ((IAIFTypeReference)type).getName();
+			String ch_k = key + "." + ch_n;
+			Variable v = createVariable((Target)getTarget(), (Thread)getThread(), (StackFrame)getStackFrame(), ch_n, ch_fn, getPosition(), getStackDepth(), ch_k);
 			v.setIsFake(childFake);
+			v.fType = type;
+			v.fValue = value;
+			children[0] = v;					
 		}
-		*/
 		else if (type instanceof ITypeAggregate) {
 			ITypeAggregate aggrType = (ITypeAggregate)type;
 			children = new Variable[aggrType.getNumberOfChildren()];
@@ -178,9 +191,21 @@ public abstract class Variable extends VariableDescriptor implements IPCDIVariab
 				Variable v = createVariable((Target)getTarget(), (Thread)getThread(), (StackFrame)getStackFrame(), ch_n, ch_fn, getPosition(), getStackDepth(), ch_k);
 				v.setIsFake(childFake);
 				v.fType = aggrType.getType(i);
+				v.fValue = ((IValueAggregate)value).getValue(i);
 				children[i] = v;
 			}
-		}		
+		}
+		else {
+			children = new Variable[1];
+			String ch_fn = fn;
+			String ch_n = ch_key;
+			String ch_k = key + "." + ch_key;
+			Variable v = createVariable((Target)getTarget(), (Thread)getThread(), (StackFrame)getStackFrame(), ch_n, ch_fn, getPosition(), getStackDepth(), ch_k);
+			v.setIsFake(childFake);
+			v.fType = type;
+			v.fValue = value;
+			children[0] = v;
+		}
 		return children;
 	}
 
@@ -197,17 +222,17 @@ public abstract class Variable extends VariableDescriptor implements IPCDIVariab
 		return 0;
 	}
 	public IAIFValue getValue() throws PCDIException {
-		if (value == null) {
+		if (fValue == null) {
 			Target target = (Target)getTarget();
 			GetAIFValueCommand command = new GetAIFValueCommand(getTarget().getTask(), getKeyName());
 			target.getDebugger().postCommand(command);
 			String v = command.getAIFValue();
-			value = AIFFactory.createAIFValueDummy(fType, v);
+			fValue = AIFFactory.createAIFValueDummy(fType, v);
 		}
-		return value;
+		return fValue;
 	}
 	public void resetValue() {
-		value = null;
+		fValue = null;
 	}
 	
 	public void setValue(IAIFValue fValue) throws PCDIException {
@@ -284,7 +309,11 @@ public abstract class Variable extends VariableDescriptor implements IPCDIVariab
 		return super.equals(var);
 	}
 	public boolean equals(Variable variable) {
-		return getName().equals(variable.getName());
+		try {
+			return getKeyName().equals(variable.getKeyName());
+		} catch (PCDIException e) {
+		}
+		return super.equals(variable);
 	}	
 	public void dispose() throws PCDIException {
 		IPCDITarget target = getTarget();

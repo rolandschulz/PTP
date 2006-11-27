@@ -117,7 +117,7 @@ int 	DbgClntDataEvaluateExpression(char **);
 int 	DbgClntVariableCreate(char **);
 int 	DbgClntVariableDelete(char **);
 int 	DbgClntVariableUpdate(char **);
-int 	DbgClntGetAIFType(char **);
+int 	DbgClntGetPartialAIF(char **);
 int 	DbgClntGetAIFValue(char **);
 
 #endif /* _DBG_CLIENT_H_ */

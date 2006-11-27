@@ -195,8 +195,8 @@ public class ProxyDebugClient extends AbstractProxyDebugClient {
 	public void debugVariableUpdate(BitList procs, String name) throws IOException {
 		sendCommand("VUP", procs, name);
 	}
-	public void debugGetAIFType(BitList procs, String name, boolean forChildren) throws IOException {
-		sendCommand("GAT", procs, name, Integer.toString(forChildren?1:0));
+	public void debugGetPartialAIF(BitList procs, String name, boolean listChildren) throws IOException {
+		sendCommand("GPA", procs, name, Integer.toString(listChildren?1:0));
 	}
 	public void debugGetAIFValue(BitList procs, String name) throws IOException {
 		sendCommand("GAV", procs, name);

@@ -63,7 +63,7 @@ struct dbg_backend_funcs {
 	int (*variablecreate)(char*);
 	int (*variabledelete)(char*);
 	int (*variableupdate)(char*);
-	int (*getaiftype)(char*, int);
+	int (*getpartialaif)(char*, int);
 	int (*getaifvalue)(char*);
 	int (*quit)(void);
 };

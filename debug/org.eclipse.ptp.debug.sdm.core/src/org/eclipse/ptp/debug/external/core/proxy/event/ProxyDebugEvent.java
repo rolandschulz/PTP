@@ -407,6 +407,16 @@ public class ProxyDebugEvent extends ProxyEvent {
 			}
 			evt = new ProxyDebugVarUpdatedEvent(set, varupdates_strs);
 			break;		
+
+		/**
+		 * [2]: aif format
+		 * [3]: aif data
+		 * [4]: type description
+		 */
+		case IProxyDebugEvent.EVENT_DBG_PARTIAL_AIF:
+			IAIF partial_data = new AIF(decodeString(args[2]), decodeBytes(args[3]), decodeString(args[4]));
+			evt = new ProxyDebugPartialAIFEvent(set, partial_data, decodeString(args[5]));
+			break;
 		}
 		return evt;
 	}
