@@ -99,3 +99,13 @@ MIVarInfoType(char *name)
 	MICommandAddOption(cmd, name, NULL);
 	return cmd;
 }
+
+MICommand *
+MIVarInfoNumChildren(char *name)
+{
+	MICommand *	cmd;
+	
+	cmd = MICommandNew("-var-info-num-children", MIResultRecordDONE);
+	MICommandAddOption(cmd, name, NULL);
+	return cmd;
+}

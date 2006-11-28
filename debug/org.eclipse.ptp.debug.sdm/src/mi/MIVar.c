@@ -317,3 +317,32 @@ MIGetVarInfoType(MICommand *cmd)
 
 	return MIVarParse(cmd->output->rr->results);
 }
+
+void
+MIGetVarInfoNumChildren(MICommand *cmd, MIVar *var)
+{
+	if (!cmd->completed || cmd->output == NULL || cmd->output->rr == NULL)
+		return NULL;
+
+	List *results;
+	MIValue *	value;
+	MIResult *	result;
+	char *		str;
+
+	if (var == NULL)
+		var = MIVarNew();
+
+	results = cmd->output->rr->results;	
+	for (SetList(results); (result = (MIResult *)GetListElement(results)) != NULL; ) {
+		value = result->value;
+		if (value != NULL && value->type == MIValueTypeConst) {
+			str = value->cstring;
+		} else {
+			str = "";
+		}
+
+		if (strcmp(result->variable, "numchild") == 0) {
+			var->numchild = atoi(str);
+		}
+	}
+}

@@ -99,6 +99,7 @@ extern MICommand *MIVarEvaluateExpression(char *name);
 extern MICommand *MIDataEvaluateExpression(char *name);
 extern MICommand *MIVarUpdate(char *name);
 extern MICommand *MIVarInfoType(char *name);
+extern MICommand *MIVarInfoNumChildren(char *name);
 
 /*
  * -thread-* commands

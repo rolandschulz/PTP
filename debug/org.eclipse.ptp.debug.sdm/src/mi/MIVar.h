@@ -65,6 +65,7 @@ extern char *MIGetDataEvaluateExpressionInfo(MICommand *cmd);
 
 extern void MIGetVarUpdateInfo(MICommand *cmd, List **varchanges);
 extern MIVar *MIGetVarInfoType(MICommand *cmd);
+extern void MIGetVarInfoNumChildren(MICommand *cmd, MIVar *var);
 #endif /* _MIVAR_H_ */
 
 
