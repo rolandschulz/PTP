@@ -117,14 +117,6 @@ IAdaptable, IResourceManagerMenuContribution, IModelModifier {
 	public ResourceManagerStatus getStatus();
 	
 	/**
-	 * @param monitor
-	 * @param force
-	 * @throws CoreException
-	 */
-	public void refreshRuntimeSystems(IProgressMonitor monitor,
-			boolean force) throws CoreException;
-	
-	/**
 	 * @param job
 	 */
 	public void removeJob(IPJob job);

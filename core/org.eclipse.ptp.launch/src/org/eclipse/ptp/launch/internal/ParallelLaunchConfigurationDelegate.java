@@ -42,6 +42,7 @@ import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
+import org.eclipse.ptp.core.IPUniverse;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.debug.core.IAbstractDebugger;
@@ -51,6 +52,7 @@ import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.launch.PLaunch;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.launch.internal.ui.LaunchMessages;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rtsystem.JobRunConfiguration;
 
 /**
@@ -133,7 +135,8 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			abort(LaunchMessages.getResourceString("AbstractParallelLaunchDelegate.Debugger_path_not_found"), new FileNotFoundException(LaunchMessages.getResourceString("AbstractParallelLaunchDelegate.Debugger_path_not_found")), IPTPLaunchConfigurationConstants.ERR_PROGRAM_NOT_EXIST);
 		}
 	}
-	public void launch(ILaunchConfiguration configuration, String mode, ILaunch launch, IProgressMonitor monitor) throws CoreException {
+	public void launch(ILaunchConfiguration configuration, String mode, ILaunch launch,
+			IProgressMonitor monitor) throws CoreException {
 		IBinaryObject exeFile = null;
 		if (monitor == null) {
 			monitor = new NullProgressMonitor();
@@ -143,7 +146,6 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 		if (monitor.isCanceled()) {
 			return;
 		}
-		PTPCorePlugin.getDefault().getModelManager().refreshRuntimeSystems(new SubProgressMonitor(monitor, 50), false);
 		
 		// Switch the perspective
 		// LaunchUtils.switchPerspectiveTo(LaunchUtils.PPerspectiveFactory_ID);
@@ -188,7 +190,12 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			monitor.worked(10);
 			
 			monitor.subTask("Starting the job . . .");
-			job = getLaunchManager().run(launch, jrunconfig, new SubProgressMonitor(monitor, 150));
+			final String resourceManagerName = jrunconfig.getResourceManagerName();
+			final IResourceManager launchManager = getLaunchManager(resourceManagerName);
+			if (launchManager == null) {
+				abort(LaunchMessages.getResourceString("ParallelLaunchConfigurationDelegate.No_ResourceManager"), null, 0);
+			}
+			job = launchManager.run(launch, jrunconfig, new SubProgressMonitor(monitor, 150));
 			
 			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
 				monitor.setTaskName("Starting the debugger . . .");
@@ -229,4 +236,16 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			monitor.done();
 		}
 	}
+
+	private IResourceManager getLaunchManager(String rmName) {
+    	IPUniverse universe = PTPCorePlugin.getDefault().getUniverse();
+    	IResourceManager[] rms = universe.getResourceManagers();
+    	for (int i=0; i<rms.length; ++i) {
+    		if (rms[i].getElementName().equals(rmName)) {
+    			return rms[i];
+    		}
+    	}
+    	return null;
+    }
+    
 }

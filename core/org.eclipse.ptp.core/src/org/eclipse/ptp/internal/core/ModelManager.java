@@ -251,12 +251,6 @@ IResourceManagerListener {
 		addResourceManagers(resourceManagers);
 	}
 	
-	public synchronized void refreshRuntimeSystems(IProgressMonitor monitor, boolean force) throws CoreException {
-		IResourceManager[] rms = universe.getResourceManagers();
-		for (int i=0; i < rms.length; ++i) {
-			rms[i].refreshRuntimeSystems(monitor, force);
-		}
-	}
 	public void removeModelListener(IModelListener listener) {
 		modelListeners.remove(listener);
 	}

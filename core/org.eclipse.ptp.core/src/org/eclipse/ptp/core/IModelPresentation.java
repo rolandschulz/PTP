@@ -19,7 +19,6 @@
 package org.eclipse.ptp.core;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
 /**
  * @author rsqrd
  */
@@ -38,11 +37,4 @@ public interface IModelPresentation extends IModelModifier {
 	 * @return
 	 */
 	public IPUniverse getUniverse();
-
-	/**
-	 * @param monitor
-	 * @param force
-	 * @throws CoreException
-	 */
-	public void refreshRuntimeSystems(IProgressMonitor monitor, boolean force) throws CoreException;
 }
