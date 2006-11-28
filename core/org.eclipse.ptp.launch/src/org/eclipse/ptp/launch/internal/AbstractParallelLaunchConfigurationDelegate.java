@@ -39,12 +39,9 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
-import org.eclipse.ptp.core.IPUniverse;
-import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.debug.core.launch.PLaunch;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.internal.ui.LaunchMessages;
-import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rtsystem.JobRunConfiguration;
 
 /**
@@ -57,13 +54,6 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
     public static final String START_NODE = HYPHEN + "o";
     public static final String PROG_NAME = HYPHEN + HYPHEN;
 
-    protected IResourceManager getLaunchManager() {
-    	IPUniverse universe = PTPCorePlugin.getDefault().getUniverse();
-    	// FIXME need to choose RM from GUI
-    	IResourceManager rm = universe.getResourceManagers()[0];
-        return rm;
-    }
-    
     protected IWorkspaceRoot getWorkspaceRoot() {
     	return ResourcesPlugin.getWorkspace().getRoot();
     }    
@@ -114,6 +104,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 		String nprocs_str = getNumberOfProcesses(configuration);
 		String nprocpnode_str = getNumberOfProcessesPerNode(configuration);
 		String firstnode_str = getFirstNodeNumber(configuration);
+		String resourceManagerName = getResourceManagerName(configuration);	
 		String machineName = getMachineName(configuration);	
 		String[] args = getProgramParameters(configuration);
 		String[] env =  DebugPlugin.getDefault().getLaunchManager().getEnvironment(configuration);
@@ -131,7 +122,8 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 		catch(NumberFormatException e) {}
 
 		return new JobRunConfiguration(programFile.getProjectRelativePath().toOSString(), 
-				dir, machineName, nprocs, nprocpnode, firstnode, args, env, dir);
+				dir, resourceManagerName, machineName, nprocs, nprocpnode,
+				firstnode, args, env, dir);
 	}
 	
    protected String verifyWorkDirectory(ILaunchConfiguration configuration) throws CoreException {
@@ -171,6 +163,9 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	}
 	protected static String getMachineName(ILaunchConfiguration configuration) throws CoreException {
 		return configuration.getAttribute(IPTPLaunchConfigurationConstants.MACHINE_NAME, (String)null);
+	}
+	protected static String getResourceManagerName(ILaunchConfiguration configuration) throws CoreException {
+		return configuration.getAttribute(IPTPLaunchConfigurationConstants.RESOURCE_MANAGER_NAME, (String)null);
 	}
 	protected static String getNumberOfProcesses(ILaunchConfiguration configuration) throws CoreException {
 	    return configuration.getAttribute(IPTPLaunchConfigurationConstants.NUMBER_OF_PROCESSES, (String)null);

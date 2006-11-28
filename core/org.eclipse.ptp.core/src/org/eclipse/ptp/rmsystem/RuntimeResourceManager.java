@@ -236,24 +236,6 @@ public abstract class RuntimeResourceManager extends AbstractResourceManager
 		return getQueueControls();
 	}
 
-	public void refreshRuntimeSystems(IProgressMonitor monitor,
-			boolean force) throws CoreException {
-		if (!force) {
-			return;
-		}
-		if (monitor == null) {
-			monitor = new NullProgressMonitor();
-		}
-		monitor.beginTask("Refresh Runtime Systems", 10);
-		SubProgressMonitor subMonitor = new SubProgressMonitor(monitor, 10);
-		try {
-			refreshRuntimeSystems(subMonitor);
-		}
-		finally {
-			monitor.done();
-		}
-	}
-
 	public void removeJob(IPJob job) {
 		localQueue.removeJob((IPJobControl) job);
 	}
@@ -600,7 +582,17 @@ public abstract class RuntimeResourceManager extends AbstractResourceManager
 	}
 
 	protected void doStart(IProgressMonitor monitor) throws CoreException {
-		refreshRuntimeSystems(monitor, true);
+		if (monitor == null) {
+			monitor = new NullProgressMonitor();
+		}
+		monitor.beginTask("Refresh Runtime Systems", 10);
+		SubProgressMonitor subMonitor = new SubProgressMonitor(monitor, 10);
+		try {
+			refreshRuntimeSystems(subMonitor);
+		}
+		finally {
+			monitor.done();
+		}
 	}
 
 	protected abstract void doStartRuntime(IProgressMonitor monitor) throws CoreException;

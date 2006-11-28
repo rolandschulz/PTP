@@ -32,7 +32,7 @@ import org.eclipse.ptp.core.IPUniverse;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.internal.core.CoreMessages;
 import org.eclipse.ptp.launch.internal.ui.LaunchImages;
-import org.eclipse.ptp.ui.PTPUIPlugin;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -51,6 +51,8 @@ public class ParallelTab extends PLaunchConfigurationTab {
 	// protected Combo startupCombo = null;
 	// protected Composite dynamicComp = null;
 
+	protected Combo resourceManagerCombo;
+
 	protected Combo machineCombo;
 
 	// protected Combo networkTypeCombo = null;
@@ -65,10 +67,11 @@ public class ParallelTab extends PLaunchConfigurationTab {
 	protected class WidgetListener extends SelectionAdapter implements
 			IPropertyChangeListener {
 		public void widgetSelected(SelectionEvent e) {
-			/*
-			 * if (e.getSource() == startupCombo) updateComboFromSelection();
-			 * else
-			 */
+
+			if (e.getSource() == resourceManagerCombo) {
+				loadMachineCombo();
+			}
+
 			updateLaunchConfigurationDialog();
 		}
 
@@ -117,19 +120,26 @@ public class ParallelTab extends PLaunchConfigurationTab {
 		// dynamicComp.setLayout(createGridLayout(2, false, 10, 10));
 		// dynamicComp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-		PTPUIPlugin.getDefault().refreshRuntimeSystem(false, false);
 		IPUniverse universe = PTPCorePlugin.getDefault().getModelManager().getUniverse();
 		if (universe == null) {
 			return;
 		}
-		IPMachine[] macs = universe.getSortedMachines();
-		new Label(parallelComp, SWT.NONE).setText("Select machine:");
-
-		machineCombo = new Combo(parallelComp, SWT.READ_ONLY);
-		for (int i = 0; i < macs.length; i++) {
-			machineCombo.add(macs[i].getElementName());
+		
+		IResourceManager[] rms = universe.getResourceManagers();
+		new Label(parallelComp, SWT.NONE).setText("Select resource manager:");
+		
+		resourceManagerCombo = new Combo(parallelComp, SWT.READ_ONLY);
+		for (int i = 0; i < rms.length; i++) {
+			resourceManagerCombo.add(rms[i].getElementName());
 		}
-		machineCombo.select(0);
+		resourceManagerCombo.select(0);
+		resourceManagerCombo.addSelectionListener(listener);
+
+		new Label(parallelComp, SWT.NONE).setText("Select machine:");
+		machineCombo = new Combo(parallelComp, SWT.READ_ONLY);
+
+		loadMachineCombo();
+		
 		machineCombo.addSelectionListener(listener);
 
 		numberOfProcessField = new IntegerFieldEditor("numberOfProcess",CoreMessages.getResourceString("ParallelTab.Number_Of_Processes"), parallelComp);
@@ -174,10 +184,6 @@ public class ParallelTab extends PLaunchConfigurationTab {
 		createVerticalSpacer(parallelComp, 2);
 	}
 
-	public void updateComboFromSelection() {
-		System.out.println("change startup");
-	}
-
 	/**
 	 * Defaults are empty.
 	 * 
@@ -205,7 +211,13 @@ public class ParallelTab extends PLaunchConfigurationTab {
 			numberOfProcessField.setStringValue(configuration.getAttribute(
 					IPTPLaunchConfigurationConstants.NUMBER_OF_PROCESSES,
 					EMPTY_STRING));
-			int idx = getMachineNameIndex(configuration.getAttribute(IPTPLaunchConfigurationConstants.MACHINE_NAME, EMPTY_STRING));
+			int idx = getResourceManagerNameIndex(configuration.getAttribute(
+					IPTPLaunchConfigurationConstants.RESOURCE_MANAGER_NAME, EMPTY_STRING));
+			resourceManagerCombo.select(idx);
+			loadMachineCombo();
+			
+			idx = getMachineNameIndex(configuration.getAttribute(
+					IPTPLaunchConfigurationConstants.MACHINE_NAME, EMPTY_STRING));
 			machineCombo.select(idx);
 			// String type =
 			// configuration.getAttribute(IPTPLaunchConfigurationConstants.NETWORK_TYPE,
@@ -228,9 +240,10 @@ public class ParallelTab extends PLaunchConfigurationTab {
 	 * @see ILaunchConfigurationTab#performApply(ILaunchConfigurationWorkingCopy)
 	 */
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
-		configuration
-				.setAttribute(IPTPLaunchConfigurationConstants.MACHINE_NAME,
-						getMachineName());
+		configuration.setAttribute(IPTPLaunchConfigurationConstants.RESOURCE_MANAGER_NAME,
+				getResourceManagerName());
+		configuration.setAttribute(IPTPLaunchConfigurationConstants.MACHINE_NAME,
+				getMachineName());
 		configuration.setAttribute(
 				IPTPLaunchConfigurationConstants.NUMBER_OF_PROCESSES,
 				getFieldContent(numberOfProcessField));
@@ -242,22 +255,12 @@ public class ParallelTab extends PLaunchConfigurationTab {
 		// getFieldContent(firstNodeNumberField));
 	}
 
-	protected String getMachineName() {
-		IPUniverse universe = PTPCorePlugin.getDefault().getModelManager().getUniverse();
-		if (universe == null) {
-			return "";
-		}
-		IPMachine[] macs = universe.getSortedMachines();
-		int i = machineCombo.getSelectionIndex();
-		return macs[i].getElementName();
-	}
-	
 	protected int getMachineNameIndex(String machineName) {
-		IPUniverse universe = PTPCorePlugin.getDefault().getModelManager().getUniverse();
-		if (universe == null) {
+		IResourceManager rm = getResourceManager();
+		if (rm == null) {
 			return -1;
 		}
-		IPMachine[] macs = universe.getSortedMachines();
+		IPMachine[] macs = rm.getMachines();
 		int found = -1;
 		for(int i=0; i<macs.length; i++) {
 			if(macs[i].getElementName().equals(machineName)) {
@@ -265,9 +268,54 @@ public class ParallelTab extends PLaunchConfigurationTab {
 				break;
 			}
 		}
-		/* if it wasn't found - maybe their machines changed then let's just set them back at machine[0].
-		 * hopefully this is acceptable - might need to in the future give them an error message instead.
-		 */
+		if(found == -1) found = 0;
+		
+		return found;
+	}
+
+	protected String getMachineName() {
+		IResourceManager rm = getResourceManager();
+		if (rm == null) {
+			return "";
+		}
+		IPMachine[] macs = rm.getMachines();
+		int i = machineCombo.getSelectionIndex();
+		return macs[i].getElementName();
+	}
+
+	protected IResourceManager getResourceManager() {
+		IPUniverse universe = PTPCorePlugin.getDefault().getModelManager().getUniverse();
+		if (universe == null) {
+			return null;
+		}
+		IResourceManager[] rms = universe.getResourceManagers();
+		int i = resourceManagerCombo.getSelectionIndex();
+		return rms[i];
+	}
+
+	protected String getResourceManagerName() {
+		IPUniverse universe = PTPCorePlugin.getDefault().getModelManager().getUniverse();
+		if (universe == null) {
+			return "";
+		}
+		IResourceManager[] rms = universe.getResourceManagers();
+		int i = resourceManagerCombo.getSelectionIndex();
+		return rms[i].getElementName();
+	}
+	
+	protected int getResourceManagerNameIndex(String rmName) {
+		IPUniverse universe = PTPCorePlugin.getDefault().getModelManager().getUniverse();
+		if (universe == null) {
+			return -1;
+		}
+		IResourceManager[] rms = universe.getResourceManagers();
+		int found = -1;
+		for(int i=0; i<rms.length; i++) {
+			if(rms[i].getElementName().equals(rmName)) {
+				found = i;
+				break;
+			}
+		}
 		if(found == -1) found = 0;
 		
 		return found;
@@ -325,5 +373,19 @@ public class ParallelTab extends PLaunchConfigurationTab {
 	 */
 	public Image getImage() {
 		return LaunchImages.getImage(LaunchImages.IMG_PARALLEL_TAB);
+	}
+
+	private void loadMachineCombo() {
+		machineCombo.removeAll();
+		IResourceManager rm = getResourceManager();
+		if (rm == null) {
+			return;
+		}
+
+		final IPMachine[] macs = rm.getMachines();
+		for (int i = 0; i < macs.length; i++) {
+			machineCombo.add(macs[i].getElementName());
+		}
+		machineCombo.select(0);
 	}
 }
