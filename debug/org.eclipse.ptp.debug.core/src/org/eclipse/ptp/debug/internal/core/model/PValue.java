@@ -30,6 +30,12 @@ import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IVariable;
 import org.eclipse.ptp.debug.core.aif.AIFException;
 import org.eclipse.ptp.debug.core.aif.IAIFType;
+import org.eclipse.ptp.debug.core.aif.IAIFTypeChar;
+import org.eclipse.ptp.debug.core.aif.IAIFTypeFloat;
+import org.eclipse.ptp.debug.core.aif.IAIFTypeInt;
+import org.eclipse.ptp.debug.core.aif.IAIFTypePointer;
+import org.eclipse.ptp.debug.core.aif.IAIFTypeReference;
+import org.eclipse.ptp.debug.core.aif.IAIFTypeString;
 import org.eclipse.ptp.debug.core.aif.IAIFValue;
 import org.eclipse.ptp.debug.core.aif.IAIFValueChar;
 import org.eclipse.ptp.debug.core.aif.IAIFValueFloat;
@@ -39,7 +45,6 @@ import org.eclipse.ptp.debug.core.aif.IAIFValueReference;
 import org.eclipse.ptp.debug.core.aif.IAIFValueString;
 import org.eclipse.ptp.debug.core.aif.ITypeAggregate;
 import org.eclipse.ptp.debug.core.aif.ITypeDerived;
-import org.eclipse.ptp.debug.core.aif.IValueAggregate;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIVariable;
 import org.eclipse.ptp.debug.core.model.IPDebugElementStatus;
@@ -75,7 +80,12 @@ public class PValue extends AbstractPValue {
 			boolean isSuspended = (pframe == null) ? getCDITarget().isSuspended() : pframe.isSuspended();
 			if (isSuspended) {
 				try {
-					fValueString = processUnderlyingValue(getUnderlyingValue());
+					if (fVariable == null) {
+						targetRequestFailed("No variable found", null);
+					}
+					fValueString = processUnderlyingValue(fVariable.getType(), fVariable.getValue());
+				} catch (PCDIException pe) {
+					setStatus(IPDebugElementStatus.ERROR, pe.getMessage());
 				} catch (AIFException e) {
 					setStatus(IPDebugElementStatus.ERROR, e.getMessage());
 				}
@@ -169,21 +179,21 @@ public class PValue extends AbstractPValue {
 			((AbstractPVariable) it.next()).dispose();
 		}
 	}
-	protected String processUnderlyingValue(IAIFValue aifValue) throws AIFException {
+	protected String processUnderlyingValue(IAIFType aifType, IAIFValue aifValue) throws AIFException {
 		if (aifValue != null) {
-			if (aifValue instanceof IAIFValueChar)
+			if (aifType instanceof IAIFTypeChar)
 				return getCharValueString((IAIFValueChar) aifValue);
-			else if (aifValue instanceof IAIFValueInt)
+			else if (aifType instanceof IAIFTypeInt)
 				return getIntValueString((IAIFValueInt) aifValue);
-			else if (aifValue instanceof IAIFValueFloat)
+			else if (aifType instanceof IAIFTypeFloat)
 				return getFloatingPointValueString((IAIFValueFloat) aifValue);
-			else if (aifValue instanceof IAIFValuePointer)
+			else if (aifType instanceof IAIFTypePointer)
 				return getPointerValueString((IAIFValuePointer) aifValue);
-			else if (aifValue instanceof IAIFValueReference)
-				return processUnderlyingValue(((IAIFValueReference) aifValue).getParent());
-			else if (aifValue instanceof IAIFValueString)
+			else if (aifType instanceof IAIFTypeReference)
+				return processUnderlyingValue(aifType, ((IAIFValueReference) aifValue).getParent());
+			else if (aifType instanceof IAIFTypeString)
 				return getWCharValueString((IAIFValueString) aifValue);
-			else if (aifValue instanceof IValueAggregate)
+			else if (aifType instanceof ITypeAggregate)
 				return "{...}";
 			else
 				return aifValue.getValueString();

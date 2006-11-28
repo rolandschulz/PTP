@@ -50,7 +50,7 @@ public abstract class ValueAggregate extends ValueParent implements IValueAggreg
 			values.add(val);
 			size += val.sizeof();
 		}
-	}
+	}	
 
 	public int getChildrenNumber() throws AIFException {
 		return values.size();

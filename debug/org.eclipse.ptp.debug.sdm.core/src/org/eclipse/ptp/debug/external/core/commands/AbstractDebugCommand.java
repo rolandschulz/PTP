@@ -247,6 +247,7 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 		}
 		//if tasks are still not suspended, then cancel it
 		if (command_finish || !debugger.isSuspended(tasks.copy())) {
+System.err.println("************************************ WAIT SUSPEND FAILURE");			
 			doFlush();
 		}
 		else {

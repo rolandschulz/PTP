@@ -19,12 +19,12 @@
 package org.eclipse.ptp.debug.external.core.cdi.model.variable;
 
 import org.eclipse.ptp.debug.core.aif.AIFException;
-import org.eclipse.ptp.debug.core.aif.AIFFactory;
 import org.eclipse.ptp.debug.core.aif.IAIF;
 import org.eclipse.ptp.debug.core.aif.IAIFType;
 import org.eclipse.ptp.debug.core.aif.IAIFTypeArray;
 import org.eclipse.ptp.debug.core.aif.IAIFTypePointer;
 import org.eclipse.ptp.debug.core.aif.IAIFTypeReference;
+import org.eclipse.ptp.debug.core.aif.IAIFTypeString;
 import org.eclipse.ptp.debug.core.aif.IAIFValue;
 import org.eclipse.ptp.debug.core.aif.IAIFValueArray;
 import org.eclipse.ptp.debug.core.aif.ITypeAggregate;
@@ -42,7 +42,6 @@ import org.eclipse.ptp.debug.external.core.cdi.event.VarChangedEvent;
 import org.eclipse.ptp.debug.external.core.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.core.cdi.model.Target;
 import org.eclipse.ptp.debug.external.core.cdi.model.Thread;
-import org.eclipse.ptp.debug.external.core.commands.GetAIFValueCommand;
 import org.eclipse.ptp.debug.external.core.commands.GetPartialAIFCommand;
 
 /**
@@ -71,11 +70,6 @@ public abstract class Variable extends VariableDescriptor implements IPCDIVariab
 	}
 	public boolean isUpdated() {
 		return isUpdated;
-	}
-	public void update() throws PCDIException {
-		Session session = (Session)getTarget().getSession();
-		VariableManager mgr = session.getVariableManager();
-		mgr.update(this);
 	}
 	public Variable getChild(String name) {
 		for (int i = 0; i < children.length; i++) {
@@ -197,7 +191,7 @@ public abstract class Variable extends VariableDescriptor implements IPCDIVariab
 		}
 		else {
 			children = new Variable[1];
-			String ch_fn = fn;
+			String ch_fn = (type instanceof IAIFTypeString) ? "*(" + fn + ")" : fn;
 			String ch_n = ch_key;
 			String ch_k = key + "." + ch_key;
 			Variable v = createVariable((Target)getTarget(), (Thread)getThread(), (StackFrame)getStackFrame(), ch_n, ch_fn, getPosition(), getStackDepth(), ch_k);
@@ -224,10 +218,13 @@ public abstract class Variable extends VariableDescriptor implements IPCDIVariab
 	public IAIFValue getValue() throws PCDIException {
 		if (fValue == null) {
 			Target target = (Target)getTarget();
-			GetAIFValueCommand command = new GetAIFValueCommand(getTarget().getTask(), getKeyName());
+			GetPartialAIFCommand command = new GetPartialAIFCommand(getTarget().getTask(), getKeyName(), false, true);
 			target.getDebugger().postCommand(command);
-			String v = command.getAIFValue();
-			fValue = AIFFactory.createAIFValueDummy(fType, v);
+			
+			IAIF aif = command.getPartialAIF();
+			fType = aif.getType();
+			fValue = aif.getValue();
+			fTypename = aif.getDescription();
 		}
 		return fValue;
 	}

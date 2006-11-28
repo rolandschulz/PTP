@@ -25,7 +25,6 @@ import org.eclipse.ptp.core.proxy.event.ProxyEvent;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.ExtFormat;
 import org.eclipse.ptp.debug.core.aif.AIF;
-import org.eclipse.ptp.debug.core.aif.AIFFactory;
 import org.eclipse.ptp.debug.core.aif.IAIF;
 import org.eclipse.ptp.debug.core.cdi.IPCDICondition;
 import org.eclipse.ptp.debug.core.cdi.IPCDILineLocation;
@@ -367,46 +366,11 @@ public class ProxyDebugEvent extends ProxyEvent {
 			break;
 
 		/**
-		 * [2]: type name
-		 */
-		case IProxyDebugEvent.EVENT_DBG_VAR_CREATE:
-			evt = new ProxyDebugVarCreatedEvent(set, decodeString(args[2]));
-			break;
-
-		/**
-		 * [2]: type name
-		 * [3]: aif format 
-		 */
-		case IProxyDebugEvent.EVENT_DBG_AIF_TYPE:
-			evt = new ProxyDebugAIFTypeEvent(set, decodeString(args[2]), AIFFactory.getAIFType(decodeString(args[3])));
-			break;
-
-		/**
-		 * [2]: aif value 
-		 */
-		case IProxyDebugEvent.EVENT_DBG_AIF_VALUE:
-			evt = new ProxyDebugAIFValueEvent(set, decodeString(args[2]));
-			break;
-
-		/**
 		 * [2]: data value 
 		 */
 		case IProxyDebugEvent.EVENT_DBG_DATA_EVA_EX:
 			evt = new ProxyDebugDataExpValueEvent(set, decodeString(args[2]));
 			break;
-
-		/**
-		 * [2]: arg list -> length
-		 * [3]: arg list -> name
-		 */
-		case IProxyDebugEvent.EVENT_DBG_VAR_UPDATE:
-			int numVarUpdates = Integer.parseInt(args[2]);
-			String[] varupdates_strs = new String[numVarUpdates];
-			for (int i=0; i<numVarUpdates; i++) {
-				varupdates_strs[i] = decodeString(args[i+3]);
-			}
-			evt = new ProxyDebugVarUpdatedEvent(set, varupdates_strs);
-			break;		
 
 		/**
 		 * [2]: aif format

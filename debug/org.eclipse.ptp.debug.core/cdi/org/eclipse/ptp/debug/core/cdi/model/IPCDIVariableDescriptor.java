@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.cdi.model;
 
+import org.eclipse.ptp.debug.core.aif.IAIF;
 import org.eclipse.ptp.debug.core.aif.IAIFType;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
@@ -39,6 +40,8 @@ public interface IPCDIVariableDescriptor extends IPCDIObject {
 	int getCastingArrayStart();
 	void setCastingArrayEnd(int end);
 	int getCastingArrayEnd();
+	
+	void setAIF(IAIF aif);
 	
 	//IPCDIVariable[] getVariablesAsArray(int start, int length) throws PCDIException;
 	//IPCDIVariable[] getVariables() throws PCDIException;

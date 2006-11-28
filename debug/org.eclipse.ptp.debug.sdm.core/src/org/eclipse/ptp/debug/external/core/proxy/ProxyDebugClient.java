@@ -186,19 +186,15 @@ public class ProxyDebugClient extends AbstractProxyDebugClient {
 	public void debugDataEvaluateExpression(BitList procs, String expr) throws IOException {
 		sendCommand("DEE", procs, expr);
 	}
-	public void debugVariableCreate(BitList procs, String name) throws IOException {
-		sendCommand("VCR", procs, name);
+	public void debugGetPartialAIF(BitList procs, String name, boolean listChildren, boolean express) throws IOException {
+		String[] args = new String[] {
+				name,
+				Integer.toString(listChildren?1:0),
+				Integer.toString(express?1:0)
+			};
+		sendCommand("GPA", procs, args);
 	}
 	public void debugVariableDelete(BitList procs, String name) throws IOException {
 		sendCommand("VDE", procs, name);
-	}
-	public void debugVariableUpdate(BitList procs, String name) throws IOException {
-		sendCommand("VUP", procs, name);
-	}
-	public void debugGetPartialAIF(BitList procs, String name, boolean listChildren) throws IOException {
-		sendCommand("GPA", procs, name, Integer.toString(listChildren?1:0));
-	}
-	public void debugGetAIFValue(BitList procs, String name) throws IOException {
-		sendCommand("GAV", procs, name);
 	}
 }
