@@ -142,6 +142,16 @@ public class JobManager extends AbstractUIManager {
 	 * @see org.eclipse.ptp.ui.IManager#getName(java.lang.String)
 	 */
 	public String getName(String id) {
+		IPJob job = findJobById(id);
+		if (job == null)
+			return "";
+		return job.getName();
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.IManager#getFullyQualifiedName(java.lang.String)
+	 */
+	public String getFullyQualifiedName(String id) {
 		final IPJob job = findJobById(id);
 		final IPQueue queue;
 		final String jobName;

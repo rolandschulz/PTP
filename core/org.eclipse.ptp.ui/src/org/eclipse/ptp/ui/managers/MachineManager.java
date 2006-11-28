@@ -276,6 +276,16 @@ public class MachineManager extends AbstractUIManager {
 		IPMachine machine = findMachineById(id);
 		if (machine == null)
 			return "";
+		return machine.getName();
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.IManager#getFullyQualifiedName(java.lang.String)
+	 */
+	public String getFullyQualifiedName(String id) {
+		IPMachine machine = findMachineById(id);
+		if (machine == null)
+			return "";
 		IResourceManager rm = machine.getResourceManager();
 		return rm.getName() + ": " + machine.getName();
 	}
