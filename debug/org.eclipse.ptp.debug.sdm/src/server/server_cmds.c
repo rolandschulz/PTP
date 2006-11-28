@@ -67,11 +67,8 @@ static int svr_clihandle(dbg_backend *, char **);
 static int svr_quit(dbg_backend *, char **);
 
 static int svr_dataevaluateexpression(dbg_backend *, char **);
-static int svr_variablecreate(dbg_backend *, char **);
-static int svr_variabledelete(dbg_backend *, char **);
-static int svr_variableupdate(dbg_backend *, char **);
 static int svr_getpartialaif(dbg_backend *, char **);
-static int svr_getaifvalue(dbg_backend *, char **);
+static int svr_variabledelete(dbg_backend *, char **);
 
 static svr_cmd svr_cmd_tab[] =
 {
@@ -103,11 +100,8 @@ static svr_cmd svr_cmd_tab[] =
 	{DBG_SIGNALINFO_CMD,			svr_signalinfo},
 	{DBG_CLIHANDLE_CMD,				svr_clihandle},
 	{DBG_DATAEVALUATEEXPRESSION_CMD,svr_dataevaluateexpression},
-	{DBG_VARIABLECREATE_CMD,		svr_variablecreate},
-	{DBG_VARIABLEDELETE_CMD,		svr_variabledelete},
-	{DBG_VARIABLEUPDATE_CMD,		svr_variableupdate},
 	{DBG_GETPARTIALAIF_CMD,			svr_getpartialaif},
-	{DBG_GETAIFVALUE_CMD,			svr_getaifvalue},
+	{DBG_VARIABLEDELETE_CMD,		svr_variabledelete},
 	{"QUI",							svr_quit},
 };
 
@@ -346,27 +340,12 @@ svr_dataevaluateexpression(dbg_backend *db, char **args)
 	return db->db_funcs->dataevaluateexpression(args[1]);
 }
 static int
-svr_variablecreate(dbg_backend *db, char **args)
+svr_getpartialaif(dbg_backend *db, char **args)
 {
-	return db->db_funcs->variablecreate(args[1]);
+	return db->db_funcs->getpartialaif(args[1], atoi(args[2]), atoi(args[3]));
 }
 static int
 svr_variabledelete(dbg_backend *db, char **args)
 {
 	return db->db_funcs->variabledelete(args[1]);
-}
-static int
-svr_variableupdate(dbg_backend *db, char **args)
-{
-	return db->db_funcs->variableupdate(args[1]);
-}
-static int
-svr_getpartialaif(dbg_backend *db, char **args)
-{
-	return db->db_funcs->getpartialaif(args[1], atoi(args[2]));
-}
-static int
-svr_getaifvalue(dbg_backend *db, char **args)
-{
-	return db->db_funcs->getaifvalue(args[1]);
 }

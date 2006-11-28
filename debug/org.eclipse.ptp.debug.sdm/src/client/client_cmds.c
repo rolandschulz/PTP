@@ -902,7 +902,7 @@ DbgClntDataEvaluateExpression(char **args)
 	return res;
 }
 int 
-DbgClntVariableCreate(char **args)
+DbgClntGetPartialAIF(char **args)
 {
 	int			res;
 	char *		cmd;
@@ -914,7 +914,7 @@ DbgClntVariableCreate(char **args)
 		return DBGRES_ERR;
 	}
 	
-	asprintf(&cmd, "%s \"%s\"", DBG_VARIABLECREATE_CMD, args[2]);
+	asprintf(&cmd, "%s \"%s\" %s %s", DBG_GETPARTIALAIF_CMD, args[2], args[3], args[4]);
 	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, cmd, NULL);
 	bitset_free(set);
 	
@@ -934,63 +934,6 @@ DbgClntVariableDelete(char **args)
 	}
 	
 	asprintf(&cmd, "%s \"%s\"", DBG_VARIABLEDELETE_CMD, args[2]);
-	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, cmd, NULL);
-	bitset_free(set);
-	
-	return res;
-}
-int 
-DbgClntVariableUpdate(char **args)
-{
-	int			res;
-	char *		cmd;
-	bitset *	set; 
-
-	set = str_to_bitset(args[1]);
-	if (set == NULL) {
-		DbgSetError(DBGERR_PROCSET, NULL);
-		return DBGRES_ERR;
-	}
-	
-	asprintf(&cmd, "%s \"%s\"", DBG_VARIABLEUPDATE_CMD, args[2]);
-	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, cmd, NULL);
-	bitset_free(set);
-	
-	return res;
-}
-int 
-DbgClntGetPartialAIF(char **args)
-{
-	int			res;
-	char *		cmd;
-	bitset *	set; 
-
-	set = str_to_bitset(args[1]);
-	if (set == NULL) {
-		DbgSetError(DBGERR_PROCSET, NULL);
-		return DBGRES_ERR;
-	}
-	
-	asprintf(&cmd, "%s \"%s\" %s", DBG_GETPARTIALAIF_CMD, args[2], args[3]);
-	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, cmd, NULL);
-	bitset_free(set);
-	
-	return res;
-}
-int 
-DbgClntGetAIFValue(char **args)
-{
-	int			res;
-	char *		cmd;
-	bitset *	set; 
-
-	set = str_to_bitset(args[1]);
-	if (set == NULL) {
-		DbgSetError(DBGERR_PROCSET, NULL);
-		return DBGRES_ERR;
-	}
-	
-	asprintf(&cmd, "%s \"%s\"", DBG_GETAIFVALUE_CMD, args[2]);
 	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, cmd, NULL);
 	bitset_free(set);
 	

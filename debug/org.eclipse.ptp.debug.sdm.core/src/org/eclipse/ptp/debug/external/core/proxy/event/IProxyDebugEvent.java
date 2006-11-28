@@ -50,11 +50,7 @@ public interface IProxyDebugEvent extends IProxyEvent {
 	public static final int EVENT_DBG_SIGNALS = DBG_EVENT_OFFSET + 19;
 
 	public static final int EVENT_DBG_DATA_EVA_EX = DBG_EVENT_OFFSET + 20;
-	public static final int EVENT_DBG_VAR_CREATE = DBG_EVENT_OFFSET + 21;
-	public static final int EVENT_DBG_VAR_UPDATE = DBG_EVENT_OFFSET + 22;
-	public static final int EVENT_DBG_AIF_TYPE = DBG_EVENT_OFFSET + 23;
-	public static final int EVENT_DBG_AIF_VALUE = DBG_EVENT_OFFSET + 24;
-	public static final int EVENT_DBG_PARTIAL_AIF = DBG_EVENT_OFFSET + 25;
+	public static final int EVENT_DBG_PARTIAL_AIF = DBG_EVENT_OFFSET + 21;
 
 	public BitList getBitSet();
 }

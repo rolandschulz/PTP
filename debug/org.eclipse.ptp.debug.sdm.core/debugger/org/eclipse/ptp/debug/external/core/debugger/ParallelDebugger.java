@@ -45,8 +45,6 @@ import org.eclipse.ptp.debug.external.core.proxy.ProxyDebugClient;
 import org.eclipse.ptp.debug.external.core.proxy.ProxyDebugSignal;
 import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugEvent;
 import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugEventListener;
-import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugAIFTypeEvent;
-import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugAIFValueEvent;
 import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugArgsEvent;
 import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugBreakpointHitEvent;
 import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugBreakpointSetEvent;
@@ -67,8 +65,6 @@ import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugStackframeEvent
 import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugStepEvent;
 import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugSuspendEvent;
 import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugTypeEvent;
-import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugVarCreatedEvent;
-import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugVarUpdatedEvent;
 import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugVarsEvent;
 
 
@@ -403,9 +399,9 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			throw new PCDIException(e.getMessage());
 		}
 	}
-	public void variableCreate(BitList tasks, String varname) throws PCDIException {
+	public void getPartialAIF(BitList tasks, String expr, boolean listChildren, boolean express) throws PCDIException {
 		try {
-			proxy.debugVariableCreate(tasks, varname);
+			proxy.debugGetPartialAIF(tasks, expr, listChildren, express);
 		} catch (IOException e) {
 			throw new PCDIException(e.getMessage());
 		}
@@ -413,27 +409,6 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 	public void variableDelete(BitList tasks, String varname) throws PCDIException {
 		try {
 			proxy.debugVariableDelete(tasks, varname);
-		} catch (IOException e) {
-			throw new PCDIException(e.getMessage());
-		}
-	}
-	public void variableUpdate(BitList tasks, String varname) throws PCDIException {
-		try {
-			proxy.debugVariableUpdate(tasks, varname);
-		} catch (IOException e) {
-			throw new PCDIException(e.getMessage());
-		}
-	}
-	public void getPartialAIF(BitList tasks, String expr, boolean listChildren) throws PCDIException {
-		try {
-			proxy.debugGetPartialAIF(tasks, expr, listChildren);
-		} catch (IOException e) {
-			throw new PCDIException(e.getMessage());
-		}
-	}
-	public void getAIFValue(BitList tasks, String expr) throws PCDIException {
-		try {
-			proxy.debugGetAIFValue(tasks, expr);
 		} catch (IOException e) {
 			throw new PCDIException(e.getMessage());
 		}
@@ -581,24 +556,8 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			completeCommand(e.getBitSet(), memoryInfoEvent.getMemoryInfo());			
 			break;
 			
-		case IProxyDebugEvent.EVENT_DBG_AIF_TYPE:
-			completeCommand(e.getBitSet(), (ProxyDebugAIFTypeEvent)e);
-			break;
-
-		case IProxyDebugEvent.EVENT_DBG_AIF_VALUE:
-			completeCommand(e.getBitSet(), (ProxyDebugAIFValueEvent)e);
-			break;
-
 		case IProxyDebugEvent.EVENT_DBG_DATA_EVA_EX:
 			completeCommand(e.getBitSet(), (ProxyDebugDataExpValueEvent)e);
-			break;
-
-		case IProxyDebugEvent.EVENT_DBG_VAR_UPDATE:
-			completeCommand(e.getBitSet(), ((ProxyDebugVarUpdatedEvent)e).getVarUpdates());
-			break;
-
-		case IProxyDebugEvent.EVENT_DBG_VAR_CREATE:
-			completeCommand(e.getBitSet(), ((ProxyDebugVarCreatedEvent)e).getName());
 			break;
 
 		case IProxyDebugEvent.EVENT_DBG_PARTIAL_AIF:

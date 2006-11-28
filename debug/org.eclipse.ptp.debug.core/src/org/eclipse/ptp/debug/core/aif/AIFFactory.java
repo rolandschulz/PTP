@@ -42,7 +42,6 @@ import org.eclipse.ptp.debug.internal.core.aif.AIFValueArray;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValueBool;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValueChar;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValueClass;
-import org.eclipse.ptp.debug.internal.core.aif.AIFValueDummy;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValueEnum;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValueFloat;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValueInt;
@@ -109,9 +108,6 @@ public class AIFFactory {
 	public static final IAIFType UNKNOWNTYPE = new AIFTypeIncomplete();
 	public static final IAIFValue UNKNOWNVALUE = new AIFValueUnknown(UNKNOWNTYPE);
 	
-	public static IAIFValue createAIFValueDummy(IAIFType type, String value) {
-		return new AIFValueDummy(type, value);
-	}
 	public static IAIF UNKNOWNAIF() {
 		return new AIF(UNKNOWNTYPE, UNKNOWNVALUE);
 	}

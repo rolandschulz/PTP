@@ -452,11 +452,11 @@ DbgDataEvaluateExpression(session *s, bitset *set, char* arg)
 	return res;
 }
 int
-DbgVariableCreate(session *s, bitset *set, char* arg)
+DbgGetPartialAIF(session *s, bitset *set, char* arg, int listChildren, int express)
 {
 	int		res;
 	char *	set_str = bitset_to_str(set);
-	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_VARIABLECREATE_CMD, DBG_VARIABLECREATE_FMT, set_str, arg);
+	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_GETPARTIALAIF_CMD, DBG_GETPARTIALAIF_FMT, set_str, arg, listChildren, express);
 	free(set_str);
 	return res;
 }
@@ -466,33 +466,6 @@ DbgVariableDelete(session *s, bitset *set, char* arg)
 	int		res;
 	char *	set_str = bitset_to_str(set);
 	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_VARIABLEDELETE_CMD, DBG_VARIABLEDELETE_FMT, set_str, arg);
-	free(set_str);
-	return res;
-}
-int
-DbgVariableUpdate(session *s, bitset *set, char* arg)
-{
-	int		res;
-	char *	set_str = bitset_to_str(set);
-	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_VARIABLEUPDATE_CMD, DBG_VARIABLEUPDATE_FMT, set_str, arg);
-	free(set_str);
-	return res;
-}
-int
-DbgGetPartialAIF(session *s, bitset *set, char* arg, int listChildren)
-{
-	int		res;
-	char *	set_str = bitset_to_str(set);
-	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_GETPARTIALAIF_CMD, DBG_GETPARTIALAIF_FMT, set_str, arg, listChildren);
-	free(set_str);
-	return res;
-}
-int
-DbgGetAIFValue(session *s, bitset *set, char* arg)
-{
-	int		res;
-	char *	set_str = bitset_to_str(set);
-	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_GETAIFVALUE_CMD, DBG_GETAIFVALUE_FMT, set_str, arg);
 	free(set_str);
 	return res;
 }

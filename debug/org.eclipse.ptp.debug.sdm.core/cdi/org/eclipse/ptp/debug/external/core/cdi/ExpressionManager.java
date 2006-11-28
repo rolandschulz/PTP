@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import org.eclipse.ptp.debug.core.aif.IAIF;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIExpression;
@@ -33,9 +34,8 @@ import org.eclipse.ptp.debug.external.core.cdi.model.Target;
 import org.eclipse.ptp.debug.external.core.cdi.model.Thread;
 import org.eclipse.ptp.debug.external.core.cdi.model.variable.LocalVariable;
 import org.eclipse.ptp.debug.external.core.cdi.model.variable.Variable;
-import org.eclipse.ptp.debug.external.core.commands.VariableCreateCommand;
+import org.eclipse.ptp.debug.external.core.commands.GetPartialAIFCommand;
 import org.eclipse.ptp.debug.external.core.commands.VariableDeleteCommand;
-import org.eclipse.ptp.debug.external.core.commands.VariableUpdateCommand;
 
 /**
  * @author Clement chu
@@ -95,9 +95,23 @@ public class ExpressionManager extends Manager {
 		IPCDIExpression[] expressions = getExpressions(target);
 		destroyExpressions(target, expressions);
 	}
-
+	public void update(Target target, String[] varList) throws PCDIException {
+		//deleteAllVariables(target);
+		List eventList = new ArrayList();
+		for (int i=0; i<varList.length; i++) {
+			Variable variable = getVariable(target, varList[i]);
+			if (variable != null) {
+				variable.setUpdated(true);
+				eventList.add(new VarChangedEvent(target.getSession(), target.getTask(), variable, varList[i]));
+			}
+		}
+		IPCDIEvent[] events = (IPCDIEvent[]) eventList.toArray(new IPCDIEvent[0]);
+		target.getDebugger().fireEvents(events);
+	}
 	public void update(Target target) throws PCDIException {
-//		deleteAllVariables(target);
+		update(target, new String[0]);
+		//deleteAllVariables(target);
+		/*
 		List eventList = new ArrayList();
 		List varList = getVariableList(target);
 		Variable[] variables = (Variable[]) varList.toArray(new Variable[varList.size()]);
@@ -111,21 +125,10 @@ public class ExpressionManager extends Manager {
 			for (int j=0; j<changes.length; j++) {
 				eventList.add(new VarChangedEvent(target.getSession(), target.getTask(), variable, changes[j]));
 			}
-			/*
-			VarUpdateInfo[] changes = command.getUpdateInfo();
-			for (int j=0; j<changes.length; j++) {
-				String n = changes[j].getName();
-				if (changes[j].isInScope()) {
-					eventList.add(new VarChangedEvent(target.getSession(), target.getTask(), variable, n));
-				}
-				else {
-					deleteVariable(variable);
-				}
-			}
-			*/
 		}
 		IPCDIEvent[] events = (IPCDIEvent[]) eventList.toArray(new IPCDIEvent[0]);
 		target.getDebugger().fireEvents(events);
+		*/
 	}	
 	
 	public Variable getVariable(Target target, String varName) {
@@ -154,14 +157,17 @@ public class ExpressionManager extends Manager {
 			target.setCurrentThread(frame.getThread(), false);
 			((Thread)frame.getThread()).setCurrentStackFrame(frame, false);
 
-			VariableCreateCommand command = new VariableCreateCommand(target.getTask(), code);
+			GetPartialAIFCommand command = new GetPartialAIFCommand(target.getTask(), code);
 			target.getDebugger().postCommand(command);
-			String keyName = command.getKeyName();
+			IAIF aif = command.getPartialAIF();
+			String keyName = command.getName();
 			
-			Variable variable = new LocalVariable(target, null, frame, code, null, 0, 0, keyName);
+			Variable v = new LocalVariable(target, null, frame, code, null, 0, 0, keyName);
+			v.setAIF(aif);
+			
 			List varList = getVariableList(target);
-			varList.add(variable);
-			return variable;
+			varList.add(v);
+			return v;
 		} finally {
 			target.setCurrentThread(currentThread, false);
 			currentThread.setCurrentStackFrame(currentFrame, false);

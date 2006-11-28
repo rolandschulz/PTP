@@ -50,7 +50,6 @@ import org.eclipse.ptp.debug.external.core.cdi.model.variable.VariableDescriptor
 import org.eclipse.ptp.debug.external.core.commands.ListArgumentsCommand;
 import org.eclipse.ptp.debug.external.core.commands.ListLocalVariablesCommand;
 import org.eclipse.ptp.debug.external.core.commands.VariableDeleteCommand;
-import org.eclipse.ptp.debug.external.core.commands.VariableUpdateCommand;
 
 /**
  * @author Clement chu
@@ -174,9 +173,7 @@ public class VariableManager extends Manager {
 						iterator.remove();
 						return variable;
 					}
-				} catch (PCDIException e) {
-					
-				}
+				} catch (PCDIException e) {}
 			}
 		}
 		return null;
@@ -428,7 +425,41 @@ public class VariableManager extends Manager {
 		}
 		return children;
 	}
+	public void update(Target target, String[] varList) throws PCDIException {
+		int highLevel = 0;
+		int lowLevel = 0;
+		IPCDIStackFrame[] frames = null;
+		StackFrame currentStack = null;
+		Thread currentThread = (Thread)target.getCurrentThread();
+		if (currentThread != null) {
+			currentStack = currentThread.getCurrentStackFrame();
+			if (currentStack != null) {
+				highLevel = currentStack.getLevel();
+			}
+			if (highLevel > MAX_STACK_DEPTH) {
+				highLevel = MAX_STACK_DEPTH;
+			}
+			lowLevel = highLevel - MAX_STACK_DEPTH;
+			if (lowLevel < 0) {
+				lowLevel = 0;
+			}
+			frames = currentThread.getStackFrames(0, highLevel);
+		}
+		
+		List eventList = new ArrayList();
+		for (int i=0; i<varList.length; i++) {
+			Variable variable = getVariable(target, varList[i]);
+			if (variable != null) {
+				variable.setUpdated(true);
+				eventList.add(new VarChangedEvent(target.getSession(), target.getTask(), variable, varList[i]));
+			}
+		}
+		IPCDIEvent[] events = (IPCDIEvent[]) eventList.toArray(new IPCDIEvent[0]);
+		target.getDebugger().fireEvents(events);
+	}
 	public void update(Target target) throws PCDIException {
+		update(target, new String[0]);
+		/*
 		int highLevel = 0;
 		int lowLevel = 0;
 		IPCDIStackFrame[] frames = null;
@@ -462,19 +493,6 @@ public class VariableManager extends Manager {
 					Variable matchVariable = findVariable(variable, changes[j]);
 					eventList.add(new VarChangedEvent(target.getSession(), target.getTask(), matchVariable, changes[j]));
 				}
-				/*
-				VarUpdateInfo[] changes = command.getUpdateInfo();
-				variable.setUpdated(true);
-				for (int j=0; j<changes.length; j++) {
-					String n = changes[j].getName();
-					if (changes[j].isInScope()) {
-						eventList.add(new VarChangedEvent(target.getSession(), target.getTask(), variable, n));
-					}
-					else {
-						destroyVariable(variable);
-					}
-				}
-				*/
 			}
 			else {
 				variable.setUpdated(false);
@@ -482,35 +500,6 @@ public class VariableManager extends Manager {
 		}
 		IPCDIEvent[] events = (IPCDIEvent[]) eventList.toArray(new IPCDIEvent[0]);
 		target.getDebugger().fireEvents(events);
-	}
-	public void update(Variable variable) throws PCDIException {
-		Target target = (Target)variable.getTarget();
-		List eventList = new ArrayList();
-		update(target, variable, eventList);
-		IPCDIEvent[] events = (IPCDIEvent[]) eventList.toArray(new IPCDIEvent[0]);
-		((Session)getSession()).getDebugger().fireEvents(events);		
-	}
-	public void update(Target target, Variable variable, List eventList) throws PCDIException {
-		String varName = variable.getKeyName();
-		VariableUpdateCommand command = new VariableUpdateCommand(target.getTask(), varName);
-		target.getDebugger().postCommand(command);
-		String[] changes = command.getChangeNames();
-		variable.setUpdated(true);
-		for (int j=0; j<changes.length; j++) {
-			eventList.add(new VarChangedEvent(target.getSession(), target.getTask(), variable, changes[j]));
-		}
-		/*
-		VarUpdateInfo[] changes = command.getUpdateInfo();
-		variable.setUpdated(true);
-		for (int j=0; j<changes.length; j++) {
-			String n = changes[j].getName();
-			if (changes[j].isInScope()) {
-				eventList.add(new VarChangedEvent(target.getSession(), target.getTask(), variable, n));
-			}
-			else {
-				destroyVariable(variable);
-			}
-		}
 		*/
 	}
 	boolean isVariableNeedsToBeUpdate(Variable variable, IPCDIStackFrame current, IPCDIStackFrame[] frames, int lowLevel) throws PCDIException {

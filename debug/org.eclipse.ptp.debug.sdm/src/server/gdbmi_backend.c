@@ -20,7 +20,7 @@
 **
 */
 
-//#define DEBUG
+#define DEBUG
 
 #ifdef __gnu_linux__
 #define _GNU_SOURCE
@@ -84,11 +84,6 @@ static struct varmap VARMap = { 0, 0, NULL };
 static int			(*AsyncFunc)(void *) = NULL;
 static void *		AsyncFuncData;
 
-static int	SetAndCheckBreak(int, int, int, char *, char *, int, int);
-static int	GetStackframes(int, int, int, List **);
-static int	GetAIFVar(char *, AIF **, char **);
-static AIF * ConvertVarToAIF(char *, MIVar *, int);
-
 static int	GDBMIInit(void (*)(dbg_event *, void *), void *);
 static int	GDBMIProgress(void);
 static int	GDBMIInterrupt(void);
@@ -121,16 +116,16 @@ static int	GDBCLISignalInfo(char*);
 static int	GDBCLIHandle(char*);
 static int	GDBMIQuit(void);
 static int	GDBMIDataEvaluateExpression(char*);
-static int	GDBMIVarCreate(char*);
+static int	GDBGetPartialAIF(char *, int, int);
 static int	GDBMIVarDelete(char*);
-static int	GDBMIVarUpdate(char*);
-static int	GDBGetPartialAIF(char *, int);
-static int	GDBGetAIFValue(char *);
 
-static List * GetChangedVariables();
-static void RemoveAllMaps();
-
+static void SendCommandWait(MISession *, MICommand *);
+static int	SetAndCheckBreak(int, int, int, char *, char *, int, int);
+static int	GetStackframes(int, int, int, List **);
+static int	GetAIFVar(char *, AIF **, char **);
+static AIF * ConvertVarToAIF(char *, MIVar *, int);
 static AIF * GetPartailAIF(MIVar *, char *);
+static void RemoveAllMaps();
 
 dbg_backend_funcs	GDBMIBackend =
 {
@@ -165,11 +160,8 @@ dbg_backend_funcs	GDBMIBackend =
 	GDBCLISignalInfo,
 	GDBCLIHandle,
 	GDBMIDataEvaluateExpression,
-	GDBMIVarCreate,
-	GDBMIVarDelete,
-	GDBMIVarUpdate,
 	GDBGetPartialAIF,
-	GDBGetAIFValue,
+	GDBMIVarDelete,
 	GDBMIQuit
 };
 
@@ -197,6 +189,33 @@ SaveEvent(dbg_event *e)
 		FreeDbgEvent(LastEvent);
 		
 	LastEvent = e;
+}
+
+/**** Variable ****/
+static MIVar*
+CreateMIVar(char *name)
+{
+	MICommand *cmd;
+	MIVar *mivar;
+
+	cmd = MIVarCreate("-", "*", name);
+	SendCommandWait(DebugSession, cmd);
+	if (!MICommandResultOK(cmd)) {
+		DbgSetError(DBGERR_UNKNOWN_VARIABLE, GetLastErrorStr());
+		MICommandFree(cmd);
+		return NULL;
+	}
+	mivar = MIGetVarCreateInfo(cmd);
+	MICommandFree(cmd);
+	return mivar;
+}
+static void
+DeleteMIVar(char *mi_name)
+{
+	MICommand *cmd;
+	cmd = MIVarDelete(mi_name);
+	SendCommandWait(DebugSession, cmd);
+	MICommandFree(cmd);
 }
 
 static void
@@ -339,6 +358,151 @@ get_current_frame(stackframe **frame)
 	return 0;
 }
 
+static void
+AddVARMap(char *name, MIVar *mivar)
+{
+	int i;
+	struct varinfo *map;
+
+	if (VARMap.size == 0) {
+		VARMap.maps = (struct varinfo *)malloc(sizeof(struct varinfo) * 100);
+		VARMap.size = 100;
+		
+		for (i=0; i<VARMap.size; i++) {
+			map = &VARMap.maps[i];
+			map->name = NULL; 
+			map->mivar = NULL;
+		}
+	}
+	if (VARMap.nels == VARMap.size) {
+		i = VARMap.size;
+		VARMap.size *= 2;
+		VARMap.maps = (struct varinfo *)realloc(VARMap.maps, sizeof(struct varinfo) * VARMap.size);
+		
+		for (; i<VARMap.size; i++) {
+			map = &VARMap.maps[i];
+			map->name = NULL; 
+			map->mivar = NULL;
+		}
+	}
+	for (i=0; i<VARMap.size; i++) {
+		map = &VARMap.maps[i];
+		if (map->name == NULL) {
+			map->name = strdup(name);
+			map->mivar = mivar;
+			VARMap.nels++;
+		}
+	}
+}
+static varinfo *
+FindVARByName(char *name) 
+{
+	int	i;
+	struct varinfo *map;
+	for (i=0; i<VARMap.nels; i++) {
+		map = &VARMap.maps[i];
+		if (map != NULL && strcmp(map->name, name) == 0) {
+			return map;
+		}
+	}
+	return NULL;
+}
+static varinfo *
+FindVARByMIName(char *mi_name) 
+{
+	int i;
+	struct varinfo *map;
+	for (i=0; i<VARMap.nels; i++) {
+		map = &VARMap.maps[i];
+		if (map != NULL && strcmp(map->mivar->name, mi_name) == 0) {
+			return map;
+		}
+	}
+	return NULL;
+}
+static void
+RemoveVARMap(varinfo *map)
+{
+	if (map != NULL) {
+		if (map->name != NULL) {
+			free(map->name);
+			map->name = NULL;
+		}
+		if (map->mivar != NULL) {
+			DeleteMIVar(map->mivar->name);
+			MIVarFree(map->mivar);
+			map->mivar = NULL;
+		}
+		VARMap.nels--;
+	}
+}
+static void
+RemoveVARMapByName(char *name)
+{
+	struct varinfo *map;	
+	map = FindVARByName(name);
+	RemoveVARMap(map);
+}
+static void
+RemoveVARMapByMIName(char *mi_name)
+{
+	struct varinfo *map;
+	map = FindVARByMIName(mi_name);
+	RemoveVARMap(map);
+}
+static void
+RemoveAllVARMap()
+{
+	int				i;
+	struct varinfo *map;
+	int length = VARMap.nels;
+	for (i = 0; i < length; i++) {
+		map = &VARMap.maps[i];
+		if (map == NULL)
+			return;
+			
+		RemoveVARMap(map);
+	}	
+}
+static void
+RemoveAllMaps()
+{
+	RemoveAllBPMap();
+	RemoveAllVARMap();
+}
+static List * 
+GetChangedVariables()
+{
+	MICommand *cmd;	
+	List *changes;
+	List *changedVars;
+	MIVarChange *var;
+	
+	cmd = MIVarUpdate("*");
+	SendCommandWait(DebugSession, cmd);
+	if (!MICommandResultOK(cmd)) {
+		DEBUG_PRINTS("------------------- GetChangedVariables error\n");
+		DbgSetError(DBGERR_INPROGRESS, GetLastErrorStr());
+		MICommandFree(cmd);
+		return NULL;
+	}
+	MIGetVarUpdateInfo(cmd, &changes);
+	MICommandFree(cmd);
+	
+	changedVars = NewList();
+	for (SetList(changes); (var = (MIVarChange *)GetListElement(changes)) != NULL;) {
+		if (var->in_scope == 1) {
+			AddToList(changedVars, (void *)strdup(var->name));
+		}
+		else {
+			DeleteMIVar(var->name);
+		}
+	}
+	DestroyList(changes, MIVarChangeFree);
+	return changedVars;
+}
+
+/**** aysn stop ****/
 static int
 AsyncStop(void *data)
 {
@@ -358,7 +522,7 @@ AsyncStop(void *data)
 			e->dbg_event_u.suspend_event.ev_u.bpid = bpmap->remote;
 			e->dbg_event_u.suspend_event.thread_id = evt->threadId;
 			e->dbg_event_u.suspend_event.frame = NULL;
-			//e->dbg_event_u.suspend_event.changed_vars = GetChangedVariables();
+			e->dbg_event_u.suspend_event.changed_vars = GetChangedVariables();
 			break;
 		}
 		/* else must be a temporary breakpoint drop through... */
@@ -376,7 +540,7 @@ AsyncStop(void *data)
 			e->dbg_event_u.suspend_event.reason = DBGEV_SUSPEND_INT;
 			e->dbg_event_u.suspend_event.thread_id = evt->threadId;
 			e->dbg_event_u.suspend_event.frame = frame;
-			//e->dbg_event_u.suspend_event.changed_vars = GetChangedVariables();
+			e->dbg_event_u.suspend_event.changed_vars = GetChangedVariables();
 		}
 		break;
 
@@ -392,7 +556,7 @@ AsyncStop(void *data)
 			e->dbg_event_u.suspend_event.reason = DBGEV_SUSPEND_STEP;
 			e->dbg_event_u.suspend_event.thread_id = evt->threadId;
 			e->dbg_event_u.suspend_event.frame = frame;
-			//e->dbg_event_u.suspend_event.changed_vars = GetChangedVariables();
+			e->dbg_event_u.suspend_event.changed_vars = GetChangedVariables();
 		}
 		break;
 
@@ -411,7 +575,7 @@ AsyncStop(void *data)
 			e->dbg_event_u.suspend_event.ev_u.sig->desc = strdup(evt->sigMeaning);
 			e->dbg_event_u.suspend_event.thread_id = evt->threadId;
 			e->dbg_event_u.suspend_event.frame = frame;
-			//e->dbg_event_u.suspend_event.changed_vars = GetChangedVariables();
+			e->dbg_event_u.suspend_event.changed_vars = GetChangedVariables();
 		}
 		break;
 		
@@ -435,7 +599,6 @@ AsyncStop(void *data)
 		DbgSetError(DBGERR_DEBUGGER, "Unknown reason for stopping");
 		return DBGRES_ERR;
 	}
-
 	MIEventFree(evt);
 	
 	if (EventCallback != NULL)
@@ -458,7 +621,6 @@ AsyncCallback(MIEvent *evt)
 	AsyncFunc = AsyncStop;
 	AsyncFuncData = (void *)evt;
 }
-
 
 /*
  * Initialize GDB
@@ -500,245 +662,6 @@ SendCommandWait(MISession *sess, MICommand *cmd)
 			break;
 		}
 	} while (!MISessionCommandCompleted(sess));
-}
-
-/**** Variable ****/
-static MIVar*
-CreateMIVar(char *name) {
-	MICommand *cmd;
-	MIVar *mivar;
-
-	cmd = MIVarCreate("-", "*", name);
-	SendCommandWait(DebugSession, cmd);
-	if (!MICommandResultOK(cmd)) {
-		DbgSetError(DBGERR_UNKNOWN_VARIABLE, GetLastErrorStr());
-		MICommandFree(cmd);
-		return NULL;
-	}
-	mivar = MIGetVarCreateInfo(cmd);
-	MICommandFree(cmd);
-	return mivar;
-}
-static void
-DeleteMIVar(char *name) {
-	MICommand *cmd;
-
-	cmd = MIVarDelete(name);
-	SendCommandWait(DebugSession, cmd);
-	MICommandFree(cmd);
-}
-
-static varinfo *
-AddVARMap(char *name)
-{
-	int				i;
-	struct varinfo *map;
-	MIVar *mivar;
-	
-	if (VARMap.size == 0) {
-		VARMap.maps = (struct varinfo *)malloc(sizeof(struct varinfo) * 100);
-		VARMap.size = 100;
-		
-		for (i = 0; i < VARMap.size; i++) {
-			map = &VARMap.maps[i];
-			map->name = NULL; 
-			map->mivar = NULL;
-		}
-	}
-	
-	if (VARMap.nels == VARMap.size) {
-		i = VARMap.size;
-		VARMap.size *= 2;
-		VARMap.maps = (struct varinfo *)realloc(VARMap.maps, sizeof(struct varinfo) * VARMap.size);
-		
-		for (; i < VARMap.size; i++) {
-			map = &VARMap.maps[i];
-			map->name = NULL; 
-			map->mivar = NULL;
-		}
-	}
-	
-	for (i = 0; i < VARMap.size; i++) {
-		map = &VARMap.maps[i];
-		if (map->name == NULL) {
-			mivar = CreateMIVar(name);
-			if (mivar == NULL) {
-				return NULL;
-			}
-			map->name = strdup(name);
-			map->mivar = mivar;
-			VARMap.nels++;
-			return map;
-		}
-	}
-	return NULL;
-}
-
-static varinfo *
-FindVARByName(char *name) 
-{
-	int				i;
-	struct varinfo *map;
-	for (i = 0; i < VARMap.nels; i++) {
-		map = &VARMap.maps[i];
-		if (map != NULL && strcmp(map->name, name) == 0) {
-			return map;
-		}
-	}
-	return NULL;
-}
-
-static varinfo *
-FindVARByMIName(char *mi_name) 
-{
-	int				i;
-	
-	struct varinfo *map;
-	for (i = 0; i < VARMap.nels; i++) {
-		map = &VARMap.maps[i];
-		if (map != NULL && strcmp(map->mivar->name, mi_name) == 0) {
-			return map;
-		}
-	}
-	return NULL;
-}
-
-static void
-RemoveVARMap(varinfo *map)
-{
-	if (map != NULL) {
-		if (map->name != NULL) {
-			free(map->name);
-			map->name = NULL;
-		}
-		if (map->mivar != NULL) {
-			DeleteMIVar(map->mivar->name);
-			MIVarFree(map->mivar);
-			map->mivar = NULL;
-		}
-		VARMap.nels--;
-	}
-}
-
-static void
-RemoveVARMapByName(char *name)
-{
-	struct varinfo *map;	
-	map = FindVARByName(name);
-	RemoveVARMap(map);
-}
-
-static void
-RemoveVARMapByMIName(char *mi_name)
-{
-	struct varinfo *map;
-	map = FindVARByMIName(mi_name);
-	RemoveVARMap(map);
-}
-
-static void
-RemoveAllVARMap()
-{
-	int				i;
-	struct varinfo *map;
-	int length = VARMap.nels;
-	for (i = 0; i < length; i++) {
-		map = &VARMap.maps[i];
-		if (map == NULL)
-			return;
-			
-		RemoveVARMap(map);
-	}	
-}
-
-static void
-RemoveAllMaps()
-{
-	RemoveAllBPMap();
-	RemoveAllVARMap();
-}
-
-static char*
-GetParentVar(char *var_name)
-{
-	char *pch;
-	char *name;
-	
-	name = strdup(var_name);
-	pch = strchr(name, '.');
-	if (pch != NULL) {
-		*pch = '\0';
-	}
-	return name;
-}
-/*
- * name1 = var1.subvar1, name2 = var2
- * return: var2.subvar1
- */
-static char*
-replaceName(char *name1, char* name2)
-{
-	char *pch;
-	char *name;
-	MIString *str1;
-	
-	pch = strchr(name1, '.');
-	//append name2 to name1
-	str1 = MIStringNew(strdup(name2));
-	if (pch != NULL) {
-		MIStringAppend(str1, MIStringNew(pch));
-	}
-	name = strdup(str1->buf);
-	MIStringFree(str1);
-	return name;
-}
-
-static List * 
-GetChangedVariables()
-{
-	MICommand *cmd;	
-	List *changes;
-	List *changedVars;
-	MIVarChange *var;
-	struct varinfo *map;
-	char *mi_name;
-	char *replaced_name;
-	
-	cmd = MIVarUpdate("*");
-	SendCommandWait(DebugSession, cmd);
-	if (!MICommandResultOK(cmd)) {
-		DEBUG_PRINTS("------------------- GetChangedVariables error\n");
-		DbgSetError(DBGERR_INPROGRESS, GetLastErrorStr());
-		MICommandFree(cmd);
-		return NULL;
-	}
-	MIGetVarUpdateInfo(cmd, &changes);
-	MICommandFree(cmd);
-	
-	changedVars = NewList();
-	for (SetList(changes); (var = (MIVarChange *)GetListElement(changes)) != NULL; ) {
-		mi_name = GetParentVar(var->name);
-		
-		map = FindVARByMIName(mi_name);
-		if (var->in_scope == 1) {
-			if (map != NULL) {
-				replaced_name = replaceName(var->name, map->name);
-				AddToList(changedVars, (void *)strdup(replaced_name));
-				free(replaced_name);
-			}
-		}
-		else {
-			if (map != NULL) {
-				RemoveVARMap(map);
-			}
-			else {
-				DeleteMIVar(var->name);
-			}
-		}
-		free(mi_name);
-	}
-	DestroyList(changes, MIVarChangeFree);
-	return changedVars;
 }
 
 /*
@@ -1620,7 +1543,7 @@ GetVarValue(char *var)
 	if (!MICommandResultOK(cmd)) {
 		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
 		MICommandFree(cmd);
-		return NULL;
+		return "";
 	}
 	res = MIGetVarEvaluateExpressionInfo(cmd);
 	MICommandFree(cmd);
@@ -2704,11 +2627,6 @@ GetPartailAIF(MIVar *var, char *exp)
 	}
 	return GetComplexAIF(var, exp);
 }
-static char *
-GetAIFValue(char *res)
-{
-	return NULL;
-}
 static MIVar *
 GetChildrenMIVar(char *mivar_name, int showParentType)
 {
@@ -2719,63 +2637,73 @@ GetChildrenMIVar(char *mivar_name, int showParentType)
 		cmd = MIVarInfoType(mivar_name);
 		SendCommandWait(DebugSession, cmd);
 		if (!MICommandResultOK(cmd)) {
-			DbgSetError(DBGERR_UNKNOWN_VARIABLE, GetLastErrorStr());
+			mivar = CreateMIVar(mivar_name);
 			MICommandFree(cmd);
-			return NULL;
+			return mivar;
 		}
 		mivar = MIGetVarInfoType(cmd);
 		mivar->name = strdup(mivar_name);
 		MICommandFree(cmd);
 	}
 	cmd = MIVarListChildren(mivar_name);
-
 	SendCommandWait(DebugSession, cmd);
 	if (!MICommandResultOK(cmd)) {
-		DbgSetError(DBGERR_UNKNOWN_VARIABLE, GetLastErrorStr());
+		mivar = CreateMIVar(mivar_name);
 		MICommandFree(cmd);
-		return NULL;
+		return mivar;
 	}
 	MIGetVarListChildrenInfo(mivar, cmd);
 	MICommandFree(cmd);
 	return mivar;	
 }
 static MIVar *
-GetMIVar(char *var_name)
+GetMIVarDetails(char *name)
 {
 	MICommand *cmd;
 	MIVar *mivar;
 
-	cmd = MIVarCreate("-", "*", var_name);
+	cmd = MIVarInfoType(name);
 	SendCommandWait(DebugSession, cmd);
 	if (!MICommandResultOK(cmd)) {
-		DbgSetError(DBGERR_UNKNOWN_VARIABLE, GetLastErrorStr());
+		mivar = CreateMIVar(name);
 		MICommandFree(cmd);
-		return NULL;
+		return mivar;
 	}
-	mivar = MIGetVarCreateInfo(cmd);
+	mivar = MIGetVarInfoType(cmd);
+	mivar->name = strdup(name);
+	MICommandFree(cmd);
+
+	cmd = MIVarInfoNumChildren(name);
+	SendCommandWait(DebugSession, cmd);
+	MIGetVarInfoNumChildren(cmd, mivar);
 	MICommandFree(cmd);
 	return mivar;
 }
 static int
-GDBGetPartialAIF(char *var_name, int listChildren)
+GDBGetPartialAIF(char *var_name, int listChildren, int express)
 {
-	//char *type;
 	MIVar *mivar;
 	AIF *a;
 	dbg_event *	e;
 
 	CHECK_SESSION();
-	
-	//@ - for partial array
-	if (!listChildren || strchr(var_name, '@') != NULL) {
-		mivar = GetMIVar(var_name);
-		if (listChildren) {
-			mivar = GetChildrenMIVar(mivar->name, 0);
+
+	if (express) {
+		mivar = GetMIVarDetails(var_name);
+	}
+	else {	
+		//@ - for partial array
+		if (!listChildren || strchr(var_name, '@') != NULL) {
+			mivar = CreateMIVar(var_name);
+			if (listChildren) {
+				mivar = GetChildrenMIVar(mivar->name, 0);
+			}
+		}
+		else {
+			mivar = GetChildrenMIVar(var_name, 1);
 		}
 	}
-	else {
-		mivar = GetChildrenMIVar(var_name, 1);
-	}
+	
 	if (mivar == NULL) {
 		return DBGRES_ERR; 
 	}	
@@ -2794,27 +2722,6 @@ GDBGetPartialAIF(char *var_name, int listChildren)
 	e->dbg_event_u.partial_aif_event.name = strdup(mivar->name);
 
 	MIVarFree(mivar);
-	SaveEvent(e);
-
-	return DBGRES_OK;
-}
-static int
-GDBGetAIFValue(char *var_name)
-{
-	char *res;
-	dbg_event *	e;
-
-	CHECK_SESSION();
-
-	e = NewDbgEvent(DBGEV_AIF_VALUE);
-	if ((res = GetVarValue(var_name)) == NULL) {
-		DEBUG_PRINTS("------------------- GDBGetAIFValue error\n");
-		res = strdup("Error..");
-	}
-#ifdef DEBUG		
-	printf("---------------------- GDBGetAIFValue found value: %s\n", res);
-#endif
-	e->dbg_event_u.aif_data = res;
 	SaveEvent(e);
 
 	return DBGRES_OK;
@@ -2846,75 +2753,11 @@ GDBMIDataEvaluateExpression(char *arg)
 	return DBGRES_OK;
 }
 static int
-GDBMIVarCreate(char *name)
-{
-	MIVar *mivar;
-	dbg_event *	e;
-
-	CHECK_SESSION();
-	
-	mivar = GetMIVar(name);
-
-	e = NewDbgEvent(DBGEV_VAR_CREATE);
-	e->dbg_event_u.type_desc = strdup(mivar->name);
-	MIVarFree(mivar);
-	SaveEvent(e);
-	
-	return DBGRES_OK;
-} 
-static int
 GDBMIVarDelete(char *name)
 {
-	MICommand *cmd;
-		
 	CHECK_SESSION();
-	
-	cmd = MIVarDelete(name);
-	SendCommandWait(DebugSession, cmd);
-	if (!MICommandResultOK(cmd)) {
-		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
-		MICommandFree(cmd);
-		return DBGRES_ERR;
-	}
-	MICommandFree(cmd);
+	DeleteMIVar(name);
 	SaveEvent(NewDbgEvent(DBGEV_OK));
-	return DBGRES_OK;
-} 
-static int
-GDBMIVarUpdate(char *name)
-{
-	MICommand *cmd;
-	List *miVarUpdateList;
-	MIVarChange *var;
-	dbg_event *	e;
-		
-	CHECK_SESSION();
-
-	cmd = MIVarUpdate(name);
-	SendCommandWait(DebugSession, cmd);
-
-	e = NewDbgEvent(DBGEV_VARS);
-	e->dbg_event_u.list = NewList();
-	if (!MICommandResultOK(cmd)) {
-		DEBUG_PRINTS("------------------- GDBMIVarUpdate error\n");
-		MICommandFree(cmd);
-		SaveEvent(e);
-		return DBGRES_OK;
-	}
-	MIGetVarUpdateInfo(cmd, &miVarUpdateList);
-	MICommandFree(cmd);
-	
-	for (SetList(miVarUpdateList); (var = (MIVarChange *)GetListElement(miVarUpdateList)) != NULL;) {
-		if (var->in_scope == 1) {
-			AddToList(e->dbg_event_u.list, (void *)strdup(var->name));
-		}
-		else {
-			GDBMIVarDelete(var->name);
-		}
-	}
-	DestroyList(miVarUpdateList, MIVarChangeFree);
-	SaveEvent(e);
-
 	return DBGRES_OK;
 } 
 

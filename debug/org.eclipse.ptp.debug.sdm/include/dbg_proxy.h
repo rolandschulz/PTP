@@ -50,11 +50,8 @@
 #define DBG_CLIHANDLE_CMD				"CHL"
 #define DBG_QUIT_CMD					"QUI"
 #define DBG_DATAEVALUATEEXPRESSION_CMD	"DEE"
-#define DBG_VARIABLECREATE_CMD			"VCR"
-#define DBG_VARIABLEDELETE_CMD			"VDE"
-#define DBG_VARIABLEUPDATE_CMD			"VUP"
 #define DBG_GETPARTIALAIF_CMD			"GPA"
-#define DBG_GETAIFVALUE_CMD				"GAV"
+#define DBG_VARIABLEDELETE_CMD			"VDE"
 
 #define DBG_STARTSESSION_FMT			"%s %ld \"%s\" \"%s\""
 #define DBG_SETLINEBREAKPOINT_FMT		"%s %d \"%s\" %d"
@@ -85,10 +82,7 @@
 #define DBG_SIGNALINFO_FMT				"%s \"%s\""
 #define DBG_CLIHANDLE_FMT				"%s \"%s\""
 #define DBG_DATAEVALUATEEXPRESSION_FMT	"%s \"%s\""
-#define DBG_VARIABLECREATE_FMT			"%s \"%s\""
+#define DBG_GETPARTIALAIF_FMT			"%s \"%s\" %d %d"
 #define DBG_VARIABLEDELETE_FMT			"%s \"%s\""
-#define DBG_VARIABLEUPDATE_FMT			"%s \"%s\""
-#define DBG_GETPARTIALAIF_FMT			"%s \"%s\" %d"
-#define DBG_GETAIFVALUE_FMT				"%s \"%s\""
 
 #endif /* _DBG_PROXY_H_ */

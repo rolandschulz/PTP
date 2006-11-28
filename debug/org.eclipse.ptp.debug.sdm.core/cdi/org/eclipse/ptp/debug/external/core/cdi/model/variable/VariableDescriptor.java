@@ -155,21 +155,23 @@ public abstract class VariableDescriptor extends PObject implements IPCDIVariabl
 	}
 	public IAIFType getType() throws PCDIException {
 		if (fType == null) {
-			Target target = (Target)getTarget();
 			try {
+				Target target = (Target)getTarget();
 				GetPartialAIFCommand command = new GetPartialAIFCommand(target.getTask(), getQualifiedName());
 				target.getDebugger().postCommand(command);
-				IAIF aif = command.getPartialAIF();
+				setAIF(command.getPartialAIF());
 				keyName = command.getName();
-				fType = aif.getType();
-				fValue = aif.getValue();
-				fTypename = aif.getDescription();
 			} catch (PCDIException e) {
 				fType = AIFFactory.UNKNOWNTYPE;
 				fValue = AIFFactory.UNKNOWNVALUE;
 			}
 		}
 		return fType;
+	}
+	public void setAIF(IAIF aif) {
+		fType = aif.getType();
+		fValue = aif.getValue();
+		fTypename = aif.getDescription();
 	}
 	public int sizeof() throws PCDIException {
 		return getType().sizeof();
