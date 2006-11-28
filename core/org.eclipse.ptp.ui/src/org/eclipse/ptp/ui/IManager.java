@@ -61,6 +61,12 @@ public interface IManager {
 	 */
 	public String getName(String id);
 	
+	/** Get fully qualified name of element
+	 * @param id element ID
+	 * @return fully quallified name of element
+	 */
+	public String getFullyQualifiedName(String id);
+
 	/** Get current set ID
 	 * @return current set ID
 	 */

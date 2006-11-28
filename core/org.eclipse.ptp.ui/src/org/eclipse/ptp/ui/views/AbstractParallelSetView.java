@@ -173,9 +173,10 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 	 */
 	public void updateTitle() {
 		if (cur_element_set != null)
-			changeTitle(manager.getName(getCurrentID()), cur_element_set.getID(), cur_set_size);
+			changeTitle(manager.getFullyQualifiedName(getCurrentID()),
+					cur_element_set.getID(), cur_set_size);
 		else
-			changeTitle(manager.getName(getCurrentID()));
+			changeTitle(manager.getFullyQualifiedName(getCurrentID()));
 	}
 	/** Update action
 	 * 
