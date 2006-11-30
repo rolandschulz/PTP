@@ -47,6 +47,7 @@ import org.eclipse.debug.ui.IDebugModelPresentation;
 import org.eclipse.debug.ui.IValueDetailListener;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.ptp.debug.core.PDebugUtils;
 import org.eclipse.ptp.debug.core.cdi.IPCDIBreakpointHit;
 import org.eclipse.ptp.debug.core.cdi.IPCDIExitInfo;
 import org.eclipse.ptp.debug.core.cdi.IPCDISharedLibraryEvent;
@@ -809,7 +810,7 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 	 * @see org.eclipse.debug.ui.IDebugEditorPresentation#removeAnnotations(org.eclipse.ui.IEditorPart, org.eclipse.debug.core.model.IThread)
 	 */
 	public void removeAnnotations(IEditorPart editorPart, IThread thread) {
-		//System.err.println("-------------PDebugModePresentation - removeAnnotations");
+		//PDebugUtils.println("-------------PDebugModePresentation - removeAnnotations");
 		/*
 		try{
 			PAnnotationManager.getDefault().removeAnnotation(editorPart, thread);
