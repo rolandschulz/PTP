@@ -44,10 +44,8 @@ public class StopDebuggerCommand extends AbstractDebugCommand {
 	protected void exec(IAbstractDebugger debugger) throws PCDIException {
 		try {
 			debugger.stopDebugger();
-			if (waitForReturn()) {
-				if (sendEvent) {
-					debugger.handleStopDebuggerEvent();
-				}				
+			if (waitForReturn() && sendEvent) {
+				debugger.handleStopDebuggerEvent();
 			}
 		} catch (CoreException e) {
 			throw new PCDIException(e);

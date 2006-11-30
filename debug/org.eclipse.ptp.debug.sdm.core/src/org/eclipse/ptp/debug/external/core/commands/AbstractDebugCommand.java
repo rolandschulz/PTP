@@ -21,6 +21,7 @@ package org.eclipse.ptp.debug.external.core.commands;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.IDebugCommand;
+import org.eclipse.ptp.debug.core.PDebugUtils;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIErrorEvent;
@@ -231,6 +232,9 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 		if (getReturn() == null) {
 			waitForReturn();
 		}
+		if (getReturn() instanceof PCDIException) {
+			throw (PCDIException)getReturn();
+		}
 		return getReturn();
 	} 
 	protected void waitSuspendExecCommand(IAbstractDebugger debugger) throws PCDIException {
@@ -247,7 +251,7 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 		}
 		//if tasks are still not suspended, then cancel it
 		if (command_finish || !debugger.isSuspended(tasks.copy())) {
-System.err.println("************************************ WAIT SUSPEND FAILURE");			
+			PDebugUtils.println("************************************ WAIT SUSPEND FAILURE");			
 			doFlush();
 		}
 		else {

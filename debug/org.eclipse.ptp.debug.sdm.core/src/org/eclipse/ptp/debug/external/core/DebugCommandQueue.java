@@ -27,7 +27,9 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.IDebugCommand;
+import org.eclipse.ptp.debug.core.PDebugUtils;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
+import org.eclipse.ptp.debug.external.core.commands.StopDebuggerCommand;
 
 /**
  * @author Clement chu
@@ -52,11 +54,10 @@ public class DebugCommandQueue extends Job {
 	}
 	public synchronized void setTerminated() {
 		terminated = true;
-		cleanup(false);
+		doFlushCommands(false);
 	}
 	public synchronized void setStopAddCommand(boolean stopAddCommand) {
 		this.stopAddCommand = stopAddCommand;
-		cleanup(false);
 	}
 	public synchronized void setInterruptCommand(IDebugCommand interruptCommand) {
 		this.interruptCommand = interruptCommand;
@@ -72,7 +73,7 @@ public class DebugCommandQueue extends Job {
 	        		currentCommand.doFlush();
 	        		break;
 	        	}
-System.err.println("*** SEND COMMAND: " + currentCommand.getCommandName() + ", tasks: " + AbstractDebugger.showBitList(currentCommand.getTasks()));
+	        	PDebugUtils.println("*** SEND COMMAND: " + currentCommand.getCommandName() + ", tasks: " + AbstractDebugger.showBitList(currentCommand.getTasks()));
 				currentCommand.execCommand(debugger);
 			} catch (PCDIException e) {
 				debugger.handleErrorEvent(currentCommand.getTasks(), e.getMessage(), e.getErrorCode());
@@ -125,7 +126,7 @@ System.err.println("*** SEND COMMAND: " + currentCommand.getCommandName() + ", t
 					//addCommandByPriority(command);
 				} 
 				else {
-					System.err.println("************ DebugCommandQueue -- Add cmd JUMP: " + command.getCommandName());
+					PDebugUtils.println("************ DebugCommandQueue -- Add cmd JUMP: " + command.getCommandName());
 					//jump the queue
 					queue.add(0, command);
 				}
@@ -142,11 +143,11 @@ System.err.println("*** SEND COMMAND: " + currentCommand.getCommandName() + ", t
 			else {
 				command.doFlush();
 				if (stopAddCommand || terminated) {
-					System.err.println("************ ERROR in DebugCommandQueue -- debugger is terminated or stoped to add command, cmd: " + command.getCommandName());
+					PDebugUtils.println("************ ERROR in DebugCommandQueue -- debugger is terminated or stoped to add command, cmd: " + command.getCommandName());
 				}
 				else {
 					//TODO how to deal with duplicate command
-					System.err.println("************ ERROR in DebugCommandQueue -- duplicate, cmd: " + command.getCommandName());
+					PDebugUtils.println("************ ERROR in DebugCommandQueue -- duplicate, cmd: " + command.getCommandName());
 				}
 			}
 		}
@@ -156,13 +157,13 @@ System.err.println("*** SEND COMMAND: " + currentCommand.getCommandName() + ", t
 			if (command.getPriority() > IDebugCommand.PRIORITY_L) {
 				for (int i=0; i<queue.size(); i++) {
 					if (((IDebugCommand)queue.get(i)).getPriority() < command.getPriority()) {
-						System.err.println("************ DebugCommandQueue -- add cmd INSERT: " + command.getCommandName());
+						PDebugUtils.println("************ DebugCommandQueue -- add cmd INSERT: " + command.getCommandName());
 						queue.add(i, command);
 						return;
 					}
 				}
 			}
-			System.err.println("************ DebugCommandQueue -- add cmd LAST: " + command.getCommandName());
+			PDebugUtils.println("************ DebugCommandQueue -- add cmd LAST: " + command.getCommandName());
 			queue.add(command);
 		}
 	}
@@ -184,7 +185,7 @@ System.err.println("*** SEND COMMAND: " + currentCommand.getCommandName() + ", t
 	public void setCommandReturn(BitList tasks, Object result) {
 		synchronized (queue) {
 			if (currentCommand != null) {
-System.err.println("*** SET COMMAND RETURN: " + currentCommand.getCommandName() + ", result: " + result + ", tasks: " + AbstractDebugger.showBitList(tasks));
+				PDebugUtils.println("*** SET COMMAND RETURN: " + currentCommand.getCommandName() + ", result: " + result + ", tasks: " + AbstractDebugger.showBitList(tasks));
 				currentCommand.setReturn(tasks, result);		
 			}
 		}
@@ -192,7 +193,7 @@ System.err.println("*** SET COMMAND RETURN: " + currentCommand.getCommandName() 
 	public IDebugCommand getCurrentCommand() {
 		return currentCommand;
 	}
-	public void doFlushCommands(boolean removeInterrupt) {
+	private void doFlushCommands(boolean removeInterrupt) {
 		synchronized (queue) {
 			IDebugCommand[] commands = getCommands();
 			for (int i=commands.length-1; i>-1; i--) {
@@ -208,9 +209,13 @@ System.err.println("*** SET COMMAND RETURN: " + currentCommand.getCommandName() 
 			queue.remove(command);
 		}
 	}
-	private void cleanup(boolean removeInterrupt) {
+	public void cleanup(boolean removeInterrupt) {
 		synchronized (queue) {
 			doFlushCommands(removeInterrupt);
+			if (currentCommand != null) {
+				currentCommand.doFlush();
+				currentCommand = null;
+			}
 		}
 	}
 }

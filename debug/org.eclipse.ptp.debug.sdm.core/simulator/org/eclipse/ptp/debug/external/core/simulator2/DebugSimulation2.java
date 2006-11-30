@@ -169,7 +169,7 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 	 * not implement yet
 	 **************************************************************************************************************************************************************************************************/
 	
-	public void getAIFValue(final BitList tasks, final String expr) throws PCDIException {
+	public void getAIF(final BitList tasks, final String expr) throws PCDIException {
 		new Thread(new Runnable() {
 			public void run() {
 				IAIF aif = null;
