@@ -63,7 +63,9 @@ static char	_fds_type_str[NUM_AIF_TYPES][12] =
 
 	{ FDS_BOOLEAN, '\0' },
 	
-	{ FDS_ADDRESS, '%', 'd', '\0' }
+	{ FDS_ADDRESS, '%', 'd', '\0' },
+
+	{ FDS_CHAR_POINTER, '%', 's', '\0' }
 };
 
 static char _fds_array_end[] = {FDS_ARRAY_END, '\0'};
@@ -215,6 +217,10 @@ FDSType(char *str)
 
 	case FDS_STRING: /* string */
 		type = AIF_STRING;
+		break;
+
+	case FDS_CHAR_POINTER: /* char pointer */
+		type = AIF_CHAR_POINTER;
 		break;
 
 	case FDS_ADDRESS: /* address */
@@ -459,6 +465,7 @@ FDSTypeSize(char *type)
 		s = FDSTypeSize(_fds_base_type(type));
 		return rank * s * 2;
 
+	case FDS_CHAR_POINTER:
 	case FDS_STRING:
 	case FDS_ADDRESS:
 	default:
@@ -546,6 +553,12 @@ TypeToFDS(int type, ...)
 			v3 = strdup(v3);
 		v1 = va_arg(args, int);
 		snprintf(_fds_buf, BUFSIZ-1, _fds_type_str[type], v3, v1 ? FDS_INTEGER_SIGNED : FDS_INTEGER_UNSIGNED);
+		_aif_free(v3);
+		break;
+
+	case AIF_CHAR_POINTER:
+		v3 = strdup(va_arg(args, char *));
+		snprintf(_fds_buf, BUFSIZ-1, _fds_type_str[type], v3);
 		_aif_free(v3);
 		break;
 
@@ -727,6 +740,7 @@ FDSTypeCompare(char *f1, char *f2)
 		res = 1;
 		break;
 
+	case AIF_CHAR_POINTER:
 	case AIF_STRING:
 	case AIF_CHARACTER:
 		res = 1;

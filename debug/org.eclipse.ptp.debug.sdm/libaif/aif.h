@@ -89,7 +89,8 @@ typedef double AIFDOUBLEST;
 #define AIF_ENUM		15
 #define AIF_BOOLEAN		16
 #define AIF_ADDRESS		17
-#define NUM_AIF_TYPES	18
+#define AIF_CHAR_POINTER	18
+#define NUM_AIF_TYPES	19
 
 #define AIF_PTR_NIL			0
 #define AIF_PTR_NORMAL		1
@@ -241,6 +242,7 @@ typedef struct AIFFILE	AIFFILE;
 #define AIF_UNION_TYPE()				TypeToFDS(AIF_UNION)
 #define AIF_VOID_TYPE(len)				TypeToFDS(AIF_VOID, (len))
 #define AIF_ADDRESS_TYPE(len)			TypeToFDS(AIF_ADDRESS, (len))
+#define AIF_CHAR_POINTER_TYPE(addr)		TypeToFDS(AIF_CHAR_POINTER, (addr))
 
 /*
  * AIF routines.
@@ -387,7 +389,9 @@ extern AIF *		UnsignedLongLongToAIF(unsigned long long);
 #endif /* CC_HAS_LONG_LONG */
 extern AIF *		VoidToAIF(char *, int);
 extern AIF *		AddressToAIF(char *, int);
-extern AIF *		CharPointerToAIF(char *);
+extern AIF *		CharPointerToAIF(AIF *, char *);
+extern AIF *		EmptyComplexArrayToAIF(int, int, AIF *);
+extern void			AIFAddComplexArrayElement(AIF *, AIF *);
 
 #endif /* !_AIF_H */
 

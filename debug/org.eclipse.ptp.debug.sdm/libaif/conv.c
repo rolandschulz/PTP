@@ -357,10 +357,10 @@ PointerToAIF(AIF *addr, AIF *i)
 }
 
 AIF *
-CharPointerToAIF(char *i)
+CharPointerToAIF(AIF *addr, char *val)
 {
 	AIF *	a;
-	int	length = strlen(i);
+	int	length = strlen(val);
 
 	if ( length > 1 << (2 * BITSPERBYTE) )
 	{
@@ -370,14 +370,16 @@ CharPointerToAIF(char *i)
 
 	ResetAIFError();
 
-	a = NewAIF(0, length+2);
+	a = NewAIF(0, AIF_LEN(addr)+length+2);
+	
+	AIF_FORMAT(a) = strdup(AIF_CHAR_POINTER_TYPE(AIF_FORMAT(addr)));
 
-	AIF_FORMAT(a) = strdup(AIF_STRING_TYPE());
+	memcpy(AIF_DATA(a), AIF_DATA(addr), AIF_LEN(addr));
 
-	(AIF_DATA(a))[0] = (length >> 8) & 0xff;
-	(AIF_DATA(a))[1] = length & 0xff;
+	(AIF_DATA(a))[AIF_LEN(addr)] = (length >> 8) & 0xff;
+	(AIF_DATA(a))[AIF_LEN(addr)+1] = length & 0xff;
 
-	strncpy(AIF_DATA(a)+2, i, length);
+	strncpy(AIF_DATA(a)+AIF_LEN(addr)+2, val, length);
 
 	return a;
 }
@@ -886,8 +888,12 @@ AIF *
 EmptyArrayToAIF(int min, int max, AIF *btype)
 {
 	AIF *	a;
-	int		len = (max - min + 1) * AIFTypeSize(btype);
-	
+	int len = 0;
+
+	if (AIF_FORMAT(btype)[0] != FDS_CHAR_POINTER) {
+		len = (max - min + 1) * AIFTypeSize(btype);
+	}
+
 	a = NewAIF(0, len);
 	
 	AIF_FORMAT(a) = FDSArrayInit(min, max, AIF_FORMAT(btype));
@@ -896,7 +902,6 @@ EmptyArrayToAIF(int min, int max, AIF *btype)
 	
 	return a;
 }
-
 /*
  * Add the element el to the array at the index given by idx.
  * This is used for array construction.
@@ -907,17 +912,58 @@ AIFAddArrayElement(AIF *a, int idx, AIF *el)
 	int	min;
 	int	max;
 	int len = AIFTypeSize(el);
-	
-	if (len == 0 || AIFTypeSize(a) == 0)
-		return;
+
+	//if (len == 0 || AIFTypeSize(a) == 0)
+		//return;
+
+	if (AIF_FORMAT(el)[0] == FDS_CHAR_POINTER) {
+		AIFAddComplexArrayElement(a, el);
+	}
+	else {
+		min = FDSArrayMinIndex(AIF_FORMAT(a), 0);
+		max = FDSArrayMaxIndex(AIF_FORMAT(a), 0);
 		
-	min = FDSArrayMinIndex(AIF_FORMAT(a), 0);
-	max = FDSArrayMaxIndex(AIF_FORMAT(a), 0);
+		if (idx < min || idx > max)
+			return;
+					
+		memcpy(AIF_DATA(a) + len * (idx - min), AIF_DATA(el), len);
+	}
+}
+
+AIF *
+EmptyComplexArrayToAIF(int min, int max, AIF *btype)
+{
+	AIF *	a;
 	
-	if (idx < min || idx > max)
-		return;
-		
-	memcpy(AIF_DATA(a) + len * (idx - min), AIF_DATA(el), len);
+	a = NewAIF(0, 0);
+	
+	AIF_FORMAT(a) = FDSArrayInit(min, max, AIF_FORMAT(btype));
+	
+	ResetAIFError();
+	
+	return a;
+}
+void
+AIFAddComplexArrayElement(AIF *a, AIF *el)
+{
+	char *newData;
+	int len = AIFTypeSize(el);
+	int cap = AIFTypeSize(a);
+
+	AIF_LEN(a) += len;
+	newData = _aif_alloc(AIF_LEN(a));
+
+	memcpy(newData, AIF_DATA(a), cap);
+	memcpy(newData+cap, AIF_DATA(el), len);
+
+	if (AIF_DATA(a))
+		_aif_free(AIF_DATA(a));
+
+	AIF_DATA(a) = _aif_alloc(AIF_LEN(a));
+
+	memcpy(AIF_DATA(a), newData, AIF_LEN(a));
+
+	_aif_free(newData);
 }
 
 /*

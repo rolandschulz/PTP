@@ -73,6 +73,7 @@ struct varmap {
 };
 
 static double		GDB_Version;
+static int			ADDRESS_LENGTH = 0;
 static MISession *	DebugSession;
 static dbg_event *	LastEvent;
 static void			(*EventCallback)(dbg_event *, void *);
@@ -871,7 +872,7 @@ SetAndCheckBreak(int bpid, int isTemp, int isHard, char *where, char *condition,
 	SendCommandWait(DebugSession, cmd);
 	
 	if (!MICommandResultOK(cmd)) {
-		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
+		DbgSetError(DBGERR_NOFILE, GetLastErrorStr());
 		MICommandFree(cmd);
 		return DBGRES_ERR;
 	}
@@ -879,7 +880,8 @@ SetAndCheckBreak(int bpid, int isTemp, int isHard, char *where, char *condition,
 	MICommandFree(cmd);
 			
 	if (bpts == NULL) {
-		DbgSetError(DBGERR_DEBUGGER, "error getting breakpoint information");
+		DbgSetError(DBGERR_NOFILE, where);
+		//DbgSetError(DBGERR_NOFILE, "error getting breakpoint information");
 		return DBGRES_ERR;
 	}
 		
@@ -1553,8 +1555,10 @@ GetVarValue(char *var)
 static int
 GetAddressLength()
 {
-	char * res;
-	
+	if (ADDRESS_LENGTH != 0) {
+		return ADDRESS_LENGTH;
+	}
+	char * res;	
 	MICommand * cmd = MIDataEvaluateExpression("\"sizeof(char *)\"");
 	SendCommandWait(DebugSession, cmd);
 	if (!MICommandResultOK(cmd)) {
@@ -1565,9 +1569,9 @@ GetAddressLength()
 	res = MIGetDataEvaluateExpressionInfo(cmd);	
 	MICommandFree(cmd);
 	
-	return atoi(res);
+	ADDRESS_LENGTH = atoi(res);
+	return ADDRESS_LENGTH;
 }
-
 static char * 
 GetPtypeValue(char *exp) 
 {
@@ -1580,7 +1584,6 @@ GetPtypeValue(char *exp)
 	MICommandFree(cmd);
 	return type;
 }
-
 static char * 
 GetModifierType(char* type) 
 {
@@ -1692,20 +1695,44 @@ GetPrimitiveTypeToAIF(int type_id, char* res)
 static AIF *
 GetAIFPointer(char *addr, AIF *i)
 {
-	AIF *address;
-	char *p;
+	AIF *av;
+	AIF *a;
+	char *pch;
 	
 	if (addr == NULL) {
-		address = VoidToAIF(0, 0);
+		av = VoidToAIF(0, 0);
 	}
 	else {
-		if ((p = strchr(addr, ' ')) != NULL) {
-			*p = '\0';
+		if ((pch = strchr(addr, ' ')) != NULL) {
+			*pch = '\0';
 		}
 		addr += 2; //skip 0x
-		address = AddressToAIF(addr, GetAddressLength());
+		av = AddressToAIF(addr, GetAddressLength());
 	}
-	return PointerToAIF(address, i);
+	a = PointerToAIF(av, i);
+	AIFFree(av);
+	return a;
+}
+static AIF *
+GetAIFCharPointer(char *res)
+{
+	char *pch;
+	char *val;
+	AIF *a;
+	AIF *av;
+	
+	if ((pch = strchr(res, ' ')) != NULL) {
+		val = strdup(pch+1);
+		*pch = '\0';
+
+		res += 2;  //skip 0x
+		av = AddressToAIF(res, GetAddressLength());
+		a = CharPointerToAIF(av, val);
+		free(val);
+		AIFFree(av);
+		return a;
+	}
+	return VoidToAIF(0, 0);
 }
 static AIF *
 SimpleVarToAIF(char *exp, MIVar *var)
@@ -1871,7 +1898,7 @@ ComplexVarToAIF(char *exp, MIVar *var, int named)
 				ac = ConvertVarToAIF(var->children[0]->exp, var->children[0], named);
 			}
 			else if (strncmp(type, "char", 4) == 0) { //char pointer - should contain 1 child
-				ac = CharPointerToAIF(GetVarValue(var->children[0]->name));
+				ac = GetAIFCharPointer(GetVarValue(var->children[0]->name));
 			} 
 			else if (strncmp(type, "union", 5) == 0) { //union
 				ac = CreateUnion(var, named);
@@ -2572,7 +2599,7 @@ GetPointerAIF(MIVar *var, char *exp)
 		else if (strncmp(var->type, "char", 4) == 0) { //char pointer -- should not call this
 			//replace miname
 			var->name = strdup(var->children[0]->exp);
-			a = CharPointerToAIF(GetVarValue(var->children[0]->name));			
+			a = GetAIFCharPointer(GetVarValue(var->children[0]->name));			
 		} 
 		else if (strncmp(var->type, "union", 5) == 0) { //union
 			a = GetUnionAIF(var, exp);
@@ -2590,7 +2617,7 @@ GetPointerAIF(MIVar *var, char *exp)
 	}
 	else {
 		if (strncmp(var->type, "char", 4) == 0) { //char pointer
-			a = CharPointerToAIF(GetVarValue(var->name));			
+			a = GetAIFCharPointer(GetVarValue(var->name));			
 		}
 		else {
 			av = VoidToAIF(0, 0);

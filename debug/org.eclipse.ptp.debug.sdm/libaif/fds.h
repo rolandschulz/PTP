@@ -50,6 +50,8 @@
 #define FDS_UNION_FIELD_SEP		','
 #define FDS_UNION_START			'('
 #define FDS_VOID				'v'
+#define FDS_CHAR_POINTER		'p'
+
 
 extern char *		FDSAddFieldToClass(char *, aifaccess, char *, char *);
 extern char *		FDSAddConstToEnum(char *, char *, int);
