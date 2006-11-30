@@ -33,6 +33,7 @@ import org.eclipse.debug.core.IBreakpointsListener;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.ISourceLocator;
 import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.PDebugUtils;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.cdi.IPCDIAddressLocation;
 import org.eclipse.ptp.debug.core.cdi.IPCDIBreakpointManager;
@@ -244,13 +245,13 @@ public class BreakpointManager extends SessionObject implements IPCDIBreakpointM
 		// session.getDebugger().setExceptionpoint(watchpoint.getTasks(), access, read, expression);
 		// session.getDebugger().fireEvent(new BreakpointCreatedEvent(session, bkpt.getTasks()));
 		// return excp;
-		System.err.println("Not implement yet - setExceptionpoint");
+		PDebugUtils.println("Not implement yet - setExceptionpoint");
 		throw new PCDIException("Not implement yet - setExceptionpoint");
 	}
 	public void setBreakpointPending(BitList tasks, boolean set) throws PCDIException {
 		// TODO - implement set setBreakpointPending
 		// session.getDebugger().setBreakpointPending(watchpoint.getTasks(), access, read, expression);
-		System.err.println("Not implement yet - setBreakpointPending");
+		PDebugUtils.println("Not implement yet - setBreakpointPending");
 		throw new PCDIException("Not implement yet - setBreakpointPending");
 	}
 	

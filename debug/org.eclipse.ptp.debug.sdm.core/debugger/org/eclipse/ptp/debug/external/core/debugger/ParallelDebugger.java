@@ -30,6 +30,7 @@ import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.ExtFormat;
 import org.eclipse.ptp.debug.core.IDebugCommand;
 import org.eclipse.ptp.debug.core.IDebugger;
+import org.eclipse.ptp.debug.core.PDebugUtils;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIErrorEvent;
@@ -416,6 +417,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 	
 	protected int getErrorCode(int internalErrorCode) {
 		switch (internalErrorCode) {
+		case IParallelDebuggerConstants.DBGERR_NOBACKEND:
 		case IParallelDebuggerConstants.DBGERR_DEBUGGER:
 		case IParallelDebuggerConstants.DBGERR_NOFILEDIR:
 		case IParallelDebuggerConstants.DBGERR_CHDIR:
@@ -423,7 +425,9 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 		//case IParallelDebuggerConstants.DBGERR_INPROGRESS:
 		//case IParallelDebuggerConstants.DBGERR_UNKNOWN_TYPE:
 		//case IParallelDebuggerConstants.DBGERR_UNKNOWN_VARIABLE:
-			//return IPCDIErrorEvent.DBG_NORMAL;
+		case IParallelDebuggerConstants.DBGERR_NOFILE:
+		case IParallelDebuggerConstants.DBGERR_NOBP:
+			return IPCDIErrorEvent.DBG_NORMAL;
 		default:
 			return IPCDIErrorEvent.DBG_WARNING;
 		}
@@ -433,7 +437,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 	 * Debug handle event
 	 ***********************************/
 	public synchronized void handleEvent(IProxyDebugEvent e) {
-		System.out.println("got debug event: " + e.toString());
+		PDebugUtils.println("got debug event: " + e.toString());
 		switch (e.getEventID()) {
 		case IProxyDebugEvent.EVENT_DBG_OK:
 			completeCommand(e.getBitSet(), IDebugCommand.RETURN_OK);
@@ -441,7 +445,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			
 		case IProxyDebugEvent.EVENT_DBG_INIT:
 			int numServers = ((ProxyDebugInitEvent)e).getNumServers();
-			System.out.println("num servers = " + numServers);
+			PDebugUtils.println("num servers = " + numServers);
 			completeCommand(e.getBitSet(), IDebugCommand.RETURN_OK);
 			break;
 		
@@ -507,13 +511,13 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			break;
 
 		case IProxyDebugEvent.EVENT_DBG_EXIT_SIGNAL:
-			System.out.println("======================= EVENT_DBG_EXIT_SIGNAL ====================");
+			PDebugUtils.println("======================= EVENT_DBG_EXIT_SIGNAL ====================");
 			ProxyDebugSignalExitEvent exitSigEvent = (ProxyDebugSignalExitEvent)e;
 			handleProcessTerminatedEvent(e.getBitSet(), exitSigEvent.getSignalName(), exitSigEvent.getSignalMeaning());
 			break;
 
 		case IProxyDebugEvent.EVENT_DBG_EXIT:
-			System.out.println("======================= EVENT_DBG_EXIT ====================");
+			PDebugUtils.println("======================= EVENT_DBG_EXIT ====================");
 			ProxyDebugExitEvent exitEvent = (ProxyDebugExitEvent)e;
 			handleProcessTerminatedEvent(e.getBitSet(), exitEvent.getExitStatus());
 			break;

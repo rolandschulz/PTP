@@ -42,7 +42,7 @@ public class TerminateCommand extends AbstractDebugCommand {
 		if (!tasks.isEmpty()) {
 			suspendRunningTasks(debugger);
 			exec(debugger);
-			if (sendEvent) {
+			if (waitForReturn() && sendEvent) {
 				debugger.handleProcessTerminatedEvent(tasks, 0);
 			}
 		}

@@ -34,6 +34,7 @@ import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.IDebugCommand;
+import org.eclipse.ptp.debug.core.PDebugUtils;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIDebugDestroyedEvent;
@@ -149,7 +150,7 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 	public synchronized final void fireEvent(final IPCDIEvent event) {		
 		if (event != null) {
 			BitList tasks = event.getAllProcesses();
-			System.out.println("***** Debugger event: " + event/* + " for tasks: " + showBitList(tasks)*/);
+			PDebugUtils.println("***** Debugger event: " + event/* + " for tasks: " + showBitList(tasks)*/);
 			if (event instanceof IPCDIDebugDestroyedEvent) {
 				commandQueue.setTerminated();
 			}
@@ -189,6 +190,7 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		}
 	}
 	private void postStopDebugger() {
+		commandQueue.cleanup(true);
 		postCommand(new StopDebuggerCommand(getSession().createBitList()));
 		commandQueue.setStopAddCommand(true);
 	}
@@ -267,7 +269,7 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		fireEvent(new InferiorExitedEvent(getSession(), tasks, signalName, signalMeaning));
 	}
 	public void handleErrorEvent(BitList tasks, String errMsg, int errCode) {
-		System.err.println("----- debugger error: " + errMsg + " on Tasks: " + showBitList(tasks) +" ------------");
+		PDebugUtils.println("----- debugger error: " + errMsg + " on Tasks: " + showBitList(tasks) +" ------------");
 		if (tasks == null || tasks.isEmpty() || errCode == IPCDIErrorEvent.DBG_FATAL) {
 			tasks = session.createBitList();
 		}

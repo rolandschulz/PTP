@@ -24,7 +24,6 @@ import org.eclipse.ptp.debug.core.aif.IAIFType;
 import org.eclipse.ptp.debug.core.aif.IAIFTypeArray;
 import org.eclipse.ptp.debug.core.aif.IAIFTypePointer;
 import org.eclipse.ptp.debug.core.aif.IAIFTypeReference;
-import org.eclipse.ptp.debug.core.aif.IAIFTypeString;
 import org.eclipse.ptp.debug.core.aif.IAIFValue;
 import org.eclipse.ptp.debug.core.aif.IAIFValueArray;
 import org.eclipse.ptp.debug.core.aif.ITypeAggregate;
@@ -122,7 +121,7 @@ public abstract class Variable extends VariableDescriptor implements IPCDIVariab
 			IAIFType baseType = ((ITypeDerived)type).getBaseType();
 			if (type instanceof IAIFTypeArray) {
 				//always get from 0
-				IAIFValue[] values = ((IAIFValueArray)value).getValues(0);
+				IAIFValue[] values = ((IAIFValueArray)value).getValues();
 				children = new Variable[values.length];
 				for (int i=0; i<children.length; i++) {
 					int index = castingIndex + i;
@@ -191,7 +190,7 @@ public abstract class Variable extends VariableDescriptor implements IPCDIVariab
 		}
 		else {
 			children = new Variable[1];
-			String ch_fn = (type instanceof IAIFTypeString) ? "*(" + fn + ")" : fn;
+			String ch_fn = fn;
 			String ch_n = ch_key;
 			String ch_k = key + "." + ch_key;
 			Variable v = createVariable((Target)getTarget(), (Thread)getThread(), (StackFrame)getStackFrame(), ch_n, ch_fn, getPosition(), getStackDepth(), ch_k);

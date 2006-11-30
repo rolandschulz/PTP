@@ -20,12 +20,13 @@ package org.eclipse.ptp.debug.external.core;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import org.eclipse.ptp.debug.core.PDebugUtils;
 
 public class PseudoOutputStream extends OutputStream {
 
 	public void write(int arg0) throws IOException {
 		// Send "arg0" to the process on the remote machine
-		System.out.println("PseudoOutputStream.write()");	
+		PDebugUtils.println("PseudoOutputStream.write()");	
 	}
 
 }

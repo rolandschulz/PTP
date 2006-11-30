@@ -31,6 +31,7 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDISharedLibrary;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IAbstractDebugger;
+import org.eclipse.ptp.debug.core.PDebugUtils;
 import org.eclipse.ptp.debug.core.cdi.IPCDIAddressLocation;
 import org.eclipse.ptp.debug.core.cdi.IPCDICondition;
 import org.eclipse.ptp.debug.core.cdi.IPCDIFunctionLocation;
@@ -627,7 +628,7 @@ public class Target extends SessionObject implements IPCDITarget {
 	
 	public boolean isLittleEndian() throws PCDIException {
 		//TODO - not implemented yet
-		System.err.println("---- called isLittleEndian");
+		PDebugUtils.println("---- called isLittleEndian");
 		if (fEndian == null) {
 			//"le" : "be"
 		}

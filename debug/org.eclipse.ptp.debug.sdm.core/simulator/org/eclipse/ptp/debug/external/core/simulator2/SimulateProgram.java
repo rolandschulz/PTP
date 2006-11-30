@@ -21,6 +21,7 @@ package org.eclipse.ptp.debug.external.core.simulator2;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
+import org.eclipse.ptp.debug.core.PDebugUtils;
 
 /**
  * @author Clement chu
@@ -57,14 +58,14 @@ public class SimulateProgram extends Observable implements Runnable {
 		try {
 			SimulateProgram.this.wait();
 		} catch (InterruptedException e) {
-			System.out.println("----- Err in waiting: " + e.getMessage());
+			PDebugUtils.println("----- Err in waiting: " + e.getMessage());
 		}
 	}
 	private void waitForWhile(long timeout) {
 		try {
 			Thread.sleep(timeout);
 		} catch (InterruptedException e) {
-			System.out.println("----- Err in waiting: " + e.getMessage());
+			PDebugUtils.println("----- Err in waiting: " + e.getMessage());
 		}
 	}
 	public synchronized void run() {
@@ -101,7 +102,7 @@ public class SimulateProgram extends Observable implements Runnable {
 				waitForWhile(50);
 			}
 		}
-		System.out.println("==== finished: " + tid);
+		PDebugUtils.println("==== finished: " + tid);
 		setChanged();
 		notifyObservers(new String[] { String.valueOf(tid), DebugSimulation2.EXIT_STATE, file, String.valueOf(current_line) });
 	}

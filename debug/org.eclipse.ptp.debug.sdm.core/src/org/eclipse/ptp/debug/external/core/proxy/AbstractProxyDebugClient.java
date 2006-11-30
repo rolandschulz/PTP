@@ -29,6 +29,7 @@ import org.eclipse.ptp.core.proxy.event.IProxyEventListener;
 import org.eclipse.ptp.core.proxy.event.ProxyErrorEvent;
 import org.eclipse.ptp.core.proxy.event.ProxyOKEvent;
 import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.PDebugUtils;
 import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugEvent;
 import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugEventListener;
 import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugErrorEvent;
@@ -85,7 +86,7 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient imple
 		
 	public synchronized void handleEvent(IProxyEvent event) {
 		IProxyDebugEvent e = null;
-//System.out.println("AbstractProxyDebugClientgot event " + event);
+//PDebugUtils.println("AbstractProxyDebugClientgot event " + event);
 		if (listeners == null)
 			return;
 		

@@ -118,10 +118,7 @@ public abstract class VariableDescriptor extends PObject implements IPCDIVariabl
 			StringBuffer buffer = new StringBuffer();
 			buffer.append("*(");
 			buffer.append('(').append(fn).append(')');
-			//if (castingIndex != 0) {
-				buffer.append('+').append(castingIndex);
-			//}
-			buffer.append(')');
+			buffer.append('+').append(castingIndex).append(')');
 			buffer.append('@').append(castingLength);
 			fn = buffer.toString();
 		} else if (castingTypes != null && castingTypes.length > 0) {
