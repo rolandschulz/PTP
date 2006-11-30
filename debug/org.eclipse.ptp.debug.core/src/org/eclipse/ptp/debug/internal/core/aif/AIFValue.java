@@ -18,10 +18,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.aif;
 
-import java.nio.ByteBuffer;
 import org.eclipse.ptp.debug.core.aif.AIFException;
 import org.eclipse.ptp.debug.core.aif.IAIFType;
 import org.eclipse.ptp.debug.core.aif.IAIFValue;
+import org.eclipse.ptp.debug.core.aif.AIFFactory.SimpleByteBuffer;
 
 /**
  * @author Clement chu
@@ -44,6 +44,19 @@ public abstract class AIFValue implements IAIFValue {
 	public boolean hasChildren() throws AIFException {
 		return (getChildrenNumber() > 0);
 	}
+	public String toString() {
+		try {
+			return getValueString();
+		} catch (AIFException e) {
+			return "err: " + e.getMessage();
+		}
+	}
+	
+	protected abstract void parse(SimpleByteBuffer buffer);
+	public int sizeof() {
+		return size;
+	}
+	/*
 	protected ByteBuffer byteBuffer(byte[] data) {
 		return byteBuffer(data, 0);
 	}
@@ -56,17 +69,5 @@ public abstract class AIFValue implements IAIFValue {
 		System.arraycopy(data, from, newByte, 0, size);
 		return newByte;
 	}
-	public String toString() {
-		try {
-			return getValueString();
-		} catch (AIFException e) {
-			return "err: " + e.getMessage();
-		}
-	}
-	
-	protected abstract void parse(byte[] data);
-	protected abstract void parse(ByteBuffer buffer);
-	public int sizeof() {
-		return size;
-	}
+	*/
 }

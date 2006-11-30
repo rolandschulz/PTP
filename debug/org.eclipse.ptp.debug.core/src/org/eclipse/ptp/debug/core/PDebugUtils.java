@@ -30,6 +30,12 @@ import org.eclipse.debug.core.IStatusHandler;
  * 
  */
 public class PDebugUtils {
+	public static final boolean DEBUG = true;
+	
+	public static void println(String msg) {
+		System.err.println(msg);
+	}
+	
 	public static boolean question(IStatus status, Object source) {
 		Boolean result = Boolean.FALSE;
 		IStatusHandler handler = DebugPlugin.getDefault().getStatusHandler(status);

@@ -18,10 +18,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.aif;
 
-import java.nio.ByteBuffer;
 import org.eclipse.ptp.debug.core.aif.AIFException;
 import org.eclipse.ptp.debug.core.aif.IAIFTypeBool;
 import org.eclipse.ptp.debug.core.aif.IAIFValueBool;
+import org.eclipse.ptp.debug.core.aif.AIFFactory.SimpleByteBuffer;
 
 /**
  * @author Clement chu
@@ -30,11 +30,11 @@ import org.eclipse.ptp.debug.core.aif.IAIFValueBool;
 public class AIFValueBool extends ValueIntegral implements IAIFValueBool {
 	boolean boolValue;
 	
-	public AIFValueBool(IAIFTypeBool type, ByteBuffer buffer) {
+	public AIFValueBool(IAIFTypeBool type, SimpleByteBuffer buffer) {
 		super(type);
 		parse(buffer);
 	}
-	protected void parse(ByteBuffer buffer) {
+	protected void parse(SimpleByteBuffer buffer) {
 		boolValue = (buffer.get()>0);
 		size = type.sizeof();
 	}
@@ -46,13 +46,5 @@ public class AIFValueBool extends ValueIntegral implements IAIFValueBool {
 	}
 	public boolean booleanValue() throws AIFException {
 		return boolValue;
-	}
-	public AIFValueBool(IAIFTypeBool type, byte[] data) {
-		super(type);
-		parse(data);
-	}
-	protected void parse(byte[] data) {
-		boolValue = (data[0]>0);
-		size = data.length;
 	}
 }

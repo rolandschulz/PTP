@@ -18,31 +18,37 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.aif;
 
+import java.math.BigInteger;
+import org.eclipse.ptp.debug.core.aif.AIFException;
 import org.eclipse.ptp.debug.core.aif.AIFFactory;
-import org.eclipse.ptp.debug.core.aif.IAIFType;
-import org.eclipse.ptp.debug.core.aif.IAIFTypeUnion;
+import org.eclipse.ptp.debug.core.aif.IAIFTypeCharPointer;
 import org.eclipse.ptp.debug.core.aif.IAIFValue;
-import org.eclipse.ptp.debug.core.aif.IAIFValueUnion;
-import org.eclipse.ptp.debug.core.aif.ITypeAggregate;
-import org.eclipse.ptp.debug.core.aif.IValueParent;
+import org.eclipse.ptp.debug.core.aif.IAIFValueCharPointer;
 import org.eclipse.ptp.debug.core.aif.AIFFactory.SimpleByteBuffer;
 
 /**
  * @author Clement chu
  * 
  */
-public class AIFValueUnion extends ValueAggregate implements IAIFValueUnion {
-	public AIFValueUnion(IValueParent parent, IAIFTypeUnion type, SimpleByteBuffer buffer) {
-		super(parent, type, buffer);
+public class AIFValueCharPointer extends AIFValueString implements IAIFValueCharPointer {	
+	IAIFValue addrValue;
+
+	public AIFValueCharPointer(IAIFTypeCharPointer type, SimpleByteBuffer buffer) {
+		super(type, buffer);
+		((AIFTypeCharPointer)type).size = size;
 	}
 	protected void parse(SimpleByteBuffer buffer) {
-		ITypeAggregate typeAggregate = (ITypeAggregate)getType();
-		int length = typeAggregate.getNumberOfChildren();
-		for (int i=0; i<length; i++) {
-			IAIFType aifType = typeAggregate.getType(i);
-			IAIFValue val = AIFFactory.getAIFValue(getParent(), aifType, buffer);
-			values.add(val);
-			size += val.sizeof();
+		addrValue = AIFFactory.getAIFValue(null, ((IAIFTypeCharPointer)type).getAddressType(), buffer);
+		super.parse(buffer);
+		size += addrValue.sizeof();
+	}
+	public String getValueString() throws AIFException {
+		if (result == null) {
+			result = "";
 		}
+		return result;
+	}
+	public BigInteger pointerValue() throws AIFException {
+		return ValueIntegral.bigIntegerValue(addrValue.getValueString());
 	}	
 }

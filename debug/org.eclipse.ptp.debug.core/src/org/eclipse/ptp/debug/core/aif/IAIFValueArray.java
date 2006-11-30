@@ -25,7 +25,7 @@ package org.eclipse.ptp.debug.core.aif;
  * 
  */
 public interface IAIFValueArray extends IValueDerived {
-	public IAIFValue[] getValues(int dim_pos);
+	public IAIFValue[] getValues();
 	//public int getCurrentDimensionPosition();
 	//public int getCurrentPosition();
 	//public Object[] getValues();

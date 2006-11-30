@@ -18,12 +18,13 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.aif;
 
-import java.nio.ByteBuffer;
 import java.util.Random;
+import org.eclipse.ptp.debug.core.PDebugUtils;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeAddress;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeArray;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeBool;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeChar;
+import org.eclipse.ptp.debug.internal.core.aif.AIFTypeCharPointer;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeClass;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeEnum;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeFloat;
@@ -41,6 +42,7 @@ import org.eclipse.ptp.debug.internal.core.aif.AIFValueAddress;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValueArray;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValueBool;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValueChar;
+import org.eclipse.ptp.debug.internal.core.aif.AIFValueCharPointer;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValueClass;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValueEnum;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValueFloat;
@@ -74,6 +76,7 @@ public class AIFFactory {
 	public static final char FDS_REFERENCE = '>';
 	public static final char FDS_NAMED = '%';
 	public static final char FDS_ADDRESS = 'a';
+	public static final char FDS_CHAR_POINTER = 'p';
 
 	public static final int FDS_FLOAT_SIZE_POS = 1;
 	public static final int FDS_VOID_SIZE_POS = 1;
@@ -111,17 +114,17 @@ public class AIFFactory {
 	public static IAIF UNKNOWNAIF() {
 		return new AIF(UNKNOWNTYPE, UNKNOWNVALUE);
 	}
-	public static IAIFValue getAIFValue(IValueParent parent, IAIFType type, ByteBuffer buffer) {
-		if (!buffer.hasRemaining()) {
+	public static IAIFValue getAIFValue(IValueParent parent, IAIFType type, SimpleByteBuffer buffer) {
+		if (buffer.end()) {
 			return new AIFValueUnknown(type);
-		}
-
-		if (type instanceof IAIFTypeChar) {
+		} else if (type instanceof IAIFTypeChar) {
 			 return new AIFValueChar((IAIFTypeChar)type, buffer);
 		} else if (type instanceof IAIFTypeFloat) {
 			return new AIFValueFloat((IAIFTypeFloat)type, buffer);
 		} else if (type instanceof IAIFTypeInt) {
 			return new AIFValueInt((IAIFTypeInt)type, buffer);
+		} else if (type instanceof IAIFTypeCharPointer) {
+			return new AIFValueCharPointer((IAIFTypeCharPointer)type, buffer);
 		} else if (type instanceof IAIFTypeString) {
 			return new AIFValueString((IAIFTypeString)type, buffer);
 		} else if (type instanceof IAIFTypeBool) {
@@ -157,7 +160,7 @@ public class AIFFactory {
 		if (data == null || data.length < 0) {
 			return new AIFValueUnknown(type);
 		}
-		return getAIFValue(parent, type, ByteBuffer.wrap(data, 0, data.length));
+		return getAIFValue(parent, type, new SimpleByteBuffer(data));
 	}
 	
 	/**
@@ -189,81 +192,83 @@ public class AIFFactory {
 	}
 	public static int getEndPosFromStart(String fmt, String regex) {
 		return fmt.indexOf(regex);
-	}	
-	
+	}
 	public static IAIFType getAIFType(String fmt) {
 		if (fmt == null || fmt.length() == 0) {
-			System.out.println("        ======= null: " + fmt);
+			PDebugUtils.println("        ======= null: " + fmt);
 			return UNKNOWNTYPE;			
 		}
 		switch (fmt.charAt(0)) {
 		case FDS_CHAR: //char is signed or unsigned ???
-			System.out.println("        ======= character: " + fmt);
+			PDebugUtils.println("        ======= character: " + fmt);
 			return new AIFTypeChar();
 		case FDS_FLOAT:
 			int float_size = Character.digit(fmt.charAt(FDS_FLOAT_SIZE_POS), 10);
-			System.out.println("        ======= floating: " + fmt + ", size: " + float_size);
+			PDebugUtils.println("        ======= floating: " + fmt + ", size: " + float_size);
 			return new AIFTypeFloat(float_size);
 		case FDS_INT: //long and int is same???  long long type
 			boolean signed = (fmt.charAt(FDS_INTEGER_SIGN_POS) == 's');
 			int int_size = Character.digit(fmt.charAt(FDS_INTEGER_SIZE_POS), 10);
-			System.out.println("        ======= int: " + fmt + ", size: " + int_size);
+			PDebugUtils.println("        ======= int: " + fmt + ", size: " + int_size);
 			return new AIFTypeInt(signed, int_size);
+		case FDS_CHAR_POINTER:
+			PDebugUtils.println("        ======= char pointer: " + fmt);
+			return new AIFTypeCharPointer(getAIFType(fmt.substring(1, 3)));
 		case FDS_STRING:
-			System.out.println("        ======= string: " + fmt);
+			PDebugUtils.println("        ======= string: " + fmt);
 			return new AIFTypeString();
 		case FDS_BOOL:
-			System.out.println("        ======= boolean: " + fmt);
+			PDebugUtils.println("        ======= boolean: " + fmt);
 			return new AIFTypeBool();
 		case FDS_ENUM:
-			System.out.println("        ======= enum: " + fmt);
+			PDebugUtils.println("        ======= enum: " + fmt);
 			int enum_end_pos = getEndPosFromLast(fmt, FDS_ENUM_END);
 			String enum_type = fmt.substring(enum_end_pos+FDS_ENUM_END.length());
 			return new AIFTypeEnum(extractFormat(fmt, 1, enum_end_pos), getAIFType(enum_type));
 		case FDS_FUNCTION:
-			System.out.println("        ======= function: " + fmt);
+			PDebugUtils.println("        ======= function: " + fmt);
 			int func_end_pos = getEndPosFromLast(fmt, FDS_FUNCTION_END);
 			String func_type = fmt.substring(func_end_pos+FDS_FUNCTION_END.length());
 			return new AIFTypeFunction(extractFormat(fmt, 1, func_end_pos), getAIFType(func_type));
 		case FDS_STRUCT_CLASS: //struct or class
 			int struct_end_pos = getEndPosFromLast(fmt, FDS_STRUCT_END);
 			if (fmt.length() == struct_end_pos + FDS_STRUCT_END.length()) {
-				System.out.println("        ======= struct " + fmt);
+				PDebugUtils.println("        ======= struct " + fmt);
 				return new AIFTypeStruct(extractFormat(fmt, 1, struct_end_pos));
 			}
 			else {
 				struct_end_pos = getEndPosFromLast(fmt, FDS_CLASS_END);
-				System.out.println("        ======= class " + fmt);
+				PDebugUtils.println("        ======= class " + fmt);
 				return new AIFTypeClass(extractFormat(fmt, 1, struct_end_pos));
 			}
 		case FDS_UNION:
-			System.out.println("        ======= union: " + fmt);
+			PDebugUtils.println("        ======= union: " + fmt);
 			int union_end_pos = getEndPosFromLast(fmt, FDS_UNION_END);
 			return new AIFTypeUnion(extractFormat(fmt, 1, union_end_pos));
 		case FDS_REFERENCE:
-			System.out.println("        ======= reference: " + fmt);
+			PDebugUtils.println("        ======= reference: " + fmt);
 			int ref_end_pos = getEndPosFromStart(fmt, FDS_REFERENCE_END);
 			return new AIFTypeReference(extractFormat(fmt, 1, ref_end_pos));
 		case FDS_ADDRESS:
-			System.out.println("        ======= address: " + fmt);
+			PDebugUtils.println("        ======= address: " + fmt);
 			return new AIFTypeAddress(Character.digit(fmt.charAt(1), 10));
 		case FDS_POINTER:
-			System.out.println("        ======= pointer: " + fmt);
+			PDebugUtils.println("        ======= pointer: " + fmt);
 			return new AIFTypePointer(getAIFType(fmt.substring(1, 3)), getAIFType(fmt.substring(3)));
 		case FDS_VOID:
-			System.out.println("        ======= void: " + fmt);
+			PDebugUtils.println("        ======= void: " + fmt);
 			int void_size = Character.digit(fmt.charAt(FDS_VOID_SIZE_POS), 10);
 			return new AIFTypeVoid(void_size);
 		case FDS_ARRAY:
-			System.out.println("        ======= array: " + fmt);
+			PDebugUtils.println("        ======= array: " + fmt);
 			int array_end_pos = getEndPosFromStart(fmt, SIGN_CLOSE);
 			return new AIFTypeArray(extractFormat(fmt, 1, array_end_pos), getAIFType(fmt.substring(array_end_pos+1)));
 		case FDS_NAMED:
-			System.out.println("        ======= named: " + fmt);
+			PDebugUtils.println("        ======= named: " + fmt);
 			int named_end_pos = getEndPosFromStart(fmt, FDS_NAMED_END);
 			return new AIFTypeNamed(extractFormat(fmt, 1, named_end_pos), getAIFType(fmt.substring(named_end_pos+1)));
 		default:
-			System.out.println("        ======= unknown: " + fmt);
+			PDebugUtils.println("        ======= unknown: " + fmt);
 			return new AIFTypeIncomplete();
 		}
 	}
@@ -274,8 +279,38 @@ public class AIFFactory {
 		return new AIF(parentType.getType(), value);
 	}
 	*/
+	public static class SimpleByteBuffer {
+		byte[] bytes;
+		int pos = 0;
+		SimpleByteBuffer(byte[] bytes) {
+			if (bytes == null) {
+				bytes = new byte[0];
+			}
+			this.bytes = bytes;
+		}
+		public boolean end() {
+			return (pos == bytes.length);
+		}
+		public byte[] getByte() {
+			return bytes;
+		}
+		public int getPosition() {
+			return pos;
+		}
+		public int getCapacity() {
+			return bytes.length;
+		}
+		public byte get() {
+			return bytes[pos++];
+		}
+		public byte get(int pos) {
+			return bytes[pos];
+		}
+		public void setPos(int pos) {
+			this.pos = pos;
+		}
+	}
 }
-
 /*
 public static int getBaseTypeLength(IAIFType baseType) {
 	if (baseType instanceof AIFTypeIntegral) {

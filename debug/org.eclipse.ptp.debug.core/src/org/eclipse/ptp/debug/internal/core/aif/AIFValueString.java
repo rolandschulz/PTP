@@ -18,24 +18,23 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.aif;
 
-import java.nio.ByteBuffer;
 import org.eclipse.ptp.debug.core.aif.AIFException;
 import org.eclipse.ptp.debug.core.aif.IAIFTypeString;
 import org.eclipse.ptp.debug.core.aif.IAIFValueString;
+import org.eclipse.ptp.debug.core.aif.AIFFactory.SimpleByteBuffer;
 
 /**
  * @author Clement chu
  * 
  */
 public class AIFValueString extends AIFValue implements IAIFValueString {	
-	public AIFValueString(IAIFTypeString type, ByteBuffer buffer) {
+	public AIFValueString(IAIFTypeString type, SimpleByteBuffer buffer) {
 		super(type);
 		parse(buffer);
 		((AIFTypeString)type).size = size;
 	}
-	protected void parse(ByteBuffer buffer) {
+	protected void parse(SimpleByteBuffer buffer) {
 		size = getSize(buffer);
-		System.err.println("------------ SIZE: " + size);
 		byte[] bytes = new byte[size];
 		for (int i=0; i<size; i++) {
 			bytes[i] = buffer.get();
@@ -43,24 +42,10 @@ public class AIFValueString extends AIFValue implements IAIFValueString {
 		result = new String(bytes);
 	}
 	
-	public static int getSize(ByteBuffer buffer) {
+	public int getSize(SimpleByteBuffer buffer) {
 		String hex = "";
 		for (int i=0; i<2; i++) {
 			hex += Integer.toHexString(0x0100 + (buffer.get() & 0x00FF)).substring(1);
-		}
-		try {
-			System.err.println("----------------- HEX: " + hex);
-			return Integer.parseInt(hex, 16);
-		} catch (NumberFormatException e) {
-			return 1;
-		}
-	}
-	public static int getSize(int from, byte[] data) {
-		String hex = "";
-		byte[] bytes = new byte[2];
-		System.arraycopy(data, from, bytes, 0, 2);
-		for (int i=0; i<bytes.length; i++) {
-			hex += Integer.toHexString(0x0100 + (bytes[i] & 0x00FF)).substring(1);
 		}
 		try {
 			return Integer.parseInt(hex, 16);
@@ -73,16 +58,6 @@ public class AIFValueString extends AIFValue implements IAIFValueString {
 			result = "";
 		}
 		return result;
-	}
-	public AIFValueString(IAIFTypeString type, byte[] data) {
-		super(type);
-		parse(data);
-		((AIFTypeString)type).size = size;
-	}
-	protected void parse(byte[] data) {
-		size = getSize(0, data);
-		byte[] newByte = createByteArray(data, 2, data.length-2);
-		result = new String(newByte);
 	}
 	public static void main(String[] args) {
 		int length = 30;
