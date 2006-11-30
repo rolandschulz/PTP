@@ -18,21 +18,21 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.aif;
 
-import java.nio.ByteBuffer;
 import org.eclipse.ptp.debug.core.aif.AIFException;
 import org.eclipse.ptp.debug.core.aif.IAIFTypeFunction;
 import org.eclipse.ptp.debug.core.aif.IAIFValueFunction;
+import org.eclipse.ptp.debug.core.aif.AIFFactory.SimpleByteBuffer;
 
 /**
  * @author Clement chu
  * 
  */
 public class AIFValueFunction extends ValueDerived implements IAIFValueFunction {
-	public AIFValueFunction(IAIFTypeFunction type, ByteBuffer buffer) {
+	public AIFValueFunction(IAIFTypeFunction type, SimpleByteBuffer buffer) {
 		super(type);
 		parse(buffer);
 	}
-	protected void parse(ByteBuffer buffer) {
+	protected void parse(SimpleByteBuffer buffer) {
 		size = type.sizeof();
 	}
 	public String getValueString() throws AIFException {
@@ -40,13 +40,6 @@ public class AIFValueFunction extends ValueDerived implements IAIFValueFunction 
 			result = String.valueOf("");
 		}
 		return null;
-	}
-	public AIFValueFunction(IAIFTypeFunction type, byte[] data) {
-		super(type);
-		parse(data);
-	}
-	protected void parse(byte[] data) {
-		size = data.length;
 	}
 }
 

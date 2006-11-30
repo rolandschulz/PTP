@@ -16,33 +16,12 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.internal.core.aif;
-
-import org.eclipse.ptp.debug.core.aif.AIFFactory;
-import org.eclipse.ptp.debug.core.aif.IAIFType;
-import org.eclipse.ptp.debug.core.aif.IAIFTypeUnion;
-import org.eclipse.ptp.debug.core.aif.IAIFValue;
-import org.eclipse.ptp.debug.core.aif.IAIFValueUnion;
-import org.eclipse.ptp.debug.core.aif.ITypeAggregate;
-import org.eclipse.ptp.debug.core.aif.IValueParent;
-import org.eclipse.ptp.debug.core.aif.AIFFactory.SimpleByteBuffer;
-
+package org.eclipse.ptp.debug.core.aif;
 /**
  * @author Clement chu
  * 
  */
-public class AIFValueUnion extends ValueAggregate implements IAIFValueUnion {
-	public AIFValueUnion(IValueParent parent, IAIFTypeUnion type, SimpleByteBuffer buffer) {
-		super(parent, type, buffer);
-	}
-	protected void parse(SimpleByteBuffer buffer) {
-		ITypeAggregate typeAggregate = (ITypeAggregate)getType();
-		int length = typeAggregate.getNumberOfChildren();
-		for (int i=0; i<length; i++) {
-			IAIFType aifType = typeAggregate.getType(i);
-			IAIFValue val = AIFFactory.getAIFValue(getParent(), aifType, buffer);
-			values.add(val);
-			size += val.sizeof();
-		}
-	}	
+public interface IAIFTypeCharPointer extends IAIFTypeString {
+	public IAIFTypeAddress getAddressType();	
 }
+

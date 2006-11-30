@@ -19,18 +19,18 @@
 
 package org.eclipse.ptp.debug.internal.core.aif;
 
-import java.nio.ByteBuffer;
 import org.eclipse.ptp.debug.core.aif.AIFException;
 import org.eclipse.ptp.debug.core.aif.IAIFTypeChar;
 import org.eclipse.ptp.debug.core.aif.IAIFValueChar;
+import org.eclipse.ptp.debug.core.aif.AIFFactory.SimpleByteBuffer;
 
 public class AIFValueChar extends ValueIntegral implements IAIFValueChar {
 	byte byteValue;
 
-	public AIFValueChar(IAIFTypeChar type, ByteBuffer buffer) {
+	public AIFValueChar(IAIFTypeChar type, SimpleByteBuffer buffer) {
 		super(type);
 	}
-	protected void parse(ByteBuffer buffer) {
+	protected void parse(SimpleByteBuffer buffer) {
 		byteValue = buffer.get();
 		size = type.sizeof();
 	}
@@ -54,16 +54,6 @@ public class AIFValueChar extends ValueIntegral implements IAIFValueChar {
 			return "err: " + e.getMessage();
 		}
 	}
-
-	public AIFValueChar(IAIFTypeChar type, byte[] data) {
-		super(type);
-		parse(data);
-	}
-	protected void parse(byte[] data) {
-		byteValue = data[0];
-		size = data.length;
-	}
-
 	/*
 	public String toString() {
 		String ch = ""+(char)val+"";

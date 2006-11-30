@@ -24,15 +24,16 @@ import java.nio.ByteBuffer;
 import org.eclipse.ptp.debug.core.aif.AIFException;
 import org.eclipse.ptp.debug.core.aif.IAIFTypeInt;
 import org.eclipse.ptp.debug.core.aif.IAIFValueInt;
+import org.eclipse.ptp.debug.core.aif.AIFFactory.SimpleByteBuffer;
 
 public class AIFValueInt extends ValueIntegral implements IAIFValueInt {
 	ByteBuffer byteBuffer;
 	
-	public AIFValueInt(IAIFTypeInt type, ByteBuffer buffer) {
+	public AIFValueInt(IAIFTypeInt type, SimpleByteBuffer buffer) {
 		super(type);
 		parse(buffer);
 	}
-	protected void parse(ByteBuffer buffer) {
+	protected void parse(SimpleByteBuffer buffer) {
 		byte[] dst = new byte[type.sizeof()]; 
 		for (int i=0; i<dst.length; i++) {
 			dst[i] = buffer.get();
@@ -99,13 +100,5 @@ public class AIFValueInt extends ValueIntegral implements IAIFValueInt {
 		} finally {
 			byteBuffer.rewind();			
 		}
-	}
-	public AIFValueInt(IAIFTypeInt type, byte[] data) {
-		super(type);
-		parse(data);
-	}
-	protected void parse(byte[] data) {
-		byteBuffer = byteBuffer(data);
-		size = data.length;		
 	}
 }

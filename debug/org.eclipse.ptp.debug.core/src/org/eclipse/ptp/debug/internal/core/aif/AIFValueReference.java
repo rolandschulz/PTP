@@ -18,12 +18,12 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.aif;
 
-import java.nio.ByteBuffer;
 import org.eclipse.ptp.debug.core.aif.AIFException;
 import org.eclipse.ptp.debug.core.aif.IAIFTypeReference;
 import org.eclipse.ptp.debug.core.aif.IAIFValueNamed;
 import org.eclipse.ptp.debug.core.aif.IAIFValueReference;
 import org.eclipse.ptp.debug.core.aif.IValueParent;
+import org.eclipse.ptp.debug.core.aif.AIFFactory.SimpleByteBuffer;
 
 /**
  * @author Clement chu
@@ -32,12 +32,12 @@ import org.eclipse.ptp.debug.core.aif.IValueParent;
 public class AIFValueReference extends ValueParent implements IAIFValueReference {
 	private String name = null;
 	
-	public AIFValueReference(IValueParent parent, IAIFTypeReference type, ByteBuffer buffer) {
+	public AIFValueReference(IValueParent parent, IAIFTypeReference type, SimpleByteBuffer buffer) {
 		super(parent, type);
 		parse(buffer);
 		this.name = type.getName();
 	}
-	protected void parse(ByteBuffer buffer) {
+	protected void parse(SimpleByteBuffer buffer) {
 		size = type.sizeof();
 	}
 	public String getName() {
@@ -61,14 +61,5 @@ public class AIFValueReference extends ValueParent implements IAIFValueReference
 
 		parent = parent.getParent();
 		return getParent();
-	}
-
-	public AIFValueReference(IValueParent parent, IAIFTypeReference type, byte[] data) {
-		super(parent, type);
-		parse(data);
-		this.name = type.getName();
-	}
-	protected void parse(byte[] data) {
-		size = data.length;
 	}
 }

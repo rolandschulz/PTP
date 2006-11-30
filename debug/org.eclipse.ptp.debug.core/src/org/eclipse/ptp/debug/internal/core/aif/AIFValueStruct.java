@@ -18,23 +18,17 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.aif;
 
-import java.nio.ByteBuffer;
-import org.eclipse.ptp.debug.core.aif.AIFFactory;
-import org.eclipse.ptp.debug.core.aif.IAIFType;
 import org.eclipse.ptp.debug.core.aif.IAIFTypeStruct;
-import org.eclipse.ptp.debug.core.aif.IAIFValue;
 import org.eclipse.ptp.debug.core.aif.IAIFValueStruct;
 import org.eclipse.ptp.debug.core.aif.IValueParent;
+import org.eclipse.ptp.debug.core.aif.AIFFactory.SimpleByteBuffer;
 
 /**
  * @author Clement chu
  * 
  */
 public class AIFValueStruct extends ValueAggregate implements IAIFValueStruct {
-	public AIFValueStruct(IValueParent parent, IAIFTypeStruct type, ByteBuffer buffer) {
+	public AIFValueStruct(IValueParent parent, IAIFTypeStruct type, SimpleByteBuffer buffer) {
 		super(parent, type, buffer);
-	}
-	public AIFValueStruct(IValueParent parent, IAIFTypeStruct type, byte[] data) {
-		super(parent, type, data);
 	}
 }

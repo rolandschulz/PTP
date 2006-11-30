@@ -24,7 +24,7 @@ import java.math.BigInteger;
  * @author Clement chu
  * 
  */
-public interface IAIFValueAddress extends IValueIntegral {
+public interface IAIFValueAddress extends IAIFValue {
 	BigInteger getAddress() throws AIFException;
 }
 

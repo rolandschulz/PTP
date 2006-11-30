@@ -18,13 +18,13 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.aif;
 
-import java.nio.ByteBuffer;
 import org.eclipse.ptp.debug.core.aif.AIFException;
 import org.eclipse.ptp.debug.core.aif.AIFFactory;
 import org.eclipse.ptp.debug.core.aif.IAIFTypeNamed;
 import org.eclipse.ptp.debug.core.aif.IAIFValue;
 import org.eclipse.ptp.debug.core.aif.IAIFValueNamed;
 import org.eclipse.ptp.debug.core.aif.IValueParent;
+import org.eclipse.ptp.debug.core.aif.AIFFactory.SimpleByteBuffer;
 
 /**
  * @author Clement chu
@@ -34,12 +34,12 @@ public class AIFValueNamed extends ValueDerived implements IAIFValueNamed {
 	IAIFValue value;
 	String name;
 	
-	public AIFValueNamed(IValueParent parent, IAIFTypeNamed type, ByteBuffer buffer) {
+	public AIFValueNamed(IValueParent parent, IAIFTypeNamed type, SimpleByteBuffer buffer) {
 		super(parent, type);
 		this.name = type.getName();
 		parse(buffer);
 	}
-	protected void parse(ByteBuffer buffer) {
+	protected void parse(SimpleByteBuffer buffer) {
 		value = AIFFactory.getAIFValue(this, ((IAIFTypeNamed)type).getBaseType(), buffer);
 	}
 	public int getChildrenNumber() throws AIFException {
@@ -58,13 +58,4 @@ public class AIFValueNamed extends ValueDerived implements IAIFValueNamed {
 	public String getName() {
 		return name;
 	}
-
-	public AIFValueNamed(IValueParent parent, IAIFTypeNamed type, byte[] data) {
-		super(parent, type);
-		this.name = type.getName();
-		parse(data);
-	}
-	protected void parse(byte[] data) {
-		value = AIFFactory.getAIFValue(this, ((IAIFTypeNamed)type).getBaseType(), data);
-	}	
 }
