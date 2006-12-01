@@ -8,16 +8,48 @@ options {
     int prevIndex;
     int currIndex;
     int inLineComment;
-//     TokenRewriteStream tokens;
-//     List tokens;
     String lineString;
     String trimmedLine;
+    public int needIdent;
+    private Token prevToken;
+
+    private boolean isKeyword(Token tmpToken) {
+        if(tmpToken.getType() >= T_INTEGER && 
+            tmpToken.getType() <= T_CLASS_IS) {
+            return true;
+        } else {
+            return false;
+        }
+    }// end isKeyword()
+
+    public void convertToIdent(Token tmpToken, int needIdent) {
+        if(needIdent == 1 && isKeyword(tmpToken)) {
+//             System.out.println("converting keyword to T_IDENT!!");
+            tmpToken.setType(T_IDENT);
+        }
+    }// end convertToIdent() 
+
+    // overrides nextToken in superclass
+    public Token nextToken() {
+        Token tmpToken;
+        tmpToken = super.nextToken();
+
+        if(tmpToken.getType() != LINE_COMMENT && 
+            tmpToken.getType() != WS) {
+            prevToken = tmpToken;
+        }
+
+        return tmpToken;
+    }// end nextToken()
+            
 }
 
 @init {
     prevIndex = 0;
     currIndex = 0;
     inLineComment = 0;
+    needIdent = 0;
+    prevToken = null;
 }
 
 /*
@@ -27,44 +59,74 @@ options {
 // original rule
 // T_EOS : ';';
 
-T_EOS : ';' 
+T_EOS 
+// options { greedy=false; }
+      : ';' 
         { 
-            // index of first char after the ';'
-            // here, we must book keep the T_EOS like we do if it's 
-            // a newline character so we can recognize if a newline 
-            // comes after a ';' or if it's for a blank line, etc.
-            currIndex = getCharIndex();
-            prevIndex = currIndex;
-        }
-      |  ('\n')  
-        {
-            // index of the newline character
-            if(inLineComment != 1) {
-                currIndex = getCharIndex()-1;
-            }
-            
-            lineString = input.substring(prevIndex, currIndex);
-            // the trim() method removes all whitespace chars and 
-            // returns a new String representing what's left.  if the 
-            // resulting String has 0 length then the original string 
-            // (or stmt in our case) has nothing but whitespace.
-            trimmedLine = lineString.trim();
-//             System.out.println("input.substring(prevIndex, currIndex): " + 
-//                 input.substring(prevIndex, currIndex));
-            
-            
-            if(trimmedLine.length() == 0) {
-                channel=99; 
+// this was part of the original method for handling newline as T_EOS
+//             // index of first char after the ';'
+//             // here, we must book keep the T_EOS like we do if it's 
+//             // a newline character so we can recognize if a newline 
+//             // comes after a ';' or if it's for a blank line, etc.
+//             currIndex = getCharIndex();
+//             prevIndex = currIndex;
+
+            // if the previous token was a T_EOS, then the one we're 
+            // processing now is whitespace, so throw it away.
+            // also, ignore semicolons that come before any real 
+            // statements (is this correct??).  --Rickett, 11.28.06
+            if(prevToken == null || 
+                (prevToken != null && prevToken.getType() == T_EOS)) {
+                channel=99;
             }
 
-            // now, if we may need to update the currIndex if we didn't 
-            // before because we were at the end of a comment
-            if(inLineComment == 1) {
-                currIndex = getCharIndex()-1;
-                inLineComment = 0;
-            }
-            prevIndex=currIndex;
+        }
+      |  ('\r')? ('\n')
+        {
+// this was part of the original method for handling newline as T_EOS
+//             // index of the newline character
+//             if(inLineComment != 1) {
+//                 currIndex = getCharIndex()-1;
+//             }
             
+// this was part of the original method for handling newline as T_EOS
+//             lineString = input.substring(prevIndex, currIndex);
+//             // the trim() method removes all whitespace chars and 
+//             // returns a new String representing what's left.  if the 
+//             // resulting String has 0 length then the original string 
+//             // (or stmt in our case) has nothing but whitespace.
+//             trimmedLine = lineString.trim();
+// //             System.out.println("input.substring(prevIndex, currIndex): " + 
+// //                 input.substring(prevIndex, currIndex));
+            
+            
+// this was part of the original method for handling newline as T_EOS
+//             if(trimmedLine.length() == 0) {
+//                 // just for testing
+//                 if(prevToken != null && prevToken.getType() == T_EOS) {
+//                     System.out.println("previous token was T_EOS here");
+//                 }
+//                 channel=99; 
+//             }
+
+            // if the previous token was a T_EOS, then the one we're 
+            // processing now is whitespace, so throw it away.
+            // also, if the previous token is null it means we have a 
+            // blank line or a semicolon at the start of the file and 
+            // we need to ignore it.  
+            if(prevToken == null || 
+                (prevToken != null && prevToken.getType() == T_EOS)) {
+                channel=99;
+            }
+
+// this was part of the original method for handling newline as T_EOS
+//             // now, if we may need to update the currIndex if we didn't 
+//             // before because we were at the end of a comment
+//             if(inLineComment == 1) {
+//                 currIndex = getCharIndex()-1;
+//                 inLineComment = 0;
+//             }
+//             prevIndex=currIndex;
         }
       ;
                 
@@ -72,9 +134,14 @@ T_EOS : ';'
 
 
 // R427 from char-literal-constant
+// original rule..  
+// T_CHAR_CONSTANT
+//         : '\'' {System.out.println("found the single quote");} ( Rep_Char )* {System.out.println("\n\nfound the Rep_Char\n\n");} '\'' {System.out.println("found the closing single quote");}
+//         | '\"' ( Rep_Char )* '\"'
+//         ;
 T_CHAR_CONSTANT
-        : '\'' ( Rep_Char )* '\''
-        | '\"' ( Rep_Char )* '\"'
+        : ('\'' ( SQ_Rep_Char )* '\'')+ // {System.out.println("T_CHAR_CONSTANT is: " + getText());}
+        | ('\"' ( DQ_Rep_Char )* '\"')+ // {System.out.println("T_CHAR_CONSTANT is: " + getText());}
         ;
 
 T_DIGIT_STRING
@@ -150,8 +217,16 @@ Special_Character
     |    '{' .. '~'
     ;
 
+// original rule is the first alt. here..
 fragment
-Rep_Char : ' '..'~' ;
+// Rep_Char : ' '..'~' {System.out.println("found the following Rep_Char: " + getText());};
+// Rep_Char : (Letter | Digit) {System.out.println("found the following Rep_Char: " + getText());};
+Rep_Char : ~('\'' | '\"') {System.out.println("found the following Rep_Char: " + getText());};
+
+fragment
+SQ_Rep_Char : ~('\'') ;
+fragment
+DQ_Rep_Char : ~('\"') ;
 
 fragment
 Letter : ('a'..'z' | 'A'..'Z') ;
@@ -226,7 +301,7 @@ T_BLOCKDATA     :       'BLOCKDATA'     ;
 T_CALL          :       'CALL'          ;
 T_CASE          :       'CASE'          ;
 T_CLASS         :       'CLASS'         ;
-T_CLASS_IS      :       'CLASS' 'IS'    ;
+// T_CLASS_IS      :       'CLASS' 'IS'    ;
 T_CLOSE         :       'CLOSE'         ;
 T_COMMON        :       'COMMON'        ;
 T_CONTAINS      :       'CONTAINS'      ;
@@ -236,7 +311,7 @@ T_DATA          :       'DATA'          ;
 T_DEFAULT       :       'DEFAULT'       ;
 T_DEALLOCATE    :       'DEALLOCATE'    ;
 T_DEFERRED      :       'DEFERRED'      ;
-T_DIMENSION     :       'DIMENSION'     ;
+// T_DIMENSION     :       'DIMENSION'     ;
 T_DO            :       'DO'            ;
 T_DOUBLE        :       'DOUBLE'        ;
 T_DOUBLEPRECISION:      'DOUBLEPRECISION' ;
@@ -270,8 +345,8 @@ T_INTENT        :       'INTENT'        ;
 T_INTERFACE     :       'INTERFACE'     ;
 T_INTRINSIC     :       'INTRINSIC'     ;
 T_INQUIRE       :       'INQUIRE'       ;
-T_KIND          :       'KIND'          ;
-T_LEN           :       'LEN'           ;
+// T_KIND          :       'KIND'          ;
+// T_LEN           :       'LEN'           ;
 T_MODULE        :       'MODULE'        ;
 T_NAMELIST      :       'NAMELIST'      ;
 T_NONE          :       'NONE'          ;
@@ -311,7 +386,7 @@ T_TARGET        :       'TARGET'        ;
 T_THEN          :       'THEN'          ;
 T_TO            :       'TO'            ;
 T_TYPE          :       'TYPE'          ;
-T_TYPE_IS       :       'TYPE' 'IS'     ;
+// T_TYPE_IS       :       'TYPE' 'IS'     ;
 T_UNFORMATTED   :       'UNFORMATTED'   ;
 T_USE           :       'USE'           ;
 T_VALUE         :       'VALUE'         ;
@@ -320,10 +395,9 @@ T_WAIT          :       'WAIT'          ;
 T_WHERE         :       'WHERE'         ;
 T_WHILE         :       'WHILE'         ;
 T_WRITE         :       'WRITE'         ;
-
-T_BIND_LPAREN_C
-        : 'BIND' '(' 'C'
-        ;
+// T_BIND_LPAREN_C
+//         : 'BIND' '(' 'C'
+//         ;
 
 T_ENDASSOCIATE  :       'ENDASSOCIATE'  ;
 T_ENDBLOCK      :       'ENDBLOCK'      ;
@@ -344,6 +418,20 @@ T_ENDWHERE      :       'ENDWHERE'      ;
 
 T_END   : 'END'
         ;
+
+T_TYPE_IS       :       'TYPE' 'IS'     ;
+T_CLASS_IS      :       'CLASS' 'IS'    ;
+// moved this here because it causes a problem with the 
+// fortran_keyword and char_selector rule in the parser.
+// --Rickett, 11.08.06
+T_DIMENSION     :       'DIMENSION'     ;
+
+
+
+T_BIND_LPAREN_C
+        : 'BIND' '(' 'C'
+        ;
+
 
 // Must come after .EQ. (for example) or will get matched first
 T_DEFINED_OP
