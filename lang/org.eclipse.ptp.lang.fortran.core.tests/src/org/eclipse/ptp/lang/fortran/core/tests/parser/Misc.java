@@ -4,6 +4,8 @@ import org.antlr.runtime.*;
 import org.eclipse.ptp.lang.fortran.core.parser.FortranLexer;
 import org.eclipse.ptp.lang.fortran.core.parser.FortranParser;
 import org.eclipse.ptp.lang.fortran.core.parser.FortranStream;
+import org.eclipse.ptp.lang.fortran.core.parser.FortranTokenStream;
+
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
@@ -17,7 +19,7 @@ public class Misc {
 
       try {
          FortranLexer lexer = new FortranLexer(new FortranStream(path));
-         CommonTokenStream tokens = new CommonTokenStream(lexer);
+         FortranTokenStream tokens = new FortranTokenStream(lexer);
          FortranParser parser = new FortranParser(tokens);
          parser.program();
          error = parser.hasErrorOccurred;
