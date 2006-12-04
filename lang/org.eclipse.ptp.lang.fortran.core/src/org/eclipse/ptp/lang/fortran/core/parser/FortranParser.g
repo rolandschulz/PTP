@@ -12,6 +12,14 @@
  */
 
 
+// replaced some occurrences of T_IDENT with valid_identifier. 
+
+// added (label)? to any rule for a statement (*_stmt, for the most 
+// part) because the draft says a label can exist with any statement.  
+// questions are:
+// - what about constructs such as if/else; where can labels all occur?
+// - or the masked_elsewhere_stmt rule...
+
 parser grammar FortranParser;
 
 options {
@@ -45,7 +53,7 @@ program
 // R202
 // backtracking needed to resolve prefix (e.g., REAL) ambiguity with main_program (REAL)
 program_unit
-options {backtrack=true;}
+options {backtrack=true; memoize=true; greedy=true;}
 	:	main_program
 	|	external_subprogram
 	|	module
@@ -160,6 +168,7 @@ options {backtrack=true;}
 // T_CONTINUE inlined for continue_stmt
 // TODO continue-stmt is ambiguous with same in end-do, check for label and if
 // label matches do-stmt label, then match end-do there
+// the original generated rules do not allow the label, so add (label)?
 action_stmt
 options {backtrack=true;}
 	:	allocate_stmt
@@ -208,14 +217,14 @@ Section 3:
 
 // R304
 name
-	:	T_IDENT
+	:	valid_identifier
 	;
 
 // R305
 // T_IDENT inlined as named_constant 
 constant
 	:	literal_constant
-	|	T_IDENT
+	|	valid_identifier
 	;
 
 scalar_constant
@@ -238,7 +247,7 @@ literal_constant
 // C302 R308 int_constant shall be of type integer
 // inlined integer portion of constant
 int_constant
-	:	T_IDENT
+	:	valid_identifier
 	|	int_literal_constant
 	;
 
@@ -246,7 +255,7 @@ int_constant
 // C303 R309 char_constant shall be of type character
 // inlined character portion of constant
 char_constant
-	:	T_IDENT
+	:	valid_identifier
 	|	char_literal_constant
 	;
 
@@ -322,7 +331,6 @@ intrinsic_type_spec
 // ERR_CHK 404 scalar_int_initialization_expr replaced by expr
 kind_selector
     : T_LPAREN (T_IDENT /* 'KIND' */ T_EQUALS)? expr T_RPAREN
-//     : T_LPAREN (T_KIND T_EQUALS)? expr T_RPAREN
     ;
 
 // TODO: turn into terminal (what about kind parameter)
@@ -340,7 +348,7 @@ int_literal_constant
 // T_IDENT inlined for scalar_int_constant_name
 kind_param
 	:	T_DIGIT_STRING
-	|	T_IDENT
+	|	valid_identifier
 	;
 
 // R408 signed_digit_string inlined
@@ -391,7 +399,7 @@ complex_literal_constant
 real_part
 	:	signed_int_literal_constant
 	|	signed_real_literal_constant
-	|	T_IDENT
+	|	valid_identifier
 	;
 
 // R423
@@ -399,7 +407,7 @@ real_part
 imag_part
 	:	signed_int_literal_constant
 	|	signed_real_literal_constant
-	|	T_IDENT
+	|	valid_identifier
 	;
 
 // R424
@@ -479,7 +487,7 @@ type_param_or_comp_def_stmt
 // R430
 // generic_name_list substituted for type_param_name_list
 derived_type_stmt
-	:	T_TYPE ( ( T_COMMA type_attr_spec_list )? T_COLON_COLON )? T_IDENT
+	:	(label)? T_TYPE ( ( T_COMMA type_attr_spec_list )? T_COLON_COLON )? valid_identifier
 		( T_LPAREN generic_name_list T_RPAREN )? T_EOS
 	;
 
@@ -488,14 +496,14 @@ type_attr_spec_list
 	;
 
 generic_name_list
-	:	T_IDENT ( T_COMMA T_IDENT )*
+	:	valid_identifier ( T_COMMA valid_identifier )*
 	;
 
 // R431
 // T_IDENT inlined for parent_type_name
 type_attr_spec
 	:	access_spec
-	|	T_EXTENDS T_LPAREN T_IDENT T_RPAREN
+	|	T_EXTENDS T_LPAREN valid_identifier T_RPAREN
 	|	T_ABSTRACT
 	|	T_BIND_LPAREN_C T_RPAREN
 	;
@@ -507,15 +515,16 @@ private_or_sequence
     ;
 
 // R433
+// TODO see if ()? works in predicate
 end_type_stmt
-options {k=2;}
-	: (T_END T_TYPE) => T_END T_TYPE ( T_IDENT )? T_EOS
-	| T_ENDTYPE ( T_IDENT )? T_EOS
+options {k=3;}
+	: ((label)? T_END T_TYPE) => (label)? T_END T_TYPE ( valid_identifier )? T_EOS
+	| (label)? T_ENDTYPE ( valid_identifier )? T_EOS
 	;
 
 // R434
 sequence_stmt
-	:	T_SEQUENCE T_EOS
+	:	(label)? T_SEQUENCE T_EOS
 	;
 
 // R435 type_param_def_stmt inlined in type_param_or_comp_def_stmt_list
@@ -524,7 +533,7 @@ sequence_stmt
 // ERR_CHK 436 scalar_int_initialization_expr replaced by expr
 // T_IDENT inlined for type_param_name
 type_param_decl
-    :    T_IDENT ( T_EQUALS expr )?
+    :    valid_identifier ( T_EQUALS expr )?
     ;
 
 type_param_decl_list
@@ -533,8 +542,7 @@ type_param_decl_list
 
 // R437
 type_param_attr_spec
-	:	T_KIND
-	|	T_LEN
+	:	T_IDENT /* { KIND | LEN } */
 	;
 
 // R438 component_part inlined as ( component_def_stmt )* in R429
@@ -548,7 +556,7 @@ component_def_stmt
 
 // R440
 data_component_def_stmt
-    :    declaration_type_spec ( ( T_COMMA component_attr_spec_list )? T_COLON_COLON )? component_decl_list T_EOS
+    :    (label)? declaration_type_spec ( ( T_COMMA component_attr_spec_list )? T_COLON_COLON )? component_decl_list T_EOS
     ;
 
 // R441, R442-F2008
@@ -567,10 +575,18 @@ component_attr_spec_list
 
 // R442, R443-F2008
 // T_IDENT inlined as component_name
+// original rule.  --Rickett, 11.08.06
+// component_decl
+//     :    T_IDENT ( T_LPAREN component_array_spec T_RPAREN )?
+//                  ( T_LBRACKET co_array_spec T_RBRACKET )?
+//                  ( T_ASTERISK char_length )? ( component_initialization )?
+//     ;
+// modify the rule to try and allow fortran keywords to be used as 
+// identifiers.  --Rickett, 11.08.06
 component_decl
-    :    T_IDENT ( T_LPAREN component_array_spec T_RPAREN )?
-                 ( T_LBRACKET co_array_spec T_RBRACKET )?
-                 ( T_ASTERISK char_length )? ( component_initialization )?
+    :   valid_identifier ( T_LPAREN component_array_spec T_RPAREN )?
+        ( T_LBRACKET co_array_spec T_RBRACKET )?
+        ( T_ASTERISK char_length )? ( component_initialization )?
     ;
 
 component_decl_list
@@ -599,7 +615,7 @@ component_initialization
 
 // R445
 proc_component_def_stmt
-	:	T_PROCEDURE T_LPAREN ( proc_interface )? T_RPAREN T_COMMA
+	:	(label)? T_PROCEDURE T_LPAREN ( proc_interface )? T_RPAREN T_COMMA
 		    proc_component_attr_spec_list T_COLON_COLON proc_decl_list T_EOS
 	;
 
@@ -607,7 +623,7 @@ proc_component_def_stmt
 // T_IDENT inlined for arg_name
 proc_component_attr_spec
     :    T_POINTER
-    |    T_PASS ( T_LPAREN T_IDENT T_RPAREN )?
+    |    T_PASS ( T_LPAREN valid_identifier T_RPAREN )?
     |    T_NOPASS
     |    access_spec
     ;
@@ -618,7 +634,7 @@ proc_component_attr_spec_list
 
 // R447
 private_components_stmt
-	:	T_PRIVATE T_EOS
+	:	(label)? T_PRIVATE T_EOS
 	;
 
 // R448
@@ -630,22 +646,22 @@ type_bound_procedure_part
 
 // R449
 binding_private_stmt
-	:	T_PRIVATE T_EOS
+	:	(label)? T_PRIVATE T_EOS
 	;
 
 // R450
 proc_binding_stmt
-	:	specific_binding T_EOS
-	|	generic_binding T_EOS
-	|	final_binding T_EOS
+	:	(label)? specific_binding T_EOS
+	|	(label)? generic_binding T_EOS
+	|	(label)? final_binding T_EOS
 	;
 
 // R451
 // T_IDENT inlined for interface_name, binding_name and procedure_name
 specific_binding
-    : T_PROCEDURE ( T_LPAREN T_IDENT T_RPAREN )?
+    : T_PROCEDURE ( T_LPAREN valid_identifier T_RPAREN )?
       ( ( T_COMMA binding_attr_list )? T_COLON_COLON )?
-      T_IDENT ( T_EQ_GT T_IDENT )?
+      valid_identifier ( T_EQ_GT valid_identifier )?
     ;
 
 // R452
@@ -657,7 +673,7 @@ generic_binding
 // R453
 // T_IDENT inlined for arg_name
 binding_attr
-    : T_PASS ( T_LPAREN T_IDENT T_RPAREN )?
+    : T_PASS ( T_LPAREN valid_identifier T_RPAREN )?
     | T_NOPASS
     | T_NON_OVERRIDABLE
     | T_DEFERRED
@@ -676,7 +692,7 @@ final_binding
 
 // R455
 derived_type_spec
-    : T_IDENT ( T_LPAREN type_param_spec_list T_RPAREN )?
+    : valid_identifier ( T_LPAREN type_param_spec_list T_RPAREN )?
     ;
 
 // R456
@@ -692,11 +708,11 @@ type_param_spec_list
 // inlined derived_type_spec (R662) to remove ambiguity using backtracking
 structure_constructor
 options {backtrack=true;}
-    : T_IDENT T_LPAREN type_param_spec_list T_RPAREN
+    : valid_identifier T_LPAREN type_param_spec_list T_RPAREN
 		T_LPAREN
 		( component_spec_list )?
 		T_RPAREN
-    | T_IDENT
+    | valid_identifier
 		T_LPAREN
 		( component_spec_list )?
 		T_RPAREN
@@ -729,19 +745,19 @@ enum_def
 
 // R461
 enum_def_stmt
-	:	T_ENUM T_COMMA T_BIND_LPAREN_C T_RPAREN T_EOS
+	:	(label)? T_ENUM T_COMMA T_BIND_LPAREN_C T_RPAREN T_EOS
 	;
 
 // R462
 enumerator_def_stmt
-	:	T_ENUMERATOR ( T_COLON_COLON )? enumerator_list T_EOS
+	:	(label)? T_ENUMERATOR ( T_COLON_COLON )? enumerator_list T_EOS
 	;
 
 // R463
 // ERR_CHK 463 scalar_int_initialization_expr replaced by expr
 // ERR_CHK 463 named_constant replaced by T_IDENT
 enumerator
-    :    T_IDENT ( T_EQUALS expr )?
+    :    valid_identifier ( T_EQUALS expr )?
     ;
 
 enumerator_list
@@ -749,10 +765,11 @@ enumerator_list
     ;
 
 // R464
+// TODO ()? work in predicate?
 end_enum_stmt
-options {k=2;}
-	:	(T_END T_ENUM) => T_END T_ENUM T_EOS
-	|	T_ENDENUM T_EOS
+options {k=3;}
+	:	((label)? T_END T_ENUM) => T_END T_ENUM T_EOS
+	|	(label)? T_ENDENUM T_EOS
 	;
 
 // R465
@@ -794,7 +811,7 @@ ac_implied_do
 // ERR_CHK 471a scalar_int_expr replaced by expr
 // ERR_CHK 471b ac_do_variable replaced by scalar_int_variable replaced by variable replaced by T_IDENT
 ac_implied_do_control
-    :    T_IDENT T_EQUALS expr T_COMMA expr ( T_COMMA expr )?
+    :    valid_identifier T_EQUALS expr T_COMMA expr ( T_COMMA expr )?
     ;
 
 // R472 inlined ac_do_variable as scalar_int_variable (and finally T_IDENT) in R471
@@ -811,7 +828,7 @@ Section 5:
 
 // R501
 type_declaration_stmt
-    :    declaration_type_spec ( ( T_COMMA attr_spec )* T_COLON_COLON )? entity_decl_list T_EOS
+    :    (label)? declaration_type_spec ( ( T_COMMA attr_spec )* T_COLON_COLON )? entity_decl_list T_EOS
     ;
 
 // R502
@@ -855,10 +872,17 @@ attr_spec
 // R504, R503-F2008
 // T_IDENT inlined for object_name and function_name
 // T_IDENT ( T_ASTERISK char_length )? (second alt) subsumed in first alt
+// original rule.  --Rickett, 11.08.06
+// entity_decl
+//     : T_IDENT ( T_LPAREN array_spec T_RPAREN )?
+//               ( T_LBRACKET co_array_spec T_RBRACKET )?
+//               ( T_ASTERISK char_length )? ( initialization )?
+//     ;
+// modify the rule to try and allow keywords to be used as an identifier
 entity_decl
-    : T_IDENT ( T_LPAREN array_spec T_RPAREN )?
-              ( T_LBRACKET co_array_spec T_RBRACKET )?
-              ( T_ASTERISK char_length )? ( initialization )?
+    : valid_identifier ( T_LPAREN array_spec T_RPAREN )?
+        ( T_LBRACKET co_array_spec T_RBRACKET )?
+        ( T_ASTERISK char_length )? ( initialization )?
     ;
 
 entity_decl_list
@@ -879,7 +903,7 @@ initialization
 // R507
 // C506 The function-reference shall be a reference to the NULL intrinsic function with no arguments.
 null_init
-	:	T_IDENT /* 'NULL' */ T_LPAREN T_RPAREN
+	:	valid_identifier /* 'NULL' */ T_LPAREN T_RPAREN
 	;
 
 // R508
@@ -976,7 +1000,7 @@ options {k=2;}
 
 // R518
 access_stmt
-    :    access_spec ( ( T_COLON_COLON )? access_id_list )? T_EOS
+    :    (label)? access_spec ( ( T_COLON_COLON )? access_id_list )? T_EOS
     ;
 
 // R519
@@ -993,27 +1017,27 @@ access_id_list
 // R520, R526-F2008
 // T_IDENT inlined for object_name
 allocatable_stmt
-    : T_ALLOCATABLE ( T_COLON_COLON )? allocatable_decl ( T_COMMA allocatable_decl )* T_EOS
+    : (label)? T_ALLOCATABLE ( T_COLON_COLON )? allocatable_decl ( T_COMMA allocatable_decl )* T_EOS
     ;
 
 // R527-F2008
 // T_IDENT inlined for object_name
 allocatable_decl
-    : T_IDENT ( T_LPAREN array_spec T_RPAREN )?
+    : valid_identifier ( T_LPAREN array_spec T_RPAREN )?
               ( T_LBRACKET co_array_spec T_RBRACKET )?
     ;
 
 // R521
 // generic_name_list substituted for object_name_list
 asynchronous_stmt
-	:	T_ASYNCHRONOUS
+	:	(label)? T_ASYNCHRONOUS
 		( T_COLON_COLON )?
 		generic_name_list T_EOS
 	;
 
 // R522
 bind_stmt
-	:	language_binding_spec
+	:	(label)? language_binding_spec
 		( T_COLON_COLON )?
 		bind_entity_list T_EOS
 	;
@@ -1021,8 +1045,8 @@ bind_stmt
 // R523
 // T_IDENT inlined for entity_name and common_block_name
 bind_entity
-	:	T_IDENT
-	|	T_SLASH T_IDENT T_SLASH
+	:	valid_identifier
+	|	T_SLASH valid_identifier T_SLASH
 	;
 
 bind_entity_list
@@ -1031,7 +1055,7 @@ bind_entity_list
 
 // R524
 data_stmt
-    :    T_DATA data_stmt_set ( ( T_COMMA )? data_stmt_set )* T_EOS
+    :    (label)? T_DATA data_stmt_set ( ( T_COMMA )? data_stmt_set )* T_EOS
     ;
 
 // R525
@@ -1056,7 +1080,7 @@ data_stmt_object_list
 // ERR_CHK 527 scalar_int_expr replaced by expr
 // data_i_do_variable replaced by T_IDENT
 data_implied_do
-    : T_LPAREN data_i_do_object_list T_COMMA T_IDENT T_EQUALS
+    : T_LPAREN data_i_do_object_list T_COMMA valid_identifier T_EQUALS
       expr T_COMMA expr ( T_COMMA expr )? T_RPAREN
     ;
 
@@ -1129,13 +1153,13 @@ options {backtrack=true;}
 // R535, R543-F2008
 // array_name replaced by T_IDENT
 dimension_stmt
-    :    T_DIMENSION ( T_COLON_COLON )? dimension_decl ( T_COMMA dimension_decl )* T_EOS
+    :    (label)? T_DIMENSION ( T_COLON_COLON )? dimension_decl ( T_COMMA dimension_decl )* T_EOS
     ;
 
 // R544-F2008
 // ERR_CHK 509-F2008 at least one of the array specs must exist
 dimension_decl
-    :    T_IDENT ( T_LPAREN array_spec T_RPAREN )? ( T_LBRACKET co_array_spec T_RBRACKET )?
+    :    valid_identifier ( T_LPAREN array_spec T_RPAREN )? ( T_LBRACKET co_array_spec T_RBRACKET )?
     ;
 
 // R509-F2008
@@ -1147,18 +1171,19 @@ dimension_spec
 // R536
 // generic_name_list substituted for dummy_arg_name_list
 intent_stmt
-	:	T_INTENT T_LPAREN intent_spec T_RPAREN ( T_COLON_COLON )? generic_name_list T_EOS
+	:	(label)? T_INTENT T_LPAREN intent_spec T_RPAREN ( T_COLON_COLON )? generic_name_list T_EOS
 	;
 
 // R537
 // generic_name_list substituted for dummy_arg_name_list
 optional_stmt
-	:	T_OPTIONAL ( T_COLON_COLON )? generic_name_list T_EOS
+	:	(label)? T_OPTIONAL ( T_COLON_COLON )? generic_name_list T_EOS
 	;
 
 // R538
+// original rule.  --Rickett, 11.14.06
 parameter_stmt
-	:	T_PARAMETER T_LPAREN named_constant_def_list T_RPAREN T_EOS
+	:	(label)? T_PARAMETER T_LPAREN named_constant_def_list T_RPAREN T_EOS
 	;
 
 named_constant_def_list
@@ -1169,12 +1194,12 @@ named_constant_def_list
 // ERR_CHK 539 initialization_expr replaced by expr
 // ERR_CHK 539 named_constant replaced by T_IDENT
 named_constant_def
-	:	T_IDENT T_EQUALS expr
+	:	valid_identifier T_EQUALS expr
 	;
 
 // R540
 pointer_stmt
-	:	T_POINTER ( T_COLON_COLON )? pointer_decl_list T_EOS
+	:	(label)? T_POINTER ( T_COLON_COLON )? pointer_decl_list T_EOS
 	;
 
 pointer_decl_list
@@ -1184,18 +1209,18 @@ pointer_decl_list
 // R541
 // T_IDENT inlined as object_name and proc_entity_name (removing second alt)
 pointer_decl
-    :    T_IDENT ( T_LPAREN deferred_shape_spec_list T_RPAREN )?
+    :    valid_identifier ( T_LPAREN deferred_shape_spec_list T_RPAREN )?
     ;
 
 // R542
 // generic_name_list substituted for entity_name_list
 protected_stmt
-	:	T_PROTECTED ( T_COLON_COLON )? generic_name_list T_EOS
+	:	(label)? T_PROTECTED ( T_COLON_COLON )? generic_name_list T_EOS
 	;
 
 // R543
 save_stmt
-    : T_SAVE ( ( T_COLON_COLON )? saved_entity_list )? T_EOS
+    : (label)? T_SAVE ( ( T_COLON_COLON )? saved_entity_list )? T_EOS
     ;
 
 // R544
@@ -1214,31 +1239,31 @@ saved_entity_list
 // R546, R555-F2008
 // T_IDENT inlined for object_name
 target_stmt
-    : T_TARGET ( T_COLON_COLON )? target_decl ( T_COMMA target_decl )* T_EOS
+    : (label)? T_TARGET ( T_COLON_COLON )? target_decl ( T_COMMA target_decl )* T_EOS
     ;
 
 // R556-F2008
 target_decl
-    : T_IDENT ( T_LPAREN array_spec T_RPAREN )?
+    : valid_identifier ( T_LPAREN array_spec T_RPAREN )?
               ( T_LBRACKET co_array_spec T_RBRACKET )?
     ;
 
 // R547
 // generic_name_list substituted for dummy_arg_name_list
 value_stmt
-	:	T_VALUE ( T_COLON_COLON )? generic_name_list T_EOS
+	:	(label)? T_VALUE ( T_COLON_COLON )? generic_name_list T_EOS
 	;
 
 // R548
 // generic_name_list substituted for object_name_list
 volatile_stmt
-	:	T_VOLATILE ( T_COLON_COLON )? generic_name_list T_EOS
+	:	(label)? T_VOLATILE ( T_COLON_COLON )? generic_name_list T_EOS
 	;
 
 // R549
 implicit_stmt
-	:	T_IMPLICIT implicit_spec_list T_EOS
-	|	T_IMPLICIT T_NONE T_EOS
+	:	(label)? T_IMPLICIT implicit_spec_list T_EOS
+	|	(label)? T_IMPLICIT T_NONE T_EOS
 	;
 
 // R550
@@ -1252,7 +1277,12 @@ implicit_spec_list
 
 // R551
 letter_spec 
-    : Letter ( T_MINUS Letter )?
+// original rule.  had to modify it because Letter is a fragment in 
+// the lexer, so the parser can not see it.  here, we'll accept a 
+// T_IDENT, and then we'll have to do error checking on it.
+// --Rickett, 11.09.06
+//     : Letter ( T_MINUS Letter )?
+    : T_IDENT ( T_MINUS T_IDENT )?
     ;
 
 letter_spec_list
@@ -1262,20 +1292,20 @@ letter_spec_list
 // R552
 // T_IDENT inlined for namelist_group_name
 namelist_stmt
-    : T_NAMELIST T_SLASH T_IDENT T_SLASH namelist_group_object_list
-         ( ( T_COMMA )? T_SLASH T_IDENT T_SLASH namelist_group_object_list )* T_EOS
+    : (label)? T_NAMELIST T_SLASH valid_identifier T_SLASH namelist_group_object_list
+         ( ( T_COMMA )? T_SLASH valid_identifier T_SLASH namelist_group_object_list )* T_EOS
     ;
 
 // R553 namelist_group_object was variable_name inlined as T_IDENT
 
 // T_IDENT inlined for namelist_group_object
 namelist_group_object_list
-    :    T_IDENT ( T_COMMA T_IDENT )*
+    :    valid_identifier ( T_COMMA valid_identifier )*
     ;
 
 // R554
 equivalence_stmt
-	:	T_EQUIVALENCE equivalence_set_list T_EOS
+	:	(label)? T_EQUIVALENCE equivalence_set_list T_EOS
 	;
 
 // R555
@@ -1297,21 +1327,21 @@ equivalence_object
 	;
 
 equivalence_object_list
-    :    equivalence_object ( T_COMMA equivalence_object )
+    :    equivalence_object ( T_COMMA equivalence_object )*
     ;
 
 // R557
 // T_IDENT inlined for common_block_name
 common_stmt
-    : T_COMMON ( T_SLASH ( T_IDENT )? T_SLASH )? common_block_object_list
-         ( ( T_COMMA )? T_SLASH ( T_IDENT )? T_SLASH common_block_object_list )* T_EOS
+    : (label)? T_COMMON ( T_SLASH ( valid_identifier )? T_SLASH )? common_block_object_list
+         ( ( T_COMMA )? T_SLASH ( valid_identifier )? T_SLASH common_block_object_list )* T_EOS
     ;
 
 // R558
 // T_IDENT inlined for variable_name and proc_pointer_name
 // T_IDENT covered by first alt so second deleted
 common_block_object
-    : T_IDENT ( T_LPAREN explicit_shape_spec_list T_RPAREN )?
+    : valid_identifier ( T_LPAREN explicit_shape_spec_list T_RPAREN )?
     ;
 
 common_block_object_list
@@ -1508,8 +1538,8 @@ image_selector
 // R623
 allocate_stmt
 options {backtrack=true;}
-    :    T_ALLOCATE T_LPAREN type_spec T_COLON_COLON allocation_list ( T_COMMA alloc_opt_list )? T_RPAREN T_EOS
-    |    T_ALLOCATE T_LPAREN allocation_list ( T_COMMA alloc_opt_list )? T_RPAREN T_EOS
+    :    (label)? T_ALLOCATE T_LPAREN type_spec T_COLON_COLON allocation_list ( T_COMMA alloc_opt_list )? T_RPAREN T_EOS
+    |    (label)? T_ALLOCATE T_LPAREN allocation_list ( T_COMMA alloc_opt_list )? T_RPAREN T_EOS
     ;
 
 // R624
@@ -1568,7 +1598,7 @@ allocate_shape_spec_list
 
 // R633
 nullify_stmt
-	:	T_NULLIFY
+	:	(label)? T_NULLIFY
 		T_LPAREN
 		pointer_object_list
 		T_RPAREN T_EOS
@@ -1588,7 +1618,7 @@ pointer_object_list
 
 // R635
 deallocate_stmt
-    :    T_DEALLOCATE T_LPAREN allocate_object_list ( T_COMMA dealloc_opt_list )? T_RPAREN T_EOS
+    :    (label)? T_DEALLOCATE T_LPAREN allocate_object_list ( T_COMMA dealloc_opt_list )? T_RPAREN T_EOS
     ;
 
 // R636
@@ -1822,7 +1852,7 @@ defined_binary_op
 
 // R734
 assignment_stmt
-	:	variable
+	:	(label)? variable
 		T_EQUALS
 		expr T_EOS
 	;
@@ -1836,9 +1866,9 @@ assignment_stmt
 // see NOTE 6.10 for why array-section does not have pointer attribute
 pointer_assignment_stmt
 options {backtrack=true;}
-    : data_ref T_EQ_GT expr T_EOS
-    | data_ref T_LPAREN bounds_spec_list T_RPAREN T_EQ_GT expr T_EOS
-    | data_ref T_LPAREN bounds_remapping_list T_RPAREN T_EQ_GT expr T_EOS
+    : (label)? data_ref T_EQ_GT expr T_EOS
+    | (label)? data_ref T_LPAREN bounds_spec_list T_RPAREN T_EQ_GT expr T_EOS
+    | (label)? data_ref T_LPAREN bounds_remapping_list T_RPAREN T_EQ_GT expr T_EOS
     ;
 
 // R736
@@ -1898,7 +1928,7 @@ proc_pointer_object
 // ERR_CHK 743 mask_expr replaced by expr
 // assignment_stmt inlined for where_assignment_stmt
 where_stmt
-	:	T_WHERE
+	:	(label)? T_WHERE
 		T_LPAREN
 		expr
 		T_RPAREN
@@ -1937,27 +1967,28 @@ options {backtrack=true;}
 // R749
 // ERR_CHK 749 mask_expr replaced by expr
 masked_elsewhere_stmt
-options {k=2;}
-	:	(T_ELSE T_WHERE) => T_ELSE T_WHERE
+options {k=3;}
+	:	((label)? T_ELSE T_WHERE) => (label)? T_ELSE T_WHERE
 		T_LPAREN	expr T_RPAREN ( T_IDENT )? T_EOS
-	|	(T_ELSEWHERE) => T_ELSEWHERE
+	|	((label)? T_ELSEWHERE) => (label)? T_ELSEWHERE
 		T_LPAREN	expr T_RPAREN ( T_IDENT )? T_EOS
 	;
 
 // R750
 elsewhere_stmt
-options {k=2;}
-	:	(T_ELSE T_WHERE) => T_ELSE T_WHERE
+options {k=3;}
+	:	((label)? T_ELSE T_WHERE) => (label)? T_ELSE T_WHERE
 		( T_IDENT )? T_EOS
-	|	(T_ELSEWHERE) => T_ELSEWHERE
+	|	((label)? T_ELSEWHERE) => (label)? T_ELSEWHERE
 		( T_IDENT )? T_EOS
 	;
 
 // R751
+// TODO is ()? valid in a predicate?
 end_where_stmt
-options {k=2;}
-	: (T_END T_WHERE) => T_END T_WHERE ( T_IDENT )? T_EOS
-	| T_ENDWHERE ( T_IDENT )? T_EOS
+options {k=3;}
+	: ((label)? T_END T_WHERE) => (label)? T_END T_WHERE ( valid_identifier )? T_EOS
+	| (label)? T_ENDWHERE ( valid_identifier )? T_EOS
 	;
 
 // R752
@@ -1969,7 +2000,7 @@ forall_construct
 
 // R753
 forall_construct_stmt
-    :    ( T_IDENT T_COLON )? T_FORALL forall_header T_EOS
+    :    (label)? ( valid_identifier T_COLON )? T_FORALL forall_header T_EOS
     ;
 
 // R754
@@ -1982,7 +2013,7 @@ forall_header
 // T_IDENT inlined for index_name
 // expr inlined for subscript and stride
 forall_triplet_spec
-    : T_IDENT T_EQUALS expr T_COLON expr ( T_COLON expr )?
+    : valid_identifier T_EQUALS expr T_COLON expr ( T_COLON expr )?
     ;
 
 forall_triplet_spec_list
@@ -2007,15 +2038,16 @@ options {backtrack=true;}
 	;
 
 // R758
+// TODO is ()? valid in a predicate?
 end_forall_stmt
-options {k=2;}
-	: (T_END T_FORALL) => T_END T_FORALL ( T_IDENT )? T_EOS
-	| T_ENDFORALL ( T_IDENT )? T_EOS
+options {k=3;}
+	: ((label)? T_END T_FORALL) => (label)? T_END T_FORALL ( valid_identifier )? T_EOS
+	| (label)? T_ENDFORALL ( valid_identifier )? T_EOS
 	;
 
 // R759
 forall_stmt
-	:	T_FORALL
+	:	(label)? T_FORALL
 		forall_header
 		forall_assignment_stmt
 	;
@@ -2037,36 +2069,38 @@ if_construct
 // R803
 // ERR_CHK 803 scalar_logical_expr replaced by expr
 if_then_stmt
-    : ( T_IDENT T_COLON )? T_IF T_LPAREN expr T_RPAREN T_THEN T_EOS
+    : (label)? ( valid_identifier T_COLON )? T_IF T_LPAREN expr T_RPAREN T_THEN T_EOS
     ;
 
 // R804
 // ERR_CHK 804 scalar_logical_expr replaced by expr
+// TODO is ()? valid in a predicate?
 else_if_stmt
-options {k=2;}
-	: (T_ELSE T_IF) => T_ELSE T_IF
+options {k=3;}
+	: ((label)? T_ELSE T_IF) => (label)? T_ELSE T_IF
         T_LPAREN expr T_RPAREN T_THEN ( T_IDENT )? T_EOS
-	| T_ELSEIF
+	| (label)? T_ELSEIF
         T_LPAREN expr T_RPAREN T_THEN ( T_IDENT )? T_EOS
 	;
 
 // R805
 else_stmt
-	:	T_ELSE
-		( T_IDENT )? T_EOS
+	:	(label)? T_ELSE
+		( valid_identifier )? T_EOS
 	;
 
 // R806
+// TODO is ()? valid in a predicate?
 end_if_stmt
-options {k=2;}
-	: (T_END T_IF) => T_END T_IF ( T_IDENT )? T_EOS
-	| T_ENDIF ( T_IDENT )? T_EOS
+options {k=3;}
+	: ((label)? T_END T_IF) => (label)? T_END T_IF ( valid_identifier )? T_EOS
+	| (label)? T_ENDIF ( valid_identifier )? T_EOS
 	;
 
 // R807
 // ERR_CHK 807 scalar_logical_expr replaced by expr
 if_stmt
-	:	T_IF
+	:	(label)? T_IF
 		T_LPAREN
 		expr
 		T_RPAREN
@@ -2081,7 +2115,7 @@ case_construct
 // R809
 // ERR_CHK 809 case_expr replaced by expr
 select_case_stmt
-    :    ( T_IDENT T_COLON )?
+    :    (label)? ( valid_identifier T_COLON )?
         t_select_case
         T_LPAREN expr T_RPAREN T_EOS
     ;
@@ -2094,16 +2128,17 @@ options {k=2;}
 
 // R810
 case_stmt
-	:	T_CASE
+	:	(label)? T_CASE
 		case_selector
-		( T_IDENT )? T_EOS
+		( valid_identifier )? T_EOS
 	;
 
 // R811
+// TODO is ()? valid in a predicate?
 end_select_stmt
-options {k=2;}
-	: (T_END T_SELECT) => T_END T_SELECT T_IDENT T_EOS
-	| T_ENDSELECT T_IDENT T_EOS
+options {k=3;}
+	: ((label)? T_END T_SELECT) => (label)? T_END T_SELECT valid_identifier T_EOS
+	| (label)? T_ENDSELECT valid_identifier T_EOS
 	;
 
 // R812 inlined case_expr with expr was either scalar_int_expr scalar_char_expr scalar_logical_expr
@@ -2148,7 +2183,7 @@ associate_construct
 
 // R817
 associate_stmt
-    : ( T_IDENT T_COLON )? T_ASSOCIATE T_LPAREN association_list T_RPAREN T_EOS
+    : (label)? ( valid_identifier T_COLON )? T_ASSOCIATE T_LPAREN association_list T_RPAREN T_EOS
     ;
 
 association_list
@@ -2158,7 +2193,7 @@ association_list
 // R818
 // T_IDENT inlined for associate_name
 association
-	:	T_IDENT T_EQ_GT selector
+	:	valid_identifier T_EQ_GT selector
 	;
 
 // R819
@@ -2168,10 +2203,11 @@ selector
 	;
 
 // R820
+// TODO is ()? valid in a predicate?
 end_associate_stmt
-options {k=2;}
-	: (T_END T_ASSOCIATE) => T_END T_ASSOCIATE ( T_IDENT )? T_EOS
-	| T_ENDASSOCIATE ( T_IDENT )? T_EOS
+options {k=3;}
+	: ((label)? T_END T_ASSOCIATE) => (label)? T_END T_ASSOCIATE ( valid_identifier )? T_EOS
+	| (label)? T_ENDASSOCIATE ( valid_identifier )? T_EOS
 	;
 
 // R821
@@ -2182,8 +2218,8 @@ select_type_construct
 // R822
 // T_IDENT inlined for select_construct_name and associate_name
 select_type_stmt
-    : ( T_IDENT T_COLON )? select_type
-         T_LPAREN ( T_IDENT T_EQ_GT )? selector T_RPAREN T_EOS
+    : (label)? ( valid_identifier T_COLON )? select_type
+         T_LPAREN ( valid_identifier T_EQ_GT )? selector T_RPAREN T_EOS
     ;
 
 select_type
@@ -2195,24 +2231,25 @@ options {k=2;}
 // R823
 // T_IDENT inlined for select_construct_name
 type_guard_stmt
-	:	T_TYPE_IS T_LPAREN
+	:	(label)? T_TYPE_IS T_LPAREN
 		type_spec
 		T_RPAREN
-		( T_IDENT )? T_EOS
-	|	T_CLASS_IS T_LPAREN
+		( valid_identifier )? T_EOS
+	|	(label)? T_CLASS_IS T_LPAREN
 		type_spec
 		T_RPAREN
-		( T_IDENT )? T_EOS
-	|	T_CLASS	T_DEFAULT
-		( T_IDENT )? T_EOS
+		( valid_identifier )? T_EOS
+	|	(label)? T_CLASS	T_DEFAULT
+		( valid_identifier )? T_EOS
 	;
 
 // R824
 // T_IDENT inlined for select_construct_name
+// TODO is ()? valid in a predicate?
 end_select_type_stmt
-options {k=2;}
-	:	(T_END T_SELECT) => T_END T_SELECT ( T_IDENT )? T_EOS
-	|	T_ENDSELECT ( T_IDENT )? T_EOS
+options {k=3;}
+	:	((label)? T_END T_SELECT) => (label)? T_END T_SELECT ( valid_identifier )? T_EOS
+	|	(label)? T_ENDSELECT ( valid_identifier )? T_EOS
 	;
 
 // R825
@@ -2233,14 +2270,14 @@ block_do_construct
 // R827
 // label_do_stmt and nonlabel_do_stmt inlined
 do_stmt
-	:	( T_IDENT T_COLON )? T_DO ( T_DIGIT_STRING )? ( loop_control )? T_EOS
+	:	(label)? ( valid_identifier T_COLON )? T_DO ( T_DIGIT_STRING )? ( loop_control )? T_EOS
 	;
 
 // R828
 // T_IDENT inlined for do_construct_name
 // T_DIGIT_STRING inlined for label
 label_do_stmt
-	:	( T_IDENT T_COLON )? T_DO T_DIGIT_STRING ( loop_control )? T_EOS
+	:	(label)? ( valid_identifier T_COLON )? T_DO T_DIGIT_STRING ( loop_control )? T_EOS
 	;
 
 // R829 inlined in R827
@@ -2250,6 +2287,7 @@ label_do_stmt
 // ERR_CHK 830a scalar_int_expr replaced by expr
 // ERR_CHK 830b scalar_logical_expr replaced by expr
 loop_control
+options {backtrack=true; memoize=true; greedy=true;}
     : ( T_COMMA )? do_variable T_EQUALS expr T_COMMA expr ( T_COMMA expr )?
     | ( T_COMMA )? T_WHILE T_LPAREN expr T_RPAREN
     ;
@@ -2268,17 +2306,18 @@ do_variable
 // do_term_action_stmt added to allow block_do_construct to cover nonblock_do_construct as well
 // TODO putback
 end_do
-	:	(label)? end_do_stmt
+	:	end_do_stmt
 //	|	(label)? T_CONTINUE T_EOS
 	|	do_term_action_stmt
 	;
 
 // R834
 // T_IDENT inlined for do_construct_name
+// TODO is ()? valid in a predicate?
 end_do_stmt
-options {k=2;}
-	: (T_END T_DO) => T_END T_DO ( T_IDENT )? T_EOS
-	| T_ENDDO ( T_IDENT )? T_EOS
+options {k=3;}
+	: ((label)? T_END T_DO) => (label)? T_END T_DO ( valid_identifier )? T_EOS
+	| (label)? T_ENDDO ( valid_identifier )? T_EOS
 	;
 
 // R835 nonblock_do_construct deleted as it was combined with block_do_construct to reduce backtracking
@@ -2311,13 +2350,13 @@ do_term_action_stmt
 // R843
 // T_IDENT inlined for do_construct_name
 cycle_stmt
-	:	T_CYCLE ( T_IDENT )? T_EOS
+	:	(label)? T_CYCLE ( valid_identifier )? T_EOS
 	;
 
 // R844
 // T_IDENT inlined for do_construct_name
 exit_stmt
-	:	T_EXIT ( T_IDENT )? T_EOS
+	:	(label)? T_EXIT ( valid_identifier )? T_EOS
 	;
 
 // R845
@@ -2328,7 +2367,7 @@ goto_stmt
 // R846
 // ERR_CHK 846 scalar_int_expr replaced by expr
 computed_goto_stmt
-	:	t_go_to T_LPAREN label_list T_RPAREN ( T_COMMA )? expr T_EOS
+	:	(label)? t_go_to T_LPAREN label_list T_RPAREN ( T_COMMA )? expr T_EOS
 	;
 
 t_go_to
@@ -2342,7 +2381,7 @@ options {k=2;}
 // R847
 // ERR_CHK 847 scalar_numeric_expr replaced by expr
 arithmetic_if_stmt
-	:	T_IF
+	:	(label)? T_IF
 		T_LPAREN
 		expr
 		T_RPAREN
@@ -2357,7 +2396,7 @@ arithmetic_if_stmt
 
 // R849
 stop_stmt
-	:	T_STOP ( stop_code )? T_EOS
+	:	(label)? T_STOP ( stop_code )? T_EOS
 	;
 
 // R850
@@ -2392,7 +2431,7 @@ file_unit_number
 
 // R904
 open_stmt
-	:	T_OPEN T_LPAREN connect_spec_list T_RPAREN T_EOS
+	:	(label)? T_OPEN T_LPAREN connect_spec_list T_RPAREN T_EOS
 	;
 
 // R905
@@ -2420,7 +2459,7 @@ connect_spec_list
 
 // R908
 close_stmt
-	:	T_CLOSE T_LPAREN close_spec_list T_RPAREN T_EOS
+	:	(label)? T_CLOSE T_LPAREN close_spec_list T_RPAREN T_EOS
 	;
 
 // R909
@@ -2435,20 +2474,21 @@ close_spec_list
 	;
 
 // R910
+// TODO is ()? valid in a predicate?
 read_stmt
-options {k=2;}
-    :    (T_READ T_LPAREN) => T_READ T_LPAREN io_control_spec_list T_RPAREN ( input_item_list )? T_EOS
-    |    (T_READ) => T_READ format ( T_COMMA input_item_list )? T_EOS
+options {k=3;}
+    :    ((label)? T_READ T_LPAREN) => (label)? T_READ T_LPAREN io_control_spec_list T_RPAREN ( input_item_list )? T_EOS
+    |    ((label)? T_READ) => (label)? T_READ format ( T_COMMA input_item_list )? T_EOS
     ;
 
 // R911
 write_stmt
-	:	T_WRITE T_LPAREN io_control_spec_list T_RPAREN ( output_item_list )? T_EOS
+	:	(label)? T_WRITE T_LPAREN io_control_spec_list T_RPAREN ( output_item_list )? T_EOS
 	;
 
 // R912
 print_stmt
-    :    T_PRINT format ( T_COMMA output_item_list )? T_EOS
+    :    (label)? T_PRINT format ( T_COMMA output_item_list )? T_EOS
     ;
 
 // R913
@@ -2537,7 +2577,7 @@ dtv_type_spec
 
 // R921
 wait_stmt
-	:	T_WAIT T_LPAREN wait_spec_list T_RPAREN T_EOS
+	:	(label)? T_WAIT T_LPAREN wait_spec_list T_RPAREN T_EOS
 	;
 
 // R922
@@ -2552,26 +2592,29 @@ wait_spec_list
 	;
 
 // R923
+// TODO is ()? valid in a predicate?
 backspace_stmt
-options {k=2;}
-	:	(T_BACKSPACE T_LPAREN) => T_BACKSPACE T_LPAREN position_spec_list T_RPAREN T_EOS
-	|	(T_BACKSPACE) => T_BACKSPACE file_unit_number T_EOS
+options {k=3;}
+	:	((label)? T_BACKSPACE T_LPAREN) => (label)? T_BACKSPACE T_LPAREN position_spec_list T_RPAREN T_EOS
+	|	((label)? T_BACKSPACE) => (label)? T_BACKSPACE file_unit_number T_EOS
 	;
 
 // R924
+// TODO is ()? valid in a predicate?
 endfile_stmt
 options {k=3;}
-	:	(T_END T_FILE T_LPAREN) => T_END T_FILE T_LPAREN position_spec_list T_RPAREN T_EOS
-	|	(T_ENDFILE T_LPAREN) => T_ENDFILE T_LPAREN position_spec_list T_RPAREN T_EOS
-	|	(T_END T_FILE) => T_END T_FILE file_unit_number T_EOS
-	|	(T_ENDFILE) => T_ENDFILE file_unit_number T_EOS
+	:	((label)? T_END T_FILE T_LPAREN) => (label)? T_END T_FILE T_LPAREN position_spec_list T_RPAREN T_EOS
+	|	((label)? T_ENDFILE T_LPAREN) => (label)? T_ENDFILE T_LPAREN position_spec_list T_RPAREN T_EOS
+	|	((label)? T_END T_FILE) => (label)? T_END T_FILE file_unit_number T_EOS
+	|	((label)? T_ENDFILE) => (label)? T_ENDFILE file_unit_number T_EOS
 	;
 
 // R925
+// TODO is ()? valid in a predicate?
 rewind_stmt
-options {k=2;}
-	:	(T_REWIND T_LPAREN) => T_REWIND T_LPAREN position_spec_list T_RPAREN T_EOS
-	|	(T_REWIND) => T_REWIND file_unit_number T_EOS
+options {k=3;}
+	:	((label)? T_REWIND T_LPAREN) => (label)? T_REWIND T_LPAREN position_spec_list T_RPAREN T_EOS
+	|	((label)? T_REWIND) => (label)? T_REWIND file_unit_number T_EOS
 	;
 
 // R926
@@ -2586,10 +2629,11 @@ position_spec_list
 	;
 
 // R927
+// TODO is ()? valid in a predicate?
 flush_stmt
-options {k=2;}
-	:	(T_FLUSH T_LPAREN) => T_FLUSH T_LPAREN flush_spec_list T_RPAREN T_EOS
-	|	(T_FLUSH) => T_FLUSH file_unit_number T_EOS
+options {k=3;}
+	:	((label)? T_FLUSH T_LPAREN) => (label)? T_FLUSH T_LPAREN flush_spec_list T_RPAREN T_EOS
+	|	((label)? T_FLUSH) => (label)? T_FLUSH file_unit_number T_EOS
 	;
 
 // R928
@@ -2606,8 +2650,8 @@ flush_spec_list
 // R929
 inquire_stmt
 options {backtrack=true;}
-	:	T_INQUIRE T_LPAREN inquire_spec_list T_RPAREN T_EOS
-	|	T_INQUIRE T_LPAREN T_IDENT /* 'IOLENGTH' */ T_EQUALS scalar_int_variable T_RPAREN output_item_list T_EOS
+	:	(label)? T_INQUIRE T_LPAREN inquire_spec_list T_RPAREN T_EOS
+	|	(label)? T_INQUIRE T_LPAREN valid_identifier /* 'IOLENGTH' */ T_EQUALS scalar_int_variable T_RPAREN output_item_list T_EOS
 	;
 
 
@@ -2636,7 +2680,7 @@ Section 10:
 
 // R1001
 format_stmt
-	:	T_FORMAT format_specification T_EOS
+	:	(label)? T_FORMAT format_specification T_EOS
 	;
 
 // R1002
@@ -2745,17 +2789,18 @@ main_program
 // R1102
 // T_IDENT inlined for program_name
 program_stmt
-	:	T_PROGRAM
-		T_IDENT T_EOS
+	:	(label)? T_PROGRAM
+		valid_identifier T_EOS
 	;
 
 // R1103
 // T_IDENT inlined for program_name
+// TODO is ()? valid in a predicate?
 end_program_stmt
-options {k=2;}
-	:	(T_END T_PROGRAM) => T_END T_PROGRAM ( T_IDENT )? end_of_stmt
-	|	T_ENDPROGRAM ( T_IDENT )? end_of_stmt
-	|	T_END end_of_stmt
+options {k=3;}
+	:	((label)? T_END T_PROGRAM) => (label)? T_END T_PROGRAM ( valid_identifier )? end_of_stmt
+	|	(label)? T_ENDPROGRAM ( valid_identifier )? end_of_stmt
+	|	(label)? T_END end_of_stmt
 	;
 
 	
@@ -2771,16 +2816,17 @@ module
 
 // R1105
 module_stmt
-	:	T_MODULE ( T_IDENT )? T_EOS
+	:	(label)? T_MODULE ( valid_identifier )? T_EOS
 	;
 
 
 // R1106
+// TODO is ()? valid in a predicate?
 end_module_stmt
-options {k=2;}
-        :       (T_END T_MODULE) => T_END T_MODULE ( T_IDENT )? end_of_stmt
-        |       T_ENDMODULE ( T_IDENT )? end_of_stmt
-        |       T_END end_of_stmt
+options {k=3;}
+        :       ((label)? T_END T_MODULE) => (label)? T_END T_MODULE ( valid_identifier )? end_of_stmt
+        |       (label)? T_ENDMODULE ( valid_identifier )? end_of_stmt
+        |       (label)? T_END end_of_stmt
         ;
 
 // R1107
@@ -2800,8 +2846,8 @@ module_subprogram
 
 // R1109
 use_stmt
-    :    T_USE ( ( T_COMMA module_nature )? T_COLON_COLON )? T_IDENT ( T_COMMA rename_list )? T_EOS
-    |    T_USE ( ( T_COMMA module_nature )? T_COLON_COLON )? T_IDENT T_COMMA T_ONLY T_COLON ( only_list )? T_EOS
+    :    (label)? T_USE ( ( T_COMMA module_nature )? T_COLON_COLON )? valid_identifier ( T_COMMA rename_list )? T_EOS
+    |    (label)? T_USE ( ( T_COMMA module_nature )? T_COLON_COLON )? valid_identifier T_COMMA T_ONLY T_COLON ( only_list )? T_EOS
     ;
 
 // R1110
@@ -2814,7 +2860,7 @@ module_nature
 // T_DEFINED_OP inlined for local_defined_operator and use_defined_operator
 // T_IDENT inlined for local_name and use_name
 rename
-	:	T_IDENT T_EQ_GT T_IDENT
+	:	valid_identifier T_EQ_GT valid_identifier
 	|	T_OPERATOR T_LPAREN T_DEFINED_OP T_RPAREN T_EQ_GT
 		T_OPERATOR T_LPAREN T_DEFINED_OP T_RPAREN
 	;
@@ -2850,20 +2896,22 @@ block_data
 	;
 
 // R1117
+// TODO is ()? valid in a predicate?
 block_data_stmt
-options {k=2;}
-	:	(T_BLOCK T_DATA) => T_BLOCK T_DATA ( T_IDENT )? T_EOS
-	|   T_BLOCKDATA ( T_IDENT )? T_EOS
+options {k=3;}
+	:	((label)? T_BLOCK T_DATA) => (label)? T_BLOCK T_DATA ( valid_identifier )? T_EOS
+	|   (label)? T_BLOCKDATA ( valid_identifier )? T_EOS
 	;
 
 // R1118
+// TODO is ()? valid in a predicate?
 end_block_data_stmt
-options {k=2;}
-	:   (T_END T_BLOCK) => T_END T_BLOCK T_DATA ( T_IDENT )? end_of_stmt
-	|   (T_ENDBLOCK T_DATA) => T_ENDBLOCK T_DATA ( T_IDENT )? end_of_stmt
-	|   (T_END T_BLOCKDATA) => T_END T_BLOCKDATA ( T_IDENT )? end_of_stmt
-	|   T_ENDBLOCKDATA ( T_IDENT )? end_of_stmt
-	|	T_END end_of_stmt
+options {k=3;}
+	:   ((label)? T_END T_BLOCK) => (label)? T_END T_BLOCK T_DATA ( valid_identifier )? end_of_stmt
+	|   ((label)? T_ENDBLOCK T_DATA) => (label)? T_ENDBLOCK T_DATA ( valid_identifier )? end_of_stmt
+	|   ((label)? T_END T_BLOCKDATA) => (label)? T_END T_BLOCKDATA ( valid_identifier )? end_of_stmt
+	|   (label)? T_ENDBLOCKDATA ( valid_identifier )? end_of_stmt
+	|	(label)? T_END end_of_stmt
 	;
 
 /*
@@ -2885,15 +2933,16 @@ interface_specification
 
 // R1203
 interface_stmt
-	:   T_INTERFACE ( generic_spec )? T_EOS
-	|	T_ABSTRACT T_INTERFACE T_EOS
+	:   (label)? T_INTERFACE ( generic_spec )? T_EOS
+	|	(label)? T_ABSTRACT T_INTERFACE T_EOS
 	;
 
 // R1204
+// TODO is ()? valid in a predicate?
 end_interface_stmt
-options {k=2;}
-	: (T_END T_INTERFACE) => T_END T_INTERFACE ( generic_spec )? T_EOS
-	| T_ENDINTERFACE ( generic_spec )? T_EOS
+options {k=3;}
+	: ((label)? T_END T_INTERFACE) => (label)? T_END T_INTERFACE ( generic_spec )? T_EOS
+	| (label)? T_ENDINTERFACE ( generic_spec )? T_EOS
 	;
 
 // R1205
@@ -2906,13 +2955,13 @@ interface_body
 // R1206
 // generic_name_list substituted for procedure_name_list
 procedure_stmt
-	:	( T_MODULE )? T_PROCEDURE generic_name_list T_EOS
+	:	(label)? ( T_MODULE )? T_PROCEDURE generic_name_list T_EOS
 	;
 
 // R1207
 // T_IDENT inlined for generic_name
 generic_spec
-	:	T_IDENT
+	:	valid_identifier
 	|	T_OPERATOR T_LPAREN defined_operator T_RPAREN
 	|	T_ASSIGNMENT T_LPAREN T_EQUALS T_RPAREN
 	|	dtio_generic_spec
@@ -2929,25 +2978,25 @@ dtio_generic_spec
 // R1209
 // generic_name_list substituted for import_name_list
 import_stmt
-    :    T_IMPORT ( ( T_COLON_COLON )? generic_name_list )? T_EOS
+    :    (label)? T_IMPORT ( ( T_COLON_COLON )? generic_name_list )? T_EOS
     ;
 
 // R1210
 // generic_name_list substituted for external_name_list
 external_stmt
-	:	T_EXTERNAL ( T_COLON_COLON )? generic_name_list T_EOS
+	:	(label)? T_EXTERNAL ( T_COLON_COLON )? generic_name_list T_EOS
 	;
 
 // R1211
 procedure_declaration_stmt
-    :    T_PROCEDURE T_LPAREN ( proc_interface )? T_RPAREN
+    :    (label)? T_PROCEDURE T_LPAREN ( proc_interface )? T_RPAREN
             ( ( T_COMMA proc_attr_spec )* T_COLON_COLON )? proc_decl_list T_EOS
     ;
 
 // R1212
 // T_IDENT inlined for interface_name
 proc_interface
-	:	T_IDENT
+	:	valid_identifier
 	|	declaration_type_spec
 	;
 
@@ -2964,7 +3013,7 @@ proc_attr_spec
 // R1214
 // T_IDENT inlined for procedure_entity_name
 proc_decl
-    :    T_IDENT ( T_EQ_GT null_init )?
+    :    valid_identifier ( T_EQ_GT null_init )?
     ;
 
 proc_decl_list
@@ -2976,7 +3025,7 @@ proc_decl_list
 // R1216
 // generic_name_list substituted for intrinsic_procedure_name_list
 intrinsic_stmt
-	:	T_INTRINSIC
+	:	(label)? T_INTRINSIC
 		( T_COLON_COLON )?
 		generic_name_list T_EOS
 	;
@@ -2986,7 +3035,7 @@ intrinsic_stmt
 // R1218
 // C1222 (R1218) The procedure-designator shall designate a subroutine.
 call_stmt
-    :    T_CALL procedure_designator
+    :    (label)? T_CALL procedure_designator
          ( T_LPAREN ( actual_arg_spec_list )? T_RPAREN )? T_EOS
     ;
 
@@ -3040,7 +3089,7 @@ function_subprogram
 // left factored optional prefix from function_stmt
 // generic_name_list substituted for dummy_arg_name_list
 function_stmt
-	:	T_FUNCTION T_IDENT
+	:	(label)? T_FUNCTION valid_identifier
 		T_LPAREN ( generic_name_list )? T_RPAREN ( suffix )? T_EOS
 	;
 
@@ -3085,11 +3134,12 @@ result_name
     ;
 
 // R1230
+// TODO is ()? valid in a predicate?
 end_function_stmt
-options {k=2;}
-	: (T_END T_FUNCTION) => T_END T_FUNCTION ( T_IDENT )? end_of_stmt
-	| T_ENDFUNCTION ( T_IDENT )? end_of_stmt
-	| T_END end_of_stmt
+options {k=3;}
+	: ((label)? T_END T_FUNCTION) => (label)? T_END T_FUNCTION ( valid_identifier )? end_of_stmt
+	| (label)? T_ENDFUNCTION ( valid_identifier )? end_of_stmt
+	| (label)? T_END end_of_stmt
 	;
 
 // R1231
@@ -3104,14 +3154,14 @@ subroutine_subprogram
 
 // R1232
 subroutine_stmt
-    :     (t_prefix)? T_SUBROUTINE T_IDENT
+    :     (label)? (t_prefix)? T_SUBROUTINE valid_identifier
           ( T_LPAREN ( dummy_arg_list )? T_RPAREN ( proc_language_binding_spec )? )? T_EOS
     ;
 
 // R1233
 // T_IDENT inlined for dummy_arg_name
 dummy_arg
-	:	T_IDENT
+	:	valid_identifier
 	|	T_ASTERISK
 	;
 
@@ -3120,24 +3170,25 @@ dummy_arg_list
     ;
 
 // R1234
+// TODO is ()? valid in a predicate?
 end_subroutine_stmt
-options {k=2;}
-    : (T_END T_SUBROUTINE) => T_END T_SUBROUTINE ( T_IDENT )? end_of_stmt
-    | T_ENDSUBROUTINE ( T_IDENT )? end_of_stmt
-    | T_END end_of_stmt
+options {k=3;}
+    : ((label)? T_END T_SUBROUTINE) => (label)? T_END T_SUBROUTINE ( valid_identifier )? end_of_stmt
+    | (label)? T_ENDSUBROUTINE ( valid_identifier )? end_of_stmt
+    | (label)? T_END end_of_stmt
     ;
 
 // R1235
 // T_INDENT inlined for entry_name
 entry_stmt
-    :    T_ENTRY T_IDENT
+    :    (label)? T_ENTRY valid_identifier
           ( T_LPAREN ( dummy_arg_list )? T_RPAREN ( suffix )? )? T_EOS
     ;
 
 // R1236
 // ERR_CHK 1236 scalar_int_expr replaced by expr
 return_stmt
-	:	T_RETURN ( expr )? T_EOS
+	:	(label)? T_RETURN ( expr )? T_EOS
 	;
 
 // R1237 contains_stmt inlined as T_CONTAINS
@@ -3148,7 +3199,7 @@ return_stmt
 // TODO Hopefully scanner and parser can help work together here to work around ambiguity.
 //      Need scanner to send special token if it sees what?
 stmt_function_stmt
-	:	T_STMT_FUNCTION T_IDENT T_LPAREN ( generic_name_list )? T_RPAREN T_EQUALS expr T_EOS
+	:	(label)? T_STMT_FUNCTION valid_identifier T_LPAREN ( generic_name_list )? T_RPAREN T_EQUALS expr T_EOS
 	;
 
 // added this to have a way to match the T_EOS and EOF combinations
@@ -3159,3 +3210,8 @@ options {k=2;}
     | T_EOS
     ;
 
+valid_identifier
+    : { ((FortranTokenStream)input).needIdent = 1; } T_IDENT 
+    ;
+
+        
