@@ -184,9 +184,9 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 					postCommand(new TerminateCommand(tasks));
 				}
 			break;
-			case IPCDIErrorEvent.DBG_NORMAL:
-				session.unregisterTargets(tasks.copy(), true);
-			break;
+			//case IPCDIErrorEvent.DBG_NORMAL:
+				//session.unregisterTargets(tasks.copy(), true);
+			//break;
 		}
 	}
 	private void postStopDebugger() {
