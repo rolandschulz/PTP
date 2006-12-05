@@ -41,6 +41,7 @@ import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.ui.actions.ParallelAction;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
+import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
@@ -68,7 +69,11 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 	//zoom
 	protected int zoom_depth = 0;
 	protected Zoom zoom = new Zoom();
-		
+
+	//last action
+	protected int last_action = -1;
+	protected IElementSet last_element_set = null;
+	
 	public AbstractParallelSetView(IManager manager) {
 		super(manager);
 	}
@@ -229,18 +234,31 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 		case IIconCanvasActionListener.CUT_ACTION:
 			if (elements.length > 0) {
 				if (!cur_element_set.isRootSet()) {
-					manager.removeFromSet(elements, cur_element_set.getID(), cur_element_set.getElementHandler());
 					clipboard.clear();
 					clipboard.add(elements);
-					selectSet(cur_element_set.getElementHandler().getSet(cur_element_set.getID()));
-					updateTitle();
-					refresh(false);
+					last_action = type;
+					last_element_set = cur_element_set;
+					//manager.removeFromSet(elements, cur_element_set.getID(), cur_element_set.getElementHandler());
+					//selectSet(cur_element_set.getElementHandler().getSet(cur_element_set.getID()));
+					//updateTitle();
+					//refresh(false);
 				}
 			}
 			break;
 		case IIconCanvasActionListener.PASTE_ACTION:
 			if (clipboard.size() > 0) {
 				IElement[] clipElements = (IElement[])clipboard.get(0);
+				if (last_action == IIconCanvasActionListener.CUT_ACTION) {
+					if (last_element_set != null && !last_element_set.getID().equals(cur_element_set.getID())) {
+						if (last_element_set.size() == clipElements.length) {
+							manager.removeSet(last_element_set.getID(), last_element_set.getElementHandler());
+						}
+						else {
+							manager.removeFromSet(clipElements, last_element_set.getID(), last_element_set.getElementHandler());
+						}
+					}
+				}
+				
 				if (cur_element_set.isRootSet())
 					createSetAction.run(clipElements);
 				else {
@@ -249,6 +267,8 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 					update();
 					refresh(false);
 				}
+				type = -1;
+				last_element_set = null;
 			}
 			break;
 		case IIconCanvasActionListener.DELETE_ACTION:

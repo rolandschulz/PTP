@@ -1786,17 +1786,7 @@ public class IconCanvas extends Canvas {
 			if (fInformationControl == null)
 				showToolTip(index, event);
 			
-			if (!show_tooltip_allthetime && fInformationControl != null) {
-				getHoverTimer().schedule(new TimerTask() {
-					public void run() {
-						getDisplay().asyncExec(new Runnable() {
-							public void run() {
-								hideToolTip();								
-							}
-						});
-					}
-				}, tooltip_timeout);
-			}
+			enableTooltipTimer();
 		} else {
 			setCursor(null);
 			hideToolTip();
@@ -1810,12 +1800,28 @@ public class IconCanvas extends Canvas {
 			fInformationControl.setVisible(false);
 			fInformationControl.dispose();
 		}
+		disableTooltipTimer();
+	}
+	protected void disableTooltipTimer() {
 		if (hoverTimer != null) {
 			hoverTimer.cancel();
 			//hoverTimer.purge();
 			hoverTimer = null;
 		}
-	}	
+	}
+	protected void enableTooltipTimer() {
+		if (!show_tooltip_allthetime && fInformationControl != null) {
+			getHoverTimer().schedule(new TimerTask() {
+				public void run() {
+					getDisplay().asyncExec(new Runnable() {
+						public void run() {
+							hideToolTip();								
+						}
+					});
+				}
+			}, tooltip_timeout);
+		}
+	}
 	/** Get hover timer
 	 * @return
 	 */
@@ -2152,17 +2158,17 @@ public class IconCanvas extends Canvas {
 	 * Self testing
 	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
 	public static void main(String[] args) {
-		final int totalImage = 5000;
+		final int totalImage = 50;
         final Display display = new Display();
         final Shell shell = new Shell(display);
-        shell.setLocation(0, 0);
-        shell.setSize(600, 400);
+        shell.setLocation(100, 200);
+        shell.setSize(600, 100);
         shell.setLayout(new FillLayout());
 
 		//File normalFile = new File("D:/eclipse3.1/workspace/org.eclipse.ptp.ui/icons/node/node_running.gif");
 		//File selectedFile = new File("D:/eclipse3.1/workspace/org.eclipse.ptp.ui/icons/node/node_running_sel.gif");
-		File normalFile = new File("/home/Clement/eclipse/workspace/org.eclipse.ptp.ui/icons/node/node_running.gif");
-		File selectedFile = new File("/home/Clement/eclipse/workspace/org.eclipse.ptp.ui/icons/node/node_running_sel.gif");
+		File normalFile = new File("/home/clement/eclipse/workspace/org.eclipse.ptp.ui/icons/node/node_running.gif");
+		File selectedFile = new File("/home/clement/eclipse/workspace/org.eclipse.ptp.ui/icons/node/node_running_sel.gif");
 		
 		URL normalURL = null;
 		URL selectedlURL = null;
@@ -2176,16 +2182,16 @@ public class IconCanvas extends Canvas {
 		final Image normalImage1 = ImageDescriptor.createFromURL(normalURL).createImage();
 		final Image selectedImage1 = ImageDescriptor.createFromURL(selectedlURL).createImage();
         
-		int w = 6;
-		int h = 6;
+		int w = 16;
+		int h = 16;
 		final Image normalImage = new Image(normalImage1.getDevice(), normalImage1.getImageData().scaledTo(w, h));		
 		final Image selectedImage = new Image(selectedImage1.getDevice(), selectedImage1.getImageData().scaledTo(w, h));		
 
         IconCanvas iconCanvas = new IconCanvas(shell, SWT.NONE);
         iconCanvas.setIconSize(w, h);
-        iconCanvas.setFontSize(6);
+        iconCanvas.setFontSize(10);
         iconCanvas.setIconSpace(1, 4);
-        iconCanvas.setTooltipWrap(false);
+        iconCanvas.setTooltipWrap(true);
         iconCanvas.setContentProvider(new IContentProvider() {
         	public Object getObject(int index) {
         		return new Integer(index);
@@ -2204,7 +2210,10 @@ public class IconCanvas extends Canvas {
         iconCanvas.setToolTipProvider(new IToolTipProvider() {
         	public String[] toolTipText(Object obj) {
         		//if (obj.toString().indexOf("1") > -1) {
-        			return new String[] { ("Object: " + obj) };
+        		String t = "<i>12345678901234567890123456789a";
+    			t += "12345678901234567890</i>1<b>23456789</b>a";
+    			t += "12345678901234567890123456789a";
+       			return new String[] { "Object: " + obj, t };
         		//}
         		/*
         		String[] texts = new String[2];
