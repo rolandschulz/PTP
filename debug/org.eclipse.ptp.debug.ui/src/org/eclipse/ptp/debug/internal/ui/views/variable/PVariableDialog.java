@@ -38,6 +38,7 @@ import org.eclipse.ptp.debug.internal.ui.PJobVariableManager.JobVariable;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -109,10 +110,14 @@ public class PVariableDialog extends Dialog {
 		layout.marginHeight = 5;
 		layout.marginWidth = 5;
 		aGroup.setLayout(layout);
-		aGroup.setLayoutData(new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL));
-
+		aGroup.setLayoutData(new GridData(GridData.FILL_BOTH));
+		
 		new Label(aGroup, SWT.NONE).setText(PVariableMessages.getString("PVariablesDialog.availVar"));
-		varTable = new Table(aGroup, SWT.CHECK | SWT.BORDER | SWT.SINGLE | SWT.FULL_SELECTION | SWT.V_SCROLL);
+		
+		ScrolledComposite sc = new ScrolledComposite(aGroup, SWT.V_SCROLL | SWT.H_SCROLL);
+		sc.setLayoutData(new GridData(GridData.FILL_BOTH));
+
+		varTable = new Table(sc, SWT.CHECK | SWT.BORDER | SWT.SINGLE | SWT.FULL_SELECTION);
 		GridData gd = new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL);
 		gd.verticalSpan = 30;
 		varTable.setLayoutData(gd);
@@ -124,6 +129,11 @@ public class PVariableDialog extends Dialog {
 				updateButtons();
 			}
 		});
+		sc.setContent(varTable);
+		sc.setExpandVertical(true);
+	    sc.setExpandHorizontal(true);
+	    sc.setMinSize(300, 200);
+	    sc.setSize(300, 250);
 
 		Composite comp2 = new Composite(aGroup, SWT.NONE);
 		comp2.setLayout(new GridLayout(2, false));
@@ -155,9 +165,12 @@ public class PVariableDialog extends Dialog {
 		layout.marginHeight = 5;
 		layout.marginWidth = 5;
 		aGroup.setLayout(layout);
-		aGroup.setLayoutData(new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL));
+		aGroup.setLayoutData(new GridData(GridData.FILL_BOTH));
 		
-		setTable = new Table(aGroup, SWT.CHECK | SWT.BORDER | SWT.FULL_SELECTION | SWT.V_SCROLL);
+		ScrolledComposite sc = new ScrolledComposite(aGroup, SWT.V_SCROLL | SWT.H_SCROLL);
+		sc.setLayoutData(new GridData(GridData.FILL_BOTH));
+
+		setTable = new Table(sc, SWT.CHECK | SWT.BORDER | SWT.FULL_SELECTION);
 		GridData gd = new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL);
 		gd.verticalSpan = 25;
 		setTable.setLayoutData(gd);
@@ -176,6 +189,11 @@ public class PVariableDialog extends Dialog {
 				updateButtons();
 			}	
 		});
+		sc.setContent(setTable);
+		sc.setExpandVertical(true);
+	    sc.setExpandHorizontal(true);
+	    sc.setMinSize(300, 100);
+	    sc.setSize(300, 150);
 	}
 	/** Set Set table items checked or not
 	 * @param checked check or not

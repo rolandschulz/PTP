@@ -43,12 +43,12 @@ public final class PJobVariableManager {
 		variableStorage.closeDebugJobStorage();
 	}
 	public String getResultDisplay(String job_id, int task_id) {
-		StringBuffer display = new StringBuffer();
-
 		ProcessValue procVal = (ProcessValue)varProcStorage.getValue(job_id, PROCESS_KEY);
 		if (procVal == null) {
-			return display.toString();
+			return "";
 		}
+		
+		StringBuffer display = new StringBuffer();
 		VariableValue[] values = procVal.getValues(task_id);
 		for (int i=0; i<values.length; i++) {
 			display.append("<i>");
