@@ -132,6 +132,7 @@ public class DefaultInformationControl implements IIconInformationControl, Dispo
 		layout= new GridLayout(1, false);
 		layout.marginHeight= 0;
 		layout.marginWidth= 0;
+		layout.marginBottom = showDetails?10:0;
 		layout.verticalSpacing= 1;
 		composite.setLayout(layout);
 		composite.setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -170,7 +171,7 @@ public class DefaultInformationControl implements IIconInformationControl, Dispo
 			// Text field
 			fText= new StyledText(composite, SWT.MULTI | SWT.READ_ONLY | style);
 			if ((style & SWT.WRAP) != 0) {//is warp
-				fMaxWidth = SHELL_DEFAULT_WIDTH;
+				fMaxWidth = SHELL_DEFAULT_WIDTH / 2;
 			}
 			
 			fText.setCaret(null);

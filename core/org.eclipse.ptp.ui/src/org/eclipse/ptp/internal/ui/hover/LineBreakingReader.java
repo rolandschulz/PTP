@@ -23,93 +23,120 @@ import java.io.IOException;
 import java.io.Reader;
 import java.text.BreakIterator;
 import org.eclipse.swt.graphics.GC;
-
 /**
  * @author Clement chu
- * 
  */
 public class LineBreakingReader {
-
 	private BufferedReader fReader;
 	private GC fGC;
 	private int fMaxWidth;
-
 	private String fLine;
 	private int fOffset;
-
+	private int fLineLen;
 	private BreakIterator fLineBreakIterator;
-
 	/**
 	 * Creates a reader that breaks an input text to fit in a given width.
-	 * @param reader Reader of the input text
-	 * @param gc The graphic context that defines the currently used font sizes
-	 * @param maxLineWidth The max width (pixes) where the text has to fit in
+	 * 
+	 * @param reader
+	 *            Reader of the input text
+	 * @param gc
+	 *            The graphic context that defines the currently used font sizes
+	 * @param maxLineWidth
+	 *            The max width (pixes) where the text has to fit in
 	 */
 	public LineBreakingReader(Reader reader, GC gc, int maxLineWidth) {
-		fReader= new BufferedReader(reader);
-		fGC= gc;
-		fMaxWidth= maxLineWidth;
-		fOffset= 0;
-		fLine= null;
-		fLineBreakIterator= BreakIterator.getLineInstance();
+		fReader = new BufferedReader(reader);
+		fGC = gc;
+		fMaxWidth = maxLineWidth;
+		fOffset = 0;
+		fLine = null;
+		fLineBreakIterator = BreakIterator.getLineInstance();
 	}
-
-	/** Is formatted line
+	/**
+	 * Is formatted line
+	 * 
 	 * @return true if it is a formatted line
 	 */
 	public boolean isFormattedLine() {
 		return fLine != null;
 	}
-
-	/** Reads the next line. The lengths of the line will not exceed the gived maximum width
+	/**
+	 * Reads the next line. The lengths of the line will not exceed the gived maximum width
+	 * 
 	 * @param indent
 	 * @return
 	 * @throws IOException
 	 */
 	public String readLine(String indent) throws IOException {
 		if (fLine == null) {
-			String line= fReader.readLine();
+			String line = fReader.readLine();
 			if (line == null)
 				return null;
-
-			int lineLen= fGC.textExtent(line).x;
+			int lineLen = fGC.textExtent(line).x;
 			if (fMaxWidth > -1 && lineLen < fMaxWidth) {
 				return line;
 			}
-			fLine= line;
+			fLine = line;
 			fLineBreakIterator.setText(line);
-			fOffset= 0;
+			fOffset = 0;
 		}
-		int breakOffset= findNextBreakOffset(fOffset, indent);
+		int breakOffset = findNextBreakOffset(fOffset, indent);
 		String res;
 		if (breakOffset != BreakIterator.DONE) {
-			res= fLine.substring(fOffset, breakOffset);
-			fOffset= findWordBegin(breakOffset);
+			res = fLine.substring(fOffset, breakOffset);
+			fOffset = findWordBegin(breakOffset);
 			if (fOffset == fLine.length()) {
-				fLine= null;
+				fLine = null;
 			}
-			if (breakOffset == 1 && res.charAt(0) == '\t') {//added to prevent empty line
+			if (breakOffset == 1 && res.charAt(0) == '\t') {// added to prevent empty line
 				return "\t" + readLine(indent);
 			}
 		} else {
-			res= fLine.substring(fOffset);
-			fLine= null;
+			res = fLine.substring(fOffset);
+			fLine = null;
 		}
 		return res;
 	}
-
-	/** Find next breaj offset
+	public String readLine() throws IOException {
+		if (fLine == null) {
+			String line = fReader.readLine();
+			if (line == null)
+				return null;
+			fLineLen = line.length();
+			if (fMaxWidth == -1 || fLineLen < fMaxWidth) {
+				return line;
+			}
+			fLine = line;
+			fOffset = 0;
+		}
+		int endLen = fOffset + fMaxWidth;
+		if (endLen > fLineLen)
+			endLen = fLineLen;
+		String res = fLine.substring(fOffset, endLen);
+		fOffset = endLen;
+		if (fOffset >= fLineLen) {
+			fLine = null;
+			fLineLen = 0;
+		}
+		if (res.charAt(0) == '\t') {// added to prevent empty line
+			return "\t" + res;
+		}
+		return res;
+	}
+	/**
+	 * Find next breaj offset
+	 * 
 	 * @param currOffset
 	 * @param indent
 	 * @return
 	 */
 	private int findNextBreakOffset(int currOffset, String indent) {
-		int currWidth= indent!=null?fGC.textExtent(indent).x:0;
-		int nextOffset= fLineBreakIterator.following(currOffset);
+		int currWidth = indent != null ? fGC.textExtent(indent).x : 0;
+		int nextOffset = fLineBreakIterator.following(currOffset);
 		while (nextOffset != BreakIterator.DONE) {
-			String word= fLine.substring(currOffset, nextOffset);
-			int wordWidth= fGC.textExtent(word).x;
-			int nextWidth= wordWidth + currWidth;
+			String word = fLine.substring(currOffset, nextOffset);
+			int wordWidth = fGC.textExtent(word).x;
+			int nextWidth = wordWidth + currWidth;
 			if (fMaxWidth > -1 && nextWidth > fMaxWidth) {
 				if (currWidth > 0) {
 					return currOffset;
@@ -117,14 +144,15 @@ public class LineBreakingReader {
 					return nextOffset;
 				}
 			}
-			currWidth= nextWidth;
-			currOffset= nextOffset;
-			nextOffset= fLineBreakIterator.next();
+			currWidth = nextWidth;
+			currOffset = nextOffset;
+			nextOffset = fLineBreakIterator.next();
 		}
 		return nextOffset;
 	}
-
-	/** Find word begin index
+	/**
+	 * Find word begin index
+	 * 
 	 * @param idx
 	 * @return
 	 */
