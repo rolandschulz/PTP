@@ -336,7 +336,8 @@ public class PCDIDebugModel {
 		} finally {
 			monitor.done();
 		}
-	}
+	}	
+	
 	/**************************************************
 	 * Debug Job
 	 **************************************************/	
@@ -347,10 +348,10 @@ public class PCDIDebugModel {
 		jobStorage.addValue(job_id, set_id, tasks);
 	}
 	public void addTasks(String job_id, String set_id, BitList tasks) {
-		getTasks(job_id, set_id).or(tasks); // add tasks
+		((BitList)jobStorage.getValue(job_id, set_id)).or(tasks); // add tasks
 	}
 	public void removeTasks(String job_id, String set_id, BitList tasks) {
-		getTasks(job_id, set_id).andNot(tasks); // remove tasks
+		((BitList)jobStorage.getValue(job_id, set_id)).andNot(tasks); // remove tasks
 	}
 	public void deleteSet(String job_id, String set_id) {
 		jobStorage.removeValue(job_id, set_id);
