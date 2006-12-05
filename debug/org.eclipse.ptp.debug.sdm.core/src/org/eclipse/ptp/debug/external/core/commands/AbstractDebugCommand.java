@@ -111,9 +111,9 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 			throw new PCDIException("Unknown error - Command " + getCommandName());
 		}
 		if (result instanceof PCDIException) {
-			if (((PCDIException)result).getErrorCode() == IPCDIErrorEvent.DBG_NORMAL) {
-				return false;
-			}
+			//if (((PCDIException)result).getErrorCode() == IPCDIErrorEvent.DBG_NORMAL) {
+				//return false;
+			//}
 			throw (PCDIException)getReturn();
 		}
 		if (result.equals(RETURN_ERROR)) {
@@ -176,9 +176,11 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 		setReturn(RETURN_CANCEL);
 	}
 	public void doFlush() {
-		command_finish = true;
-		flush = true;
-		setReturn(RETURN_FLUSH);
+		if (getReturn() == null) {
+			command_finish = true;
+			flush = true;
+			setReturn(RETURN_FLUSH);
+		}
 	}
 	private void setCheckTasks() {
 		if (check_tasks == null) {

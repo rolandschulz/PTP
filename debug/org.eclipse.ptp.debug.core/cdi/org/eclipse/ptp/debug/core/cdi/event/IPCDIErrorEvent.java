@@ -25,9 +25,9 @@ import org.eclipse.ptp.debug.core.cdi.IPCDISessionObject;
  * 
  */
 public interface IPCDIErrorEvent extends IPCDIEvent {
-	public static final int DBG_NORMAL = 0; // show in error log and no action
-	public static final int DBG_WARNING = 1; // show in error log and pupup error dialog and no action
-	public static final int DBG_FATAL = 2; // show in error log and pupup error dialog and action - terminate debugger
+	public static final int DBG_NORMAL = 0; // show in error log and pupup error dialog and no action
+	public static final int DBG_WARNING = 1; // show in error log and pupup error dialog and terminate error proceses
+	public static final int DBG_FATAL = 2; // show in error log and pupup error dialog and action - terminate all processes and stop debugger
 	public int getErrorCode();
 	public String getMessage();
 	public IPCDISessionObject getReason();

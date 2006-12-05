@@ -155,20 +155,14 @@ public class ParallelDebugViewEventHandler extends AbstractPDebugEventHandler {
 				refresh();
 				break;
 			case IPDebugEvent.ERROR:
-				switch (event.getDetail()) {
-				case IPDebugEvent.ERR_NORMAL:
-					break;
-				case IPDebugEvent.ERR_WARNING:
-				case IPDebugEvent.ERR_FATAL:
-					final IPDebugErrorInfo errInfo = (IPDebugErrorInfo)info;
-					PTPDebugUIPlugin.getDisplay().asyncExec(new Runnable() {
-						public void run() {
-							IStatus status = new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "Error on tasks: "+ PDebugUIUtils.showBitList(errInfo.getAllProcesses()), null);
-							PTPDebugUIPlugin.errorDialog("Fatal Error", status);
-						}
-					});
-					break;
-				}
+				final IPDebugErrorInfo errInfo = (IPDebugErrorInfo)info;
+				PTPDebugUIPlugin.getDisplay().asyncExec(new Runnable() {
+					public void run() {
+						String msg = "Error on tasks: "+ PDebugUIUtils.showBitList(errInfo.getAllProcesses()) + " - " + errInfo.getMsg();
+						IStatus status = new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, msg, null);
+						PTPDebugUIPlugin.errorDialog("Error", status);
+					}
+				});
 				refresh(true);
 				break;
 		}
