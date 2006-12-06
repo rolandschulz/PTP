@@ -1966,7 +1966,7 @@ ConvertVarToAIF(char *exp, MIVar *var, int named)
 
 	a = ComplexVarToAIF(exp, var, named);
 	if (a == NULL) {
-		DbgSetError(DBGERR_UNKNOWN_TYPE, "type not supported (yet)");
+		DbgSetError(DBGERR_UNKNOWN_TYPE, var->type);
 	}
 	return a;
 }
@@ -2030,10 +2030,14 @@ GetAIFVar(char *var, AIF **val, char **type)
 	
 	mivar = CreateMIVar(var);
 	if (mivar == NULL) {
+		DbgSetError(DBGERR_UNKNOWN_VARIABLE, var);
 		return DBGRES_ERR;
 	}
 
 	if ((res = ConvertVarToAIF(var, mivar, 0)) == NULL) {
+		DbgSetError(DBGERR_UNKNOWN_TYPE, mivar->type);
+		DeleteMIVar(mivar->name);
+		MIVarFree(mivar);
 		return DBGRES_ERR;
 	}
 	*type = strdup(mivar->type);
@@ -2732,11 +2736,12 @@ GDBGetPartialAIF(char *var_name, int listChildren, int express)
 	}
 	
 	if (mivar == NULL) {
+		DbgSetError(DBGERR_UNKNOWN_VARIABLE, var_name);
 		return DBGRES_ERR; 
-	}	
+	}
 
 	if ((a = GetPartailAIF(mivar, var_name)) == NULL) {
-		DbgSetError(DBGERR_UNKNOWN_TYPE, "type not supported (yet)");
+		DbgSetError(DBGERR_UNKNOWN_TYPE, mivar->type);
 		MIVarFree(mivar);
 		return DBGRES_ERR; 
 	}

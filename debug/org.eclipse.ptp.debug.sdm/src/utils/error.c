@@ -69,8 +69,8 @@ static char * dbg_error_tab[] =
 	/* DBGERR_SETVAR */			"Can't set variable.",
 	/* DBGERR_PROCSET */		"Invalid process set",
 	/* DBGERR_UNKNOWN */		"Unknown error: \"%s\"",
-	/* DBGERR_UNKNOWN_TYPE */	"Unknown type",
-	/* DBGERR_UNKNOWN_VARIABLE */"Unknown variable"
+	/* DBGERR_UNKNOWN_TYPE */	"Unknown type: \"%s\"",
+	/* DBGERR_UNKNOWN_VARIABLE */"Unknown variable: \"%s\""
 };
 
 /*
