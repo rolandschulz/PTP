@@ -117,7 +117,7 @@ public class PVariableDialog extends Dialog {
 		varTable = new Table(aGroup, SWT.CHECK | SWT.BORDER | SWT.SINGLE | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL);
 		GridData gd = new GridData(GridData.FILL_BOTH);
         gd.widthHint = 300;
-        gd.heightHint = 250;
+        gd.heightHint = 200;
 		//gd.verticalSpan = 30;
 		varTable.setLayoutData(gd);
 		varTable.addSelectionListener(new SelectionAdapter() {
@@ -164,7 +164,7 @@ public class PVariableDialog extends Dialog {
 		setTable = new Table(aGroup, SWT.CHECK | SWT.BORDER | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL);
 		GridData gd = new GridData(GridData.FILL_BOTH);
         gd.widthHint = 300;
-        gd.heightHint = 150;
+        gd.heightHint = 100;
 		//gd.verticalSpan = 25;
 		setTable.setLayoutData(gd);
 		setTable.addSelectionListener(new SelectionAdapter() {
