@@ -20,6 +20,7 @@ package org.eclipse.ptp.debug.internal.ui.views.variable;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugException;
@@ -38,7 +39,6 @@ import org.eclipse.ptp.debug.internal.ui.PJobVariableManager.JobVariable;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -114,12 +114,11 @@ public class PVariableDialog extends Dialog {
 		
 		new Label(aGroup, SWT.NONE).setText(PVariableMessages.getString("PVariablesDialog.availVar"));
 		
-		ScrolledComposite sc = new ScrolledComposite(aGroup, SWT.V_SCROLL | SWT.H_SCROLL);
-		sc.setLayoutData(new GridData(GridData.FILL_BOTH));
-
-		varTable = new Table(sc, SWT.CHECK | SWT.BORDER | SWT.SINGLE | SWT.FULL_SELECTION);
-		GridData gd = new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL);
-		gd.verticalSpan = 30;
+		varTable = new Table(aGroup, SWT.CHECK | SWT.BORDER | SWT.SINGLE | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL);
+		GridData gd = new GridData(GridData.FILL_BOTH);
+        gd.widthHint = 300;
+        gd.heightHint = 250;
+		//gd.verticalSpan = 30;
 		varTable.setLayoutData(gd);
 		varTable.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -129,11 +128,6 @@ public class PVariableDialog extends Dialog {
 				updateButtons();
 			}
 		});
-		sc.setContent(varTable);
-		sc.setExpandVertical(true);
-	    sc.setExpandHorizontal(true);
-	    sc.setMinSize(300, 200);
-	    sc.setSize(300, 250);
 
 		Composite comp2 = new Composite(aGroup, SWT.NONE);
 		comp2.setLayout(new GridLayout(2, false));
@@ -167,12 +161,11 @@ public class PVariableDialog extends Dialog {
 		aGroup.setLayout(layout);
 		aGroup.setLayoutData(new GridData(GridData.FILL_BOTH));
 		
-		ScrolledComposite sc = new ScrolledComposite(aGroup, SWT.V_SCROLL | SWT.H_SCROLL);
-		sc.setLayoutData(new GridData(GridData.FILL_BOTH));
-
-		setTable = new Table(sc, SWT.CHECK | SWT.BORDER | SWT.FULL_SELECTION);
-		GridData gd = new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL);
-		gd.verticalSpan = 25;
+		setTable = new Table(aGroup, SWT.CHECK | SWT.BORDER | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL);
+		GridData gd = new GridData(GridData.FILL_BOTH);
+        gd.widthHint = 300;
+        gd.heightHint = 150;
+		//gd.verticalSpan = 25;
 		setTable.setLayoutData(gd);
 		setTable.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -189,11 +182,6 @@ public class PVariableDialog extends Dialog {
 				updateButtons();
 			}	
 		});
-		sc.setContent(setTable);
-		sc.setExpandVertical(true);
-	    sc.setExpandHorizontal(true);
-	    sc.setMinSize(300, 100);
-	    sc.setSize(300, 150);
 	}
 	/** Set Set table items checked or not
 	 * @param checked check or not
@@ -328,15 +316,7 @@ public class PVariableDialog extends Dialog {
 	 * @see org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets.Composite)
 	 */
 	protected Control createDialogArea(Composite parent) {
-		Composite composite = new Composite(parent, SWT.NONE);
-		GridLayout layout = new GridLayout(1, false);
-		layout.marginHeight = 2;
-		layout.marginWidth = 2;
-		layout.marginTop = 5;
-		layout.verticalSpacing = 0;
-		composite.setLayout(layout);
-		composite.setLayoutData(new GridData(GridData.FILL, GridData.CENTER, true, false));
-		applyDialogFont(composite);
+		Composite composite = (Composite)super.createDialogArea(parent);
 
 		createVarSection(composite);
 		createVerticalSpan(composite, 2);
@@ -344,6 +324,7 @@ public class PVariableDialog extends Dialog {
 		createOthersSection(composite);
 
 		initContent();
+		
 		return composite;
 	}
 	protected String[] getSelectedSets() {
