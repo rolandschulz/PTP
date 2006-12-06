@@ -1798,7 +1798,8 @@ public class IconCanvas extends Canvas {
 	protected void hideToolTip() {
 		if (fInformationControl != null) {
 			fInformationControl.setVisible(false);
-			fInformationControl.dispose();
+			if (fInformationControl != null)
+				fInformationControl.dispose();
 		}
 		disableTooltipTimer();
 	}
