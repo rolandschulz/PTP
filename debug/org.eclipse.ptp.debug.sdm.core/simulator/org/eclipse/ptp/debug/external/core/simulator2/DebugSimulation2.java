@@ -316,17 +316,22 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 		}
 	}
 	
-	public void listStackFrames(final BitList tasks) throws PCDIException {
+	public void listStackFrames(final BitList tasks, int low, int high) throws PCDIException {
 		new Thread(new Runnable() {
 			public void run() {
 				int[] taskArray = tasks.toArray();
 				List frameList = new ArrayList();
 				for (int i=0; i<taskArray.length; i++) {
 					IPCDITarget target = getSession().getTarget(taskArray[i]);
-					SimulateFrame[] frames = getSimProg(taskArray[i]).getSimStackFrames();
-				    for (int j=0; j<frames.length; j++) {
-				    	frameList.add(new StackFrame((Target)target, frames[j].getLevel(), frames[j].getFile(), frames[j].getFunc(), frames[j].getLine(), new BigInteger(frames[j].getAddr())));
-				    }
+					try {
+						org.eclipse.ptp.debug.external.core.cdi.model.Thread t = (org.eclipse.ptp.debug.external.core.cdi.model.Thread)target.getCurrentThread();
+						SimulateFrame[] frames = getSimProg(taskArray[i]).getSimStackFrames();
+					    for (int j=0; j<frames.length; j++) {
+					    	frameList.add(new StackFrame(t, frames[j].getLevel(), frames[j].getFile(), frames[j].getFunc(), frames[j].getLine(), new BigInteger(frames[j].getAddr()), null));
+					    }
+					} catch (PCDIException e) {
+						
+					}
 				}
 				completeCommand(tasks, (IPCDIStackFrame[]) frameList.toArray(new IPCDIStackFrame[0]));
 			}
@@ -372,36 +377,32 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 			}
 		}).start();
 	}
-	public void listArguments(final BitList tasks, final IPCDIStackFrame frame, final int depth) throws PCDIException {
+	public void listArguments(final BitList tasks, int low, int high) throws PCDIException {
 		new Thread(new Runnable() {
 			public void run() {
-				current_frame = frame;
-
 				int[] taskArray = tasks.toArray();
 				List argList = new ArrayList();
 				for (int i=0; i<taskArray.length; i++) {
 					IPCDITarget target = getSession().getTarget(taskArray[i]);
 				    SimVariable[] args = getArguments();
 				    for (int j=0; j<args.length; j++) {
-						argList.add(new Argument((Target) target, null, (StackFrame)current_frame, args[j].getVariable(), args[j].getVariable(), args.length - j, frame.getLevel(), null));
+						argList.add(new Argument((Target) target, null, (StackFrame)current_frame, args[j].getVariable(), args[j].getVariable(), args.length - j, 1, null));
 				    }
 				}
 				completeCommand(tasks, (IPCDIArgument[]) argList.toArray(new IPCDIArgument[0]));
 			}
 		}).start();
 	}
-	public void listLocalVariables(final BitList tasks, final IPCDIStackFrame frame) throws PCDIException {
+	public void listLocalVariables(final BitList tasks) throws PCDIException {
 		new Thread(new Runnable() {
 			public void run() {
-				current_frame = frame;
-		
 				int[] taskArray = tasks.toArray();
 				List varList = new ArrayList();
 				for (int i=0; i<taskArray.length; i++) {
 					IPCDITarget target = getSession().getTarget(taskArray[i]);
 				    SimVariable[] vars = getVariables();
 				    for (int j=0; j<vars.length; j++) {
-				    	varList.add(new LocalVariable((Target) target, null, (StackFrame)current_frame, vars[j].getVariable(), vars[j].getVariable(), vars.length - j, frame.getLevel(), null));
+				    	varList.add(new LocalVariable((Target) target, null, (StackFrame)current_frame, vars[j].getVariable(), vars[j].getVariable(), vars.length - j, 1, null));
 				    }
 				}
 				completeCommand(tasks, (IPCDILocalVariable[])varList.toArray(new IPCDILocalVariable[0]));
@@ -440,6 +441,16 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 	}
 	public void setDataWriteMemoryCommand(final BitList tasks, long offset, String address, int wordFormat, int wordSize, String value) throws PCDIException {
 		throw new PCDIException("not supported in simulator");
+	}
+	
+	public void dataEvaluateExpression(BitList tasks, String expression) throws PCDIException {
+		throw new PCDIException("dataEvaluateExpression - not supported in simulator yet");
+	}
+	public void getPartialAIF(BitList tasks, String expr, boolean listChildren, boolean express) throws PCDIException {
+		throw new PCDIException("getPartialAIF - not supported in simulator yet");
+	}
+	public void variableDelete(BitList tasks, String varname) throws PCDIException {
+		throw new PCDIException("variableDelete - not supported in simulator yet");
 	}
 	
 	public synchronized void update(Observable obs, Object obj) {
