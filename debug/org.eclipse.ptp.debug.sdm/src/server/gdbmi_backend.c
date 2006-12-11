@@ -2056,11 +2056,11 @@ static int get_simple_type(char *type) {
 	
 	//check modifiers
 	if (strncmp(type, "const volatile", 14) == 0)
-		t = strdup(type[15]); //+ 1 remove whitespeace
+		t = strdup(&type[15]); //+ 1 remove whitespeace
 	else if (strncmp(type, "volatile", 8) == 0)
-		t = strdup(type[9]); //+ 1 remove whitespeace
+		t = strdup(&type[9]); //+ 1 remove whitespeace
 	else if (strncmp(type, "const", 5) == 0)
-		t = strdup(type[6]); //+ 1 remove whitespeace
+		t = strdup(&type[6]); //+ 1 remove whitespeace
 	else
 		t = strdup(type);
 		
