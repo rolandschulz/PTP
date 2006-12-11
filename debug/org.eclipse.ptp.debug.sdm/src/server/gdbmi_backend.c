@@ -124,7 +124,8 @@ static void SendCommandWait(MISession *, MICommand *);
 static int	SetAndCheckBreak(int, int, int, char *, char *, int, int);
 static int	GetStackframes(int, int, int, List **);
 static int	GetAIFVar(char *, AIF **, char **);
-static AIF * ConvertVarToAIF(char *, MIVar *, int);
+
+static AIF * GetAIF(MIVar *, char *, int);
 static AIF * GetPartailAIF(MIVar *, char *);
 static void RemoveAllMaps();
 
@@ -1461,592 +1462,9 @@ DumpBinaryValue(MISession *sess, char *exp, char *file)
 		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
 		MICommandFree(cmd);
 		return -1;
-	}
-		
+	}		
 	MICommandFree(cmd);
-	
 	return 0;
-}
-
-/*
-** Evaluate the expression exp.
-*/
-static int
-GDBMIEvaluateExpression(char *exp)
-{
-	char *		type;
-	AIF *		a;
-	dbg_event *	e;
-
-	if (GetAIFVar(exp, &a, &type) != DBGRES_OK)
-		return DBGRES_ERR;
-		
-	e = NewDbgEvent(DBGEV_DATA);
-	e->dbg_event_u.data_event.data = a;
-	e->dbg_event_u.data_event.type_desc = type;
-	SaveEvent(e);
-
-	return DBGRES_OK;
-}
-
-struct simple_type {
-	char *	type_c;
-	int		type;
-};
-
-#define OTHER		0
-#define CHAR		1
-#define SHORT		2
-#define USHORT		3
-#define INT			4
-#define UINT		5
-#define LONG		6
-#define ULONG		7
-#define LONGLONG	8
-#define ULONGLONG	9
-#define FLOAT		10
-#define DOUBLE		11
-#define STRING		12
-
-char* MODIFIERS[] = {
-	"const volatile",
-	"volatile",
-	"const",
-	NULL
-};
-
-struct simple_type simple_types[] = {
-	{ "char", CHAR },
-	{ "unsigned char", CHAR },
-	{ "short int", SHORT },
-	{ "short unsigned int", USHORT },
-	{ "int", INT },
-	{ "unsigned int", UINT },
-	{ "long int", LONG },
-	{ "long unsigned int", ULONG },
-#ifdef CC_HAS_LONG_LONG
-	{ "long long int", LONGLONG },
-	{ "long long unsigned int", ULONGLONG },
-#endif /* CC_HAS_LONG_LONG */
-	{ "long", LONG },
-	{ "float", FLOAT },
-	{ "double", DOUBLE },
-	{ "string", STRING },
-	{ NULL, 0 }
-};
-
-static char *
-GetVarValue(char *var)
-{
-	char *		res;
-	MICommand *	cmd = MIVarEvaluateExpression(var);
-
-	SendCommandWait(DebugSession, cmd);
-	if (!MICommandResultOK(cmd)) {
-		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
-		MICommandFree(cmd);
-		return "";
-	}
-	res = MIGetVarEvaluateExpressionInfo(cmd);
-	MICommandFree(cmd);
-	return res;
-}
-
-static int
-GetAddressLength()
-{
-	if (ADDRESS_LENGTH != 0) {
-		return ADDRESS_LENGTH;
-	}
-	char * res;	
-	MICommand * cmd = MIDataEvaluateExpression("\"sizeof(char *)\"");
-	SendCommandWait(DebugSession, cmd);
-	if (!MICommandResultOK(cmd)) {
-		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
-		MICommandFree(cmd);
-		return 0;
-	}
-	res = MIGetDataEvaluateExpressionInfo(cmd);	
-	MICommandFree(cmd);
-	
-	ADDRESS_LENGTH = atoi(res);
-	return ADDRESS_LENGTH;
-}
-static char * 
-GetPtypeValue(char *exp) 
-{
-	MICommand* cmd;
-	char * type = NULL;
-	
-	cmd = CLIPType(exp);
-	SendCommandWait(DebugSession, cmd);
-	type = CLIGetPTypeInfo(cmd);
-	MICommandFree(cmd);
-	return type;
-}
-static char * 
-GetModifierType(char* type) 
-{
-	char** m;
-	int len;
-	for (m = MODIFIERS; *m != NULL; m++) {
-		len = strlen(*m);
-		if (strncmp(type, *m, len) == 0) {
-			return type + len + 1; //+1 remove whitespace
-		}
-	}
-	return type;
-}
-static int 
-getSimpleTypeID(char* type, char* exp) 
-{
-	struct simple_type *	s;
-	
-	type = GetModifierType(type);
-	for (s = simple_types; s->type_c != NULL; s++) {
-		if (strcmp(type, s->type_c) == 0) {
-			return s->type;
-		}
-	}
-	/*
-	if (exp != NULL) {
-		return getSimpleTypeID(GetPtypeValue(exp), NULL);
-	}
-	//check whether it is struct
-	if (strncmp(type, "struct", 6) == 0) {//struct
-		return 0;
-	}
-	*/
-	return -1;	
-}
-static AIF * 
-GetPrimitiveTypeToAIF(int type_id, char* res)
-{
-	AIF *a;
-	char *p;
-
-	switch (type_id) {
-	case STRING:
-	case CHAR:
-		if ((p = strchr(res, ' ')) != NULL) {
-			p++;
-			if (*p == '\'') { //character
-				p--;
-				*p = '\0';
-				a = CharToAIF((char)atoi(res));
-			}
-			else { //string
-				a = StringToAIF(p);			
-			}
-		}
-		else {
-			a = CharToAIF((char)atoi(res));
-		}
-		break;
-				
-	case SHORT:
-		a = ShortToAIF((short)atoi(res));
-		break;
-				
-	case USHORT:
-		a = UnsignedShortToAIF((unsigned short)atoi(res));
-		break;
-		
-	case INT:
-		a = IntToAIF(atoi(res));
-		break;
-		
-	case UINT:
-		a = UnsignedIntToAIF((unsigned int)atoi(res));
-		break;
-				
-	case LONG:
-		a = LongToAIF(atol(res));
-		break;
-		
-	case ULONG:
-		a = UnsignedLongToAIF((unsigned long)atol(res));
-		break;
-				
-#ifdef CC_HAS_LONG_LONG					
-	case LONGLONG:
-		a = LongLongToAIF(atoll(res));
-		break;
-		
-	case ULONGLONG:
-		a = UnsignedLongLongToAIF((unsigned long long)atoll(res));
-		break;
-#endif /* CC_HAS_LONG_LONG */
-	
-	case FLOAT:
-		a = FloatToAIF((float)atof(res));
-		break;
-		
-	case DOUBLE:
-		a = DoubleToAIF(atof(res));
-		break;
-		
-	default://other type
-	 	a = VoidToAIF(res, 0);
-		break;				
-	}
-	return a;
-}
-static AIF *
-GetAIFPointer(char *addr, AIF *i)
-{
-	AIF *av;
-	AIF *a;
-	char *pch;
-	
-	if (addr == NULL) {
-		av = VoidToAIF(0, 0);
-	}
-	else {
-		if ((pch = strchr(addr, ' ')) != NULL) {
-			*pch = '\0';
-		}
-		addr += 2; //skip 0x
-		av = AddressToAIF(addr, GetAddressLength());
-	}
-	a = PointerToAIF(av, i);
-	AIFFree(av);
-	return a;
-}
-static AIF *
-GetAIFCharPointer(char *res)
-{
-	char *pch;
-	char *val;
-	AIF *a;
-	AIF *av;
-	
-	if ((pch = strchr(res, ' ')) != NULL) {
-		val = strdup(pch+1);
-		*pch = '\0';
-
-		res += 2;  //skip 0x
-		av = AddressToAIF(res, GetAddressLength());
-		a = CharPointerToAIF(av, val);
-		free(val);
-		AIFFree(av);
-		return a;
-	}
-	return VoidToAIF(0, 0);
-}
-static AIF *
-SimpleVarToAIF(char *exp, MIVar *var)
-{
-	int		len;
-	char	*p;
-	AIF *	a = NULL;
-	AIF		*av;
-	char	*res;
-
-	len = strlen(var->type);
-	if (var->type[len - 1] == ')') { /* function */
-		return MakeAIF("&/is4", exp);
-	} 
-	if (strcmp(var->type, "void *") == 0) { /* void pointer */
-		av = VoidToAIF(0, 0);
-		a = GetAIFPointer(GetVarValue(var->name), av);
-		AIFFree(av);
-		return a;
-	}
-	if (strncmp(var->type, "enum", 4) == 0) { /* enum */
-		if ((p = strchr(var->type, ' ')) != NULL) {
-			*p++ = '\0';
-			a = EmptyEnumToAIF(p);
-		} else
-			a = EmptyEnumToAIF(NULL);
-		return a;
-	}
-
-	if ((res = GetVarValue(var->name)) != NULL) {
-		return GetPrimitiveTypeToAIF(getSimpleTypeID(var->type, exp), res);
-	}
-	//DbgSetError(DBGERR_UNKNOWN_TYPE, "Could not convert simple type");
-	return VoidToAIF(0, 0);
-}
-static AIF* 
-CreateNamed(AIF *a, int named) 
-{
-	if (FDSType(AIF_FORMAT(a)) != AIF_NAME) {
-		return NameAIF(a, named);
-	}
-	return a;
-}
-static AIF *
-CreateStruct(MIVar *var, int named)
-{
-	int		i;
-	MIVar *	v;
-	AIF *	a;
-	AIF *	ac;
-	char *pch;	
-	char *struct_name = strdup(var->type);
-	named++;
-
-	if ((pch = strchr(struct_name, ' ')) != NULL) {
-		pch++;
-		a = EmptyStructToAIF(pch);
-	}
-	else {
-		a = EmptyStructToAIF(struct_name);
-		//a = EmptyStructToAIF(NULL);
-	}
-	free(struct_name);
-
-	for (i=0; i<var->numchild; i++) {
-		v = var->children[i];
-		//check whether child contains parent
-		if (strcmp(var->type, v->type) == 0 && strcmp(var->name, v->name)) {
-			a = CreateNamed(a, named);
-			ac = AIFNull(a);
-		}
-		else {
-			if ((ac = ConvertVarToAIF(v->exp, v, named)) == NULL) {
-				AIFFree(a);
-				return NULL;
-			}
-		}
-		AIFAddFieldToStruct(a, v->exp, ac);
-	}
-	return a;
-}
-static AIF *
-CreateUnion(MIVar *var, int named)
-{
-	int		i;
-	MIVar *	v;
-	AIF *	a;
-	AIF *	ac;
-	char *union_name = NULL;
-	named++;
-
-	if (var->type[5] == ' ') {
-		union_name = strdup(&var->type[6]);
-	}
-	a = EmptyUnionToAIF(union_name);
-	if (union_name != NULL)
-		free(union_name);
-	
-	for (i=0; i<var->numchild; i++) {
-		v = var->children[i];
-		//check whether child contains parent
-		if (strcmp(var->type, v->type) == 0 && strcmp(var->name, v->name)) {
-			a = CreateNamed(a, named);
-			ac = AIFNull(a);
-		}
-		else {
-			if ((ac = ConvertVarToAIF(v->exp, v, named)) == NULL) {
-				AIFFree(a);
-				return NULL;
-			}
-		}
-		AIFAddFieldToUnion(a, v->exp, AIF_FORMAT(ac));
-
-		//Set the union value
-		if (i == var->numchild - 1)
-			AIFSetUnion(a, v->exp, ac);
-
-		AIFFree(ac);
-	}
-	return a;
-}
-static AIF *
-CreateArray(MIVar *var, int named)
-{
-	int		i;
-	MIVar *	v;
-	AIF *	a = NULL;
-	AIF *	ac;
-
-	for (i = 0; i < var->numchild; i++) {
-		v = var->children[i];
-		if ((ac = ConvertVarToAIF(v->exp, v, named)) == NULL) {
-			return NULL;
-		}
-		if (a == NULL)
-			a = EmptyArrayToAIF(0, var->numchild-1, ac);
-		AIFAddArrayElement(a, i, ac);
-		AIFFree(ac);
-	}
-	return a;
-}
-static AIF * 
-ComplexVarToAIF(char *exp, MIVar *var, int named) 
-{
-	AIF 	*ac = NULL;
-	AIF 	*a;
-	char	*type;
-	char	*res;
-	int		type_id;
-
-	switch (var->type[strlen(var->type) - 1]) {
-	case ']': /* array */
-		a = CreateArray(var, named);
-		break;
-
-	case '*': /* pointer */
-		if ((res = GetVarValue(var->name)) == NULL) { //get address
-			a = VoidToAIF(0, 0);
-		}
-		else {
-			type = strdup(var->type);
-			if (type[strlen(type) - 2] == '*') {//pointer pointer - should contain 1 child
-				ac = ConvertVarToAIF(var->children[0]->exp, var->children[0], named);
-			}
-			else if (strncmp(type, "char", 4) == 0) { //char pointer - should contain 1 child
-				ac = GetAIFCharPointer(GetVarValue(var->children[0]->name));
-			} 
-			else if (strncmp(type, "union", 5) == 0) { //union
-				ac = CreateUnion(var, named);
-			}
-			else {
-				while (type[strlen(type) - 1] == ' ') {//remove whilespace
-					type[strlen(type) - 1] = '\0';
-				}
-				
-				if ((type_id = getSimpleTypeID(type, exp)) > -1) { //simple type
-					ac = GetPrimitiveTypeToAIF(type_id, res);
-				}
-				else {
-					ac = CreateStruct(var, named);
-				}
-			}
-			free(type);
-			if (ac == NULL) {
-				ac = VoidToAIF(0, 0);
-			}
-			a = GetAIFPointer(res, ac);
-			AIFFree(ac);
-		}
-		break;
-					
-	default:
-		if (strncmp(var->type, "union", 5) == 0) {
-			a = CreateUnion(var, named);
-		}
-		else {
-			//if (strncmp(var->type, "struct", 6) == 0) { /* struct */
-			a = CreateStruct(var, named);
-		}
-	}
-	
-	if (a == NULL) {//try again with ptype
-		var->type = GetPtypeValue(exp);
-		a = ComplexVarToAIF(NULL, var, named);
-	}
-	return a;
-}
-static AIF *
-ConvertVarToAIF(char *exp, MIVar *var, int named)
-{
-	AIF *	a = NULL;
-	MICommand	*cmd;
-
-	if (strcmp(var->type, "<text variable, no debug info>") == 0) {
-		DbgSetError(DBGERR_NOSYMS, "");
-		return NULL;
-	}
-	if (var->numchild == 0) { //simple type
-		return SimpleVarToAIF(exp, var);
-	}
-	//complex type
-	cmd = MIVarListChildren(var->name);
-	SendCommandWait(DebugSession, cmd);
-	if (!MICommandResultOK(cmd)) {
-		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
-		MICommandFree(cmd);
-		return NULL;
-	}
-	MIGetVarListChildrenInfo(var, cmd);
-	MICommandFree(cmd);
-
-	a = ComplexVarToAIF(exp, var, named);
-	if (a == NULL) {
-		DbgSetError(DBGERR_UNKNOWN_TYPE, var->type);
-	}
-	return a;
-}
-/*
-** Find native type of variable.
-*/
-static int
-GDBMIGetNativeType(char *var)
-{
-	dbg_event *	e;
-	AIF *		a;
-	char *		type;
-
-	CHECK_SESSION()
-
-	if (GetAIFVar(var, &a, &type) != DBGRES_OK)
-		return DBGRES_ERR;
-		
-	e = NewDbgEvent(DBGEV_TYPE);
-	e->dbg_event_u.type_desc = type;
-
-	SaveEvent(e);
-
-	AIFFree(a);
-
-	return DBGRES_OK;
-}
-
-#ifdef notdef
-/*
-** Find AIF type of variable.
-*/
-static int
-GDBGetAIFType(char *var)
-{
-	dbg_event *	e;
-	AIF *		a;
-	char *		type;
-
-	CHECK_SESSION()
-
-	if (GetAIFVar(var, &a, &type) != DBGRES_OK)
-		return DBGRES_ERR;
-		
-	e = NewDbgEvent(DBGEV_TYPE);
-	e->type_desc = AIF_FORMAT(a);
-
-	SaveEvent(e);
-
-	AIFFree(a);
-
-	return DBGRES_OK;
-}
-#endif
-
-static int
-GetAIFVar(char *var, AIF **val, char **type)
-{
-	AIF * res;
-	MIVar *mivar;
-	
-	mivar = CreateMIVar(var);
-	if (mivar == NULL) {
-		DbgSetError(DBGERR_UNKNOWN_VARIABLE, var);
-		return DBGRES_ERR;
-	}
-
-	if ((res = ConvertVarToAIF(var, mivar, 0)) == NULL) {
-		DbgSetError(DBGERR_UNKNOWN_TYPE, mivar->type);
-		DeleteMIVar(mivar->name);
-		MIVarFree(mivar);
-		return DBGRES_ERR;
-	}
-	*type = strdup(mivar->type);
-	*val = res;
-
-	DeleteMIVar(mivar->name);
-	MIVarFree(mivar);
-
-	return DBGRES_OK;
 }
 
 /*
@@ -2428,14 +1846,294 @@ GDBCLIHandle(char *arg)
 	return DBGRES_OK;
 } 
 
-/*************************** PARTIAL AIF ***************************/
+static int
+GDBMIDataEvaluateExpression(char *arg)
+{
+	MICommand *cmd;
+	dbg_event *	e;
+	char *res = NULL;
+		
+	CHECK_SESSION();
+	
+	cmd = MIDataEvaluateExpression(arg);
+	SendCommandWait(DebugSession, cmd);
+		
+	if (MICommandResultOK(cmd)) {
+		res = MIGetDataEvaluateExpressionInfo(cmd);
+	}
+	if (res == NULL) {
+		res = strdup("No value found.");
+	}
+	MICommandFree(cmd);
+
+	e = NewDbgEvent(DBGEV_DATA_EVA_EX);
+	e->dbg_event_u.data_expression = res;
+	SaveEvent(e);
+
+	return DBGRES_OK;
+}
+
+/*
+** Evaluate the expression exp.
+*/
+static int
+GDBMIEvaluateExpression(char *exp)
+{
+	char *		type;
+	AIF *		a;
+	dbg_event *	e;
+
+	if (GetAIFVar(exp, &a, &type) != DBGRES_OK)
+		return DBGRES_ERR;
+		
+	e = NewDbgEvent(DBGEV_DATA);
+	e->dbg_event_u.data_event.data = a;
+	e->dbg_event_u.data_event.type_desc = type;
+	SaveEvent(e);
+
+	return DBGRES_OK;
+}
+/*
+** Find native type of variable.
+*/
+static int
+GDBMIGetNativeType(char *var)
+{
+	dbg_event *	e;
+	AIF *		a;
+	char *		type;
+
+	CHECK_SESSION();
+
+	if (GetAIFVar(var, &a, &type) != DBGRES_OK)
+		return DBGRES_ERR;
+		
+	e = NewDbgEvent(DBGEV_TYPE);
+	e->dbg_event_u.type_desc = type;
+
+	SaveEvent(e);
+	AIFFree(a);
+	return DBGRES_OK;
+}
+#ifdef notdef
+/*
+** Find AIF type of variable.
+*/
+static int
+GDBGetAIFType(char *var)
+{
+	dbg_event *	e;
+	AIF *		a;
+	char *		type;
+
+	CHECK_SESSION();
+	if (GetAIFVar(var, &a, &type) != DBGRES_OK)
+		return DBGRES_ERR;
+		
+	e = NewDbgEvent(DBGEV_TYPE);
+	e->type_desc = AIF_FORMAT(a);
+
+	SaveEvent(e);
+	AIFFree(a);
+	return DBGRES_OK;
+}
+#endif
+
+static int
+GetAIFVar(char *var, AIF **val, char **type)
+{
+	AIF * res;
+	MIVar *mivar;
+	
+	mivar = CreateMIVar(var);
+	if (mivar == NULL) {
+		DbgSetError(DBGERR_UNKNOWN_VARIABLE, var);
+		return DBGRES_ERR;
+	}
+
+	if ((res = GetAIF(mivar, var, 0)) == NULL) {
+		DbgSetError(DBGERR_UNKNOWN_TYPE, mivar->type);
+		DeleteMIVar(mivar->name);
+		MIVarFree(mivar);
+		return DBGRES_ERR;
+	}
+	*type = strdup(mivar->type);
+	*val = res;
+
+	DeleteMIVar(mivar->name);
+	MIVarFree(mivar);
+
+	return DBGRES_OK;
+}
+
+static char *
+GetVarValue(char *var)
+{
+	char *		res;
+	MICommand *	cmd = MIVarEvaluateExpression(var);
+
+	SendCommandWait(DebugSession, cmd);
+	if (!MICommandResultOK(cmd)) {
+		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
+		MICommandFree(cmd);
+		return "";
+	}
+	res = MIGetVarEvaluateExpressionInfo(cmd);
+	MICommandFree(cmd);
+	return res;
+}
+static int
+GetAddressLength()
+{
+	if (ADDRESS_LENGTH != 0) {
+		return ADDRESS_LENGTH;
+	}
+	char * res;	
+	MICommand * cmd = MIDataEvaluateExpression("\"sizeof(char *)\"");
+	SendCommandWait(DebugSession, cmd);
+	if (!MICommandResultOK(cmd)) {
+		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
+		MICommandFree(cmd);
+		return 0;
+	}
+	res = MIGetDataEvaluateExpressionInfo(cmd);	
+	MICommandFree(cmd);
+	
+	ADDRESS_LENGTH = atoi(res);
+	return ADDRESS_LENGTH;
+}
+static char * 
+GetPtypeValue(char *exp) 
+{
+	char * type = NULL;
+	MICommand* cmd = CLIPType(exp);
+	SendCommandWait(DebugSession, cmd);
+	type = CLIGetPTypeInfo(cmd);
+	MICommandFree(cmd);
+	return type;
+}
+/********************************************************
+ * TYPE CONVERTION 
+ ********************************************************/
+#define T_OTHER			0
+#define T_CHAR			1
+#define T_SHORT			2
+#define T_USHORT		3
+#define T_INT			4
+#define T_UINT			5
+#define T_LONG			6
+#define T_ULONG			7
+#define T_LONGLONG		8
+#define T_ULONGLONG		9
+#define T_FLOAT			10
+#define T_DOUBLE		11
+#define T_STRING		12
+#define T_BOOLEAN		13
+
+#define T_CHAR_PTR		14
+#define T_FUNCTION		15
+#define T_VOID_PTR		16
+#define T_UNION			17
+#define T_ENUM			18
+#define T_ARRAY			19
+#define T_STRUCT		20
+#define T_POINTER		21
+
+static int get_simple_type(char *type) {
+	char *t = NULL;
+	int id;
+	int len = strlen(type);
+
+	if (type[len - 1] == ')') { // function
+		return T_FUNCTION;
+	}
+	if (strncmp(type, "void *", 6) == 0) { // void pointer
+		return T_VOID_PTR;
+	}
+	if (strncmp(type, "enum", 4) == 0) { // enum
+		return T_ENUM;
+	}
+	
+	//check modifiers
+	if (strncmp(type, "const volatile", 14) == 0)
+		t = strndup(type, 15); //+ 1 remove whitespeace
+	else if (strncmp(type, "volatile", 8) == 0)
+		t = strndup(type, 9); //+ 1 remove whitespeace
+	else if (strncmp(type, "const", 5) == 0)
+		t = strndup(type, 6); //+ 1 remove whitespeace
+	else
+		t = strdup(type);
+		
+	if (strncmp(t, "char *", 6) == 0)
+		id = T_CHAR_PTR;
+	else if (strncmp(t, "char", 4) == 0)
+		id = T_CHAR;
+	else if (strncmp(t, "unsigned char", 13) == 0)
+		id = T_CHAR;
+	else if (strncmp(t, "short int", 9) == 0 || strncmp(t, "int2", 4) == 0)
+		id = T_SHORT;
+	else if (strncmp(t, "short unsigned int", 18) == 0)
+		id = T_USHORT;
+	else if (strncmp(t, "int", 3) == 0 || strncmp(t, "int4", 4) == 0)
+		id = T_INT;
+	else if (strncmp(t, "unsigned int", 12) == 0)
+		id = T_UINT;
+	else if (strncmp(t, "long int", 8) == 0 || strncmp(t, "int8", 4) == 0)
+		id = T_LONG;
+	else if (strncmp(t, "long unsigned int", 17) == 0)
+		id = T_ULONG;
+#ifdef CC_HAS_LONG_LONG
+	else if (strncmp(t, "long long int", 13) == 0 || strncmp(t, "real*16", 7) == 0)
+		id = T_LONGLONG;
+	else if (strncmp(t, "long long unsigned int", 22) == 0)
+		id = T_ULONGLONG;
+#endif /* CC_HAS_LONG_LONG */
+	else if (strncmp(t, "long", 4) == 0 || strncmp(t, "real*4", 6) == 0)
+		id = T_LONG;
+	else if (strncmp(t, "float", 5) == 0 || strncmp(t, "real*8", 6) == 0)
+		id = T_FLOAT;
+	else if (strncmp(t, "double", 6) == 0)
+		id = T_DOUBLE;
+	else if (strncmp(t, "string", 6) == 0)
+		id = T_STRING;
+ 	else if (strncmp(t, "logical4", 8) == 0)
+ 		id = T_BOOLEAN;	
+	else
+		id = T_OTHER;
+		
+	free(t);
+	return id;
+}
+static int get_complex_type(char *type) {
+	int len = strlen(type);
+
+	switch (type[len - 1]) {
+	case ']':
+		return T_ARRAY;
+	case '*':
+		if (type[len - 2] == '*') //pointer pointer
+			return T_POINTER;
+		if (strncmp(type, "char", 4) == 0) //char pointer
+			return T_CHAR_PTR;
+		return T_POINTER; //normal pointer
+	default:
+		if (strncmp(type, "union", 5) == 0)
+			return T_UNION;
+		return T_STRUCT;
+	}
+}
+
 static AIF* 
-GetPrimitiveAIF(char *type, char *res)
+GetPrimitiveAIF(int id, char *res)
 {
 	char *pch;
-	switch (getSimpleTypeID(type, NULL)) {
-		case STRING:
-		case CHAR:
+	
+	if (res == NULL) {
+		return NULL;
+	}
+	switch (id) {
+		case T_STRING:
+		case T_CHAR:
 			if ((pch = strchr(res, ' ')) != NULL) {
 				pch++;
 				if (*pch == '\'') { //character
@@ -2451,57 +2149,303 @@ GetPrimitiveAIF(char *type, char *res)
 				return CharToAIF((char)atoi(res));
 			}
 			break;
-		case SHORT:
+		case T_SHORT:
 			return ShortToAIF((short)atoi(res));
-		case USHORT:
+		case T_USHORT:
 			return UnsignedShortToAIF((unsigned short)atoi(res));
-		case INT:
+		case T_INT:
 			return IntToAIF(atoi(res));
-		case UINT:
+		case T_UINT:
 			return UnsignedIntToAIF((unsigned int)atoi(res));
-		case LONG:
+		case T_LONG:
 			return LongToAIF(atol(res));
-		case ULONG:
+		case T_ULONG:
 			return UnsignedLongToAIF((unsigned long)atol(res));
 		#ifdef CC_HAS_LONG_LONG				
-			case LONGLONG:
+			case T_LONGLONG:
 				return LongLongToAIF(atoll(res));
-			case ULONGLONG:
+			case T_ULONGLONG:
 				return UnsignedLongLongToAIF((unsigned long long)atoll(res));
 		#endif /* CC_HAS_LONG_LONG */
-		case FLOAT:
+		case T_FLOAT:
 			return FloatToAIF((float)atof(res));
-		case DOUBLE:
+		case T_DOUBLE:
 			return DoubleToAIF(atof(res));
 		default://other type
 			return VoidToAIF(0, 0);
 	}
 }
-static AIF* 
+static AIF *
+GetAIFPointer(char *addr, AIF *i)
+{
+	AIF *ac;
+	AIF *a;
+	char *pch;
+	
+	if (addr == NULL) {
+		ac = VoidToAIF(0, 0);
+	}
+	else {
+		if ((pch = strchr(addr, ' ')) != NULL) {
+			*pch = '\0';
+		}
+		addr += 2; //skip 0x
+		ac = AddressToAIF(addr, GetAddressLength());
+	}
+	a = PointerToAIF(ac, i);
+	AIFFree(ac);
+	return a;
+}
+static AIF *
+GetCharPointerAIF(char *res)
+{
+	char *pch;
+	char *val;
+	AIF *a;
+	AIF *ac;
+	
+	if ((pch = strchr(res, ' ')) != NULL) {
+		val = strdup(pch+1);
+		*pch = '\0';
+
+		res += 2;  //skip 0x
+		ac = AddressToAIF(res, GetAddressLength());
+		a = CharPointerToAIF(ac, val);
+		free(val);
+		AIFFree(ac);
+		return a;
+	}
+	return VoidToAIF(0, 0);
+}
+static AIF *
 GetSimpleAIF(MIVar *var, char *exp)
 {
-	AIF *av;
-	AIF *a;
+	AIF *	a = NULL;
+	AIF		*ac;
 
-	if (var->type[strlen(var->type) - 1] == ')') { // function
+	int id = get_simple_type(var->type);
+	switch (id) {
+	case T_FUNCTION:
 		return MakeAIF("&/is4", exp);
-	} 
-	if (strcmp(var->type, "void *") == 0) { /// void pointer
-		av = VoidToAIF(0, 0);
-		a = GetAIFPointer(GetVarValue(var->name), av);
-		AIFFree(av);
+	case T_VOID_PTR:
+		ac = VoidToAIF(0, 0);
+		a = GetAIFPointer(GetVarValue(var->name), ac);
+		AIFFree(ac);
 		return a;
-	} 
-	if (strncmp(var->type, "enum", 4) == 0) { // enum
+	case T_ENUM:
 		return (var->type[4] == ' ') ? EmptyEnumToAIF(&var->type[5]) : EmptyEnumToAIF(NULL);
+	case T_OTHER:
+		if (exp == NULL)
+			return NULL;
+		
+		var->type = GetPtypeValue(exp);
+		return GetSimpleAIF(var, NULL);
+	default:
+		return GetPrimitiveAIF(id, GetVarValue(var->name));
 	}
-	return GetPrimitiveAIF(var->type, GetVarValue(var->name));
 }
 static AIF* 
-GetArrayAIF(MIVar *var, char *exp)
+GetNamedAIF(AIF *a, int named) 
+{
+	if (FDSType(AIF_FORMAT(a)) != AIF_NAME) {
+		return NameAIF(a, named);
+	}
+	return a;
+}
+static AIF *
+GetStructAIF(MIVar *var, int named)
+{
+	int		i;
+	MIVar *	v;
+	AIF *	a;
+	AIF *	ac;
+	char *pch;	
+	char *struct_name = strdup(var->type);
+	named++;
+
+	if ((pch = strchr(struct_name, ' ')) != NULL) {
+		pch++;
+		a = EmptyStructToAIF(pch);
+	}
+	else {
+		a = EmptyStructToAIF(struct_name);
+	}
+	free(struct_name);
+
+	for (i=0; i<var->numchild; i++) {
+		v = var->children[i];
+		//check whether child contains parent
+		if (strcmp(var->type, v->type) == 0 && strcmp(var->name, v->name)) {
+			a = GetNamedAIF(a, named);
+			ac = AIFNull(a);
+		}
+		else {
+			if ((ac = GetAIF(v, v->exp, named)) == NULL) {
+				AIFFree(a);
+				return NULL;
+			}
+		}
+		AIFAddFieldToStruct(a, v->exp, ac);
+	}
+	return a;
+}
+static AIF *
+GetUnionAIF(MIVar *var, int named)
+{
+	int		i;
+	MIVar *	v;
+	AIF *	a;
+	AIF *	ac;
+	char *union_name = NULL;
+	named++;
+
+	if (var->type[5] == ' ') {
+		union_name = strdup(&var->type[6]);
+	}
+	a = EmptyUnionToAIF(union_name);
+	if (union_name != NULL)
+		free(union_name);
+	
+	for (i=0; i<var->numchild; i++) {
+		v = var->children[i];
+		//check whether child contains parent
+		if (strcmp(var->type, v->type) == 0 && strcmp(var->name, v->name)) {
+			a = GetNamedAIF(a, named);
+			ac = AIFNull(a);
+		}
+		else {
+			if ((ac = GetAIF(v, v->exp, named)) == NULL) {
+				AIFFree(a);
+				return NULL;
+			}
+		}
+		AIFAddFieldToUnion(a, v->exp, AIF_FORMAT(ac));
+
+		//Set the union value
+		if (i == var->numchild - 1)
+			AIFSetUnion(a, v->exp, ac);
+
+		AIFFree(ac);
+	}
+	return a;
+}
+static AIF *
+GetArrayAIF(MIVar *var, int named)
+{
+	int		i;
+	MIVar *	v;
+	AIF *	a = NULL;
+	AIF *	ac;
+
+	for (i = 0; i < var->numchild; i++) {
+		v = var->children[i];
+		if ((ac = GetAIF(v, v->exp, named)) == NULL) {
+			return NULL;
+		}
+		if (a == NULL)
+			a = EmptyArrayToAIF(0, var->numchild-1, ac);
+		AIFAddArrayElement(a, i, ac);
+		AIFFree(ac);
+	}
+	return a;
+}
+static AIF *
+GetPointerAIF(MIVar *var, int named)
+{
+	AIF *ac;
+	AIF *a;
+	int id;
+	
+	var->type[strlen(var->type) - 1] = '\0'; //remove pointer
+	while (var->type[strlen(var->type) - 1] == ' ') {//remove whilespace
+		var->type[strlen(var->type) - 1] = '\0';
+	}
+
+	id = get_complex_type(var->type);
+	switch (id) {
+		case T_POINTER:
+			ac = GetAIF(var->children[0], var->children[0]->exp, named);
+			break;
+		case T_CHAR_PTR:
+			return GetCharPointerAIF(GetVarValue(var->children[0]->name));
+		case T_UNION:
+			ac = GetUnionAIF(var, named);
+			break;
+		default:
+			if (var->numchild == 1) {
+				ac = GetAIF(var->children[0], var->children[0]->exp, named);
+			}
+			else {
+				ac = GetStructAIF(var, named);
+			}
+			break;
+	}
+	
+	if (ac == NULL) {
+		ac = VoidToAIF(0, 0);
+	}
+	a = GetAIFPointer(GetVarValue(var->name), ac);
+	AIFFree(ac);
+	return a;
+}
+static AIF * 
+GetComplexAIF(MIVar *var, char *exp, int named) 
+{
+	int id = get_complex_type(var->type);
+	switch (id) {
+	case T_ARRAY:
+		return GetArrayAIF(var, named);
+	case T_CHAR_PTR:
+		return GetCharPointerAIF(GetVarValue(var->name));
+	case T_POINTER:
+		return GetPointerAIF(var, named); 
+	case T_UNION:
+		return GetUnionAIF(var, named);
+	default://struct
+		return GetStructAIF(var, named);
+	}
+}
+static AIF *
+GetAIF(MIVar *var, char *exp, int named)
+{
+	AIF *	a = NULL;
+	MICommand	*cmd;
+
+	if (strcmp(var->type, "<text variable, no debug info>") == 0) {
+		DbgSetError(DBGERR_NOSYMS, "");
+		return NULL;
+	}
+	if (var->numchild == 0) { //simple type
+		return GetSimpleAIF(var, exp);
+	}
+	//complex type
+	cmd = MIVarListChildren(var->name);
+	SendCommandWait(DebugSession, cmd);
+	if (!MICommandResultOK(cmd)) {
+		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
+		MICommandFree(cmd);
+		return NULL;
+	}
+	MIGetVarListChildrenInfo(var, cmd);
+	MICommandFree(cmd);
+
+	a = GetComplexAIF(var, exp, named);
+	if (a == NULL) {//try again with ptype
+		if (exp == NULL)
+			return NULL;
+
+		var->type = GetPtypeValue(exp);
+		a = GetComplexAIF(var, NULL, named);
+	}
+	return a;
+}
+
+/*************************** PARTIAL AIF ***************************/
+static AIF* 
+GetPartialArrayAIF(MIVar *var)
 {
 	AIF *a = NULL;
-	AIF *av;
+	AIF *ac;
 	int i;
 	char *pch;
 
@@ -2511,24 +2455,24 @@ GetArrayAIF(MIVar *var, char *exp)
 		while (var->type[strlen(var->type) - 1] == ' ') {//remove whilespace
 			var->type[strlen(var->type) - 1] = '\0';
 		}
-		av = GetPrimitiveAIF(var->type, "");
-		a = EmptyArrayToAIF(0, var->numchild-1, av);
-		AIFFree(av);
+		ac = GetPrimitiveAIF(get_simple_type(var->type), "");
+		a = EmptyArrayToAIF(0, var->numchild-1, ac);
+		AIFFree(ac);
 	}
 	else {
 		for (i=0; i<var->numchild; i++) {
-			av = GetPartailAIF(var->children[i], NULL);
+			ac = GetPartailAIF(var->children[i], NULL);
 			if (a == NULL) {
-				a = EmptyArrayToAIF(0, var->numchild-1, av);
+				a = EmptyArrayToAIF(0, var->numchild-1, ac);
 			}
-			AIFAddArrayElement(a, i, av);
-			AIFFree(av);				
+			AIFAddArrayElement(a, i, ac);
+			AIFFree(ac);				
 		}
 	}
 	return a;
 }
 static AIF *
-GetStructAIF(MIVar *var, char *exp)
+GetPartialStructAIF(MIVar *var)
 {
 	AIF *ac;
 	AIF *a;
@@ -2555,7 +2499,7 @@ GetStructAIF(MIVar *var, char *exp)
 	return a;
 }
 static AIF *
-GetUnionAIF(MIVar *var, char *exp)
+GetPartialUnionAIF(MIVar *var)
 {
 	AIF *ac;
 	AIF *a;
@@ -2582,10 +2526,11 @@ GetUnionAIF(MIVar *var, char *exp)
 	return a;
 }
 static AIF *
-GetPointerAIF(MIVar *var, char *exp)
+GetPartialPointerAIF(MIVar *var)
 {
-	AIF *av;
+	AIF *ac;
 	AIF *a;
+	int id;
 	
 	if (var->children != NULL) {
 		var->type[strlen(var->type) - 1] = '\0'; //remove pointer
@@ -2593,62 +2538,72 @@ GetPointerAIF(MIVar *var, char *exp)
 			var->type[strlen(var->type) - 1] = '\0';
 		}
 
-		if (var->type[strlen(var->type) - 1] == '*') {//pointer
-			//replace miname
-			var->name = strdup(var->children[0]->exp);
-			av = VoidToAIF(0, 0);
-			a = GetAIFPointer(GetVarValue(var->children[0]->name), av);
-			AIFFree(av);
-		}
-		else if (strncmp(var->type, "char", 4) == 0) { //char pointer -- should not call this
-			//replace miname
-			var->name = strdup(var->children[0]->exp);
-			a = GetAIFCharPointer(GetVarValue(var->children[0]->name));			
-		} 
-		else if (strncmp(var->type, "union", 5) == 0) { //union
-			a = GetUnionAIF(var, exp);
-		}
-		else {
-			if (var->numchild == 1) {
+		id = get_complex_type(var->type);
+		switch (id) {
+			case T_CHAR_PTR:
 				//replace miname
 				var->name = strdup(var->children[0]->exp);
-				a = GetPartailAIF(var->children[0], var->children[0]->exp);
-			}
-			else {
-				a = GetStructAIF(var, exp);
-			}
+				a = GetCharPointerAIF(GetVarValue(var->children[0]->name));
+				break;			
+			case T_POINTER:
+				//replace miname
+				var->name = strdup(var->children[0]->exp);
+				ac = VoidToAIF(0, 0);
+				a = GetAIFPointer(GetVarValue(var->children[0]->name), ac);
+				AIFFree(ac);
+				break;
+			case T_UNION:
+				a = GetPartialUnionAIF(var);
+				break;
+			default:
+				if (var->numchild == 1) {
+					//replace miname
+					var->name = strdup(var->children[0]->exp);
+					a = GetPartailAIF(var->children[0], var->children[0]->exp);
+				}
+				else {
+					a = GetPartialStructAIF(var);
+				}
+				break;
 		}
 	}
 	else {
-		if (strncmp(var->type, "char", 4) == 0) { //char pointer
-			a = GetAIFCharPointer(GetVarValue(var->name));			
-		}
-		else {
-			av = VoidToAIF(0, 0);
-			a = GetAIFPointer(GetVarValue(var->name), av);
-			AIFFree(av);
+		id = get_complex_type(var->type);
+		switch (id) {
+			case T_CHAR_PTR:
+				a = GetCharPointerAIF(GetVarValue(var->name));
+				break;
+			default:			
+				ac = VoidToAIF(0, 0);
+				a = GetAIFPointer(GetVarValue(var->name), ac);
+				AIFFree(ac);
+				break;
 		}
 	}
 	return a;
 }
 static AIF * 
-GetComplexAIF(MIVar *var, char *exp)
+GetPartialComplexAIF(MIVar *var, char *exp)
 {
-	switch (var->type[strlen(var->type) - 1]) {
-	case ']':
-		return GetArrayAIF(var, exp);
-	case '*':
-		return GetPointerAIF(var, exp);
-	default:
-		if (strncmp(var->type, "union", 5) == 0) {
-			return GetUnionAIF(var, exp);
-		}
-		return GetStructAIF(var, exp);
+	int id = get_complex_type(var->type);
+	switch (id) {
+	case T_ARRAY:
+		return GetPartialArrayAIF(var);
+	case T_CHAR_PTR:
+		return GetCharPointerAIF(GetVarValue(var->name));
+	case T_POINTER:
+		return GetPartialPointerAIF(var); 
+	case T_UNION:
+		return GetPartialUnionAIF(var);
+	default://struct
+		return GetPartialStructAIF(var);
 	}
 }
 static AIF *
 GetPartailAIF(MIVar *var, char *exp)
 {
+	AIF *a;
+	
 	if (strcmp(var->type, "<text variable, no debug info>") == 0) {
 		DbgSetError(DBGERR_NOSYMS, "");
 		return NULL;
@@ -2656,8 +2611,17 @@ GetPartailAIF(MIVar *var, char *exp)
 	if (var->numchild == 0) {
 		return GetSimpleAIF(var, exp);
 	}
-	return GetComplexAIF(var, exp);
+	a = GetPartialComplexAIF(var, exp);
+	if (a == NULL) {//try again with ptype
+		if (exp == NULL)
+			return NULL;
+
+		var->type = GetPtypeValue(exp);
+		a = GetPartialComplexAIF(var, NULL);
+	}
+	return a;
 }
+
 static MIVar *
 GetChildrenMIVar(char *mivar_name, int showParentType)
 {
@@ -2758,32 +2722,9 @@ GDBGetPartialAIF(char *var_name, int listChildren, int express)
 
 	return DBGRES_OK;
 }
-static int
-GDBMIDataEvaluateExpression(char *arg)
-{
-	MICommand *cmd;
-	dbg_event *	e;
-	char *res = NULL;
-		
-	CHECK_SESSION();
-	
-	cmd = MIDataEvaluateExpression(arg);
-	SendCommandWait(DebugSession, cmd);
-		
-	if (MICommandResultOK(cmd)) {
-		res = MIGetDataEvaluateExpressionInfo(cmd);
-	}
-	if (res == NULL) {
-		res = strdup("No value found.");
-	}
-	MICommandFree(cmd);
 
-	e = NewDbgEvent(DBGEV_DATA_EVA_EX);
-	e->dbg_event_u.data_expression = res;
-	SaveEvent(e);
 
-	return DBGRES_OK;
-}
+
 static int
 GDBMIVarDelete(char *name)
 {
