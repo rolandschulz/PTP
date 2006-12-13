@@ -12,7 +12,8 @@ public final class OffsetLength
     
     public boolean contains(OffsetLength other)
     {
-        return this.offset <= other.offset
+        return other != null
+            && this.offset <= other.offset
             && other.getPositionPastEnd() <= this.getPositionPastEnd();
     }
 

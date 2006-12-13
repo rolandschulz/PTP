@@ -36,7 +36,7 @@ import org.eclipse.photran.internal.core.lexer.Token;
  * <code>FortranElementInfo</code>, which also has a few methods copied from
  * <code>SourceManipulationInfo</code>.
  * 
- * TODO-Jeff: If we inherit from Parent instead, use the commented-out methods, and use
+ * NOTE-Jeff: If we inherit from Parent instead, use the commented-out methods, and use
  * FortranElementInfo, pieces of the Outline view seem to be missing (things beyond two levels
  * deep?) WTF?!
  * 
