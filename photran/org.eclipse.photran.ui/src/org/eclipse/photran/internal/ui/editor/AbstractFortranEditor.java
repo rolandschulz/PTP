@@ -58,6 +58,7 @@ import org.eclipse.ui.editors.text.TextEditor;
 import org.eclipse.ui.part.IShowInTargetList;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 import org.eclipse.ui.texteditor.DefaultRangeIndicator;
+import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.WorkbenchChainedTextFontFieldEditor;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 
@@ -478,7 +479,12 @@ public abstract class AbstractFortranEditor extends TextEditor implements ISelec
     public IDocument getIDocument()
     {
         IEditorInput input = getEditorInput();
-        return input == null ? null : getDocumentProvider().getDocument(input);
+        if (input == null) return null;
+        
+        IDocumentProvider dp = getDocumentProvider();
+        if (dp == null) return null;
+        
+        return dp.getDocument(input);
     }
     
     public ITextSelection getSelection()
@@ -525,6 +531,7 @@ public abstract class AbstractFortranEditor extends TextEditor implements ISelec
         //  //   //  //    ////   //  //    //
         
         IDocument doc = getIDocument();
+        if (doc == null) return;
         doc.set(" " + doc.get());
         doSave(null);
         doc.set(doc.get().substring(1));
