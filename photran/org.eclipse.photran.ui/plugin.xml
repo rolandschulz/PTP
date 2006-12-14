@@ -152,7 +152,6 @@
    <!-- Commands, key bindings, and popup menu entries
    
         - Comment/Uncomment (Ctrl+/)
-        - Open Declaration (F3 or Ctrl+F3)
         
         Each command should have its ID declared as a constant in AbstractFortranEditor, and
         it must be set up in AbstractFortranEditor#createActions().
@@ -169,15 +168,6 @@
 	           menubarPath="group.edit" 
 	           id="org.eclipse.photran.ui.BlockCommentMenuAction"/>
 	  </viewerContribution>
-	  <viewerContribution 
-	        targetID="#FortranEditorContextMenu" 
-	        id="org.eclipse.photran.ui.NavigationContribution">
-	     <action 
-	           label="&amp;Open Declaration"
-	           class="org.eclipse.photran.internal.ui.actions.FortranOpenDeclarationActionDelegate" 
-	           menubarPath="group.open" 
-	           id="org.eclipse.photran.ui.OpenDeclarationMenuAction"/>
-	  </viewerContribution>
    </extension>
    <extension
          point="org.eclipse.ui.commands">
@@ -191,17 +181,6 @@
             description="Comment/Uncomment"
             id="org.eclipse.photran.ui.CommentCommand"
             name="Photran Block Comment">
-      </command>
-      <category
-            name="Navigation"
-            description="Navigation"
-            id="org.eclipse.photran.ui.NavigationCategory">
-      </category>
-      <command
-            categoryId="org.eclipse.photran.ui.NavigationCategory"
-            description="Open Declaration"
-            id="org.eclipse.photran.ui.OpenDeclarationCommand"
-            name="Open Declaration">
       </command>
    </extension>
    <extension
@@ -218,16 +197,6 @@
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             contextId="org.eclipse.photran.ui.FortranEditorContext"
             commandId="org.eclipse.photran.ui.CommentCommand"/>
-        <key
-            sequence="F3"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            contextId="org.eclipse.photran.ui.FortranEditorContext"
-            commandId="org.eclipse.photran.ui.OpenDeclarationCommand"/>
-        <key
-            sequence="M1+F3"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            contextId="org.eclipse.photran.ui.FortranEditorContext"
-            commandId="org.eclipse.photran.ui.OpenDeclarationCommand"/>
    </extension>
 
    <!-- Define toggling a breakpoint as the default double-click action -->

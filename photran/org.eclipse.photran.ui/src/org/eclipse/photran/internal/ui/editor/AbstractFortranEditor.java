@@ -39,7 +39,6 @@ import org.eclipse.photran.core.util.OffsetLength;
 import org.eclipse.photran.internal.core.lexer.LexerOptions;
 import org.eclipse.photran.internal.core.preferences.FortranPreferences;
 import org.eclipse.photran.internal.ui.actions.FortranBlockCommentActionDelegate;
-import org.eclipse.photran.internal.ui.actions.FortranOpenDeclarationActionDelegate;
 import org.eclipse.photran.ui.FortranUIPlugin;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
@@ -167,7 +166,7 @@ public abstract class AbstractFortranEditor extends TextEditor implements ISelec
     {
         super.createActions();
         createAction(new FortranBlockCommentActionDelegate(this), BLOCK_COMMENT_COMMAND_ID);
-        createAction(new FortranOpenDeclarationActionDelegate(this), OPEN_DECLARATION_COMMAND_ID);
+        //createAction(new FortranOpenDeclarationActionDelegate(this), OPEN_DECLARATION_COMMAND_ID);
     }
 
     private void createAction(IAction action, String id)
