@@ -1,0 +1,8 @@
+ptp_lsf_proxy
+.deps
+stamp-h1
+config.status
+Makefile
+config.h
+.libs
+autom4te.cache

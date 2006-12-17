@@ -1,0 +1,23 @@
+This project contains the source code of the LSF proxy server. The following
+steps are used to set up your build environment so that the executable will be
+correctly built and installed. In order to use the server binary, it needs to 
+be installed in a fragment that corresponds to the architecture of the machine 
+it will be run on. 
+
+1. Make sure you have checked out the fragment corresponding to your architecture. 
+   For example, if you're on a Linux x86 machine, you should have the fragment:
+
+		org.eclipse.ptp.linux.x86
+
+2. Run the following command IN THE FRAGMENT DIRECTORY to configure, build and 
+   install the project:
+   
+   		sh BUILD
+
+3. You can also use 'make' and 'make install' from this directory, either from
+   the command line, or from the 'Make Targets' view in Eclipse to 
+   build and install the executable into the fragment directory.
+
+4. If any of the automake/autoconf files changes, you should just need to
+   run 'make' and it will automatically regenerate the appropriate files.
+
