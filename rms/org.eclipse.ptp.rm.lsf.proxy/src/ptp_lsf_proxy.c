@@ -19,10 +19,17 @@
 
 #include "config.h"
 
+#ifdef LSF
+#include <lsf/lsbatch.h>
+#else
+#define LS_LONG_INT long
+#endif
+
 #include <getopt.h>
 //#include <stdbool.h>
 #include <errno.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include <proxy.h>
 #include <proxy_tcp.h>
@@ -144,13 +151,36 @@ static struct option longopts[] = {
 #define JOBID_LSF	3
 
 
+/**
+ * Initialize the LSF service
+ */
+static int
+LSF_Init(char* app_name)
+{
+	fprintf(stdout, "LSF_Init (%s)\n", app_name); fflush(stdout);
+
+#ifdef LSF	
+	/* initialize LSBLIB */
+	if (lsb_init(app_name) < 0) {
+		lsb_perror("%s: lsb_init() failed", app_name);
+		exit(-1);
+	}
+#endif LSF
+
+	is_lsf_initialized = 1;
+	return 0;
+}
+
+
 static int
 LSF_IsShutdown(void)
 {
 	return lsf_shutdown != 0;
 }
 
-
+/**
+ * Initialize the LSF service (no LSBLIB calls needed to shutdown LSF)
+ */
 static int
 LSF_Shutdown(void)
 {
@@ -183,19 +213,32 @@ LSF_Initialized(void)
 	return is_lsf_initialized;
 }
 
-
+#ifdef LSF
 static int
 LSF_CheckErrorCode(int type, int rc)
 {
-	if(rc != LSF_SUCCESS) {
+	if (rc != LSF_SUCCESS) {
 		printf("ARgh!  An error!\n"); fflush(stdout);
 		printf("ERROR %s\n", LSF_ERROR_NAME(rc)); fflush(stdout);
 		AddToList(eventList, (void *)LSF_ErrorStr(type, (char *)LSF_ERROR_NAME(rc)));
 		return 1;
 	}
 	
+	if (jobId < 0)
+        /* if job submission fails, lsb_submit returns -1 */
+    switch (lsberrno) {
+        /* and sets lsberrno to indicate the error */
+    case LSBE_QUEUE_USE:
+    case LSBE_QUEUE_CLOSED:
+    lsb_perror(reply.queue);
+    exit(-1);
+    default:
+    lsb_perror(NULL);
+    exit(-1);
+	
 	return 0;
 }
+#endif
 
 
 /**
@@ -219,17 +262,49 @@ LSF_StartDaemon(char ** args)
 int
 LSF_Run(char **args)
 {
+#ifdef LSF
+	int					rtn;
+	LS_LONG_INT			jobId;				
+	struct submit*		jobSubReq;		/* Job specifications */
+	struct submitReply*	jobSubReply;	/* Results of job submission */
+	rtn = lsb_submit(jobSubReq, jobSubReply);
+	rtn = lsb_modify(jobSubReq, jobSubReply, jobId);
+#endif
+	
 	fprintf(stdout, "Returning from LSFRun\n"); fflush(stdout);
 	return PROXY_RES_OK;
 }
 
 
 /**
- * Initiate the discovery phase 
+ * Initiate the discovery phase
+ * 
+ * Discover:
+ *		1. host information - ls_gethostinfo()
+ * 		2. batch specific host information - lsb_hostinfo()
+ * 		3. queue information - lsb_queueinfo()
  */
 int
 LSF_Discover(char **args)
-{	
+{
+#ifdef LSF
+	char*	hosts[1];			/* list of host names */
+	int		num_hosts = 1;		/* number of hosts (0 = all; 1 = localhost) */
+	struct hostInfoEnt* host_info = lsb_hostinfo(hosts, &num_hosts);
+	
+	char  **queues;			/* Array containing names of queues of interest */
+	int   *numQueues;		/* Number of queues */
+	char  *hostname;		/* Specified queues using hostname */
+	char  *username;		/* Specified queues enabled for user */
+	int   options;			/* Reserved for future use; supply 0 */
+	struct queueInfoEnt* queue_info = lsb_queueinfo(queues, numQueues, hostname, username, options);
+	
+	if (host_info == NULL) {
+		lsb_perror("ptp_lsf_proxy: lsb_hostinfo() failed");
+		exit (-1);
+	}
+#endif
+
 	fprintf(stdout, "DISCOVERY PHASE: end\n"); fflush(stdout);
 	return PROXY_RES_OK;
 }
@@ -241,8 +316,18 @@ LSF_Discover(char **args)
 int
 LSF_TerminateJob(char **args)
 {
-	int		jobid = atoi(args[1]);
-	fprintf(stdout, "  LSF_TerminateJob (%d)\n", jobid); fflush(stdout);
+#ifdef LSF
+	int		rtn;			/* TODO - find what return value signifies from documentation */
+	int		times = 0;		/* number of runs before job is deleted */
+	int		options = 0;
+#endif
+	LS_LONG_INT jobid = atoi(args[1]);
+	
+	fprintf(stdout, "  LSF_TerminateJob (%ld)\n", jobid); fflush(stdout);
+#ifdef LSF
+	rtn = lsb_deletejob(jobid, times, options);
+#endif
+
 	return PROXY_RES_OK;
 }
 
@@ -256,20 +341,6 @@ LSF_Quit(char **args)
 	LSF_Shutdown();
 	fprintf(stdout, "LSF_Quit called!\n"); fflush(stdout);
 	return PROXY_RES_OK;
-}
-
-
-/**
- * Initialize the LSF service
- *
- * TODO - who calls this, it may not be needed, called from proxy_srv_init
- */
-static int
-LSF_Init(char *universe_name)
-{
-	fprintf(stdout, "LSF_Init (%s)\n", universe_name); fflush(stdout);
-	is_lsf_initialized = 1;
-	return 0;
 }
 
 
@@ -368,10 +439,12 @@ LSF_Progress(void)
 
 
 int
-server(char* name, char* host, int port)
+server(char* app_name, char* name, char* host, int port)
 {
 	char* msg, * msg1, * msg2;
 	int rc;
+	
+	LSF_Init(app_name);
 	
 	eventList = NewList();
 	jobList = NewList();
@@ -463,8 +536,8 @@ main(int argc, char* argv[])
 {
 	int			ch;
 	int			port = PROXY_TCP_PORT;
-	char *			host = "localhost";
-	char *			proxy_str = DEFAULT_PROXY;
+	char*		host = "localhost";
+	char*		proxy_str = DEFAULT_PROXY;
 	int			rc;
 	
 	while ((ch = getopt_long(argc, argv, "P:p:h:", longopts, NULL)) != -1)
@@ -519,7 +592,7 @@ main(int argc, char* argv[])
 	if(saved_signals[SIGABRT] != SIG_ERR && saved_signals[SIGABRT] != SIG_IGN && saved_signals[SIGABRT] != SIG_DFL) {
 		printf("  ---> SIGNAL SIGABRT was previously already defined.  Shadowing.\n"); fflush(stdout);
 	}	
-	rc = server(proxy_str, host, port);
+	rc = server(argv[0], proxy_str, host, port);
 	
 	return rc;
 }
