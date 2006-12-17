@@ -1,0 +1,48 @@
+dnl
+dnl
+
+AC_PREREQ(2.50)
+
+AC_INIT(org.eclipse.lsf.orte, 1.1.0)
+AC_CONFIG_SRCDIR(src/ptp_lsf_proxy.c)
+AC_CONFIG_HEADERS(config.h)
+
+AM_INIT_AUTOMAKE
+
+AC_CANONICAL_BUILD
+
+CFLAGS="$CFLAGS -Wall"
+
+dnl
+dnl Check for programs.
+dnl
+
+AC_PROG_CC([cc])
+AM_PROG_CC_C_O
+AC_PROG_INSTALL
+AC_PROG_MAKE_SET
+AC_PROG_RANLIB
+dnl AC_PROG_LIBTOOL
+
+dnl
+dnl Check for header files.
+dnl
+
+AC_HEADER_STDC
+
+dnl
+dnl Check for types
+dnl
+AC_TYPE_SIGNAL
+
+dnl LSF Libraries
+#AC_PATH_PROG(OMPI_INFO, ompi_info, no)
+#if test "$ac_cv_path_OMPI_INFO" != no; then
+#	AC_DEFINE(OMPI,1,[Enable Open MPI support.])
+#else
+#	AC_MSG_ERROR([You must install Open MPI first.])
+#fi
+
+AC_CONFIG_FILES([Makefile])
+AC_CONFIG_SUBDIRS([../org.eclipse.ptp.proxy ../org.eclipse.ptp.utils])
+AC_OUTPUT
