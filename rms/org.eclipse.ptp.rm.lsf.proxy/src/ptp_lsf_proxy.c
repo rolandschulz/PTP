@@ -18,6 +18,9 @@
  ******************************************************************************/
 
 #include "config.h"
+#include "ptp_lsf_proxy.h"
+
+#define LSF 1
 
 #ifdef LSF
 #include <lsf/lsbatch.h>
@@ -25,11 +28,18 @@
 #define LS_LONG_INT long
 #endif
 
+/* non portable code, get rid of this and other remnants */
+#ifdef _GNU_SOURCE
+#define HAVE_ASPRINTF 1
+#endif
+
 #include <getopt.h>
 //#include <stdbool.h>
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <signal.h>
+#include <string.h>
 
 #include <proxy.h>
 #include <proxy_tcp.h>
@@ -49,6 +59,7 @@
 
 #define DEFAULT_PROXY		"tcp"
 
+#define LSF_MAX_MSG_SIZE 256
 /*
  * RTEV codes must EXACTLY match org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEvent
  */
@@ -92,13 +103,6 @@
 #define JOB_STATE_ERROR            4
 
 #define LSF_SUCCESS                1
-
-
-int LSF_StartDaemon(char **);
-int LSF_Run(char **);
-int LSF_Discover(char **);
-int LSF_TerminateJob(char **);
-int LSF_Quit(char **);
 
 struct ptp_job {
 	int ptp_jobid;		// job ID as known by PTP
@@ -162,10 +166,10 @@ LSF_Init(char* app_name)
 #ifdef LSF	
 	/* initialize LSBLIB */
 	if (lsb_init(app_name) < 0) {
-		lsb_perror("%s: lsb_init() failed", app_name);
+		lsb_perror("%s: lsb_init() failed");
 		exit(-1);
 	}
-#endif LSF
+#endif
 
 	is_lsf_initialized = 1;
 	return 0;
@@ -200,7 +204,8 @@ LSF_ErrorStr(int type, char *msg)
 	}
 	
 	proxy_cstring_to_str(msg, &str);
-	asprintf(&res, "%d %d %s", RTEV_ERROR, type, str);
+	res = malloc(strlen(str) + 1 + 2*32);
+	sprintf(res, "%d %d %s", RTEV_ERROR, type, str);
 	free(str);
 	
 	return res;	
@@ -218,16 +223,18 @@ static int
 LSF_CheckErrorCode(int type, int rc)
 {
 	if (rc != LSF_SUCCESS) {
-		printf("ARgh!  An error!\n"); fflush(stdout);
-		printf("ERROR %s\n", LSF_ERROR_NAME(rc)); fflush(stdout);
-		AddToList(eventList, (void *)LSF_ErrorStr(type, (char *)LSF_ERROR_NAME(rc)));
+// FIXME
+//		printf("ARgh!  An error!\n"); fflush(stdout);
+//		printf("ERROR %s\n", LSF_ERROR_NAME(rc)); fflush(stdout);
+//		AddToList(eventList, (void *)LSF_ErrorStr(type, (char *)LSF_ERROR_NAME(rc)));
 		return 1;
 	}
-	
+
+/***** FIXME
 	if (jobId < 0)
-        /* if job submission fails, lsb_submit returns -1 */
+        // if job submission fails, lsb_submit returns -1
     switch (lsberrno) {
-        /* and sets lsberrno to indicate the error */
+        // and sets lsberrno to indicate the error
     case LSBE_QUEUE_USE:
     case LSBE_QUEUE_CLOSED:
     lsb_perror(reply.queue);
@@ -235,7 +242,10 @@ LSF_CheckErrorCode(int type, int rc)
     default:
     lsb_perror(NULL);
     exit(-1);
-	
+
+*****/
+    fprintf(stdout, "LSF_CheckErrorCode: type = %d\n", type);   // FIXME by removal
+    
 	return 0;
 }
 #endif
@@ -438,12 +448,12 @@ LSF_Progress(void)
 }
 
 
-int
+static int
 server(char* app_name, char* name, char* host, int port)
 {
 	char* msg, * msg1, * msg2;
 	int rc;
-	
+
 	LSF_Init(app_name);
 	
 	eventList = NewList();
@@ -465,45 +475,49 @@ server(char* app_name, char* name, char* host, int port)
 		}
 	}
 	
+	msg  = malloc(LSF_MAX_MSG_SIZE);
+	msg1 = malloc(LSF_MAX_MSG_SIZE);
+	msg2 = malloc(LSF_MAX_MSG_SIZE);
+	
 	if (ptp_signal_exit != 0) {
 		switch(ptp_signal_exit) {
 			case SIGINT:
-				asprintf(&msg1, "INT");
-				asprintf(&msg2, "Interrupt");
+				sprintf(msg1, "INT");
+				sprintf(msg2, "Interrupt");
 				break;
 			case SIGHUP:
-				asprintf(&msg1, "HUP");
-				asprintf(&msg2, "Hangup");
+				sprintf(msg1, "HUP");
+				sprintf(msg2, "Hangup");
 				break;
 			case SIGILL:
-				asprintf(&msg1, "ILL");
-				asprintf(&msg2, "Illegal Instruction");
+				sprintf(msg1, "ILL");
+				sprintf(msg2, "Illegal Instruction");
 				break;
 			case SIGSEGV:
-				asprintf(&msg1, "SEGV");
-				asprintf(&msg2, "Segmentation Violation");
+				sprintf(msg1, "SEGV");
+				sprintf(msg2, "Segmentation Violation");
 				break;
 			case SIGTERM:
-				asprintf(&msg1, "TERM");
-				asprintf(&msg2, "Termination");
+				sprintf(msg1, "TERM");
+				sprintf(msg2, "Termination");
 				break;
 			case SIGQUIT:
-				asprintf(&msg1, "QUIT");
-				asprintf(&msg2, "Quit");
+				sprintf(msg1, "QUIT");
+				sprintf(msg2, "Quit");
 				break;
 			case SIGABRT:
-				asprintf(&msg1, "ABRT");
-				asprintf(&msg2, "Process Aborted");
+				sprintf(msg1, "ABRT");
+				sprintf(msg2, "Process Aborted");
 				break;
 			default:
-				asprintf(&msg1, "***UNKNOWN SIGNAL***");
-				asprintf(&msg2, "ERROR - UNKNOWN SIGNAL, REPORT THIS!");
+				sprintf(msg1, "***UNKNOWN SIGNAL***");
+				sprintf(msg2, "ERROR - UNKNOWN SIGNAL, REPORT THIS!");
 				break;
 		}
 		printf("###### SIGNAL: %s\n", msg1);
 		printf("###### Shutting down LSFd\n");
 		LSF_Shutdown();
-		asprintf(&msg, "ptp_lsf_proxy received signal %s (%s).  Exit was required and performed cleanly.", msg1, msg2);
+		sprintf(msg, "ptp_lsf_proxy received signal %s (%s).  Exit was required and performed cleanly.", msg1, msg2);
 		AddToList(eventList, (void *) LSF_ErrorStr(RTEV_ERROR_SIGNAL, msg));
 		free(msg);
 		free(msg1);
