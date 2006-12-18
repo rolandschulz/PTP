@@ -32,12 +32,12 @@ public interface IResourceManagerListener {
 	/**
 	 * @param resourceManager
 	 */
-	public void handleStarted(IResourceManager resourceManager);
+	public void handleStartup(IResourceManager resourceManager);
 
 	/**
 	 * @param resourceManager
 	 */
-	public void handleStopped(IResourceManager resourceManager);
+	public void handleShutdown(IResourceManager resourceManager);
 
 	/**
 	 * @param oldStatus

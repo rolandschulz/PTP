@@ -19,7 +19,6 @@
 package org.eclipse.ptp.rmsystem;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 
 import org.eclipse.core.runtime.CoreException;
@@ -33,7 +32,6 @@ import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPMachine;
 import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
-import org.eclipse.ptp.core.IPQueue;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elementcontrols.IPJobControl;
 import org.eclipse.ptp.core.elementcontrols.IPMachineControl;
@@ -64,7 +62,7 @@ import org.eclipse.ptp.rtsystem.JobRunConfiguration;
 public abstract class RuntimeResourceManager extends AbstractResourceManager
 		implements IRuntimeListener {
 
-	private final class LocalQueue extends Parent implements IPQueueControl {
+	final class LocalQueue extends Parent implements IPQueueControl {
 
 		private LocalQueue() {
 			super(RuntimeResourceManager.this, "localQueue", "0", 0);
@@ -150,15 +148,16 @@ public abstract class RuntimeResourceManager extends AbstractResourceManager
 	}
 
 	private IControlSystem controlSystem = null;
-	private final LocalQueue localQueue = new LocalQueue();
-	private final HashMap machines = new HashMap();
-	private IMonitoringSystem monitoringSystem = null;
 	private int jobID = 1;
+	private LocalQueue localQueue = null;
+	private IMonitoringSystem monitoringSystem = null;
 	private IRuntimeProxy runtimeProxy = null;
 	
 	public RuntimeResourceManager(IPUniverseControl universe, 
 			IResourceManagerConfiguration config) {
 		super(universe, config);
+		localQueue = new LocalQueue();
+		addQueue(localQueue.getIDString(), localQueue);
 	}
 
 	public synchronized boolean abortJob(String jobName) throws CoreException {
@@ -183,57 +182,6 @@ public abstract class RuntimeResourceManager extends AbstractResourceManager
 
 	public void dispose() {
 		super.dispose();
-	}
-
-	public synchronized IPJobControl findJobById(String job_id) {
-		IPQueueControl[] queues = getQueueControls();
-		for (int j = 0; j < queues.length; ++j) {
-			IPJobControl job = queues[j].findJobById(job_id);
-			if (job != null) {
-				return job;
-			}
-		}
-		return null;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.IResourceManager#findQueueById(java.lang.String)
-	 */
-	public synchronized IPQueue findQueueById(String id) {
-		IPQueueControl[] queues = getQueueControls();
-		for (int j = 0; j < queues.length; ++j) {
-			if (queues[j].getIDString().equals(id)) {
-				return queues[j];
-			}
-		}
-		return null;
-	}
-
-	public synchronized IPMachine getMachine(String ID) {
-		return (IPMachine) machines.get(ID);
-	}
-
-	public synchronized IPMachineControl[] getMachineControls() {
-		return (IPMachineControl[]) machines.values().toArray(new IPMachineControl[0]);
-	}
-
-	public IPMachine[] getMachines() {
-		return getMachineControls();
-	}
-
-	public IPQueue getQueue(int id) {
-		if (id == 0)
-			return localQueue;
-		else
-			return null;
-	}
-
-	public synchronized IPQueueControl[] getQueueControls() {
-		return new IPQueueControl[]{ localQueue };
-	}
-
-	public IPQueue[] getQueues() {
-		return getQueueControls();
 	}
 
 	public void removeJob(IPJob job) {
@@ -318,8 +266,6 @@ public abstract class RuntimeResourceManager extends AbstractResourceManager
 							AttributeConstants.ATTRIB_MACHINE_NAME_PREFIX + value, value);
 					addMachine(value, curmachine);
 					newEntity = true;
-					
-					fireMachinesChanged(new int[]{curmachine.getID()});
 				}
 			} else if (curmachine != null && key.equals(AttributeConstants.ATTRIB_NODE_NUMBER)) {
 				/* ok so we've got a machine that's not null, and we think we have a node
@@ -417,7 +363,7 @@ public abstract class RuntimeResourceManager extends AbstractResourceManager
 		}
 	}
 
-	public void stop() throws CoreException {
+	public void shutdown() throws CoreException {
 		if(monitoringSystem != null)
 			monitoringSystem.shutdown();
 		if(controlSystem != null)
@@ -427,31 +373,12 @@ public abstract class RuntimeResourceManager extends AbstractResourceManager
 		monitoringSystem = null;
 		controlSystem = null;
 		runtimeProxy = null;
-		super.stop();
-	}
-
-	private synchronized void addMachine(String ID, IPMachineControl machine) {
-		machines.put(ID, machine);
+		super.shutdown();
 	}
 
 	private synchronized void clearContents() {
 		machines.clear();
 		localQueue.clearContents();
-	}
-
-	private IPMachineControl getMachineControl(String ID) {
-		return (IPMachineControl) machines.get(ID);
-	}
-
-	private synchronized IPProcess getProcess(String ID) {
-		IPJob[] jobs = localQueue.getJobs();
-		for (int i = 0; i < jobs.length; ++i) {
-			IPJob job = jobs[i];
-			IPProcess proc = job.findProcessByName(ID);
-			if (proc != null)
-				return proc;
-		}
-		return null;
 	}
 
 	private synchronized IPJob newJob(int numProcesses, boolean debug,
@@ -576,12 +503,28 @@ public abstract class RuntimeResourceManager extends AbstractResourceManager
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManager#doDisableEvents()
+	 */
+	protected void doDisableEvents() {
+		// no-op		
+	}
+
 	protected void doDispose() {
 		// stop should be called by super.dispose(), so there is
 		// nothing left to do.
 	}
 
-	protected void doStart(IProgressMonitor monitor) throws CoreException {
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManager#doEnableEvents()
+	 */
+	protected void doEnableEvents() {
+		// no-op
+	}
+
+	protected abstract void doStartRuntime(IProgressMonitor monitor) throws CoreException;
+
+	protected void doStartup(IProgressMonitor monitor) throws CoreException {
 		if (monitor == null) {
 			monitor = new NullProgressMonitor();
 		}
@@ -594,8 +537,6 @@ public abstract class RuntimeResourceManager extends AbstractResourceManager
 			monitor.done();
 		}
 	}
-
-	protected abstract void doStartRuntime(IProgressMonitor monitor) throws CoreException;
 
 	protected IControlSystem getControlSystem() {
 		return controlSystem;

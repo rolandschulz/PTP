@@ -99,7 +99,7 @@ IAdaptable, IResourceManagerMenuContribution, IModelModifier {
 	 * @param id
 	 * @return
 	 */
-	public IPQueue getQueue(int id);
+	public IPQueue getQueue(String id);
 
 	/**
 	 * @return
@@ -140,10 +140,20 @@ IAdaptable, IResourceManagerMenuContribution, IModelModifier {
 	 * @param monitor TODO
 	 * 
 	 */
-	public void start(IProgressMonitor monitor) throws CoreException;
+	public void startUp(IProgressMonitor monitor) throws CoreException;
 
 	/**
 	 * 
 	 */
-	public void stop() throws CoreException;
+	public void shutdown() throws CoreException;
+	
+	/**
+	 * @throws CoreException
+	 */
+	public void enableEvents() throws CoreException;
+	
+	/**
+	 * @throws CoreException
+	 */
+	public void disableEvents() throws CoreException;
 }

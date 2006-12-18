@@ -7,6 +7,10 @@ package org.eclipse.ptp.rmsystem;
  */
 public class ResourceManagerStatus {
 
+	public static final ResourceManagerStatus EVENTS_DISABLED = new ResourceManagerStatus(Messages.getString("ResourceManagerStatus.EVENTS_DISABLED")); //$NON-NLS-1$
+
+	public static final ResourceManagerStatus EVENTS_ENABLED = new ResourceManagerStatus(Messages.getString("ResourceManagerStatus.EVENTS_ENABLED")); //$NON-NLS-1$
+
 	public static final ResourceManagerStatus ERROR = new ResourceManagerStatus(Messages.getString("ResourceManagerStatus.ERROR")); //$NON-NLS-1$
 
 	public static final ResourceManagerStatus STARTED = new ResourceManagerStatus(Messages.getString("ResourceManagerStatus.STARTED")); //$NON-NLS-1$

@@ -21,6 +21,8 @@
  */
 package org.eclipse.ptp.rmsystem;
 
+import java.util.HashMap;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ISafeRunnable;
@@ -32,8 +34,13 @@ import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.ptp.core.IModelListener;
 import org.eclipse.ptp.core.INodeListener;
+import org.eclipse.ptp.core.IPJob;
+import org.eclipse.ptp.core.IPMachine;
+import org.eclipse.ptp.core.IPProcess;
+import org.eclipse.ptp.core.IPQueue;
 import org.eclipse.ptp.core.IProcessListener;
 import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.elementcontrols.IPJobControl;
 import org.eclipse.ptp.core.elementcontrols.IPMachineControl;
 import org.eclipse.ptp.core.elementcontrols.IPQueueControl;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
@@ -56,13 +63,17 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 
 	private ResourceManagerStatus status;
 
-	protected final Display display;
-
 	private final ListenerList modelListeners = new ListenerList();
 
 	private final ListenerList nodeListeners = new ListenerList();
 
 	private final ListenerList processListeners = new ListenerList();
+
+	protected final Display display;
+
+	protected final HashMap queues = new HashMap();
+
+	protected final HashMap machines = new HashMap();
 	
 	public AbstractResourceManager(IPUniverseControl universe, IResourceManagerConfiguration config)
 	{
@@ -94,6 +105,14 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	}
 
 	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManager#disableEvents()
+	 */
+	public void disableEvents() throws CoreException {
+		doDisableEvents();
+		setStatus(ResourceManagerStatus.EVENTS_DISABLED, true);
+	}
+
+	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.IResourceManager#dispose()
 	 */
 	public void dispose() {
@@ -102,9 +121,38 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 		processListeners.clear();
 		SafeRunnable.run(new SafeRunnable(){
 			public void run() throws Exception {
-				stop();
+				shutdown();
 			}});
 		doDispose();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManager#enableEvents()
+	 */
+	public void enableEvents() throws CoreException {
+		doEnableEvents();
+		setStatus(ResourceManagerStatus.EVENTS_ENABLED, true);
+	}
+
+	public synchronized IPJobControl findJobById(String job_id) {
+		IPQueueControl[] queues = getQueueControls();
+		for (int j = 0; j < queues.length; ++j) {
+			IPJobControl job = queues[j].findJobById(job_id);
+			if (job != null) {
+				return job;
+			}
+		}
+		return null;
+	}
+
+	public synchronized IPQueue findQueueById(String id) {
+		IPQueueControl[] queues = getQueueControls();
+		for (int j = 0; j < queues.length; ++j) {
+			if (queues[j].getIDString().equals(id)) {
+				return queues[j];
+			}
+		}
+		return null;
 	}
 
 	/* (non-Javadoc)
@@ -124,7 +172,7 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	public IResourceManagerConfiguration getConfiguration() {
 		return config;
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.IResourceManager#getDescription()
 	 */
@@ -132,11 +180,35 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 		return config.getDescription();
 	}
 
+	public synchronized IPMachine getMachine(String ID) {
+		return (IPMachine) machines.get(ID);
+	}
+
+	public synchronized IPMachineControl[] getMachineControls() {
+		return (IPMachineControl[]) machines.values().toArray(new IPMachineControl[0]);
+	}
+
+	public IPMachine[] getMachines() {
+		return getMachineControls();
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.IResourceManager#getName()
 	 */
 	public String getName() {
 		return config.getName();
+	}
+
+	public IPQueue getQueue(String id) {
+		return (IPQueue) queues.get(id);
+	}
+
+	public synchronized IPQueueControl[] getQueueControls() {
+		return (IPQueueControl[]) queues.values().toArray(new IPQueueControl[0]);
+	}
+
+	public IPQueue[] getQueues() {
+		return getQueueControls();
 	}
 
 	/* (non-Javadoc)
@@ -149,7 +221,7 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	public boolean hasChildren() {
 		return getMachines().length > 0 || getQueues().length > 0;
 	}
-	
+
 	public boolean isAllStop() {
 		IPMachineControl[] machines = getMachineControls();
 		for (int i = 0; i < machines.length; i++) {
@@ -175,7 +247,7 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	public void removeProcessListener(IProcessListener listener) {
 		processListeners.remove(listener);
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -188,9 +260,22 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see org.eclipse.ptp.rm.IResourceManager#stop()
+	 */
+	public void shutdown() throws CoreException {
+		if (status.equals(ResourceManagerStatus.STARTED)) {
+			doShutdown();
+			setStatus(ResourceManagerStatus.STOPPED, false);
+			fireShutdown();
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.rm.IResourceManager#start()
 	 */
-	public void start(IProgressMonitor monitor) throws CoreException {
+	public void startUp(IProgressMonitor monitor) throws CoreException {
 		monitor.beginTask("Starting Resource Manager " + getName(), 10);
 		if (!status.equals(ResourceManagerStatus.STARTED) &&
 				!status.equals(ResourceManagerStatus.ERROR)) {
@@ -199,7 +284,7 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 			}
 			SubProgressMonitor subMonitor = new SubProgressMonitor(monitor, 10);
 			try {
-				doStart(subMonitor);
+				doStartup(subMonitor);
 			}
 			finally {
 				monitor.done();
@@ -209,19 +294,6 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 		}
 		else {
 			monitor.done();
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rm.IResourceManager#stop()
-	 */
-	public void stop() throws CoreException {
-		if (status.equals(ResourceManagerStatus.STARTED)) {
-			doStop();
-			setStatus(ResourceManagerStatus.STOPPED, false);
-			fireStopped();
 		}
 	}
 
@@ -238,21 +310,41 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 		}
 	}
 
+	protected synchronized void addMachine(String ID, IPMachineControl machine) {
+		machines.put(ID, machine);
+		fireMachinesChanged(new int[]{machine.getID()});
+	}
+
+	protected synchronized void addQueue(String ID, IPQueueControl queue) {
+		queues.put(ID, queue);
+		fireQueuesChanged(new int[]{queue.getID()});
+	}
+
+	/**
+	 * 
+	 */
+	protected abstract void doDisableEvents();
+
 	/**
 	 * 
 	 */
 	protected abstract void doDispose();
 
 	/**
-	 * @param monitor TODO
-	 * @throws CoreException
+	 * 
 	 */
-	protected abstract void doStart(IProgressMonitor monitor) throws CoreException;
+	protected abstract void doEnableEvents();
 
 	/**
 	 * @throws CoreException
 	 */
-	protected abstract void doStop() throws CoreException;
+	protected abstract void doShutdown() throws CoreException;
+
+	/**
+	 * @param monitor
+	 * @throws CoreException
+	 */
+	protected abstract void doStartup(IProgressMonitor monitor) throws CoreException;
 
 	/**
 	 * @param event
@@ -325,6 +417,19 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 		}
 	}
 
+	protected void fireShutdown() {
+		Object[] tmpListeners = listeners.getListeners();
+		
+		for (int i = 0, n = tmpListeners.length; i < n; ++i) {
+			final IResourceManagerListener listener = (IResourceManagerListener) tmpListeners[i];
+			safeRunAsyncInUIThread(new SafeRunnable() {
+				public void run() {
+					listener.handleShutdown(AbstractResourceManager.this);
+				}
+			});
+		}
+	}
+
 	protected void fireStarted() {
 		Object[] tmpListeners = listeners.getListeners();
 		
@@ -332,7 +437,7 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 			final IResourceManagerListener listener = (IResourceManagerListener) tmpListeners[i];
 			safeRunAsyncInUIThread(new SafeRunnable() {
 				public void run() {
-					listener.handleStarted(AbstractResourceManager.this);
+					listener.handleStartup(AbstractResourceManager.this);
 				}
 			});
 		}
@@ -351,17 +456,28 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 		}
 	}
 
-	protected void fireStopped() {
-		Object[] tmpListeners = listeners.getListeners();
-		
-		for (int i = 0, n = tmpListeners.length; i < n; ++i) {
-			final IResourceManagerListener listener = (IResourceManagerListener) tmpListeners[i];
-			safeRunAsyncInUIThread(new SafeRunnable() {
-				public void run() {
-					listener.handleStopped(AbstractResourceManager.this);
-				}
-			});
+	protected IPMachineControl getMachineControl(String ID) {
+		return (IPMachineControl) machines.get(ID);
+	}
+
+	protected synchronized IPProcess getProcess(String ID) {
+		IPQueueControl[] theQueues = getQueueControls();
+		for (int iq=0; iq<theQueues.length; ++iq) {
+			IPJob[] jobs = theQueues[iq].getJobs();
+			for (int i = 0; i < jobs.length; ++i) {
+				IPJob job = jobs[i];
+				IPProcess proc = job.findProcessByName(ID);
+				if (proc != null)
+					return proc;
+			}
 		}
+		return null;
+	}
+
+	protected CoreException makeCoreException(String string) {
+		IStatus status = new Status(Status.ERROR, PTPCorePlugin.getUniqueIdentifier(),
+				Status.ERROR, string, null);
+		return new CoreException(status);
 	}
 
 	/**
@@ -395,12 +511,6 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 		if (fireEvent) {
 			fireStatusChanged(oldStatus);
 		}
-	}
-
-	protected CoreException makeCoreException(String string) {
-		IStatus status = new Status(Status.ERROR, PTPCorePlugin.getUniqueIdentifier(),
-				Status.ERROR, string, null);
-		return new CoreException(status);
 	}
 
 }
