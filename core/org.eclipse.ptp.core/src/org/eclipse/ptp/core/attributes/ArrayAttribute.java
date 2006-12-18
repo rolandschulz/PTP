@@ -27,6 +27,17 @@ import java.util.TreeSet;
 public final class ArrayAttribute extends AbstractAttribute {
 
 	/**
+	 * Acyclic visitor pattern, PLOPD3, p.79
+	 * @author rsqrd
+	 *
+	 */
+	public interface IVisitor extends IAttributeVisitor {
+
+		void visit(ArrayAttribute attribute);
+
+	}
+
+	/**
 	 * Compare two sets of components lexigraphically, i.e. dictionary ordering,
 	 * e.g.<br>
 	 * (aa) < (ab)<br>
@@ -78,6 +89,15 @@ public final class ArrayAttribute extends AbstractAttribute {
 	}
 
 	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.attributes.IAttribute#accept(org.eclipse.ptp.core.attributes.IAttributeVisitor)
+	 */
+	public void accept(IAttributeVisitor visitor) {
+		if (visitor instanceof IVisitor) {
+			((IVisitor) visitor).visit(this);
+		}
+	}
+	
+	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.attributes.IAttribute#create(java.lang.String)
 	 */
 	public IAttribute create(String string) throws IllegalValue {
@@ -116,8 +136,22 @@ public final class ArrayAttribute extends AbstractAttribute {
 		return Arrays.deepHashCode(attributes);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.attributes.IAttribute#isValid(java.lang.String)
+	 */
+	public boolean isValid(String string) {
+		throw new UnsupportedOperationException("ArrayAttribute is not mutable");
+	}
+
 	public void setDelimiter(String delimiter) {
 		this.delimeter = delimiter;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.attributes.IAttribute#setValue(java.lang.String)
+	 */
+	public void setValue(String string) throws IllegalValue {
+		throw new UnsupportedOperationException("ArrayAttribute is not mutable");
 	}
 
 	/**

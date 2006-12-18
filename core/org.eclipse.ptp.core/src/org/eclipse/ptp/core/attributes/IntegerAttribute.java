@@ -18,16 +18,31 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.attributes;
 
+
 public final class IntegerAttribute extends AbstractAttribute {
 
-	private final Integer value;
-	
+	/**
+	 * Acyclic Visitor Pattern, PLOPD3, p. 79
+	 * @author rsqrd
+	 *
+	 */
+	public interface IVisitor extends IAttributeVisitor {
+
+		void visit(IntegerAttribute attribute);
+
+	}
+
+	private Integer value;
+	private int minValue = 0;
+	private int maxValue = Integer.MAX_VALUE;
+
 	public IntegerAttribute(IAttributeDescription description, int value) {
 		super(description);
 		this.value = Integer.valueOf(value);
 	}
 
-	public IntegerAttribute(IAttributeDescription description, String string) throws IllegalValue {
+	public IntegerAttribute(IAttributeDescription description, String string)
+	throws IllegalValue {
 		super(description);
 		try {
 			this.value = Integer.valueOf(string);
@@ -37,11 +52,19 @@ public final class IntegerAttribute extends AbstractAttribute {
 		}
 	}
 
+	public void accept(IAttributeVisitor visitor) {
+		if (visitor instanceof IVisitor) {
+			((IVisitor)visitor).visit(this);
+		}
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.attributes.IAttribute#create(java.lang.String)
 	 */
 	public IAttribute create(String string) throws IllegalValue {
-		return new IntegerAttribute(getDescription(), string);
+		final IntegerAttribute integerAttribute = new IntegerAttribute(getDescription(), string);
+		integerAttribute.setValidRange(minValue, maxValue);
+		return integerAttribute;
 	}
 
 	public boolean equals(Object obj) {
@@ -50,6 +73,13 @@ public final class IntegerAttribute extends AbstractAttribute {
 			return value.equals(attr.value);
 		}
 		return false;
+	}
+	public int getMaxValue() {
+		return maxValue;
+	}
+
+	public int getMinValue() {
+		return minValue;
 	}
 
 	public String getStringRep() {
@@ -64,8 +94,53 @@ public final class IntegerAttribute extends AbstractAttribute {
 		return value.hashCode();
 	}
 
+	public boolean isValid(String string) {
+		try {
+			int val = Integer.parseInt(string);
+			if (val < minValue || val > maxValue) {
+				return false;
+			}
+			return true;
+		}
+		catch (NumberFormatException e) {
+			return false;
+		}
+	}
+
+	public void setValidRange(int minValue, int maxValue) throws IllegalValue {
+		if (minValue > maxValue) {
+			throw new IllegalArgumentException("minValue must be less than or equal to maxValue");
+		}
+		this.minValue = minValue;
+		this.maxValue = maxValue;
+		if (value.intValue() < this.minValue || value.intValue() > this.maxValue) {
+			throw new IllegalValue("The set valid range does not include the present value");
+		}
+	}
+	
+	public void setValue(Integer value) throws IllegalValue {
+		if (value.intValue() < this.minValue || value.intValue() > this.maxValue) {
+			throw new IllegalValue("The set valid range does not include the new value");
+		}
+		this.value = value;
+	}
+
+	public void setValue(String string) throws IAttribute.IllegalValue {
+		try {
+			Integer value = Integer.valueOf(string);
+			if (value.intValue() < this.minValue || value.intValue() > this.maxValue) {
+				throw new IllegalValue("The set valid range does not include the new value");
+			}
+			this.value = value;
+		}
+		catch (NumberFormatException e) {
+			throw new IAttribute.IllegalValue(e);
+		}
+	}
+
 	protected int doCompareTo(AbstractAttribute arg0) {
 		IntegerAttribute attr = (IntegerAttribute) arg0;
 		return this.value.compareTo(attr.value);
 	}
+
 }
