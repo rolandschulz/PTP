@@ -64,7 +64,7 @@ public class SimulationResourceManager extends RuntimeResourceManager {
 		}
 	}
 
-	protected void doStop() throws CoreException {
+	protected void doShutdown() throws CoreException {
 		// TODO Auto-generated method stub
 
 	}

@@ -92,7 +92,7 @@ public class ORTEResourceManager extends RuntimeResourceManager {
 		// do nothing
 	}
 
-	protected void doStop() throws CoreException {
+	protected void doShutdown() throws CoreException {
 		// do nothing
 	}
 

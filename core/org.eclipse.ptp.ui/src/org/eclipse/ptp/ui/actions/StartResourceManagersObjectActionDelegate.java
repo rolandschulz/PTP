@@ -82,7 +82,7 @@ public class StartResourceManagersObjectActionDelegate implements
 
 				protected IStatus run(IProgressMonitor monitor) {
 					try {
-						rmManager.start(monitor);
+						rmManager.startUp(monitor);
 					} catch (CoreException e) {
 						return e.getStatus();
 					}

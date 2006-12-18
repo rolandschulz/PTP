@@ -278,7 +278,7 @@ public class ResourceManagerView extends ViewPart implements
 		viewer.setInput(PTPCorePlugin.getDefault().getUniverse().getResourceManagers());
 	}
 
-	public void handleStarted(IResourceManager resourceManager) {
+	public void handleStartup(IResourceManager resourceManager) {
 		refreshViewer(resourceManager);
 	}
 
@@ -292,7 +292,7 @@ public class ResourceManagerView extends ViewPart implements
 		}
 	}
 
-	public void handleStopped(IResourceManager resourceManager) {
+	public void handleShutdown(IResourceManager resourceManager) {
 		refreshViewer(resourceManager);
 	}
 
