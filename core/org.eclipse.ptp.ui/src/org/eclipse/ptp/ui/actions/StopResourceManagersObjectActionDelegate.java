@@ -80,7 +80,7 @@ public class StopResourceManagersObjectActionDelegate implements
 			}
 
 			try {
-				rmManager.stop();
+				rmManager.shutdown();
 			} catch (CoreException e) {
 				final String message = UIMessage.getResourceString("StopResourceManagersObjectActionDelegate.UnableStopResourceManager") //$NON-NLS-1$
 						+ rmManager.getConfiguration().getName() + "\""; //$NON-NLS-1$

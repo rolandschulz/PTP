@@ -178,7 +178,7 @@ public class ResourceManagerPersistence {
 							// start the resource manager if it was running when saved.
 							if (isRunning) {
 								try {
-									tmpRMs[index].start(new SubProgressMonitor(monitor, 1));
+									tmpRMs[index].startUp(new SubProgressMonitor(monitor, 1));
 								} catch (CoreException e) {
 									statuses.add(e.getStatus());
 								}

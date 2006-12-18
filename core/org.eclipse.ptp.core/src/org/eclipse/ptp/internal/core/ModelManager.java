@@ -226,7 +226,7 @@ IResourceManagerListener {
 		}
 	}
 
-	public void handleStarted(IResourceManager resourceManager) {
+	public void handleStartup(IResourceManager resourceManager) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -234,7 +234,7 @@ IResourceManagerListener {
 		// TODO Auto-generated method stub
 		
 	}
-	public void handleStopped(IResourceManager resourceManager) {
+	public void handleShutdown(IResourceManager resourceManager) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -338,7 +338,7 @@ IResourceManagerListener {
 	public void stopResourceManagers() throws CoreException {
 		IResourceManager[] resourceManagers = universe.getResourceManagers();
 		for (int i = 0; i<resourceManagers.length; ++i) {
-			resourceManagers[i].stop();
+			resourceManagers[i].shutdown();
 		}
 	}
 	
