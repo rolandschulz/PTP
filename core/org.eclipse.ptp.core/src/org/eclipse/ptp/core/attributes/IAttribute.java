@@ -46,6 +46,13 @@ public interface IAttribute extends Comparable {
 	}
 
 	/**
+	 * This is part of the Acyclic IVisitor Pattern,
+	 * "Patterns Languages of Program Design 3", p.79
+	 * @param visitor
+	 */
+	void accept(IAttributeVisitor visitor);
+	
+	/**
 	 * Creates a new attribute of the same type given the string representation.
 	 * 
 	 * @param string
@@ -63,4 +70,19 @@ public interface IAttribute extends Comparable {
 	 * @return
 	 */
 	String getStringRep();
+	
+	/**
+	 * Is the string a parsable to a valid
+	 * attribute of this type?
+	 * 
+	 * @param string
+	 * @return
+	 */
+	boolean isValid(String string);
+		
+	/**
+	 * @param string
+	 * @throws IAttribute.IllegalValue
+	 */
+	void setValue(String string) throws IAttribute.IllegalValue;
 }

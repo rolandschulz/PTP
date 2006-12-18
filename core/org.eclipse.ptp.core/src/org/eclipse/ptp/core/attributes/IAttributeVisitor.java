@@ -18,20 +18,11 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.attributes;
 
-public interface IMutableAttribute extends IAttribute {
-	
-	/**
-	 * Is the string a parsable to a valid
-	 * attribute of this type?
-	 * 
-	 * @param string
-	 * @return
-	 */
-	boolean isValid(String string);
-		
-	/**
-	 * @param string
-	 * @throws IAttribute.IllegalValue
-	 */
-	void setValue(String string) throws IAttribute.IllegalValue;
+/**
+ * Part of the Acycylic Visitor Pattern, Pattern Languages of Program Design 3
+ * @author rsqrd
+ *
+ */
+public interface IAttributeVisitor {
+	// empty
 }

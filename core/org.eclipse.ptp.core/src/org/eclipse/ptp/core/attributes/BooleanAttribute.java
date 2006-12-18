@@ -18,73 +18,89 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.attributes;
 
-public final class StringAttribute extends AbstractAttribute {
+public class BooleanAttribute extends AbstractAttribute {
 
 	/**
 	 * Acyclic Visitor Pattern, PLOPD3, p. 79
 	 * @author rsqrd
 	 *
 	 */
-	public interface IVisitor extends IAttributeVisitor {
+	public interface IVisitor {
 
-		void visit(StringAttribute attribute);
+		void visit(BooleanAttribute attribute);
 
 	}
 
-	private StringBuffer value;
-	public StringAttribute(IAttributeDescription description, String string) {
-		this(description, new StringBuffer(string));
+	private Boolean value;
+
+	public BooleanAttribute(IAttributeDescription description, boolean value) {
+		super(description);
+		this.value = new Boolean(value);
 	}
-	
-	public StringAttribute(IAttributeDescription description, StringBuffer value) {
+
+	public BooleanAttribute(IAttributeDescription description, Boolean value) {
 		super(description);
 		this.value = value;
 	}
-	
+
 	public void accept(IAttributeVisitor visitor) {
 		if (visitor instanceof IVisitor) {
 			((IVisitor)visitor).visit(this);
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.attributes.IAttribute#create(java.lang.String)
-	 */
 	public IAttribute create(String string) throws IllegalValue {
-		return new StringAttribute(getDescription(), string);
+		return new BooleanAttribute(getDescription(), value);
 	}
 
 	public boolean equals(Object obj) {
-		if (obj instanceof StringAttribute) {
-			StringAttribute attr = (StringAttribute) obj;
-			return value.equals(attr.value);
-		}
-		return false;
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		final BooleanAttribute other = (BooleanAttribute) obj;
+		if (value == null) {
+			if (other.value != null)
+				return false;
+		} else if (!value.equals(other.value))
+			return false;
+		return true;
 	}
 
 	public String getStringRep() {
 		return value.toString();
 	}
-	
-	public String getValue() {
-		return value.toString();
-	}
 
 	public int hashCode() {
-		return value.hashCode();
+		final int PRIME = 31;
+		int result = 1;
+		result = PRIME * result + ((value == null) ? 0 : value.hashCode());
+		return result;
 	}
 
 	public boolean isValid(String string) {
-		return true;
+		if ("true".equalsIgnoreCase(string) || "false".equalsIgnoreCase(string)) {
+			return true;
+		}
+		return false;
 	}
 
-	public void setValue(String string) throws IAttribute.IllegalValue {
-		this.value.replace(0, this.value.length(), string);
+	public void setValue(Boolean value) {
+		this.value = value;
 	}
 
-	protected int doCompareTo(AbstractAttribute arg0) {
-		StringAttribute attr = (StringAttribute) arg0;
-		return this.value.toString().compareTo(attr.value.toString());
+	public void setValue(String string) throws IllegalValue {
+		if (!isValid(string)) {
+			throw new IllegalValue(string + " is not a legal Boolean");
+		}
+		value = Boolean.valueOf(string);
+	}
+
+	protected int doCompareTo(AbstractAttribute other) {
+		BooleanAttribute ba = (BooleanAttribute) other;
+		return value.compareTo(ba.value);
 	}
 
 }
