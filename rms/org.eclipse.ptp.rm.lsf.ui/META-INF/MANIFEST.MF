@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: LSF UI Plug-in
+Bundle-SymbolicName: org.eclipse.ptp.lsf.ui
+Bundle-Version: 2.0.0
+Bundle-Activator: org.eclipse.ptp.lsf.ui.Activator
+Bundle-Vendor: Los Alamos National Laboratory
+Bundle-Localization: plugin
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime
+Eclipse-LazyStart: true
