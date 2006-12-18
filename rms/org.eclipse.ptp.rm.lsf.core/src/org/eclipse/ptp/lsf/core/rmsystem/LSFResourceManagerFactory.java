@@ -28,30 +28,33 @@ import org.eclipse.ui.IMemento;
 public class LSFResourceManagerFactory extends AbstractResourceManagerFactory {
 
 	/**
-	 * @param name name of resource manager instance
+	 * @param name LSF resource manager instance name
 	 */
 	public LSFResourceManagerFactory(String name) {
 		super(name);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory#create(org.eclipse.ptp.rmsystem.IResourceManagerConfiguration)
+	 */
 	public IResourceManager create(IResourceManagerConfiguration confIn) {
 		LSFResourceManagerConfiguration configuration = (LSFResourceManagerConfiguration) confIn;
 		final PTPCorePlugin plugin = PTPCorePlugin.getDefault();
-		//Preferences p = plugin.getPluginPreferences();
 		final IPUniverseControl universe = (IPUniverseControl) plugin.getUniverse();
 		return new LSFResourceManager(universe, configuration);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerFactory#createConfiguration()
+	 */
 	public IResourceManagerConfiguration createConfiguration() {
-		// TODO Auto-generated method stub
-		return null;
+		return new LSFResourceManagerConfiguration(this);
 	}
 
-	/**
-	 * @param memento
-	 * @return
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerFactory#loadConfiguration(org.eclipse.ui.IMemento)
 	 */
 	public IResourceManagerConfiguration loadConfiguration(IMemento memento) {
-		return null;
+		return LSFResourceManagerConfiguration.load(this, memento);
 	}
 }

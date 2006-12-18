@@ -34,8 +34,7 @@ public class LSFResourceManager extends AbstractProxyResourceManager {
 	 * @param universe
 	 * @param config
 	 */
-	public LSFResourceManager(IPUniverseControl universe,
-			LSFResourceManagerConfiguration config) {
+	public LSFResourceManager(IPUniverseControl universe, LSFResourceManagerConfiguration config) {
 		super(universe, config);
 		// TODO Auto-generated constructor stub
 	}

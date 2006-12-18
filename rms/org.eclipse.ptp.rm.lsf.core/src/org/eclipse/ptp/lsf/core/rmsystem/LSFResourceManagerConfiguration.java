@@ -31,60 +31,71 @@ import org.eclipse.ui.IMemento;
 public class LSFResourceManagerConfiguration implements
 		IResourceManagerConfiguration {
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#getDescription()
-	 */
+	private static final String TAG_DESCRIPTION = "description"; //$NON-NLS-1$
+	private static final String TAG_FACTORY_ID = "factoryId"; //$NON-NLS-1$
+	private static final String TAG_NAME = "name"; //$NON-NLS-1$
+
+	public static IResourceManagerConfiguration load(LSFResourceManagerFactory factory,
+			IMemento memento) {
+		String factoryId = memento.getString(TAG_FACTORY_ID);
+		if (!factoryId.equals(factory.getId())) {
+			throw new IllegalStateException("Incompatable factory with factoryId"
+					+ " stored id" + factoryId 
+					+ ", factory id:" + factory.getId());
+		}
+		String name = memento.getString(TAG_NAME);
+		String desc = memento.getString(TAG_DESCRIPTION);
+		
+		LSFResourceManagerConfiguration config = new LSFResourceManagerConfiguration(factory,
+				name, desc);
+		
+		return config;
+	}
+	
+	private String description;
+	private final String factoryId;
+	private String name;
+	
+	public LSFResourceManagerConfiguration(LSFResourceManagerFactory factory) {
+		this(factory, "", "");
+		setDefaultNameAndDesc();
+	}
+	
+	public LSFResourceManagerConfiguration(LSFResourceManagerFactory factory, String name,
+			String desc) {
+		this.factoryId = factory.getId();
+		this.name = name;
+		this.description = desc;
+	}
+
 	public String getDescription() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.description;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#getName()
-	 */
 	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.name;
 	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#getResourceManagerId()
-	 */
+	
 	public String getResourceManagerId() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.factoryId;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#save(org.eclipse.ui.IMemento)
-	 */
 	public void save(IMemento memento) {
-		// TODO Auto-generated method stub
-
+		memento.putString(TAG_FACTORY_ID, getResourceManagerId());
+		memento.putString(TAG_NAME, name);
+		memento.putString(TAG_DESCRIPTION, description);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#setDefaultNameAndDesc()
-	 */
 	public void setDefaultNameAndDesc() {
-		// TODO Auto-generated method stub
-
+		this.name = "LSF";
+		this.description = "LSF Resource Manager";
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#setDescription(java.lang.String)
-	 */
 	public void setDescription(String description) {
-		// TODO Auto-generated method stub
-
+		this.description = description;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#setName(java.lang.String)
-	 */
 	public void setName(String name) {
-		// TODO Auto-generated method stub
-
+		this.name = name;
 	}
-
 }
