@@ -48,7 +48,7 @@ public final class ArrayAttribute extends AbstractAttribute {
 	 * @param rhs
 	 * @return
 	 */
-	protected static int compareLexigraphically(SortedSet lhs, SortedSet rhs) {
+	public static int compareLexigraphically(SortedSet lhs, SortedSet rhs) {
 		Iterator first1 = lhs.iterator();
 		Iterator first2 = rhs.iterator();
 		while (first1.hasNext() && first2.hasNext()) {
