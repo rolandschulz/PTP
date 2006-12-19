@@ -30,8 +30,8 @@ public class LSFResourceManagerFactory extends AbstractResourceManagerFactory {
 	/**
 	 * @param name LSF resource manager instance name
 	 */
-	public LSFResourceManagerFactory(String name) {
-		super(name);
+	public LSFResourceManagerFactory() {
+		super("LSF");
 	}
 
 	/* (non-Javadoc)
@@ -48,7 +48,12 @@ public class LSFResourceManagerFactory extends AbstractResourceManagerFactory {
 	 * @see org.eclipse.ptp.rmsystem.IResourceManagerFactory#createConfiguration()
 	 */
 	public IResourceManagerConfiguration createConfiguration() {
-		return new LSFResourceManagerConfiguration(this);
+		String proxyPath = "";
+		String host = "";
+		boolean launchManually = false;
+		LSFResourceManagerConfiguration config = new LSFResourceManagerConfiguration(this,
+				proxyPath, host, launchManually);
+		return config;
 	}
 
 	/* (non-Javadoc)

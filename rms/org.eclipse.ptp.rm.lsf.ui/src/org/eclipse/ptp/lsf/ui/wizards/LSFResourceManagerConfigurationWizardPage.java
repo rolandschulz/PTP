@@ -16,7 +16,7 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.mpich2.ui.wizards;
+package org.eclipse.ptp.lsf.ui.wizards;
 
 import java.io.File;
 
@@ -25,8 +25,8 @@ import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.mpich2.core.rmsystem.MPICH2ResourceManagerConfiguration;
-import org.eclipse.ptp.mpich2.ui.preferences.PreferenceConstants;
+import org.eclipse.ptp.lsf.core.rmsystem.LSFResourceManagerConfiguration;
+import org.eclipse.ptp.lsf.ui.preferences.PreferenceConstants;
 import org.eclipse.ptp.ui.utils.SWTUtil;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizard;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage;
@@ -44,14 +44,14 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-public final class MPICH2ResourceManagerConfigurationWizardPage extends
+public final class LSFResourceManagerConfigurationWizardPage extends
 		RMConfigurationWizardPage {
 	
 	protected class WidgetListener extends SelectionAdapter implements ModifyListener, IPropertyChangeListener 
 	{
 		public void modifyText(ModifyEvent evt) {
 			Object source = evt.getSource();
-			if(!loading && source == serverText)
+			if (!loading && (source == serverText || source == hostText))
 				updatePage();
 		}
 	
@@ -70,24 +70,26 @@ public final class MPICH2ResourceManagerConfigurationWizardPage extends
 	}
 
 	public static final String EMPTY_STRING = "";
-	private MPICH2ResourceManagerConfiguration config;
+	private LSFResourceManagerConfiguration config;
 	private String serverFile = EMPTY_STRING;
+	private String host = EMPTY_STRING;
 	private boolean loading = true;
 	private boolean isValid;
 	protected Text serverText = null;
+	protected Text hostText = null;
 	protected Button browseButton = null;
 	protected Button fManualButton = null;
 	protected WidgetListener listener = new WidgetListener();
 	
-	public MPICH2ResourceManagerConfigurationWizardPage(RMConfigurationWizard wizard) {
-		super(wizard, "MPICH2 Configuration Wizard Page");
-		setTitle("MPICH2 Configuration Wizard Page");
-		setDescription("MPICH2 Configuration Wizard Page");
+	public LSFResourceManagerConfigurationWizardPage(RMConfigurationWizard wizard) {
+		super(wizard, "LSF Configuration Wizard Page");
+		setTitle("LSF Configuration Wizard Page");
+		setDescription("LSF Configuration Wizard Page");
 		
-		//System.out.println("in MPICH2ResourceManagerConfigurationWizardPage");
+		//System.out.println("in LSFResourceManagerConfigurationWizardPage");
 		
 		final RMConfigurationWizard confWizard = getConfigurationWizard();
-		config = (MPICH2ResourceManagerConfiguration) confWizard.getConfiguration();
+		config = (LSFResourceManagerConfiguration) confWizard.getConfiguration();
 		setPageComplete(false);
 		isValid = false;
 	}
@@ -96,12 +98,12 @@ public final class MPICH2ResourceManagerConfigurationWizardPage extends
 	 * @see org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage#createControl(org.eclipse.swt.widgets.Composite)
 	 */
 	public void createControl(Composite parent) {
-		//System.out.println("In MPICH2ResourceManagerConfigurationWizardPage.createControl");
+		//System.out.println("In LSFResourceManagerConfigurationWizardPage.createControl");
 		Composite composite = new Composite(parent, SWT.NONE);
 		composite.setLayout(createGridLayout(1, true, 0, 0));
 		composite.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
 
-		createMPICH2Contents(composite);
+		createLSFContents(composite);
 		
 		loading = true;
 		loadSaved();
@@ -111,52 +113,65 @@ public final class MPICH2ResourceManagerConfigurationWizardPage extends
 
 		setControl(composite);
 		
-		//System.out.println("leaving MPICH2ResourceManagerConfigurationWizardPage.createControl");
+		//System.out.println("leaving LSFResourceManagerConfigurationWizardPage.createControl");
 	}
 
 	private void store() 
 	{
 		serverFile = serverText.getText();
+		host = hostText.getText();
 	}
 
 	public boolean performOk() 
 	{
 		store();
 		config.setServerFile(serverFile);
+		config.setHost(host);
 		config.setManualLaunch(fManualButton.getSelection());
 		return true;
 	}
 
-	private void createMPICH2Contents(Composite parent) {
+	private void createLSFContents(Composite parent) {
 		Group bGroup = new Group(parent, SWT.SHADOW_ETCHED_IN);
 		bGroup.setLayout(createGridLayout(1, true, 10, 10));
 		bGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
-		bGroup.setText("MPICH2 PTP Proxy Server");
+		bGroup.setText("LSF PTP Proxy Server");
 		
-		new Label(bGroup, SWT.WRAP).setText("Enter the path to the PTP MPICH2 proxy server.");
+		new Label(bGroup, SWT.WRAP).setText("Enter the path to the PTP LSF proxy server.");
 		
 		Composite serverComp = new Composite(bGroup, SWT.NONE);
 		serverComp.setLayout(createGridLayout(3, false, 0, 0));
 		serverComp.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 5));
 		
-		new Label(serverComp, SWT.NONE).setText("MPICH2|PTP proxy server file:");
+		new Label(serverComp, SWT.NONE).setText("LSF|PTP proxy server file:");
 		serverText = new Text(serverComp, SWT.SINGLE | SWT.BORDER);
 		serverText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		serverText.addModifyListener(listener);
 		browseButton = SWTUtil.createPushButton(serverComp, "Browse", null);
 		browseButton.addSelectionListener(listener);
 		
-		fManualButton = createCheckButton(parent, "Launch MPICH2 server manually");
+		new Label(bGroup, SWT.WRAP).setText("Enter the name of the LSF server host.");
+		
+		Composite hostComp = new Composite(bGroup, SWT.NONE);
+		hostComp.setLayout(createGridLayout(3, false, 0, 0));
+		hostComp.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 5));
+		
+		new Label(hostComp, SWT.NONE).setText("LSF|PTP proxy server host:");
+		hostText = new Text(hostComp, SWT.SINGLE | SWT.BORDER);
+		hostText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		hostText.addModifyListener(listener);
+		
+		fManualButton = createCheckButton(parent, "Launch LSF server manually");
 	}
 
 	private void loadSaved()
 	{
 		Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
 		
-		serverFile = preferences.getString(PreferenceConstants.MPICH2_PROXY_PATH);
-		/* if they don't have the ptp_mpich2_proxy path set, let's try and give them a default that might help */
+		serverFile = preferences.getString(PreferenceConstants.LSF_PROXY_PATH);
+		/* if they don't have the proxy path set, let's try and give them a default that might help */
 		if(serverFile.equals("")) {
-			serverFile = PTPCorePlugin.getDefault().locateFragmentFile("org.eclipse.ptp.mpich2.proxy", "ptp_mpich2_proxy.py");
+			serverFile = PTPCorePlugin.getDefault().locateFragmentFile("org.eclipse.ptp.lsf.proxy", "ptp_lsf_proxy.py");
 	    }
 		
 		//System.out.println("serverFile: " + serverFile);
@@ -166,7 +181,7 @@ public final class MPICH2ResourceManagerConfigurationWizardPage extends
 			return;
 		}
 		serverText.setText(serverFile);
-		fManualButton.setSelection(preferences.getBoolean(PreferenceConstants.MPICH2_LAUNCH_MANUALLY));
+		fManualButton.setSelection(preferences.getBoolean(PreferenceConstants.LSF_LAUNCH_MANUALLY));
 	}
 
 	private void setValid(boolean b) {
@@ -214,7 +229,7 @@ public final class MPICH2ResourceManagerConfigurationWizardPage extends
 	protected void handlePathBrowseButtonSelected() 
 	{
 		FileDialog dialog = new FileDialog(getShell());
-		dialog.setText("Select MPICH2|PTP Proxy server file");
+		dialog.setText("Select LSF|PTP Proxy server file");
 		String correctPath = getFieldContent(serverText.getText());
 		if (correctPath != null) {
 			File path = new File(correctPath);
@@ -228,23 +243,23 @@ public final class MPICH2ResourceManagerConfigurationWizardPage extends
 			serverText.setText(selectedPath);
 	}
 
-	protected boolean isValidMPICH2dSetting() 
+	protected boolean isValidLSFdSetting() 
 	{
-		String name = getFieldContent(serverText.getText());
-		if (name == null) {
-			setErrorMessage("Invalid MPICH2|PTP proxy server file");
+		String server = getFieldContent(serverText.getText());
+		if (server == null) {
+			setErrorMessage("Invalid LSF|PTP proxy server file");
 			//setValid(false);
 			return false;
 		}
 		else {
-			File path = new File(name);
+			File path = new File(server);
 			if (!path.exists() || !path.isFile()) {
-				setErrorMessage("Invalid MPICH2|PTP proxy server file");
+				setErrorMessage("Invalid LSF|PTP proxy server file");
 				//setValid(false);
 				return false;
 			}
 		}
-	
+		
 		return true;
 	}
 
@@ -265,7 +280,7 @@ public final class MPICH2ResourceManagerConfigurationWizardPage extends
 		setErrorMessage(null);
 		setMessage(null);
 	
-		if (!isValidMPICH2dSetting())
+		if (!isValidLSFdSetting())
 			return;
 	
 		performOk();

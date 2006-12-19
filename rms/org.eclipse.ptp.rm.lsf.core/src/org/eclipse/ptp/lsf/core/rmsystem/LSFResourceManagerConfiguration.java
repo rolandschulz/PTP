@@ -24,16 +24,14 @@ package org.eclipse.ptp.lsf.core.rmsystem;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ui.IMemento;
 
-/**
- * @author rsqrd
- *
- */
-public class LSFResourceManagerConfiguration implements
-		IResourceManagerConfiguration {
-
+final public class LSFResourceManagerConfiguration implements IResourceManagerConfiguration {
+	
 	private static final String TAG_DESCRIPTION = "description"; //$NON-NLS-1$
-	private static final String TAG_FACTORY_ID = "factoryId"; //$NON-NLS-1$
 	private static final String TAG_NAME = "name"; //$NON-NLS-1$
+	private static final String TAG_FACTORY_ID = "factoryId"; //$NON-NLS-1$
+	private static final String TAG_PROXY_PATH = "proxyPath"; //$NON-NLS-1$
+	private static final String TAG_LAUNCH_MANUALLY = "launchManually"; //$NON-NLS-1$
+	private static final String TAG_HOST = "host"; //$NON-NLS-1$
 
 	public static IResourceManagerConfiguration load(LSFResourceManagerFactory factory,
 			IMemento memento) {
@@ -45,45 +43,73 @@ public class LSFResourceManagerConfiguration implements
 		}
 		String name = memento.getString(TAG_NAME);
 		String desc = memento.getString(TAG_DESCRIPTION);
+		String serverFile = memento.getString(TAG_PROXY_PATH);
+		String host = memento.getString(TAG_HOST);
+		boolean launchManually = Boolean.parseBoolean(memento.getString(TAG_LAUNCH_MANUALLY));
 		
 		LSFResourceManagerConfiguration config = new LSFResourceManagerConfiguration(factory,
-				name, desc);
+				name, desc, serverFile, host, launchManually);
 		
 		return config;
 	}
-	
 	private String description;
-	private final String factoryId;
 	private String name;
+	private final String factoryId;
+	private String serverFile;
+
+	private boolean launchManually;
+	private String host;
 	
-	public LSFResourceManagerConfiguration(LSFResourceManagerFactory factory) {
-		this(factory, "", "");
+	public LSFResourceManagerConfiguration(LSFResourceManagerFactory factory,
+			String serverFile, String host, boolean launchManually) {
+		this(factory, "", "", serverFile, host, launchManually);
 		setDefaultNameAndDesc();
 	}
 	
-	public LSFResourceManagerConfiguration(LSFResourceManagerFactory factory, String name,
-			String desc) {
+	public LSFResourceManagerConfiguration(LSFResourceManagerFactory factory, String name, String desc,
+			String serverFile, String host, boolean launchManually) {
 		this.factoryId = factory.getId();
 		this.name = name;
 		this.description = desc;
+		this.serverFile = serverFile;
+		this.host = host;
+		this.launchManually = launchManually;
 	}
 
 	public String getDescription() {
 		return this.description;
 	}
 
+	/**
+	 * @return the host
+	 */
+	public String getHost() {
+		return host;
+	}
+	
 	public String getName() {
 		return this.name;
 	}
-	
+
 	public String getResourceManagerId() {
 		return this.factoryId;
+	}
+
+	public String getServerFile() {
+		return serverFile;
+	}
+
+	public boolean isLaunchManually() {
+		return launchManually;
 	}
 
 	public void save(IMemento memento) {
 		memento.putString(TAG_FACTORY_ID, getResourceManagerId());
 		memento.putString(TAG_NAME, name);
 		memento.putString(TAG_DESCRIPTION, description);
+		memento.putString(TAG_PROXY_PATH, serverFile);
+		memento.putString(TAG_HOST, host);
+		memento.putString(TAG_LAUNCH_MANUALLY, Boolean.toString(launchManually));
 	}
 
 	public void setDefaultNameAndDesc() {
@@ -95,7 +121,29 @@ public class LSFResourceManagerConfiguration implements
 		this.description = description;
 	}
 
+	/**
+	 * @param host the host to set
+	 */
+	public void setHost(String host) {
+		this.host = host;
+	}
+
+	/**
+	 * @param launchManually the launchManually to set
+	 */
+	public void setLaunchManually(boolean launchManually) {
+		this.launchManually = launchManually;
+	}
+
+	public void setManualLaunch(boolean launchManually) {
+		this.launchManually = launchManually;
+	}
+
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public void setServerFile(String serverFile) {
+		this.serverFile = serverFile;
 	}
 }
