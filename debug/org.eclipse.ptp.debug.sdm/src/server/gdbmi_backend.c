@@ -360,6 +360,7 @@ get_current_frame(stackframe **frame)
 	return 0;
 }
 
+#if 0
 static void
 AddVARMap(char *name, MIVar *mivar)
 {
@@ -396,6 +397,7 @@ AddVARMap(char *name, MIVar *mivar)
 		}
 	}
 }
+
 static varinfo *
 FindVARByName(char *name) 
 {
@@ -409,6 +411,7 @@ FindVARByName(char *name)
 	}
 	return NULL;
 }
+
 static varinfo *
 FindVARByMIName(char *mi_name) 
 {
@@ -422,6 +425,8 @@ FindVARByMIName(char *mi_name)
 	}
 	return NULL;
 }
+#endif
+
 static void
 RemoveVARMap(varinfo *map)
 {
@@ -438,6 +443,8 @@ RemoveVARMap(varinfo *map)
 		VARMap.nels--;
 	}
 }
+
+#if 0
 static void
 RemoveVARMapByName(char *name)
 {
@@ -445,6 +452,7 @@ RemoveVARMapByName(char *name)
 	map = FindVARByName(name);
 	RemoveVARMap(map);
 }
+
 static void
 RemoveVARMapByMIName(char *mi_name)
 {
@@ -452,6 +460,8 @@ RemoveVARMapByMIName(char *mi_name)
 	map = FindVARByMIName(mi_name);
 	RemoveVARMap(map);
 }
+#endif
+
 static void
 RemoveAllVARMap()
 {
@@ -466,12 +476,14 @@ RemoveAllVARMap()
 		RemoveVARMap(map);
 	}	
 }
+
 static void
 RemoveAllMaps()
 {
 	RemoveAllBPMap();
 	RemoveAllVARMap();
 }
+
 static List * 
 GetChangedVariables()
 {
@@ -644,10 +656,13 @@ GDBMIInit(void (*event_callback)(dbg_event *, void *), void *data)
 	return DBGRES_OK;
 }
 
-int timeout_cb(void *data)
+#if 0
+static int 
+timeout_cb(void *data)
 {
 	return 0;
 }
+#endif
 
 /*
  * Send command and wait for immediate response.
@@ -1446,7 +1461,6 @@ gmi_aif_evaluate_expression(mi_h *h, char *exp)
 	mi_send(h, "-aif-evaluate-expression \"%s\"\n", exp);
 	return mi_res_aif(h);
 }
-#endif
 
 int
 DumpBinaryValue(MISession *sess, char *exp, char *file)
@@ -1466,6 +1480,7 @@ DumpBinaryValue(MISession *sess, char *exp, char *file)
 	MICommandFree(cmd);
 	return 0;
 }
+#endif
 
 /*
 ** List local variables.
@@ -1915,6 +1930,7 @@ GDBMIGetNativeType(char *var)
 	AIFFree(a);
 	return DBGRES_OK;
 }
+
 #ifdef notdef
 /*
 ** Find AIF type of variable.
@@ -1982,6 +1998,7 @@ GetVarValue(char *var)
 	MICommandFree(cmd);
 	return res;
 }
+
 static int
 GetAddressLength()
 {
@@ -2002,6 +2019,7 @@ GetAddressLength()
 	ADDRESS_LENGTH = atoi(res);
 	return ADDRESS_LENGTH;
 }
+
 static char * 
 GetPtypeValue(char *exp) 
 {
@@ -2012,8 +2030,9 @@ GetPtypeValue(char *exp)
 	MICommandFree(cmd);
 	return type;
 }
+
 /********************************************************
- * TYPE CONVERTION 
+ * TYPE CONVERSION 
  ********************************************************/
 #define T_OTHER			0
 #define T_CHAR			1
@@ -2039,7 +2058,9 @@ GetPtypeValue(char *exp)
 #define T_STRUCT		20
 #define T_POINTER		21
 
-static int get_simple_type(char *type) {
+static int 
+get_simple_type(char *type) 
+{
 	char *t = NULL;
 	int id;
 	int len = strlen(type);
@@ -2104,7 +2125,10 @@ static int get_simple_type(char *type) {
 	free(t);
 	return id;
 }
-static int get_complex_type(char *type) {
+
+static int 
+get_complex_type(char *type) 
+{
 	int len = strlen(type);
 
 	switch (type[len - 1]) {
@@ -2175,6 +2199,7 @@ GetPrimitiveAIF(int id, char *res)
 			return VoidToAIF(0, 0);
 	}
 }
+
 static AIF *
 GetAIFPointer(char *addr, AIF *i)
 {
@@ -2196,6 +2221,7 @@ GetAIFPointer(char *addr, AIF *i)
 	AIFFree(ac);
 	return a;
 }
+
 static AIF *
 GetCharPointerAIF(char *res)
 {
@@ -2217,6 +2243,7 @@ GetCharPointerAIF(char *res)
 	}
 	return VoidToAIF(0, 0);
 }
+
 static AIF *
 GetSimpleAIF(MIVar *var, char *exp)
 {
@@ -2244,6 +2271,7 @@ GetSimpleAIF(MIVar *var, char *exp)
 		return GetPrimitiveAIF(id, GetVarValue(var->name));
 	}
 }
+
 static AIF* 
 GetNamedAIF(AIF *a, int named) 
 {
@@ -2252,6 +2280,7 @@ GetNamedAIF(AIF *a, int named)
 	}
 	return a;
 }
+
 static AIF *
 GetStructAIF(MIVar *var, int named)
 {
@@ -2289,6 +2318,7 @@ GetStructAIF(MIVar *var, int named)
 	}
 	return a;
 }
+
 static AIF *
 GetUnionAIF(MIVar *var, int named)
 {
@@ -2329,6 +2359,7 @@ GetUnionAIF(MIVar *var, int named)
 	}
 	return a;
 }
+
 static AIF *
 GetArrayAIF(MIVar *var, int named)
 {
@@ -2349,6 +2380,7 @@ GetArrayAIF(MIVar *var, int named)
 	}
 	return a;
 }
+
 static AIF *
 GetPointerAIF(MIVar *var, int named)
 {
@@ -2388,6 +2420,7 @@ GetPointerAIF(MIVar *var, int named)
 	AIFFree(ac);
 	return a;
 }
+
 static AIF * 
 GetComplexAIF(MIVar *var, char *exp, int named) 
 {
@@ -2405,6 +2438,7 @@ GetComplexAIF(MIVar *var, char *exp, int named)
 		return GetStructAIF(var, named);
 	}
 }
+
 static AIF *
 GetAIF(MIVar *var, char *exp, int named)
 {
@@ -2441,7 +2475,7 @@ GetAIF(MIVar *var, char *exp, int named)
 }
 
 /*************************** PARTIAL AIF ***************************/
-static AIF* 
+static AIF * 
 GetPartialArrayAIF(MIVar *var)
 {
 	AIF *a = NULL;
@@ -2471,6 +2505,7 @@ GetPartialArrayAIF(MIVar *var)
 	}
 	return a;
 }
+
 static AIF *
 GetPartialStructAIF(MIVar *var)
 {
@@ -2498,6 +2533,7 @@ GetPartialStructAIF(MIVar *var)
 	}
 	return a;
 }
+
 static AIF *
 GetPartialUnionAIF(MIVar *var)
 {
@@ -2525,6 +2561,7 @@ GetPartialUnionAIF(MIVar *var)
 	}
 	return a;
 }
+
 static AIF *
 GetPartialPointerAIF(MIVar *var)
 {
@@ -2582,6 +2619,7 @@ GetPartialPointerAIF(MIVar *var)
 	}
 	return a;
 }
+
 static AIF * 
 GetPartialComplexAIF(MIVar *var, char *exp)
 {
@@ -2599,6 +2637,7 @@ GetPartialComplexAIF(MIVar *var, char *exp)
 		return GetPartialStructAIF(var);
 	}
 }
+
 static AIF *
 GetPartailAIF(MIVar *var, char *exp)
 {
@@ -2651,6 +2690,7 @@ GetChildrenMIVar(char *mivar_name, int showParentType)
 	MICommandFree(cmd);
 	return mivar;	
 }
+
 static MIVar *
 GetMIVarDetails(char *name)
 {
@@ -2674,6 +2714,7 @@ GetMIVarDetails(char *name)
 	MICommandFree(cmd);
 	return mivar;
 }
+
 static int
 GDBGetPartialAIF(char *var_name, int listChildren, int express)
 {
@@ -2722,8 +2763,6 @@ GDBGetPartialAIF(char *var_name, int listChildren, int express)
 
 	return DBGRES_OK;
 }
-
-
 
 static int
 GDBMIVarDelete(char *name)
