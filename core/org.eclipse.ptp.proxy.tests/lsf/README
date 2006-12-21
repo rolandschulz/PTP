@@ -1,0 +1,7 @@
+A version of the LSF proxy, ptp_lsf_proxy, is built in this directory for testing.
+
+In order to run the LSF JUnit tests one must first:
+	1. Run make in org.eclipse.ptp.lsf.proxy
+		- This will require that org.eclipse.ptp.proxy and org.eclipse.ptp.utils
+		  libraries be created.
+	2. Run make in this directory to create a local copy of ptp_lsf_proxy.
