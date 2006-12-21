@@ -114,7 +114,6 @@ typedef struct ptp_job ptp_job;
 
 int 		lsf_shutdown = 0;
 proxy_svr *	lsf_proxy;			/* this proxy server */
-int		is_lsf_initialized = 0;
 pid_t		lsfd_pid = 0;
 List *		eventList;
 List *		jobList;
@@ -134,12 +133,13 @@ static proxy_svr_helper_funcs helper_funcs = {
 };
 
 static proxy_svr_commands command_tab[] = {
-	{"STARTDAEMON",		LSF_StartDaemon},
-	{"DISCOVER",		LSF_Discover},
-	{"RUN",			LSF_Run},
-	{"TERMJOB",		LSF_TerminateJob},
-	{"QUI",			LSF_Quit},
-	{NULL,			NULL},
+	{"INIT",			LSF_Initialize},
+	{"START_EVENTS",	LSF_StartEvents},
+	{"HALT_EVENTS",		LSF_HaltEvents},
+	{"RUN",				LSF_Run},
+	{"TERMJOB",			LSF_TerminateJob},
+	{"QUI",				LSF_Quit},
+	{NULL,				NULL},
 };
 
 static struct option longopts[] = {
@@ -154,39 +154,47 @@ static struct option longopts[] = {
 #define JOBID_DEBUG	2
 #define JOBID_LSF	3
 
-
 /**
- * Initialize the LSF service
+ * Initialize LSFLIB
  */
-static int
-LSF_Init(char* app_name)
-{
-	fprintf(stdout, "LSF_Init (%s)\n", app_name); fflush(stdout);
-
-#ifdef LSF	
+ static int
+initLSF(char* app_name)
+ {
+ 	int ret;
+ 	
+    gInitialized = 1;
+	gLSF_host_poll_freq  = LSF_HOST_POLL_FREQ_DEFAULT;
+	gLSF_queue_poll_freq = LSF_QUEUE_POLL_FREQ_DEFAULT;
+	
 	/* initialize LSBLIB */
-	if (lsb_init(app_name) < 0) {
+	if ( (ret = lsb_init(app_name)) < 0 ) {
 		lsb_perror("%s: lsb_init() failed");
-		exit(-1);
+		return ret;
 	}
-#endif
 
-	is_lsf_initialized = 1;
-	return 0;
-}
+ 	return 0;
+ }
 
 
 static int
-LSF_IsShutdown(void)
+isShutdown(void)
 {
 	return lsf_shutdown != 0;
 }
+
+static useconds_t
+usleepInterval()
+{
+	useconds_t interval = 1000000 / gLSF_queue_poll_freq;
+	return interval;
+}
+
 
 /**
  * Initialize the LSF service (no LSBLIB calls needed to shutdown LSF)
  */
 static int
-LSF_Shutdown(void)
+shutdownLSF(void)
 {
 	lsf_shutdown = 0;
 	return 0;
@@ -194,7 +202,7 @@ LSF_Shutdown(void)
 
 
 static char *
-LSF_ErrorStr(int type, char *msg)
+errorStr(int type, char *msg)
 {
 	char * str;
 	static char * res = NULL;
@@ -212,21 +220,15 @@ LSF_ErrorStr(int type, char *msg)
 }
 
 
-static int
-LSF_Initialized(void)
-{
-	return is_lsf_initialized;
-}
-
 #ifdef LSF
 static int
-LSF_CheckErrorCode(int type, int rc)
+checkErrorCode(int type, int rc)
 {
 	if (rc != LSF_SUCCESS) {
 // FIXME
 //		printf("ARgh!  An error!\n"); fflush(stdout);
 //		printf("ERROR %s\n", LSF_ERROR_NAME(rc)); fflush(stdout);
-//		AddToList(eventList, (void *)LSF_ErrorStr(type, (char *)LSF_ERROR_NAME(rc)));
+//		AddToList(eventList, (void *)errorStr(type, (char *)LSF_ERROR_NAME(rc)));
 		return 1;
 	}
 
@@ -246,21 +248,93 @@ LSF_CheckErrorCode(int type, int rc)
 *****/
     fprintf(stdout, "LSF_CheckErrorCode: type = %d\n", type);   // FIXME by removal
     
-	return 0;
+	return PROXY_RES_OK;
 }
 #endif
 
 
 /**
- * Start the LSF daemon (remote call from a client proxy)
- *
- * TODO - may not need to start a daemon for LSF (perhaps need to start a copy of myself)
+ * Notify proxy client of host information changes
+ * 
+ * 	TODO - compare with old info
+ */
+static int
+notifyHostInfoChange(struct hostInfoEnt *hInfo)
+{
+	char *res, *str1, *str2, *str3;
+	char id[64], host[64], state[64];
+
+	sprintf(id, "%s=%d", ATTRIB_MACHINEID, 0);
+	//sprintf(host, "%s=%s", ATTRIB_NODE_NUMBER, hInfo->host); ??????
+	sprintf(host, "%s=%s", ATTRIB_NODE_NAME, hInfo->host);
+	sprintf(state, "%s=%d", ATTRIB_NODE_STATE, hInfo->hStatus);
+	proxy_cstring_to_str(id, &str1);
+	proxy_cstring_to_str(host, &str2);
+	proxy_cstring_to_str(state, &str3);
+	asprintf(&res, "%d %s %s %s", RTEV_NATTR, str1, str2, str3);
+	AddToList(eventList, (void *)res);
+	
+	return PROXY_RES_OK;
+}
+
+
+/**
+ * Send EVENT_RUNTIME_OK to server
+ */
+ static void
+ sendRuntimeEventOK()
+ {
+ 	char* res;
+ 	asprintf(&res, "%d", RTEV_OK);
+	AddToList(eventList, (void *)res);
+	// TODO - is this a memory leak?
+ }
+
+
+/**
+ * Initialize the LSF service
  */
 int
-LSF_StartDaemon(char ** args)
+LSF_Initialize(char** args)
 {
-	fprintf(stdout, "  LSF_StartDaemon\n"); fflush(stdout);
-	return 0;
+	fprintf(stdout, "LSF_Initialize (%s)\n", args[0]); fflush(stdout);
+	if ( !gInitialized ) {
+		if ( initLSF(args[0]) ) {
+			return PROXY_RES_ERR;
+		}
+	}
+	sendRuntimeEventOK();
+	
+	return PROXY_RES_OK;
+}
+
+
+/**
+ * Start polling
+ * 
+ *  start polling for:
+ *		1. host information - lsb_gethostinfo()
+ * 		2. batch specific host information - lsb_hostinfo()
+ * 		3. queue information - lsb_queueinfo()
+ */
+ int
+LSF_StartEvents(char **args)
+{
+	fprintf(stdout, "  LSF_StartEvents\n"); fflush(stdout);
+	gSendEvents = 1;
+	return PROXY_RES_OK;	
+}
+
+
+/**
+ * Stop polling
+ */
+ int
+LSF_HaltEvents(char **args)
+{
+	fprintf(stdout, "  LSF_HaltEvents\n"); fflush(stdout);
+	gSendEvents = 0;
+	return PROXY_RES_OK;	
 }
 
 
@@ -272,7 +346,7 @@ LSF_StartDaemon(char ** args)
 int
 LSF_Run(char **args)
 {
-#ifdef LSF
+#ifdef LSF_NOT_YET
 	int					rtn;
 	LS_LONG_INT			jobId;				
 	struct submit*		jobSubReq;		/* Job specifications */
@@ -289,32 +363,10 @@ LSF_Run(char **args)
 /**
  * Initiate the discovery phase
  * 
- * Discover:
- *		1. host information - ls_gethostinfo()
- * 		2. batch specific host information - lsb_hostinfo()
- * 		3. queue information - lsb_queueinfo()
  */
 int
 LSF_Discover(char **args)
 {
-#ifdef LSF
-	char*	hosts[1];			/* list of host names */
-	int		num_hosts = 1;		/* number of hosts (0 = all; 1 = localhost) */
-	struct hostInfoEnt* host_info = lsb_hostinfo(hosts, &num_hosts);
-	
-	char  **queues;			/* Array containing names of queues of interest */
-	int   *numQueues;		/* Number of queues */
-	char  *hostname;		/* Specified queues using hostname */
-	char  *username;		/* Specified queues enabled for user */
-	int   options;			/* Reserved for future use; supply 0 */
-	struct queueInfoEnt* queue_info = lsb_queueinfo(queues, numQueues, hostname, username, options);
-	
-	if (host_info == NULL) {
-		lsb_perror("ptp_lsf_proxy: lsb_hostinfo() failed");
-		exit (-1);
-	}
-#endif
-
 	fprintf(stdout, "DISCOVERY PHASE: end\n"); fflush(stdout);
 	return PROXY_RES_OK;
 }
@@ -348,8 +400,10 @@ LSF_TerminateJob(char **args)
 int
 LSF_Quit(char **args)
 {
-	LSF_Shutdown();
 	fprintf(stdout, "LSF_Quit called!\n"); fflush(stdout);
+	shutdownLSF();
+	sendRuntimeEventOK();
+
 	return PROXY_RES_OK;
 }
 
@@ -360,11 +414,29 @@ LSF_Quit(char **args)
 static int
 LSF_Progress(void)
 {
+#ifdef LSF
+	char*	hosts[1];			/* list of host names */
+	int		num_hosts = 1;		/* number of hosts (0 = all; 1 = localhost) */
+	struct	hostInfoEnt* host_info;
+	
+	char*  queues[1];			/* Array containing names of queues of interest */
+	int   *numQueues;			/* Number of queues */
+	char  *queuehost = NULL;	/* Specified queues using hostname (NULL for all) */
+	char  *username = NULL;		/* Specified queues enabled for user (NULL for all) */
+	int   options = 0;			/* Reserved for future use; supply 0 */
+	struct queueInfoEnt* queue_info;
+#endif
+
+	// TODO - create function for this
+	static int nextHostPoll = 0;	/* poll for hosts when reaches 0 */
+
+	/* file descriptors for handling resource manager commands */
+	
 	fd_set			rfds;
 	fd_set			wfds;
 	fd_set			efds;
-	int			res;
-	int			nfds = 0;
+	int				res;
+	int				nfds = 0;
 	char *			event;
 	struct timeval	tv;
 	handler *		h;
@@ -379,15 +451,12 @@ LSF_Progress(void)
 		free(event);	
 	}
 
-	// TODO - are file events needed?
-	
 	/***********************************
 	 * First: Check for any file events
 	 */
 	 
-	/*
-	 * Set up fd sets
-	 */
+	/* Set up fd sets */
+
 	FD_ZERO(&rfds);
 	FD_ZERO(&wfds);
 	FD_ZERO(&efds);
@@ -419,11 +488,9 @@ LSF_Progress(void)
 			return PROXY_RES_ERR;
 		
 		case 0:
-			/*
-			 * Timeout.
-			 */
-			 break;
-			 		
+			/* Timeout. */
+			break;
+
 		default:
 			for (SetHandler(); (h = GetHandler()) != NULL; ) {
 				if (h->htype == HANDLER_FILE
@@ -438,12 +505,32 @@ LSF_Progress(void)
 	
 		break;
 	}
-	
-	/* only run the progress of the LSF code if we've initialized the LSF daemon */
-	if (LSF_Initialized()) {
-		// TODO: opal_event_loop(OPAL_EVLOOP_ONCE);
+
+#ifdef LSF
+	/* poll for hosts */
+    if (gSendEvents && --nextHostPoll < 1) {
+    	nextHostPoll = 0;	// TODO
+		host_info = lsb_hostinfo(hosts, &num_hosts);
+		if (host_info == NULL) {
+			lsb_perror("ptp_lsf_proxy: lsb_hostinfo() failed");
+			return PROXY_RES_ERR;
+		}
+		notifyHostInfoChange(host_info);
+    }
+#endif
+
+#ifdef LSF
+    /* poll for queues */
+    if (gSendEvents) {
+		queue_info = lsb_queueinfo(queues, numQueues, queuehost, username, options);
+		if (queue_info == NULL) {
+			lsb_perror("ptp_lsf_proxy: lsb_queueinfo() failed");
+			return PROXY_RES_ERR;
+		}
 	}
-	
+#endif
+	usleep(usleepInterval());
+
 	return PROXY_RES_OK;
 }
 
@@ -454,7 +541,7 @@ server(char* app_name, char* name, char* host, int port)
 	char* msg, * msg1, * msg2;
 	int rc;
 
-	LSF_Init(app_name);
+	initLSF(app_name);
 	
 	eventList = NewList();
 	jobList = NewList();
@@ -469,7 +556,7 @@ server(char* app_name, char* name, char* host, int port)
 	printf("proxy_svr_connect returned.\n");
 	
         /* make progress until shutdown */
-	while (ptp_signal_exit == 0 && !LSF_IsShutdown()) {
+	while (ptp_signal_exit == 0 && !isShutdown()) {
 		if  ((LSF_Progress() != PROXY_RES_OK) || (proxy_svr_progress(lsf_proxy) != PROXY_RES_OK)) {
 			break;
 		}
@@ -516,9 +603,9 @@ server(char* app_name, char* name, char* host, int port)
 		}
 		printf("###### SIGNAL: %s\n", msg1);
 		printf("###### Shutting down LSFd\n");
-		LSF_Shutdown();
+		shutdownLSF();
 		sprintf(msg, "ptp_lsf_proxy received signal %s (%s).  Exit was required and performed cleanly.", msg1, msg2);
-		AddToList(eventList, (void *) LSF_ErrorStr(RTEV_ERROR_SIGNAL, msg));
+		AddToList(eventList, (void *) errorStr(RTEV_ERROR_SIGNAL, msg));
 		free(msg);
 		free(msg1);
 		free(msg2);
@@ -551,6 +638,7 @@ main(int argc, char* argv[])
 	int			ch;
 	int			port = PROXY_TCP_PORT;
 	char*		host = "localhost";
+	char*		app_name = "ptp_lsf_proxy";
 	char*		proxy_str = DEFAULT_PROXY;
 	int			rc;
 	
@@ -606,7 +694,7 @@ main(int argc, char* argv[])
 	if(saved_signals[SIGABRT] != SIG_ERR && saved_signals[SIGABRT] != SIG_IGN && saved_signals[SIGABRT] != SIG_DFL) {
 		printf("  ---> SIGNAL SIGABRT was previously already defined.  Shadowing.\n"); fflush(stdout);
 	}	
-	rc = server(argv[0], proxy_str, host, port);
+	rc = server(app_name, proxy_str, host, port);
 	
 	return rc;
 }
