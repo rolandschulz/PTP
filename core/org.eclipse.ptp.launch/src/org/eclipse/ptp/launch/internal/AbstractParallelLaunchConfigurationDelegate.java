@@ -39,6 +39,7 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
+import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.debug.core.launch.PLaunch;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.internal.ui.LaunchMessages;
@@ -101,32 +102,24 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	protected JobRunConfiguration getJobRunConfiguration(ILaunchConfiguration configuration) throws CoreException
 	{
 		IFile programFile = getProgramFile(configuration);
-		String nprocs_str = getNumberOfProcesses(configuration);
-		String nprocpnode_str = getNumberOfProcessesPerNode(configuration);
-		String firstnode_str = getFirstNodeNumber(configuration);
 		String resourceManagerName = getResourceManagerName(configuration);	
 		String machineName = getMachineName(configuration);	
+		String queueName = getQueueName(configuration);	
+		IAttribute[] launchAttributes = getLaunchAttributes(configuration);
 		String[] args = getProgramParameters(configuration);
 		String[] env =  DebugPlugin.getDefault().getLaunchManager().getEnvironment(configuration);
 		String dir = verifyWorkDirectory(configuration);
 
-		int nprocs = -1;
-		int nprocpnode = -1;
-		int firstnode = -1;
-		
-		try {
-			nprocs = (new Integer(nprocs_str)).intValue();
-			nprocpnode = (new Integer(nprocpnode_str)).intValue();
-			firstnode = (new Integer(firstnode_str)).intValue();
-		}
-		catch(NumberFormatException e) {}
-
 		return new JobRunConfiguration(programFile.getProjectRelativePath().toOSString(), 
-				dir, resourceManagerName, machineName, nprocs, nprocpnode,
-				firstnode, args, env, dir);
+				dir, resourceManagerName, machineName, queueName, launchAttributes,
+				args, env, dir);
 	}
 	
-   protected String verifyWorkDirectory(ILaunchConfiguration configuration) throws CoreException {
+   private IAttribute[] getLaunchAttributes(ILaunchConfiguration configuration) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+protected String verifyWorkDirectory(ILaunchConfiguration configuration) throws CoreException {
         String workPath = getWorkDirectory(configuration);
         if (workPath == null) {
 			IProject project = verifyProject(configuration);
@@ -164,23 +157,17 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	protected static String getMachineName(ILaunchConfiguration configuration) throws CoreException {
 		return configuration.getAttribute(IPTPLaunchConfigurationConstants.MACHINE_NAME, (String)null);
 	}
+	protected static String getQueueName(ILaunchConfiguration configuration) throws CoreException {
+		return configuration.getAttribute(IPTPLaunchConfigurationConstants.QUEUE_NAME, (String)null);
+	}
 	protected static String getResourceManagerName(ILaunchConfiguration configuration) throws CoreException {
 		return configuration.getAttribute(IPTPLaunchConfigurationConstants.RESOURCE_MANAGER_NAME, (String)null);
-	}
-	protected static String getNumberOfProcesses(ILaunchConfiguration configuration) throws CoreException {
-	    return configuration.getAttribute(IPTPLaunchConfigurationConstants.NUMBER_OF_PROCESSES, (String)null);
 	}
 	/*
 	protected static String getCommunication(ILaunchConfiguration configuration) throws CoreException {
 	    return configuration.getAttribute(IPTPLaunchConfigurationConstants.NETWORK_TYPE, (String)null);
 	}
 	*/
-	protected static String getNumberOfProcessesPerNode(ILaunchConfiguration configuration) throws CoreException {
-	    return configuration.getAttribute(IPTPLaunchConfigurationConstants.PROCESSES_PER_NODE, (String)null);
-	}
-	protected static String getFirstNodeNumber(ILaunchConfiguration configuration) throws CoreException {
-	    return configuration.getAttribute(IPTPLaunchConfigurationConstants.FIRST_NODE_NUMBER, (String)null);
-	}
 	protected static String getArgument(ILaunchConfiguration configuration) throws CoreException {
 	    return configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_ARGUMENT, (String)null);
 	}

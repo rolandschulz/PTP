@@ -44,17 +44,15 @@ public interface IPTPLaunchConfigurationConstants {
 
 	public static final String MACHINE_NAME = PTP_LAUNCH_ID + ".MACHINE_NAME";
 
-	public static final String ATTR_STOP_IN_MAIN = PTP_LAUNCH_ID + ".STOP_IN_MAIN";
+	public static final String QUEUE_NAME = PTP_LAUNCH_ID + ".QUEUE_NAME";
+	
+	public static final String LAUNCH_ATTR_MAP = PTP_LAUNCH_ID + ".LAUNCH_ATTR_MAP";
 
-	public static final String NUMBER_OF_PROCESSES = PTP_LAUNCH_ID + ".NUMBER_OF_PROCESSES";
+	public static final String ATTR_STOP_IN_MAIN = PTP_LAUNCH_ID + ".STOP_IN_MAIN";
 
 	public static final String ATTR_DEBUGGER_ID = PTP_LAUNCH_ID + ".DEBUGGER_ID";
 
 	// public static final String NETWORK_TYPE = PTP_LAUNCH_ID + ".COMMUNICATION";
-	public static final String PROCESSES_PER_NODE = PTP_LAUNCH_ID + ".NUMBER_OF_PROCESSES_START";
-
-	public static final String FIRST_NODE_NUMBER = PTP_LAUNCH_ID + ".NODE_NUMBER";
-
 	public static final String ATTR_ARGUMENT = PTP_LAUNCH_ID + ".ARGUMENT_ATTR";
 
 	public static final String ATTR_WORK_DIRECTORY = PTP_LAUNCH_ID + ".WORK_DIRECTORY_ATTR";
@@ -65,13 +63,7 @@ public interface IPTPLaunchConfigurationConstants {
 	 */
 	public static final String ATTR_PLATFORM = PTP_LAUNCH_ID + ".PLATFFORM";
 
-	public static final String DEF_NUMBER_OF_PROCESSES = "0";
-
 	public static final String DEF_NETWORK_TYPE = P_TYPE;
-
-	public static final String DEF_PROCESSES_PER_NODE = "1";
-
-	public static final String DEF_FIRST_NODE_NUMBER = "0";
 
 	/**
 	 * Launch configuration attribute key. The value is the platform string of

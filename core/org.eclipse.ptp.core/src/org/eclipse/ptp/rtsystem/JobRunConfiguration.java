@@ -19,6 +19,8 @@
 
 package org.eclipse.ptp.rtsystem;
 
+import org.eclipse.ptp.core.attributes.IAttribute;
+
 /**
  * This is a complete description needed to run or debug a parallel job
  * 
@@ -42,27 +44,26 @@ public class JobRunConfiguration {
 	protected String pathToExec;
 	protected String resourceManagerName;
 	protected String machineName;
-	protected int numberOfProcesses;
-	protected int numberOfProcessesPerNode;
-	protected int firstNodeNumber;
 	protected String workingDir;
 	protected String[] arguments;
 	protected String[] environment;
 	protected String debuggerPath;
 	protected String[] debuggerArgs;
 	protected boolean isDebugJob;
+	protected IAttribute[] launchAttributes;
+	protected String queueName;
 	
 	public JobRunConfiguration(String exe, String exePath, String resourceManager,
-			String machine, int nprocs, int npernode, int first, String[] args,
-			String[] env, String dir)
+			String machine, String queue, IAttribute[] launchAttributes,
+			String[] args, String[] env,
+			String dir)
 	{
 		execName = exe;
 		pathToExec = exePath;
 		resourceManagerName = resourceManager;
 		machineName = machine;
-		numberOfProcesses = nprocs;
-		numberOfProcessesPerNode = npernode;
-		firstNodeNumber = first;
+		queueName = queue;
+		this.launchAttributes = launchAttributes;
 		workingDir = dir;
 		arguments = args;
 		environment = env;
@@ -91,21 +92,11 @@ public class JobRunConfiguration {
 		return machineName;
 	}
 	
-	public int getNumberOfProcesses()
+	public String getQueueName()
 	{
-		return numberOfProcesses;
+		return queueName;
 	}
 	
-	public int getNumberOfProcessesPerNode()
-	{
-		return numberOfProcessesPerNode;
-	}
-	
-	public int getFirstNodeNumber()
-	{
-		return firstNodeNumber;
-	}
-
 	public String getWorkingDir()
 	{
 		return workingDir;
@@ -157,9 +148,10 @@ public class JobRunConfiguration {
 				"path:\t\t"+pathToExec+"\n"+
 				"cwd:\t\t"+workingDir+"\n"+
 				"machineName:\t"+machineName+"\n"+
-				"#procs:\t\t"+numberOfProcesses+"\n"+
-				"#proc/node:\t"+numberOfProcessesPerNode+"\n"+
-				"firstNode#:\t"+firstNodeNumber+"\n"+
 				"isDebug?\t\t"+isDebugJob;
+	}
+
+	public IAttribute[] getLaunchAttributes() {
+		return launchAttributes;
 	}
 }

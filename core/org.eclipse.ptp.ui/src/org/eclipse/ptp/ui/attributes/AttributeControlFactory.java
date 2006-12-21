@@ -34,7 +34,7 @@ public class AttributeControlFactory {
 	 * @param attribute
 	 * @return
 	 */
-	public IAttributeControl create(Composite parent, int style, IAttribute attribute) {
+	public static IAttributeControl create(Composite parent, int style, IAttribute attribute) {
 		AttributeControlVisitor visitor = new AttributeControlVisitor(parent, style);
 		attribute.accept(visitor);
 		return visitor.getEditor();

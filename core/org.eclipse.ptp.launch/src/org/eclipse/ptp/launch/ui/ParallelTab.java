@@ -18,6 +18,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.launch.ui;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
@@ -27,12 +31,20 @@ import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ptp.core.IPMachine;
+import org.eclipse.ptp.core.IPQueue;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.IPUniverse;
 import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.attributes.IAttribute;
+import org.eclipse.ptp.core.attributes.IAttributeDescription;
+import org.eclipse.ptp.core.attributes.IAttribute.IllegalValue;
+import org.eclipse.ptp.core.elementcontrols.IPMachineControl;
+import org.eclipse.ptp.core.elementcontrols.IPQueueControl;
 import org.eclipse.ptp.internal.core.CoreMessages;
 import org.eclipse.ptp.launch.internal.ui.LaunchImages;
 import org.eclipse.ptp.rmsystem.IResourceManager;
+import org.eclipse.ptp.ui.attributes.AttributeControlFactory;
+import org.eclipse.ptp.ui.attributes.IAttributeControl;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -41,6 +53,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 
 /**
@@ -51,36 +64,47 @@ public class ParallelTab extends PLaunchConfigurationTab {
 	// protected Combo startupCombo = null;
 	// protected Composite dynamicComp = null;
 
-	protected Combo resourceManagerCombo;
+	protected class WidgetListener extends SelectionAdapter implements
+			IPropertyChangeListener {
+		public void propertyChange(PropertyChangeEvent event) {
+			updateLaunchConfigurationDialog();
+		}
 
-	protected Combo machineCombo;
+		public void widgetSelected(SelectionEvent e) {
+
+			if (e.getSource() == resourceManagerCombo) {
+				loadMachineAndQueueCombos();
+				updateLaunchAttributeControls();
+			}
+			else if (e.getSource() == machineCombo) {
+				updateLaunchAttributeControls();
+			}
+			else if (e.getSource() == queueCombo) {
+				updateLaunchAttributeControls();
+			}
+
+			updateLaunchConfigurationDialog();
+		}
+	}
+
+	protected Combo resourceManagerCombo;
 
 	// protected Combo networkTypeCombo = null;
 
-	protected IntegerFieldEditor numberOfProcessField = null;
-
+	protected Combo machineCombo;
+	
 	/*
 	 * protected IntegerFieldEditor numberOfProcessStartField = null; protected
 	 * IntegerFieldEditor firstNodeNumberField = null;
 	 */
 
-	protected class WidgetListener extends SelectionAdapter implements
-			IPropertyChangeListener {
-		public void widgetSelected(SelectionEvent e) {
-
-			if (e.getSource() == resourceManagerCombo) {
-				loadMachineCombo();
-			}
-
-			updateLaunchConfigurationDialog();
-		}
-
-		public void propertyChange(PropertyChangeEvent event) {
-			updateLaunchConfigurationDialog();
-		}
-	}
+	protected Combo queueCombo;
 
 	protected WidgetListener listener = new WidgetListener();
+
+	private Composite attrComp;
+
+	private IAttributeControl[] attrControls = new IAttributeControl[0];
 
 	/**
 	 * @see ILaunchConfigurationTab#createControl(Composite)
@@ -138,69 +162,65 @@ public class ParallelTab extends PLaunchConfigurationTab {
 		new Label(parallelComp, SWT.NONE).setText("Select machine:");
 		machineCombo = new Combo(parallelComp, SWT.READ_ONLY);
 
-		loadMachineCombo();
+		new Label(parallelComp, SWT.NONE).setText("Select queue:");
+		queueCombo = new Combo(parallelComp, SWT.READ_ONLY);
+
+		loadMachineAndQueueCombos();
 		
 		machineCombo.addSelectionListener(listener);
+		queueCombo.addSelectionListener(listener);
 
-		numberOfProcessField = new IntegerFieldEditor("numberOfProcess",CoreMessages.getResourceString("ParallelTab.Number_Of_Processes"), parallelComp);
-		numberOfProcessField.setValidRange(1, 100000);
-		numberOfProcessField.setPropertyChangeListener(listener);
+		createVerticalSpacer(parallelComp, 2);
 
-		// pRadio = new Button(parallelComp, SWT.RADIO);
-		// pRadio.setText(CoreMessages.getResourceString("ParallelTab.Ethernet_For_Communication"));
-		// gRadio = new Button(parallelComp, SWT.RADIO);
-		// gRadio.setText(CoreMessages.getResourceString("ParallelTab.Myrinet_For_Communication"));
+		attrComp = new Composite(parallelComp, SWT.NONE);
+		attrComp.setLayout(createGridLayout(2, false, 0, 0));
+		attrComp.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 5));
 
-		// pRadio = createRadioButton(parallelComp,
-		// CoreMessages.getResourceString("ParallelTab.Ethernet_For_Communication"));
-		// pRadio.addSelectionListener(listener);
-		// gRadio = createRadioButton(parallelComp,
-		// CoreMessages.getResourceString("ParallelTab.Myrinet_For_Communication"));
-		// gRadio.addSelectionListener(listener);
-
-		/*
-		 * new Label(dynamicComp,
-		 * SWT.NONE).setText(CoreMessages.getResourceString("ParallelTab.NetworkTypeLabel"));
-		 * networkTypeCombo = new Combo(dynamicComp, SWT.DROP_DOWN |
-		 * SWT.READ_ONLY); networkTypeCombo.setLayoutData(new
-		 * GridData(GridData.FILL_HORIZONTAL)); networkTypeCombo.setItems(new
-		 * String[] {"P4", "GM"});
-		 * networkTypeCombo.addSelectionListener(listener);
-		 */
-
-		/*
-		 * disabled temporarily numberOfProcessStartField = new
-		 * IntegerFieldEditor("numberOfProcessStar",
-		 * CoreMessages.getResourceString("ParallelTab.Processes_Per_Node"),
-		 * dynamicComp); numberOfProcessStartField.setValidRange(0, 5000);
-		 * numberOfProcessStartField.setPropertyChangeListener(listener);
-		 * 
-		 * firstNodeNumberField = new IntegerFieldEditor("firstNodeNumber",
-		 * CoreMessages.getResourceString("ParallelTab.First_Node_Number"),
-		 * dynamicComp); firstNodeNumberField.setValidRange(0, 5000);
-		 * firstNodeNumberField.setPropertyChangeListener(listener);
-		 */
-
+		updateLaunchAttributeControls();
+		
 		createVerticalSpacer(parallelComp, 2);
 	}
 
+	private void updateLaunchAttributeControls() {
+		for (IAttributeControl control : attrControls) {
+			control.dispose();
+		}
+		for (Control control : attrComp.getChildren()) {
+			control.dispose();
+		}
+		
+		int nChildren = attrComp.getChildren().length;
+		assert(nChildren == 0);
+		
+		IResourceManager rm = getResourceManager();
+		IAttribute[] attrs = rm.getLaunchAttributes(getMachine(), getQueue());
+		attrControls = new IAttributeControl[attrs.length];
+		for (int i = 0; i < attrs.length; ++i) {
+			IAttributeDescription description = attrs[i].getDescription();
+			new Label(attrComp, SWT.NONE).setText(description.getDescription() + ": ");
+			attrControls[i] = AttributeControlFactory.create(attrComp,
+					SWT.DROP_DOWN , attrs[i]);
+			attrControls[i].addPropertyChangeListener(listener);
+		}
+		nChildren = attrComp.getChildren().length;
+		assert(nChildren == 2*attrs.length);
+		attrComp.pack(true);
+		getControl().redraw();
+		getControl().update();
+	}
+
 	/**
-	 * Defaults are empty.
-	 * 
-	 * @see ILaunchConfigurationTab#setDefaults(ILaunchConfigurationWorkingCopy)
+	 * @see ILaunchConfigurationTab#getImage()
 	 */
-	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
-		configuration.setAttribute(
-				IPTPLaunchConfigurationConstants.NUMBER_OF_PROCESSES,
-				IPTPLaunchConfigurationConstants.DEF_NUMBER_OF_PROCESSES);
-		// configuration.setAttribute(IPTPLaunchConfigurationConstants.NETWORK_TYPE,
-		// IPTPLaunchConfigurationConstants.DEF_NETWORK_TYPE);
-		configuration.setAttribute(
-				IPTPLaunchConfigurationConstants.PROCESSES_PER_NODE,
-				IPTPLaunchConfigurationConstants.DEF_PROCESSES_PER_NODE);
-		configuration.setAttribute(
-				IPTPLaunchConfigurationConstants.FIRST_NODE_NUMBER,
-				IPTPLaunchConfigurationConstants.DEF_FIRST_NODE_NUMBER);
+	public Image getImage() {
+		return LaunchImages.getImage(LaunchImages.IMG_PARALLEL_TAB);
+	}
+
+	/**
+	 * @see ILaunchConfigurationTab#getName()
+	 */
+	public String getName() {
+		return CoreMessages.getResourceString("ParallelTab.Parallel");
 	}
 
 	/**
@@ -208,32 +228,116 @@ public class ParallelTab extends PLaunchConfigurationTab {
 	 */
 	public void initializeFrom(ILaunchConfiguration configuration) {
 		try {
-			numberOfProcessField.setStringValue(configuration.getAttribute(
-					IPTPLaunchConfigurationConstants.NUMBER_OF_PROCESSES,
-					EMPTY_STRING));
+			Map<String, String> attrValues;
+			attrValues = configuration.getAttribute(IPTPLaunchConfigurationConstants.LAUNCH_ATTR_MAP,
+					Collections.EMPTY_MAP);
 			int idx = getResourceManagerNameIndex(configuration.getAttribute(
 					IPTPLaunchConfigurationConstants.RESOURCE_MANAGER_NAME, EMPTY_STRING));
+			if (idx < 0)
+				idx = 0;
 			resourceManagerCombo.select(idx);
-			loadMachineCombo();
+			loadMachineAndQueueCombos();
 			
 			idx = getMachineNameIndex(configuration.getAttribute(
 					IPTPLaunchConfigurationConstants.MACHINE_NAME, EMPTY_STRING));
+			if (idx < 0)
+				idx = 0;
 			machineCombo.select(idx);
-			// String type =
-			// configuration.getAttribute(IPTPLaunchConfigurationConstants.NETWORK_TYPE,
-			// EMPTY_STRING);
-			// networkTypeCombo.select(type.equals(IPTPLaunchConfigurationConstants.P_TYPE)?0:1);
-			// numberOfProcessStartField.setStringValue(configuration.getAttribute(IPTPLaunchConfigurationConstants.PROCESSES_PER_NODE,
-			// EMPTY_STRING));
-			// firstNodeNumberField.setStringValue(configuration.getAttribute(IPTPLaunchConfigurationConstants.FIRST_NODE_NUMBER,
-			// EMPTY_STRING));
+
+			idx = getQueueNameIndex(configuration.getAttribute(
+					IPTPLaunchConfigurationConstants.QUEUE_NAME, EMPTY_STRING));
+			if (idx < 0)
+				idx = 0;
+			queueCombo.select(idx);
+
+			Map<String, IAttributeControl> attributeMap = 
+				new HashMap<String, IAttributeControl>();
+			
+			for (IAttributeControl attrControl : attrControls) {
+				IAttribute attr = attrControl.getAttribute();
+				attributeMap.put(attr.getDescription().getName(), attrControl);
+			}
+			
+			for (String name : attrValues.keySet()) {
+				String value = attrValues.get(name);
+				IAttributeControl attrControl = attributeMap.get(name);
+				attrControl.setValue(value);
+			}
+			
 		} catch (CoreException e) {
 			setErrorMessage(CoreMessages
 					.getFormattedResourceString(
 							"CommonTab.common.Exception_occurred_reading_configuration_EXCEPTION",
 							e.getStatus().getMessage()));
+		} catch (IllegalValue e) {
+			setErrorMessage(CoreMessages
+					.getFormattedResourceString(
+							"CommonTab.common.Exception_occurred_reading_configuration_EXCEPTION",
+							e.getMessage()));
 		}
 		
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#isValid(org.eclipse.debug.core.ILaunchConfiguration)
+	 */
+	public boolean isValid(ILaunchConfiguration configuration) {
+		setErrorMessage(null);
+		setMessage(null);
+		try {
+			Map<String, String> attrValues;
+			attrValues = configuration.getAttribute(IPTPLaunchConfigurationConstants.LAUNCH_ATTR_MAP,
+					Collections.EMPTY_MAP);
+			String rmName = configuration.getAttribute(
+					IPTPLaunchConfigurationConstants.RESOURCE_MANAGER_NAME, EMPTY_STRING);
+			int idx = getResourceManagerNameIndex(rmName);
+			if (idx < 0) {
+				setErrorMessage("Invalid resource manager name: + " + rmName);
+				return false;
+			}
+			String machName = configuration.getAttribute(
+								IPTPLaunchConfigurationConstants.MACHINE_NAME, EMPTY_STRING);
+			idx = getMachineNameIndex(machName);
+			if (idx < 0) {
+				setErrorMessage("Invalid machine name: + " + machName);
+				return false;
+			}
+
+			String queueName = configuration.getAttribute(
+								IPTPLaunchConfigurationConstants.QUEUE_NAME, EMPTY_STRING);
+			idx = getQueueNameIndex(queueName);
+			if (idx < 0) {
+				setErrorMessage("Invalid queue name: + " + queueName);
+				return false;
+			}
+			for (IAttributeControl attrControl : attrControls) {
+				IAttribute attr = attrControl.getAttribute();
+				IAttributeDescription desc = attr.getDescription();
+				if (attrValues.containsKey(desc.getName())) {
+					String newValue = attrValues.get(desc.getName());
+					boolean valid = attr.isValid(newValue);
+					if (!valid) {
+						// try to set an invalid value on purpose to get
+						// the error message from it.
+						try {
+							attr.setValue(newValue);
+						} catch (IllegalValue e) {
+							setErrorMessage(e.getMessage());
+							return false;
+						}
+					}
+				}
+			}
+		} catch (CoreException e) {
+			setErrorMessage(CoreMessages
+				.getFormattedResourceString(
+						"CommonTab.common.Exception_occurred_reading_configuration_EXCEPTION",
+						e.getStatus().getMessage()));
+			return false;
+		}	
+		return true;
 	}
 
 	/**
@@ -244,15 +348,97 @@ public class ParallelTab extends PLaunchConfigurationTab {
 				getResourceManagerName());
 		configuration.setAttribute(IPTPLaunchConfigurationConstants.MACHINE_NAME,
 				getMachineName());
+		configuration.setAttribute(IPTPLaunchConfigurationConstants.QUEUE_NAME,
+				getQueueName());
+		Map<String, String> valueMap = new HashMap<String, String>();
+		for (IAttributeControl control : attrControls) {
+			IAttribute attribute;
+			attribute = control.getAttribute();
+			valueMap.put(attribute.getDescription().getName(), control.getControlText());
+		}
 		configuration.setAttribute(
-				IPTPLaunchConfigurationConstants.NUMBER_OF_PROCESSES,
-				getFieldContent(numberOfProcessField));
-		// configuration.setAttribute(IPTPLaunchConfigurationConstants.NETWORK_TYPE,
-		// networkTypeCombo.getSelectionIndex()==0?IPTPLaunchConfigurationConstants.P_TYPE:IPTPLaunchConfigurationConstants.G_TYPE);
-		// configuration.setAttribute(IPTPLaunchConfigurationConstants.PROCESSES_PER_NODE,
-		// getFieldContent(numberOfProcessStartField));
-		// configuration.setAttribute(IPTPLaunchConfigurationConstants.FIRST_NODE_NUMBER,
-		// getFieldContent(firstNodeNumberField));
+				IPTPLaunchConfigurationConstants.LAUNCH_ATTR_MAP,
+				valueMap);
+	}
+
+	/**
+	 * Defaults are empty.
+	 * 
+	 * @see ILaunchConfigurationTab#setDefaults(ILaunchConfigurationWorkingCopy)
+	 */
+	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
+		configuration.setAttribute(IPTPLaunchConfigurationConstants.RESOURCE_MANAGER_NAME,
+				getResourceManagerName());
+		configuration.setAttribute(IPTPLaunchConfigurationConstants.MACHINE_NAME,
+				getMachineName());
+		configuration.setAttribute(IPTPLaunchConfigurationConstants.QUEUE_NAME,
+				getQueueName());
+		Map<String, String> valueMap = new HashMap<String, String>();
+		IResourceManager rm = getResourceManager();
+		IAttribute[] attrs = rm.getLaunchAttributes(getMachine(), getQueue());
+		for (IAttribute attr : attrs) {
+			valueMap.put(attr.getDescription().getName(), attr.getStringRep());
+		}
+		configuration.setAttribute(
+				IPTPLaunchConfigurationConstants.LAUNCH_ATTR_MAP,
+				valueMap);
+	}
+
+	/**
+	 * @see ILaunchConfigurationTab#setLaunchConfigurationDialog(ILaunchConfigurationDialog)
+	 */
+	public void setLaunchConfigurationDialog(ILaunchConfigurationDialog dialog) {
+		super.setLaunchConfigurationDialog(dialog);
+	}
+
+	private void loadMachineAndQueueCombos() {
+		machineCombo.removeAll();
+		IResourceManager rm = getResourceManager();
+		if (rm == null) {
+			return;
+		}
+
+		final IPMachine[] macs = rm.getMachines();
+		for (int i = 0; i < macs.length; i++) {
+			machineCombo.add(macs[i].getElementName());
+		}
+		machineCombo.select(0);
+		
+		queueCombo.removeAll();
+
+		final IPQueue[] queues = rm.getQueues();
+		for (int i = 0; i < queues.length; i++) {
+			queueCombo.add(queues[i].getElementName());
+		}
+		queueCombo.select(0);
+	}
+
+	protected String getFieldContent(IntegerFieldEditor editorField) {
+		return getFieldContent(editorField.getStringValue());
+	}
+
+	protected IPMachineControl getMachine() {
+		IResourceManager rm = getResourceManager();
+		if (rm == null) {
+			return null;
+		}
+		IPMachineControl[] macs = rm.getMachineControls();
+		int i = 0;
+		if (machineCombo != null)
+			i = machineCombo.getSelectionIndex();
+		return macs[i];
+	}
+	
+	protected String getMachineName() {
+		IResourceManager rm = getResourceManager();
+		if (rm == null) {
+			return "";
+		}
+		IPMachine[] macs = rm.getMachines();
+		int i = 0;
+		if (machineCombo != null)
+			i = machineCombo.getSelectionIndex();
+		return macs[i].getElementName();
 	}
 
 	protected int getMachineNameIndex(String machineName) {
@@ -268,19 +454,47 @@ public class ParallelTab extends PLaunchConfigurationTab {
 				break;
 			}
 		}
-		if(found == -1) found = 0;
-		
 		return found;
 	}
 
-	protected String getMachineName() {
+	protected IPQueueControl getQueue() {
+		IResourceManager rm = getResourceManager();
+		if (rm == null) {
+			return null;
+		}
+		IPQueueControl[] queues = rm.getQueueControls();
+		int i = 0;
+		if (queueCombo != null)
+			i = queueCombo.getSelectionIndex();
+		return queues[i];
+	}
+
+	protected String getQueueName() {
 		IResourceManager rm = getResourceManager();
 		if (rm == null) {
 			return "";
 		}
-		IPMachine[] macs = rm.getMachines();
-		int i = machineCombo.getSelectionIndex();
-		return macs[i].getElementName();
+		IPQueue[] queues = rm.getQueues();
+		int i = 0;
+		if (queueCombo != null)
+			i = queueCombo.getSelectionIndex();
+		return queues[i].getElementName();
+	}
+
+	protected int getQueueNameIndex(String queueName) {
+		IResourceManager rm = getResourceManager();
+		if (rm == null) {
+			return -1;
+		}
+		IPQueue[] queues = rm.getQueues();
+		int found = -1;
+		for(int i=0; i<queues.length; i++) {
+			if(queues[i].getElementName().equals(queueName)) {
+				found = i;
+				break;
+			}
+		}
+		return found;
 	}
 
 	protected IResourceManager getResourceManager() {
@@ -289,7 +503,9 @@ public class ParallelTab extends PLaunchConfigurationTab {
 			return null;
 		}
 		IResourceManager[] rms = universe.getResourceManagers();
-		int i = resourceManagerCombo.getSelectionIndex();
+		int i = 0;
+		if (resourceManagerCombo != null)
+			i = resourceManagerCombo.getSelectionIndex();
 		return rms[i];
 	}
 
@@ -299,10 +515,12 @@ public class ParallelTab extends PLaunchConfigurationTab {
 			return "";
 		}
 		IResourceManager[] rms = universe.getResourceManagers();
-		int i = resourceManagerCombo.getSelectionIndex();
+		int i = 0;
+		if (resourceManagerCombo != null)
+			i = resourceManagerCombo.getSelectionIndex();
 		return rms[i].getElementName();
 	}
-	
+
 	protected int getResourceManagerNameIndex(String rmName) {
 		IPUniverse universe = PTPCorePlugin.getDefault().getModelManager().getUniverse();
 		if (universe == null) {
@@ -316,76 +534,6 @@ public class ParallelTab extends PLaunchConfigurationTab {
 				break;
 			}
 		}
-		if(found == -1) found = 0;
-		
 		return found;
-	}
-
-	protected String getFieldContent(IntegerFieldEditor editorField) {
-		return getFieldContent(editorField.getStringValue());
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#isValid(org.eclipse.debug.core.ILaunchConfiguration)
-	 */
-	public boolean isValid(ILaunchConfiguration configuration) {
-		setErrorMessage(null);
-		setMessage(null);
-
-		if (!numberOfProcessField.isValid()) {
-			setErrorMessage(numberOfProcessField.getErrorMessage());
-			return false;
-		}
-
-		/*
-		 * if (getFieldContent(numberOfProcessStartField) != null &&
-		 * !numberOfProcessStartField.isValid()) {
-		 * setErrorMessage(numberOfProcessStartField.getErrorMessage()); return
-		 * false; }
-		 * 
-		 * if (getFieldContent(firstNodeNumberField) != null &&
-		 * !firstNodeNumberField.isValid()) {
-		 * setErrorMessage(firstNodeNumberField.getErrorMessage()); return
-		 * false; }
-		 */
-
-		return true;
-	}
-
-	/**
-	 * @see ILaunchConfigurationTab#getName()
-	 */
-	public String getName() {
-		return CoreMessages.getResourceString("ParallelTab.Parallel");
-	}
-
-	/**
-	 * @see ILaunchConfigurationTab#setLaunchConfigurationDialog(ILaunchConfigurationDialog)
-	 */
-	public void setLaunchConfigurationDialog(ILaunchConfigurationDialog dialog) {
-		super.setLaunchConfigurationDialog(dialog);
-	}
-
-	/**
-	 * @see ILaunchConfigurationTab#getImage()
-	 */
-	public Image getImage() {
-		return LaunchImages.getImage(LaunchImages.IMG_PARALLEL_TAB);
-	}
-
-	private void loadMachineCombo() {
-		machineCombo.removeAll();
-		IResourceManager rm = getResourceManager();
-		if (rm == null) {
-			return;
-		}
-
-		final IPMachine[] macs = rm.getMachines();
-		for (int i = 0; i < macs.length; i++) {
-			machineCombo.add(macs[i].getElementName());
-		}
-		machineCombo.select(0);
 	}
 }

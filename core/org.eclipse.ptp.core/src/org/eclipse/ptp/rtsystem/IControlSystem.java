@@ -43,12 +43,15 @@ public interface IControlSystem {
 	 * processes, etc.
 	 * 
 	 * @param jobID	the jobID for this run 
+	 * @param nProcs TODO
+	 * @param firstNodeNum TODO
+	 * @param nProcsPerNode TODO
 	 * @param jobRunConfig the configuration information about the job
 	 * @return the job identifier of the created job or -1 on error
 	 * @throws CoreException 
 	 * @see JobRunConfiguration
 	 */
-	public void run(int jobID, JobRunConfiguration jobRunConfig) throws CoreException;
+	public void run(int jobID, int nProcs, int firstNodeNum, int nProcsPerNode, JobRunConfiguration jobRunConfig) throws CoreException;
 
 	/**
 	 * Terminates a running job.  The {@link IPJob} contains the job identifier used to 

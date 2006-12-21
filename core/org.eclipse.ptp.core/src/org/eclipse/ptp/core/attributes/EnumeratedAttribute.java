@@ -84,8 +84,9 @@ public class EnumeratedAttribute extends AbstractAttribute {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.attributes.IAttribute#create(java.lang.String)
 	 */
-	public IAttribute create(String string) throws IllegalValue {
-		EnumeratedAttribute ea = new EnumeratedAttribute(getDescription(), enumerations, string);
+	public EnumeratedAttribute create(String string) throws IllegalValue {
+		EnumeratedAttribute ea = new EnumeratedAttribute(getDescription(), enumerations,
+				string);
 		return ea;
 	}
 

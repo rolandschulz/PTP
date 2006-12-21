@@ -18,16 +18,33 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.attributes;
 
+import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute.IllegalValue;
 import org.eclipse.swt.widgets.Control;
 
 public interface IAttributeControl {
 
+	public void addPropertyChangeListener(IPropertyChangeListener listener);
+	
+	public void dispose();
+	
+	public abstract IAttribute getAttribute();
+
 	public abstract Control getControl();
 
+	public String getControlText();
+	
+	public String getErrorMessage();
+	
 	public abstract boolean isValid();
 
-	public abstract IAttribute getAttribute() throws IllegalValue;
+	public void removePropertyChangeListener(IPropertyChangeListener listener);
+
+	public void resetToInitialValue();
+	
+	public void setCurrentToInitialValue();
+
+	public void setValue(String value) throws IllegalValue;
 
 }
