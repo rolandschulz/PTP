@@ -65,7 +65,7 @@ public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventList
 	}
 	
 	/* launches the job */
-	public void run(int jobID, JobRunConfiguration jobRunConfig) throws CoreException {
+	public void run(int jobID, int nProcs, int firstNodeNum, int nProcsPerNode, JobRunConfiguration jobRunConfig) throws CoreException {
 		System.out.println("JAVA OMPI: run() with args:\n"+jobRunConfig.toString());
 		
 		if(proxyDead) {
@@ -85,11 +85,11 @@ public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventList
 			argList.add(path);
 		}
 		argList.add("numOfProcs");
-		argList.add(Integer.toString(jobRunConfig.getNumberOfProcesses()));
+		argList.add(Integer.valueOf(nProcs));
 		argList.add("procsPerNode");
-		argList.add(Integer.toString(jobRunConfig.getNumberOfProcessesPerNode()));
+		argList.add(Integer.valueOf(nProcsPerNode));
 		argList.add("firstNodeNum");
-		argList.add(Integer.toString(jobRunConfig.getFirstNodeNumber()));
+		argList.add(Integer.valueOf(firstNodeNum));
 		
 		String dir = jobRunConfig.getWorkingDir();
 		if (dir != null) {

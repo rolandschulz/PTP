@@ -63,7 +63,7 @@ public class SimulationControlSystem implements IControlSystem {
 	}
 	
 	/* returns the new job name that it started - unique */
-	public void run(int jobID, JobRunConfiguration jobRunConfig) {
+	public void run(int jobID, int nProcs, int firstNodeNum, int nProcsPerNode, JobRunConfiguration jobRunConfig) {
 		/*
 		if (spawned_app_state != null
 				&& (spawned_app_state.equals(IPProcess.STARTING) || spawned_app_state
@@ -82,9 +82,9 @@ public class SimulationControlSystem implements IControlSystem {
 		ss.spawned_num_procs = ss.spawned_procs_per_node = ss.spawned_first_node = 0;
 
 		ss.machine_name = jobRunConfig.getMachineName();
-		ss.spawned_num_procs = jobRunConfig.getNumberOfProcesses();
-		ss.spawned_procs_per_node = jobRunConfig.getNumberOfProcessesPerNode();
-		ss.spawned_first_node = jobRunConfig.getFirstNodeNumber();
+		ss.spawned_num_procs = nProcs;
+		ss.spawned_procs_per_node = nProcsPerNode;
+		ss.spawned_first_node = firstNodeNum;
 
 		processMap.put(s, new Integer(ss.spawned_num_procs));
 

@@ -33,6 +33,11 @@ import org.eclipse.ptp.core.IPMachine;
 import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.attributes.AttributeDescription;
+import org.eclipse.ptp.core.attributes.IAttribute;
+import org.eclipse.ptp.core.attributes.IAttributeDescription;
+import org.eclipse.ptp.core.attributes.IntegerAttribute;
+import org.eclipse.ptp.core.attributes.IAttribute.IllegalValue;
 import org.eclipse.ptp.core.elementcontrols.IPJobControl;
 import org.eclipse.ptp.core.elementcontrols.IPMachineControl;
 import org.eclipse.ptp.core.elementcontrols.IPNodeControl;
@@ -146,6 +151,12 @@ public abstract class RuntimeResourceManager extends AbstractResourceManager
 			removeChild(job);
 		}
 	}
+	private static final IAttributeDescription firstNodeAttrDesc =
+		new AttributeDescription("FirstNodeNumber", "First Node Number");
+	private static final IAttributeDescription nProcsAttrDesc = 
+		new AttributeDescription("NumProcs", "Number of Processes");
+	private static final IAttributeDescription nProcsPerNodeAttrDesc =
+		new AttributeDescription("NumProcsPerNode", "Number of Procs Per Node");
 
 	private IControlSystem controlSystem = null;
 	private int jobID = 1;
@@ -184,10 +195,30 @@ public abstract class RuntimeResourceManager extends AbstractResourceManager
 		super.dispose();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManager#getLaunchAttributes(org.eclipse.ptp.core.elementcontrols.IPMachineControl, org.eclipse.ptp.core.elementcontrols.IPQueueControl)
+	 */
+	public IAttribute[] getLaunchAttributes(IPMachineControl machine, IPQueueControl queue) {
+		IAttribute[] attrs = new IAttribute[3];
+		try {
+			IntegerAttribute nProcsPerNodeAttr = new IntegerAttribute(nProcsPerNodeAttrDesc, 1);
+			nProcsPerNodeAttr.setValidRange(1, Integer.MAX_VALUE);
+			IntegerAttribute firstNodeAttr = new IntegerAttribute(firstNodeAttrDesc, 0);
+			firstNodeAttr.setValidRange(0, Integer.MAX_VALUE);
+			IntegerAttribute nProcsAttr = new IntegerAttribute(nProcsAttrDesc, 1);
+			nProcsAttr.setValidRange(1, Integer.MAX_VALUE);
+			attrs[0] = nProcsAttr;
+			attrs[1] = firstNodeAttr;
+			attrs[2] = nProcsPerNodeAttr;
+		} catch (IllegalValue e) {
+			throw new RuntimeException(e);
+		}
+		return attrs;
+	}
+
 	public void removeJob(IPJob job) {
 		localQueue.removeJob((IPJobControl) job);
 	}
-
 	public IPJob run(ILaunch launch, JobRunConfiguration jobRunConfig,
 			IProgressMonitor pm) throws CoreException {
 		if (!getStatus().equals(ResourceManagerStatus.STARTED)) {
@@ -195,11 +226,28 @@ public abstract class RuntimeResourceManager extends AbstractResourceManager
 					" it is not currently in the STARTED state.");
 		}
 		pm.setTaskName("Creating the job...");
-		
-		IPJob job = newJob(jobRunConfig.getNumberOfProcesses(), jobRunConfig.isDebug(), pm);
+
+		int firstNodeNum = -1;
+		int nProcs = -1;
+		int nProcsPerNode = -1;
+		IAttribute[] attrs = jobRunConfig.getLaunchAttributes();
+		for (int i=0; i<attrs.length; ++i) {
+			IAttributeDescription desc = attrs[i].getDescription();
+			if (desc.equals(firstNodeAttrDesc)) {
+				firstNodeNum = Integer.parseInt(attrs[i].getStringRep());
+			}
+			else if (desc.equals(nProcsAttrDesc)) {
+				nProcs = Integer.parseInt(attrs[i].getStringRep());
+			}
+			else if (desc.equals(nProcsPerNodeAttrDesc)) {
+				nProcsPerNode = Integer.parseInt(attrs[i].getStringRep());
+			}
+		}
+		IPJob job = newJob(nProcs, jobRunConfig.isDebug(), pm);
 		System.out.println("RuntimeResourceManager.run() - new JobID = "+job.getJobNumberInt());
 
-		controlSystem.run(job.getJobNumberInt(), jobRunConfig);
+		controlSystem.run(job.getJobNumberInt(), nProcs, firstNodeNum, nProcsPerNode,
+				jobRunConfig);
 		
 		return job;
 	}
@@ -549,7 +597,7 @@ public abstract class RuntimeResourceManager extends AbstractResourceManager
 	protected IRuntimeProxy getRuntimeProxy() {
 		return runtimeProxy;
 	}
-
+	
 	protected void setControlSystem(IControlSystem system) {
 		controlSystem = system;
 	}
@@ -561,5 +609,6 @@ public abstract class RuntimeResourceManager extends AbstractResourceManager
 	protected void setRuntimeProxy(IRuntimeProxy proxy) {
 		runtimeProxy = proxy;
 	}
+
 
 }

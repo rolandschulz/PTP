@@ -49,7 +49,10 @@ public class BooleanAttribute extends AbstractAttribute {
 		}
 	}
 
-	public IAttribute create(String string) throws IllegalValue {
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.attributes.IAttribute#create(java.lang.String)
+	 */
+	public BooleanAttribute create(String string) throws IllegalValue {
 		return new BooleanAttribute(getDescription(), value);
 	}
 
@@ -67,6 +70,10 @@ public class BooleanAttribute extends AbstractAttribute {
 		} else if (!value.equals(other.value))
 			return false;
 		return true;
+	}
+	
+	public Boolean getValue() {
+		return value;
 	}
 
 	public String getStringRep() {

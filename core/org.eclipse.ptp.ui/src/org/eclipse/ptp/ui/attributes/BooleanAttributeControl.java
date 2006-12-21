@@ -24,6 +24,8 @@ package org.eclipse.ptp.ui.attributes;
 import org.eclipse.ptp.core.attributes.BooleanAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute.IllegalValue;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -35,6 +37,7 @@ import org.eclipse.swt.widgets.Control;
 public class BooleanAttributeControl extends AbstractAttributeControl {
 
 	private final BooleanAttribute attribute;
+	private Boolean initialValue;
 
 	/**
 	 * @param parent
@@ -45,19 +48,56 @@ public class BooleanAttributeControl extends AbstractAttributeControl {
 			BooleanAttribute attribute) {
 		super(parent, style);
 		this.attribute = attribute;
+		initialValue = attribute.getValue();
+		
 		// is always valid
 		setValid(true);
 	}
 
+	public IAttribute getAttribute() {
+		return attribute;
+	}
+
+	public String getControlText() {
+		return Boolean.toString((getButton()).getSelection());
+	}
+
+	@Override
+	public void resetToInitialValue() {
+		(getButton()).setSelection(initialValue.booleanValue());
+	}
+
+	@Override
+	public void setCurrentToInitialValue() {
+		initialValue = attribute.getValue();
+	}
+
+	private Button getButton() {
+		return (Button)getControl();
+	}
+
 	protected Control doCreateControl(Composite parent, int style) {
 		final Button button = new Button(parent, style);
+		button.addSelectionListener(new SelectionListener(){
+
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+
+			public void widgetSelected(SelectionEvent e) {
+				Boolean oldValue = attribute.getValue();
+				boolean selected = (getButton()).getSelection();
+				Boolean newValue = new Boolean(selected);
+				if (oldValue.equals(newValue)) {
+					attribute.setValue(newValue);
+					firePropertyChanged(VALUE_CHANGED_PROPERTY, oldValue, newValue);
+				}				
+			}});
 		return button;
 	}
 
-	public IAttribute getAttribute() throws IllegalValue {
-		boolean selected = ((Button)getControl()).getSelection();
-		attribute.setValue(new Boolean(selected));
-		return attribute;
+	public void setValue(String value) throws IllegalValue {
+		BooleanAttribute newAttr = attribute.create(value);
+		getButton().setSelection(newAttr.getValue().booleanValue());
 	}
 
 }

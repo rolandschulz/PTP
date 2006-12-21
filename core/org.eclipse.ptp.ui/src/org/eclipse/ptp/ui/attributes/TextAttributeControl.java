@@ -23,8 +23,10 @@ package org.eclipse.ptp.ui.attributes;
 
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute.IllegalValue;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
@@ -41,16 +43,56 @@ public class TextAttributeControl extends AbstractAttributeControl {
 			Text text = (Text) e.getSource();
 			String value = text.getText();
 			boolean valid = attribute.isValid(value);
+			String oldValue = attribute.getStringRep();
+			try {
+				attribute.setValue(value);
+			} catch (IllegalValue exc) {
+				setErrorMessage(exc.getMessage());
+			}
+			fireValueChanged(oldValue, value);
 			setValid(valid);
 		}
 
 	}
 
+	private static final int TEXT_WIDTH = 50;
+
 	private final IAttribute attribute;
+	private String initialValue;
 
 	public TextAttributeControl(Composite parent, int style, IAttribute attribute) {
 		super(parent, style);
 		this.attribute = attribute;
+		initialValue = attribute.getStringRep();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.attributes.AbstractAttributeControl#getAttribute()
+	 */
+	public IAttribute getAttribute() {
+		return attribute;
+	}
+
+	public String getControlText() {
+		return getText().getText();
+	}
+
+	@Override
+	public void resetToInitialValue() {
+		(getText()).setText(initialValue);
+	}
+
+	@Override
+	public void setCurrentToInitialValue() {
+		initialValue = attribute.getStringRep();
+	}
+
+	public void setValue(String value) throws IllegalValue {
+		getText().setText(value);
+	}
+
+	private Text getText() {
+		return (Text)getControl();
 	}
 
 	/* (non-Javadoc)
@@ -58,18 +100,9 @@ public class TextAttributeControl extends AbstractAttributeControl {
 	 */
 	protected Control doCreateControl(Composite parent, int style) {
 		Text text = new Text(parent, style);
+		text.setLayoutData(new GridData(TEXT_WIDTH, SWT.DEFAULT));
 		text.addModifyListener(new TextModifyListener());
 		return text;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.attributes.AbstractAttributeControl#getAttribute()
-	 */
-	public IAttribute getAttribute() throws IllegalValue {
-		Text text = (Text) getControl();
-		String value = text.getText();
-		attribute.setValue(value);
-		return attribute;
 	}
 
 }

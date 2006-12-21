@@ -26,6 +26,7 @@ import org.eclipse.ptp.core.IModelModifier;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPMachine;
 import org.eclipse.ptp.core.IPQueue;
+import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.elementcontrols.IPElementControl;
 import org.eclipse.ptp.core.elementcontrols.IPJobControl;
 import org.eclipse.ptp.core.elementcontrols.IPMachineControl;
@@ -74,6 +75,13 @@ IAdaptable, IResourceManagerMenuContribution, IModelModifier {
 	 */
 	public String getDescription();
 
+	/**
+	 * @param machine
+	 * @param queue
+	 * @return
+	 */
+	public IAttribute[] getLaunchAttributes(IPMachineControl machine, IPQueueControl queue);
+	
 	/**
 	 * @param ID
 	 * @return

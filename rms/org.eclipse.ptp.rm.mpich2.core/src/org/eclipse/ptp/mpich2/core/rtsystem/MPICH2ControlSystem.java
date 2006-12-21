@@ -46,115 +46,18 @@ import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeProcessOutputEvent;
 public class MPICH2ControlSystem implements IControlSystem, IProxyRuntimeEventListener {
 	private Vector knownJobs = null;
 	
-	protected List listeners = new ArrayList(2);
-	
 	private MPICH2ProxyRuntimeClient proxy = null;
+	
 	private boolean proxyDead = true;
+	protected List listeners = new ArrayList(2);
 
 	public MPICH2ControlSystem(MPICH2ProxyRuntimeClient proxy) {
 		this.proxy = proxy;
 		if(proxy != null) proxyDead = false;
 	}
 	
-	public boolean isHealthy() { return !proxyDead; }
-	
-	public void startup() {
-		knownJobs = new Vector();
-		
-		proxy.addRuntimeEventListener(this);
-	}
-	
-	/* returns the new job name that it started - unique */
-	public void run(int jobID, JobRunConfiguration jobRunConfig) throws CoreException {
-		System.out.println("JAVA MPICH2: run() with args:\n"+jobRunConfig.toString());
-		
-		if(proxyDead) {
-			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, "Control system is shut down", null));
-		}
-
-		List argList = new ArrayList();
-		
-		argList.add("jobID");
-		argList.add(Integer.toString(jobID));
-		
-		argList.add("execName");
-		argList.add(jobRunConfig.getExecName());
-		String path = jobRunConfig.getPathToExec();
-		if (path != null) {
-			argList.add("pathToExec");
-			argList.add(path);
-		}
-		argList.add("numOfProcs");
-		argList.add(Integer.toString(jobRunConfig.getNumberOfProcesses()));
-		argList.add("procsPerNode");
-		argList.add(Integer.toString(jobRunConfig.getNumberOfProcessesPerNode()));
-		argList.add("firstNodeNum");
-		argList.add(Integer.toString(jobRunConfig.getFirstNodeNumber()));
-		
-		String dir = jobRunConfig.getWorkingDir();
-		if (dir != null) {
-			argList.add("workingDir");
-			argList.add(dir);
-		}
-		String[] args = jobRunConfig.getArguments();
-		if (args != null) {
-			for (int i = 0; i < args.length; i++) {
-				argList.add("progArg");
-				argList.add(args[i]);
-			}
-		}
-		String[] env = jobRunConfig.getEnvironment();
-		if (env != null) {
-			for (int i = 0; i < env.length; i++) {
-				argList.add("progEnv");
-				argList.add(env[i]);
-			}
-		}
-		
-		if (jobRunConfig.isDebug()) {
-			argList.add("debuggerPath");
-			argList.add(jobRunConfig.getDebuggerPath());
-			String[] dbgArgs = jobRunConfig.getDebuggerArgs();
-			if (dbgArgs != null) {
-				for (int i = 0; i < dbgArgs.length; i++) {
-					argList.add("debuggerArg");
-					argList.add(dbgArgs[i]);
-				}
-			}
-		}
-		
-		try {
-			proxy.runJob((String[])argList.toArray(new String[0]));
-		} catch(IOException e) {
-			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, 
-				"Control system is shut down, proxy exception.  The proxy may have crashed or been killed.", null));
-		}
-	}
-
-	public void terminateJob(IPJob job) throws CoreException {
-		if(proxyDead) {
-			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, "Control system is shut down", null));
-		}
-		
-		if(job == null) {
-			System.err.println("ERROR: Tried to abort a null job.");
-			return;
-		}
-		
-		int jobID = job.getJobNumberInt();
-
-		if(jobID >= 0) {
-			System.out.println("MPICH2ControlSystem: abortJob() with name "+job.toString()+" and ID "+jobID);
-			try {
-				proxy.terminateJob(jobID);
-			} catch(IOException e) {
-				throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, 
-					"Control system is shut down, proxy exception.  The proxy may have crashed or been killed.", null));
-			}
-		}
-		else {
-			System.err.println("ERROR: Tried to abort a null job.");
-		}
+	public void addRuntimeListener(IRuntimeListener listener) {
+		listeners.add(listener);
 	}
 	
 	public String[] getJobs() throws CoreException 
@@ -175,45 +78,8 @@ public class MPICH2ControlSystem implements IControlSystem, IProxyRuntimeEventLi
 		if(a.length == 0) return null;
 		return (String[])a;
 	}
-
-	public void addRuntimeListener(IRuntimeListener listener) {
-		listeners.add(listener);
-	}
-
-	public void removeRuntimeListener(IRuntimeListener listener) {
-		listeners.remove(listener);
-	}
-
-	protected synchronized void fireEvent(String ID, RuntimeEvent event) {
-		if (listeners == null)
-			return;
-		Iterator i = listeners.iterator();
-		while (i.hasNext()) {
-			IRuntimeListener listener = (IRuntimeListener) i.next();
-			switch (event.getEventNumber()) {
-			case RuntimeEvent.EVENT_PROCESS_OUTPUT:
-				listener.runtimeProcessOutput(ID, event.getText());
-				break;
-			case RuntimeEvent.EVENT_JOB_EXITED:
-				listener.runtimeJobExited(ID);
-				break;
-			case RuntimeEvent.EVENT_JOB_STATE_CHANGED:
-				listener.runtimeJobStateChanged(ID, event.getText());
-				break;
-			case RuntimeEvent.EVENT_NEW_JOB:
-				listener.runtimeNewJob(ID);
-				break;
-			}
-		}
-	}
-
-	public void shutdown() {
-		System.out.println("MPICH2ControlSystem: shutdown() called");
-		listeners.clear();
-		listeners = null;
-	}
-
-    public synchronized void handleEvent(IProxyRuntimeEvent e) {
+	
+	public synchronized void handleEvent(IProxyRuntimeEvent e) {
         if(e instanceof ProxyRuntimeJobStateEvent) {
         		RuntimeEvent re = new RuntimeEvent(RuntimeEvent.EVENT_JOB_STATE_CHANGED);
         		int state = ((ProxyRuntimeJobStateEvent)e).getJobState();
@@ -268,4 +134,139 @@ public class MPICH2ControlSystem implements IControlSystem, IProxyRuntimeEventLi
         	}
         	
     }
+
+	public boolean isHealthy() { return !proxyDead; }
+	
+	public void removeRuntimeListener(IRuntimeListener listener) {
+		listeners.remove(listener);
+	}
+
+	/* returns the new job name that it started - unique */
+	public void run(int jobID, int nProcs, int firstNodeNum, int nProcsPerNode, JobRunConfiguration jobRunConfig) throws CoreException {
+		System.out.println("JAVA MPICH2: run() with args:\n"+jobRunConfig.toString());
+		
+		if(proxyDead) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, "Control system is shut down", null));
+		}
+
+		List argList = new ArrayList();
+		
+		argList.add("jobID");
+		argList.add(Integer.toString(jobID));
+		
+		argList.add("execName");
+		argList.add(jobRunConfig.getExecName());
+		String path = jobRunConfig.getPathToExec();
+		if (path != null) {
+			argList.add("pathToExec");
+			argList.add(path);
+		}
+		argList.add("numOfProcs");
+		argList.add(Integer.valueOf(nProcs));
+		argList.add("procsPerNode");
+		argList.add(Integer.valueOf(nProcsPerNode));
+		argList.add("firstNodeNum");
+		argList.add(Integer.valueOf(firstNodeNum));
+		
+		String dir = jobRunConfig.getWorkingDir();
+		if (dir != null) {
+			argList.add("workingDir");
+			argList.add(dir);
+		}
+		String[] args = jobRunConfig.getArguments();
+		if (args != null) {
+			for (int i = 0; i < args.length; i++) {
+				argList.add("progArg");
+				argList.add(args[i]);
+			}
+		}
+		String[] env = jobRunConfig.getEnvironment();
+		if (env != null) {
+			for (int i = 0; i < env.length; i++) {
+				argList.add("progEnv");
+				argList.add(env[i]);
+			}
+		}
+		
+		if (jobRunConfig.isDebug()) {
+			argList.add("debuggerPath");
+			argList.add(jobRunConfig.getDebuggerPath());
+			String[] dbgArgs = jobRunConfig.getDebuggerArgs();
+			if (dbgArgs != null) {
+				for (int i = 0; i < dbgArgs.length; i++) {
+					argList.add("debuggerArg");
+					argList.add(dbgArgs[i]);
+				}
+			}
+		}
+		
+		try {
+			proxy.runJob((String[])argList.toArray(new String[0]));
+		} catch(IOException e) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, 
+				"Control system is shut down, proxy exception.  The proxy may have crashed or been killed.", null));
+		}
+	}
+
+	public void shutdown() {
+		System.out.println("MPICH2ControlSystem: shutdown() called");
+		listeners.clear();
+		listeners = null;
+	}
+
+	public void startup() {
+		knownJobs = new Vector();
+		
+		proxy.addRuntimeEventListener(this);
+	}
+
+	public void terminateJob(IPJob job) throws CoreException {
+		if(proxyDead) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, "Control system is shut down", null));
+		}
+		
+		if(job == null) {
+			System.err.println("ERROR: Tried to abort a null job.");
+			return;
+		}
+		
+		int jobID = job.getJobNumberInt();
+
+		if(jobID >= 0) {
+			System.out.println("MPICH2ControlSystem: abortJob() with name "+job.toString()+" and ID "+jobID);
+			try {
+				proxy.terminateJob(jobID);
+			} catch(IOException e) {
+				throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, 
+					"Control system is shut down, proxy exception.  The proxy may have crashed or been killed.", null));
+			}
+		}
+		else {
+			System.err.println("ERROR: Tried to abort a null job.");
+		}
+	}
+
+    protected synchronized void fireEvent(String ID, RuntimeEvent event) {
+		if (listeners == null)
+			return;
+		Iterator i = listeners.iterator();
+		while (i.hasNext()) {
+			IRuntimeListener listener = (IRuntimeListener) i.next();
+			switch (event.getEventNumber()) {
+			case RuntimeEvent.EVENT_PROCESS_OUTPUT:
+				listener.runtimeProcessOutput(ID, event.getText());
+				break;
+			case RuntimeEvent.EVENT_JOB_EXITED:
+				listener.runtimeJobExited(ID);
+				break;
+			case RuntimeEvent.EVENT_JOB_STATE_CHANGED:
+				listener.runtimeJobStateChanged(ID, event.getText());
+				break;
+			case RuntimeEvent.EVENT_NEW_JOB:
+				listener.runtimeNewJob(ID);
+				break;
+			}
+		}
+	}
+
 }
