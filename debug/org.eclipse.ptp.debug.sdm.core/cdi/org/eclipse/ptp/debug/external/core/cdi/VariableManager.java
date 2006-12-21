@@ -426,6 +426,8 @@ public class VariableManager extends Manager {
 		return children;
 	}
 	public void update(Target target, String[] varList) throws PCDIException {
+		/*
+		 * Why need frames here?
 		int highLevel = 0;
 		int lowLevel = 0;
 		IPCDIStackFrame[] frames = null;
@@ -445,6 +447,7 @@ public class VariableManager extends Manager {
 			}
 			frames = currentThread.getStackFrames(0, highLevel);
 		}
+		*/
 		
 		List eventList = new ArrayList();
 		for (int i=0; i<varList.length; i++) {
