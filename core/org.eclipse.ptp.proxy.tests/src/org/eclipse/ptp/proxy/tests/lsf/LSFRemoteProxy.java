@@ -3,6 +3,7 @@ package org.eclipse.ptp.proxy.tests.lsf;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
+import org.eclipse.ptp.lsf.core.rtsystem.LSFProxyRuntimeClient;
 
 import org.eclipse.ptp.rtsystem.proxy.ProxyRuntimeClient;
 import org.junit.Test;
@@ -11,18 +12,15 @@ public class LSFRemoteProxy {
 
 	@Test public void start_stop() {
 		boolean error = false;
+		String proxy = "../org.eclipse.ptp.lsf.proxy/ptp_lsf_proxy";
 		
-		ProxyRuntimeClient client = new ProxyRuntimeClient();
+		LSFProxyRuntimeClient client = new LSFProxyRuntimeClient(proxy, false);
 		
-		try {
-			client.sessionCreate(3333, 0);
-			//wait(50000);
-			//client.initialize();
-		} catch(Exception e) {
-            e.printStackTrace();
+		if (client.startup(null)) {
+			client.shutdown();
+		} else {
 			error = true;
-
-		} 
+		}
     	      
 		assertEquals("Proxy Client: unsuccessfull initialization",
     	              false,
