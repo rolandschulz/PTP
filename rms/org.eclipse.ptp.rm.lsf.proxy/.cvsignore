@@ -6,3 +6,4 @@ Makefile
 config.h
 .libs
 autom4te.cache
+.gdb_history
