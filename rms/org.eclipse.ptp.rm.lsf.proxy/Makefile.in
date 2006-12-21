@@ -14,6 +14,7 @@
 
 @SET_MAKE@
 
+
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
 VPATH = @srcdir@
@@ -36,11 +37,11 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 bin_PROGRAMS = ptp_lsf_proxy$(EXEEXT)
-DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
-	$(srcdir)/Makefile.in $(srcdir)/config.h.in \
-	$(top_srcdir)/configure AUTHORS COPYING ChangeLog INSTALL NEWS \
-	compile config.guess config.sub depcomp install-sh ltmain.sh \
-	missing
+DIST_COMMON = README $(am__configure_deps) $(ptp_lsf_proxy_HEADERS) \
+	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
+	$(srcdir)/config.h.in $(top_srcdir)/configure AUTHORS COPYING \
+	ChangeLog INSTALL NEWS compile config.guess config.sub depcomp \
+	install-sh ltmain.sh missing
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
@@ -51,7 +52,8 @@ am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = config.h
 CONFIG_CLEAN_FILES =
-am__installdirs = "$(DESTDIR)$(bindir)"
+am__installdirs = "$(DESTDIR)$(bindir)" \
+	"$(DESTDIR)$(ptp_lsf_proxydir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_ptp_lsf_proxy_OBJECTS = ptp_lsf_proxy-ptp_lsf_proxy.$(OBJEXT)
@@ -73,6 +75,14 @@ RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	install-recursive installcheck-recursive installdirs-recursive \
 	pdf-recursive ps-recursive uninstall-info-recursive \
 	uninstall-recursive
+am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
+am__vpath_adj = case $$p in \
+    $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
+    *) f=$$p;; \
+  esac;
+am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
+ptp_lsf_proxyHEADERS_INSTALL = $(INSTALL_HEADER)
+HEADERS = $(ptp_lsf_proxy_HEADERS)
 ETAGS = etags
 CTAGS = ctags
 DIST_SUBDIRS = $(SUBDIRS)
@@ -171,11 +181,14 @@ sharedstatedir = @sharedstatedir@
 subdirs = @subdirs@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
+LSF = /LSF
 PROXY = ../org.eclipse.ptp.proxy
 UTILS = ../org.eclipse.ptp.utils
 SUBDIRS = $(PROXY) $(UTILS)
+ptp_lsf_proxy_HEADERS = include/ptp_lsf_proxy.h
+ptp_lsf_proxydir = src
 ptp_lsf_proxy_SOURCES = src/ptp_lsf_proxy.c
-ptp_lsf_proxy_CFLAGS = -I$(PROXY)/include -I$(UTILS)/include $(AM_CFLAGS) -g
+ptp_lsf_proxy_CFLAGS = -I./include -I$(PROXY)/include -I$(UTILS)/include -I$(LSF)/share/include $(AM_CFLAGS) -g
 ptp_lsf_proxy_LDADD = $(PROXY)/libproxysvr.a $(UTILS)/libutils.a
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
@@ -295,6 +308,23 @@ ptp_lsf_proxy-ptp_lsf_proxy.obj: src/ptp_lsf_proxy.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ptp_lsf_proxy_CFLAGS) $(CFLAGS) -c -o ptp_lsf_proxy-ptp_lsf_proxy.obj `if test -f 'src/ptp_lsf_proxy.c'; then $(CYGPATH_W) 'src/ptp_lsf_proxy.c'; else $(CYGPATH_W) '$(srcdir)/src/ptp_lsf_proxy.c'; fi`
 uninstall-info-am:
+install-ptp_lsf_proxyHEADERS: $(ptp_lsf_proxy_HEADERS)
+	@$(NORMAL_INSTALL)
+	test -z "$(ptp_lsf_proxydir)" || $(mkdir_p) "$(DESTDIR)$(ptp_lsf_proxydir)"
+	@list='$(ptp_lsf_proxy_HEADERS)'; for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  f=$(am__strip_dir) \
+	  echo " $(ptp_lsf_proxyHEADERS_INSTALL) '$$d$$p' '$(DESTDIR)$(ptp_lsf_proxydir)/$$f'"; \
+	  $(ptp_lsf_proxyHEADERS_INSTALL) "$$d$$p" "$(DESTDIR)$(ptp_lsf_proxydir)/$$f"; \
+	done
+
+uninstall-ptp_lsf_proxyHEADERS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(ptp_lsf_proxy_HEADERS)'; for p in $$list; do \
+	  f=$(am__strip_dir) \
+	  echo " rm -f '$(DESTDIR)$(ptp_lsf_proxydir)/$$f'"; \
+	  rm -f "$(DESTDIR)$(ptp_lsf_proxydir)/$$f"; \
+	done
 
 # This directory's subdirectories are mostly independent; you can cd
 # into them and run `make' without going through this Makefile.
@@ -431,6 +461,7 @@ distclean-tags:
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
+	$(mkdir_p) $(distdir)/include
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \
@@ -571,10 +602,10 @@ distcleancheck: distclean
 	       exit 1; } >&2
 check-am: all-am
 check: check-recursive
-all-am: Makefile $(PROGRAMS) config.h
+all-am: Makefile $(PROGRAMS) $(HEADERS) config.h
 installdirs: installdirs-recursive
 installdirs-am:
-	for dir in "$(DESTDIR)$(bindir)"; do \
+	for dir in "$(DESTDIR)$(bindir)" "$(DESTDIR)$(ptp_lsf_proxydir)"; do \
 	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
 	done
 install: install-recursive
@@ -622,7 +653,7 @@ info: info-recursive
 
 info-am:
 
-install-data-am:
+install-data-am: install-ptp_lsf_proxyHEADERS
 
 install-exec-am: install-binPROGRAMS
 
@@ -651,7 +682,8 @@ ps: ps-recursive
 
 ps-am:
 
-uninstall-am: uninstall-binPROGRAMS uninstall-info-am
+uninstall-am: uninstall-binPROGRAMS uninstall-info-am \
+	uninstall-ptp_lsf_proxyHEADERS
 
 uninstall-info: uninstall-info-recursive
 
@@ -664,12 +696,14 @@ uninstall-info: uninstall-info-recursive
 	distuninstallcheck dvi dvi-am html html-am info info-am \
 	install install-am install-binPROGRAMS install-data \
 	install-data-am install-exec install-exec-am install-info \
-	install-info-am install-man install-strip installcheck \
-	installcheck-am installdirs installdirs-am maintainer-clean \
-	maintainer-clean-generic maintainer-clean-recursive \
-	mostlyclean mostlyclean-compile mostlyclean-generic \
-	mostlyclean-recursive pdf pdf-am ps ps-am tags tags-recursive \
-	uninstall uninstall-am uninstall-binPROGRAMS uninstall-info-am
+	install-info-am install-man install-ptp_lsf_proxyHEADERS \
+	install-strip installcheck installcheck-am installdirs \
+	installdirs-am maintainer-clean maintainer-clean-generic \
+	maintainer-clean-recursive mostlyclean mostlyclean-compile \
+	mostlyclean-generic mostlyclean-recursive pdf pdf-am ps ps-am \
+	tags tags-recursive uninstall uninstall-am \
+	uninstall-binPROGRAMS uninstall-info-am \
+	uninstall-ptp_lsf_proxyHEADERS
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
