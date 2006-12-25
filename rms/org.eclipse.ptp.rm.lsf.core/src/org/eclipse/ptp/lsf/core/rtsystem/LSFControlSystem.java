@@ -85,11 +85,11 @@ public class LSFControlSystem implements IControlSystem, IProxyRuntimeEventListe
 			argList.add(path);
 		}
 		argList.add("numOfProcs");
-		argList.add(Integer.toString(jobRunConfig.getNumberOfProcesses()));
+// TODO		argList.add(Integer.toString(jobRunConfig.getNumberOfProcesses()));
 		argList.add("procsPerNode");
-		argList.add(Integer.toString(jobRunConfig.getNumberOfProcessesPerNode()));
+// TODO		argList.add(Integer.toString(jobRunConfig.getNumberOfProcessesPerNode()));
 		argList.add("firstNodeNum");
-		argList.add(Integer.toString(jobRunConfig.getFirstNodeNumber()));
+// TODO		argList.add(Integer.toString(jobRunConfig.getFirstNodeNumber()));
 		
 		String dir = jobRunConfig.getWorkingDir();
 		if (dir != null) {
@@ -276,4 +276,9 @@ public class LSFControlSystem implements IControlSystem, IProxyRuntimeEventListe
     		}
     	}
     }
+
+	public void run(int jobID, int nProcs, int firstNodeNum, int nProcsPerNode, JobRunConfiguration jobRunConfig) throws CoreException {
+		// TODO Auto-generated method stub
+		
+	}
 }
