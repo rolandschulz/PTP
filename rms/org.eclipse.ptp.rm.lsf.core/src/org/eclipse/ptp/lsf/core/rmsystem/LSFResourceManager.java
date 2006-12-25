@@ -21,6 +21,9 @@
  */
 package org.eclipse.ptp.lsf.core.rmsystem;
 
+import org.eclipse.ptp.core.attributes.IAttribute;
+import org.eclipse.ptp.core.elementcontrols.IPMachineControl;
+import org.eclipse.ptp.core.elementcontrols.IPQueueControl;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
 import org.eclipse.ptp.rmsystem.AbstractProxyResourceManager;
 
@@ -77,6 +80,11 @@ public class LSFResourceManager extends AbstractProxyResourceManager {
 	protected void doDispose() {
 		// TODO Auto-generated method stub
 
+	}
+
+	public IAttribute[] getLaunchAttributes(IPMachineControl machine, IPQueueControl queue) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
