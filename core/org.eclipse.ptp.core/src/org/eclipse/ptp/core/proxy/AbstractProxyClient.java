@@ -43,10 +43,11 @@ import org.eclipse.ptp.core.proxy.event.ProxyTimeoutEvent;
 import org.eclipse.ptp.core.util.BitList;
 
 public abstract class AbstractProxyClient {
+	private int					transactionId = 0;
 	private String				sessHost = null;
 	private int					sessPort = 0;
 	private ServerSocketChannel	sessSvrSock = null;
-	private SocketChannel			sessSock = null;
+	private SocketChannel		sessSock = null;
 	private boolean				sessConnected = false;
 	private boolean				exitThread;
 	private Thread				eventThread;
@@ -58,7 +59,11 @@ public abstract class AbstractProxyClient {
 	private boolean shutting_down = false;
 	private boolean have_shut_down = false;
 	
-	private String encodeLength(int val) {
+	private int newTransactionId() {
+		return ++transactionId;
+	}
+
+	private String encodeIntVal(int val) {
 		char[] res = new char[8];
 		String str = Integer.toHexString(val);
 		int rem = 8 - str.length();
@@ -94,7 +99,8 @@ public abstract class AbstractProxyClient {
 
 	protected void sendCommand(String cmd) throws IOException {
 		if (sessConnected) {
-			String buf = encodeLength(cmd.length()) + " " + cmd;
+			String buf = encodeIntVal(cmd.length()) + "," +
+						 encodeIntVal(newTransactionId()) + " " + cmd;
 			System.out.println("<" + buf + ">");
 			fullWrite(encoder.encode(CharBuffer.wrap(buf)));
 		}
