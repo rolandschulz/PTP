@@ -21,9 +21,12 @@ package org.eclipse.ptp.rtsystem.proxy;
 
 import java.io.IOException;
 
+// TODO - this class should go away (never really used anyway), implementation in superclass.
+
+
 public class ProxyRuntimeClient extends AbstractProxyRuntimeClient {
 	public ProxyRuntimeClient() {
-		super();
+		super(null, true);
 	}
 	
     public void sendCommand(String cmd) throws IOException {
@@ -31,11 +34,11 @@ public class ProxyRuntimeClient extends AbstractProxyRuntimeClient {
     }
     
     public void initialize() throws IOException {
-    	sendCommand("STARTDAEMON");
+    	sendCommand("INIT");
     }
     
     public void initiateDiscovery() throws IOException {
-    	sendCommand("DISCOVER");
+    	sendCommand("SEND_EVENTS");
     }
 
 	public void run(String[] args) throws IOException {
