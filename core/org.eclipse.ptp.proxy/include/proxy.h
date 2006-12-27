@@ -21,6 +21,7 @@
 #define _PROXY_H_
 
 #include <stdarg.h>
+#include <list.h>
 
 #define PROXY_RES_OK		0
 #define PROXY_RES_ERR		-1
@@ -80,6 +81,7 @@ struct proxy_svr_funcs {
 	int (*create)(struct proxy_svr *, int);
 	int (*connect)(struct proxy_svr *, char *, int);
 	int (*progress)(struct proxy_svr *);
+	int (*handle_events)(struct proxy_svr *, List *, struct timeval);
 	void (*finish)(struct proxy_svr *);
 };
 typedef struct proxy_svr_funcs	proxy_svr_funcs;
@@ -119,6 +121,7 @@ extern int		proxy_svr_init(char *, proxy_handler_funcs *, proxy_svr_helper_funcs
 extern int		proxy_svr_create(proxy_svr *, int);
 extern int		proxy_svr_connect(proxy_svr *, char *, int);
 extern int		proxy_svr_progress(proxy_svr *);
+extern int		proxy_svr_handle_events(proxy_svr *, List *, struct timeval);
 extern void		proxy_svr_finish(proxy_svr *);
 extern void		proxy_svr_event_callback(proxy_svr *, char *);
 
