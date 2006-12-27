@@ -24,6 +24,7 @@
 #include <stdlib.h>
  
 #include "proxy.h"
+#include <list.h>
 
 extern proxy_svr_funcs 	proxy_tcp_svr_funcs;
 
@@ -85,6 +86,16 @@ proxy_svr_progress(proxy_svr *ps)
 	if (ps != NULL)
 		return ps->proxy->svr_funcs->progress(ps);
 		
+	return PROXY_RES_ERR;
+}
+
+int
+proxy_svr_handle_events(proxy_svr *ps, List *eventList, struct timeval timeout)
+{
+	if (ps != NULL) {
+		return ps->proxy->svr_funcs->handle_events(ps, eventList, timeout);
+	}
+	
 	return PROXY_RES_ERR;
 }
 
