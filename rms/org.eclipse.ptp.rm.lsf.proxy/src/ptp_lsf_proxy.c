@@ -117,7 +117,7 @@ proxy_svr *	lsf_proxy;			/* this proxy server */
 pid_t		lsfd_pid = 0;
 List *		eventList;
 List *		jobList;
-int		ptp_signal_exit;
+int			ptp_signal_exit;
 RETSIGTYPE	(*saved_signals[NSIG])(int);
 
 static proxy_handler_funcs handler_funcs = {
@@ -182,6 +182,7 @@ isShutdown(void)
 	return lsf_shutdown != 0;
 }
 
+
 static useconds_t
 usleepInterval()
 {
@@ -191,7 +192,7 @@ usleepInterval()
 
 
 /**
- * Initialize the LSF service (no LSBLIB calls needed to shutdown LSF)
+ * Shutdown the LSF service (no LSBLIB calls needed to shutdown LSF)
  */
 static int
 shutdownLSF(void)
@@ -430,81 +431,15 @@ LSF_Progress(void)
 	// TODO - create function for this
 	static int nextHostPoll = 0;	/* poll for hosts when reaches 0 */
 
-	/* file descriptors for handling resource manager commands */
-	
-	fd_set			rfds;
-	fd_set			wfds;
-	fd_set			efds;
-	int				res;
-	int				nfds = 0;
-	char *			event;
-	struct timeval	tv;
-	handler *		h;
-	
-	struct timeval TIMEOUT;
-	TIMEOUT.tv_sec = 0;
-	TIMEOUT.tv_usec = 2000;
+	/* timeout interval to wait for arrival of events (usecs) */ 
+	struct timeval timeout;
+	timeout.tv_sec = 2;
+	timeout.tv_usec = 2000;
+//	timeout.tv_usec = 2000000;  // TODO - this causes error, make sure tests completes and fails
 
-	for (SetList(eventList); (event = (char *)GetListElement(eventList)) != NULL; ) {
-		proxy_svr_event_callback(lsf_proxy, event);
-		RemoveFromList(eventList, (void *)event);
-		free(event);	
-	}
-
-	/***********************************
-	 * First: Check for any file events
-	 */
-	 
-	/* Set up fd sets */
-
-	FD_ZERO(&rfds);
-	FD_ZERO(&wfds);
-	FD_ZERO(&efds);
-	
-	for (SetHandler(); (h = GetHandler()) != NULL; ) {
-		if (h->htype == HANDLER_FILE) {
-			if (h->file_type & READ_FILE_HANDLER)
-				FD_SET(h->fd, &rfds);
-			if (h->file_type & WRITE_FILE_HANDLER)
-				FD_SET(h->fd, &wfds);
-			if (h->file_type & EXCEPT_FILE_HANDLER)
-				FD_SET(h->fd, &efds);
-			if (h->fd > nfds)
-				nfds = h->fd;
-		}
-	}
-	
-	tv = TIMEOUT;
-	
-	for ( ;; ) {
-		res = select(nfds+1, &rfds, &wfds, &efds, &tv);
-	
-		switch (res) {
-		case INVALID_SOCKET:
-			if ( errno == EINTR )
-				continue;
-		
-			perror("socket");
-			return PROXY_RES_ERR;
-		
-		case 0:
-			/* Timeout. */
-			break;
-
-		default:
-			for (SetHandler(); (h = GetHandler()) != NULL; ) {
-				if (h->htype == HANDLER_FILE
-					&& ((h->file_type & READ_FILE_HANDLER && FD_ISSET(h->fd, &rfds))
-						|| (h->file_type & WRITE_FILE_HANDLER && FD_ISSET(h->fd, &wfds))
-						|| (h->file_type & EXCEPT_FILE_HANDLER && FD_ISSET(h->fd, &efds)))
-					&& h->file_handler(h->fd, h->data) < 0)
-					return PROXY_RES_ERR;
-			}
-			
-		}
-	
-		break;
-	}
+    if (proxy_svr_handle_events(lsf_proxy, eventList, timeout) == PROXY_RES_ERR) {
+    	return PROXY_RES_ERR;
+    }
 
 #ifdef LSF
 	/* poll for hosts */
@@ -529,7 +464,7 @@ LSF_Progress(void)
 		}
 	}
 #endif
-	usleep(usleepInterval());
+	// not needed sleep in fd reads usleep(usleepInterval());
 
 	return PROXY_RES_OK;
 }
