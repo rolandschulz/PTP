@@ -43,10 +43,11 @@
 #include "handler.h"
 
 static int	proxy_tcp_svr_init(proxy_svr *, void **);
-static int	proxy_tcp_svr_create(proxy_svr *svr, int);
-static int	proxy_tcp_svr_connect(proxy_svr *svr, char *, int);
-static int	proxy_tcp_svr_progress(proxy_svr *svr);
-static void	proxy_tcp_svr_finish(proxy_svr *svr);
+static int	proxy_tcp_svr_create(proxy_svr *, int);
+static int	proxy_tcp_svr_connect(proxy_svr *, char *, int);
+static int  proxy_tcp_svr_handle_events(proxy_svr *, List *, struct timeval);
+static int	proxy_tcp_svr_progress(proxy_svr *);
+static void	proxy_tcp_svr_finish(proxy_svr *);
 
 static int	proxy_tcp_svr_recv_msgs(int, void *);
 static int	proxy_tcp_svr_accept(int, void *);
@@ -58,6 +59,7 @@ proxy_svr_funcs proxy_tcp_svr_funcs =
 	proxy_tcp_svr_create,
 	proxy_tcp_svr_connect,
 	proxy_tcp_svr_progress,
+	proxy_tcp_svr_handle_events,
 	proxy_tcp_svr_finish,
 };
 
@@ -297,6 +299,87 @@ proxy_tcp_svr_progress(proxy_svr *svr)
 	}
 
 	return PROXY_RES_OK;
+}
+
+/**
+ * Check file descriptors for messages and if present, call handlers
+ */
+static int
+proxy_tcp_svr_handle_events(proxy_svr *svr, List * eventList, struct timeval timeout)
+{
+	/* file descriptors for handling resource manager commands */
+
+	fd_set			rfds;
+	fd_set			wfds;
+	fd_set			efds;
+	int				res;
+	int				nfds = 0;
+	char *			event;
+	struct timeval	tv;
+	handler *		h;
+
+	for (SetList(eventList); (event = (char *)GetListElement(eventList)) != NULL; ) {
+		proxy_svr_event_callback(svr, event);
+		RemoveFromList(eventList, (void *)event);
+		free(event);	
+	}
+
+	/***********************************
+	 * First: Check for any file events
+	 */
+	 
+	/* Set up fd sets */
+
+	FD_ZERO(&rfds);
+	FD_ZERO(&wfds);
+	FD_ZERO(&efds);
+	
+	for (SetHandler(); (h = GetHandler()) != NULL; ) {
+		if (h->htype == HANDLER_FILE) {
+			if (h->file_type & READ_FILE_HANDLER)
+				FD_SET(h->fd, &rfds);
+			if (h->file_type & WRITE_FILE_HANDLER)
+				FD_SET(h->fd, &wfds);
+			if (h->file_type & EXCEPT_FILE_HANDLER)
+				FD_SET(h->fd, &efds);
+			if (h->fd > nfds)
+				nfds = h->fd;
+		}
+	}
+	
+	tv = timeout;
+	
+	for ( ;; ) {
+		res = select(nfds+1, &rfds, &wfds, &efds, &tv);
+	
+		switch (res) {
+		case INVALID_SOCKET:
+			if ( errno == EINTR )
+				continue;
+		
+			perror("socket");
+			return PROXY_RES_ERR;
+		
+		case 0:
+			/* Timeout. */
+			break;
+
+		default:
+			for (SetHandler(); (h = GetHandler()) != NULL; ) {
+				if (h->htype == HANDLER_FILE
+					&& ((h->file_type & READ_FILE_HANDLER && FD_ISSET(h->fd, &rfds))
+						|| (h->file_type & WRITE_FILE_HANDLER && FD_ISSET(h->fd, &wfds))
+						|| (h->file_type & EXCEPT_FILE_HANDLER && FD_ISSET(h->fd, &efds)))
+					&& h->file_handler(h->fd, h->data) < 0)
+					return PROXY_RES_ERR;
+			}
+			
+		}
+	
+		break;
+	}
+
+	return 0;	
 }
 
 /*
