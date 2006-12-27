@@ -82,7 +82,17 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 		sendCommand("INIT");
 		waitForRuntimeEvent();
     }
-    
+
+    public void sendEvents() throws IOException {
+		if (logEvents) System.out.println("ProxyRuntimeClient: Starting event stream.");
+		sendCommand("SEND_EVENTS");  	
+    }
+
+    public void haltEvents() throws IOException {
+		if (logEvents) System.out.println("ProxyRuntimeClient: Halting event stream.");
+		sendCommand("HALT_EVENTS");  	
+    }
+
     public void initiateDiscovery() throws IOException {
     	sendCommand("SEND_EVENTS");
     }
