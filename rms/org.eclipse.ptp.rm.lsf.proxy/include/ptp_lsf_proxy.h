@@ -7,7 +7,7 @@ int LSF_Discover(char **);
 
 /* proxy methods */
 int LSF_Initialize(char **);
-int LSF_StartEvents(char **);
+int LSF_SendEvents(char **);
 int LSF_HaltEvents(char **);
 int LSF_Run(char **);
 int LSF_TerminateJob(char **);

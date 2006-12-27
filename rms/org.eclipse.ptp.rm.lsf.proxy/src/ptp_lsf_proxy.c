@@ -134,7 +134,7 @@ static proxy_svr_helper_funcs helper_funcs = {
 
 static proxy_svr_commands command_tab[] = {
 	{"INIT",			LSF_Initialize},
-	{"START_EVENTS",	LSF_StartEvents},
+	{"SEND_EVENTS",		LSF_SendEvents},
 	{"HALT_EVENTS",		LSF_HaltEvents},
 	{"RUN",				LSF_Run},
 	{"TERMJOB",			LSF_TerminateJob},
@@ -311,7 +311,7 @@ LSF_Initialize(char** args)
 
 
 /**
- * Start polling
+ * Start polling LSF change events
  * 
  *  start polling for:
  *		1. host information - lsb_gethostinfo()
@@ -319,16 +319,16 @@ LSF_Initialize(char** args)
  * 		3. queue information - lsb_queueinfo()
  */
  int
-LSF_StartEvents(char **args)
+LSF_SendEvents(char **args)
 {
-	fprintf(stdout, "  LSF_StartEvents\n"); fflush(stdout);
+	fprintf(stdout, "  LSF_SendEvents\n"); fflush(stdout);
 	gSendEvents = 1;
 	return PROXY_RES_OK;	
 }
 
 
 /**
- * Stop polling
+ * Stop polling for LSF change events
  */
  int
 LSF_HaltEvents(char **args)
