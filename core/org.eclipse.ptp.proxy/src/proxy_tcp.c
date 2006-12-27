@@ -153,14 +153,14 @@ proxy_tcp_send_msg(proxy_tcp_conn *conn, char *message, int len)
 }
 
 static int
-proxy_tcp_get_msg_len(proxy_tcp_conn *conn)
+proxy_tcp_get_msg_header(proxy_tcp_conn *conn)
 {
 	char *	end;
 
 	/*
 	 * If we haven't read enough then return for more...
 	 */
-	if (conn->total_read < MAX_MSG_LEN_SIZE + 1)
+	if (conn->total_read < MAX_MSG_HEADER_SIZE + 1)
 		return 0;
 		
 	conn->msg_len = strtol(conn->buf, &end, 16);
@@ -168,7 +168,17 @@ proxy_tcp_get_msg_len(proxy_tcp_conn *conn)
 	/*
 	 * check if we've received the length
 	 */
-	if (conn->msg_len == 0 || (conn->msg_len > 0 && *end != ' ')) {
+	if (conn->msg_len == 0 || (conn->msg_len > 0 && *end != ',')) {
+		proxy_set_error(PROXY_ERR_PROTO, "could not understand message");
+		return -1;
+	}
+
+	/*
+	 *read the transaction id
+	 */
+	conn->msg_id = strtol(end+1, &end, 16);
+	
+	if (conn->msg_id <= 0 || (conn->msg_id > 0 && *end != ' ')) {
 		proxy_set_error(PROXY_ERR_PROTO, "could not understand message");
 		return -1;
 	}
@@ -182,15 +192,15 @@ proxy_tcp_copy_msg(proxy_tcp_conn *conn, char **result)
 	int	n = conn->msg_len;
 	
 	*result = (char *)malloc(conn->msg_len + 1);
-	memcpy(*result, &conn->buf[MAX_MSG_LEN_SIZE + 1], conn->msg_len);
+	memcpy(*result, &conn->buf[MAX_MSG_HEADER_SIZE + 1], conn->msg_len);
 	(*result)[conn->msg_len] = '\0';
 	
 	/*
 	 * Move rest of buffer down if necessary
 	 */
-	if (conn->total_read > conn->msg_len + MAX_MSG_LEN_SIZE + 1) {
-		conn->total_read -= conn->msg_len + MAX_MSG_LEN_SIZE + 1;
-		memmove(conn->buf, &conn->buf[conn->msg_len + MAX_MSG_LEN_SIZE + 1], conn->total_read);
+	if (conn->total_read > conn->msg_len + MAX_MSG_HEADER_SIZE + 1) {
+		conn->total_read -= conn->msg_len + MAX_MSG_HEADER_SIZE + 1;
+		memmove(conn->buf, &conn->buf[conn->msg_len + MAX_MSG_HEADER_SIZE + 1], conn->total_read);
 	} else {
 		conn->buf_pos = 0;
 		conn->total_read = 0;
@@ -207,7 +217,7 @@ proxy_tcp_get_msg_body(proxy_tcp_conn *conn, char **result)
 	/*
 	 * If we haven't read enough then return for more...
 	 */
-	if (conn->total_read - MAX_MSG_LEN_SIZE + 1 < conn->msg_len)
+	if (conn->total_read - MAX_MSG_HEADER_SIZE + 1 < conn->msg_len)
 		return 0;
 		
 	return proxy_tcp_copy_msg(conn, result);
@@ -243,7 +253,7 @@ proxy_tcp_get_msg(proxy_tcp_conn *conn, char **result)
 {
 	int	n;
 	
-	if (conn->msg_len == 0 && (n = proxy_tcp_get_msg_len(conn)) <= 0)
+	if (conn->msg_len == 0 && (n = proxy_tcp_get_msg_header(conn)) <= 0)
 		return n;
 		
 	return proxy_tcp_get_msg_body(conn, result);

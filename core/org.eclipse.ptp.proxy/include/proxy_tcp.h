@@ -23,7 +23,7 @@
 #include "compat.h"
 
 #define PROXY_TCP_PORT	12345
-#define MAX_MSG_LEN_SIZE	8
+#define MAX_MSG_HEADER_SIZE	17
 
 struct proxy_tcp_conn {
 	proxy_clnt *	clnt;
@@ -34,13 +34,14 @@ struct proxy_tcp_conn {
 	SOCKET		sess_sock;
 	SOCKET		svr_sock;
 	char *		buf;
-	char			msg_len_buf[11];
+	char		msg_len_buf[11];
 	int			buf_size;
 	int			buf_pos;
 	int			total_read;
 	char *		msg;
 	int			msg_len;
-	void			(*event_handler)(void *, void *);
+	int			msg_id;
+	void		(*event_handler)(void *, void *);
 	void *		event_data;
 };
 typedef struct proxy_tcp_conn	proxy_tcp_conn;
