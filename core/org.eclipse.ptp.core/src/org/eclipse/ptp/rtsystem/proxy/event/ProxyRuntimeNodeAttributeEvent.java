@@ -54,7 +54,17 @@ public class ProxyRuntimeNodeAttributeEvent extends AbstractProxyRuntimeEvent im
 	}
 	
 	public String toString() {
-		return "EVENT_RUNTIME_NODEATTR " + this.keys+" : "+ this.values;
+		String rtn = "EVENT_RUNTIME_NODEATTR [";
+		for (int i = 0; i < keys.length; i++) {
+			rtn += keys[i];
+			if (i != keys.length - 1) rtn += ", ";
+		}
+		rtn += "] [";
+		for (int i = 0; i < values.length; i++) {
+			rtn += values[i] + " ";
+			if (i != values.length - 1) rtn += ", ";
+		}
+		return rtn + "]";
 	}
 }
 
