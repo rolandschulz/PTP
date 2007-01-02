@@ -255,6 +255,54 @@ checkErrorCode(int type, int rc)
 
 
 /**
+ * Compares hostInfoEnt structures
+ * 
+ * @returns true if entries are the same, otherwise copies new entry into the
+ * original and returns false
+ * 
+ */
+static int
+hostInfoHasChanged(struct hostInfoEnt * hInfoSaved, struct hostInfoEnt * hInfo)
+{
+	if (hInfoSaved->host		!= hInfo->host)			goto hasChanged;
+	if (hInfoSaved->hStatus		!= hInfo->hStatus)		goto hasChanged;
+	
+	/* no changes */
+	return 0;
+	
+	/* something has changed */
+	hasChanged:
+
+	*hInfoSaved = *hInfo;
+	return 1;
+}
+
+
+/**
+ * Compares hostInfoEnt structures
+ * 
+ * @returns true if entries are the same, otherwise copies new entry into the
+ * original and returns false
+ * 
+ */
+static int
+queueInfoHasChanged(struct queueInfoEnt * qInfoSaved, struct queueInfoEnt * qInfo)
+{
+	if (qInfoSaved->host		!= qInfo->host)			goto hasChanged;
+	if (qInfoSaved->hStatus		!= qInfo->hStatus)		goto hasChanged;
+	
+	/* no changes */
+	return 0;
+	
+	/* something has changed */
+	hasChanged:
+
+	*qInfoSaved = *qInfo;
+	return 1;
+}
+
+
+/**
  * Notify proxy client of host information changes
  * 
  * 	TODO - compare with old info
@@ -265,15 +313,48 @@ notifyHostInfoChange(struct hostInfoEnt *hInfo)
 	char *res, *str1, *str2, *str3;
 	char id[64], host[64], state[64];
 
-	sprintf(id, "%s=%d", ATTRIB_MACHINEID, 0);
-	//sprintf(host, "%s=%s", ATTRIB_NODE_NUMBER, hInfo->host); ??????
-	sprintf(host, "%s=%s", ATTRIB_NODE_NAME, hInfo->host);
-	sprintf(state, "%s=%d", ATTRIB_NODE_STATE, hInfo->hStatus);
-	proxy_cstring_to_str(id, &str1);
-	proxy_cstring_to_str(host, &str2);
-	proxy_cstring_to_str(state, &str3);
-	asprintf(&res, "%d %s %s %s", RTEV_NATTR, str1, str2, str3);
-	AddToList(eventList, (void *)res);
+	static struct hostInfoEnt hInfoSaved;
+
+	if (hostInfoHasChanged(&hInfoSaved, hInfo)) {
+		sprintf(id, "%s=%d", ATTRIB_MACHINEID, 0);
+		//sprintf(host, "%s=%s", ATTRIB_NODE_NUMBER, hInfo->host); ??????
+		sprintf(host, "%s=%s", ATTRIB_NODE_NAME, hInfo->host);
+		sprintf(state, "%s=%d", ATTRIB_NODE_STATE, hInfo->hStatus);
+		proxy_cstring_to_str(id, &str1);
+		proxy_cstring_to_str(host, &str2);
+		proxy_cstring_to_str(state, &str3);
+		asprintf(&res, "%d %s %s %s", RTEV_NATTR, str1, str2, str3);
+		AddToList(eventList, (void *)res);
+	}
+	
+	return PROXY_RES_OK;
+}
+
+
+/**
+ * Notify proxy client of host information changes
+ * 
+ * 	TODO - compare with old info
+ */
+static int
+notifyQueueInfoChange(struct queueInfoEnt *qInfo)
+{
+	char *res, *str1, *str2, *str3;
+	char id[64], host[64], state[64];
+
+	static struct queueInfoEnt qInfoSaved;
+
+	if (queueInfoHasChanged(&qInfoSaved, qInfo)) {
+		sprintf(id, "%s=%d", ATTRIB_MACHINEID, 0);
+		//sprintf(host, "%s=%s", ATTRIB_NODE_NUMBER, hInfo->host); ??????
+		sprintf(host, "%s=%s", ATTRIB_NODE_NAME, hInfo->host);
+		sprintf(state, "%s=%d", ATTRIB_NODE_STATE, hInfo->hStatus);
+		proxy_cstring_to_str(id, &str1);
+		proxy_cstring_to_str(host, &str2);
+		proxy_cstring_to_str(state, &str3);
+		asprintf(&res, "%d %s %s %s", RTEV_NATTR, str1, str2, str3);
+		AddToList(eventList, (void *)res);
+	}
 	
 	return PROXY_RES_OK;
 }
@@ -462,6 +543,7 @@ LSF_Progress(void)
 			lsb_perror("ptp_lsf_proxy: lsb_queueinfo() failed");
 			return PROXY_RES_ERR;
 		}
+		notifyQueueInfoChange(queue_info);
 	}
 #endif
 	// not needed sleep in fd reads usleep(usleepInterval());
