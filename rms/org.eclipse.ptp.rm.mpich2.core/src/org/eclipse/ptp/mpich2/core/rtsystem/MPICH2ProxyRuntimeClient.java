@@ -122,18 +122,9 @@ public class MPICH2ProxyRuntimeClient extends ProxyRuntimeClient implements IRun
 		} catch (IOException e) {
 			PTPCorePlugin.log(e);
 		}
-	}	
-
-	private void setWaitEvent(int eventID) {
-		waitEvents.set(eventID);
-		waitEvents.set(IProxyRuntimeEvent.EVENT_RUNTIME_ERROR); // always check for errors
 	}
 
-	private IProxyRuntimeEvent waitForRuntimeEvent() throws IOException {
-		return waitForRuntimeEvent(null);
-	}
-
-	private synchronized IProxyRuntimeEvent waitForRuntimeEvent(IProgressMonitor monitor) throws IOException {
+	protected synchronized IProxyRuntimeEvent waitForRuntimeEvent(IProgressMonitor monitor) throws IOException {
 		IProxyRuntimeEvent event = null;
 		
 		System.out.println("MPICH2ProxyRuntimeClient waiting on " + waitEvents.toString());
