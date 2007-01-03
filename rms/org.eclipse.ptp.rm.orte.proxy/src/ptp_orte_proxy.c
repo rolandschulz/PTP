@@ -165,6 +165,7 @@ static proxy_svr_helper_funcs helper_funcs = {
 
 static proxy_svr_commands command_tab[] = {
 	{"STARTDAEMON",	ORTEStartDaemon},
+	{"SEND_EVENTS", ORTEDiscover},
 	{"DISCOVER",    ORTEDiscover},
 	{"RUN",			ORTERun},
 	{"TERMJOB",		ORTETerminateJob},
