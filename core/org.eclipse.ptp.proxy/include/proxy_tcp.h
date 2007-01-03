@@ -41,6 +41,7 @@ struct proxy_tcp_conn {
 	char *		msg;
 	int			msg_len;
 	int			msg_id;
+	int			msg_cmd;
 	void		(*event_handler)(void *, void *);
 	void *		event_data;
 };
