@@ -10,6 +10,7 @@ public class LSFProxyRuntimeClient extends AbstractProxyRuntimeClient implements
 	public LSFProxyRuntimeClient(String proxyPath, boolean launchManually) {
 		super(proxyPath, launchManually);
 		super.addRuntimeEventListener(this);
+		setProxyName("LSF");
 	}
 	
 	public void runJob(String[] args) throws IOException {
