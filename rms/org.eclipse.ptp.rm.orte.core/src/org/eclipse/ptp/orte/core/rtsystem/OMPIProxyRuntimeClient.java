@@ -25,6 +25,7 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
 		this.proxyPath = proxyPath;
 		this.launchManually = launchManually;
 		super.addRuntimeEventListener(this);
+		setProxyName("OMPI");
 	}
 	
 	public void runJob(String[] args) throws IOException {
@@ -109,60 +110,5 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
 		}
 		return true;
 	}
-
-	public void shutdown() {
-		try {
-			System.out.println("OMPIProxyRuntimeClient shutting down server...");
-			setWaitEvent(IProxyRuntimeEvent.EVENT_RUNTIME_OK);
-			sessionFinish();
-			waitForRuntimeEvent();
-			System.out.println("OMPIProxyRuntimeClient shut down.");
-		} catch (IOException e) {
-			PTPCorePlugin.log(e);
-		}
-	}	
-
-	protected synchronized IProxyRuntimeEvent waitForRuntimeEvent(IProgressMonitor monitor) throws IOException {
-		IProxyRuntimeEvent event = null;
-		
-		System.out.println("OMPIProxyRuntimeClient waiting on " + waitEvents.toString());
-		while (this.events.isEmpty()) {
-    			try {
-    				wait(500);
-    			} catch (InterruptedException e) {
-    				System.err.println("Interrupted exception.");
-    			}
-    			if (monitor != null && monitor.isCanceled()) {
-    				throw new IOException("Cancelled by user");
-    			}
-		}
-		System.out.println("OMPIProxyRuntimeClient awoke!");
-		try {
-			event = (IProxyRuntimeEvent) this.events.removeItem();
-		} catch (InterruptedException e) {
-			waitEvents.clear();
-			throw new IOException(e.getMessage());
-		}
-   		if (event instanceof ProxyRuntimeErrorEvent) {
-   	   		waitEvents.clear();
-   			throw new IOException(((ProxyRuntimeErrorEvent)event).getErrorMessage());
-   		}
-   		waitEvents.clear();
-   		return event;
-	}
-
-	/*
-	 * Only handle events we're interested in
-	 */
-    public synchronized void handleEvent(IProxyRuntimeEvent e) {
-		System.out.println("OMPIProxyRuntimeClient got event: " + e.toString());
-		
-		if (waitEvents.get(e.getEventID())) {
-			System.out.println("OMPIProxyRuntimeClient notifying...");
-			this.events.addItem(e);
-			notifyAll();
-		}
-		
-    }
 
 }
