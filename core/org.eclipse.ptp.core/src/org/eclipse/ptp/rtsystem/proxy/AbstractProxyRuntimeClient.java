@@ -48,12 +48,13 @@ import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeTimeoutEvent;
 
 public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient implements IProxyEventListener {
-	private boolean logEvents = true;
-	protected final String proxyPath;
+	private boolean			logEvents = true;
+	private String			proxyName = "";
+	protected final String	proxyPath;
 	protected final boolean launchManually;
-	protected BitSet waitEvents = new BitSet();
-	protected Queue events = new Queue();
-	protected List 	listeners = Collections.synchronizedList(new ArrayList());
+	protected BitSet		waitEvents = new BitSet();
+	protected Queue			events = new Queue();
+	protected List			listeners = Collections.synchronizedList(new ArrayList());
 
 	public AbstractProxyRuntimeClient(String proxyPath, boolean launchManually) {
 		super();
@@ -71,12 +72,21 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 		this.logEvents = logEvents;
 	}
 
+	/**
+	 * Set the name of the proxy (used in the logging of events)
+	 * 
+	 * @param proxyName - type name of the proxy, e.g., LSF
+	 */ 
+	protected void setProxyName(String proxyName) {
+		this.proxyName = proxyName;
+	}
+
     public void sendCommand(String cmd) throws IOException {
         super.sendCommand(cmd);
     }
     
     public void initialize() throws IOException {
-		if (logEvents) System.out.println("ProxyRuntimeClient: Waiting on initialize.");
+		if (logEvents) System.out.println(proxyName + "ProxyRuntimeClient: Waiting on initialize.");
 
 		setWaitEvent(IProxyRuntimeEvent.EVENT_RUNTIME_OK);
 		sendCommand("INIT");
@@ -84,12 +94,12 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
     }
 
     public void sendEvents() throws IOException {
-		if (logEvents) System.out.println("ProxyRuntimeClient: Starting event stream.");
+		if (logEvents) System.out.println(proxyName + "ProxyRuntimeClient: Starting event stream.");
 		sendCommand("SEND_EVENTS");  	
     }
 
     public void haltEvents() throws IOException {
-		if (logEvents) System.out.println("ProxyRuntimeClient: Halting event stream.");
+		if (logEvents) System.out.println(proxyName + "ProxyRuntimeClient: Halting event stream.");
 		sendCommand("HALT_EVENTS");  	
     }
 
@@ -114,7 +124,7 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 	public void handleEvent(IProxyEvent event) {
 		IProxyRuntimeEvent e = null;
 		if (listeners == null) {
-			System.out.println("AbstractProxyRuntimeClient.handleEvent() no listeners!");
+			System.out.println(proxyName + "ProxyRuntimeClient.handleEvent() no listeners!");
 			return;
 		}
 		
@@ -145,7 +155,7 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 		final String proxy_path = proxyPath;
 		
 		if (logEvents) {
-			System.out.println("ProxyRuntimeClient - firing up proxy, waiting for connection.  Please wait!  This can take a minute . . .");
+			System.out.println(proxyName + "ProxyRuntimeClient - firing up proxy, waiting for connection.  Please wait!  This can take a minute . . .");
 			System.out.println("PROXY_SERVER path = '" + proxyPath + "'");
 		}
 
@@ -157,7 +167,7 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 					monitor.subTask("Waiting for manual lauch of proxy on port " + getSessionPort() + "...");
 				}
 			} else {
-				Thread runThread = new Thread("Proxy Server Thread") {
+				Thread runThread = new Thread(proxyName + "Proxy Server Thread") {
 					public void run() {
 						String[] cmd = new String[2];
 						cmd[0] = proxy_path;
@@ -175,7 +185,7 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 									try {
 										String output;
 										while ((output = out_reader.readLine()) != null) {
-											if (logEvents) System.out.println("++++++++++ ptp_lsf_proxy: " + output);
+											if (logEvents) System.out.println("++++++++++ " + proxyName + " ptp_proxy: " + output);
 										}
 									} catch (IOException e) {
 										e.printStackTrace();
@@ -207,7 +217,7 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 				runThread.start();
 			}
 			
-			if (logEvents) System.out.println("ProxyRuntimeClient: Waiting on accept.");
+			if (logEvents) System.out.println(proxyName + "ProxyRuntimeClient: Waiting on accept.");
 			waitForRuntimeEvent(monitor);
 
 		} catch (IOException e) {
@@ -224,11 +234,11 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 
 	public void shutdown() {
 		try {
-			if (logEvents) System.out.println("ProxyRuntimeClient: shutting down server...");
+			if (logEvents) System.out.println(proxyName + "ProxyRuntimeClient: shutting down server...");
 			setWaitEvent(IProxyRuntimeEvent.EVENT_RUNTIME_OK);
 			sessionFinish();
 			waitForRuntimeEvent();
-			System.out.println("ProxyRuntimeClient: server shut down.");
+			System.out.println(proxyName + "ProxyRuntimeClient: server shut down.");
 		} catch (IOException e) {
 			PTPCorePlugin.log(e);
 		}
@@ -246,7 +256,7 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 	protected synchronized IProxyRuntimeEvent waitForRuntimeEvent(IProgressMonitor monitor) throws IOException {
 		IProxyRuntimeEvent event = null;
 		
-		System.out.println("LSFProxyRuntimeClient waiting on " + waitEvents.toString());
+		System.out.println(proxyName + "ProxyRuntimeClient waiting on " + waitEvents.toString());
 		while (this.events.isEmpty()) {
     			try {
     				wait(500);
@@ -257,7 +267,7 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
     				throw new IOException("Cancelled by user");
     			}
 		}
-		System.out.println("LSFProxyRuntimeClient awoke!");
+		System.out.println(proxyName + "ProxyRuntimeClient awoke!");
 		try {
 			event = (IProxyRuntimeEvent) this.events.removeItem();
 		} catch (InterruptedException e) {
@@ -276,10 +286,10 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 	 * Only handle events we're interested in
 	 */
     public synchronized void handleEvent(IProxyRuntimeEvent e) {
-		if (logEvents) System.out.println("ProxyRuntimeClient got event: " + e.toString());
+		if (logEvents) System.out.println(proxyName + "ProxyRuntimeClient got event: " + e.toString());
 		
 		if (waitEvents.get(e.getEventID())) {
-			if (logEvents) System.out.println("ProxyRuntimeClient notifying...");
+			if (logEvents) System.out.println(proxyName + "ProxyRuntimeClient notifying...");
 			this.events.addItem(e);
 			notifyAll();
 		}
