@@ -44,6 +44,7 @@
 #include <proxy.h>
 #include <proxy_tcp.h>
 #include <proxy_event.h>
+#include <proxy_cmd.h>
 #include <handler.h>
 #include <list.h>
 
@@ -60,24 +61,13 @@
 #define DEFAULT_PROXY		"tcp"
 
 #define LSF_MAX_MSG_SIZE 256
-/*
- * RTEV codes must EXACTLY match org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEvent
- */
-#define RTEV_OFFSET						200
-#define RTEV_OK							RTEV_OFFSET + 0
-#define RTEV_ERROR						RTEV_OFFSET + 1
-#define RTEV_JOBSTATE					RTEV_OFFSET + 2
-#define RTEV_PROCS						RTEV_OFFSET + 4
-#define RTEV_PATTR						RTEV_OFFSET + 5
-#define RTEV_NODES						RTEV_OFFSET + 7
-#define RTEV_NATTR						RTEV_OFFSET + 8
-#define RTEV_NEWJOB						RTEV_OFFSET + 12
-#define RTEV_PROCOUT					RTEV_OFFSET + 13
 
 /*
  * RTEV_ERROR codes are used internally in the ORTE specific plugin
  */
+// TODO: are signals needed?
 #define RTEV_ERROR_SIGNAL				RTEV_OFFSET + 1009
+
 
 /*
  * Attribute names must EXACTLY match org.eclipse.ptp.core.AttributeConstants
@@ -133,13 +123,11 @@ static proxy_svr_helper_funcs helper_funcs = {
 };
 
 static proxy_svr_commands command_tab[] = {
-	{"INIT",			LSF_Initialize},
-	{"SEND_EVENTS",		LSF_SendEvents},
-	{"HALT_EVENTS",		LSF_HaltEvents},
-	{"RUN",				LSF_Run},
-	{"TERMJOB",			LSF_TerminateJob},
-	{"QUI",				LSF_Quit},
-	{NULL,				NULL},
+	{CMD_INIT,			LSF_Initialize},
+	{CMD_SEND_EVENTS,	LSF_SendEvents},
+	{CMD_HALT_EVENTS,	LSF_HaltEvents},
+	{CMD_QUIT,			LSF_Quit},
+	{0,					NULL},
 };
 
 static struct option longopts[] = {
@@ -262,8 +250,12 @@ checkErrorCode(int type, int rc)
  * 
  */
 static int
-hostInfoHasChanged(struct hostInfoEnt * hInfoSaved, struct hostInfoEnt * hInfo)
+hostInfoHasChanged(struct hostInfoEnt * hInfoSaved, struct hostInfoEnt * hInfo, int * initialize)
 {
+	if (*initialize) {
+		*initialize = 0;
+		goto hasChanged;
+	}
 	if (hInfoSaved->host		!= hInfo->host)			goto hasChanged;
 	if (hInfoSaved->hStatus		!= hInfo->hStatus)		goto hasChanged;
 	
@@ -279,17 +271,21 @@ hostInfoHasChanged(struct hostInfoEnt * hInfoSaved, struct hostInfoEnt * hInfo)
 
 
 /**
- * Compares hostInfoEnt structures
+ * Compares queueInfoEnt structures
  * 
  * @returns true if entries are the same, otherwise copies new entry into the
  * original and returns false
  * 
  */
 static int
-queueInfoHasChanged(struct queueInfoEnt * qInfoSaved, struct queueInfoEnt * qInfo)
+queueInfoHasChanged(struct queueInfoEnt * qInfoSaved, struct queueInfoEnt * qInfo, int * initialize)
 {
-	if (qInfoSaved->host		!= qInfo->host)			goto hasChanged;
-	if (qInfoSaved->hStatus		!= qInfo->hStatus)		goto hasChanged;
+	if (*initialize) {
+		*initialize = 0;
+		goto hasChanged;
+	}
+	if (strcmp(qInfoSaved->queue, qInfo->queue) != 0)	goto hasChanged;
+	if (qInfoSaved->qStatus		!= qInfo->qStatus)		goto hasChanged;
 	
 	/* no changes */
 	return 0;
@@ -313,9 +309,10 @@ notifyHostInfoChange(struct hostInfoEnt *hInfo)
 	char *res, *str1, *str2, *str3;
 	char id[64], host[64], state[64];
 
+	static int initialize = 1;
 	static struct hostInfoEnt hInfoSaved;
 
-	if (hostInfoHasChanged(&hInfoSaved, hInfo)) {
+	if (hostInfoHasChanged(&hInfoSaved, hInfo, &initialize)) {
 		sprintf(id, "%s=%d", ATTRIB_MACHINEID, 0);
 		//sprintf(host, "%s=%s", ATTRIB_NODE_NUMBER, hInfo->host); ??????
 		sprintf(host, "%s=%s", ATTRIB_NODE_NAME, hInfo->host);
@@ -332,7 +329,7 @@ notifyHostInfoChange(struct hostInfoEnt *hInfo)
 
 
 /**
- * Notify proxy client of host information changes
+ * Notify proxy client of queue information changes
  * 
  * 	TODO - compare with old info
  */
@@ -342,18 +339,19 @@ notifyQueueInfoChange(struct queueInfoEnt *qInfo)
 	char *res, *str1, *str2, *str3;
 	char id[64], host[64], state[64];
 
+	static int initialize = 1;
 	static struct queueInfoEnt qInfoSaved;
 
-	if (queueInfoHasChanged(&qInfoSaved, qInfo)) {
-		sprintf(id, "%s=%d", ATTRIB_MACHINEID, 0);
-		//sprintf(host, "%s=%s", ATTRIB_NODE_NUMBER, hInfo->host); ??????
-		sprintf(host, "%s=%s", ATTRIB_NODE_NAME, hInfo->host);
-		sprintf(state, "%s=%d", ATTRIB_NODE_STATE, hInfo->hStatus);
+	if (queueInfoHasChanged(&qInfoSaved, qInfo, &initialize)) {
+//		sprintf(id, "%s=%d", ATTRIB_MACHINEID, 0);
+		//sprintf(host, "%s=%s", ATTRIB_NODE_NUMBER, qInfo->host); ??????
+//		sprintf(host, "%s=%s", ATTRIB_NODE_NAME, qInfo->host);
+		sprintf(state, "%s=%d", ATTRIB_NODE_STATE, qInfo->qStatus);
 		proxy_cstring_to_str(id, &str1);
 		proxy_cstring_to_str(host, &str2);
 		proxy_cstring_to_str(state, &str3);
 		asprintf(&res, "%d %s %s %s", RTEV_NATTR, str1, str2, str3);
-		AddToList(eventList, (void *)res);
+//		AddToList(eventList, (void *)res);
 	}
 	
 	return PROXY_RES_OK;
@@ -379,7 +377,7 @@ notifyQueueInfoChange(struct queueInfoEnt *qInfo)
 int
 LSF_Initialize(char** args)
 {
-	fprintf(stdout, "LSF_Initialize (%s)\n", args[0]); fflush(stdout);
+	fprintf(stdout, "LSF_Initialize\n"); fflush(stdout);
 	if ( !gInitialized ) {
 		if ( initLSF(args[0]) ) {
 			return PROXY_RES_ERR;
@@ -572,9 +570,12 @@ server(char* app_name, char* name, char* host, int port)
 	proxy_svr_connect(lsf_proxy, host, port);
 	printf("proxy_svr_connect returned.\n");
 	
-        /* make progress until shutdown */
+	/* make progress until shutdown */
 	while (ptp_signal_exit == 0 && !isShutdown()) {
-		if  ((LSF_Progress() != PROXY_RES_OK) || (proxy_svr_progress(lsf_proxy) != PROXY_RES_OK)) {
+		if  ( LSF_Progress() != PROXY_RES_OK ) {
+			break;
+		}
+		if  ( proxy_svr_progress(lsf_proxy) != PROXY_RES_OK ) {
 			break;
 		}
 	}
