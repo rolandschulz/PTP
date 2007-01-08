@@ -377,15 +377,21 @@ notifyQueueInfoChange(struct queueInfoEnt *qInfo)
 int
 LSF_Initialize(char** args)
 {
-	fprintf(stdout, "LSF_Initialize\n"); fflush(stdout);
-	if ( !gInitialized ) {
-		if ( initLSF(args[0]) ) {
-			return PROXY_RES_ERR;
-		}
-	}
-	sendRuntimeEventOK();
+	char * version;
+
+	proxy_str_to_cstring(args[0], &version);
+	fprintf(stdout, "LSF_Initialize {%s}\n", version); fflush(stdout);
 	
-	return PROXY_RES_OK;
+	if (strncmp(version, "2.0", 3) != 0) {
+		fprintf(stdout, "LSF_Initialize: incorrect version [%s]\n", version); fflush(stdout);
+		AddToList(eventList, errorStr(1, "LSF_Initialize: incorrect version, should be 2.0"));
+		free(version);
+		return PROXY_RES_ERR;
+	} else {
+		sendRuntimeEventOK();
+		free(version);
+		return PROXY_RES_OK;
+	}
 }
 
 
