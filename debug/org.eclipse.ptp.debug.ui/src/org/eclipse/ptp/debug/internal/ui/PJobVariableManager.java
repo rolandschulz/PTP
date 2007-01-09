@@ -24,10 +24,15 @@ import java.util.List;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.core.IPJob;
+import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.DebugJobStorage;
 import org.eclipse.ptp.debug.core.PCDIDebugModel;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
+import org.eclipse.ptp.debug.core.aif.AIFException;
+import org.eclipse.ptp.debug.core.aif.IAIF;
+import org.eclipse.ptp.debug.core.cdi.ICommandResult;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
+import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
 /**
  * @author Clement chu
@@ -36,6 +41,8 @@ public final class PJobVariableManager {
 	private DebugJobStorage variableStorage = new DebugJobStorage("Variable");
 	private DebugJobStorage varProcStorage = new DebugJobStorage("Variable_Process");
 	private final String PROCESS_KEY = "process_key";
+	private final String VALUE_UNKNOWN = "Unkwnon";
+	private final String VALUE_ERROR = "Error in getting value";
 	
 	public void shutdown() {
 		cleanupJobVariableValues();
@@ -138,6 +145,15 @@ public final class PJobVariableManager {
 			}
 		}
 	}
+	public void cleanupJobVariableValues(String job_id, BitList tasks) {
+		ProcessValue procVal = (ProcessValue)varProcStorage.getValue(job_id, PROCESS_KEY);
+		if (procVal != null) {
+			int[] task_array = tasks.toArray();
+			for (int h=0; h<task_array.length; h++) {
+				procVal.cleanValues(task_array[h]);
+			}
+		}
+	}
 	public String[] getVariables(String job_id, String set_id, boolean enable) {
 		List vars = new ArrayList();
 		for (Iterator i=variableStorage.getValueIterator(job_id); i.hasNext();) {
@@ -148,7 +164,13 @@ public final class PJobVariableManager {
 		}
 		return (String[])vars.toArray(new String[0]);
 	}
-	public void updateJobVariableValues(String job_id, String set_id, IProgressMonitor monitor) throws CoreException {
+	public void storeProcessValue(ProcessValue procVal, BitList tasks, String var, String val) {
+		int[] task_array = tasks.toArray();
+		for (int h=0; h<task_array.length; h++) {
+			procVal.addValue(task_array[h], new VariableValue(var, val));
+		}
+	}
+	public void updateJobVariableValues(String job_id, String set_id, BitList tasks, IProgressMonitor monitor) throws CoreException {
 		ProcessValue procVal = (ProcessValue)varProcStorage.getValue(job_id, PROCESS_KEY);
 		if (procVal != null) {
 			//only update when current set id contain in VariableInfo
@@ -158,18 +180,29 @@ public final class PJobVariableManager {
 				IPCDISession session = debugModel.getPCDISession(job_id);
 				if (session != null) {
 					//get suspended tasks only in given job and given set
-					int[] tasks = session.getDebugger().filterRunningTasks(debugModel.getTasks(job_id, set_id)).toArray();
-					int length = tasks.length;
-					
-					monitor.beginTask("Updating variables value...", (length * vars.length + 1));
-					for (int i=0; i<length; i++) {
-						if (!monitor.isCanceled()) {
-							VariableValue[] values = new VariableValue[vars.length];
-							for (int j=0; j<vars.length; j++) {
-								String val = debugModel.getValue(session, tasks[i], vars[j], monitor);
-								values[j] = new VariableValue(vars[j], val);
+					BitList suspend_tasks = session.getDebugger().filterRunningTasks(tasks);
+
+					monitor.beginTask("Updating variables value...", (suspend_tasks.cardinality() * vars.length + 1));
+					monitor.worked(1);
+					for (int i=0; i<vars.length; i++) {
+						if (monitor.isCanceled())
+							break;
+						
+						try {
+							ICommandResult result = session.getExpressionValue(suspend_tasks, vars[i]);
+							BitList[] rTasks = result.getTasksArray();
+							Object[] rValues = result.getResultsArray();
+							
+							for (int j=0; j<rTasks.length; j++) {
+								if (rValues[j] instanceof IAIF) {
+									storeProcessValue(procVal, rTasks[j], vars[i], ((IAIF)rValues[j]).getValue().getValueString());
+									monitor.worked(1);
+								}
 							}
-							procVal.setValues(tasks[i], values);
+						} catch (PCDIException e) {
+							storeProcessValue(procVal, suspend_tasks, vars[i], VALUE_ERROR);
+						} catch (AIFException e) {
+							storeProcessValue(procVal, suspend_tasks, vars[i], VALUE_ERROR);
 						}
 					}
 				}
@@ -241,11 +274,12 @@ public final class PJobVariableManager {
 	}
 	class VariableValue {
 		String var;
-		String val;
+		String val = VALUE_UNKNOWN;
 		
 		VariableValue(String var, String val) {
 			this.var = var;
-			this.val = val;
+			if (val != null)
+				this.val = val;
 		}
 		String getVar() {
 			return var;

@@ -19,6 +19,7 @@
 package org.eclipse.ptp.debug.internal.ui.actions;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.internal.ui.PDebugImage;
 import org.eclipse.ptp.debug.internal.ui.UIDebugManager;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
@@ -32,6 +33,7 @@ import org.eclipse.ptp.ui.model.IElement;
  */
 public class StepReturnAction extends StepAction {
 	public static final String name = "Step Return";
+	private BitList tasks = null;//can step return tasks
 
 	/** Constructor
 	 * @param view
@@ -54,11 +56,36 @@ public class StepReturnAction extends StepAction {
 		IManager manager = view.getUIManager();
 		if (manager instanceof UIDebugManager) {
 			try {
-				((UIDebugManager)manager).stepReturn();
-				setEnabled(false);
+				((UIDebugManager)manager).stepReturn(tasks);
+				resetTask();
+				update();
 			} catch (CoreException e) {
 				PTPDebugUIPlugin.errorDialog(getShell(), "Error", e.getStatus());				
 			}
 		}
+	}
+	public void resetTask() {
+		tasks = null;
+	}
+	public void delTask(BitList task) {
+		if (tasks != null && task != null) {
+			tasks.andNot(task);
+		}
+	}
+	public void addTask(BitList task) {
+		if (task != null) {
+			if (tasks == null) {
+				tasks = task.copy();
+			}
+			else {
+				tasks.or(task);
+			}
+		}
+	}
+	public void update() {
+		setEnabled(tasks != null && !tasks.isEmpty());
+	}
+	public BitList getTasks() {
+		return tasks;
 	}
 }

@@ -50,7 +50,7 @@ public class AddPExpressionAction extends Action {
 	public void run() {
 		if (new PVariableDialog(view).open() == Window.OK) {
 			view.refresh();
-			view.getUIManager().updateVariableValue(true);
+			view.getUIManager().updateVariableValue(true, null);
 		}
 	}
 }
