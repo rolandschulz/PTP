@@ -59,6 +59,14 @@ MIExecFinish(void)
 }
 
 MICommand *
+MIExecUtil(char* loc)
+{
+	MICommand *	cmd = MICommandNew("-exec-util", MIResultRecordRUNNING);
+	MICommandAddOption(cmd, loc, NULL);
+	return cmd;
+}
+
+MICommand *
 MIExecInterrupt(void)
 {
 	return MICommandNew("-exec-interrupt", MIResultRecordDONE);

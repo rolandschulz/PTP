@@ -558,6 +558,7 @@ AsyncStop(void *data)
 		}
 		break;
 
+	case MIEventTypeFunctionFinished:
 	case MIEventTypeSteppingRange:
 		frame = ConvertMIFrameToStackframe(evt->frame);
 		if (frame == NULL) {
