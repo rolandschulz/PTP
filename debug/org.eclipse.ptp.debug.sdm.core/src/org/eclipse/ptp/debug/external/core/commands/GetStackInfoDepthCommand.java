@@ -20,13 +20,14 @@ package org.eclipse.ptp.debug.external.core.commands;
 
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IAbstractDebugger;
+import org.eclipse.ptp.debug.core.cdi.ICommandResult;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
 /**
  * @author Clement chu
  * 
  */
-public class GetStackInfoDepthCommand extends AbstractDebugCommand {
+public class GetStackInfoDepthCommand extends AbstractDebugCommand2 {
 	public GetStackInfoDepthCommand(BitList tasks) {
 		super(tasks);
 	}
@@ -36,10 +37,14 @@ public class GetStackInfoDepthCommand extends AbstractDebugCommand {
 	public void exec(IAbstractDebugger debugger) throws PCDIException {
 		debugger.getStackInfoDepth(tasks);
 	}
+	public ICommandResult getDepths() throws PCDIException {
+		return getCommandResult();
+	}
 	public int getDepth() throws PCDIException {
-		Object res = getResultValue();
-		if (res instanceof Integer) {
-			return ((Integer)res).intValue();
+		ICommandResult res = getDepths();
+		Object[] objs = res.getResultsArray();
+		if (objs.length > 0) {
+			return ((Integer)objs[0]).intValue();
 		}
 		return 0;
 	}

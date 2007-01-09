@@ -32,18 +32,19 @@ import org.eclipse.ptp.debug.core.cdi.event.IPCDIErrorEvent;
  * 
  */
 public abstract class AbstractDebugCommand implements IDebugCommand {
-	protected final Object lock = new Object(); 
+	protected final Object lock = new Object();
 	
 	protected BitList tasks = null;
 	protected BitList check_tasks = null;
 	protected Object result = null;
 	protected boolean waitForReturn = false;
 	protected boolean interrupt = false;
-	private boolean flush = false;
-	private boolean cancelled = false;
+	protected boolean flush = false;
+	protected boolean cancelled = false;
 	protected long timeout = 20000;
 	protected boolean waitInQueue = false;
-	private boolean canWaitMore = false; 
+	protected boolean waitAgain = false;
+	protected boolean blocked = false;
 	
 	protected boolean command_finish = false;
 	protected int priority = PRIORITY_M;
@@ -94,68 +95,101 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 		return tasks;
 	}
 	public boolean isWaitForReturn() {
-		return waitForReturn;
+		synchronized (lock) {
+			return waitForReturn;
+		}
 	}
 	protected Object getReturn() {
-		return result;
+		synchronized (lock) {
+			return result;
+		}
 	}
 	protected boolean checkReturn() throws PCDIException {
-		Object result = getReturn();
-		if (result == null) {
-			if (check_tasks != null && !check_tasks.isEmpty()) {
+		synchronized (lock) {
+			Object result = getReturn();
+			if (result == null) {
+				if (check_tasks != null && !check_tasks.isEmpty()) {
+					throw new PCDIException("Incomplete - Command " + getCommandName());
+				}
+				throw new PCDIException("Time out - Command " + getCommandName(), IPCDIErrorEvent.DBG_NORMAL);
+			}
+			if (isBlocked()) {
+				throw new PCDIException("Time out - Command " + getCommandName(), IPCDIErrorEvent.DBG_NORMAL);
+			}
+			if (result.equals(RETURN_INCOMPLETE)) {
 				throw new PCDIException("Incomplete - Command " + getCommandName());
 			}
-			throw new PCDIException("Time out - Command " + getCommandName(), IPCDIErrorEvent.DBG_NORMAL);
+			if (result.equals(RETURN_NOTHING)) {
+				throw new PCDIException("Unknown error - Command " + getCommandName());
+			}
+			if (result instanceof PCDIException) {
+				//if (((PCDIException)result).getErrorCode() == IPCDIErrorEvent.DBG_NORMAL) {
+					//return false;
+				//}
+				throw (PCDIException)getReturn();
+			}
+			if (result.equals(RETURN_ERROR)) {
+				throw new PCDIException("Tasks do not match with <" + getCommandName() + "> command.");
+			}
+			if (result.equals(RETURN_CANCEL)) {
+				throw new PCDIException("Cancelled - command " + getCommandName());
+			}
+			if (result.equals(RETURN_FLUSH)) {
+				return false;
+			}		
+			return true;
 		}
-		if (result.equals(RETURN_NOTHING)) {
-			throw new PCDIException("Unknown error - Command " + getCommandName());
-		}
-		if (result instanceof PCDIException) {
-			//if (((PCDIException)result).getErrorCode() == IPCDIErrorEvent.DBG_NORMAL) {
-				//return false;
-			//}
-			throw (PCDIException)getReturn();
-		}
-		if (result.equals(RETURN_ERROR)) {
-			throw new PCDIException("Tasks do not match with <" + getCommandName() + "> command.");
-		}
-		if (result.equals(RETURN_CANCEL)) {
-			throw new PCDIException("Cancelled - command " + getCommandName());
-		}
-		if (result.equals(RETURN_FLUSH)) {
-			return false;
-		}		
-		return true;
 	}
+	protected boolean isBlocked() {
+    	synchronized (lock) {
+    		return blocked;
+    	}
+	}
+    protected void releaseLock() {
+    	synchronized (lock) {
+    		waitAgain = false;
+    		blocked = false;
+    		lock.notifyAll();
+    	}
+    }
+    protected void lockAgain() {
+    	synchronized (lock) {
+    		waitAgain = true;
+    		lock.notify();
+    	}
+    }
 	//wait again for return back
 	protected void doWait(long timeout) throws InterruptedException {
 		synchronized (lock) {
-			lock.wait(timeout);
+			do {
+				waitAgain = false;
+				blocked = true;
+				lock.wait(timeout);
+			} while (waitAgain);
 		}
 	}
 	public boolean waitForReturn() throws PCDIException {
-		return waitForReturn(timeout);
+		synchronized (lock) {
+			return waitForReturn(timeout);
+		}
 	}
 	public boolean waitForReturn(long timeout) throws PCDIException {
-		//no need to wait return back
-		if (!isWaitForReturn() || command_finish)
-			return true;
-
-		//start waiting
-		try {
-			synchronized (lock) {
-				do {
-					canWaitMore = false;
-					doWait(timeout);
-				} while (canWaitMore);
+		synchronized (lock) {
+			//no need to wait return back
+			if (!isWaitForReturn() || command_finish)
+				return true;
+	
+			//start waiting
+			try {
+				doWait(timeout);
+			} catch (InterruptedException e) {
+				throw new PCDIException(e);
 			}
-		} catch (InterruptedException e) {
-			throw new PCDIException(e);
-		}
-		try {
-			return checkReturn();
-		} finally {
-			command_finish = true;
+			try {
+				return checkReturn();
+			} finally {
+				command_finish = true;
+			}
 		}
 	}
 	public void setTimeout(long timeout) {
@@ -171,28 +205,38 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 		return flush;
 	}
 	public void doCancelWaiting() {
-		command_finish = true;
-		cancelled = true;
-		setReturn(RETURN_CANCEL);
-	}
-	public void doFlush() {
-		if (getReturn() == null) {
+		synchronized (lock) {
 			command_finish = true;
-			flush = true;
-			setReturn(RETURN_FLUSH);
+			cancelled = true;
+			setReturn(RETURN_CANCEL);
 		}
 	}
-	private void setCheckTasks() {
-		if (check_tasks == null) {
-			check_tasks = tasks.copy();
+	public void doFlush() {
+		synchronized (lock) {
+			if (getReturn() == null) {
+				command_finish = true;
+				flush = true;
+				setReturn(RETURN_FLUSH);
+			}
+		}
+	}
+	protected void setCheckTasks() {
+		synchronized (lock) {
+			if (check_tasks == null) {
+				check_tasks = tasks.copy();
+			}
+		}
+	}
+	public void setResult(Object result) {
+		synchronized (lock) {
+			this.result = result;
 		}
 	}
 	public void setReturn(Object result) {
 		synchronized (lock) {
 			setCheckTasks();
-			canWaitMore = false;
-			this.result = result;
-			lock.notifyAll();
+			setResult(result);
+			releaseLock();
 		}
 	}
 	public void setReturn(BitList return_tasks, Object result) {
@@ -202,20 +246,21 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 				//check whether return tasks is same as command tasks
 				check_tasks.andNot(return_tasks);
 				if (check_tasks.isEmpty()) {
-					canWaitMore = false;
-					this.result = result;
-					lock.notifyAll();
+					setResult(result);
+					releaseLock();
 				}
 				else {
 					//if return tasks is not equal to command tasks, wait again
-					canWaitMore = true;
-					lock.notifyAll();
+					lockAgain();
 				}
 			}
 			else {
-				canWaitMore = false;
+				setReturn(RETURN_INCOMPLETE);
+				/*
+				setWaitAgain(false);
 				this.result = result;
 				lock.notifyAll();
+				*/
 			}
 		}
 	}
@@ -240,24 +285,26 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 		return getReturn();
 	} 
 	protected void waitSuspendExecCommand(IAbstractDebugger debugger) throws PCDIException {
-		if (!debugger.isSuspended(tasks.copy())) {
-			try {
-				wait(2000);
-				//wait again if tasks are not suspended
-				if (!debugger.isSuspended(tasks.copy())) {
+		synchronized (lock) {
+			if (!debugger.isSuspended(tasks.copy())) {
+				try {
 					wait(2000);
+					//wait again if tasks are not suspended
+					if (!debugger.isSuspended(tasks.copy())) {
+						wait(2000);
+					}
+				} catch (InterruptedException e) {
+					throw new PCDIException(e);
 				}
-			} catch (InterruptedException e) {
-				throw new PCDIException(e);
 			}
-		}
-		//if tasks are still not suspended, then cancel it
-		if (command_finish || !debugger.isSuspended(tasks.copy())) {
-			PDebugUtils.println("************************************ WAIT SUSPEND FAILURE");			
-			doFlush();
-		}
-		else {
-			exec(debugger);
+			//if tasks are still not suspended, then cancel it
+			if (command_finish || !debugger.isSuspended(tasks.copy())) {
+				PDebugUtils.println("************************************ WAIT SUSPEND FAILURE");			
+				doFlush();
+			}
+			else {
+				exec(debugger);
+			}
 		}
 	}
 	protected void checkBeforeExecCommand(IAbstractDebugger debugger) throws PCDIException {

@@ -40,10 +40,7 @@ import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.core.util.BitList;
-import org.eclipse.ptp.debug.core.aif.AIFException;
-import org.eclipse.ptp.debug.core.aif.IAIF;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
-import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITargetConfiguration;
 import org.eclipse.ptp.debug.core.events.IPDebugEvent;
@@ -64,9 +61,6 @@ import org.eclipse.ptp.debug.internal.core.model.PSession;
  * 
  */
 public class PCDIDebugModel {
-	private final String VALUE_UNKNOWN = "Unkwnon";
-	private final String VALUE_ERROR = "Error in getting value";
-
 	private final String SESSION_KEY = "session_key";
 	private DebugJobStorage jobStorage = new DebugJobStorage("Job");
 	private DebugJobStorage sessionStorage = new DebugJobStorage("Session");
@@ -357,29 +351,12 @@ public class PCDIDebugModel {
 		jobStorage.removeValue(job_id, set_id);
 	}
 	public BitList getTasks(String job_id, String set_id) {
-		return ((BitList)jobStorage.getValue(job_id, set_id)).copy();
+		BitList tasks = ((BitList)jobStorage.getValue(job_id, set_id));
+		if (tasks != null)
+			return tasks.copy();
+		return null;
 	}
 	public void deleteJob(IPJob job) {
 		jobStorage.removeJobStorage(job.getIDString());
-	}
-	/***********************************************************************************************
-	 * Expression
-	 ***********************************************************************************************/
-	public String getValue(IPCDISession session, int taskID, String var, IProgressMonitor monitor) {
-		try {
-			IAIF aif = session.getExpressionValue(taskID, var);
-			if (aif == null) {
-				return VALUE_UNKNOWN;
-			}
-			else {
-				return aif.getValue().getValueString();
-			}
-		} catch (PCDIException pe) {
-			return VALUE_ERROR;
-		} catch (AIFException e) {
-			return VALUE_ERROR;
-		} finally {
-			monitor.worked(1);
-		}
 	}
 }
