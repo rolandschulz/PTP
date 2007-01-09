@@ -20,10 +20,10 @@ package org.eclipse.ptp.debug.internal.core.model;
 
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.ILaunch;
-import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.IVariable;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIVariable;
+import org.eclipse.ptp.debug.core.model.IPDebugTarget;
 import org.eclipse.ptp.debug.core.model.IPStackFrame;
 import org.eclipse.ptp.debug.core.model.IPType;
 import org.eclipse.ptp.debug.core.model.IPValue;
@@ -53,7 +53,7 @@ public class PValueFactory {
 		public String getModelIdentifier() {
 			return PTPDebugCorePlugin.getUniqueIdentifier();
 		}
-		public IDebugTarget getDebugTarget() {
+		public IPDebugTarget getDebugTarget() {
 			return null;
 		}
 		public ILaunch getLaunch() {

@@ -616,6 +616,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPCDIE
 		List newThreads = refreshThreads();
 		if (source instanceof IPCDITarget) {
 			//if (!(this.getConfiguration() instanceof ICDITargetConfiguration2) || !((ICDITargetConfiguration2)this.getConfiguration()).supportsThreadControl())
+			System.err.println("+++++++++++++++++++++++++ target suspend threads ++++++++++++++++++");
 			suspendThreads(event);
 		}
 		// We need this for debuggers that don't have notifications for newly created threads.

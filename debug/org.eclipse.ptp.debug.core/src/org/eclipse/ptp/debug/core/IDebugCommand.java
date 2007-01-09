@@ -27,6 +27,7 @@ public interface IDebugCommand extends Comparable {
 	public static final int PRIORITY_L = 1;
 	public static final int PRIORITY_M = 2;
 	public static final int PRIORITY_H = 3;
+	public static final String RETURN_INCOMPLETE = "Incomplete";
 	public static final String RETURN_NOTHING = "Nothing";
 	public static final String RETURN_OK = "OK";
 	public static final String RETURN_FLUSH = "Flush";

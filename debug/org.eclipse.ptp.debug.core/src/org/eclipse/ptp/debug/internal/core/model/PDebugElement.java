@@ -29,7 +29,6 @@
 package org.eclipse.ptp.debug.internal.core.model;
 
 import java.text.MessageFormat;
-
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.core.runtime.Status;
@@ -65,7 +64,7 @@ public abstract class PDebugElement extends PlatformObject implements IPDebugEle
 	public String getModelIdentifier() {
 		return PCDIDebugModel.getPluginIdentifier();
 	}
-	public IDebugTarget getDebugTarget() {
+	public IPDebugTarget getDebugTarget() {
 		return fDebugTarget;
 	}
 	public ILaunch getLaunch() {

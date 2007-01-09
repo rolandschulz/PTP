@@ -23,7 +23,6 @@ import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.external.core.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.core.cdi.model.Target;
 import org.eclipse.ptp.debug.external.core.cdi.model.Thread;
-import org.eclipse.ptp.debug.external.core.commands.GetAIFCommand;
 
 /**
  * @author Clement chu
@@ -52,9 +51,10 @@ public class SourceManager extends Manager {
 		}
 	}
 	public IAIF getAIF(Target target, String name) throws PCDIException {
-		GetAIFCommand command = new GetAIFCommand(target.getTask(), name);
-		target.getDebugger().postCommand(command);
-		return command.getAIF();
+		//GetAIFCommand command = new GetAIFCommand(target.getTask(), name);
+		//target.getDebugger().postCommand(command);
+		//ICommandResult result = command.getAIF();
+		throw new PCDIException (" SourceManager - getAIF disabled this method");
 	}
 	
 	public void setSourcePaths(Target target, String[] dirs) throws PCDIException {

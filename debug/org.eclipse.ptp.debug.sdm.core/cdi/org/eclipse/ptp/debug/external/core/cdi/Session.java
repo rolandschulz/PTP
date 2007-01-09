@@ -32,7 +32,7 @@ import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
-import org.eclipse.ptp.debug.core.aif.IAIF;
+import org.eclipse.ptp.debug.core.cdi.ICommandResult;
 import org.eclipse.ptp.debug.core.cdi.IPCDIBreakpointManager;
 import org.eclipse.ptp.debug.core.cdi.IPCDIEventManager;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
@@ -44,6 +44,7 @@ import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.debug.external.core.PTPDebugExternalPlugin;
 import org.eclipse.ptp.debug.external.core.cdi.model.Target;
 import org.eclipse.ptp.debug.external.core.commands.GetAIFCommand;
+import org.eclipse.ptp.debug.external.core.commands.GetStackInfoDepthCommand;
 import org.eclipse.ptp.debug.external.core.commands.GoCommand;
 import org.eclipse.ptp.debug.external.core.commands.HaltCommand;
 import org.eclipse.ptp.debug.external.core.commands.StepFinishCommand;
@@ -256,12 +257,37 @@ public class Session implements IPCDISession, IPCDISessionObject {
 	public void steppingReturn(BitList tasks) throws PCDIException {
 		getDebugger().postCommand(new StepFinishCommand(tasks));
 	}
-	public IAIF getExpressionValue(BitList tasks, String variable) throws PCDIException {
+	public ICommandResult getExpressionValue(BitList tasks, String variable) throws PCDIException {
 		GetAIFCommand command = new GetAIFCommand(tasks, variable);
 		getDebugger().postCommand(command);
 		return command.getAIF();
 	}
-	public IAIF getExpressionValue(int task_id, String variable) throws PCDIException {
-		return getExpressionValue(createBitList(task_id), variable);
-	}	
+	public BitList[] getStepReturnTasks(BitList tasks) throws PCDIException {
+		GetStackInfoDepthCommand command = new GetStackInfoDepthCommand(tasks);
+		getDebugger().postCommand(command);
+		ICommandResult result = command.getDepths();
+		Object[] objs = result.getResultsArray();
+		BitList[] bits = result.getTasksArray();
+		BitList addTasks = null;
+		BitList delTasks = null;
+		for (int i=0; i<bits.length; i++) {
+			if (((Integer)objs[i]).intValue() > 1) {
+				if (addTasks == null) {
+					addTasks = bits[i].copy();
+				}
+				else {
+					addTasks.or(bits[i]);
+				}
+			}
+			else {
+				if (delTasks == null) {
+					delTasks = bits[i].copy();
+				}
+				else {
+					delTasks.or(bits[i]);
+				}
+			}
+		}
+		return new BitList[] { addTasks, delTasks };
+	}
 }

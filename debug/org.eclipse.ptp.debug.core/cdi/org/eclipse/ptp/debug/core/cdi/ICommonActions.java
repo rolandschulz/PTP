@@ -19,7 +19,6 @@
 package org.eclipse.ptp.debug.core.cdi;
 
 import org.eclipse.ptp.core.util.BitList;
-import org.eclipse.ptp.debug.core.aif.IAIF;
 
 /**
  * @author Clement chu
@@ -56,19 +55,19 @@ public interface ICommonActions {
 	 * @throws PCDIException
 	 */
 	public void steppingReturn(BitList tasks) throws PCDIException;
+	
+	/** get step return tasks
+	 * @param tasks test tasks for step return
+	 * @return BitList[] with 2 elements - 0: add tasks, 1: delete tasks
+	 * @throws PCDIException
+	 */
+	public BitList[] getStepReturnTasks(BitList tasks) throws PCDIException;
 	/** Get expression value of given tasks and given variable name
 	 * @param tasks
 	 * @param variable
 	 * @return
 	 * @throws PCDIException
 	 */
-	public IAIF getExpressionValue(BitList tasks, String variable) throws PCDIException;
-	/** Get expression value of given tasks and given variable name
-	 * @param task_id
-	 * @param variable
-	 * @return
-	 * @throws PCDIException
-	 */
-	public IAIF getExpressionValue(int task_id, String variable) throws PCDIException;
+	public ICommandResult getExpressionValue(BitList tasks, String variable) throws PCDIException;
 }
 

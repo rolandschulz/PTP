@@ -29,10 +29,7 @@ import org.eclipse.ptp.debug.core.cdi.event.IPCDIResumedEvent;
  */
 public class StepFinishCommand extends StepCommand {
 	public StepFinishCommand(BitList tasks) {
-		this(tasks, 0);
-	}
-	public StepFinishCommand(BitList tasks, int count) {
-		super(tasks, count);
+		super(tasks, 0);
 	}
 	public String getCommandName() {
 		return "Step finish"; 

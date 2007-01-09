@@ -16,33 +16,15 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.external.core.commands;
+package org.eclipse.ptp.debug.core.cdi;
 
 import org.eclipse.ptp.core.util.BitList;
-import org.eclipse.ptp.debug.core.IAbstractDebugger;
-import org.eclipse.ptp.debug.core.cdi.ICommandResult;
-import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
 /**
- * @author Clement chu
- * 
+ * @author clement
  */
-public class GetAIFCommand extends AbstractDebugCommand2 {
-	private String varName = "";
-	public GetAIFCommand(BitList tasks, String varName) {
-		super(tasks);
-		this.varName = varName;
-	}
-	public void preExecCommand(IAbstractDebugger debugger) throws PCDIException {
-		checkBeforeExecCommand(debugger);
-	}
-	public void exec(IAbstractDebugger debugger) throws PCDIException {
-		debugger.getAIF(tasks, varName);
-	}
-	public ICommandResult getAIF() throws PCDIException {
-		return getCommandResult();
-	}
-	public String getCommandName() {
-		return "Get AIF: " + varName;
-	}
+public interface ICommandResult {
+	public BitList[] getTasksArray();
+	public Object[] getResultsArray();
 }
+
