@@ -298,6 +298,29 @@ public class ParallelDebugView extends ParallelJobView {
 			((UIDebugManager) manager).unregisterElements(canvas.getSelectedElements());
 		}
 	}
+	//overwrite change job method
+	protected void changeJob(final IPJob job) {
+		super.changeJob(job);
+		if (job != null) {
+			((StepReturnAction)stepReturnAction).resetTask();
+			BitList suspendedTaskList = (BitList) job.getAttribute(IAbstractDebugger.SUSPENDED_PROC_KEY);
+			if (suspendedTaskList != null) {
+				updateStepReturnButton(suspendedTaskList.copy());
+			}
+		}
+	}
+	//overwrite change set method
+	public void selectSet(IElementSet set) {
+		super.selectSet(set);
+		if (set != null) {
+			((StepReturnAction)stepReturnAction).resetTask();
+			IPJob job = ((UIDebugManager) manager).findJobById(getCurrentID());
+			BitList suspendedTaskList = (BitList) job.getAttribute(IAbstractDebugger.SUSPENDED_PROC_KEY);
+			if (suspendedTaskList != null) {
+				updateStepReturnButton(suspendedTaskList.copy());
+			}
+		}
+	}
 	// Update button
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.views.AbstractParallelSetView#updateAction()
@@ -359,7 +382,31 @@ public class ParallelDebugView extends ParallelJobView {
 		resumeAction.setEnabled(isEnabled);
 		stepIntoAction.setEnabled(isEnabled);
 		stepOverAction.setEnabled(isEnabled);
-		// stepReturnAction.setEnabled(isEnabled);
+		if (!isEnabled)
+			stepReturnAction.setEnabled(false);
+	}
+	public void updateStepReturnButton(BitList source) {
+		IElementSet set = getCurrentSet();
+		if (set == null || source == null) {
+			return;
+		}
+
+		try {
+			BitList setTasks = ((UIDebugManager) manager).getTasks(getCurrentID(), set.getID());
+			if (setTasks != null) {
+				setTasks.and(source);
+				if (!setTasks.isEmpty()) {
+					BitList[] t = ((UIDebugManager) manager).filterStepReturnTasks(setTasks);
+					if (t.length == 2) {
+						((StepReturnAction)stepReturnAction).addTask(t[0]);
+						((StepReturnAction)stepReturnAction).delTask(t[1]);
+					}
+					((StepReturnAction)stepReturnAction).update();
+				}
+			}
+		} catch (CoreException e) {
+			PTPDebugUIPlugin.log(e);
+		}
 	}
 	/** Updtae terminate button
 	 * @param source

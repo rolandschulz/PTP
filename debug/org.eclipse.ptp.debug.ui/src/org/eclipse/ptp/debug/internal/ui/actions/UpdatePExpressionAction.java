@@ -46,6 +46,6 @@ public class UpdatePExpressionAction extends Action {
 	 * @see org.eclipse.jface.action.Action#run()
 	 */
 	public void run() {
-		view.getUIManager().updateVariableValue(true);
+		view.getUIManager().updateVariableValue(true, null);
 	}
 }

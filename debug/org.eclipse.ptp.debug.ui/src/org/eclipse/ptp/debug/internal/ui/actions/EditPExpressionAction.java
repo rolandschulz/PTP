@@ -61,7 +61,7 @@ public class EditPExpressionAction extends Action {
 			}
 			if (new PVariableDialog(view, PVariableDialog.EDIT_MODE).open() == Window.OK) {
 				view.refresh();
-				view.getUIManager().updateVariableValue(true);
+				view.getUIManager().updateVariableValue(true, null);
 			}
 		}		
 	}

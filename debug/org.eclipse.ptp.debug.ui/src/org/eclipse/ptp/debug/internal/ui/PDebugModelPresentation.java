@@ -21,7 +21,6 @@ package org.eclipse.ptp.debug.internal.ui;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.eclipse.cdt.core.IAddress;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -47,7 +46,6 @@ import org.eclipse.debug.ui.IDebugModelPresentation;
 import org.eclipse.debug.ui.IValueDetailListener;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.ptp.debug.core.PDebugUtils;
 import org.eclipse.ptp.debug.core.cdi.IPCDIBreakpointHit;
 import org.eclipse.ptp.debug.core.cdi.IPCDIExitInfo;
 import org.eclipse.ptp.debug.core.cdi.IPCDISharedLibraryEvent;

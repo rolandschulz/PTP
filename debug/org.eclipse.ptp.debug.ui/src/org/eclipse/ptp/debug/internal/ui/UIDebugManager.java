@@ -34,8 +34,14 @@ import org.eclipse.debug.core.IBreakpointListener;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.IStackFrame;
+import org.eclipse.debug.core.model.IStep;
 import org.eclipse.debug.core.model.IThread;
+import org.eclipse.debug.ui.AbstractDebugView;
+import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.util.BitList;
@@ -46,6 +52,7 @@ import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.ProcessInputStream;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
+import org.eclipse.ptp.debug.core.model.IPDebugElement;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.debug.ui.model.DebugElement;
@@ -54,6 +61,7 @@ import org.eclipse.ptp.ui.managers.JobManager;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
+import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.WorkbenchJob;
 
@@ -72,6 +80,10 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	private boolean prefAutoUpdateVarOnSuspend = false;
 	private boolean prefAutoUpdateVarOnChange = false;
 	private boolean prefRegisterProc0 = true;
+	
+	private final int STEP_INTO = 1;
+	private final int STEP_OVER = 2;
+	private final int STEP_RETURN = 3;
 		
 	private IPropertyChangeListener propertyChangeListener = new IPropertyChangeListener() {
 		public void propertyChange(PropertyChangeEvent event) {
@@ -634,7 +646,9 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 		if (session == null)
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null));
 		try {
-			session.steppingInto(getTasks(job_id, set_id));
+			BitList tasks = getTasks(job_id, set_id);
+			filterRunningTasks(tasks, STEP_INTO);
+			session.steppingInto(tasks);
 		} catch (PCDIException e) {
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));
 		}
@@ -655,7 +669,9 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 		if (session == null)
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null));
 		try {
-			session.steppingOver(getTasks(job_id, set_id));
+			BitList tasks = getTasks(job_id, set_id);
+			filterRunningTasks(tasks, STEP_OVER);
+			session.steppingOver(tasks);
 		} catch (PCDIException e) {
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));
 		}
@@ -663,24 +679,43 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	/** Step return debugger
 	 * @throws CoreException
 	 */
-	public void stepReturn() throws CoreException {
-		stepReturn(getCurrentJobId(), getCurrentSetId());
+	public void stepReturn(BitList tasks) throws CoreException {
+		stepReturn(tasks, getCurrentJobId(), getCurrentSetId());
 	}
 	/** Step return debugger
 	 * @param job_id
 	 * @param set_id
 	 * @throws CoreException
 	 */
-	public void stepReturn(String job_id, String set_id) throws CoreException {
+	public void stepReturn(BitList tasks, String job_id, String set_id) throws CoreException {
+		if (tasks == null) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No task selected", null));
+		}
 		IPCDISession session = getDebugSession(job_id);
 		if (session == null)
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null));
 		try {
-			session.steppingReturn(getTasks(job_id, set_id));
+			//BitList tasks = getTasks(job_id, set_id);
+			filterRunningTasks(tasks, STEP_RETURN);
+			session.steppingReturn(tasks);
 		} catch (PCDIException e) {
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));
 		}
 	}
+	public BitList[] filterStepReturnTasks(BitList tasks) {
+		return filterStepReturnTasks(tasks, getCurrentJobId());
+	}
+	public BitList[] filterStepReturnTasks(BitList tasks, String job_id) {
+		IPCDISession session = getDebugSession(job_id);
+		if (session == null)
+			return new BitList[0];
+		try {
+			return session.getStepReturnTasks(tasks);
+		} catch (PCDIException e) {
+			return new BitList[0];
+		}
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#removeJob(org.eclipse.ptp.core.IPJob)
 	 */
@@ -697,27 +732,40 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	/**********************************************************
 	 * Variable methods
 	 **********************************************************/
-	public void updateVariableValueOnSuspend() {
-		updateVariableValue(isAutoUpdateVarOnSuspend());
+	public void updateVariableValueOnSuspend(BitList tasks) {
+		updateVariableValue(isAutoUpdateVarOnSuspend(), tasks);
 	}
 	public void updateVariableValueOnChange() {
-		updateVariableValue(isAutoUpdateVarOnChange());
+		updateVariableValue(isAutoUpdateVarOnChange(), null);
 	}
-	public void updateVariableValue(boolean force) {
-		cleanVariableValue();
+	public void updateVariableValue(boolean force, BitList tasks) {
+		cleanVariableValue(tasks);
 		if (force) {
-			updateVariableValue();
+			updateVariableValue(tasks);
 		}
 	}
-	public void updateVariableValue() {
-		updateVariableValue(getCurrentJobId(), getCurrentSetId());
+	public void cleanVariableValue(BitList tasks) {
+		String jid = getCurrentJobId();
+		String sid = getCurrentSetId();
+		if (tasks == null) {
+			tasks = debugModel.getTasks(jid, sid);
+		}
+		getJobVariableManager().cleanupJobVariableValues(jid, tasks);
 	}
-	public void updateVariableValue(final String jid, final String sid) {
+	public void updateVariableValue(BitList tasks) {
+		String jid = getCurrentJobId();
+		String sid = getCurrentSetId();
+		if (tasks == null) {
+			tasks = debugModel.getTasks(jid, sid);
+		}
+		updateVariableValue(jid, sid, tasks);
+	}
+	public void updateVariableValue(final String jid, final String sid, final BitList tasks) {
 		if (jid != null) {
 			Job uiJob = new Job("Updating variables...") {
 				protected IStatus run(IProgressMonitor monitor) {
 					try {
-						getJobVariableManager().updateJobVariableValues(jid, sid, monitor);
+						getJobVariableManager().updateJobVariableValues(jid, sid, tasks, monitor);
 					} catch (CoreException e) {
 						return e.getStatus();
 					}
@@ -728,9 +776,6 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 			PlatformUI.getWorkbench().getProgressService().showInDialog(PTPDebugUIPlugin.getActiveWorkbenchShell(), uiJob);
 			uiJob.schedule();
 		}
-	}
-	public void cleanVariableValue() {
-		getJobVariableManager().cleanupJobVariableValues();
 	}
 	public Object getDebugObject(IPJob job, int task_id) {
 		IPCDISession session = getDebugSession(job); 
@@ -772,5 +817,41 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 			 return ((IPDebugTarget)target).getTargetID();
 		}
 		return -1;
+	}
+	//For make sure the task in current set is not registered and is not focus on and it is not stepping, otherwise remove this task
+	public void filterRunningTasks(BitList tasks, int step) {
+		Viewer viewer = null;
+		IViewPart part = PTPDebugUIPlugin.getActiveWorkbenchWindow().getActivePage().findView(IDebugUIConstants.ID_DEBUG_VIEW);
+		if (part != null && part instanceof AbstractDebugView) {
+			viewer = ((AbstractDebugView)part).getViewer();
+		}
+		if (viewer != null) {
+			ISelection selection = viewer.getSelection();
+			if (!selection.isEmpty() && selection instanceof IStructuredSelection) {
+				Object obj = ((IStructuredSelection)selection).getFirstElement();
+				if (obj instanceof IStep) {
+					int taskID = ((IPDebugElement)obj).getDebugTarget().getTargetID();
+					if (tasks.get(taskID)) {
+						switch (step) {
+						case STEP_INTO:
+							if (!((IStep)obj).canStepInto()) {
+								tasks.clear(taskID);
+							}
+							break;
+						case STEP_OVER:
+							if (!((IStep)obj).canStepOver()) {
+								tasks.clear(taskID);
+							}
+							break;
+						case STEP_RETURN:
+							if (!((IStep)obj).canStepReturn()) {
+								tasks.clear(taskID);
+							}
+							break;
+						}
+					}
+				}
+			}
+		}
 	}
 }

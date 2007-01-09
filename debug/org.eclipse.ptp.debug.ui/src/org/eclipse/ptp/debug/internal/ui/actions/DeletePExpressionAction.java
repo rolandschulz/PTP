@@ -58,7 +58,7 @@ public class DeletePExpressionAction extends Action {
 				view.getUIManager().getJobVariableManager().removeJobVariable(jVar.getJob().getIDString(), jVar.getVar());		
 				view.refresh();
 				if (jVar.getJob().getIDString().equals(view.getUIManager().getCurrentJobId())) {
-					view.getUIManager().cleanVariableValue();
+					view.getUIManager().cleanVariableValue(null);
 				}
 			}
 		}
