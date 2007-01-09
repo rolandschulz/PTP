@@ -64,6 +64,7 @@ extern MICommand *MIExecStep(int);
 extern MICommand *MIExecNext(int);
 extern MICommand *MIExecFinish(void);
 extern MICommand *MIExecInterrupt(void);
+extern MICommand *MIExecUtil(char*);
 
 /*
  * -break-* commands
