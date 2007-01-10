@@ -11,7 +11,10 @@ AM_INIT_AUTOMAKE
 
 AC_CANONICAL_BUILD
 
-CFLAGS="$CFLAGS -Wall"
+UTILS="../org.eclipse.ptp.utils"
+PROXY="../org.eclipse.ptp.proxy"
+CFLAGS="$CFLAGS -Wall -I$UTILS/include -I$PROXY/include"
+LIBS="$LIBS -L$UTILS -L$PROXY"
 
 dnl
 dnl Check for programs.
@@ -22,7 +25,12 @@ AM_PROG_CC_C_O
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
-dnl AC_PROG_LIBTOOL
+
+dnl
+dnl Check for libraries.
+dnl
+AC_CHECK_LIB(utils, bitset_new)
+AC_CHECK_LIB(proxysvr, proxy_svr_init)
 
 dnl
 dnl Check for header files.
@@ -44,5 +52,4 @@ dnl LSF Libraries
 #fi
 
 AC_CONFIG_FILES([Makefile])
-AC_CONFIG_SUBDIRS([../org.eclipse.ptp.proxy ../org.eclipse.ptp.utils])
 AC_OUTPUT
