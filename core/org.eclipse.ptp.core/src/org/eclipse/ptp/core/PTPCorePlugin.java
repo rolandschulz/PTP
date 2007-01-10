@@ -242,25 +242,10 @@ public class PTPCorePlugin extends AbstractUIPlugin {
 				System.out.println("Testing fragment "+(i+1)+" with this OS/arch - path: '"+str_path+"'");
 				
 				/* 
-				 * OK so now we know where the absolute path of this fragment is -
-				 * but is this the fragment for the machine we're running on?
-				 * 
-				 * First: check for a 'bin' directory in the fragment. This may be an architecture
-				 * 		  independent fragment.
-				 * 
-				 * Second: check for a 'bin' directory in the fragment with the os and arch appended.
+				 * Check each fragment that matches our os and arch for a bin directory.
 				 */
-				int idx = str_path.indexOf(fragment);
-				if(idx > 0) {
-					String file_path = str_path + "bin/"+file;
-					System.out.println("\tSearching for file in '"+file_path+"'");
-					File f = new File(file_path);
-					if(f.exists()) {
-						System.out.println("\t\t**** FOUND IT!");
-						return file_path;
-					}
-				}
-				idx = str_path.indexOf(frag_os_arch);
+
+				int idx = str_path.indexOf(frag_os_arch);
 				if(idx > 0) {
 					/* found it!  This is the right fragment for our OS & arch */
 					System.out.println("\tCorrect fragment for our OS & arch");
