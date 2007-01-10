@@ -1,0 +1,22 @@
+dnl
+dnl
+
+AC_PREREQ(2.50)
+
+AC_INIT(org.eclipse.ptp.mpich2, 1.0.0)
+AC_CONFIG_SRCDIR(src/ptp_mpich2_proxy.py.in)
+
+AM_INIT_AUTOMAKE
+
+AC_CANONICAL_BUILD
+
+dnl
+dnl Check for programs.
+dnl
+
+AC_PROG_INSTALL
+
+dnl MPICH2
+
+AC_CONFIG_FILES([Makefile src/ptp_mpich2_proxy.py src/ptplib.py])
+AC_OUTPUT
