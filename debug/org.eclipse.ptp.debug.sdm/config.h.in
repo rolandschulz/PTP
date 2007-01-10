@@ -8,9 +8,6 @@
 #define DEBUG_PRINTS(str)
 #endif /* DEBUG */
 
-/* Define to 1 if you have the <dlfcn.h> header file. */
-#undef HAVE_DLFCN_H
-
 /* Define to 1 if you don't have `vprintf' but do have `_doprnt.' */
 #undef HAVE_DOPRNT
 
@@ -31,6 +28,9 @@
 
 /* Define to 1 if you have the `socket' library (-lsocket). */
 #undef HAVE_LIBSOCKET
+
+/* Define to 1 if you have the `utils' library (-lutils). */
+#undef HAVE_LIBUTILS
 
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
