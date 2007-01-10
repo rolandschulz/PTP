@@ -11,7 +11,9 @@ AM_INIT_AUTOMAKE
 
 AC_CANONICAL_BUILD
 
-CFLAGS="$CFLAGS -Wall"
+UTILS="../org.eclipse.ptp.utils"
+CFLAGS="$CFLAGS -Wall -I$UTILS/include"
+LIBS="$LIBS -L$UTILS"
 
 dnl
 dnl Check for programs.
@@ -22,7 +24,12 @@ AM_PROG_CC_C_O
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
-AC_PROG_LIBTOOL
+
+dnl
+dnl Check for libraries.
+dnl
+
+AC_CHECK_LIB(utils, bitset_new)
 
 AH_VERBATIM([DEBUG],
 [#ifdef DEBUG
