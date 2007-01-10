@@ -5,3 +5,5 @@ aif_xdr.c
 config.h
 *.a
 autom4te.cache
+.deps
+stamp-h1
