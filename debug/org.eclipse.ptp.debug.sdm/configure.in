@@ -8,10 +8,13 @@ AC_CONFIG_SRCDIR(src/client/client.c)
 
 AM_INIT_AUTOMAKE([subdir-objects])
 
-AC_CONFIG_HEADER(config.h)
+AM_CONFIG_HEADER(config.h)
 AC_CANONICAL_BUILD
 
-CFLAGS="$CFLAGS -Wall"
+UTILS="../org.eclipse.ptp.utils"
+PROXY="../org.eclipse.ptp.proxy"
+CFLAGS="$CFLAGS -Wall -I$UTILS/include -I$PROXY/include"
+LIBS="$LIBS -L$UTILS -L$PROXY"
 
 dnl
 dnl Check for programs.
@@ -22,7 +25,6 @@ AM_PROG_CC_C_O
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
-AC_PROG_LIBTOOL
 
 dnl
 dnl Check for libraries.
@@ -33,15 +35,11 @@ AC_CHECK_LIB(socket, socket)
 AC_SEARCH_LIBS(openpty, [util],
 	[AC_DEFINE(HAVE_OPENPTY, 1, [System has openpty() function.])])dnl
 
-dnl AIF libraries
-dnl AC_TEST_PACKAGE_NEW(aif,[#include <aif.h>],-laif,,[/usr/local $(TOP)/../libaif],LIBAIF)
-dnl if test "$with_aif" = "no"; then
-dnl 	INCLUDE_aif='$(srcdir)/src/aif'
-dnl 	LIB_aif='$(srcdir)/src/aif'
-dnl 	# note: copy of libaif in guard src tree is old, and should not
-dnl 	# be used anymore.
-dnl 	AC_MSG_ERROR([You must have libaif to compile sdm.])
-dnl fi
+AC_CHECK_LIB(utils, bitset_new)
+AC_CHECK_LIB(proxysvr, proxy_svr_init, [SVR_LIBS="$SVR_LIBS -lproxysvr"])
+AC_SUBST([SVR_LIBS])
+AC_CHECK_LIB(proxyclnt, proxy_clnt_init, [CLNT_LIBS="$CLNT_LIBS -lproxyclnt"])
+AC_SUBST([CLNT_LIBS])
 
 dnl Check for posix4
 AC_CHECK_LIB(posix4, clock_gettime)
@@ -91,5 +89,5 @@ AH_VERBATIM([DEBUG],
 #endif /* DEBUG */])
 
 AC_CONFIG_FILES([Makefile])
-AC_CONFIG_SUBDIRS([libaif ../org.eclipse.ptp.proxy ../org.eclipse.ptp.utils])
+AC_CONFIG_SUBDIRS([libaif])
 AC_OUTPUT

@@ -38,16 +38,15 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-host_triplet = @host@
 bin_PROGRAMS = sdm$(EXEEXT)
 noinst_PROGRAMS = test_proxy$(EXEEXT) test_proxy_rev$(EXEEXT) \
 	test_mi$(EXEEXT)
+subdir = .
 DIST_COMMON = README $(am__configure_deps) $(noinst_HEADERS) \
 	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(srcdir)/config.h.in $(top_srcdir)/configure AUTHORS COPYING \
 	ChangeLog INSTALL NEWS compile config.guess config.sub depcomp \
 	install-sh ltmain.sh missing
-subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
 	$(top_srcdir)/configure.in
@@ -59,6 +58,7 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = config.h
 CONFIG_CLEAN_FILES =
 LIBRARIES = $(noinst_LIBRARIES)
+AR = ar
 ARFLAGS = cru
 libdbgclnt_a_AR = $(AR) $(ARFLAGS)
 libdbgclnt_a_LIBADD =
@@ -116,33 +116,27 @@ am_sdm_OBJECTS = src/client/sdm-startup.$(OBJEXT) \
 	src/server/sdm-backend.$(OBJEXT) \
 	src/server/sdm-gdbmi_backend.$(OBJEXT)
 sdm_OBJECTS = $(am_sdm_OBJECTS)
-sdm_DEPENDENCIES = $(PROXY)/libproxysvr.a libdbgutils.a \
-	$(UTILS)/libutils.a libmi.a libaif/libaif.a
+sdm_DEPENDENCIES = libdbgutils.a libmi.a libaif/libaif.a
 am_test_mi_OBJECTS = src/mi/test_mi-test_mi.$(OBJEXT)
 test_mi_OBJECTS = $(am_test_mi_OBJECTS)
-test_mi_DEPENDENCIES = libmi.a $(UTILS)/libutils.a
+test_mi_DEPENDENCIES = libmi.a
 am_test_proxy_OBJECTS = src/test/test_proxy-test_proxy.$(OBJEXT) \
 	src/test/test_proxy-test_proxy_clnt.$(OBJEXT)
 test_proxy_OBJECTS = $(am_test_proxy_OBJECTS)
-test_proxy_DEPENDENCIES = libdbgclnt.a $(PROXY)/libproxyclnt.a \
-	libdbgutils.a $(UTILS)/libutils.a libaif/libaif.a
+test_proxy_DEPENDENCIES = libdbgclnt.a libdbgutils.a libaif/libaif.a
 am_test_proxy_rev_OBJECTS =  \
 	src/test/test_proxy_rev-test_proxy_rev.$(OBJEXT) \
 	src/test/test_proxy_rev-test_proxy_clnt.$(OBJEXT)
 test_proxy_rev_OBJECTS = $(am_test_proxy_rev_OBJECTS)
-test_proxy_rev_DEPENDENCIES = libdbgclnt.a $(PROXY)/libproxyclnt.a \
-	libdbgutils.a $(UTILS)/libutils.a libaif/libaif.a
+test_proxy_rev_DEPENDENCIES = libdbgclnt.a libdbgutils.a \
+	libaif/libaif.a
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I.
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-LTCOMPILE = $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) \
-	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
-	$(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
-LINK = $(LIBTOOL) --mode=link --tag=CC $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
-	$(AM_LDFLAGS) $(LDFLAGS) -o $@
+LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(libdbgclnt_a_SOURCES) $(libdbgutils_a_SOURCES) \
 	$(libmi_a_SOURCES) $(sdm_SOURCES) $(test_mi_SOURCES) \
 	$(test_proxy_SOURCES) $(test_proxy_rev_SOURCES)
@@ -174,7 +168,6 @@ ACLOCAL = @ACLOCAL@
 AMDEP_FALSE = @AMDEP_FALSE@
 AMDEP_TRUE = @AMDEP_TRUE@
 AMTAR = @AMTAR@
-AR = @AR@
 AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
@@ -182,23 +175,17 @@ AWK = @AWK@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
+CLNT_LIBS = @CLNT_LIBS@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
-CXX = @CXX@
-CXXCPP = @CXXCPP@
-CXXDEPMODE = @CXXDEPMODE@
-CXXFLAGS = @CXXFLAGS@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
-ECHO = @ECHO@
 ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
-F77 = @F77@
-FFLAGS = @FFLAGS@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
@@ -206,8 +193,6 @@ INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
-LIBTOOL = @LIBTOOL@
-LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
 MAKEINFO = @MAKEINFO@
 OBJEXT = @OBJEXT@
@@ -225,17 +210,13 @@ RANLIB = @RANLIB@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
+SVR_LIBS = @SVR_LIBS@
 VERSION = @VERSION@
-ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
-ac_ct_CXX = @ac_ct_CXX@
-ac_ct_F77 = @ac_ct_F77@
 ac_ct_RANLIB = @ac_ct_RANLIB@
 ac_ct_STRIP = @ac_ct_STRIP@
 am__fastdepCC_FALSE = @am__fastdepCC_FALSE@
 am__fastdepCC_TRUE = @am__fastdepCC_TRUE@
-am__fastdepCXX_FALSE = @am__fastdepCXX_FALSE@
-am__fastdepCXX_TRUE = @am__fastdepCXX_TRUE@
 am__include = @am__include@
 am__leading_dot = @am__leading_dot@
 am__quote = @am__quote@
@@ -249,11 +230,7 @@ build_os = @build_os@
 build_vendor = @build_vendor@
 datadir = @datadir@
 exec_prefix = @exec_prefix@
-host = @host@
 host_alias = @host_alias@
-host_cpu = @host_cpu@
-host_os = @host_os@
-host_vendor = @host_vendor@
 includedir = @includedir@
 infodir = @infodir@
 install_sh = @install_sh@
@@ -270,82 +247,80 @@ sharedstatedir = @sharedstatedir@
 subdirs = @subdirs@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
-PROXY = ../org.eclipse.ptp.proxy
-UTILS = ../org.eclipse.ptp.utils
-SUBDIRS = libaif $(PROXY) $(UTILS)
+SUBDIRS = libaif
 sdm_SOURCES = src/client/startup.c\
-						src/client/client.c \
-						src/client/client_cmds.c \
-						src/client/client_svr.c \
-						src/server/server.c \
-						src/server/server_cmds.c \
-						src/server/backend.c \
-						src/server/gdbmi_backend.c
+							src/client/client.c \
+							src/client/client_cmds.c \
+							src/client/client_svr.c \
+							src/server/server.c \
+							src/server/server_cmds.c \
+							src/server/backend.c \
+							src/server/gdbmi_backend.c
 
-sdm_CFLAGS = -I./include -I./libaif -I./src/mi -I$(PROXY)/include -I$(UTILS)/include $(AM_CFLAGS)
-sdm_LDADD = $(PROXY)/libproxysvr.a libdbgutils.a $(UTILS)/libutils.a libmi.a libaif/libaif.a
+sdm_CFLAGS = -I./include -I./libaif -I./src/mi $(AM_CFLAGS)
+sdm_LDADD = libdbgutils.a libmi.a libaif/libaif.a @SVR_LIBS@
 test_proxy_SOURCES = src/test/test_proxy.c \
-						src/test/test_proxy_clnt.c
+							src/test/test_proxy_clnt.c
 
-test_proxy_CFLAGS = -I./include -I./libaif -I$(PROXY)/include -I$(UTILS)/include $(AM_CFLAGS) -g
+test_proxy_CFLAGS = -I./include -I./libaif $(AM_CFLAGS) -g
 test_proxy_LDFLAGS = -g
-test_proxy_LDADD = libdbgclnt.a $(PROXY)/libproxyclnt.a libdbgutils.a $(UTILS)/libutils.a libaif/libaif.a
+test_proxy_LDADD = libdbgclnt.a libdbgutils.a libaif/libaif.a @CLNT_LIBS@
 test_proxy_rev_SOURCES = src/test/test_proxy_rev.c \
-						src/test/test_proxy_clnt.c
+							src/test/test_proxy_clnt.c
 
-test_proxy_rev_CFLAGS = -I./include -I./libaif -I$(PROXY)/include -I$(UTILS)/include $(AM_CFLAGS) -g
+test_proxy_rev_CFLAGS = -I./include -I./libaif $(AM_CFLAGS) -g
 test_proxy_rev_LDFLAGS = -g
-test_proxy_rev_LDADD = libdbgclnt.a $(PROXY)/libproxyclnt.a libdbgutils.a $(UTILS)/libutils.a libaif/libaif.a
+test_proxy_rev_LDADD = libdbgclnt.a libdbgutils.a libaif/libaif.a @CLNT_LIBS@
 test_mi_SOURCES = src/mi/test_mi.c
-test_mi_CFLAGS = -I./include -I./src/mi -I$(UTILS)/include $(AM_CFLAGS) -g
+test_mi_CFLAGS = -I./include -I./src/mi $(AM_CFLAGS) -g
 test_mi_LDFLAGS = -g
-test_mi_LDADD = libmi.a $(UTILS)/libutils.a
+test_mi_LDADD = libmi.a
 noinst_HEADERS = include/breakpoint.h include/dbg.h include/location.h include/stackframe.h include/memoryinfo.h include/signalinfo.h
 noinst_LIBRARIES = libdbgclnt.a libdbgutils.a libmi.a
 libdbgclnt_a_SOURCES = src/client/client_interface.c 
-libdbgclnt_a_CFLAGS = -I./include -I./libaif -I$(PROXY)/include -I$(UTILS)/include $(AM_CFLAGS) -g
+libdbgclnt_a_CFLAGS = -I./include -I./libaif $(AM_CFLAGS) -g
 libdbgutils_a_SOURCES = src/utils/error.c \
-						src/utils/breakpoint.c \
-						src/utils/stackframe.c \
-						src/utils/event.c \
-						src/utils/itimer.c \
-						src/utils/memoryinfo.c \
-						src/utils/signalinfo.c
+							src/utils/breakpoint.c \
+							src/utils/stackframe.c \
+							src/utils/event.c \
+							src/utils/itimer.c \
+							src/utils/memoryinfo.c \
+							src/utils/signalinfo.c
 
-libdbgutils_a_CFLAGS = -I./include -I./libaif -I$(PROXY)/include -I$(UTILS)/include $(AM_CFLAGS) -g
+libdbgutils_a_CFLAGS = -I./include -I./libaif $(AM_CFLAGS) -g
 libmi_a_SOURCES = src/mi/MIParser.c \
-						src/mi/MIOOBRecord.c \
-						src/mi/MIOutput.c \
-						src/mi/MIResult.c \
-						src/mi/MIResultRecord.c \
-						src/mi/MIValue.c \
-						src/mi/MIString.c \
-						src/mi/MIBreakpoint.c \
-						src/mi/MIFrame.c \
-						src/mi/MIThread.c \
-						src/mi/MIArg.c \
-						src/mi/MIVar.c \
-						src/mi/MIEvent.c \
-						src/mi/MICommand.c \
-						src/mi/MIGDBCommand.c \
-						src/mi/MIExecCommand.c \
-						src/mi/MIBreakCommand.c \
-						src/mi/MIStackCommand.c \
-						src/mi/MIVarCommand.c \
-						src/mi/MIError.c \
-						src/mi/MISession.c \
-						src/mi/MIThreadCommand.c \
-						src/mi/MIMemory.c \
-						src/mi/MIMemoryCommand.c \
-						src/mi/CLICommand.c \
-						src/mi/CLIOutput.c
+							src/mi/MIOOBRecord.c \
+							src/mi/MIOutput.c \
+							src/mi/MIResult.c \
+							src/mi/MIResultRecord.c \
+							src/mi/MIValue.c \
+							src/mi/MIString.c \
+							src/mi/MIBreakpoint.c \
+							src/mi/MIFrame.c \
+							src/mi/MIThread.c \
+							src/mi/MIArg.c \
+							src/mi/MIVar.c \
+							src/mi/MIEvent.c \
+							src/mi/MICommand.c \
+							src/mi/MIGDBCommand.c \
+							src/mi/MIExecCommand.c \
+							src/mi/MIBreakCommand.c \
+							src/mi/MIStackCommand.c \
+							src/mi/MIVarCommand.c \
+							src/mi/MIError.c \
+							src/mi/MISession.c \
+							src/mi/MIThreadCommand.c \
+							src/mi/MIMemory.c \
+							src/mi/MIMemoryCommand.c \
+							src/mi/CLICommand.c \
+							src/mi/CLIOutput.c
 
-libmi_a_CFLAGS = -I./include -I$(UTILS)/include $(AM_CFLAGS) -g 
+libmi_a_CFLAGS = -I./include $(AM_CFLAGS) -g 
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
 .SUFFIXES:
-.SUFFIXES: .c .lo .o .obj
+.SUFFIXES: .c .o .obj
 am--refresh:
 	@:
 $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
@@ -504,11 +479,10 @@ install-binPROGRAMS: $(bin_PROGRAMS)
 	@list='$(bin_PROGRAMS)'; for p in $$list; do \
 	  p1=`echo $$p|sed 's/$(EXEEXT)$$//'`; \
 	  if test -f $$p \
-	     || test -f $$p1 \
 	  ; then \
 	    f=`echo "$$p1" | sed 's,^.*/,,;$(transform);s/$$/$(EXEEXT)/'`; \
-	   echo " $(INSTALL_PROGRAM_ENV) $(LIBTOOL) --mode=install $(binPROGRAMS_INSTALL) '$$p' '$(DESTDIR)$(bindir)/$$f'"; \
-	   $(INSTALL_PROGRAM_ENV) $(LIBTOOL) --mode=install $(binPROGRAMS_INSTALL) "$$p" "$(DESTDIR)$(bindir)/$$f" || exit 1; \
+	   echo " $(INSTALL_PROGRAM_ENV) $(binPROGRAMS_INSTALL) '$$p' '$(DESTDIR)$(bindir)/$$f'"; \
+	   $(INSTALL_PROGRAM_ENV) $(binPROGRAMS_INSTALL) "$$p" "$(DESTDIR)$(bindir)/$$f" || exit 1; \
 	  else :; fi; \
 	done
 
@@ -521,18 +495,10 @@ uninstall-binPROGRAMS:
 	done
 
 clean-binPROGRAMS:
-	@list='$(bin_PROGRAMS)'; for p in $$list; do \
-	  f=`echo $$p|sed 's/$(EXEEXT)$$//'`; \
-	  echo " rm -f $$p $$f"; \
-	  rm -f $$p $$f ; \
-	done
+	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
 
 clean-noinstPROGRAMS:
-	@list='$(noinst_PROGRAMS)'; for p in $$list; do \
-	  f=`echo $$p|sed 's/$(EXEEXT)$$//'`; \
-	  echo " rm -f $$p $$f"; \
-	  rm -f $$p $$f ; \
-	done
+	-test -z "$(noinst_PROGRAMS)" || rm -f $(noinst_PROGRAMS)
 src/client/sdm-startup.$(OBJEXT): src/client/$(am__dirstamp) \
 	src/client/$(DEPDIR)/$(am__dirstamp)
 src/client/sdm-client.$(OBJEXT): src/client/$(am__dirstamp) \
@@ -700,14 +666,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(COMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
-
-.c.lo:
-@am__fastdepCC_TRUE@	depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.lo$$||'`; \
-@am__fastdepCC_TRUE@	if $(LTCOMPILE) -MT $@ -MD -MP -MF "$$depbase.Tpo" -c -o $@ $<; \
-@am__fastdepCC_TRUE@	then mv -f "$$depbase.Tpo" "$$depbase.Plo"; else rm -f "$$depbase.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
 
 src/client/libdbgclnt_a-client_interface.o: src/client/client_interface.c
 @am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdbgclnt_a_CFLAGS) $(CFLAGS) -MT src/client/libdbgclnt_a-client_interface.o -MD -MP -MF "src/client/$(DEPDIR)/libdbgclnt_a-client_interface.Tpo" -c -o src/client/libdbgclnt_a-client_interface.o `test -f 'src/client/client_interface.c' || echo '$(srcdir)/'`src/client/client_interface.c; \
@@ -1366,15 +1324,6 @@ src/test/test_proxy_rev-test_proxy_clnt.obj: src/test/test_proxy_clnt.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/test/test_proxy_clnt.c' object='src/test/test_proxy_rev-test_proxy_clnt.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_proxy_rev_CFLAGS) $(CFLAGS) -c -o src/test/test_proxy_rev-test_proxy_clnt.obj `if test -f 'src/test/test_proxy_clnt.c'; then $(CYGPATH_W) 'src/test/test_proxy_clnt.c'; else $(CYGPATH_W) '$(srcdir)/src/test/test_proxy_clnt.c'; fi`
-
-mostlyclean-libtool:
-	-rm -f *.lo
-
-clean-libtool:
-	-rm -rf .libs _libs
-
-distclean-libtool:
-	-rm -f libtool
 uninstall-info-am:
 
 # This directory's subdirectories are mostly independent; you can cd
@@ -1683,15 +1632,15 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-recursive
 
-clean-am: clean-binPROGRAMS clean-generic clean-libtool \
-	clean-noinstLIBRARIES clean-noinstPROGRAMS mostlyclean-am
+clean-am: clean-binPROGRAMS clean-generic clean-noinstLIBRARIES \
+	clean-noinstPROGRAMS mostlyclean-am
 
 distclean: distclean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -rf src/client/$(DEPDIR) src/mi/$(DEPDIR) src/server/$(DEPDIR) src/test/$(DEPDIR) src/utils/$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
-	distclean-hdr distclean-libtool distclean-tags
+	distclean-hdr distclean-tags
 
 dvi: dvi-recursive
 
@@ -1722,8 +1671,7 @@ maintainer-clean-am: distclean-am maintainer-clean-generic
 
 mostlyclean: mostlyclean-recursive
 
-mostlyclean-am: mostlyclean-compile mostlyclean-generic \
-	mostlyclean-libtool
+mostlyclean-am: mostlyclean-compile mostlyclean-generic
 
 pdf: pdf-recursive
 
@@ -1738,22 +1686,21 @@ uninstall-am: uninstall-binPROGRAMS uninstall-info-am
 uninstall-info: uninstall-info-recursive
 
 .PHONY: $(RECURSIVE_TARGETS) CTAGS GTAGS all all-am am--refresh check \
-	check-am clean clean-binPROGRAMS clean-generic clean-libtool \
+	check-am clean clean-binPROGRAMS clean-generic \
 	clean-noinstLIBRARIES clean-noinstPROGRAMS clean-recursive \
 	ctags ctags-recursive dist dist-all dist-bzip2 dist-gzip \
 	dist-shar dist-tarZ dist-zip distcheck distclean \
 	distclean-compile distclean-generic distclean-hdr \
-	distclean-libtool distclean-recursive distclean-tags \
-	distcleancheck distdir distuninstallcheck dvi dvi-am html \
-	html-am info info-am install install-am install-binPROGRAMS \
-	install-data install-data-am install-exec install-exec-am \
-	install-info install-info-am install-man install-strip \
-	installcheck installcheck-am installdirs installdirs-am \
-	maintainer-clean maintainer-clean-generic \
-	maintainer-clean-recursive mostlyclean mostlyclean-compile \
-	mostlyclean-generic mostlyclean-libtool mostlyclean-recursive \
-	pdf pdf-am ps ps-am tags tags-recursive uninstall uninstall-am \
-	uninstall-binPROGRAMS uninstall-info-am
+	distclean-recursive distclean-tags distcleancheck distdir \
+	distuninstallcheck dvi dvi-am html html-am info info-am \
+	install install-am install-binPROGRAMS install-data \
+	install-data-am install-exec install-exec-am install-info \
+	install-info-am install-man install-strip installcheck \
+	installcheck-am installdirs installdirs-am maintainer-clean \
+	maintainer-clean-generic maintainer-clean-recursive \
+	mostlyclean mostlyclean-compile mostlyclean-generic \
+	mostlyclean-recursive pdf pdf-am ps ps-am tags tags-recursive \
+	uninstall uninstall-am uninstall-binPROGRAMS uninstall-info-am
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

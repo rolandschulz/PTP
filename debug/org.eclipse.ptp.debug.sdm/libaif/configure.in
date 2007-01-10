@@ -10,9 +10,8 @@ dnl
 AC_PREREQ(2.50)
 
 AC_INIT(aif.c)
+AM_INIT_AUTOMAKE
 AC_CONFIG_HEADER(config.h)
-
-CFLAGS="$CFLAGS -Wall"
 
 dnl Checks for programs.
 AC_PROG_CC
@@ -63,4 +62,4 @@ if test -z "$ac_cv_path_XMLTO"; then
 	XMLTO=":"
 fi
 
-AC_OUTPUT(Makefile doc/Makefile)
+AC_OUTPUT([Makefile doc/Makefile])
