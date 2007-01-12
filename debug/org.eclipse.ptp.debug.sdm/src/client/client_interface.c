@@ -452,11 +452,11 @@ DbgDataEvaluateExpression(session *s, bitset *set, char* arg)
 	return res;
 }
 int
-DbgGetPartialAIF(session *s, bitset *set, char* arg, int listChildren, int express)
+DbgGetPartialAIF(session *s, bitset *set, char* name, char* key, int listChildren, int express)
 {
 	int		res;
 	char *	set_str = bitset_to_str(set);
-	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_GETPARTIALAIF_CMD, DBG_GETPARTIALAIF_FMT, set_str, arg, listChildren, express);
+	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_GETPARTIALAIF_CMD, DBG_GETPARTIALAIF_FMT, set_str, name, key, listChildren, express);
 	free(set_str);
 	return res;
 }

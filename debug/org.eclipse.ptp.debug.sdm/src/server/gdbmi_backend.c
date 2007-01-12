@@ -117,7 +117,7 @@ static int	GDBCLISignalInfo(char*);
 static int	GDBCLIHandle(char*);
 static int	GDBMIQuit(void);
 static int	GDBMIDataEvaluateExpression(char*);
-static int	GDBGetPartialAIF(char *, int, int);
+static int	GDBGetPartialAIF(char *, char *, int, int);
 static int	GDBMIVarDelete(char*);
 
 static void SendCommandWait(MISession *, MICommand *);
@@ -1525,6 +1525,42 @@ GDBMIGetLocalVariables(void)
 }
 
 /*
+ * This is needed to check for a bug in the Linux x86 GCC 4.0 compiler
+ * that causes gdb 6.5 to crash under certain conditions.
+ */
+#if __gnu_linux__ &&  __i386__ && __GNUC__ == 4
+static int
+CurrentFrame(int level, char *name)
+{
+	MICommand *	cmd;
+	MIFrame *	frame;
+	List *		frames;
+	int val = 0;
+	
+	if (GDB_Version > 6.3) {
+		cmd = MIStackListFrames(level, level);
+		SendCommandWait(DebugSession, cmd);
+		if (!MICommandResultOK(cmd)) {
+			MICommandFree(cmd);
+			return val;
+		}
+		frames = MIGetStackListFramesInfo(cmd);
+	
+		//only one frame
+		SetList(frames);
+		if ((frame = (MIFrame *)GetListElement(frames)) != NULL) {
+			if (frame->func != NULL && strncmp(frame->func, name, 4) == 0) {
+				val = 1;
+			}
+		}
+		DestroyList(frames, MIFrameFree);
+	}
+		
+	return val;
+}
+#endif
+
+/*
 ** List arguments.
 */
 static int
@@ -1562,12 +1598,16 @@ GDBMIListArguments(int low, int high)
  	 */ 
 	SetList(frames);
 	if ((frame = (MIFrame *)GetListElement(frames)) != NULL) {
-		for (SetList(frame->args); (arg = (MIArg *)GetListElement(frame->args)) != NULL; )
-			AddToList(e->dbg_event_u.list, (void *)strdup(arg->name));
-	}
-	
+#if __gnu_linux__ &&  __i386__ && __GNUC__ == 4
+		if (!CurrentFrame(frame->level, "main")) {
+#endif
+			for (SetList(frame->args); (arg = (MIArg *)GetListElement(frame->args)) != NULL; )
+				AddToList(e->dbg_event_u.list, (void *)strdup(arg->name));
+#if __gnu_linux__ &&  __i386__ && __GNUC__ == 4
+		}
+#endif
+	}	
 	DestroyList(frames, MIFrameFree);
-	
 	SaveEvent(e);
 	
 	return DBGRES_OK;
@@ -2672,9 +2712,8 @@ GetChildrenMIVar(char *mivar_name, int showParentType)
 		cmd = MIVarInfoType(mivar_name);
 		SendCommandWait(DebugSession, cmd);
 		if (!MICommandResultOK(cmd)) {
-			mivar = CreateMIVar(mivar_name);
 			MICommandFree(cmd);
-			return mivar;
+			return NULL;
 		}
 		mivar = MIGetVarInfoType(cmd);
 		mivar->name = strdup(mivar_name);
@@ -2683,9 +2722,8 @@ GetChildrenMIVar(char *mivar_name, int showParentType)
 	cmd = MIVarListChildren(mivar_name);
 	SendCommandWait(DebugSession, cmd);
 	if (!MICommandResultOK(cmd)) {
-		mivar = CreateMIVar(mivar_name);
 		MICommandFree(cmd);
-		return mivar;
+		return NULL;
 	}
 	MIGetVarListChildrenInfo(mivar, cmd);
 	MICommandFree(cmd);
@@ -2701,9 +2739,8 @@ GetMIVarDetails(char *name)
 	cmd = MIVarInfoType(name);
 	SendCommandWait(DebugSession, cmd);
 	if (!MICommandResultOK(cmd)) {
-		mivar = CreateMIVar(name);
 		MICommandFree(cmd);
-		return mivar;
+		return NULL;
 	}
 	mivar = MIGetVarInfoType(cmd);
 	mivar->name = strdup(name);
@@ -2717,13 +2754,17 @@ GetMIVarDetails(char *name)
 }
 
 static int
-GDBGetPartialAIF(char *var_name, int listChildren, int express)
+GDBGetPartialAIF(char* name, char* key, int listChildren, int express)
 {
 	MIVar *mivar;
 	AIF *a;
 	dbg_event *	e;
+	char* var_name;
 
 	CHECK_SESSION();
+
+	//key is prefered if it exists 
+	var_name = (key == NULL || strlen(key) == 0)?name:key;
 
 	if (express) {
 		mivar = GetMIVarDetails(var_name);
@@ -2742,8 +2783,12 @@ GDBGetPartialAIF(char *var_name, int listChildren, int express)
 	}
 	
 	if (mivar == NULL) {
-		DbgSetError(DBGERR_UNKNOWN_VARIABLE, var_name);
-		return DBGRES_ERR; 
+		//try again with original variable name
+		var_name = name;
+		if ((mivar = CreateMIVar(var_name)) == NULL) {
+			DbgSetError(DBGERR_UNKNOWN_VARIABLE, var_name);
+			return DBGRES_ERR; 
+		}
 	}
 
 	if ((a = GetPartailAIF(mivar, var_name)) == NULL) {
