@@ -446,7 +446,7 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 	public void dataEvaluateExpression(BitList tasks, String expression) throws PCDIException {
 		throw new PCDIException("dataEvaluateExpression - not supported in simulator yet");
 	}
-	public void getPartialAIF(BitList tasks, String expr, boolean listChildren, boolean express) throws PCDIException {
+	public void getPartialAIF(BitList tasks, String expr, String key, boolean listChildren, boolean express) throws PCDIException {
 		throw new PCDIException("getPartialAIF - not supported in simulator yet");
 	}
 	public void variableDelete(BitList tasks, String varname) throws PCDIException {

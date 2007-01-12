@@ -30,26 +30,28 @@ import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugPartialAIFEvent
  */
 public class GetPartialAIFCommand extends AbstractDebugCommand {
 	private String name = "";
+	private String key = "";
 	private boolean listChildren = false;
 	private boolean express = false;
 	
-	public GetPartialAIFCommand(BitList tasks, String name, boolean listChildren, boolean express) {
+	public GetPartialAIFCommand(BitList tasks, String name, String key, boolean listChildren, boolean express) {
 		super(tasks);
 		this.name = name;
+		this.key = key;
 		this.listChildren = listChildren;
 		this.express = express;
 	}
-	public GetPartialAIFCommand(BitList tasks, String name, boolean listChildren) {
-		this(tasks, name, listChildren, false);
+	public GetPartialAIFCommand(BitList tasks, String name, String key, boolean listChildren) {
+		this(tasks, name, key, listChildren, false);
 	}
-	public GetPartialAIFCommand(BitList tasks, String name) {
-		this(tasks, name, false, false);
+	public GetPartialAIFCommand(BitList tasks, String name, String key) {
+		this(tasks, name, key, false, false);
 	}
 	public void preExecCommand(IAbstractDebugger debugger) throws PCDIException {
 		checkBeforeExecCommand(debugger);
 	}
 	public void exec(IAbstractDebugger debugger) throws PCDIException {
-		debugger.getPartialAIF(tasks, name, listChildren, express);
+		debugger.getPartialAIF(tasks, name, key, listChildren, express);
 	}
 	public IAIF getPartialAIF() throws PCDIException {
 		Object res = getResultValue();

@@ -19,6 +19,7 @@
 package org.eclipse.ptp.debug.external.core.cdi.model.variable;
 
 import org.eclipse.ptp.debug.core.aif.AIFException;
+import org.eclipse.ptp.debug.core.aif.AIFFactory;
 import org.eclipse.ptp.debug.core.aif.IAIF;
 import org.eclipse.ptp.debug.core.aif.IAIFType;
 import org.eclipse.ptp.debug.core.aif.IAIFTypeArray;
@@ -104,7 +105,7 @@ public abstract class Variable extends VariableDescriptor implements IPCDIVariab
 		boolean childFake = false;
 		
 		Target target = (Target)getTarget();
-		GetPartialAIFCommand command = new GetPartialAIFCommand(target.getTask(), key==null?getQualifiedName():key, true);
+		GetPartialAIFCommand command = new GetPartialAIFCommand(target.getTask(), getQualifiedName(), key, true);
 		target.getDebugger().postCommand(command);
 		
 		IAIF aif = command.getPartialAIF();
@@ -215,15 +216,16 @@ public abstract class Variable extends VariableDescriptor implements IPCDIVariab
 		return 0;
 	}
 	public IAIFValue getValue() throws PCDIException {
-		if (fValue == null) {
+		if (fValue == null || fValue == AIFFactory.UNKNOWNVALUE) {
 			Target target = (Target)getTarget();
-			GetPartialAIFCommand command = new GetPartialAIFCommand(getTarget().getTask(), getKeyName(), false, true);
+			GetPartialAIFCommand command = new GetPartialAIFCommand(getTarget().getTask(), getQualifiedName(), getKeyName(), false, true);
 			target.getDebugger().postCommand(command);
-			
+
 			IAIF aif = command.getPartialAIF();
 			fType = aif.getType();
 			fValue = aif.getValue();
 			fTypename = aif.getDescription();
+			keyName = command.getName();
 		}
 		return fValue;
 	}

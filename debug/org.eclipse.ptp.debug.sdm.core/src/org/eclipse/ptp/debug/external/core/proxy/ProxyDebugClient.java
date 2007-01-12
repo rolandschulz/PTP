@@ -186,9 +186,10 @@ public class ProxyDebugClient extends AbstractProxyDebugClient {
 	public void debugDataEvaluateExpression(BitList procs, String expr) throws IOException {
 		sendCommand("DEE", procs, expr);
 	}
-	public void debugGetPartialAIF(BitList procs, String name, boolean listChildren, boolean express) throws IOException {
+	public void debugGetPartialAIF(BitList procs, String name, String key, boolean listChildren, boolean express) throws IOException {
 		String[] args = new String[] {
 				name,
+				key,
 				Integer.toString(listChildren?1:0),
 				Integer.toString(express?1:0)
 			};
