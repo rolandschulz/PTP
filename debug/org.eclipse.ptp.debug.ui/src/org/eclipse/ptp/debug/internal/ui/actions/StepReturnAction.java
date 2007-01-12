@@ -18,11 +18,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.ui.actions;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.internal.ui.PDebugImage;
 import org.eclipse.ptp.debug.internal.ui.UIDebugManager;
-import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.debug.ui.views.ParallelDebugView;
 import org.eclipse.ptp.ui.IManager;
 import org.eclipse.ptp.ui.model.IElement;
@@ -55,13 +53,9 @@ public class StepReturnAction extends StepAction {
 	public void run() {
 		IManager manager = view.getUIManager();
 		if (manager instanceof UIDebugManager) {
-			try {
-				((UIDebugManager)manager).stepReturn(tasks);
-				resetTask();
-				update();
-			} catch (CoreException e) {
-				PTPDebugUIPlugin.errorDialog(getShell(), "Error", e.getStatus());				
-			}
+			setEnabled(false);
+			((UIDebugManager)manager).stepReturn(tasks);
+			resetTask();
 		}
 	}
 	public void resetTask() {
