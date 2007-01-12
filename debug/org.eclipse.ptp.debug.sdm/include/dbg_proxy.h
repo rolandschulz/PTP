@@ -82,7 +82,7 @@
 #define DBG_SIGNALINFO_FMT				"%s \"%s\""
 #define DBG_CLIHANDLE_FMT				"%s \"%s\""
 #define DBG_DATAEVALUATEEXPRESSION_FMT	"%s \"%s\""
-#define DBG_GETPARTIALAIF_FMT			"%s \"%s\" %d %d"
+#define DBG_GETPARTIALAIF_FMT			"%s \"%s\" \"%s\" %d %d"
 #define DBG_VARIABLEDELETE_FMT			"%s \"%s\""
 
 #endif /* _DBG_PROXY_H_ */

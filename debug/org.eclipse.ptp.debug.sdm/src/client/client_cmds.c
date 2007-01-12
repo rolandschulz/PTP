@@ -914,7 +914,7 @@ DbgClntGetPartialAIF(char **args)
 		return DBGRES_ERR;
 	}
 	
-	asprintf(&cmd, "%s \"%s\" %s %s", DBG_GETPARTIALAIF_CMD, args[2], args[3], args[4]);
+	asprintf(&cmd, "%s \"%s\" \"%s\" %s %s", DBG_GETPARTIALAIF_CMD, args[2], args[3], args[4], args[5]);
 	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, cmd, NULL);
 	bitset_free(set);
 	

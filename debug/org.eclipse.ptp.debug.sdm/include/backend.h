@@ -60,7 +60,7 @@ struct dbg_backend_funcs {
 	int (*signalinfo)(char*);
 	int (*clihandle)(char*);
 	int (*dataevaluateexpression)(char*);
-	int (*getpartialaif)(char*, int, int);
+	int (*getpartialaif)(char*, char*, int, int);
 	int (*variabledelete)(char*);
 	int (*quit)(void);
 };

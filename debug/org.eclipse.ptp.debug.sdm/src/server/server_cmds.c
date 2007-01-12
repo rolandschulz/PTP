@@ -342,7 +342,7 @@ svr_dataevaluateexpression(dbg_backend *db, char **args)
 static int
 svr_getpartialaif(dbg_backend *db, char **args)
 {
-	return db->db_funcs->getpartialaif(args[1], atoi(args[2]), atoi(args[3]));
+	return db->db_funcs->getpartialaif(args[1], args[2], atoi(args[3]), atoi(args[4]));
 }
 static int
 svr_variabledelete(dbg_backend *db, char **args)
