@@ -72,7 +72,7 @@ public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventList
 			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, "Control system is shut down", null));
 		}
 
-		List argList = new ArrayList();
+		List<String> argList = new ArrayList();
 		
 		argList.add("jobID");
 		argList.add(Integer.toString(jobID));
@@ -85,11 +85,11 @@ public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventList
 			argList.add(path);
 		}
 		argList.add("numOfProcs");
-		argList.add(Integer.valueOf(nProcs));
+		argList.add(Integer.toString(nProcs));
 		argList.add("procsPerNode");
-		argList.add(Integer.valueOf(nProcsPerNode));
+		argList.add(Integer.toString(nProcsPerNode));
 		argList.add("firstNodeNum");
-		argList.add(Integer.valueOf(firstNodeNum));
+		argList.add(Integer.toString(firstNodeNum));
 		
 		String dir = jobRunConfig.getWorkingDir();
 		if (dir != null) {

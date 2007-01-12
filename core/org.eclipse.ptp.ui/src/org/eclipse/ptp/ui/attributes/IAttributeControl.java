@@ -24,26 +24,28 @@ import org.eclipse.ptp.core.attributes.IAttribute.IllegalValue;
 import org.eclipse.swt.widgets.Control;
 
 public interface IAttributeControl {
-
+	
 	public void addPropertyChangeListener(IPropertyChangeListener listener);
 	
 	public void dispose();
-	
-	public abstract IAttribute getAttribute();
 
-	public abstract Control getControl();
-
-	public String getControlText();
+	public IAttribute getAttribute();
 	
+	public Control getControl();
+
 	public String getErrorMessage();
 	
-	public abstract boolean isValid();
+	public boolean isEnabled();
+	
+	public boolean isValid();
 
 	public void removePropertyChangeListener(IPropertyChangeListener listener);
 
 	public void resetToInitialValue();
 	
 	public void setCurrentToInitialValue();
+
+	public void setEnabled(boolean b);
 
 	public void setValue(String value) throws IllegalValue;
 

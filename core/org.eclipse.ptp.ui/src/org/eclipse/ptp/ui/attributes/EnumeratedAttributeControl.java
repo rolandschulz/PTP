@@ -64,8 +64,13 @@ public class EnumeratedAttributeControl extends AbstractAttributeControl {
 				Combo combo = (Combo) control;
 				selected = combo.getSelectionIndex();
 			}
+			assert(selected >= 0);
 			try {
+				String oldValue = attribute.getStringRep();
 				attribute.setValueIndex(selected);
+				String newValue = attribute.getStringRep();
+				fireValueChanged(oldValue, newValue);
+				
 			} catch (IllegalValue exc) {
 				// shouldn't happen
 				throw new RuntimeException(exc);
@@ -82,8 +87,7 @@ public class EnumeratedAttributeControl extends AbstractAttributeControl {
 	 * @param parent
 	 * @param style
 	 */
-	public EnumeratedAttributeControl(Composite parent, int style, EnumeratedAttribute attribute) {
-		super(parent, style);
+	public EnumeratedAttributeControl(EnumeratedAttribute attribute) {
 		this.attribute = attribute;
 		initialSelection = attribute.getValueIndex();
 		// should always be valid
@@ -95,12 +99,6 @@ public class EnumeratedAttributeControl extends AbstractAttributeControl {
 	 */
 	public IAttribute getAttribute() {
 		return attribute;
-	}
-
-	public String getControlText() {
-		// same as the attribute value,
-		// since it is always valid
-		return attribute.getStringRep();
 	}
 
 	@Override

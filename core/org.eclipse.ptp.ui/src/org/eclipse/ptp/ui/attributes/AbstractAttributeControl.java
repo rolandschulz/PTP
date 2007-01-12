@@ -29,21 +29,49 @@ public abstract class AbstractAttributeControl implements IAttributeControl {
 	
 	public static final String IS_VALID_PROPERTY = "IS_VALID";
 	public static final String VALUE_CHANGED_PROPERTY = "VALUE_CHANGED";
-	private final Control control;
-	private boolean isValid = true;
-	private final ListenerList listenerList = new ListenerList();
-	private String errorMessage = "";
-	
-	public AbstractAttributeControl(Composite parent, int style) {
-		this.control = doCreateControl(parent, style);
+	public static final String ATTRIBUTE_CONTROL_KEY = "ATTRIBUTE_CONTROL";
+
+	/**
+	 * Returns the AbstractAttributeControl associated with this Control
+	 * @param control the SWT Control associated with an AbstractAttributeControl
+	 * @return
+	 */
+	public static AbstractAttributeControl getAttributeControl(Control control) {
+		return (AbstractAttributeControl) control.getData(ATTRIBUTE_CONTROL_KEY);
 	}
+	
+	private Control control = null;
+	private boolean isValid = true;
+	
+	private final ListenerList listenerList = new ListenerList();
+
+	private String errorMessage = "";
 
 	public void addPropertyChangeListener(IPropertyChangeListener listener) {
 		listenerList.add(listener);
 	}
+
+	/**
+	 * Warning! Calling his method additional times will cause
+	 * the previous SWT Controls to be disposed.
+	 *  
+	 * @param parent
+	 * @param style
+	 * @return The SWT Control assocatiated with this AbstractAttributeControl
+	 */
+	public Control createControl(Composite parent, int style) {
+		if (control != null) {
+			control.dispose();
+		}
+		control = doCreateControl(parent, style);
+		control.setData(ATTRIBUTE_CONTROL_KEY, this);
+		control.setEnabled(getAttribute().isEnabled());
+		return control;
+	}
 	
 	public void dispose() {
-		control.dispose();
+		if (control != null)
+			control.dispose();
 	}
 
 	/* (non-Javadoc)
@@ -60,6 +88,13 @@ public abstract class AbstractAttributeControl implements IAttributeControl {
 
 	public String getErrorMessage() {
 		return errorMessage;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.attributes.IAttributeControl#isEnabled()
+	 */
+	public boolean isEnabled() {
+		return getControl().isEnabled();
 	}
 
 	/* (non-Javadoc)
@@ -86,6 +121,13 @@ public abstract class AbstractAttributeControl implements IAttributeControl {
 	 */
 	public abstract void setCurrentToInitialValue();
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.attributes.IAttributeControl#setEnabled(boolean)
+	 */
+	public void setEnabled(boolean b) {
+		getControl().setEnabled(b);
+	}
+
 	/**
 	 * @param parent
 	 * @param style
@@ -107,6 +149,7 @@ public abstract class AbstractAttributeControl implements IAttributeControl {
 	}
 
 	protected void setErrorMessage(String errorMessage) {
+		assert(errorMessage != null);
 		this.errorMessage = errorMessage;
 	}
 

@@ -26,8 +26,7 @@ import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.core.PreferenceConstants;
-import org.eclipse.ptp.internal.core.CoreMessages;
+import org.eclipse.ptp.simulation.internal.ui.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -116,15 +115,15 @@ public class SimulationPreferencePage extends PreferencePage implements IWorkben
 		Group aGroup = new Group(parent, SWT.SHADOW_ETCHED_IN);
 		aGroup.setLayout(createGridLayout(3, false, 10, 10));
 		aGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
-		aGroup.setText(CoreMessages.getResourceString("SimulationPreferencesPage.group_simulation")); //$NON-NLS-1$
+		aGroup.setText(Messages.getString("SimulationPreferencesPage.group_simulation")); //$NON-NLS-1$
 		
-		new Label(aGroup, SWT.NONE).setText(CoreMessages.getResourceString("SimulationPreferencesPage.createSimulationProject_combo")); //$NON-NLS-1$
+		new Label(aGroup, SWT.NONE).setText(Messages.getString("SimulationPreferencesPage.createSimulationProject_combo")); //$NON-NLS-1$
 		final Combo projectCombo = new Combo(aGroup, SWT.READ_ONLY);
 		//FIXME hard code for c project 
 		projectCombo.add("C"); //$NON-NLS-1$
 		
 		Button createSimulationButton = new Button(aGroup, SWT.PUSH);
-		createSimulationButton.setText(CoreMessages.getResourceString("SimulationPreferencesPage.createSimulationProject_button")); //$NON-NLS-1$
+		createSimulationButton.setText(Messages.getString("SimulationPreferencesPage.createSimulationProject_button")); //$NON-NLS-1$
 		createSimulationButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				if (projectCombo.getSelectionIndex() > -1) {
@@ -133,7 +132,7 @@ public class SimulationPreferencePage extends PreferencePage implements IWorkben
 					try {
 						simulationProject.createSimulatorProject();
 					} catch (CoreException e) {
-						ErrorDialog.openError(getShell(), CoreMessages.getResourceString("SimulationPreferencePage.ErrorFound"), CoreMessages.getResourceString("SimulationPreferencePage.CannotCreateProject"), e.getStatus());					 //$NON-NLS-1$ //$NON-NLS-2$
+						ErrorDialog.openError(getShell(), Messages.getString("SimulationPreferencePage.ErrorFound"), Messages.getString("SimulationPreferencePage.CannotCreateProject"), e.getStatus());					 //$NON-NLS-1$ //$NON-NLS-2$
 					}
 				}
 			}
@@ -145,10 +144,10 @@ public class SimulationPreferencePage extends PreferencePage implements IWorkben
 		Group aGroup = new Group(parent, SWT.SHADOW_ETCHED_IN);
 		aGroup.setLayout(createGridLayout(1, true, 10, 10));
 		aGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
-		aGroup.setText(CoreMessages.getResourceString("SimulationPreferencesPage.group_main")); //$NON-NLS-1$
+		aGroup.setText(Messages.getString("SimulationPreferencesPage.group_main")); //$NON-NLS-1$
 		
 		Label ortedComment = new Label(aGroup, SWT.WRAP);
-		ortedComment.setText(CoreMessages.getResourceString("SimulationPreferencePage.NumSimulatedMachines")); //$NON-NLS-1$
+		ortedComment.setText(Messages.getString("SimulationPreferencePage.NumSimulatedMachines")); //$NON-NLS-1$
 		
 		spin = new Spinner(aGroup, SWT.READ_ONLY);
 		spin.setMinimum(1);
@@ -157,15 +156,15 @@ public class SimulationPreferencePage extends PreferencePage implements IWorkben
 		Group bGroup = new Group(parent, SWT.SHADOW_ETCHED_IN);
 		bGroup.setLayout(createGridLayout(1, true, 10, 10));
 		bGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL, 2));
-		bGroup.setText(CoreMessages.getResourceString("SimulationPreferencesPage.group_machines")); //$NON-NLS-1$
+		bGroup.setText(Messages.getString("SimulationPreferencesPage.group_machines")); //$NON-NLS-1$
 		
-		new Label(bGroup, SWT.NONE).setText(CoreMessages.getResourceString("SimulationPreferencePage.SelectMachine")); //$NON-NLS-1$
+		new Label(bGroup, SWT.NONE).setText(Messages.getString("SimulationPreferencePage.SelectMachine")); //$NON-NLS-1$
 		
 		mcombo = new Combo(bGroup, SWT.READ_ONLY);
 		mcombo.addSelectionListener(listener);
 		
 		nodeLabel = new Label(bGroup, SWT.NONE);
-		nodeLabel.setText(CoreMessages.getResourceString("SimulationPreferencePage.NumNodesMachine_0")); //$NON-NLS-1$
+		nodeLabel.setText(Messages.getString("SimulationPreferencePage.NumNodesMachine_0")); //$NON-NLS-1$
 		nodeLabel.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
 		
 		nodeText = new Text(bGroup, SWT.BORDER | SWT.SINGLE);
@@ -214,7 +213,7 @@ public class SimulationPreferencePage extends PreferencePage implements IWorkben
 		mcombo.removeAll();
 		
 		for(int i=0; i< choice; i++) {
-			mcombo.add(CoreMessages.getResourceString("SimulationPreferencePage.Machine")+i); //$NON-NLS-1$
+			mcombo.add(Messages.getString("SimulationPreferencePage.Machine")+i); //$NON-NLS-1$
 		}
 		
 		/* put the user back on their selection */
@@ -229,7 +228,7 @@ public class SimulationPreferencePage extends PreferencePage implements IWorkben
 		mcombo.pack();
 		
 		sel = mcombo.getSelectionIndex();
-		nodeLabel.setText(CoreMessages.getResourceString("SimulationPreferencePage.NumNodesMachine")+(sel)+":"); //$NON-NLS-1$ //$NON-NLS-2$
+		nodeLabel.setText(Messages.getString("SimulationPreferencePage.NumNodesMachine")+(sel)+":"); //$NON-NLS-1$ //$NON-NLS-2$
 		//nodeLabel.pack();
 		if(nodes != null)
 			nodeText.setText(""+nodes[sel]+""); //$NON-NLS-1$ //$NON-NLS-2$

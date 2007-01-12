@@ -32,6 +32,7 @@ import org.eclipse.ptp.core.elementcontrols.IPElementControl;
 import org.eclipse.ptp.core.elementcontrols.IPJobControl;
 import org.eclipse.ptp.core.elementcontrols.IPNodeControl;
 import org.eclipse.ptp.core.elementcontrols.IPProcessControl;
+import org.eclipse.ptp.core.util.OutputTextFile;
 
 public class PProcess extends Parent implements IPProcessControl {
 	protected String NAME_TAG = "process ";

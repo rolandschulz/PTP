@@ -40,9 +40,7 @@ import org.eclipse.ptp.core.elementcontrols.IPElementControl;
 import org.eclipse.ptp.core.elementcontrols.IPNodeControl;
 import org.eclipse.ptp.core.elementcontrols.IPProcessControl;
 import org.eclipse.ptp.core.events.IProcessEvent;
-import org.eclipse.ptp.internal.core.OutputTextFile;
-import org.eclipse.ptp.internal.core.PElement;
-import org.eclipse.ptp.internal.core.PElementInfo;
+import org.eclipse.ptp.core.util.OutputTextFile;
 import org.eclipse.search.ui.ISearchPageScoreComputer;
 
 public class SimProcess extends Process implements IPProcessControl, IPElementControl, Comparable {
@@ -165,6 +163,7 @@ public class SimProcess extends Process implements IPProcessControl, IPElementCo
 	public String getProcessNumber() {
 		return "" + getTaskId() + "";
 	}
+	
 	private void fireEvent(IProcessEvent event) {
 		for (Iterator i=listeners.iterator(); i.hasNext();) {
 			IProcessListener listener = (IProcessListener)i.next();

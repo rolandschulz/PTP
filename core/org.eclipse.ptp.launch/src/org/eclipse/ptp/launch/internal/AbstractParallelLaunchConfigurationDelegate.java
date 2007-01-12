@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -39,10 +40,15 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
+import org.eclipse.ptp.core.IPUniverse;
+import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.IAttribute;
+import org.eclipse.ptp.core.attributes.IAttribute.IllegalValue;
 import org.eclipse.ptp.debug.core.launch.PLaunch;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.internal.ui.LaunchMessages;
+import org.eclipse.ptp.launch.ui.ParallelTab;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rtsystem.JobRunConfiguration;
 
 /**
@@ -99,7 +105,8 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 		return (String[]) arguments.toArray(new String[arguments.size()]);
 	}
 	
-	protected JobRunConfiguration getJobRunConfiguration(ILaunchConfiguration configuration) throws CoreException
+	protected JobRunConfiguration getJobRunConfiguration(ILaunchConfiguration configuration)
+	throws CoreException
 	{
 		IFile programFile = getProgramFile(configuration);
 		String resourceManagerName = getResourceManagerName(configuration);	
@@ -115,11 +122,41 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 				args, env, dir);
 	}
 	
-   private IAttribute[] getLaunchAttributes(ILaunchConfiguration configuration) {
-		// TODO Auto-generated method stub
-		return null;
+	private IAttribute[] getLaunchAttributes(ILaunchConfiguration configuration)
+	throws CoreException {
+
+		String resourceManagerName = getResourceManagerName(configuration);	
+		String machineName = getMachineName(configuration);	
+		String queueName = getQueueName(configuration);	
+
+		IAttribute[] attrs = new IAttribute[0];
+		IPUniverse universe = PTPCorePlugin.getDefault().getUniverse();
+		IResourceManager[] rms = universe.getResourceManagers();
+		for (IResourceManager rm : rms) {
+			if (rm.getElementName().equals(resourceManagerName)) {
+				attrs = rm.getLaunchAttributes(machineName, queueName, attrs);
+				break;
+			}
+		}
+
+		Map<String, String> configAttrValueMap =
+			ParallelTab.getConfigurationAttributeValueMap(configuration);
+		for (IAttribute attr : attrs) {
+			if (attr.isEnabled()) {
+				String uniqueId = attr.getDescription().getUniqueId();
+				String value = configAttrValueMap.get(uniqueId);
+				try {
+					attr.setValue(value);
+				} catch (IllegalValue e) {
+					// shouldn't happen
+					PTPCorePlugin.log(e);
+				}
+			}
+		}
+		return attrs;
 	}
-protected String verifyWorkDirectory(ILaunchConfiguration configuration) throws CoreException {
+   
+   protected String verifyWorkDirectory(ILaunchConfiguration configuration) throws CoreException {
         String workPath = getWorkDirectory(configuration);
         if (workPath == null) {
 			IProject project = verifyProject(configuration);

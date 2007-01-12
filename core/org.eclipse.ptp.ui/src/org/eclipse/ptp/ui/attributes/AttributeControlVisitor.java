@@ -24,8 +24,6 @@ import org.eclipse.ptp.core.attributes.DoubleAttribute;
 import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.IntegerAttribute;
 import org.eclipse.ptp.core.attributes.StringAttribute;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Composite;
 
 public class AttributeControlVisitor implements DateAttribute.IVisitor,
 		BooleanAttribute.IVisitor,
@@ -34,64 +32,54 @@ public class AttributeControlVisitor implements DateAttribute.IVisitor,
 		StringAttribute.IVisitor,
 		EnumeratedAttribute.IVisitor {
 	
-	private IAttributeControl editor = null;
-	private final Composite parent;
-	private int style;
+	private AbstractAttributeControl attributeControl = null;
 	
-	/**
-	 * @param parent
-	 * @param style
-	 */
-	public AttributeControlVisitor(final Composite parent, final int style) {
-		this.parent = parent;
-		this.style = style;
+	AttributeControlVisitor() {
+		// This is a default package scope method to keep other objects outside
+		// of this package from using this visitor
 	}
-
-	public IAttributeControl getEditor() {
-		return editor;
-	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.attributes.BooleanAttribute.IVisitor#visit(org.eclipse.ptp.core.attributes.BooleanAttribute)
 	 */
 	public void visit(BooleanAttribute attribute) {
-		// we must have a check or toggle
-		if ((style & (SWT.CHECK | SWT.TOGGLE)) == 0) {
-			style |= SWT.CHECK;
-		}
-		editor = new BooleanAttributeControl(parent, style, attribute);
+		attributeControl = new BooleanAttributeControl(attribute);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.attributes.DateAttribute.IVisitor#visit(org.eclipse.ptp.core.attributes.DateAttribute)
 	 */
 	public void visit(DateAttribute attribute) {
-		editor = new TextAttributeControl(parent, style, attribute);
+		attributeControl = new TextAttributeControl(attribute);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.attributes.DoubleAttribute.IVisitor#visit(org.eclipse.ptp.core.attributes.DoubleAttribute)
 	 */
 	public void visit(DoubleAttribute attribute) {
-		editor = new TextAttributeControl(parent, style, attribute);
+		attributeControl = new TextAttributeControl(attribute);
 	}
 
 	public void visit(EnumeratedAttribute attribute) {
-		editor = new EnumeratedAttributeControl(parent, style, attribute);
+		attributeControl = new EnumeratedAttributeControl(attribute);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.attributes.IntegerAttribute.IVisitor#visit(org.eclipse.ptp.core.attributes.IntegerAttribute)
 	 */
 	public void visit(IntegerAttribute attribute) {
-		editor = new TextAttributeControl(parent, style, attribute);
+		attributeControl = new TextAttributeControl(attribute);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.attributes.StringAttribute.IVisitor#visit(org.eclipse.ptp.core.attributes.StringAttribute)
 	 */
 	public void visit(StringAttribute attribute) {
-		editor = new TextAttributeControl(parent, style, attribute);
+		attributeControl = new TextAttributeControl(attribute);
+	}
+
+	AbstractAttributeControl getAttributeControl() {
+		return attributeControl;
 	}
 
 }

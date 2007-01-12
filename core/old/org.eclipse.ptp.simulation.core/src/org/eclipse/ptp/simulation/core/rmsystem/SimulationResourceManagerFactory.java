@@ -18,9 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.simulation.core.rmsystem;
 
-import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory;
 import org.eclipse.ptp.rmsystem.IResourceManager;
@@ -38,13 +36,7 @@ public class SimulationResourceManagerFactory extends
 	public IResourceManager create(IResourceManagerConfiguration confIn) {
 		SimulationRMConfiguration configuration = (SimulationRMConfiguration) confIn;
 		final PTPCorePlugin plugin = PTPCorePlugin.getDefault();
-		Preferences p = plugin.getPluginPreferences();
-		//p.setValue(PreferenceConstants.MONITORING_SYSTEM_SELECTION, MSI);
-		//p.setValue(PreferenceConstants.CONTROL_SYSTEM_SELECTION, CSI);
-		p.setValue(PreferenceConstants.DEVELOPER_MODE, true);
 		plugin.savePluginPreferences();
-//		ModelManager manager = new ModelManager(configuration.getNumMachines(),
-//				configuration.getNumNodesPerMachines());
 		final IPUniverseControl universe = (IPUniverseControl) plugin.getUniverse();
 		return new SimulationResourceManager(universe, configuration);
 	}

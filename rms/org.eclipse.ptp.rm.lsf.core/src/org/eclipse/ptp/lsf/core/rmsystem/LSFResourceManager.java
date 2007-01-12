@@ -43,6 +43,15 @@ public class LSFResourceManager extends AbstractProxyResourceManager {
 	}
 
 	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManager#getLaunchAttributes(java.lang.String, java.lang.String)
+	 */
+	public IAttribute[] getLaunchAttributes(String machine, String queue,
+			IAttribute[] currentAttrs) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.AbstractProxyResourceManager#doAfterCloseConnection()
 	 */
 	protected void doAfterCloseConnection() {
@@ -80,11 +89,6 @@ public class LSFResourceManager extends AbstractProxyResourceManager {
 	protected void doDispose() {
 		// TODO Auto-generated method stub
 
-	}
-
-	public IAttribute[] getLaunchAttributes(IPMachineControl machine, IPQueueControl queue) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 }

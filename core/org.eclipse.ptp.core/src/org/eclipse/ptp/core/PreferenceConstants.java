@@ -27,16 +27,8 @@ public interface PreferenceConstants {
 	public static final String JOB_WORK_DIR = "work_dir";
 	public static final String JOB_ARGS = "args";
 	
-	public static final String MONITORING_SYSTEM_SELECTION = "MONITORING_SYSTEM_SELECTION";
-	public static final String CONTROL_SYSTEM_SELECTION = "CONTROL_SYSTEM_SELECTION";
 	public static final String OUTPUT_DIR = "OUTPUT_DIR";
 	public static final String STORE_LINE = "STORE_LINE";
-	public static final String DEVELOPER_MODE = "DEVELOPER_MODE";
 	public int DEF_STORE_LINE = 100;
 	public String DEF_OUTPUT_DIR_NAME = "output";
-
-	public static final String SIMULATION_MACHINE_NODE_PREFIX = "SIMULATION_MACHINE_NODE_";
-	public static final String SIMULATION_NUM_MACHINES = "SIMULATION_NUM_MACHINES";
-	public final static String SIMULATION_PROJECT_NAME = "PTPSimulation";
-	public final static String SIMULATION_FILE_NAME = "main";
 }

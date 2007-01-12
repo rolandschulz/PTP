@@ -44,9 +44,7 @@ public class BooleanAttributeControl extends AbstractAttributeControl {
 	 * @param style
 	 * @param attribute
 	 */
-	public BooleanAttributeControl(Composite parent, int style,
-			BooleanAttribute attribute) {
-		super(parent, style);
+	public BooleanAttributeControl(BooleanAttribute attribute) {
 		this.attribute = attribute;
 		initialValue = attribute.getValue();
 		
@@ -56,10 +54,6 @@ public class BooleanAttributeControl extends AbstractAttributeControl {
 
 	public IAttribute getAttribute() {
 		return attribute;
-	}
-
-	public String getControlText() {
-		return Boolean.toString((getButton()).getSelection());
 	}
 
 	@Override
@@ -89,7 +83,7 @@ public class BooleanAttributeControl extends AbstractAttributeControl {
 				Boolean newValue = new Boolean(selected);
 				if (oldValue.equals(newValue)) {
 					attribute.setValue(newValue);
-					firePropertyChanged(VALUE_CHANGED_PROPERTY, oldValue, newValue);
+					fireValueChanged(oldValue, newValue);
 				}				
 			}});
 		return button;
