@@ -563,123 +563,166 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 		return debugModel.getTasks(job_id, set_id);
 	}
 	/** Resume debugger
-	 * @throws CoreException
 	 */
-	public void resume() throws CoreException {
+	public void resume() {
 		resume(getCurrentJobId(), getCurrentSetId());
 	}
 	/** Resume debugger
 	 * @param job_id job ID
 	 * @param set_id set ID
-	 * @throws CoreException
 	 */
-	public void resume(String job_id, String set_id) throws CoreException {
-		IPCDISession session = getDebugSession(job_id);
-		if (session == null)
-			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null));
-		try {
-			session.resume(getTasks(job_id, set_id));
-		} catch (PCDIException e) {
-			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));
-		}
+	public void resume(final String job_id, final String set_id) {
+		WorkbenchJob uiJob = new WorkbenchJob("PTP Resume...") {
+			public IStatus runInUIThread(IProgressMonitor monitor) {
+				IPCDISession session = getDebugSession(job_id);
+				if (session == null)
+					return new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null);
+				try {
+					session.resume(getTasks(job_id, set_id));
+				} catch (CoreException e) {
+					return e.getStatus();
+				} catch (PCDIException e) {
+					return new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null);
+				}
+				return Status.OK_STATUS;
+			}
+		};
+		uiJob.setSystem(true);
+		uiJob.setPriority(Job.INTERACTIVE);
+		uiJob.schedule();
 	}
 	/** Suspend debugger
-	 * @throws CoreException
 	 */
-	public void suspend() throws CoreException {
+	public void suspend() {
 		suspend(getCurrentJobId(), getCurrentSetId());
 	}
 	/** Suspend debugger
 	 * @param job_id
 	 * @param set_id
-	 * @throws CoreException
 	 */
-	public void suspend(String job_id, String set_id) throws CoreException {
-		IPCDISession session = getDebugSession(job_id);
-		if (session == null)
-			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null));
-		try {
-			session.suspend(getTasks(job_id, set_id));
-		} catch (PCDIException e) {
-			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));
-		}
+	public void suspend(final String job_id, final String set_id) {
+		WorkbenchJob uiJob = new WorkbenchJob("PTP Suspend...") {
+			public IStatus runInUIThread(IProgressMonitor monitor) {
+				IPCDISession session = getDebugSession(job_id);
+				if (session == null)
+					return new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null);
+				try {
+					session.suspend(getTasks(job_id, set_id));
+				} catch (CoreException e) {
+					return e.getStatus();
+				} catch (PCDIException e) {
+					return new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null);
+				}
+				return Status.OK_STATUS;
+			}
+		};
+		uiJob.setSystem(true);
+		uiJob.setPriority(Job.INTERACTIVE);
+		uiJob.schedule();
 	}
 	/** Terminate debugger
-	 * @throws CoreException
 	 */
-	public void terminate() throws CoreException {
+	public void terminate() {
 		terminate(getCurrentJobId(), getCurrentSetId());
 	}
 	/** Terminate debugger
 	 * @param job_id
 	 * @param set_id
-	 * @throws CoreException
 	 */
-	public void terminate(String job_id, String set_id) throws CoreException {
-		IPJob job = findJobById(job_id);
-		if (isDebugMode(job)) {
-			IPCDISession session = getDebugSession(job);
-			if (session == null)
-				throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null));
-			try {
-				session.stop(getTasks(job_id, set_id));
-			} catch (PCDIException e) {
-				throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));
+	public void terminate(final String job_id, final String set_id) {
+		WorkbenchJob uiJob = new WorkbenchJob("PTP Terminate...") {
+			public IStatus runInUIThread(IProgressMonitor monitor) {
+				IPJob job = findJobById(job_id);
+				if (isDebugMode(job)) {
+					IPCDISession session = getDebugSession(job);
+					if (session == null)
+						return new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null);
+					try {
+						session.stop(getTasks(job_id, set_id));
+					} catch (CoreException e) {
+						return e.getStatus();
+					} catch (PCDIException e) {
+						return new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null);
+					}
+				} else {
+					try {
+						terminateAll(job_id);
+					} catch (CoreException e) {
+						return e.getStatus();
+					}
+				}
+				return Status.OK_STATUS;
 			}
-		} else {
-			super.terminateAll(job_id);
-		}
+		};
+		uiJob.setSystem(true);
+		uiJob.setPriority(Job.INTERACTIVE);
+		uiJob.schedule();
 	}
 	/** Step into debugger
-	 * @throws CoreException
 	 */
-	public void stepInto() throws CoreException {
+	public void stepInto() {
 		stepInto(getCurrentJobId(), getCurrentSetId());
 	}
 	/** Step into debugger
 	 * @param job_id
 	 * @param set_id
-	 * @throws CoreException
 	 */
-	public void stepInto(String job_id, String set_id) throws CoreException {
-		IPCDISession session = getDebugSession(job_id);
-		if (session == null)
-			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null));
-		try {
-			BitList tasks = getTasks(job_id, set_id);
-			filterRunningTasks(tasks, STEP_INTO);
-			session.steppingInto(tasks);
-		} catch (PCDIException e) {
-			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));
-		}
+	public void stepInto(final String job_id, final String set_id) {
+		WorkbenchJob uiJob = new WorkbenchJob("PTP Step into...") {
+			public IStatus runInUIThread(IProgressMonitor monitor) {
+				IPCDISession session = getDebugSession(job_id);
+				if (session == null)
+					return new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null);
+				try {
+					BitList tasks = getTasks(job_id, set_id);
+					filterRunningTasks(tasks, STEP_INTO);
+					session.steppingInto(tasks);
+				} catch (CoreException e) {
+					return e.getStatus();
+				} catch (PCDIException e) {
+					return new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null);
+				}
+				return Status.OK_STATUS;
+			}
+		};
+		uiJob.setSystem(true);
+		uiJob.setPriority(Job.INTERACTIVE);
+		uiJob.schedule();
 	}
 	/** Step over debugger
-	 * @throws CoreException
 	 */
-	public void stepOver() throws CoreException {
+	public void stepOver() {
 		stepOver(getCurrentJobId(), getCurrentSetId());
 	}
 	/** Step over debugger
 	 * @param job_id
 	 * @param set_id
-	 * @throws CoreException
 	 */
-	public void stepOver(String job_id, String set_id) throws CoreException {
-		IPCDISession session = getDebugSession(job_id);
-		if (session == null)
-			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null));
-		try {
-			BitList tasks = getTasks(job_id, set_id);
-			filterRunningTasks(tasks, STEP_OVER);
-			session.steppingOver(tasks);
-		} catch (PCDIException e) {
-			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));
-		}
+	public void stepOver(final String job_id, final String set_id) {
+		WorkbenchJob uiJob = new WorkbenchJob("PTP Step over...") {
+			public IStatus runInUIThread(IProgressMonitor monitor) {
+				IPCDISession session = getDebugSession(job_id);
+				if (session == null)
+					return new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null);
+				try {
+					BitList tasks = getTasks(job_id, set_id);
+					filterRunningTasks(tasks, STEP_OVER);
+					session.steppingOver(tasks);
+				} catch (CoreException e) {
+					return e.getStatus();
+				} catch (PCDIException e) {
+					return new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null);
+				}
+				return Status.OK_STATUS;
+			}
+		};
+		uiJob.setSystem(true);
+		uiJob.setPriority(Job.INTERACTIVE);
+		uiJob.schedule();
 	}
 	/** Step return debugger
-	 * @throws CoreException
 	 */
-	public void stepReturn(BitList tasks) throws CoreException {
+	public void stepReturn(BitList tasks) {
 		stepReturn(tasks, getCurrentJobId(), getCurrentSetId());
 	}
 	/** Step return debugger
@@ -687,20 +730,28 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	 * @param set_id
 	 * @throws CoreException
 	 */
-	public void stepReturn(BitList tasks, String job_id, String set_id) throws CoreException {
-		if (tasks == null) {
-			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No task selected", null));
-		}
-		IPCDISession session = getDebugSession(job_id);
-		if (session == null)
-			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null));
-		try {
-			//BitList tasks = getTasks(job_id, set_id);
-			filterRunningTasks(tasks, STEP_RETURN);
-			session.steppingReturn(tasks);
-		} catch (PCDIException e) {
-			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));
-		}
+	public void stepReturn(final BitList tasks, final String job_id, final String set_id) {
+		WorkbenchJob uiJob = new WorkbenchJob("PTP Step over...") {
+			public IStatus runInUIThread(IProgressMonitor monitor) {
+				if (tasks == null) {
+					return new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No task selected", null);
+				}
+				IPCDISession session = getDebugSession(job_id);
+				if (session == null)
+					return new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null);
+				try {
+					//BitList tasks = getTasks(job_id, set_id);
+					filterRunningTasks(tasks, STEP_RETURN);
+					session.steppingReturn(tasks);
+				} catch (PCDIException e) {
+					return new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null);
+				}
+				return Status.OK_STATUS;
+			}
+		};
+		uiJob.setSystem(true);
+		uiJob.setPriority(Job.INTERACTIVE);
+		uiJob.schedule();
 	}
 	public BitList[] filterStepReturnTasks(BitList tasks) {
 		return filterStepReturnTasks(tasks, getCurrentJobId());
@@ -829,7 +880,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 			ISelection selection = viewer.getSelection();
 			if (!selection.isEmpty() && selection instanceof IStructuredSelection) {
 				Object obj = ((IStructuredSelection)selection).getFirstElement();
-				if (obj instanceof IStep) {
+				if (obj instanceof IStep && obj instanceof IPDebugElement) {
 					int taskID = ((IPDebugElement)obj).getDebugTarget().getTargetID();
 					if (tasks.get(taskID)) {
 						switch (step) {
