@@ -30,4 +30,9 @@ public interface IAttributeDescription extends Comparable {
 	 */
 	String getName();
 	
+	/**
+	 * @return
+	 */
+	String getUniqueId();
+	
 }

@@ -26,12 +26,9 @@ import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.ptp.core.ControlSystemChoices;
-import org.eclipse.ptp.core.MonitoringSystemChoices;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.PreferenceConstants;
-import org.eclipse.ptp.internal.core.CoreMessages;
-import org.eclipse.ptp.ui.PTPUIPlugin;
+import org.eclipse.ptp.ui.UIMessage;
 import org.eclipse.ptp.ui.utils.SWTUtil;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -42,7 +39,6 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DirectoryDialog;
@@ -57,20 +53,13 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 	protected Text outputDirText = null;
 	protected Button browseButton = null;
 	protected IntegerFieldEditor storeLineField = null;
-	protected Combo comboCS = null;
-	protected Combo comboMS = null;
 	private String outputDIR = EMPTY_STRING;
 	private String defaultOutputDIR = "/tmp";
 	private int storeLine = PreferenceConstants.DEF_STORE_LINE;
-	private int MSChoiceID = -1;
-	private int CSChoiceID = -1;
-	private int lastMSChoiceID = -1;
-	private int lastCSChoiceID = -1;
-	protected Button develModeButton = null;
 
 	public PTPPreferencesPage() {
 		setPreferenceStore(PTPCorePlugin.getDefault().getPreferenceStore());
-		// setDescription(CoreMessages.getResourceString("PTPPreferencesPage.preferencesDescription"));
+		// setDescription(UIMessage.getResourceString("PTPPreferencesPage.preferencesDescription"));
 	}
 
 	protected class WidgetListener extends SelectionAdapter implements ModifyListener, IPropertyChangeListener {
@@ -96,11 +85,7 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 		Composite composite = new Composite(parent, SWT.NONE);
 		composite.setLayout(createGridLayout(1, true, 0, 0));
 		composite.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
-		createChooseRSContents(composite);
-		// createMPICTRLContents(composite);
 		createOutputContents(composite);
-		develModeButton = createCheckButton(composite,
-			CoreMessages.getResourceString("PTPPreferencesPage.devel_mode"));
 		loadSaved();
 		defaultSetting();
 		return composite;
@@ -122,40 +107,24 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 		Group aGroup = new Group(parent, SWT.SHADOW_ETCHED_IN);
 		aGroup.setLayout(createGridLayout(1, true, 10, 10));
 		aGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
-		aGroup.setText(CoreMessages.getResourceString("PTPPreferencesPage.group_output"));
+		aGroup.setText(UIMessage.getResourceString("PTPPreferencesPage.group_output"));
 		Composite outputComposite = new Composite(aGroup, SWT.NONE);
 		outputComposite.setLayout(createGridLayout(3, false, 0, 0));
 		outputComposite.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 5));
-		new Label(outputComposite, SWT.NONE).setText(CoreMessages.getResourceString("PTPPreferencesPage.output_text"));
+		new Label(outputComposite, SWT.NONE).setText(UIMessage.getResourceString("PTPPreferencesPage.output_text"));
 		outputDirText = new Text(outputComposite, SWT.SINGLE | SWT.BORDER);
 		outputDirText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		outputDirText.addModifyListener(listener);
-		browseButton = SWTUtil.createPushButton(outputComposite, CoreMessages.getResourceString("PTPPreferencesPage.browseButton"), null);
+		browseButton = SWTUtil.createPushButton(outputComposite, UIMessage.getResourceString("PTPPreferencesPage.browseButton"), null);
 		browseButton.addSelectionListener(listener);
 		Composite lineComposite = new Composite(aGroup, SWT.NONE);
 		lineComposite.setLayout(new FillLayout());
 		lineComposite.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 5));
-		storeLineField = new IntegerFieldEditor(PreferenceConstants.STORE_LINE, CoreMessages.getResourceString("PTPPreferencesPage.store_line_text"), lineComposite);
+		storeLineField = new IntegerFieldEditor(PreferenceConstants.STORE_LINE, UIMessage.getResourceString("PTPPreferencesPage.store_line_text"), lineComposite);
 		storeLineField.setPropertyChangeListener(listener);
 		storeLineField.setEmptyStringAllowed(false);
 	}
-	private void createChooseRSContents(Composite parent) {
-		Group aGroup = new Group(parent, SWT.SHADOW_ETCHED_IN);
-		aGroup.setLayout(createGridLayout(1, true, 10, 10));
-		aGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
-		aGroup.setText(CoreMessages.getResourceString("PTPPreferencesPage.group_rs"));
-		new Label(aGroup, SWT.NONE).setText(CoreMessages.getResourceString("PTPPreferencesPage.group_cs"));
-		comboCS = new Combo(aGroup, SWT.READ_ONLY);
-		comboCS.setItems(ControlSystemChoices.getCSStrings());
-		comboCS.addSelectionListener(listener);
-		new Label(aGroup, SWT.NONE).setText(CoreMessages.getResourceString("PTPPreferencesPage.group_ms"));
-		comboMS = new Combo(aGroup, SWT.READ_ONLY);
-		comboMS.setItems(MonitoringSystemChoices.getMSStrings());
-		comboMS.addSelectionListener(listener);
-	}
 	protected void defaultSetting() {
-		comboMS.select(MonitoringSystemChoices.getMSArrayIndexByID(MSChoiceID));
-		comboCS.select(ControlSystemChoices.getCSArrayIndexByID(CSChoiceID));
 		outputDirText.setText(outputDIR);
 		storeLineField.setStringValue(String.valueOf(storeLine));
 	}
@@ -177,13 +146,6 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 			outputDirText.setText(outputDIR);
 		storeLine = preferences.getInt(PreferenceConstants.STORE_LINE);
 		storeLineField.setStringValue(String.valueOf(storeLine));
-		MSChoiceID = preferences.getInt(PreferenceConstants.MONITORING_SYSTEM_SELECTION);
-		comboMS.select(MonitoringSystemChoices.getMSArrayIndexByID(MSChoiceID));
-		lastMSChoiceID = MSChoiceID;
-		CSChoiceID = preferences.getInt(PreferenceConstants.CONTROL_SYSTEM_SELECTION);
-		comboCS.select(ControlSystemChoices.getCSArrayIndexByID(CSChoiceID));
-		lastCSChoiceID = CSChoiceID;
-		develModeButton.setSelection(preferences.getBoolean(PreferenceConstants.DEVELOPER_MODE));
 	}
 	/* do stuff on init() of preferences, if anything */
 	public void init(IWorkbench workbench) {}
@@ -195,19 +157,14 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 		updateApplyButton();
 	}
 	private void store() {
-		MSChoiceID = MonitoringSystemChoices.getMSIDByIndex(comboMS.getSelectionIndex());
-		CSChoiceID = ControlSystemChoices.getCSIDByIndex(comboCS.getSelectionIndex());
 		outputDIR = outputDirText.getText();
 		storeLine = storeLineField.getIntValue();
 	}
 	public boolean performOk() {
 		store();
 		Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
-		preferences.setValue(PreferenceConstants.MONITORING_SYSTEM_SELECTION, MSChoiceID);
-		preferences.setValue(PreferenceConstants.CONTROL_SYSTEM_SELECTION, CSChoiceID);
 		preferences.setValue(PreferenceConstants.OUTPUT_DIR, outputDIR);
 		preferences.setValue(PreferenceConstants.STORE_LINE, storeLine);
-		preferences.setValue(PreferenceConstants.DEVELOPER_MODE, develModeButton.getSelection());
 		PTPCorePlugin.getDefault().savePluginPreferences();
 		/*
 		 * IModelManager manager = PTPCorePlugin.getDefault().getModelManager(); 
@@ -217,13 +174,11 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 		File outputDirPath = new File(outputDIR);
 		if (!outputDirPath.exists())
 			outputDirPath.mkdir();
-		lastCSChoiceID = CSChoiceID;
-		lastMSChoiceID = MSChoiceID;
 		return true;
 	}
 	protected void handleOutputDirectoryBrowseButtonSelected() {
 		DirectoryDialog dialog = new DirectoryDialog(getShell());
-		dialog.setText(CoreMessages.getResourceString("PTPPreferencesPage.Select_Output_Directory"));
+		dialog.setText(UIMessage.getResourceString("PTPPreferencesPage.Select_Output_Directory"));
 		String currectDirPath = getFieldContent(outputDirText.getText());
 		if (currectDirPath != null) {
 			File path = new File(currectDirPath);
@@ -234,74 +189,10 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 		if (selectedDirPath != null)
 			outputDirText.setText(selectedDirPath);
 	}
-	/**
-	 * Returns true if the selected monitoring system is a valid selection. We allow the system to display MS choices which are not yet complete or enabled yet.
-	 */
-	protected boolean isValidMSSetting() {
-		int MS = comboMS.getSelectionIndex();
-		if (MS < 0) {
-			setErrorMessage("Select a monitoring system.");
-			setValid(false);
-			return false;
-		}
-		int MSID = MonitoringSystemChoices.getMSIDByIndex(MS);
-		switch (MSID) {
-		case MonitoringSystemChoices.SIMULATED:
-		case MonitoringSystemChoices.ORTE:
-		case MonitoringSystemChoices.MPICH2:
-			break;
-		default:
-			setErrorMessage("Sorry, that monitoring system choice is not yet implemented.");
-			setValid(false);
-			return false;
-		} 
-		return true;
-	}
-	/**
-	 * Returns true if the selected control system is a valid selection. We allow the system to display CS choices which are not yet complete or enabled yet.
-	 */
-	protected boolean isValidCSSetting() {
-		int CS = comboCS.getSelectionIndex();
-		if (CS < 0) {
-			setErrorMessage("Select a control system.");
-			setValid(false);
-			return false;
-		}
-		int CSID = ControlSystemChoices.getCSIDByIndex(CS);
-		switch (CSID) {
-		case ControlSystemChoices.SIMULATED:
-		case ControlSystemChoices.ORTE:
-		case ControlSystemChoices.MPICH2:
-			break;
-		default:
-			setErrorMessage("Sorry, that control system choice is not yet implemented.");
-			setValid(false);
-			return false;
-		}
-		return true;
-	}
-	/**
-	 * Checks that the selected control and monitoring systems are able to work together. Returns true if they are a valid pair, else false.
-	 */
-	protected boolean isValidRSSetting() {
-		int CS = comboCS.getSelectionIndex();
-		int MS = comboMS.getSelectionIndex();
-		int CSID = ControlSystemChoices.getCSIDByIndex(CS);
-		int MSID = MonitoringSystemChoices.getMSIDByIndex(MS);
-		if (CSID == ControlSystemChoices.SIMULATED && MSID == MonitoringSystemChoices.SIMULATED)
-			return true;
-		if (CSID == ControlSystemChoices.ORTE && MSID == MonitoringSystemChoices.ORTE)
-			return true;
-		if (CSID == ControlSystemChoices.MPICH2 && MSID == MonitoringSystemChoices.MPICH2)
-			return true;
-		setErrorMessage("Sorry, that combination of control and monitoring systems it not valid.");
-		setValid(false);
-		return false;
-	}
 	protected boolean isValidOutputSetting() {
 		String name = getFieldContent(outputDirText.getText());
 		if (name == null) {
-			setErrorMessage(CoreMessages.getResourceString("PTPPreferencesPage.Incorrect_Output_directory"));
+			setErrorMessage(UIMessage.getResourceString("PTPPreferencesPage.Incorrect_Output_directory"));
 			setValid(false);
 			return false;
 		}
@@ -309,7 +200,7 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 		if (!path.exists()) {
 			File parent = path.getParentFile();
 			if (parent == null || !parent.exists()) {
-				setErrorMessage(CoreMessages.getResourceString("PTPPreferencesPage.Incorrect_Output_directory"));
+				setErrorMessage(UIMessage.getResourceString("PTPPreferencesPage.Incorrect_Output_directory"));
 				setValid(false);
 				return false;
 			}
@@ -324,12 +215,6 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 	protected void updatePreferencePage() {
 		setErrorMessage(null);
 		setMessage(null);
-		if (!isValidCSSetting())
-			return;
-		if (!isValidMSSetting())
-			return;
-		if (!isValidRSSetting())
-			return;
 		if (!isValidOutputSetting())
 			return;
 		setValid(true);

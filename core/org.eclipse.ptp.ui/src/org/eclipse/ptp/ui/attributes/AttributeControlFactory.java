@@ -20,13 +20,19 @@ package org.eclipse.ptp.ui.attributes;
 
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 
 public class AttributeControlFactory {
 	
-	private AttributeControlFactory() {
-		// empty
+	/**
+	 * Returns the AbstractAttributeControl associated with this Control
+	 * @param control the SWT Control associated with an AbstractAttributeControl
+	 * @return
+	 */
+	public static AbstractAttributeControl getAttributeControl(Control control) {
+		return AbstractAttributeControl.getAttributeControl(control);
 	}
-	
+
 	/**
 	 * Create an attribute editor from an attribute
 	 * @param parent
@@ -34,9 +40,18 @@ public class AttributeControlFactory {
 	 * @param attribute
 	 * @return
 	 */
-	public static IAttributeControl create(Composite parent, int style, IAttribute attribute) {
-		AttributeControlVisitor visitor = new AttributeControlVisitor(parent, style);
+	public AbstractAttributeControl create(Composite parent, int style,
+			IAttribute attribute) {
+		
+		AttributeControlVisitor visitor = new AttributeControlVisitor();
 		attribute.accept(visitor);
-		return visitor.getEditor();
+		final AbstractAttributeControl attrControl = visitor.getAttributeControl();
+		
+		// We need to make sure that the SWT control is made right now,
+		// and not later, lasily.
+		@SuppressWarnings("unused")
+		Control control = attrControl.createControl(parent, style);
+		
+		return attrControl;
 	}
 }

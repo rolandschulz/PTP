@@ -76,12 +76,14 @@ IAdaptable, IResourceManagerMenuContribution, IModelModifier {
 	public String getDescription();
 
 	/**
-	 * @param machine
-	 * @param queue
+	 * @param machineName
+	 * @param queueName
+	 * @param currentAttrs 
 	 * @return
 	 */
-	public IAttribute[] getLaunchAttributes(IPMachineControl machine, IPQueueControl queue);
-	
+	public IAttribute[] getLaunchAttributes(String machineName, String queueName,
+			IAttribute[] currentAttrs);
+
 	/**
 	 * @param ID
 	 * @return

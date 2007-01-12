@@ -21,9 +21,11 @@ package org.eclipse.ptp.core.attributes;
 public abstract class AbstractAttribute implements IAttribute {
 
 	private final IAttributeDescription description;
+	private boolean enabled;
 
 	public AbstractAttribute(IAttributeDescription description) {
 		this.description = description;
+		this.enabled = true;
 	}
 	
 	/**
@@ -52,6 +54,20 @@ public abstract class AbstractAttribute implements IAttribute {
 	public abstract String getStringRep();
 
 	public abstract int hashCode();
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.attributes.IAttribute#isEnabled()
+	 */
+	public boolean isEnabled() {
+		return enabled;
+	}
+
+	/**
+	 * @param enabled the enabled to set
+	 */
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
 
 	public final String toString() {
 		return getStringRep();

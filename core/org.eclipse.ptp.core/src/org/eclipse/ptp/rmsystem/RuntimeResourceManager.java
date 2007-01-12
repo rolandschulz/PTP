@@ -152,11 +152,11 @@ public abstract class RuntimeResourceManager extends AbstractResourceManager
 		}
 	}
 	private static final IAttributeDescription firstNodeAttrDesc =
-		new AttributeDescription("FirstNodeNumber", "First Node Number");
+		new AttributeDescription("FNN_ID0", "FirstNodeNumber", "First Node Number");
 	private static final IAttributeDescription nProcsAttrDesc = 
-		new AttributeDescription("NumProcs", "Number of Processes");
+		new AttributeDescription("NP_ID0", "NumProcs", "Number of Processes");
 	private static final IAttributeDescription nProcsPerNodeAttrDesc =
-		new AttributeDescription("NumProcsPerNode", "Number of Procs Per Node");
+		new AttributeDescription("NPPN_ID0", "NumProcsPerNode", "Number of Procs Per Node");
 
 	private IControlSystem controlSystem = null;
 	private int jobID = 1;
@@ -196,10 +196,11 @@ public abstract class RuntimeResourceManager extends AbstractResourceManager
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.IResourceManager#getLaunchAttributes(org.eclipse.ptp.core.elementcontrols.IPMachineControl, org.eclipse.ptp.core.elementcontrols.IPQueueControl)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManager#getLaunchAttributes(java.lang.String, java.lang.String, org.eclipse.ptp.core.attributes.IAttribute[])
 	 */
-	public IAttribute[] getLaunchAttributes(IPMachineControl machine, IPQueueControl queue) {
-		IAttribute[] attrs = new IAttribute[3];
+	public IAttribute[] getLaunchAttributes(String machine, String queue,
+			IAttribute[] currentAttrs) {
+		IAttribute[] attrs = new IAttribute[3]; 
 		try {
 			IntegerAttribute nProcsPerNodeAttr = new IntegerAttribute(nProcsPerNodeAttrDesc, 1);
 			nProcsPerNodeAttr.setValidRange(1, Integer.MAX_VALUE);

@@ -72,7 +72,13 @@ public interface IAttribute extends Comparable {
 	String getStringRep();
 	
 	/**
-	 * Is the string a parsable to a valid
+	 * @return whether any UI elements for this attribute
+	 * should be enabled.
+	 */
+	boolean isEnabled();
+	
+	/**
+	 * Is the string parsable to a valid
 	 * attribute of this type?
 	 * 
 	 * @param string

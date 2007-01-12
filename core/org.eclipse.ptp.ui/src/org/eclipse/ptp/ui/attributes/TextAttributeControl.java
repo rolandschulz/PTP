@@ -49,8 +49,8 @@ public class TextAttributeControl extends AbstractAttributeControl {
 			} catch (IllegalValue exc) {
 				setErrorMessage(exc.getMessage());
 			}
-			fireValueChanged(oldValue, value);
 			setValid(valid);
+			fireValueChanged(oldValue, value);
 		}
 
 	}
@@ -60,8 +60,7 @@ public class TextAttributeControl extends AbstractAttributeControl {
 	private final IAttribute attribute;
 	private String initialValue;
 
-	public TextAttributeControl(Composite parent, int style, IAttribute attribute) {
-		super(parent, style);
+	public TextAttributeControl(IAttribute attribute) {
 		this.attribute = attribute;
 		initialValue = attribute.getStringRep();
 	}
@@ -71,10 +70,6 @@ public class TextAttributeControl extends AbstractAttributeControl {
 	 */
 	public IAttribute getAttribute() {
 		return attribute;
-	}
-
-	public String getControlText() {
-		return getText().getText();
 	}
 
 	@Override

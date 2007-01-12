@@ -42,7 +42,7 @@ public final class DateAttribute extends AbstractAttribute {
 	public static void main(String[] args) throws IAttribute.IllegalValue {
 		Calendar cal = Calendar.getInstance();
 		DateAttribute mda = new DateAttribute(
-				new AttributeDescription("name", "desc"), cal);
+				new AttributeDescription("uniqId", "name", "desc"), cal);
 		System.out.println(mda.toString());
 		String str = mda.toString();
 		cal.add(Calendar.MONTH, 2);

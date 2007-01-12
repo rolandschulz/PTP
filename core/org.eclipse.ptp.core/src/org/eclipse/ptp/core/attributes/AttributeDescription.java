@@ -21,8 +21,10 @@ package org.eclipse.ptp.core.attributes;
 public final class AttributeDescription implements IAttributeDescription {
 	private final String name;
 	private final String description;
+	private final String uniqueId;
 	
-	public AttributeDescription(final String name, final String description) {
+	public AttributeDescription(final String uniqueId, final String name, final String description) {
+		this.uniqueId = uniqueId;
 		this.name = name;
 		this.description = description;
 	}
@@ -46,6 +48,10 @@ public final class AttributeDescription implements IAttributeDescription {
 
 	public String getName() {
 		return name;
+	}
+
+	public String getUniqueId() {
+		return uniqueId;
 	}
 
 	public int hashCode() {
