@@ -400,9 +400,9 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			throw new PCDIException(e.getMessage());
 		}
 	}
-	public void getPartialAIF(BitList tasks, String expr, boolean listChildren, boolean express) throws PCDIException {
+	public void getPartialAIF(BitList tasks, String expr, String key, boolean listChildren, boolean express) throws PCDIException {
 		try {
-			proxy.debugGetPartialAIF(tasks, expr, listChildren, express);
+			proxy.debugGetPartialAIF(tasks, expr, key, listChildren, express);
 		} catch (IOException e) {
 			throw new PCDIException(e.getMessage());
 		}

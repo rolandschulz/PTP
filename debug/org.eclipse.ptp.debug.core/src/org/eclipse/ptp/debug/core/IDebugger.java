@@ -67,7 +67,7 @@ public interface IDebugger {
 	public void listLocalVariables(BitList tasks) throws PCDIException;
 	public void listGlobalVariables(BitList tasks) throws PCDIException;
 	public void dataEvaluateExpression(BitList tasks, String expression) throws PCDIException;
-	public void getPartialAIF(BitList tasks, String expr, boolean listChildren, boolean express) throws PCDIException;	
+	public void getPartialAIF(BitList tasks, String expr, String key, boolean listChildren, boolean express) throws PCDIException;	
 	public void variableDelete(BitList tasks, String varname) throws PCDIException;
 
 	/* Execution Control */

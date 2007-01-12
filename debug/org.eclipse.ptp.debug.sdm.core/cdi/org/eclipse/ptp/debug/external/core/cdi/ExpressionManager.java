@@ -157,7 +157,7 @@ public class ExpressionManager extends Manager {
 			target.setCurrentThread(frame.getThread(), false);
 			((Thread)frame.getThread()).setCurrentStackFrame(frame, false);
 
-			GetPartialAIFCommand command = new GetPartialAIFCommand(target.getTask(), code);
+			GetPartialAIFCommand command = new GetPartialAIFCommand(target.getTask(), code, "");
 			target.getDebugger().postCommand(command);
 			IAIF aif = command.getPartialAIF();
 			String keyName = command.getName();
