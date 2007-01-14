@@ -33,10 +33,7 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.photran.core.ASTFactory;
-import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.core.util.OffsetLength;
-import org.eclipse.photran.internal.core.lexer.LexerOptions;
 import org.eclipse.photran.internal.core.preferences.FortranPreferences;
 import org.eclipse.photran.internal.ui.actions.FortranBlockCommentActionDelegate;
 import org.eclipse.photran.ui.FortranUIPlugin;
@@ -506,19 +503,6 @@ public abstract class AbstractFortranEditor extends TextEditor implements ISelec
     public Shell getShell()
     {
         return getSite().getShell();
-    }
-    
-    public IFortranAST parseContents(int lexerOptions)
-    {
-        try
-        {
-            lexerOptions = (isFixedForm() ? LexerOptions.FIXED_FORM : LexerOptions.FREE_FORM) | lexerOptions;
-            return ASTFactory.buildAST(getIFile(), lexerOptions);
-        }
-        catch (Exception e)
-        {
-            return null;
-        }
     }
     
     public void forceOutlineViewUpdate()

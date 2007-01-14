@@ -6,8 +6,6 @@ import java.io.InputStream;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.photran.internal.core.lexer.ILexer;
 import org.eclipse.photran.internal.core.lexer.LexerFactory;
-import org.eclipse.photran.internal.core.parser.Parser;
-import org.eclipse.photran.internal.core.parser.Productions;
 
 /**
  * A collection of (static) factory methods for creating Fortran parsers.
@@ -29,11 +27,6 @@ public class ASTFactory
     }
     
     public static IFortranAST buildAST(File file, int lexerOptions) throws Exception
-    {
-        return buildAST(LexerFactory.createLexer(file, lexerOptions));
-    }
-    
-    public static IFortranAST buildAST(IFile file, int lexerOptions) throws Exception
     {
         return buildAST(LexerFactory.createLexer(file, lexerOptions));
     }
