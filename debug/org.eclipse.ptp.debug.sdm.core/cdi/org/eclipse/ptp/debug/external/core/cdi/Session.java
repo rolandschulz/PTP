@@ -134,7 +134,7 @@ public class Session implements IPCDISession, IPCDISessionObject {
 				m.worked(1);
 				
 				boolean stopInMain = getLaunch().getLaunchConfiguration().getAttribute(IPTPLaunchConfigurationConstants.ATTR_STOP_IN_MAIN, false);
-				m.subTask("Initialing breakpoints...");
+				m.subTask("Initializing breakpoints...");
 				breakpointManager.setInitialBreakpoints();
 				if (stopInMain) {
 					breakpointManager.setInternalTemporaryBreakpoint(createBitList(), breakpointManager.createFunctionLocation("", "main"));
