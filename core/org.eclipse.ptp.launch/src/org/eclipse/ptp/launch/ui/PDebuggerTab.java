@@ -49,92 +49,10 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Shell;
 
 public class PDebuggerTab extends AbstractPDebuggerTab {
-	public class AdvancedDebuggerOptionsDialog extends Dialog {
-		private Button fVarBookKeeping;
-		private Button fRegBookKeeping;
-
-		final String[] protocolItems = new String[] { "mi", "mi1", "mi2", "mi3" };
-		private Combo fPCombo;
-
-		protected AdvancedDebuggerOptionsDialog(Shell parentShell) {
-			super(parentShell);
-		}
-		protected Control createDialogArea(Composite parent) {
-			Composite composite = (Composite)super.createDialogArea(parent);
-			Group group = new Group(composite, SWT.NONE);
-			group.setText(LaunchMessages.getResourceString("PDebuggerTab.Automatically_track_values_of"));
-			GridLayout layout = new GridLayout();
-			group.setLayout(layout);
-			group.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-			fVarBookKeeping = new Button(group, SWT.CHECK);
-			fVarBookKeeping.setText(LaunchMessages.getResourceString("PDebuggerTab.Variables"));
-			fRegBookKeeping = new Button(group, SWT.CHECK);
-			fRegBookKeeping.setText(LaunchMessages.getResourceString("PDebuggerTab.Registers"));
-			createProtocolCombo(composite, 2);
-			initialize();
-			return composite;
-		}
-		protected void createProtocolCombo(Composite parent, int colspan) {
-			Group comboComp = new Group(parent, SWT.NONE);
-			comboComp.setText("Protocol");
-			GridLayout layout = new GridLayout(2, false);
-			comboComp.setLayout(layout);
-			GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-			gd.horizontalSpan = colspan;
-			comboComp.setLayoutData(gd);
-			fPCombo = new Combo(comboComp, SWT.READ_ONLY | SWT.DROP_DOWN);
-			fPCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-			fPCombo.setItems(protocolItems);
-		}
-		protected void okPressed() {
-			saveValues();
-			super.okPressed();
-		}
-		private void initialize() {
-			Map attr = getAdvancedAttributes();
-			Object varBookkeeping = attr.get(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ENABLE_VARIABLE_BOOKKEEPING);
-			fVarBookKeeping.setSelection((varBookkeeping instanceof Boolean) ? ! ((Boolean)varBookkeeping).booleanValue() : true);
-			Object regBookkeeping = attr.get(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ENABLE_REGISTER_BOOKKEEPING);
-			fRegBookKeeping.setSelection((regBookkeeping instanceof Boolean) ? ! ((Boolean)regBookkeeping).booleanValue() : true);
-			Object protocol = attr.get(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_PROTOCOL);
-			int index = 0;
-			if (protocol instanceof String) {
-				String p = (String)protocol;
-				if (p != null && p.length() > 0) {
-					for (int i = 0; i < protocolItems.length; ++i) {
-						if (protocolItems[i].equals(p)) {
-							index = i;
-						}
-					}
-				}
-			}
-			fPCombo.select(index);
-		}
-		private void saveValues() {
-			Map attr = getAdvancedAttributes();
-			Boolean varBookkeeping = (fVarBookKeeping.getSelection()) ? Boolean.FALSE : Boolean.TRUE;
-			attr.put(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ENABLE_VARIABLE_BOOKKEEPING, varBookkeeping);
-			Boolean regBookkeeping = (fRegBookKeeping.getSelection()) ? Boolean.FALSE : Boolean.TRUE;
-			attr.put(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ENABLE_REGISTER_BOOKKEEPING, regBookkeeping);
-			String protocol = fPCombo.getText();
-			if (protocol != null && protocol.length() > 0) {
-				attr.put(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_PROTOCOL, protocol);
-			}
-			updateLaunchConfigurationDialog();
-		}
-		protected void configureShell(Shell newShell) {
-			super.configureShell(newShell);
-			newShell.setText(LaunchMessages.getResourceString("PDebuggerTab.Advanced_Options_Dialog_Title"));
-		}
-	}
-
 	final protected boolean fAttachMode;
 
-	protected Button fAdvancedButton;
 	protected Button fStopInMain;
 	protected Button fAttachButton;
-
-	private Map fAdvancedAttributes = new HashMap(5);
 
 	public PDebuggerTab(boolean attachMode) {
 		fAttachMode = attachMode;
@@ -209,8 +127,6 @@ public class PDebuggerTab extends AbstractPDebuggerTab {
 			config.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_START_MODE, IPTPLaunchConfigurationConstants.DEBUGGER_MODE_RUN);
 			config.setAttribute(IPTPLaunchConfigurationConstants.ATTR_STOP_IN_MAIN, IPTPLaunchConfigurationConstants.DEBUGGER_STOP_AT_MAIN_DEFAULT);
 		}
-		config.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ENABLE_VARIABLE_BOOKKEEPING, false);
-		config.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ENABLE_REGISTER_BOOKKEEPING, false);
 	}
 
 	public void initializeFrom(ILaunchConfiguration config) {
@@ -233,7 +149,6 @@ public class PDebuggerTab extends AbstractPDebuggerTab {
 			config.setAttribute(IPTPLaunchConfigurationConstants.ATTR_STOP_IN_MAIN, fStopInMain.getSelection());
 			config.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_START_MODE, IPTPLaunchConfigurationConstants.DEBUGGER_MODE_RUN);
 		}
-		applyAdvancedAttributes(config);
 	}
 
 	public boolean isValid(ILaunchConfiguration config) {
@@ -355,46 +270,6 @@ public class PDebuggerTab extends AbstractPDebuggerTab {
 				}
 			});
 		}
-		fAdvancedButton = createPushButton(optionsComp, LaunchMessages.getResourceString("PDebuggerTab.Advanced"), null);
-		GridData data = new GridData();
-		data.horizontalAlignment = GridData.END;
-		//PixelConverter pc = new PixelConverter(parent);
-		//data.widthHint = pc.convertHorizontalDLUsToPixels(IDialogConstants.BUTTON_WIDTH);
-		fAdvancedButton.setLayoutData(data);
-		fAdvancedButton.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				Dialog dialog = new AdvancedDebuggerOptionsDialog(getShell());
-				dialog.open();
-			}
-		});
-	}
-
-	protected Map getAdvancedAttributes() {
-		return fAdvancedAttributes;
-	}
-
-	private void initializeAdvancedAttributes(ILaunchConfiguration config) {
-		Map attr = getAdvancedAttributes();
-		try {
-			Boolean varBookkeeping = (config.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ENABLE_VARIABLE_BOOKKEEPING, false)) ? Boolean.TRUE : Boolean.FALSE;
-			attr.put(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ENABLE_VARIABLE_BOOKKEEPING, varBookkeeping);
-		} catch (CoreException e) {
-		}
-		try {
-			Boolean regBookkeeping = (config.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ENABLE_REGISTER_BOOKKEEPING, false)) ? Boolean.TRUE : Boolean.FALSE;
-			attr.put(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ENABLE_REGISTER_BOOKKEEPING, regBookkeeping);
-		} catch (CoreException e) {
-		}
-	}
-
-	private void applyAdvancedAttributes(ILaunchConfigurationWorkingCopy config) {
-		Map attr = getAdvancedAttributes();
-		Object varBookkeeping = attr.get(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ENABLE_VARIABLE_BOOKKEEPING);
-		if (varBookkeeping instanceof Boolean)
-			config.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ENABLE_VARIABLE_BOOKKEEPING, ((Boolean)varBookkeeping).booleanValue());
-		Object regBookkeeping = attr.get(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ENABLE_REGISTER_BOOKKEEPING);
-		if (regBookkeeping instanceof Boolean)
-			config.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ENABLE_REGISTER_BOOKKEEPING, ((Boolean)regBookkeeping).booleanValue());
 	}
 
 	protected Shell getShell() {
@@ -402,7 +277,6 @@ public class PDebuggerTab extends AbstractPDebuggerTab {
 	}
 
 	public void dispose() {
-		getAdvancedAttributes().clear();
 		super.dispose();
 	}
 
@@ -411,7 +285,6 @@ public class PDebuggerTab extends AbstractPDebuggerTab {
 			if (!fAttachMode) {
 				fStopInMain.setSelection(config.getAttribute(IPTPLaunchConfigurationConstants.ATTR_STOP_IN_MAIN, IPTPLaunchConfigurationConstants.DEBUGGER_STOP_AT_MAIN_DEFAULT));
 			}
-			initializeAdvancedAttributes(config);
 		} catch (CoreException e) {
 		}
 	}
