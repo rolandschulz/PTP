@@ -20,4 +20,11 @@
             id="org.eclipse.ptp.debug.external.ui.SDMPreferencePage">
       </page>
    </extension>
+   <extension
+         point="org.eclipse.ptp.debug.ui.PDebuggerPage">
+      <debuggerPage
+            class="org.eclipse.ptp.debug.external.internal.ui.SDMPage"
+            debuggerID="org.eclipse.ptp.debug.external.sdm"
+            id="org.eclipse.ptp.debug.sdm.SDMPage"/>
+   </extension>
 </plugin>
