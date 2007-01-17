@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.internal.ui;
 
-import java.io.File;
 import java.util.Observable;
 import java.util.Observer;
 import org.eclipse.core.runtime.CoreException;
@@ -21,17 +20,13 @@ import org.eclipse.ptp.debug.external.core.IExtLaunchConfigurationConstants;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.TabFolder;
-import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Text;
 
 /**
@@ -39,77 +34,124 @@ import org.eclipse.swt.widgets.Text;
  */
 public class SDMPage extends AbstractLaunchConfigurationTab implements Observer {
 
-	protected TabFolder fTabFolder;
-
-	protected Text fGDBCommandText;
-
-	protected Text fGDBInitText;
-
-	private IExtLaunchConfigurationComponent fSolibBlock;
+	protected Text fExePathText;
+	protected Button fExePathButton = null;
+	protected Text fCWDText;
+	protected Button fCWDButton = null;
 	
-	private boolean fIsInitializing = false;
+	protected static final String EMPTY_STRING = ""; //$NON-NLS-1$
 
+	private boolean fIsInitializing = false;
+	
 	public void createControl(Composite parent) {
 		Composite comp = new Composite(parent, SWT.NONE);
 		comp.setLayout(new GridLayout());
 		comp.setLayoutData(new GridData(GridData.FILL_BOTH));
-		fTabFolder = new TabFolder(comp, SWT.NONE);
-		fTabFolder.setLayoutData(new GridData(GridData.FILL_BOTH | GridData.GRAB_VERTICAL));
-		createTabs(fTabFolder);
-		fTabFolder.setSelection(0);
-		setControl(comp);
+		
+		Composite subComp = ControlFactory.createCompositeEx(comp, 2, GridData.FILL_HORIZONTAL);
+		((GridLayout)subComp.getLayout()).makeColumnsEqualWidth = false;
+
+		fExePathButton = createCheckButton(subComp, ExternalDebugUIMessages.getString("SDMDebuggerPage.2"));
+		fExePathButton.addSelectionListener(new SelectionListener() {
+		    public void widgetDefaultSelected(SelectionEvent e) {
+	            handleExePathButtonSelected();
+	    		if (!isInitializing())
+	    			updateLaunchConfigurationDialog();
+		    }
+		    public void widgetSelected(SelectionEvent e) {
+	            handleExePathButtonSelected();
+	    		if (!isInitializing())
+	    			updateLaunchConfigurationDialog();
+		    }
+		});
+		fExePathText = ControlFactory.createTextField(subComp, SWT.SINGLE | SWT.BORDER);
+		fExePathText.addModifyListener(new ModifyListener() {
+			public void modifyText(ModifyEvent evt) {
+				if (!isInitializing())
+					updateLaunchConfigurationDialog();
+			}
+		});
+		
+		fCWDButton = createCheckButton(subComp, ExternalDebugUIMessages.getString("SDMDebuggerPage.3"));
+		fCWDButton.addSelectionListener(new SelectionListener() {
+		    public void widgetDefaultSelected(SelectionEvent e) {
+	            handleCWDButtonSelected();
+	    		if (!isInitializing())
+	    			updateLaunchConfigurationDialog();
+		    }
+		    public void widgetSelected(SelectionEvent e) {
+	            handleCWDButtonSelected();
+	    		if (!isInitializing())
+	    			updateLaunchConfigurationDialog();
+		    }
+		});
+		fCWDText = ControlFactory.createTextField(subComp, SWT.SINGLE | SWT.BORDER);
+		fCWDText.addModifyListener(new ModifyListener() {
+			public void modifyText(ModifyEvent evt) {
+				if (!isInitializing())
+					updateLaunchConfigurationDialog();
+			}
+		});
+		
+		setControl(parent);
 	}
 
 	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
-		configuration.setAttribute(IExtLaunchConfigurationConstants.ATTR_DEBUG_NAME, "gdb");
-		configuration.setAttribute(IExtLaunchConfigurationConstants.ATTR_GDB_INIT, "");
-		if (fSolibBlock != null)
-			fSolibBlock.setDefaults(configuration);
+		configuration.setAttribute(IExtLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, (String)null);
+		configuration.setAttribute(IExtLaunchConfigurationConstants.ATTR_DEBUGGER_WORKING_DIR, (String)null);
 	}
 
 	public boolean isValid(ILaunchConfiguration launchConfig) {
-		boolean valid = fGDBCommandText.getText().length() != 0;
-		if (valid) {
-			setErrorMessage(null);
-			setMessage(null);
-		}
-		else {
-			setErrorMessage(ExternalDebugUIMessages.getString("GDBDebuggerPage.0"));
-			setMessage(null);
-		}
-		return valid;
+		setErrorMessage(null);
+		setMessage(null);
+		return true;
 	}
 
 	public void initializeFrom(ILaunchConfiguration configuration) {
 		setInitializing(true);
-		String gdbCommand = "gdb";
-		String gdbInit = "";
 		try {
-			gdbCommand = configuration.getAttribute(IExtLaunchConfigurationConstants.ATTR_DEBUG_NAME, "gdb");
-			gdbInit = configuration.getAttribute(IExtLaunchConfigurationConstants.ATTR_GDB_INIT, "");
+			String exe = configuration.getAttribute(IExtLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, (String)null);
+			if (exe == null) {
+				fExePathText.setText(EMPTY_STRING);
+				fExePathButton.setSelection(false);
+			} else {
+				fExePathText.setText(exe);
+				fExePathButton.setSelection(true);
+			}
+			handleExePathButtonSelected();	
+			
+			String cwd = configuration.getAttribute(IExtLaunchConfigurationConstants.ATTR_DEBUGGER_WORKING_DIR, (String)null);
+			if (cwd == null) {
+				fCWDText.setText(EMPTY_STRING);
+				fCWDButton.setSelection(false);
+			} else {
+				fCWDText.setText(cwd);
+				fCWDButton.setSelection(true);
+			}
+			handleCWDButtonSelected();	
 		}
 		catch(CoreException e) {
+	           setErrorMessage("Exception occurred reading configuration");
 		}
-		if (fSolibBlock != null)
-			fSolibBlock.initializeFrom(configuration);
-		fGDBCommandText.setText(gdbCommand);
-		fGDBInitText.setText(gdbInit);
 		setInitializing(false); 
 	}
 
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
-		String gdbStr = fGDBCommandText.getText();
-		gdbStr.trim();
-		configuration.setAttribute(IExtLaunchConfigurationConstants.ATTR_DEBUG_NAME, gdbStr);
-		gdbStr = fGDBInitText.getText();
-		gdbStr.trim();
-		configuration.setAttribute(IExtLaunchConfigurationConstants.ATTR_GDB_INIT, gdbStr);
-		if (fSolibBlock != null)
-			fSolibBlock.performApply(configuration);
+		String exe = null;
+		if (fExePathButton.getSelection()) {
+			exe = getFieldContent(fExePathText.getText());
+		}
+		configuration.setAttribute(IExtLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, exe);
+		
+		String cwd = null;
+		if (fCWDButton.getSelection()) {
+			cwd = getFieldContent(fCWDText.getText());
+		}
+		configuration.setAttribute(IExtLaunchConfigurationConstants.ATTR_DEBUGGER_WORKING_DIR, cwd);
 	}
 
 	public String getName() {
-		return ExternalDebugUIMessages.getString("GDBDebuggerPage.1");
+		return ExternalDebugUIMessages.getString("SDMDebuggerPage.1");
 	}
 
 	/**
@@ -137,127 +179,11 @@ public class SDMPage extends AbstractLaunchConfigurationTab implements Observer 
 	}
 
 	/*
-	public IExtLaunchConfigurationComponent createSolibBlock(Composite parent) {
-		IExtLaunchConfigurationComponent block = ExternalDebugUIUtils.createGDBSolibBlock(ExternalDebugUIUtils.createSolibSearchPathBlock(null), true, true); 
-		block.createControl(parent);
-		return block;
-	}
-	*/
-	
-	public void createTabs(TabFolder tabFolder) {
-		createMainTab(tabFolder);
-		createSolibTab(tabFolder);
-	}
-
-	public void createMainTab(TabFolder tabFolder) {
-		TabItem tabItem = new TabItem(tabFolder, SWT.NONE);
-		tabItem.setText(ExternalDebugUIMessages.getString("GDBDebuggerPage.2"));
-		Composite comp = ControlFactory.createCompositeEx(fTabFolder, 1, GridData.FILL_BOTH);
-		((GridLayout)comp.getLayout()).makeColumnsEqualWidth = false;
-		tabItem.setControl(comp);
-		Composite subComp = ControlFactory.createCompositeEx(comp, 3, GridData.FILL_HORIZONTAL);
-		((GridLayout)subComp.getLayout()).makeColumnsEqualWidth = false;
-		Label label = ControlFactory.createLabel(subComp, ExternalDebugUIMessages.getString("GDBDebuggerPage.3"));
-		GridData gd = new GridData();
-		//		gd.horizontalSpan = 2;
-		label.setLayoutData(gd);
-		fGDBCommandText = ControlFactory.createTextField(subComp, SWT.SINGLE | SWT.BORDER);
-		fGDBCommandText.addModifyListener(new ModifyListener() {
-
-			public void modifyText(ModifyEvent evt) {
-				if (!isInitializing())
-					updateLaunchConfigurationDialog();
-			}
-		});
-		Button button = createPushButton(subComp, ExternalDebugUIMessages.getString("GDBDebuggerPage.4"), null);
-		button.addSelectionListener(new SelectionAdapter() {
-
-			public void widgetSelected(SelectionEvent evt) {
-				handleGDBButtonSelected();
-				updateLaunchConfigurationDialog();
-			}
-
-			private void handleGDBButtonSelected() {
-				FileDialog dialog = new FileDialog(getShell(), SWT.NONE);
-				dialog.setText(ExternalDebugUIMessages.getString("GDBDebuggerPage.5"));
-				String gdbCommand = fGDBCommandText.getText().trim();
-				int lastSeparatorIndex = gdbCommand.lastIndexOf(File.separator);
-				if (lastSeparatorIndex != -1) {
-					dialog.setFilterPath(gdbCommand.substring(0, lastSeparatorIndex));
-				}
-				String res = dialog.open();
-				if (res == null) {
-					return;
-				}
-				fGDBCommandText.setText(res);
-			}
-		});
-		label = ControlFactory.createLabel(subComp, ExternalDebugUIMessages.getString("GDBDebuggerPage.6"));
-		gd = new GridData();
-		//		gd.horizontalSpan = 2;
-		label.setLayoutData(gd);
-		fGDBInitText = ControlFactory.createTextField(subComp, SWT.SINGLE | SWT.BORDER);
-		gd = new GridData(GridData.FILL_HORIZONTAL);
-		fGDBInitText.setLayoutData(gd);
-		fGDBInitText.addModifyListener(new ModifyListener() {
-
-			public void modifyText(ModifyEvent evt) {
-				if (!isInitializing())
-					updateLaunchConfigurationDialog();
-			}
-		});
-		button = createPushButton(subComp, ExternalDebugUIMessages.getString("GDBDebuggerPage.7"), null);
-		button.addSelectionListener(new SelectionAdapter() {
-
-			public void widgetSelected(SelectionEvent evt) {
-				handleGDBInitButtonSelected();
-				updateLaunchConfigurationDialog();
-			}
-
-			private void handleGDBInitButtonSelected() {
-				FileDialog dialog = new FileDialog(getShell(), SWT.NONE);
-				dialog.setText(ExternalDebugUIMessages.getString("GDBDebuggerPage.8"));
-				String gdbCommand = fGDBInitText.getText().trim();
-				int lastSeparatorIndex = gdbCommand.lastIndexOf(File.separator);
-				if (lastSeparatorIndex != -1) {
-					dialog.setFilterPath(gdbCommand.substring(0, lastSeparatorIndex));
-				}
-				String res = dialog.open();
-				if (res == null) {
-					return;
-				}
-				fGDBInitText.setText(res);
-			}
-		});
-		label = ControlFactory.createLabel(comp, ExternalDebugUIMessages.getString("GDBDebuggerPage.9"),
-				200, SWT.DEFAULT, SWT.WRAP);
-		gd = new GridData(GridData.FILL_HORIZONTAL);
-		gd.horizontalSpan = 1;
-		gd.widthHint = 200;
-		label.setLayoutData(gd);
-	}
-
-	public void createSolibTab(TabFolder tabFolder) {
-		TabItem tabItem = new TabItem(tabFolder, SWT.NONE);
-		tabItem.setText(ExternalDebugUIMessages.getString("GDBDebuggerPage.10"));
-		Composite comp = ControlFactory.createCompositeEx(fTabFolder, 1, GridData.FILL_BOTH);
-		tabItem.setControl(comp);
-		//fSolibBlock = createSolibBlock(comp);
-		//if (fSolibBlock instanceof Observable)
-		//	((Observable)fSolibBlock).addObserver(this);
-	}
-
-	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#dispose()
 	 */
 	public void dispose() {
-		if (fSolibBlock != null) {
-			if (fSolibBlock instanceof Observable)
-				((Observable)fSolibBlock).deleteObserver(this);
-			fSolibBlock.dispose();
-		}
 		super.dispose();
 	}
 
@@ -275,4 +201,33 @@ public class SDMPage extends AbstractLaunchConfigurationTab implements Observer 
 	private void setInitializing(boolean isInitializing) {
 		fIsInitializing = isInitializing;
 	}
+
+	/**
+	 * The default check box has been toggled.
+	 */
+	protected void handleExePathButtonSelected() {
+		if (fExePathButton.getSelection()) {
+			fExePathText.setEnabled(true);
+		} else {
+			fExePathText.setEnabled(false);
+		}
+	}
+
+	/**
+	 * The default check box has been toggled.
+	 */
+	protected void handleCWDButtonSelected() {
+		if (fCWDButton.getSelection()) {
+			fCWDText.setEnabled(true);
+		} else {
+			fCWDText.setEnabled(false);
+		}
+	}
+	
+    protected String getFieldContent(String text) {
+        if (text.trim().length() == 0 || text.equals(EMPTY_STRING))
+            return null;
+        
+        return text;
+    }
 }
