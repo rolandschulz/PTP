@@ -214,6 +214,12 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	protected static String getDebuggerID(ILaunchConfiguration configuration) throws CoreException {
 	    return configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ID, (String)null);
 	}
+	protected static String getDebuggerExePath(ILaunchConfiguration configuration) throws CoreException {
+	    return configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, (String)null);
+	}
+	protected static String getDebuggerWorkDirectory(ILaunchConfiguration configuration) throws CoreException {
+	    return configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_WORKING_DIR, (String)null);
+	}
 	
 	public ILaunch getLaunch(ILaunchConfiguration configuration, String mode) throws CoreException {
 		return new PLaunch(configuration, mode, null);

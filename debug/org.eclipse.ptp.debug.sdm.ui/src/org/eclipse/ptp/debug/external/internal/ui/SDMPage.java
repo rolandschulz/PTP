@@ -16,7 +16,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
-import org.eclipse.ptp.debug.external.core.IExtLaunchConfigurationConstants;
+import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -97,8 +97,8 @@ public class SDMPage extends AbstractLaunchConfigurationTab implements Observer 
 	}
 
 	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
-		configuration.setAttribute(IExtLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, (String)null);
-		configuration.setAttribute(IExtLaunchConfigurationConstants.ATTR_DEBUGGER_WORKING_DIR, (String)null);
+		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, (String)null);
+		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_WORKING_DIR, (String)null);
 	}
 
 	public boolean isValid(ILaunchConfiguration launchConfig) {
@@ -110,7 +110,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab implements Observer 
 	public void initializeFrom(ILaunchConfiguration configuration) {
 		setInitializing(true);
 		try {
-			String exe = configuration.getAttribute(IExtLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, (String)null);
+			String exe = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, (String)null);
 			if (exe == null) {
 				fExePathText.setText(EMPTY_STRING);
 				fExePathButton.setSelection(false);
@@ -120,7 +120,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab implements Observer 
 			}
 			handleExePathButtonSelected();	
 			
-			String cwd = configuration.getAttribute(IExtLaunchConfigurationConstants.ATTR_DEBUGGER_WORKING_DIR, (String)null);
+			String cwd = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_WORKING_DIR, (String)null);
 			if (cwd == null) {
 				fCWDText.setText(EMPTY_STRING);
 				fCWDButton.setSelection(false);
@@ -141,13 +141,13 @@ public class SDMPage extends AbstractLaunchConfigurationTab implements Observer 
 		if (fExePathButton.getSelection()) {
 			exe = getFieldContent(fExePathText.getText());
 		}
-		configuration.setAttribute(IExtLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, exe);
+		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, exe);
 		
 		String cwd = null;
 		if (fCWDButton.getSelection()) {
 			cwd = getFieldContent(fCWDText.getText());
 		}
-		configuration.setAttribute(IExtLaunchConfigurationConstants.ATTR_DEBUGGER_WORKING_DIR, cwd);
+		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_WORKING_DIR, cwd);
 	}
 
 	public String getName() {

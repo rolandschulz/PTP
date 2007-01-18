@@ -41,18 +41,6 @@ public interface IExtLaunchConfigurationConstants {
 	public static final String ATTR_DEBUGGER_SOLIB_PATH = PTPDebugExternalPlugin.getUniqueIdentifier() + ".SOLIB_PATH"; //$NON-NLS-1$
 
 	/**
-	 * Launch configuration attribute key. The value is the location of the executable
-	 * being debugged.
-	 */
-	public static final String ATTR_DEBUGGER_EXECUTABLE_PATH = PTPDebugExternalPlugin.getUniqueIdentifier() + ".EXECUTABLE_PATH";
-
-	/**
-	 * Launch configuration attribute key. The value is the working directory from
-	 * which to run the debugger.
-	 */
-	public static final String ATTR_DEBUGGER_WORKING_DIR = PTPDebugExternalPlugin.getUniqueIdentifier() + ".WORKING_DIR";
-
-	/**
 	 * Launch configuration attribute value. The key is ATTR_DEBUGGER_AUTO_SOLIB.
 	 */
 	public static boolean DEBUGGER_AUTO_SOLIB_DEFAULT = true;
