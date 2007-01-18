@@ -199,9 +199,21 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			
 			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
 				monitor.setTaskName("Starting the debugger . . .");
-				job.setAttribute(PreferenceConstants.JOB_APP_NAME, jrunconfig.getExecName());
-				job.setAttribute(PreferenceConstants.JOB_APP_PATH, jrunconfig.getPathToExec());
-				job.setAttribute(PreferenceConstants.JOB_WORK_DIR, jrunconfig.getWorkingDir());
+				String dbgExe = getDebuggerExePath(configuration);
+				if (dbgExe != null) {
+					IPath dbgExePath = new Path(dbgExe);
+					job.setAttribute(PreferenceConstants.JOB_APP_NAME, dbgExePath.lastSegment());
+					job.setAttribute(PreferenceConstants.JOB_APP_PATH, dbgExePath.removeLastSegments(1).toOSString());
+				} else {
+					job.setAttribute(PreferenceConstants.JOB_APP_NAME, jrunconfig.getExecName());
+					job.setAttribute(PreferenceConstants.JOB_APP_PATH, jrunconfig.getPathToExec());
+				}
+				String wd = getDebuggerWorkDirectory(configuration);
+				if (wd != null) {
+					job.setAttribute(PreferenceConstants.JOB_WORK_DIR, wd);
+				} else {
+					job.setAttribute(PreferenceConstants.JOB_WORK_DIR, jrunconfig.getWorkingDir());
+				}
 				job.setAttribute(PreferenceConstants.JOB_ARGS, jrunconfig.getArguments());
 				job.setAttribute(PreferenceConstants.JOB_DEBUG_DIR, exePath.removeLastSegments(1).toOSString());
 				PLaunch pLaunch = (PLaunch) launch;
