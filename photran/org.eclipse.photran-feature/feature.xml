@@ -182,7 +182,27 @@ Java and all Java-based trademarks are trademarks of Sun Microsystems, Inc. in t
          id="org.eclipse.photran.errorparsers.xlf"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="3.1.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.photran.managedbuilder.gnu.ui"
+         download-size="0"
+         install-size="0"
+         version="3.1.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.photran.managedbuilder.intel.ui"
+         download-size="0"
+         install-size="0"
+         version="3.1.0"/>
+
+   <plugin
+         id="org.eclipse.photran.managedbuilder.xlf.ui"
+         download-size="0"
+         install-size="0"
+         version="3.1.0"
          unpack="false"/>
 
 </feature>
