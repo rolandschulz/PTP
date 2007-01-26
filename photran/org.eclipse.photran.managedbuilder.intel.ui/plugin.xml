@@ -1601,19 +1601,21 @@
             cleanCommand="rm -rf"
             errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.photran.core.intel.IntelCompilerErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser">
             <toolChain
-               archList="x86,x86_64"
+               archList="x86"
                osList="linux"
                name="%ToolChainName.Dbg"
                targetTool="photran.managedbuild.tool.intel.fortran.linker.exe.x86.debug"
                scannerConfigDiscoveryProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile"
                id="photran.managedbuild.toolchain.intel.fortran.exe.x86.debug">
+               <!-- add archList="x86,x86_64" when possible-->
 		       <targetPlatform
 		          id="photran.managedbuild.target.intel.platform.exe.x86.debug"
 		          name="%PlatformName.Dbg"
 		          binaryParser="org.eclipse.cdt.core.ELF"
 		          osList="linux"
-                  archList="x86,x86_64">
+                  archList="x86">
                </targetPlatform>
+               <!-- add archList="x86,x86_64" when possible-->
                <builder
                   superClass="cdt.managedbuild.target.gnu.builder"
                   id="photran.managedbuild.target.intel.builder.exe.x86.debug"
@@ -1671,19 +1673,21 @@
             cleanCommand="rm -rf"
             errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.photran.core.intel.IntelCompilerErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser">
             <toolChain
-               archList="x86,x86_64"
+               archList="x86"
                osList="linux"
                name="%ToolChainName.Rel"
                targetTool="photran.managedbuild.tool.intel.fortran.linker.exe.x86.release"
                scannerConfigDiscoveryProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile"
                id="photran.managedbuild.toolchain.intel.fortran.exe.x86.release">
+               <!-- add archList="x86,x86_64" when possible-->
                <targetPlatform
                   id="photran.managedbuild.target.intel.platform.fortran.exe.x86.release"
                   name="%PlatformName.Rel"		             
                   binaryParser="org.eclipse.cdt.core.ELF"
                   osList="linux"
-                  archList="x86,x86_64">
+                  archList="x86">
                </targetPlatform>
+               <!-- add archList="x86,x86_64" when possible-->
                <builder
                   superClass="cdt.managedbuild.target.gnu.builder"
                   id="photran.managedbuild.target.intel.builder.exe.x86.release"
@@ -1866,19 +1870,21 @@
             artifactExtension="a"
             errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.photran.core.intel.IntelCompilerErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser">
             <toolChain
-               archList="x86,x86_64"
+               archList="x86"
                osList="linux"
                name="%ToolChainName.Dbg"
                targetTool="photran.managedbuild.tool.intel.fortran.archiver.ar.x86.debug"
                scannerConfigDiscoveryProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile"
                id="photran.managedbuild.toolchain.intel.fortran.ar.x86.debug">
+               <!-- add archList="x86,x86_64" when possible-->
                <targetPlatform
                   id="photran.managedbuild.target.intel.platform.ar.x86.debug"
                   name="%PlatformName.Dbg"
                   binaryParser="org.eclipse.cdt.core.ELF"
                   osList="linux"
-                  archList="x86,x86_64">
+                  archList="x86">
                </targetPlatform>
+               <!-- add archList="x86,x86_64" when possible-->
                <builder
                   superClass="cdt.managedbuild.target.gnu.builder"
                   id="photran.managedbuild.target.intel.builder.ar.x86.debug"
@@ -1944,19 +1950,21 @@
             artifactExtension="a"
             errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.photran.core.intel.IntelCompilerErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser">
             <toolChain
-               archList="x86,x86_64"
+               archList="x86"
                osList="linux"
                name="%ToolChainName.Rel"
                targetTool="photran.managedbuild.tool.intel.fortran.archiver.ar.x86.release"
                scannerConfigDiscoveryProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile"
                id="photran.managedbuild.toolchain.intel.fortran.ar.x86.release">
+               <!-- add archList="x86,x86_64" when possible-->
                <targetPlatform
                   id="photran.managedbuild.target.intel.platform.fortran.ar.x86.release"
                   name="%PlatformName.Rel"		             
                   binaryParser="org.eclipse.cdt.core.ELF"
                   osList="linux"
-                  archList="x86,x86_64">
+                  archList="x86">
                </targetPlatform>
+               <!-- add archList="x86,x86_64" when possible-->
                <builder
                   superClass="cdt.managedbuild.target.gnu.builder"
                   id="photran.managedbuild.target.intel.builder.ar.x86.release"
@@ -2140,19 +2148,21 @@
             artifactExtension="so"
             errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.photran.core.intel.IntelCompilerErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser">
             <toolChain
-               archList="x86,x86_64"
+               archList="x86"
                osList="linux"
                name="%ToolChainName.Dbg"
                targetTool="photran.managedbuild.tool.intel.fortran.linker.so.x86.debug"
                scannerConfigDiscoveryProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile"
                id="photran.managedbuild.toolchain.intel.fortran.so.x86.debug">
+               <!-- add archList="x86,x86_64" when possible-->
                <targetPlatform
                   id="photran.managedbuild.target.intel.platform.so.x86.debug"
                   name="%PlatformName.Dbg"
                   binaryParser="org.eclipse.cdt.core.ELF"
                   osList="linux"
-                  archList="x86,x86_64">
+                  archList="x86">
                </targetPlatform>
+               <!-- add archList="x86,x86_64" when possible-->
                <builder
                   superClass="cdt.managedbuild.target.gnu.builder"
                   id="photran.managedbuild.target.intel.builder.so.x86.debug"
@@ -2226,19 +2236,21 @@
             artifactExtension="so"
             errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.photran.core.intel.IntelCompilerErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser">
             <toolChain
-               archList="x86,x86_64"
+               archList="x86"
                osList="linux"
                name="%ToolChainName.Rel"
                targetTool="photran.managedbuild.tool.intel.fortran.linker.so.x86.release"
                scannerConfigDiscoveryProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile"
                id="photran.managedbuild.toolchain.intel.fortran.so.x86.release">
+               <!-- add archList="x86,x86_64" when possible-->
                <targetPlatform
                   id="photran.managedbuild.target.intel.platform.fortran.so.x86.release"
                   name="%PlatformName.Rel"		             
                   binaryParser="org.eclipse.cdt.core.ELF"
                   osList="linux"
-                  archList="x86,x86_64">
+                  archList="x86">
                </targetPlatform>
+               <!-- add archList="x86,x86_64" when possible-->
                <builder
                   superClass="cdt.managedbuild.target.gnu.builder"
                   id="photran.managedbuild.target.intel.builder.so.x86.release"
