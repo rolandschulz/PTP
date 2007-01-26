@@ -45,7 +45,7 @@ public class FortranLanguage extends PlatformObject implements ILanguage
 
 	public Object getAdapter(Class adapter)
 	{
-		System.out.println("getAdapter " + adapter.getName());
+		//System.out.println("getAdapter " + adapter.getName());
 		
         if (adapter == IPDOMLinkageFactory.class)
 			return new IPDOMLinkageFactory()
