@@ -11,7 +11,11 @@ import org.eclipse.photran.internal.core.parser.Terminal;
 /**
  * The Reindenter is used to correct indentation when a node is pasted into an AST
  * so that the pasted lines are correctly indented in their new context.
-
+ * 
+ * This code is very specific to the way Photran's parser uses the whiteBefore and
+ * whiteAfter parts of a Token; it will not generalize to parsers that, say, include
+ * newlines in the whitetext.
+ *  
  * @author Jeff Overbey
  */
 public class Reindenter
@@ -20,26 +24,33 @@ public class Reindenter
 
     public static void reindent(ParseTreeNode node, ASTExecutableProgramNode entireAST)
     {
+        recomputeLineColInfo(entireAST);
+        
         final Token firstToken = findFirstTokenIn(node); if (firstToken == null) return;
         final Token lastToken = findLastTokenIn(node);
         
+        System.out.println("First token in region: " + firstToken.getText());
+        System.out.println("Last token in region: " + lastToken.getText());
+        
         int startLine = getLine(firstToken);
-        
         Token tokenStartingLine = findTokenStartingLine(startLine, entireAST);
+        System.out.println("First token on line: " + tokenStartingLine.getText());
+        System.out.println("Eq? " + (tokenStartingLine == firstToken));
         if (tokenStartingLine != firstToken) startLine++;
+        System.out.println("Start line: " + startLine);
         
-        Token firstTokenAbove = findTokenStartingLastNonemptyLineAbove(startLine, node);
+        Token firstTokenAbove = findTokenStartingLastNonemptyLineAbove(startLine, entireAST);
+        System.out.println("Token above: " + firstTokenAbove.getText());
         
         int indentSize = 0;
-        if (startsIndentedRegion(firstTokenAbove))
-            indentSize = 4;
-        else
-            indentSize = Math.max(getColumn(firstTokenAbove)-1, 0);
+        indentSize = Math.max(getColumn(firstTokenAbove)-1, 0);
+        if (startsIndentedRegion(firstTokenAbove)) indentSize += 4;
         indentSize -= getUnindentAmount(node);
+        System.out.println("Indent size: " + indentSize);
         
         final int indentAmount = indentSize;
         
-        new GenericParseTreeVisitor()
+        entireAST.visitUsing(new GenericParseTreeVisitor()
         {
             boolean inFormatRegion = false;
             Token previousToken = null;
@@ -49,30 +60,79 @@ public class Reindenter
                 if (token == firstToken)
                     inFormatRegion = true;
                 else if (token == lastToken)
+                {
                     inFormatRegion = false;
+                    System.out.println("left");
+                }
                 
                 if (inFormatRegion && getLine(token) > getLine(previousToken))
-                    changeWhiteAfter(previousToken, indentAmount);
-                
+                    changeWhitetext(token, previousToken, indentAmount);
+                    
                 previousToken = token;
             }
 
-            private void changeWhiteAfter(Token token, int indentAmount)
+            private void changeWhitetext(Token firstTokenOnLine, Token previousToken, int indentAmount)
             {
                 if (indentAmount == 0) return;
+                if (lineIsEmpty(firstTokenOnLine, previousToken)) return;
                 
+                String spaces = spaces(indentAmount);
+                
+                String whiteAfterPrevTok = previousToken.getWhiteAfter();
+                String whiteBeforeFirstTok = firstTokenOnLine.getWhiteBefore();
+                
+                if (indentAmount > 0)
+                    firstTokenOnLine.setWhiteBefore(whiteBeforeFirstTok + spaces);
+                else if (indentAmount < 0 && whiteAfterPrevTok.endsWith(spaces))
+                    previousToken.setWhiteAfter(whiteAfterPrevTok.substring(0, whiteAfterPrevTok.length() + indentAmount));
+                else if (indentAmount < 0 && whiteBeforeFirstTok.endsWith(spaces))
+                    firstTokenOnLine.setWhiteBefore(whiteBeforeFirstTok.substring(0, whiteBeforeFirstTok.length() + indentAmount));
+            }
+
+            private boolean lineIsEmpty(Token firstTokenOnLine, Token previousToken)
+            {
+                // TODO: lineIsEmpty()
+                return false;
+            }
+
+            private String spaces(int indentAmount)
+            {
                 StringBuffer sb = new StringBuffer();
                 for (int i = 0; i < Math.abs(indentAmount); i++)
                     sb.append(' ');
                 String spaces = sb.toString();
-                
-                String whiteAfter = token.getWhiteAfter();
-                if (indentAmount > 0)
-                    token.setWhiteAfter(whiteAfter + spaces);
-                else if (indentAmount < 0 && whiteAfter.endsWith(spaces))
-                    token.setWhiteAfter(whiteAfter.substring(0, whiteAfter.length() + indentAmount));
+                return spaces;
             }
-        };
+        });
+    }
+
+    private static void recomputeLineColInfo(ASTExecutableProgramNode ast)
+    {
+        ast.visitUsing(new GenericParseTreeVisitor()
+        {
+            int line = 1, col = 1;
+            
+            public void visitToken(Token token)
+            {
+                update(token.getWhiteBefore());
+                token.setAdapter(LineCol.class, new LineCol(line, col));
+                update(token.getText());
+                update(token.getWhiteAfter());
+            }
+
+            private void update(String s)
+            {
+                for (int i = 0, len = s.length(); i < len; i++)
+                {
+                    if (s.charAt(i) == '\n')
+                    {
+                        line++;
+                        col = 1;
+                    }
+                    else col++;
+                }
+            }
+        });
     }
 
     private static Token findTokenStartingLastNonemptyLineAbove(int startLine, ParseTreeNode inNode)
@@ -85,7 +145,7 @@ public class Reindenter
         return null;
     }
 
-    protected static boolean startsIndentedRegion(Token token)
+    private static boolean startsIndentedRegion(Token token)
     {
         Terminal t = token.getTerminal();
         return t == Terminal.T_PROGRAM
@@ -105,7 +165,8 @@ public class Reindenter
             || t == Terminal.T_SELECT
             || t == Terminal.T_CASE
             || t == Terminal.T_DO
-            || t == Terminal.T_INTERFACE;
+            || t == Terminal.T_INTERFACE
+            || t == Terminal.T_CONTAINS;
     }
 
     private static int getLine(Token token)
@@ -127,7 +188,7 @@ public class Reindenter
         return Math.max(getStartColOfLeftmostBlockIn(node) - 1, 0);
     }
 
-    public static Token findFirstTokenIn(final ParseTreeNode node)
+    private static Token findFirstTokenIn(final ParseTreeNode node)
     {
         try
         {
@@ -146,19 +207,22 @@ public class Reindenter
         return null;
     }
 
-    protected static Token findLastTokenIn(ParseTreeNode node)
+    private static Token findLastTokenIn(final ParseTreeNode node)
     {
-        return new GenericParseTreeVisitor()
+        return new Object()
         {
             private Token lastToken;
             
-            public void visitToken(Token token)
-            {
-                lastToken = token;
-            }
-            
             public Token getLastToken()
             {
+                node.visitUsing(new GenericParseTreeVisitor()
+                {
+                    public void visitToken(Token token)
+                    {
+                        lastToken = token;
+                    }
+                });
+
                 return lastToken;
             }
         }.getLastToken();
@@ -190,7 +254,7 @@ public class Reindenter
         }.getMinCol();
     }
 
-    public static Token findTokenStartingLine(final int lineNum, final ParseTreeNode node)
+    private static Token findTokenStartingLine(final int lineNum, final ParseTreeNode node)
     {
         try
         {
@@ -199,7 +263,7 @@ public class Reindenter
                 public void visitToken(Token token)
                 {
                     int tokenLine = getLine(token);
-                    if (tokenLine >= lineNum) throw new Notification(token);
+                    if (tokenLine == lineNum) throw new Notification(token);
                 }
             });
         }
