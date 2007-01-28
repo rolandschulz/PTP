@@ -4,6 +4,7 @@ import org.eclipse.photran.core.util.LineCol;
 import org.eclipse.photran.core.util.Notification;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
+import org.eclipse.photran.internal.core.parser.AbstractParseTreeNode;
 import org.eclipse.photran.internal.core.parser.GenericParseTreeVisitor;
 import org.eclipse.photran.internal.core.parser.ParseTreeNode;
 import org.eclipse.photran.internal.core.parser.Terminal;
@@ -22,7 +23,7 @@ public class Reindenter
 {
     private Reindenter() {}
 
-    public static void reindent(ParseTreeNode node, ASTExecutableProgramNode entireAST)
+    public static void reindent(AbstractParseTreeNode node, ASTExecutableProgramNode entireAST)
     {
         recomputeLineColInfo(entireAST);
         
@@ -172,12 +173,12 @@ public class Reindenter
      * @return the number of characters by which the source code in this node needs to be shifted
      * to the left so that the leftmost token will begin on column one.
      */
-    private static int getUnindentAmount(ParseTreeNode node)
+    private static int getUnindentAmount(AbstractParseTreeNode node)
     {
         return Math.max(getStartColOfLeftmostBlockIn(node) - 1, 0);
     }
 
-    private static Token findFirstTokenIn(final ParseTreeNode node)
+    private static Token findFirstTokenIn(final AbstractParseTreeNode node)
     {
         try
         {
@@ -196,7 +197,7 @@ public class Reindenter
         return null;
     }
 
-    private static Token findLastTokenIn(final ParseTreeNode node)
+    private static Token findLastTokenIn(final AbstractParseTreeNode node)
     {
         return new Object()
         {
@@ -221,7 +222,7 @@ public class Reindenter
      * @return the leftmost column at which a token in this PartialProgram is positioned
      * (useful for unindenting code)
      */
-    private static int getStartColOfLeftmostBlockIn(final ParseTreeNode node)
+    private static int getStartColOfLeftmostBlockIn(final AbstractParseTreeNode node)
     {
         return new Object()
         {

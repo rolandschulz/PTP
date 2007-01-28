@@ -108,13 +108,13 @@ public class ParseTreeNode extends AbstractParseTreeNode
         }
     }
     
-    public void addChild(int index, ParseTreeNode nodeToAdd)
+    public void addChild(int index, AbstractParseTreeNode nodeToAdd)
     {
         if (children == null) children = new LinkedList/*<AbstractParseTreeNode>*/();
         children.add(index, nodeToAdd);
     }
 
-    public boolean removeChild(ParseTreeNode childToRemove)
+    public boolean removeChild(AbstractParseTreeNode childToRemove)
     {
         return children == null ? false : children.remove(childToRemove);
     }
