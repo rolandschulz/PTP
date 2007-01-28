@@ -29,24 +29,16 @@ public class Reindenter
         final Token firstToken = findFirstTokenIn(node); if (firstToken == null) return;
         final Token lastToken = findLastTokenIn(node);
         
-        System.out.println("First token in region: " + firstToken.getText());
-        System.out.println("Last token in region: " + lastToken.getText());
-        
         int startLine = getLine(firstToken);
         Token tokenStartingLine = findTokenStartingLine(startLine, entireAST);
-        System.out.println("First token on line: " + tokenStartingLine.getText());
-        System.out.println("Eq? " + (tokenStartingLine == firstToken));
         if (tokenStartingLine != firstToken) startLine++;
-        System.out.println("Start line: " + startLine);
         
         Token firstTokenAbove = findTokenStartingLastNonemptyLineAbove(startLine, entireAST);
-        System.out.println("Token above: " + firstTokenAbove.getText());
         
         int indentSize = 0;
         indentSize = Math.max(getColumn(firstTokenAbove)-1, 0);
         if (startsIndentedRegion(firstTokenAbove)) indentSize += 4;
         indentSize -= getUnindentAmount(node);
-        System.out.println("Indent size: " + indentSize);
         
         final int indentAmount = indentSize;
         
@@ -60,10 +52,7 @@ public class Reindenter
                 if (token == firstToken)
                     inFormatRegion = true;
                 else if (token == lastToken)
-                {
                     inFormatRegion = false;
-                    System.out.println("left");
-                }
                 
                 if (inFormatRegion && getLine(token) > getLine(previousToken))
                     changeWhitetext(token, previousToken, indentAmount);
