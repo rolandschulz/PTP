@@ -4,7 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
-import org.eclipse.photran.internal.core.parser.ParseTreeNode;
+import org.eclipse.photran.internal.core.parser.AbstractParseTreeNode;
 
 public class SourcePrinter
 {
@@ -24,7 +24,7 @@ public class SourcePrinter
         return result;
     }
     
-    public static String getSourceCodeFromASTNode(ParseTreeNode node)
+    public static String getSourceCodeFromASTNode(AbstractParseTreeNode node)
     {
         ByteArrayOutputStream out = new ByteArrayOutputStream(4096);
         node.printOn(new PrintStream(out));
