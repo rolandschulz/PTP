@@ -27,7 +27,6 @@ import org.eclipse.debug.core.model.IDebugElement;
 public interface IPDebugElement extends IDebugElement {
 	public PDebugElementState getState();
 	public Object getCurrentStateInfo();
-	public IPDebugTarget getDebugTarget();
 }
 
 

@@ -22,7 +22,6 @@ import java.math.BigInteger;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.eclipse.cdt.core.IAddress;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;

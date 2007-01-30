@@ -64,7 +64,7 @@ public abstract class PDebugElement extends PlatformObject implements IPDebugEle
 	public String getModelIdentifier() {
 		return PCDIDebugModel.getPluginIdentifier();
 	}
-	public IPDebugTarget getDebugTarget() {
+	public IDebugTarget getDebugTarget() {
 		return fDebugTarget;
 	}
 	public ILaunch getLaunch() {

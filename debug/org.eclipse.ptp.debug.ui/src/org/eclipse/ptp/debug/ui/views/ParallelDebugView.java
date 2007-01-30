@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.ui.views;
 
+import java.util.Iterator;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -34,8 +35,9 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.Viewer;
@@ -43,6 +45,8 @@ import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IAbstractDebugger;
+import org.eclipse.ptp.debug.core.model.IPDebugElement;
+import org.eclipse.ptp.debug.core.model.IPDebugTarget;
 import org.eclipse.ptp.debug.internal.ui.UIDebugManager;
 import org.eclipse.ptp.debug.internal.ui.actions.RegisterAction;
 import org.eclipse.ptp.debug.internal.ui.actions.ResumeAction;
@@ -83,6 +87,25 @@ public class ParallelDebugView extends ParallelJobView {
 	protected ParallelAction unregisterAction = null;
 	protected AbstractPDebugEventHandler fEventHandler;
 	
+	private ISelectionChangedListener debugViewSelectChangedListener = new ISelectionChangedListener() {
+		public void selectionChanged(SelectionChangedEvent event) {
+			ISelection selection = event.getSelection();
+			if (!selection.isEmpty()) {
+				if (selection instanceof IStructuredSelection) {
+					canvas.unselectAllElements();
+					for (Iterator i=((IStructuredSelection)selection).iterator(); i.hasNext();) {
+						Object obj = i.next();
+						if (obj instanceof IPDebugElement) {
+							int taskID = ((IPDebugTarget)((IPDebugElement)obj).getDebugTarget()).getTargetID();
+							if (!canvas.isSelected(taskID))
+								canvas.selectElement(taskID);
+						}
+					}
+					canvas.redraw();
+				}
+			}
+		}
+	};
 	/*
 	private MouseAdapter debugViewMouseAdapter = new MouseAdapter() {
 		public void mouseUp(MouseEvent event) {
@@ -114,6 +137,7 @@ public class ParallelDebugView extends ParallelJobView {
 		if (getEventHandler() != null) {
 			getEventHandler().dispose();
 		}
+		getDebugViewer().removeSelectionChangedListener(debugViewSelectChangedListener);
 		super.dispose();
 	}
 	protected Viewer getViewer(String view_id) {
@@ -170,6 +194,7 @@ public class ParallelDebugView extends ParallelJobView {
 	public void createView(Composite parent) {
 		super.createView(parent);
 		setEventHandler(new ParallelDebugViewEventHandler(this));
+		getDebugViewer().addSelectionChangedListener(debugViewSelectChangedListener);
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.views.AbstractParallelSetView#fillContextMenu(org.eclipse.jface.action.IMenuManager)
@@ -454,8 +479,8 @@ public class ParallelDebugView extends ParallelJobView {
     public void selectionChanged(SelectionChangedEvent event) {
     	super.selectionChanged(event);
     	ISelection selection = event.getSelection();
-    	if (!selection.isEmpty() && selection instanceof StructuredSelection) {
-    		StructuredSelection structSelection = (StructuredSelection)selection;
+    	if (!selection.isEmpty() && selection instanceof IStructuredSelection) {
+    		IStructuredSelection structSelection = (IStructuredSelection)selection;
     		if (structSelection.size() == 1) {
 	    		IElement element = (IElement)structSelection.getFirstElement();
 	    		if (element.isRegistered()) {
