@@ -19,7 +19,6 @@
 package org.eclipse.ptp.debug.internal.core;
 
 import java.util.ArrayList;
-
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;

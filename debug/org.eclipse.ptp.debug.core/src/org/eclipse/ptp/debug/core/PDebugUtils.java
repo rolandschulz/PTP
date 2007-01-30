@@ -19,7 +19,6 @@
 package org.eclipse.ptp.debug.core;
 
 import java.util.Arrays;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.debug.core.DebugPlugin;

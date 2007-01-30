@@ -18,8 +18,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core;
 
-import java.io.File;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -51,7 +49,6 @@ import org.eclipse.ptp.debug.internal.core.PDebugConfiguration;
 import org.eclipse.ptp.debug.internal.core.sourcelookup.CommonSourceLookupDirector;
 import org.eclipse.ptp.debug.internal.core.sourcelookup.PSourceLookupDirector;
 import org.eclipse.ptp.debug.internal.core.sourcelookup.SourceUtils;
-import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
 public class PTPDebugCorePlugin extends Plugin {
