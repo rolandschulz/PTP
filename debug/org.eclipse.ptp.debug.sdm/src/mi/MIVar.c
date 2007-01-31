@@ -322,7 +322,7 @@ void
 MIGetVarInfoNumChildren(MICommand *cmd, MIVar *var)
 {
 	if (!cmd->completed || cmd->output == NULL || cmd->output->rr == NULL)
-		return NULL;
+		return;
 
 	List *results;
 	MIValue *	value;

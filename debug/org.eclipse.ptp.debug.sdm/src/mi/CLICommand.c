@@ -24,14 +24,6 @@
 #include "MICommand.h"
 
 MICommand *
-MIGDBVersion(void)
-{
-	MICommand * cmd;
-	cmd = MICommandNew("-gdb-version", MIResultRecordDONE);
-	return cmd;
-}
-
-MICommand *
 CLIHandle(char *arg) {
 	MICommand * cmd;
 	cmd = MICommandNew("handle", MIResultRecordDONE);

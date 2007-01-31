@@ -58,30 +58,35 @@
 #include "orte/runtime/runtime.h"
 
 #if ORTE_VERSION_1_0
-#define ORTE_QUERY()									orte_rmgr.query()
-#define ORTE_LAUNCH_JOB(jobid)							orte_rmgr.launch(jobid)
-#define ORTE_TERMINATE_JOB(jobid)						orte_rmgr.terminate_job(jobid)
-#define ORTE_SETUP_JOB(app_context,num_context,jobid)	orte_rmgr.create(app_context,num_context,jobid)
-#define ORTE_SUBSCRIBE(jobid,cbfunc,cbdata,cond)		orte_rmgr_base_proc_stage_gate_subscribe(jobid,cbfunc,cbdata,cond)
-#define ORTE_SPAWN(apps,num_apps,jobid,cbfunc)			orte_rmgr.spawn(apps,num_apps,jobid,cbfunc)
-#define ORTE_PACK(buf,cmd,num,type)						orte_dps.pack(buf,cmd,num,type)
-#define ORTE_KEYVALUE_TYPE(keyval)						(keyval)->type
-#define ORTE_GET_UINT32_VALUE(keyval)					(keyval)->value.ui32
-#define ORTE_GET_STRING_VALUE(keyval)					(keyval)->value.strptr
-#define ORTE_GET_PID_VALUE(keyval)						(keyval)->value.pid
-#define ORTE_NOTIFY_ALL									ORTE_STAGE_GATE_ALL
-#define ORTE_STD_CNTR_TYPE								size_t
+#define ORTE_QUERY(jobid)									orte_rmgr.query()
+#define ORTE_LAUNCH_JOB(jobid)								orte_rmgr.launch(jobid)
+#define ORTE_TERMINATE_JOB(jobid,attr)						orte_rmgr.terminate_job(jobid)
+#define ORTE_SETUP_JOB(app_context,num_context,jobid,attr)	orte_rmgr.create(app_context,num_context,jobid)
+#define ORTE_SUBSCRIBE(jobid,cbfunc,cbdata,cond)			orte_rmgr_base_proc_stage_gate_subscribe(jobid,cbfunc,cbdata,cond)
+#define ORTE_SPAWN(apps,num_apps,jobid,cbfunc)				orte_rmgr.spawn(apps,num_apps,jobid,cbfunc)
+#define ORTE_PACK(buf,cmd,num,type)							orte_dps.pack(buf,cmd,num,type)
+#define ORTE_FREE_NAME(name)								orte_ns.free_name(&name)
+#define ORTE_KEYVALUE_TYPE(keyval)							(keyval)->type
+#define ORTE_GET_UINT32_VALUE(keyval)						(keyval)->value.ui32
+#define ORTE_GET_STRING_VALUE(keyval)						(keyval)->value.strptr
+#define ORTE_GET_PID_VALUE(keyval)							(keyval)->value.pid
+#define ORTE_NOTIFY_ALL										ORTE_STAGE_GATE_ALL
+#define ORTE_STD_CNTR_TYPE									size_t
 #else /* ORTE_VERSION_1_0 */
-#define ORTE_QUERY()									orte_rds.query()
-#define ORTE_LAUNCH_JOB(jobid)							orte_pls.launch_job(jobid)
-#define ORTE_TERMINATE_JOB(jobid)						orte_pls.terminate_job(jobid)
-#define ORTE_SETUP_JOB(app_context,num_context,jobid)	orte_rmgr.setup_job(app_context,num_context,jobid)
-#define ORTE_SUBSCRIBE(jobid,cbfunc,cbdata,cond)		orte_smr.job_stage_gate_subscribe(jobid,cbfunc,cbdata,cond)
-#define ORTE_PACK(buf,cmd,num,type)						orte_dss.pack(buf,cmd,num,type)
-#define ORTE_GET_VPID_RANGE(jobid, start, range)		orte_rmgr.get_vpid_range(jobid, start, range)
-#define ORTE_KEYVALUE_TYPE(keyval)						(keyval)->value->type
-#define ORTE_NOTIFY_ALL									ORTE_PROC_STATE_ALL
-#define ORTE_STD_CNTR_TYPE								orte_std_cntr_t
+#define ORTE_QUERY(jobid)									orte_rds.query(jobid)
+#define ORTE_LAUNCH_JOB(jobid)								orte_pls.launch_job(jobid)
+#define ORTE_TERMINATE_JOB(jobid,attr)						orte_pls.terminate_job(jobid, attr)
+#define ORTE_SETUP_JOB(app_context,num_context,jobid,attr)	orte_rmgr.setup_job(app_context,num_context,jobid, attr)
+#define ORTE_SUBSCRIBE(jobid,cbfunc,cbdata,cond)			orte_smr.job_stage_gate_subscribe(jobid,cbfunc,cbdata,cond)
+#define ORTE_PACK(buf,cmd,num,type)							orte_dss.pack(buf,cmd,num,type)
+#define ORTE_GET_VPID_RANGE(jobid, start, range)			orte_rmgr.get_vpid_range(jobid, start, range)
+#define ORTE_FREE_NAME(name)								free(name)
+#define ORTE_KEYVALUE_TYPE(keyval)							(keyval)->value->type
+#define ORTE_NOTIFY_ALL										ORTE_PROC_STATE_ALL
+#define ORTE_STD_CNTR_TYPE									orte_std_cntr_t
+#ifndef ORTE_RML_NAME_SEED
+#define ORTE_RML_NAME_SEED									ORTE_PROC_MY_HNP
+#endif /* ORTE_RML_NAME_SEED */
 #endif /* ORTE_VERSION_1_0 */
 
 #if ORTE_VERSION_1_0

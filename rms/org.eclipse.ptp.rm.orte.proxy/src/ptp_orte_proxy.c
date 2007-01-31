@@ -359,7 +359,7 @@ ORTEStartDaemon(char **args)
 	ORTE_Subscribe_Bproc();
 #endif
 
-	ORTE_QUERY();
+	ORTE_QUERY(ORTE_JOBID_INVALID);
 	
 	printf("Start daemon returning OK.\n");
 	asprintf(&res, "%d", RTEV_OK);
@@ -880,9 +880,9 @@ ORTETerminateJob(char **args)
 	
 	if ((j = find_job(jobid, JOBID_PTP)) != NULL) {
 		if (j->debug_jobid < 0)
-			rc = ORTE_TERMINATE_JOB(j->orte_jobid);
+			rc = ORTE_TERMINATE_JOB(j->orte_jobid, NULL);
 		else
-			rc = ORTE_TERMINATE_JOB(j->debug_jobid);
+			rc = ORTE_TERMINATE_JOB(j->debug_jobid, NULL);
 		
 		if(ORTECheckErrorCode(RTEV_ERROR_TERMINATE_JOB, rc)) return 1;
 	}
@@ -1038,7 +1038,7 @@ debug_allocate(orte_app_context_t** app_context, size_t num_context, orte_jobid_
 	 * Initialize job segment and allocate resources
 	 */
 
-	if (ORTE_SUCCESS != (rc = ORTE_SETUP_JOB(app_context,num_context,jobid))) {
+	if (ORTE_SUCCESS != (rc = ORTE_SETUP_JOB(app_context,num_context,jobid,NULL))) {
 		ORTE_ERROR_LOG(rc);
 		return rc;
 	}
@@ -1079,7 +1079,7 @@ debug_allocate(orte_app_context_t** app_context, size_t num_context, orte_jobid_
 		}
 	}
 
-	orte_ns.free_name(&name);
+	ORTE_FREE_NAME(name);
 
 	return ORTE_SUCCESS;
 }
