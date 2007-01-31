@@ -25,6 +25,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "MIOOBRecord.h"
 #include "CLIOutput.h"
@@ -115,10 +116,9 @@ CLIGetSigHandleList(MICommand *cmd, List** signals)
 double 
 CLIGetGDBVersion(MICommand *cmd)
 {
-	List *oobs;
-	MIOOBRecord *oob;
-	char *text;
-	char * pch;
+	List *			oobs;
+	MIOOBRecord *	oob;
+	char *			text;
 	
 	if (!cmd->completed || cmd->output == NULL || cmd->output->oobs == NULL) {
 		return -1.0;
@@ -135,21 +135,31 @@ CLIGetGDBVersion(MICommand *cmd)
 			continue;
 		}
 		while (*text == ' ') {
-			*text++;
+			text++;
 		}
 		
-		//linux self: GUN gdb 6.5.0
-		//fedore: GNU gdb Red Hat Linux (6.5-8.fc6rh)
-		//Mac OS X: GNU gdb 6.1-20040303 (Apple version gdb-384) (Mon Mar 21 00:05:26 GMT 2005)
+		/*
+		 * linux self: GUN gdb 6.5.0
+		 * fedore: GNU gdb Red Hat Linux (6.5-8.fc6rh)
+		 * Mac OS X: GNU gdb 6.1-20040303 (Apple version gdb-384) (Mon Mar 21 00:05:26 GMT 2005)
+		 */
 		if (strncmp(text, "GNU gdb", 7) == 0) {
-			text += 8; //bypass "GUN gdb "
-			pch = strchr(text, '.');
-			if (pch != NULL) {
-			    text = pch - 1; // get 1 digit before .
-			    pch += 2; // include . and 1 more digit
-				*pch = '\0';
-				return atof(strdup(text));
-			}
+			/*
+			 * bypass "GNU gdb"
+			 */
+			text += 8;
+			
+			/*
+			 * find first digit
+			 */
+			while (*text != '\0' && !isdigit(*text))
+				text++;
+				
+			/*
+			 * Convert whatever is here to a double
+			 */
+			if (*text != '\0')
+				return strtod(text, NULL);
 		}
 	}
 	return -1.0;
