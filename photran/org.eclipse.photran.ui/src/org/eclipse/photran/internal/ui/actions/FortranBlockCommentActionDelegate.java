@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.text.Assert;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.BadPartitioningException;
@@ -31,7 +32,7 @@ public class FortranBlockCommentActionDelegate extends FortranEditorActionDelega
     
     public FortranBlockCommentActionDelegate(AbstractFortranEditor ed) { super(ed); }
 
-    public void run()
+    public void run(IProgressMonitor progressMonitor)
     {
         AbstractFortranEditor editor = getFortranEditor();
         ITextSelection selection = editor.getSelection();
