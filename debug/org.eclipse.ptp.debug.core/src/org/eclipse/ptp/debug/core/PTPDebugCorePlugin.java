@@ -27,6 +27,7 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
+
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -45,9 +46,9 @@ import org.eclipse.debug.core.DebugException;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ptp.debug.core.events.IPDebugEvent;
 import org.eclipse.ptp.debug.core.sourcelookup.IPSourceLocation;
+import org.eclipse.ptp.debug.core.sourcelookup.PSourceLookupDirector;
 import org.eclipse.ptp.debug.internal.core.PDebugConfiguration;
 import org.eclipse.ptp.debug.internal.core.sourcelookup.CommonSourceLookupDirector;
-import org.eclipse.ptp.debug.internal.core.sourcelookup.PSourceLookupDirector;
 import org.eclipse.ptp.debug.internal.core.sourcelookup.SourceUtils;
 import org.osgi.framework.BundleContext;
 

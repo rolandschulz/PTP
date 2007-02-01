@@ -16,11 +16,12 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.internal.core.sourcelookup;
+package org.eclipse.ptp.debug.core.sourcelookup;
 
 import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
+
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -31,13 +32,12 @@ import org.eclipse.debug.core.sourcelookup.AbstractSourceLookupDirector;
 import org.eclipse.debug.core.sourcelookup.ISourceContainer;
 import org.eclipse.debug.core.sourcelookup.ISourceContainerType;
 import org.eclipse.debug.core.sourcelookup.ISourceLookupParticipant;
+import org.eclipse.debug.core.sourcelookup.containers.DirectorySourceContainer;
 import org.eclipse.debug.core.sourcelookup.containers.FolderSourceContainer;
 import org.eclipse.debug.core.sourcelookup.containers.ProjectSourceContainer;
 import org.eclipse.debug.core.sourcelookup.containers.WorkspaceSourceContainer;
 import org.eclipse.ptp.debug.core.model.IPBreakpoint;
-import org.eclipse.ptp.debug.core.sourcelookup.IPSourceLookupDirector;
-import org.eclipse.ptp.debug.core.sourcelookup.MappingSourceContainer;
-import org.eclipse.ptp.debug.core.sourcelookup.PDirectorySourceContainer;
+import org.eclipse.ptp.debug.internal.core.sourcelookup.PSourceLookupParticipant;
 
 public class PSourceLookupDirector extends AbstractSourceLookupDirector implements IPSourceLookupDirector {
 	private static Set fSupportedTypes;
@@ -46,8 +46,11 @@ public class PSourceLookupDirector extends AbstractSourceLookupDirector implemen
 		fSupportedTypes.add(WorkspaceSourceContainer.TYPE_ID);
 		fSupportedTypes.add(ProjectSourceContainer.TYPE_ID);
 		fSupportedTypes.add(FolderSourceContainer.TYPE_ID);
-		fSupportedTypes.add(PDirectorySourceContainer.TYPE_ID);
-		fSupportedTypes.add(MappingSourceContainer.TYPE_ID);
+		fSupportedTypes.add(DirectorySourceContainer.TYPE_ID);
+		/**
+		 *	No Mapping
+		 * 	fSupportedTypes.add(MappingSourceContainer.TYPE_ID);
+		 */
 	}
 
 	public void initializeParticipants() {

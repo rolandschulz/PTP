@@ -27,12 +27,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
-import org.eclipse.cdt.core.resources.FileStorage;
-import org.eclipse.cdt.debug.core.CDebugUtils;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -41,6 +41,8 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.ptp.core.resources.FileStorage;
+import org.eclipse.ptp.debug.core.PDebugUtils;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.sourcelookup.IDirectorySourceLocation;
 import org.eclipse.ptp.debug.core.sourcelookup.IPSourceLocation;
@@ -226,7 +228,7 @@ public class PDirectorySourceLocation implements IDirectorySourceLocation {
 			if (getAssociation() != null)
 				node.setAttribute(ATTR_ASSOCIATION, getAssociation().toOSString());
 			node.setAttribute(ATTR_SEARCH_SUBFOLDERS, new Boolean(searchSubfolders()).toString());
-			return CDebugUtils.serializeDocument(document);
+			return PDebugUtils.serializeDocument(document);
 		} catch (ParserConfigurationException e) {
 			ex = e;
 		} catch (IOException e) {
@@ -234,7 +236,7 @@ public class PDirectorySourceLocation implements IDirectorySourceLocation {
 		} catch (TransformerException e) {
 			ex = e;
 		}
-		abort(MessageFormat.format(InternalSourceLookupMessages.getString("CDirectorySourceLocation.0"), new String[] { getDirectory().toOSString() }), ex);
+		abort(MessageFormat.format(InternalSourceLookupMessages.getString("PDirectorySourceLocation.0"), new String[] { getDirectory().toOSString() }), ex);
 		// execution will not reach here
 		return null;
 	}
@@ -248,13 +250,13 @@ public class PDirectorySourceLocation implements IDirectorySourceLocation {
 			root = parser.parse(source).getDocumentElement();
 			String dir = root.getAttribute(ATTR_DIRECTORY);
 			if (isEmpty(dir)) {
-				abort(InternalSourceLookupMessages.getString("CDirectorySourceLocation.1"), null);
+				abort(InternalSourceLookupMessages.getString("PDirectorySourceLocation.1"), null);
 			} else {
 				IPath path = new Path(dir);
 				if (path.isValidPath(dir) && path.toFile().isDirectory() && path.toFile().exists()) {
 					setDirectory(path);
 				} else {
-					abort(MessageFormat.format(InternalSourceLookupMessages.getString("CDirectorySourceLocation.2"), new String[] { dir }), null);
+					abort(MessageFormat.format(InternalSourceLookupMessages.getString("PDirectorySourceLocation.2"), new String[] { dir }), null);
 				}
 			}
 			dir = root.getAttribute(ATTR_ASSOCIATION);
@@ -277,7 +279,7 @@ public class PDirectorySourceLocation implements IDirectorySourceLocation {
 		} catch (IOException e) {
 			ex = e;
 		}
-		abort(InternalSourceLookupMessages.getString("CDirectorySourceLocation.3"), ex);
+		abort(InternalSourceLookupMessages.getString("PDirectorySourceLocation.3"), ex);
 	}
 	private void abort(String message, Throwable e) throws CoreException {
 		IStatus s = new Status(IStatus.ERROR, PTPDebugCorePlugin.getUniqueIdentifier(), PTPDebugCorePlugin.INTERNAL_ERROR, message, e);

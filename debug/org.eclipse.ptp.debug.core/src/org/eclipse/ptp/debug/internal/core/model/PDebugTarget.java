@@ -68,6 +68,7 @@ import org.eclipse.debug.core.model.IThread;
 import org.eclipse.debug.core.sourcelookup.ISourceContainer;
 import org.eclipse.debug.core.sourcelookup.ISourceLookupDirector;
 import org.eclipse.debug.core.sourcelookup.ISourceLookupParticipant;
+import org.eclipse.debug.core.sourcelookup.containers.DirectorySourceContainer;
 import org.eclipse.debug.core.sourcelookup.containers.FolderSourceContainer;
 import org.eclipse.debug.core.sourcelookup.containers.ProjectSourceContainer;
 import org.eclipse.ptp.debug.core.IPDebugConstants;
@@ -114,7 +115,6 @@ import org.eclipse.ptp.debug.core.model.IPSignal;
 import org.eclipse.ptp.debug.core.model.PDebugElementState;
 import org.eclipse.ptp.debug.core.sourcelookup.IPSourceLocator;
 import org.eclipse.ptp.debug.core.sourcelookup.ISourceLookupChangeListener;
-import org.eclipse.ptp.debug.core.sourcelookup.PDirectorySourceContainer;
 import org.eclipse.ptp.debug.internal.core.PGlobalVariableManager;
 import org.eclipse.ptp.debug.internal.core.PSignalManager;
 import org.eclipse.ptp.debug.internal.core.PTPMemoryBlockRetrievalExtension;
@@ -1044,8 +1044,8 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPCDIE
 				if (container != null && container.exists())
 					list.add(container.getLocation().toPortableString());
 			}
-			if (containers[i] instanceof PDirectorySourceContainer) {
-				File dir = ((PDirectorySourceContainer) containers[i]).getDirectory();
+			if (containers[i] instanceof DirectorySourceContainer) {
+				File dir = ((DirectorySourceContainer) containers[i]).getDirectory();
 				if (dir != null && dir.exists()) {
 					IPath path = new Path(dir.getAbsolutePath());
 					list.add(path.toPortableString());

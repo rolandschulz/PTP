@@ -42,7 +42,7 @@ public interface IPDebugConstants {
 	/**
 	 * String preference for the common source containers.
 	 */
-	public static final String PREF_COMMON_SOURCE_CONTAINERS = PTPDebugCorePlugin.getUniqueIdentifier() + ".cDebug.common_source_containers";
+	public static final String PREF_COMMON_SOURCE_CONTAINERS = PTPDebugCorePlugin.getUniqueIdentifier() + ".pDebug.common_source_containers";
 	
 	/**
 	 * C/C++ debug plug-in identifier (value
