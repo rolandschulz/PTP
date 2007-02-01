@@ -66,6 +66,7 @@ public abstract class AbstractParallelView extends ViewPart implements IModelLis
     
 	public void modelEvent(IModelEvent event) {
 		if (event instanceof IModelErrorEvent) {
+			build();
 			refresh(true);
 		}
 		else if (event instanceof IModelRuntimeNotifierEvent) {

@@ -24,6 +24,7 @@ import java.util.BitSet;
 import java.util.Hashtable;
 import java.util.Timer;
 import java.util.TimerTask;
+
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.SafeRunnable;
@@ -85,6 +86,8 @@ public class IconCanvas extends Canvas {
 	protected boolean mouseDown = false;
 	protected boolean mouseDoubleClick = false;
 	// scrolling and selection
+	protected int firstSelectedIndex = -1;
+	protected int secondSelectedIndex = -1; //for mac	
 	protected BitSet selectedElements = new BitSet();
 	protected BitSet tempSelectedElements = new BitSet();
 	protected int sel_size = 1;
@@ -117,6 +120,7 @@ public class IconCanvas extends Canvas {
 	protected boolean show_tooltip_allthetime = false;
 	private Timer hoverTimer = null;
 	protected boolean tooltip_wrap = true; 
+	protected boolean show_tooltip = true;
 	
 	// input
 	protected int total_elements = 0;
@@ -154,7 +158,7 @@ public class IconCanvas extends Canvas {
 	 * @see org.eclipse.swt.widgets.Widget#dispose()
 	 */
 	public void dispose() {
-		if (fInformationControl == null) {
+		if (fInformationControl != null) {
 			fInformationControl.dispose();
 		}
 		super.dispose();
@@ -222,8 +226,10 @@ public class IconCanvas extends Canvas {
 		actualScrollStart_y = 0;
 		autoScrollDirection = SWT.NULL;
 		verticalScrollOffset = 0;
-		selectedElements.clear();
-		tempSelectedElements.clear();
+		unselectAllElements();
+		firstSelectedIndex = -1;
+		secondSelectedIndex = -1;
+		selection = null;
 		resetMargin();
 		resetInfo();
 		getVerticalBar().setSelection(0);
@@ -241,6 +247,9 @@ public class IconCanvas extends Canvas {
 	 */
 	public void setToolTipProvider(IToolTipProvider toolTipProvider) {
 		this.toolTipProvider = toolTipProvider;
+	}
+	public void setShowTooltip(boolean show) {
+		this.show_tooltip = show;
 	}
 	/** Get image provider
 	 * @return
@@ -990,13 +999,22 @@ public class IconCanvas extends Canvas {
 					doPageUp(1);
 				}
 				selection.y = actualScrollStart_y - verticalScrollOffset;
-				if (!isSelect)
-					unselectElement(index);
-				if (!isSelected(index - max_col))
-					autoSelectUnselectElement(index - max_col);
+				boolean redrawAll = !selectedElements.isEmpty();
+				if (!isSelect) {
+					unselectAllElements();
+					selectedElements.set(index - max_col);
+				}
+				else {
+					if (!isSelected(index - max_col))
+						selectElements(index-max_col, index);
+					else
+						unselectElements(index-max_col+1, index);						
+				}
+				
+				if (redrawAll)
+					redraw();
 				else
-					unselectElement(index);
-				redraw(index, index - max_col);
+					redraw(index - max_col, index);
 			}
 		}
 	}
@@ -1013,13 +1031,23 @@ public class IconCanvas extends Canvas {
 					doPageDown(1);
 				}
 				selection.y = actualScrollStart_y - verticalScrollOffset;
-				if (!isSelect)
-					unselectElement(index);
-				if (!isSelected(index + max_col))
-					autoSelectUnselectElement(index + max_col);
+				boolean redrawAll = !selectedElements.isEmpty();
+				if (!isSelect) {
+					unselectAllElements();
+					selectedElements.set(index + max_col);
+				}
+				else {
+					if (!isSelected(index + max_col))
+						selectElements(index, index+max_col);
+					else
+						unselectElements(index, index+max_col-1);						
+				}
+			
+				if (redrawAll)
+					redraw();
 				else
-					unselectElement(index);
-				redraw(index, index + max_col);
+					redraw(index, index + max_col);
+
 			}
 		}
 	}
@@ -1038,13 +1066,19 @@ public class IconCanvas extends Canvas {
 				selection.x = e_offset_x + (getMaxCol() * getElementWidth()) - e_width;
 				selection.y = actualScrollStart_y - verticalScrollOffset;
 			}
-			if (!isSelect)
-				unselectElement(index);
+			boolean redrawAll = !selectedElements.isEmpty();
+			if (!isSelect) {
+				unselectAllElements();
+			}
 			if (!isSelected(index - 1))
 				autoSelectUnselectElement(index - 1);
 			else
-				unselectElement(index);
-			redraw(index - 1, index);
+				selectedElements.clear(index);
+			
+			if (redrawAll)
+				redraw();
+			else
+				redraw(index-1, index);
 		}
 	}
 	/** Go next
@@ -1062,13 +1096,18 @@ public class IconCanvas extends Canvas {
 				selection.x = e_offset_x + e_spacing_x;
 				selection.y = actualScrollStart_y - verticalScrollOffset;
 			}
-			if (!isSelect)
-				unselectElement(index);
+			boolean redrawAll = !selectedElements.isEmpty();
+			if (!isSelect) {
+				unselectAllElements();
+			}
 			if (!isSelected(index + 1))
 				autoSelectUnselectElement(index + 1);
 			else
-				unselectElement(index);
-			redraw(index, index + 1);
+				selectedElements.clear(index);
+			if (redrawAll)
+				redraw();
+			else
+				redraw(index, index+1);
 		}
 	}
 	/** Go to line start
@@ -1251,8 +1290,8 @@ public class IconCanvas extends Canvas {
 	 */
 	protected Point findLocation(int index) {
 		Point section = findSection(index);
-		int x_loc = (section.x * getElementWidth() + e_offset_x);
-		int y_loc = (section.y * getElementHeight() + e_offset_y) - verticalScrollOffset;
+		int x_loc = (section.x * getElementWidth() + e_offset_x + 1); //plus 1 for margin
+		int y_loc = (section.y * getElementHeight() + e_offset_y + 1) - verticalScrollOffset;
 		return new Point(x_loc, y_loc);
 	}
 	/** Get direction 
@@ -1290,6 +1329,10 @@ public class IconCanvas extends Canvas {
 				int index = findSelectedIndex(row_count, col_count);
 				if (index > -1 && index < total) {
 					newElements.set(index);
+				}
+				//indicate the first selected element when dragging
+				if (firstSelectedIndex == -1 || firstSelectedIndex > index) {
+					firstSelectedIndex = index;
 				}
 			}
 		}
@@ -1330,6 +1373,7 @@ public class IconCanvas extends Canvas {
 		int e_x = end_pt.x;
 		int s_y = isInitialPage ? start_pt.y : (actualScrollStart_y - verticalScrollOffset);
 		int e_y = end_pt.y;
+
 		switch (direction) {
 		case SW:
 			s_x = end_pt.x;
@@ -1350,11 +1394,12 @@ public class IconCanvas extends Canvas {
 		int d_ex = e_x - e_offset_x;
 		int d_sy = s_y - e_offset_y + e_spacing_y;
 		int d_ey = e_y - e_offset_y;
-		
+
 		int col_start = Math.max(0, getSelectedCol(d_sx, true));
 		int col_end = Math.min(getSelectedCol(d_ex, true) + 1, getMaxCol());
 		int row_start = Math.max(0, getSelectedRow(d_sy, true));
 		int row_end = Math.min(getSelectedRow(d_ey, true) + 1, getMaxRow());
+
 		tempSelectedElements.clear();
 		tempSelectedElements.or(selectElements(col_start, col_end, row_start, row_end));
 		if (movingSelectionEnd != null) {
@@ -1467,36 +1512,17 @@ public class IconCanvas extends Canvas {
 		int diff = Math.abs(end_row - start_row) + 1;
 		redraw(0, Math.min(start_y_loc, end_y_loc), (max_col * getElementWidth() + e_offset_x), diff * getElementHeight(), false);
 	}
-	/** Can select elements
-	 * @param start_pt
-	 * @param end_pt
+	/** select elements
+	 * @param start_index
+	 * @param end_index
+	 * @param checkStatus
 	 * @return true if element can be selected
 	 */
-	protected boolean canSelectElements(Point start_pt, Point end_pt) {
-		int start_index = start_pt == null ? -1 : findSelectedIndexByLocation(start_pt.x, start_pt.y, false);
-		int end_index = end_pt == null ? -1 : findSelectedIndexByLocation(end_pt.x, end_pt.y, false);
-		int start_count = start_index + 1;
-		int end_count = end_index;
-		if (start_index > end_index) {// swarp
-			if (end_index == -1)
-				return false;
-			start_count = end_count;
-			end_count = start_index - 1;
-		} else if (start_index < end_index) {
-			if (start_index == -1) {
-				autoSelectUnselectElement(end_index);
-				return true;
-			}
-		} else {// equals
-			if (start_index > -1) {
-				autoSelectUnselectElement(start_index);
-				return true;
-			}
+	protected boolean canSelectElements(int start_index, int end_index, boolean checkStatus) {
+		if (start_index == -1 || end_index == -1)
 			return false;
-		}
-		for (int index = start_count; index < end_count + 1; index++) {
-			selectedElements.set(index);
-		}
+
+		selectElements(start_index, end_index, checkStatus);						
 		return true;
 	}
 	/** unselect all elements
@@ -1534,6 +1560,9 @@ public class IconCanvas extends Canvas {
 	 */
 	public void selectElement(int index) {
 		selectedElements.set(index);
+		firstSelectedIndex = index;
+		//selection = findLocation(index);
+		//actualScrollStart_y = selection.y + verticalScrollOffset;
 	}
 	/** Select elements 
 	 * @param from_index
@@ -1553,6 +1582,11 @@ public class IconCanvas extends Canvas {
 				autoSelectUnselectElement(index);
 			else
 				selectedElements.set(index);
+		}
+	}
+	public void unselectElements(int from_index, int to_index) {
+		for (int index = from_index; index < to_index + 1; index++) {
+			selectedElements.clear(index);
 		}
 	}
 	/** Paint the view
@@ -1883,26 +1917,63 @@ public class IconCanvas extends Canvas {
 		}
 		boolean isCtrl = (event.stateMask & SWT.MOD1) != 0;
 		boolean isShift = (event.stateMask & SWT.MOD2) != 0;
-		if (isShift && isCtrl) {
-			isShift = false;
-			isCtrl = false;
+		
+		int end = findSelectedIndexByLocation(event.x, event.y, false);
+		int start = isShift?firstSelectedIndex:end;
+
+		if (start == -1)
+			start = end;
+		
+		if (start > end) {// swarp
+			int tmp = start;
+			start = end;
+			end = tmp;
 		}
-		if (!isShift && !isCtrl) {
-			selectedElements.clear();
-			tempSelectedElements.clear();
-			selection = null;
+
+		if (IS_CARBON) {// mac
+			if (start > -1 && end > -1 && !isCtrl) {
+				firstSelectedIndex = start;
+				secondSelectedIndex = end;
+			}
+			if (isShift) {
+				if (firstSelectedIndex > -1 && secondSelectedIndex > -1 && firstSelectedIndex < secondSelectedIndex) {
+					end = secondSelectedIndex;
+				}
+			}
 		}
-		canSelectElements(isShift ? (selection != null ? new Point(selection.x, actualScrollStart_y - verticalScrollOffset) : null) : null, new Point(event.x, event.y));
-		//int start_x = Math.min(getMaxCol() * getElementWidth() + e_offset_x, Math.max(0 + sel_size, event.x));
-		//int start_y = (Math.min((getMaxRow() - current_top_row) * getElementHeight() + sel_size, Math.max(0 + sel_size, event.y)));
+		else if (IS_GTK || IS_MOTIF) {// linux
+			if (isShift && isCtrl) {//only apply ctrl if both keys pressed
+				isShift = false;
+				if (start < secondSelectedIndex)
+					end = start;
+				else
+					start = end;
+			}
+			if (start > -1 && end > -1 && (!isShift || start == end)) {//get last selection if no shift or start==end
+				firstSelectedIndex = start;
+				secondSelectedIndex = end;
+			}
+		}
+		else {// others eg. windows
+			if (start > -1 && end > -1 && (!isShift || start == end)) {//get last selection if no shift or start==end
+				firstSelectedIndex = start;
+			}
+		}
+		if (!isShift && !isCtrl) { //no shift, no ctrl
+			unselectAllElements();
+		}
+		if (start > -1 && end > -1 && isShift && !isCtrl) { //shift
+			unselectAllElements();
+		}
+		if ((start == -1 || end == -1) && !isShift && !isCtrl) {//clear all elementd if no selected
+			unselectAllElements();
+			firstSelectedIndex = -1;
+			secondSelectedIndex = -1;
+		}
+
 		selection = new Point(event.x, event.y);
 		actualScrollStart_y = selection.y + verticalScrollOffset;
-		/*
-		int index = findSelectedIndexByLocation(event.x, event.y, false);
-		if (index > -1) {
-			fireAction(IIconCanvasActionListener.SELECTION_ACTION, index);
-		}
-		*/
+		canSelectElements(start, end, (isCtrl && !isShift));
 		redraw();
 	}
 	/** Handle mouse up event
@@ -1940,6 +2011,9 @@ public class IconCanvas extends Canvas {
 		if (!mouseDown || mouseDoubleClick || getTotalElements() == 0)
 			return;
 		if ((event.stateMask & SWT.BUTTON1) == 0) {
+			return;
+		}
+		if ((event.stateMask & SWT.MOD2) != 0) { //shift key
 			return;
 		}
 		update();
@@ -2005,11 +2079,13 @@ public class IconCanvas extends Canvas {
 	 * @param event
 	 */
 	protected void handleResize(Event event) {
+		/*
 		int index = selection == null ? -1 : findSelectedIndexByLocation(selection.x, (actualScrollStart_y - verticalScrollOffset), false);
 		if (index > -1) {
 			selectedElements.clear(index);
 			selection = null;
 		}
+		*/
 		resetInfo();
 		setVerticalScrollBar(getVerticalBar());
 		if (!claimBottomFreeSpace())
@@ -2026,7 +2102,7 @@ public class IconCanvas extends Canvas {
 	 * @param event mouse move event
 	 */
 	protected void showToolTip(int index, Event event) {
-		if (index == -1) {
+		if (!show_tooltip || index == -1) {
 			hideToolTip();
 			return;
 		}
@@ -2159,17 +2235,17 @@ public class IconCanvas extends Canvas {
 	 * Self testing
 	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
 	public static void main(String[] args) {
-		final int totalImage = 50;
+		final int totalImage = 200;
         final Display display = new Display();
         final Shell shell = new Shell(display);
         shell.setLocation(100, 200);
-        shell.setSize(600, 100);
+        shell.setSize(600, 300);
         shell.setLayout(new FillLayout());
 
 		//File normalFile = new File("D:/eclipse3.1/workspace/org.eclipse.ptp.ui/icons/node/node_running.gif");
 		//File selectedFile = new File("D:/eclipse3.1/workspace/org.eclipse.ptp.ui/icons/node/node_running_sel.gif");
-		File normalFile = new File("/home/clement/eclipse/workspace/org.eclipse.ptp.ui/icons/node/node_running.gif");
-		File selectedFile = new File("/home/clement/eclipse/workspace/org.eclipse.ptp.ui/icons/node/node_running_sel.gif");
+		File normalFile = new File("/home/clement/Desktop/workspace_1.1/org.eclipse.ptp.ui/icons/node/node_running.gif");
+		File selectedFile = new File("/home/clement/Desktop/workspace_1.1/org.eclipse.ptp.ui/icons/node/node_running_sel.gif");
 		
 		URL normalURL = null;
 		URL selectedlURL = null;
@@ -2189,6 +2265,7 @@ public class IconCanvas extends Canvas {
 		final Image selectedImage = new Image(selectedImage1.getDevice(), selectedImage1.getImageData().scaledTo(w, h));		
 
         IconCanvas iconCanvas = new IconCanvas(shell, SWT.NONE);
+        iconCanvas.setShowTooltip(false);
         iconCanvas.setIconSize(w, h);
         iconCanvas.setFontSize(10);
         iconCanvas.setIconSpace(1, 4);
@@ -2211,10 +2288,11 @@ public class IconCanvas extends Canvas {
         iconCanvas.setToolTipProvider(new IToolTipProvider() {
         	public String[] toolTipText(Object obj) {
         		//if (obj.toString().indexOf("1") > -1) {
-        		String t = "<i>12345678901234567890123456789a";
-    			t += "12345678901234567890</i>1<b>23456789</b>a";
-    			t += "12345678901234567890123456789a";
-       			return new String[] { "Object: " + obj, t };
+        		String t = "<i>12345678901234567890123456789a<br>";
+	    		t += "12345678901234567890</i>1<b>23456789</b>a";
+	    		t += "12345678901234567890123456789a";
+	       		return new String[] { "Object: " + obj, t };
+        		//return new String[] { "" };
         		//}
         		/*
         		String[] texts = new String[2];

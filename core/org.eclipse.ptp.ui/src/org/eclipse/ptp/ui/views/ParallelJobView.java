@@ -94,6 +94,7 @@ public class ParallelJobView extends AbstractParallelSetView implements IProcess
 		this(PTPUIPlugin.getDefault().getJobManager());
 	}
 	public void dispose() {
+		elementViewComposite.dispose();
 		PTPCorePlugin.getDefault().getModelPresentation().removeProcessListener(this);		
 		super.dispose();
 	}
@@ -319,14 +320,16 @@ public class ParallelJobView extends AbstractParallelSetView implements IProcess
 	 * @param job_id Job ID
 	 */
 	public void changeJob(final String job_id) {
-		getDisplay().syncExec(new Runnable() {
-			public void run() {
-				IPJob job = manager.findJobById(job_id);
-				changeJob(job);
-				jobTableViewer.refresh(true);
-				jobTableViewer.setSelection(job == null ? new StructuredSelection() : new StructuredSelection(job), true);
-			}
-		});
+		if (!elementViewComposite.isDisposed()) {
+			getDisplay().syncExec(new Runnable() {
+				public void run() {
+					IPJob job = manager.findJobById(job_id);
+					changeJob(job);
+					jobTableViewer.refresh(true);
+					jobTableViewer.setSelection(job == null ? new StructuredSelection() : new StructuredSelection(job), true);
+				}
+			});
+		}
 	}
 	/** Change job
 	 * @param job

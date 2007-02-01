@@ -61,6 +61,8 @@ public class ElementIconCanvas extends IconCanvas implements ISelectionProvider 
 	 */
 	public void dispose() {
 		listeners.clear();
+		selection = null;
+		cur_element_set = null;
 		super.dispose();
 	}
 

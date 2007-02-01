@@ -101,7 +101,7 @@ public class IconHoverPresenter implements DefaultInformationControl.IInformatio
 		}
 		fCounter += length;
 	}
-	/*
+	/**
 	 * Get indentation
 	 * 
 	 * @param line

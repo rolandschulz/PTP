@@ -142,12 +142,12 @@ public class PDebugTextHover implements ICEditorTextHover, ITextHoverExtension, 
 	public void setEditor(IEditorPart editor) {
 		if (editor != null) {
 			fEditor = editor;
-			final IWorkbenchPage page = editor.getSite().getPage();
-			page.addSelectionListener(IDebugUIConstants.ID_DEBUG_VIEW, this);
-			page.addPartListener(this);
 			// initialize selection
 			Runnable r = new Runnable() {
 				public void run() {
+					IWorkbenchPage page = fEditor.getSite().getPage();
+					page.addSelectionListener(IDebugUIConstants.ID_DEBUG_VIEW, PDebugTextHover.this);
+					page.addPartListener(PDebugTextHover.this);
 					fSelection = page.getSelection(IDebugUIConstants.ID_DEBUG_VIEW);
 				}
 			};

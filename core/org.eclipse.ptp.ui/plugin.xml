@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.0"?>
 <plugin>
-   <extension-point id="rmconfiguration" name="Resource Manager Configuration Wizard Pages" schema="schema/rmconfiguration.exsd"/>
+	<extension-point id="rmconfiguration" name="Resource Manager Configuration Wizard Pages" schema="schema/rmconfiguration.exsd"/>
 	<extension
 		point="org.eclipse.ui.views">
 		<category
@@ -22,20 +22,14 @@
 			class="org.eclipse.ptp.ui.views.ParallelJobView"
 			id="org.eclipse.ptp.ui.views.parallelJobView">
 		</view>
-      <view
-            name="%ResourceManagersView.name"
-            icon="icons/rm/rm_view.gif"
-            category="org.eclipse.ptp.ui.views"
-            class="org.eclipse.ptp.ui.views.ResourceManagerView"
-            id="org.eclipse.ptp.ui.views.resourceManagerView">
-      </view>
+		<view
+			name="%ResourceManagersView.name"
+			icon="icons/rm/rm_view.gif"
+			category="org.eclipse.ptp.ui.views"
+			class="org.eclipse.ptp.ui.views.ResourceManagerView"
+			id="org.eclipse.ptp.ui.views.resourceManagerView">
+		</view>
 	</extension>
-   <extension
-         point="org.eclipse.ui.perspectiveExtensions">
-      <perspectiveExtension
-            targetID="org.eclipse.ptp.ui.PTPRunPerspective">
-      </perspectiveExtension>
-   </extension>
 	<extension
 		point="org.eclipse.ui.editors">
 		<editor
@@ -56,93 +50,128 @@
 			name="%perspective.name"
 			id="org.eclipse.ptp.ui.PTPRunPerspective"/>
 	</extension>   
+	<extension
+		point="org.eclipse.ui.perspectiveExtensions">
+		<perspectiveExtension
+			targetID="org.eclipse.ui.resourcePerspective">
+			<perspectiveShortcut
+				id="org.eclipse.ptp.ui.PTPRunPerspective">
+			</perspectiveShortcut>
+		</perspectiveExtension>
+		<perspectiveExtension
+			targetID="org.eclipse.debug.ui.DebugPerspective">
+			<perspectiveShortcut
+				id="org.eclipse.ptp.ui.PTPRunPerspective">
+			</perspectiveShortcut>
+		</perspectiveExtension>
+		<perspectiveExtension
+			targetID="org.eclipse.ptp.ui.PTPRunPerspective">
+			<perspectiveShortcut
+				id="org.eclipse.ptp.debug.ui.PTPDebugPerspective">
+			</perspectiveShortcut>
+			<perspectiveShortcut
+				id="org.eclipse.debug.ui.DebugPerspective">
+			</perspectiveShortcut>
+			<actionSet
+				id="org.eclipse.debug.ui.launchActionSet">
+			</actionSet>
+			<actionSet
+				id="org.eclipse.ptp.ui.actionSets">
+			</actionSet>
+		</perspectiveExtension>
+	</extension>
 
-<!-- create preference page //-->
-   <extension
-         point="org.eclipse.ui.preferencePages">
-      <page
-            name="%preferencePages.name"
-            class="org.eclipse.ptp.ui.preferences.PTPPreferencesPage"
-            id="org.eclipse.ptp.ui.preferences.ptpPreferencesPage">
-      </page>
-<!--      <page
-            name="%SimulationpreferencePage.name"
-            class="org.eclipse.ptp.ui.preferences.SimulationPreferencesPage"
-            id="org.eclipse.ptp.ui.preferences.simulationPreferencesPage"
-            category="org.eclipse.ptp.ui.preferences.ptpPreferencesPage">
-      </page>-->
-      <page
-            name="%ViewerpreferencePage.name"
-            class="org.eclipse.ptp.ui.preferences.PTPViewerPreferencesPage"
-            id="org.eclipse.ptp.ui.preferences.viewerPreferencesPage"
-            category="org.eclipse.ptp.ui.preferences.ptpPreferencesPage">
-      </page>
-   </extension>
-   <extension
-         point="org.eclipse.core.runtime.preferences">
-      <initializer
-            class="org.eclipse.ptp.ui.preferences.PreferenceInitializer">
-      </initializer>
-   </extension>
+	<!-- create preference page //-->
+	<extension
+		point="org.eclipse.ui.preferencePages">
+		<page
+			name="%preferencePages.name"
+			class="org.eclipse.ptp.ui.preferences.PTPPreferencesPage"
+			id="org.eclipse.ptp.ui.preferences.ptpPreferencesPage">
+		</page>
+		<!--      
+		<page
+			name="%SimulationpreferencePage.name"
+			class="org.eclipse.ptp.ui.preferences.SimulationPreferencesPage"
+			id="org.eclipse.ptp.ui.preferences.simulationPreferencesPage"
+			category="org.eclipse.ptp.ui.preferences.ptpPreferencesPage">
+		</page>
+		-->
+		<page
+			name="%ViewerpreferencePage.name"
+			class="org.eclipse.ptp.ui.preferences.PTPViewerPreferencesPage"
+			id="org.eclipse.ptp.ui.preferences.viewerPreferencesPage"
+			category="org.eclipse.ptp.ui.preferences.ptpPreferencesPage">
+		</page>
+	</extension>
+	<extension
+		point="org.eclipse.core.runtime.preferences">
+		<initializer
+			class="org.eclipse.ptp.ui.preferences.PreferenceInitializer">
+		</initializer>
+	</extension>
    
-<!-- add buttons to editor action toolbar //-->
-   <extension
-         point="org.eclipse.ui.actionSets">
-      <actionSet
-            label="%actionSets.name"
-            visible="false"
-            id="org.eclipse.ptp.ui.actionSets">
-         <action
-               label="%legendAction.name"
-               icon="icons/legend.gif"
-               class="org.eclipse.ptp.internal.ui.actions.ShowLegendAction"
-               tooltip="%legendAction.tooltip"
-               toolbarPath="org.eclipse.ptp.ui.actionSets"
-               id="org.eclipse.ptp.ui.actions.showLegendAction">
-         </action>
-         <!--
-         <action
-               label="%searchAction.name"
-               icon="icons/search.gif"
-               class="org.eclipse.pdt.ui.actions.SearchAction"
-               tooltip="%searchAction.tooltip"
-               toolbarPath="org.eclipse.pdt.actionSets"
-               id="org.eclipse.pdt.ui.actions.searchAction">
-         </action>
-         //-->
-      </actionSet>
-   </extension>
-   <extension
-         point="org.eclipse.ui.popupMenus">
-      <objectContribution
-            id="org.eclipse.ptp.ui.resourceManager.popupuMenu"
-            objectClass="org.eclipse.ptp.rmsystem.IResourceManagerMenuContribution">
-         <menu
-               id="org.eclipse.ptp.ui.resourceManager.popupSubMenu"
-               label="%ResourceManagersMenu.label"
-               path="additions">
-            <groupMarker name="content"/>
-            <separator name="additions"/>
-         </menu>
-         <action
-               class="org.eclipse.ptp.ui.actions.StopResourceManagersObjectActionDelegate"
-               enablesFor="+"
-               icon="icons/rm/stop.gif"
-               id="org.eclipse.ptp.ui.actions.stopResourceManagersAction"
-               label="%StopResourceManagersAction.label"
-               menubarPath="org.eclipse.ptp.ui.resourceManager.popupSubMenu/content"
-               />
-         <action
-               class="org.eclipse.ptp.ui.actions.StartResourceManagersObjectActionDelegate"
-               enablesFor="+"
-               icon="icons/rm/start.gif"
-               id="org.eclipse.ptp.ui.actions.startResourceManagersAction"
-               label="%StartResourceManagersAction.label"
-               menubarPath="org.eclipse.ptp.ui.resourceManager.popupSubMenu/content"
-               />
-        <!-- //-->
-        <!-- //-->
-      </objectContribution>
-   </extension>
-   
+	<!-- add buttons to editor action toolbar //-->
+	<extension
+		point="org.eclipse.ui.actionSets">
+		<actionSet
+			label="%actionSets.name"
+			visible="false"
+			id="org.eclipse.ptp.ui.actionSets">
+			<action
+				label="%legendAction.name"
+				icon="icons/legend.gif"
+				class="org.eclipse.ptp.internal.ui.actions.ShowLegendAction"
+				tooltip="%legendAction.tooltip"
+				toolbarPath="org.eclipse.ptp.ui.actionSets"
+				id="org.eclipse.ptp.ui.actions.showLegendAction">
+			</action>
+			<!--
+			<action
+				label="%searchAction.name"
+				icon="icons/search.gif"
+				class="org.eclipse.pdt.ui.actions.SearchAction"
+				tooltip="%searchAction.tooltip"
+				toolbarPath="org.eclipse.pdt.actionSets"
+				id="org.eclipse.pdt.ui.actions.searchAction">
+			</action>
+			//-->
+		</actionSet>
+	</extension>
+	<extension
+		point="org.eclipse.ui.popupMenus">
+		<objectContribution
+			id="org.eclipse.ptp.ui.resourceManager.popupuMenu"
+			objectClass="org.eclipse.ptp.rmsystem.IResourceManagerMenuContribution">
+			<menu
+				id="org.eclipse.ptp.ui.resourceManager.popupSubMenu"
+				label="%ResourceManagersMenu.label"
+				path="additions">
+				<groupMarker name="content"/>
+				<separator name="additions"/>
+			</menu>
+			<action
+				class="org.eclipse.ptp.ui.actions.StopResourceManagersObjectActionDelegate"
+				enablesFor="+"
+				icon="icons/rm/stop.gif"
+				id="org.eclipse.ptp.ui.actions.stopResourceManagersAction"
+				label="%StopResourceManagersAction.label"
+				menubarPath="org.eclipse.ptp.ui.resourceManager.popupSubMenu/content"/>
+			<action
+				class="org.eclipse.ptp.ui.actions.StartResourceManagersObjectActionDelegate"
+				enablesFor="+"
+				icon="icons/rm/start.gif"
+				id="org.eclipse.ptp.ui.actions.startResourceManagersAction"
+				label="%StartResourceManagersAction.label"
+				menubarPath="org.eclipse.ptp.ui.resourceManager.popupSubMenu/content"/>
+			<action
+				class="org.eclipse.ptp.ui.actions.SetCurrentResourceManagerObjectActionDelegate"
+				enablesFor="1"
+				icon="icons/rm/rm_current.gif"
+				id="org.eclipse.ptp.ui.actions.setCurrentResourceManagerAction"
+				label="%SetCurrentResourceManagerAction.label"
+				menubarPath="org.eclipse.ptp.ui.resourceManager.popupSubMenu/content"/>
+		</objectContribution>
+	</extension>
+
 </plugin>

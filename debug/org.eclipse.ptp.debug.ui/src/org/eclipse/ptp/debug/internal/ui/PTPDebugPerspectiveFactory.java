@@ -20,7 +20,6 @@ package org.eclipse.ptp.debug.internal.ui;
 
 import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
-import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.search.ui.NewSearchUI;
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
@@ -40,7 +39,8 @@ public class PTPDebugPerspectiveFactory implements IPerspectiveFactory {
 		IFolderLayout folder1= layout.createFolder("bottom", IPageLayout.BOTTOM, (float)0.8, editorArea);
 		folder1.addView(IConsoleConstants.ID_CONSOLE_VIEW);
 		folder1.addView("org.eclipse.debug.ui.MemoryView");
-
+		folder1.addView("org.eclipse.pde.runtime.LogView");
+		
 		IFolderLayout folder2= layout.createFolder("topLeftUp", IPageLayout.TOP, (float)0.5, editorArea);
 		folder2.addView(IPTPDebugUIConstants.ID_VIEW_PARALLELDEBUG);
 
@@ -59,8 +59,8 @@ public class PTPDebugPerspectiveFactory implements IPerspectiveFactory {
 		folder5.addView(IPageLayout.ID_OUTLINE);
 		
 		// set toolbar or menu icon
-		layout.addActionSet(IDebugUIConstants.LAUNCH_ACTION_SET);
-		layout.addActionSet(IPTPUIConstants.ACTION_SET);
+		//layout.addActionSet(IDebugUIConstants.LAUNCH_ACTION_SET);
+		//layout.addActionSet(IPTPUIConstants.ACTION_SET);
 		
 		// views - short cut
 		layout.addShowViewShortcut(IConsoleConstants.ID_CONSOLE_VIEW);
@@ -77,12 +77,14 @@ public class PTPDebugPerspectiveFactory implements IPerspectiveFactory {
 		layout.addShowViewShortcut(IPageLayout.ID_PROBLEM_VIEW);
 		//layout.addShowViewShortcut(IPageLayout.ID_RES_NAV);
 		layout.addShowViewShortcut(IPageLayout.ID_PROP_SHEET);
+		layout.addShowViewShortcut("org.eclipse.pde.runtime.LogView");
 
 		// link - things we should do
 		layout.addShowInPart(IPTPDebugUIConstants.ID_VIEW_PARALLELDEBUG);
 		layout.addShowInPart(IPTPDebugUIConstants.ID_VIEW_ARRAY);
 		layout.addShowInPart(IPTPDebugUIConstants.ID_VIEW_SIGNAL);
 		layout.addShowInPart(IPTPDebugUIConstants.ID_VIEW_VARIABLE);
+		layout.addShowInPart(IDebugUIConstants.ID_DEBUG_VIEW);
 		//layout.addShowInPart(IPageLayout.ID_RES_NAV);
 	}
 }

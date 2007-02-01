@@ -72,11 +72,13 @@ public class ParallelDebugViewEventHandler extends AbstractPDebugEventHandler {
 					int[] processes = info.getAllRegisteredProcesses().toArray();
 					if (refresh) {
 						IElementHandler elementHandler = getPView().getElementHandler(job.getIDString());
-						for (int j=0; j<processes.length; j++) {
-							//IPProcess proc = job.findProcessByTaskId(processes[j]);
-							IElement element = elementHandler.getSetRoot().get(String.valueOf(processes[j]));
-							element.setRegistered(true);
-							elementHandler.addRegisterElement(element);
+						if (elementHandler != null) {
+							for (int j=0; j<processes.length; j++) {
+								//IPProcess proc = job.findProcessByTaskId(processes[j]);
+								IElement element = elementHandler.getSetRoot().get(String.valueOf(processes[j]));
+								element.setRegistered(true);
+								elementHandler.addRegisterElement(element);
+							}
 						}
 						refresh();
 					}
@@ -100,11 +102,13 @@ public class ParallelDebugViewEventHandler extends AbstractPDebugEventHandler {
 					int[] processes = info.getAllUnregisteredProcesses().toArray();
 					if (refresh) {
 						IElementHandler elementHandler = getPView().getElementHandler(job.getIDString());
-						for (int j = 0; j < processes.length; j++) {
-							//IPProcess proc = job.findProcessByTaskId(processes[j]);
-							IElement element = elementHandler.getSetRoot().get(String.valueOf(processes[j]));
-							element.setRegistered(false);
-							elementHandler.removeRegisterElement(element);
+						if (elementHandler != null) {
+							for (int j = 0; j < processes.length; j++) {
+								//IPProcess proc = job.findProcessByTaskId(processes[j]);
+								IElement element = elementHandler.getSetRoot().get(String.valueOf(processes[j]));
+								element.setRegistered(false);
+								elementHandler.removeRegisterElement(element);
+							}
 						}
 						refresh();
 					}
