@@ -301,7 +301,8 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 					return new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No job found", null);
 				IPCDISession session = getDebugSession(job);
 				if (session == null)
-					return new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null);
+					return Status.CANCEL_STATUS;
+				//return new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null);
 		
 				BitList tasks = session.createEmptyBitList();
 				for (int i = 0; i < elements.length; i++) {
@@ -335,7 +336,8 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 		
 				IPCDISession session = getDebugSession(job);
 				if (session == null)
-					return new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null);
+					return Status.CANCEL_STATUS;
+				//return new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null);
 				
 				BitList tasks = session.createEmptyBitList();
 				for (int i = 0; i < elements.length; i++) {
@@ -430,7 +432,6 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 					return Status.CANCEL_STATUS;
 
 				BitList tasks = session.createEmptyBitList();
-
 				IElement[] registerElements = elementHandler.getRegisteredElements();
 				monitor.beginTask("Removing registering processes....", registerElements.length);
 				for (int i = 0; i < registerElements.length; i++) {

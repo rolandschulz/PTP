@@ -73,6 +73,7 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		IPJob job = launch.getPJob();
 		session = new Session(this, job, launch, exe);
 		initialize(job, timeout);
+		this.job = job;
 		return session;
 	}
 	public IDebugCommand getCurrentCommand() {
@@ -92,7 +93,8 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		commandQueue.setCommandReturn(tasks, result);
 	}
 	public final void initialize(IPJob job, int timeout) throws CoreException {
-		this.job = job;
+		connection();
+
 		job.setAttribute(TERMINATED_PROC_KEY, new BitList(job.totalProcesses()));
 		job.setAttribute(SUSPENDED_PROC_KEY, new BitList(job.totalProcesses()));
 		commandQueue = new DebugCommandQueue(this);
@@ -102,7 +104,7 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		procs = job.getSortedProcesses();
 		// Initialize state variables
 		
-		StartDebuggerCommand command = new StartDebuggerCommand(session.createBitList(), job);
+		IDebugCommand command = new StartDebuggerCommand(session.createBitList(), job);
 		postCommand(command);
 		try {
 			command.waitForReturn();

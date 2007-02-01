@@ -105,7 +105,7 @@ public abstract class AbstractProxyClient {
 			fullWrite(encoder.encode(CharBuffer.wrap(buf)));
 		}
 		else {
-			throw new IOException();
+			throw new IOException("Session is not connected");
 		}
 	}
 
@@ -248,7 +248,7 @@ public abstract class AbstractProxyClient {
 		eventThread.start();
 	}
 	
-	private synchronized boolean query_have_shut_down() {
+	protected synchronized boolean query_have_shut_down() {
 		return have_shut_down;
 	}
 	
@@ -316,9 +316,13 @@ public abstract class AbstractProxyClient {
 	}
 
 	public void sessionFinish() throws IOException {
-		this.sendCommand("QUI");
-		shutting_down = true;
-		if (acceptThread.isAlive())
-			acceptThread.interrupt();
+		try {
+			sendCommand("QUI");
+		} finally {
+			//make sure all socket is closed
+			shutting_down = true;
+			if (acceptThread.isAlive())
+				acceptThread.interrupt();
+		}
 	}
 }
