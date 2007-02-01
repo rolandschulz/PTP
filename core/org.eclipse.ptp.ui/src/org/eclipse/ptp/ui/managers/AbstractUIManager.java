@@ -23,6 +23,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SafeRunner;
+import org.eclipse.debug.core.DebugPlugin;
+import org.eclipse.debug.core.ILaunch;
+import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.ptp.core.IModelPresentation;
@@ -248,6 +251,14 @@ public abstract class AbstractUIManager implements IManager {
 	public void removeJob(IPJob job) {
 		IPUniverse universe = modelPresentation.getUniverse();
 		if (universe != null) {
+			//remove launch from debug view
+			ILaunchManager launchManager = DebugPlugin.getDefault().getLaunchManager();
+			ILaunch[] launches = launchManager.getLaunches();
+			for (int i=0; i<launches.length; i++) {
+				if (launches[i].getAttribute("JOB_ID").equals(job.getIDString())) {
+					launchManager.removeLaunch(launches[i]);
+				}
+			}
 			universe.deleteJob(job);
 			fireJobChangedEvent(IJobChangedListener.REMOVED, null, job.getIDString());
 		}

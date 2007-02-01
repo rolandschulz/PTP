@@ -18,7 +18,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.ui;
 
-import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.search.ui.NewSearchUI;
 import org.eclipse.ui.IFolderLayout;
@@ -46,13 +45,14 @@ public class PRunPerspectiveFactory implements IPerspectiveFactory {
 		folder2.addView(IPageLayout.ID_PROBLEM_VIEW);
 		folder2.addView(IPageLayout.ID_PROP_SHEET);
 		folder2.addView(IPageLayout.ID_TASK_LIST);
+		folder2.addView("org.eclipse.pde.runtime.LogView");
 		
 		IFolderLayout folder3= layout.createFolder("topRight", IPageLayout.RIGHT,(float)0.75, editorArea);
 		folder3.addView(IPageLayout.ID_OUTLINE);
 
 		// set toolbar or menu icon
-		layout.addActionSet(IDebugUIConstants.LAUNCH_ACTION_SET);
-		layout.addActionSet(IPTPUIConstants.ACTION_SET);
+		//layout.addActionSet(IDebugUIConstants.LAUNCH_ACTION_SET);
+		//layout.addActionSet(IPTPUIConstants.ACTION_SET);
 
 		// views - build console
 		layout.addShowViewShortcut(IConsoleConstants.ID_CONSOLE_VIEW);
@@ -67,12 +67,12 @@ public class PRunPerspectiveFactory implements IPerspectiveFactory {
 		layout.addShowViewShortcut(IPageLayout.ID_TASK_LIST);
 		layout.addShowViewShortcut(IPageLayout.ID_PROBLEM_VIEW);
 		layout.addShowViewShortcut(IPageLayout.ID_PROP_SHEET);
-		//layout.addShowViewShortcut("org.eclipse.pde.runtime.LogView");
+		layout.addShowViewShortcut("org.eclipse.pde.runtime.LogView");
 		
 		// link - things we should do
 		layout.addShowInPart(IPTPUIConstants.VIEW_PARALLELMACHINE);
 		layout.addShowInPart(IPTPUIConstants.VIEW_PARALLELJOB);
 		//layout.addShowInPart(IPageLayout.ID_RES_NAV);
-		layout.addShowInPart("org.eclipse.pde.runtime.LogView");
+		//layout.addShowInPart("org.eclipse.pde.runtime.LogView");
 	}
 }

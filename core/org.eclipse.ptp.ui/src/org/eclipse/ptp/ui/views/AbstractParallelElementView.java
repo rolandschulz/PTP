@@ -172,6 +172,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	public void dispose() {
 		canvas.removeActionListener(this);
 		canvas.removeSelectionChangedListener(this);
+		canvas.dispose();
 		PTPUIPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(propertyChangeListener);
 		super.dispose();
 	}
@@ -198,14 +199,16 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	 * @param set Target set
 	 */
 	public void selectSet(IElementSet set) {
-		cur_set_size = 0;
-		if (set != null) {
-			cur_set_size = set.size();
-			manager.setCurrentSetId(set.getID());
+		if (!canvas.isDisposed()) {
+			cur_set_size = 0;
+			if (set != null) {
+				cur_set_size = set.size();
+				manager.setCurrentSetId(set.getID());
+			}
+			canvas.setElementSet(set);
+			fireChangeEvent(set, cur_element_set);
+			cur_element_set = set;
 		}
-		canvas.setElementSet(set);
-		fireChangeEvent(set, cur_element_set);
-		cur_element_set = set;
 	}
 	/** Get current set
 	 * @return current set

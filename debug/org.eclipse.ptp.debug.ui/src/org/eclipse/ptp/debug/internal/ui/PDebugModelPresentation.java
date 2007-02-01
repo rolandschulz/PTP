@@ -22,9 +22,11 @@ import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 import org.eclipse.cdt.core.IAddress;
+import org.eclipse.cdt.internal.ui.util.ExternalEditorInput;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
@@ -41,11 +43,13 @@ import org.eclipse.debug.core.model.IThread;
 import org.eclipse.debug.core.model.IValue;
 import org.eclipse.debug.core.model.IVariable;
 import org.eclipse.debug.core.model.IWatchExpression;
+import org.eclipse.debug.core.sourcelookup.containers.LocalFileStorage;
 import org.eclipse.debug.ui.IDebugEditorPresentation;
 import org.eclipse.debug.ui.IDebugModelPresentation;
 import org.eclipse.debug.ui.IValueDetailListener;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.ptp.core.resources.FileStorage;
 import org.eclipse.ptp.debug.core.cdi.IPCDIBreakpointHit;
 import org.eclipse.ptp.debug.core.cdi.IPCDIExitInfo;
 import org.eclipse.ptp.debug.core.cdi.IPCDISharedLibraryEvent;
@@ -163,9 +167,9 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 			if (file != null)
 				return new FileEditorInput(file);
 		}
-		/*
-		 * FIXME if (element instanceof FileStorage || element instanceof LocalFileStorage) { return new ExternalEditorInput((IStorage)element); }
-		 */
+		if (element instanceof FileStorage || element instanceof LocalFileStorage) {
+			return new ExternalEditorInput((IStorage) element);
+		}
 		return null;
 	}
 	/* (non-Javadoc)
