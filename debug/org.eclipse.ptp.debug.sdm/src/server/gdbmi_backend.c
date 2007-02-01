@@ -126,7 +126,7 @@ static int	GetStackframes(int, int, int, List **);
 static int	GetAIFVar(char *, AIF **, char **);
 
 static AIF * GetAIF(MIVar *, char *, int);
-static AIF * GetPartailAIF(MIVar *, char *);
+static AIF * GetPartialAIF(MIVar *, char *);
 static void RemoveAllMaps();
 
 dbg_backend_funcs	GDBMIBackend =
@@ -1525,10 +1525,12 @@ GDBMIGetLocalVariables(void)
 }
 
 /*
- * This is needed to check for a bug in the Linux x86 GCC 4.0 compiler
- * that causes gdb 6.5 to crash under certain conditions.
+ * This is needed to check for a bug in the Linux x86 GCC 4.1 compiler
+ * that causes gdb 6.4 and 6.5 to crash under certain conditions.
  */
-#if __gnu_linux__ &&  __i386__ && __GNUC__ == 4
+#define GDB_BUG_2188	__gnu_linux__ && __i386__ && __GNUC__ == 4 && __GNUC_MINOR__ == 1
+
+#if GDB_BUG_2188
 static int
 CurrentFrame(int level, char *name)
 {
@@ -1537,7 +1539,7 @@ CurrentFrame(int level, char *name)
 	List *		frames;
 	int val = 0;
 	
-	if (GDB_Version > 6.3) {
+	if (GDB_Version > 6.3 && GDB_Version < 6.6) {
 		cmd = MIStackListFrames(level, level);
 		SendCommandWait(DebugSession, cmd);
 		if (!MICommandResultOK(cmd)) {
@@ -1558,7 +1560,7 @@ CurrentFrame(int level, char *name)
 		
 	return val;
 }
-#endif
+#endif /* GDB_BUG_2188 */
 
 /*
 ** List arguments.
@@ -1598,14 +1600,14 @@ GDBMIListArguments(int low, int high)
  	 */ 
 	SetList(frames);
 	if ((frame = (MIFrame *)GetListElement(frames)) != NULL) {
-#if __gnu_linux__ &&  __i386__ && __GNUC__ == 4
+#if GDB_BUG_2188
 		if (!CurrentFrame(frame->level, "main")) {
-#endif
+#endif /* GDB_BUG_2188 */
 			for (SetList(frame->args); (arg = (MIArg *)GetListElement(frame->args)) != NULL; )
 				AddToList(e->dbg_event_u.list, (void *)strdup(arg->name));
-#if __gnu_linux__ &&  __i386__ && __GNUC__ == 4
+#if GDB_BUG_2188
 		}
-#endif
+#endif /* GDB_BUG_2188 */
 	}	
 	DestroyList(frames, MIFrameFree);
 	SaveEvent(e);
@@ -2536,7 +2538,7 @@ GetPartialArrayAIF(MIVar *var)
 	}
 	else {
 		for (i=0; i<var->numchild; i++) {
-			ac = GetPartailAIF(var->children[i], NULL);
+			ac = GetPartialAIF(var->children[i], NULL);
 			if (a == NULL) {
 				a = EmptyArrayToAIF(0, var->numchild-1, ac);
 			}
@@ -2567,7 +2569,7 @@ GetPartialStructAIF(MIVar *var)
 
 	if (var->children != NULL) {
 		for (i=0; i<var->numchild; i++) {
-			ac = GetPartailAIF(var->children[i], var->children[i]->exp);
+			ac = GetPartialAIF(var->children[i], var->children[i]->exp);
 			AIFAddFieldToStruct(a, var->children[i]->exp, ac);
 			AIFFree(ac);
 		}
@@ -2592,7 +2594,7 @@ GetPartialUnionAIF(MIVar *var)
 
 	if (var->children != NULL) {
 		for (i=0; i<var->numchild; i++) {
-			ac = GetPartailAIF(var->children[i], var->children[i]->exp);
+			ac = GetPartialAIF(var->children[i], var->children[i]->exp);
 			AIFAddFieldToUnion(a, var->children[i]->exp, AIF_FORMAT(ac));
 			if (i == var->numchild - 1) {
 				AIFSetUnion(a, var->children[i]->exp, ac);
@@ -2637,7 +2639,7 @@ GetPartialPointerAIF(MIVar *var)
 				if (var->numchild == 1) {
 					//replace miname
 					var->name = strdup(var->children[0]->exp);
-					a = GetPartailAIF(var->children[0], var->children[0]->exp);
+					a = GetPartialAIF(var->children[0], var->children[0]->exp);
 				}
 				else {
 					a = GetPartialStructAIF(var);
@@ -2680,7 +2682,7 @@ GetPartialComplexAIF(MIVar *var, char *exp)
 }
 
 static AIF *
-GetPartailAIF(MIVar *var, char *exp)
+GetPartialAIF(MIVar *var, char *exp)
 {
 	AIF *a;
 	
@@ -2791,7 +2793,7 @@ GDBGetPartialAIF(char* name, char* key, int listChildren, int express)
 		}
 	}
 
-	if ((a = GetPartailAIF(mivar, var_name)) == NULL) {
+	if ((a = GetPartialAIF(mivar, var_name)) == NULL) {
 		DbgSetError(DBGERR_UNKNOWN_TYPE, mivar->type);
 		MIVarFree(mivar);
 		return DBGRES_ERR; 
