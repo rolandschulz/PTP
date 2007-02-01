@@ -104,7 +104,7 @@ public class Session implements IPCDISession, IPCDISessionObject {
 		} catch (CoreException e) {
 			//e.printStackTrace();
 		}
-		DebugPlugin.getDefault().getLaunchManager().removeLaunch(launch);
+		//DebugPlugin.getDefault().getLaunchManager().removeLaunch(launch);
 		variableManager.shutdown();
 		expressionManager.shutdown();
 		breakpointManager.shutdown();
