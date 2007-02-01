@@ -19,6 +19,7 @@
 package org.eclipse.ptp.debug.core.launch;
 /**
  * @author Clement chu
+ * @deprecated
  * 
  */
 public interface IPLaunchListener {

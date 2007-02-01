@@ -22,6 +22,7 @@ import org.eclipse.ptp.core.IPJob;
 
 /**
  * @author Clement chu
+ * @deprecated
  * 
  */
 public interface IPLaunchEvent {

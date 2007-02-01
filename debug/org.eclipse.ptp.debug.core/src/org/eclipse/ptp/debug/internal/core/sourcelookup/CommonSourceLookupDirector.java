@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.sourcelookup.ISourceContainer;
 import org.eclipse.ptp.debug.core.IPDebugConstants;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
+import org.eclipse.ptp.debug.core.sourcelookup.PSourceLookupDirector;
 
 public class CommonSourceLookupDirector extends PSourceLookupDirector {
 	public void setSourceContainers(ISourceContainer[] containers) {

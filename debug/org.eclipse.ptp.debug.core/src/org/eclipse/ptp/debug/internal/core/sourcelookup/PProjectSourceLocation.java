@@ -178,7 +178,7 @@ public class PProjectSourceLocation implements IProjectSourceLocation {
 		} catch (TransformerException e) {
 			ex = e;
 		}
-		abort(MessageFormat.format(InternalSourceLookupMessages.getString("CProjectSourceLocation.0"), new String[] { getProject().getName() }), ex);
+		abort(MessageFormat.format(InternalSourceLookupMessages.getString("PProjectSourceLocation.0"), new String[] { getProject().getName() }), ex);
 		// execution will not reach here
 		return null;
 	}
@@ -192,7 +192,7 @@ public class PProjectSourceLocation implements IProjectSourceLocation {
 			root = parser.parse(source).getDocumentElement();
 			String name = root.getAttribute(ATTR_PROJECT);
 			if (isEmpty(name)) {
-				abort(InternalSourceLookupMessages.getString("CProjectSourceLocation.1"), null);
+				abort(InternalSourceLookupMessages.getString("PProjectSourceLocation.1"), null);
 			} else {
 				IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(name);
 				setProject(project);
@@ -209,7 +209,7 @@ public class PProjectSourceLocation implements IProjectSourceLocation {
 		} catch (IOException e) {
 			ex = e;
 		}
-		abort(InternalSourceLookupMessages.getString("CProjectSourceLocation.2"), ex);
+		abort(InternalSourceLookupMessages.getString("PProjectSourceLocation.2"), ex);
 	}
 	private void abort(String message, Throwable e) throws CoreException {
 		IStatus s = new Status(IStatus.ERROR, PTPDebugCorePlugin.getUniqueIdentifier(), PTPDebugCorePlugin.INTERNAL_ERROR, message, e);

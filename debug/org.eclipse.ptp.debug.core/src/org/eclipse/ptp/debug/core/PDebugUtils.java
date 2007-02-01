@@ -18,11 +18,25 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.IStatusHandler;
+import org.w3c.dom.Document;
 
 /**
  * @author Clement chu
@@ -172,6 +186,57 @@ public class PDebugUtils {
 			sb.append(text);
 		}
 		return sb.toString();
+	}
+	public static List getReferencedProjects( IProject project ) {
+		ArrayList list = new ArrayList( 10 );
+		if ( project != null && project.exists() && project.isOpen() ) {
+			IProject[] refs = new IProject[0];
+			try {
+				refs = project.getReferencedProjects();
+			}
+			catch( CoreException e ) {
+			}
+			for( int i = 0; i < refs.length; ++i ) {
+				if ( !project.equals( refs[i] ) && refs[i] != null && refs[i].exists() && refs[i].isOpen() ) {
+					list.add( refs[i] );
+					getReferencedProjects( project, refs[i], list );
+				}
+			}
+		}
+		return list;
+	}
+	private static void getReferencedProjects( IProject root, IProject project, List list ) {
+		if ( project != null && project.exists() && project.isOpen() ) {
+			IProject[] refs = new IProject[0];
+			try {
+				refs = project.getReferencedProjects();
+			}
+			catch( CoreException e ) {
+			}
+			for( int i = 0; i < refs.length; ++i ) {
+				if ( !list.contains( refs[i] ) && refs[i] != null && !refs[i].equals( root ) && refs[i].exists() && refs[i].isOpen() ) {
+					list.add( refs[i] );
+					getReferencedProjects( root, refs[i], list );
+				}
+			}
+		}
+	}
+	/**
+	 * Serializes a XML document into a string - encoded in UTF8 format, with platform line separators.
+	 * 
+	 * @param doc document to serialize
+	 * @return the document as a string
+	 */
+	public static String serializeDocument( Document doc ) throws IOException, TransformerException {
+		ByteArrayOutputStream s = new ByteArrayOutputStream();
+		TransformerFactory factory = TransformerFactory.newInstance();
+		Transformer transformer = factory.newTransformer();
+		transformer.setOutputProperty( OutputKeys.METHOD, "xml" ); //$NON-NLS-1$
+		transformer.setOutputProperty( OutputKeys.INDENT, "yes" ); //$NON-NLS-1$
+		DOMSource source = new DOMSource( doc );
+		StreamResult outputTarget = new StreamResult( s );
+		transformer.transform( source, outputTarget );
+		return s.toString( "UTF8" ); //$NON-NLS-1$			
 	}
 }
 

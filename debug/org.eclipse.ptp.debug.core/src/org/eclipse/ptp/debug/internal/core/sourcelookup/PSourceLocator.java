@@ -65,7 +65,7 @@ import org.xml.sax.SAXException;
  * 
  */
 public class PSourceLocator implements IPSourceLocator, IPersistableSourceLocator, IResourceChangeListener {
-	private static final String SOURCE_LOCATOR_NAME = "cSourceLocator";
+	private static final String SOURCE_LOCATOR_NAME = "pSourceLocator";
 	private static final String DISABLED_GENERIC_PROJECT_NAME = "disabledGenericProject";
 	private static final String ADDITIONAL_SOURCE_LOCATION_NAME = "additionalSourceLocation";
 	private static final String SOURCE_LOCATION_NAME = "cSourceLocation";
@@ -213,7 +213,7 @@ public class PSourceLocator implements IPSourceLocator, IPersistableSourceLocato
 		} catch (TransformerException e) {
 			ex = e;
 		}
-		abort(InternalSourceLookupMessages.getString("CSourceLocator.0"), ex);
+		abort(InternalSourceLookupMessages.getString("PSourceLocator.0"), ex);
 		// execution will not reach here
 		return null;
 	}
@@ -229,7 +229,7 @@ public class PSourceLocator implements IPSourceLocator, IPersistableSourceLocato
 			InputSource source = new InputSource(reader);
 			root = parser.parse(source).getDocumentElement();
 			if (!root.getNodeName().equalsIgnoreCase(SOURCE_LOCATOR_NAME)) {
-				abort(InternalSourceLookupMessages.getString("CSourceLocator.1"), null);
+				abort(InternalSourceLookupMessages.getString("PSourceLocator.1"), null);
 			}
 			List sourceLocations = new ArrayList();
 			// Add locations based on referenced projects
@@ -250,7 +250,7 @@ public class PSourceLocator implements IPSourceLocator, IPersistableSourceLocato
 		} catch (IOException e) {
 			ex = e;
 		}
-		abort(InternalSourceLookupMessages.getString("CSourceLocator.2"), ex);
+		abort(InternalSourceLookupMessages.getString("PSourceLocator.2"), ex);
 	}
 	private void removeDisabledLocations(Element root, List sourceLocations) {
 		NodeList list = root.getChildNodes();
@@ -279,7 +279,7 @@ public class PSourceLocator implements IPSourceLocator, IPersistableSourceLocato
 	}
 	private void addAdditionalLocations(Element root, List sourceLocations) throws CoreException {
 		Bundle bundle = PTPDebugCorePlugin.getDefault().getBundle();
-		MultiStatus status = new MultiStatus(PTPDebugCorePlugin.getUniqueIdentifier(), PTPDebugCorePlugin.INTERNAL_ERROR, InternalSourceLookupMessages.getString("CSourceLocator.3"), null);
+		MultiStatus status = new MultiStatus(PTPDebugCorePlugin.getUniqueIdentifier(), PTPDebugCorePlugin.INTERNAL_ERROR, InternalSourceLookupMessages.getString("PSourceLocator.3"), null);
 		NodeList list = root.getChildNodes();
 		int length = list.getLength();
 		for (int i = 0; i < length; ++i) {

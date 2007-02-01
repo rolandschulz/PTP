@@ -24,6 +24,7 @@ import org.eclipse.ptp.core.util.BitList;
 
 /**
  * @author Clement chu
+ * @deprecated
  * 
  */
 public abstract class AbstractPLaunchEvent implements IPLaunchEvent {

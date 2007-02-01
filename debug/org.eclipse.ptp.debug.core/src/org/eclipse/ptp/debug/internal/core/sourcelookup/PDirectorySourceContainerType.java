@@ -26,7 +26,7 @@
  * Contributors:
  * QNX Software Systems - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.debug.internal.core.sourcelookup; 
+package org.eclipse.ptp.debug.internal.core.sourcelookup;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
@@ -36,48 +36,51 @@ import org.eclipse.ptp.debug.core.sourcelookup.PDirectorySourceContainer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
- 
+
 /**
  * See <code>CDirectorySourceContainer</code>.
  */
 public class PDirectorySourceContainerType extends AbstractSourceContainerTypeDelegate {
-
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.internal.core.sourcelookup.ISourceContainerType#createSourceContainer(java.lang.String)
 	 */
-	public ISourceContainer createSourceContainer( String memento ) throws CoreException {
-		Node node = parseDocument( memento );
-		if ( node.getNodeType() == Node.ELEMENT_NODE ) {
-			Element element = (Element)node;
-			if ( "directory".equals( element.getNodeName() ) ) { //$NON-NLS-1$
-				String string = element.getAttribute( "path" ); //$NON-NLS-1$
-				if ( string == null || string.length() == 0 ) {
-					abort( InternalSourceLookupMessages.getString( "CDirectorySourceContainerType.0" ), null ); //$NON-NLS-1$
+	public ISourceContainer createSourceContainer(String memento) throws CoreException {
+		Node node = parseDocument(memento);
+		if (node.getNodeType() == Node.ELEMENT_NODE) {
+			Element element = (Element) node;
+			if ("directory".equals(element.getNodeName())) {
+				String string = element.getAttribute("path");
+				if (string == null || string.length() == 0) {
+					abort(InternalSourceLookupMessages.getString("PDirectorySourceContainerType.0"), null);
 				}
-				String nest = element.getAttribute( "nest" ); //$NON-NLS-1$
-				boolean nested = "true".equals( nest ); //$NON-NLS-1$
-				return new PDirectorySourceContainer( new Path( string ), nested );
+				String nest = element.getAttribute("nest");
+				boolean nested = "true".equals(nest);
+				return new PDirectorySourceContainer(new Path(string), nested);
 			}
-			abort( InternalSourceLookupMessages.getString( "CDirectorySourceContainerType.1" ), null ); //$NON-NLS-1$
+			abort(InternalSourceLookupMessages.getString("PDirectorySourceContainerType.1"), null);
 		}
-		abort( InternalSourceLookupMessages.getString( "CDirectorySourceContainerType.2" ), null ); //$NON-NLS-1$
+		abort(InternalSourceLookupMessages.getString("PDirectorySourceContainerType.2"), null);
 		return null;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.internal.core.sourcelookup.ISourceContainerType#getMemento(org.eclipse.debug.internal.core.sourcelookup.ISourceContainer)
 	 */
-	public String getMemento( ISourceContainer container ) throws CoreException {
-		PDirectorySourceContainer folder = (PDirectorySourceContainer)container;
+	public String getMemento(ISourceContainer container) throws CoreException {
+		PDirectorySourceContainer folder = (PDirectorySourceContainer) container;
 		Document document = newDocument();
-		Element element = document.createElement( "directory" ); //$NON-NLS-1$
-		element.setAttribute( "path", folder.getDirectory().getAbsolutePath() ); //$NON-NLS-1$
-		String nest = "false"; //$NON-NLS-1$
-		if ( folder.isComposite() ) {
-			nest = "true"; //$NON-NLS-1$
+		Element element = document.createElement("directory");
+		element.setAttribute("path", folder.getDirectory().getAbsolutePath());
+		String nest = "false";
+		if (folder.isComposite()) {
+			nest = "true";
 		}
-		element.setAttribute( "nest", nest ); //$NON-NLS-1$
-		document.appendChild( element );
-		return serializeDocument( document );
+		element.setAttribute("nest", nest);
+		document.appendChild(element);
+		return serializeDocument(document);
 	}
 }

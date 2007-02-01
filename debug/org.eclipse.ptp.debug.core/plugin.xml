@@ -1,40 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.0"?>
 <plugin>
+	<extension-point id="PTPDebugger" name="Parallel Tools Core Debugger Extension"/>
 
-   <extension-point id="PTPDebugger" name="Parallel Tools Core Debugger Extension" />
-
-   <extension
-         point="org.eclipse.debug.core.sourcePathComputers">
-      <sourcePathComputer
-            class="org.eclipse.ptp.debug.internal.core.sourcelookup.PSourcePathComputerDelegate"
-            id="org.eclipse.ptp.debug.core.sourcePathComputer"/>
-   </extension>
-   <extension
-         point="org.eclipse.debug.core.sourceLocators">
-      <sourceLocator
-            class="org.eclipse.ptp.debug.internal.core.sourcelookup.PSourceLookupDirector"
-            name="C/C++ Source Locator"
-            id="org.eclipse.ptp.debug.core.sourceLocator"/>
-   </extension>
-   <extension
-         point="org.eclipse.debug.core.sourceContainerTypes">
-      <sourceContainerType
-            class="org.eclipse.ptp.debug.internal.core.sourcelookup.MappingSourceContainerType"
-            description="%containerDescription.mapping"
-            id="org.eclipse.ptp.debug.core.containerType.mapping"
-            name="%containerName.mapping"/>
-      <sourceContainerType
-            class="org.eclipse.ptp.debug.internal.core.sourcelookup.MapEntrySourceContainerType"
-            description="%containerDescription.mapEntry"
-            id="org.eclipse.ptp.debug.core.containerType.mapEntry"
-            name="%containerName.mapEntry"/>
-      <sourceContainerType
-            class="org.eclipse.ptp.debug.internal.core.sourcelookup.PDirectorySourceContainerType"
-            description="%containerDescription.directory"
-            id="org.eclipse.ptp.debug.core.containerType.directory"
-            name="%containerName.directory"/>
-   </extension>
+	<extension
+		point="org.eclipse.debug.core.sourcePathComputers">
+		<sourcePathComputer
+			class="org.eclipse.ptp.debug.internal.core.sourcelookup.PSourcePathComputerDelegate"
+			id="org.eclipse.ptp.debug.core.sourcePathComputer"/>
+	</extension>
+	<extension
+		point="org.eclipse.debug.core.sourceLocators">
+		<sourceLocator
+			class="org.eclipse.ptp.debug.core.sourcelookup.PSourceLookupDirector"
+			name="PTP Source Locator"
+			id="org.eclipse.ptp.debug.core.sourceLocator"/>
+	</extension>
+	<extension
+		point="org.eclipse.debug.core.sourceContainerTypes">
+        <!--
+        No Mapping support now 
+		<sourceContainerType
+			class="org.eclipse.ptp.debug.internal.core.sourcelookup.MappingSourceContainerType"
+			description="%containerDescription.mapping"
+			id="org.eclipse.ptp.debug.core.containerType.mapping"
+			name="%containerName.mapping"/>
+		<sourceContainerType
+			class="org.eclipse.ptp.debug.internal.core.sourcelookup.MapEntrySourceContainerType"
+			description="%containerDescription.mapEntry"
+			id="org.eclipse.ptp.debug.core.containerType.mapEntry"
+			name="%containerName.mapEntry"/>
+		//-->
+		<sourceContainerType
+			class="org.eclipse.ptp.debug.internal.core.sourcelookup.PDirectorySourceContainerType"
+			description="%containerDescription.directory"
+			id="org.eclipse.ptp.debug.core.containerType.directory"
+			name="%containerName.directory"/>
+	</extension>
 
    <extension
          id="pBreakpointMarker"
