@@ -27,10 +27,6 @@ public class ProxyDebugClient extends AbstractProxyDebugClient {
 	public static final int STEP_OVER = 1;
 	public static final int STEP_FINISH = 2;
 	
-	public ProxyDebugClient() {
-		super();
-	}
-
 	public void debugStartSession(String prog, String path, String dir, String[] args) throws IOException {
 		sendCommand("INI", prog, path, dir, args);
 	}
