@@ -182,7 +182,7 @@ CLIGetPTypeInfo(MICommand *cmd) {
 			continue;
 		}
 		while (*text == ' ') {
-			*text++;
+			text++;
 		}
 
 		if (strncmp(text, "type", 4) == 0) {
@@ -238,7 +238,7 @@ CLIGetInfoThreadsInfo(MICommand *cmd)
 			continue;
 		}
 		while (*text == ' ') {
-			*text++;
+			text++;
 		}
 		if (strncmp(text, "*", 1) == 0) {
 			text += 2;//escape "* ";
