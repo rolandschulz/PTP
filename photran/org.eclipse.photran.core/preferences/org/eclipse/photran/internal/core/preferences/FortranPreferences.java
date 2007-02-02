@@ -58,8 +58,6 @@ public final class FortranPreferences
         FortranCorePlugin.getDefault().savePluginPreferences();
     }
 
-    //public static final FortranModulePathsPreference MODULE_PATHS = new FortranModulePathsPreference();
-
     public static final FortranBooleanPreference SHOW_PARSE_TREE = new FortranBooleanPreference("parsetree", false);
 
     public static final FortranRGBPreference COLOR_COMMENTS    = new FortranRGBPreference("comments",    new RGB(63,  127, 95 ));
