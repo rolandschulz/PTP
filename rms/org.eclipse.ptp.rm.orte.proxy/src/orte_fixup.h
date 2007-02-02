@@ -74,43 +74,145 @@
 #define ORTE_STD_CNTR_TYPE									size_t
 #else /* ORTE_VERSION_1_0 */
 #define ORTE_QUERY(jobid)									orte_rds.query(jobid)
-#define ORTE_LAUNCH_JOB(jobid)								orte_pls.launch_job(jobid)
 #define ORTE_TERMINATE_JOB(jobid,attr)						orte_pls.terminate_job(jobid, attr)
-#define ORTE_SETUP_JOB(app_context,num_context,jobid,attr)	orte_rmgr.setup_job(app_context,num_context,jobid, attr)
 #define ORTE_SUBSCRIBE(jobid,cbfunc,cbdata,cond)			orte_smr.job_stage_gate_subscribe(jobid,cbfunc,cbdata,cond)
 #define ORTE_PACK(buf,cmd,num,type)							orte_dss.pack(buf,cmd,num,type)
 #define ORTE_GET_VPID_RANGE(jobid, start, range)			orte_rmgr.get_vpid_range(jobid, start, range)
 #define ORTE_FREE_NAME(name)								free(name)
 #define ORTE_KEYVALUE_TYPE(keyval)							(keyval)->value->type
-#define ORTE_NOTIFY_ALL										ORTE_PROC_STATE_ALL
 #define ORTE_STD_CNTR_TYPE									orte_std_cntr_t
-#ifndef ORTE_RML_NAME_SEED
-#define ORTE_RML_NAME_SEED									ORTE_PROC_MY_HNP
-#endif /* ORTE_RML_NAME_SEED */
 #endif /* ORTE_VERSION_1_0 */
 
 #if ORTE_VERSION_1_0
-static int
-ORTE_ALLOCATE_AND_MAP(orte_jobid_t jobid)
+static void 
+ptp_ompi_wireup_stdin(orte_jobid_t jobid)
 {
 	int rc;
+	orte_process_name_t* name;
 	
-	if (ORTE_SUCCESS != (rc = orte_rmgr.allocate(jobid))) {
+	if (ORTE_SUCCESS != (rc = orte_ns.create_process_name(&name, 0, jobid, 0))) {
 		ORTE_ERROR_LOG(rc);
-		return rc;
+		return;
 	}
-	
-	if (ORTE_SUCCESS != (rc = orte_rmgr.map(jobid))) {
+	if (ORTE_SUCCESS != (rc = orte_iof.iof_push(name, ORTE_NS_CMP_JOBID, ORTE_IOF_STDIN, 0))) {
 		ORTE_ERROR_LOG(rc);
-		return rc;
 	}
-	
-	return rc;
+}
+
+static void 
+ptp_ompi_callback(orte_gpr_notify_data_t *data, void *cbdata)
+{   
+	orte_rmgr_cb_fn_t cbfunc = (orte_rmgr_cb_fn_t)cbdata;
+	orte_gpr_value_t **values, *value;
+	orte_gpr_keyval_t** keyvals;
+	orte_jobid_t jobid;
+	size_t i, j, k;
+	int rc;
+	    
+	/* we made sure in the subscriptions that at least one
+	 * value is always returned
+	 * get the jobid from the segment name in the first value
+	 */
+	values = (orte_gpr_value_t**)(data->values)->addr;
+	if (ORTE_SUCCESS != (rc =
+			orte_schema.extract_jobid_from_segment_name(&jobid,
+			values[0]->segment))) {
+			ORTE_ERROR_LOG(rc);
+		return;
+	}
+
+	for(i = 0, k=0; k < data->cnt && i < (data->values)->size; i++) {
+		if (NULL != values[i]) {
+			k++;
+			value = values[i];
+			/* determine the state change */
+			keyvals = value->keyvals;
+			for(j=0; j<value->cnt; j++) { 
+				orte_gpr_keyval_t* keyval = keyvals[j];
+				if(strcmp(keyval->key, ORTE_PROC_NUM_AT_STG1) == 0) {
+					(*cbfunc)(jobid,ORTE_PROC_STATE_AT_STG1);
+					/* BWB - XXX - FIX ME: this needs to happen when all
+					   are LAUNCHED, before STG1 */
+					ptp_ompi_wireup_stdin(jobid);
+					continue;
+				}
+				if(strcmp(keyval->key, ORTE_PROC_NUM_AT_STG2) == 0) {
+					(*cbfunc)(jobid,ORTE_PROC_STATE_AT_STG2);
+					continue;
+				}
+				if(strcmp(keyval->key, ORTE_PROC_NUM_AT_STG3) == 0) {
+					(*cbfunc)(jobid,ORTE_PROC_STATE_AT_STG3);
+					continue;
+				}
+				if(strcmp(keyval->key, ORTE_PROC_NUM_FINALIZED) == 0) {
+					(*cbfunc)(jobid,ORTE_PROC_STATE_FINALIZED);
+					continue;
+				}
+				if(strcmp(keyval->key, ORTE_PROC_NUM_TERMINATED) == 0) {
+					(*cbfunc)(jobid,ORTE_PROC_STATE_TERMINATED);
+					continue;
+				}
+				if(strcmp(keyval->key, ORTE_PROC_NUM_ABORTED) == 0) {
+					(*cbfunc)(jobid,ORTE_PROC_STATE_ABORTED);
+					continue;
+				}
+			}
+		}
+	}
 }
 
 static int
-ORTE_STAGE_GATE_INIT(orte_jobid_t jobid)
+ORTE_ALLOCATE_JOB(orte_app_context_t **apps, int num_apps, orte_jobid_t *jobid, void (*cbfunc)(orte_jobid_t, orte_proc_state_t))
 {
+	int						rc;
+	orte_process_name_t *	name;
+
+	/* 
+	 * Initialize job segment and allocate resources
+	 */
+
+	if (ORTE_SUCCESS != (rc = ORTE_SETUP_JOB(apps,num_apps,jobid,NULL))) {
+		ORTE_ERROR_LOG(rc);
+		return rc;
+	}
+	
+	if (ORTE_SUCCESS != (rc = orte_rmgr.allocate(*jobid))) {
+		ORTE_ERROR_LOG(rc);
+		return rc;
+	}
+	
+	if (ORTE_SUCCESS != (rc = orte_rmgr.map(*jobid))) {
+		ORTE_ERROR_LOG(rc);
+		return rc;
+	}
+
+	/* 
+	 * setup I/O forwarding
+	 */
+	if (ORTE_SUCCESS != (rc = orte_ns.create_process_name(&name, 0, *jobid, 0))) {      
+		ORTE_ERROR_LOG(rc);
+		return rc;
+	} if (ORTE_SUCCESS != (rc = orte_iof.iof_pull(name, ORTE_NS_CMP_JOBID, ORTE_IOF_STDOUT, 1))) {
+		ORTE_ERROR_LOG(rc);
+		return rc;
+	} if (ORTE_SUCCESS != (rc = orte_iof.iof_pull(name, ORTE_NS_CMP_JOBID, ORTE_IOF_STDERR, 2))) {
+		ORTE_ERROR_LOG(rc);
+		return rc;
+	}
+    
+	/* 
+	 * setup callback
+	 */
+	if(NULL != cbfunc) {
+		rc = ORTE_SUBSCRIBE(*jobid, ptp_ompi_callback, (void*)cbfunc, ORTE_NOTIFY_ALL);
+		if(ORTE_SUCCESS != rc) {
+			ORTE_ERROR_LOG(rc);
+			return rc;
+		}
+	}
+
+	ORTE_FREE_NAME(name);
+	
 	return ORTE_SUCCESS;
 }
 
@@ -125,25 +227,47 @@ ORTE_GET_VPID_RANGE(orte_jobid_t jobid, int *start, int *range)
 }
 #else /* ORTE_VERSION_1_0 */
 static int
-ORTE_ALLOCATE_AND_MAP(orte_jobid_t jobid)
+ORTE_ALLOCATE_JOB(orte_app_context_t **apps, int num_apps, orte_jobid_t *jobid, void (*cbfunc)(orte_jobid_t, orte_proc_state_t))
 {
 	int			rc;
-	opal_list_t attributes;
+	opal_list_t	attr;
+	uint8_t		flow;
 	
-	OBJ_CONSTRUCT(&attributes, opal_list_t);
+	OBJ_CONSTRUCT(&attr, opal_list_t);
 	
-	if (ORTE_SUCCESS != (rc = orte_ras.allocate_job(jobid, &attributes))) {
+	flow = ORTE_RMGR_SETUP | ORTE_RMGR_RES_DISC | ORTE_RMGR_ALLOC | ORTE_RMGR_MAP | ORTE_RMGR_SETUP_TRIGS;
+    orte_rmgr.add_attribute(&attr, ORTE_RMGR_SPAWN_FLOW, ORTE_UINT8, &flow, ORTE_RMGR_ATTR_OVERRIDE);
+	
+	rc = orte_rmgr.spawn_job(apps, num_apps, jobid, 0, NULL, cbfunc, ORTE_PROC_STATE_ALL, &attr);
+
+	OBJ_DESTRUCT(&attr);
+	
+	if(rc != ORTE_SUCCESS) {
 		ORTE_ERROR_LOG(rc);
-		goto cleanup;
 	}
 	
-	if (ORTE_SUCCESS != (rc = orte_rmaps.map_job(jobid, &attributes))) {
-		ORTE_ERROR_LOG(rc);
-		goto cleanup;
-	}
+	return rc;
+}
+
+static int
+ORTE_LAUNCH_JOB(orte_jobid_t jobid)
+{
+	int			rc;
+	opal_list_t	attr;
+	uint8_t		flow;
 	
-cleanup:
-	OBJ_DESTRUCT(&attributes);
+	OBJ_CONSTRUCT(&attr, opal_list_t);
+	
+	flow = ORTE_RMGR_LAUNCH;
+    orte_rmgr.add_attribute(&attr, ORTE_RMGR_SPAWN_FLOW, ORTE_UINT8, &flow, ORTE_RMGR_ATTR_OVERRIDE);
+	
+	rc = orte_rmgr.spawn_job(NULL, 0, &jobid, 0, NULL, NULL, ORTE_PROC_STATE_ALL, &attr);
+
+	OBJ_DESTRUCT(&attr);
+	
+	if(rc != ORTE_SUCCESS) {
+		ORTE_ERROR_LOG(rc);
+	}
 	
 	return rc;
 }
@@ -159,6 +283,10 @@ ORTE_SPAWN(orte_app_context_t **apps, int num_apps, orte_jobid_t *jobid, void (*
 	rc = orte_rmgr.spawn_job(apps, num_apps, jobid, 0, NULL, cbfunc, ORTE_PROC_STATE_ALL, &attr);
 	
 	OBJ_DESTRUCT(&attr);
+	
+	if(rc != ORTE_SUCCESS) {
+		ORTE_ERROR_LOG(rc);
+	}
 	
 	return rc;
 }
@@ -192,65 +320,4 @@ ORTE_GET_PID_VALUE(orte_gpr_keyval_t *keyval)
 		
 	return tmp_int;
 }
-
-static int 
-ORTE_STAGE_GATE_INIT(orte_jobid_t jobid)
-{
-    orte_buffer_t cmd;
-    orte_buffer_t rsp;
-    orte_std_cntr_t count;
-    orte_rmgr_cmd_t command=ORTE_RMGR_SETUP_GATES_CMD;
-    int rc;
-
-    /* construct command */
-    OBJ_CONSTRUCT(&cmd, orte_buffer_t);
-
-    /* pack the command */
-    if (ORTE_SUCCESS != (rc = orte_dss.pack(&cmd, &command, 1, ORTE_RMGR_CMD))) {
-        ORTE_ERROR_LOG(rc);
-        OBJ_DESTRUCT(&cmd);
-        return rc;
-    }
-
-    /* pack the jobid */
-    if(ORTE_SUCCESS != (rc = orte_dss.pack(&cmd, &jobid, 1, ORTE_JOBID))) {
-        ORTE_ERROR_LOG(rc);
-        OBJ_DESTRUCT(&cmd);
-        return rc;
-    }
-
-    /* send the command */
-    if(0 > (rc = orte_rml.send_buffer(ORTE_RML_NAME_SEED, &cmd, ORTE_RML_TAG_RMGR, 0))) {
-        ORTE_ERROR_LOG(rc);
-        OBJ_DESTRUCT(&cmd);
-        return rc;
-    }
-    
-    OBJ_DESTRUCT(&cmd);
-    /* wait for response */
-    
-    OBJ_CONSTRUCT(&rsp, orte_buffer_t);
-    if(0 > (rc = orte_rml.recv_buffer(ORTE_RML_NAME_SEED, &rsp, ORTE_RML_TAG_RMGR))) {
-        ORTE_ERROR_LOG(rc);
-        OBJ_DESTRUCT(&rsp);
-        return rc;
-    }
-
-    /* get the returned command */
-    count = 1;
-    if (ORTE_SUCCESS != (rc = orte_dss.unpack(&rsp, &command, &count, ORTE_RMGR_CMD))) {
-        ORTE_ERROR_LOG(rc);
-        OBJ_DESTRUCT(&rsp);
-        return rc;
-    }
-    /* and check it to ensure valid comm */
-    if (ORTE_RMGR_SETUP_GATES_CMD != command) {
-        OBJ_DESTRUCT(&rsp);
-        ORTE_ERROR_LOG(ORTE_ERR_COMM_FAILURE);
-        return ORTE_ERR_COMM_FAILURE;    
-    }
-        
-    OBJ_DESTRUCT(&rsp);
-    return rc; 
-} 
 #endif /* !ORTE_VERSION_1_0 */

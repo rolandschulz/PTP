@@ -17,6 +17,10 @@
  * LA-CC 04-115
  ******************************************************************************/
 
+#ifdef __gnu_linux__
+#define _GNU_SOURCE
+#endif /* __gnu_linux__ */
+
 #include "config.h"
 
 #include <getopt.h>
@@ -951,138 +955,6 @@ debug_job_state_callback(orte_jobid_t jobid, orte_proc_state_t state)
 	AddToList(eventList, (void *)res);
 }
 
-static void 
-debug_wireup_stdin(orte_jobid_t jobid)
-{
-	int rc;
-	orte_process_name_t* name;
-	
-	if (ORTE_SUCCESS != (rc = orte_ns.create_process_name(&name, 0, jobid, 0))) {
-		ORTE_ERROR_LOG(rc);
-		return;
-	}
-	if (ORTE_SUCCESS != (rc = orte_iof.iof_push(name, ORTE_NS_CMP_JOBID, ORTE_IOF_STDIN, 0))) {
-		ORTE_ERROR_LOG(rc);
-	}
-}
-
-static void 
-debug_callback(orte_gpr_notify_data_t *data, void *cbdata)
-{   
-	orte_rmgr_cb_fn_t cbfunc = (orte_rmgr_cb_fn_t)cbdata;
-	orte_gpr_value_t **values, *value;
-	orte_gpr_keyval_t** keyvals;
-	orte_jobid_t jobid;
-	size_t i, j, k;
-	int rc;
-	    
-	/* we made sure in the subscriptions that at least one
-	 * value is always returned
-	 * get the jobid from the segment name in the first value
-	 */
-	values = (orte_gpr_value_t**)(data->values)->addr;
-	if (ORTE_SUCCESS != (rc =
-			orte_schema.extract_jobid_from_segment_name(&jobid,
-			values[0]->segment))) {
-			ORTE_ERROR_LOG(rc);
-		return;
-	}
-
-	for(i = 0, k=0; k < data->cnt && i < (data->values)->size; i++) {
-		if (NULL != values[i]) {
-			k++;
-			value = values[i];
-			/* determine the state change */
-			keyvals = value->keyvals;
-			for(j=0; j<value->cnt; j++) { 
-				orte_gpr_keyval_t* keyval = keyvals[j];
-				if(strcmp(keyval->key, ORTE_PROC_NUM_AT_STG1) == 0) {
-					(*cbfunc)(jobid,ORTE_PROC_STATE_AT_STG1);
-					/* BWB - XXX - FIX ME: this needs to happen when all
-					   are LAUNCHED, before STG1 */
-					debug_wireup_stdin(jobid);
-					continue;
-				}
-				if(strcmp(keyval->key, ORTE_PROC_NUM_AT_STG2) == 0) {
-					(*cbfunc)(jobid,ORTE_PROC_STATE_AT_STG2);
-					continue;
-				}
-				if(strcmp(keyval->key, ORTE_PROC_NUM_AT_STG3) == 0) {
-					(*cbfunc)(jobid,ORTE_PROC_STATE_AT_STG3);
-					continue;
-				}
-				if(strcmp(keyval->key, ORTE_PROC_NUM_FINALIZED) == 0) {
-					(*cbfunc)(jobid,ORTE_PROC_STATE_FINALIZED);
-					continue;
-				}
-				if(strcmp(keyval->key, ORTE_PROC_NUM_TERMINATED) == 0) {
-					(*cbfunc)(jobid,ORTE_PROC_STATE_TERMINATED);
-					continue;
-				}
-				if(strcmp(keyval->key, ORTE_PROC_NUM_ABORTED) == 0) {
-					(*cbfunc)(jobid,ORTE_PROC_STATE_ABORTED);
-					continue;
-				}
-			}
-		}
-	}
-}
-
-static int
-debug_allocate(orte_app_context_t** app_context, size_t num_context, orte_jobid_t* jobid, orte_rmgr_cb_fn_t cbfunc)
-{
-	int rc;
-	orte_process_name_t* name;
-
-	/* 
-	 * Initialize job segment and allocate resources
-	 */
-
-	if (ORTE_SUCCESS != (rc = ORTE_SETUP_JOB(app_context,num_context,jobid,NULL))) {
-		ORTE_ERROR_LOG(rc);
-		return rc;
-	}
-	
-	if (ORTE_SUCCESS != (rc = ORTE_ALLOCATE_AND_MAP(*jobid))) {
-		ORTE_ERROR_LOG(rc);
-		return rc;
-	}
-
-	/* 
-	 * setup I/O forwarding
-	 */
-	if (ORTE_SUCCESS != (rc = orte_ns.create_process_name(&name, 0, *jobid, 0))) {      
-		ORTE_ERROR_LOG(rc);
-		return rc;
-	} if (ORTE_SUCCESS != (rc = orte_iof.iof_pull(name, ORTE_NS_CMP_JOBID, ORTE_IOF_STDOUT, 1))) {
-		ORTE_ERROR_LOG(rc);
-		return rc;
-	} if (ORTE_SUCCESS != (rc = orte_iof.iof_pull(name, ORTE_NS_CMP_JOBID, ORTE_IOF_STDERR, 2))) {
-		ORTE_ERROR_LOG(rc);
-		return rc;
-	}
-    
-	/* 
-	 * setup callback
-	 */
-    /* setup the launch system's stage gate counters and subscriptions */
-    if (ORTE_SUCCESS != (rc = ORTE_STAGE_GATE_INIT(*jobid))) {
-        ORTE_ERROR_LOG(rc);
-        return rc;
-    } 
-
-	if(NULL != cbfunc) {
-		rc = ORTE_SUBSCRIBE(*jobid, debug_callback, (void*)cbfunc, ORTE_NOTIFY_ALL);
-		if(ORTE_SUCCESS != rc) {
-			ORTE_ERROR_LOG(rc);
-			return rc;
-		}
-	}
-
-	ORTE_FREE_NAME(name);
-
-	return ORTE_SUCCESS;
-}
 /*
  * Debug spawner. To spawn a debug job, two process allocations must be made. 
  * This first is for the application and the second for the debugger (which is
@@ -1098,37 +970,41 @@ debug_spawn(char *debug_path, int argc, char **argv, orte_app_context_t** app_co
 	int						rc;
 	orte_jobid_t			jid1;
 	orte_jobid_t			jid2;
-	orte_app_context_t **	debug_context;
+	orte_app_context_t *	debug_context;
 
-	if ((rc = debug_allocate(app_context, num_context, &jid1, debug_app_job_state_callback)) != ORTE_SUCCESS)
+	rc = ORTE_ALLOCATE_JOB(app_context, num_context, &jid1, debug_app_job_state_callback);
+	if (rc != ORTE_SUCCESS) {
+		ORTE_ERROR_LOG(rc);
 		return rc;
+	}
 
-	debug_context = malloc(sizeof(orte_app_context_t *));
-	debug_context[0] = OBJ_NEW(orte_app_context_t);
-	debug_context[0]->num_procs = app_context[0]->num_procs + 1;
-	debug_context[0]->app = strdup(debug_path);
-	debug_context[0]->cwd = strdup(app_context[0]->cwd);
+	debug_context = OBJ_NEW(orte_app_context_t);
+	debug_context->num_procs = app_context[0]->num_procs + 1;
+	debug_context->app = strdup(debug_path);
+	debug_context->cwd = strdup(app_context[0]->cwd);
 	/* no special environment variables */
 #if ORTE_VERSION_1_0
-	debug_context[0]->num_env = 0;
+	debug_context->num_env = 0;
 #endif /* ORTE_VERSION_1_0 */
-	debug_context[0]->env = NULL;
+	debug_context->env = NULL;
 	/* no special mapping of processes to nodes */
-	debug_context[0]->num_map = 0;
-	debug_context[0]->map_data = NULL;
+	debug_context->num_map = 0;
+	debug_context->map_data = NULL;
 	/* setup argv */
-	debug_context[0]->argv = (char **)malloc((argc+2) * sizeof(char *));
+	debug_context->argv = (char **)malloc((argc+2) * sizeof(char *));
 	for (i = 0; i < argc; i++) {
-		debug_context[0]->argv[i] = strdup(argv[i]);
+		debug_context->argv[i] = strdup(argv[i]);
 	}
-	asprintf(&debug_context[0]->argv[i++], "--jobid=%d", jid1);
-	debug_context[0]->argv[i++] = NULL;
+	asprintf(&debug_context->argv[i++], "--jobid=%d", jid1);
+	debug_context->argv[i++] = NULL;
 #if ORTE_VERSION_1_0
-	debug_context[0]->argc = i;
+	debug_context->argc = i;
 #endif /* ORTE_VERSION_1_0 */
 
-	if ((rc = debug_allocate(debug_context, num_context, &jid2, debug_job_state_callback)) != ORTE_SUCCESS) {
-		// TODO free debug_context...
+	rc = ORTE_ALLOCATE_JOB(&debug_context, 1, &jid2, debug_job_state_callback);
+	if (rc != ORTE_SUCCESS) {
+		OBJ_RELEASE(debug_context);
+		ORTE_ERROR_LOG(rc);
 		return rc;
 	}
 
@@ -1136,12 +1012,15 @@ debug_spawn(char *debug_path, int argc, char **argv, orte_app_context_t** app_co
 	 * launch the debugger
 	 */
 	if (ORTE_SUCCESS != (rc = ORTE_LAUNCH_JOB(jid2))) {
+		OBJ_RELEASE(debug_context);
 		ORTE_ERROR_LOG(rc);
 		return rc;
 	}
 
 	*app_jobid = jid1;
 	*debug_jobid = jid2;
+    
+    OBJ_RELEASE(debug_context);
     
 	return ORTE_SUCCESS;
 }
@@ -1155,7 +1034,6 @@ ORTERun(char **args)
 	int						a;
 	int						num_procs = 0;
 	int						debug = 0;
-	int						num_apps;
 	int						num_args = 0;
 	int						num_env = 0;
 	int						debug_argc = 0;
@@ -1168,7 +1046,7 @@ ORTERun(char **args)
 	char *					debug_exec_path;
 	char **					debug_args;
 	char **					env = NULL;
-	orte_app_context_t **	apps;
+	orte_app_context_t *	apps;
 	orte_jobid_t			jobid = ORTE_JOBID_MAX;
 	orte_jobid_t			debug_jobid = -1;
 
@@ -1271,52 +1149,50 @@ ORTERun(char **args)
 		debug_args[a] = NULL;
 	}
 
-	/* hard coded test for spawning just 1 job (JOB not PROCESSES!) */
-	num_apps = 1;
-
 	/* format the app_context_t struct */
-	apps = malloc(sizeof(orte_app_context_t *) * num_apps);
-	apps[0] = OBJ_NEW(orte_app_context_t);
-	apps[0]->num_procs = num_procs;
-	apps[0]->app = full_path;
-	apps[0]->cwd = strdup(cwd);
+	apps = OBJ_NEW(orte_app_context_t);
+	apps->num_procs = num_procs;
+	apps->app = full_path;
+	apps->cwd = strdup(cwd);
 	/* no special environment variables */
 #if ORTE_VERSION_1_0
-	apps[0]->num_env = num_env;
+	apps->num_env = num_env;
 #endif /* ORTE_VERSION_1_0 */
-	apps[0]->env = env;
+	apps->env = env;
 	/* no special mapping of processes to nodes */
-	apps[0]->num_map = 0;
-	apps[0]->map_data = NULL;
+	apps->num_map = 0;
+	apps->map_data = NULL;
 	/* setup argv */
-	apps[0]->argv = (char **)malloc((num_args + 2) * sizeof(char *));
-	apps[0]->argv[0] = strdup(pgm_name);
+	apps->argv = (char **)malloc((num_args + 2) * sizeof(char *));
+	apps->argv[0] = strdup(full_path);
 	if (num_args > 0) {
 		for (a = 1, i = 1; args[i] != NULL; i += 2) {
 			if (strcmp(args[i], "progArg") == 0)
-				apps[0]->argv[a++] = strdup(args[i+1]);
+				apps->argv[a++] = strdup(args[i+1]);
 		}
 	}
-	apps[0]->argv[num_args+1] = NULL;
+	apps->argv[num_args+1] = NULL;
 #if ORTE_VERSION_1_0
-	apps[0]->argc = num_args + 1;
+	apps->argc = num_args + 1;
 #endif /* ORTE_VERSION_1_0 */
 
-	printf("(debug ? %d) Spawning %d processes of job '%s'\n", debug, (int)apps[0]->num_procs, apps[0]->app);
-	printf("\tprogram name '%s'\n", apps[0]->argv[0]);
+	printf("(debug ? %d) Spawning %d processes of job '%s'\n", debug, (int)apps->num_procs, apps->app);
+	printf("\tprogram name '%s'\n", apps->argv[0]);
 	fflush(stdout);
 	
 	/* calls the ORTE spawn function with the app to spawn.  Return the
 	 * jobid assigned by the registry/ORTE.  Passes a callback function
 	 * that ORTE will call with state change on this job */
 	if (debug) {
-		rc = debug_spawn(debug_exec_path, debug_argc, debug_args, apps, num_apps, &jobid, &debug_jobid);
+		rc = debug_spawn(debug_exec_path, debug_argc, debug_args, &apps, 1, &jobid, &debug_jobid);
 		free(debug_args);
 	} else {
-		rc = ORTE_SPAWN(apps, num_apps, &jobid, job_state_callback);
+		rc = ORTE_SPAWN(&apps, 1, &jobid, job_state_callback);
 	}
 	
 	printf("SPAWNED [error code %d = '%s'], now unlocking\n", rc, ORTE_ERROR_NAME(rc)); fflush(stdout);
+	
+	OBJ_RELEASE(apps);
 	
 	if(ORTECheckErrorCode(RTEV_ERROR_ORTE_RUN, rc)) return 1;
 
