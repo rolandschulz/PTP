@@ -47,6 +47,7 @@ public class SDMPreferencePage extends AbstractPerferencePage {
 	private Text sdmPathText = null;
 	private Text sdmHostText = null;
 	private Text sdmBackendPathText = null;
+	private Text sdmArgsText = null;
 	private Combo sdmBackendCombo = null;
 	private Button sdmPathButton = null;
 	
@@ -116,10 +117,16 @@ public class SDMPreferencePage extends AbstractPerferencePage {
 		sdmPathText.addModifyListener(listener);		
 		sdmPathButton = createButton(comp, PreferenceMessages.getString("SDMPreferencePage.browse_1"), SWT.PUSH);
 		sdmPathButton.addSelectionListener(listener);
+		
+		new Label(comp, SWT.NONE).setText(PreferenceMessages.getString("SDMPreferencePage.sdm_args"));
+		sdmArgsText = new Text(comp, SWT.SINGLE | SWT.BORDER);
+		sdmArgsText.setLayoutData(gd);
+		sdmArgsText.addModifyListener(listener);		
 	}
 	public void performDefaults() { 
 		IPreferenceStore store = getPreferenceStore();
 		sdmPathText.setText(store.getDefaultString(IPDebugConstants.PREF_PTP_DEBUGGER_FILE));
+		sdmArgsText.setText(store.getDefaultString(IPDebugConstants.PREF_PTP_DEBUGGER_ARGS));
 		sdmHostText.setText(store.getDefaultString(IPDebugConstants.PREF_PTP_DEBUGGER_HOST));
 		sdmBackendCombo.select(sdmBackendCombo.indexOf(store.getDefaultString(IPDebugConstants.PREF_PTP_DEBUGGER_BACKEND)));
 		sdmBackendPathText.setText(store.getDefaultString(IPDebugConstants.PREF_PTP_DEBUGGER_BACKEND_PATH));
@@ -128,6 +135,7 @@ public class SDMPreferencePage extends AbstractPerferencePage {
 	protected void setValues() {
 		IPreferenceStore store = getPreferenceStore();
 		sdmPathText.setText(store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_FILE));
+		sdmArgsText.setText(store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_ARGS));
 		sdmHostText.setText(store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_HOST));
 		sdmBackendCombo.select(sdmBackendCombo.indexOf(store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_BACKEND)));
 		sdmBackendPathText.setText(store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_BACKEND_PATH));
@@ -135,6 +143,7 @@ public class SDMPreferencePage extends AbstractPerferencePage {
 	protected void storeValues() {
 		IPreferenceStore store = getPreferenceStore();
 		store.setValue(IPDebugConstants.PREF_PTP_DEBUGGER_FILE, sdmPathText.getText());
+		store.setValue(IPDebugConstants.PREF_PTP_DEBUGGER_ARGS, sdmArgsText.getText());
 		store.setValue(IPDebugConstants.PREF_PTP_DEBUGGER_HOST, sdmHostText.getText());
 		store.setValue(IPDebugConstants.PREF_PTP_DEBUGGER_BACKEND, sdmBackendCombo.getItem(sdmBackendCombo.getSelectionIndex()));
 		store.setValue(IPDebugConstants.PREF_PTP_DEBUGGER_BACKEND_PATH, sdmBackendPathText.getText());

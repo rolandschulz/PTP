@@ -71,6 +71,11 @@ public interface IPDebugConstants {
 	 * Location of the sdm
 	 */
 	public static final String PREF_PTP_DEBUGGER_FILE = PLUGIN_ID + ".pDebug.debugger_file";
+	
+	/**
+	 * Extra arguments to pass to the sdm (e.g. debugging flags)
+	 */
+	public static final String PREF_PTP_DEBUGGER_ARGS = PLUGIN_ID + ".pDebug.debugger_args";
 
 	/**
 	 * Host for the sdm client
