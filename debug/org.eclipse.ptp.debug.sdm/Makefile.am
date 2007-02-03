@@ -45,7 +45,8 @@ libdbgutils_a_SOURCES =		src/utils/error.c \
 							src/utils/event.c \
 							src/utils/itimer.c \
 							src/utils/memoryinfo.c \
-							src/utils/signalinfo.c
+							src/utils/signalinfo.c \
+							src/utils/debug.c
 						
 libdbgutils_a_CFLAGS =		-I./include -I./libaif $(AM_CFLAGS) -g
 

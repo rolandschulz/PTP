@@ -10,8 +10,6 @@
  * task ids.
  */
 
-#include <config.h>
-
 #ifdef __gnu_linux__
 #define _GNU_SOURCE
 #endif /* __gnu_linux__ */
@@ -49,7 +47,7 @@ do_normal_command(char *cmd, void *data)
 {
 	dbg_backend *	dbgr = (dbg_backend *)data;
 	
-	DEBUG_PRINTF("executing local command '%s'\n", cmd);
+	DEBUG_PRINTF(DEBUG_LEVEL_SERVER, "executing local command '%s'\n", cmd);
 	
 	(void)svr_dispatch(dbgr, cmd);
 }
@@ -59,7 +57,7 @@ do_int_command(void *data)
 {
 	dbg_backend *	dbgr = (dbg_backend *)data;
 	
-	DEBUG_PRINTS("executing interrupt command\n");
+	DEBUG_PRINTS(DEBUG_LEVEL_SERVER, "executing interrupt command\n");
 	
 	(void)svr_interrupt(dbgr);
 }
@@ -106,7 +104,7 @@ server(int nprocs, int my_id, int job_id, dbg_backend *dbgr)
 {
 	char **		env = NULL;
 	
-	DEBUG_PRINTF("starting server on [%d,%d,%d]\n", my_id, nprocs, job_id);
+	DEBUG_PRINTF(DEBUG_LEVEL_SERVER, "starting server on [%d,%d,%d]\n", my_id, nprocs, job_id);
 	
 	if (job_id >= 0) {
 		env = (char **)malloc(4 * sizeof(char **));

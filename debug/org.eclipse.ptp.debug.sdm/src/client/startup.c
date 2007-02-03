@@ -17,6 +17,8 @@
  * LA-CC 04-115
  ******************************************************************************/
 
+#include "config.h"
+
 #include <mpi.h>
 #include <getopt.h>
 #include <stdlib.h>
@@ -39,20 +41,40 @@ static struct option longopts[] = {
 	{"port",			required_argument,	NULL, 	'p'}, 
 	{"host",			required_argument,	NULL, 	'h'}, 
 	{"jobid",			required_argument,	NULL, 	'j'},
+#ifdef DEBUG
+	{"debug",			optional_argument,	NULL, 	'd'},
+#endif /* DEBUG */
 	{NULL,				0,					NULL,	0}
 };
 
+#ifdef DEBUG
+static char * shortopts = "b:e:P:p:h:d::";
+#else /* DEBUG */
+static char * shortopts = "b:e:P:p:h:";
+#endif /* DEBUG */
+
+static int	fatal_error = 0;
+static char *error_str = NULL;
+
 void
-error_msg(int rank, char *fmt, ...)
+error_msg(char *fmt, ...)
 {
 	va_list	ap;
 	
-	if (rank != 0)
-		return;
-		
 	va_start(ap, fmt);
-	vfprintf(stderr, fmt, ap);
+	vasprintf(&error_str, fmt, ap);
 	va_end(ap);
+	
+	fatal_error = 1;
+}
+
+void
+print_error_msg()
+{
+	if (error_str != NULL) {
+		fprintf(stderr, "%s", error_str);
+		fflush(stderr);
+	}
 }
 
 /*
@@ -80,12 +102,7 @@ main(int argc, char *argv[])
 	proxy *			p;
 	dbg_backend *	d;
 
-	MPI_Init(&argc, &argv);
-	
-	MPI_Comm_size(MPI_COMM_WORLD, &size);
-	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-	
-	while ((ch = getopt_long(argc, argv, "b:e:P:p:h:", longopts, NULL)) != -1)
+	while ((ch = getopt_long(argc, argv, shortopts, longopts, NULL)) != -1)
 	switch (ch) {
 	case 'b':
 		debugger_str = optarg;
@@ -105,50 +122,85 @@ main(int argc, char *argv[])
 	case 'j':
 		jobid = atoi(optarg);
 		break;
+#ifdef DEBUG
+	case 'd':
+		if (optarg == NULL)
+			debug_level = DEBUG_LEVEL_ALL;
+		else
+			debug_level = atoi(optarg);
+		break;
+#endif /* DEBUG */
 	default:
-		error_msg(rank, "sdm [--debugger=value] [--debugger_path=path]\n");
-		error_msg(rank, "    [--proxy=proxy]\n");
-		error_msg(rank, "    [--host=host_name] [--port=port]\n");
-		error_msg(rank, "    [--jobid=jobid]\n");
-		exit(1);
+		error_msg(
+			"sdm [--debugger=value] [--debugger_path=path]\n"
+			"    [--proxy=proxy]\n"
+			"    [--host=host_name] [--port=port]\n"
+			"    [--jobid=jobid]\n"
+#ifdef DEBUG
+			"    [--debug[=level]]\n"
+#endif /* DEBUG */
+		);
+		goto error_out;
 	}
 	
 	argc -= optind;
 	argv += optind;
 	
-	if (size < 2) {
-		error_msg(rank, "Debugger requires at least 2 processes\n");
-		MPI_Finalize();
-		return 1;
-	}
-	
-	// MPI_Comm_create_errhandler(handle_fatal_errors, &err_handler);
-	// MPI_Comm_set_errhandler(MPI_COMM_WORLD, err_handler);
-	
 	if (find_dbg_backend(debugger_str, &d) < 0) {
-		error_msg(rank, "No such backend: \"%s\"\n", debugger_str);
-		MPI_Finalize();
-		return 1;
+		error_msg("No such backend: \"%s\"\n", debugger_str);
+		goto error_out;
 	}
 	
 	if (path != NULL)
 		backend_set_path(d, path);
 	
 	if (find_proxy(proxy_str, &p) < 0) {
-		error_msg(rank, "No such proxy: \"%s\"\n", proxy_str);
+		error_msg("No such proxy: \"%s\"\n", proxy_str);
+		goto error_out;
+	}
+	
+	/*
+	 * Become an MPI program
+	 */
+error_out:
+	DEBUG_PRINTS(DEBUG_LEVEL_STARTUP, "starting MPI\n");
+	
+	MPI_Init(&argc, &argv);
+	
+	MPI_Comm_size(MPI_COMM_WORLD, &size);
+	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+	
+	DEBUG_SET_RANK(rank);
+	
+	DEBUG_PRINTF(DEBUG_LEVEL_STARTUP, "size=%d rank=%d\n", size, rank);
+
+	if (size < 2) {
+		error_msg("Debugger requires at least 2 processes\n");
+	}
+	
+	if (fatal_error) {
+		if (rank == 0)
+			print_error_msg();
 		MPI_Finalize();
 		return 1;
 	}
+		
+	// MPI_Comm_create_errhandler(handle_fatal_errors, &err_handler);
+	// MPI_Comm_set_errhandler(MPI_COMM_WORLD, err_handler);
 	
 	/*
 	 * The client process *must* always have task id 'size' - 1 since it
 	 * does not control a debugged process.
 	 */
 	if (rank == size-1) {
+		DEBUG_PRINTS(DEBUG_LEVEL_STARTUP, "starting client\n");
 		client(size, rank, proxy_str, host, port);
 	} else {
+		DEBUG_PRINTF(DEBUG_LEVEL_STARTUP, "starting task %d\n", rank);
 		server(size, rank, jobid, d);
 	}
+
+	DEBUG_PRINTS(DEBUG_LEVEL_STARTUP, "all finished\n");
 	
 	MPI_Finalize();
 	

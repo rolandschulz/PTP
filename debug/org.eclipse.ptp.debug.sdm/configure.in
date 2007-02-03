@@ -80,12 +80,26 @@ if test "$ac_cv_path_OMPI_INFO" = no; then
 fi
 
 AH_VERBATIM([DEBUG],
-[#ifdef DEBUG
-#define DEBUG_PRINTF(format, ...)	printf(format, __VA_ARGS__); fflush(stdout)
-#define DEBUG_PRINTS(str)			printf("%s\n", (str)); fflush(stdout)
+[#define DEBUG
+#ifdef DEBUG
+extern int debug_level;
+extern int debug_rank;
+extern void debug_printf(int, char *, ...);
+extern void debug_set_rank(int);
+#define DEBUG_LEVEL_NONE	0x00
+#define DEBUG_LEVEL_ALL		0xff
+#define DEBUG_LEVEL_STARTUP	0x01
+#define DEBUG_LEVEL_CLIENT	0x02
+#define DEBUG_LEVEL_SERVER	0x04
+#define DEBUG_LEVEL_BACKEND	0x08
+#define TEST_DEBUG_LEVEL(level)			((debug_level&(level))==(level))
+#define DEBUG_PRINTF(level,format,...)	debug_printf((level),(format),__VA_ARGS__)
+#define DEBUG_PRINTS(level,str)			debug_printf((level),"%s",(str))
+#define DEBUG_SET_RANK(rank)			debug_set_rank((rank))
 #else /* DEBUG */
-#define DEBUG_PRINTF(format, ...)
-#define DEBUG_PRINTS(str)
+#define DEBUG_PRINTF(level,format,...)
+#define DEBUG_PRINTS(level,str)
+#define DEBUG_SET_RANK(rank)
 #endif /* DEBUG */])
 
 AC_CONFIG_FILES([Makefile])

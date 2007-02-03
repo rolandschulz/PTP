@@ -50,6 +50,7 @@ typedef struct MISession	MISession;
 extern MISession *MISessionNew(void);
 extern void MISessionFree(MISession *sess);
 extern void MISessionSetTimeout(MISession *sess, long sec, long usec);
+extern void MISessionSetDebug(int debug);
 extern int MISessionStartLocal(MISession *sess, char *);
 extern void MISessionRegisterEventCallback(MISession *sess, void (*callback)(MIEvent *));
 extern void MISessionRegisterCommandCallback(MISession *sess, void (*callback)(MIResultRecord *));
