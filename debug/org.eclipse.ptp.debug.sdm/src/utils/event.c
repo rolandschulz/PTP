@@ -424,7 +424,7 @@ dbg_str_to_stackframe(char ***args, stackframe **frame)
 	stackframe *	sf;
 	
 	if (strcmp(*(*args), NULL_STR) == 0) {
-		*(*args)++;
+		(*args)++;
 		*frame = NULL;
 		return 0;
 	}
@@ -449,7 +449,7 @@ dbg_str_to_signalinfo(char ***args, signalinfo **sig)
 	signalinfo *s;
 	
 	if (strcmp(*(*args), NULL_STR) == 0) {
-		*(*args)++;
+		(*args)++;
 		*sig = NULL;
 		return 0;
 	}
@@ -599,7 +599,7 @@ dbg_str_to_memoryinfo(char ***args, memoryinfo **info)
 	memoryinfo * meminfo;
 	
 	if (strcmp(*(*args), NULL_STR) == 0) {
-		*(*args)++;
+		(*args)++;
 		*info = NULL;
 		return 0;
 	}
