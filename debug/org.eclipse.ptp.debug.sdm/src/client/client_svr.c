@@ -208,7 +208,7 @@ new_request(bitset *mask, char *msg, int timeout, void *cbdata)
 	bitset_andeq(send_to, mask);
 	
 	if (bitset_isempty(send_to)) {
-		DEBUG_PRINTF("[%d] No one to send to\n", this);
+		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] No one to send to\n", this);
 		return;
 	}
 
@@ -230,7 +230,7 @@ new_request(bitset *mask, char *msg, int timeout, void *cbdata)
 		
 	AddToList(all_requests, (void *)r);
 	
-	DEBUG_PRINTF("[%d] Creating new request (%d, %s, '%s')\n", this, r->id, bitset_to_set(send_to), msg);
+	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Creating new request (%d, %s, '%s')\n", this, r->id, bitset_to_set(send_to), msg);
 }
 
 static void
@@ -423,8 +423,8 @@ ClntSvrInit(int size, int my_id)
     find_descendents(children, this_p, root, size, p2, 0);
     find_descendents(descendents, this_p, root, size, p2, 1);
 
-	DEBUG_PRINTF("[%d] children = %s\n", this, bitset_to_set(children));
-	DEBUG_PRINTF("[%d] descendents = %s\n", this, bitset_to_set(descendents));
+	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] children = %s\n", this, bitset_to_set(children));
+	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] descendents = %s\n", this, bitset_to_set(descendents));
 	
 	all_requests = NewList();
 	current_request = NULL;
@@ -501,11 +501,11 @@ update_reply(request *req, bitset *mask, char *msg, int hash)
 	 * Save reply if it is new, otherwise just update the reply bitset
 	 */
 	if ((r = HashSearch(req->replys, hash)) == NULL) {
-		DEBUG_PRINTF("[%d] creating new reply (%s, '%s') for #%x\n", this, bitset_to_set(mask), msg, hash);
+		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] creating new reply (%s, '%s') for #%x\n", this, bitset_to_set(mask), msg, hash);
 		r = new_reply(mask, msg);
 		HashInsert(req->replys, hash, (void *)r);
 	} else {
-		DEBUG_PRINTF("[%d] updating reply #%x\n", this, hash);
+		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] updating reply #%x\n", this, hash);
 		bitset_oreq(r->mask, mask);
 	}
 	
@@ -514,7 +514,7 @@ update_reply(request *req, bitset *mask, char *msg, int hash)
 	 */
 	bitset_andeqnot(req->outstanding, r->mask);
 	
-	DEBUG_PRINTF("[%d] request outstanding is now %s\n", this, bitset_to_set(req->outstanding));
+	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] request outstanding is now %s\n", this, bitset_to_set(req->outstanding));
 	
 	/* 
 	 * Start timer if necessary
@@ -532,7 +532,7 @@ ClntSvrInsertMessage(char *msg)
 	request *	r;
 	bitset *	mask;
 	
-	DEBUG_PRINTF("[%d] insert '%s'\n", this, msg);
+	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] insert '%s'\n", this, msg);
 	
 	for (SetList(all_requests); (r = (request *)GetListElement(all_requests)) != NULL; ) {
 		if (bitset_test(r->outstanding, this)) {
@@ -563,7 +563,7 @@ ClntSvrSendReply(bitset *mask, char *msg, void *data)
 	MPI_Send(hdr, 2, MPI_UNSIGNED, parent, TAG_NORMAL, MPI_COMM_WORLD);
 	MPI_Send(reply_buf, hdr[1], MPI_CHAR, parent, TAG_NORMAL, MPI_COMM_WORLD);
 
-	DEBUG_PRINTF("[%d] sent reply <(%x,%d),'%s...'>\n", this, hdr[0], hdr[1], reply_buf);
+	DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] sent reply <(%x,%d),'%s...'>\n", this, hdr[0], hdr[1], reply_buf);
 	
 	free(reply_buf);
 }
@@ -585,8 +585,8 @@ send_to_children(bitset *mask, int tag, int timeout, char *msg)
 	pack_buffer(mask, timeout, msg, &buf, &len);
 	
 	for (sibs = bitset_dup(children); (child_id = bitset_firstset(sibs)) != -1; bitset_unset(sibs, child_id)) {
-		DEBUG_PRINTF("[%d] sibs is %s\n", this, bitset_to_set(sibs));
-		DEBUG_PRINTF("[%d] Sending (%s, %d, '%s...') to %d\n", this, tag==TAG_INTERRUPT ? "interrupt" : "normal", len, buf, child_id);
+		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] sibs is %s\n", this, bitset_to_set(sibs));
+		DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] Sending (%s, %d, '%s...') to %d\n", this, tag==TAG_INTERRUPT ? "interrupt" : "normal", len, buf, child_id);
 		MPI_Send(buf, len, MPI_CHAR, child_id, tag, MPI_COMM_WORLD); // TODO: handle fatal errors
 	}
 		
@@ -629,7 +629,7 @@ check_for_messages(int ignore_parent)
 			buf = (char *)malloc(len);
 			MPI_Recv(buf, len, MPI_CHAR, parent, stat.MPI_TAG, MPI_COMM_WORLD, &stat);
 			
-			DEBUG_PRINTF("[%d] got message from parent (%d, '%s...')\n", this, len, buf);
+			DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] got message from parent (%d, '%s...')\n", this, len, buf);
 			
 			unpack_buffer(buf, len, &mask, &timeout, &msg);
 
@@ -682,7 +682,7 @@ check_for_messages(int ignore_parent)
 			
 			unpack_buffer(buf, len, &mask, &timeout, &msg);
 			
-			DEBUG_PRINTF("[%d] got reply from child %d (%x, %s, '%s')\n", this, recv_id, hdr[0], bitset_to_set(mask), msg);
+			DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] got reply from child %d (%x, %s, '%s')\n", this, recv_id, hdr[0], bitset_to_set(mask), msg);
 			
 			/*
 			 * Find the request this reply is for.
@@ -739,9 +739,9 @@ ClntSvrProgressCmds(void)
 			send_to_children(req->interrupt_mask, TAG_INTERRUPT, req->timeout, NULL);
 
 			if (this != root && bitset_test(req->interrupt_mask, this) && int_cmd_callback != NULL) {
-				DEBUG_PRINTF("[%d] running interrupt locally\n", this);
+				DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] running interrupt locally\n", this);
 				int_cmd_callback(local_cmd_data);
-				DEBUG_PRINTF("[%d] finished interrupt command\n", this);
+				DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] finished interrupt command\n", this);
 			}
 			
 			req->interrupt = 0;
@@ -749,9 +749,9 @@ ClntSvrProgressCmds(void)
 			send_to_children(req->active_mask, TAG_NORMAL, req->timeout, req->msg);
 			
 			if (this != root && bitset_test(req->active_mask, this) && local_cmd_callback != NULL) {
-				DEBUG_PRINTF("[%d] running command locally\n", this);
+				DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] running command locally\n", this);
 				local_cmd_callback(req->msg, local_cmd_data);
-				DEBUG_PRINTF("[%d] finished local command\n", this);
+				DEBUG_PRINTF(DEBUG_LEVEL_CLIENT, "[%d] finished local command\n", this);
 			}
 			
 			req->active = 1;

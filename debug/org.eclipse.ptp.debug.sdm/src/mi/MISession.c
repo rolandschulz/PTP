@@ -38,14 +38,13 @@
 
 static List *			MISessionList = NULL;
 static struct timeval	MISessionDefaultSelectTimeout = {0, 1000};
+static int				MISessionDebug = 0;
 
 static void DoOOBAsyncCallbacks(MISession *sess, List *oobs);
 static void DoOOBStreamCallbacks(MISession *sess, List *oobs);
 static void HandleChild(int sig);
 static int WriteCommand(int fd, char *cmd);
 static char *ReadResponse(int fd);
-
-//#define DEBUG
 
 MISession *
 MISessionNew(void)
@@ -109,6 +108,12 @@ MISessionSetTimeout(MISession *sess, long sec, long usec)
 {
 	sess->select_timeout.tv_sec = sec;
 	sess->select_timeout.tv_usec = usec;
+}
+
+void
+MISessionSetDebug(int debug)
+{
+	MISessionDebug = debug;
 }
 
 int
@@ -241,9 +246,12 @@ WriteCommand(int fd, char *cmd)
 	int	n;
 	int	len = strlen(cmd);
 
-#ifdef DEBUG
-	printf("gdb>>> %s\n", cmd); fflush(stdout);
-#endif
+	if (MISessionDebug) {
+		printf("MI: SEND %s", cmd);
+		if (cmd[len-1] != '\n')
+			printf("\n");
+		fflush(stdout);
+	}
 		
 	while (len > 0) {
 		n = write(fd, cmd, len);
@@ -319,9 +327,13 @@ ReadResponse(int fd)
 	
 	if (n > 0)
 		p[n] = '\0';
-#ifdef DEBUG
-	printf("<<<gdb %s\n", res_buf); fflush(stdout);
-#endif
+
+	if (MISessionDebug) {
+		printf("MI: RECV %s", res_buf); 
+		if (res_buf[strlen(res_buf)-1] != '\n')
+			printf("\n");
+		fflush(stdout);
+	}
 
 	return res_buf;
 }
@@ -358,9 +370,10 @@ MISessionProcessCommandsAndResponses(MISession *sess, fd_set *rfds, fd_set *wfds
 		 * interrupt a running process seems to be from the command line.
 		 */
 		if (strcmp(sess->command->command, "-exec-interrupt") == 0) {
-#ifdef DEBUG
-			printf("sending SIGINT to %d\n", sess->pid); fflush(stdout);			
-#endif /* DEBUG */
+			if (MISessionDebug) {
+				printf("MI: sending SIGINT to %d\n", sess->pid); 
+				fflush(stdout);
+			}		
 			kill(sess->pid, SIGINT);
 		} else if (WriteCommand(sess->in_fd, MICommandToString(sess->command)) < 0) {
 			sess->in_fd = -1;
