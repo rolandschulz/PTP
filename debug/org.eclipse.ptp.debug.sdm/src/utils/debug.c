@@ -29,7 +29,8 @@
 
 int		debug_level = DEBUG_LEVEL_NONE;
 int 	debug_rank = -1;
-FILE *	debug_out = stdout;
+
+#define debug_out	stdout
 
 void
 debug_printf(int level, char *fmt, ...)
