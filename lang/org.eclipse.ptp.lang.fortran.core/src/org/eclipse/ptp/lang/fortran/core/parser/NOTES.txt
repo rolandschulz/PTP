@@ -1,0 +1,14 @@
+12.05.06
+
+- in call stmt:
+  -  in procedure_designator:
+     - the rule for procedure_designator has data_ref, which alt1
+     looks the same as the optional part of call_stmt!
+
+
+
+
+
+
+
+

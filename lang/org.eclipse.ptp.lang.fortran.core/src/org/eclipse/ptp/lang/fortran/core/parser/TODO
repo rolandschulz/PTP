@@ -1,0 +1,8 @@
+* keywords as id's, using Sale's algorithm most likely.
+
+1. string literals
+2. labels (labeled statements)
+3. multi-line statements
+4. fixed format
+5. backtracking
+
