@@ -4,7 +4,7 @@ JAVA=java
 GENERATED_JAVA_FILES=FortranLexer.java FortranParser.java
 CLASS_FILES=FortranLexer.class FortranParser.class \
             FortranStream.class FortranTokenStream.class \
-            FortranMain.class 
+            FortranLexicalPrepass.class FortranMain.class 
 GENERATED_TOKEN_FILES=FortranLexer.tokens FortranParser.tokens
 
 all: $(GENERATED_JAVA_FILES) $(CLASS_FILES) 
@@ -20,15 +20,15 @@ runTests: $(CLASS_FILES)
         done;
 
 
-FortranLexer.java: FortranLexer.g
+FortranLexer.java: FortranLexer.g 
 	$(JAVA) org.antlr.Tool $<
-FortranParser.java: FortranParser.g
+FortranParser.java: FortranParser.g FortranLexer.tokens
 	$(JAVA) org.antlr.Tool $<
 
-FortranLexer.class: FortranLexer.java 
+FortranLexer.class: FortranLexer.java FortranLexer.tokens
 	$(JAVAC) $<
 
-FortranParser.class: FortranParser.java
+FortranParser.class: FortranParser.java FortranLexer.tokens
 	$(JAVAC) $<
 
 FortranStream.class: FortranStream.java
@@ -37,7 +37,13 @@ FortranStream.class: FortranStream.java
 FortranTokenStream.class: FortranTokenStream.java
 	$(JAVAC) $<
 
-FortranMain.class: FortranMain.java
+FortranLexicalPrepass.class: FortranLexicalPrepass.java \
+                             FortranTokenStream.class
+	$(JAVAC) $<
+
+FortranMain.class: FortranMain.java FortranLexer.class \
+                   FortranParser.class FortranTokenStream.class \
+                   FortranStream.class FortranLexicalPrepass.class
 	$(JAVAC) $<
 
 
