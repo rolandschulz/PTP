@@ -5,29 +5,27 @@ options {
 }
 
 @members {
-    int prevIndex;
-    int currIndex;
-    int inLineComment;
-    String lineString;
-    String trimmedLine;
-    public int needIdent;
     private Token prevToken;
+    private boolean continueFlag;
+    
 
-    private boolean isKeyword(Token tmpToken) {
+    public boolean isKeyword(Token tmpToken) {
         if(tmpToken.getType() >= T_INTEGER && 
-            tmpToken.getType() <= T_CLASS_IS) {
+            tmpToken.getType() <= T_DIMENSION) {
             return true;
         } else {
             return false;
         }
     }// end isKeyword()
 
-    public void convertToIdent(Token tmpToken, int needIdent) {
-        if(needIdent == 1 && isKeyword(tmpToken)) {
-//             System.out.println("converting keyword to T_IDENT!!");
-            tmpToken.setType(T_IDENT);
+    public boolean isKeyword(int tokenType) {
+        if(tokenType >= T_INTEGER && tokenType <= T_DIMENSION) {
+            return true;
+        } else {
+            return false;
         }
-    }// end convertToIdent() 
+    }// end isKeyword()
+
 
     // overrides nextToken in superclass
     public Token nextToken() {
@@ -41,14 +39,27 @@ options {
 
         return tmpToken;
     }// end nextToken()
-            
+
+
+    public int getIgnoreChannelNumber() {
+        // return the channel number that antlr uses for ignoring a token
+        return 99;
+    }// end getIgnoreChannelNumber()
+
+    /**
+     * Do this here because not sure how to get antlr to generate the 
+     * init code.  It doesn't seem to do anything with the @init block below.
+     * This is called my FortranMain().
+     */
+    public FortranLexer(FortranStream input) {
+        super(input);
+        prevToken = null;
+        continueFlag = false;
+    }// end constructor()
+
 }
 
 @init {
-    prevIndex = 0;
-    currIndex = 0;
-    inLineComment = 0;
-    needIdent = 0;
     prevToken = null;
 }
 
@@ -56,77 +67,37 @@ options {
  * Lexer rules
  */
 
-// original rule
-// T_EOS : ';';
+/* 
+ * Note: antlr sometimes has LL(*) failures with the grammars, but not always.
+ * it seems that it may be the timeout issue that was mentioned..
+ */
 
 T_EOS 
-// options { greedy=false; }
       : ';' 
         { 
-// this was part of the original method for handling newline as T_EOS
-//             // index of first char after the ';'
-//             // here, we must book keep the T_EOS like we do if it's 
-//             // a newline character so we can recognize if a newline 
-//             // comes after a ';' or if it's for a blank line, etc.
-//             currIndex = getCharIndex();
-//             prevIndex = currIndex;
-
             // if the previous token was a T_EOS, then the one we're 
             // processing now is whitespace, so throw it away.
             // also, ignore semicolons that come before any real 
             // statements (is this correct??).  --Rickett, 11.28.06
             if(prevToken == null || 
-                (prevToken != null && prevToken.getType() == T_EOS)) {
-                channel=99;
+                (prevToken != null && prevToken.getType() == T_EOS) ||
+                continueFlag == true) {
+                _channel=99;
             }
 
         }
       |  ('\r')? ('\n')
         {
-// this was part of the original method for handling newline as T_EOS
-//             // index of the newline character
-//             if(inLineComment != 1) {
-//                 currIndex = getCharIndex()-1;
-//             }
-            
-// this was part of the original method for handling newline as T_EOS
-//             lineString = input.substring(prevIndex, currIndex);
-//             // the trim() method removes all whitespace chars and 
-//             // returns a new String representing what's left.  if the 
-//             // resulting String has 0 length then the original string 
-//             // (or stmt in our case) has nothing but whitespace.
-//             trimmedLine = lineString.trim();
-// //             System.out.println("input.substring(prevIndex, currIndex): " + 
-// //                 input.substring(prevIndex, currIndex));
-            
-            
-// this was part of the original method for handling newline as T_EOS
-//             if(trimmedLine.length() == 0) {
-//                 // just for testing
-//                 if(prevToken != null && prevToken.getType() == T_EOS) {
-//                     System.out.println("previous token was T_EOS here");
-//                 }
-//                 channel=99; 
-//             }
-
             // if the previous token was a T_EOS, then the one we're 
             // processing now is whitespace, so throw it away.
             // also, if the previous token is null it means we have a 
             // blank line or a semicolon at the start of the file and 
             // we need to ignore it.  
             if(prevToken == null || 
-                (prevToken != null && prevToken.getType() == T_EOS)) {
-                channel=99;
+                (prevToken != null && prevToken.getType() == T_EOS) ||
+                continueFlag == true) {
+                _channel=99;
             }
-
-// this was part of the original method for handling newline as T_EOS
-//             // now, if we may need to update the currIndex if we didn't 
-//             // before because we were at the end of a comment
-//             if(inLineComment == 1) {
-//                 currIndex = getCharIndex()-1;
-//                 inLineComment = 0;
-//             }
-//             prevIndex=currIndex;
         }
       ;
                 
@@ -134,18 +105,13 @@ T_EOS
 
 
 // R427 from char-literal-constant
-// original rule..  
-// T_CHAR_CONSTANT
-//         : '\'' {System.out.println("found the single quote");} ( Rep_Char )* {System.out.println("\n\nfound the Rep_Char\n\n");} '\'' {System.out.println("found the closing single quote");}
-//         | '\"' ( Rep_Char )* '\"'
-//         ;
 T_CHAR_CONSTANT
-        : ('\'' ( SQ_Rep_Char )* '\'')+ // {System.out.println("T_CHAR_CONSTANT is: " + getText());}
-        | ('\"' ( DQ_Rep_Char )* '\"')+ // {System.out.println("T_CHAR_CONSTANT is: " + getText());}
+        : ('\'' ( SQ_Rep_Char )* '\'')+ 
+        | ('\"' ( DQ_Rep_Char )* '\"')+ 
         ;
 
 T_DIGIT_STRING
-	:	Digit_String
+	:	Digit_String 
 	;
 
 // R412
@@ -176,11 +142,7 @@ DOUBLE_CONSTANT
 	|	Digit_String  D_Exponent
 	;	
 
-// original rule..
-// WS  :  (' '|'\r'|'\t'|'\u000C'|'\n') {channel=99;}
-//     ;
-
-WS  :  (' '|'\r'|'\t'|'\u000C') {channel=99;}
+WS  :  (' '|'\r'|'\t'|'\u000C') {_channel=99;}
     ;
 
 /*
@@ -217,11 +179,8 @@ Special_Character
     |    '{' .. '~'
     ;
 
-// original rule is the first alt. here..
 fragment
-// Rep_Char : ' '..'~' {System.out.println("found the following Rep_Char: " + getText());};
-// Rep_Char : (Letter | Digit) {System.out.println("found the following Rep_Char: " + getText());};
-Rep_Char : ~('\'' | '\"') {System.out.println("found the following Rep_Char: " + getText());};
+Rep_Char : ~('\'' | '\"') ;
 
 fragment
 SQ_Rep_Char : ~('\'') ;
@@ -233,6 +192,13 @@ Letter : ('a'..'z' | 'A'..'Z') ;
 
 fragment
 Digit : '0'..'9' ;
+
+/* if this is a fragment, the generated code never seems to execute the
+ * action.  the action needs to set the flag so T_EOS knows whether it should
+ * be _channel 99'ed or not (ignor T_EOS if continuation is true, which is the
+ * case of the & at the end of a line).
+ */
+CONTINUE_CHAR : '&' {continueFlag = !(continueFlag); _channel=99;};
 
 /*
  * from fortran03_lexer.g
@@ -280,7 +246,8 @@ T_EQV           : '.EQV.' ;
 T_NEQV          : '.NEQV.';
 
 // not sure what this is; is it just a place holder for something 
-// else??  --Rickett, 10.27.06
+// else??  --Rickett, 10.27.06  
+// it's a placeholder in the parser..
 T_XYZ           : 'XYZ';
 
 T_INTEGER       :       'INTEGER'       ;
@@ -301,7 +268,6 @@ T_BLOCKDATA     :       'BLOCKDATA'     ;
 T_CALL          :       'CALL'          ;
 T_CASE          :       'CASE'          ;
 T_CLASS         :       'CLASS'         ;
-// T_CLASS_IS      :       'CLASS' 'IS'    ;
 T_CLOSE         :       'CLOSE'         ;
 T_COMMON        :       'COMMON'        ;
 T_CONTAINS      :       'CONTAINS'      ;
@@ -311,7 +277,6 @@ T_DATA          :       'DATA'          ;
 T_DEFAULT       :       'DEFAULT'       ;
 T_DEALLOCATE    :       'DEALLOCATE'    ;
 T_DEFERRED      :       'DEFERRED'      ;
-// T_DIMENSION     :       'DIMENSION'     ;
 T_DO            :       'DO'            ;
 T_DOUBLE        :       'DOUBLE'        ;
 T_DOUBLEPRECISION:      'DOUBLEPRECISION' ;
@@ -345,8 +310,6 @@ T_INTENT        :       'INTENT'        ;
 T_INTERFACE     :       'INTERFACE'     ;
 T_INTRINSIC     :       'INTRINSIC'     ;
 T_INQUIRE       :       'INQUIRE'       ;
-// T_KIND          :       'KIND'          ;
-// T_LEN           :       'LEN'           ;
 T_MODULE        :       'MODULE'        ;
 T_NAMELIST      :       'NAMELIST'      ;
 T_NONE          :       'NONE'          ;
@@ -386,7 +349,6 @@ T_TARGET        :       'TARGET'        ;
 T_THEN          :       'THEN'          ;
 T_TO            :       'TO'            ;
 T_TYPE          :       'TYPE'          ;
-// T_TYPE_IS       :       'TYPE' 'IS'     ;
 T_UNFORMATTED   :       'UNFORMATTED'   ;
 T_USE           :       'USE'           ;
 T_VALUE         :       'VALUE'         ;
@@ -395,9 +357,6 @@ T_WAIT          :       'WAIT'          ;
 T_WHERE         :       'WHERE'         ;
 T_WHILE         :       'WHILE'         ;
 T_WRITE         :       'WRITE'         ;
-// T_BIND_LPAREN_C
-//         : 'BIND' '(' 'C'
-//         ;
 
 T_ENDASSOCIATE  :       'ENDASSOCIATE'  ;
 T_ENDBLOCK      :       'ENDBLOCK'      ;
@@ -419,11 +378,6 @@ T_ENDWHERE      :       'ENDWHERE'      ;
 T_END   : 'END'
         ;
 
-T_TYPE_IS       :       'TYPE' 'IS'     ;
-T_CLASS_IS      :       'CLASS' 'IS'    ;
-// moved this here because it causes a problem with the 
-// fortran_keyword and char_selector rule in the parser.
-// --Rickett, 11.08.06
 T_DIMENSION     :       'DIMENSION'     ;
 
 
@@ -438,20 +392,30 @@ T_DEFINED_OP
     :    '.' Letter+ '.'
     ;
 
-// used to catch edit descriptors and other situations
-T_ID_OR_OTHER
-	:	'ID_OR_OTHER'
-	;
+// // used to catch edit descriptors and other situations
+// T_ID_OR_OTHER
+// 	:	'ID_OR_OTHER'
+// 	;
 
 // extra, context-sensitive terminals that require communication between parser and scanner
-
+// added the underscores so there is no way this could overlap w/ any valid
+// idents in Fortran.  we just need this token to be defined so we can 
+// create one of them while we're fixing up labeled do stmts.
 T_LABEL_DO_TERMINAL
-	:	'LABEL_DO_TERMINAL'
+	:	'__LABEL_DO_TERMINAL__'
 	;
+
+T_DATA_EDIT_DESC : '__T_DATA_EDIT_DESC__' ;
+T_CONTROL_EDIT_DESC : '__T_CONTROL_EDIT_DESC__' ;
+T_CHAR_STRING_EDIT_DESC : '__T_CHAR_STRING_EDIT_DESC__' ;
 
 T_STMT_FUNCTION 
 	:	'STMT_FUNCTION'
 	;
+
+T_ASSIGNMENT_STMT : '__T_ASSIGNMENT_STMT__' ;
+T_PTR_ASSIGNMENT_STMT : '__T_PTR_ASSIGNMENT_STMT__' ;
+T_ARITHMETIC_IF_STMT : '__T_ARITHMETIC_IF_STMT__' ;
 
 // R304
 T_IDENT
@@ -459,16 +423,8 @@ options {k=1;}
 	:	Letter ( Alphanumeric_Character )*
 	;
 
-// original rule.  need to remove the newline stuff since newlines 
-// now are either whitespace or EOS.
-// LINE_COMMENT
-//     : '!' ~('\n'|'\r')* '\r'? '\n' 
-
-//         {channel=99;}
-//     ;
-
 LINE_COMMENT
-    : '!' {currIndex=getCharIndex()-2; inLineComment=1;} ~('\n'|'\r')*  
+    : '!'  ~('\n'|'\r')*  
 
-        {channel=99;}
+        {_channel=99;}
     ;
