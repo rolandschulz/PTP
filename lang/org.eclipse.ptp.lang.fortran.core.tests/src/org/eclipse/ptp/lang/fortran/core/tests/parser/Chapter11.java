@@ -1,10 +1,6 @@
 package org.eclipse.ptp.lang.fortran.core.tests.parser;
 
-import org.antlr.runtime.*;
-import org.eclipse.ptp.lang.fortran.core.parser.FortranLexer;
-import org.eclipse.ptp.lang.fortran.core.parser.FortranParser;
-import org.eclipse.ptp.lang.fortran.core.parser.FortranStream;
-import org.eclipse.ptp.lang.fortran.core.parser.FortranTokenStream;
+import org.eclipse.ptp.lang.fortran.core.parser.FortranMain;
 
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
@@ -14,15 +10,12 @@ public class Chapter11 {
    public static final String TEST_ROOT = "../org.eclipse.ptp.lang.fortran.core.tests/parser-test-files/";
 
    private void parse(String file) {
-      boolean error = false;
+      Boolean error = false;
       String path = TEST_ROOT + file;
 
       try {
-         FortranLexer lexer = new FortranLexer(new FortranStream(path));
-         FortranTokenStream tokens = new FortranTokenStream(lexer);
-         FortranParser parser = new FortranParser(tokens);
-         parser.program();
-         error = parser.hasErrorOccurred;
+    	  FortranMain fortran = new FortranMain(path);
+    	  error = fortran.call();
       } catch(Exception e) {
  //        e.printStackTrace();
          error = true;
