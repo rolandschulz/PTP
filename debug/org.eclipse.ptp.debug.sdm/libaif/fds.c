@@ -2351,7 +2351,7 @@ _fds_resolve(char **fmt)
 	while ( **fmt == FDS_NAME )
 	{
 		(*fmt)++;
-		index = atoi(*fmt);
+		index = (int)strtol(*fmt, NULL, 10);
 		*fmt = (char *)_fds_skipnum(*fmt)+1; /* past name, trailing slash */
 		_aif_types_seen[index+MAX_TYPES_SEEN/2] = *fmt;
 	}
@@ -2363,7 +2363,7 @@ _fds_lookup(char **fmt)
 	int	index;
 
 	(*fmt)++;
-	index = atoi(*fmt);
+	index = (int)strtol(*fmt, NULL, 10);
 	*fmt = (char *)_fds_skipnum(*fmt)+1; /* past name, trailing slash */
 
 	return _aif_types_seen[index+MAX_TYPES_SEEN/2];

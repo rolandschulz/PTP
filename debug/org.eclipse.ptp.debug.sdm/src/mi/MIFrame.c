@@ -83,7 +83,7 @@ MIFrameParse(MIValue *tuple)
 		}
 	
 		if (strcmp(var, "level") == 0) { //$NON-NLS-1$
-			frame->level = atoi(str);
+			frame->level = (int)strtol(str, NULL, 10);
 		} else if (strcmp(var, "addr") == 0) { //$NON-NLS-1$
 			frame->addr = strdup(str);
 		} else if (strcmp(var, "func") == 0) { //$NON-NLS-1$
@@ -104,7 +104,7 @@ MIFrameParse(MIValue *tuple)
 		} else if (strcmp(var, "file") == 0) { //$NON-NLS-1$
 			frame->file = strdup(str);
 		} else if (strcmp(var, "line") == 0) { //$NON-NLS-1$
-			frame->line = atoi(str);
+			frame->line = (int)strtol(str, NULL, 10);
 		} else if (strcmp(var, "args") == 0) { //$NON-NLS-1$
 			frame->args = MIArgsParse(value);
 		}
@@ -269,7 +269,7 @@ MIGetStackInfoDepth(MICommand *cmd)
 	if ((result = (MIResult *)GetListElement(rr->results)) != NULL) {
 		if (strcmp(result->variable, "depth") == 0) {
 			val = result->value;
-			return atoi(val->cstring);
+			return (int)strtol(val->cstring, NULL, 10);
 		}
 	}
 	return -1;

@@ -23,12 +23,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jface.text.source.Annotation;
+
 import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
-import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 
 /**
  * @author Clement chu
@@ -41,13 +37,13 @@ public class AnnotationGroup {
 	 * @param annotation
 	 * @return true if contains
 	 */
-	public boolean contains(Annotation annotation) {
+	public boolean contains(PInstructionPointerAnnotation2 annotation) {
 		return annotationList.contains(annotation);
 	}
 	/** Add a new annotation to the list
 	 * @param annotation
 	 */
-	public void addAnnotation(PInstructionPointerAnnotation annotation) {
+	public void addAnnotation(PInstructionPointerAnnotation2 annotation) {
 		if (!contains(annotation))
 			annotationList.add(annotation);
 	}
@@ -60,7 +56,7 @@ public class AnnotationGroup {
 	/** Remove annotation from the list
 	 * @param annotation
 	 */
-	public void removeAnnotation(PInstructionPointerAnnotation annotation) {
+	public void removeAnnotation(PInstructionPointerAnnotation2 annotation) {
 		if (contains(annotation))
 			annotationList.remove(annotation);
 	}
@@ -68,7 +64,7 @@ public class AnnotationGroup {
 	 * 
 	 */
 	public void removeAnnotations() {
-		removeAllMarkers();
+		throwAllAnnotations();
 		annotationList.clear();
 	}
 	/** Total annotations
@@ -89,46 +85,26 @@ public class AnnotationGroup {
 	public boolean isEmpty() {
 		return annotationList.isEmpty();
 	}
-	/** Clean the list
-	 * 
-	 */
-	public void clear() {
-		annotationList.clear();
-	}
 	/** Remove all annotation markers
 	 * 
 	 */
-	public void removeAllMarkers() {
+	public void throwAllAnnotations() {
 		for (Iterator i = annotationList.iterator(); i.hasNext();) {
-			((PInstructionPointerAnnotation) i.next()).deleteMarker();
+			((PInstructionPointerAnnotation2) i.next()).removeAnnotation();
 		}
 	}
 	/** Retrieve all markers
 	 * 
 	 */
-	public void retrieveAllMarkers() {
+	public void retrieveAllAnnontations() {
 		for (Iterator i = annotationList.iterator(); i.hasNext();) {
-			PInstructionPointerAnnotation annotation = (PInstructionPointerAnnotation) i.next();
-			try {
-				String type = annotation.getType();
-				if (type.equals(IPTPDebugUIConstants.SET_ANN_INSTR_POINTER_CURRENT))
-					type = IPTPDebugUIConstants.CURSET_ANN_INSTR_POINTER_CURRENT;
+			PInstructionPointerAnnotation2 annotation = (PInstructionPointerAnnotation2) i.next();
+			String type = annotation.getType();
+			if (type.equals(IPTPDebugUIConstants.SET_ANN_INSTR_POINTER_CURRENT))
+				type = IPTPDebugUIConstants.CURSET_ANN_INSTR_POINTER_CURRENT;
 				
-				annotation.setMarker(createMarker(annotation.getMarker().getResource(), type));
-				annotation.getAnnotationModel().addAnnotation(annotation, annotation.getPosition());
-				annotation.setMessage(!type.equals(IPTPDebugUIConstants.CURSET_ANN_INSTR_POINTER_CURRENT));
-			} catch (CoreException e) {
-				PTPDebugUIPlugin.log(e);
-			}
+			annotation.addAnnotationToModel();
+			annotation.setMessage(!type.equals(IPTPDebugUIConstants.CURSET_ANN_INSTR_POINTER_CURRENT));
 		}
-	}
-	/** Create a marker
-	 * @param resource file of marker
-	 * @param type type of marker
-	 * @return
-	 * @throws CoreException
-	 */
-	public IMarker createMarker(IResource resource, String type) throws CoreException {
-		return resource.createMarker(type);
 	}
 }

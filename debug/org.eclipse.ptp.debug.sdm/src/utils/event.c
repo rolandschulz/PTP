@@ -471,7 +471,7 @@ static int
 dbg_str_to_stackframes(char ***args, List **lst)
 {
 	int				i;
-	int				count = atoi(*(*args)++);
+	int				count = (int)strtol(*(*args)++, NULL, 10);
 	stackframe *	sf;
 
 	*lst = NewList();
@@ -491,7 +491,7 @@ static int
 dbg_str_to_signals(char ***args, List **lst) 
 {
 	int				i;
-	int 			count = atoi(*(*args)++);
+	int 			count = (int)strtol(*(*args)++, NULL, 10);
 	signalinfo *	sig;
 
 	*lst = NewList();	
@@ -509,7 +509,7 @@ static int
 dbg_str_to_cstring_list(char ***args, List **lst)
 {
 	int		i;
-	int		count = atoi(*(*args)++);
+	int		count = (int)strtol(*(*args)++, NULL, 10);
 	char *	str;
 	
 	*lst = NewList();
@@ -551,7 +551,7 @@ static int
 dbg_str_to_memory_data(char ***args, List **lst) 
 {
 	int	i;
-	int	count = atoi(*(*args)++);
+	int	count = (int)strtol(*(*args)++, NULL, 10);
 	char * str;
 
 	*lst = NewList();
@@ -570,7 +570,7 @@ static int
 dbg_str_to_memory(char ***args, List **lst) 
 {
 	int	i;
-	int	count = atoi(*(*args)++);
+	int	count = (int)strtol(*(*args)++, NULL, 10);
 	memory *m;
 	
 	*lst = NewList();
@@ -653,7 +653,7 @@ DbgStrToEvent(char *str, dbg_event **ev)
 	if (str == NULL || (args = ap = Str2Args(str)) == NULL)
 		return -1;
 		
-	event = atoi(*ap++);
+	event = (int)strtol(*ap++, NULL, 10);
 	procs = str_to_bitset(*ap++);
 
 	switch (event)

@@ -47,11 +47,3 @@ MIGDBShowEndian(void)
 	MICommandAddOption(cmd, "endian", NULL);
 	return cmd;
 }
-
-MICommand *
-MIGDBVersion(void)
-{
-	MICommand * cmd;
-	cmd = MICommandNew("-gdb-version", MIResultRecordDONE);
-	return cmd;
-}

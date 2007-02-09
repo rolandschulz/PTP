@@ -114,20 +114,20 @@ main(int argc, char *argv[])
 		proxy_str = optarg;
 		break;
 	case 'p':
-		port = atoi(optarg);
+		port = (int)strtol(optarg, NULL, 10);
 		break;
 	case 'h':
 		host = optarg;
 		break;
 	case 'j':
-		jobid = atoi(optarg);
+		jobid = (int)strtol(optarg, NULL, 10);
 		break;
 #ifdef DEBUG
 	case 'd':
 		if (optarg == NULL)
 			debug_level = DEBUG_LEVEL_ALL;
 		else
-			debug_level = atoi(optarg);
+			debug_level = (int)strtol(optarg, NULL, 10);
 		break;
 #endif /* DEBUG */
 	default:

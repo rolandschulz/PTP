@@ -131,7 +131,7 @@ MIEventParseStopped(MIEvent *event, List *results)
 			}
 	
 			if (strcmp(res->variable, "bkptno") == 0) {
-				event->bkptno = atoi(str);
+				event->bkptno = (int)strtol(str, NULL, 10);
 			} else if (strcmp(res->variable, "wpt") == 0 || strcmp(res->variable, "hw-awpt") == 0|| strcmp(res->variable, "hw-rwpt") == 0) {
 				if (value->type == MIValueTypeTuple) {
 					MIEventParseWPT(event, value->results);
@@ -141,7 +141,7 @@ MIEventParseStopped(MIEvent *event, List *results)
 					MIEventParseValue(event, value->results);
 				}
 			} else if (strcmp(res->variable, "wpnum") == 0) {
-				event->number = atoi(str);
+				event->number = (int)strtol(str, NULL, 10);
 			} else if (strcmp(res->variable, "signal-name") == 0) {
 				event->sigName = strdup(str);
 			} else if (strcmp(res->variable, "signal-meaning") == 0) {
@@ -153,9 +153,9 @@ MIEventParseStopped(MIEvent *event, List *results)
 			} else if (strcmp(res->variable, "return-type") == 0) {
 				event->returnType = strdup(str);
 			} else if (strcmp(res->variable, "exit-code") == 0) {
-				event->code = atoi(str);
+				event->code = (int)strtol(str, NULL, 10);
 			} else if (strcmp(res->variable, "thread-id") == 0) {
-				event->threadId = atoi(str);
+				event->threadId = (int)strtol(str, NULL, 10);
 			} else if (strcmp(res->variable, "frame") == 0) {
 				if (value->type == MIValueTypeTuple) {
 					event->frame = MIFrameParse(value);
@@ -178,7 +178,7 @@ MIEventParseWPT(MIEvent *event, List *results)
 			str = value->cstring;
 		}
 		if (strcmp(res->variable, "number") == 0) {
-			event->number = atoi(str);
+			event->number = (int)strtol(str, NULL, 10);
 		} else if (strcmp(res->variable, "exp") == 0) { 
 			event->exp = strdup(value->cstring);
 		}

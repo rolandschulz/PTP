@@ -879,7 +879,7 @@ int
 ORTETerminateJob(char **args)
 {
 	int			rc;
-	int			jobid = atoi(args[1]);
+	int			jobid = (int)strtol(args[1], NULL, 10);
 	ptp_job *	j;
 	
 	if ((j = find_job(jobid, JOBID_PTP)) != NULL) {
@@ -1052,13 +1052,13 @@ ORTERun(char **args)
 
 	for (i = 1; args[i] != NULL; i += 2) {
 		if (strcmp(args[i], "jobID") == 0) {
-			ptpid = atoi(args[i+1]);
+			ptpid = (int)strtol(args[i+1], NULL, 10);
 		} else if (strcmp(args[i], "execName") == 0) {
 			pgm_name = args[i+1];
 		} else if (strcmp(args[i], "pathToExec") == 0) {
 			exec_path = args[i+1];
 		} else if (strcmp(args[i], "numOfProcs") == 0) {
-			num_procs = atoi(args[i+1]);
+			num_procs = (int)strtol(args[i+1], NULL, 10);
 		} else if (strcmp(args[i], "procsPerNode") == 0) {
 			// not yet
 		} else if (strcmp(args[i], "firstNodeNum") == 0) {
@@ -2024,7 +2024,7 @@ main(int argc, char *argv[])
 		proxy_str = optarg;
 		break;
 	case 'p':
-		port = atoi(optarg);
+		port = (int)strtol(optarg, NULL, 10);
 		break;
 	case 'h':
 		host = optarg;
