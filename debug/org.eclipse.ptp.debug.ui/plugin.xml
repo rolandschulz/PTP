@@ -740,5 +740,12 @@
 			</action>
 		</actionSet>
 	</extension>
-
+	<!-- testing
+	<extension
+		point="org.eclipse.core.filebuffers.annotationModelCreation">
+		<factory
+			class="org.eclipse.ptp.debug.internal.ui.DebugMarkerAnnotationModelFactory"
+			contentTypeId="org.eclipse.ptt.core.pSource"/>
+	</extension>
+	//-->
 </plugin>

@@ -173,55 +173,55 @@ svr_interrupt(dbg_backend *db)
 static int 
 svr_start_session(dbg_backend *db, char **args)
 {
-	return db->db_funcs->start_session(db->db_exe_path, args[2], args[3], args[4], &args[5], svr_env, atol(args[1]));
+	return db->db_funcs->start_session(db->db_exe_path, args[2], args[3], args[4], &args[5], svr_env, strtol(args[1], NULL, 10));
 }
 
 static int 
 svr_setlinebreakpoint(dbg_backend *db, char **args)
 {
-	return db->db_funcs->setlinebreakpoint(atoi(args[1]), atoi(args[2]), atoi(args[3]), args[4], atoi(args[5]), args[6], atoi(args[7]), atoi(args[8]));
+	return db->db_funcs->setlinebreakpoint((int)strtol(args[1], NULL, 10), (int)strtol(args[2], NULL, 10), (int)strtol(args[3], NULL, 10), args[4], (int)strtol(args[5], NULL, 10), args[6], (int)strtol(args[7], NULL, 10), (int)strtol(args[8], NULL, 10));
 }
 
 static int 
 svr_setfuncbreakpoint(dbg_backend *db, char **args)
 {
-	return db->db_funcs->setfuncbreakpoint(atoi(args[1]), atoi(args[2]), atoi(args[3]), args[4], args[5], args[6], atoi(args[7]), atoi(args[8]));
+	return db->db_funcs->setfuncbreakpoint((int)strtol(args[1], NULL, 10), (int)strtol(args[2], NULL, 10), (int)strtol(args[3], NULL, 10), args[4], args[5], args[6], (int)strtol(args[7], NULL, 10), (int)strtol(args[8], NULL, 10));
 }
 
 static int 
 svr_deletebreakpoint(dbg_backend *db, char **args)
 {
-	return db->db_funcs->deletebreakpoint(atoi(args[1]));
+	return db->db_funcs->deletebreakpoint((int)strtol(args[1], NULL, 10));
 }
 
 static int 
 svr_enablebreakpoint(dbg_backend *db, char **args)
 {
-	return db->db_funcs->enablebreakpoint(atoi(args[1]));
+	return db->db_funcs->enablebreakpoint((int)strtol(args[1], NULL, 10));
 }
 
 static int 
 svr_disablebreakpoint(dbg_backend *db, char **args)
 {
-	return db->db_funcs->disablebreakpoint(atoi(args[1]));
+	return db->db_funcs->disablebreakpoint((int)strtol(args[1], NULL, 10));
 }
 
 static int 
 svr_conditionbreakpoint(dbg_backend *db, char **args)
 {
-	return db->db_funcs->conditionbreakpoint(atoi(args[1]), args[2]);
+	return db->db_funcs->conditionbreakpoint((int)strtol(args[1], NULL, 10), args[2]);
 }
 
 static int 
 svr_breakpointafter(dbg_backend *db, char **args)
 {
-	return db->db_funcs->breakpointafter(atoi(args[1]), atoi(args[2]));
+	return db->db_funcs->breakpointafter((int)strtol(args[1], NULL, 10), (int)strtol(args[2], NULL, 10));
 }
 
 static int 
 svr_setwatchpoint(dbg_backend *db, char **args)
 {
-	return db->db_funcs->setwatchpoint(atoi(args[1]), args[2], atoi(args[3]), atoi(args[4]), args[5], atoi(args[6]));
+	return db->db_funcs->setwatchpoint((int)strtol(args[1], NULL, 10), args[2], (int)strtol(args[3], NULL, 10), (int)strtol(args[4], NULL, 10), args[5], (int)strtol(args[6], NULL, 10));
 }
 
 static int 
@@ -233,7 +233,7 @@ svr_go(dbg_backend *db, char **args)
 static int 
 svr_step(dbg_backend *db, char **args)
 {
-	return db->db_funcs->step(atoi(args[1]), atoi(args[2]));
+	return db->db_funcs->step((int)strtol(args[1], NULL, 10), (int)strtol(args[2], NULL, 10));
 }
 
 static int 
@@ -245,13 +245,13 @@ svr_terminate(dbg_backend *db, char **args)
 static int 
 svr_liststackframes(dbg_backend *db, char **args)
 {
-	return db->db_funcs->liststackframes(atoi(args[1]), atoi(args[2]));
+	return db->db_funcs->liststackframes((int)strtol(args[1], NULL, 10), (int)strtol(args[2], NULL, 10));
 }
 
 static int 
 svr_setcurrentstackframe(dbg_backend *db, char **args)
 {
-	return db->db_funcs->setcurrentstackframe(atoi(args[1]));
+	return db->db_funcs->setcurrentstackframe((int)strtol(args[1], NULL, 10));
 }
 
 static int 
@@ -275,7 +275,7 @@ svr_listlocalvariables(dbg_backend *db, char **args)
 static int 
 svr_listarguments(dbg_backend *db, char **args)
 {
-	return db->db_funcs->listarguments(atoi(args[1]), atoi(args[2]));
+	return db->db_funcs->listarguments((int)strtol(args[1], NULL, 10), (int)strtol(args[2], NULL, 10));
 }
 
 static int 
@@ -293,7 +293,7 @@ svr_listinfothreads(dbg_backend *db, char **args)
 static int 
 svr_setthreadselect(dbg_backend *db, char **args) 
 {
-	return db->db_funcs->setthreadselect(atoi(args[1]));
+	return db->db_funcs->setthreadselect((int)strtol(args[1], NULL, 10));
 }
 
 static int 
@@ -303,12 +303,12 @@ svr_stackinfodepth(dbg_backend *db, char **args) {
 
 static int 
 svr_datareadmemory(dbg_backend *db, char **args)  {
-	return db->db_funcs->datareadmemory(atol(args[1]), args[2], args[3], atoi(args[4]), atoi(args[5]), atoi(args[6]), args[7]);
+	return db->db_funcs->datareadmemory(strtol(args[1], NULL, 10), args[2], args[3], (int)strtol(args[4], NULL, 10), (int)strtol(args[5], NULL, 10), (int)strtol(args[6], NULL, 10), args[7]);
 }
 
 static int
 svr_datawritememory(dbg_backend *db, char **args) {
-	return db->db_funcs->datawritememory(atol(args[1]), args[2], args[3], atoi(args[4]), args[5]);
+	return db->db_funcs->datawritememory(strtol(args[1], NULL, 10), args[2], args[3], (int)strtol(args[4], NULL, 10), args[5]);
 }
 
 static int 
@@ -342,7 +342,7 @@ svr_dataevaluateexpression(dbg_backend *db, char **args)
 static int
 svr_getpartialaif(dbg_backend *db, char **args)
 {
-	return db->db_funcs->getpartialaif(args[1], args[2], atoi(args[3]), atoi(args[4]));
+	return db->db_funcs->getpartialaif(args[1], args[2], (int)strtol(args[3], NULL, 10), (int)strtol(args[4], NULL, 10));
 }
 static int
 svr_variabledelete(dbg_backend *db, char **args)

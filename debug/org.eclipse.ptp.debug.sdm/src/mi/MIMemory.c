@@ -147,17 +147,17 @@ MIGetDataReadMemoryInfo(MICommand *cmd)
 		if (strcmp(var, "addr") == 0) {
 			info->addr = strdup(str);
 		} else if (strcmp(var, "nr-bytes") == 0) {
-			info->numBytes = atol(str);
+			info->numBytes = strtol(str, NULL, 10);
 		} else if (strcmp(var, "total-bytes") == 0) {
-			info->totalBytes = atol(str);
+			info->totalBytes = strtol(str, NULL, 10);
 		} else if (strcmp(var, "next-row") == 0) {
-			info->nextRow = atol(str);
+			info->nextRow = strtol(str, NULL, 10);
 		} else if (strcmp(var, "prev-row") == 0) {
-			info->prevRow = atol(str);
+			info->prevRow = strtol(str, NULL, 10);
 		} else if (strcmp(var, "next-page") == 0) {
-			info->nextPage = atol(str);
+			info->nextPage = strtol(str, NULL, 10);
 		} else if (strcmp(var, "prev-page") == 0) {
-			info->prevPage = atol(str);
+			info->prevPage = strtol(str, NULL, 10);
 		} else if (strcmp(var, "memory") == 0) {
 			if (value->type == MIValueTypeList) {
 				info->memories = MIGetMemoryList(value);

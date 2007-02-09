@@ -58,7 +58,7 @@ MISetThreadSelectInfo(MICommand *cmd)
 	for (SetList(rr->results); (result = (MIResult *)GetListElement(rr->results)) != NULL; ) {
 		if (strcmp(result->variable, "new-thread-id") == 0) {
 			val = result->value;
-			info->current_thread_id = atoi(val->cstring);
+			info->current_thread_id = (int)strtol(val->cstring, NULL, 10);
 		}
 		else if (strcmp(result->variable, "frame") == 0) {
 			val = result->value;

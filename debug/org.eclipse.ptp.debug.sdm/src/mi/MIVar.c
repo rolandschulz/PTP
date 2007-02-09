@@ -94,7 +94,7 @@ MIVarParse(List *results)
 		}
 
 		if (strcmp(result->variable, "numchild") == 0) {
-			var->numchild = atoi(str);
+			var->numchild = (int)strtol(str, NULL, 10);
 		} else if (strcmp(result->variable, "name") == 0) {
 			var->name = strdup(str);
 		} else if (strcmp(result->variable, "type") == 0) {
@@ -163,7 +163,7 @@ MIGetVarListChildrenInfo(MIVar *var, MICommand *cmd)
 
 		if (strcmp(result->variable, "numchild") == 0) {
 			if (value->type == MIValueTypeConst) {
-				var->numchild = atoi(value->cstring);
+				var->numchild = (int)strtol(value->cstring, NULL, 10);
 			}
 		} else if (strcmp(result->variable, "children") == 0) {
 			parseChildren(value, &children);
@@ -342,7 +342,7 @@ MIGetVarInfoNumChildren(MICommand *cmd, MIVar *var)
 		}
 
 		if (strcmp(result->variable, "numchild") == 0) {
-			var->numchild = atoi(str);
+			var->numchild = (int)strtol(str, NULL, 10);
 		}
 	}
 }

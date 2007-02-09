@@ -203,7 +203,7 @@ proxy_str_to_int(char *str, int *val)
 	if (str == NULL)
 		return -1;
 	
-	*val = atoi(str);
+	*val = (int)strtol(str, NULL, 10);
 	
 	return 0;
 }
@@ -221,7 +221,7 @@ proxy_str_to_event(char *str, proxy_event **ev)
 
 	*rest++ = '\0';
 	
-	event = atoi(str);
+	event = (int)strtol(str, NULL, 10);
 	
 	switch (event)
 	{

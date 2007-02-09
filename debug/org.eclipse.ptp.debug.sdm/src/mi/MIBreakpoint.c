@@ -100,7 +100,7 @@ MIBreakpointParse(MIValue *tuple)
 		str = value->cstring;
 		
 		if (strcmp(var, "number") == 0) {
-			bp->number = atoi(str);
+			bp->number = (int)strtol(str, NULL, 10);
 		} else if (strcmp(var, "type") == 0) {
 			bp->type = strdup(str);
 			//type="hw watchpoint"
@@ -139,13 +139,13 @@ MIBreakpointParse(MIValue *tuple)
 		} else if (strcmp(var, "thread") == 0) {
 			bp->threadId = strdup(str);
 		} else if (strcmp(var, "line") == 0) {
-			bp->line = atoi(str);
+			bp->line = (int)strtol(str, NULL, 10);
 		} else if (strcmp(var, "times") == 0) {
-			bp->times = atoi(str);
+			bp->times = (int)strtol(str, NULL, 10);
 		} else if (strcmp(var, "what") == 0 || strcmp(var, "exp") == 0) { //$NON-NLS-2$
 			bp->what = strdup(str);
 		} else if (strcmp(var, "ignore") == 0) {
-			bp->ignore = atoi(str);
+			bp->ignore = (int)strtol(str, NULL, 10);
 		} else if (strcmp(var, "cond") == 0) {
 			bp->cond = strdup(str);
 		}
