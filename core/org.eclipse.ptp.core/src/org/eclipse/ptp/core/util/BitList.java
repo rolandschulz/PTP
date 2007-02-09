@@ -310,6 +310,35 @@ public class BitList {
 	private int bitInByte(int idx) {
 		return idx - (bytePos(idx) << 3);
 	}
-}
-	
 
+	public static String showBitList(BitList tasks) {
+		if (tasks == null) {
+			return "";
+		}
+		int[] array = tasks.toArray();
+		if (array.length == 0)
+			return "";
+		
+		String msg = "";
+		int preTask = array[0];
+		msg += preTask;
+		boolean isContinue = false;
+		for (int i = 1; i < array.length; i++) {
+			if (preTask == (array[i] - 1)) {
+				preTask = array[i];
+				isContinue = true;
+				if (i == (array.length - 1)) {
+					msg += "-" + array[i];
+					break;
+				}
+				continue;
+			}
+			if (isContinue)
+				msg += "-" + preTask;
+			msg += "," + array[i];
+			isContinue = false;
+			preTask = array[i];
+		}
+		return msg;
+	}
+}
