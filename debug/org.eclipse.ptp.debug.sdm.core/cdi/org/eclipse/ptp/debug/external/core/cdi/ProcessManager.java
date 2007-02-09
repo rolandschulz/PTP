@@ -67,9 +67,11 @@ public class ProcessManager extends Manager {
 		int[] ids = tasks.toArray();
 		for (int i = 0; i<ids.length; i++) {
 			Integer key = new Integer(ids[i]);
-			if (containTarget(key))
+			if (containTarget(key)) {
+				//remove already registered process id
+				tasks.clear(ids[i]);
 				continue;
-			
+			}
 			IPCDITarget target = new Target((Session)getSession(), ids[i]);
 			targets.add(target);
 			debugTargetMap.put(key, target);

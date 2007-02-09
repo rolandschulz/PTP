@@ -29,6 +29,7 @@ import org.eclipse.cdt.debug.core.model.ITargetProperties;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.IRegisterGroup;
+import org.eclipse.ptp.core.util.BitList;
 
 /**
  * @author Clement chu
@@ -38,6 +39,7 @@ public interface IPDebugTarget extends IDebugTarget, IExecFileInfo, IRestart, IR
 	public void cleanup();
 	public void terminated();
 	public int getTargetID();
+	public BitList getTask();
 	public boolean isLittleEndian();
 	public boolean hasSignals() throws DebugException;
 	public IPSignal[] getSignals() throws DebugException;

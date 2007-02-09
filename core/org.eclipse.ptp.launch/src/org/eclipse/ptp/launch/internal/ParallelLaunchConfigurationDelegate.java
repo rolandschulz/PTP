@@ -18,30 +18,20 @@
  *******************************************************************************/
 package org.eclipse.ptp.launch.internal;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.text.MessageFormat;
-import org.eclipse.cdt.core.CCorePlugin;
-import org.eclipse.cdt.core.IBinaryParser;
-import org.eclipse.cdt.core.ICExtensionReference;
 import org.eclipse.cdt.core.IBinaryParser.IBinaryObject;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ptp.core.IPJob;
-import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.IPUniverse;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.PreferenceConstants;
@@ -49,49 +39,33 @@ import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.IPDebugConfiguration;
 import org.eclipse.ptp.debug.core.IPDebugConstants;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
-import org.eclipse.ptp.debug.core.launch.PLaunch;
+import org.eclipse.ptp.debug.core.launch.IPLaunch;
+import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
+import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.internal.ui.LaunchMessages;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rtsystem.JobRunConfiguration;
+import org.eclipse.ptp.ui.IPTPUIConstants;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.WorkbenchException;
 
 /**
  * 
  */
 public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchConfigurationDelegate {
-	private IBinaryObject verifyBinary(IProject project, IPath exePath) throws CoreException {
-		ICExtensionReference[] parserRef = CCorePlugin.getDefault().getBinaryParserExtensions(project);
-		for (int i = 0; i < parserRef.length; i++) {
-			try {
-				IBinaryParser parser = (IBinaryParser) parserRef[i].createExtension();
-				IBinaryObject exe = (IBinaryObject) parser.getBinary(exePath);
-				if (exe != null) {
-					return exe;
-				}
-			} catch (ClassCastException e) {
-			} catch (IOException e) {
-			}
-		}
-		IBinaryParser parser = CCorePlugin.getDefault().getDefaultBinaryParser();
-		try {
-			return (IBinaryObject) parser.getBinary(exePath);
-		} catch (ClassCastException e) {
-		} catch (IOException e) {
-		}
-		Throwable exception = new FileNotFoundException(LaunchMessages.getResourceString("AbstractParallelLaunchDelegate.Program_is_not_a_recongnized_executable"));
-		int code = IPTPLaunchConfigurationConstants.ERR_PROGRAM_NOT_BINARY;
-		MultiStatus status = new MultiStatus(PTPCorePlugin.getUniqueIdentifier(), code, LaunchMessages.getResourceString("AbstractParallelLaunchDelegate.Program_is_not_a_recongnized_executable"), exception);
-		status.add(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), code, exception == null ? "" : exception.getLocalizedMessage(), exception));
-		throw new CoreException(status);
-	}
-	private static IPath getProgramPath(ILaunchConfiguration configuration) throws CoreException {
+	/*
+	protected IPath getProgramPath(ILaunchConfiguration configuration) throws CoreException {
 		String path = getProgramName(configuration);
 		if (path == null) {
 			return null;
 		}
 		return new Path(path);
 	}
-	private IPath verifyProgramPath(ILaunchConfiguration config) throws CoreException {
+	protected IPath verifyProgramPath(ILaunchConfiguration config) throws CoreException {
 		IProject project = verifyProject(config);
 		IPath programPath = getProgramPath(config);
 		if (programPath == null || programPath.isEmpty()) {
@@ -105,69 +79,44 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 		}
 		return programPath;
 	}
-	public static IProject getProject(ILaunchConfiguration configuration) throws CoreException {
+	protected IProject getProject(ILaunchConfiguration configuration) throws CoreException {
 		String projectName = getProjectName(configuration);
 		if (projectName != null) {
 			projectName = projectName.trim();
 			if (projectName.length() > 0) {
 				return ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
-				//ICProject cProject = CCorePlugin.getDefault().getCoreModel().create(project);
-				//if (cProject != null && cProject.exists()) {
-					//return cProject;
-				//}
+				// ICProject cProject =
+				// CCorePlugin.getDefault().getCoreModel().create(project);
+				// if (cProject != null && cProject.exists()) {
+				// return cProject;
+				// }
 			}
 		}
 		return null;
 	}
-	private IPDebugConfiguration getDebugConfig(ILaunchConfiguration config) throws CoreException {
-		IPDebugConfiguration dbgCfg = null;
-		try {
-			dbgCfg = PTPDebugCorePlugin.getDefault().getDebugConfiguration(getDebuggerID(config));
-		} catch (CoreException e) {
-			System.out.println("ParallelLaunchConfigurationDelegate.getDebugConfig() Error");
-			throw e;
+	*/
+	public void launch(ILaunchConfiguration configuration, String mode, ILaunch launch, IProgressMonitor monitor) throws CoreException {
+		if (!(launch instanceof IPLaunch)) {
+			abort(LaunchMessages.getResourceString("ParallelLaunchConfigurationDelegate.Invalid_launch_object"), null, 0);
 		}
-		return dbgCfg;
-	}
-	private void verifyDebuggerPath(String path) throws CoreException {
-		IPath programPath = new Path(path);
-		if (programPath == null || programPath.isEmpty() || !programPath.toFile().exists()) {
-			abort(LaunchMessages.getResourceString("AbstractParallelLaunchDelegate.Debugger_path_not_found"), new FileNotFoundException(LaunchMessages.getResourceString("AbstractParallelLaunchDelegate.Debugger_path_not_found")), IPTPLaunchConfigurationConstants.ERR_PROGRAM_NOT_EXIST);
-		}
-	}
-	public void launch(ILaunchConfiguration configuration, String mode, ILaunch launch,
-			IProgressMonitor monitor) throws CoreException {
-		IBinaryObject exeFile = null;
+		IPLaunch pLaunch = (IPLaunch) launch;
+
 		if (monitor == null) {
 			monitor = new NullProgressMonitor();
 		}
-		monitor.beginTask("",  250);
+		monitor.beginTask("", 250);
 		monitor.setTaskName(MessageFormat.format("{0} . . .", new String[] { "Launching " + configuration.getName() }));
 		if (monitor.isCanceled()) {
 			return;
 		}
-		
-		// Switch the perspective
-		// LaunchUtils.switchPerspectiveTo(LaunchUtils.PPerspectiveFactory_ID);
+
 		IAbstractDebugger debugger = null;
 		IPJob job = null;
-		
+
 		// done the verification phase
 		JobRunConfiguration jrunconfig = getJobRunConfiguration(configuration);
 		/* Assuming we have parsed the configuration */
-		
-		IPath exePath = null;
-		
-		try {
-			exePath = verifyProgramPath(configuration);
-			IProject project = verifyProject(configuration);
-			if (exePath != null) {
-				exeFile = verifyBinary(project, exePath);
-			}
-		} catch(CoreException e) {
-			abort(LaunchMessages.getResourceString("ParallelLaunchConfigurationDelegate.Invalid_binary"), null, 0);
-		}
-		
+
 		try {
 			IPreferenceStore store = PTPDebugUIPlugin.getDefault().getPreferenceStore();
 			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
@@ -191,7 +140,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 				jrunconfig.setDebug();
 			}
 			monitor.worked(10);
-			
+
 			monitor.subTask("Starting the job . . .");
 			final String resourceManagerName = jrunconfig.getResourceManagerName();
 			final IResourceManager launchManager = getLaunchManager(resourceManagerName);
@@ -199,15 +148,23 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 				abort(LaunchMessages.getResourceString("ParallelLaunchConfigurationDelegate.No_ResourceManager"), null, 0);
 			}
 			job = launchManager.run(launch, jrunconfig, new SubProgressMonitor(monitor, 150));
-			
+			launch.setAttribute("JOB_ID", job.getIDString());
+
 			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
+				// show ptp debug view
+				showPTPDebugView(IPTPDebugUIConstants.ID_VIEW_PARALLELDEBUG);
+				// Switch the perspective
+				// switchPerspectiveTo(DebugUITools.getLaunchPerspective(configuration.getType(), mode));
 				monitor.setTaskName("Starting the debugger . . .");
+
 				String dbgExe = getDebuggerExePath(configuration);
 				if (dbgExe != null) {
+					//remote setting
 					IPath dbgExePath = new Path(dbgExe);
 					job.setAttribute(PreferenceConstants.JOB_APP_NAME, dbgExePath.lastSegment());
 					job.setAttribute(PreferenceConstants.JOB_APP_PATH, dbgExePath.removeLastSegments(1).toOSString());
-				} else {
+				}
+				else {
 					job.setAttribute(PreferenceConstants.JOB_APP_NAME, jrunconfig.getExecName());
 					job.setAttribute(PreferenceConstants.JOB_APP_PATH, jrunconfig.getPathToExec());
 				}
@@ -217,25 +174,33 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 				} else {
 					job.setAttribute(PreferenceConstants.JOB_WORK_DIR, jrunconfig.getWorkingDir());
 				}
+
 				job.setAttribute(PreferenceConstants.JOB_ARGS, jrunconfig.getArguments());
-				job.setAttribute(PreferenceConstants.JOB_DEBUG_DIR, exePath.removeLastSegments(1).toOSString());
-				PLaunch pLaunch = (PLaunch) launch;
+				//job.setAttribute(PreferenceConstants.JOB_DEBUG_DIR, exePath.removeLastSegments(1).toOSString());
+				job.setAttribute(PreferenceConstants.JOB_DEBUG_DIR, jrunconfig.getPathToExec());
 				pLaunch.setPJob(job);
+
+				IBinaryObject exeFile = verifyBinary(configuration);
+				setDefaultSourceLocator(launch, configuration);
+				
 				int timeout = store.getInt(IPDebugConstants.PREF_PTP_DEBUG_COMM_TIMEOUT);
 				PTPDebugCorePlugin.getDebugModel().createDebuggerSession(debugger, pLaunch, exeFile, timeout, new SubProgressMonitor(monitor, 40));
 				monitor.worked(10);
 				if (monitor.isCanceled()) {
 					PTPDebugCorePlugin.getDebugModel().shutdownSession(job);
 				}
-			}
-			else {
+			} else {
+				showPTPDebugView(IPTPUIConstants.VIEW_PARALLELJOB);
+				new RuntimeProcess(pLaunch, job, null);
 				monitor.worked(40);
 			}
 		} catch (CoreException e) {
 			if (e.getStatus().getPlugin().equals(PTPCorePlugin.PLUGIN_ID)) {
 				String msg = e.getMessage();
-				if(msg == null) msg = "";
-				else msg = msg + "\n\n";
+				if (msg == null)
+					msg = "";
+				else
+					msg = msg + "\n\n";
 				abort(msg + LaunchMessages.getResourceString("ParallelLaunchConfigurationDelegate.Control_system_does_not_exist"), null, 0);
 			}
 			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
@@ -251,7 +216,6 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			monitor.done();
 		}
 	}
-
 	private IResourceManager getLaunchManager(String rmName) {
     	IPUniverse universe = PTPCorePlugin.getDefault().getUniverse();
     	IResourceManager[] rms = universe.getResourceManagers();
@@ -262,5 +226,51 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
     	}
     	return null;
     }
-    
+
+	private void switchPerspectiveTo(final String perspectiveID) {
+		Display display = Display.getCurrent();
+		if (display == null) {
+			display = Display.getDefault();
+		}
+		if (display != null && !display.isDisposed()) {
+			display.syncExec(new Runnable() {
+				public void run() {
+					IWorkbenchWindow window = PTPLaunchPlugin.getActiveWorkbenchWindow();
+					if (window != null) {
+						IWorkbenchPage page = window.getActivePage();
+						if (!page.getPerspective().getId().equals(perspectiveID)) {
+							try {
+								window.getWorkbench().showPerspective(perspectiveID, window);
+							} catch (WorkbenchException e) {
+								e.printStackTrace();
+							}
+						}
+					}
+				}
+			});
+		}
+	}
+
+	private void showPTPDebugView(final String viewID) {
+		Display display = Display.getCurrent();
+		if (display == null) {
+			display = Display.getDefault();
+		}
+		if (display != null && !display.isDisposed()) {
+			display.syncExec(new Runnable() {
+				public void run() {
+					IWorkbenchWindow window = PTPLaunchPlugin.getActiveWorkbenchWindow();
+					if (window != null) {
+						IWorkbenchPage page = window.getActivePage();
+						if (page != null) {
+							try {
+								page.showView(viewID);
+							} catch (PartInitException e) {
+							}
+						}
+					}
+				}
+			});
+		}
+	}
 }
