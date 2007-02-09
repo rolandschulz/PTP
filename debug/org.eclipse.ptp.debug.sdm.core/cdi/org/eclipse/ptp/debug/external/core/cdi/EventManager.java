@@ -275,7 +275,7 @@ public class EventManager extends SessionObject implements IPCDIEventManager, Ob
 		int detail = IPDebugEvent.UNSPECIFIED;
 		
 		int lineNumber = 0;
-		String fileName = (String) baseInfo.getJob().getAttribute(PreferenceConstants.JOB_DEBUG_DIR) + "/";
+		String fileName = "";//(String) baseInfo.getJob().getAttribute(PreferenceConstants.JOB_DEBUG_DIR) + "/";
 		if (event instanceof BreakpointHitEvent) {
 			IPCDIBreakpoint bpt = ((IPCDIBreakpointHit) ((IPCDISuspendedEvent) event).getReason()).getBreakpoint();
 			if (bpt instanceof IPCDILocationBreakpoint) {

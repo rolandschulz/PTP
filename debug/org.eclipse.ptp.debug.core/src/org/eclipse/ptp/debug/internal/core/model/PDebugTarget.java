@@ -71,6 +71,7 @@ import org.eclipse.debug.core.sourcelookup.ISourceLookupParticipant;
 import org.eclipse.debug.core.sourcelookup.containers.DirectorySourceContainer;
 import org.eclipse.debug.core.sourcelookup.containers.FolderSourceContainer;
 import org.eclipse.debug.core.sourcelookup.containers.ProjectSourceContainer;
+import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IPDebugConstants;
 import org.eclipse.ptp.debug.core.PDebugUtils;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
@@ -172,6 +173,9 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPCDIE
 	}
 	public int getTargetID() {
 		return fCDITarget.getTargetID();
+	}
+	public BitList getTask() {
+		return fCDITarget.getTask();
 	}
 	private PTPMemoryBlockRetrievalExtension getMemoryBlockRetrieval() {
 		return fMemoryBlockRetrieval;
