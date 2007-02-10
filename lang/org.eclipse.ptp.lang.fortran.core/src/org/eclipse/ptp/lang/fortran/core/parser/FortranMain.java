@@ -23,8 +23,6 @@ public class FortranMain implements Callable<Boolean> {
    private static boolean parseMainProgram(FortranTokenStream tokens, 
                                            FortranParser parser, 
                                            int start) throws Exception {
-//       System.out.println("attempting to parse a main program");
-      // try parsing the main program
       parser.main_program();
 
       return parser.hasErrorOccurred;
@@ -195,15 +193,7 @@ public class FortranMain implements Callable<Boolean> {
 	      while(tokens.LA(1) != FortranLexer.EOF) {
 	         // attempt to parse the current program unit
 	         error = parseProgramUnit(lexer, tokens, parser);
-	         
-	         // see if we successfully parse the program unit or not
-	         if(error != false) {
-	            System.out.println("Parser failed");
-	            System.exit(1);
-	         } else {
-	            System.out.println("Parser exiting normally");
-	         }// end else(parser exited normally)
-	      }// end while(not end of file) 
+	      }
 
 	      return new Boolean(error);
 	   }// end main()
