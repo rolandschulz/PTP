@@ -23,7 +23,7 @@ public class Chapter11 {
       
       assertEquals("Fortran Parser: unsuccessfully parsed " + file,
                    Boolean.FALSE,
-                   error);
+                   error.booleanValue());
    }
    
    @Test public void note_11_2() {
