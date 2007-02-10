@@ -1,0 +1,3 @@
+TYPE (NODE) :: CURRENT
+POINTER :: CURRENT, A (:, :)
+END
