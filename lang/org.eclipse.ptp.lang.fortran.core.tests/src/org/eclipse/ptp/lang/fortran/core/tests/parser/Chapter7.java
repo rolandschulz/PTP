@@ -10,7 +10,7 @@ public class Chapter7 {
    public static final String TEST_ROOT = "../org.eclipse.ptp.lang.fortran.core.tests/parser-test-files/";
 
    private void parse(String file) {
-	      Boolean error = false;
+	      Boolean error = Boolean.FALSE;
 	      String path = TEST_ROOT + file;
 
 	      try {
@@ -18,11 +18,11 @@ public class Chapter7 {
 	    	  error = fortran.call();
 	      } catch(Exception e) {
 	 //        e.printStackTrace();
-	         error = true;
+	         error = Boolean.TRUE;
 	      } 
 	      
 	      assertEquals("Fortran Parser: unsuccessfully parsed " + file,
-	                   false,
+	                   Boolean.FALSE,
 	                   error);
 	   }
 	   
