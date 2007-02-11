@@ -55,17 +55,5 @@ public class Chapter8 {
 		parse("chapter_8/note_8.18.f03");
 	}
 
-	@Test public void C_5_3_1() {
-		parse("chapter_8/C.5.3.1.f03");
-	}
-
-	@Test public void C_5_3_2() {
-		parse("chapter_8/C.5.3.2.f03");
-	}
-
-	@Test public void C_5_3_3() {
-		parse("chapter_8/C.5.3.3.f03");
-	}
-
 } // end class Chapter8
 
