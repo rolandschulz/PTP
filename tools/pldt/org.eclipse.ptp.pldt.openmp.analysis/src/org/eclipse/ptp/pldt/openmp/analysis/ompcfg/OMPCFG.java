@@ -27,6 +27,7 @@ import org.eclipse.ptp.pldt.openmp.analysis.ompcfg.factory.OMPCFGResult;
  */
 public class OMPCFG
 {
+	private static final boolean traceOn=false;
     protected PASTOMPPragma          pragma_        = null;
     protected IASTStatement          statement_     = null;
     protected OMPCFGNode             rootNode_      = null;
@@ -140,7 +141,7 @@ public class OMPCFG
             OMPCFGNode [] nodes = node.getOutNodes();
             for(int i=0; i<nodes.length; i++) {
                 if (!(nodes[i] instanceof OMPCFGNode)) {
-                    System.out.println("Node " + nodes[i].getId() + 
+                    if(traceOn)System.out.println("Node " + nodes[i].getId() + 
                             " has out node of type: "+nodes[i].getClass());
                     continue;
                 }
@@ -154,32 +155,32 @@ public class OMPCFG
     private void printNode(OMPCFGNode node)
     {
         int num = node.getId();
-        graphOut_.println("Node "+num+" ------------------ "+getShortClassName(node.getClass()));
+        if(traceOn)graphOut_.println("Node "+num+" ------------------ "+getShortClassName(node.getClass()));
         
         // some contents of the node
         if (node instanceof OMPBasicBlock) {
             OMPBasicBlock obb = (OMPBasicBlock)node;
             IASTStatement [] stmts = obb.getStatements();
             for(int i=0; i<stmts.length; i++)
-                System.out.println("       -------- "+getShortClassName(stmts[i].getClass()));
+                if(traceOn)System.out.println("       -------- "+getShortClassName(stmts[i].getClass()));
         }
         
         
         
         OMPCFGNode [] nodes = node.getOutNodes();
-        graphOut_.print("      out to the following "+nodes.length+" nodes:");
+        if(traceOn)graphOut_.print("      out to the following "+nodes.length+" nodes:");
         for(int i=0; i<nodes.length; i++) {
             int index = nodes[i].getId();
-            graphOut_.print(" "+index);
+            if(traceOn)graphOut_.print(" "+index);
         }
-        System.out.println();
+        if(traceOn)System.out.println();
         OMPCFGNode [] inodes = node.getInNodes();
-        graphOut_.print("      in from the following "+inodes.length+" nodes:");
+        if(traceOn)graphOut_.print("      in from the following "+inodes.length+" nodes:");
         for(int i=0; i<inodes.length; i++) {
             int index = inodes[i].getId();
-            graphOut_.print(" "+index);
+            if(traceOn)graphOut_.print(" "+index);
         }
-        System.out.println();
+        if(traceOn)System.out.println();
 
     }
     

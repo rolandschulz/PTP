@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2005 IBM Corporation.
+ * Copyright (c) 2005, 2006 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.pldt.mpi.core.analysis;
 
-
 import java.util.List;
 
 import org.eclipse.cdt.core.dom.ast.IASTExpression;
@@ -18,6 +17,7 @@ import org.eclipse.cdt.core.dom.ast.IASTFunctionCallExpression;
 import org.eclipse.cdt.core.dom.ast.IASTIdExpression;
 import org.eclipse.cdt.core.dom.ast.IASTLiteralExpression;
 import org.eclipse.cdt.core.dom.ast.IASTName;
+import org.eclipse.cdt.core.dom.ast.IBinding;
 import org.eclipse.ptp.pldt.common.ScanReturn;
 import org.eclipse.ptp.pldt.common.analysis.PldtAstVisitor;
 
@@ -27,12 +27,13 @@ import org.eclipse.ptp.pldt.common.analysis.PldtAstVisitor;
  * and constants. It add markers to the source file for C code, marking the
  * position of the artifacts found.
  * 
- * This version extends PldtAstVisitor instead of delegating to<br>
- * MpiGeneralASTVisitorBehavior.
+ * @author Beth Tibbitts
  * 
  */
 public class MpiCASTVisitor extends PldtAstVisitor {
-	private static final String PREFIX="MPI_";
+	private static final String PREFIX = "MPI_";
+
+	private static final boolean traceOn = false;
 
 	{
 		this.shouldVisitExpressions = true;
@@ -44,29 +45,56 @@ public class MpiCASTVisitor extends PldtAstVisitor {
 	public MpiCASTVisitor(List mpiIncludes, String fileName, ScanReturn msr) {
 		super(mpiIncludes, fileName, msr);
 		ARTIFACT_CALL = "MPI Call";
-		ARTIFACT_CONSTANT="MPI Constant";
+		ARTIFACT_CONSTANT = "MPI Constant";
 
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Visit an expression node.
 	 * 
 	 * @see org.eclipse.cdt.core.dom.ast.ASTVisitor#visit(org.eclipse.cdt.core.dom.ast.IASTExpression)
 	 */
 	public int visit(IASTExpression expression) {
 		if (expression instanceof IASTFunctionCallExpression) {
-			IASTExpression astExpr = ((IASTFunctionCallExpression) expression)
-					.getFunctionNameExpression();
+			// in stdmake this is a CASTFunctionCallExpression but implements
+			// IASTFUnctionCallExpr, so ok
+			IASTExpression astExpr = ((IASTFunctionCallExpression) expression).getFunctionNameExpression();
 			String signature = astExpr.getRawSignature();
-			// System.out.println("func signature=" + signature);
+			// note: getRawSig is the name BEFORE being processed by
+			// preprocessor!
+			// but it seems to be empty if it's different.
+			// IASTFunctionCallExpression
+			// fce=(IASTFunctionCallExpression)expression;
+			// IASTExpression fne=fce.getFunctionNameExpression();
+
+			// can we get post-pre-processor name here?
+			if (astExpr instanceof IASTIdExpression) {
+				IASTName tempFN = ((IASTIdExpression) astExpr).getName();
+				IBinding tempBIND = tempFN.resolveBinding();
+				String tempNAME = tempBIND.getName();
+				if(traceOn)System.out.println("MCAV name: "+tempNAME+" rawsig: "+signature);
+				// if e.g. preprocessor substitution used, use that for function
+				// name
+				boolean preProcUsed = !signature.equals(tempNAME);
+				if (preProcUsed) {
+					signature = tempNAME;
+				}
+			}
 			if (signature.startsWith(PREFIX)) {
 				if (astExpr instanceof IASTIdExpression) {
 					IASTName funcName = ((IASTIdExpression) astExpr).getName();
-					processFuncName(funcName,astExpr);
+					// IBinding binding = funcName.resolveBinding();
+					// String name=binding.getName();// name ok for stdMake
+					processFuncName(funcName, astExpr);
 				}
 			}
 		} else if (expression instanceof IASTLiteralExpression) {
 			processMacroLiteral((IASTLiteralExpression) expression);
+		} else {
+			// Other possibilities? Do we care? Assume not.
+			// if(expression instanceof CASTUnaryExpression)
+			// if(expression instanceof CASTIdExpression)
+
 		}
 		return PROCESS_CONTINUE;
 	}

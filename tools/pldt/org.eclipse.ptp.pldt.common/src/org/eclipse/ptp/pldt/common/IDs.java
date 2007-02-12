@@ -38,6 +38,11 @@ public interface IDs
 
     // marker attribute for the extra info saved for each marker/artifact
     String CONSTRUCT_TYPE  = "constructType";
+    /**
+	 * Key for storing preference of whether or not to show popup confirmation
+	 * dialog when analysis is complete.
+	 */
+	String SHOW_ANALYSIS_CONFIRMATION = "showAnalysisConfirmation";
     
     // id for MPI Artifact view
 //    String MPI_VIEW_ID = "org.eclipse.ptp.pldt.mpi.core.views.MPITableView";

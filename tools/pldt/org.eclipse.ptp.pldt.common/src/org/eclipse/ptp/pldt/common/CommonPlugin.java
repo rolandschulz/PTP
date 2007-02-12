@@ -47,6 +47,8 @@ public class CommonPlugin extends AbstractUIPlugin {
 	 */
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
+		// there's probably a better place to put this, but...
+		getPreferenceStore().setDefault(IDs.SHOW_ANALYSIS_CONFIRMATION, true);
 	}
 
 	/**

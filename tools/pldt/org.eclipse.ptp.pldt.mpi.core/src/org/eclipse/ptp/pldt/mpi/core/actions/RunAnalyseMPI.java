@@ -47,7 +47,7 @@ public class RunAnalyseMPI extends RunAnalyseBase {
 		final ScanReturn msr = new ScanReturn();
 		final String fileName = file.getName();
 		ParserLanguage lang = AnalysisUtil.getLanguageFromFile(file);
-		System.out.println("lang=" + lang);
+		//System.out.println("lang=" + lang);
 		try {
 			IASTTranslationUnit astTransUnit = CDOM.getInstance().getASTService().getTranslationUnit(file,
 					CDOM.getInstance().getCodeReaderFactory(CDOM.PARSE_SAVED_RESOURCES));
