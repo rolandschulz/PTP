@@ -36,25 +36,28 @@ import org.eclipse.ptp.pldt.common.ScanReturn;
 import org.eclipse.ptp.pldt.common.util.SourceInfo;
 
 /**
- * @author tibbitts
+ * This dom-walker helper collects interesting constructs (currently
+ * function calls and constants), and adds markers to the source file for
+ * C/C++ code. <br>
+ * This base class encapsulates the common behaviors for both C and C++
+ * code.
+ * 
+ * @author Beth Tibbitts
  * 
  */
 public class PldtAstVisitor extends CASTVisitor {
-	/**
-	 * This dom-walker helper collects interesting constructs (currently
-	 * function calls and constants), and add markers to the source file for
-	 * C/C++ code. <br>
-	 * This base class encapsulates the common behaviors for both C and C++
-	 * code.
-	 * 
-	 * @author Beth Tibbitts
-	 * 
-	 */
+
 
 	protected static String ARTIFACT_CALL = "Artifact Call";
 	protected static String ARTIFACT_CONSTANT = "Artifact Constant";
 	protected static String PREFIX = "";
+	private static final boolean traceOn=false;
 
+	/**
+	 * List of include paths that we'll probably want to consider in the work that this visitor does.
+	 * For example, only paths found in this list (specified in PLDT preferences) would be considered
+	 * to be a path from which definitions of "Artifacts" would be found.
+	 */
 	private final List includes_;
 	private final String fileName;
 	private final ScanReturn scanReturn;
@@ -80,11 +83,11 @@ public class PldtAstVisitor extends CASTVisitor {
 	/**
 	 * Skip statements that are included.
 	 */
-	public int visit(IASTStatement statement) {//called
+	public int visit(IASTStatement statement) { 
 		if (preprocessorIncluded(statement)) {
 			return ASTVisitor.PROCESS_SKIP;
 		}
-		return ASTVisitor.PROCESS_CONTINUE;//path taken
+		return ASTVisitor.PROCESS_CONTINUE; 
 	}
 
 	/**
@@ -105,19 +108,29 @@ public class PldtAstVisitor extends CASTVisitor {
 	 * marked as an Artifact. If so, append it to the scanReturn object that
 	 * this visitor is populating.
 	 * 
+	 * An artifact is a function name that was found in the MPI include path,
+	 * as defined in the MPI preferences.
+	 * 
 	 * @param astExpr
+	 * @param funcName
 	 */
 	public void processFuncName(IASTName funcName, IASTExpression astExpr) {
-		// IASTName funcName = ((IASTIdExpression) astExpr).getName();
 		IASTTranslationUnit tu = funcName.getTranslationUnit();
 
 		if (isArtifact(funcName)) {
 			SourceInfo sourceInfo = getSourceInfo(astExpr, Artifact.FUNCTION_CALL);
 			if (sourceInfo != null) {
-				System.out.println("found MPI artifact: " + funcName.toString());
-
+				if(traceOn) System.out.println("found MPI artifact: " + funcName.toString());
+				String artName=funcName.toString();
+				String rawName=funcName.getRawSignature();
+				String bName=funcName.getBinding().getName();
+				if(!artName.equals(rawName)) {
+					if(rawName.length()==0)rawName="  ";
+					artName=artName+"  ("+rawName+")"; // indicate orig pre-pre-processor value in parens
+					// note: currently rawName seems to always be empty.
+				}
 				scanReturn.addArtifact(new Artifact(fileName, sourceInfo.getStartingLine(), 1,
-						funcName.toString(), ARTIFACT_CALL, sourceInfo));
+						artName, ARTIFACT_CALL, sourceInfo));
 
 			}
 		}
@@ -148,29 +161,37 @@ public class PldtAstVisitor extends CASTVisitor {
 	/**
 	 * Determines if the funcName is an instance of the type of artifact in
 	 * which we are interested. <br>
-	 * That is, is it declared in the include path?
+	 * An artifact is a function name that was found in the  include path (e.g. MPI or OpenMP),
+	 * as defined in the PLDT preferences.
 	 * 
 	 * @param funcName
 	 */
 	protected boolean isArtifact(IASTName funcName) {
+		String funcNameString=funcName.toString();
 		IBinding binding = funcName.resolveBinding();
-		IASTName[] decls = funcName.getTranslationUnit().getDeclarations(binding);
+		String name=binding.getName(); 
+		String rawSig=funcName.getRawSignature();
+		if(name.length()==0) {
+			name=funcName.getRawSignature();
+		}
+
+		IASTName[] decls = funcName.getTranslationUnit().getDeclarations(binding);//empty for C++
 
 		for (int i = 0; i < decls.length; ++i) {
 			// IASTFileLocation is file and range of lineNos
 			IASTFileLocation loc = decls[i].getFileLocation();
 			String filename = loc.getFileName();
-			System.out.println("PldtAstVisitor found filename " + filename);
+			if(traceOn)System.out.println("PldtAstVisitor found filename " + filename);
 			IPath path = new Path(filename);
 			// is this path valid?
-			System.out.println("PldtAstVisitor found path " + path);
+			if(traceOn)System.out.println("PldtAstVisitor found path " + path);
 
 			if (isInIncludePath(path))
 				return true;
 		}
 		return false;
 	}
-	//called
+ 
 	public void processMacroLiteral(IASTLiteralExpression expression) {
 		IASTNodeLocation[] locations = expression.getNodeLocations();
 		if ((locations.length == 1) && (locations[0] instanceof IASTMacroExpansion)) {//path taken &not
@@ -200,41 +221,15 @@ public class PldtAstVisitor extends CASTVisitor {
 
 			}
 		}
-	}// run from here gives J9 exception:  5/15/06 2:05 pm
-//	Unhandled exception
-//	Type=Segmentation error vmState=0x00000000
-//	Target=2_30_20051027_03723_lHdSMR (Windows XP 5.1 build 2600 Service Pack 1)
-//	CPU=x86 (1 logical CPUs) (0x3feec000 RAM)
-//	J9Generic_Signal_Number=00000004 ExceptionCode=c0000005 ExceptionAddress=70A41318 ContextFlags=0001003f
-//	Handler1=70C1FF10 Handler2=70B76A30 InaccessibleAddress=00000018
-//	EDI=00000000 ESI=00000000 EAX=00000003 EBX=051DBFF0
-//	ECX=06FC039A EDX=00000000
-//	EIP=70A41318 ESP=0174FDD0 EBP=01CB16FC
-//	Module=C:\java2-ibm-sdk-50\jre\bin\j9jit23.dll
-//	Module_base_address=70840000 Offset_in_DLL=00201318
-//	JVMDUMP006I Processing Dump Event "gpf", detail "" - Please Wait.
-//	JVMDUMP007I JVM Requesting System Dump using 'C:\ecl\eclipse-3.2rc4\eclipse\core.20060515.140418.4084.dmp'
-//	JVMDUMP010I System Dump written to C:\ecl\eclipse-3.2rc4\eclipse\core.20060515.140418.4084.dmp
-//	JVMDUMP007I JVM Requesting Snap Dump using 'C:\ecl\eclipse-3.2rc4\eclipse\Snap0001.20060515.140418.4084.trc'
-//	JVMDUMP010I Snap Dump written to C:\ecl\eclipse-3.2rc4\eclipse\Snap0001.20060515.140418.4084.trc
-//	JVMDUMP007I JVM Requesting Java Dump using 'C:\ecl\eclipse-3.2rc4\eclipse\javacore.20060515.140418.4084.txt'
-//	JVMDUMP010I Java Dump written to C:\ecl\eclipse-3.2rc4\eclipse\javacore.20060515.140418.4084.txt
-//	JVMDUMP013I Processed Dump Event "gpf", detail "".
+	}
 
 	/**
-	 * Returns if the path is under any one of the artifact include paths from
-	 * preference page.
+	 * Is this path found in the include path in which we are interested?
+	 * E.g. is it in the MPI include path specified in PLDT preferences,
+	 * which would identify it as an MPI artifact of interest.
 	 * 
-	 * @param includeFilePath
-	 * @return
-	 */
-	/**
-	 * @param includeFilePath
-	 * @return
-	 */
-	/**
-	 * @param includeFilePath
-	 * @return
+	 * @param includeFilePath under consideration
+	 * @return true if this is found in the include path from PLDT preferences
 	 */
 	private boolean isInIncludePath(IPath includeFilePath) {
 		if (includeFilePath == null)
@@ -267,12 +262,22 @@ public class PldtAstVisitor extends CASTVisitor {
 			IASTFileLocation astFileLocation = null;
 			if (locations[0] instanceof IASTFileLocation) {
 				astFileLocation = (IASTFileLocation) locations[0];
+			}
+			// handle the case e.g. #define foo MPI_fn - recognize foo() as MPI_fn()
+			else if (locations[0] instanceof IASTMacroExpansion) {
+				IASTMacroExpansion me=(IASTMacroExpansion)locations[0];
+				astFileLocation=me.asFileLocation();
+			}
+			if(astFileLocation!=null) {
+				String tmp=astFileLocation.toString();
 				sourceInfo = new SourceInfo();
 				sourceInfo.setStartingLine(astFileLocation.getStartingLineNumber());
 				sourceInfo.setStart(astFileLocation.getNodeOffset());
 				sourceInfo
 						.setEnd(astFileLocation.getNodeOffset() + astFileLocation.getNodeLength());
 				sourceInfo.setConstructType(constructType);
+				
+				
 			}
 		}
 		return sourceInfo;
@@ -297,7 +302,7 @@ public class PldtAstVisitor extends CASTVisitor {
 
 		return sourceInfo;
 	}
-	//called
+	
 	private boolean preprocessorIncluded(IASTNode astNode) {
 		if (astNode.getFileLocation() == null)
 			return false;

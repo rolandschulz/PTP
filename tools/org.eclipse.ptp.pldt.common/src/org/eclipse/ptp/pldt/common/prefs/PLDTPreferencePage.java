@@ -4,6 +4,8 @@ import org.eclipse.jface.preference.*;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ptp.pldt.common.CommonPlugin;
+import org.eclipse.ptp.pldt.common.IDs;
+
 
 /**
  * This class represents a preference page that
@@ -36,6 +38,10 @@ public class PLDTPreferencePage
 	 * restore itself.
 	 */
 	public void createFieldEditors() {
+		String conf = "Show Analysis Confirmation with count of number of artifacts found";
+        BooleanFieldEditor bed = new BooleanFieldEditor(IDs.SHOW_ANALYSIS_CONFIRMATION,conf,getFieldEditorParent());
+        //StringFieldEditor sed = new StringFieldEditor(MpiIDs.MPI_BUILD_CMD, MPI_BUILD_COMMAND_LABEL,getFieldEditorParent());
+        addField(bed);
 	}
 
 	/* (non-Javadoc)

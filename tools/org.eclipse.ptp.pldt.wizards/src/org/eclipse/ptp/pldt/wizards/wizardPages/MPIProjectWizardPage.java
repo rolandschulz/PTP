@@ -185,7 +185,7 @@ public class MPIProjectWizardPage extends MBSCustomPage {
 		path=path.addTrailingSeparator();
 
 		defaultMpiLibPath=path.toString()+"lib";
-		System.out.println("defaultMpiLibPath="+defaultMpiLibPath);
+		//System.out.println("defaultMpiLibPath="+defaultMpiLibPath);
 		setCurrentMpiLibPath(defaultMpiLibPath);
 		
 		//standardize format for mpi include path, too

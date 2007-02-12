@@ -20,8 +20,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspaceRunnable;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
@@ -29,15 +27,16 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
-import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ptp.pldt.common.ArtifactMarkingVisitor;
 import org.eclipse.ptp.pldt.common.CommonPlugin;
 import org.eclipse.ptp.pldt.common.IDs;
 import org.eclipse.ptp.pldt.common.ScanReturn;
-import org.eclipse.swt.widgets.Display;
+import org.eclipse.ptp.pldt.common.util.AnalysisUtil;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IViewPart;
@@ -46,11 +45,11 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
+import org.eclipse.ui.actions.WorkspaceModifyOperation;
 
 /**
  * 
- * RunAnalyseBase - run analysis to create generic artifact markers. Can be
- * extended to run other framework analysis, such as LAPI.<br>
+ * RunAnalyseBase - run analysis to create generic artifact markers. <br>
  * The analysis is done in the doArtifactAnalysis() method
  * 
  * @author Beth Tibbitts
@@ -61,26 +60,40 @@ import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 public abstract class RunAnalyseBase implements IObjectActionDelegate, IWorkbenchWindowActionDelegate {
 	private static final boolean traceOn = false;
 
-	// indent amount for each level of nesting
+	/**
+	 * indent amount for each level of nesting; useful when printing debug
+	 * statements
+	 */
 	private static final int INDENT_INCR = 2;
 
-	/**
-	 * run analysis? set false for debugging UI only (value will be found from
-	 * preferences dialog)
-	 */
-	private boolean runAnalysis = true;
-
 	protected boolean forceEcho = false;
+
 	protected IWorkbenchWindow window;
+
 	protected boolean cancelledByUser = false;
+
 	protected int cumulativeArtifacts = 0;
+
+	/** the type of artifact e.g. "MPI" or "OpenMP" */
 	protected String name;// = "MPI";
+
 	protected ArtifactMarkingVisitor visitor;
+
 	protected String markerID;
-	private boolean keepErr = false;
+
+	private boolean err = false;
+
+	protected Shell shell;
 
 	/**
 	 * Constructor for the "Run Analysis" action
+	 * 
+	 * @param name
+	 *            the type of artifact e.g. "MPI" or "OpenMP"
+	 * @param visitor
+	 *            the visitor that will put the markers on the source files
+	 * @param markerID
+	 *            marker ID
 	 */
 	public RunAnalyseBase(String name, ArtifactMarkingVisitor visitor, String markerID) {
 		this.name = name;
@@ -96,6 +109,7 @@ public abstract class RunAnalyseBase implements IObjectActionDelegate, IWorkbenc
 	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
 		if (traceOn)
 			System.out.println("RunAnalyseBase.setActivePart()...");
+		shell = targetPart.getSite().getShell();
 	}
 
 	/**
@@ -108,107 +122,172 @@ public abstract class RunAnalyseBase implements IObjectActionDelegate, IWorkbenc
 		if (traceOn)
 			System.out.println("RunAnalyseBase.run()...");
 
-		cancelledByUser = false; // do we need to reset this? or is each
-		// invokation a new obj?
+		cancelledByUser = false;
+		err = false;
 		cumulativeArtifacts = 0;
-		// Determine preference for running analysis (could be false for UI-only
-		// testing)
 		readPreferences();
 		if (traceOn)
 			System.out.println("RunAnalyseBase.run() action id=" + action.getId());
 
 		final int indent = 0;
-		String whatToRun = "";
-		boolean ranIt = false;
-		boolean haveConfirmedWithUser = false;
 		if ((selection == null) || selection.isEmpty()) {
 			MessageDialog.openWarning(null, "No files selected for analysis.",
 					"Please select a source file or container (folder or project) to analyze.");
+
 			return;
 		} else {
 			// get preference for include paths
 			final List includes = getIncludePath();
 			if (areIncludePathsNeeded() && includes.isEmpty()) {
 				System.out.println("RunAnalyseBase.run(), no include paths found.");
-				Shell shell = this.window.getShell();
 				MessageDialog.openWarning(shell, name + " Include Paths Not Found", "Please first specify the " + name
 						+ " include paths in the Preferences page.");
 
 			} else {
-				Iterator iter = this.selection.iterator();
-				while (iter.hasNext()) {
-					Object obj = (Object) iter.next();
-					// It can be a Project, Folder, File, etc...
-					if (obj instanceof IAdaptable) {
-						final IResource res = (IResource) ((IAdaptable) obj).getAdapter(IResource.class);
-						if (res != null) {
-							whatToRun = getPrefacedName(res);
-							String multipleMsg = (this.selection.size() > 1) ? "\n(Plus other files selected)" : "";
-							String msg = "Run Artifact Analysis on " + whatToRun + "?" + multipleMsg;
-							// Confirm with user only prior to first run.
-							boolean runIt = haveConfirmedWithUser;
 
-							runIt = true; // skip dialog, it's annoying.
-							// Put in Preferences?
-							if (!runIt) {
-								runIt = MessageDialog.openQuestion(null, "Run Analysis", msg);
-								if (!runIt)
-									return; // don't run
-							}
-							haveConfirmedWithUser = true;
-							ranIt = true;
-							try {
-								// put this in a Runnable to reduce Resource
-								// Change events
-								ResourcesPlugin.getWorkspace().run(new IWorkspaceRunnable() {
-									public void run(IProgressMonitor monitor) throws CoreException {
-										boolean err = runResource(res, indent, includes);
-										keepErr = err;
-									}
-								}, null); // null monitor
-							} catch (CoreException e1) {
-								e1.printStackTrace();
-							}
-							// refresh parent so that any resource changes will
-							// show
-							// (e.g. if the analysis changed any files. For
-							// future use.)
-							IContainer parent = res.getParent();
-							try {
-								parent.refreshLocal(IResource.DEPTH_INFINITE, null);
-							} catch (CoreException e) {
-								System.out.println("Exception refreshing after analysis");
-								e.printStackTrace();
-							}
-						}
+				// batch ws modifications *and* report progress
+				WorkspaceModifyOperation wmo = new WorkspaceModifyOperation() {
+					@Override
+					protected void execute(IProgressMonitor monitor) throws CoreException, InvocationTargetException,
+							InterruptedException {
+						err = runResources(monitor, indent, includes);
 					}
-				} // end while
-			}
+				};
+				ProgressMonitorDialog pmdialog = new ProgressMonitorDialog(shell);
+				try {
+					pmdialog.run(true, true, wmo);  // fork=true; if false, not cancelable
+					
+				} catch (InvocationTargetException e) {
+					err = true;
+					System.out.println("Error running analysis: ITE " + e.getMessage());
+					System.out.println("  cause: " + e.getCause()+" - "+e.getCause().getMessage());
+					Throwable th=e.getCause();
+					th.printStackTrace();
+					} 
+				catch (InterruptedException e) {
+					cancelledByUser = true;
+				}
+
+			}// end else
 		}
 		if (traceOn)
-			System.out.println("RunAnalyseBase: retd from run iterator for " + whatToRun + ", ranIt=" + ranIt);
-		if (ranIt) {
-			String pisFound = "\nNumber of " + name + " Artifacts found: " + cumulativeArtifacts;
-			if (cancelledByUser) {
-				MessageDialog.openInformation(null, "Partial Analysis Complete.",
-						"Partial Analysis complete.  Cancelled by User." + pisFound);
-			} else {
-				String msg = "***Analysis is complete for:  " + whatToRun;
-
-				if (!keepErr) {
-					String sMsg = cumulativeArtifacts + " " + name + " Artifacts found in " + whatToRun;
+			System.out.println("RunAnalyseBase: retd from run iterator, err=" + err);
+		String artsFound = "\nNumber of " + name + " Artifacts found: " + cumulativeArtifacts;
+		if (cancelledByUser) {
+			MessageDialog.openInformation(null, "Partial Analysis Complete.",
+					"Partial Analysis complete.  Cancelled by User." + artsFound);
+		} else {
+			String msg = "***Analysis is complete.";
+			if (!err) {
+				String key = IDs.SHOW_ANALYSIS_CONFIRMATION;
+				IPreferenceStore pf = CommonPlugin.getDefault().getPreferenceStore();
+				boolean showDialog = pf.getBoolean(IDs.SHOW_ANALYSIS_CONFIRMATION);
+				if (showDialog) {
+					String title = "Analysis complete.";
+					String sMsg = cumulativeArtifacts + " " + name + " Artifacts found";
+					String togMsg = "Don't show me this again";
+					MessageDialogWithToggle.openInformation(shell, title, sMsg, togMsg, false, pf, key);
 					showStatusMessage(sMsg, "RunAnalyseBase.run()");
-					MessageDialog.openInformation(null, "Analysis complete.", msg + pisFound);
-					showStatusMessage(sMsg, "RunAnalyseBase.run()"); // repeat;
-					activateProblemsView();
-					activateArtifactView();
-				} else {
-					showStatusMessage(msg, "RunAnalyseBase.run() error");
-					msg = "Analysis for: " + whatToRun + " completed with errors. See Tasks View.";
-					MessageDialog.openError(null, "Analysis completed with errors", msg + pisFound);
+				}
+				activateProblemsView();
+				activateArtifactView();
+			} else { // error occurred
+				showStatusMessage(msg, "RunAnalyseBase.run() error");
+				msg = "Analysis completed with errors";
+				MessageDialog.openError(null, "Analysis completed with errors", msg + artsFound);
+			}
+		}
+
+	}
+
+	/**
+	 * Run the analysis on the current selection (file, container, or multiple-selection)
+	 * @param monitor
+	 *            progress monitor on which to report progress.
+	 * @param indent
+	 *            indent amount, in number of spaces, used only for debug
+	 *            printing.
+	 * @param includes
+	 * @return true if any errors were found.
+	 * @throws InterruptedException
+	 */
+	protected boolean runResources(IProgressMonitor monitor, int indent, List includes) throws InterruptedException {
+		boolean foundError = false;
+		// First, count files so we know how much work to do.
+		// note this is number of files of any type, not necessarily number of
+		// files that will be anlayzed.
+		int count = countFilesSelected();
+
+		monitor.beginTask("Analysis", count);
+		// Get elements of a possible multiple selection
+		Iterator iter = this.selection.iterator();
+		while (iter.hasNext()) {
+			if(monitor.isCanceled()) {
+				// this is usually caught here while processing multiple-selection of files
+				throw new InterruptedException();
+			}
+			Object obj = (Object) iter.next();
+			// It can be a Project, Folder, File, etc...
+			if (obj instanceof IAdaptable) {
+				final IResource res = (IResource) ((IAdaptable) obj).getAdapter(IResource.class);
+				if (res != null) {
+					boolean err = runResource(monitor, res, indent, includes);
+					foundError = foundError | err;
 				}
 			}
 		}
+		monitor.done();
+		return foundError;
+	}
+
+	/**
+	 * Counts the number of files in the selection (leaf nodes only - Files -
+	 * not the directories/containers) <br>
+	 * Note that this makes no distinction about what type of files.
+	 * 
+	 * @return number of files
+	 */
+	protected int countFilesSelected() {
+		int count = 0;
+		// Get elements of a possible multiple selection
+		Iterator iter = this.selection.iterator();
+		while (iter.hasNext()) {
+			Object obj = (Object) iter.next();
+			// It can be a Project, Folder, File, etc...
+			if (obj instanceof IAdaptable) {
+				final IResource res = (IResource) ((IAdaptable) obj).getAdapter(IResource.class);
+				count = count + countFiles(res);
+			}
+		}
+		//System.out.println("number of files: " + count);
+		return count;
+	}
+
+	/**
+	 * Count the number of files in this resource (file or container).
+	 * 
+	 * @param res
+	 * @return
+	 */
+	protected int countFiles(IResource res) {
+		if (res instanceof IFile) {
+			return 1;
+		} else if (res instanceof IContainer) {
+			int count = 0;
+
+			try {
+				IResource[] kids = ((IContainer) res).members();
+				for (int i = 0; i < kids.length; i++) {
+					IResource child = kids[i];
+					count = count + countFiles(child);
+				}
+				return count;
+			} catch (CoreException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return 0;
 	}
 
 	abstract protected void activateArtifactView();
@@ -249,17 +328,9 @@ public abstract class RunAnalyseBase implements IObjectActionDelegate, IWorkbenc
 	/**
 	 * Read preferences
 	 * 
-	 * Including: set run analysis preference could be set to 'false' for
-	 * UI-only testing that doesn't call analysis at each leaf node (source
-	 * file)
-	 * 
 	 */
 	protected void readPreferences() {
 		Preferences pref = CommonPlugin.getDefault().getPluginPreferences();
-		runAnalysis = pref.getBoolean(IDs.P_RUN_ANALYSIS);
-		if (traceOn)
-			println("RunAnalyseBase()... runAnalysis=" + runAnalysis);
-
 		forceEcho = pref.getBoolean(IDs.P_ECHO_FORCE);
 
 	}
@@ -274,44 +345,35 @@ public abstract class RunAnalyseBase implements IObjectActionDelegate, IWorkbenc
 	 *            number of levels of nesting/recursion for prettyprinting
 	 * @param includes
 	 *            contains header files include paths from the Preference page
-	 * @return
+	 * @return true if an error was encountered
+	 * @throws InterruptedException 
 	 */
-	protected boolean runResource(IResource resource, int indent, List /*
-																		 * of
-																		 * String
-																		 */includes) {
-		// boolean ok = true;
+	protected boolean runResource(IProgressMonitor monitor, IResource resource, int indent, List includes) throws InterruptedException {
 		indent += INDENT_INCR;
 		ScanReturn results;
 		boolean foundError = false;
-		if (!cancelledByUser) {
+
+		if (!monitor.isCanceled()) {
 			if (resource instanceof IFile) {
 				IFile file = (IFile) resource;
 				String filename = file.getName();
-				// if (AnalysisUtil.validForAnalysis(filename)) {
-				if (true) {
+				if (AnalysisUtil.validForAnalysis(filename)) {
 					if (traceOn)
 						println(getSpaces(indent) + "file: " + filename);
-					runAnalysis = true;
-					if (runAnalysis) {
-						results = analyse(file, includes); // jx: changed to
-						// file, instead of
-						// resource
-						foundError = foundError || results == null || results.wasError();
-						if (traceOn)
-							println("******** RunAnalyseBase, analysis complete; ScanReturn=" + results);
-						if (results != null) {
-							// apply markers
-							// Use artifact objects directly from
-							// ScanReturn
-							// obj
-							processResults(results, resource);
-							// List artifacts = results.getArtifactList();
-							// visitor.visitFile(resource, artifacts);
-							// set the metrics in the metrics view
-							// setMetrics(file, results);
-						}
+					results = analyse(monitor, file, includes);
+
+					foundError = foundError || results == null || results.wasError();
+					if (foundError) {
+						int stopHere = 0;
+						System.out.println("found error on " + file.getName() + " " + stopHere);
 					}
+					if (traceOn)
+						println("******** RunAnalyseBase, analysis complete; ScanReturn=" + results);
+					if (results != null) {
+						// apply markers to the file
+						processResults(results, resource);
+					}
+
 				} else {
 					if (traceOn)
 						println(getSpaces(indent) + "---omit: not valid file: " + filename);
@@ -325,7 +387,11 @@ public abstract class RunAnalyseBase implements IObjectActionDelegate, IWorkbenc
 				try {
 					IResource[] mems = container.members();
 					for (int i = 0; i < mems.length; i++) {
-						boolean err = runResource(mems[i], indent, includes);
+						if(monitor.isCanceled()) {
+							//this is usually hit while processing normal analysis of e.g. container
+							throw new InterruptedException();
+						}
+						boolean err = runResource(monitor, mems[i], indent, includes);
 						foundError = foundError || err;
 					}
 				} catch (CoreException e) {
@@ -333,7 +399,7 @@ public abstract class RunAnalyseBase implements IObjectActionDelegate, IWorkbenc
 				}
 
 			}
-		} // end if !cancelledByUser
+		} // end if !monitor.isCanceled()
 		else {
 			String name = "";
 			if (resource instanceof IResource) {
@@ -343,6 +409,7 @@ public abstract class RunAnalyseBase implements IObjectActionDelegate, IWorkbenc
 				name = path.toString();
 			}
 			System.out.println("Cancelled by User, aborting analysis on subsequent files... " + name);
+			throw new InterruptedException();
 		}
 
 		return foundError;
@@ -354,63 +421,49 @@ public abstract class RunAnalyseBase implements IObjectActionDelegate, IWorkbenc
 	}
 
 	/**
-	 * Remember what the selected object was
+	 * Remember what the selected object was. <br>
+	 * If selection is empty, it's probably from another view, so don't change
+	 * what we consider the current selection from this view.
 	 */
 	public void selectionChanged(IAction action, ISelection selection) {
 		if (selection instanceof IStructuredSelection) {
-			this.selection = (IStructuredSelection) selection;
+			if (!selection.isEmpty()) {
+				this.selection = (IStructuredSelection) selection;
+			}
 		}
 	}
 
-	public ScanReturn analyse(IFile file, List /* of String */includes) {
+	public ScanReturn analyse(IProgressMonitor monitor, IFile file, List /*
+																			 * of
+																			 * String
+																			 */includes) {
 		if (traceOn)
 			println("RunAnalyseBase.analyse()...");
 		ScanReturn nr = null;
 		String errMsg = null;
-		// ============= Run with Progress Monitor
-		AnalyseWithProgress op = null;
-		try {
-			op = new AnalyseWithProgress(file, includes);
-			Shell activeShell = this.window.getShell();
-			ProgressMonitorDialog pmd = new ProgressMonitorDialog(activeShell);
-			pmd.run(true, true, op);
-			nr = op.getResults();
-		} catch (InvocationTargetException e) {
-			errMsg = "RunAnalyseBase: InvocationTargetException in analysis for " + file.getLocation();
-			System.out.println(errMsg);
-			e.printStackTrace();
-			Throwable origExcp = e.getTargetException();
-			System.out.println("Original target exception is: " + origExcp);
-			System.out.println("   stack trace printed to stdout.");
-			origExcp.printStackTrace();
-			Throwable te = origExcp;
-			// System.err.println("---Original exception was: ");
-			// te.printStackTrace();
-			// Try to print some info to the Log file to pinpoint the error.
-			StackTraceElement[] ste = te.getStackTrace();
-			System.out.println("   Stack trace:");
-			for (int j = 0; j < ste.length; j++) {
-				StackTraceElement el = ste[j];
-				System.out.println("     " + (j + 1) + " " + el.toString());
-			}
-		}
 
-		catch (InterruptedException e) {
-			System.out.println("RunAnalyseBase: Interrupted Analysis for " + file.getProjectRelativePath());
-			System.out.println("   reason: " + e.getMessage());
-			// note: user hitting 'cancel' on progress monitor will land here.
-			// need graceful exit. Get results from previous run, which probably
-			// finished.
-			if (op != null) {
-				nr = op.getResults();
-			}
-			cancelledByUser = true;
-			// e.printStackTrace();
-		}
-		// =====================
-		if (nr == null) {
+		monitor.subTask("Starting Analysis...");
+
+		// fully qualified file location
+		String rawPath = file.getRawLocation().toString();
+		if (traceOn)
+			println("RunAnalyseBase:              file = " + file.getLocation());
+
+		monitor.subTask(" on " + rawPath);
+		ScanReturn scanReturn = doArtifactAnalysis(file, includes);
+		monitor.worked(1);
+		if (traceOn)
+			println("Artifact analysis complete...");
+		int numArtifacts = scanReturn.getArtifactList().size();
+		cumulativeArtifacts = cumulativeArtifacts + numArtifacts;
+
+		if (traceOn)
+			System.out.println("Artifacts found for " + file.getProjectRelativePath() + ": " + numArtifacts);
+		if (traceOn)
+			System.out.println("   Total # found: " + cumulativeArtifacts);
+
+		if (scanReturn == null) {
 			System.out.println("ScanReturn result is NULL.  No results for " + file.getProjectRelativePath());
-			Shell shell = Display.getCurrent().getActiveShell();
 			errMsg = "Error: No results were returned from analysis of " + file.getProjectRelativePath();
 			MessageDialog.openError(shell, "Error in Analysis", errMsg);
 		} else {
@@ -420,15 +473,15 @@ public abstract class RunAnalyseBase implements IObjectActionDelegate, IWorkbenc
 				System.out.println("   Analysis err? = " + nr.wasError());
 		}
 
-		if (nr != null) {
-			boolean wasError = nr.wasError();
+		if (scanReturn != null) {
+			boolean wasError = scanReturn.wasError();
 			if (traceOn)
 				System.out.println("error occurred =" + wasError);
 			if (wasError) {
 				System.out.println("RunAnalyseBase.analyse...Error...");
 			}
 		}
-		return nr;
+		return scanReturn;
 	}
 
 	/**
@@ -504,96 +557,12 @@ public abstract class RunAnalyseBase implements IObjectActionDelegate, IWorkbenc
 	}
 
 	/**
-	 * Class wrapper for running the analysis, so we can put up a progress
-	 * monitor while it's running <br>
-	 * Note: the analysis runs in the non-UI thread, so callbacks must be forced
-	 * back on the UI thread
-	 * 
-	 * @see IObjectActionDelegate#setActivePart(IAction, IWorkbenchPart)
-	 * @author Beth Tibbitts
-	 * 
-	 * 
-	 * 
-	 */
-	public class AnalyseWithProgress implements IRunnableWithProgress {
-		private IFile file_;
-
-		private ScanReturn scanReturn_;
-
-		List /* of String */includes_;
-
-		/**
-		 * Constructor
-		 * 
-		 * @param file
-		 *            the File to be analyzed
-		 * @param includes
-		 *            include paths from the Preference page.
-		 */
-		public AnalyseWithProgress(IFile file, List /* of String */includes) {
-			file_ = file;
-			includes_ = includes;
-			// for analysis
-		}
-
-		/**
-		 * run the analysis inside a progress monitor.
-		 */
-		public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-			// subtasks probably happen too fast to see, but update the monitor
-			// anyway...
-			monitor.subTask("Starting Analysis...");
-
-			// fully qualified file location
-			String rawPath = file_.getRawLocation().toString();
-			if (traceOn)
-				println("RunAnalyseBase:              file = " + file_.getLocation());
-
-			monitor.subTask("Running analysis on " + rawPath);
-			// CancelChecker checker = new CancelChecker(monitor);
-			if (monitor.isCanceled()) {
-				// checker.setCancelRequested(true);
-				System.out.println("RunAnalyseBase, progressMonitor canceled...before");
-				throw new InterruptedException("Analysis canceled by user");
-			}
-
-			scanReturn_ = doArtifactAnalysis(file_, includes_);
-
-			if (monitor.isCanceled()) {
-				// checker.setCancelRequested(true);
-				System.out.println("RunAnalyseBase, progressMonitor canceled...after");
-				throw new InterruptedException("Analysis canceled by user");
-			}
-
-			monitor.subTask("Analysis done.");
-			// if (traceOn)
-			// println("ScanReturn: errorcode=" + scanReturn_.errorCode_);
-			if (traceOn)
-				println("Artifact analysis complete...");
-			int numArtifacts = scanReturn_.getArtifactList().size();
-			cumulativeArtifacts = cumulativeArtifacts + numArtifacts;
-
-			if (traceOn)
-				System.out.println("Artifacts found for " + file_.getProjectRelativePath() + ": " + numArtifacts);
-			if (traceOn)
-				System.out.println("   Total # found: " + cumulativeArtifacts);
-
-			monitor.subTask("All done.");
-			monitor.done();
-		}
-
-		public ScanReturn getResults() {
-			return scanReturn_;
-		}
-
-	}// end AnalyseWithProgress
-
-	/**
 	 * Returns artifact analysis for file. <br>
 	 * Derived class should override this method.
 	 * 
 	 * @param file
-	 * @param includes header files include paths
+	 * @param includes
+	 *            header files include paths
 	 * @return
 	 */
 	public abstract ScanReturn doArtifactAnalysis(final IFile file, final List includes);
