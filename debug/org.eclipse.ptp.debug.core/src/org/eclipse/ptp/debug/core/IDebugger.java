@@ -23,6 +23,7 @@
 package org.eclipse.ptp.debug.core;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
@@ -52,7 +53,7 @@ public interface IDebugger {
 	
 	public int getDebuggerPort() throws CoreException;
 	
-	public void connection() throws CoreException;
+	public void connection(IProgressMonitor monitor) throws CoreException;
 	public void startDebugger(IPJob job) throws CoreException;
 	public void stopDebugger() throws CoreException;
 	

@@ -19,6 +19,7 @@
 package org.eclipse.ptp.debug.external.core.commands;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
@@ -36,12 +37,12 @@ public class ConnectionCommand extends AbstractDebugCommand {
 	}
 	public void exec(IAbstractDebugger debugger) throws PCDIException {
 		try {
-			debugger.connection();
+			debugger.connection(new NullProgressMonitor());
 		} catch (CoreException e) {
 			throw new PCDIException(e);
 		}
 	}	
 	public String getCommandName() {
-		return "Connaction"; 
+		return "Connection"; 
 	}
 }

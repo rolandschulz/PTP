@@ -21,6 +21,7 @@ package org.eclipse.ptp.debug.external.core.debugger;
 import java.io.IOException;
 import org.eclipse.cdt.debug.core.cdi.ICDICondition;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.core.IPJob;
@@ -83,12 +84,12 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 		return proxy.getSessionPort();
 	}
 	
-	public void connection() throws CoreException {
+	public void connection(IProgressMonitor monitor) throws CoreException {
 		try {
 			//using checkConnection() instead of waitForConnect()
-			proxy.checkConnection();
-			//proxy.waitForConnect();
-			proxy.addEventListener(this);
+			//proxy.checkConnection();
+			if (proxy.waitForConnect(monitor))
+				proxy.addEventListener(this);
 		} catch (IOException e) {
 			try {
 				stopDebugger();

@@ -28,6 +28,7 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.Random;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IDebugCommand;
@@ -80,7 +81,7 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 	public int getBreakpointId() {
 		return bpt_id++;
 	}
-	public void connection() throws CoreException {
+	public void connection(IProgressMonitor monitor) throws CoreException {
 		completeCommand(null, IDebugCommand.RETURN_OK);
 	}
 	public int getDebuggerPort() throws CoreException {
