@@ -2252,28 +2252,16 @@ options {k=2;}
 
 // R823
 // T_IDENT inlined for select_construct_name
-// TODO - FIXME - have to remove T_TYPE_IS and T_CLASS_IS because the lexer never
-// matches the sequences.  lexer now matches a T_IDENT for the 'IS'.
-// also, for the 'TYPE IS', it seems like type_spec is wrong.  it seems that
-// it has to be a variable name for a derived type (looking at note_8.13).
-// if it were type_spec, it couldn't successfully accept note_8.13.  i then 
-// changed the rule for 'CLASS IS' the same way.  is this correct??  
-// --Rickett, 01.30.07
+// TODO - FIXME - have to remove T_TYPE_IS and T_CLASS_IS because the 
+// lexer never matches the sequences.  lexer now matches a T_IDENT for 
+// the 'IS'.  this rule should be fixed (see test_select_stmts.f03)
 type_guard_stmt
-// 	:	(label)? T_TYPE_IS T_LPAREN
-// 		type_spec
-// 		T_RPAREN
-// 		( T_IDENT )? T_EOS
-// 	|	(label)? T_CLASS_IS T_LPAREN
-// 		type_spec
-// 		T_RPAREN
-// 		( T_IDENT )? T_EOS
 	:	(label)? T_TYPE T_IDENT T_LPAREN
-		T_IDENT
+		type_spec
 		T_RPAREN
 		( T_IDENT )? T_EOS
 	|	(label)? T_CLASS T_IDENT T_LPAREN
-		T_IDENT
+		type_spec
 		T_RPAREN
 		( T_IDENT )? T_EOS
 	|	(label)? T_CLASS	T_DEFAULT
@@ -2371,12 +2359,11 @@ options {k=3;}
 // TODO need interaction with scanner to terminate shared terminal action statements (see R835).
 do_term_action_stmt
     // try requiring an action_stmt and then we can simply insert the new
-    // T_LABEL_DO_TERMINAL during the Sale's prepass.  T_EOS is in action_stmt
+    // T_LABEL_DO_TERMINAL during the Sale's prepass.  T_EOS is in action_stmt.
     // added the T_END T_DO and T_ENDDO options to this rule because of the
     // token T_LABEL_DO_TERMINAL that is inserted if they end a labeled DO.
     :   label T_LABEL_DO_TERMINAL 
         (action_stmt | ( (T_END T_DO (T_IDENT)?) | (T_ENDDO) (T_IDENT)?) T_EOS)
-//    |   label action_stmt
 // 	:	T_LABEL_DO_TERMINAL action_stmt  
 // 	:	T_LABEL_DO_TERMINAL action_or_cont_stmt  
 	;
@@ -2736,10 +2723,6 @@ format_specification
 // r replaced by int_literal_constant replaced by char_literal_constant replaced by T_CHAR_CONSTANT
 // char_string_edit_desc replaced by T_CHAR_CONSTANT
 format_item
-//     :   (T_DIGIT_STRING)? data_plus_control_edit_desc
-// 	|	T_CHAR_CONSTANT
-// 	|	(T_DIGIT_STRING)? T_LPAREN format_item_list T_RPAREN
-// 	;
     :   T_DATA_EDIT_DESC 
     |   T_CONTROL_EDIT_DESC
     |   T_CHAR_STRING_EDIT_DESC
@@ -2750,50 +2733,9 @@ format_item
 // 17-22
 // ERR_CHK
 format_item_list
-//     :    format_item ( T_COMMA format_item )*
     :    format_item ( (T_COMMA)? format_item )*
     ;
 
-// R1004 r inlined in R1003 and R1011 as int_literal_constant (then as DIGIT_STRING)
-// C1004 (R1004) r shall not have a kind parameter associated with it
-
-// R1005
-// w,m,d,e replaced by int_literal_constant replaced by T_DIGIT_STRING
-// char_literal_constant replaced by T_CHAR_CONSTANT
-// ERR_CHK 1005 matching T_ID_OR_OTHER with alternatives will have to be done here
-// TODO - get rid of this rule if not used
-data_plus_control_edit_desc
-options {k=2;}
-//     : (T_IDENT T_PERIOD) => T_IDENT T_PERIOD T_DIGIT_STRING (T_IDENT)?
-    : (T_IDENT REAL_CONSTANT) => T_IDENT REAL_CONSTANT (T_IDENT)?
-    | (T_IDENT T_CHAR_CONSTANT) => T_IDENT T_CHAR_CONSTNT ( T_LPAREN v_list
-            T_RPAREN )? /* 'DT' with char-constant */
-//     | (T_DIGIT_STRING T_IDENT) => T_DIGIT_STRING T_IDENT
-//     | ( (T_DIGIT_STRING)? T_SLASH ) => ( T_DIGIT_STRING )? T_SLASH
-    | T_IDENT ( T_LPAREN v_list T_RPAREN )? /* 'DT' w/o char-constant */
-    | T_COLON
-    | T_SLASH
-//     : T_IDENT ( ( T_PERIOD T_DIGIT_STRING)? | 
-//                 ( T_CHAR_CONSTANT)? ( T_LPAREN v_list T_RPAREN )?)  /* 'DT' */
-//     : T_ID_OR_OTHER /* {'I','B','O','Z','F','E','EN','ES','G','L','A','D'} */ 
-//       T_DIGIT_STRING ( T_PERIOD T_DIGIT_STRING )?
-//       ( T_ID_OR_OTHER /* is 'E' */ T_DIGIT_STRING )?
-//     | T_ID_OR_OTHER /* is 'DT' */ T_CHAR_CONSTANT ( T_LPAREN v_list T_RPAREN )?
-//     | T_ID_OR_OTHER /* {'A','DT'},{'X','P' from control_edit_desc} */
-    ;
-
-// control_edit_desc
-//     : T_COLON
-// 	:	T_ID_OR_OTHER /* {'I','B','O','Z','F','E','EN','ES','G','L','A','D'},{T','TL','TR'} */ 
-// 		    T_DIGIT_STRING ( T_PERIOD T_DIGIT_STRING )?
-// 		    ( T_ID_OR_OTHER /* is 'E' */ T_DIGIT_STRING )?
-// 	|	T_ID_OR_OTHER /* is 'DT' */ T_CHAR_CONSTANT ( T_LPAREN v_list T_RPAREN )?
-// 	|	T_ID_OR_OTHER /* {'A','DT'},{'BN','BZ','RU','RD','RZ','RN','RC','RP','DC','DP'} */
-// // following only from control_edit_desc
-// 	|	( T_DIGIT_STRING )? T_SLASH
-// 	|	T_COLON
-// 	|	(T_PLUS|T_MINUS) T_DIGIT_STRING T_ID_OR_OTHER /* is 'P' */
-// 	;
 
 // the following rules, from here to the v_list, are the originals.  modifying 
 // to try and simplify and make match up with the standard.
