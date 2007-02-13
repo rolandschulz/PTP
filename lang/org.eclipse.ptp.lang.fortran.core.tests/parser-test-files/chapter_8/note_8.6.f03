@@ -1,11 +1,17 @@
-          INTEGER FUNCTION SIGNUM (N)
-          SELECT CASE (N)
-          CASE (:-1)
-             SIGNUM = -1
-          CASE (0)
-             SIGNUM = 0
-          CASE (1:)
-             SIGNUM = 1
-          END SELECT
-          END
+module note_8_6
+
+contains
+  integer function signum(n)
+    select case(n)
+    case(:-1)
+       signum = -1
+    case(0)
+       signum = 0
+    case(1:)
+       signum = 1
+    end select
+    
+  end function signum
+
+end module note_8_6
 

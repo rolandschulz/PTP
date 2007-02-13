@@ -1,11 +1,11 @@
-       READ (IUN, '(1X, G14.7)', IOSTAT = IOS) X
-       DO WHILE (IOS == 0)
-          IF (X >= 0.) THEN
-             CALL SUBA (X)
-             CALL SUBB (X)
+read (iun, '(1x, g14.7)', iostat = ios) x
+do while (ios == 0)
+   if(x>=0.) then
+      call suba(x)
+      call subb(x)
+      call subz(x)
+   endif
+   read(iun, '(1x, g14.7)', iostat = ios) x
+end do
 
-             CALL SUBZ (X)
-          ENDIF
-          READ (IUN, '(1X, G14.7)', IOSTAT = IOS) X
-       END DO
-END
+end

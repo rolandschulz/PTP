@@ -1,21 +1,23 @@
-          CHARACTER (80) :: LINE
+character(80) :: line
 
-          LEVEL = 0
-          SCAN_LINE: DO I = 1, 80
-             CHECK_PARENS: SELECT CASE (LINE (I:I))
-             CASE ('(')
-                LEVEL = LEVEL + 1
-             CASE (')')
-                LEVEL = LEVEL - 1
-                IF (LEVEL < 0) THEN
-                   PRINT *, 'UNEXPECTED RIGHT PARENTHESIS'
-                   EXIT SCAN_LINE
-                END IF
-             CASE DEFAULT
-                ! Ignore all other characters
-             END SELECT CHECK_PARENS
-          END DO SCAN_LINE
-          IF (LEVEL > 0) THEN
-             PRINT *, 'MISSING RIGHT PARENTHESIS'
-          END IF
-ENd
+level = 0
+scan_line: do i = 1,80
+   check_parens: select case(line(i:i))
+   case('(')
+      level = level + 1
+   case(')')
+      level = level - 1
+      if(level < 0) then
+         print *, 'unexpected right parenthesis'
+         exit scan_line
+      end if
+      case default
+         ! ignore all other characters
+      end select check_parens
+   end do scan_line
+if(level > 0) then
+   print *, 'missing right parenthesis'
+end if
+
+end
+
