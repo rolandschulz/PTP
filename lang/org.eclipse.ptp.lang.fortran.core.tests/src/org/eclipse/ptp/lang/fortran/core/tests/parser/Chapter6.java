@@ -31,35 +31,35 @@ public class Chapter6 {
    }
 
    @Test public void note_6_5() {
-      parse("chapter_6/note_6.5.f03");
+      parse("chapter_6/note_6_5.f03");
    }
 
    @Test public void note_6_9() {
-      parse("chapter_6/note_6.9.f03");
+      parse("chapter_6/note_6_9.f03");
    }
 
    @Test public void note_6_11() {
-      parse("chapter_6/note_6.11.f03");
+      parse("chapter_6/note_6_11.f03");
    }
 
    @Test public void note_6_17() {
-      parse("chapter_6/note_6.17.f03");
+      parse("chapter_6/note_6_17.f03");
    }
 
    @Test public void note_6_19() {
-      parse("chapter_6/note_6.19.f03");
+      parse("chapter_6/note_6_19.f03");
    }
 
    @Test public void note_6_22() {
-      parse("chapter_6/note_6.22.f03");
+      parse("chapter_6/note_6_22.f03");
    }
 
    @Test public void note_6_24() {
-      parse("chapter_6/note_6.24.f03");
+      parse("chapter_6/note_6_24.f03");
    }
 
    @Test public void note_6_25() {
-      parse("chapter_6/note_6.25.f03");
+      parse("chapter_6/note_6_25.f03");
    }
 }// end class Chapter6
 
