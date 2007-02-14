@@ -1,0 +1,3 @@
+deallocate (x,b)
+
+end
