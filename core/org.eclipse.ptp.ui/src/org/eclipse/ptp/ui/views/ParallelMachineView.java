@@ -57,7 +57,7 @@ import org.eclipse.swt.widgets.TableItem;
  * @author clement chu
  * 
  */
-public class ParallelMachineView extends AbstractParallelSetView implements INodeListener, IModelListener {
+public class ParallelMachineView extends AbstractParallelSetView implements INodeListener {
 	// actions
 	protected ParallelAction changeMachineAction = null;
 	// composite

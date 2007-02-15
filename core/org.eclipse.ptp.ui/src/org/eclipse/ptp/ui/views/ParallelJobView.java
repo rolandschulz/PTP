@@ -65,7 +65,7 @@ import org.eclipse.swt.widgets.TableItem;
  * @author Clement chu
  * 
  */
-public class ParallelJobView extends AbstractParallelSetView implements IProcessListener, IModelListener {
+public class ParallelJobView extends AbstractParallelSetView implements IProcessListener {
 	// selected element
 	protected String cur_selected_element_id = IManager.EMPTY_ID;
 	// composite
