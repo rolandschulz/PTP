@@ -44,7 +44,7 @@ public final class OffsetLength
 
     public int getPositionPastEnd()
     {
-        return offset + length;
+        return offset + Math.max(length, 1);
     }
 
     public void setLength(int length)
