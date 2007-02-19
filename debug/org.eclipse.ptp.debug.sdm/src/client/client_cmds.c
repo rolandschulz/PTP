@@ -48,8 +48,11 @@ static proxy_svr *		dbg_proxy;
  * The TIMEOUT determines how often the debugger polls progress routines.
  * Too often and it uses too much CPU, too few and things will slow down...
  */
-#define CLIENT_TIMEOUT	50000
-#define SERVER_TIMEOUT	50000
+ //TODO
+//#define CLIENT_TIMEOUT	50000
+//#define SERVER_TIMEOUT	50000
+#define CLIENT_TIMEOUT	100
+#define SERVER_TIMEOUT	100
 
 /**
  * A send command is completed. Process the result and 
