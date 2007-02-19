@@ -2765,7 +2765,7 @@ GDBGetPartialAIF(char* name, char* key, int listChildren, int express)
 
 	CHECK_SESSION();
 
-	//key is prefered if it exists 
+	//key is first perference if it exists 
 	var_name = (key == NULL || strlen(key) == 0)?name:key;
 
 	if (express) {
@@ -2792,7 +2792,6 @@ GDBGetPartialAIF(char* name, char* key, int listChildren, int express)
 			return DBGRES_ERR; 
 		}
 	}
-
 	if ((a = GetPartialAIF(mivar, var_name)) == NULL) {
 		DbgSetError(DBGERR_UNKNOWN_TYPE, mivar->type);
 		MIVarFree(mivar);
