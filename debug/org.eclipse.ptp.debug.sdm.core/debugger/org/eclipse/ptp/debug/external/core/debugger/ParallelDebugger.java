@@ -91,12 +91,19 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			if (proxy.waitForConnect(monitor))
 				proxy.addEventListener(this);
 		} catch (IOException e) {
-			try {
-				stopDebugger();
-			} catch (CoreException ex) {
-				//ex.printStackTrace();
-			}
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugCorePlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));
+		}
+	}
+	public void disconnection(IProgressMonitor monitor) throws CoreException {
+		try {
+			if (proxy != null) {
+				proxy.removeEventListener(this);
+				proxy.closeConnection();
+			}
+		} catch (IOException e) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPDebugCorePlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));
+		} finally {
+			proxy = null;
 		}
 	}
 	
@@ -117,9 +124,6 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 				proxy.sessionFinish();
 			} catch (IOException e) {
 				throw new CoreException(new Status(IStatus.ERROR, PTPDebugCorePlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));
-			} finally {
-				//proxy.removeEventListener(this);
-				proxy = null;
 			}
 		}
 	}

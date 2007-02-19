@@ -84,6 +84,8 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 	public void connection(IProgressMonitor monitor) throws CoreException {
 		completeCommand(null, IDebugCommand.RETURN_OK);
 	}
+	public void disconnection(IProgressMonitor monitor) throws CoreException {
+	}
 	public int getDebuggerPort() throws CoreException {
 		return 0;
 	}

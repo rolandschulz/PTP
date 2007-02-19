@@ -44,6 +44,11 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient imple
 	public AbstractProxyDebugClient() {
 		addEventListener(this);
 	}
+	public void closeConnection() throws IOException {
+		removeEventListener(this);
+		sessionFinish();
+		//sessionDestroy();
+	}
 	public synchronized void checkConnection() throws IOException {
 		if (!connected) {
 			try {
@@ -54,7 +59,7 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient imple
 			}
 		}
 		if (!connected) {
-			removeEventListener(this);
+			closeConnection();
 			throw new IOException("Cannot connect to proxy server.");
 		}
 	}
@@ -63,13 +68,13 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient imple
 			while (!connected) {
 				waiting = true;
 				if (monitor.isCanceled()) {
-					removeEventListener(this);
+					closeConnection();
 					return false;
 				}
-				wait(1000);
+				wait(500);
 			}
 		} catch (InterruptedException e) {
-			removeEventListener(this);
+			closeConnection();
 			throw new IOException(e.getMessage());
 		}
 		return true;
