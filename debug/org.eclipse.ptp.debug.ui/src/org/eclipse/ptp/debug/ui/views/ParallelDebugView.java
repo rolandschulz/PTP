@@ -69,6 +69,7 @@ import org.eclipse.ptp.ui.views.ParallelJobView;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.progress.WorkbenchJob;
 
 /**
@@ -85,23 +86,26 @@ public class ParallelDebugView extends ParallelJobView {
 	protected ParallelAction stepReturnAction = null;
 	protected ParallelAction registerAction = null;
 	protected ParallelAction unregisterAction = null;
-	protected AbstractPDebugEventHandler fEventHandler;
+	protected AbstractPDebugEventHandler fEventHandler = null;
+	protected Viewer launchViewer = null;
 	
 	private ISelectionChangedListener debugViewSelectChangedListener = new ISelectionChangedListener() {
 		public void selectionChanged(SelectionChangedEvent event) {
 			ISelection selection = event.getSelection();
 			if (!selection.isEmpty()) {
 				if (selection instanceof IStructuredSelection) {
-					canvas.unselectAllElements();
-					for (Iterator i=((IStructuredSelection)selection).iterator(); i.hasNext();) {
-						Object obj = i.next();
-						if (obj instanceof IPDebugElement) {
-							int taskID = ((IPDebugTarget)((IPDebugElement)obj).getDebugTarget()).getTargetID();
-							if (!canvas.isSelected(taskID))
-								canvas.selectElement(taskID);
+					if (canvas != null && !canvas.isDisposed()) {
+						canvas.unselectAllElements();
+						for (Iterator i=((IStructuredSelection)selection).iterator(); i.hasNext();) {
+							Object obj = i.next();
+							if (obj instanceof IPDebugElement) {
+								int taskID = ((IPDebugTarget)((IPDebugElement)obj).getDebugTarget()).getTargetID();
+								if (!canvas.isSelected(taskID))
+									canvas.selectElement(taskID);
+							}
 						}
+						canvas.redraw();
 					}
-					canvas.redraw();
 				}
 			}
 		}
@@ -134,12 +138,14 @@ public class ParallelDebugView extends ParallelJobView {
 	 * @see org.eclipse.ui.IWorkbenchPart#dispose()
 	 */
 	public void dispose() {
-		if (getEventHandler() != null) {
+		Viewer viewer = getDebugViewer();
+		if (viewer != null)
+			viewer.removeSelectionChangedListener(debugViewSelectChangedListener);
+		if (getEventHandler() != null)
 			getEventHandler().dispose();
-		}
-		getDebugViewer().removeSelectionChangedListener(debugViewSelectChangedListener);
 		super.dispose();
 	}
+	/*
 	protected Viewer getViewer(String view_id) {
 		//IViewPart part = PTPDebugUIPlugin.getActiveWorkbenchWindow().getActivePage().findView(IDebugUIConstants.ID_DEBUG_VIEW);
 		IViewPart part = getViewSite().getPage().findView(view_id);
@@ -148,8 +154,22 @@ public class ParallelDebugView extends ParallelJobView {
 		}
 		return null;
 	}
+	*/
 	protected Viewer getDebugViewer() {
-		return getViewer(IDebugUIConstants.ID_DEBUG_VIEW);
+		if (launchViewer == null) {
+			IViewPart part = getViewSite().getPage().findView(IDebugUIConstants.ID_DEBUG_VIEW);
+			if (part == null) {
+				try {
+					part = getViewSite().getPage().showView(IDebugUIConstants.ID_DEBUG_VIEW);
+				} catch (PartInitException e) {
+					return null;
+				}
+			}
+			if (part != null && part instanceof AbstractDebugView) {
+				launchViewer = ((AbstractDebugView)part).getViewer();
+			}			
+		}
+		return launchViewer;
 	}
 	/*
 	 * FIXME does not work if create a new set.  Currently we can task id to identify icon, but viewer is using order 

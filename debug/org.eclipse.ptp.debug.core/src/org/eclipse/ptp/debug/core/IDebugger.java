@@ -54,6 +54,7 @@ public interface IDebugger {
 	public int getDebuggerPort() throws CoreException;
 	
 	public void connection(IProgressMonitor monitor) throws CoreException;
+	public void disconnection(IProgressMonitor monitor) throws CoreException;
 	public void startDebugger(IPJob job) throws CoreException;
 	public void stopDebugger() throws CoreException;
 	

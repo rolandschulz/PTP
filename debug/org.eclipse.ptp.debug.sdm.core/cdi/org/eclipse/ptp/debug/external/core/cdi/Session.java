@@ -128,23 +128,19 @@ public class Session implements IPCDISession, IPCDISessionObject {
 	public void start(IProgressMonitor monitor) throws CoreException {
 		IWorkspaceRunnable r = new IWorkspaceRunnable() {
 			public void run(IProgressMonitor m) throws CoreException {
-				m.beginTask("", 3);
-				m.setTaskName("Creating debugging session...");
-				m.worked(1);
-				
 				boolean stopInMain = getLaunch().getLaunchConfiguration().getAttribute(IPTPLaunchConfigurationConstants.ATTR_STOP_IN_MAIN, false);
 				m.subTask("Initializing breakpoints...");
 				breakpointManager.setInitialBreakpoints();
 				if (stopInMain) {
 					breakpointManager.setInternalTemporaryBreakpoint(createBitList(), breakpointManager.createFunctionLocation("", "main"));
 				}
-				m.worked(1);
+				m.worked(5);
 				if (m.isCanceled()) {
 					throw new CoreException(Status.CANCEL_STATUS);
 				}
 				try {
 					resume(createBitList());
-					m.worked(1);
+					m.worked(5);
 				} catch (PCDIException e) {
 					throw new CoreException(new Status(IStatus.ERROR, PTPDebugExternalPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));			
 				} finally {
