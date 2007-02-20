@@ -13,7 +13,6 @@ package org.eclipse.ptp.lang.fortran.internal.core.dom.parser;
 
 import java.util.Iterator;
 
-//import lpg.lpgjavaruntime.IToken;
 import org.antlr.runtime.Token;
 
 import org.eclipse.cdt.core.dom.ast.IASTArrayDeclarator;
@@ -113,6 +112,9 @@ import org.eclipse.cdt.internal.core.dom.parser.c.CASTTypeIdInitializerExpressio
 import org.eclipse.cdt.internal.core.dom.parser.c.CASTTypedefNameSpecifier;
 
 import org.eclipse.ptp.lang.fortran.core.parser.FortranParser;
+import org.eclipse.ptp.lang.fortran.core.parser.IFortranParserAction;
+import org.eclipse.ptp.lang.fortran.core.parser.IFortranParserAction.KindParam;
+import org.eclipse.ptp.lang.fortran.core.parser.IFortranParserAction.LiteralConstant;
 
 
 /**
@@ -120,7 +122,7 @@ import org.eclipse.ptp.lang.fortran.core.parser.FortranParser;
  * 
  * @author crasmussen
  */
-public class FortranParserAction {
+public class FortranParserAction implements IFortranParserAction {
 
 	private static final char[] EMPTY_CHAR_ARRAY = {};
 	
@@ -172,17 +174,17 @@ public class FortranParserAction {
 	
 	
 	
-	private static int offset(Token token) {
-		// TODO - return token.getStartOffset();
-		return 0;
+	public static int offset(Token token) {
+		// TODO - fix line/character info;
+		return 80*(token.getLine() - 1) + token.getCharPositionInLine();
 	}
 	
 	private static int offset(IASTNode node) {
 		return ((ASTNode)node).getOffset();
 	}
 	
-	private static int length(Token token) {
-		return endOffset(token) - offset(token);
+	public static int length(Token token) {
+		return token.getText().length();
 	}
 	
 	private static int length(IASTNode node) {
@@ -233,17 +235,10 @@ public class FortranParserAction {
 	
 	
 	/**
-	 * constant ::= 'integer' | 'floating' | 'charconst' | 'stringlit'
-	 * 
-	 * @param kind One of the kind flags from IASTLiteralExpression
-	 * @see IASTLiteralExpression
+	 * @see org.eclipse.ptp.lang.fortran.core.parser.IFortranParserAction#consumeExpressionConstant(LiteralConstant, Token, KindParam, Token)
 	 */
-	protected void consumeExpressionConstant(int kind) {
-		FortranASTLiteralExpression expr = new FortranASTLiteralExpression();
-		Token token = parser.getRightIToken();
-		expr.setKind(kind);
-		expr.setValue(token.toString());
-		expr.setOffsetAndLength(offset(token), length(token));
+	public void consumeExpressionConstant(LiteralConstant kind, Token cToken, KindParam kindType, Token ktToken) {
+		FortranASTLiteralExpression expr = new FortranASTLiteralExpression(kind, cToken, kindType, ktToken);
 		astStack.push(expr);
 	}
 	
@@ -251,7 +246,7 @@ public class FortranParserAction {
 	/**
 	 * primary_expression ::= 'identifier'
 	 */
-	protected void consumeExpressionID() {
+	public void consumeExpressionID() {
 		FortranASTIdExpression expr = new FortranASTIdExpression();
 		FortranASTName name = createName(parser.getRightIToken());
 		expr.setName(name);
@@ -268,7 +263,7 @@ public class FortranParserAction {
 	 * 
 	 * @param op Field from IASTBinaryExpression
 	 */
-	protected void consumeExpressionBinaryOperator(int op) {
+	public void consumeExpressionBinaryOperator(int op) {
 		IASTExpression expr2 = (IASTExpression) astStack.pop();
 		IASTExpression expr1 = (IASTExpression) astStack.pop();
 		
