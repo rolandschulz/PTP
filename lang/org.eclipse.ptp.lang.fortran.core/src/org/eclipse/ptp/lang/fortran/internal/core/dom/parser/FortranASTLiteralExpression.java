@@ -11,18 +11,61 @@
  *******************************************************************************/
 package org.eclipse.ptp.lang.fortran.internal.core.dom.parser;
 
+import org.antlr.runtime.Token;
+
 import org.eclipse.cdt.core.dom.ast.ASTVisitor;
 import org.eclipse.cdt.core.dom.ast.IASTLiteralExpression;
 import org.eclipse.cdt.core.dom.ast.IType;
 
+import org.eclipse.ptp.lang.fortran.core.parser.IFortranParserAction.KindParam;
+import org.eclipse.ptp.lang.fortran.core.parser.IFortranParserAction.LiteralConstant;
+
 /**
- * @author jcamelon
+ * @author crasmussen
  */
 public class FortranASTLiteralExpression extends FortranASTNode implements
         IASTLiteralExpression {
 
     private int kind;
     private String value = ""; //$NON-NLS-1$
+    
+	/* Fortran specific variables */
+
+    private Token token;
+    private Token ktToken;
+    private int kindType = -1;
+    private KindParam kindTokenType = KindParam.none;
+    
+    FortranASTLiteralExpression(LiteralConstant fKind, Token cToken, KindParam kindTokenType, Token ktToken) {
+    	super();
+    	
+    	this.token = cToken;
+    	this.ktToken = ktToken;
+    	this.kindTokenType = kindTokenType;
+    	if (kindTokenType == KindParam.literal) {
+    		kindType = Integer.parseInt(ktToken.getText());
+    	} else {
+    		// TODO - get kind type from identifier
+    	}
+    	
+		setValue(cToken.getText());
+		setOffsetAndLength(FortranParserAction.offset(cToken), FortranParserAction.length(cToken));
+    	
+    	switch (fKind) {
+		case int_literal_constant:
+			setKind(IASTLiteralExpression.lk_integer_constant);		break;
+		case real_literal_constant:
+			setKind(IASTLiteralExpression.lk_float_constant);		break;
+		case complex_literal_constant:
+			setKind(IASTLiteralExpression.lk_last + 1);				break;
+		case logical_literal_constant:
+			setKind(IASTLiteralExpression.lk_last + 2);				break;
+		case char_literal_constant:
+			setKind(IASTLiteralExpression.lk_string_literal);		break;
+		case boz_literal_constant:
+			setKind(IASTLiteralExpression.lk_last + 3);				break;
+		}
+    }
 
     public int getKind() {
         return kind;
@@ -35,6 +78,12 @@ public class FortranASTLiteralExpression extends FortranASTNode implements
     public void setValue(String value) {
         this.value = value;
     }
+
+    /* Fortran specific methods */
+
+    public int getKindTypeParameter() {
+    	return kindType;
+	}
     
     public String toString() {
         return value;
