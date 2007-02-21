@@ -49,7 +49,7 @@ public class FortranASTLiteralExpression extends FortranASTNode implements
     	}
     	
 		setValue(cToken.getText());
-		setOffsetAndLength(FortranParserAction.offset(cToken), FortranParserAction.length(cToken));
+		setOffsetAndLength(FortranParserActionDom.offset(cToken), FortranParserActionDom.length(cToken));
     	
     	switch (fKind) {
 		case int_literal_constant:
