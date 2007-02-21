@@ -33,7 +33,21 @@ options {
         super.reportError(re);
         hasErrorOccurred = true;
     }
+
+    /** Provide an action object to implement the AST */
+    private IFortranParserAction action = FortranParserActionFactory.newAction(this, "CDT");
+
+	/* TODO - implement, needed by FortranParserAction */
+	public Token getRightIToken() {
+		return null;
+	}
+
+	/* TODO - implement, may be needed by FortranParserAction */
+	public Token getRhsIToken(int i) {
+		return null;
+	}
 }// end members
+
 
 /*
  * Section 1:
@@ -397,7 +411,17 @@ signed_int_literal_constant
 
 // R406
 int_literal_constant
-	:	T_DIGIT_STRING (T_UNDERSCORE kind_param)?
+@init {Token kind = null;}
+	:	T_DIGIT_STRING (T_UNDERSCORE kind_param {kind = $kind_param.start;})?
+		{
+			IFortranParserAction.KindParam type = IFortranParserAction.KindParam.none;
+			if (kind != null) {
+				if (kind.getType() == T_DIGIT_STRING) type = IFortranParserAction.KindParam.literal;
+				else type = IFortranParserAction.KindParam.id;
+			}
+			action.buildExpressionConstant(IFortranParserAction.LiteralConstant.int_literal_constant,
+			$T_DIGIT_STRING, type, kind);
+		}
 	;
 
 // R407
