@@ -32,6 +32,7 @@
 
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <sys/select.h>
 
 #include <proxy.h>
 #include <proxy_tcp.h>
@@ -53,7 +54,7 @@
 #include "orte_fixup.h"
 
 #define DEFAULT_PROXY		"tcp"
-#define DEFAULT_ORTED_ARGS	"orted --scope public --seed --persistent"
+#define DEFAULT_ORTED_ARGS	"orted --scope public --seed --persistent --no-daemonize"
 
 /*
  * RTEV codes must EXACTLY match org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEvent
@@ -126,6 +127,7 @@ struct ptp_job {
 };
 typedef struct ptp_job ptp_job;
 
+static void	get_proc_info(orte_jobid_t jobid, int ptpid);
 static int get_node_attribute(int machid, int node_num, char **input_keys, int *input_types, char **input_values, int input_num_keys);
 static void job_state_callback(orte_jobid_t jobid, orte_proc_state_t state);
 static int orte_console_send_command(orte_daemon_cmd_flag_t usercmd);
@@ -293,61 +295,100 @@ ORTECheckErrorCode(int type, int rc)
 int
 ORTEStartDaemon(char **args)
 {
-	int ret;
-	char *res, *universe_name;
+	int				n;
+	int				ret;
+	int				pfd[2];
+	char *			res;
+	char *			universe_name;
+	char			buf[BUFSIZ];
+	fd_set			fds;
+	struct timeval	timeout;
 	
-	switch(orted_pid = fork()) {
-		case -1:
-			{
-				res = ORTEErrorStr(RTEV_ERROR_ORTE_INIT, "fork() failed for the orted spawn in ORTESpawnDaemon");
-				AddToList(eventList, (void *)res);
-				printf("\t%s\n", res);
-				return 1;
-			}
-			break;
-		/* child */
-		case 0:
-			{
-				char **orted_args;
-				
-				proxy_svr_finish(orte_proxy);
-				
-				asprintf(&res, "%s --universe PTP-ORTE-%d", DEFAULT_ORTED_ARGS, getpid());
-
-				orted_args  = Str2Args(res);
-				printf("StartDaemon(orted %s)\n", res); fflush(stdout);
-				free(res);
-				
-				/* spawn the daemon */
-				printf("CHILD: Starting execvp now!\n"); fflush(stdout);
-				errno = 0;
-
-				setsid();
-				ret = execvp("orted", orted_args);
-
-				FreeArgs(orted_args);
-				
-				if (ret != 0) {
-					printf("CHILD: error return from execvp, ret = %d, errno = %d\n", ret, errno); fflush(stdout);
-					printf("CHILD: PATH = %s\n", getenv("PATH")); fflush(stdout);
-					exit(ret);
-				}
-			}
-			break;
-	    /* parent */
-	    default:
-	    	printf("PARENT: orted_pid = %d\n", orted_pid); fflush(stdout);
-			/* sleep - letting the daemon get started up */
-			sleep(1);
-			wait(&ret);
-			break;
-	}
-
-	if (ret != 0) {
-		printf("Start daemon returning ERROR, orted_pid = %d.\n", orted_pid); fflush(stdout);
-		res = ORTEErrorStr(RTEV_ERROR_ORTE_INIT, "initialization failed");
+	if (pipe(pfd) < 0)
+	{
+		res = ORTEErrorStr(RTEV_ERROR_ORTE_INIT, "pipe() failed for the orted spawn in ORTESpawnDaemon");
 		AddToList(eventList, (void *)res);
 		return 0;
+	}
+	
+	switch(orted_pid = fork()) {
+	case -1:
+		{
+			res = ORTEErrorStr(RTEV_ERROR_ORTE_INIT, "fork() failed for the orted spawn in ORTESpawnDaemon");
+			AddToList(eventList, (void *)res);
+			printf("\t%s\n", res);
+			return 1;
+		}
+		break;
+	/* child */
+	case 0:
+		{
+			char **orted_args;
+			
+			proxy_svr_finish(orte_proxy);
+			
+			asprintf(&res, "%s --universe PTP-ORTE-%d --report-uri %d", DEFAULT_ORTED_ARGS, getpid(), pfd[1]);
+
+			orted_args  = Str2Args(res);
+			printf("StartDaemon(orted %s)\n", res); fflush(stdout);
+			free(res);
+			
+			/* spawn the daemon */
+			printf("CHILD: Starting execvp now!\n"); fflush(stdout);
+			errno = 0;
+			close(pfd[0]);
+
+			setsid();
+			ret = execvp("orted", orted_args);
+
+			FreeArgs(orted_args);
+			
+			if (ret != 0) {
+				printf("CHILD: error return from execvp, ret = %d, errno = %d\n", ret, errno); fflush(stdout);
+				printf("CHILD: PATH = %s\n", getenv("PATH")); fflush(stdout);
+				exit(ret);
+			}
+		}
+		break;
+    /* parent */
+    default:
+    	printf("PARENT: orted_pid = %d\n", orted_pid); fflush(stdout);
+    	
+		/* 
+		 * the daemon will report it's URI on the pipe when it's started up 
+		 */
+		timeout.tv_sec = 15;
+		timeout.tv_usec = 0;
+		FD_ZERO(&fds);
+		FD_SET(pfd[0], &fds);
+		
+		switch (select(pfd[0]+1, &fds, NULL, NULL, &timeout)) {
+		case -1:
+			/*
+			 * Something serious has gone wrong. Kill the orted and shut down.
+			 */
+			(void)kill(orted_pid, SIGKILL);
+			res = ORTEErrorStr(RTEV_ERROR_ORTE_INIT, "select() returned error");
+			AddToList(eventList, (void *)res);
+			return 0;
+		case 0:
+			/*
+			 * Timeout. Kill off orted (if it's running) and shut down.
+			 */
+			(void)kill(orted_pid, SIGKILL);
+			res = ORTEErrorStr(RTEV_ERROR_ORTE_INIT, "Timeout waiting for orted to start");
+			AddToList(eventList, (void *)res);
+			return 0;
+		default:
+			if ((n = read(pfd[0], buf, BUFSIZ-1)) > 0) {
+				buf[n] = '\0';
+				printf("PARENT: URI = %s\n", buf); fflush(stdout);
+			}
+		}
+
+		close(pfd[0]);
+		close(pfd[1]);
+		break;
 	}
 	
 	asprintf(&universe_name, "PTP-ORTE-%d", orted_pid);
@@ -380,17 +421,13 @@ ORTEInit(char *universe_name)
 		
 	printf("ORTEInit (%s)\n", universe_name); fflush(stdout);
 	asprintf(&str, "OMPI_MCA_universe=%s", universe_name);
-	
-	printf("str = '%s'\n", str); fflush(stdout);
-	/* this makes the orte_init() fail if the orte daemon isn't
-	 * running */
-	putenv("OMPI_MCA_orte_univ_exist=1");
 	putenv(str);
-	/* we cannot free 'str' because it's hooked into the environment, putenv()
-	 * man says that any changes to 'str' will automagically change the
-	 * environment variable's value - which includes freeing it */
-	//free(str);
 	
+	/* 
+	 * make the orte_init() fail if the orte daemon isn't running
+	 */
+	putenv("OMPI_MCA_orte_univ_exist=1");
+
 	rc = orte_init(true);
 	
 	if(ORTECheckErrorCode(RTEV_ERROR_ORTE_INIT, rc)) return 1;
@@ -415,6 +452,8 @@ ORTEInit(char *universe_name)
 	return 0;
 }
 
+
+#if ORTE_VERSION_1_0
 /*
  * This callback gets invoked when any attributes of a process get changed.
  */
@@ -516,6 +555,8 @@ orte_subscribe_proc(ptp_job * job, int procid)
 	orte_gpr_value_t			value;
 	orte_gpr_value_t *			values;
 	orte_process_name_t			proc;
+
+	printf("subscribing proc %d\n", procid); fflush(stdout);
 	
 	rc = orte_ns.convert_jobid_to_string(&jobid_str, job->orte_jobid);
 	if(rc != ORTE_SUCCESS) {
@@ -593,6 +634,7 @@ ORTE_Subscribe_Job(orte_jobid_t jobid)
 		
 	return 0;
 }
+#endif /* ORTE_VERSION_1_0 */
 
 #ifdef HAVE_SYS_BPROC_H
 /*
@@ -884,9 +926,9 @@ ORTETerminateJob(char **args)
 	
 	if ((j = find_job(jobid, JOBID_PTP)) != NULL) {
 		if (j->debug_jobid < 0)
-			rc = ORTE_TERMINATE_JOB(j->orte_jobid, NULL);
+			rc = ORTE_TERMINATE_JOB(j->orte_jobid);
 		else
-			rc = ORTE_TERMINATE_JOB(j->debug_jobid, NULL);
+			rc = ORTE_TERMINATE_JOB(j->debug_jobid);
 		
 		if(ORTECheckErrorCode(RTEV_ERROR_TERMINATE_JOB, rc)) return 1;
 	}
@@ -1213,46 +1255,19 @@ ORTERun(char **args)
 		orte_job_record_start(jobid);
 	}
 	
+#if ORTE_VERSION_1_0
+	ORTE_Subscribe_Job(jobid);
+#else /* ORTE_VERSION_1_0 */
 	/*
 	 * If this is a debug job then the debugger will manage
 	 * process state. However we need to set up the process/node
 	 * mapping first.
 	 */
 	if (debug) {
-#if !ORTE_VERSION_1_0
-		char *					kv;
-		char *					str;
-		orte_job_map_t *		map;
-		opal_list_item_t *		item;
-		opal_list_item_t *		item2;
-		orte_mapped_node_t *	node;
-		orte_mapped_proc_t *	proc;
-		       
-		rc = orte_rmaps.get_job_map(&map, jobid);
-		if (rc == ORTE_SUCCESS) {
-	        for (item =  opal_list_get_first(&map->nodes);
-	             item != opal_list_get_end(&map->nodes);
-	             item =  opal_list_get_next(item)) {
-	            node = (orte_mapped_node_t*)item;
-				for (item2 = opal_list_get_first(&node->procs);
-                 item2 != opal_list_get_end(&node->procs);
-                 item2 = opal_list_get_next(item2)) {
-                	proc = (orte_mapped_proc_t*)item2;
-	                asprintf(&kv, "%s=%s", ATTRIB_PROCESS_NODE_NAME, node->nodename);
-	                proxy_cstring_to_str(kv, &str);
-	            	free(kv);
-	                asprintf(&res, "%d %d 0:0 1:0 1 %d %s", RTEV_PATTR, ptpid, proc->rank, str);
-			        AddToList(eventList, (void *)res);
-	            }
-	        }
-	        
-	        OBJ_RELEASE(map);
-		}
-#endif /* !ORTE_VERSION_1_0 */
-	} else {
-		ORTE_Subscribe_Job(jobid);
+		get_proc_info(jobid, ptpid);
 	}
-			
+#endif /* ORTE_VERSION_1_0 */
+	
 	printf("Returning from ORTERun\n"); fflush(stdout);
 	
 	return PROXY_RES_OK;
@@ -1410,6 +1425,12 @@ job_state_callback(orte_jobid_t jobid, orte_proc_state_t proc_state)
 	 * generate events where appropriate */
 	
 	switch (proc_state) {
+#if !ORTE_VERSION_1_0
+		case ORTE_JOB_STATE_LAUNCHED:
+			get_proc_info(jobid, j->ptp_jobid);
+			/* fall through */
+#endif /* !ORTE_VERSION_1_0 */
+			
 #if ORTE_VERSION_1_0
 		case ORTE_JOB_STATE_AT_STG1:
 #else /* ORTE_VERSION_1_0 */
@@ -1424,6 +1445,7 @@ job_state_callback(orte_jobid_t jobid, orte_proc_state_t proc_state)
 			if (orte_job_record_started(jobid)) {
 				orte_job_record_end(jobid);
 			}
+			ORTE_TERMINATE_ORTEDS(jobid);
 			remove_job(jobid, JOBID_ORTE);
 			state = JOB_STATE_TERMINATED;
 			break;
@@ -1442,7 +1464,7 @@ job_state_callback(orte_jobid_t jobid, orte_proc_state_t proc_state)
 		asprintf(&res, "%d %d %d", RTEV_JOBSTATE, j->ptp_jobid, state);
 		AddToList(eventList, (void *)res);
 	}
-	printf("state callback returning!\n"); fflush(stdout);
+	printf("state callback returning state=%d\n", state); fflush(stdout);
 }
 
 /*
@@ -1484,6 +1506,102 @@ orte_console_send_command(orte_daemon_cmd_flag_t usercmd)
 
     return ORTE_SUCCESS;
 }
+
+#if !ORTE_VERSION_1_0
+static void
+get_proc_info(orte_jobid_t jobid, int ptpid)
+{
+	int					i;
+	int					rc;
+	char *				segment = NULL;
+	ORTE_STD_CNTR_TYPE	cnt;
+	orte_gpr_value_t **	values;
+	char *				keys[] = {
+		ORTE_NODE_NAME_KEY,
+		ORTE_PROC_LOCAL_PID_KEY,
+		ORTE_PROC_RANK_KEY,
+		NULL
+	};
+	
+   if((rc = orte_schema.get_job_segment_name(&segment, jobid)) != ORTE_SUCCESS) {
+        ORTE_ERROR_LOG(rc);
+        return;
+    }
+	
+	rc = orte_gpr.get(ORTE_GPR_KEYS_OR | ORTE_GPR_TOKENS_OR, segment, NULL, keys, &cnt, &values);
+	if(rc != ORTE_SUCCESS) {
+		free(segment);
+		return;
+	}
+	
+    for (i = 0; i < cnt; i++) {
+    	int					k;
+		int					num = 0;
+		char *				res;
+		char *				str1;
+		char *				str2;
+		pid_t	*			pidptr;
+		orte_std_cntr_t		rank = 0;
+		orte_std_cntr_t		*rankptr;
+		orte_gpr_value_t *	value = values[i];
+		
+		res = NULL;
+		
+		for(k = 0; k < value->cnt; k++) {
+			char *				kv1;
+			char *				kv2;
+			orte_gpr_keyval_t *	keyval = value->keyvals[k];
+			
+			if(strcmp(keyval->key, ORTE_NODE_NAME_KEY) == 0) {
+				asprintf(&kv1, "%s=%s", ATTRIB_PROCESS_NODE_NAME, (char*)(keyval->value->data));
+				proxy_cstring_to_str(kv1, &str1);
+				free(kv1);
+				num |= 1;
+ 				continue;               
+			}
+			if(strcmp(keyval->key, ORTE_PROC_LOCAL_PID_KEY) == 0) {
+				if (ORTE_SUCCESS != (rc = orte_dss.get((void**)&pidptr, keyval->value, ORTE_PID))) {
+					ORTE_ERROR_LOG(rc);
+					continue;          
+				}       
+				asprintf(&kv2, "%s=%d", ATTRIB_PROCESS_PID, *pidptr);
+				proxy_cstring_to_str(kv2, &str2);
+				free(kv2);
+				num |= 2;
+				continue;               
+			}
+			if(strcmp(keyval->key, ORTE_PROC_RANK_KEY) == 0) {
+				if (ORTE_SUCCESS != (rc = orte_dss.get((void**)&rankptr, keyval->value, ORTE_STD_CNTR))) {
+					ORTE_ERROR_LOG(rc);
+					continue;          
+				}
+				rank = *rankptr;
+				continue;               
+			}
+					
+		}
+		
+		switch (num) {
+		case 1:
+	    	asprintf(&res, "%d %d 0:0 1:0 1 %d %s", RTEV_PATTR, ptpid, rank, str1);
+			free(str1);
+			break;
+		case 2:
+			asprintf(&res, "%d %d 0:0 1:0 1 %d %s", RTEV_PATTR, ptpid, rank, str2);
+			free(str2);
+			break;
+		case 3:
+			asprintf(&res, "%d %d 0:0 1:0 2 %d %s %d %s", RTEV_PATTR, ptpid, rank, str1, rank, str2);
+			free(str1);
+			free(str2);
+			break;
+		}
+		
+		if (res != NULL)
+			AddToList(eventList, (void *)res);
+    }
+}
+#endif /* !ORTE_VERSION_1_0 */
 
 #if ORTE_VERSION_1_0
 /*
@@ -1925,8 +2043,11 @@ ORTEQuit(char **args)
 int
 server(char *name, char *host, int port)
 {
-	char *msg, *msg1, *msg2;
-	int rc;
+	char *	msg;
+	char *	msg1;
+	char *	msg2;
+	int		rc;
+	int		shutdown_orted = 1;
 	
 	eventList = NewList();
 	jobList = NewList();
@@ -1973,14 +2094,21 @@ server(char *name, char *host, int port)
 				asprintf(&msg1, "ABRT");
 				asprintf(&msg2, "Process Aborted");
 				break;
+			case SIGCHLD:
+				asprintf(&msg1, "CHLD");
+				asprintf(&msg2, "ORTED Process Exited");
+				shutdown_orted = 0;
+				break;
 			default:
 				asprintf(&msg1, "***UNKNOWN SIGNAL***");
 				asprintf(&msg2, "ERROR - UNKNOWN SIGNAL, REPORT THIS!");
 				break;
 		}
 		printf("###### SIGNAL: %s\n", msg1);
-		printf("###### Shutting down ORTEd\n");
-		ORTEShutdown();
+		if (shutdown_orted) {
+			printf("###### Shutting down ORTEd\n");
+			ORTEShutdown();
+		}
 		asprintf(&msg, "ptp_orte_proxy received signal %s (%s).  Exit was required and performed cleanly.", msg1, msg2);
 		//proxy_svr_event_callback(orte_proxy, ORTEErrorStr(RTEV_ERROR_SIGNAL, msg));
 		AddToList(eventList, (void *) ORTEErrorStr(RTEV_ERROR_SIGNAL, msg));
@@ -2000,6 +2128,9 @@ server(char *name, char *host, int port)
 RETSIGTYPE
 ptp_signal_handler(int sig)
 {
+		int	ret;
+		if (sig == SIGCHLD)
+			wait(&ret);
 		ptp_signal_exit = sig;
 		if(sig >= 0 && sig < NSIG) {
 			RETSIGTYPE (*saved_signal)(int) = saved_signals[sig];
@@ -2048,6 +2179,7 @@ main(int argc, char *argv[])
 	saved_signals[SIGTERM] = signal(SIGTERM, ptp_signal_handler);
 	saved_signals[SIGQUIT] = signal(SIGQUIT, ptp_signal_handler);
 	saved_signals[SIGABRT] = signal(SIGABRT, ptp_signal_handler);
+	saved_signals[SIGCHLD] = signal(SIGCHLD, ptp_signal_handler);
 	
 	if(saved_signals[SIGINT] != SIG_ERR && saved_signals[SIGINT] != SIG_IGN && saved_signals[SIGINT] != SIG_DFL) {
 		printf("  ---> SIGNAL SIGINT was previously already defined.  Shadowing.\n"); fflush(stdout);
@@ -2068,6 +2200,9 @@ main(int argc, char *argv[])
 		printf("  ---> SIGNAL SIGQUIT was previously already defined.  Shadowing.\n"); fflush(stdout);
 	}
 	if(saved_signals[SIGABRT] != SIG_ERR && saved_signals[SIGABRT] != SIG_IGN && saved_signals[SIGABRT] != SIG_DFL) {
+		printf("  ---> SIGNAL SIGABRT was previously already defined.  Shadowing.\n"); fflush(stdout);
+	}	
+	if(saved_signals[SIGCHLD] != SIG_ERR && saved_signals[SIGABRT] != SIG_IGN && saved_signals[SIGCHLD] != SIG_DFL) {
 		printf("  ---> SIGNAL SIGABRT was previously already defined.  Shadowing.\n"); fflush(stdout);
 	}	
 	rc = server(proxy_str, host, port);

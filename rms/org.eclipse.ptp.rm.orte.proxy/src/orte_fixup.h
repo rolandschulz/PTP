@@ -60,7 +60,8 @@
 #if ORTE_VERSION_1_0
 #define ORTE_QUERY(jobid)									orte_rmgr.query()
 #define ORTE_LAUNCH_JOB(jobid)								orte_rmgr.launch(jobid)
-#define ORTE_TERMINATE_JOB(jobid,attr)						orte_rmgr.terminate_job(jobid)
+#define ORTE_TERMINATE_JOB(jobid)							orte_rmgr.terminate_job(jobid)
+#define ORTE_TERMINATE_ORTEDS(jobid)
 #define ORTE_SETUP_JOB(app_context,num_context,jobid,attr)	orte_rmgr.create(app_context,num_context,jobid)
 #define ORTE_SUBSCRIBE(jobid,cbfunc,cbdata,cond)			orte_rmgr_base_proc_stage_gate_subscribe(jobid,cbfunc,cbdata,cond)
 #define ORTE_SPAWN(apps,num_apps,jobid,cbfunc)				orte_rmgr.spawn(apps,num_apps,jobid,cbfunc)
@@ -74,7 +75,6 @@
 #define ORTE_STD_CNTR_TYPE									size_t
 #else /* ORTE_VERSION_1_0 */
 #define ORTE_QUERY(jobid)									orte_rds.query(jobid)
-#define ORTE_TERMINATE_JOB(jobid,attr)						orte_pls.terminate_job(jobid, attr)
 #define ORTE_SUBSCRIBE(jobid,cbfunc,cbdata,cond)			orte_smr.job_stage_gate_subscribe(jobid,cbfunc,cbdata,cond)
 #define ORTE_PACK(buf,cmd,num,type)							orte_dss.pack(buf,cmd,num,type)
 #define ORTE_GET_VPID_RANGE(jobid, start, range)			orte_rmgr.get_vpid_range(jobid, start, range)
@@ -272,6 +272,56 @@ ORTE_LAUNCH_JOB(orte_jobid_t jobid)
 	return rc;
 }
 
+static int
+ORTE_TERMINATE_JOB(orte_jobid_t jobid)
+{
+	int				rc;
+	opal_list_t		attr;
+	struct timeval	timeout;
+	
+	timeout.tv_sec = 10;
+    timeout.tv_usec = 0;
+    
+	OBJ_CONSTRUCT(&attr, opal_list_t);
+	
+	orte_rmgr.add_attribute(&attr, ORTE_NS_INCLUDE_DESCENDANTS, ORTE_UNDEF, NULL, ORTE_RMGR_ATTR_OVERRIDE);
+	
+	rc = orte_pls.terminate_job(jobid, &timeout, &attr);
+
+	OBJ_DESTRUCT(&attr);
+	
+	if(rc != ORTE_SUCCESS) {
+		ORTE_ERROR_LOG(rc);
+	}
+	
+	return rc;
+}
+
+static int
+ORTE_TERMINATE_ORTEDS(orte_jobid_t jobid)
+{
+	int				rc;
+	opal_list_t		attr;
+	struct timeval	timeout;
+	
+	timeout.tv_sec = 10;
+    timeout.tv_usec = 0;
+    
+	OBJ_CONSTRUCT(&attr, opal_list_t);
+	
+	orte_rmgr.add_attribute(&attr, ORTE_NS_INCLUDE_DESCENDANTS, ORTE_UNDEF, NULL, ORTE_RMGR_ATTR_OVERRIDE);
+	
+	rc = orte_pls.terminate_orteds(jobid, &timeout, &attr);
+
+	OBJ_DESTRUCT(&attr);
+	
+	if(rc != ORTE_SUCCESS) {
+		ORTE_ERROR_LOG(rc);
+	}
+	
+	return rc;
+}
+
 static int 
 ORTE_SPAWN(orte_app_context_t **apps, int num_apps, orte_jobid_t *jobid, void (*cbfunc)(orte_jobid_t, orte_proc_state_t))
 {
@@ -309,15 +359,5 @@ ORTE_GET_STRING_VALUE(orte_gpr_keyval_t *keyval)
     orte_dss.get((void **) &tmp_str, keyval->value, ORTE_STRING);
 		
 	return tmp_str;
-}
-
-static int
-ORTE_GET_PID_VALUE(orte_gpr_keyval_t *keyval)
-{
-	int	tmp_int = 0;
-	
-    orte_dss.get((void **) &tmp_int, keyval->value, ORTE_UINT32);
-		
-	return tmp_int;
 }
 #endif /* !ORTE_VERSION_1_0 */
