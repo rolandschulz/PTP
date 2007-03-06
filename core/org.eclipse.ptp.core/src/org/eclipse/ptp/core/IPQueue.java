@@ -33,6 +33,11 @@ public interface IPQueue extends IPElement {
 	 * @return
 	 */
 	IPJob[] getJobs();
+
+	/**
+	 * @return
+	 */
+	IPJob[] getSortedJobs();
 	
 	/**
 	 * @return
