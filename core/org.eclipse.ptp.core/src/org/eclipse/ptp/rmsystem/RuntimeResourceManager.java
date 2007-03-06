@@ -120,7 +120,8 @@ public abstract class RuntimeResourceManager extends AbstractResourceManager
 		 * @see org.eclipse.ptp.core.elementcontrols.IPQueueControl#getJobControls()
 		 */
 		public synchronized IPJobControl[] getJobControls() {
-			return (IPJobControl[]) getCollection().toArray(new IPJobControl[0]);
+			IPJobControl[] jobs = (IPJobControl[]) getCollection().toArray(new IPJobControl[0]);
+			return jobs;
 		}
 
 		/* (non-Javadoc)
@@ -130,6 +131,15 @@ public abstract class RuntimeResourceManager extends AbstractResourceManager
 			return getJobControls();
 		}
 
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.core.IPQueue#getJobs()
+		 */
+		public synchronized IPJob[] getSortedJobs() {
+			IPJobControl[] jobs = getJobControls();
+			sort(jobs);
+			return jobs;
+		}
+		
 		/* (non-Javadoc)
 		 * @see org.eclipse.ptp.core.IPQueue#getName()
 		 */

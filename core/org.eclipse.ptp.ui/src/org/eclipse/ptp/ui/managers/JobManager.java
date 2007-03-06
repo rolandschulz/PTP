@@ -283,7 +283,7 @@ public class JobManager extends AbstractUIManager {
 		// loop until we find a job or run out of queues
 		for (Iterator qit = queues.iterator(); qit.hasNext() && last_job_id.equals(EMPTY_ID); ) {
 			final IPQueue q = (IPQueue) qit.next();
-			jobs = q.getJobs();
+			jobs = q.getSortedJobs();
 			if (jobs.length > 0) {
 				// focus on last job
 				final IPJob lastJob = jobs[jobs.length - 1];
