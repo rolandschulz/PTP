@@ -56,14 +56,14 @@ public class MappingSourceContainer extends AbstractSourceContainer {
 
 	private String fName;
 
-	private ArrayList fContainers;
+	private ArrayList<MapEntrySourceContainer> fContainers;
 
 	/**
 	 * Constructor for MappingSourceContainer.
 	 */
 	public MappingSourceContainer(String name) {
 		fName = name;
-		fContainers = new ArrayList();
+		fContainers = new ArrayList<MapEntrySourceContainer>();
 	}
 
 	/*
@@ -103,11 +103,11 @@ public class MappingSourceContainer extends AbstractSourceContainer {
 	}
 
 	protected Object[] findSourceElements(String name, ISourceContainer[] containers) throws CoreException {
-		List results = null;
+		List<Object> results = null;
 		CoreException single = null;
 		MultiStatus multiStatus = null;
 		if (isFindDuplicates()) {
-			results = new ArrayList();
+			results = new ArrayList<Object>();
 		}
 		for (int i = 0; i < containers.length; i++) {
 			ISourceContainer container = containers[i];

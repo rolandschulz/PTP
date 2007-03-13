@@ -41,14 +41,14 @@ import org.eclipse.ptp.debug.external.core.commands.DataReadMemoryCommand;
  */
 public class MemoryManager extends Manager {
 	IPCDIMemoryBlock[] EMPTY_MEMORY_BLOCKS = {};
-	Map blockMap;
+	Map<Target, List<IPCDIMemoryBlock>> blockMap;
 
 	/** Constructor
 	 * @param session
 	 */
 	public MemoryManager(Session session) {
 		super(session, true);
-		blockMap = new Hashtable();
+		blockMap = new Hashtable<Target, List<IPCDIMemoryBlock>>();
 	}
 	public void shutdown() {
 		blockMap.clear();
@@ -57,10 +57,10 @@ public class MemoryManager extends Manager {
 	 * @param target
 	 * @return
 	 */
-	synchronized List getMemoryBlockList(Target target) {
-		List blockList = (List)blockMap.get(target);
+	synchronized List<IPCDIMemoryBlock> getMemoryBlockList(Target target) {
+		List<IPCDIMemoryBlock> blockList = blockMap.get(target);
 		if (blockList == null) {
-			blockList = Collections.synchronizedList(new ArrayList());
+			blockList = Collections.synchronizedList(new ArrayList<IPCDIMemoryBlock>());
 			blockMap.put(target, blockList);
 		}
 		return blockList;
@@ -74,9 +74,9 @@ public class MemoryManager extends Manager {
 	 * @see org.eclipse.ptp.debug.external.core.cdi.Manager#update(org.eclipse.ptp.debug.external.core.cdi.model.Target)
 	 */
 	public void update(Target target) {
-		List blockList = getMemoryBlockList(target);
+		List<IPCDIMemoryBlock> blockList = getMemoryBlockList(target);
 		MemoryBlock[] blocks = (MemoryBlock[]) blockList.toArray(new MemoryBlock[blockList.size()]);
-		List eventList = new ArrayList(blocks.length);
+		List<IPCDIEvent> eventList = new ArrayList<IPCDIEvent>(blocks.length);
 		for (int i = 0; i < blocks.length; i++) {
 			if (! blocks[i].isFrozen()) {
 				try {
@@ -95,7 +95,7 @@ public class MemoryManager extends Manager {
 	 * @return
 	 * @throws PCDIException
 	 */
-	public BigInteger[] update(MemoryBlock block, List aList) throws PCDIException {
+	public BigInteger[] update(MemoryBlock block, List<IPCDIEvent> aList) throws PCDIException {
 		MemoryBlock newBlock = cloneBlock(block);
 		boolean newAddress = ! newBlock.getStartAddress().equals(block.getStartAddress());
 		BigInteger[] array = compareBlocks(block, newBlock);
@@ -124,7 +124,7 @@ public class MemoryManager extends Manager {
 	BigInteger[] compareBlocks(MemoryBlock oldBlock, MemoryBlock newBlock) throws PCDIException {
 		byte[] oldBytes = oldBlock.getBytes();
 		byte[] newBytes = newBlock.getBytes();
-		List aList = new ArrayList(newBytes.length);
+		List<BigInteger> aList = new ArrayList<BigInteger>(newBytes.length);
 		BigInteger distance = newBlock.getStartAddress().subtract(oldBlock.getStartAddress());
 		//IPF_TODO enshure it is OK here
 		int diff = distance.intValue();
@@ -173,14 +173,14 @@ public class MemoryManager extends Manager {
 		boolean little = target.isLittleEndian();
 		DataReadMemoryInfo info = createDataReadMemoryInfo(target, address, units, wordSize);
 		IPCDIMemoryBlock block = new MemoryBlock(target, address, wordSize, little, info);
-		List blockList = getMemoryBlockList(target);
+		List<IPCDIMemoryBlock> blockList = getMemoryBlockList(target);
 		blockList.add(block);
 		//IPCDISession session = target.getSession();
 		//session.getDebugger().fireEvent(new MemoryCreatedEvent(session, block.getStartAddress(), block.getLength()));
 		return block;
 	}
 	public IPCDIMemoryBlock[] getMemoryBlocks(Target target) throws PCDIException {
-		List blockList = getMemoryBlockList(target);
+		List<IPCDIMemoryBlock> blockList = getMemoryBlockList(target);
 		return (IPCDIMemoryBlock[]) blockList.toArray(new IPCDIMemoryBlock[blockList.size()]);
 	}
 
@@ -190,7 +190,7 @@ public class MemoryManager extends Manager {
 	}
 
 	public void removeBlocks(Target target, IPCDIMemoryBlock[] memoryBlocks) throws PCDIException {
-		List blockList = (List)blockMap.get(target);
+		List<IPCDIMemoryBlock> blockList = blockMap.get(target);
 		if (blockList != null) {
 			blockList.removeAll(Arrays.asList(memoryBlocks));
 		}

@@ -328,7 +328,7 @@ public class PVariableDialog extends Dialog {
 		return composite;
 	}
 	protected String[] getSelectedSets() {
-		List sets = new ArrayList();
+		List<String> sets = new ArrayList<String>();
 		TableItem[] items = setTable.getItems();
 		for (int i=0; i<items.length; i++) {
 			if (items[i].getChecked())
@@ -337,7 +337,7 @@ public class PVariableDialog extends Dialog {
 		return (String[])sets.toArray(new String[0]);
 	}
 	protected String[] getSelectedAvailableVariables() {
-		List vars = new ArrayList();
+		List<String> vars = new ArrayList<String>();
 		TableItem[] items = varTable.getItems();
 		for (int i=0; i<items.length; i++) {
 			if (items[i].getChecked())

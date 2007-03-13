@@ -50,7 +50,7 @@ public class MapEntrySourceContainer extends AbstractSourceContainer {
 			path = path.removeFirstSegments(getBackendPath().segmentCount());
 			path = getLocalPath().append(path);
 			IFile[] wsFiles = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocation(path);
-			ArrayList list = new ArrayList();
+			ArrayList<IFile> list = new ArrayList<IFile>();
 			for (int j = 0; j < wsFiles.length; ++j) {
 				if (wsFiles[j].exists()) {
 					list.add(wsFiles[j]);

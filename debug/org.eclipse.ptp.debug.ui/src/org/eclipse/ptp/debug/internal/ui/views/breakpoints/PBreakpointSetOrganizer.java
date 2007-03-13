@@ -31,44 +31,48 @@ import org.eclipse.ptp.debug.internal.ui.PDebugImage;
 
 /**
  * @author Clement chu
- *
+ * 
  */
 public class PBreakpointSetOrganizer extends AbstractBreakpointOrganizerDelegate {
-	private Map types = new HashMap();
+	private Map<String, IAdaptable[]> types = new HashMap<String, IAdaptable[]>();
 
-    /* (non-Javadoc)
-     * @see org.eclipse.debug.ui.IBreakpointOrganizerDelegate#getCategories(org.eclipse.debug.core.model.IBreakpoint)
-     */
-    public IAdaptable[] getCategories(IBreakpoint breakpoint) {
-        if (!(breakpoint instanceof IPBreakpoint))
-        		return null;
-        	
-        IBreakpointTypeCategory category = (IBreakpointTypeCategory)breakpoint.getAdapter(IBreakpointTypeCategory.class);
-        if (category != null) {
-            return new IAdaptable[]{ category };
-        }
-        
-		IPBreakpoint pBpt = (IPBreakpoint)breakpoint;
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.ui.IBreakpointOrganizerDelegate#getCategories(org.eclipse.debug.core.model.IBreakpoint)
+	 */
+	public IAdaptable[] getCategories(IBreakpoint breakpoint) {
+		if (!(breakpoint instanceof IPBreakpoint))
+			return null;
+
+		IBreakpointTypeCategory category = (IBreakpointTypeCategory) breakpoint.getAdapter(IBreakpointTypeCategory.class);
+		if (category != null) {
+			return new IAdaptable[] { category };
+		}
+
+		IPBreakpoint pBpt = (IPBreakpoint) breakpoint;
 		try {
-			String sid = pBpt.getSetId();    			
+			String sid = pBpt.getSetId();
 			if (sid.length() > 0) {
-				IAdaptable[] categories = (IAdaptable[])types.get(sid);
-    	    		if (category == null) {
-    	    			categories = new IAdaptable[]{ new BreakpointTypeCategory(sid, PDebugImage.ID_IMG_DEBUG_PTPBPTSET) };
-    	    			types.put(sid, category);
-    	    		}
-    	    		return categories;
+				IAdaptable[] categories = (IAdaptable[]) types.get(sid);
+				if (category == null) {
+					categories = new IAdaptable[] { new BreakpointTypeCategory(sid, PDebugImage.ID_IMG_DEBUG_PTPBPTSET) };
+					types.put(sid, categories);
+				}
+				return categories;
 			}
 		} catch (CoreException e) {
 			return null;
 		}
-    	return null;
-    }
-    
-    /* (non-Javadoc)
-     * @see org.eclipse.debug.ui.IBreakpointOrganizerDelegate#dispose()
-     */
-    public void dispose() {
-    	types.clear();
-    }
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.ui.IBreakpointOrganizerDelegate#dispose()
+	 */
+	public void dispose() {
+		types.clear();
+	}
 }

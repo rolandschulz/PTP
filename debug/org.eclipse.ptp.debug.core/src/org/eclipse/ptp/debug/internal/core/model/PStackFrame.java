@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+
 import org.eclipse.cdt.core.IAddress;
 import org.eclipse.cdt.core.IAddressFactory;
 import org.eclipse.cdt.debug.core.cdi.CDIException;
@@ -48,7 +49,9 @@ import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEventListener;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIArgumentDescriptor;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIExpression;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDILocalVariableDescriptor;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDILocation;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDILocator;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIStackFrame;
@@ -56,6 +59,7 @@ import org.eclipse.ptp.debug.core.cdi.model.IPCDIThread;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIVariableDescriptor;
 import org.eclipse.ptp.debug.core.model.IPGlobalVariable;
 import org.eclipse.ptp.debug.core.model.IPStackFrame;
+import org.eclipse.ptp.debug.core.model.IPVariable;
 import org.eclipse.ptp.debug.core.model.IResumeWithoutSignal;
 import org.eclipse.ptp.debug.core.sourcelookup.IPSourceLocator;
 import org.eclipse.ptp.debug.internal.core.PGlobalVariableManager;
@@ -68,9 +72,9 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 	private IPCDIStackFrame fCDIStackFrame;
 	private IPCDIStackFrame fLastCDIStackFrame;
 	private PThread fThread;
-	private List fVariables;
+	private List<IPVariable> fVariables;
 	private boolean fRefreshVariables = true;
-	private List fExpressions;
+	private List<PExpression> fExpressions;
 	private boolean fIsDisposed = false;
 
 	public PStackFrame(PThread thread, IPCDIStackFrame cdiFrame) {
@@ -87,21 +91,21 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 	}
 	public IVariable[] getVariables() throws DebugException {
 		IPGlobalVariable[] globals = getGlobals();
-		List vars = getVariables0();
-		List all = new ArrayList(globals.length + vars.size());
+		List<IPVariable> vars = getVariables0();
+		List<IPVariable> all = new ArrayList<IPVariable>(globals.length + vars.size());
 		all.addAll(Arrays.asList(globals));
 		all.addAll(vars);
 		return (IVariable[]) all.toArray(new IVariable[all.size()]);
 	}
-	protected synchronized List getVariables0() throws DebugException {
+	protected synchronized List<IPVariable> getVariables0() throws DebugException {
 		if (isDisposed()) {
 			return Collections.EMPTY_LIST;
 		}
 		PThread thread = (PThread) getThread();
 		if (thread.isSuspended()) {
 			if (fVariables == null) {
-				List vars = getAllCDIVariableObjects();
-				fVariables = new ArrayList(vars.size());
+				List<IPCDIVariableDescriptor> vars = getAllCDIVariableObjects();
+				fVariables = new ArrayList<IPVariable>(vars.size());
 				Iterator it = vars.iterator();
 				while (it.hasNext()) {
 					fVariables.add(PVariableFactory.createLocalVariable(this, (IPCDIVariableDescriptor) it.next()));
@@ -362,8 +366,8 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 		}
 		fExpressions = null;
 	}
-	protected List getCDILocalVariableObjects() throws DebugException {
-		List list = new ArrayList();
+	protected List<IPCDIVariableDescriptor> getCDILocalVariableObjects() throws DebugException {
+		List<IPCDIVariableDescriptor> list = new ArrayList<IPCDIVariableDescriptor>();
 		try {
 			list.addAll(Arrays.asList(getCDIStackFrame().getLocalVariableDescriptors()));
 		} catch (PCDIException e) {
@@ -371,8 +375,8 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 		}
 		return list;
 	}
-	protected List getCDIArgumentObjects() throws DebugException {
-		List list = new ArrayList();
+	protected List<IPCDIVariableDescriptor> getCDIArgumentObjects() throws DebugException {
+		List<IPCDIVariableDescriptor> list = new ArrayList<IPCDIVariableDescriptor>();
 		try {
 			list.addAll(Arrays.asList(getCDIStackFrame().getArgumentDescriptors()));
 		} catch (PCDIException e) {
@@ -380,8 +384,8 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 		}
 		return list;
 	}
-	protected List getAllCDIVariableObjects() throws DebugException {
-		List list = new ArrayList();
+	protected List<IPCDIVariableDescriptor> getAllCDIVariableObjects() throws DebugException {
+		List<IPCDIVariableDescriptor> list = new ArrayList<IPCDIVariableDescriptor>();
 		list.addAll(getCDIArgumentObjects());
 		list.addAll(getCDILocalVariableObjects());
 		return list;
@@ -488,7 +492,7 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 			return null;
 		}
 		if (fExpressions == null) {
-			fExpressions = new ArrayList(5);
+			fExpressions = new ArrayList<PExpression>(5);
 		}
 		PExpression expression = null;
 		Iterator it = fExpressions.iterator();

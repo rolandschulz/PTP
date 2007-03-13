@@ -442,10 +442,11 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			return IPCDIErrorEvent.DBG_FATAL;
 		//case IParallelDebuggerConstants.DBGERR_INPROGRESS:
 		case IParallelDebuggerConstants.DBGERR_UNKNOWN_TYPE:
-		case IParallelDebuggerConstants.DBGERR_UNKNOWN_VARIABLE:
 		case IParallelDebuggerConstants.DBGERR_NOFILE:
 		case IParallelDebuggerConstants.DBGERR_NOBP:
 			return IPCDIErrorEvent.DBG_NORMAL;
+		case IParallelDebuggerConstants.DBGERR_UNKNOWN_VARIABLE:
+			return IPCDIErrorEvent.DBG_IGNORE;
 		default:
 			return IPCDIErrorEvent.DBG_WARNING;
 		}

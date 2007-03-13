@@ -36,7 +36,7 @@ import org.eclipse.debug.core.model.IFlushableStreamMonitor;
  */
 public class POutputStreamMonitor implements IFlushableStreamMonitor {
 	private InputStream fStream;
-	private List fListeners = new ArrayList(1);
+	private List<IStreamListener> fListeners = new ArrayList<IStreamListener>(1);
 	private boolean fBuffered = true;
 	private StringBuffer fContents;
 	private Thread fThread;

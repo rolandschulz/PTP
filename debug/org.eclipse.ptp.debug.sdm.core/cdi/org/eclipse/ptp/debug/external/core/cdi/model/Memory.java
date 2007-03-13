@@ -28,7 +28,7 @@ import java.util.List;
 public class Memory {
 	String addr;
 	long [] data = new long[0];
-	List badOffsets = new ArrayList();
+	List<Integer> badOffsets = new ArrayList<Integer>();
 	String ascii = "";
 	
 	/** Constructor

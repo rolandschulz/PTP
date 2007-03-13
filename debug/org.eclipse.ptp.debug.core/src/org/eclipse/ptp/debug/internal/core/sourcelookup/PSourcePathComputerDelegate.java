@@ -58,7 +58,7 @@ public class PSourcePathComputerDelegate implements ISourcePathComputerDelegate 
 	 */
 	public ISourceContainer[] computeSourceContainers( ILaunchConfiguration configuration, IProgressMonitor monitor ) throws CoreException {
 		ISourceContainer[] common = PTPDebugCorePlugin.getDefault().getCommonSourceLookupDirector().getSourceContainers();
-		ArrayList containers = new ArrayList( common.length + 1 );
+		ArrayList<ISourceContainer> containers = new ArrayList<ISourceContainer>( common.length + 1 );
 		containers.addAll( Arrays.asList( common ) );
 		String projectName = configuration.getAttribute( IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME, (String)null );
 		if ( projectName != null ) {

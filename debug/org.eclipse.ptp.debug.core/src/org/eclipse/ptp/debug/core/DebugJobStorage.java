@@ -29,13 +29,13 @@ import java.util.Map;
  * @author Clement chu
  */
 public class DebugJobStorage {
-	private static Map storages = new HashMap();
+	private static Map<String, DebugJobStorage> storages = new HashMap<String, DebugJobStorage>();
 	
 	private String name;
-	private Map jobMap;
+	private Map<String, Storage> jobMap;
 	
 	public DebugJobStorage(String name) {
-		jobMap = new HashMap();
+		jobMap = new HashMap<String, Storage>();
 		if (containsKey(name)) {
 			this.name = name + "1";
 			addDebugStorage(this.name, this);
@@ -71,7 +71,7 @@ public class DebugJobStorage {
 	}
 	public Iterator getJobValueIterator() {
 		synchronized (jobMap) {
-			List values = new ArrayList();
+			List<Object> values = new ArrayList<Object>();
 			for (Iterator i=jobMap.values().iterator(); i.hasNext();) {
 				values.addAll(((Storage)i.next()).getValues());
 			}
@@ -80,7 +80,7 @@ public class DebugJobStorage {
 	}
 	public Object[] getJobValues() {
 		synchronized (jobMap) {
-			List values = new ArrayList();
+			List<Object> values = new ArrayList<Object>();
 			for (Iterator i=jobMap.values().iterator(); i.hasNext();) {
 				values.addAll(((Storage)i.next()).getValues());
 			}
@@ -114,7 +114,7 @@ public class DebugJobStorage {
 	}
 	
 	private class Storage {
-		Map aMap = new HashMap();
+		Map<String, Object> aMap = new HashMap<String, Object>();
 		void clean() {
 			aMap.clear();
 		}
@@ -138,7 +138,7 @@ public class DebugJobStorage {
 				return aMap.get(key);
 			}
 		}
-		Collection getValues() {
+		Collection<Object> getValues() {
 			synchronized (aMap) {
 				return aMap.values();
 			}

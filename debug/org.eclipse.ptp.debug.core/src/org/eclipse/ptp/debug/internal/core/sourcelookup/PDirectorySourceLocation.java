@@ -121,12 +121,12 @@ public class PDirectorySourceLocation implements IDirectorySourceLocation {
 			return null;
 		File[] folders = getFolders();
 		if (folders != null) {
-			LinkedList list = new LinkedList();
+			LinkedList<Object> list = new LinkedList<Object>();
 			for (int i = 0; i < folders.length; ++i) {
 				Object result = findFileByAbsolutePath(folders[i], name);
 				if (result instanceof List) {
 					if (searchForDuplicateFiles())
-						list.addAll((List) result);
+						list.addAll((List)result);
 					else
 						return list.getFirst();
 				} else if (result != null) {

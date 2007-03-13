@@ -47,7 +47,7 @@ public class PTPMemoryBlockExtension extends PDebugElement implements IMemoryBlo
 	private BigInteger fBaseAddress;
 	private IPCDIMemoryBlock fCDIBlock;
 	private MemoryByte[] fBytes = null;
-	private HashSet fChanges = new HashSet();
+	private HashSet<BigInteger> fChanges = new HashSet<BigInteger>();
 	private int fWordSize;
 
 	/** Constructor for PTPMemoryBlockExtension

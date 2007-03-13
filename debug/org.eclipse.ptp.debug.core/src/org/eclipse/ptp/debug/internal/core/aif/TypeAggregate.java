@@ -29,8 +29,8 @@ import org.eclipse.ptp.debug.core.aif.ITypeAggregate;
  * 
  */
 public abstract class TypeAggregate extends AIFType implements ITypeAggregate {
-	protected List fields = new ArrayList(); 
-	protected List types = new ArrayList();
+	protected List<String> fields = new ArrayList<String>(); 
+	protected List<IAIFType> types = new ArrayList<IAIFType>();
 	protected String name;
 	private int size = 0;
 

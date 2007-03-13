@@ -24,6 +24,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIArgumentDescriptor;
@@ -33,6 +34,7 @@ import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIThread;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIThreadStorageDescriptor;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIVariable;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIVariableDescriptor;
 import org.eclipse.ptp.debug.external.core.cdi.event.VarChangedEvent;
 import org.eclipse.ptp.debug.external.core.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.core.cdi.model.Target;
@@ -58,19 +60,19 @@ import org.eclipse.ptp.debug.external.core.commands.VariableDeleteCommand;
 public class VariableManager extends Manager {
 	static final IPCDIVariable[] EMPTY_VARIABLES = {};
 	int MAX_STACK_DEPTH = Thread.STACKFRAME_DEFAULT_DEPTH;
-	private Map variablesMap;
+	private Map<IPCDITarget, List<IPCDIVariable>> variablesMap;
 
 	public VariableManager(Session session) {
 		super(session, true);
-		variablesMap = new Hashtable();
+		variablesMap = new Hashtable<IPCDITarget, List<IPCDIVariable>>();
 	}
 	public void shutdown() {
 		variablesMap.clear();
 	}	
-	synchronized List getVariablesList(Target target) {
-		List variablesList = (List) variablesMap.get(target);
+	synchronized List<IPCDIVariable> getVariablesList(Target target) {
+		List<IPCDIVariable> variablesList = variablesMap.get(target);
 		if (variablesList == null) {
-			variablesList = Collections.synchronizedList(new ArrayList());
+			variablesList = Collections.synchronizedList(new ArrayList<IPCDIVariable>());
 			variablesMap.put(target, variablesList);
 		}
 		return variablesList;
@@ -133,7 +135,7 @@ public class VariableManager extends Manager {
 		return null;
 	}	
 	Variable[] getVariables(IPCDITarget target) {
-		List variableList = (List)variablesMap.get(target);
+		List<IPCDIVariable> variableList = variablesMap.get(target);
 		if (variableList != null) {
 			return (Variable[]) variableList.toArray(new Variable[variableList.size()]);
 		}
@@ -164,7 +166,7 @@ public class VariableManager extends Manager {
 		command.waitForReturn();
 	}
 	public Variable removeVariableFromList(Target target, String varName) {
-		List varList = getVariablesList(target);
+		List<IPCDIVariable> varList = getVariablesList(target);
 		synchronized (varList) {
 			for (Iterator iterator = varList.iterator(); iterator.hasNext();) {
 				Variable variable = (Variable)iterator.next();
@@ -276,7 +278,7 @@ public class VariableManager extends Manager {
 			((Thread)stack.getThread()).setCurrentStackFrame(stack, false);
 			try {
 				argument = new Argument(argDesc);
-				List variablesList = getVariablesList(target);
+				List<IPCDIVariable> variablesList = getVariablesList(target);
 				if (!variablesList.contains(argument))
 					variablesList.add(argument);
 			} finally {
@@ -287,7 +289,7 @@ public class VariableManager extends Manager {
 		return argument;
 	}
 	public IPCDIArgumentDescriptor[] getArgumentDescriptors(StackFrame frame) throws PCDIException {
-		List argObjects = new ArrayList();
+		List<IPCDIVariableDescriptor> argObjects = new ArrayList<IPCDIVariableDescriptor>();
 		Target target = (Target)frame.getTarget();
 		Thread currentThread = (Thread)target.getCurrentThread();
 		StackFrame currentFrame = currentThread.getCurrentStackFrame();
@@ -343,13 +345,13 @@ public class VariableManager extends Manager {
 			Target target = (Target)varDesc.getTarget();
 
 			global = new GlobalVariable(varDesc);
-			List variablesList = getVariablesList(target);
+			List<IPCDIVariable> variablesList = getVariablesList(target);
 			variablesList.add(global);
 		}
 		return global;
 	}
 	public IPCDILocalVariableDescriptor[] getLocalVariableDescriptors(StackFrame frame) throws PCDIException {
-		List varObjects = new ArrayList();
+		List<IPCDIVariableDescriptor> varObjects = new ArrayList<IPCDIVariableDescriptor>();
 		Target target = (Target)frame.getTarget();
 		Thread currentThread = (Thread)target.getCurrentThread();
 		StackFrame currentFrame = currentThread.getCurrentStackFrame();
@@ -388,7 +390,7 @@ public class VariableManager extends Manager {
 			((Thread)stack.getThread()).setCurrentStackFrame(stack, false);
 			try {
 				local = new LocalVariable(varDesc);
-				List variablesList = getVariablesList(target);
+				List<IPCDIVariable> variablesList = getVariablesList(target);
 				variablesList.add(local);
 			} finally {
 				target.setCurrentThread(currentThread, false);
@@ -449,7 +451,7 @@ public class VariableManager extends Manager {
 		}
 		*/
 		
-		List eventList = new ArrayList();
+		List<IPCDIEvent> eventList = new ArrayList<IPCDIEvent>();
 		for (int i=0; i<varList.length; i++) {
 			Variable variable = getVariable(target, varList[i]);
 			if (variable != null) {

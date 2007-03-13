@@ -30,7 +30,7 @@ import org.eclipse.jface.util.PropertyChangeEvent;
  */
 public class PTPPreferenceStore implements IPreferenceStore {
 	private Preferences fPreferences;
-	private HashMap fListeners = new HashMap();
+	private HashMap<IPropertyChangeListener, Preferences.IPropertyChangeListener> fListeners = new HashMap<IPropertyChangeListener, Preferences.IPropertyChangeListener>();
 	public PTPPreferenceStore (Preferences pref) {
 		fPreferences = pref;
 	}

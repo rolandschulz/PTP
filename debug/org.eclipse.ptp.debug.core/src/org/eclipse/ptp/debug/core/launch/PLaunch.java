@@ -7,21 +7,20 @@ import java.util.List;
 
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.Launch;
+import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.ISourceLocator;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
 
 public class PLaunch extends Launch implements IPLaunch {
 	private IPJob pJob;
-	private Comparator targetComparator;
+	private Comparator<IPDebugTarget> targetComparator;
 	//private Comparator processComparator;
 
 	public PLaunch(ILaunchConfiguration launchConfiguration, String mode, ISourceLocator locator) {
 		super(launchConfiguration, mode, locator);
-		targetComparator = new Comparator() {
-			public int compare(Object arg0, Object arg1) {
-				IPDebugTarget t0 = (IPDebugTarget) arg0;
-				IPDebugTarget t1 = (IPDebugTarget) arg1;
+		targetComparator = new Comparator<IPDebugTarget>() {
+			public int compare(IPDebugTarget t0, IPDebugTarget t1) {
 				return t0.getTargetID() - t1.getTargetID();
 			}
 		};
@@ -45,7 +44,7 @@ public class PLaunch extends Launch implements IPLaunch {
 		pJob = job;
 	}
 	protected List getDebugTargets0() {
-		List list = super.getDebugTargets0();
+		List<IPDebugTarget> list = super.getDebugTargets0();
 		Collections.sort(list, targetComparator);
 		return list;
 	}

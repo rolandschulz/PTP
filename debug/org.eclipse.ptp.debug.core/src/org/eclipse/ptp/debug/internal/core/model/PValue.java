@@ -58,7 +58,7 @@ import org.eclipse.ptp.debug.core.model.PVariableFormat;
  */
 public class PValue extends AbstractPValue {
 	private String fValueString = null;
-	private List fVariables = Collections.EMPTY_LIST;
+	private List<IVariable> fVariables = Collections.EMPTY_LIST;
 	private PType fType;
 	private IPCDIVariable fVariable;
 
@@ -97,16 +97,16 @@ public class PValue extends AbstractPValue {
 		return true;
 	}
 	public IVariable[] getVariables() throws DebugException {
-		List list = getVariables0();
+		List<IVariable> list = getVariables0();
 		return (IVariable[]) list.toArray(new IVariable[list.size()]);
 	}
-	protected synchronized List getVariables0() throws DebugException {
+	protected synchronized List<IVariable> getVariables0() throws DebugException {
 		if (!isAllocated() || !hasVariables())
 			return Collections.EMPTY_LIST;
 		if (fVariables.size() == 0) {
 			try {
-				List vars = getCDIVariables();
-				fVariables = new ArrayList(vars.size());
+				List<IPCDIVariable> vars = getCDIVariables();
+				fVariables = new ArrayList<IVariable>(vars.size());
 				Iterator it = vars.iterator();
 				while (it.hasNext()) {
 					fVariables.add(PVariableFactory.createLocalVariable(this, (IPCDIVariable)it.next()));
@@ -146,7 +146,7 @@ public class PValue extends AbstractPValue {
 			return null;
 		}
 	}
-	protected List getCDIVariables() throws DebugException {
+	protected List<IPCDIVariable> getCDIVariables() throws DebugException {
 		IPCDIVariable[] vars = null;
 		try {
 			IPCDIVariable var = getCurrentVariable();

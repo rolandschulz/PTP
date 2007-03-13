@@ -47,8 +47,8 @@ public class PDebugConfiguration implements IPDebugConfiguration {
 	 * The configuration element of the extension.
 	 */
 	private IConfigurationElement fElement;
-	private HashSet fModes;
-	private HashSet fCPUs;
+	private HashSet<String> fModes;
+	private HashSet<String> fCPUs;
 	private String[] fCoreExt;
 
 	public PDebugConfiguration(IConfigurationElement element) {
@@ -110,14 +110,14 @@ public class PDebugConfiguration implements IPDebugConfiguration {
 	 * 
 	 * @return the set of modes specified in the configuration data
 	 */
-	protected Set getModes() {
+	protected Set<String> getModes() {
 		if (fModes == null) {
 			String modes = getConfigurationElement().getAttribute("modes");
 			if (modes == null) {
-				return new HashSet(0);
+				return new HashSet<String>(0);
 			}
 			StringTokenizer tokenizer = new StringTokenizer(modes, ",");
-			fModes = new HashSet(tokenizer.countTokens());
+			fModes = new HashSet<String>(tokenizer.countTokens());
 			while (tokenizer.hasMoreTokens()) {
 				fModes.add(tokenizer.nextToken().trim());
 			}
@@ -125,17 +125,17 @@ public class PDebugConfiguration implements IPDebugConfiguration {
 		return fModes;
 	}
 
-	protected Set getCPUs() {
+	protected Set<String> getCPUs() {
 		if (fCPUs == null) {
 			String cpus = getConfigurationElement().getAttribute("cpu");
 			if (cpus == null) {
-				fCPUs = new HashSet(1);
+				fCPUs = new HashSet<String>(1);
 				fCPUs.add(CPU_NATIVE);
 			}
 			else {
 				String nativeCPU = Platform.getOSArch();
 				StringTokenizer tokenizer = new StringTokenizer(cpus, ",");
-				fCPUs = new HashSet(tokenizer.countTokens());
+				fCPUs = new HashSet<String>(tokenizer.countTokens());
 				while (tokenizer.hasMoreTokens()) {
 					String cpu = tokenizer.nextToken().trim();
 					fCPUs.add(cpu);
@@ -154,7 +154,7 @@ public class PDebugConfiguration implements IPDebugConfiguration {
 	 */
 	public String[] getCoreFileExtensions() {
 		if (fCoreExt == null) {
-			List exts = new ArrayList();
+			List<String> exts = new ArrayList<String>();
 			String cexts = getConfigurationElement().getAttribute("coreFileFilter");
 			if (cexts != null) {
 				StringTokenizer tokenizer = new StringTokenizer(cexts, ",");

@@ -36,7 +36,7 @@ import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugErrorEvent;
 import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugEvent;
 
 public abstract class AbstractProxyDebugClient extends AbstractProxyClient implements IProxyEventListener {
-	protected List		listeners = new ArrayList(2);
+	protected List<IProxyDebugEventListener>		listeners = new ArrayList<IProxyDebugEventListener>(2);
 	private boolean		waiting = false;
 	private boolean		connected = false;
 	private final long WAIT_CONNECTION = 60000;

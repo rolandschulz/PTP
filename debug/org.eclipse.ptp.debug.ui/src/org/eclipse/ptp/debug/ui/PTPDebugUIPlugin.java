@@ -53,7 +53,7 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 	//Resource bundle.
 	private ResourceBundle resourceBundle;
 	private static UIDebugManager uiDebugManager = null;
-	protected Map fDebuggerPageMap;
+	protected Map<String, IConfigurationElement> fDebuggerPageMap;
 
 	/**
 	 * The constructor.
@@ -280,7 +280,7 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 	 * 
 	 */
 	protected void initializeDebuggerPageMap() {
-		fDebuggerPageMap = new HashMap(10);
+		fDebuggerPageMap = new HashMap<String, IConfigurationElement>(10);
 		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(PLUGIN_ID, "PDebuggerPage");
 		IConfigurationElement[] infos = extensionPoint.getConfigurationElements();
 		for(int i = 0; i < infos.length; i++) {

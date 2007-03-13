@@ -201,7 +201,7 @@ public class PCDIDebugModel {
 	 **************************************************/
 	public IPLineBreakpoint[] lineBreakpointsExists(String sourceHandle, IResource resource, int lineNumber) throws CoreException {
 		IBreakpoint[] breakpoints = getPBreakpoints();
-		List foundBreakpoints = new ArrayList(0);
+		List<IBreakpoint> foundBreakpoints = new ArrayList<IBreakpoint>(0);
 		for (int i = 0; i < breakpoints.length; i++) {
 			if (!(breakpoints[i] instanceof IPLineBreakpoint))
 				continue;
@@ -235,7 +235,7 @@ public class PCDIDebugModel {
 		return handle1.equals(handle2);
 	}
 	public IBreakpoint createLineBreakpoint(String sourceHandle, IResource resource, int lineNumber, boolean enabled, int ignoreCount, String condition, boolean register, String set_id, String job_id, String jobName) throws CoreException {
-		HashMap attributes = new HashMap(10);
+		HashMap<String, Object> attributes = new HashMap<String, Object>(10);
 		attributes.put(IBreakpoint.ID, PTPDebugCorePlugin.getUniqueIdentifier());
 		attributes.put(IMarker.LINE_NUMBER, new Integer(lineNumber));
 		attributes.put(IBreakpoint.ENABLED, new Boolean(enabled));
@@ -252,7 +252,7 @@ public class PCDIDebugModel {
 		return DebugPlugin.getDefault().getBreakpointManager().getBreakpoints(getPluginIdentifier());
 	}
 	public IBreakpoint[] findPBreakpoints(String job_id, String set_id) throws CoreException {
-		List bptList = new ArrayList();
+		List<IBreakpoint> bptList = new ArrayList<IBreakpoint>();
 		IBreakpoint[] breakpoints = getPBreakpoints();
 		for (int i = 0; i < breakpoints.length; i++) {
 			if (!(breakpoints[i] instanceof IPLineBreakpoint))
@@ -265,7 +265,7 @@ public class PCDIDebugModel {
 		return (IBreakpoint[]) bptList.toArray(new IBreakpoint[bptList.size()]);
 	}
 	public IPBreakpoint[] findPBreakpoints(String job_id, boolean includeGlobal) throws CoreException {
-		List bptList = new ArrayList();
+		List<IBreakpoint> bptList = new ArrayList<IBreakpoint>();
 		IBreakpoint[] breakpoints = getPBreakpoints();
 		for (int i = 0; i < breakpoints.length; i++) {
 			if (!(breakpoints[i] instanceof IPBreakpoint))

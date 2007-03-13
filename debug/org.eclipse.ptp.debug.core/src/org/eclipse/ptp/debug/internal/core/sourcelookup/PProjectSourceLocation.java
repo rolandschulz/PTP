@@ -59,8 +59,8 @@ public class PProjectSourceLocation implements IProjectSourceLocation {
 	private static final String ATTR_GENERIC = "generic";
 	private IProject fProject;
 	private IResource[] fFolders;
-	private HashMap fCache = new HashMap(20);
-	private HashSet fNotFoundCache = new HashSet(20);
+	private HashMap<String, Object> fCache = new HashMap<String, Object>(20);
+	private HashSet<String> fNotFoundCache = new HashSet<String>(20);
 	private boolean fGenerated = true;
 	private boolean fSearchForDuplicateFiles = false;
 
@@ -109,7 +109,7 @@ public class PProjectSourceLocation implements IProjectSourceLocation {
 		return (file.isAbsolute()) ? findFileByAbsolutePath(file) : findFileByRelativePath(name);
 	}
 	private Object findFileByAbsolutePath(File file) {
-		LinkedList list = new LinkedList();
+		LinkedList<IFile> list = new LinkedList<IFile>();
 		if (file.exists()) {
 			IPath path = new Path(file.getAbsolutePath());
 			IFile[] wsFiles = PTPDebugCorePlugin.getWorkspace().getRoot().findFilesForLocation(path);
@@ -124,7 +124,7 @@ public class PProjectSourceLocation implements IProjectSourceLocation {
 	}
 	private Object findFileByRelativePath(String fileName) {
 		IResource[] folders = getFolders();
-		LinkedList list = new LinkedList();
+		LinkedList<IFile> list = new LinkedList<IFile>();
 		for (int i = 0; i < folders.length; ++i) {
 			if (list.size() > 0 && !searchForDuplicateFiles())
 				break;
@@ -230,7 +230,7 @@ public class PProjectSourceLocation implements IProjectSourceLocation {
 		return false;
 	}
 	private void initializeFolders() {
-		final LinkedList list = new LinkedList();
+		final LinkedList<IResource> list = new LinkedList<IResource>();
 		if (getProject() != null && getProject().exists()) {
 			list.add(getProject());
 			try {

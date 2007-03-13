@@ -95,7 +95,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
 public class PAnnotationManager implements IJobChangedListener, IPDebugEventListener {
 	private static PAnnotationManager instance = null;
 	private final Object LOCK = new Object();
-	protected Map annotationMap = Collections.synchronizedMap(new HashMap());
+	protected Map<String, AnnotationGroup> annotationMap = Collections.synchronizedMap(new HashMap<String, AnnotationGroup>());
 	protected UIDebugManager uiDebugManager = null;
 
 	/* Constructor
@@ -640,7 +640,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 	 */
 	protected void removeAnnotation(AnnotationGroup annotationGroup, BitList tasks) throws CoreException {
 		synchronized (LOCK) {
-			List removedList = new ArrayList(0);
+			List<PInstructionPointerAnnotation2> removedList = new ArrayList<PInstructionPointerAnnotation2>(0);
 			for (Iterator i = annotationGroup.getAnnotationIterator(); i.hasNext();) {
 				PInstructionPointerAnnotation2 annotation = (PInstructionPointerAnnotation2) i.next();
 				annotation.removeTasks(tasks);
@@ -661,7 +661,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 	 */
 	public Iterator findAnnotationIterator(AnnotationGroup annotationGroup, String type) {
 		synchronized (LOCK) {
-			List annotations = new ArrayList();
+			List<PInstructionPointerAnnotation2> annotations = new ArrayList<PInstructionPointerAnnotation2>();
 			for (Iterator i = annotationGroup.getAnnotationIterator(); i.hasNext();) {
 				PInstructionPointerAnnotation2 annotation = (PInstructionPointerAnnotation2) i.next();
 				if (annotation.getType().equals(type)) {
@@ -673,7 +673,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 	}
 	protected PInstructionPointerAnnotation2[] findAnnotations(AnnotationGroup annotationGroup, BitList tasks) {
 		synchronized (LOCK) {
-			List match = new ArrayList();
+			List<PInstructionPointerAnnotation2> match = new ArrayList<PInstructionPointerAnnotation2>();
 			if (tasks.isEmpty())
 				return new PInstructionPointerAnnotation2[0];
 

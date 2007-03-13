@@ -34,7 +34,7 @@ import org.eclipse.ptp.debug.core.aif.AIFFactory.SimpleByteBuffer;
  * 
  */
 public abstract class ValueAggregate extends ValueParent implements IValueAggregate {
-	protected List values = new ArrayList();
+	protected List<IAIFValue> values = new ArrayList<IAIFValue>();
 	
 	public ValueAggregate(IValueParent parent, ITypeAggregate type, SimpleByteBuffer buffer) {
 		super(parent, type);

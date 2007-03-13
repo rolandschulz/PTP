@@ -33,7 +33,7 @@ public class PBreakpointPreferenceStore implements IPreferenceStore {
 	protected final static String CONDITION = "CONDITION";
 	protected final static String IGNORE_COUNT = "IGNORE_COUNT";
 
-	protected HashMap properties;
+	protected HashMap<String, Object> properties;
 	private boolean isDirty = false;
 	private ListenerList listeners;
 
@@ -41,7 +41,7 @@ public class PBreakpointPreferenceStore implements IPreferenceStore {
 	 * 
 	 */
 	public PBreakpointPreferenceStore() {
-		properties = new HashMap(3);
+		properties = new HashMap<String, Object>(3);
 		listeners = new ListenerList();
 	}
 
