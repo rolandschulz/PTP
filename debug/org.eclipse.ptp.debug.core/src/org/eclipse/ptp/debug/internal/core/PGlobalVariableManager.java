@@ -66,7 +66,7 @@ public class PGlobalVariableManager implements IPGlobalVariableManager {
 	private static final String ATTR_GLOBAL_VARIABLE_NAME = "name";
 	private PDebugTarget fDebugTarget;
 	private IGlobalVariableDescriptor[] fInitialDescriptors = new IGlobalVariableDescriptor[0];
-	private ArrayList fGlobals;
+	private ArrayList<IPGlobalVariable> fGlobals;
 
 	public PGlobalVariableManager(PDebugTarget target) {
 		super();
@@ -90,9 +90,9 @@ public class PGlobalVariableManager implements IPGlobalVariableManager {
 		return (IPGlobalVariable[]) fGlobals.toArray(new IPGlobalVariable[fGlobals.size()]);
 	}
 	public void addGlobals(IGlobalVariableDescriptor[] descriptors) throws DebugException {
-		fGlobals = new ArrayList(10);
+		fGlobals = new ArrayList<IPGlobalVariable>(10);
 		MultiStatus ms = new MultiStatus(PTPDebugCorePlugin.getUniqueIdentifier(), 0, "", null);
-		ArrayList globals = new ArrayList(descriptors.length);
+		ArrayList<IPGlobalVariable> globals = new ArrayList<IPGlobalVariable>(descriptors.length);
 		for (int i = 0; i < descriptors.length; ++i) {
 			try {
 				globals.add(getDebugTarget().createGlobalVariable(descriptors[i]));
@@ -175,7 +175,7 @@ public class PGlobalVariableManager implements IPGlobalVariableManager {
 			InputSource source = new InputSource(reader);
 			root = parser.parse(source).getDocumentElement();
 			if (root.getNodeName().equalsIgnoreCase(GLOBAL_VARIABLE_LIST)) {
-				List descriptors = new ArrayList();
+				List<IGlobalVariableDescriptor> descriptors = new ArrayList<IGlobalVariableDescriptor>();
 				NodeList list = root.getChildNodes();
 				int length = list.getLength();
 				for (int i = 0; i < length; ++i) {

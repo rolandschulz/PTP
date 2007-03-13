@@ -67,7 +67,7 @@ import org.eclipse.ptp.debug.core.model.PDebugElementState;
 public class PThread extends PDebugElement implements IPThread, IRestart, IResumeWithoutSignal, IPCDIEventListener {
 	private final static int MAX_STACK_DEPTH = 100;
 	private IPCDIThread fCDIThread;
-	private ArrayList fStackFrames;
+	private ArrayList<IStackFrame> fStackFrames;
 	private boolean fRefreshChildren = true;
 	private IPCDITargetConfiguration fConfig;
 	private boolean fIsCurrent = false;
@@ -89,10 +89,10 @@ public class PThread extends PDebugElement implements IPThread, IRestart, IResum
 		getCDISession().getEventManager().addEventListener(this);
 	}
 	protected void initialize() {
-		fStackFrames = new ArrayList();
+		fStackFrames = new ArrayList<IStackFrame>();
 	}
 	public IStackFrame[] getStackFrames() throws DebugException {
-		List list = Collections.EMPTY_LIST;
+		List<IStackFrame> list = Collections.EMPTY_LIST;
 		try {
 			list = computeStackFrames();
 		} catch (DebugException e) {
@@ -105,10 +105,10 @@ public class PThread extends PDebugElement implements IPThread, IRestart, IResum
 		// Always return true to postpone the stack frames request
 		return true;
 	}
-	protected synchronized List computeStackFrames(boolean refreshChildren) throws DebugException {
+	protected synchronized List<IStackFrame> computeStackFrames(boolean refreshChildren) throws DebugException {
 		if (isSuspended()) {
 			if (isTerminated()) {
-				fStackFrames = new ArrayList();
+				fStackFrames = new ArrayList<IStackFrame>();
 			} else if (refreshChildren) {
 				if (fStackFrames.size() > 0) {
 					Object frame = fStackFrames.get(fStackFrames.size() - 1);
@@ -183,14 +183,14 @@ public class PThread extends PDebugElement implements IPThread, IRestart, IResum
 			}
 		}
 	}
-	public List computeStackFrames() throws DebugException {
+	public List<IStackFrame> computeStackFrames() throws DebugException {
 		return computeStackFrames(refreshChildren());
 	}
-	public List computeNewStackFrames() throws DebugException {
+	public List<IStackFrame> computeNewStackFrames() throws DebugException {
 		return computeStackFrames(true);
 	}
-	protected List createAllStackFrames(int depth, IPCDIStackFrame[] frames) throws DebugException {
-		List list = new ArrayList(frames.length);
+	protected List<IStackFrame> createAllStackFrames(int depth, IPCDIStackFrame[] frames) throws DebugException {
+		List<IStackFrame> list = new ArrayList<IStackFrame>(frames.length);
 		for (int i = 0; i < frames.length; ++i) {
 			list.add(new PStackFrame(this, frames[i]));
 		}
@@ -212,7 +212,7 @@ public class PThread extends PDebugElement implements IPThread, IRestart, IResum
 		return getCDIThread().toString();
 	}
 	public IBreakpoint[] getBreakpoints() {
-		List list = new ArrayList(1);
+		List<IBreakpoint> list = new ArrayList<IBreakpoint>(1);
 		if (isSuspended()) {
 			IBreakpoint bkpt = null;
 			IPCDIBreakpointManager bManager = getCDISession().getBreakpointManager();
@@ -393,7 +393,7 @@ public class PThread extends PDebugElement implements IPThread, IRestart, IResum
 		setRefreshChildren(true);
 	}
 	protected void disposeStackFrames(int index, int length) {
-		List removeList = new ArrayList(length);
+		List<IStackFrame> removeList = new ArrayList<IStackFrame>(length);
 		Iterator it = fStackFrames.iterator();
 		int counter = 0;
 		while (it.hasNext()) {
@@ -563,7 +563,7 @@ public class PThread extends PDebugElement implements IPThread, IRestart, IResum
 		}
 		return result;
 	}
-	protected void resumedByTarget(int detail, List events) {
+	protected void resumedByTarget(int detail, List<DebugEvent> events) {
 		if (isCurrent() && detail != DebugEvent.CLIENT_REQUEST && detail != DebugEvent.UNSPECIFIED) {
 			setState(PDebugElementState.STEPPED);
 			preserveStackFrames();

@@ -92,7 +92,7 @@ public class PSourceLocator implements IPSourceLocator, IPersistableSourceLocato
 	protected Object getInput(IStackFrame f) {
 		if (f instanceof IPStackFrame) {
 			IPStackFrame frame = (IPStackFrame) f;
-			LinkedList list = new LinkedList();
+			LinkedList<Object> list = new LinkedList<Object>();
 			if (frame != null) {
 				Object result = null;
 				String fileName = frame.getFile();
@@ -147,14 +147,14 @@ public class PSourceLocator implements IPSourceLocator, IPersistableSourceLocato
 		fSourceLocations = locations;
 	}
 	public static IPSourceLocation[] getDefaultSourceLocations(IProject project) {
-		ArrayList list = new ArrayList();
+		ArrayList<IProjectSourceLocation> list = new ArrayList<IProjectSourceLocation>();
 		if (project != null && project.exists()) {
 			list.add(SourceLookupFactory.createProjectSourceLocation(project));
 			addReferencedSourceLocations(list, project);
 		}
 		return (IPSourceLocation[]) list.toArray(new IPSourceLocation[list.size()]);
 	}
-	private static void addReferencedSourceLocations(List list, IProject project) {
+	private static void addReferencedSourceLocations(List<IProjectSourceLocation> list, IProject project) {
 		if (project != null) {
 			try {
 				IProject[] projects = project.getReferencedProjects();
@@ -169,10 +169,10 @@ public class PSourceLocator implements IPSourceLocator, IPersistableSourceLocato
 			}
 		}
 	}
-	private static boolean containsProject(List list, IProject project) {
+	private static boolean containsProject(List<IProjectSourceLocation> list, IProject project) {
 		Iterator it = list.iterator();
 		while (it.hasNext()) {
-			PProjectSourceLocation location = (PProjectSourceLocation) it.next();
+			IProjectSourceLocation location = (IProjectSourceLocation) it.next();
 			if (project.equals(location.getProject()))
 				return true;
 		}
@@ -231,7 +231,7 @@ public class PSourceLocator implements IPSourceLocator, IPersistableSourceLocato
 			if (!root.getNodeName().equalsIgnoreCase(SOURCE_LOCATOR_NAME)) {
 				abort(InternalSourceLookupMessages.getString("PSourceLocator.1"), null);
 			}
-			List sourceLocations = new ArrayList();
+			List<IPSourceLocation> sourceLocations = new ArrayList<IPSourceLocation>();
 			// Add locations based on referenced projects
 			IProject project = getProject();
 			if (project != null && project.exists() && project.isOpen())
@@ -252,10 +252,10 @@ public class PSourceLocator implements IPSourceLocator, IPersistableSourceLocato
 		}
 		abort(InternalSourceLookupMessages.getString("PSourceLocator.2"), ex);
 	}
-	private void removeDisabledLocations(Element root, List sourceLocations) {
+	private void removeDisabledLocations(Element root, List<IPSourceLocation> sourceLocations) {
 		NodeList list = root.getChildNodes();
 		int length = list.getLength();
-		HashSet disabledProjects = new HashSet(length);
+		HashSet<String> disabledProjects = new HashSet<String>(length);
 		for (int i = 0; i < length; ++i) {
 			Node node = list.item(i);
 			short type = node.getNodeType();
@@ -277,7 +277,7 @@ public class PSourceLocator implements IPSourceLocator, IPersistableSourceLocato
 				it.remove();
 		}
 	}
-	private void addAdditionalLocations(Element root, List sourceLocations) throws CoreException {
+	private void addAdditionalLocations(Element root, List<IPSourceLocation> sourceLocations) throws CoreException {
 		Bundle bundle = PTPDebugCorePlugin.getDefault().getBundle();
 		MultiStatus status = new MultiStatus(PTPDebugCorePlugin.getUniqueIdentifier(), PTPDebugCorePlugin.INTERNAL_ERROR, InternalSourceLookupMessages.getString("PSourceLocator.3"), null);
 		NodeList list = root.getChildNodes();
@@ -323,7 +323,7 @@ public class PSourceLocator implements IPSourceLocator, IPersistableSourceLocato
 		if (status.getSeverity() > IStatus.OK)
 			throw new CoreException(status);
 	}
-	private void addOldLocations(Element root, List sourceLocations) throws CoreException {
+	private void addOldLocations(Element root, List<IPSourceLocation> sourceLocations) throws CoreException {
 		Bundle bundle = PTPDebugCorePlugin.getDefault().getBundle();
 		NodeList list = root.getChildNodes();
 		int length = list.getLength();
@@ -377,7 +377,7 @@ public class PSourceLocator implements IPSourceLocator, IPersistableSourceLocato
 		if (event.getSource() instanceof IWorkspace && event.getDelta() != null) {
 			IResourceDelta[] deltas = event.getDelta().getAffectedChildren();
 			if (deltas != null) {
-				ArrayList list = new ArrayList(deltas.length);
+				ArrayList<IResource> list = new ArrayList<IResource>(deltas.length);
 				for (int i = 0; i < deltas.length; ++i)
 					if (deltas[i].getResource() instanceof IProject)
 						list.add(deltas[i].getResource());
@@ -389,7 +389,7 @@ public class PSourceLocator implements IPSourceLocator, IPersistableSourceLocato
 		IProject project = getProject();
 		if (project != null && project.exists() && project.isOpen()) {
 			List list = CDebugUtils.getReferencedProjects(project);
-			HashSet names = new HashSet(list.size() + 1);
+			HashSet<String> names = new HashSet<String>(list.size() + 1);
 			names.add(project.getName());
 			Iterator it = list.iterator();
 			while (it.hasNext()) {
@@ -443,7 +443,7 @@ public class PSourceLocator implements IPSourceLocator, IPersistableSourceLocato
 	}
 	protected IPSourceLocation[] getDefaultSourceLocations() {
 		Iterator it = fReferencedProjects.iterator();
-		ArrayList list = new ArrayList(fReferencedProjects.size());
+		ArrayList<IProjectSourceLocation> list = new ArrayList<IProjectSourceLocation>(fReferencedProjects.size());
 		if (getProject() != null && getProject().exists() && getProject().isOpen())
 			list.add(SourceLookupFactory.createProjectSourceLocation(getProject()));
 		while (it.hasNext()) {
@@ -465,7 +465,7 @@ public class PSourceLocator implements IPSourceLocator, IPersistableSourceLocato
 	private void removeGenericSourceLocations() {
 		fReferencedProjects.clear();
 		IPSourceLocation[] locations = getSourceLocations();
-		ArrayList newLocations = new ArrayList(locations.length);
+		ArrayList<IPSourceLocation> newLocations = new ArrayList<IPSourceLocation>(locations.length);
 		for (int i = 0; i < locations.length; ++i)
 			if (!(locations[i] instanceof IProjectSourceLocation) || !((IProjectSourceLocation) locations[i]).isGeneric())
 				newLocations.add(locations[i]);
@@ -474,7 +474,7 @@ public class PSourceLocator implements IPSourceLocator, IPersistableSourceLocato
 	private void updateGenericSourceLocations(List affectedProjects) {
 		List newRefs = CDebugUtils.getReferencedProjects(getProject());
 		IPSourceLocation[] locations = getSourceLocations();
-		ArrayList newLocations = new ArrayList(locations.length);
+		ArrayList<IPSourceLocation> newLocations = new ArrayList<IPSourceLocation>(locations.length);
 		for (int i = 0; i < locations.length; ++i) {
 			if (!(locations[i] instanceof IProjectSourceLocation) || !((IProjectSourceLocation) locations[i]).isGeneric()) {
 				newLocations.add(locations[i]);

@@ -206,7 +206,7 @@ public class Target extends SessionObject implements IPCDITarget {
 			currentThreads = noThreads;
 		}
 
-		List cList = new ArrayList(currentThreads.length);
+		List<Integer> cList = new ArrayList<Integer>(currentThreads.length);
 		for (int i = 0; i < currentThreads.length; i++) {
 			boolean found = false;
 			for (int j = 0; j < oldThreads.length; j++) {
@@ -230,7 +230,7 @@ public class Target extends SessionObject implements IPCDITarget {
 			getDebugger().fireEvents(events);
 		}
 		//Fire destroryd event for old threads
-		List dList = new ArrayList(oldThreads.length);
+		List<Integer> dList = new ArrayList<Integer>(oldThreads.length);
 		for (int i = 0; i < oldThreads.length; i++) {
 			boolean found = false;
 			for (int j = 0; j < currentThreads.length; j++) {

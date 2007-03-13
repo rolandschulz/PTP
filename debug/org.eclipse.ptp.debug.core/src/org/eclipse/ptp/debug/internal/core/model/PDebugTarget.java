@@ -128,7 +128,7 @@ import org.eclipse.ptp.debug.internal.core.sourcelookup.PSourceManager;
  */
 public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPCDIEventListener, ILaunchListener, IExpressionListener, ISourceLookupChangeListener {
 	private final String PROCESS_NAME = "Process ";
-	private ArrayList fThreads;
+	private ArrayList<IThread> fThreads;
 	private IProcess fDebuggeeProcess = null;
 	private IPCDITarget fCDITarget;
 	private IPLaunch fLaunch;
@@ -153,7 +153,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPCDIE
 		setExecFile(file);
 		initializePreferences();
 		setConfiguration((IPCDITargetConfiguration)cdiTarget.getConfiguration());
-		setThreadList(new ArrayList(5));
+		setThreadList(new ArrayList<IThread>(5));
 		if (fCDITarget.isTerminated()) {
 			setState(PDebugElementState.TERMINATED);
 		} else {
@@ -186,14 +186,14 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPCDIE
 	}	
 	protected void initialize() {
 		initializeSourceLookupPath();
-		ArrayList debugEvents = new ArrayList(1);
+		ArrayList<DebugEvent> debugEvents = new ArrayList<DebugEvent>(1);
 		debugEvents.add(createCreateEvent());
 		initializeThreads(debugEvents);
 		initializeSourceManager();
 		initializeMemoryBlocks();
 		fireEventSet((DebugEvent[]) debugEvents.toArray(new DebugEvent[debugEvents.size()]));
 	}
-	protected void initializeThreads(List debugEvents) {
+	protected void initializeThreads(List<DebugEvent> debugEvents) {
 		IPCDIThread[] cdiThreads = new IPCDIThread[0];
 		try {
 			if (isSuspended())
@@ -254,7 +254,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPCDIE
 		fDebuggeeProcess = debuggeeProcess;
 	}
 	public IThread[] getThreads() {
-		List threads = getThreadList();
+		List<IThread> threads = getThreadList();
 		return (IThread[]) threads.toArray(new IThread[threads.size()]);
 	}
 	public boolean hasThreads() throws DebugException {
@@ -357,9 +357,9 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPCDIE
 		}
 	}
 	protected synchronized List refreshThreads() {
-		ArrayList newThreads = new ArrayList(5);
-		ArrayList list = new ArrayList(5);
-		ArrayList debugEvents = new ArrayList(5);
+		ArrayList<IThread> newThreads = new ArrayList<IThread>(5);
+		ArrayList<IThread> list = new ArrayList<IThread>(5);
+		ArrayList<DebugEvent> debugEvents = new ArrayList<DebugEvent>(5);
 		List oldList = (List) getThreadList().clone();
 		IPCDIThread[] cdiThreads = new IPCDIThread[0];
 		IPCDIThread currentCDIThread = null;
@@ -440,10 +440,10 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPCDIE
 	public ILaunch getLaunch() {
 		return fLaunch;
 	}
-	protected ArrayList getThreadList() {
+	protected ArrayList<IThread> getThreadList() {
 		return fThreads;
 	}
-	private void setThreadList(ArrayList threads) {
+	private void setThreadList(ArrayList<IThread> threads) {
 		fThreads = threads;
 	}
 	public Object getAdapter(Class adapter) {
@@ -587,9 +587,9 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPCDIE
 		getMemoryBlockRetrieval().dispose();
 	}
 	protected void removeAllThreads() {
-		List threads = getThreadList();
-		setThreadList(new ArrayList(0));
-		ArrayList debugEvents = new ArrayList(threads.size());
+		List<IThread> threads = getThreadList();
+		setThreadList(new ArrayList<IThread>(0));
+		ArrayList<DebugEvent> debugEvents = new ArrayList<DebugEvent>(threads.size());
 		Iterator it = threads.iterator();
 		while (it.hasNext()) {
 			PThread thread = (PThread) it.next();
@@ -652,7 +652,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPCDIE
 		setState(PDebugElementState.RESUMED);
 		setCurrentStateInfo(null);
 		resetStatus();
-		ArrayList debugEvents = new ArrayList(10);
+		ArrayList<DebugEvent> debugEvents = new ArrayList<DebugEvent>(10);
 		int detail = DebugEvent.UNSPECIFIED;
 		switch (event.getType()) {
 		case IPCDIResumedEvent.CONTINUE:
@@ -1007,15 +1007,15 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPCDIE
 		// TODO Not implement yet
 	}
 	public IGlobalVariableDescriptor[] getGlobals() throws DebugException {
-		ArrayList list = new ArrayList();
+		ArrayList<IGlobalVariableDescriptor> list = new ArrayList<IGlobalVariableDescriptor>();
 		IBinaryObject file = getBinaryFile();
 		if (file != null) {
 			list.addAll(getCFileGlobals(file));
 		}
 		return (IGlobalVariableDescriptor[]) list.toArray(new IGlobalVariableDescriptor[list.size()]);
 	}
-	private List getCFileGlobals(IBinaryObject file) throws DebugException {
-		ArrayList list = new ArrayList();
+	private List<IGlobalVariableDescriptor> getCFileGlobals(IBinaryObject file) throws DebugException {
+		ArrayList<IGlobalVariableDescriptor> list = new ArrayList<IGlobalVariableDescriptor>();
 		ISymbol[] symbols = file.getSymbols();
 		for (int i = 0; i < symbols.length; ++i) {
 			if (symbols[i].getType() == ISymbol.VARIABLE) {
@@ -1028,7 +1028,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPCDIE
 		setSourceLookupPath(director.getSourceContainers());
 	}
 	private void setSourceLookupPath(ISourceContainer[] containers) {
-		ArrayList list = new ArrayList(containers.length);
+		ArrayList<String> list = new ArrayList<String>(containers.length);
 		getSourceLookupPath(list, containers);
 		try {
 			getCDITarget().setSourcePaths((String[]) list.toArray(new String[list.size()]));
@@ -1036,7 +1036,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPCDIE
 			PTPDebugCorePlugin.log(e);
 		}
 	}
-	private void getSourceLookupPath(List list, ISourceContainer[] containers) {
+	private void getSourceLookupPath(List<String> list, ISourceContainer[] containers) {
 		for (int i = 0; i < containers.length; ++i) {
 			if (containers[i] instanceof ProjectSourceContainer) {
 				IProject project = ((ProjectSourceContainer) containers[i]).getProject();

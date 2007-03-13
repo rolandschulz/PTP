@@ -35,7 +35,7 @@ import org.eclipse.ptp.debug.core.cdi.PCDIException;
  * 
  */
 public class DebugCommandQueue extends Job {
-	private List queue = new ArrayList();
+	private List<IDebugCommand> queue = new ArrayList<IDebugCommand>();
 	private boolean terminated = false;
 	private boolean stopAddCommand = false;
 	private IDebugCommand currentCommand = null;
@@ -151,6 +151,7 @@ public class DebugCommandQueue extends Job {
 			}
 		}
 	}
+	/*
 	private void addCommandByPriority(IDebugCommand command) {
 		synchronized (queue) {
 			if (command.getPriority() > IDebugCommand.PRIORITY_L) {
@@ -166,6 +167,7 @@ public class DebugCommandQueue extends Job {
 			queue.add(command);
 		}
 	}
+	*/
 	private boolean contains(IDebugCommand command) {
 		synchronized (queue) {
 			//if (currentCommand != null && currentCommand.compareTo(command) == 0)

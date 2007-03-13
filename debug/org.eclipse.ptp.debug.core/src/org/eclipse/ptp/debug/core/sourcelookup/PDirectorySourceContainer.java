@@ -114,7 +114,7 @@ public class PDirectorySourceContainer extends CompositeSourceContainer {
 	 * @see org.eclipse.debug.internal.core.sourcelookup.ISourceContainer#findSourceElements(java.lang.String)
 	 */
 	public Object[] findSourceElements( String name ) throws CoreException {
-		ArrayList sources = new ArrayList();
+		ArrayList<Object> sources = new ArrayList<Object>();
 		File directory = getDirectory();
 		File file = new File( directory, name );
 		if ( file.exists() && file.isFile() ) {
@@ -175,7 +175,7 @@ public class PDirectorySourceContainer extends CompositeSourceContainer {
 		if ( isComposite() ) {
 			String[] files = fDirectory.list();
 			if ( files != null ) {
-				List dirs = new ArrayList();
+				List<ISourceContainer> dirs = new ArrayList<ISourceContainer>();
 				for( int i = 0; i < files.length; i++ ) {
 					String name = files[i];
 					File file = new File( getDirectory(), name );

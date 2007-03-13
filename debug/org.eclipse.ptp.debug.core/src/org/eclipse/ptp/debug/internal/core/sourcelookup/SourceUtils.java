@@ -107,7 +107,7 @@ public class SourceUtils {
 		return result;
 	}
 	public static IPSourceLocation[] initializeSourceLocations(Element root) {
-		List sourceLocations = new LinkedList();
+		List<IPSourceLocation> sourceLocations = new LinkedList<IPSourceLocation>();
 		NodeList list = root.getChildNodes();
 		int length = list.getLength();
 		for (int i = 0; i < length; ++i) {
@@ -154,7 +154,7 @@ public class SourceUtils {
 		return (string == null || string.trim().length() == 0);
 	}
 	static public ISourceContainer[] convertSourceLocations(IPSourceLocation[] locations) {
-		ArrayList containers = new ArrayList(locations.length);
+		ArrayList<ISourceContainer> containers = new ArrayList<ISourceContainer>(locations.length);
 		int mappingCount = 0;
 		for (int i = 0; i < locations.length; ++i) {
 			if (locations[i] instanceof IProjectSourceLocation) {

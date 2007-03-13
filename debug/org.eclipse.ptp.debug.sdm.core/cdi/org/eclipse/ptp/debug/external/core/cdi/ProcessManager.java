@@ -35,11 +35,11 @@ import org.eclipse.ptp.debug.external.core.cdi.model.Target;
  */
 public class ProcessManager extends Manager {
 	static final Target[] EMPTY_TARGETS = new Target[0];
-	Map debugTargetMap = null;
+	Map<Integer, IPCDITarget> debugTargetMap = null;
 
 	public ProcessManager(Session session) {
 		super(session, true);
-		debugTargetMap = Collections.synchronizedMap(new HashMap());
+		debugTargetMap = Collections.synchronizedMap(new HashMap<Integer, IPCDITarget>());
 	}
 	public void shutdown() {
 		debugTargetMap.clear();
@@ -63,7 +63,7 @@ public class ProcessManager extends Manager {
 		return getRegisteredTargets().toArray();
 	}
 	public IPCDITarget[] addTargets(BitList tasks) {
-		List targets = new ArrayList();
+		List<IPCDITarget> targets = new ArrayList<IPCDITarget>();
 		int[] ids = tasks.toArray();
 		for (int i = 0; i<ids.length; i++) {
 			Integer key = new Integer(ids[i]);

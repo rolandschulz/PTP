@@ -98,7 +98,7 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 
 	protected UIDebugManager uiDebugManager = null;
 
-	protected Map attributes = new HashMap(3);
+	protected Map<String, Object> attributes = new HashMap<String, Object>(3);
 
 	private OverlayImageCache imageCache = new OverlayImageCache();
 
@@ -470,7 +470,7 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 	 * 
 	 * @return
 	 */
-	private Map getAttributes() {
+	private Map<String, Object> getAttributes() {
 		return attributes;
 	}
 

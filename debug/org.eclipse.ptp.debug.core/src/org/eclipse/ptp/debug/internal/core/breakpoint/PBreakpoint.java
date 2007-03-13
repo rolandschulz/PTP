@@ -44,10 +44,10 @@ import org.eclipse.ptp.debug.core.model.IPThread;
  * 
  */
 public abstract class PBreakpoint extends Breakpoint implements IPBreakpoint {
-	private Map fFilteredThreadsByTarget;
+	private Map<IPDebugTarget, Set<IPThread>> fFilteredThreadsByTarget;
 
 	public PBreakpoint() {
-		fFilteredThreadsByTarget = new HashMap(10);
+		fFilteredThreadsByTarget = new HashMap<IPDebugTarget, Set<IPThread>>(10);
 	}
 	public PBreakpoint(final IResource resource, final String markerType, final Map attributes, final boolean add) throws CoreException {
 		this();
@@ -200,11 +200,11 @@ public abstract class PBreakpoint extends Breakpoint implements IPBreakpoint {
 		return sb.toString();
 	}
 	public IPDebugTarget[] getTargetFilters() throws CoreException {
-		Set set = fFilteredThreadsByTarget.keySet();
+		Set<IPDebugTarget> set = fFilteredThreadsByTarget.keySet();
 		return (IPDebugTarget[]) set.toArray(new IPDebugTarget[set.size()]);
 	}
 	public IPThread[] getThreadFilters(IPDebugTarget target) throws CoreException {
-		Set set = (Set) fFilteredThreadsByTarget.get(target);
+		Set<IPThread> set = fFilteredThreadsByTarget.get(target);
 		return (set != null) ? (IPThread[]) set.toArray(new IPThread[set.size()]) : null;
 	}
 	public void removeTargetFilter(IPDebugTarget target) throws CoreException {
@@ -216,7 +216,7 @@ public abstract class PBreakpoint extends Breakpoint implements IPBreakpoint {
 		if (threads != null && threads.length > 0) {
 			IDebugTarget target = threads[0].getDebugTarget();
 			if (fFilteredThreadsByTarget.containsKey(target)) {
-				Set set = (Set) fFilteredThreadsByTarget.get(target);
+				Set<IPThread> set = fFilteredThreadsByTarget.get(target);
 				if (set != null) {
 					set.removeAll(Arrays.asList(threads));
 					if (set.isEmpty()) {
@@ -231,7 +231,7 @@ public abstract class PBreakpoint extends Breakpoint implements IPBreakpoint {
 	}
 	public void setThreadFilters(IPThread[] threads) throws CoreException {
 		if (threads != null && threads.length > 0) {
-			fFilteredThreadsByTarget.put(threads[0].getDebugTarget(), new HashSet(Arrays.asList(threads)));
+			fFilteredThreadsByTarget.put((IPDebugTarget)threads[0].getDebugTarget(), new HashSet<IPThread>(Arrays.asList(threads)));
 		}
 	}
 	

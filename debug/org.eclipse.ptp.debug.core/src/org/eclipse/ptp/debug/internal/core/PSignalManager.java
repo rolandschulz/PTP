@@ -64,7 +64,7 @@ public class PSignalManager implements IAdaptable {
 		if (!isDisposed() && fSignals == null) {
 			try {
 				IPCDISignal[] cdiSignals = getDebugTarget().getCDITarget().getSignals();
-				ArrayList list = new ArrayList(cdiSignals.length);
+				ArrayList<PSignal> list = new ArrayList<PSignal>(cdiSignals.length);
 				for(int i = 0; i < cdiSignals.length; ++i) {
 					list.add(new PSignal(getDebugTarget(), cdiSignals[i]));
 				}

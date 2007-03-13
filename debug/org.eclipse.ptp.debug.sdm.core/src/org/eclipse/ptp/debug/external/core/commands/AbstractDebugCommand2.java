@@ -31,8 +31,8 @@ import org.eclipse.ptp.debug.core.cdi.event.IPCDIErrorEvent;
  * 
  */
 public abstract class AbstractDebugCommand2 extends AbstractDebugCommand {
-	protected List completedTasks = new ArrayList();
-	protected List completedReturns = new ArrayList();
+	protected List<BitList> completedTasks = new ArrayList<BitList>();
+	protected List<Object> completedReturns = new ArrayList<Object>();
 
 	/** constructor
 	 * @param tasks

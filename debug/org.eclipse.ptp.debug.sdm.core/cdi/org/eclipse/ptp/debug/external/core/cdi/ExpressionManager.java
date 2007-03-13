@@ -43,50 +43,50 @@ import org.eclipse.ptp.debug.external.core.commands.VariableDeleteCommand;
  */
 public class ExpressionManager extends Manager {
 	final static IPCDIExpression[] EMPTY_EXPRESSIONS = {};
-	Map expMap;
-	Map varMap;
+	Map<Target, List<IPCDIExpression>> expMap;
+	Map<Target, List<Variable>> varMap;
 
 	public ExpressionManager(Session session) {
 		super(session, true);
-		expMap = new Hashtable();
-		varMap = new Hashtable();
+		expMap = new Hashtable<Target, List<IPCDIExpression>>();
+		varMap = new Hashtable<Target, List<Variable>>();
 	}
 	public void shutdown() {
 		expMap.clear();
 		varMap.clear();
 	}
 
-	synchronized List getExpressionList(Target target) {
-		List expList = (List)expMap.get(target);
+	synchronized List<IPCDIExpression> getExpressionList(Target target) {
+		List<IPCDIExpression> expList = expMap.get(target);
 		if (expList == null) {
-			expList = Collections.synchronizedList(new ArrayList());
+			expList = Collections.synchronizedList(new ArrayList<IPCDIExpression>());
 			expMap.put(target, expList);
 		}
 		return expList;
 	}
-	synchronized List getVariableList(Target target) {
-		List varList = (List)varMap.get(target);
+	synchronized List<Variable> getVariableList(Target target) {
+		List<Variable> varList = varMap.get(target);
 		if (varList == null) {
-			varList = Collections.synchronizedList(new ArrayList());
+			varList = Collections.synchronizedList(new ArrayList<Variable>());
 			varMap.put(target, varList);
 		}
 		return varList;
 	}
 	public IPCDIExpression createExpression(Target target, String name) throws PCDIException {
 		Expression expression = new Expression(target, name);
-		List exprList = getExpressionList(target);
+		List<IPCDIExpression> exprList = getExpressionList(target);
 		exprList.add(expression);
 		return expression;
 	}
 	public IPCDIExpression[] getExpressions(Target target) throws PCDIException {
-		List expList = (List) expMap.get(target);
+		List<IPCDIExpression> expList = expMap.get(target);
 		if (expList != null) {
 			return (IPCDIExpression[])expList.toArray(EMPTY_EXPRESSIONS);
 		}
 		return EMPTY_EXPRESSIONS;
 	}
 	public void destroyExpressions(Target target, IPCDIExpression[] expressions) throws PCDIException {
-		List expList = getExpressionList(target);
+		List<IPCDIExpression> expList = getExpressionList(target);
 		for (int i = 0; i < expressions.length; ++i) {
 			expList.remove(expressions[i]);
 		}
@@ -97,7 +97,7 @@ public class ExpressionManager extends Manager {
 	}
 	public void update(Target target, String[] varList) throws PCDIException {
 		//deleteAllVariables(target);
-		List eventList = new ArrayList();
+		List<IPCDIEvent> eventList = new ArrayList<IPCDIEvent>();
 		for (int i=0; i<varList.length; i++) {
 			Variable variable = getVariable(target, varList[i]);
 			if (variable != null) {
@@ -135,7 +135,7 @@ public class ExpressionManager extends Manager {
 		if (target == null)
 			return null;
 		
-		List varList = getVariableList(target);
+		List<Variable> varList = getVariableList(target);
 		Variable[] vars = (Variable[])varList.toArray(new Variable[0]);
 		for (int i = 0; i < vars.length; i++) {
 			if (vars[i].getName().equals(varName)) {
@@ -165,7 +165,7 @@ public class ExpressionManager extends Manager {
 			Variable v = new LocalVariable(target, null, frame, code, null, 0, 0, keyName);
 			v.setAIF(aif);
 			
-			List varList = getVariableList(target);
+			List<Variable> varList = getVariableList(target);
 			varList.add(v);
 			return v;
 		} finally {
@@ -177,14 +177,14 @@ public class ExpressionManager extends Manager {
 	public Variable removeVariableFromList(Target target, String varName) {
 		Variable var = getVariable(target, varName);
 		if (var != null) {
-			List varList = getVariableList(target);
+			List<Variable> varList = getVariableList(target);
 			varList.remove(var);
 			return var;
 		}
 		return null;
 	}
 	public void deleteAllVariables(Target target) throws PCDIException {
-		List varList = getVariableList(target);
+		List<Variable> varList = getVariableList(target);
 		Variable[] variables = (Variable[]) varList.toArray(new Variable[varList.size()]);
 		for (int i = 0; i < variables.length; ++i) {
 			deleteVariable(variables[i]);

@@ -73,9 +73,9 @@ import org.eclipse.ptp.debug.external.core.commands.SetWatchpointCommand;
 
 public class BreakpointManager extends SessionObject implements IPCDIBreakpointManager, IBreakpointsListener {
 	public static IPCDIBreakpoint[] EMPTY_BREAKPOINTS = new IPCDIBreakpoint[0];
-	Map breakMap = new HashMap();
-	Map cdiBbreakMap = new HashMap();
-	Map cdiBreakIDMap = new HashMap();
+	Map<IPBreakpoint, IPCDIBreakpoint> breakMap = new HashMap<IPBreakpoint, IPCDIBreakpoint>();
+	Map<IPCDIBreakpoint, IPBreakpoint> cdiBbreakMap = new HashMap<IPCDIBreakpoint, IPBreakpoint>();
+	Map<Integer, IPCDIBreakpoint> cdiBreakIDMap = new HashMap<Integer, IPCDIBreakpoint>();
 
 	public BreakpointManager(Session session) {
 		super(session);

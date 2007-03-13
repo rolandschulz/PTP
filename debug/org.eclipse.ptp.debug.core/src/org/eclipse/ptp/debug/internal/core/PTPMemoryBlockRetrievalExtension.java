@@ -95,7 +95,7 @@ public class PTPMemoryBlockRetrievalExtension extends PlatformObject implements 
 	private void initializeFromMemento(String memento) throws CoreException {
 		Element root = DebugPlugin.parseDocument(memento);
 		if (root.getNodeName().equalsIgnoreCase(MEMORY_BLOCK_EXPRESSION_LIST)) {
-			List expressions = new ArrayList();
+			List<String> expressions = new ArrayList<String>();
 			NodeList list = root.getChildNodes();
 			int length = list.getLength();
 			for(int i = 0; i < length; ++i) {
@@ -116,7 +116,7 @@ public class PTPMemoryBlockRetrievalExtension extends PlatformObject implements 
 	}
 
 	private void createMemoryBlocks(String[] expressions) {
-		ArrayList list = new ArrayList(expressions.length);
+		ArrayList<PTPMemoryBlockExtension> list = new ArrayList<PTPMemoryBlockExtension>(expressions.length);
 		for (int i = 0; i < expressions.length; ++i) {
 			IAddress address = getDebugTarget().getAddressFactory().createAddress(expressions[i]);
 			if (address != null) {

@@ -23,9 +23,11 @@ import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDISignal;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.external.core.cdi.event.SignalChangedEvent;
 import org.eclipse.ptp.debug.external.core.cdi.model.Signal;
 import org.eclipse.ptp.debug.external.core.cdi.model.Target;
@@ -38,21 +40,21 @@ import org.eclipse.ptp.debug.external.core.commands.CLIListSignalsCommand;
 public class SignalManager extends Manager {
 	IPCDISignal[] EMPTY_SIGNALS = {};
 	Signal[] noSigs = new Signal[0];
-	Map signalsMap;
+	Map<IPCDITarget, List<IPCDISignal>> signalsMap;
 
 	public SignalManager(Session session) {
 		super(session, false);
-		signalsMap = new Hashtable();
+		signalsMap = new Hashtable<IPCDITarget, List<IPCDISignal>>();
 	}
 	
 	public void shutdown() {
 		signalsMap.clear();
 	}
 
-	synchronized List getSignalsList(Target target) {
-		List signalsList = (List)signalsMap.get(target);
+	synchronized List<IPCDISignal> getSignalsList(Target target) {
+		List<IPCDISignal> signalsList = signalsMap.get(target);
 		if (signalsList == null) {
-			signalsList = Collections.synchronizedList(new ArrayList());
+			signalsList = Collections.synchronizedList(new ArrayList<IPCDISignal>());
 			signalsMap.put(target, signalsList);
 		}
 		return signalsList;
@@ -86,7 +88,7 @@ public class SignalManager extends Manager {
 
 	protected IPCDISignal findSignal(Target target, String name) {
 		IPCDISignal sig = null;
-		List signalsList = (List)signalsMap.get(target);
+		List<IPCDISignal> signalsList = signalsMap.get(target);
 		if (signalsList != null) {
 			IPCDISignal[] sigs = (IPCDISignal[])signalsList.toArray(new IPCDISignal[0]);
 			for (int i = 0; i < sigs.length; i++) {
@@ -133,11 +135,11 @@ public class SignalManager extends Manager {
 	}
 
 	public IPCDISignal[] getSignals(Target target) throws PCDIException {
-		List signalsList = (List)signalsMap.get(target);
+		List<IPCDISignal> signalsList = signalsMap.get(target);
 		if (signalsList == null) {
 			update(target);
 		}
-		signalsList = (List)signalsMap.get(target);
+		signalsList = signalsMap.get(target);
 		if (signalsList != null) {
 			return (IPCDISignal[])signalsList.toArray(new IPCDISignal[0]);
 		}
@@ -146,8 +148,8 @@ public class SignalManager extends Manager {
 
 	public void update(Target target) throws PCDIException {
 		IPCDISignal[] new_sigs = createSignals(target);
-		List eventList = new ArrayList(new_sigs.length);
-		List signalsList = getSignalsList(target);
+		List<IPCDIEvent> eventList = new ArrayList<IPCDIEvent>(new_sigs.length);
+		List<IPCDISignal> signalsList = getSignalsList(target);
 		for (int i = 0; i<new_sigs.length; i++) {
 			IPCDISignal sig = findSignal(target, new_sigs[i].getName());
 			if (sig != null) {

@@ -56,7 +56,7 @@ public class PTPDebugCorePlugin extends Plugin {
 	public static final String PLUGIN_ID = "org.eclipse.ptp.debug.core";
 	public static final int INTERNAL_ERROR = 1000;
 	private static PTPDebugCorePlugin plugin;
-	private HashMap fDebugConfigurations;
+	private HashMap<String, PDebugConfiguration> fDebugConfigurations;
 	private static Logger logger;
 	private Level loggingLevel = Level.FINE;
 	//private ListenerList fBreakpointListeners;
@@ -64,7 +64,7 @@ public class PTPDebugCorePlugin extends Plugin {
 	private static PCDIDebugModel debugModel = null;
 	private EventDispatchJob dispatchJob = new EventDispatchJob();
 	private ListenerList fEventListeners = new ListenerList();
-	private List fEventQueue = new ArrayList();
+	private List<IPDebugEvent> fEventQueue = new ArrayList<IPDebugEvent>();
 	private boolean fShuttingDown= false;
 	private int fDispatching = 0;
 	
@@ -114,7 +114,7 @@ public class PTPDebugCorePlugin extends Plugin {
 	private void initializeDebugConfiguration() {
 		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(getUniqueIdentifier(), "PTPDebugger");
 		IConfigurationElement[] infos = extensionPoint.getConfigurationElements();
-		fDebugConfigurations = new HashMap(infos.length);
+		fDebugConfigurations = new HashMap<String, PDebugConfiguration>(infos.length);
 		for (int i = 0; i < infos.length; i++) {
 			IConfigurationElement configurationElement = infos[i];
 			PDebugConfiguration configType = new PDebugConfiguration(configurationElement);

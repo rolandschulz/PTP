@@ -96,7 +96,7 @@ public class ArrayTabItem extends PTabItem {
 				
 				pmonitor.beginTask(MessageFormat.format("{0}", new String[]{ ArrayMessages.getString("ArrayTabItem.initVariable")}), 10);
 				try {
-					List varList = new ArrayList();
+					List<Integer> varList = new ArrayList<Integer>();
 					if (!setVariables(varList, variable.getValue(), pmonitor))
 						throw new InvocationTargetException(new Exception(ArrayMessages.getString("ArrayTabItem.cancel")));
 					
@@ -118,7 +118,7 @@ public class ArrayTabItem extends PTabItem {
 		}
 	}
 	
-	public boolean setVariables(List varList, IValue value, IProgressMonitor monitor) throws DebugException {
+	public boolean setVariables(List<Integer> varList, IValue value, IProgressMonitor monitor) throws DebugException {
 		if (monitor.isCanceled())
 			return false;
 		

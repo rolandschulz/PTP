@@ -44,7 +44,7 @@ public class Thread extends PObject implements IPCDIThread {
 	int id;
 	String name;
 	StackFrame currentFrame;
-	List currentFrames;
+	List<IPCDIStackFrame> currentFrames;
 	int stackdepth = 0;
 
 	final public static int STACKFRAME_DEFAULT_DEPTH = 200;
@@ -91,7 +91,7 @@ public class Thread extends PObject implements IPCDIThread {
 
 		// refresh if we have nothing or if we have just a subset get everything.
 		if (currentFrames == null || currentFrames.size() < depth) {
-			currentFrames = new ArrayList();
+			currentFrames = new ArrayList<IPCDIStackFrame>();
 			Target target = (Target)getTarget();
 			IPCDIThread currentThread = (IPCDIThread)target.getCurrentThread();
 			target.setCurrentThread(this, false);
@@ -146,7 +146,7 @@ public class Thread extends PObject implements IPCDIThread {
 	}
 	public IPCDIStackFrame[] getStackFrames(int low, int high) throws PCDIException {
 		if (currentFrames == null || currentFrames.size() < high) {
-			currentFrames = new ArrayList();
+			currentFrames = new ArrayList<IPCDIStackFrame>();
 			Target target = (Target)getTarget();
 			IPCDIThread currentThread = target.getCurrentThread();
 			target.setCurrentThread(this, false);
@@ -178,7 +178,7 @@ public class Thread extends PObject implements IPCDIThread {
 				}
 			}
 		}
-		List list = ((high - low + 1) <= currentFrames.size()) ? currentFrames.subList(low, high + 1) : currentFrames;
+		List<IPCDIStackFrame> list = ((high - low + 1) <= currentFrames.size()) ? currentFrames.subList(low, high + 1) : currentFrames;
 		return (IPCDIStackFrame[])list.toArray(noStack);
 		/* old design
 		if (currentFrames == null || currentFrames.size() < high) {

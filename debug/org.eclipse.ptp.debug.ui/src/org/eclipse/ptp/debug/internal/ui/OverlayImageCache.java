@@ -28,7 +28,7 @@ import org.eclipse.swt.graphics.Image;
  *
  */
 public class OverlayImageCache {
-	private Map cache = new HashMap();
+	private Map<OverlayImageDescriptor, Image> cache = new HashMap<OverlayImageDescriptor, Image>();
 
 	/** Get image 
 	 * @param imageDescriptor
@@ -57,7 +57,7 @@ public class OverlayImageCache {
 	/** Get stored images
 	 * @return
 	 */
-	private Map getCache() {
+	private Map<OverlayImageDescriptor, Image> getCache() {
 		return cache;
 	}
 }

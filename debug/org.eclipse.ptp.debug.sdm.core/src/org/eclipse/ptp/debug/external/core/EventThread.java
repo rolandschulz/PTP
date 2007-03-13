@@ -28,7 +28,7 @@ import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 
 public class EventThread {
-	private List fEventQueue = new ArrayList();
+	private List<IPCDIEvent> fEventQueue = new ArrayList<IPCDIEvent>();
 	private EventDispatchJob dispatchJob = new EventDispatchJob(); 
 
 	IAbstractDebugger dbg;

@@ -275,8 +275,11 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 	public void handleProcessTerminatedEvent(BitList tasks, String signalName, String signalMeaning) {
 		fireEvent(new InferiorExitedEvent(getSession(), tasks, signalName, signalMeaning));
 	}
-	public void handleErrorEvent(BitList tasks, String errMsg, int errCode) {
+	public void handleErrorEvent(BitList tasks, String errMsg, int errCode) {		
 		PDebugUtils.println("----- debugger error: " + errMsg + " on Tasks: " + showBitList(tasks) + " ------------");
+		if (errCode == IPCDIErrorEvent.DBG_IGNORE)
+			return;
+
 		if (tasks == null || tasks.isEmpty() || errCode == IPCDIErrorEvent.DBG_FATAL) {
 			tasks = session.createBitList();
 		}

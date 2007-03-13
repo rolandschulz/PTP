@@ -26,7 +26,6 @@ import org.eclipse.ptp.debug.core.model.IPBreakpoint;
 import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.debug.ui.views.ParallelDebugView;
-import org.eclipse.ptp.ui.UIUtils;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ui.IViewActionDelegate;
 import org.eclipse.ui.IViewPart;

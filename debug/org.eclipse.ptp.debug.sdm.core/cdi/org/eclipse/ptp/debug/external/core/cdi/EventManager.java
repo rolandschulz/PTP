@@ -28,7 +28,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.cdi.IPCDIBreakpointHit;
 import org.eclipse.ptp.debug.core.cdi.IPCDIEndSteppingRange;
@@ -62,7 +61,7 @@ import org.eclipse.ptp.debug.external.core.cdi.model.Target;
 import org.eclipse.ptp.debug.external.core.cdi.model.Thread;
 
 public class EventManager extends SessionObject implements IPCDIEventManager, Observer {
-	List list = Collections.synchronizedList(new ArrayList());
+	List<IPCDIEventListener> list = Collections.synchronizedList(new ArrayList<IPCDIEventListener>());
 	protected final Object lock = new Object(); 
 
 	public EventManager(Session session) {

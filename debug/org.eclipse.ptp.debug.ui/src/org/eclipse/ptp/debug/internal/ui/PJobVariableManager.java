@@ -103,7 +103,7 @@ public final class PJobVariableManager {
 		addJobVariable(newJob, newVar, sets, enable);
 	}
 	public void deleteSet(String job_id, String set_id) {
-		List removeVars = new ArrayList();
+		List<String> removeVars = new ArrayList<String>();
 		for (Iterator i=variableStorage.getValueIterator(job_id); i.hasNext();) {
 			JobVariable jVar = (JobVariable)i.next();
 			if (jVar.containSet(set_id)) {
@@ -155,7 +155,7 @@ public final class PJobVariableManager {
 		}
 	}
 	public String[] getVariables(String job_id, String set_id, boolean enable) {
-		List vars = new ArrayList();
+		List<String> vars = new ArrayList<String>();
 		for (Iterator i=variableStorage.getValueIterator(job_id); i.hasNext();) {
 			JobVariable jVar = (JobVariable)i.next();
 			if (jVar.isEnable() == enable && jVar.containSet(set_id)) {

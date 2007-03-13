@@ -45,7 +45,7 @@ public class MappingSourceContainerType extends AbstractSourceContainerTypeDeleg
 				String name = element.getAttribute(ATTR_NAME);
 				if (name == null)
 					name = "";
-				List entries = new ArrayList();
+				List<MapEntrySourceContainer> entries = new ArrayList<MapEntrySourceContainer>();
 				Node childNode = element.getFirstChild();
 				while (childNode != null) {
 					if (childNode.getNodeType() == Node.ELEMENT_NODE) {

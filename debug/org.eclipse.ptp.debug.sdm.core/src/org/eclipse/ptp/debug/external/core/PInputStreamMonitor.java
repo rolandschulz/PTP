@@ -29,7 +29,7 @@ import org.eclipse.debug.core.DebugPlugin;
  */
 public class PInputStreamMonitor {
 	private OutputStream fStream;
-	private Vector fQueue;
+	private Vector<String> fQueue;
 	private Thread fThread;
 	private Object fLock;
 	
@@ -37,7 +37,7 @@ public class PInputStreamMonitor {
 	
 	public PInputStreamMonitor(OutputStream stream) {
 		fStream = stream;
-		fQueue = new Vector();
+		fQueue = new Vector<String>();
 		fLock = new Object();
 	}
 	

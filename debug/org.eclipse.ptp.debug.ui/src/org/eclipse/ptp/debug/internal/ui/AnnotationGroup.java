@@ -31,7 +31,7 @@ import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
  * 
  */
 public class AnnotationGroup {
-	private List annotationList = Collections.synchronizedList(new ArrayList());
+	private List<PInstructionPointerAnnotation2> annotationList = Collections.synchronizedList(new ArrayList<PInstructionPointerAnnotation2>());
 
 	/** Check the annotation whether it contains in the list
 	 * @param annotation

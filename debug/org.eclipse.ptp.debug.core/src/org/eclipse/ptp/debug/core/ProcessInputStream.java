@@ -31,7 +31,7 @@ import org.eclipse.ptp.core.events.IProcessEvent;
  * @author Clement chu
  */
 public class ProcessInputStream extends InputStream implements IProcessListener {
-	protected List buffers;
+	protected List<String> buffers;
     protected int pos;
     protected int count;
     private String currentBuffer;
@@ -39,7 +39,7 @@ public class ProcessInputStream extends InputStream implements IProcessListener 
 
     public ProcessInputStream(IPProcess process) {
     	this.process = process;
-    	buffers = Collections.synchronizedList(new LinkedList());
+    	buffers = Collections.synchronizedList(new LinkedList<String>());
 		PTPCorePlugin.getDefault().getModelPresentation().addProcessListener(this);
     }
     public IPProcess getProcess() {

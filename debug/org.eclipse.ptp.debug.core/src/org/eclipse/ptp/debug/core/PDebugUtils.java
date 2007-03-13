@@ -187,8 +187,8 @@ public class PDebugUtils {
 		}
 		return sb.toString();
 	}
-	public static List getReferencedProjects( IProject project ) {
-		ArrayList list = new ArrayList( 10 );
+	public static List getReferencedProjects(IProject project) {
+		ArrayList<IProject> list = new ArrayList<IProject>(10);
 		if ( project != null && project.exists() && project.isOpen() ) {
 			IProject[] refs = new IProject[0];
 			try {
@@ -205,7 +205,7 @@ public class PDebugUtils {
 		}
 		return list;
 	}
-	private static void getReferencedProjects( IProject root, IProject project, List list ) {
+	private static void getReferencedProjects( IProject root, IProject project, List<IProject> list ) {
 		if ( project != null && project.exists() && project.isOpen() ) {
 			IProject[] refs = new IProject[0];
 			try {

@@ -40,9 +40,9 @@ import org.eclipse.ptp.debug.core.model.IPBreakpoint;
 import org.eclipse.ptp.debug.internal.core.sourcelookup.PSourceLookupParticipant;
 
 public class PSourceLookupDirector extends AbstractSourceLookupDirector implements IPSourceLookupDirector {
-	private static Set fSupportedTypes;
+	private static Set<String> fSupportedTypes;
 	static {
-		fSupportedTypes = new HashSet();
+		fSupportedTypes = new HashSet<String>();
 		fSupportedTypes.add(WorkspaceSourceContainer.TYPE_ID);
 		fSupportedTypes.add(ProjectSourceContainer.TYPE_ID);
 		fSupportedTypes.add(FolderSourceContainer.TYPE_ID);

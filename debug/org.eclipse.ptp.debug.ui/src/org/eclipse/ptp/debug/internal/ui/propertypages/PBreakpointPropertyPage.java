@@ -404,7 +404,7 @@ public class PBreakpointPropertyPage extends FieldEditorPreferencePage implement
 	 * @see org.eclipse.jface.preference.IPreferencePage#performOk()
 	 */
 	public boolean performOk() {
-		final List changedProperties = new ArrayList(5);
+		final List<String> changedProperties = new ArrayList<String>(5);
 		getPreferenceStore().addPropertyChangeListener(new IPropertyChangeListener() {
 			public void propertyChange(PropertyChangeEvent event) {
 				changedProperties.add(event.getProperty());
