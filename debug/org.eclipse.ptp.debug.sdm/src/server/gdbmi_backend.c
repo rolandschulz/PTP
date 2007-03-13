@@ -201,7 +201,7 @@ CreateMIVar(char *name)
 	cmd = MIVarCreate("-", "*", name);
 	SendCommandWait(DebugSession, cmd);
 	if (!MICommandResultOK(cmd)) {
-		DbgSetError(DBGERR_UNKNOWN_VARIABLE, GetLastErrorStr());
+		//DbgSetError(DBGERR_UNKNOWN_VARIABLE, GetLastErrorStr());
 		MICommandFree(cmd);
 		return NULL;
 	}
