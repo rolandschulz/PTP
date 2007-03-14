@@ -355,7 +355,7 @@ public class MPIProjectWizardPage extends MBSCustomPage {
 	 */
 	private void createUserEntryArea(Composite composite, boolean defaultEnabled) {
 		includePathLabel = new Label(composite, SWT.NONE);
-		includePathLabel.setText("Include Path:");
+		includePathLabel.setText("Include path:");
 		includePathLabel.setToolTipText("Location of MPI include path(s)");
 
 		// Include path location  entry field
