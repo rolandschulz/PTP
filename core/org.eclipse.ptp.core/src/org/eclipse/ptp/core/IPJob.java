@@ -29,6 +29,7 @@ package org.eclipse.ptp.core;
  * @author Nathan DeBardeleben
  */
 public interface IPJob extends IPElement {
+	public static final String JOB_ID_TEXT = "JOB_ID";
 	/**
 	 * Find a Process in this Job by the Process number. Returns the Process
 	 * object if found, else returns <code>null</code>.

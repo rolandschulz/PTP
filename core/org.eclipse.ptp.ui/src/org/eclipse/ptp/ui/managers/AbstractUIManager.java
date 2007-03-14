@@ -255,7 +255,8 @@ public abstract class AbstractUIManager implements IManager {
 			ILaunchManager launchManager = DebugPlugin.getDefault().getLaunchManager();
 			ILaunch[] launches = launchManager.getLaunches();
 			for (int i=0; i<launches.length; i++) {
-				if (launches[i].getAttribute("JOB_ID").equals(job.getIDString())) {
+				String launchedJobID = launches[i].getAttribute(IPJob.JOB_ID_TEXT);
+				if (launchedJobID != null && launchedJobID.equals(job.getIDString())) {
 					launchManager.removeLaunch(launches[i]);
 				}
 			}
