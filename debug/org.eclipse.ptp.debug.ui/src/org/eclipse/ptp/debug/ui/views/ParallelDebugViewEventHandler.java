@@ -114,11 +114,13 @@ public class ParallelDebugViewEventHandler extends AbstractPDebugEventHandler {
 					}
 					break;
 				default:
+					/*
 					if (job.getIDString().equals(getPView().getCurrentID())) {
 						BitList tsource = (BitList) job.getAttribute(IAbstractDebugger.TERMINATED_PROC_KEY);
 						BitList ttarget = (BitList) job.getAttribute(IAbstractDebugger.SUSPENDED_PROC_KEY);
 						getPView().updateTerminateButton(tsource, ttarget);
 					}
+					*/
 					refresh(true);
 					break;
 				}
@@ -136,6 +138,7 @@ public class ParallelDebugViewEventHandler extends AbstractPDebugEventHandler {
 						PTPDebugUIPlugin.getUIDebugManager().updateVariableValueOnSuspend(info.getAllProcesses());
 					}
 				}
+				getPView().updateAction();
 				refresh();
 				break;
 			case IPDebugEvent.CHANGE:

@@ -240,6 +240,8 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 					IEditorReference[] refs = page.getEditorReferences();
 					for (int i = 0; i < refs.length; i++) {
 						IEditorPart refEditor = refs[i].getEditor(false);
+						if (refEditor == null)
+							continue;
 						IEditorInput editorInput = refEditor.getEditorInput();
 						if (editorInput instanceof IFileEditorInput) {
 							if (((IFileEditorInput) editorInput).getFile().equals(file)) {
