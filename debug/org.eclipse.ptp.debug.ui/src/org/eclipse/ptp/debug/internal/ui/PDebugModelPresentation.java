@@ -45,7 +45,6 @@ import org.eclipse.debug.core.model.IValue;
 import org.eclipse.debug.core.model.IVariable;
 import org.eclipse.debug.core.model.IWatchExpression;
 import org.eclipse.debug.core.sourcelookup.containers.LocalFileStorage;
-import org.eclipse.debug.ui.IDebugEditorPresentation;
 import org.eclipse.debug.ui.IDebugModelPresentation;
 import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.debug.ui.IValueDetailListener;
@@ -80,7 +79,6 @@ import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorRegistry;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
@@ -89,7 +87,7 @@ import org.eclipse.ui.part.FileEditorInput;
  * @author Clement chu
  * 
  */
-public class PDebugModelPresentation extends LabelProvider implements IDebugModelPresentation, IDebugEditorPresentation {
+public class PDebugModelPresentation extends LabelProvider implements IDebugModelPresentation /*, IDebugEditorPresentation */ {
 	private static PDebugModelPresentation instance = null;
 
 	public final static String DISPLAY_FULL_PATHS = "DISPLAY_FULL_PATHS";
@@ -883,12 +881,7 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		attributes.clear();
 		super.dispose();
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.ui.IDebugEditorPresentation#addAnnotations(org.eclipse.ui.IEditorPart, org.eclipse.debug.core.model.IStackFrame)
-	 */
+/*
 	public boolean addAnnotations(IEditorPart editorPart, IStackFrame stackFrame) {
 		try {
 			// PAnnotationManager.getDefault().focusAnnotation(editorPart, stackFrame);
@@ -899,16 +892,9 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 			return false;
 		}
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.ui.IDebugEditorPresentation#removeAnnotations(org.eclipse.ui.IEditorPart, org.eclipse.debug.core.model.IThread)
-	 */
 	public void removeAnnotations(IEditorPart editorPart, IThread thread) {
 		// PDebugUtils.println("-------------PDebugModePresentation - removeAnnotations");
-		/*
-		 * try{ PAnnotationManager.getDefault().removeAnnotation(editorPart, thread); } catch (CoreException e) { PTPDebugUIPlugin.log(e); }
-		 */
+		//try{ PAnnotationManager.getDefault().removeAnnotation(editorPart, thread); } catch (CoreException e) { PTPDebugUIPlugin.log(e); }
 	}
+*/
 }
