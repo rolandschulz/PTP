@@ -19,6 +19,7 @@
 package org.eclipse.ptp.debug.ui.views;
 
 import java.util.Iterator;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -214,7 +215,9 @@ public class ParallelDebugView extends ParallelJobView {
 	public void createView(Composite parent) {
 		super.createView(parent);
 		setEventHandler(new ParallelDebugViewEventHandler(this));
-		getDebugViewer().addSelectionChangedListener(debugViewSelectChangedListener);
+		Viewer viewer = getDebugViewer();
+		if (viewer != null)
+			viewer.addSelectionChangedListener(debugViewSelectChangedListener);
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.views.AbstractParallelSetView#fillContextMenu(org.eclipse.jface.action.IMenuManager)
@@ -384,51 +387,57 @@ public class ParallelDebugView extends ParallelJobView {
 			if (elementHandler != null) {
 				BitList suspendedTaskList = (BitList) job.getAttribute(IAbstractDebugger.SUSPENDED_PROC_KEY);
 				BitList terminatedTaskList = (BitList) job.getAttribute(IAbstractDebugger.TERMINATED_PROC_KEY);
-				updateSuspendResumeButton(suspendedTaskList, terminatedTaskList);
-				updateTerminateButton(terminatedTaskList, suspendedTaskList);
+				updateDebugButtons(terminatedTaskList, suspendedTaskList);
 			}
-		} else
-			setEnableResumeButtonGroup(false);
-	}
-	/** Update buttons to enable / disable
-	 * @param source
-	 * @param set
-	 * @param target
-	 */
-	public void updateSuspendResumeButton(BitList source, BitList target) {
-		IElementSet set = getCurrentSet();
-		if (set == null || source == null)
-			return;
-		boolean isEnabled = false;
-		if (set.isRootSet()) {
-			isEnabled = !source.isEmpty();// tasks != 0: some processes suspended
-			suspendAction.setEnabled(set.size() != source.cardinality()); // disable suspend Action if all tasks same as root size
 		} else {
+			resumeAction.setEnabled(false);
+			stepIntoAction.setEnabled(false);
+			stepOverAction.setEnabled(false);
+			suspendAction.setEnabled(false);
+		}
+	}
+	/** Updtae debug button
+	 * @param terminatedTasks
+	 * @param suspendedTasks
+	 */
+	public void updateDebugButtons(BitList terminatedTasks, BitList suspendedTasks) {
+		IElementSet set = getCurrentSet();
+		if (set == null || terminatedTasks == null)
+			return;
+		int setSize = set.size();
+		int totalTerminatedSize = terminatedTasks.cardinality();
+		int totalSuspendedSize = (suspendedTasks == null || suspendedTasks.isEmpty() ? 0 : suspendedTasks.cardinality());
+		if (!set.isRootSet()) {
 			try {
 				BitList setTasks = ((UIDebugManager) manager).getTasks(getCurrentID(), set.getID());
-				// this set contains some suspended processes
-				isEnabled = setTasks.intersects(source);
-				BitList refTasks = source.copy();
+				setSize = setTasks.cardinality();
+				BitList refTasks = terminatedTasks.copy();
 				refTasks.and(setTasks);
-				// the size is not equal: there is some processes running
-				suspendAction.setEnabled(set.size() != refTasks.cardinality());
+				// size equals: the set contains all terminated processes
+				totalTerminatedSize = refTasks.cardinality();
+				if (setSize != totalTerminatedSize) {
+					BitList tarRefTasks = suspendedTasks.copy();
+					tarRefTasks.and(setTasks);
+					totalSuspendedSize = tarRefTasks.cardinality();
+				}
 			} catch (CoreException e) {
 				PTPDebugUIPlugin.log(e);
 			}
 		}
-		setEnableResumeButtonGroup(isEnabled);
-	}
-	/** Set buttons enable / disable
-	 * has suspend = resume enable
-	 * has running = suspend enable
-	 * @param isEnabled
-	 */
-	private void setEnableResumeButtonGroup(boolean isEnabled) {
-		resumeAction.setEnabled(isEnabled);
-		stepIntoAction.setEnabled(isEnabled);
-		stepOverAction.setEnabled(isEnabled);
-		if (!isEnabled)
-			stepReturnAction.setEnabled(false);
+		boolean enabledTerminatedButton = (setSize != totalTerminatedSize);
+		terminateAction.setEnabled(enabledTerminatedButton);
+		if (enabledTerminatedButton) {// not all processes terminated
+			resumeAction.setEnabled(totalSuspendedSize > 0);
+			boolean enableStepButtons = (setSize == totalSuspendedSize + totalTerminatedSize);
+			stepIntoAction.setEnabled(enableStepButtons);
+			stepOverAction.setEnabled(enableStepButtons);
+			suspendAction.setEnabled(!enableStepButtons);
+		} else {// all process terminated
+			resumeAction.setEnabled(false);
+			stepIntoAction.setEnabled(false);
+			stepOverAction.setEnabled(false);
+			suspendAction.setEnabled(false);
+		}
 	}
 	public void updateStepReturnButton(BitList source) {
 		IElementSet set = getCurrentSet();
@@ -451,48 +460,6 @@ public class ParallelDebugView extends ParallelJobView {
 			}
 		} catch (CoreException e) {
 			PTPDebugUIPlugin.log(e);
-		}
-	}
-	/** Updtae terminate button
-	 * @param source
-	 * @param set
-	 * @param target
-	 */
-	public void updateTerminateButton(BitList source, BitList target) {
-		IElementSet set = getCurrentSet();
-		if (set == null || source == null)
-			return;
-		int setSize = set.size();
-		int totalTerminatedSize = source.cardinality();
-		int totalSuspendedSize = (target == null || target.isEmpty() ? 0 : target.cardinality());
-		// size equals: all processes are terminated
-		boolean isEnabled = (setSize != totalTerminatedSize);
-		if (!set.isRootSet()) {
-			try {
-				BitList setTasks = ((UIDebugManager) manager).getTasks(getCurrentID(), set.getID());
-				setSize = setTasks.cardinality();
-				BitList refTasks = source.copy();
-				refTasks.and(setTasks);
-				// size equals: the set contains all terminated processes
-				totalTerminatedSize = refTasks.cardinality();
-				isEnabled = (setSize != totalTerminatedSize);
-				if (isEnabled) {
-					BitList tarRefTasks = target.copy();
-					tarRefTasks.and(setTasks);
-					totalSuspendedSize = tarRefTasks.cardinality();
-				}
-			} catch (CoreException e) {
-				PTPDebugUIPlugin.log(e);
-			}
-		}
-		terminateAction.setEnabled(isEnabled);
-		if (isEnabled) {// not all processes terminated
-			setEnableResumeButtonGroup(totalSuspendedSize > 0);
-			// no suspended process or running process: total terminated + total suspended != set size
-			suspendAction.setEnabled(totalSuspendedSize == 0 || (setSize != (totalTerminatedSize + totalSuspendedSize)));
-		} else {// all process terminated
-			setEnableResumeButtonGroup(false);
-			suspendAction.setEnabled(false);
 		}
 	}
 
@@ -593,6 +560,7 @@ public class ParallelDebugView extends ParallelJobView {
 				return Status.OK_STATUS;
 			}
         };
+        //set job priority very low to make sure it is executed at last
         job.setSystem(true);
         job.setPriority(Job.DECORATE);
         job.schedule();
