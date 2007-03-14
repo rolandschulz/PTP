@@ -108,7 +108,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 				abort(LaunchMessages.getResourceString("ParallelLaunchConfigurationDelegate.No_ResourceManager"), null, 0);
 			}
 			job = launchManager.run(launch, jrunconfig, new SubProgressMonitor(monitor, 150));
-			launch.setAttribute("JOB_ID", job.getIDString());
+			launch.setAttribute(IPJob.JOB_ID_TEXT, job.getIDString());
 			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
 				// show ptp debug view
 				showPTPDebugView(IPTPDebugUIConstants.ID_VIEW_PARALLELDEBUG);
