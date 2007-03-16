@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse-cdt version="2.0"?>
+
+<cdtproject id="org.eclipse.cdt.make.core.make">
+<extension point="org.eclipse.cdt.core.BinaryParser" id="org.eclipse.cdt.core.GNU_ELF">
+<attribute key="addr2line" value="addr2line"/>
+<attribute key="c++filt" value="c++filt"/>
+</extension>
+<extension point="org.eclipse.cdt.core.BinaryParser" id="org.eclipse.cdt.core.Cygwin_PE">
+<attribute key="addr2line" value="addr2line"/>
+<attribute key="cygpath" value="cygpath"/>
+<attribute key="c++filt" value="c++filt"/>
+</extension>
+<extension point="org.eclipse.cdt.core.BinaryParser" id="org.eclipse.cdt.core.XCOFF32">
+<attribute key="addr2line" value="addr2line"/>
+<attribute key="c++filt" value="c++filt"/>
+</extension>
+<extension point="org.eclipse.cdt.core.BinaryParser" id="org.eclipse.cdt.core.ELF"/>
+<extension point="org.eclipse.cdt.core.BinaryParser" id="org.eclipse.cdt.core.PE"/>
+<data>
+<item id="org.eclipse.cdt.core.pathentry">
+<pathentry kind="src" path=""/>
+<pathentry kind="out" path=""/>
+</item>
+<item id="cdt_indexer">
+<indexEnabled indexValue="false"/>
+<indexerProblemsEnabled indexProblemsValue="0"/>
+</item>
+<item id="cdt_resolver">
+<custom value="false"/>
+</item>
+</data>
+</cdtproject>
