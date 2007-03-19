@@ -13,12 +13,13 @@ package org.eclipse.ptp.debug.ui.testplugin;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
 import java.util.zip.ZipFile;
-
 import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.core.CProjectNature;
 import org.eclipse.cdt.core.ICDescriptor;
 import org.eclipse.cdt.core.ICDescriptorOperation;
+import org.eclipse.cdt.core.IBinaryParser.IBinaryObject;
 import org.eclipse.cdt.core.model.CModelException;
 import org.eclipse.cdt.core.model.IArchive;
 import org.eclipse.cdt.core.model.IArchiveContainer;
@@ -33,6 +34,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ui.dialogs.IOverwriteQuery;
@@ -40,14 +42,18 @@ import org.eclipse.ui.wizards.datatransfer.ImportOperation;
 import org.eclipse.ui.wizards.datatransfer.ZipFileStructureProvider;
 
 /**
- * Helper methods to set up a ICProject.
+ * @author Clement chu
  */
 public class PTPProjectHelper {
 	public static File getFileInPlugin(IPath path) {
-		IPath filePath = PTPDebugTestPlugin.getDefault().getStateLocation().append(path);
-		return new File(filePath.toOSString());
+		try {
+			URL installURL = new URL(PTPDebugTestPlugin.getDefault().getBundle().getEntry("/"), path.toOSString());
+			URL localURL = FileLocator.toFileURL(installURL);
+			return new File(localURL.getFile());
+		} catch (IOException e) {
+			return null;
+		}
 	}
-	
 	/**
 	 * Creates a ICProject.
 	 */	
@@ -64,26 +70,25 @@ public class PTPProjectHelper {
 			project.open(null);
 		}
 		File zip = getFileInPlugin(zipFile);
-		importFilesFromZip(new ZipFile(zip),project.getFullPath(),null);
+		importFilesFromZip(new ZipFile(zip), project.getFullPath(),null);
 		
 		if (!project.hasNature(CProjectNature.C_NATURE_ID)) {
 			addNatureToProject(project, CProjectNature.C_NATURE_ID, null);
 		}
-		
 		ICProject cproject = CCorePlugin.getDefault().getCoreModel().create(project);
-		/* Try to guess at the correct binary parser.. elf or pe at this point.. */
+		//Try to guess at the correct binary parser.. elf or pe at this point..
 		ICDescriptorOperation op = new ICDescriptorOperation() {
 			public void execute(ICDescriptor descriptor, IProgressMonitor monitor) throws CoreException {
 				descriptor.remove(CCorePlugin.BINARY_PARSER_UNIQ_ID);
 				String os = System.getProperty("os.name");
-				boolean pe=(os.toLowerCase().indexOf("windows")!=-1);
-				descriptor.create(CCorePlugin.BINARY_PARSER_UNIQ_ID, pe?"org.eclipse.cdt.core.PE":"org.eclipse.cdt.core.ELF");
+				boolean isMac=(os.toLowerCase().indexOf("mac")!=-1);
+				boolean isPe=(os.toLowerCase().indexOf("windows")!=-1);
+				descriptor.create(CCorePlugin.BINARY_PARSER_UNIQ_ID, isMac?"org.eclipse.cdt.core.MachO":(isPe?"org.eclipse.cdt.core.PE":"org.eclipse.cdt.core.ELF"));
 			}
 		};
 		CCorePlugin.getDefault().getCDescriptorManager().runDescriptorOperation(project, op, null);
 		return cproject;	
 	}
-
 	/**
 	 * Creates a ICProject.
 	 */	
@@ -95,26 +100,21 @@ public class PTPProjectHelper {
 		} else {
 			project.refreshLocal(IResource.DEPTH_INFINITE, null);
 		}
-		
 		if (!project.isOpen()) {
 			project.open(null);
 		}
-		
 		if (!project.hasNature(CProjectNature.C_NATURE_ID)) {
 			addNatureToProject(project, CProjectNature.C_NATURE_ID, null);
 		}
-		
 		ICProject cproject = CCorePlugin.getDefault().getCoreModel().create(project);
 		return cproject;
 	}
-	
 	/**
 	 * Removes a ICProject.
 	 */		
 	public static void delete(ICProject cproject) throws CoreException {
 		cproject.getProject().delete(true, true, null);
 	}
-
 	/**
 	 * Attempts to find an archive with the given name in the workspace
 	 */
@@ -132,10 +132,17 @@ public class PTPProjectHelper {
 		}
 		return(null);
 	}	
+	public static IBinaryObject findBinaryObject(ICProject testProject, String name) throws CoreException {
+		IBinary binary = findBinary(testProject, name);
+		if (binary == null) {
+			return null;        
+		}
+		return (IBinaryObject)binary.getAdapter(IBinaryObject.class);
+	}
 	/**
 	 * Attempts to find a binary with the given name in the workspace
 	 */
-	public static IBinary findBinary(ICProject testProject,String name) throws CModelException {
+	public static IBinary findBinary(ICProject testProject, String name) throws CModelException {
 		IBinaryContainer binCont;
 		int x;
 		IBinary[] myBinaries;
@@ -150,7 +157,6 @@ public class PTPProjectHelper {
 		}
 		return(null);
 	}	
-
 	/**
 	 * Attempts to find an object with the given name in the workspace
 	 */

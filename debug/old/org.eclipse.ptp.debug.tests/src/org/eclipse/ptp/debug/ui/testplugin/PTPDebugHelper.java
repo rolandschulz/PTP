@@ -10,19 +10,16 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.ui.testplugin;
 
-import org.eclipse.cdt.core.IBinaryParser.IBinaryObject;
-import org.eclipse.cdt.core.model.IBinary;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.ptp.core.IPJob;
-import org.eclipse.ptp.core.IPMachine;
-import org.eclipse.ptp.core.IPNode;
-import org.eclipse.ptp.core.IPProcess;
-import org.eclipse.ptp.core.IPQueue;
-import org.eclipse.ptp.core.IPUniverse;
+import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.AttributeDescription;
 import org.eclipse.ptp.core.attributes.IAttribute;
@@ -30,118 +27,27 @@ import org.eclipse.ptp.core.attributes.IAttributeDescription;
 import org.eclipse.ptp.core.attributes.IntegerAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute.IllegalValue;
 import org.eclipse.ptp.debug.core.IAbstractDebugger;
-import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.debug.core.launch.PLaunch;
-import org.eclipse.ptp.debug.external.core.cdi.Session;
 import org.eclipse.ptp.debug.external.core.debugger.ParallelDebugger;
 import org.eclipse.ptp.rmsystem.IResourceManager;
+import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
+import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
 import org.eclipse.ptp.rtsystem.JobRunConfiguration;
-
+import org.eclipse.ui.IMemento;
+import org.eclipse.ui.XMLMemento;
 
 /**
- * Helper methods to set up a Debug session.
+ * @author Clement chu
  */
 public class PTPDebugHelper {
-	public static IPJob createJob() {
-		IPJob job = new IPJob() {
-			public Object getAdapter(Class adapter) {
-				return null;
-			}
-			public int getID(){
-				return 1;
-			}
-			public String getElementName() {
-				return "Job1";
-			}
-			public IPProcess findProcess(String processNumber) {
-				return null;
-			}
-			public IPProcess findProcessByName(String pname) {
-				return null;
-			}
-			public IPProcess findProcessByTaskId(int taskId) {
-				return null;
-			}
-			public Object getAttribute(String key) {
-				return null;
-			}
-			public String[] getAttributeKeys() {
-				return new String[0];
-			}
-			public String getIDString() {
-				return "1";
-			}
-			public String getJobNumber() {
-				return "1";
-			}
-			public int getJobNumberInt() {
-				return 1;
-			}
-			public IPMachine[] getMachines() {
-				return new IPMachine[0];
-			}
-			public String getName() {
-				return "Job1";
-			}
-			public IPNode[] getNodes() {
-				return new IPNode[0];
-			}
-			public IPProcess[] getProcesses() {
-				return new IPProcess[0];
-			}
-			public IPNode[] getSortedNodes() {
-				return new IPNode[0];
-			}
-			public IPProcess[] getSortedProcesses() {
-				return new IPProcess[0];
-			}
-			public IPUniverse getUniverse() {
-				return null;
-			}
-			public boolean isAllStop() {
-				return false;
-			}
-			public boolean isDebug() {
-				return true;
-			}
-			public void removeAllProcesses(){}
-			public void setAttribute(String key, Object o){}
-			public void setDebug(){}
-			public int totalNodes() {
-				return 1;
-			}
-			public int totalProcesses() {
-				return 10;
-			}
-			public IPQueue getQueue() {
-				return null;
-			}
-		};
-		return job;
-	}
 	public static IPLaunch createDebugLaunch(ILaunchConfiguration config) {
 		return new PLaunch(config, "debug", null);
 	}
 	public static IAbstractDebugger createDebugger() {
 		return new ParallelDebugger();
 	}
-	/**
-	 * Creates a IPCDISession.
-	 */	
-	public static IPCDISession createSession(IAbstractDebugger debugger, IPJob job, IPLaunch launch, ICProject project) throws CoreException {
-		IBinary bins[] = project.getBinaryContainer().getBinaries();
-		if (bins.length != 1) {
-			//SHOULD NOT HAPPEN
-			return null;        
-		}
-		IBinaryObject binObj = (IBinaryObject)bins[0].getAdapter(IBinaryObject.class);
-		if (binObj == null)
-			return null;
-		return new Session(debugger, job, launch, binObj);
-	}
-	
-	public static IAttribute[] getAttributes(int nProcs, int firstNode, int NProcsPerNode) {
+	private static IAttribute[] getAttributes(int nProcs, int firstNode, int NProcsPerNode) {
 		final IAttributeDescription firstNodeAttrDesc = new AttributeDescription("FNN_ID0", "FirstNodeNumber", "First Node Number");
 		final IAttributeDescription nProcsAttrDesc = new AttributeDescription("NP_ID0", "NumProcs", "Number of Processes");
 		final IAttributeDescription nProcsPerNodeAttrDesc = new AttributeDescription("NPPN_ID0", "NumProcsPerNode", "Number of Procs Per Node");
@@ -164,42 +70,70 @@ public class PTPDebugHelper {
 		}
 		return attrs;
 	}
-	
-	public static JobRunConfiguration getJobRunConfiguration() {
-		String appName = "TestVar";
-		String appPath = "/Users/clement/Documents/runtime-EclipseApplication/TestVar/Debug";
-		String resourceMgr = "ORTE";
-		String machine = "Machine0";
-		String queue = "localQueue";
-		IAttribute[] attrs = getAttributes(3,0,3);
+	public static JobRunConfiguration getJobRunConfiguration(ICProject project, String appName, String resourceMgrName, String machineName, String queueName, int nProcs, int firstNode, int NProcsPerNode) {
+		IAttribute[] attrs = getAttributes(nProcs, firstNode, NProcsPerNode);
 		String[] args = new String[0];
 		String[] envs = null;
-		String dir = "/Users/clement/Documents/runtime-EclipseApplication/TestVar";
-		String debugArgs = "--host=localhost --debugger=gdb-mi --port=51281";
-		String debugFilePath = "/Users/clement/Documents/workspace_head/org.eclipse.ptp.macosx.ppc/bin/sdm";
-		JobRunConfiguration jobConfig = new JobRunConfiguration(appName, appPath, resourceMgr, machine, queue, attrs, args, envs, dir);
+		String path = project.getProject().getLocation().toOSString();
+		return new JobRunConfiguration(appName, path, resourceMgrName, machineName, queueName, attrs, args, envs, path);
+	}
+	public static JobRunConfiguration getJobDebugConfiguration(ICProject project, String appName, String resourceMgrName, String machineName, String queueName, int nProcs, int firstNode, int NProcsPerNode, String debugHost, int debugPort, String sdmPath) {
+		String debugArgs = "--host=" + debugHost + " --debugger=gdb-mi --port=" + debugPort;
+		JobRunConfiguration jobConfig = getJobRunConfiguration(project, appName, resourceMgrName, machineName, queueName, nProcs, firstNode, NProcsPerNode);
 		jobConfig.setDebug();
-		jobConfig.setDebuggerPath(debugFilePath);
+		jobConfig.setDebuggerPath(sdmPath);
 		jobConfig.setDebuggerArgs(debugArgs);
 		return jobConfig;
 	}
-	private static IResourceManager getLaunchManager(String rmName) {
-		IPUniverse universe = PTPCorePlugin.getDefault().getUniverse();
-		IResourceManager[] rms = universe.getResourceManagers();
-		for (int i = 0; i < rms.length; ++i) {
-			if (rms[i].getElementName().equals(rmName)) {
-				return rms[i];
-			}
+	public static IResourceManager createIResourceManager(String xmlFile, String mgrID) throws CoreException {
+		File xml = PTPProjectHelper.getFileInPlugin(new Path(xmlFile));
+		FileReader reader;
+		try {
+			reader = new FileReader(xml);
+		} catch (IOException e) {
+			System.err.println("No XML is found.  Err: " + e.getMessage());
+			return null;
 		}
-		return null;
-	}
-	public static IPJob launchDebugger(JobRunConfiguration jobConfig) throws CoreException {
-		final String resourceManagerName = jobConfig.getResourceManagerName();
-		final IResourceManager launchManager = getLaunchManager(resourceManagerName);
-		return launchManager.run(null, jobConfig, new SubProgressMonitor(new NullProgressMonitor(), 150));
-	}
-	
-	public static void adasdasd() {
+		XMLMemento memento = XMLMemento.createReadRoot(reader);
+		IMemento[] children = memento.getChildren("ResourceManager");
+		if (children.length == 0) {
+			System.err.println("IMemento: No ResourceManager found");
+			return null;
+		}
+
+		IModelManager modelMgr = PTPCorePlugin.getDefault().getModelManager();
+		if (modelMgr == null)
+			return null;
+		IResourceManagerFactory factory = modelMgr.getResourceManagerFactory(mgrID);
+		if (factory == null) {
+			System.err.println("IResourceManagerFactory is NULL");
+			return null;
+		}
 		
+		IMemento configMemento = children[0].getChild("Configuration");
+		if (configMemento == null) {
+			System.err.println("IMemento Configuration is NULL");
+			return null;
+		}
+			
+		if (!new File(configMemento.getString("proxyPath")).exists()) {
+			System.err.println("Proxy path is not found: " + configMemento.getString("proxyPath"));
+			System.err.println("Please check the resources/resourceManagers.xml file");
+			return null;
+		}
+	
+		IResourceManagerConfiguration config = factory.loadConfiguration(configMemento);
+		if (config == null) {
+			System.err.println("IResourceManagerConfiguration is not found");
+			return null;
+		}
+		
+		IResourceManager mgr = factory.create(config);
+		//Boolean.valueOf(children[0].getString("IsRunning")).booleanValue();
+		if (mgr != null) {
+			//in any case start resource manager
+			mgr.startUp(new SubProgressMonitor(new NullProgressMonitor(), 1));
+		}
+		return mgr;
 	}
 }

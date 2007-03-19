@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ResourceManagers>
+<ResourceManager IsRunning="false" ResourceManagerId="org.eclipse.ptp.orte.core.resourcemanager" ResourceManagerIndex="0">
+<Configuration description="ORTE Resource Manager" factoryId="org.eclipse.ptp.orte.core.resourcemanager" launchManually="false" name="ORTE" proxyPath="/Users/clement/Documents/workspace_head/org.eclipse.ptp.macosx.ppc/bin/ptp_orte_proxy"/>
+</ResourceManager>
+</ResourceManagers>

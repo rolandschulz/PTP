@@ -9,16 +9,13 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 /**
- * The activator class controls the plug-in life cycle
+ * @author Clement chu
  */
 public class PTPDebugTestPlugin extends AbstractUIPlugin {
-
 	// The plug-in ID
 	public static final String PLUGIN_ID = "org.eclipse.ptp.debug.ui.tests";
-
 	// The shared instance
 	private static PTPDebugTestPlugin plugin;
-	
 	/**
 	 * The constructor
 	 */
