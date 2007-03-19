@@ -7,7 +7,6 @@ import java.util.List;
 
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.Launch;
-import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.ISourceLocator;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
