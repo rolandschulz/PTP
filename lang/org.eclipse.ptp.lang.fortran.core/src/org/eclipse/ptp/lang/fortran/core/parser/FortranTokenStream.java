@@ -1,5 +1,23 @@
 package org.eclipse.ptp.lang.fortran.core.parser;
 
+/**
+ * Copyright (c) 2005, 2006 Los Alamos National Security, LLC.  This
+ * material was produced under U.S. Government contract DE-
+ * AC52-06NA25396 for Los Alamos National Laboratory (LANL), which is
+ * operated by the Los Alamos National Security, LLC (LANS) for the
+ * U.S. Department of Energy. The U.S. Government has rights to use,
+ * reproduce, and distribute this software. NEITHER THE GOVERNMENT NOR
+ * LANS MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR ASSUMES ANY
+ * LIABILITY FOR THE USE OF THIS SOFTWARE. If software is modified to
+ * produce derivative works, such modified software should be clearly
+ * marked, so as not to confuse it with the version available from
+ * LANL.
+ *  
+ * Additionally, this program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ */
 import java.io.*;
 import java.util.*;
 import org.antlr.runtime.*;
@@ -343,11 +361,19 @@ public class FortranTokenStream extends CommonTokenStream {
       int i;
 
       // make sure the requested lookAhead isn't out of range.  
-      if((lookAhead-1) > this.packedListSize) 
-         return -1;
+//       if((lookAhead-1) >= this.packedListSize) {
+//          System.err.println("Index : " + lookAhead + " out of range: " + 
+//                             (this.packedListSize-1));
+// //          return -1;
+//       }
 
       // then get the token from the packedList
-      tmpToken = (Token)(packedList.get(lookAhead-1));
+      try {
+         tmpToken = (Token)(packedList.get(lookAhead-1));
+      } catch(Exception e) {
+         e.printStackTrace();
+         System.exit(1);
+      }
       return tmpToken.getType();
    }// end currLineLA()
 
