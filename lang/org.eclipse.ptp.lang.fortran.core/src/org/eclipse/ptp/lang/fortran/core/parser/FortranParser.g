@@ -26,6 +26,27 @@ options {
     tokenVocab=FortranLexer;
 }
 
+@header {
+/**
+ * Copyright (c) 2005, 2006 Los Alamos National Security, LLC.  This
+ * material was produced under U.S. Government contract DE-
+ * AC52-06NA25396 for Los Alamos National Laboratory (LANL), which is
+ * operated by the Los Alamos National Security, LLC (LANS) for the
+ * U.S. Department of Energy. The U.S. Government has rights to use,
+ * reproduce, and distribute this software. NEITHER THE GOVERNMENT NOR
+ * LANS MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR ASSUMES ANY
+ * LIABILITY FOR THE USE OF THIS SOFTWARE. If software is modified to
+ * produce derivative works, such modified software should be clearly
+ * marked, so as not to confuse it with the version available from
+ * LANL.
+ *  
+ * Additionally, this program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ */
+}
+
 @members {
 	public boolean hasErrorOccurred = false;
 
@@ -210,7 +231,7 @@ specification_stmt
 
 // R213
 executable_construct
-options {backtrack=true;}
+// options {backtrack=true;}
 	:	action_stmt
 	|	associate_construct
 	|	case_construct
@@ -1428,7 +1449,9 @@ variable
 // (substring-range) may be matched in data-ref
 // this rule is now identical to substring
 designator
-options {backtrack=true;}
+// TODO: does this need backtracking?  it should be able to lookahead and 
+// see if it has a char_literal_constant to prevent any ambiguities.
+// options {backtrack=true;}
 	:	data_ref (T_LPAREN substring_range T_RPAREN)?
 	|	char_literal_constant T_LPAREN substring_range T_RPAREN
 	;
@@ -1526,7 +1549,7 @@ data_ref
 // a = foo(b) is ambiguous YUK...
 // TODO putback F2008
 part_ref
-options {k=2; backtrack=false;}
+options {k=2;}
 	:	( T_IDENT T_LPAREN) => T_IDENT T_LPAREN section_subscript_list T_RPAREN ( image_selector )? 
 //	|	 T_IDENT image_selector
 	|	T_IDENT 
@@ -1588,9 +1611,16 @@ image_selector
 // R625-F2008 co_subscript was scalar_int_expr inlined as expr in R624-F2004
 
 // R623
+// modified to remove backtracking by looking for the token inserted during
+// the lexical prepass if a :: was found (which required alt1 below).
 allocate_stmt
-options {backtrack=true;}
-    :    (label)? T_ALLOCATE T_LPAREN type_spec T_COLON_COLON allocation_list ( T_COMMA alloc_opt_list )? T_RPAREN T_EOS
+options {k=2;}
+// options {backtrack=true;}
+//     :    (label)? T_ALLOCATE T_LPAREN type_spec T_COLON_COLON allocation_list ( T_COMMA alloc_opt_list )? T_RPAREN T_EOS
+    :    ((label)? T_ALLOCATE_STMT_1) => 
+         (label)? T_ALLOCATE_STMT_1 T_ALLOCATE T_LPAREN type_spec 
+            T_COLON_COLON allocation_list 
+            ( T_COMMA alloc_opt_list )? T_RPAREN T_EOS
     |    (label)? T_ALLOCATE T_LPAREN allocation_list ( T_COMMA alloc_opt_list )? T_RPAREN T_EOS
     ;
 
@@ -1916,6 +1946,8 @@ assignment_stmt
 // third alt covered by first alt so proc_pointer_object assignment deleted
 // designator (R603), minus the substring part is data_ref, so designator replaced by data_ref,
 // see NOTE 6.10 for why array-section does not have pointer attribute
+// TODO: alt1 and alt3 require the backtracking.  if find a way to disambiguate
+// them, should be able to remove backtracking.
 pointer_assignment_stmt
 options {backtrack=true;}
     : (label)? T_PTR_ASSIGNMENT_STMT data_ref T_EQ_GT expr T_EOS
@@ -1980,7 +2012,7 @@ proc_pointer_object
 // ERR_CHK 743 mask_expr replaced by expr
 // assignment_stmt inlined for where_assignment_stmt
 where_stmt
-	:	(label)? T_WHERE
+	:	(label)? T_WHERE_STMT T_WHERE
 		T_LPAREN
 		expr
 		T_RPAREN
@@ -1996,15 +2028,18 @@ where_construct
 // R745
 // ERR_CHK 745 mask_expr replaced by expr
 where_construct_stmt
-    :    ( T_IDENT T_COLON )? T_WHERE T_LPAREN expr T_RPAREN T_EOS
+//     :    ( T_IDENT T_COLON )? T_WHERE T_LPAREN expr T_RPAREN T_EOS
+    :    ( T_IDENT T_COLON )? T_WHERE_CONSTRUCT_STMT T_WHERE 
+            T_LPAREN expr T_RPAREN T_EOS
     ;
 
 // R746
 // assignment_stmt inlined for where_assignment_stmt
 where_body_construct
-options {backtrack=true;}
+// options {backtrack=true;}
+options {k=2;}
 	:	assignment_stmt
-	|	where_stmt
+	|	( (label)? T_WHERE_STMT ) => where_stmt
 	|	where_construct
 	;
 
@@ -2051,7 +2086,9 @@ forall_construct
 
 // R753
 forall_construct_stmt
-    :    (label)? ( T_IDENT T_COLON )? T_FORALL forall_header T_EOS
+//     :    (label)? ( T_IDENT T_COLON )? T_FORALL forall_header T_EOS
+    :    (label)? ( T_IDENT T_COLON )? T_FORALL_CONSTRUCT_STMT T_FORALL 
+            forall_header T_EOS
     ;
 
 // R754
@@ -2073,19 +2110,21 @@ forall_triplet_spec_list
 
 // R756
 forall_body_construct
-options {backtrack=true;}
+// options {backtrack=true;}
+options {k=2;}
 	:	forall_assignment_stmt
-	|	where_stmt
-	|	where_construct
-	|	forall_construct
-	|	forall_stmt
+	|	( (label)? T_WHERE_STMT ) => where_stmt
+	|	( T_WHERE_CONSTRUCT) => where_construct
+	|	( T_FORALL_CONSTRUCT) => forall_construct
+	|	( (label)? T_FORALL_STMT) => forall_stmt
 	;
 
 // R757
 forall_assignment_stmt
-options {backtrack=true;}
-	:	assignment_stmt
-	|	pointer_assignment_stmt
+// options {backtrack=true;}
+options {k=2;}
+	:	( (label)? T_ASSIGNMENT_STMT ) => assignment_stmt
+	|	( (label)? T_PTR_ASSIGNMENT_STMT ) => pointer_assignment_stmt
 	;
 
 // R758
@@ -2097,7 +2136,10 @@ options {k=3;}
 
 // R759
 forall_stmt
-	:	(label)? T_FORALL
+// 	:	(label)? T_FORALL
+// 		forall_header
+// 		forall_assignment_stmt
+	:	(label)? T_FORALL_STMT T_FORALL
 		forall_header
 		forall_assignment_stmt
 	;
@@ -2148,7 +2190,12 @@ options {k=3;}
 // R807
 // ERR_CHK 807 scalar_logical_expr replaced by expr
 if_stmt
-	:	(label)? T_IF
+// 	:	(label)? T_IF
+// 		T_LPAREN
+// 		expr
+// 		T_RPAREN
+// 		action_stmt
+	:	(label)? T_IF_STMT T_IF
 		T_LPAREN
 		expr
 		T_RPAREN
@@ -2335,9 +2382,12 @@ label_do_stmt
 // ERR_CHK 830a scalar_int_expr replaced by expr
 // ERR_CHK 830b scalar_logical_expr replaced by expr
 loop_control
-options {backtrack=true; memoize=true; greedy=true;}
-    : ( T_COMMA )? do_variable T_EQUALS expr T_COMMA expr ( T_COMMA expr )?
-    | ( T_COMMA )? T_WHILE T_LPAREN expr T_RPAREN
+// options {backtrack=true; memoize=true; greedy=true;}
+//     : ( T_COMMA )? do_variable T_EQUALS expr T_COMMA expr ( T_COMMA expr )?
+//     | ( T_COMMA )? T_WHILE T_LPAREN expr T_RPAREN
+options {k=2;}
+    : ( (T_COMMA)? T_WHILE ) => ( T_COMMA )? T_WHILE T_LPAREN expr T_RPAREN
+    | ( T_COMMA )? do_variable T_EQUALS expr T_COMMA expr ( T_COMMA expr )?
     ;
 
 // R831
@@ -2702,9 +2752,13 @@ flush_spec_list
 
 // R929
 inquire_stmt
-options {backtrack=true;}
+// options {backtrack=true;}
+options{k=2;}
 	:	(label)? T_INQUIRE T_LPAREN inquire_spec_list T_RPAREN T_EOS
-	|	(label)? T_INQUIRE T_LPAREN T_IDENT /* 'IOLENGTH' */ T_EQUALS scalar_int_variable T_RPAREN output_item_list T_EOS
+// 	|	(label)? T_INQUIRE T_LPAREN T_IDENT /* 'IOLENGTH' */ T_EQUALS scalar_int_variable T_RPAREN output_item_list T_EOS
+	|	( (label)? T_INQUIRE_STMT_2 ) => (label)? T_INQUIRE_STMT_2 
+            T_INQUIRE T_LPAREN T_IDENT /* 'IOLENGTH' */ T_EQUALS 
+            scalar_int_variable T_RPAREN output_item_list T_EOS
 	;
 
 
