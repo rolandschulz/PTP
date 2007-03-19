@@ -1,6 +1,31 @@
 package org.eclipse.ptp.lang.fortran.core.parser;
 
-// $ANTLR 3.0b6 FortranLexer.g 2007-02-06 12:23:20
+// $ANTLR 3.0b4 FortranLexer.g 2007-03-19 13:11:37
+
+/**
+ * Copyright (c) 2005, 2006 Los Alamos National Security, LLC.  This
+ * material was produced under U.S. Government contract DE-
+ * AC52-06NA25396 for Los Alamos National Laboratory (LANL), which is
+ * operated by the Los Alamos National Security, LLC (LANS) for the
+ * U.S. Department of Energy. The U.S. Government has rights to use,
+ * reproduce, and distribute this software. NEITHER THE GOVERNMENT NOR
+ * LANS MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR ASSUMES ANY
+ * LIABILITY FOR THE USE OF THIS SOFTWARE. If software is modified to
+ * produce derivative works, such modified software should be clearly
+ * marked, so as not to confuse it with the version available from
+ * LANL.
+ *  
+ * Additionally, this program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ */
+
+/**
+ *
+ * @author Craig E Rasmussen, Christopher D. Rickett
+ */
+
 
 import org.antlr.runtime.*;
 import java.util.Stack;
@@ -14,14 +39,14 @@ public class FortranLexer extends Lexer {
     public static final int T_ENDFILE=175;
     public static final int Special_Character=22;
     public static final int T_GREATERTHAN_EQ=33;
-    public static final int T_FORALL=106;
     public static final int T_LABEL_DO_TERMINAL=189;
+    public static final int T_FORALL=106;
     public static final int T_NON_OVERRIDABLE=126;
-    public static final int T_WRITE=168;
     public static final int T_NONE=124;
+    public static final int T_WRITE=168;
     public static final int T_COMMON=81;
-    public static final int SQ_Rep_Char=5;
     public static final int T_CYCLE=84;
+    public static final int SQ_Rep_Char=5;
     public static final int T_ASTERISK=25;
     public static final int Letter=20;
     public static final int T_UNFORMATTED=161;
@@ -37,44 +62,48 @@ public class FortranLexer extends Lexer {
     public static final int T_CLOSE=80;
     public static final int WS=19;
     public static final int T_DEALLOCATE=87;
+    public static final int T_WHERE_CONSTRUCT_STMT=204;
     public static final int T_ASYNCHRONOUS=73;
+    public static final int T_IF_STMT=202;
     public static final int T_ENDTYPE=183;
     public static final int T_LESSTHAN=34;
     public static final int T_LESSTHAN_EQ=35;
     public static final int T_CHARACTER=66;
     public static final int T_FUNCTION=109;
     public static final int T_ENDFORALL=174;
+    public static final int T_FORALL_CONSTRUCT_STMT=205;
     public static final int T_NE=50;
     public static final int T_ENDPROGRAM=180;
     public static final int T_THEN=158;
     public static final int T_DIMENSION=186;
     public static final int T_OPEN=130;
     public static final int T_ASSIGNMENT=71;
-    public static final int T_REAL=64;
     public static final int T_ABSTRACT=68;
-    public static final int T_FINAL=104;
+    public static final int T_REAL=64;
     public static final int T_STMT_FUNCTION=193;
+    public static final int T_FINAL=104;
     public static final int T_FORMAT=107;
     public static final int BINARY_CONSTANT=10;
     public static final int Digit=12;
     public static final int T_PRECISION=138;
     public static final int T_INTEGER=63;
     public static final int T_EXTENDS=101;
-    public static final int T_TYPE=160;
     public static final int T_RETURN=148;
+    public static final int T_TYPE=160;
     public static final int T_SELECT=151;
-    public static final int T_GE=54;
     public static final int T_IDENT=197;
+    public static final int T_GE=54;
     public static final int T_PARAMETER=134;
-    public static final int T_NOPASS=127;
     public static final int T_INTENT=118;
+    public static final int T_NOPASS=127;
     public static final int T_ENDASSOCIATE=169;
+    public static final int T_INQUIRE_STMT_2=206;
     public static final int T_PRINT=137;
     public static final int T_FORMATTED=108;
-    public static final int T_IMPORT=115;
     public static final int T_EXTERNAL=102;
-    public static final int T_PRIVATE=139;
+    public static final int T_IMPORT=115;
     public static final int DQ_Rep_Char=6;
+    public static final int T_PRIVATE=139;
     public static final int T_DIGIT_STRING=9;
     public static final int T_PLUS=41;
     public static final int T_POWER=42;
@@ -85,17 +114,17 @@ public class FortranLexer extends Lexer {
     public static final int T_SLASH_SLASH=45;
     public static final int T_EQ_GT=31;
     public static final int T_LE=52;
-    public static final int T_IN=116;
     public static final int T_GOTO=112;
-    public static final int T_PERIOD=40;
+    public static final int T_IN=116;
     public static final int T_COLON=26;
+    public static final int T_PERIOD=40;
     public static final int T_ALLOCATE=70;
-    public static final int T_UNDERSCORE=48;
     public static final int T_TRUE=55;
-    public static final int T_NAMELIST=123;
+    public static final int T_UNDERSCORE=48;
     public static final int T_IMPLICIT=114;
-    public static final int OCTAL_CONSTANT=11;
+    public static final int T_NAMELIST=123;
     public static final int T_CLASS=79;
+    public static final int OCTAL_CONSTANT=11;
     public static final int T_RECURSIVE=146;
     public static final int T_DOUBLEPRECISION=91;
     public static final int T_DO=89;
@@ -121,6 +150,7 @@ public class FortranLexer extends Lexer {
     public static final int T_ELSE=93;
     public static final int T_ENDMODULE=179;
     public static final int REAL_CONSTANT=16;
+    public static final int T_WHERE_STMT=201;
     public static final int T_LBRACKET=36;
     public static final int T_PURE=144;
     public static final int T_EQ_EQ=30;
@@ -171,9 +201,11 @@ public class FortranLexer extends Lexer {
     public static final int T_OUT=133;
     public static final int T_NULLIFY=128;
     public static final int T_EQ=49;
+    public static final int T_ALLOCATE_STMT_1=200;
     public static final int DOUBLE_CONSTANT=18;
     public static final int T_STOP=155;
     public static final int T_VALUE=163;
+    public static final int T_FORALL_STMT=203;
     public static final int T_DEFAULT=86;
     public static final int T_DEFINED_OP=188;
     public static final int T_FLUSH=105;
@@ -193,14 +225,14 @@ public class FortranLexer extends Lexer {
     public static final int T_ENDIF=177;
     public static final int T_WAIT=165;
     public static final int T_ENDBLOCK=170;
-    public static final int T_ONLY=129;
     public static final int T_COMPLEX=65;
+    public static final int T_ONLY=129;
     public static final int T_PROCEDURE=140;
     public static final int T_INTRINSIC=120;
     public static final int T_ELSEWHERE=95;
     public static final int T_ENDENUM=173;
-    public static final int T_SAVE=150;
     public static final int T_PROGRAM=141;
+    public static final int T_SAVE=150;
     public static final int EOF=-1;
     public static final int T_INTERFACE=119;
     public static final int T_AND=58;
@@ -208,7 +240,6 @@ public class FortranLexer extends Lexer {
 
         private Token prevToken;
         private boolean continueFlag;
-        
 
         public boolean isKeyword(Token tmpToken) {
             if(tmpToken.getType() >= T_INTEGER && 
@@ -234,7 +265,7 @@ public class FortranLexer extends Lexer {
             tmpToken = super.nextToken();
 
             if(tmpToken.getType() != LINE_COMMENT && 
-                tmpToken.getType() != WS) {
+               tmpToken.getType() != WS) {
                 prevToken = tmpToken;
             }
 
@@ -269,12 +300,12 @@ public class FortranLexer extends Lexer {
     public void mT_EOS() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_EOS;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:76:9: ( ';' | ( '\\r' )? ( '\\n' ) )
+            int type = T_EOS;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:101:9: ( ';' | ( '\\r' )? ( '\\n' ) )
             int alt2=2;
             int LA2_0 = input.LA(1);
             if ( (LA2_0==';') ) {
@@ -285,13 +316,13 @@ public class FortranLexer extends Lexer {
             }
             else {
                 NoViableAltException nvae =
-                    new NoViableAltException("75:1: T_EOS : ( ';' | ( '\\r' )? ( '\\n' ) );", 2, 0, input);
+                    new NoViableAltException("100:1: T_EOS : ( ';' | ( '\\r' )? ( '\\n' ) );", 2, 0, input);
 
                 throw nvae;
             }
             switch (alt2) {
                 case 1 :
-                    // FortranLexer.g:76:9: ';'
+                    // FortranLexer.g:101:9: ';'
                     {
                     match(';'); 
                      
@@ -300,9 +331,8 @@ public class FortranLexer extends Lexer {
                                 // also, ignore semicolons that come before any real 
                                 // statements (is this correct??).  --Rickett, 11.28.06
                                 if(prevToken == null || 
-                                    (prevToken != null && prevToken.getType() == T_EOS) ||
-                                    continueFlag == true) {
-                                    _channel=99;
+                                    (prevToken != null && prevToken.getType() == T_EOS)) {
+                                    channel=99;
                                 }
 
                             
@@ -310,9 +340,9 @@ public class FortranLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // FortranLexer.g:89:10: ( '\\r' )? ( '\\n' )
+                    // FortranLexer.g:113:10: ( '\\r' )? ( '\\n' )
                     {
-                    // FortranLexer.g:89:10: ( '\\r' )?
+                    // FortranLexer.g:113:10: ( '\\r' )?
                     int alt1=2;
                     int LA1_0 = input.LA(1);
                     if ( (LA1_0=='\r') ) {
@@ -320,7 +350,7 @@ public class FortranLexer extends Lexer {
                     }
                     switch (alt1) {
                         case 1 :
-                            // FortranLexer.g:89:11: '\\r'
+                            // FortranLexer.g:113:11: '\\r'
                             {
                             match('\r'); 
 
@@ -329,8 +359,8 @@ public class FortranLexer extends Lexer {
 
                     }
 
-                    // FortranLexer.g:89:18: ( '\\n' )
-                    // FortranLexer.g:89:19: '\\n'
+                    // FortranLexer.g:113:18: ( '\\n' )
+                    // FortranLexer.g:113:19: '\\n'
                     {
                     match('\n'); 
 
@@ -343,10 +373,8 @@ public class FortranLexer extends Lexer {
                                 // blank line or a semicolon at the start of the file and 
                                 // we need to ignore it.  
                                 if(prevToken == null || 
-                                    (prevToken != null && prevToken.getType() == T_EOS) ||
-                                    continueFlag == true) {
-                                    _channel=99;
-                                }
+                                    (prevToken != null && prevToken.getType() == T_EOS))
+                                   channel=99;
                             
 
                     }
@@ -356,7 +384,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -370,12 +398,12 @@ public class FortranLexer extends Lexer {
     public void mT_CHAR_CONSTANT() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_CHAR_CONSTANT;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:109:11: ( ( '\\'' ( SQ_Rep_Char )* '\\'' )+ | ( '\\\"' ( DQ_Rep_Char )* '\\\"' )+ )
+            int type = T_CHAR_CONSTANT;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:131:11: ( ( '\\'' ( SQ_Rep_Char )* '\\'' )+ | ( '\\\"' ( DQ_Rep_Char )* '\\\"' )+ )
             int alt7=2;
             int LA7_0 = input.LA(1);
             if ( (LA7_0=='\'') ) {
@@ -386,15 +414,15 @@ public class FortranLexer extends Lexer {
             }
             else {
                 NoViableAltException nvae =
-                    new NoViableAltException("108:1: T_CHAR_CONSTANT : ( ( '\\'' ( SQ_Rep_Char )* '\\'' )+ | ( '\\\"' ( DQ_Rep_Char )* '\\\"' )+ );", 7, 0, input);
+                    new NoViableAltException("130:1: T_CHAR_CONSTANT : ( ( '\\'' ( SQ_Rep_Char )* '\\'' )+ | ( '\\\"' ( DQ_Rep_Char )* '\\\"' )+ );", 7, 0, input);
 
                 throw nvae;
             }
             switch (alt7) {
                 case 1 :
-                    // FortranLexer.g:109:11: ( '\\'' ( SQ_Rep_Char )* '\\'' )+
+                    // FortranLexer.g:131:11: ( '\\'' ( SQ_Rep_Char )* '\\'' )+
                     {
-                    // FortranLexer.g:109:11: ( '\\'' ( SQ_Rep_Char )* '\\'' )+
+                    // FortranLexer.g:131:11: ( '\\'' ( SQ_Rep_Char )* '\\'' )+
                     int cnt4=0;
                     loop4:
                     do {
@@ -407,10 +435,10 @@ public class FortranLexer extends Lexer {
 
                         switch (alt4) {
                     	case 1 :
-                    	    // FortranLexer.g:109:12: '\\'' ( SQ_Rep_Char )* '\\''
+                    	    // FortranLexer.g:131:12: '\\'' ( SQ_Rep_Char )* '\\''
                     	    {
                     	    match('\''); 
-                    	    // FortranLexer.g:109:17: ( SQ_Rep_Char )*
+                    	    // FortranLexer.g:131:17: ( SQ_Rep_Char )*
                     	    loop3:
                     	    do {
                     	        int alt3=2;
@@ -422,7 +450,7 @@ public class FortranLexer extends Lexer {
 
                     	        switch (alt3) {
                     	    	case 1 :
-                    	    	    // FortranLexer.g:109:19: SQ_Rep_Char
+                    	    	    // FortranLexer.g:131:19: SQ_Rep_Char
                     	    	    {
                     	    	    mSQ_Rep_Char(); 
 
@@ -452,9 +480,9 @@ public class FortranLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // FortranLexer.g:110:11: ( '\\\"' ( DQ_Rep_Char )* '\\\"' )+
+                    // FortranLexer.g:132:11: ( '\\\"' ( DQ_Rep_Char )* '\\\"' )+
                     {
-                    // FortranLexer.g:110:11: ( '\\\"' ( DQ_Rep_Char )* '\\\"' )+
+                    // FortranLexer.g:132:11: ( '\\\"' ( DQ_Rep_Char )* '\\\"' )+
                     int cnt6=0;
                     loop6:
                     do {
@@ -467,10 +495,10 @@ public class FortranLexer extends Lexer {
 
                         switch (alt6) {
                     	case 1 :
-                    	    // FortranLexer.g:110:12: '\\\"' ( DQ_Rep_Char )* '\\\"'
+                    	    // FortranLexer.g:132:12: '\\\"' ( DQ_Rep_Char )* '\\\"'
                     	    {
                     	    match('\"'); 
-                    	    // FortranLexer.g:110:17: ( DQ_Rep_Char )*
+                    	    // FortranLexer.g:132:17: ( DQ_Rep_Char )*
                     	    loop5:
                     	    do {
                     	        int alt5=2;
@@ -482,7 +510,7 @@ public class FortranLexer extends Lexer {
 
                     	        switch (alt5) {
                     	    	case 1 :
-                    	    	    // FortranLexer.g:110:19: DQ_Rep_Char
+                    	    	    // FortranLexer.g:132:19: DQ_Rep_Char
                     	    	    {
                     	    	    mDQ_Rep_Char(); 
 
@@ -516,7 +544,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -530,13 +558,13 @@ public class FortranLexer extends Lexer {
     public void mT_DIGIT_STRING() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_DIGIT_STRING;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:114:4: ( Digit_String )
-            // FortranLexer.g:114:4: Digit_String
+            int type = T_DIGIT_STRING;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:136:4: ( Digit_String )
+            // FortranLexer.g:136:4: Digit_String
             {
             mDigit_String(); 
 
@@ -545,7 +573,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -559,12 +587,12 @@ public class FortranLexer extends Lexer {
     public void mBINARY_CONSTANT() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = BINARY_CONSTANT;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:119:7: ( ('b'|'B') '\\'' ( '0' .. '1' )+ '\\'' | ('b'|'B') '\\\"' ( '0' .. '1' )+ '\\\"' )
+            int type = BINARY_CONSTANT;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:141:7: ( ('b'|'B') '\\'' ( '0' .. '1' )+ '\\'' | ('b'|'B') '\\\"' ( '0' .. '1' )+ '\\\"' )
             int alt10=2;
             int LA10_0 = input.LA(1);
             if ( (LA10_0=='B'||LA10_0=='b') ) {
@@ -577,20 +605,20 @@ public class FortranLexer extends Lexer {
                 }
                 else {
                     NoViableAltException nvae =
-                        new NoViableAltException("118:1: BINARY_CONSTANT : ( ('b'|'B') '\\'' ( '0' .. '1' )+ '\\'' | ('b'|'B') '\\\"' ( '0' .. '1' )+ '\\\"' );", 10, 1, input);
+                        new NoViableAltException("140:1: BINARY_CONSTANT : ( ('b'|'B') '\\'' ( '0' .. '1' )+ '\\'' | ('b'|'B') '\\\"' ( '0' .. '1' )+ '\\\"' );", 10, 1, input);
 
                     throw nvae;
                 }
             }
             else {
                 NoViableAltException nvae =
-                    new NoViableAltException("118:1: BINARY_CONSTANT : ( ('b'|'B') '\\'' ( '0' .. '1' )+ '\\'' | ('b'|'B') '\\\"' ( '0' .. '1' )+ '\\\"' );", 10, 0, input);
+                    new NoViableAltException("140:1: BINARY_CONSTANT : ( ('b'|'B') '\\'' ( '0' .. '1' )+ '\\'' | ('b'|'B') '\\\"' ( '0' .. '1' )+ '\\\"' );", 10, 0, input);
 
                 throw nvae;
             }
             switch (alt10) {
                 case 1 :
-                    // FortranLexer.g:119:7: ('b'|'B') '\\'' ( '0' .. '1' )+ '\\''
+                    // FortranLexer.g:141:7: ('b'|'B') '\\'' ( '0' .. '1' )+ '\\''
                     {
                     if ( input.LA(1)=='B'||input.LA(1)=='b' ) {
                         input.consume();
@@ -603,7 +631,7 @@ public class FortranLexer extends Lexer {
                     }
 
                     match('\''); 
-                    // FortranLexer.g:119:22: ( '0' .. '1' )+
+                    // FortranLexer.g:141:22: ( '0' .. '1' )+
                     int cnt8=0;
                     loop8:
                     do {
@@ -616,7 +644,7 @@ public class FortranLexer extends Lexer {
 
                         switch (alt8) {
                     	case 1 :
-                    	    // FortranLexer.g:119:23: '0' .. '1'
+                    	    // FortranLexer.g:141:23: '0' .. '1'
                     	    {
                     	    matchRange('0','1'); 
 
@@ -637,7 +665,7 @@ public class FortranLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // FortranLexer.g:120:7: ('b'|'B') '\\\"' ( '0' .. '1' )+ '\\\"'
+                    // FortranLexer.g:142:7: ('b'|'B') '\\\"' ( '0' .. '1' )+ '\\\"'
                     {
                     if ( input.LA(1)=='B'||input.LA(1)=='b' ) {
                         input.consume();
@@ -650,7 +678,7 @@ public class FortranLexer extends Lexer {
                     }
 
                     match('\"'); 
-                    // FortranLexer.g:120:22: ( '0' .. '1' )+
+                    // FortranLexer.g:142:22: ( '0' .. '1' )+
                     int cnt9=0;
                     loop9:
                     do {
@@ -663,7 +691,7 @@ public class FortranLexer extends Lexer {
 
                         switch (alt9) {
                     	case 1 :
-                    	    // FortranLexer.g:120:23: '0' .. '1'
+                    	    // FortranLexer.g:142:23: '0' .. '1'
                     	    {
                     	    matchRange('0','1'); 
 
@@ -688,7 +716,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -702,38 +730,38 @@ public class FortranLexer extends Lexer {
     public void mOCTAL_CONSTANT() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = OCTAL_CONSTANT;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:125:7: ( ('o'|'O') '\\'' ( '0' .. '7' )+ '\\'' | ('o'|'O') '\\\"' ( '0' .. '7' )+ '\\\"' )
+            int type = OCTAL_CONSTANT;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:147:7: ( ('o'|'O') '\\'' ( '0' .. '7' )+ '\\'' | ('o'|'O') '\\\"' ( '0' .. '7' )+ '\\\"' )
             int alt13=2;
             int LA13_0 = input.LA(1);
             if ( (LA13_0=='O'||LA13_0=='o') ) {
                 int LA13_1 = input.LA(2);
-                if ( (LA13_1=='\'') ) {
-                    alt13=1;
-                }
-                else if ( (LA13_1=='\"') ) {
+                if ( (LA13_1=='\"') ) {
                     alt13=2;
+                }
+                else if ( (LA13_1=='\'') ) {
+                    alt13=1;
                 }
                 else {
                     NoViableAltException nvae =
-                        new NoViableAltException("124:1: OCTAL_CONSTANT : ( ('o'|'O') '\\'' ( '0' .. '7' )+ '\\'' | ('o'|'O') '\\\"' ( '0' .. '7' )+ '\\\"' );", 13, 1, input);
+                        new NoViableAltException("146:1: OCTAL_CONSTANT : ( ('o'|'O') '\\'' ( '0' .. '7' )+ '\\'' | ('o'|'O') '\\\"' ( '0' .. '7' )+ '\\\"' );", 13, 1, input);
 
                     throw nvae;
                 }
             }
             else {
                 NoViableAltException nvae =
-                    new NoViableAltException("124:1: OCTAL_CONSTANT : ( ('o'|'O') '\\'' ( '0' .. '7' )+ '\\'' | ('o'|'O') '\\\"' ( '0' .. '7' )+ '\\\"' );", 13, 0, input);
+                    new NoViableAltException("146:1: OCTAL_CONSTANT : ( ('o'|'O') '\\'' ( '0' .. '7' )+ '\\'' | ('o'|'O') '\\\"' ( '0' .. '7' )+ '\\\"' );", 13, 0, input);
 
                 throw nvae;
             }
             switch (alt13) {
                 case 1 :
-                    // FortranLexer.g:125:7: ('o'|'O') '\\'' ( '0' .. '7' )+ '\\''
+                    // FortranLexer.g:147:7: ('o'|'O') '\\'' ( '0' .. '7' )+ '\\''
                     {
                     if ( input.LA(1)=='O'||input.LA(1)=='o' ) {
                         input.consume();
@@ -746,7 +774,7 @@ public class FortranLexer extends Lexer {
                     }
 
                     match('\''); 
-                    // FortranLexer.g:125:22: ( '0' .. '7' )+
+                    // FortranLexer.g:147:22: ( '0' .. '7' )+
                     int cnt11=0;
                     loop11:
                     do {
@@ -759,7 +787,7 @@ public class FortranLexer extends Lexer {
 
                         switch (alt11) {
                     	case 1 :
-                    	    // FortranLexer.g:125:23: '0' .. '7'
+                    	    // FortranLexer.g:147:23: '0' .. '7'
                     	    {
                     	    matchRange('0','7'); 
 
@@ -780,7 +808,7 @@ public class FortranLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // FortranLexer.g:126:7: ('o'|'O') '\\\"' ( '0' .. '7' )+ '\\\"'
+                    // FortranLexer.g:148:7: ('o'|'O') '\\\"' ( '0' .. '7' )+ '\\\"'
                     {
                     if ( input.LA(1)=='O'||input.LA(1)=='o' ) {
                         input.consume();
@@ -793,7 +821,7 @@ public class FortranLexer extends Lexer {
                     }
 
                     match('\"'); 
-                    // FortranLexer.g:126:22: ( '0' .. '7' )+
+                    // FortranLexer.g:148:22: ( '0' .. '7' )+
                     int cnt12=0;
                     loop12:
                     do {
@@ -806,7 +834,7 @@ public class FortranLexer extends Lexer {
 
                         switch (alt12) {
                     	case 1 :
-                    	    // FortranLexer.g:126:23: '0' .. '7'
+                    	    // FortranLexer.g:148:23: '0' .. '7'
                     	    {
                     	    matchRange('0','7'); 
 
@@ -831,7 +859,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -845,12 +873,12 @@ public class FortranLexer extends Lexer {
     public void mHEX_CONSTANT() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = HEX_CONSTANT;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:131:7: ( ('z'|'Z') '\\'' ( Digit | 'a' .. 'f' | 'A' .. 'F' )+ '\\'' | ('z'|'Z') '\\\"' ( Digit | 'a' .. 'f' | 'A' .. 'F' )+ '\\\"' )
+            int type = HEX_CONSTANT;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:153:7: ( ('z'|'Z') '\\'' ( Digit | 'a' .. 'f' | 'A' .. 'F' )+ '\\'' | ('z'|'Z') '\\\"' ( Digit | 'a' .. 'f' | 'A' .. 'F' )+ '\\\"' )
             int alt16=2;
             int LA16_0 = input.LA(1);
             if ( (LA16_0=='Z'||LA16_0=='z') ) {
@@ -863,20 +891,20 @@ public class FortranLexer extends Lexer {
                 }
                 else {
                     NoViableAltException nvae =
-                        new NoViableAltException("130:1: HEX_CONSTANT : ( ('z'|'Z') '\\'' ( Digit | 'a' .. 'f' | 'A' .. 'F' )+ '\\'' | ('z'|'Z') '\\\"' ( Digit | 'a' .. 'f' | 'A' .. 'F' )+ '\\\"' );", 16, 1, input);
+                        new NoViableAltException("152:1: HEX_CONSTANT : ( ('z'|'Z') '\\'' ( Digit | 'a' .. 'f' | 'A' .. 'F' )+ '\\'' | ('z'|'Z') '\\\"' ( Digit | 'a' .. 'f' | 'A' .. 'F' )+ '\\\"' );", 16, 1, input);
 
                     throw nvae;
                 }
             }
             else {
                 NoViableAltException nvae =
-                    new NoViableAltException("130:1: HEX_CONSTANT : ( ('z'|'Z') '\\'' ( Digit | 'a' .. 'f' | 'A' .. 'F' )+ '\\'' | ('z'|'Z') '\\\"' ( Digit | 'a' .. 'f' | 'A' .. 'F' )+ '\\\"' );", 16, 0, input);
+                    new NoViableAltException("152:1: HEX_CONSTANT : ( ('z'|'Z') '\\'' ( Digit | 'a' .. 'f' | 'A' .. 'F' )+ '\\'' | ('z'|'Z') '\\\"' ( Digit | 'a' .. 'f' | 'A' .. 'F' )+ '\\\"' );", 16, 0, input);
 
                 throw nvae;
             }
             switch (alt16) {
                 case 1 :
-                    // FortranLexer.g:131:7: ('z'|'Z') '\\'' ( Digit | 'a' .. 'f' | 'A' .. 'F' )+ '\\''
+                    // FortranLexer.g:153:7: ('z'|'Z') '\\'' ( Digit | 'a' .. 'f' | 'A' .. 'F' )+ '\\''
                     {
                     if ( input.LA(1)=='Z'||input.LA(1)=='z' ) {
                         input.consume();
@@ -889,7 +917,7 @@ public class FortranLexer extends Lexer {
                     }
 
                     match('\''); 
-                    // FortranLexer.g:131:22: ( Digit | 'a' .. 'f' | 'A' .. 'F' )+
+                    // FortranLexer.g:153:22: ( Digit | 'a' .. 'f' | 'A' .. 'F' )+
                     int cnt14=0;
                     loop14:
                     do {
@@ -928,21 +956,21 @@ public class FortranLexer extends Lexer {
 
                         switch (alt14) {
                     	case 1 :
-                    	    // FortranLexer.g:131:23: Digit
+                    	    // FortranLexer.g:153:23: Digit
                     	    {
                     	    mDigit(); 
 
                     	    }
                     	    break;
                     	case 2 :
-                    	    // FortranLexer.g:131:29: 'a' .. 'f'
+                    	    // FortranLexer.g:153:29: 'a' .. 'f'
                     	    {
                     	    matchRange('a','f'); 
 
                     	    }
                     	    break;
                     	case 3 :
-                    	    // FortranLexer.g:131:38: 'A' .. 'F'
+                    	    // FortranLexer.g:153:38: 'A' .. 'F'
                     	    {
                     	    matchRange('A','F'); 
 
@@ -963,7 +991,7 @@ public class FortranLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // FortranLexer.g:132:7: ('z'|'Z') '\\\"' ( Digit | 'a' .. 'f' | 'A' .. 'F' )+ '\\\"'
+                    // FortranLexer.g:154:7: ('z'|'Z') '\\\"' ( Digit | 'a' .. 'f' | 'A' .. 'F' )+ '\\\"'
                     {
                     if ( input.LA(1)=='Z'||input.LA(1)=='z' ) {
                         input.consume();
@@ -976,7 +1004,7 @@ public class FortranLexer extends Lexer {
                     }
 
                     match('\"'); 
-                    // FortranLexer.g:132:22: ( Digit | 'a' .. 'f' | 'A' .. 'F' )+
+                    // FortranLexer.g:154:22: ( Digit | 'a' .. 'f' | 'A' .. 'F' )+
                     int cnt15=0;
                     loop15:
                     do {
@@ -1015,21 +1043,21 @@ public class FortranLexer extends Lexer {
 
                         switch (alt15) {
                     	case 1 :
-                    	    // FortranLexer.g:132:23: Digit
+                    	    // FortranLexer.g:154:23: Digit
                     	    {
                     	    mDigit(); 
 
                     	    }
                     	    break;
                     	case 2 :
-                    	    // FortranLexer.g:132:29: 'a' .. 'f'
+                    	    // FortranLexer.g:154:29: 'a' .. 'f'
                     	    {
                     	    matchRange('a','f'); 
 
                     	    }
                     	    break;
                     	case 3 :
-                    	    // FortranLexer.g:132:38: 'A' .. 'F'
+                    	    // FortranLexer.g:154:38: 'A' .. 'F'
                     	    {
                     	    matchRange('A','F'); 
 
@@ -1054,7 +1082,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -1068,20 +1096,20 @@ public class FortranLexer extends Lexer {
     public void mREAL_CONSTANT() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = REAL_CONSTANT;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:136:4: ( Significand ( E_Exponent )? | Digit_String E_Exponent )
+            int type = REAL_CONSTANT;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:158:4: ( Significand ( E_Exponent )? | Digit_String E_Exponent )
             int alt18=2;
             alt18 = dfa18.predict(input);
             switch (alt18) {
                 case 1 :
-                    // FortranLexer.g:136:4: Significand ( E_Exponent )?
+                    // FortranLexer.g:158:4: Significand ( E_Exponent )?
                     {
                     mSignificand(); 
-                    // FortranLexer.g:136:16: ( E_Exponent )?
+                    // FortranLexer.g:158:16: ( E_Exponent )?
                     int alt17=2;
                     int LA17_0 = input.LA(1);
                     if ( (LA17_0=='E'||LA17_0=='e') ) {
@@ -1089,7 +1117,7 @@ public class FortranLexer extends Lexer {
                     }
                     switch (alt17) {
                         case 1 :
-                            // FortranLexer.g:136:16: E_Exponent
+                            // FortranLexer.g:158:16: E_Exponent
                             {
                             mE_Exponent(); 
 
@@ -1102,7 +1130,7 @@ public class FortranLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // FortranLexer.g:137:4: Digit_String E_Exponent
+                    // FortranLexer.g:159:4: Digit_String E_Exponent
                     {
                     mDigit_String(); 
                     mE_Exponent(); 
@@ -1114,7 +1142,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -1128,17 +1156,17 @@ public class FortranLexer extends Lexer {
     public void mDOUBLE_CONSTANT() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = DOUBLE_CONSTANT;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:141:4: ( Significand D_Exponent | Digit_String D_Exponent )
+            int type = DOUBLE_CONSTANT;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:163:4: ( Significand D_Exponent | Digit_String D_Exponent )
             int alt19=2;
             alt19 = dfa19.predict(input);
             switch (alt19) {
                 case 1 :
-                    // FortranLexer.g:141:4: Significand D_Exponent
+                    // FortranLexer.g:163:4: Significand D_Exponent
                     {
                     mSignificand(); 
                     mD_Exponent(); 
@@ -1146,7 +1174,7 @@ public class FortranLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // FortranLexer.g:142:4: Digit_String D_Exponent
+                    // FortranLexer.g:164:4: Digit_String D_Exponent
                     {
                     mDigit_String(); 
                     mD_Exponent(); 
@@ -1158,7 +1186,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -1172,13 +1200,13 @@ public class FortranLexer extends Lexer {
     public void mWS() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = WS;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:145:8: ( (' '|'\\r'|'\\t'|'\\u000C'))
-            // FortranLexer.g:145:8: (' '|'\\r'|'\\t'|'\\u000C')
+            int type = WS;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:167:8: ( (' '|'\\r'|'\\t'|'\\u000C'))
+            // FortranLexer.g:167:8: (' '|'\\r'|'\\t'|'\\u000C')
             {
             if ( input.LA(1)=='\t'||(input.LA(1)>='\f' && input.LA(1)<='\r')||input.LA(1)==' ' ) {
                 input.consume();
@@ -1190,14 +1218,14 @@ public class FortranLexer extends Lexer {
                 recover(mse);    throw mse;
             }
 
-            _channel=99;
+            channel=99;
 
             }
 
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -1211,10 +1239,10 @@ public class FortranLexer extends Lexer {
     public void mDigit_String() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            // FortranLexer.g:154:16: ( ( Digit )+ )
-            // FortranLexer.g:154:16: ( Digit )+
+            // FortranLexer.g:176:16: ( ( Digit )+ )
+            // FortranLexer.g:176:16: ( Digit )+
             {
-            // FortranLexer.g:154:16: ( Digit )+
+            // FortranLexer.g:176:16: ( Digit )+
             int cnt20=0;
             loop20:
             do {
@@ -1227,7 +1255,7 @@ public class FortranLexer extends Lexer {
 
                 switch (alt20) {
             	case 1 :
-            	    // FortranLexer.g:154:16: Digit
+            	    // FortranLexer.g:176:16: Digit
             	    {
             	    mDigit(); 
 
@@ -1257,7 +1285,7 @@ public class FortranLexer extends Lexer {
     public void mSignificand() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            // FortranLexer.g:159:9: ( Digit_String '.' ( Digit_String )? | '.' Digit_String )
+            // FortranLexer.g:181:9: ( Digit_String '.' ( Digit_String )? | '.' Digit_String )
             int alt22=2;
             int LA22_0 = input.LA(1);
             if ( ((LA22_0>='0' && LA22_0<='9')) ) {
@@ -1268,17 +1296,17 @@ public class FortranLexer extends Lexer {
             }
             else {
                 NoViableAltException nvae =
-                    new NoViableAltException("157:1: fragment Significand : ( Digit_String '.' ( Digit_String )? | '.' Digit_String );", 22, 0, input);
+                    new NoViableAltException("179:1: fragment Significand : ( Digit_String '.' ( Digit_String )? | '.' Digit_String );", 22, 0, input);
 
                 throw nvae;
             }
             switch (alt22) {
                 case 1 :
-                    // FortranLexer.g:159:9: Digit_String '.' ( Digit_String )?
+                    // FortranLexer.g:181:9: Digit_String '.' ( Digit_String )?
                     {
                     mDigit_String(); 
                     match('.'); 
-                    // FortranLexer.g:159:26: ( Digit_String )?
+                    // FortranLexer.g:181:26: ( Digit_String )?
                     int alt21=2;
                     int LA21_0 = input.LA(1);
                     if ( ((LA21_0>='0' && LA21_0<='9')) ) {
@@ -1286,7 +1314,7 @@ public class FortranLexer extends Lexer {
                     }
                     switch (alt21) {
                         case 1 :
-                            // FortranLexer.g:159:28: Digit_String
+                            // FortranLexer.g:181:28: Digit_String
                             {
                             mDigit_String(); 
 
@@ -1299,7 +1327,7 @@ public class FortranLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // FortranLexer.g:160:9: '.' Digit_String
+                    // FortranLexer.g:182:9: '.' Digit_String
                     {
                     match('.'); 
                     mDigit_String(); 
@@ -1319,8 +1347,8 @@ public class FortranLexer extends Lexer {
     public void mE_Exponent() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            // FortranLexer.g:164:14: ( ('e'|'E') ( ('+'|'-'))? ( '0' .. '9' )+ )
-            // FortranLexer.g:164:14: ('e'|'E') ( ('+'|'-'))? ( '0' .. '9' )+
+            // FortranLexer.g:186:14: ( ('e'|'E') ( ('+'|'-'))? ( '0' .. '9' )+ )
+            // FortranLexer.g:186:14: ('e'|'E') ( ('+'|'-'))? ( '0' .. '9' )+
             {
             if ( input.LA(1)=='E'||input.LA(1)=='e' ) {
                 input.consume();
@@ -1332,7 +1360,7 @@ public class FortranLexer extends Lexer {
                 recover(mse);    throw mse;
             }
 
-            // FortranLexer.g:164:24: ( ('+'|'-'))?
+            // FortranLexer.g:186:24: ( ('+'|'-'))?
             int alt23=2;
             int LA23_0 = input.LA(1);
             if ( (LA23_0=='+'||LA23_0=='-') ) {
@@ -1340,7 +1368,7 @@ public class FortranLexer extends Lexer {
             }
             switch (alt23) {
                 case 1 :
-                    // FortranLexer.g:164:25: ('+'|'-')
+                    // FortranLexer.g:186:25: ('+'|'-')
                     {
                     if ( input.LA(1)=='+'||input.LA(1)=='-' ) {
                         input.consume();
@@ -1358,7 +1386,7 @@ public class FortranLexer extends Lexer {
 
             }
 
-            // FortranLexer.g:164:35: ( '0' .. '9' )+
+            // FortranLexer.g:186:35: ( '0' .. '9' )+
             int cnt24=0;
             loop24:
             do {
@@ -1371,7 +1399,7 @@ public class FortranLexer extends Lexer {
 
                 switch (alt24) {
             	case 1 :
-            	    // FortranLexer.g:164:36: '0' .. '9'
+            	    // FortranLexer.g:186:36: '0' .. '9'
             	    {
             	    matchRange('0','9'); 
 
@@ -1401,8 +1429,8 @@ public class FortranLexer extends Lexer {
     public void mD_Exponent() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            // FortranLexer.g:167:14: ( ('d'|'D') ( ('+'|'-'))? ( '0' .. '9' )+ )
-            // FortranLexer.g:167:14: ('d'|'D') ( ('+'|'-'))? ( '0' .. '9' )+
+            // FortranLexer.g:189:14: ( ('d'|'D') ( ('+'|'-'))? ( '0' .. '9' )+ )
+            // FortranLexer.g:189:14: ('d'|'D') ( ('+'|'-'))? ( '0' .. '9' )+
             {
             if ( input.LA(1)=='D'||input.LA(1)=='d' ) {
                 input.consume();
@@ -1414,7 +1442,7 @@ public class FortranLexer extends Lexer {
                 recover(mse);    throw mse;
             }
 
-            // FortranLexer.g:167:24: ( ('+'|'-'))?
+            // FortranLexer.g:189:24: ( ('+'|'-'))?
             int alt25=2;
             int LA25_0 = input.LA(1);
             if ( (LA25_0=='+'||LA25_0=='-') ) {
@@ -1422,7 +1450,7 @@ public class FortranLexer extends Lexer {
             }
             switch (alt25) {
                 case 1 :
-                    // FortranLexer.g:167:25: ('+'|'-')
+                    // FortranLexer.g:189:25: ('+'|'-')
                     {
                     if ( input.LA(1)=='+'||input.LA(1)=='-' ) {
                         input.consume();
@@ -1440,7 +1468,7 @@ public class FortranLexer extends Lexer {
 
             }
 
-            // FortranLexer.g:167:35: ( '0' .. '9' )+
+            // FortranLexer.g:189:35: ( '0' .. '9' )+
             int cnt26=0;
             loop26:
             do {
@@ -1453,7 +1481,7 @@ public class FortranLexer extends Lexer {
 
                 switch (alt26) {
             	case 1 :
-            	    // FortranLexer.g:167:36: '0' .. '9'
+            	    // FortranLexer.g:189:36: '0' .. '9'
             	    {
             	    matchRange('0','9'); 
 
@@ -1483,7 +1511,7 @@ public class FortranLexer extends Lexer {
     public void mAlphanumeric_Character() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            // FortranLexer.g:171:26: ( Letter | Digit | '_' )
+            // FortranLexer.g:193:26: ( Letter | Digit | '_' )
             int alt27=3;
             switch ( input.LA(1) ) {
             case 'A':
@@ -1557,28 +1585,28 @@ public class FortranLexer extends Lexer {
                 break;
             default:
                 NoViableAltException nvae =
-                    new NoViableAltException("170:1: fragment Alphanumeric_Character : ( Letter | Digit | '_' );", 27, 0, input);
+                    new NoViableAltException("192:1: fragment Alphanumeric_Character : ( Letter | Digit | '_' );", 27, 0, input);
 
                 throw nvae;
             }
 
             switch (alt27) {
                 case 1 :
-                    // FortranLexer.g:171:26: Letter
+                    // FortranLexer.g:193:26: Letter
                     {
                     mLetter(); 
 
                     }
                     break;
                 case 2 :
-                    // FortranLexer.g:171:35: Digit
+                    // FortranLexer.g:193:35: Digit
                     {
                     mDigit(); 
 
                     }
                     break;
                 case 3 :
-                    // FortranLexer.g:171:43: '_'
+                    // FortranLexer.g:193:43: '_'
                     {
                     match('_'); 
 
@@ -1597,8 +1625,8 @@ public class FortranLexer extends Lexer {
     public void mSpecial_Character() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            // FortranLexer.g:175:5: ( (' '..'/'|':'..'@'|'['..'^'|'`'|'{'..'~'))
-            // FortranLexer.g:175:10: (' '..'/'|':'..'@'|'['..'^'|'`'|'{'..'~')
+            // FortranLexer.g:197:5: ( (' '..'/'|':'..'@'|'['..'^'|'`'|'{'..'~'))
+            // FortranLexer.g:197:10: (' '..'/'|':'..'@'|'['..'^'|'`'|'{'..'~')
             {
             if ( (input.LA(1)>=' ' && input.LA(1)<='/')||(input.LA(1)>=':' && input.LA(1)<='@')||(input.LA(1)>='[' && input.LA(1)<='^')||input.LA(1)=='`'||(input.LA(1)>='{' && input.LA(1)<='~') ) {
                 input.consume();
@@ -1624,8 +1652,8 @@ public class FortranLexer extends Lexer {
     public void mRep_Char() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            // FortranLexer.g:183:12: (~ ('\\''|'\\\"'))
-            // FortranLexer.g:183:12: ~ ('\\''|'\\\"')
+            // FortranLexer.g:205:12: (~ ('\\''|'\\\"'))
+            // FortranLexer.g:205:12: ~ ('\\''|'\\\"')
             {
             if ( (input.LA(1)>='\u0000' && input.LA(1)<='!')||(input.LA(1)>='#' && input.LA(1)<='&')||(input.LA(1)>='(' && input.LA(1)<='\uFFFE') ) {
                 input.consume();
@@ -1651,8 +1679,8 @@ public class FortranLexer extends Lexer {
     public void mSQ_Rep_Char() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            // FortranLexer.g:186:15: (~ '\\'' )
-            // FortranLexer.g:186:15: ~ '\\''
+            // FortranLexer.g:208:15: (~ '\\'' )
+            // FortranLexer.g:208:15: ~ '\\''
             {
             if ( (input.LA(1)>='\u0000' && input.LA(1)<='&')||(input.LA(1)>='(' && input.LA(1)<='\uFFFE') ) {
                 input.consume();
@@ -1678,8 +1706,8 @@ public class FortranLexer extends Lexer {
     public void mDQ_Rep_Char() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            // FortranLexer.g:188:15: (~ '\\\"' )
-            // FortranLexer.g:188:15: ~ '\\\"'
+            // FortranLexer.g:210:15: (~ '\\\"' )
+            // FortranLexer.g:210:15: ~ '\\\"'
             {
             if ( (input.LA(1)>='\u0000' && input.LA(1)<='!')||(input.LA(1)>='#' && input.LA(1)<='\uFFFE') ) {
                 input.consume();
@@ -1705,8 +1733,8 @@ public class FortranLexer extends Lexer {
     public void mLetter() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            // FortranLexer.g:191:10: ( ('a'..'z'|'A'..'Z'))
-            // FortranLexer.g:191:10: ('a'..'z'|'A'..'Z')
+            // FortranLexer.g:213:10: ( ('a'..'z'|'A'..'Z'))
+            // FortranLexer.g:213:10: ('a'..'z'|'A'..'Z')
             {
             if ( (input.LA(1)>='A' && input.LA(1)<='Z')||(input.LA(1)>='a' && input.LA(1)<='z') ) {
                 input.consume();
@@ -1732,8 +1760,8 @@ public class FortranLexer extends Lexer {
     public void mDigit() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            // FortranLexer.g:194:9: ( '0' .. '9' )
-            // FortranLexer.g:194:9: '0' .. '9'
+            // FortranLexer.g:216:9: ( '0' .. '9' )
+            // FortranLexer.g:216:9: '0' .. '9'
             {
             matchRange('0','9'); 
 
@@ -1750,23 +1778,25 @@ public class FortranLexer extends Lexer {
     public void mCONTINUE_CHAR() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = CONTINUE_CHAR;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:201:17: ( '&' )
-            // FortranLexer.g:201:17: '&'
+            int type = CONTINUE_CHAR;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:223:17: ( '&' )
+            // FortranLexer.g:223:17: '&'
             {
             match('&'); 
-            continueFlag = !(continueFlag); _channel=99;
+            continueFlag=true; channel=99; 
+                                 input.setLine(input.getLine()+1); 
+                                 input.setCharPositionInLine(0);
 
             }
 
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -1780,13 +1810,13 @@ public class FortranLexer extends Lexer {
     public void mT_ASTERISK() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_ASTERISK;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:207:19: ( '*' )
-            // FortranLexer.g:207:19: '*'
+            int type = T_ASTERISK;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:231:19: ( '*' )
+            // FortranLexer.g:231:19: '*'
             {
             match('*'); 
 
@@ -1795,7 +1825,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -1809,13 +1839,13 @@ public class FortranLexer extends Lexer {
     public void mT_COLON() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_COLON;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:208:19: ( ':' )
-            // FortranLexer.g:208:19: ':'
+            int type = T_COLON;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:232:19: ( ':' )
+            // FortranLexer.g:232:19: ':'
             {
             match(':'); 
 
@@ -1824,7 +1854,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -1838,13 +1868,13 @@ public class FortranLexer extends Lexer {
     public void mT_COLON_COLON() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_COLON_COLON;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:209:19: ( '::' )
-            // FortranLexer.g:209:19: '::'
+            int type = T_COLON_COLON;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:233:19: ( '::' )
+            // FortranLexer.g:233:19: '::'
             {
             match("::"); 
 
@@ -1854,7 +1884,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -1868,13 +1898,13 @@ public class FortranLexer extends Lexer {
     public void mT_COMMA() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_COMMA;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:210:19: ( ',' )
-            // FortranLexer.g:210:19: ','
+            int type = T_COMMA;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:234:19: ( ',' )
+            // FortranLexer.g:234:19: ','
             {
             match(','); 
 
@@ -1883,7 +1913,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -1897,13 +1927,13 @@ public class FortranLexer extends Lexer {
     public void mT_EQUALS() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_EQUALS;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:211:19: ( '=' )
-            // FortranLexer.g:211:19: '='
+            int type = T_EQUALS;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:235:19: ( '=' )
+            // FortranLexer.g:235:19: '='
             {
             match('='); 
 
@@ -1912,7 +1942,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -1926,13 +1956,13 @@ public class FortranLexer extends Lexer {
     public void mT_EQ_EQ() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_EQ_EQ;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:212:19: ( '==' )
-            // FortranLexer.g:212:19: '=='
+            int type = T_EQ_EQ;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:236:19: ( '==' )
+            // FortranLexer.g:236:19: '=='
             {
             match("=="); 
 
@@ -1942,7 +1972,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -1956,13 +1986,13 @@ public class FortranLexer extends Lexer {
     public void mT_EQ_GT() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_EQ_GT;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:213:19: ( '=>' )
-            // FortranLexer.g:213:19: '=>'
+            int type = T_EQ_GT;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:237:19: ( '=>' )
+            // FortranLexer.g:237:19: '=>'
             {
             match("=>"); 
 
@@ -1972,7 +2002,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -1986,13 +2016,13 @@ public class FortranLexer extends Lexer {
     public void mT_GREATERTHAN() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_GREATERTHAN;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:214:19: ( '>' )
-            // FortranLexer.g:214:19: '>'
+            int type = T_GREATERTHAN;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:238:19: ( '>' )
+            // FortranLexer.g:238:19: '>'
             {
             match('>'); 
 
@@ -2001,7 +2031,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -2015,13 +2045,13 @@ public class FortranLexer extends Lexer {
     public void mT_GREATERTHAN_EQ() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_GREATERTHAN_EQ;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:215:19: ( '>=' )
-            // FortranLexer.g:215:19: '>='
+            int type = T_GREATERTHAN_EQ;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:239:19: ( '>=' )
+            // FortranLexer.g:239:19: '>='
             {
             match(">="); 
 
@@ -2031,7 +2061,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -2045,13 +2075,13 @@ public class FortranLexer extends Lexer {
     public void mT_LESSTHAN() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_LESSTHAN;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:216:19: ( '<' )
-            // FortranLexer.g:216:19: '<'
+            int type = T_LESSTHAN;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:240:19: ( '<' )
+            // FortranLexer.g:240:19: '<'
             {
             match('<'); 
 
@@ -2060,7 +2090,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -2074,13 +2104,13 @@ public class FortranLexer extends Lexer {
     public void mT_LESSTHAN_EQ() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_LESSTHAN_EQ;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:217:19: ( '<=' )
-            // FortranLexer.g:217:19: '<='
+            int type = T_LESSTHAN_EQ;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:241:19: ( '<=' )
+            // FortranLexer.g:241:19: '<='
             {
             match("<="); 
 
@@ -2090,7 +2120,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -2104,13 +2134,13 @@ public class FortranLexer extends Lexer {
     public void mT_LBRACKET() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_LBRACKET;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:218:19: ( '[' )
-            // FortranLexer.g:218:19: '['
+            int type = T_LBRACKET;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:242:19: ( '[' )
+            // FortranLexer.g:242:19: '['
             {
             match('['); 
 
@@ -2119,7 +2149,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -2133,13 +2163,13 @@ public class FortranLexer extends Lexer {
     public void mT_LPAREN() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_LPAREN;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:219:19: ( '(' )
-            // FortranLexer.g:219:19: '('
+            int type = T_LPAREN;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:243:19: ( '(' )
+            // FortranLexer.g:243:19: '('
             {
             match('('); 
 
@@ -2148,7 +2178,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -2162,13 +2192,13 @@ public class FortranLexer extends Lexer {
     public void mT_MINUS() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_MINUS;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:220:19: ( '-' )
-            // FortranLexer.g:220:19: '-'
+            int type = T_MINUS;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:244:19: ( '-' )
+            // FortranLexer.g:244:19: '-'
             {
             match('-'); 
 
@@ -2177,7 +2207,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -2191,13 +2221,13 @@ public class FortranLexer extends Lexer {
     public void mT_PERCENT() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_PERCENT;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:221:19: ( '%' )
-            // FortranLexer.g:221:19: '%'
+            int type = T_PERCENT;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:245:19: ( '%' )
+            // FortranLexer.g:245:19: '%'
             {
             match('%'); 
 
@@ -2206,7 +2236,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -2220,13 +2250,13 @@ public class FortranLexer extends Lexer {
     public void mT_PERIOD() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_PERIOD;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:222:19: ( '.' )
-            // FortranLexer.g:222:19: '.'
+            int type = T_PERIOD;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:246:19: ( '.' )
+            // FortranLexer.g:246:19: '.'
             {
             match('.'); 
 
@@ -2235,7 +2265,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -2249,13 +2279,13 @@ public class FortranLexer extends Lexer {
     public void mT_PLUS() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_PLUS;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:223:19: ( '+' )
-            // FortranLexer.g:223:19: '+'
+            int type = T_PLUS;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:247:19: ( '+' )
+            // FortranLexer.g:247:19: '+'
             {
             match('+'); 
 
@@ -2264,7 +2294,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -2278,13 +2308,13 @@ public class FortranLexer extends Lexer {
     public void mT_POWER() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_POWER;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:224:19: ( '**' )
-            // FortranLexer.g:224:19: '**'
+            int type = T_POWER;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:248:19: ( '**' )
+            // FortranLexer.g:248:19: '**'
             {
             match("**"); 
 
@@ -2294,7 +2324,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -2308,13 +2338,13 @@ public class FortranLexer extends Lexer {
     public void mT_SLASH() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_SLASH;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:225:19: ( '/' )
-            // FortranLexer.g:225:19: '/'
+            int type = T_SLASH;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:249:19: ( '/' )
+            // FortranLexer.g:249:19: '/'
             {
             match('/'); 
 
@@ -2323,7 +2353,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -2337,13 +2367,13 @@ public class FortranLexer extends Lexer {
     public void mT_SLASH_EQ() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_SLASH_EQ;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:226:19: ( '/=' )
-            // FortranLexer.g:226:19: '/='
+            int type = T_SLASH_EQ;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:250:19: ( '/=' )
+            // FortranLexer.g:250:19: '/='
             {
             match("/="); 
 
@@ -2353,7 +2383,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -2367,13 +2397,13 @@ public class FortranLexer extends Lexer {
     public void mT_SLASH_SLASH() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_SLASH_SLASH;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:227:19: ( '//' )
-            // FortranLexer.g:227:19: '//'
+            int type = T_SLASH_SLASH;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:251:19: ( '//' )
+            // FortranLexer.g:251:19: '//'
             {
             match("//"); 
 
@@ -2383,7 +2413,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -2397,13 +2427,13 @@ public class FortranLexer extends Lexer {
     public void mT_RBRACKET() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_RBRACKET;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:228:19: ( ']' )
-            // FortranLexer.g:228:19: ']'
+            int type = T_RBRACKET;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:252:19: ( ']' )
+            // FortranLexer.g:252:19: ']'
             {
             match(']'); 
 
@@ -2412,7 +2442,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -2426,13 +2456,13 @@ public class FortranLexer extends Lexer {
     public void mT_RPAREN() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_RPAREN;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:229:19: ( ')' )
-            // FortranLexer.g:229:19: ')'
+            int type = T_RPAREN;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:253:19: ( ')' )
+            // FortranLexer.g:253:19: ')'
             {
             match(')'); 
 
@@ -2441,7 +2471,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -2455,13 +2485,13 @@ public class FortranLexer extends Lexer {
     public void mT_UNDERSCORE() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_UNDERSCORE;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:230:19: ( '_' )
-            // FortranLexer.g:230:19: '_'
+            int type = T_UNDERSCORE;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:254:19: ( '_' )
+            // FortranLexer.g:254:19: '_'
             {
             match('_'); 
 
@@ -2470,7 +2500,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -2484,13 +2514,13 @@ public class FortranLexer extends Lexer {
     public void mT_EQ() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_EQ;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:232:19: ( '.EQ.' )
-            // FortranLexer.g:232:19: '.EQ.'
+            int type = T_EQ;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:256:19: ( '.EQ.' )
+            // FortranLexer.g:256:19: '.EQ.'
             {
             match(".EQ."); 
 
@@ -2500,7 +2530,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -2514,13 +2544,13 @@ public class FortranLexer extends Lexer {
     public void mT_NE() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_NE;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:233:19: ( '.NE.' )
-            // FortranLexer.g:233:19: '.NE.'
+            int type = T_NE;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:257:19: ( '.NE.' )
+            // FortranLexer.g:257:19: '.NE.'
             {
             match(".NE."); 
 
@@ -2530,7 +2560,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -2544,13 +2574,13 @@ public class FortranLexer extends Lexer {
     public void mT_LT() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_LT;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:234:19: ( '.LT.' )
-            // FortranLexer.g:234:19: '.LT.'
+            int type = T_LT;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:258:19: ( '.LT.' )
+            // FortranLexer.g:258:19: '.LT.'
             {
             match(".LT."); 
 
@@ -2560,7 +2590,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -2574,13 +2604,13 @@ public class FortranLexer extends Lexer {
     public void mT_LE() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_LE;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:235:19: ( '.LE.' )
-            // FortranLexer.g:235:19: '.LE.'
+            int type = T_LE;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:259:19: ( '.LE.' )
+            // FortranLexer.g:259:19: '.LE.'
             {
             match(".LE."); 
 
@@ -2590,7 +2620,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -2604,13 +2634,13 @@ public class FortranLexer extends Lexer {
     public void mT_GT() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_GT;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:236:19: ( '.GT.' )
-            // FortranLexer.g:236:19: '.GT.'
+            int type = T_GT;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:260:19: ( '.GT.' )
+            // FortranLexer.g:260:19: '.GT.'
             {
             match(".GT."); 
 
@@ -2620,7 +2650,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -2634,13 +2664,13 @@ public class FortranLexer extends Lexer {
     public void mT_GE() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_GE;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:237:19: ( '.GE.' )
-            // FortranLexer.g:237:19: '.GE.'
+            int type = T_GE;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:261:19: ( '.GE.' )
+            // FortranLexer.g:261:19: '.GE.'
             {
             match(".GE."); 
 
@@ -2650,7 +2680,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -2664,13 +2694,13 @@ public class FortranLexer extends Lexer {
     public void mT_TRUE() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_TRUE;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:239:19: ( '.TRUE.' )
-            // FortranLexer.g:239:19: '.TRUE.'
+            int type = T_TRUE;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:263:19: ( '.TRUE.' )
+            // FortranLexer.g:263:19: '.TRUE.'
             {
             match(".TRUE."); 
 
@@ -2680,7 +2710,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -2694,13 +2724,13 @@ public class FortranLexer extends Lexer {
     public void mT_FALSE() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_FALSE;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:240:19: ( '.FALSE.' )
-            // FortranLexer.g:240:19: '.FALSE.'
+            int type = T_FALSE;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:264:19: ( '.FALSE.' )
+            // FortranLexer.g:264:19: '.FALSE.'
             {
             match(".FALSE."); 
 
@@ -2710,7 +2740,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -2724,13 +2754,13 @@ public class FortranLexer extends Lexer {
     public void mT_NOT() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_NOT;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:242:19: ( '.NOT.' )
-            // FortranLexer.g:242:19: '.NOT.'
+            int type = T_NOT;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:266:19: ( '.NOT.' )
+            // FortranLexer.g:266:19: '.NOT.'
             {
             match(".NOT."); 
 
@@ -2740,7 +2770,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -2754,13 +2784,13 @@ public class FortranLexer extends Lexer {
     public void mT_AND() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_AND;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:243:19: ( '.AND.' )
-            // FortranLexer.g:243:19: '.AND.'
+            int type = T_AND;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:267:19: ( '.AND.' )
+            // FortranLexer.g:267:19: '.AND.'
             {
             match(".AND."); 
 
@@ -2770,7 +2800,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -2784,13 +2814,13 @@ public class FortranLexer extends Lexer {
     public void mT_OR() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_OR;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:244:19: ( '.OR.' )
-            // FortranLexer.g:244:19: '.OR.'
+            int type = T_OR;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:268:19: ( '.OR.' )
+            // FortranLexer.g:268:19: '.OR.'
             {
             match(".OR."); 
 
@@ -2800,7 +2830,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -2814,13 +2844,13 @@ public class FortranLexer extends Lexer {
     public void mT_EQV() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_EQV;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:245:19: ( '.EQV.' )
-            // FortranLexer.g:245:19: '.EQV.'
+            int type = T_EQV;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:269:19: ( '.EQV.' )
+            // FortranLexer.g:269:19: '.EQV.'
             {
             match(".EQV."); 
 
@@ -2830,7 +2860,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -2844,13 +2874,13 @@ public class FortranLexer extends Lexer {
     public void mT_NEQV() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_NEQV;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:246:19: ( '.NEQV.' )
-            // FortranLexer.g:246:19: '.NEQV.'
+            int type = T_NEQV;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:270:19: ( '.NEQV.' )
+            // FortranLexer.g:270:19: '.NEQV.'
             {
             match(".NEQV."); 
 
@@ -2860,7 +2890,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -2874,13 +2904,13 @@ public class FortranLexer extends Lexer {
     public void mT_XYZ() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_XYZ;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:251:19: ( 'XYZ' )
-            // FortranLexer.g:251:19: 'XYZ'
+            int type = T_XYZ;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:275:19: ( 'XYZ' )
+            // FortranLexer.g:275:19: 'XYZ'
             {
             match("XYZ"); 
 
@@ -2890,7 +2920,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -2904,13 +2934,13 @@ public class FortranLexer extends Lexer {
     public void mT_INTEGER() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_INTEGER;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:253:25: ( 'INTEGER' )
-            // FortranLexer.g:253:25: 'INTEGER'
+            int type = T_INTEGER;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:277:25: ( 'INTEGER' )
+            // FortranLexer.g:277:25: 'INTEGER'
             {
             match("INTEGER"); 
 
@@ -2920,7 +2950,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -2934,13 +2964,13 @@ public class FortranLexer extends Lexer {
     public void mT_REAL() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_REAL;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:254:25: ( 'REAL' )
-            // FortranLexer.g:254:25: 'REAL'
+            int type = T_REAL;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:278:25: ( 'REAL' )
+            // FortranLexer.g:278:25: 'REAL'
             {
             match("REAL"); 
 
@@ -2950,7 +2980,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -2964,13 +2994,13 @@ public class FortranLexer extends Lexer {
     public void mT_COMPLEX() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_COMPLEX;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:255:25: ( 'COMPLEX' )
-            // FortranLexer.g:255:25: 'COMPLEX'
+            int type = T_COMPLEX;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:279:25: ( 'COMPLEX' )
+            // FortranLexer.g:279:25: 'COMPLEX'
             {
             match("COMPLEX"); 
 
@@ -2980,7 +3010,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -2994,13 +3024,13 @@ public class FortranLexer extends Lexer {
     public void mT_CHARACTER() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_CHARACTER;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:256:25: ( 'CHARACTER' )
-            // FortranLexer.g:256:25: 'CHARACTER'
+            int type = T_CHARACTER;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:280:25: ( 'CHARACTER' )
+            // FortranLexer.g:280:25: 'CHARACTER'
             {
             match("CHARACTER"); 
 
@@ -3010,7 +3040,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -3024,13 +3054,13 @@ public class FortranLexer extends Lexer {
     public void mT_LOGICAL() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_LOGICAL;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:257:25: ( 'LOGICAL' )
-            // FortranLexer.g:257:25: 'LOGICAL'
+            int type = T_LOGICAL;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:281:25: ( 'LOGICAL' )
+            // FortranLexer.g:281:25: 'LOGICAL'
             {
             match("LOGICAL"); 
 
@@ -3040,7 +3070,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -3054,13 +3084,13 @@ public class FortranLexer extends Lexer {
     public void mT_ABSTRACT() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_ABSTRACT;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:259:25: ( 'ABSTRACT' )
-            // FortranLexer.g:259:25: 'ABSTRACT'
+            int type = T_ABSTRACT;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:283:25: ( 'ABSTRACT' )
+            // FortranLexer.g:283:25: 'ABSTRACT'
             {
             match("ABSTRACT"); 
 
@@ -3070,7 +3100,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -3084,13 +3114,13 @@ public class FortranLexer extends Lexer {
     public void mT_ALLOCATABLE() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_ALLOCATABLE;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:260:25: ( 'ALLOCATABLE' )
-            // FortranLexer.g:260:25: 'ALLOCATABLE'
+            int type = T_ALLOCATABLE;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:284:25: ( 'ALLOCATABLE' )
+            // FortranLexer.g:284:25: 'ALLOCATABLE'
             {
             match("ALLOCATABLE"); 
 
@@ -3100,7 +3130,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -3114,13 +3144,13 @@ public class FortranLexer extends Lexer {
     public void mT_ALLOCATE() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_ALLOCATE;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:261:25: ( 'ALLOCATE' )
-            // FortranLexer.g:261:25: 'ALLOCATE'
+            int type = T_ALLOCATE;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:285:25: ( 'ALLOCATE' )
+            // FortranLexer.g:285:25: 'ALLOCATE'
             {
             match("ALLOCATE"); 
 
@@ -3130,7 +3160,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -3144,13 +3174,13 @@ public class FortranLexer extends Lexer {
     public void mT_ASSIGNMENT() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_ASSIGNMENT;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:262:25: ( 'ASSIGNMENT' )
-            // FortranLexer.g:262:25: 'ASSIGNMENT'
+            int type = T_ASSIGNMENT;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:286:25: ( 'ASSIGNMENT' )
+            // FortranLexer.g:286:25: 'ASSIGNMENT'
             {
             match("ASSIGNMENT"); 
 
@@ -3160,7 +3190,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -3174,13 +3204,13 @@ public class FortranLexer extends Lexer {
     public void mT_ASSOCIATE() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_ASSOCIATE;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:263:25: ( 'ASSOCIATE' )
-            // FortranLexer.g:263:25: 'ASSOCIATE'
+            int type = T_ASSOCIATE;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:287:25: ( 'ASSOCIATE' )
+            // FortranLexer.g:287:25: 'ASSOCIATE'
             {
             match("ASSOCIATE"); 
 
@@ -3190,7 +3220,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -3204,13 +3234,13 @@ public class FortranLexer extends Lexer {
     public void mT_ASYNCHRONOUS() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_ASYNCHRONOUS;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:264:25: ( 'ASYNCHRONOUS' )
-            // FortranLexer.g:264:25: 'ASYNCHRONOUS'
+            int type = T_ASYNCHRONOUS;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:288:25: ( 'ASYNCHRONOUS' )
+            // FortranLexer.g:288:25: 'ASYNCHRONOUS'
             {
             match("ASYNCHRONOUS"); 
 
@@ -3220,7 +3250,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -3234,13 +3264,13 @@ public class FortranLexer extends Lexer {
     public void mT_BACKSPACE() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_BACKSPACE;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:265:25: ( 'BACKSPACE' )
-            // FortranLexer.g:265:25: 'BACKSPACE'
+            int type = T_BACKSPACE;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:289:25: ( 'BACKSPACE' )
+            // FortranLexer.g:289:25: 'BACKSPACE'
             {
             match("BACKSPACE"); 
 
@@ -3250,7 +3280,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -3264,13 +3294,13 @@ public class FortranLexer extends Lexer {
     public void mT_BLOCK() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_BLOCK;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:266:25: ( 'BLOCK' )
-            // FortranLexer.g:266:25: 'BLOCK'
+            int type = T_BLOCK;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:290:25: ( 'BLOCK' )
+            // FortranLexer.g:290:25: 'BLOCK'
             {
             match("BLOCK"); 
 
@@ -3280,7 +3310,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -3294,13 +3324,13 @@ public class FortranLexer extends Lexer {
     public void mT_BLOCKDATA() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_BLOCKDATA;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:267:25: ( 'BLOCKDATA' )
-            // FortranLexer.g:267:25: 'BLOCKDATA'
+            int type = T_BLOCKDATA;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:291:25: ( 'BLOCKDATA' )
+            // FortranLexer.g:291:25: 'BLOCKDATA'
             {
             match("BLOCKDATA"); 
 
@@ -3310,7 +3340,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -3324,13 +3354,13 @@ public class FortranLexer extends Lexer {
     public void mT_CALL() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_CALL;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:268:25: ( 'CALL' )
-            // FortranLexer.g:268:25: 'CALL'
+            int type = T_CALL;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:292:25: ( 'CALL' )
+            // FortranLexer.g:292:25: 'CALL'
             {
             match("CALL"); 
 
@@ -3340,7 +3370,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -3354,13 +3384,13 @@ public class FortranLexer extends Lexer {
     public void mT_CASE() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_CASE;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:269:25: ( 'CASE' )
-            // FortranLexer.g:269:25: 'CASE'
+            int type = T_CASE;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:293:25: ( 'CASE' )
+            // FortranLexer.g:293:25: 'CASE'
             {
             match("CASE"); 
 
@@ -3370,7 +3400,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -3384,13 +3414,13 @@ public class FortranLexer extends Lexer {
     public void mT_CLASS() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_CLASS;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:270:25: ( 'CLASS' )
-            // FortranLexer.g:270:25: 'CLASS'
+            int type = T_CLASS;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:294:25: ( 'CLASS' )
+            // FortranLexer.g:294:25: 'CLASS'
             {
             match("CLASS"); 
 
@@ -3400,7 +3430,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -3414,13 +3444,13 @@ public class FortranLexer extends Lexer {
     public void mT_CLOSE() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_CLOSE;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:271:25: ( 'CLOSE' )
-            // FortranLexer.g:271:25: 'CLOSE'
+            int type = T_CLOSE;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:295:25: ( 'CLOSE' )
+            // FortranLexer.g:295:25: 'CLOSE'
             {
             match("CLOSE"); 
 
@@ -3430,7 +3460,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -3444,13 +3474,13 @@ public class FortranLexer extends Lexer {
     public void mT_COMMON() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_COMMON;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:272:25: ( 'COMMON' )
-            // FortranLexer.g:272:25: 'COMMON'
+            int type = T_COMMON;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:296:25: ( 'COMMON' )
+            // FortranLexer.g:296:25: 'COMMON'
             {
             match("COMMON"); 
 
@@ -3460,7 +3490,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -3474,13 +3504,13 @@ public class FortranLexer extends Lexer {
     public void mT_CONTAINS() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_CONTAINS;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:273:25: ( 'CONTAINS' )
-            // FortranLexer.g:273:25: 'CONTAINS'
+            int type = T_CONTAINS;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:297:25: ( 'CONTAINS' )
+            // FortranLexer.g:297:25: 'CONTAINS'
             {
             match("CONTAINS"); 
 
@@ -3490,7 +3520,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -3504,13 +3534,13 @@ public class FortranLexer extends Lexer {
     public void mT_CONTINUE() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_CONTINUE;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:274:25: ( 'CONTINUE' )
-            // FortranLexer.g:274:25: 'CONTINUE'
+            int type = T_CONTINUE;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:298:25: ( 'CONTINUE' )
+            // FortranLexer.g:298:25: 'CONTINUE'
             {
             match("CONTINUE"); 
 
@@ -3520,7 +3550,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -3534,13 +3564,13 @@ public class FortranLexer extends Lexer {
     public void mT_CYCLE() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_CYCLE;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:275:25: ( 'CYCLE' )
-            // FortranLexer.g:275:25: 'CYCLE'
+            int type = T_CYCLE;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:299:25: ( 'CYCLE' )
+            // FortranLexer.g:299:25: 'CYCLE'
             {
             match("CYCLE"); 
 
@@ -3550,7 +3580,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -3564,13 +3594,13 @@ public class FortranLexer extends Lexer {
     public void mT_DATA() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_DATA;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:276:25: ( 'DATA' )
-            // FortranLexer.g:276:25: 'DATA'
+            int type = T_DATA;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:300:25: ( 'DATA' )
+            // FortranLexer.g:300:25: 'DATA'
             {
             match("DATA"); 
 
@@ -3580,7 +3610,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -3594,13 +3624,13 @@ public class FortranLexer extends Lexer {
     public void mT_DEFAULT() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_DEFAULT;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:277:25: ( 'DEFAULT' )
-            // FortranLexer.g:277:25: 'DEFAULT'
+            int type = T_DEFAULT;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:301:25: ( 'DEFAULT' )
+            // FortranLexer.g:301:25: 'DEFAULT'
             {
             match("DEFAULT"); 
 
@@ -3610,7 +3640,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -3624,13 +3654,13 @@ public class FortranLexer extends Lexer {
     public void mT_DEALLOCATE() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_DEALLOCATE;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:278:25: ( 'DEALLOCATE' )
-            // FortranLexer.g:278:25: 'DEALLOCATE'
+            int type = T_DEALLOCATE;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:302:25: ( 'DEALLOCATE' )
+            // FortranLexer.g:302:25: 'DEALLOCATE'
             {
             match("DEALLOCATE"); 
 
@@ -3640,7 +3670,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -3654,13 +3684,13 @@ public class FortranLexer extends Lexer {
     public void mT_DEFERRED() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_DEFERRED;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:279:25: ( 'DEFERRED' )
-            // FortranLexer.g:279:25: 'DEFERRED'
+            int type = T_DEFERRED;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:303:25: ( 'DEFERRED' )
+            // FortranLexer.g:303:25: 'DEFERRED'
             {
             match("DEFERRED"); 
 
@@ -3670,7 +3700,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -3684,13 +3714,13 @@ public class FortranLexer extends Lexer {
     public void mT_DO() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_DO;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:280:25: ( 'DO' )
-            // FortranLexer.g:280:25: 'DO'
+            int type = T_DO;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:304:25: ( 'DO' )
+            // FortranLexer.g:304:25: 'DO'
             {
             match("DO"); 
 
@@ -3700,7 +3730,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -3714,13 +3744,13 @@ public class FortranLexer extends Lexer {
     public void mT_DOUBLE() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_DOUBLE;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:281:25: ( 'DOUBLE' )
-            // FortranLexer.g:281:25: 'DOUBLE'
+            int type = T_DOUBLE;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:305:25: ( 'DOUBLE' )
+            // FortranLexer.g:305:25: 'DOUBLE'
             {
             match("DOUBLE"); 
 
@@ -3730,7 +3760,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -3744,13 +3774,13 @@ public class FortranLexer extends Lexer {
     public void mT_DOUBLEPRECISION() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_DOUBLEPRECISION;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:282:25: ( 'DOUBLEPRECISION' )
-            // FortranLexer.g:282:25: 'DOUBLEPRECISION'
+            int type = T_DOUBLEPRECISION;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:306:25: ( 'DOUBLEPRECISION' )
+            // FortranLexer.g:306:25: 'DOUBLEPRECISION'
             {
             match("DOUBLEPRECISION"); 
 
@@ -3760,7 +3790,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -3774,13 +3804,13 @@ public class FortranLexer extends Lexer {
     public void mT_ELEMENTAL() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_ELEMENTAL;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:283:25: ( 'ELEMENTAL' )
-            // FortranLexer.g:283:25: 'ELEMENTAL'
+            int type = T_ELEMENTAL;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:307:25: ( 'ELEMENTAL' )
+            // FortranLexer.g:307:25: 'ELEMENTAL'
             {
             match("ELEMENTAL"); 
 
@@ -3790,7 +3820,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -3804,13 +3834,13 @@ public class FortranLexer extends Lexer {
     public void mT_ELSE() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_ELSE;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:284:25: ( 'ELSE' )
-            // FortranLexer.g:284:25: 'ELSE'
+            int type = T_ELSE;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:308:25: ( 'ELSE' )
+            // FortranLexer.g:308:25: 'ELSE'
             {
             match("ELSE"); 
 
@@ -3820,7 +3850,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -3834,13 +3864,13 @@ public class FortranLexer extends Lexer {
     public void mT_ELSEIF() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_ELSEIF;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:285:25: ( 'ELSEIF' )
-            // FortranLexer.g:285:25: 'ELSEIF'
+            int type = T_ELSEIF;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:309:25: ( 'ELSEIF' )
+            // FortranLexer.g:309:25: 'ELSEIF'
             {
             match("ELSEIF"); 
 
@@ -3850,7 +3880,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -3864,13 +3894,13 @@ public class FortranLexer extends Lexer {
     public void mT_ELSEWHERE() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_ELSEWHERE;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:286:25: ( 'ELSEWHERE' )
-            // FortranLexer.g:286:25: 'ELSEWHERE'
+            int type = T_ELSEWHERE;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:310:25: ( 'ELSEWHERE' )
+            // FortranLexer.g:310:25: 'ELSEWHERE'
             {
             match("ELSEWHERE"); 
 
@@ -3880,7 +3910,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -3894,13 +3924,13 @@ public class FortranLexer extends Lexer {
     public void mT_ENTRY() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_ENTRY;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:287:25: ( 'ENTRY' )
-            // FortranLexer.g:287:25: 'ENTRY'
+            int type = T_ENTRY;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:311:25: ( 'ENTRY' )
+            // FortranLexer.g:311:25: 'ENTRY'
             {
             match("ENTRY"); 
 
@@ -3910,7 +3940,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -3924,13 +3954,13 @@ public class FortranLexer extends Lexer {
     public void mT_ENUM() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_ENUM;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:288:25: ( 'ENUM' )
-            // FortranLexer.g:288:25: 'ENUM'
+            int type = T_ENUM;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:312:25: ( 'ENUM' )
+            // FortranLexer.g:312:25: 'ENUM'
             {
             match("ENUM"); 
 
@@ -3940,7 +3970,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -3954,13 +3984,13 @@ public class FortranLexer extends Lexer {
     public void mT_ENUMERATOR() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_ENUMERATOR;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:289:25: ( 'ENUMERATOR' )
-            // FortranLexer.g:289:25: 'ENUMERATOR'
+            int type = T_ENUMERATOR;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:313:25: ( 'ENUMERATOR' )
+            // FortranLexer.g:313:25: 'ENUMERATOR'
             {
             match("ENUMERATOR"); 
 
@@ -3970,7 +4000,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -3984,13 +4014,13 @@ public class FortranLexer extends Lexer {
     public void mT_EQUIVALENCE() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_EQUIVALENCE;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:290:25: ( 'EQUIVALENCE' )
-            // FortranLexer.g:290:25: 'EQUIVALENCE'
+            int type = T_EQUIVALENCE;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:314:25: ( 'EQUIVALENCE' )
+            // FortranLexer.g:314:25: 'EQUIVALENCE'
             {
             match("EQUIVALENCE"); 
 
@@ -4000,7 +4030,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -4014,13 +4044,13 @@ public class FortranLexer extends Lexer {
     public void mT_EXIT() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_EXIT;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:291:25: ( 'EXIT' )
-            // FortranLexer.g:291:25: 'EXIT'
+            int type = T_EXIT;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:315:25: ( 'EXIT' )
+            // FortranLexer.g:315:25: 'EXIT'
             {
             match("EXIT"); 
 
@@ -4030,7 +4060,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -4044,13 +4074,13 @@ public class FortranLexer extends Lexer {
     public void mT_EXTENDS() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_EXTENDS;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:292:25: ( 'EXTENDS' )
-            // FortranLexer.g:292:25: 'EXTENDS'
+            int type = T_EXTENDS;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:316:25: ( 'EXTENDS' )
+            // FortranLexer.g:316:25: 'EXTENDS'
             {
             match("EXTENDS"); 
 
@@ -4060,7 +4090,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -4074,13 +4104,13 @@ public class FortranLexer extends Lexer {
     public void mT_EXTERNAL() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_EXTERNAL;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:293:25: ( 'EXTERNAL' )
-            // FortranLexer.g:293:25: 'EXTERNAL'
+            int type = T_EXTERNAL;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:317:25: ( 'EXTERNAL' )
+            // FortranLexer.g:317:25: 'EXTERNAL'
             {
             match("EXTERNAL"); 
 
@@ -4090,7 +4120,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -4104,13 +4134,13 @@ public class FortranLexer extends Lexer {
     public void mT_FILE() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_FILE;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:294:25: ( 'FILE' )
-            // FortranLexer.g:294:25: 'FILE'
+            int type = T_FILE;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:318:25: ( 'FILE' )
+            // FortranLexer.g:318:25: 'FILE'
             {
             match("FILE"); 
 
@@ -4120,7 +4150,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -4134,13 +4164,13 @@ public class FortranLexer extends Lexer {
     public void mT_FINAL() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_FINAL;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:295:25: ( 'FINAL' )
-            // FortranLexer.g:295:25: 'FINAL'
+            int type = T_FINAL;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:319:25: ( 'FINAL' )
+            // FortranLexer.g:319:25: 'FINAL'
             {
             match("FINAL"); 
 
@@ -4150,7 +4180,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -4164,13 +4194,13 @@ public class FortranLexer extends Lexer {
     public void mT_FLUSH() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_FLUSH;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:296:25: ( 'FLUSH' )
-            // FortranLexer.g:296:25: 'FLUSH'
+            int type = T_FLUSH;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:320:25: ( 'FLUSH' )
+            // FortranLexer.g:320:25: 'FLUSH'
             {
             match("FLUSH"); 
 
@@ -4180,7 +4210,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -4194,13 +4224,13 @@ public class FortranLexer extends Lexer {
     public void mT_FORALL() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_FORALL;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:297:25: ( 'FORALL' )
-            // FortranLexer.g:297:25: 'FORALL'
+            int type = T_FORALL;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:321:25: ( 'FORALL' )
+            // FortranLexer.g:321:25: 'FORALL'
             {
             match("FORALL"); 
 
@@ -4210,7 +4240,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -4224,13 +4254,13 @@ public class FortranLexer extends Lexer {
     public void mT_FORMAT() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_FORMAT;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:298:25: ( 'FORMAT' )
-            // FortranLexer.g:298:25: 'FORMAT'
+            int type = T_FORMAT;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:322:25: ( 'FORMAT' )
+            // FortranLexer.g:322:25: 'FORMAT'
             {
             match("FORMAT"); 
 
@@ -4240,7 +4270,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -4254,13 +4284,13 @@ public class FortranLexer extends Lexer {
     public void mT_FORMATTED() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_FORMATTED;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:299:25: ( 'FORMATTED' )
-            // FortranLexer.g:299:25: 'FORMATTED'
+            int type = T_FORMATTED;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:323:25: ( 'FORMATTED' )
+            // FortranLexer.g:323:25: 'FORMATTED'
             {
             match("FORMATTED"); 
 
@@ -4270,7 +4300,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -4284,13 +4314,13 @@ public class FortranLexer extends Lexer {
     public void mT_FUNCTION() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_FUNCTION;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:300:25: ( 'FUNCTION' )
-            // FortranLexer.g:300:25: 'FUNCTION'
+            int type = T_FUNCTION;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:324:25: ( 'FUNCTION' )
+            // FortranLexer.g:324:25: 'FUNCTION'
             {
             match("FUNCTION"); 
 
@@ -4300,7 +4330,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -4314,13 +4344,13 @@ public class FortranLexer extends Lexer {
     public void mT_GENERIC() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_GENERIC;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:301:25: ( 'GENERIC' )
-            // FortranLexer.g:301:25: 'GENERIC'
+            int type = T_GENERIC;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:325:25: ( 'GENERIC' )
+            // FortranLexer.g:325:25: 'GENERIC'
             {
             match("GENERIC"); 
 
@@ -4330,7 +4360,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -4344,13 +4374,13 @@ public class FortranLexer extends Lexer {
     public void mT_GO() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_GO;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:302:25: ( 'GO' )
-            // FortranLexer.g:302:25: 'GO'
+            int type = T_GO;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:326:25: ( 'GO' )
+            // FortranLexer.g:326:25: 'GO'
             {
             match("GO"); 
 
@@ -4360,7 +4390,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -4374,13 +4404,13 @@ public class FortranLexer extends Lexer {
     public void mT_GOTO() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_GOTO;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:303:25: ( 'GOTO' )
-            // FortranLexer.g:303:25: 'GOTO'
+            int type = T_GOTO;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:327:25: ( 'GOTO' )
+            // FortranLexer.g:327:25: 'GOTO'
             {
             match("GOTO"); 
 
@@ -4390,7 +4420,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -4404,13 +4434,13 @@ public class FortranLexer extends Lexer {
     public void mT_IF() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_IF;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:304:25: ( 'IF' )
-            // FortranLexer.g:304:25: 'IF'
+            int type = T_IF;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:328:25: ( 'IF' )
+            // FortranLexer.g:328:25: 'IF'
             {
             match("IF"); 
 
@@ -4420,7 +4450,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -4434,13 +4464,13 @@ public class FortranLexer extends Lexer {
     public void mT_IMPLICIT() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_IMPLICIT;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:305:25: ( 'IMPLICIT' )
-            // FortranLexer.g:305:25: 'IMPLICIT'
+            int type = T_IMPLICIT;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:329:25: ( 'IMPLICIT' )
+            // FortranLexer.g:329:25: 'IMPLICIT'
             {
             match("IMPLICIT"); 
 
@@ -4450,7 +4480,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -4464,13 +4494,13 @@ public class FortranLexer extends Lexer {
     public void mT_IMPORT() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_IMPORT;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:306:25: ( 'IMPORT' )
-            // FortranLexer.g:306:25: 'IMPORT'
+            int type = T_IMPORT;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:330:25: ( 'IMPORT' )
+            // FortranLexer.g:330:25: 'IMPORT'
             {
             match("IMPORT"); 
 
@@ -4480,7 +4510,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -4494,13 +4524,13 @@ public class FortranLexer extends Lexer {
     public void mT_IN() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_IN;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:307:25: ( 'IN' )
-            // FortranLexer.g:307:25: 'IN'
+            int type = T_IN;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:331:25: ( 'IN' )
+            // FortranLexer.g:331:25: 'IN'
             {
             match("IN"); 
 
@@ -4510,7 +4540,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -4524,13 +4554,13 @@ public class FortranLexer extends Lexer {
     public void mT_INOUT() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_INOUT;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:308:25: ( 'INOUT' )
-            // FortranLexer.g:308:25: 'INOUT'
+            int type = T_INOUT;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:332:25: ( 'INOUT' )
+            // FortranLexer.g:332:25: 'INOUT'
             {
             match("INOUT"); 
 
@@ -4540,7 +4570,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -4554,13 +4584,13 @@ public class FortranLexer extends Lexer {
     public void mT_INTENT() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_INTENT;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:309:25: ( 'INTENT' )
-            // FortranLexer.g:309:25: 'INTENT'
+            int type = T_INTENT;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:333:25: ( 'INTENT' )
+            // FortranLexer.g:333:25: 'INTENT'
             {
             match("INTENT"); 
 
@@ -4570,7 +4600,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -4584,13 +4614,13 @@ public class FortranLexer extends Lexer {
     public void mT_INTERFACE() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_INTERFACE;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:310:25: ( 'INTERFACE' )
-            // FortranLexer.g:310:25: 'INTERFACE'
+            int type = T_INTERFACE;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:334:25: ( 'INTERFACE' )
+            // FortranLexer.g:334:25: 'INTERFACE'
             {
             match("INTERFACE"); 
 
@@ -4600,7 +4630,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -4614,13 +4644,13 @@ public class FortranLexer extends Lexer {
     public void mT_INTRINSIC() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_INTRINSIC;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:311:25: ( 'INTRINSIC' )
-            // FortranLexer.g:311:25: 'INTRINSIC'
+            int type = T_INTRINSIC;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:335:25: ( 'INTRINSIC' )
+            // FortranLexer.g:335:25: 'INTRINSIC'
             {
             match("INTRINSIC"); 
 
@@ -4630,7 +4660,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -4644,13 +4674,13 @@ public class FortranLexer extends Lexer {
     public void mT_INQUIRE() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_INQUIRE;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:312:25: ( 'INQUIRE' )
-            // FortranLexer.g:312:25: 'INQUIRE'
+            int type = T_INQUIRE;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:336:25: ( 'INQUIRE' )
+            // FortranLexer.g:336:25: 'INQUIRE'
             {
             match("INQUIRE"); 
 
@@ -4660,7 +4690,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -4674,13 +4704,13 @@ public class FortranLexer extends Lexer {
     public void mT_MODULE() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_MODULE;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:313:25: ( 'MODULE' )
-            // FortranLexer.g:313:25: 'MODULE'
+            int type = T_MODULE;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:337:25: ( 'MODULE' )
+            // FortranLexer.g:337:25: 'MODULE'
             {
             match("MODULE"); 
 
@@ -4690,7 +4720,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -4704,13 +4734,13 @@ public class FortranLexer extends Lexer {
     public void mT_NAMELIST() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_NAMELIST;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:314:25: ( 'NAMELIST' )
-            // FortranLexer.g:314:25: 'NAMELIST'
+            int type = T_NAMELIST;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:338:25: ( 'NAMELIST' )
+            // FortranLexer.g:338:25: 'NAMELIST'
             {
             match("NAMELIST"); 
 
@@ -4720,7 +4750,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -4734,13 +4764,13 @@ public class FortranLexer extends Lexer {
     public void mT_NONE() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_NONE;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:315:25: ( 'NONE' )
-            // FortranLexer.g:315:25: 'NONE'
+            int type = T_NONE;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:339:25: ( 'NONE' )
+            // FortranLexer.g:339:25: 'NONE'
             {
             match("NONE"); 
 
@@ -4750,7 +4780,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -4764,13 +4794,13 @@ public class FortranLexer extends Lexer {
     public void mT_NON_INTRINSIC() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_NON_INTRINSIC;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:316:25: ( 'NON_INTRINSIC' )
-            // FortranLexer.g:316:25: 'NON_INTRINSIC'
+            int type = T_NON_INTRINSIC;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:340:25: ( 'NON_INTRINSIC' )
+            // FortranLexer.g:340:25: 'NON_INTRINSIC'
             {
             match("NON_INTRINSIC"); 
 
@@ -4780,7 +4810,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -4794,13 +4824,13 @@ public class FortranLexer extends Lexer {
     public void mT_NON_OVERRIDABLE() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_NON_OVERRIDABLE;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:317:25: ( 'NON_OVERRIDABLE' )
-            // FortranLexer.g:317:25: 'NON_OVERRIDABLE'
+            int type = T_NON_OVERRIDABLE;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:341:25: ( 'NON_OVERRIDABLE' )
+            // FortranLexer.g:341:25: 'NON_OVERRIDABLE'
             {
             match("NON_OVERRIDABLE"); 
 
@@ -4810,7 +4840,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -4824,13 +4854,13 @@ public class FortranLexer extends Lexer {
     public void mT_NOPASS() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_NOPASS;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:318:25: ( 'NOPASS' )
-            // FortranLexer.g:318:25: 'NOPASS'
+            int type = T_NOPASS;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:342:25: ( 'NOPASS' )
+            // FortranLexer.g:342:25: 'NOPASS'
             {
             match("NOPASS"); 
 
@@ -4840,7 +4870,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -4854,13 +4884,13 @@ public class FortranLexer extends Lexer {
     public void mT_NULLIFY() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_NULLIFY;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:319:25: ( 'NULLIFY' )
-            // FortranLexer.g:319:25: 'NULLIFY'
+            int type = T_NULLIFY;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:343:25: ( 'NULLIFY' )
+            // FortranLexer.g:343:25: 'NULLIFY'
             {
             match("NULLIFY"); 
 
@@ -4870,7 +4900,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -4884,13 +4914,13 @@ public class FortranLexer extends Lexer {
     public void mT_ONLY() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_ONLY;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:320:25: ( 'ONLY' )
-            // FortranLexer.g:320:25: 'ONLY'
+            int type = T_ONLY;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:344:25: ( 'ONLY' )
+            // FortranLexer.g:344:25: 'ONLY'
             {
             match("ONLY"); 
 
@@ -4900,7 +4930,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -4914,13 +4944,13 @@ public class FortranLexer extends Lexer {
     public void mT_OPEN() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_OPEN;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:321:25: ( 'OPEN' )
-            // FortranLexer.g:321:25: 'OPEN'
+            int type = T_OPEN;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:345:25: ( 'OPEN' )
+            // FortranLexer.g:345:25: 'OPEN'
             {
             match("OPEN"); 
 
@@ -4930,7 +4960,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -4944,13 +4974,13 @@ public class FortranLexer extends Lexer {
     public void mT_OPERATOR() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_OPERATOR;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:322:25: ( 'OPERATOR' )
-            // FortranLexer.g:322:25: 'OPERATOR'
+            int type = T_OPERATOR;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:346:25: ( 'OPERATOR' )
+            // FortranLexer.g:346:25: 'OPERATOR'
             {
             match("OPERATOR"); 
 
@@ -4960,7 +4990,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -4974,13 +5004,13 @@ public class FortranLexer extends Lexer {
     public void mT_OPTIONAL() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_OPTIONAL;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:323:25: ( 'OPTIONAL' )
-            // FortranLexer.g:323:25: 'OPTIONAL'
+            int type = T_OPTIONAL;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:347:25: ( 'OPTIONAL' )
+            // FortranLexer.g:347:25: 'OPTIONAL'
             {
             match("OPTIONAL"); 
 
@@ -4990,7 +5020,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -5004,13 +5034,13 @@ public class FortranLexer extends Lexer {
     public void mT_OUT() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_OUT;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:324:25: ( 'OUT' )
-            // FortranLexer.g:324:25: 'OUT'
+            int type = T_OUT;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:348:25: ( 'OUT' )
+            // FortranLexer.g:348:25: 'OUT'
             {
             match("OUT"); 
 
@@ -5020,7 +5050,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -5034,13 +5064,13 @@ public class FortranLexer extends Lexer {
     public void mT_PARAMETER() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_PARAMETER;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:325:25: ( 'PARAMETER' )
-            // FortranLexer.g:325:25: 'PARAMETER'
+            int type = T_PARAMETER;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:349:25: ( 'PARAMETER' )
+            // FortranLexer.g:349:25: 'PARAMETER'
             {
             match("PARAMETER"); 
 
@@ -5050,7 +5080,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -5064,13 +5094,13 @@ public class FortranLexer extends Lexer {
     public void mT_PASS() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_PASS;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:326:25: ( 'PASS' )
-            // FortranLexer.g:326:25: 'PASS'
+            int type = T_PASS;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:350:25: ( 'PASS' )
+            // FortranLexer.g:350:25: 'PASS'
             {
             match("PASS"); 
 
@@ -5080,7 +5110,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -5094,13 +5124,13 @@ public class FortranLexer extends Lexer {
     public void mT_POINTER() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_POINTER;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:327:25: ( 'POINTER' )
-            // FortranLexer.g:327:25: 'POINTER'
+            int type = T_POINTER;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:351:25: ( 'POINTER' )
+            // FortranLexer.g:351:25: 'POINTER'
             {
             match("POINTER"); 
 
@@ -5110,7 +5140,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -5124,13 +5154,13 @@ public class FortranLexer extends Lexer {
     public void mT_PRINT() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_PRINT;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:328:25: ( 'PRINT' )
-            // FortranLexer.g:328:25: 'PRINT'
+            int type = T_PRINT;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:352:25: ( 'PRINT' )
+            // FortranLexer.g:352:25: 'PRINT'
             {
             match("PRINT"); 
 
@@ -5140,7 +5170,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -5154,13 +5184,13 @@ public class FortranLexer extends Lexer {
     public void mT_PRECISION() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_PRECISION;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:329:25: ( 'PRECISION' )
-            // FortranLexer.g:329:25: 'PRECISION'
+            int type = T_PRECISION;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:353:25: ( 'PRECISION' )
+            // FortranLexer.g:353:25: 'PRECISION'
             {
             match("PRECISION"); 
 
@@ -5170,7 +5200,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -5184,13 +5214,13 @@ public class FortranLexer extends Lexer {
     public void mT_PRIVATE() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_PRIVATE;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:330:25: ( 'PRIVATE' )
-            // FortranLexer.g:330:25: 'PRIVATE'
+            int type = T_PRIVATE;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:354:25: ( 'PRIVATE' )
+            // FortranLexer.g:354:25: 'PRIVATE'
             {
             match("PRIVATE"); 
 
@@ -5200,7 +5230,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -5214,13 +5244,13 @@ public class FortranLexer extends Lexer {
     public void mT_PROCEDURE() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_PROCEDURE;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:331:25: ( 'PROCEDURE' )
-            // FortranLexer.g:331:25: 'PROCEDURE'
+            int type = T_PROCEDURE;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:355:25: ( 'PROCEDURE' )
+            // FortranLexer.g:355:25: 'PROCEDURE'
             {
             match("PROCEDURE"); 
 
@@ -5230,7 +5260,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -5244,13 +5274,13 @@ public class FortranLexer extends Lexer {
     public void mT_PROGRAM() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_PROGRAM;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:332:25: ( 'PROGRAM' )
-            // FortranLexer.g:332:25: 'PROGRAM'
+            int type = T_PROGRAM;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:356:25: ( 'PROGRAM' )
+            // FortranLexer.g:356:25: 'PROGRAM'
             {
             match("PROGRAM"); 
 
@@ -5260,7 +5290,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -5274,13 +5304,13 @@ public class FortranLexer extends Lexer {
     public void mT_PROTECTED() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_PROTECTED;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:333:25: ( 'PROTECTED' )
-            // FortranLexer.g:333:25: 'PROTECTED'
+            int type = T_PROTECTED;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:357:25: ( 'PROTECTED' )
+            // FortranLexer.g:357:25: 'PROTECTED'
             {
             match("PROTECTED"); 
 
@@ -5290,7 +5320,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -5304,13 +5334,13 @@ public class FortranLexer extends Lexer {
     public void mT_PUBLIC() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_PUBLIC;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:334:25: ( 'PUBLIC' )
-            // FortranLexer.g:334:25: 'PUBLIC'
+            int type = T_PUBLIC;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:358:25: ( 'PUBLIC' )
+            // FortranLexer.g:358:25: 'PUBLIC'
             {
             match("PUBLIC"); 
 
@@ -5320,7 +5350,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -5334,13 +5364,13 @@ public class FortranLexer extends Lexer {
     public void mT_PURE() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_PURE;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:335:25: ( 'PURE' )
-            // FortranLexer.g:335:25: 'PURE'
+            int type = T_PURE;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:359:25: ( 'PURE' )
+            // FortranLexer.g:359:25: 'PURE'
             {
             match("PURE"); 
 
@@ -5350,7 +5380,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -5364,13 +5394,13 @@ public class FortranLexer extends Lexer {
     public void mT_READ() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_READ;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:336:25: ( 'READ' )
-            // FortranLexer.g:336:25: 'READ'
+            int type = T_READ;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:360:25: ( 'READ' )
+            // FortranLexer.g:360:25: 'READ'
             {
             match("READ"); 
 
@@ -5380,7 +5410,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -5394,13 +5424,13 @@ public class FortranLexer extends Lexer {
     public void mT_RECURSIVE() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_RECURSIVE;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:337:25: ( 'RECURSIVE' )
-            // FortranLexer.g:337:25: 'RECURSIVE'
+            int type = T_RECURSIVE;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:361:25: ( 'RECURSIVE' )
+            // FortranLexer.g:361:25: 'RECURSIVE'
             {
             match("RECURSIVE"); 
 
@@ -5410,7 +5440,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -5424,13 +5454,13 @@ public class FortranLexer extends Lexer {
     public void mT_RESULT() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_RESULT;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:338:25: ( 'RESULT' )
-            // FortranLexer.g:338:25: 'RESULT'
+            int type = T_RESULT;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:362:25: ( 'RESULT' )
+            // FortranLexer.g:362:25: 'RESULT'
             {
             match("RESULT"); 
 
@@ -5440,7 +5470,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -5454,13 +5484,13 @@ public class FortranLexer extends Lexer {
     public void mT_RETURN() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_RETURN;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:339:25: ( 'RETURN' )
-            // FortranLexer.g:339:25: 'RETURN'
+            int type = T_RETURN;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:363:25: ( 'RETURN' )
+            // FortranLexer.g:363:25: 'RETURN'
             {
             match("RETURN"); 
 
@@ -5470,7 +5500,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -5484,13 +5514,13 @@ public class FortranLexer extends Lexer {
     public void mT_REWIND() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_REWIND;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:340:25: ( 'REWIND' )
-            // FortranLexer.g:340:25: 'REWIND'
+            int type = T_REWIND;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:364:25: ( 'REWIND' )
+            // FortranLexer.g:364:25: 'REWIND'
             {
             match("REWIND"); 
 
@@ -5500,7 +5530,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -5514,13 +5544,13 @@ public class FortranLexer extends Lexer {
     public void mT_SAVE() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_SAVE;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:341:25: ( 'SAVE' )
-            // FortranLexer.g:341:25: 'SAVE'
+            int type = T_SAVE;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:365:25: ( 'SAVE' )
+            // FortranLexer.g:365:25: 'SAVE'
             {
             match("SAVE"); 
 
@@ -5530,7 +5560,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -5544,13 +5574,13 @@ public class FortranLexer extends Lexer {
     public void mT_SELECT() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_SELECT;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:342:25: ( 'SELECT' )
-            // FortranLexer.g:342:25: 'SELECT'
+            int type = T_SELECT;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:366:25: ( 'SELECT' )
+            // FortranLexer.g:366:25: 'SELECT'
             {
             match("SELECT"); 
 
@@ -5560,7 +5590,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -5574,13 +5604,13 @@ public class FortranLexer extends Lexer {
     public void mT_SELECTCASE() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_SELECTCASE;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:343:25: ( 'SELECTCASE' )
-            // FortranLexer.g:343:25: 'SELECTCASE'
+            int type = T_SELECTCASE;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:367:25: ( 'SELECTCASE' )
+            // FortranLexer.g:367:25: 'SELECTCASE'
             {
             match("SELECTCASE"); 
 
@@ -5590,7 +5620,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -5604,13 +5634,13 @@ public class FortranLexer extends Lexer {
     public void mT_SELECTTYPE() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_SELECTTYPE;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:344:25: ( 'SELECTTYPE' )
-            // FortranLexer.g:344:25: 'SELECTTYPE'
+            int type = T_SELECTTYPE;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:368:25: ( 'SELECTTYPE' )
+            // FortranLexer.g:368:25: 'SELECTTYPE'
             {
             match("SELECTTYPE"); 
 
@@ -5620,7 +5650,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -5634,13 +5664,13 @@ public class FortranLexer extends Lexer {
     public void mT_SEQUENCE() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_SEQUENCE;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:345:25: ( 'SEQUENCE' )
-            // FortranLexer.g:345:25: 'SEQUENCE'
+            int type = T_SEQUENCE;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:369:25: ( 'SEQUENCE' )
+            // FortranLexer.g:369:25: 'SEQUENCE'
             {
             match("SEQUENCE"); 
 
@@ -5650,7 +5680,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -5664,13 +5694,13 @@ public class FortranLexer extends Lexer {
     public void mT_STOP() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_STOP;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:346:25: ( 'STOP' )
-            // FortranLexer.g:346:25: 'STOP'
+            int type = T_STOP;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:370:25: ( 'STOP' )
+            // FortranLexer.g:370:25: 'STOP'
             {
             match("STOP"); 
 
@@ -5680,7 +5710,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -5694,13 +5724,13 @@ public class FortranLexer extends Lexer {
     public void mT_SUBROUTINE() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_SUBROUTINE;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:347:25: ( 'SUBROUTINE' )
-            // FortranLexer.g:347:25: 'SUBROUTINE'
+            int type = T_SUBROUTINE;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:371:25: ( 'SUBROUTINE' )
+            // FortranLexer.g:371:25: 'SUBROUTINE'
             {
             match("SUBROUTINE"); 
 
@@ -5710,7 +5740,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -5724,13 +5754,13 @@ public class FortranLexer extends Lexer {
     public void mT_TARGET() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_TARGET;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:348:25: ( 'TARGET' )
-            // FortranLexer.g:348:25: 'TARGET'
+            int type = T_TARGET;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:372:25: ( 'TARGET' )
+            // FortranLexer.g:372:25: 'TARGET'
             {
             match("TARGET"); 
 
@@ -5740,7 +5770,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -5754,13 +5784,13 @@ public class FortranLexer extends Lexer {
     public void mT_THEN() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_THEN;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:349:25: ( 'THEN' )
-            // FortranLexer.g:349:25: 'THEN'
+            int type = T_THEN;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:373:25: ( 'THEN' )
+            // FortranLexer.g:373:25: 'THEN'
             {
             match("THEN"); 
 
@@ -5770,7 +5800,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -5784,13 +5814,13 @@ public class FortranLexer extends Lexer {
     public void mT_TO() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_TO;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:350:25: ( 'TO' )
-            // FortranLexer.g:350:25: 'TO'
+            int type = T_TO;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:374:25: ( 'TO' )
+            // FortranLexer.g:374:25: 'TO'
             {
             match("TO"); 
 
@@ -5800,7 +5830,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -5814,13 +5844,13 @@ public class FortranLexer extends Lexer {
     public void mT_TYPE() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_TYPE;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:351:25: ( 'TYPE' )
-            // FortranLexer.g:351:25: 'TYPE'
+            int type = T_TYPE;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:375:25: ( 'TYPE' )
+            // FortranLexer.g:375:25: 'TYPE'
             {
             match("TYPE"); 
 
@@ -5830,7 +5860,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -5844,13 +5874,13 @@ public class FortranLexer extends Lexer {
     public void mT_UNFORMATTED() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_UNFORMATTED;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:352:25: ( 'UNFORMATTED' )
-            // FortranLexer.g:352:25: 'UNFORMATTED'
+            int type = T_UNFORMATTED;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:376:25: ( 'UNFORMATTED' )
+            // FortranLexer.g:376:25: 'UNFORMATTED'
             {
             match("UNFORMATTED"); 
 
@@ -5860,7 +5890,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -5874,13 +5904,13 @@ public class FortranLexer extends Lexer {
     public void mT_USE() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_USE;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:353:25: ( 'USE' )
-            // FortranLexer.g:353:25: 'USE'
+            int type = T_USE;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:377:25: ( 'USE' )
+            // FortranLexer.g:377:25: 'USE'
             {
             match("USE"); 
 
@@ -5890,7 +5920,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -5904,13 +5934,13 @@ public class FortranLexer extends Lexer {
     public void mT_VALUE() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_VALUE;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:354:25: ( 'VALUE' )
-            // FortranLexer.g:354:25: 'VALUE'
+            int type = T_VALUE;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:378:25: ( 'VALUE' )
+            // FortranLexer.g:378:25: 'VALUE'
             {
             match("VALUE"); 
 
@@ -5920,7 +5950,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -5934,13 +5964,13 @@ public class FortranLexer extends Lexer {
     public void mT_VOLATILE() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_VOLATILE;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:355:25: ( 'VOLATILE' )
-            // FortranLexer.g:355:25: 'VOLATILE'
+            int type = T_VOLATILE;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:379:25: ( 'VOLATILE' )
+            // FortranLexer.g:379:25: 'VOLATILE'
             {
             match("VOLATILE"); 
 
@@ -5950,7 +5980,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -5964,13 +5994,13 @@ public class FortranLexer extends Lexer {
     public void mT_WAIT() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_WAIT;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:356:25: ( 'WAIT' )
-            // FortranLexer.g:356:25: 'WAIT'
+            int type = T_WAIT;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:380:25: ( 'WAIT' )
+            // FortranLexer.g:380:25: 'WAIT'
             {
             match("WAIT"); 
 
@@ -5980,7 +6010,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -5994,13 +6024,13 @@ public class FortranLexer extends Lexer {
     public void mT_WHERE() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_WHERE;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:357:25: ( 'WHERE' )
-            // FortranLexer.g:357:25: 'WHERE'
+            int type = T_WHERE;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:381:25: ( 'WHERE' )
+            // FortranLexer.g:381:25: 'WHERE'
             {
             match("WHERE"); 
 
@@ -6010,7 +6040,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -6024,13 +6054,13 @@ public class FortranLexer extends Lexer {
     public void mT_WHILE() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_WHILE;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:358:25: ( 'WHILE' )
-            // FortranLexer.g:358:25: 'WHILE'
+            int type = T_WHILE;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:382:25: ( 'WHILE' )
+            // FortranLexer.g:382:25: 'WHILE'
             {
             match("WHILE"); 
 
@@ -6040,7 +6070,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -6054,13 +6084,13 @@ public class FortranLexer extends Lexer {
     public void mT_WRITE() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_WRITE;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:359:25: ( 'WRITE' )
-            // FortranLexer.g:359:25: 'WRITE'
+            int type = T_WRITE;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:383:25: ( 'WRITE' )
+            // FortranLexer.g:383:25: 'WRITE'
             {
             match("WRITE"); 
 
@@ -6070,7 +6100,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -6084,13 +6114,13 @@ public class FortranLexer extends Lexer {
     public void mT_ENDASSOCIATE() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_ENDASSOCIATE;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:361:25: ( 'ENDASSOCIATE' )
-            // FortranLexer.g:361:25: 'ENDASSOCIATE'
+            int type = T_ENDASSOCIATE;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:385:25: ( 'ENDASSOCIATE' )
+            // FortranLexer.g:385:25: 'ENDASSOCIATE'
             {
             match("ENDASSOCIATE"); 
 
@@ -6100,7 +6130,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -6114,13 +6144,13 @@ public class FortranLexer extends Lexer {
     public void mT_ENDBLOCK() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_ENDBLOCK;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:362:25: ( 'ENDBLOCK' )
-            // FortranLexer.g:362:25: 'ENDBLOCK'
+            int type = T_ENDBLOCK;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:386:25: ( 'ENDBLOCK' )
+            // FortranLexer.g:386:25: 'ENDBLOCK'
             {
             match("ENDBLOCK"); 
 
@@ -6130,7 +6160,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -6144,13 +6174,13 @@ public class FortranLexer extends Lexer {
     public void mT_ENDBLOCKDATA() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_ENDBLOCKDATA;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:363:25: ( 'ENDBLOCKDATA' )
-            // FortranLexer.g:363:25: 'ENDBLOCKDATA'
+            int type = T_ENDBLOCKDATA;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:387:25: ( 'ENDBLOCKDATA' )
+            // FortranLexer.g:387:25: 'ENDBLOCKDATA'
             {
             match("ENDBLOCKDATA"); 
 
@@ -6160,7 +6190,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -6174,13 +6204,13 @@ public class FortranLexer extends Lexer {
     public void mT_ENDDO() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_ENDDO;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:364:25: ( 'ENDDO' )
-            // FortranLexer.g:364:25: 'ENDDO'
+            int type = T_ENDDO;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:388:25: ( 'ENDDO' )
+            // FortranLexer.g:388:25: 'ENDDO'
             {
             match("ENDDO"); 
 
@@ -6190,7 +6220,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -6204,13 +6234,13 @@ public class FortranLexer extends Lexer {
     public void mT_ENDENUM() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_ENDENUM;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:365:25: ( 'ENDENUM' )
-            // FortranLexer.g:365:25: 'ENDENUM'
+            int type = T_ENDENUM;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:389:25: ( 'ENDENUM' )
+            // FortranLexer.g:389:25: 'ENDENUM'
             {
             match("ENDENUM"); 
 
@@ -6220,7 +6250,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -6234,13 +6264,13 @@ public class FortranLexer extends Lexer {
     public void mT_ENDFORALL() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_ENDFORALL;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:366:25: ( 'ENDFORALL' )
-            // FortranLexer.g:366:25: 'ENDFORALL'
+            int type = T_ENDFORALL;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:390:25: ( 'ENDFORALL' )
+            // FortranLexer.g:390:25: 'ENDFORALL'
             {
             match("ENDFORALL"); 
 
@@ -6250,7 +6280,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -6264,13 +6294,13 @@ public class FortranLexer extends Lexer {
     public void mT_ENDFILE() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_ENDFILE;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:367:25: ( 'ENDFILE' )
-            // FortranLexer.g:367:25: 'ENDFILE'
+            int type = T_ENDFILE;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:391:25: ( 'ENDFILE' )
+            // FortranLexer.g:391:25: 'ENDFILE'
             {
             match("ENDFILE"); 
 
@@ -6280,7 +6310,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -6294,13 +6324,13 @@ public class FortranLexer extends Lexer {
     public void mT_ENDFUNCTION() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_ENDFUNCTION;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:368:25: ( 'ENDFUNCTION' )
-            // FortranLexer.g:368:25: 'ENDFUNCTION'
+            int type = T_ENDFUNCTION;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:392:25: ( 'ENDFUNCTION' )
+            // FortranLexer.g:392:25: 'ENDFUNCTION'
             {
             match("ENDFUNCTION"); 
 
@@ -6310,7 +6340,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -6324,13 +6354,13 @@ public class FortranLexer extends Lexer {
     public void mT_ENDIF() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_ENDIF;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:369:25: ( 'ENDIF' )
-            // FortranLexer.g:369:25: 'ENDIF'
+            int type = T_ENDIF;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:393:25: ( 'ENDIF' )
+            // FortranLexer.g:393:25: 'ENDIF'
             {
             match("ENDIF"); 
 
@@ -6340,7 +6370,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -6354,13 +6384,13 @@ public class FortranLexer extends Lexer {
     public void mT_ENDINTERFACE() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_ENDINTERFACE;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:370:25: ( 'ENDINTERFACE' )
-            // FortranLexer.g:370:25: 'ENDINTERFACE'
+            int type = T_ENDINTERFACE;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:394:25: ( 'ENDINTERFACE' )
+            // FortranLexer.g:394:25: 'ENDINTERFACE'
             {
             match("ENDINTERFACE"); 
 
@@ -6370,7 +6400,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -6384,13 +6414,13 @@ public class FortranLexer extends Lexer {
     public void mT_ENDMODULE() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_ENDMODULE;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:371:25: ( 'ENDMODULE' )
-            // FortranLexer.g:371:25: 'ENDMODULE'
+            int type = T_ENDMODULE;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:395:25: ( 'ENDMODULE' )
+            // FortranLexer.g:395:25: 'ENDMODULE'
             {
             match("ENDMODULE"); 
 
@@ -6400,7 +6430,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -6414,13 +6444,13 @@ public class FortranLexer extends Lexer {
     public void mT_ENDPROGRAM() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_ENDPROGRAM;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:372:25: ( 'ENDPROGRAM' )
-            // FortranLexer.g:372:25: 'ENDPROGRAM'
+            int type = T_ENDPROGRAM;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:396:25: ( 'ENDPROGRAM' )
+            // FortranLexer.g:396:25: 'ENDPROGRAM'
             {
             match("ENDPROGRAM"); 
 
@@ -6430,7 +6460,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -6444,13 +6474,13 @@ public class FortranLexer extends Lexer {
     public void mT_ENDSELECT() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_ENDSELECT;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:373:25: ( 'ENDSELECT' )
-            // FortranLexer.g:373:25: 'ENDSELECT'
+            int type = T_ENDSELECT;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:397:25: ( 'ENDSELECT' )
+            // FortranLexer.g:397:25: 'ENDSELECT'
             {
             match("ENDSELECT"); 
 
@@ -6460,7 +6490,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -6474,13 +6504,13 @@ public class FortranLexer extends Lexer {
     public void mT_ENDSUBROUTINE() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_ENDSUBROUTINE;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:374:25: ( 'ENDSUBROUTINE' )
-            // FortranLexer.g:374:25: 'ENDSUBROUTINE'
+            int type = T_ENDSUBROUTINE;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:398:25: ( 'ENDSUBROUTINE' )
+            // FortranLexer.g:398:25: 'ENDSUBROUTINE'
             {
             match("ENDSUBROUTINE"); 
 
@@ -6490,7 +6520,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -6504,13 +6534,13 @@ public class FortranLexer extends Lexer {
     public void mT_ENDTYPE() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_ENDTYPE;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:375:25: ( 'ENDTYPE' )
-            // FortranLexer.g:375:25: 'ENDTYPE'
+            int type = T_ENDTYPE;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:399:25: ( 'ENDTYPE' )
+            // FortranLexer.g:399:25: 'ENDTYPE'
             {
             match("ENDTYPE"); 
 
@@ -6520,7 +6550,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -6534,13 +6564,13 @@ public class FortranLexer extends Lexer {
     public void mT_ENDWHERE() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_ENDWHERE;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:376:25: ( 'ENDWHERE' )
-            // FortranLexer.g:376:25: 'ENDWHERE'
+            int type = T_ENDWHERE;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:400:25: ( 'ENDWHERE' )
+            // FortranLexer.g:400:25: 'ENDWHERE'
             {
             match("ENDWHERE"); 
 
@@ -6550,7 +6580,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -6564,13 +6594,13 @@ public class FortranLexer extends Lexer {
     public void mT_END() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_END;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:378:11: ( 'END' )
-            // FortranLexer.g:378:11: 'END'
+            int type = T_END;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:402:11: ( 'END' )
+            // FortranLexer.g:402:11: 'END'
             {
             match("END"); 
 
@@ -6580,7 +6610,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -6594,13 +6624,13 @@ public class FortranLexer extends Lexer {
     public void mT_DIMENSION() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_DIMENSION;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:381:25: ( 'DIMENSION' )
-            // FortranLexer.g:381:25: 'DIMENSION'
+            int type = T_DIMENSION;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:405:25: ( 'DIMENSION' )
+            // FortranLexer.g:405:25: 'DIMENSION'
             {
             match("DIMENSION"); 
 
@@ -6610,7 +6640,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -6624,13 +6654,13 @@ public class FortranLexer extends Lexer {
     public void mT_BIND_LPAREN_C() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_BIND_LPAREN_C;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:386:11: ( 'BIND' '(' 'C' )
-            // FortranLexer.g:386:11: 'BIND' '(' 'C'
+            int type = T_BIND_LPAREN_C;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:410:11: ( 'BIND' '(' 'C' )
+            // FortranLexer.g:410:11: 'BIND' '(' 'C'
             {
             match("BIND"); 
 
@@ -6642,7 +6672,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -6656,16 +6686,16 @@ public class FortranLexer extends Lexer {
     public void mT_DEFINED_OP() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_DEFINED_OP;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:392:10: ( '.' ( Letter )+ '.' )
-            // FortranLexer.g:392:10: '.' ( Letter )+ '.'
+            int type = T_DEFINED_OP;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:416:10: ( '.' ( Letter )+ '.' )
+            // FortranLexer.g:416:10: '.' ( Letter )+ '.'
             {
             match('.'); 
-            // FortranLexer.g:392:14: ( Letter )+
+            // FortranLexer.g:416:14: ( Letter )+
             int cnt28=0;
             loop28:
             do {
@@ -6678,7 +6708,7 @@ public class FortranLexer extends Lexer {
 
                 switch (alt28) {
             	case 1 :
-            	    // FortranLexer.g:392:14: Letter
+            	    // FortranLexer.g:416:14: Letter
             	    {
             	    mLetter(); 
 
@@ -6701,7 +6731,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -6715,13 +6745,13 @@ public class FortranLexer extends Lexer {
     public void mT_LABEL_DO_TERMINAL() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_LABEL_DO_TERMINAL;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:405:4: ( '__LABEL_DO_TERMINAL__' )
-            // FortranLexer.g:405:4: '__LABEL_DO_TERMINAL__'
+            int type = T_LABEL_DO_TERMINAL;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:429:4: ( '__LABEL_DO_TERMINAL__' )
+            // FortranLexer.g:429:4: '__LABEL_DO_TERMINAL__'
             {
             match("__LABEL_DO_TERMINAL__"); 
 
@@ -6731,7 +6761,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -6745,13 +6775,13 @@ public class FortranLexer extends Lexer {
     public void mT_DATA_EDIT_DESC() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_DATA_EDIT_DESC;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:408:20: ( '__T_DATA_EDIT_DESC__' )
-            // FortranLexer.g:408:20: '__T_DATA_EDIT_DESC__'
+            int type = T_DATA_EDIT_DESC;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:432:20: ( '__T_DATA_EDIT_DESC__' )
+            // FortranLexer.g:432:20: '__T_DATA_EDIT_DESC__'
             {
             match("__T_DATA_EDIT_DESC__"); 
 
@@ -6761,7 +6791,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -6775,13 +6805,13 @@ public class FortranLexer extends Lexer {
     public void mT_CONTROL_EDIT_DESC() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_CONTROL_EDIT_DESC;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:409:23: ( '__T_CONTROL_EDIT_DESC__' )
-            // FortranLexer.g:409:23: '__T_CONTROL_EDIT_DESC__'
+            int type = T_CONTROL_EDIT_DESC;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:433:23: ( '__T_CONTROL_EDIT_DESC__' )
+            // FortranLexer.g:433:23: '__T_CONTROL_EDIT_DESC__'
             {
             match("__T_CONTROL_EDIT_DESC__"); 
 
@@ -6791,7 +6821,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -6805,13 +6835,13 @@ public class FortranLexer extends Lexer {
     public void mT_CHAR_STRING_EDIT_DESC() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_CHAR_STRING_EDIT_DESC;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:410:27: ( '__T_CHAR_STRING_EDIT_DESC__' )
-            // FortranLexer.g:410:27: '__T_CHAR_STRING_EDIT_DESC__'
+            int type = T_CHAR_STRING_EDIT_DESC;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:434:27: ( '__T_CHAR_STRING_EDIT_DESC__' )
+            // FortranLexer.g:434:27: '__T_CHAR_STRING_EDIT_DESC__'
             {
             match("__T_CHAR_STRING_EDIT_DESC__"); 
 
@@ -6821,7 +6851,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -6835,13 +6865,13 @@ public class FortranLexer extends Lexer {
     public void mT_STMT_FUNCTION() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_STMT_FUNCTION;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:413:4: ( 'STMT_FUNCTION' )
-            // FortranLexer.g:413:4: 'STMT_FUNCTION'
+            int type = T_STMT_FUNCTION;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:437:4: ( 'STMT_FUNCTION' )
+            // FortranLexer.g:437:4: 'STMT_FUNCTION'
             {
             match("STMT_FUNCTION"); 
 
@@ -6851,7 +6881,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -6865,13 +6895,13 @@ public class FortranLexer extends Lexer {
     public void mT_ASSIGNMENT_STMT() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_ASSIGNMENT_STMT;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:416:21: ( '__T_ASSIGNMENT_STMT__' )
-            // FortranLexer.g:416:21: '__T_ASSIGNMENT_STMT__'
+            int type = T_ASSIGNMENT_STMT;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:440:21: ( '__T_ASSIGNMENT_STMT__' )
+            // FortranLexer.g:440:21: '__T_ASSIGNMENT_STMT__'
             {
             match("__T_ASSIGNMENT_STMT__"); 
 
@@ -6881,7 +6911,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -6895,13 +6925,13 @@ public class FortranLexer extends Lexer {
     public void mT_PTR_ASSIGNMENT_STMT() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_PTR_ASSIGNMENT_STMT;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:417:25: ( '__T_PTR_ASSIGNMENT_STMT__' )
-            // FortranLexer.g:417:25: '__T_PTR_ASSIGNMENT_STMT__'
+            int type = T_PTR_ASSIGNMENT_STMT;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:441:25: ( '__T_PTR_ASSIGNMENT_STMT__' )
+            // FortranLexer.g:441:25: '__T_PTR_ASSIGNMENT_STMT__'
             {
             match("__T_PTR_ASSIGNMENT_STMT__"); 
 
@@ -6911,7 +6941,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -6925,13 +6955,13 @@ public class FortranLexer extends Lexer {
     public void mT_ARITHMETIC_IF_STMT() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_ARITHMETIC_IF_STMT;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:418:24: ( '__T_ARITHMETIC_IF_STMT__' )
-            // FortranLexer.g:418:24: '__T_ARITHMETIC_IF_STMT__'
+            int type = T_ARITHMETIC_IF_STMT;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:442:24: ( '__T_ARITHMETIC_IF_STMT__' )
+            // FortranLexer.g:442:24: '__T_ARITHMETIC_IF_STMT__'
             {
             match("__T_ARITHMETIC_IF_STMT__"); 
 
@@ -6941,7 +6971,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -6951,20 +6981,230 @@ public class FortranLexer extends Lexer {
     }
     // $ANTLR end T_ARITHMETIC_IF_STMT
 
+    // $ANTLR start T_ALLOCATE_STMT_1
+    public void mT_ALLOCATE_STMT_1() throws RecognitionException {
+        try {
+            ruleNestingLevel++;
+            int type = T_ALLOCATE_STMT_1;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:443:21: ( '__T_ALLOCATE_STMT_1__' )
+            // FortranLexer.g:443:21: '__T_ALLOCATE_STMT_1__'
+            {
+            match("__T_ALLOCATE_STMT_1__"); 
+
+
+            }
+
+
+
+                    if ( token==null && ruleNestingLevel==1 ) {
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
+                    }
+
+                        }
+        finally {
+            ruleNestingLevel--;
+        }
+    }
+    // $ANTLR end T_ALLOCATE_STMT_1
+
+    // $ANTLR start T_WHERE_STMT
+    public void mT_WHERE_STMT() throws RecognitionException {
+        try {
+            ruleNestingLevel++;
+            int type = T_WHERE_STMT;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:444:16: ( '__T_WHERE_STMT__' )
+            // FortranLexer.g:444:16: '__T_WHERE_STMT__'
+            {
+            match("__T_WHERE_STMT__"); 
+
+
+            }
+
+
+
+                    if ( token==null && ruleNestingLevel==1 ) {
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
+                    }
+
+                        }
+        finally {
+            ruleNestingLevel--;
+        }
+    }
+    // $ANTLR end T_WHERE_STMT
+
+    // $ANTLR start T_IF_STMT
+    public void mT_IF_STMT() throws RecognitionException {
+        try {
+            ruleNestingLevel++;
+            int type = T_IF_STMT;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:445:13: ( '__T_IF_STMT__' )
+            // FortranLexer.g:445:13: '__T_IF_STMT__'
+            {
+            match("__T_IF_STMT__"); 
+
+
+            }
+
+
+
+                    if ( token==null && ruleNestingLevel==1 ) {
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
+                    }
+
+                        }
+        finally {
+            ruleNestingLevel--;
+        }
+    }
+    // $ANTLR end T_IF_STMT
+
+    // $ANTLR start T_FORALL_STMT
+    public void mT_FORALL_STMT() throws RecognitionException {
+        try {
+            ruleNestingLevel++;
+            int type = T_FORALL_STMT;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:446:17: ( '__T_FORALL_STMT__' )
+            // FortranLexer.g:446:17: '__T_FORALL_STMT__'
+            {
+            match("__T_FORALL_STMT__"); 
+
+
+            }
+
+
+
+                    if ( token==null && ruleNestingLevel==1 ) {
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
+                    }
+
+                        }
+        finally {
+            ruleNestingLevel--;
+        }
+    }
+    // $ANTLR end T_FORALL_STMT
+
+    // $ANTLR start T_WHERE_CONSTRUCT_STMT
+    public void mT_WHERE_CONSTRUCT_STMT() throws RecognitionException {
+        try {
+            ruleNestingLevel++;
+            int type = T_WHERE_CONSTRUCT_STMT;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:447:26: ( '__T_WHERE_CONSTRUCT_STMT__' )
+            // FortranLexer.g:447:26: '__T_WHERE_CONSTRUCT_STMT__'
+            {
+            match("__T_WHERE_CONSTRUCT_STMT__"); 
+
+
+            }
+
+
+
+                    if ( token==null && ruleNestingLevel==1 ) {
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
+                    }
+
+                        }
+        finally {
+            ruleNestingLevel--;
+        }
+    }
+    // $ANTLR end T_WHERE_CONSTRUCT_STMT
+
+    // $ANTLR start T_FORALL_CONSTRUCT_STMT
+    public void mT_FORALL_CONSTRUCT_STMT() throws RecognitionException {
+        try {
+            ruleNestingLevel++;
+            int type = T_FORALL_CONSTRUCT_STMT;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:448:27: ( '__T_FORALL_CONSTRUCT_STMT__' )
+            // FortranLexer.g:448:27: '__T_FORALL_CONSTRUCT_STMT__'
+            {
+            match("__T_FORALL_CONSTRUCT_STMT__"); 
+
+
+            }
+
+
+
+                    if ( token==null && ruleNestingLevel==1 ) {
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
+                    }
+
+                        }
+        finally {
+            ruleNestingLevel--;
+        }
+    }
+    // $ANTLR end T_FORALL_CONSTRUCT_STMT
+
+    // $ANTLR start T_INQUIRE_STMT_2
+    public void mT_INQUIRE_STMT_2() throws RecognitionException {
+        try {
+            ruleNestingLevel++;
+            int type = T_INQUIRE_STMT_2;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:449:20: ( '__T_INQUIRE_STMT_2__' )
+            // FortranLexer.g:449:20: '__T_INQUIRE_STMT_2__'
+            {
+            match("__T_INQUIRE_STMT_2__"); 
+
+
+            }
+
+
+
+                    if ( token==null && ruleNestingLevel==1 ) {
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
+                    }
+
+                        }
+        finally {
+            ruleNestingLevel--;
+        }
+    }
+    // $ANTLR end T_INQUIRE_STMT_2
+
     // $ANTLR start T_IDENT
     public void mT_IDENT() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T_IDENT;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:423:4: ( Letter ( Alphanumeric_Character )* )
-            // FortranLexer.g:423:4: Letter ( Alphanumeric_Character )*
+            int type = T_IDENT;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:454:4: ( Letter ( Alphanumeric_Character )* )
+            // FortranLexer.g:454:4: Letter ( Alphanumeric_Character )*
             {
             mLetter(); 
-            // FortranLexer.g:423:11: ( Alphanumeric_Character )*
+            // FortranLexer.g:454:11: ( Alphanumeric_Character )*
             loop29:
             do {
                 int alt29=2;
@@ -6976,7 +7216,7 @@ public class FortranLexer extends Lexer {
 
                 switch (alt29) {
             	case 1 :
-            	    // FortranLexer.g:423:13: Alphanumeric_Character
+            	    // FortranLexer.g:454:13: Alphanumeric_Character
             	    {
             	    mAlphanumeric_Character(); 
 
@@ -6994,7 +7234,7 @@ public class FortranLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -7008,16 +7248,16 @@ public class FortranLexer extends Lexer {
     public void mLINE_COMMENT() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = LINE_COMMENT;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // FortranLexer.g:427:7: ( '!' (~ ('\\n'|'\\r'))* )
-            // FortranLexer.g:427:7: '!' (~ ('\\n'|'\\r'))*
+            int type = LINE_COMMENT;
+            int start = getCharIndex();
+            int line = getLine();
+            int charPosition = getCharPositionInLine();
+            int channel = Token.DEFAULT_CHANNEL;
+            // FortranLexer.g:458:7: ( '!' (~ ('\\n'|'\\r'))* )
+            // FortranLexer.g:458:7: '!' (~ ('\\n'|'\\r'))*
             {
             match('!'); 
-            // FortranLexer.g:427:12: (~ ('\\n'|'\\r'))*
+            // FortranLexer.g:458:12: (~ ('\\n'|'\\r'))*
             loop30:
             do {
                 int alt30=2;
@@ -7029,7 +7269,7 @@ public class FortranLexer extends Lexer {
 
                 switch (alt30) {
             	case 1 :
-            	    // FortranLexer.g:427:12: ~ ('\\n'|'\\r')
+            	    // FortranLexer.g:458:12: ~ ('\\n'|'\\r')
             	    {
             	    if ( (input.LA(1)>='\u0000' && input.LA(1)<='\t')||(input.LA(1)>='\u000B' && input.LA(1)<='\f')||(input.LA(1)>='\u000E' && input.LA(1)<='\uFFFE') ) {
             	        input.consume();
@@ -7050,14 +7290,14 @@ public class FortranLexer extends Lexer {
                 }
             } while (true);
 
-            _channel=99;
+            channel=99;
 
             }
 
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
                     }
 
                         }
@@ -7068,8 +7308,8 @@ public class FortranLexer extends Lexer {
     // $ANTLR end LINE_COMMENT
 
     public void mTokens() throws RecognitionException {
-        // FortranLexer.g:1:10: ( T_EOS | T_CHAR_CONSTANT | T_DIGIT_STRING | BINARY_CONSTANT | OCTAL_CONSTANT | HEX_CONSTANT | REAL_CONSTANT | DOUBLE_CONSTANT | WS | CONTINUE_CHAR | T_ASTERISK | T_COLON | T_COLON_COLON | T_COMMA | T_EQUALS | T_EQ_EQ | T_EQ_GT | T_GREATERTHAN | T_GREATERTHAN_EQ | T_LESSTHAN | T_LESSTHAN_EQ | T_LBRACKET | T_LPAREN | T_MINUS | T_PERCENT | T_PERIOD | T_PLUS | T_POWER | T_SLASH | T_SLASH_EQ | T_SLASH_SLASH | T_RBRACKET | T_RPAREN | T_UNDERSCORE | T_EQ | T_NE | T_LT | T_LE | T_GT | T_GE | T_TRUE | T_FALSE | T_NOT | T_AND | T_OR | T_EQV | T_NEQV | T_XYZ | T_INTEGER | T_REAL | T_COMPLEX | T_CHARACTER | T_LOGICAL | T_ABSTRACT | T_ALLOCATABLE | T_ALLOCATE | T_ASSIGNMENT | T_ASSOCIATE | T_ASYNCHRONOUS | T_BACKSPACE | T_BLOCK | T_BLOCKDATA | T_CALL | T_CASE | T_CLASS | T_CLOSE | T_COMMON | T_CONTAINS | T_CONTINUE | T_CYCLE | T_DATA | T_DEFAULT | T_DEALLOCATE | T_DEFERRED | T_DO | T_DOUBLE | T_DOUBLEPRECISION | T_ELEMENTAL | T_ELSE | T_ELSEIF | T_ELSEWHERE | T_ENTRY | T_ENUM | T_ENUMERATOR | T_EQUIVALENCE | T_EXIT | T_EXTENDS | T_EXTERNAL | T_FILE | T_FINAL | T_FLUSH | T_FORALL | T_FORMAT | T_FORMATTED | T_FUNCTION | T_GENERIC | T_GO | T_GOTO | T_IF | T_IMPLICIT | T_IMPORT | T_IN | T_INOUT | T_INTENT | T_INTERFACE | T_INTRINSIC | T_INQUIRE | T_MODULE | T_NAMELIST | T_NONE | T_NON_INTRINSIC | T_NON_OVERRIDABLE | T_NOPASS | T_NULLIFY | T_ONLY | T_OPEN | T_OPERATOR | T_OPTIONAL | T_OUT | T_PARAMETER | T_PASS | T_POINTER | T_PRINT | T_PRECISION | T_PRIVATE | T_PROCEDURE | T_PROGRAM | T_PROTECTED | T_PUBLIC | T_PURE | T_READ | T_RECURSIVE | T_RESULT | T_RETURN | T_REWIND | T_SAVE | T_SELECT | T_SELECTCASE | T_SELECTTYPE | T_SEQUENCE | T_STOP | T_SUBROUTINE | T_TARGET | T_THEN | T_TO | T_TYPE | T_UNFORMATTED | T_USE | T_VALUE | T_VOLATILE | T_WAIT | T_WHERE | T_WHILE | T_WRITE | T_ENDASSOCIATE | T_ENDBLOCK | T_ENDBLOCKDATA | T_ENDDO | T_ENDENUM | T_ENDFORALL | T_ENDFILE | T_ENDFUNCTION | T_ENDIF | T_ENDINTERFACE | T_ENDMODULE | T_ENDPROGRAM | T_ENDSELECT | T_ENDSUBROUTINE | T_ENDTYPE | T_ENDWHERE | T_END | T_DIMENSION | T_BIND_LPAREN_C | T_DEFINED_OP | T_LABEL_DO_TERMINAL | T_DATA_EDIT_DESC | T_CONTROL_EDIT_DESC | T_CHAR_STRING_EDIT_DESC | T_STMT_FUNCTION | T_ASSIGNMENT_STMT | T_PTR_ASSIGNMENT_STMT | T_ARITHMETIC_IF_STMT | T_IDENT | LINE_COMMENT )
-        int alt31=184;
+        // FortranLexer.g:1:10: ( T_EOS | T_CHAR_CONSTANT | T_DIGIT_STRING | BINARY_CONSTANT | OCTAL_CONSTANT | HEX_CONSTANT | REAL_CONSTANT | DOUBLE_CONSTANT | WS | CONTINUE_CHAR | T_ASTERISK | T_COLON | T_COLON_COLON | T_COMMA | T_EQUALS | T_EQ_EQ | T_EQ_GT | T_GREATERTHAN | T_GREATERTHAN_EQ | T_LESSTHAN | T_LESSTHAN_EQ | T_LBRACKET | T_LPAREN | T_MINUS | T_PERCENT | T_PERIOD | T_PLUS | T_POWER | T_SLASH | T_SLASH_EQ | T_SLASH_SLASH | T_RBRACKET | T_RPAREN | T_UNDERSCORE | T_EQ | T_NE | T_LT | T_LE | T_GT | T_GE | T_TRUE | T_FALSE | T_NOT | T_AND | T_OR | T_EQV | T_NEQV | T_XYZ | T_INTEGER | T_REAL | T_COMPLEX | T_CHARACTER | T_LOGICAL | T_ABSTRACT | T_ALLOCATABLE | T_ALLOCATE | T_ASSIGNMENT | T_ASSOCIATE | T_ASYNCHRONOUS | T_BACKSPACE | T_BLOCK | T_BLOCKDATA | T_CALL | T_CASE | T_CLASS | T_CLOSE | T_COMMON | T_CONTAINS | T_CONTINUE | T_CYCLE | T_DATA | T_DEFAULT | T_DEALLOCATE | T_DEFERRED | T_DO | T_DOUBLE | T_DOUBLEPRECISION | T_ELEMENTAL | T_ELSE | T_ELSEIF | T_ELSEWHERE | T_ENTRY | T_ENUM | T_ENUMERATOR | T_EQUIVALENCE | T_EXIT | T_EXTENDS | T_EXTERNAL | T_FILE | T_FINAL | T_FLUSH | T_FORALL | T_FORMAT | T_FORMATTED | T_FUNCTION | T_GENERIC | T_GO | T_GOTO | T_IF | T_IMPLICIT | T_IMPORT | T_IN | T_INOUT | T_INTENT | T_INTERFACE | T_INTRINSIC | T_INQUIRE | T_MODULE | T_NAMELIST | T_NONE | T_NON_INTRINSIC | T_NON_OVERRIDABLE | T_NOPASS | T_NULLIFY | T_ONLY | T_OPEN | T_OPERATOR | T_OPTIONAL | T_OUT | T_PARAMETER | T_PASS | T_POINTER | T_PRINT | T_PRECISION | T_PRIVATE | T_PROCEDURE | T_PROGRAM | T_PROTECTED | T_PUBLIC | T_PURE | T_READ | T_RECURSIVE | T_RESULT | T_RETURN | T_REWIND | T_SAVE | T_SELECT | T_SELECTCASE | T_SELECTTYPE | T_SEQUENCE | T_STOP | T_SUBROUTINE | T_TARGET | T_THEN | T_TO | T_TYPE | T_UNFORMATTED | T_USE | T_VALUE | T_VOLATILE | T_WAIT | T_WHERE | T_WHILE | T_WRITE | T_ENDASSOCIATE | T_ENDBLOCK | T_ENDBLOCKDATA | T_ENDDO | T_ENDENUM | T_ENDFORALL | T_ENDFILE | T_ENDFUNCTION | T_ENDIF | T_ENDINTERFACE | T_ENDMODULE | T_ENDPROGRAM | T_ENDSELECT | T_ENDSUBROUTINE | T_ENDTYPE | T_ENDWHERE | T_END | T_DIMENSION | T_BIND_LPAREN_C | T_DEFINED_OP | T_LABEL_DO_TERMINAL | T_DATA_EDIT_DESC | T_CONTROL_EDIT_DESC | T_CHAR_STRING_EDIT_DESC | T_STMT_FUNCTION | T_ASSIGNMENT_STMT | T_PTR_ASSIGNMENT_STMT | T_ARITHMETIC_IF_STMT | T_ALLOCATE_STMT_1 | T_WHERE_STMT | T_IF_STMT | T_FORALL_STMT | T_WHERE_CONSTRUCT_STMT | T_FORALL_CONSTRUCT_STMT | T_INQUIRE_STMT_2 | T_IDENT | LINE_COMMENT )
+        int alt31=191;
         alt31 = dfa31.predict(input);
         switch (alt31) {
             case 1 :
@@ -8347,14 +8587,63 @@ public class FortranLexer extends Lexer {
                 }
                 break;
             case 183 :
-                // FortranLexer.g:1:1890: T_IDENT
+                // FortranLexer.g:1:1890: T_ALLOCATE_STMT_1
+                {
+                mT_ALLOCATE_STMT_1(); 
+
+                }
+                break;
+            case 184 :
+                // FortranLexer.g:1:1908: T_WHERE_STMT
+                {
+                mT_WHERE_STMT(); 
+
+                }
+                break;
+            case 185 :
+                // FortranLexer.g:1:1921: T_IF_STMT
+                {
+                mT_IF_STMT(); 
+
+                }
+                break;
+            case 186 :
+                // FortranLexer.g:1:1931: T_FORALL_STMT
+                {
+                mT_FORALL_STMT(); 
+
+                }
+                break;
+            case 187 :
+                // FortranLexer.g:1:1945: T_WHERE_CONSTRUCT_STMT
+                {
+                mT_WHERE_CONSTRUCT_STMT(); 
+
+                }
+                break;
+            case 188 :
+                // FortranLexer.g:1:1968: T_FORALL_CONSTRUCT_STMT
+                {
+                mT_FORALL_CONSTRUCT_STMT(); 
+
+                }
+                break;
+            case 189 :
+                // FortranLexer.g:1:1992: T_INQUIRE_STMT_2
+                {
+                mT_INQUIRE_STMT_2(); 
+
+                }
+                break;
+            case 190 :
+                // FortranLexer.g:1:2009: T_IDENT
                 {
                 mT_IDENT(); 
 
                 }
                 break;
-            case 184 :
-                // FortranLexer.g:1:1898: LINE_COMMENT
+            case 191 :
+                // FortranLexer.g:1:2017: LINE_COMMENT
                 {
                 mLINE_COMMENT(); 
 
@@ -8405,7 +8694,7 @@ public class FortranLexer extends Lexer {
             }
         }
         public String getDescription() {
-            return "135:1: REAL_CONSTANT : ( Significand ( E_Exponent )? | Digit_String E_Exponent );";
+            return "157:1: REAL_CONSTANT : ( Significand ( E_Exponent )? | Digit_String E_Exponent );";
         }
     }
     public static final String DFA19_eotS =
@@ -8444,230 +8733,236 @@ public class FortranLexer extends Lexer {
             }
         }
         public String getDescription() {
-            return "140:1: DOUBLE_CONSTANT : ( Significand D_Exponent | Digit_String D_Exponent );";
+            return "162:1: DOUBLE_CONSTANT : ( Significand D_Exponent | Digit_String D_Exponent );";
         }
     }
     public static final String DFA31_eotS =
         "\2\uffff\1\11\1\uffff\1\60\3\56\1\106\2\uffff\1\111\1\113\1\uffff"+
-        "\1\116\1\120\1\122\5\uffff\1\125\2\uffff\1\127\24\56\4\uffff\1\61"+
-        "\2\uffff\5\56\1\uffff\1\56\13\uffff\1\61\20\uffff\1\56\1\u00a4\1"+
-        "\56\1\u00a6\15\56\1\u00be\10\56\1\u00cd\16\56\1\u00e3\11\56\1\61"+
-        "\6\56\1\u00f5\15\uffff\1\u0104\3\56\1\uffff\1\56\1\uffff\27\56\1"+
-        "\uffff\1\u0131\15\56\1\uffff\25\56\1\uffff\2\56\1\u015b\12\56\1"+
-        "\u0166\1\56\1\u0168\1\56\20\uffff\7\56\1\u0184\1\u0185\3\56\1\u0189"+
-        "\1\u018a\20\56\1\u019c\15\56\1\uffff\1\u01af\3\56\1\u01b5\1\56\1"+
-        "\u01b8\1\56\1\u01ba\4\56\1\u01bf\3\56\1\u01c4\13\56\1\u01d0\1\u01d1"+
-        "\4\56\1\u01d6\1\u01d7\2\56\1\u01da\1\u01db\1\uffff\5\56\1\u01e1"+
-        "\1\56\1\u01e4\1\uffff\1\56\1\uffff\1\56\1\uffff\1\56\21\uffff\4"+
-        "\56\1\u01f6\4\56\2\uffff\3\56\2\uffff\1\u01fe\1\u01ff\5\56\1\u0205"+
-        "\11\56\1\uffff\7\56\1\u0216\1\56\1\u0218\10\56\1\uffff\1\u0221\4"+
-        "\56\1\uffff\2\56\1\uffff\1\u0228\1\uffff\3\56\1\u022c\1\uffff\4"+
-        "\56\1\uffff\7\56\1\u0238\3\56\2\uffff\4\56\2\uffff\2\56\2\uffff"+
-        "\1\56\1\u0243\1\56\1\u0245\1\u0246\1\uffff\1\u0247\1\56\1\uffff"+
-        "\3\56\12\uffff\1\56\1\u0250\2\56\1\uffff\2\56\1\u0255\1\u0256\1"+
-        "\u0257\1\u0258\1\56\2\uffff\3\56\1\u025d\1\56\1\uffff\12\56\1\u026a"+
-        "\5\56\1\uffff\1\56\1\uffff\10\56\1\uffff\2\56\1\u027b\3\56\1\uffff"+
-        "\1\u0280\1\u0281\1\56\1\uffff\1\56\1\u0284\2\56\1\u0287\6\56\1\uffff"+
-        "\2\56\1\u0290\1\56\1\u0294\3\56\1\u0298\1\56\1\uffff\1\56\3\uffff"+
-        "\4\56\3\uffff\1\u02a0\1\uffff\2\56\1\u02a3\1\56\4\uffff\3\56\1\u02a8"+
-        "\1\uffff\1\56\1\u02aa\6\56\1\u02b2\3\56\1\uffff\2\56\1\u02b8\7\56"+
-        "\1\u02c0\1\56\1\u02c2\3\56\1\uffff\2\56\1\u02c8\1\56\2\uffff\1\56"+
-        "\1\u02cb\1\uffff\2\56\1\uffff\1\56\1\u02cf\1\56\1\u02d1\2\56\1\u02d4"+
-        "\1\u02d5\1\uffff\3\56\1\uffff\3\56\1\uffff\4\56\1\u02e0\1\u02e1"+
-        "\2\uffff\2\56\1\uffff\1\u02e4\1\56\1\u02e6\1\u02e7\1\uffff\1\56"+
-        "\1\uffff\3\56\1\u02ec\1\u02ed\1\56\1\u02ef\1\uffff\3\56\1\u02f4"+
-        "\1\u02f5\1\uffff\7\56\1\uffff\1\56\1\uffff\4\56\1\u0302\1\uffff"+
-        "\1\56\1\u0304\1\uffff\2\56\1\u0307\1\uffff\1\56\1\uffff\2\56\2\uffff"+
-        "\3\56\1\u030e\3\56\1\u0312\1\u0313\1\u0314\2\uffff\1\u0315\1\u0316"+
-        "\1\uffff\1\u0317\2\uffff\1\u0318\1\u0319\2\56\2\uffff\1\56\1\uffff"+
-        "\1\56\1\u031e\2\56\2\uffff\1\u0321\4\56\1\u0326\1\56\1\u0328\2\56"+
-        "\1\u032b\1\u032c\1\uffff\1\u032d\1\uffff\2\56\1\uffff\1\u0330\1"+
-        "\u0331\1\u0332\1\u0333\2\56\1\uffff\3\56\10\uffff\1\u0339\2\56\1"+
-        "\u033c\1\uffff\2\56\1\uffff\4\56\1\uffff\1\u0343\1\uffff\1\u0344"+
-        "\1\56\3\uffff\2\56\4\uffff\1\u0348\1\u0349\1\56\1\u034b\1\56\1\uffff"+
-        "\1\56\1\u034e\1\uffff\2\56\1\u0351\3\56\2\uffff\1\u0355\2\56\2\uffff"+
-        "\1\56\1\uffff\1\u0359\1\u035a\1\uffff\1\56\1\u035c\1\uffff\1\u035d"+
-        "\1\u035e\1\56\1\uffff\3\56\2\uffff\1\56\3\uffff\1\u0364\1\56\1\u0366"+
-        "\1\u0367\1\56\1\uffff\1\56\2\uffff\1\u036a\1\u036b\2\uffff";
+        "\1\116\1\120\1\122\5\uffff\1\125\2\uffff\1\127\24\56\4\uffff\1\63"+
+        "\2\uffff\4\56\1\uffff\2\56\13\uffff\1\63\20\uffff\1\56\1\u00a4\1"+
+        "\u00a5\13\56\1\u00ba\14\56\1\u00ce\16\56\1\u00e4\10\56\1\63\5\56"+
+        "\1\u00f4\1\56\15\uffff\1\u0104\3\56\2\uffff\24\56\1\uffff\4\56\1"+
+        "\u0131\16\56\1\uffff\25\56\1\uffff\2\56\1\u015c\13\56\1\u0168\1"+
+        "\uffff\1\u0169\17\uffff\10\56\1\u0188\1\u0189\5\56\1\u0190\1\u0191"+
+        "\16\56\1\u01a0\14\56\1\uffff\1\56\1\u01b3\1\56\1\u01b6\1\u01b9\5"+
+        "\56\1\u01bf\3\56\1\u01c3\2\56\1\u01c7\11\56\1\u01d1\1\56\1\u01d3"+
+        "\4\56\1\u01d8\1\u01d9\3\56\1\u01dd\1\u01de\1\56\1\uffff\4\56\1\u01e4"+
+        "\1\56\1\uffff\1\u01e7\3\56\26\uffff\5\56\1\u01ff\4\56\2\uffff\6"+
+        "\56\2\uffff\1\u020a\1\u020b\1\u020c\13\56\1\uffff\1\56\1\u0219\12"+
+        "\56\1\u0224\3\56\1\u0228\1\56\1\uffff\2\56\1\uffff\2\56\1\uffff"+
+        "\4\56\1\u0232\1\uffff\1\u0233\2\56\1\uffff\3\56\1\uffff\10\56\1"+
+        "\u0241\1\uffff\1\56\1\uffff\4\56\2\uffff\3\56\2\uffff\2\56\1\u024c"+
+        "\1\u024d\1\u024e\1\uffff\1\u024f\1\56\1\uffff\3\56\17\uffff\2\56"+
+        "\1\u025b\2\56\1\uffff\1\u025e\1\56\1\u0260\1\u0261\1\56\1\u0263"+
+        "\1\u0264\3\56\3\uffff\7\56\1\u0270\4\56\1\uffff\12\56\1\uffff\3"+
+        "\56\1\uffff\4\56\1\u0286\2\56\1\u028a\1\u028b\2\uffff\2\56\1\u028e"+
+        "\2\56\1\u0291\7\56\1\uffff\1\56\1\u029a\1\56\1\u029e\3\56\1\u02a2"+
+        "\2\56\4\uffff\4\56\5\uffff\1\56\1\u02ad\1\uffff\1\56\1\u02af\1\uffff"+
+        "\1\56\2\uffff\1\56\2\uffff\1\u02b2\3\56\1\u02b6\6\56\1\uffff\1\56"+
+        "\1\u02bf\7\56\1\u02c7\2\56\1\u02ca\2\56\1\u02cd\2\56\1\u02d0\2\56"+
+        "\1\uffff\3\56\2\uffff\1\56\1\u02d7\1\uffff\2\56\1\uffff\1\56\1\u02db"+
+        "\2\56\1\u02de\1\56\1\u02e0\1\56\1\uffff\1\u02e2\2\56\1\uffff\3\56"+
+        "\1\uffff\4\56\1\u02ec\1\u02ed\3\uffff\1\56\1\uffff\1\56\1\uffff"+
+        "\1\u02f2\1\56\1\uffff\1\u02f4\1\u02f5\1\56\1\uffff\3\56\1\u02fa"+
+        "\1\56\1\u02fc\2\56\1\uffff\1\u02ff\6\56\1\uffff\2\56\1\uffff\1\u0309"+
+        "\1\56\1\uffff\1\u030b\1\56\1\uffff\1\u030d\4\56\1\u0312\1\uffff"+
+        "\2\56\1\u0315\1\uffff\2\56\1\uffff\1\56\1\uffff\1\56\1\uffff\2\56"+
+        "\1\u031c\3\56\1\u0320\1\u0321\1\u0322\4\uffff\1\u0325\1\u0326\1"+
+        "\uffff\1\u0327\2\uffff\1\u0328\1\56\1\u032a\1\56\1\uffff\1\56\1"+
+        "\uffff\2\56\1\uffff\1\u032f\2\56\1\u0332\1\u0333\1\u0334\3\56\1"+
+        "\uffff\1\56\1\uffff\1\56\1\uffff\1\u033a\1\u033b\1\56\1\u033d\1"+
+        "\uffff\2\56\1\uffff\1\u0340\1\u0341\1\u0342\1\u0343\2\56\1\uffff"+
+        "\3\56\11\uffff\1\u034c\1\uffff\3\56\1\u0350\1\uffff\2\56\3\uffff"+
+        "\3\56\1\u0356\1\u0357\2\uffff\1\56\1\uffff\2\56\4\uffff\1\u035b"+
+        "\1\u035c\1\56\1\u035e\1\56\4\uffff\1\56\1\u0363\1\56\1\uffff\2\56"+
+        "\1\u0367\2\56\2\uffff\1\u036a\2\56\2\uffff\1\56\1\uffff\1\u036e"+
+        "\2\uffff\1\u036f\1\uffff\1\56\1\u0371\1\56\1\uffff\1\u0373\1\u0374"+
+        "\1\uffff\3\56\2\uffff\1\56\1\uffff\1\u0379\2\uffff\1\u037a\1\56"+
+        "\1\u037c\1\56\2\uffff\1\56\1\uffff\1\u037f\1\u0380\2\uffff";
     public static final String DFA31_eofS =
-        "\u036c\uffff";
+        "\u0381\uffff";
     public static final String DFA31_minS =
         "\1\11\1\uffff\1\12\1\uffff\1\56\3\42\1\60\2\uffff\1\52\1\72\1\uffff"+
         "\3\75\5\uffff\1\57\2\uffff\1\137\1\131\1\106\1\105\1\101\1\117\1"+
         "\102\1\42\1\101\1\114\1\111\1\105\1\117\1\101\1\42\3\101\1\116\2"+
-        "\101\4\uffff\1\60\2\uffff\1\117\1\116\1\103\1\114\1\105\1\uffff"+
-        "\1\124\1\uffff\10\56\2\uffff\1\60\16\uffff\1\114\1\uffff\1\132\1"+
-        "\60\1\120\1\60\1\101\1\114\1\101\1\115\1\101\1\103\1\107\2\123\1"+
-        "\114\1\101\1\124\1\115\1\60\1\104\1\125\1\105\1\111\1\114\1\122"+
-        "\1\116\1\125\1\60\1\116\1\104\1\116\1\115\1\114\1\105\1\111\1\102"+
-        "\1\122\1\114\1\115\1\126\1\102\1\122\1\60\1\120\2\105\1\106\2\114"+
-        "\1\105\2\111\1\60\1\103\1\104\1\113\1\131\1\111\1\116\1\60\13\56"+
-        "\1\137\1\uffff\1\60\1\105\2\125\1\uffff\1\114\1\uffff\1\111\1\104"+
-        "\3\125\1\105\1\114\2\123\1\124\1\115\1\122\1\114\2\111\1\116\1\124"+
-        "\1\117\1\101\1\114\1\101\1\105\1\102\1\uffff\1\60\1\115\1\122\1"+
-        "\111\1\115\2\105\1\124\1\101\1\105\1\101\1\103\1\123\1\117\1\uffff"+
-        "\1\105\1\125\1\105\1\101\1\105\1\114\2\103\2\116\1\114\1\105\1\123"+
-        "\1\101\1\105\1\125\1\124\1\120\1\105\1\122\1\107\1\uffff\1\105\1"+
-        "\116\1\60\1\117\1\125\1\101\1\114\1\122\2\124\1\113\1\50\1\123\1"+
-        "\60\1\117\1\60\1\101\2\uffff\2\56\4\uffff\2\56\2\uffff\2\56\1\101"+
-        "\1\uffff\1\107\1\111\1\124\2\111\1\122\1\116\2\60\1\122\1\114\1"+
-        "\122\2\60\1\123\1\105\1\101\1\114\1\117\1\101\1\105\2\103\1\107"+
-        "\1\103\1\122\1\103\1\122\1\125\1\114\1\60\1\116\2\114\1\110\1\111"+
-        "\1\117\1\123\1\106\1\105\1\122\1\131\1\117\1\116\1\uffff\1\60\1"+
-        "\131\1\126\1\105\1\60\1\116\1\60\1\114\1\60\1\101\1\114\1\124\1"+
-        "\110\1\60\1\122\1\114\1\111\1\60\1\123\1\114\2\111\1\122\2\105\1"+
-        "\124\1\101\1\124\1\111\2\60\1\115\1\103\1\105\1\137\2\60\1\117\1"+
-        "\105\2\60\1\uffff\1\122\1\105\1\124\2\105\1\60\1\105\1\60\1\uffff"+
-        "\1\120\1\uffff\1\116\1\uffff\1\124\1\uffff\1\56\6\uffff\1\56\3\uffff"+
-        "\1\56\1\122\1\uffff\1\110\1\uffff\1\105\1\124\1\106\1\116\1\60\1"+
-        "\122\1\103\1\124\1\104\2\uffff\1\116\1\124\1\123\2\uffff\2\60\1"+
-        "\111\1\116\1\105\1\116\1\103\1\60\1\101\1\111\1\116\1\110\2\101"+
-        "\1\122\1\114\1\117\1\uffff\1\123\1\105\1\117\1\105\1\114\1\122\1"+
-        "\116\1\60\1\123\1\60\1\124\1\102\1\114\1\117\1\120\1\104\1\125\1"+
-        "\122\1\uffff\1\60\1\101\1\116\1\106\1\110\1\uffff\1\116\1\104\1"+
-        "\uffff\1\60\1\uffff\1\124\1\114\1\111\1\60\1\uffff\1\111\1\105\1"+
-        "\126\1\116\1\uffff\1\123\1\111\1\106\1\123\1\101\1\104\1\103\1\60"+
-        "\1\124\1\105\1\103\2\uffff\1\105\1\124\1\116\1\106\2\uffff\1\125"+
-        "\1\124\2\uffff\1\115\1\60\1\111\2\60\1\uffff\1\60\1\101\1\uffff"+
-        "\2\101\1\117\5\uffff\1\56\4\uffff\1\122\1\60\1\101\1\123\1\uffff"+
-        "\1\105\1\111\4\60\1\111\2\uffff\1\116\1\125\1\130\1\60\1\124\1\uffff"+
-        "\1\114\1\101\1\115\1\122\1\103\1\124\1\105\1\124\1\103\1\111\1\60"+
-        "\1\103\1\122\1\105\1\101\1\103\1\uffff\1\117\1\uffff\1\105\1\122"+
-        "\1\105\1\107\1\105\1\125\1\115\1\101\1\uffff\1\114\1\124\1\60\1"+
-        "\105\1\101\1\123\1\uffff\2\60\1\117\1\uffff\1\103\1\60\1\105\1\124"+
-        "\1\60\1\123\1\131\1\111\1\115\1\125\1\124\1\uffff\1\105\1\122\1"+
-        "\60\1\124\1\60\1\103\1\125\1\124\1\60\1\101\1\uffff\1\114\3\uffff"+
-        "\1\124\1\103\1\114\1\122\3\uffff\1\60\1\uffff\1\103\1\111\1\60\1"+
-        "\124\4\uffff\1\126\1\123\1\105\1\60\1\uffff\1\105\1\60\1\124\1\105"+
-        "\1\117\1\124\1\101\1\104\1\60\1\101\1\117\1\122\1\uffff\1\113\1"+
-        "\105\1\60\1\114\1\124\1\103\1\122\1\117\1\103\1\122\1\60\1\114\1"+
-        "\60\1\124\1\105\1\101\1\uffff\1\122\1\114\1\60\1\105\2\uffff\1\116"+
-        "\1\60\1\uffff\2\122\1\uffff\1\124\1\60\1\117\1\60\1\122\1\105\2"+
-        "\60\1\uffff\1\105\1\101\1\131\1\uffff\1\105\1\116\1\111\1\uffff"+
-        "\1\124\1\105\1\101\1\105\2\60\2\uffff\1\105\1\103\1\uffff\1\60\1"+
-        "\105\2\60\1\uffff\1\122\1\uffff\1\105\2\116\2\60\1\102\1\60\1\uffff"+
-        "\1\124\1\116\1\105\2\60\1\uffff\1\114\2\111\1\106\1\125\1\124\1"+
-        "\101\1\uffff\1\105\1\uffff\1\117\1\116\1\114\1\105\1\60\1\uffff"+
-        "\1\104\1\60\1\uffff\1\122\1\111\1\60\1\uffff\1\116\1\uffff\1\105"+
-        "\1\104\2\uffff\1\122\1\123\1\120\1\60\1\103\1\116\1\124\3\60\2\uffff"+
-        "\2\60\1\uffff\1\60\2\uffff\2\60\1\124\1\117\2\uffff\1\114\1\uffff"+
-        "\1\105\1\60\1\103\1\101\2\uffff\1\60\1\117\2\101\1\124\1\60\1\115"+
-        "\1\60\1\122\1\103\2\60\1\uffff\1\60\1\uffff\1\111\1\116\1\uffff"+
-        "\4\60\2\105\1\uffff\1\124\2\105\10\uffff\1\60\1\125\1\105\1\60\1"+
-        "\uffff\1\111\1\124\1\uffff\1\116\1\124\1\103\1\111\1\uffff\1\60"+
-        "\1\uffff\1\60\1\105\3\uffff\1\104\1\123\4\uffff\2\60\1\111\1\60"+
-        "\1\104\1\uffff\1\123\1\60\1\uffff\1\123\1\101\1\60\2\105\1\116\2"+
-        "\uffff\1\60\1\101\1\111\2\uffff\1\117\1\uffff\2\60\1\uffff\1\111"+
-        "\1\60\1\uffff\2\60\1\105\1\uffff\1\102\1\103\1\116\2\uffff\1\117"+
-        "\3\uffff\1\60\1\114\2\60\1\116\1\uffff\1\105\2\uffff\2\60\2\uffff";
+        "\101\4\uffff\1\60\2\uffff\1\116\1\117\1\103\1\105\1\uffff\1\124"+
+        "\1\114\1\uffff\10\56\2\uffff\1\60\16\uffff\1\114\1\uffff\1\132\2"+
+        "\60\1\120\1\101\1\115\1\114\1\103\2\101\1\107\1\123\1\114\1\123"+
+        "\1\60\1\101\1\124\1\115\1\104\1\111\1\105\1\125\1\122\1\114\1\125"+
+        "\2\116\1\60\1\104\1\116\1\115\1\114\1\105\1\122\1\102\1\111\1\114"+
+        "\1\126\1\115\1\102\1\122\1\105\1\60\1\120\1\106\1\105\2\114\1\105"+
+        "\2\111\1\60\1\104\1\103\1\113\1\111\1\116\1\60\1\131\13\56\1\137"+
+        "\1\uffff\1\60\1\105\2\125\2\uffff\1\114\2\125\1\104\1\125\1\111"+
+        "\1\115\1\124\1\114\1\105\1\114\2\123\1\122\2\111\1\116\1\117\1\124"+
+        "\1\102\1\uffff\1\114\2\101\1\105\1\60\1\122\1\115\1\105\1\124\1"+
+        "\105\1\115\1\111\2\101\1\105\1\123\1\103\1\105\1\117\1\uffff\1\125"+
+        "\1\105\1\101\1\105\1\114\2\103\1\116\1\123\1\101\1\105\1\114\1\116"+
+        "\1\105\1\125\1\105\1\120\1\124\1\122\1\107\1\116\1\uffff\1\105\1"+
+        "\117\1\60\1\101\1\125\1\122\1\114\2\124\1\50\1\113\1\123\1\117\1"+
+        "\101\1\60\1\uffff\1\60\3\uffff\1\56\2\uffff\1\56\1\uffff\2\56\1"+
+        "\uffff\2\56\1\101\1\uffff\1\111\1\107\1\111\1\124\1\122\1\111\1"+
+        "\122\1\114\2\60\1\122\1\116\1\117\1\114\1\101\2\60\2\105\1\123\1"+
+        "\101\1\103\1\107\3\103\1\122\2\114\1\125\1\122\1\60\1\116\1\106"+
+        "\1\105\1\117\1\111\1\123\1\116\1\114\1\117\1\122\1\131\1\110\1\uffff"+
+        "\1\131\1\60\1\116\2\60\1\105\1\126\1\101\2\114\1\60\1\110\1\124"+
+        "\1\122\1\60\1\114\1\111\1\60\1\123\1\114\1\111\2\105\1\122\1\111"+
+        "\1\101\1\124\1\60\1\115\1\60\1\111\1\124\1\103\1\105\2\60\1\137"+
+        "\1\117\1\105\2\60\1\122\1\uffff\1\124\3\105\1\60\1\105\1\uffff\1"+
+        "\60\1\120\1\116\1\124\5\uffff\1\56\4\uffff\1\56\2\uffff\1\56\1\uffff"+
+        "\1\117\1\uffff\1\114\1\106\2\110\1\uffff\1\116\1\105\1\124\1\106"+
+        "\1\122\1\60\1\124\1\103\1\116\1\124\2\uffff\1\123\1\104\1\116\1"+
+        "\105\1\116\1\111\2\uffff\3\60\1\103\1\101\1\116\1\111\1\110\2\101"+
+        "\1\105\1\117\1\114\1\122\1\uffff\1\123\1\60\1\124\1\102\1\114\1"+
+        "\104\1\122\1\114\1\116\1\123\1\125\1\117\1\60\1\117\1\120\1\105"+
+        "\1\60\1\122\1\uffff\1\104\1\116\1\uffff\1\110\1\106\1\uffff\1\116"+
+        "\1\101\1\124\1\114\1\60\1\uffff\1\60\2\111\1\uffff\1\105\1\116\1"+
+        "\126\1\uffff\1\123\1\111\1\106\1\103\1\104\1\101\1\123\1\124\1\60"+
+        "\1\uffff\1\105\1\uffff\1\103\1\105\1\124\1\116\2\uffff\1\106\1\125"+
+        "\1\124\2\uffff\1\115\1\111\3\60\1\uffff\1\60\1\101\1\uffff\2\101"+
+        "\1\117\2\uffff\1\56\3\uffff\1\122\7\uffff\1\105\1\123\1\122\1\60"+
+        "\1\101\1\105\1\uffff\1\60\1\111\2\60\1\111\2\60\1\130\1\125\1\116"+
+        "\3\uffff\1\124\1\114\1\115\1\101\1\122\1\124\1\103\1\60\1\103\1"+
+        "\124\1\105\1\111\1\uffff\1\105\1\122\1\105\1\125\1\101\1\105\1\103"+
+        "\1\117\1\115\1\103\1\uffff\1\107\1\105\1\122\1\uffff\1\101\1\123"+
+        "\1\101\1\105\1\60\1\124\1\114\2\60\2\uffff\1\117\1\103\1\60\1\124"+
+        "\1\105\1\60\1\123\1\131\1\124\1\125\1\115\1\111\1\105\1\uffff\1"+
+        "\124\1\60\1\122\1\60\1\103\1\125\1\124\1\60\1\101\1\114\4\uffff"+
+        "\1\124\1\103\1\114\1\122\3\uffff\1\101\1\122\1\111\1\60\1\uffff"+
+        "\1\103\1\60\1\uffff\1\124\2\uffff\1\126\2\uffff\1\60\1\105\1\123"+
+        "\1\105\1\60\1\105\1\124\1\117\1\101\1\124\1\122\1\uffff\1\101\1"+
+        "\60\1\104\1\117\1\122\1\117\1\103\2\114\1\60\1\124\1\103\1\60\1"+
+        "\113\1\122\1\60\1\105\1\124\1\60\1\114\1\122\1\uffff\1\101\2\105"+
+        "\2\uffff\1\116\1\60\1\uffff\2\122\1\uffff\1\124\1\60\1\105\1\122"+
+        "\1\60\1\117\1\60\1\105\1\uffff\1\60\1\131\1\101\1\uffff\1\105\1"+
+        "\116\1\111\1\uffff\1\124\1\105\1\101\1\105\2\60\1\uffff\1\114\1"+
+        "\105\1\103\1\uffff\1\105\1\uffff\1\60\1\105\1\uffff\2\60\1\122\1"+
+        "\uffff\1\116\1\105\1\116\1\60\1\102\1\60\1\105\1\124\1\uffff\1\60"+
+        "\1\116\1\106\1\125\1\124\1\105\1\114\1\uffff\2\111\1\uffff\1\60"+
+        "\1\101\1\uffff\1\60\1\117\1\uffff\1\60\1\105\1\114\1\116\1\104\1"+
+        "\60\1\uffff\1\111\1\122\1\60\1\uffff\1\104\1\105\1\uffff\1\116\1"+
+        "\uffff\1\122\1\uffff\1\120\1\123\1\60\1\103\1\116\1\124\3\60\2\uffff"+
+        "\1\114\1\137\2\60\1\uffff\1\60\2\uffff\1\60\1\124\1\60\1\117\1\uffff"+
+        "\1\114\1\uffff\1\103\1\105\1\uffff\1\60\1\101\1\124\3\60\1\117\2"+
+        "\101\1\uffff\1\115\1\uffff\1\122\1\uffff\2\60\1\103\1\60\1\uffff"+
+        "\1\116\1\111\1\uffff\4\60\2\105\1\uffff\1\124\2\105\3\uffff\1\137"+
+        "\1\103\4\uffff\1\60\1\uffff\1\125\1\105\1\111\1\60\1\uffff\1\103"+
+        "\1\111\3\uffff\1\116\2\124\2\60\2\uffff\1\105\1\uffff\1\123\1\104"+
+        "\4\uffff\2\60\1\111\1\60\1\104\1\103\3\uffff\1\123\1\60\1\123\1"+
+        "\uffff\1\105\1\116\1\60\1\105\1\101\2\uffff\1\60\1\111\1\101\2\uffff"+
+        "\1\117\1\uffff\1\60\2\uffff\1\60\1\uffff\1\111\1\60\1\105\1\uffff"+
+        "\2\60\1\uffff\1\103\1\102\1\116\2\uffff\1\117\1\uffff\1\60\2\uffff"+
+        "\1\60\1\114\1\60\1\116\2\uffff\1\105\1\uffff\2\60\2\uffff";
     public static final String DFA31_maxS =
         "\1\172\1\uffff\1\12\1\uffff\1\145\1\114\1\125\1\47\1\172\2\uffff"+
         "\1\52\1\72\1\uffff\1\76\2\75\5\uffff\1\75\2\uffff\1\137\1\131\1"+
         "\116\1\105\1\131\1\117\1\123\1\47\1\117\1\130\1\125\2\117\1\125"+
-        "\1\47\2\125\1\131\1\123\1\117\1\122\4\uffff\1\144\2\uffff\1\117"+
-        "\1\116\1\103\1\114\1\124\1\uffff\1\124\1\uffff\10\172\2\uffff\1"+
-        "\144\16\uffff\1\124\1\uffff\1\132\1\172\1\120\1\172\1\127\1\123"+
-        "\1\117\1\116\1\101\1\103\1\107\1\131\1\123\1\114\1\106\1\124\1\115"+
-        "\1\172\2\125\1\123\1\124\1\116\1\122\1\116\1\125\1\172\1\116\1\104"+
-        "\1\120\1\115\1\114\1\117\1\111\1\122\1\123\1\121\1\117\1\126\1\102"+
-        "\1\122\1\172\1\120\2\105\1\106\2\114\3\111\1\144\1\103\1\104\1\113"+
-        "\1\131\1\111\1\122\14\172\1\137\1\uffff\1\172\1\122\2\125\1\uffff"+
-        "\1\117\1\uffff\1\111\1\114\3\125\1\105\1\114\2\123\1\124\1\120\1"+
-        "\122\1\114\1\111\1\117\1\116\1\124\1\117\1\105\1\114\1\101\1\105"+
-        "\1\102\1\uffff\1\172\1\115\1\122\1\111\1\115\2\105\1\124\1\101\1"+
-        "\105\1\115\1\103\1\123\1\117\1\uffff\1\105\1\125\1\137\1\101\1\105"+
-        "\1\114\1\103\1\124\1\126\1\116\1\114\1\105\1\123\1\101\1\105\1\125"+
-        "\1\124\1\120\1\105\1\122\1\107\1\uffff\1\105\1\116\1\172\1\117\1"+
-        "\125\1\101\1\114\1\122\2\124\1\113\1\50\1\123\1\172\1\117\1\172"+
-        "\1\101\2\uffff\2\172\4\uffff\2\172\2\uffff\2\172\1\120\1\uffff\1"+
-        "\122\1\111\1\124\2\111\1\122\1\116\2\172\1\122\1\114\1\122\2\172"+
-        "\1\123\1\105\1\111\1\114\1\117\1\101\1\105\2\103\1\107\1\103\1\122"+
-        "\1\103\1\122\1\125\1\114\1\172\1\116\2\114\1\110\1\125\1\117\1\123"+
-        "\1\116\1\125\1\122\1\131\1\117\1\116\1\uffff\1\172\1\131\1\126\1"+
-        "\105\1\172\1\122\1\172\1\114\1\172\1\101\1\114\1\124\1\110\1\172"+
-        "\1\122\1\114\1\117\1\172\1\123\1\114\2\111\1\122\2\105\1\124\1\101"+
-        "\1\124\1\111\2\172\1\115\1\103\1\105\1\137\2\172\1\117\1\105\2\172"+
-        "\1\uffff\1\122\1\105\1\124\2\105\1\172\1\105\1\172\1\uffff\1\120"+
-        "\1\uffff\1\116\1\uffff\1\124\1\uffff\1\172\6\uffff\1\172\3\uffff"+
-        "\1\172\1\123\1\uffff\1\117\1\uffff\1\105\1\124\1\106\1\116\1\172"+
-        "\1\122\1\103\1\124\1\104\2\uffff\1\116\1\124\1\123\2\uffff\2\172"+
-        "\1\111\1\116\1\105\1\116\1\103\1\172\1\101\1\111\1\116\1\110\2\101"+
-        "\1\122\1\114\1\117\1\uffff\1\123\1\105\1\117\1\105\1\114\1\122\1"+
-        "\116\1\172\1\123\1\172\1\124\1\102\1\114\1\117\1\120\1\104\1\125"+
-        "\1\122\1\uffff\1\172\1\101\1\116\1\106\1\110\1\uffff\1\116\1\104"+
-        "\1\uffff\1\172\1\uffff\1\124\1\114\1\111\1\172\1\uffff\1\111\1\105"+
-        "\1\126\1\116\1\uffff\1\123\1\111\1\106\1\123\1\101\1\104\1\103\1"+
-        "\172\1\124\1\105\1\103\2\uffff\1\105\1\124\1\116\1\106\2\uffff\1"+
-        "\125\1\124\2\uffff\1\115\1\172\1\111\2\172\1\uffff\1\172\1\101\1"+
-        "\uffff\2\101\1\117\5\uffff\1\172\4\uffff\1\122\1\172\1\101\1\123"+
-        "\1\uffff\1\105\1\111\4\172\1\111\2\uffff\1\116\1\125\1\130\1\172"+
-        "\1\124\1\uffff\1\114\1\101\1\115\1\122\1\103\1\124\1\105\1\124\1"+
-        "\103\1\111\1\172\1\103\1\122\1\105\1\101\1\103\1\uffff\1\117\1\uffff"+
-        "\1\105\1\122\1\105\1\107\1\105\1\125\1\115\1\101\1\uffff\1\114\1"+
-        "\124\1\172\1\105\1\101\1\123\1\uffff\2\172\1\117\1\uffff\1\103\1"+
-        "\172\1\105\1\124\1\172\1\123\1\131\1\111\1\115\1\125\1\124\1\uffff"+
-        "\1\105\1\122\1\172\1\124\1\172\1\103\1\125\1\124\1\172\1\101\1\uffff"+
-        "\1\114\3\uffff\1\124\1\103\1\114\1\122\3\uffff\1\172\1\uffff\1\103"+
-        "\1\111\1\172\1\124\4\uffff\1\126\1\123\1\105\1\172\1\uffff\1\105"+
-        "\1\172\1\124\1\105\1\117\1\124\1\105\1\104\1\172\1\101\1\117\1\122"+
-        "\1\uffff\1\113\1\105\1\172\1\114\1\124\1\103\1\122\1\117\1\103\1"+
-        "\122\1\172\1\114\1\172\1\124\1\105\1\101\1\uffff\1\122\1\114\1\172"+
-        "\1\105\2\uffff\1\116\1\172\1\uffff\2\122\1\uffff\1\124\1\172\1\117"+
-        "\1\172\1\122\1\105\2\172\1\uffff\1\105\1\101\1\131\1\uffff\1\105"+
-        "\1\116\1\111\1\uffff\1\124\1\105\1\101\1\105\2\172\2\uffff\1\105"+
-        "\1\103\1\uffff\1\172\1\105\2\172\1\uffff\1\122\1\uffff\1\105\2\116"+
-        "\2\172\1\102\1\172\1\uffff\1\124\1\116\1\105\2\172\1\uffff\1\114"+
-        "\2\111\1\106\1\125\1\124\1\101\1\uffff\1\105\1\uffff\1\117\1\116"+
-        "\1\114\1\105\1\172\1\uffff\1\104\1\172\1\uffff\1\122\1\111\1\172"+
-        "\1\uffff\1\116\1\uffff\1\105\1\104\2\uffff\1\122\1\123\1\120\1\172"+
-        "\1\103\1\116\1\124\3\172\2\uffff\2\172\1\uffff\1\172\2\uffff\2\172"+
-        "\1\124\1\117\2\uffff\1\114\1\uffff\1\105\1\172\1\103\1\101\2\uffff"+
-        "\1\172\1\117\2\101\1\124\1\172\1\115\1\172\1\122\1\103\2\172\1\uffff"+
-        "\1\172\1\uffff\1\111\1\116\1\uffff\4\172\2\105\1\uffff\1\124\2\105"+
-        "\10\uffff\1\172\1\125\1\105\1\172\1\uffff\1\111\1\124\1\uffff\1"+
-        "\116\1\124\1\103\1\111\1\uffff\1\172\1\uffff\1\172\1\105\3\uffff"+
-        "\1\104\1\123\4\uffff\2\172\1\111\1\172\1\104\1\uffff\1\123\1\172"+
-        "\1\uffff\1\123\1\101\1\172\2\105\1\116\2\uffff\1\172\1\101\1\111"+
-        "\2\uffff\1\117\1\uffff\2\172\1\uffff\1\111\1\172\1\uffff\2\172\1"+
-        "\105\1\uffff\1\102\1\103\1\116\2\uffff\1\117\3\uffff\1\172\1\114"+
-        "\2\172\1\116\1\uffff\1\105\2\uffff\2\172\2\uffff";
+        "\1\47\2\125\1\131\1\123\1\117\1\122\4\uffff\1\144\2\uffff\1\116"+
+        "\1\117\1\103\1\124\1\uffff\1\124\1\114\1\uffff\10\172\2\uffff\1"+
+        "\144\16\uffff\1\124\1\uffff\1\132\2\172\1\120\1\127\1\116\1\123"+
+        "\1\103\1\117\1\101\1\107\1\131\1\114\1\123\1\172\1\106\1\124\1\115"+
+        "\1\125\1\124\1\123\1\125\1\122\1\116\1\125\2\116\1\172\1\104\1\120"+
+        "\1\115\1\114\1\117\1\123\1\122\1\111\1\121\1\126\1\117\1\102\1\122"+
+        "\1\105\1\172\1\120\1\106\1\105\2\114\3\111\1\144\1\104\1\103\1\113"+
+        "\1\111\1\122\1\172\1\131\13\172\1\137\1\uffff\1\172\1\122\2\125"+
+        "\2\uffff\1\117\2\125\1\114\1\125\1\111\1\120\1\124\1\114\1\105\1"+
+        "\114\2\123\1\122\1\111\1\117\1\116\1\117\1\124\1\102\1\uffff\1\114"+
+        "\1\105\1\101\1\105\1\172\1\122\1\115\1\105\1\124\1\105\1\115\1\111"+
+        "\1\115\1\101\1\105\1\123\1\103\1\105\1\117\1\uffff\1\125\1\137\1"+
+        "\101\1\105\1\114\1\124\1\103\1\126\1\123\1\101\1\105\1\114\1\116"+
+        "\1\105\1\125\1\105\1\120\1\124\1\122\1\107\1\116\1\uffff\1\105\1"+
+        "\117\1\172\1\101\1\125\1\122\1\114\2\124\1\50\1\113\1\123\1\117"+
+        "\1\101\1\172\1\uffff\1\172\3\uffff\1\172\2\uffff\1\172\1\uffff\2"+
+        "\172\1\uffff\2\172\1\127\1\uffff\1\111\1\122\1\111\1\124\1\122\1"+
+        "\111\1\122\1\114\2\172\1\122\1\116\1\117\1\114\1\111\2\172\2\105"+
+        "\1\123\1\101\1\103\1\107\3\103\1\122\2\114\1\125\1\122\1\172\2\116"+
+        "\1\125\1\117\1\125\1\123\1\116\1\114\1\117\1\122\1\131\1\110\1\uffff"+
+        "\1\131\1\172\1\122\2\172\1\105\1\126\1\101\2\114\1\172\1\110\1\124"+
+        "\1\122\1\172\1\114\1\117\1\172\1\123\1\114\1\111\2\105\1\122\1\111"+
+        "\1\101\1\124\1\172\1\115\1\172\1\111\1\124\1\103\1\105\2\172\1\137"+
+        "\1\117\1\105\2\172\1\122\1\uffff\1\124\3\105\1\172\1\105\1\uffff"+
+        "\1\172\1\120\1\116\1\124\5\uffff\1\172\4\uffff\1\172\2\uffff\1\172"+
+        "\1\uffff\1\117\1\uffff\1\123\1\116\1\117\1\110\1\uffff\1\116\1\105"+
+        "\1\124\1\106\1\122\1\172\1\124\1\103\1\116\1\124\2\uffff\1\123\1"+
+        "\104\1\116\1\105\1\116\1\111\2\uffff\3\172\1\103\1\101\1\116\1\111"+
+        "\1\110\2\101\1\105\1\117\1\114\1\122\1\uffff\1\123\1\172\1\124\1"+
+        "\102\1\114\1\104\1\122\1\114\1\116\1\123\1\125\1\117\1\172\1\117"+
+        "\1\120\1\105\1\172\1\122\1\uffff\1\104\1\116\1\uffff\1\110\1\106"+
+        "\1\uffff\1\116\1\101\1\124\1\114\1\172\1\uffff\1\172\2\111\1\uffff"+
+        "\1\105\1\116\1\126\1\uffff\1\123\1\111\1\106\1\103\1\104\1\101\1"+
+        "\123\1\124\1\172\1\uffff\1\105\1\uffff\1\103\1\105\1\124\1\116\2"+
+        "\uffff\1\106\1\125\1\124\2\uffff\1\115\1\111\3\172\1\uffff\1\172"+
+        "\1\101\1\uffff\2\101\1\117\2\uffff\1\172\3\uffff\1\122\7\uffff\1"+
+        "\105\1\123\1\122\1\172\1\101\1\105\1\uffff\1\172\1\111\2\172\1\111"+
+        "\2\172\1\130\1\125\1\116\3\uffff\1\124\1\114\1\115\1\101\1\122\1"+
+        "\124\1\103\1\172\1\103\1\124\1\105\1\111\1\uffff\1\105\1\122\1\105"+
+        "\1\125\1\101\1\105\1\103\1\117\1\115\1\103\1\uffff\1\107\1\105\1"+
+        "\122\1\uffff\1\101\1\123\1\101\1\105\1\172\1\124\1\114\2\172\2\uffff"+
+        "\1\117\1\103\1\172\1\124\1\105\1\172\1\123\1\131\1\124\1\125\1\115"+
+        "\1\111\1\105\1\uffff\1\124\1\172\1\122\1\172\1\103\1\125\1\124\1"+
+        "\172\1\101\1\114\4\uffff\1\124\1\103\1\114\1\122\3\uffff\1\101\1"+
+        "\122\1\111\1\172\1\uffff\1\103\1\172\1\uffff\1\124\2\uffff\1\126"+
+        "\2\uffff\1\172\1\105\1\123\1\105\1\172\1\105\1\124\1\117\1\105\1"+
+        "\124\1\122\1\uffff\1\101\1\172\1\104\1\117\1\122\1\117\1\103\2\114"+
+        "\1\172\1\124\1\103\1\172\1\113\1\122\1\172\1\105\1\124\1\172\1\114"+
+        "\1\122\1\uffff\1\101\2\105\2\uffff\1\116\1\172\1\uffff\2\122\1\uffff"+
+        "\1\124\1\172\1\105\1\122\1\172\1\117\1\172\1\105\1\uffff\1\172\1"+
+        "\131\1\101\1\uffff\1\105\1\116\1\111\1\uffff\1\124\1\105\1\101\1"+
+        "\105\2\172\1\uffff\1\114\1\105\1\103\1\uffff\1\105\1\uffff\1\172"+
+        "\1\105\1\uffff\2\172\1\122\1\uffff\1\116\1\105\1\116\1\172\1\102"+
+        "\1\172\1\105\1\124\1\uffff\1\172\1\116\1\106\1\125\1\124\1\105\1"+
+        "\114\1\uffff\2\111\1\uffff\1\172\1\101\1\uffff\1\172\1\117\1\uffff"+
+        "\1\172\1\105\1\114\1\116\1\104\1\172\1\uffff\1\111\1\122\1\172\1"+
+        "\uffff\1\104\1\105\1\uffff\1\116\1\uffff\1\122\1\uffff\1\120\1\123"+
+        "\1\172\1\103\1\116\1\124\3\172\2\uffff\1\114\1\137\2\172\1\uffff"+
+        "\1\172\2\uffff\1\172\1\124\1\172\1\117\1\uffff\1\114\1\uffff\1\103"+
+        "\1\105\1\uffff\1\172\1\101\1\124\3\172\1\117\2\101\1\uffff\1\115"+
+        "\1\uffff\1\122\1\uffff\2\172\1\103\1\172\1\uffff\1\116\1\111\1\uffff"+
+        "\4\172\2\105\1\uffff\1\124\2\105\3\uffff\1\137\1\123\4\uffff\1\172"+
+        "\1\uffff\1\125\1\105\1\111\1\172\1\uffff\1\103\1\111\3\uffff\1\116"+
+        "\2\124\2\172\2\uffff\1\105\1\uffff\1\123\1\104\4\uffff\2\172\1\111"+
+        "\1\172\1\104\1\123\3\uffff\1\123\1\172\1\123\1\uffff\1\105\1\116"+
+        "\1\172\1\105\1\101\2\uffff\1\172\1\111\1\101\2\uffff\1\117\1\uffff"+
+        "\1\172\2\uffff\1\172\1\uffff\1\111\1\172\1\105\1\uffff\2\172\1\uffff"+
+        "\1\103\1\102\1\116\2\uffff\1\117\1\uffff\1\172\2\uffff\1\172\1\114"+
+        "\1\172\1\116\2\uffff\1\105\1\uffff\2\172\2\uffff";
     public static final String DFA31_acceptS =
         "\1\uffff\1\1\1\uffff\1\2\5\uffff\1\11\1\12\2\uffff\1\16\3\uffff"+
-        "\1\26\1\27\1\30\1\31\1\33\1\uffff\1\40\1\41\25\uffff\1\u00b7\1\u00b8"+
-        "\1\3\1\7\1\uffff\1\10\1\4\5\uffff\1\5\1\uffff\1\6\10\uffff\1\u00ae"+
+        "\1\26\1\27\1\30\1\31\1\33\1\uffff\1\40\1\41\25\uffff\1\u00be\1\u00bf"+
+        "\1\3\1\10\1\uffff\1\7\1\4\4\uffff\1\5\2\uffff\1\6\10\uffff\1\u00ae"+
         "\1\32\1\uffff\1\34\1\13\1\15\1\14\1\21\1\20\1\17\1\23\1\22\1\25"+
-        "\1\24\1\36\1\37\1\35\1\uffff\1\42\107\uffff\1\u00af\4\uffff\1\146"+
-        "\1\uffff\1\143\27\uffff\1\113\16\uffff\1\141\25\uffff\1\u0091\21"+
-        "\uffff\1\167\1\44\2\uffff\1\46\1\45\1\55\1\43\2\uffff\1\50\1\47"+
-        "\3\uffff\1\60\54\uffff\1\u00ab\51\uffff\1\u0094\10\uffff\1\u00ad"+
-        "\1\uffff\1\163\1\uffff\1\164\1\uffff\1\44\1\uffff\1\53\1\46\1\45"+
-        "\1\55\1\43\1\56\1\uffff\1\50\1\47\1\54\2\uffff\1\u00b5\1\uffff\1"+
-        "\u00b0\11\uffff\1\u0083\1\62\3\uffff\1\100\1\77\21\uffff\1\107\22"+
-        "\uffff\1\123\5\uffff\1\117\2\uffff\1\126\1\uffff\1\131\4\uffff\1"+
-        "\142\4\uffff\1\156\13\uffff\1\u0082\1\171\4\uffff\1\u008d\1\u0088"+
-        "\2\uffff\1\u0092\1\u0090\5\uffff\1\u0097\2\uffff\1\75\3\uffff\1"+
-        "\57\1\53\1\56\1\51\1\54\1\uffff\1\u00b4\1\u00b6\1\u00b1\1\u00b2"+
-        "\4\uffff\1\147\7\uffff\1\101\1\102\5\uffff\1\106\20\uffff\1\u009e"+
-        "\1\uffff\1\u00a3\10\uffff\1\122\6\uffff\1\132\3\uffff\1\133\13\uffff"+
-        "\1\173\12\uffff\1\u0095\1\uffff\1\u0099\1\u0098\1\u009a\4\uffff"+
-        "\1\57\1\51\1\52\1\uffff\1\150\4\uffff\1\145\1\u0087\1\u0086\1\u0085"+
-        "\4\uffff\1\103\14\uffff\1\114\20\uffff\1\120\4\uffff\1\135\1\134"+
-        "\2\uffff\1\154\2\uffff\1\161\10\uffff\1\u0081\3\uffff\1\u0089\3"+
-        "\uffff\1\u008f\6\uffff\1\52\1\61\2\uffff\1\153\4\uffff\1\63\1\uffff"+
-        "\1\65\7\uffff\1\110\5\uffff\1\u00a1\7\uffff\1\u00a9\1\uffff\1\u009f"+
-        "\5\uffff\1\127\2\uffff\1\140\3\uffff\1\162\1\uffff\1\177\2\uffff"+
-        "\1\175\1\172\12\uffff\1\166\1\165\2\uffff\1\144\1\uffff\1\104\1"+
-        "\105\4\uffff\1\66\1\70\1\uffff\1\112\4\uffff\1\u009c\1\u00aa\14"+
-        "\uffff\1\130\1\uffff\1\137\2\uffff\1\155\6\uffff\1\u008c\3\uffff"+
-        "\1\u0096\1\76\1\74\1\151\1\152\1\u0084\1\64\1\72\4\uffff\1\u00ac"+
-        "\2\uffff\1\u00a0\4\uffff\1\u00a7\1\uffff\1\u00a5\2\uffff\1\116\1"+
-        "\121\1\136\2\uffff\1\174\1\176\1\u0080\1\170\5\uffff\1\71\2\uffff"+
-        "\1\111\6\uffff\1\u00a6\1\124\3\uffff\1\u008a\1\u008b\1\uffff\1\u008e"+
-        "\2\uffff\1\67\2\uffff\1\u00a2\3\uffff\1\125\3\uffff\1\u0093\1\73"+
-        "\1\uffff\1\u009d\1\u009b\1\u00a4\5\uffff\1\u00a8\1\uffff\1\157\1"+
-        "\u00b3\2\uffff\1\115\1\160";
+        "\1\24\1\37\1\36\1\35\1\uffff\1\42\107\uffff\1\u00af\4\uffff\1\146"+
+        "\1\143\24\uffff\1\113\23\uffff\1\141\25\uffff\1\u0091\17\uffff\1"+
+        "\167\1\uffff\1\50\1\47\1\55\1\uffff\1\46\1\45\1\uffff\1\43\2\uffff"+
+        "\1\44\3\uffff\1\60\54\uffff\1\u00ab\52\uffff\1\u0094\6\uffff\1\u00ad"+
+        "\4\uffff\1\164\1\163\1\50\1\47\1\55\1\uffff\1\46\1\45\1\56\1\43"+
+        "\1\uffff\1\54\1\44\1\uffff\1\53\1\uffff\1\u00b5\4\uffff\1\u00b0"+
+        "\12\uffff\1\u0083\1\62\6\uffff\1\77\1\100\16\uffff\1\107\22\uffff"+
+        "\1\123\2\uffff\1\126\2\uffff\1\117\5\uffff\1\131\3\uffff\1\142\3"+
+        "\uffff\1\156\11\uffff\1\171\1\uffff\1\u0082\4\uffff\1\u0088\1\u008d"+
+        "\3\uffff\1\u0090\1\u0092\5\uffff\1\u0097\2\uffff\1\75\3\uffff\1"+
+        "\51\1\56\1\uffff\1\54\1\57\1\53\1\uffff\1\u00b7\1\u00b4\1\u00b6"+
+        "\1\u00bd\1\u00b9\1\u00b2\1\u00b1\6\uffff\1\147\12\uffff\1\106\1"+
+        "\102\1\101\14\uffff\1\u00a3\12\uffff\1\u009e\3\uffff\1\122\11\uffff"+
+        "\1\132\1\133\15\uffff\1\173\12\uffff\1\u0095\1\u0098\1\u0099\1\u009a"+
+        "\4\uffff\1\51\1\52\1\57\4\uffff\1\150\2\uffff\1\145\1\uffff\1\u0086"+
+        "\1\u0085\1\uffff\1\u0087\1\103\13\uffff\1\114\25\uffff\1\120\3\uffff"+
+        "\1\135\1\134\2\uffff\1\154\2\uffff\1\161\10\uffff\1\u0081\3\uffff"+
+        "\1\u0089\3\uffff\1\u008f\6\uffff\1\52\3\uffff\1\61\1\uffff\1\153"+
+        "\2\uffff\1\63\3\uffff\1\65\10\uffff\1\110\7\uffff\1\u00a1\2\uffff"+
+        "\1\u009f\2\uffff\1\u00a9\2\uffff\1\127\6\uffff\1\140\3\uffff\1\162"+
+        "\2\uffff\1\177\1\uffff\1\175\1\uffff\1\172\11\uffff\1\166\1\165"+
+        "\4\uffff\1\144\1\uffff\1\105\1\104\4\uffff\1\70\1\uffff\1\66\2\uffff"+
+        "\1\112\11\uffff\1\u009c\1\uffff\1\u00aa\1\uffff\1\130\4\uffff\1"+
+        "\137\2\uffff\1\155\6\uffff\1\u008c\3\uffff\1\u0096\1\76\1\74\2\uffff"+
+        "\1\152\1\151\1\u0084\1\64\1\uffff\1\72\4\uffff\1\u00ac\2\uffff\1"+
+        "\u00a7\1\u00a5\1\u00a0\5\uffff\1\121\1\116\1\uffff\1\136\2\uffff"+
+        "\1\u0080\1\176\1\174\1\170\6\uffff\1\u00b8\1\u00bb\1\71\3\uffff"+
+        "\1\111\5\uffff\1\u00a6\1\124\3\uffff\1\u008b\1\u008a\1\uffff\1\u008e"+
+        "\1\uffff\1\u00ba\1\u00bc\1\uffff\1\67\3\uffff\1\u00a2\2\uffff\1"+
+        "\125\3\uffff\1\u0093\1\73\1\uffff\1\u00a4\1\uffff\1\u009b\1\u009d"+
+        "\4\uffff\1\u00a8\1\157\1\uffff\1\u00b3\2\uffff\1\115\1\160";
     public static final String DFA31_specialS =
-        "\u036c\uffff}>";
+        "\u0381\uffff}>";
     public static final String[] DFA31_transition = {
         "\1\11\1\1\1\uffff\1\11\1\2\22\uffff\1\11\1\57\1\3\2\uffff\1\24\1"+
         "\12\1\3\1\22\1\30\1\13\1\25\1\15\1\23\1\10\1\26\12\4\1\14\1\1\1"+
@@ -8678,12 +8973,12 @@ public class FortranLexer extends Lexer {
         "",
         "\1\1",
         "",
-        "\1\62\1\uffff\12\4\12\uffff\1\63\1\61\36\uffff\1\63\1\61",
-        "\1\64\4\uffff\1\64\31\uffff\1\67\7\uffff\1\66\2\uffff\1\65",
-        "\1\72\4\uffff\1\72\46\uffff\1\70\1\uffff\1\71\4\uffff\1\73",
+        "\1\62\1\uffff\12\4\12\uffff\1\61\1\63\36\uffff\1\61\1\63",
+        "\1\64\4\uffff\1\64\31\uffff\1\67\7\uffff\1\65\2\uffff\1\66",
+        "\1\71\4\uffff\1\71\46\uffff\1\73\1\uffff\1\70\4\uffff\1\72",
         "\1\74\4\uffff\1\74",
-        "\12\107\7\uffff\1\103\3\105\1\100\1\104\1\102\4\105\1\76\1\105\1"+
-        "\75\1\77\4\105\1\101\6\105\6\uffff\32\105",
+        "\12\107\7\uffff\1\103\3\105\1\101\1\102\1\75\4\105\1\100\1\105\1"+
+        "\104\1\76\4\105\1\77\6\105\6\uffff\32\105",
         "",
         "",
         "\1\110",
@@ -8697,56 +8992,56 @@ public class FortranLexer extends Lexer {
         "",
         "",
         "",
-        "\1\124\15\uffff\1\123",
+        "\1\123\15\uffff\1\124",
         "",
         "",
         "\1\126",
         "\1\130",
-        "\1\133\6\uffff\1\132\1\131",
+        "\1\132\6\uffff\1\133\1\131",
         "\1\134",
-        "\1\135\6\uffff\1\140\3\uffff\1\136\2\uffff\1\137\11\uffff\1\141",
+        "\1\136\6\uffff\1\141\3\uffff\1\140\2\uffff\1\135\11\uffff\1\137",
         "\1\142",
-        "\1\144\11\uffff\1\145\6\uffff\1\143",
+        "\1\145\11\uffff\1\144\6\uffff\1\143",
         "\1\64\4\uffff\1\64",
-        "\1\147\3\uffff\1\146\3\uffff\1\150\5\uffff\1\151",
-        "\1\154\1\uffff\1\152\2\uffff\1\153\6\uffff\1\155",
-        "\1\156\2\uffff\1\161\2\uffff\1\157\5\uffff\1\160",
-        "\1\163\11\uffff\1\162",
+        "\1\150\3\uffff\1\147\3\uffff\1\151\5\uffff\1\146",
+        "\1\154\1\uffff\1\152\2\uffff\1\155\6\uffff\1\153",
+        "\1\157\2\uffff\1\160\2\uffff\1\156\5\uffff\1\161",
+        "\1\162\11\uffff\1\163",
         "\1\164",
         "\1\166\15\uffff\1\165\5\uffff\1\167",
-        "\1\72\4\uffff\1\72",
-        "\1\173\15\uffff\1\171\2\uffff\1\170\2\uffff\1\172",
-        "\1\176\3\uffff\1\174\16\uffff\1\175\1\177",
-        "\1\u0080\6\uffff\1\u0083\6\uffff\1\u0081\11\uffff\1\u0082",
-        "\1\u0085\4\uffff\1\u0084",
-        "\1\u0086\15\uffff\1\u0087",
+        "\1\71\4\uffff\1\71",
+        "\1\171\15\uffff\1\173\2\uffff\1\170\2\uffff\1\172",
+        "\1\175\3\uffff\1\174\16\uffff\1\176\1\177",
+        "\1\u0080\6\uffff\1\u0081\6\uffff\1\u0082\11\uffff\1\u0083",
+        "\1\u0084\4\uffff\1\u0085",
+        "\1\u0087\15\uffff\1\u0086",
         "\1\u0089\6\uffff\1\u0088\11\uffff\1\u008a",
         "",
         "",
         "",
         "",
-        "\12\u008b\12\uffff\1\63\37\uffff\1\63",
+        "\12\u008b\12\uffff\1\61\37\uffff\1\61",
         "",
         "",
         "\1\u008c",
         "\1\u008d",
         "\1\u008e",
-        "\1\u008f",
-        "\1\u0091\16\uffff\1\u0090",
+        "\1\u0090\16\uffff\1\u008f",
         "",
+        "\1\u0091",
         "\1\u0092",
         "",
-        "\1\105\22\uffff\4\105\1\u0093\11\105\1\u0094\13\105\6\uffff\32\105",
-        "\1\105\22\uffff\4\105\1\u0095\16\105\1\u0096\6\105\6\uffff\32\105",
-        "\1\105\22\uffff\21\105\1\u0097\10\105\6\uffff\32\105",
-        "\1\105\22\uffff\20\105\1\u0098\11\105\6\uffff\32\105",
-        "\1\105\22\uffff\21\105\1\u0099\10\105\6\uffff\32\105",
-        "\1\105\22\uffff\4\105\1\u009a\16\105\1\u009b\6\105\6\uffff\32\105",
-        "\1\105\22\uffff\15\105\1\u009c\14\105\6\uffff\32\105",
-        "\1\105\22\uffff\1\u009d\31\105\6\uffff\32\105",
+        "\1\105\22\uffff\4\105\1\u0093\16\105\1\u0094\6\105\6\uffff\32\105",
+        "\1\105\22\uffff\21\105\1\u0095\10\105\6\uffff\32\105",
+        "\1\105\22\uffff\21\105\1\u0096\10\105\6\uffff\32\105",
+        "\1\105\22\uffff\4\105\1\u0097\16\105\1\u0098\6\105\6\uffff\32\105",
+        "\1\105\22\uffff\20\105\1\u0099\11\105\6\uffff\32\105",
+        "\1\105\22\uffff\1\u009a\31\105\6\uffff\32\105",
+        "\1\105\22\uffff\15\105\1\u009b\14\105\6\uffff\32\105",
+        "\1\105\22\uffff\4\105\1\u009c\11\105\1\u009d\13\105\6\uffff\32\105",
         "",
         "",
-        "\12\107\12\uffff\1\63\37\uffff\1\63",
+        "\12\107\12\uffff\1\61\37\uffff\1\61",
         "",
         "",
         "",
@@ -8764,111 +9059,111 @@ public class FortranLexer extends Lexer {
         "\1\u009f\7\uffff\1\u009e",
         "",
         "\1\u00a0",
-        "\12\56\7\uffff\16\56\1\u00a2\1\56\1\u00a3\2\56\1\u00a1\6\56\4\uffff"+
+        "\12\56\7\uffff\16\56\1\u00a3\1\56\1\u00a2\2\56\1\u00a1\6\56\4\uffff"+
         "\1\56\1\uffff\32\56",
-        "\1\u00a5",
         "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
-        "\1\u00a8\1\uffff\1\u00ab\17\uffff\1\u00aa\1\u00a9\2\uffff\1\u00a7",
-        "\1\u00ad\6\uffff\1\u00ac",
-        "\1\u00ae\15\uffff\1\u00af",
-        "\1\u00b1\1\u00b0",
-        "\1\u00b2",
+        "\1\u00a6",
+        "\1\u00a9\1\uffff\1\u00aa\17\uffff\1\u00a8\1\u00a7\2\uffff\1\u00ab",
+        "\1\u00ac\1\u00ad",
+        "\1\u00ae\6\uffff\1\u00af",
+        "\1\u00b0",
+        "\1\u00b2\15\uffff\1\u00b1",
         "\1\u00b3",
         "\1\u00b4",
         "\1\u00b5\5\uffff\1\u00b6",
         "\1\u00b7",
         "\1\u00b8",
-        "\1\u00ba\4\uffff\1\u00b9",
-        "\1\u00bb",
-        "\1\u00bc",
-        "\12\56\7\uffff\24\56\1\u00bd\5\56\4\uffff\1\56\1\uffff\32\56",
-        "\1\u00bf\17\uffff\1\u00c1\1\u00c0",
-        "\1\u00c2",
-        "\1\u00c3\15\uffff\1\u00c4",
-        "\1\u00c6\12\uffff\1\u00c5",
-        "\1\u00c8\1\uffff\1\u00c7",
-        "\1\u00c9",
+        "\12\56\7\uffff\24\56\1\u00b9\5\56\4\uffff\1\56\1\uffff\32\56",
+        "\1\u00bb\4\uffff\1\u00bc",
+        "\1\u00bd",
+        "\1\u00be",
+        "\1\u00bf\17\uffff\1\u00c0\1\u00c1",
+        "\1\u00c3\12\uffff\1\u00c2",
+        "\1\u00c5\15\uffff\1\u00c4",
+        "\1\u00c6",
+        "\1\u00c7",
+        "\1\u00c9\1\uffff\1\u00c8",
         "\1\u00ca",
         "\1\u00cb",
-        "\12\56\7\uffff\23\56\1\u00cc\6\56\4\uffff\1\56\1\uffff\32\56",
-        "\1\u00ce",
+        "\1\u00cc",
+        "\12\56\7\uffff\23\56\1\u00cd\6\56\4\uffff\1\56\1\uffff\32\56",
         "\1\u00cf",
         "\1\u00d0\1\uffff\1\u00d1",
         "\1\u00d2",
         "\1\u00d3",
-        "\1\u00d4\3\uffff\1\u00d6\5\uffff\1\u00d5",
-        "\1\u00d7",
-        "\1\u00d8\17\uffff\1\u00d9",
-        "\1\u00db\1\u00da",
+        "\1\u00d5\3\uffff\1\u00d6\5\uffff\1\u00d4",
+        "\1\u00d8\1\u00d7",
+        "\1\u00da\17\uffff\1\u00d9",
+        "\1\u00db",
         "\1\u00dc\4\uffff\1\u00dd",
-        "\1\u00de\1\uffff\1\u00df",
-        "\1\u00e0",
+        "\1\u00de",
+        "\1\u00e0\1\uffff\1\u00df",
         "\1\u00e1",
         "\1\u00e2",
+        "\1\u00e3",
         "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
-        "\1\u00e4",
         "\1\u00e5",
         "\1\u00e6",
         "\1\u00e7",
         "\1\u00e8",
         "\1\u00e9",
-        "\1\u00eb\3\uffff\1\u00ea",
+        "\1\u00ea\3\uffff\1\u00eb",
         "\1\u00ec",
         "\1\u00ed",
-        "\12\u008b\12\uffff\1\63\37\uffff\1\63",
+        "\12\u008b\12\uffff\1\61\37\uffff\1\61",
         "\1\u00ee",
         "\1\u00ef",
         "\1\u00f0",
         "\1\u00f1",
-        "\1\u00f2",
-        "\1\u00f3\3\uffff\1\u00f4",
+        "\1\u00f3\3\uffff\1\u00f2",
         "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
-        "\1\u00f6\22\uffff\20\105\1\u00f7\11\105\6\uffff\32\105",
-        "\1\105\22\uffff\23\105\1\u00f8\6\105\6\uffff\32\105",
-        "\1\u00f9\22\uffff\32\105\6\uffff\32\105",
+        "\1\u00f5",
+        "\1\u00f6\22\uffff\32\105\6\uffff\32\105",
+        "\1\u00f7\22\uffff\32\105\6\uffff\32\105",
+        "\1\u00f8\22\uffff\32\105\6\uffff\32\105",
+        "\1\105\22\uffff\24\105\1\u00f9\5\105\6\uffff\32\105",
         "\1\u00fa\22\uffff\32\105\6\uffff\32\105",
         "\1\u00fb\22\uffff\32\105\6\uffff\32\105",
-        "\1\u00fc\22\uffff\25\105\1\u00fd\4\105\6\uffff\32\105",
-        "\1\105\22\uffff\24\105\1\u00fe\5\105\6\uffff\32\105",
-        "\1\u00ff\22\uffff\32\105\6\uffff\32\105",
-        "\1\u0100\22\uffff\32\105\6\uffff\32\105",
-        "\1\105\22\uffff\3\105\1\u0101\26\105\6\uffff\32\105",
-        "\1\105\22\uffff\13\105\1\u0102\16\105\6\uffff\32\105",
+        "\1\u00fd\22\uffff\25\105\1\u00fc\4\105\6\uffff\32\105",
+        "\1\105\22\uffff\13\105\1\u00fe\16\105\6\uffff\32\105",
+        "\1\105\22\uffff\3\105\1\u00ff\26\105\6\uffff\32\105",
+        "\1\u0100\22\uffff\20\105\1\u0101\11\105\6\uffff\32\105",
+        "\1\105\22\uffff\23\105\1\u0102\6\105\6\uffff\32\105",
         "\1\u0103",
         "",
         "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
-        "\1\u0105\14\uffff\1\u0106",
+        "\1\u0106\14\uffff\1\u0105",
         "\1\u0107",
         "\1\u0108",
         "",
-        "\1\u0109\2\uffff\1\u010a",
         "",
+        "\1\u010a\2\uffff\1\u0109",
         "\1\u010b",
-        "\1\u010c\7\uffff\1\u010d",
-        "\1\u010e",
+        "\1\u010c",
+        "\1\u010d\7\uffff\1\u010e",
         "\1\u010f",
         "\1\u0110",
-        "\1\u0111",
-        "\1\u0112",
+        "\1\u0111\2\uffff\1\u0112",
         "\1\u0113",
         "\1\u0114",
         "\1\u0115",
-        "\1\u0117\2\uffff\1\u0116",
+        "\1\u0116",
+        "\1\u0117",
         "\1\u0118",
         "\1\u0119",
         "\1\u011a",
-        "\1\u011c\5\uffff\1\u011b",
+        "\1\u011b\5\uffff\1\u011c",
         "\1\u011d",
         "\1\u011e",
         "\1\u011f",
-        "\1\u0121\3\uffff\1\u0120",
-        "\1\u0122",
-        "\1\u0123",
+        "\1\u0120",
+        "",
+        "\1\u0121",
+        "\1\u0122\3\uffff\1\u0123",
         "\1\u0124",
         "\1\u0125",
-        "",
-        "\12\56\7\uffff\1\u012a\1\u0126\1\56\1\u0129\1\u0130\1\u0128\2\56"+
-        "\1\u012b\3\56\1\u012f\2\56\1\u012d\2\56\1\u012c\1\u012e\2\56\1\u0127"+
+        "\12\56\7\uffff\1\u012a\1\u012c\1\56\1\u012d\1\u012b\1\u0129\2\56"+
+        "\1\u0126\3\56\1\u0128\2\56\1\u012e\2\56\1\u0127\1\u012f\2\56\1\u0130"+
         "\3\56\4\uffff\1\56\1\uffff\32\56",
         "\1\u0132",
         "\1\u0133",
@@ -8877,22 +9172,22 @@ public class FortranLexer extends Lexer {
         "\1\u0136",
         "\1\u0137",
         "\1\u0138",
-        "\1\u0139",
-        "\1\u013a",
-        "\1\u013c\13\uffff\1\u013b",
+        "\1\u013a\13\uffff\1\u0139",
+        "\1\u013b",
+        "\1\u013c",
         "\1\u013d",
         "\1\u013e",
         "\1\u013f",
-        "",
         "\1\u0140",
+        "",
         "\1\u0141",
         "\1\u0143\31\uffff\1\u0142",
         "\1\u0144",
         "\1\u0145",
         "\1\u0146",
-        "\1\u0147",
-        "\1\u0149\3\uffff\1\u0148\14\uffff\1\u014a",
-        "\1\u014b\7\uffff\1\u014c",
+        "\1\u0148\3\uffff\1\u0149\14\uffff\1\u0147",
+        "\1\u014a",
+        "\1\u014c\7\uffff\1\u014b",
         "\1\u014d",
         "\1\u014e",
         "\1\u014f",
@@ -8905,11 +9200,11 @@ public class FortranLexer extends Lexer {
         "\1\u0156",
         "\1\u0157",
         "\1\u0158",
-        "",
         "\1\u0159",
+        "",
         "\1\u015a",
+        "\1\u015b",
         "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
-        "\1\u015c",
         "\1\u015d",
         "\1\u015e",
         "\1\u015f",
@@ -8919,46 +9214,44 @@ public class FortranLexer extends Lexer {
         "\1\u0163",
         "\1\u0164",
         "\1\u0165",
-        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\1\u0166",
         "\1\u0167",
         "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
-        "\1\u0169",
         "",
-        "",
-        "\1\105\22\uffff\25\105\1\u016b\4\105\6\uffff\32\105",
-        "\1\u016c\22\uffff\32\105\6\uffff\32\105",
+        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
         "",
         "",
         "",
-        "",
-        "\1\u0171\22\uffff\32\105\6\uffff\32\105",
-        "\1\105\22\uffff\4\105\1\u0172\25\105\6\uffff\32\105",
+        "\1\105\22\uffff\4\105\1\u016d\25\105\6\uffff\32\105",
         "",
         "",
-        "\1\u0175\22\uffff\32\105\6\uffff\32\105",
-        "\1\105\22\uffff\22\105\1\u0176\7\105\6\uffff\32\105",
-        "\1\u0177\1\uffff\1\u0179\1\u017a\13\uffff\1\u0178",
+        "\1\u0170\22\uffff\32\105\6\uffff\32\105",
         "",
-        "\1\u017b\6\uffff\1\u017c\3\uffff\1\u017d",
+        "\1\105\22\uffff\22\105\1\u0172\7\105\6\uffff\32\105",
+        "\1\u0173\22\uffff\32\105\6\uffff\32\105",
+        "",
+        "\1\105\22\uffff\25\105\1\u0175\4\105\6\uffff\32\105",
+        "\1\u0176\22\uffff\32\105\6\uffff\32\105",
+        "\1\u0179\1\uffff\1\u017b\1\u017d\1\uffff\1\u0177\2\uffff\1\u017a"+
+        "\6\uffff\1\u0178\6\uffff\1\u017c",
+        "",
         "\1\u017e",
-        "\1\u017f",
-        "\1\u0180",
-        "\1\u0181",
+        "\1\u017f\6\uffff\1\u0180\3\uffff\1\u0181",
         "\1\u0182",
         "\1\u0183",
-        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
-        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\1\u0184",
+        "\1\u0185",
         "\1\u0186",
         "\1\u0187",
-        "\1\u0188",
         "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
         "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\1\u018a",
         "\1\u018b",
         "\1\u018c",
-        "\1\u018d\7\uffff\1\u018e",
-        "\1\u018f",
-        "\1\u0190",
-        "\1\u0191",
+        "\1\u018d",
+        "\1\u018f\7\uffff\1\u018e",
+        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
         "\1\u0192",
         "\1\u0193",
         "\1\u0194",
@@ -8969,31 +9262,31 @@ public class FortranLexer extends Lexer {
         "\1\u0199",
         "\1\u019a",
         "\1\u019b",
-        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\1\u019c",
         "\1\u019d",
         "\1\u019e",
         "\1\u019f",
-        "\1\u01a0",
-        "\1\u01a1\5\uffff\1\u01a2\5\uffff\1\u01a3",
-        "\1\u01a4",
-        "\1\u01a5",
-        "\1\u01a6\7\uffff\1\u01a7",
-        "\1\u01a9\17\uffff\1\u01a8",
+        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\1\u01a1",
+        "\1\u01a2\7\uffff\1\u01a3",
+        "\1\u01a5\17\uffff\1\u01a4",
+        "\1\u01a6",
+        "\1\u01a8\5\uffff\1\u01a7\5\uffff\1\u01a9",
         "\1\u01aa",
         "\1\u01ab",
         "\1\u01ac",
         "\1\u01ad",
-        "",
-        "\12\56\7\uffff\4\56\1\u01ae\25\56\4\uffff\1\56\1\uffff\32\56",
+        "\1\u01ae",
+        "\1\u01af",
         "\1\u01b0",
+        "",
         "\1\u01b1",
-        "\1\u01b2",
-        "\12\56\7\uffff\10\56\1\u01b3\15\56\1\u01b4\3\56\4\uffff\1\56\1\uffff"+
+        "\12\56\7\uffff\4\56\1\u01b2\25\56\4\uffff\1\56\1\uffff\32\56",
+        "\1\u01b4\3\uffff\1\u01b5",
+        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\12\56\7\uffff\10\56\1\u01b8\15\56\1\u01b7\3\56\4\uffff\1\56\1\uffff"+
         "\32\56",
-        "\1\u01b7\3\uffff\1\u01b6",
-        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
-        "\1\u01b9",
-        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\1\u01ba",
         "\1\u01bb",
         "\1\u01bc",
         "\1\u01bd",
@@ -9001,11 +9294,11 @@ public class FortranLexer extends Lexer {
         "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
         "\1\u01c0",
         "\1\u01c1",
-        "\1\u01c3\5\uffff\1\u01c2",
+        "\1\u01c2",
         "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
-        "\1\u01c5",
-        "\1\u01c6",
-        "\1\u01c7",
+        "\1\u01c4",
+        "\1\u01c5\5\uffff\1\u01c6",
+        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
         "\1\u01c8",
         "\1\u01c9",
         "\1\u01ca",
@@ -9014,36 +9307,34 @@ public class FortranLexer extends Lexer {
         "\1\u01cd",
         "\1\u01ce",
         "\1\u01cf",
-        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\1\u01d0",
         "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
         "\1\u01d2",
-        "\1\u01d3",
+        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
         "\1\u01d4",
         "\1\u01d5",
+        "\1\u01d6",
+        "\1\u01d7",
         "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
         "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
-        "\1\u01d8",
-        "\1\u01d9",
-        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
-        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
-        "",
+        "\1\u01da",
+        "\1\u01db",
         "\1\u01dc",
-        "\1\u01dd",
-        "\1\u01de",
-        "\1\u01df",
-        "\1\u01e0",
         "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
-        "\1\u01e2",
-        "\12\56\7\uffff\3\56\1\u01e3\26\56\4\uffff\1\56\1\uffff\32\56",
+        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\1\u01df",
         "",
+        "\1\u01e0",
+        "\1\u01e1",
+        "\1\u01e2",
+        "\1\u01e3",
+        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
         "\1\u01e5",
         "",
-        "\1\u01e6",
-        "",
-        "\1\u01e7",
-        "",
-        "\1\u01e8\22\uffff\32\105\6\uffff\32\105",
-        "",
+        "\12\56\7\uffff\3\56\1\u01e6\26\56\4\uffff\1\56\1\uffff\32\56",
+        "\1\u01e8",
+        "\1\u01e9",
+        "\1\u01ea",
         "",
         "",
         "",
@@ -9053,45 +9344,44 @@ public class FortranLexer extends Lexer {
         "",
         "",
         "",
+        "",
         "\1\105\22\uffff\4\105\1\u01ed\25\105\6\uffff\32\105",
-        "\1\u01ef\1\u01ee",
         "",
-        "\1\u01f1\6\uffff\1\u01f0",
         "",
-        "\1\u01f2",
-        "\1\u01f3",
-        "\1\u01f4",
-        "\1\u01f5",
-        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
-        "\1\u01f7",
-        "\1\u01f8",
+        "\1\u01ef\22\uffff\32\105\6\uffff\32\105",
+        "",
+        "\1\u01f1",
+        "",
+        "\1\u01f2\5\uffff\1\u01f4\1\u01f3",
+        "\1\u01f6\7\uffff\1\u01f5",
+        "\1\u01f7\6\uffff\1\u01f8",
         "\1\u01f9",
+        "",
         "\1\u01fa",
-        "",
-        "",
         "\1\u01fb",
         "\1\u01fc",
         "\1\u01fd",
-        "",
-        "",
-        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\1\u01fe",
         "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
         "\1\u0200",
         "\1\u0201",
         "\1\u0202",
         "\1\u0203",
+        "",
+        "",
         "\1\u0204",
-        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\1\u0205",
         "\1\u0206",
         "\1\u0207",
         "\1\u0208",
         "\1\u0209",
-        "\1\u020a",
-        "\1\u020b",
-        "\1\u020c",
+        "",
+        "",
+        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
         "\1\u020d",
         "\1\u020e",
-        "",
         "\1\u020f",
         "\1\u0210",
         "\1\u0211",
@@ -9099,10 +9389,11 @@ public class FortranLexer extends Lexer {
         "\1\u0213",
         "\1\u0214",
         "\1\u0215",
-        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\1\u0216",
         "\1\u0217",
+        "",
+        "\1\u0218",
         "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
-        "\1\u0219",
         "\1\u021a",
         "\1\u021b",
         "\1\u021c",
@@ -9110,172 +9401,168 @@ public class FortranLexer extends Lexer {
         "\1\u021e",
         "\1\u021f",
         "\1\u0220",
-        "",
-        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\1\u0221",
         "\1\u0222",
         "\1\u0223",
-        "\1\u0224",
+        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
         "\1\u0225",
-        "",
         "\1\u0226",
         "\1\u0227",
-        "",
         "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
-        "",
         "\1\u0229",
+        "",
         "\1\u022a",
         "\1\u022b",
-        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
         "",
+        "\1\u022c",
         "\1\u022d",
+        "",
         "\1\u022e",
         "\1\u022f",
         "\1\u0230",
-        "",
         "\1\u0231",
-        "\1\u0232",
-        "\1\u0233",
+        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "",
+        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
         "\1\u0234",
         "\1\u0235",
+        "",
         "\1\u0236",
         "\1\u0237",
-        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\1\u0238",
+        "",
         "\1\u0239",
         "\1\u023a",
         "\1\u023b",
-        "",
-        "",
         "\1\u023c",
         "\1\u023d",
         "\1\u023e",
         "\1\u023f",
-        "",
-        "",
         "\1\u0240",
-        "\1\u0241",
-        "",
+        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
         "",
         "\1\u0242",
-        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "",
+        "\1\u0243",
         "\1\u0244",
-        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
-        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\1\u0245",
+        "\1\u0246",
         "",
-        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "",
+        "\1\u0247",
         "\1\u0248",
-        "",
         "\1\u0249",
+        "",
+        "",
         "\1\u024a",
         "\1\u024b",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "\1\u024e\22\uffff\32\105\6\uffff\32\105",
-        "",
-        "",
-        "",
-        "",
-        "\1\u024f",
         "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "",
+        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\1\u0250",
+        "",
         "\1\u0251",
         "\1\u0252",
-        "",
         "\1\u0253",
-        "\1\u0254",
-        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
-        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
-        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
-        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "",
+        "",
+        "\1\u0255\22\uffff\32\105\6\uffff\32\105",
+        "",
+        "",
+        "",
+        "\1\u0257",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "\1\u0258",
         "\1\u0259",
-        "",
-        "",
         "\1\u025a",
-        "\1\u025b",
-        "\1\u025c",
         "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
-        "\1\u025e",
+        "\1\u025c",
+        "\1\u025d",
         "",
+        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
         "\1\u025f",
-        "\1\u0260",
-        "\1\u0261",
+        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
         "\1\u0262",
-        "\1\u0263",
-        "\1\u0264",
+        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
         "\1\u0265",
         "\1\u0266",
         "\1\u0267",
+        "",
+        "",
+        "",
         "\1\u0268",
-        "\12\56\7\uffff\17\56\1\u0269\12\56\4\uffff\1\56\1\uffff\32\56",
+        "\1\u0269",
+        "\1\u026a",
         "\1\u026b",
         "\1\u026c",
         "\1\u026d",
         "\1\u026e",
-        "\1\u026f",
-        "",
-        "\1\u0270",
-        "",
+        "\12\56\7\uffff\17\56\1\u026f\12\56\4\uffff\1\56\1\uffff\32\56",
         "\1\u0271",
         "\1\u0272",
         "\1\u0273",
         "\1\u0274",
+        "",
         "\1\u0275",
         "\1\u0276",
         "\1\u0277",
         "\1\u0278",
-        "",
         "\1\u0279",
         "\1\u027a",
-        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\1\u027b",
         "\1\u027c",
         "\1\u027d",
         "\1\u027e",
         "",
-        "\12\56\7\uffff\23\56\1\u027f\6\56\4\uffff\1\56\1\uffff\32\56",
-        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
-        "\1\u0282",
+        "\1\u027f",
+        "\1\u0280",
+        "\1\u0281",
         "",
+        "\1\u0282",
         "\1\u0283",
-        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\1\u0284",
         "\1\u0285",
-        "\1\u0286",
         "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\1\u0287",
         "\1\u0288",
-        "\1\u0289",
-        "\1\u028a",
-        "\1\u028b",
+        "\12\56\7\uffff\23\56\1\u0289\6\56\4\uffff\1\56\1\uffff\32\56",
+        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "",
+        "",
         "\1\u028c",
         "\1\u028d",
-        "",
-        "\1\u028e",
-        "\1\u028f",
         "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
-        "\1\u0291",
-        "\12\56\7\uffff\2\56\1\u0292\20\56\1\u0293\6\56\4\uffff\1\56\1\uffff"+
-        "\32\56",
+        "\1\u028f",
+        "\1\u0290",
+        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\1\u0292",
+        "\1\u0293",
+        "\1\u0294",
         "\1\u0295",
         "\1\u0296",
         "\1\u0297",
-        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\1\u0298",
+        "",
         "\1\u0299",
-        "",
-        "\1\u029a",
-        "",
-        "",
-        "",
+        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
         "\1\u029b",
-        "\1\u029c",
-        "\1\u029d",
-        "\1\u029e",
-        "",
-        "",
-        "",
-        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
-        "",
+        "\12\56\7\uffff\2\56\1\u029d\20\56\1\u029c\6\56\4\uffff\1\56\1\uffff"+
+        "\32\56",
+        "\1\u029f",
+        "\1\u02a0",
         "\1\u02a1",
-        "\1\u02a2",
         "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\1\u02a3",
         "\1\u02a4",
         "",
         "",
@@ -9284,273 +9571,303 @@ public class FortranLexer extends Lexer {
         "\1\u02a5",
         "\1\u02a6",
         "\1\u02a7",
-        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\1\u02a8",
         "",
-        "\1\u02a9",
-        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "",
+        "",
+        "\1\u02aa",
         "\1\u02ab",
         "\1\u02ac",
-        "\1\u02ad",
+        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "",
         "\1\u02ae",
-        "\1\u02b0\3\uffff\1\u02af",
+        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "",
+        "\1\u02b0",
+        "",
+        "",
         "\1\u02b1",
+        "",
+        "",
         "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
         "\1\u02b3",
         "\1\u02b4",
         "\1\u02b5",
-        "",
-        "\1\u02b6",
-        "\1\u02b7",
         "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\1\u02b7",
+        "\1\u02b8",
         "\1\u02b9",
-        "\1\u02ba",
-        "\1\u02bb",
+        "\1\u02bb\3\uffff\1\u02ba",
         "\1\u02bc",
         "\1\u02bd",
+        "",
         "\1\u02be",
-        "\1\u02bf",
         "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\1\u02c0",
         "\1\u02c1",
-        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\1\u02c2",
         "\1\u02c3",
         "\1\u02c4",
         "\1\u02c5",
-        "",
         "\1\u02c6",
-        "\1\u02c7",
         "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\1\u02c8",
         "\1\u02c9",
-        "",
-        "",
-        "\1\u02ca",
         "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
-        "",
+        "\1\u02cb",
         "\1\u02cc",
-        "\1\u02cd",
-        "",
+        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
         "\1\u02ce",
+        "\1\u02cf",
         "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
-        "\1\u02d0",
-        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\1\u02d1",
         "\1\u02d2",
+        "",
         "\1\u02d3",
-        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
-        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\1\u02d4",
+        "\1\u02d5",
+        "",
         "",
         "\1\u02d6",
-        "\1\u02d7",
+        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "",
         "\1\u02d8",
-        "",
         "\1\u02d9",
-        "\1\u02da",
-        "\1\u02db",
         "",
+        "\1\u02da",
+        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
         "\1\u02dc",
         "\1\u02dd",
-        "\1\u02de",
+        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
         "\1\u02df",
         "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\1\u02e1",
+        "",
         "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
-        "",
-        "",
-        "\1\u02e2",
         "\1\u02e3",
+        "\1\u02e4",
         "",
-        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
         "\1\u02e5",
-        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
-        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\1\u02e6",
+        "\1\u02e7",
         "",
         "\1\u02e8",
-        "",
         "\1\u02e9",
         "\1\u02ea",
         "\1\u02eb",
         "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
         "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "",
         "\1\u02ee",
-        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
-        "",
+        "\1\u02ef",
         "\1\u02f0",
-        "\1\u02f1",
-        "\1\u02f2",
-        "\12\56\7\uffff\3\56\1\u02f3\26\56\4\uffff\1\56\1\uffff\32\56",
-        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
         "",
+        "\1\u02f1",
+        "",
+        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\1\u02f3",
+        "",
+        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
         "\1\u02f6",
+        "",
         "\1\u02f7",
         "\1\u02f8",
         "\1\u02f9",
-        "\1\u02fa",
+        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
         "\1\u02fb",
-        "\1\u02fc",
-        "",
+        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
         "\1\u02fd",
-        "",
         "\1\u02fe",
-        "\1\u02ff",
+        "",
+        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
         "\1\u0300",
         "\1\u0301",
-        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
-        "",
+        "\1\u0302",
         "\1\u0303",
-        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
-        "",
+        "\1\u0304",
         "\1\u0305",
+        "",
         "\1\u0306",
-        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\1\u0307",
         "",
-        "\1\u0308",
-        "",
-        "\1\u0309",
+        "\12\56\7\uffff\3\56\1\u0308\26\56\4\uffff\1\56\1\uffff\32\56",
         "\1\u030a",
         "",
-        "",
-        "\1\u030b",
-        "\1\u030c",
-        "\1\u030d",
         "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\1\u030c",
+        "",
+        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\1\u030e",
         "\1\u030f",
         "\1\u0310",
         "\1\u0311",
         "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
-        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "",
+        "\1\u0313",
+        "\1\u0314",
         "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
         "",
+        "\1\u0316",
+        "\1\u0317",
         "",
-        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
-        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\1\u0318",
         "",
-        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\1\u0319",
         "",
-        "",
-        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
-        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
         "\1\u031a",
         "\1\u031b",
-        "",
-        "",
-        "\1\u031c",
-        "",
+        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
         "\1\u031d",
-        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\1\u031e",
         "\1\u031f",
-        "\1\u0320",
-        "",
-        "",
         "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
-        "\1\u0322",
+        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "",
+        "",
         "\1\u0323",
         "\1\u0324",
-        "\1\u0325",
         "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
-        "\1\u0327",
+        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "",
+        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "",
+        "",
         "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
         "\1\u0329",
-        "\1\u032a",
         "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
-        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\1\u032b",
         "",
-        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\1\u032c",
         "",
+        "\1\u032d",
         "\1\u032e",
-        "\1\u032f",
         "",
         "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\1\u0330",
+        "\1\u0331",
         "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
         "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
         "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
-        "\1\u0334",
         "\1\u0335",
-        "",
         "\1\u0336",
         "\1\u0337",
+        "",
         "\1\u0338",
         "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
+        "\1\u0339",
         "",
         "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
-        "\1\u033a",
-        "\1\u033b",
+        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\1\u033c",
         "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
         "",
-        "\1\u033d",
         "\1\u033e",
-        "",
         "\1\u033f",
-        "\1\u0340",
-        "\1\u0341",
-        "\1\u0342",
         "",
         "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
-        "",
         "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\1\u0344",
         "\1\u0345",
-        "",
-        "",
         "",
         "\1\u0346",
         "\1\u0347",
+        "\1\u0348",
+        "",
+        "",
+        "",
+        "\1\u0349",
+        "\1\u034b\17\uffff\1\u034a",
         "",
         "",
         "",
         "",
         "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
-        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
-        "\1\u034a",
-        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
-        "\1\u034c",
         "",
         "\1\u034d",
+        "\1\u034e",
+        "\1\u034f",
         "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
         "",
-        "\1\u034f",
-        "\1\u0350",
-        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\1\u0351",
         "\1\u0352",
+        "",
+        "",
+        "",
         "\1\u0353",
         "\1\u0354",
-        "",
-        "",
+        "\1\u0355",
         "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
-        "\1\u0356",
-        "\1\u0357",
+        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
         "",
         "",
         "\1\u0358",
         "",
-        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
-        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\1\u0359",
+        "\1\u035a",
         "",
-        "\1\u035b",
-        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "",
+        "",
         "",
         "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\1\u035d",
         "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
         "\1\u035f",
+        "\1\u0361\17\uffff\1\u0360",
         "",
-        "\1\u0360",
-        "\1\u0361",
+        "",
+        "",
         "\1\u0362",
-        "",
-        "",
-        "\1\u0363",
-        "",
-        "",
-        "",
         "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\1\u0364",
+        "",
         "\1\u0365",
-        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\1\u0366",
         "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
         "\1\u0368",
-        "",
         "\1\u0369",
         "",
+        "",
+        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\1\u036b",
+        "\1\u036c",
+        "",
+        "",
+        "\1\u036d",
+        "",
+        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "",
+        "",
+        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "",
+        "\1\u0370",
+        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\1\u0372",
+        "",
+        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "",
+        "\1\u0375",
+        "\1\u0376",
+        "\1\u0377",
+        "",
+        "",
+        "\1\u0378",
+        "",
+        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "",
+        "",
+        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\1\u037b",
+        "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
+        "\1\u037d",
+        "",
+        "",
+        "\1\u037e",
         "",
         "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
         "\12\56\7\uffff\32\56\4\uffff\1\56\1\uffff\32\56",
@@ -9575,7 +9892,7 @@ public class FortranLexer extends Lexer {
             }
         }
         public String getDescription() {
-            return "1:1: Tokens : ( T_EOS | T_CHAR_CONSTANT | T_DIGIT_STRING | BINARY_CONSTANT | OCTAL_CONSTANT | HEX_CONSTANT | REAL_CONSTANT | DOUBLE_CONSTANT | WS | CONTINUE_CHAR | T_ASTERISK | T_COLON | T_COLON_COLON | T_COMMA | T_EQUALS | T_EQ_EQ | T_EQ_GT | T_GREATERTHAN | T_GREATERTHAN_EQ | T_LESSTHAN | T_LESSTHAN_EQ | T_LBRACKET | T_LPAREN | T_MINUS | T_PERCENT | T_PERIOD | T_PLUS | T_POWER | T_SLASH | T_SLASH_EQ | T_SLASH_SLASH | T_RBRACKET | T_RPAREN | T_UNDERSCORE | T_EQ | T_NE | T_LT | T_LE | T_GT | T_GE | T_TRUE | T_FALSE | T_NOT | T_AND | T_OR | T_EQV | T_NEQV | T_XYZ | T_INTEGER | T_REAL | T_COMPLEX | T_CHARACTER | T_LOGICAL | T_ABSTRACT | T_ALLOCATABLE | T_ALLOCATE | T_ASSIGNMENT | T_ASSOCIATE | T_ASYNCHRONOUS | T_BACKSPACE | T_BLOCK | T_BLOCKDATA | T_CALL | T_CASE | T_CLASS | T_CLOSE | T_COMMON | T_CONTAINS | T_CONTINUE | T_CYCLE | T_DATA | T_DEFAULT | T_DEALLOCATE | T_DEFERRED | T_DO | T_DOUBLE | T_DOUBLEPRECISION | T_ELEMENTAL | T_ELSE | T_ELSEIF | T_ELSEWHERE | T_ENTRY | T_ENUM | T_ENUMERATOR | T_EQUIVALENCE | T_EXIT | T_EXTENDS | T_EXTERNAL | T_FILE | T_FINAL | T_FLUSH | T_FORALL | T_FORMAT | T_FORMATTED | T_FUNCTION | T_GENERIC | T_GO | T_GOTO | T_IF | T_IMPLICIT | T_IMPORT | T_IN | T_INOUT | T_INTENT | T_INTERFACE | T_INTRINSIC | T_INQUIRE | T_MODULE | T_NAMELIST | T_NONE | T_NON_INTRINSIC | T_NON_OVERRIDABLE | T_NOPASS | T_NULLIFY | T_ONLY | T_OPEN | T_OPERATOR | T_OPTIONAL | T_OUT | T_PARAMETER | T_PASS | T_POINTER | T_PRINT | T_PRECISION | T_PRIVATE | T_PROCEDURE | T_PROGRAM | T_PROTECTED | T_PUBLIC | T_PURE | T_READ | T_RECURSIVE | T_RESULT | T_RETURN | T_REWIND | T_SAVE | T_SELECT | T_SELECTCASE | T_SELECTTYPE | T_SEQUENCE | T_STOP | T_SUBROUTINE | T_TARGET | T_THEN | T_TO | T_TYPE | T_UNFORMATTED | T_USE | T_VALUE | T_VOLATILE | T_WAIT | T_WHERE | T_WHILE | T_WRITE | T_ENDASSOCIATE | T_ENDBLOCK | T_ENDBLOCKDATA | T_ENDDO | T_ENDENUM | T_ENDFORALL | T_ENDFILE | T_ENDFUNCTION | T_ENDIF | T_ENDINTERFACE | T_ENDMODULE | T_ENDPROGRAM | T_ENDSELECT | T_ENDSUBROUTINE | T_ENDTYPE | T_ENDWHERE | T_END | T_DIMENSION | T_BIND_LPAREN_C | T_DEFINED_OP | T_LABEL_DO_TERMINAL | T_DATA_EDIT_DESC | T_CONTROL_EDIT_DESC | T_CHAR_STRING_EDIT_DESC | T_STMT_FUNCTION | T_ASSIGNMENT_STMT | T_PTR_ASSIGNMENT_STMT | T_ARITHMETIC_IF_STMT | T_IDENT | LINE_COMMENT );";
+            return "1:1: Tokens : ( T_EOS | T_CHAR_CONSTANT | T_DIGIT_STRING | BINARY_CONSTANT | OCTAL_CONSTANT | HEX_CONSTANT | REAL_CONSTANT | DOUBLE_CONSTANT | WS | CONTINUE_CHAR | T_ASTERISK | T_COLON | T_COLON_COLON | T_COMMA | T_EQUALS | T_EQ_EQ | T_EQ_GT | T_GREATERTHAN | T_GREATERTHAN_EQ | T_LESSTHAN | T_LESSTHAN_EQ | T_LBRACKET | T_LPAREN | T_MINUS | T_PERCENT | T_PERIOD | T_PLUS | T_POWER | T_SLASH | T_SLASH_EQ | T_SLASH_SLASH | T_RBRACKET | T_RPAREN | T_UNDERSCORE | T_EQ | T_NE | T_LT | T_LE | T_GT | T_GE | T_TRUE | T_FALSE | T_NOT | T_AND | T_OR | T_EQV | T_NEQV | T_XYZ | T_INTEGER | T_REAL | T_COMPLEX | T_CHARACTER | T_LOGICAL | T_ABSTRACT | T_ALLOCATABLE | T_ALLOCATE | T_ASSIGNMENT | T_ASSOCIATE | T_ASYNCHRONOUS | T_BACKSPACE | T_BLOCK | T_BLOCKDATA | T_CALL | T_CASE | T_CLASS | T_CLOSE | T_COMMON | T_CONTAINS | T_CONTINUE | T_CYCLE | T_DATA | T_DEFAULT | T_DEALLOCATE | T_DEFERRED | T_DO | T_DOUBLE | T_DOUBLEPRECISION | T_ELEMENTAL | T_ELSE | T_ELSEIF | T_ELSEWHERE | T_ENTRY | T_ENUM | T_ENUMERATOR | T_EQUIVALENCE | T_EXIT | T_EXTENDS | T_EXTERNAL | T_FILE | T_FINAL | T_FLUSH | T_FORALL | T_FORMAT | T_FORMATTED | T_FUNCTION | T_GENERIC | T_GO | T_GOTO | T_IF | T_IMPLICIT | T_IMPORT | T_IN | T_INOUT | T_INTENT | T_INTERFACE | T_INTRINSIC | T_INQUIRE | T_MODULE | T_NAMELIST | T_NONE | T_NON_INTRINSIC | T_NON_OVERRIDABLE | T_NOPASS | T_NULLIFY | T_ONLY | T_OPEN | T_OPERATOR | T_OPTIONAL | T_OUT | T_PARAMETER | T_PASS | T_POINTER | T_PRINT | T_PRECISION | T_PRIVATE | T_PROCEDURE | T_PROGRAM | T_PROTECTED | T_PUBLIC | T_PURE | T_READ | T_RECURSIVE | T_RESULT | T_RETURN | T_REWIND | T_SAVE | T_SELECT | T_SELECTCASE | T_SELECTTYPE | T_SEQUENCE | T_STOP | T_SUBROUTINE | T_TARGET | T_THEN | T_TO | T_TYPE | T_UNFORMATTED | T_USE | T_VALUE | T_VOLATILE | T_WAIT | T_WHERE | T_WHILE | T_WRITE | T_ENDASSOCIATE | T_ENDBLOCK | T_ENDBLOCKDATA | T_ENDDO | T_ENDENUM | T_ENDFORALL | T_ENDFILE | T_ENDFUNCTION | T_ENDIF | T_ENDINTERFACE | T_ENDMODULE | T_ENDPROGRAM | T_ENDSELECT | T_ENDSUBROUTINE | T_ENDTYPE | T_ENDWHERE | T_END | T_DIMENSION | T_BIND_LPAREN_C | T_DEFINED_OP | T_LABEL_DO_TERMINAL | T_DATA_EDIT_DESC | T_CONTROL_EDIT_DESC | T_CHAR_STRING_EDIT_DESC | T_STMT_FUNCTION | T_ASSIGNMENT_STMT | T_PTR_ASSIGNMENT_STMT | T_ARITHMETIC_IF_STMT | T_ALLOCATE_STMT_1 | T_WHERE_STMT | T_IF_STMT | T_FORALL_STMT | T_WHERE_CONSTRUCT_STMT | T_FORALL_CONSTRUCT_STMT | T_INQUIRE_STMT_2 | T_IDENT | LINE_COMMENT );";
         }
     }
  
