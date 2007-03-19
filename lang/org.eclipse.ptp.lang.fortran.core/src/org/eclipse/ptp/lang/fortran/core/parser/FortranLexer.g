@@ -4,10 +4,35 @@ options {
     tokenVocab=FortranLexer;
 }
 
+@header {
+/**
+ * Copyright (c) 2005, 2006 Los Alamos National Security, LLC.  This
+ * material was produced under U.S. Government contract DE-
+ * AC52-06NA25396 for Los Alamos National Laboratory (LANL), which is
+ * operated by the Los Alamos National Security, LLC (LANS) for the
+ * U.S. Department of Energy. The U.S. Government has rights to use,
+ * reproduce, and distribute this software. NEITHER THE GOVERNMENT NOR
+ * LANS MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR ASSUMES ANY
+ * LIABILITY FOR THE USE OF THIS SOFTWARE. If software is modified to
+ * produce derivative works, such modified software should be clearly
+ * marked, so as not to confuse it with the version available from
+ * LANL.
+ *  
+ * Additionally, this program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ */
+
+/**
+ *
+ * @author Craig E Rasmussen, Christopher D. Rickett
+ */
+}
+
 @members {
     private Token prevToken;
     private boolean continueFlag;
-    
 
     public boolean isKeyword(Token tmpToken) {
         if(tmpToken.getType() >= T_INTEGER && 
@@ -33,7 +58,7 @@ options {
         tmpToken = super.nextToken();
 
         if(tmpToken.getType() != LINE_COMMENT && 
-            tmpToken.getType() != WS) {
+           tmpToken.getType() != WS) {
             prevToken = tmpToken;
         }
 
@@ -80,9 +105,8 @@ T_EOS
             // also, ignore semicolons that come before any real 
             // statements (is this correct??).  --Rickett, 11.28.06
             if(prevToken == null || 
-                (prevToken != null && prevToken.getType() == T_EOS) ||
-                continueFlag == true) {
-                _channel=99;
+                (prevToken != null && prevToken.getType() == T_EOS)) {
+                channel=99;
             }
 
         }
@@ -94,10 +118,8 @@ T_EOS
             // blank line or a semicolon at the start of the file and 
             // we need to ignore it.  
             if(prevToken == null || 
-                (prevToken != null && prevToken.getType() == T_EOS) ||
-                continueFlag == true) {
-                _channel=99;
-            }
+                (prevToken != null && prevToken.getType() == T_EOS))
+               channel=99;
         }
       ;
                 
@@ -142,7 +164,7 @@ DOUBLE_CONSTANT
 	|	Digit_String  D_Exponent
 	;	
 
-WS  :  (' '|'\r'|'\t'|'\u000C') {_channel=99;}
+WS  :  (' '|'\r'|'\t'|'\u000C') {channel=99;}
     ;
 
 /*
@@ -195,10 +217,12 @@ Digit : '0'..'9' ;
 
 /* if this is a fragment, the generated code never seems to execute the
  * action.  the action needs to set the flag so T_EOS knows whether it should
- * be _channel 99'ed or not (ignor T_EOS if continuation is true, which is the
+ * be channel 99'ed or not (ignor T_EOS if continuation is true, which is the
  * case of the & at the end of a line).
  */
-CONTINUE_CHAR : '&' {continueFlag = !(continueFlag); _channel=99;};
+CONTINUE_CHAR : '&' {continueFlag=true; channel=99; 
+                     input.setLine(input.getLine()+1); 
+                     input.setCharPositionInLine(0);};
 
 /*
  * from fortran03_lexer.g
@@ -416,6 +440,13 @@ T_STMT_FUNCTION
 T_ASSIGNMENT_STMT : '__T_ASSIGNMENT_STMT__' ;
 T_PTR_ASSIGNMENT_STMT : '__T_PTR_ASSIGNMENT_STMT__' ;
 T_ARITHMETIC_IF_STMT : '__T_ARITHMETIC_IF_STMT__' ;
+T_ALLOCATE_STMT_1 : '__T_ALLOCATE_STMT_1__' ;
+T_WHERE_STMT : '__T_WHERE_STMT__' ;
+T_IF_STMT : '__T_IF_STMT__' ;
+T_FORALL_STMT : '__T_FORALL_STMT__' ;
+T_WHERE_CONSTRUCT_STMT : '__T_WHERE_CONSTRUCT_STMT__' ;
+T_FORALL_CONSTRUCT_STMT : '__T_FORALL_CONSTRUCT_STMT__' ;
+T_INQUIRE_STMT_2 : '__T_INQUIRE_STMT_2__' ;
 
 // R304
 T_IDENT
@@ -426,5 +457,5 @@ options {k=1;}
 LINE_COMMENT
     : '!'  ~('\n'|'\r')*  
 
-        {_channel=99;}
+        {channel=99;}
     ;
