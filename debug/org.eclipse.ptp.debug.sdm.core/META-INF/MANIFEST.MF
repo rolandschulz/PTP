@@ -12,6 +12,7 @@ Export-Package: org.eclipse.ptp.debug.external.core,
  org.eclipse.ptp.debug.external.core.cdi.model,
  org.eclipse.ptp.debug.external.core.cdi.model.variable,
  org.eclipse.ptp.debug.external.core.debugger,
+ org.eclipse.ptp.debug.external.core.proxy.event,
  org.eclipse.ptp.debug.external.core.proxy
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
