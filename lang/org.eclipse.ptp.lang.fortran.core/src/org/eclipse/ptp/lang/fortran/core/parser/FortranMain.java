@@ -1,5 +1,23 @@
 package org.eclipse.ptp.lang.fortran.core.parser;
 
+/**
+ * Copyright (c) 2005, 2006 Los Alamos National Security, LLC.  This
+ * material was produced under U.S. Government contract DE-
+ * AC52-06NA25396 for Los Alamos National Laboratory (LANL), which is
+ * operated by the Los Alamos National Security, LLC (LANS) for the
+ * U.S. Department of Energy. The U.S. Government has rights to use,
+ * reproduce, and distribute this software. NEITHER THE GOVERNMENT NOR
+ * LANS MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR ASSUMES ANY
+ * LIABILITY FOR THE USE OF THIS SOFTWARE. If software is modified to
+ * produce derivative works, such modified software should be clearly
+ * marked, so as not to confuse it with the version available from
+ * LANL.
+ *  
+ * Additionally, this program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ */
 import java.io.*;
 import org.antlr.runtime.*;
 import java.util.concurrent.Callable;
@@ -8,21 +26,28 @@ import java.util.concurrent.Callable;
 // stuff for antlrworks.  
 public class FortranMain implements Callable<Boolean> {
 	
-	private FortranTokenStream		tokens;
-	private FortranLexer			lexer;
-	private FortranParser			parser;
-	private FortranLexicalPrepass	prepass;
-	
-	public FortranMain(String filename) throws IOException {
-		this.lexer = new FortranLexer(new FortranStream(filename));
-		this.tokens = new FortranTokenStream(lexer);
-		this.parser = new FortranParser(tokens);
-		this.prepass = new FortranLexicalPrepass(lexer, tokens, parser);
-	}
+   private FortranTokenStream              tokens;
+   private FortranLexer                    lexer;
+   private FortranParser                   parser;
+   private FortranLexicalPrepass           prepass;
+   private String fileName;
+
+   public static final int FREE_FORM = 1;
+   public static final int FIXED_FORM = 2;
+        
+   public FortranMain(String filename) throws IOException {
+      this.lexer = new FortranLexer(new FortranStream(filename));
+      this.tokens = new FortranTokenStream(lexer);
+      this.parser = new FortranParser(tokens);
+      this.prepass = new FortranLexicalPrepass(lexer, tokens, 
+                                               parser);
+      this.fileName = filename;
+   }
 	
    private static boolean parseMainProgram(FortranTokenStream tokens, 
                                            FortranParser parser, 
                                            int start) throws Exception {
+      // try parsing the main program
       parser.main_program();
 
       return parser.hasErrorOccurred;
@@ -31,20 +56,6 @@ public class FortranMain implements Callable<Boolean> {
    private static boolean parseModule(FortranTokenStream tokens, 
                                       FortranParser parser, int start) 
       throws Exception {
-//       System.out.println("found MODULE in first line");
-//       // try parsing the module
-//       parser.module_stmt();
-//       if(parser.hasErrorOccurred == false) {
-//          // rewind tokens to include line we just looked at
-//          tokens.rewind(start);
-//          parser.module();
-//       } else {
-//          // it failed to look like block data, so try matching it as 
-//          // a main program
-//          tokens.rewind(start);
-//          parseMainProgram(tokens, parser, start);
-//       }// end if(module)/else(main program)         
-
       parser.module();
       return parser.hasErrorOccurred;
    }// end parseModule()
@@ -52,20 +63,6 @@ public class FortranMain implements Callable<Boolean> {
    private static boolean parseBlockData(FortranTokenStream tokens, 
                                          FortranParser parser, 
                                          int start) throws Exception {
-//       System.out.println("found BLOCK in first line");
-      // try parsing the block data
-//       parser.block_data_stmt();
-//       if(parser.hasErrorOccurred == false) {
-//          // rewind tokens to include line we just looked at
-//          tokens.rewind(start);
-//          parser.block_data();
-//       } else {
-//          // it failed to look like block data, so try matching it as 
-//          // a main program
-//          tokens.rewind(start);
-//          parseMainProgram(tokens, parser, start);
-//       }// end if(block data)/else(main program)
-
       parser.block_data();
       
       return parser.hasErrorOccurred;
@@ -74,20 +71,6 @@ public class FortranMain implements Callable<Boolean> {
    private static boolean parseSubroutine(FortranTokenStream tokens, 
                                           FortranParser parser, 
                                           int start) throws Exception {
-//       System.out.println("found SUBROUTINE in first line");
-//       // try parsing the subroutine
-//       parser.subroutine_stmt();
-//       if(parser.hasErrorOccurred == false) {
-//          // rewind tokens to include line we just looked at
-//          tokens.rewind(start);
-//          parser.subroutine_subprogram();
-//       } else {
-//          // it failed to look like a subroutine, so try matching it as 
-//          // a main program
-//          tokens.rewind(start);
-//          parseMainProgram(tokens, parser, start);
-//       }// end if(subroutine)/else(main_program)         
-
       parser.subroutine_subprogram();
 
       return parser.hasErrorOccurred;
@@ -96,21 +79,6 @@ public class FortranMain implements Callable<Boolean> {
    private static boolean parseFunction(FortranTokenStream tokens, 
                                         FortranParser parser, 
                                         int start) throws Exception {
-//       System.out.println("found FUNCTION in first line");
-//       // try parsing the function
-//       parser.ext_function_stmt_test();
-//       if(parser.hasErrorOccurred == false) {
-//          // reset the token input since the test for 
-//          // matching function_stmt moves token index ptr.
-//          tokens.rewind(start);
-//          parser.ext_function_subprogram();
-//       } else {
-//          // it failed to look like a function, so try matching it as 
-//          // a main program
-//          tokens.rewind(start);
-//          parseMainProgram(tokens, parser, start);
-//       }// end if(function)/else(main_program)
-
       parser.ext_function_subprogram();
       return parser.hasErrorOccurred;
    }// end parseFunction()
@@ -131,7 +99,6 @@ public class FortranMain implements Callable<Boolean> {
          lookAhead = 1;
          do {
             firstToken = tokens.LA(lookAhead);
-//             System.out.println("firstToken is: " + firstToken);
             lookAhead++;
          } while(firstToken == FortranLexer.LINE_COMMENT || 
                  firstToken == FortranLexer.T_EOS);
@@ -176,26 +143,68 @@ public class FortranMain implements Callable<Boolean> {
    }// end parseProgramUnit()
 
    public static void main(String args[]) throws Exception {
-      new FortranMain(args[0]).call();
+      Boolean error = null;
+      int i = 0;
+
+      try {
+         while(args[i] != null) {
+            System.out.println("********************************************");
+            System.out.println("args[" + i + "]: " + args[i]);
+            error = new FortranMain(args[i]).call();
+            i++;
+            System.out.println("********************************************");
+         }
+      } catch(ArrayIndexOutOfBoundsException e) {
+         // do nothing; simply the end of the args
+      }
+
+//       error = new FortranMain(args[0]).call();
+//       if(error.booleanValue() == true)
+//          // an error occurred
+//          System.exit(1);
    }// end main()
    
    public Boolean call() throws Exception {
-	   boolean error = false;
-	      
-	   // apply Sale's algorithm to the tokens to allow keywords
-	   // as identifiers.  also, fixup labeled do's, etc.
-	      prepass.performPrepass();
+      boolean error = false;
+              
+      if(determineSourceForm(this.fileName) == FIXED_FORM)
+         System.out.println(this.fileName + " is FIXED FORM");
+      else
+         System.out.println(this.fileName + " is FREE FORM");
 
-	      // overwrite the old token stream with the (possibly) modified one
-	      tokens.finalizeTokenStream();
-	         
-	      // parse each program unit in a given file
-	      while(tokens.LA(1) != FortranLexer.EOF) {
-	         // attempt to parse the current program unit
-	         error = parseProgramUnit(lexer, tokens, parser);
-	      }
+      // determine whether the file is fixed or free form and 
+      // set the source form in the prepass so it knows how to handle lines.
+      prepass.setSourceForm(determineSourceForm(this.fileName));
 
-	      return new Boolean(error);
-	   }// end main()
+      // apply Sale's algorithm to the tokens to allow keywords
+      // as identifiers.  also, fixup labeled do's, etc.
+      prepass.performPrepass();
+
+      // overwrite the old token stream with the (possibly) modified one
+      tokens.finalizeTokenStream();
+                 
+      // parse each program unit in a given file
+      while(tokens.LA(1) != FortranLexer.EOF) {
+         // attempt to parse the current program unit
+         error = parseProgramUnit(lexer, tokens, parser);
+                 
+         // see if we successfully parse the program unit or not
+         if(error != false) {
+            System.out.println("Parser failed");
+         } else {
+            System.out.println("Parser exiting normally");
+         }// end else(parser exited normally)
+      }// end while(not end of file) 
+
+      return new Boolean(error);
+   }// end call()
+
+   private int determineSourceForm(String fileName) {
+      if(fileName.endsWith(new String(".f")) == true ||
+         fileName.endsWith(new String(".F")) == true)
+         return FIXED_FORM;
+      else
+         return FREE_FORM;
+   }// end determineSourceForm()
 
 }//end class FortranMain
