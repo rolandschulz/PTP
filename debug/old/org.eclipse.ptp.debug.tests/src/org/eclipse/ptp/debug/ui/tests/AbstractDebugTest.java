@@ -40,7 +40,6 @@ import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.PCDIDebugModel;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
-import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.debug.external.core.proxy.ProxyDebugClient;
 import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugEventListener;
 import org.eclipse.ptp.debug.ui.testplugin.PTPDebugHelper;
@@ -61,14 +60,15 @@ public abstract class AbstractDebugTest extends TestCase implements IProxyDebugE
 	final static String queueName = "localQueue";
 	final static String debugHost = "localhost";
 	final static String sdmPath = "/Users/clement/Documents/workspace_head/org.eclipse.ptp.macosx.ppc/bin/sdm";
-	final static String resourceXML = "resources/resourceManagers.xml";
-	final static String resourceMgrID = "org.eclipse.ptp.orte.core.resourcemanager";
+	final static String ptp_orte_proxyPath = "/Users/clement/Documents/workspace_head/org.eclipse.ptp.macosx.ppc/bin/ptp_orte_proxy";
+	//final static String resourceXML = "resources/resourceManagers.xml";
+	//final static String resourceMgrID = "org.eclipse.ptp.orte.core.resourcemanager";
 
 	protected IWorkspace workspace;
 	protected IWorkspaceRoot root;
 	protected NullProgressMonitor monitor;
 	protected IPJob job = null;
-	protected IPLaunch launch = null;
+	//protected IPLaunch launch = null;
 	//protected IPCDISession cdiSession = null;
 	protected ICProject testProject = null;
 	protected PCDIDebugModel debugModel = null;
@@ -163,38 +163,45 @@ public abstract class AbstractDebugTest extends TestCase implements IProxyDebugE
 		int port = 0;
 		
 		assertTrue(new File(sdmPath).exists());
+		assertTrue(new File(ptp_orte_proxyPath).exists());
+
 		exec = PTPProjectHelper.findBinaryObject(testProject, testAppName);
 		assertNotNull(exec);
 		proxy = new ProxyDebugClient();
 		assertNotNull(proxy);
 		proxy.sessionCreate();
-		//debugger = PTPDebugHelper.createDebugger();
-		//assertNotNull(debugger);
-		//port = debugger.getDebuggerPort();
 		port = proxy.getSessionPort();
 		assertTrue(port > 1000);
+		resourceMgr = PTPDebugHelper.createOrteManager(ptp_orte_proxyPath);
+		assertNotNull(resourceMgr);
+		resourceMgr.startUp(monitor);
+		
+		/*
+		debugger = PTPDebugHelper.createDebugger();
+		assertNotNull(debugger);
+		port = debugger.getDebuggerPort();
+		resourceMgr = PTPDebugHelper.createIResourceManager(resourceXML, resourceMgrID);
 		launch = PTPDebugHelper.createDebugLaunch(null);
 		assertNotNull(launch);
-		resourceMgr = PTPDebugHelper.createIResourceManager(resourceXML, resourceMgrID);
-		assertNotNull(resourceMgr);
+		*/
 		jobConfig = PTPDebugHelper.getJobDebugConfiguration(testProject, testAppName, resourceMgrName, machineName, queueName, nProcs, firstNode, NProcsPerNode, debugHost, port, sdmPath);
 		assertNotNull(jobConfig);
 		job = resourceMgr.run(null, jobConfig, new SubProgressMonitor(monitor, 150));
 		assertNotNull(job);
-		launch.setAttribute(IPJob.JOB_ID_TEXT, job.getIDString());
+		//launch.setAttribute(IPJob.JOB_ID_TEXT, job.getIDString());
 		job.setAttribute(PreferenceConstants.JOB_APP_NAME, jobConfig.getExecName());
 		job.setAttribute(PreferenceConstants.JOB_APP_PATH, jobConfig.getPathToExec());
 		job.setAttribute(PreferenceConstants.JOB_WORK_DIR, jobConfig.getWorkingDir());
 		job.setAttribute(PreferenceConstants.JOB_ARGS, jobConfig.getArguments());
 		job.setAttribute(PreferenceConstants.JOB_DEBUG_DIR, jobConfig.getPathToExec());
-		launch.setPJob(job);
+		//launch.setPJob(job);
 		
 		assertTrue(proxy.waitForConnect(monitor));
 		proxy.addEventListener(this);
 
+		assertTrue(new File(jobConfig.getPathToExec()).exists());
 		proxy.debugStartSession(jobConfig.getExecName(), jobConfig.getPathToExec(), jobConfig.getWorkingDir(), jobConfig.getArguments());
 		
-		proxy.debugTerminate(createBitList());
 		//cdiSession = debugger.createDebuggerSession(launch, exec, 1000, new SubProgressMonitor(new NullProgressMonitor(), 40));
 		//assertNotNull(cdiSession);
 		//debugModel.newJob(job, cdiSession.createBitList());

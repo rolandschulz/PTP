@@ -21,5 +21,6 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.cdt.core,
  org.eclipse.ptp.launch,
  org.eclipse.ptp.core,
- org.eclipse.search
+ org.eclipse.search,
+ org.eclipse.ptp.orte.core
 Eclipse-LazyStart: true

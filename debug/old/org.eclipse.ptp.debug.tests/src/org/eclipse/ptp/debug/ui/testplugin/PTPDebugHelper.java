@@ -10,17 +10,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.ui.testplugin;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import org.eclipse.cdt.core.model.ICProject;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.ptp.core.IModelManager;
-import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.AttributeDescription;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IAttributeDescription;
@@ -30,12 +21,10 @@ import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.debug.core.launch.PLaunch;
 import org.eclipse.ptp.debug.external.core.debugger.ParallelDebugger;
+import org.eclipse.ptp.orte.core.rmsystem.ORTEResourceManagerConfiguration;
+import org.eclipse.ptp.orte.core.rmsystem.ORTEResourceManagerFactory;
 import org.eclipse.ptp.rmsystem.IResourceManager;
-import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
-import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
 import org.eclipse.ptp.rtsystem.JobRunConfiguration;
-import org.eclipse.ui.IMemento;
-import org.eclipse.ui.XMLMemento;
 
 /**
  * @author Clement chu
@@ -85,6 +74,11 @@ public class PTPDebugHelper {
 		jobConfig.setDebuggerArgs(debugArgs);
 		return jobConfig;
 	}
+	public static IResourceManager createOrteManager(String ptp_orte_proxyPath) {
+		ORTEResourceManagerFactory factory = new ORTEResourceManagerFactory();
+		return factory.create(new ORTEResourceManagerConfiguration(factory, "ORTE", "Orte Resource", ptp_orte_proxyPath, false));		
+	}
+	/*
 	public static IResourceManager createIResourceManager(String xmlFile, String mgrID) throws CoreException {
 		File xml = PTPProjectHelper.getFileInPlugin(new Path(xmlFile));
 		FileReader reader;
@@ -136,4 +130,5 @@ public class PTPDebugHelper {
 		}
 		return mgr;
 	}
+	*/
 }
