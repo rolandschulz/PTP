@@ -21,6 +21,7 @@ package org.eclipse.ptp.debug.external.core.cdi;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.eclipse.core.resources.IMarkerDelta;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -91,8 +92,9 @@ public class BreakpointManager extends SessionObject implements IPCDIBreakpointM
 		if (bpt != null && !breakMap.containsKey(bpt)) {
 			breakMap.put(bpt, cdiBpt);
 			cdiBbreakMap.put(cdiBpt, bpt);
-			cdiBreakIDMap.put(new Integer(cdiBpt.getBreakpointId()), cdiBpt);
 		}
+		if (cdiBpt != null)
+			cdiBreakIDMap.put(new Integer(cdiBpt.getBreakpointId()), cdiBpt);
 	}
 	private void removeBreakpoint(IPBreakpoint bpt) {
 		IPCDIBreakpoint cdiBpt = (IPCDIBreakpoint) breakMap.remove(bpt);
@@ -119,7 +121,6 @@ public class BreakpointManager extends SessionObject implements IPCDIBreakpointM
 			return (IPCDIBreakpoint) cdiBreakIDMap.get(new Integer(bpid));
 		}
 	}
-	
 	public void setConditionBreakpoint(String job_id, IPBreakpoint bpt) throws CoreException {
 		deleteBreakpoint(job_id, bpt);
 		setBreakpoint(job_id, bpt, false);
@@ -226,6 +227,16 @@ public class BreakpointManager extends SessionObject implements IPCDIBreakpointM
 		} else {
 			cdiBpt = createLineBreakpoint(tasks, type, (IPCDILineLocation) location, condition, enabled);
 		}
+		return cdiBpt;
+	}
+	public IPCDILineBreakpoint setLineBreakpoint(BitList tasks, int type, IPCDILineLocation location, IPCDICondition condition, boolean deferred) throws PCDIException {
+		IPCDILineBreakpoint cdiBpt = createLineBreakpoint(tasks, type, location, condition, deferred);
+		postBreakpointCommand(tasks, cdiBpt, null, true);
+		return cdiBpt;
+	}
+	public IPCDIFunctionBreakpoint setFunctionBreakpoint(BitList tasks, int type, IPCDIFunctionLocation location, IPCDICondition condition, boolean deferred) throws PCDIException {
+		IPCDIFunctionBreakpoint cdiBpt = createFunctionBreakpoint(tasks, type, location, condition, deferred);
+		postBreakpointCommand(tasks, cdiBpt, null, true);
 		return cdiBpt;
 	}
 	public void setInternalTemporaryBreakpoint(BitList tasks, IPCDILocation location) throws DebugException {
