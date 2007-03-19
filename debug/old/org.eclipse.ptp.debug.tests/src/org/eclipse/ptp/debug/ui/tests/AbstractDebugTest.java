@@ -21,7 +21,9 @@ package org.eclipse.ptp.debug.ui.tests;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+
 import junit.framework.TestCase;
+
 import org.eclipse.cdt.core.IBinaryParser.IBinaryObject;
 import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.core.resources.IWorkspace;
@@ -34,12 +36,13 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.PreferenceConstants;
-import org.eclipse.ptp.debug.core.IAbstractDebugger;
+import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.PCDIDebugModel;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
-import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
+import org.eclipse.ptp.debug.external.core.proxy.ProxyDebugClient;
+import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugEventListener;
 import org.eclipse.ptp.debug.ui.testplugin.PTPDebugHelper;
 import org.eclipse.ptp.debug.ui.testplugin.PTPProjectHelper;
 import org.eclipse.ptp.rmsystem.IResourceManager;
@@ -48,8 +51,9 @@ import org.eclipse.ptp.rtsystem.JobRunConfiguration;
 /**
  * @author clement
  */
-public abstract class AbstractDebugTest extends TestCase {
+public abstract class AbstractDebugTest extends TestCase implements IProxyDebugEventListener {
 	final static String testAppName = "main";
+	final static String testApp = testAppName + ".c";
 	final static String testAppPath = "resources/debugTest.zip";
 	final static String projectName = "filetest";
 	final static String resourceMgrName = "ORTE";
@@ -65,14 +69,18 @@ public abstract class AbstractDebugTest extends TestCase {
 	protected NullProgressMonitor monitor;
 	protected IPJob job = null;
 	protected IPLaunch launch = null;
-	protected IPCDISession cdiSession = null;
+	//protected IPCDISession cdiSession = null;
 	protected ICProject testProject = null;
 	protected PCDIDebugModel debugModel = null;
 	protected IResourceManager resourceMgr = null;
+	protected ProxyDebugClient proxy = null;
 	
+	private int bpId = 0;
 	private int nProcs = 1;
 	private int firstNode = 0;
 	private int NProcsPerNode = 1;
+	private Object LOCK = new Object();
+	private BitList tasks = null;
 	
 	public AbstractDebugTest(String name, int nProcs, int firstNode, int NProcsPerNode) {
 		super(name);
@@ -115,11 +123,11 @@ public abstract class AbstractDebugTest extends TestCase {
 	 * 
 	 * Called after every test case method.
 	 */
-	protected void tearDown() throws CoreException, PCDIException {
+	protected void tearDown() throws CoreException, IOException, PCDIException {
 		if (job != null) {
-			if(!job.isAllStop() && cdiSession != null) {
+			if(!job.isAllStop()) {
 				job.removeAllProcesses();
-				cdiSession.shutdown();
+				//cdiSession.shutdown();
 				try {
 					Thread.sleep(2000);
 				} catch (InterruptedException e) {
@@ -127,10 +135,18 @@ public abstract class AbstractDebugTest extends TestCase {
 				}
 			}
 		}
+		if (proxy != null) {
+			proxy.sessionFinish();
+			proxy.removeEventListener(this);
+			proxy.closeConnection();
+			proxy = null;
+		}
+
 		if (resourceMgr != null)
 			resourceMgr.shutdown();
 		PTPProjectHelper.delete(testProject);
-		cdiSession = null;
+		//cdiSession = null;
+		tasks = null;
 		resourceMgr = null;
 		job = null;
 		debugModel = null;
@@ -140,8 +156,8 @@ public abstract class AbstractDebugTest extends TestCase {
 	 * 
 	 * Called after every test case method.
 	 */
-	public void startDebugServer() throws CoreException {
-		IAbstractDebugger debugger;
+	public void startDebugServer() throws CoreException, IOException {
+		//IAbstractDebugger debugger;
 		JobRunConfiguration jobConfig;
 		IBinaryObject exec;
 		int port = 0;
@@ -149,9 +165,13 @@ public abstract class AbstractDebugTest extends TestCase {
 		assertTrue(new File(sdmPath).exists());
 		exec = PTPProjectHelper.findBinaryObject(testProject, testAppName);
 		assertNotNull(exec);
-		debugger = PTPDebugHelper.createDebugger();
-		assertNotNull(debugger);
-		port = debugger.getDebuggerPort();
+		proxy = new ProxyDebugClient();
+		assertNotNull(proxy);
+		proxy.sessionCreate();
+		//debugger = PTPDebugHelper.createDebugger();
+		//assertNotNull(debugger);
+		//port = debugger.getDebuggerPort();
+		port = proxy.getSessionPort();
 		assertTrue(port > 1000);
 		launch = PTPDebugHelper.createDebugLaunch(null);
 		assertNotNull(launch);
@@ -168,11 +188,43 @@ public abstract class AbstractDebugTest extends TestCase {
 		job.setAttribute(PreferenceConstants.JOB_ARGS, jobConfig.getArguments());
 		job.setAttribute(PreferenceConstants.JOB_DEBUG_DIR, jobConfig.getPathToExec());
 		launch.setPJob(job);
+		
+		assertTrue(proxy.waitForConnect(monitor));
+		proxy.addEventListener(this);
 
-		cdiSession = debugger.createDebuggerSession(launch, exec, 1000, new SubProgressMonitor(new NullProgressMonitor(), 40));
-		assertNotNull(cdiSession);
-		debugModel.newJob(job, cdiSession.createBitList());
-		debugModel.fireSessionEvent(job, cdiSession);
+		proxy.debugStartSession(jobConfig.getExecName(), jobConfig.getPathToExec(), jobConfig.getWorkingDir(), jobConfig.getArguments());
+		
+		proxy.debugTerminate(createBitList());
+		//cdiSession = debugger.createDebuggerSession(launch, exec, 1000, new SubProgressMonitor(new NullProgressMonitor(), 40));
+		//assertNotNull(cdiSession);
+		//debugModel.newJob(job, cdiSession.createBitList());
+		//debugModel.fireSessionEvent(job, cdiSession);
+	}
+	protected int newBreakpointId() {
+		return this.bpId++;
+	}
+	protected BitList createBitList() {
+		BitList tasks = new BitList(nProcs);
+		tasks.set(0, nProcs);
+		return tasks;
+	}
+	protected BitList createBitList(int index) {
+		BitList tasks = new BitList(nProcs);
+		tasks.set(index);
+		return tasks;
+	}
+	protected void waitEvent(BitList tasks) throws InterruptedException {
+		synchronized (LOCK) {
+			this.tasks = tasks;
+			LOCK.wait(10000);
+		}
+	}
+	protected void notifyEvent(BitList evtTasks) {
+		synchronized (LOCK) {
+			tasks.andNot(evtTasks);
+			if (tasks.isEmpty())
+				LOCK.notifyAll();
+		}
 	}
 }
 
