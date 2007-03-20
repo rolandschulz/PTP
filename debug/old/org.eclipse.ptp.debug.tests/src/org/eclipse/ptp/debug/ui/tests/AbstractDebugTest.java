@@ -37,9 +37,12 @@ import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.PCDIDebugModel;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
+import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
+import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.debug.external.core.proxy.ProxyDebugClient;
 import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugEventListener;
 import org.eclipse.ptp.debug.ui.testplugin.PTPDebugHelper;
@@ -68,14 +71,12 @@ public abstract class AbstractDebugTest extends TestCase implements IProxyDebugE
 	protected IWorkspaceRoot root;
 	protected NullProgressMonitor monitor;
 	protected IPJob job = null;
-	//protected IPLaunch launch = null;
-	//protected IPCDISession cdiSession = null;
+	protected IPCDISession cdiSession = null;
 	protected ICProject testProject = null;
 	protected PCDIDebugModel debugModel = null;
 	protected IResourceManager resourceMgr = null;
 	protected ProxyDebugClient proxy = null;
-	
-	private int bpId = 0;
+
 	private int nProcs = 1;
 	private int firstNode = 0;
 	private int NProcsPerNode = 1;
@@ -105,7 +106,7 @@ public abstract class AbstractDebugTest extends TestCase implements IProxyDebugE
 	 * 
 	 * Called before every test case method.
 	 */
-	protected void setUp() throws CoreException, InvocationTargetException, IOException {
+	protected void setUp() throws CoreException, InvocationTargetException, IOException, InterruptedException {
 		ResourcesPlugin.getWorkspace().getDescription().setAutoBuilding(false);
 		 //Create a new project and import the test source.
 		testProject = PTPProjectHelper.createCProjectWithImport(projectName, new Path(testAppPath));
@@ -127,7 +128,8 @@ public abstract class AbstractDebugTest extends TestCase implements IProxyDebugE
 		if (job != null) {
 			if(!job.isAllStop()) {
 				job.removeAllProcesses();
-				//cdiSession.shutdown();
+				if (cdiSession != null)
+					cdiSession.shutdown();
 				try {
 					Thread.sleep(2000);
 				} catch (InterruptedException e) {
@@ -145,19 +147,61 @@ public abstract class AbstractDebugTest extends TestCase implements IProxyDebugE
 		if (resourceMgr != null)
 			resourceMgr.shutdown();
 		PTPProjectHelper.delete(testProject);
-		//cdiSession = null;
+		cdiSession = null;
 		tasks = null;
 		resourceMgr = null;
 		job = null;
 		debugModel = null;
+	}
+	public void startDebugServer2() throws CoreException, IOException, InterruptedException {
+		IAbstractDebugger debugger;
+		IPLaunch launch;
+		JobRunConfiguration jobConfig;
+		IBinaryObject exec;
+		int port = 0;
+		
+		assertTrue(new File(sdmPath).exists());
+		assertTrue(new File(ptp_orte_proxyPath).exists());
+
+		exec = PTPProjectHelper.findBinaryObject(testProject, testAppName);
+		assertNotNull(exec);
+		proxy = new ProxyDebugClient();
+		assertNotNull(proxy);
+		proxy.sessionCreate();
+		port = proxy.getSessionPort();
+		assertTrue(port > 1000);
+		resourceMgr = PTPDebugHelper.createOrteManager(ptp_orte_proxyPath);
+		assertNotNull(resourceMgr);
+		resourceMgr.startUp(monitor);
+
+		debugger = PTPDebugHelper.createDebugger();
+		assertNotNull(debugger);
+		port = debugger.getDebuggerPort();
+		launch = PTPDebugHelper.createDebugLaunch(null);
+		assertNotNull(launch);
+
+		jobConfig = PTPDebugHelper.getJobDebugConfiguration(testProject, testAppName, resourceMgrName, machineName, queueName, nProcs, firstNode, NProcsPerNode, debugHost, port, sdmPath);
+		assertNotNull(jobConfig);
+		job = resourceMgr.run(null, jobConfig, new SubProgressMonitor(monitor, 150));
+		assertNotNull(job);
+		launch.setAttribute(IPJob.JOB_ID_TEXT, job.getIDString());
+		job.setAttribute(PreferenceConstants.JOB_APP_NAME, jobConfig.getExecName());
+		job.setAttribute(PreferenceConstants.JOB_APP_PATH, jobConfig.getPathToExec());
+		job.setAttribute(PreferenceConstants.JOB_WORK_DIR, jobConfig.getWorkingDir());
+		job.setAttribute(PreferenceConstants.JOB_ARGS, jobConfig.getArguments());
+		job.setAttribute(PreferenceConstants.JOB_DEBUG_DIR, jobConfig.getPathToExec());
+		launch.setPJob(job);
+		cdiSession = debugger.createDebuggerSession(launch, exec, 1000, new SubProgressMonitor(new NullProgressMonitor(), 40));
+		assertNotNull(cdiSession);
+		debugModel.newJob(job, cdiSession.createBitList());
+		debugModel.fireSessionEvent(job, cdiSession);
 	}
 	/**
 	 * Tears down the test fixture.
 	 * 
 	 * Called after every test case method.
 	 */
-	public void startDebugServer() throws CoreException, IOException {
-		//IAbstractDebugger debugger;
+	public void startDebugServer() throws CoreException, IOException, InterruptedException {
 		JobRunConfiguration jobConfig;
 		IBinaryObject exec;
 		int port = 0;
@@ -176,14 +220,6 @@ public abstract class AbstractDebugTest extends TestCase implements IProxyDebugE
 		assertNotNull(resourceMgr);
 		resourceMgr.startUp(monitor);
 		
-		/*
-		debugger = PTPDebugHelper.createDebugger();
-		assertNotNull(debugger);
-		port = debugger.getDebuggerPort();
-		resourceMgr = PTPDebugHelper.createIResourceManager(resourceXML, resourceMgrID);
-		launch = PTPDebugHelper.createDebugLaunch(null);
-		assertNotNull(launch);
-		*/
 		jobConfig = PTPDebugHelper.getJobDebugConfiguration(testProject, testAppName, resourceMgrName, machineName, queueName, nProcs, firstNode, NProcsPerNode, debugHost, port, sdmPath);
 		assertNotNull(jobConfig);
 		job = resourceMgr.run(null, jobConfig, new SubProgressMonitor(monitor, 150));
@@ -201,14 +237,10 @@ public abstract class AbstractDebugTest extends TestCase implements IProxyDebugE
 
 		assertTrue(new File(jobConfig.getPathToExec()).exists());
 		proxy.debugStartSession(jobConfig.getExecName(), jobConfig.getPathToExec(), jobConfig.getWorkingDir(), jobConfig.getArguments());
-		
-		//cdiSession = debugger.createDebuggerSession(launch, exec, 1000, new SubProgressMonitor(new NullProgressMonitor(), 40));
-		//assertNotNull(cdiSession);
-		//debugModel.newJob(job, cdiSession.createBitList());
-		//debugModel.fireSessionEvent(job, cdiSession);
-	}
-	protected int newBreakpointId() {
-		return this.bpId++;
+		BitList t = createBitList();
+		//wait suspend event
+		waitEvent(t);
+		assertTrue("Debugger is initialized: " + t.isEmpty(), t.isEmpty());
 	}
 	protected BitList createBitList() {
 		BitList tasks = new BitList(nProcs);
@@ -223,7 +255,7 @@ public abstract class AbstractDebugTest extends TestCase implements IProxyDebugE
 	protected void waitEvent(BitList tasks) throws InterruptedException {
 		synchronized (LOCK) {
 			this.tasks = tasks;
-			LOCK.wait(10000);
+			LOCK.wait(5000);
 		}
 	}
 	protected void notifyEvent(BitList evtTasks) {
