@@ -66,8 +66,8 @@ public class PTPDebugHelper {
 		String path = project.getProject().getLocation().toOSString();
 		return new JobRunConfiguration(appName, path, resourceMgrName, machineName, queueName, attrs, args, envs, path);
 	}
-	public static JobRunConfiguration getJobDebugConfiguration(ICProject project, String appName, String resourceMgrName, String machineName, String queueName, int nProcs, int firstNode, int NProcsPerNode, String debugHost, int debugPort, String sdmPath) {
-		String debugArgs = "--host=" + debugHost + " --debugger=gdb-mi --port=" + debugPort;
+	public static JobRunConfiguration getJobDebugConfiguration(ICProject project, String appName, String resourceMgrName, String machineName, String queueName, int nProcs, int firstNode, int NProcsPerNode, String debuggerType, String debugHost, int debugPort, String sdmPath) {
+		String debugArgs = "--host=" + debugHost + " --debugger=" + debuggerType + " --port=" + debugPort;
 		JobRunConfiguration jobConfig = getJobRunConfiguration(project, appName, resourceMgrName, machineName, queueName, nProcs, firstNode, NProcsPerNode);
 		jobConfig.setDebug();
 		jobConfig.setDebuggerPath(sdmPath);

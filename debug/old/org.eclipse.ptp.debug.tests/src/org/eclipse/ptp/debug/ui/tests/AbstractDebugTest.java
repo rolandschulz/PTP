@@ -64,6 +64,7 @@ public abstract class AbstractDebugTest extends TestCase implements IProxyDebugE
 	final static String debugHost = "localhost";
 	final static String sdmPath = "/Users/clement/Documents/workspace_head/org.eclipse.ptp.macosx.ppc/bin/sdm";
 	final static String ptp_orte_proxyPath = "/Users/clement/Documents/workspace_head/org.eclipse.ptp.macosx.ppc/bin/ptp_orte_proxy";
+	final static String debuggerType = "test"; //gdb-mi or test
 	//final static String resourceXML = "resources/resourceManagers.xml";
 	//final static String resourceMgrID = "org.eclipse.ptp.orte.core.resourcemanager";
 
@@ -180,7 +181,7 @@ public abstract class AbstractDebugTest extends TestCase implements IProxyDebugE
 		launch = PTPDebugHelper.createDebugLaunch(null);
 		assertNotNull(launch);
 
-		jobConfig = PTPDebugHelper.getJobDebugConfiguration(testProject, testAppName, resourceMgrName, machineName, queueName, nProcs, firstNode, NProcsPerNode, debugHost, port, sdmPath);
+		jobConfig = PTPDebugHelper.getJobDebugConfiguration(testProject, testAppName, resourceMgrName, machineName, queueName, nProcs, firstNode, NProcsPerNode, debuggerType, debugHost, port, sdmPath);
 		assertNotNull(jobConfig);
 		job = resourceMgr.run(null, jobConfig, new SubProgressMonitor(monitor, 150));
 		assertNotNull(job);
@@ -220,7 +221,7 @@ public abstract class AbstractDebugTest extends TestCase implements IProxyDebugE
 		assertNotNull(resourceMgr);
 		resourceMgr.startUp(monitor);
 		
-		jobConfig = PTPDebugHelper.getJobDebugConfiguration(testProject, testAppName, resourceMgrName, machineName, queueName, nProcs, firstNode, NProcsPerNode, debugHost, port, sdmPath);
+		jobConfig = PTPDebugHelper.getJobDebugConfiguration(testProject, testAppName, resourceMgrName, machineName, queueName, nProcs, firstNode, NProcsPerNode, debuggerType, debugHost, port, sdmPath);
 		assertNotNull(jobConfig);
 		job = resourceMgr.run(null, jobConfig, new SubProgressMonitor(monitor, 150));
 		assertNotNull(job);
