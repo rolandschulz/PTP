@@ -10,7 +10,8 @@ sdm_SOURCES =				src/client/startup.c\
 							src/server/server.c \
 							src/server/server_cmds.c \
 							src/server/backend.c \
-							src/server/gdbmi_backend.c
+							src/server/gdbmi_backend.c \
+							src/server/test_backend.c
 					
 sdm_CFLAGS =				-I./include -I./libaif -I./src/mi $(AM_CFLAGS)
 sdm_LDADD =					libdbgutils.a libmi.a libaif/libaif.a @SVR_LIBS@
@@ -37,7 +38,7 @@ noinst_HEADERS =			include/breakpoint.h include/dbg.h include/location.h include
 noinst_LIBRARIES =			libdbgclnt.a libdbgutils.a libmi.a
 
 libdbgclnt_a_SOURCES =		src/client/client_interface.c 
-libdbgclnt_a_CFLAGS =		-I./include -I./libaif $(AM_CFLAGS) -g
+libdbgclnt_a_CFLAGS =		-I./include -I./libaif $(AM_CFLAGS) -g -pg
 
 libdbgutils_a_SOURCES =		src/utils/error.c \
 							src/utils/breakpoint.c \
@@ -48,7 +49,7 @@ libdbgutils_a_SOURCES =		src/utils/error.c \
 							src/utils/signalinfo.c \
 							src/utils/debug.c
 						
-libdbgutils_a_CFLAGS =		-I./include -I./libaif $(AM_CFLAGS) -g
+libdbgutils_a_CFLAGS =		-I./include -I./libaif $(AM_CFLAGS) -g -pg
 
 libmi_a_SOURCES =			src/mi/MIParser.c \
 							src/mi/MIOOBRecord.c \
@@ -77,4 +78,4 @@ libmi_a_SOURCES =			src/mi/MIParser.c \
 							src/mi/CLICommand.c \
 							src/mi/CLIOutput.c
 						
-libmi_a_CFLAGS =			-I./include $(AM_CFLAGS) -g 
+libmi_a_CFLAGS =			-I./include $(AM_CFLAGS) -g -pg
