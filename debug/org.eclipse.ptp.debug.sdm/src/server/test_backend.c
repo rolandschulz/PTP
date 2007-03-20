@@ -641,6 +641,17 @@ AsyncCallback(MIEvent *evt)
 static int
 GDBMIInit(void (*event_callback)(dbg_event *, void *), void *data)
 {
+	EventCallback = event_callback;
+	EventCallbackData = data;
+	DebugSession = NULL;
+	LastEvent = NULL;
+	GDB_Version = -1.0;
+	ServerExit = 0;
+		
+	signal(SIGTERM, SIG_IGN);
+	signal(SIGHUP, SIG_IGN);
+	signal(SIGINT, SIG_IGN);
+
 	return DBGRES_OK;
 }
 
@@ -692,8 +703,44 @@ GDBMIStartSession(char *gdb_path, char *prog, char *path, char *work_dir, char *
 static int	
 GDBMIProgress(void)
 {
-	return 0;
-}
+	int				res = 0;
+	
+	/*
+	 * Check for existing events
+	 */
+	if (LastEvent != NULL) {
+		if (EventCallback != NULL) {
+			EventCallback(LastEvent, EventCallbackData);
+			res = 1;
+		}
+			
+		if (ServerExit && LastEvent->event == DBGEV_OK) {
+			if (DebugSession != NULL) {
+				DebugSession = NULL;
+			}
+			res = -1;
+		}
+			
+		FreeDbgEvent(LastEvent);
+		LastEvent = NULL;
+		return res;
+	}
+	
+	if (DebugSession == NULL)
+		return 0;
+	
+	//MISessionProgress(DebugSession, MIOutputNew());
+	
+	/*
+	 * Do any extra async functions. We can call gdbmi safely here
+	 */
+	if (AsyncFunc != NULL) {
+		AsyncFunc(AsyncFuncData);
+		AsyncFunc = NULL;
+		return 1;
+	}
+
+	return 0;}
 
 /*
 ** Set breakpoint at specified line.
