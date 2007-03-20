@@ -15,9 +15,11 @@
 #include "backend.h"
 
 extern dbg_backend_funcs	GDBMIBackend;
+extern dbg_backend_funcs	TestBackend;
 
 dbg_backend	dbg_backends[] = {
 	{"gdb-mi", &GDBMIBackend, "gdb"},
+	{"test", &TestBackend, NULL},
 };
 
 int
