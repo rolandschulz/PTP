@@ -220,20 +220,20 @@ public abstract class AbstractDebugTest extends TestCase implements IProxyDebugE
 		proxy.sessionCreate();
 		port = proxy.getSessionPort();
 		assertTrue(port > 1000);
-		resourceMgr = PTPDebugHelper.createOrteManager(ptp_orte_proxyPath);
-		assertNotNull(resourceMgr);
-		resourceMgr.startUp(monitor);
+		//resourceMgr = PTPDebugHelper.createOrteManager(ptp_orte_proxyPath);
+		//assertNotNull(resourceMgr);
+		//resourceMgr.startUp(monitor);
 		
 		jobConfig = PTPDebugHelper.getJobDebugConfiguration(testProject, testAppName, resourceMgrName, machineName, queueName, nProcs, firstNode, NProcsPerNode, debuggerType, debugHost, port, sdmPath);
 		assertNotNull(jobConfig);
-		job = resourceMgr.run(null, jobConfig, new SubProgressMonitor(monitor, 150));
-		assertNotNull(job);
+		//job = resourceMgr.run(null, jobConfig, new SubProgressMonitor(monitor, 150));
+		//assertNotNull(job);
 		//launch.setAttribute(IPJob.JOB_ID_TEXT, job.getIDString());
-		job.setAttribute(PreferenceConstants.JOB_APP_NAME, jobConfig.getExecName());
-		job.setAttribute(PreferenceConstants.JOB_APP_PATH, jobConfig.getPathToExec());
-		job.setAttribute(PreferenceConstants.JOB_WORK_DIR, jobConfig.getWorkingDir());
-		job.setAttribute(PreferenceConstants.JOB_ARGS, jobConfig.getArguments());
-		job.setAttribute(PreferenceConstants.JOB_DEBUG_DIR, jobConfig.getPathToExec());
+		//job.setAttribute(PreferenceConstants.JOB_APP_NAME, jobConfig.getExecName());
+		//job.setAttribute(PreferenceConstants.JOB_APP_PATH, jobConfig.getPathToExec());
+		//job.setAttribute(PreferenceConstants.JOB_WORK_DIR, jobConfig.getWorkingDir());
+		//job.setAttribute(PreferenceConstants.JOB_ARGS, jobConfig.getArguments());
+		//job.setAttribute(PreferenceConstants.JOB_DEBUG_DIR, jobConfig.getPathToExec());
 		//launch.setPJob(job);
 		
 		assertTrue(proxy.waitForConnect(monitor));
