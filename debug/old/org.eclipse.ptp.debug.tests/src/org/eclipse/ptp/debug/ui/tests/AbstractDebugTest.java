@@ -62,9 +62,12 @@ public abstract class AbstractDebugTest extends TestCase implements IProxyDebugE
 	final static String machineName = "Machine0";
 	final static String queueName = "localQueue";
 	final static String debugHost = "localhost";
-	final static String sdmPath = "/Users/clement/Documents/workspace_head/org.eclipse.ptp.macosx.ppc/bin/sdm";
-	final static String ptp_orte_proxyPath = "/Users/clement/Documents/workspace_head/org.eclipse.ptp.macosx.ppc/bin/ptp_orte_proxy";
+	//NEED MODIFICATION
 	final static String debuggerType = "test"; //gdb-mi or test
+	final static String localPath = "/Users/clement/Documents/workspace_head/org.eclipse.ptp.macosx.ppc/bin";
+
+	final static String sdmPath = localPath + "/sdm";
+	final static String ptp_orte_proxyPath = localPath + "/ptp_orte_proxy";
 	//final static String resourceXML = "resources/resourceManagers.xml";
 	//final static String resourceMgrID = "org.eclipse.ptp.orte.core.resourcemanager";
 
