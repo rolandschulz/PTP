@@ -61,8 +61,9 @@ public abstract class AbstractDebugTest extends TestCase implements IProxyDebugE
 	final static String resourceMgrName = "ORTE";
 	final static String machineName = "Machine0";
 	final static String queueName = "localQueue";
-	final static String debugHost = "localhost";
 	//NEED MODIFICATION
+	final static boolean isRunSDMManually = false;
+	final static String debugHost = "localhost";
 	final static String debuggerType = "test"; //gdb-mi or test
 	final static String localPath = "/Users/clement/Documents/workspace_head/org.eclipse.ptp.macosx.ppc/bin";
 
@@ -209,9 +210,11 @@ public abstract class AbstractDebugTest extends TestCase implements IProxyDebugE
 		JobRunConfiguration jobConfig;
 		IBinaryObject exec;
 		int port = 0;
-		
-		assertTrue(new File(sdmPath).exists());
-		assertTrue(new File(ptp_orte_proxyPath).exists());
+
+		if (!isRunSDMManually) {
+			assertTrue(new File(sdmPath).exists());
+			assertTrue(new File(ptp_orte_proxyPath).exists());
+		}
 
 		exec = PTPProjectHelper.findBinaryObject(testProject, testAppName);
 		assertNotNull(exec);
@@ -220,21 +223,27 @@ public abstract class AbstractDebugTest extends TestCase implements IProxyDebugE
 		proxy.sessionCreate();
 		port = proxy.getSessionPort();
 		assertTrue(port > 1000);
-		//resourceMgr = PTPDebugHelper.createOrteManager(ptp_orte_proxyPath);
-		//assertNotNull(resourceMgr);
-		//resourceMgr.startUp(monitor);
+		
+		if (!isRunSDMManually) {
+			resourceMgr = PTPDebugHelper.createOrteManager(ptp_orte_proxyPath);
+			assertNotNull(resourceMgr);
+			resourceMgr.startUp(monitor);
+		}
 		
 		jobConfig = PTPDebugHelper.getJobDebugConfiguration(testProject, testAppName, resourceMgrName, machineName, queueName, nProcs, firstNode, NProcsPerNode, debuggerType, debugHost, port, sdmPath);
 		assertNotNull(jobConfig);
-		//job = resourceMgr.run(null, jobConfig, new SubProgressMonitor(monitor, 150));
-		//assertNotNull(job);
-		//launch.setAttribute(IPJob.JOB_ID_TEXT, job.getIDString());
-		//job.setAttribute(PreferenceConstants.JOB_APP_NAME, jobConfig.getExecName());
-		//job.setAttribute(PreferenceConstants.JOB_APP_PATH, jobConfig.getPathToExec());
-		//job.setAttribute(PreferenceConstants.JOB_WORK_DIR, jobConfig.getWorkingDir());
-		//job.setAttribute(PreferenceConstants.JOB_ARGS, jobConfig.getArguments());
-		//job.setAttribute(PreferenceConstants.JOB_DEBUG_DIR, jobConfig.getPathToExec());
-		//launch.setPJob(job);
+		
+		if (!isRunSDMManually) {
+			job = resourceMgr.run(null, jobConfig, new SubProgressMonitor(monitor, 150));
+			assertNotNull(job);
+			//launch.setAttribute(IPJob.JOB_ID_TEXT, job.getIDString());
+			job.setAttribute(PreferenceConstants.JOB_APP_NAME, jobConfig.getExecName());
+			job.setAttribute(PreferenceConstants.JOB_APP_PATH, jobConfig.getPathToExec());
+			job.setAttribute(PreferenceConstants.JOB_WORK_DIR, jobConfig.getWorkingDir());
+			job.setAttribute(PreferenceConstants.JOB_ARGS, jobConfig.getArguments());
+			job.setAttribute(PreferenceConstants.JOB_DEBUG_DIR, jobConfig.getPathToExec());
+			//launch.setPJob(job);
+		}
 		
 		assertTrue(proxy.waitForConnect(monitor));
 		proxy.addEventListener(this);

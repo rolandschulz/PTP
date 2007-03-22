@@ -29,7 +29,7 @@ public class BreakpointTests extends AbstractDebugTest {
 	 * @param name
 	 */
 	public BreakpointTests(String name) {
-		super(name, 3, 0, 3);
+		super(name, 8, 0, 8);
 	}
 	/*
 	public void testBreakpoints2() throws CoreException, IOException, PCDIException, InterruptedException {
@@ -169,6 +169,7 @@ public class BreakpointTests extends AbstractDebugTest {
 		//suspended. It sould hit the breakponint almost immediatly so we
 		//should only sleep for max 1000 ms
 		//Resume the target, this should cause it to run till it hits the breakpoint
+		/*
 		t = createBitList();
 		proxy.debugGo(t);
 		//wait suspend event
@@ -188,11 +189,13 @@ public class BreakpointTests extends AbstractDebugTest {
 		//wait terminated event
 		waitEvent(t);
 		assertTrue("All processes are terminated: " + t.isEmpty(), t.isEmpty());
-
-		//t = createBitList();
-		//proxy.debugTerminate(t);
-		//waitEvent(t);
-		//assertTrue("Command completed: " + t.isEmpty(), t.isEmpty());
+		*/
+		
+		t = createBitList();
+		proxy.debugTerminate(t);
+		//wait terminated event
+		waitEvent(t);
+		assertTrue("Command completed: " + t.isEmpty(), t.isEmpty());
 	}
 	
 	public synchronized void handleEvent(IProxyDebugEvent e) {
@@ -210,7 +213,8 @@ public class BreakpointTests extends AbstractDebugTest {
 			notifyEvent(e.getBitSet());
 			break;
 		case IProxyDebugEvent.EVENT_DBG_ERROR:
-			System.err.println("Event Debug Error: " + (((ProxyDebugErrorEvent)e).getErrorMessage()));
+			ProxyDebugErrorEvent errEvent = (ProxyDebugErrorEvent)e;
+			System.err.println("Event Debug Error - code: " + errEvent.getErrorCode() + ", msg: " + errEvent.getErrorMessage());
 			break;
 		case IProxyDebugEvent.EVENT_DBG_OK:
 			System.err.println("EVENT_DBG_OK");

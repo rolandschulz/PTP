@@ -69,7 +69,8 @@ public class PTPDebugHelper {
 	public static JobRunConfiguration getJobDebugConfiguration(ICProject project, String appName, String resourceMgrName, String machineName, String queueName, int nProcs, int firstNode, int NProcsPerNode, String debuggerType, String debugHost, int debugPort, String sdmPath) {
 		String debugArgs = "--host=" + debugHost + " --debugger=" + debuggerType + " --port=" + debugPort;
 
-		System.err.println("*** For manually launch: " + debugArgs);
+		System.err.println("*** If you start JUnit test with manually launch sdm, please type the following on command line ***");
+		System.err.println(">>> mpirun -np " + (nProcs+1) + " ./sdm " + debugArgs);
 		JobRunConfiguration jobConfig = getJobRunConfiguration(project, appName, resourceMgrName, machineName, queueName, nProcs, firstNode, NProcsPerNode);
 		jobConfig.setDebug();
 		jobConfig.setDebuggerPath(sdmPath);
