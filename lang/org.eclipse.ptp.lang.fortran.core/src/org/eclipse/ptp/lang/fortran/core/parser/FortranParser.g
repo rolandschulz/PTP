@@ -252,6 +252,7 @@ executable_construct
 // label matches do-stmt label, then match end-do there
 // the original generated rules do not allow the label, so add (label)?
 action_stmt
+@init {Token lbl = null;} //@init {INIT_TOKEN_NULL(lbl);}
 // TODO:
 // tried removing backtracking by inserting extra tokens in the stream by the 
 // prepass that signals whether we have an assignment-stmt, a 
@@ -265,7 +266,7 @@ action_stmt
 	|	backspace_stmt
 	|	call_stmt
 	|	close_stmt
-	|	(label)? T_CONTINUE T_EOS
+	|	(label {lbl=$label.tk;})? T_CONTINUE T_EOS
 	|	cycle_stmt
 	|	deallocate_stmt
 	|	endfile_stmt
@@ -377,8 +378,8 @@ extended_intrinsic_op
 
 // R313
 // ERR_CHK 313 five characters or less
-label
-    : T_DIGIT_STRING
+label returns [Token tk]
+    : T_DIGIT_STRING {tk = $T_DIGIT_STRING;}
     ;
 
 label_list
@@ -432,7 +433,7 @@ signed_int_literal_constant
 
 // R406
 int_literal_constant
-@init {Token kind = null;}
+@init{Token kind = null;} // @init{INIT_TOKEN_NULL(kind);}
 	:	T_DIGIT_STRING (T_UNDERSCORE kind_param {kind = $kind_param.start;})?
 		{
 			IFortranParserAction.KindParam type = IFortranParserAction.KindParam.none;
@@ -588,7 +589,8 @@ type_param_or_comp_def_stmt
 // R430
 // generic_name_list substituted for type_param_name_list
 derived_type_stmt
-	:	(label)? T_TYPE ( ( T_COMMA type_attr_spec_list )? T_COLON_COLON )? T_IDENT
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	:	(label {lbl=$label.tk;})? T_TYPE ( ( T_COMMA type_attr_spec_list )? T_COLON_COLON )? T_IDENT
 		( T_LPAREN generic_name_list T_RPAREN )? T_EOS
 	;
 
@@ -618,13 +620,15 @@ private_or_sequence
 // R433
 end_type_stmt
 options {k=3;}
-	: ((label)? T_END T_TYPE) => (label)? T_END T_TYPE ( T_IDENT )? T_EOS
-	| (label)? T_ENDTYPE ( T_IDENT )? T_EOS
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	: ((label)? T_END T_TYPE) => (label {lbl=$label.tk;})? T_END T_TYPE ( T_IDENT )? T_EOS
+	| (label {lbl=$label.tk;})? T_ENDTYPE ( T_IDENT )? T_EOS
 	;
 
 // R434
 sequence_stmt
-	:	(label)? T_SEQUENCE T_EOS
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	:	(label {lbl=$label.tk;})? T_SEQUENCE T_EOS
 	;
 
 // R435 type_param_def_stmt inlined in type_param_or_comp_def_stmt_list
@@ -656,7 +660,8 @@ component_def_stmt
 
 // R440
 data_component_def_stmt
-    :    (label)? declaration_type_spec ( ( T_COMMA component_attr_spec_list )? T_COLON_COLON )? component_decl_list T_EOS
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+    :    (label {lbl=$label.tk;})? declaration_type_spec ( ( T_COMMA component_attr_spec_list )? T_COLON_COLON )? component_decl_list T_EOS
     ;
 
 // R441, R442-F2008
@@ -707,7 +712,8 @@ component_initialization
 
 // R445
 proc_component_def_stmt
-	:	(label)? T_PROCEDURE T_LPAREN ( proc_interface )? T_RPAREN T_COMMA
+@init{Token lbl = null;}
+	:	(label {lbl=$label.tk;})? T_PROCEDURE T_LPAREN ( proc_interface )? T_RPAREN T_COMMA
 		    proc_component_attr_spec_list T_COLON_COLON proc_decl_list T_EOS
 	;
 
@@ -726,7 +732,8 @@ proc_component_attr_spec_list
 
 // R447
 private_components_stmt
-	:	(label)? T_PRIVATE T_EOS
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	:	(label {lbl=$label.tk;})? T_PRIVATE T_EOS
 	;
 
 // R448
@@ -738,14 +745,16 @@ type_bound_procedure_part
 
 // R449
 binding_private_stmt
-	:	(label)? T_PRIVATE T_EOS
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	:	(label {lbl=$label.tk;})? T_PRIVATE T_EOS
 	;
 
 // R450
 proc_binding_stmt
-	:	(label)? specific_binding T_EOS
-	|	(label)? generic_binding T_EOS
-	|	(label)? final_binding T_EOS
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	:	(label {lbl=$label.tk;})? specific_binding T_EOS
+	|	(label {lbl=$label.tk;})? generic_binding T_EOS
+	|	(label {lbl=$label.tk;})? final_binding T_EOS
 	;
 
 // R451
@@ -837,12 +846,14 @@ enum_def
 
 // R461
 enum_def_stmt
-	:	(label)? T_ENUM T_COMMA T_BIND_LPAREN_C T_RPAREN T_EOS
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	:	(label {lbl=$label.tk;})? T_ENUM T_COMMA T_BIND_LPAREN_C T_RPAREN T_EOS
 	;
 
 // R462
 enumerator_def_stmt
-	:	(label)? T_ENUMERATOR ( T_COLON_COLON )? enumerator_list T_EOS
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	:	(label {lbl=$label.tk;})? T_ENUMERATOR ( T_COLON_COLON )? enumerator_list T_EOS
 	;
 
 // R463
@@ -857,10 +868,12 @@ enumerator_list
     ;
 
 // R464
+// TODO - what happened to the label statement on the first option
 end_enum_stmt
 options {k=3;}
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
 	:	((label)? T_END T_ENUM) => T_END T_ENUM T_EOS
-	|	(label)? T_ENDENUM T_EOS
+	|	(label {lbl=$label.tk;})? T_ENDENUM T_EOS
 	;
 
 // R465
@@ -919,7 +932,8 @@ Section 5:
 
 // R501
 type_declaration_stmt
-    :    (label)? declaration_type_spec ( ( T_COMMA attr_spec )* T_COLON_COLON )? entity_decl_list T_EOS
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+    :    (label {lbl=$label.tk;})? declaration_type_spec ( ( T_COMMA attr_spec )* T_COLON_COLON )? entity_decl_list T_EOS
     ;
 
 // R502
@@ -1084,7 +1098,8 @@ options {k=2;}
 
 // R518
 access_stmt
-    :    (label)? access_spec ( ( T_COLON_COLON )? access_id_list )? T_EOS
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+    :    (label {lbl=$label.tk;})? access_spec ( ( T_COLON_COLON )? access_id_list )? T_EOS
     ;
 
 // R519
@@ -1102,7 +1117,8 @@ access_id_list
 // R520, R526-F2008
 // T_IDENT inlined for object_name
 allocatable_stmt
-    : (label)? T_ALLOCATABLE ( T_COLON_COLON )? allocatable_decl ( T_COMMA allocatable_decl )* T_EOS
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+    : (label {lbl=$label.tk;})? T_ALLOCATABLE ( T_COLON_COLON )? allocatable_decl ( T_COMMA allocatable_decl )* T_EOS
     ;
 
 // R527-F2008
@@ -1115,14 +1131,16 @@ allocatable_decl
 // R521
 // generic_name_list substituted for object_name_list
 asynchronous_stmt
-	:	(label)? T_ASYNCHRONOUS
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	:	(label {lbl=$label.tk;})? T_ASYNCHRONOUS
 		( T_COLON_COLON )?
 		generic_name_list T_EOS
 	;
 
 // R522
 bind_stmt
-	:	(label)? language_binding_spec
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	:	(label {lbl=$label.tk;})? language_binding_spec
 		( T_COLON_COLON )?
 		bind_entity_list T_EOS
 	;
@@ -1140,7 +1158,8 @@ bind_entity_list
 
 // R524
 data_stmt
-    :    (label)? T_DATA data_stmt_set ( ( T_COMMA )? data_stmt_set )* T_EOS
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+    :    (label {lbl=$label.tk;})? T_DATA data_stmt_set ( ( T_COMMA )? data_stmt_set )* T_EOS
     ;
 
 // R525
@@ -1238,7 +1257,8 @@ options {backtrack=true;}
 // R535, R543-F2008
 // array_name replaced by T_IDENT
 dimension_stmt
-    :    (label)? T_DIMENSION ( T_COLON_COLON )? dimension_decl ( T_COMMA dimension_decl )* T_EOS
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+    :    (label {lbl=$label.tk;})? T_DIMENSION ( T_COLON_COLON )? dimension_decl ( T_COMMA dimension_decl )* T_EOS
     ;
 
 // R544-F2008
@@ -1256,18 +1276,21 @@ dimension_spec
 // R536
 // generic_name_list substituted for dummy_arg_name_list
 intent_stmt
-	:	(label)? T_INTENT T_LPAREN intent_spec T_RPAREN ( T_COLON_COLON )? generic_name_list T_EOS
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	:	(label {lbl=$label.tk;})? T_INTENT T_LPAREN intent_spec T_RPAREN ( T_COLON_COLON )? generic_name_list T_EOS
 	;
 
 // R537
 // generic_name_list substituted for dummy_arg_name_list
 optional_stmt
-	:	(label)? T_OPTIONAL ( T_COLON_COLON )? generic_name_list T_EOS
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	:	(label {lbl=$label.tk;})? T_OPTIONAL ( T_COLON_COLON )? generic_name_list T_EOS
 	;
 
 // R538
 parameter_stmt
-	:	(label)? T_PARAMETER T_LPAREN named_constant_def_list T_RPAREN T_EOS
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	:	(label {lbl=$label.tk;})? T_PARAMETER T_LPAREN named_constant_def_list T_RPAREN T_EOS
 	;
 
 named_constant_def_list
@@ -1283,7 +1306,8 @@ named_constant_def
 
 // R540
 pointer_stmt
-	:	(label)? T_POINTER ( T_COLON_COLON )? pointer_decl_list T_EOS
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	:	(label {lbl=$label.tk;})? T_POINTER ( T_COLON_COLON )? pointer_decl_list T_EOS
 	;
 
 pointer_decl_list
@@ -1299,12 +1323,14 @@ pointer_decl
 // R542
 // generic_name_list substituted for entity_name_list
 protected_stmt
-	:	(label)? T_PROTECTED ( T_COLON_COLON )? generic_name_list T_EOS
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	:	(label {lbl=$label.tk;})? T_PROTECTED ( T_COLON_COLON )? generic_name_list T_EOS
 	;
 
 // R543
 save_stmt
-    : (label)? T_SAVE ( ( T_COLON_COLON )? saved_entity_list )? T_EOS
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+    : (label {lbl=$label.tk;})? T_SAVE ( ( T_COLON_COLON )? saved_entity_list )? T_EOS
     ;
 
 // R544
@@ -1323,7 +1349,8 @@ saved_entity_list
 // R546, R555-F2008
 // T_IDENT inlined for object_name
 target_stmt
-    : (label)? T_TARGET ( T_COLON_COLON )? target_decl ( T_COMMA target_decl )* T_EOS
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+    : (label {lbl=$label.tk;})? T_TARGET ( T_COLON_COLON )? target_decl ( T_COMMA target_decl )* T_EOS
     ;
 
 // R556-F2008
@@ -1335,19 +1362,22 @@ target_decl
 // R547
 // generic_name_list substituted for dummy_arg_name_list
 value_stmt
-	:	(label)? T_VALUE ( T_COLON_COLON )? generic_name_list T_EOS
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	:	(label {lbl=$label.tk;})? T_VALUE ( T_COLON_COLON )? generic_name_list T_EOS
 	;
 
 // R548
 // generic_name_list substituted for object_name_list
 volatile_stmt
-	:	(label)? T_VOLATILE ( T_COLON_COLON )? generic_name_list T_EOS
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	:	(label {lbl=$label.tk;})? T_VOLATILE ( T_COLON_COLON )? generic_name_list T_EOS
 	;
 
 // R549
 implicit_stmt
-	:	(label)? T_IMPLICIT implicit_spec_list T_EOS
-	|	(label)? T_IMPLICIT T_NONE T_EOS
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	:	(label {lbl=$label.tk;})? T_IMPLICIT implicit_spec_list T_EOS
+	|	(label {lbl=$label.tk;})? T_IMPLICIT T_NONE T_EOS
 	;
 
 // R550
@@ -1373,7 +1403,8 @@ letter_spec_list
 // R552
 // T_IDENT inlined for namelist_group_name
 namelist_stmt
-    : (label)? T_NAMELIST T_SLASH T_IDENT T_SLASH namelist_group_object_list
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+    : (label {lbl=$label.tk;})? T_NAMELIST T_SLASH T_IDENT T_SLASH namelist_group_object_list
          ( ( T_COMMA )? T_SLASH T_IDENT T_SLASH namelist_group_object_list )* T_EOS
     ;
 
@@ -1386,7 +1417,8 @@ namelist_group_object_list
 
 // R554
 equivalence_stmt
-	:	(label)? T_EQUIVALENCE equivalence_set_list T_EOS
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	:	(label {lbl=$label.tk;})? T_EQUIVALENCE equivalence_set_list T_EOS
 	;
 
 // R555
@@ -1414,7 +1446,8 @@ equivalence_object_list
 // R557
 // T_IDENT inlined for common_block_name
 common_stmt
-    : (label)? T_COMMON ( T_SLASH ( T_IDENT )? T_SLASH )? common_block_object_list
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+    : (label {lbl=$label.tk;})? T_COMMON ( T_SLASH ( T_IDENT )? T_SLASH )? common_block_object_list
          ( ( T_COMMA )? T_SLASH ( T_IDENT )? T_SLASH common_block_object_list )* T_EOS
     ;
 
@@ -1615,13 +1648,14 @@ image_selector
 // the lexical prepass if a :: was found (which required alt1 below).
 allocate_stmt
 options {k=2;}
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
 // options {backtrack=true;}
-//     :    (label)? T_ALLOCATE T_LPAREN type_spec T_COLON_COLON allocation_list ( T_COMMA alloc_opt_list )? T_RPAREN T_EOS
+//     :    (label {lbl=$label.tk;})? T_ALLOCATE T_LPAREN type_spec T_COLON_COLON allocation_list ( T_COMMA alloc_opt_list )? T_RPAREN T_EOS
     :    ((label)? T_ALLOCATE_STMT_1) => 
-         (label)? T_ALLOCATE_STMT_1 T_ALLOCATE T_LPAREN type_spec 
+         (label {lbl=$label.tk;})? T_ALLOCATE_STMT_1 T_ALLOCATE T_LPAREN type_spec 
             T_COLON_COLON allocation_list 
             ( T_COMMA alloc_opt_list )? T_RPAREN T_EOS
-    |    (label)? T_ALLOCATE T_LPAREN allocation_list ( T_COMMA alloc_opt_list )? T_RPAREN T_EOS
+    |    (label {lbl=$label.tk;})? T_ALLOCATE T_LPAREN allocation_list ( T_COMMA alloc_opt_list )? T_RPAREN T_EOS
     ;
 
 // R624
@@ -1680,7 +1714,8 @@ allocate_shape_spec_list
 
 // R633
 nullify_stmt
-	:	(label)? T_NULLIFY
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	:	(label {lbl=$label.tk;})? T_NULLIFY
 		T_LPAREN
 		pointer_object_list
 		T_RPAREN T_EOS
@@ -1700,7 +1735,8 @@ pointer_object_list
 
 // R635
 deallocate_stmt
-    :    (label)? T_DEALLOCATE T_LPAREN allocate_object_list ( T_COMMA dealloc_opt_list )? T_RPAREN T_EOS
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+    :    (label {lbl=$label.tk;})? T_DEALLOCATE T_LPAREN allocate_object_list ( T_COMMA dealloc_opt_list )? T_RPAREN T_EOS
     ;
 
 // R636
@@ -1934,7 +1970,8 @@ defined_binary_op
 
 // R734
 assignment_stmt
-	:	(label)? T_ASSIGNMENT_STMT variable
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	:	(label {lbl=$label.tk;})? T_ASSIGNMENT_STMT variable
 		T_EQUALS 
 		expr T_EOS
 	;
@@ -1950,9 +1987,10 @@ assignment_stmt
 // them, should be able to remove backtracking.
 pointer_assignment_stmt
 options {backtrack=true;}
-    : (label)? T_PTR_ASSIGNMENT_STMT data_ref T_EQ_GT expr T_EOS
-    | (label)? T_PTR_ASSIGNMENT_STMT data_ref T_LPAREN bounds_spec_list T_RPAREN T_EQ_GT expr T_EOS
-    | (label)? T_PTR_ASSIGNMENT_STMT data_ref T_LPAREN bounds_remapping_list T_RPAREN T_EQ_GT expr T_EOS
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+    : (label {lbl=$label.tk;})? T_PTR_ASSIGNMENT_STMT data_ref T_EQ_GT expr T_EOS
+    | (label {lbl=$label.tk;})? T_PTR_ASSIGNMENT_STMT data_ref T_LPAREN bounds_spec_list T_RPAREN T_EQ_GT expr T_EOS
+    | (label {lbl=$label.tk;})? T_PTR_ASSIGNMENT_STMT data_ref T_LPAREN bounds_remapping_list T_RPAREN T_EQ_GT expr T_EOS
     ;
 
 // R736
@@ -2012,7 +2050,8 @@ proc_pointer_object
 // ERR_CHK 743 mask_expr replaced by expr
 // assignment_stmt inlined for where_assignment_stmt
 where_stmt
-	:	(label)? T_WHERE_STMT T_WHERE
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	:	(label {lbl=$label.tk;})? T_WHERE_STMT T_WHERE
 		T_LPAREN
 		expr
 		T_RPAREN
@@ -2055,26 +2094,29 @@ options {k=2;}
 // ERR_CHK 749 mask_expr replaced by expr
 masked_elsewhere_stmt
 options {k=3;}
-	:	((label)? T_ELSE T_WHERE) => (label)? T_ELSE T_WHERE
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	:	((label)? T_ELSE T_WHERE) => (label {lbl=$label.tk;})? T_ELSE T_WHERE
 		T_LPAREN	expr T_RPAREN ( T_IDENT )? T_EOS
-	|	((label)? T_ELSEWHERE) => (label)? T_ELSEWHERE
+	|	((label)? T_ELSEWHERE) => (label {lbl=$label.tk;})? T_ELSEWHERE
 		T_LPAREN	expr T_RPAREN ( T_IDENT )? T_EOS
 	;
 
 // R750
 elsewhere_stmt
 options {k=3;}
-	:	((label)? T_ELSE T_WHERE) => (label)? T_ELSE T_WHERE
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	:	((label)? T_ELSE T_WHERE) => (label {lbl=$label.tk;})? T_ELSE T_WHERE
 		( T_IDENT )? T_EOS
-	|	((label)? T_ELSEWHERE) => (label)? T_ELSEWHERE
+	|	((label)? T_ELSEWHERE) => (label {lbl=$label.tk;})? T_ELSEWHERE
 		( T_IDENT )? T_EOS
 	;
 
 // R751
 end_where_stmt
 options {k=3;}
-	: ((label)? T_END T_WHERE) => (label)? T_END T_WHERE ( T_IDENT )? T_EOS
-	| (label)? T_ENDWHERE ( T_IDENT )? T_EOS
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	: ((label)? T_END T_WHERE) => (label {lbl=$label.tk;})? T_END T_WHERE ( T_IDENT )? T_EOS
+	| (label {lbl=$label.tk;})? T_ENDWHERE ( T_IDENT )? T_EOS
 	;
 
 // R752
@@ -2086,8 +2128,9 @@ forall_construct
 
 // R753
 forall_construct_stmt
-//     :    (label)? ( T_IDENT T_COLON )? T_FORALL forall_header T_EOS
-    :    (label)? ( T_IDENT T_COLON )? T_FORALL_CONSTRUCT_STMT T_FORALL 
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+//     :    (label {lbl=$label.tk;})? ( T_IDENT T_COLON )? T_FORALL forall_header T_EOS
+    :    (label {lbl=$label.tk;})? ( T_IDENT T_COLON )? T_FORALL_CONSTRUCT_STMT T_FORALL 
             forall_header T_EOS
     ;
 
@@ -2130,16 +2173,18 @@ options {k=2;}
 // R758
 end_forall_stmt
 options {k=3;}
-	: ((label)? T_END T_FORALL) => (label)? T_END T_FORALL ( T_IDENT )? T_EOS
-	| (label)? T_ENDFORALL ( T_IDENT )? T_EOS
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	: ((label)? T_END T_FORALL) => (label {lbl=$label.tk;})? T_END T_FORALL ( T_IDENT )? T_EOS
+	| (label {lbl=$label.tk;})? T_ENDFORALL ( T_IDENT )? T_EOS
 	;
 
 // R759
 forall_stmt
-// 	:	(label)? T_FORALL
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+// 	:	(label {lbl=$label.tk;})? T_FORALL
 // 		forall_header
 // 		forall_assignment_stmt
-	:	(label)? T_FORALL_STMT T_FORALL
+	:	(label {lbl=$label.tk;})? T_FORALL_STMT T_FORALL
 		forall_header
 		forall_assignment_stmt
 	;
@@ -2161,41 +2206,46 @@ if_construct
 // R803
 // ERR_CHK 803 scalar_logical_expr replaced by expr
 if_then_stmt
-    : (label)? ( T_IDENT T_COLON )? T_IF T_LPAREN expr T_RPAREN T_THEN T_EOS
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+    : (label {lbl=$label.tk;})? ( T_IDENT T_COLON )? T_IF T_LPAREN expr T_RPAREN T_THEN T_EOS
     ;
 
 // R804
 // ERR_CHK 804 scalar_logical_expr replaced by expr
 else_if_stmt
 options {k=3;}
-	: ((label)? T_ELSE T_IF) => (label)? T_ELSE T_IF
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	: ((label)? T_ELSE T_IF) => (label {lbl=$label.tk;})? T_ELSE T_IF
         T_LPAREN expr T_RPAREN T_THEN ( T_IDENT )? T_EOS
-	| (label)? T_ELSEIF
+	| (label {lbl=$label.tk;})? T_ELSEIF
         T_LPAREN expr T_RPAREN T_THEN ( T_IDENT )? T_EOS
 	;
 
 // R805
 else_stmt
-	:	(label)? T_ELSE
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	:	(label {lbl=$label.tk;})? T_ELSE
 		( T_IDENT )? T_EOS
 	;
 
 // R806
 end_if_stmt
 options {k=3;}
-	: ((label)? T_END T_IF) => (label)? T_END T_IF ( T_IDENT )? T_EOS
-	| (label)? T_ENDIF ( T_IDENT )? T_EOS
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	: ((label)? T_END T_IF) => (label {lbl=$label.tk;})? T_END T_IF ( T_IDENT )? T_EOS
+	| (label {lbl=$label.tk;})? T_ENDIF ( T_IDENT )? T_EOS
 	;
 
 // R807
 // ERR_CHK 807 scalar_logical_expr replaced by expr
 if_stmt
-// 	:	(label)? T_IF
+// 	:	(label {lbl=$label.tk;})? T_IF
 // 		T_LPAREN
 // 		expr
 // 		T_RPAREN
 // 		action_stmt
-	:	(label)? T_IF_STMT T_IF
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	:	(label {lbl=$label.tk;})? T_IF_STMT T_IF
 		T_LPAREN
 		expr
 		T_RPAREN
@@ -2210,7 +2260,8 @@ case_construct
 // R809
 // ERR_CHK 809 case_expr replaced by expr
 select_case_stmt
-    :    (label)? ( T_IDENT T_COLON )?
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+    :    (label {lbl=$label.tk;})? ( T_IDENT T_COLON )?
         t_select_case
         T_LPAREN expr T_RPAREN T_EOS
     ;
@@ -2223,7 +2274,8 @@ options {k=2;}
 
 // R810
 case_stmt
-	:	(label)? T_CASE
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	:	(label {lbl=$label.tk;})? T_CASE
 		case_selector
 		( T_IDENT )? T_EOS
 	;
@@ -2231,8 +2283,9 @@ case_stmt
 // R811
 end_select_stmt
 options {k=3;}
-	: ((label)? T_END T_SELECT) => (label)? T_END T_SELECT (T_IDENT)? T_EOS
-	| (label)? T_ENDSELECT (T_IDENT)? T_EOS
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	: ((label)? T_END T_SELECT) => (label {lbl=$label.tk;})? T_END T_SELECT (T_IDENT)? T_EOS
+	| (label {lbl=$label.tk;})? T_ENDSELECT (T_IDENT)? T_EOS
 	;
 
 // R812 inlined case_expr with expr was either scalar_int_expr scalar_char_expr scalar_logical_expr
@@ -2277,7 +2330,8 @@ associate_construct
 
 // R817
 associate_stmt
-    : (label)? ( T_IDENT T_COLON )? T_ASSOCIATE T_LPAREN association_list T_RPAREN T_EOS
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+    : (label {lbl=$label.tk;})? ( T_IDENT T_COLON )? T_ASSOCIATE T_LPAREN association_list T_RPAREN T_EOS
     ;
 
 association_list
@@ -2299,8 +2353,9 @@ selector
 // R820
 end_associate_stmt
 options {k=3;}
-	: ((label)? T_END T_ASSOCIATE) => (label)? T_END T_ASSOCIATE ( T_IDENT )? T_EOS
-	| (label)? T_ENDASSOCIATE ( T_IDENT )? T_EOS
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	: ((label)? T_END T_ASSOCIATE) => (label {lbl=$label.tk;})? T_END T_ASSOCIATE ( T_IDENT )? T_EOS
+	| (label {lbl=$label.tk;})? T_ENDASSOCIATE ( T_IDENT )? T_EOS
 	;
 
 // R821
@@ -2311,7 +2366,8 @@ select_type_construct
 // R822
 // T_IDENT inlined for select_construct_name and associate_name
 select_type_stmt
-    : (label)? ( T_IDENT T_COLON )? select_type
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+    : (label {lbl=$label.tk;})? ( T_IDENT T_COLON )? select_type
          T_LPAREN ( T_IDENT T_EQ_GT )? selector T_RPAREN T_EOS
     ;
 
@@ -2327,15 +2383,16 @@ options {k=2;}
 // lexer never matches the sequences.  lexer now matches a T_IDENT for 
 // the 'IS'.  this rule should be fixed (see test_select_stmts.f03)
 type_guard_stmt
-	:	(label)? T_TYPE T_IDENT T_LPAREN
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	:	(label {lbl=$label.tk;})? T_TYPE T_IDENT T_LPAREN
 		type_spec
 		T_RPAREN
 		( T_IDENT )? T_EOS
-	|	(label)? T_CLASS T_IDENT T_LPAREN
+	|	(label {lbl=$label.tk;})? T_CLASS T_IDENT T_LPAREN
 		type_spec
 		T_RPAREN
 		( T_IDENT )? T_EOS
-	|	(label)? T_CLASS	T_DEFAULT
+	|	(label {lbl=$label.tk;})? T_CLASS	T_DEFAULT
 		( T_IDENT )? T_EOS
 	;
 
@@ -2343,8 +2400,9 @@ type_guard_stmt
 // T_IDENT inlined for select_construct_name
 end_select_type_stmt
 options {k=3;}
-	:	((label)? T_END T_SELECT) => (label)? T_END T_SELECT ( T_IDENT )? T_EOS
-	|	(label)? T_ENDSELECT ( T_IDENT )? T_EOS
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	:	((label)? T_END T_SELECT) => (label {lbl=$label.tk;})? T_END T_SELECT ( T_IDENT )? T_EOS
+	|	(label {lbl=$label.tk;})? T_ENDSELECT ( T_IDENT )? T_EOS
 	;
 
 // R825
@@ -2365,14 +2423,16 @@ block_do_construct
 // R827
 // label_do_stmt and nonlabel_do_stmt inlined
 do_stmt
-	:	(label)? ( T_IDENT T_COLON )? T_DO ( T_DIGIT_STRING )? ( loop_control )? T_EOS
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	:	(label {lbl=$label.tk;})? ( T_IDENT T_COLON )? T_DO ( T_DIGIT_STRING )? ( loop_control )? T_EOS
 	;
 
 // R828
 // T_IDENT inlined for do_construct_name
 // T_DIGIT_STRING inlined for label
 label_do_stmt
-	:	(label)? ( T_IDENT T_COLON )? T_DO T_DIGIT_STRING ( loop_control )? T_EOS
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	:	(label {lbl=$label.tk;})? ( T_IDENT T_COLON )? T_DO T_DIGIT_STRING ( loop_control )? T_EOS
 	;
 
 // R829 inlined in R827
@@ -2412,8 +2472,9 @@ end_do
 // T_IDENT inlined for do_construct_name
 end_do_stmt
 options {k=3;}
-	: ((label)? T_END T_DO) => (label)? T_END T_DO ( T_IDENT )? T_EOS
-	| (label)? T_ENDDO ( T_IDENT )? T_EOS
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	: ((label)? T_END T_DO) => (label {lbl=$label.tk;})? T_END T_DO ( T_IDENT )? T_EOS
+	| (label {lbl=$label.tk;})? T_ENDDO ( T_IDENT )? T_EOS
 	;
 
 // R835 nonblock_do_construct deleted as it was combined with block_do_construct to reduce backtracking
@@ -2453,13 +2514,15 @@ do_term_action_stmt
 // R843
 // T_IDENT inlined for do_construct_name
 cycle_stmt
-	:	(label)? T_CYCLE ( T_IDENT )? T_EOS
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	:	(label {lbl=$label.tk;})? T_CYCLE ( T_IDENT )? T_EOS
 	;
 
 // R844
 // T_IDENT inlined for do_construct_name
 exit_stmt
-	:	(label)? T_EXIT ( T_IDENT )? T_EOS
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	:	(label {lbl=$label.tk;})? T_EXIT ( T_IDENT )? T_EOS
 	;
 
 // R845
@@ -2470,7 +2533,8 @@ goto_stmt
 // R846
 // ERR_CHK 846 scalar_int_expr replaced by expr
 computed_goto_stmt
-	:	(label)? t_go_to T_LPAREN label_list T_RPAREN ( T_COMMA )? expr T_EOS
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	:	(label {lbl=$label.tk;})? t_go_to T_LPAREN label_list T_RPAREN ( T_COMMA )? expr T_EOS
 	;
 
 t_go_to
@@ -2483,23 +2547,25 @@ options {k=2;}
 
 // R847
 // ERR_CHK 847 scalar_numeric_expr replaced by expr
+// TODO - fix label action handling
 arithmetic_if_stmt
-	:	(label)? T_ARITHMETIC_IF_STMT T_IF
+	:	(lbl=label)? T_ARITHMETIC_IF_STMT T_IF
 		T_LPAREN
 		expr
 		T_RPAREN
-		label
+		label1=label
 		T_COMMA
-		label
+		label2=label
 		T_COMMA
-		label T_EOS
+		label3=label T_EOS
 	;
 
 // R848 continue_stmt inlined as T_CONTINUE
 
 // R849
 stop_stmt
-	:	(label)? T_STOP ( stop_code )? T_EOS
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	:	(label {lbl=$label.tk;})? T_STOP ( stop_code )? T_EOS
 	;
 
 // R850
@@ -2539,7 +2605,8 @@ file_unit_number
 
 // R904
 open_stmt
-	:	(label)? T_OPEN T_LPAREN connect_spec_list T_RPAREN T_EOS
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	:	(label {lbl=$label.tk;})? T_OPEN T_LPAREN connect_spec_list T_RPAREN T_EOS
 	;
 
 // R905
@@ -2567,7 +2634,8 @@ connect_spec_list
 
 // R908
 close_stmt
-	:	(label)? T_CLOSE T_LPAREN close_spec_list T_RPAREN T_EOS
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	:	(label {lbl=$label.tk;})? T_CLOSE T_LPAREN close_spec_list T_RPAREN T_EOS
 	;
 
 // R909
@@ -2584,18 +2652,21 @@ close_spec_list
 // R910
 read_stmt
 options {k=3;}
-    :    ((label)? T_READ T_LPAREN) => (label)? T_READ T_LPAREN io_control_spec_list T_RPAREN ( input_item_list )? T_EOS
-    |    ((label)? T_READ) => (label)? T_READ format ( T_COMMA input_item_list )? T_EOS
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+    :    ((label)? T_READ T_LPAREN) => (label {lbl=$label.tk;})? T_READ T_LPAREN io_control_spec_list T_RPAREN ( input_item_list )? T_EOS
+    |    ((label)? T_READ) => (label {lbl=$label.tk;})? T_READ format ( T_COMMA input_item_list )? T_EOS
     ;
 
 // R911
 write_stmt
-	:	(label)? T_WRITE T_LPAREN io_control_spec_list T_RPAREN ( output_item_list )? T_EOS
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	:	(label {lbl=$label.tk;})? T_WRITE T_LPAREN io_control_spec_list T_RPAREN ( output_item_list )? T_EOS
 	;
 
 // R912
 print_stmt
-    :    (label)? T_PRINT format ( T_COMMA output_item_list )? T_EOS
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+    :    (label {lbl=$label.tk;})? T_PRINT format ( T_COMMA output_item_list )? T_EOS
     ;
 
 // R913
@@ -2684,7 +2755,8 @@ dtv_type_spec
 
 // R921
 wait_stmt
-	:	(label)? T_WAIT T_LPAREN wait_spec_list T_RPAREN T_EOS
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	:	(label {lbl=$label.tk;})? T_WAIT T_LPAREN wait_spec_list T_RPAREN T_EOS
 	;
 
 // R922
@@ -2701,24 +2773,27 @@ wait_spec_list
 // R923
 backspace_stmt
 options {k=3;}
-	:	((label)? T_BACKSPACE T_LPAREN) => (label)? T_BACKSPACE T_LPAREN position_spec_list T_RPAREN T_EOS
-	|	((label)? T_BACKSPACE) => (label)? T_BACKSPACE file_unit_number T_EOS
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	:	((label)? T_BACKSPACE T_LPAREN) => (label {lbl=$label.tk;})? T_BACKSPACE T_LPAREN position_spec_list T_RPAREN T_EOS
+	|	((label)? T_BACKSPACE) => (label {lbl=$label.tk;})? T_BACKSPACE file_unit_number T_EOS
 	;
 
 // R924
 endfile_stmt
 options {k=3;}
-	:	((label)? T_END T_FILE T_LPAREN) => (label)? T_END T_FILE T_LPAREN position_spec_list T_RPAREN T_EOS
-	|	((label)? T_ENDFILE T_LPAREN) => (label)? T_ENDFILE T_LPAREN position_spec_list T_RPAREN T_EOS
-	|	((label)? T_END T_FILE) => (label)? T_END T_FILE file_unit_number T_EOS
-	|	((label)? T_ENDFILE) => (label)? T_ENDFILE file_unit_number T_EOS
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	:	((label)? T_END T_FILE T_LPAREN) => (label {lbl=$label.tk;})? T_END T_FILE T_LPAREN position_spec_list T_RPAREN T_EOS
+	|	((label)? T_ENDFILE T_LPAREN) => (label {lbl=$label.tk;})? T_ENDFILE T_LPAREN position_spec_list T_RPAREN T_EOS
+	|	((label)? T_END T_FILE) => (label {lbl=$label.tk;})? T_END T_FILE file_unit_number T_EOS
+	|	((label)? T_ENDFILE) => (label {lbl=$label.tk;})? T_ENDFILE file_unit_number T_EOS
 	;
 
 // R925
 rewind_stmt
 options {k=3;}
-	:	((label)? T_REWIND T_LPAREN) => (label)? T_REWIND T_LPAREN position_spec_list T_RPAREN T_EOS
-	|	((label)? T_REWIND) => (label)? T_REWIND file_unit_number T_EOS
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	:	((label)? T_REWIND T_LPAREN) => (label {lbl=$label.tk;})? T_REWIND T_LPAREN position_spec_list T_RPAREN T_EOS
+	|	((label)? T_REWIND) => (label {lbl=$label.tk;})? T_REWIND file_unit_number T_EOS
 	;
 
 // R926
@@ -2735,8 +2810,9 @@ position_spec_list
 // R927
 flush_stmt
 options {k=3;}
-	:	((label)? T_FLUSH T_LPAREN) => (label)? T_FLUSH T_LPAREN flush_spec_list T_RPAREN T_EOS
-	|	((label)? T_FLUSH) => (label)? T_FLUSH file_unit_number T_EOS
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	:	((label)? T_FLUSH T_LPAREN) => (label {lbl=$label.tk;})? T_FLUSH T_LPAREN flush_spec_list T_RPAREN T_EOS
+	|	((label)? T_FLUSH) => (label {lbl=$label.tk;})? T_FLUSH file_unit_number T_EOS
 	;
 
 // R928
@@ -2754,9 +2830,10 @@ flush_spec_list
 inquire_stmt
 // options {backtrack=true;}
 options{k=2;}
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
 	:	(label)? T_INQUIRE T_LPAREN inquire_spec_list T_RPAREN T_EOS
 // 	|	(label)? T_INQUIRE T_LPAREN T_IDENT /* 'IOLENGTH' */ T_EQUALS scalar_int_variable T_RPAREN output_item_list T_EOS
-	|	( (label)? T_INQUIRE_STMT_2 ) => (label)? T_INQUIRE_STMT_2 
+	|	( (label)? T_INQUIRE_STMT_2 ) => (label {lbl=$label.tk;})? T_INQUIRE_STMT_2 
             T_INQUIRE T_LPAREN T_IDENT /* 'IOLENGTH' */ T_EQUALS 
             scalar_int_variable T_RPAREN output_item_list T_EOS
 	;
@@ -2789,6 +2866,7 @@ Section 10:
 // TODO: error checking: label is required.  accept as optional so we can
 // report the error to the user.
 format_stmt
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
 	:	(label)? T_FORMAT format_specification T_EOS
 	;
 
@@ -2910,7 +2988,8 @@ v_list
 // R1102
 // T_IDENT inlined for program_name
 program_stmt
-	:	(label)? T_PROGRAM
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	:	(label {lbl=$label.tk;})? T_PROGRAM
 		T_IDENT T_EOS
 	;
 
@@ -2918,7 +2997,8 @@ program_stmt
 // T_IDENT inlined for program_name
 end_program_stmt
 options {k=3;}
-	:	((label)? T_END T_PROGRAM) => (label)? T_END T_PROGRAM ( T_IDENT )? end_of_stmt
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	:	((label)? T_END T_PROGRAM) => (label {lbl=$label.tk;})? T_END T_PROGRAM ( T_IDENT )? end_of_stmt
 	|	(label)? T_ENDPROGRAM ( T_IDENT )? end_of_stmt
 	|	(label)? T_END end_of_stmt
 	;
@@ -2936,6 +3016,7 @@ module
 
 // R1105
 module_stmt
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
 	:	(label)? T_MODULE ( T_IDENT )? T_EOS
 	;
 
@@ -2943,9 +3024,10 @@ module_stmt
 // R1106
 end_module_stmt
 options {k=3;}
-        :       ((label)? T_END T_MODULE) => (label)? T_END T_MODULE ( T_IDENT )? end_of_stmt
-        |       (label)? T_ENDMODULE ( T_IDENT )? end_of_stmt
-        |       (label)? T_END end_of_stmt
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+        :       ((label)? T_END T_MODULE) => (label {lbl=$label.tk;})? T_END T_MODULE ( T_IDENT )? end_of_stmt
+        |       (label {lbl=$label.tk;})? T_ENDMODULE ( T_IDENT )? end_of_stmt
+        |       (label {lbl=$label.tk;})? T_END end_of_stmt
         ;
 
 // R1107
@@ -2965,8 +3047,9 @@ module_subprogram
 
 // R1109
 use_stmt
-    :    (label)? T_USE ( ( T_COMMA module_nature )? T_COLON_COLON )? T_IDENT ( T_COMMA rename_list )? T_EOS
-    |    (label)? T_USE ( ( T_COMMA module_nature )? T_COLON_COLON )? T_IDENT T_COMMA T_ONLY T_COLON ( only_list )? T_EOS
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+    :    (label {lbl=$label.tk;})? T_USE ( ( T_COMMA module_nature )? T_COLON_COLON )? T_IDENT ( T_COMMA rename_list )? T_EOS
+    |    (label {lbl=$label.tk;})? T_USE ( ( T_COMMA module_nature )? T_COLON_COLON )? T_IDENT T_COMMA T_ONLY T_COLON ( only_list )? T_EOS
     ;
 
 // R1110
@@ -3017,17 +3100,19 @@ block_data
 // R1117
 block_data_stmt
 options {k=3;}
-	:	((label)? T_BLOCK T_DATA) => (label)? T_BLOCK T_DATA ( T_IDENT )? T_EOS
-	|   (label)? T_BLOCKDATA ( T_IDENT )? T_EOS
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	:	((label)? T_BLOCK T_DATA) => (label {lbl=$label.tk;})? T_BLOCK T_DATA ( T_IDENT )? T_EOS
+	|   (label {lbl=$label.tk;})? T_BLOCKDATA ( T_IDENT )? T_EOS
 	;
 
 // R1118
 end_block_data_stmt
 options {k=3;}
-	:   ((label)? T_END T_BLOCK) => (label)? T_END T_BLOCK T_DATA ( T_IDENT )? end_of_stmt
-	|   ((label)? T_ENDBLOCK T_DATA) => (label)? T_ENDBLOCK T_DATA ( T_IDENT )? end_of_stmt
-	|   ((label)? T_END T_BLOCKDATA) => (label)? T_END T_BLOCKDATA ( T_IDENT )? end_of_stmt
-	|   (label)? T_ENDBLOCKDATA ( T_IDENT )? end_of_stmt
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	:   ((label)? T_END T_BLOCK) => (label {lbl=$label.tk;})? T_END T_BLOCK T_DATA ( T_IDENT )? end_of_stmt
+	|   ((label)? T_ENDBLOCK T_DATA) => (label {lbl=$label.tk;})? T_ENDBLOCK T_DATA ( T_IDENT )? end_of_stmt
+	|   ((label)? T_END T_BLOCKDATA) => (label {lbl=$label.tk;})? T_END T_BLOCKDATA ( T_IDENT )? end_of_stmt
+	|   (label {lbl=$label.tk;})? T_ENDBLOCKDATA ( T_IDENT )? end_of_stmt
 	|	(label)? T_END end_of_stmt
 	;
 
@@ -3050,15 +3135,17 @@ interface_specification
 
 // R1203
 interface_stmt
-	:   (label)? T_INTERFACE ( generic_spec )? T_EOS
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	:   (label {lbl=$label.tk;})? T_INTERFACE ( generic_spec )? T_EOS
 	|	(label)? T_ABSTRACT T_INTERFACE T_EOS
 	;
 
 // R1204
 end_interface_stmt
 options {k=3;}
-	: ((label)? T_END T_INTERFACE) => (label)? T_END T_INTERFACE ( generic_spec )? T_EOS
-	| (label)? T_ENDINTERFACE ( generic_spec )? T_EOS
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	: ((label)? T_END T_INTERFACE) => (label {lbl=$label.tk;})? T_END T_INTERFACE ( generic_spec )? T_EOS
+	| (label {lbl=$label.tk;})? T_ENDINTERFACE ( generic_spec )? T_EOS
 	;
 
 // R1205
@@ -3071,7 +3158,8 @@ interface_body
 // R1206
 // generic_name_list substituted for procedure_name_list
 procedure_stmt
-	:	(label)? ( T_MODULE )? T_PROCEDURE generic_name_list T_EOS
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	:	(label {lbl=$label.tk;})? ( T_MODULE )? T_PROCEDURE generic_name_list T_EOS
 	;
 
 // R1207
@@ -3094,18 +3182,21 @@ dtio_generic_spec
 // R1209
 // generic_name_list substituted for import_name_list
 import_stmt
-    :    (label)? T_IMPORT ( ( T_COLON_COLON )? generic_name_list )? T_EOS
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+    :    (label {lbl=$label.tk;})? T_IMPORT ( ( T_COLON_COLON )? generic_name_list )? T_EOS
     ;
 
 // R1210
 // generic_name_list substituted for external_name_list
 external_stmt
-	:	(label)? T_EXTERNAL ( T_COLON_COLON )? generic_name_list T_EOS
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	:	(label {lbl=$label.tk;})? T_EXTERNAL ( T_COLON_COLON )? generic_name_list T_EOS
 	;
 
 // R1211
 procedure_declaration_stmt
-    :    (label)? T_PROCEDURE T_LPAREN ( proc_interface )? T_RPAREN
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+    :    (label {lbl=$label.tk;})? T_PROCEDURE T_LPAREN ( proc_interface )? T_RPAREN
             ( ( T_COMMA proc_attr_spec )* T_COLON_COLON )? proc_decl_list T_EOS
     ;
 
@@ -3141,7 +3232,8 @@ proc_decl_list
 // R1216
 // generic_name_list substituted for intrinsic_procedure_name_list
 intrinsic_stmt
-	:	(label)? T_INTRINSIC
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	:	(label {lbl=$label.tk;})? T_INTRINSIC
 		( T_COLON_COLON )?
 		generic_name_list T_EOS
 	;
@@ -3151,7 +3243,8 @@ intrinsic_stmt
 // R1218
 // C1222 (R1218) The procedure-designator shall designate a subroutine.
 call_stmt
-    :    (label)? T_CALL procedure_designator
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+    :    (label {lbl=$label.tk;})? T_CALL procedure_designator
          ( T_LPAREN ( actual_arg_spec_list )? T_RPAREN )? T_EOS
     ;
 
@@ -3207,7 +3300,8 @@ function_subprogram
 // left factored optional prefix from function_stmt
 // generic_name_list substituted for dummy_arg_name_list
 function_stmt
-	:	(label)? T_FUNCTION T_IDENT
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	:	(label {lbl=$label.tk;})? T_FUNCTION T_IDENT
 		T_LPAREN ( generic_name_list )? T_RPAREN ( suffix )? T_EOS
 	;
 
@@ -3254,9 +3348,10 @@ result_name
 // R1230
 end_function_stmt
 options {k=3;}
-	: ((label)? T_END T_FUNCTION) => (label)? T_END T_FUNCTION ( T_IDENT )? end_of_stmt
-	| (label)? T_ENDFUNCTION ( T_IDENT )? end_of_stmt
-	| (label)? T_END end_of_stmt
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	: ((label)? T_END T_FUNCTION) => (label {lbl=$label.tk;})? T_END T_FUNCTION ( T_IDENT )? end_of_stmt
+	| (label {lbl=$label.tk;})? T_ENDFUNCTION ( T_IDENT )? end_of_stmt
+	| (label {lbl=$label.tk;})? T_END end_of_stmt
 	;
 
 // R1231
@@ -3271,7 +3366,8 @@ subroutine_subprogram
 
 // R1232
 subroutine_stmt
-    :     (label)? (t_prefix)? T_SUBROUTINE T_IDENT
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+    :     (label {lbl=$label.tk;})? (t_prefix)? T_SUBROUTINE T_IDENT
           ( T_LPAREN ( dummy_arg_list )? T_RPAREN ( proc_language_binding_spec )? )? T_EOS
     ;
 
@@ -3290,22 +3386,25 @@ dummy_arg_list
 // R1234
 end_subroutine_stmt
 options {k=3;}
-    : ((label)? T_END T_SUBROUTINE) => (label)? T_END T_SUBROUTINE ( T_IDENT )? end_of_stmt
-    | (label)? T_ENDSUBROUTINE ( T_IDENT )? end_of_stmt
-    | (label)? T_END end_of_stmt
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+    : ((label)? T_END T_SUBROUTINE) => (label {lbl=$label.tk;})? T_END T_SUBROUTINE ( T_IDENT )? end_of_stmt
+    | (label {lbl=$label.tk;})? T_ENDSUBROUTINE ( T_IDENT )? end_of_stmt
+    | (label {lbl=$label.tk;})? T_END end_of_stmt
     ;
 
 // R1235
 // T_INDENT inlined for entry_name
 entry_stmt
-    :    (label)? T_ENTRY T_IDENT
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+    :    (label {lbl=$label.tk;})? T_ENTRY T_IDENT
           ( T_LPAREN ( dummy_arg_list )? T_RPAREN ( suffix )? )? T_EOS
     ;
 
 // R1236
 // ERR_CHK 1236 scalar_int_expr replaced by expr
 return_stmt
-	:	(label)? T_RETURN ( expr )? T_EOS
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	:	(label {lbl=$label.tk;})? T_RETURN ( expr )? T_EOS
 	;
 
 // R1237 contains_stmt inlined as T_CONTAINS
@@ -3319,7 +3418,8 @@ return_stmt
 //      Need scanner to send special token if it sees what?
 // TODO - won't do a(b==3,c) = 2
 stmt_function_stmt
-	:	(label)? T_STMT_FUNCTION T_IDENT T_LPAREN ( generic_name_list )? T_RPAREN T_EQUALS expr T_EOS
+@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+	:	(label {lbl=$label.tk;})? T_STMT_FUNCTION T_IDENT T_LPAREN ( generic_name_list )? T_RPAREN T_EQUALS expr T_EOS
 	;
 
 // added this to have a way to match the T_EOS and EOF combinations
@@ -3330,4 +3430,3 @@ end_of_stmt
         // generate the java code.  (as of 12.11.06)
     | (EOF) => EOF
     ;
-   
