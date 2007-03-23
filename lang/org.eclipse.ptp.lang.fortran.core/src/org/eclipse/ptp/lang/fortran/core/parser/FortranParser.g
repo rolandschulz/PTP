@@ -45,9 +45,20 @@ options {
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
+
+import org.eclipse.ptp.lang.fortran.core.parser.IFortranParserAction.LiteralConstant;
+import org.eclipse.ptp.lang.fortran.core.parser.IFortranParserAction.KindParam;
+import org.eclipse.ptp.lang.fortran.core.parser.IFortranParserAction.KindSelector;
+import org.eclipse.ptp.lang.fortran.core.parser.IFortranParserAction.IntrinsicTypeSpec;
 }
 
 @members {
+	public FortranParser(TokenStream input, String kind, String filename) {
+		super(input);
+		ruleMemo = new HashMap[489+1];
+		this.action = FortranParserActionFactory.newAction(this, kind, filename);
+	}
+
 	public boolean hasErrorOccurred = false;
 
     public void reportError(RecognitionException re) {
@@ -128,11 +139,16 @@ options {
 // R1101
 // specification_part made non-optional to remove END ambiguity (as can be empty)
 main_program
-	:	( program_stmt )?
+@init{boolean hasProgramStmt = false;
+	  boolean hasExecutionPart = false;
+	  boolean hasInternalSubprogramPart = false;
+	 }
+	:	( program_stmt {hasProgramStmt = true;})?
 		specification_part
-		( execution_part )?
-		( internal_subprogram_part )?
-		end_program_stmt 
+		( execution_part {hasExecutionPart = true;})?
+		( internal_subprogram_part {hasInternalSubprogramPart = true;})?
+		end_program_stmt
+		{ action.buildMainProgram(hasProgramStmt, hasExecutionPart, hasInternalSubprogramPart); }
 	;
 
 // added rule so could have one rule for main() to call for attempting
@@ -2989,18 +3005,21 @@ v_list
 // T_IDENT inlined for program_name
 program_stmt
 @init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
-	:	(label {lbl=$label.tk;})? T_PROGRAM
-		T_IDENT T_EOS
+	:	(label {lbl=$label.tk;})? T_PROGRAM T_IDENT T_EOS
+		{ action.buildProgramStmt(lbl, $T_IDENT); }
 	;
 
 // R1103
 // T_IDENT inlined for program_name
 end_program_stmt
 options {k=3;}
-@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
-	:	((label)? T_END T_PROGRAM) => (label {lbl=$label.tk;})? T_END T_PROGRAM ( T_IDENT )? end_of_stmt
-	|	(label)? T_ENDPROGRAM ( T_IDENT )? end_of_stmt
-	|	(label)? T_END end_of_stmt
+@init{Token lbl = null; Token id = null;}
+// @init{INIT_TOKEN_NULL(lbl); INIT_TOKEN_NULL(id);}
+	:	((label)? T_END T_PROGRAM)
+		=> (label {lbl=$label.tk;})? T_END T_PROGRAM (T_IDENT {id=$T_IDENT;})? end_of_stmt
+	|	(label {lbl=$label.tk;})? T_ENDPROGRAM (T_IDENT {id=$T_IDENT;})? end_of_stmt
+	|	(label {lbl=$label.tk;})? T_END end_of_stmt
+		{ action.buildEndProgramStmt(lbl, id); }
 	;
 
 	
@@ -3017,7 +3036,7 @@ module
 // R1105
 module_stmt
 @init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
-	:	(label)? T_MODULE ( T_IDENT )? T_EOS
+	:	(label {lbl=$label.tk;})? T_MODULE ( T_IDENT )? T_EOS
 	;
 
 
