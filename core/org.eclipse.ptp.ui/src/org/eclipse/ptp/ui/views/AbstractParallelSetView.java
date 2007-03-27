@@ -170,7 +170,6 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#update()
 	 */
 	public void update() {
-		updateAction();
 		updateTitle();
 	}
 	/* (non-Javadoc)
@@ -186,7 +185,7 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 	/** Update action
 	 * 
 	 */
-	protected void updateAction() {
+	public void updateAction() {
 		boolean deleteActionEnable = (manager.getCurrentSetId().length() == 0 || manager.getCurrentSetId().equals(IElementHandler.SET_ROOT_ID));
 		deleteSetAction.setEnabled(!deleteActionEnable);
 		deleteProcessAction.setEnabled(!deleteActionEnable);

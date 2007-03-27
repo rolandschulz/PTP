@@ -209,6 +209,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 			fireChangeEvent(set, cur_element_set);
 			cur_element_set = set;
 		}
+		updateAction();
 	}
 	/** Get current set
 	 * @return current set
@@ -225,6 +226,8 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	public void refresh(final boolean all) {
 		getDisplay().asyncExec(new Runnable() {
 			public void run() {
+				if (all)
+					updateAction();
 				repaint(all);
 				if (!canvas.isDisposed()) {
 					canvas.redraw();
@@ -232,6 +235,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 			}
 		});
 	}
+	public abstract void updateAction();
 	// Set element info
 	/** Initial view setting
 	 * 

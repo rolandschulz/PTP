@@ -289,14 +289,19 @@ public class IconCanvas extends Canvas {
 	 * 
 	 */
 	private void resetMargin() {
+		e_offset_x = DEFAULT_OFFSET;
 		if (isDisplayRuler()) {
 			GC newGC = getGC();
 			newGC.setFont(getFont());
-			e_offset_x = newGC.stringExtent(String.valueOf(total_elements-1)).x + e_spacing_x + margin_text;
+			if (total_elements > 0) {
+				//Get the last index number to determine the width of ruler bar
+				Object obj = contentProvider.getObject(total_elements-1);
+				if (obj != null) {
+					String text = contentProvider.getRulerIndex(obj, total_elements-1);
+					e_offset_x = newGC.stringExtent(text).x + e_spacing_x + margin_text;
+				}
+			}
 			newGC.dispose();
-		}
-		else {
-			e_offset_x = DEFAULT_OFFSET;
 		}
 	}
 	public void setFontSizeSmaller() {

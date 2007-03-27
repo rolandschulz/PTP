@@ -30,11 +30,12 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.ptp.core.IModelListener;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.IProcessListener;
 import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.events.IModelEvent;
+import org.eclipse.ptp.core.events.IModelRuntimeNotifierEvent;
 import org.eclipse.ptp.core.events.IProcessEvent;
 import org.eclipse.ptp.internal.ui.ParallelImages;
 import org.eclipse.ptp.internal.ui.actions.ChangeQueueAction;
@@ -339,6 +340,7 @@ public class ParallelJobView extends AbstractParallelSetView implements IProcess
 		//if (cur_id != null && job != null && cur_id.equals(job.getIDString()))
 			//return;
 		selectJob((job == null ? IManager.EMPTY_ID : job.getIDString()));
+		updateAction();
 		update();
 	}
 	/** Update Job
@@ -351,7 +353,7 @@ public class ParallelJobView extends AbstractParallelSetView implements IProcess
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.views.AbstractParallelSetView#updateAction()
 	 */
-	protected void updateAction() {
+	public void updateAction() {
 		super.updateAction();
 		if (changeQueueAction != null) {
 			changeQueueAction.setEnabled(getJobManager().getQueues().length > 0);
@@ -475,5 +477,22 @@ public class ParallelJobView extends AbstractParallelSetView implements IProcess
 	
 	public String getQueueID() {
 		return getJobManager().getQueueID();
+	}
+	public void modelEvent(IModelEvent event) {
+		if (event instanceof IModelRuntimeNotifierEvent) {
+			IModelRuntimeNotifierEvent runtimeEvent = (IModelRuntimeNotifierEvent)event;
+			switch (runtimeEvent.getStatus()) {
+			case IModelRuntimeNotifierEvent.RUNNING:
+				build();
+				break;
+			case IModelRuntimeNotifierEvent.STARTED:
+				build();
+				break;
+			case IModelRuntimeNotifierEvent.STOPPED:
+			case IModelRuntimeNotifierEvent.ABORTED:
+				break;
+			}
+		}
+		super.modelEvent(event);
 	}
 }
