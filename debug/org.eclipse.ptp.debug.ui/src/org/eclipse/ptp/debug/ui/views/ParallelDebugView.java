@@ -19,7 +19,6 @@
 package org.eclipse.ptp.debug.ui.views;
 
 import java.util.Iterator;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -373,7 +372,7 @@ public class ParallelDebugView extends ParallelJobView {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.views.AbstractParallelSetView#updateAction()
 	 */
-	protected void updateAction() {
+	public void updateAction() {
 		super.updateAction();
 		IPJob job = ((UIDebugManager) manager).findJobById(getCurrentID());
 		boolean isDebugMode = ((UIDebugManager) manager).isDebugMode(job);
