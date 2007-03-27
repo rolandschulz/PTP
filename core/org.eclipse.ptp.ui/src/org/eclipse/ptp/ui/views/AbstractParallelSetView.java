@@ -170,6 +170,7 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#update()
 	 */
 	public void update() {
+		updateAction();
 		updateTitle();
 	}
 	/* (non-Javadoc)
