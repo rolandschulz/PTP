@@ -70,19 +70,6 @@ public abstract class AbstractParallelView extends ViewPart implements IModelLis
 			refresh(true);
 		}
 		else if (event instanceof IModelRuntimeNotifierEvent) {
-			IModelRuntimeNotifierEvent runtimeEvent = (IModelRuntimeNotifierEvent)event;
-			switch (runtimeEvent.getStatus()) {
-			case IModelRuntimeNotifierEvent.RUNNING:
-				build();
-				break;
-			case IModelRuntimeNotifierEvent.STARTED:
-				build();
-				break;
-			case IModelRuntimeNotifierEvent.STOPPED:
-				break;
-			case IModelRuntimeNotifierEvent.ABORTED:
-				break;
-			}
 			refresh(true);
 		}
 		else if (event instanceof IModelSysChangedEvent) {
