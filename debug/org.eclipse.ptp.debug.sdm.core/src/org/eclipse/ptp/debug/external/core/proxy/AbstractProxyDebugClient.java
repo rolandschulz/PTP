@@ -20,10 +20,8 @@
 package org.eclipse.ptp.debug.external.core.proxy;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.ptp.core.proxy.AbstractProxyClient;
 import org.eclipse.ptp.core.proxy.event.IProxyEvent;
 import org.eclipse.ptp.core.proxy.event.IProxyEventListener;
@@ -34,9 +32,9 @@ import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugEvent;
 import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugEventListener;
 import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugErrorEvent;
 import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugEvent;
-
 public abstract class AbstractProxyDebugClient extends AbstractProxyClient implements IProxyEventListener {
-	protected List<IProxyDebugEventListener>		listeners = new ArrayList<IProxyDebugEventListener>(2);
+	//protected List<IProxyDebugEventListener>		listeners = new ArrayList<IProxyDebugEventListener>(2);
+	protected ListenerList	listeners = new ListenerList();
 	private boolean		waiting = false;
 	private boolean		connected = false;
 	private final long WAIT_CONNECTION = 60000;
@@ -131,11 +129,17 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient imple
 		}
 		
 		if (e != null) {
+			Object[] objects = listeners.getListeners();
+			for (int i=0; i<objects.length; i++) {
+				((IProxyDebugEventListener)objects[i]).handleEvent(e);
+			}
+			/*
 			Iterator i = listeners.iterator();
 			while (i.hasNext()) {
 				IProxyDebugEventListener listener = (IProxyDebugEventListener) i.next();
 				listener.handleEvent(e);
 			}
+			*/
 		}
 		//if (query_have_shut_down()) {
 			//removeEventListener(this);
