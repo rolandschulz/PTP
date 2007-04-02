@@ -38,8 +38,8 @@ public class StepReturnAction extends StepAction {
 	 */
 	public StepReturnAction(ParallelDebugView view) {
 		super(name, view);
-	    setImageDescriptor(PDebugImage.ID_ICON_STEPRETURN_NORMAL);
-	    setDisabledImageDescriptor(PDebugImage.ID_ICON_STEPRETURN_DISABLE);
+	    setImageDescriptor(PDebugImage.getDescriptor(PDebugImage.ICON_STEPRETURN_NORMAL));
+	    setDisabledImageDescriptor(PDebugImage.getDescriptor(PDebugImage.ICON_STEPRETURN_DISABLE));
 	}
 	
 	/* (non-Javadoc)

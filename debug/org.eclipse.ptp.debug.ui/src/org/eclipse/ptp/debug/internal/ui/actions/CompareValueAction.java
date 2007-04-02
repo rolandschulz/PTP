@@ -35,7 +35,7 @@ public class CompareValueAction extends Action {
 	 */
 	public CompareValueAction(PVariableView view) {
 		super(name, IAction.AS_PUSH_BUTTON);
-	    setImageDescriptor(PDebugImage.ID_ICON_VAR_COMPARE_NORMAL);
+	    setImageDescriptor(PDebugImage.getDescriptor(PDebugImage.ICON_VAR_COMPARE_NORMAL));
 	    //setDisabledImageDescriptor(PDebugImage.ID_ICON_VAR_REFRESH_DISABLE);
 	    setToolTipText(name);
 	    setId(name);

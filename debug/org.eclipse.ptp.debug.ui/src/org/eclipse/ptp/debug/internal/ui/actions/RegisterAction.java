@@ -37,7 +37,7 @@ public class RegisterAction extends DebugAction {
 	 */
 	public RegisterAction(ParallelDebugView view) {
 		super(name, view);
-	    setImageDescriptor(PDebugImage.ID_ICON_REGISTER_NORMAL);
+	    setImageDescriptor(PDebugImage.getDescriptor(PDebugImage.ICON_REGISTER_NORMAL));
 	}
 
 	/* (non-Javadoc)

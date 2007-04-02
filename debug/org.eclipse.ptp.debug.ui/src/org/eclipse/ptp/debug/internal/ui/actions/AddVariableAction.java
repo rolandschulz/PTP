@@ -54,7 +54,7 @@ public class AddVariableAction extends Action {
 	 */
 	public AddVariableAction(PTabFolder folder) {
 		super(name, IAction.AS_PUSH_BUTTON);
-		setImageDescriptor(PDebugImage.ID_ICON_ADD_VAR_NORMAL);
+		setImageDescriptor(PDebugImage.getDescriptor(PDebugImage.ICON_ADD_VAR_NORMAL));
 		setToolTipText(name);
 		this.folder = folder;
 	}

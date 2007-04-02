@@ -36,8 +36,8 @@ public class SuspendAction extends DebugAction {
 	 */
 	public SuspendAction(ParallelDebugView view) {
 		super(name, view);
-	    setImageDescriptor(PDebugImage.ID_ICON_SUSPEND_NORMAL);
-	    setDisabledImageDescriptor(PDebugImage.ID_ICON_SUSPEND_DISABLE);
+	    setImageDescriptor(PDebugImage.getDescriptor(PDebugImage.ICON_SUSPEND_NORMAL));
+	    setDisabledImageDescriptor(PDebugImage.getDescriptor(PDebugImage.ICON_SUSPEND_DISABLE));
 	}
 
 	/* (non-Javadoc)

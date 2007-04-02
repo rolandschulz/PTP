@@ -21,7 +21,6 @@ package org.eclipse.ptp.debug.internal.ui;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.eclipse.cdt.core.IAddress;
 import org.eclipse.cdt.internal.ui.util.ExternalEditorInput;
 import org.eclipse.core.resources.IFile;
@@ -706,19 +705,19 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		ImageDescriptor[] overlays = new ImageDescriptor[] { null, null, null, null };
 		try {
 			if (breakpoint.isGlobal()) {
-				overlays[OverlayImageDescriptor.TOP_LEFT] = (breakpoint.isEnabled()) ? PDebugImage.ID_IMG_DEBUG_OVER_BPT_GLOB_EN : PDebugImage.ID_IMG_DEBUG_OVER_BPT_GLOB_DI;
+				overlays[OverlayImageDescriptor.TOP_LEFT] = (breakpoint.isEnabled()) ? PDebugImage.getDescriptor(PDebugImage.IMG_DEBUG_OVER_BPT_GLOB_EN) : PDebugImage.getDescriptor(PDebugImage.IMG_DEBUG_OVER_BPT_GLOB_DI);
 			}
 			if (breakpoint.isConditional()) {
-				overlays[OverlayImageDescriptor.BOTTOM_LEFT] = (breakpoint.isEnabled()) ? PDebugImage.ID_IMG_DEBUG_OVER_BPT_COND_EN : PDebugImage.ID_IMG_DEBUG_OVER_BPT_COND_DI;
+				overlays[OverlayImageDescriptor.BOTTOM_LEFT] = (breakpoint.isEnabled()) ? PDebugImage.getDescriptor(PDebugImage.IMG_DEBUG_OVER_BPT_COND_EN) : PDebugImage.getDescriptor(PDebugImage.IMG_DEBUG_OVER_BPT_COND_DI);
 			}
 			if (breakpoint.isInstalled()) {
-				overlays[OverlayImageDescriptor.BOTTOM_LEFT] = (breakpoint.isEnabled()) ? PDebugImage.ID_IMG_DEBUG_OVER_BPT_INST_EN : PDebugImage.ID_IMG_DEBUG_OVER_BPT_INST_DI;
+				overlays[OverlayImageDescriptor.BOTTOM_LEFT] = (breakpoint.isEnabled()) ? PDebugImage.getDescriptor(PDebugImage.IMG_DEBUG_OVER_BPT_INST_EN) : PDebugImage.getDescriptor(PDebugImage.IMG_DEBUG_OVER_BPT_INST_DI);
 			}
 			if (breakpoint instanceof IPAddressBreakpoint) {
-				overlays[OverlayImageDescriptor.TOP_RIGHT] = (breakpoint.isEnabled()) ? PDebugImage.ID_IMG_DEBUG_OVER_BPT_ADDR_EN : PDebugImage.ID_IMG_DEBUG_OVER_BPT_ADDR_DI;
+				overlays[OverlayImageDescriptor.TOP_RIGHT] = (breakpoint.isEnabled()) ? PDebugImage.getDescriptor(PDebugImage.IMG_DEBUG_OVER_BPT_ADDR_EN) : PDebugImage.getDescriptor(PDebugImage.IMG_DEBUG_OVER_BPT_ADDR_DI);
 			}
 			if (breakpoint instanceof IPFunctionBreakpoint) {
-				overlays[OverlayImageDescriptor.BOTTOM_RIGHT] = (breakpoint.isEnabled()) ? PDebugImage.ID_IMG_DEBUG_OVER_BPT_FUNC_EN : PDebugImage.ID_IMG_DEBUG_OVER_BPT_FUNC_DI;
+				overlays[OverlayImageDescriptor.BOTTOM_RIGHT] = (breakpoint.isEnabled()) ? PDebugImage.getDescriptor(PDebugImage.IMG_DEBUG_OVER_BPT_FUNC_EN) : PDebugImage.getDescriptor(PDebugImage.IMG_DEBUG_OVER_BPT_FUNC_DI);
 			}
 		} catch (CoreException e) {
 			PTPDebugUIPlugin.log(e);
