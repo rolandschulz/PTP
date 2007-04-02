@@ -18,24 +18,33 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.ui;
 
-import java.net.MalformedURLException;
 import java.net.URL;
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.swt.graphics.Image;
+import org.osgi.framework.Bundle;
 
 /**
  * @author clement chu
  *
  */
 public class PDebugImage {
-	public final static URL ICONURL = PTPDebugUIPlugin.getDefault().getBundle().getEntry("icons/");
-	public final static URL TOOLICONURL = PTPDebugUIPlugin.getDefault().getBundle().getEntry("icons/tool/");
-	public final static URL PROCESSICONURL = PTPDebugUIPlugin.getDefault().getBundle().getEntry("icons/process/");
-	public final static URL DEBUGICONURL = PTPDebugUIPlugin.getDefault().getBundle().getEntry("icons/debug/");
+	public final static String ICONPATH = "icons/";
+	public final static String TOOLICONPATH = ICONPATH + "tool/";
+	public final static String PROCESSICONPATH = ICONPATH + "process/";
+	public final static String DEBUGICONPATH = ICONPATH + "debug";
+	
+	/*
+	public final static URL ICONURL = PTPDebugUIPlugin.getDefault().getBundle().getEntry(ICONPATH);
+	public final static URL TOOLICONURL = PTPDebugUIPlugin.getDefault().getBundle().getEntry(TOOLICONPATH);
+	public final static URL PROCESSICONURL = PTPDebugUIPlugin.getDefault().getBundle().getEntry(PROCESSICONPATH);
+	public final static URL DEBUGICONURL = PTPDebugUIPlugin.getDefault().getBundle().getEntry(DEBUGICONPATH);
 	
     private static ImageRegistry imageRegistry = null;
+    */
     
     //array view
 	public static final String ICON_ADD_VAR_NORMAL = "add_variable_normal.gif";
@@ -92,6 +101,7 @@ public class PDebugImage {
 	public static final String IMG_DEBUG_OVER_BPT_FUNC_EN = "function_ovr.gif";
 	public static final String IMG_DEBUG_OVER_BPT_FUNC_DI = "function_ovr_disabled.gif";
 	
+	/*
 	//array view
 	public static final ImageDescriptor ID_ICON_ADD_VAR_NORMAL = createImageDescriptor(TOOLICONURL, ICON_ADD_VAR_NORMAL, ICON_ADD_VAR_NORMAL);
 
@@ -146,53 +156,100 @@ public class PDebugImage {
 	public static final ImageDescriptor ID_IMG_DEBUG_OVER_BPT_ADDR_DI = createImageDescriptor(DEBUGICONURL, IMG_DEBUG_OVER_BPT_ADDR_DI, IMG_DEBUG_OVER_BPT_ADDR_DI);
 	public static final ImageDescriptor ID_IMG_DEBUG_OVER_BPT_FUNC_EN = createImageDescriptor(DEBUGICONURL, IMG_DEBUG_OVER_BPT_FUNC_EN, IMG_DEBUG_OVER_BPT_FUNC_EN);
 	public static final ImageDescriptor ID_IMG_DEBUG_OVER_BPT_FUNC_DI = createImageDescriptor(DEBUGICONURL, IMG_DEBUG_OVER_BPT_FUNC_DI, IMG_DEBUG_OVER_BPT_FUNC_DI);
+	*/
 
+	public static void initializeImageRegistry(ImageRegistry reg) {
+		Bundle bundle = PTPDebugUIPlugin.getDefault().getBundle();
+
+		//array view
+		registerImage(bundle, reg, TOOLICONPATH, ICON_ADD_VAR_NORMAL);
+		
+		//expression view
+		registerImage(bundle, reg, TOOLICONPATH, ICON_VAR_ADD_NORMAL);
+		registerImage(bundle, reg, TOOLICONPATH, ICON_VAR_DELETE_NORMAL);
+		registerImage(bundle, reg, TOOLICONPATH, ICON_VAR_EDIT_NORMAL);
+		registerImage(bundle, reg, TOOLICONPATH, ICON_VAR_REFRESH_NORMAL);
+		registerImage(bundle, reg, TOOLICONPATH, ICON_VAR_COMPARE_NORMAL);
+
+		registerImage(bundle, reg, TOOLICONPATH, ICON_RESUME_DISABLE);
+		registerImage(bundle, reg, TOOLICONPATH, ICON_RESUME_NORMAL);
+		registerImage(bundle, reg, TOOLICONPATH, ICON_SUSPEND_DISABLE);
+		registerImage(bundle, reg, TOOLICONPATH, ICON_SUSPEND_NORMAL);
+		registerImage(bundle, reg, TOOLICONPATH, ICON_TERMINATEALL_DISABLE);
+		registerImage(bundle, reg, TOOLICONPATH, ICON_TERMINATEALL_NORMAL);
+		registerImage(bundle, reg, TOOLICONPATH, ICON_STEPINTO_DISABLE);
+		registerImage(bundle, reg, TOOLICONPATH, ICON_STEPINTO_NORMAL);
+		registerImage(bundle, reg, TOOLICONPATH, ICON_STEPOVER_DISABLE);
+		registerImage(bundle, reg, TOOLICONPATH, ICON_STEPOVER_NORMAL);
+		registerImage(bundle, reg, TOOLICONPATH, ICON_STEPRETURN_DISABLE);
+		registerImage(bundle, reg, TOOLICONPATH, ICON_STEPRETURN_NORMAL);
+		registerImage(bundle, reg, TOOLICONPATH, ICON_REGISTER_NORMAL);
+		registerImage(bundle, reg, TOOLICONPATH, ICON_UNREGISTER_NORMAL);
+		
+		registerImage(bundle, reg, PROCESSICONPATH, IMG_PRO_ERROR_SEL);
+		registerImage(bundle, reg, PROCESSICONPATH, IMG_PRO_ERROR);
+		registerImage(bundle, reg, PROCESSICONPATH, IMG_PRO_RUNNING_SEL);
+		registerImage(bundle, reg, PROCESSICONPATH, IMG_PRO_RUNNING);
+		registerImage(bundle, reg, PROCESSICONPATH, IMG_PRO_STARTED_SEL);
+		registerImage(bundle, reg, PROCESSICONPATH, IMG_PRO_STARTED);
+		registerImage(bundle, reg, PROCESSICONPATH, IMG_PRO_STOPPED_SEL);
+		registerImage(bundle, reg, PROCESSICONPATH, IMG_PRO_STOPPED);
+		registerImage(bundle, reg, PROCESSICONPATH, IMG_PRO_SUSPENDED_SEL);
+		registerImage(bundle, reg, PROCESSICONPATH, IMG_PRO_SUSPENDED);
+
+		registerImage(bundle, reg, DEBUGICONPATH, IMG_DEBUG_PTPBPTSET);
+		registerImage(bundle, reg, DEBUGICONPATH, IMG_DEBUG_BPTCURSET_EN);
+		registerImage(bundle, reg, DEBUGICONPATH, IMG_DEBUG_BPTMULTISET_EN);
+		registerImage(bundle, reg, DEBUGICONPATH, IMG_DEBUG_BPTNOSET_EN);
+		registerImage(bundle, reg, DEBUGICONPATH, IMG_DEBUG_BPTCURSET_DI);
+		registerImage(bundle, reg, DEBUGICONPATH, IMG_DEBUG_BPTMULTISET_DI);
+		registerImage(bundle, reg, DEBUGICONPATH, IMG_DEBUG_BPTNOSET_DI);
+
+		registerImage(bundle, reg, DEBUGICONPATH, IMG_DEBUG_OVER_BPT_GLOB_EN);
+		registerImage(bundle, reg, DEBUGICONPATH, IMG_DEBUG_OVER_BPT_GLOB_DI);
+		registerImage(bundle, reg, DEBUGICONPATH, IMG_DEBUG_OVER_BPT_COND_EN);
+		registerImage(bundle, reg, DEBUGICONPATH, IMG_DEBUG_OVER_BPT_COND_DI);
+		registerImage(bundle, reg, DEBUGICONPATH, IMG_DEBUG_OVER_BPT_INST_EN);
+		registerImage(bundle, reg, DEBUGICONPATH, IMG_DEBUG_OVER_BPT_INST_DI);
+		registerImage(bundle, reg, DEBUGICONPATH, IMG_DEBUG_OVER_BPT_ADDR_EN);
+		registerImage(bundle, reg, DEBUGICONPATH, IMG_DEBUG_OVER_BPT_ADDR_DI);
+		registerImage(bundle, reg, DEBUGICONPATH, IMG_DEBUG_OVER_BPT_FUNC_EN);
+		registerImage(bundle, reg, DEBUGICONPATH, IMG_DEBUG_OVER_BPT_FUNC_DI);
+	}
+	private static void registerImage(Bundle bundle, ImageRegistry registry, String basePath, String file) {
+		URL url = FileLocator.find(bundle, new Path(basePath + file), null);
+		if (url!=null) {
+			ImageDescriptor desc = ImageDescriptor.createFromURL(url);
+			registry.put(file, desc);
+		}
+	}
 	/** Get image
 	 * @param key
 	 * @return
 	 */
 	public static Image getImage(String key) {
-		return getImageRegistry().get(key);
+		return PTPDebugUIPlugin.getDefault().getImageRegistry().get(key);
 	}
 	/** Get image descriptor
 	 * @param key
 	 * @return
 	 */
 	public static ImageDescriptor getDescriptor(String key) {
-		return getImageRegistry().getDescriptor(key);
+		return PTPDebugUIPlugin.getDefault().getImageRegistry().getDescriptor(key);
 	}
-	
-	/** Get image registry
-	 * @return
-	 */
+	/*
 	private static ImageRegistry getImageRegistry() {
 		if (imageRegistry == null) {
 			imageRegistry = new ImageRegistry();
 		}
 		return imageRegistry;
 	}
-	
-	/** Add image
-	 * @param key
-	 * @param image
-	 */
 	public static void addImage(String key, Image image) {
 		getImageRegistry().put(key, image);
 	}
-	/** Add image descriptor
-	 * @param key
-	 * @param imageDescriptor
-	 */
 	public static void addImageDescriptor(String key, ImageDescriptor imageDescriptor) {
 		getImageRegistry().put(key, imageDescriptor);
 	}
-		
-	/** Create image descriptor
-	 * @param iconURL
-	 * @param key
-	 * @param name
-	 * @return
-	 */
 	public static ImageDescriptor createImageDescriptor(URL iconURL, String key, String name) {
 		try {
 			ImageDescriptor imageDescriptor = ImageDescriptor.createFromURL(getIconURL(iconURL, name));
@@ -202,17 +259,11 @@ public class PDebugImage {
 			return ImageDescriptor.getMissingImageDescriptor();
 		}
 	}
-	
-	/** Get icon url
-	 * @param iconURL
-	 * @param name
-	 * @return
-	 * @throws MalformedURLException
-	 */
 	private static URL getIconURL(URL iconURL, String name) throws MalformedURLException {
 		if (iconURL == null)
 			throw new MalformedURLException();
 			
 		return new URL(iconURL, name);
-	}	
+	}
+	*/	
 }

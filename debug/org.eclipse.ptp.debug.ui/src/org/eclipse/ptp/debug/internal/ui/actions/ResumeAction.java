@@ -35,8 +35,8 @@ public class ResumeAction extends DebugAction {
 	 */
 	public ResumeAction(ParallelDebugView view) {
 		super(name, view);
-	    setImageDescriptor(PDebugImage.ID_ICON_RESUME_NORMAL);
-	    setDisabledImageDescriptor(PDebugImage.ID_ICON_RESUME_DISABLE);
+	    setImageDescriptor(PDebugImage.getDescriptor(PDebugImage.ICON_RESUME_NORMAL));
+	    setDisabledImageDescriptor(PDebugImage.getDescriptor(PDebugImage.ICON_RESUME_DISABLE));
 	}
 
 	/* (non-Javadoc)

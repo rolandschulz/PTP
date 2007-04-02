@@ -32,6 +32,8 @@ import org.eclipse.debug.core.model.IPersistableSourceLocator;
 import org.eclipse.debug.ui.ILaunchConfigurationTab;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.ptp.debug.internal.ui.PDebugImage;
 import org.eclipse.ptp.debug.internal.ui.PDebugModelPresentation;
 import org.eclipse.ptp.debug.internal.ui.UIDebugManager;
 import org.eclipse.ptp.debug.ui.sourcelookup.DefaultSourceLocator;
@@ -62,6 +64,9 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 		super();
 		plugin = this;
 	}
+    protected void initializeImageRegistry(ImageRegistry reg) {
+    	PDebugImage.initializeImageRegistry(reg);
+    }	
 
 	/** Get unique identifier of plugin
 	 * @return

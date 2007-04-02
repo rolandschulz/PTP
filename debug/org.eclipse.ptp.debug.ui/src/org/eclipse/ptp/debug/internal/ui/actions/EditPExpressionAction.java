@@ -41,7 +41,7 @@ public class EditPExpressionAction extends Action {
 	 */
 	public EditPExpressionAction(PVariableView view) {
 		super(name, IAction.AS_PUSH_BUTTON);
-	    setImageDescriptor(PDebugImage.ID_ICON_VAR_EDIT_NORMAL);
+	    setImageDescriptor(PDebugImage.getDescriptor(PDebugImage.ICON_VAR_EDIT_NORMAL));
 	    //setDisabledImageDescriptor(PDebugImage.ID_ICON_VAR_EDIT_DISABLE);
 	    setToolTipText(name);
 	    setId(name);

@@ -36,8 +36,8 @@ public class StepOverAction extends StepAction {
 	 */
 	public StepOverAction(ParallelDebugView view) {
 		super(name, view);
-	    setImageDescriptor(PDebugImage.ID_ICON_STEPOVER_NORMAL);
-	    setDisabledImageDescriptor(PDebugImage.ID_ICON_STEPOVER_DISABLE);
+	    setImageDescriptor(PDebugImage.getDescriptor(PDebugImage.ICON_STEPOVER_NORMAL));
+	    setDisabledImageDescriptor(PDebugImage.getDescriptor(PDebugImage.ICON_STEPOVER_DISABLE));
 	}
 
 	/* (non-Javadoc)

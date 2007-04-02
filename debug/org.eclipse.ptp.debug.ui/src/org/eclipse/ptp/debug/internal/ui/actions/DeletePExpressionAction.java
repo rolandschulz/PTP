@@ -39,7 +39,7 @@ public class DeletePExpressionAction extends Action {
 	 */
 	public DeletePExpressionAction(PVariableView view) {
 		super(name, IAction.AS_PUSH_BUTTON);
-	    setImageDescriptor(PDebugImage.ID_ICON_VAR_DELETE_NORMAL);
+	    setImageDescriptor(PDebugImage.getDescriptor(PDebugImage.ICON_VAR_DELETE_NORMAL));
 	    //setDisabledImageDescriptor(PDebugImage.ID_ICON_VAR_DELETE_DISABLE);
 	    setToolTipText(name);
 	    setId(name);

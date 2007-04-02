@@ -35,7 +35,7 @@ public class UnregisterAction extends DebugAction {
 	 */
 	public UnregisterAction(ParallelDebugView view) {
 		super(name, view);
-	    setImageDescriptor(PDebugImage.ID_ICON_UNREGISTER_NORMAL);
+	    setImageDescriptor(PDebugImage.getDescriptor(PDebugImage.ICON_UNREGISTER_NORMAL));
 	}
 
 	/* (non-Javadoc)

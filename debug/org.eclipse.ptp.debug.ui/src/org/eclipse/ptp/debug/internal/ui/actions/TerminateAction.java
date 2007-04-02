@@ -36,8 +36,8 @@ public class TerminateAction extends DebugAction {
 	 */
 	public TerminateAction(ParallelDebugView view) {
 		super(name, view);
-	    setImageDescriptor(PDebugImage.ID_ICON_TERMINATEALL_NORMAL);
-	    setDisabledImageDescriptor(PDebugImage.ID_ICON_TERMINATEALL_DISABLE);
+	    setImageDescriptor(PDebugImage.getDescriptor(PDebugImage.ICON_TERMINATEALL_NORMAL));
+	    setDisabledImageDescriptor(PDebugImage.getDescriptor(PDebugImage.ICON_TERMINATEALL_DISABLE));
 	}
 	
 	/* (non-Javadoc)

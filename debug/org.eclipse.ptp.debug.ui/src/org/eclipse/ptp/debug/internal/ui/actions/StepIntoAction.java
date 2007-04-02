@@ -36,8 +36,8 @@ public class StepIntoAction extends StepAction {
 	 */
 	public StepIntoAction(ParallelDebugView view) {
 		super(name, view);
-	    setImageDescriptor(PDebugImage.ID_ICON_STEPINTO_NORMAL);
-	    setDisabledImageDescriptor(PDebugImage.ID_ICON_STEPINTO_DISABLE);
+	    setImageDescriptor(PDebugImage.getDescriptor(PDebugImage.ICON_STEPINTO_NORMAL));
+	    setDisabledImageDescriptor(PDebugImage.getDescriptor(PDebugImage.ICON_STEPINTO_DISABLE));
 	}
 
 	/* (non-Javadoc)

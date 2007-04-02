@@ -56,7 +56,7 @@ public class PBreakpointSetOrganizer extends AbstractBreakpointOrganizerDelegate
 			if (sid.length() > 0) {
 				IAdaptable[] categories = (IAdaptable[]) types.get(sid);
 				if (category == null) {
-					categories = new IAdaptable[] { new BreakpointTypeCategory(sid, PDebugImage.ID_IMG_DEBUG_PTPBPTSET) };
+					categories = new IAdaptable[] { new BreakpointTypeCategory(sid, PDebugImage.getDescriptor(PDebugImage.IMG_DEBUG_PTPBPTSET)) };
 					types.put(sid, categories);
 				}
 				return categories;
