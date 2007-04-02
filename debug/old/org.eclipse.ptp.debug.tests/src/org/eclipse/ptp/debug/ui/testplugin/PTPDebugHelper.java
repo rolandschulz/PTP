@@ -59,23 +59,27 @@ public class PTPDebugHelper {
 		}
 		return attrs;
 	}
-	public static JobRunConfiguration getJobRunConfiguration(ICProject project, String appName, String resourceMgrName, String machineName, String queueName, int nProcs, int firstNode, int NProcsPerNode) {
+	public static JobRunConfiguration getJobRunConfiguration(String path, String appName, String resourceMgrName, String machineName, String queueName, int nProcs, int firstNode, int NProcsPerNode) {
 		IAttribute[] attrs = getAttributes(nProcs, firstNode, NProcsPerNode);
 		String[] args = new String[0];
 		String[] envs = null;
-		String path = project.getProject().getLocation().toOSString();
 		return new JobRunConfiguration(appName, path, resourceMgrName, machineName, queueName, attrs, args, envs, path);
 	}
-	public static JobRunConfiguration getJobDebugConfiguration(ICProject project, String appName, String resourceMgrName, String machineName, String queueName, int nProcs, int firstNode, int NProcsPerNode, String debuggerType, String debugHost, int debugPort, String sdmPath) {
+	public static JobRunConfiguration getJobRunConfiguration(ICProject project, String appName, String resourceMgrName, String machineName, String queueName, int nProcs, int firstNode, int NProcsPerNode) {
+		return getJobRunConfiguration(project.getProject().getLocation().toOSString(), appName, resourceMgrName, machineName, queueName, nProcs, firstNode, NProcsPerNode);
+	}
+	public static JobRunConfiguration getJobDebugConfiguration(String path, String appName, String resourceMgrName, String machineName, String queueName, int nProcs, int firstNode, int NProcsPerNode, String debuggerType, String debugHost, int debugPort, String sdmPath) {
 		String debugArgs = "--host=" + debugHost + " --debugger=" + debuggerType + " --port=" + debugPort;
-
 		System.err.println("*** If you start JUnit test with manually launch sdm, please type the following on command line ***");
 		System.err.println(">>> mpirun -np " + (nProcs+1) + " ./sdm " + debugArgs);
-		JobRunConfiguration jobConfig = getJobRunConfiguration(project, appName, resourceMgrName, machineName, queueName, nProcs, firstNode, NProcsPerNode);
+		JobRunConfiguration jobConfig = getJobRunConfiguration(path, appName, resourceMgrName, machineName, queueName, nProcs, firstNode, NProcsPerNode);
 		jobConfig.setDebug();
 		jobConfig.setDebuggerPath(sdmPath);
 		jobConfig.setDebuggerArgs(debugArgs);
 		return jobConfig;
+	}
+	public static JobRunConfiguration getJobDebugConfiguration(ICProject project, String appName, String resourceMgrName, String machineName, String queueName, int nProcs, int firstNode, int NProcsPerNode, String debuggerType, String debugHost, int debugPort, String sdmPath) {
+		return getJobDebugConfiguration(project.getProject().getLocation().toOSString(), appName, resourceMgrName, machineName, queueName, nProcs, firstNode, NProcsPerNode, debuggerType, debugHost, debugPort, sdmPath);
 	}
 	public static IResourceManager createOrteManager(String ptp_orte_proxyPath) {
 		ORTEResourceManagerFactory factory = new ORTEResourceManagerFactory();
