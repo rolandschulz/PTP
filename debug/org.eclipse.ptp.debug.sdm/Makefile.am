@@ -38,7 +38,7 @@ noinst_HEADERS =			include/breakpoint.h include/dbg.h include/location.h include
 noinst_LIBRARIES =			libdbgclnt.a libdbgutils.a libmi.a
 
 libdbgclnt_a_SOURCES =		src/client/client_interface.c 
-libdbgclnt_a_CFLAGS =		-I./include -I./libaif $(AM_CFLAGS) -g -pg
+libdbgclnt_a_CFLAGS =		-I./include -I./libaif $(AM_CFLAGS) -g
 
 libdbgutils_a_SOURCES =		src/utils/error.c \
 							src/utils/breakpoint.c \
@@ -49,7 +49,7 @@ libdbgutils_a_SOURCES =		src/utils/error.c \
 							src/utils/signalinfo.c \
 							src/utils/debug.c
 						
-libdbgutils_a_CFLAGS =		-I./include -I./libaif $(AM_CFLAGS) -g -pg
+libdbgutils_a_CFLAGS =		-I./include -I./libaif $(AM_CFLAGS) -g
 
 libmi_a_SOURCES =			src/mi/MIParser.c \
 							src/mi/MIOOBRecord.c \
@@ -78,4 +78,4 @@ libmi_a_SOURCES =			src/mi/MIParser.c \
 							src/mi/CLICommand.c \
 							src/mi/CLIOutput.c
 						
-libmi_a_CFLAGS =			-I./include $(AM_CFLAGS) -g -pg
+libmi_a_CFLAGS =			-I./include $(AM_CFLAGS) -g
