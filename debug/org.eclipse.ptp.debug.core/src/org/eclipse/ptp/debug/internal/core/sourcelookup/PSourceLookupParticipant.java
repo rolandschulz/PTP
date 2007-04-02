@@ -23,13 +23,13 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.debug.core.sourcelookup.AbstractSourceLookupParticipant;
 import org.eclipse.debug.core.sourcelookup.ISourceLookupDirector;
 import org.eclipse.debug.core.sourcelookup.containers.LocalFileStorage;
 import org.eclipse.ptp.debug.core.model.IPStackFrame;
 import org.eclipse.ptp.debug.core.sourcelookup.ISourceLookupChangeListener;
-import org.eclipse.ptp.debug.internal.core.ListenerList;
 
 /**
  * @author Clement chu
@@ -87,7 +87,7 @@ public class PSourceLookupParticipant extends AbstractSourceLookupParticipant {
 		return new LocalFileStorage[] { new LocalFileStorage(file) };
 	}
 	public void dispose() {
-		fListeners.removeAll();
+		fListeners.clear();
 		super.dispose();
 	}
 	public void addSourceLookupChangeListener(ISourceLookupChangeListener listener) {
