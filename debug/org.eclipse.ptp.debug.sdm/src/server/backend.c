@@ -19,7 +19,7 @@ extern dbg_backend_funcs	TestBackend;
 
 dbg_backend	dbg_backends[] = {
 	{"gdb-mi", &GDBMIBackend, "gdb"},
-	{"test", &TestBackend, NULL},
+	{"test", &TestBackend, NULL}
 };
 
 int
