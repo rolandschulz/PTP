@@ -21,7 +21,7 @@ import org.junit.Test;
  */
 public class BreakpointTests extends AbstractBaseTest {
 	//total process
-	static final int total_process = 8;
+	static final int total_process = 736;
 	
 	public BreakpointTests(String name) {
 		super(name, total_process, 0, total_process);

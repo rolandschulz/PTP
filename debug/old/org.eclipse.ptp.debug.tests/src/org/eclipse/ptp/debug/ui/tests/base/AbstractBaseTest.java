@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.ptp.core.util.BitList;
@@ -46,10 +47,11 @@ import org.eclipse.ptp.rtsystem.JobRunConfiguration;
 public abstract class AbstractBaseTest extends AbstractDebugTest implements IProxyDebugEventListener {
 	protected final String testAppName = "main";
 	protected final String testApp = testAppName + ".c";
-	protected final String appPath = "/home/clement/Desktop/runtime-EclipseApplication/TestVar/Debug";
+	protected final String appPath = "/tmp_mnt/u/cluster1/staff/chu/runtime-PTP";
 	//common
-	protected final long timeout = 5000;
+	protected final long timeout = 360000; //default 1 hour
 	protected BitList tasks = null;
+	protected boolean time_up = false;
 	protected boolean waitAgain = false;
 	protected Object LOCK = new Object();
 	protected NullProgressMonitor monitor;
@@ -57,6 +59,9 @@ public abstract class AbstractBaseTest extends AbstractDebugTest implements IPro
 	//command
 	protected List<BitList> completedTasks = new ArrayList<BitList>();
 	protected List<Object> completedReturns = new ArrayList<Object>();
+	//time
+	protected long time_start = 0;
+	protected long time_end = 0;
 	
 	public AbstractBaseTest(String name, int nProcs, int firstNode, int NProcsPerNode) {
 		super(name, nProcs, firstNode, NProcsPerNode);
@@ -72,6 +77,51 @@ public abstract class AbstractBaseTest extends AbstractDebugTest implements IPro
 		tasks = null;
 		super.tearDown();
 	}
+	private String getTimeFormat(long ms) {
+		//System.err.println("##### TEST TIME: " + ms);
+		int d = 0;
+		int h = 0;
+		int m = 0;
+		int s = 0;
+		String format = "";
+		if (ms < 1000) {
+			format += ms + " ms";
+			return format;
+		}
+		s = (int)(ms / 1000);
+		ms = ms - (s * 1000);
+		if (s < 60) {
+			format += s + " s ";
+			format += ms + " ms";
+			return format;
+		}
+		m = s / 60;
+		s = s - (m * 60);
+		if (m < 60) {
+			format += m + " min ";
+			format += s + " s ";
+			format += ms + " ms";
+			return format;
+		}
+		h = m / 60;
+		m = m - (h * 60);
+		if (h < 24) {
+			format += h + " hr ";
+			format += m + " min ";
+			format += s + " s ";
+			format += ms + " ms";
+			return format;
+		}
+		d = h / 24;
+		h = h - (d * 24); 
+		format += d + " day ";
+		format += h + " hr ";
+		format += m + " min ";
+		format += s + " s ";
+		format += ms + " ms";
+		return format;
+	}
+	
 	public void startDebugServer() throws CoreException, IOException, InterruptedException {
 		JobRunConfiguration jobConfig;
 		int port = 0;
@@ -98,7 +148,8 @@ public abstract class AbstractBaseTest extends AbstractDebugTest implements IPro
 	}
 	protected BitList createBitList() {
 		BitList tasks = new BitList(nProcs);
-		tasks.set(0, nProcs);
+		tasks.set(0, nProcs);		
+
 		return tasks;
 	}
 	protected BitList createBitList(int index) throws PCDIException {
@@ -118,20 +169,24 @@ public abstract class AbstractBaseTest extends AbstractDebugTest implements IPro
 	protected void waitEvent(BitList tasks) throws InterruptedException {
 		synchronized (LOCK) {
 			this.tasks = tasks;
-			this.completedTasks.clear();
-			this.completedReturns.clear();
+			completedTasks.clear();
+			completedReturns.clear();
+			time_up = true; 
+			time_start = System.currentTimeMillis();
 			do {
 				waitAgain = false;
 				LOCK.wait(timeout);
 			} while (waitAgain);
+			time_end = System.currentTimeMillis();
+			if (time_up) {
+				fail("#### TIME OUT ####");
+			}
+			printTime(time_start, time_end);
 		}
 	}
-    protected void lockAgain() {
-    	synchronized (LOCK) {
-    		waitAgain = true;
-    		LOCK.notify();
-    	}
-    }
+	protected void printTime(long start_t, long end_t) {
+		System.err.println("##### SPENT TIME: " + getTimeFormat(end_t - start_t));
+	}
 	protected void notifyEvent(BitList evtTasks, Object result) {
 		synchronized (LOCK) {
 			completedTasks.add(evtTasks.copy());
@@ -147,9 +202,16 @@ public abstract class AbstractBaseTest extends AbstractDebugTest implements IPro
 			}
 		}
 	}
+    protected void lockAgain() {
+    	synchronized (LOCK) {
+    		waitAgain = true;
+    		LOCK.notify();
+    	}
+    }
     protected void releaseLock() {
     	synchronized (LOCK) {
     		waitAgain = false;
+    		time_up = false;
     		LOCK.notifyAll();
     	}
     }
