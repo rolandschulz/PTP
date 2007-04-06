@@ -1,6 +1,5 @@
-This is a C Standard Make Project.  If you have CDT installed,
-you can use the make target "all" to rebuild the PDFs using
-pdflatex.
+The documentation is built using Ant.
+Right-click build.xml and click on Run As > Ant Build.
 
 Contents:
 

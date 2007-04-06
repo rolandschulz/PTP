@@ -1,10 +1,8 @@
-package org.eclipse.photran.internal.core.parser; import org.eclipse.photran.internal.core.lexer.*;
-
-import java.io.PrintStream;
-import java.lang.ref.WeakReference;
+package org.eclipse.photran.internal.core.parser; import java.io.PrintStream;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
+
+import org.eclipse.photran.internal.core.lexer.Token;
 
 public class ParseTreeNode extends AbstractParseTreeNode
 {
@@ -45,7 +43,8 @@ public class ParseTreeNode extends AbstractParseTreeNode
     
     private Nonterminal nonterminal;
     private Production production;
-    private LinkedList/*<AbstractParseTreeNode>*/ children;
+    private AbstractParseTreeNode[] childArray;
+    private int numChildren;
     
     ///////////////////////////////////////////////////////////////////////////
     // Constructor
@@ -55,7 +54,8 @@ public class ParseTreeNode extends AbstractParseTreeNode
     {
         this.nonterminal = nonterminal;
         this.production = production;
-        this.children = null;
+        this.childArray = null;
+        this.numChildren = 0;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -75,10 +75,24 @@ public class ParseTreeNode extends AbstractParseTreeNode
     public void addChild(AbstractParseTreeNode child)
     {
         if (child == null) child = EMPTY;
+        ensureCapacity();
+        childArray[numChildren++] = child;
+        child.parent = this;
+    }
 
-        if (children == null) children = new LinkedList/*<AbstractParseTreeNode>*/();
-        children.add(child);
-        child.parentRef = new WeakReference/*<ParseTreeNode>*/(this);
+    private void ensureCapacity()
+    {
+        if (childArray == null)
+            childArray = new AbstractParseTreeNode[16]; // Heuristic
+        else if (numChildren >= childArray.length)
+            expandArray();
+    }
+
+    private void expandArray()
+    {
+        AbstractParseTreeNode[] newChildArray = new AbstractParseTreeNode[Math.min(childArray.length*2, 1024)];
+        System.arraycopy(childArray, 0, newChildArray, 0, childArray.length);
+        childArray = newChildArray;
     }
 
     /**
@@ -94,97 +108,145 @@ public class ParseTreeNode extends AbstractParseTreeNode
             return;
         else
         {
-            if (children == null) children = new LinkedList/*<AbstractParseTreeNode>*/();
             for (Iterator it = child.iterator(); it.hasNext(); )
             {
                 Object o = it.next();
                 if (o instanceof Token)
-                {
-                    Token t = (Token)o;
-                    children.add(t);
-                    t.parentRef = new WeakReference/*<ParseTreeNode>*/(this);
-                }
+                    addChild((Token)o);
             }
         }
     }
     
     public void addChild(int index, AbstractParseTreeNode nodeToAdd)
     {
-        if (children == null) children = new LinkedList/*<AbstractParseTreeNode>*/();
-        children.add(index, nodeToAdd);
+        if (index < 0 || index > numChildren) throw new IllegalArgumentException("Invalid index " + index);
+        
+        ensureCapacity();
+        for (int i = numChildren; i >= index; i--)
+            childArray[i+1] = childArray[i];
+        childArray[index] = nodeToAdd;
+        numChildren++;
+    }
+    
+    public int findChild(AbstractParseTreeNode child)
+    {
+        if (childArray == null) return -1;
+        
+        for (int i = 0; i < numChildren; i++)
+            if (childArray[i].equals(child))
+                return i;
+        return -1;
     }
 
     public boolean removeChild(AbstractParseTreeNode childToRemove)
     {
-        return children == null ? false : children.remove(childToRemove);
+        int index = findChild(childToRemove);
+        return index < 0 ? false : removeChild(index);
     }
     
     public boolean removeChild(int index)
     {
-        if (children == null) return false;
+        if (index < 0 || index >= numChildren) throw new IllegalArgumentException("Invalid index " + index);
+        if (childArray == null) return false;
         
-        children.remove(index);
+        for (int i = index + 1; i < numChildren; i++)
+            childArray[i-1] = childArray[i];
+        numChildren--;
         return true;
+    }
+    
+    private AbstractParseTreeNode privateGetChild(int index)
+    {
+        if (index < 0 || index >= numChildren) throw new IllegalArgumentException("Invalid index " + index);
+        if (childArray == null) return null;
+        
+        AbstractParseTreeNode result = childArray[index];
+        return result == EMPTY ? null : result;
     }
     
     public ParseTreeNode getChild(int index)
     {
-        if (children == null || index < 0 || index >= children.size() || children.get(index) == EMPTY)
-            return null;
+        AbstractParseTreeNode result = privateGetChild(index);
+        if (result == null || result instanceof ParseTreeNode)
+            return (ParseTreeNode)result;
         else
-            return (ParseTreeNode)children.get(index);
+            throw new IllegalArgumentException("The child at index " + index + " is a " + result.getClass().getName() + ", not a ParseTreeNode");
     }
     
     public ParseTreeNode getChild(String name)
     {
-        return getChild(production.getNamedIndex(name));
+        int index = production.getNamedIndex(name);
+        return index < 0 ? null : getChild(index);
     }
     
     public Token getChildToken(int index)
     {
-        if (children == null || index < 0 || index >= children.size() || children.get(index) == EMPTY)
-            return null;
+        AbstractParseTreeNode result = privateGetChild(index);
+        if (result == null || result instanceof Token)
+            return (Token)result;
         else
-            return (Token)children.get(index);
+            throw new IllegalArgumentException("The child at index " + index + " is a " + result.getClass().getName() + ", not a Token");
     }
     
     public Token getChildToken(String name)
     {
-        return getChildToken(production.getNamedIndex(name));
+        int index = production.getNamedIndex(name);
+        return index < 0 ? null : getChildToken(index);
     }
     
     public int getNumberOfChildren()
     {
-        return children == null ? 0 : children.size();
+        return numChildren;
     }
     
-    public List getChildren()
-    {
-        return children;
-    }
-
-    public Iterator iterator()
-    {
-        class NullIterator implements Iterator
-        {
-            public boolean hasNext()
-            {
-                return false;
-            }
-
-            public Object next()
-            {
-                return null;
-            }
-
-            public void remove()
-            {
-                throw new Error();
-            }
-        }
-        
-        return children == null ? new NullIterator() : children.iterator();
-    }
+//    public List getChildren()
+//    {
+//        return Arrays.asList(childArray);
+//    }
+//
+//    public Iterator iterator()
+//    {
+//        class NullIterator implements Iterator
+//        {
+//            public boolean hasNext()
+//            {
+//                return false;
+//            }
+//
+//            public Object next()
+//            {
+//                return null;
+//            }
+//
+//            public void remove()
+//            {
+//                throw new Error();
+//            }
+//        }
+//        
+//        class ArrayIterator implements Iterator
+//        {
+//            private int index = 0;
+//            
+//            public boolean hasNext()
+//            {
+//                return index < numChildren;
+//            }
+//
+//            public Object next()
+//            {
+//                return childArray[index++];
+//            }
+//
+//            public void remove()
+//            {
+//                throw new Error();
+//            }
+//            
+//        }
+//        
+//        return childArray == null ? (Iterator)new NullIterator() : (Iterator)new ArrayIterator();
+//    }
 
     ///////////////////////////////////////////////////////////////////////////
     // Visitor Support
@@ -194,22 +256,16 @@ public class ParseTreeNode extends AbstractParseTreeNode
     {
         visitThisNodeUsing(visitor);
 
-        Iterator it = children.iterator();
-        while (it.hasNext())
-        {
-            AbstractParseTreeNode n = (AbstractParseTreeNode)it.next(); 
-            n.visitTopDownUsing(visitor);
-        }
+        if (childArray != null)
+            for (int i = 0; i < numChildren; i++)
+                childArray[i].visitTopDownUsing(visitor);
     }
 
     public void visitBottomUpUsing(ASTVisitor visitor)
     {
-        Iterator it = children.iterator();
-        while (it.hasNext())
-        {
-            AbstractParseTreeNode n = (AbstractParseTreeNode)it.next(); 
-            n.visitBottomUpUsing(visitor);
-        }
+        if (childArray != null)
+            for (int i = 0; i < numChildren; i++)
+                childArray[i].visitBottomUpUsing(visitor);
 
         visitThisNodeUsing(visitor);
     }
@@ -229,12 +285,9 @@ public class ParseTreeNode extends AbstractParseTreeNode
         nonterminal.visitParseTreeNodeUsing(this, visitor);
 
         visitor.preparingToVisitChildrenOf(this);
-        Iterator it = children.iterator();
-        while (it.hasNext())
-        {
-            AbstractParseTreeNode n = (AbstractParseTreeNode)it.next(); 
-            n.visitUsing(visitor);
-        }
+        if (childArray != null)
+            for (int i = 0; i < numChildren; i++)
+                childArray[i].visitUsing(visitor);
         visitor.doneVisitingChildrenOf(this);
     }
 
@@ -243,12 +296,9 @@ public class ParseTreeNode extends AbstractParseTreeNode
         visitor.visitParseTreeNode(this);
 
         visitor.preparingToVisitChildrenOf(this);
-        Iterator it = children.iterator();
-        while (it.hasNext())
-        {
-            AbstractParseTreeNode n = (AbstractParseTreeNode)it.next(); 
-            n.visitUsing(visitor);
-        }
+        if (childArray != null)
+            for (int i = 0; i < numChildren; i++)
+                childArray[i].visitUsing(visitor);
         visitor.doneVisitingChildrenOf(this);
     }
 
@@ -263,12 +313,9 @@ public class ParseTreeNode extends AbstractParseTreeNode
         sb.append(nonterminal.getDescription());
         sb.append("\n");
 
-        Iterator it = children.iterator();
-        while (it.hasNext())
-        {
-            AbstractParseTreeNode n = (AbstractParseTreeNode)it.next(); 
-            sb.append(n.toString(numSpaces + INDENT_SIZE));
-        }
+        if (childArray != null)
+            for (int i = 0; i < numChildren; i++)
+                sb.append(childArray[i].toString(numSpaces + INDENT_SIZE));
         
         return sb.toString();
     }
@@ -279,11 +326,8 @@ public class ParseTreeNode extends AbstractParseTreeNode
     
     public void printOn(PrintStream out)
     {
-        Iterator it = children.iterator();
-        while (it.hasNext())
-        {
-            AbstractParseTreeNode n = (AbstractParseTreeNode)it.next(); 
-            n.printOn(out);
-        }
+        if (childArray != null)
+            for (int i = 0; i < numChildren; i++)
+                childArray[i].printOn(out);
     }
 }

@@ -1,0 +1,134 @@
+% Plug-in Decomposition
+
+\textit{Last Updated 4/4/07}
+
+\section{The Photran Feature}
+
+The following projects comprise Photran as it is distributed to users.
+All sources are Java 4.
+
+\begin{itemize}
+
+\item org.eclipse.photran-feature
+
+	This is the Eclipse feature for Photran, used to build the Zip
+	file distributed to users.  (A feature is a grouping of related
+	plug-ins.)
+
+\item org.eclipse.photran.cdtinterface
+
+	This contains all of the components (core and user interface) related
+	to integration with the CDT.  It includes
+	\begin{itemize}
+	\item ILanguage for Fortran (i.e., the means
+              of adding Fortran to the list of languages recognized
+              by the CDT)
+	\item Fortran model builder, model elements, and icons for the Outline and Projects views
+	\item Fortran perspective, Fortran Projects view, and new project wizards
+	\end{itemize}
+
+\item org.eclipse.photran.core
+
+	This is the Photran Core plug-in.  It
+	contains most of the Fortran-specific ``behind the scenes'' functionality:
+	\begin{itemize}
+	\item Utility classes
+	\item Error parsers for Fortran compilers
+	\item Fortran 95 parser
+	\item Workspace preferences
+	\end{itemize}
+
+\item org.eclipse.photran.core.errorparsers.xlf
+
+	Error parser for the XLF compiler.
+	Managed by Craig Rasmussen at LANL.
+
+\item org.eclipse.photran.managedbuilder.core,
+      org.eclipse.photran.managedbuilder.gnu.ui,
+      org.eclipse.photran.managedbuilder.xlf.ui,
+      org.eclipse.photran.managedbuilder.ui
+
+	Support for Managed Build projects using the GNU toolchain.
+	Managed by Craig Rasmussen at LANL.
+
+\item org.eclipse.photran.core.intel,
+      org.eclipse.photran.intel-feature,
+      org.eclipse.photran.managedbuilder.intel.ui
+
+	Support for Managed Build projects using Intel toolchains.
+	Maintained by Bill Hilliard at Intel.
+
+\item org.eclipse.photran.ui
+
+	This contains the Fortran-specific components of the user interface:
+	\begin{itemize}
+	\item Editor
+	\item Preference pages
+	\end{itemize}
+
+\section{The Refactoring Feature}
+
+The following projects support analysis and refactoring of Fortran sources.
+They are written in Java 5.  The functionality in org.eclipse.photran.core.analysis
+should really be in org.eclipse.photran.core, and likewise with the analysis UI,
+although they are separate since the main Photran plug-in needs to be compilable
+with Java 4.  (Someone originally wanted to compile a native version using gcj,
+as was done with CDT and JDT at Red Hat, and gcj does not currently support
+Java 5.)
+
+\item org.eclipse.photran.refactoring-feature
+
+	The analysis and refactoring feature, distributed separately from the
+	base Photran distribution.
+
+\item org.eclipse.photran.core.analysis
+
+	Support for type checking and analysis of scope, bindings, etc., mainly
+	to support refactoring.  This also includes the Fortran Indexer, which
+	caches to disk information about the externally-visible modules, functions,
+	etc. in each Fortran file in the user's workspace.
+
+\item org.eclipse.photran.ui.analysis
+
+	UI contributions (other than refactorings) that depend on the
+	org.eclipse.photran.core.analysis plug-in.  Currently, this is the Open
+	Declaration action and a project property page where the user can customize
+	the search path for Fortran modules.
+	
+	Some debug actions (e.g., displaying the index, dumping the symbol table,
+	describing the type of a variable) are also included at the time of writing.
+
+\item org.eclipse.photran.refactoring.core,
+      org.eclipse.photran.refactoring.ui,
+      org.eclipse.photran.refactoring-feature
+
+	Support for refactoring Fortran.  In progress.
+
+\section{Other Plug-ins}
+
+The following projects are in CVS but are not distributed to users:
+
+\item org.eclipse.photran-dev-docs
+
+    Developer documentation, including this document
+    (\texttt{dev-guide/*}), CVS instructions
+    (\texttt{dev-guide/cvs-instructions.pdf}),
+	the materials from our presentation at EclipseCon 2006 on adding a new
+	language to the CDT, and a spreadsheet
+    mapping features in the Fortran language to JUnit tests
+    (\texttt{language-coverage/*}).
+
+\item org.eclipse.photran-samples
+
+	A Photran project containing an assortment of Fortran code.
+
+\item org.eclipse.photran.cdtinterface.tests
+\item org.eclipse.photran.core.tests
+\item org.eclipse.photran.refactoring.tests
+
+	JUnit tests for the like-named plug-ins.
+	
+	org.eclipse.photran.refactoring.tests must be run as a JUnit Plug-in Test.
+	The others are run as ordinary JUnit tests.
+
+\end{itemize}

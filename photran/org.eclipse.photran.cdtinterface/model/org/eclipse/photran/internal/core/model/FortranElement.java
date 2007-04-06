@@ -8,8 +8,6 @@ import org.eclipse.cdt.internal.core.model.Parent;
 import org.eclipse.cdt.internal.core.model.SourceManipulation;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.photran.cdtinterface.CDTInterfacePlugin;
-import org.eclipse.photran.core.util.LineCol;
-import org.eclipse.photran.core.util.OffsetLength;
 import org.eclipse.photran.internal.core.lexer.Token;
 
 /**
@@ -80,14 +78,13 @@ public abstract class FortranElement extends SourceManipulation // Parent
 
         if (identifier != null)
         {
-            LineCol pos = (LineCol)identifier.getAdapter(LineCol.class);
-            OffsetLength ol = (OffsetLength)identifier.getAdapter(OffsetLength.class);
-            if (pos != null && ol != null)
-            {
-                setIdPos(ol.getOffset(), ol.getLength());
-                setPos(ol.getOffset(), ol.getLength());
-                setLines(pos.getLine(), pos.getLine());
-            }
+            int offset = identifier.getOffset();
+            int length = identifier.getLength();
+            int line = identifier.getLine();
+            
+            setIdPos(offset, length);
+            setPos(offset, length);
+            setLines(line, line);
         }
     }
 

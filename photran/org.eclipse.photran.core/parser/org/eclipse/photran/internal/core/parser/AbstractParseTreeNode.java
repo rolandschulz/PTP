@@ -1,7 +1,4 @@
-package org.eclipse.photran.internal.core.parser; import org.eclipse.photran.internal.core.lexer.*;
-
-import java.io.PrintStream;
-import java.lang.ref.WeakReference;
+package org.eclipse.photran.internal.core.parser; import java.io.PrintStream;
 
 
 /**
@@ -22,7 +19,7 @@ public abstract class AbstractParseTreeNode
     // Fields
     ///////////////////////////////////////////////////////////////////////////
     
-    protected WeakReference/*<ParseTreeNode>*/ parentRef = null;
+    protected ParseTreeNode parent = null;
 
     ///////////////////////////////////////////////////////////////////////////
     // Accessor/Mutator Methods
@@ -30,7 +27,7 @@ public abstract class AbstractParseTreeNode
 
     public ParseTreeNode getParent()
     {
-        return parentRef == null ? null : (ParseTreeNode)parentRef.get();
+        return parent;
     }
 
     ///////////////////////////////////////////////////////////////////////////

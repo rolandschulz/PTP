@@ -14,7 +14,7 @@ public class SourceEditor
     public static void paste(AbstractParseTreeNode subtreeToPaste, AbstractParseTreeNode pasteBefore, ASTExecutableProgramNode entireAST, boolean reindent)
     {
         ParseTreeNode parent = pasteBefore.getParent();
-        parent.addChild(parent.getChildren().indexOf(pasteBefore), subtreeToPaste);
+        parent.addChild(parent.findChild(pasteBefore), subtreeToPaste);
         if (reindent) Reindenter.reindent(subtreeToPaste, entireAST);
     }
 

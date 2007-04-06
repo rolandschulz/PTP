@@ -1,5 +1,7 @@
 % Introduction
 
+\textit{Last Updated 4/4/07}
+
 Photran is a IDE for Fortran 90/95 and Fortran 77 that is built on top of
 Eclipse.  It is structured as an Eclipse feature, in other words,
 as a set of plug-ins that are designed to be used together.
@@ -61,11 +63,13 @@ in the next section.
 
 \end{itemize}
 
+
+
 \section{The Model}
 
-The Make Projects view in Photran is essentially a visualization of
+The Fortran Projects view in Photran is essentially a visualization of
 the CDT's \textit{model}, a tree data structure describing the contents
-of all Make Projects in the workspace as well as the high-level contents
+of all Fortran Projects in the workspace as well as the high-level contents
 (functions, aggregate types, etc.) of source files.
 
 Alain Magloire (CDT) described the model, A.K.A. the \texttt{ICElement}

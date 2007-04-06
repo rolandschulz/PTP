@@ -1,10 +1,10 @@
 % Getting the Photran Sources from CVS
 
-\textit{Updated 9/8/06}
+\textit{Last Updated 4/4/07}
 
-\hspace{1em}\textbf{Part~I.  Check out the CDT sources from CVS}
+\hspace{1em}\textbf{Part~I.  Check out the CDT 3.1.2 sources from CVS}
 
-If you already have the latest version of CDT installed and do not need
+If you already have CDT 3.2 installed and do not need
 to edit the CDT source code, Part~I can be skipped.
 
 \begin{enumerate}
@@ -33,7 +33,7 @@ to edit the CDT source code, Part~I can be skipped.
 %    and then expand Versions (in the CVS Repositories view)
 \item  Expand :pserver:anonymous@dev.eclipse.org:/cvsroot/tools,
     and then expand HEAD (in the CVS Repositories view)
-%\item  Under org.eclipse.cdt-build, expand org.eclipse.cdt-build CDT\_3\_0
+%\item  Under org.eclipse.cdt-build, expand org.eclipse.cdt-build CDT\_3\_1\_2
 \item  Expand org.eclipse.cdt-build
 %\item  Right click and check out all of the org.eclipse.cdt.* packages
 \item  Under org.eclipse.cdt-build, right click and check out all of the org.eclipse.cdt.* packages
@@ -44,7 +44,7 @@ to edit the CDT source code, Part~I can be skipped.
     (lots of warnings, but no errors).
 
 \vspace{.5em}
-\noindent\textbf{Part II.  Check out the Photran sources from CVS}
+\noindent\textbf{Part~II.  Check out the Photran sources from CVS}
 
 \item In Eclipse, switch to the CVS Repository Exploring perspective.
 \item Right-click the CVS Repositories view; choose New, Repository Location
@@ -67,7 +67,7 @@ to edit the CDT source code, Part~I can be skipped.
     org.eclipse.photran
 \item Right-click and check out all of the projects under org.eclipse.photran
 
-The sources should all compile (albeit with about 2700 warnings).
+The sources should all compile (albeit with lots of warnings).
 
 \end{enumerate}
 

@@ -7,7 +7,7 @@ package org.eclipse.photran.internal.core.parser; import org.eclipse.photran.int
  * <ExecutableProgram> ::= ProgramUnit:<ProgramUnit>  :production1
  * <ExecutableProgram> ::= @:<ExecutableProgram> ProgramUnit:<ProgramUnit>  :production2
  */
-public class ASTExecutableProgramNode extends ParseTreeNode implements IFortranAST
+public class ASTExecutableProgramNode extends ParseTreeNode
 {
     public ASTExecutableProgramNode(Nonterminal nonterminal, Production production)
     {

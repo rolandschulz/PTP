@@ -1,6 +1,5 @@
 package org.eclipse.photran.core;
 
-import org.eclipse.photran.core.util.LineCol;
 import org.eclipse.photran.core.util.Notification;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
@@ -30,14 +29,14 @@ public class Reindenter
         final Token firstToken = findFirstTokenIn(node); if (firstToken == null) return;
         final Token lastToken = findLastTokenIn(node);
         
-        int startLine = getLine(firstToken);
+        int startLine = firstToken.getLine();
         Token tokenStartingLine = findTokenStartingLine(startLine, entireAST);
         if (tokenStartingLine != firstToken) startLine++;
         
         Token firstTokenAbove = findTokenStartingLastNonemptyLineAbove(startLine, entireAST);
         
         int indentSize = 0;
-        indentSize = Math.max(getColumn(firstTokenAbove)-1, 0);
+        indentSize = Math.max(firstTokenAbove.getCol()-1, 0);
         if (startsIndentedRegion(firstTokenAbove)) indentSize += 4;
         indentSize -= getUnindentAmount(node);
         
@@ -55,7 +54,7 @@ public class Reindenter
                 else if (token == lastToken)
                     inFormatRegion = false;
                 
-                if (inFormatRegion && getLine(token) > getLine(previousToken))
+                if (inFormatRegion && token.getLine() > previousToken.getLine())
                     changeWhitetext(token, previousToken, indentAmount);
                     
                 previousToken = token;
@@ -105,7 +104,8 @@ public class Reindenter
             public void visitToken(Token token)
             {
                 update(token.getWhiteBefore());
-                token.setAdapter(LineCol.class, new LineCol(line, col));
+                token.setLine(line);
+                token.setCol(col);
                 update(token.getText());
                 update(token.getWhiteAfter());
             }
@@ -157,16 +157,6 @@ public class Reindenter
             || t == Terminal.T_DO
             || t == Terminal.T_INTERFACE
             || t == Terminal.T_CONTAINS;
-    }
-
-    private static int getLine(Token token)
-    {
-        return ((LineCol)token.getAdapter(LineCol.class)).getLine();
-    }
-
-    private static int getColumn(Token token)
-    {
-        return ((LineCol)token.getAdapter(LineCol.class)).getCol();
     }
 
     /**
@@ -234,8 +224,7 @@ public class Reindenter
                 {
                     public void visitToken(Token token)
                     {
-                        int col = getColumn(token);
-                        minCol = Math.min(col, minCol);
+                        minCol = Math.min(token.getCol(), minCol);
                     }
                 });
 
@@ -252,8 +241,7 @@ public class Reindenter
             {
                 public void visitToken(Token token)
                 {
-                    int tokenLine = getLine(token);
-                    if (tokenLine == lineNum) throw new Notification(token);
+                    if (token.getLine() == lineNum) throw new Notification(token);
                 }
             });
         }

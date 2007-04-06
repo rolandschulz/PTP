@@ -21,7 +21,7 @@ class FixedFormLexerPhase2 implements ILexer
 
     private Token nextToken = null;
 
-    public FixedFormLexerPhase2(InputStream in, String filename, int options)
+    public FixedFormLexerPhase2(InputStream in, String filename)
     {
         final FixedFormLexerPrepass prepass = new FixedFormLexerPrepass(in);
         InputStream prepassReader = new InputStream()
@@ -41,7 +41,7 @@ class FixedFormLexerPhase2 implements ILexer
         };
 
         FixedFormLexerPhase1 fixedLexer1 = new FixedFormLexerPhase1(prepassReader, prepass, filename);
-        freeLexer2 = new FreeFormLexerPhase2(fixedLexer1, options);
+        freeLexer2 = new FreeFormLexerPhase2(fixedLexer1);
     }
 
     public Token yylex() throws Exception

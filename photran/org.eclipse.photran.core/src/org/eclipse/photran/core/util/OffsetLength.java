@@ -1,5 +1,7 @@
 package org.eclipse.photran.core.util;
 
+import org.eclipse.photran.internal.core.lexer.Token;
+
 public final class OffsetLength
 {
     private int offset = 0, length = 0;
@@ -10,11 +12,30 @@ public final class OffsetLength
         this.length = length;
     }
     
+    public static boolean contains(int offset, int length, int otherOffset, int otherLength)
+    {
+        return offset <= otherOffset
+            && getPositionPastEnd(otherOffset, otherLength) <= getPositionPastEnd(offset, length);
+    }
+    
+    public static boolean contains(int offset, int length, OffsetLength other)
+    {
+        return other != null && contains(offset, length, other.offset, other.length);
+    }
+    
     public boolean contains(OffsetLength other)
     {
-        return other != null
-            && this.offset <= other.offset
-            && other.getPositionPastEnd() <= this.getPositionPastEnd();
+        return contains(this.offset, this.length, other);
+    }
+    
+    public boolean contains(Token token)
+    {
+        return contains(this.offset, this.length, token.getOffset(), token.getLength());
+    }
+    
+    public boolean equals(OffsetLength other)
+    {
+        return this.offset == other.offset && this.length == other.length;
     }
 
     public boolean isOnOrAfter(int targetOffset)
@@ -42,9 +63,14 @@ public final class OffsetLength
         return length;
     }
 
-    public int getPositionPastEnd()
+    public static int getPositionPastEnd(int offset, int length)
     {
         return offset + Math.max(length, 1);
+    }
+
+    public int getPositionPastEnd()
+    {
+        return getPositionPastEnd(offset, length);
     }
 
     public void setLength(int length)

@@ -32,6 +32,11 @@ public final class LineCol
     
     public String toString()
     {
+        return toString(line, col);
+    }
+    
+    public static String toString(int line, int col)
+    {
         return "line " + line + ", column " + col;
     }
 }

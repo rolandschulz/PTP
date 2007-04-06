@@ -16,24 +16,28 @@ import org.eclipse.core.runtime.CoreException;
  */
 public final class LexerFactory
 {
+    public static final int AUTO_DETECT_SOURCE_FORM = 0;
+    public static final int FIXED_FORM = 1;
+    public static final int FREE_FORM = 2;
+    
     private LexerFactory() {;}
     
-    public static ILexer createLexer(InputStream in, String filename, int options) throws FileNotFoundException
+    public static IAccumulatingLexer createLexer(InputStream in, String filename, int options) throws FileNotFoundException
     {
-        if ((options & LexerOptions.FIXED_FORM) != 0)
-            return new FixedFormLexerPhase2(in, filename, options);
-        else if ((options & LexerOptions.FREE_FORM) != 0)
-            return new FreeFormLexerPhase2(new FreeFormLexerPhase1(in, filename), options);
+        if ((options & FIXED_FORM) != 0)
+            return new LexerPhase3(new FixedFormLexerPhase2(in, filename));
+        else if ((options & FREE_FORM) != 0)
+            return new LexerPhase3(new FreeFormLexerPhase2(new FreeFormLexerPhase1(in, filename)));
         else // FIXME: JEFF: Automatically detect lexer type from filename extension
-            return new FreeFormLexerPhase2(new FreeFormLexerPhase1(in, filename), options);
+            return new LexerPhase3(new FreeFormLexerPhase2(new FreeFormLexerPhase1(in, filename)));
     }
     
-    public static ILexer createLexer(File file, int options) throws FileNotFoundException
+    public static IAccumulatingLexer createLexer(File file, int options) throws FileNotFoundException
     {
         return createLexer(new BufferedInputStream(new FileInputStream(file)), file.getAbsolutePath(), options);
     }
     
-    public static ILexer createLexer(IFile file, int options) throws FileNotFoundException, CoreException
+    public static IAccumulatingLexer createLexer(IFile file, int options) throws FileNotFoundException, CoreException
     {
         return createLexer(file.getContents(), file.getName(), options);
     }

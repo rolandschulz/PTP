@@ -14,7 +14,12 @@ public class SourcePrinter
     
     public static String getSourceCodeFromAST(IFortranAST ast)
     {
-        String result = getSourceCodeFromASTNode((ASTExecutableProgramNode)ast);
+        return getSourceCodeFromAST(ast.getRoot());
+    }
+    
+    public static String getSourceCodeFromAST(ASTExecutableProgramNode ast)
+    {
+        String result = getSourceCodeFromASTNode(ast);
         
         // When we read in the AST, we use a LineAppendingInputStream so that the
         // user does not have to have a final carriage return in their file.  However,

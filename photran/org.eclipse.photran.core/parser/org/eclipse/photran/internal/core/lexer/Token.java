@@ -1,10 +1,8 @@
 package org.eclipse.photran.internal.core.lexer;
 
 import java.io.PrintStream;
-import java.util.Map;
 
-import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.photran.core.util.ObjectMap;
+import org.eclipse.photran.core.util.OffsetLength;
 import org.eclipse.photran.internal.core.parser.ASTVisitor;
 import org.eclipse.photran.internal.core.parser.AbstractParseTreeNode;
 import org.eclipse.photran.internal.core.parser.GenericParseTreeVisitor;
@@ -15,7 +13,7 @@ import org.eclipse.photran.internal.core.parser.Terminal;
 /**
  * Enumerates the terminal symbols in the grammar being parsed
  */
-public class Token extends AbstractParseTreeNode implements ParserSymbol, IAdaptable
+public class Token extends AbstractParseTreeNode implements ParserSymbol
 {
     ///////////////////////////////////////////////////////////////////////////
     // Fields
@@ -41,7 +39,12 @@ public class Token extends AbstractParseTreeNode implements ParserSymbol, IAdapt
      */
     protected String whiteAfter = "";
     
-    protected Map/*<Class, Object>*/ adapters = new ObjectMap/*<Class, Object>*/();
+    ///////////////////////////////////////////////////////////////////////////
+    // Additional Fields - Not updated when refactoring
+    ///////////////////////////////////////////////////////////////////////////
+    
+    protected int line = -1, col = -1, offset = -1, length = -1;
+    protected Object binding = null;
 
     ///////////////////////////////////////////////////////////////////////////
     // Constructors
@@ -103,24 +106,65 @@ public class Token extends AbstractParseTreeNode implements ParserSymbol, IAdapt
      * Sets whitespace and whitetext appearing after this token that should be associated with this token, not the next
      */
     public void setWhiteAfter(String value) { whiteAfter = value == null ? "" : value; }
-    
-    ///////////////////////////////////////////////////////////////////////////
-    // Adapter/Property Support
-    ///////////////////////////////////////////////////////////////////////////
-    
-    public Object getAdapter(Class adapter)
+
+    public int getLine()
     {
-        return adapters.get(adapter);
-    }
-    
-    public void setAdapter(Class adapterClass, Object adaptedObject)
-    {
-        adapters.put(adapterClass, adaptedObject);
+        return line;
     }
 
-    public Map/*<Class, Object>*/ getAllAdapters()
+    public void setLine(int line)
     {
-        return adapters;
+        this.line = line;
+    }
+
+    public int getCol()
+    {
+        return col;
+    }
+
+    public void setCol(int col)
+    {
+        this.col = col;
+    }
+
+    public int getOffset()
+    {
+        return offset;
+    }
+
+    public void setOffset(int offset)
+    {
+        this.offset = offset;
+    }
+
+    public int getLength()
+    {
+        return length;
+    }
+
+    public void setLength(int length)
+    {
+        this.length = length;
+    }
+    
+    public Object getBinding()
+    {
+        return binding;
+    }
+    
+    public void setBinding(Object binding)
+    {
+        this.binding = binding;
+    }
+
+    public boolean contains(OffsetLength other)
+    {
+        return OffsetLength.contains(offset, length, other);
+    }
+    
+    public boolean isOnOrAfter(int targetOffset)
+    {
+        return offset >= targetOffset;
     }
 
     ///////////////////////////////////////////////////////////////////////////

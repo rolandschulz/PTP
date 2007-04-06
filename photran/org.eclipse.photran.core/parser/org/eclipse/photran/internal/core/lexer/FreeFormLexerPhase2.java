@@ -7,8 +7,6 @@ import java.util.ListIterator;
 import java.util.Vector;
 import java.util.regex.Pattern;
 
-import org.eclipse.photran.core.util.LineCol;
-import org.eclipse.photran.core.util.OffsetLength;
 import org.eclipse.photran.internal.core.parser.Parser;
 import org.eclipse.photran.internal.core.parser.Terminal;
 
@@ -34,8 +32,6 @@ import org.eclipse.photran.internal.core.parser.Terminal;
  */
 class FreeFormLexerPhase2 implements ILexer
 {
-    private int options = LexerOptions.NONE;
-    
     private ILexer yylex;
     private Vector tokenStream = new Vector();
     private Vector lineNumbers = new Vector();
@@ -88,10 +84,9 @@ class FreeFormLexerPhase2 implements ILexer
      * @param phase1Lexer  the phase 1 lexer to read tokens from
      * @param filename  the name of the file being read
      */
-    public FreeFormLexerPhase2(ILexer phase1Lexer, int options)
+    public FreeFormLexerPhase2(ILexer phase1Lexer)
     {
       this.yylex = phase1Lexer;
-      this.options = options;
       buildAdditionalRules();
     }
     
@@ -110,12 +105,17 @@ class FreeFormLexerPhase2 implements ILexer
         if (tokenIt.hasNext())
         {
             lastToken = (Token)tokenIt.next();
+            
             lastTokenLine = ((Integer)lineIt.next()).intValue();
             lastTokenCol = ((Integer)colIt.next()).intValue();
             lastTokenOffset = ((Integer)offsetIt.next()).intValue();
             lastTokenLength = ((Integer)lengthIt.next()).intValue();
-            if ((options & LexerOptions.ASSOCIATE_LINE_COL) != 0) lastToken.setAdapter(LineCol.class, new LineCol(lastTokenLine, lastTokenCol));
-            if ((options & LexerOptions.ASSOCIATE_OFFSET_LENGTH) != 0) lastToken.setAdapter(OffsetLength.class, new OffsetLength(lastTokenOffset, lastTokenLength));
+            
+            lastToken.setLine(lastTokenLine);
+            lastToken.setCol(lastTokenCol);
+            lastToken.setOffset(lastTokenOffset);
+            lastToken.setLength(lastTokenLength);
+            
             return lastToken;
         }
         else return null;

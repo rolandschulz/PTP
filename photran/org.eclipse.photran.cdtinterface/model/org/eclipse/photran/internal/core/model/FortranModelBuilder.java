@@ -13,8 +13,8 @@ import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.cdt.internal.core.model.Parent;
 import org.eclipse.cdt.internal.core.model.TranslationUnit;
 import org.eclipse.photran.core.ASTFactory;
-import org.eclipse.photran.internal.core.lexer.LexerOptions;
-import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
+import org.eclipse.photran.core.IFortranAST;
+import org.eclipse.photran.internal.core.lexer.LexerFactory;
 import org.eclipse.photran.internal.core.preferences.FortranPreferences;
 
 /**
@@ -54,12 +54,8 @@ public class FortranModelBuilder implements IContributedModelBuilder
 
         try
         {
-            int lexerOptions = (isFixedForm ? LexerOptions.FIXED_FORM : LexerOptions.FREE_FORM)
-                               | LexerOptions.ASSOCIATE_LINE_COL
-                               | LexerOptions.ASSOCIATE_OFFSET_LENGTH;
-            ASTExecutableProgramNode ast = (ASTExecutableProgramNode)ASTFactory.buildAST(inputStream,
-                                                                                         filename,
-                                                                                         lexerOptions);
+            int lexerOptions = isFixedForm ? LexerFactory.FIXED_FORM : LexerFactory.FREE_FORM;
+            IFortranAST ast = ASTFactory.buildAST(inputStream, filename, lexerOptions);
             if (isParseTreeModelEnabled())
                 ast.visitUsing(new FortranParseTreeModelBuildingVisitor(translationUnit, this));
             else
