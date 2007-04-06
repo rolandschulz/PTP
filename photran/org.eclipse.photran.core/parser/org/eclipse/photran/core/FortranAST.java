@@ -57,8 +57,10 @@ public class FortranAST implements IFortranAST
 
     public Token findTokenByOffsetLength(final int offset, final int length)
     {
+        // Binary Search
         return tokenList.findOffsetLength(offset, length);
-        
+
+// or Linear Search...
 //        for (int i = 0; i < tokenList.size(); i++)
 //        {
 //            Token token = (Token)tokenList.get(i);
@@ -67,6 +69,7 @@ public class FortranAST implements IFortranAST
 //        }
 //        return null;
         
+// or Parse Tree Traversal...
 //        try
 //        {
 //            root.visitUsing(new GenericParseTreeVisitor()
@@ -83,5 +86,11 @@ public class FortranAST implements IFortranAST
 //            return (Token)n.getResult();
 //        }
 //        return null;
+    }
+    
+    public Token findFirstTokenOnLine(int line)
+    {
+        // Binary Search
+        return tokenList.findFirstTokenOnLine(line);
     }
 }

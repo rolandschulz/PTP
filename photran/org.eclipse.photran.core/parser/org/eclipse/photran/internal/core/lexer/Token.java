@@ -45,6 +45,7 @@ public class Token extends AbstractParseTreeNode implements ParserSymbol
     
     protected int line = -1, col = -1, offset = -1, length = -1;
     protected Object binding = null;
+    protected Object scope = null;
 
     ///////////////////////////////////////////////////////////////////////////
     // Constructors
@@ -155,6 +156,16 @@ public class Token extends AbstractParseTreeNode implements ParserSymbol
     public void setBinding(Object binding)
     {
         this.binding = binding;
+    }
+    
+    public Object getScope()
+    {
+        return scope;
+    }
+    
+    public void setScope(Object scope)
+    {
+        this.scope = scope;
     }
 
     public boolean contains(OffsetLength other)

@@ -25,4 +25,5 @@ public interface IFortranAST extends Iterable/*<Token>*/
     public ASTExecutableProgramNode getRoot();
     
     public Token findTokenByOffsetLength(int offset, int length);
+    public Token findFirstTokenOnLine(int line);
 }
