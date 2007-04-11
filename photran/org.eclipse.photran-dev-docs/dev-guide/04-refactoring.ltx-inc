@@ -1,0 +1,95 @@
+% Refactoring
+
+\textit{Last Updated 4/11/07}
+
+\section{Structure of a Refactoring}
+
+Refactorings in Photran are subclassed from \texttt{FortranRefactoring},
+which is in turn a subclass of the \texttt{Refactoring} class provided
+by the Eclipse Language ToolKit (LTK).
+
+Refactorings---that is, subclasses of \texttt{FortranRefactoring}---must
+implement three methods:
+
+{\footnotesize\begin{verbatim}
+    public String getName();
+    protected abstract void doCheckInitialConditions() throws PreconditionFailure;
+    protected abstract void doCheckFinalConditions() throws PreconditionFailure;
+    protected abstract void doCreateChange() throws CoreException, OperationCanceledException;
+\end{verbatim}}
+
+\texttt{getName} simply returns the name of the refactoring: ``Rename,'' ``Extract Subroutine,''
+``Introduce Implicit None,'' or something similar.
+
+Initial conditions are checked before any dialog is displayed to the user.
+An example would be making sure that the user has selected an identifier to rename.
+If the check fails, a \texttt{PreconditionFailure} should be thrown with a message
+describing the problem for the user.
+
+Final conditions are checked after the user has provided any input.
+An example would be making sure that a string is a legal identifier.
+
+The actual transformation is done in the \texttt{doCreateChange} method,
+which will be called only after the final preconditions are checked.
+
+\section{Checking Preconditions}
+
+The \texttt{FortranRefactoring} class provides a large number of \texttt{protected} utility methods,
+mostly for precondition testing.  Some representative examples follow.  This is by no means an exhaustive
+list, and others will be added as more refactorings are written.
+
+Methods that serve directly as preconditions are often named \texttt{ensure...}.  For example:
+
+\texttt{\begin{itemize}
+\item    protected void ensureIsIdentifierToken(Token t) throws PreconditionFailure
+\item    protected void ensureIsValidIdentifier(String name) throws PreconditionFailure
+\item    protected void ensureIsBoundIdentifier(Token t) throws PreconditionFailure
+\item    protected Definition ensureIsUniquelyDefinedIdentifer(Token t) throws PreconditionFailure
+\item    protected void ensureNameWillNotConflictInScope(Binding binding, String name) throws PreconditionFailure
+\end{itemize}}
+
+Other methods are more primitive and are used to build such precondition checks.  For example:
+
+\begin{itemize}
+\item \texttt{void failIf(boolean test, String msg)} throws a \texttt{PreconditionFailure} if the given boolean expression evaluates to false.
+\item \texttt{Token findEnclosingToken(IFortranAST ast, final OffsetLength selection)} finds the \texttt{Token} containing the given characters in the source file.
+\item \texttt{Token findEnclosingIdentifier(IFortranAST ast, OffsetLength selection)} does the same but throws a \texttt{PreconditionFailure} if the token is not an identifier.
+\item \texttt{StatementSequence findEnclosingStatementSequence(IFortranAST ast, OffsetLength selection)} finds the smallest sequence of statements containing the given characters in the source file. (This is useful for, say, Extract Subroutine.)
+\end{itemize}
+
+\section{AST Rewriting}
+
+After it is determined what files are affected by a refactoring, manipulating the source code
+in the \texttt{doCreateChange} method is conceptually straightforward.
+\begin{enumerate}
+\item To change the text of a single token, simply call its \texttt{setText} method.
+\item To remove part of an AST, call the static method \texttt{SourceEditor.cut(node)}, which will remove
+      the given node (and all of its children), returning it.
+\item To insert a node into an ast, call one of the \texttt{SourceEditor.paste...} methods.  The pasted node
+      will be automatically reindented to match its surroundings.
+\end{enumerate}
+
+After all of the changes have been made to a file's AST,
+\texttt{addChangeFromModifiedAST(IFile file)} should be invoked to
+commit the change, after which it is safe to call \texttt{FortranWorkspace.getInstance().release...}.
+
+\textbf{CAUTION:} Internally, the AST is changed only enough to reproduce correct source code.  After making changes
+to an AST, most of the accessor methods on \texttt{Token}s (\texttt{getLine(), getOffset(), getScope(), getBinding(),} etc.)
+will return \textit{incorrect} values.  This also means that the \texttt{find...} methods in \texttt{FortranWorkspace},
+as well as \texttt{findSourceToken} in the \texttt{Binding} class will \textit{not} work correctly.
+Instead, pointers to the nodes and tokens to manipulate should be obtained \textit{prior to} making any modifications to the AST.
+
+\section{User Interface}
+
+Adding a refactoring to the user interface is best done by following an example.
+First, an action must be added to both the editor popup menu \textit{and} the Refactor
+menu in the menu bar by modifying the plugin.xml file in the org.eclipse.photran.refactoring.ui plug-in.
+Then, the action delegate must be created to populate the user interface of the refactoring wizard dialog;
+\texttt{RenameAction} (in the \texttt{org.eclipse.photran.internal.refactoring.ui} package)
+can be used as a starting point.
+
+\section{An Example: Rename}
+
+The rename refactoring, implemented as \texttt{RenameRefactoring} in the
+\texttt{org.eclipse.photran.internal.core.refactoring} package, is quite brief
+and should serve as a model for building future Fortran refactorings.

@@ -1,8 +1,8 @@
 %\documentclass[10pt,letterpaper,twocolumn]{article}
-\documentclass[10pt,letterpaper]{report}
+\documentclass[12pt,letterpaper]{report}
 
 %\usepackage{anysize}
-%\marginsize{1in}{1in}{1in}{1in}
+%\marginsize{0.5in}{0.5in}{0.5in}{0.5in}
 \usepackage{fullpage}
 
 \usepackage{graphicx}
@@ -34,8 +34,11 @@
 \chapter{Plug-in Decomposition}
 \input{02-plugins.ltx-inc}
 
-\chapter{Parsing, Analysis, and Refactoring}
+\chapter{Parsing and Analysis}
 \input{03-parsing.ltx-inc}
+
+\chapter{Refactoring}
+\input{04-refactoring.ltx-inc}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \appendix
@@ -46,6 +49,9 @@
 
 \chapter{Creating an Error Parser}
 \input{a2-error-parsers.ltx-inc}
+
+\chapter{Creating Tests for the Rename Refactoring}
+\input{a3-rename-tests.ltx-inc}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \end{document}
