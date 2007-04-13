@@ -2,7 +2,7 @@ package org.eclipse.photran.internal.core.lexer;
 
 import java.util.Iterator;
 
-public class TokenList implements Iterable/*<Token>*/
+public class TokenList
 {
     private Token[] array = new Token[4096]; // Heuristic
     private int size = 0;

@@ -6,7 +6,7 @@ import org.eclipse.photran.internal.core.parser.ASTVisitor;
 import org.eclipse.photran.internal.core.parser.GenericParseTreeVisitor;
 import org.eclipse.photran.internal.core.parser.ParseTreeVisitor;
 
-public interface IFortranAST extends Iterable/*<Token>*/
+public interface IFortranAST
 {
     ///////////////////////////////////////////////////////////////////////////
     // Visitor Support
