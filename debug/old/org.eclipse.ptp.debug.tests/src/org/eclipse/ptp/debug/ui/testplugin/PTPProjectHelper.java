@@ -45,6 +45,11 @@ import org.eclipse.ui.wizards.datatransfer.ZipFileStructureProvider;
  * @author Clement chu
  */
 public class PTPProjectHelper {
+	/**
+	 * Get File from working directory
+	 * @param path
+	 * @return
+	 */
 	public static File getFileInPlugin(IPath path) {
 		try {
 			URL installURL = new URL(PTPDebugTestPlugin.getDefault().getBundle().getEntry("/"), path.toOSString());
@@ -55,8 +60,14 @@ public class PTPProjectHelper {
 		}
 	}
 	/**
-	 * Creates a ICProject.
-	 */	
+	 * Create CProject with imported zip file
+	 * @param projectName
+	 * @param zipFile
+	 * @return
+	 * @throws CoreException
+	 * @throws InvocationTargetException
+	 * @throws IOException
+	 */
 	public static ICProject createCProjectWithImport(String projectName, IPath zipFile) throws CoreException, InvocationTargetException, IOException {
 		IWorkspaceRoot root= ResourcesPlugin.getWorkspace().getRoot();
 		IProject project= root.getProject(projectName);
@@ -90,8 +101,11 @@ public class PTPProjectHelper {
 		return cproject;	
 	}
 	/**
-	 * Creates a ICProject.
-	 */	
+	 * Create CProject with given project name
+	 * @param projectName
+	 * @return
+	 * @throws CoreException
+	 */
 	public static ICProject createCProject(String projectName) throws CoreException {
 		IWorkspaceRoot root= ResourcesPlugin.getWorkspace().getRoot();
 		IProject project= root.getProject(projectName);
@@ -110,13 +124,19 @@ public class PTPProjectHelper {
 		return cproject;
 	}
 	/**
-	 * Removes a ICProject.
-	 */		
+	 * Delete given CProject
+	 * @param cproject
+	 * @throws CoreException
+	 */
 	public static void delete(ICProject cproject) throws CoreException {
 		cproject.getProject().delete(true, true, null);
 	}
 	/**
 	 * Attempts to find an archive with the given name in the workspace
+	 * @param testProject
+	 * @param name
+	 * @return
+	 * @throws CModelException
 	 */
 	public static IArchive findArchive(ICProject testProject,String name) throws CModelException {
 		int x;
@@ -131,7 +151,14 @@ public class PTPProjectHelper {
 					return(myArchives[x]);
 		}
 		return(null);
-	}	
+	}
+	/**
+	 * Find binary object file
+	 * @param testProject
+	 * @param name
+	 * @return IBinaryObject
+	 * @throws CoreException
+	 */
 	public static IBinaryObject findBinaryObject(ICProject testProject, String name) throws CoreException {
 		IBinary binary = findBinary(testProject, name);
 		if (binary == null) {
@@ -141,6 +168,10 @@ public class PTPProjectHelper {
 	}
 	/**
 	 * Attempts to find a binary with the given name in the workspace
+	 * @param testProject
+	 * @param name
+	 * @return
+	 * @throws CModelException
 	 */
 	public static IBinary findBinary(ICProject testProject, String name) throws CModelException {
 		IBinaryContainer binCont;
@@ -156,9 +187,13 @@ public class PTPProjectHelper {
 				
 		}
 		return(null);
-	}	
+	}
 	/**
 	 * Attempts to find an object with the given name in the workspace
+	 * @param testProject
+	 * @param name
+	 * @return
+	 * @throws CModelException
 	 */
 	public static IBinary findObject(ICProject testProject,String name) throws CModelException {
 		int x;
@@ -173,9 +208,13 @@ public class PTPProjectHelper {
 				}
 		}
 		return(null);
-	}	
+	}
 	/**
 	 * Attempts to find a TranslationUnit with the given name in the workspace
+	 * @param testProject
+	 * @param name
+	 * @return
+	 * @throws CModelException
 	 */
 	public static ITranslationUnit findTranslationUnit(ICProject testProject,String name) throws CModelException {
 		int x;
@@ -205,7 +244,14 @@ public class PTPProjectHelper {
 				return myElements[x];
 		}
 		return(null);
-	}	
+	}
+	/**
+	 * Add project nature
+	 * @param proj
+	 * @param natureId
+	 * @param monitor
+	 * @throws CoreException
+	 */
 	private static void addNatureToProject(IProject proj, String natureId, IProgressMonitor monitor) throws CoreException {
 		IProjectDescription description = proj.getDescription();
 		String[] prevNatures= description.getNatureIds();
@@ -215,6 +261,13 @@ public class PTPProjectHelper {
 		description.setNatureIds(newNatures);
 		proj.setDescription(description, monitor);
 	}
+	/**
+	 * Import zip file
+	 * @param srcZipFile
+	 * @param destPath
+	 * @param monitor
+	 * @throws InvocationTargetException
+	 */
 	private static void importFilesFromZip(ZipFile srcZipFile, IPath destPath, IProgressMonitor monitor) throws InvocationTargetException {		
 		ZipFileStructureProvider structureProvider=	new ZipFileStructureProvider(srcZipFile);
 		try {
@@ -224,6 +277,11 @@ public class PTPProjectHelper {
 			// should not happen
 		}
 	}
+	/**
+	 * inner class
+	 * @author clement
+	 *
+	 */
 	private static class ImportOverwriteQuery implements IOverwriteQuery {
 		public String queryOverwrite(String file) {
 			return ALL;

@@ -36,6 +36,13 @@ public class PTPDebugHelper {
 	public static IAbstractDebugger createDebugger() {
 		return new ParallelDebugger();
 	}
+	/**
+	 * Create IAttribute array
+	 * @param nProcs number of process
+	 * @param firstNode 
+	 * @param NProcsPerNode
+	 * @return array of IAttribute
+	 */
 	private static IAttribute[] getAttributes(int nProcs, int firstNode, int NProcsPerNode) {
 		final IAttributeDescription firstNodeAttrDesc = new AttributeDescription("FNN_ID0", "FirstNodeNumber", "First Node Number");
 		final IAttributeDescription nProcsAttrDesc = new AttributeDescription("NP_ID0", "NumProcs", "Number of Processes");
@@ -59,15 +66,55 @@ public class PTPDebugHelper {
 		}
 		return attrs;
 	}
+	/**
+	 * Create JobRunConfiguration 
+	 * @param path
+	 * @param appName
+	 * @param resourceMgrName
+	 * @param machineName
+	 * @param queueName
+	 * @param nProcs
+	 * @param firstNode
+	 * @param NProcsPerNode
+	 * @return JobRunConfiguration
+	 */
 	public static JobRunConfiguration getJobRunConfiguration(String path, String appName, String resourceMgrName, String machineName, String queueName, int nProcs, int firstNode, int NProcsPerNode) {
 		IAttribute[] attrs = getAttributes(nProcs, firstNode, NProcsPerNode);
 		String[] args = new String[0];
 		String[] envs = null;
 		return new JobRunConfiguration(appName, path, resourceMgrName, machineName, queueName, attrs, args, envs, path);
 	}
+	/**
+	 * Create JobRunConfiguration
+	 * @param project
+	 * @param appName
+	 * @param resourceMgrName
+	 * @param machineName
+	 * @param queueName
+	 * @param nProcs
+	 * @param firstNode
+	 * @param NProcsPerNode
+	 * @return JobRunConfiguration
+	 */
 	public static JobRunConfiguration getJobRunConfiguration(ICProject project, String appName, String resourceMgrName, String machineName, String queueName, int nProcs, int firstNode, int NProcsPerNode) {
 		return getJobRunConfiguration(project.getProject().getLocation().toOSString(), appName, resourceMgrName, machineName, queueName, nProcs, firstNode, NProcsPerNode);
 	}
+	/**
+	 * Create Debug JobRunConfiguration
+	 * @param path
+	 * @param appName
+	 * @param resourceMgrName
+	 * @param machineName
+	 * @param queueName
+	 * @param nProcs
+	 * @param firstNode
+	 * @param NProcsPerNode
+	 * @param debuggerType
+	 * @param debugHost
+	 * @param debugPort
+	 * @param sdmPath
+	 * @return JobRunConfiguration
+	 */
 	public static JobRunConfiguration getJobDebugConfiguration(String path, String appName, String resourceMgrName, String machineName, String queueName, int nProcs, int firstNode, int NProcsPerNode, String debuggerType, String debugHost, int debugPort, String sdmPath) {
 		String debugArgs = "--host=" + debugHost + " --debugger=" + debuggerType + " --port=" + debugPort;
 		System.err.println("*** If you start JUnit test with manually launch sdm, please type the following on command line ***");
@@ -78,9 +125,30 @@ public class PTPDebugHelper {
 		jobConfig.setDebuggerArgs(debugArgs);
 		return jobConfig;
 	}
+	/**
+	 * Create Debug JobRunConfiguration
+	 * @param project
+	 * @param appName
+	 * @param resourceMgrName
+	 * @param machineName
+	 * @param queueName
+	 * @param nProcs
+	 * @param firstNode
+	 * @param NProcsPerNode
+	 * @param debuggerType
+	 * @param debugHost
+	 * @param debugPort
+	 * @param sdmPath
+	 * @return JobRunConfiguration
+	 */
 	public static JobRunConfiguration getJobDebugConfiguration(ICProject project, String appName, String resourceMgrName, String machineName, String queueName, int nProcs, int firstNode, int NProcsPerNode, String debuggerType, String debugHost, int debugPort, String sdmPath) {
 		return getJobDebugConfiguration(project.getProject().getLocation().toOSString(), appName, resourceMgrName, machineName, queueName, nProcs, firstNode, NProcsPerNode, debuggerType, debugHost, debugPort, sdmPath);
 	}
+	/**
+	 * Create ORTE IResourceManager
+	 * @param ptp_orte_proxyPath
+	 * @return IResourceManager
+	 */
 	public static IResourceManager createOrteManager(String ptp_orte_proxyPath) {
 		ORTEResourceManagerFactory factory = new ORTEResourceManagerFactory();
 		return factory.create(new ORTEResourceManagerConfiguration(factory, "ORTE", "Orte Resource", ptp_orte_proxyPath, false));		

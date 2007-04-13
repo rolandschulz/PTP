@@ -25,12 +25,15 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
-/**
+/** Abtract Debug Junit Test
  * @author clement
  */
 public abstract class AbstractDebugTest extends TestCase {
+	//given the name of resource manager
 	protected final String resourceMgrName = "ORTE";
+	//given machine name
 	protected final String machineName = "Machine0";
+	//given queue name
 	protected final String queueName = "localQueue";
 
 	protected IPJob job = null;
@@ -39,12 +42,25 @@ public abstract class AbstractDebugTest extends TestCase {
 	protected int firstNode = 0;
 	protected int NProcsPerNode = 1;
 	
+	/**
+	 * Constructor
+	 * @param name
+	 * @param nProcs
+	 * @param firstNode
+	 * @param NProcsPerNode
+	 */
 	public AbstractDebugTest(String name, int nProcs, int firstNode, int NProcsPerNode) {
 		super(name);
 		this.nProcs = nProcs;
 		this.firstNode = firstNode;
 		this.NProcsPerNode = NProcsPerNode;
 	}
+	/**
+	 * Start Debugger Server
+	 * @throws CoreException
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
 	protected abstract void startDebugServer() throws CoreException, IOException, InterruptedException;
 	/**
 	 * Sets up the test fixture.
@@ -55,6 +71,9 @@ public abstract class AbstractDebugTest extends TestCase {
 		//Creae debug model object..
 		startDebugServer();
 	}
+	/**
+	 * Tear down when test case is finished
+	 */
 	protected void tearDown() throws CoreException, IOException, PCDIException {
 		if (job != null) {
 			if(!job.isAllStop()) {

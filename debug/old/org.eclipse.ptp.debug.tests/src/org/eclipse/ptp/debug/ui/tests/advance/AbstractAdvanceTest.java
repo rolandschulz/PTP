@@ -70,6 +70,13 @@ public abstract class AbstractAdvanceTest extends AbstractDebugTest {
 	protected final String sdmPath = localPath + "/sdm";
 	protected final String ptp_orte_proxyPath = localPath + "/ptp_orte_proxy";
 
+	/**
+	 * Constructor
+	 * @param name
+	 * @param nProcs
+	 * @param firstNode
+	 * @param NProcsPerNode
+	 */
 	public AbstractAdvanceTest(String name, int nProcs, int firstNode, int NProcsPerNode) {
 		super(name, nProcs, firstNode, NProcsPerNode);
 		/***********************************************************************
@@ -96,6 +103,9 @@ public abstract class AbstractAdvanceTest extends AbstractDebugTest {
 		debugModel = PTPDebugCorePlugin.getDebugModel();
 		super.setUp();
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.ui.tests.AbstractDebugTest#tearDown()
+	 */
 	protected void tearDown() throws CoreException, IOException, PCDIException {
 		if (cdiSession != null)
 			cdiSession.shutdown();
@@ -111,6 +121,9 @@ public abstract class AbstractAdvanceTest extends AbstractDebugTest {
 		testProject = null;
 		super.tearDown();
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.ui.tests.AbstractDebugTest#startDebugServer()
+	 */
 	public void startDebugServer() throws CoreException, IOException, InterruptedException {
 		IAbstractDebugger debugger;
 		IPLaunch launch;

@@ -27,9 +27,18 @@ public class BreakpointTests extends AbstractAdvanceTest {
 	//total process
 	static final int total_process = 8;
 
+	/** Constructor
+	 * @param name
+	 */
 	public BreakpointTests(String name) {
 		super(name, total_process, 0, total_process);
 	}
+	/** test breakpoints
+	 * @throws CoreException
+	 * @throws IOException
+	 * @throws PCDIException
+	 * @throws InterruptedException
+	 */
 	public void testBreakpoints() throws CoreException, IOException, PCDIException, InterruptedException {
 		// Function breakpoint
 		IPCDIFunctionLocation funcLoc;

@@ -21,11 +21,20 @@ import org.junit.Test;
  */
 public class BreakpointTests extends AbstractBaseTest {
 	//total process
-	static final int total_process = 736;
+	static final int total_process = 4;
 	
+	/** Constructor 
+	 * @param name
+	 */
 	public BreakpointTests(String name) {
 		super(name, total_process, 0, total_process);
 	}
+	/** Test breakpoint
+	 * @throws CoreException
+	 * @throws IOException
+	 * @throws PCDIException
+	 * @throws InterruptedException
+	 */
 	@Test public void testBreakpoints() throws CoreException, IOException, PCDIException, InterruptedException {
 		BitList t;
 		int bpid = 0;

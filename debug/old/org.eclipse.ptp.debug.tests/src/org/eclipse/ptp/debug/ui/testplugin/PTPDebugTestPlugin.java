@@ -22,7 +22,6 @@ public class PTPDebugTestPlugin extends AbstractUIPlugin {
 	public PTPDebugTestPlugin() {
 		plugin = this;
 	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
@@ -30,7 +29,6 @@ public class PTPDebugTestPlugin extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
@@ -39,7 +37,6 @@ public class PTPDebugTestPlugin extends AbstractUIPlugin {
 		plugin = null;
 		super.stop(context);
 	}
-
 	/**
 	 * Returns the shared instance
 	 *
@@ -48,7 +45,6 @@ public class PTPDebugTestPlugin extends AbstractUIPlugin {
 	public static PTPDebugTestPlugin getDefault() {
 		return plugin;
 	}
-
 	/**
 	 * Returns an image descriptor for the image file at the given
 	 * plug-in relative path
@@ -59,11 +55,18 @@ public class PTPDebugTestPlugin extends AbstractUIPlugin {
 	public static ImageDescriptor getImageDescriptor(String path) {
 		return imageDescriptorFromPlugin(PLUGIN_ID, path);
 	}
-	
+	/**
+	 * Get ResourcesPlugin Workspace
+	 * @return IWorkspace
+	 */
 	public static IWorkspace getWorkspace() {
 		return ResourcesPlugin.getWorkspace();
 	}
-	
+	/**
+	 * Enable auto build
+	 * @param enable
+	 * @throws CoreException
+	 */
 	public static void enableAutobuild(boolean enable) throws CoreException {
 		// disable auto build
 		IWorkspace workspace= PTPDebugTestPlugin.getWorkspace();
@@ -71,5 +74,4 @@ public class PTPDebugTestPlugin extends AbstractUIPlugin {
 		desc.setAutoBuilding(enable);
 		workspace.setDescription(desc);
 	}
-		
 }

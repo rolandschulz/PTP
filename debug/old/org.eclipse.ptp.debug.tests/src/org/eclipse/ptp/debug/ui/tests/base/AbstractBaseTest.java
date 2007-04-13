@@ -47,7 +47,7 @@ import org.eclipse.ptp.rtsystem.JobRunConfiguration;
 public abstract class AbstractBaseTest extends AbstractDebugTest implements IProxyDebugEventListener {
 	protected final String testAppName = "main";
 	protected final String testApp = testAppName + ".c";
-	protected final String appPath = "/tmp_mnt/u/cluster1/staff/chu/runtime-PTP";
+	protected final String appPath = "/home/clement/Desktop/runtime-EclipseApplication/TestMPI/";
 	//common
 	protected final long timeout = 360000; //default 1 hour
 	protected BitList tasks = null;
@@ -63,10 +63,19 @@ public abstract class AbstractBaseTest extends AbstractDebugTest implements IPro
 	protected long time_start = 0;
 	protected long time_end = 0;
 	
+	/** Constructor for non-GUI test
+	 * @param name
+	 * @param nProcs
+	 * @param firstNode
+	 * @param NProcsPerNode
+	 */
 	public AbstractBaseTest(String name, int nProcs, int firstNode, int NProcsPerNode) {
 		super(name, nProcs, firstNode, NProcsPerNode);
 		monitor = new NullProgressMonitor();
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.ui.tests.AbstractDebugTest#tearDown()
+	 */
 	protected void tearDown() throws CoreException, IOException, PCDIException {
 		if (debugProxy != null) {
 			debugProxy.removeEventListener(this);
@@ -77,6 +86,10 @@ public abstract class AbstractBaseTest extends AbstractDebugTest implements IPro
 		tasks = null;
 		super.tearDown();
 	}
+	/** Get time format
+	 * @param ms milliseconds
+	 * @return String format days hours minutes seconds milliseconds
+	 */
 	private String getTimeFormat(long ms) {
 		//System.err.println("##### TEST TIME: " + ms);
 		int d = 0;
@@ -122,6 +135,9 @@ public abstract class AbstractBaseTest extends AbstractDebugTest implements IPro
 		return format;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.ui.tests.AbstractDebugTest#startDebugServer()
+	 */
 	public void startDebugServer() throws CoreException, IOException, InterruptedException {
 		JobRunConfiguration jobConfig;
 		int port = 0;
@@ -146,12 +162,19 @@ public abstract class AbstractBaseTest extends AbstractDebugTest implements IPro
 		waitEvent(t);
 		assertTrue("Debugger is initialized: " + t.isEmpty(), t.isEmpty());
 	}
+	/** Create BitList with all processes
+	 * @return
+	 */
 	protected BitList createBitList() {
 		BitList tasks = new BitList(nProcs);
-		tasks.set(0, nProcs);		
-
+		tasks.set(0, nProcs);
 		return tasks;
 	}
+	/** Create BitList with given task id
+	 * @param index
+	 * @return
+	 * @throws PCDIException
+	 */
 	protected BitList createBitList(int index) throws PCDIException {
 		if (index < 0 || index > nProcs)
 			throw new PCDIException("Invalid process number.");
@@ -159,6 +182,12 @@ public abstract class AbstractBaseTest extends AbstractDebugTest implements IPro
 		tasks.set(index);
 		return tasks;
 	}
+	/** Create BitList with range of given task ids
+	 * @param from
+	 * @param to
+	 * @return
+	 * @throws PCDIException
+	 */
 	protected BitList createBitList(int from, int to) throws PCDIException {
 		if (from < 0 || to > nProcs)
 			throw new PCDIException("Invalid process number.");
@@ -166,6 +195,10 @@ public abstract class AbstractBaseTest extends AbstractDebugTest implements IPro
 		tasks.set(from, to);
 		return tasks;
 	}
+	/** Wait Event after send a command
+	 * @param tasks
+	 * @throws InterruptedException
+	 */
 	protected void waitEvent(BitList tasks) throws InterruptedException {
 		synchronized (LOCK) {
 			this.tasks = tasks;
@@ -184,9 +217,17 @@ public abstract class AbstractBaseTest extends AbstractDebugTest implements IPro
 			printTime(time_start, time_end);
 		}
 	}
+	/** print time
+	 * @param start_t
+	 * @param end_t
+	 */
 	protected void printTime(long start_t, long end_t) {
 		System.err.println("##### SPENT TIME: " + getTimeFormat(end_t - start_t));
 	}
+	/** event back
+	 * @param evtTasks
+	 * @param result
+	 */
 	protected void notifyEvent(BitList evtTasks, Object result) {
 		synchronized (LOCK) {
 			completedTasks.add(evtTasks.copy());
@@ -202,12 +243,18 @@ public abstract class AbstractBaseTest extends AbstractDebugTest implements IPro
 			}
 		}
 	}
+    /** re-lock
+     * 
+     */
     protected void lockAgain() {
     	synchronized (LOCK) {
     		waitAgain = true;
     		LOCK.notify();
     	}
     }
+    /** unlock
+     * 
+     */
     protected void releaseLock() {
     	synchronized (LOCK) {
     		waitAgain = false;
@@ -215,9 +262,9 @@ public abstract class AbstractBaseTest extends AbstractDebugTest implements IPro
     		LOCK.notifyAll();
     	}
     }
-	/******************************************************
-	 *  Event
-	 ******************************************************/
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugEventListener#handleEvent(org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugEvent)
+	 */
 	public synchronized void handleEvent(IProxyDebugEvent e) {
 		switch (e.getEventID()) {
 		case IProxyDebugEvent.EVENT_DBG_SUSPEND:
