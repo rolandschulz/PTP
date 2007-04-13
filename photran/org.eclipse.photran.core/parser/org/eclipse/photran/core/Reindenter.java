@@ -36,7 +36,7 @@ public class Reindenter
         Token firstTokenAbove = findTokenStartingLastNonemptyLineAbove(startLine, entireAST);
         
         int indentSize = 0;
-        indentSize = Math.max(firstTokenAbove.getCol()-1, 0);
+        indentSize = firstTokenAbove == null ? 0 : Math.max(firstTokenAbove.getCol()-1, 0);
         if (startsIndentedRegion(firstTokenAbove)) indentSize += 4;
         indentSize -= getUnindentAmount(node);
         
@@ -54,7 +54,7 @@ public class Reindenter
                 else if (token == lastToken)
                     inFormatRegion = false;
                 
-                if (inFormatRegion && token.getLine() > previousToken.getLine())
+                if (inFormatRegion && (previousToken == null || token.getLine() > previousToken.getLine()))
                     changeWhitetext(token, previousToken, indentAmount);
                     
                 previousToken = token;
@@ -137,6 +137,8 @@ public class Reindenter
 
     private static boolean startsIndentedRegion(Token token)
     {
+        if (token == null) return false;
+        
         Terminal t = token.getTerminal();
         return t == Terminal.T_PROGRAM
             || t == Terminal.T_FUNCTION
@@ -144,7 +146,7 @@ public class Reindenter
             || t == Terminal.T_MODULE
             || t == Terminal.T_BLOCK
             || t == Terminal.T_BLOCKDATA
-            || t == Terminal.T_TYPE
+            //|| t == Terminal.T_TYPE
             || t == Terminal.T_FORALL
             || t == Terminal.T_WHERE
             || t == Terminal.T_ELSE
