@@ -65,5 +65,5 @@ public abstract class AbstractParseTreeNode
     // Source Code Reproduction
     ///////////////////////////////////////////////////////////////////////////
     
-    public abstract void printOn(PrintStream out);
+    public abstract String printOn(PrintStream out, String currentPreprocessorDirective);
 }

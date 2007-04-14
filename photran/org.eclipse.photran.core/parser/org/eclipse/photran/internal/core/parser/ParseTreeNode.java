@@ -28,7 +28,10 @@ public class ParseTreeNode extends AbstractParseTreeNode
             return sb.toString();
         }
 
-        public void printOn(PrintStream out) {}
+        public String printOn(PrintStream out, String currentPreprocessorDirective)
+        {
+            return currentPreprocessorDirective;
+        }
     }
     
     ///////////////////////////////////////////////////////////////////////////
@@ -324,10 +327,11 @@ public class ParseTreeNode extends AbstractParseTreeNode
     // Source Code Reproduction
     ///////////////////////////////////////////////////////////////////////////
     
-    public void printOn(PrintStream out)
+    public String printOn(PrintStream out, String currentPreprocessorDirective)
     {
         if (childArray != null)
             for (int i = 0; i < numChildren; i++)
-                childArray[i].printOn(out);
+                currentPreprocessorDirective = childArray[i].printOn(out, currentPreprocessorDirective);
+        return currentPreprocessorDirective;
     }
 }

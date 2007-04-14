@@ -2,6 +2,7 @@ package org.eclipse.photran.internal.core.lexer;
 
 import java.io.PrintStream;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.photran.core.util.OffsetLength;
 import org.eclipse.photran.internal.core.parser.ASTVisitor;
 import org.eclipse.photran.internal.core.parser.AbstractParseTreeNode;
@@ -43,7 +44,17 @@ public class Token extends AbstractParseTreeNode implements ParserSymbol
     // Additional Fields - Not updated when refactoring
     ///////////////////////////////////////////////////////////////////////////
     
-    protected int line = -1, col = -1, offset = -1, length = -1;
+    /**
+     * If this <code>Token</code> resulted from expanding a preprocessor directive (e.g., an INCLUDE or a macro
+     * expansion), this is the text of the preprocessor directive in the <i>top-level file</i> under which it was
+     * expanded.  <code>Token</code>s expanded from the same directive will have pointer-identical
+     * <code>preprocessorDirective</code>s.
+     */
+    protected String preprocessorDirective = null;
+    
+    protected IFile file = null;
+    
+    protected int line = -1, col = -1, fileOffset = -1, streamOffset = -1, length = -1;
     protected Object binding = null;
     protected Object scope = null;
 
@@ -108,6 +119,16 @@ public class Token extends AbstractParseTreeNode implements ParserSymbol
      */
     public void setWhiteAfter(String value) { whiteAfter = value == null ? "" : value; }
 
+    public String getPreprocessorDirective()
+    {
+        return preprocessorDirective;
+    }
+
+    public void setPreprocessorDirective(String preprocessorDirective)
+    {
+        this.preprocessorDirective = preprocessorDirective;
+    }
+
     public int getLine()
     {
         return line;
@@ -128,14 +149,34 @@ public class Token extends AbstractParseTreeNode implements ParserSymbol
         this.col = col;
     }
 
-    public int getOffset()
+    public IFile getFile()
     {
-        return offset;
+        return file;
     }
 
-    public void setOffset(int offset)
+    public void setFile(IFile file)
     {
-        this.offset = offset;
+        this.file = file;
+    }
+
+    public int getFileOffset()
+    {
+        return fileOffset;
+    }
+
+    public void setFileOffset(int fileOffset)
+    {
+        this.fileOffset = fileOffset;
+    }
+
+    public int getStreamOffset()
+    {
+        return streamOffset;
+    }
+
+    public void setStreamOffset(int streamOffset)
+    {
+        this.streamOffset = streamOffset;
     }
 
     public int getLength()
@@ -168,14 +209,24 @@ public class Token extends AbstractParseTreeNode implements ParserSymbol
         this.scope = scope;
     }
 
-    public boolean contains(OffsetLength other)
+    public boolean containsFileOffset(OffsetLength other)
     {
-        return OffsetLength.contains(offset, length, other);
+        return OffsetLength.contains(fileOffset, length, other);
     }
     
-    public boolean isOnOrAfter(int targetOffset)
+    public boolean isOnOrAfterFileOffset(int targetOffset)
     {
-        return offset >= targetOffset;
+        return fileOffset >= targetOffset;
+    }
+
+    public boolean containsStreamOffset(OffsetLength other)
+    {
+        return OffsetLength.contains(streamOffset, length, other);
+    }
+    
+    public boolean isOnOrAfterStreamOffset(int targetOffset)
+    {
+        return streamOffset >= targetOffset;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -205,10 +256,25 @@ public class Token extends AbstractParseTreeNode implements ParserSymbol
     // Source Code Reproduction
     ///////////////////////////////////////////////////////////////////////////
     
-    public void printOn(PrintStream out)
+    public String printOn(PrintStream out, String currentPreprocessorDirective)
     {
-        out.print(whiteBefore);
-        out.print(text);
-        out.print(whiteAfter);
+        if (this.preprocessorDirective != currentPreprocessorDirective)
+        {
+            if (this.preprocessorDirective != null)
+            {
+                out.print(whiteBefore);
+                out.print(this.preprocessorDirective);
+            }
+            currentPreprocessorDirective = this.preprocessorDirective;
+        }
+        
+        if (currentPreprocessorDirective == null && this.preprocessorDirective == null)
+        {
+            out.print(whiteBefore);
+            out.print(text);
+            out.print(whiteAfter);
+        }
+        
+        return currentPreprocessorDirective;
     }
 }

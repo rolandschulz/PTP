@@ -55,10 +55,10 @@ public class FortranAST implements IFortranAST
         return tokenList.iterator();
     }
 
-    public Token findTokenByOffsetLength(final int offset, final int length)
+    public Token findTokenByStreamOffsetLength(final int offset, final int length)
     {
         // Binary Search
-        return tokenList.findOffsetLength(offset, length);
+        return tokenList.findStreamOffsetLength(offset, length);
 
 // or Linear Search...
 //        for (int i = 0; i < tokenList.size(); i++)

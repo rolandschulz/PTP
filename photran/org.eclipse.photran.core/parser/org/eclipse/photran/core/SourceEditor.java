@@ -1,11 +1,17 @@
 package org.eclipse.photran.core;
 
+import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 import org.eclipse.photran.internal.core.parser.AbstractParseTreeNode;
 import org.eclipse.photran.internal.core.parser.ParseTreeNode;
 
 public class SourceEditor
 {
+    public static void changeTokenText(Token t, String newText)
+    {
+        t.setText(newText);
+    }
+    
     public static AbstractParseTreeNode cut(AbstractParseTreeNode subtree)
     {
         return subtree.getParent().removeChild(subtree) == true ? subtree : null;

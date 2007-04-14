@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.LinkedList;
 import org.eclipse.photran.internal.core.parser.Terminal;
+import org.eclipse.core.resources.IFile;
 
 %%
  
@@ -60,13 +61,15 @@ import org.eclipse.photran.internal.core.parser.Terminal;
       return prepass.getColumn(yychar);
     }
     
-    private int lastTokenLine = 1, lastTokenCol = 1, lastTokenOffset = 0, lastTokenLength = 0;
+    protected IFile lastTokenFile = null;
+    protected int lastTokenLine = 1, lastTokenCol = 1, lastTokenFileOffset = 0, lastTokenStreamOffset = 0, lastTokenLength = 0;
     
 	private Token token(Terminal terminal)
 	{
 		lastTokenLine = prepass.getLine(yychar)+1;
 		lastTokenCol = prepass.getColumn(yychar)+1;
-		lastTokenOffset = prepass.getOffset(yychar);
+		lastTokenFileOffset = prepass.getOffset(yychar);
+		lastTokenStreamOffset = prepass.getOffset(yychar);
 		lastTokenLength = prepass.getOffset(yychar+yylength()-1)-prepass.getOffset(yychar)+1;
 		return new Token(terminal,
 		                 "",
@@ -82,7 +85,8 @@ import org.eclipse.photran.internal.core.parser.Terminal;
 		Token t = new Token();
 		t.setTerminal(terminal);
 		t.setFilename(this.filename);
-		t.setOffset(prepass.getOffset(yychar));
+		t.setFileOffset(prepass.getOffset(yychar));
+		t.setStreamOffset(prepass.getOffset(yychar));
 		t.setLength(prepass.getOffset(yychar+yylength()-1)-prepass.getOffset(yychar)+1);
 		t.setText(terminal == Terminal.T_SCON || terminal == Terminal.T_HCON
 		          ? stringBuffer.toString()
@@ -124,9 +128,19 @@ import org.eclipse.photran.internal.core.parser.Terminal;
         return lastTokenCol;
     }
     
-    public int getLastTokenOffset()
+    public IFile getLastTokenFile()
     {
-    	return lastTokenOffset;
+        return lastTokenFile;
+    }
+    
+    public int getLastTokenFileOffset()
+    {
+        return lastTokenFileOffset;
+    }
+    
+    public int getLastTokenStreamOffset()
+    {
+        return lastTokenStreamOffset;
     }
     
     public int getLastTokenLength()

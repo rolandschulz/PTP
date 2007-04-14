@@ -7,6 +7,7 @@ import java.util.ListIterator;
 import java.util.Vector;
 import java.util.regex.Pattern;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.photran.internal.core.parser.Parser;
 import org.eclipse.photran.internal.core.parser.Terminal;
 
@@ -36,16 +37,21 @@ class FreeFormLexerPhase2 implements ILexer
     private Vector tokenStream = new Vector();
     private Vector lineNumbers = new Vector();
     private Vector colNumbers = new Vector();
-    private Vector offsets = new Vector();
+    private Vector files = new Vector();
+    private Vector fileOffsets = new Vector();
+    private Vector streamOffsets = new Vector();
     private Vector lengths = new Vector();
     private ListIterator tokenIt;
     private ListIterator lineIt;
     private ListIterator colIt;
-    private ListIterator offsetIt;
+    private ListIterator fileIt;
+    private ListIterator fileOffsetIt;
+    private ListIterator streamOffsetIt;
     private ListIterator lengthIt;
     
     private Token lastToken = null;
-    private int lastTokenLine = 1, lastTokenCol = 1, lastTokenOffset = 0, lastTokenLength = 0;
+    private IFile lastTokenFile = null;
+    private int lastTokenLine = 1, lastTokenCol = 1, lastTokenFileOffset = 0, lastTokenStreamOffset = 0, lastTokenLength = 0;
     
     private int firstTokenPos = 0;
     private int idPos = -1;
@@ -108,12 +114,16 @@ class FreeFormLexerPhase2 implements ILexer
             
             lastTokenLine = ((Integer)lineIt.next()).intValue();
             lastTokenCol = ((Integer)colIt.next()).intValue();
-            lastTokenOffset = ((Integer)offsetIt.next()).intValue();
+            lastTokenFile = (IFile)fileIt.next();
+            lastTokenFileOffset = ((Integer)fileOffsetIt.next()).intValue();
+            lastTokenStreamOffset = ((Integer)streamOffsetIt.next()).intValue();
             lastTokenLength = ((Integer)lengthIt.next()).intValue();
             
             lastToken.setLine(lastTokenLine);
             lastToken.setCol(lastTokenCol);
-            lastToken.setOffset(lastTokenOffset);
+            lastToken.setFile(lastTokenFile);
+            lastToken.setFileOffset(lastTokenFileOffset);
+            lastToken.setStreamOffset(lastTokenStreamOffset);
             lastToken.setLength(lastTokenLength);
             
             return lastToken;
@@ -169,7 +179,9 @@ class FreeFormLexerPhase2 implements ILexer
         tokenIt = tokenStream.listIterator();
         lineIt = lineNumbers.listIterator();
         colIt = colNumbers.listIterator();
-        offsetIt = offsets.listIterator();
+        fileIt = files.listIterator();
+        fileOffsetIt = fileOffsets.listIterator();
+        streamOffsetIt = streamOffsets.listIterator();
         lengthIt = lengths.listIterator();
     }
 
@@ -182,7 +194,9 @@ class FreeFormLexerPhase2 implements ILexer
         tokenStream.clear();
         lineNumbers.clear();
         colNumbers.clear();
-        offsets.clear();
+        files.clear();
+        fileOffsets.clear();
+        streamOffsets.clear();
         lengths.clear();
         do
         {
@@ -192,7 +206,9 @@ class FreeFormLexerPhase2 implements ILexer
                 tokenStream.add(t);
                 lineNumbers.add(new Integer(yylex.getLastTokenLine()));
                 colNumbers.add(new Integer(yylex.getLastTokenCol()));
-                offsets.add(new Integer(yylex.getLastTokenOffset()));
+                files.add(yylex.getLastTokenFile());
+                fileOffsets.add(new Integer(yylex.getLastTokenFileOffset()));
+                streamOffsets.add(new Integer(yylex.getLastTokenStreamOffset()));
                 lengths.add(new Integer(yylex.getLastTokenLength()));
             }
             // if (t != null) { System.out.print(t.id + ":"); }
@@ -1325,7 +1341,9 @@ class FreeFormLexerPhase2 implements ILexer
                 tokenStream.insertElementAt(eq, i+j+1);
                 lineNumbers.insertElementAt(lineNumbers.get(i+j), i+j+1);
                 colNumbers.insertElementAt(new Integer(((Integer)colNumbers.get(i+j)).intValue()+textWithoutEquals.length()), i+j+1);
-                offsets.insertElementAt(new Integer(((Integer)offsets.get(i+j)).intValue()+textWithoutEquals.length()), i+j+1);
+                files.insertElementAt((IFile)files.get(i+j), i+j+1);
+                fileOffsets.insertElementAt(new Integer(((Integer)fileOffsets.get(i+j)).intValue()+textWithoutEquals.length()), i+j+1);
+                streamOffsets.insertElementAt(new Integer(((Integer)streamOffsets.get(i+j)).intValue()+textWithoutEquals.length()), i+j+1);
                 lengths.insertElementAt(new Integer(1), i+j+1);
             }
         }
@@ -1377,13 +1395,17 @@ class FreeFormLexerPhase2 implements ILexer
             tokenStream.insertElementAt(star, i+(2*j)+1);
             lineNumbers.insertElementAt(lineNumbers.get(i+(2*j)), i+(2*j)+1);
             colNumbers.insertElementAt(new Integer(((Integer)colNumbers.get(i+(2*j))).intValue()+textBeforeStar.length()), i+(2*j)+1);
-            offsets.insertElementAt(new Integer(((Integer)offsets.get(i+(2*j))).intValue()+textBeforeStar.length()), i+(2*j)+1);
+            files.insertElementAt((IFile)files.get(i+(2*j)), i+(2*j)+1);
+            fileOffsets.insertElementAt(new Integer(((Integer)fileOffsets.get(i+(2*j))).intValue()+textBeforeStar.length()), i+(2*j)+1);
+            streamOffsets.insertElementAt(new Integer(((Integer)streamOffsets.get(i+(2*j))).intValue()+textBeforeStar.length()), i+(2*j)+1);
             lengths.insertElementAt(new Integer(1), i+(2*j)+1);
             
             tokenStream.insertElementAt(num, i+(2*j)+2);
             lineNumbers.insertElementAt(lineNumbers.get(i+(2*j)+1), i+(2*j)+2);
             colNumbers.insertElementAt(new Integer(((Integer)colNumbers.get(i+(2*j)+1)).intValue()+textBeforeStar.length()+1), i+(2*j)+2);
-            offsets.insertElementAt(new Integer(((Integer)offsets.get(i+(2*j)+1)).intValue()+textBeforeStar.length()+1), i+(2*j)+2);
+            files.insertElementAt((IFile)files.get(i+(2*j)), i+(2*j)+1);
+            fileOffsets.insertElementAt(new Integer(((Integer)fileOffsets.get(i+(2*j)+1)).intValue()+textBeforeStar.length()+1), i+(2*j)+2);
+            streamOffsets.insertElementAt(new Integer(((Integer)streamOffsets.get(i+(2*j)+1)).intValue()+textBeforeStar.length()+1), i+(2*j)+2);
             lengths.insertElementAt(new Integer(1), i+(2*j)+2);
         }
     }
@@ -1536,9 +1558,19 @@ class FreeFormLexerPhase2 implements ILexer
         return lastTokenCol;
     }
     
-    public int getLastTokenOffset()
+    public IFile getLastTokenFile()
     {
-        return lastTokenOffset;
+        return lastTokenFile;
+    }
+    
+    public int getLastTokenFileOffset()
+    {
+        return lastTokenFileOffset;
+    }
+    
+    public int getLastTokenStreamOffset()
+    {
+        return lastTokenStreamOffset;
     }
     
     public int getLastTokenLength()

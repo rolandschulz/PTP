@@ -67,12 +67,12 @@ public class TokenList
         return -1;
     }
     
-    public Token findOffsetLength(int offset, int length)
+    public Token findStreamOffsetLength(int offset, int length)
     {
         int low = 0, high = size - 1;
         for (int mid = (high+low)/2; low <= high; mid = (high+low)/2)
         {
-            int value = array[mid].getOffset();
+            int value = array[mid].getStreamOffset();
             if (offset > value)
                 low = mid + 1;
             else if (offset < value)

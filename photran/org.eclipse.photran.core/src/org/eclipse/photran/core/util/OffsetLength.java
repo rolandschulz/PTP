@@ -28,9 +28,9 @@ public final class OffsetLength
         return contains(this.offset, this.length, other);
     }
     
-    public boolean contains(Token token)
+    public boolean containsFileRange(Token token)
     {
-        return contains(this.offset, this.length, token.getOffset(), token.getLength());
+        return contains(this.offset, this.length, token.getFileOffset(), token.getLength());
     }
     
     public boolean equals(OffsetLength other)

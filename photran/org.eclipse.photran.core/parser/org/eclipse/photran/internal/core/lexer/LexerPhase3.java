@@ -1,13 +1,14 @@
 package org.eclipse.photran.internal.core.lexer;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.photran.internal.core.parser.Parser;
 
 /**
  * This is the lexical analyzer that is used directly in the Fortran parser.
  * 
  * This is connected to either <code>FreeFormLexerPhase2</code> or <code>FixedFormLexerPhase2</code>,
- * which does the "real" work; <code>LexerPhase3</code> accumulates tokens in an <code>ArrayList</code>
- * so that they can be binary searched and accessed by index.
+ * which does the "real" work; <code>LexerPhase3</code> accumulates tokens in an array
+ * so that they can be binary searched and accessed by their source offsets.
  * 
  * @author Jeffrey Overbey
  * 
@@ -46,9 +47,19 @@ class LexerPhase3 implements IAccumulatingLexer
         return phase2Lexer.getLastTokenLine();
     }
 
-    public int getLastTokenOffset()
+    public IFile getLastTokenFile()
     {
-        return phase2Lexer.getLastTokenOffset();
+        return phase2Lexer.getLastTokenFile();
+    }
+
+    public int getLastTokenFileOffset()
+    {
+        return phase2Lexer.getLastTokenFileOffset();
+    }
+
+    public int getLastTokenStreamOffset()
+    {
+        return phase2Lexer.getLastTokenStreamOffset();
     }
 
     public Token yylex() throws Exception

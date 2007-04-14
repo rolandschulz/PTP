@@ -20,6 +20,7 @@ import java.io.FileNotFoundException;
 import java.util.LinkedList;
 import java.util.List;
 import org.eclipse.photran.internal.core.parser.Terminal;
+import org.eclipse.core.resources.IFile;
 
 %%
  
@@ -34,7 +35,8 @@ import org.eclipse.photran.internal.core.parser.Terminal;
 %type Token
 %{
 	private StringBuffer whiteBeforeSB = new StringBuffer();
-	private int lastTokenLine = 1, lastTokenCol = 1, lastTokenOffset = 0, lastTokenLength = 0;
+	protected IFile lastTokenFile = null;
+	protected int lastTokenLine = 1, lastTokenCol = 1, lastTokenFileOffset = 0, lastTokenStreamOffset = 0, lastTokenLength = 0;
 	private Token lastToken = null;
 	private StringBuffer whiteAfterSB = new StringBuffer();
 	
@@ -55,14 +57,16 @@ import org.eclipse.photran.internal.core.parser.Terminal;
 		{
 			lastTokenLine = sbLine;
 			lastTokenCol = sbCol;
-			lastTokenOffset = sbOffset;
+			lastTokenFileOffset = sbOffset;
+			lastTokenStreamOffset = sbOffset;
 			lastTokenLength = stringBuffer.toString().length();
 		}
 		else
 		{
 			lastTokenLine = yyline+1;
 			lastTokenCol = yycolumn+1;
-			lastTokenOffset = yychar;
+			lastTokenFileOffset = yychar;
+			lastTokenStreamOffset = yychar;
 			lastTokenLength = yylength();
 		}
 		lastToken = new Token(terminal,
@@ -103,9 +107,19 @@ import org.eclipse.photran.internal.core.parser.Terminal;
         return lastTokenCol;
     }
     
-    public int getLastTokenOffset()
+    public IFile getLastTokenFile()
     {
-    	return lastTokenOffset;
+        return lastTokenFile;
+    }
+    
+    public int getLastTokenFileOffset()
+    {
+        return lastTokenFileOffset;
+    }
+    
+    public int getLastTokenStreamOffset()
+    {
+        return lastTokenStreamOffset;
     }
     
     public int getLastTokenLength()

@@ -3,6 +3,7 @@ package org.eclipse.photran.internal.core.lexer;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.photran.internal.core.parser.Parser;
 import org.eclipse.photran.internal.core.parser.Terminal;
 
@@ -81,9 +82,19 @@ class FixedFormLexerPhase2 implements ILexer
         return freeLexer2.getLastTokenCol();
     }
     
-    public int getLastTokenOffset()
+    public IFile getLastTokenFile()
     {
-        return freeLexer2.getLastTokenOffset();
+        return freeLexer2.getLastTokenFile();
+    }
+    
+    public int getLastTokenFileOffset()
+    {
+        return freeLexer2.getLastTokenFileOffset();
+    }
+    
+    public int getLastTokenStreamOffset()
+    {
+        return freeLexer2.getLastTokenStreamOffset();
     }
     
     public int getLastTokenLength()

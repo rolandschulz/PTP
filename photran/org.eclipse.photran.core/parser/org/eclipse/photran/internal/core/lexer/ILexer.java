@@ -1,5 +1,7 @@
 package org.eclipse.photran.internal.core.lexer;
 
+import org.eclipse.core.resources.IFile;
+
 /**
  * Common interface implemented by fixed and free form Fortran lexers
  * 
@@ -15,7 +17,11 @@ public interface ILexer
 
     int getLastTokenCol();
     
-    int getLastTokenOffset();
+    IFile getLastTokenFile();
+    
+    int getLastTokenFileOffset();
+    
+    int getLastTokenStreamOffset();
     
     int getLastTokenLength();
 }

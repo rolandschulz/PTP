@@ -78,7 +78,7 @@ public abstract class FortranElement extends SourceManipulation // Parent
 
         if (identifier != null)
         {
-            int offset = identifier.getOffset();
+            int offset = identifier.getFileOffset();
             int length = identifier.getLength();
             int line = identifier.getLine();
             

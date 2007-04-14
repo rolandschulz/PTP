@@ -14,7 +14,7 @@ import org.eclipse.cdt.internal.core.model.Parent;
 import org.eclipse.cdt.internal.core.model.TranslationUnit;
 import org.eclipse.photran.core.ASTFactory;
 import org.eclipse.photran.core.IFortranAST;
-import org.eclipse.photran.internal.core.lexer.LexerFactory;
+import org.eclipse.photran.internal.core.lexer.SourceForm;
 import org.eclipse.photran.internal.core.preferences.FortranPreferences;
 
 /**
@@ -54,8 +54,8 @@ public class FortranModelBuilder implements IContributedModelBuilder
 
         try
         {
-            int lexerOptions = isFixedForm ? LexerFactory.FIXED_FORM : LexerFactory.FREE_FORM;
-            IFortranAST ast = ASTFactory.buildAST(inputStream, filename, lexerOptions);
+            SourceForm sourceForm = isFixedForm ? SourceForm.FIXED_FORM : SourceForm.UNPREPROCESSED_FREE_FORM;
+            IFortranAST ast = ASTFactory.buildAST(inputStream, filename, sourceForm);
             if (isParseTreeModelEnabled())
                 ast.visitUsing(new FortranParseTreeModelBuildingVisitor(translationUnit, this));
             else

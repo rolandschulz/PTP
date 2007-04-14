@@ -32,7 +32,7 @@ public class SourcePrinter
     public static String getSourceCodeFromASTNode(AbstractParseTreeNode node)
     {
         ByteArrayOutputStream out = new ByteArrayOutputStream(4096);
-        node.printOn(new PrintStream(out));
+        node.printOn(new PrintStream(out), null);
         return out.toString();
     }
 }
