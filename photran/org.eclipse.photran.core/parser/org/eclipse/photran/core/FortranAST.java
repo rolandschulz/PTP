@@ -50,7 +50,7 @@ public class FortranAST implements IFortranAST
         return root;
     }
 
-    public Iterator/*<Token>*/ iterator()
+    public Iterator/*<token>*/ iterator()
     {
         return tokenList.iterator();
     }
