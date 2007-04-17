@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry exported="true" kind="lib" path="batik-combined.jar"/>
+	<classpathentry exported="true" kind="lib" path="jargs.jar"/>
+	<classpathentry exported="true" kind="lib" path="jcommon-0.9.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="jfreechart-0.9.21.jar"/>
+	<classpathentry exported="true" kind="lib" path="jgraph.jar"/>
+	<classpathentry exported="true" kind="lib" path="jogl.jar"/>
+	<classpathentry exported="true" kind="lib" path="jython.jar"/>
+	<classpathentry exported="true" kind="lib" path="paraprof.jar"/>
+	<classpathentry exported="true" kind="lib" path="perfdmf.jar"/>
+	<classpathentry exported="true" kind="lib" path="tau-common.jar"/>
+	<classpathentry exported="true" kind="lib" path="vis.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry kind="lib" path="xerces.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

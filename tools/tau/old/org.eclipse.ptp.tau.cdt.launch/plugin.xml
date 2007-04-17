@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension targetID="org.eclipse.cdt.ui.CPerspective">
+         <actionSet id="org.eclipse.debug.ui.profileActionSet"/>
+      </perspectiveExtension>
+      <perspectiveExtension targetID="org.eclipse.photran.ui.FortranPerspective">
+         <actionSet id="org.eclipse.photran.ui.FortranPerspective"/>
+      </perspectiveExtension>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.launchConfigurationTabGroups">
+      <launchConfigurationTabGroup
+            class="org.eclipse.ptp.tau.cdt.launch.internal.ui.TAUCDTLaunchConfigurationTabGroup"
+            id="org.eclipse.ptp.tau.cdtlaunchtau.launchConfigurationTabGroup"
+            type="org.eclipse.cdt.launch.localCLaunch">
+         <launchMode
+               description="Create a configuration to launch a program to be instrumented and profiled by TAU."
+               mode="profile"/>
+      </launchConfigurationTabGroup>
+   </extension>
+   <extension
+         point="org.eclipse.debug.core.launchDelegates">
+      <launchDelegate
+            delegate="org.eclipse.ptp.tau.cdt.launch.internal.TAUCDTLaunchConfigurationDelegate"
+            id="org.eclipse.ptp.tau.cdtlaunchtau.launchDelegate"
+            modes="profile"
+            sourceLocatorId="org.eclipse.cdt.debug.core.sourceLocator"
+            sourcePathComputerId="org.eclipse.cdt.debug.core.sourcePathComputer"
+            type="org.eclipse.cdt.launch.localCLaunch"/>
+   </extension>
+
+</plugin>

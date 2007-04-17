@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            id="org.eclipse.ptp.tau.selinst.LoopPopup"
+            nameFilter="*"
+            objectClass="org.eclipse.cdt.core.model.ICElement">
+         <menu
+               id="org.eclipse.ptp.tau.selinst.menu2"
+               label="Selective Instrumentation"
+               path="additions">
+            <separator name="org.eclipse.ptp.tau.selinst.separator2"/>
+         </menu>
+         <action
+               class="org.eclipse.ptp.tau.selinst.popup.actions.Loops"
+               enablesFor="+"
+               id="org.eclipse.ptp.tau.selinst.newAction"
+               label="Instrument Loops"
+               menubarPath="org.eclipse.ptp.tau.selinst.menu2/group1"/>
+      </objectContribution>
+      <objectContribution
+            id="org.eclipse.ptp.tau.selinst.ExcludePopup"
+            nameFilter="*"
+            objectClass="org.eclipse.cdt.core.model.ICElement">
+         <menu
+               id="org.eclipse.ptp.tau.selinst.menu2"
+               label="Selective Instrumentation"
+               path="additions">
+            <separator name="org.eclipse.ptp.tau.selinst.separator2"/>
+         </menu>
+         <action
+               class="org.eclipse.ptp.tau.selinst.popup.actions.Exclude"
+               enablesFor="+"
+               id="org.eclipse.ptp.tau.selinst.action1"
+               label="Exclude"
+               menubarPath="org.eclipse.ptp.tau.selinst.menu2/group1"/>
+      </objectContribution>
+      <objectContribution
+            id="org.eclipse.ptp.tau.selinst.SelectPopup"
+            nameFilter="*"
+            objectClass="org.eclipse.cdt.core.model.ICElement">
+         <menu
+               id="org.eclipse.ptp.tau.selinst.menu2"
+               label="Selective Instrumentation"
+               path="additions">
+            <separator name="org.eclipse.ptp.tau.selinst.separator2"/>
+         </menu>
+         <action
+               class="org.eclipse.ptp.tau.selinst.popup.actions.Select"
+               enablesFor="+"
+               id="org.eclipse.ptp.tau.selinst.action2"
+               label="Select"
+               menubarPath="org.eclipse.ptp.tau.selinst.menu2/group1"/>
+      </objectContribution>
+      <objectContribution
+            id="org.eclipse.ptp.tau.selinst.ClearPopup"
+            nameFilter="*"
+            objectClass="org.eclipse.cdt.core.model.ICElement">
+         <menu
+               id="org.eclipse.ptp.tau.selinst.menu2"
+               label="Selective Instrumentation"
+               path="additions">
+            <separator name="org.eclipse.ptp.tau.selinst.separator2"/>
+         </menu>
+         <action
+               class="org.eclipse.ptp.tau.selinst.popup.actions.Clear"
+               enablesFor="+"
+               id="org.eclipse.ptp.tau.selinst.action3"
+               label="Clear"
+               menubarPath="org.eclipse.ptp.tau.selinst.menu2/group1"/>
+      </objectContribution>
+      <viewerContribution
+            id="org.eclipse.ptp.tau.selinst.AddAtomicEvent"
+            targetID="#CEditorContext">
+         <action
+               class="org.eclipse.ptp.tau.selinst.popup.actions.Instrument"
+               enablesFor="*"
+               id="org.eclipse.ptp.tau.selinst.te.Select"
+               label="Insert TAU Atomic User Defined Event"
+               menubarPath="org.eclipse.ptp.tau.selinst.menu1/group1">
+            <selection class="org.eclipse.jface.text.ITextSelection"/>
+         </action>
+         <menu
+               id="org.eclipse.ptp.tau.selinst.menu1"
+               label="Selective Instrumentation"
+               path="additions"/>
+      </viewerContribution>
+      <viewerContribution
+            id="org.eclipse.ptp.tau.selinst.AddIncrementalEvent"
+            targetID="#CEditorContext">
+         <action
+               class="org.eclipse.ptp.tau.selinst.popup.actions.IncrementInstrument"
+               enablesFor="*"
+               id="org.eclipse.ptp.tau.selinst.te.SelectInstFunc"
+               label="Insert TAU Interval (start/stop) User Defined Event"
+               menubarPath="org.eclipse.ptp.tau.selinst.menu1/group1">
+            <selection class="org.eclipse.jface.text.ITextSelection"/>
+         </action>
+         <menu
+               id="org.eclipse.ptp.tau.selinst.menu1"
+               label="Selective Instrumentation"
+               path="additions"/>
+      </viewerContribution>
+   </extension>
+
+</plugin>
