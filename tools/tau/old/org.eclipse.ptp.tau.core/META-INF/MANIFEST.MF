@@ -1,0 +1,21 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Tauutils Plug-in
+Bundle-SymbolicName: org.eclipse.ptp.tau.core;singleton:=true
+Bundle-Version: 1.0.0
+Bundle-Activator: org.eclipse.ptp.tau.core.TAULaunchPlugin
+Bundle-Localization: plugin
+Require-Bundle: org.eclipse.cdt.core,
+ org.eclipse.cdt.make.core,
+ org.eclipse.cdt.managedbuilder.core,
+ org.eclipse.core.resources,
+ org.eclipse.core.runtime,
+ org.eclipse.debug.core,
+ org.eclipse.jface,
+ org.eclipse.ptp.tau.options,
+ org.eclipse.ptp.tau.perfdmf,
+ org.eclipse.ui,
+ org.eclipse.debug.ui,
+ org.eclipse.ptp.tau.papiselect
+Export-Package: org.eclipse.ptp.tau.core.internal
+Eclipse-LazyStart: true
