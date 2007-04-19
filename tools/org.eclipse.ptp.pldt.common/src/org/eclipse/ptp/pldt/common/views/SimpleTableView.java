@@ -184,7 +184,7 @@ public class SimpleTableView extends ViewPart {
 	public static final int CONSTANT = 2;
 
 	/** types of constructs, for the default case */
-	public static final String[] CONSTRUCT_TYPE_NAMES = { "None",
+	public static   String[] CONSTRUCT_TYPE_NAMES = { "None",
 			"Function Call", "Constant" };
 
 	/**

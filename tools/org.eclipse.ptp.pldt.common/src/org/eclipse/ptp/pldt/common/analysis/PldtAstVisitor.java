@@ -175,8 +175,12 @@ public class PldtAstVisitor extends CASTVisitor {
 			name=funcName.getRawSignature();
 		}
 
-		IASTName[] decls = funcName.getTranslationUnit().getDeclarations(binding);//empty for C++
-
+		// CDT4.0: 
+		IASTName[] decls=funcName.getTranslationUnit().getDeclarationsInAST(binding);//1/2/07: empty! for MPB
+		if(decls.length==0)System.out.println("decls empty!");
+		//CDT3.1 IASTName[] decls = funcName.getTranslationUnit().getDeclarations(binding);
+		
+		
 		for (int i = 0; i < decls.length; ++i) {
 			// IASTFileLocation is file and range of lineNos
 			IASTFileLocation loc = decls[i].getFileLocation();
