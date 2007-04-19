@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2006 IBM Corporation.
+ * Copyright (c) 2006, 2007 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -133,6 +133,11 @@ public abstract class PASTNode implements IASTNode
 	public boolean accept(ASTVisitor visitor) {
 		return astNode_.accept(visitor);
 	}
+	/**  @since cdt40*/
+    public boolean contains(IASTNode node) {
+    	return astNode_.contains(node);
+    }
+
 
 	public String getContainingFilename() {
 		return astNode_.getContainingFilename();
@@ -169,5 +174,6 @@ public abstract class PASTNode implements IASTNode
 	public void setPropertyInParent(ASTNodeProperty property) {
 		astNode_.setPropertyInParent(property);
 	}
+	
     
 }
