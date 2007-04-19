@@ -15,6 +15,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Iterator;
 import java.util.List;
 
+import org.eclipse.cdt.core.model.ICContainer;
+import org.eclipse.cdt.core.model.ICElement;
+import org.eclipse.cdt.core.model.ICProject;
+import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -57,7 +61,8 @@ import org.eclipse.ui.actions.WorkspaceModifyOperation;
  * IObjectActionDelegate enables popup menu selection <br>
  * IWindowActionDelegate enables toolbar(or menu) selection
  */
-public abstract class RunAnalyseBase implements IObjectActionDelegate, IWorkbenchWindowActionDelegate {
+public abstract class RunAnalyseBase implements IObjectActionDelegate,
+		IWorkbenchWindowActionDelegate {
 	private static final boolean traceOn = false;
 
 	/**
@@ -95,7 +100,8 @@ public abstract class RunAnalyseBase implements IObjectActionDelegate, IWorkbenc
 	 * @param markerID
 	 *            marker ID
 	 */
-	public RunAnalyseBase(String name, ArtifactMarkingVisitor visitor, String markerID) {
+	public RunAnalyseBase(String name, ArtifactMarkingVisitor visitor,
+			String markerID) {
 		this.name = name;
 		this.visitor = visitor;
 		this.markerID = markerID;
@@ -127,66 +133,82 @@ public abstract class RunAnalyseBase implements IObjectActionDelegate, IWorkbenc
 		cumulativeArtifacts = 0;
 		readPreferences();
 		if (traceOn)
-			System.out.println("RunAnalyseBase.run() action id=" + action.getId());
+			System.out.println("RunAnalyseBase.run() action id="
+					+ action.getId());
 
 		final int indent = 0;
 		if ((selection == null) || selection.isEmpty()) {
-			MessageDialog.openWarning(null, "No files selected for analysis.",
-					"Please select a source file or container (folder or project) to analyze.");
+			MessageDialog
+					.openWarning(null, "No files selected for analysis.",
+							"Please select a source file or container (folder or project) to analyze.");
 
 			return;
 		} else {
 			// get preference for include paths
 			final List includes = getIncludePath();
 			if (areIncludePathsNeeded() && includes.isEmpty()) {
-				System.out.println("RunAnalyseBase.run(), no include paths found.");
-				MessageDialog.openWarning(shell, name + " Include Paths Not Found", "Please first specify the " + name
-						+ " include paths in the Preferences page.");
+				System.out
+						.println("RunAnalyseBase.run(), no include paths found.");
+				MessageDialog.openWarning(shell, name
+						+ " Include Paths Not Found",
+						"Please first specify the " + name
+								+ " include paths in the Preferences page.");
 
 			} else {
 
 				// batch ws modifications *and* report progress
 				WorkspaceModifyOperation wmo = new WorkspaceModifyOperation() {
 					@Override
-					protected void execute(IProgressMonitor monitor) throws CoreException, InvocationTargetException,
+					protected void execute(IProgressMonitor monitor)
+							throws CoreException, InvocationTargetException,
 							InterruptedException {
 						err = runResources(monitor, indent, includes);
 					}
 				};
-				ProgressMonitorDialog pmdialog = new ProgressMonitorDialog(shell);
+				ProgressMonitorDialog pmdialog = new ProgressMonitorDialog(
+						shell);
 				try {
-					pmdialog.run(true, true, wmo);  // fork=true; if false, not cancelable
-					
+					pmdialog.run(true, true, wmo); // fork=true; if false, not
+													// cancelable
+
 				} catch (InvocationTargetException e) {
 					err = true;
-					System.out.println("Error running analysis: ITE " + e.getMessage());
-					System.out.println("  cause: " + e.getCause()+" - "+e.getCause().getMessage());
-					Throwable th=e.getCause();
+					System.out.println("Error running analysis: ITE "
+							+ e.getMessage());
+					System.out.println("  cause: " + e.getCause() + " - "
+							+ e.getCause().getMessage());
+					Throwable th = e.getCause();
 					th.printStackTrace();
-					} 
-				catch (InterruptedException e) {
+				} catch (InterruptedException e) {
 					cancelledByUser = true;
 				}
 
 			}// end else
 		}
 		if (traceOn)
-			System.out.println("RunAnalyseBase: retd from run iterator, err=" + err);
-		String artsFound = "\nNumber of " + name + " Artifacts found: " + cumulativeArtifacts;
+			System.out.println("RunAnalyseBase: retd from run iterator, err="
+					+ err);
+		String artsFound = "\nNumber of " + name + " Artifacts found: "
+				+ cumulativeArtifacts;
 		if (cancelledByUser) {
 			MessageDialog.openInformation(null, "Partial Analysis Complete.",
-					"Partial Analysis complete.  Cancelled by User." + artsFound);
+					"Partial Analysis complete.  Cancelled by User."
+							+ artsFound);
 		} else {
 			String msg = "***Analysis is complete.";
 			if (!err) {
 				String key = IDs.SHOW_ANALYSIS_CONFIRMATION;
-				IPreferenceStore pf = CommonPlugin.getDefault().getPreferenceStore();
-				boolean showDialog = pf.getBoolean(IDs.SHOW_ANALYSIS_CONFIRMATION);
+				IPreferenceStore pf = CommonPlugin.getDefault()
+						.getPreferenceStore();
+				boolean showDialog = pf
+						.getBoolean(IDs.SHOW_ANALYSIS_CONFIRMATION);
 				if (showDialog) {
 					String title = "Analysis complete.";
-					String sMsg = cumulativeArtifacts + " " + name + " Artifacts found";
+					String sMsg = cumulativeArtifacts + " " + name
+							+ " Artifacts found";
 					String togMsg = "Don't show me this again";
-					MessageDialogWithToggle.openInformation(shell, title, sMsg, togMsg, false, pf, key);
+					MessageDialogWithToggle.openInformation(shell, title, sMsg,
+							togMsg, false, pf, key);
 					showStatusMessage(sMsg, "RunAnalyseBase.run()");
 				}
 				activateProblemsView();
@@ -194,14 +216,17 @@ public abstract class RunAnalyseBase implements IObjectActionDelegate, IWorkbenc
 			} else { // error occurred
 				showStatusMessage(msg, "RunAnalyseBase.run() error");
 				msg = "Analysis completed with errors";
-				MessageDialog.openError(null, "Analysis completed with errors", msg + artsFound);
+				MessageDialog.openError(null, "Analysis completed with errors",
+						msg + artsFound);
 			}
 		}
 
 	}
 
 	/**
-	 * Run the analysis on the current selection (file, container, or multiple-selection)
+	 * Run the analysis on the current selection (file, container, or
+	 * multiple-selection)
+	 * 
 	 * @param monitor
 	 *            progress monitor on which to report progress.
 	 * @param indent
@@ -211,7 +236,8 @@ public abstract class RunAnalyseBase implements IObjectActionDelegate, IWorkbenc
 	 * @return true if any errors were found.
 	 * @throws InterruptedException
 	 */
-	protected boolean runResources(IProgressMonitor monitor, int indent, List includes) throws InterruptedException {
+	protected boolean runResources(IProgressMonitor monitor, int indent,
+			List includes) throws InterruptedException {
 		boolean foundError = false;
 		// First, count files so we know how much work to do.
 		// note this is number of files of any type, not necessarily number of
@@ -222,18 +248,34 @@ public abstract class RunAnalyseBase implements IObjectActionDelegate, IWorkbenc
 		// Get elements of a possible multiple selection
 		Iterator iter = this.selection.iterator();
 		while (iter.hasNext()) {
-			if(monitor.isCanceled()) {
-				// this is usually caught here while processing multiple-selection of files
+			if (monitor.isCanceled()) {
+				// this is usually caught here while processing
+				// multiple-selection of files
 				throw new InterruptedException();
 			}
-			Object obj = (Object) iter.next();
+			Object obj = (Object) iter.next();// piece of selectionb
 			// It can be a Project, Folder, File, etc...
 			if (obj instanceof IAdaptable) {
-				final IResource res = (IResource) ((IAdaptable) obj).getAdapter(IResource.class);
-				if (res != null) {
-					boolean err = runResource(monitor, res, indent, includes);
-					foundError = foundError | err;
+				// final IResource res = (IResource) ((IAdaptable)
+				// obj).getAdapter(IResource.class);
+				// final ITranslationUnit tu = (ITranslationUnit) ((IAdaptable)
+				// obj).getAdapter(ITranslationUnit.class);
+
+				// ICElement covers folders and translationunits
+				final ICElement ce = (ICElement) ((IAdaptable) obj)
+						.getAdapter(ICElement.class);// cdt40
+				// int elmtType = ce.getElementType();
+				// if(ce instanceof ICContainer)
+				if (ce != null) {
+					// cdt40
+					// IASTTranslationUnit atu = tu.getAST(); not yet
+					boolean err = runResource(monitor, ce, indent, includes);
 				}
+				// OLD
+				// if (res != null) {
+				// boolean err = runResource(monitor, res, indent, includes);
+				// foundError = foundError | err;
+				// }
 			}
 		}
 		monitor.done();
@@ -255,11 +297,12 @@ public abstract class RunAnalyseBase implements IObjectActionDelegate, IWorkbenc
 			Object obj = (Object) iter.next();
 			// It can be a Project, Folder, File, etc...
 			if (obj instanceof IAdaptable) {
-				final IResource res = (IResource) ((IAdaptable) obj).getAdapter(IResource.class);
+				final IResource res = (IResource) ((IAdaptable) obj)
+						.getAdapter(IResource.class);
 				count = count + countFiles(res);
 			}
 		}
-		//System.out.println("number of files: " + count);
+		// System.out.println("number of files: " + count);
 		return count;
 	}
 
@@ -313,14 +356,16 @@ public abstract class RunAnalyseBase implements IObjectActionDelegate, IWorkbenc
 			message += " - ";
 			message += debugMessage;
 		}
-		IWorkbenchWindow ww = CommonPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow();
+		IWorkbenchWindow ww = CommonPlugin.getDefault().getWorkbench()
+				.getActiveWorkbenchWindow();
 		IWorkbenchPage page = ww.getActivePage();
 		IViewReference[] viewRefs = page.getViewReferences();
 		for (int j = 0; j < viewRefs.length; j++) {
 			IViewReference reference = viewRefs[j];
 			IViewPart vp = reference.getView(false);
 			if (vp != null)
-				vp.getViewSite().getActionBars().getStatusLineManager().setMessage(message);
+				vp.getViewSite().getActionBars().getStatusLineManager()
+						.setMessage(message);
 		}
 
 	}
@@ -339,76 +384,113 @@ public abstract class RunAnalyseBase implements IObjectActionDelegate, IWorkbenc
 	 * Run analysis on a resource (e.g. File or Folder) Will descend to members
 	 * of folder
 	 * 
-	 * @param resource
+	 * @param atu
 	 *            the resource
 	 * @param indent
 	 *            number of levels of nesting/recursion for prettyprinting
 	 * @param includes
 	 *            contains header files include paths from the Preference page
 	 * @return true if an error was encountered
-	 * @throws InterruptedException 
+	 * @throws InterruptedException
 	 */
-	protected boolean runResource(IProgressMonitor monitor, IResource resource, int indent, List includes) throws InterruptedException {
+	protected boolean runResource(IProgressMonitor monitor, ICElement ce,
+			int indent, List includes) throws InterruptedException {
 		indent += INDENT_INCR;
 		ScanReturn results;
 		boolean foundError = false;
 
 		if (!monitor.isCanceled()) {
-			if (resource instanceof IFile) {
-				IFile file = (IFile) resource;
-				String filename = file.getName();
-				if (AnalysisUtil.validForAnalysis(filename)) {
-					if (traceOn)
-						println(getSpaces(indent) + "file: " + filename);
-					results = analyse(monitor, file, includes);
+			if (ce instanceof ITranslationUnit) {
+				IResource res = ce.getResource(); // null if not part of C
+													// project in ws
+				// cdt40: eventually shd be able to deal with just tu;
+				// tu.getResource() can always work later...
+				if (res instanceof IFile) {//shd always be true (but might be null)
+					IFile file = (IFile) res;
+					String filename = file.getName();
+					String fn2 = ce.getElementName();// shd be filename too
+														// cdt40
+					if (AnalysisUtil.validForAnalysis(filename)) {
+						if (traceOn)
+							println(getSpaces(indent) + "file: " + filename);
+						results = analyse(monitor, (ITranslationUnit) ce,
+								includes);
 
-					foundError = foundError || results == null || results.wasError();
-					if (foundError) {
-						int stopHere = 0;
-						System.out.println("found error on " + file.getName() + " " + stopHere);
-					}
-					if (traceOn)
-						println("******** RunAnalyseBase, analysis complete; ScanReturn=" + results);
-					if (results != null) {
-						// apply markers to the file
-						processResults(results, resource);
-					}
+						foundError = foundError || results == null
+								|| results.wasError();
+						if (foundError) {
+							int stopHere = 0;
+							System.out.println("found error on "
+									+ file.getName() + " " + stopHere);
+						}
+						if (traceOn)
+							println("******** RunAnalyseBase, analysis complete; ScanReturn="
+									+ results);
+						if (results != null) {
+							// apply markers to the file
+							processResults(results, file);
+						}
 
-				} else {
-					if (traceOn)
-						println(getSpaces(indent) + "---omit: not valid file: " + filename);
+					} else {
+						if (traceOn)
+							println(getSpaces(indent)
+									+ "---omit: not valid file: " + filename);
+					}
+					return foundError;
 				}
-				return foundError;
 			}
 
-			// container could be project or folder
-			else if (resource instanceof IContainer) {
-				IContainer container = (IContainer) resource;
+			else if (ce instanceof ICContainer) {
+				ICContainer container = (ICContainer) ce;
 				try {
-					IResource[] mems = container.members();
+					ICElement[] mems = container.getChildren();
 					for (int i = 0; i < mems.length; i++) {
-						if(monitor.isCanceled()) {
-							//this is usually hit while processing normal analysis of e.g. container
+						if (monitor.isCanceled()) {
+							// this is usually hit while processing normal
+							// analysis of e.g. container
 							throw new InterruptedException();
 						}
-						boolean err = runResource(monitor, mems[i], indent, includes);
+						boolean err = runResource(monitor, mems[i], indent,
+								includes);
 						foundError = foundError || err;
 					}
 				} catch (CoreException e) {
 					e.printStackTrace();
 				}
-
+				
 			}
+			else if (ce instanceof ICProject) {
+				ICProject proj = (ICProject) ce;
+				try {
+					ICElement[] mems = proj.getChildren();
+					for (int i = 0; i < mems.length; i++) {
+						if (monitor.isCanceled()) {
+							// this is usually hit while processing normal
+							// analysis of e.g. container
+							throw new InterruptedException();
+						}
+						boolean err = runResource(monitor, mems[i], indent,
+								includes);
+						foundError = foundError || err;
+					}
+				} catch (CoreException e) {
+					e.printStackTrace();
+				}
+				
+			}
+
+			// container could be project or folder
+			
 		} // end if !monitor.isCanceled()
 		else {
 			String name = "";
-			if (resource instanceof IResource) {
-				IResource res = (IResource) resource;
-				// name=res.getName(); // simple filename only, no path info
-				IPath path = res.getProjectRelativePath();
-				name = path.toString();
-			}
-			System.out.println("Cancelled by User, aborting analysis on subsequent files... " + name);
+			//cdt40
+				name = ce.getElementName();
+				String p=ce.getPath().toString();
+			 
+			System.out
+					.println("Cancelled by User, aborting analysis on subsequent files... "
+							+ name);
 			throw new InterruptedException();
 		}
 
@@ -433,10 +515,10 @@ public abstract class RunAnalyseBase implements IObjectActionDelegate, IWorkbenc
 		}
 	}
 
-	public ScanReturn analyse(IProgressMonitor monitor, IFile file, List /*
-																			 * of
-																			 * String
-																			 */includes) {
+	public ScanReturn analyse(IProgressMonitor monitor, ITranslationUnit tu,
+			List /*
+					 * of String
+					 */includes) {
 		if (traceOn)
 			println("RunAnalyseBase.analyse()...");
 		ScanReturn nr = null;
@@ -445,12 +527,13 @@ public abstract class RunAnalyseBase implements IObjectActionDelegate, IWorkbenc
 		monitor.subTask("Starting Analysis...");
 
 		// fully qualified file location
-		String rawPath = file.getRawLocation().toString();
+		// String rawPath = tu.getRawLocation().toString();
+		String rawPath = tu.getLocation().toString();// cdt40
 		if (traceOn)
-			println("RunAnalyseBase:              file = " + file.getLocation());
+			println("RunAnalyseBase:              file = " + tu.getLocation());
 
 		monitor.subTask(" on " + rawPath);
-		ScanReturn scanReturn = doArtifactAnalysis(file, includes);
+		ScanReturn scanReturn = doArtifactAnalysis(tu, includes);
 		monitor.worked(1);
 		if (traceOn)
 			println("Artifact analysis complete...");
@@ -458,17 +541,21 @@ public abstract class RunAnalyseBase implements IObjectActionDelegate, IWorkbenc
 		cumulativeArtifacts = cumulativeArtifacts + numArtifacts;
 
 		if (traceOn)
-			System.out.println("Artifacts found for " + file.getProjectRelativePath() + ": " + numArtifacts);
+			System.out.println("Artifacts found for "
+					+ tu.getResource().getProjectRelativePath() + ": " + numArtifacts);
 		if (traceOn)
 			System.out.println("   Total # found: " + cumulativeArtifacts);
 
 		if (scanReturn == null) {
-			System.out.println("ScanReturn result is NULL.  No results for " + file.getProjectRelativePath());
-			errMsg = "Error: No results were returned from analysis of " + file.getProjectRelativePath();
+			System.out.println("ScanReturn result is NULL.  No results for "
+					+ tu.getResource().getProjectRelativePath());
+			errMsg = "Error: No results were returned from analysis of "
+					+ tu.getResource().getProjectRelativePath();
 			MessageDialog.openError(shell, "Error in Analysis", errMsg);
 		} else {
 			if (traceOn)
-				System.out.println("RunAnalyzeBase: ScanReturn received for " + file.getName());
+				System.out.println("RunAnalyzeBase: ScanReturn received for "
+						+ tu.getElementName());
 			if (traceOn)
 				System.out.println("   Analysis err? = " + nr.wasError());
 		}
@@ -498,7 +585,8 @@ public abstract class RunAnalyseBase implements IObjectActionDelegate, IWorkbenc
 		try {
 			indentSpace = SPACES.substring(0, indent);
 		} catch (StringIndexOutOfBoundsException e) {
-			println("RunAnalyseBase: Nesting level " + indent + " exceeds print indent; INCR at each level is "
+			println("RunAnalyseBase: Nesting level " + indent
+					+ " exceeds print indent; INCR at each level is "
 					+ INDENT_INCR);
 			// e.printStackTrace();
 		}
@@ -560,12 +648,13 @@ public abstract class RunAnalyseBase implements IObjectActionDelegate, IWorkbenc
 	 * Returns artifact analysis for file. <br>
 	 * Derived class should override this method.
 	 * 
-	 * @param file
+	 * @param tu
 	 * @param includes
 	 *            header files include paths
 	 * @return
 	 */
-	public abstract ScanReturn doArtifactAnalysis(final IFile file, final List includes);
+	public abstract ScanReturn doArtifactAnalysis(final ITranslationUnit tu,
+			final List includes);
 
 	/**
 	 * returns true if include paths must be set for this implementation. For

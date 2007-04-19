@@ -370,11 +370,6 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 					if (traceOn)
 						System.out.println("input is null in getElements...");
 				}
-				// use the cached input object instead of querying from
-				// workspace
-				// objs =
-				// ResourcesPlugin.getWorkspace().getRoot().findMarkers(id,
-				// false, IResource.DEPTH_INFINITE);
 				objs = input.findMarkers(id, false, IResource.DEPTH_INFINITE);
 				parentList=createParents(objs);
 			} catch (CoreException e) {
@@ -1399,6 +1394,10 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 			public void run() {
 				ISelection selection = viewer.getSelection();
 				Object obj = ((IStructuredSelection) selection).getFirstElement();
+				// This action only makes sense on child nodes (markers)
+				if (!(obj instanceof IMarker)) {
+					return;
+				}
 				IMarker marker = (IMarker) obj;
 				try {
 					IFile f = (IFile) marker.getResource();
