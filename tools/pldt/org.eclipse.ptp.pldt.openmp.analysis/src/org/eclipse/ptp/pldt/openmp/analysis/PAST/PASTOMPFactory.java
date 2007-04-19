@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2006 IBM Corporation.
+ * Copyright (c) 2006, 2007 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,6 +13,7 @@ package org.eclipse.ptp.pldt.openmp.analysis.PAST;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+import org.eclipse.cdt.core.dom.IName;
 import org.eclipse.cdt.core.dom.ast.ASTVisitor;
 import org.eclipse.cdt.core.dom.ast.IASTCompoundStatement;
 import org.eclipse.cdt.core.dom.ast.IASTFileLocation;
@@ -297,7 +298,7 @@ public class PASTOMPFactory
     }
     
     /**
-     * isSymbolRelevant - see if symbol is a local variable in scope to pragma
+     * See if symbol is a local variable in scope to pragma
      * @param symbol - Symbol
      * @return boolean
      */
@@ -305,7 +306,10 @@ public class PASTOMPFactory
     {   
         IASTNode node = null;
         try {
-            node=symbol.getScope().getPhysicalNode();
+            //old node=symbol.getScope().getPhysicalNode();
+           IName name=symbol.getScope().getScopeName();//cdt40?
+           //findBindings...
+           //TODO cdt40 find equivalent CDT 4.0 APIs...
         }
         catch (Exception e) { return false; }
         
