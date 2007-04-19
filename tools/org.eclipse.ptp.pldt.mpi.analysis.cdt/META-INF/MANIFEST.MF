@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: CDT Analysis - more general analysis features
+Bundle-SymbolicName: org.eclipse.ptp.pldt.mpi.analysis.cdt
+Bundle-Version: 1.0.0
+Bundle-Activator: org.eclipse.ptp.pldt.mpi.analysis.cdt.Activator
+Bundle-Localization: plugin
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.cdt.core,
+ org.eclipse.core.resources
+Eclipse-LazyStart: true
+Export-Package: org.eclipse.ptp.pldt.mpi.analysis.cdt.graphs,
+ org.eclipse.ptp.pldt.mpi.analysis.cdt.graphs.impl
