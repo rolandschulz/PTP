@@ -7,5 +7,6 @@
       <topic label="Running PTP MPI tools"  href="html/run.html"/> 
            <topic label="Setup for PTP OpenMP tools"  href="html/setupOMP.html"/> 
       <topic label="Running PTP OpenMP tools"  href="html/runOMP.html"/> 
+   <topic label="MPI Barrier Analysis"  href="html/barrier.html"/> 
    
 </toc>
