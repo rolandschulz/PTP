@@ -5,32 +5,31 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.cdt.core.dom.CDOM;
-import org.eclipse.cdt.core.dom.IASTServiceProvider;
 import org.eclipse.cdt.core.dom.ast.IASTFileLocation;
 import org.eclipse.cdt.core.dom.ast.IASTNodeLocation;
 import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit;
-import org.eclipse.cdt.core.parser.ParserLanguage;
+import org.eclipse.cdt.core.dom.ast.gnu.c.GCCLanguage;
+import org.eclipse.cdt.core.model.ILanguage;
+import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.ptp.pldt.common.Artifact;
+import org.eclipse.ptp.pldt.common.ScanReturn;
+import org.eclipse.ptp.pldt.common.actions.RunAnalyseBase;
+import org.eclipse.ptp.pldt.common.util.SourceInfo;
+import org.eclipse.ptp.pldt.common.util.ViewActivater;
 import org.eclipse.ptp.pldt.openmp.analysis.OpenMPAnalysisManager;
 import org.eclipse.ptp.pldt.openmp.analysis.OpenMPError;
 import org.eclipse.ptp.pldt.openmp.analysis.OpenMPErrorManager;
 import org.eclipse.ptp.pldt.openmp.analysis.PAST.PASTNode;
 import org.eclipse.ptp.pldt.openmp.analysis.PAST.PASTOMPPragma;
-import org.eclipse.ptp.pldt.openmp.ui.pv.PvPlugin;
-import org.eclipse.ptp.pldt.openmp.ui.pv.views.ProblemMarkerAttrIds;
-import org.eclipse.ptp.pldt.common.Artifact;
-import org.eclipse.ptp.pldt.common.ScanReturn;
-import org.eclipse.ptp.pldt.common.actions.RunAnalyseBase;
-import org.eclipse.ptp.pldt.common.util.AnalysisUtil;
-import org.eclipse.ptp.pldt.common.util.SourceInfo;
-import org.eclipse.ptp.pldt.common.util.ViewActivater;
 import org.eclipse.ptp.pldt.openmp.core.OpenMPArtifactMarkingVisitor;
 import org.eclipse.ptp.pldt.openmp.core.OpenMPPlugin;
 import org.eclipse.ptp.pldt.openmp.core.OpenMPScanReturn;
 import org.eclipse.ptp.pldt.openmp.core.analysis.OpenMPCASTVisitor;
+import org.eclipse.ptp.pldt.openmp.ui.pv.PvPlugin;
+import org.eclipse.ptp.pldt.openmp.ui.pv.views.ProblemMarkerAttrIds;
 import org.eclipse.ui.texteditor.MarkerUtilities;
 
 /**
@@ -60,25 +59,26 @@ public class RunAnalyseOpenMP extends RunAnalyseBase
      * @param includes OpenMP include paths
      * @return
      */
-    public ScanReturn doArtifactAnalysis(final IFile file, final List /* of String */includes)
+    @Override
+    public ScanReturn doArtifactAnalysis(final ITranslationUnit tu, final List /* of String */includes)
     {
-        OpenMPScanReturn msr = new OpenMPScanReturn();
-        final String fileName = file.getName();
-        ParserLanguage lang = AnalysisUtil.getLanguageFromFile(file);
-        IASTTranslationUnit astTransUnit = null;
-        try {
-            astTransUnit = CDOM.getInstance().getASTService().getTranslationUnit(file,
-                    CDOM.getInstance().getCodeReaderFactory(CDOM.PARSE_SAVED_RESOURCES));
-            if (lang == ParserLanguage.C) {
-                astTransUnit.accept(new OpenMPCASTVisitor(includes, fileName, msr));
-            }
-        } catch (IASTServiceProvider.UnsupportedDialectException e) {
-        }
-        // DPP should put code to recognize #pragmas etc. here
-        
-        processOpenMPPragmas(msr, astTransUnit, file);
-        return msr;
-    }
+		final ScanReturn msr = new ScanReturn();
+		final String fileName = tu.getElementName();
+		ILanguage lang;
+		try {
+			lang = tu.getLanguage();
+
+			IASTTranslationUnit atu = tu.getAST();
+			if (lang.getId().equals(GCCLanguage.ID)) {// cdt40
+				atu.accept(new OpenMPCASTVisitor(includes, fileName, msr));
+			} 
+		} catch (CoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return msr;
+	}
+
     
     protected void processOpenMPPragmas(OpenMPScanReturn    msr, 
     		                            IASTTranslationUnit astTransUnit,
