@@ -2,15 +2,14 @@ package org.eclipse.ptp.pldt.mpi.core.actions;
 
 import java.util.List;
 
-import org.eclipse.cdt.core.dom.CDOM;
-import org.eclipse.cdt.core.dom.IASTServiceProvider;
 import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit;
-import org.eclipse.cdt.core.parser.ParserLanguage;
-import org.eclipse.core.resources.IFile;
-
+import org.eclipse.cdt.core.dom.ast.gnu.c.GCCLanguage;
+import org.eclipse.cdt.core.model.ILanguage;
+import org.eclipse.cdt.core.model.ITranslationUnit;
+import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPASTTranslationUnit;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.pldt.common.ScanReturn;
 import org.eclipse.ptp.pldt.common.actions.RunAnalyseBase;
-import org.eclipse.ptp.pldt.common.util.AnalysisUtil;
 import org.eclipse.ptp.pldt.common.util.ViewActivater;
 import org.eclipse.ptp.pldt.mpi.core.MPIArtifactMarkingVisitor;
 import org.eclipse.ptp.pldt.mpi.core.MpiIDs;
@@ -43,24 +42,27 @@ public class RunAnalyseMPI extends RunAnalyseBase {
 	 *            MPI include paths
 	 * @return
 	 */
-	public ScanReturn doArtifactAnalysis(final IFile file, final List includes) {
+
+	public ScanReturn doArtifactAnalysis(final ITranslationUnit tu,	final List includes) {
 		final ScanReturn msr = new ScanReturn();
-		final String fileName = file.getName();
-		ParserLanguage lang = AnalysisUtil.getLanguageFromFile(file);
-		//System.out.println("lang=" + lang);
+		final String fileName = tu.getElementName();
+		ILanguage lang;
 		try {
-			IASTTranslationUnit astTransUnit = CDOM.getInstance().getASTService().getTranslationUnit(file,
-					CDOM.getInstance().getCodeReaderFactory(CDOM.PARSE_SAVED_RESOURCES));
-			if (lang == ParserLanguage.C) {
-				astTransUnit.accept(new MpiCASTVisitor(includes, fileName, msr));
-			} else if (lang == ParserLanguage.CPP) {
-				astTransUnit.accept(new MpiCPPASTVisitor(includes, fileName, msr));
+			lang = tu.getLanguage();
+            
+			IASTTranslationUnit atu = tu.getAST();
+			if (lang.getId().equals(GCCLanguage.ID)) {// cdt40
+				atu.accept(new MpiCASTVisitor(includes, fileName, msr));
+				// BRT FIXME  inconsistent way of accessing Language
+			} else if (atu instanceof CPPASTTranslationUnit) {
+				atu.accept(new MpiCPPASTVisitor(includes, fileName, msr));
 
 			}
-		} catch (IASTServiceProvider.UnsupportedDialectException e) {
-			System.out.println("RunAnalyseMPI, UnsupportedDialectException "+e.getMessage());
-		}
 
+		} catch (CoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return msr;
 	}
 
