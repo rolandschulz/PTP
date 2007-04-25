@@ -23,7 +23,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+
 import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.core.IBinaryParser;
 import org.eclipse.cdt.core.ICExtensionReference;
@@ -45,18 +45,20 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.IPersistableSourceLocator;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
-import org.eclipse.ptp.core.IPUniverse;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.IAttribute;
-import org.eclipse.ptp.core.attributes.IAttribute.IllegalValue;
+import org.eclipse.ptp.core.elements.IPQueue;
+import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.debug.core.IPDebugConfiguration;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.launch.PLaunch;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.internal.ui.LaunchMessages;
-import org.eclipse.ptp.launch.ui.ParallelTab;
+import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory;
+import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.rmsystem.IResourceManager;
+import org.eclipse.ptp.rmsystem.ResourceManagerState;
 import org.eclipse.ptp.rtsystem.JobRunConfiguration;
 
 /**
@@ -113,51 +115,52 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 			arguments.add(temp);
 		return (String[]) arguments.toArray(new String[arguments.size()]);
 	}
-	protected JobRunConfiguration getJobRunConfiguration(ILaunchConfiguration configuration) throws CoreException {
+	protected JobRunConfiguration getJobRunConfiguration(ILaunchConfiguration configuration)
+	throws CoreException {
 		IPath programFile = getProgramFile(configuration);
 		String resourceManagerName = getResourceManagerName(configuration);	
-		String machineName = getMachineName(configuration);	
 		String queueName = getQueueName(configuration);	
 		IAttribute[] launchAttributes = getLaunchAttributes(configuration);
 		String[] args = getProgramParameters(configuration);
 		String[] env =  DebugPlugin.getDefault().getLaunchManager().getEnvironment(configuration);
 		String dir = verifyWorkDirectory(configuration);
 
-		return new JobRunConfiguration(programFile.lastSegment(), programFile.removeLastSegments(1).toOSString(), resourceManagerName, machineName, queueName, launchAttributes, args, env, dir);
+		return new JobRunConfiguration(programFile.lastSegment(),
+				programFile.removeLastSegments(1).toOSString(), resourceManagerName,
+				queueName, launchAttributes, args, env, dir);
 		//original - return new JobRunConfiguration(programFile.getProjectRelativePath().toOSString(), dir, machineName, nprocs, nprocpnode, firstnode, args, env, dir);
 	}
 	private IAttribute[] getLaunchAttributes(ILaunchConfiguration configuration)
 	throws CoreException {
 
 		String resourceManagerName = getResourceManagerName(configuration);	
-		String machineName = getMachineName(configuration);	
 		String queueName = getQueueName(configuration);	
 
-		IAttribute[] attrs = new IAttribute[0];
 		IPUniverse universe = PTPCorePlugin.getDefault().getUniverse();
+		IResourceManager rm = null;
 		IResourceManager[] rms = universe.getResourceManagers();
-		for (IResourceManager rm : rms) {
-			if (rm.getElementName().equals(resourceManagerName)) {
-				attrs = rm.getLaunchAttributes(machineName, queueName, attrs);
-				break;
-			}
-		}
-
-		Map<String, String> configAttrValueMap =
-			ParallelTab.getConfigurationAttributeValueMap(configuration);
-		for (IAttribute attr : attrs) {
-			if (attr.isEnabled()) {
-				String uniqueId = attr.getDescription().getUniqueId();
-				String value = configAttrValueMap.get(uniqueId);
-				try {
-					attr.setValue(value);
-				} catch (IllegalValue e) {
-					// shouldn't happen
-					PTPCorePlugin.log(e);
+		for (IResourceManager rm_i : rms) {
+			if (rm_i.getElementName().equals(resourceManagerName)) {
+				if (rm_i.getState() == ResourceManagerState.State.STARTED) {
+					rm = rm_i;
+					break;
 				}
 			}
 		}
-		return attrs;
+
+		final AbstractRMLaunchConfigurationFactory rmFactory =
+			PTPLaunchPlugin.getDefault().getRMLaunchConfigurationFactory(rm);
+		if (rmFactory == null) {
+			return new IAttribute[0];
+		}
+		IRMLaunchConfigurationDynamicTab rmDynamicTab = rmFactory.create(rm);
+		IPQueue[] queues = rm.getQueues();
+		for (IPQueue q : queues) {
+			if (q.getName().equals(queueName)) {
+				return rmDynamicTab.getAttributes(rm, q, configuration);
+			}
+		}
+		return new IAttribute[0];
 	}
 	
    protected String verifyWorkDirectory(ILaunchConfiguration configuration) throws CoreException {
@@ -194,9 +197,6 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	}
 	protected static String getProgramName(ILaunchConfiguration configuration) throws CoreException {
 	    return configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_APPLICATION_NAME, (String)null);
-	}
-	protected static String getMachineName(ILaunchConfiguration configuration) throws CoreException {
-		return configuration.getAttribute(IPTPLaunchConfigurationConstants.MACHINE_NAME, (String)null);
 	}
 	protected static String getQueueName(ILaunchConfiguration configuration) throws CoreException {
 		return configuration.getAttribute(IPTPLaunchConfigurationConstants.QUEUE_NAME, (String)null);

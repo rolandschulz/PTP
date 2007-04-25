@@ -25,7 +25,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.ptp.core.proxy.AbstractProxyClient;
 import org.eclipse.ptp.core.proxy.event.IProxyConnectedEvent;
 import org.eclipse.ptp.core.proxy.event.IProxyDisconnectedEvent;
@@ -41,7 +40,6 @@ import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugBreakpointSetE
 import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugDataEvent;
 import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugDataExpValueEvent;
 import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugErrorEvent;
-import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugEvent;
 import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugEventListener;
 import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugExitEvent;
 import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugInfoThreadsEvent;
@@ -62,7 +60,7 @@ import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugVarsEvent;
 import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugEventFactory;
 
 public abstract class AbstractProxyDebugClient extends AbstractProxyClient implements IProxyDebugClient,IProxyEventListener {
-	protected ListenerList	listeners = new ListenerList();
+	private List<IProxyDebugEventListener>	listeners = Collections.synchronizedList(new ArrayList<IProxyDebugEventListener>());
 	private boolean		waiting = false;
 	private boolean		connected = false;
 	private final long WAIT_CONNECTION = 60000;
