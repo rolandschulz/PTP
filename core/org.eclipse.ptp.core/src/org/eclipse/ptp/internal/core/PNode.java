@@ -22,20 +22,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.ptp.core.AttributeConstants;
-import org.eclipse.ptp.core.IPJob;
-import org.eclipse.ptp.core.IPMachine;
-import org.eclipse.ptp.core.IPProcess;
+import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.elementcontrols.IPElementControl;
 import org.eclipse.ptp.core.elementcontrols.IPMachineControl;
 import org.eclipse.ptp.core.elementcontrols.IPNodeControl;
 import org.eclipse.ptp.core.elementcontrols.IPProcessControl;
+import org.eclipse.ptp.core.elements.IPJob;
+import org.eclipse.ptp.core.elements.IPMachine;
+import org.eclipse.ptp.core.elements.IPProcess;
 
 public class PNode extends Parent implements IPNodeControl {
 	protected String NAME_TAG = "node ";
 
-	public PNode(IPElementControl mac, String name, String key) {
-		super(mac, name, key, P_NODE);
-		this.setAttribute(AttributeConstants.ATTRIB_NODE_NUMBER, new Integer(key));
+	public PNode(int id, IPMachineControl mac, IAttribute[] attrs) {
+		super(id, mac, P_NODE, attrs);
+		this.setAttribute(AttributeConstants.ATTRIB_NODE_NUMBER, Integer.toString(id));
 	}
 	
 	public void addProcess(IPProcessControl process) {
@@ -92,17 +93,6 @@ public class PNode extends Parent implements IPNodeControl {
 			}
 		}
 		return (IPJob[]) array.toArray(new IPJob[array.size()]);
-	}
-	public Object getAttribute(String key) {
-		return this.getAttribute(AttributeConstants.ATTRIB_CLASS_NODE, key);
-	}
-
-	public void setAttribute(String key, Object o) {
-		this.setAttribute(AttributeConstants.ATTRIB_CLASS_NODE, key, o);
-	}
-	
-	public String[] getAttributeKeys() {
-		return this.getAttributeKeys(AttributeConstants.ATTRIB_CLASS_NODE);
 	}
 	
 	/* (non-Javadoc)

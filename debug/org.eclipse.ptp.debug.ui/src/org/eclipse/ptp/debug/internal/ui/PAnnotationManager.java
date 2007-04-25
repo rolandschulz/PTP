@@ -52,7 +52,7 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.IAnnotationModel;
-import org.eclipse.ptp.core.IPJob;
+import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.resources.FileStorage;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IAbstractDebugger;

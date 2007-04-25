@@ -21,7 +21,17 @@
  */
 package org.eclipse.ptp.rmsystem;
 
-import org.eclipse.ptp.rmsystem.events.IResourceManagerContentsChangedEvent;
+import org.eclipse.ptp.rmsystem.events.IResourceManagerChangedJobsEvent;
+import org.eclipse.ptp.rmsystem.events.IResourceManagerChangedMachinesEvent;
+import org.eclipse.ptp.rmsystem.events.IResourceManagerChangedNodesEvent;
+import org.eclipse.ptp.rmsystem.events.IResourceManagerChangedProcessesEvent;
+import org.eclipse.ptp.rmsystem.events.IResourceManagerChangedQueuesEvent;
+import org.eclipse.ptp.rmsystem.events.IResourceManagerErrorEvent;
+import org.eclipse.ptp.rmsystem.events.IResourceManagerNewJobsEvent;
+import org.eclipse.ptp.rmsystem.events.IResourceManagerNewMachinesEvent;
+import org.eclipse.ptp.rmsystem.events.IResourceManagerNewNodesEvent;
+import org.eclipse.ptp.rmsystem.events.IResourceManagerNewProcessesEvent;
+import org.eclipse.ptp.rmsystem.events.IResourceManagerNewQueuesEvent;
 
 
 /**
@@ -29,24 +39,74 @@ import org.eclipse.ptp.rmsystem.events.IResourceManagerContentsChangedEvent;
  * 
  */
 public interface IResourceManagerListener {
-	/**
-	 * @param resourceManager
-	 */
-	public void handleStartup(IResourceManager resourceManager);
-
-	/**
-	 * @param resourceManager
-	 */
-	public void handleShutdown(IResourceManager resourceManager);
-
-	/**
-	 * @param oldStatus
-	 * @param manager
-	 */
-	public void handleStatusChanged(ResourceManagerStatus oldStatus, IResourceManager manager);
 	
 	/**
-	 * @param event
+	 * @param e
 	 */
-	public void handleContentsChanged(IResourceManagerContentsChangedEvent event);
+	public void handleChangedJobsEvent(IResourceManagerChangedJobsEvent e);
+	
+	/**
+	 * @param e
+	 */
+	public void handleChangedMachinesEvent(IResourceManagerChangedMachinesEvent e);
+	
+	/**
+	 * @param e
+	 */
+	public void handleChangedNodesEvent(IResourceManagerChangedNodesEvent e);
+	
+	/**
+	 * @param e
+	 */
+	public void handleChangedProcessesEvent(IResourceManagerChangedProcessesEvent e);
+	
+	/**
+	 * @param e
+	 */
+	public void handleChangedQueuesEvent(IResourceManagerChangedQueuesEvent e);
+
+	/**
+     * @param e
+     */
+    public void handleErrorStateEvent(IResourceManagerErrorEvent e);
+
+    /**
+	 * @param e
+	 */
+	public void handleNewJobsEvent(IResourceManagerNewJobsEvent e);
+
+    /**
+	 * @param e
+	 */
+	public void handleNewMachinesEvent(IResourceManagerNewMachinesEvent e);
+
+	/**
+	 * @param e
+	 */
+	public void handleNewNodesEvent(IResourceManagerNewNodesEvent e);
+
+	/**
+	 * @param e
+	 */
+	public void handleNewProcessesEvent(IResourceManagerNewProcessesEvent e);
+
+	/**
+	 * @param e
+	 */
+	public void handleNewQueuesEvent(IResourceManagerNewQueuesEvent e);
+
+	/**
+	 * @param resourceManager
+	 */
+	public void handleShutdownStateEvent(IResourceManager resourceManager);
+
+	/**
+	 * @param resourceManager
+	 */
+	public void handleStartupStateEvent(IResourceManager resourceManager);
+
+	/**
+     * @param manager
+     */
+    public void handleSuspendedStateEvent(AbstractResourceManager manager);
 }

@@ -43,7 +43,6 @@ public class JobRunConfiguration {
 	protected String execName;
 	protected String pathToExec;
 	protected String resourceManagerName;
-	protected String machineName;
 	protected String workingDir;
 	protected String[] arguments;
 	protected String[] environment;
@@ -54,14 +53,13 @@ public class JobRunConfiguration {
 	protected String queueName;
 	
 	public JobRunConfiguration(String exe, String exePath, String resourceManager,
-			String machine, String queue, IAttribute[] launchAttributes,
+			String queue, IAttribute[] launchAttributes,
 			String[] args, String[] env,
 			String dir)
 	{
 		execName = exe;
 		pathToExec = exePath;
 		resourceManagerName = resourceManager;
-		machineName = machine;
 		queueName = queue;
 		this.launchAttributes = launchAttributes;
 		workingDir = dir;
@@ -85,11 +83,6 @@ public class JobRunConfiguration {
 	public String getResourceManagerName()
 	{
 		return resourceManagerName;
-	}
-	
-	public String getMachineName()
-	{
-		return machineName;
 	}
 	
 	public String getQueueName()
@@ -147,7 +140,8 @@ public class JobRunConfiguration {
 		return "name:\t\t"+execName+"\n"+
 				"path:\t\t"+pathToExec+"\n"+
 				"cwd:\t\t"+workingDir+"\n"+
-				"machineName:\t"+machineName+"\n"+
+				"resourceManagerName:\t"+resourceManagerName+"\n"+
+				"queueName:\t"+queueName+"\n"+
 				"isDebug?\t\t"+isDebugJob;
 	}
 

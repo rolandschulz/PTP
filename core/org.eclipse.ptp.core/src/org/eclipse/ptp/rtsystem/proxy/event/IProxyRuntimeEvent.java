@@ -19,28 +19,29 @@
 
 package org.eclipse.ptp.rtsystem.proxy.event;
 
-import org.eclipse.ptp.core.proxy.event.IProxyEvent;
+import org.eclipse.ptp.core.proxy.event.IProxyExtendedEvent;
 import org.eclipse.ptp.core.util.BitList;
 
-public interface IProxyRuntimeEvent extends IProxyEvent {
-	public static final int RUNTIME_EVENT_OFFSET = 200;
-	public static final int EVENT_RUNTIME_OK = RUNTIME_EVENT_OFFSET + 0;
-	public static final int EVENT_RUNTIME_ERROR = RUNTIME_EVENT_OFFSET + 1;
-	public static final int EVENT_RUNTIME_JOBSTATE = RUNTIME_EVENT_OFFSET + 2;
-	public static final int EVENT_RUNTIME_JOBS = RUNTIME_EVENT_OFFSET + 3;
-	public static final int EVENT_RUNTIME_PROCS = RUNTIME_EVENT_OFFSET + 4;
-	public static final int EVENT_RUNTIME_PROCATTR = RUNTIME_EVENT_OFFSET + 5;
-	public static final int EVENT_RUNTIME_MACHINES = RUNTIME_EVENT_OFFSET + 6;
-	public static final int EVENT_RUNTIME_NODES = RUNTIME_EVENT_OFFSET + 7;
-	public static final int EVENT_RUNTIME_NODEATTR = RUNTIME_EVENT_OFFSET + 8;
-	public static final int EVENT_RUNTIME_MACHID = RUNTIME_EVENT_OFFSET + 9;
-	public static final int EVENT_RUNTIME_CONNECTED = RUNTIME_EVENT_OFFSET + 10;
-	public static final int EVENT_RUNTIME_DISCONNECTED = RUNTIME_EVENT_OFFSET + 11;
-	public static final int EVENT_RUNTIME_NEWJOB = RUNTIME_EVENT_OFFSET + 12;
-	public static final int EVENT_RUNTIME_PROCOUT = RUNTIME_EVENT_OFFSET + 13;
-	public static final int EVENT_RUNTIME_NODECHANGE = RUNTIME_EVENT_OFFSET + 14;
-	public static final int EVENT_RUNTIME_TIMEOUT = RUNTIME_EVENT_OFFSET + 15;
+public interface IProxyRuntimeEvent extends IProxyExtendedEvent {
+	public static final int PROXY_RUNTIME_EVENT_OFFSET = 200;
 	
+	public static final int PROXY_RUNTIME_ERROR_EVENT = PROXY_RUNTIME_EVENT_OFFSET + 1;
+	public static final int PROXY_RUNTIME_ATTR_DEF_EVENT = PROXY_RUNTIME_EVENT_OFFSET + 2;
+	public static final int PROXY_RUNTIME_NEW_JOB_EVENT = PROXY_RUNTIME_EVENT_OFFSET + 3;
+	public static final int PROXY_RUNTIME_NEW_MACHINE_EVENT = PROXY_RUNTIME_EVENT_OFFSET + 4;
+	public static final int PROXY_RUNTIME_NEW_NODE_EVENT = PROXY_RUNTIME_EVENT_OFFSET + 5;
+	public static final int PROXY_RUNTIME_NEW_PROCESS_EVENT = PROXY_RUNTIME_EVENT_OFFSET + 6;
+	public static final int PROXY_RUNTIME_NEW_QUEUE_EVENT = PROXY_RUNTIME_EVENT_OFFSET + 7;
+	public static final int PROXY_RUNTIME_JOB_CHANGE_EVENT = PROXY_RUNTIME_EVENT_OFFSET + 8;
+	public static final int PROXY_RUNTIME_MACHINE_CHANGE_EVENT = PROXY_RUNTIME_EVENT_OFFSET + 96;
+	public static final int PROXY_RUNTIME_NODE_CHANGE_EVENT = PROXY_RUNTIME_EVENT_OFFSET + 10;
+	public static final int PROXY_RUNTIME_PROCESS_CHANGE_EVENT = PROXY_RUNTIME_EVENT_OFFSET + 11;
+	public static final int PROXY_RUNTIME_QUEUE_CHANGE_EVENT = PROXY_RUNTIME_EVENT_OFFSET + 12;
+	public static final int PROXY_RUNTIME_STARTUP_EVENT = PROXY_RUNTIME_EVENT_OFFSET + 13;
+	public static final int PROXY_RUNTIME_RUNNING_EVENT = PROXY_RUNTIME_EVENT_OFFSET + 14;
+	public static final int PROXY_RUNTIME_SHUTDOWN_EVENT = PROXY_RUNTIME_EVENT_OFFSET + 15;
+
+	public static final int PROXY_RUNTIME_EVENT_TERMINAL = PROXY_RUNTIME_EVENT_OFFSET + 15;
 	
 	public BitList getBitSet();
 }

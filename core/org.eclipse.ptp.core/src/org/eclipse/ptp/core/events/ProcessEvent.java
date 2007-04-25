@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.events;
 
-import org.eclipse.ptp.core.IPProcess;
+import org.eclipse.ptp.core.elements.IPProcess;
 
 
 /**

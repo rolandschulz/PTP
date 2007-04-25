@@ -20,7 +20,7 @@ package org.eclipse.ptp.internal.ui.actions;
 
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.MenuManager;
-import org.eclipse.ptp.core.IPMachine;
+import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.internal.ui.ParallelImages;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.ui.actions.GotoAction;

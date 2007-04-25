@@ -32,10 +32,11 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
-import org.eclipse.ptp.rmsystem.ResourceManagerStatus;
+import org.eclipse.ptp.rmsystem.ResourceManagerState;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.XMLMemento;
 
@@ -54,7 +55,7 @@ public class ResourceManagerPersistence {
 	private static final String TAG_RESOURCEMANGER_RUNNING = "IsRunning";
 
 	public static void saveResourceManagers(File file,
-			IResourceManager[] resourceManagers) {
+			IResourceManagerControl[] resourceManagers) {
 		System.out.println("In saveResourceManagers to file, " + file.getAbsolutePath());
 		XMLMemento memento = XMLMemento.createWriteRoot(TAG_RESOURCEMANAGERS);
 		saveResourceManagers(memento, resourceManagers);
@@ -77,25 +78,25 @@ public class ResourceManagerPersistence {
 	}
 
 	private static void saveResourceManagers(XMLMemento memento,
-			IResourceManager[] resourceManagers) {
+			IResourceManagerControl[] resourceManagers) {
 		for (int i = 0; i < resourceManagers.length; ++i) {
 			IMemento child = memento.createChild(TAG_RESOURCEMANGER);
 			child.putString(
 					TAG_RESOURCEMANGER_ID,
 					resourceManagers[i].getConfiguration().getResourceManagerId());
 			child.putInteger(TAG_RESOURCEMANAGER_INDEX, i);
-			boolean isRunning = resourceManagers[i].getStatus().equals(ResourceManagerStatus.STARTED);
+			boolean isRunning = resourceManagers[i].getState().equals(ResourceManagerState.State.STARTED);
 			child.putString(TAG_RESOURCEMANGER_RUNNING, isRunning ? "true" : "false");
 			IMemento grandchild = child.createChild(TAG_RESOURCEMANGER_CONFIGURATION);
 			resourceManagers[i].getConfiguration().save(grandchild);
 		}
 	}
 
-	private IResourceManager[] resourceManagers = new IResourceManager[0];
+	private IResourceManagerControl[] resourceManagers = new IResourceManagerControl[0];
 
-	private IResourceManager savedCurrentResourceManager;
+	private IResourceManagerControl savedCurrentResourceManager;
 
-	public IResourceManager[] getResourceManagers() {
+	public IResourceManagerControl[] getResourceManagerControls() {
 		return resourceManagers;
 	}
 
@@ -107,7 +108,7 @@ public class ResourceManagerPersistence {
 	 * Loads and, if necessary, starts saved resource managers.
 	 * @param file
 	 * @param factories
-	 * @param monitor TODO
+	 * @param monitor
 	 * @throws CoreException 
 	 */
 	public void loadResourceManagers(File file,
@@ -147,7 +148,7 @@ public class ResourceManagerPersistence {
 	 * Loads and, if necessary, starts saved resource managers.
 	 * @param memento
 	 * @param factories
-	 * @param monitor TODO
+	 * @param monitor
 	 * @throws CoreException 
 	 */
 	private void loadResourceManagers(XMLMemento memento,
@@ -156,8 +157,8 @@ public class ResourceManagerPersistence {
 		ArrayList statuses = new ArrayList();
 		monitor.beginTask("Loading the Resource Managers", children.length);
 		try {
-			final IResourceManager[] tmpRMs = new IResourceManager[children.length];
-			ArrayList rms = new ArrayList(tmpRMs.length);
+			final IResourceManagerControl[] tmpRMs = new IResourceManagerControl[children.length];
+			ArrayList<IResourceManagerControl> rms = new ArrayList<IResourceManagerControl>(tmpRMs.length);
 
 			for (int i = 0; i < children.length; ++i) {
 				String resourceManagerId = children[i].getString(TAG_RESOURCEMANGER_ID);
@@ -192,7 +193,7 @@ public class ResourceManagerPersistence {
 				}
 			}
 
-			resourceManagers = (IResourceManager[]) rms.toArray(new IResourceManager[rms.size()]);
+			resourceManagers = rms.toArray(new IResourceManagerControl[rms.size()]);
 			if (statuses.size() > 0) {
 				throw new CoreException(new MultiStatus(PTPCorePlugin.PLUGIN_ID,
 						MultiStatus.ERROR, (IStatus[])statuses.toArray(new IStatus[0]),

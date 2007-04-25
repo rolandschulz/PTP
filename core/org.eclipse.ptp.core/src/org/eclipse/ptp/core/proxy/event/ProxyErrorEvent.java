@@ -19,14 +19,14 @@
 
 package org.eclipse.ptp.core.proxy.event;
 
-public class ProxyErrorEvent extends AbstractProxyEvent implements IProxyEvent {
+public class ProxyErrorEvent extends AbstractProxyEvent implements IProxyErrorEvent {
 	public static final int EVENT_ERR_EVENT = 11;
 	
 	private int		err_code;
 	private String	err_msg;
 	
-	public ProxyErrorEvent(int err_code, String err_msg) {
-		super(EVENT_ERROR);
+	public ProxyErrorEvent(int transactionID, int err_code, String err_msg) {
+		super(EVENT_ERROR, transactionID);
 		this.err_code = err_code;
 		this.err_msg = err_msg;
 	}

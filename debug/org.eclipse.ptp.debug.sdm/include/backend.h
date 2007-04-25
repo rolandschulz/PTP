@@ -29,7 +29,7 @@
 #include "dbg_event.h"
 
 struct dbg_backend_funcs {
-	int (*init)(void (*)(dbg_event *, void *), void *);
+	int (*init)(void (*)(dbg_event *));
 	int (*progress)(void);
 	int (*interrupt)(void);
 	int (*start_session)(char *, char *, char *, char *, char **, char **, long);

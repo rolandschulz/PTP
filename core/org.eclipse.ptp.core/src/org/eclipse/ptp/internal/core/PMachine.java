@@ -25,26 +25,27 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.ptp.core.AttributeConstants;
-import org.eclipse.ptp.core.IPNode;
-import org.eclipse.ptp.core.IPProcess;
-import org.eclipse.ptp.core.IPUniverse;
+import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.elementcontrols.IPElementControl;
 import org.eclipse.ptp.core.elementcontrols.IPMachineControl;
 import org.eclipse.ptp.core.elementcontrols.IPNodeControl;
 import org.eclipse.ptp.core.elementcontrols.IPProcessControl;
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
+import org.eclipse.ptp.core.elements.IPNode;
+import org.eclipse.ptp.core.elements.IPProcess;
+import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 
 public class PMachine extends Parent implements IPMachineControl {
 	protected String NAME_TAG = "machine ";
-
 	protected String arch = "undefined";
 
-	public PMachine(IResourceManager rm, String name, String machineID) {
-		super(rm, name, machineID, P_MACHINE);
+	public PMachine(int id, IResourceManagerControl rm, IAttribute[] attrs) {
+		super(id, rm, P_MACHINE, attrs);
 		//System.out.println("Name is " + name + ", key is " + machineID);
 		//System.out.println("NAME_TAG = " + NAME_TAG + ", toString = "
 		//		+ this.toString() + ", key# = " + this.getID());
-		this.setAttribute(AttributeConstants.ATTRIB_MACHINEID, machineID);
+		this.setAttribute(AttributeConstants.ATTRIB_MACHINEID, Integer.toString(id));
 	}
 
 	public synchronized void addNode(IPNodeControl curnode) {
@@ -78,14 +79,6 @@ public class PMachine extends Parent implements IPMachineControl {
 		return arch;
 	}
 
-	public Object getAttribute(String key) {
-		return this.getAttribute(AttributeConstants.ATTRIB_CLASS_MACHINE, key);
-	}
-
-	public String[] getAttributeKeys() {
-		return this.getAttributeKeys(AttributeConstants.ATTRIB_CLASS_MACHINE);
-	}
-
 	public String getMachineId() {
 		return (String)this.getAttribute(AttributeConstants.ATTRIB_MACHINEID);
 	}
@@ -108,7 +101,7 @@ public class PMachine extends Parent implements IPMachineControl {
 	 * machine
 	 */
 	public synchronized IPProcessControl[] getProcessControls() {
-		List array = new ArrayList(0);
+		List<IPProcessControl> array = new ArrayList<IPProcessControl>(0);
 		IPNodeControl[] nodes = (IPNodeControl[]) getNodes();
 		for (int i = 0; i < nodes.length; i++)
 			array.addAll(Arrays.asList(nodes[i].getProcessControls()));
@@ -176,10 +169,6 @@ public class PMachine extends Parent implements IPMachineControl {
 		this.arch = arch;
 	}
 	
-	public void setAttribute(String key, Object o) {
-		this.setAttribute(AttributeConstants.ATTRIB_CLASS_MACHINE, key, o);
-	}
-
 	/*
 	 * returns all the nodes comprised by this machine, which is just the size()
 	 * of its children group
@@ -201,5 +190,4 @@ public class PMachine extends Parent implements IPMachineControl {
 
 		return counter;
 	}
-
 }

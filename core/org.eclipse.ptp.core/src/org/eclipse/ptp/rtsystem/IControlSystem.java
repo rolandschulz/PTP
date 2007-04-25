@@ -20,7 +20,8 @@
 package org.eclipse.ptp.rtsystem;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.ptp.core.IPJob;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.ptp.core.elements.IPJob;
 
 /**
  * A Control System is a portion of a runtime system that handles controlling jobs.  This includes
@@ -38,11 +39,11 @@ public interface IControlSystem {
 	public boolean isHealthy();
 	
 	/**
-	 * Performs a job run given the jobRunConfig.  The JobRunConfiguration contains specifics
+	 * Submits a job run given the jobRunConfig.  The JobRunConfiguration contains specifics
 	 * about how the user wants to run the job, such as the program name, number of
 	 * processes, etc.
 	 * 
-	 * @param jobID	the jobID for this run 
+	 * @param jobID	the jobID for this submission 
 	 * @param nProcs TODO
 	 * @param firstNodeNum TODO
 	 * @param nProcsPerNode TODO
@@ -51,7 +52,7 @@ public interface IControlSystem {
 	 * @throws CoreException 
 	 * @see JobRunConfiguration
 	 */
-	public void run(int jobID, int nProcs, int firstNodeNum, int nProcsPerNode, JobRunConfiguration jobRunConfig) throws CoreException;
+	public void submitJob(int jobID, int nProcs, int firstNodeNum, int nProcsPerNode, JobRunConfiguration jobRunConfig) throws CoreException;
 
 	/**
 	 * Terminates a running job.  The {@link IPJob} contains the job identifier used to 
@@ -61,44 +62,4 @@ public interface IControlSystem {
 	 * @throws CoreException 
 	 */
 	public void terminateJob(IPJob job) throws CoreException;
-	
-	/**
-	 * Returns an array of {@link String}s of the form [ job1", "job2", "job10" ].
-	 * The jobs should be a concat of the string "job" and the identifier.
-	 * 
-	 * @return the names of the known jobs
-	 * @throws CoreException 
-	 */
-	public String[] getJobs() throws CoreException;
-
-	/**
-	 * Adds a listener to the control system.  The control system may fire {@link RuntimeEvent}s
-	 * and will use this list of listeners to determine who to send these events to.
-	 * 
-	 * @param listener someone that wants to listener to {@link RuntimeEvent}s
-	 * @see RuntimeEvent
-	 */
-	public void addRuntimeListener(IRuntimeListener listener);
-
-	/**
-	 * Removes a listener from the list of things listening to {@link RuntimeEvent}s on
-	 * this control system.
-	 * 
-	 * @param listener the listener to remove
-	 * @see RuntimeEvent
-	 */
-	public void removeRuntimeListener(IRuntimeListener listener);
-
-	/**
-	 * Called after the control system is contructed.  The implementation can use this
-	 * to handle any startup functionality.
-	 */
-	public void startup();
-	
-	/**
-	 * Called when the control system is being shutdown.  Usually this is either at
-	 * close of the PTP plug-in or when switching control systems.  The implementation
-	 * needs to handle any cleanup that is required at this time.
-	 */
-	public void shutdown();
 }

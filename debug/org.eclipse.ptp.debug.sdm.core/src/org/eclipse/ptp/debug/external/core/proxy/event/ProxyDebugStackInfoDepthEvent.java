@@ -22,11 +22,11 @@ package org.eclipse.ptp.debug.external.core.proxy.event;
 import org.eclipse.ptp.core.util.BitList;
 
 
-public class ProxyDebugStackInfoDepthEvent extends AbstractProxyDebugEvent implements IProxyDebugEvent {
+public class ProxyDebugStackInfoDepthEvent extends AbstractProxyDebugEvent implements IProxyDebugStackInfoDepthEvent {
 	private int	depth;
 	
-	public ProxyDebugStackInfoDepthEvent(BitList set, int depth) {
-		super(EVENT_DBG_STACK_INFO_DEPTH, set);
+	public ProxyDebugStackInfoDepthEvent(int transID, BitList set, int depth) {
+		super(transID, EVENT_DBG_STACK_INFO_DEPTH, set);
 		this.depth = depth;
 	}
 	
@@ -35,6 +35,6 @@ public class ProxyDebugStackInfoDepthEvent extends AbstractProxyDebugEvent imple
 	}
 	
 	public String toString() {
-		return "EVENT_DBG_STACK_INFO_DEPTH " + this.getBitSet().toString();
+		return "EVENT_DBG_STACK_INFO_DEPTH transid=" + getTransactionID() + " " + this.getBitSet().toString();
 	}
 }

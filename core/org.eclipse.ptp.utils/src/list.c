@@ -23,7 +23,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include	"compat.h"
 #include	"list.h"
+
+THREAD_DECL(list);
 
 List *
 NewList(void)
@@ -54,10 +57,14 @@ AddToList(List *l, void *v)
 
 	e->l_value = v;
 	e->l_next = (ListElement *)NULL;
+	
+	THREAD_LOCK(list);
+	
 	*(l->l_tail) = e;
-
 	l->l_tail = &e->l_next;
 	l->l_nel++;
+	
+	THREAD_UNLOCK(list);
 }
 
 /*
@@ -77,6 +84,8 @@ AddFirst(List *l, void *v)
 	e->l_value = v;
 	e->l_next = l->l_head;
 
+	THREAD_LOCK(list);
+	
 	/*
 	** Adjust tail if necessary.
 	*/
@@ -90,6 +99,8 @@ AddFirst(List *l, void *v)
 
 	l->l_head = e;
 	l->l_nel++;
+	
+	THREAD_UNLOCK(list);
 }
 
 void
@@ -109,8 +120,12 @@ RemoveFromList(List *l, void *v)
 	ListElement *	e;
 	ListElement *	ep;
 
-	if ( l == (List *)NULL || l->l_nel == 0 )
+	THREAD_LOCK(list);
+	
+	if ( l == (List *)NULL || l->l_nel == 0 ) {
+		THREAD_UNLOCK(list);
 		return;
+	}
 
 	for ( ep = e = l->l_head ; e != (ListElement *)NULL ; )
 	{
@@ -146,6 +161,8 @@ RemoveFromList(List *l, void *v)
 	}
 
 	l->l_nel--;
+	
+	THREAD_UNLOCK(list);
 }
 
 /*
@@ -158,8 +175,12 @@ RemoveFirst(List *l)
 	ListElement *	e;
 	ListElement *	ep;
 
-	if ( l == (List *)NULL || l->l_nel == 0 )
+	THREAD_LOCK(list);
+
+	if ( l == (List *)NULL || l->l_nel == 0 ) {
+		THREAD_UNLOCK(list);
 		return (void *)NULL;
+	}
 
 	ep = e = l->l_head;
 
@@ -177,6 +198,8 @@ RemoveFirst(List *l)
 
 	l->l_nel--;
 
+	THREAD_UNLOCK(list);
+
 	return v;
 }
 
@@ -188,6 +211,8 @@ DestroyList(List *l, void (*destroy)())
 
 	if ( l == (List *)NULL )
 		return;
+
+	THREAD_LOCK(list);
 
 	ep = l->l_head;
 
@@ -204,6 +229,8 @@ DestroyList(List *l, void (*destroy)())
 	}
 
 	free(l);
+
+	THREAD_UNLOCK(list);
 }
 
 void
@@ -212,37 +239,63 @@ SetList(List *l)
 	if ( l == (List *)NULL )
 		return;
 
+	THREAD_LOCK(list);
 	l->l_scan = l->l_head;
+	THREAD_UNLOCK(list);
 }
 
 void *
 GetListElement(List *l)
 {
+	void *			val;
 	ListElement *	le;
 
-	if ( l == (List *)NULL || l->l_scan == (ListElement *)NULL )
+	THREAD_LOCK(list);
+	
+	if ( l == (List *)NULL || l->l_scan == (ListElement *)NULL ) {
+		THREAD_UNLOCK(list);
 		return (void *)NULL;
+	}
 
 	le = l->l_scan;
-
 	l->l_scan = le->l_next;
-
-	return le->l_value;
+	
+	val = le->l_value;
+	
+	THREAD_UNLOCK(list);
+	
+	return val;
 }
 
 void *
 GetFirstElement(List *l)
 {
-	if ( l == (List *)NULL || l->l_head == (ListElement *) NULL)
+	void *	val;
+	
+	THREAD_LOCK(list);
+	
+	if ( l == (List *)NULL || l->l_head == (ListElement *) NULL) {
+		THREAD_UNLOCK(list);
 		return (void *)NULL;
-		
-	return l->l_head->l_value;
+	}
+
+	val = l->l_head->l_value;
+	
+	THREAD_UNLOCK(list);
+	
+	return val;
 }
 
 int
 EmptyList(List *l)
 {
-	return (int)(l == (List *)NULL || l->l_nel == 0);
+	int	res;
+	
+	THREAD_LOCK(list);
+	res = (int)(l == (List *)NULL || l->l_nel == 0);
+	THREAD_UNLOCK(list);
+	
+	return res;
 }
 
 int
@@ -250,12 +303,21 @@ InList(List *l, void *v)
 {
 	ListElement *	e;
 
-	if ( l == (List *)NULL )
-		return 0;
+	THREAD_LOCK(list);
 
-	for ( e = l->l_head ; e != (ListElement *)NULL ; e = e->l_next )
-		if ( e->l_value == v )
+	if ( l == (List *)NULL ) {
+		THREAD_UNLOCK(list);
+		return 0;
+	}
+
+	for ( e = l->l_head ; e != (ListElement *)NULL ; e = e->l_next ) {
+		if ( e->l_value == v ) {
+			THREAD_UNLOCK(list);
 			return 1;
+		}
+	}
+
+	THREAD_UNLOCK(list);
 
 	return 0;
 }
@@ -263,8 +325,14 @@ InList(List *l, void *v)
 int
 SizeOfList(List *l)
 {
+	int	res;
+	
 	if ( l == (List *)NULL )
 		return 0;
 
-	return l->l_nel;
+	THREAD_LOCK(list);
+	res = l->l_nel;
+	THREAD_UNLOCK(list);
+	
+	return res;
 }

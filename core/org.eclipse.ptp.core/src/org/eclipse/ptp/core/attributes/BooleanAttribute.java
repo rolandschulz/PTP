@@ -18,73 +18,26 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.attributes;
 
-public class BooleanAttribute extends AbstractAttribute {
-
-	/**
-	 * Acyclic Visitor Pattern, PLOPD3, p. 79
-	 * @author rsqrd
-	 *
-	 */
-	public interface IVisitor {
-
-		void visit(BooleanAttribute attribute);
-
-	}
+public class BooleanAttribute extends AbstractAttribute implements IBooleanAttribute {
 
 	private Boolean value;
 
-	public BooleanAttribute(IAttributeDescription description, boolean value) {
-		super(description);
-		this.value = new Boolean(value);
+	public BooleanAttribute(IAttributeDefinition definition, Boolean initialValue) {
+		super(definition);
+		this.value = initialValue;
 	}
-
-	public BooleanAttribute(IAttributeDescription description, Boolean value) {
-		super(description);
-		this.value = value;
-	}
-
-	public void accept(IAttributeVisitor visitor) {
-		if (visitor instanceof IVisitor) {
-			((IVisitor)visitor).visit(this);
-		}
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.attributes.IAttribute#create(java.lang.String)
-	 */
-	public BooleanAttribute create(String string) throws IllegalValue {
-		return new BooleanAttribute(getDescription(), value);
-	}
-
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		final BooleanAttribute other = (BooleanAttribute) obj;
-		if (value == null) {
-			if (other.value != null)
-				return false;
-		} else if (!value.equals(other.value))
-			return false;
-		return true;
+	
+	public BooleanAttribute(IAttributeDefinition definition, String initialValue) {
+		super(definition);
+		this.value = Boolean.valueOf(initialValue);
 	}
 	
 	public Boolean getValue() {
-		return value;
+		return value.booleanValue();
 	}
-
-	public String getStringRep() {
+	
+	public String getValueAsString() {
 		return value.toString();
-	}
-
-	public int hashCode() {
-		final int PRIME = 31;
-		int result = 1;
-		result = PRIME * result + ((value == null) ? 0 : value.hashCode());
-		return result;
 	}
 
 	public boolean isValid(String string) {
@@ -98,16 +51,11 @@ public class BooleanAttribute extends AbstractAttribute {
 		this.value = value;
 	}
 
-	public void setValue(String string) throws IllegalValue {
+	public void setValue(String string) throws IllegalValueException {
 		if (!isValid(string)) {
-			throw new IllegalValue(string + " is not a legal Boolean");
+			throw new IllegalValueException(string + " is not a legal Boolean");
 		}
 		value = Boolean.valueOf(string);
-	}
-
-	protected int doCompareTo(AbstractAttribute other) {
-		BooleanAttribute ba = (BooleanAttribute) other;
-		return value.compareTo(ba.value);
 	}
 
 }

@@ -22,8 +22,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.ptp.core.IModelManager;
-import org.eclipse.ptp.core.IPMachine;
 import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.elements.IPMachine;
+import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
@@ -38,14 +39,14 @@ public class ResourceManagerPropertySource implements IPropertySource {
 	public ResourceManagerPropertySource(IResourceManager resourceManager) {
 		this.resourceManager = resourceManager;
 		// TODO get attributes from the resourceManager's configuration
-		List descriptors = new ArrayList();
+		List<PropertyDescriptor> descriptors = new ArrayList();
 		descriptors.add(new PropertyDescriptor("name", "name"));
 		descriptors.add(new PropertyDescriptor("description", "description"));
 		descriptors.add(new PropertyDescriptor("type", "type"));
 		descriptors.add(new PropertyDescriptor("status", "status"));
 		descriptors.add(new PropertyDescriptor("machines", "machines"));
-		this.descriptors = (PropertyDescriptor[]) descriptors.toArray(
-				new PropertyDescriptor[descriptors.size()]);
+		descriptors.add(new PropertyDescriptor("queues", "queues"));
+		this.descriptors = descriptors.toArray(new PropertyDescriptor[0]);
 	}
 
 	public Object getEditableValue() {
@@ -62,21 +63,25 @@ public class ResourceManagerPropertySource implements IPropertySource {
 			return resourceManager.getName();
 		}
 		if ("description".equals(id)) {
-			return resourceManager.getConfiguration().getDescription();
+			return resourceManager.getDescription();
 		}
 		if ("type".equals(id)) {
-			final String resourceManagerId = resourceManager.getConfiguration().getResourceManagerId();
+			final String resourceManagerId = resourceManager.getIDString();
 			final IModelManager modelManager = PTPCorePlugin.getDefault().getModelManager();
 			IResourceManagerFactory factory = modelManager.getResourceManagerFactory(
 					resourceManagerId);
 			return factory.getName();
 		}
 		if ("status".equals(id)) {
-			return resourceManager.getStatus().toString();
+			return resourceManager.getState().toString();
 		}
 		if ("machines".equals(id)) {
 			final IPMachine[] machines = resourceManager.getMachines();
 			return Integer.toString(machines.length);
+		}
+		if ("queues".equals(id)) {
+			final IPQueue[] queues = resourceManager.getQueues();
+			return Integer.toString(queues.length);
 		}
 		
 		// TODO get the property value from the rm's configuration attributes

@@ -20,30 +20,26 @@
 #ifndef _PROXY_EVENT_H_
 #define _PROXY_EVENT_H_
 
-#include "list.h"
+#define PROXY_EV_OK				0
+#define PROXY_EV_ERROR			1
+#define PROXY_EV_CONNECTED		2	/* LOCAL EVENT */
+#define PROXY_EV_DISCONNECTED	3	/* LOCAL EVENT */
+#define PROXY_EV_TIMEOUT		4	/* LOCAL EVENT */
 
-#define PROXY_EV_OK			0
-#define PROXY_EV_ERROR		1
-#define PROXY_EV_CONNECTED		2
-
-#define PROXY_EVENT_HANDLER	0
-
-struct proxy_event {
-	int		event;
-	char *	event_data;
-	int		error_code;
-	char *	error_msg;
-};
-typedef struct proxy_event proxy_event;
-
-extern int 			proxy_data_to_str(char *, int, char **);
-extern int 			proxy_cstring_to_str(char *, char **);
-extern int 			proxy_list_to_str(List *, int (*)(void *, char **), char **);
-extern int 			proxy_str_to_data(char *, char **, int *);
-extern int 			proxy_str_to_cstring(char *, char **);
-extern int 			proxy_str_to_int(char *, int *);
-extern int 			proxy_str_to_event(char *, proxy_event **);
-extern int 			proxy_event_to_str(proxy_event *, char **);
-extern proxy_event *	new_proxy_event(int);
-extern void			free_proxy_event(proxy_event *);
-#endif /* proxy_event */
+/*
+ * Codes must EXACTLY match org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEvent
+ */
+#define PROXY_EV_RT_OFFSET				200
+#define PROXY_EV_RT_ERROR				PROXY_EV_RT_OFFSET + 1	/* LOCAL EVENT */
+#define PROXY_EV_RT_ATTR_DEF			PROXY_EV_RT_OFFSET + 2
+#define PROXY_EV_RT_NEW_JOB				PROXY_EV_RT_OFFSET + 3
+#define PROXY_EV_RT_NEW_MACHINE			PROXY_EV_RT_OFFSET + 4
+#define PROXY_EV_RT_NEW_NODE			PROXY_EV_RT_OFFSET + 5
+#define PROXY_EV_RT_NEW_PROCESS			PROXY_EV_RT_OFFSET + 6
+#define PROXY_EV_RT_NEW_QUEUE			PROXY_EV_RT_OFFSET + 7
+#define PROXY_EV_RT_JOB_CHANGE			PROXY_EV_RT_OFFSET + 8
+#define PROXY_EV_RT_MACHINE_CHANGE		PROXY_EV_RT_OFFSET + 9
+#define PROXY_EV_RT_NODE_CHANGE			PROXY_EV_RT_OFFSET + 10
+#define PROXY_EV_RT_PROCESS_CHANGE		PROXY_EV_RT_OFFSET + 11
+#define PROXY_EV_RT_QUEUE_CHANGE		PROXY_EV_RT_OFFSET + 12
+#endif /* !_PROXY_EVENT_H_ */

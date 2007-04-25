@@ -22,12 +22,12 @@ package org.eclipse.ptp.debug.external.core.proxy.event;
 import org.eclipse.ptp.core.util.BitList;
 
 
-public class ProxyDebugOKEvent extends AbstractProxyDebugEvent implements IProxyDebugEvent {
-	public ProxyDebugOKEvent(BitList set) {
-		super(EVENT_DBG_OK, set);
+public class ProxyDebugOKEvent extends AbstractProxyDebugEvent implements IProxyDebugOKEvent {
+	public ProxyDebugOKEvent(int transID, BitList set) {
+		super(transID, EVENT_DBG_OK, set);
 	}
 
 	public String toString() {
-		return "EVENT_DBG_OK " + this.getBitSet().toString();
+		return "EVENT_DBG_OK transid=" + getTransactionID() + " " + this.getBitSet().toString();
 	}
 }

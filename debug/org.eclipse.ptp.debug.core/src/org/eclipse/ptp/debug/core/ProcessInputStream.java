@@ -22,9 +22,9 @@ import java.io.InputStream;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.IProcessListener;
 import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.events.IProcessEvent;
 
 /**

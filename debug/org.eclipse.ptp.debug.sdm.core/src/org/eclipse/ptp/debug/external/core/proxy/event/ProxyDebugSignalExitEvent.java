@@ -21,12 +21,12 @@ package org.eclipse.ptp.debug.external.core.proxy.event;
 
 import org.eclipse.ptp.core.util.BitList;
 
-public class ProxyDebugSignalExitEvent extends AbstractProxyDebugEvent implements IProxyDebugEvent {
+public class ProxyDebugSignalExitEvent extends AbstractProxyDebugEvent implements IProxyDebugSignalExitEvent {
 	private String signalName;
 	private String signalMeaning;
 
-	public ProxyDebugSignalExitEvent(BitList set, String signalName, String signalMeaning) {
-		super(EVENT_DBG_EXIT_SIGNAL, set);
+	public ProxyDebugSignalExitEvent(int transID, BitList set, String signalName, String signalMeaning) {
+		super(transID, EVENT_DBG_EXIT_SIGNAL, set);
 		this.signalName = signalName;
 		this.signalMeaning = signalMeaning;
 	}
@@ -39,6 +39,6 @@ public class ProxyDebugSignalExitEvent extends AbstractProxyDebugEvent implement
 	}
 
 	public String toString() {
-		return "EVENT_DBG_EXIT_SIGNAL " + this.getBitSet().toString() + " " + this.signalName + " " + this.signalMeaning;
+		return "EVENT_DBG_EXIT_SIGNAL transid=" + getTransactionID() + " " + this.getBitSet().toString() + " " + this.signalName + " " + this.signalMeaning;
 	}
 }

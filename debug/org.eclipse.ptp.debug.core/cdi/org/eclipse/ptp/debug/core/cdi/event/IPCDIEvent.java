@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.cdi.event;
 
-import org.eclipse.ptp.core.IPJob;
+import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIObject;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;

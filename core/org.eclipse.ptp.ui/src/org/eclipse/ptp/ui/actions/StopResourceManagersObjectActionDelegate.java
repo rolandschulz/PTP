@@ -28,7 +28,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerMenuContribution;
-import org.eclipse.ptp.rmsystem.ResourceManagerStatus;
+import org.eclipse.ptp.rmsystem.ResourceManagerState;
 import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.ui.UIMessage;
 import org.eclipse.swt.widgets.Event;
@@ -70,11 +70,11 @@ public class StopResourceManagersObjectActionDelegate implements
 			IResourceManagerMenuContribution menuContrib = menuContribs[i];
 			IResourceManager rmManager = (IResourceManager) menuContrib.getAdapter(IResourceManager.class);
 
-			if (!rmManager.getStatus().equals(ResourceManagerStatus.STARTED)) {
+			if (!rmManager.getState().equals(ResourceManagerState.State.STARTED)) {
 				MessageDialog.openInformation(targetShell,
 						UIMessage.getResourceString("StopResourceManagersObjectActionDelegate.ResourceManagerNotAlreadyStarted"), //$NON-NLS-1$
 						UIMessage.getResourceString("StopResourceManagersObjectActionDelegate.ResourceManager") //$NON-NLS-1$
-								+ rmManager.getConfiguration().getName()
+								+ rmManager.getName()
 								+ UIMessage.getResourceString("StopResourceManagersObjectActionDelegate.NotAlreadyStarted")); //$NON-NLS-1$
 				return;
 			}
@@ -83,7 +83,7 @@ public class StopResourceManagersObjectActionDelegate implements
 				rmManager.shutdown();
 			} catch (CoreException e) {
 				final String message = UIMessage.getResourceString("StopResourceManagersObjectActionDelegate.UnableStopResourceManager") //$NON-NLS-1$
-						+ rmManager.getConfiguration().getName() + "\""; //$NON-NLS-1$
+						+ rmManager.getName() + "\""; //$NON-NLS-1$
 				Status status = new Status(Status.ERROR, PTPUIPlugin.PLUGIN_ID,
 						1, message, e);
 				ErrorDialog dlg = new ErrorDialog(targetShell,

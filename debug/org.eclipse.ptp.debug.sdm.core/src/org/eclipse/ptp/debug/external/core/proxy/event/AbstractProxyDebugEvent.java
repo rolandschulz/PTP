@@ -26,8 +26,8 @@ import org.eclipse.ptp.core.util.BitList;
 public abstract class AbstractProxyDebugEvent extends AbstractProxyEvent implements IProxyDebugEvent {
 	private BitList	procSet;
 	
-	public AbstractProxyDebugEvent(int id, BitList set) {
-		super(id);
+	public AbstractProxyDebugEvent(int transID, int id, BitList set) {
+		super(id, transID);
 		procSet = set;
 	}
 	

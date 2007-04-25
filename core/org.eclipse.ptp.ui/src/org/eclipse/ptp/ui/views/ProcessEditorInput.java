@@ -19,7 +19,7 @@
 package org.eclipse.ptp.ui.views;
 
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.ptp.core.IPProcess;
+import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 

@@ -19,18 +19,18 @@
 
 package org.eclipse.ptp.core.proxy.event;
 
-public class ProxyDisconnectedEvent extends AbstractProxyEvent implements IProxyEvent {
+public class ProxyDisconnectedEvent extends AbstractProxyEvent implements IProxyDisconnectedEvent {
 	
 	private boolean error = false;
 	
 	public ProxyDisconnectedEvent(boolean error) {
-		super(EVENT_DISCONNECTED);
+		super(EVENT_DISCONNECTED, 0);
 		this.error = error;
 	}
 	
 	public boolean wasError() { return error; }
 
 	public String toString() {
-		return "EVENT_DISCONNECTED " + "error? "+error;
+		return "EVENT_DISCONNECTED transid=" + getTransactionID() + " error? " + error;
 	}
 }

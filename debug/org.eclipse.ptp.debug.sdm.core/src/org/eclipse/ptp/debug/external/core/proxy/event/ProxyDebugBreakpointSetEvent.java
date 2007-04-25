@@ -23,12 +23,12 @@ import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIBreakpoint;
 
 
-public class ProxyDebugBreakpointSetEvent extends AbstractProxyDebugEvent implements IProxyDebugEvent {
+public class ProxyDebugBreakpointSetEvent extends AbstractProxyDebugEvent implements IProxyDebugBreakpointSetEvent {
 	private int				bpId;
 	private IPCDIBreakpoint	bpt;
 	
-	public ProxyDebugBreakpointSetEvent(BitList set, int id, IPCDIBreakpoint bpt) {
-		super(EVENT_DBG_BPSET, set);
+	public ProxyDebugBreakpointSetEvent(int transID, BitList set, int id, IPCDIBreakpoint bpt) {
+		super(transID, EVENT_DBG_BPSET, set);
 		this.bpId = id;
 		this.bpt = bpt;
 		bpt.setBreakpointId(id);
@@ -43,6 +43,6 @@ public class ProxyDebugBreakpointSetEvent extends AbstractProxyDebugEvent implem
 	}
 
 	public String toString() {
-		return "EVENT_DBG_BPSET " + this.getBitSet().toString();
+		return "EVENT_DBG_BPSET transid=" + getTransactionID() + " " + this.getBitSet().toString();
 	}
 }

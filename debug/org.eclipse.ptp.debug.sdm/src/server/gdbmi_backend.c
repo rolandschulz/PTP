@@ -74,8 +74,7 @@ static double		GDB_Version;
 static int			ADDRESS_LENGTH = 0;
 static MISession *	DebugSession;
 static dbg_event *	LastEvent;
-static void			(*EventCallback)(dbg_event *, void *);
-static void *		EventCallbackData;
+static void			(*EventCallback)(dbg_event *);
 static int			ServerExit;
 static int			Started;
 static struct bpmap	BPMap = { 0, 0, NULL };
@@ -83,7 +82,7 @@ static struct varmap VARMap = { 0, 0, NULL };
 static int			(*AsyncFunc)(void *) = NULL;
 static void *		AsyncFuncData;
 
-static int	GDBMIInit(void (*)(dbg_event *, void *), void *);
+static int	GDBMIInit(void (*)(dbg_event *));
 static int	GDBMIProgress(void);
 static int	GDBMIInterrupt(void);
 static int	GDBMIStartSession(char *, char *, char *, char *, char **, char **, long);
@@ -615,7 +614,7 @@ AsyncStop(void *data)
 	MIEventFree(evt);
 	
 	if (EventCallback != NULL)
-		EventCallback(e, EventCallbackData);
+		EventCallback(e);
 
 	FreeDbgEvent(e);
 	return DBGRES_OK;
@@ -639,10 +638,9 @@ AsyncCallback(MIEvent *evt)
  * Initialize GDB
  */
 static int
-GDBMIInit(void (*event_callback)(dbg_event *, void *), void *data)
+GDBMIInit(void (*event_callback)(dbg_event *))
 {
 	EventCallback = event_callback;
-	EventCallbackData = data;
 	DebugSession = NULL;
 	LastEvent = NULL;
 	GDB_Version = -1.0;
@@ -789,11 +787,11 @@ GDBMIProgress(void)
 	 */
 	if (LastEvent != NULL) {
 		if (EventCallback != NULL) {
-			EventCallback(LastEvent, EventCallbackData);
+			EventCallback(LastEvent);
 			res = 1;
 		}
 			
-		if (ServerExit && LastEvent->event == DBGEV_OK) {
+		if (ServerExit && LastEvent->event_id == DBGEV_OK) {
 			if (DebugSession != NULL) {
 				DebugSession = NULL;
 			}

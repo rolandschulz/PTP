@@ -23,14 +23,14 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-public class Queue {
-	protected List list;
+public class Queue<T> {
+	protected List<T> list;
 
 	public Queue() {
-		list = Collections.synchronizedList(new LinkedList());
+		list = Collections.synchronizedList(new LinkedList<T>());
 	}
 
-	public Object removeItem() throws InterruptedException {
+	public T removeItem() throws InterruptedException {
 		synchronized (list) {
 			while (list.isEmpty()) {
 				list.wait();
@@ -39,17 +39,17 @@ public class Queue {
 		}
 	}
 
-	public void addItem(Object item) {
+	public void addItem(T item) {
 		synchronized (list) {
 			list.add(item);
 			list.notifyAll();
 		}
 	}
 	
-	public Object[] clearItems() {
-		Object[] array;
+	public T[] clearItems() {
+		T[] array;
 		synchronized (list) {
-			array = list.toArray();
+			array = (T[]) list.toArray();
 			list.clear();
 		}
 		return array;

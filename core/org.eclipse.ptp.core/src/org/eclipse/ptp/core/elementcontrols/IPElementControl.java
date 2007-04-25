@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.elementcontrols;
 
-import org.eclipse.ptp.core.IPElement;
+import org.eclipse.ptp.core.elements.IPElement;
 import org.eclipse.search.ui.ISearchPageScoreComputer;
 
 /**
@@ -64,37 +64,14 @@ public interface IPElementControl extends IPElement, ISearchPageScoreComputer {
 	public static final int P_PROCESS = 14;
 	
 	/**
-	 * Element tag for Process Elements
+	 * Element tag for Resource Manager Elements
 	 */
 	public static final int P_RESOURCE_MANAGER = 15;
 	
 	/**
-	 * Searches for an attribute on the Element given an attribute class and key.  
-	 * The resulting attribute Object is returned.  The returned may be null if the attribute
-	 * was not found.
-	 * 
-	 * @param attr_class Class of attribute
-	 * @param key String key of the attribute to look for
-	 * @return Object of the attribute or null if not found
+	 * Element tag for Queue Elements
 	 */
-	public Object getAttribute(int attr_class, String key);
-	
-	/**
-	 * Sets an attribute given a class, key and Object.
-	 * 
-	 * @param attr_class Class of the attribute
-	 * @param key String key of the attribute
-	 * @param Object of the attribute
-	 */
-	public void setAttribute(int attr_class, String key, Object o);
-	
-	/**
-	 * Get all the keys of all attributes in a particular class.
-	 * 
-	 * @param attr_class Class of attribute keys
-	 * @return A string array containing the keys
-	 */
-	public String[] getAttributeKeys(int attr_class);
+	public static final int P_QUEUE = 16;
 
 	/**
 	 * Returns the element type (such as P_UNIVERSE, P_MACHINE, etc.) for this

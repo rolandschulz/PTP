@@ -8,7 +8,7 @@ import java.util.List;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.Launch;
 import org.eclipse.debug.core.model.ISourceLocator;
-import org.eclipse.ptp.core.IPJob;
+import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
 
 public class PLaunch extends Launch implements IPLaunch {

@@ -25,24 +25,15 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-public final class DateAttribute extends AbstractAttribute {
-
-	/**
-	 * @author rsqrd
-	 *
-	 */
-	public interface IVisitor extends IAttributeVisitor {
-
-		void visit(DateAttribute attribute);
-
-	}
+public class DateAttribute extends AbstractAttribute implements IDateAttribute {
 
 	private static DateFormat[] dateFormats = null;
 
-	public static void main(String[] args) throws IAttribute.IllegalValue {
+	public static void main(String[] args) throws IllegalValueException {
 		Calendar cal = Calendar.getInstance();
-		DateAttribute mda = new DateAttribute(
-				new AttributeDescription("uniqId", "name", "desc"), cal);
+		IDateAttributeDefinition def = new DateAttributeDefinition("uniqId", "name", "desc", cal.getTime(), DateFormat.getDateTimeInstance());
+		IDateAttribute mda = (IDateAttribute)def.create();
+		mda.setValue(cal);
 		System.out.println(mda.toString());
 		String str = mda.toString();
 		cal.add(Calendar.MONTH, 2);
@@ -58,7 +49,7 @@ public final class DateAttribute extends AbstractAttribute {
 		Locale[] locals = DateFormat.getAvailableLocales();
 		final int styles[] = { DateFormat.SHORT, DateFormat.MEDIUM,
 				DateFormat.LONG, DateFormat.FULL };
-		ArrayList dfs = new ArrayList(styles.length * styles.length
+		ArrayList<DateFormat> dfs = new ArrayList<DateFormat>(styles.length * styles.length
 				* locals.length);
 		for (int i = 0; i < locals.length; ++i) {
 			for (int ds = 0; ds < styles.length; ++ds) {
@@ -75,96 +66,29 @@ public final class DateAttribute extends AbstractAttribute {
 		return dateFormats;
 	}
 
-	private Date minDate = new Date(Long.MIN_VALUE);
-	private Date maxDate = new Date(Long.MAX_VALUE);
+	protected Calendar value = Calendar.getInstance();
 	
-	protected final DateFormat outputDateFormat;
-	protected Calendar value;
-	
-	public DateAttribute(IAttributeDescription description, Calendar value) {
-		this(description, value, DateFormat.getDateTimeInstance());
+	public DateAttribute(IDateAttributeDefinition definition, Date initialValue) throws IllegalValueException {
+		super(definition);
+		setValue(initialValue);
 	}
 
-	public DateAttribute(IAttributeDescription description, Calendar value,
-			DateFormat outputDateFormat) {
-		super(description);
-		this.value = value;
-		this.outputDateFormat = outputDateFormat;
+	public DateAttribute(IDateAttributeDefinition definition, String initialValue) throws IllegalValueException {
+		super(definition);
+		setValue(initialValue);
 	}
 
-	public DateAttribute(IAttributeDescription description, Date date) {
-		this(description, date, DateFormat.getDateTimeInstance());
-	}
-
-	public DateAttribute(IAttributeDescription description, Date date,
-			DateFormat outputDateFormat) {
-		super(description);
-		this.outputDateFormat = outputDateFormat;
-		this.value = Calendar.getInstance();
-		this.value.setTime(date);
-	}
-
-	public DateAttribute(IAttributeDescription description, String string)
-	throws IllegalValue {
-		super(description);
-		this.outputDateFormat = DateFormat.getDateTimeInstance();
-		final Date date = parseString(string);
-		if (date == null) {
-			throw new IllegalValue("Unable to parse \"" + string
-					+ "\" into a date");
-		}
-		this.value = Calendar.getInstance();
-		this.value.setTime(date);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.attributes.IAttribute#accept(org.eclipse.ptp.core.attributes.IAttributeVisitor)
-	 */
-	public void accept(IAttributeVisitor visitor) {
-		if (visitor instanceof IVisitor) {
-			((IVisitor)visitor).visit(this);
-		}
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.attributes.IAttribute#create(java.lang.String)
-	 */
-	public IAttribute create(String string) throws IllegalValue {
-		final DateAttribute dateAttribute = new DateAttribute(getDescription(), string);
-		dateAttribute.setValidRange(minDate, maxDate);
-		return dateAttribute;
-	}
-
-	public boolean equals(Object obj) {
-		if (obj instanceof DateAttribute) {
-			DateAttribute attr = (DateAttribute) obj;
-			return value.equals(attr.value);
-		}
-		return false;
-	}
-	
-	public Calendar getCalendar() {
+	public Calendar getValue() {
 		return (Calendar) value.clone();
 	}
 	
-	public Date getDate() {
+	public Date getDateValue() {
 		return value.getTime();
 	}
 
-	public Date getMaxDate() {
-		return maxDate;
-	}
 
-	public Date getMinDate() {
-		return minDate;
-	}
-
-	public String getStringRep() {
-		return outputDateFormat.format(value.getTime());
-	}
-
-	public int hashCode() {
-		return value.hashCode();
+	public String getValueAsString() {
+		return getDateFormat().format(value);
 	}
 	
 	public boolean isValid(String string) {
@@ -172,70 +96,40 @@ public final class DateAttribute extends AbstractAttribute {
 		if (date == null) {
 			return false;
 		}
-		if (date.compareTo(minDate) < 0) {
+		if (date.compareTo(getMinDate()) < 0) {
 			return false;
 		}
-		if (date.compareTo(maxDate) > 0) {
+		if (date.compareTo(getMaxDate()) > 0) {
 			return false;
 		}
 		return true;
 	}
 	
-	public void setCalendar(Calendar calendar) throws IllegalValue {
-		value.setTime(calendar.getTime());
+	public void setValue(Calendar calendar) throws IllegalValueException {
+		setValue(calendar.getTime());
 	}
 
-	public void setDate(Date date) throws IllegalValue {
+	public void setValue(Date date) throws IllegalValueException {
 		value.setTime(date);
-		if (date.compareTo(minDate) < 0) {
-			throw new IllegalValue("date specified is before min date");
+		if (date.compareTo(getMinDate()) < 0) {
+			throw new IllegalValueException("date specified is before min date");
 		}
-		if (date.compareTo(maxDate) > 0) {
-			throw new IllegalValue("date specified is after max date");
-		}
-	}
-
-	public void setValidRange(Date minDate, Date maxDate) throws IllegalValue {
-		if (minDate == null) {
-			this.minDate = new Date(Long.MIN_VALUE);
-		}
-		else {
-			this.minDate = minDate;
-		}
-		if (maxDate == null) {
-			this.maxDate = new Date(Long.MAX_VALUE);
-		}
-		else {
-			this.maxDate = maxDate;
-		}
-		if (this.minDate.compareTo(this.maxDate) > 0) {
-				throw new IllegalArgumentException("minDate must be less than or equal to maxDate");
-		}
-		Date date = getDate();
-		try {
-			if (date.compareTo(this.minDate) < 0) {
-				setDate(this.minDate);
-			}
-			if (date.compareTo(this.maxDate) > 0) {
-				setDate(this.maxDate);
-			}
-		} catch (IllegalValue e) {
-			throw new IllegalValue("the set valid range of dates " +
-					"does not include the current date");
+		if (date.compareTo(getMaxDate()) > 0) {
+			throw new IllegalValueException("date specified is after max date");
 		}
 	}
 
-	public void setValue(String string) throws IAttribute.IllegalValue {
+	public void setValue(String string) throws IllegalValueException {
 		final Date date = parseString(string);
 		if (date == null) {
-			throw new IAttribute.IllegalValue("Unable to parse \"" + string
+			throw new IllegalValueException("Unable to parse \"" + string
 					+ "\" into a date");
 		}
-		if (date.compareTo(minDate) < 0) {
-			throw new IllegalValue("Date, " + string + ", is before " + toString(minDate));
+		if (date.compareTo(getMinDate()) < 0) {
+			throw new IllegalValueException("Date, " + string + ", is before " + toString(getMinDate()));
 		}
-		if (date.compareTo(maxDate) > 0) {
-			throw new IllegalValue("Date, " + string + ", is after " + toString(maxDate));
+		if (date.compareTo(getMaxDate()) > 0) {
+			throw new IllegalValueException("Date, " + string + ", is after " + toString(getMaxDate()));
 		}
 		value.setTime(date);
 	}
@@ -243,7 +137,7 @@ public final class DateAttribute extends AbstractAttribute {
 	private Date parseString(String string) {
 		Date date = null;
 		final ParsePosition parsePosition = new ParsePosition(0);
-		date = outputDateFormat.parse(string, parsePosition);
+		date = getDateFormat().parse(string, parsePosition);
 		if (date != null) {
 			return date;
 		}
@@ -256,14 +150,26 @@ public final class DateAttribute extends AbstractAttribute {
 		}
 		return date;
 	}
-
-	private String toString(Date date) {
-		return outputDateFormat.format(date);
+	
+	public String toString() {
+		return getValueAsString();
+		
 	}
 
-	protected int doCompareTo(AbstractAttribute arg0) {
-		DateAttribute da = (DateAttribute) arg0;
-		return this.value.compareTo(da.value);
+	private String toString(Date date) {
+		return getDateFormat().format(date);
+	}
+
+	private Date getMaxDate() {
+		return ((IDateAttributeDefinition)getDefinition()).getMaxDate();
+	}
+
+	private Date getMinDate() {
+		return ((IDateAttributeDefinition)getDefinition()).getMinDate();
+	}
+	
+	public DateFormat getDateFormat() {
+		return ((IDateAttributeDefinition)getDefinition()).getDateFormat();
 	}
 
 }

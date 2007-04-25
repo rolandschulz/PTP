@@ -18,64 +18,18 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.attributes;
 
-public interface IAttribute extends Comparable {
-
-	/**
-	 * @author rsqrd
-	 *
-	 */
-	public static class IllegalValue extends Exception {
-	
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 2366875582524976226L;
-	
-		public IllegalValue(String message) {
-			super(message);
-		}
-	
-		public IllegalValue(String message, Throwable cause) {
-			super(message, cause);
-		}
-	
-		public IllegalValue(Throwable cause) {
-			super(cause);
-		}
-	
-	}
-
-	/**
-	 * This is part of the Acyclic IVisitor Pattern,
-	 * "Patterns Languages of Program Design 3", p.79
-	 * @param visitor
-	 */
-	void accept(IAttributeVisitor visitor);
+public interface IAttribute {
 	
 	/**
-	 * Creates a new attribute of the same type given the string representation.
-	 * 
-	 * @param string
-	 * @return a new attribute of the same type.
-	 * @throws IllegalValue
+	 * @return the attribute definition object associated with this attribute
 	 */
-	IAttribute create(String string) throws IllegalValue;
-	
-	/**
-	 * @return the description object associated with this attribute
-	 */
-	IAttributeDescription getDescription();
-	
-	/**
-	 * @return
-	 */
-	String getStringRep();
+	public IAttributeDefinition getDefinition();
 	
 	/**
 	 * @return whether any UI elements for this attribute
 	 * should be enabled.
 	 */
-	boolean isEnabled();
+	public boolean isEnabled();
 	
 	/**
 	 * Is the string parsable to a valid
@@ -84,11 +38,16 @@ public interface IAttribute extends Comparable {
 	 * @param string
 	 * @return
 	 */
-	boolean isValid(String string);
+	public boolean isValid(String string);
+	
+	/**
+	 * @return string
+	 */
+	public String getValueAsString();
 		
 	/**
 	 * @param string
 	 * @throws IAttribute.IllegalValue
 	 */
-	void setValue(String string) throws IAttribute.IllegalValue;
+	public void setValue(String string) throws IllegalValueException;
 }

@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.core.cdi.model;
 
-import org.eclipse.ptp.core.IPProcess;
+import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcess;
 import org.eclipse.ptp.debug.external.core.cdi.Session;

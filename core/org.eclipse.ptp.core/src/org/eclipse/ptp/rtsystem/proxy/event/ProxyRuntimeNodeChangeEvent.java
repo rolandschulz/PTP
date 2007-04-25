@@ -19,38 +19,25 @@
 
 package org.eclipse.ptp.rtsystem.proxy.event;
 
-import org.eclipse.ptp.core.proxy.event.ProxyEvent;
-
-public class ProxyRuntimeNodeChangeEvent extends AbstractProxyRuntimeEvent implements IProxyRuntimeEvent {
-	private int machID;
-	private String key;
-	private String val;
-	private String nodeName;
-
-	public ProxyRuntimeNodeChangeEvent(String[] args) {
-		super(EVENT_RUNTIME_NODECHANGE);
-		this.machID = Integer.parseInt(args[1]);
-		this.nodeName = ProxyEvent.decodeString(args[2]);
-		
-		String text = new String("");
-		for(int i=3; i<args.length; i++) {
-			if(i == 3) text = ProxyEvent.decodeString(args[i]);
-			else text = text + " " + ProxyEvent.decodeString(args[i]);
-		}
-		
-		int idx = text.indexOf('=');
-		key = text.substring(0, idx);
-		val = text.substring(idx+1, text.length());
-		
-		System.out.println("key = '"+key+"', val = '"+val+"'");
+public class ProxyRuntimeNodeChangeEvent extends AbstractProxyRuntimeEvent implements IProxyRuntimeNodeChangeEvent {
+	private String[] args;
+	
+	public ProxyRuntimeNodeChangeEvent(int transID, String[] args) {
+		super(PROXY_RUNTIME_NODE_CHANGE_EVENT, transID);
+		this.args = args;
 	}
 	
-	public int getMachineID() { return this.machID; }
-	public String getNodeName() { return this.nodeName; }
-	public String getKey() { return this.key; }
-	public String getValue() { return this.val; }
+	public String[] getArguments() {
+		return this.args;
+	}
 	
 	public String toString() {
-		return "EVENT_RUNTIME_NODECHANGE (machID="+this.machID+", nodeID="+this.nodeName+") key='"+this.key+"' val='"+this.val+"'";
+		String str = "EVENT_RUNTIME_NODE_CHANGE transid=" + getTransactionID() + " (";
+		for (int i = 0 ; i < args.length; i++) {
+			if (i > 0)
+				str += ",";
+			str += args[i];
+		}
+		return str + ")";
 	}
 }

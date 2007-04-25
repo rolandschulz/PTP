@@ -24,418 +24,382 @@
 #include <string.h>
 
 #include "dbg_event.h"
-#include "proxy_event.h"
 #include "args.h"
+#include "proxy_msg.h"
 
-#define NULL_STR	"*"
+#define EMPTY	"*"
 
-static int
-dbg_location_to_str(location *loc, char **result)
+static void
+dbg_add_location(proxy_msg *m, location *loc)
 {
-	char *	file;
-	char *	func;
-	char *	addr;
-
-	proxy_cstring_to_str(loc->file, &file);
-	proxy_cstring_to_str(loc->func, &func);
-	proxy_cstring_to_str(loc->addr, &addr);
-
-	asprintf(result, "%s %s %s %d", file, func, addr, loc->line);
-
-	free(file);
-	free(func);
-	free(addr);
-
-	return 0;
+	proxy_msg_add_string(m, loc->file);
+	proxy_msg_add_string(m, loc->func);
+	proxy_msg_add_string(m, loc->addr);
+	proxy_msg_add_int(m, loc->line);
 }
 
-static int
-dbg_breakpoint_to_str(breakpoint *bp, char **result)
+static void
+dbg_add_breakpoint(proxy_msg *m, breakpoint *bp)
 {
-	char *	type;
-	char *	loc;
-	
-	proxy_cstring_to_str(bp->type, &type);
-	dbg_location_to_str(&bp->loc, &loc);
-	
-	asprintf(result, "%d %d %d %d %s %s %d", bp->id, bp->ignore, bp->special, bp->deleted, type, loc, bp->hits);
-
-	free(type);
-	free(loc);
-
-	return 0;
-	
+	proxy_msg_add_int(m, bp->id);
+	proxy_msg_add_int(m, bp->ignore);
+	proxy_msg_add_int(m, bp->special); 
+	proxy_msg_add_int(m, bp->deleted);
+	proxy_msg_add_string(m, bp->type);
+	dbg_add_location(m, &bp->loc);
+	proxy_msg_add_int(m, bp->hits);
 }
 
-static int 
-dbg_signalinfo_to_str(signalinfo *sig, char **result) 
+static void 
+dbg_add_signalinfo(proxy_msg *m, signalinfo *sig) 
 {
-	char *name;
-	char *desc;
-	
 	if (sig == NULL) {
-		asprintf(result, "%s", NULL_STR);
-		return 0;
+		proxy_msg_add_string(m, EMPTY);
+		return;
 	}
 
-	proxy_cstring_to_str(sig->name, &name);
-	proxy_cstring_to_str(sig->desc, &desc);	
-	asprintf(result, "%s %d %d %d %s", name, sig->stop, sig->print, sig->pass, desc);
-
-	free(name);
-	free(desc);
-	return 0;
+	proxy_msg_add_string(m, sig->name);
+	proxy_msg_add_int(m, sig->stop);
+	proxy_msg_add_int(m, sig->print);
+	proxy_msg_add_int(m, sig->pass);
+	proxy_msg_add_string(m, sig->desc);
 }
 
-static int
-dbg_stackframe_to_str(stackframe *sf, char **result)
+static void
+dbg_add_stackframe(proxy_msg *m, stackframe *sf)
 {
-	char *	loc;
-	
 	if (sf == NULL) {
-		asprintf(result, "%s", NULL_STR);
-		return 0;
+		proxy_msg_add_string(m, EMPTY);
+		return;
 	}
 	
-	dbg_location_to_str(&sf->loc, &loc);
-	
-	asprintf(result, "%d %s", sf->level, loc);
-	
-	free(loc);
-	
-	return 0;
+	proxy_msg_add_int(m, sf->level);
+	dbg_add_location(m, &sf->loc);	
 }
 
-static int
-dbg_cstring_list_to_str(List *lst, char **result)
+static void
+dbg_add_strings(proxy_msg *m, List *lst)
 {
-	return proxy_list_to_str(lst, (int (*)(void *, char **))proxy_cstring_to_str, result);
-}
-
-static int
-dbg_stackframes_to_str(List *lst, char **result)
-{
-	return proxy_list_to_str(lst, (int (*)(void *, char **))dbg_stackframe_to_str, result);
-}
-
-static int 
-dbg_signals_to_str(List *lst, char **result) 
-{
-	return proxy_list_to_str(lst, (int (*)(void *, char **))dbg_signalinfo_to_str, result);
-}
-
-static int 
-dbg_memory_to_str(memory *mem, char **result) 
-{
-	char * addr;
-	char * ascii;
-	char * data;
+	char *	s;
 	
+	proxy_msg_add_int(m, SizeOfList(lst));
+	
+	for (SetList(lst); (s = (char *)GetListElement(lst)) != NULL; ) {
+		proxy_msg_add_string(m, s);
+	}
+}
+
+static void
+dbg_add_stackframes(proxy_msg *m, List *lst)
+{
+	stackframe *	s;
+	
+	proxy_msg_add_int(m, SizeOfList(lst));
+	
+	for (SetList(lst); (s = (stackframe *)GetListElement(lst)) != NULL; ) {
+		dbg_add_stackframe(m, s);
+	}
+}
+
+static void 
+dbg_add_signals(proxy_msg *m, List *lst) 
+{
+	signalinfo *	s;
+	
+	proxy_msg_add_int(m, SizeOfList(lst));
+	
+	for (SetList(lst); (s = (signalinfo *)GetListElement(lst)) != NULL; ) {
+		dbg_add_signalinfo(m, s);
+	}
+}
+
+static void 
+dbg_add_memory(proxy_msg *m, memory *mem) 
+{
 	if (mem == NULL) {
-		asprintf(result, "%s", NULL_STR);
-		return 0;
+		proxy_msg_add_string(m, EMPTY);
+		return;
 	}
 	
-	proxy_cstring_to_str(mem->addr, &addr);
-	proxy_cstring_to_str(mem->ascii, &ascii);
-	dbg_cstring_list_to_str(mem->data, &data);
-	asprintf(result, "%s %s %s", addr, ascii, data);
+	proxy_msg_add_string(m, mem->addr);
+	proxy_msg_add_string(m, mem->ascii);
+	dbg_add_strings(m, mem->data);
+}
+
+static void 
+dbg_add_memories(proxy_msg *m, List *lst) 
+{
+	memory *	mem;
 	
-	free(addr);
-	free(ascii);
-	free(data);
-	return 0;
+	proxy_msg_add_int(m, SizeOfList(lst));
+	
+	for (SetList(lst); (mem = (memory *)GetListElement(lst)) != NULL; ) {
+		dbg_add_memory(m, mem);
+	}
 }
 
-static int 
-dbg_memories_to_str(List *lst, char **result) 
+static void 
+dbg_add_memoryinfo(proxy_msg *m, memoryinfo *meninfo) 
 {
-	return proxy_list_to_str(lst, (int (*)(void *, char **))dbg_memory_to_str, result);
-}
-
-static int 
-dbg_memoryinfo_to_str(memoryinfo *meninfo, char **result) 
-{
-	char * addr;
-	char * memories;
-
 	if (meninfo == NULL) {
-		asprintf(result, "%s", NULL_STR);
-		return 0;
+		proxy_msg_add_string(m, EMPTY);
+		return;
 	}
 
-	proxy_cstring_to_str(meninfo->addr, &addr);
-	dbg_memories_to_str(meninfo->memories, &memories);
-	asprintf(result, "%s %ld %ld %ld %ld %ld %ld %s", addr, meninfo->nextRow, meninfo->prevRow, meninfo->nextPage, meninfo->prevPage, meninfo->numBytes, meninfo->totalBytes, memories);
-
-	free(addr);
-	free(memories);
-	return 0;
+	proxy_msg_add_string(m, meninfo->addr);
+	proxy_msg_add_int(m, meninfo->nextRow);
+	proxy_msg_add_int(m, meninfo->prevRow);
+	proxy_msg_add_int(m, meninfo->nextPage);
+	proxy_msg_add_int(m, meninfo->prevPage);
+	proxy_msg_add_int(m, meninfo->numBytes);
+	proxy_msg_add_int(m, meninfo->totalBytes);
+	dbg_add_memories(m, meninfo->memories);
 }
 
-static int
-dbg_aif_to_str(AIF *a, char **result)
+static void
+dbg_add_aif(proxy_msg *m, AIF *a)
 {
-	char *	fmt;
-	char *	data;
-		
-	proxy_cstring_to_str(AIF_FORMAT(a), &fmt);
-	proxy_data_to_str(AIF_DATA(a), AIF_LEN(a), &data);
-	
-	asprintf(result, "%s %s", fmt, data);
-
-	free(fmt);
-	free(data);
-
-	return 0;
+	proxy_msg_add_string(m, AIF_FORMAT(a));
+	proxy_msg_add_data(m, AIF_DATA(a), AIF_LEN(a));
 }
 
+/*
+ * Serialize a debug event for sending between debug servers.
+ * 
+ * Note that the serialized event does not include the bitset, since it is
+ * only relevant to communication with the client. The bitset is
+ * added just prior to sending back to the client.
+ */
 int
-DbgEventToStr(dbg_event *e, char **result)
+DbgSerializeEvent(dbg_event *e, char **result)
 {
-	int		res = 0;
-	char *	str;
-	char *	str2;
-	char *	str3;
-	char *	pstr;
+	int			res = 0;
+	proxy_msg *	p = NULL;
 
 	if (e == NULL)
 		return -1;
-	
-	pstr = bitset_to_str(e->procs);
 
-	switch (e->event)
+	p = new_proxy_msg(e->event_id, e->trans_id);
+	
+	switch (e->event_id)
 	{
 	case DBGEV_OK:
-		asprintf(result, "%d %s", e->event, pstr);
 		break;
 		
 	case DBGEV_ERROR:
- 		proxy_cstring_to_str(e->dbg_event_u.error_event.error_msg, &str);
- 		asprintf(result, "%d %s %d %s", e->event, pstr, e->dbg_event_u.error_event.error_code, str);
+		proxy_msg_add_int(p, e->dbg_event_u.error_event.error_code);
+		proxy_msg_add_string(p, e->dbg_event_u.error_event.error_msg);
 		break;
 	
 	case DBGEV_INIT:
- 		asprintf(result, "%d %s %d", e->event, pstr, e->dbg_event_u.num_servers);
+		proxy_msg_add_int(p, e->dbg_event_u.num_servers);
 		break;
 	
-	case DBGEV_SUSPEND:
-		dbg_stackframe_to_str(e->dbg_event_u.suspend_event.frame, &str);
-		dbg_cstring_list_to_str(e->dbg_event_u.suspend_event.changed_vars, &str2);
-	
+	case DBGEV_SUSPEND:	
+		proxy_msg_add_int(p, e->dbg_event_u.suspend_event.reason);
+		
 		switch (e->dbg_event_u.suspend_event.reason) {
-			case DBGEV_SUSPEND_BPHIT:
-				asprintf(result, "%d %s %d %d %d %s", 
-					e->event, 
-					pstr, 
-					e->dbg_event_u.suspend_event.reason, 
-					e->dbg_event_u.suspend_event.ev_u.bpid, 
-					e->dbg_event_u.suspend_event.thread_id,
-					str2);
-				break;
-				
-			case DBGEV_SUSPEND_SIGNAL:
-				dbg_signalinfo_to_str(e->dbg_event_u.suspend_event.ev_u.sig, &str3);
-				asprintf(result, "%d %s %d %s %s %d %s", 
-					e->event, 
-					pstr, 
-					e->dbg_event_u.suspend_event.reason,
-					str3, 
-					str, 
-					e->dbg_event_u.suspend_event.thread_id, 
-					str2);
-				free(str3);
-				break;
-		
-			case DBGEV_SUSPEND_STEP:
-			case DBGEV_SUSPEND_INT:
-				asprintf(result, "%d %s %d %s %d %s", 
-					e->event, 
-					pstr, 
-					e->dbg_event_u.suspend_event.reason, 
-					str, 
-					e->dbg_event_u.suspend_event.thread_id,
-					str2);
-				break;
+		case DBGEV_SUSPEND_BPHIT:
+			proxy_msg_add_int(p, e->dbg_event_u.suspend_event.ev_u.bpid);
+			proxy_msg_add_int(p, e->dbg_event_u.suspend_event.thread_id);
+			dbg_add_strings(p, e->dbg_event_u.suspend_event.changed_vars);
+			break;
+			
+		case DBGEV_SUSPEND_SIGNAL:
+			dbg_add_signalinfo(p, e->dbg_event_u.suspend_event.ev_u.sig);
+			dbg_add_stackframe(p, e->dbg_event_u.suspend_event.frame);
+			proxy_msg_add_int(p, e->dbg_event_u.suspend_event.thread_id);
+			dbg_add_strings(p, e->dbg_event_u.suspend_event.changed_vars);
+			break;
+	
+		case DBGEV_SUSPEND_STEP:
+		case DBGEV_SUSPEND_INT:
+			dbg_add_stackframe(p, e->dbg_event_u.suspend_event.frame);
+			proxy_msg_add_int(p, e->dbg_event_u.suspend_event.thread_id);
+			dbg_add_strings(p, e->dbg_event_u.suspend_event.changed_vars);
+			break;
 		}
-		
-		free(str);
-		free(str2);
 		break;
 
 	case DBGEV_BPSET:
-		dbg_breakpoint_to_str(e->dbg_event_u.bpset_event.bp, &str);
-		asprintf(result, "%d %s %d %s", e->event, pstr, e->dbg_event_u.bpset_event.bpid, str);
-		free(str);
+ 		proxy_msg_add_int(p, e->dbg_event_u.bpset_event.bpid);
+		dbg_add_breakpoint(p, e->dbg_event_u.bpset_event.bp);
 		break;
 		
 	case DBGEV_SIGNALS:
-		dbg_signals_to_str(e->dbg_event_u.list, &str);
-		asprintf(result, "%d %s %s", e->event, pstr, str);
-		free(str);
+ 		dbg_add_signals(p, e->dbg_event_u.list);
 		break;
 	
 	case DBGEV_EXIT:
+		proxy_msg_add_int(p, e->dbg_event_u.exit_event.reason);
+	 	
 		switch (e->dbg_event_u.exit_event.reason) {
 		case DBGEV_EXIT_NORMAL:
-			asprintf(result, "%d %s %d %d", 
-				e->event, 
-				pstr, 
-				e->dbg_event_u.exit_event.reason, 
-				e->dbg_event_u.exit_event.ev_u.exit_status);
+			proxy_msg_add_int(p, e->dbg_event_u.exit_event.ev_u.exit_status);
 			break;
 
 		case DBGEV_EXIT_SIGNAL:
-			dbg_signalinfo_to_str(e->dbg_event_u.exit_event.ev_u.sig, &str);
-			asprintf(result, "%d %s %d %s", 
-				e->event, 
-				pstr,
-				e->dbg_event_u.exit_event.reason,
-				str);
-			free(str);
+			dbg_add_signalinfo(p, e->dbg_event_u.exit_event.ev_u.sig);
 			break;
 		}
 		break;
 	
 	case DBGEV_FRAMES:
-		dbg_stackframes_to_str(e->dbg_event_u.list, &str);
-		asprintf(result, "%d %s %s", e->event, pstr, str);
-		free(str);
+ 		dbg_add_stackframes(p, e->dbg_event_u.list);
 		break;
 
 	case DBGEV_THREAD_SELECT:
-		dbg_stackframe_to_str(e->dbg_event_u.thread_select_event.frame, &str);
-		asprintf(result, "%d %s %d %s", e->event, pstr, e->dbg_event_u.thread_select_event.thread_id, str);
-		free(str);
+ 		proxy_msg_add_int(p, e->dbg_event_u.thread_select_event.thread_id);
+		dbg_add_stackframe(p, e->dbg_event_u.thread_select_event.frame);
 		break;
 	
 	case DBGEV_THREADS:
-		dbg_cstring_list_to_str(e->dbg_event_u.threads_event.list, &str);
-		asprintf(result, "%d %s %d %s", e->event, pstr, e->dbg_event_u.threads_event.thread_id, str);
-		free(str);
+ 		proxy_msg_add_int(p, e->dbg_event_u.threads_event.thread_id);
+		dbg_add_strings(p, e->dbg_event_u.threads_event.list);
 		break;
 		
 	case DBGEV_STACK_DEPTH:
-		asprintf(result, "%d %s %d", e->event, pstr, e->dbg_event_u.stack_depth);
+ 		proxy_msg_add_int(p, e->dbg_event_u.stack_depth);
 		break;
 
 	case DBGEV_DATAR_MEM:
-		dbg_memoryinfo_to_str(e->dbg_event_u.meminfo, &str);
-		asprintf(result, "%d %s %s", e->event, pstr, str);
-		free(str);
+ 		dbg_add_memoryinfo(p, e->dbg_event_u.meminfo);
 		break;
 		
 	case DBGEV_VARS:
-		dbg_cstring_list_to_str(e->dbg_event_u.list, &str);
-		asprintf(result, "%d %s %s", e->event, pstr, str);
-		free(str);
+ 		dbg_add_strings(p, e->dbg_event_u.list);
 		break;
 
 	case DBGEV_ARGS:
-		dbg_cstring_list_to_str(e->dbg_event_u.list, &str);
-		asprintf(result, "%d %s %s", e->event, pstr, str);
-		free(str);
+		dbg_add_strings(p, e->dbg_event_u.list);
 		break;
 
 	case DBGEV_TYPE:
-		proxy_cstring_to_str(e->dbg_event_u.type_desc, &str);
-		asprintf(result, "%d %s %s", e->event, pstr, str);
-		free(str);
+		proxy_msg_add_string(p, e->dbg_event_u.type_desc);
 		break;
 
 	case DBGEV_DATA:
-		dbg_aif_to_str(e->dbg_event_u.data_event.data, &str);
-		proxy_cstring_to_str(e->dbg_event_u.data_event.type_desc, &str2);
-		asprintf(result, "%d %s %s %s", e->event, pstr, str, str2);
-		free(str);
-		free(str2);
+ 		dbg_add_aif(p, e->dbg_event_u.data_event.data);
+		proxy_msg_add_string(p, e->dbg_event_u.data_event.type_desc);
 		break;
 	
 	case DBGEV_DATA_EVA_EX:
-		proxy_cstring_to_str(e->dbg_event_u.data_expression, &str);
-		asprintf(result, "%d %s %s", e->event, pstr, str);
-		free(str);
+ 		proxy_msg_add_string(p, e->dbg_event_u.data_expression);
 		break;
 		
 	case DBGEV_PARTIAL_AIF:
-		dbg_aif_to_str(e->dbg_event_u.partial_aif_event.data, &str);
-		proxy_cstring_to_str(e->dbg_event_u.partial_aif_event.type_desc, &str2);
-		proxy_cstring_to_str(e->dbg_event_u.partial_aif_event.name, &str3);
-		asprintf(result, "%d %s %s %s %s", e->event, pstr, str, str2, str3);
-		free(str);
-		free(str2);
-		free(str3);
+ 		dbg_add_aif(p, e->dbg_event_u.partial_aif_event.data);
+		proxy_msg_add_string(p, e->dbg_event_u.partial_aif_event.type_desc);
+		proxy_msg_add_string(p, e->dbg_event_u.partial_aif_event.name);
 		break;
 
 	default:
 		res = -1;
 		break;
 	}
-
-	free(pstr);
 	
-	return res;
+	return proxy_serialize_msg(p, result);
 }
 
 static int
-dbg_str_to_location(char ***args, location *loc)
+dbg_str_to_int(char ***args, int *nargs, int *val)
 {
-	if (proxy_str_to_cstring(*(*args)++, &loc->file) < 0 ||
-		proxy_str_to_cstring(*(*args)++, &loc->func) < 0 ||
-		proxy_str_to_cstring(*(*args)++, &loc->addr) < 0 ||
-		proxy_str_to_int(*(*args)++, &loc->line) < 0) {
-		FreeLocation(loc);
+	if (*nargs < 1)
 		return -1;
+		
+	proxy_get_int(*(*args)++, val);
+	*nargs--;
+	
+	return 0;
+}
+
+static int
+dbg_copy_str(char ***args, int *nargs, char **str)
+{
+	if (*nargs < 1)
+		return -1;
+		
+	*str = strdup(*(*args)++);
+	*nargs--;
+	
+	return 0;
+}
+
+static int
+dbg_str_to_data(char ***args, int *nargs, char **data, int *len)
+{
+	if (*nargs < 1)
+		return -1;
+		
+	proxy_get_data(*(*args)++, data, len);
+	*nargs--;
+	
+	return 0;
+}
+
+static int
+dbg_str_to_location(char ***args, int *nargs, location *loc)
+{
+	if (dbg_copy_str(args, nargs, &loc->file) < 0 ||
+		dbg_copy_str(args, nargs, &loc->func) < 0 ||
+		dbg_copy_str(args, nargs, &loc->addr) < 0 ||
+		dbg_str_to_int(args, nargs, &loc->line) < 0) {
+			FreeLocation(loc);
+			return -1;
 	}
 	
 	return 0;
 }
 
 static int
-dbg_str_to_breakpoint(char ***args, breakpoint **bp)
+dbg_str_to_breakpoint(char ***args, int *nargs, breakpoint **bp)
 {
-	int			id;
+	int				id;
 	breakpoint *	b;
 	
-	if (proxy_str_to_int(*(*args)++, &id) < 0)
+	if (dbg_str_to_int(args, nargs, &id) < 0) {
 		return -1;
+	}
 		
 	b = NewBreakpoint(id);
 	
-	if (proxy_str_to_int(*(*args)++, &b->ignore) < 0 ||
-		proxy_str_to_int(*(*args)++, &b->special) < 0 ||
-		proxy_str_to_int(*(*args)++, &b->deleted) < 0 ||
-		proxy_str_to_cstring(*(*args)++, &b->type) < 0 ||
-		dbg_str_to_location(args, &b->loc) < 0 ||
-		proxy_str_to_int(*(*args)++, &b->hits) < 0) {
-		FreeBreakpoint(b);
-		return -1;
+	if (dbg_str_to_int(args, nargs, &b->ignore) < 0 ||
+		dbg_str_to_int(args, nargs, &b->special) < 0 ||
+		dbg_str_to_int(args, nargs, &b->deleted) < 0 ||
+		dbg_copy_str(args, nargs, &b->type) < 0 ||
+		dbg_str_to_location(args, nargs, &b->loc) < 0 ||
+		dbg_str_to_int(args, nargs, &b->hits) < 0) {
+			FreeBreakpoint(b);
+			return -1;
 	}
-	
+
 	*bp = b;
 	
 	return 0;
 }
 
 static int
-dbg_str_to_stackframe(char ***args, stackframe **frame)
+dbg_str_to_stackframe(char ***args, int *nargs, stackframe **frame)
 {
-	int			level;
+	int				level;
 	stackframe *	sf;
 	
-	if (strcmp(*(*args), NULL_STR) == 0) {
+	if (strcmp(*(*args), EMPTY) == 0) {
 		(*args)++;
+		*nargs--;
 		*frame = NULL;
 		return 0;
 	}
 	
-	if (proxy_str_to_int(*(*args)++, &level) < 0) {
+	if (dbg_str_to_int(args, nargs, &level) < 0) {
 		return -1;
 	}
+		
 	sf = NewStackframe(level);
-	if (dbg_str_to_location(args, &sf->loc) < 0) {
+	
+	if (dbg_str_to_location(args, nargs, &sf->loc) < 0) {
 		FreeStackframe(sf);
-		return -1;			
+		return -1;
 	}
 	
 	*frame = sf;
@@ -444,40 +408,48 @@ dbg_str_to_stackframe(char ***args, stackframe **frame)
 }
 
 static int 
-dbg_str_to_signalinfo(char ***args, signalinfo **sig) 
+dbg_str_to_signalinfo(char ***args, int *nargs, signalinfo **sig) 
 {
 	signalinfo *s;
 	
-	if (strcmp(*(*args), NULL_STR) == 0) {
+	if (strcmp(*(*args), EMPTY) == 0) {
 		(*args)++;
+		*nargs--;
 		*sig = NULL;
 		return 0;
 	}
 	
 	s = NewSignalInfo();
-	if (proxy_str_to_cstring(*(*args)++, &s->name) < 0 ||
-		proxy_str_to_int(*(*args)++, &s->stop) < 0 ||
-		proxy_str_to_int(*(*args)++, &s->print) < 0 ||
-		proxy_str_to_int(*(*args)++, &s->pass) < 0 || 
-		proxy_str_to_cstring(*(*args)++, &s->desc) < 0) {
-		FreeSignalInfo(s);
-		return -1;
+	
+	if (dbg_copy_str(args, nargs, &s->name) < 0 ||
+		dbg_str_to_int(args, nargs, &s->stop) < 0 ||
+		dbg_str_to_int(args, nargs, &s->print) < 0 ||
+		dbg_str_to_int(args, nargs, &s->pass) < 0 || 
+		dbg_copy_str(args, nargs, &s->desc) < 0) {
+			FreeSignalInfo(s);
+			return -1;
 	}
+
 	*sig = s;
+	
 	return 0;
 }
 
 static int
-dbg_str_to_stackframes(char ***args, List **lst)
+dbg_str_to_stackframes(char ***args, int *nargs, List **lst)
 {
 	int				i;
-	int				count = (int)strtol(*(*args)++, NULL, 10);
+	int				count;
 	stackframe *	sf;
 
+	if (dbg_str_to_int(args, nargs, &count) < 0) {
+		return -1;
+	}
+	
 	*lst = NewList();
 	
 	for (i = 0; i < count; i++) {
-		if (dbg_str_to_stackframe(args, &sf) < 0) {
+		if (dbg_str_to_stackframe(args, nargs, &sf) < 0) {
 			DestroyList(*lst, FreeStackframe);
 			return -1;
 		}
@@ -488,34 +460,43 @@ dbg_str_to_stackframes(char ***args, List **lst)
 }
 
 static int 
-dbg_str_to_signals(char ***args, List **lst) 
+dbg_str_to_signals(char ***args, int *nargs, List **lst) 
 {
 	int				i;
-	int 			count = (int)strtol(*(*args)++, NULL, 10);
+	int				count;
 	signalinfo *	sig;
 
-	*lst = NewList();	
+	if (dbg_str_to_int(args, nargs, &count) < 0) {
+	}
+		
+	*lst = NewList();
+	
 	for (i = 0; i < count; i++) {
-		if (dbg_str_to_signalinfo(args, &sig) < 0) {
-			DestroyList(*lst, FreeSignalInfo);
+		if (dbg_str_to_signalinfo(args, nargs, &sig) < 0) {
+			DestroyList(*lst, FreeMemory);
 			return -1;
 		}
 		AddToList(*lst, (void *)sig);
 	}
+	
 	return 0;
 }
 
 static int
-dbg_str_to_cstring_list(char ***args, List **lst)
+dbg_str_to_list(char ***args, int *nargs, List **lst)
 {
 	int		i;
-	int		count = (int)strtol(*(*args)++, NULL, 10);
+	int		count;
 	char *	str;
 	
+	if (dbg_str_to_int(args, nargs, &count) < 0) {
+		return -1;
+	}
+		
 	*lst = NewList();
 	
 	for (i = 0; i < count; i++) {
-		if (proxy_str_to_cstring(*(*args)++, &str) < 0) {
+		if (dbg_copy_str(args, nargs, &str) < 0) {
 			DestroyList(*lst, free);
 			return -1;
 		}
@@ -526,16 +507,17 @@ dbg_str_to_cstring_list(char ***args, List **lst)
 }
 
 static int
-dbg_str_to_aif(char ***args, AIF **res)
+dbg_str_to_aif(char ***args, int *nargs, AIF **res)
 {
 	int		data_len;
 	AIF *	a;
 	char *	fmt;
 	char *	data;
 	
-	if (proxy_str_to_cstring(*(*args)++, &fmt) < 0 ||
-		proxy_str_to_data(*(*args)++, &data, &data_len))
-		return -1;
+	if (dbg_copy_str(args, nargs, &fmt) < 0 ||
+		dbg_str_to_data(args, nargs, &data, &data_len) < 0) {
+			return -1;
+	}
 	
 	a = NewAIF(0, 0);
 	AIF_FORMAT(a) = fmt;
@@ -548,160 +530,141 @@ dbg_str_to_aif(char ***args, AIF **res)
 }
 
 static int 
-dbg_str_to_memory_data(char ***args, List **lst) 
+dbg_str_to_memory_data(char ***args, int *nargs, List **lst) 
 {
-	int	i;
-	int	count = (int)strtol(*(*args)++, NULL, 10);
-	char * str;
+	int		i;
+	int		count;
+	char *	str;
+
+	if (dbg_str_to_int(args, nargs, &count) < 0) {
+		return -1;
+	}
 
 	*lst = NewList();
-	for (i=0; i<count; i++) {
-		if (proxy_str_to_cstring(*(*args)++, &str) < 0) {
+	
+	for (i = 0; i < count; i++) {
+		if (dbg_copy_str(args, nargs, &str) < 0) {
 			DestroyList(*lst, free);
 			return -1;
 		}
 		AddToList(*lst, (void *)str);
 	}
+	
 	return 0;
 }
 
 
 static int 
-dbg_str_to_memory(char ***args, List **lst) 
+dbg_str_to_memory(char ***args, int *nargs, List **lst) 
 {
-	int	i;
-	int	count = (int)strtol(*(*args)++, NULL, 10);
-	memory *m;
+	int			i;
+	int			count;
+	memory *	m;
 	
+	if (dbg_str_to_int(args, nargs, &count) < 0) {
+	}
+
 	*lst = NewList();
-	for (i=0; i<count; i++) {
+	
+	for (i = 0; i < count; i++) {
 		m = NewMemory();
-		if (proxy_str_to_cstring(*(*args)++, &m->addr) < 0) {
-			DestroyList(*lst, FreeMemory);
-			return -1;
-		}
-		if (proxy_str_to_cstring(*(*args)++, &m->ascii) < 0) {
-			DestroyList(*lst, FreeMemory);
-			return -1;
-		}		
-		if (dbg_str_to_memory_data(args, &m->data) < 0) {
-			DestroyList(*lst, FreeMemory);
-			return -1;
+		if (dbg_copy_str(args, nargs, &m->addr) < 0 ||
+			dbg_copy_str(args, nargs, &m->ascii) < 0 ||
+			dbg_str_to_memory_data(args, nargs, &m->data) < 0) {
+				DestroyList(*lst, FreeMemory);
+				return -1;
 		}
 		AddToList(*lst, (void *)m);
 	}
+	
 	return 0;
 }
 
 static int 
-dbg_str_to_memoryinfo(char ***args, memoryinfo **info) 
+dbg_str_to_memoryinfo(char ***args, int *nargs, memoryinfo **info) 
 {
 	memoryinfo * meminfo;
 	
-	if (strcmp(*(*args), NULL_STR) == 0) {
+	if (*nargs < 1)
+		return -1;
+		
+	if (strcmp(*(*args), EMPTY) == 0) {
 		(*args)++;
+		*nargs--;
 		*info = NULL;
-		return 0;
 	}
 
 	meminfo = NewMemoryInfo();
-	if (proxy_str_to_cstring(*(*args)++, &meminfo->addr) < 0) {
-		FreeMemoryInfo(meminfo);
-		return -1;
+	
+	if (dbg_copy_str(args, nargs, &meminfo->addr) < 0 ||
+		dbg_str_to_int(args, nargs, (int *)&meminfo->nextRow) < 0 ||
+		dbg_str_to_int(args, nargs, (int *)&meminfo->prevRow) < 0 ||
+		dbg_str_to_int(args, nargs, (int *)&meminfo->nextPage) < 0 ||
+		dbg_str_to_int(args, nargs, (int *)&meminfo->prevPage) < 0 ||
+		dbg_str_to_int(args, nargs, (int *)&meminfo->numBytes) < 0 ||
+		dbg_str_to_int(args, nargs, (int *)&meminfo->totalBytes) < 0 ||
+		dbg_str_to_memory(args, nargs, &meminfo->memories) < 0) {
+			FreeMemoryInfo(meminfo);
+			return -1;
 	}
-	if (proxy_str_to_int(*(*args)++, (int *)&meminfo->nextRow) < 0) {
-		FreeMemoryInfo(meminfo);
-		return -1;
-	}
-	if (proxy_str_to_int(*(*args)++, (int *)&meminfo->prevRow) < 0) {
-		FreeMemoryInfo(meminfo);
-		return -1;
-	}
-	if (proxy_str_to_int(*(*args)++, (int *)&meminfo->nextPage) < 0) {
-		FreeMemoryInfo(meminfo);
-		return -1;
-	}
-	if (proxy_str_to_int(*(*args)++, (int *)&meminfo->prevPage) < 0) {
-		FreeMemoryInfo(meminfo);
-		return -1;
-	}
-	if (proxy_str_to_int(*(*args)++, (int *)&meminfo->numBytes) < 0) {
-		FreeMemoryInfo(meminfo);
-		return -1;
-	}
-	if (proxy_str_to_int(*(*args)++, (int *)&meminfo->totalBytes) < 0) {
-		FreeMemoryInfo(meminfo);
-		return -1;
-	}
-	if (dbg_str_to_memory(args, &meminfo->memories) < 0) {
-		FreeMemoryInfo(meminfo);
-		return -1;			
-	}
-	*info = meminfo;	
+	
+	*info = meminfo;
+	
 	return 0;
 }
 
+/*
+ * Convert an array of strings (as a result of deserializing a proxy message)
+ * into a debug event. This is used on the client end, so the event will include
+ * a bitset.
+ */
 int
-DbgStrToEvent(char *str, dbg_event **ev)
+DbgDeserializeEvent(int id, int nargs, char **args, dbg_event **ev)
 {
-	int			event;
-	char **		args;
-	char **		ap;
 	dbg_event *	e = NULL;
-	bitset *		procs = NULL;
+	bitset *	procs = NULL;
 	
-	if (str == NULL || (args = ap = Str2Args(str)) == NULL)
-		return -1;
-		
-	event = (int)strtol(*ap++, NULL, 10);
-	procs = str_to_bitset(*ap++);
+	proxy_get_bitset(*args++, &procs);
+	nargs--;
 
-	switch (event)
+	e = NewDbgEvent(id);
+		
+	switch (id)
 	{
 	case DBGEV_OK:
-		e = NewDbgEvent(DBGEV_OK);
 		break;
 		
 	case DBGEV_ERROR:
-		e = NewDbgEvent(DBGEV_ERROR);
-		if (proxy_str_to_int(*ap++, &e->dbg_event_u.error_event.error_code) < 0 ||
-			proxy_str_to_cstring(*ap++, &e->dbg_event_u.error_event.error_msg) < 0)
-			goto error_out;
+		dbg_str_to_int(&args, &nargs, &e->dbg_event_u.error_event.error_code);
+		dbg_copy_str(&args, &nargs, &e->dbg_event_u.error_event.error_msg);
 		break;
 		
 	case DBGEV_INIT:
-		e = NewDbgEvent(DBGEV_INIT);
-		if (proxy_str_to_int(*ap++, &e->dbg_event_u.num_servers) < 0)
-			goto error_out;
+		dbg_str_to_int(&args, &nargs, &e->dbg_event_u.num_servers);
 		break;
 		
 	case DBGEV_SUSPEND:
-		e = NewDbgEvent(DBGEV_SUSPEND);
-		if (proxy_str_to_int(*ap++, &e->dbg_event_u.suspend_event.reason) < 0)
-			goto error_out;
+		dbg_str_to_int(&args, &nargs, &e->dbg_event_u.suspend_event.reason);
 			
 		switch (e->dbg_event_u.suspend_event.reason) {
 		case DBGEV_SUSPEND_BPHIT:
-			if (proxy_str_to_int(*ap++, &e->dbg_event_u.suspend_event.ev_u.bpid) < 0 ||
-				proxy_str_to_int(*ap++, &e->dbg_event_u.suspend_event.thread_id) < 0 ||
-				dbg_str_to_cstring_list(&ap, &e->dbg_event_u.suspend_event.changed_vars) < 0)
-				goto error_out;
+			dbg_str_to_int(&args, &nargs, &e->dbg_event_u.suspend_event.ev_u.bpid);
+			dbg_str_to_int(&args, &nargs, &e->dbg_event_u.suspend_event.thread_id);
+			dbg_str_to_list(&args, &nargs, &e->dbg_event_u.suspend_event.changed_vars);
 			break;
 
 		case DBGEV_SUSPEND_SIGNAL:
-			if (dbg_str_to_signalinfo(&ap, &e->dbg_event_u.suspend_event.ev_u.sig) < 0 ||
-				dbg_str_to_stackframe(&ap, &e->dbg_event_u.suspend_event.frame) < 0 ||
-				proxy_str_to_int(*ap++, &e->dbg_event_u.suspend_event.thread_id) < 0 ||
-				dbg_str_to_cstring_list(&ap, &e->dbg_event_u.suspend_event.changed_vars) < 0)
-				goto error_out;
+			dbg_str_to_signalinfo(&args, &nargs, &e->dbg_event_u.suspend_event.ev_u.sig);
+			dbg_str_to_stackframe(&args, &nargs, &e->dbg_event_u.suspend_event.frame);
+			dbg_str_to_int(&args, &nargs, &e->dbg_event_u.suspend_event.thread_id);
+			dbg_str_to_list(&args, &nargs, &e->dbg_event_u.suspend_event.changed_vars);
 			break;
 
 		case DBGEV_SUSPEND_STEP:
 		case DBGEV_SUSPEND_INT:
-			if (dbg_str_to_stackframe(&ap, &e->dbg_event_u.suspend_event.frame) < 0 ||
-				proxy_str_to_int(*ap++, &e->dbg_event_u.suspend_event.thread_id) < 0 ||
-				dbg_str_to_cstring_list(&ap, &e->dbg_event_u.suspend_event.changed_vars) < 0)
-				goto error_out;
+			dbg_str_to_stackframe(&args, &nargs, &e->dbg_event_u.suspend_event.frame);
+			dbg_str_to_int(&args, &nargs, &e->dbg_event_u.suspend_event.thread_id);
+			dbg_str_to_list(&args, &nargs, &e->dbg_event_u.suspend_event.changed_vars);
 			break;
 		
 		default:
@@ -711,32 +674,24 @@ DbgStrToEvent(char *str, dbg_event **ev)
 		break;
 	
 	case DBGEV_BPSET:
-		e = NewDbgEvent(DBGEV_BPSET);
-		if (proxy_str_to_int(*ap++, &e->dbg_event_u.bpset_event.bpid) < 0 ||
-			dbg_str_to_breakpoint(&ap, &e->dbg_event_u.bpset_event.bp)	< 0)
-			goto error_out;
+		dbg_str_to_int(&args, &nargs, &e->dbg_event_u.bpset_event.bpid);
+		dbg_str_to_breakpoint(&args, &nargs, &e->dbg_event_u.bpset_event.bp);
 		break;
 
 	case DBGEV_SIGNALS:
-		e = NewDbgEvent(DBGEV_SIGNALS);
-		if (dbg_str_to_signals(&ap, &e->dbg_event_u.list) < 0)
-			goto error_out;
+		dbg_str_to_signals(&args, &nargs, &e->dbg_event_u.list);
 		break;
 	
 	case DBGEV_EXIT:
-		e = NewDbgEvent(DBGEV_EXIT);
-		if (proxy_str_to_int(*ap++, &e->dbg_event_u.exit_event.reason) < 0)
-			goto error_out;
+		dbg_str_to_int(&args, &nargs, &e->dbg_event_u.exit_event.reason);
 			
 		switch (e->dbg_event_u.exit_event.reason) {
 		case DBGEV_EXIT_NORMAL:
-			if (proxy_str_to_int(*ap++, &e->dbg_event_u.exit_event.ev_u.exit_status) < 0)
-				goto error_out;
+			dbg_str_to_int(&args, &nargs, &e->dbg_event_u.exit_event.ev_u.exit_status);
 			break;
 
 		case DBGEV_EXIT_SIGNAL:
-			if (dbg_str_to_signalinfo(&ap, &e->dbg_event_u.exit_event.ev_u.sig) < 0)
-				goto error_out;
+			dbg_str_to_signalinfo(&args, &nargs, &e->dbg_event_u.exit_event.ev_u.sig);
 			break;
 			
 		default:
@@ -746,81 +701,57 @@ DbgStrToEvent(char *str, dbg_event **ev)
 		break;
 
 	case DBGEV_FRAMES:
-		e = NewDbgEvent(DBGEV_FRAMES);
-		if (dbg_str_to_stackframes(&ap, &e->dbg_event_u.list) < 0)
-			goto error_out;
+		dbg_str_to_stackframes(&args, &nargs, &e->dbg_event_u.list);
 		break;
 
 	case DBGEV_THREAD_SELECT:
-		e = NewDbgEvent(DBGEV_THREAD_SELECT);
-		if (proxy_str_to_int(*ap++, &e->dbg_event_u.thread_select_event.thread_id) < 0 || 
-			dbg_str_to_stackframe(&ap, &e->dbg_event_u.thread_select_event.frame) < 0)
-			goto error_out;
+		dbg_str_to_int(&args, &nargs, &e->dbg_event_u.thread_select_event.thread_id);
+		dbg_str_to_stackframe(&args, &nargs, &e->dbg_event_u.thread_select_event.frame);
 		break;
 	
 	case DBGEV_THREADS:
-		e = NewDbgEvent(DBGEV_THREADS);
-		if (proxy_str_to_int(*ap++, &e->dbg_event_u.threads_event.thread_id) < 0 || 
-			dbg_str_to_cstring_list(&ap, &e->dbg_event_u.threads_event.list) < 0)
-			goto error_out;
+		dbg_str_to_int(&args, &nargs, &e->dbg_event_u.threads_event.thread_id);
+		dbg_str_to_list(&args, &nargs, &e->dbg_event_u.threads_event.list);
 		break;
 
 	case DBGEV_STACK_DEPTH:
-		e = NewDbgEvent(DBGEV_STACK_DEPTH);
-		if (proxy_str_to_int(*ap++, &e->dbg_event_u.stack_depth) < 0)
-			goto error_out;
+		dbg_str_to_int(&args, &nargs, &e->dbg_event_u.stack_depth);
 		break;
 
 	case DBGEV_DATAR_MEM:
-		e = NewDbgEvent(DBGEV_DATAR_MEM);
-		if (dbg_str_to_memoryinfo(&ap, &e->dbg_event_u.meminfo) < 0)
-			goto error_out;
+		dbg_str_to_memoryinfo(&args, &nargs, &e->dbg_event_u.meminfo);
 		break;
 	
 	case DBGEV_VARS:
-		e = NewDbgEvent(DBGEV_VARS);
-		if (dbg_str_to_cstring_list(&ap, &e->dbg_event_u.list) < 0)
-			goto error_out;
+		dbg_str_to_list(&args, &nargs, &e->dbg_event_u.list);
 		break;
 
 	case DBGEV_ARGS:
-		e = NewDbgEvent(DBGEV_ARGS);
-		if (dbg_str_to_cstring_list(&ap, &e->dbg_event_u.list) < 0)
-			goto error_out;
+		dbg_str_to_list(&args,&nargs,  &e->dbg_event_u.list);
 		break;
 
 	case DBGEV_TYPE:
-		e = NewDbgEvent(DBGEV_TYPE);
-		if (proxy_str_to_cstring(*ap++, &e->dbg_event_u.type_desc) < 0)
-			goto error_out;
+		dbg_copy_str(&args, &nargs, &e->dbg_event_u.type_desc);
 		break;
 
 	case DBGEV_DATA:
-		e = NewDbgEvent(DBGEV_DATA);
-		if (dbg_str_to_aif(&ap, &e->dbg_event_u.data_event.data) < 0 ||
-			proxy_str_to_cstring(*ap++, &e->dbg_event_u.data_event.type_desc) < 0)
-			goto error_out;
+		dbg_str_to_aif(&args, &nargs, &e->dbg_event_u.data_event.data);
+		dbg_copy_str(&args, &nargs, &e->dbg_event_u.data_event.type_desc);
 		break;
 
 	case DBGEV_DATA_EVA_EX:
-		e = NewDbgEvent(DBGEV_DATA_EVA_EX);
-		if (proxy_str_to_cstring(*ap++, &e->dbg_event_u.data_expression) < 0)
-			goto error_out;
+		dbg_copy_str(&args, &nargs, &e->dbg_event_u.data_expression);
 		break;
 
 	case DBGEV_PARTIAL_AIF:
-		e = NewDbgEvent(DBGEV_PARTIAL_AIF);
-		if (dbg_str_to_aif(&ap, &e->dbg_event_u.partial_aif_event.data) < 0 ||
-			proxy_str_to_cstring(*ap++, &e->dbg_event_u.partial_aif_event.type_desc) < 0 ||
-			proxy_str_to_cstring(*ap++, &e->dbg_event_u.partial_aif_event.name) < 0)
-			goto error_out;
+		dbg_str_to_aif(&args, &nargs, &e->dbg_event_u.partial_aif_event.data);
+		dbg_copy_str(&args, &nargs, &e->dbg_event_u.partial_aif_event.type_desc);
+		dbg_copy_str(&args, &nargs, &e->dbg_event_u.partial_aif_event.name);
 		break;
 
 	default:
 		goto error_out;
 	}
-	
-	FreeArgs(args);
 	
 	e->procs = procs;
 	*ev = e;
@@ -828,8 +759,7 @@ DbgStrToEvent(char *str, dbg_event **ev)
 	return 0;
 	
 error_out:
-	FreeArgs(args);
-	
+
 	if (procs != NULL)
 		bitset_free(procs);
 	
@@ -845,14 +775,14 @@ NewDbgEvent(int event) {
 	
 	memset((void *)e, 0, sizeof(dbg_event));
 	 
-	e->event = event;
+	e->event_id = event;
 	
 	return e;
 }
 
 void	
 FreeDbgEvent(dbg_event *e) {
-	switch (e->event) {
+	switch (e->event_id) {
 	case DBGEV_OK:
 	case DBGEV_INIT:
 		break;

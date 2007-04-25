@@ -19,10 +19,10 @@
 
 package org.eclipse.ptp.core.proxy.event;
 
-public class ProxyTimeoutEvent extends AbstractProxyEvent implements IProxyEvent {
+public class ProxyTimeoutEvent extends AbstractProxyEvent implements IProxyTimeoutEvent {
 	
 	public ProxyTimeoutEvent() {
-		super(EVENT_TIMEOUT);
+		super(EVENT_TIMEOUT, 0);
 	}
 
 	public String toString() {

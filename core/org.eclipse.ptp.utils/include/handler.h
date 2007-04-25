@@ -20,11 +20,13 @@
 #ifndef _HANDLER_H_
 #define _HANDLER_H_
 
+#include <sys/select.h>
+
 #define HANDLER_FILE		1
-#define HANDLER_SIGNAL	2
+#define HANDLER_SIGNAL		2
 #define HANDLER_EVENT		3
 
-#define READ_FILE_HANDLER		1
+#define READ_FILE_HANDLER	1
 #define WRITE_FILE_HANDLER	2
 #define EXCEPT_FILE_HANDLER	4
 
@@ -35,30 +37,33 @@ struct handler {
 	/*
 	 * HANDLER_FILE
 	 */
-	int		file_type;
-	int		fd;
-	int		(*file_handler)(int, void *);
+	int		file_type; 							/* type of this file handler */
+	int		fd;									/* file descriptor */
+	int		error;								/* last operation result */
+	int		(*file_handler)(int, void *);		/* handler callback function */
 	
 	/*
 	 * HANDLER_SIGNAL
 	 */
-	int		signal;
+	int		signal;								/* signal to handle */
 
 	/*
 	 * HANDLER_EVENT
 	 */
-	int		event_type;
-	void 	(*event_handler)(void *, void *);
+	int		event_type;							/* type of this event handler */
+	void 	(*event_handler)(void *, void *);	/* handler callback function */
 };
 typedef struct handler	handler;
 
 handler *	NewHandler(int, void *);
-void			DestroyHandler(handler *);
-void			SetHandler(void);
+void		DestroyHandler(handler *);
+void		SetHandler(void);
 handler *	GetHandler(void);
-void			RegisterEventHandler(int, void (*)(void *, void *), void *);
-void			UnregisterEventHandler(int, void (*)(void *, void *));
-void			RegisterFileHandler(int fd, int type, int (*)(int, void *), void *);
-void			UnregisterFileHandler(int);
-void			CallEventHandlers(int, void *);
+void		RegisterEventHandler(int, void (*)(void *, void *), void *);
+void		UnregisterEventHandler(int, void (*)(void *, void *));
+void		RegisterFileHandler(int fd, int type, int (*)(int, void *), void *);
+void		UnregisterFileHandler(int);
+void		CallEventHandlers(int, void *);
+int			CallFileHandlers(fd_set *rfds, fd_set *wfds, fd_set *efds);
+void		GenerateFDSets(int *, fd_set *, fd_set *, fd_set *);
 #endif /* !_HANDLER_H_ */

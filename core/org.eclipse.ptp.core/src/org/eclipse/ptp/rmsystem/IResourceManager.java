@@ -22,53 +22,28 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunch;
-import org.eclipse.ptp.core.IModelModifier;
-import org.eclipse.ptp.core.IPJob;
-import org.eclipse.ptp.core.IPMachine;
-import org.eclipse.ptp.core.IPQueue;
 import org.eclipse.ptp.core.attributes.IAttribute;
-import org.eclipse.ptp.core.elementcontrols.IPElementControl;
-import org.eclipse.ptp.core.elementcontrols.IPJobControl;
-import org.eclipse.ptp.core.elementcontrols.IPMachineControl;
-import org.eclipse.ptp.core.elementcontrols.IPQueueControl;
+import org.eclipse.ptp.core.attributes.IAttributeDefinition;
+import org.eclipse.ptp.core.elements.IPElement;
+import org.eclipse.ptp.core.elements.IPJob;
+import org.eclipse.ptp.core.elements.IPMachine;
+import org.eclipse.ptp.core.elements.IPProcess;
+import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.rtsystem.JobRunConfiguration;
 
-public interface IResourceManager extends IPElementControl,
-IAdaptable, IResourceManagerMenuContribution, IModelModifier {
-	
-	/**
-	 * @param name
-	 * @return whether the job was found and aborted
-	 * @throws CoreException
-	 */
-	public boolean abortJob(String name) throws CoreException;
-	
+public interface IResourceManager extends IPElement,
+IAdaptable, IResourceManagerMenuContribution {
+
 	/**
 	 * @param listener
 	 */
 	public void addResourceManagerListener(IResourceManagerListener listener);
 	
 	/**
-	 * 
-	 */
-	public void dispose();
-	
-	/**
 	 * @param job_id
 	 * @return
 	 */
-	public IPJobControl findJobById(String job_id);
-
-	/**
-	 * @param id
-	 * @return
-	 */
-	public IPQueue findQueueById(String id);
-
-	/**
-	 * @return
-	 */
-	public IResourceManagerConfiguration getConfiguration();
+	public IPJob findJobById(String job_id);
 	
 	/**
 	 * @return
@@ -76,24 +51,29 @@ IAdaptable, IResourceManagerMenuContribution, IModelModifier {
 	public String getDescription();
 
 	/**
-	 * @param machineName
 	 * @param queueName
 	 * @param currentAttrs 
 	 * @return
 	 */
-	public IAttribute[] getLaunchAttributes(String machineName, String queueName,
-			IAttribute[] currentAttrs);
+	public IAttribute[] getLaunchAttributes(String queueName, IAttribute[] currentAttrs);
 
+	/**
+	 * 
+	 * @param attrId
+	 * @return
+	 */
+	public IAttributeDefinition getAttributeDefinition(String attrId);
+	
 	/**
 	 * @param ID
 	 * @return
 	 */
-	public IPMachine getMachine(String ID);
+	public IPMachine getMachine(int ID);
 
 	/**
 	 * @return
 	 */
-	public IPMachineControl[] getMachineControls();
+	public IPJob[] getJobs();
 
 	/**
 	 * @return
@@ -103,39 +83,33 @@ IAdaptable, IResourceManagerMenuContribution, IModelModifier {
 	/**
 	 * @return
 	 */
+	public IPProcess[] getProcesses();
+
+	/**
+	 * @return
+	 */
 	public String getName();
-
-	/**
-	 * @param id
-	 * @return
-	 */
-	public IPQueue getQueue(String id);
-
-	/**
-	 * @return
-	 */
-	public IPQueueControl[] getQueueControls();
 
 	/**
 	 * @return
 	 */
 	public IPQueue[] getQueues();
-	
+
 	/**
 	 * @return
 	 */
-	public ResourceManagerStatus getStatus();
-	
+	public ResourceManagerState.State getState();
+
 	/**
 	 * @param job
 	 */
 	public void removeJob(IPJob job);
-
+	
 	/**
 	 * @param listener
 	 */
 	public void removeResourceManagerListener(IResourceManagerListener listener);
-
+	
 	/**
 	 * @param launch
 	 * @param jobRunConfig
@@ -143,27 +117,23 @@ IAdaptable, IResourceManagerMenuContribution, IModelModifier {
 	 * @return
 	 * @throws CoreException
 	 */
-	public IPJob run(ILaunch launch, JobRunConfiguration jobRunConfig,
+	public IPJob submitJob(ILaunch launch, JobRunConfiguration jobRunConfig,
 			IProgressMonitor pm) throws CoreException;
-
-	/**
-	 * @param monitor TODO
-	 * 
-	 */
-	public void startUp(IProgressMonitor monitor) throws CoreException;
 
 	/**
 	 * 
 	 */
 	public void shutdown() throws CoreException;
-	
+
 	/**
-	 * @throws CoreException
+	 * @param monitor
+	 * 
 	 */
-	public void enableEvents() throws CoreException;
-	
+	public void startUp(IProgressMonitor monitor) throws CoreException;
+
 	/**
-	 * @throws CoreException
+	 * @param job
 	 */
-	public void disableEvents() throws CoreException;
+	public void terminateJob(IPJob job) throws CoreException;
+
 }

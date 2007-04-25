@@ -19,36 +19,25 @@
 
 package org.eclipse.ptp.rtsystem.proxy.event;
 
-import org.eclipse.ptp.core.util.BitList;
+public class ProxyRuntimeErrorEvent extends AbstractProxyRuntimeEvent implements IProxyRuntimeErrorEvent {
+	private String description;
+	private ErrorType type;
 
-public class ProxyRuntimeErrorEvent extends AbstractProxyRuntimeEvent implements IProxyRuntimeEvent {
-	private int		errorCode;
-	private String	errorMsg;
-	
-	public ProxyRuntimeErrorEvent(int code, String msg) {
-		super(EVENT_RUNTIME_ERROR);
-		this.errorCode = code;
-		this.errorMsg = msg;
+	public ProxyRuntimeErrorEvent(int transID, ErrorType type, String description) {
+		super(PROXY_RUNTIME_ERROR_EVENT, transID);
+		this.type = type;
+		this.description = description;
 	}
 	
-	public ProxyRuntimeErrorEvent(BitList set, int code, String msg) {
-		super(EVENT_RUNTIME_ERROR, set);
-		this.errorCode = code;
-		this.errorMsg = msg;
-	}
-
-	public int getErrorCode() {
-		return this.errorCode;
+	public ErrorType getType() {
+		return type;
 	}
 	
-	public String getErrorMessage() {
-		return this.errorMsg;
+	public String getDescription() {
+		return description;
 	}
-
+	
 	public String toString() {
-		String str = "EVENT_RUNTIME_ERROR";
-		if (this.getBitSet() != null)
-			str += " " + this.getBitSet().toString();
-		return str + " " + this.errorCode + " " + this.errorMsg;
+		return "EVENT_RUNTIME_ERROR transid=" + getTransactionID() + " type=" + getType() + " desc=\"" + getDescription() + "\"";
 	}
 }

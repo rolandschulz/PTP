@@ -33,7 +33,7 @@ proxy proxies[] = {
 };
 
 int 
-proxy_clnt_init(char *name, proxy_handler_funcs *pf, proxy_clnt_helper_funcs *cf, proxy_clnt **clnt, char *attr, va_list ap)
+proxy_clnt_init(char *name, struct timeval *timeout, proxy_clnt_helper_funcs *cf, proxy_clnt **clnt, char *attr, va_list ap)
 {
 	proxy *		p;
 	proxy_clnt *	pc;
@@ -42,11 +42,10 @@ proxy_clnt_init(char *name, proxy_handler_funcs *pf, proxy_clnt_helper_funcs *cf
 	if (find_proxy(name, &p) < 0)
 		return PROXY_RES_ERR;
 		
-	p->handler_funcs = pf;
-
 	pc = (proxy_clnt *)malloc(sizeof(proxy_clnt));
 	pc->proxy = p;
 	pc->clnt_helper_funcs = cf;
+	pc->clnt_timeout = timeout;
 	
 	if (p->clnt_funcs->init(pc, &data, attr, ap) < 0) {
 		free(pc);
@@ -54,6 +53,7 @@ proxy_clnt_init(char *name, proxy_handler_funcs *pf, proxy_clnt_helper_funcs *cf
 	}
 
 	pc->clnt_data = data;
+	pc->clnt_events = NewList();
 	
 	*clnt = pc;
 	
@@ -87,24 +87,9 @@ proxy_clnt_progress(proxy_clnt *pc)
 	return PROXY_RES_ERR;
 }
 
-int
-proxy_clnt_sendcmd(proxy_clnt *pc, char *cmd, char *fmt, ...)
+void
+proxy_clnt_queue_msg(proxy_clnt *pc, proxy_msg *m)
 {
-	int		res = PROXY_RES_ERR;
-	va_list	ap;
-	
-	if (pc != NULL) {
-		va_start(ap, fmt);
-		res = pc->proxy->clnt_funcs->sendcmd(pc, cmd, fmt, ap);
-		va_end(ap);
-	}
-	
-	return res;
+	proxy_queue_msg(pc->clnt_events, m);
 }
 
-void
-proxy_clnt_event_callback(proxy_clnt *pc, char *data)
-{
-	if (pc != NULL)
-		proxy_event_callback(pc->proxy, data);
-}

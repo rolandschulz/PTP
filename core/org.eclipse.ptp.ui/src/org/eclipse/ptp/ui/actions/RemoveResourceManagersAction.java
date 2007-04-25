@@ -28,6 +28,7 @@ import org.eclipse.swt.widgets.Shell;
 public class RemoveResourceManagersAction extends Action {
 	
 	private IResourceManager[] selectedRMManagers;
+	@SuppressWarnings("unused")
 	private final Shell shell;
 
 	public RemoveResourceManagersAction(Shell shell) {
@@ -44,7 +45,7 @@ public class RemoveResourceManagersAction extends Action {
 	}
 
 	public void setResourceManager(IResourceManager[] rmManagers) {
-		this.selectedRMManagers = (IResourceManager[]) rmManagers.clone();
+		this.selectedRMManagers = rmManagers.clone();
 	}
 
 }

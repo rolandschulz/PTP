@@ -19,13 +19,9 @@
 package org.eclipse.ptp.core;
 
 public class IDGenerator {
-	private int current_ID = -1;
+	private static int current_ID = 1;
 	
-	public IDGenerator() {
-		current_ID = 1;
-	}
-	
-	public int getNewID() {
+	public static int getNewID() {
 		return current_ID++;
 	}
 }

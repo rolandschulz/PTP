@@ -22,12 +22,12 @@ package org.eclipse.ptp.debug.external.core.proxy.event;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.external.core.proxy.ProxyDebugStackframe;
 
-public class ProxyDebugSetThreadSelectEvent extends AbstractProxyDebugEvent implements IProxyDebugEvent {
+public class ProxyDebugSetThreadSelectEvent extends AbstractProxyDebugEvent implements IProxyDebugSetThreadSelectEvent {
 	private int thread_id = -1;
 	private ProxyDebugStackframe frame;
 	
-	public ProxyDebugSetThreadSelectEvent(BitList set, int thread_id, ProxyDebugStackframe frame) {
-		super(EVENT_DBG_THREAD_SELECT, set);
+	public ProxyDebugSetThreadSelectEvent(int transID, BitList set, int thread_id, ProxyDebugStackframe frame) {
+		super(transID, EVENT_DBG_THREAD_SELECT, set);
 		this.thread_id = thread_id;
 		this.frame = frame;
 	}
@@ -40,7 +40,7 @@ public class ProxyDebugSetThreadSelectEvent extends AbstractProxyDebugEvent impl
 	}
 	
 	public String toString() {
-		String res = "EVENT_DBG_THREAD_SELECT " + this.getBitSet().toString();
+		String res = "EVENT_DBG_THREAD_SELECT transid=" + getTransactionID() + " " + this.getBitSet().toString();
 		res += "\n id: " + frame.toString();
 		return res;
 	}

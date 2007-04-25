@@ -32,7 +32,7 @@
 #include "dbg_proxy.h"
 #include "dbg_client.h"
 #include "client_srv.h"
-#include "proxy_event.h"
+#include "proxy_msg.h"
 #include "bitset.h"
 #include "handler.h"
 #include "list.h"
@@ -58,20 +58,18 @@ static proxy_svr *		dbg_proxy;
 static void
 dbg_clnt_cmd_completed(bitset *mask, char *msg, void *data)
 {
-	dbg_event *		e;
-	char *			str;
+	proxy_msg *	m;
 
- 	if (DbgStrToEvent(msg, &e) < 0)
- 		fprintf(stderr, "bad conversion to dbg_event");
+ 	if (proxy_deserialize_msg(msg, strlen(msg), &m) < 0)
+ 		fprintf(stderr, "bad conversion to proxy event");
  	else {
- 		e->procs = bitset_dup(mask);
-		if (DbgEventToStr(e, &str) < 0) {
-			fprintf(stderr, "could not convert dbg_event");
-		} else {
-			proxy_svr_event_callback(dbg_proxy, str);
-			free(str);
-		}
-		FreeDbgEvent(e);
+ 		/*
+ 		 * Insert actual bitset as first arg. The debug events sent internally
+ 		 * don't include the bitset, it is only added prior to sending back
+ 		 * to the client.
+ 		 */
+ 		proxy_msg_insert_bitset(m, mask, 0);
+ 		proxy_svr_queue_msg(dbg_proxy, m);
  	}
 	
 	/*
@@ -85,8 +83,10 @@ dbg_clnt_cmd_completed(bitset *mask, char *msg, void *data)
 }
 
 int
-DbgClntInit(int num_svrs, int my_id, char *name, proxy_handler_funcs *handlers, proxy_svr_helper_funcs *funcs, proxy_svr_commands *cmds)
+DbgClntInit(int num_svrs, int my_id, char *name, proxy_svr_helper_funcs *funcs, proxy_commands *cmds)
 {
+	struct timeval	tv = { 0, CLIENT_TIMEOUT };	
+	
 	/*
 	 * Initialize client/server interface
 	 */
@@ -111,7 +111,7 @@ DbgClntInit(int num_svrs, int my_id, char *name, proxy_handler_funcs *handlers, 
 	/*
 	 * Initialize proxy
 	 */
-	if (proxy_svr_init(name, handlers, funcs, cmds, &dbg_proxy) != PROXY_RES_OK) {
+	if (proxy_svr_init(name, &tv, funcs, cmds, &dbg_proxy) != PROXY_RES_OK) {
 		DbgSetError(DBGERR_DEBUGGER, proxy_get_error_str());
 		return DBGRES_ERR;
 	}
@@ -150,23 +150,20 @@ DbgClntIsShutdown(void)
 }
 
 int 
-DbgClntStartSession(char **args)
+DbgClntStartSession(int tid, int nargs, char **args)
 {
-	int		res;
-	char *	cmd;
-	char *	buf;
-	char **	ap;
+	int			res;
+	char *		buf;
+	proxy_msg *	msg = new_proxy_msg(DBG_STARTSESSION_CMD, tid);
 	
-	asprintf(&cmd, "%s %d %s \"%s\"", DBG_STARTSESSION_CMD, SERVER_TIMEOUT, args[1], args[2]);
+	proxy_msg_add_args_nocopy(msg, nargs, args);
+	proxy_serialize_msg(msg, &buf);
 	
-	for (ap = &args[3]; *ap != NULL; ap++) {
-		asprintf(&buf, "%s \"%s\"", cmd, *ap);
-		free(cmd);
-		cmd = buf;
-	}
+	res = ClntSvrSendCommand(dbg_procs, DBG_EV_WAITALL, buf, NULL);
 	
-	res = ClntSvrSendCommand(dbg_procs, DBG_EV_WAITALL, cmd, NULL);
-	free(cmd);
+	free_proxy_msg(msg);
+	free(buf);
+	
 	return res;
 }
 
@@ -174,78 +171,66 @@ DbgClntStartSession(char **args)
  * Breakpoint operations
  */
 int 
-DbgClntSetLineBreakpoint(char **args)
+DbgClntSetLineBreakpoint(int tid, int nargs, char **args)
 {
 	int			res;
-	char *		cmd;
-	bitset *		set; 
-
+	bitset *	set; 
+	char *		buf;
+	proxy_msg *	msg;
+	
 	set = str_to_bitset(args[1]);
 	if (set == NULL) {
 		DbgSetError(DBGERR_PROCSET, NULL);
 		return DBGRES_ERR;
 	}
 
-	asprintf(&cmd, "%s %s %s %s \"%s\" %s \"%s\" %s %s", DBG_SETLINEBREAKPOINT_CMD, args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9]);
-	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, cmd, NULL);
+	msg = new_proxy_msg(DBG_SETLINEBREAKPOINT_CMD, tid);
+	proxy_msg_add_args_nocopy(msg, nargs, args);
+	proxy_serialize_msg(msg, &buf);
+
+	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, buf, NULL);
 	
-	free(cmd);
 	bitset_free(set);
-	
-	return res;
-}
-
-int 
-DbgClntSetFuncBreakpoint(char **args)
-{
-	int			res;
-	char *		cmd;
-	bitset *		set; 
-
-
-	set = str_to_bitset(args[1]);
-	if (set == NULL) {
-		DbgSetError(DBGERR_PROCSET, NULL);
-		return DBGRES_ERR;
-	}
-
-	asprintf(&cmd, "%s %s %s %s \"%s\" \"%s\" \"%s\" %s %s", DBG_SETFUNCBREAKPOINT_CMD, args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9]);
-	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, cmd, NULL);
-	
-	free(cmd);
-	bitset_free(set);
+	free_proxy_msg(msg);
+	free(buf);
 		
 	return res;
 }
 
 int 
-DbgClntDeleteBreakpoint(char **args)
+DbgClntSetFuncBreakpoint(int tid, int nargs, char **args)
 {
 	int			res;
-	char *		cmd;
-	bitset *		set; 
+	char *		buf;
+	proxy_msg *	msg;
+	bitset *	set; 
 
 	set = str_to_bitset(args[1]);
 	if (set == NULL) {
 		DbgSetError(DBGERR_PROCSET, NULL);
 		return DBGRES_ERR;
 	}
+
+	msg = new_proxy_msg(DBG_SETFUNCBREAKPOINT_CMD, tid);
+	proxy_msg_add_args_nocopy(msg, nargs, args);
+	proxy_serialize_msg(msg, &buf);
+
+	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, buf, NULL);
 	
-	asprintf(&cmd, "%s %s", DBG_DELETEBREAKPOINT_CMD, args[2]);
-	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, cmd, NULL);
-	
-	free(cmd);
 	bitset_free(set);
+	free_proxy_msg(msg);
+	free(buf);
 		
 	return res;
 }
 
 int 
-DbgClntEnableBreakpoint(char **args)
+DbgClntDeleteBreakpoint(int tid, int nargs, char **args)
 {
 	int			res;
-	char *		cmd;
-	bitset *		set; 
+	char *		buf;
+	proxy_msg *	msg;
+	bitset *	set; 
 
 	set = str_to_bitset(args[1]);
 	if (set == NULL) {
@@ -253,21 +238,26 @@ DbgClntEnableBreakpoint(char **args)
 		return DBGRES_ERR;
 	}
 	
-	asprintf(&cmd, "%s %s", DBG_ENABLEBREAKPOINT_CMD, args[2]);
-	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, cmd, NULL);
+	msg = new_proxy_msg(DBG_DELETEBREAKPOINT_CMD, tid);
+	proxy_msg_add_args_nocopy(msg, nargs, args);
+	proxy_serialize_msg(msg, &buf);
+
+	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, buf, NULL);
 	
-	free(cmd);
 	bitset_free(set);
+	free_proxy_msg(msg);
+	free(buf);
 		
 	return res;
 }
 
 int 
-DbgClntDisableBreakpoint(char **args)
+DbgClntEnableBreakpoint(int tid, int nargs, char **args)
 {
 	int			res;
-	char *		cmd;
-	bitset *		set; 
+	char *		buf;
+	proxy_msg *	msg;
+	bitset *	set; 
 
 	set = str_to_bitset(args[1]);
 	if (set == NULL) {
@@ -275,21 +265,26 @@ DbgClntDisableBreakpoint(char **args)
 		return DBGRES_ERR;
 	}
 	
-	asprintf(&cmd, "%s %s", DBG_DISABLEBREAKPOINT_CMD, args[2]);
-	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, cmd, NULL);
+	msg = new_proxy_msg(DBG_ENABLEBREAKPOINT_CMD, tid);
+	proxy_msg_add_args_nocopy(msg, nargs, args);
+	proxy_serialize_msg(msg, &buf);
+
+	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, buf, NULL);
 	
-	free(cmd);
 	bitset_free(set);
+	free_proxy_msg(msg);
+	free(buf);
 		
 	return res;
 }
 
 int 
-DbgClntConditionBreakpoint(char **args)
+DbgClntDisableBreakpoint(int tid, int nargs, char **args)
 {
 	int			res;
-	char *		cmd;
-	bitset *		set; 
+	char *		buf;
+	proxy_msg *	msg;
+	bitset *	set; 
 
 	set = str_to_bitset(args[1]);
 	if (set == NULL) {
@@ -297,21 +292,26 @@ DbgClntConditionBreakpoint(char **args)
 		return DBGRES_ERR;
 	}
 	
-	asprintf(&cmd, "%s %s \"%s\"", DBG_CONDITIONBREAKPOINT_CMD, args[2], args[3]);
-	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, cmd, NULL);
+	msg = new_proxy_msg(DBG_DISABLEBREAKPOINT_CMD, tid);
+	proxy_msg_add_args_nocopy(msg, nargs, args);
+	proxy_serialize_msg(msg, &buf);
+
+	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, buf, NULL);
 	
-	free(cmd);
 	bitset_free(set);
+	free_proxy_msg(msg);
+	free(buf);
 		
 	return res;
 }
 
 int 
-DbgClntBreakpointAfter(char **args)
+DbgClntConditionBreakpoint(int tid, int nargs, char **args)
 {
 	int			res;
-	char *		cmd;
-	bitset *		set; 
+	char *		buf;
+	proxy_msg *	msg;
+	bitset *	set; 
 
 	set = str_to_bitset(args[1]);
 	if (set == NULL) {
@@ -319,21 +319,53 @@ DbgClntBreakpointAfter(char **args)
 		return DBGRES_ERR;
 	}
 	
-	asprintf(&cmd, "%s %s %s", DBG_BREAKPOINTAFTER_CMD, args[2], args[3]);
-	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, cmd, NULL);
+	msg = new_proxy_msg(DBG_CONDITIONBREAKPOINT_CMD, tid);
+	proxy_msg_add_args_nocopy(msg, nargs, args);
+	proxy_serialize_msg(msg, &buf);
+
+	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, buf, NULL);
 	
-	free(cmd);
 	bitset_free(set);
+	free_proxy_msg(msg);
+	free(buf);
 		
 	return res;
 }
 
 int 
-DbgClntSetWatchpoint(char **args)
+DbgClntBreakpointAfter(int tid, int nargs, char **args)
 {
 	int			res;
-	char *		cmd;
-	bitset *		set; 
+	char *		buf;
+	proxy_msg *	msg;
+	bitset *	set; 
+	
+	set = str_to_bitset(args[1]);
+	if (set == NULL) {
+		DbgSetError(DBGERR_PROCSET, NULL);
+		return DBGRES_ERR;
+	}
+	
+	msg = new_proxy_msg(DBG_BREAKPOINTAFTER_CMD, tid);
+	proxy_msg_add_args_nocopy(msg, nargs, args);
+	proxy_serialize_msg(msg, &buf);
+
+	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, buf, NULL);
+	
+	bitset_free(set);
+	free_proxy_msg(msg);
+	free(buf);
+		
+	return res;
+}
+
+int 
+DbgClntSetWatchpoint(int tid, int nargs, char **args)
+{
+	int			res;
+	char *		buf;
+	proxy_msg *	msg;
+	bitset *	set; 
 
 	set = str_to_bitset(args[1]);
 	if (set == NULL) {
@@ -341,11 +373,15 @@ DbgClntSetWatchpoint(char **args)
 		return DBGRES_ERR;
 	}
 	
-	asprintf(&cmd, "%s %s \"%s\" %s %s \"%s\" %s", DBG_SETWATCHPOINT_CMD, args[2], args[3], args[4], args[5], args[6], args[7]);
-	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, cmd, NULL);
+	msg = new_proxy_msg(DBG_SETWATCHPOINT_CMD, tid);
+	proxy_msg_add_args_nocopy(msg, nargs, args);
+	proxy_serialize_msg(msg, &buf);
+
+	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, buf, NULL);
 	
-	free(cmd);
 	bitset_free(set);
+	free_proxy_msg(msg);
+	free(buf);
 		
 	return res;
 }
@@ -354,10 +390,12 @@ DbgClntSetWatchpoint(char **args)
  * Process control operations
  */
 int 
-DbgClntGo(char **args)
+DbgClntGo(int tid, int nargs, char **args)
 {
 	int			res;
-	bitset *		set; 
+	char *		buf;
+	proxy_msg *	msg;
+	bitset *	set; 
 
 	set = str_to_bitset(args[1]);
 	if (set == NULL) {
@@ -365,19 +403,26 @@ DbgClntGo(char **args)
 		return DBGRES_ERR;
 	}
 	
-	res = ClntSvrSendCommand(set, DBG_EV_WAITSOME, DBG_GO_CMD, NULL);
+	msg = new_proxy_msg(DBG_GO_CMD, tid);
+	proxy_msg_add_args_nocopy(msg, nargs, args);
+	proxy_serialize_msg(msg, &buf);
+
+	res = ClntSvrSendCommand(set, DBG_EV_WAITSOME, buf, NULL);
 	
 	bitset_free(set);
+	free_proxy_msg(msg);
+	free(buf);
 		
 	return res;
 }
 
 int 
-DbgClntStep(char **args)
+DbgClntStep(int tid, int nargs, char **args)
 {
 	int			res;
-	char *		cmd;
-	bitset *		set; 
+	char *		buf;
+	proxy_msg *	msg;
+	bitset *	set; 
 
 	set = str_to_bitset(args[1]);
 	if (set == NULL) {
@@ -385,20 +430,26 @@ DbgClntStep(char **args)
 		return DBGRES_ERR;
 	}
 	
-	asprintf(&cmd, "%s %s %s", DBG_STEP_CMD, args[2], args[3]);
-	res = ClntSvrSendCommand(set, DBG_EV_WAITSOME, cmd, NULL);
+	msg = new_proxy_msg(DBG_STEP_CMD, tid);
+	proxy_msg_add_args_nocopy(msg, nargs, args);
+	proxy_serialize_msg(msg, &buf);
+
+	res = ClntSvrSendCommand(set, DBG_EV_WAITSOME, buf, NULL);
 	
-	free(cmd);
 	bitset_free(set);
+	free_proxy_msg(msg);
+	free(buf);
 	
 	return res;
 }
 
 int 
-DbgClntTerminate(char **args)
+DbgClntTerminate(int tid, int nargs, char **args)
 {
 	int			res;
-	bitset *		set; 
+	char *		buf;
+	proxy_msg *	msg;
+	bitset *	set; 
 
 	set = str_to_bitset(args[1]);
 	if (set == NULL) {
@@ -406,18 +457,24 @@ DbgClntTerminate(char **args)
 		return DBGRES_ERR;
 	}
 	
-	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, DBG_TERMINATE_CMD, NULL);
+	msg = new_proxy_msg(DBG_TERMINATE_CMD, tid);
+	proxy_msg_add_args_nocopy(msg, nargs, args);
+	proxy_serialize_msg(msg, &buf);
+
+	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, buf, NULL);
 	
 	bitset_free(set);
+	free_proxy_msg(msg);
+	free(buf);
 	
 	return res;
 }
 
 int 
-DbgClntSuspend(char **args)
+DbgClntSuspend(int tid, int nargs, char **args)
 {
 	int			res;
-	bitset *		set; 
+	bitset *	set; 
 
 	set = str_to_bitset(args[1]);
 	if (set == NULL) {
@@ -436,11 +493,12 @@ DbgClntSuspend(char **args)
  * Stack frame operations
  */
 int 
-DbgClntListStackframes(char **args)
+DbgClntListStackframes(int tid, int nargs, char **args)
 {
 	int			res;
-	char *		cmd;
-	bitset *		set; 
+	char *		buf;
+	proxy_msg *	msg;
+	bitset *	set; 
 
 	set = str_to_bitset(args[1]);
 	if (set == NULL) {
@@ -448,21 +506,26 @@ DbgClntListStackframes(char **args)
 		return DBGRES_ERR;
 	}
 	
-	asprintf(&cmd, "%s %s %s", DBG_LISTSTACKFRAMES_CMD, args[2], args[3]);
-	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, cmd, NULL);
+	msg = new_proxy_msg(DBG_LISTSTACKFRAMES_CMD, tid);
+	proxy_msg_add_args_nocopy(msg, nargs, args);
+	proxy_serialize_msg(msg, &buf);
+
+	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, buf, NULL);
 	
-	free(cmd);
 	bitset_free(set);
+	free_proxy_msg(msg);
+	free(buf);
 	
 	return res;
 }
 
 int 
-DbgClntSetCurrentStackframe(char **args)
+DbgClntSetCurrentStackframe(int tid, int nargs, char **args)
 {
 	int			res;
-	char *		cmd;
-	bitset *		set; 
+	char *		buf;
+	proxy_msg *	msg;
+	bitset *	set; 
 
 	set = str_to_bitset(args[1]);
 	if (set == NULL) {
@@ -470,11 +533,15 @@ DbgClntSetCurrentStackframe(char **args)
 		return DBGRES_ERR;
 	}
 	
-	asprintf(&cmd, "%s %s", DBG_SETCURRENTSTACKFRAME_CMD, args[2]);
-	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, cmd, NULL);
+	msg = new_proxy_msg(DBG_SETCURRENTSTACKFRAME_CMD, tid);
+	proxy_msg_add_args_nocopy(msg, nargs, args);
+	proxy_serialize_msg(msg, &buf);
+
+	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, buf, NULL);
 	
-	free(cmd);
 	bitset_free(set);
+	free_proxy_msg(msg);
+	free(buf);
 	
 	return res;
 }
@@ -483,32 +550,11 @@ DbgClntSetCurrentStackframe(char **args)
  * Expression/variable operations
  */
 int 
-DbgClntEvaluateExpression(char **args)
+DbgClntEvaluateExpression(int tid, int nargs, char **args)
 {
 	int			res;
-	char *		cmd;
-	bitset *		set; 
-
-	set = str_to_bitset(args[1]);
-	if (set == NULL) {
-		DbgSetError(DBGERR_PROCSET, NULL);
-		return DBGRES_ERR;
-	}
-	
-	asprintf(&cmd, "%s \"%s\"", DBG_EVALUATEEXPRESSION_CMD, args[2]);
-	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, cmd, NULL);
-	
-	free(cmd);
-	bitset_free(set);
-	
-	return res;
-}
-
-int 
-DbgClntGetType(char **args)
-{
-	int		res;
-	char *	cmd;
+	char *		buf;
+	proxy_msg *	msg;
 	bitset *	set; 
 
 	set = str_to_bitset(args[1]);
@@ -517,20 +563,26 @@ DbgClntGetType(char **args)
 		return DBGRES_ERR;
 	}
 	
-	asprintf(&cmd, "%s \"%s\"", DBG_GETTYPE_CMD, args[2]);
-	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, cmd, NULL);
+	msg = new_proxy_msg(DBG_EVALUATEEXPRESSION_CMD, tid);
+	proxy_msg_add_args_nocopy(msg, nargs, args);
+	proxy_serialize_msg(msg, &buf);
+
+	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, buf, NULL);
 	
-	free(cmd);
 	bitset_free(set);
+	free_proxy_msg(msg);
+	free(buf);
 	
 	return res;
 }
 
 int 
-DbgClntListLocalVariables(char **args)
+DbgClntGetType(int tid, int nargs, char **args)
 {
 	int			res;
-	bitset *		set; 
+	char *		buf;
+	proxy_msg *	msg;
+	bitset *	set;
 
 	set = str_to_bitset(args[1]);
 	if (set == NULL) {
@@ -538,19 +590,26 @@ DbgClntListLocalVariables(char **args)
 		return DBGRES_ERR;
 	}
 	
-	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, DBG_LISTLOCALVARIABLES_CMD, NULL);
+	msg = new_proxy_msg(DBG_GETTYPE_CMD, tid);
+	proxy_msg_add_args_nocopy(msg, nargs, args);
+	proxy_serialize_msg(msg, &buf);
+
+	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, buf, NULL);
 	
 	bitset_free(set);
+	free_proxy_msg(msg);
+	free(buf);
 	
 	return res;
 }
 
 int 
-DbgClntListArguments(char **args)
+DbgClntListLocalVariables(int tid, int nargs, char **args)
 {
 	int			res;
-	char *		cmd;
-	bitset *		set; 
+	char *		buf;
+	proxy_msg *	msg;
+	bitset *	set; 
 
 	set = str_to_bitset(args[1]);
 	if (set == NULL) {
@@ -558,20 +617,26 @@ DbgClntListArguments(char **args)
 		return DBGRES_ERR;
 	}
 	
-	asprintf(&cmd, "%s %s %s", DBG_LISTARGUMENTS_CMD, args[2], args[3]);
-	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, cmd, NULL);
+	msg = new_proxy_msg(DBG_LISTLOCALVARIABLES_CMD, tid);
+	proxy_msg_add_args_nocopy(msg, nargs, args);
+	proxy_serialize_msg(msg, &buf);
+
+	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, buf, NULL);
 	
-	free(cmd);
 	bitset_free(set);
+	free_proxy_msg(msg);
+	free(buf);
 	
 	return res;
 }
 
 int 
-DbgClntListGlobalVariables(char **args)
+DbgClntListArguments(int tid, int nargs, char **args)
 {
 	int			res;
-	bitset *		set; 
+	char *		buf;
+	proxy_msg *	msg;
+	bitset *	set; 
 
 	set = str_to_bitset(args[1]);
 	if (set == NULL) {
@@ -579,18 +644,53 @@ DbgClntListGlobalVariables(char **args)
 		return DBGRES_ERR;
 	}
 	
-	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, DBG_LISTGLOBALVARIABLES_CMD, NULL);
+	msg = new_proxy_msg(DBG_LISTARGUMENTS_CMD, tid);
+	proxy_msg_add_args_nocopy(msg, nargs, args);
+	proxy_serialize_msg(msg, &buf);
+
+	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, buf, NULL);
 	
 	bitset_free(set);
+	free_proxy_msg(msg);
+	free(buf);
+	
+	return res;
+}
+
+int 
+DbgClntListGlobalVariables(int tid, int nargs, char **args)
+{
+	int			res;
+	char *		buf;
+	proxy_msg *	msg;
+	bitset *	set; 
+
+	set = str_to_bitset(args[1]);
+	if (set == NULL) {
+		DbgSetError(DBGERR_PROCSET, NULL);
+		return DBGRES_ERR;
+	}
+	
+	msg = new_proxy_msg(DBG_LISTGLOBALVARIABLES_CMD, tid);
+	proxy_msg_add_args_nocopy(msg, nargs, args);
+	proxy_serialize_msg(msg, &buf);
+
+	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, buf, NULL);
+	
+	bitset_free(set);
+	free_proxy_msg(msg);
+	free(buf);
 	
 	return res;
 }
 
 int
-DbgClntListInfoThreads(char **args) 
+DbgClntListInfoThreads(int tid, int nargs, char **args) 
 {
 	int			res;
-	bitset *		set; 
+	char *		buf;
+	proxy_msg *	msg;
+	bitset *	set; 
 
 	set = str_to_bitset(args[1]);
 	if (set == NULL) {
@@ -598,38 +698,52 @@ DbgClntListInfoThreads(char **args)
 		return DBGRES_ERR;
 	}
 	
-	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, DBG_LISTINFOTHREADS_CMD, NULL);
+	msg = new_proxy_msg(DBG_LISTINFOTHREADS_CMD, tid);
+	proxy_msg_add_args_nocopy(msg, nargs, args);
+	proxy_serialize_msg(msg, &buf);
+
+	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, buf, NULL);
+
 	bitset_free(set);
+	free_proxy_msg(msg);
+	free(buf);
 	
 	return res;
 }
 
 int
-DbgClntSetThreadSelect(char **args)
+DbgClntSetThreadSelect(int tid, int nargs, char **args)
 {
 	int			res;
-	char *		cmd;
+	char *		buf;
+	proxy_msg *	msg;
 	bitset *	set; 
-
+	
 	set = str_to_bitset(args[1]);
 	if (set == NULL) {
 		DbgSetError(DBGERR_PROCSET, NULL);
 		return DBGRES_ERR;
 	}
 	
-	asprintf(&cmd, "%s %s", DBG_SETTHREADSELECT_CMD, args[2]);
-	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, cmd, NULL);
+	msg = new_proxy_msg(DBG_SETTHREADSELECT_CMD, tid);
+	proxy_msg_add_args_nocopy(msg, nargs, args);
+	proxy_serialize_msg(msg, &buf);
+
+	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, buf, NULL);
 	
-	free(cmd);
 	bitset_free(set);
+	free_proxy_msg(msg);
+	free(buf);
 	
 	return res;
 }
 
 int
-DbgClntStackInfoDepth(char **args)
+DbgClntStackInfoDepth(int tid, int nargs, char **args)
 {
 	int			res;
+	char *		buf;
+	proxy_msg *	msg;
 	bitset *	set; 
 
 	set = str_to_bitset(args[1]);
@@ -638,17 +752,25 @@ DbgClntStackInfoDepth(char **args)
 		return DBGRES_ERR;
 	}
 	
-	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, DBG_STACKINFODEPTH_CMD, NULL);
+	msg = new_proxy_msg(DBG_STACKINFODEPTH_CMD, tid);
+	proxy_msg_add_args_nocopy(msg, nargs, args);
+	proxy_serialize_msg(msg, &buf);
+
+	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, buf, NULL);
+
 	bitset_free(set);
+	free_proxy_msg(msg);
+	free(buf);
 	
 	return res;
 }
 
 int 
-DbgClntDataReadMemory(char **args) 
+DbgClntDataReadMemory(int tid, int nargs, char **args) 
 {
 	int			res;
-	char *		cmd;
+	char *		buf;
+	proxy_msg *	msg;
 	bitset *	set; 
 
 	set = str_to_bitset(args[1]);
@@ -656,57 +778,26 @@ DbgClntDataReadMemory(char **args)
 		DbgSetError(DBGERR_PROCSET, NULL);
 		return DBGRES_ERR;
 	}
-	asprintf(&cmd, "%s %s \"%s\" \"%s\" %s %s %s \"%s\"", DBG_DATAREADMEMORY_CMD, args[2], args[3], args[4], args[5], args[6], args[7], args[8]);
-	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, cmd, NULL);
+
+	msg = new_proxy_msg(DBG_DATAREADMEMORY_CMD, tid);
+	proxy_msg_add_args_nocopy(msg, nargs, args);
+	proxy_serialize_msg(msg, &buf);
+
+	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, buf, NULL);
+
 	bitset_free(set);
+	free_proxy_msg(msg);
+	free(buf);
 	
 	return res;
 }
 
 int 
-DbgClntDataWriteMemory(char **args) 
+DbgClntDataWriteMemory(int tid, int nargs, char **args) 
 {
 	int			res;
-	char *		cmd;
-	bitset *	set; 
-
-	set = str_to_bitset(args[1]);
-	if (set == NULL) {
-		DbgSetError(DBGERR_PROCSET, NULL);
-		return DBGRES_ERR;
-	}
-	
-	asprintf(&cmd, "%s %s \"%s\" \"%s\" %s \"%s\"", DBG_DATAWRITEMEMORY_CMD, args[2], args[3], args[4], args[5], args[6]);
-	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, cmd, NULL);
-	bitset_free(set);
-	
-	return res;
-}
-
-int 
-DbgClntListSignals(char **args)
-{
-	int			res;
-	char *		cmd;
-	bitset *	set; 
-
-	set = str_to_bitset(args[1]);
-	if (set == NULL) {
-		DbgSetError(DBGERR_PROCSET, NULL);
-		return DBGRES_ERR;
-	}
-	
-	asprintf(&cmd, "%s \"%s\"", DBG_LISTSIGNALS_CMD, args[2]);
-	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, cmd, NULL);
-	bitset_free(set);
-	
-	return res;
-}
-int 
-DbgClntSignalInfo(char **args)
-{
-	int			res;
-	char *		cmd;
+	char *		buf;
+	proxy_msg *	msg;
 	bitset *	set; 
 
 	set = str_to_bitset(args[1]);
@@ -715,18 +806,25 @@ DbgClntSignalInfo(char **args)
 		return DBGRES_ERR;
 	}
 	
-	asprintf(&cmd, "%s \"%s\"", DBG_SIGNALINFO_CMD, args[2]);
-	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, cmd, NULL);
+	msg = new_proxy_msg(DBG_DATAWRITEMEMORY_CMD, tid);
+	proxy_msg_add_args_nocopy(msg, nargs, args);
+	proxy_serialize_msg(msg, &buf);
+
+	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, buf, NULL);
+
 	bitset_free(set);
+	free_proxy_msg(msg);
+	free(buf);
 	
 	return res;
 }
 
 int 
-DbgClntCLIHandle(char **args)
+DbgClntListSignals(int tid, int nargs, char **args)
 {
 	int			res;
-	char *		cmd;
+	char *		buf;
+	proxy_msg *	msg;
 	bitset *	set; 
 
 	set = str_to_bitset(args[1]);
@@ -735,19 +833,91 @@ DbgClntCLIHandle(char **args)
 		return DBGRES_ERR;
 	}
 	
-	asprintf(&cmd, "%s \"%s\"", DBG_CLIHANDLE_CMD, args[2]);
-	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, cmd, NULL);
+	msg = new_proxy_msg(DBG_LISTSIGNALS_CMD, tid);
+	proxy_msg_add_args_nocopy(msg, nargs, args);
+	proxy_serialize_msg(msg, &buf);
+
+	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, buf, NULL);
+
 	bitset_free(set);
+	free_proxy_msg(msg);
+	free(buf);
+	
+	return res;
+}
+int 
+DbgClntSignalInfo(int tid, int nargs, char **args)
+{
+	int			res;
+	char *		buf;
+	proxy_msg *	msg;
+	bitset *	set; 
+
+	set = str_to_bitset(args[1]);
+	if (set == NULL) {
+		DbgSetError(DBGERR_PROCSET, NULL);
+		return DBGRES_ERR;
+	}
+	
+	msg = new_proxy_msg(DBG_SIGNALINFO_CMD, tid);
+	proxy_msg_add_args_nocopy(msg, nargs, args);
+	proxy_serialize_msg(msg, &buf);
+
+	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, buf, NULL);
+
+	bitset_free(set);
+	free_proxy_msg(msg);
+	free(buf);
 	
 	return res;
 }
 
 int 
-DbgClntQuit(char **args)
+DbgClntCLIHandle(int tid, int nargs, char **args)
 {
+	int			res;
+	char *		buf;
+	proxy_msg *	msg;
+	bitset *	set; 
+
+	set = str_to_bitset(args[1]);
+	if (set == NULL) {
+		DbgSetError(DBGERR_PROCSET, NULL);
+		return DBGRES_ERR;
+	}
+	
+	msg = new_proxy_msg(DBG_CLIHANDLE_CMD, tid);
+	proxy_msg_add_args_nocopy(msg, nargs, args);
+	proxy_serialize_msg(msg, &buf);
+
+	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, buf, NULL);
+
+	bitset_free(set);
+	free_proxy_msg(msg);
+	free(buf);
+	
+	return res;
+}
+
+int 
+DbgClntQuit(int tid, int nargs, char **args)
+{
+	int			res;
+	char *		buf;
+	proxy_msg *	msg;
+	
 	dbg_shutdown = SHUTDOWN_STARTED;
 	
-	return ClntSvrSendCommand(dbg_procs, DBG_EV_WAITALL, "QUI", NULL);
+	msg = new_proxy_msg(DBG_QUIT_CMD, tid);
+	proxy_msg_add_args_nocopy(msg, nargs, args);
+	proxy_serialize_msg(msg, &buf);
+
+	res = ClntSvrSendCommand(dbg_procs, DBG_EV_WAITALL, buf, NULL);
+
+	free_proxy_msg(msg);
+	free(buf);
+	
+	return res;
 }
 
 /*
@@ -756,78 +926,14 @@ DbgClntQuit(char **args)
 int
 DbgClntProgress(void)
 {
-	fd_set			rfds;
-	fd_set			wfds;
-	fd_set			efds;
-	int				res;
-	int				nfds = 0;
-	struct timeval	tv = { 0, CLIENT_TIMEOUT };
-	handler *		h;
-
-	/***********************************
-	 * First: Check for any file events
-	 */
-	 
-	/*
-	 * Set up fd sets
-	 */
-	FD_ZERO(&rfds);
-	FD_ZERO(&wfds);
-	FD_ZERO(&efds);
-	
-	for (SetHandler(); (h = GetHandler()) != NULL; ) {
-		if (h->htype == HANDLER_FILE) {
-			if (h->file_type & READ_FILE_HANDLER)
-				FD_SET(h->fd, &rfds);
-			if (h->file_type & WRITE_FILE_HANDLER)
-				FD_SET(h->fd, &wfds);
-			if (h->file_type & EXCEPT_FILE_HANDLER)
-				FD_SET(h->fd, &efds);
-			if (h->fd > nfds)
-				nfds = h->fd;
-		}
-	}
-	
-	for ( ;; ) {
-		res = select(nfds+1, &rfds, &wfds, &efds, &tv);
-	
-		switch (res) {
-		case INVALID_SOCKET:
-			if ( errno == EINTR )
-				continue;
-		
-			DbgSetError(DBGERR_SYSTEM, strerror(errno));
-			return DBGRES_ERR;
-		
-		case 0:
-			/*
-			 * Timeout.
-			 */
-			 break;
-			 		
-		default:
-			for (SetHandler(); (h = GetHandler()) != NULL; ) {
-				if (h->htype == HANDLER_FILE
-					&& ((h->file_type & READ_FILE_HANDLER && FD_ISSET(h->fd, &rfds))
-						|| (h->file_type & WRITE_FILE_HANDLER && FD_ISSET(h->fd, &wfds))
-						|| (h->file_type & EXCEPT_FILE_HANDLER && FD_ISSET(h->fd, &efds)))
-					&& h->file_handler(h->fd, h->data) < 0)
-					return DBGRES_ERR;
-			}
-			
-		}
-	
-		break;
-	}
-	
 	/*************************************
-	 * Second: Check for any server events
+	 * Check for any server events
 	 */
 	 
 	ClntSvrProgressCmds();
 	
 	/**************************************
-	 * Third: Check for proxy events
+	 * Check for proxy events
 	 */
 	 
 	return proxy_svr_progress(dbg_proxy) == PROXY_RES_OK ? DBGRES_OK : DBGRES_ERR;
@@ -883,7 +989,7 @@ DbgClntUnregisterFileHandler(int fd)
 }
 
 int 
-DbgClntDataEvaluateExpression(char **args)
+DbgClntDataEvaluateExpression(int tid, int nargs, char **args)
 {
 	int			res;
 	char *		cmd;
@@ -902,7 +1008,7 @@ DbgClntDataEvaluateExpression(char **args)
 	return res;
 }
 int 
-DbgClntGetPartialAIF(char **args)
+DbgClntGetPartialAIF(int tid, int nargs, char **args)
 {
 	int			res;
 	char *		cmd;
@@ -921,7 +1027,7 @@ DbgClntGetPartialAIF(char **args)
 	return res;
 }
 int 
-DbgClntVariableDelete(char **args)
+DbgClntVariableDelete(int tid, int nargs, char **args)
 {
 	int			res;
 	char *		cmd;

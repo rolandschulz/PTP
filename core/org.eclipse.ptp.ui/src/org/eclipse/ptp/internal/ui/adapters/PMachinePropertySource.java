@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.ui.adapters;
 
-import org.eclipse.ptp.core.IPMachine;
+import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource;
 import org.eclipse.ui.views.properties.PropertyDescriptor;

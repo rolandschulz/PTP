@@ -16,27 +16,38 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.core.IModelManager;
-import org.eclipse.ptp.core.IPElement;
-import org.eclipse.ptp.core.IPMachine;
-import org.eclipse.ptp.core.IPQueue;
-import org.eclipse.ptp.core.IPUniverse;
 import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.elements.IPElement;
+import org.eclipse.ptp.core.elements.IPMachine;
+import org.eclipse.ptp.core.elements.IPQueue;
+import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.internal.ui.ParallelImages;
+import org.eclipse.ptp.rmsystem.AbstractResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerChangedListener;
-import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
 import org.eclipse.ptp.rmsystem.IResourceManagerListener;
 import org.eclipse.ptp.rmsystem.IResourceManagerMenuContribution;
-import org.eclipse.ptp.rmsystem.ResourceManagerStatus;
+import org.eclipse.ptp.rmsystem.ResourceManagerState;
 import org.eclipse.ptp.rmsystem.events.IResourceManagerAddedRemovedEvent;
-import org.eclipse.ptp.rmsystem.events.IResourceManagerContentsChangedEvent;
+import org.eclipse.ptp.rmsystem.events.IResourceManagerChangedJobsEvent;
+import org.eclipse.ptp.rmsystem.events.IResourceManagerChangedMachinesEvent;
+import org.eclipse.ptp.rmsystem.events.IResourceManagerChangedNodesEvent;
+import org.eclipse.ptp.rmsystem.events.IResourceManagerChangedProcessesEvent;
+import org.eclipse.ptp.rmsystem.events.IResourceManagerChangedQueuesEvent;
+import org.eclipse.ptp.rmsystem.events.IResourceManagerErrorEvent;
+import org.eclipse.ptp.rmsystem.events.IResourceManagerNewJobsEvent;
+import org.eclipse.ptp.rmsystem.events.IResourceManagerNewMachinesEvent;
+import org.eclipse.ptp.rmsystem.events.IResourceManagerNewNodesEvent;
+import org.eclipse.ptp.rmsystem.events.IResourceManagerNewProcessesEvent;
+import org.eclipse.ptp.rmsystem.events.IResourceManagerNewQueuesEvent;
 import org.eclipse.ptp.ui.UIMessage;
 import org.eclipse.ptp.ui.actions.AddResourceManagerAction;
 import org.eclipse.ptp.ui.actions.RemoveResourceManagersAction;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchActionConstants;
@@ -96,9 +107,9 @@ public class ResourceManagerView extends ViewPart implements
 				rm = (IResourceManager) ((IAdaptable) parentElement).getAdapter(IResourceManager.class);
 			}
 			if (rm != null) {
-				if (!rm.getStatus().equals(ResourceManagerStatus.STARTED)) {
-					return new Object[0];
-				}
+//				if (!rm.getState().equals(ResourceManagerState.STARTED)) {
+//					return new Object[0];
+//				}
 				IPMachine[] machines = rm.getMachines();
 				IPQueue[] queues = rm.getQueues();
 				return new Object[] {
@@ -132,7 +143,7 @@ public class ResourceManagerView extends ViewPart implements
 			if (element instanceof IAdaptable) {
 				IResourceManager rm = (IResourceManager) ((IAdaptable) element).getAdapter(IResourceManager.class);
 				if (rm != null)
-					return rm.getStatus().equals(ResourceManagerStatus.STARTED);
+					return rm.getState().equals(ResourceManagerState.State.STARTED);
 			}
 			return false;
 		}
@@ -193,13 +204,14 @@ public class ResourceManagerView extends ViewPart implements
 
 		public Image getImage(Object element) {
 			if (element instanceof IResourceManager) {
-				ResourceManagerStatus status = ((IResourceManager) element).getStatus();
-				if (status.equals(ResourceManagerStatus.STARTED))
-					return ParallelImages.rmImages[1];
-				if (status.equals(ResourceManagerStatus.STOPPED)
-						|| status.equals(ResourceManagerStatus.INIT))
+				ResourceManagerState.State status = ((IResourceManager) element).getState();
+                if (status.equals(ResourceManagerState.State.STARTED))
+                    return ParallelImages.rmImages[1];
+                if (status.equals(ResourceManagerState.State.SUSPENDED))
+                    return ParallelImages.rmImages[1];
+				if (status.equals(ResourceManagerState.State.STOPPED))
 					return ParallelImages.rmImages[0];
-				if (status.equals(ResourceManagerStatus.ERROR))
+				if (status.equals(ResourceManagerState.State.ERROR))
 					return ParallelImages.rmImages[3];
 			}
 			return super.getImage(element);
@@ -207,14 +219,14 @@ public class ResourceManagerView extends ViewPart implements
 
 		public String getText(Object element) {
 			if (element instanceof IResourceManager) {
-				IResourceManagerConfiguration configuration = ((IResourceManager) element).getConfiguration();
+				final IResourceManager resourceManager = (IResourceManager) element;
 				final IModelManager modelManager = PTPCorePlugin.getDefault().getModelManager();
-				final String resourceManagerId = configuration.getResourceManagerId();
+				final String resourceManagerId = resourceManager.getIDString();
 				if (resourceManagerId == null)
-					return configuration.getName();
+					return resourceManager.getName();
 				IResourceManagerFactory factory = modelManager.getResourceManagerFactory(
 						resourceManagerId);
-				return configuration.getName() + " (" + factory.getName() + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+				return resourceManager.getName() + " (" + factory.getName() + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			if (element instanceof ChildContainer) {
 				return ((ChildContainer) element).getName();
@@ -266,35 +278,71 @@ public class ResourceManagerView extends ViewPart implements
 		super.dispose();
 	}
 
-	public void handleContentsChanged(IResourceManagerContentsChangedEvent event) {
-		IResourceManager resourceManager = event.getSource();
-		viewer.refresh(resourceManager);
-		refreshViewer(resourceManager);
+	public void handleChangedJobsEvent(IResourceManagerChangedJobsEvent e) {
+		// This does not display these items
+	}
+
+	public void handleChangedMachinesEvent(IResourceManagerChangedMachinesEvent e) {
+		updateViewer(e.getSource());
+	}
+
+	public void handleChangedNodesEvent(IResourceManagerChangedNodesEvent e) {
+		// This does not display these items
+	}
+
+	public void handleChangedProcessesEvent(IResourceManagerChangedProcessesEvent e) {
+		// This does not display these items
+	}
+
+	public void handleChangedQueuesEvent(IResourceManagerChangedQueuesEvent e) {
+		updateViewer(e.getSource());
+	}
+
+	public void handleErrorStateEvent(IResourceManagerErrorEvent e) {
+		updateViewer(e.getSource());        
+	}
+
+	public void handleNewJobsEvent(IResourceManagerNewJobsEvent e) {
+		// This does not display these items
+	}
+
+    public void handleNewMachinesEvent(IResourceManagerNewMachinesEvent e) {
+		refreshViewer(e.getSource());
+	}
+
+    public void handleNewNodesEvent(IResourceManagerNewNodesEvent e) {
+		// This does not display these items
+	}
+
+	public void handleNewProcessesEvent(IResourceManagerNewProcessesEvent e) {
+		// This does not display these items
+	}
+
+	public void handleNewQueuesEvent(IResourceManagerNewQueuesEvent e) {
+		refreshViewer(e.getSource());
 	}
 
 	public void handleResourceManagersAddedRemoved(IResourceManagerAddedRemovedEvent event) {
-		// Let the content provider register and unregister
-		// to the added and removed resource managers
-		viewer.setInput(PTPCorePlugin.getDefault().getUniverse().getResourceManagers());
+		Display display = viewer.getControl().getDisplay();
+		display.asyncExec(new Runnable(){
+			public void run() {
+				// Let the content provider register and unregister
+				// to the added and removed resource managers
+				viewer.setInput(PTPCorePlugin.getDefault().getUniverse().getResourceManagers());
+			}});
 	}
 
-	public void handleStartup(IResourceManager resourceManager) {
+	public void handleShutdownStateEvent(IResourceManager resourceManager) {
 		refreshViewer(resourceManager);
 	}
 
-	public void handleStatusChanged(ResourceManagerStatus oldStatus,
-			IResourceManager resourceManager) {
-		if (oldStatus.equals(ResourceManagerStatus.STARTED) ||
-				resourceManager.getStatus().equals(ResourceManagerStatus.STARTED)) {
-			refreshViewer(resourceManager);
-		} else {
-			updateViewer(resourceManager);
-		}
-	}
-
-	public void handleShutdown(IResourceManager resourceManager) {
+	public void handleStartupStateEvent(IResourceManager resourceManager) {
 		refreshViewer(resourceManager);
 	}
+
+	public void handleSuspendedStateEvent(AbstractResourceManager manager) {
+        updateViewer(manager);
+    }
 
 	public void setFocus() {
 		viewer.getControl().setFocus();
@@ -346,16 +394,20 @@ public class ResourceManagerView extends ViewPart implements
 				+ "-end")); //$NON-NLS-1$
 	}
 
-	private void refreshViewer(IResourceManager resourceManager) {
-
-		viewer.refresh(resourceManager);
-
+	private void refreshViewer(final IResourceManager resourceManager) {
+		Display display = viewer.getControl().getDisplay();
+		display.asyncExec(new Runnable(){
+			public void run() {
+				viewer.refresh(resourceManager);
+			}});
 	}
 
-	private void updateViewer(IResourceManager resourceManager) {
-
-		viewer.update(resourceManager, null);
-
+	private void updateViewer(final IResourceManager resourceManager) {
+		Display display = viewer.getControl().getDisplay();
+		display.asyncExec(new Runnable(){
+			public void run() {
+				viewer.update(resourceManager, null);
+			}});
 	}
 
 }

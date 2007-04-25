@@ -23,12 +23,12 @@ import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDILocator;
 
 
-public class ProxyDebugSignalEvent extends AbstractProxyDebugSuspendEvent implements IProxyDebugEvent {
+public class ProxyDebugSignalEvent extends AbstractProxyDebugSuspendEvent implements IProxyDebugSignalEvent {
 	private String		signalName;
 	private String		signalMeaning;
 	
-	public ProxyDebugSignalEvent(BitList set, String name, String meaning, IPCDILocator loc, int tid, String[] vars) {
-		super(set, loc, tid, vars);
+	public ProxyDebugSignalEvent(int transID, BitList set, String name, String meaning, IPCDILocator loc, int tid, String[] vars) {
+		super(transID, set, loc, tid, vars);
 		this.signalName = name;
 		this.signalMeaning = meaning;
 	}
@@ -42,7 +42,7 @@ public class ProxyDebugSignalEvent extends AbstractProxyDebugSuspendEvent implem
 	}
 	
 	public String toString() {
-		String res = "EVENT_DBG_SIGNAL " + this.getBitSet().toString() + " " + this.signalName;
+		String res = "EVENT_DBG_SIGNAL transid=" + getTransactionID() + " " + this.getBitSet().toString() + " " + this.signalName;
 		if (this.getLocator() != null)
 			res += " " + getLocator().toString();
 		return res;

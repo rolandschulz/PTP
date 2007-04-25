@@ -26,7 +26,6 @@ Require-Bundle: org.eclipse.ui,
 Eclipse-LazyStart: true
 Export-Package: org.eclipse.ptp.ui,
  org.eclipse.ptp.ui.actions,
- org.eclipse.ptp.ui.attributes,
  org.eclipse.ptp.ui.listeners,
  org.eclipse.ptp.ui.managers,
  org.eclipse.ptp.ui.model,

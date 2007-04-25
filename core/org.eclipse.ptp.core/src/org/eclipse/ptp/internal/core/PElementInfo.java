@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.ptp.core.elementcontrols.IPElementControl;
+import org.eclipse.ptp.core.elements.IPElement;
 
 /**
  *
@@ -46,7 +47,7 @@ public class PElementInfo {
 		fChildren.put(member.getIDString(), member);
 	}
 
-	public void removeChild(IPElementControl member) {
+	public void removeChild(IPElement member) {
 		fChildren.remove(member.getIDString());
 	}
 

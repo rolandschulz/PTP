@@ -18,7 +18,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.core;
 
-import org.eclipse.core.runtime.CoreException;
+import org.eclipse.ptp.core.elements.IPUniverse;
+
 /**
  * @author rsqrd
  */
@@ -28,11 +29,6 @@ import org.eclipse.core.runtime.CoreException;
  */
 public interface IModelPresentation extends IModelModifier {
 	
-	/**
-	 * @param jobName
-	 * @throws CoreException
-	 */
-	public void abortJob(String jobName) throws CoreException;
 	/**
 	 * @return
 	 */

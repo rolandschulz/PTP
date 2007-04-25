@@ -54,7 +54,7 @@ event_callback(dbg_event *e, void *data)
 		
 	printf("-> ");
 	
-	switch (e->event) {
+	switch (e->event_id) {
 	case DBGEV_ERROR:
 		printf("error: %s\n", e->dbg_event_u.error_event.error_msg);
 		switch (e->dbg_event_u.error_event.error_code) {
@@ -109,7 +109,7 @@ event_callback(dbg_event *e, void *data)
 		}
 		break;
 	default:
-		printf("got event %d\n", e->event);
+		printf("got event %d\n", e->event_id);
 		break;
 	}
 

@@ -25,7 +25,7 @@
 struct session {
 	int					sess_procs;
 	struct proxy_clnt *	sess_proxy;
-	void					(*sess_event_handler)(dbg_event *, void *);
+	void				(*sess_event_handler)(dbg_event *, void *);
 	void *				sess_event_data;
 };
 typedef struct session	session;

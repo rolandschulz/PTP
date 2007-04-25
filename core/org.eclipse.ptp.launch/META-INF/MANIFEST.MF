@@ -27,4 +27,5 @@ Eclipse-LazyStart: true
 Export-Package: org.eclipse.ptp.launch,
  org.eclipse.ptp.launch.internal;x-internal:=true,
  org.eclipse.ptp.launch.internal.ui;x-internal:=true,
- org.eclipse.ptp.launch.ui
+ org.eclipse.ptp.launch.ui,
+ org.eclipse.ptp.launch.ui.extensions

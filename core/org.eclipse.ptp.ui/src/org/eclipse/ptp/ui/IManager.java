@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui;
 
-import org.eclipse.ptp.core.IPJob;
+import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.ui.listeners.IJobChangedListener;
 import org.eclipse.ptp.ui.listeners.ISetListener;
 import org.eclipse.ptp.ui.model.IElement;
@@ -153,11 +153,6 @@ public interface IManager {
 	 * @return true job is stopped
 	 */
 	public boolean isJobStop(String job_id);
-	/** Search a job by job name
-	 * @param job_name Job name
-	 * @return null if no job found
-	 */
-	public IPJob findJob(String job_name);
 	/** Search a job by job ID
 	 * @param job_id Job ID
 	 * @return null if no job found

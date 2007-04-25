@@ -19,19 +19,25 @@
 
 package org.eclipse.ptp.rtsystem.proxy.event;
 
-public class ProxyRuntimeNewJobEvent extends AbstractProxyRuntimeEvent implements IProxyRuntimeEvent {
-	private int		jobID;
+public class ProxyRuntimeNewJobEvent extends AbstractProxyRuntimeEvent implements IProxyRuntimeNewJobEvent {
+	private String[]		args;
 
-	public ProxyRuntimeNewJobEvent(int jobid) {
-		super(EVENT_RUNTIME_NEWJOB);
-		this.jobID = jobid;
+	public ProxyRuntimeNewJobEvent(int transid, String[] args) {
+		super(PROXY_RUNTIME_NEW_JOB_EVENT, transid);
+		this.args = args;
 	}
 	
-	public int getJobID() {
-		return this.jobID;
+	public String[] getArguments() {
+		return this.args;
 	}
 	
 	public String toString() {
-		return "EVENT_RUNTIME_NEWJOB jobid="+jobID;
+		String str = "EVENT_RUNTIME_NEWJOB transid=" + getTransactionID() + " (";
+		for (int i = 0 ; i < args.length; i++) {
+			if (i > 0)
+				str += ",";
+			str += args[i];
+		}
+		return str + ")";
 	}
 }
