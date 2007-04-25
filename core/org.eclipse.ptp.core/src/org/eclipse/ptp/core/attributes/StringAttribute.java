@@ -18,73 +18,29 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.attributes;
 
-public final class StringAttribute extends AbstractAttribute {
 
-	/**
-	 * Acyclic Visitor Pattern, PLOPD3, p. 79
-	 * @author rsqrd
-	 *
-	 */
-	public interface IVisitor extends IAttributeVisitor {
+public final class StringAttribute extends AbstractAttribute implements IStringAttribute {
 
-		void visit(StringAttribute attribute);
+	private StringBuffer value = new StringBuffer();
 
-	}
-
-	private StringBuffer value;
-	public StringAttribute(IAttributeDescription description, String string) {
-		this(description, new StringBuffer(string));
-	}
-	
-	public StringAttribute(IAttributeDescription description, StringBuffer value) {
+	public StringAttribute(IStringAttributeDefinition description, String initialValue) throws IllegalValueException {
 		super(description);
-		this.value = value;
-	}
-	
-	public void accept(IAttributeVisitor visitor) {
-		if (visitor instanceof IVisitor) {
-			((IVisitor)visitor).visit(this);
-		}
+		setValue(initialValue);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.attributes.IAttribute#create(java.lang.String)
-	 */
-	public IAttribute create(String string) throws IllegalValue {
-		return new StringAttribute(getDescription(), string);
-	}
-
-	public boolean equals(Object obj) {
-		if (obj instanceof StringAttribute) {
-			StringAttribute attr = (StringAttribute) obj;
-			return value.equals(attr.value);
-		}
-		return false;
-	}
-
-	public String getStringRep() {
-		return value.toString();
-	}
-	
 	public String getValue() {
 		return value.toString();
 	}
-
-	public int hashCode() {
-		return value.hashCode();
+	
+	public String getValueAsString() {
+		return getValue();
 	}
-
+	
 	public boolean isValid(String string) {
 		return true;
 	}
 
-	public void setValue(String string) throws IAttribute.IllegalValue {
+	public void setValue(String string) throws IllegalValueException {
 		this.value.replace(0, this.value.length(), string);
 	}
-
-	protected int doCompareTo(AbstractAttribute arg0) {
-		StringAttribute attr = (StringAttribute) arg0;
-		return this.value.toString().compareTo(attr.value.toString());
-	}
-
 }

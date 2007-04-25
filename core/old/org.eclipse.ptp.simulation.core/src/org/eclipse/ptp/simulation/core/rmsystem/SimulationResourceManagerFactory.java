@@ -20,8 +20,8 @@ package org.eclipse.ptp.simulation.core.rmsystem;
 
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory;
-import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.Messages;
 import org.eclipse.ui.IMemento;
@@ -33,12 +33,12 @@ public class SimulationResourceManagerFactory extends
 		super(Messages.getString("SimulationResourceManagerFactory.ResourceManagerFactoryName")); //$NON-NLS-1$
 	}
 
-	public IResourceManager create(IResourceManagerConfiguration confIn) {
+	public IResourceManagerControl create(IResourceManagerConfiguration confIn) {
 		SimulationRMConfiguration configuration = (SimulationRMConfiguration) confIn;
 		final PTPCorePlugin plugin = PTPCorePlugin.getDefault();
 		plugin.savePluginPreferences();
 		final IPUniverseControl universe = (IPUniverseControl) plugin.getUniverse();
-		return new SimulationResourceManager(universe, configuration);
+		return new SimulationResourceManager(universe.getNextResourceManagerId(), universe, configuration);
 	}
 
 	public IResourceManagerConfiguration createConfiguration() {

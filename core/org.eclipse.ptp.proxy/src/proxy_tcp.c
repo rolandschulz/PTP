@@ -35,6 +35,7 @@
 #include "compat.h"
 #include "proxy.h"
 #include "proxy_tcp.h"
+#include "proxy_cmd.h"
 
 struct timeval TCPTIMEOUT = { 25, 0 };
 
@@ -131,20 +132,17 @@ tcp_send(proxy_tcp_conn *conn, char *buf, int len)
 int
 proxy_tcp_send_msg(proxy_tcp_conn *conn, char *message, int len)
 {
-	char *	buf;
+	char 	buf[9];
 	
 	/*
 	 * Send message length first
 	 */
-	asprintf(&buf, "%08x ", len & 0xffffffff);
+	sprintf(buf, "%08x", len & MSG_LENGTH_MASK);
 	
 	if (tcp_send(conn, buf, strlen(buf)) < 0) {
-		free(buf);
 		return -1;
 	}
 	
-	free(buf);
-		
 	/* 
 	 * Now send message
 	 */
@@ -153,14 +151,14 @@ proxy_tcp_send_msg(proxy_tcp_conn *conn, char *message, int len)
 }
 
 static int
-proxy_tcp_get_msg_header(proxy_tcp_conn *conn)
+proxy_tcp_get_msg_len(proxy_tcp_conn *conn)
 {
 	char *	end;
 
 	/*
 	 * If we haven't read enough then return for more...
 	 */
-	if (conn->total_read < MAX_MSG_HEADER_SIZE + 1)
+	if (conn->total_read < MSG_LEN_SIZE)
 		return 0;
 		
 	conn->msg_len = strtol(conn->buf, &end, 16);
@@ -168,17 +166,7 @@ proxy_tcp_get_msg_header(proxy_tcp_conn *conn)
 	/*
 	 * check if we've received the length
 	 */
-	if (conn->msg_len == 0 || (conn->msg_len > 0 && *end != ',')) {
-		proxy_set_error(PROXY_ERR_PROTO, "could not understand message");
-		return -1;
-	}
-
-	/*
-	 *read the transaction id
-	 */
-	conn->msg_id = strtol(end+1, &end, 16);
-	
-	if (conn->msg_id <= 0 || (conn->msg_id > 0 && *end != ' ')) {
+	if (conn->msg_len == 0 || (conn->msg_len > 0 && *end != ' ')) {
 		proxy_set_error(PROXY_ERR_PROTO, "could not understand message");
 		return -1;
 	}
@@ -192,15 +180,15 @@ proxy_tcp_copy_msg(proxy_tcp_conn *conn, char **result)
 	int	n = conn->msg_len;
 	
 	*result = (char *)malloc(conn->msg_len + 1);
-	memcpy(*result, &conn->buf[MAX_MSG_HEADER_SIZE + 1], conn->msg_len);
+	memcpy(*result, &conn->buf[MSG_LEN_SIZE], conn->msg_len);
 	(*result)[conn->msg_len] = '\0';
 	
 	/*
 	 * Move rest of buffer down if necessary
 	 */
-	if (conn->total_read > conn->msg_len + MAX_MSG_HEADER_SIZE + 1) {
-		conn->total_read -= conn->msg_len + MAX_MSG_HEADER_SIZE + 1;
-		memmove(conn->buf, &conn->buf[conn->msg_len + MAX_MSG_HEADER_SIZE + 1], conn->total_read);
+	if (conn->total_read > conn->msg_len + MSG_LEN_SIZE) {
+		conn->total_read -= conn->msg_len + MSG_LEN_SIZE;
+		memmove(conn->buf, &conn->buf[conn->msg_len + MSG_LEN_SIZE], conn->total_read);
 	} else {
 		conn->buf_pos = 0;
 		conn->total_read = 0;
@@ -217,7 +205,7 @@ proxy_tcp_get_msg_body(proxy_tcp_conn *conn, char **result)
 	/*
 	 * If we haven't read enough then return for more...
 	 */
-	if (conn->total_read - MAX_MSG_HEADER_SIZE + 1 < conn->msg_len)
+	if (conn->total_read - MSG_LEN_SIZE < conn->msg_len)
 		return 0;
 		
 	return proxy_tcp_copy_msg(conn, result);
@@ -249,55 +237,46 @@ proxy_tcp_recv_msgs(proxy_tcp_conn *conn)
  * 			-1	error
  */
 int
-proxy_tcp_get_msg(proxy_tcp_conn *conn, char **result)
+proxy_tcp_get_msg(proxy_tcp_conn *conn, char **result, int *len)
 {
 	int	n;
 	
-	if (conn->msg_len == 0 && (n = proxy_tcp_get_msg_header(conn)) <= 0)
+	if (conn->msg_len == 0 && (n = proxy_tcp_get_msg_len(conn)) <= 0)
 		return n;
-		
+	
+	*len = conn->msg_len;
 	return proxy_tcp_get_msg_body(conn, result);
 }
 
-void
-skipwhitespace(char **s)
+/*
+ * Decode string argument
+ */
+int
+proxy_tcp_decode_string(char *str, char **arg, char **end)
 {
-	if (s == NULL || (*s) == NULL)
-		return;
+	int		arg_len;
+	int 	str_len = strlen(str);
+	char *	ep;
+	char *	p;
 	
-	while (isspace((int)*(*s)))
-		(*s)++;
-}
-
-char *
-getword(char **s)
-{
-	char *	wp;
-	char *	word;
-	
-	skipwhitespace(s);
-	
-	word = wp = malloc(strlen(*s)+1);
-	
-	if (*(*s) != '"'  ||  *((*s)+1) != '"') {
-		while (*(*s) != '\0'  &&  !isspace((int)*(*s))) {
-			*wp = **s;
-			wp++;
-			(*s)++;
-		}
-	} else {
-		(*s) += 2;
-		while (*(*s) != '\0'  &&  (*(*s) != '"'  ||  *((*s)+1) != '"')) {
-			*wp = *(*s);
-			wp++;
-			(*s)++;
-		}
-		if ( *(*s) == '"'  &&  *(*s+1) == '"' ) {
-			(*s) += 2;
-		}
+	if (str_len < CMD_ARG_LEN_SIZE + 1) {
+		return -1;
 	}
 	
-	*wp = '\0';
+	ep = str + CMD_ARG_LEN_SIZE;
+	*ep++ = '\0';
+	arg_len = strtol(str, NULL, 16);
 	
-	return word;
+	if (str_len < CMD_ARG_LEN_SIZE + arg_len + 1) {
+		return -1;
+	}
+	
+	p = (char *)malloc(arg_len + 1);
+	memcpy(p, ep, arg_len);
+	p[arg_len] = '\0';
+	
+	*arg = p;
+	*end = str + CMD_ARG_LEN_SIZE + arg_len + 1;
+	
+	return 0;
 }

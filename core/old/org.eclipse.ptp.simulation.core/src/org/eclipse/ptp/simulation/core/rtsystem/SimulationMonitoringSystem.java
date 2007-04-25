@@ -27,10 +27,9 @@ import java.util.Set;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.ptp.core.AttributeConstants;
-import org.eclipse.ptp.core.IPMachine;
-import org.eclipse.ptp.core.IPNode;
+import org.eclipse.ptp.core.elements.IPMachine;
+import org.eclipse.ptp.core.elements.IPNode;
 import org.eclipse.ptp.rtsystem.IMonitoringSystem;
-import org.eclipse.ptp.rtsystem.IRuntimeListener;
 
 public class SimulationMonitoringSystem implements IMonitoringSystem {
 	protected ListenerList listeners = new ListenerList();
@@ -204,14 +203,6 @@ public class SimulationMonitoringSystem implements IMonitoringSystem {
 		listeners = null;
 	}
 	
-	public void addRuntimeListener(IRuntimeListener listener) {
-		listeners.add(listener);
-	}
-
-	public void removeRuntimeListener(IRuntimeListener listener) {
-		listeners.remove(listener);
-	}
-	
 	public String[] getMachines() {
 		int i = 0;
 		Set set = nodeMap.keySet();
@@ -309,7 +300,7 @@ public class SimulationMonitoringSystem implements IMonitoringSystem {
 		return allvals;
 	}
 
-	public void initiateDiscovery() throws CoreException {
+	public void startEvents() throws CoreException {
 		ArrayList keyList = new ArrayList();
 		ArrayList valueList = new ArrayList();
 		for (int im = 0; im < numMachines; ++im) {
@@ -323,11 +314,10 @@ public class SimulationMonitoringSystem implements IMonitoringSystem {
 
 		String[] keys = (String[]) keyList.toArray(new String[0]);
 		String[] values = (String[]) valueList.toArray(new String[0]);
+			}
+
+	public void stopEvents() throws CoreException {
+		// TODO Auto-generated method stub
 		
-		Object[] tmpListeners = listeners.getListeners();
-		for (int i=0; i<tmpListeners.length; ++i) {
-			IRuntimeListener l = (IRuntimeListener) tmpListeners[i];
-			l.runtimeNodeGeneralChange(keys, values);
-		}
 	}
 }

@@ -19,7 +19,6 @@
 package org.eclipse.ptp.launch.ui;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,24 +27,19 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.debug.ui.ILaunchConfigurationTab;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.ptp.core.IPMachine;
-import org.eclipse.ptp.core.IPQueue;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
-import org.eclipse.ptp.core.IPUniverse;
 import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.core.attributes.IAttribute;
-import org.eclipse.ptp.core.attributes.IAttributeDescription;
-import org.eclipse.ptp.core.attributes.IAttribute.IllegalValue;
-import org.eclipse.ptp.core.elementcontrols.IPMachineControl;
-import org.eclipse.ptp.core.elementcontrols.IPQueueControl;
+import org.eclipse.ptp.core.elements.IPQueue;
+import org.eclipse.ptp.core.elements.IPUniverse;
+import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.internal.ui.LaunchImages;
 import org.eclipse.ptp.launch.internal.ui.LaunchMessages;
+import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory;
+import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationContentsChangedListener;
+import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab;
+import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.rmsystem.IResourceManager;
-import org.eclipse.ptp.ui.attributes.AbstractAttributeControl;
-import org.eclipse.ptp.ui.attributes.AttributeControlFactory;
-import org.eclipse.ptp.ui.attributes.IAttributeControl;
+import org.eclipse.ptp.rmsystem.ResourceManagerState;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -54,6 +48,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 
@@ -65,24 +60,17 @@ public class ParallelTab extends PLaunchConfigurationTab {
 	// private Combo startupCombo = null;
 	// private Composite dynamicComp = null;
 
-	private class WidgetListener extends SelectionAdapter implements
-			IPropertyChangeListener {
-		
-		public void propertyChange(PropertyChangeEvent event) {
-			
-			if (event.getProperty() == AbstractAttributeControl.VALUE_CHANGED_PROPERTY) {
-				// Update the value of the controls based on any changes
-				// in the values
-				updateLaunchAttributeControls();
-			}
-			
-			/*
-			 * Updates the buttons and message in this page's launch
-			 * configuration dialog.
-			 */
+	private final class ContentsChangedListener implements IRMLaunchConfigurationContentsChangedListener {
+
+		public void handleContentsChanged(IRMLaunchConfigurationDynamicTab rmDynamicTab) {
+			// The buttons and messages have to be updated based on anything
+			// that has changed in the dynamic portion of the launch tab.
 			updateLaunchConfigurationDialog();
 		}
+	}
 
+	private final class WidgetListener extends SelectionAdapter {
+		
 		public void widgetSelected(SelectionEvent e) {
 
 			if (e.getSource() == resourceManagerCombo) {
@@ -91,18 +79,23 @@ public class ParallelTab extends PLaunchConfigurationTab {
 				 * queues combo boxes must be re-loaded, and the attributes'
 				 * controls must be updated.
 				 */
-				loadMachineAndQueueCombos();
-				updateLaunchAttributeControls();
-			}
-			else if (e.getSource() == machineCombo) {
-				// If a different machine is chosen the
-				// attributes' controls must be updated.
-				updateLaunchAttributeControls();
+				IResourceManager rm = getResourceManagerFromCombo();
+				loadQueueCombo(rm);
+				final IPQueue queue = getQueueFromCombo();
+
+				// Update the dynamic portions of the launch configuration
+				// tab.
+				updateLaunchAttributeControls(rm, queue, getLaunchConfiguration());
 			}
 			else if (e.getSource() == queueCombo) {
 				// If a different queue is chosen the
 				// attributes' controls must be updated.
-				updateLaunchAttributeControls();
+				final IResourceManager rm = getResourceManagerFromCombo();
+				final IPQueue queue = getQueueFromCombo();
+
+				// Update the dynamic portions of the launch configuration
+				// tab.
+				updateLaunchAttributeControls(rm, queue, getLaunchConfiguration());
 			}
 
 			/*
@@ -115,24 +108,57 @@ public class ParallelTab extends PLaunchConfigurationTab {
 
 	private Combo resourceManagerCombo;
 
-	// private Combo networkTypeCombo = null;
-
-	private Combo machineCombo;
-	
-	/*
-	 * private IntegerFieldEditor numberOfProcessStartField = null; private
-	 * IntegerFieldEditor firstNodeNumberField = null;
-	 */
-
 	private Combo queueCombo;
 
-	private WidgetListener listener = new WidgetListener();
+	private final WidgetListener combosListener = new WidgetListener();
 
 	// The composite that holds the RM's attributes for the launch configuration 
-	private Composite attrComp;
+	private Composite launchConfigurationComposite;
 
-	private Map<String, IAttributeControl> attrControls = null;
+	private final Map<Integer, IPQueue> queues = new HashMap<Integer, IPQueue>();
+	private final Map<IPQueue, Integer> queueIndices = new HashMap<IPQueue, Integer>();
+	private final Map<Integer, IResourceManager> resourceManagers =
+		new HashMap<Integer, IResourceManager>(); 
+	private final HashMap<IResourceManager, Integer> resourceManagerIndices =
+		new HashMap<IResourceManager, Integer>();
 
+	private ILaunchConfiguration launchConfiguration = null;
+
+	private final Map<IResourceManager, IRMLaunchConfigurationDynamicTab> rmDynamicTabs = 
+		new HashMap<IResourceManager, IRMLaunchConfigurationDynamicTab>();
+
+	private final ContentsChangedListener launchContentsChangedListener = 
+		new ContentsChangedListener(); 
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#canSave()
+	 */
+	@Override
+	public boolean canSave() {
+		setErrorMessage(null);
+		final IResourceManager rm = getResourceManagerFromCombo();
+		if (rm == null) {
+			setErrorMessage("No Resource Manager has been selected");
+			return false;
+		}
+		final IPQueue queue = getQueueFromCombo();
+		if (queue == null) {
+			//TODO setErrorMessage("No Queue has been selected");
+			//TODO return false;
+		}
+		IRMLaunchConfigurationDynamicTab rmDynamicTab = getRMLaunchConfigurationDynamicTab(rm);
+		final Composite launchComp = getLaunchConfigurationComposite();
+		if (rmDynamicTab == null || launchComp == null) {
+			setErrorMessage("No Launch Control Available for Resource Manager: " + rm.getName());
+			return false;
+		}
+		RMLaunchValidation validation = rmDynamicTab.canSave(launchComp, rm, queue);
+		if (!validation.isSuccess()) {
+			setErrorMessage(validation.getMessage());
+			return false;
+		}
+		return true;
+	}
 
 	/**
 	 * @see ILaunchConfigurationTab#createControl(Composite)
@@ -140,7 +166,7 @@ public class ParallelTab extends PLaunchConfigurationTab {
 	public void createControl(Composite parent) {
 		Composite comp = new Composite(parent, SWT.NONE);
 		setControl(comp);
-
+		
 		GridLayout topLayout = new GridLayout();
 		comp.setLayout(topLayout);
 		// createVerticalSpacer(comp, 1);
@@ -156,37 +182,40 @@ public class ParallelTab extends PLaunchConfigurationTab {
 			return;
 		}
 		
-		IResourceManager[] rms = universe.getResourceManagers();
+		IResourceManager[] rms = getStartedResourceManagers(universe);
 		new Label(parallelComp, SWT.NONE).setText("Select resource manager:");
 		
 		resourceManagerCombo = new Combo(parallelComp, SWT.READ_ONLY);
 		for (int i = 0; i < rms.length; i++) {
 			resourceManagerCombo.add(rms[i].getElementName());
+			resourceManagers.put(i, rms[i]);
+			resourceManagerIndices.put(rms[i], i);
 		}
 		resourceManagerCombo.select(0);
-		resourceManagerCombo.addSelectionListener(listener);
-
-		new Label(parallelComp, SWT.NONE).setText("Select machine:");
-		machineCombo = new Combo(parallelComp, SWT.READ_ONLY);
+		resourceManagerCombo.addSelectionListener(combosListener);
 
 		new Label(parallelComp, SWT.NONE).setText("Select queue:");
 		queueCombo = new Combo(parallelComp, SWT.READ_ONLY);
 
-		loadMachineAndQueueCombos();
+		final IResourceManager rm = rms.length > 0 ? rms[0] : null;
+		loadQueueCombo(rm);
 		
-		machineCombo.addSelectionListener(listener);
-		queueCombo.addSelectionListener(listener);
+		queueCombo.addSelectionListener(combosListener);
 
 		createVerticalSpacer(parallelComp, 2);
 
 		// The composite that holds the RM's attributes for the launch configuration
 		Group attrGroup = new Group(parallelComp, SWT.SHADOW_ETCHED_IN);
-		attrComp = attrGroup;
 		attrGroup.setText("Launch Attributes");
-		attrComp.setLayout(createGridLayout(2, false, 0, 0));
-		attrComp.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 5));
+		attrGroup.setLayout(createGridLayout(1, false, 0, 0));
+		attrGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 5));
 
-		createLaunchAttributeControls();
+		createVerticalSpacer(attrGroup, 2);
+		
+		final Composite launchComp = createLaunchAttributeControlComposite(attrGroup, 2);
+		setLaunchConfigurationComposite(launchComp);
+		
+		createVerticalSpacer(attrGroup, 2);
 		
 		createVerticalSpacer(parallelComp, 2);
 	}
@@ -209,81 +238,52 @@ public class ParallelTab extends PLaunchConfigurationTab {
 	 * @see ILaunchConfigurationTab#initializeFrom(ILaunchConfiguration)
 	 */
 	public void initializeFrom(ILaunchConfiguration configuration) {
+		
+		// cache the launch configuration for updates
+		setLaunchConfiguration(configuration);
+		
 		try {
-			int idx = getResourceManagerNameIndex(configuration.getAttribute(
+			IResourceManager rm = getResourceManagerFromName(configuration.getAttribute(
 					IPTPLaunchConfigurationConstants.RESOURCE_MANAGER_NAME, EMPTY_STRING));
-			if (idx < 0)
-				idx = 0;
-			resourceManagerCombo.select(idx);
+			if (rm == null) {
+				setErrorMessage(LaunchMessages.getResourceString(
+						"ParallelTab.Invalid_Resource_Manager"));
+				return;
+			}
 
+			setResourceManagerComboSelection(rm);
+			
 			// load up the combos given that the configuration has selected
 			// a resource manager
-			loadMachineAndQueueCombos();
+			loadQueueCombo(rm);
 			
-			idx = getMachineNameIndex(configuration.getAttribute(
-					IPTPLaunchConfigurationConstants.MACHINE_NAME, EMPTY_STRING));
-			if (idx < 0)
-				idx = 0;
-			machineCombo.select(idx);
-
-			idx = getQueueNameIndex(configuration.getAttribute(
+			IPQueue queue = getQueueFromName(rm, configuration.getAttribute(
 					IPTPLaunchConfigurationConstants.QUEUE_NAME, EMPTY_STRING));
-			if (idx < 0)
-				idx = 0;
-			queueCombo.select(idx);
-
-			Map<String, String> configurationAttributeValueMap = 
-				getConfigurationAttributeValueMap(configuration);
-
-			for (String attrUniqueId : configurationAttributeValueMap.keySet()) {
-				IAttributeControl attrControl = attrControls.get(attrUniqueId);
-				if (attrControl != null) {
-					String value = configurationAttributeValueMap.get(attrUniqueId);
-					attrControl.setValue(value);
-				}
+			if (queue != null) {
+				setErrorMessage(LaunchMessages.getResourceString(
+						"ParallelTab.Invalid_Queue"));
+				return;
 			}
+
+			setQueueComboSelection(queue);
+			
+			IRMLaunchConfigurationDynamicTab rmDynamicTab = getRMLaunchConfigurationDynamicTab(rm);
+			final Composite launchComp = getLaunchConfigurationComposite();
+			if (rmDynamicTab == null || launchComp == null) {
+				setErrorMessage("No Launch Control Available for Resource Manager: " +
+						rm.getName());
+				return;
+			}
+			
+			// Update the dynamic portions of the launch configuration
+			// tab.
+			updateLaunchAttributeControls(rm, queue, getLaunchConfiguration());
 			
 		} catch (CoreException e) {
-			setErrorMessage(LaunchMessages
-					.getFormattedResourceString(
+			setErrorMessage(LaunchMessages.getFormattedResourceString(
 							"CommonTab.common.Exception_occurred_reading_configuration_EXCEPTION",
 							e.getStatus().getMessage()));
-		} catch (IllegalValue e) {
-			setErrorMessage(LaunchMessages
-					.getFormattedResourceString(
-							"CommonTab.common.Exception_occurred_reading_configuration_EXCEPTION",
-							e.getMessage()));
 		}
-		
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#canSave()
-	 */
-	@Override
-	public boolean canSave() {
-		setErrorMessage(null);
-		if (resourceManagerCombo.getSelectionIndex() < 0) {
-			setErrorMessage("No Resource Manager has been selected");
-			return false;
-		}
-		if (machineCombo.getSelectionIndex() < 0) {
-			setErrorMessage("No Machine has been selected");
-			return false;
-		}
-		if (queueCombo.getSelectionIndex() < 0) {
-			setErrorMessage("No Queue has been selected");
-			return false;
-		}
-		for (IAttributeControl attrControl : attrControls.values()) {
-			if (attrControl.isEnabled()) {
-				if (!attrControl.isValid()) {
-					setErrorMessage(attrControl.getErrorMessage());
-					return false;
-				}
-			}
-		}	
-		return true;
 	}
 
 	/*
@@ -292,7 +292,54 @@ public class ParallelTab extends PLaunchConfigurationTab {
 	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#isValid(org.eclipse.debug.core.ILaunchConfiguration)
 	 */
 	public boolean isValid(ILaunchConfiguration configuration) {
-		return canSave();
+		setErrorMessage(null);
+		setMessage(null);
+		try {
+			IResourceManager rm = getResourceManagerFromName(configuration.getAttribute(
+					IPTPLaunchConfigurationConstants.RESOURCE_MANAGER_NAME, EMPTY_STRING));
+			if (rm == null) {
+				setErrorMessage(LaunchMessages.getResourceString(
+						"ParallelTab.Invalid_Resource_Manager"));
+				return false;
+			}
+			
+			assert(rm == getResourceManagerFromCombo());
+
+			// load up the combos given that the configuration has selected
+			// a resource manager
+			loadQueueCombo(rm);
+			
+			IPQueue queue = getQueueFromName(rm, configuration.getAttribute(
+					IPTPLaunchConfigurationConstants.QUEUE_NAME, EMPTY_STRING));
+			if (queue == null) {
+				//TODO setErrorMessage(LaunchMessages.getResourceString(
+                //				"ParallelTab.Invalid_Queue"));
+				// TODO	return false;
+			}
+			
+			assert(queue == getQueueFromCombo());
+
+			IRMLaunchConfigurationDynamicTab rmDynamicTab = getRMLaunchConfigurationDynamicTab(rm);
+			if (rmDynamicTab == null) {
+				setErrorMessage("No Launch Configuration Available for Resource Manager: " +
+						rm.getName());
+				return false;
+			}
+			RMLaunchValidation validation = rmDynamicTab.isValid(configuration, rm, queue);
+			if (!validation.isSuccess()) {
+				setErrorMessage(validation.getMessage());
+				return false;
+			}
+			
+			return true;
+
+		} catch (CoreException e) {
+			setErrorMessage(LaunchMessages
+					.getFormattedResourceString(
+							"CommonTab.common.Exception_occurred_reading_configuration_EXCEPTION",
+							e.getStatus().getMessage()));
+			return false;
+		}
 	}
 
 	/**
@@ -301,42 +348,45 @@ public class ParallelTab extends PLaunchConfigurationTab {
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
 		configuration.setAttribute(IPTPLaunchConfigurationConstants.RESOURCE_MANAGER_NAME,
 				getResourceManagerNameFromCombo());
-		configuration.setAttribute(IPTPLaunchConfigurationConstants.MACHINE_NAME,
-				getMachineNameFromCombo());
 		configuration.setAttribute(IPTPLaunchConfigurationConstants.QUEUE_NAME,
 				getQueueNameFromCombo());
-		Map<String, String> valueMap = new HashMap<String, String>();
-		for (IAttributeControl control : attrControls.values()) {
-			IAttribute attribute;
-			attribute = control.getAttribute();
-			valueMap.put(attribute.getDescription().getUniqueId(), attribute.getStringRep());
+		final IResourceManager rm = getResourceManagerFromCombo();
+		IRMLaunchConfigurationDynamicTab rmDynamicTab = getRMLaunchConfigurationDynamicTab(rm);
+		if (rmDynamicTab == null) {
+			setErrorMessage("No Launch Configuration Available for Resource Manager: " +
+					rm.getName());
+			return;
 		}
-		setConfigurationAttributeValueMap(configuration, valueMap);
+		final IPQueue queue = getQueueFromCombo();
+		RMLaunchValidation validation = rmDynamicTab.performApply(configuration, rm, queue);
+		if (!validation.isSuccess()) {
+			setErrorMessage(validation.getMessage());
+			return;
+		}
+		
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#setDefaults(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy)
 	 */
 	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
-		configuration.setAttribute(IPTPLaunchConfigurationConstants.RESOURCE_MANAGER_NAME,
-				getResourceManagerNameFromCombo());
-		configuration.setAttribute(IPTPLaunchConfigurationConstants.MACHINE_NAME,
-				getMachineNameFromCombo());
-		configuration.setAttribute(IPTPLaunchConfigurationConstants.QUEUE_NAME,
-				getQueueNameFromCombo());
-		Map<String, String> configurationAttributeValueMap = new HashMap<String, String>();
-		IResourceManager rm = getResourceManagerFromCombo();
-		if (rm != null) {
-			IAttribute[] attributes = null;
-			attributes = rm.getLaunchAttributes(getMachineNameFromCombo(),
-					getQueueNameFromCombo(), attributes);
-			for (IAttribute attr : attributes) {
-				final String attrValue = attr.getStringRep();
-				final String uniqueId = attr.getDescription().getUniqueId();
-				configurationAttributeValueMap.put(uniqueId, attrValue);
-			}
-			setConfigurationAttributeValueMap(configuration, configurationAttributeValueMap);
+		final IResourceManager rm = getResourceManagerDefault();
+		if (rm == null) {
+			setErrorMessage("Cannot find a resource manager.");
+			return;
 		}
+		configuration.setAttribute(IPTPLaunchConfigurationConstants.RESOURCE_MANAGER_NAME,
+				rm.getName());
+		final IPQueue queue = getQueueDefault(rm);
+		final String queueName = (queue != null ? queue.getName() : "");
+		configuration.setAttribute(IPTPLaunchConfigurationConstants.QUEUE_NAME,
+				queueName);
+		IRMLaunchConfigurationDynamicTab rmDynamicTab = getRMLaunchConfigurationDynamicTab(rm);
+		if (rmDynamicTab == null) {
+			setErrorMessage("Cannot find a launch configuration for this resource manager.");
+			return;
+		}
+		rmDynamicTab.setDefaults(configuration, rm, queue);
 	}
 
 	/**
@@ -346,120 +396,129 @@ public class ParallelTab extends PLaunchConfigurationTab {
 		super.setLaunchConfigurationDialog(dialog);
 	}
 
-	private void createLaunchAttributeControls() {
-		createVerticalSpacer(attrComp, 2);
-	
-		IResourceManager rm = getResourceManagerFromCombo();
-		if (rm != null) {
-			IAttribute[] attributes = rm.getLaunchAttributes(getMachineNameFromCombo(),
-					getQueueNameFromCombo(), null);
-			attrControls = new HashMap<String, IAttributeControl>();
-			AttributeControlFactory factory = new AttributeControlFactory();
-			for (int i = 0; i < attributes.length; ++i) {
-				IAttributeDescription description = attributes[i].getDescription();
-				new Label(attrComp, SWT.NONE).setText(description.getName() + ": ");
-				String uniqeId = description.getUniqueId();
-				final IAttributeControl attrControl = factory.create(attrComp,
-						SWT.DROP_DOWN,	attributes[i]);
-				attrControls.put(uniqeId, attrControl);
-				// This listens for changes in the attrControl's value,
-				// and to the valid/invalid state of the attrControl.
-				attrControl.addPropertyChangeListener(listener);
-			}
+	private Composite createLaunchAttributeControlComposite(Composite parent, int colspan) {
+		Composite attrComp = new Composite(parent, SWT.NONE);
+//		attrComp.setLayout(createGridLayout(1, false, 0, 0));
+//		attrComp.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 5));
+		GridLayout launchConfigLayout = new GridLayout();
+		launchConfigLayout.marginHeight = 0;
+		launchConfigLayout.marginWidth = 0;
+		launchConfigLayout.numColumns = 1;
+		attrComp.setLayout(launchConfigLayout);
+		GridData gd = new GridData(GridData.FILL_BOTH);
+		gd.horizontalSpan = colspan;
+		attrComp.setLayoutData(gd);
+		return attrComp;
+	}
+
+	/**
+	 * Create a new dynamic tab, given the resource manager.
+	 * 
+	 * @param rm
+	 * @return
+	 * @throws CoreException
+	 */
+	private IRMLaunchConfigurationDynamicTab createRMLaunchConfigurationDynamicTab(
+			final IResourceManager rm) throws CoreException {
+		
+		final AbstractRMLaunchConfigurationFactory rmFactory = 
+			PTPLaunchPlugin.getDefault().getRMLaunchConfigurationFactory(rm);
+		if (rmFactory == null) {
+			return null;
+		}
+		IRMLaunchConfigurationDynamicTab rmDynamicTab =	rmFactory.create(rm);
+		if (rmDynamicTab == null) {
+			return null;
+		}
+		rmDynamicTab.addContentsChangedListener(launchContentsChangedListener);
+		return rmDynamicTab;
+	}
+
+	/**
+	 * @return the launchConfiguration
+	 */
+	private ILaunchConfiguration getLaunchConfiguration() {
+		return launchConfiguration;
+	}
+
+	private Composite getLaunchConfigurationComposite() {
+		return launchConfigurationComposite;
+	}
+
+	private IPQueue getQueueDefault(IResourceManager rm) {
+		final IPQueue[] queues = rm.getQueues();
+		if (queues.length == 0) {
+			return null;
+		}
+		return queues[0];
+	}
+
+	private IPQueue getQueueFromCombo() {
+		if (queueCombo != null) {
+			int i = queueCombo.getSelectionIndex();
+			return queues.get(i);
+		}
+		return null;
+	}
+
+	private IPQueue getQueueFromName(IResourceManager rm, String queueName) {
+		if (rm == null) {
+			return null;
 		}
 		
-		createVerticalSpacer(attrComp, 2);
-	}
-
-	private IPMachineControl getMachineFromCombo() {
-		IResourceManager rm = getResourceManagerFromCombo();
-		if (rm == null) {
-			return null;
+		IPQueue[] queues = rm.getQueues();
+		
+		for (IPQueue queue : queues) {
+			if (queue.getName().equals(queueName))
+				return queue;
 		}
-		IPMachineControl[] macs = rm.getMachineControls();
-		if (macs.length == 0) {
-			return null;
-		}
-		int i = 0;
-		if (machineCombo != null)
-			i = machineCombo.getSelectionIndex();
-		return macs[i];
-	}
-
-	private String getMachineNameFromCombo() {
-		IPMachineControl machine = getMachineFromCombo();
-		if (machine == null) {
-			return "";
-		}
-		return machine.getElementName();
-	}
-
-	private int getMachineNameIndex(String machineName) {
-		IResourceManager rm = getResourceManagerFromCombo();
-		if (rm == null) {
-			return -1;
-		}
-		IPMachine[] macs = rm.getMachines();
-		int found = -1;
-		for(int i=0; i<macs.length; i++) {
-			if(macs[i].getElementName().equals(machineName)) {
-				found = i;
-				break;
-			}
-		}
-		return found;
-	}
-	
-	private IPQueueControl getQueueFromCombo() {
-		IResourceManager rm = getResourceManagerFromCombo();
-		if (rm == null) {
-			return null;
-		}
-		IPQueueControl[] queues = rm.getQueueControls();
-		int i = 0;
-		if (queueCombo != null)
-			i = queueCombo.getSelectionIndex();
-		return queues[i];
+		return null;
 	}
 
 	private String getQueueNameFromCombo() {
-		IPQueueControl queue = getQueueFromCombo();
+		IPQueue queue = getQueueFromCombo();
 		if (queue == null) {
 			return "";
 		}
 		return queue.getElementName();
 	}
 
-	private int getQueueNameIndex(String queueName) {
-		IResourceManager rm = getResourceManagerFromCombo();
-		if (rm == null) {
-			return -1;
-		}
-		IPQueue[] queues = rm.getQueues();
-		int found = -1;
-		for(int i=0; i<queues.length; i++) {
-			if(queues[i].getElementName().equals(queueName)) {
-				found = i;
-				break;
-			}
-		}
-		return found;
-	}
-
-	private IResourceManager getResourceManagerFromCombo() {
+	private IResourceManager getResourceManagerDefault() {
 		IPUniverse universe = PTPCorePlugin.getDefault().getModelManager().getUniverse();
 		if (universe == null) {
 			return null;
 		}
-		IResourceManager[] rms = universe.getResourceManagers();
-		int i = -1;
-		if (resourceManagerCombo != null)
-			i = resourceManagerCombo.getSelectionIndex();
-		if (i >= 0 && i < rms.length)
-			return rms[i];
+		
+		IResourceManager[] rms = getStartedResourceManagers(universe);
+		if (rms.length == 0) {
+			return null;
+		}
+		return rms[0];
+	}
+
+	private IResourceManager getResourceManagerFromCombo() {
+		if (resourceManagerCombo != null) {
+			int i = resourceManagerCombo.getSelectionIndex();
+			return resourceManagers.get(i);
+		}
 		return null;
 	}
 
+	private IResourceManager getResourceManagerFromName(String rmName) {
+		IPUniverse universe = PTPCorePlugin.getDefault().getModelManager().getUniverse();
+		if (universe == null) {
+			return null;
+		}
+		
+		IResourceManager[] rms = getStartedResourceManagers(universe);
+		
+		for (IResourceManager rm : rms) {
+			if (rm.getName().equals(rmName)) {
+				return rm;
+			}
+		}
+		return null;
+	}
 	private String getResourceManagerNameFromCombo() {
 		IResourceManager rm = getResourceManagerFromCombo();
 		if (rm == null) {
@@ -468,97 +527,119 @@ public class ParallelTab extends PLaunchConfigurationTab {
 		return rm.getElementName();
 	}
 
-	private int getResourceManagerNameIndex(String rmName) {
-		IPUniverse universe = PTPCorePlugin.getDefault().getModelManager().getUniverse();
-		if (universe == null) {
-			return -1;
-		}
-		IResourceManager[] rms = universe.getResourceManagers();
-		int found = -1;
-		for(int i=0; i<rms.length; i++) {
-			if(rms[i].getElementName().equals(rmName)) {
-				found = i;
-				break;
+	/**
+	 * Returns a cached launch configuration dynamic tab.  If it isn't in the cache
+	 * then it creates a new one, and puts it in the cache.
+	 * 
+	 * @param rm
+	 * @return
+	 */
+	private IRMLaunchConfigurationDynamicTab getRMLaunchConfigurationDynamicTab(
+			final IResourceManager rm) {
+		if (!rmDynamicTabs.containsKey(rm)) { 
+			try {
+				IRMLaunchConfigurationDynamicTab rmDynamicTab =
+					createRMLaunchConfigurationDynamicTab(rm);
+				rmDynamicTabs.put(rm, rmDynamicTab);
+				return rmDynamicTab;
+			} catch (CoreException e) {
+				setErrorMessage(e.getMessage());
+				PTPLaunchPlugin.errorDialog(e.getMessage(), e);
+				return null;
 			}
 		}
-		return found;
+		return rmDynamicTabs.get(rm);
+	}
+
+	/**
+	 * @param universe
+	 * @return
+	 */
+	private IResourceManager[] getStartedResourceManagers(IPUniverse universe) {
+		IResourceManager[] rms = universe.getResourceManagers();
+		ArrayList<IResourceManager> startedRMs = 
+			new ArrayList<IResourceManager>(rms.length);
+		for (IResourceManager rm : rms) {
+			if (rm.getState() == ResourceManagerState.State.STARTED) {
+				startedRMs.add(rm);
+			}
+		}
+		return startedRMs.toArray(new IResourceManager[startedRMs.size()]);
 	}
 
 	/**
 	 * After a resource manager is chosen the machine and
 	 * queues combo boxes must be re-loaded.
 	 * This method does just that.
+	 * @param rm 
 	 */
-	private void loadMachineAndQueueCombos() {
-		machineCombo.removeAll();
+	private void loadQueueCombo(IResourceManager rm) {
 		queueCombo.removeAll();
+		queues.clear();
 
-		IResourceManager rm = getResourceManagerFromCombo();
 		if (rm == null) {
 			return;
 		}
 
-		final IPMachine[] macs = rm.getMachines();
-		for (int i = 0; i < macs.length; i++) {
-			machineCombo.add(macs[i].getElementName());
-		}
-		machineCombo.select(0);
-		
-		final IPQueue[] queues = rm.getQueues();
-		for (int i = 0; i < queues.length; i++) {
-			queueCombo.add(queues[i].getElementName());
+		final IPQueue[] qs = rm.getQueues();
+		for (int i = 0; i < qs.length; i++) {
+			queueCombo.add(qs[i].getElementName());
+			queues.put(i, qs[i]);
+			queueIndices.put(qs[i], i);
 		}
 		queueCombo.select(0);
 	}
 
-	private void updateLaunchAttributeControls() {
-		
-		IResourceManager rm = getResourceManagerFromCombo();
-		
-		if (rm != null) {
-			
-			ArrayList<IAttribute> currentAttrList = 
-				new ArrayList<IAttribute>(attrControls.size());
-			for (IAttributeControl attrControl : attrControls.values()) {
-				currentAttrList.add(attrControl.getAttribute());
-			}
-			final IAttribute[] currentAttrs = currentAttrList.toArray(new IAttribute[0]);
-			
-			IAttribute[] newAttrs = rm.getLaunchAttributes(getMachineNameFromCombo(),
-					getQueueNameFromCombo(), currentAttrs);
-			
-			for (IAttribute attr : newAttrs) {
-				IAttributeDescription description = attr.getDescription();
-				String uniqId = description.getUniqueId();
-				IAttributeControl attrControl = attrControls.get(uniqId);
-				if (attrControl != null) {
-					if (attrControl.isEnabled() != attr.isEnabled())
-						attrControl.setEnabled(attr.isEnabled());
-				}
-			}
+	private void setLaunchConfiguration(ILaunchConfiguration configuration) {
+		launchConfiguration = configuration;
+	}
+
+	private void setLaunchConfigurationComposite(Composite launchConfigurationComposite) {
+		this.launchConfigurationComposite = launchConfigurationComposite;
+	}
+
+	private void setQueueComboSelection(IPQueue queue) {
+		final Integer results = queueIndices.get(queue);
+		int i = 0;
+		if (results != null)
+			i = results.intValue();
+		queueCombo.select(i);
+	}
+
+	private void setResourceManagerComboSelection(IResourceManager rm) {
+		final Integer results = resourceManagerIndices.get(rm);
+		int i = 0;
+		if (results != null)
+			i = results.intValue();
+		resourceManagerCombo.select(i);
+	}
+
+	/**
+	 * This routine is called when either the resource manager or the
+	 * queue has been changed via the combo boxes.  It's job is to
+	 * regenerate the dynamic ui components, dependent on the resource
+	 * manager and queue choice.
+	 * 
+	 * @param rm
+	 * @param queue
+	 * @param launchConfiguration
+	 */
+	private void updateLaunchAttributeControls(IResourceManager rm, IPQueue queue,
+			ILaunchConfiguration launchConfiguration) {
+		final Composite launchComp = getLaunchConfigurationComposite();
+		for (Control child : launchComp.getChildren()) {
+			child.dispose();
 		}
-		
-		attrComp.layout();
-	}
-
-	/**
-	 * @param configuration
-	 * @param valueMap
-	 */
-	static public void setConfigurationAttributeValueMap(ILaunchConfigurationWorkingCopy configuration,
-			Map<String, String> valueMap) {
-		configuration.setAttribute(IPTPLaunchConfigurationConstants.LAUNCH_ATTR_MAP,
-				valueMap);
-	}
-
-	/**
-	 * @param configuration
-	 * @return
-	 * @throws CoreException
-	 */
-	static public Map<String,String> getConfigurationAttributeValueMap(ILaunchConfiguration configuration)
-	throws CoreException {
-		return configuration.getAttribute(IPTPLaunchConfigurationConstants.LAUNCH_ATTR_MAP,
-				Collections.EMPTY_MAP);
+		IRMLaunchConfigurationDynamicTab rmDynamicTab = getRMLaunchConfigurationDynamicTab(rm);
+		if (rmDynamicTab != null) {
+			try {
+				rmDynamicTab.createControl(launchComp, rm, queue);
+				rmDynamicTab.initializeFrom(launchComp, rm, queue, launchConfiguration);
+			} catch (CoreException e) {
+				setErrorMessage(e.getMessage());
+				PTPLaunchPlugin.errorDialog(e.getMessage(), e);
+			}
+		}		
+		launchComp.layout(true);
 	}
 }

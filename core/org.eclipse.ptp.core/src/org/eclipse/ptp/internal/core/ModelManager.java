@@ -20,6 +20,7 @@ package org.eclipse.ptp.internal.core;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -36,23 +37,48 @@ import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.ptp.core.IModelListener;
 import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.INodeListener;
-import org.eclipse.ptp.core.IPJob;
-import org.eclipse.ptp.core.IPUniverse;
 import org.eclipse.ptp.core.IProcessListener;
 import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.attributes.IAttribute;
+import org.eclipse.ptp.core.attributes.IEnumeratedAttribute;
+import org.eclipse.ptp.core.attributes.IEnumeratedAttributeDefinition;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
+import org.eclipse.ptp.core.elements.IPJob;
+import org.eclipse.ptp.core.elements.IPNode;
+import org.eclipse.ptp.core.elements.IPProcess;
+import org.eclipse.ptp.core.elements.IPUniverse;
+import org.eclipse.ptp.core.events.IModelErrorEvent;
 import org.eclipse.ptp.core.events.IModelEvent;
+import org.eclipse.ptp.core.events.IModelRuntimeNotifierEvent;
+import org.eclipse.ptp.core.events.IModelSysChangedEvent;
 import org.eclipse.ptp.core.events.INodeEvent;
 import org.eclipse.ptp.core.events.IProcessEvent;
+import org.eclipse.ptp.core.events.ModelErrorEvent;
+import org.eclipse.ptp.core.events.ModelRuntimeNotifierEvent;
+import org.eclipse.ptp.core.events.ModelSysChangedEvent;
+import org.eclipse.ptp.core.events.NodeEvent;
+import org.eclipse.ptp.core.events.ProcessEvent;
 import org.eclipse.ptp.internal.rmsystem.ResourceManagerPersistence;
+import org.eclipse.ptp.rmsystem.AbstractResourceManager;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerChangedListener;
 import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
 import org.eclipse.ptp.rmsystem.IResourceManagerListener;
-import org.eclipse.ptp.rmsystem.ResourceManagerStatus;
+import org.eclipse.ptp.rmsystem.JobState;
 import org.eclipse.ptp.rmsystem.events.IResourceManagerAddedRemovedEvent;
-import org.eclipse.ptp.rmsystem.events.IResourceManagerContentsChangedEvent;
+import org.eclipse.ptp.rmsystem.events.IResourceManagerChangedJobsEvent;
+import org.eclipse.ptp.rmsystem.events.IResourceManagerChangedMachinesEvent;
+import org.eclipse.ptp.rmsystem.events.IResourceManagerChangedNodesEvent;
+import org.eclipse.ptp.rmsystem.events.IResourceManagerChangedProcessesEvent;
+import org.eclipse.ptp.rmsystem.events.IResourceManagerChangedQueuesEvent;
+import org.eclipse.ptp.rmsystem.events.IResourceManagerErrorEvent;
+import org.eclipse.ptp.rmsystem.events.IResourceManagerNewJobsEvent;
+import org.eclipse.ptp.rmsystem.events.IResourceManagerNewMachinesEvent;
+import org.eclipse.ptp.rmsystem.events.IResourceManagerNewNodesEvent;
+import org.eclipse.ptp.rmsystem.events.IResourceManagerNewProcessesEvent;
+import org.eclipse.ptp.rmsystem.events.IResourceManagerNewQueuesEvent;
 import org.eclipse.ptp.rmsystem.events.ResourceManagerAddedRemovedEvent;
 import org.eclipse.swt.widgets.Display;
 
@@ -60,10 +86,6 @@ public class ModelManager implements IModelManager, IResourceManagerChangedListe
 IResourceManagerListener {
 	private final ListenerList resourceManagerListeners = new ListenerList();
 	private IResourceManagerFactory[] resourceManagerFactories;
-	private final IModelListener rmModelListener;
-	private final INodeListener rmNodeListener;
-
-	private final IProcessListener rmProcessListener;
 	private final Display display;
 	protected ListenerList modelListeners = new ListenerList();
 	protected ListenerList nodeListeners = new ListenerList();
@@ -74,41 +96,9 @@ IResourceManagerListener {
 	protected ILaunchConfiguration config = null;
 
 	public ModelManager() {
-
 		this.display = PTPCorePlugin.getDisplay();
-
-		// Forward resource manager events to the ModelManager's listeners
-		rmModelListener = new IModelListener(){
-			public void modelEvent(IModelEvent event) {
-				fireEvent(event);
-			}
-		};
-
-		// Forward resource manager events to the ModelManager's listeners
-		rmNodeListener = new INodeListener(){
-			public void nodeEvent(INodeEvent event) {
-				fireEvent(event);
-			}
-		};
-
-		// Forward resource manager events to the ModelManager's listeners
-		rmProcessListener = new IProcessListener(){
-			public void processEvent(IProcessEvent event) {
-				fireEvent(event);
-			}
-		};
 	}
 
-	public void abortJob(String jobName) throws CoreException {
-		IResourceManager[] resourceManagers = universe.getResourceManagers();
-		for (int i=0; i< resourceManagers.length; ++i) {
-			boolean found = resourceManagers[i].abortJob(jobName);
-			if (found) {
-				return;
-			}
-		}
-	}
-	
 	public void addModelListener(IModelListener listener) {
 		modelListeners.add(listener);
 	}
@@ -120,7 +110,7 @@ IResourceManagerListener {
 		processListeners.add(listener);
 	}
 	
-	public void addResourceManager(IResourceManager addedManager) {
+	public void addResourceManager(IResourceManagerControl addedManager) {
 		// begin forwarding of events to the ModelManager
 		addRMListeners(addedManager);
 		universe.addResourceManager(addedManager);
@@ -133,7 +123,7 @@ IResourceManagerListener {
 		resourceManagerListeners.add(listener);
 	}
 	
-	public void addResourceManagers(IResourceManager[] addedManagers) {
+	public void addResourceManagers(IResourceManagerControl[] addedManagers) {
 		// begin forwarding of events to the ModelManager
 		for (int i=0; i<addedManagers.length; ++i) {
 			addRMListeners(addedManagers[i]);
@@ -206,11 +196,109 @@ IResourceManagerListener {
 	public IPUniverse getUniverse() {
 		return universe;
 	}
-	public void handleContentsChanged(IResourceManagerContentsChangedEvent event) {
+    
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerListener#handleChangedJobsEvent(org.eclipse.ptp.rmsystem.events.IResourceManagerChangedJobsEvent)
+	 */
+	public void handleChangedJobsEvent(IResourceManagerChangedJobsEvent e) {
+		Collection<IAttribute> attrs = e.getChangedAttributes();
+		boolean stateChanged = false;
+		int eventState = -1;
+		final IEnumeratedAttributeDefinition stateAttributeDefinition = 
+			JobState.getStateAttributeDefinition();
+		for (IAttribute attr : attrs) {
+			if (attr.getDefinition() == stateAttributeDefinition) {
+				stateChanged = true;
+				eventState = extractStateCode((IEnumeratedAttribute)attr);
+			}
+		}
+		final Collection<IPJob> jobs = e.getChangedJobs();
+		if (stateChanged) {
+			for (IPJob job : jobs) {
+				fireEvent(new ModelRuntimeNotifierEvent(job.getIDString(),
+						IModelRuntimeNotifierEvent.TYPE_JOB, eventState));
+			}
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerListener#handleChangedMachinesEvent(org.eclipse.ptp.rmsystem.events.IResourceManagerChangedMachinesEvent)
+	 */
+	public void handleChangedMachinesEvent(IResourceManagerChangedMachinesEvent e) {
+		fireEvent(new ModelSysChangedEvent(IModelSysChangedEvent.SYS_STATUS_CHANGED, null));
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerListener#handleChangedNodesEvent(org.eclipse.ptp.rmsystem.events.IResourceManagerChangedNodesEvent)
+	 */
+	public void handleChangedNodesEvent(IResourceManagerChangedNodesEvent e) {
+		fireNodesStatesChanged(e.getChangedNodes());
+	}
+	
+	public void handleChangedProcessesEvent(IResourceManagerChangedProcessesEvent e) {
+		for (IPProcess proc : e.getChangedProcesses()) {
+			fireEvent(new ProcessEvent(proc,
+					IProcessEvent.STATUS_CHANGE_TYPE, proc.getStatus()));
+		}
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerListener#handleChangedQueuesEvent(org.eclipse.ptp.rmsystem.events.IResourceManagerChangedQueuesEvent)
+	 */
+	public void handleChangedQueuesEvent(IResourceManagerChangedQueuesEvent e) {
+		fireEvent(new ModelSysChangedEvent(IModelSysChangedEvent.SYS_STATUS_CHANGED, null));
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerListener#handleErrorStateEvent(org.eclipse.ptp.rmsystem.events.IResourceManagerErrorEvent)
+	 */
+	public void handleErrorStateEvent(IResourceManagerErrorEvent e) {
+		fireEvent(new ModelErrorEvent(IModelErrorEvent.TYPE_ERROR, e.getMessage()));
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerListener#handleNewJobsEvent(org.eclipse.ptp.rmsystem.events.IResourceManagerNewJobsEvent)
+	 */
+	public void handleNewJobsEvent(IResourceManagerNewJobsEvent e) {
+		for (IPJob job : e.getNewJobs()) {
+			fireEvent(new ModelRuntimeNotifierEvent(job.getIDString(),
+					IModelRuntimeNotifierEvent.TYPE_JOB, IModelRuntimeNotifierEvent.STARTED));
+		}
+	}	
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerListener#handleNewMachinesEvent(org.eclipse.ptp.rmsystem.events.IResourceManagerNewMachinesEvent)
+	 */
+	public void handleNewMachinesEvent(IResourceManagerNewMachinesEvent e) {
+		fireEvent(new ModelSysChangedEvent(IModelSysChangedEvent.MAJOR_SYS_CHANGED, null));
+		fireEvent(new ModelSysChangedEvent(IModelSysChangedEvent.SYS_STATUS_CHANGED, null));
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerListener#handleNewNodesEvent(org.eclipse.ptp.rmsystem.events.IResourceManagerNewNodesEvent)
+	 */
+	public void handleNewNodesEvent(IResourceManagerNewNodesEvent e) {
+		fireEvent(new ModelSysChangedEvent(IModelSysChangedEvent.MAJOR_SYS_CHANGED, null));
+		
+		fireNodesStatesChanged(e.getNewNodes());
+	}
+	
+	public void handleNewProcessesEvent(IResourceManagerNewProcessesEvent e) {
 		// TODO Auto-generated method stub
 		
 	}
-
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerListener#handleNewQueuesEvent(org.eclipse.ptp.rmsystem.events.IResourceManagerNewQueuesEvent)
+	 */
+	public void handleNewQueuesEvent(IResourceManagerNewQueuesEvent e) {
+		fireEvent(new ModelSysChangedEvent(IModelSysChangedEvent.MAJOR_SYS_CHANGED, null));
+		fireEvent(new ModelSysChangedEvent(IModelSysChangedEvent.SYS_STATUS_CHANGED, null));
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerChangedListener#handleResourceManagersAddedRemoved(org.eclipse.ptp.rmsystem.events.IResourceManagerAddedRemovedEvent)
+	 */
 	public void handleResourceManagersAddedRemoved(IResourceManagerAddedRemovedEvent event) {
 		if (event.getType() == IResourceManagerAddedRemovedEvent.ADDED) {
 			IResourceManager[] rms = event.getResourceManagers();
@@ -225,19 +313,21 @@ IResourceManagerListener {
 			}
 		}
 	}
-
-	public void handleStartup(IResourceManager resourceManager) {
+	
+	public void handleShutdownStateEvent(IResourceManager resourceManager) {
 		// TODO Auto-generated method stub
 		
 	}
-	public void handleStatusChanged(ResourceManagerStatus oldStatus, IResourceManager manager) {
+	
+	public void handleStartupStateEvent(IResourceManager resourceManager) {
 		// TODO Auto-generated method stub
 		
 	}
-	public void handleShutdown(IResourceManager resourceManager) {
-		// TODO Auto-generated method stub
-		
-	}
+	
+	public void handleSuspendedStateEvent(AbstractResourceManager manager) {
+        // TODO Auto-generated method stub
+        
+    }
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.IModelManager#loadResourceManagers()
@@ -247,17 +337,17 @@ IResourceManagerListener {
 		// Loads and, if necessary, starts saved resource managers.
 		rmp.loadResourceManagers(getResourceManagersFile(), getResourceManagerFactories(),
 				monitor);
-		IResourceManager[] resourceManagers = rmp.getResourceManagers();
+		IResourceManagerControl[] resourceManagers = rmp.getResourceManagerControls();
 		addResourceManagers(resourceManagers);
 	}
-	
+
 	public void removeModelListener(IModelListener listener) {
 		modelListeners.remove(listener);
 	}
 	
 	public void removeNodeListener(INodeListener listener) {
 		nodeListeners.remove(listener);
-	}	
+	}
 	
 	public void removeProcessListener(IProcessListener listener) {
 		processListeners.remove(listener);
@@ -272,7 +362,7 @@ IResourceManagerListener {
 	public void removeResourceManagerChangedListener(IResourceManagerChangedListener listener) {
 		resourceManagerListeners.remove(listener);
 	}
-	
+
 	public void removeResourceManagers(IResourceManager[] removedRMs) {
 		universe.removeResourceManagers(removedRMs);
 		IResourceManagerAddedRemovedEvent event = new ResourceManagerAddedRemovedEvent(this,
@@ -286,13 +376,13 @@ IResourceManagerListener {
 	
 	public void saveResourceManagers() {
 		ResourceManagerPersistence.saveResourceManagers(getResourceManagersFile(),
-				universe.getResourceManagers());
+				universe.getResourceManagerControls());
 	}
 	
 	public void setPTPConfiguration(ILaunchConfiguration config) {
 		this.config = config;
 	}
-	
+
 	public void shutdown() throws CoreException {
 		saveResourceManagers();
 		stopResourceManagers();
@@ -308,18 +398,18 @@ IResourceManagerListener {
 		nodeListeners.clear();
 		processListeners.clear();
 	}
-	
-	/**
+
+    /**
 	 * shuts down all of the resource managers.
 	 */
 	public void shutdownResourceManagers() {
-		IResourceManager[] resourceManagers = universe.getResourceManagers();
+		IResourceManagerControl[] resourceManagers = universe.getResourceManagerControls();
 		for (int i = 0; i<resourceManagers.length; ++i) {
 			resourceManagers[i].dispose();
 		}
 	}
-	
-	public void start(IProgressMonitor monitor) throws CoreException {
+
+    public void start(IProgressMonitor monitor) throws CoreException {
 		monitor.beginTask("Starting Model Manager", 10);
 		try {
 			SubProgressMonitor subMonitor = new SubProgressMonitor(monitor, 10);
@@ -341,17 +431,37 @@ IResourceManagerListener {
 			resourceManagers[i].shutdown();
 		}
 	}
-	
+
 	/**
 	 * Forward resource manager events to the ModelManager's listeners
-	 * @param manager
+	 * @param rm
 	 */
-	private void addRMListeners(IResourceManager manager) {
-		manager.addModelListener(rmModelListener);
-		manager.addNodeListener(rmNodeListener);
-		manager.addProcessListener(rmProcessListener);
+	private void addRMListeners(IResourceManager rm) {
+		rm.addResourceManagerListener(this);
 	}
-	
+
+	private int extractStateCode(IEnumeratedAttribute attr) {
+		int eventState = -1;
+		JobState.State state = JobState.State.values()[attr.getValueIndex()];
+		switch (state) {
+		case ABORTED:
+			eventState = IModelRuntimeNotifierEvent.ABORTED;
+			break;
+		case STARTED:
+			eventState = IModelRuntimeNotifierEvent.STARTED;
+			break;
+		case RUNNING:
+			eventState = IModelRuntimeNotifierEvent.RUNNING;
+			break;
+		case STOPPED:
+			eventState = IModelRuntimeNotifierEvent.STOPPED;
+			break;
+		default:
+			throw new IllegalArgumentException("unknown job state");
+		}
+		return eventState;
+	}
+
 	private void fireEvent(final IModelEvent event) {
         Object[] array = modelListeners.getListeners();
         for (int i = 0; i < array.length; i++) {
@@ -363,7 +473,7 @@ IResourceManagerListener {
             });
         }
 	}
-	
+
 	private void fireEvent(final INodeEvent event) {
         Object[] array = nodeListeners.getListeners();
         for (int i = 0; i < array.length; i++) {
@@ -375,7 +485,7 @@ IResourceManagerListener {
             });
         }
 	}
-	
+
 	private void fireEvent(final IProcessEvent event) {
         Object[] array = processListeners.getListeners();
         for (int i = 0; i < array.length; i++) {
@@ -386,6 +496,17 @@ IResourceManagerListener {
                 }
             });
         }
+	}
+
+	private void fireNodesStatesChanged(Collection<IPNode> nodes) {
+		if (nodes.size() == 1) {
+			IPNode the_one_changed_node = nodes.iterator().next();
+			fireEvent(new NodeEvent(the_one_changed_node, INodeEvent.STATUS_UPDATE_TYPE, null));
+		}
+		else {
+			/* ok more than 1 node changed, too complex let's just let them know to do a refresh */
+			fireEvent(new ModelSysChangedEvent(IModelSysChangedEvent.SYS_STATUS_CHANGED, null));
+		}
 	}
 
 	private void fireResourceManagersAddedRemoved(final IResourceManagerAddedRemovedEvent event) {
@@ -400,20 +521,18 @@ IResourceManagerListener {
 			});
 		}
 	}
-	
+
 	private File getResourceManagersFile() {
 		final PTPCorePlugin plugin = PTPCorePlugin.getDefault();
 		return plugin.getStateLocation().append("resourceManagers.xml").toFile();
 	}
-	
+
 	/**
 	 * Forward resource manager events to the ModelManager's listeners
-	 * @param manager
+	 * @param rm
 	 */
-	private void removeRMListeners(IResourceManager manager) {
-		manager.removeModelListener(rmModelListener);
-		manager.removeNodeListener(rmNodeListener);
-		manager.removeProcessListener(rmProcessListener);
+	private void removeRMListeners(IResourceManager rm) {
+		rm.removeResourceManagerListener(this);
 	}
 
 	/**

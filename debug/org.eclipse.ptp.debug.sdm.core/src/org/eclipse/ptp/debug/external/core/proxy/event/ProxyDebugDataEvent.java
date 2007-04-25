@@ -23,11 +23,11 @@ import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.aif.IAIF;
 
 
-public class ProxyDebugDataEvent extends AbstractProxyDebugEvent implements IProxyDebugEvent {
+public class ProxyDebugDataEvent extends AbstractProxyDebugEvent implements IProxyDebugDataEvent {
 	private IAIF data;
 	
-	public ProxyDebugDataEvent(BitList set, IAIF data) {
-		super(EVENT_DBG_DATA, set);
+	public ProxyDebugDataEvent(int transID, BitList set, IAIF data) {
+		super(transID, EVENT_DBG_DATA, set);
 		this.data = data;
 	}
 	
@@ -36,7 +36,7 @@ public class ProxyDebugDataEvent extends AbstractProxyDebugEvent implements IPro
 	}
 	
 	public String toString() {
-		String res = "EVENT_DBG_DATA " + this.getBitSet().toString();
+		String res = "EVENT_DBG_DATA transid=" + getTransactionID() + " " + this.getBitSet().toString();
 		if (this.data != null)
 			res += " " + this.data.toString();
 		else

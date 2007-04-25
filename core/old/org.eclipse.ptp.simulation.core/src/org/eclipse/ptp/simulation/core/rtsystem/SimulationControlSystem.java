@@ -19,20 +19,20 @@
 
 package org.eclipse.ptp.simulation.core.rtsystem;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.ptp.core.AttributeConstants;
-import org.eclipse.ptp.core.IPJob;
-import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.elementcontrols.IPJobControl;
 import org.eclipse.ptp.core.elementcontrols.IPProcessControl;
+import org.eclipse.ptp.core.elements.IPJob;
+import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.rtsystem.IControlSystem;
-import org.eclipse.ptp.rtsystem.IRuntimeListener;
 import org.eclipse.ptp.rtsystem.JobRunConfiguration;
 import org.eclipse.ptp.rtsystem.RuntimeEvent;
 
@@ -41,29 +41,32 @@ public class SimulationControlSystem implements IControlSystem {
 
 	protected int numJobs = -1;
 
-	protected List listeners = new ArrayList(2);
-
 	protected Thread runningAppEventsThread = null;
 
 	protected Thread runningAppFinishThread = null;
 
-	protected HashMap processMap;
+	protected HashMap<String,Integer> processMap;
 	
-	protected Vector simJobs = null;
+	protected Vector<SimJobState> simJobs = null;
 
 	public SimulationControlSystem() {
-		simJobs = new Vector();
+		simJobs = new Vector<SimJobState>();
 	}
 	
 	/* a simulated (fake) system is always healthy :) */
 	public boolean isHealthy() { return true; }
 	
-	public void startup() {
-		processMap = new HashMap();
+	public void startup(IProgressMonitor monitor) {
+		if (monitor == null) {
+			monitor = new NullProgressMonitor();
+		}
+		monitor.beginTask("startup", 1);
+		processMap = new HashMap<String,Integer>();
+		monitor.worked(1);
 	}
 	
 	/* returns the new job name that it started - unique */
-	public void run(int jobID, int nProcs, int firstNodeNum, int nProcsPerNode, JobRunConfiguration jobRunConfig) {
+	public void submit(int jobID, int nProcs, int firstNodeNum, int nProcsPerNode, JobRunConfiguration jobRunConfig) {
 		/*
 		if (spawned_app_state != null
 				&& (spawned_app_state.equals(IPProcess.STARTING) || spawned_app_state
@@ -81,7 +84,7 @@ public class SimulationControlSystem implements IControlSystem {
 		ss.jobname = s;
 		ss.spawned_num_procs = ss.spawned_procs_per_node = ss.spawned_first_node = 0;
 
-		ss.machine_name = jobRunConfig.getMachineName();
+		ss.machine_name = jobRunConfig.getQueueName();
 		ss.spawned_num_procs = nProcs;
 		ss.spawned_procs_per_node = nProcsPerNode;
 		ss.spawned_first_node = firstNodeNum;
@@ -300,39 +303,8 @@ public class SimulationControlSystem implements IControlSystem {
 		return retstr;
 	}
 
-	public void addRuntimeListener(IRuntimeListener listener) {
-		listeners.add(listener);
-	}
-
-	public void removeRuntimeListener(IRuntimeListener listener) {
-		listeners.remove(listener);
-	}
-
-	protected synchronized void fireEvent(String ne, RuntimeEvent event) {
-		if (listeners == null)
-			return;
-		Iterator i = listeners.iterator();
-		while (i.hasNext()) {
-			IRuntimeListener listener = (IRuntimeListener) i.next();
-			switch (event.getEventNumber()) {
-			case RuntimeEvent.EVENT_PROCESS_OUTPUT:
-				listener.runtimeProcessOutput(ne, event.getText());
-				break;
-			case RuntimeEvent.EVENT_JOB_EXITED:
-				listener.runtimeJobExited(ne);
-				break;
-			case RuntimeEvent.EVENT_JOB_STATE_CHANGED:
-				listener.runtimeJobStateChanged(ne, "<SIMULATED>");
-				break;
-			case RuntimeEvent.EVENT_NEW_JOB:
-				listener.runtimeNewJob(ne);
-				break;
-			}
-		}
-	}
-
-	public void shutdown() {
-		listeners.clear();
-		listeners = null;
+	public void submitJob(int jobID, int nProcs, int firstNodeNum, int nProcsPerNode, JobRunConfiguration jobRunConfig) throws CoreException {
+		// TODO Auto-generated method stub
+		
 	}
 }

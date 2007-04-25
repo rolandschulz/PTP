@@ -21,78 +21,112 @@
  */
 package org.eclipse.ptp.rmsystem;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
+import org.eclipse.debug.core.ILaunch;
 import org.eclipse.jface.util.SafeRunnable;
-import org.eclipse.ptp.core.IModelListener;
-import org.eclipse.ptp.core.INodeListener;
-import org.eclipse.ptp.core.IPJob;
-import org.eclipse.ptp.core.IPMachine;
-import org.eclipse.ptp.core.IPProcess;
-import org.eclipse.ptp.core.IPQueue;
-import org.eclipse.ptp.core.IProcessListener;
 import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
+import org.eclipse.ptp.core.attributes.EnumeratedAttributeDefinition;
+import org.eclipse.ptp.core.attributes.IAttribute;
+import org.eclipse.ptp.core.attributes.IAttributeDefinition;
+import org.eclipse.ptp.core.attributes.IEnumeratedAttributeDefinition;
+import org.eclipse.ptp.core.attributes.IIntegerAttribute;
+import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.elementcontrols.IPJobControl;
 import org.eclipse.ptp.core.elementcontrols.IPMachineControl;
+import org.eclipse.ptp.core.elementcontrols.IPNodeControl;
+import org.eclipse.ptp.core.elementcontrols.IPProcessControl;
 import org.eclipse.ptp.core.elementcontrols.IPQueueControl;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
-import org.eclipse.ptp.core.events.IModelEvent;
-import org.eclipse.ptp.core.events.INodeEvent;
-import org.eclipse.ptp.core.events.IProcessEvent;
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
+import org.eclipse.ptp.core.elements.IPJob;
+import org.eclipse.ptp.core.elements.IPMachine;
+import org.eclipse.ptp.core.elements.IPNode;
+import org.eclipse.ptp.core.elements.IPProcess;
+import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.internal.core.PElement;
-import org.eclipse.ptp.rmsystem.events.ResourceManagerContentsChangedEvent;
-import org.eclipse.swt.widgets.Display;
+import org.eclipse.ptp.internal.core.PJob;
+import org.eclipse.ptp.internal.core.PMachine;
+import org.eclipse.ptp.internal.core.PNode;
+import org.eclipse.ptp.internal.core.PProcess;
+import org.eclipse.ptp.internal.core.PQueue;
+import org.eclipse.ptp.rmsystem.events.IResourceManagerChangedJobsEvent;
+import org.eclipse.ptp.rmsystem.events.IResourceManagerChangedMachinesEvent;
+import org.eclipse.ptp.rmsystem.events.IResourceManagerChangedNodesEvent;
+import org.eclipse.ptp.rmsystem.events.IResourceManagerChangedProcessesEvent;
+import org.eclipse.ptp.rmsystem.events.IResourceManagerChangedQueuesEvent;
+import org.eclipse.ptp.rmsystem.events.IResourceManagerNewJobsEvent;
+import org.eclipse.ptp.rmsystem.events.IResourceManagerNewMachinesEvent;
+import org.eclipse.ptp.rmsystem.events.IResourceManagerNewNodesEvent;
+import org.eclipse.ptp.rmsystem.events.IResourceManagerNewProcessesEvent;
+import org.eclipse.ptp.rmsystem.events.IResourceManagerNewQueuesEvent;
+import org.eclipse.ptp.rmsystem.events.ResourceManagerChangedJobsEvent;
+import org.eclipse.ptp.rmsystem.events.ResourceManagerChangedMachinesEvent;
+import org.eclipse.ptp.rmsystem.events.ResourceManagerChangedNodesEvent;
+import org.eclipse.ptp.rmsystem.events.ResourceManagerChangedProcessesEvent;
+import org.eclipse.ptp.rmsystem.events.ResourceManagerChangedQueuesEvent;
+import org.eclipse.ptp.rmsystem.events.ResourceManagerErrorEvent;
+import org.eclipse.ptp.rmsystem.events.ResourceManagerNewJobsEvent;
+import org.eclipse.ptp.rmsystem.events.ResourceManagerNewMachinesEvent;
+import org.eclipse.ptp.rmsystem.events.ResourceManagerNewNodesEvent;
+import org.eclipse.ptp.rmsystem.events.ResourceManagerNewProcessesEvent;
+import org.eclipse.ptp.rmsystem.events.ResourceManagerNewQueuesEvent;
+import org.eclipse.ptp.rtsystem.JobRunConfiguration;
 
 /**
  * @author rsqrd
  * 
  */
-public abstract class AbstractResourceManager extends PElement implements IResourceManager {
+public abstract class AbstractResourceManager extends PElement implements IResourceManager,
+IResourceManagerControl {
 	
+	private static IAttribute[] getDefaultAttributes(IResourceManagerConfiguration config) {
+		IAttribute nameAttr = null;
+		
+		try {
+			 nameAttr = AttributeDefinitionManager.getNameAttributeDefinition().create(config.getName());
+		} catch (IllegalValueException e) {
+		}
+		
+		return new IAttribute[]{nameAttr};
+	}
+
 	private final ListenerList listeners = new ListenerList();
 
 	private final IResourceManagerConfiguration config;
+	private ResourceManagerState.State state;
+	private String statusMessage;
+	private AttributeDefinitionManager attrDefManager;
 
-	private ResourceManagerStatus status;
+	private final HashMap<Integer, IPJobControl> jobs = new HashMap<Integer, IPJobControl>();
+	private final HashMap<Integer, IPMachineControl> machines = new HashMap<Integer, IPMachineControl>();
+	private final HashMap<Integer, IPNodeControl> nodes = new HashMap<Integer, IPNodeControl>();
+	private final HashMap<Integer, IPProcessControl> processes = new HashMap<Integer, IPProcessControl>();
+	private final HashMap<Integer, IPQueueControl> queues = new HashMap<Integer, IPQueueControl>();
 
-	private final ListenerList modelListeners = new ListenerList();
-
-	private final ListenerList nodeListeners = new ListenerList();
-
-	private final ListenerList processListeners = new ListenerList();
-
-	protected final Display display;
-
-	protected final HashMap queues = new HashMap();
-
-	protected final HashMap machines = new HashMap();
-	
-	public AbstractResourceManager(IPUniverseControl universe, IResourceManagerConfiguration config)
+	public AbstractResourceManager(int id, IPUniverseControl universe, IResourceManagerConfiguration config)
 	{
-		super(universe, config.getName(), config.getResourceManagerId(), P_RESOURCE_MANAGER);
-		this.display = PTPCorePlugin.getDisplay();
+		super(id, universe, P_RESOURCE_MANAGER, getDefaultAttributes(config));
 		this.config = config;
-		this.status = ResourceManagerStatus.INIT;
-	}
-	
-	public void addModelListener(IModelListener listener) {
-		modelListeners.add(listener);
-	}
-
-	public void addNodeListener(INodeListener listener) {
-		nodeListeners.add(listener);
-	}
-
-	public void addProcessListener(IProcessListener listener) {
-		processListeners.add(listener);
+		this.state = ResourceManagerState.State.STOPPED;
+		this.statusMessage = this.state.toString();
+		this.attrDefManager = new AttributeDefinitionManager();
+		this.attrDefManager.setAttributeDefinition(JobState.getStateAttributeDefinition());
+		this.attrDefManager.setAttributeDefinition(MachineState.getStateAttributeDefinition());
+		this.attrDefManager.setAttributeDefinition(NodeState.getStateAttributeDefinition());
+		this.attrDefManager.setAttributeDefinition(ProcessState.getStateAttributeDefinition());
+		this.attrDefManager.setAttributeDefinition(QueueState.getStateAttributeDefinition());
+		this.attrDefManager.setAttributeDefinition(ResourceManagerState.getStateAttributeDefinition());
 	}
 
 	/*
@@ -101,6 +135,7 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	 * @see org.eclipse.ptp.rm.IResourceManager#addResourceManagerListener(org.eclipse.ptp.rm.IResourceManagerListener)
 	 */
 	public void addResourceManagerListener(IResourceManagerListener listener) {
+		System.out.println("listener: " + listener + " added to " + this);
 		listeners.add(listener);
 	}
 
@@ -108,48 +143,42 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	 * @see org.eclipse.ptp.rmsystem.IResourceManager#disableEvents()
 	 */
 	public void disableEvents() throws CoreException {
-		doDisableEvents();
-		setStatus(ResourceManagerStatus.EVENTS_DISABLED, true);
+	    if (getState().equals(ResourceManagerState.State.STARTED)) {
+	        doDisableEvents();
+	        setState(ResourceManagerState.State.SUSPENDED);
+            fireSuspended();
+        }
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.IResourceManager#dispose()
 	 */
 	public void dispose() {
-		modelListeners.clear();
-		nodeListeners.clear();
-		processListeners.clear();
+		listeners.clear();
 		SafeRunnable.run(new SafeRunnable(){
 			public void run() throws Exception {
 				shutdown();
 			}});
 		doDispose();
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.IResourceManager#enableEvents()
 	 */
 	public void enableEvents() throws CoreException {
-		doEnableEvents();
-		setStatus(ResourceManagerStatus.EVENTS_ENABLED, true);
+	    if (getState().equals(ResourceManagerState.State.SUSPENDED)) {
+	        doEnableEvents();
+	        setState(ResourceManagerState.State.STARTED);
+            fireStarted();
+	    }
 	}
 
-	public synchronized IPJobControl findJobById(String job_id) {
-		IPQueueControl[] queues = getQueueControls();
+	public synchronized IPJob findJobById(String job_id) {
+		IPQueue[] queues = getQueues();
 		for (int j = 0; j < queues.length; ++j) {
-			IPJobControl job = queues[j].findJobById(job_id);
+			IPJob job = queues[j].getJob(Integer.parseInt(job_id));
 			if (job != null) {
 				return job;
-			}
-		}
-		return null;
-	}
-
-	public synchronized IPQueue findQueueById(String id) {
-		IPQueueControl[] queues = getQueueControls();
-		for (int j = 0; j < queues.length; ++j) {
-			if (queues[j].getIDString().equals(id)) {
-				return queues[j];
 			}
 		}
 		return null;
@@ -166,13 +195,27 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 		}
 	}
 
+	public AttributeDefinitionManager getAttributeDefinitionManager() {
+		return attrDefManager;
+	}
+	
+	/**
+	 * Lookup an attribute definition
+	 * 
+	 * @param attrId
+	 * @return attribute definition
+	 */
+	public IAttributeDefinition getAttributeDefinition(String attrId) {
+		return attrDefManager.getAttributeDefinition(attrId);
+	}
+	
 	/**
 	 * @return
 	 */
 	public IResourceManagerConfiguration getConfiguration() {
 		return config;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.IResourceManager#getDescription()
 	 */
@@ -180,14 +223,56 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 		return config.getDescription();
 	}
 
-	public synchronized IPMachine getMachine(String ID) {
-		return (IPMachine) machines.get(ID);
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.internal.core.PElement#getID()
+	 */
+	@Override
+	public int getID() {
+		// needed this to get around draconian plug-in
+		// library restrictions
+		return super.getID();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.internal.core.PElement#getIDString()
+	 */
+	@Override
+	public String getIDString() {
+		return getConfiguration().getResourceManagerId();
+	}
+
+	/**
+	 * @param ID
+	 * @return
+	 */
+	public synchronized IPJob getJob(int id) {
+		return jobs.get(id);
+	}
+
+	public synchronized IPJobControl[] getJobControls() {
+		return (IPJobControl[]) jobs.values().toArray(new IPJobControl[0]);
+	}
+
+	public IPJob[] getJobs() {
+		return getJobControls();
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManager#getLaunchAttributes(java.lang.String, org.eclipse.ptp.core.attributes.IAttribute[])
+	 */
+	public IAttribute[] getLaunchAttributes(String queueName, IAttribute[] currentAttrs) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	public synchronized IPMachine getMachine(int id) {
+		return machines.get(id);
 	}
 
 	public synchronized IPMachineControl[] getMachineControls() {
 		return (IPMachineControl[]) machines.values().toArray(new IPMachineControl[0]);
 	}
-
+	
 	public IPMachine[] getMachines() {
 		return getMachineControls();
 	}
@@ -198,15 +283,39 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	public String getName() {
 		return config.getName();
 	}
-
-	public IPQueue getQueue(String id) {
-		return (IPQueue) queues.get(id);
+	
+	public synchronized IPNode getNode(int id) {
+		return nodes.get(id);
 	}
 
+	public synchronized IPNodeControl[] getNodeControls() {
+		return (IPNodeControl[]) nodes.values().toArray(new IPNodeControl[0]);
+	}
+	
+	public IPNode[] getNodes() {
+		return getNodeControls();
+	}
+
+	public synchronized IPProcess getProcess(int id) {
+		return processes.get(id);
+	}
+	
+	public synchronized IPProcessControl[] getProcessControls() {
+		return (IPProcessControl[]) processes.values().toArray(new IPProcessControl[0]);
+	}
+
+	public IPProcess[] getProcesses() {
+		return getProcessControls();
+	}
+	
+	public synchronized IPQueue getQueue(int id) {
+		return queues.get(id);
+	}
+	
 	public synchronized IPQueueControl[] getQueueControls() {
 		return (IPQueueControl[]) queues.values().toArray(new IPQueueControl[0]);
 	}
-
+	
 	public IPQueue[] getQueues() {
 		return getQueueControls();
 	}
@@ -214,38 +323,31 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.IResourceManager#getStatus()
 	 */
-	public ResourceManagerStatus getStatus() {
-		return status;
+	synchronized public ResourceManagerState.State getState() {
+		return state;
 	}
-
+	
+	/**
+	 * @return the status message
+	 */
+	public String getStatusMessage() {
+		return statusMessage;
+	}
+	
 	public boolean hasChildren() {
 		return getMachines().length > 0 || getQueues().length > 0;
 	}
-
+	
 	public boolean isAllStop() {
-		IPMachineControl[] machines = getMachineControls();
-		for (int i = 0; i < machines.length; i++) {
-			if (!machines[i].isAllStop())
-				return false;
-		}
-		IPQueueControl[] queues = getQueueControls();
-		for (int i = 0; i < queues.length; i++) {
-			if (!queues[i].isAllStop())
-				return false;
-		}
-		return true;
+		return false;
 	}
 
-	public void removeModelListener(IModelListener listener) {
-		modelListeners.remove(listener);
-	}
-
-	public void removeNodeListener(INodeListener listener) {
-		nodeListeners.remove(listener);
-	}
-
-	public void removeProcessListener(IProcessListener listener) {
-		processListeners.remove(listener);
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManager#removeJob(org.eclipse.ptp.core.IPJob)
+	 */
+	public void removeJob(IPJob job) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	/*
@@ -256,70 +358,105 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	public void removeResourceManagerListener(IResourceManagerListener listener) {
 		listeners.remove(listener);
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.rm.IResourceManager#stop()
 	 */
 	public void shutdown() throws CoreException {
-		if (status.equals(ResourceManagerStatus.STARTED)) {
-			doShutdown();
-			setStatus(ResourceManagerStatus.STOPPED, false);
-			fireShutdown();
+		IProgressMonitor monitor = null;
+        if (monitor == null) {
+            monitor = new NullProgressMonitor();
+        }
+		monitor.beginTask("Stopping Resource Manager " + getName(), 10);
+        ResourceManagerState.State state = getState();
+		if (!state.equals(ResourceManagerState.State.STOPPED)) {
+			SubProgressMonitor subMonitor = new SubProgressMonitor(monitor, 10);
+			try {
+				doShutdown(subMonitor);
+				if (!subMonitor.isCanceled()) {
+					setState(ResourceManagerState.State.STOPPED);
+					fireShutdown();
+				}
+			}
+			finally {
+				monitor.done();
+			}
+		}
+		else {
+			monitor.done();
 		}
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.rm.IResourceManager#start()
 	 */
 	public void startUp(IProgressMonitor monitor) throws CoreException {
+        if (monitor == null) {
+            monitor = new NullProgressMonitor();
+        }
 		monitor.beginTask("Starting Resource Manager " + getName(), 10);
-		if (!status.equals(ResourceManagerStatus.STARTED) &&
-				!status.equals(ResourceManagerStatus.ERROR)) {
-			if (monitor == null) {
-				monitor = new NullProgressMonitor();
-			}
+        ResourceManagerState.State state = getState();
+		if (!state.equals(ResourceManagerState.State.STARTED) &&
+				!state.equals(ResourceManagerState.State.ERROR)) {
 			SubProgressMonitor subMonitor = new SubProgressMonitor(monitor, 10);
 			try {
 				doStartup(subMonitor);
+				if (!subMonitor.isCanceled()) {
+					setState(ResourceManagerState.State.STARTED);
+					fireStarted();
+				}
 			}
 			finally {
 				monitor.done();
 			}
-			setStatus(ResourceManagerStatus.STARTED, false);
-			fireStarted();
 		}
 		else {
 			monitor.done();
 		}
 	}
-
-	private void fireContentsChanged(final ResourceManagerContentsChangedEvent event) {
-		Object[] tmpListeners = listeners.getListeners();
-			
-		for (int i = 0, n = tmpListeners.length; i < n; ++i) {
-			final IResourceManagerListener listener = (IResourceManagerListener) tmpListeners[i];
-			safeRunAsyncInUIThread(new SafeRunnable() {
-				public void run() {
-					listener.handleContentsChanged(event);
-				}
-			});
-		}
+	
+	public IPJob submitJob(ILaunch launch, JobRunConfiguration jobRunConfig, IProgressMonitor monitor) throws CoreException {
+		return doSubmitJob(launch, jobRunConfig, monitor);
+	}
+	
+	public void terminateJob(IPJob job) throws CoreException {
+		doTerminateJob(job);
 	}
 
-	protected synchronized void addMachine(String ID, IPMachineControl machine) {
-		machines.put(ID, machine);
-		fireMachinesChanged(new int[]{machine.getID()});
+	/**
+	 * @param statusMessage the status message to set
+	 */
+	private void setStatusMessage(String statusMessage) {
+		this.statusMessage = statusMessage;
+	}
+	
+	/*
+	 * Add new model elements to the model.
+	 */
+	protected synchronized void addJob(int jobId, IPJobControl job) {
+		jobs.put(jobId, job);
+	}
+	
+	protected synchronized void addMachine(int machineId, IPMachineControl machine) {
+		machines.put(machineId, machine);
 	}
 
-	protected synchronized void addQueue(String ID, IPQueueControl queue) {
-		queues.put(ID, queue);
-		fireQueuesChanged(new int[]{queue.getID()});
+	protected synchronized void addNode(int nodeId, IPNodeControl node) {
+		nodes.put(nodeId, node);
 	}
 
+	protected synchronized void addProcess(int processId, IPProcessControl process) {
+		processes.put(processId, process);
+	}
+	
+	protected synchronized void addQueue(int queueId, IPQueueControl queue) {
+		queues.put(queueId, queue);
+	}
+	
 	/**
 	 * 
 	 */
@@ -338,82 +475,137 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	/**
 	 * @throws CoreException
 	 */
-	protected abstract void doShutdown() throws CoreException;
+	protected abstract void doShutdown(IProgressMonitor monitor) throws CoreException;
 
 	/**
 	 * @param monitor
 	 * @throws CoreException
 	 */
 	protected abstract void doStartup(IProgressMonitor monitor) throws CoreException;
+	
+	/**
+	 * @param launch
+	 * @param jobRunConfig
+	 * @param monitor
+	 * @throws CoreException
+	 */
+	protected abstract IPJob doSubmitJob(ILaunch launch, JobRunConfiguration jobRunConfig, IProgressMonitor monitor) throws CoreException;
 
 	/**
-	 * @param event
+	 * @param job
+	 * @throws CoreException
 	 */
-	protected void fireEvent(final IModelEvent event) {
-		Object[] array = modelListeners.getListeners();
-		for (int i = 0; i < array.length; i++) {
-			final IModelListener l = (IModelListener) array[i];
-			final SafeRunnable safeRunnable = new SafeRunnable() {
-				public void run() {
-					l.modelEvent(event);
-				}
-			};
-			safeRunAsyncInUIThread(safeRunnable);
+	protected abstract void doTerminateJob(IPJob job) throws CoreException;
+
+	protected void fireError(String message) {
+    	Object[] tmpListeners = listeners.getListeners();
+    	
+    	for (int i = 0, n = tmpListeners.length; i < n; ++i) {
+    		final IResourceManagerListener listener = (IResourceManagerListener) tmpListeners[i];
+    		listener.handleErrorStateEvent(new ResourceManagerErrorEvent(this, message));
+    	}
+    }
+
+	protected void fireJobsChanged(List<IPJob> jobs, Collection<? extends IAttribute> attrs) {
+		IResourceManagerChangedJobsEvent e = 
+			new ResourceManagerChangedJobsEvent(this, jobs, attrs);
+		Object[] tmpListeners = listeners.getListeners();
+
+		for (int i = 0, n = tmpListeners.length; i < n; ++i) {
+			final IResourceManagerListener listener = (IResourceManagerListener) tmpListeners[i];
+			listener.handleChangedJobsEvent(e);
 		}
 	}
 
-	/**
-	 * @param event
-	 */
-	protected void fireEvent(final INodeEvent event) {
-		Object[] array = nodeListeners.getListeners();
-		for (int i = 0; i < array.length; i++) {
-			final INodeListener l = (INodeListener) array[i];
-			final SafeRunnable safeRunnable = new SafeRunnable() {
-				public void run() {
-					l.nodeEvent(event);
-				}
-			};
-			safeRunAsyncInUIThread(safeRunnable);
+	protected void fireMachinesChanged(List<IPMachine> macs) {
+		IResourceManagerChangedMachinesEvent e = 
+			new ResourceManagerChangedMachinesEvent(this, macs);
+		Object[] tmpListeners = listeners.getListeners();
+
+		for (int i = 0, n = tmpListeners.length; i < n; ++i) {
+			final IResourceManagerListener listener = (IResourceManagerListener) tmpListeners[i];
+			listener.handleChangedMachinesEvent(e);
 		}
 	}
 
-	protected void fireEvent(final IProcessEvent event) {
-		Object[] array = processListeners.getListeners();
-		for (int i = 0; i < array.length; i++) {
-			final IProcessListener l = (IProcessListener) array[i];
-			final SafeRunnable safeRunnable = new SafeRunnable() {
-				public void run() {
-					l.processEvent(event);
-				}
-			};
-			safeRunAsyncInUIThread(safeRunnable);
+	protected void fireNewJobs(List<IPJob> jobs) {
+    	IResourceManagerNewJobsEvent e = new ResourceManagerNewJobsEvent(this, jobs);
+    	Object[] tmpListeners = listeners.getListeners();
+    	
+    	for (int i = 0, n = tmpListeners.length; i < n; ++i) {
+    		final IResourceManagerListener listener = (IResourceManagerListener) tmpListeners[i];
+    		listener.handleNewJobsEvent(e);
+    	}
+    }
+
+	protected void fireNewMachines(List<IPMachine> macs) {
+		IResourceManagerNewMachinesEvent e = new ResourceManagerNewMachinesEvent(this, macs);
+		Object[] tmpListeners = listeners.getListeners();
+
+		for (int i = 0, n = tmpListeners.length; i < n; ++i) {
+			final IResourceManagerListener listener = (IResourceManagerListener) tmpListeners[i];
+			listener.handleNewMachinesEvent(e);
 		}
 	}
 
-	protected void fireMachinesChanged(int[] ids) {
-		try {
-			ResourceManagerContentsChangedEvent event = 
-				new ResourceManagerContentsChangedEvent(this,
-					ResourceManagerContentsChangedEvent.MACHINE, ids);
-			fireContentsChanged(event);
-			
-		} catch (CoreException e) {
-			// Shouldn't happen
-			e.printStackTrace();
+    protected void fireNewNodes(List<IPNode> nodes) {
+		IResourceManagerNewNodesEvent e = new ResourceManagerNewNodesEvent(this, nodes);
+		Object[] tmpListeners = listeners.getListeners();
+
+		for (int i = 0, n = tmpListeners.length; i < n; ++i) {
+			final IResourceManagerListener listener = (IResourceManagerListener) tmpListeners[i];
+			listener.handleNewNodesEvent(e);
 		}
 	}
 
-	protected void fireQueuesChanged(int[] ids) {
-		try {
-			ResourceManagerContentsChangedEvent event = 
-				new ResourceManagerContentsChangedEvent(this,
-					ResourceManagerContentsChangedEvent.QUEUE, ids);
-			fireContentsChanged(event);
-			
-		} catch (CoreException e) {
-			// Shouldn't happen
-			e.printStackTrace();
+    protected void fireNewProcesses(List<IPProcess> procs) {
+    	IResourceManagerNewProcessesEvent e = new ResourceManagerNewProcessesEvent(this, procs);
+    	Object[] tmpListeners = listeners.getListeners();
+    	
+    	for (int i = 0, n = tmpListeners.length; i < n; ++i) {
+    		final IResourceManagerListener listener = (IResourceManagerListener) tmpListeners[i];
+    		listener.handleNewProcessesEvent(e);
+    	}
+    }
+
+    protected void fireNewQueues(List<IPQueue> queues) {
+    	IResourceManagerNewQueuesEvent e = new ResourceManagerNewQueuesEvent(this, queues);
+    	Object[] tmpListeners = listeners.getListeners();
+    	
+    	for (int i = 0, n = tmpListeners.length; i < n; ++i) {
+    		final IResourceManagerListener listener = (IResourceManagerListener) tmpListeners[i];
+    		listener.handleNewQueuesEvent(e);
+    	}
+    }
+
+    protected void fireNodesChanged(List<IPNode> nodes) {
+		IResourceManagerChangedNodesEvent e = new ResourceManagerChangedNodesEvent(this, nodes);
+		Object[] tmpListeners = listeners.getListeners();
+
+		for (int i = 0, n = tmpListeners.length; i < n; ++i) {
+			final IResourceManagerListener listener = (IResourceManagerListener) tmpListeners[i];
+			listener.handleChangedNodesEvent(e);
+		}
+	}
+
+	protected void fireProcessesChanged(List<IPProcess> procs) {
+		IResourceManagerChangedProcessesEvent e = 
+			new ResourceManagerChangedProcessesEvent(this, procs);
+		Object[] tmpListeners = listeners.getListeners();
+
+		for (int i = 0, n = tmpListeners.length; i < n; ++i) {
+			final IResourceManagerListener listener = (IResourceManagerListener) tmpListeners[i];
+			listener.handleChangedProcessesEvent(e);
+		}
+	}
+
+	protected void fireQueuesChanged(List<IPQueue> queues) {
+		IResourceManagerChangedQueuesEvent e = new ResourceManagerChangedQueuesEvent(this, queues);
+		Object[] tmpListeners = listeners.getListeners();
+
+		for (int i = 0, n = tmpListeners.length; i < n; ++i) {
+			final IResourceManagerListener listener = (IResourceManagerListener) tmpListeners[i];
+			listener.handleChangedQueuesEvent(e);
 		}
 	}
 
@@ -422,11 +614,7 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 		
 		for (int i = 0, n = tmpListeners.length; i < n; ++i) {
 			final IResourceManagerListener listener = (IResourceManagerListener) tmpListeners[i];
-			safeRunAsyncInUIThread(new SafeRunnable() {
-				public void run() {
-					listener.handleShutdown(AbstractResourceManager.this);
-				}
-			});
+			listener.handleShutdownStateEvent(AbstractResourceManager.this);
 		}
 	}
 
@@ -435,43 +623,37 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 		
 		for (int i = 0, n = tmpListeners.length; i < n; ++i) {
 			final IResourceManagerListener listener = (IResourceManagerListener) tmpListeners[i];
-			safeRunAsyncInUIThread(new SafeRunnable() {
-				public void run() {
-					listener.handleStartup(AbstractResourceManager.this);
-				}
-			});
+			listener.handleStartupStateEvent(AbstractResourceManager.this);
 		}
 	}
 
-	protected void fireStatusChanged(final ResourceManagerStatus oldStatus) {
-		Object[] tmpListeners = listeners.getListeners();
-		
-		for (int i = 0, n = tmpListeners.length; i < n; ++i) {
-			final IResourceManagerListener listener = (IResourceManagerListener) tmpListeners[i];
-			safeRunAsyncInUIThread(new SafeRunnable() {
-				public void run() {
-					listener.handleStatusChanged(oldStatus, AbstractResourceManager.this);
-				}
-			});
-		}
+	protected void fireSuspended() {
+    	Object[] tmpListeners = listeners.getListeners();
+    	
+    	for (int i = 0, n = tmpListeners.length; i < n; ++i) {
+    		final IResourceManagerListener listener = (IResourceManagerListener) tmpListeners[i];
+    		listener.handleSuspendedStateEvent(AbstractResourceManager.this);
+    	}
+    }
+
+	protected IPJobControl getJobControl(int jobId) {
+		return jobs.get(jobId);
+	}
+	
+	protected IPMachineControl getMachineControl(int machineId) {
+		return machines.get(machineId);
 	}
 
-	protected IPMachineControl getMachineControl(String ID) {
-		return (IPMachineControl) machines.get(ID);
+	protected IPNodeControl getNodeControl(int nodeId) {
+		return nodes.get(nodeId);
 	}
 
-	protected synchronized IPProcess getProcess(String ID) {
-		IPQueueControl[] theQueues = getQueueControls();
-		for (int iq=0; iq<theQueues.length; ++iq) {
-			IPJob[] jobs = theQueues[iq].getJobs();
-			for (int i = 0; i < jobs.length; ++i) {
-				IPJob job = jobs[i];
-				IPProcess proc = job.findProcessByName(ID);
-				if (proc != null)
-					return proc;
-			}
-		}
-		return null;
+	protected IPProcessControl getProcessControl(int processId) {
+		return processes.get(processId);
+	}
+
+	protected IPQueueControl getQueueControl(int machineId) {
+		return queues.get(machineId);
 	}
 
 	protected CoreException makeCoreException(String string) {
@@ -480,37 +662,93 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 		return new CoreException(status);
 	}
 
-	/**
-	 * Makes sure that the safeRunnable is ran in the UI thread. 
-	 * @param safeRunnable
+	/*
+	 * Create new model elements.
 	 */
-	protected void safeRunAsyncInUIThread(final ISafeRunnable safeRunnable) {
-		if (display.isDisposed()) {
-			try {
-				safeRunnable.run();
-			} catch (Exception e) {
-				PTPCorePlugin.log(e);
+	protected IPJobControl newJob(IPQueueControl queue, int jobId, IAttribute[] attrs) {
+		return new PJob(jobId, queue, attrs);
+	}
+
+	protected IPMachineControl newMachine(int machineId, IAttribute[] attrs) {
+		return new PMachine(machineId, this, attrs);
+	}
+
+	protected IPNodeControl newNode(IPMachineControl machine, int nodeId, IAttribute[] attrs) {
+		return new PNode(nodeId, machine, attrs);
+	}
+
+	protected IPProcessControl newProcess(IPJobControl job, int processId, IAttribute[] attrs) {
+		IPProcessControl process = new PProcess(processId, job, attrs);
+		/*
+		 * If there is an ID attribute then it should be a node ID, so connect it up.
+		 */
+		for (IAttribute attr: attrs) {
+			if (attr.getDefinition() == AttributeDefinitionManager.getIdAttributeDefinition()) {
+				IPNodeControl node = getNodeControl(((IIntegerAttribute)attr).getValue());
+				if (node != null) {
+					node.addProcess(process);
+				}
 			}
 		}
-		else {
-			display.asyncExec(new Runnable() {
-				public void run() {
-					SafeRunnable.run(safeRunnable);
-				}
-			});
-		}
+		return process;
+	}
+
+	protected IPQueueControl newQueue(int queueId, IAttribute[] attrs) {
+		return new PQueue(queueId, this, attrs);
 	}
 
 	/**
-	 * @param status
-	 * @param fireEvent
+	 * @param state
 	 */
-	protected void setStatus(ResourceManagerStatus status, boolean fireEvent) {
-		final ResourceManagerStatus oldStatus = this.status;
-		this.status = status;
-		if (fireEvent) {
-			fireStatusChanged(oldStatus);
-		}
+	synchronized protected void setState(ResourceManagerState.State state) {
+		this.state = state;
+		setStatusMessage(state.toString());
 	}
 
+	/**
+	 * @param state
+	 * @param message
+	 */
+	synchronized protected void setState(ResourceManagerState.State state, String message) {
+		this.state = state;
+		setStatusMessage(message);
+	}
+
+	/*
+	 * Update attribute information in model elements.
+	 */
+	protected boolean updateJob(IPJobControl job, IAttribute[] attrs) {
+		for (IAttribute attr : attrs) {
+			job.setAttribute(attr.getDefinition().getId(), attr);
+		}
+		return true;
+	}
+
+	protected boolean updateMachine(IPMachineControl machine, IAttribute[] attrs) {
+		for (IAttribute attr : attrs) {
+			machine.setAttribute(attr.getDefinition().getId(), attr);
+		}
+		return true;
+	}
+
+	protected boolean updateNode(IPNodeControl node, IAttribute[] attrs) {
+		for (IAttribute attr : attrs) {
+			node.setAttribute(attr.getDefinition().getId(), attr);
+		}
+		return true;
+	}
+
+	protected boolean updateProcess(IPProcessControl process, IAttribute[] attrs) {
+		for (IAttribute attr : attrs) {
+			process.setAttribute(attr.getDefinition().getId(), attr);
+		}
+		return true;
+	}
+
+	protected boolean updateQueue(IPQueueControl queue, IAttribute[] attrs) {
+		for (IAttribute attr : attrs) {
+			queue.setAttribute(attr.getDefinition().getId(), attr);
+		}
+		return true;
+	}
 }

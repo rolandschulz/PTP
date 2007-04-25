@@ -22,8 +22,8 @@
 package org.eclipse.ptp.internal.ui.adapters;
 
 import org.eclipse.core.runtime.IAdapterFactory;
-import org.eclipse.ptp.core.IPElement;
-import org.eclipse.ptp.core.IPMachine;
+import org.eclipse.ptp.core.elements.IPElement;
+import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ui.views.properties.IPropertySource;
 

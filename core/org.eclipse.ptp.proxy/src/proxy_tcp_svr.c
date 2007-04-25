@@ -39,19 +39,20 @@
 #include "args.h"
 #include "proxy.h"
 #include "proxy_event.h"
+#include "proxy_cmd.h"
 #include "proxy_tcp.h"
 #include "handler.h"
 
 static int	proxy_tcp_svr_init(proxy_svr *, void **);
 static int	proxy_tcp_svr_create(proxy_svr *, int);
 static int	proxy_tcp_svr_connect(proxy_svr *, char *, int);
-static int  proxy_tcp_svr_handle_events(proxy_svr *, List *, struct timeval);
-static int	proxy_tcp_svr_progress(proxy_svr *);
+static int  proxy_tcp_svr_progress(proxy_svr *);
+static void	proxy_tcp_svr_process_cmds(void);
 static void	proxy_tcp_svr_finish(proxy_svr *);
 
 static int	proxy_tcp_svr_recv_msgs(int, void *);
 static int	proxy_tcp_svr_accept(int, void *);
-static int	proxy_tcp_svr_dispatch(proxy_tcp_conn *, char *);
+static int	proxy_tcp_svr_dispatch(proxy_svr *, char *, int);
 
 proxy_svr_funcs proxy_tcp_svr_funcs =
 {
@@ -59,22 +60,22 @@ proxy_svr_funcs proxy_tcp_svr_funcs =
 	proxy_tcp_svr_create,
 	proxy_tcp_svr_connect,
 	proxy_tcp_svr_progress,
-	proxy_tcp_svr_handle_events,
 	proxy_tcp_svr_finish,
 };
 
 /*
- * Called when an event is received in response to a client debug command.
+ * Called for each event that is placed on the event queue.
  * Sends the event to the proxy peer.
  */
 static void
 proxy_tcp_svr_event_callback(void *ev_data, void *data)
 {
-	proxy_event *	ev = (proxy_event *)ev_data;
-	proxy_tcp_conn *	conn = (proxy_tcp_conn *)data;
-	char *			str;
+	proxy_svr *			svr = (proxy_svr *)ev_data;
+	proxy_tcp_conn *	conn = (proxy_tcp_conn *)svr->svr_data;
+	proxy_msg *			msg = (proxy_msg *)data;
+	char *				str;
 	
-	if (proxy_event_to_str(ev, &str) < 0) {
+	if (proxy_serialize_msg(msg, &str) < 0) {
 		/*
 		 * TODO should send an error back to proxy peer
 		 */
@@ -86,6 +87,23 @@ proxy_tcp_svr_event_callback(void *ev_data, void *data)
 	
 	(void)proxy_tcp_send_msg(conn, str, strlen(str));
 	free(str);
+}
+
+/*
+ * Called to process any commands in the read buffer.
+ */
+static void
+proxy_tcp_svr_cmd_callback(void *cmd_data, void *data)
+{
+	int						len;
+	char *					msg = NULL;
+	proxy_svr *				svr = (proxy_svr *)cmd_data;
+	proxy_tcp_conn *		conn = (proxy_tcp_conn *)svr->svr_data;
+
+	if (proxy_tcp_get_msg(conn, &msg, &len) > 0) {
+		proxy_tcp_svr_dispatch(svr, msg, len);
+		if (msg != NULL) free(msg);
+	}
 }
 
 static int
@@ -111,7 +129,7 @@ proxy_tcp_svr_create(proxy_svr *svr, int port)
 	socklen_t				slen;
 	SOCKET					sd;
 	struct sockaddr_in		sname;
-	proxy_tcp_conn *			conn = (proxy_tcp_conn *)svr->svr_data;
+	proxy_tcp_conn *		conn = (proxy_tcp_conn *)svr->svr_data;
 	
 	if ( (sd = socket(PF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET )
 	{
@@ -150,10 +168,9 @@ proxy_tcp_svr_create(proxy_svr *svr, int port)
 	conn->svr_sock = sd;
 	conn->port = (int) ntohs(sname.sin_port);
 	
-	if (svr->proxy->handler_funcs->regfile != NULL)
-		svr->proxy->handler_funcs->regfile(sd, READ_FILE_HANDLER, proxy_tcp_svr_accept, (void *)conn);
-	if (svr->proxy->handler_funcs->regeventhandler != NULL)
-		svr->proxy->handler_funcs->regeventhandler(PROXY_EVENT_HANDLER, proxy_tcp_svr_event_callback, (void *)conn);
+	RegisterFileHandler(sd, READ_FILE_HANDLER, proxy_tcp_svr_accept, (void *)svr);
+	RegisterEventHandler(PROXY_EVENT_HANDLER, proxy_tcp_svr_event_callback, (void *)svr);
+	RegisterEventHandler(PROXY_CMD_HANDLER, proxy_tcp_svr_cmd_callback, (void *)svr);
 	
 	return PROXY_RES_OK;
 }
@@ -165,10 +182,10 @@ static int
 proxy_tcp_svr_connect(proxy_svr *svr, char *host, int port)
 {
 	SOCKET					sd;
-	struct hostent *			hp;
-	long int					haddr;
+	struct hostent *		hp;
+	long int				haddr;
 	struct sockaddr_in		scket;
-	proxy_tcp_conn *			conn = (proxy_tcp_conn *)svr->svr_data;
+	proxy_tcp_conn *		conn = (proxy_tcp_conn *)svr->svr_data;
 		        
 	if (host == NULL) {
 		proxy_set_error(PROXY_ERR_SERVER, "no host specified");
@@ -209,10 +226,9 @@ proxy_tcp_svr_connect(proxy_svr *svr, char *host, int port)
 	conn->host = strdup(host);
 	conn->port = port;
 	
-	if (svr->proxy->handler_funcs->regeventhandler != NULL)
-		svr->proxy->handler_funcs->regeventhandler(PROXY_EVENT_HANDLER, proxy_tcp_svr_event_callback, (void *)conn);
-	if (svr->proxy->handler_funcs->regfile != NULL)
-		svr->proxy->handler_funcs->regfile(sd, READ_FILE_HANDLER, proxy_tcp_svr_recv_msgs, (void *)conn);
+	RegisterEventHandler(PROXY_EVENT_HANDLER, proxy_tcp_svr_event_callback, (void *)svr);
+	RegisterEventHandler(PROXY_CMD_HANDLER, proxy_tcp_svr_cmd_callback, (void *)svr);
+	RegisterFileHandler(sd, READ_FILE_HANDLER, proxy_tcp_svr_recv_msgs, (void *)svr);
 	
 	return PROXY_RES_OK;
 }
@@ -226,7 +242,8 @@ proxy_tcp_svr_accept(int fd, void *data)
 	socklen_t				fromlen;
 	SOCKET					ns;
 	struct sockaddr			addr;
-	proxy_tcp_conn *			conn = (proxy_tcp_conn *)data;
+	proxy_svr *				svr = (proxy_svr *)data;
+	proxy_tcp_conn *		conn = (proxy_tcp_conn *)svr->svr_data;
 	
 	fromlen = sizeof(addr);
 	ns = accept(fd, &addr, &fromlen);
@@ -251,8 +268,7 @@ proxy_tcp_svr_accept(int fd, void *data)
 	conn->sess_sock = ns;
 	conn->connected++;
 	
-	if (conn->svr->proxy->handler_funcs->regfile != NULL)
-		conn->svr->proxy->handler_funcs->regfile(ns, READ_FILE_HANDLER, proxy_tcp_svr_recv_msgs, (void *)conn);
+	RegisterFileHandler(ns, READ_FILE_HANDLER, proxy_tcp_svr_recv_msgs, (void *)svr);
 	
 	return PROXY_RES_OK;
 }
@@ -263,18 +279,16 @@ proxy_tcp_svr_accept(int fd, void *data)
 static void 
 proxy_tcp_svr_finish(proxy_svr *svr)
 {
-	proxy_tcp_conn *			conn = (proxy_tcp_conn *)svr->svr_data;
+	proxy_tcp_conn *	conn = (proxy_tcp_conn *)svr->svr_data;
 	
 	if (conn->sess_sock != INVALID_SOCKET) {
-		if (svr->proxy->handler_funcs->unregfile != NULL)
-			svr->proxy->handler_funcs->unregfile(conn->sess_sock);
+		UnregisterFileHandler(conn->sess_sock);
 		CLOSE_SOCKET(conn->sess_sock);
 		conn->sess_sock = INVALID_SOCKET;
 	}
 	
 	if (conn->svr_sock != INVALID_SOCKET) {
-		if (svr->proxy->handler_funcs->unregfile != NULL)
-			svr->proxy->handler_funcs->unregfile(conn->svr_sock);
+		UnregisterFileHandler(conn->svr_sock);
 		CLOSE_SOCKET(conn->svr_sock);
 		conn->svr_sock = INVALID_SOCKET;
 	}
@@ -283,72 +297,41 @@ proxy_tcp_svr_finish(proxy_svr *svr)
 }
 
 /**
- * Check for incoming messages or connection attempts.
- * 
- * @return	0	success
+ * Check for incoming messages.
+ */
+static void
+proxy_tcp_svr_process_cmds()
+{
+	CallEventHandlers(PROXY_CMD_HANDLER, NULL);
+}
+
+static void
+proxy_tcp_svr_process_events(proxy_msg *msg, void *data)
+{
+	CallEventHandlers(PROXY_EVENT_HANDLER, (void *)msg);
+}
+
+/**
+ * Processes any queued events Also checks for ready file descriptors 
+ * and calls appropriate handlers.
  */
 static int
 proxy_tcp_svr_progress(proxy_svr *svr)
 {
-	char *					msg;
-	proxy_tcp_conn *			conn = (proxy_tcp_conn *)svr->svr_data;
+	fd_set					rfds;
+	fd_set					wfds;
+	fd_set					efds;
+	int						res;
+	int						nfds = 0;
+	struct timeval			tv;
 
-	if (proxy_tcp_get_msg(conn, &msg) > 0) {
-		proxy_tcp_svr_dispatch(conn, msg);
-		free(msg);
-	}
+	proxy_process_msgs(svr->svr_events, proxy_tcp_svr_process_events, NULL);
 
-	return PROXY_RES_OK;
-}
-
-/**
- * Check file descriptors for messages and if present, call handlers
- */
-static int
-proxy_tcp_svr_handle_events(proxy_svr *svr, List * eventList, struct timeval timeout)
-{
-	/* file descriptors for handling resource manager commands */
-
-	fd_set			rfds;
-	fd_set			wfds;
-	fd_set			efds;
-	int				res;
-	int				nfds = 0;
-	char *			event;
-	struct timeval	tv;
-	handler *		h;
-
-	for (SetList(eventList); (event = (char *)GetListElement(eventList)) != NULL; ) {
-		proxy_svr_event_callback(svr, event);
-		RemoveFromList(eventList, (void *)event);
-		free(event);	
-	}
-
-	/***********************************
-	 * First: Check for any file events
-	 */
-	 
 	/* Set up fd sets */
+	GenerateFDSets(&nfds, &rfds, &wfds, &efds);
+	
+	memcpy((char *)&tv, (char *)svr->svr_timeout, sizeof(struct timeval));
 
-	FD_ZERO(&rfds);
-	FD_ZERO(&wfds);
-	FD_ZERO(&efds);
-	
-	for (SetHandler(); (h = GetHandler()) != NULL; ) {
-		if (h->htype == HANDLER_FILE) {
-			if (h->file_type & READ_FILE_HANDLER)
-				FD_SET(h->fd, &rfds);
-			if (h->file_type & WRITE_FILE_HANDLER)
-				FD_SET(h->fd, &wfds);
-			if (h->file_type & EXCEPT_FILE_HANDLER)
-				FD_SET(h->fd, &efds);
-			if (h->fd > nfds)
-				nfds = h->fd;
-		}
-	}
-	
-	tv = timeout;
-	
 	for ( ;; ) {
 		res = select(nfds+1, &rfds, &wfds, &efds, &tv);
 	
@@ -365,19 +348,14 @@ proxy_tcp_svr_handle_events(proxy_svr *svr, List * eventList, struct timeval tim
 			break;
 
 		default:
-			for (SetHandler(); (h = GetHandler()) != NULL; ) {
-				if (h->htype == HANDLER_FILE
-					&& ((h->file_type & READ_FILE_HANDLER && FD_ISSET(h->fd, &rfds))
-						|| (h->file_type & WRITE_FILE_HANDLER && FD_ISSET(h->fd, &wfds))
-						|| (h->file_type & EXCEPT_FILE_HANDLER && FD_ISSET(h->fd, &efds)))
-					&& h->file_handler(h->fd, h->data) < 0)
-					return PROXY_RES_ERR;
-			}
-			
+			if (CallFileHandlers(&rfds, &wfds, &efds) < 0)
+				return PROXY_RES_ERR;
 		}
 	
 		break;
 	}
+
+	proxy_tcp_svr_process_cmds();
 
 	return 0;	
 }
@@ -390,48 +368,35 @@ proxy_tcp_svr_handle_events(proxy_svr *svr, List * eventList, struct timeval tim
  * client.
  */
 static int
-proxy_tcp_svr_dispatch(proxy_tcp_conn *conn, char *msg)
+proxy_tcp_svr_dispatch(proxy_svr *svr, char *msg, int len)
 {
-	int					i;
-	int					argc;
-	char *				p;
-	char **				args;
-	proxy_svr_commands * cmd;
-	
+	int					idx;
+	char *				err_str;
+	proxy_commands * 	cmd_tab = svr->svr_commands;
+	proxy_msg *			m;
+
 	DEBUG_PRINT("SVR received <%s>\n", msg);
-
-	/*
-	 * Convert msg into an array of arguments
-	 * Convert each argument from proxy str to a cstring (apart from first)
-	 */
-	for (argc = 1, p = msg; *p != '\0';)
-		if (*p++ == ' ')
-			argc++;
-			
-	args = (char **)malloc((argc + 1) * sizeof(char *));
-
-	for (i = 0; i < argc; i++) {
-		if ((p = strsep(&msg, " ")) == NULL)
-			break;
-		if (i == 0)
-			args[i] = strdup(p);
-		else
-			proxy_str_to_cstring(p, &args[i]);
-	}
-		
-	args[i] = NULL;
-                               
-	for (cmd = conn->svr->svr_commands; cmd->cmd_name != NULL; cmd++) {
-		if (strcmp(args[0], cmd->cmd_name) == 0) {
-			(void)cmd->cmd_func(args);
-			break;
-		}
-	}
 	
-	for (i = 0; i < argc; i++)
-		free(args[i]);
-		
-	free(args);
+	if (proxy_deserialize_msg(msg, len, &m) < 0) {
+		m = new_proxy_msg(0, PROXY_EV_ERROR);
+		proxy_msg_add_int(m, ERROR_MALFORMED_COMMAND);
+		asprintf(&err_str, "malformed command, len is %d", len);
+		proxy_msg_add_string_nocopy(m, err_str);
+		proxy_queue_msg(svr->svr_events, m);
+		return 0;
+	}
+    
+    idx = m->msg_id - cmd_tab->cmd_base;
+                    
+	if (idx >= 0 && idx < cmd_tab->cmd_size) {
+		(void)cmd_tab->cmd_funcs[idx](m->trans_id, m->num_args, m->args);
+	} else {
+		m = new_proxy_msg(0, PROXY_EV_ERROR);
+		proxy_msg_add_int(m, ERROR_MALFORMED_COMMAND);
+		asprintf(&err_str, "malformed command, len is %d", len);
+		proxy_msg_add_string_nocopy(m, err_str);
+		proxy_queue_msg(svr->svr_events, m);
+	}
 	
 	return 0;
 }
@@ -439,7 +404,8 @@ proxy_tcp_svr_dispatch(proxy_tcp_conn *conn, char *msg)
 static int
 proxy_tcp_svr_recv_msgs(int fd, void *data)
 {
-	proxy_tcp_conn *		conn = (proxy_tcp_conn *)data;
+	proxy_svr *			svr = (proxy_svr *)data;
+	proxy_tcp_conn *	conn = (proxy_tcp_conn *)svr->svr_data;
 	
 	return proxy_tcp_recv_msgs(conn);
 }

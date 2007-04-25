@@ -27,7 +27,7 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.ptp.core.IPProcess;
+import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.internal.ui.actions.ChangeSetAction;
 import org.eclipse.ptp.internal.ui.actions.CreateSetAction;
 import org.eclipse.ptp.internal.ui.actions.DeleteSetAction;

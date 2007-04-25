@@ -29,61 +29,61 @@
 /*
  * Session control
  */
-int 	DbgClntInit(int, int, char *, proxy_handler_funcs *, proxy_svr_helper_funcs *, proxy_svr_commands *);
+int 	DbgClntInit(int, int, char *, proxy_svr_helper_funcs *, proxy_commands *);
 int 	DbgClntCreateSession(int, char *, int);
-int 	DbgClntStartSession(char **);
-int 	DbgClntQuit(char **);
+int 	DbgClntStartSession(int, int, char **);
+int 	DbgClntQuit(int, int, char **);
 int 	DbgClntIsShutdown(void);
 void 	DbgClntFinish(void);
 
 /*
  * Breakpoint operations
  */
-int 	DbgClntSetLineBreakpoint(char **);
-int 	DbgClntSetFuncBreakpoint(char **);
-int 	DbgClntDeleteBreakpoint(char **);
-int 	DbgClntEnableBreakpoint(char **);
-int 	DbgClntDisableBreakpoint(char **);
-int 	DbgClntConditionBreakpoint(char **);
-int 	DbgClntBreakpointAfter(char **);
-int 	DbgClntSetWatchpoint(char **);
+int 	DbgClntSetLineBreakpoint(int, int, char **);
+int 	DbgClntSetFuncBreakpoint(int, int, char **);
+int 	DbgClntDeleteBreakpoint(int, int, char **);
+int 	DbgClntEnableBreakpoint(int, int, char **);
+int 	DbgClntDisableBreakpoint(int, int, char **);
+int 	DbgClntConditionBreakpoint(int, int, char **);
+int 	DbgClntBreakpointAfter(int, int, char **);
+int 	DbgClntSetWatchpoint(int, int, char **);
 
 /*
  * Process control operations
  */
-int 	DbgClntGo(char **);
-int 	DbgClntStep(char **);
-int 	DbgClntTerminate(char **);
-int 	DbgClntSuspend(char **);
+int 	DbgClntGo(int, int, char **);
+int 	DbgClntStep(int, int, char **);
+int 	DbgClntTerminate(int, int, char **);
+int 	DbgClntSuspend(int, int, char **);
 
 /*
  * Stack frame operations
  */
-int 	DbgClntListStackframes(char **);
-int 	DbgClntSetCurrentStackframe(char **);
+int 	DbgClntListStackframes(int, int, char **);
+int 	DbgClntSetCurrentStackframe(int, int, char **);
 
 /*
  * Expression/variable operations
  */
-int 	DbgClntEvaluateExpression(char **);
-int 	DbgClntGetType(char **);
-int 	DbgClntListLocalVariables(char **);
-int 	DbgClntListArguments(char **);
-int 	DbgClntListGlobalVariables(char **);
+int 	DbgClntEvaluateExpression(int, int, char **);
+int 	DbgClntGetType(int, int, char **);
+int 	DbgClntListLocalVariables(int, int, char **);
+int 	DbgClntListArguments(int, int, char **);
+int 	DbgClntListGlobalVariables(int, int, char **);
 
 /**
  * Thread operations
  */
-int 	DbgClntListInfoThreads(char **);
-int 	DbgClntSetThreadSelect(char **);
+int 	DbgClntListInfoThreads(int, int, char **);
+int 	DbgClntSetThreadSelect(int, int, char **);
 
-int 	DbgClntStackInfoDepth(char **);
+int 	DbgClntStackInfoDepth(int, int, char **);
 
 /**
  * Thread operations
  */
-int 	DbgClntDataReadMemory(char **);
-int 	DbgClntDataWriteMemory(char **);
+int 	DbgClntDataReadMemory(int, int, char **);
+int 	DbgClntDataWriteMemory(int, int, char **);
 
 /*
  * Event Handling
@@ -105,16 +105,16 @@ char *	DbgClntGetErrorStr(void);
 /*
  * CLI Handling
  */
-int		DbgClntCLIHandle(char **);
+int		DbgClntCLIHandle(int, int, char **);
 
 /**
  * Signal operations
  */
-int 	DbgClntListSignals(char **);
-int 	DbgClntSignalInfo(char **);
+int 	DbgClntListSignals(int, int, char **);
+int 	DbgClntSignalInfo(int, int, char **);
 
-int 	DbgClntDataEvaluateExpression(char **);
-int 	DbgClntGetPartialAIF(char **);
-int 	DbgClntVariableDelete(char **);
+int 	DbgClntDataEvaluateExpression(int, int, char **);
+int 	DbgClntGetPartialAIF(int, int, char **);
+int 	DbgClntVariableDelete(int, int, char **);
 
 #endif /* _DBG_CLIENT_H_ */

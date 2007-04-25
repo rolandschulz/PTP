@@ -147,9 +147,9 @@ public class LSFPreferencePage extends PreferencePage implements IWorkbenchPrefe
 		Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
 		
 		proxyServerFile = preferences.getString(PreferenceConstants.LSF_PROXY_PATH);
-		/* if they don't have the ptp_mpich2_proxy path set, let's try and give them a default that might help */
+		/* if they don't have the ptp_lsf_proxy path set, let's try and give them a default that might help */
 		if(proxyServerFile.equals("")) {
-			proxyServerFile = PTPCorePlugin.getDefault().locateFragmentFile("org.eclipse.ptp.mpich2.proxy", "ptp_mpich2_proxy.py");
+			proxyServerFile = PTPCorePlugin.getDefault().locateFragmentFile("org.eclipse.ptp", "ptp_lsf_proxy");
         }
 		
 		if (proxyServerFile == null) {

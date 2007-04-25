@@ -21,33 +21,39 @@
  */
 package org.eclipse.ptp.lsf.core.rmsystem;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.core.attributes.IAttribute;
+import org.eclipse.ptp.core.attributes.IntegerAttributeDefinition;
+import org.eclipse.ptp.core.elementcontrols.IPJobControl;
 import org.eclipse.ptp.core.elementcontrols.IPMachineControl;
+import org.eclipse.ptp.core.elementcontrols.IPNodeControl;
+import org.eclipse.ptp.core.elementcontrols.IPProcessControl;
 import org.eclipse.ptp.core.elementcontrols.IPQueueControl;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
-import org.eclipse.ptp.rmsystem.AbstractProxyResourceManager;
+import org.eclipse.ptp.core.elements.IPQueue;
+import org.eclipse.ptp.lsf.core.rtsystem.LSFProxyRuntimeClient;
+import org.eclipse.ptp.lsf.core.rtsystem.LSFRuntimeSystem;
+import org.eclipse.ptp.rmsystem.AbstractRuntimeResourceManager;
+import org.eclipse.ptp.rtsystem.IRuntimeSystem;
 
 /**
  * @author rsqrd
  *
  */
-public class LSFResourceManager extends AbstractProxyResourceManager {
+public class LSFResourceManager extends AbstractRuntimeResourceManager {
 
 	/**
 	 * @param universe
 	 * @param config
 	 */
-	public LSFResourceManager(IPUniverseControl universe, LSFResourceManagerConfiguration config) {
-		super(universe, config);
-		// TODO Auto-generated constructor stub
+	public LSFResourceManager(int id, IPUniverseControl universe, LSFResourceManagerConfiguration config) {
+		super(id, universe, config);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.IResourceManager#getLaunchAttributes(java.lang.String, java.lang.String)
 	 */
-	public IAttribute[] getLaunchAttributes(String machine, String queue,
-			IAttribute[] currentAttrs) {
-		// TODO Auto-generated method stub
+	public IAttribute[] getLaunchAttributes(String queue, IAttribute[] currentAttrs) {
 		return null;
 	}
 
@@ -55,40 +61,96 @@ public class LSFResourceManager extends AbstractProxyResourceManager {
 	 * @see org.eclipse.ptp.rmsystem.AbstractProxyResourceManager#doAfterCloseConnection()
 	 */
 	protected void doAfterCloseConnection() {
-		// TODO Auto-generated method stub
-
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.AbstractProxyResourceManager#doAfterOpenConnection()
 	 */
 	protected void doAfterOpenConnection() {
-		// TODO Auto-generated method stub
-
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.AbstractProxyResourceManager#doBeforeCloseConnection()
 	 */
 	protected void doBeforeCloseConnection() {
-		// TODO Auto-generated method stub
-
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.AbstractProxyResourceManager#doBeforeOpenConnection()
 	 */
 	protected void doBeforeOpenConnection() {
-		// TODO Auto-generated method stub
-
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManager#doDispose()
 	 */
 	protected void doDispose() {
-		// TODO Auto-generated method stub
+	}
 
+	@Override
+	protected IPJobControl doCreateJob(IPQueueControl queue, int jobId, IAttribute[] attrs) {
+		return newJob(queue, jobId, attrs);
+	}
+
+	@Override
+	protected IPMachineControl doCreateMachine(int machineId, IAttribute[] attrs) {
+		return newMachine(machineId, attrs);
+	}
+
+	@Override
+	protected IPNodeControl doCreateNode(IPMachineControl machine, int nodeId, IAttribute[] attrs) {
+		return newNode(machine, nodeId, attrs);
+	}
+
+	@Override
+	protected IPProcessControl doCreateProcess(IPJobControl job, int processId, IAttribute[] attrs) {
+		return newProcess(job, processId, attrs);
+	}
+
+	@Override
+	protected IPQueueControl doCreateQueue(int queueId, IAttribute[] attrs) {
+		return newQueue(queueId, attrs);
+	}
+
+	@Override
+	protected boolean doUpdateJob(IPJobControl job, IAttribute[] attrs) {
+		return updateJob(job, attrs);
+	}
+
+	@Override
+	protected boolean doUpdateMachine(IPMachineControl machine, IAttribute[] attrs) {
+		return updateMachine(machine, attrs);
+	}
+
+	@Override
+	protected boolean doUpdateNode(IPNodeControl node, IAttribute[] attrs) {
+		return updateNode(node, attrs);
+	}
+
+	@Override
+	protected boolean doUpdateProcess(IPProcessControl process, IAttribute[] attrs) {
+		return updateProcess(process, attrs);
+	}
+
+	@Override
+	protected boolean doUpdateQueue(IPQueueControl queue, IAttribute[] attrs) {
+		return updateQueue(queue, attrs);
+	}
+
+	@Override
+	protected IRuntimeSystem doCreateRuntimeSystem() throws CoreException {
+		LSFResourceManagerConfiguration config = (LSFResourceManagerConfiguration) getConfiguration();
+		String serverFile = config.getServerFile();
+		int	rmId = getID();
+		boolean launchManually = config.isLaunchManually();
+		/* load up the control and monitoring systems for OMPI */
+		LSFProxyRuntimeClient runtimeProxy = new LSFProxyRuntimeClient(serverFile, rmId, launchManually);
+		return new LSFRuntimeSystem(runtimeProxy, getAttributeDefinitionManager());
+	}
+
+	public IntegerAttributeDefinition getNumProcsAttrDef(IPQueue queue) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

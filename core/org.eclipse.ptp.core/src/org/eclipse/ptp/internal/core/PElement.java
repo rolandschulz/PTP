@@ -21,27 +21,39 @@ package org.eclipse.ptp.internal.core;
 import java.util.HashMap;
 
 import org.eclipse.core.runtime.PlatformObject;
-import org.eclipse.ptp.core.AttributeConstants;
-import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
+import org.eclipse.ptp.core.attributes.IAttribute;
+import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.elementcontrols.IPElementControl;
 import org.eclipse.search.ui.ISearchPageScoreComputer;
 
 public abstract class PElement extends PlatformObject implements IPElementControl, Comparable {
+	private static String getName(IAttribute[] attrs) {
+		for (IAttribute attr : attrs) {
+			if (attr.getDefinition() == AttributeDefinitionManager.getNameAttributeDefinition()) {
+				return attr.getValueAsString();
+			}
+		}
+		return "";
+	}
 	private PElementInfo elementInfo = null;
-	protected HashMap[] attribClass = null;
-	
-	protected HashMap elementAttribs = null;
 
-	protected int ID = -1;
+	protected HashMap<String, Object> attributeValues = new HashMap<String, Object>();
+	protected int elementId = -1;
+	protected IPElementControl elementParent;
+	protected String elementName;
 
-	protected PElement(IPElementControl parent, String name, String key, int type) {
-		attribClass = new HashMap[AttributeConstants.NUM_ATTRIB_CLASSES];
-		elementAttribs = new HashMap();
-		ID = PTPCorePlugin.getDefault().getNewID();
-		elementAttribs.put(AttributeConstants.ATTRIB_PARENT, parent);
-		elementAttribs.put(AttributeConstants.ATTRIB_NAME, name);
-		elementAttribs.put(AttributeConstants.ATTRIB_TYPE, new Integer(type));
-		attribClass[AttributeConstants.ATTRIB_CLASS_ELEMENT] = elementAttribs;
+	protected int elementType;
+
+	protected PElement(int id, IPElementControl parent, int type, IAttribute[] attrs) {
+		elementId = id;
+		elementName = getName(attrs);
+		elementType = type;
+		elementParent = parent;
+		for (IAttribute attr : attrs) {
+			final IAttributeDefinition attrDef = attr.getDefinition();
+			setAttribute(attrDefToAttrKey(attrDef), attr);
+		}
 	}
 
 	public int compareTo(Object obj) {
@@ -57,7 +69,7 @@ public abstract class PElement extends PlatformObject implements IPElementContro
 		}
 		return 0;
 	}
-
+	
 	public int computeScore(String pageId, Object element) {
 		//FIXME
 		//if (!CoreUtils.PTP_SEARCHPAGE_ID.equals(pageId))
@@ -69,61 +81,63 @@ public abstract class PElement extends PlatformObject implements IPElementContro
 		return ISearchPageScoreComputer.LOWEST;
 	}
 
-	public Object getAttribute(int attr_class, String key) {
-		if (attr_class < 0 || attr_class >= AttributeConstants.NUM_ATTRIB_CLASSES)
-			return null;
-		HashMap attribs = attribClass[attr_class];
-		if (attribs == null)
-			return null;
-		return attribs.get(key);
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.IPElement#getAttribute(org.eclipse.ptp.core.attributes.IAttributeDefinition)
+	 */
+	public IAttribute getAttribute(IAttributeDefinition attrDef) {
+		return (IAttribute) getAttribute(attrDefToAttrKey(attrDef));
 	}
-	
-	public String[] getAttributeKeys(int attr_class) {
-		if (attr_class < 0 || attr_class >= AttributeConstants.NUM_ATTRIB_CLASSES)
-			return new String[]{};
-		HashMap attribs = attribClass[attr_class];
-		if (attribs == null)
-			return new String[]{};
-		return (String[])attribs.keySet().toArray(new String[0]);
+
+	public Object getAttribute(String attrId) {
+		return attributeValues.get(attrId);
+	}
+
+	public String[] getAttributeKeys() {
+		return attributeValues.keySet().toArray(new String[0]);
 	}
 	
 	public String getElementName() {
-		// return NAME_TAG + getKey();
-		return (String)elementAttribs.get(AttributeConstants.ATTRIB_NAME);
+		return elementName;
 	}
-
+	
 	/**
 	 * @return Returns the Type.
 	 */
 	public int getElementType() {
-		Integer i = (Integer)elementAttribs.get(AttributeConstants.ATTRIB_TYPE);
-		if(i == null) return P_TYPE_ERROR;
-		else return i.intValue();
-	}
-	
-	public int getID() {
-		return ID;
+		return elementType;
 	}
 
+	public int getID() {
+		return elementId;
+	}
+	
 	public String getIDString() {
-		return ""+ID+"";
+		return ""+elementId+"";
 	}
 
 	/**
 	 * @return Returns the Parent.
 	 */
 	public IPElementControl getParent() {
-		return (IPElementControl)elementAttribs.get(AttributeConstants.ATTRIB_PARENT);
+		return elementParent;
 	}
 
-	public void setAttribute(int attr_class, String key, Object o) {
-		if (attr_class < 0 || attr_class >= AttributeConstants.NUM_ATTRIB_CLASSES)
-			return;
-		HashMap attribs = attribClass[attr_class];
-		if (attribs == null)
-			attribs = new HashMap();
-		attribs.put(key, o);
-		attribClass[attr_class] = attribs;
+	public void setAttribute(String attrId, boolean attrib) {
+	}
+
+	public void setAttribute(String attrId, IAttribute attrib) {
+		attributeValues.put(attrId, attrib);
+	}
+	
+	public void setAttribute(String attrId, int attrib) {
+	}
+
+	public void setAttribute(String attrId, Object attrib) {
+		attributeValues.put(attrId, attrib);
+	}
+
+	public void setAttribute(String attrId, String attrib) {
+		attributeValues.put(attrId, attrib);
 	}
 
 	public int size() {
@@ -134,33 +148,13 @@ public abstract class PElement extends PlatformObject implements IPElementContro
 		return getElementName();
 	}
 
+	private String attrDefToAttrKey(final IAttributeDefinition attrDef) {
+		return "ATTRDEF_ID: " + attrDef.getId();
+	}
+
 	protected PElementInfo getElementInfo() {
 		if (elementInfo == null)
 			elementInfo = new PElementInfo(this);
 		return elementInfo;
-	}
-
-	/**
-	 * @param name
-	 *            The Name to set.
-	 */
-	protected void setElementName(String name) {
-		elementAttribs.put(AttributeConstants.ATTRIB_NAME, name);
-	}
-
-	/**
-	 * @param type
-	 *            The Type to set.
-	 */
-	protected void setElementType(int type) {
-		elementAttribs.put(AttributeConstants.ATTRIB_TYPE, new Integer(type));
-	}
-
-	/**
-	 * @param parent
-	 *            The Parent to set.
-	 */
-	protected void setParent(IPElementControl parent) {
-		elementAttribs.put(AttributeConstants.ATTRIB_PARENT, parent);
 	}
 }

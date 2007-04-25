@@ -25,10 +25,10 @@ import java.util.LinkedList;
 import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.ptp.core.IPJob;
-import org.eclipse.ptp.core.IPProcess;
-import org.eclipse.ptp.core.IPQueue;
-import org.eclipse.ptp.core.IPUniverse;
+import org.eclipse.ptp.core.elements.IPJob;
+import org.eclipse.ptp.core.elements.IPProcess;
+import org.eclipse.ptp.core.elements.IPQueue;
+import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.listeners.IJobChangedListener;
@@ -43,7 +43,7 @@ import org.eclipse.ptp.ui.model.IElementSet;
  * 
  */
 public class JobManager extends AbstractUIManager {
-	protected Map jobList = new HashMap();
+	protected Map<String, IElementHandler> jobList = new HashMap<String, IElementHandler>();
 	protected String cur_job_id = EMPTY_ID;
 	protected String cur_queue_id = EMPTY_ID;
 
@@ -273,7 +273,7 @@ public class JobManager extends AbstractUIManager {
 		}
 		
 		String last_job_id = EMPTY_ID;
-		final LinkedList queues = new LinkedList(Arrays.asList(getQueues()));
+		final LinkedList<IPQueue> queues = new LinkedList<IPQueue>(Arrays.asList(getQueues()));
 		final IPQueue curQueue = getCurrentQueue();
 		// move the current Queue to the front of the list
 		if (curQueue != null) {
@@ -366,7 +366,12 @@ public class JobManager extends AbstractUIManager {
 	 * @throws CoreException
 	 */
 	public void terminateAll(String job_id) throws CoreException {
-		modelPresentation.abortJob(getName(job_id));
+		IPUniverse universe = getUniverse();
+		if (universe == null) {
+			return;
+		}
+		IPJob job = universe.findJobById(job_id);
+		job.getQueue().getResourceManager().terminateJob(job);
 	}
 	private IPQueue getCurrentQueue() {
 		final IPQueue queue;

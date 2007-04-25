@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.events;
 
-import org.eclipse.ptp.core.IPNode;
+import org.eclipse.ptp.core.elements.IPNode;
 
 /**
  * @author Clement chu

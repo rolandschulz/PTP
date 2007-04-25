@@ -20,40 +20,17 @@ package org.eclipse.ptp.core.attributes;
 
 public abstract class AbstractAttribute implements IAttribute {
 
-	private final IAttributeDescription description;
+	private final IAttributeDefinition definition;
 	private boolean enabled;
 
-	public AbstractAttribute(IAttributeDescription description) {
-		this.description = description;
+	public AbstractAttribute(IAttributeDefinition definition) {
+		this.definition = definition;
 		this.enabled = true;
 	}
 	
-	/**
-	 * First compare the descriptions. If the descriptions are the same then
-	 * do the compare in the subclass.
-	 * 
-	 * @param other
-	 * @return
-	 */
-	public final int compareTo(Object arg0) {
-		AbstractAttribute other = (AbstractAttribute) arg0;
-		int compareDesc = this.description.compareTo(other.description);
-		if (compareDesc != 0) {
-			return compareDesc;
-		}
-		
-		return doCompareTo(other);
+	public IAttributeDefinition getDefinition() {
+		return definition;
 	}
-
-	public abstract boolean equals(Object obj);
-
-	public IAttributeDescription getDescription() {
-		return description;
-	}
-
-	public abstract String getStringRep();
-
-	public abstract int hashCode();
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.attributes.IAttribute#isEnabled()
@@ -68,11 +45,4 @@ public abstract class AbstractAttribute implements IAttribute {
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
 	}
-
-	public final String toString() {
-		return getStringRep();
-	}
-
-	protected abstract int doCompareTo(AbstractAttribute other);
-
 }

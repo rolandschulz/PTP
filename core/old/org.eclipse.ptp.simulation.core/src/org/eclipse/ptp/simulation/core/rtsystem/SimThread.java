@@ -23,7 +23,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Observable;
 
-import org.eclipse.ptp.core.IPProcess;
+import org.eclipse.ptp.core.elements.IPProcess;
 
 
 public class SimThread extends Observable {

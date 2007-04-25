@@ -21,17 +21,18 @@ package org.eclipse.ptp.core;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerChangedListener;
 import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
 
 public interface IModelManager extends IModelPresentation {
 
-	public void addResourceManager(IResourceManager addedManager);
+	public void addResourceManager(IResourceManagerControl addedManager);
 	
 	public void addResourceManagerChangedListener(IResourceManagerChangedListener listener);
 	
-	public void addResourceManagers(IResourceManager[] addedManagers);
+	public void addResourceManagers(IResourceManagerControl[] addedManagers);
 	public ILaunchConfiguration getPTPConfiguration();
 
 	/**

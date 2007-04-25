@@ -25,7 +25,7 @@ import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.rmsystem.IResourceManager;
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
 import org.eclipse.ptp.ui.PTPUIPlugin;
@@ -287,7 +287,7 @@ public class RMConfigurationWizard extends Wizard {
 		if (useDefaultNameAndDesc) {
 			config.setDefaultNameAndDesc();
 		}
-		IResourceManager rm = resourceManagerFactory.create(config);
+		IResourceManagerControl rm = resourceManagerFactory.create(config);
 		PTPCorePlugin.getDefault().getModelManager().addResourceManager(rm);
 		Arrays.fill(configs, null);
 		return true;

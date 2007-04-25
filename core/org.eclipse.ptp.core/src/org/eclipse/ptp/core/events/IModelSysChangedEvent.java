@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.events;
 
-import org.eclipse.ptp.core.IPElement;
+import org.eclipse.ptp.core.elements.IPElement;
 
 /**
  * @author Clement chu

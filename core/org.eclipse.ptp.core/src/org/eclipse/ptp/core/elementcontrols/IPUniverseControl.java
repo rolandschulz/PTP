@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.elementcontrols;
 
-import org.eclipse.ptp.core.IPUniverse;
+import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 
 /**
@@ -33,10 +33,12 @@ public interface IPUniverseControl extends IPUniverse, IPElementControl {
 
 	public void removeResourceManagers(IResourceManager[] removedRMs);
 
-	public void addResourceManager(IResourceManager addedManager);
+	public void addResourceManager(IResourceManagerControl addedManager);
 
-	public void addResourceManagers(IResourceManager[] addedManagers);
+	public void addResourceManagers(IResourceManagerControl[] addedManagers);
 
-	public IResourceManager[] getResourceManagers();
+	public IResourceManagerControl[] getResourceManagerControls();
+
+	public int getNextResourceManagerId();
 	
 }

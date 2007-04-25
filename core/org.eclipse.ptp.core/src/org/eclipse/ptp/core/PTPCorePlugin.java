@@ -26,12 +26,15 @@ import java.util.ResourceBundle;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.util.SafeRunnable;
+import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.internal.core.ModelManager;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -116,6 +119,28 @@ public class PTPCorePlugin extends AbstractUIPlugin {
 		return display;		
 	}
 	
+
+	/**
+	 * Makes sure that the safeRunnable is ran in the UI thread. 
+	 * @param safeRunnable
+	 */
+	public static void safeRunAsyncInUIThread(final ISafeRunnable safeRunnable) {
+		if (getDisplay().isDisposed()) {
+			try {
+				safeRunnable.run();
+			} catch (Exception e) {
+				PTPCorePlugin.log(e);
+			}
+		}
+		else {
+			getDisplay().asyncExec(new Runnable() {
+				public void run() {
+					SafeRunnable.run(safeRunnable);
+				}
+			});
+		}
+	}
+	
 	/**
 	 * Returns the string from the plugin's resource bundle, or 'key' if not
 	 * found.
@@ -170,8 +195,6 @@ public class PTPCorePlugin extends AbstractUIPlugin {
 	// Resource bundle.
 	private ResourceBundle resourceBundle;
 
-	private IDGenerator IDGen;
-
 	private ModelManager modelManager;
 	
 	/**
@@ -186,7 +209,6 @@ public class PTPCorePlugin extends AbstractUIPlugin {
 		} catch (MissingResourceException x) {
 			resourceBundle = null;
 		}
-		IDGen = new IDGenerator();
 	}
 	
 	public IModelManager getModelManager() {
@@ -198,10 +220,6 @@ public class PTPCorePlugin extends AbstractUIPlugin {
 	 */
 	public IModelPresentation getModelPresentation() {
 		return modelManager;
-	}
-	
-	public synchronized int getNewID() {
-		return IDGen.getNewID();
 	}
 
 	/**

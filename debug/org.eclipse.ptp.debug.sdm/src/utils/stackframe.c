@@ -39,12 +39,18 @@ NewStackframe(int level)
 void
 FreeLocation(location *loc) 
 {
-	if (loc->file != NULL)
+	if (loc->file != NULL) {
 		free(loc->file);
-	if (loc->func != NULL)
+		loc->file = NULL;
+	}
+	if (loc->func != NULL) {
 		free(loc->func);
-	if (loc->addr != NULL)
+		loc->func = NULL;
+	}
+	if (loc->addr != NULL) {
 		free(loc->addr);
+		loc->addr = NULL;
+	}
 }
 
 void	

@@ -3,6 +3,7 @@ package org.eclipse.ptp.launch.internal;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -14,13 +15,14 @@ import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IStreamsProxy;
 import org.eclipse.ptp.core.IModelListener;
 import org.eclipse.ptp.core.IModelPresentation;
-import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.events.IModelErrorEvent;
 import org.eclipse.ptp.core.events.IModelEvent;
 import org.eclipse.ptp.core.events.IModelRuntimeNotifierEvent;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 
 public class RuntimeProcess implements IProcess, IModelListener {
 	private IPLaunch launch = null;
@@ -106,7 +108,8 @@ public class RuntimeProcess implements IProcess, IModelListener {
 	public void terminate() throws DebugException {
 		if (!isTerminated()) {
 			try {
-				getModelPresentation().abortJob(job.getIDString());
+				IResourceManager rm = job.getQueue().getResourceManager();
+				rm.terminateJob(job);
 			} catch (CoreException e) {
 				throw new DebugException(e.getStatus());
 			}

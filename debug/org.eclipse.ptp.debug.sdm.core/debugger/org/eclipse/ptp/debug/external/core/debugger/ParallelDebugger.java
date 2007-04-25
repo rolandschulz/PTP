@@ -19,14 +19,15 @@
 package org.eclipse.ptp.debug.external.core.debugger;
 
 import java.io.IOException;
+
 import org.eclipse.cdt.debug.core.cdi.ICDICondition;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.ptp.core.IPJob;
-import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.PreferenceConstants;
+import org.eclipse.ptp.core.elements.IPJob;
+import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.ExtFormat;
 import org.eclipse.ptp.debug.core.IDebugCommand;
@@ -45,29 +46,30 @@ import org.eclipse.ptp.debug.external.core.cdi.model.Signal;
 import org.eclipse.ptp.debug.external.core.cdi.model.Target;
 import org.eclipse.ptp.debug.external.core.proxy.ProxyDebugClient;
 import org.eclipse.ptp.debug.external.core.proxy.ProxyDebugSignal;
-import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugEvent;
+import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugArgsEvent;
+import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugBreakpointHitEvent;
+import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugBreakpointSetEvent;
+import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugDataEvent;
+import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugDataExpValueEvent;
+import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugErrorEvent;
 import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugEventListener;
-import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugArgsEvent;
-import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugBreakpointHitEvent;
-import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugBreakpointSetEvent;
-import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugDataEvent;
-import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugDataExpValueEvent;
-import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugErrorEvent;
-import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugExitEvent;
-import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugInfoThreadsEvent;
+import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugExitEvent;
+import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugInfoThreadsEvent;
+import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugInitEvent;
+import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugMemoryInfoEvent;
+import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugOKEvent;
+import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugPartialAIFEvent;
+import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugSetThreadSelectEvent;
+import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugSignalEvent;
+import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugSignalExitEvent;
+import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugSignalsEvent;
+import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugStackInfoDepthEvent;
+import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugStackframeEvent;
+import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugStepEvent;
+import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugSuspendEvent;
+import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugTypeEvent;
+import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugVarsEvent;
 import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugInitEvent;
-import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugMemoryInfoEvent;
-import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugPartialAIFEvent;
-import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugSetThreadSelectEvent;
-import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugSignalEvent;
-import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugSignalExitEvent;
-import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugSignalsEvent;
-import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugStackInfoDepthEvent;
-import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugStackframeEvent;
-import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugStepEvent;
-import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugSuspendEvent;
-import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugTypeEvent;
-import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugVarsEvent;
 
 
 public class ParallelDebugger extends AbstractDebugger implements IDebugger, IProxyDebugEventListener {
@@ -88,16 +90,18 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 		try {
 			//using checkConnection() instead of waitForConnect()
 			//proxy.checkConnection();
-			if (proxy.waitForConnect(monitor))
-				proxy.addEventListener(this);
+			if (proxy.waitForConnect(monitor)) {
+				proxy.addProxyDebugEventListener(this);
+			}
 		} catch (IOException e) {
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugCorePlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));
 		}
 	}
+	
 	public void disconnection(IProgressMonitor monitor) throws CoreException {
 		try {
 			if (proxy != null) {
-				proxy.removeEventListener(this);
+				proxy.removeProxyDebugEventListener(this);
 				proxy.closeConnection();
 			}
 		} catch (IOException e) {
@@ -118,6 +122,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugCorePlugin.getUniqueIdentifier(), IStatus.ERROR, "Cannot start debugger", e));
 		}
 	}
+	
 	public void stopDebugger() throws CoreException {
 		if (proxy != null) {
 			try {
@@ -127,12 +132,15 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			}
 		}
 	}
+	
 	public Process getDebuggerProcess() {
 		return null;
 	}
+	
 	public void restart() throws PCDIException {
 		throw new PCDIException(PCDIException.NOT_IMPLEMENTED, "restart");
 	}
+	
 	public void run(String[] args) throws PCDIException {
 		throw new PCDIException(PCDIException.NOT_IMPLEMENTED, "run");		
 	}
@@ -145,6 +153,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			throw new PCDIException(e.getMessage());
 		}
 	}
+	
 	public void kill(BitList tasks) throws PCDIException {
 		//halt(tasks);
 		try {
@@ -154,6 +163,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			throw new PCDIException(e.getMessage());
 		}
 	}
+	
 	public void halt(BitList tasks) throws PCDIException {
 		try {
 			proxy.debugInterrupt(tasks);
@@ -162,6 +172,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			throw new PCDIException(e.getMessage());
 		}
 	}
+	
 	public void stepInto(BitList tasks, int count) throws PCDIException {
 		try {
 			proxy.debugStep(tasks, count, ProxyDebugClient.STEP_INTO);
@@ -169,6 +180,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			throw new PCDIException(e.getMessage());
 		}
 	}
+	
 	public void stepOver(BitList tasks, int count) throws PCDIException {
 		try {
 			proxy.debugStep(tasks, count, ProxyDebugClient.STEP_OVER);
@@ -183,6 +195,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			throw new PCDIException(e.getMessage());
 		}
 	}
+	
 	public void setLineBreakpoint(BitList tasks, IPCDILineBreakpoint bpt) throws PCDIException {
 		try {
 			ICDICondition condition = bpt.getCondition();
@@ -191,6 +204,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			throw new PCDIException(e.getMessage());
 		}
 	}
+	
 	public void setFunctionBreakpoint(BitList tasks, IPCDIFunctionBreakpoint bpt) throws PCDIException {
 		try {
 			ICDICondition condition = bpt.getCondition();
@@ -199,6 +213,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			throw new PCDIException(e.getMessage());
 		}
 	}
+	
 	public void setWatchpoint(BitList tasks, IPCDIWatchpoint bpt) throws PCDIException {
 		try {
 			String expression = bpt.getWatchExpression();
@@ -211,6 +226,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			throw new PCDIException(e.getMessage());
 		}
 	}
+	
 	public void deleteBreakpoint(BitList tasks, int bpid)  throws PCDIException {
 		try {
 			proxy.debugDeleteBreakpoint(tasks, bpid);
@@ -218,6 +234,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			throw new PCDIException(e.getMessage());
 		}
 	}
+	
 	public void enableBreakpoint(BitList tasks, int bpid) throws PCDIException {
 		try {
 			proxy.debugEnableBreakpoint(tasks, bpid);
@@ -225,6 +242,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			throw new PCDIException(e.getMessage());
 		}
 	}
+	
 	public void disableBreakpoint(BitList tasks, int bpid) throws PCDIException {
 		try {
 			proxy.debugDisableBreakpoint(tasks, bpid);
@@ -232,6 +250,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			throw new PCDIException(e.getMessage());
 		}
 	}
+	
 	public void conditionBreakpoint(BitList tasks, int bpid, String expr) throws PCDIException {
 		try {
 			proxy.debugConditionBreakpoint(tasks, bpid, expr);
@@ -250,6 +269,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			throw new PCDIException(e.getMessage());
 		}
 	}
+	
 	public void setCurrentStackFrame(BitList tasks, int level) throws PCDIException {
 		try {
 			proxy.debugSetCurrentStackframe(tasks, level);
@@ -257,6 +277,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			throw new PCDIException(e.getMessage());
 		}
 	}
+	
 	/**
 	 * evaluate expression for first process in procs
 	 */
@@ -271,6 +292,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 	public void getAIF(BitList tasks, String expr) throws PCDIException {
 		evaluateExpression(tasks, expr);
 	}
+	
 	/**
 	 * get variable type for first process in procs
 	 */
@@ -281,6 +303,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			throw new PCDIException(e.getMessage());
 		}
 	}
+	
 	/**
 	 * list local variables for first process in procs
 	 */
@@ -291,12 +314,14 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			throw new PCDIException(e.getMessage());
 		}
 	}
+	
 	/**
 	 * list global variables for first process in procs
 	 */
 	public void listGlobalVariables(BitList tasks) throws PCDIException {
 		throw new PCDIException(PCDIException.NOT_IMPLEMENTED, "listGlobalVariables");
 	}
+	
 	/**
 	 * list arguments for first process in procs
 	 */
@@ -307,6 +332,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			throw new PCDIException(e.getMessage());
 		}
 	}
+	
 	/**
 	 * thread
 	 */
@@ -317,6 +343,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			throw new PCDIException(e.getMessage());
 		}
 	}
+	
 	public void setThreadSelect(BitList tasks, int threadNum) throws PCDIException {
 		try {
 			proxy.debugSetThreadSelect(tasks, threadNum);
@@ -324,6 +351,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			throw new PCDIException(e.getMessage());
 		}
 	}
+	
 	private String createFormat(int wordFormat) {
 		switch (wordFormat) {
 		case ExtFormat.UNSIGNED :
@@ -349,6 +377,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			return "x";
 		}
 	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.debug.core.IDebugger#setDataReadMemoryCommand(org.eclipse.ptp.core.util.BitList, long, java.lang.String, int, int, int, int, java.lang.Character)
 	 */
@@ -359,6 +388,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			throw new PCDIException(e.getMessage());
 		}
 	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.debug.core.IDebugger#setDataWriteMemoryCommand(org.eclipse.ptp.core.util.BitList, long, java.lang.String, int, int, java.lang.String)
 	 */
@@ -369,6 +399,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			throw new PCDIException(e.getMessage());
 		}
 	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.debug.core.IDebugger#getStackInfoDepth(org.eclipse.ptp.core.util.BitList)
 	 */
@@ -380,6 +411,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			throw new PCDIException(e.getMessage());
 		}
 	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.debug.core.IDebugger#getListSignals(org.eclipse.ptp.core.util.BitList, java.lang.String)
 	 */
@@ -390,6 +422,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			throw new PCDIException(e.getMessage());
 		}
 	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.debug.core.IDebugger#getSignalInfo(org.eclipse.ptp.core.util.BitList, java.lang.String)
 	 */
@@ -400,6 +433,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			throw new PCDIException(e.getMessage());
 		}
 	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.debug.core.IDebugger#cliHandle(org.eclipse.ptp.core.util.BitList, java.lang.String)
 	 */
@@ -410,6 +444,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			throw new PCDIException(e.getMessage());
 		}
 	}
+	
 	/** new function **/
 	public void dataEvaluateExpression(BitList tasks, String expression) throws PCDIException {
 		try {
@@ -418,6 +453,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			throw new PCDIException(e.getMessage());
 		}
 	}
+	
 	public void getPartialAIF(BitList tasks, String expr, String key, boolean listChildren, boolean express) throws PCDIException {
 		try {
 			proxy.debugGetPartialAIF(tasks, expr, key, listChildren, express);
@@ -425,6 +461,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			throw new PCDIException(e.getMessage());
 		}
 	}
+	
 	public void variableDelete(BitList tasks, String varname) throws PCDIException {
 		try {
 			proxy.debugVariableDelete(tasks, varname);
@@ -452,144 +489,128 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 		}
 	}
 	
-	/************************************
-	 * Debug handle event
-	 ***********************************/
-	public synchronized void handleEvent(IProxyDebugEvent e) {
-		PDebugUtils.println("got debug event: " + e.toString());
-		switch (e.getEventID()) {
-		case IProxyDebugEvent.EVENT_DBG_OK:
-			completeCommand(e.getBitSet(), IDebugCommand.RETURN_OK);
-			break;
-			
-		case IProxyDebugEvent.EVENT_DBG_INIT:
-			int numServers = ((ProxyDebugInitEvent)e).getNumServers();
-			PDebugUtils.println("num servers = " + numServers);
-			completeCommand(e.getBitSet(), IDebugCommand.RETURN_OK);
-			break;
-		
-		case IProxyDebugEvent.EVENT_DBG_ERROR:
-			ProxyDebugErrorEvent errEvent = (ProxyDebugErrorEvent)e;
-			String errMsg = errEvent.getErrorMessage();
-			if (errMsg == null || errMsg.length() ==0)
-				errMsg = "Unknown Error";
-			
-			int err_code = getErrorCode(errEvent.getErrorCode());
-			completeCommand(e.getBitSet(), new PCDIException(errMsg, err_code));
-			//handleErrorEvent(e.getBitSet(), errMsg, err_code);
-			//handleException(e.getBitSet(), err_code);
-			break;
-				
-		case IProxyDebugEvent.EVENT_DBG_SUSPEND:
-			if (e instanceof ProxyDebugBreakpointHitEvent) {
-				ProxyDebugBreakpointHitEvent bptHitEvent = (ProxyDebugBreakpointHitEvent)e;
-				handleBreakpointHitEvent(e.getBitSet(), bptHitEvent.getBreakpointId(), bptHitEvent.getThreadId(), bptHitEvent.getChangedVars());
-			} else if (e instanceof ProxyDebugSuspendEvent) {
-				ProxyDebugSuspendEvent suspendEvent = (ProxyDebugSuspendEvent)e;
-				handleSuspendEvent(e.getBitSet(), suspendEvent.getLocator(), suspendEvent.getThreadId(), suspendEvent.getChangedVars());
-			} else if (e instanceof ProxyDebugStepEvent) {
-				ProxyDebugStepEvent stepEvent = (ProxyDebugStepEvent)e;
-				handleEndSteppingEvent(e.getBitSet(), stepEvent.getFrame().getLocator().getLineNumber(), stepEvent.getFrame().getLocator().getFile(), stepEvent.getThreadId(), stepEvent.getChangedVars());
-			} else if (e instanceof ProxyDebugSignalEvent) {
-				ProxyDebugSignalEvent sigEvent = (ProxyDebugSignalEvent)e;
-				
-				IDebugCommand cmd = getInterruptCommand();
-				if (cmd != null) {
-					cmd.setReturn(e.getBitSet(), IDebugCommand.RETURN_OK);
-				}
-				else {
-					//send signal if the current command is not terminate command.
-					handleProcessSignaledEvent(e.getBitSet(), sigEvent.getLocator(), sigEvent.getThreadId(), sigEvent.getChangedVars());
-				}
-			}
-			break;	
-			
-		case IProxyDebugEvent.EVENT_DBG_BPSET:
-			completeCommand(e.getBitSet(), ((ProxyDebugBreakpointSetEvent)e).getBreakpoint());
-			break;
-			
-		case IProxyDebugEvent.EVENT_DBG_FRAMES:
-			completeCommand(e.getBitSet(), ((ProxyDebugStackframeEvent)e).getFrames());
-			//completeCommand(e.getBitSet(), (IPCDIStackFrame[]) frameList.toArray(new IPCDIStackFrame[0]));
-			break;
-
-		case IProxyDebugEvent.EVENT_DBG_TYPE:
-			completeCommand(e.getBitSet(), ((ProxyDebugTypeEvent)e).getType());
-			break;
-			
-		case IProxyDebugEvent.EVENT_DBG_DATA:
-			completeCommand(e.getBitSet(), ((ProxyDebugDataEvent)e).getData());
-			break;
-			
-		case IProxyDebugEvent.EVENT_DBG_VARS:
-			completeCommand(e.getBitSet(), ((ProxyDebugVarsEvent)e).getVariables());			
-			break;
-			
-		case IProxyDebugEvent.EVENT_DBG_ARGS:
-			completeCommand(e.getBitSet(), ((ProxyDebugArgsEvent)e).getVariables());			
-			break;
-
-		case IProxyDebugEvent.EVENT_DBG_EXIT_SIGNAL:
-			PDebugUtils.println("======================= EVENT_DBG_EXIT_SIGNAL ====================");
-			ProxyDebugSignalExitEvent exitSigEvent = (ProxyDebugSignalExitEvent)e;
-			handleProcessTerminatedEvent(e.getBitSet(), exitSigEvent.getSignalName(), exitSigEvent.getSignalMeaning());
-			break;
-
-		case IProxyDebugEvent.EVENT_DBG_EXIT:
-			PDebugUtils.println("======================= EVENT_DBG_EXIT ====================");
-			ProxyDebugExitEvent exitEvent = (ProxyDebugExitEvent)e;
-			handleProcessTerminatedEvent(e.getBitSet(), exitEvent.getExitStatus());
-			break;
-			
-		case IProxyDebugEvent.EVENT_DBG_SIGNALS:
-			ProxyDebugSignalsEvent signalsEvent = (ProxyDebugSignalsEvent)e;
-			IPCDISignal[] pcdiSignals = new IPCDISignal[0];
-			IPProcess[] sigProcs = getProcesses(e.getBitSet());
-			if (sigProcs.length > 0) {
-				int taskId = sigProcs[0].getTaskId();
-				IPCDITarget target = getSession().getTarget(taskId);
-				ProxyDebugSignal[] signals = signalsEvent.getSignals();
-				pcdiSignals = new IPCDISignal[signals.length];
-				for (int j=0; j<signals.length; j++) {
-					pcdiSignals[j] = new Signal((Target)target, signals[j].getName(), signals[j].isStop(), signals[j].isPrint(), signals[j].isPass(), signals[j].getDescription()); 
-				}
-			}
-			completeCommand(e.getBitSet(), pcdiSignals);
-			break;
-		
-		case IProxyDebugEvent.EVENT_DBG_THREADS:
-			completeCommand(e.getBitSet(), ((ProxyDebugInfoThreadsEvent)e).getThreadIds());			
-			break;
-			
-		case IProxyDebugEvent.EVENT_DBG_THREAD_SELECT:
-			ProxyDebugSetThreadSelectEvent setThreadSelectEvent = (ProxyDebugSetThreadSelectEvent)e;
-			Object[] objects = new Object[2];
-			objects[0] = new Integer(setThreadSelectEvent.getThreadId());
-			objects[1] = setThreadSelectEvent.getFrame();
-			completeCommand(e.getBitSet(), objects);
-			break;
-			
-		case IProxyDebugEvent.EVENT_DBG_STACK_INFO_DEPTH:
-			ProxyDebugStackInfoDepthEvent stackInfoDepthEvent = (ProxyDebugStackInfoDepthEvent)e;
-			completeCommand(e.getBitSet(), new Integer(stackInfoDepthEvent.getDepth()));			
-			break;
-			
-		case IProxyDebugEvent.EVENT_DBG_DATA_READ_MEMORY:
-			ProxyDebugMemoryInfoEvent memoryInfoEvent = (ProxyDebugMemoryInfoEvent)e;
-			completeCommand(e.getBitSet(), memoryInfoEvent.getMemoryInfo());			
-			break;
-			
-		case IProxyDebugEvent.EVENT_DBG_DATA_EVA_EX:
-			completeCommand(e.getBitSet(), (ProxyDebugDataExpValueEvent)e);
-			break;
-
-		case IProxyDebugEvent.EVENT_DBG_PARTIAL_AIF:
-			completeCommand(e.getBitSet(), (ProxyDebugPartialAIFEvent)e);
-			break;
-		}
-	}	
-
 	private int newBreakpointId() {
 		return this.bpId++;
 	}
+
+	public void handleProxyDebugArgsEvent(IProxyDebugArgsEvent e) {
+		completeCommand(e.getBitSet(),e.getVariables());			
+	}
+
+	public void handleProxyDebugBreakpointHitEvent(IProxyDebugBreakpointHitEvent e) {
+		handleBreakpointHitEvent(e.getBitSet(), e.getBreakpointId(), e.getThreadId(), e.getChangedVars());
+	}
+
+	public void handleProxyDebugBreakpointSetEvent(IProxyDebugBreakpointSetEvent e) {
+		completeCommand(e.getBitSet(), e.getBreakpoint());
+	}
+
+	public void handleProxyDebugDataEvent(IProxyDebugDataEvent e) {
+		completeCommand(e.getBitSet(), e.getData());
+	}
+
+	public void handleProxyDebugDataExpValueEvent(IProxyDebugDataExpValueEvent e) {
+		completeCommand(e.getBitSet(), e);
+	}
+
+	public void handleProxyDebugExitEvent(IProxyDebugExitEvent e) {
+		PDebugUtils.println("======================= EVENT_DBG_EXIT ====================");
+		handleProcessTerminatedEvent(e.getBitSet(), e.getExitStatus());
+	}
+
+	public void handleProxyDebugErrorEvent(IProxyDebugErrorEvent e) {
+		String errMsg = e.getErrorMessage();
+		if (errMsg == null || errMsg.length() ==0)
+			errMsg = "Unknown Error";
+		
+		int err_code = getErrorCode(e.getErrorCode());
+		completeCommand(e.getBitSet(), new PCDIException(errMsg, err_code));
+		//handleErrorEvent(e.getBitSet(), errMsg, err_code);
+		//handleException(e.getBitSet(), err_code);
+	}
+
+	public void handleProxyDebugInfoThreadsEvent(IProxyDebugInfoThreadsEvent e) {
+		completeCommand(e.getBitSet(), e.getThreadIds());			
+	}
+
+	public void handleProxyDebugInitEvent(IProxyDebugInitEvent e) {
+		int numServers = ((ProxyDebugInitEvent)e).getNumServers();
+		PDebugUtils.println("num servers = " + numServers);
+		completeCommand(e.getBitSet(), IDebugCommand.RETURN_OK);
+	}
+
+	public void handleProxyDebugMemoryInfoEvent(IProxyDebugMemoryInfoEvent e) {
+		completeCommand(e.getBitSet(), e.getMemoryInfo());			
+	}
+
+	public void handleProxyDebugOKEvent(IProxyDebugOKEvent e) {
+		completeCommand(e.getBitSet(), IDebugCommand.RETURN_OK);
+	}
+	
+	public void handleProxyDebugPartialAIFEvent(IProxyDebugPartialAIFEvent e) {
+		completeCommand(e.getBitSet(), e);
+	}
+
+	public void handleProxyDebugSetThreadSelectEvent(IProxyDebugSetThreadSelectEvent e) {
+		Object[] objects = new Object[2];
+		objects[0] = new Integer(e.getThreadId());
+		objects[1] = e.getFrame();
+		completeCommand(e.getBitSet(), objects);
+	}
+
+	public void handleProxyDebugSignalEvent(IProxyDebugSignalEvent e) {
+		IDebugCommand cmd = getInterruptCommand();
+		if (cmd != null) {
+			cmd.setReturn(e.getBitSet(), IDebugCommand.RETURN_OK);
+		}
+		else {
+			//send signal if the current command is not terminate command.
+			handleProcessSignaledEvent(e.getBitSet(), e.getLocator(), e.getThreadId(), e.getChangedVars());
+		}
+	}
+
+	public void handleProxyDebugSignalExitEvent(IProxyDebugSignalExitEvent e) {
+		PDebugUtils.println("======================= EVENT_DBG_EXIT_SIGNAL ====================");
+		handleProcessTerminatedEvent(e.getBitSet(), e.getSignalName(), e.getSignalMeaning());
+	}
+
+	public void handleProxyDebugSignalsEvent(IProxyDebugSignalsEvent e) {
+		IPCDISignal[] pcdiSignals = new IPCDISignal[0];
+		IPProcess[] sigProcs = getProcesses(e.getBitSet());
+		if (sigProcs.length > 0) {
+			int taskId = sigProcs[0].getTaskId();
+			IPCDITarget target = getSession().getTarget(taskId);
+			ProxyDebugSignal[] signals = e.getSignals();
+			pcdiSignals = new IPCDISignal[signals.length];
+			for (int j=0; j<signals.length; j++) {
+				pcdiSignals[j] = new Signal((Target)target, signals[j].getName(), signals[j].isStop(), signals[j].isPrint(), signals[j].isPass(), signals[j].getDescription()); 
+			}
+		}
+		completeCommand(e.getBitSet(), pcdiSignals);
+	}
+
+	public void handleProxyDebugStackInfoDepthEvent(IProxyDebugStackInfoDepthEvent e) {
+		completeCommand(e.getBitSet(), new Integer(e.getDepth()));			
+	}
+
+	public void handleProxyDebugStackframeEvent(IProxyDebugStackframeEvent e) {
+		completeCommand(e.getBitSet(), e.getFrames());
+	}
+
+	public void handleProxyDebugStepEvent(IProxyDebugStepEvent e) {
+		handleEndSteppingEvent(e.getBitSet(), e.getFrame().getLocator().getLineNumber(), e.getFrame().getLocator().getFile(), e.getThreadId(), e.getChangedVars());
+	}
+
+	public void handleProxyDebugSuspendEvent(IProxyDebugSuspendEvent e) {
+		handleSuspendEvent(e.getBitSet(), e.getLocator(), e.getThreadId(), e.getChangedVars());
+	}
+
+	public void handleProxyDebugTypeEvent(IProxyDebugTypeEvent e) {
+		completeCommand(e.getBitSet(), e.getType());
+	}
+
+	public void handleProxyDebugVarsEvent(IProxyDebugVarsEvent e) {
+		completeCommand(e.getBitSet(), e.getVariables());			
+	}
+
 }

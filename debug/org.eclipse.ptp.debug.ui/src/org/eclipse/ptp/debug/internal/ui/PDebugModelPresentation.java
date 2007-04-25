@@ -21,6 +21,7 @@ package org.eclipse.ptp.debug.internal.ui;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.eclipse.cdt.core.IAddress;
 import org.eclipse.cdt.internal.ui.util.ExternalEditorInput;
 import org.eclipse.core.resources.IFile;
@@ -880,20 +881,4 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		attributes.clear();
 		super.dispose();
 	}
-/*
-	public boolean addAnnotations(IEditorPart editorPart, IStackFrame stackFrame) {
-		try {
-			// PAnnotationManager.getDefault().focusAnnotation(editorPart, stackFrame);
-			PAnnotationManager.getDefault().addAnnotation(editorPart, stackFrame);
-			return true;
-		} catch (CoreException e) {
-			PTPDebugUIPlugin.log(e);
-			return false;
-		}
-	}
-	public void removeAnnotations(IEditorPart editorPart, IThread thread) {
-		// PDebugUtils.println("-------------PDebugModePresentation - removeAnnotations");
-		//try{ PAnnotationManager.getDefault().removeAnnotation(editorPart, thread); } catch (CoreException e) { PTPDebugUIPlugin.log(e); }
-	}
-*/
 }

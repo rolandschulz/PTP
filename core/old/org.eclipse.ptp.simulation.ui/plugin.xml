@@ -17,5 +17,11 @@
             class="org.eclipse.ptp.simulation.ui.wizards.SimulationRMConfigurationWizardPageFactory"
             id="org.eclipse.ptp.simulation.ui.configurationWizard"/>
    </extension>
+   <extension
+         point="org.eclipse.ptp.launch.rmLaunchConfiguration">
+      <launchConfiguration
+            class="org.eclipse.ptp.simulation.ui.rmLaunchConfiguration.SimulationRMLaunchConfigurationFactory"
+            id="org.eclipse.ptp.simulation.ui.launchConfiguration"/>
+   </extension>
 
 </plugin>

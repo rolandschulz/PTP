@@ -19,75 +19,121 @@
 package org.eclipse.ptp.mpich2.core.rmsystem;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.OperationCanceledException;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.attributes.IAttribute;
+import org.eclipse.ptp.core.elementcontrols.IPJobControl;
+import org.eclipse.ptp.core.elementcontrols.IPMachineControl;
+import org.eclipse.ptp.core.elementcontrols.IPNodeControl;
+import org.eclipse.ptp.core.elementcontrols.IPProcessControl;
+import org.eclipse.ptp.core.elementcontrols.IPQueueControl;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
-import org.eclipse.ptp.mpich2.core.rtsystem.MPICH2ControlSystem;
-import org.eclipse.ptp.mpich2.core.rtsystem.MPICH2MonitoringSystem;
 import org.eclipse.ptp.mpich2.core.rtsystem.MPICH2ProxyRuntimeClient;
+import org.eclipse.ptp.mpich2.core.rtsystem.MPICH2RuntimeSystem;
+import org.eclipse.ptp.rmsystem.AbstractRuntimeResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
-import org.eclipse.ptp.rmsystem.RuntimeResourceManager;
+import org.eclipse.ptp.rtsystem.IRuntimeSystem;
 
-public class MPICH2ResourceManager extends RuntimeResourceManager {
+public class MPICH2ResourceManager extends AbstractRuntimeResourceManager {
 
-	public MPICH2ResourceManager(IPUniverseControl universe,
-			IResourceManagerConfiguration config) {
-		super(universe, config);
+	public MPICH2ResourceManager(int id, IPUniverseControl universe, IResourceManagerConfiguration config) {
+		super(id, universe, config);
 	}
 
-	protected void doStartRuntime(IProgressMonitor monitor)
-			throws CoreException {
-		monitor.beginTask("Starting MPICH2 proxy runtime...", 30);
-		try {
-			MPICH2ResourceManagerConfiguration config =
-				(MPICH2ResourceManagerConfiguration) getConfiguration();
-			String serverFile = config.getServerFile();
-			boolean launchManually = config.isLaunchManually();
-			/* load up the control and monitoring systems for OMPI */
-			MPICH2ProxyRuntimeClient runtimeProxy = new MPICH2ProxyRuntimeClient(serverFile,
-					launchManually);
-			if (monitor.isCanceled()) {
-				throw new OperationCanceledException();
-			}
-			setRuntimeProxy(runtimeProxy);
-			monitor.worked(10);
-
-			if(!runtimeProxy.startup(monitor)) {
-				System.err.println("Failed to start up the proxy runtime.");
-				runtimeProxy = null;
-				setRuntimeProxy(runtimeProxy);
-				if (monitor.isCanceled()) {
-					throw new OperationCanceledException();
-				}
-				throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, 
-						"There was an error starting the MPICH2 proxy runtime.  The path to 'ptp_mpich2_proxy' "+
-						"may have been incorrect. Try checking the console log or error logs for more detailed information.",
-						null));
-			}
-			monitor.subTask("Starting MPICH2 monitoring system...");
-			setMonitoringSystem(new MPICH2MonitoringSystem(runtimeProxy));
-			if (monitor.isCanceled()) {
-				throw new OperationCanceledException();
-			}
-			monitor.worked(10);
-			monitor.subTask("Starting MPICH2 control system...");
-			setControlSystem(new MPICH2ControlSystem(runtimeProxy));
-			if (monitor.isCanceled()) {
-				throw new OperationCanceledException();
-			}
-			monitor.worked(10);
-		}
-		finally {
-			monitor.done();
-		}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManager#getLaunchAttributes(java.lang.String, java.lang.String)
+	 */
+	public IAttribute[] getLaunchAttributes(String queue, IAttribute[] currentAttrs) {
+		return null;
 	}
 
-	protected void doShutdown() throws CoreException {
-		// TODO Auto-generated method stub
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.AbstractProxyResourceManager#doAfterCloseConnection()
+	 */
+	protected void doAfterCloseConnection() {
+	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.AbstractProxyResourceManager#doAfterOpenConnection()
+	 */
+	protected void doAfterOpenConnection() {
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.AbstractProxyResourceManager#doBeforeCloseConnection()
+	 */
+	protected void doBeforeCloseConnection() {
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.AbstractProxyResourceManager#doBeforeOpenConnection()
+	 */
+	protected void doBeforeOpenConnection() {
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManager#doDispose()
+	 */
+	protected void doDispose() {
+	}
+
+	@Override
+	protected IPJobControl doCreateJob(IPQueueControl queue, int jobId, IAttribute[] attrs) {
+		return newJob(queue, jobId, attrs);
+	}
+
+	@Override
+	protected IPMachineControl doCreateMachine(int machineId, IAttribute[] attrs) {
+		return newMachine(machineId, attrs);
+	}
+
+	@Override
+	protected IPNodeControl doCreateNode(IPMachineControl machine, int nodeId, IAttribute[] attrs) {
+		return newNode(machine, nodeId, attrs);
+	}
+
+	@Override
+	protected IPProcessControl doCreateProcess(IPJobControl job, int processId, IAttribute[] attrs) {
+		return newProcess(job, processId, attrs);
+	}
+
+	@Override
+	protected IPQueueControl doCreateQueue(int queueId, IAttribute[] attrs) {
+		return newQueue(queueId, attrs);
+	}
+
+	@Override
+	protected boolean doUpdateJob(IPJobControl job, IAttribute[] attrs) {
+		return updateJob(job, attrs);
+	}
+
+	@Override
+	protected boolean doUpdateMachine(IPMachineControl machine, IAttribute[] attrs) {
+		return updateMachine(machine, attrs);
+	}
+
+	@Override
+	protected boolean doUpdateNode(IPNodeControl node, IAttribute[] attrs) {
+		return updateNode(node, attrs);
+	}
+
+	@Override
+	protected boolean doUpdateProcess(IPProcessControl process, IAttribute[] attrs) {
+		return updateProcess(process, attrs);
+	}
+
+	@Override
+	protected boolean doUpdateQueue(IPQueueControl queue, IAttribute[] attrs) {
+		return updateQueue(queue, attrs);
+	}
+
+	@Override
+	protected IRuntimeSystem doCreateRuntimeSystem() throws CoreException {
+		MPICH2ResourceManagerConfiguration config = (MPICH2ResourceManagerConfiguration) getConfiguration();
+		String serverFile = config.getServerFile();
+		int	rmId = getID();
+		boolean launchManually = config.isLaunchManually();
+		/* load up the control and monitoring systems for OMPI */
+		MPICH2ProxyRuntimeClient runtimeProxy = new MPICH2ProxyRuntimeClient(serverFile, rmId, launchManually);
+		return new MPICH2RuntimeSystem(runtimeProxy, getAttributeDefinitionManager());
 	}
 
 }

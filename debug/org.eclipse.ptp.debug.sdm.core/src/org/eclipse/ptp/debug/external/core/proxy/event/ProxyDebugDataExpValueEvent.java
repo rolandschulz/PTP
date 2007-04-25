@@ -22,11 +22,11 @@ package org.eclipse.ptp.debug.external.core.proxy.event;
 import org.eclipse.ptp.core.util.BitList;
 
 
-public class ProxyDebugDataExpValueEvent extends AbstractProxyDebugEvent implements IProxyDebugEvent {
+public class ProxyDebugDataExpValueEvent extends AbstractProxyDebugEvent implements IProxyDebugDataExpValueEvent {
 	private String value;
 	
-	public ProxyDebugDataExpValueEvent(BitList set, String value) {
-		super(EVENT_DBG_DATA_EVA_EX, set);
+	public ProxyDebugDataExpValueEvent(int transID, BitList set, String value) {
+		super(transID, EVENT_DBG_DATA_EVA_EX, set);
 		this.value = value;
 	}
 	public String getValue() {
@@ -34,6 +34,6 @@ public class ProxyDebugDataExpValueEvent extends AbstractProxyDebugEvent impleme
 	}
 	
 	public String toString() {
-		return "EVENT_DBG_DATA_EVA_EX " + this.getBitSet().toString() + " - value: " + this.value;
+		return "EVENT_DBG_DATA_EVA_EX transid=" + getTransactionID() + " " + this.getBitSet().toString() + " - value: " + this.value;
 	}
 }

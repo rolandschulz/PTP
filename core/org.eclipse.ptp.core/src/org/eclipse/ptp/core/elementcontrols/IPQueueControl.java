@@ -18,18 +18,19 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.elementcontrols;
 
-import org.eclipse.ptp.core.IPQueue;
+import org.eclipse.ptp.core.elements.IPQueue;
 
 public interface IPQueueControl extends IPQueue, IPElementControl {
 	/**
-	 * @param name
+	 * @param jobId
 	 * @return
 	 */
-	public IPJobControl getJobControl(String name);
+	public IPJobControl getJobControl(int jobId);
 	/**
 	 * @param job
 	 */
 	void addJob(IPJobControl job);
+	
 	/**
 	 * @param job_id
 	 * @return

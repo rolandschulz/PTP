@@ -21,12 +21,12 @@ package org.eclipse.ptp.debug.external.core.proxy.event;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDILocator;
 
-public class ProxyDebugSuspendEvent extends AbstractProxyDebugSuspendEvent implements IProxyDebugEvent {
-	public ProxyDebugSuspendEvent(BitList set, IPCDILocator loc, int thread_id, String[] vars) {
-		super(set, loc, thread_id, vars);
+public class ProxyDebugSuspendEvent extends AbstractProxyDebugSuspendEvent implements IProxyDebugSuspendEvent {
+	public ProxyDebugSuspendEvent(int transID, BitList set, IPCDILocator loc, int thread_id, String[] vars) {
+		super(transID, set, loc, thread_id, vars);
 	}
 	
 	public String toString() {
-		return "EVENT_DBG_SUSPEND " + this.getBitSet().toString() + " " + this.getLocator().toString();
+		return "EVENT_DBG_SUSPEND transid=" + getTransactionID() + " " + this.getBitSet().toString() + " " + this.getLocator().toString();
 	}
 }

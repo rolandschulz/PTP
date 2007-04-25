@@ -17,16 +17,41 @@
  * LA-CC 04-115
  ******************************************************************************/
  
- #ifndef PROXY_CMD_H_
+#ifndef PROXY_CMD_H_
 #define PROXY_CMD_H_
 
 /*
- * CMD codes must EXACTLY match org.eclipse.ptp.core.proxy.AbstractProxyClient
+ * CMD codes must EXACTLY match org.eclipse.ptp.core.proxy.IProxyCommand
  */
 
-#define CMD_INIT			1
-#define CMD_QUIT			2
-#define CMD_SEND_EVENTS		3
-#define CMD_HALT_EVENTS		4
+#define CMD_QUIT			1
+#define CMD_INIT			2
+#define CMD_MODEL_DEF		3
+#define CMD_START_EVENTS	4
+#define CMD_STOP_EVENTS		5
+#define CMD_SUBMIT_JOB		6
+#define CMD_TERM_JOB		7
+
+#define CMD_ID_SIZE			4
+#define CMD_ID_MASK			0xffff
+#define CMD_TRANS_ID_SIZE	4
+#define CMD_TRANS_ID_MASK	0xffff
+#define CMD_NARGS_SIZE		8
+#define CMD_NARGS_MASK		0xffffffff
+#define CMD_ARG_LEN_SIZE	8
+#define CMD_ARG_LEN_MASK	0xffffffff
+
+/*
+ * Command dispatch structure
+ */
+
+typedef int (*proxy_cmd)(int trans_id, int nargs, char **args);
+
+struct proxy_commands {
+	int			cmd_base;
+	int			cmd_size;
+	proxy_cmd *	cmd_funcs;
+};
+typedef struct proxy_commands	proxy_commands;
 
 #endif /*PROXY_CMD_H_*/

@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.elementcontrols;
 
-import org.eclipse.ptp.core.IPMachine;
+import org.eclipse.ptp.core.elements.IPMachine;
 
 public interface IPMachineControl extends IPElementControl, IPMachine {
 
@@ -29,6 +29,8 @@ public interface IPMachineControl extends IPElementControl, IPMachine {
 	 */
 	public IPProcessControl[] getProcessControls();
 
-	public void addNode(IPNodeControl curnode);
-
+	/**
+	 * @param node
+	 */
+	public void addNode(IPNodeControl node);
 }

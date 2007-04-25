@@ -23,7 +23,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.elementcontrols.IPElementControl;
+import org.eclipse.ptp.core.elements.IPElement;
 
 /**
  *  
@@ -64,8 +66,8 @@ public abstract class Parent extends PElement {
 		element[j] = tempElement;
 	}
 
-	public Parent(IPElementControl parent, String name, String key, int type) {
-		super(parent, name, key, type);
+	public Parent(int id, IPElementControl parent, int type, IAttribute[] attrs) {
+		super(id, parent, type, attrs);
 	}
 
 	public boolean hasChildren() {
@@ -118,7 +120,7 @@ public abstract class Parent extends PElement {
 		return Collections.EMPTY_LIST;
 	}
 
-	protected void removeChild(IPElementControl member) {
+	protected void removeChild(IPElement member) {
 		getElementInfo().removeChild(member);
 	}
 

@@ -35,3 +35,34 @@ digittoint(int c)
 	return 0;
 }
 #endif /* __linux__ */
+
+
+/* need to look for asprintf in configure */
+
+#ifdef DONT_HAVE_ASPRINTF
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdarg.h>
+
+/* 
+ * assumes presence of snprintf (ISO C99) to calculate length of formatted string 
+ */
+
+int
+asprintf(char ** ret, const char * fmt, ...)
+{
+	va_list ap;
+	size_t len;
+	char buf[2];
+
+	va_start(ap, fmt);
+
+	len = snprintf(buf, 2, fmt, ap);	/* get length of string first */
+	*ret = malloc(len+1);
+	len = snprintf(*ret, len+1, fmt, ap);
+
+	va_end(ap);
+	return len;
+}
+
+#endif /* DONT_HAVE_ASPRINTF */

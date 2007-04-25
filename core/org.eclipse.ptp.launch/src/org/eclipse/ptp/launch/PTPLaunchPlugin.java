@@ -19,17 +19,29 @@
 
 package org.eclipse.ptp.launch;
 
-import org.eclipse.ptp.launch.internal.ui.LaunchMessages;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.plugin.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
+
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExtension;
+import org.eclipse.core.runtime.IExtensionPoint;
+import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.ptp.launch.internal.ui.LaunchMessages;
+import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory;
+import org.eclipse.ptp.rmsystem.IResourceManager;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
-import java.util.*;
 
 /**
  * The main plugin class to be used in the desktop.
@@ -41,6 +53,9 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 	private static PTPLaunchPlugin plugin;
 	//Resource bundle.
 	private ResourceBundle resourceBundle;
+
+	private final Map<Class, AbstractRMLaunchConfigurationFactory> rmLaunchConfigurationFactories =
+		new HashMap<Class, AbstractRMLaunchConfigurationFactory>();
 	
 	/**
 	 * The constructor.
@@ -55,6 +70,7 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 	 */
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
+		retrieveRMLaunchConfigurationFactories();
 	}
 
 	/**
@@ -62,6 +78,7 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 	 */
 	public void stop(BundleContext context) throws Exception {
 		super.stop(context);
+		rmLaunchConfigurationFactories.clear();
 		plugin = null;
 		resourceBundle = null;
 	}
@@ -192,4 +209,48 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 		}
 		return null;
 	}
+
+	/**
+	 * @param rm
+	 * @return
+	 */
+	public AbstractRMLaunchConfigurationFactory getRMLaunchConfigurationFactory(IResourceManager rm) {
+		if (rm == null) {
+			return null;
+		}
+		return rmLaunchConfigurationFactories.get(rm.getClass());
+	}
+	
+	/**
+	 * 
+	 */
+	private void retrieveRMLaunchConfigurationFactories() {
+
+    	System.out.println("In retrieveRMLaunchConfigurationFactories");
+    	rmLaunchConfigurationFactories.clear();
+    	
+    	IExtensionRegistry registry = Platform.getExtensionRegistry();
+		IExtensionPoint extensionPoint = registry.getExtensionPoint(PLUGIN_ID + ".rmLaunchConfiguration");
+		final IExtension[] extensions = extensionPoint.getExtensions();
+		
+		for (int iext = 0; iext < extensions.length; ++iext) {
+			final IExtension ext = extensions[iext];
+			
+			final IConfigurationElement[] elements = ext.getConfigurationElements();
+		
+			for (int i=0; i< elements.length; i++)
+			{
+				IConfigurationElement ce = elements[i];
+				try {
+					AbstractRMLaunchConfigurationFactory factory = (AbstractRMLaunchConfigurationFactory) ce.createExecutableExtension("class");
+					Class resourceManagerClass = factory.getResourceManagerClass();
+					rmLaunchConfigurationFactories.put(resourceManagerClass, factory);
+					System.out.println("RM Launch Config factory: " + factory + " for class: " + resourceManagerClass);
+				} catch (CoreException e) {
+					log(e);
+				}
+			}
+		}
+	   	System.out.println("leaving retrieveRMLaunchConfigurationFactories");
+    }
 }

@@ -1,14 +1,21 @@
-/*
- * server() has two roles. The first is to launch the process being debugged 
- * (debuggee) under the control of a debugger (us). The second is to manage 
- * communication with the client process.
+/******************************************************************************
+ * Copyright (c) 2005 The Regents of the University of California.
+ * This material was produced under U.S. Government contract W-7405-ENG-36
+ * for Los Alamos National Laboratory, which is operated by the University
+ * of California for the U.S. Department of Energy. The U.S. Government has
+ * rights to use, reproduce, and distribute this software. NEITHER THE
+ * GOVERNMENT NOR THE UNIVERSITY MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR
+ * ASSUMES ANY LIABILITY FOR THE USE OF THIS SOFTWARE. If software is modified
+ * to produce derivative works, such modified software should be clearly  
+ * marked, so as not to confuse it with the version available from LANL.
  *
- * Note that there will be num_procs+1 [0..num_procs] processes in our 
- * communicator, where num_procs is the number of processes in the parallel 
- * job being debugged. To simplify the accounting, we use the task id of
- * num_procs as the client task id and [0..num_procs-1] for the server
- * task ids.
- */
+ * Additionally, this program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * LA-CC 04-115
+ ******************************************************************************/
 
 #include <string.h>
 

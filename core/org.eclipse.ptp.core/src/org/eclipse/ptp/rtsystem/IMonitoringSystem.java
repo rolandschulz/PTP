@@ -31,47 +31,8 @@ import org.eclipse.core.runtime.CoreException;
  *
  */
 public interface IMonitoringSystem {
-//	/**
-//	 * Gets all the machines visible to this Monitoring System and returns their names
-//	 * as a {@link String} array of the form [ "machine0", "machine1", "etc" ]
-//	 * 
-//	 * @return the machines visible to the monitoring system
-//	 * @throws CoreException 
-//	 */
-//	public String[] getMachines() throws CoreException;
+
+	public void startEvents() throws CoreException;
 	
-	public void initiateDiscovery() throws CoreException;
-	
-//
-//	/**
-//	 * Gets the names of all the nodes contained in a specified {@link IPMachine}.
-//	 * The nodes must be named of the form "machinename_nodename" like
-//	 * [ "machine0_node0", "machine0_node1", "etc" ]
-//	 * 
-//	 * @param machine the machine to look for nodes on
-//	 * @return a list of the node names
-//	 * @throws CoreException 
-//	 */
-//	public String[] getNodes(IPMachine machine) throws CoreException;
-
-//	/**
-//	 * Gets the name of the machine given 
-//	 * @param nodeName
-//	 * @return
-//	 * @throws CoreException 
-//	 */
-//	public String getNodeMachineName(String nodeName) throws CoreException;
-	
-	//public String[] getAllNodesAttributes(IPMachine machine, String[] attribs) throws CoreException;
-
-	//public String[] getNodeAttributes(IPNode node, String[] attribs) throws CoreException;
-
-	/* event stuff */
-	public void addRuntimeListener(IRuntimeListener listener);
-
-	public void removeRuntimeListener(IRuntimeListener listener);
-
-	public void startup();
-	
-	public void shutdown();
+	public void stopEvents() throws CoreException;
 }

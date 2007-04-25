@@ -19,11 +19,11 @@
 
 package org.eclipse.ptp.debug.external.core.proxy.event;
 
-import org.eclipse.ptp.core.proxy.event.IProxyEvent;
+import org.eclipse.ptp.core.proxy.event.IProxyExtendedEvent;
 import org.eclipse.ptp.core.util.BitList;
 
 
-public interface IProxyDebugEvent extends IProxyEvent {
+public interface IProxyDebugEvent extends IProxyExtendedEvent {
 	public static final int DBG_EVENT_OFFSET = 100;
 	public static final int EVENT_DBG_EXIT = DBG_EVENT_OFFSET + 2;
 	public static final int 	EVENT_DBG_EXIT_NORMAL = 0;

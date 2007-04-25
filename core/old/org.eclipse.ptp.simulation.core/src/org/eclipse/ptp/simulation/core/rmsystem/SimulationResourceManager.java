@@ -20,21 +20,21 @@ package org.eclipse.ptp.simulation.core.rmsystem;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.debug.core.ILaunch;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
+import org.eclipse.ptp.core.elements.IPJob;
+import org.eclipse.ptp.rmsystem.AbstractResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
-import org.eclipse.ptp.rmsystem.RuntimeResourceManager;
-import org.eclipse.ptp.rtsystem.IRuntimeProxy;
-import org.eclipse.ptp.simulation.core.rtsystem.SimulationControlSystem;
-import org.eclipse.ptp.simulation.core.rtsystem.SimulationMonitoringSystem;
+import org.eclipse.ptp.rtsystem.JobRunConfiguration;
 
-public class SimulationResourceManager extends RuntimeResourceManager {
+public class SimulationResourceManager extends AbstractResourceManager {
 
 	private int numMachines = 0;
 	private int[] numNodes = new int[0];
 
-	public SimulationResourceManager(IPUniverseControl universe,
+	public SimulationResourceManager(int id, IPUniverseControl universe,
 			IResourceManagerConfiguration config) {
-		super(universe, config);
+		super(id, universe, config);
 	}
 
 	private SimulationRMConfiguration getSimulationRMConfiguration() {
@@ -46,26 +46,51 @@ public class SimulationResourceManager extends RuntimeResourceManager {
 
 	}
 
-	protected void doStartRuntime(IProgressMonitor monitor) {
+	protected void doShutdown(IProgressMonitor monitor) throws CoreException {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	protected void doDisableEvents() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected void doEnableEvents() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected void doStartup(IProgressMonitor monitor) throws CoreException {
 		monitor.beginTask("Starting simulation...", 20);
 		try {
 			final SimulationRMConfiguration simConfig = getSimulationRMConfiguration();
 			numMachines = simConfig.getNumMachines();
 			numNodes = (int[]) simConfig.getNumNodesPerMachines().clone();
 			/* load up the control and monitoring systems for the simulation */
-			setMonitoringSystem(new SimulationMonitoringSystem(numMachines, numNodes));
+			//TODO FIX! setMonitoringSystem(new SimulationMonitoringSystem(numMachines, numNodes));
 			monitor.worked(10);
-			setControlSystem(new SimulationControlSystem());
+//			TODO FIX! setControlSystem(new SimulationControlSystem());
 			monitor.worked(10);
-			setRuntimeProxy((IRuntimeProxy)null);
+//			TODO FIX! setRuntimeProxy((IRuntimeProxy)null);
 		}
 		finally {
 			monitor.done();
 		}
 	}
 
-	protected void doShutdown() throws CoreException {
+	@Override
+	protected IPJob doSubmitJob(ILaunch launch, JobRunConfiguration jobRunConfig, IProgressMonitor monitor) throws CoreException {
 		// TODO Auto-generated method stub
+		return null;
+	}
 
+	@Override
+	protected void doTerminateJob(IPJob job) throws CoreException {
+		// TODO Auto-generated method stub
+		
 	}
 }

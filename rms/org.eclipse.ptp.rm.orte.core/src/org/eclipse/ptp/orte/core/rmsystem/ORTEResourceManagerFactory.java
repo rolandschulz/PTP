@@ -20,8 +20,8 @@ package org.eclipse.ptp.orte.core.rmsystem;
 
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory;
-import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ui.IMemento;
 
@@ -31,12 +31,12 @@ public class ORTEResourceManagerFactory extends AbstractResourceManagerFactory {
 		super("ORTE");
 	}
 
-	public IResourceManager create(IResourceManagerConfiguration confIn) {
+	public IResourceManagerControl create(IResourceManagerConfiguration confIn) {
 		ORTEResourceManagerConfiguration configuration = (ORTEResourceManagerConfiguration) confIn;
 		final PTPCorePlugin plugin = PTPCorePlugin.getDefault();
 		//Preferences p = plugin.getPluginPreferences();
 		final IPUniverseControl universe = (IPUniverseControl) plugin.getUniverse();
-		return new ORTEResourceManager(universe, configuration);
+		return new ORTEResourceManager(universe.getNextResourceManagerId(), universe, configuration);
 	}
 
 	public IResourceManagerConfiguration createConfiguration() {

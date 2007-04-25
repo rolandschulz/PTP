@@ -24,6 +24,9 @@
 #include <stdlib.h>
  
 #include "proxy.h"
+#include "proxy_cmd.h"
+#include "proxy_event.h"
+
 #include <list.h>
 
 extern proxy_svr_funcs 	proxy_tcp_svr_funcs;
@@ -34,7 +37,7 @@ proxy proxies[] = {
 };
 
 int
-proxy_svr_init(char *name, proxy_handler_funcs *pf, proxy_svr_helper_funcs *sf, proxy_svr_commands *cmds, proxy_svr **svr)
+proxy_svr_init(char *name, struct timeval *timeout, proxy_svr_helper_funcs *sf, proxy_commands *cmds, proxy_svr **svr)
 {
 	proxy *		p;
 	proxy_svr *	ps;
@@ -43,12 +46,11 @@ proxy_svr_init(char *name, proxy_handler_funcs *pf, proxy_svr_helper_funcs *sf, 
 	if (find_proxy(name, &p) < 0)
 		return PROXY_RES_ERR;
 		
-	p->handler_funcs = pf;
-
 	ps = (proxy_svr *)malloc(sizeof(proxy_svr));
 	ps->proxy = p;
 	ps->svr_helper_funcs = sf;
 	ps->svr_commands = cmds;
+	ps->svr_timeout = timeout;
 	
 	if (p->svr_funcs->init(ps, &data) < 0) {
 		free(ps);
@@ -56,6 +58,7 @@ proxy_svr_init(char *name, proxy_handler_funcs *pf, proxy_svr_helper_funcs *sf, 
 	}
 
 	ps->svr_data = data;
+	ps->svr_events = NewList();
 	
 	*svr = ps;
 	
@@ -85,16 +88,6 @@ proxy_svr_progress(proxy_svr *ps)
 {
 	if (ps != NULL)
 		return ps->proxy->svr_funcs->progress(ps);
-		
-	return PROXY_RES_ERR;
-}
-
-int
-proxy_svr_handle_events(proxy_svr *ps, List *eventList, struct timeval timeout)
-{
-	if (ps != NULL) {
-		return ps->proxy->svr_funcs->handle_events(ps, eventList, timeout);
-	}
 	
 	return PROXY_RES_ERR;
 }
@@ -107,8 +100,7 @@ proxy_svr_finish(proxy_svr *ps)
 }
 
 void
-proxy_svr_event_callback(proxy_svr *ps, char *data)
+proxy_svr_queue_msg(proxy_svr *ps, proxy_msg *msg)
 {
-	if (ps != NULL)
-		proxy_event_callback(ps->proxy, data);
+	proxy_queue_msg(ps->svr_events, msg);
 }

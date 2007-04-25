@@ -192,7 +192,7 @@ public class ParallelJobView extends AbstractParallelSetView implements IProcess
 					changeJob((IPJob) null);
 				}
 				else if (item != null) {
-					IPJob job = manager.findJob(item.getText());
+					IPJob job = (IPJob)item.getData();
 					if (job == null) {
 						changeJob((IPJob) null);
 					}

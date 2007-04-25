@@ -28,6 +28,7 @@
 #include "signalinfo.h"
 #include "bitset.h"
 #include "list.h"
+#include "proxy_msg.h"
 
 #define DBG_EV_WAITALL	0
 #define DBG_EV_WAITSOME	100000
@@ -124,7 +125,8 @@ struct dbg_partial_aif_event {
 typedef struct dbg_partial_aif_event dbg_partial_aif_event;
 
 struct dbg_event {
-	int			event;
+	int			event_id;
+	int			trans_id;
 	bitset *	procs;
 	
 	union {
@@ -202,8 +204,8 @@ struct dbg_event {
 };
 typedef struct dbg_event dbg_event;
 
-extern int 			DbgStrToEvent(char *, dbg_event **);
-extern int 			DbgEventToStr(dbg_event *, char **);
+extern int 			DbgDeserializeEvent(int, int, char **, dbg_event **);
+extern int 			DbgSerializeEvent(dbg_event *, char **);
 extern dbg_event *	NewDbgEvent(int);
 extern void			FreeDbgEvent(dbg_event *);
 extern dbg_event *	DbgErrorEvent(int, char *);

@@ -22,6 +22,18 @@
 
 #include <sys/types.h>
 #include <ctype.h>
+#include <unistd.h>
+
+#ifdef USE_POSIX_THREADS
+#include <pthread.h>
+#define THREAD_DECL(context)	pthread_mutex_t context ## _thread_mutex = PTHREAD_MUTEX_INITIALIZER
+#define THREAD_LOCK(context)	pthread_mutex_lock(&context ## _thread_mutex)
+#define THREAD_UNLOCK(context)	pthread_mutex_unlock(&context ## _thread_mutex)
+#else /* USE_POSIX_THREADS */
+#define THREAD_DECL(context)
+#define THREAD_LOCK(context)
+#define THREAD_UNLOCK(context)
+#endif /* USE_POSIX_THREADS */
 
 #ifndef MAX
 #define MAX(a, b)		((a) < (b) ? (b) : (a))

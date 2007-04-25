@@ -28,8 +28,8 @@ public abstract class AbstractProxyDebugSuspendEvent extends AbstractProxyDebugE
 	private IPCDILocator locator;
 	private String[] changed_vars;
 	
-	public AbstractProxyDebugSuspendEvent(BitList set, IPCDILocator loc, int tid, String[] vars) {
-		super(EVENT_DBG_SUSPEND, set);
+	public AbstractProxyDebugSuspendEvent(int transID, BitList set, IPCDILocator loc, int tid, String[] vars) {
+		super(EVENT_DBG_SUSPEND, transID, set);
 		this.locator = loc;
 		this.thread_id = tid;
 		this.changed_vars = vars;

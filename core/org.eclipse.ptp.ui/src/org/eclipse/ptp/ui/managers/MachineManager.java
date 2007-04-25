@@ -22,10 +22,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.ptp.core.AttributeConstants;
-import org.eclipse.ptp.core.IPMachine;
-import org.eclipse.ptp.core.IPNode;
-import org.eclipse.ptp.core.IPProcess;
-import org.eclipse.ptp.core.IPUniverse;
+import org.eclipse.ptp.core.elements.IPMachine;
+import org.eclipse.ptp.core.elements.IPNode;
+import org.eclipse.ptp.core.elements.IPProcess;
+import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.model.Element;
@@ -182,7 +182,7 @@ public class MachineManager extends AbstractUIManager {
 			if(nodeState == null) {
 				return IPTPUIConstants.NODE_UNKNOWN;
 			}
-			if (nodeState.equals(IPNode.NODE_STATE_UP)) {
+			if (nodeState.equals(IPNode.OLD_NODE_STATE_UP)) {
 				if (node.getNumProcesses() > 0)
 					return (node.isAllStop() ? IPTPUIConstants.NODE_EXITED : IPTPUIConstants.NODE_RUNNING);
 				
@@ -213,9 +213,9 @@ public class MachineManager extends AbstractUIManager {
 					}
 				}
 				return IPTPUIConstants.NODE_UP;
-			} else if (nodeState.equals(IPNode.NODE_STATE_DOWN))
+			} else if (nodeState.equals(IPNode.OLD_NODE_STATE_DOWN))
 				return IPTPUIConstants.NODE_DOWN;
-			else if (nodeState.equals(IPNode.NODE_STATE_ERROR))
+			else if (nodeState.equals(IPNode.OLD_NODE_STATE_ERROR))
 				return IPTPUIConstants.NODE_ERROR;
 		}
 		return IPTPUIConstants.NODE_UNKNOWN;
@@ -253,14 +253,6 @@ public class MachineManager extends AbstractUIManager {
 		}
 		return machine.findNode(node_id);
 	}
-	/** Find machine
-	 * @param machine_name
-	 * @return
-	 */
-	public IPMachine findMachine(String machine_name) {
-		return (IPMachine) modelPresentation.getUniverse().findMachineByName(machine_name);
-	}
-	
 	/** find machine by ID
 	 * @param machine_id machine ID
 	 * @return

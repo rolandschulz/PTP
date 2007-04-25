@@ -25,12 +25,12 @@ import org.eclipse.ptp.core.util.BitList;
 public abstract class AbstractProxyRuntimeEvent extends AbstractProxyEvent implements IProxyRuntimeEvent {
 	private BitList	procSet;
 	
-	public AbstractProxyRuntimeEvent(int id) {
-		super(id);
+	public AbstractProxyRuntimeEvent(int eventID, int transID) {
+		super(eventID, transID);
 	}
 
-	public AbstractProxyRuntimeEvent(int id, BitList set) {
-		super(id);
+	public AbstractProxyRuntimeEvent(int eventID, int transactionID, BitList set) {
+		super(eventID, transactionID);
 		procSet = set;
 	}
 	

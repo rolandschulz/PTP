@@ -23,15 +23,17 @@ import java.io.File;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.core.AttributeConstants;
-import org.eclipse.ptp.core.IPJob;
-import org.eclipse.ptp.core.IPNode;
-import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.PreferenceConstants;
+import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
+import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.elementcontrols.IPElementControl;
 import org.eclipse.ptp.core.elementcontrols.IPJobControl;
 import org.eclipse.ptp.core.elementcontrols.IPNodeControl;
 import org.eclipse.ptp.core.elementcontrols.IPProcessControl;
+import org.eclipse.ptp.core.elements.IPJob;
+import org.eclipse.ptp.core.elements.IPNode;
+import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.util.OutputTextFile;
 
 public class PProcess extends Parent implements IPProcessControl {
@@ -50,19 +52,43 @@ public class PProcess extends Parent implements IPProcessControl {
 	 */
 	protected IPNodeControl node;
 
-	public PProcess(IPElementControl element, String name, String key, String pid, int taskId, String status, String exitCode, String signalName) {
-		super(element, name, key, P_PROCESS);
-		if (element == null) {
-			throw new IllegalArgumentException("Process, " + name + ", was created with a null parent.");
-		}
-		this.pid = pid;
-		this.setAttribute(AttributeConstants.ATTRIB_TASKID, new Integer(taskId));
+	public PProcess(int id, IPJobControl job, IAttribute[] attrs) {
+		super(id, job, P_PROCESS, attrs);
+		this.pid = getPID(attrs);
+		this.setAttribute(AttributeConstants.ATTRIB_TASKID, new Integer(getTaskID(attrs)));
 		this.setAttribute(AttributeConstants.ATTRIB_ISREGISTERED, new Boolean(false));
-		this.exitCode = exitCode;
-		this.status = status;
+		this.status = getStatus(attrs);
 		setOutputStore();
-		outputFile = new OutputTextFile(name, outputDirPath, storeLine);
+		outputFile = new OutputTextFile(getElementName(), outputDirPath, storeLine);
 	}
+	
+	private static String getStatus(IAttribute[] attrs) {
+		for (IAttribute attr : attrs) {
+			if (attr.getDefinition() == AttributeDefinitionManager.getNameAttributeDefinition()) {
+				return attr.getValueAsString();
+			}
+		}
+		return "";
+	}
+	
+	private static String getPID(IAttribute[] attrs) {
+		for (IAttribute attr : attrs) {
+			if (attr.getDefinition() == AttributeDefinitionManager.getNameAttributeDefinition()) {
+				return attr.getValueAsString();
+			}
+		}
+		return "";
+	}
+	
+	private static String getTaskID(IAttribute[] attrs) {
+		for (IAttribute attr : attrs) {
+			if (attr.getDefinition() == AttributeDefinitionManager.getNameAttributeDefinition()) {
+				return attr.getValueAsString();
+			}
+		}
+		return "";
+	}
+	
 	private void setOutputStore() {
 		Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
 		outputDirPath = preferences.getString(PreferenceConstants.OUTPUT_DIR);
@@ -75,6 +101,7 @@ public class PProcess extends Parent implements IPProcessControl {
 		if (!outputDirectory.exists())
 			outputDirectory.mkdir();
 	}
+	
 	public IPJob getJob() {
 		IPElementControl current = this;
 		do {
@@ -83,9 +110,11 @@ public class PProcess extends Parent implements IPProcessControl {
 		} while ((current = current.getParent()) != null);
 		return null;
 	}
+	
 	public String getProcessNumber() {
 		return "" + getTaskId() + "";
 	}
+	
 	public void setStatus(String status) {
 		if (status == null) {
 			status = "unknown";
@@ -97,81 +126,89 @@ public class PProcess extends Parent implements IPProcessControl {
 			isTerminated = true;
 		}
 	}
+	
 	public void setExitCode(String exitCode) {
 		this.exitCode = exitCode;
 	}
+	
 	public void setSignalName(String signalName) {
 		this.signalName = signalName;
 	}
+	
 	public void setPid(String pid) {
 		this.pid = pid;
 	}
+	
 	public String getPid() {
 		return pid;
 	}
+	
 	public String getExitCode() {
 		return exitCode;
 	}
+	
 	public String getSignalName() {
 		return signalName;
 	}
+	
 	public String getStatus() {
 		return status;
 	}
+	
 	public boolean isTerminated() {
 		return isTerminated;
 	}
+	
 	public void removeProcess() {
 		final IPNodeControl parent = (IPNodeControl) getParent();
 		if (parent != null)
 			parent.removeProcess(this);
 	}
+	
 	public void setTerminated(boolean isTerminated) {
 		this.isTerminated = isTerminated;
 	}
+	
 	public void addOutput(String output) {
 		// outputList.add(output);
 		// outputList.add("random output from process: " + (counter++));
 		outputFile.write(output + "\n");
 	}
+	
 	public String getContents() {
 		// String[] array = new String[outputList.size()];
 		// return (String[]) outputList.toArray( array );
 		return outputFile.getContents();
 	}
+	
 	public String[] getOutputs() {
 		// String[] array = new String[outputList.size()];
 		// return (String[]) outputList.toArray( array );
 		return null;
 	}
+	
 	public void clearOutput() {
 		outputFile.delete();
 		// outputList.clear();
 	}
+	
 	public boolean isAllStop() {
 		return (getStatus().startsWith(EXITED) || getStatus().startsWith(ERROR));
 	}
+	
 	public void setNode(IPNode node) {
 		this.node = (IPNodeControl) node;
 		if (node != null)
 			this.node.addProcess(this);
 	}
+	
 	public IPNode getNode() {
 		return this.node;
 	}
+	
+	// TODO Should not be a method!
 	public int getTaskId() {
 		return ((Integer) this.getAttribute(AttributeConstants.ATTRIB_TASKID)).intValue();
-	}
-	public Object getAttribute(String key) {
-		return this.getAttribute(AttributeConstants.ATTRIB_CLASS_PROCESS, key);
-	}
-
-	public void setAttribute(String key, Object o) {
-		this.setAttribute(AttributeConstants.ATTRIB_CLASS_PROCESS, key, o);
-	}
-	
-	public String[] getAttributeKeys() {
-		return this.getAttributeKeys(AttributeConstants.ATTRIB_CLASS_PROCESS);
 	}
 	
 	public String getName() {
@@ -182,12 +219,6 @@ public class PProcess extends Parent implements IPProcessControl {
 		return (IPProcess) getParent();
 	}
 	
-	public void setParent(IPElementControl parent) {
-		if (parent == null) {
-			throw new IllegalArgumentException("Process, " + getName() + ", set to null parent");
-		}
-		super.setParent(parent);
-	}
 	public int getNumChildProcesses() {
 		return size();
 	}

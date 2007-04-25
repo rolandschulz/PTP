@@ -29,7 +29,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerMenuContribution;
-import org.eclipse.ptp.rmsystem.ResourceManagerStatus;
+import org.eclipse.ptp.rmsystem.ResourceManagerState;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IActionDelegate2;
@@ -70,10 +70,10 @@ public class StartResourceManagersObjectActionDelegate implements
 			IResourceManagerMenuContribution menuContrib = menuContribs[i];
 			final IResourceManager rmManager = (IResourceManager) menuContrib.getAdapter(IResourceManager.class);
 
-			if (rmManager.getStatus().equals(ResourceManagerStatus.STARTED)) {
+			if (rmManager.getState().equals(ResourceManagerState.State.STARTED)) {
 				MessageDialog.openInformation(targetShell,
 						"Resource Manager Already Started", "Resource Manager \""
-						+ rmManager.getConfiguration().getName()
+						+ rmManager.getName()
 						+ "\" Already Started");
 				return;
 			}

@@ -21,6 +21,8 @@
  */
 package org.eclipse.ptp.rmsystem;
 
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
+
 
 
 /**
@@ -49,7 +51,7 @@ public abstract class AbstractResourceManagerFactory implements
 	 * 
 	 * @see org.eclipse.ptp.rm.IResourceManagerFactory#create(org.eclipse.ptp.rm.IRMConfiguration)
 	 */
-	public abstract IResourceManager create(IResourceManagerConfiguration configuration);
+	public abstract IResourceManagerControl create(IResourceManagerConfiguration configuration);
 
 	/*
 	 * (non-Javadoc)

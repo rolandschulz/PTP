@@ -74,6 +74,9 @@
  * 
  * TODO: Replace with new attribute system
  */
+#define ATTRIB_NODE_NAME_ID			2
+#define ATTRIB_QUEUE_NAME_ID		3
+
 #define ATTRIB_MACHINEID			"Machine ID"
 #define ATTRIB_NODE_NAME			"Node Name"
 #define ATTRIB_NODE_NUMBER			"Node Number"
@@ -124,8 +127,10 @@ static proxy_svr_helper_funcs helper_funcs = {
 
 static proxy_svr_commands command_tab[] = {
 	{CMD_INIT,			LSF_Initialize},
-	{CMD_SEND_EVENTS,	LSF_SendEvents},
-	{CMD_HALT_EVENTS,	LSF_HaltEvents},
+	{CMD_MODEL_DEF,		LSF_ModelDef},
+	{CMD_START_EVENTS,	LSF_StartEvents},
+	{CMD_STOP_EVENTS,	LSF_StopEvents},
+	{CMD_SUBMIT_JOB,	LSF_SubmitJob},
 	{CMD_QUIT,			LSF_Quit},
 	{0,					NULL},
 };
@@ -241,7 +246,7 @@ checkErrorCode(int type, int rc)
 }
 #endif
 
-
+ 
 /**
  * Compares hostInfoEnt structures
  * 
@@ -312,6 +317,7 @@ notifyHostInfoChange(struct hostInfoEnt *hInfo)
 	static int initialize = 1;
 	static struct hostInfoEnt hInfoSaved;
 
+/* TODO - turn change events back on
 	if (hostInfoHasChanged(&hInfoSaved, hInfo, &initialize)) {
 		sprintf(id, "%s=%d", ATTRIB_MACHINEID, 0);
 		//sprintf(host, "%s=%s", ATTRIB_NODE_NUMBER, hInfo->host); ??????
@@ -322,8 +328,11 @@ notifyHostInfoChange(struct hostInfoEnt *hInfo)
 		proxy_cstring_to_str(state, &str3);
 		asprintf(&res, "%d %s %s %s", RTEV_NATTR, str1, str2, str3);
 		AddToList(eventList, (void *)res);
+		free(str1);
+		free(str2);
+		free(str3);
 	}
-	
+*/
 	return PROXY_RES_OK;
 }
 
@@ -341,7 +350,7 @@ notifyQueueInfoChange(struct queueInfoEnt *qInfo)
 
 	static int initialize = 1;
 	static struct queueInfoEnt qInfoSaved;
-
+/* TODO - turn on change notification
 	if (queueInfoHasChanged(&qInfoSaved, qInfo, &initialize)) {
 //		sprintf(id, "%s=%d", ATTRIB_MACHINEID, 0);
 		//sprintf(host, "%s=%s", ATTRIB_NODE_NUMBER, qInfo->host); ??????
@@ -353,21 +362,151 @@ notifyQueueInfoChange(struct queueInfoEnt *qInfo)
 		asprintf(&res, "%d %s %s %s", RTEV_NATTR, str1, str2, str3);
 //		AddToList(eventList, (void *)res);
 	}
-	
+*/
 	return PROXY_RES_OK;
 }
 
 
 /**
- * Send EVENT_RUNTIME_OK to server
+ * Send Attributes to client
  */
  static void
- sendRuntimeEventOK()
+ sendAttributes(int trans_id)
+ {
+ 	char *	res;
+ 	char	id[32], type[32], sname[64], lname[128], min[32], max[32], def[32];
+ 	char *	str_id, *str_type, *str_sname, *str_lname, *str_min, *str_max, *str_def;
+
+//	ID	TYPE	 SNAME	LNAME	[ MIN	MAX DEF	VALS ]
+
+ 	/* node name */
+ 	
+	sprintf(id, "id=%d", ATTRIB_NODE_NAME_ID);
+	sprintf(type, "type=%d", RTEV_ATTRIB_TYPE_STRING);
+	sprintf(sname, "sname=%s", "Node name");
+	sprintf(lname, "lname=%s", "Name of the host machine");
+	sprintf(min, "min=%s", "1");
+	sprintf(max, "max=%s", "128");
+	sprintf(def, "def=%s", "1");
+
+	proxy_cstring_to_str(id, &str_id);
+	proxy_cstring_to_str(type, &str_type);
+	proxy_cstring_to_str(sname, &str_sname);
+	proxy_cstring_to_str(lname, &str_lname);
+	proxy_cstring_to_str(min, &str_min);
+	proxy_cstring_to_str(max, &str_max);
+	proxy_cstring_to_str(def, &str_def);
+	asprintf(&res, "%d %d %s %s %s %s %s %s %s", trans_id, RTEV_ATTR_DEF,
+			 str_id, str_type, str_sname, str_lname, str_min, str_max, str_def);
+	AddToList(eventList, (void *)res);
+
+	free(str_id);
+	free(str_type);
+	free(str_sname);
+	free(str_lname);
+	free(str_min);
+	free(str_max);
+	free(str_def);
+
+ 	/* queue name */
+ 	
+	sprintf(id, "id=%d", ATTRIB_QUEUE_NAME_ID);
+	sprintf(type, "type=%d", RTEV_ATTRIB_TYPE_STRING);
+	sprintf(sname, "sname=%s", "Queue name");
+	sprintf(lname, "lname=%s", "Name of a queue for job submissions");
+	sprintf(min, "min=%s", "queueA");
+	sprintf(max, "max=%s", "queueC");
+	sprintf(def, "def=%s", "queueB");
+
+	proxy_cstring_to_str(id, &str_id);
+	proxy_cstring_to_str(type, &str_type);
+	proxy_cstring_to_str(sname, &str_sname);
+	proxy_cstring_to_str(lname, &str_lname);
+	proxy_cstring_to_str(min, &str_min);
+	proxy_cstring_to_str(max, &str_max);
+	proxy_cstring_to_str(def, &str_def);
+	asprintf(&res, "%d %d %s %s %s %s %s %s %s", trans_id, RTEV_ATTR_DEF,
+			 str_id, str_type, str_sname, str_lname, str_min, str_max, str_def);
+	AddToList(eventList, (void *)res);
+
+	free(str_id);
+	free(str_type);
+	free(str_sname);
+	free(str_lname);
+	free(str_min);
+	free(str_max);
+	free(str_def);
+ }
+
+/**
+ * Send new machine info to client
+ */
+ static void
+ sendMachineInfo(int trans_id)
+ {
+ 	char *	res;
+ 	char	name[64];
+ 	char *	str_name;
+
+ 	/* machine name */
+ 	
+	sprintf(name, "denali.lanl.gov");
+	proxy_cstring_to_str(name, &str_name);
+	asprintf(&res, "%d %d %s", trans_id, RTEV_NEW_MACHINE, str_name);
+	AddToList(eventList, (void *)res);
+	free(str_name);
+ }
+
+
+/**
+ * Send new node info to client
+ */
+ static void
+ sendNodeInfo(int trans_id)
+ {
+ 	char *	res;
+ 	char	name[64];
+ 	char *	str_name;
+
+ 	/* node name */
+ 	
+	sprintf(name, "node0");
+	proxy_cstring_to_str(name, &str_name);
+	asprintf(&res, "%d %d %s", trans_id, RTEV_NEW_NODE, str_name);
+	AddToList(eventList, (void *)res);
+	free(str_name);
+ }
+
+
+/**
+ * Send new queue info to client
+ */
+ static void
+ sendQueueInfo(int trans_id)
+ {
+ 	char *	res;
+ 	char	name[64];
+ 	char *	str_name;
+
+ 	/* queue name */
+ 	
+	sprintf(name, "default");
+	proxy_cstring_to_str(name, &str_name);
+	asprintf(&res, "%d %d %s", trans_id, RTEV_NEW_QUEUE, str_name);
+	AddToList(eventList, (void *)res);
+	free(str_name);
+ }
+
+
+/**
+ * Send EVENT_RUNTIME_OK to client
+ */
+ static void
+ sendRuntimeEventOK(int trans_id)
  {
  	char* res;
- 	asprintf(&res, "%d", RTEV_OK);
+ 	asprintf(&res, "%d %d", trans_id, RTEV_OK);
 	AddToList(eventList, (void *)res);
-	// TODO - is this a memory leak?
  }
 
 
@@ -375,23 +514,34 @@ notifyQueueInfoChange(struct queueInfoEnt *qInfo)
  * Initialize the LSF service
  */
 int
-LSF_Initialize(char** args)
+LSF_Initialize(int trans_id, char** args)
 {
-	char * version;
-
-	proxy_str_to_cstring(args[0], &version);
-	fprintf(stdout, "LSF_Initialize {%s}\n", version); fflush(stdout);
+	char * version = args[0];
+	fprintf(stdout, "LSF_Initialize (%d): version {%s}\n", trans_id, version); fflush(stdout);
 	
 	if (strncmp(version, "2.0", 3) != 0) {
-		fprintf(stdout, "LSF_Initialize: incorrect version [%s]\n", version); fflush(stdout);
+		fprintf(stdout, "LSF_Initialize: incorrect version {%s}\n", version); fflush(stdout);
 		AddToList(eventList, errorStr(1, "LSF_Initialize: incorrect version, should be 2.0"));
-		free(version);
 		return PROXY_RES_ERR;
-	} else {
-		sendRuntimeEventOK();
-		free(version);
-		return PROXY_RES_OK;
 	}
+
+	sendRuntimeEventOK(trans_id);
+	return PROXY_RES_OK;
+}
+
+
+/**
+ * Initiate the model definition phase
+ */
+int
+LSF_ModelDef(int trans_id, char **args)
+{
+	fprintf(stdout, "LSF_ModelDef (%d):\n", trans_id); fflush(stdout);
+	
+//	sendAttributes(trans_id);
+	
+	sendRuntimeEventOK(trans_id);
+	return PROXY_RES_OK;
 }
 
 
@@ -404,10 +554,15 @@ LSF_Initialize(char** args)
  * 		3. queue information - lsb_queueinfo()
  */
  int
-LSF_SendEvents(char **args)
+LSF_StartEvents(int trans_id, char **args)
 {
-	fprintf(stdout, "  LSF_SendEvents\n"); fflush(stdout);
-	gSendEvents = 1;
+	fprintf(stdout, "  LSF_StartEvents (%d):\n", trans_id); fflush(stdout);
+	gStartEventsID = trans_id;
+
+	sendMachineInfo(trans_id);
+	sendNodeInfo(trans_id);
+	sendQueueInfo(trans_id);
+	
 	return PROXY_RES_OK;	
 }
 
@@ -416,21 +571,24 @@ LSF_SendEvents(char **args)
  * Stop polling for LSF change events
  */
  int
-LSF_HaltEvents(char **args)
+LSF_StopEvents(int trans_id, char **args)
 {
-	fprintf(stdout, "  LSF_HaltEvents\n"); fflush(stdout);
-	gSendEvents = 0;
+	fprintf(stdout, "  LSF_StopEvents (%d):\n", trans_id); fflush(stdout);
+	/* notification that start events have completed */
+	sendRuntimeEventOK(gStartEventsID);
+	gStartEventsID = 0;
+	sendRuntimeEventOK(trans_id);
 	return PROXY_RES_OK;	
 }
 
 
 /**
- * Run/submit a job with the given executable path and arguments (remote call from a client proxy)
+ * Submit a job with the given executable path and arguments (remote call from a client proxy)
  *
  * TODO - what about queues, should there be a LSF_Submit?
  */
 int
-LSF_Run(char **args)
+LSF_SubmitJob(int trans_id, char **args)
 {
 #ifdef LSF_NOT_YET
 	int					rtn;
@@ -440,20 +598,12 @@ LSF_Run(char **args)
 	rtn = lsb_submit(jobSubReq, jobSubReply);
 	rtn = lsb_modify(jobSubReq, jobSubReply, jobId);
 #endif
-	
-	fprintf(stdout, "Returning from LSFRun\n"); fflush(stdout);
-	return PROXY_RES_OK;
-}
 
+	fprintf(stdout, "  LSF_SubmitJob (%d): %s %s %s %s %s %s\n", trans_id,
+		args[0], args[1], args[2], args[3], args[4], args[5]); fflush(stdout);
 
-/**
- * Initiate the discovery phase
- * 
- */
-int
-LSF_Discover(char **args)
-{
-	fprintf(stdout, "DISCOVERY PHASE: end\n"); fflush(stdout);
+	sendRuntimeEventOK(trans_id);
+
 	return PROXY_RES_OK;
 }
 
@@ -462,7 +612,7 @@ LSF_Discover(char **args)
  * Terminate a job given a jobid (remote call from a client proxy)
  */
 int
-LSF_TerminateJob(char **args)
+LSF_TerminateJob(int trans_id, char **args)
 {
 #ifdef LSF
 	int		rtn;			/* TODO - find what return value signifies from documentation */
@@ -471,7 +621,7 @@ LSF_TerminateJob(char **args)
 #endif
 	LS_LONG_INT jobid = atoi(args[1]);
 	
-	fprintf(stdout, "  LSF_TerminateJob (%ld)\n", jobid); fflush(stdout);
+	fprintf(stdout, "  LSF_TerminateJob (%d):\n", trans_id); fflush(stdout);
 #ifdef LSF
 	rtn = lsb_deletejob(jobid, times, options);
 #endif
@@ -484,11 +634,17 @@ LSF_TerminateJob(char **args)
  * Shutdown 
  */
 int
-LSF_Quit(char **args)
+LSF_Quit(int trans_id, char **args)
 {
-	fprintf(stdout, "LSF_Quit called!\n"); fflush(stdout);
+	fprintf(stdout, "LSF_Quit (%d):\n", trans_id); fflush(stdout);
 	shutdownLSF();
-	sendRuntimeEventOK();
+
+	/* if events are running, ok the start events command  to complete it */
+	if (gStartEventsID > 0) {
+		sendRuntimeEventOK(gStartEventsID);
+		gStartEventsID = 0;
+	}
+	sendRuntimeEventOK(trans_id);
 
 	return PROXY_RES_OK;
 }
@@ -528,7 +684,7 @@ LSF_Progress(void)
 
 #ifdef LSF
 	/* poll for hosts */
-    if (gSendEvents && --nextHostPoll < 1) {
+    if (gStartEventsID && --nextHostPoll < 1) {
     	nextHostPoll = 0;	// TODO
 		host_info = lsb_hostinfo(hosts, &num_hosts);
 		if (host_info == NULL) {
@@ -541,7 +697,7 @@ LSF_Progress(void)
 
 #ifdef LSF
     /* poll for queues */
-    if (gSendEvents) {
+    if (gStartEventsID) {
 		queue_info = lsb_queueinfo(queues, numQueues, queuehost, username, options);
 		if (queue_info == NULL) {
 			lsb_perror("ptp_lsf_proxy: lsb_queueinfo() failed");
@@ -559,8 +715,7 @@ LSF_Progress(void)
 static int
 server(char* app_name, char* name, char* host, int port)
 {
-	char* msg, * msg1, * msg2;
-	int rc;
+	int rc = 0;
 
 	initLSF(app_name);
 	
@@ -586,11 +741,9 @@ server(char* app_name, char* name, char* host, int port)
 		}
 	}
 	
-	msg  = malloc(LSF_MAX_MSG_SIZE);
-	msg1 = malloc(LSF_MAX_MSG_SIZE);
-	msg2 = malloc(LSF_MAX_MSG_SIZE);
-	
 	if (ptp_signal_exit != 0) {
+		char msg[LSF_MAX_MSG_SIZE], msg1[LSF_MAX_MSG_SIZE], msg2[LSF_MAX_MSG_SIZE];
+		
 		switch(ptp_signal_exit) {
 			case SIGINT:
 				sprintf(msg1, "INT");
@@ -630,9 +783,6 @@ server(char* app_name, char* name, char* host, int port)
 		shutdownLSF();
 		sprintf(msg, "ptp_lsf_proxy received signal %s (%s).  Exit was required and performed cleanly.", msg1, msg2);
 		AddToList(eventList, (void *) errorStr(RTEV_ERROR_SIGNAL, msg));
-		free(msg);
-		free(msg1);
-		free(msg2);
 		/* our return code = the signal that fired */
 		rc = ptp_signal_exit;
 	}

@@ -47,6 +47,8 @@
 #include "compat.h"
 #include "hash.h"
 
+THREAD_DECL(hash);
+
 /*
 ** mix 3 32-bit values reversibly.
 ** For every delta with one or two bit set, and the deltas of all three
@@ -136,6 +138,8 @@ HashDestroy(Hash *htab,  void (*destroy)(void *))
 	if ( htab == NULL )
 		return;
 
+	THREAD_LOCK(hash);
+	
 	for ( i = 0 ; i < (int)htab->size ; i++ )
 	{
 		for ( h = htab->table[i] ; h != NULL ; )
@@ -153,6 +157,8 @@ HashDestroy(Hash *htab,  void (*destroy)(void *))
 		free(htab->table);
 
 	free(htab);
+	
+	THREAD_UNLOCK(hash);
 }
 
 /*
@@ -245,11 +251,17 @@ HashSearch(Hash *htab, unsigned int idx)
 {
 	HashEntry *	h;
 	
+	THREAD_LOCK(hash);
+	
 	for ( h = htab->table[idx & htab->mask] ; h != NULL ; h = h->h_next)
 	{
-		if ( idx == h->h_hval )
+		if ( idx == h->h_hval ) {
+			THREAD_UNLOCK(hash);
 			return h->h_data;
+		}
 	}
+	
+	THREAD_UNLOCK(hash);
 
 	return NULL;
 }
@@ -260,13 +272,17 @@ HashInsert(Hash *htab, unsigned int idx, void *data)
 	HashEntry *	h;
 	HashEntry **	hp;
 	
+	THREAD_LOCK(hash);
+	
 	/*
 	** Check if entry already exists
 	*/
 	for ( h = htab->table[idx & htab->mask] ; h != (HashEntry *)NULL ; h = h->h_next)
 	{
-		if ( idx == h->h_hval )
+		if ( idx == h->h_hval ) {
+			THREAD_UNLOCK(hash);
 			return NULL;
+		}
 	}
 
 	/*
@@ -284,6 +300,8 @@ HashInsert(Hash *htab, unsigned int idx, void *data)
 	h->h_next = *hp;
 	*hp = h;
 
+	THREAD_UNLOCK(hash);
+
 	return h;
 }
 
@@ -292,6 +310,8 @@ HashRemove(Hash *htab, unsigned int idx)
 {
 	HashEntry *		h;
 	HashEntry **	hp;
+	
+	THREAD_LOCK(hash);
 	
 	/*
 	** Find item.
@@ -302,8 +322,10 @@ HashRemove(Hash *htab, unsigned int idx)
 	/*
 	 * Found item?
 	 */
-	if (*hp == NULL)
+	if (*hp == NULL) {
+		THREAD_UNLOCK(hash);
 		return;
+	}
 		
 	/*
 	 * Update scan values
@@ -319,13 +341,17 @@ HashRemove(Hash *htab, unsigned int idx)
 	free(h);
 
 	htab->count--;
+	
+	THREAD_UNLOCK(hash);
 }
 
 void
 HashSet(Hash *htab)
 {
+	THREAD_LOCK(hash);
 	htab->scan = 0;
 	htab->scan_entry = NULL;
+	THREAD_UNLOCK(hash);
 }
 
 HashEntry *
@@ -333,17 +359,23 @@ HashGet(Hash *htab)
 {
 	HashEntry *	h;
 	
+	THREAD_LOCK(hash);
+	
 	if ((h = htab->scan_entry) != NULL) {
 		htab->scan_entry = htab->scan_entry->h_next;
+		THREAD_UNLOCK(hash);
 		return h;
 	}
 	
 	while (htab->scan < htab->size) {
 		if ((h = htab->table[htab->scan++]) != NULL) {
 			htab->scan_entry = h->h_next;
+			THREAD_UNLOCK(hash);
 			return h;
 		}
 	}
+	
+	THREAD_UNLOCK(hash);
 	
 	return NULL;
 }	

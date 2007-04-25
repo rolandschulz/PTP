@@ -30,15 +30,18 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.core.AttributeConstants;
-import org.eclipse.ptp.core.IPJob;
-import org.eclipse.ptp.core.IPNode;
-import org.eclipse.ptp.core.IPProcess;
+import org.eclipse.ptp.core.IDGenerator;
 import org.eclipse.ptp.core.IProcessListener;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.PreferenceConstants;
+import org.eclipse.ptp.core.attributes.IAttribute;
+import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.elementcontrols.IPElementControl;
 import org.eclipse.ptp.core.elementcontrols.IPNodeControl;
 import org.eclipse.ptp.core.elementcontrols.IPProcessControl;
+import org.eclipse.ptp.core.elements.IPJob;
+import org.eclipse.ptp.core.elements.IPNode;
+import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.events.IProcessEvent;
 import org.eclipse.ptp.core.util.OutputTextFile;
 import org.eclipse.search.ui.ISearchPageScoreComputer;
@@ -49,9 +52,8 @@ public class SimProcess extends Process implements IPProcessControl, IPElementCo
 	OutputStream out;
 	SimThread[] threads;
 	SimQueue commands;
-	protected HashMap attribs = null;
+	protected HashMap<String, Object> attribs = null;
 	protected int ID = -1;
-	private PElementInfo elementInfo = null;
 	protected String NAME_TAG = "process ";
 	private String pid = null;
 	private String status = null;
@@ -63,6 +65,7 @@ public class SimProcess extends Process implements IPProcessControl, IPElementCo
 	protected String outputDirPath = null;
 	protected int storeLine = 0;
 	private List listeners = new ArrayList();
+	private IPElementControl parent;
 	/*
 	 * the node that this process is running on, or was scheduled on / will be, etc
 	 */
@@ -72,9 +75,9 @@ public class SimProcess extends Process implements IPProcessControl, IPElementCo
 	final int numThreads = 1;
 
 	public SimProcess(IPElementControl element, String name, String key, String pid, int taskId, String status, String exitCode, String signalName) {
-		attribs = new HashMap();
-		ID = PTPCorePlugin.getDefault().getNewID();
-		attribs.put(AttributeConstants.ATTRIB_PARENT, element);
+		attribs = new HashMap<String, Object>();
+		ID = IDGenerator.getNewID();
+		this.parent = element;
 		attribs.put(AttributeConstants.ATTRIB_NAME, name);
 		attribs.put(AttributeConstants.ATTRIB_TYPE, new Integer(P_PROCESS));
 		System.out.println("NEW PElement - ID = " + ID);
@@ -247,26 +250,23 @@ public class SimProcess extends Process implements IPProcessControl, IPElementCo
 		return ((Integer) attribs.get(AttributeConstants.ATTRIB_TASKID)).intValue();
 	}
 	public void addChild(IPElementControl member) {
-		getElementInfo().addChild(member);
+		addChild(member);
 	}
 	public void removeChild(IPElementControl member) {
-		getElementInfo().removeChild(member);
+		removeChild(member);
 	}
 	public void removeChildren() {
-		getElementInfo().removeChildren();
+		removeChildren();
 	}
 	public IPElementControl[] getChildren() {
-		PElementInfo info = getElementInfo();
-		if (info != null)
-			return info.getChildren();
-		return new IPElementControl[] {};
+		return getChildren();
 	}
 	public List getChildrenOfType(int type) {
 		IPElementControl[] children = getChildren();
 		int size = children.length;
 		ArrayList list = new ArrayList(size);
 		for (int i = 0; i < size; ++i) {
-			PElement elt = (PElement) children[i];
+			IPElementControl elt = (IPElementControl) children[i];
 			if (elt.getElementType() == type) {
 				list.add(elt);
 			}
@@ -274,7 +274,7 @@ public class SimProcess extends Process implements IPProcessControl, IPElementCo
 		return list;
 	}
 	public boolean hasChildren() {
-		return getElementInfo().hasChildren();
+		return hasChildren();
 	}
 	private void quickSort(IPElementControl element[], int low, int high) {
 		int lo = low;
@@ -308,16 +308,9 @@ public class SimProcess extends Process implements IPProcessControl, IPElementCo
 	public void sort(IPElementControl element[]) {
 		quickSort(element, 0, element.length - 1);
 	}
-	protected PElementInfo getElementInfo() {
-		if (elementInfo == null)
-			elementInfo = new PElementInfo(this);
-		return elementInfo;
-	}
-	public Object getAttribute(String key) {
-		return this.getAttribute(AttributeConstants.ATTRIB_CLASS_PROCESS, key);
-	}
-	public Object getAttribute(int attr, String key) {
-		return attribs.get(key);
+	public IAttribute getAttribute(String key) {
+		// TODO implement
+		return null;
 	}
 	public String[] getAttributeKeys() {
 		return this.getAttributeKeys(AttributeConstants.ATTRIB_CLASS_PROCESS);
@@ -346,14 +339,14 @@ public class SimProcess extends Process implements IPProcessControl, IPElementCo
 	 * @return Returns the Parent.
 	 */
 	public IPElementControl getParent() {
-		return (IPElementControl) attribs.get(AttributeConstants.ATTRIB_PARENT);
+		return parent;
 	}
 	/**
 	 * @param parent
 	 *            The Parent to set.
 	 */
 	public void setParent(IPElementControl parent) {
-		attribs.put(AttributeConstants.ATTRIB_PARENT, parent);
+		this.parent = parent;
 	}
 	/**
 	 * @return Returns the Type.
@@ -376,7 +369,7 @@ public class SimProcess extends Process implements IPProcessControl, IPElementCo
 		return getElementName();
 	}
 	public int size() {
-		return getElementInfo().size();
+		return size();
 	}
 	public int compareTo(Object obj) {
 		if (obj instanceof IPElementControl) {
@@ -452,11 +445,8 @@ public class SimProcess extends Process implements IPProcessControl, IPElementCo
 	public int getThreadCount() {
 		return threads.length;
 	}
-	public void setAttribute(String key, Object o) {
-		this.setAttribute(AttributeConstants.ATTRIB_CLASS_PROCESS, key, o);
-	}
-	public void setAttribute(int attr, String key, Object o) {
-		attribs.put(key, o);
+	public void setAttribute(String key, IAttribute attr) {
+		// TODO implement
 	}
 	public String getName() {
 		return getElementName();
@@ -472,5 +462,25 @@ public class SimProcess extends Process implements IPProcessControl, IPElementCo
 	
 	public Object getAdapter(Class adapter) {
 		return Platform.getAdapterManager().getAdapter(this, adapter);
+	}
+	public IAttribute getAttribute(int Id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	public void setAttribute(int attrId, IAttribute attrValue) {
+		// TODO Auto-generated method stub
+		
+	}
+	public void setAttribute(String attrId, String attrValue) {
+		// TODO Auto-generated method stub
+		
+	}
+	public void setAttribute(String attrId, Object attrValue) {
+		// TODO Auto-generated method stub
+		
+	}
+	public IAttribute getAttribute(IAttributeDefinition attrDef) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

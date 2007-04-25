@@ -18,6 +18,11 @@
  *******************************************************************************/
 package org.eclipse.ptp.core;
 
+/**
+ * 
+ * @deprecated
+ *
+ */
 public interface AttributeConstants {
 
 	public static final int ATTRIB_CLASS_ELEMENT = 0;

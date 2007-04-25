@@ -23,18 +23,18 @@ import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.external.core.proxy.ProxyDebugSignal;
 
 
-public class ProxyDebugSignalsEvent extends AbstractProxyDebugEvent implements IProxyDebugEvent {
+public class ProxyDebugSignalsEvent extends AbstractProxyDebugEvent implements IProxyDebugSignalsEvent {
 	private ProxyDebugSignal[] signals;
 	
-	public ProxyDebugSignalsEvent(BitList set, ProxyDebugSignal[] signals) {
-		super(EVENT_DBG_SIGNALS, set);
+	public ProxyDebugSignalsEvent(int transID, BitList set, ProxyDebugSignal[] signals) {
+		super(transID, EVENT_DBG_SIGNALS, set);
 		this.signals = signals;
 	}
 	public ProxyDebugSignal[] getSignals() {
 		return signals;
 	}
 	public String toString() {
-		String res = "EVENT_DBG_SIGNALS " + this.getBitSet().toString();
+		String res = "EVENT_DBG_SIGNALS transid=" + getTransactionID() + " " + this.getBitSet().toString();
 		/*
 		for (int i = 0; i<signals.length; i++) {
 			res += "\n " + signals[i].toString();

@@ -20,8 +20,8 @@ package org.eclipse.ptp.mpich2.core.rmsystem;
 
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory;
-import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ui.IMemento;
 
@@ -31,12 +31,12 @@ public class MPICH2ResourceManagerFactory extends AbstractResourceManagerFactory
 		super("MPICH2");
 	}
 
-	public IResourceManager create(IResourceManagerConfiguration confIn) {
+	public IResourceManagerControl create(IResourceManagerConfiguration confIn) {
 		MPICH2ResourceManagerConfiguration configuration = (MPICH2ResourceManagerConfiguration) confIn;
 		final PTPCorePlugin plugin = PTPCorePlugin.getDefault();
 		//Preferences p = plugin.getPluginPreferences();
 		final IPUniverseControl universe = (IPUniverseControl) plugin.getUniverse();
-		return new MPICH2ResourceManager(universe, configuration);
+		return new MPICH2ResourceManager(universe.getNextResourceManagerId(), universe, configuration);
 	}
 
 	public IResourceManagerConfiguration createConfiguration() {

@@ -19,6 +19,7 @@
 package org.eclipse.ptp.launch.internal;
 
 import java.text.MessageFormat;
+
 import org.eclipse.cdt.core.IBinaryParser.IBinaryObject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -31,10 +32,10 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.ptp.core.IPJob;
-import org.eclipse.ptp.core.IPUniverse;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.PreferenceConstants;
+import org.eclipse.ptp.core.elements.IPJob;
+import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.IPDebugConfiguration;
 import org.eclipse.ptp.debug.core.IPDebugConstants;
@@ -45,8 +46,8 @@ import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.internal.ui.LaunchMessages;
 import org.eclipse.ptp.rmsystem.IResourceManager;
+import org.eclipse.ptp.rmsystem.ResourceManagerState;
 import org.eclipse.ptp.rtsystem.JobRunConfiguration;
-import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -107,8 +108,11 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			if (launchManager == null) {
 				abort(LaunchMessages.getResourceString("ParallelLaunchConfigurationDelegate.No_ResourceManager"), null, 0);
 			}
-			job = launchManager.run(launch, jrunconfig, new SubProgressMonitor(monitor, 150));
-			launch.setAttribute(IPJob.JOB_ID_TEXT, job.getIDString());
+			job = launchManager.submitJob(launch, jrunconfig, new SubProgressMonitor(monitor, 150));
+			if (job == null) {
+				abort("No job created by launch manager.", null, 0);
+			}
+			launch.setAttribute("JOB_ID", job.getIDString());
 			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
 				// show ptp debug view
 				showPTPDebugView(IPTPDebugUIConstants.ID_VIEW_PARALLELDEBUG);
@@ -176,7 +180,8 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 		IPUniverse universe = PTPCorePlugin.getDefault().getUniverse();
 		IResourceManager[] rms = universe.getResourceManagers();
 		for (int i = 0; i < rms.length; ++i) {
-			if (rms[i].getElementName().equals(rmName)) {
+			if (rms[i].getState() == ResourceManagerState.State.STARTED &&
+					rms[i].getElementName().equals(rmName)) {
 				return rms[i];
 			}
 		}

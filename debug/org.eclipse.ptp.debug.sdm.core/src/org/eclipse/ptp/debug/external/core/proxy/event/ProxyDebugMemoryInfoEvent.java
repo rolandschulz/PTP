@@ -25,11 +25,11 @@ import org.eclipse.ptp.debug.external.core.cdi.model.DataReadMemoryInfo;
  * @author clement chu
  *
  */
-public class ProxyDebugMemoryInfoEvent extends AbstractProxyDebugEvent implements IProxyDebugEvent {
+public class ProxyDebugMemoryInfoEvent extends AbstractProxyDebugEvent implements IProxyDebugMemoryInfoEvent {
 	private DataReadMemoryInfo memoryInfo;
 	
-	public ProxyDebugMemoryInfoEvent(BitList set, DataReadMemoryInfo memoryInfo) {
-		super(EVENT_DBG_DATA_READ_MEMORY, set);
+	public ProxyDebugMemoryInfoEvent(int transID, BitList set, DataReadMemoryInfo memoryInfo) {
+		super(transID, EVENT_DBG_DATA_READ_MEMORY, set);
 		this.memoryInfo = memoryInfo;
 	}
 	
@@ -38,6 +38,6 @@ public class ProxyDebugMemoryInfoEvent extends AbstractProxyDebugEvent implement
 	}
 	
 	public String toString() {
-		return "EVENT_DBG_DATA_READ_MEMORY " + this.getBitSet().toString();
+		return "EVENT_DBG_DATA_READ_MEMORY transid=" + getTransactionID() + " " + this.getBitSet().toString();
 	}
 }

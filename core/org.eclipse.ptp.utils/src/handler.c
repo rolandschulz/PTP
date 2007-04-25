@@ -103,6 +103,7 @@ RegisterFileHandler(int fd, int type, int (*file_handler)(int, void *), void *da
 	h = NewHandler(HANDLER_FILE, data);
 	h->file_type = type;
 	h->fd = fd;
+	h->error = 0;
 	h->file_handler = file_handler;
 }
 
@@ -130,6 +131,57 @@ CallEventHandlers(int type, void *data)
 
 	for (SetHandler(); (h = GetHandler()) != NULL; ) {
 		if (h->htype == HANDLER_EVENT && h->event_type == type)
-			h->event_handler(data, h->data);
+			h->event_handler(h->data, data);
+	}
+}
+
+/*
+ * Call all file handlers
+ */
+int
+CallFileHandlers(fd_set *rfds, fd_set *wfds, fd_set *efds)
+{
+	int			ret = 0;
+	handler *	h;
+	
+	for (SetHandler(); (h = GetHandler()) != NULL; ) {
+		if (h->htype == HANDLER_FILE
+			&& h->error >= 0
+			&& ((h->file_type & READ_FILE_HANDLER && FD_ISSET(h->fd, rfds))
+				|| (h->file_type & WRITE_FILE_HANDLER && FD_ISSET(h->fd, wfds))
+				|| (h->file_type & EXCEPT_FILE_HANDLER && FD_ISSET(h->fd, efds)))) {
+			h->error = h->file_handler(h->fd, h->data);
+			if (h->error < 0)
+				ret = -1;
+		}
+	}
+	
+	return ret;
+}
+
+/*
+ * Generate file descriptor sets
+ */
+void
+GenerateFDSets(int *nfds, fd_set *rfds, fd_set *wfds, fd_set *efds)
+{
+	handler *	h;
+	
+	*nfds = 0;
+	FD_ZERO(rfds);
+	FD_ZERO(wfds);
+	FD_ZERO(efds);
+	
+	for (SetHandler(); (h = GetHandler()) != NULL; ) {
+		if (h->htype == HANDLER_FILE) {
+			if (h->file_type & READ_FILE_HANDLER)
+				FD_SET(h->fd, rfds);
+			if (h->file_type & WRITE_FILE_HANDLER)
+				FD_SET(h->fd, wfds);
+			if (h->file_type & EXCEPT_FILE_HANDLER)
+				FD_SET(h->fd, efds);
+			if (h->fd > *nfds)
+				*nfds = h->fd;
+		}
 	}
 }

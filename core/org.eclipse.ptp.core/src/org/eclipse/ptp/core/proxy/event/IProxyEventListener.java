@@ -20,5 +20,11 @@
 package org.eclipse.ptp.core.proxy.event;
 
 public interface IProxyEventListener {
-	public void handleEvent(IProxyEvent e);
+
+	public void handleProxyExtendedEvent(IProxyExtendedEvent e);
+	public void handleProxyOKEvent(IProxyOKEvent e);
+	public void handleProxyConnectedEvent(IProxyConnectedEvent e);
+	public void handleProxyDisconnectedEvent(IProxyDisconnectedEvent e);
+	public void handleProxyErrorEvent(IProxyErrorEvent e);
+	public void handleProxyTimeoutEvent(IProxyTimeoutEvent e);
 }

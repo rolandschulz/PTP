@@ -24,17 +24,18 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.ptp.core.AttributeConstants;
-import org.eclipse.ptp.core.IPJob;
-import org.eclipse.ptp.core.IPMachine;
-import org.eclipse.ptp.core.IPNode;
-import org.eclipse.ptp.core.IPProcess;
-import org.eclipse.ptp.core.IPQueue;
-import org.eclipse.ptp.core.IPUniverse;
+import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.elementcontrols.IPElementControl;
 import org.eclipse.ptp.core.elementcontrols.IPJobControl;
 import org.eclipse.ptp.core.elementcontrols.IPNodeControl;
 import org.eclipse.ptp.core.elementcontrols.IPProcessControl;
 import org.eclipse.ptp.core.elementcontrols.IPQueueControl;
+import org.eclipse.ptp.core.elements.IPMachine;
+import org.eclipse.ptp.core.elements.IPNode;
+import org.eclipse.ptp.core.elements.IPProcess;
+import org.eclipse.ptp.core.elements.IPQueue;
+import org.eclipse.ptp.core.elements.IPUniverse;
+import org.eclipse.ptp.rmsystem.IResourceManager;
 
 public class PJob extends Parent implements IPJobControl {
 	final public static int BASE_OFFSET = 10000;
@@ -45,10 +46,10 @@ public class PJob extends Parent implements IPJobControl {
 	
 	protected boolean isDebugJob = false;
 
-	public PJob(IPQueueControl queue, String name, String key, int jobNumber) {
-		super(queue, name, key, P_JOB);
+	public PJob(int id, IPQueueControl queue, IAttribute[] attrs) {
+		super(id, queue, P_JOB, attrs);
 		taskIdMap = new ArrayList();
-		this.setAttribute(AttributeConstants.ATTRIB_JOBID, new Integer(jobNumber));
+		this.setAttribute(AttributeConstants.ATTRIB_JOBID, new Integer(id));
 	}
 	
 	public void addProcess(IPProcessControl p) {
@@ -85,14 +86,6 @@ public class PJob extends Parent implements IPJobControl {
 			return findProcess(procNumber);
 	}
 	
-	public Object getAttribute(String key) {
-		return this.getAttribute(AttributeConstants.ATTRIB_CLASS_JOB, key);
-	}
-
-	public String[] getAttributeKeys() {
-		return this.getAttributeKeys(AttributeConstants.ATTRIB_CLASS_JOB);
-	}
-
 	public String getJobNumber() {
 		return ""+((Integer) this.getAttribute(AttributeConstants.ATTRIB_JOBID)).intValue()+"";
 		/*
@@ -119,7 +112,7 @@ public class PJob extends Parent implements IPJobControl {
 	 */
 	public IPMachine[] getMachines() {
 		IPNode[] nodes = getNodes();
-		List array = new ArrayList(0);
+		ArrayList<IPMachine> array = new ArrayList<IPMachine>(0);
 		for (int i = 0; i < nodes.length; i++) {
 			final IPMachine machine = nodes[i].getMachine();
 			if (machine != null && !array.contains(machine)) {
@@ -194,10 +187,6 @@ public class PJob extends Parent implements IPJobControl {
 		removeChildren();
 	}
 	
-	public void setAttribute(String key, Object o) {
-		this.setAttribute(AttributeConstants.ATTRIB_CLASS_JOB, key, o);
-	}
-
 	public void setDebug() {
 		isDebugJob = true;
 	}
@@ -215,6 +204,10 @@ public class PJob extends Parent implements IPJobControl {
 	}
 
 	public IPQueue getQueue() {
-		return (IPQueueControl) getParent();
+		return (IPQueue) getParent();
+	}
+
+	public IResourceManager getResourceManager() {
+		return getQueue().getResourceManager();
 	}
 }

@@ -18,82 +18,132 @@
  *******************************************************************************/
 package org.eclipse.ptp.orte.core.rmsystem;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.OperationCanceledException;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.attributes.IAttribute;
+import org.eclipse.ptp.core.attributes.IntegerAttributeDefinition;
+import org.eclipse.ptp.core.elementcontrols.IPJobControl;
+import org.eclipse.ptp.core.elementcontrols.IPMachineControl;
+import org.eclipse.ptp.core.elementcontrols.IPNodeControl;
+import org.eclipse.ptp.core.elementcontrols.IPProcessControl;
+import org.eclipse.ptp.core.elementcontrols.IPQueueControl;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
-import org.eclipse.ptp.orte.core.rtsystem.OMPIControlSystem;
-import org.eclipse.ptp.orte.core.rtsystem.OMPIMonitoringSystem;
-import org.eclipse.ptp.orte.core.rtsystem.OMPIProxyRuntimeClient;
+import org.eclipse.ptp.core.elements.IPQueue;
+import org.eclipse.ptp.orte.core.rtsystem.ORTEProxyRuntimeClient;
+import org.eclipse.ptp.orte.core.rtsystem.ORTERuntimeSystem;
+import org.eclipse.ptp.rmsystem.AbstractRuntimeResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
-import org.eclipse.ptp.rmsystem.RuntimeResourceManager;
+import org.eclipse.ptp.rtsystem.IRuntimeSystem;
 
-public class ORTEResourceManager extends RuntimeResourceManager {
+public class ORTEResourceManager extends AbstractRuntimeResourceManager {
+	
+	//TODO get the real definition for this guy.
+	private final IntegerAttributeDefinition numProcsAttrDef = 
+		new IntegerAttributeDefinition("xxx", "yyy", "zzz", 1);
 
-	public ORTEResourceManager(IPUniverseControl universe,
-			IResourceManagerConfiguration config) {
-		super(universe, config);
-		if (config instanceof ORTEResourceManagerConfiguration) {
-			ORTEResourceManagerConfiguration oConfig = (ORTEResourceManagerConfiguration) config;
-			System.out.println("ctor ORTEResourceManager: " + oConfig.getOrteServerFile());
-		}
+	public ORTEResourceManager(int id, IPUniverseControl universe, IResourceManagerConfiguration config) {
+		super(id, universe, config);
 	}
 
-	protected void doStartRuntime(IProgressMonitor monitor) throws CoreException {
-		monitor.beginTask("Starting OMPI proxy runtime...", 30);
-		try {
-			ORTEResourceManagerConfiguration config = (ORTEResourceManagerConfiguration) getConfiguration();
-			String serverFile = config.getOrteServerFile();
-			boolean launchManually = config.isLaunchManually();
-			/* load up the control and monitoring systems for OMPI */
-			OMPIProxyRuntimeClient runtimeProxy = new OMPIProxyRuntimeClient(serverFile,
-					launchManually);
-			if (monitor.isCanceled()) {
-				throw new OperationCanceledException();
-			}
-			setRuntimeProxy(runtimeProxy);
-			monitor.worked(10);
-
-			if(!runtimeProxy.startup(monitor)) {
-				System.err.println("Failed to start up the proxy runtime.");
-				runtimeProxy = null;
-				setRuntimeProxy(runtimeProxy);
-				if (monitor.isCanceled()) {
-					throw new OperationCanceledException();
-				}
-				throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, 
-						"There was an error starting the OMPI proxy runtime.  The path to 'ptp_orte_proxy' or 'orted' "+
-						"may have been incorrect.  The 'orted' binary MUST be in your PATH to be found by 'ptp_orte_proxy'.  "+
-						"Try checking the console log or error logs for more detailed information.",
-						null));
-			}
-			monitor.subTask("Starting OMPI monitoring system...");
-			setMonitoringSystem(new OMPIMonitoringSystem(runtimeProxy));
-			if (monitor.isCanceled()) {
-				throw new OperationCanceledException();
-			}
-			monitor.worked(10);
-			monitor.subTask("Starting OMPI control system...");
-			setControlSystem(new OMPIControlSystem(runtimeProxy));
-			if (monitor.isCanceled()) {
-				throw new OperationCanceledException();
-			}
-			monitor.worked(10);
-		}
-		finally {
-			monitor.done();
-		}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManager#getLaunchAttributes(java.lang.String, java.lang.String)
+	 */
+	public IAttribute[] getLaunchAttributes(String queue, IAttribute[] currentAttrs) {
+		// TODO Auto-generated method stub
+		return new IAttribute[0];
 	}
 
-	protected void doDispose() {
-		// do nothing
+	/**
+	 * Return the launch attribute for determining the number of processes with which
+	 * to launch a job.
+	 * 
+	 * @param queue
+	 * @return
+	 */
+	public IntegerAttributeDefinition getNumProcsAttrDef(IPQueue queue) {
+		return numProcsAttrDef;
 	}
 
-	protected void doShutdown() throws CoreException {
-		// do nothing
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.AbstractProxyResourceManager#doAfterCloseConnection()
+	 */
+	protected void doAfterCloseConnection() {
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.AbstractProxyResourceManager#doAfterOpenConnection()
+	 */
+	protected void doAfterOpenConnection() {
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.AbstractProxyResourceManager#doBeforeCloseConnection()
+	 */
+	protected void doBeforeCloseConnection() {
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.AbstractProxyResourceManager#doBeforeOpenConnection()
+	 */
+	protected void doBeforeOpenConnection() {
+	}
+
+	@Override
+	protected IPJobControl doCreateJob(IPQueueControl queue, int jobId, IAttribute[] attrs) {
+		return newJob(queue, jobId, attrs);
+	}
+
+	@Override
+	protected IPMachineControl doCreateMachine(int machineId, IAttribute[] attrs) {
+		return newMachine(machineId, attrs);
+	}
+
+	@Override
+	protected IPNodeControl doCreateNode(IPMachineControl machine, int nodeId, IAttribute[] attrs) {
+		return newNode(machine, nodeId, attrs);
+	}
+
+	@Override
+	protected IPProcessControl doCreateProcess(IPJobControl job, int processId, IAttribute[] attrs) {
+		return newProcess(job, processId, attrs);
+	}
+
+	@Override
+	protected IPQueueControl doCreateQueue(int queueId, IAttribute[] attrs) {
+		return newQueue(queueId, attrs);
+	}
+
+	@Override
+	protected IRuntimeSystem doCreateRuntimeSystem() {
+		ORTEResourceManagerConfiguration config = (ORTEResourceManagerConfiguration) getConfiguration();
+		String serverFile = config.getOrteServerFile();
+		int	rmId = getID();
+		boolean launchManually = config.isLaunchManually();
+		/* load up the control and monitoring systems for OMPI */
+		ORTEProxyRuntimeClient runtimeProxy = new ORTEProxyRuntimeClient(serverFile, rmId, launchManually);
+		return new ORTERuntimeSystem(runtimeProxy, getAttributeDefinitionManager());
+	}
+
+	@Override
+	protected boolean doUpdateJob(IPJobControl job, IAttribute[] attrs) {
+		return updateJob(job, attrs);
+	}
+
+	@Override
+	protected boolean doUpdateMachine(IPMachineControl machine, IAttribute[] attrs) {
+		return updateMachine(machine, attrs);
+	}
+
+	@Override
+	protected boolean doUpdateNode(IPNodeControl node, IAttribute[] attrs) {
+		return updateNode(node, attrs);
+	}
+
+	@Override
+	protected boolean doUpdateProcess(IPProcessControl process, IAttribute[] attrs) {
+		return updateProcess(process, attrs);
+	}
+
+	@Override
+	protected boolean doUpdateQueue(IPQueueControl queue, IAttribute[] attrs) {
+		return updateQueue(queue, attrs);
+	}
 }

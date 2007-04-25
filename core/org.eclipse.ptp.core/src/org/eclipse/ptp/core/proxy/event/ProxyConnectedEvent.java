@@ -19,10 +19,10 @@
 
 package org.eclipse.ptp.core.proxy.event;
 
-public class ProxyConnectedEvent extends AbstractProxyEvent implements IProxyEvent {
+public class ProxyConnectedEvent extends AbstractProxyEvent implements IProxyConnectedEvent {
 	
 	public ProxyConnectedEvent() {
-		super(EVENT_CONNECTED);
+		super(EVENT_CONNECTED, 0);
 	}
 
 	public String toString() {

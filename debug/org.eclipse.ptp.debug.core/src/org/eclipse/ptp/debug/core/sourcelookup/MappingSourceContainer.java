@@ -55,7 +55,6 @@ public class MappingSourceContainer extends AbstractSourceContainer {
 	public static final String TYPE_ID = PTPDebugCorePlugin.getUniqueIdentifier() + ".containerType.mapping";
 
 	private String fName;
-
 	private ArrayList<MapEntrySourceContainer> fContainers;
 
 	/**

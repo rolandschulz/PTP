@@ -22,11 +22,11 @@ package org.eclipse.ptp.debug.external.core.proxy.event;
 import org.eclipse.ptp.core.util.BitList;
 
 
-public class ProxyDebugInfoThreadsEvent extends AbstractProxyDebugEvent implements IProxyDebugEvent {
+public class ProxyDebugInfoThreadsEvent extends AbstractProxyDebugEvent implements IProxyDebugInfoThreadsEvent {
 	private String[] thread_ids;
 	
-	public ProxyDebugInfoThreadsEvent(BitList set, String[] thread_ids) {
-		super(EVENT_DBG_THREADS, set);
+	public ProxyDebugInfoThreadsEvent(int transID, BitList set, String[] thread_ids) {
+		super(transID, EVENT_DBG_THREADS, set);
 		this.thread_ids = thread_ids;
 	}
 	
@@ -35,7 +35,7 @@ public class ProxyDebugInfoThreadsEvent extends AbstractProxyDebugEvent implemen
 	}
 
 	public String toString() {
-		String res = "EVENT_DBG_THREADS: " + this.getBitSet().toString() + " {";
+		String res = "EVENT_DBG_THREADS: transid=" + getTransactionID() + " " + this.getBitSet().toString() + " {";
 
 		for (int i = 0; i < thread_ids.length; i++) {
 			if (i > 0)

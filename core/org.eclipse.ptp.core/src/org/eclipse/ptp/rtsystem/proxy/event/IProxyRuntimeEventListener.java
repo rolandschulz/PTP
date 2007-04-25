@@ -20,5 +20,19 @@
 package org.eclipse.ptp.rtsystem.proxy.event;
 
 public interface IProxyRuntimeEventListener {
-	public void handleEvent(IProxyRuntimeEvent e);
+	public void handleProxyRuntimeErrorEvent(IProxyRuntimeErrorEvent e);
+	public void handleProxyRuntimeAttributeDefEvent(IProxyRuntimeAttributeDefEvent e);
+	public void handleProxyRuntimeNewJobEvent(IProxyRuntimeNewJobEvent e);
+	public void handleProxyRuntimeNewMachineEvent(IProxyRuntimeNewMachineEvent e);
+	public void handleProxyRuntimeNewNodeEvent(IProxyRuntimeNewNodeEvent e);
+	public void handleProxyRuntimeNewProcessEvent(IProxyRuntimeNewProcessEvent e);
+	public void handleProxyRuntimeNewQueueEvent(IProxyRuntimeNewQueueEvent e);
+	public void handleProxyRuntimeJobChangeEvent(IProxyRuntimeJobChangeEvent e);
+	public void handleProxyRuntimeMachineChangeEvent(IProxyRuntimeMachineChangeEvent e);
+	public void handleProxyRuntimeNodeChangeEvent(IProxyRuntimeNodeChangeEvent e);
+	public void handleProxyRuntimeProcessChangeEvent(IProxyRuntimeProcessChangeEvent e);	
+	public void handleProxyRuntimeQueueChangeEvent(IProxyRuntimeQueueChangeEvent e);	
+	public void handleProxyRuntimeConnectedStateEvent(IProxyRuntimeConnectedStateEvent e);
+	public void handleProxyRuntimeRunningStateEvent(IProxyRuntimeRunningStateEvent e);
+	public void handleProxyRuntimeShutdownStateEvent(IProxyRuntimeShutdownStateEvent e);
 }

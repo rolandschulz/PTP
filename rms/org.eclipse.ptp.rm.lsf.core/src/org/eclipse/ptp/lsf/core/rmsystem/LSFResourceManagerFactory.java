@@ -20,8 +20,8 @@ package org.eclipse.ptp.lsf.core.rmsystem;
 
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory;
-import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ui.IMemento;
 
@@ -37,11 +37,11 @@ public class LSFResourceManagerFactory extends AbstractResourceManagerFactory {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory#create(org.eclipse.ptp.rmsystem.IResourceManagerConfiguration)
 	 */
-	public IResourceManager create(IResourceManagerConfiguration confIn) {
+	public IResourceManagerControl create(IResourceManagerConfiguration confIn) {
 		LSFResourceManagerConfiguration configuration = (LSFResourceManagerConfiguration) confIn;
 		final PTPCorePlugin plugin = PTPCorePlugin.getDefault();
 		final IPUniverseControl universe = (IPUniverseControl) plugin.getUniverse();
-		return new LSFResourceManager(universe, configuration);
+		return new LSFResourceManager(universe.getNextResourceManagerId(), universe, configuration);
 	}
 
 	/* (non-Javadoc)

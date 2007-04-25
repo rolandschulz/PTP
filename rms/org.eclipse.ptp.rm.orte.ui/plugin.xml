@@ -17,5 +17,11 @@
             class="org.eclipse.ptp.orte.ui.wizards.ORTEResourceManagerConfigurationWizardPageFactory"
             id="org.eclipse.ptp.orte.ui.configurationWizard"/>
    </extension>
+   <extension
+         point="org.eclipse.ptp.launch.rmLaunchConfiguration">
+      <launchConfiguration
+            class="org.eclipse.ptp.orte.ui.rmLaunchConfiguration.ORTERMLaunchConfigurationFactory"
+            id="org.eclipse.ptp.orte.ui.launchConfiguration"/>
+   </extension>
 
 </plugin>

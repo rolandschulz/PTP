@@ -15,5 +15,12 @@
             id="org.eclipse.ptp.lsf.ui.LSFPreferencePage"
             name="LSF"/>
    </extension>
+   <extension
+         point="org.eclipse.ptp.launch.rmLaunchConfiguration">
+      <launchConfiguration
+            class="org.eclipse.ptp.lsf.ui.rmLaunchConfiguration.LSFRMLaunchConfigurationFactory"
+            id="org.eclipse.ptp.lsf.ui.launchConfiguration">
+      </launchConfiguration>
+   </extension>
 
 </plugin>

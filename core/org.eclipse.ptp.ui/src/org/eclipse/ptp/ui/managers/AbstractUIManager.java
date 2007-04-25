@@ -29,10 +29,10 @@ import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.ptp.core.IModelPresentation;
-import org.eclipse.ptp.core.IPJob;
-import org.eclipse.ptp.core.IPQueue;
-import org.eclipse.ptp.core.IPUniverse;
 import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.elements.IPJob;
+import org.eclipse.ptp.core.elements.IPQueue;
+import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.ui.IManager;
 import org.eclipse.ptp.ui.PTPUIPlugin;
@@ -220,15 +220,6 @@ public abstract class AbstractUIManager implements IManager {
 			return true;
 		IPJob job = findJobById(job_id);
 		return (job == null || job.isAllStop());
-	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.IManager#findJob(java.lang.String)
-	 */
-	public IPJob findJob(String job_name) {
-		IPUniverse universe = modelPresentation.getUniverse();
-		if (universe == null)
-			return null;
-		return universe.findJobByName(job_name);
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#findJobById(java.lang.String)
