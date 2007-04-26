@@ -23,14 +23,14 @@ import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
-import org.eclipse.ptp.rmsystem.Messages;
+import org.eclipse.ptp.simulation.core.SimulationMessages;
 import org.eclipse.ui.IMemento;
 
 public class SimulationResourceManagerFactory extends
 		AbstractResourceManagerFactory {
 	
 	public SimulationResourceManagerFactory() {
-		super(Messages.getString("SimulationResourceManagerFactory.ResourceManagerFactoryName")); //$NON-NLS-1$
+		super(SimulationMessages.getResourceString("SimulationResourceManagerFactory.ResourceManagerFactoryName")); //$NON-NLS-1$
 	}
 
 	public IResourceManagerControl create(IResourceManagerConfiguration confIn) {
@@ -42,8 +42,8 @@ public class SimulationResourceManagerFactory extends
 	}
 
 	public IResourceManagerConfiguration createConfiguration() {
-		String name = Messages.getString("SimulationResourceManagerFactory.DefaultRMName"); //$NON-NLS-1$
-		String description = Messages.getString("SimulationResourceManagerFactory.DefaultRMDescription"); //$NON-NLS-1$
+		String name = SimulationMessages.getResourceString("SimulationResourceManagerFactory.DefaultRMName"); //$NON-NLS-1$
+		String description = SimulationMessages.getResourceString("SimulationResourceManagerFactory.DefaultRMDescription"); //$NON-NLS-1$
 		SimulationRMConfiguration config = new SimulationRMConfiguration(this, name, description);
 		return config;
 	}

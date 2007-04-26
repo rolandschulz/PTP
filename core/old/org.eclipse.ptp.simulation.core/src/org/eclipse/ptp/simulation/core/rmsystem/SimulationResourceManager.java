@@ -20,12 +20,11 @@ package org.eclipse.ptp.simulation.core.rmsystem;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.debug.core.ILaunch;
+import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.rmsystem.AbstractResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
-import org.eclipse.ptp.rtsystem.JobRunConfiguration;
 
 public class SimulationResourceManager extends AbstractResourceManager {
 
@@ -83,7 +82,7 @@ public class SimulationResourceManager extends AbstractResourceManager {
 	}
 
 	@Override
-	protected IPJob doSubmitJob(ILaunch launch, JobRunConfiguration jobRunConfig, IProgressMonitor monitor) throws CoreException {
+	protected IPJob doSubmitJob(AttributeManager mgr, IProgressMonitor monitor) throws CoreException {
 		// TODO Auto-generated method stub
 		return null;
 	}

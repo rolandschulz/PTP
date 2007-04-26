@@ -24,7 +24,7 @@ package org.eclipse.ptp.simulation.core.rmsystem;
 import java.util.Arrays;
 
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
-import org.eclipse.ptp.rmsystem.Messages;
+import org.eclipse.ptp.simulation.core.SimulationMessages;
 import org.eclipse.ui.IMemento;
 
 public class SimulationRMConfiguration implements IResourceManagerConfiguration {
@@ -39,9 +39,9 @@ public class SimulationRMConfiguration implements IResourceManagerConfiguration 
 	public static SimulationRMConfiguration load(SimulationResourceManagerFactory factory, IMemento memento) {
 		String factoryId = memento.getString(TAG_FACTORY_ID);
 		if (!factoryId.equals(factory.getId())) {
-			throw new IllegalStateException(Messages.getString("SimulationRMConfiguration.IncompatableFactoryID") //$NON-NLS-1$
-					+ Messages.getString("SimulationRMConfiguration.StoredId") + factoryId //$NON-NLS-1$
-					+ Messages.getString("SimulationRMConfiguration.ExpectedFactoryId") + factory.getId()); //$NON-NLS-1$
+			throw new IllegalStateException(SimulationMessages.getResourceString("SimulationRMConfiguration.IncompatableFactoryID") //$NON-NLS-1$
+					+ SimulationMessages.getResourceString("SimulationRMConfiguration.StoredId") + factoryId //$NON-NLS-1$
+					+ SimulationMessages.getResourceString("SimulationRMConfiguration.ExpectedFactoryId") + factory.getId()); //$NON-NLS-1$
 		}
 		String name = memento.getString(TAG_NAME);
 		String desc = memento.getString(TAG_DESCRIPTION);
@@ -50,7 +50,7 @@ public class SimulationRMConfiguration implements IResourceManagerConfiguration 
 		int[] numNodesPerMachine = new int[numMachines];
 		IMemento[] machineChildren = memento.getChildren(TAG_MACHINE);
 		if (machineChildren.length != numMachines) {
-			throw new RuntimeException(Messages.getString("SimulationRMConfiguration.IncorrectNumMachines")); //$NON-NLS-1$
+			throw new RuntimeException(SimulationMessages.getResourceString("SimulationRMConfiguration.IncorrectNumMachines")); //$NON-NLS-1$
 		}
 		for (int i=0; i<numMachines; ++i) {
 			numNodesPerMachine[i] = machineChildren[i].getInteger(TAG_NUM_NODES).intValue();
@@ -77,7 +77,7 @@ public class SimulationRMConfiguration implements IResourceManagerConfiguration 
 		this.numMachines = numMachines;
 		this.numNodesPerMachines = numNodesPerMachine;
 		if (numNodesPerMachine.length != numMachines) {
-			throw new IllegalArgumentException(Messages.getString("SimulationRMConfiguration.NumNodesPerMachineLength")); //$NON-NLS-1$
+			throw new IllegalArgumentException(SimulationMessages.getResourceString("SimulationRMConfiguration.NumNodesPerMachineLength")); //$NON-NLS-1$
 		}
 	}
 
@@ -135,9 +135,9 @@ public class SimulationRMConfiguration implements IResourceManagerConfiguration 
 	}
 
 	public void setDefaultNameAndDesc() {
-		String name = Messages.getString("SimulationResourceManagerFactory.DefaultRMName"); //$NON-NLS-1$
-		String description = Messages.getString("SimulationResourceManagerFactory.DefaultRMDescription"); //$NON-NLS-1$
-		String machinesLabel = Messages.getString("SimulationRMConfiguration.Machines"); //$NON-NLS-1$
+		String name = SimulationMessages.getResourceString("SimulationResourceManagerFactory.DefaultRMName"); //$NON-NLS-1$
+		String description = SimulationMessages.getResourceString("SimulationResourceManagerFactory.DefaultRMDescription"); //$NON-NLS-1$
+		String machinesLabel = SimulationMessages.getResourceString("SimulationRMConfiguration.Machines"); //$NON-NLS-1$
 		machinesLabel = " (" + Integer.toString(numMachines) + machinesLabel + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 		this.name = name + machinesLabel;
 		this.description = description + machinesLabel;

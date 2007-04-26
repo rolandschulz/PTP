@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.ptp.core.AttributeConstants;
+import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.elementcontrols.IPJobControl;
 import org.eclipse.ptp.core.elementcontrols.IPProcessControl;
 import org.eclipse.ptp.core.elements.IPJob;
@@ -303,7 +304,7 @@ public class SimulationControlSystem implements IControlSystem {
 		return retstr;
 	}
 
-	public void submitJob(int jobID, int nProcs, int firstNodeNum, int nProcsPerNode, JobRunConfiguration jobRunConfig) throws CoreException {
+	public void submitJob(int jobSubId, AttributeManager attrMgr) throws CoreException {
 		// TODO Auto-generated method stub
 		
 	}
