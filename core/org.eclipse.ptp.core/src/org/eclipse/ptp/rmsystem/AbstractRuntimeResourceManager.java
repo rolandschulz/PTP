@@ -136,20 +136,27 @@ public abstract class AbstractRuntimeResourceManager extends
 		
 		for (Map.Entry<RangeSet, AttributeManager> entry : eMgr.getEntrySet()) {
 			IAttribute[] attrs = entry.getValue().getAttributes();
+			RangeSet jobIds = entry.getKey();
 			changed = false;
 			
-			for (int id : entry.getKey()) {
+			for (int id : jobIds) {
 				IPJobControl job = getJobControl(id);
-				final boolean jobChanged = doUpdateJob(job, attrs);
-				changed |= jobChanged;
-				if (jobChanged) {
-					jobs.add(job);
+				if (job != null) {
+					final boolean jobChanged = doUpdateJob(job, attrs);
+					changed |= jobChanged;
+					if (jobChanged) {
+						jobs.add(job);
+					}
+				} else {
+					System.out.println("JobChange: unknown job " + id);
 				}
 			}
 			
 			if (changed) {
 				fireJobsChanged(jobs, Arrays.asList(attrs));
 			}
+			
+			jobs.clear();
 		}
 	}
 
@@ -164,20 +171,27 @@ public abstract class AbstractRuntimeResourceManager extends
 		
 		for (Map.Entry<RangeSet, AttributeManager> entry : eMgr.getEntrySet()) {
 			IAttribute[] attrs = entry.getValue().getAttributes();
+			RangeSet machineIds = entry.getKey();
 			changed = false;
 			
-			for (int id : entry.getKey()) {
+			for (int id : machineIds) {
 				IPMachineControl machine = getMachineControl(id);
-				final boolean macChanged = doUpdateMachine(machine, attrs);
-				changed |= macChanged;
-				if (macChanged) {
-					macs.add(machine);
+				if (machine != null) {
+					final boolean macChanged = doUpdateMachine(machine, attrs);
+					changed |= macChanged;
+					if (macChanged) {
+						macs.add(machine);
+					}
+				} else {
+					System.out.println("MachineChange: unknown machine " + id);
 				}
 			}
 			
 			if (changed) {
 				fireMachinesChanged(macs);
 			}
+			
+			macs.clear();
 		}
 	}
 
@@ -193,9 +207,10 @@ public abstract class AbstractRuntimeResourceManager extends
 		
 		for (Map.Entry<RangeSet, AttributeManager> entry : mgr.getEntrySet()) {
 			IAttribute[] attrs = entry.getValue().getAttributes();
+			RangeSet jobIds = entry.getKey();
 			changed = false;
 
-			for (int id : entry.getKey()) {
+			for (int id : jobIds) {
 				IPJobControl job = getJobControl(id);
 				if (job == null) {
 					job = doCreateJob(queue, id, attrs);
@@ -220,6 +235,8 @@ public abstract class AbstractRuntimeResourceManager extends
 			if (changed) {
 				fireNewJobs(jobs);
 			}
+			
+			jobs.clear();
 		}
 	}
 
@@ -235,9 +252,10 @@ public abstract class AbstractRuntimeResourceManager extends
 		
 		for (Map.Entry<RangeSet, AttributeManager> entry : mgr.getEntrySet()) {
 			IAttribute[] attrs = entry.getValue().getAttributes();
+			RangeSet machineIds = entry.getKey();
 			changed = false;
 
-			for (int id : entry.getKey()) {
+			for (int id : machineIds) {
 				IPMachineControl machine = getMachineControl(id);
 				if (machine == null) {
 					machine = doCreateMachine(id, attrs);
@@ -250,6 +268,8 @@ public abstract class AbstractRuntimeResourceManager extends
 			if (changed) {
 				fireNewMachines(machines);
 			}
+			
+			machines.clear();
 		}
 	}
 	
@@ -267,9 +287,10 @@ public abstract class AbstractRuntimeResourceManager extends
 			
 			for (Map.Entry<RangeSet, AttributeManager> entry : mgr.getEntrySet()) {
 				IAttribute[] attrs = entry.getValue().getAttributes();
+				RangeSet nodeIds = entry.getKey();
 				changed = false;
 	
-				for (int id : entry.getKey()) {
+				for (int id : nodeIds) {
 					IPNodeControl node = getNodeControl(id);
 					if (node == null) {
 						node = doCreateNode(machine, id, attrs);
@@ -282,6 +303,8 @@ public abstract class AbstractRuntimeResourceManager extends
 				if (changed) {
 					fireNewNodes(nodes);
 				}
+				
+				nodes.clear();
 			}
 		}
 	}
@@ -300,9 +323,10 @@ public abstract class AbstractRuntimeResourceManager extends
 			
 			for (Map.Entry<RangeSet, AttributeManager> entry : mgr.getEntrySet()) {
 				IAttribute[] attrs = entry.getValue().getAttributes();
+				RangeSet processIds = entry.getKey();
 				changed = false;
 	
-				for (int id : entry.getKey()) {
+				for (int id : processIds) {
 					IPProcessControl process = getProcessControl(id);
 					if (process == null) {
 						process = doCreateProcess(job, id, attrs);
@@ -315,6 +339,8 @@ public abstract class AbstractRuntimeResourceManager extends
 				if (changed) {
 					fireNewProcesses(procs);
 				}
+				
+				procs.clear();
 			}
 		}
 	}
@@ -332,9 +358,10 @@ public abstract class AbstractRuntimeResourceManager extends
 		
 		for (Map.Entry<RangeSet, AttributeManager> entry : mgr.getEntrySet()) {
 			IAttribute[] attrs = entry.getValue().getAttributes();
+			RangeSet queueIds = entry.getKey();
 			changed = false;
 
-			for (int id : entry.getKey()) {
+			for (int id : queueIds) {
 				IPQueueControl queue = getQueueControl(id);
 				if (queue == null) {
 					queue = doCreateQueue(id, attrs);
@@ -347,6 +374,8 @@ public abstract class AbstractRuntimeResourceManager extends
 			if (changed) {
 				fireNewQueues(queues);
 			}
+			
+			queues.clear();
 		}
 	}
 
@@ -361,20 +390,27 @@ public abstract class AbstractRuntimeResourceManager extends
 
 		for (Map.Entry<RangeSet, AttributeManager> entry : eMgr.getEntrySet()) {
 			IAttribute[] attrs = entry.getValue().getAttributes();
+			RangeSet nodeIds = entry.getKey();
 			changed = false;
 			
-			for (int id : entry.getKey()) {
+			for (int id : nodeIds) {
 				IPNodeControl node = getNodeControl(id);
-				final boolean nodeChanged = doUpdateNode(node, attrs);
-				changed |= nodeChanged;
-				if (nodeChanged) {
-					changedNodes.add(node);
+				if (node != null) {
+					final boolean nodeChanged = doUpdateNode(node, attrs);
+					changed |= nodeChanged;
+					if (nodeChanged) {
+						changedNodes.add(node);
+					}
+				} else {
+					System.out.println("NodeChange: unknown node " + id);
 				}
 			}
 			
 			if (changed) {
 				fireNodesChanged(changedNodes);
 			}
+			
+			changedNodes.clear();
 		}
 	}
 
@@ -389,20 +425,27 @@ public abstract class AbstractRuntimeResourceManager extends
 		
 		for (Map.Entry<RangeSet, AttributeManager> entry : eMgr.getEntrySet()) {
 			IAttribute[] attrs = entry.getValue().getAttributes();
+			RangeSet processIds = entry.getKey();
 			changed = false;
 			
-			for (int id : entry.getKey()) {
+			for (int id : processIds) {
 				IPProcessControl process = getProcessControl(id);
-				final boolean procChanged = doUpdateProcess(process, attrs);
-				changed |= procChanged;
-				if (procChanged) {
-					procs.add(process);
+				if (process != null) {
+					final boolean procChanged = doUpdateProcess(process, attrs);
+					changed |= procChanged;
+					if (procChanged) {
+						procs.add(process);
+					}
+				} else {
+					System.out.println("ProcessChange: unknown process " + id);
 				}
 			}
 			
 			if (changed) {
 				fireProcessesChanged(procs);
 			}
+			
+			procs.clear();
 		}
 	}
 	
@@ -417,20 +460,27 @@ public abstract class AbstractRuntimeResourceManager extends
 		
 		for (Map.Entry<RangeSet, AttributeManager> entry : eMgr.getEntrySet()) {
 			IAttribute[] attrs = entry.getValue().getAttributes();
+			RangeSet queueIds = entry.getKey();
 			changed = false;
 			
-			for (int id : entry.getKey()) {
+			for (int id : queueIds) {
 				IPQueueControl queue = getQueueControl(id);
-				final boolean queueChanged = doUpdateQueue(queue, attrs);
-				changed |= queueChanged;
-				if (queueChanged) {
-					queues.add(queue);
+				if (queue != null) {
+					final boolean queueChanged = doUpdateQueue(queue, attrs);
+					changed |= queueChanged;
+					if (queueChanged) {
+						queues.add(queue);
+					}
+				} else {
+					System.out.println("QueueChange: unknown queue " + id);
 				}
 			}
 			
 			if (changed) {
 				fireQueuesChanged(queues);
 			}
+			
+			queues.clear();
 		}
 	}
 
@@ -645,7 +695,7 @@ public abstract class AbstractRuntimeResourceManager extends
 	// asynchronous. Corresponding changes to the launch
 	// configuration will be required.
 	//
-	protected IPJob doSubmitJob(IPQueue queue, JobRunConfiguration jobRunConfig, IProgressMonitor monitor) throws CoreException {
+	protected IPJob doSubmitJob(AttributeManager attrMgr, IProgressMonitor monitor) throws CoreException {
 		if (monitor == null) {
 			monitor = new NullProgressMonitor();
 		}
@@ -653,16 +703,8 @@ public abstract class AbstractRuntimeResourceManager extends
 		try {
 			newJob = null;
 			
-			IAttribute[] attrs = jobRunConfig.getLaunchAttributes();
-			AttributeManager attrMgr = new AttributeManager(attrs);
 			// FIXME: generate a proper job submission id
 			jobSubId++;
-			
-			/*
-			 * Add a queueId attribute
-			 */
-			IIntegerAttribute queueId = QueueAttributes.getIdAttributeDefinition().create(queue.getID());
-			attrMgr.setAttribute(queueId);
 			
 			runtimeSystem.submitJob(jobSubId, attrMgr);
 			
@@ -677,7 +719,6 @@ public abstract class AbstractRuntimeResourceManager extends
 				//abortConnection(runtimeSystem);
 				return null;
 			}
-		} catch (IllegalValueException e) {
 		} finally {
 			jobSubmissionLock.unlock();
 			monitor.done();
