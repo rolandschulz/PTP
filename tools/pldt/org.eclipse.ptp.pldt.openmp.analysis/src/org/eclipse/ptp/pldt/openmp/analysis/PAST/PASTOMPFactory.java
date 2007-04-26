@@ -22,6 +22,7 @@ import org.eclipse.cdt.core.dom.ast.IASTFunctionDefinition;
 import org.eclipse.cdt.core.dom.ast.IASTNode;
 import org.eclipse.cdt.core.dom.ast.IASTStatement;
 import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit;
+import org.eclipse.cdt.core.dom.ast.IScope;
 import org.eclipse.cdt.core.parser.ISourceElementRequestor;
 import org.eclipse.cdt.core.parser.IToken;
 import org.eclipse.cdt.core.parser.NullSourceElementRequestor;
@@ -57,7 +58,7 @@ public class PASTOMPFactory
     protected ScannerCallbackManager callbackManager_ = null;
     
     /**
-     * PASTOMPFactory - factory used only by this class
+     * Factory used only by this class
      * @param pragma - PASTPragma
      */
     protected PASTOMPFactory(PASTPragma          pragma, 
@@ -94,7 +95,7 @@ public class PASTOMPFactory
 
     
     /**
-     * retrievePragma - return either omp or non-omp pragma
+     * Return either omp or non-omp pragma
      * @return
      */
     protected PASTPragma retrievePragma()
@@ -103,7 +104,7 @@ public class PASTOMPFactory
     }
     
     /**
-     * makePASTOMP - factor for making the PASTOMPPragma structure
+     * Factory for making the PASTOMPPragma structure
      *               if possible
      * @param pragma     : PASTPragma 
      * @param ast        : IASTTranslationUnit
@@ -121,14 +122,20 @@ public class PASTOMPFactory
     }
     
     /**
-     * parse - parse the pragma context for OMP
+     * Parse the pragma context for OMP
      * @return boolean
      */
     protected boolean parse() 
     {
-        // The first two tokens should b # and pragma
-        if (nextToken().getType()!=OpenMPScanner.mpPound) return false;
-        if (nextToken().getType()!=OpenMPScanner.mpPragma) return false;
+        // The first two tokens should be # and pragma
+    	OpenMPToken tok=nextToken();
+    	if(tok==null){
+    		System.out.println("PASTOMPFactory.parser()..null token, ignored.");
+    		return false; //robustly handle empty tokens
+    	}
+        if (tok.getType()!=OpenMPScanner.mpPound) return false;
+        tok=nextToken();
+        if (tok.getType()!=OpenMPScanner.mpPragma) return false;
         
         // if next is not omp - this is not an openmp directive
         if (nextToken().getType()!=OpenMPScanner.mpOmp) 
@@ -198,7 +205,7 @@ public class PASTOMPFactory
     }
     
     /**
-     * setOMPType - set the type of OpenMP statement based on keyword
+     * Set the type of OpenMP statement based on keyword
      * @param t
      * @return
      *    Note: always exit with the current token being the next to process, i.e.
@@ -244,7 +251,7 @@ public class PASTOMPFactory
     }
     
     /**
-     * getIdentifierList - parse a list of identifiers, e.g. as from shared(...)
+     * Parse a list of identifiers, e.g. as from shared(...)
      * @return OpenMPToken []
      */
     protected OpenMPToken [] getIdentifierList()
@@ -305,13 +312,13 @@ public class PASTOMPFactory
     protected boolean isSymbolRelevant(Symbol symbol)
     {   
         IASTNode node = null;
-        try {
-            //old node=symbol.getScope().getPhysicalNode();
-           IName name=symbol.getScope().getScopeName();//cdt40?
-           //findBindings...
-           //TODO cdt40 find equivalent CDT 4.0 APIs...
-        }
-        catch (Exception e) { return false; }
+		try {
+			// node=symbol.getScope().getPhysicalNode(); // no longer in CDT 4.0
+			node = symbol.getPhysicalNode();//cdt40
+
+		} catch (Exception e) {
+			return false;
+		}
         
         Utility.Location l = Utility.getLocation(node);
         int nodeOffset = (l!=null ? l.getLow()  : 0);
@@ -331,7 +338,7 @@ public class PASTOMPFactory
     }
     
     /**
-     * nextToken - acquire the next token
+     * Acquire the next token
      * @return OpenMPToken
      */
     protected OpenMPToken nextToken()
@@ -351,7 +358,7 @@ public class PASTOMPFactory
     }
     
     /**
-     * mark - used to get current token so as to mark (in code) where we were
+     * Get current token so as to mark (in code) where we were
      * @return OpenMPToken
      */
     protected OpenMPToken mark()
@@ -362,7 +369,7 @@ public class PASTOMPFactory
     }
     
     /**
-     * backupTo - method to reset toke queue (nextToken() get one after this one)
+     * Reset token queue (nextToken() get one after this one)
      * @param token
      */
     protected void backupTo(OpenMPToken token)
@@ -371,7 +378,7 @@ public class PASTOMPFactory
     }
     
     /**
-     * readTokens - used to test the parser
+     * Test the parser
      *
      */
     private void readTokens()
@@ -387,7 +394,7 @@ public class PASTOMPFactory
     }
     
     /**
-     * completeParallel - complete the parsing of #pragma omp parallel
+     * Complete the parsing of #pragma omp parallel
      *
      */
     private void completeParallel()
@@ -444,7 +451,7 @@ public class PASTOMPFactory
     }
     
     /**
-     * completeFor - Complete parsing #paragma omp for
+     * Complete parsing #paragma omp for
      *
      */
     private void completeFor()
@@ -499,7 +506,7 @@ public class PASTOMPFactory
     
     
     /**
-     * completeParallelFor - Complete parsing #paragma omp parallel for
+     * Complete parsing #paragma omp parallel for
      *
      */
     private void completeParallelFor()
@@ -568,7 +575,7 @@ public class PASTOMPFactory
     
     
     /**
-     * completeParallelSections - Complete parsing #paragma omp parallel sections
+     * Complete parsing #pragma omp parallel sections
      *
      */
     private void completeParallelSections()
@@ -626,7 +633,7 @@ public class PASTOMPFactory
 
     
     /**
-     * completeSections - Complete parse of #pragma omp sections
+     * Complete parse of #pragma omp sections
      *
      */
     private void completeSections()
@@ -670,7 +677,7 @@ public class PASTOMPFactory
     }
     
     /**
-     * completeSingle - complete options for the #pragma omp single
+     * Complete options for the #pragma omp single
      *
      */
     private void completeSingle()
@@ -709,7 +716,7 @@ public class PASTOMPFactory
     }
     
     /**
-     * completeFlush - complete the options for the #pragma omp flush
+     * Complete the options for the #pragma omp flush
      *
      */
     private void completeFlush()
@@ -723,7 +730,7 @@ public class PASTOMPFactory
 
     
     /**
-     * completeThreadPrivate - complete the options for the #pragma omp threadprivate
+     * Complete the options for the #pragma omp threadprivate
      *
      */
     private void completeThreadPrivate()
@@ -736,7 +743,7 @@ public class PASTOMPFactory
     }
     
     /**
-     * getReductionOperation - translate the type of reduction operato
+     * Translate the type of reduction operato
      * @return int (that PASTOMPPragma understands)
      */
     private int getReductionOperator()
@@ -764,7 +771,7 @@ public class PASTOMPFactory
     }
     
     /**
-     * getScheduleKind - Translate the kind of schedule
+     * Translate the kind of schedule
      * @return int (that PASTOMPPragma understands)
      */
     private int getScheduleKind()
@@ -784,7 +791,7 @@ public class PASTOMPFactory
     }
     
     /**
-     * getExpression - get the schedule expression
+     * Get the schedule expression
      * @return OpenMPToken []
      */
     private OpenMPToken [] getExpression()
@@ -969,7 +976,7 @@ public class PASTOMPFactory
     }
     
     /**
-     * locateRegion - Find the associated region to the current pragma
+     * lFind the associated region to the current pragma
      *
      */
     private void locateRegion()
@@ -1017,7 +1024,7 @@ public class PASTOMPFactory
     public static final int LOCATION_ONLY      = RegionDeterminationVisitor.LOCATION_ONLY;
     
     /**
-     * determineRegion - determine that code region affilated with a pragma & the peer node
+     * Determine that code region affilated with a pragma & the peer node
      * @param type - int (see constatns above)
      * @param ompPragma - PASTOMPPragma
      */
@@ -1039,9 +1046,10 @@ public class PASTOMPFactory
         }
     }
     
-    //-------------------------------------------------------------------------
-    // RegionDeterminationVisitor - used to traverse AST to find region
-    //-------------------------------------------------------------------------
+   
+    /**
+     * RegionDeterminationVisitor is used to traverse AST to find region
+     */
     protected class RegionDeterminationVisitor extends ASTVisitor
     {
         protected int           searchType_        = STRUCTURED_BLOCK;
@@ -1085,8 +1093,8 @@ public class PASTOMPFactory
         }
         
         /**
-         * visit - override function to visit statements implementation
-         *         NOTE: Regsion is first statement following pragma
+         * override function to visit statements implementation
+         *         NOTE: Region is first statement following pragma
          * 
          * @param statement - IASTStatement
          * @return int
