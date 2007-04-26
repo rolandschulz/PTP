@@ -361,3 +361,42 @@ ORTE_GET_STRING_VALUE(orte_gpr_keyval_t *keyval)
 	return tmp_str;
 }
 #endif /* !ORTE_VERSION_1_0 */
+
+/*
+ * Send an exit command to the ORTE daemon.
+ * 
+ */
+static int 
+ORTE_SHUTDOWN(void)
+{
+    orte_buffer_t *cmd;
+    orte_daemon_cmd_flag_t command;
+    orte_process_name_t    seed = {0,0,0};
+    int rc;
+
+    cmd = OBJ_NEW(orte_buffer_t);
+    if (NULL == cmd) {
+        ORTE_ERROR_LOG(ORTE_ERROR);
+        return ORTE_ERROR;
+    }
+
+    command = ORTE_DAEMON_EXIT_CMD;
+
+    rc = ORTE_PACK(cmd, &command, 1, ORTE_DAEMON_CMD);
+    if ( ORTE_SUCCESS != rc ) {
+        ORTE_ERROR_LOG(rc);
+        OBJ_RELEASE(cmd);
+        return rc;
+    } 
+
+    rc = orte_rml.send_buffer(&seed, cmd, ORTE_RML_TAG_DAEMON, 0);
+    if ( 0 > rc ) {
+        ORTE_ERROR_LOG(ORTE_ERR_COMM_FAILURE);
+        OBJ_RELEASE(cmd);
+        return ORTE_ERR_COMM_FAILURE;
+    }
+
+    OBJ_RELEASE(cmd);
+
+    return ORTE_SUCCESS;
+}

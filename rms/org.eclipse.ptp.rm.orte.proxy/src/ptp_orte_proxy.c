@@ -29,18 +29,19 @@
 #include <pwd.h>
 #include <stdbool.h>
 #include <errno.h>
+#include <signal.h>
 
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/select.h>
 
-#include <proxy.h>
-#include <proxy_tcp.h>
-#include <proxy_event.h>
-#include <handler.h>
-#include <list.h>
-#include <args.h>
-#include <signal.h>
+#include "proxy.h"
+#include "proxy_tcp.h"
+#include "proxy_event.h"
+#include "proxy_cmd.h"
+#include "handler.h"
+#include "list.h"
+#include "args.h"
 
 /*
  * Need to undef these if we include
@@ -52,6 +53,8 @@
 #undef PACKAGE_TARNAME
 #undef PACKAGE_VERSION
 #include "orte_fixup.h"
+
+#define WIRE_PROTOCOL_VERSION	"2.0"
 
 #define DEFAULT_PROXY		"tcp"
 #define DEFAULT_ORTED_ARGS	"orted --scope public --seed --persistent --no-daemonize"
@@ -86,58 +89,83 @@
 
 /*
  * Attribute names must EXACTLY match org.eclipse.ptp.core.AttributeConstants
- * 
- * TODO: Replace with new attribute system
  */
-#define ATTRIB_MACHINEID			"Machine ID"
-#define ATTRIB_NODE_NAME			"Node Name"
-#define ATTRIB_NODE_NUMBER			"Node Number"
-#define ATTRIB_NODE_STATE			"Status"
-#define ATTRIB_NODE_GROUP			"Group Owner"
-#define ATTRIB_NODE_USER			"User Owner"
-#define ATTRIB_NODE_MODE			"Mode"
-#define ATTRIB_PROCESS_PID			"ATTRIB_PROCESS_PID"
-#define ATTRIB_PROCESS_EXIT_CODE	"ATTRIB_PROCESS_EXIT_CODE"
-#define ATTRIB_PROCESS_STATUS		"ATTRIB_PROCESS_STATUS"
-#define ATTRIB_PROCESS_SIGNAL		"ATTRIB_PROCESS_SIGNAL"
-#define ATTRIB_PROCESS_NODE_NAME	"ATTRIB_PROCESS_NODE_NAME"
+#define ATTRDEF_ID_KEY				"id"
+#define ATTRDEF_NAME_KEY			"name"
+#define ATTRDEF_JOB_STATE_KEY		"jobState"
+#define ATTRDEF_NODE_STATE_KEY		"nodeState"
+#define ATTRDEF_GROUP_KEY			"group"
+#define ATTRDEF_USER_KEY			"user"
+#define ATTRDEF_MODE_KEY			"mode"
+#define ATTRDEF_PID_KEY				"pid"
+#define ATTRDEF_TASKID_KEY			"taskid"
+#define ATTRDEF_STDOUT_KEY			"stdout"
 
-#define JOB_STATE_INIT             1
-#define JOB_STATE_RUNNING          2
-#define JOB_STATE_TERMINATED       3
-#define JOB_STATE_ERROR            4
+#define JOB_STATE_INIT				"STARTED"
+#define JOB_STATE_RUNNING			"RUNNING"
+#define JOB_STATE_TERMINATED		"ABORTED"
+#define JOB_STATE_ERROR				"ERROR"
 
-#define PTP_UINT32				1
-#define PTP_STRING				2
+#define NODE_STATE_UP				"UP"
+#define NODE_STATE_DOWN				"DOWN"
+#define NODE_STATE_ERROR			"ERROR"
+#define NODE_STATE_UNKNOWN			"UNKNOWN"
 
-int ORTEIsShutdown(void);
-int ORTEInit(char *universe_name);
+#define DEFAULT_NODE_MODE			0111
+#define DEFAULT_QUEUE_NAME			"default"
 
-int ORTEStartDaemon(char **);
-int ORTERun(char **);
-int ORTETerminateJob(char **);
-int ORTEDiscover(char **);
-int ORTEQuit(char **);
+int ORTE_Initialize(int, int, char **);
+int ORTE_ModelDef(int, int, char **);
+int ORTE_StartEvents(int, int, char **);
+int ORTE_StopEvents(int, int, char **);
+int ORTE_SubmitJob(int, int, char **);
+int ORTE_TerminateJob(int, int, char **);
+int ORTE_Quit(int, int, char **);
 
 struct ptp_job {
-	int ptp_jobid;		// job ID as known by PTP */
-	int	debug_jobid;	// job ID of debugger or -1 if not a debug job
-	int orte_jobid;		// job ID that will be used by program when it starts
-	int	num_procs;		// number of procs requested for program (debugger uses num_procs+1)
+	int 	ptp_jobid;		// job ID as known by PTP */
+	int		debug_jobid;	// job ID of debugger or -1 if not a debug job
+	int 	orte_jobid;		// job ID that will be used by program when it starts
+	int		num_procs;		// number of procs requested for program (debugger uses num_procs+1)
+	List *	procs;
 };
 typedef struct ptp_job ptp_job;
 
-static void	get_proc_info(orte_jobid_t jobid, int ptpid);
-static int get_node_attribute(int machid, int node_num, char **input_keys, int *input_types, char **input_values, int input_num_keys);
+struct ptp_machine {
+	int		id;
+	List *	nodes;
+};
+typedef struct ptp_machine	ptp_machine;
+
+struct ptp_node {
+	int 	id;
+	char *	name;
+	char *	state;
+	char *	user;
+	char *	group;
+	char *	mode;
+};
+typedef struct ptp_node	ptp_node;
+
+struct ptp_process {
+	int		id;
+	int		node_id;
+	int		task_id;
+	int		pid;
+};
+typedef struct ptp_process	ptp_process;
+
+int do_orte_init(int, char *universe_name);
+static void	get_proc_info(ptp_job *);
+static int get_node_attributes(ptp_machine *mach, ptp_node **first_node, ptp_node **last_node);
 static void job_state_callback(orte_jobid_t jobid, orte_proc_state_t state);
-static int orte_console_send_command(orte_daemon_cmd_flag_t usercmd);
 static void iof_callback(orte_process_name_t* src_name, orte_iof_base_tag_t src_tag, void* cbdata, const unsigned char* data, size_t count);
 static void orte_job_record_start(orte_jobid_t jobid);
 static void orte_job_record_end(orte_jobid_t jobid);
 static int orte_job_record_started(orte_jobid_t jobid);
 
 #ifdef HAVE_SYS_BPROC_H
-int ORTE_Subscribe_Bproc(void);
+int subscribe_bproc(void);
 #else /* HAVE_SYS_BPROC_H */
 /*
  * Provide some fake values.
@@ -148,35 +176,40 @@ int ORTE_Subscribe_Bproc(void);
 #define ORTE_SOH_BPROC_NODE_MODE	"ORTE_SOH_BPROC_NODE_MODE"
 #endif /* HAVE_SYS_BPROC_H */
 
-int 		orte_shutdown = 0;
-proxy_svr *	orte_proxy;
-int			is_orte_initialized = 0;
-pid_t		orted_pid = 0;
-List *		eventList;
-List *		jobList;
-int			ptp_signal_exit;
-RETSIGTYPE	(*saved_signals[NSIG])(int);
-
-static proxy_handler_funcs handler_funcs = {
-	RegisterFileHandler,	// regfile() - call to register a file handler
-	UnregisterFileHandler,	// unregfile() - called to unregister file handler
-	RegisterEventHandler,	// regeventhandler() - called to register the proxy event handler
-	CallEventHandlers
-};
+static int			gTransID = 0; /* transaction id for start of event stream, is 0 when events are off */
+static int			gBaseID = 0; /* base ID for event generation */
+static int			gLastID = 1; /* ID generator */
+static int			gQueueID; /* ID of default queue */
+static int 			proxy_shutdown = 0;
+static int			proxy_initialized = 0;
+static proxy_svr *	orte_proxy;
+static pid_t		orted_pid = 0;
+static List *		gJobList;
+static List *		gMachineList;
+static int			ptp_signal_exit;
+static RETSIGTYPE	(*saved_signals[NSIG])(int);
 
 static proxy_svr_helper_funcs helper_funcs = {
 	NULL,					// newconn() - can be used to reject connections
 	NULL					// numservers() - if there are multiple servers, return the number
 };
 
-static proxy_svr_commands command_tab[] = {
-	{"STARTDAEMON",	ORTEStartDaemon},
-	{"SEND_EVENTS", ORTEDiscover},
-	{"DISCOVER",    ORTEDiscover},
-	{"RUN",			ORTERun},
-	{"TERMJOB",		ORTETerminateJob},
-	{"QUI",			ORTEQuit},
-	{NULL,			NULL},
+#define CMD_BASE	0
+
+static proxy_cmd	cmds[] = {
+	ORTE_Quit,
+	ORTE_Initialize,
+	ORTE_ModelDef,
+	ORTE_StartEvents,
+	ORTE_StopEvents,
+	ORTE_SubmitJob,
+	ORTE_TerminateJob
+};
+
+static proxy_commands command_tab = {
+	CMD_BASE,
+	sizeof(cmds)/sizeof(proxy_cmd),
+	cmds
 };
 
 static struct option longopts[] = {
@@ -189,6 +222,92 @@ static struct option longopts[] = {
 #define JOBID_PTP	0
 #define JOBID_ORTE	1
 #define JOBID_DEBUG	2
+
+/*
+ * Generate a model element ID
+ */
+static int
+generate_id(void)
+{
+	return gBaseID + gLastID++;
+}
+
+/*
+ * Create a new machine.
+ */
+static ptp_machine *
+new_machine()
+{
+	ptp_machine *	m = (ptp_machine *)malloc(sizeof(ptp_machine));
+	m->id = generate_id();
+	m->nodes = NewList();
+    AddToList(gMachineList, (void *)m);
+    return m;
+}
+
+/*
+ * Create a new node.
+ */
+static ptp_node *
+new_node(ptp_machine *mach, char *name, char *state, char *user, char *group, char *mode)
+{
+	ptp_node *	n = (ptp_node *)malloc(sizeof(ptp_node));
+	
+	memset((char *)n, 0, sizeof(ptp_node));
+	n->id = generate_id();
+	if (name != NULL)
+		n->name = strdup(name);
+	if (state != NULL)
+		n->state = strdup(state);
+	if (user != NULL)
+		n->user = strdup(user);
+	if (group != NULL)
+		n->group = strdup(group);
+	if (mode != NULL)
+		n->mode = strdup(mode);
+    AddToList(mach->nodes, (void *)n);
+    return n;
+}
+
+/*
+ * Very expensive!
+ */
+static ptp_node *
+find_node_by_name(char *name)
+{
+	ptp_machine *	m;
+	ptp_node *		n;
+	
+	for (SetList(gMachineList); (m = (ptp_machine *)GetListElement(gMachineList)) != NULL; ) {
+		for (SetList(m->nodes); (n = (ptp_node *)GetListElement(m->nodes)) != NULL; ) {
+			if (strcmp(name, n->name) == 0)
+				return n;
+		}
+	}
+	
+	return NULL;
+}
+
+/*
+ * Create a new process.
+ */
+static ptp_process *
+new_process(ptp_job *job, int node_id, int task_id, int pid)
+{
+	ptp_process *	p = (ptp_process *)malloc(sizeof(ptp_process));
+	p->id = generate_id();
+	p->node_id = node_id;
+	p->task_id = task_id;
+	p->pid = pid;
+    AddToList(job->procs, (void *)p);
+    return p;
+}
+
+static void
+free_process(ptp_process *p)
+{
+	free(p);
+}
 
 /*
  * Select correct jobid
@@ -213,14 +332,23 @@ get_jobid(ptp_job *j, int which)
  * Keep a list of the jobs that we have created. If they are
  * debug jobs, keep the debug jobid as well.
  */
-static void
-add_job(int ptp_jobid, int orte_jobid, int debug_jobid)
+static ptp_job *
+new_job(int ptp_jobid, int orte_jobid, int debug_jobid)
 {
 	ptp_job *	j = (ptp_job *)malloc(sizeof(ptp_job));
 	j->ptp_jobid = ptp_jobid;
     j->orte_jobid = orte_jobid;
     j->debug_jobid = debug_jobid;
-    AddToList(jobList, (void *)j);
+    j->procs = NewList();
+    AddToList(gJobList, (void *)j);
+    return j;
+}
+
+static void
+free_job(ptp_job *j)
+{
+	DestroyList(j->procs, free_process);
+	free(j);
 }
 
 /*
@@ -232,9 +360,10 @@ remove_job(int jobid, int which)
 {
 	ptp_job *	j;
 	
-	for (SetList(jobList); (j = (ptp_job *)GetListElement(jobList)) != NULL; ) {
+	for (SetList(gJobList); (j = (ptp_job *)GetListElement(gJobList)) != NULL; ) {
 		if (get_jobid(j, which) == jobid) {
-			RemoveFromList(jobList, (void *)j);
+			RemoveFromList(gJobList, (void *)j);
+			free_job(j);
 			break;
 		}
 	}
@@ -249,7 +378,7 @@ find_job(int jobid, int which)
 {
 	ptp_job *	j;
 	
-	for (SetList(jobList); (j = (ptp_job *)GetListElement(jobList)) != NULL; ) {
+	for (SetList(gJobList); (j = (ptp_job *)GetListElement(gJobList)) != NULL; ) {
 		if (get_jobid(j, which) == jobid) {
 			return j;
 		}
@@ -257,1020 +386,216 @@ find_job(int jobid, int which)
 	return NULL;
 }
 
-char *
-ORTEErrorStr(int type, char *msg)
+ 
+/**
+ * Send EVENT_RUNTIME_OK to client
+ */
+static void
+sendOKEvent(int trans_id)
 {
-	char *str;
-	static char *res = NULL;
+ 	proxy_msg *	m = new_proxy_msg(PROXY_EV_OK, trans_id);
+	proxy_svr_queue_msg(orte_proxy, m);
+}
+
+static int
+sendErrorEvent(int trans_id, int code, char *fmt, ...)
+{
+	va_list		ap;
+	char *		msg;
+	proxy_msg *	m = new_proxy_msg(PROXY_EV_ERROR, trans_id);
 	
-	if (res != NULL)
-		free(res);
+	va_start(ap, fmt);
+	vasprintf(&msg, fmt, ap);
+	va_end(ap);
 	
-	proxy_cstring_to_str(msg, &str);
-	asprintf(&res, "%d %d %s", RTEV_ERROR, type, str);
-	free(str);
+	proxy_msg_add_int(m, code);
+	proxy_msg_add_string(m, msg);
+	proxy_svr_queue_msg(orte_proxy, m);
 	
-	return res;	
+	return 0;	
+}
+
+static int
+sendAttrDefIntEvent(int trans_id, char *id, char *name, char *desc, int def)
+{
+	proxy_msg *	m = new_proxy_msg(PROXY_EV_RT_ATTR_DEF, trans_id);
+	
+	proxy_msg_add_int(m, 1); /* 1 attribute def */
+	proxy_msg_add_int(m, 5); /* 5 args in this attribute def */
+	proxy_msg_add_string(m, id);
+	proxy_msg_add_string(m, "INTEGER");
+	proxy_msg_add_string(m, name);
+	proxy_msg_add_string(m, desc);
+	proxy_msg_add_int(m, def);
+	proxy_svr_queue_msg(orte_proxy, m);
+	
+	return 0;	
+}
+
+
+static int
+sendAttrDefStringEvent(int trans_id, char *id, char *name, char *desc, char *def)
+{
+	proxy_msg *	m = new_proxy_msg(PROXY_EV_RT_ATTR_DEF, trans_id);
+	
+	proxy_msg_add_int(m, 1); /* 1 attribute def */
+	proxy_msg_add_int(m, 5); /* 5 args in this attribute def */
+	proxy_msg_add_string(m, id);
+	proxy_msg_add_string(m, "STRING");
+	proxy_msg_add_string(m, name);
+	proxy_msg_add_string(m, desc);
+	proxy_msg_add_string(m, def);
+	proxy_svr_queue_msg(orte_proxy, m);
+	
+	return 0;	
+}
+
+static int
+sendNewMachineEvent(int trans_id, int id)
+{
+	proxy_msg *	m = new_proxy_msg(PROXY_EV_RT_NEW_MACHINE, trans_id);
+	
+	proxy_msg_add_int(m, gBaseID);
+	proxy_msg_add_int(m, id);
+	proxy_svr_queue_msg(orte_proxy, m);
+	
+	return 0;	
+}
+
+static int
+sendNewNodeEvent(int trans_id, int mach_id, int from_id, int to_id)
+{
+	char *		range;
+	proxy_msg *	m = new_proxy_msg(PROXY_EV_RT_NEW_NODE, trans_id);
+	
+	if (from_id == to_id) {
+		asprintf(&range, "%d", from_id);
+	} else {
+		asprintf(&range, "%d-%d", from_id, to_id);
+	}
+	
+	proxy_msg_add_int(m, mach_id);	
+	proxy_msg_add_string(m, range);	
+	proxy_svr_queue_msg(orte_proxy, m);
+	
+	free(range);
+	
+	return 0;	
+}
+
+static int
+sendNewProcessEvent(int trans_id, int job_id, ptp_process *p)
+{
+	proxy_msg *	m = new_proxy_msg(PROXY_EV_RT_NEW_PROCESS, trans_id);
+	
+	proxy_msg_add_int(m, job_id);	
+	proxy_msg_add_keyval_int(m, ATTRDEF_ID_KEY, p->node_id);	
+	proxy_msg_add_keyval_int(m, ATTRDEF_TASKID_KEY, p->task_id);	
+	proxy_msg_add_keyval_int(m, ATTRDEF_PID_KEY, p->pid);	
+	proxy_svr_queue_msg(orte_proxy, m);
+	
+	return 0;	
+}
+
+static int
+sendNewQueueEvent(int trans_id)
+{
+	proxy_msg *	m = new_proxy_msg(PROXY_EV_RT_NEW_QUEUE, trans_id);
+	
+	gQueueID = generate_id();
+	
+	proxy_msg_add_int(m, gBaseID);	
+	proxy_msg_add_int(m, gQueueID);
+	proxy_msg_add_keyval_string(m, ATTRDEF_NAME_KEY, DEFAULT_QUEUE_NAME);
+	proxy_svr_queue_msg(orte_proxy, m);
+	
+	return 0;	
+}
+
+static int
+sendJobStateChangeEvent(int trans_id, int jobid, char *state)
+{
+	proxy_msg *	m = new_proxy_msg(PROXY_EV_RT_JOB_CHANGE, trans_id);
+	
+	proxy_msg_add_int(m, jobid);
+	proxy_msg_add_keyval_string(m, ATTRDEF_JOB_STATE_KEY, state);
+	proxy_svr_queue_msg(orte_proxy, m);
+	
+	return 0;	
+}
+
+static int
+sendNodeChangeEvent(int trans_id, ptp_node *node)
+{
+	proxy_msg *	m = new_proxy_msg(PROXY_EV_RT_NODE_CHANGE, trans_id);
+	
+	if (node->name != NULL)
+		proxy_msg_add_keyval_string(m, ATTRDEF_NAME_KEY, node->name);
+	if (node->state != NULL)
+		proxy_msg_add_keyval_string(m, ATTRDEF_NODE_STATE_KEY, node->state);
+	if (node->user != NULL)
+		proxy_msg_add_keyval_string(m, ATTRDEF_USER_KEY, node->user);
+	if (node->group != NULL)
+		proxy_msg_add_keyval_string(m, ATTRDEF_GROUP_KEY, node->group);
+	if (node->mode != NULL)
+		proxy_msg_add_keyval_string(m, ATTRDEF_MODE_KEY, node->mode);
+	proxy_svr_queue_msg(orte_proxy, m);
+	
+	return 0;	
+}
+
+static int
+sendProcessChangeEvent(int trans_id, ptp_process *p, int node_id, int task_id, int pid)
+{
+	proxy_msg *	m;
+	
+	if (p->node_id != node_id || p->task_id != task_id || p->pid != pid) {
+		m = new_proxy_msg(PROXY_EV_RT_PROCESS_CHANGE, trans_id);
+		
+		proxy_msg_add_int(m, p->id);
+		
+		if (p->node_id != node_id) {
+			p->node_id = node_id;
+			proxy_msg_add_keyval_int(m, ATTRDEF_ID_KEY, node_id);	
+		}
+		if (p->task_id != task_id) {
+			p->task_id = task_id;
+			proxy_msg_add_keyval_int(m, ATTRDEF_TASKID_KEY, task_id);	
+		}
+		if (p->pid != pid) {
+			p->pid = pid;
+			proxy_msg_add_keyval_int(m, ATTRDEF_PID_KEY, pid);	
+		}
+		
+		proxy_svr_queue_msg(orte_proxy, m);
+	}
+	
+	return 0;	
+}
+
+static int
+sendProcessOutputEvent(int trans_id, int procid, char *output)
+{
+	proxy_msg *	m = new_proxy_msg(PROXY_EV_RT_PROCESS_CHANGE, trans_id);
+	
+	proxy_msg_add_int(m, procid);
+	proxy_msg_add_keyval_string(m, ATTRDEF_STDOUT_KEY, output);
+	proxy_svr_queue_msg(orte_proxy, m);
+	
+	return 0;	
 }
 
 int
-ORTEInitialized(void)
-{
-	return is_orte_initialized;
-}
-
-int
-ORTECheckErrorCode(int type, int rc)
+ORTECheckErrorCode(int trans_id, int type, int rc)
 {
 	if(rc != ORTE_SUCCESS) {
 		printf("ARgh!  An error!\n"); fflush(stdout);
 		printf("ERROR %s\n", ORTE_ERROR_NAME(rc)); fflush(stdout);
-		AddToList(eventList, (void *)ORTEErrorStr(type, (char *)ORTE_ERROR_NAME(rc)));
+		sendErrorEvent(trans_id, type, (char *)ORTE_ERROR_NAME(rc));
 		return 1;
 	}
 	
 	return 0;
-}
-
-int
-ORTEStartDaemon(char **args)
-{
-	int				n;
-	int				ret;
-	int				pfd[2];
-	char *			res;
-	char *			universe_name;
-	char			buf[BUFSIZ];
-	fd_set			fds;
-	struct timeval	timeout;
-	
-	if (pipe(pfd) < 0)
-	{
-		res = ORTEErrorStr(RTEV_ERROR_ORTE_INIT, "pipe() failed for the orted spawn in ORTESpawnDaemon");
-		AddToList(eventList, (void *)res);
-		return 0;
-	}
-	
-	switch(orted_pid = fork()) {
-	case -1:
-		{
-			res = ORTEErrorStr(RTEV_ERROR_ORTE_INIT, "fork() failed for the orted spawn in ORTESpawnDaemon");
-			AddToList(eventList, (void *)res);
-			printf("\t%s\n", res);
-			return 1;
-		}
-		break;
-	/* child */
-	case 0:
-		{
-			char **orted_args;
-			
-			proxy_svr_finish(orte_proxy);
-			
-			asprintf(&res, "%s --universe PTP-ORTE-%d --report-uri %d", DEFAULT_ORTED_ARGS, getpid(), pfd[1]);
-
-			orted_args  = Str2Args(res);
-			printf("StartDaemon(orted %s)\n", res); fflush(stdout);
-			free(res);
-			
-			/* spawn the daemon */
-			printf("CHILD: Starting execvp now!\n"); fflush(stdout);
-			errno = 0;
-			close(pfd[0]);
-
-			setsid();
-			ret = execvp("orted", orted_args);
-
-			FreeArgs(orted_args);
-			
-			if (ret != 0) {
-				printf("CHILD: error return from execvp, ret = %d, errno = %d\n", ret, errno); fflush(stdout);
-				printf("CHILD: PATH = %s\n", getenv("PATH")); fflush(stdout);
-				exit(ret);
-			}
-		}
-		break;
-    /* parent */
-    default:
-    	printf("PARENT: orted_pid = %d\n", orted_pid); fflush(stdout);
-    	
-		/* 
-		 * the daemon will report it's URI on the pipe when it's started up 
-		 */
-		timeout.tv_sec = 15;
-		timeout.tv_usec = 0;
-		FD_ZERO(&fds);
-		FD_SET(pfd[0], &fds);
-		
-		switch (select(pfd[0]+1, &fds, NULL, NULL, &timeout)) {
-		case -1:
-			/*
-			 * Something serious has gone wrong. Kill the orted and shut down.
-			 */
-			(void)kill(orted_pid, SIGKILL);
-			res = ORTEErrorStr(RTEV_ERROR_ORTE_INIT, "select() returned error");
-			AddToList(eventList, (void *)res);
-			return 0;
-		case 0:
-			/*
-			 * Timeout. Kill off orted (if it's running) and shut down.
-			 */
-			(void)kill(orted_pid, SIGKILL);
-			res = ORTEErrorStr(RTEV_ERROR_ORTE_INIT, "Timeout waiting for orted to start");
-			AddToList(eventList, (void *)res);
-			return 0;
-		default:
-			if ((n = read(pfd[0], buf, BUFSIZ-1)) > 0) {
-				buf[n] = '\0';
-				printf("PARENT: URI = %s\n", buf); fflush(stdout);
-			}
-		}
-
-		close(pfd[0]);
-		close(pfd[1]);
-		break;
-	}
-	
-	asprintf(&universe_name, "PTP-ORTE-%d", orted_pid);
-	
-	if (ORTEInit(universe_name) != 0) {
-		free(universe_name);
-		return 0;
-	}
-	
-	free(universe_name);
-	
-#ifdef HAVE_SYS_BPROC_H
-	ORTE_Subscribe_Bproc();
-#endif
-
-	ORTE_QUERY(ORTE_JOBID_INVALID);
-	
-	printf("Start daemon returning OK.\n");
-	asprintf(&res, "%d", RTEV_OK);
-	AddToList(eventList, (void *)res);
-	
-	return 0;
-}
-
-int
-ORTEInit(char *universe_name)
-{
-	int rc;
-	char *str;
-		
-	printf("ORTEInit (%s)\n", universe_name); fflush(stdout);
-	asprintf(&str, "OMPI_MCA_universe=%s", universe_name);
-	putenv(str);
-	
-	/* 
-	 * make the orte_init() fail if the orte daemon isn't running
-	 */
-	putenv("OMPI_MCA_orte_univ_exist=1");
-
-	rc = orte_init(true);
-	
-	if(ORTECheckErrorCode(RTEV_ERROR_ORTE_INIT, rc)) return 1;
-	
-	/* this code was given to me to put in here to force the system to populate the node segment
-	 * in ORTE.  It basically crashes us if we use our own universe name.  I'm leaving it here
-	 * because I think one day we might be able to find a way to use this right. */
-#if 0
-	{
-	orte_ras_base_module_t *module = NULL;
-  	orte_jobid_t jobid = 1;
-	printf("Calling RDS_base_query() . . .\n"); fflush(stdout);
-	orte_rds_base_query();
-	printf("Calling RAS_Base_allocate() . . .\n"); fflush(stdout);
-	orte_ras_base_allocate(jobid, &module);
-	printf("Success with BOTH!\n"); fflush(stdout);
-	}
-#endif
-	
-	is_orte_initialized = true;
-	
-	return 0;
-}
-
-
-#if ORTE_VERSION_1_0
-/*
- * This callback gets invoked when any attributes of a process get changed.
- */
-static void 
-job_proc_notify_callback(orte_gpr_notify_data_t *data, void *cbdata)
-{
-	int						len;
-	size_t					i;
-	size_t					j;
-	size_t					k;
-	orte_gpr_value_t **		values;
-	orte_gpr_value_t *		value;
-	orte_gpr_keyval_t **	keyvals;
-	ptp_job *				job = (ptp_job *)cbdata;
-	char *					str1;
-	char *					str2;
-	char *					res;
-	char *					kv = NULL;
-	char *					vpid = NULL;
-	
-	values = (orte_gpr_value_t**)(data->values)->addr;
-	
-	for(i=0, k=0; k<data->cnt && i < (data->values)->size; i++) {
-		if(values[i] == NULL) continue;
-		
-		k++;
-		value = values[i];
-		keyvals = value->keyvals;
-		
-		len = strlen(ORTE_VPID_KEY);
-		
-		if (strlen(value->tokens[1]) <= len
-			|| strncmp(value->tokens[1], ORTE_VPID_KEY, len) != 0)
-			continue;
-			
-		asprintf(&vpid, "%s", value->tokens[1]+len+1);
-		
-		for(j=0; j<value->cnt; j++) {
-			orte_gpr_keyval_t *keyval = keyvals[j];
-			char *external_key = NULL;
-			char * tmp_str = NULL;
-
-			if (!strcmp(keyval->key, ORTE_NODE_NAME_KEY))
-				asprintf(&external_key, "%s", ATTRIB_PROCESS_NODE_NAME);
-			else if (!strcmp(keyval->key, ORTE_PROC_PID_KEY))
-				asprintf(&external_key, "%s", ATTRIB_PROCESS_PID);
-			else
-				external_key = strdup(keyval->key);
-
-			if (external_key != NULL) {					
-				switch(ORTE_KEYVALUE_TYPE(keyval)) {
-					case ORTE_STRING:
-						if ((tmp_str = ORTE_GET_STRING_VALUE(keyval)) != NULL);
-							asprintf(&kv, "%s=%s", external_key, tmp_str);
-						break;
-					case ORTE_UINT32:
-						asprintf(&kv, "%s=%d", external_key, ORTE_GET_UINT32_VALUE(keyval));
-						break;
-					case ORTE_PID:
-						asprintf(&kv, "%s=%d", external_key, ORTE_GET_PID_VALUE(keyval));
-						break;
-					default:
-						asprintf(&kv, "%s=<unknown type>%d", external_key, ORTE_KEYVALUE_TYPE(keyval));
-						break;
-				}
-	
-				if (kv != NULL) {
-					if (job != NULL) {
-						proxy_cstring_to_str("", &str1);
-						proxy_cstring_to_str(kv, &str2);
-						asprintf(&res, "%d %d 0:0 %s 1 %s %s", RTEV_PATTR, job->ptp_jobid, str1, vpid, str2);
-			        	AddToList(eventList, (void *)res);
-			        	free(str1);
-			        	free(str2);
-					}
-					free(kv);
-					kv = NULL;
-				}
-				
-				free(external_key);
-	        }
-		}
-		
-		free(vpid);
-	}
-}
-
-/*
- * Subscribe to attribute changes for 'procid' in 'job'.
- */
-static int
-orte_subscribe_proc(ptp_job * job, int procid)
-{
-	int							i;
-	int							rc;
-	char *						jobid_str;
-	orte_gpr_subscription_t 	sub;
-	orte_gpr_subscription_t *	subs;
-	orte_gpr_value_t			value;
-	orte_gpr_value_t *			values;
-	orte_process_name_t			proc;
-
-	printf("subscribing proc %d\n", procid); fflush(stdout);
-	
-	rc = orte_ns.convert_jobid_to_string(&jobid_str, job->orte_jobid);
-	if(rc != ORTE_SUCCESS) {
-		printf("ERROR: '%s'\n", ORTE_ERROR_NAME(rc)); fflush(stdout);
-		return -1;
-	}
-		
-	OBJ_CONSTRUCT(&sub, orte_gpr_subscription_t);
-	sub.action = ORTE_GPR_NOTIFY_VALUE_CHG;
-	
-	OBJ_CONSTRUCT(&value, orte_gpr_value_t);
-	values = &value;
-	sub.values = &values;
-	sub.cnt = 1; /* number of values */
-	value.addr_mode = ORTE_GPR_TOKENS_XAND | ORTE_GPR_KEYS_OR;
-	asprintf(&value.segment, "%s-%s", ORTE_JOB_SEGMENT, jobid_str);
-	
-	value.cnt = 3; /* number of keyvals */
-	value.keyvals = (orte_gpr_keyval_t**)malloc(value.cnt * sizeof(orte_gpr_keyval_t*));
-	
-	i = 0;
-	
-	value.keyvals[i] = OBJ_NEW(orte_gpr_keyval_t);
-	value.keyvals[i++]->key = strdup(ORTE_NODE_NAME_KEY);
-
-	value.keyvals[i] = OBJ_NEW(orte_gpr_keyval_t);
-	value.keyvals[i++]->key = strdup(ORTE_PROC_PID_KEY);
-	
-	value.keyvals[i] = OBJ_NEW(orte_gpr_keyval_t);
-	value.keyvals[i++]->key = strdup(ORTE_PROC_NAME_KEY);
-
-	proc.cellid = 0;
-	proc.jobid = job->orte_jobid;
-	proc.vpid = procid;
-	
-	orte_schema.get_proc_tokens(&value.tokens, &value.num_tokens, &proc); /* TODO: what frees tokens? */
-	
-	sub.cbfunc = job_proc_notify_callback;
-	sub.user_tag = (void *)job;
-	
-	subs = &sub;
-	rc = orte_gpr.subscribe(1, &subs, 0, NULL);
-	
-	if(ORTECheckErrorCode(RTEV_ERROR_ORTE_BPROC_SUBSCRIBE, rc)) return 1;
-	
-	return 0;
-}
-
-/*
- * Subscribe to all processes in a job. 
- * 
- * It would be nice if there was a more efficient way of doing this.
- */
-int 
-ORTE_Subscribe_Job(orte_jobid_t jobid)
-{
-	int			rc;
-	int			vpid;
-	int			vpid_start;
-	int			vpid_range;
-	ptp_job *	job;
-	
-	if (ORTE_SUCCESS != (rc = ORTE_GET_VPID_RANGE(jobid, &vpid_start, &vpid_range))) {
-		printf("no processes for job\n"); fflush(stdout);
-		return -1;
-	}
-	
-	job = find_job(jobid, JOBID_ORTE);
-	if (job != NULL) {
-		printf("subscribing %d procs\n", vpid_range); fflush(stdout);
-		
-		for (vpid = vpid_start; vpid < vpid_start + vpid_range; vpid++)
-				orte_subscribe_proc(job, vpid);
-	}
-		
-	return 0;
-}
-#endif /* ORTE_VERSION_1_0 */
-
-#ifdef HAVE_SYS_BPROC_H
-/*
- * This callback gets invoked when any of the bproc specific state of health attributes
- * change. These are all node-related events, so this is really the monitoring
- * functions for bproc support.
- */
-static void 
-bproc_notify_callback(orte_gpr_notify_data_t *data, void *cbdata)
-{
-	size_t i, j, k;
-	orte_gpr_value_t **values, *value;
-	orte_gpr_keyval_t **keyvals;
-	char *res, *kv, *str1, *str2, *str3, *foo, *bar, *nodename;
-	int machID;
-	
-	printf("BPROC NOTIFY CALLBACK!\n"); fflush(stdout);
-	
-	values = (orte_gpr_value_t**)(data->values)->addr;
-	
-	machID = 0;
-	
-	for(i=0, k=0; k<data->cnt && i < (data->values)->size; i++) {
-		if(values[i] == NULL) continue;
-		
-		k++;
-		value = values[i];
-		keyvals = value->keyvals;
-		
-		asprintf(&nodename, "%s", value->tokens[1]);
-		printf("NODE NAME = %s\n", nodename);
-		
-		for(j=0; j<value->cnt; j++) {
-			orte_gpr_keyval_t *keyval = keyvals[j];
-			char *external_key;
-			
-			printf("--- BPROC CHANGE: key = %s\n", keyval->key); fflush(stdout);
-			
-			if(!strcmp(keyval->key, ORTE_NODE_NAME_KEY))
-				asprintf(&external_key, "%s", ATTRIB_NODE_NAME);
-			else if(!strcmp(keyval->key, ORTE_SOH_BPROC_NODE_USER))
-				asprintf(&external_key, "%s", ATTRIB_NODE_USER);
-			else if(!strcmp(keyval->key, ORTE_SOH_BPROC_NODE_GROUP))
-				asprintf(&external_key, "%s", ATTRIB_NODE_GROUP);
-			else if(!strcmp(keyval->key, ORTE_SOH_BPROC_NODE_STATUS) || !strcmp(keyval->key, ORTE_NODE_STATE_KEY))
-				asprintf(&external_key, "%s", ATTRIB_NODE_STATE);
-			else if(!strcmp(keyval->key, ORTE_SOH_BPROC_NODE_MODE))
-				asprintf(&external_key, "%s", ATTRIB_NODE_MODE);
-			else
-				printf("******************* Unknown key type on bproc event - key = '%s'\n", keyval->key); fflush(stdout);
-					
-			switch(keyval->type) {
-				case ORTE_NODE_STATE:
-					printf("--- BPROC CHANGE: (state) val = %d\n", keyval->value.node_state); fflush(stdout);
-					asprintf(&kv, "%s=%d", external_key, keyval->value.node_state);
-					break;
-				case ORTE_STRING:
-					printf("--- BPROC CHANGE: (str) val = %s\n", keyval->value.strptr); fflush(stdout);
-					asprintf(&kv, "%s=%s", external_key, keyval->value.strptr);
-					break;
-				case ORTE_UINT32:
-					printf("--- BPROC CHANGE: (uint32) val = %d\n", keyval->value.ui32); fflush(stdout);
-					asprintf(&kv, "%s=%d", external_key, keyval->value.ui32);
-					break;
-				default:
-					printf("--- BPROC CHANGE: unknown type %d\n", keyval->type); fflush(stdout);
-					asprintf(&kv, "%s=%d", external_key, keyval->type);
-			}
-			
-			
-			asprintf(&foo, "%s=%d", ATTRIB_MACHIINEID, 0);
-			asprintf(&bar, "%s=%s", ATTRIB_NODE_NUMBER, nodename); /* for bproc the node number is the same as the name */
-			asprintf(&bar, "%s=%s", ATTRIB_NODE_NAME, nodename);
-			proxy_cstring_to_str(foo, &str1);
-			proxy_cstring_to_str(bar, &str2);
-			proxy_cstring_to_str(kv, &str3);
-			asprintf(&res, "%d %s %s %s", RTEV_NATTR, str1, str2, str3);
-			AddToList(eventList, (void *)res);
-			
-        	free(kv);
-			free(external_key);
-        	free(foo);
-        	free(bar);
-        	free(str1);
-        	free(str2);
-        	free(str3);
-        }
-		
-		free(nodename);
-	}
-}
-
-/*
- * Subscribe to the bproc specific attribute changes.
- */
-int 
-ORTE_Subscribe_Bproc(void)
-{
-	int i, rc;
-	orte_gpr_subscription_t sub, *subs;
-	orte_gpr_value_t value, *values;
-	
-	OBJ_CONSTRUCT(&sub, orte_gpr_subscription_t);
-	sub.action = ORTE_GPR_NOTIFY_VALUE_CHG;
-	
-	OBJ_CONSTRUCT(&value, orte_gpr_value_t);
-	values = &value;
-	sub.values = &values;
-	sub.cnt = 1; /* number of values */
-	value.addr_mode = ORTE_GPR_TOKENS_XAND | ORTE_GPR_KEYS_OR;
-	value.segment = strdup(ORTE_NODE_SEGMENT);
-	
-	value.cnt = 6; /* number of keyvals */
-	value.keyvals = (orte_gpr_keyval_t**)malloc(value.cnt * sizeof(orte_gpr_keyval_t*));
-	
-	i = 0;
-	
-	value.keyvals[i] = OBJ_NEW(orte_gpr_keyval_t);
-	value.keyvals[i++]->key = strdup(ORTE_NODE_NAME_KEY);
-	
-	value.keyvals[i] = OBJ_NEW(orte_gpr_keyval_t);
-	value.keyvals[i++]->key = strdup(ORTE_NODE_STATE_KEY);
-	
-	value.keyvals[i] = OBJ_NEW(orte_gpr_keyval_t);
-	value.keyvals[i++]->key = strdup(ORTE_SOH_BPROC_NODE_STATUS);
-	
-	value.keyvals[i] = OBJ_NEW(orte_gpr_keyval_t);
-	value.keyvals[i++]->key = strdup(ORTE_SOH_BPROC_NODE_MODE);
-	
-	value.keyvals[i] = OBJ_NEW(orte_gpr_keyval_t);
-	value.keyvals[i++]->key = strdup(ORTE_SOH_BPROC_NODE_USER);
-	
-	value.keyvals[i] = OBJ_NEW(orte_gpr_keyval_t);
-	value.keyvals[i++]->key = strdup(ORTE_SOH_BPROC_NODE_GROUP);
-	
-	/* any token */
-	value.tokens = NULL;
-	value.num_tokens = 0;
-	
-	sub.cbfunc = bproc_notify_callback;
-	sub.user_tag = NULL;
-	
-	subs = &sub;
-	rc = orte_gpr.subscribe(1, &subs, 0, NULL);
-	
-	if(ORTECheckErrorCode(RTEV_ERROR_ORTE_BPROC_SUBSCRIBE, rc)) return 1;
-	
-	return 0;
-}
-#endif
-
-/* 
- *  finalize the registry 
- */
-int
-ORTEFinalize(void)
-{
-	int rc;
-	
-	rc = orte_finalize();
-	
-	if(ORTECheckErrorCode(RTEV_ERROR_ORTE_FINALIZE, rc)) return 1;
-	
-	return 0;
-}
-
-/* 
- * tell the daemon to exit 
- */
-int
-ORTEShutdown(void)
-{
-	printf("ORTEShutdown() called.  Telling daemon to turn off.\n"); fflush(stdout);
-	orte_console_send_command(ORTE_DAEMON_EXIT_CMD);
-	printf("ORTEShutdown() - told ORTEd to exit.\n"); fflush(stdout);
-	orte_shutdown++;
-	
-	orte_finalize();
-	
-	return 0;
-}
-
-int
-ORTEIsShutdown(void)
-{
-	return orte_shutdown != 0;
-}
-
-/* 
- * Check for events and call appropriate progress hooks.
- */
-int
-ORTEProgress(void)
-{
-	fd_set			rfds;
-	fd_set			wfds;
-	fd_set			efds;
-	int				res;
-	int				nfds = 0;
-	char *			event;
-	struct timeval	tv;
-	handler *		h;
-	
-	struct timeval TIMEOUT;
-	TIMEOUT.tv_sec = 0;
-	TIMEOUT.tv_usec = 2000;
-
-	for (SetList(eventList); (event = (char *)GetListElement(eventList)) != NULL; ) {
-		proxy_svr_event_callback(orte_proxy, event);
-		RemoveFromList(eventList, (void *)event);
-		free(event);	
-	}
-	
-	/***********************************
-	 * First: Check for any file events
-	 */
-	 
-	/*
-	 * Set up fd sets
-	 */
-	FD_ZERO(&rfds);
-	FD_ZERO(&wfds);
-	FD_ZERO(&efds);
-	
-	for (SetHandler(); (h = GetHandler()) != NULL; ) {
-		if (h->htype == HANDLER_FILE) {
-			if (h->file_type & READ_FILE_HANDLER)
-				FD_SET(h->fd, &rfds);
-			if (h->file_type & WRITE_FILE_HANDLER)
-				FD_SET(h->fd, &wfds);
-			if (h->file_type & EXCEPT_FILE_HANDLER)
-				FD_SET(h->fd, &efds);
-			if (h->fd > nfds)
-				nfds = h->fd;
-		}
-	}
-	
-	tv = TIMEOUT;
-	
-	for ( ;; ) {
-		res = select(nfds+1, &rfds, &wfds, &efds, &tv);
-	
-		switch (res) {
-		case INVALID_SOCKET:
-			if ( errno == EINTR )
-				continue;
-		
-			perror("socket");
-			return PROXY_RES_ERR;
-		
-		case 0:
-			/*
-			 * Timeout.
-			 */
-			 break;
-			 		
-		default:
-			for (SetHandler(); (h = GetHandler()) != NULL; ) {
-				if (h->htype == HANDLER_FILE
-					&& ((h->file_type & READ_FILE_HANDLER && FD_ISSET(h->fd, &rfds))
-						|| (h->file_type & WRITE_FILE_HANDLER && FD_ISSET(h->fd, &wfds))
-						|| (h->file_type & EXCEPT_FILE_HANDLER && FD_ISSET(h->fd, &efds)))
-					&& h->file_handler(h->fd, h->data) < 0)
-					return PROXY_RES_ERR;
-			}
-			
-		}
-	
-		break;
-	}
-	
-	/* only run the progress of the ORTE code if we've initted the ORTE daemon */
-	if(ORTEInitialized()) {
-		opal_event_loop(OPAL_EVLOOP_ONCE);
-	}
-	
-	return PROXY_RES_OK;
-}
-
-/* 
- * terminate a job, given a jobid 
- */
-int
-ORTETerminateJob(char **args)
-{
-	int			rc;
-	int			jobid = (int)strtol(args[1], NULL, 10);
-	ptp_job *	j;
-	
-	if ((j = find_job(jobid, JOBID_PTP)) != NULL) {
-		if (j->debug_jobid < 0)
-			rc = ORTE_TERMINATE_JOB(j->orte_jobid);
-		else
-			rc = ORTE_TERMINATE_JOB(j->debug_jobid);
-		
-		if(ORTECheckErrorCode(RTEV_ERROR_TERMINATE_JOB, rc)) return 1;
-	}
-	
-	return PROXY_RES_OK;
-}
-
-/*
- * If we're under debug control, let the debugger handle process state update. 
- * We still want to wire up stdio though.
- * 
- * Note: this will only be used if the debugger allows the program to
- * reach MPI_Init(), which may not ever happen. Don't rely this to do anything
- * for any type of job.
- * 
- * Note also: the debugger manages process state updates so we don't need
- * to send events back to the runtime.
- */
-static void
-debug_app_job_state_callback(orte_jobid_t jobid, orte_proc_state_t state)
-{
-	switch(state) {
-		case ORTE_PROC_STATE_TERMINATED:
-		case ORTE_PROC_STATE_ABORTED:
-			if (orte_job_record_started(jobid)) {
-				orte_job_record_end(jobid);
-			}
-			break;
-	}
-}
-
-/*
- * job_state_callback for the debugger. Detects debugger start and exit and notifies the
- * UI. Cleans up job id map.
- */
-static void
-debug_job_state_callback(orte_jobid_t jobid, orte_proc_state_t state)
-{
-	int				app_jobid;
-	int				job_state;
-	char *			res;
-	ptp_job	*		j;
-	
-	if ((j = find_job(jobid, JOBID_DEBUG)) == NULL)
-		return;
-	
-	app_jobid = j->ptp_jobid;
-	
-	switch(state) {
-#if !ORTE_VERSION_1_0
-		case ORTE_JOB_STATE_AT_STG2:
-#endif /* !ORTE_VERSION_1_0 */
-		case ORTE_JOB_STATE_RUNNING:
-			job_state = JOB_STATE_RUNNING;
-			break;
-		case ORTE_PROC_STATE_TERMINATED:
-		case ORTE_PROC_STATE_ABORTED:
-			job_state = JOB_STATE_TERMINATED;
-           	remove_job(jobid, JOBID_DEBUG);
-    		break;
-    	default:
-    		return;
-	}
-	
-	asprintf(&res, "%d %d %d", RTEV_JOBSTATE, app_jobid, job_state);
-	AddToList(eventList, (void *)res);
-}
-
-/*
- * Debug spawner. To spawn a debug job, two process allocations must be made. 
- * This first is for the application and the second for the debugger (which is
- * an MPI program). We then launch the debugger, and let it deal with starting
- * the application processes.
- * 
- * This will need to be modified to support attaching.
- */
-static int
-debug_spawn(char *debug_path, int argc, char **argv, orte_app_context_t** app_context, size_t num_context, orte_jobid_t* app_jobid, orte_jobid_t* debug_jobid)
-{
-	int						i;
-	int						rc;
-	orte_jobid_t			jid1;
-	orte_jobid_t			jid2;
-	orte_app_context_t *	debug_context;
-
-	rc = ORTE_ALLOCATE_JOB(app_context, num_context, &jid1, debug_app_job_state_callback);
-	if (rc != ORTE_SUCCESS) {
-		ORTE_ERROR_LOG(rc);
-		return rc;
-	}
-
-	debug_context = OBJ_NEW(orte_app_context_t);
-	debug_context->num_procs = app_context[0]->num_procs + 1;
-	debug_context->app = strdup(debug_path);
-	debug_context->cwd = strdup(app_context[0]->cwd);
-	/* no special environment variables */
-#if ORTE_VERSION_1_0
-	debug_context->num_env = 0;
-#endif /* ORTE_VERSION_1_0 */
-	debug_context->env = NULL;
-	/* no special mapping of processes to nodes */
-	debug_context->num_map = 0;
-	debug_context->map_data = NULL;
-	/* setup argv */
-	debug_context->argv = (char **)malloc((argc+2) * sizeof(char *));
-	for (i = 0; i < argc; i++) {
-		debug_context->argv[i] = strdup(argv[i]);
-	}
-	asprintf(&debug_context->argv[i++], "--jobid=%d", jid1);
-	debug_context->argv[i++] = NULL;
-#if ORTE_VERSION_1_0
-	debug_context->argc = i;
-#endif /* ORTE_VERSION_1_0 */
-
-	rc = ORTE_ALLOCATE_JOB(&debug_context, 1, &jid2, debug_job_state_callback);
-	if (rc != ORTE_SUCCESS) {
-		OBJ_RELEASE(debug_context);
-		ORTE_ERROR_LOG(rc);
-		return rc;
-	}
-
-	/*
-	 * launch the debugger
-	 */
-	if (ORTE_SUCCESS != (rc = ORTE_LAUNCH_JOB(jid2))) {
-		OBJ_RELEASE(debug_context);
-		ORTE_ERROR_LOG(rc);
-		return rc;
-	}
-
-	*app_jobid = jid1;
-	*debug_jobid = jid2;
-    
-    OBJ_RELEASE(debug_context);
-    
-	return ORTE_SUCCESS;
-}
-
-/* spawn a job with the given executable path and # of procs. */
-int
-ORTERun(char **args)
-{
-	int						rc;
-	int						i;
-	int						a;
-	int						num_procs = 0;
-	int						debug = 0;
-	int						num_args = 0;
-	int						num_env = 0;
-	int						debug_argc = 0;
-	int						ptpid = 0;
-	char *					res;
-	char *					full_path;
-	char	 *				pgm_name = NULL;
-	char	 *				cwd = NULL;
-	char *					exec_path = NULL;
-	char *					debug_exec_path;
-	char **					debug_args;
-	char **					env = NULL;
-	orte_app_context_t *	apps;
-	orte_jobid_t			jobid = ORTE_JOBID_MAX;
-	orte_jobid_t			debug_jobid = -1;
-
-	for (i = 1; args[i] != NULL; i += 2) {
-		if (strcmp(args[i], "jobID") == 0) {
-			ptpid = (int)strtol(args[i+1], NULL, 10);
-		} else if (strcmp(args[i], "execName") == 0) {
-			pgm_name = args[i+1];
-		} else if (strcmp(args[i], "pathToExec") == 0) {
-			exec_path = args[i+1];
-		} else if (strcmp(args[i], "numOfProcs") == 0) {
-			num_procs = (int)strtol(args[i+1], NULL, 10);
-		} else if (strcmp(args[i], "procsPerNode") == 0) {
-			// not yet
-		} else if (strcmp(args[i], "firstNodeNum") == 0) {
-			// not yet
-		} else if (strcmp(args[i], "workingDir") == 0) {
-			cwd = args[i+1];
-		} else if (strcmp(args[i], "progArg") == 0) {
-			num_args++;
-		} else if (strcmp(args[i], "progEnv") == 0) {
-			num_env++;
-		} else if (strcmp(args[i], "debuggerPath") == 0) {
-			debug_exec_path = args[i+1];
-			debug = 1;
-		} else if (strcmp(args[i], "debuggerArg") == 0) {
-			debug_argc++;
-		}
-	}
-	
-	/*
-	 * Do some checking first
-	 */
-	 
-	if (pgm_name == NULL) {
-		AddToList(eventList, (void *)ORTEErrorStr(RTEV_ERROR_ORTE_RUN, "Must specify a program name"));
-		return PROXY_RES_OK;
-	}
-	
-	if (num_procs <= 0) {
-		AddToList(eventList, (void *)ORTEErrorStr(RTEV_ERROR_ORTE_RUN, "Invalid number of processes"));
-		return PROXY_RES_OK;
-	}
-	
-	/*
-	 * Must specify a working directory. For local launches, this is normally the project directory. For
-	 * remote launches, it will probably be the user's home directory.
-	 */
-	if (cwd == NULL) {
-		AddToList(eventList, (void *)ORTEErrorStr(RTEV_ERROR_ORTE_RUN, "Must specify a working directory"));
-		return PROXY_RES_OK;
-	}
-		
-	/*
-	 * Get supplied environment. It is used to locate executable if necessary.
-	 */
-	
-	if (num_env > 0) {
-		env = (char **)malloc((num_env + 1) * sizeof(char *));
-		for (a = 0, i = 1; args[i] != NULL; i += 2) {
-			if (strcmp(args[i], "progEnv") == 0)
-				env[a++] = strdup(args[i+1]);
-		}
-		env[a] = NULL;
-	}
-		
-	/*
-	 * If no path is specified, then try to locate execuable.
-	 */		
-	if (exec_path == NULL) {
-		full_path = opal_path_findv(pgm_name, 0, env, cwd);
-		if (full_path == NULL) {
-			AddToList(eventList, (void *)ORTEErrorStr(RTEV_ERROR_ORTE_RUN, "Executuable not found"));
-			return PROXY_RES_OK;
-		}
-	} else {
-		asprintf(&full_path, "%s/%s", exec_path, pgm_name);
-	}
-	
-	if (access(full_path, X_OK) < 0) {
-		AddToList(eventList, (void *)ORTEErrorStr(RTEV_ERROR_ORTE_RUN, strerror(errno)));
-		return PROXY_RES_OK;
-	}
-	
-	if (debug) {		
-		if (access(debug_exec_path, X_OK) < 0) {
-			printf("ERROR debug_exec_path = '%s' not found\n", debug_exec_path); fflush(stdout);
-			AddToList(eventList, (void *)ORTEErrorStr(RTEV_ERROR_ORTE_RUN, strerror(errno)));
-			return PROXY_RES_OK;
-		}
-		
-		debug_argc++;
-		debug_args = (char **)malloc((debug_argc+1) * sizeof(char *));
-		debug_args[0] = debug_exec_path;
-		for (i = 1, a = 1; args[i] != NULL; i += 2) {
-			if (strcmp(args[i], "debuggerArg") == 0) {
-				debug_args[a++] = args[i+1];
-			}
-		}
-		debug_args[a] = NULL;
-	}
-
-	/* format the app_context_t struct */
-	apps = OBJ_NEW(orte_app_context_t);
-	apps->num_procs = num_procs;
-	apps->app = full_path;
-	apps->cwd = strdup(cwd);
-	/* no special environment variables */
-#if ORTE_VERSION_1_0
-	apps->num_env = num_env;
-#endif /* ORTE_VERSION_1_0 */
-	apps->env = env;
-	/* no special mapping of processes to nodes */
-	apps->num_map = 0;
-	apps->map_data = NULL;
-	/* setup argv */
-	apps->argv = (char **)malloc((num_args + 2) * sizeof(char *));
-	apps->argv[0] = strdup(full_path);
-	if (num_args > 0) {
-		for (a = 1, i = 1; args[i] != NULL; i += 2) {
-			if (strcmp(args[i], "progArg") == 0)
-				apps->argv[a++] = strdup(args[i+1]);
-		}
-	}
-	apps->argv[num_args+1] = NULL;
-#if ORTE_VERSION_1_0
-	apps->argc = num_args + 1;
-#endif /* ORTE_VERSION_1_0 */
-
-	printf("(debug ? %d) Spawning %d processes of job '%s'\n", debug, (int)apps->num_procs, apps->app);
-	printf("\tprogram name '%s'\n", apps->argv[0]);
-	fflush(stdout);
-	
-	/* calls the ORTE spawn function with the app to spawn.  Return the
-	 * jobid assigned by the registry/ORTE.  Passes a callback function
-	 * that ORTE will call with state change on this job */
-	if (debug) {
-		rc = debug_spawn(debug_exec_path, debug_argc, debug_args, &apps, 1, &jobid, &debug_jobid);
-		free(debug_args);
-	} else {
-		rc = ORTE_SPAWN(&apps, 1, &jobid, job_state_callback);
-	}
-	
-	printf("SPAWNED [error code %d = '%s'], now unlocking\n", rc, ORTE_ERROR_NAME(rc)); fflush(stdout);
-	
-	OBJ_RELEASE(apps);
-	
-	if(ORTECheckErrorCode(RTEV_ERROR_ORTE_RUN, rc)) return 1;
-
-	printf("NEW JOBID = %d\n", (int)jobid); fflush(stdout);
-	
-    add_job(ptpid, jobid, debug_jobid);
-	
-	/*
-	 * Fake a job state event
-	 */
-	asprintf(&res, "%d %d %d", RTEV_JOBSTATE, ptpid, JOB_STATE_INIT);
-	AddToList(eventList, (void *)res);
-	
-	/*
-	 * Start I/O forwarding
-	 */
-	if (!orte_job_record_started(jobid)) {
-		orte_job_record_start(jobid);
-	}
-	
-#if ORTE_VERSION_1_0
-	ORTE_Subscribe_Job(jobid);
-#else /* ORTE_VERSION_1_0 */
-	/*
-	 * If this is a debug job then the debugger will manage
-	 * process state. However we need to set up the process/node
-	 * mapping first.
-	 */
-	if (debug) {
-		get_proc_info(jobid, ptpid);
-	}
-#endif /* ORTE_VERSION_1_0 */
-	
-	printf("Returning from ORTERun\n"); fflush(stdout);
-	
-	return PROXY_RES_OK;
 }
 
 /*
@@ -1288,7 +613,6 @@ iof_callback(
     const unsigned char* data,
     size_t count)
 {
-	char *res, *str;
 	char *line;
 	
     if(count > 0) {
@@ -1296,12 +620,9 @@ iof_callback(
     	if (j != NULL) {
 	        line = (char *)malloc(count+1);
 	        strncpy((char*)line, (char*)data, count);
-	        if(line[count-1] == '\n') line[count-1] = '\0';
+	        if (line[count-1] == '\n') line[count-1] = '\0';
 	        line[count] = '\0';
-	        proxy_cstring_to_str(line, &str);
-	        asprintf(&res, "%d %d %d %s", RTEV_PROCOUT, j->ptp_jobid, (int)src_name->vpid, str);
-	        AddToList(eventList, (void *)res);
-	        free(str);
+	        sendProcessOutputEvent(gTransID, (int)src_name->vpid, line);
 	        free(line);
     	}
     }
@@ -1412,9 +733,13 @@ orte_job_record_end(orte_jobid_t jobid)
 static void
 job_state_callback(orte_jobid_t jobid, orte_proc_state_t proc_state)
 {
-	int			state;
-	char *		res;
+	char *		state;
 	ptp_job *	j = find_job(jobid, JOBID_ORTE);
+	
+	if (j == NULL) {
+		printf("JOB STATE CALLBACK: could not find jobid %d\n", jobid); fflush(stdout);
+		return;
+	}
 	
 	printf("JOB STATE CALLBACK: %d\n", proc_state); fflush(stdout);
 		
@@ -1427,7 +752,7 @@ job_state_callback(orte_jobid_t jobid, orte_proc_state_t proc_state)
 	switch (proc_state) {
 #if !ORTE_VERSION_1_0
 		case ORTE_JOB_STATE_LAUNCHED:
-			get_proc_info(jobid, j->ptp_jobid);
+			get_proc_info(j);
 			/* fall through */
 #endif /* !ORTE_VERSION_1_0 */
 			
@@ -1461,58 +786,23 @@ job_state_callback(orte_jobid_t jobid, orte_proc_state_t proc_state)
 	}
 	
 	if (j != NULL) {
-		asprintf(&res, "%d %d %d", RTEV_JOBSTATE, j->ptp_jobid, state);
-		AddToList(eventList, (void *)res);
+		sendJobStateChangeEvent(gTransID, j->ptp_jobid, state);
 	}
-	printf("state callback returning state=%d\n", state); fflush(stdout);
-}
-
-/*
- * Send a command to the ORTE daemon.
- * 
- * Currently only used to request the daemon to exit.
- */
-static int 
-orte_console_send_command(orte_daemon_cmd_flag_t usercmd)
-{
-    orte_buffer_t *cmd;
-    orte_daemon_cmd_flag_t command;
-    orte_process_name_t    seed = {0,0,0};
-    int rc;
-
-    cmd = OBJ_NEW(orte_buffer_t);
-    if (NULL == cmd) {
-        ORTE_ERROR_LOG(ORTE_ERROR);
-        return ORTE_ERROR;
-    }
-
-    command = usercmd;
-
-    rc = ORTE_PACK(cmd, &command, 1, ORTE_DAEMON_CMD);
-    if ( ORTE_SUCCESS != rc ) {
-        ORTE_ERROR_LOG(rc);
-        OBJ_RELEASE(cmd);
-        return rc;
-    } 
-
-    rc = orte_rml.send_buffer(&seed, cmd, ORTE_RML_TAG_DAEMON, 0);
-    if ( 0 > rc ) {
-        ORTE_ERROR_LOG(ORTE_ERR_COMM_FAILURE);
-        OBJ_RELEASE(cmd);
-        return ORTE_ERR_COMM_FAILURE;
-    }
-
-    OBJ_RELEASE(cmd);
-
-    return ORTE_SUCCESS;
+	printf("state callback returning state=%s\n", state); fflush(stdout);
 }
 
 #if !ORTE_VERSION_1_0
+/*
+ * Called to get process info when a new job is created. Subsequent calls will
+ * result in process change events if anything has changed.
+ */
 static void
-get_proc_info(orte_jobid_t jobid, int ptpid)
+get_proc_info(ptp_job *j)
 {
 	int					i;
 	int					rc;
+	int					new_job = EmptyList(j->procs);
+	ptp_process *		p;
 	char *				segment = NULL;
 	ORTE_STD_CNTR_TYPE	cnt;
 	orte_gpr_value_t **	values;
@@ -1523,7 +813,7 @@ get_proc_info(orte_jobid_t jobid, int ptpid)
 		NULL
 	};
 	
-   if((rc = orte_schema.get_job_segment_name(&segment, jobid)) != ORTE_SUCCESS) {
+   if((rc = orte_schema.get_job_segment_name(&segment, j->orte_jobid)) != ORTE_SUCCESS) {
         ORTE_ERROR_LOG(rc);
         return;
     }
@@ -1536,70 +826,51 @@ get_proc_info(orte_jobid_t jobid, int ptpid)
 	
     for (i = 0; i < cnt; i++) {
     	int					k;
-		int					num = 0;
-		char *				res;
-		char *				str1;
-		char *				str2;
+    	int					pid = 0;
+    	int					task_id = 0;
+    	int					node_id = 0;
+    	ptp_node *			node;
 		pid_t	*			pidptr;
-		orte_std_cntr_t		rank = 0;
 		orte_std_cntr_t		*rankptr;
 		orte_gpr_value_t *	value = values[i];
 		
-		res = NULL;
-		
+		/*
+		 * Find process rank. Make sure it gets added to event before
+		 * the other attributes.
+		 */
 		for(k = 0; k < value->cnt; k++) {
-			char *				kv1;
-			char *				kv2;
 			orte_gpr_keyval_t *	keyval = value->keyvals[k];
-			
-			if(strcmp(keyval->key, ORTE_NODE_NAME_KEY) == 0) {
-				asprintf(&kv1, "%s=%s", ATTRIB_PROCESS_NODE_NAME, (char*)(keyval->value->data));
-				proxy_cstring_to_str(kv1, &str1);
-				free(kv1);
-				num |= 1;
- 				continue;               
-			}
-			if(strcmp(keyval->key, ORTE_PROC_LOCAL_PID_KEY) == 0) {
-				if (ORTE_SUCCESS != (rc = orte_dss.get((void**)&pidptr, keyval->value, ORTE_PID))) {
-					ORTE_ERROR_LOG(rc);
-					continue;          
-				}       
-				asprintf(&kv2, "%s=%d", ATTRIB_PROCESS_PID, *pidptr);
-				proxy_cstring_to_str(kv2, &str2);
-				free(kv2);
-				num |= 2;
-				continue;               
-			}
 			if(strcmp(keyval->key, ORTE_PROC_RANK_KEY) == 0) {
 				if (ORTE_SUCCESS != (rc = orte_dss.get((void**)&rankptr, keyval->value, ORTE_STD_CNTR))) {
 					ORTE_ERROR_LOG(rc);
 					continue;          
 				}
-				rank = *rankptr;
-				continue;               
+				task_id = *rankptr;       
+			} else if(strcmp(keyval->key, ORTE_NODE_NAME_KEY) == 0) {
+				node = find_node_by_name((char*)(keyval->value->data));
+				if (node != NULL)
+					node_id = node->id;             
+			} else if(strcmp(keyval->key, ORTE_PROC_LOCAL_PID_KEY) == 0) {
+				if (ORTE_SUCCESS != (rc = orte_dss.get((void**)&pidptr, keyval->value, ORTE_PID))) {
+					ORTE_ERROR_LOG(rc);
+					continue;          
+				}       
+				pid = *pidptr;          
 			}
-					
 		}
 		
-		switch (num) {
-		case 1:
-	    	asprintf(&res, "%d %d 0:0 1:0 1 %d %s", RTEV_PATTR, ptpid, rank, str1);
-			free(str1);
-			break;
-		case 2:
-			asprintf(&res, "%d %d 0:0 1:0 1 %d %s", RTEV_PATTR, ptpid, rank, str2);
-			free(str2);
-			break;
-		case 3:
-			asprintf(&res, "%d %d 0:0 1:0 2 %d %s %d %s", RTEV_PATTR, ptpid, rank, str1, rank, str2);
-			free(str1);
-			free(str2);
-			break;
+		if (new_job) {
+			p = new_process(j, node_id, task_id, pid);
+	    	sendNewProcessEvent(gTransID, j->ptp_jobid, p);
+		} else {
+			p = (ptp_process *)GetListElement(j->procs);
+			if (p != NULL) {
+				sendProcessChangeEvent(gTransID, p, node_id, task_id, pid);
+			}
 		}
-		
-		if (res != NULL)
-			AddToList(eventList, (void *)res);
     }
+    
+    SetList(j->procs);
 }
 #endif /* !ORTE_VERSION_1_0 */
 
@@ -1646,46 +917,6 @@ cleanup:
 }
 #endif /* ORTE_VERSION_1_0 */
 
-/*
-** Very inefficient! Probably better to build a data structure
-** from keyvals, then work with that.
-*/
-static int 
-get_ui32_value(orte_gpr_value_t *value, char *key)
-{
-    int k;
-
-    for(k=0; k<value->cnt; k++) {
-        orte_gpr_keyval_t* keyval = value->keyvals[k];
-        if (strcmp(key, keyval->key) == 0) {
-			return ORTE_GET_UINT32_VALUE(keyval);
-        }
-    }
-
-    return -1;
-}
-
-/*
-** Ditto.
-*/
-static char *
-get_str_value(orte_gpr_value_t *value, char *key)
-{
-    int		k;
-    char *	tmp_str;
-
-    for(k=0; k<value->cnt; k++) {
-		orte_gpr_keyval_t* keyval = value->keyvals[k];
-        if (strcmp(key, keyval->key) == 0) {
-            if ((tmp_str = ORTE_GET_STRING_VALUE(keyval)) == NULL)
-            	return "";
-			return tmp_str;
-        }
-	}
-
-    return "";
-}
-
 static int
 get_num_nodes(int machid)
 {
@@ -1714,328 +945,1125 @@ get_num_machines()
 	return 1;
 }
 
+static int
+get_node_attributes(ptp_machine *mach, ptp_node **first_node, ptp_node **last_node)
+{
+	int					rc;
+	int					i;
+	char *				name;
+	char *				user;
+	char *				group;
+	char *				status;
+	char *				mode = NULL;
+	ptp_node *			node;
+	ORTE_STD_CNTR_TYPE	cnt;
+	orte_gpr_value_t **	values;
+#ifndef HAVE_SYS_BPROC_H
+	struct passwd *		pwd = getpwuid(geteuid());
+	struct group *		grp = getgrgid(getgid());
+	
+	user = pwd->pw_name;
+	group = grp->gr_name;
+	asprintf(&status, "%d", NODE_STATE_UP);
+#endif /* HAVE_SYS_BPROC_H */
+
+	rc = orte_gpr.get(ORTE_GPR_KEYS_OR | ORTE_GPR_TOKENS_OR, ORTE_NODE_SEGMENT, NULL, NULL, &cnt, &values);
+	if (rc != ORTE_SUCCESS)
+		return 1;
+		
+	for (i = 0; i < cnt; i++) {
+    	int					k;
+		orte_gpr_value_t *	value = values[i];
+		
+		for(k = 0; k < value->cnt; k++) {
+			orte_gpr_keyval_t *	keyval = value->keyvals[k];
+			
+			if (strcmp(keyval->key, ORTE_NODE_NAME_KEY) == 0) {
+				name = ORTE_GET_STRING_VALUE(keyval);
+			}              
+#ifdef HAVE_SYS_BPROC_H
+			else if (strcmp(input_keys[j], ORTE_SOH_BPROC_NODE_USER) == 0) {
+				user = ORTE_GET_STRING_VALUE(keyval);
+			} else if (!strcmp(input_keys[j], ORTE_SOH_BPROC_NODE_GROUP) == 0) {
+				group = ORTE_GET_STRING_VALUE(keyval);
+			} else if (!strcmp(input_keys[j], ORTE_SOH_BPROC_NODE_STATUS) == 0) {
+				status = ORTE_GET_STRING_VALUE(keyval);
+			} else if (!strcmp(input_keys[j], ORTE_SOH_BPROC_NODE_MODE) == 0) {
+				asprintf(&mode, "%s", ORTE_GET_UINT32_VALUE(keyval));
+			}
+#endif  /* HAVE_SYS_BPROC_H */			
+		}
+		
+		node = new_node(mach, name, status, user, group, mode);
+		if (i == 0)
+			*first_node = node;
+			
+#ifdef HAVE_SYS_BPROC_H
+		free(mode);
+#endif /* HAVE_SYS_BPROC_H */
+    }
+    
+    *last_node = node;
+
+#ifndef  HAVE_SYS_BPROC_H
+	free(status);
+#endif  /* HAVE_SYS_BPROC_H */
+
+	return 0;
+}
+
 /*
- * Initiates the discovery phase.
- * This fires up some talks with ORTE to ask it about the machines
- * it knows about, the nodes, and the attributes associated with
- * those nodes.
+ * If we're under debug control, let the debugger handle process state update. 
+ * We still want to wire up stdio though.
  * 
- * even though there CAN be args, we don't use them at this time
+ * Note: this will only be used if the debugger allows the program to
+ * reach MPI_Init(), which may not ever happen. Don't rely this to do anything
+ * for any type of job.
+ * 
+ * Note also: the debugger manages process state updates so we don't need
+ * to send events back to the runtime.
+ */
+static void
+debug_app_job_state_callback(orte_jobid_t jobid, orte_proc_state_t state)
+{
+	switch(state) {
+		case ORTE_PROC_STATE_TERMINATED:
+		case ORTE_PROC_STATE_ABORTED:
+			if (orte_job_record_started(jobid)) {
+				orte_job_record_end(jobid);
+			}
+			break;
+	}
+}
+
+/*
+ * job_state_callback for the debugger. Detects debugger start and exit and notifies the
+ * UI. Cleans up job id map.
+ */
+static void
+debug_job_state_callback(orte_jobid_t jobid, orte_proc_state_t state)
+{
+	int				app_jobid;
+	char *			job_state;
+	ptp_job	*		j;
+	
+	if ((j = find_job(jobid, JOBID_DEBUG)) == NULL)
+		return;
+	
+	app_jobid = j->ptp_jobid;
+	
+	switch(state) {
+#if !ORTE_VERSION_1_0
+		case ORTE_JOB_STATE_AT_STG2:
+#endif /* !ORTE_VERSION_1_0 */
+		case ORTE_JOB_STATE_RUNNING:
+			job_state = JOB_STATE_RUNNING;
+			break;
+		case ORTE_PROC_STATE_TERMINATED:
+		case ORTE_PROC_STATE_ABORTED:
+			job_state = JOB_STATE_TERMINATED;
+           	remove_job(jobid, JOBID_DEBUG);
+    		break;
+    	default:
+    		return;
+	}
+	
+	sendJobStateChangeEvent(gTransID, app_jobid, job_state);
+}
+
+/*
+ * Debug spawner. To spawn a debug job, two process allocations must be made. 
+ * This first is for the application and the second for the debugger (which is
+ * an MPI program). We then launch the debugger, and let it deal with starting
+ * the application processes.
+ * 
+ * This will need to be modified to support attaching.
+ */
+static int
+debug_spawn(char *debug_path, int argc, char **argv, orte_app_context_t** app_context, size_t num_context, orte_jobid_t* app_jobid, orte_jobid_t* debug_jobid)
+{
+	int						i;
+	int						rc;
+	orte_jobid_t			jid1;
+	orte_jobid_t			jid2;
+	orte_app_context_t *	debug_context;
+
+	rc = ORTE_ALLOCATE_JOB(app_context, num_context, &jid1, debug_app_job_state_callback);
+	if (rc != ORTE_SUCCESS) {
+		ORTE_ERROR_LOG(rc);
+		return rc;
+	}
+
+	debug_context = OBJ_NEW(orte_app_context_t);
+	debug_context->num_procs = app_context[0]->num_procs + 1;
+	debug_context->app = strdup(debug_path);
+	debug_context->cwd = strdup(app_context[0]->cwd);
+	/* no special environment variables */
+#if ORTE_VERSION_1_0
+	debug_context->num_env = 0;
+#endif /* ORTE_VERSION_1_0 */
+	debug_context->env = NULL;
+	/* no special mapping of processes to nodes */
+	debug_context->num_map = 0;
+	debug_context->map_data = NULL;
+	/* setup argv */
+	debug_context->argv = (char **)malloc((argc+2) * sizeof(char *));
+	for (i = 0; i < argc; i++) {
+		debug_context->argv[i] = strdup(argv[i]);
+	}
+	asprintf(&debug_context->argv[i++], "--jobid=%d", jid1);
+	debug_context->argv[i++] = NULL;
+#if ORTE_VERSION_1_0
+	debug_context->argc = i;
+#endif /* ORTE_VERSION_1_0 */
+
+	rc = ORTE_ALLOCATE_JOB(&debug_context, 1, &jid2, debug_job_state_callback);
+	if (rc != ORTE_SUCCESS) {
+		OBJ_RELEASE(debug_context);
+		ORTE_ERROR_LOG(rc);
+		return rc;
+	}
+
+	/*
+	 * launch the debugger
+	 */
+	if (ORTE_SUCCESS != (rc = ORTE_LAUNCH_JOB(jid2))) {
+		OBJ_RELEASE(debug_context);
+		ORTE_ERROR_LOG(rc);
+		return rc;
+	}
+
+	*app_jobid = jid1;
+	*debug_jobid = jid2;
+    
+    OBJ_RELEASE(debug_context);
+    
+	return ORTE_SUCCESS;
+}
+
+int
+do_orte_init(int trans_id, char *universe_name)
+{
+	int rc;
+	char *str;
+		
+	printf("ORTEInit (%s)\n", universe_name); fflush(stdout);
+	asprintf(&str, "OMPI_MCA_universe=%s", universe_name);
+	putenv(str);
+	
+	/* 
+	 * make the orte_init() fail if the orte daemon isn't running
+	 */
+	putenv("OMPI_MCA_orte_univ_exist=1");
+
+	rc = orte_init(true);
+	
+	if(ORTECheckErrorCode(trans_id, RTEV_ERROR_ORTE_INIT, rc)) return 1;
+	
+	/* this code was given to me to put in here to force the system to populate the node segment
+	 * in ORTE.  It basically crashes us if we use our own universe name.  I'm leaving it here
+	 * because I think one day we might be able to find a way to use this right. */
+#if 0
+	{
+	orte_ras_base_module_t *module = NULL;
+  	orte_jobid_t jobid = 1;
+	printf("Calling RDS_base_query() . . .\n"); fflush(stdout);
+	orte_rds_base_query();
+	printf("Calling RAS_Base_allocate() . . .\n"); fflush(stdout);
+	orte_ras_base_allocate(jobid, &module);
+	printf("Success with BOTH!\n"); fflush(stdout);
+	}
+#endif
+	
+	proxy_initialized = true;
+	
+	return 0;
+}
+
+#if ORTE_VERSION_1_0
+/*
+ * This callback gets invoked when any attributes of a process get changed.
+ */
+static void 
+job_proc_notify_callback(orte_gpr_notify_data_t *data, void *cbdata)
+{
+	int						len;
+	size_t					i;
+	size_t					j;
+	size_t					k;
+	orte_gpr_value_t **		values;
+	orte_gpr_value_t *		value;
+	orte_gpr_keyval_t **	keyvals;
+	ptp_job *				job = (ptp_job *)cbdata;
+	char *					str1;
+	char *					str2;
+	char *					res;
+	char *					kv = NULL;
+	char *					vpid = NULL;
+	
+	values = (orte_gpr_value_t**)(data->values)->addr;
+	
+	for(i=0, k=0; k<data->cnt && i < (data->values)->size; i++) {
+		if(values[i] == NULL) continue;
+		
+		k++;
+		value = values[i];
+		keyvals = value->keyvals;
+		
+		len = strlen(ORTE_VPID_KEY);
+		
+		if (strlen(value->tokens[1]) <= len
+			|| strncmp(value->tokens[1], ORTE_VPID_KEY, len) != 0)
+			continue;
+			
+		asprintf(&vpid, "%s", value->tokens[1]+len+1);
+		
+		for(j=0; j<value->cnt; j++) {
+			orte_gpr_keyval_t *keyval = keyvals[j];
+			char *external_key = NULL;
+			char * tmp_str = NULL;
+
+			if (!strcmp(keyval->key, ORTE_NODE_NAME_KEY))
+				asprintf(&external_key, "%s", ATTRIB_PROCESS_NODE_NAME);
+			else if (!strcmp(keyval->key, ORTE_PROC_PID_KEY))
+				asprintf(&external_key, "%s", ATTRIB_PROCESS_PID);
+			else
+				external_key = strdup(keyval->key);
+
+			if (external_key != NULL) {					
+				switch(ORTE_KEYVALUE_TYPE(keyval)) {
+					case ORTE_STRING:
+						if ((tmp_str = ORTE_GET_STRING_VALUE(keyval)) != NULL);
+							asprintf(&kv, "%s=%s", external_key, tmp_str);
+						break;
+					case ORTE_UINT32:
+						asprintf(&kv, "%s=%d", external_key, ORTE_GET_UINT32_VALUE(keyval));
+						break;
+					case ORTE_PID:
+						asprintf(&kv, "%s=%d", external_key, ORTE_GET_PID_VALUE(keyval));
+						break;
+					default:
+						asprintf(&kv, "%s=<unknown type>%d", external_key, ORTE_KEYVALUE_TYPE(keyval));
+						break;
+				}
+	
+				if (kv != NULL) {
+					if (job != NULL) {
+						proxy_cstring_to_str("", &str1);
+						proxy_cstring_to_str(kv, &str2);
+						asprintf(&res, "%d %d 0:0 %s 1 %s %s", RTEV_PATTR, job->ptp_jobid, str1, vpid, str2);
+			        	AddToList(eventList, (void *)res);
+			        	free(str1);
+			        	free(str2);
+					}
+					free(kv);
+					kv = NULL;
+				}
+				
+				free(external_key);
+	        }
+		}
+		
+		free(vpid);
+	}
+}
+
+/*
+ * Subscribe to attribute changes for 'procid' in 'job'.
+ */
+static int
+subscribe_proc(ptp_job * job, int procid)
+{
+	int							i;
+	int							rc;
+	char *						jobid_str;
+	orte_gpr_subscription_t 	sub;
+	orte_gpr_subscription_t *	subs;
+	orte_gpr_value_t			value;
+	orte_gpr_value_t *			values;
+	orte_process_name_t			proc;
+
+	printf("subscribing proc %d\n", procid); fflush(stdout);
+	
+	rc = orte_ns.convert_jobid_to_string(&jobid_str, job->orte_jobid);
+	if(rc != ORTE_SUCCESS) {
+		printf("ERROR: '%s'\n", ORTE_ERROR_NAME(rc)); fflush(stdout);
+		return -1;
+	}
+		
+	OBJ_CONSTRUCT(&sub, orte_gpr_subscription_t);
+	sub.action = ORTE_GPR_NOTIFY_VALUE_CHG;
+	
+	OBJ_CONSTRUCT(&value, orte_gpr_value_t);
+	values = &value;
+	sub.values = &values;
+	sub.cnt = 1; /* number of values */
+	value.addr_mode = ORTE_GPR_TOKENS_XAND | ORTE_GPR_KEYS_OR;
+	asprintf(&value.segment, "%s-%s", ORTE_JOB_SEGMENT, jobid_str);
+	
+	value.cnt = 3; /* number of keyvals */
+	value.keyvals = (orte_gpr_keyval_t**)malloc(value.cnt * sizeof(orte_gpr_keyval_t*));
+	
+	i = 0;
+	
+	value.keyvals[i] = OBJ_NEW(orte_gpr_keyval_t);
+	value.keyvals[i++]->key = strdup(ORTE_NODE_NAME_KEY);
+
+	value.keyvals[i] = OBJ_NEW(orte_gpr_keyval_t);
+	value.keyvals[i++]->key = strdup(ORTE_PROC_PID_KEY);
+	
+	value.keyvals[i] = OBJ_NEW(orte_gpr_keyval_t);
+	value.keyvals[i++]->key = strdup(ORTE_PROC_NAME_KEY);
+
+	proc.cellid = 0;
+	proc.jobid = job->orte_jobid;
+	proc.vpid = procid;
+	
+	orte_schema.get_proc_tokens(&value.tokens, &value.num_tokens, &proc); /* TODO: what frees tokens? */
+	
+	sub.cbfunc = job_proc_notify_callback;
+	sub.user_tag = (void *)job;
+	
+	subs = &sub;
+	rc = orte_gpr.subscribe(1, &subs, 0, NULL);
+	
+	if(ORTECheckErrorCode(RTEV_ERROR_ORTE_BPROC_SUBSCRIBE, rc)) return 1;
+	
+	return 0;
+}
+
+/*
+ * Subscribe to all processes in a job. 
+ * 
+ * It would be nice if there was a more efficient way of doing this.
+ */
+int 
+subscribe_job(orte_jobid_t jobid)
+{
+	int			rc;
+	int			vpid;
+	int			vpid_start;
+	int			vpid_range;
+	ptp_job *	job;
+	
+	if (ORTE_SUCCESS != (rc = ORTE_GET_VPID_RANGE(jobid, &vpid_start, &vpid_range))) {
+		printf("no processes for job\n"); fflush(stdout);
+		return -1;
+	}
+	
+	job = find_job(jobid, JOBID_ORTE);
+	if (job != NULL) {
+		printf("subscribing %d procs\n", vpid_range); fflush(stdout);
+		
+		for (vpid = vpid_start; vpid < vpid_start + vpid_range; vpid++)
+			subscribe_proc(job, vpid);
+	}
+		
+	return 0;
+}
+#endif /* ORTE_VERSION_1_0 */
+
+#ifdef HAVE_SYS_BPROC_H
+/*
+ * This callback gets invoked when any of the bproc specific state of health attributes
+ * change. These are all node-related events, so this is really the monitoring
+ * functions for bproc support.
+ */
+static void 
+bproc_notify_callback(orte_gpr_notify_data_t *data, void *cbdata)
+{
+	size_t i, j, k;
+	orte_gpr_value_t **values, *value;
+	orte_gpr_keyval_t **keyvals;
+	char *res, *kv, *str1, *str2, *str3, *foo, *bar, *nodename;
+	int machID;
+	
+	printf("BPROC NOTIFY CALLBACK!\n"); fflush(stdout);
+	
+	values = (orte_gpr_value_t**)(data->values)->addr;
+	
+	machID = 0;
+	
+	for(i=0, k=0; k<data->cnt && i < (data->values)->size; i++) {
+		if(values[i] == NULL) continue;
+		
+		k++;
+		value = values[i];
+		keyvals = value->keyvals;
+		
+		asprintf(&nodename, "%s", value->tokens[1]);
+		printf("NODE NAME = %s\n", nodename);
+		
+		for(j=0; j<value->cnt; j++) {
+			orte_gpr_keyval_t *keyval = keyvals[j];
+			char *external_key;
+			
+			printf("--- BPROC CHANGE: key = %s\n", keyval->key); fflush(stdout);
+			
+			if(!strcmp(keyval->key, ORTE_NODE_NAME_KEY))
+				asprintf(&external_key, "%s", ATTRIB_NODE_NAME);
+			else if(!strcmp(keyval->key, ORTE_SOH_BPROC_NODE_USER))
+				asprintf(&external_key, "%s", ATTRIB_NODE_USER);
+			else if(!strcmp(keyval->key, ORTE_SOH_BPROC_NODE_GROUP))
+				asprintf(&external_key, "%s", ATTRIB_NODE_GROUP);
+			else if(!strcmp(keyval->key, ORTE_SOH_BPROC_NODE_STATUS) || !strcmp(keyval->key, ORTE_NODE_STATE_KEY))
+				asprintf(&external_key, "%s", ATTRIB_NODE_STATE);
+			else if(!strcmp(keyval->key, ORTE_SOH_BPROC_NODE_MODE))
+				asprintf(&external_key, "%s", ATTRIB_NODE_MODE);
+			else
+				printf("******************* Unknown key type on bproc event - key = '%s'\n", keyval->key); fflush(stdout);
+					
+			switch(keyval->type) {
+				case ORTE_NODE_STATE:
+					printf("--- BPROC CHANGE: (state) val = %d\n", keyval->value.node_state); fflush(stdout);
+					asprintf(&kv, "%s=%d", external_key, keyval->value.node_state);
+					break;
+				case ORTE_STRING:
+					printf("--- BPROC CHANGE: (str) val = %s\n", keyval->value.strptr); fflush(stdout);
+					asprintf(&kv, "%s=%s", external_key, keyval->value.strptr);
+					break;
+				case ORTE_UINT32:
+					printf("--- BPROC CHANGE: (uint32) val = %d\n", keyval->value.ui32); fflush(stdout);
+					asprintf(&kv, "%s=%d", external_key, keyval->value.ui32);
+					break;
+				default:
+					printf("--- BPROC CHANGE: unknown type %d\n", keyval->type); fflush(stdout);
+					asprintf(&kv, "%s=%d", external_key, keyval->type);
+			}
+			
+			
+			asprintf(&foo, "%s=%d", ATTRIB_MACHIINEID, 0);
+			asprintf(&bar, "%s=%s", ATTRIB_NODE_NUMBER, nodename); /* for bproc the node number is the same as the name */
+			asprintf(&bar, "%s=%s", ATTRIB_NODE_NAME, nodename);
+			proxy_cstring_to_str(foo, &str1);
+			proxy_cstring_to_str(bar, &str2);
+			proxy_cstring_to_str(kv, &str3);
+			asprintf(&res, "%d %s %s %s", RTEV_NATTR, str1, str2, str3);
+			AddToList(eventList, (void *)res);
+			
+        	free(kv);
+			free(external_key);
+        	free(foo);
+        	free(bar);
+        	free(str1);
+        	free(str2);
+        	free(str3);
+        }
+		
+		free(nodename);
+	}
+}
+
+/*
+ * Subscribe to the bproc specific attribute changes.
+ */
+int 
+subscribe_bproc(void)
+{
+	int i, rc;
+	orte_gpr_subscription_t sub, *subs;
+	orte_gpr_value_t value, *values;
+	
+	OBJ_CONSTRUCT(&sub, orte_gpr_subscription_t);
+	sub.action = ORTE_GPR_NOTIFY_VALUE_CHG;
+	
+	OBJ_CONSTRUCT(&value, orte_gpr_value_t);
+	values = &value;
+	sub.values = &values;
+	sub.cnt = 1; /* number of values */
+	value.addr_mode = ORTE_GPR_TOKENS_XAND | ORTE_GPR_KEYS_OR;
+	value.segment = strdup(ORTE_NODE_SEGMENT);
+	
+	value.cnt = 6; /* number of keyvals */
+	value.keyvals = (orte_gpr_keyval_t**)malloc(value.cnt * sizeof(orte_gpr_keyval_t*));
+	
+	i = 0;
+	
+	value.keyvals[i] = OBJ_NEW(orte_gpr_keyval_t);
+	value.keyvals[i++]->key = strdup(ORTE_NODE_NAME_KEY);
+	
+	value.keyvals[i] = OBJ_NEW(orte_gpr_keyval_t);
+	value.keyvals[i++]->key = strdup(ORTE_NODE_STATE_KEY);
+	
+	value.keyvals[i] = OBJ_NEW(orte_gpr_keyval_t);
+	value.keyvals[i++]->key = strdup(ORTE_SOH_BPROC_NODE_STATUS);
+	
+	value.keyvals[i] = OBJ_NEW(orte_gpr_keyval_t);
+	value.keyvals[i++]->key = strdup(ORTE_SOH_BPROC_NODE_MODE);
+	
+	value.keyvals[i] = OBJ_NEW(orte_gpr_keyval_t);
+	value.keyvals[i++]->key = strdup(ORTE_SOH_BPROC_NODE_USER);
+	
+	value.keyvals[i] = OBJ_NEW(orte_gpr_keyval_t);
+	value.keyvals[i++]->key = strdup(ORTE_SOH_BPROC_NODE_GROUP);
+	
+	/* any token */
+	value.tokens = NULL;
+	value.num_tokens = 0;
+	
+	sub.cbfunc = bproc_notify_callback;
+	sub.user_tag = NULL;
+	
+	subs = &sub;
+	rc = orte_gpr.subscribe(1, &subs, 0, NULL);
+	
+	if(ORTECheckErrorCode(RTEV_ERROR_ORTE_BPROC_SUBSCRIBE, rc)) return 1;
+	
+	return 0;
+}
+#endif
+
+/* 
+ * tell the daemon to exit 
  */
 int
-ORTEDiscover(char **args)
-{	
-	int 			num_machines;
-	int				machid;
-	int				nodeid;
-	char *			res;
-	int				num_nodes;
-	int				num_keys;
-	int				i;
-	char **			internal_keys = NULL;
-	char **			external_keys = NULL;
-	char **			values = NULL;
-	int *			types = NULL;
-	int				tot_len;
-	char *			valstr = NULL;
-	int				values_len;
-	char *			str1;
-	char *			str2;
-	char *			str3;
-	char *			str4;
-	char *			str5;
-	char *			str6;
-	char *			str7;
+do_orte_shutdown(void)
+{
+	printf("ORTEShutdown() called.  Telling daemon to turn off.\n"); fflush(stdout);
+	ORTE_SHUTDOWN();
+	printf("ORTEShutdown() - told ORTEd to exit.\n"); fflush(stdout);
 	
-	/* first set up the keys we're interested in about the nodes we'll
-	 * discover */
-	 
-	/* how many keys do we send back? */
-	num_keys = 7;
-	internal_keys = (char**)malloc(num_keys*sizeof(char*));
-	external_keys = (char**)malloc(num_keys*sizeof(char*));
-	types = (int*)malloc((num_keys)*sizeof(int));
-	 
-	asprintf(&(internal_keys[0]), "%s", "machine_id");
-	asprintf(&(external_keys[0]), "%s", ATTRIB_MACHINEID);
-	types[0] = PTP_UINT32;
-	asprintf(&(internal_keys[1]), "%s", "node_number");
-	asprintf(&(external_keys[1]), "%s", ATTRIB_NODE_NUMBER);
-	types[1] = PTP_UINT32;
-	/* set up the keys we know about in ORTE and BPROC */
-	asprintf(&(internal_keys[2]), "%s", ORTE_NODE_NAME_KEY);
-	asprintf(&(external_keys[2]), "%s", ATTRIB_NODE_NAME);
-	types[2] = PTP_STRING;
-	asprintf(&(internal_keys[3]), "%s", ORTE_SOH_BPROC_NODE_USER);
-	asprintf(&(external_keys[3]), "%s", ATTRIB_NODE_USER);
-	types[3] = PTP_STRING;
-	asprintf(&(internal_keys[4]), "%s", ORTE_SOH_BPROC_NODE_GROUP);
-	asprintf(&(external_keys[4]), "%s", ATTRIB_NODE_GROUP);
-	types[4] = PTP_STRING;
-	asprintf(&(internal_keys[5]), "%s", ORTE_SOH_BPROC_NODE_STATUS);
-	asprintf(&(external_keys[5]), "%s", ATTRIB_NODE_STATE);
-	types[5] = PTP_STRING;
-	asprintf(&(internal_keys[6]), "%s", ORTE_SOH_BPROC_NODE_MODE);
-	asprintf(&(external_keys[6]), "%s", ATTRIB_NODE_MODE);
-	types[6] = PTP_UINT32;
+	orte_finalize();
+	
+	return 0;
+}
 
+/* 
+ * Check for events and call appropriate progress hooks.
+ */
+int
+do_orte_progress(void)
+{	
+	/* only run the progress of the ORTE code if we've initted the ORTE daemon */
+	if(proxy_initialized && !proxy_shutdown) {
+		opal_event_loop(OPAL_EVLOOP_ONCE);
+	}
+	
+	return PROXY_RES_OK;
+}
+
+/******************************
+ * START OF DISPATCH ROUTINES *
+ ******************************/
+int
+ORTE_Initialize(int trans_id, int nargs, char **args)
+{
+	int				n;
+	int				ret;
+	int				pfd[2];
+	char *			res;
+	char *			universe_name;
+	char			buf[BUFSIZ];
+	fd_set			fds;
+	struct timeval	timeout;
+	
+	fprintf(stdout, "ORTE_Initialize (%d):\n", trans_id); fflush(stdout);
+	
+	if (proxy_initialized) {
+		sendErrorEvent(trans_id, RTEV_ERROR_ORTE_INIT, "already initialized");
+		return 0;
+	}
+	
+	if (nargs < 2) {
+		sendErrorEvent(trans_id, RTEV_ERROR_ORTE_INIT, "incorrect arg count");
+		return 0;
+	}
+	
+	if (strcmp(args[0], WIRE_PROTOCOL_VERSION) != 0) {
+		sendErrorEvent(trans_id, RTEV_ERROR_ORTE_INIT, "wire protocol version \"%s\" not supported", args[0]);
+		return 0;
+	}
+	
+	gBaseID = strtol(args[1], NULL, 10);
+	
+	if (pipe(pfd) < 0)
+	{
+		sendErrorEvent(trans_id, RTEV_ERROR_ORTE_INIT, "pipe() failed for the orted spawn in ORTESpawnDaemon");
+		return 0;
+	}
+	
+	switch(orted_pid = fork()) {
+	case -1:
+		{
+			sendErrorEvent(trans_id, RTEV_ERROR_ORTE_INIT, "fork() failed for the orted spawn in ORTESpawnDaemon");
+			return 1;
+		}
+		break;
+	/* child */
+	case 0:
+		{
+			char **orted_args;
+			
+			proxy_svr_finish(orte_proxy);
+			
+			asprintf(&res, "%s --universe PTP-ORTE-%d --report-uri %d", DEFAULT_ORTED_ARGS, getpid(), pfd[1]);
+
+			orted_args  = Str2Args(res);
+			printf("StartDaemon(orted %s)\n", res); fflush(stdout);
+			free(res);
+			
+			/* spawn the daemon */
+			printf("CHILD: Starting execvp now!\n"); fflush(stdout);
+			errno = 0;
+			close(pfd[0]);
+
+			setsid();
+			ret = execvp("orted", orted_args);
+
+			FreeArgs(orted_args);
+			
+			if (ret != 0) {
+				printf("CHILD: error return from execvp, ret = %d, errno = %d\n", ret, errno); fflush(stdout);
+				printf("CHILD: PATH = %s\n", getenv("PATH")); fflush(stdout);
+				exit(ret);
+			}
+		}
+		break;
+    /* parent */
+    default:
+    	printf("PARENT: orted_pid = %d\n", orted_pid); fflush(stdout);
+    	
+		/* 
+		 * the daemon will report it's URI on the pipe when it's started up 
+		 */
+		timeout.tv_sec = 15;
+		timeout.tv_usec = 0;
+		FD_ZERO(&fds);
+		FD_SET(pfd[0], &fds);
+		
+		switch (select(pfd[0]+1, &fds, NULL, NULL, &timeout)) {
+		case -1:
+			/*
+			 * Something serious has gone wrong. Kill the orted and shut down.
+			 */
+			(void)kill(orted_pid, SIGKILL);
+			sendErrorEvent(trans_id, RTEV_ERROR_ORTE_INIT, "select() returned error");
+			return 0;
+		case 0:
+			/*
+			 * Timeout. Kill off orted (if it's running) and shut down.
+			 */
+			(void)kill(orted_pid, SIGKILL);
+			sendErrorEvent(trans_id, RTEV_ERROR_ORTE_INIT, "Timeout waiting for orted to start");
+			return 0;
+		default:
+			if ((n = read(pfd[0], buf, BUFSIZ-1)) > 0) {
+				buf[n] = '\0';
+				printf("PARENT: URI = %s\n", buf); fflush(stdout);
+			}
+		}
+
+		close(pfd[0]);
+		close(pfd[1]);
+		break;
+	}
+	
+	asprintf(&universe_name, "PTP-ORTE-%d", orted_pid);
+	
+	if (do_orte_init(trans_id, universe_name) != 0) {
+		free(universe_name);
+		return 0;
+	}
+	
+	free(universe_name);
+	
+#ifdef HAVE_SYS_BPROC_H
+	subscribe_bproc();
+#endif
+
+	ORTE_QUERY(ORTE_JOBID_INVALID);
+	
+	printf("Start daemon returning OK.\n");
+	sendOKEvent(trans_id);
+	
+	return 0;
+}
+
+/**
+ * Initiate the model definition phase
+ */
+int
+ORTE_ModelDef(int trans_id, int nargs, char **args)
+{
+	fprintf(stdout, "ORTE_ModelDef (%d):\n", trans_id); fflush(stdout);
+	
+	sendAttrDefStringEvent(trans_id, ATTRDEF_USER_KEY, "User", "User Name", "");
+	sendAttrDefStringEvent(trans_id, ATTRDEF_GROUP_KEY, "Group", "Group Name", "");
+	sendAttrDefIntEvent(trans_id, ATTRDEF_PID_KEY, "PID", "Process ID", 0);
+	sendAttrDefIntEvent(trans_id, ATTRDEF_TASKID_KEY, "TID", "Process Task ID", 0);
+	sendAttrDefStringEvent(trans_id, ATTRDEF_STDOUT_KEY, "Output", "Process Standard Output", "");
+
+	sendOKEvent(trans_id);
+	return PROXY_RES_OK;
+}
+
+/**
+ * Stop polling for LSF change events
+ */
+ int
+ORTE_StopEvents(int trans_id, int nargs, char **args)
+{
+	fprintf(stdout, "  ORTE_StopEvents (%d):\n", trans_id); fflush(stdout);
+	/* notification that start events have completed */
+	sendOKEvent(gTransID);
+	gTransID = 0;
+	sendOKEvent(trans_id);
+	return PROXY_RES_OK;	
+}
+
+/**
+ * Submit a job with the given executable path and arguments (remote call from a client proxy)
+ *
+ * TODO - what about queues, should there be a LSF_Submit?
+ */
+int
+ORTE_SubmitJob(int trans_id, int nargs, char **args)
+{
+	int						rc;
+	int						i;
+	int						a;
+	int						num_procs = 0;
+	int						debug = 0;
+	int						num_args = 0;
+	int						num_env = 0;
+	int						debug_argc = 0;
+	int						ptpid = 0;
+	char *					full_path;
+	char	 *				pgm_name = NULL;
+	char	 *				cwd = NULL;
+	char *					exec_path = NULL;
+	char *					debug_exec_path;
+	char **					debug_args;
+	char **					env = NULL;
+	orte_app_context_t *	apps;
+	orte_jobid_t			jobid = ORTE_JOBID_MAX;
+	orte_jobid_t			debug_jobid = -1;
+	ptp_job *				j;
+
+	if (!proxy_initialized) {
+		sendErrorEvent(trans_id, RTEV_ERROR_ORTE_INIT, "must call INIT first");
+		return PROXY_RES_OK;
+	}
+	
+	if (nargs < 1) {
+		sendErrorEvent(trans_id, RTEV_ERROR_ORTE_INIT, "incorrect arg count");
+		return PROXY_RES_OK;
+	}
+	
+	fprintf(stdout, "  ORTE_SubmitJob (%d): %s\n", trans_id, args[0]); fflush(stdout);
+
+	for (i = 0; i < nargs; i++) {
+		if (strncmp(args[i], "jobID=", 6) == 0) {
+			ptpid = (int)strtol(args[i]+6, NULL, 10);
+		} else if (strncmp(args[i], "execName=", 9) == 0) {
+			pgm_name = args[i]+9;
+		} else if (strncmp(args[i], "pathToExec=", 11) == 0) {
+			exec_path = args[i] + 11;
+		} else if (strncmp(args[i], "numOfProcs=", 11) == 0) {
+			num_procs = (int)strtol(args[i] + 11, NULL, 10);
+		} else if (strncmp(args[i], "procsPerNode=", 13) == 0) {
+			// not yet
+		} else if (strncmp(args[i], "firstNodeNum=", 13) == 0) {
+			// not yet
+		} else if (strncmp(args[i], "workingDir=", 11) == 0) {
+			cwd = args[i] + 11;
+		} else if (strncmp(args[i], "progArg=", 8) == 0) {
+			num_args++;
+		} else if (strncmp(args[i], "progEnv=", 8) == 0) {
+			num_env++;
+		} else if (strncmp(args[i], "debuggerPath=", 13) == 0) {
+			debug_exec_path = args[i] + 13;
+			debug = 1;
+		} else if (strncmp(args[i], "debuggerArg=", 12) == 0) {
+			debug_argc++;
+		}
+	}
+	
+	/*
+	 * Do some checking first
+	 */
+	 
+	if (pgm_name == NULL) {
+		sendErrorEvent(trans_id, RTEV_ERROR_ORTE_RUN, "Must specify a program name");
+		return PROXY_RES_OK;
+	}
+	
+	if (num_procs <= 0) {
+		sendErrorEvent(trans_id, RTEV_ERROR_ORTE_RUN, "Invalid number of processes");
+		return PROXY_RES_OK;
+	}
+	
+	/*
+	 * Must specify a working directory. For local launches, this is normally the project directory. For
+	 * remote launches, it will probably be the user's home directory.
+	 */
+	if (cwd == NULL) {
+		sendErrorEvent(trans_id, RTEV_ERROR_ORTE_RUN, "Must specify a working directory");
+		return PROXY_RES_OK;
+	}
+		
+	/*
+	 * Get supplied environment. It is used to locate executable if necessary.
+	 */
+	
+	if (num_env > 0) {
+		env = (char **)malloc((num_env + 1) * sizeof(char *));
+		for (i = 0, a = 0; i < nargs; i++) {
+			if (strncmp(args[i], "progEnv=", 8) == 0)
+				env[a++] = strdup(args[i] + 8);
+		}
+		env[a] = NULL;
+	}
+		
+	/*
+	 * If no path is specified, then try to locate execuable.
+	 */		
+	if (exec_path == NULL) {
+		full_path = opal_path_findv(pgm_name, 0, env, cwd);
+		if (full_path == NULL) {
+			sendErrorEvent(trans_id, RTEV_ERROR_ORTE_RUN, "Executuable not found");
+			return PROXY_RES_OK;
+		}
+	} else {
+		asprintf(&full_path, "%s/%s", exec_path, pgm_name);
+	}
+	
+	if (access(full_path, X_OK) < 0) {
+		sendErrorEvent(trans_id, RTEV_ERROR_ORTE_RUN, strerror(errno));
+		return PROXY_RES_OK;
+	}
+	
+	if (debug) {		
+		if (access(debug_exec_path, X_OK) < 0) {
+			printf("ERROR debug_exec_path = '%s' not found\n", debug_exec_path); fflush(stdout);
+			sendErrorEvent(trans_id, RTEV_ERROR_ORTE_RUN, strerror(errno));
+			return PROXY_RES_OK;
+		}
+		
+		debug_argc++;
+		debug_args = (char **)malloc((debug_argc+1) * sizeof(char *));
+		debug_args[0] = debug_exec_path;
+		for (i = 0, a = 1; i < nargs; i++) {
+			if (strncmp(args[i], "debuggerArg=", 12) == 0) {
+				debug_args[a++] = args[i] + 12;
+			}
+		}
+		debug_args[a] = NULL;
+	}
+
+	/* format the app_context_t struct */
+	apps = OBJ_NEW(orte_app_context_t);
+	apps->num_procs = num_procs;
+	apps->app = full_path;
+	apps->cwd = strdup(cwd);
+	/* no special environment variables */
+#if ORTE_VERSION_1_0
+	apps->num_env = num_env;
+#endif /* ORTE_VERSION_1_0 */
+	apps->env = env;
+	/* no special mapping of processes to nodes */
+	apps->num_map = 0;
+	apps->map_data = NULL;
+	/* setup argv */
+	apps->argv = (char **)malloc((num_args + 2) * sizeof(char *));
+	apps->argv[0] = strdup(full_path);
+	if (num_args > 0) {
+		for (i = 0, a = 1; i < nargs; i++) {
+			if (strncmp(args[i], "progArg=", 8) == 0)
+				apps->argv[a++] = strdup(args[i] + 8);
+		}
+	}
+	apps->argv[num_args+1] = NULL;
+#if ORTE_VERSION_1_0
+	apps->argc = num_args + 1;
+#endif /* ORTE_VERSION_1_0 */
+
+	printf("(debug ? %d) Spawning %d processes of job '%s'\n", debug, (int)apps->num_procs, apps->app);
+	printf("\tprogram name '%s'\n", apps->argv[0]);
+	fflush(stdout);
+	
+	/* calls the ORTE spawn function with the app to spawn.  Return the
+	 * jobid assigned by the registry/ORTE.  Passes a callback function
+	 * that ORTE will call with state change on this job */
+	if (debug) {
+		rc = debug_spawn(debug_exec_path, debug_argc, debug_args, &apps, 1, &jobid, &debug_jobid);
+		free(debug_args);
+	} else {
+		rc = ORTE_SPAWN(&apps, 1, &jobid, job_state_callback);
+	}
+	
+	printf("SPAWNED [error code %d = '%s'], now unlocking\n", rc, ORTE_ERROR_NAME(rc)); fflush(stdout);
+	
+	OBJ_RELEASE(apps);
+	
+	if(ORTECheckErrorCode(trans_id, RTEV_ERROR_ORTE_RUN, rc)) return 1;
+
+	printf("NEW JOBID = %d\n", (int)jobid); fflush(stdout);
+
+	/*
+	 * Send ok for job submission.
+	 */	
+	sendOKEvent(trans_id);
+	
+    j = new_job(ptpid, jobid, debug_jobid);
+	
+	/*
+	 * Fake a job state event
+	 */
+	sendJobStateChangeEvent(gTransID, ptpid, JOB_STATE_INIT);
+	
+	/*
+	 * Start I/O forwarding. Don't start it before we have
+	 * sent the new process events!
+	 */
+	if (!orte_job_record_started(jobid)) {
+		orte_job_record_start(jobid);
+	}
+
+#if ORTE_VERSION_1_0
+	subscribe_job(jobid);
+#else /* ORTE_VERSION_1_0 */
+	/*
+	 * If this is a debug job then the debugger will manage
+	 * process state. However we need to set up the process/node
+	 * mapping first. 
+	 * 
+	 * Also, we must create the process model elements before any
+	 * process change events are generated as a result of processes
+	 * writing to stdout.
+	 */
+	get_proc_info(j);
+#endif /* ORTE_VERSION_1_0 */
+	
+	return PROXY_RES_OK;
+}
+
+/* 
+ * terminate a job, given a jobid 
+ */
+int
+ORTE_TerminateJob(int trans_id, int nargs, char **args)
+{
+	int			rc;
+	int			jobid = (int)strtol(args[1], NULL, 10);
+	ptp_job *	j;
+	
+	if (!proxy_initialized) {
+		sendErrorEvent(trans_id, RTEV_ERROR_ORTE_INIT, "must call INIT first");
+		return PROXY_RES_OK;
+	}
+	
+	if ((j = find_job(jobid, JOBID_PTP)) != NULL) {
+		if (j->debug_jobid < 0)
+			rc = ORTE_TERMINATE_JOB(j->orte_jobid);
+		else
+			rc = ORTE_TERMINATE_JOB(j->debug_jobid);
+		
+		if(ORTECheckErrorCode(trans_id, RTEV_ERROR_TERMINATE_JOB, rc)) return 1;
+	}
+	
+	return PROXY_RES_OK;
+}
+
+/*
+ * Enables sending of events. The first thing that must be sent is a
+ * description of the model. This comprises new model element events
+ * for each element in the model. Once the model description has been
+ * sent, model change events will be sent as detected.
+ * 
+ */
+ int
+ORTE_StartEvents(int trans_id, int nargs, char **args)
+{
+	int 			num_machines;
+	int				m;
+	ptp_machine *	mach;
+	ptp_node *		node;
+	int				nodeid;
+	int				num_nodes;
+	
+	fprintf(stdout, "  ORTE_StartEvents (%d):\n", trans_id); fflush(stdout);
+
+	if (!proxy_initialized) {
+		sendErrorEvent(trans_id, RTEV_ERROR_ORTE_INIT, "must call INIT first");
+		return PROXY_RES_OK;
+	}
+
+	gTransID = trans_id;
+	
 	num_machines = get_num_machines();
 	
-	for(machid = 0; machid < num_machines; machid++) {
-		num_nodes = get_num_nodes(machid);
+	for(m = 0; m < num_machines; m++) {
+		mach = new_machine();
+		sendNewMachineEvent(trans_id, mach->id);
 		
-		values_len = num_keys * num_nodes;
-		values = (char**)malloc(values_len * sizeof(char*));
-
+		num_nodes = get_num_nodes(mach->id);
+		
 		/* 
-		 * if we know of no nodes, then we better just try something out I guess for this
-		 * node.  this is a huge hack :( 
+		 * if we know of no nodes, then just use the local machine
 		 */
 		if(num_nodes == 0) {
 			char hostname[256];
 			gid_t gid;
 			struct group *grp;
 			struct passwd *pwd;
-        	char * status = "up";
-        	char * mode = "73";
-        	char * tmpstr;
+			char *state;
 		
 			pwd = getpwuid(geteuid());
 			gid = getgid();
 			grp = getgrgid(gid);
-		
 			gethostname(hostname, 256);
-			printf("Hostname = '%s'\n", hostname); fflush(stdout);
-			printf("Username = '%s'\n", pwd->pw_name); fflush(stdout);
-			printf("Groupname = '%s'\n", grp->gr_name); fflush(stdout);
-		
-			/* 0 = machine 0 */
-			asprintf(&tmpstr, "%s=%d", external_keys[0], 0);
-			proxy_cstring_to_str(tmpstr, &str1);
-        	free(tmpstr);
-        	/* 0 = node 0 */
-			asprintf(&tmpstr, "%s=%d", external_keys[1], 0);
-			proxy_cstring_to_str(tmpstr, &str2);
-        	free(tmpstr);
-			asprintf(&tmpstr, "%s=%s", external_keys[2], hostname);
-        	proxy_cstring_to_str(tmpstr, &str3);
-        	free(tmpstr);
-        	asprintf(&tmpstr, "%s=%s", external_keys[3], pwd->pw_name);
-        	proxy_cstring_to_str(tmpstr, &str4);
-        	free(tmpstr);
-        	asprintf(&tmpstr, "%s=%s", external_keys[4], grp->gr_name);
-        	proxy_cstring_to_str(tmpstr, &str5);
-        	free(tmpstr);
-        	asprintf(&tmpstr, "%s=%s", external_keys[5], status);
-        	proxy_cstring_to_str(tmpstr, &str6);
-        	free(tmpstr);
-        	asprintf(&tmpstr, "%s=%s", external_keys[6], mode);
-        	proxy_cstring_to_str(tmpstr, &str7);
-        	free(tmpstr);
-       
-        	asprintf(&valstr, "%s %s %s %s %s %s %s", str1, str2, str3, str4, str5, str6, str7);
-        	
-        	free(str1);
-        	free(str2);
-        	free(str3);
-        	free(str4);
-        	free(str5); 
-        	free(str6);
-        	free(str7);
-		} else if (values_len != 0) {
-			char *tmpstr;
-			int key_num = 0;
+       		asprintf(&state, "%d", NODE_STATE_UP);
+       		
+        	node = new_node(mach, hostname, state, pwd->pw_name, grp->gr_name, NULL);
+
+			sendNewNodeEvent(trans_id, mach->id, node->id, node->id);
+			sendNodeChangeEvent(trans_id, node);
+			
+			free(state);
+		} else {
+			ptp_node *	first_node;
+			ptp_node *	last_node;
 		
 			/* nodeid = -1 means we want the attributes for ALL nodes */
 			nodeid = -1;
 	
-			if(get_node_attribute(machid, nodeid, internal_keys, types, values, num_keys)) {
+			if( get_node_attributes(mach, &first_node, &last_node) ) {
 				/* error - so bail out */
-				res = ORTEErrorStr(RTEV_ERROR_NATTR, "error finding key on node or error getting keys");
-				AddToList(eventList, (void *)res);
+				sendErrorEvent(trans_id, RTEV_ERROR_NATTR, "error finding key on node or error getting keys");
 				return PROXY_RES_OK;
 			}
-			/* else we're good, use the values */
 	
-			tot_len = 0;
-			for(i=0; i<values_len; i++) {
-				tot_len += strlen(values[i]);
+			sendNewNodeEvent(trans_id, mach->id, first_node->id, last_node->id);
+
+			for (SetList(mach->nodes); (first_node = (ptp_node *)GetListElement(mach->nodes)) != NULL; ) {
+				sendNodeChangeEvent(trans_id, first_node);
 			}
-	
-			tot_len += values_len * 2; /* add on some for spaces and null, etc - little bit of extra here */
-		
-			asprintf(&valstr, "%s", "");
-			for(i=0; i<values_len; i++) {
-				if(i == 0) {
-					asprintf(&tmpstr, "%s=%s", external_keys[key_num], values[i]);
-					proxy_cstring_to_str(tmpstr, &valstr);
-				}
-				else {
-					str1 = valstr;
-					asprintf(&tmpstr, "%s=%s", external_keys[key_num], values[i]);
-					proxy_cstring_to_str(tmpstr, &str2);
-					asprintf(&valstr, "%s %s", str1, str2);
-					free(str1);
-					free(str2);
-					free(tmpstr);
-				}
-				key_num++;
-				if(key_num >= num_keys) key_num = 0;
-			}	
-		} else {
-			/* error - so bail out */
-			res = ORTEErrorStr(RTEV_ERROR_NATTR, "error finding key on node or error getting keys");
-			AddToList(eventList, (void *)res);
-			return PROXY_RES_OK;
 		}
-	
-		asprintf(&res, "%d %s", RTEV_NATTR, valstr);
-		AddToList(eventList, (void *)res);
-		
-		for(i=0; i<num_keys; i++) {
-			if(internal_keys[i] != NULL) free(internal_keys[i]);
-			if(external_keys[i] != NULL) free(external_keys[i]);
-		}
-	
-		for(i=0; i<values_len; i++) {
-			if(values[i] != NULL) free(values[i]);
-		}
-		
-		free(values);
-		free(valstr);
 	}
 	
-	printf("DISCOVERY PHASE: end\n"); fflush(stdout);
-
-	free(internal_keys);
-	free(external_keys);
-	free(types);
+	/*
+	 * Send default queue
+	 */
+	sendNewQueueEvent(trans_id);
 	
 	return PROXY_RES_OK;
 }
 
-static int
-get_node_attribute(int machid, int node_num, char **input_keys, int *input_types, char **input_values, int input_num_keys)
-{
-	int rc;
-	ORTE_STD_CNTR_TYPE cnt;
-	orte_gpr_value_t **values;
-	orte_gpr_value_t *value;
-	int i, ret, j, min, max;
-#ifndef HAVE_SYS_BPROC_H
-	gid_t gid;
-	struct group *grp;
-	struct passwd *pwd;
-	char * status = "up";
-	char * mode = "73";
-
-	pwd = getpwuid(geteuid());
-	gid = getgid();
-	grp = getgrgid(gid);
-#endif /* HAVE_SYS_BPROC_H */
-
-	
-	/* ignore the machine ID until ORTE implements this part */
-	
-#if 0
-	keys = (char**)malloc((input_num_keys + 1)* sizeof(char*));
-	for(i=0; i<input_num_keys; i++) {
-		keys[i] = strdup(input_keys[i]);
-	}
-	/* null terminated */
-	keys[input_num_keys] = NULL;
-#endif
-
-	rc = orte_gpr.get(ORTE_GPR_KEYS_OR | ORTE_GPR_TOKENS_OR, ORTE_NODE_SEGMENT, NULL, NULL, &cnt, &values);
-	cnt = get_num_nodes(machid);
-	
-	
-	if(cnt <= 0) {
-		ret = 1;
-		goto cleanup;
-	}
-	
-	
-	/* specified a proc bigger than any we know of in this job, bail out */
-	if(node_num != -1 && node_num >= cnt) {
-		ret = 1;
-		goto cleanup;
-	}
-	
-	/* they want a full dump */
-	if(node_num == -1) {
-		min = 0;
-		max = cnt;
-	}
-	/* they were looking for a specific process - quick and dirty */
-	else {
-		min = node_num;
-		max = node_num + 1;
-	}
-	
-	for(i=min; i<max; i++) {
-		value = values[i];
-			
-		for(j=0; j<input_num_keys; j++) {
-			/* Open MPI does not have a notion of a machine ID or node number (though it does have node name), at least
-			 * at this time, at least as far as I know.  Therefore, we push these in here by hand.
-			 * It sucks, so figure out the right keys to search for if you know how to do it right */
-			if (!strcmp(input_keys[j], "machine_id")) {
-				asprintf(&(input_values[((i-min) * input_num_keys) + j]), "0");
-			} else if (!strcmp(input_keys[j], "node_number")) {
-				asprintf(&(input_values[((i-min) * input_num_keys) + j]), "%d", i);
-#ifndef HAVE_SYS_BPROC_H
-			} else if (!strcmp(input_keys[j], ORTE_SOH_BPROC_NODE_USER)) {
-				asprintf(&(input_values[((i-min) * input_num_keys) + j]), "%s", pwd->pw_name);
-			} else if (!strcmp(input_keys[j], ORTE_SOH_BPROC_NODE_GROUP)) {
-				asprintf(&(input_values[((i-min) * input_num_keys) + j]), "%s", grp->gr_name);
-			} else if (!strcmp(input_keys[j], ORTE_SOH_BPROC_NODE_STATUS)) {
-				asprintf(&(input_values[((i-min) * input_num_keys) + j]), "%s", status);
-			} else if (!strcmp(input_keys[j], ORTE_SOH_BPROC_NODE_MODE)) {
-				asprintf(&(input_values[((i-min) * input_num_keys) + j]), "%s", mode);
-#endif
-			} else {
-				switch(input_types[j]) {
-					case PTP_STRING:
-						asprintf(&(input_values[((i-min) * input_num_keys) + j]), "%s", get_str_value(value, input_keys[j]));
-						break;
-					case PTP_UINT32:
-						asprintf(&(input_values[((i-min) * input_num_keys) + j]), "%d", get_ui32_value(value, input_keys[j]));
-						break;
-				}
-			}
-		}
-	}
-	
-	/* success */
-	ret = 0;
-	
-cleanup:
-#if 0
-	if(keys != NULL) {
-		for(i=0; i<input_num_keys; i++) {
-			if(keys[i] != NULL) free(keys[i]);
-		}
-		free(keys);
-	}
-	#endif
-		
-	return ret;
-}
-
 int
-ORTEQuit(char **args)
+ORTE_Quit(int trans_id, int nargs, char **args)
 {
-	char *res;
-	printf("ORTEQuit called!\n"); fflush(stdout);
-	ORTEShutdown();
-	asprintf(&res, "%d", RTEV_OK);
+	printf("ORTE_Quit called!\n"); fflush(stdout);
+	
+	if (proxy_initialized) {
+		do_orte_shutdown();
+	}
+	
+	proxy_shutdown++;
 	
 	/*
-	 * Send event immediately for QUIT
+	 * No longer required to send OK event.
 	 */
-	proxy_svr_event_callback(orte_proxy, res);
-	free(res);
 	
 	return PROXY_RES_OK;
 }
@@ -2043,23 +2071,24 @@ ORTEQuit(char **args)
 int
 server(char *name, char *host, int port)
 {
-	char *	msg;
-	char *	msg1;
-	char *	msg2;
-	int		rc;
-	int		shutdown_orted = 1;
+	char *			msg;
+	char *			msg1;
+	char *			msg2;
+	int				rc;
+	int				shutdown_orted = 1;
+	struct timeval	timeout = {0, 20000};
 	
-	eventList = NewList();
-	jobList = NewList();
+	gJobList = NewList();
+	gMachineList = NewList();
 	
-	if (proxy_svr_init(name, &handler_funcs, &helper_funcs, command_tab, &orte_proxy) != PROXY_RES_OK)
+	if (proxy_svr_init(name, &timeout, &helper_funcs, &command_tab, &orte_proxy) != PROXY_RES_OK)
 		return 0;
 	
 	proxy_svr_connect(orte_proxy, host, port);
 	printf("proxy_svr_connect returned.\n");
 	
-	while (ptp_signal_exit == 0 && !ORTEIsShutdown()) {
-		if  ((ORTEProgress() != PROXY_RES_OK) ||
+	while (ptp_signal_exit == 0 && !proxy_shutdown) {
+		if  ((do_orte_progress() != PROXY_RES_OK) ||
 			(proxy_svr_progress(orte_proxy) != PROXY_RES_OK))
 			break;
 	}
@@ -2107,11 +2136,11 @@ server(char *name, char *host, int port)
 		printf("###### SIGNAL: %s\n", msg1);
 		if (shutdown_orted) {
 			printf("###### Shutting down ORTEd\n");
-			ORTEShutdown();
+			do_orte_shutdown();
 		}
 		asprintf(&msg, "ptp_orte_proxy received signal %s (%s).  Exit was required and performed cleanly.", msg1, msg2);
 		//proxy_svr_event_callback(orte_proxy, ORTEErrorStr(RTEV_ERROR_SIGNAL, msg));
-		AddToList(eventList, (void *) ORTEErrorStr(RTEV_ERROR_SIGNAL, msg));
+		sendErrorEvent(gTransID, RTEV_ERROR_SIGNAL, msg);
 		free(msg);
 		free(msg1);
 		free(msg2);
