@@ -36,6 +36,7 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
+import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.EnumeratedAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
@@ -425,8 +426,11 @@ IResourceManagerControl {
 		}
 	}
 	
-	public IPJob submitJob(IPQueue queue, JobRunConfiguration jobRunConfig, IProgressMonitor monitor) throws CoreException {
-		return doSubmitJob(queue, jobRunConfig, monitor);
+	public IPJob submitJob(AttributeManager attrMgr, IProgressMonitor monitor) throws CoreException {
+		if (monitor == null) {
+			monitor = new NullProgressMonitor();
+		}
+		return doSubmitJob(attrMgr, monitor);
 	}
 	
 	public void terminateJob(IPJob job) throws CoreException {
@@ -490,12 +494,12 @@ IResourceManagerControl {
 	protected abstract void doStartup(IProgressMonitor monitor) throws CoreException;
 	
 	/**
-	 * @param queue
-	 * @param jobRunConfig
+	 * @param attrMgr
 	 * @param monitor
+	 * @return
 	 * @throws CoreException
 	 */
-	protected abstract IPJob doSubmitJob(IPQueue queue, JobRunConfiguration jobRunConfig, IProgressMonitor monitor) throws CoreException;
+	protected abstract IPJob doSubmitJob(AttributeManager attrMgr, IProgressMonitor monitor) throws CoreException;
 
 	/**
 	 * @param job
