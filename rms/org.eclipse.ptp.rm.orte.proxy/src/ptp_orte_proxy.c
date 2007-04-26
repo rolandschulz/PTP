@@ -122,15 +122,6 @@ int ORTE_SubmitJob(int, int, char **);
 int ORTE_TerminateJob(int, int, char **);
 int ORTE_Quit(int, int, char **);
 
-struct ptp_job {
-	int 	ptp_jobid;		// job ID as known by PTP */
-	int		debug_jobid;	// job ID of debugger or -1 if not a debug job
-	int 	orte_jobid;		// job ID that will be used by program when it starts
-	int		num_procs;		// number of procs requested for program (debugger uses num_procs+1)
-	List *	procs;
-};
-typedef struct ptp_job ptp_job;
-
 struct ptp_machine {
 	int		id;
 	List *	nodes;
@@ -154,6 +145,15 @@ struct ptp_process {
 	int		pid;
 };
 typedef struct ptp_process	ptp_process;
+
+struct ptp_job {
+	int 			ptp_jobid;		// job ID as known by PTP */
+	int				debug_jobid;	// job ID of debugger or -1 if not a debug job
+	int 			orte_jobid;		// job ID that will be used by program when it starts
+	int				num_procs;		// number of procs requested for program (debugger uses num_procs+1)
+	ptp_process **	procs;
+};
+typedef struct ptp_job ptp_job;
 
 int do_orte_init(int, char *universe_name);
 static void	get_proc_info(ptp_job *);
@@ -299,7 +299,7 @@ new_process(ptp_job *job, int node_id, int task_id, int pid)
 	p->node_id = node_id;
 	p->task_id = task_id;
 	p->pid = pid;
-    AddToList(job->procs, (void *)p);
+    job->procs[task_id] = p;
     return p;
 }
 
@@ -307,6 +307,15 @@ static void
 free_process(ptp_process *p)
 {
 	free(p);
+}
+
+static ptp_process *
+find_process(ptp_job *job, int task_id)
+{
+	if (task_id < 0 || task_id >= job->num_procs)
+		return NULL;
+		
+	return job->procs[task_id];
 }
 
 /*
@@ -333,13 +342,15 @@ get_jobid(ptp_job *j, int which)
  * debug jobs, keep the debug jobid as well.
  */
 static ptp_job *
-new_job(int ptp_jobid, int orte_jobid, int debug_jobid)
+new_job(int num_procs, int ptp_jobid, int orte_jobid, int debug_jobid)
 {
 	ptp_job *	j = (ptp_job *)malloc(sizeof(ptp_job));
 	j->ptp_jobid = ptp_jobid;
     j->orte_jobid = orte_jobid;
     j->debug_jobid = debug_jobid;
-    j->procs = NewList();
+    j->num_procs = num_procs;
+    j->procs = (ptp_process **)malloc(sizeof(ptp_process *) * num_procs);
+    memset(j->procs, 0, sizeof(ptp_process *) * num_procs);
     AddToList(gJobList, (void *)j);
     return j;
 }
@@ -347,7 +358,13 @@ new_job(int ptp_jobid, int orte_jobid, int debug_jobid)
 static void
 free_job(ptp_job *j)
 {
-	DestroyList(j->procs, free_process);
+	int	i;
+	
+	for (i = 0; i < j->num_procs; i++) {
+		if (j->procs[i] != NULL)
+			free_process(j->procs[i]);
+	}
+	free(j->procs);
 	free(j);
 }
 
@@ -388,7 +405,8 @@ find_job(int jobid, int which)
 
  
 /**
- * Send EVENT_RUNTIME_OK to client
+ * See org.eclipse.ptp.rtsysmte.AbstractProxyRuntimeSystem for a description
+ * of the protocol format.
  */
 static void
 sendOKEvent(int trans_id)
@@ -456,29 +474,60 @@ sendNewMachineEvent(int trans_id, int id)
 	proxy_msg *	m = new_proxy_msg(PROXY_EV_RT_NEW_MACHINE, trans_id);
 	
 	proxy_msg_add_int(m, gBaseID);
+	proxy_msg_add_int(m, 1);	
 	proxy_msg_add_int(m, id);
+	proxy_msg_add_int(m, 0);
 	proxy_svr_queue_msg(orte_proxy, m);
 	
 	return 0;	
 }
 
 static int
-sendNewNodeEvent(int trans_id, int mach_id, int from_id, int to_id)
+num_node_attrs(ptp_node *node)
 {
-	char *		range;
+	int	cnt = 0;
+	if (node->name != NULL)
+		cnt++;
+	if (node->state != NULL)
+		cnt++;
+	if (node->user != NULL)
+		cnt++;
+	if (node->group != NULL)
+		cnt++;
+	if (node->mode != NULL)
+		cnt++;
+	return cnt;	
+}
+
+static void
+add_node_attrs(proxy_msg *m, ptp_node *node)
+{
+	if (node->name != NULL)
+		proxy_msg_add_keyval_string(m, ATTRDEF_NAME_KEY, node->name);
+	if (node->state != NULL)
+		proxy_msg_add_keyval_string(m, ATTRDEF_NODE_STATE_KEY, node->state);
+	if (node->user != NULL)
+		proxy_msg_add_keyval_string(m, ATTRDEF_USER_KEY, node->user);
+	if (node->group != NULL)
+		proxy_msg_add_keyval_string(m, ATTRDEF_GROUP_KEY, node->group);
+	if (node->mode != NULL)
+		proxy_msg_add_keyval_string(m, ATTRDEF_MODE_KEY, node->mode);
+}
+
+static int
+sendNewNodeEvent(int trans_id, int mach_id, ptp_machine *mach)
+{
+	ptp_node *	n;
 	proxy_msg *	m = new_proxy_msg(PROXY_EV_RT_NEW_NODE, trans_id);
 	
-	if (from_id == to_id) {
-		asprintf(&range, "%d", from_id);
-	} else {
-		asprintf(&range, "%d-%d", from_id, to_id);
+	proxy_msg_add_int(m, mach_id);
+	proxy_msg_add_int(m, SizeOfList(mach->nodes));
+	for (SetList(mach->nodes); (n = (ptp_node *)GetListElement(mach->nodes)) != NULL; ) {
+		proxy_msg_add_int(m, n->id);
+		proxy_msg_add_int(m, num_node_attrs(n));
+		add_node_attrs(m, n);
 	}
-	
-	proxy_msg_add_int(m, mach_id);	
-	proxy_msg_add_string(m, range);	
 	proxy_svr_queue_msg(orte_proxy, m);
-	
-	free(range);
 	
 	return 0;	
 }
@@ -489,6 +538,9 @@ sendNewProcessEvent(int trans_id, int job_id, ptp_process *p)
 	proxy_msg *	m = new_proxy_msg(PROXY_EV_RT_NEW_PROCESS, trans_id);
 	
 	proxy_msg_add_int(m, job_id);	
+	proxy_msg_add_int(m, 1);	
+	proxy_msg_add_int(m, p->id);	
+	proxy_msg_add_int(m, 3);	
 	proxy_msg_add_keyval_int(m, ATTRDEF_ID_KEY, p->node_id);	
 	proxy_msg_add_keyval_int(m, ATTRDEF_TASKID_KEY, p->task_id);	
 	proxy_msg_add_keyval_int(m, ATTRDEF_PID_KEY, p->pid);	
@@ -505,7 +557,9 @@ sendNewQueueEvent(int trans_id)
 	gQueueID = generate_id();
 	
 	proxy_msg_add_int(m, gBaseID);	
+	proxy_msg_add_int(m, 1);	
 	proxy_msg_add_int(m, gQueueID);
+	proxy_msg_add_int(m, 1);	
 	proxy_msg_add_keyval_string(m, ATTRDEF_NAME_KEY, DEFAULT_QUEUE_NAME);
 	proxy_svr_queue_msg(orte_proxy, m);
 	
@@ -517,7 +571,9 @@ sendJobStateChangeEvent(int trans_id, int jobid, char *state)
 {
 	proxy_msg *	m = new_proxy_msg(PROXY_EV_RT_JOB_CHANGE, trans_id);
 	
+	proxy_msg_add_int(m, 1);	
 	proxy_msg_add_int(m, jobid);
+	proxy_msg_add_int(m, 1);	
 	proxy_msg_add_keyval_string(m, ATTRDEF_JOB_STATE_KEY, state);
 	proxy_svr_queue_msg(orte_proxy, m);
 	
@@ -529,16 +585,10 @@ sendNodeChangeEvent(int trans_id, ptp_node *node)
 {
 	proxy_msg *	m = new_proxy_msg(PROXY_EV_RT_NODE_CHANGE, trans_id);
 	
-	if (node->name != NULL)
-		proxy_msg_add_keyval_string(m, ATTRDEF_NAME_KEY, node->name);
-	if (node->state != NULL)
-		proxy_msg_add_keyval_string(m, ATTRDEF_NODE_STATE_KEY, node->state);
-	if (node->user != NULL)
-		proxy_msg_add_keyval_string(m, ATTRDEF_USER_KEY, node->user);
-	if (node->group != NULL)
-		proxy_msg_add_keyval_string(m, ATTRDEF_GROUP_KEY, node->group);
-	if (node->mode != NULL)
-		proxy_msg_add_keyval_string(m, ATTRDEF_MODE_KEY, node->mode);
+	proxy_msg_add_int(m, 1);	
+	proxy_msg_add_int(m, node->id);	
+	proxy_msg_add_int(m, num_node_attrs(node));	
+	add_node_attrs(m, node);
 	proxy_svr_queue_msg(orte_proxy, m);
 	
 	return 0;	
@@ -547,13 +597,27 @@ sendNodeChangeEvent(int trans_id, ptp_node *node)
 static int
 sendProcessChangeEvent(int trans_id, ptp_process *p, int node_id, int task_id, int pid)
 {
+	int			cnt = 0;
 	proxy_msg *	m;
 	
 	if (p->node_id != node_id || p->task_id != task_id || p->pid != pid) {
 		m = new_proxy_msg(PROXY_EV_RT_PROCESS_CHANGE, trans_id);
 		
+		proxy_msg_add_int(m, 1);	
 		proxy_msg_add_int(m, p->id);
 		
+		if (p->node_id != node_id) {
+			cnt++;	
+		}
+		if (p->task_id != task_id) {
+			cnt++;	
+		}
+		if (p->pid != pid) {
+			cnt++;	
+		}
+		
+		proxy_msg_add_int(m, cnt);
+			
 		if (p->node_id != node_id) {
 			p->node_id = node_id;
 			proxy_msg_add_keyval_int(m, ATTRDEF_ID_KEY, node_id);	
@@ -573,12 +637,18 @@ sendProcessChangeEvent(int trans_id, ptp_process *p, int node_id, int task_id, i
 	return 0;	
 }
 
+/*
+ * TODO: optimize this so that we don't send one event for
+ * every process, even if the output is identical.
+ */
 static int
 sendProcessOutputEvent(int trans_id, int procid, char *output)
 {
 	proxy_msg *	m = new_proxy_msg(PROXY_EV_RT_PROCESS_CHANGE, trans_id);
 	
+	proxy_msg_add_int(m, 1);
 	proxy_msg_add_int(m, procid);
+	proxy_msg_add_int(m, 1);
 	proxy_msg_add_keyval_string(m, ATTRDEF_STDOUT_KEY, output);
 	proxy_svr_queue_msg(orte_proxy, m);
 	
@@ -613,7 +683,8 @@ iof_callback(
     const unsigned char* data,
     size_t count)
 {
-	char *line;
+	char *			line;
+	ptp_process *	p;
 	
     if(count > 0) {
     	ptp_job *	j = find_job((int)src_name->jobid, JOBID_ORTE);
@@ -622,7 +693,9 @@ iof_callback(
 	        strncpy((char*)line, (char*)data, count);
 	        if (line[count-1] == '\n') line[count-1] = '\0';
 	        line[count] = '\0';
-	        sendProcessOutputEvent(gTransID, (int)src_name->vpid, line);
+	        p = find_process(j, (int)src_name->vpid);
+	        if (p != NULL)
+	        	sendProcessOutputEvent(gTransID, p->id, line);
 	        free(line);
     	}
     }
@@ -801,7 +874,6 @@ get_proc_info(ptp_job *j)
 {
 	int					i;
 	int					rc;
-	int					new_job = EmptyList(j->procs);
 	ptp_process *		p;
 	char *				segment = NULL;
 	ORTE_STD_CNTR_TYPE	cnt;
@@ -859,18 +931,14 @@ get_proc_info(ptp_job *j)
 			}
 		}
 		
-		if (new_job) {
+		p = find_process(j, task_id);
+		if (p == NULL) {
 			p = new_process(j, node_id, task_id, pid);
 	    	sendNewProcessEvent(gTransID, j->ptp_jobid, p);
 		} else {
-			p = (ptp_process *)GetListElement(j->procs);
-			if (p != NULL) {
-				sendProcessChangeEvent(gTransID, p, node_id, task_id, pid);
-			}
+			sendProcessChangeEvent(gTransID, p, node_id, task_id, pid);
 		}
     }
-    
-    SetList(j->procs);
 }
 #endif /* !ORTE_VERSION_1_0 */
 
@@ -964,7 +1032,7 @@ get_node_attributes(ptp_machine *mach, ptp_node **first_node, ptp_node **last_no
 	
 	user = pwd->pw_name;
 	group = grp->gr_name;
-	asprintf(&status, "%d", NODE_STATE_UP);
+	status = NODE_STATE_UP;
 #endif /* HAVE_SYS_BPROC_H */
 
 	rc = orte_gpr.get(ORTE_GPR_KEYS_OR | ORTE_GPR_TOKENS_OR, ORTE_NODE_SEGMENT, NULL, NULL, &cnt, &values);
@@ -1004,10 +1072,6 @@ get_node_attributes(ptp_machine *mach, ptp_node **first_node, ptp_node **last_no
     }
     
     *last_node = node;
-
-#ifndef  HAVE_SYS_BPROC_H
-	free(status);
-#endif  /* HAVE_SYS_BPROC_H */
 
 	return 0;
 }
@@ -1905,7 +1969,7 @@ ORTE_SubmitJob(int trans_id, int nargs, char **args)
 	 */	
 	sendOKEvent(trans_id);
 	
-    j = new_job(ptpid, jobid, debug_jobid);
+    j = new_job(num_procs, ptpid, jobid, debug_jobid);
 	
 	/*
 	 * Fake a job state event
@@ -2016,11 +2080,10 @@ ORTE_StartEvents(int trans_id, int nargs, char **args)
        		asprintf(&state, "%d", NODE_STATE_UP);
        		
         	node = new_node(mach, hostname, state, pwd->pw_name, grp->gr_name, NULL);
-
-			sendNewNodeEvent(trans_id, mach->id, node->id, node->id);
-			sendNodeChangeEvent(trans_id, node);
 			
 			free(state);
+
+			sendNewNodeEvent(trans_id, mach->id, mach);
 		} else {
 			ptp_node *	first_node;
 			ptp_node *	last_node;
@@ -2034,11 +2097,7 @@ ORTE_StartEvents(int trans_id, int nargs, char **args)
 				return PROXY_RES_OK;
 			}
 	
-			sendNewNodeEvent(trans_id, mach->id, first_node->id, last_node->id);
-
-			for (SetList(mach->nodes); (first_node = (ptp_node *)GetListElement(mach->nodes)) != NULL; ) {
-				sendNodeChangeEvent(trans_id, first_node);
-			}
+			sendNewNodeEvent(trans_id, mach->id, mach);
 		}
 	}
 	
