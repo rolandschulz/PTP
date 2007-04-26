@@ -93,6 +93,7 @@
 #define ATTRDEF_ID_KEY				"id"
 #define ATTRDEF_NAME_KEY			"name"
 #define ATTRDEF_JOB_STATE_KEY		"jobState"
+#define ATTRDEF_JOB_SUB_KEY			"jobSubId"
 #define ATTRDEF_NODE_STATE_KEY		"nodeState"
 #define ATTRDEF_GROUP_KEY			"group"
 #define ATTRDEF_USER_KEY			"user"
@@ -512,6 +513,22 @@ add_node_attrs(proxy_msg *m, ptp_node *node)
 		proxy_msg_add_keyval_string(m, ATTRDEF_GROUP_KEY, node->group);
 	if (node->mode != NULL)
 		proxy_msg_add_keyval_string(m, ATTRDEF_MODE_KEY, node->mode);
+}
+
+static int
+sendNewJobEvent(int trans_id, int jobid, int jobSubId, char *state)
+{
+	proxy_msg *	m = new_proxy_msg(PROXY_EV_RT_NEW_JOB, trans_id);
+	
+	proxy_msg_add_int(m, gQueueID);	
+	proxy_msg_add_int(m, 1);	
+	proxy_msg_add_int(m, jobid);
+	proxy_msg_add_int(m, 2);	
+	proxy_msg_add_keyval_int(m, ATTRDEF_JOB_SUB_KEY, jobSubId);
+	proxy_msg_add_keyval_string(m, ATTRDEF_JOB_STATE_KEY, state);
+	proxy_svr_queue_msg(orte_proxy, m);
+	
+	return 0;	
 }
 
 static int
@@ -1791,7 +1808,8 @@ ORTE_SubmitJob(int trans_id, int nargs, char **args)
 	int						num_args = 0;
 	int						num_env = 0;
 	int						debug_argc = 0;
-	int						ptpid = 0;
+	int						ptpid = generate_id();
+	int						jobsubid = 0;
 	char *					full_path;
 	char	 *				pgm_name = NULL;
 	char	 *				cwd = NULL;
@@ -1800,7 +1818,7 @@ ORTE_SubmitJob(int trans_id, int nargs, char **args)
 	char **					debug_args;
 	char **					env = NULL;
 	orte_app_context_t *	apps;
-	orte_jobid_t			jobid = ORTE_JOBID_MAX;
+	orte_jobid_t			ortejobid = ORTE_JOBID_MAX;
 	orte_jobid_t			debug_jobid = -1;
 	ptp_job *				j;
 
@@ -1817,8 +1835,9 @@ ORTE_SubmitJob(int trans_id, int nargs, char **args)
 	fprintf(stdout, "  ORTE_SubmitJob (%d): %s\n", trans_id, args[0]); fflush(stdout);
 
 	for (i = 0; i < nargs; i++) {
-		if (strncmp(args[i], "jobID=", 6) == 0) {
-			ptpid = (int)strtol(args[i]+6, NULL, 10);
+		if (strncmp(args[i], "jobSubId=", 9) == 0) {
+			jobsubid = (int)strtol(args[i]+9, NULL, 10);
+			printf("jobsubid=%d\n", jobsubid); fflush(stdout);
 		} else if (strncmp(args[i], "execName=", 9) == 0) {
 			pgm_name = args[i]+9;
 		} else if (strncmp(args[i], "pathToExec=", 11) == 0) {
@@ -1950,10 +1969,10 @@ ORTE_SubmitJob(int trans_id, int nargs, char **args)
 	 * jobid assigned by the registry/ORTE.  Passes a callback function
 	 * that ORTE will call with state change on this job */
 	if (debug) {
-		rc = debug_spawn(debug_exec_path, debug_argc, debug_args, &apps, 1, &jobid, &debug_jobid);
+		rc = debug_spawn(debug_exec_path, debug_argc, debug_args, &apps, 1, &ortejobid, &debug_jobid);
 		free(debug_args);
 	} else {
-		rc = ORTE_SPAWN(&apps, 1, &jobid, job_state_callback);
+		rc = ORTE_SPAWN(&apps, 1, &ortejobid, job_state_callback);
 	}
 	
 	printf("SPAWNED [error code %d = '%s'], now unlocking\n", rc, ORTE_ERROR_NAME(rc)); fflush(stdout);
@@ -1962,30 +1981,30 @@ ORTE_SubmitJob(int trans_id, int nargs, char **args)
 	
 	if(ORTECheckErrorCode(trans_id, RTEV_ERROR_ORTE_RUN, rc)) return 1;
 
-	printf("NEW JOBID = %d\n", (int)jobid); fflush(stdout);
+	printf("NEW JOB (%d,%d,%d)\n", jobsubid, ptpid, (int)ortejobid); fflush(stdout);
 
 	/*
 	 * Send ok for job submission.
 	 */	
 	sendOKEvent(trans_id);
 	
-    j = new_job(num_procs, ptpid, jobid, debug_jobid);
+    j = new_job(num_procs, ptpid, ortejobid, debug_jobid);
 	
 	/*
 	 * Fake a job state event
 	 */
-	sendJobStateChangeEvent(gTransID, ptpid, JOB_STATE_INIT);
+	sendNewJobEvent(gTransID, ptpid, jobsubid, JOB_STATE_INIT);
 	
 	/*
 	 * Start I/O forwarding. Don't start it before we have
 	 * sent the new process events!
 	 */
-	if (!orte_job_record_started(jobid)) {
-		orte_job_record_start(jobid);
+	if (!orte_job_record_started(ortejobid)) {
+		orte_job_record_start(ortejobid);
 	}
 
 #if ORTE_VERSION_1_0
-	subscribe_job(jobid);
+	subscribe_job(ortejobid);
 #else /* ORTE_VERSION_1_0 */
 	/*
 	 * If this is a debug job then the debugger will manage
