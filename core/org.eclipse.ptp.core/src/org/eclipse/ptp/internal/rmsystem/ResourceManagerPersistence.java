@@ -33,10 +33,10 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
+import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
-import org.eclipse.ptp.rmsystem.ResourceManagerState;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.XMLMemento;
 
@@ -85,7 +85,7 @@ public class ResourceManagerPersistence {
 					TAG_RESOURCEMANGER_ID,
 					resourceManagers[i].getConfiguration().getResourceManagerId());
 			child.putInteger(TAG_RESOURCEMANAGER_INDEX, i);
-			boolean isRunning = resourceManagers[i].getState().equals(ResourceManagerState.State.STARTED);
+			boolean isRunning = resourceManagers[i].getState().equals(ResourceManagerAttributes.State.STARTED);
 			child.putString(TAG_RESOURCEMANGER_RUNNING, isRunning ? "true" : "false");
 			IMemento grandchild = child.createChild(TAG_RESOURCEMANGER_CONFIGURATION);
 			resourceManagers[i].getConfiguration().save(grandchild);

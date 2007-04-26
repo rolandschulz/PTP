@@ -9,9 +9,9 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.ptp.core.attributes.IAttribute;
+import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.util.RangeSet;
 import org.eclipse.ptp.orte.core.rtsystem.ORTEProxyRuntimeClient;
-import org.eclipse.ptp.rmsystem.JobState;
 import org.eclipse.ptp.rtsystem.JobRunConfiguration;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeAttributeDefEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeConnectedStateEvent;
@@ -291,9 +291,9 @@ public class ORTERemoteProxyTest implements IProxyRuntimeEventListener {
 			 */
 			for (int i = 1; i < args.length; i++) {
 				String[] kv = args[i].split("=");
-				if (kv.length == 2 && kv[0].equals(JobState.STATE_ATTR_ID)){
+				if (kv.length == 2 && kv[0].equals(JobAttributes.STATE_ATTR_ID)){
 					try {
-						if (kv[1].equals(JobState.State.ABORTED.toString())) {
+						if (kv[1].equals(JobAttributes.State.ABORTED.toString())) {
 							System.out.println("job terminated!");
 							lock.lock();
 							try {

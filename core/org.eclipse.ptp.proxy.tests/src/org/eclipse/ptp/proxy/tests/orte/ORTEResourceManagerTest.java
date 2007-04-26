@@ -2,23 +2,18 @@ package org.eclipse.ptp.proxy.tests.orte;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.debug.core.ILaunch;
-import org.eclipse.debug.core.ILaunchManager;
-import org.eclipse.debug.core.Launch;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IEnumeratedAttribute;
-import org.eclipse.ptp.core.attributes.IIntegerAttribute;
 import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPNode;
 import org.eclipse.ptp.core.elements.IPQueue;
+import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.internal.core.PUniverse;
 import org.eclipse.ptp.orte.core.rmsystem.ORTEResourceManager;
 import org.eclipse.ptp.orte.core.rmsystem.ORTEResourceManagerConfiguration;
@@ -26,7 +21,6 @@ import org.eclipse.ptp.orte.core.rmsystem.ORTEResourceManagerFactory;
 import org.eclipse.ptp.rmsystem.AbstractResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerListener;
-import org.eclipse.ptp.rmsystem.JobState;
 import org.eclipse.ptp.rmsystem.events.IResourceManagerChangedJobsEvent;
 import org.eclipse.ptp.rmsystem.events.IResourceManagerChangedMachinesEvent;
 import org.eclipse.ptp.rmsystem.events.IResourceManagerChangedNodesEvent;
@@ -162,8 +156,8 @@ public class ORTEResourceManagerTest implements IResourceManagerListener {
 		 * Find a state change, if any
 		 */
 		for (IAttribute a : e.getChangedAttributes()) {
-			if (a.getDefinition() == JobState.getStateAttributeDefinition()) {
-				if (((IEnumeratedAttribute)a).getEnumValue() == JobState.State.ABORTED) {
+			if (a.getDefinition() == JobAttributes.getStateAttributeDefinition()) {
+				if (((IEnumeratedAttribute)a).getEnumValue() == JobAttributes.State.ABORTED) {
 					System.out.println("job terminated!");
 					lock.lock();
 					try {

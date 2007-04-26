@@ -19,23 +19,16 @@
 
 package org.eclipse.ptp.rtsystem.events;
 
-import org.eclipse.ptp.core.attributes.IAttribute;
-import org.eclipse.ptp.core.util.RangeSet;
+import org.eclipse.ptp.core.elements.attributes.ElementAttributeManager;
 
 public abstract class AbstractRuntimeChangeEvent implements IRuntimeChangeEvent {
-	private RangeSet elementIds;
-	private IAttribute[] attributes = null;
+	private ElementAttributeManager attrMgr;
 	
-	public AbstractRuntimeChangeEvent(RangeSet elementIds, IAttribute[] attrs) {
-		this.elementIds = elementIds;
-		this.attributes = attrs;
+	public AbstractRuntimeChangeEvent(ElementAttributeManager attrs) {
+		this.attrMgr = attrs;
 	}
 	
-	public RangeSet getElementIds() {
-		return elementIds;
-	}
-	
-	public IAttribute[] getAttributes() {
-		return attributes;
+	public ElementAttributeManager getElementAttributeManager() {
+		return attrMgr;
 	}
 }

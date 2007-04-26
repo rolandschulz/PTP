@@ -2,11 +2,7 @@ package org.eclipse.ptp.proxy.tests.orte;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -19,15 +15,14 @@ import org.eclipse.ptp.core.attributes.IIntegerAttribute;
 import org.eclipse.ptp.core.attributes.IStringAttribute;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
+import org.eclipse.ptp.core.elements.attributes.MachineAttributes;
+import org.eclipse.ptp.core.elements.attributes.NodeAttributes;
+import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.core.elements.attributes.QueueAttributes;
+import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.core.util.RangeSet;
 import org.eclipse.ptp.orte.core.rtsystem.ORTEProxyRuntimeClient;
 import org.eclipse.ptp.orte.core.rtsystem.ORTERuntimeSystem;
-import org.eclipse.ptp.rmsystem.JobState;
-import org.eclipse.ptp.rmsystem.MachineState;
-import org.eclipse.ptp.rmsystem.NodeState;
-import org.eclipse.ptp.rmsystem.ProcessState;
-import org.eclipse.ptp.rmsystem.ResourceManagerState;
 import org.eclipse.ptp.rtsystem.IRuntimeEventListener;
 import org.eclipse.ptp.rtsystem.JobRunConfiguration;
 import org.eclipse.ptp.rtsystem.events.IRuntimeAttributeDefinitionEvent;
@@ -137,12 +132,12 @@ public class ORTERuntimeSystemTest implements IRuntimeEventListener {
 		String dir = "/etc";
 		
 		AttributeDefinitionManager attrDefManager = new AttributeDefinitionManager();
-		attrDefManager.setAttributeDefinition(JobState.getStateAttributeDefinition());
-		attrDefManager.setAttributeDefinition(MachineState.getStateAttributeDefinition());
-		attrDefManager.setAttributeDefinition(NodeState.getStateAttributeDefinition());
-		attrDefManager.setAttributeDefinition(ProcessState.getStateAttributeDefinition());
+		attrDefManager.setAttributeDefinition(JobAttributes.getStateAttributeDefinition());
+		attrDefManager.setAttributeDefinition(MachineAttributes.getStateAttributeDefinition());
+		attrDefManager.setAttributeDefinition(NodeAttributes.getStateAttributeDefinition());
+		attrDefManager.setAttributeDefinition(ProcessAttributes.getStateAttributeDefinition());
 		attrDefManager.setAttributeDefinition(QueueAttributes.getStateAttributeDefinition());
-		attrDefManager.setAttributeDefinition(ResourceManagerState.getStateAttributeDefinition());
+		attrDefManager.setAttributeDefinition(ResourceManagerAttributes.getStateAttributeDefinition());
 		ORTEProxyRuntimeClient client = new ORTEProxyRuntimeClient(proxy, rmId, launchManually);
 		ORTERuntimeSystem rtsystem = new ORTERuntimeSystem(client, attrDefManager);
 		rtsystem.addRuntimeEventListener(this);

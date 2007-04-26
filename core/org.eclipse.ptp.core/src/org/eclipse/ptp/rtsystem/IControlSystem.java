@@ -20,7 +20,7 @@
 package org.eclipse.ptp.rtsystem;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.elements.IPJob;
 
 /**
@@ -32,27 +32,24 @@ import org.eclipse.ptp.core.elements.IPJob;
  */
 
 public interface IControlSystem {	
-	/**
-	 * The control system can still be available even if the connection to the outside world
-	 * has been severed.  This method returns if that connection is alive or not.
-	 */
-	public boolean isHealthy();
 	
 	/**
-	 * Submits a job run given the jobRunConfig.  The JobRunConfiguration contains specifics
-	 * about how the user wants to run the job, such as the program name, number of
-	 * processes, etc.
+	 * Submits a job run given the attributes provided by the AttributeManager.  
+	 * The AttributeManager contains resource manager specific information about 
+	 * how the user wants to run the job, such as the program name, number of processes, etc.
 	 * 
-	 * @param jobID	the jobID for this submission 
-	 * @param nProcs TODO
-	 * @param firstNodeNum TODO
-	 * @param nProcsPerNode TODO
-	 * @param jobRunConfig the configuration information about the job
-	 * @return the job identifier of the created job or -1 on error
+	 * The jobSubId argument is used to provide an job submission ID that can be used
+	 * to identify the new job that is created. The ID will be returned as an attribute
+	 * on the new job.
+	 * 
+	 * This will call will result in either a new job event when the job is created
+	 * by the resource manager or an error event if the job submission fails.
+	 * 
+	 * @param jobSubId
+	 * @param attrMgr 
 	 * @throws CoreException 
-	 * @see JobRunConfiguration
 	 */
-	public void submitJob(int jobID, int nProcs, int firstNodeNum, int nProcsPerNode, JobRunConfiguration jobRunConfig) throws CoreException;
+	public void submitJob(int jobSubId, AttributeManager attrMgr) throws CoreException;
 
 	/**
 	 * Terminates a running job.  The {@link IPJob} contains the job identifier used to 

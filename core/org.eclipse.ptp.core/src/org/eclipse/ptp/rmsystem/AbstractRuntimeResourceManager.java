@@ -21,6 +21,7 @@ package org.eclipse.ptp.rmsystem;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
@@ -29,8 +30,11 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.debug.core.ILaunch;
+import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
+import org.eclipse.ptp.core.attributes.IIntegerAttribute;
+import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.elementcontrols.IPJobControl;
 import org.eclipse.ptp.core.elementcontrols.IPMachineControl;
 import org.eclipse.ptp.core.elementcontrols.IPNodeControl;
@@ -42,6 +46,10 @@ import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPNode;
 import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.IPQueue;
+import org.eclipse.ptp.core.elements.attributes.ElementAttributeManager;
+import org.eclipse.ptp.core.elements.attributes.JobAttributes;
+import org.eclipse.ptp.core.elements.attributes.QueueAttributes;
+import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.core.util.RangeSet;
 import org.eclipse.ptp.rtsystem.IRuntimeEventListener;
 import org.eclipse.ptp.rtsystem.IRuntimeSystem;
@@ -69,7 +77,11 @@ public abstract class AbstractRuntimeResourceManager extends
 	private final ReentrantLock startupLock = new ReentrantLock();
 	private final Condition startupCondition = startupLock.newCondition();
 	private boolean started;
-
+	private final ReentrantLock jobSubmissionLock = new ReentrantLock();
+	private final Condition jobSubmissionCondition = jobSubmissionLock.newCondition();
+	private IPJob newJob;
+	private int jobSubId;
+	
 	public AbstractRuntimeResourceManager(int id, IPUniverseControl universe,
 			IResourceManagerConfiguration config) {
 		super(id, universe, config);
@@ -108,7 +120,7 @@ public abstract class AbstractRuntimeResourceManager extends
 	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleRuntimeErrorEvent(org.eclipse.ptp.rtsystem.events.IRuntimeErrorEvent)
 	 */
 	public void handleRuntimeErrorEvent(IRuntimeErrorEvent e) {
-		setState(ResourceManagerState.State.ERROR,
+		setState(ResourceManagerAttributes.State.ERROR,
 				e.getMessage());
 		fireError(e.getMessage());
 	}
@@ -118,22 +130,26 @@ public abstract class AbstractRuntimeResourceManager extends
 	 */
 	public void handleRuntimeJobChangeEvent(IRuntimeJobChangeEvent e) {
 		boolean changed = false;
-		RangeSet jobIds = e.getElementIds();
-		IAttribute[] attrs = e.getAttributes();
+		ElementAttributeManager eMgr = e.getElementAttributeManager();
 
 		List<IPJob> jobs = new ArrayList<IPJob>();
 		
-		for (int id : jobIds) {		
-			IPJobControl job = getJobControl(id);
-			final boolean jobChanged = doUpdateJob(job, attrs);
-			changed |= jobChanged;
-			if (jobChanged) {
-				jobs.add(job);
+		for (Map.Entry<RangeSet, AttributeManager> entry : eMgr.getEntrySet()) {
+			IAttribute[] attrs = entry.getValue().getAttributes();
+			changed = false;
+			
+			for (int id : entry.getKey()) {
+				IPJobControl job = getJobControl(id);
+				final boolean jobChanged = doUpdateJob(job, attrs);
+				changed |= jobChanged;
+				if (jobChanged) {
+					jobs.add(job);
+				}
 			}
-		}
-		
-		if (changed) {
-			fireJobsChanged(jobs, Arrays.asList(attrs));
+			
+			if (changed) {
+				fireJobsChanged(jobs, Arrays.asList(attrs));
+			}
 		}
 	}
 
@@ -142,22 +158,26 @@ public abstract class AbstractRuntimeResourceManager extends
 	 */
 	public void handleRuntimeMachineChangeEvent(IRuntimeMachineChangeEvent e) {
 		boolean changed = false;
-		RangeSet machineIds = e.getElementIds();
-		IAttribute[] attrs = e.getAttributes();
+		ElementAttributeManager eMgr = e.getElementAttributeManager();
 
 		List<IPMachine> macs = new ArrayList<IPMachine>();
 		
-		for (int id : machineIds) {		
-			IPMachineControl machine = getMachineControl(id);
-			final boolean macChanged = doUpdateMachine(machine, attrs);
-			changed |= macChanged;
-			if (macChanged) {
-				macs.add(machine);
+		for (Map.Entry<RangeSet, AttributeManager> entry : eMgr.getEntrySet()) {
+			IAttribute[] attrs = entry.getValue().getAttributes();
+			changed = false;
+			
+			for (int id : entry.getKey()) {
+				IPMachineControl machine = getMachineControl(id);
+				final boolean macChanged = doUpdateMachine(machine, attrs);
+				changed |= macChanged;
+				if (macChanged) {
+					macs.add(machine);
+				}
 			}
-		}
-		
-		if (changed) {
-			fireMachinesChanged(macs);
+			
+			if (changed) {
+				fireMachinesChanged(macs);
+			}
 		}
 	}
 
@@ -166,22 +186,40 @@ public abstract class AbstractRuntimeResourceManager extends
 	 */
 	public void handleRuntimeNewJobEvent(IRuntimeNewJobEvent e) {
 		boolean changed = false;
-		int queueId = e.getParentId();
-		RangeSet jobIds = e.getElementIds();
-		IAttribute[] attrs = e.getAttributes();
+		IPQueueControl queue = getQueueControl(e.getParentId());
+		ElementAttributeManager mgr = e.getElementAttributeManager();
 
 		List<IPJob> jobs = new ArrayList<IPJob>();
 		
-		for (int id : jobIds) {
-			IPQueueControl queue = getQueueControl(queueId);
-			IPJobControl job = doCreateJob(queue, id, attrs);
-			jobs.add(job);
-			addJob(id, job);
-			changed = true;
-		}
-		
-		if (changed) {
-			fireNewJobs(jobs);
+		for (Map.Entry<RangeSet, AttributeManager> entry : mgr.getEntrySet()) {
+			IAttribute[] attrs = entry.getValue().getAttributes();
+			changed = false;
+
+			for (int id : entry.getKey()) {
+				IPJobControl job = getJobControl(id);
+				if (job == null) {
+					job = doCreateJob(queue, id, attrs);
+					jobs.add(job);
+					addJob(id, job);
+					changed = true;
+					
+					// TODO Fix launch code to eliminate this!
+					jobSubmissionLock.lock();
+					try {
+						IIntegerAttribute jobSubAttr = (IIntegerAttribute) job.getAttribute(JobAttributes.getSubIdAttributeDefinition());
+						if (jobSubAttr.getValue() == jobSubId) {
+							newJob = job;
+							jobSubmissionCondition.signal();
+						}
+					} finally {
+						jobSubmissionLock.unlock();
+					}
+				}
+			}
+			
+			if (changed) {
+				fireNewJobs(jobs);
+			}
 		}
 	}
 
@@ -191,19 +229,27 @@ public abstract class AbstractRuntimeResourceManager extends
 	public void handleRuntimeNewMachineEvent(IRuntimeNewMachineEvent e) {
 		System.out.println(this + ": handleRuntimeNewMachineEvent");
 		boolean changed = false;
-		RangeSet machineIds = e.getElementIds();
-		IAttribute[] attrs = e.getAttributes();
+		ElementAttributeManager mgr = e.getElementAttributeManager();
 
 		List<IPMachine> machines = new ArrayList<IPMachine>();
-		for (int id : machineIds) {
-			IPMachineControl machine = doCreateMachine(id, attrs);
-			addMachine(id, machine);
-			machines.add(machine);
-			changed = true;
-		}
 		
-		if (changed) {
-			fireNewMachines(machines);
+		for (Map.Entry<RangeSet, AttributeManager> entry : mgr.getEntrySet()) {
+			IAttribute[] attrs = entry.getValue().getAttributes();
+			changed = false;
+
+			for (int id : entry.getKey()) {
+				IPMachineControl machine = getMachineControl(id);
+				if (machine == null) {
+					machine = doCreateMachine(id, attrs);
+					addMachine(id, machine);
+					machines.add(machine);
+					changed = true;
+				}
+			}
+			
+			if (changed) {
+				fireNewMachines(machines);
+			}
 		}
 	}
 	
@@ -212,21 +258,31 @@ public abstract class AbstractRuntimeResourceManager extends
 	 */
 	public void handleRuntimeNewNodeEvent(IRuntimeNewNodeEvent e) {
 		boolean changed = false;
-		int machineId = e.getParentId();
-		RangeSet nodeIds = e.getElementIds();
-		IAttribute[] attrs = e.getAttributes();
-
-		List<IPNode> nodes = new ArrayList<IPNode>();
-		for (int id : nodeIds) {	
-			IPMachineControl machine = getMachineControl(machineId);
-			IPNodeControl node = doCreateNode(machine, id, attrs);
-			nodes.add(node);
-			addNode(id, node);
-			changed = true;
-		}
+		IPMachineControl machine = getMachineControl(e.getParentId());
 		
-		if (changed) {
-			fireNewNodes(nodes);
+		if (machine != null) {
+			ElementAttributeManager mgr = e.getElementAttributeManager();
+	
+			List<IPNode> nodes = new ArrayList<IPNode>();
+			
+			for (Map.Entry<RangeSet, AttributeManager> entry : mgr.getEntrySet()) {
+				IAttribute[] attrs = entry.getValue().getAttributes();
+				changed = false;
+	
+				for (int id : entry.getKey()) {
+					IPNodeControl node = getNodeControl(id);
+					if (node == null) {
+						node = doCreateNode(machine, id, attrs);
+						nodes.add(node);
+						addNode(id, node);
+						changed = true;
+					}
+				}
+				
+				if (changed) {
+					fireNewNodes(nodes);
+				}
+			}
 		}
 	}
 	
@@ -235,22 +291,31 @@ public abstract class AbstractRuntimeResourceManager extends
 	 */
 	public void handleRuntimeNewProcessEvent(IRuntimeNewProcessEvent e) {
 		boolean changed = false;
-		int jobId = e.getParentId();
-		RangeSet processIds = e.getElementIds();
-		IAttribute[] attrs = e.getAttributes();
-
-		List<IPProcess> procs = new ArrayList<IPProcess>();
+		IPJobControl job = getJobControl(e.getParentId());
 		
-		for (int id : processIds) {	
-			IPJobControl job = getJobControl(jobId);
-			IPProcessControl process = doCreateProcess(job, id, attrs);
-			addProcess(id, process);
-			procs.add(process);
-			changed = true;
-		}
-		
-		if (changed) {
-			fireNewProcesses(procs);
+		if (job != null) {
+			ElementAttributeManager mgr = e.getElementAttributeManager();
+	
+			List<IPProcess> procs = new ArrayList<IPProcess>();
+			
+			for (Map.Entry<RangeSet, AttributeManager> entry : mgr.getEntrySet()) {
+				IAttribute[] attrs = entry.getValue().getAttributes();
+				changed = false;
+	
+				for (int id : entry.getKey()) {
+					IPProcessControl process = getProcessControl(id);
+					if (process == null) {
+						process = doCreateProcess(job, id, attrs);
+						addProcess(id, process);
+						procs.add(process);
+						changed = true;
+					}
+				}
+				
+				if (changed) {
+					fireNewProcesses(procs);
+				}
+			}
 		}
 	}
 
@@ -261,20 +326,27 @@ public abstract class AbstractRuntimeResourceManager extends
 		System.out.println(this + ": handleRuntimeNewQueueEvent");
 
 		boolean changed = false;
-		RangeSet queueIds = e.getElementIds();
-		IAttribute[] attrs = e.getAttributes();
+		ElementAttributeManager mgr = e.getElementAttributeManager();
 		
 		List<IPQueue> queues = new ArrayList<IPQueue>();
 		
-		for (int id : queueIds) {	
-			IPQueueControl queue = doCreateQueue(id, attrs);
-			addQueue(id, queue);
-			queues.add(queue);
-			changed = true;
-		}
-		
-		if (changed) {
-			fireNewQueues(queues);
+		for (Map.Entry<RangeSet, AttributeManager> entry : mgr.getEntrySet()) {
+			IAttribute[] attrs = entry.getValue().getAttributes();
+			changed = false;
+
+			for (int id : entry.getKey()) {
+				IPQueueControl queue = getQueueControl(id);
+				if (queue == null) {
+					queue = doCreateQueue(id, attrs);
+					addQueue(id, queue);
+					queues.add(queue);
+					changed = true;
+				}
+			}
+			
+			if (changed) {
+				fireNewQueues(queues);
+			}
 		}
 	}
 
@@ -283,21 +355,26 @@ public abstract class AbstractRuntimeResourceManager extends
 	 */
 	public void handleRuntimeNodeChangeEvent(IRuntimeNodeChangeEvent e) {
 		boolean changed = false;
-		RangeSet nodeIds = e.getElementIds();
-		IAttribute[] attrs = e.getAttributes();
+		ElementAttributeManager eMgr = e.getElementAttributeManager();
 
 		List<IPNode> changedNodes = new ArrayList<IPNode>();
-		for (int id : nodeIds) {		
-			IPNodeControl node = getNodeControl(id);
-			final boolean nodeChanged = doUpdateNode(node, attrs);
-			changed |= nodeChanged;
-			if (nodeChanged) {
-				changedNodes.add(node);
+
+		for (Map.Entry<RangeSet, AttributeManager> entry : eMgr.getEntrySet()) {
+			IAttribute[] attrs = entry.getValue().getAttributes();
+			changed = false;
+			
+			for (int id : entry.getKey()) {
+				IPNodeControl node = getNodeControl(id);
+				final boolean nodeChanged = doUpdateNode(node, attrs);
+				changed |= nodeChanged;
+				if (nodeChanged) {
+					changedNodes.add(node);
+				}
 			}
-		}
-		
-		if (changed) {
-			fireNodesChanged(changedNodes);
+			
+			if (changed) {
+				fireNodesChanged(changedNodes);
+			}
 		}
 	}
 
@@ -306,22 +383,26 @@ public abstract class AbstractRuntimeResourceManager extends
 	 */
 	public void handleRuntimeProcessChangeEvent(IRuntimeProcessChangeEvent e) {
 		boolean changed = false;
-		RangeSet processIds = e.getElementIds();
-		IAttribute[] attrs = e.getAttributes();
+		ElementAttributeManager eMgr = e.getElementAttributeManager();
 		
 		List<IPProcess> procs = new ArrayList<IPProcess>();
 		
-		for (int id : processIds) {		
-			IPProcessControl process = getProcessControl(id);
-			final boolean procChanged = doUpdateProcess(process, attrs);
-			changed |= procChanged;
-			if (procChanged) {
-				procs.add(process);
+		for (Map.Entry<RangeSet, AttributeManager> entry : eMgr.getEntrySet()) {
+			IAttribute[] attrs = entry.getValue().getAttributes();
+			changed = false;
+			
+			for (int id : entry.getKey()) {
+				IPProcessControl process = getProcessControl(id);
+				final boolean procChanged = doUpdateProcess(process, attrs);
+				changed |= procChanged;
+				if (procChanged) {
+					procs.add(process);
+				}
 			}
-		}
-		
-		if (changed) {
-			fireProcessesChanged(procs);
+			
+			if (changed) {
+				fireProcessesChanged(procs);
+			}
 		}
 	}
 	
@@ -330,22 +411,26 @@ public abstract class AbstractRuntimeResourceManager extends
 	 */
 	public void handleRuntimeQueueChangeEvent(IRuntimeQueueChangeEvent e) {
 		boolean changed = false;
-		RangeSet queueIds = e.getElementIds();
-		IAttribute[] attrs = e.getAttributes();
+		ElementAttributeManager eMgr = e.getElementAttributeManager();
 		
 		List<IPQueue> queues = new ArrayList<IPQueue>();
 		
-		for (int id : queueIds) {		
-			IPQueueControl queue = getQueueControl(id);
-			final boolean queueChanged = doUpdateQueue(queue, attrs);
-			changed |= queueChanged;
-			if (queueChanged) {
-				queues.add(queue);
+		for (Map.Entry<RangeSet, AttributeManager> entry : eMgr.getEntrySet()) {
+			IAttribute[] attrs = entry.getValue().getAttributes();
+			changed = false;
+			
+			for (int id : entry.getKey()) {
+				IPQueueControl queue = getQueueControl(id);
+				final boolean queueChanged = doUpdateQueue(queue, attrs);
+				changed |= queueChanged;
+				if (queueChanged) {
+					queues.add(queue);
+				}
 			}
-		}
-		
-		if (changed) {
-			fireQueuesChanged(queues);
+			
+			if (changed) {
+				fireQueuesChanged(queues);
+			}
 		}
 	}
 
@@ -555,9 +640,49 @@ public abstract class AbstractRuntimeResourceManager extends
 		}
 	}
 	
-	protected IPJob doSubmitJob(ILaunch launch, JobRunConfiguration jobRunConfig, IProgressMonitor monitor) throws CoreException {
-		// TODO how?
-		return null;
+	//
+	// TODO this needs to be changed to make job submission
+	// asynchronous. Corresponding changes to the launch
+	// configuration will be required.
+	//
+	protected IPJob doSubmitJob(IPQueue queue, JobRunConfiguration jobRunConfig, IProgressMonitor monitor) throws CoreException {
+		if (monitor == null) {
+			monitor = new NullProgressMonitor();
+		}
+		jobSubmissionLock.lock();
+		try {
+			newJob = null;
+			
+			IAttribute[] attrs = jobRunConfig.getLaunchAttributes();
+			AttributeManager attrMgr = new AttributeManager(attrs);
+			// FIXME: generate a proper job submission id
+			jobSubId++;
+			
+			/*
+			 * Add a queueId attribute
+			 */
+			IIntegerAttribute queueId = QueueAttributes.getIdAttributeDefinition().create(queue.getID());
+			attrMgr.setAttribute(queueId);
+			
+			runtimeSystem.submitJob(jobSubId, attrMgr);
+			
+			while (!monitor.isCanceled() && newJob != null) {
+				try {
+					jobSubmissionCondition.await(500, TimeUnit.MILLISECONDS);
+				} catch (InterruptedException e) {
+					// Expect to be interrupted if monitor is cancelled
+				}
+			}
+			if (monitor.isCanceled()) {
+				//abortConnection(runtimeSystem);
+				return null;
+			}
+		} catch (IllegalValueException e) {
+		} finally {
+			jobSubmissionLock.unlock();
+			monitor.done();
+		}
+		return newJob;
 	}
 	
 	protected void doTerminateJob(IPJob job) throws CoreException {

@@ -54,6 +54,12 @@ import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPNode;
 import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.IPQueue;
+import org.eclipse.ptp.core.elements.attributes.JobAttributes;
+import org.eclipse.ptp.core.elements.attributes.MachineAttributes;
+import org.eclipse.ptp.core.elements.attributes.NodeAttributes;
+import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
+import org.eclipse.ptp.core.elements.attributes.QueueAttributes;
+import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.internal.core.PElement;
 import org.eclipse.ptp.internal.core.PJob;
 import org.eclipse.ptp.internal.core.PMachine;
@@ -104,7 +110,7 @@ IResourceManagerControl {
 	private final ListenerList listeners = new ListenerList();
 
 	private final IResourceManagerConfiguration config;
-	private ResourceManagerState.State state;
+	private ResourceManagerAttributes.State state;
 	private String statusMessage;
 	private AttributeDefinitionManager attrDefManager;
 
@@ -118,15 +124,15 @@ IResourceManagerControl {
 	{
 		super(id, universe, P_RESOURCE_MANAGER, getDefaultAttributes(config));
 		this.config = config;
-		this.state = ResourceManagerState.State.STOPPED;
+		this.state = ResourceManagerAttributes.State.STOPPED;
 		this.statusMessage = this.state.toString();
 		this.attrDefManager = new AttributeDefinitionManager();
-		this.attrDefManager.setAttributeDefinition(JobState.getStateAttributeDefinition());
-		this.attrDefManager.setAttributeDefinition(MachineState.getStateAttributeDefinition());
-		this.attrDefManager.setAttributeDefinition(NodeState.getStateAttributeDefinition());
-		this.attrDefManager.setAttributeDefinition(ProcessState.getStateAttributeDefinition());
-		this.attrDefManager.setAttributeDefinition(QueueState.getStateAttributeDefinition());
-		this.attrDefManager.setAttributeDefinition(ResourceManagerState.getStateAttributeDefinition());
+		this.attrDefManager.setAttributeDefinitions(JobAttributes.getDefaultAttributeDefinitions());
+		this.attrDefManager.setAttributeDefinitions(MachineAttributes.getDefaultAttributeDefinitions());
+		this.attrDefManager.setAttributeDefinitions(NodeAttributes.getDefaultAttributeDefinitions());
+		this.attrDefManager.setAttributeDefinitions(ProcessAttributes.getDefaultAttributeDefinitions());
+		this.attrDefManager.setAttributeDefinitions(QueueAttributes.getDefaultAttributeDefinitions());
+		this.attrDefManager.setAttributeDefinitions(ResourceManagerAttributes.getDefaultAttributeDefinitions());
 	}
 
 	/*
@@ -143,9 +149,9 @@ IResourceManagerControl {
 	 * @see org.eclipse.ptp.rmsystem.IResourceManager#disableEvents()
 	 */
 	public void disableEvents() throws CoreException {
-	    if (getState().equals(ResourceManagerState.State.STARTED)) {
+	    if (getState().equals(ResourceManagerAttributes.State.STARTED)) {
 	        doDisableEvents();
-	        setState(ResourceManagerState.State.SUSPENDED);
+	        setState(ResourceManagerAttributes.State.SUSPENDED);
             fireSuspended();
         }
 	}
@@ -166,9 +172,9 @@ IResourceManagerControl {
 	 * @see org.eclipse.ptp.rmsystem.IResourceManager#enableEvents()
 	 */
 	public void enableEvents() throws CoreException {
-	    if (getState().equals(ResourceManagerState.State.SUSPENDED)) {
+	    if (getState().equals(ResourceManagerAttributes.State.SUSPENDED)) {
 	        doEnableEvents();
-	        setState(ResourceManagerState.State.STARTED);
+	        setState(ResourceManagerAttributes.State.STARTED);
             fireStarted();
 	    }
 	}
@@ -323,7 +329,7 @@ IResourceManagerControl {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.IResourceManager#getStatus()
 	 */
-	synchronized public ResourceManagerState.State getState() {
+	synchronized public ResourceManagerAttributes.State getState() {
 		return state;
 	}
 	
@@ -370,13 +376,13 @@ IResourceManagerControl {
             monitor = new NullProgressMonitor();
         }
 		monitor.beginTask("Stopping Resource Manager " + getName(), 10);
-        ResourceManagerState.State state = getState();
-		if (!state.equals(ResourceManagerState.State.STOPPED)) {
+        ResourceManagerAttributes.State state = getState();
+		if (!state.equals(ResourceManagerAttributes.State.STOPPED)) {
 			SubProgressMonitor subMonitor = new SubProgressMonitor(monitor, 10);
 			try {
 				doShutdown(subMonitor);
 				if (!subMonitor.isCanceled()) {
-					setState(ResourceManagerState.State.STOPPED);
+					setState(ResourceManagerAttributes.State.STOPPED);
 					fireShutdown();
 				}
 			}
@@ -399,14 +405,14 @@ IResourceManagerControl {
             monitor = new NullProgressMonitor();
         }
 		monitor.beginTask("Starting Resource Manager " + getName(), 10);
-        ResourceManagerState.State state = getState();
-		if (!state.equals(ResourceManagerState.State.STARTED) &&
-				!state.equals(ResourceManagerState.State.ERROR)) {
+        ResourceManagerAttributes.State state = getState();
+		if (!state.equals(ResourceManagerAttributes.State.STARTED) &&
+				!state.equals(ResourceManagerAttributes.State.ERROR)) {
 			SubProgressMonitor subMonitor = new SubProgressMonitor(monitor, 10);
 			try {
 				doStartup(subMonitor);
 				if (!subMonitor.isCanceled()) {
-					setState(ResourceManagerState.State.STARTED);
+					setState(ResourceManagerAttributes.State.STARTED);
 					fireStarted();
 				}
 			}
@@ -419,8 +425,8 @@ IResourceManagerControl {
 		}
 	}
 	
-	public IPJob submitJob(ILaunch launch, JobRunConfiguration jobRunConfig, IProgressMonitor monitor) throws CoreException {
-		return doSubmitJob(launch, jobRunConfig, monitor);
+	public IPJob submitJob(IPQueue queue, JobRunConfiguration jobRunConfig, IProgressMonitor monitor) throws CoreException {
+		return doSubmitJob(queue, jobRunConfig, monitor);
 	}
 	
 	public void terminateJob(IPJob job) throws CoreException {
@@ -484,12 +490,12 @@ IResourceManagerControl {
 	protected abstract void doStartup(IProgressMonitor monitor) throws CoreException;
 	
 	/**
-	 * @param launch
+	 * @param queue
 	 * @param jobRunConfig
 	 * @param monitor
 	 * @throws CoreException
 	 */
-	protected abstract IPJob doSubmitJob(ILaunch launch, JobRunConfiguration jobRunConfig, IProgressMonitor monitor) throws CoreException;
+	protected abstract IPJob doSubmitJob(IPQueue queue, JobRunConfiguration jobRunConfig, IProgressMonitor monitor) throws CoreException;
 
 	/**
 	 * @param job
@@ -700,7 +706,7 @@ IResourceManagerControl {
 	/**
 	 * @param state
 	 */
-	synchronized protected void setState(ResourceManagerState.State state) {
+	synchronized protected void setState(ResourceManagerAttributes.State state) {
 		this.state = state;
 		setStatusMessage(state.toString());
 	}
@@ -709,7 +715,7 @@ IResourceManagerControl {
 	 * @param state
 	 * @param message
 	 */
-	synchronized protected void setState(ResourceManagerState.State state, String message) {
+	synchronized protected void setState(ResourceManagerAttributes.State state, String message) {
 		this.state = state;
 		setStatusMessage(message);
 	}

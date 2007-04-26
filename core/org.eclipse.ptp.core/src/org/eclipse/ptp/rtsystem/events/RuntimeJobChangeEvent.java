@@ -19,13 +19,11 @@
 
 package org.eclipse.ptp.rtsystem.events;
 
-import org.eclipse.ptp.core.attributes.IAttribute;
-import org.eclipse.ptp.core.util.RangeSet;
+import org.eclipse.ptp.core.elements.attributes.ElementAttributeManager;
 
 public class RuntimeJobChangeEvent extends AbstractRuntimeChangeEvent implements IRuntimeJobChangeEvent {
 
-	public RuntimeJobChangeEvent(RangeSet ids, IAttribute[] args) {
-		super(ids, args);
+	public RuntimeJobChangeEvent(ElementAttributeManager attrs) {
+		super(attrs);
 	}
-
 }
