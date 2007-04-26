@@ -60,7 +60,7 @@ public class OpenMPAnalysisManager
     
 
     /**
-     * OpenMPAnalysisManager - Constructor used by Eclipse
+     * Constructor called by eclipse
      * @param file
      * @throws OpenMPAnalysisException
      */
@@ -80,7 +80,7 @@ public class OpenMPAnalysisManager
     }
     
     /**
-     * OpenMPAnalysisManager - Constructor used by testing mechanism
+     * Constructor used by testing mechanism
      * @param astTransUnit
      */
     public OpenMPAnalysisManager(IASTTranslationUnit astTransUnit, IFile iFile)
@@ -92,7 +92,7 @@ public class OpenMPAnalysisManager
     }
     
     /**
-     * getCurrentManager - get the last analysis manager built
+     * Get the last analysis manager built
      * @return OpenMPAnalysisManager
      */
     public static OpenMPAnalysisManager getCurrentManager()
@@ -101,7 +101,7 @@ public class OpenMPAnalysisManager
     }
     
     /**
-     * init - main logic invoked by both constructors
+     * main logic invoked by both constructors
      *
      */
     private void init()
@@ -123,7 +123,7 @@ public class OpenMPAnalysisManager
     }
 	
     /**
-     * buildPreprocessorAST - build all the nodes, compute which compiled
+     * Build all the nodes, compute which compiled
      *
      */
 	private void buildPreprocessorAST()
@@ -141,7 +141,7 @@ public class OpenMPAnalysisManager
 	}
     
     /**
-     * buildDictionary - build the "variable" dictionary
+     * Build the "variable" dictionary
      *
      */
     private void buildDictionary()
@@ -162,7 +162,7 @@ public class OpenMPAnalysisManager
 //    }
     
     /**
-     * buildOMPPragmas - build the OMP style pragmas
+     * Build the OMP style pragmas
      *
      */
     private void buildOMPPragmas()
@@ -209,7 +209,7 @@ public class OpenMPAnalysisManager
     }
     
     /**
-     * buildOMPConcurrencyAnalysis - concurrency analysis
+     * Build concurrency analysis
      *
      */
     private void buildOMPConcurrencyAnalysis()
@@ -229,7 +229,7 @@ public class OpenMPAnalysisManager
     }
 
     /**
-     * buildFileMap - build the location-->stmt/expr map
+     * Build the location-->stmt/expr map
      *
      */
     protected void buildFileMap()
@@ -240,7 +240,7 @@ public class OpenMPAnalysisManager
     }
     
     /**
-     * getPAST - the the PAST tree
+     * Get the pragma AST tree
      * @return PASTNode []
      */
     public PASTNode [] getPAST()
@@ -249,7 +249,7 @@ public class OpenMPAnalysisManager
     }
     
     /**
-     * getOMPPragmas - return a list of PASTOMPPragmas
+     * Return a list of PASTOMPPragmas
      * @return
      */
     public PASTOMPPragma [] getOMPPragmas()
@@ -258,7 +258,7 @@ public class OpenMPAnalysisManager
     }
     
     /**
-     * getTU - return IASTTranslationUnit
+     * Return IASTTranslationUnit
      * @return IASTTranslationUnit
      */
     public IASTTranslationUnit getTU()
@@ -267,7 +267,7 @@ public class OpenMPAnalysisManager
     }
     
     /**
-     * getFileMap - accessor to the file map for analyzed file
+     * Accessor to the file map for analyzed file
      * @return FileStatementMap
      */
     public FileStatementMap getFileMap()
@@ -276,7 +276,7 @@ public class OpenMPAnalysisManager
     }
     
     /**
-     * getAnalyses - get the analysis for each function
+     * Get the analysis for each function
      * @return FunctionConcurrencyAnalysis []
      */
     public FunctionConcurrencyAnalysis [] getAnalyses() 
@@ -284,7 +284,7 @@ public class OpenMPAnalysisManager
     
     
     /**
-     * getNodesConcurrentTo - get all nodes concurrent to given node
+     * Get all nodes concurrent to given node
      * @param node - IASTNode
      * @return Set
      */
@@ -294,7 +294,7 @@ public class OpenMPAnalysisManager
     }
    
     /**
-     * printResults - prints out results for debugging
+     * Prints out results for debugging
      *
      */
     protected void printPASTResults()
@@ -313,7 +313,7 @@ public class OpenMPAnalysisManager
     }
 	
     /**
-     * computeCompiled - compute which statements compiled
+     * Compute which statements compiled
      *
      */
 	private void computeCompiled()
@@ -330,6 +330,9 @@ public class OpenMPAnalysisManager
         int i=0;
         for(i=0; i<past_.length; i++) {
         	PASTNode node = past_[i];
+        	if(node==null){
+        		int stopHere=0;
+        	}
         	if (currentEvaluation) {
         		if (isIf(node)) {
         			currentEvaluation = ifDecision(node);
@@ -415,7 +418,7 @@ public class OpenMPAnalysisManager
 	}
 	
     /**
-     * isIF - determine if node is a branch
+     * Determine if node is a branch
      * @param node
      * @return
      */
@@ -425,7 +428,7 @@ public class OpenMPAnalysisManager
 	}
 	
     /**
-     * ifDecision - retrieve the compile decision of the if condition
+     * Retrieve the compile decision of the 'if' condition
      * @param node
      * @return
      */
@@ -439,7 +442,7 @@ public class OpenMPAnalysisManager
 	}
 	
     /**
-     * isElse - determine if the node is of else kind
+     * Determine if the node is of 'else' kind
      * @param node
      * @return
      */
@@ -449,7 +452,7 @@ public class OpenMPAnalysisManager
 	}
     
     /**
-     * isElseif - determine if the node is of elseif kind
+     * Determine if the node is of 'elseif' kind
      * @param node
      * @return
      */
@@ -459,7 +462,7 @@ public class OpenMPAnalysisManager
     }
 	
     /**
-     * isEnd - determine if node is of end kind
+     * Determine if node is of 'end' kind
      * @param node
      * @return
      */
@@ -470,10 +473,8 @@ public class OpenMPAnalysisManager
 	
 	
     /**
-    //******************************************************************************
-    // Class: CompiledContext - stack object used for evaluating "compiled" state of PP's
-    //******************************************************************************
-     */
+    * Stack object used for evaluating "compiled" state of PP's
+    */
 	private static class CompiledContext
 	{
 		private boolean evaluation_  = false;

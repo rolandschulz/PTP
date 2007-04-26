@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2006 IBM Corporation.
+ * Copyright (c) 2006, 2007 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -62,6 +62,8 @@ public class PASTFactory
     		return new PASTFunctionMacro((ASTFunctionMacro)node);
         else if (node instanceof ASTObjectMacro)
             return new PASTObjectMacro((ASTObjectMacro)node);
-    	return null;
+        else{
+        	return null;//what is node?   LocationMap$ASTWarning.
+        }
     }
 }
