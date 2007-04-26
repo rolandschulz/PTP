@@ -10,10 +10,11 @@
  *******************************************************************************/package org.eclipse.ptp.core.attributes;
 
 import java.util.Arrays;
+import java.util.List;
 
 public final class ArrayAttribute extends AbstractAttribute implements IArrayAttribute {
 
-	private Object[] value;
+	private List<Object> value;
 
 	public ArrayAttribute(IArrayAttributeDefinition definition, String initialValue) throws IllegalValueException {
 		super(definition);
@@ -26,15 +27,19 @@ public final class ArrayAttribute extends AbstractAttribute implements IArrayAtt
 	}
 
 	public Object[] getValue() {
-		return this.value;
+		return this.value.toArray();
 	}
 	
 	public void setValue(Object[] value) {
-		this.value = value;
+		this.value = Arrays.asList(value);
+	}
+
+	public void addAll(Object[] value) {
+		this.value.addAll(Arrays.asList(value));
 	}
 
 	public String getValueAsString() {
-		return Arrays.toString(value);
+		return Arrays.toString(value.toArray());
 	}
 
 	public boolean isValid(String string) {
