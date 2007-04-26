@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunch;
+import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.elements.IPElement;
@@ -112,14 +113,13 @@ IAdaptable, IResourceManagerMenuContribution {
 	public void removeResourceManagerListener(IResourceManagerListener listener);
 	
 	/**
-	 * @param queue
-	 * @param jobRunConfig
+	 * @param attrMgr
 	 * @param pm
-	 * @return
+	 * @return IPJob
 	 * @throws CoreException
 	 */
-	public IPJob submitJob(IPQueue queue, JobRunConfiguration jobRunConfig,
-			IProgressMonitor pm) throws CoreException;
+	public IPJob submitJob(AttributeManager attrMgr, IProgressMonitor pm) 
+		throws CoreException;
 
 	/**
 	 * 
