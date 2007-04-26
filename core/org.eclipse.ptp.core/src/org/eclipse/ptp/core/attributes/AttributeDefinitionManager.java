@@ -52,6 +52,12 @@ public class AttributeDefinitionManager {
 		}
 	}
 	
+	public void setAttributeDefinitions(IAttributeDefinition[] attrDefs) {
+		for (IAttributeDefinition attrDef : attrDefs) {
+			setAttributeDefinition(attrDef);
+		}
+	}
+	
 	/**
 	 * Lookup an attribute definition
 	 * 

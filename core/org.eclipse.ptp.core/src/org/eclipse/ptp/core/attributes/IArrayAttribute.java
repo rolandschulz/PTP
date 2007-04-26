@@ -16,4 +16,6 @@ public interface IArrayAttribute extends IAttribute {
 	public Object[] getValue();
 	
 	public void setValue(Object[] value);
+	
+	public void addAll(Object[] value);
 }
