@@ -1,0 +1,382 @@
+package org.eclipse.ptp.proxy.tests.orte;
+
+import static org.junit.Assert.assertEquals;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
+
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
+import org.eclipse.ptp.core.attributes.AttributeManager;
+import org.eclipse.ptp.core.attributes.IAttribute;
+import org.eclipse.ptp.core.attributes.IEnumeratedAttribute;
+import org.eclipse.ptp.core.attributes.IIntegerAttribute;
+import org.eclipse.ptp.core.attributes.IStringAttribute;
+import org.eclipse.ptp.core.attributes.IllegalValueException;
+import org.eclipse.ptp.core.elements.attributes.JobAttributes;
+import org.eclipse.ptp.core.elements.attributes.QueueAttributes;
+import org.eclipse.ptp.core.util.RangeSet;
+import org.eclipse.ptp.orte.core.rtsystem.ORTEProxyRuntimeClient;
+import org.eclipse.ptp.orte.core.rtsystem.ORTERuntimeSystem;
+import org.eclipse.ptp.rmsystem.JobState;
+import org.eclipse.ptp.rmsystem.MachineState;
+import org.eclipse.ptp.rmsystem.NodeState;
+import org.eclipse.ptp.rmsystem.ProcessState;
+import org.eclipse.ptp.rmsystem.ResourceManagerState;
+import org.eclipse.ptp.rtsystem.IRuntimeEventListener;
+import org.eclipse.ptp.rtsystem.JobRunConfiguration;
+import org.eclipse.ptp.rtsystem.events.IRuntimeAttributeDefinitionEvent;
+import org.eclipse.ptp.rtsystem.events.IRuntimeConnectedStateEvent;
+import org.eclipse.ptp.rtsystem.events.IRuntimeErrorEvent;
+import org.eclipse.ptp.rtsystem.events.IRuntimeJobChangeEvent;
+import org.eclipse.ptp.rtsystem.events.IRuntimeMachineChangeEvent;
+import org.eclipse.ptp.rtsystem.events.IRuntimeNewJobEvent;
+import org.eclipse.ptp.rtsystem.events.IRuntimeNewMachineEvent;
+import org.eclipse.ptp.rtsystem.events.IRuntimeNewNodeEvent;
+import org.eclipse.ptp.rtsystem.events.IRuntimeNewProcessEvent;
+import org.eclipse.ptp.rtsystem.events.IRuntimeNewQueueEvent;
+import org.eclipse.ptp.rtsystem.events.IRuntimeNodeChangeEvent;
+import org.eclipse.ptp.rtsystem.events.IRuntimeProcessChangeEvent;
+import org.eclipse.ptp.rtsystem.events.IRuntimeQueueChangeEvent;
+import org.eclipse.ptp.rtsystem.events.IRuntimeRunningStateEvent;
+import org.eclipse.ptp.rtsystem.events.IRuntimeShutdownStateEvent;
+import org.junit.Test;
+
+public class ORTERuntimeSystemTest implements IRuntimeEventListener {
+	
+	private boolean connected = false;
+	private boolean running = false;
+	private boolean haveQueue = false;
+	private boolean jobCompleted = false;
+	private boolean shutdown = false;
+	private ReentrantLock lock = new ReentrantLock();
+	private Condition notConnected = lock.newCondition();
+	private Condition notRunning = lock.newCondition();
+	private Condition notHaveQueue = lock.newCondition();
+	private Condition notJobCompleted = lock.newCondition();
+	private Condition notShutdown = lock.newCondition();
+	
+	private int queueId = -1;
+	private String queueName = null;
+	private int jobId;
+	private int jobSubmitID = 3;
+	private final int rmId = 200; /* fake rm ID */
+
+	@Test public void start_stop() {
+
+		this.connected = false;
+		this.running = false;
+		this.shutdown = false;
+		
+		boolean error = false;
+		boolean launchManually = false;
+		String proxy = "orte/ptp_orte_proxy";
+
+		ORTEProxyRuntimeClient client = new ORTEProxyRuntimeClient(proxy, rmId, launchManually);
+		ORTERuntimeSystem rtsystem = new ORTERuntimeSystem(client, new AttributeDefinitionManager());
+		rtsystem.addRuntimeEventListener(this);
+		
+		lock.lock();
+		try {
+			rtsystem.startup();
+			while (!connected) {
+				notConnected.await();
+			}
+			System.out.println("test: connected");
+			while (!running) {
+				notRunning.await();
+			}
+			System.out.println("test: running");
+			rtsystem.shutdown();
+			while (!shutdown) {
+				notShutdown.await();
+			}
+			System.out.println("test: shutdown");
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (CoreException e) {
+			e.printStackTrace();
+		} finally {
+			lock.unlock();
+		}
+
+		assertEquals("ORTERemoteProxyTest: Proxy Client: FAILURE, unsuccessfull initialization",
+	              false,
+	              error);
+
+	}
+
+	@Test public void submitJob() {
+
+		this.connected = false;
+		this.running = false;
+		this.haveQueue = false;
+		this.jobCompleted = false;
+		this.shutdown = false;
+
+		boolean error = false;
+		boolean launchManually = false;
+		String proxy = "orte/ptp_orte_proxy";
+		int nProcs = 4;
+		int firstNodeNum = 1;
+		int nProcsPerNode = 1;
+		
+		String exe = "ls";
+		String exePath = "/bin";
+		String rm = "ORTE";
+		
+		IAttribute[] attr = null;
+
+		String[] configArgs = null;
+		String[] env = null;
+		String dir = "/etc";
+		
+		AttributeDefinitionManager attrDefManager = new AttributeDefinitionManager();
+		attrDefManager.setAttributeDefinition(JobState.getStateAttributeDefinition());
+		attrDefManager.setAttributeDefinition(MachineState.getStateAttributeDefinition());
+		attrDefManager.setAttributeDefinition(NodeState.getStateAttributeDefinition());
+		attrDefManager.setAttributeDefinition(ProcessState.getStateAttributeDefinition());
+		attrDefManager.setAttributeDefinition(QueueAttributes.getStateAttributeDefinition());
+		attrDefManager.setAttributeDefinition(ResourceManagerState.getStateAttributeDefinition());
+		ORTEProxyRuntimeClient client = new ORTEProxyRuntimeClient(proxy, rmId, launchManually);
+		ORTERuntimeSystem rtsystem = new ORTERuntimeSystem(client, attrDefManager);
+		rtsystem.addRuntimeEventListener(this);
+		
+		lock.lock();
+		try {
+			rtsystem.startup();
+			while (!connected) {
+				notConnected.await();
+			}
+			while (!running) {
+				notRunning.await();
+			}
+			try {
+				rtsystem.startEvents();
+			} catch(CoreException e) {
+				error = true;
+			}
+			
+			while (!haveQueue) {
+				notHaveQueue.await();
+			}
+
+			if (!error) {
+				JobRunConfiguration jobRunConfig = new JobRunConfiguration(exe, exePath, rm,
+						queueName, attr, configArgs, env, dir);
+				AttributeDefinitionManager defMgr = new AttributeDefinitionManager();
+
+				AttributeManager attrMgr = new AttributeManager();
+				
+				try {
+					attrMgr.setAttribute(QueueAttributes.getIdAttributeDefinition().create(queueId));
+					
+					attrMgr.setAttribute(defMgr.createStringAttributeDefinition("execName", "", "", "").create(jobRunConfig.getExecName()));
+					
+					String path = jobRunConfig.getPathToExec();
+					if (path != null) {
+						attrMgr.setAttribute(defMgr.createStringAttributeDefinition("pathToExec", "", "", "").create(path));
+					}
+					
+					attrMgr.setAttribute(defMgr.createIntegerAttributeDefinition("numOfProcs", "", "", 0).create(nProcs));
+					attrMgr.setAttribute(defMgr.createIntegerAttributeDefinition("procsPerNode", "", "", 0).create(nProcsPerNode));
+					attrMgr.setAttribute(defMgr.createIntegerAttributeDefinition("firstNodeNum", "", "", 0).create(firstNodeNum));
+							
+					String wd = jobRunConfig.getWorkingDir();
+					if (wd != null) {
+						attrMgr.setAttribute(defMgr.createStringAttributeDefinition("workingDir", "", "", "").create(wd));
+					}
+					
+					String[] argArr = jobRunConfig.getArguments();
+					if (argArr != null) {
+						attrMgr.setAttribute(defMgr.createArrayAttributeDefinition("progArg", "", "", null).create(argArr));
+					}
+					
+					String[] envArr = jobRunConfig.getEnvironment();
+					if (envArr != null) {
+						attrMgr.setAttribute(defMgr.createArrayAttributeDefinition("progEnv", "", "", null).create(envArr));
+					}
+					
+					if (jobRunConfig.isDebug()) {
+						attrMgr.setAttribute(defMgr.createStringAttributeDefinition("debuggerPath", "", "", "").create(jobRunConfig.getDebuggerPath()));
+						String[] dbgArgs = jobRunConfig.getDebuggerArgs();
+						if (dbgArgs != null) {
+							attrMgr.setAttribute(defMgr.createArrayAttributeDefinition("debuggerArg", "", "", null).create(dbgArgs));
+						}
+					}
+					
+					System.out.println("about to submit");
+					rtsystem.submitJob(jobSubmitID, attrMgr);
+				} catch (IllegalValueException e1) {
+					error = true;
+				} catch(CoreException e) {
+					error = true;
+				}
+			}
+
+			while (!error && !jobCompleted) {
+				notJobCompleted.await();
+			}
+			
+			rtsystem.shutdown();
+			while (!shutdown) {
+				notShutdown.await();
+			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (CoreException e) {
+			e.printStackTrace();
+		} finally {
+			lock.unlock();
+		}
+    	      
+		assertEquals("ORTERemoteProxyTest: Proxy Client: FAILURE, unsuccessfull initialization",
+    	              false,
+    	              error);
+
+	}
+
+	public void handleRuntimeAttributeDefinitionEvent(IRuntimeAttributeDefinitionEvent e) {
+		System.out.println("got attribute def event");
+	}
+
+	public void handleRuntimeNewJobEvent(IRuntimeNewJobEvent e) {
+		for (Map.Entry<RangeSet, AttributeManager> entry : e.getElementAttributeManager().getEntrySet()) {
+			AttributeManager mgr = entry.getValue();
+			for (int id : entry.getKey()) {
+				IIntegerAttribute attr = (IIntegerAttribute) mgr.getAttribute(JobAttributes.getSubIdAttributeDefinition());
+				if (attr.getValue() == jobSubmitID) {
+					jobId = id;
+					return;
+				}
+			}
+		}
+	}
+
+	public void handleRuntimeNewMachineEvent(IRuntimeNewMachineEvent e) {
+		for (Integer id : e.getElementAttributeManager().getElementIds()) {
+			System.out.println("new machine " + id.toString());
+		}
+	}
+
+	public void handleRuntimeNewNodeEvent(IRuntimeNewNodeEvent e) {
+		int parentId = e.getParentId();
+		for (Integer id : e.getElementAttributeManager().getElementIds()) {
+			System.out.println("new node " + parentId + " "+ id.toString());
+		}
+	}
+
+	public void handleRuntimeNewQueueEvent(IRuntimeNewQueueEvent e) {
+		for (Map.Entry<RangeSet, AttributeManager> entry : e.getElementAttributeManager().getEntrySet()) {
+			AttributeManager mgr = entry.getValue();
+			for (int id : entry.getKey()) {
+				IStringAttribute attr = (IStringAttribute) mgr.getAttribute(AttributeDefinitionManager.getNameAttributeDefinition());
+				if (attr != null) {
+					queueId = id;
+					queueName = attr.getValueAsString();
+					System.out.println("new queue " + queueName);
+				}
+			}
+		}
+		
+		if (queueId != -1) {
+			lock.lock();
+			try {
+				haveQueue = true;
+				notHaveQueue.signal();
+			} finally {
+				lock.unlock();
+			}
+		}
+	}
+
+	public void handleRuntimeNodeChangeEvent(IRuntimeNodeChangeEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void handleRuntimeJobChangeEvent(IRuntimeJobChangeEvent e) {
+		/*
+		 * Find a state change, if any
+		 */
+		for (Map.Entry<RangeSet, AttributeManager> entry : e.getElementAttributeManager().getEntrySet()) {
+			AttributeManager mgr = entry.getValue();
+			for (int id : entry.getKey()) {
+				if (jobId == id) {
+					IEnumeratedAttribute a = (IEnumeratedAttribute) mgr.getAttribute(JobAttributes.getStateAttributeDefinition());
+					if (a != null && a.getEnumValue() == JobAttributes.State.ABORTED) {
+						System.out.println("job terminated!");
+						lock.lock();
+						try {
+							jobCompleted = true;
+							notJobCompleted.signal();
+						} finally {
+							lock.unlock();
+						}
+						return;
+					}
+				}
+			}
+		}
+	}
+
+	public void handleRuntimeMachineChangeEvent(IRuntimeMachineChangeEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void handleRuntimeNewProcessEvent(IRuntimeNewProcessEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void handleRuntimeProcessChangeEvent(IRuntimeProcessChangeEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void handleRuntimeQueueChangeEvent(IRuntimeQueueChangeEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void handleRuntimeErrorEvent(IRuntimeErrorEvent e) {
+		System.out.println("got runtime error: " + e.getMessage());
+	}
+
+	public void handleRuntimeConnectedStateEvent(IRuntimeConnectedStateEvent e) {
+		lock.lock();
+		try {
+			connected = true;
+			notConnected.signal();
+		} finally {
+			lock.unlock();
+		}		
+	}	
+
+	public void handleRuntimeRunningStateEvent(IRuntimeRunningStateEvent e) {
+		lock.lock();
+		try {
+			running = true;
+			notRunning.signal();
+		} finally {
+			lock.unlock();
+		}
+	}
+
+	public void handleRuntimeShutdownStateEvent(IRuntimeShutdownStateEvent e) {
+		lock.lock();
+		try {
+			shutdown = true;
+			notShutdown.signal();
+		} finally {
+			lock.unlock();
+		}
+	}
+
+}
