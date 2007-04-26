@@ -19,13 +19,12 @@
 
 package org.eclipse.ptp.rtsystem.events;
 
-import org.eclipse.ptp.core.attributes.IAttribute;
-import org.eclipse.ptp.core.util.RangeSet;
+import org.eclipse.ptp.core.elements.attributes.ElementAttributeManager;
 
 public class RuntimeMachineChangeEvent extends AbstractRuntimeChangeEvent implements IRuntimeMachineChangeEvent {
 
-	public RuntimeMachineChangeEvent(RangeSet ids, IAttribute[] args) {
-		super(ids, args);
+	public RuntimeMachineChangeEvent(ElementAttributeManager attrs) {
+		super(attrs);
 	}
 
 }

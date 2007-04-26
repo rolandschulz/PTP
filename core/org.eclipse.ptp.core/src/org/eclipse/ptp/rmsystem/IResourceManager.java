@@ -29,6 +29,7 @@ import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.IPQueue;
+import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.rtsystem.JobRunConfiguration;
 
 public interface IResourceManager extends IPElement,
@@ -98,7 +99,7 @@ IAdaptable, IResourceManagerMenuContribution {
 	/**
 	 * @return
 	 */
-	public ResourceManagerState.State getState();
+	public ResourceManagerAttributes.State getState();
 
 	/**
 	 * @param job
@@ -111,13 +112,13 @@ IAdaptable, IResourceManagerMenuContribution {
 	public void removeResourceManagerListener(IResourceManagerListener listener);
 	
 	/**
-	 * @param launch
+	 * @param queue
 	 * @param jobRunConfig
 	 * @param pm
 	 * @return
 	 * @throws CoreException
 	 */
-	public IPJob submitJob(ILaunch launch, JobRunConfiguration jobRunConfig,
+	public IPJob submitJob(IPQueue queue, JobRunConfiguration jobRunConfig,
 			IProgressMonitor pm) throws CoreException;
 
 	/**

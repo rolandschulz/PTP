@@ -19,10 +19,8 @@
 
 package org.eclipse.ptp.rtsystem.events;
 
-import org.eclipse.ptp.core.attributes.IAttribute;
-import org.eclipse.ptp.core.util.RangeSet;
+import org.eclipse.ptp.core.elements.attributes.ElementAttributeManager;
 
 public interface IRuntimeChangeEvent extends IRuntimeEvent {	
-	public RangeSet getElementIds();
-	public IAttribute[] getAttributes();
+	public ElementAttributeManager getElementAttributeManager();
 }

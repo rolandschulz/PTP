@@ -48,6 +48,7 @@ import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPNode;
 import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.IPUniverse;
+import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.events.IModelErrorEvent;
 import org.eclipse.ptp.core.events.IModelEvent;
 import org.eclipse.ptp.core.events.IModelRuntimeNotifierEvent;
@@ -66,7 +67,6 @@ import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerChangedListener;
 import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
 import org.eclipse.ptp.rmsystem.IResourceManagerListener;
-import org.eclipse.ptp.rmsystem.JobState;
 import org.eclipse.ptp.rmsystem.events.IResourceManagerAddedRemovedEvent;
 import org.eclipse.ptp.rmsystem.events.IResourceManagerChangedJobsEvent;
 import org.eclipse.ptp.rmsystem.events.IResourceManagerChangedMachinesEvent;
@@ -205,7 +205,7 @@ IResourceManagerListener {
 		boolean stateChanged = false;
 		int eventState = -1;
 		final IEnumeratedAttributeDefinition stateAttributeDefinition = 
-			JobState.getStateAttributeDefinition();
+			JobAttributes.getStateAttributeDefinition();
 		for (IAttribute attr : attrs) {
 			if (attr.getDefinition() == stateAttributeDefinition) {
 				stateChanged = true;
@@ -442,7 +442,7 @@ IResourceManagerListener {
 
 	private int extractStateCode(IEnumeratedAttribute attr) {
 		int eventState = -1;
-		JobState.State state = JobState.State.values()[attr.getValueIndex()];
+		JobAttributes.State state = JobAttributes.State.values()[attr.getValueIndex()];
 		switch (state) {
 		case ABORTED:
 			eventState = IModelRuntimeNotifierEvent.ABORTED;

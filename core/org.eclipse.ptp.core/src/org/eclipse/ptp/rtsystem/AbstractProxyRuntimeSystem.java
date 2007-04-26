@@ -23,7 +23,6 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
 import org.eclipse.core.runtime.CoreException;
@@ -31,16 +30,14 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
-import org.eclipse.ptp.core.attributes.BooleanAttributeDefinition;
-import org.eclipse.ptp.core.attributes.DateAttributeDefinition;
-import org.eclipse.ptp.core.attributes.DoubleAttributeDefinition;
-import org.eclipse.ptp.core.attributes.EnumeratedAttributeDefinition;
+import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
+import org.eclipse.ptp.core.attributes.IIntegerAttribute;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
-import org.eclipse.ptp.core.attributes.IntegerAttributeDefinition;
-import org.eclipse.ptp.core.attributes.StringAttributeDefinition;
 import org.eclipse.ptp.core.elements.IPJob;
+import org.eclipse.ptp.core.elements.attributes.ElementAttributeManager;
+import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.util.RangeSet;
 import org.eclipse.ptp.rtsystem.events.RuntimeAttributeDefinitionEvent;
 import org.eclipse.ptp.rtsystem.events.RuntimeConnectedStateEvent;
@@ -75,12 +72,75 @@ import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeQueueChangeEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRunningStateEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeShutdownStateEvent;
 
+/*
+ * ProxyAttributeDefEvents are formatted as follows:
+ * 
+ *	EVENT_HEADER NUM_DEFS ATTR_DEF ... ATTR_DEF
+ * 
+ *	where:
+ * 
+ *	EVENT_HEADER is the event message header
+ *	NUM_DEFS is the number of attribute definitions to follow
+ *	ATTR_DEF is an attribute definition of the form:
+ * 
+ *	NUM_ARGS ID TYPE NAME DESCRIPTION DEFAULT [ADDITIONAL_PARAMS]
+ * 
+ *	where:
+ * 
+ *	NUM_ARGS is the number of arguments in the attribute definition
+ *	ID is a unique definition ID
+ *	TYPE is the type of the attribute. Legal types are:
+ *		'BOOLEAN', 'DATE', 'DOUBLE', 'ENUMERATED', 'INTEGER', 'STRING', 'ARRAY'
+ *	NAME is the short name of the attribute
+ *	DESCRIPTION is the long name of the attribute
+ *	DEFAULT is the default value of the attribute
+ *	ADDITIONAL_PARAMS are optional parameters depending on the attribute type:
+ *		BOOLEAN - none
+ *		DATE - DATE_STYLE TIME_STYLE LOCALE [MIN MAX]
+ *		DOUBLE - [MIN MAX]
+ *		ENUMERATED - VAL ... VAL
+ *		INTEGER - [MIN MAX]
+ *		STRING - none
+ *		ARRAY - none
+ *	MIN is the minimum allowable value for the attribute
+ *	MAX is the maximum allowable value for the attribute
+ *	DATE_STYLE is the date format: SHORT, MEDIUM, LONG, or FULL
+ *	TIME_STYLE is the time format: SHORT, MEDIUM, LONG, or FULL
+ *	LOCALE is the country (see java.lang.Local)
+ *	NUM_VALS is the number of enumerated values
+ *	VAL is the enumerated value
+ * 
+ * ProxyNew*Events are formatted as follows:
+ * 
+ *	EVENT_HEADER PARENT_ID NUM_RANGES ID_RANGE NUM_ATTRS KEY=VALUE ... KEY=VALUE ...
+ * 
+ *	where:
+ * 
+ *	EVENT_HEADER is the event message header
+ *	PARENT_ID is the model element ID of the parent element
+ *	NUM_RANGES is the number of ID_RANGEs to follow
+ *	ID_RANGE is a range of model element ID's in RangeSet notation
+ *	NUM_ATTRS is the number of attributes to follow
+ *	KEY=VALUE are key/value pairs, where KEY is the attribute ID and VALUE is the attribute value
+ * 
+ * Proxy*ChangeEvents are formatted as follows:
+ * 
+ *	EVENT_HEADER NUM_RANGES ID_RANGE NUM_ATTRS KEY=VALUE ... KEY=VALUE
+ * 
+ *	where:
+ * 
+ *	EVENT_HEADER is the event message header
+ *	NUM_RANGES is the number of ID_RANGEs to follow
+ *	ID_RANGE is a range of model element ID's in RangeSet notation
+ *	NUM_ATTRS is the number of attributes to follow
+ *	KEY=VALUE are key/value pairs, where KEY is the attribute ID and VALUE is the new attribute value
+ * 
+ */
 
 public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem implements IProxyRuntimeEventListener {
 
 	private final static int ATTR_MIN_LEN = 5;
 	protected IProxyRuntimeClient proxy = null;
-	private boolean proxyDead = true;
 	private AttributeDefinitionManager attrDefManager;
 
 	public AbstractProxyRuntimeSystem(IProxyRuntimeClient proxy, AttributeDefinitionManager manager) {
@@ -89,44 +149,6 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 		proxy.addProxyRuntimeEventListener(this);
 	}
 	
-	/*
-	 * ProxyAttributeDefEvents are formatted as follows:
-	 * 
-	 * EVENT_HEADER NUM_DEFS ATTR_DEF ... ATTR_DEF
-	 * 
-	 * where:
-	 * 
-	 * EVENT_HEADER is the event message header
-	 * NUM_DEFS is the number of attribute definitions to follow
-	 * ATTR_DEF is an attribute definition of the form:
-	 * 
-	 * NUM_ARGS ID TYPE NAME DESCRIPTION DEFAULT [ADDITIONAL_PARAMS]
-	 * 
-	 * where:
-	 * 
-	 * NUM_ARGS is the number of arguments in the attribute definition
-	 * ID is a unique definition ID
-	 * TYPE is the type of the attribute. Legal types are:
-	 * 	'BOOLEAN', 'DATE', 'DOUBLE', 'ENUMERATED', 'INTEGER', 'STRING'
-	 * NAME is the short name of the attribute
-	 * DESCRIPTION is the long name of the attribute
-	 * DEFAULT is the default value of the attribute
-	 * ADDITIONAL_PARAMS are optional parameters depending on the attribute type:
-	 * 	BOOLEAN - none
-	 * 	DATE - DATE_STYLE TIME_STYLE LOCALE [MIN MAX]
-	 * 	DOUBLE - [MIN MAX]
-	 * 	ENUMERATED - VAL ... VAL
-	 * 	INTEGER - [MIN MAX]
-	 *	STRING - none
-	 * MIN is the minimum allowable value for the attribute
-	 * MAX is the maximum allowable value for the attribute
-	 * DATE_STYLE is the date format: SHORT, MEDIUM, LONG, or FULL
-	 * TIME_STYLE is the time format: SHORT, MEDIUM, LONG, or FULL
-	 * LOCALE is the country (see java.lang.Local)
-	 * NUM_VALS is the number of enumerated values
-	 * VAL is the enumerated value
-	 * 
-	 */	
 	public void handleProxyRuntimeAttributeDefEvent(IProxyRuntimeAttributeDefEvent e) {
 		String[] args = e.getArguments();
 		
@@ -169,203 +191,210 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	public void handleProxyRuntimeJobChangeEvent(IProxyRuntimeJobChangeEvent e) {
 		String[] args = e.getArguments();
 		
-		if (args.length >= 2) {
-			RangeSet jobIds = new RangeSet(args[0]);
-			IAttribute[] attrs = getAttributes(args, 1);
-			if (attrs != null) {
-				fireRuntimeJobChangeEvent(new RuntimeJobChangeEvent(jobIds, attrs));
+		if (args.length < 1) {
+			fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: not enough arguments"));
+			return;
+		}
+		
+		try {
+			ElementAttributeManager eMgr = getElementAttributeManager(args, 0);
+			if (eMgr != null) {			
+				fireRuntimeJobChangeEvent(new RuntimeJobChangeEvent(eMgr));
 			} else {
-				fireRuntimeErrorEvent(new RuntimeErrorEvent("Bad proxy event: reference to unknown attribute"));
+				fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: could not parse message"));				
 			}
-		} else {
-			fireRuntimeErrorEvent(new RuntimeErrorEvent("Bad proxy event: not enough arguments"));
+		} catch (NumberFormatException e1) {
+			fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: invalid parent ID"));				
 		}
 	}
 
 	public void handleProxyRuntimeMachineChangeEvent(IProxyRuntimeMachineChangeEvent e) {
 		String[] args = e.getArguments();
 		
-		if (args.length >= 2) {
-			RangeSet machineIds = new RangeSet(args[0]);
-			IAttribute[] attrs = getAttributes(args, 1);
-			if (attrs != null) {
-				fireRuntimeMachineChangeEvent(new RuntimeMachineChangeEvent(machineIds, attrs));
+		if (args.length < 1) {
+			fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: not enough arguments"));
+			return;
+		}
+		
+		try {
+			ElementAttributeManager eMgr = getElementAttributeManager(args, 0);
+			if (eMgr != null) {			
+				fireRuntimeMachineChangeEvent(new RuntimeMachineChangeEvent(eMgr));
 			} else {
-				fireRuntimeErrorEvent(new RuntimeErrorEvent("Bad proxy event: reference to unknown attribute"));
+				fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: could not parse message"));				
 			}
-		} else {
-			fireRuntimeErrorEvent(new RuntimeErrorEvent("Bad proxy event: not enough arguments"));
+		} catch (NumberFormatException e1) {
+			fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: invalid parent ID"));				
 		}
 	}
 	
 	public void handleProxyRuntimeNewJobEvent(IProxyRuntimeNewJobEvent e) {
 		String[] args = e.getArguments();
-		int parentId = -1;
 		
-		if (args.length >= 3) {
-			try {
-				parentId = Integer.parseInt(args[0]);
-			} catch (NumberFormatException e1) {
-				//	TODO throw new IOException("protocol error: invalid parent id");
-			}
-			RangeSet jobIds = new RangeSet(args[1]);
-			IAttribute[] attrs = getAttributes(args, 2);
-			if (attrs != null) {
-				fireRuntimeNewJobEvent(new RuntimeNewJobEvent(parentId, jobIds, attrs));
+		if (args.length < 2) {
+			fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: not enough arguments"));
+			return;
+		}
+		
+		try {
+			int parentId = Integer.parseInt(args[0]);
+			
+			ElementAttributeManager eMgr = getElementAttributeManager(args, 1);
+			if (eMgr != null) {			
+				fireRuntimeNewJobEvent(new RuntimeNewJobEvent(parentId, eMgr));
 			} else {
-				fireRuntimeErrorEvent(new RuntimeErrorEvent("Bad proxy event: reference to unknown attribute"));
+				fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: could not parse message"));				
 			}
-		} else {
-			fireRuntimeErrorEvent(new RuntimeErrorEvent("Bad proxy event: not enough arguments"));
+		} catch (NumberFormatException e1) {
+			fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: invalid parent ID"));				
 		}
 	}
 	
 	public void handleProxyRuntimeNewMachineEvent(IProxyRuntimeNewMachineEvent e) {
 		String[] args = e.getArguments();
-		int parentId = -1;
 		
-		if (args.length >= 2) {
-			try {
-				parentId = Integer.parseInt(args[0]);
-			} catch (NumberFormatException e1) {
-				//	TODO throw new IOException("protocol error: invalid parent id");
-			}
-			RangeSet machineIds = new RangeSet(args[1]);
-			IAttribute[] attrs = getAttributes(args, 2);
-			if (attrs != null) {
-				fireRuntimeNewMachineEvent(new RuntimeNewMachineEvent(parentId, machineIds, attrs));
+		if (args.length < 2) {
+			fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: not enough arguments"));
+			return;
+		}
+		
+		try {
+			int parentId = Integer.parseInt(args[0]);
+			
+			ElementAttributeManager eMgr = getElementAttributeManager(args, 1);
+			if (eMgr != null) {			
+				fireRuntimeNewMachineEvent(new RuntimeNewMachineEvent(parentId, eMgr));
 			} else {
-				fireRuntimeErrorEvent(new RuntimeErrorEvent("Bad proxy event: reference to unknown attribute"));
+				fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: could not parse message"));				
 			}
-		} else {
-			fireRuntimeErrorEvent(new RuntimeErrorEvent("Bad proxy event: not enough arguments"));
+		} catch (NumberFormatException e1) {
+			fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: invalid parent ID"));				
 		}
 	}
 	
 	public void handleProxyRuntimeNewNodeEvent(IProxyRuntimeNewNodeEvent e) {
 		String[] args = e.getArguments();
-		int parentId = -1;
 		
-		if (args.length >= 2) {
-			try {
-				parentId = Integer.parseInt(args[0]);
-			} catch (NumberFormatException e1) {
-				//	TODO throw new IOException("protocol error: invalid parent id");
-			}
-			RangeSet nodeIds = new RangeSet(args[1]);
-			IAttribute[] attrs = getAttributes(args, 2);
-			if (attrs != null) {
-				fireRuntimeNewNodeEvent(new RuntimeNewNodeEvent(parentId, nodeIds, attrs));
+		if (args.length < 2) {
+			fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: not enough arguments"));
+			return;
+		}
+		
+		try {
+			int parentId = Integer.parseInt(args[0]);
+			
+			ElementAttributeManager eMgr = getElementAttributeManager(args, 1);
+			if (eMgr != null) {			
+				fireRuntimeNewNodeEvent(new RuntimeNewNodeEvent(parentId, eMgr));
 			} else {
-				fireRuntimeErrorEvent(new RuntimeErrorEvent("Bad proxy event: reference to unknown attribute"));
+				fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: could not parse message"));				
 			}
-		} else {
-			fireRuntimeErrorEvent(new RuntimeErrorEvent("Bad proxy event: not enough arguments"));
+		} catch (NumberFormatException e1) {
+			fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: invalid parent ID"));				
 		}
 	}
 	
 	public void handleProxyRuntimeNewProcessEvent(IProxyRuntimeNewProcessEvent e) {
 		String[] args = e.getArguments();
-		int parentId = -1;
 		
-		if (args.length >= 2) {
-			try {
-				parentId = Integer.parseInt(args[0]);
-			} catch (NumberFormatException e1) {
-				//	TODO throw new IOException("protocol error: invalid parent or node id");
-			}
-			RangeSet processIds = new RangeSet(args[1]);
-			IAttribute[] attrs = getAttributes(args, 2);
-			if (attrs != null) {
-				fireRuntimeNewProcessEvent(new RuntimeNewProcessEvent(parentId, processIds, attrs));
+		if (args.length < 2) {
+			fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: not enough arguments"));
+			return;
+		}
+		
+		try {
+			int parentId = Integer.parseInt(args[0]);
+			
+			ElementAttributeManager eMgr = getElementAttributeManager(args, 1);
+			if (eMgr != null) {			
+				fireRuntimeNewProcessEvent(new RuntimeNewProcessEvent(parentId, eMgr));
 			} else {
-				fireRuntimeErrorEvent(new RuntimeErrorEvent("Bad proxy event: reference to unknown attribute"));
+				fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: could not parse message"));				
 			}
-		} else {
-			fireRuntimeErrorEvent(new RuntimeErrorEvent("Bad proxy event: not enough arguments"));
+		} catch (NumberFormatException e1) {
+			fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: invalid parent ID"));				
 		}
 	}
 
 	public void handleProxyRuntimeNewQueueEvent(IProxyRuntimeNewQueueEvent e) {
 		String[] args = e.getArguments();
-		int parentId = -1;
 		
-		if (args.length >= 2) {
-			try {
-				parentId = Integer.parseInt(args[0]);
-			} catch (NumberFormatException e1) {
-				//	TODO throw new IOException("protocol error: invalid parent id");
-			}
-			RangeSet queueIds = new RangeSet(args[1]);
-			IAttribute[] attrs = getAttributes(args, 2);
-			if (attrs != null) {
-				fireRuntimeNewQueueEvent(new RuntimeNewQueueEvent(parentId, queueIds, attrs));
+		if (args.length < 2) {
+			fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: not enough arguments"));
+			return;
+		}
+		
+		try {
+			int parentId = Integer.parseInt(args[0]);
+			
+			ElementAttributeManager eMgr = getElementAttributeManager(args, 1);
+			if (eMgr != null) {			
+				fireRuntimeNewQueueEvent(new RuntimeNewQueueEvent(parentId, eMgr));
 			} else {
-				fireRuntimeErrorEvent(new RuntimeErrorEvent("Bad proxy event: reference to unknown attribute"));
+				fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: could not parse message"));				
 			}
-		} else {
-			fireRuntimeErrorEvent(new RuntimeErrorEvent("Bad proxy event: not enough arguments"));
+		} catch (NumberFormatException e1) {
+			fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: invalid parent ID"));				
 		}
 	}
-
+	
 	public void handleProxyRuntimeNodeChangeEvent(IProxyRuntimeNodeChangeEvent e) {
 		String[] args = e.getArguments();
 		
-		if (args.length >= 2) {
-			RangeSet nodeIds = new RangeSet(args[0]);
-			IAttribute[] attrs = getAttributes(args, 1);
-			if (attrs != null) {
-				fireRuntimeNodeChangeEvent(new RuntimeNodeChangeEvent(nodeIds, attrs));
+		if (args.length < 1) {
+			fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: not enough arguments"));
+			return;
+		}
+		
+		try {
+			ElementAttributeManager eMgr = getElementAttributeManager(args, 0);
+			if (eMgr != null) {			
+				fireRuntimeNodeChangeEvent(new RuntimeNodeChangeEvent(eMgr));
 			} else {
-				fireRuntimeErrorEvent(new RuntimeErrorEvent("Bad proxy event: reference to unknown attribute"));
+				fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: could not parse message"));				
 			}
-		} else {
-			fireRuntimeErrorEvent(new RuntimeErrorEvent("Bad proxy event: not enough arguments"));
+		} catch (NumberFormatException e1) {
+			fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: invalid parent ID"));				
 		}
 	}
 
 	public void handleProxyRuntimeProcessChangeEvent(IProxyRuntimeProcessChangeEvent e) {
 		String[] args = e.getArguments();
 		
-		if (args.length >= 2) {
-			RangeSet processIds = new RangeSet(args[0]);
-			IAttribute[] attrs = getAttributes(args, 1);
-			if (attrs != null) {
-				fireRuntimeProcessChangeEvent(new RuntimeProcessChangeEvent(processIds, attrs));
+		if (args.length < 1) {
+			fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: not enough arguments"));
+			return;
+		}
+		
+		try {
+			ElementAttributeManager eMgr = getElementAttributeManager(args, 0);
+			if (eMgr != null) {			
+				fireRuntimeProcessChangeEvent(new RuntimeProcessChangeEvent(eMgr));
 			} else {
-				fireRuntimeErrorEvent(new RuntimeErrorEvent("Bad proxy event: reference to unknown attribute"));
+				fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: could not parse message"));				
 			}
-		} else {
-			fireRuntimeErrorEvent(new RuntimeErrorEvent("Bad proxy event: not enough arguments"));
+		} catch (NumberFormatException e1) {
+			fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: invalid parent ID"));				
 		}
 	}
-	
-	/*
-	 * ProxyChangeEvents are formatted as follows:
-	 * 
-	 * EVENT_HEADER ID_RANGE [KEY=VALUE ... KEY=VALUE]
-	 * 
-	 * where:
-	 * 
-	 * EVENT_HEADER is the event message header
-	 * ID_RANGE is a range of model element ID's in RangeSet notation
-	 * KEY=VALUE are key/value pairs, where KEY is the attribute ID and VALUE is the new attribute value
-	 * 
-	 */
 	
 	public void handleProxyRuntimeQueueChangeEvent(IProxyRuntimeQueueChangeEvent e) {
 		String[] args = e.getArguments();
 		
-		if (args.length >= 2) {
-			RangeSet queueIds = new RangeSet(args[0]);
-			IAttribute[] attrs = getAttributes(args, 1);
-			if (attrs != null) {
-				fireRuntimeQueueChangeEvent(new RuntimeQueueChangeEvent(queueIds, attrs));
+		if (args.length < 1) {
+			fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: not enough arguments"));
+			return;
+		}
+		
+		try {
+			ElementAttributeManager eMgr = getElementAttributeManager(args, 0);
+			if (eMgr != null) {			
+				fireRuntimeQueueChangeEvent(new RuntimeQueueChangeEvent(eMgr));
 			} else {
-				fireRuntimeErrorEvent(new RuntimeErrorEvent("Bad proxy event: reference to unknown attribute"));
+				fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: could not parse message"));				
 			}
-		} else {
-			fireRuntimeErrorEvent(new RuntimeErrorEvent("Bad proxy event: not enough arguments"));
+		} catch (NumberFormatException e1) {
+			fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: invalid parent ID"));				
 		}
 	}
 
@@ -381,8 +410,6 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 		fireRuntimeShutdownStateEvent(new RuntimeShutdownStateEvent());
 	}
 
-	public boolean isHealthy() { return !proxyDead; }
-
 	public void shutdown() {
 		proxy.shutdown();
 	}
@@ -390,94 +417,24 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	public void startup() throws CoreException {
 		proxy.startup();
 	}
-
-	/*
-	 * ProxyNewEvents are formatted as follows:
-	 * 
-	 * EVENT_HEADER PARENT_ID [RELATED_ID] ID_RANGE [KEY=VALUE ... KEY=VALUE]
-	 * 
-	 * where:
-	 * 
-	 * EVENT_HEADER is the event message header
-	 * PARENT_ID is the model element ID of the parent element
-	 * RELATED_ID is an optional ID of a related model element (only used by NewProcess event)
-	 * ID_RANGE is a range of model element ID's in RangeSet notation
-	 * KEY=VALUE are key/value pairs, where KEY is the attribute ID and VALUE is the attribute value
-	 * 
-	 */
 	
-	public void submitJob(int jobID, int nProcs, int firstNodeNum, int nProcsPerNode, JobRunConfiguration jobRunConfig) throws CoreException {
-		if(proxyDead) {
-			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, "Control system is shut down", null));
-		}
-
-		List<String> argList = new ArrayList<String>();
-		
-		argList.add("jobID");
-		argList.add(Integer.toString(jobID));
-		
-		argList.add("execName");
-		argList.add(jobRunConfig.getExecName());
-		String path = jobRunConfig.getPathToExec();
-		if (path != null) {
-			argList.add("pathToExec");
-			argList.add(path);
-		}
-		argList.add("numOfProcs");
-// TODO		argList.add(Integer.toString(jobRunConfig.getNumberOfProcesses()));
-		argList.add(Integer.toString(nProcs));
-		argList.add("procsPerNode");
-// TODO		argList.add(Integer.toString(jobRunConfig.getNumberOfProcessesPerNode()));
-		argList.add(Integer.toString(nProcsPerNode));
-		argList.add("firstNodeNum");
-// TODO		argList.add(Integer.toString(jobRunConfig.getFirstNodeNumber()));
-		argList.add(Integer.toString(firstNodeNum));
-		
-		String dir = jobRunConfig.getWorkingDir();
-		if (dir != null) {
-			argList.add("workingDir");
-			argList.add(dir);
-		}
-		String[] args = jobRunConfig.getArguments();
-		if (args != null) {
-			for (int i = 0; i < args.length; i++) {
-				argList.add("progArg");
-				argList.add(args[i]);
-			}
-		}
-		String[] env = jobRunConfig.getEnvironment();
-		if (env != null) {
-			for (int i = 0; i < env.length; i++) {
-				argList.add("progEnv");
-				argList.add(env[i]);
-			}
-		}
-		
-		if (jobRunConfig.isDebug()) {
-			argList.add("debuggerPath");
-			argList.add(jobRunConfig.getDebuggerPath());
-			String[] dbgArgs = jobRunConfig.getDebuggerArgs();
-			if (dbgArgs != null) {
-				for (int i = 0; i < dbgArgs.length; i++) {
-					argList.add("debuggerArg");
-					argList.add(dbgArgs[i]);
-				}
-			}
-		}
-		
+	public void submitJob(int jobSubId, AttributeManager attrMgr) throws CoreException {
 		try {
-			proxy.submitJob(argList.toArray(new String[0]));
+			/*
+			 * Add the job submission ID to the attributes. This is done here to force the
+			 * use of the ID.
+			 */
+			IIntegerAttribute jobSubAttr = JobAttributes.getSubIdAttributeDefinition().create(jobSubId);
+			attrMgr.setAttribute(jobSubAttr);
+			proxy.submitJob(attrMgr.toStringArray());
 		} catch(IOException e) {
 			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, 
 				"Control system is shut down, proxy exception.  The proxy may have crashed or been killed.", null));
+		} catch (IllegalValueException e) {
 		}
 	}
 
 	public void terminateJob(IPJob job) throws CoreException {
-		if(proxyDead) {
-			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, "Control system is shut down", null));
-		}
-		
 		if(job == null) {
 			System.err.println("ERROR: Tried to abort a null job.");
 			return;
@@ -500,36 +457,79 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	}
 
 	public void startEvents() throws CoreException {
-		// TODO
+		try {
+			proxy.startEvents();
+		} catch (IOException e) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, 
+					e.getMessage(), e));
+		}
 	}
 	
 	public void stopEvents() throws CoreException {
-		// TODO
+		try {
+			proxy.stopEvents();
+		} catch (IOException e) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, 
+					e.getMessage(), e));
+		}	
 	}
 
-	private IAttribute[] getAttributes(String[] kvs, int start) {
-		ArrayList<IAttribute> attrList = new ArrayList<IAttribute>();
+	private AttributeManager getAttributeManager(String[] kvs, int start, int end) {
+		AttributeManager mgr = new AttributeManager();
 		
-		for (int i = start; i < kvs.length; i++) {
+		for (int i = start; i <= end; i++) {
 			String[] kv = kvs[i].split("=");
 			if (kv.length == 2) {
 				try {
 					IAttributeDefinition attrDef = attrDefManager.getAttributeDefinition(kv[0]);
-					if(attrDef == null) {
-						return null;
+					if(attrDef != null) {
+						IAttribute attr = attrDef.create(kv[1]);
+						mgr.setAttribute(attr);
+					} else {
+						System.out.println("AbstractProxyRuntimSystem: unknown attribute definition");
 					}
-					IAttribute attr = attrDef.create(kv[1]);
-					attrList.add(attr);
 				} catch (IllegalValueException e1) {
-					//TODO log("protocol error: invalid attribute type");
+					System.out.println("AbstractProxyRuntimSystem: invalid attribute for definition");
 				}
 			}
 		}
 		
-		return attrList.toArray(new IAttribute[attrList.size()]);
+		return mgr;
 	}
 
-	/*
+	private ElementAttributeManager getElementAttributeManager(String[] args, int pos) {
+		ElementAttributeManager eMgr = new ElementAttributeManager();
+		
+		try {
+			int numRanges = Integer.parseInt(args[pos++]);
+			
+			for (int i = 0; i < numRanges; i++) {
+				if (pos >= args.length) {
+					return null;					
+				}
+				
+				RangeSet jobIds = new RangeSet(args[pos++]);
+				int numAttrs = Integer.parseInt(args[pos++]);
+				
+				int start = pos;
+				int end = pos + numAttrs - 1;
+				
+				if (end >= args.length) {
+					return null;					
+				}
+				
+				eMgr.setAttributeManager(jobIds, getAttributeManager(args, start, end));
+				
+				pos = end + 1;
+			}
+		} catch (NumberFormatException e1) {
+			return null;
+		}
+		
+		return eMgr;
+	}
+	
+	/**
 	 * Parse and extract an attribute definition.
 	 * 
 	 * On entry, we know that end < args.length and end - start >= ATTR_MIN_LEN
