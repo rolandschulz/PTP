@@ -39,8 +39,8 @@ public class ElementAttributeManager {
 		return map.get(id);
 	}
 	
-	public Integer[] getElementIds() {
-		return map.keySet().toArray(new Integer[map.size()]);
+	public RangeSet[] getElementIds() {
+		return map.keySet().toArray(new RangeSet[map.size()]);
 	}
 	
 	public Set<Map.Entry<RangeSet, AttributeManager>> getEntrySet() {
