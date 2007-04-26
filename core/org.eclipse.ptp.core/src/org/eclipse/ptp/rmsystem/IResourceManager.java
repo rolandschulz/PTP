@@ -21,7 +21,7 @@ package org.eclipse.ptp.rmsystem;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.debug.core.ILaunch;
+import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
@@ -31,7 +31,6 @@ import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
-import org.eclipse.ptp.rtsystem.JobRunConfiguration;
 
 public interface IResourceManager extends IPElement,
 IAdaptable, IResourceManagerMenuContribution {
@@ -136,5 +135,10 @@ IAdaptable, IResourceManagerMenuContribution {
 	 * @param job
 	 */
 	public void terminateJob(IPJob job) throws CoreException;
-
+	
+	/**
+	 * @param name
+	 * @return IPQueue
+	 */
+	public IPQueue getQueue(String name);
 }
