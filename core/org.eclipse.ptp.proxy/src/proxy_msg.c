@@ -35,7 +35,7 @@
 extern int digittoint(int c);
 #endif /* __linux__ */
 
-#define ARG_SIZE	10
+#define ARG_SIZE	100
 
 static char tohex[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 
@@ -227,13 +227,16 @@ proxy_msg_decode_string(char *str, char **arg, char **end)
 static void
 check_arg_space(proxy_msg *m, int n)
 {
-	if (m->arg_size == 0) {
-		m->arg_size = ARG_SIZE;
+	int size = m->arg_size;
+
+	while (m->arg_size < m->num_args + n) {
+		m->arg_size += ARG_SIZE;
+	}
+	
+	if (size == 0) {
 		m->args = (char **)malloc(sizeof(char *) * m->arg_size);
 		m->free_args = (int *)malloc(sizeof(int *) * m->arg_size);
-	} else if (m->num_args + n > m->arg_size) {
-		int size = n > ARG_SIZE ? n : ARG_SIZE;
-		m->arg_size += size;
+	} else {
 		m->args = (char **)realloc(m->args, m->arg_size);
 		m->free_args = (int *)realloc(m->free_args, m->arg_size);
 	}
