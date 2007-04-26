@@ -8,12 +8,16 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
+import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IEnumeratedAttribute;
+import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPNode;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
+import org.eclipse.ptp.core.elements.attributes.QueueAttributes;
 import org.eclipse.ptp.internal.core.PUniverse;
 import org.eclipse.ptp.orte.core.rmsystem.ORTEResourceManager;
 import org.eclipse.ptp.orte.core.rmsystem.ORTEResourceManagerConfiguration;
@@ -115,14 +119,56 @@ public class ORTEResourceManagerTest implements IResourceManagerListener {
 				JobRunConfiguration jobRunConfig = new JobRunConfiguration(exe, exePath, "ORTE",
 						queueName, attr, configArgs, env, dir);
 
+				AttributeManager attrMgr = new AttributeManager();
+				AttributeDefinitionManager defMgr = rm.getAttributeDefinitionManager();
+				
 				try {
-					rm.submitJob(subQueue, jobRunConfig, new NullProgressMonitor());
+					attrMgr.setAttribute(QueueAttributes.getIdAttributeDefinition().create(subQueue.getIDString()));
+					
+					attrMgr.setAttribute(defMgr.createStringAttributeDefinition("execName", "", "", "").create(jobRunConfig.getExecName()));
+					
+					String path = jobRunConfig.getPathToExec();
+					if (path != null) {
+						attrMgr.setAttribute(defMgr.createStringAttributeDefinition("pathToExec", "", "", "").create(path));
+					}
+					
+					attrMgr.setAttribute(defMgr.createIntegerAttributeDefinition("numOfProcs", "", "", 0).create(nProcs));
+					attrMgr.setAttribute(defMgr.createIntegerAttributeDefinition("procsPerNode", "", "", 0).create(nProcsPerNode));
+					attrMgr.setAttribute(defMgr.createIntegerAttributeDefinition("firstNodeNum", "", "", 0).create(firstNodeNum));
+							
+					String wd = jobRunConfig.getWorkingDir();
+					if (wd != null) {
+						attrMgr.setAttribute(defMgr.createStringAttributeDefinition("workingDir", "", "", "").create(wd));
+					}
+					
+					String[] argArr = jobRunConfig.getArguments();
+					if (argArr != null) {
+						attrMgr.setAttribute(defMgr.createArrayAttributeDefinition("progArg", "", "", null).create(argArr));
+					}
+					
+					String[] envArr = jobRunConfig.getEnvironment();
+					if (envArr != null) {
+						attrMgr.setAttribute(defMgr.createArrayAttributeDefinition("progEnv", "", "", null).create(envArr));
+					}
+					
+					if (jobRunConfig.isDebug()) {
+						attrMgr.setAttribute(defMgr.createStringAttributeDefinition("debuggerPath", "", "", "").create(jobRunConfig.getDebuggerPath()));
+						String[] dbgArgs = jobRunConfig.getDebuggerArgs();
+						if (dbgArgs != null) {
+							attrMgr.setAttribute(defMgr.createArrayAttributeDefinition("debuggerArg", "", "", null).create(dbgArgs));
+						}
+					}
+					
+					System.out.println("about to submit");
+					rm.submitJob(attrMgr, new NullProgressMonitor());
+				} catch (IllegalValueException e1) {
+					error = true;
 				} catch(CoreException e) {
 					error = true;
 				}
 			}
 
-			while (!jobCompleted) {
+			while (!jobCompleted && !error) {
 				notJobCompleted.await();
 			}
 			

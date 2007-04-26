@@ -232,11 +232,18 @@ public class ORTERemoteProxyTest implements IProxyRuntimeEventListener {
 	public void handleProxyRuntimeNewMachineEvent(IProxyRuntimeNewMachineEvent e) {
 		String[] args = e.getArguments();
 		if (args.length >= 2) {
-			RangeSet machineIds = new RangeSet(args[1]);
-			System.out.println("new machine " + machineIds.toString());
-			for (int id : machineIds) {
-				machineId = id;
-				break;
+			int parentId = Integer.parseInt(args[0]);
+			int num = Integer.parseInt(args[1]);
+			int pos = 2;
+			for (int i = 0; i < num; i++) {
+				RangeSet machineIds = new RangeSet(args[pos++]);
+				int numArgs = Integer.parseInt(args[pos++]);
+				pos += numArgs;
+				System.out.println("new machine " + parentId + " " + machineIds.toString());
+				for (int id : machineIds) {
+					machineId = id;
+					break;
+				}
 			}
 		}
 	}
@@ -246,8 +253,14 @@ public class ORTERemoteProxyTest implements IProxyRuntimeEventListener {
 		try {
 			if (args.length >= 2) {
 				int parentId = Integer.parseInt(args[0]);
-				RangeSet nodeIds = new RangeSet(args[1]);
-				System.out.println("new node " + parentId + " "+ nodeIds.toString());
+				int num = Integer.parseInt(args[1]);
+				int pos = 2;
+				for (int i = 0; i < num; i++) {
+					RangeSet nodeIds = new RangeSet(args[pos++]);
+					int numArgs = Integer.parseInt(args[pos++]);
+					pos += numArgs;
+					System.out.println("new node " + parentId + " "+ nodeIds.toString());
+				}
 			}
 		} catch (NumberFormatException ex) {
 			System.out.println("new node: bad arg " + args[0]);
@@ -256,23 +269,31 @@ public class ORTERemoteProxyTest implements IProxyRuntimeEventListener {
 
 	public void handleProxyRuntimeNewQueueEvent(IProxyRuntimeNewQueueEvent e) {
 		String[] args = e.getArguments();
-		if (args.length >= 3) {
-			RangeSet queueIds = new RangeSet(args[1]);
-			String[] kv = args[2].split("=");
-			if (kv.length == 2) {
-				System.out.println("new queue " + queueIds.toString() + " " + args[2]);
-				for (int id : queueIds) {
-					queueId = id;
-					queueName = kv[1];
-					break;
-				}
-				
-				lock.lock();
-				try {
-					haveQueue = true;
-					notHaveQueue.signal();
-				} finally {
-					lock.unlock();
+		if (args.length >= 2) {
+			int parentId = Integer.parseInt(args[0]);
+			int num = Integer.parseInt(args[1]);
+			int pos = 2;
+			for (int i = 0; i < num; i++) {
+				RangeSet queueIds = new RangeSet(args[pos++]);
+				int numArgs = Integer.parseInt(args[pos++]);
+				for (int j = 0; j < numArgs; j++) {
+					String[] kv = args[pos++].split("=");
+					if (kv.length == 2) {
+						System.out.println("new queue " + parentId + " " + queueIds.toString());
+						for (int id : queueIds) {
+							queueId = id;
+							queueName = kv[1];
+							break;
+						}
+						
+						lock.lock();
+						try {
+							haveQueue = true;
+							notHaveQueue.signal();
+						} finally {
+							lock.unlock();
+						}
+					}
 				}
 			}
 		}
@@ -286,25 +307,30 @@ public class ORTERemoteProxyTest implements IProxyRuntimeEventListener {
 	public void handleProxyRuntimeJobChangeEvent(IProxyRuntimeJobChangeEvent e) {
 		String[] args = e.getArguments();
 		if (args.length >= 2) {
-			/*
-			 * Find a state change, if any
-			 */
-			for (int i = 1; i < args.length; i++) {
-				String[] kv = args[i].split("=");
-				if (kv.length == 2 && kv[0].equals(JobAttributes.STATE_ATTR_ID)){
-					try {
-						if (kv[1].equals(JobAttributes.State.ABORTED.toString())) {
-							System.out.println("job terminated!");
-							lock.lock();
-							try {
-								jobCompleted = true;
-								notJobCompleted.signal();
-							} finally {
-								lock.unlock();
+			int num = Integer.parseInt(args[0]);
+			int pos = 1;
+			for (int i = 0; i < num; i++) {
+				RangeSet jobIds = new RangeSet(args[pos++]);
+				int numArgs = Integer.parseInt(args[pos++]);
+				for (int j = 0; j < numArgs; j++) {
+				/*
+				 * Find a state change, if any
+				 */
+					String[] kv = args[pos++].split("=");
+					if (kv.length == 2 && kv[0].equals(JobAttributes.STATE_ATTR_ID)){
+						try {
+							if (kv[1].equals(JobAttributes.State.ABORTED.toString())) {
+								System.out.println("job terminated!");
+								lock.lock();
+								try {
+									jobCompleted = true;
+									notJobCompleted.signal();
+								} finally {
+									lock.unlock();
+								}
 							}
-							break;
+						} catch (NumberFormatException e1) {
 						}
-					} catch (NumberFormatException e1) {
 					}
 				}
 			}

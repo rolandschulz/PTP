@@ -132,12 +132,12 @@ public class ORTERuntimeSystemTest implements IRuntimeEventListener {
 		String dir = "/etc";
 		
 		AttributeDefinitionManager attrDefManager = new AttributeDefinitionManager();
-		attrDefManager.setAttributeDefinition(JobAttributes.getStateAttributeDefinition());
-		attrDefManager.setAttributeDefinition(MachineAttributes.getStateAttributeDefinition());
-		attrDefManager.setAttributeDefinition(NodeAttributes.getStateAttributeDefinition());
-		attrDefManager.setAttributeDefinition(ProcessAttributes.getStateAttributeDefinition());
-		attrDefManager.setAttributeDefinition(QueueAttributes.getStateAttributeDefinition());
-		attrDefManager.setAttributeDefinition(ResourceManagerAttributes.getStateAttributeDefinition());
+		attrDefManager.setAttributeDefinitions(JobAttributes.getDefaultAttributeDefinitions());
+		attrDefManager.setAttributeDefinitions(MachineAttributes.getDefaultAttributeDefinitions());
+		attrDefManager.setAttributeDefinitions(NodeAttributes.getDefaultAttributeDefinitions());
+		attrDefManager.setAttributeDefinitions(ProcessAttributes.getDefaultAttributeDefinitions());
+		attrDefManager.setAttributeDefinitions(QueueAttributes.getDefaultAttributeDefinitions());
+		attrDefManager.setAttributeDefinitions(ResourceManagerAttributes.getDefaultAttributeDefinitions());
 		ORTEProxyRuntimeClient client = new ORTEProxyRuntimeClient(proxy, rmId, launchManually);
 		ORTERuntimeSystem rtsystem = new ORTERuntimeSystem(client, attrDefManager);
 		rtsystem.addRuntimeEventListener(this);
@@ -164,44 +164,43 @@ public class ORTERuntimeSystemTest implements IRuntimeEventListener {
 			if (!error) {
 				JobRunConfiguration jobRunConfig = new JobRunConfiguration(exe, exePath, rm,
 						queueName, attr, configArgs, env, dir);
-				AttributeDefinitionManager defMgr = new AttributeDefinitionManager();
-
+				
 				AttributeManager attrMgr = new AttributeManager();
 				
 				try {
 					attrMgr.setAttribute(QueueAttributes.getIdAttributeDefinition().create(queueId));
 					
-					attrMgr.setAttribute(defMgr.createStringAttributeDefinition("execName", "", "", "").create(jobRunConfig.getExecName()));
+					attrMgr.setAttribute(attrDefManager.createStringAttributeDefinition("execName", "", "", "").create(jobRunConfig.getExecName()));
 					
 					String path = jobRunConfig.getPathToExec();
 					if (path != null) {
-						attrMgr.setAttribute(defMgr.createStringAttributeDefinition("pathToExec", "", "", "").create(path));
+						attrMgr.setAttribute(attrDefManager.createStringAttributeDefinition("pathToExec", "", "", "").create(path));
 					}
 					
-					attrMgr.setAttribute(defMgr.createIntegerAttributeDefinition("numOfProcs", "", "", 0).create(nProcs));
-					attrMgr.setAttribute(defMgr.createIntegerAttributeDefinition("procsPerNode", "", "", 0).create(nProcsPerNode));
-					attrMgr.setAttribute(defMgr.createIntegerAttributeDefinition("firstNodeNum", "", "", 0).create(firstNodeNum));
+					attrMgr.setAttribute(attrDefManager.createIntegerAttributeDefinition("numOfProcs", "", "", 0).create(nProcs));
+					attrMgr.setAttribute(attrDefManager.createIntegerAttributeDefinition("procsPerNode", "", "", 0).create(nProcsPerNode));
+					attrMgr.setAttribute(attrDefManager.createIntegerAttributeDefinition("firstNodeNum", "", "", 0).create(firstNodeNum));
 							
 					String wd = jobRunConfig.getWorkingDir();
 					if (wd != null) {
-						attrMgr.setAttribute(defMgr.createStringAttributeDefinition("workingDir", "", "", "").create(wd));
+						attrMgr.setAttribute(attrDefManager.createStringAttributeDefinition("workingDir", "", "", "").create(wd));
 					}
 					
 					String[] argArr = jobRunConfig.getArguments();
 					if (argArr != null) {
-						attrMgr.setAttribute(defMgr.createArrayAttributeDefinition("progArg", "", "", null).create(argArr));
+						attrMgr.setAttribute(attrDefManager.createArrayAttributeDefinition("progArg", "", "", null).create(argArr));
 					}
 					
 					String[] envArr = jobRunConfig.getEnvironment();
 					if (envArr != null) {
-						attrMgr.setAttribute(defMgr.createArrayAttributeDefinition("progEnv", "", "", null).create(envArr));
+						attrMgr.setAttribute(attrDefManager.createArrayAttributeDefinition("progEnv", "", "", null).create(envArr));
 					}
 					
 					if (jobRunConfig.isDebug()) {
-						attrMgr.setAttribute(defMgr.createStringAttributeDefinition("debuggerPath", "", "", "").create(jobRunConfig.getDebuggerPath()));
+						attrMgr.setAttribute(attrDefManager.createStringAttributeDefinition("debuggerPath", "", "", "").create(jobRunConfig.getDebuggerPath()));
 						String[] dbgArgs = jobRunConfig.getDebuggerArgs();
 						if (dbgArgs != null) {
-							attrMgr.setAttribute(defMgr.createArrayAttributeDefinition("debuggerArg", "", "", null).create(dbgArgs));
+							attrMgr.setAttribute(attrDefManager.createArrayAttributeDefinition("debuggerArg", "", "", null).create(dbgArgs));
 						}
 					}
 					
@@ -254,15 +253,19 @@ public class ORTERuntimeSystemTest implements IRuntimeEventListener {
 	}
 
 	public void handleRuntimeNewMachineEvent(IRuntimeNewMachineEvent e) {
-		for (Integer id : e.getElementAttributeManager().getElementIds()) {
-			System.out.println("new machine " + id.toString());
+		for (RangeSet r : e.getElementAttributeManager().getElementIds()) {
+			for (int id : r) {
+				System.out.println("new machine " + id);
+			}
 		}
 	}
 
 	public void handleRuntimeNewNodeEvent(IRuntimeNewNodeEvent e) {
 		int parentId = e.getParentId();
-		for (Integer id : e.getElementAttributeManager().getElementIds()) {
-			System.out.println("new node " + parentId + " "+ id.toString());
+		for (RangeSet r : e.getElementAttributeManager().getElementIds()) {
+			for (int id : r) {
+				System.out.println("new node " + parentId + " "+ id);
+			}
 		}
 	}
 
