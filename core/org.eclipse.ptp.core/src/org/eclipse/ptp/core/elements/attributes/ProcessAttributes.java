@@ -18,7 +18,7 @@ public class ProcessAttributes {
 		ERROR
 	};
 
-	public static final String STATE_ATTR_ID = "processState";
+	private static final String STATE_ATTR_ID = "processState";
 
 	private final static IEnumeratedAttributeDefinition stateAttrDef = 
 		new EnumeratedAttributeDefinition(STATE_ATTR_ID, "state", "Process State", State.STARTING, State.values());

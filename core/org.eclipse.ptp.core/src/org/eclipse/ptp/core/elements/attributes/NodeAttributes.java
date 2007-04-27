@@ -16,7 +16,7 @@ public class NodeAttributes {
 		ERROR
 	};
 
-	public static final String STATE_ATTR_ID = "nodeState";
+	private static final String STATE_ATTR_ID = "nodeState";
 
 	private final static IEnumeratedAttributeDefinition stateAttrDef = 
 		new EnumeratedAttributeDefinition(STATE_ATTR_ID, "state", "Node State", State.UNKNOWN, State.values());

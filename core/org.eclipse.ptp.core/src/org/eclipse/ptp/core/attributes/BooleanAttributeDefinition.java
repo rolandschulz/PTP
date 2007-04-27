@@ -35,6 +35,10 @@ public final class BooleanAttributeDefinition extends AbstractAttributeDefinitio
 		return new BooleanAttribute(this, defaultValue);
 	}
 
+	public IBooleanAttribute create(Boolean value) {
+		return new BooleanAttribute(this, value);
+	}
+	
 	public IBooleanAttribute create(String value) {
 		return new BooleanAttribute(this, value);
 	}
