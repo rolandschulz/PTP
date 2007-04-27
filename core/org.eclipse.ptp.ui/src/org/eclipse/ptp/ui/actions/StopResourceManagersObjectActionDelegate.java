@@ -26,9 +26,9 @@ import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerMenuContribution;
-import org.eclipse.ptp.rmsystem.ResourceManagerState;
 import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.ui.UIMessage;
 import org.eclipse.swt.widgets.Event;
@@ -70,7 +70,7 @@ public class StopResourceManagersObjectActionDelegate implements
 			IResourceManagerMenuContribution menuContrib = menuContribs[i];
 			IResourceManager rmManager = (IResourceManager) menuContrib.getAdapter(IResourceManager.class);
 
-			if (!rmManager.getState().equals(ResourceManagerState.State.STARTED)) {
+			if (!rmManager.getState().equals(ResourceManagerAttributes.State.STARTED)) {
 				MessageDialog.openInformation(targetShell,
 						UIMessage.getResourceString("StopResourceManagersObjectActionDelegate.ResourceManagerNotAlreadyStarted"), //$NON-NLS-1$
 						UIMessage.getResourceString("StopResourceManagersObjectActionDelegate.ResourceManager") //$NON-NLS-1$
