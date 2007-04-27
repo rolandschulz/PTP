@@ -28,7 +28,6 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SubProgressMonitor;
@@ -80,13 +79,11 @@ import org.eclipse.ptp.rmsystem.events.IResourceManagerNewNodesEvent;
 import org.eclipse.ptp.rmsystem.events.IResourceManagerNewProcessesEvent;
 import org.eclipse.ptp.rmsystem.events.IResourceManagerNewQueuesEvent;
 import org.eclipse.ptp.rmsystem.events.ResourceManagerAddedRemovedEvent;
-import org.eclipse.swt.widgets.Display;
 
 public class ModelManager implements IModelManager, IResourceManagerChangedListener,
 IResourceManagerListener {
 	private final ListenerList resourceManagerListeners = new ListenerList();
 	private IResourceManagerFactory[] resourceManagerFactories;
-	private final Display display;
 	protected ListenerList modelListeners = new ListenerList();
 	protected ListenerList nodeListeners = new ListenerList();
 	protected ListenerList processListeners = new ListenerList();
@@ -96,7 +93,6 @@ IResourceManagerListener {
 	protected ILaunchConfiguration config = null;
 
 	public ModelManager() {
-		this.display = PTPCorePlugin.getDisplay();
 	}
 
 	public void addModelListener(IModelListener listener) {
@@ -514,11 +510,7 @@ IResourceManagerListener {
 		for (int i=0, n = tmpListeners.length; i < n; ++i) {
 			final IResourceManagerChangedListener listener =
 				(IResourceManagerChangedListener) tmpListeners[i]; 
-			safeRunAsyncInUIThread(new SafeRunnable() {
-				public void run() {
-					listener.handleResourceManagersAddedRemoved(event);
-				}
-			});
+			listener.handleResourceManagersAddedRemoved(event);
 		}
 	}
 
@@ -533,27 +525,6 @@ IResourceManagerListener {
 	 */
 	private void removeRMListeners(IResourceManager rm) {
 		rm.removeResourceManagerListener(this);
-	}
-
-	/**
-	 * Makes sure that the safeRunnable is ran in the UI thread. 
-	 * @param safeRunnable
-	 */
-	protected void safeRunAsyncInUIThread(final ISafeRunnable safeRunnable) {
-		if (display.isDisposed()) {
-			try {
-				safeRunnable.run();
-			} catch (Exception e) {
-				PTPCorePlugin.log(e);
-			}
-		}
-		else {
-			display.asyncExec(new Runnable() {
-				public void run() {
-					SafeRunnable.run(safeRunnable);
-				}
-			});
-		}
 	}
 
 }

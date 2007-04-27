@@ -26,20 +26,12 @@ import java.util.ResourceBundle;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.jface.dialogs.ErrorDialog;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.internal.core.ModelManager;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -50,95 +42,11 @@ public class PTPCorePlugin extends AbstractUIPlugin {
 	// The shared instance.
 	private static PTPCorePlugin plugin;
 
-	public static void errorDialog(Shell shell, String title, IStatus s) {
-		errorDialog(shell, title, s.getMessage(), s);
-	}
-	
-	public static void errorDialog(Shell shell, String title, String message, IStatus s) {
-		if (s != null && message != null && message.equals(s.getMessage()))
-			message = null;
-
-		ErrorDialog.openError(shell, title, message, s);
-	}
-
-	public static void errorDialog(Shell shell, String title, String message, Throwable t) {
-		IStatus status;
-		if (t instanceof CoreException) {
-			status = ((CoreException)t).getStatus();
-		} else {
-			status = new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, "Error within PTP Core: ", t);
-			log(status);	
-		}
-		errorDialog(shell, title, message, status);
-	}
-
-	public static void errorDialog(final String title, final String message, final Throwable t) {
-		getDisplay().syncExec(new Runnable() {
-			public void run() {
-				errorDialog(getDisplay().getActiveShell(), title, message, t);
-			}
-		});
-	}
-	
-	public static IWorkbenchPage getActivePage() {
-		IWorkbenchWindow w = getActiveWorkbenchWindow();
-		if (w != null) {
-			return w.getActivePage();
-		}
-		return null;
-	}
-	/**
-	 * Returns the active workbench shell or <code>null</code> if none
-	 * 
-	 * @return the active workbench shell or <code>null</code> if none
-	 */
-	public static Shell getActiveWorkbenchShell() {
-		IWorkbenchWindow window = getActiveWorkbenchWindow();
-		if (window != null) {
-			return window.getShell();
-		}
-		return null;
-	}
-
-	public static IWorkbenchWindow getActiveWorkbenchWindow() {
-		return getDefault().getWorkbench().getActiveWorkbenchWindow();
-	}
-	
 	/**
 	 * Returns the shared instance.
 	 */
 	public static PTPCorePlugin getDefault() {
 		return plugin;
-	}
-
-	public static Display getDisplay() {
-		Display display= Display.getCurrent();
-		if (display == null) {
-			display= Display.getDefault();
-		}
-		return display;		
-	}
-	
-
-	/**
-	 * Makes sure that the safeRunnable is ran in the UI thread. 
-	 * @param safeRunnable
-	 */
-	public static void safeRunAsyncInUIThread(final ISafeRunnable safeRunnable) {
-		if (getDisplay().isDisposed()) {
-			try {
-				safeRunnable.run();
-			} catch (Exception e) {
-				PTPCorePlugin.log(e);
-			}
-		}
-		else {
-			getDisplay().asyncExec(new Runnable() {
-				public void run() {
-					SafeRunnable.run(safeRunnable);
-				}
-			});
-		}
 	}
 	
 	/**
@@ -164,14 +72,6 @@ public class PTPCorePlugin extends AbstractUIPlugin {
 		return getDefault().getBundle().getSymbolicName();
 	}
 
-	public static void informationDialog(final String title, final String message) {
-		getDisplay().syncExec(new Runnable() {
-			public void run() {
-				MessageDialog.openInformation(getDisplay().getActiveShell(), title, message);
-			}
-		});
-	}
-
 	public static void log(IStatus status) {
 		getDefault().getLog().log(status);
 	}
@@ -182,14 +82,6 @@ public class PTPCorePlugin extends AbstractUIPlugin {
 
 	public static void log(Throwable e) {
 		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, "Internal Error", e));
-	}
-
-	public static void warningDialog(final String title, final String message) {
-		getDisplay().syncExec(new Runnable() {
-			public void run() {
-				MessageDialog.openWarning(getDisplay().getActiveShell(), title, message);
-			}
-		});
 	}
 
 	// Resource bundle.
