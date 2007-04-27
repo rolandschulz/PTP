@@ -686,7 +686,9 @@ IResourceManagerControl {
 	 * Create new model elements.
 	 */
 	protected IPJobControl newJob(IPQueueControl queue, int jobId, IAttribute[] attrs) {
-		return new PJob(jobId, queue, attrs);
+		IPJobControl job = new PJob(jobId, queue, attrs);
+		queue.addJob(job);
+		return job;
 	}
 
 	protected IPMachineControl newMachine(int machineId, IAttribute[] attrs) {
@@ -694,7 +696,9 @@ IResourceManagerControl {
 	}
 
 	protected IPNodeControl newNode(IPMachineControl machine, int nodeId, IAttribute[] attrs) {
-		return new PNode(nodeId, machine, attrs);
+		IPNodeControl node = new PNode(nodeId, machine, attrs);
+		machine.addNode(node);
+		return node;
 	}
 
 	protected IPProcessControl newProcess(IPJobControl job, int processId, IAttribute[] attrs) {
