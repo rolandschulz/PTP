@@ -18,8 +18,8 @@ public class QueueAttributes {
 		STOPPED
 	};
 
-	public static final String STATE_ATTR_ID = "queueState";
-	public static final String ID_ATTR_ID = "queueId";
+	private static final String STATE_ATTR_ID = "queueState";
+	private static final String ID_ATTR_ID = "queueId";
 
 	private final static IEnumeratedAttributeDefinition stateAttrDef = 
 		new EnumeratedAttributeDefinition(STATE_ATTR_ID, "state", "Queue State", State.NORMAL, State.values());

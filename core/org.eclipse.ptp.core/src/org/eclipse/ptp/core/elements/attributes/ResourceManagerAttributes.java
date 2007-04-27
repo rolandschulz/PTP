@@ -16,7 +16,7 @@ public class ResourceManagerAttributes {
 	    SUSPENDED
 	}
 	
-	public final static String STATE_ATTR_ID = "rmState";
+	private final static String STATE_ATTR_ID = "rmState";
 
 	private final static IEnumeratedAttributeDefinition stateAttrDef = 
 		new EnumeratedAttributeDefinition(STATE_ATTR_ID, "state", "RM State", State.STOPPED, State.values());

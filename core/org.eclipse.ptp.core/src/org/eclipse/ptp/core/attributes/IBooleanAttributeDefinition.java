@@ -19,4 +19,5 @@
 package org.eclipse.ptp.core.attributes;
 
 public interface IBooleanAttributeDefinition extends IAttributeDefinition {
+	public IBooleanAttribute create(Boolean value);
 }

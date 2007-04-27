@@ -16,7 +16,7 @@ public class MachineAttributes {
 		STOPPED
 	};
 
-	public static final String STATE_ATTR_ID = "machineState";
+	private static final String STATE_ATTR_ID = "machineState";
 
 	private final static IEnumeratedAttributeDefinition stateAttrDef = 
 		new EnumeratedAttributeDefinition(STATE_ATTR_ID, "state", "Machine State", State.UNKNOWN, State.values());
