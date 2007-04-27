@@ -94,7 +94,7 @@ public class SimpleTableBarrierView extends ViewPart {
 
 	private Action doubleClickAction;
 
-	private static final boolean traceOn = true;
+	private static final boolean traceOn = false;
 
 	private static final boolean traceStatusLine = false;
 
@@ -1672,7 +1672,7 @@ public class SimpleTableBarrierView extends ViewPart {
 				// ignore errors; only tracing for now.
 				System.out
 						.println("ATV.UpdateVisitor error getting marker info ");
-				e1.printStackTrace();
+				//e1.printStackTrace();
 			}
 			if (traceOn)
 				System.out.println("    markerID_=" + mid
