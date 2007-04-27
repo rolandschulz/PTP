@@ -181,14 +181,20 @@ IResourceManagerControl {
 	}
 
 	public synchronized IPJob findJobById(String job_id) {
-		IPQueue[] queues = getQueues();
-		for (int j = 0; j < queues.length; ++j) {
-			IPJob job = queues[j].getJob(Integer.parseInt(job_id));
-			if (job != null) {
-				return job;
+		IPJob job = null;
+		try {
+			int id = Integer.parseInt(job_id);
+			IPQueue[] queues = getQueues();
+			for (int j = 0; j < queues.length; ++j) {
+				job = queues[j].getJob(id);
+				if (job != null) {
+					break;
+				}
 			}
+		} catch (NumberFormatException e) {
+			return null;
 		}
-		return null;
+		return job;
 	}
 
 	/* (non-Javadoc)
