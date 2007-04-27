@@ -63,15 +63,6 @@
  * RTEV codes must EXACTLY match org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEvent
  */
 #define RTEV_OFFSET						200
-#define RTEV_OK							RTEV_OFFSET + 0
-#define RTEV_ERROR						RTEV_OFFSET + 1
-#define RTEV_JOBSTATE					RTEV_OFFSET + 2
-#define RTEV_PROCS						RTEV_OFFSET + 4
-#define RTEV_PATTR						RTEV_OFFSET + 5
-#define RTEV_NODES						RTEV_OFFSET + 7
-#define RTEV_NATTR						RTEV_OFFSET + 8
-#define RTEV_NEWJOB						RTEV_OFFSET + 12
-#define RTEV_PROCOUT					RTEV_OFFSET + 13
 
 /*
  * RTEV_ERROR codes are used internally in the ORTE specific plugin
@@ -470,14 +461,15 @@ sendAttrDefStringEvent(int trans_id, char *id, char *name, char *desc, char *def
 }
 
 static int
-sendNewMachineEvent(int trans_id, int id)
+sendNewMachineEvent(int trans_id, int id, char *name)
 {
 	proxy_msg *	m = new_proxy_msg(PROXY_EV_RT_NEW_MACHINE, trans_id);
 	
 	proxy_msg_add_int(m, gBaseID);
 	proxy_msg_add_int(m, 1);	
 	proxy_msg_add_int(m, id);
-	proxy_msg_add_int(m, 0);
+	proxy_msg_add_int(m, 1);
+	proxy_msg_add_keyval_string(m, ATTRDEF_NAME_KEY, name);
 	proxy_svr_queue_msg(orte_proxy, m);
 	
 	return 0;	
@@ -1028,6 +1020,16 @@ static int
 get_num_machines()
 {
 	return 1;
+}
+
+static char *
+get_machine_name(int num)
+{
+	static char	hostname[BUFSIZ+1];
+	
+	gethostname(hostname, BUFSIZ);
+	
+	return hostname;
 }
 
 static int
@@ -2078,7 +2080,7 @@ ORTE_StartEvents(int trans_id, int nargs, char **args)
 	
 	for(m = 0; m < num_machines; m++) {
 		mach = new_machine();
-		sendNewMachineEvent(trans_id, mach->id);
+		sendNewMachineEvent(trans_id, mach->id, get_machine_name(m));
 		
 		num_nodes = get_num_nodes(mach->id);
 		
