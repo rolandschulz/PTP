@@ -32,15 +32,11 @@ import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
-import org.eclipse.debug.core.ILaunch;
-import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
 import org.eclipse.ptp.core.attributes.AttributeManager;
-import org.eclipse.ptp.core.attributes.EnumeratedAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
-import org.eclipse.ptp.core.attributes.IEnumeratedAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IIntegerAttribute;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.elementcontrols.IPJobControl;
@@ -88,7 +84,6 @@ import org.eclipse.ptp.rmsystem.events.ResourceManagerNewMachinesEvent;
 import org.eclipse.ptp.rmsystem.events.ResourceManagerNewNodesEvent;
 import org.eclipse.ptp.rmsystem.events.ResourceManagerNewProcessesEvent;
 import org.eclipse.ptp.rmsystem.events.ResourceManagerNewQueuesEvent;
-import org.eclipse.ptp.rtsystem.JobRunConfiguration;
 
 /**
  * @author rsqrd
@@ -162,10 +157,10 @@ IResourceManagerControl {
 	 */
 	public void dispose() {
 		listeners.clear();
-		SafeRunnable.run(new SafeRunnable(){
-			public void run() throws Exception {
-				shutdown();
-			}});
+		try {
+			shutdown();
+		} catch (CoreException e) {
+		}
 		doDispose();
 	}
 	
