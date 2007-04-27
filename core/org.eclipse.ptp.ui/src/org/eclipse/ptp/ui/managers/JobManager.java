@@ -284,7 +284,7 @@ public class JobManager extends AbstractUIManager {
 		for (Iterator qit = queues.iterator(); qit.hasNext() && last_job_id.equals(EMPTY_ID); ) {
 			final IPQueue q = (IPQueue) qit.next();
 			jobs = q.getJobs();
-			if (jobs.length > 0) {
+			if (jobs != null && jobs.length > 0) {
 				// focus on last job
 				final IPJob lastJob = jobs[jobs.length - 1];
 				cur_queue_id = q.getIDString();
@@ -376,13 +376,17 @@ public class JobManager extends AbstractUIManager {
 	private IPQueue getCurrentQueue() {
 		final IPQueue queue;
 		if (cur_queue_id.equals(EMPTY_ID)) {
-			IPUniverse universe = getUniverse();
-			IPJob job = universe.findJobById(cur_job_id);
-			if (job == null) {
+			if (!cur_job_id.equals(EMPTY_ID)) {
+				IPUniverse universe = getUniverse();
+				IPJob job = universe.findJobById(cur_job_id);
+				if (job == null) {
+					queue = null;
+				}
+				else {
+					queue = job.getQueue();
+				}
+			} else {
 				queue = null;
-			}
-			else {
-				queue = job.getQueue();
 			}
 		}
 		else {
