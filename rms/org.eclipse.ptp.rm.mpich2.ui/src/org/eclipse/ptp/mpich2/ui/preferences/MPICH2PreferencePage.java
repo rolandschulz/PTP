@@ -27,6 +27,7 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.mpich2.ui.internal.ui.Messages;
+import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.ui.utils.SWTUtil;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -59,7 +60,7 @@ public class MPICH2PreferencePage extends PreferencePage implements IWorkbenchPr
 	private boolean loading = true;
 
 	public MPICH2PreferencePage() {
-		setPreferenceStore(PTPCorePlugin.getDefault().getPreferenceStore());
+		setPreferenceStore(PTPUIPlugin.getDefault().getPreferenceStore());
 	}
 
 	protected class WidgetListener extends SelectionAdapter implements ModifyListener, IPropertyChangeListener 

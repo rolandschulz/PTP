@@ -27,6 +27,7 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.simulation.internal.ui.Messages;
+import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -58,7 +59,7 @@ public class SimulationPreferencePage extends PreferencePage implements IWorkben
 	protected int nodes[];
 
 	public SimulationPreferencePage() {
-		setPreferenceStore(PTPCorePlugin.getDefault().getPreferenceStore());
+		setPreferenceStore(PTPUIPlugin.getDefault().getPreferenceStore());
 	}
 
 	protected class WidgetListener extends SelectionAdapter implements ModifyListener, IPropertyChangeListener
