@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.views;
 
+import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ptp.core.IModelListener;
 import org.eclipse.ptp.core.PTPCorePlugin;
@@ -25,6 +26,7 @@ import org.eclipse.ptp.core.events.IModelErrorEvent;
 import org.eclipse.ptp.core.events.IModelEvent;
 import org.eclipse.ptp.core.events.IModelRuntimeNotifierEvent;
 import org.eclipse.ptp.core.events.IModelSysChangedEvent;
+import org.eclipse.ptp.ui.UIUtils;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.part.ViewPart;
 /**
@@ -64,7 +66,14 @@ public abstract class AbstractParallelView extends ViewPart implements IModelLis
 	
 	public abstract ISelection getSelection();
     
-	public void modelEvent(IModelEvent event) {
+	public void modelEvent(final IModelEvent event) {
+		UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
+			public void run() {
+				safeModelEvent(event);
+			}
+		});	
+	}
+	private void safeModelEvent(final IModelEvent event) {
 		if (event instanceof IModelErrorEvent) {
 			build();
 			refresh(true);

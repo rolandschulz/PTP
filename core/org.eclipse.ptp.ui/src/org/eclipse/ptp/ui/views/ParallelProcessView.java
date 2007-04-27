@@ -19,6 +19,8 @@
 package org.eclipse.ptp.ui.views;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.ISafeRunnable;
+import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.ptp.core.IModelListener;
 import org.eclipse.ptp.core.IProcessListener;
 import org.eclipse.ptp.core.PTPCorePlugin;
@@ -28,6 +30,8 @@ import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.events.IModelEvent;
 import org.eclipse.ptp.core.events.IModelRuntimeNotifierEvent;
 import org.eclipse.ptp.core.events.IProcessEvent;
+import org.eclipse.ptp.ui.PTPUIPlugin;
+import org.eclipse.ptp.ui.UIUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -187,7 +191,7 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 			IPNode node = process.getNode();
 			if (node != null) {
 				totalLabel.setText("Total: " + node.getNumProcesses());
-				nodeLabel.setText("Node: " + node.getNodeNumber());
+				nodeLabel.setText("Node: " + node.getElementName());
 			}
 			
 			/*
@@ -204,6 +208,13 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 	}
 	
 	public void processEvent(final IProcessEvent event) {
+		UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
+			public void run() {
+				safeProcessEvent(event);
+			}
+		});
+	}
+	private void safeProcessEvent(final IProcessEvent event) {
 		if (event.getProcess() != null && event.getProcess().equals(getProcess())) {
 			getSite().getShell().getDisplay().asyncExec(new Runnable() {
 				public void run() {
@@ -268,12 +279,21 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 		}
 	}
 	
-	public void modelEvent(IModelEvent event) {
+	public void modelEvent(final IModelEvent event) {
+		UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
+			public void run() {
+				safeModelEvent(event);
+			}
+		});
+	}
+	
+	private void safeModelEvent(IModelEvent event) {
 		if (event instanceof IModelRuntimeNotifierEvent) {
 			IModelRuntimeNotifierEvent runEvent = (IModelRuntimeNotifierEvent)event;
 			if (runEvent.getType() == IModelRuntimeNotifierEvent.STOPPED) {
 				close();
 			}
-		}
+		}	
 	}
+
 }
