@@ -462,11 +462,7 @@ IResourceManagerListener {
         Object[] array = modelListeners.getListeners();
         for (int i = 0; i < array.length; i++) {
             final IModelListener l = (IModelListener) array[i];
-            SafeRunnable.run(new SafeRunnable() {
-                public void run() {
-                    l.modelEvent(event);
-                }
-            });
+            l.modelEvent(event);
         }
 	}
 
@@ -474,11 +470,7 @@ IResourceManagerListener {
         Object[] array = nodeListeners.getListeners();
         for (int i = 0; i < array.length; i++) {
             final INodeListener l = (INodeListener) array[i];
-            SafeRunnable.run(new SafeRunnable() {
-                public void run() {
-                    l.nodeEvent(event);
-                }
-            });
+            l.nodeEvent(event);
         }
 	}
 
@@ -486,11 +478,7 @@ IResourceManagerListener {
         Object[] array = processListeners.getListeners();
         for (int i = 0; i < array.length; i++) {
             final IProcessListener l = (IProcessListener) array[i];
-            SafeRunnable.run(new SafeRunnable() {
-                public void run() {
-                    l.processEvent(event);
-                }
-            });
+            l.processEvent(event);
         }
 	}
 
