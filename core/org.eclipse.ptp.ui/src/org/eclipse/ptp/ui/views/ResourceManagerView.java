@@ -21,6 +21,7 @@ import org.eclipse.ptp.core.elements.IPElement;
 import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IPUniverse;
+import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.internal.ui.ParallelImages;
 import org.eclipse.ptp.rmsystem.AbstractResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManager;
@@ -28,7 +29,6 @@ import org.eclipse.ptp.rmsystem.IResourceManagerChangedListener;
 import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
 import org.eclipse.ptp.rmsystem.IResourceManagerListener;
 import org.eclipse.ptp.rmsystem.IResourceManagerMenuContribution;
-import org.eclipse.ptp.rmsystem.ResourceManagerState;
 import org.eclipse.ptp.rmsystem.events.IResourceManagerAddedRemovedEvent;
 import org.eclipse.ptp.rmsystem.events.IResourceManagerChangedJobsEvent;
 import org.eclipse.ptp.rmsystem.events.IResourceManagerChangedMachinesEvent;
@@ -143,7 +143,7 @@ public class ResourceManagerView extends ViewPart implements
 			if (element instanceof IAdaptable) {
 				IResourceManager rm = (IResourceManager) ((IAdaptable) element).getAdapter(IResourceManager.class);
 				if (rm != null)
-					return rm.getState().equals(ResourceManagerState.State.STARTED);
+					return rm.getState().equals(ResourceManagerAttributes.State.STARTED);
 			}
 			return false;
 		}
@@ -204,14 +204,14 @@ public class ResourceManagerView extends ViewPart implements
 
 		public Image getImage(Object element) {
 			if (element instanceof IResourceManager) {
-				ResourceManagerState.State status = ((IResourceManager) element).getState();
-                if (status.equals(ResourceManagerState.State.STARTED))
+				ResourceManagerAttributes.State status = ((IResourceManager) element).getState();
+                if (status.equals(ResourceManagerAttributes.State.STARTED))
                     return ParallelImages.rmImages[1];
-                if (status.equals(ResourceManagerState.State.SUSPENDED))
+                if (status.equals(ResourceManagerAttributes.State.SUSPENDED))
                     return ParallelImages.rmImages[1];
-				if (status.equals(ResourceManagerState.State.STOPPED))
+				if (status.equals(ResourceManagerAttributes.State.STOPPED))
 					return ParallelImages.rmImages[0];
-				if (status.equals(ResourceManagerState.State.ERROR))
+				if (status.equals(ResourceManagerAttributes.State.ERROR))
 					return ParallelImages.rmImages[3];
 			}
 			return super.getImage(element);
