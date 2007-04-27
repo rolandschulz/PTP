@@ -319,6 +319,15 @@ IResourceManagerControl {
 		return queues.get(id);
 	}
 	
+	public synchronized IPQueue getQueue(String name) {
+		for (IPQueue queue : getQueues()) {
+			if (queue.getName().equals(name)) {
+				return queue;
+			}
+		}
+		return null;
+	}
+	
 	public synchronized IPQueueControl[] getQueueControls() {
 		return (IPQueueControl[]) queues.values().toArray(new IPQueueControl[0]);
 	}
