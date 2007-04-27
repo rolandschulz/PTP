@@ -28,14 +28,7 @@ import org.eclipse.ptp.core.elementcontrols.IPElementControl;
 import org.eclipse.search.ui.ISearchPageScoreComputer;
 
 public abstract class PElement extends PlatformObject implements IPElementControl, Comparable {
-	private static String getName(IAttribute[] attrs) {
-		for (IAttribute attr : attrs) {
-			if (attr.getDefinition() == AttributeDefinitionManager.getNameAttributeDefinition()) {
-				return attr.getValueAsString();
-			}
-		}
-		return "";
-	}
+
 	private PElementInfo elementInfo = null;
 
 	protected HashMap<String, Object> attributeValues = new HashMap<String, Object>();
@@ -52,10 +45,18 @@ public abstract class PElement extends PlatformObject implements IPElementContro
 		elementParent = parent;
 		for (IAttribute attr : attrs) {
 			final IAttributeDefinition attrDef = attr.getDefinition();
-			setAttribute(attrDefToAttrKey(attrDef), attr);
+			setAttribute(attrDef.getId(), attr);
 		}
 	}
 
+	private String getName(IAttribute[] attrs) {
+		IAttribute attr = (IAttribute) attributeValues.get(AttributeDefinitionManager.getNameAttributeDefinition().getId());
+		if (attr != null) {
+			return attr.getValueAsString();
+		}
+		return "";
+	}
+	
 	public int compareTo(Object obj) {
 		if (obj instanceof IPElementControl) {
 			int my_rank = getID();
@@ -85,7 +86,7 @@ public abstract class PElement extends PlatformObject implements IPElementContro
 	 * @see org.eclipse.ptp.core.IPElement#getAttribute(org.eclipse.ptp.core.attributes.IAttributeDefinition)
 	 */
 	public IAttribute getAttribute(IAttributeDefinition attrDef) {
-		return (IAttribute) getAttribute(attrDefToAttrKey(attrDef));
+		return (IAttribute) getAttribute(attrDef.getId());
 	}
 
 	public Object getAttribute(String attrId) {
@@ -146,10 +147,6 @@ public abstract class PElement extends PlatformObject implements IPElementContro
 
 	public String toString() {
 		return getElementName();
-	}
-
-	private String attrDefToAttrKey(final IAttributeDefinition attrDef) {
-		return "ATTRDEF_ID: " + attrDef.getId();
 	}
 
 	protected PElementInfo getElementInfo() {

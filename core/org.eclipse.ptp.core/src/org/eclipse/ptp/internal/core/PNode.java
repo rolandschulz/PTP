@@ -22,7 +22,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.ptp.core.AttributeConstants;
+import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
 import org.eclipse.ptp.core.attributes.IAttribute;
+import org.eclipse.ptp.core.attributes.IAttributeDefinition;
+import org.eclipse.ptp.core.attributes.IIntegerAttribute;
+import org.eclipse.ptp.core.attributes.IStringAttribute;
 import org.eclipse.ptp.core.elementcontrols.IPElementControl;
 import org.eclipse.ptp.core.elementcontrols.IPMachineControl;
 import org.eclipse.ptp.core.elementcontrols.IPNodeControl;
@@ -30,6 +34,7 @@ import org.eclipse.ptp.core.elementcontrols.IPProcessControl;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPProcess;
+import org.eclipse.ptp.core.elements.attributes.NodeAttributes;
 
 public class PNode extends Parent implements IPNodeControl {
 	protected String NAME_TAG = "node ";
@@ -53,12 +58,11 @@ public class PNode extends Parent implements IPNodeControl {
 	}
 	
 	public String getNodeNumber() {
-		return ""+((Integer) this.getAttribute(AttributeConstants.ATTRIB_NODE_NUMBER)).intValue()+"";
-	}
-	
-	public int getNodeNumberInt()
-	{
-		return ((Integer) this.getAttribute(AttributeConstants.ATTRIB_NODE_NUMBER)).intValue();
+		IIntegerAttribute num = (IIntegerAttribute)getAttribute(NodeAttributes.getNumberAttributeDefinition());
+		if (num != null) {
+			return num.getValueAsString();
+		}
+		return "";
 	}
 	
 	public IPProcessControl[] getProcessControls() {
