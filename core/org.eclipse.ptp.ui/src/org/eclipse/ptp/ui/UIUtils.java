@@ -18,9 +18,12 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui;
 
+import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.util.SafeRunnable;
+import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
@@ -157,4 +160,22 @@ public class UIUtils {
             return;
         viewPart.dispose();
     }
+    
+
+    public static void safeRunAsyncInUIThread(final ISafeRunnable safeRunnable) {
+		if (PTPUIPlugin.getDisplay().isDisposed()) {
+			try {
+				safeRunnable.run();
+			} catch (Exception e) {
+				PTPCorePlugin.log(e);
+			}
+		}
+		else {
+			PTPUIPlugin.getDisplay().asyncExec(new Runnable() {
+				public void run() {
+					SafeRunnable.run(safeRunnable);
+				}
+			});
+		}
+	}
 }
