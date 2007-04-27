@@ -317,7 +317,7 @@ public class ORTERemoteProxyTest implements IProxyRuntimeEventListener {
 				 * Find a state change, if any
 				 */
 					String[] kv = args[pos++].split("=");
-					if (kv.length == 2 && kv[0].equals(JobAttributes.STATE_ATTR_ID)){
+					if (kv.length == 2 && kv[0].equals(JobAttributes.getStateAttributeDefinition().getId())){
 						try {
 							if (kv[1].equals(JobAttributes.State.ABORTED.toString())) {
 								System.out.println("job terminated!");
