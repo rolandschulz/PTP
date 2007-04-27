@@ -46,9 +46,15 @@ import org.eclipse.debug.core.model.IPersistableSourceLocator;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
+import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttribute;
+import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IPUniverse;
+import org.eclipse.ptp.core.elements.attributes.JobAttributes;
+import org.eclipse.ptp.core.elements.attributes.QueueAttributes;
+import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.debug.core.IPDebugConfiguration;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.launch.PLaunch;
@@ -58,7 +64,6 @@ import org.eclipse.ptp.launch.internal.ui.LaunchMessages;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory;
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.rmsystem.IResourceManager;
-import org.eclipse.ptp.rmsystem.ResourceManagerState;
 import org.eclipse.ptp.rtsystem.JobRunConfiguration;
 
 /**
@@ -115,38 +120,63 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 			arguments.add(temp);
 		return (String[]) arguments.toArray(new String[arguments.size()]);
 	}
-	protected JobRunConfiguration getJobRunConfiguration(ILaunchConfiguration configuration)
-	throws CoreException {
-		IPath programFile = getProgramFile(configuration);
-		String resourceManagerName = getResourceManagerName(configuration);	
-		String queueName = getQueueName(configuration);	
-		IAttribute[] launchAttributes = getLaunchAttributes(configuration);
-		String[] args = getProgramParameters(configuration);
-		String[] env =  DebugPlugin.getDefault().getLaunchManager().getEnvironment(configuration);
-		String dir = verifyWorkDirectory(configuration);
-
-		return new JobRunConfiguration(programFile.lastSegment(),
-				programFile.removeLastSegments(1).toOSString(), resourceManagerName,
-				queueName, launchAttributes, args, env, dir);
-		//original - return new JobRunConfiguration(programFile.getProjectRelativePath().toOSString(), dir, machineName, nprocs, nprocpnode, firstnode, args, env, dir);
+	/**
+	 * Get all the attributes specified in the launch configuration.
+	 * 
+	 * @param configuration
+	 * @return AttributeManager
+	 * @throws CoreException
+	 */
+	protected AttributeManager getAttributeManager(ILaunchConfiguration configuration) throws CoreException {
+		AttributeManager attrMgr = new AttributeManager();
+		IResourceManager rm = getResourceManager(configuration);
+		if (rm != null) {
+			try {
+				IPQueue queue = rm.getQueue(getQueueName(configuration));
+				if (queue != null) {
+						attrMgr.setAttribute(QueueAttributes.getIdAttributeDefinition().create(queue.getIDString()));
+				}
+				
+				IPath programFile = getProgramFile(configuration);
+				attrMgr.setAttribute(JobAttributes.getExecutableNameAttributeDefinition().create(programFile.lastSegment()));
+				
+				String path = programFile.removeLastSegments(1).toOSString();
+				if (path != null) {
+					attrMgr.setAttribute(JobAttributes.getExecutablePathAttributeDefinition().create(path));
+				}
+				
+				String wd = verifyWorkDirectory(configuration);
+				if (wd != null) {
+					attrMgr.setAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition().create(wd));
+				}
+				
+				String[] argArr = getProgramParameters(configuration);
+				if (argArr != null) {
+					attrMgr.setAttribute(JobAttributes.getProgramArgumentsAttributeDefinition().create(argArr));
+				}
+				
+				String[] envArr = DebugPlugin.getDefault().getLaunchManager().getEnvironment(configuration);
+				if (envArr != null) {
+					attrMgr.setAttribute(JobAttributes.getEnvironmentAttributeDefinition().create(envArr));
+				}
+			} catch (IllegalValueException e) {
+			}
+			attrMgr.setAttributes(getLaunchAttributes(configuration));
+		} 
+		return attrMgr;
 	}
+	/**
+	 * Get the attributes from the resource manager specific launch page.
+	 * 
+	 * @param configuration
+	 * @return IAttribute[]
+	 * @throws CoreException
+	 */
 	private IAttribute[] getLaunchAttributes(ILaunchConfiguration configuration)
 	throws CoreException {
 
-		String resourceManagerName = getResourceManagerName(configuration);	
 		String queueName = getQueueName(configuration);	
-
-		IPUniverse universe = PTPCorePlugin.getDefault().getUniverse();
-		IResourceManager rm = null;
-		IResourceManager[] rms = universe.getResourceManagers();
-		for (IResourceManager rm_i : rms) {
-			if (rm_i.getElementName().equals(resourceManagerName)) {
-				if (rm_i.getState() == ResourceManagerState.State.STARTED) {
-					rm = rm_i;
-					break;
-				}
-			}
-		}
+		IResourceManager rm = getResourceManager(configuration);
 
 		final AbstractRMLaunchConfigurationFactory rmFactory =
 			PTPLaunchPlugin.getDefault().getRMLaunchConfigurationFactory(rm);
@@ -154,11 +184,9 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 			return new IAttribute[0];
 		}
 		IRMLaunchConfigurationDynamicTab rmDynamicTab = rmFactory.create(rm);
-		IPQueue[] queues = rm.getQueues();
-		for (IPQueue q : queues) {
-			if (q.getName().equals(queueName)) {
-				return rmDynamicTab.getAttributes(rm, q, configuration);
-			}
+		IPQueue queue = rm.getQueue(queueName);
+		if (queue != null) {
+			return rmDynamicTab.getAttributes(rm, queue, configuration);
 		}
 		return new IAttribute[0];
 	}
@@ -312,5 +340,17 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 			}
 			launch.setSourceLocator(sourceLocator);
 		}
+	}
+	protected IResourceManager getResourceManager(ILaunchConfiguration configuration) throws CoreException {
+		IPUniverse universe = PTPCorePlugin.getDefault().getUniverse();
+		IResourceManager[] rms = universe.getResourceManagers();
+		String rmName = getResourceManagerName(configuration);
+		for (int i = 0; i < rms.length; ++i) {
+			if (rms[i].getState() == ResourceManagerAttributes.State.STARTED &&
+					rms[i].getElementName().equals(rmName)) {
+				return rms[i];
+			}
+		}
+		return null;
 	}
 }

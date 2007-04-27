@@ -19,6 +19,8 @@
 package org.eclipse.ptp.launch.internal;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.eclipse.cdt.core.IBinaryParser.IBinaryObject;
 import org.eclipse.core.runtime.CoreException;
@@ -34,8 +36,10 @@ import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.PreferenceConstants;
+import org.eclipse.ptp.core.attributes.AttributeManager;
+import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.elements.IPJob;
-import org.eclipse.ptp.core.elements.IPUniverse;
+import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.IPDebugConfiguration;
 import org.eclipse.ptp.debug.core.IPDebugConstants;
@@ -46,7 +50,6 @@ import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.internal.ui.LaunchMessages;
 import org.eclipse.ptp.rmsystem.IResourceManager;
-import org.eclipse.ptp.rmsystem.ResourceManagerState;
 import org.eclipse.ptp.rtsystem.JobRunConfiguration;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchPage;
@@ -71,44 +74,55 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			monitor = new NullProgressMonitor();
 		}
 		monitor.beginTask("", 250);
-		monitor.setTaskName(MessageFormat.format("{0} . . .", new String[] { "Launching " + configuration.getName() }));
+		monitor.setTaskName(MessageFormat.format("{0} . . .", new Object[] { "Launching " + configuration.getName() }));
 		if (monitor.isCanceled()) {
 			return;
 		}
 		IAbstractDebugger debugger = null;
 		IPJob job = null;
-		// done the verification phase
-		JobRunConfiguration jrunconfig = getJobRunConfiguration(configuration);
-		/* Assuming we have parsed the configuration */
+		
+		final IResourceManager rm = getResourceManager(configuration);
+		if (rm == null) {
+			abort(LaunchMessages.getResourceString("ParallelLaunchConfigurationDelegate.No_ResourceManager"), null, 0);
+		}
+		
+		AttributeManager attrManager = getAttributeManager(configuration);
+
 		try {
 			IPreferenceStore store = PTPDebugUIPlugin.getDefault().getPreferenceStore();
 			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
 				monitor.subTask("Configuring debug setting . . .");
+				
 				String dbgFile = store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_FILE);
-				String dbgArgs = "--host=" + store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_HOST);
-				dbgArgs += " --debugger=" + store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_BACKEND);
+				
+				ArrayList<String> dbgArgs = new ArrayList<String>();
+				
+				dbgArgs.add("--host=" + store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_HOST));
+				dbgArgs.add("--debugger=" + store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_BACKEND));
+				
 				String dbgPath = store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_BACKEND_PATH);
-				if (dbgPath.length() > 0)
-					dbgArgs += " --debugger_path=" + dbgPath;
+				if (dbgPath.length() > 0) {
+					dbgArgs.add("--debugger_path=" + dbgPath);
+				}
+				
 				String dbgExtraArgs = store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_ARGS);
-				if (dbgExtraArgs.length() > 0)
-					dbgArgs += " " + dbgExtraArgs;
+				if (dbgExtraArgs.length() > 0) {
+					dbgArgs.addAll(Arrays.asList(dbgExtraArgs.split("")));
+				}
+				
 				verifyDebuggerPath(dbgFile);
+				
 				IPDebugConfiguration debugConfig = getDebugConfig(configuration);
 				debugger = debugConfig.createDebugger();
-				jrunconfig.setDebuggerPath(dbgFile);
-				dbgArgs += " --port=" + debugger.getDebuggerPort();
-				jrunconfig.setDebuggerArgs(dbgArgs);
-				jrunconfig.setDebug();
+				dbgArgs.add(" --port=" + debugger.getDebuggerPort());
+			
+				attrManager.setAttribute(JobAttributes.getDebuggerPathAttributeDefinition().create(dbgFile));
+				attrManager.setAttribute(JobAttributes.getDebuggerArgumentsAttributeDefinition().create(dbgFile));
+				attrManager.setAttribute(JobAttributes.getDebugFlagAttributeDefinition().create(true));
 			}
 			monitor.worked(10);
 			monitor.subTask("Starting the job . . .");
-			final String resourceManagerName = jrunconfig.getResourceManagerName();
-			final IResourceManager launchManager = getLaunchManager(resourceManagerName);
-			if (launchManager == null) {
-				abort(LaunchMessages.getResourceString("ParallelLaunchConfigurationDelegate.No_ResourceManager"), null, 0);
-			}
-			job = launchManager.submitJob(launch, jrunconfig, new SubProgressMonitor(monitor, 150));
+			job = rm.submitJob(attrManager, new SubProgressMonitor(monitor, 150));
 			if (job == null) {
 				abort("No job created by launch manager.", null, 0);
 			}
@@ -126,18 +140,18 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 					job.setAttribute(PreferenceConstants.JOB_APP_NAME, dbgExePath.lastSegment());
 					job.setAttribute(PreferenceConstants.JOB_APP_PATH, dbgExePath.removeLastSegments(1).toOSString());
 				} else {
-					job.setAttribute(PreferenceConstants.JOB_APP_NAME, jrunconfig.getExecName());
-					job.setAttribute(PreferenceConstants.JOB_APP_PATH, jrunconfig.getPathToExec());
+					job.setAttribute(PreferenceConstants.JOB_APP_NAME, attrManager.getAttribute(JobAttributes.getExecutableNameAttributeDefinition()));
+					job.setAttribute(PreferenceConstants.JOB_APP_PATH, attrManager.getAttribute(JobAttributes.getExecutablePathAttributeDefinition()));
 				}
 				String wd = getDebuggerWorkDirectory(configuration);
 				if (wd != null) {
 					job.setAttribute(PreferenceConstants.JOB_WORK_DIR, wd);
 				} else {
-					job.setAttribute(PreferenceConstants.JOB_WORK_DIR, jrunconfig.getWorkingDir());
+					job.setAttribute(PreferenceConstants.JOB_WORK_DIR,  attrManager.getAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition()));
 				}
-				job.setAttribute(PreferenceConstants.JOB_ARGS, jrunconfig.getArguments());
+				job.setAttribute(PreferenceConstants.JOB_ARGS,  attrManager.getAttribute(JobAttributes.getProgramArgumentsAttributeDefinition()));
 				// job.setAttribute(PreferenceConstants.JOB_DEBUG_DIR, exePath.removeLastSegments(1).toOSString());
-				job.setAttribute(PreferenceConstants.JOB_DEBUG_DIR, jrunconfig.getPathToExec());
+				job.setAttribute(PreferenceConstants.JOB_DEBUG_DIR,  attrManager.getAttribute(JobAttributes.getExecutablePathAttributeDefinition()));
 				pLaunch.setPJob(job);
 				IBinaryObject exeFile = verifyBinary(configuration);
 				setDefaultSourceLocator(launch, configuration);
@@ -172,20 +186,11 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			if (e.getStatus().getCode() != IStatus.CANCEL) {
 				throw e;
 			}
+		} catch (IllegalValueException e) {
+			// TODO Not sure if it's possible to get here
 		} finally {
 			monitor.done();
 		}
-	}
-	private IResourceManager getLaunchManager(String rmName) {
-		IPUniverse universe = PTPCorePlugin.getDefault().getUniverse();
-		IResourceManager[] rms = universe.getResourceManagers();
-		for (int i = 0; i < rms.length; ++i) {
-			if (rms[i].getState() == ResourceManagerState.State.STARTED &&
-					rms[i].getElementName().equals(rmName)) {
-				return rms[i];
-			}
-		}
-		return null;
 	}
 	private void switchPerspectiveTo(final String perspectiveID) {
 		Display display = Display.getCurrent();
