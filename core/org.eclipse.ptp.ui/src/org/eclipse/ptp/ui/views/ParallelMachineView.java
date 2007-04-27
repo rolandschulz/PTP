@@ -19,7 +19,7 @@
 package org.eclipse.ptp.ui.views;
 
 import org.eclipse.jface.action.IToolBarManager;
-import org.eclipse.ptp.core.AttributeConstants;
+import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.ptp.core.INodeListener;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elements.IPJob;
@@ -32,6 +32,7 @@ import org.eclipse.ptp.internal.ui.actions.ChangeMachineAction;
 import org.eclipse.ptp.ui.IManager;
 import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.PTPUIPlugin;
+import org.eclipse.ptp.ui.UIUtils;
 import org.eclipse.ptp.ui.actions.ParallelAction;
 import org.eclipse.ptp.ui.listeners.IJobChangedListener;
 import org.eclipse.ptp.ui.managers.AbstractUIManager;
@@ -269,12 +270,7 @@ public class ParallelMachineView extends AbstractParallelSetView implements INod
 
 		IPNode node = (IPNode)obj;
 		StringBuffer buffer = new StringBuffer();
-		//buffer.append(" Node ID: " + node.getNodeNumber());
-		//buffer.append("\n");
-		//buffer.append(" Node name: " + node.getElementName());
-		//buffer.append(" Node name: " + node.getAttrib(AttributeConstants.ATTRIB_NODE_NAME));
-		//buffer.append(" (ID: "+node.getNodeNumber()+")");
-		buffer.append(" "+node.getAttribute(AttributeConstants.ATTRIB_NODE_NAME));
+		buffer.append(node.getElementName());
 		IElementSet[] sets = setManager.getSetsWithElement(node.getIDString());
 		if (sets.length > 1)
 			buffer.append("\n Set: ");
@@ -360,74 +356,20 @@ public class ParallelMachineView extends AbstractParallelSetView implements INod
 			}
 		}
 	}
-	/*
-	public void run(String arg) {
-		System.out.println("------------ machine run - job " + arg);
-		IPJob job = ((MachineManager) manager).findJob(arg);
-		if (job != null) {
-			IPMachine[] machines = job.getMachines();
-			if (machines.length > 0) {
-				selectMachine(machines[0].getIDString());
-			}
-		}
-		update();
-		refresh();
-	}
-	public void start() {
-		System.out.println("------------ machine start");
-		refresh();
-	}
-	public void stopped() {
-		System.out.println("------------ machine stop");
-		refresh();
-	}
-	public void exit() {
-		System.out.println("------------ machine exit");
-		refresh();
-	}
-	public void abort() {
-		System.out.println("------------ machine abort");
-		refresh();
-	}
-	public void monitoringSystemChangeEvent(Object object) {
-		System.out.println("------------ machine monitoringSystemChangeEvent");
-		manager.clear();
-		initialView();
-		refresh();
-	}
-	public void execStatusChangeEvent(Object object) {
-		System.out.println("------------ machine execStatusChangeEvent");
-		refresh();
-	}
-	public void sysStatusChangeEvent() {
-		System.out.println("------------ machine sysStatusChangeEvent");
-		refresh();
-	}
-	
-	public void majorSystemChangeEvent() {
-		System.out.println("------------ machine majorSystemChangeEvent");
-		manager.clear();
-		initialView();
-		refresh();
-	}
-	public void processOutputEvent(Object object) {
-		System.out.println("------------ machine processOutputEvent");
-		refresh();
-	}
-	public void errorEvent(Object object) {
-		System.out.println("------------ machine errorEvent");
-		refresh();
-	}
-	public void updatedStatusEvent() {
-		System.out.println("------------ machine updatedStatusEvent");
-		refresh();
-	}
-	*/
 
 	public void repaint(boolean all) {
 		updateLowerTextRegions();
 	}
-	public void nodeEvent(INodeEvent event) {
+	
+	public void nodeEvent(final INodeEvent event) {
+		UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
+			public void run() {
+				safeNodeEvent(event);
+			}
+		});	
+	
+	}
+	private void safeNodeEvent(final INodeEvent event) {
 		// only redraw if the current set contain the node
 		IPNode node = event.getNode();
 		final IPMachine machine = node.getMachine();

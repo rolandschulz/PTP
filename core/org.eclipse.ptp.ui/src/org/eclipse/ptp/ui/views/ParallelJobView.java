@@ -23,6 +23,7 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -44,6 +45,7 @@ import org.eclipse.ptp.internal.ui.actions.TerminateAllAction;
 import org.eclipse.ptp.ui.IManager;
 import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.PTPUIPlugin;
+import org.eclipse.ptp.ui.UIUtils;
 import org.eclipse.ptp.ui.actions.ParallelAction;
 import org.eclipse.ptp.ui.managers.AbstractUIManager;
 import org.eclipse.ptp.ui.managers.JobManager;
@@ -448,7 +450,14 @@ public class ParallelJobView extends AbstractParallelSetView implements IProcess
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.IProcessListener#processEvent(org.eclipse.ptp.core.events.IProcessEvent)
 	 */
-	public void processEvent(IProcessEvent event) {
+	public void processEvent(final IProcessEvent event) {
+		UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
+			public void run() {
+				safeProcessEvent(event);
+			}
+		});	
+	}
+	public void safeProcessEvent(final IProcessEvent event) {
 		// only redraw if the current set contain the process
 		IPProcess process = event.getProcess();
 		if (getJobManager().isCurrentSetContainProcess(getCurrentID(), process.getIDString())) {
@@ -478,7 +487,14 @@ public class ParallelJobView extends AbstractParallelSetView implements IProcess
 	public String getQueueID() {
 		return getJobManager().getQueueID();
 	}
-	public void modelEvent(IModelEvent event) {
+	public void modelEvent(final IModelEvent event) {
+		UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
+			public void run() {
+				safeModelEvent(event);
+			}
+		});	
+	}
+	private void safeModelEvent(final IModelEvent event) {
 		if (event instanceof IModelRuntimeNotifierEvent) {
 			IModelRuntimeNotifierEvent runtimeEvent = (IModelRuntimeNotifierEvent)event;
 			switch (runtimeEvent.getStatus()) {
