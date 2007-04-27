@@ -28,15 +28,15 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.internal.core.ModelManager;
-import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
-public class PTPCorePlugin extends AbstractUIPlugin {
+public class PTPCorePlugin extends Plugin {
 	public static final String PLUGIN_ID = "org.eclipse.ptp.core";
 
 	// The shared instance.
@@ -175,10 +175,6 @@ public class PTPCorePlugin extends AbstractUIPlugin {
 		return null;
 	}
 	
-	public void refreshParallelPluginActions() {
-		refreshPluginActions();
-	}
-	
 	/**
 	 * This method is called upon plug-in activation
 	 */
@@ -207,7 +203,6 @@ public class PTPCorePlugin extends AbstractUIPlugin {
 	 */
 	public void stop(BundleContext context) throws Exception {
 		modelManager.shutdown();
-		super.stop(context);
 	}
 
 }

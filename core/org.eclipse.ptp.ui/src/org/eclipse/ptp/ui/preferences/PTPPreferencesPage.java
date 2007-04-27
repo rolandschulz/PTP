@@ -28,6 +28,7 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.PreferenceConstants;
+import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.ui.UIMessage;
 import org.eclipse.ptp.ui.utils.SWTUtil;
 import org.eclipse.swt.SWT;
@@ -58,7 +59,7 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 	private int storeLine = PreferenceConstants.DEF_STORE_LINE;
 
 	public PTPPreferencesPage() {
-		setPreferenceStore(PTPCorePlugin.getDefault().getPreferenceStore());
+		setPreferenceStore(PTPUIPlugin.getDefault().getPreferenceStore());
 		// setDescription(UIMessage.getResourceString("PTPPreferencesPage.preferencesDescription"));
 	}
 
