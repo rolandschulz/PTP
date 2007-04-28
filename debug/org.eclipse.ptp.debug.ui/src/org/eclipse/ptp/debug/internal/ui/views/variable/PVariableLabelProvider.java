@@ -43,7 +43,7 @@ public class PVariableLabelProvider extends LabelProvider implements ITableLabel
 			case 1:
 				return jVar.getVar();
 			case 2:
-				return jVar.getJob().getElementName();
+				return jVar.getJob().getName();
 			case 3:
 				String[] sets = jVar.getSets();
 				String setsText = "";

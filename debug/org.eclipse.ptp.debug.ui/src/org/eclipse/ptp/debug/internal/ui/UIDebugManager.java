@@ -244,7 +244,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	 */
 	private void addConsoleWindow(IPJob job, IPProcess proc) {
 		if (consoleStorage.getValue(job.getIDString(), proc.getIDString()) == null) {
-			OutputConsole outputConsole = new OutputConsole(proc.getElementName(), new ProcessInputStream(proc));
+			OutputConsole outputConsole = new OutputConsole(proc.getName(), new ProcessInputStream(proc));
 			consoleStorage.addValue(job.getIDString(), proc.getIDString(), outputConsole);
 		}
 	}

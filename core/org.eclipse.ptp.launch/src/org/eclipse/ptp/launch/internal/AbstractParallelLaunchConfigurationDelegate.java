@@ -347,7 +347,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 		String rmName = getResourceManagerName(configuration);
 		for (int i = 0; i < rms.length; ++i) {
 			if (rms[i].getState() == ResourceManagerAttributes.State.STARTED &&
-					rms[i].getElementName().equals(rmName)) {
+					rms[i].getName().equals(rmName)) {
 				return rms[i];
 			}
 		}
