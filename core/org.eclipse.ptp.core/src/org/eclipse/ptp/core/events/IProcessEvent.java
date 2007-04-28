@@ -19,6 +19,7 @@
 package org.eclipse.ptp.core.events;
 
 import org.eclipse.ptp.core.elements.IPProcess;
+import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 
 /**
  * @author Clement chu
@@ -33,4 +34,6 @@ public interface IProcessEvent {
 	public IPProcess getProcess();
 	public String getInput();
 	public int getType();
+	public int getValue();
+	public ProcessAttributes.State getState();
 }
