@@ -187,7 +187,7 @@ public class ParallelTab extends PLaunchConfigurationTab {
 		
 		resourceManagerCombo = new Combo(parallelComp, SWT.READ_ONLY);
 		for (int i = 0; i < rms.length; i++) {
-			resourceManagerCombo.add(rms[i].getElementName());
+			resourceManagerCombo.add(rms[i].getName());
 			resourceManagers.put(i, rms[i]);
 			resourceManagerIndices.put(rms[i], i);
 		}
@@ -480,7 +480,7 @@ public class ParallelTab extends PLaunchConfigurationTab {
 		if (queue == null) {
 			return "";
 		}
-		return queue.getElementName();
+		return queue.getName();
 	}
 
 	private IResourceManager getResourceManagerDefault() {
@@ -524,7 +524,7 @@ public class ParallelTab extends PLaunchConfigurationTab {
 		if (rm == null) {
 			return "";
 		}
-		return rm.getElementName();
+		return rm.getName();
 	}
 
 	/**
@@ -583,7 +583,7 @@ public class ParallelTab extends PLaunchConfigurationTab {
 
 		final IPQueue[] qs = rm.getQueues();
 		for (int i = 0; i < qs.length; i++) {
-			queueCombo.add(qs[i].getElementName());
+			queueCombo.add(qs[i].getName());
 			queues.put(i, qs[i]);
 			queueIndices.put(qs[i], i);
 		}
