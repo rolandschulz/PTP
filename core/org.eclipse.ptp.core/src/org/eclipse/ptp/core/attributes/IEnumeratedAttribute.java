@@ -24,7 +24,7 @@ public interface IEnumeratedAttribute extends IAttribute {
 	
 	public int getValueIndex();
 	
-	public void setValue(String value) throws IllegalValueException;
+	public void setValue(Enum value) throws IllegalValueException;
 
     public Enum getEnumValue();
 }

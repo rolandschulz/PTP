@@ -28,4 +28,9 @@ public interface IEnumeratedAttributeDefinition extends IAttributeDefinition {
 	public List<String> getEnumerations();
 
     public Class<? extends Enum> getEnumClass();
+
+    public IEnumeratedAttribute create(Enum value) throws IllegalValueException;
+
+    public IEnumeratedAttribute create(int value) throws IllegalValueException;
+ 
 }
