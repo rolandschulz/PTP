@@ -233,7 +233,7 @@ public class ResourceManagerView extends ViewPart implements
 			}
 			if (element instanceof IPElement) {
 				IPElement ipelement = (IPElement) element;
-				return ipelement.getElementName();
+				return ipelement.getName();
 			}
 			return super.getText(element);
 		}

@@ -19,7 +19,6 @@
 package org.eclipse.ptp.ui.views;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.ptp.core.IModelListener;
 import org.eclipse.ptp.core.IProcessListener;
@@ -30,7 +29,6 @@ import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.events.IModelEvent;
 import org.eclipse.ptp.core.events.IModelRuntimeNotifierEvent;
 import org.eclipse.ptp.core.events.IProcessEvent;
-import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.ui.UIUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -53,15 +51,12 @@ import org.eclipse.ui.texteditor.ITextEditorActionConstants;
  * 
  */
 public class ParallelProcessView extends AbstractTextEditor implements IProcessListener, IModelListener {
-	private final String EXITCODE_TEXT = "Exit code: ";
-	private final String SIGNALNAME_TEXT = "Signal name: ";
 	private Label rankLabel = null;
 	private Label nodeLabel = null;
 	private Label jobLabel = null;
 	private Label totalLabel = null;
 	private Label pidLabel = null;
 	private Label statusLabel = null;
-	private Label dynamicLabel = null;
 	private Text outputText = null;
 	private FormToolkit toolkit = null;
 	private ScrolledForm myForm = null;
@@ -175,34 +170,22 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 		outputText.setText("N/A");
 		
 		if (process != null) {
-			rankLabel.setText("Rank: " + process.getProcessNumber());
+			rankLabel.setText("Rank: " + process.getTaskId());
 			final IPJob job = process.getJob();
-			final String jobNumber;
-			if (job == null) {
-				jobNumber = "none";
+			String jobName = "none";
+			if (job != null) {
+				jobName = job.getName();
 			}
-			else {
-				jobNumber = job.getJobNumber();
-			}
-			jobLabel.setText("Job: " + jobNumber);
+			jobLabel.setText("Job: " + jobName);
 			pidLabel.setText("PID: " + process.getPid());
 			statusLabel.setText("Status: " + process.getStatus());
 			
 			IPNode node = process.getNode();
 			if (node != null) {
 				totalLabel.setText("Total: " + node.getNumProcesses());
-				nodeLabel.setText("Node: " + node.getElementName());
+				nodeLabel.setText("Node: " + node.getName());
 			}
 			
-			/*
-			if (process.getExitCode() != null)
-				dynamicLabel.setText("Exit code: " + process.getExitCode());
-			else if (process.getSignalName() != null)
-				dynamicLabel.setText("Signal name: " + process.getSignalName());
-			*/
-			// String[] outputs = process.getOutputs();
-			// for (int i=0; i<outputs.length; i++)
-			// outputText.append(outputs[i] + "\n");
 			outputText.setText(process.getContents());
 		}
 	}
@@ -220,14 +203,14 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 				public void run() {
 					switch (event.getType()) {
 					case IProcessEvent.STATUS_CHANGE_TYPE:
-						statusLabel.setText("Status: " + event.getInput());
+						statusLabel.setText("Status: " + event.getState().toString());
 						break;
 						/*
 					case IProcessEvent.STATUS_EXIT_TYPE:
-						dynamicLabel.setText(EXITCODE_TEXT + event.getInput());
+						dynamicLabel.setText(EXITCODE_TEXT + event.getValue());
 						break;
 					case IProcessEvent.STATUS_SIGNALNAME_TYPE:
-						dynamicLabel.setText(SIGNALNAME_TEXT + event.getInput());
+						dynamicLabel.setText(SIGNALNAME_TEXT + event.getValue());
 						break;
 						*/
 					case IProcessEvent.ADD_OUTPUT_TYPE:
@@ -273,7 +256,7 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 			else if (ITextEditorActionConstants.STATUS_CATEGORY_ELEMENT_STATE.equals(category))
 				text = rankLabel.getText();
 			else if (ITextEditorActionConstants.STATUS_CATEGORY_INPUT_MODE.equals(category)) {
-				text = getProcess().getStatus();
+				text = getProcess().getStatus().toString();
 			}
 			field.setText(text == null ? fErrorLabel : text);
 		}

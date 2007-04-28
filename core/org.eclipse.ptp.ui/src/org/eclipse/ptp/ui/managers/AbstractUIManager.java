@@ -19,6 +19,7 @@
 package org.eclipse.ptp.ui.managers;
 
 import java.lang.reflect.InvocationTargetException;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -30,6 +31,7 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.ptp.core.IModelPresentation;
 import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IPUniverse;
@@ -246,7 +248,7 @@ public abstract class AbstractUIManager implements IManager {
 			ILaunchManager launchManager = DebugPlugin.getDefault().getLaunchManager();
 			ILaunch[] launches = launchManager.getLaunches();
 			for (int i=0; i<launches.length; i++) {
-				String launchedJobID = launches[i].getAttribute(IPJob.JOB_ID_TEXT);
+				String launchedJobID = launches[i].getAttribute(AttributeDefinitionManager.getIdAttributeDefinition().getId());
 				if (launchedJobID != null && launchedJobID.equals(job.getIDString())) {
 					launchManager.removeLaunch(launches[i]);
 				}
