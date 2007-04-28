@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.attributes;
 
-public final class DoubleAttribute extends AbstractAttribute implements IDoubleAttribute {
+public final class DoubleAttribute extends AbstractAttribute implements IAttribute {
 
 	private Double value;
 
@@ -71,11 +71,11 @@ public final class DoubleAttribute extends AbstractAttribute implements IDoubleA
 	}
 	
 	private double getMinValue() {
-		return ((IDoubleAttributeDefinition)getDefinition()).getMinValue();
+		return ((DoubleAttributeDefinition)getDefinition()).getMinValue();
 	}
 	
 	private double getMaxValue() {
-		return ((IDoubleAttributeDefinition)getDefinition()).getMaxValue();
+		return ((DoubleAttributeDefinition)getDefinition()).getMaxValue();
 	}
 
 }

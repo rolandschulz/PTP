@@ -21,7 +21,7 @@ package org.eclipse.ptp.ui.managers;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.ptp.core.attributes.IEnumeratedAttribute;
+import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPNode;
 import org.eclipse.ptp.core.elements.IPUniverse;
@@ -128,7 +128,7 @@ public class MachineManager extends AbstractUIManager {
 		if (node == null) {
 			return "Unknown";
 		}
-		IEnumeratedAttribute nodeStateAttr = (IEnumeratedAttribute) node.getAttribute(NodeAttributes.getStateAttributeDefinition());
+		EnumeratedAttribute nodeStateAttr = (EnumeratedAttribute) node.getAttribute(NodeAttributes.getStateAttributeDefinition());
 		if(nodeStateAttr == null) {
 			return "Unknown";
 		}
@@ -142,7 +142,7 @@ public class MachineManager extends AbstractUIManager {
 				return "Running";
 			}
 
-			IEnumeratedAttribute extraStateAttr = (IEnumeratedAttribute) node.getAttribute(NodeAttributes.getExtraStateAttributeDefinition());
+			EnumeratedAttribute extraStateAttr = (EnumeratedAttribute) node.getAttribute(NodeAttributes.getExtraStateAttributeDefinition());
 			NodeAttributes.ExtraState extraState = ExtraState.NONE;
 			if (extraStateAttr != null) {
 				extraState = (ExtraState) extraStateAttr.getEnumValue();
@@ -189,7 +189,7 @@ public class MachineManager extends AbstractUIManager {
 	 */
 	public int getNodeStatus(IPNode node) {
 		if (node != null) {
-			IEnumeratedAttribute nodeStateAttr = (IEnumeratedAttribute) node.getAttribute(NodeAttributes.getStateAttributeDefinition());
+			EnumeratedAttribute nodeStateAttr = (EnumeratedAttribute) node.getAttribute(NodeAttributes.getStateAttributeDefinition());
 			if(nodeStateAttr == null) {
 				return IPTPUIConstants.NODE_UNKNOWN;
 			}
@@ -204,7 +204,7 @@ public class MachineManager extends AbstractUIManager {
 					return IPTPUIConstants.NODE_RUNNING;
 				}
 				
-				IEnumeratedAttribute extraStateAttr = (IEnumeratedAttribute) node.getAttribute(NodeAttributes.getExtraStateAttributeDefinition());
+				EnumeratedAttribute extraStateAttr = (EnumeratedAttribute) node.getAttribute(NodeAttributes.getExtraStateAttributeDefinition());
 				NodeAttributes.ExtraState extraState = ExtraState.NONE;
 				if (extraStateAttr != null) {
 					extraState = (ExtraState) extraStateAttr.getEnumValue();

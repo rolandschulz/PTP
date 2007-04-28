@@ -56,64 +56,64 @@ public class AttributeDefinitionManager {
 		return attributeDefs.get(attrId);
 	}
 	
-	public IBooleanAttributeDefinition createBooleanAttributeDefinition(final String uniqueId, final String name, final String description, final Boolean defaultValue) {
-		IBooleanAttributeDefinition def = new BooleanAttributeDefinition(uniqueId, name, description, defaultValue);
+	public BooleanAttributeDefinition createBooleanAttributeDefinition(final String uniqueId, final String name, final String description, final Boolean defaultValue) {
+		BooleanAttributeDefinition def = new BooleanAttributeDefinition(uniqueId, name, description, defaultValue);
 		setAttributeDefinition(def);
 		return def;
 	}
 	
-	public IDateAttributeDefinition createDateAttributeDefinition(final String uniqueId, final String name, final String description, final Date defaultValue, final DateFormat outputDateFormat) {
-		IDateAttributeDefinition def = new DateAttributeDefinition(uniqueId, name, description, defaultValue, outputDateFormat);
+	public DateAttributeDefinition createDateAttributeDefinition(final String uniqueId, final String name, final String description, final Date defaultValue, final DateFormat outputDateFormat) {
+		DateAttributeDefinition def = new DateAttributeDefinition(uniqueId, name, description, defaultValue, outputDateFormat);
 		setAttributeDefinition(def);
 		return def;
 	}
 	
-	public IDateAttributeDefinition createDateAttributeDefinition(final String uniqueId, final String name, final String description, final Date defaultValue, final DateFormat outputDateFormat, final Date min, final Date max) throws IllegalValueException {
-		IDateAttributeDefinition def = new DateAttributeDefinition(uniqueId, name, description, defaultValue, outputDateFormat, min, max);
+	public DateAttributeDefinition createDateAttributeDefinition(final String uniqueId, final String name, final String description, final Date defaultValue, final DateFormat outputDateFormat, final Date min, final Date max) throws IllegalValueException {
+		DateAttributeDefinition def = new DateAttributeDefinition(uniqueId, name, description, defaultValue, outputDateFormat, min, max);
 		setAttributeDefinition(def);
 		return def;
 	}
 
-	public IDoubleAttributeDefinition createDoubleAttributeDefinition(final String uniqueId, final String name, final String description, final Double defaultValue) {
-		IDoubleAttributeDefinition def = new DoubleAttributeDefinition(uniqueId, name, description, defaultValue);
+	public DoubleAttributeDefinition createDoubleAttributeDefinition(final String uniqueId, final String name, final String description, final Double defaultValue) {
+		DoubleAttributeDefinition def = new DoubleAttributeDefinition(uniqueId, name, description, defaultValue);
 		setAttributeDefinition(def);
 		return def;
 	}
 	
-	public IDoubleAttributeDefinition createDoubleAttributeDefinition(final String uniqueId, final String name, final String description, final Double defaultValue, final Double min, final Double max) throws IllegalValueException {
-		IDoubleAttributeDefinition def = new DoubleAttributeDefinition(uniqueId, name, description, defaultValue, min, max);
+	public DoubleAttributeDefinition createDoubleAttributeDefinition(final String uniqueId, final String name, final String description, final Double defaultValue, final Double min, final Double max) throws IllegalValueException {
+		DoubleAttributeDefinition def = new DoubleAttributeDefinition(uniqueId, name, description, defaultValue, min, max);
 		setAttributeDefinition(def);
 		return def;
 	}
 
-	public IEnumeratedAttributeDefinition createEnumeratedAttributeDefinition(
+	public EnumeratedAttributeDefinition createEnumeratedAttributeDefinition(
 			final String uniqueId, final String name, final String description,
 			final String defaultValue, final String[] values) throws IllegalValueException {
-		IEnumeratedAttributeDefinition def = new EnumeratedAttributeDefinition(uniqueId, name, description, defaultValue, values);
+		EnumeratedAttributeDefinition def = new EnumeratedAttributeDefinition(uniqueId, name, description, defaultValue, values);
 		setAttributeDefinition(def);
 		return def;
 	}
 	
-	public IIntegerAttributeDefinition createIntegerAttributeDefinition(final String uniqueId, final String name, final String description, final Integer defaultValue) {
-		IIntegerAttributeDefinition def = new IntegerAttributeDefinition(uniqueId, name, description, defaultValue);
+	public IntegerAttributeDefinition createIntegerAttributeDefinition(final String uniqueId, final String name, final String description, final Integer defaultValue) {
+		IntegerAttributeDefinition def = new IntegerAttributeDefinition(uniqueId, name, description, defaultValue);
 		setAttributeDefinition(def);
 		return def;
 	}
 
-	public IIntegerAttributeDefinition createIntegerAttributeDefinition(final String uniqueId, final String name, final String description, final Integer defaultValue, final Integer min, final Integer max) throws IllegalValueException {
-		IIntegerAttributeDefinition def = new IntegerAttributeDefinition(uniqueId, name, description, defaultValue, min, max);
+	public IntegerAttributeDefinition createIntegerAttributeDefinition(final String uniqueId, final String name, final String description, final Integer defaultValue, final Integer min, final Integer max) throws IllegalValueException {
+		IntegerAttributeDefinition def = new IntegerAttributeDefinition(uniqueId, name, description, defaultValue, min, max);
 		setAttributeDefinition(def);
 		return def;
 	}
 
-	public IStringAttributeDefinition createStringAttributeDefinition(final String uniqueId, final String name, final String description, final String defaultValue) {
-		IStringAttributeDefinition def = new StringAttributeDefinition(uniqueId, name, description, defaultValue);
+	public StringAttributeDefinition createStringAttributeDefinition(final String uniqueId, final String name, final String description, final String defaultValue) {
+		StringAttributeDefinition def = new StringAttributeDefinition(uniqueId, name, description, defaultValue);
 		setAttributeDefinition(def);
 		return def;
 	}
 	
-	public IArrayAttributeDefinition createArrayAttributeDefinition(final String uniqueId, final String name, final String description, final Object[] defaultValue) {
-		IArrayAttributeDefinition def = new ArrayAttributeDefinition(uniqueId, name, description, defaultValue);
+	public ArrayAttributeDefinition createArrayAttributeDefinition(final String uniqueId, final String name, final String description, final Object[] defaultValue) {
+		ArrayAttributeDefinition def = new ArrayAttributeDefinition(uniqueId, name, description, defaultValue);
 		setAttributeDefinition(def);
 		return def;
 	}

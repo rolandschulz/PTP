@@ -37,8 +37,8 @@ import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
-import org.eclipse.ptp.core.attributes.IIntegerAttribute;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
+import org.eclipse.ptp.core.attributes.IntegerAttribute;
 import org.eclipse.ptp.core.elementcontrols.IPJobControl;
 import org.eclipse.ptp.core.elementcontrols.IPMachineControl;
 import org.eclipse.ptp.core.elementcontrols.IPNodeControl;
@@ -265,14 +265,6 @@ IResourceManagerControl {
 
 	public IPJob[] getJobs() {
 		return getJobControls();
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.IResourceManager#getLaunchAttributes(java.lang.String, org.eclipse.ptp.core.attributes.IAttribute[])
-	 */
-	public IAttribute[] getLaunchAttributes(String queueName, IAttribute[] currentAttrs) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 	
 	public synchronized IPMachine getMachine(int id) {
@@ -708,9 +700,9 @@ IResourceManagerControl {
 		/*
 		 * If there is a node ID attribute, connect it up.
 		 */
-		IIntegerAttribute attr = (IIntegerAttribute) attrs.getAttribute(ProcessAttributes.getNodeIdAttributeDefinition());
+		IntegerAttribute attr = (IntegerAttribute) attrs.getAttribute(ProcessAttributes.getNodeIdAttributeDefinition());
 		if (attr != null) {
-			IPNodeControl node = getNodeControl(((IIntegerAttribute)attr).getValue());
+			IPNodeControl node = getNodeControl(((IntegerAttribute)attr).getValue());
 			if (node != null) {
 				node.addProcess(process);
 			}

@@ -48,9 +48,9 @@ public class AttributeManager {
 	public void setAttributes(IAttribute[] attrs) {
 		for (IAttribute attr : attrs) {
 			String id = attr.getDefinition().getId();
-			if (map.containsKey(id) && attr instanceof IArrayAttribute) {
-				IArrayAttribute exAttr = (IArrayAttribute)map.get(id);
-				exAttr.addAll(((IArrayAttribute)attr).getValue());
+			if (map.containsKey(id) && attr instanceof ArrayAttribute) {
+				ArrayAttribute exAttr = (ArrayAttribute)map.get(id);
+				exAttr.addAll(((ArrayAttribute)attr).getValue());
 			} else {
 				setAttribute(attr);
 			}
@@ -82,8 +82,8 @@ public class AttributeManager {
 		
 		for (Map.Entry<String, IAttribute> entry : map.entrySet()) {
 			IAttribute attr = entry.getValue();
-			if (attr instanceof IArrayAttribute) {
-				Object[] arrObj = ((IArrayAttribute)attr).getValue();
+			if (attr instanceof ArrayAttribute) {
+				Object[] arrObj = ((ArrayAttribute)attr).getValue();
 				for (Object obj : arrObj) {
 					res.add(entry.getKey() + "=" + obj.toString());					
 				}

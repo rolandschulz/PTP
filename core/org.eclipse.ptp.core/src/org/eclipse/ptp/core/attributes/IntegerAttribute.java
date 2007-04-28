@@ -18,16 +18,16 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.attributes;
 
-public final class IntegerAttribute extends AbstractAttribute implements IIntegerAttribute {
+public final class IntegerAttribute extends AbstractAttribute implements IAttribute {
 
 	private Integer value;
 
-	public IntegerAttribute(IIntegerAttributeDefinition definition, Integer initialValue) throws IllegalValueException {
+	public IntegerAttribute(IntegerAttributeDefinition definition, Integer initialValue) throws IllegalValueException {
 		super(definition);
 		setValue(initialValue);
 	}
 
-	public IntegerAttribute(IIntegerAttributeDefinition definition, String initialValue) throws IllegalValueException {
+	public IntegerAttribute(IntegerAttributeDefinition definition, String initialValue) throws IllegalValueException {
 		super(definition);
 		setValue(initialValue);
 	}
@@ -74,10 +74,10 @@ public final class IntegerAttribute extends AbstractAttribute implements IIntege
 	}
 	
 	private int getMinValue() {
-		return ((IIntegerAttributeDefinition)getDefinition()).getMinValue();
+		return ((IntegerAttributeDefinition)getDefinition()).getMinValue();
 	}
 	
 	private int getMaxValue() {
-		return ((IIntegerAttributeDefinition)getDefinition()).getMaxValue();
+		return ((IntegerAttributeDefinition)getDefinition()).getMaxValue();
 	}
 }

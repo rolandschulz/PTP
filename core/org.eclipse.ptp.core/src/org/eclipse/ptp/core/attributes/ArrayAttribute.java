@@ -12,16 +12,16 @@
 import java.util.Arrays;
 import java.util.List;
 
-public final class ArrayAttribute extends AbstractAttribute implements IArrayAttribute {
+public final class ArrayAttribute extends AbstractAttribute implements IAttribute {
 
 	private List<Object> value;
 
-	public ArrayAttribute(IArrayAttributeDefinition definition, String initialValue) throws IllegalValueException {
+	public ArrayAttribute(ArrayAttributeDefinition definition, String initialValue) throws IllegalValueException {
 		super(definition);
 		setValue(initialValue);
 	}
 
-	public ArrayAttribute(IArrayAttributeDefinition definition, Object[] initialValue) throws IllegalValueException {
+	public ArrayAttribute(ArrayAttributeDefinition definition, Object[] initialValue) throws IllegalValueException {
 		super(definition);
 		setValue(initialValue);
 	}

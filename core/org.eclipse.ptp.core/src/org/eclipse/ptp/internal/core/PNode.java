@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.ptp.core.attributes.IAttribute;
-import org.eclipse.ptp.core.attributes.IIntegerAttribute;
+import org.eclipse.ptp.core.attributes.IntegerAttribute;
 import org.eclipse.ptp.core.elementcontrols.IPElementControl;
 import org.eclipse.ptp.core.elementcontrols.IPMachineControl;
 import org.eclipse.ptp.core.elementcontrols.IPNodeControl;
@@ -53,7 +53,7 @@ public class PNode extends Parent implements IPNodeControl {
 	}
 	
 	public String getNodeNumber() {
-		IIntegerAttribute num = (IIntegerAttribute)getAttribute(NodeAttributes.getNumberAttributeDefinition());
+		IntegerAttribute num = (IntegerAttribute)getAttribute(NodeAttributes.getNumberAttributeDefinition());
 		if (num != null) {
 			return num.getValueAsString();
 		}

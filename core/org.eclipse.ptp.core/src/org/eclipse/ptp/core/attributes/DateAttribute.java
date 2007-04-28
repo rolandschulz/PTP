@@ -25,14 +25,14 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-public class DateAttribute extends AbstractAttribute implements IDateAttribute {
+public class DateAttribute extends AbstractAttribute implements IAttribute {
 
 	private static DateFormat[] dateFormats = null;
 
 	public static void main(String[] args) throws IllegalValueException {
 		Calendar cal = Calendar.getInstance();
-		IDateAttributeDefinition def = new DateAttributeDefinition("uniqId", "name", "desc", cal.getTime(), DateFormat.getDateTimeInstance());
-		IDateAttribute mda = (IDateAttribute)def.create();
+		DateAttributeDefinition def = new DateAttributeDefinition("uniqId", "name", "desc", cal.getTime(), DateFormat.getDateTimeInstance());
+		DateAttribute mda = (DateAttribute)def.create();
 		mda.setValue(cal);
 		System.out.println(mda.toString());
 		String str = mda.toString();
@@ -68,12 +68,12 @@ public class DateAttribute extends AbstractAttribute implements IDateAttribute {
 
 	protected Calendar value = Calendar.getInstance();
 	
-	public DateAttribute(IDateAttributeDefinition definition, Date initialValue) throws IllegalValueException {
+	public DateAttribute(DateAttributeDefinition definition, Date initialValue) throws IllegalValueException {
 		super(definition);
 		setValue(initialValue);
 	}
 
-	public DateAttribute(IDateAttributeDefinition definition, String initialValue) throws IllegalValueException {
+	public DateAttribute(DateAttributeDefinition definition, String initialValue) throws IllegalValueException {
 		super(definition);
 		setValue(initialValue);
 	}
@@ -161,15 +161,15 @@ public class DateAttribute extends AbstractAttribute implements IDateAttribute {
 	}
 
 	private Date getMaxDate() {
-		return ((IDateAttributeDefinition)getDefinition()).getMaxDate();
+		return ((DateAttributeDefinition)getDefinition()).getMaxDate();
 	}
 
 	private Date getMinDate() {
-		return ((IDateAttributeDefinition)getDefinition()).getMinDate();
+		return ((DateAttributeDefinition)getDefinition()).getMinDate();
 	}
 	
 	public DateFormat getDateFormat() {
-		return ((IDateAttributeDefinition)getDefinition()).getDateFormat();
+		return ((DateAttributeDefinition)getDefinition()).getDateFormat();
 	}
 
 }

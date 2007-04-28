@@ -19,7 +19,7 @@
 package org.eclipse.ptp.core.attributes;
 
 
-public final class StringAttributeDefinition extends AbstractAttributeDefinition implements IStringAttributeDefinition {
+public final class StringAttributeDefinition extends AbstractAttributeDefinition implements IAttributeDefinition {
 
 	private String defaultValue;
 	
@@ -31,11 +31,11 @@ public final class StringAttributeDefinition extends AbstractAttributeDefinition
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.attributes.IAttribute#create(java.lang.String)
 	 */
-	public IStringAttribute create() throws IllegalValueException {
+	public StringAttribute create() throws IllegalValueException {
 		return new StringAttribute(this, defaultValue);
 	}
 
-	public IStringAttribute create(String value) throws IllegalValueException {
+	public StringAttribute create(String value) throws IllegalValueException {
 		return new StringAttribute(this, value);
 	}
 }

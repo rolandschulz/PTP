@@ -1,8 +1,6 @@
 package org.eclipse.ptp.core.elements.attributes;
 
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
-import org.eclipse.ptp.core.attributes.IIntegerAttributeDefinition;
-import org.eclipse.ptp.core.attributes.IStringAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IntegerAttributeDefinition;
 import org.eclipse.ptp.core.attributes.StringAttributeDefinition;
 
@@ -18,17 +16,17 @@ public class ElementAttributes {
 	private final static String ATTR_ID = "id";
 	private final static String ATTR_NAME = "name";
 	
-	private final static IIntegerAttributeDefinition idAttributeDefinition = 
+	private final static IntegerAttributeDefinition idAttributeDefinition = 
 		new IntegerAttributeDefinition(ATTR_ID, "ID", "Unique ID of element", 0);
 
-	private final static IStringAttributeDefinition nameAttributeDefinition = 
+	private final static StringAttributeDefinition nameAttributeDefinition = 
 		new StringAttributeDefinition(ATTR_NAME, "Name", "Name of element", "");
 
-	public static IIntegerAttributeDefinition getIdAttributeDefinition() {
+	public static IntegerAttributeDefinition getIdAttributeDefinition() {
 		return idAttributeDefinition;
 	}
 	
-	public static IStringAttributeDefinition getNameAttributeDefinition() {
+	public static StringAttributeDefinition getNameAttributeDefinition() {
 		return nameAttributeDefinition;
 	}
 

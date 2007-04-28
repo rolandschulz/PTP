@@ -19,7 +19,7 @@
 package org.eclipse.ptp.core.attributes;
 
 
-public final class IntegerAttributeDefinition extends AbstractAttributeDefinition implements IIntegerAttributeDefinition {
+public final class IntegerAttributeDefinition extends AbstractAttributeDefinition implements IAttributeDefinition {
 
 	private Integer minValue = 0;
 	private Integer maxValue = Integer.MAX_VALUE;
@@ -46,15 +46,15 @@ public final class IntegerAttributeDefinition extends AbstractAttributeDefinitio
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.attributes.IAttribute#create(java.lang.String)
 	 */
-	public IIntegerAttribute create() throws IllegalValueException {
+	public IntegerAttribute create() throws IllegalValueException {
 		return new IntegerAttribute(this, defaultValue);
 	}
 
-	public IIntegerAttribute create(String value) throws IllegalValueException {
+	public IntegerAttribute create(String value) throws IllegalValueException {
 		return new IntegerAttribute(this, value);
 	}
 
-	public IIntegerAttribute create(Integer value) throws IllegalValueException {
+	public IntegerAttribute create(Integer value) throws IllegalValueException {
 		return new IntegerAttribute(this, value);
 	}
 

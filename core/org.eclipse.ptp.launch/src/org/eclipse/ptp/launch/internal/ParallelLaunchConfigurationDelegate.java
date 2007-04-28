@@ -36,8 +36,8 @@ import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.AttributeManager;
-import org.eclipse.ptp.core.attributes.IStringAttribute;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
+import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
@@ -125,7 +125,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 				}
 				String dbgWD = getDebuggerWorkDirectory(configuration);
 				if (dbgWD != null) {
-					IStringAttribute wdAttr = (IStringAttribute) attrManager.getAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition());
+					StringAttribute wdAttr = (StringAttribute) attrManager.getAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition());
 					if (wdAttr != null) {
 						wdAttr.setValue(dbgWD);
 					} else {

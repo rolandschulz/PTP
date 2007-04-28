@@ -2,7 +2,6 @@ package org.eclipse.ptp.core.elements.attributes;
 
 import org.eclipse.ptp.core.attributes.EnumeratedAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
-import org.eclipse.ptp.core.attributes.IEnumeratedAttributeDefinition;
 
 
 /**
@@ -18,10 +17,10 @@ public class ResourceManagerAttributes {
 	
 	private final static String STATE_ATTR_ID = "rmState";
 
-	private final static IEnumeratedAttributeDefinition stateAttrDef = 
+	private final static EnumeratedAttributeDefinition stateAttrDef = 
 		new EnumeratedAttributeDefinition(STATE_ATTR_ID, "state", "RM State", State.STOPPED, State.values());
 	
-	public static IEnumeratedAttributeDefinition getStateAttributeDefinition() {
+	public static EnumeratedAttributeDefinition getStateAttributeDefinition() {
 		return stateAttrDef;
 	}
 	

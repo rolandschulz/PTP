@@ -21,7 +21,7 @@ package org.eclipse.ptp.core.attributes;
 import java.text.DateFormat;
 import java.util.Date;
 
-public final class DateAttributeDefinition extends AbstractAttributeDefinition implements IDateAttributeDefinition {
+public final class DateAttributeDefinition extends AbstractAttributeDefinition implements IAttributeDefinition {
 
 	private Date minDate = new Date(Long.MIN_VALUE);
 	private Date maxDate = new Date(Long.MAX_VALUE);
@@ -50,11 +50,11 @@ public final class DateAttributeDefinition extends AbstractAttributeDefinition i
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.attributes.IAttribute#create(java.lang.String)
 	 */
-	public IDateAttribute create() throws IllegalValueException {
+	public DateAttribute create() throws IllegalValueException {
 		return new DateAttribute(this, defaultValue);
 	}
 	
-	public IDateAttribute create(String value) throws IllegalValueException {
+	public DateAttribute create(String value) throws IllegalValueException {
 		return new DateAttribute(this, value);
 	}
 

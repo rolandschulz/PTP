@@ -27,7 +27,7 @@ import java.util.List;
  * @author rsqrd
  *
  */
-public class EnumeratedAttribute extends AbstractAttribute implements IEnumeratedAttribute {
+public class EnumeratedAttribute extends AbstractAttribute implements IAttribute {
 
 	private int valueIndex;
 
@@ -113,8 +113,8 @@ public class EnumeratedAttribute extends AbstractAttribute implements IEnumerate
 	/**
      * @return
      */
-    private IEnumeratedAttributeDefinition getEnumAttrDefinition() {
-        return (IEnumeratedAttributeDefinition) getDefinition();
+    private EnumeratedAttributeDefinition getEnumAttrDefinition() {
+        return (EnumeratedAttributeDefinition) getDefinition();
     }
 	
 	private List<String> getEnumerations() {

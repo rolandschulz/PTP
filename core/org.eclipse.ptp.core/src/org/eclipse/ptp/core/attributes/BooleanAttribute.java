@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.attributes;
 
-public class BooleanAttribute extends AbstractAttribute implements IBooleanAttribute {
+public class BooleanAttribute extends AbstractAttribute implements IAttribute {
 
 	private Boolean value;
 

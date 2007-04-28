@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.attributes;
 
-public abstract class AbstractAttribute implements IAttribute {
+public abstract class AbstractAttribute {
 
 	private final IAttributeDefinition definition;
 	private boolean enabled;

@@ -12,7 +12,7 @@
 package org.eclipse.ptp.core.attributes;
 
 
-public final class ArrayAttributeDefinition extends AbstractAttributeDefinition implements IArrayAttributeDefinition {
+public final class ArrayAttributeDefinition extends AbstractAttributeDefinition implements IAttributeDefinition {
 
 	private Object[] defaultValue;
 
@@ -21,15 +21,15 @@ public final class ArrayAttributeDefinition extends AbstractAttributeDefinition 
 		this.defaultValue = defaultValue;
 	}
 
-	public IArrayAttribute create() throws IllegalValueException {
+	public ArrayAttribute create() throws IllegalValueException {
 		return new ArrayAttribute(this, defaultValue);
 	}
 
-	public IArrayAttribute create(String value) throws IllegalValueException {
+	public ArrayAttribute create(String value) throws IllegalValueException {
 		return new ArrayAttribute(this, value);
 	}
 
-	public IArrayAttribute create(Object[] value) throws IllegalValueException {
+	public ArrayAttribute create(Object[] value) throws IllegalValueException {
 		return new ArrayAttribute(this, value);
 	}
 }

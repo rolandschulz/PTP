@@ -33,8 +33,8 @@ import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
-import org.eclipse.ptp.core.attributes.IIntegerAttribute;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
+import org.eclipse.ptp.core.attributes.IntegerAttribute;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributeManager;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
@@ -424,7 +424,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 			 * Add the job submission ID to the attributes. This is done here to force the
 			 * use of the ID.
 			 */
-			IIntegerAttribute jobSubAttr = JobAttributes.getSubIdAttributeDefinition().create(jobSubId);
+			IntegerAttribute jobSubAttr = JobAttributes.getSubIdAttributeDefinition().create(jobSubId);
 			attrMgr.setAttribute(jobSubAttr);
 			proxy.submitJob(attrMgr.toStringArray());
 		} catch(IOException e) {

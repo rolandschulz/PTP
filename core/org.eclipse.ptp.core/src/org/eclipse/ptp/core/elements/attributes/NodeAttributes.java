@@ -2,8 +2,6 @@ package org.eclipse.ptp.core.elements.attributes;
 
 import org.eclipse.ptp.core.attributes.EnumeratedAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
-import org.eclipse.ptp.core.attributes.IEnumeratedAttributeDefinition;
-import org.eclipse.ptp.core.attributes.IIntegerAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IntegerAttributeDefinition;
 
 
@@ -30,24 +28,24 @@ public class NodeAttributes {
 	private static final String EXTRA_STATE_ATTR_ID = "nodeExtraState";
 	private static final String NUMBER_ATTR_ID = "nodeNumber";
 
-	private final static IEnumeratedAttributeDefinition stateAttrDef = 
+	private final static EnumeratedAttributeDefinition stateAttrDef = 
 		new EnumeratedAttributeDefinition(STATE_ATTR_ID, "Node State", "State of the node", State.UNKNOWN, State.values());
 	
-	private final static IEnumeratedAttributeDefinition extraStateAttrDef = 
+	private final static EnumeratedAttributeDefinition extraStateAttrDef = 
 		new EnumeratedAttributeDefinition(EXTRA_STATE_ATTR_ID, "Extra Node State", "Extra state information for the node (e.g. job scheduler state)", ExtraState.NONE, ExtraState.values());
 	
-	private final static IIntegerAttributeDefinition numAttrDef = 
+	private final static IntegerAttributeDefinition numAttrDef = 
 		new IntegerAttributeDefinition(NUMBER_ATTR_ID, "Node Number", "Zero-based index of node", 0);
 	
-	public static IEnumeratedAttributeDefinition getStateAttributeDefinition() {
+	public static EnumeratedAttributeDefinition getStateAttributeDefinition() {
 		return stateAttrDef;
 	}
 	
-	public static IEnumeratedAttributeDefinition getExtraStateAttributeDefinition() {
+	public static EnumeratedAttributeDefinition getExtraStateAttributeDefinition() {
 		return extraStateAttrDef;
 	}
 
-	public static IIntegerAttributeDefinition getNumberAttributeDefinition() {
+	public static IntegerAttributeDefinition getNumberAttributeDefinition() {
 		return numAttrDef;
 	}
 	
