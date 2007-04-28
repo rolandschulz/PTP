@@ -86,11 +86,6 @@ public interface IPNode extends IPElement {
 	/**
 	 * @return
 	 */
-	public String getName();
-
-	/**
-	 * @return
-	 */
 	public String getIDString();
 
 	/**

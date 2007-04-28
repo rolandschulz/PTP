@@ -21,12 +21,8 @@ package org.eclipse.ptp.internal.core;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.ptp.core.AttributeConstants;
-import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
 import org.eclipse.ptp.core.attributes.IAttribute;
-import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IIntegerAttribute;
-import org.eclipse.ptp.core.attributes.IStringAttribute;
 import org.eclipse.ptp.core.elementcontrols.IPElementControl;
 import org.eclipse.ptp.core.elementcontrols.IPMachineControl;
 import org.eclipse.ptp.core.elementcontrols.IPNodeControl;
@@ -41,7 +37,6 @@ public class PNode extends Parent implements IPNodeControl {
 
 	public PNode(int id, IPMachineControl mac, IAttribute[] attrs) {
 		super(id, mac, P_NODE, attrs);
-		this.setAttribute(AttributeConstants.ATTRIB_NODE_NUMBER, Integer.toString(id));
 	}
 	
 	public void addProcess(IPProcessControl process) {
@@ -97,13 +92,6 @@ public class PNode extends Parent implements IPNodeControl {
 			}
 		}
 		return (IPJob[]) array.toArray(new IPJob[array.size()]);
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.IPNode#getName()
-	 */
-	public String getName() {
-		return getElementName();
 	}
 	
 	/* (non-Javadoc)

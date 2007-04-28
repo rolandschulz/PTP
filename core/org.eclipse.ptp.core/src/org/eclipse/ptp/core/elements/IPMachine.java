@@ -41,8 +41,6 @@ public interface IPMachine extends IPElement {
 	 */
 	public IPNode[] getNodes();
 	
-	public String getMachineId();
-	
 	/**
 	 * Returns a sorted array of all the Nodes in this Machine. May return null
 	 * if there are none. The type of sorting is left open to the implementers
@@ -134,13 +132,6 @@ public interface IPMachine extends IPElement {
 	 */
 	public String getArch();
 	
-	/**
-	 * @return
-	 */
-	public String getName();
-
-	public String getIDString();
-
 	/**
 	 * @return the machine's parent resource manager
 	 */

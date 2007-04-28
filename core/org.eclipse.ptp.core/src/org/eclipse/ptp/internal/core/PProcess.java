@@ -22,28 +22,26 @@ import java.io.File;
 
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Preferences;
-import org.eclipse.ptp.core.AttributeConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.PreferenceConstants;
-import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
 import org.eclipse.ptp.core.attributes.IAttribute;
+import org.eclipse.ptp.core.attributes.IEnumeratedAttribute;
+import org.eclipse.ptp.core.attributes.IIntegerAttribute;
+import org.eclipse.ptp.core.attributes.IStringAttribute;
+import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.elementcontrols.IPElementControl;
 import org.eclipse.ptp.core.elementcontrols.IPJobControl;
 import org.eclipse.ptp.core.elementcontrols.IPNodeControl;
 import org.eclipse.ptp.core.elementcontrols.IPProcessControl;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPNode;
-import org.eclipse.ptp.core.elements.IPProcess;
+import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
+import org.eclipse.ptp.core.elements.attributes.ProcessAttributes.State;
 import org.eclipse.ptp.core.util.OutputTextFile;
 
 public class PProcess extends Parent implements IPProcessControl {
 	protected String NAME_TAG = "process ";
-	private String pid = null;
-	private String status = null;
-	private String exitCode = null;
-	private String signalName = null;
 	private boolean isTerminated = false;
-	// private List outputList = new ArrayList();
 	private OutputTextFile outputFile = null;
 	protected String outputDirPath = null;
 	protected int storeLine = 0;
@@ -54,39 +52,8 @@ public class PProcess extends Parent implements IPProcessControl {
 
 	public PProcess(int id, IPJobControl job, IAttribute[] attrs) {
 		super(id, job, P_PROCESS, attrs);
-		this.pid = getPID(attrs);
-		this.setAttribute(AttributeConstants.ATTRIB_TASKID, new Integer(getTaskID(attrs)));
-		this.setAttribute(AttributeConstants.ATTRIB_ISREGISTERED, new Boolean(false));
-		this.status = getStatus(attrs);
 		setOutputStore();
-		outputFile = new OutputTextFile(getElementName(), outputDirPath, storeLine);
-	}
-	
-	private static String getStatus(IAttribute[] attrs) {
-		for (IAttribute attr : attrs) {
-			if (attr.getDefinition() == AttributeDefinitionManager.getNameAttributeDefinition()) {
-				return attr.getValueAsString();
-			}
-		}
-		return "";
-	}
-	
-	private static String getPID(IAttribute[] attrs) {
-		for (IAttribute attr : attrs) {
-			if (attr.getDefinition() == AttributeDefinitionManager.getNameAttributeDefinition()) {
-				return attr.getValueAsString();
-			}
-		}
-		return "";
-	}
-	
-	private static String getTaskID(IAttribute[] attrs) {
-		for (IAttribute attr : attrs) {
-			if (attr.getDefinition() == AttributeDefinitionManager.getNameAttributeDefinition()) {
-				return attr.getValueAsString();
-			}
-		}
-		return "";
+		outputFile = new OutputTextFile(getName(), outputDirPath, storeLine);
 	}
 	
 	private void setOutputStore() {
@@ -115,44 +82,19 @@ public class PProcess extends Parent implements IPProcessControl {
 		return "" + getTaskId() + "";
 	}
 	
-	public void setStatus(String status) {
-		if (status == null) {
-			status = "unknown";
+	public void setStatus(ProcessAttributes.State state) {
+		IEnumeratedAttribute procState = (IEnumeratedAttribute) getAttribute(ProcessAttributes.getStateAttributeDefinition());
+		try {
+			if (procState == null) {
+				procState = ProcessAttributes.getStateAttributeDefinition().create(state);
+			} else {
+				procState.setValue(state);
+			}
+		} catch (IllegalValueException e) {
 		}
-		if (!isTerminated)
-			this.status = status;
-
-		if (this.status.equals(ERROR) || this.status.startsWith(EXITED)) {
+		if (isAllStop()) {
 			isTerminated = true;
 		}
-	}
-	
-	public void setExitCode(String exitCode) {
-		this.exitCode = exitCode;
-	}
-	
-	public void setSignalName(String signalName) {
-		this.signalName = signalName;
-	}
-	
-	public void setPid(String pid) {
-		this.pid = pid;
-	}
-	
-	public String getPid() {
-		return pid;
-	}
-	
-	public String getExitCode() {
-		return exitCode;
-	}
-	
-	public String getSignalName() {
-		return signalName;
-	}
-	
-	public String getStatus() {
-		return status;
 	}
 	
 	public boolean isTerminated() {
@@ -170,30 +112,24 @@ public class PProcess extends Parent implements IPProcessControl {
 	}
 	
 	public void addOutput(String output) {
-		// outputList.add(output);
-		// outputList.add("random output from process: " + (counter++));
 		outputFile.write(output + "\n");
 	}
 	
 	public String getContents() {
-		// String[] array = new String[outputList.size()];
-		// return (String[]) outputList.toArray( array );
 		return outputFile.getContents();
 	}
 	
 	public String[] getOutputs() {
-		// String[] array = new String[outputList.size()];
-		// return (String[]) outputList.toArray( array );
 		return null;
 	}
 	
 	public void clearOutput() {
 		outputFile.delete();
-		// outputList.clear();
 	}
 	
 	public boolean isAllStop() {
-		return (getStatus().startsWith(EXITED) || getStatus().startsWith(ERROR));
+		ProcessAttributes.State state = getStatus();
+		return (state == State.ERROR || state == State.EXITED || state == State.EXITED_SIGNALLED);
 	}
 	
 	public void setNode(IPNode node) {
@@ -205,21 +141,44 @@ public class PProcess extends Parent implements IPProcessControl {
 	public IPNode getNode() {
 		return this.node;
 	}
-	
-	// TODO Should not be a method!
+
+	public int getExitCode() {
+		IIntegerAttribute attr = (IIntegerAttribute) getAttribute(ProcessAttributes.getExitCodeAttributeDefinition());
+		if (attr != null) {
+			return attr.getValue();
+		}
+		return 0;
+	}
+
+	public int getPid() {
+		IIntegerAttribute attr = (IIntegerAttribute) getAttribute(ProcessAttributes.getPIDAttributeDefinition());
+		if (attr != null) {
+			return attr.getValue();
+		}
+		return 0;
+	}
+
+	public String getSignalName() {
+		IStringAttribute attr = (IStringAttribute) getAttribute(ProcessAttributes.getSignalNameAttributeDefinition());
+		if (attr != null) {
+			return attr.getValue();
+		}
+		return "";
+	}
+
+	public State getStatus() {
+		IEnumeratedAttribute attr = (IEnumeratedAttribute) getAttribute(ProcessAttributes.getStateAttributeDefinition());
+		if (attr != null) {
+			return (State) attr.getEnumValue();
+		}
+		return State.ERROR;
+	}
+
 	public int getTaskId() {
-		return ((Integer) this.getAttribute(AttributeConstants.ATTRIB_TASKID)).intValue();
-	}
-	
-	public String getName() {
-		return getElementName();
-	}
-	
-	public IPProcess getParentProcess() {
-		return (IPProcess) getParent();
-	}
-	
-	public int getNumChildProcesses() {
-		return size();
+		IIntegerAttribute attr = (IIntegerAttribute) getAttribute(ProcessAttributes.getTaskIdAttributeDefinition());
+		if (attr != null) {
+			return attr.getValue();
+		}
+		return 0;
 	}
 }

@@ -24,7 +24,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import org.eclipse.ptp.core.AttributeConstants;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.elementcontrols.IPElementControl;
 import org.eclipse.ptp.core.elementcontrols.IPMachineControl;
@@ -42,10 +41,6 @@ public class PMachine extends Parent implements IPMachineControl {
 
 	public PMachine(int id, IResourceManagerControl rm, IAttribute[] attrs) {
 		super(id, rm, P_MACHINE, attrs);
-		//System.out.println("Name is " + name + ", key is " + machineID);
-		//System.out.println("NAME_TAG = " + NAME_TAG + ", toString = "
-		//		+ this.toString() + ", key# = " + this.getID());
-		this.setAttribute(AttributeConstants.ATTRIB_MACHINEID, Integer.toString(id));
 	}
 
 	public synchronized void addNode(IPNodeControl curnode) {
@@ -77,17 +72,6 @@ public class PMachine extends Parent implements IPMachineControl {
 	/* returns a string representation of the architecture of this machine */
 	public String getArch() {
 		return arch;
-	}
-
-	public String getMachineId() {
-		return (String)this.getAttribute(AttributeConstants.ATTRIB_MACHINEID);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.IPMachine#getName()
-	 */
-	public String getName() {
-		return getElementName();
 	}
 
 	/* returns an array of the nodes that are comprised by this machine */
