@@ -45,7 +45,7 @@ public class PElementPropertySource implements IPropertySource {
 
 	public Object getPropertyValue(Object id) {
 		if ("name".equals(id)) {
-			return pelement.getElementName();
+			return pelement.getName();
 		}
 		return null;
 	}

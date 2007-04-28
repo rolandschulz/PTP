@@ -18,10 +18,13 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.views;
 
+import java.util.Map;
+
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.ptp.core.INodeListener;
 import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPNode;
@@ -270,7 +273,7 @@ public class ParallelMachineView extends AbstractParallelSetView implements INod
 
 		IPNode node = (IPNode)obj;
 		StringBuffer buffer = new StringBuffer();
-		buffer.append(node.getElementName());
+		buffer.append(node.getName());
 		IElementSet[] sets = setManager.getSetsWithElement(node.getIDString());
 		if (sets.length > 1)
 			buffer.append("\n Set: ");
@@ -333,9 +336,10 @@ public class ParallelMachineView extends AbstractParallelSetView implements INod
 		if (node == null) {
 			return;
 		}
-		String[] keys = node.getAttributeKeys();
-		for (int i = 0; i < keys.length; i++) {
-			new TableItem(BLtable, SWT.NULL).setText(new String[] { keys[i], node.getAttribute(keys[i]).toString() });
+		for (Map.Entry<String, IAttribute> entry : node.getAttributeEntrySet()) {
+			String key = entry.getKey();
+			String value = entry.getValue().getValueAsString();
+			new TableItem(BLtable, SWT.NULL).setText(new String[] { key, value });
 		}
 		IPProcess procs[] = node.getSortedProcesses();
 		if (procs != null) {
@@ -345,14 +349,11 @@ public class ParallelMachineView extends AbstractParallelSetView implements INod
 				item = new TableItem(BRtable, SWT.NULL);
 				item.setImage(ParallelImages.procImages[proc_state][0]);
 				final IPJob job = procs[i].getJob();
-				final String jobNumber;
-				if (job == null) {
-					jobNumber = "none";
+				String jobName = "none";
+				if (job != null) {
+					jobName = job.getName();
 				}
-				else {
-					jobNumber = job.getJobNumber();
-				}
-				item.setText("Process " + procs[i].getProcessNumber() + ", Job " + jobNumber);
+				item.setText("Process " + procs[i].getName() + ", Job " + jobName);
 			}
 		}
 	}

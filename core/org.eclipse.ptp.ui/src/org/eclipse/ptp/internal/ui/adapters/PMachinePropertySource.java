@@ -50,13 +50,13 @@ public class PMachinePropertySource implements IPropertySource {
 
 	public Object getPropertyValue(Object id) {
 		if ("name".equals(id)) {
-			return pmachine.getElementName();
+			return pmachine.getName();
 		}
 		if ("numNodes".equals(id)) {
 			return Integer.toString(pmachine.getNodes().length);
 		}
 
-		return pmachine.getAttribute(id.toString());
+		return pmachine.getAttribute(id.toString()).getValueAsString();
 	}
 
 	public boolean isPropertySet(Object id) {

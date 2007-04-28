@@ -21,11 +21,14 @@ package org.eclipse.ptp.ui.managers;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.ptp.core.AttributeConstants;
+import org.eclipse.ptp.core.attributes.IEnumeratedAttribute;
 import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPNode;
-import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.IPUniverse;
+import org.eclipse.ptp.core.elements.attributes.NodeAttributes;
+import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
+import org.eclipse.ptp.core.elements.attributes.NodeAttributes.ExtraState;
+import org.eclipse.ptp.core.elements.attributes.NodeAttributes.State;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.model.Element;
@@ -38,7 +41,7 @@ import org.eclipse.ptp.ui.model.IElementSet;
  * 
  */
 public class MachineManager extends AbstractUIManager {
-	private Map machineList = new HashMap();
+	private Map<String, IElementHandler> machineList = new HashMap<String, IElementHandler>();
 	protected String cur_machine_id = EMPTY_ID;
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#shutdown()
@@ -122,26 +125,34 @@ public class MachineManager extends AbstractUIManager {
 	 * @return status text
 	 */
 	public String getNodeStatusText(IPNode node) {
-		switch (getNodeStatus(node)) {
-		case IPTPUIConstants.NODE_USER_ALLOC_EXCL:
-			return "User Alloc Excl";
-		case IPTPUIConstants.NODE_USER_ALLOC_SHARED:
-			return "User Alloc Shared";
-		case IPTPUIConstants.NODE_OTHER_ALLOC_EXCL:
-			return "Other Alloc Excl";
-		case IPTPUIConstants.NODE_OTHER_ALLOC_SHARED:
-			return "Other Alloc Shared";
-		case IPTPUIConstants.NODE_UP:
-			return "Up";
-		case IPTPUIConstants.NODE_DOWN:
-			return "Down";
-		case IPTPUIConstants.NODE_ERROR:
-			return "Error";
-		case IPTPUIConstants.NODE_UNKNOWN:
-			return "Unknown";
-		default:
+		if (node == null) {
 			return "Unknown";
 		}
+		IEnumeratedAttribute nodeStateAttr = (IEnumeratedAttribute) node.getAttribute(NodeAttributes.getStateAttributeDefinition());
+		if(nodeStateAttr == null) {
+			return "Unknown";
+		}
+		NodeAttributes.State nodeState = (State) nodeStateAttr.getEnumValue();
+		
+		if (nodeState == State.UP) {
+			if (node.getNumProcesses() > 0) {
+				if (node.isAllStop()) {
+					return "Exited";
+				}
+				return "Running";
+			}
+
+			IEnumeratedAttribute extraStateAttr = (IEnumeratedAttribute) node.getAttribute(NodeAttributes.getExtraStateAttributeDefinition());
+			NodeAttributes.ExtraState extraState = ExtraState.NONE;
+			if (extraStateAttr != null) {
+				extraState = (ExtraState) extraStateAttr.getEnumValue();
+			}
+			
+			if (extraState != ExtraState.NONE) {
+				return extraState.toString();
+			}
+		}
+		return nodeState.toString();
 	}
 	/** Get node status text
 	 * @param job_id job ID
@@ -152,24 +163,25 @@ public class MachineManager extends AbstractUIManager {
 		return getNodeStatusText(findNode(job_id, proc_id));
 	}
 	/** Get process status
-	 * @param p_state
+	 * @param state
 	 * @return status
 	 */
-	public int getProcStatus(String p_state) {
-		if (p_state.equals(IPProcess.STARTING))
+	public int getProcStatus(ProcessAttributes.State state) {
+		switch (state) {
+		case STARTING:
 			return IPTPUIConstants.PROC_STARTING;
-		else if (p_state.equals(IPProcess.RUNNING))
+		case RUNNING:
 			return IPTPUIConstants.PROC_RUNNING;
-		else if (p_state.equals(IPProcess.EXITED))
+		case EXITED:
 			return IPTPUIConstants.PROC_EXITED;
-		else if (p_state.equals(IPProcess.EXITED_SIGNALLED))
+		case EXITED_SIGNALLED:
 			return IPTPUIConstants.PROC_EXITED_SIGNAL;
-		else if (p_state.equals(IPProcess.STOPPED))
+		case STOPPED:
 			return IPTPUIConstants.PROC_STOPPED;
-		else if (p_state.equals(IPProcess.ERROR))
+		case ERROR:
+		default:
 			return IPTPUIConstants.PROC_ERROR;
-		else
-			return IPTPUIConstants.PROC_ERROR;
+		}
 	}
 	/** Get node status
 	 * @param node
@@ -177,46 +189,43 @@ public class MachineManager extends AbstractUIManager {
 	 */
 	public int getNodeStatus(IPNode node) {
 		if (node != null) {
-			String nodeState = (String)node.getAttribute(AttributeConstants.ATTRIB_NODE_STATE);
-			//System.out.println("nodestate = '"+nodeState+"'");
-			if(nodeState == null) {
+			IEnumeratedAttribute nodeStateAttr = (IEnumeratedAttribute) node.getAttribute(NodeAttributes.getStateAttributeDefinition());
+			if(nodeStateAttr == null) {
 				return IPTPUIConstants.NODE_UNKNOWN;
 			}
-			if (nodeState.equals(IPNode.OLD_NODE_STATE_UP)) {
-				if (node.getNumProcesses() > 0)
-					return (node.isAllStop() ? IPTPUIConstants.NODE_EXITED : IPTPUIConstants.NODE_RUNNING);
-				
-				String nodeUser = (String)node.getAttribute(AttributeConstants.ATTRIB_NODE_USER);
-				String mode = (String) node.getAttribute(AttributeConstants.ATTRIB_NODE_MODE);
-				
-				//System.out.println("Node User = "+nodeUser);
-				
-				if(nodeUser != null) {
-					if(nodeUser.equals(System.getProperty("user.name"))) {
-						if(mode != null) {
-							//System.out.println("Mode = '"+mode+"'");
-							if (mode.equals("64"))
-								return IPTPUIConstants.NODE_USER_ALLOC_EXCL;
-							else if (mode.equals("72") || mode.equals("73") || mode.equals("65"))
-								return IPTPUIConstants.NODE_USER_ALLOC_SHARED;
-						}
-					} else {
-						if(mode != null) {
-							if(nodeUser.equals("root") && mode.equals("73")) {
-								return IPTPUIConstants.NODE_UP;
-							}
-							else if (mode.equals("64"))
-								return IPTPUIConstants.NODE_OTHER_ALLOC_EXCL;
-							else if (mode.equals("72") || mode.equals("73") || mode.equals("65"))
-								return IPTPUIConstants.NODE_OTHER_ALLOC_SHARED;
-						}
+			NodeAttributes.State nodeState = (State) nodeStateAttr.getEnumValue();
+			
+			switch (nodeState) {
+			case UP:
+				if (node.getNumProcesses() > 0) {
+					if (node.isAllStop()) {
+						return IPTPUIConstants.NODE_EXITED;
 					}
+					return IPTPUIConstants.NODE_RUNNING;
+				}
+				
+				IEnumeratedAttribute extraStateAttr = (IEnumeratedAttribute) node.getAttribute(NodeAttributes.getExtraStateAttributeDefinition());
+				NodeAttributes.ExtraState extraState = ExtraState.NONE;
+				if (extraStateAttr != null) {
+					extraState = (ExtraState) extraStateAttr.getEnumValue();
+				}
+				
+				switch (extraState) {
+				case USER_ALLOC_EXCL:
+					return IPTPUIConstants.NODE_USER_ALLOC_EXCL;
+				case USER_ALLOC_SHARED:
+					return IPTPUIConstants.NODE_USER_ALLOC_SHARED;
+				case OTHER_ALLOC_EXCL:
+					return IPTPUIConstants.NODE_OTHER_ALLOC_EXCL;
+				case OTHER_ALLOC_SHARED:
+					return IPTPUIConstants.NODE_OTHER_ALLOC_SHARED;
 				}
 				return IPTPUIConstants.NODE_UP;
-			} else if (nodeState.equals(IPNode.OLD_NODE_STATE_DOWN))
+			case DOWN:
 				return IPTPUIConstants.NODE_DOWN;
-			else if (nodeState.equals(IPNode.OLD_NODE_STATE_ERROR))
+			case ERROR:
 				return IPTPUIConstants.NODE_ERROR;
+			}
 		}
 		return IPTPUIConstants.NODE_UNKNOWN;
 	}
@@ -227,11 +236,7 @@ public class MachineManager extends AbstractUIManager {
 	 */
 	public int getStatus(String machine_id, String node_id) {
 		IPNode node = findNode(machine_id, node_id);
-		int s = getNodeStatus(node);
-		
-		//System.out.println("getStatus("+machine_id+", "+node_id+") = "+s);
-		
-		return s;
+		return getNodeStatus(node);
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#getStatus(java.lang.String)
@@ -308,7 +313,6 @@ public class MachineManager extends AbstractUIManager {
 		if (macs.length > 0) {
 			cur_machine_id = macs[0].getIDString();
 			for (int j = 0; j < macs.length; j++) {
-				//System.out.println("testing -- " + macs[j] + ", " + macs[j].getID());
 				addMachine(macs[j]);
 			}
 			setCurrentSetId(IElementHandler.SET_ROOT_ID);

@@ -181,19 +181,20 @@ public class JobManager extends AbstractUIManager {
 	 */
 	public int getProcessStatus(IPProcess proc) {
 		if (proc != null) {
-			String status = proc.getStatus();
-			if (status.equals(IPProcess.STARTING))
+			switch (proc.getStatus()) {
+			case STARTING:
 				return IPTPUIConstants.PROC_STARTING;
-			else if (status.equals(IPProcess.RUNNING))
+			case RUNNING:
 				return IPTPUIConstants.PROC_RUNNING;
-			else if (status.equals(IPProcess.EXITED))
+			case EXITED:
 				return IPTPUIConstants.PROC_EXITED;
-			else if (status.equals(IPProcess.EXITED_SIGNALLED))
+			case EXITED_SIGNALLED:
 				return IPTPUIConstants.PROC_EXITED_SIGNAL;
-			else if (status.equals(IPProcess.STOPPED))
+			case STOPPED:
 				return IPTPUIConstants.PROC_STOPPED;
-			else if (status.equals(IPProcess.ERROR))
+			case ERROR:
 				return IPTPUIConstants.PROC_ERROR;
+			}
 		}
 		return IPTPUIConstants.PROC_ERROR;
 	}	
@@ -202,22 +203,10 @@ public class JobManager extends AbstractUIManager {
 	 * @return status
 	 */
 	public String getProcessStatusText(IPProcess proc) {
-		switch (getProcessStatus(proc)) {
-		case IPTPUIConstants.PROC_STARTING:
-			return "Starting";
-		case IPTPUIConstants.PROC_RUNNING:
-			return "Running";
-		case IPTPUIConstants.PROC_EXITED:
-			return "Exited";
-		case IPTPUIConstants.PROC_EXITED_SIGNAL:
-			return "Exited Signal";
-		case IPTPUIConstants.PROC_STOPPED:
-			return "Stopped";
-		case IPTPUIConstants.PROC_ERROR:
-			return "Error";
-		default:
-			return "Error";
+		if (proc != null) {
+			return proc.getStatus().toString();
 		}
+		return "Error";
 	}
 	public String getQueueID() {
 		return cur_queue_id;
