@@ -28,8 +28,8 @@ public class AttributeDefinitionManager {
 	 * Predefine attributes. These are attributes that
 	 * the UI knows about.
 	 */
-	public final static String ATTR_ID = "id";
-	public final static String ATTR_NAME = "name";
+	private final static String ATTR_ID = "id";
+	private final static String ATTR_NAME = "name";
 	
 	private final static IIntegerAttributeDefinition idAttributeDefinition = new IntegerAttributeDefinition(ATTR_ID, "id", "ID of element", 0);
 	private final static IStringAttributeDefinition nameAttributeDefinition = new StringAttributeDefinition(ATTR_NAME, "name", "Name of element", "");

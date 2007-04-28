@@ -96,6 +96,10 @@ public class EnumeratedAttribute extends AbstractAttribute implements IEnumerate
 		valueIndex = vi;
 	}
 
+	public void setValue(Enum value) throws IllegalValueException {
+		setValueIndex(value.ordinal());
+	}
+	
 	/**
 	 * @param valueIndex the valueIndex to set
 	 */
