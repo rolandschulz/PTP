@@ -22,30 +22,6 @@ import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 
 
 public interface IPProcess extends IPElement {
-	/**
-	 * @deprecated
-	 */
-	public static final String STARTING = "starting";
-	/**
-	 * @deprecated
-	 */
-	public static final String RUNNING = "running";
-	/**
-	 * @deprecated
-	 */
-	public static final String EXITED = "exited";
-	/**
-	 * @deprecated
-	 */
-	public static final String EXITED_SIGNALLED = "exited-signalled";
-	/**
-	 * @deprecated
-	 */
-	public static final String STOPPED = "stopped";
-	/**
-	 * @deprecated
-	 */
-	public static final String ERROR = "error";
 
 	public boolean isTerminated();
 	public void setTerminated(boolean isTerminate);
