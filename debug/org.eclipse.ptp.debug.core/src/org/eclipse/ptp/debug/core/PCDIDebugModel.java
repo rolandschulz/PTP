@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+
 import org.eclipse.cdt.core.IBinaryParser.IBinaryObject;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
@@ -35,10 +36,8 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.model.IBreakpoint;
-import org.eclipse.ptp.core.AttributeConstants;
 import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.core.elements.IPJob;
-import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
@@ -145,12 +144,6 @@ public class PCDIDebugModel {
 			protected IStatus run(IProgressMonitor monitor) {
 				int[] taskArray = tasks.toArray();
 				for (int i=0; i<taskArray.length; i++) {
-					final IPJob pjob = launch.getPJob();
-					final IPProcess process = pjob.findProcessByTaskId(taskArray[i]);
-					if (process != null) {
-						process.setAttribute(AttributeConstants.ATTRIB_ISREGISTERED,
-							new Boolean(false));
-					}
 					IPDebugTarget debugTarget = launch.getDebugTarget(taskArray[i]);
 					if (debugTarget != null) {
 						launch.removeDebugTarget(debugTarget);
@@ -179,12 +172,6 @@ public class PCDIDebugModel {
 						} catch (DebugException e) {
 							PTPDebugCorePlugin.log(e);
 						}
-					}
-					final IPJob pjob = launch.getPJob();
-					final IPProcess process = pjob.findProcessByTaskId(target.getTargetID());
-					if (process != null) {
-						process.setAttribute(AttributeConstants.ATTRIB_ISREGISTERED,
-								new Boolean(true));
 					}
 					launch.addDebugTarget(target);
 				}

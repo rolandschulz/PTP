@@ -19,6 +19,7 @@
 package org.eclipse.ptp.debug.ui.views;
 
 import java.util.Iterator;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -45,6 +46,7 @@ import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IAbstractDebugger;
+import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.model.IPDebugElement;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
 import org.eclipse.ptp.debug.internal.ui.UIDebugManager;
@@ -350,9 +352,15 @@ public class ParallelDebugView extends ParallelJobView {
 		super.changeJob(job);
 		if (job != null) {
 			((StepReturnAction)stepReturnAction).resetTask();
-			BitList suspendedTaskList = (BitList) job.getAttribute(IAbstractDebugger.SUSPENDED_PROC_KEY);
-			if (suspendedTaskList != null) {
-				updateStepReturnButton(suspendedTaskList.copy());
+			IPCDISession session = ((UIDebugManager) manager).getDebugSession(job);
+			if (session != null) {
+				IAbstractDebugger debugger = session.getDebugger();
+				if (debugger != null) {
+					BitList suspendedTaskList = debugger.getSuspendedProc();
+					if (suspendedTaskList != null) {
+						updateStepReturnButton(suspendedTaskList.copy());
+					}
+				}
 			}
 		}
 	}
@@ -361,10 +369,15 @@ public class ParallelDebugView extends ParallelJobView {
 		super.selectSet(set);
 		if (set != null) {
 			((StepReturnAction)stepReturnAction).resetTask();
-			IPJob job = ((UIDebugManager) manager).findJobById(getCurrentID());
-			BitList suspendedTaskList = (BitList) job.getAttribute(IAbstractDebugger.SUSPENDED_PROC_KEY);
-			if (suspendedTaskList != null) {
-				updateStepReturnButton(suspendedTaskList.copy());
+			IPCDISession session = ((UIDebugManager) manager).getDebugSession(getCurrentID());
+			if (session != null) {
+				IAbstractDebugger debugger = session.getDebugger();
+				if (debugger != null) {
+					BitList suspendedTaskList = debugger.getSuspendedProc();
+					if (suspendedTaskList != null) {
+						updateStepReturnButton(suspendedTaskList.copy());
+					}
+				}
 			}
 		}
 	}
@@ -384,9 +397,17 @@ public class ParallelDebugView extends ParallelJobView {
 		if (isRunning && isDebugMode) {
 			IElementHandler elementHandler = getCurrentElementHandler();
 			if (elementHandler != null) {
-				BitList suspendedTaskList = (BitList) job.getAttribute(IAbstractDebugger.SUSPENDED_PROC_KEY);
-				BitList terminatedTaskList = (BitList) job.getAttribute(IAbstractDebugger.TERMINATED_PROC_KEY);
-				updateDebugButtons(terminatedTaskList, suspendedTaskList);
+				IPCDISession session = ((UIDebugManager) manager).getDebugSession(job);
+				if (session != null) {
+					IAbstractDebugger debugger = session.getDebugger();
+					if (debugger != null) {
+						BitList suspendedTaskList = debugger.getSuspendedProc();
+						BitList terminatedTaskList = debugger.getTerminatedProc();
+						if (suspendedTaskList != null && terminatedTaskList != null) {
+							updateDebugButtons(terminatedTaskList, suspendedTaskList);
+						}
+					}
+				}
 			}
 		} else {
 			resumeAction.setEnabled(false);

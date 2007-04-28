@@ -21,6 +21,7 @@ package org.eclipse.ptp.debug.external.core.cdi.model;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.eclipse.cdt.debug.core.cdi.model.ICDIInstruction;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIMixedInstruction;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIRegister;
@@ -29,6 +30,8 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIRegisterGroup;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIRuntimeOptions;
 import org.eclipse.cdt.debug.core.cdi.model.ICDISharedLibrary;
 import org.eclipse.ptp.core.elements.IPProcess;
+import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
+import org.eclipse.ptp.core.elements.attributes.ProcessAttributes.State;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.PDebugUtils;
@@ -395,17 +398,17 @@ public class Target extends SessionObject implements IPCDITarget {
 		signal(signal);
 	}
 	public void resume(boolean passSignal) throws PCDIException {
-		String state = getPProcess().getStatus();
-		if (state.equals(IPProcess.RUNNING)) {
+		ProcessAttributes.State state = getPProcess().getStatus();
+		if (state == State.RUNNING) {
 			throw new PCDIException("The process is already running");
 		}
-		else if (state.equals(IPProcess.STOPPED)) {
+		else if (state == State.STOPPED) {
 			if (passSignal) {
 				signal();
 			} else {
 				continuation();
 			}
-		} else if (state.equals(IPProcess.EXITED)) {
+		} else if (state == State.EXITED || state == State.EXITED_SIGNALLED) {
 			restart();
 		} else {
 			restart();
@@ -489,10 +492,10 @@ public class Target extends SessionObject implements IPCDITarget {
 		return isTerminated();
 	}
 	public boolean isSuspended() {
-		return getPProcess().getStatus().equals(IPProcess.STOPPED);
+		return getPProcess().getStatus() == State.STOPPED;
 	}
 	public boolean isRunning() {
-		return getPProcess().getStatus().equals(IPProcess.RUNNING);
+		return getPProcess().getStatus() == State.RUNNING;
 	}
 	public Process getProcess() {
 		return null;

@@ -36,9 +36,6 @@ import org.eclipse.ptp.debug.core.cdi.model.IPCDILocator;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 
 public interface IAbstractDebugger extends IDebugger {
-	public final static String TERMINATED_PROC_KEY = "terminated";
-	public final static String SUSPENDED_PROC_KEY = "suspended";
-	
 	public IPCDISession createDebuggerSession(IPLaunch launch, IBinaryObject exe, int timeout, IProgressMonitor monitor) throws CoreException;
 	
 	/* Debugger Initialization/Termination */
