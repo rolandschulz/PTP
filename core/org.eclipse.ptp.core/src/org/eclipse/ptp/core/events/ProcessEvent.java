@@ -19,6 +19,8 @@
 package org.eclipse.ptp.core.events;
 
 import org.eclipse.ptp.core.elements.IPProcess;
+import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
+import org.eclipse.ptp.core.elements.attributes.ProcessAttributes.State;
 
 
 /**
@@ -26,14 +28,27 @@ import org.eclipse.ptp.core.elements.IPProcess;
  *
  */
 public class ProcessEvent implements IProcessEvent {
-	private int type = -1;
+	private int type;
+	private IPProcess p;
 	private String input = null;
-	private IPProcess p = null;
+	private int val = 0;
+	private ProcessAttributes.State state = State.ERROR;
 	
-	public ProcessEvent(IPProcess p, int type, String input) {
+	public ProcessEvent(IPProcess p, int type) {
 		this.p = p;
 		this.type = type;
+	}
+	public ProcessEvent(IPProcess p, int type, String input) {
+		this(p, type);
 		this.input = input;
+	}
+	public ProcessEvent(IPProcess p, int type, ProcessAttributes.State state) {
+		this(p, type);
+		this.state = state;
+	}
+	public ProcessEvent(IPProcess p, int type, int val) {
+		this(p, type);
+		this.val = val;
 	}
 	public IPProcess getProcess() {
 		return p;
@@ -43,5 +58,11 @@ public class ProcessEvent implements IProcessEvent {
 	}
 	public int getType() {
 		return type;
+	}
+	public int getValue() {
+		return val;
+	}
+	public ProcessAttributes.State getState() {
+		return state;
 	}
 }
