@@ -35,8 +35,9 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.core.PreferenceConstants;
+import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
 import org.eclipse.ptp.core.attributes.AttributeManager;
+import org.eclipse.ptp.core.attributes.IStringAttribute;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
@@ -50,7 +51,6 @@ import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.internal.ui.LaunchMessages;
 import org.eclipse.ptp.rmsystem.IResourceManager;
-import org.eclipse.ptp.rtsystem.JobRunConfiguration;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -116,8 +116,25 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 				debugger = debugConfig.createDebugger();
 				dbgArgs.add(" --port=" + debugger.getDebuggerPort());
 			
-				attrManager.setAttribute(JobAttributes.getDebuggerPathAttributeDefinition().create(dbgFile));
-				attrManager.setAttribute(JobAttributes.getDebuggerArgumentsAttributeDefinition().create(dbgFile));
+				String dbgPathConf = getDebuggerExePath(configuration);
+				if (dbgPathConf != null) {
+					// remote setting
+					IPath path = new Path(dbgPathConf);
+					attrManager.setAttribute(JobAttributes.getDebuggerExecutableNameAttributeDefinition().create(path.lastSegment()));
+					attrManager.setAttribute(JobAttributes.getDebuggerExecutablePathAttributeDefinition().create(path.removeLastSegments(1).toOSString()));
+				}
+				String dbgWD = getDebuggerWorkDirectory(configuration);
+				if (dbgWD != null) {
+					IStringAttribute wdAttr = (IStringAttribute) attrManager.getAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition());
+					if (wdAttr != null) {
+						wdAttr.setValue(dbgWD);
+					} else {
+						attrManager.setAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition().create(dbgWD));
+				
+					}
+				}
+				attrManager.setAttribute(JobAttributes.getDebuggerBackendPathAttributeDefinition().create(dbgFile));
+				attrManager.setAttribute(JobAttributes.getDebuggerArgumentsAttributeDefinition().create(dbgArgs.toArray(new String[0])));
 				attrManager.setAttribute(JobAttributes.getDebugFlagAttributeDefinition().create(true));
 			}
 			monitor.worked(10);
@@ -126,32 +143,13 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			if (job == null) {
 				abort("No job created by launch manager.", null, 0);
 			}
-			launch.setAttribute("JOB_ID", job.getIDString());
+			launch.setAttribute(AttributeDefinitionManager.getIdAttributeDefinition().getId(), job.getIDString());
 			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
 				// show ptp debug view
 				showPTPDebugView(IPTPDebugUIConstants.ID_VIEW_PARALLELDEBUG);
 				// Switch the perspective
 				// switchPerspectiveTo(DebugUITools.getLaunchPerspective(configuration.getType(), mode));
 				monitor.setTaskName("Starting the debugger . . .");
-				String dbgExe = getDebuggerExePath(configuration);
-				if (dbgExe != null) {
-					// remote setting
-					IPath dbgExePath = new Path(dbgExe);
-					job.setAttribute(PreferenceConstants.JOB_APP_NAME, dbgExePath.lastSegment());
-					job.setAttribute(PreferenceConstants.JOB_APP_PATH, dbgExePath.removeLastSegments(1).toOSString());
-				} else {
-					job.setAttribute(PreferenceConstants.JOB_APP_NAME, attrManager.getAttribute(JobAttributes.getExecutableNameAttributeDefinition()));
-					job.setAttribute(PreferenceConstants.JOB_APP_PATH, attrManager.getAttribute(JobAttributes.getExecutablePathAttributeDefinition()));
-				}
-				String wd = getDebuggerWorkDirectory(configuration);
-				if (wd != null) {
-					job.setAttribute(PreferenceConstants.JOB_WORK_DIR, wd);
-				} else {
-					job.setAttribute(PreferenceConstants.JOB_WORK_DIR,  attrManager.getAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition()));
-				}
-				job.setAttribute(PreferenceConstants.JOB_ARGS,  attrManager.getAttribute(JobAttributes.getProgramArgumentsAttributeDefinition()));
-				// job.setAttribute(PreferenceConstants.JOB_DEBUG_DIR, exePath.removeLastSegments(1).toOSString());
-				job.setAttribute(PreferenceConstants.JOB_DEBUG_DIR,  attrManager.getAttribute(JobAttributes.getExecutablePathAttributeDefinition()));
 				pLaunch.setPJob(job);
 				IBinaryObject exeFile = verifyBinary(configuration);
 				setDefaultSourceLocator(launch, configuration);
