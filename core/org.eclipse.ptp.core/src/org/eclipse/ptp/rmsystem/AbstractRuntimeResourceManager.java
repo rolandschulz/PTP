@@ -81,20 +81,12 @@ public abstract class AbstractRuntimeResourceManager extends
 	private final Condition jobSubmissionCondition = jobSubmissionLock.newCondition();
 	private IPJob newJob;
 	private int jobSubId;
+	private AttributeManager jobSubAttrs;
 	
 	public AbstractRuntimeResourceManager(int id, IPUniverseControl universe,
 			IResourceManagerConfiguration config) {
 		super(id, universe, config);
 		// nothing to do here
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.IResourceManager#getLaunchAttributes(java.lang.String,
-	 *  java.lang.String, org.eclipse.ptp.core.attributes.IAttribute[])
-	 */
-	public IAttribute[] getLaunchAttributes(String machineName, String queueName, IAttribute[] currentAttrs) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	/* (non-Javadoc)
@@ -206,14 +198,19 @@ public abstract class AbstractRuntimeResourceManager extends
 		List<IPJob> jobs = new ArrayList<IPJob>();
 		
 		for (Map.Entry<RangeSet, AttributeManager> entry : mgr.getEntrySet()) {
-			IAttribute[] attrs = entry.getValue().getAttributes();
+			/*
+			 * Combine job submission attributes with the job attributes. These are
+			 * then added to the job.
+			 */
+			AttributeManager jobAttrs = new AttributeManager(jobSubAttrs.getAttributes());
+			jobAttrs.setAttributes(entry.getValue().getAttributes());
 			RangeSet jobIds = entry.getKey();
 			changed = false;
 
 			for (int id : jobIds) {
 				IPJobControl job = getJobControl(id);
 				if (job == null) {
-					job = doCreateJob(queue, id, attrs);
+					job = doCreateJob(queue, id, jobAttrs.getAttributes());
 					jobs.add(job);
 					addJob(id, job);
 					changed = true;
@@ -702,6 +699,11 @@ public abstract class AbstractRuntimeResourceManager extends
 		jobSubmissionLock.lock();
 		try {
 			newJob = null;
+			
+			/*
+			 * Save submission attributes so they can be added to the job later.
+			 */
+			jobSubAttrs = attrMgr;
 			
 			// FIXME: generate a proper job submission id
 			jobSubId++;
