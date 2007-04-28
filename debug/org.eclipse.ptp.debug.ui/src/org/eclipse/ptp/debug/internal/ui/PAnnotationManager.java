@@ -369,9 +369,12 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 		return getTasks(stackFrame.getDebugTarget());
 	}
 	protected BitList filterRunningTasks(String job_id, BitList tasks) {//get suspend tasks
-		IPJob job = uiDebugManager.findJobById(job_id);
-		if (job != null)
-			tasks.and((BitList) job.getAttribute(IAbstractDebugger.SUSPENDED_PROC_KEY));
+		IPCDISession session = uiDebugManager.getDebugSession(job_id);
+		if (session != null) {
+			IAbstractDebugger debugger = session.getDebugger();
+			if (debugger != null)
+				tasks.and(debugger.getSuspendedProc());
+		}
 		return tasks;
 	}	
 	/* Is given type register type

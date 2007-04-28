@@ -19,6 +19,7 @@
 package org.eclipse.ptp.debug.external.core.cdi.model;
 
 import org.eclipse.ptp.core.elements.IPProcess;
+import org.eclipse.ptp.core.elements.attributes.ProcessAttributes.State;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcess;
 import org.eclipse.ptp.debug.external.core.cdi.Session;
@@ -37,13 +38,12 @@ public class DebugProcess extends SessionObject implements IPCDIDebugProcess {
 		return pProcess;
 	}
 	public String getName() {
-		return pProcess.getElementName();
+		return pProcess.getName();
 	}
 	public boolean isTerminated() {
 		return pProcess.isTerminated();
 	}
 	public boolean isSuspended() {
-		String status = pProcess.getStatus();
-		return (status.equals(IPProcess.STOPPED));
+		return pProcess.getStatus() == State.STOPPED;
 	}
 }

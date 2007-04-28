@@ -31,6 +31,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPProcess;
+import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.IDebugCommand;
@@ -67,6 +68,8 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 	protected boolean isExited = false;
 	protected IPJob job = null;
 	protected DebugCommandQueue commandQueue = null;
+	protected BitList terminatedProcs = null;
+	protected BitList suspendedProcs = null;
 	public IPCDISession createDebuggerSession(IPLaunch launch, IBinaryObject exe, int timeout, IProgressMonitor monitor) throws CoreException {
 		IPJob job = launch.getPJob();
 		session = new Session(this, job, launch, exe);
@@ -98,8 +101,8 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 			throw new CoreException(Status.CANCEL_STATUS);
 
 		monitor.subTask("Starting debugger...");
-		job.setAttribute(TERMINATED_PROC_KEY, new BitList(job.totalProcesses()));
-		job.setAttribute(SUSPENDED_PROC_KEY, new BitList(job.totalProcesses()));
+		terminatedProcs = new BitList(job.totalProcesses());
+		suspendedProcs = new BitList(job.totalProcesses());
 		commandQueue = new DebugCommandQueue(this);
 		isExited = false;
 		eventThread = new EventThread(this);
@@ -113,7 +116,7 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 			command.waitForReturn();
 		} catch (PCDIException e) {
 			if (session != null) {
-				setJobFinished(command.getTasks(), IPProcess.ERROR);
+				setJobFinished(command.getTasks(), ProcessAttributes.State.ERROR);
 			}
 			exit();
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugExternalPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));
@@ -123,7 +126,7 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		if (!isExited) {
 			// make sure all processes are finished
 			if (session != null && !isJobFinished()) {
-				setJobFinished(session.createBitList(), IPProcess.EXITED);
+				setJobFinished(session.createBitList(), ProcessAttributes.State.EXITED);
 			}
 			try {
 				stopDebugger();
@@ -163,18 +166,18 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 			if (event instanceof IPCDIDebugDestroyedEvent) {
 				commandQueue.setTerminated();
 			} else if (event instanceof IPCDIExitedEvent) {
-				setJobFinished(tasks, (((IPCDIExitedEvent) event).getExitStatus() > -1) ? IPProcess.EXITED : IPProcess.EXITED_SIGNALLED);
+				setJobFinished(tasks, (((IPCDIExitedEvent) event).getExitStatus() > -1) ? ProcessAttributes.State.EXITED : ProcessAttributes.State.EXITED_SIGNALLED);
 				if (isJobFinished()) {
 					postStopDebugger();
 				}
 			} else if (event instanceof IPCDIResumedEvent) {
 				setSuspendTasks(false, tasks);
-				setProcessStatus(tasks.toArray(), IPProcess.RUNNING);
+				setProcessStatus(tasks.toArray(), ProcessAttributes.State.RUNNING);
 			} else if (event instanceof IPCDIErrorEvent) {
 				handleException(tasks, ((IPCDIErrorEvent) event).getErrorCode());
 			} else if (event instanceof IPCDISuspendedEvent) {
 				setSuspendTasks(true, tasks);
-				setProcessStatus(tasks.toArray(), IPProcess.STOPPED);
+				setProcessStatus(tasks.toArray(), ProcessAttributes.State.STOPPED);
 			}
 			// FIXME - add item here or??
 			eventThread.fireDebugEvent(event);
@@ -183,12 +186,12 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 	protected void handleException(BitList tasks, int err_code) {
 		switch (err_code) {
 		case IPCDIErrorEvent.DBG_FATAL:
-			setJobFinished(tasks, IPProcess.ERROR);
+			setJobFinished(tasks, ProcessAttributes.State.ERROR);
 			postStopDebugger();
 			break;
 		case IPCDIErrorEvent.DBG_WARNING:
 			if (!session.getJob().isAllStop()) {
-				setJobFinished(tasks, IPProcess.ERROR);
+				setJobFinished(tasks, ProcessAttributes.State.ERROR);
 				postCommand(new TerminateCommand(tasks));
 			}
 			break;
@@ -209,7 +212,7 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 	public final boolean isExited() {
 		return isExited;
 	}
-	protected synchronized void setJobFinished(BitList tasks, String status) {
+	protected synchronized void setJobFinished(BitList tasks, ProcessAttributes.State status) {
 		if (tasks == null || tasks.isEmpty()) {
 			tasks = session.createBitList();
 		}
@@ -232,16 +235,16 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		else
 			removeTasks(suspendedTasks, tasks);
 	}
-	protected void setProcessStatus(int[] tasks, String state) {
+	protected void setProcessStatus(int[] tasks, ProcessAttributes.State state) {
 		for (int i = 0; i < tasks.length; i++) {
 			getProcess(tasks[i]).setStatus(state);
 		}
 	}
 	public synchronized BitList getSuspendedProc() {
-		return (BitList) job.getAttribute(IAbstractDebugger.SUSPENDED_PROC_KEY);
+		return suspendedProcs;
 	}
 	public synchronized BitList getTerminatedProc() {
-		return (BitList) job.getAttribute(IAbstractDebugger.TERMINATED_PROC_KEY);
+		return terminatedProcs;
 	}
 	// event
 	public void handleStopDebuggerEvent() {

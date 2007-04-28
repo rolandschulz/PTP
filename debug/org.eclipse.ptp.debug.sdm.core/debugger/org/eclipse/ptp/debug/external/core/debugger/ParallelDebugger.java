@@ -25,9 +25,10 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.ptp.core.PreferenceConstants;
+import org.eclipse.ptp.core.attributes.IArrayAttribute;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPProcess;
+import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.ExtFormat;
 import org.eclipse.ptp.debug.core.IDebugCommand;
@@ -113,10 +114,10 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 	
 	public void startDebugger(IPJob job) throws CoreException {
 		try {
-			String app = (String) job.getAttribute(PreferenceConstants.JOB_APP_NAME);
-			String path = (String) job.getAttribute(PreferenceConstants.JOB_APP_PATH);
-			String dir = (String) job.getAttribute(PreferenceConstants.JOB_WORK_DIR);
-			String[] args = (String[]) job.getAttribute(PreferenceConstants.JOB_ARGS);
+			String app = job.getAttribute(JobAttributes.getExecutableNameAttributeDefinition()).getValueAsString();
+			String path = job.getAttribute(JobAttributes.getExecutablePathAttributeDefinition()).getValueAsString();
+			String dir = job.getAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition()).getValueAsString();
+			String[] args = (String[]) (((IArrayAttribute)job.getAttribute(JobAttributes.getProgramArgumentsAttributeDefinition())).getValue());
 			proxy.debugStartSession(app, path, dir, args);
 		} catch (IOException e) {
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugCorePlugin.getUniqueIdentifier(), IStatus.ERROR, "Cannot start debugger", e));
