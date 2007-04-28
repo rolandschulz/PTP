@@ -56,6 +56,100 @@ public class PProcess extends Parent implements IPProcessControl {
 		outputFile = new OutputTextFile(getName(), outputDirPath, storeLine);
 	}
 	
+	public void addOutput(String output) {
+		outputFile.write(output + "\n");
+	}
+	
+	public void clearOutput() {
+		outputFile.delete();
+	}
+	
+	public String getContents() {
+		return outputFile.getContents();
+	}
+	
+	public int getExitCode() {
+		IIntegerAttribute attr = (IIntegerAttribute) getAttribute(ProcessAttributes.getExitCodeAttributeDefinition());
+		if (attr != null) {
+			return attr.getValue();
+		}
+		return 0;
+	}
+	
+	public IPJob getJob() {
+		IPElementControl current = this;
+		do {
+			if (current instanceof IPJobControl)
+				return (IPJobControl) current;
+		} while ((current = current.getParent()) != null);
+		return null;
+	}
+
+	public IPNode getNode() {
+		return this.node;
+	}
+
+	public String[] getOutputs() {
+		return null;
+	}
+	
+	public int getPid() {
+		IIntegerAttribute attr = (IIntegerAttribute) getAttribute(ProcessAttributes.getPIDAttributeDefinition());
+		if (attr != null) {
+			return attr.getValue();
+		}
+		return 0;
+	}
+	
+	public String getProcessNumber() {
+		return "" + getTaskId() + "";
+	}
+	
+	public String getSignalName() {
+		IStringAttribute attr = (IStringAttribute) getAttribute(ProcessAttributes.getSignalNameAttributeDefinition());
+		if (attr != null) {
+			return attr.getValue();
+		}
+		return "";
+	}
+	
+	public State getStatus() {
+		IEnumeratedAttribute attr = (IEnumeratedAttribute) getAttribute(ProcessAttributes.getStateAttributeDefinition());
+		if (attr != null) {
+			return (State) attr.getEnumValue();
+		}
+		return State.ERROR;
+	}
+	
+	public int getTaskId() {
+		IIntegerAttribute attr = (IIntegerAttribute) getAttribute(ProcessAttributes.getTaskIdAttributeDefinition());
+		if (attr != null) {
+			return attr.getValue();
+		}
+		return 0;
+	}
+	
+	public boolean isAllStop() {
+		ProcessAttributes.State state = getStatus();
+		return (state == State.ERROR || state == State.EXITED || state == State.EXITED_SIGNALLED);
+	}
+	
+	public boolean isTerminated() {
+		return isTerminated;
+	}
+	
+	public void removeProcess() {
+		final IPNodeControl parent = (IPNodeControl) getParent();
+		if (parent != null)
+			parent.removeProcess(this);
+	}
+
+	public void setNode(IPNode node) {
+		this.node = (IPNodeControl) node;
+		if (node != null)
+			this.node.addProcess(this);
+	}
+
 	private void setOutputStore() {
 		Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
 		outputDirPath = preferences.getString(PreferenceConstants.OUTPUT_DIR);
@@ -68,20 +162,7 @@ public class PProcess extends Parent implements IPProcessControl {
 		if (!outputDirectory.exists())
 			outputDirectory.mkdir();
 	}
-	
-	public IPJob getJob() {
-		IPElementControl current = this;
-		do {
-			if (current instanceof IPJobControl)
-				return (IPJobControl) current;
-		} while ((current = current.getParent()) != null);
-		return null;
-	}
-	
-	public String getProcessNumber() {
-		return "" + getTaskId() + "";
-	}
-	
+
 	public void setStatus(ProcessAttributes.State state) {
 		IEnumeratedAttribute procState = (IEnumeratedAttribute) getAttribute(ProcessAttributes.getStateAttributeDefinition());
 		try {
@@ -96,89 +177,8 @@ public class PProcess extends Parent implements IPProcessControl {
 			isTerminated = true;
 		}
 	}
-	
-	public boolean isTerminated() {
-		return isTerminated;
-	}
-	
-	public void removeProcess() {
-		final IPNodeControl parent = (IPNodeControl) getParent();
-		if (parent != null)
-			parent.removeProcess(this);
-	}
-	
+
 	public void setTerminated(boolean isTerminated) {
 		this.isTerminated = isTerminated;
-	}
-	
-	public void addOutput(String output) {
-		outputFile.write(output + "\n");
-	}
-	
-	public String getContents() {
-		return outputFile.getContents();
-	}
-	
-	public String[] getOutputs() {
-		return null;
-	}
-	
-	public void clearOutput() {
-		outputFile.delete();
-	}
-	
-	public boolean isAllStop() {
-		ProcessAttributes.State state = getStatus();
-		return (state == State.ERROR || state == State.EXITED || state == State.EXITED_SIGNALLED);
-	}
-	
-	public void setNode(IPNode node) {
-		this.node = (IPNodeControl) node;
-		if (node != null)
-			this.node.addProcess(this);
-	}
-	
-	public IPNode getNode() {
-		return this.node;
-	}
-
-	public int getExitCode() {
-		IIntegerAttribute attr = (IIntegerAttribute) getAttribute(ProcessAttributes.getExitCodeAttributeDefinition());
-		if (attr != null) {
-			return attr.getValue();
-		}
-		return 0;
-	}
-
-	public int getPid() {
-		IIntegerAttribute attr = (IIntegerAttribute) getAttribute(ProcessAttributes.getPIDAttributeDefinition());
-		if (attr != null) {
-			return attr.getValue();
-		}
-		return 0;
-	}
-
-	public String getSignalName() {
-		IStringAttribute attr = (IStringAttribute) getAttribute(ProcessAttributes.getSignalNameAttributeDefinition());
-		if (attr != null) {
-			return attr.getValue();
-		}
-		return "";
-	}
-
-	public State getStatus() {
-		IEnumeratedAttribute attr = (IEnumeratedAttribute) getAttribute(ProcessAttributes.getStateAttributeDefinition());
-		if (attr != null) {
-			return (State) attr.getEnumValue();
-		}
-		return State.ERROR;
-	}
-
-	public int getTaskId() {
-		IIntegerAttribute attr = (IIntegerAttribute) getAttribute(ProcessAttributes.getTaskIdAttributeDefinition());
-		if (attr != null) {
-			return attr.getValue();
-		}
-		return 0;
 	}
 }
