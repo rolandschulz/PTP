@@ -19,7 +19,7 @@
 package org.eclipse.ptp.core.attributes;
 
 
-public final class DoubleAttributeDefinition extends AbstractAttributeDefinition implements IDoubleAttributeDefinition {
+public final class DoubleAttributeDefinition extends AbstractAttributeDefinition implements IAttributeDefinition {
 
 	private Double minValue = Double.NEGATIVE_INFINITY;
 	private Double maxValue = Double.POSITIVE_INFINITY;
@@ -46,11 +46,11 @@ public final class DoubleAttributeDefinition extends AbstractAttributeDefinition
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.attributes.IAttribute#create(java.lang.String)
 	 */
-	public IDoubleAttribute create() throws IllegalValueException {
+	public DoubleAttribute create() throws IllegalValueException {
 		return new DoubleAttribute(this, defaultValue);
 	}
 
-	public IDoubleAttribute create(String value) throws IllegalValueException {
+	public DoubleAttribute create(String value) throws IllegalValueException {
 		return new DoubleAttribute(this, value);
 	}
 

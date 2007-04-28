@@ -26,6 +26,7 @@ import org.eclipse.ptp.core.attributes.IntegerAttributeDefinition;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
+import org.eclipse.ptp.orte.core.ORTEAttributes;
 import org.eclipse.ptp.orte.core.rmsystem.ORTEResourceManager;
 import org.eclipse.ptp.orte.ui.Activator;
 import org.eclipse.ptp.rmsystem.IResourceManager;
@@ -210,9 +211,7 @@ public class ORTERMLaunchConfigurationDynamicTab extends
 	 * @return
 	 */
 	private IntegerAttributeDefinition getNumProcsAttrDef(IResourceManager rm, IPQueue queue) {
-		ORTEResourceManager orm = (ORTEResourceManager) rm;
-		IntegerAttributeDefinition numProcsAttrDef = orm.getNumProcsAttrDef(queue);
-		return numProcsAttrDef;
+		return ORTEAttributes.getNumberOfProcessesAttributeDefinition();
 	}
 
 }

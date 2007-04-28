@@ -51,13 +51,6 @@ IAdaptable, IResourceManagerMenuContribution {
 	public String getDescription();
 
 	/**
-	 * @param queueName
-	 * @param currentAttrs 
-	 * @return
-	 */
-	public IAttribute[] getLaunchAttributes(String queueName, IAttribute[] currentAttrs);
-
-	/**
 	 * 
 	 * @param attrId
 	 * @return

@@ -10,8 +10,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
 import org.eclipse.ptp.core.attributes.AttributeManager;
+import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute;
-import org.eclipse.ptp.core.attributes.IEnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPNode;
@@ -203,7 +203,7 @@ public class ORTEResourceManagerTest implements IResourceManagerListener {
 		 */
 		for (IAttribute a : e.getChangedAttributes()) {
 			if (a.getDefinition() == JobAttributes.getStateAttributeDefinition()) {
-				if (((IEnumeratedAttribute)a).getEnumValue() == JobAttributes.State.ABORTED) {
+				if (((EnumeratedAttribute)a).getEnumValue() == JobAttributes.State.ABORTED) {
 					System.out.println("job terminated!");
 					lock.lock();
 					try {

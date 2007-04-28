@@ -2,9 +2,6 @@ package org.eclipse.ptp.core.elements.attributes;
 
 import org.eclipse.ptp.core.attributes.EnumeratedAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
-import org.eclipse.ptp.core.attributes.IEnumeratedAttributeDefinition;
-import org.eclipse.ptp.core.attributes.IIntegerAttributeDefinition;
-import org.eclipse.ptp.core.attributes.IStringAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IntegerAttributeDefinition;
 import org.eclipse.ptp.core.attributes.StringAttributeDefinition;
 
@@ -30,52 +27,52 @@ public class ProcessAttributes {
 	private static final String STDOUT_ATTR_ID = "processStdout";
 	private static final String NODEID_ATTR_ID = "processNodeId";
 
-	private final static IEnumeratedAttributeDefinition stateAttrDef = 
+	private final static EnumeratedAttributeDefinition stateAttrDef = 
 		new EnumeratedAttributeDefinition(STATE_ATTR_ID, "Process State", "Execution state of a process", State.STARTING, State.values());
 	
-	private final static IIntegerAttributeDefinition pidAttrDef = 
+	private final static IntegerAttributeDefinition pidAttrDef = 
 		new IntegerAttributeDefinition(PID_ATTR_ID, "Process ID", "Operating system process ID", 0);
 	
-	private final static IIntegerAttributeDefinition exitCodeAttrDef = 
+	private final static IntegerAttributeDefinition exitCodeAttrDef = 
 		new IntegerAttributeDefinition(EXIT_CODE_ATTR_ID, "Process Exit Code", "Operating system exit code", 0);
 	
-	private final static IIntegerAttributeDefinition taskIdAttrDef = 
+	private final static IntegerAttributeDefinition taskIdAttrDef = 
 		new IntegerAttributeDefinition(TASKID_ATTR_ID, "Process Task ID", "MPI task ID of process", 0);
 	
-	private final static IStringAttributeDefinition signalNameAttrDef = 
+	private final static StringAttributeDefinition signalNameAttrDef = 
 		new StringAttributeDefinition(SIGNAL_NAME_ATTR_ID, "Process Signal", "Name of signal that caused process termination", "");
 	
-	private final static IStringAttributeDefinition stdoutNameAttrDef = 
+	private final static StringAttributeDefinition stdoutNameAttrDef = 
 		new StringAttributeDefinition(STDOUT_ATTR_ID, "Process Stdout", "Standard output from process", "");
 	
-	private final static IIntegerAttributeDefinition nodeIdAttrDef = 
+	private final static IntegerAttributeDefinition nodeIdAttrDef = 
 		new IntegerAttributeDefinition(NODEID_ATTR_ID, "Process Node ID", "Node that this process is running on", 0);
 	
-	public static IEnumeratedAttributeDefinition getStateAttributeDefinition() {
+	public static EnumeratedAttributeDefinition getStateAttributeDefinition() {
 		return stateAttrDef;
 	}
 	
-	public static IIntegerAttributeDefinition getPIDAttributeDefinition() {
+	public static IntegerAttributeDefinition getPIDAttributeDefinition() {
 		return pidAttrDef;
 	}
 	
-	public static IIntegerAttributeDefinition getExitCodeAttributeDefinition() {
+	public static IntegerAttributeDefinition getExitCodeAttributeDefinition() {
 		return exitCodeAttrDef;
 	}
 	
-	public static IIntegerAttributeDefinition getTaskIdAttributeDefinition() {
+	public static IntegerAttributeDefinition getTaskIdAttributeDefinition() {
 		return taskIdAttrDef;
 	}
 	
-	public static IStringAttributeDefinition getSignalNameAttributeDefinition() {
+	public static StringAttributeDefinition getSignalNameAttributeDefinition() {
 		return signalNameAttrDef;
 	}
 	
-	public static IStringAttributeDefinition getStdoutAttributeDefinition() {
+	public static StringAttributeDefinition getStdoutAttributeDefinition() {
 		return stdoutNameAttrDef;
 	}
 	
-	public static IIntegerAttributeDefinition getNodeIdAttributeDefinition() {
+	public static IntegerAttributeDefinition getNodeIdAttributeDefinition() {
 		return taskIdAttrDef;
 	}
 	

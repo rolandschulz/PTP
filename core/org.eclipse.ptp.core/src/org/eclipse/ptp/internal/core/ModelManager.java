@@ -37,9 +37,9 @@ import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.INodeListener;
 import org.eclipse.ptp.core.IProcessListener;
 import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
+import org.eclipse.ptp.core.attributes.EnumeratedAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IAttribute;
-import org.eclipse.ptp.core.attributes.IEnumeratedAttribute;
-import org.eclipse.ptp.core.attributes.IEnumeratedAttributeDefinition;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPJob;
@@ -199,12 +199,12 @@ IResourceManagerListener {
 		Collection<IAttribute> attrs = e.getChangedAttributes();
 		boolean stateChanged = false;
 		int eventState = -1;
-		final IEnumeratedAttributeDefinition stateAttributeDefinition = 
+		final EnumeratedAttributeDefinition stateAttributeDefinition = 
 			JobAttributes.getStateAttributeDefinition();
 		for (IAttribute attr : attrs) {
 			if (attr.getDefinition() == stateAttributeDefinition) {
 				stateChanged = true;
-				eventState = extractStateCode((IEnumeratedAttribute)attr);
+				eventState = extractStateCode((EnumeratedAttribute)attr);
 			}
 		}
 		final Collection<IPJob> jobs = e.getChangedJobs();
@@ -435,7 +435,7 @@ IResourceManagerListener {
 		rm.addResourceManagerListener(this);
 	}
 
-	private int extractStateCode(IEnumeratedAttribute attr) {
+	private int extractStateCode(EnumeratedAttribute attr) {
 		int eventState = -1;
 		JobAttributes.State state = JobAttributes.State.values()[attr.getValueIndex()];
 		switch (state) {

@@ -9,11 +9,11 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
 import org.eclipse.ptp.core.attributes.AttributeManager;
+import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute;
-import org.eclipse.ptp.core.attributes.IEnumeratedAttribute;
-import org.eclipse.ptp.core.attributes.IIntegerAttribute;
-import org.eclipse.ptp.core.attributes.IStringAttribute;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
+import org.eclipse.ptp.core.attributes.IntegerAttribute;
+import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.MachineAttributes;
@@ -244,7 +244,7 @@ public class ORTERuntimeSystemTest implements IRuntimeEventListener {
 		for (Map.Entry<RangeSet, AttributeManager> entry : e.getElementAttributeManager().getEntrySet()) {
 			AttributeManager mgr = entry.getValue();
 			for (int id : entry.getKey()) {
-				IIntegerAttribute attr = (IIntegerAttribute) mgr.getAttribute(JobAttributes.getSubIdAttributeDefinition());
+				IntegerAttribute attr = (IntegerAttribute) mgr.getAttribute(JobAttributes.getSubIdAttributeDefinition());
 				if (attr.getValue() == jobSubmitID) {
 					jobId = id;
 					return;
@@ -274,7 +274,7 @@ public class ORTERuntimeSystemTest implements IRuntimeEventListener {
 		for (Map.Entry<RangeSet, AttributeManager> entry : e.getElementAttributeManager().getEntrySet()) {
 			AttributeManager mgr = entry.getValue();
 			for (int id : entry.getKey()) {
-				IStringAttribute attr = (IStringAttribute) mgr.getAttribute(ElementAttributes.getNameAttributeDefinition());
+				StringAttribute attr = (StringAttribute) mgr.getAttribute(ElementAttributes.getNameAttributeDefinition());
 				if (attr != null) {
 					queueId = id;
 					queueName = attr.getValueAsString();
@@ -307,7 +307,7 @@ public class ORTERuntimeSystemTest implements IRuntimeEventListener {
 			AttributeManager mgr = entry.getValue();
 			for (int id : entry.getKey()) {
 				if (jobId == id) {
-					IEnumeratedAttribute a = (IEnumeratedAttribute) mgr.getAttribute(JobAttributes.getStateAttributeDefinition());
+					EnumeratedAttribute a = (EnumeratedAttribute) mgr.getAttribute(JobAttributes.getStateAttributeDefinition());
 					if (a != null && a.getEnumValue() == JobAttributes.State.ABORTED) {
 						System.out.println("job terminated!");
 						lock.lock();

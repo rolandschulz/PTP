@@ -24,11 +24,11 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.PreferenceConstants;
+import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute;
-import org.eclipse.ptp.core.attributes.IEnumeratedAttribute;
-import org.eclipse.ptp.core.attributes.IIntegerAttribute;
-import org.eclipse.ptp.core.attributes.IStringAttribute;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
+import org.eclipse.ptp.core.attributes.IntegerAttribute;
+import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.elementcontrols.IPElementControl;
 import org.eclipse.ptp.core.elementcontrols.IPJobControl;
 import org.eclipse.ptp.core.elementcontrols.IPNodeControl;
@@ -69,7 +69,7 @@ public class PProcess extends Parent implements IPProcessControl {
 	}
 	
 	public int getExitCode() {
-		IIntegerAttribute attr = (IIntegerAttribute) getAttribute(ProcessAttributes.getExitCodeAttributeDefinition());
+		IntegerAttribute attr = (IntegerAttribute) getAttribute(ProcessAttributes.getExitCodeAttributeDefinition());
 		if (attr != null) {
 			return attr.getValue();
 		}
@@ -94,7 +94,7 @@ public class PProcess extends Parent implements IPProcessControl {
 	}
 	
 	public int getPid() {
-		IIntegerAttribute attr = (IIntegerAttribute) getAttribute(ProcessAttributes.getPIDAttributeDefinition());
+		IntegerAttribute attr = (IntegerAttribute) getAttribute(ProcessAttributes.getPIDAttributeDefinition());
 		if (attr != null) {
 			return attr.getValue();
 		}
@@ -106,7 +106,7 @@ public class PProcess extends Parent implements IPProcessControl {
 	}
 	
 	public String getSignalName() {
-		IStringAttribute attr = (IStringAttribute) getAttribute(ProcessAttributes.getSignalNameAttributeDefinition());
+		StringAttribute attr = (StringAttribute) getAttribute(ProcessAttributes.getSignalNameAttributeDefinition());
 		if (attr != null) {
 			return attr.getValue();
 		}
@@ -114,7 +114,7 @@ public class PProcess extends Parent implements IPProcessControl {
 	}
 	
 	public State getStatus() {
-		IEnumeratedAttribute attr = (IEnumeratedAttribute) getAttribute(ProcessAttributes.getStateAttributeDefinition());
+		EnumeratedAttribute attr = (EnumeratedAttribute) getAttribute(ProcessAttributes.getStateAttributeDefinition());
 		if (attr != null) {
 			return (State) attr.getEnumValue();
 		}
@@ -122,7 +122,7 @@ public class PProcess extends Parent implements IPProcessControl {
 	}
 	
 	public int getTaskId() {
-		IIntegerAttribute attr = (IIntegerAttribute) getAttribute(ProcessAttributes.getTaskIdAttributeDefinition());
+		IntegerAttribute attr = (IntegerAttribute) getAttribute(ProcessAttributes.getTaskIdAttributeDefinition());
 		if (attr != null) {
 			return attr.getValue();
 		}
@@ -164,7 +164,7 @@ public class PProcess extends Parent implements IPProcessControl {
 	}
 
 	public void setStatus(ProcessAttributes.State state) {
-		IEnumeratedAttribute procState = (IEnumeratedAttribute) getAttribute(ProcessAttributes.getStateAttributeDefinition());
+		EnumeratedAttribute procState = (EnumeratedAttribute) getAttribute(ProcessAttributes.getStateAttributeDefinition());
 		try {
 			if (procState == null) {
 				procState = ProcessAttributes.getStateAttributeDefinition().create(state);

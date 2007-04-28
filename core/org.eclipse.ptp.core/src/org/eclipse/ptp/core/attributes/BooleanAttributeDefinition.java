@@ -19,7 +19,7 @@
 package org.eclipse.ptp.core.attributes;
 
 
-public final class BooleanAttributeDefinition extends AbstractAttributeDefinition implements IBooleanAttributeDefinition {
+public final class BooleanAttributeDefinition extends AbstractAttributeDefinition implements IAttributeDefinition {
 
 	private Boolean defaultValue;
 	
@@ -31,15 +31,15 @@ public final class BooleanAttributeDefinition extends AbstractAttributeDefinitio
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.attributes.IAttribute#create(java.lang.String)
 	 */
-	public IBooleanAttribute create() {
+	public BooleanAttribute create() {
 		return new BooleanAttribute(this, defaultValue);
 	}
 
-	public IBooleanAttribute create(Boolean value) {
+	public BooleanAttribute create(Boolean value) {
 		return new BooleanAttribute(this, value);
 	}
 	
-	public IBooleanAttribute create(String value) {
+	public BooleanAttribute create(String value) {
 		return new BooleanAttribute(this, value);
 	}
 

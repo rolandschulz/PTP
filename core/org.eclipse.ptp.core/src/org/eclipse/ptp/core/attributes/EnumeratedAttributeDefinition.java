@@ -25,7 +25,7 @@ import java.util.Collections;
 import java.util.List;
 
 
-public final class EnumeratedAttributeDefinition extends AbstractAttributeDefinition implements IEnumeratedAttributeDefinition {
+public final class EnumeratedAttributeDefinition extends AbstractAttributeDefinition implements IAttributeDefinition {
 
 	private final ArrayList<String> enumerations = new ArrayList<String>();
 	private final int defaultValue;
@@ -56,19 +56,19 @@ public final class EnumeratedAttributeDefinition extends AbstractAttributeDefini
   	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.attributes.IAttribute#create(java.lang.String)
 	 */
-	public IEnumeratedAttribute create() throws IllegalValueException {
+	public EnumeratedAttribute create() throws IllegalValueException {
 		return new EnumeratedAttribute(this, defaultValue);
 	}
 
-    public IEnumeratedAttribute create(Enum value) throws IllegalValueException {
+    public EnumeratedAttribute create(Enum value) throws IllegalValueException {
         return new EnumeratedAttribute(this, value.ordinal());
     }
 
-    public IEnumeratedAttribute create(int value) throws IllegalValueException {
+    public EnumeratedAttribute create(int value) throws IllegalValueException {
         return new EnumeratedAttribute(this, value);
     }
 
-    public IEnumeratedAttribute create(String value) throws IllegalValueException {
+    public EnumeratedAttribute create(String value) throws IllegalValueException {
         return new EnumeratedAttribute(this, value);
     }
 

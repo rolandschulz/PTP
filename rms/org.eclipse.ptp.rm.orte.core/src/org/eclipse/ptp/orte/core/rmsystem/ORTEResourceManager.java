@@ -19,14 +19,12 @@
 package org.eclipse.ptp.orte.core.rmsystem;
 
 import org.eclipse.ptp.core.attributes.AttributeManager;
-import org.eclipse.ptp.core.attributes.IIntegerAttributeDefinition;
 import org.eclipse.ptp.core.elementcontrols.IPJobControl;
 import org.eclipse.ptp.core.elementcontrols.IPMachineControl;
 import org.eclipse.ptp.core.elementcontrols.IPNodeControl;
 import org.eclipse.ptp.core.elementcontrols.IPProcessControl;
 import org.eclipse.ptp.core.elementcontrols.IPQueueControl;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
-import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.orte.core.ORTEAttributes;
 import org.eclipse.ptp.orte.core.rtsystem.ORTEProxyRuntimeClient;
 import org.eclipse.ptp.orte.core.rtsystem.ORTERuntimeSystem;
@@ -39,17 +37,6 @@ public class ORTEResourceManager extends AbstractRuntimeResourceManager {
 	public ORTEResourceManager(int id, IPUniverseControl universe, IResourceManagerConfiguration config) {
 		super(id, universe, config);
 		getAttributeDefinitionManager().setAttributeDefinitions(ORTEAttributes.getDefaultAttributeDefinitions());
-	}
-
-	/**
-	 * Return the launch attribute for determining the number of processes with which
-	 * to launch a job.
-	 * 
-	 * @param queue
-	 * @return
-	 */
-	public IIntegerAttributeDefinition getNumProcsAttrDef(IPQueue queue) {
-		return ORTEAttributes.getNumberOfProcessesAttributeDefinition();
 	}
 
 	/* (non-Javadoc)

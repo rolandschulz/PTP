@@ -1,7 +1,6 @@
 package org.eclipse.ptp.orte.core;
 
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
-import org.eclipse.ptp.core.attributes.IIntegerAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IntegerAttributeDefinition;
 
 
@@ -11,10 +10,10 @@ import org.eclipse.ptp.core.attributes.IntegerAttributeDefinition;
 public class ORTEAttributes {
 	private static final String NUM_PROCS_ATTR_ID = "jobNumProcs";
 
-	private final static IIntegerAttributeDefinition numProcsAttrDef = 
+	private final static IntegerAttributeDefinition numProcsAttrDef = 
 		new IntegerAttributeDefinition(NUM_PROCS_ATTR_ID, "Number of Processes", "Number of processes to launch", 0);
 
-	public static IIntegerAttributeDefinition getNumberOfProcessesAttributeDefinition() {
+	public static IntegerAttributeDefinition getNumberOfProcessesAttributeDefinition() {
 		return numProcsAttrDef;
 	}
 

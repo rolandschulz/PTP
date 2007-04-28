@@ -19,11 +19,11 @@
 package org.eclipse.ptp.core.attributes;
 
 
-public final class StringAttribute extends AbstractAttribute implements IStringAttribute {
+public final class StringAttribute extends AbstractAttribute implements IAttribute {
 
 	private StringBuffer value = new StringBuffer();
 
-	public StringAttribute(IStringAttributeDefinition description, String initialValue) throws IllegalValueException {
+	public StringAttribute(StringAttributeDefinition description, String initialValue) throws IllegalValueException {
 		super(description);
 		setValue(initialValue);
 	}

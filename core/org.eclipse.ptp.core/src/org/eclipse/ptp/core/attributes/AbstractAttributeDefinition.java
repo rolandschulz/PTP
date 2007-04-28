@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.attributes;
 
-public abstract class AbstractAttributeDefinition implements IAttributeDefinition {
+public abstract class AbstractAttributeDefinition {
 	private final String name;
 	private final String description;
 	private final String uniqueId;
