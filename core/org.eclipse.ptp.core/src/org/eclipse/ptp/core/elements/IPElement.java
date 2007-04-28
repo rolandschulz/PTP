@@ -18,6 +18,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.elements;
 
+import java.util.Map;
+import java.util.Set;
+
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
@@ -44,15 +47,7 @@ public interface IPElement extends IAdaptable {
 	 * 
 	 * @return This Element's name
 	 */
-	public String getElementName();
-	
-	/**
-	 * Returns the attribute corresponding to the attribute ID.
-	 * 
-	 * @param attrId
-	 * @return The attribute for this ID
-	 */
-	public Object getAttribute(String attrId);
+	public String getName();
 	
 	/**
 	 * Returns the attribute corresponding to the attribute definition.
@@ -63,12 +58,27 @@ public interface IPElement extends IAdaptable {
 	public IAttribute getAttribute(IAttributeDefinition attrDef);
 	
 	/**
-	 * Returns a list of the attribute names
+	 * Returns the attribute corresponding to the attribute definition ID.
 	 * 
-	 * @return attribute names
+	 * @param attrDefId
+	 * @return The attribute for this attribute definition
+	 */
+	public IAttribute getAttribute(String attrDefId);
+
+	/**
+	 * Returns a set continain attribute name, attribute pairs
+	 * 
+	 * @return entry set
+	 */
+	public Set<Map.Entry<String, IAttribute>> getAttributeEntrySet();
+
+	/**
+	 * Get all the attribute definition ID's that this element knows about.
+	 * 
+	 * @return array of string keys
 	 */
 	public String[] getAttributeKeys();
-
+	
 	/**
 	 * Sets the attribute value corresponding to the attribute ID.
 	 * 
@@ -76,21 +86,4 @@ public interface IPElement extends IAdaptable {
 	 * @param attrValue
 	 */
 	public void setAttribute(String attrId, IAttribute attrValue);
-
-	/**
-	 * Sets the string attribute value corresponding to the attribute ID.
-	 * 
-	 * @param attrId
-	 * @param attrValue
-	 */
-	public void setAttribute(String attrId, String attrValue);
-	
-	/**
-	 * Sets the Object attribute value corresponding to the attribute ID.
-	 * 
-	 * @param attrId
-	 * @param attrValue
-	 */
-	public void setAttribute(String attrId, Object attrValue);
-
 }

@@ -52,21 +52,20 @@ public interface IPJob extends IPElement {
 	 */
 	public IPProcess findProcessByName(String pname);
 	
+	/**
+	 * Finds a Process in by it's task ID. Returns the Process
+	 * object if found, else returns <code>null</code>.
+	 * 
+	 * @param taskId
+	 *            The Process task ID to search for
+	 * @return The Process object if found, else <code>null</code>
+	 */
 	public IPProcess findProcessByTaskId(int taskId);
 	
 	/**
 	 * @return
 	 */
 	public String getIDString();
-
-	/**
-	 * Returns the Job number of this Job as a String.
-	 * 
-	 * @return The Job number of this Job
-	 */
-	public String getJobNumber();
-
-	public int getJobNumberInt();
 
 	/**
 	 * Returns an array of the Machines that this Job has Processes on. For most
@@ -76,11 +75,6 @@ public interface IPJob extends IPElement {
 	 * @return The Machines this Job has Processes on
 	 */
 	public IPMachine[] getMachines();
-
-	/**
-	 * @return
-	 */
-	public String getName();
 
 	/**
 	 * Returns an array of the Nodes that this Job has Processes on.
@@ -98,12 +92,17 @@ public interface IPJob extends IPElement {
 	public IPProcess[] getProcesses();
 
 	/**
+	 * @return
+	 */
+	public IPQueue getQueue();
+
+	/**
 	 * Returns a sorted array of the Nodes that this Job has Processes on.
 	 * 
 	 * @return The Nodes that this Job has Processes on
 	 */
 	public IPNode[] getSortedNodes();
-
+	
 	/**
 	 * Returns a sorted array of the Processes comprised by this Job. Might
 	 * return <code>null</code> if no Processes have yet been assigned.
@@ -111,7 +110,7 @@ public interface IPJob extends IPElement {
 	 * @return
 	 */
 	public IPProcess[] getSortedProcesses();
-	
+
 	/**
 	 * Returns the Universe that this Job resides within.
 	 * 
@@ -130,7 +129,7 @@ public interface IPJob extends IPElement {
 	 * @return True if this job is a debug job
 	 */
 	public boolean isDebug();
-
+	
 	public void removeAllProcesses();
 	
 	/**
@@ -138,7 +137,7 @@ public interface IPJob extends IPElement {
 	 *
 	 */
 	public void setDebug();
-	
+
 	/**
 	 * Returns the number of Nodes that this Job has Processes on. This may not
 	 * be the same size as the number of Processes if some Processes are
@@ -154,10 +153,4 @@ public interface IPJob extends IPElement {
 	 * @return The number of Processes in this Job.
 	 */
 	public int totalProcesses();
-
-	/**
-	 * @return
-	 */
-	public IPQueue getQueue();
-
 }

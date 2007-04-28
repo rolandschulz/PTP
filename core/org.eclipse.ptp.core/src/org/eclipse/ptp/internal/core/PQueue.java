@@ -34,13 +34,6 @@ public class PQueue extends Parent implements IPQueueControl {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.IPMachine#getName()
-	 */
-	public String getName() {
-		return getElementName();
-	}
-	
-	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.IPMachine#getResourceManager()
 	 */
 	public IResourceManager getResourceManager() {

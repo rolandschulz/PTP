@@ -19,6 +19,8 @@
 package org.eclipse.ptp.internal.core;
 
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
@@ -31,16 +33,14 @@ public abstract class PElement extends PlatformObject implements IPElementContro
 
 	private PElementInfo elementInfo = null;
 
-	protected HashMap<String, Object> attributeValues = new HashMap<String, Object>();
+	protected Map<String, IAttribute> attributeValues = new HashMap<String, IAttribute>();
 	protected int elementId = -1;
 	protected IPElementControl elementParent;
-	protected String elementName;
 
 	protected int elementType;
 
 	protected PElement(int id, IPElementControl parent, int type, IAttribute[] attrs) {
 		elementId = id;
-		elementName = getName(attrs);
 		elementType = type;
 		elementParent = parent;
 		for (IAttribute attr : attrs) {
@@ -49,14 +49,6 @@ public abstract class PElement extends PlatformObject implements IPElementContro
 		}
 	}
 
-	private String getName(IAttribute[] attrs) {
-		IAttribute attr = (IAttribute) attributeValues.get(AttributeDefinitionManager.getNameAttributeDefinition().getId());
-		if (attr != null) {
-			return attr.getValueAsString();
-		}
-		return "";
-	}
-	
 	public int compareTo(Object obj) {
 		if (obj instanceof IPElementControl) {
 			int my_rank = getID();
@@ -86,19 +78,27 @@ public abstract class PElement extends PlatformObject implements IPElementContro
 	 * @see org.eclipse.ptp.core.IPElement#getAttribute(org.eclipse.ptp.core.attributes.IAttributeDefinition)
 	 */
 	public IAttribute getAttribute(IAttributeDefinition attrDef) {
-		return (IAttribute) getAttribute(attrDef.getId());
+		return getAttribute(attrDef.getId());
 	}
 
-	public Object getAttribute(String attrId) {
+	public IAttribute getAttribute(String attrId) {
 		return attributeValues.get(attrId);
 	}
-
+	
+	public Set<Map.Entry<String, IAttribute>> getAttributeEntrySet() {
+		return attributeValues.entrySet();
+	}
+	
 	public String[] getAttributeKeys() {
 		return attributeValues.keySet().toArray(new String[0]);
 	}
 	
-	public String getElementName() {
-		return elementName;
+	public String getName() {
+		IAttribute attr = (IAttribute) attributeValues.get(AttributeDefinitionManager.getNameAttributeDefinition().getId());
+		if (attr != null) {
+			return attr.getValueAsString();
+		}
+		return "";
 	}
 	
 	/**
@@ -123,30 +123,16 @@ public abstract class PElement extends PlatformObject implements IPElementContro
 		return elementParent;
 	}
 
-	public void setAttribute(String attrId, boolean attrib) {
-	}
-
 	public void setAttribute(String attrId, IAttribute attrib) {
 		attributeValues.put(attrId, attrib);
 	}
 	
-	public void setAttribute(String attrId, int attrib) {
-	}
-
-	public void setAttribute(String attrId, Object attrib) {
-		attributeValues.put(attrId, attrib);
-	}
-
-	public void setAttribute(String attrId, String attrib) {
-		attributeValues.put(attrId, attrib);
-	}
-
 	public int size() {
 		return getElementInfo().size();
 	}
 
 	public String toString() {
-		return getElementName();
+		return getName();
 	}
 
 	protected PElementInfo getElementInfo() {

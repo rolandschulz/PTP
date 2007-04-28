@@ -23,7 +23,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import org.eclipse.ptp.core.AttributeConstants;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.elementcontrols.IPElementControl;
 import org.eclipse.ptp.core.elementcontrols.IPJobControl;
@@ -40,7 +39,7 @@ import org.eclipse.ptp.rmsystem.IResourceManager;
 public class PJob extends Parent implements IPJobControl {
 	final public static int BASE_OFFSET = 10000;
 	final public static int STATE_NEW = 5000;
-	private ArrayList taskIdMap;
+	private ArrayList<String> taskIdMap = new ArrayList<String>();
 
 	protected String NAME_TAG = "root ";
 	
@@ -48,8 +47,6 @@ public class PJob extends Parent implements IPJobControl {
 
 	public PJob(int id, IPQueueControl queue, IAttribute[] attrs) {
 		super(id, queue, P_JOB, attrs);
-		taskIdMap = new ArrayList();
-		this.setAttribute(AttributeConstants.ATTRIB_JOBID, new Integer(id));
 	}
 	
 	public void addProcess(IPProcessControl p) {
@@ -71,7 +68,7 @@ public class PJob extends Parent implements IPJobControl {
 			Object ob = it.next();
 			if (ob instanceof IPProcessControl) {
 				IPProcessControl proc = (IPProcessControl) ob;
-				if (proc.getElementName().equals(pname))
+				if (proc.getName().equals(pname))
 					return proc;
 			}
 		}
@@ -86,25 +83,6 @@ public class PJob extends Parent implements IPJobControl {
 			return findProcess(procNumber);
 	}
 	
-	public String getJobNumber() {
-		return ""+((Integer) this.getAttribute(AttributeConstants.ATTRIB_JOBID)).intValue()+"";
-		/*
-		int i = getID();
-		System.out.println("get job number - ID = "+i+", offset = "+BASE_OFFSET);
-		return "" + (i - BASE_OFFSET) + "";
-		*/
-		/*
-		 * String s = getKey(); int i = -1; try { i = (new
-		 * Integer(s)).intValue(); } catch(NumberFormatException e) { } if(i !=
-		 * -1) { return ""+(i - BASE_OFFSET)+""; } else return "";
-		 */
-	}
-
-	public int getJobNumberInt()
-	{
-		return ((Integer) this.getAttribute(AttributeConstants.ATTRIB_JOBID)).intValue();
-	}
-
 	/*
 	 * returns the Machines that this job is running on. this is accomplished by
 	 * drilling down to the processes, finding the nodes they are running on,
@@ -121,10 +99,6 @@ public class PJob extends Parent implements IPJobControl {
 		}
 
 		return (IPMachine[]) array.toArray(new IPMachine[array.size()]);
-	}
-
-	public String getName() {
-		return getElementName();
 	}
 
 	public synchronized IPNode[] getNodes() {

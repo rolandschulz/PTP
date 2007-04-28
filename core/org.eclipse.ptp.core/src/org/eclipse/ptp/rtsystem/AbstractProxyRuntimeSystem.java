@@ -440,7 +440,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 			return;
 		}
 		
-		int jobID = job.getJobNumberInt();
+		int jobID = job.getID();
 
 		if(jobID >= 0) {
 			System.out.println("LSFControlSystem: abortJob() with name "+job.toString()+" and ID "+jobID);

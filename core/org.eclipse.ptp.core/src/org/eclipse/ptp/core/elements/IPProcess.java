@@ -18,6 +18,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.elements;
 
+import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
+
 
 public interface IPProcess extends IPElement {
 	/**
@@ -47,16 +49,12 @@ public interface IPProcess extends IPElement {
 
 	public boolean isTerminated();
 	public void setTerminated(boolean isTerminate);
-	public String getProcessNumber();
-	public String getPid();
+	public int getPid();
 	public int getTaskId();
-	public String getStatus();
-	public String getExitCode();
+	public ProcessAttributes.State getStatus();
+	public int getExitCode();
 	public String getSignalName();
-	public void setPid(String pid);
-	public void setStatus(String status);
-	public void setExitCode(String code);
-	public void setSignalName(String signalName);
+	public void setStatus(ProcessAttributes.State status);
 	public void removeProcess();
 	public String getContents();
 	public String[] getOutputs();
@@ -69,21 +67,6 @@ public interface IPProcess extends IPElement {
 	/* returns the node that this process is running on */
 	public IPNode getNode();
 	
-	/**
-	 * @return
-	 */
-	public String getName();
-	
-	/**
-	 * @return
-	 */
-	public IPProcess getParentProcess();
-	
-	/**
-	 * @return
-	 */
-	public int getNumChildProcesses();
-
 	/**
 	 * @return
 	 */
