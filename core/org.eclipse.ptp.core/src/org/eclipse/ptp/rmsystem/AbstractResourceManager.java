@@ -51,6 +51,7 @@ import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPNode;
 import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.IPQueue;
+import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.MachineAttributes;
 import org.eclipse.ptp.core.elements.attributes.NodeAttributes;
@@ -96,7 +97,7 @@ IResourceManagerControl {
 		IAttribute nameAttr = null;
 		
 		try {
-			 nameAttr = AttributeDefinitionManager.getNameAttributeDefinition().create(config.getName());
+			 nameAttr = ElementAttributes.getNameAttributeDefinition().create(config.getName());
 		} catch (IllegalValueException e) {
 		}
 		
@@ -123,6 +124,7 @@ IResourceManagerControl {
 		this.state = ResourceManagerAttributes.State.STOPPED;
 		this.statusMessage = this.state.toString();
 		this.attrDefManager = new AttributeDefinitionManager();
+		this.attrDefManager.setAttributeDefinitions(ElementAttributes.getDefaultAttributeDefinitions());
 		this.attrDefManager.setAttributeDefinitions(JobAttributes.getDefaultAttributeDefinitions());
 		this.attrDefManager.setAttributeDefinitions(MachineAttributes.getDefaultAttributeDefinitions());
 		this.attrDefManager.setAttributeDefinitions(NodeAttributes.getDefaultAttributeDefinitions());
@@ -685,40 +687,39 @@ IResourceManagerControl {
 	/*
 	 * Create new model elements.
 	 */
-	protected IPJobControl newJob(IPQueueControl queue, int jobId, IAttribute[] attrs) {
-		IPJobControl job = new PJob(jobId, queue, attrs);
+	protected IPJobControl newJob(IPQueueControl queue, int jobId, AttributeManager attrs) {
+		IPJobControl job = new PJob(jobId, queue, attrs.getAttributes());
 		queue.addJob(job);
 		return job;
 	}
 
-	protected IPMachineControl newMachine(int machineId, IAttribute[] attrs) {
-		return new PMachine(machineId, this, attrs);
+	protected IPMachineControl newMachine(int machineId, AttributeManager attrs) {
+		return new PMachine(machineId, this, attrs.getAttributes());
 	}
 
-	protected IPNodeControl newNode(IPMachineControl machine, int nodeId, IAttribute[] attrs) {
-		IPNodeControl node = new PNode(nodeId, machine, attrs);
+	protected IPNodeControl newNode(IPMachineControl machine, int nodeId, AttributeManager attrs) {
+		IPNodeControl node = new PNode(nodeId, machine, attrs.getAttributes());
 		machine.addNode(node);
 		return node;
 	}
 
-	protected IPProcessControl newProcess(IPJobControl job, int processId, IAttribute[] attrs) {
-		IPProcessControl process = new PProcess(processId, job, attrs);
+	protected IPProcessControl newProcess(IPJobControl job, int processId, AttributeManager attrs) {
+		IPProcessControl process = new PProcess(processId, job, attrs.getAttributes());
 		/*
-		 * If there is an ID attribute then it should be a node ID, so connect it up.
+		 * If there is a node ID attribute, connect it up.
 		 */
-		for (IAttribute attr: attrs) {
-			if (attr.getDefinition() == AttributeDefinitionManager.getIdAttributeDefinition()) {
-				IPNodeControl node = getNodeControl(((IIntegerAttribute)attr).getValue());
-				if (node != null) {
-					node.addProcess(process);
-				}
+		IIntegerAttribute attr = (IIntegerAttribute) attrs.getAttribute(ProcessAttributes.getNodeIdAttributeDefinition());
+		if (attr != null) {
+			IPNodeControl node = getNodeControl(((IIntegerAttribute)attr).getValue());
+			if (node != null) {
+				node.addProcess(process);
 			}
 		}
 		return process;
 	}
 
-	protected IPQueueControl newQueue(int queueId, IAttribute[] attrs) {
-		return new PQueue(queueId, this, attrs);
+	protected IPQueueControl newQueue(int queueId, AttributeManager attrs) {
+		return new PQueue(queueId, this, attrs.getAttributes());
 	}
 
 	/**
@@ -741,38 +742,28 @@ IResourceManagerControl {
 	/*
 	 * Update attribute information in model elements.
 	 */
-	protected boolean updateJob(IPJobControl job, IAttribute[] attrs) {
-		for (IAttribute attr : attrs) {
-			job.setAttribute(attr.getDefinition().getId(), attr);
-		}
+	protected boolean updateJob(IPJobControl job, AttributeManager attrs) {
+		job.setAttributes(attrs.getAttributes());
 		return true;
 	}
 
-	protected boolean updateMachine(IPMachineControl machine, IAttribute[] attrs) {
-		for (IAttribute attr : attrs) {
-			machine.setAttribute(attr.getDefinition().getId(), attr);
-		}
+	protected boolean updateMachine(IPMachineControl machine, AttributeManager attrs) {
+		machine.setAttributes(attrs.getAttributes());
 		return true;
 	}
 
-	protected boolean updateNode(IPNodeControl node, IAttribute[] attrs) {
-		for (IAttribute attr : attrs) {
-			node.setAttribute(attr.getDefinition().getId(), attr);
-		}
+	protected boolean updateNode(IPNodeControl node, AttributeManager attrs) {
+		node.setAttributes(attrs.getAttributes());
 		return true;
 	}
 
-	protected boolean updateProcess(IPProcessControl process, IAttribute[] attrs) {
-		for (IAttribute attr : attrs) {
-			process.setAttribute(attr.getDefinition().getId(), attr);
-		}
+	protected boolean updateProcess(IPProcessControl process, AttributeManager attrs) {
+		process.setAttributes(attrs.getAttributes());
 		return true;
 	}
 
-	protected boolean updateQueue(IPQueueControl queue, IAttribute[] attrs) {
-		for (IAttribute attr : attrs) {
-			queue.setAttribute(attr.getDefinition().getId(), attr);
-		}
+	protected boolean updateQueue(IPQueueControl queue, AttributeManager attrs) {
+		queue.setAttributes(attrs.getAttributes());
 		return true;
 	}
 }

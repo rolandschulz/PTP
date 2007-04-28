@@ -31,10 +31,10 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.ptp.core.IModelPresentation;
 import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IPUniverse;
+import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.ui.IManager;
 import org.eclipse.ptp.ui.PTPUIPlugin;
@@ -248,7 +248,7 @@ public abstract class AbstractUIManager implements IManager {
 			ILaunchManager launchManager = DebugPlugin.getDefault().getLaunchManager();
 			ILaunch[] launches = launchManager.getLaunches();
 			for (int i=0; i<launches.length; i++) {
-				String launchedJobID = launches[i].getAttribute(AttributeDefinitionManager.getIdAttributeDefinition().getId());
+				String launchedJobID = launches[i].getAttribute(ElementAttributes.getIdAttributeDefinition().getId());
 				if (launchedJobID != null && launchedJobID.equals(job.getIDString())) {
 					launchManager.removeLaunch(launches[i]);
 				}

@@ -24,21 +24,9 @@ import java.util.HashMap;
 
 public class AttributeDefinitionManager {
 
-	/*
-	 * Predefine attributes. These are attributes that
-	 * the UI knows about.
-	 */
-	private final static String ATTR_ID = "id";
-	private final static String ATTR_NAME = "name";
-	
-	private final static IIntegerAttributeDefinition idAttributeDefinition = new IntegerAttributeDefinition(ATTR_ID, "id", "ID of element", 0);
-	private final static IStringAttributeDefinition nameAttributeDefinition = new StringAttributeDefinition(ATTR_NAME, "name", "Name of element", "");
-	
 	private final HashMap<String, IAttributeDefinition> attributeDefs = new HashMap<String, IAttributeDefinition>();
 	
 	public AttributeDefinitionManager() {
-		setAttributeDefinition(getIdAttributeDefinition());
-		setAttributeDefinition(getNameAttributeDefinition());
 	}
 	
 	/**
@@ -128,13 +116,5 @@ public class AttributeDefinitionManager {
 		IArrayAttributeDefinition def = new ArrayAttributeDefinition(uniqueId, name, description, defaultValue);
 		setAttributeDefinition(def);
 		return def;
-	}
-
-	public static IIntegerAttributeDefinition getIdAttributeDefinition() {
-		return idAttributeDefinition;
-	}
-	
-	public static IStringAttributeDefinition getNameAttributeDefinition() {
-		return nameAttributeDefinition;
 	}
 }

@@ -23,7 +23,6 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.elementcontrols.IPJobControl;
@@ -35,6 +34,7 @@ import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPQueue;
+import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
 import org.eclipse.ptp.rmsystem.IResourceManager;
 
 public class PUniverse extends PElement implements IPUniverseControl {
@@ -54,7 +54,7 @@ public class PUniverse extends PElement implements IPUniverseControl {
 		IAttribute nameAttr = null;
 		
 		try {
-			 nameAttr = AttributeDefinitionManager.getNameAttributeDefinition().create(name);
+			 nameAttr = ElementAttributes.getNameAttributeDefinition().create(name);
 		} catch (IllegalValueException e) {
 		}
 		

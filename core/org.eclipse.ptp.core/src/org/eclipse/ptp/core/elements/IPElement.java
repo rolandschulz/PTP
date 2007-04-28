@@ -80,10 +80,17 @@ public interface IPElement extends IAdaptable {
 	public String[] getAttributeKeys();
 	
 	/**
-	 * Sets the attribute value corresponding to the attribute ID.
+	 * Sets the attribute value.
 	 * 
-	 * @param attrId
 	 * @param attrValue
 	 */
-	public void setAttribute(String attrId, IAttribute attrValue);
+	public void setAttribute(IAttribute attrValue);
+
+	/**
+	 * Sets the attribute values.
+	 * 
+	 * @param attrValues
+	 */
+	public void setAttributes(IAttribute[] attrValues);
+
 }
