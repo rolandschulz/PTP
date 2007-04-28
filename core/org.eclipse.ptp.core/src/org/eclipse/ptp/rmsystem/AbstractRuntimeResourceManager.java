@@ -127,7 +127,7 @@ public abstract class AbstractRuntimeResourceManager extends
 		List<IPJob> jobs = new ArrayList<IPJob>();
 		
 		for (Map.Entry<RangeSet, AttributeManager> entry : eMgr.getEntrySet()) {
-			IAttribute[] attrs = entry.getValue().getAttributes();
+			AttributeManager attrs = entry.getValue();
 			RangeSet jobIds = entry.getKey();
 			changed = false;
 			
@@ -145,7 +145,7 @@ public abstract class AbstractRuntimeResourceManager extends
 			}
 			
 			if (changed) {
-				fireJobsChanged(jobs, Arrays.asList(attrs));
+				fireJobsChanged(jobs, Arrays.asList(attrs.getAttributes()));
 			}
 			
 			jobs.clear();
@@ -162,7 +162,7 @@ public abstract class AbstractRuntimeResourceManager extends
 		List<IPMachine> macs = new ArrayList<IPMachine>();
 		
 		for (Map.Entry<RangeSet, AttributeManager> entry : eMgr.getEntrySet()) {
-			IAttribute[] attrs = entry.getValue().getAttributes();
+			AttributeManager attrs = entry.getValue();
 			RangeSet machineIds = entry.getKey();
 			changed = false;
 			
@@ -210,7 +210,7 @@ public abstract class AbstractRuntimeResourceManager extends
 			for (int id : jobIds) {
 				IPJobControl job = getJobControl(id);
 				if (job == null) {
-					job = doCreateJob(queue, id, jobAttrs.getAttributes());
+					job = doCreateJob(queue, id, jobAttrs);
 					jobs.add(job);
 					addJob(id, job);
 					changed = true;
@@ -248,7 +248,7 @@ public abstract class AbstractRuntimeResourceManager extends
 		List<IPMachine> machines = new ArrayList<IPMachine>();
 		
 		for (Map.Entry<RangeSet, AttributeManager> entry : mgr.getEntrySet()) {
-			IAttribute[] attrs = entry.getValue().getAttributes();
+			AttributeManager attrs = entry.getValue();
 			RangeSet machineIds = entry.getKey();
 			changed = false;
 
@@ -283,7 +283,7 @@ public abstract class AbstractRuntimeResourceManager extends
 			List<IPNode> nodes = new ArrayList<IPNode>();
 			
 			for (Map.Entry<RangeSet, AttributeManager> entry : mgr.getEntrySet()) {
-				IAttribute[] attrs = entry.getValue().getAttributes();
+				AttributeManager attrs = entry.getValue();
 				RangeSet nodeIds = entry.getKey();
 				changed = false;
 	
@@ -319,7 +319,7 @@ public abstract class AbstractRuntimeResourceManager extends
 			List<IPProcess> procs = new ArrayList<IPProcess>();
 			
 			for (Map.Entry<RangeSet, AttributeManager> entry : mgr.getEntrySet()) {
-				IAttribute[] attrs = entry.getValue().getAttributes();
+				AttributeManager attrs = entry.getValue();
 				RangeSet processIds = entry.getKey();
 				changed = false;
 	
@@ -354,7 +354,7 @@ public abstract class AbstractRuntimeResourceManager extends
 		List<IPQueue> queues = new ArrayList<IPQueue>();
 		
 		for (Map.Entry<RangeSet, AttributeManager> entry : mgr.getEntrySet()) {
-			IAttribute[] attrs = entry.getValue().getAttributes();
+			AttributeManager attrs = entry.getValue();
 			RangeSet queueIds = entry.getKey();
 			changed = false;
 
@@ -386,7 +386,7 @@ public abstract class AbstractRuntimeResourceManager extends
 		List<IPNode> changedNodes = new ArrayList<IPNode>();
 
 		for (Map.Entry<RangeSet, AttributeManager> entry : eMgr.getEntrySet()) {
-			IAttribute[] attrs = entry.getValue().getAttributes();
+			AttributeManager attrs = entry.getValue();
 			RangeSet nodeIds = entry.getKey();
 			changed = false;
 			
@@ -421,7 +421,7 @@ public abstract class AbstractRuntimeResourceManager extends
 		List<IPProcess> procs = new ArrayList<IPProcess>();
 		
 		for (Map.Entry<RangeSet, AttributeManager> entry : eMgr.getEntrySet()) {
-			IAttribute[] attrs = entry.getValue().getAttributes();
+			AttributeManager attrs = entry.getValue();
 			RangeSet processIds = entry.getKey();
 			changed = false;
 			
@@ -456,7 +456,7 @@ public abstract class AbstractRuntimeResourceManager extends
 		List<IPQueue> queues = new ArrayList<IPQueue>();
 		
 		for (Map.Entry<RangeSet, AttributeManager> entry : eMgr.getEntrySet()) {
-			IAttribute[] attrs = entry.getValue().getAttributes();
+			AttributeManager attrs = entry.getValue();
 			RangeSet queueIds = entry.getKey();
 			changed = false;
 			
@@ -558,7 +558,7 @@ public abstract class AbstractRuntimeResourceManager extends
 	 * @param jobId
 	 * @return
 	 */
-	abstract protected IPJobControl doCreateJob(IPQueueControl queue, int jobId, IAttribute[] attrs);
+	abstract protected IPJobControl doCreateJob(IPQueueControl queue, int jobId, AttributeManager attrs);
 	
 	/**
 	 * Template pattern method to actually create the machine.
@@ -566,7 +566,7 @@ public abstract class AbstractRuntimeResourceManager extends
 	 * @param machineId
 	 * @return
 	 */
-	abstract protected IPMachineControl doCreateMachine(int machineId, IAttribute[] attrs);
+	abstract protected IPMachineControl doCreateMachine(int machineId, AttributeManager attrs);
 
 	/**
 	 * Template pattern method to actually create the node.
@@ -575,7 +575,7 @@ public abstract class AbstractRuntimeResourceManager extends
 	 * @param nodeId
 	 * @return
 	 */
-	abstract protected IPNodeControl doCreateNode(IPMachineControl machine, int nodeId, IAttribute[] attrs);
+	abstract protected IPNodeControl doCreateNode(IPMachineControl machine, int nodeId, AttributeManager attrs);
 
 	/**
 	 * Template pattern method to actually create the process.
@@ -584,7 +584,7 @@ public abstract class AbstractRuntimeResourceManager extends
 	 * @param processId
 	 * @return
 	 */
-	abstract protected IPProcessControl doCreateProcess(IPJobControl job, int processId, IAttribute[] attrs);
+	abstract protected IPProcessControl doCreateProcess(IPJobControl job, int processId, AttributeManager attrs);
 
 	/**
 	 * Template pattern method to actually create the queue.
@@ -592,7 +592,7 @@ public abstract class AbstractRuntimeResourceManager extends
 	 * @param queueId
 	 * @return
 	 */
-	abstract protected IPQueueControl doCreateQueue(int queueId, IAttribute[] attrs);
+	abstract protected IPQueueControl doCreateQueue(int queueId, AttributeManager attrs);
 
 	/**
 	 * create a new runtime system
@@ -739,7 +739,7 @@ public abstract class AbstractRuntimeResourceManager extends
 	 * @param attrs
 	 * @return changes were made
 	 */
-	abstract protected boolean doUpdateJob(IPJobControl job, IAttribute[] attrs);
+	abstract protected boolean doUpdateJob(IPJobControl job, AttributeManager attrs);
 
 	/**
 	 * Template pattern method to actually update the machine.
@@ -748,7 +748,7 @@ public abstract class AbstractRuntimeResourceManager extends
 	 * @param attrs
 	 * @return changes were made
 	 */
-	abstract protected boolean doUpdateMachine(IPMachineControl machine, IAttribute[] attrs);
+	abstract protected boolean doUpdateMachine(IPMachineControl machine, AttributeManager attrs);
 
 	/**
 	 * Template pattern method to actually update the node.
@@ -757,7 +757,7 @@ public abstract class AbstractRuntimeResourceManager extends
 	 * @param attrs
 	 * @return changes were made
 	 */
-	protected abstract boolean doUpdateNode(IPNodeControl node, IAttribute[] attrs);
+	protected abstract boolean doUpdateNode(IPNodeControl node, AttributeManager attrs);
 
 	/**
 	 * Template pattern method to actually update the process.
@@ -766,7 +766,7 @@ public abstract class AbstractRuntimeResourceManager extends
 	 * @param attrs
 	 * @return changes were made
 	 */
-	protected abstract boolean doUpdateProcess(IPProcessControl node, IAttribute[] attrs);
+	protected abstract boolean doUpdateProcess(IPProcessControl node, AttributeManager attrs);
 
 	/**
 	 * Template pattern method to actually update the queue.
@@ -775,7 +775,7 @@ public abstract class AbstractRuntimeResourceManager extends
 	 * @param attrs
 	 * @return changes were made
 	 */
-	protected abstract boolean doUpdateQueue(IPQueueControl queue, IAttribute[] attrs);
+	protected abstract boolean doUpdateQueue(IPQueueControl queue, AttributeManager attrs);
 
 	/**
 	 * @return the runtimeSystem

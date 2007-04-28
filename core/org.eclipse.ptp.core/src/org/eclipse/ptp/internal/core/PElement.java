@@ -18,22 +18,22 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.core;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.runtime.PlatformObject;
-import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
+import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.elementcontrols.IPElementControl;
+import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
 import org.eclipse.search.ui.ISearchPageScoreComputer;
 
 public abstract class PElement extends PlatformObject implements IPElementControl, Comparable {
 
 	private PElementInfo elementInfo = null;
 
-	protected Map<String, IAttribute> attributeValues = new HashMap<String, IAttribute>();
+	protected AttributeManager attributeValues = new AttributeManager();
 	protected int elementId = -1;
 	protected IPElementControl elementParent;
 
@@ -43,10 +43,7 @@ public abstract class PElement extends PlatformObject implements IPElementContro
 		elementId = id;
 		elementType = type;
 		elementParent = parent;
-		for (IAttribute attr : attrs) {
-			final IAttributeDefinition attrDef = attr.getDefinition();
-			setAttribute(attrDef.getId(), attr);
-		}
+		setAttributes(attrs);
 	}
 
 	public int compareTo(Object obj) {
@@ -78,23 +75,23 @@ public abstract class PElement extends PlatformObject implements IPElementContro
 	 * @see org.eclipse.ptp.core.IPElement#getAttribute(org.eclipse.ptp.core.attributes.IAttributeDefinition)
 	 */
 	public IAttribute getAttribute(IAttributeDefinition attrDef) {
-		return getAttribute(attrDef.getId());
+		return attributeValues.getAttribute(attrDef);
 	}
 
 	public IAttribute getAttribute(String attrId) {
-		return attributeValues.get(attrId);
+		return attributeValues.getAttribute(attrId);
 	}
 	
 	public Set<Map.Entry<String, IAttribute>> getAttributeEntrySet() {
-		return attributeValues.entrySet();
+		return attributeValues.getEntrySet();
 	}
 	
 	public String[] getAttributeKeys() {
-		return attributeValues.keySet().toArray(new String[0]);
+		return attributeValues.getKeySet().toArray(new String[0]);
 	}
 	
 	public String getName() {
-		IAttribute attr = (IAttribute) attributeValues.get(AttributeDefinitionManager.getNameAttributeDefinition().getId());
+		IAttribute attr = (IAttribute) attributeValues.getAttribute(ElementAttributes.getNameAttributeDefinition());
 		if (attr != null) {
 			return attr.getValueAsString();
 		}
@@ -123,10 +120,14 @@ public abstract class PElement extends PlatformObject implements IPElementContro
 		return elementParent;
 	}
 
-	public void setAttribute(String attrId, IAttribute attrib) {
-		attributeValues.put(attrId, attrib);
+	public void setAttribute(IAttribute attrib) {
+		attributeValues.setAttribute(attrib);
 	}
-	
+
+	public void setAttributes(IAttribute[] attribs) {
+		attributeValues.setAttributes(attribs);
+	}
+
 	public int size() {
 		return getElementInfo().size();
 	}

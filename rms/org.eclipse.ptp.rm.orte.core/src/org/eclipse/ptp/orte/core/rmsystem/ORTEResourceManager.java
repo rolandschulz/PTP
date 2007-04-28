@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.orte.core.rmsystem;
 
-import org.eclipse.ptp.core.attributes.IAttribute;
+import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IntegerAttributeDefinition;
 import org.eclipse.ptp.core.elementcontrols.IPJobControl;
 import org.eclipse.ptp.core.elementcontrols.IPMachineControl;
@@ -41,14 +41,6 @@ public class ORTEResourceManager extends AbstractRuntimeResourceManager {
 
 	public ORTEResourceManager(int id, IPUniverseControl universe, IResourceManagerConfiguration config) {
 		super(id, universe, config);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.IResourceManager#getLaunchAttributes(java.lang.String, java.lang.String)
-	 */
-	public IAttribute[] getLaunchAttributes(String queue, IAttribute[] currentAttrs) {
-		// TODO Auto-generated method stub
-		return new IAttribute[0];
 	}
 
 	/**
@@ -87,27 +79,27 @@ public class ORTEResourceManager extends AbstractRuntimeResourceManager {
 	}
 
 	@Override
-	protected IPJobControl doCreateJob(IPQueueControl queue, int jobId, IAttribute[] attrs) {
+	protected IPJobControl doCreateJob(IPQueueControl queue, int jobId, AttributeManager attrs) {
 		return newJob(queue, jobId, attrs);
 	}
 
 	@Override
-	protected IPMachineControl doCreateMachine(int machineId, IAttribute[] attrs) {
+	protected IPMachineControl doCreateMachine(int machineId, AttributeManager attrs) {
 		return newMachine(machineId, attrs);
 	}
 
 	@Override
-	protected IPNodeControl doCreateNode(IPMachineControl machine, int nodeId, IAttribute[] attrs) {
+	protected IPNodeControl doCreateNode(IPMachineControl machine, int nodeId, AttributeManager attrs) {
 		return newNode(machine, nodeId, attrs);
 	}
 
 	@Override
-	protected IPProcessControl doCreateProcess(IPJobControl job, int processId, IAttribute[] attrs) {
+	protected IPProcessControl doCreateProcess(IPJobControl job, int processId, AttributeManager attrs) {
 		return newProcess(job, processId, attrs);
 	}
 
 	@Override
-	protected IPQueueControl doCreateQueue(int queueId, IAttribute[] attrs) {
+	protected IPQueueControl doCreateQueue(int queueId, AttributeManager attrs) {
 		return newQueue(queueId, attrs);
 	}
 
@@ -123,27 +115,27 @@ public class ORTEResourceManager extends AbstractRuntimeResourceManager {
 	}
 
 	@Override
-	protected boolean doUpdateJob(IPJobControl job, IAttribute[] attrs) {
+	protected boolean doUpdateJob(IPJobControl job, AttributeManager attrs) {
 		return updateJob(job, attrs);
 	}
 
 	@Override
-	protected boolean doUpdateMachine(IPMachineControl machine, IAttribute[] attrs) {
+	protected boolean doUpdateMachine(IPMachineControl machine, AttributeManager attrs) {
 		return updateMachine(machine, attrs);
 	}
 
 	@Override
-	protected boolean doUpdateNode(IPNodeControl node, IAttribute[] attrs) {
+	protected boolean doUpdateNode(IPNodeControl node, AttributeManager attrs) {
 		return updateNode(node, attrs);
 	}
 
 	@Override
-	protected boolean doUpdateProcess(IPProcessControl process, IAttribute[] attrs) {
+	protected boolean doUpdateProcess(IPProcessControl process, AttributeManager attrs) {
 		return updateProcess(process, attrs);
 	}
 
 	@Override
-	protected boolean doUpdateQueue(IPQueueControl queue, IAttribute[] attrs) {
+	protected boolean doUpdateQueue(IPQueueControl queue, AttributeManager attrs) {
 		return updateQueue(queue, attrs);
 	}
 }

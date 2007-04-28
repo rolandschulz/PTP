@@ -13,6 +13,7 @@ package org.eclipse.ptp.core.attributes;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * An attribute manager is responsible for managing a set of attribute definition ID's and
@@ -66,6 +67,14 @@ public class AttributeManager {
 
 	public IAttribute[] getAttributes() {
 		return map.values().toArray(new IAttribute[map.size()]);
+	}
+	
+	public Set<Map.Entry<String, IAttribute>> getEntrySet() {
+		return map.entrySet();
+	}
+	
+	public Set<String> getKeySet() {
+		return map.keySet();
 	}
 	
 	public String[] toStringArray() {

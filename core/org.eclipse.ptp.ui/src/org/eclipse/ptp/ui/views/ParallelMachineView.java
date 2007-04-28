@@ -337,7 +337,7 @@ public class ParallelMachineView extends AbstractParallelSetView implements INod
 			return;
 		}
 		for (Map.Entry<String, IAttribute> entry : node.getAttributeEntrySet()) {
-			String key = entry.getKey();
+			String key = entry.getValue().getDefinition().getName();
 			String value = entry.getValue().getValueAsString();
 			new TableItem(BLtable, SWT.NULL).setText(new String[] { key, value });
 		}

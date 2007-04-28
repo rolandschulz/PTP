@@ -14,6 +14,7 @@ import org.eclipse.ptp.core.attributes.IEnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.IIntegerAttribute;
 import org.eclipse.ptp.core.attributes.IStringAttribute;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
+import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.MachineAttributes;
 import org.eclipse.ptp.core.elements.attributes.NodeAttributes;
@@ -273,7 +274,7 @@ public class ORTERuntimeSystemTest implements IRuntimeEventListener {
 		for (Map.Entry<RangeSet, AttributeManager> entry : e.getElementAttributeManager().getEntrySet()) {
 			AttributeManager mgr = entry.getValue();
 			for (int id : entry.getKey()) {
-				IStringAttribute attr = (IStringAttribute) mgr.getAttribute(AttributeDefinitionManager.getNameAttributeDefinition());
+				IStringAttribute attr = (IStringAttribute) mgr.getAttribute(ElementAttributes.getNameAttributeDefinition());
 				if (attr != null) {
 					queueId = id;
 					queueName = attr.getValueAsString();
