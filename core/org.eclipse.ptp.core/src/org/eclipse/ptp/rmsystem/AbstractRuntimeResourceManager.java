@@ -705,7 +705,7 @@ public abstract class AbstractRuntimeResourceManager extends
 			
 			runtimeSystem.submitJob(jobSubId, attrMgr);
 			
-			while (!monitor.isCanceled() && newJob != null) {
+			while (!monitor.isCanceled() && newJob == null) {
 				try {
 					jobSubmissionCondition.await(500, TimeUnit.MILLISECONDS);
 				} catch (InterruptedException e) {
