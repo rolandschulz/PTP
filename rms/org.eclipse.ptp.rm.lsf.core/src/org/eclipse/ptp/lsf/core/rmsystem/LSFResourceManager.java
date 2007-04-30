@@ -41,13 +41,15 @@ import org.eclipse.ptp.rtsystem.IRuntimeSystem;
  *
  */
 public class LSFResourceManager extends AbstractRuntimeResourceManager {
-
+	private Integer LSFRMID;
+	
 	/**
 	 * @param universe
 	 * @param config
 	 */
-	public LSFResourceManager(int id, IPUniverseControl universe, LSFResourceManagerConfiguration config) {
-		super(id, universe, config);
+	public LSFResourceManager(Integer id, IPUniverseControl universe, LSFResourceManagerConfiguration config) {
+		super(id.toString(), universe, config);
+		LSFRMID = id;
 	}
 
 	/* (non-Javadoc)
@@ -81,27 +83,27 @@ public class LSFResourceManager extends AbstractRuntimeResourceManager {
 	}
 
 	@Override
-	protected IPJobControl doCreateJob(IPQueueControl queue, int jobId, AttributeManager attrs) {
+	protected IPJobControl doCreateJob(IPQueueControl queue, String jobId, AttributeManager attrs) {
 		return newJob(queue, jobId, attrs);
 	}
 
 	@Override
-	protected IPMachineControl doCreateMachine(int machineId, AttributeManager attrs) {
+	protected IPMachineControl doCreateMachine(String machineId, AttributeManager attrs) {
 		return newMachine(machineId, attrs);
 	}
 
 	@Override
-	protected IPNodeControl doCreateNode(IPMachineControl machine, int nodeId, AttributeManager attrs) {
+	protected IPNodeControl doCreateNode(IPMachineControl machine, String nodeId, AttributeManager attrs) {
 		return newNode(machine, nodeId, attrs);
 	}
 
 	@Override
-	protected IPProcessControl doCreateProcess(IPJobControl job, int processId, AttributeManager attrs) {
+	protected IPProcessControl doCreateProcess(IPJobControl job, String processId, AttributeManager attrs) {
 		return newProcess(job, processId, attrs);
 	}
 
 	@Override
-	protected IPQueueControl doCreateQueue(int queueId, AttributeManager attrs) {
+	protected IPQueueControl doCreateQueue(String queueId, AttributeManager attrs) {
 		return newQueue(queueId, attrs);
 	}
 
@@ -134,10 +136,9 @@ public class LSFResourceManager extends AbstractRuntimeResourceManager {
 	protected IRuntimeSystem doCreateRuntimeSystem() throws CoreException {
 		LSFResourceManagerConfiguration config = (LSFResourceManagerConfiguration) getConfiguration();
 		String serverFile = config.getServerFile();
-		int	rmId = getID();
 		boolean launchManually = config.isLaunchManually();
 		/* load up the control and monitoring systems for OMPI */
-		LSFProxyRuntimeClient runtimeProxy = new LSFProxyRuntimeClient(serverFile, rmId, launchManually);
+		LSFProxyRuntimeClient runtimeProxy = new LSFProxyRuntimeClient(serverFile, LSFRMID, launchManually);
 		return new LSFRuntimeSystem(runtimeProxy, getAttributeDefinitionManager());
 	}
 

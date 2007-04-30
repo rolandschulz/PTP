@@ -34,8 +34,11 @@ import org.eclipse.ptp.rtsystem.IRuntimeSystem;
 
 public class ORTEResourceManager extends AbstractRuntimeResourceManager {
 
-	public ORTEResourceManager(int id, IPUniverseControl universe, IResourceManagerConfiguration config) {
-		super(id, universe, config);
+	private Integer ORTERMID;
+	
+	public ORTEResourceManager(Integer id, IPUniverseControl universe, IResourceManagerConfiguration config) {
+		super(id.toString(), universe, config);
+		ORTERMID = id;
 		getAttributeDefinitionManager().setAttributeDefinitions(ORTEAttributes.getDefaultAttributeDefinitions());
 	}
 
@@ -64,27 +67,27 @@ public class ORTEResourceManager extends AbstractRuntimeResourceManager {
 	}
 
 	@Override
-	protected IPJobControl doCreateJob(IPQueueControl queue, int jobId, AttributeManager attrs) {
+	protected IPJobControl doCreateJob(IPQueueControl queue, String jobId, AttributeManager attrs) {
 		return newJob(queue, jobId, attrs);
 	}
 
 	@Override
-	protected IPMachineControl doCreateMachine(int machineId, AttributeManager attrs) {
+	protected IPMachineControl doCreateMachine(String machineId, AttributeManager attrs) {
 		return newMachine(machineId, attrs);
 	}
 
 	@Override
-	protected IPNodeControl doCreateNode(IPMachineControl machine, int nodeId, AttributeManager attrs) {
+	protected IPNodeControl doCreateNode(IPMachineControl machine, String nodeId, AttributeManager attrs) {
 		return newNode(machine, nodeId, attrs);
 	}
 
 	@Override
-	protected IPProcessControl doCreateProcess(IPJobControl job, int processId, AttributeManager attrs) {
+	protected IPProcessControl doCreateProcess(IPJobControl job, String processId, AttributeManager attrs) {
 		return newProcess(job, processId, attrs);
 	}
 
 	@Override
-	protected IPQueueControl doCreateQueue(int queueId, AttributeManager attrs) {
+	protected IPQueueControl doCreateQueue(String queueId, AttributeManager attrs) {
 		return newQueue(queueId, attrs);
 	}
 
@@ -92,10 +95,9 @@ public class ORTEResourceManager extends AbstractRuntimeResourceManager {
 	protected IRuntimeSystem doCreateRuntimeSystem() {
 		ORTEResourceManagerConfiguration config = (ORTEResourceManagerConfiguration) getConfiguration();
 		String serverFile = config.getOrteServerFile();
-		int	rmId = getID();
 		boolean launchManually = config.isLaunchManually();
 		/* load up the control and monitoring systems for OMPI */
-		ORTEProxyRuntimeClient runtimeProxy = new ORTEProxyRuntimeClient(serverFile, rmId, launchManually);
+		ORTEProxyRuntimeClient runtimeProxy = new ORTEProxyRuntimeClient(serverFile, ORTERMID, launchManually);
 		return new ORTERuntimeSystem(runtimeProxy, getAttributeDefinitionManager());
 	}
 
