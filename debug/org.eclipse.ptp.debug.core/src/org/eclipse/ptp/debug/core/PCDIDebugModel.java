@@ -69,7 +69,7 @@ public class PCDIDebugModel {
 			IPSession pSession = (IPSession)i.next();
 			if (pSession != null) {
 				IPJob job = pSession.getJob();
-				if(!job.isAllStop()) {
+				if(!job.isTerminated()) {
 					job.removeAllProcesses();
 					pSession.getPCDISession().shutdown();
 					try {
@@ -86,7 +86,7 @@ public class PCDIDebugModel {
 	}
 	public void shutdownSession(IPJob job) {
 		if (job != null) {
-			IPSession pSession = (IPSession)sessionStorage.removeValue(job.getIDString(), SESSION_KEY);
+			IPSession pSession = (IPSession)sessionStorage.removeValue(job.getID(), SESSION_KEY);
 			if (pSession != null) {
 				pSession.getPCDISession().shutdown();
 			}
@@ -103,7 +103,7 @@ public class PCDIDebugModel {
 		IPSession pSession = new PSession(debugger.createDebuggerSession(launch, exe, timeout, monitor));
 		if (!monitor.isCanceled()) {
 			IPJob job = launch.getPJob();
-			sessionStorage.addValue(job.getIDString(), SESSION_KEY, pSession);
+			sessionStorage.addValue(job.getID(), SESSION_KEY, pSession);
 			
 			newJob(job, pSession.getPCDISession().createBitList());
 			fireSessionEvent(job, pSession.getPCDISession());
@@ -120,7 +120,7 @@ public class PCDIDebugModel {
 	}
 	public void fireRegisterEvent(IPJob job, BitList tasks, boolean refresh) {
 		if (!tasks.isEmpty()) {
-			IPCDISession session = getPCDISession(job.getIDString());
+			IPCDISession session = getPCDISession(job.getID());
 			if (session != null) {
 				IPDebugInfo info = new PDebugRegisterInfo(job, tasks, tasks, null, refresh);
 				PTPDebugCorePlugin.getDefault().fireDebugEvent(new PDebugEvent(session, IPDebugEvent.CREATE, IPDebugEvent.REGISTER, info));
@@ -129,7 +129,7 @@ public class PCDIDebugModel {
 	}
 	public void fireUnregisterEvent(IPJob job, BitList tasks, boolean refresh) {
 		if (!tasks.isEmpty()) {
-			IPCDISession session = getPCDISession(job.getIDString());
+			IPCDISession session = getPCDISession(job.getID());
 			if (session != null) {
 				IPDebugInfo info = new PDebugRegisterInfo(job, tasks, null, tasks, refresh);
 				PTPDebugCorePlugin.getDefault().fireDebugEvent(new PDebugEvent(session, IPDebugEvent.TERMINATE, IPDebugEvent.REGISTER, info));
@@ -325,7 +325,7 @@ public class PCDIDebugModel {
 	 * Debug Job
 	 **************************************************/	
 	public void newJob(IPJob job, BitList rootTasks) {
-		createSet(job.getIDString(), PreferenceConstants.SET_ROOT_ID, rootTasks);
+		createSet(job.getID(), PreferenceConstants.SET_ROOT_ID, rootTasks);
 	}
 	public void createSet(String job_id, String set_id, BitList tasks) {
 		jobStorage.addValue(job_id, set_id, tasks);
@@ -346,6 +346,6 @@ public class PCDIDebugModel {
 		return null;
 	}
 	public void deleteJob(IPJob job) {
-		jobStorage.removeJobStorage(job.getIDString());
+		jobStorage.removeJobStorage(job.getID());
 	}
 }

@@ -190,7 +190,7 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 			postStopDebugger();
 			break;
 		case IPCDIErrorEvent.DBG_WARNING:
-			if (!session.getJob().isAllStop()) {
+			if (!session.getJob().isTerminated()) {
 				setJobFinished(tasks, ProcessAttributes.State.ERROR);
 				postCommand(new TerminateCommand(tasks));
 			}
@@ -237,7 +237,7 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 	}
 	protected void setProcessStatus(int[] tasks, ProcessAttributes.State state) {
 		for (int i = 0; i < tasks.length; i++) {
-			getProcess(tasks[i]).setStatus(state);
+			getProcess(tasks[i]).setState(state);
 		}
 	}
 	public synchronized BitList getSuspendedProc() {

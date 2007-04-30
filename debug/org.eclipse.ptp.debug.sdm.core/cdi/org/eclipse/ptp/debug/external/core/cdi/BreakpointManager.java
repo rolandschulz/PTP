@@ -187,7 +187,7 @@ public class BreakpointManager extends SessionObject implements IPCDIBreakpointM
 		postBreakpointCommand(tasks, cdiBpt, bpt, ignoreCheck);
 	}
 	public void setInitialBreakpoints() throws CoreException {
-		String job_id = ((Session) getSession()).getJob().getIDString();
+		String job_id = ((Session) getSession()).getJob().getID();
 		IPBreakpoint[] bpts = PTPDebugCorePlugin.getDebugModel().findPBreakpoints(job_id, true);
 		for (int i = 0; i < bpts.length; i++) {
 			setBreakpoint(job_id, bpts[i], true);
@@ -331,7 +331,7 @@ public class BreakpointManager extends SessionObject implements IPCDIBreakpointM
 		synchronized (breakMap) {
 			for (int i=0; i<breakpoints.length; ++i) {
 				if (breakpoints[i] instanceof IPBreakpoint) {
-					String job_id = getSession().getJob().getIDString();
+					String job_id = getSession().getJob().getID();
 					try {
 						String bp_job_id = ((IPBreakpoint)breakpoints[i]).getJobId(); 
 						if (bp_job_id.equals(job_id) || bp_job_id.equals(IPBreakpoint.GLOBAL)) {
@@ -355,7 +355,7 @@ public class BreakpointManager extends SessionObject implements IPCDIBreakpointM
 			for (int i=0; i<breakpoints.length; ++i) {
 				if (breakpoints[i] instanceof IPBreakpoint) {
 					IPBreakpoint breakpoint = (IPBreakpoint)breakpoints[i];
-					String job_id = getSession().getJob().getIDString();
+					String job_id = getSession().getJob().getID();
 					try {
 						String bp_job_id = ((IPBreakpoint)breakpoints[i]).getJobId(); 
 						if (bp_job_id.equals(job_id) || bp_job_id.equals(IPBreakpoint.GLOBAL)) {
@@ -402,7 +402,7 @@ public class BreakpointManager extends SessionObject implements IPCDIBreakpointM
 		synchronized (breakMap) {
 			for (int i=0; i<breakpoints.length; ++i) {
 				if (breakpoints[i] instanceof IPBreakpoint) {
-					String job_id = getSession().getJob().getIDString();
+					String job_id = getSession().getJob().getID();
 					try {
 						String bp_job_id = ((IPBreakpoint)breakpoints[i]).getJobId(); 
 						if (bp_job_id.equals(job_id) || bp_job_id.equals(IPBreakpoint.GLOBAL)) {
