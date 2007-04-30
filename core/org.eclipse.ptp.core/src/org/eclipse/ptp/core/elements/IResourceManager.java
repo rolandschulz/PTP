@@ -16,20 +16,16 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.rmsystem;
+package org.eclipse.ptp.core.elements;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.core.attributes.AttributeManager;
-import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
-import org.eclipse.ptp.core.elements.IPElement;
-import org.eclipse.ptp.core.elements.IPJob;
-import org.eclipse.ptp.core.elements.IPMachine;
-import org.eclipse.ptp.core.elements.IPProcess;
-import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
+import org.eclipse.ptp.rmsystem.IResourceManagerListener;
+import org.eclipse.ptp.rmsystem.IResourceManagerMenuContribution;
 
 public interface IResourceManager extends IPElement,
 IAdaptable, IResourceManagerMenuContribution {
@@ -40,34 +36,23 @@ IAdaptable, IResourceManagerMenuContribution {
 	public void addResourceManagerListener(IResourceManagerListener listener);
 	
 	/**
-	 * @param job_id
-	 * @return
-	 */
-	public IPJob findJobById(String job_id);
-	
-	/**
-	 * @return
-	 */
-	public String getDescription();
-
-	/**
 	 * 
 	 * @param attrId
 	 * @return
 	 */
 	public IAttributeDefinition getAttributeDefinition(String attrId);
+
+	/**
+	 * @return
+	 */
+	public String getDescription();
 	
 	/**
-	 * @param ID
+	 * @param id
 	 * @return
 	 */
-	public IPMachine getMachine(int ID);
-
-	/**
-	 * @return
-	 */
-	public IPJob[] getJobs();
-
+	public IPMachine getMachineById(String id);
+	
 	/**
 	 * @return
 	 */
@@ -76,12 +61,19 @@ IAdaptable, IResourceManagerMenuContribution {
 	/**
 	 * @return
 	 */
-	public IPProcess[] getProcesses();
+	public String getName();
 
 	/**
-	 * @return
+	 * @param id
+	 * @return IPQueue
 	 */
-	public String getName();
+	public IPQueue getQueueById(String id);
+
+	/**
+	 * @param name
+	 * @return IPQueue
+	 */
+	public IPQueue getQueueByName(String name);
 
 	/**
 	 * @return
@@ -92,25 +84,11 @@ IAdaptable, IResourceManagerMenuContribution {
 	 * @return
 	 */
 	public ResourceManagerAttributes.State getState();
-
-	/**
-	 * @param job
-	 */
-	public void removeJob(IPJob job);
 	
 	/**
 	 * @param listener
 	 */
 	public void removeResourceManagerListener(IResourceManagerListener listener);
-	
-	/**
-	 * @param attrMgr
-	 * @param pm
-	 * @return IPJob
-	 * @throws CoreException
-	 */
-	public IPJob submitJob(AttributeManager attrMgr, IProgressMonitor pm) 
-		throws CoreException;
 
 	/**
 	 * 
@@ -124,13 +102,16 @@ IAdaptable, IResourceManagerMenuContribution {
 	public void startUp(IProgressMonitor monitor) throws CoreException;
 
 	/**
+	 * @param attrMgr
+	 * @param pm
+	 * @return IPJob
+	 * @throws CoreException
+	 */
+	public IPJob submitJob(AttributeManager attrMgr, IProgressMonitor pm) 
+		throws CoreException;
+	
+	/**
 	 * @param job
 	 */
 	public void terminateJob(IPJob job) throws CoreException;
-	
-	/**
-	 * @param name
-	 * @return IPQueue
-	 */
-	public IPQueue getQueue(String name);
 }

@@ -16,7 +16,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.rmsystem.events;
 
-import org.eclipse.ptp.rmsystem.IResourceManager;
+import org.eclipse.ptp.core.elements.IResourceManager;
 
 public class ResourceManagerErrorEvent implements IResourceManagerErrorEvent {
 
