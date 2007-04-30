@@ -55,9 +55,9 @@ public class DeletePExpressionAction extends Action {
 			IStructuredSelection structSelection = (IStructuredSelection)selection;
 			for (Iterator i=structSelection.iterator(); i.hasNext();) {
 				JobVariable jVar = (JobVariable)i.next();
-				view.getUIManager().getJobVariableManager().removeJobVariable(jVar.getJob().getIDString(), jVar.getVar());		
+				view.getUIManager().getJobVariableManager().removeJobVariable(jVar.getJob().getID(), jVar.getVar());		
 				view.refresh();
-				if (jVar.getJob().getIDString().equals(view.getUIManager().getCurrentJobId())) {
+				if (jVar.getJob().getID().equals(view.getUIManager().getCurrentJobId())) {
 					view.getUIManager().cleanVariableValue(null);
 				}
 			}

@@ -885,17 +885,17 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 			case IPDebugEvent.CREATE:
 				switch (event.getDetail()) {
 				case IPDebugEvent.REGISTER:
-					register(job.getIDString(), info.getAllRegisteredProcesses());
+					register(job.getID(), info.getAllRegisteredProcesses());
 					break;
 				}
 				break;
 			case IPDebugEvent.TERMINATE:
 				switch (event.getDetail()) {
 				case IPDebugEvent.DEBUGGER:
-					removeAnnotationGroup(job.getIDString());
+					removeAnnotationGroup(job.getID());
 					break;
 				case IPDebugEvent.REGISTER:
-					unregister(job.getIDString(), info.getAllUnregisteredProcesses());
+					unregister(job.getID(), info.getAllUnregisteredProcesses());
 					break;
 				default:
 					removeAnnotationAction(job, info.getAllProcesses());
@@ -908,7 +908,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 			case IPDebugEvent.SUSPEND:
 				IPDebugSuspendInfo susInfo = (IPDebugSuspendInfo)info; 
 				try {
-					addAnnotation(job.getIDString(), susInfo.getFilename(), susInfo.getLineNumber(), info.getAllUnregisteredProcesses(), info.getAllRegisteredProcesses());
+					addAnnotation(job.getID(), susInfo.getFilename(), susInfo.getLineNumber(), info.getAllUnregisteredProcesses(), info.getAllRegisteredProcesses());
 				} catch (final CoreException e) {
 					PTPDebugUIPlugin.getDisplay().asyncExec(new Runnable() {
 						public void run() {
@@ -926,7 +926,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 	}	
 	private void removeAnnotationAction(IPJob job, BitList tasks) {
 		try {
-			removeAnnotation(job.getIDString(), tasks);
+			removeAnnotation(job.getID(), tasks);
 		} catch (final CoreException e) {
 			PTPDebugUIPlugin.getDisplay().asyncExec(new Runnable() {
 				public void run() {
