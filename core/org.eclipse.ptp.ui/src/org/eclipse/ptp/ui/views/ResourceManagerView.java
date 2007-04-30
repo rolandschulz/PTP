@@ -17,14 +17,15 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPElement;
 import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IPUniverse;
+import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.internal.ui.ParallelImages;
 import org.eclipse.ptp.rmsystem.AbstractResourceManager;
-import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerChangedListener;
 import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
 import org.eclipse.ptp.rmsystem.IResourceManagerListener;
@@ -90,7 +91,7 @@ public class ResourceManagerView extends ViewPart implements
 
 	public class TheContentProvider implements ITreeContentProvider {
 
-		private final HashMap parents = new HashMap();
+		private final HashMap<Object, ChildContainer> parents = new HashMap<Object, ChildContainer>();
 
 		public void dispose() {
 			// no-op
@@ -153,8 +154,8 @@ public class ResourceManagerView extends ViewPart implements
 
 			parents.clear();
 
-			HashSet oldRMs = new HashSet();
-			HashSet newRMs = new HashSet();
+			HashSet<IResourceManager> oldRMs = new HashSet<IResourceManager>();
+			HashSet<IResourceManager> newRMs = new HashSet<IResourceManager>();
 
 			if (oldInput != null) {
 				IResourceManager[] oldManagers = (IResourceManager[]) oldInput;
@@ -168,7 +169,7 @@ public class ResourceManagerView extends ViewPart implements
 
 			// We only want to add/remove listenership to added or removed
 			// resource managers, not unaffected ones.
-			HashSet unaffectedRMs = new HashSet(oldRMs);
+			HashSet<IResourceManager> unaffectedRMs = new HashSet<IResourceManager>(oldRMs);
 			unaffectedRMs.retainAll(newRMs);
 
 			newRMs.removeAll(unaffectedRMs);
@@ -219,9 +220,9 @@ public class ResourceManagerView extends ViewPart implements
 
 		public String getText(Object element) {
 			if (element instanceof IResourceManager) {
-				final IResourceManager resourceManager = (IResourceManager) element;
+				final IResourceManagerControl resourceManager = (IResourceManagerControl) element;
 				final IModelManager modelManager = PTPCorePlugin.getDefault().getModelManager();
-				final String resourceManagerId = resourceManager.getIDString();
+				final String resourceManagerId = resourceManager.getConfiguration().getResourceManagerId();
 				if (resourceManagerId == null)
 					return resourceManager.getName();
 				IResourceManagerFactory factory = modelManager.getResourceManagerFactory(

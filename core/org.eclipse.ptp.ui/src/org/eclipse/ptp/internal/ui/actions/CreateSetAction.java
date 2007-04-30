@@ -55,14 +55,14 @@ public class CreateSetAction extends GotoDropDownAction {
 
 		IElementSet[] sets = setManager.getSortedSets();
 	    	for (int i=1; i<sets.length; i++) {
-	    		addAction(dropDownMenuMgr, sets[i].getID(), sets[i].getID(), curID);
+	    		addAction(dropDownMenuMgr, sets[i].getID(), sets[i].getID(), curID, null);
 	    	}		
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.actions.GotoDropDownAction#addAction(org.eclipse.jface.action.MenuManager, java.lang.String, java.lang.String, java.lang.String)
 	 */
-	protected void addAction(MenuManager dropDownMenuMgr, String e_name, String id, String curID) {
+	protected void addAction(MenuManager dropDownMenuMgr, String e_name, String id, String curID, Object data) {
 		IAction action = new InternalSetAction("Add to set: " + e_name, id, view, this);
 		action.setEnabled(!curID.equals(id));
 		dropDownMenuMgr.add(action);
@@ -72,13 +72,13 @@ public class CreateSetAction extends GotoDropDownAction {
 	 * @see org.eclipse.ptp.ui.actions.ParallelAction#run(org.eclipse.ptp.ui.model.IElement[])
 	 */
 	public void run(IElement[] elements) {
-		run(elements, null);
+		run(elements, null, null);
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.actions.GotoDropDownAction#run(org.eclipse.ptp.ui.model.IElement[], java.lang.String)
 	 */
-	public void run(IElement[] elements, String setID) {
+	public void run(IElement[] elements, String setID, Object data) {
 		if (validation(elements)) {
 			final IElementHandler setManager = view.getCurrentElementHandler();
 			if (setManager == null)
@@ -118,7 +118,7 @@ public class CreateSetAction extends GotoDropDownAction {
 	 */
 	private class InternalSetAction extends GotoAction {
 		public InternalSetAction(String name, String id, AbstractParallelElementView view, GotoDropDownAction action) {
-			super(name, id, view, action);
+			super(name, id, view, action, null);
 		    setImageDescriptor(ParallelImages.ID_ICON_CREATESET_NORMAL);
 		}	
 	}	

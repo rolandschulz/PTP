@@ -52,7 +52,7 @@ public class ChangeSetAction extends GotoDropDownAction {
 	    if (curID == null || curID.length() == 0)
 	    		return;
 	    
-	    addAction(dropDownMenuMgr, IElementHandler.SET_ROOT_ID, IElementHandler.SET_ROOT_ID, curID);
+	    addAction(dropDownMenuMgr, IElementHandler.SET_ROOT_ID, IElementHandler.SET_ROOT_ID, curID, null);
 		IElementHandler setManager = view.getCurrentElementHandler();
 		if (setManager == null)
 			return;
@@ -64,14 +64,14 @@ public class ChangeSetAction extends GotoDropDownAction {
 	    		if (sets[i].getID().equals(IElementHandler.SET_ROOT_ID))
 	    			continue;
 	    		
-	    		addAction(dropDownMenuMgr, sets[i].getID(), sets[i].getID(), curID);
+	    		addAction(dropDownMenuMgr, sets[i].getID(), sets[i].getID(), curID, null);
 	    	}		
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.actions.GotoDropDownAction#addAction(org.eclipse.jface.action.MenuManager, java.lang.String, java.lang.String, java.lang.String)
 	 */
-	protected void addAction(MenuManager dropDownMenuMgr, String e_name, String id, String curID) {
+	protected void addAction(MenuManager dropDownMenuMgr, String e_name, String id, String curID, Object data) {
 		IAction action = new InternalSetAction(e_name, id, view, this);
 		action.setChecked(curID.equals(id));
 		action.setEnabled(true);
@@ -117,7 +117,7 @@ public class ChangeSetAction extends GotoDropDownAction {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.actions.GotoDropDownAction#run(org.eclipse.ptp.ui.model.IElement[], java.lang.String)
 	 */
-	public void run(IElement[] elements, String id) {
+	public void run(IElement[] elements, String id, Object data) {
 		IElementHandler setManager = view.getCurrentElementHandler();
 		if (setManager == null)
 			return;
@@ -131,7 +131,7 @@ public class ChangeSetAction extends GotoDropDownAction {
 	 */
 	private class InternalSetAction extends GotoAction {
 		public InternalSetAction(String name, String id, AbstractParallelElementView view, GotoDropDownAction action) {
-			super(name, id, view, action);
+			super(name, id, view, action, null);
 		}	
 	}
 }

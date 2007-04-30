@@ -178,11 +178,11 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 			}
 			jobLabel.setText("Job: " + jobName);
 			pidLabel.setText("PID: " + process.getPid());
-			statusLabel.setText("Status: " + process.getStatus());
+			statusLabel.setText("Status: " + process.getState());
 			
 			IPNode node = process.getNode();
 			if (node != null) {
-				totalLabel.setText("Total: " + node.getNumProcesses());
+				totalLabel.setText("Total: " + node.getProcesses().length);
 				nodeLabel.setText("Node: " + node.getName());
 			}
 			
@@ -256,7 +256,7 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 			else if (ITextEditorActionConstants.STATUS_CATEGORY_ELEMENT_STATE.equals(category))
 				text = rankLabel.getText();
 			else if (ITextEditorActionConstants.STATUS_CATEGORY_INPUT_MODE.equals(category)) {
-				text = getProcess().getStatus().toString();
+				text = getProcess().getState().toString();
 			}
 			field.setText(text == null ? fErrorLabel : text);
 		}

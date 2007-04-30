@@ -22,14 +22,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
+import org.eclipse.ptp.core.elements.IPElement;
 import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPNode;
-import org.eclipse.ptp.core.elements.IPUniverse;
+import org.eclipse.ptp.core.elements.IPProcess;
+import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.NodeAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.core.elements.attributes.NodeAttributes.ExtraState;
 import org.eclipse.ptp.core.elements.attributes.NodeAttributes.State;
-import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.model.Element;
 import org.eclipse.ptp.ui.model.ElementHandler;
@@ -42,7 +43,7 @@ import org.eclipse.ptp.ui.model.IElementSet;
  */
 public class MachineManager extends AbstractUIManager {
 	private Map<String, IElementHandler> machineList = new HashMap<String, IElementHandler>();
-	protected String cur_machine_id = EMPTY_ID;
+	protected IPMachine cur_machine = null;
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#shutdown()
 	 */
@@ -55,14 +56,7 @@ public class MachineManager extends AbstractUIManager {
 	 * @return true if there is no machine
 	 */
 	public boolean isNoMachine() {
-		return isNoMachine(cur_machine_id);
-	}
-	/** Is no machine
-	 * @param machid machine ID
-	 * @return true if there is no machine 
-	 */
-	public boolean isNoMachine(String machid) {
-		return (machid == null || machid.length() == 0);
+		return cur_machine == null;
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#getElementHandler(java.lang.String)
@@ -88,24 +82,23 @@ public class MachineManager extends AbstractUIManager {
 	 * @return machines
 	 */
 	public IPMachine[] getMachines() {
-		IPUniverse universe = modelPresentation.getUniverse();
-		if (universe == null) {
-			return new IPMachine[0];
+		if (cur_machine != null) {
+			return cur_machine.getResourceManager().getMachines();
 		}
-		return universe.getMachines();
+		return new IPMachine[] {};
 	}
 	
 	/** Get current machine ID
 	 * @return current machine ID
 	 */
-	public String getCurrentMachineId() {
-		return cur_machine_id;
+	public IPMachine getCurrentMachine() {
+		return cur_machine;
 	}
 	/** Set current machine ID
 	 * @param machine_id machine ID
 	 */
-	public void setCurrentMachineId(String machine_id) {
-		cur_machine_id = machine_id;
+	public void setCurrentMachine(IPMachine machine) {
+		cur_machine = machine;
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#getCurrentSetId()
@@ -135,8 +128,8 @@ public class MachineManager extends AbstractUIManager {
 		NodeAttributes.State nodeState = (State) nodeStateAttr.getEnumValue();
 		
 		if (nodeState == State.UP) {
-			if (node.getNumProcesses() > 0) {
-				if (node.isAllStop()) {
+			if (node.getProcesses().length > 0) {
+				if (node.getProcesses()[0].getJob().isTerminated()) {
 					return "Exited";
 				}
 				return "Running";
@@ -153,14 +146,6 @@ public class MachineManager extends AbstractUIManager {
 			}
 		}
 		return nodeState.toString();
-	}
-	/** Get node status text
-	 * @param job_id job ID
-	 * @param proc_id process ID
-	 * @return status
-	 */
-	public String getNodeStatusText(String job_id, String proc_id) {
-		return getNodeStatusText(findNode(job_id, proc_id));
 	}
 	/** Get process status
 	 * @param state
@@ -197,8 +182,9 @@ public class MachineManager extends AbstractUIManager {
 			
 			switch (nodeState) {
 			case UP:
-				if (node.getNumProcesses() > 0) {
-					if (node.isAllStop()) {
+				IPProcess[] procs = node.getProcesses();
+				if (node.getProcesses().length > 0) {
+					if (node.getProcesses()[0].getJob().isTerminated()) {
 						return IPTPUIConstants.NODE_EXITED;
 					}
 					return IPTPUIConstants.NODE_RUNNING;
@@ -229,95 +215,89 @@ public class MachineManager extends AbstractUIManager {
 		}
 		return IPTPUIConstants.NODE_UNKNOWN;
 	}
-	/** Get status 
-	 * @param machine_id Machine ID
-	 * @param node_id node ID
-	 * @return status
-	 */
-	public int getStatus(String machine_id, String node_id) {
-		IPNode node = findNode(machine_id, node_id);
-		return getNodeStatus(node);
-	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#getStatus(java.lang.String)
 	 */
 	public int getStatus(String id) {
-		return getStatus(getCurrentMachineId(), id);
+		IPMachine machine = getCurrentMachine();
+		if (machine != null) {
+			return getNodeStatus(machine.getNodeById(id));
+		}
+		return getNodeStatus(null);
 	}
-	
+
 	/** Find node 
-	 * @param machine_id machine ID
 	 * @param node_id node ID
 	 * @return null is not found
 	 */
-	public IPNode findNode(String machine_id, String node_id) {
-		IPMachine machine = findMachineById(machine_id);
+	public IPNode findNode(String node_id) {
+		IPMachine machine = getCurrentMachine();
 		if (machine == null) {
-			System.out.println("\t*** POSSIBLE ERROR: Unable to find machine defined by ID "+machine_id+")");
+			System.out.println("\t*** POSSIBLE ERROR: Unable to find machine");
 			return null;
 		}
-		return machine.findNode(node_id);
-	}
-	/** find machine by ID
-	 * @param machine_id machine ID
-	 * @return
-	 */
-	public IPMachine findMachineById(String machine_id) {
-		return modelPresentation.getUniverse().findMachineByGlobalId(machine_id);
-	}
+		return machine.getNodeById(node_id);
+	}	
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#getName(java.lang.String)
 	 */
 	public String getName(String id) {
-		IPMachine machine = findMachineById(id);
-		if (machine == null)
+		if (cur_machine == null)
 			return "";
-		return machine.getName();
+		return cur_machine.getName();
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#getFullyQualifiedName(java.lang.String)
 	 */
 	public String getFullyQualifiedName(String id) {
-		IPMachine machine = findMachineById(id);
-		if (machine == null)
-			return "";
-		IResourceManager rm = machine.getResourceManager();
-		return rm.getName() + ": " + machine.getName();
+		//TODO check that this is what should happen. Can we just use cur_machine?
+		IPMachine machine = getCurrentMachine();
+		if (machine != null) {
+			IResourceManager rm = machine.getResourceManager();
+			IPMachine machine2 = rm.getMachineById(id);
+			if (machine2 != null) {
+				return rm.getName() + ": " + machine2.getName();
+			}
+		}
+		return "";
 	}
+	
 	/** Add machine
 	 * @param mac machine
 	 */
 	public void addMachine(IPMachine mac) {
-		if (machineList.containsKey(mac.getIDString()))
+		if (machineList.containsKey(mac.getID()))
 			return;
 
-		IPNode[] pNodes = mac.getSortedNodes();
-		int total_element = pNodes.length;
-		if (total_element > 0) {
-			IElementHandler elementHandler = new ElementHandler();
-			IElementSet set = elementHandler.getSetRoot();
-			for (int i = 0; i < total_element; i++) {
-				set.add(new Element(set, pNodes[i].getIDString(), pNodes[i].getName()));
-			}
-			elementHandler.add(set);
-			machineList.put(mac.getIDString(), elementHandler);
-		}
+		IElementHandler elementHandler = new ElementHandler();
+		machineList.put(mac.getID(), elementHandler);
 	}
+	
+	/** Add machine
+	 * @param mac machine
+	 */
+	public void addNode(IPNode node) {
+		addMachine(node.getMachine());
+		IElementHandler elementHandler = machineList.get(node.getMachine().getID());
+		IElementSet set = elementHandler.getSetRoot();
+		set.add(new Element(set, node.getID(), node.getName()));
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#initial()
 	 */
-	public String initial() {
+	public IPElement initial() {
 		IPMachine[] macs = getMachines();
 		if (macs.length > 0) {
-			cur_machine_id = macs[0].getIDString();
+			cur_machine = macs[0];
 			for (int j = 0; j < macs.length; j++) {
 				addMachine(macs[j]);
 			}
 			setCurrentSetId(IElementHandler.SET_ROOT_ID);
 		}
-		return cur_machine_id;
+		return cur_machine;
 	}
 	/** Is current set contain node
 	 * @param mid machine ID
@@ -325,14 +305,18 @@ public class MachineManager extends AbstractUIManager {
 	 * @return true if current set contains node
 	 */
 	public boolean isCurrentSetContainNode(String mid, String nodeID) {
-		if (!getCurrentMachineId().equals(mid))
-			return false;
-		IElementHandler elementHandler = getElementHandler(getCurrentMachineId());
-		if (elementHandler == null)
-			return false;
-		IElementSet set = elementHandler.getSet(getCurrentSetId());
-		if (set == null)
-			return false;
-		return set.contains(nodeID);
+		IPMachine machine = getCurrentMachine();
+		if (machine != null) {
+			if (!machine.getID().equals(mid))
+				return false;
+			IElementHandler elementHandler = getElementHandler(machine.getID());
+			if (elementHandler == null)
+				return false;
+			IElementSet set = elementHandler.getSet(getCurrentSetId());
+			if (set == null)
+				return false;
+			return set.contains(nodeID);
+		}
+		return false;
 	}
 }

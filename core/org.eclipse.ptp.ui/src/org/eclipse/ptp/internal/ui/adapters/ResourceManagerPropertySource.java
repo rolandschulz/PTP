@@ -25,7 +25,7 @@ import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPQueue;
-import org.eclipse.ptp.rmsystem.IResourceManager;
+import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource;
@@ -39,7 +39,7 @@ public class ResourceManagerPropertySource implements IPropertySource {
 	public ResourceManagerPropertySource(IResourceManager resourceManager) {
 		this.resourceManager = resourceManager;
 		// TODO get attributes from the resourceManager's configuration
-		List<PropertyDescriptor> descriptors = new ArrayList();
+		List<PropertyDescriptor> descriptors = new ArrayList<PropertyDescriptor>();
 		descriptors.add(new PropertyDescriptor("name", "name"));
 		descriptors.add(new PropertyDescriptor("description", "description"));
 		descriptors.add(new PropertyDescriptor("type", "type"));
@@ -66,7 +66,7 @@ public class ResourceManagerPropertySource implements IPropertySource {
 			return resourceManager.getDescription();
 		}
 		if ("type".equals(id)) {
-			final String resourceManagerId = resourceManager.getIDString();
+			final String resourceManagerId = resourceManager.getID();
 			final IModelManager modelManager = PTPCorePlugin.getDefault().getModelManager();
 			IResourceManagerFactory factory = modelManager.getResourceManagerFactory(
 					resourceManagerId);

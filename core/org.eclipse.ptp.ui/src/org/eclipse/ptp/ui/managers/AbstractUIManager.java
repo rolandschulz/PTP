@@ -18,33 +18,20 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.managers;
 
-import java.lang.reflect.InvocationTargetException;
-
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ListenerList;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SafeRunner;
-import org.eclipse.debug.core.DebugPlugin;
-import org.eclipse.debug.core.ILaunch;
-import org.eclipse.debug.core.ILaunchManager;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.ptp.core.IModelPresentation;
 import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.core.elements.IPJob;
-import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IPUniverse;
-import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
-import org.eclipse.ptp.rmsystem.IResourceManager;
+import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.ui.IManager;
-import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.ui.listeners.IJobChangedListener;
 import org.eclipse.ptp.ui.listeners.ISetListener;
 import org.eclipse.ptp.ui.model.ElementSet;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
-import org.eclipse.ui.PlatformUI;
 
 /**
  * @author Clement chu
@@ -209,104 +196,6 @@ public abstract class AbstractUIManager implements IManager {
 		}
 	}
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.IManager#isNoJob(java.lang.String)
-	 */
-	public boolean isNoJob(String jid) {
-		return (jid == null || jid.length() == 0);
-	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.IManager#isJobStop(java.lang.String)
-	 */
-	public boolean isJobStop(String job_id) {
-		if (isNoJob(job_id))
-			return true;
-		IPJob job = findJobById(job_id);
-		return (job == null || job.isAllStop());
-	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.IManager#findJobById(java.lang.String)
-	 */
-	public IPJob findJobById(String job_id) {
-		if (job_id == null) {
-			return null;
-		}
-		
-		IPUniverse universe = modelPresentation.getUniverse();
-		if (universe == null)
-			return null;
-		// IPElement element = universe.findChild(job_id);
-		IPJob job = universe.findJobById(job_id);
-		return job;
-	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.IManager#removeJob(org.eclipse.ptp.core.IPJob)
-	 */
-	public void removeJob(IPJob job) {
-		IPUniverse universe = modelPresentation.getUniverse();
-		if (universe != null) {
-			//remove launch from debug view
-			ILaunchManager launchManager = DebugPlugin.getDefault().getLaunchManager();
-			ILaunch[] launches = launchManager.getLaunches();
-			for (int i=0; i<launches.length; i++) {
-				String launchedJobID = launches[i].getAttribute(ElementAttributes.getIdAttributeDefinition().getId());
-				if (launchedJobID != null && launchedJobID.equals(job.getIDString())) {
-					launchManager.removeLaunch(launches[i]);
-				}
-			}
-			universe.deleteJob(job);
-			fireJobChangedEvent(IJobChangedListener.REMOVED, null, job.getIDString());
-		}
-	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.IManager#removeAllStoppedJobs()
-	 */
-	public void removeAllStoppedJobs() {
-		IRunnableWithProgress runnable = new IRunnableWithProgress() {
-			public void run(IProgressMonitor pmonitor) throws InvocationTargetException {
-				if (pmonitor == null)
-					pmonitor = new NullProgressMonitor();
-				try {
-					IPUniverse universe = modelPresentation.getUniverse();
-					if (universe != null) {
-						IPJob[] jobs = universe.getJobs();
-						pmonitor.beginTask("Removing stopped jobs...", jobs.length);
-						for (int i = 0; i < jobs.length; i++) {
-							if (pmonitor.isCanceled())
-								throw new InvocationTargetException(new Exception("Cancelled by user"));
-							if (jobs[i].isAllStop())
-								removeJob(jobs[i]);
-							pmonitor.worked(1);
-						}
-					}
-				} finally {
-					pmonitor.done();
-				}
-			}
-		};
-		try {
-			PlatformUI.getWorkbench().getProgressService().busyCursorWhile(runnable);
-		} catch (InterruptedException e) {
-			PTPUIPlugin.log(e);
-		} catch (InvocationTargetException e1) {
-			PTPUIPlugin.log(e1);
-		}
-	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.IManager#hasStoppedJob()
-	 */
-	public boolean hasStoppedJob() {
-		IPUniverse universe = modelPresentation.getUniverse();
-		if (universe == null)
-			return false;
-		
-		IPJob[] jobs = universe.getJobs();
-		for (int i = 0; i < jobs.length; i++) {
-			if (jobs[i].isAllStop())
-				return true;
-		}
-		return false;
-	}
-	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#getStatus(org.eclipse.ptp.ui.model.IElement)
 	 */
 	public int getStatus(IElement element) {
@@ -322,11 +211,4 @@ public abstract class AbstractUIManager implements IManager {
 		}
 		return universe.getResourceManagers();
 	}
-	public IPQueue[] getQueues() {
-		IPUniverse universe = modelPresentation.getUniverse();
-		if (universe == null) {
-			return new IPQueue[0];
-		}
-		return universe.getQueues();
-	}		
 }

@@ -29,6 +29,8 @@ import org.eclipse.ptp.ui.views.AbstractParallelElementView;
 public abstract class GotoAction extends ParallelAction {
 	protected String id = "";
 	protected GotoDropDownAction action = null;
+	protected Object data;
+	
 	
 	/** Constructor
 	 * @param name name of action
@@ -36,8 +38,8 @@ public abstract class GotoAction extends ParallelAction {
 	 * @param view view
 	 * @param action drop down action
 	 */
-	public GotoAction(String name, String id, AbstractParallelElementView view, GotoDropDownAction action) {
-		this(name, id, view, IAction.AS_CHECK_BOX, action);
+	public GotoAction(String name, String id, AbstractParallelElementView view, GotoDropDownAction action, Object data) {
+		this(name, id, view, IAction.AS_CHECK_BOX, action, data);
 	}
 	/** Constructor
 	 * @param name name of action
@@ -46,16 +48,17 @@ public abstract class GotoAction extends ParallelAction {
 	 * @param style style of action
 	 * @param action drop down action
 	 */
-	public GotoAction(String name, String id, AbstractParallelElementView view, int style, GotoDropDownAction action) {
+	public GotoAction(String name, String id, AbstractParallelElementView view, int style, GotoDropDownAction action, Object data) {
 		super(name, style, view);
 		this.id = id;
 		this.action = action;	
+		this.data = data;
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.actions.ParallelAction#run(org.eclipse.ptp.ui.model.IElement[])
 	 */
 	public void run(IElement[] elements) {
-		action.run(elements, id);
+		action.run(elements, id, data);
 	}
 }

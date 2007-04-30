@@ -35,6 +35,7 @@ import org.eclipse.ptp.core.IProcessListener;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPProcess;
+import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.events.IModelEvent;
 import org.eclipse.ptp.core.events.IModelRuntimeNotifierEvent;
 import org.eclipse.ptp.core.events.IProcessEvent;
@@ -130,7 +131,7 @@ public class ParallelJobView extends AbstractParallelSetView implements IProcess
 	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#initialElement()
 	 */
 	protected void initialElement() {
-		changeJob(manager.initial());
+		changeJobRefresh((IPJob) manager.initial());
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#initialView()
@@ -166,7 +167,7 @@ public class ParallelJobView extends AbstractParallelSetView implements IProcess
 			public Image getImage(Object element) {
 				if (element instanceof IPJob) {
 					IPJob job = (IPJob) element;
-					if (job.isAllStop())
+					if (job.isTerminated())
 						return ParallelImages.jobImages[2];
 					if (job.isDebug())
 						return ParallelImages.jobImages[1];
@@ -179,7 +180,7 @@ public class ParallelJobView extends AbstractParallelSetView implements IProcess
 			public void dispose() {}
 			public Object[] getElements(Object inputElement) {
 				if (inputElement instanceof AbstractUIManager)
-					return ((JobManager) inputElement).getJobsFromCurrentQueue();
+					return ((JobManager) inputElement).getJobs();
 				return new Object[0];
 			}
 			public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
@@ -203,7 +204,7 @@ public class ParallelJobView extends AbstractParallelSetView implements IProcess
 					}
 					else {
 						String cur_id = getCurrentID();
-						if (cur_id == null || !cur_id.equals(job.getIDString())) {
+						if (cur_id == null || !cur_id.equals(job.getID())) {
 							changeJob(job);
 						}
 					}
@@ -235,7 +236,7 @@ public class ParallelJobView extends AbstractParallelSetView implements IProcess
 	 */
 	protected void fillJobContextMenu(IMenuManager menuManager) {
 		ParallelAction removeAllTerminatedAction = new RemoveAllTerminatedAction(this);
-		removeAllTerminatedAction.setEnabled(manager.hasStoppedJob());
+		removeAllTerminatedAction.setEnabled(getJobManager().hasStoppedJob());
 		menuManager.add(removeAllTerminatedAction);
 	}
 	/* (non-Javadoc)
@@ -286,7 +287,7 @@ public class ParallelJobView extends AbstractParallelSetView implements IProcess
 		buffer.append("Task ID: " + proc.getTaskId());
 		buffer.append("\n");
 		buffer.append("Process ID: " + proc.getPid());
-		IElementSet[] sets = setManager.getSetsWithElement(proc.getIDString());
+		IElementSet[] sets = setManager.getSetsWithElement(proc.getID());
 		if (sets.length > 1)
 			buffer.append("\nSet: ");
 		for (int i = 1; i < sets.length; i++) {
@@ -301,13 +302,17 @@ public class ParallelJobView extends AbstractParallelSetView implements IProcess
 	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#getCurrentID()
 	 */
 	public String getCurrentID() {
-		return getJobManager().getCurrentJobId();
+		IPJob job = getJobManager().getJob();
+		if (job != null) {
+			return job.getID();
+		}
+		return IManager.EMPTY_ID;
 	}
 	/** Change job
 	 * @param job_id Target job ID
 	 */
-	protected void selectJob(String job_id) {
-		getJobManager().setCurrentJobId(job_id);
+	protected void selectJob(IPJob job) {
+		getJobManager().setJob(job);
 		updateJob();
 	}
 	/** Get selected job
@@ -315,8 +320,8 @@ public class ParallelJobView extends AbstractParallelSetView implements IProcess
 	 */
 	public IPJob getCheckedJob() {
 		String job_id = getCurrentID();
-		if (!manager.isNoJob(job_id))
-			return manager.findJobById(job_id);
+		if (!((JobManager)manager).isNoJob(job_id))
+			return ((JobManager)manager).findJobById(job_id);
 		return null;
 	}
 	/** Change job
@@ -326,7 +331,7 @@ public class ParallelJobView extends AbstractParallelSetView implements IProcess
 		if (!elementViewComposite.isDisposed()) {
 			getDisplay().syncExec(new Runnable() {
 				public void run() {
-					IPJob job = manager.findJobById(job_id);
+					IPJob job = ((JobManager)manager).findJobById(job_id);
 					changeJob(job);
 					jobTableViewer.refresh(true);
 					jobTableViewer.setSelection(job == null ? new StructuredSelection() : new StructuredSelection(job), true);
@@ -338,12 +343,21 @@ public class ParallelJobView extends AbstractParallelSetView implements IProcess
 	 * @param job
 	 */
 	protected void changeJob(final IPJob job) {
-		//String cur_id = getCurrentID();
-		//if (cur_id != null && job != null && cur_id.equals(job.getIDString()))
-			//return;
-		selectJob((job == null ? IManager.EMPTY_ID : job.getIDString()));
+		selectJob(job);
 		updateAction();
 		update();
+	}
+	
+	public void changeJobRefresh(final IPJob job) {
+		if (!elementViewComposite.isDisposed()) {
+			getDisplay().syncExec(new Runnable() {
+				public void run() {
+					changeJob(job);
+					jobTableViewer.refresh(true);
+					jobTableViewer.setSelection(job == null ? new StructuredSelection() : new StructuredSelection(job), true);
+				}
+			});
+		}
 	}
 	/** Update Job
 	 * 
@@ -366,75 +380,10 @@ public class ParallelJobView extends AbstractParallelSetView implements IProcess
 				terminateAllAction.setEnabled(false);
 			} else {
 				IPJob job = (IPJob) ((IStructuredSelection) selection).getFirstElement();
-				terminateAllAction.setEnabled(!(job.isDebug() || job.isAllStop()));
+				terminateAllAction.setEnabled(!(job.isDebug() || job.isTerminated()));
 			}
 		}
 	}
-	/*
-	public void run(final String arg) {
-		System.out.println("------------ job run: " + arg);
-		initialView();
-		/*
-		getDisplay().syncExec(new Runnable() {
-			public void run() {
-				jobTableViewer.refresh(true);
-				IPJob job = manager.findJob(arg);
-				jobTableViewer.setSelection(job == null ? new StructuredSelection() : new StructuredSelection(job));
-				changeJob(job);
-			}
-		});
-		*
-		refresh();
-	}
-	public void start() {
-		System.out.println("------------ job start");
-		refresh();
-	}
-	public void stopped() {
-		System.out.println("------------ job stop");
-		refresh();
-	}
-	public void exit() {
-		System.out.println("------------ job exit");
-		refresh();
-	}
-	public void abort() {
-		System.out.println("------------ job abort");
-		refresh();
-	}
-	public void monitoringSystemChangeEvent(Object object) {
-		System.out.println("------------ job monitoringSystemChangeEvent");
-		manager.clear();
-		initialView();
-		refresh();
-	}
-	public void execStatusChangeEvent(Object object) {
-		System.out.println("------------ job execStatusChangeEvent");
-		refresh();
-	}
-	public void sysStatusChangeEvent() {
-		System.out.println("------------ job sysStatusChangeEvent");
-		refresh();
-	}
-	public void majorSystemChangeEvent() {
-		System.out.println("------------ job majorSystemChangeEvent");
-		manager.clear();
-		initialView();
-		refresh();
-	}
-	public void processOutputEvent(Object object) {
-		System.out.println("------------ job processOutputEvent");
-		refresh();
-	}
-	public void errorEvent(Object object) {
-		System.out.println("------------ job errorEvent");
-		refresh();
-	}
-	public void updatedStatusEvent() {
-		System.out.println("------------ job updatedStatusEvent");
-		refresh();
-	}
-	*/
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#updateView(java.lang.Object)
@@ -460,7 +409,7 @@ public class ParallelJobView extends AbstractParallelSetView implements IProcess
 	public void safeProcessEvent(final IProcessEvent event) {
 		// only redraw if the current set contain the process
 		IPProcess process = event.getProcess();
-		if (getJobManager().isCurrentSetContainProcess(getCurrentID(), process.getIDString())) {
+		if (getJobManager().isCurrentSetContainProcess(getCurrentID(), process.getID())) {
 			if (event.getType() != IProcessEvent.ADD_OUTPUT_TYPE)
 				refresh(false);
 		}
@@ -478,14 +427,14 @@ public class ParallelJobView extends AbstractParallelSetView implements IProcess
 		}
 	}
 	
-	public void selectQueue(String id) {
+	public void selectQueue(IPQueue queue) {
 		JobManager jobManager = getJobManager();
-		jobManager.setCurrentQueueId(id);
+		jobManager.setQueue(queue);
 		updateJob();
 	}
 	
-	public String getQueueID() {
-		return getJobManager().getQueueID();
+	public IPQueue getQueue() {
+		return getJobManager().getQueue();
 	}
 	public void modelEvent(final IModelEvent event) {
 		UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {

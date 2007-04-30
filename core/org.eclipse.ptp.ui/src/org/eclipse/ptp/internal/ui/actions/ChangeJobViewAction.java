@@ -48,16 +48,16 @@ public class ChangeJobViewAction extends GotoDropDownAction {
 		if (view instanceof ParallelJobView) {
 			ParallelJobView jView = (ParallelJobView)view;
 	    	String current_view = jView.getCurrentView();
-    		addAction(dropDownMenuMgr, "Both", ParallelJobView.BOTH_VIEW, current_view);
-    		addAction(dropDownMenuMgr, "Job", ParallelJobView.JOB_VIEW, current_view);
-    		addAction(dropDownMenuMgr, "Process", ParallelJobView.PRO_VIEW, current_view);
+    		addAction(dropDownMenuMgr, "Both", ParallelJobView.BOTH_VIEW, current_view, null);
+    		addAction(dropDownMenuMgr, "Job", ParallelJobView.JOB_VIEW, current_view, null);
+    		addAction(dropDownMenuMgr, "Process", ParallelJobView.PRO_VIEW, current_view, null);
 		}
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.actions.GotoDropDownAction#addAction(org.eclipse.jface.action.MenuManager, java.lang.String, java.lang.String, java.lang.String)
 	 */
-	protected void addAction(MenuManager dropDownMenuMgr, String view_name, String id, String curID) {
+	protected void addAction(MenuManager dropDownMenuMgr, String view_name, String id, String curID, Object data) {
 		IAction action = new InternalJobAction(view_name, id, getViewPart(), this);
 		action.setChecked(curID.equals(id));
 		action.setEnabled(true);
@@ -77,18 +77,18 @@ public class ChangeJobViewAction extends GotoDropDownAction {
 			ParallelJobView jView = ((ParallelJobView)view);
 			String current_view = jView.getCurrentView();
 			if (current_view.equals(ParallelJobView.BOTH_VIEW))
-				run(null, ParallelJobView.JOB_VIEW);
+				run(null, ParallelJobView.JOB_VIEW, null);
 			else if (current_view.equals(ParallelJobView.JOB_VIEW))
-				run(null, ParallelJobView.PRO_VIEW);
+				run(null, ParallelJobView.PRO_VIEW, null);
 			else
-				run(null, ParallelJobView.BOTH_VIEW);
+				run(null, ParallelJobView.BOTH_VIEW, null);
     	}
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.actions.GotoDropDownAction#run(org.eclipse.ptp.ui.model.IElement[], java.lang.String)
 	 */
-	public void run(IElement[] elements, String id) {
+	public void run(IElement[] elements, String id, Object data) {
 		if (view instanceof ParallelJobView) {
 			ParallelJobView jView = ((ParallelJobView)view);
 			jView.changeView(id);
@@ -101,7 +101,7 @@ public class ChangeJobViewAction extends GotoDropDownAction {
 	 */
 	private class InternalJobAction extends GotoAction {
 		public InternalJobAction(String name, String id, AbstractParallelElementView view, GotoDropDownAction action) {
-			super(name, id, view, action);
+			super(name, id, view, action, null);
 		    setImageDescriptor(ParallelImages.ID_ICON_JOB_NORMAL);
 		}	
 	}
