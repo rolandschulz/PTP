@@ -50,7 +50,7 @@ public class PProcess extends Parent implements IPProcessControl {
 	 */
 	protected IPNodeControl node;
 
-	public PProcess(int id, IPJobControl job, IAttribute[] attrs) {
+	public PProcess(String id, IPJobControl job, IAttribute[] attrs) {
 		super(id, job, P_PROCESS, attrs);
 		setOutputStore();
 		outputFile = new OutputTextFile(getName(), outputDirPath, storeLine);
@@ -101,10 +101,6 @@ public class PProcess extends Parent implements IPProcessControl {
 		return 0;
 	}
 	
-	public String getProcessNumber() {
-		return "" + getTaskId() + "";
-	}
-	
 	public String getSignalName() {
 		StringAttribute attr = (StringAttribute) getAttribute(ProcessAttributes.getSignalNameAttributeDefinition());
 		if (attr != null) {
@@ -113,7 +109,7 @@ public class PProcess extends Parent implements IPProcessControl {
 		return "";
 	}
 	
-	public State getStatus() {
+	public State getState() {
 		EnumeratedAttribute attr = (EnumeratedAttribute) getAttribute(ProcessAttributes.getStateAttributeDefinition());
 		if (attr != null) {
 			return (State) attr.getEnumValue();
@@ -127,11 +123,6 @@ public class PProcess extends Parent implements IPProcessControl {
 			return attr.getValue();
 		}
 		return 0;
-	}
-	
-	public boolean isAllStop() {
-		ProcessAttributes.State state = getStatus();
-		return (state == State.ERROR || state == State.EXITED || state == State.EXITED_SIGNALLED);
 	}
 	
 	public boolean isTerminated() {
@@ -163,7 +154,7 @@ public class PProcess extends Parent implements IPProcessControl {
 			outputDirectory.mkdir();
 	}
 
-	public void setStatus(ProcessAttributes.State state) {
+	public void setState(ProcessAttributes.State state) {
 		EnumeratedAttribute procState = (EnumeratedAttribute) getAttribute(ProcessAttributes.getStateAttributeDefinition());
 		try {
 			if (procState == null) {
@@ -173,8 +164,8 @@ public class PProcess extends Parent implements IPProcessControl {
 			}
 		} catch (IllegalValueException e) {
 		}
-		if (isAllStop()) {
-			isTerminated = true;
+		if (state == State.ERROR || state == State.EXITED || state == State.EXITED_SIGNALLED) {
+			setTerminated(true);
 		}
 	}
 

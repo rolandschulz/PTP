@@ -75,10 +75,11 @@ public abstract class AbstractRuntimeResourceManager extends
 	private final ReentrantLock jobSubmissionLock = new ReentrantLock();
 	private final Condition jobSubmissionCondition = jobSubmissionLock.newCondition();
 	private IPJob newJob;
-	private int jobSubId;
+	private int jobSubId = 0;
+	private boolean jobSubCompleted = true;
 	private AttributeManager jobSubAttrs;
 	
-	public AbstractRuntimeResourceManager(int id, IPUniverseControl universe,
+	public AbstractRuntimeResourceManager(String id, IPUniverseControl universe,
 			IResourceManagerConfiguration config) {
 		super(id, universe, config);
 		// nothing to do here
@@ -107,8 +108,19 @@ public abstract class AbstractRuntimeResourceManager extends
 	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleRuntimeErrorEvent(org.eclipse.ptp.rtsystem.events.IRuntimeErrorEvent)
 	 */
 	public void handleRuntimeErrorEvent(IRuntimeErrorEvent e) {
-		setState(ResourceManagerAttributes.State.ERROR,
-				e.getMessage());
+		// Job submission failed, break out of submitJob
+		// FIXME: this has to go!
+		// TODO Fix launch code to eliminate this!
+		jobSubmissionLock.lock();
+		try {
+			if (!jobSubCompleted) {
+				jobSubCompleted = true;
+				jobSubmissionCondition.signal();
+			}
+		} finally {
+			jobSubmissionLock.unlock();
+		}
+		//setState(ResourceManagerAttributes.State.ERROR, e.getMessage());
 		fireError(e.getMessage());
 	}
 	
@@ -126,8 +138,9 @@ public abstract class AbstractRuntimeResourceManager extends
 			RangeSet jobIds = entry.getKey();
 			changed = false;
 			
-			for (int id : jobIds) {
-				IPJobControl job = getJobControl(id);
+			for (Integer id : jobIds) {
+				String elementId = id.toString();
+				IPJobControl job = getJobControl(elementId);
 				if (job != null) {
 					final boolean jobChanged = doUpdateJob(job, attrs);
 					changed |= jobChanged;
@@ -161,8 +174,9 @@ public abstract class AbstractRuntimeResourceManager extends
 			RangeSet machineIds = entry.getKey();
 			changed = false;
 			
-			for (int id : machineIds) {
-				IPMachineControl machine = getMachineControl(id);
+			for (Integer id : machineIds) {
+				String elementId = id.toString();
+				IPMachineControl machine = getMachineControl(elementId);
 				if (machine != null) {
 					final boolean macChanged = doUpdateMachine(machine, attrs);
 					changed |= macChanged;
@@ -202,12 +216,13 @@ public abstract class AbstractRuntimeResourceManager extends
 			RangeSet jobIds = entry.getKey();
 			changed = false;
 
-			for (int id : jobIds) {
-				IPJobControl job = getJobControl(id);
+			for (Integer id : jobIds) {
+				String elementId = id.toString();
+				IPJobControl job = getJobControl(elementId);
 				if (job == null) {
-					job = doCreateJob(queue, id, jobAttrs);
+					job = doCreateJob(queue, elementId, jobAttrs);
 					jobs.add(job);
-					addJob(id, job);
+					addJob(elementId, job);
 					changed = true;
 					
 					// TODO Fix launch code to eliminate this!
@@ -216,6 +231,7 @@ public abstract class AbstractRuntimeResourceManager extends
 						IntegerAttribute jobSubAttr = (IntegerAttribute) job.getAttribute(JobAttributes.getSubIdAttributeDefinition());
 						if (jobSubAttr.getValue() == jobSubId) {
 							newJob = job;
+							jobSubCompleted = true;
 							jobSubmissionCondition.signal();
 						}
 					} finally {
@@ -247,11 +263,12 @@ public abstract class AbstractRuntimeResourceManager extends
 			RangeSet machineIds = entry.getKey();
 			changed = false;
 
-			for (int id : machineIds) {
-				IPMachineControl machine = getMachineControl(id);
+			for (Integer id : machineIds) {
+				String elementId = id.toString();
+				IPMachineControl machine = getMachineControl(elementId);
 				if (machine == null) {
-					machine = doCreateMachine(id, attrs);
-					addMachine(id, machine);
+					machine = doCreateMachine(elementId, attrs);
+					addMachine(elementId, machine);
 					machines.add(machine);
 					changed = true;
 				}
@@ -282,12 +299,13 @@ public abstract class AbstractRuntimeResourceManager extends
 				RangeSet nodeIds = entry.getKey();
 				changed = false;
 	
-				for (int id : nodeIds) {
-					IPNodeControl node = getNodeControl(id);
+				for (Integer id : nodeIds) {
+					String elementId = id.toString();
+					IPNodeControl node = getNodeControl(elementId);
 					if (node == null) {
-						node = doCreateNode(machine, id, attrs);
+						node = doCreateNode(machine, elementId, attrs);
 						nodes.add(node);
-						addNode(id, node);
+						addNode(elementId, node);
 						changed = true;
 					}
 				}
@@ -318,11 +336,12 @@ public abstract class AbstractRuntimeResourceManager extends
 				RangeSet processIds = entry.getKey();
 				changed = false;
 	
-				for (int id : processIds) {
-					IPProcessControl process = getProcessControl(id);
+				for (Integer id : processIds) {
+					String elementId = id.toString();
+					IPProcessControl process = getProcessControl(elementId);
 					if (process == null) {
-						process = doCreateProcess(job, id, attrs);
-						addProcess(id, process);
+						process = doCreateProcess(job, elementId, attrs);
+						addProcess(elementId, process);
 						procs.add(process);
 						changed = true;
 					}
@@ -353,11 +372,12 @@ public abstract class AbstractRuntimeResourceManager extends
 			RangeSet queueIds = entry.getKey();
 			changed = false;
 
-			for (int id : queueIds) {
-				IPQueueControl queue = getQueueControl(id);
+			for (Integer id : queueIds) {
+				String elementId = id.toString();
+				IPQueueControl queue = getQueueControl(elementId);
 				if (queue == null) {
-					queue = doCreateQueue(id, attrs);
-					addQueue(id, queue);
+					queue = doCreateQueue(elementId, attrs);
+					addQueue(elementId, queue);
 					queues.add(queue);
 					changed = true;
 				}
@@ -385,8 +405,9 @@ public abstract class AbstractRuntimeResourceManager extends
 			RangeSet nodeIds = entry.getKey();
 			changed = false;
 			
-			for (int id : nodeIds) {
-				IPNodeControl node = getNodeControl(id);
+			for (Integer id : nodeIds) {
+				String elementId = id.toString();
+				IPNodeControl node = getNodeControl(elementId);
 				if (node != null) {
 					final boolean nodeChanged = doUpdateNode(node, attrs);
 					changed |= nodeChanged;
@@ -420,8 +441,9 @@ public abstract class AbstractRuntimeResourceManager extends
 			RangeSet processIds = entry.getKey();
 			changed = false;
 			
-			for (int id : processIds) {
-				IPProcessControl process = getProcessControl(id);
+			for (Integer id : processIds) {
+				String elementId = id.toString();
+				IPProcessControl process = getProcessControl(elementId);
 				if (process != null) {
 					final boolean procChanged = doUpdateProcess(process, attrs);
 					changed |= procChanged;
@@ -455,8 +477,9 @@ public abstract class AbstractRuntimeResourceManager extends
 			RangeSet queueIds = entry.getKey();
 			changed = false;
 			
-			for (int id : queueIds) {
-				IPQueueControl queue = getQueueControl(id);
+			for (Integer id : queueIds) {
+				String elementId = id.toString();
+				IPQueueControl queue = getQueueControl(elementId);
 				if (queue != null) {
 					final boolean queueChanged = doUpdateQueue(queue, attrs);
 					changed |= queueChanged;
@@ -553,7 +576,7 @@ public abstract class AbstractRuntimeResourceManager extends
 	 * @param jobId
 	 * @return
 	 */
-	abstract protected IPJobControl doCreateJob(IPQueueControl queue, int jobId, AttributeManager attrs);
+	abstract protected IPJobControl doCreateJob(IPQueueControl queue, String jobId, AttributeManager attrs);
 	
 	/**
 	 * Template pattern method to actually create the machine.
@@ -561,7 +584,7 @@ public abstract class AbstractRuntimeResourceManager extends
 	 * @param machineId
 	 * @return
 	 */
-	abstract protected IPMachineControl doCreateMachine(int machineId, AttributeManager attrs);
+	abstract protected IPMachineControl doCreateMachine(String machineId, AttributeManager attrs);
 
 	/**
 	 * Template pattern method to actually create the node.
@@ -570,7 +593,7 @@ public abstract class AbstractRuntimeResourceManager extends
 	 * @param nodeId
 	 * @return
 	 */
-	abstract protected IPNodeControl doCreateNode(IPMachineControl machine, int nodeId, AttributeManager attrs);
+	abstract protected IPNodeControl doCreateNode(IPMachineControl machine, String nodeId, AttributeManager attrs);
 
 	/**
 	 * Template pattern method to actually create the process.
@@ -579,7 +602,7 @@ public abstract class AbstractRuntimeResourceManager extends
 	 * @param processId
 	 * @return
 	 */
-	abstract protected IPProcessControl doCreateProcess(IPJobControl job, int processId, AttributeManager attrs);
+	abstract protected IPProcessControl doCreateProcess(IPJobControl job, String processId, AttributeManager attrs);
 
 	/**
 	 * Template pattern method to actually create the queue.
@@ -587,7 +610,7 @@ public abstract class AbstractRuntimeResourceManager extends
 	 * @param queueId
 	 * @return
 	 */
-	abstract protected IPQueueControl doCreateQueue(int queueId, AttributeManager attrs);
+	abstract protected IPQueueControl doCreateQueue(String queueId, AttributeManager attrs);
 
 	/**
 	 * create a new runtime system
@@ -694,6 +717,7 @@ public abstract class AbstractRuntimeResourceManager extends
 		jobSubmissionLock.lock();
 		try {
 			newJob = null;
+			jobSubCompleted = false;
 			
 			/*
 			 * Save submission attributes so they can be added to the job later.
@@ -705,7 +729,7 @@ public abstract class AbstractRuntimeResourceManager extends
 			
 			runtimeSystem.submitJob(jobSubId, attrMgr);
 			
-			while (!monitor.isCanceled() && newJob == null) {
+			while (!monitor.isCanceled() && !jobSubCompleted) {
 				try {
 					jobSubmissionCondition.await(500, TimeUnit.MILLISECONDS);
 				} catch (InterruptedException e) {

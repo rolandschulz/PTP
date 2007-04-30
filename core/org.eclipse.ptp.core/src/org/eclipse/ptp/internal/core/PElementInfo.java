@@ -29,14 +29,12 @@ import org.eclipse.ptp.core.elements.IPElement;
  *
  */
 public class PElementInfo {
-	private Map fChildren = null;
+	private Map<String, IPElementControl> fChildren = new HashMap<String, IPElementControl>();
 
 	protected IPElementControl element;
 
 	public PElementInfo(IPElementControl element) {
 		this.element = element;
-		// Array list starts with size = 0
-		fChildren = new HashMap(0);
 	}
 
 	public IPElementControl getElement() {
@@ -44,11 +42,11 @@ public class PElementInfo {
 	}
 
 	public void addChild(IPElementControl member) {
-		fChildren.put(member.getIDString(), member);
+		fChildren.put(member.getID(), member);
 	}
 
 	public void removeChild(IPElement member) {
-		fChildren.remove(member.getIDString());
+		fChildren.remove(member.getID());
 	}
 
 	public IPElementControl findChild(String key) {
@@ -59,19 +57,19 @@ public class PElementInfo {
 
 	public IPElementControl[] getChildren() {
 		synchronized (fChildren) {
-			return (IPElementControl[]) fChildren.values().toArray(
+			 return (IPElementControl[]) fChildren.values().toArray(
 					new IPElementControl[size()]);
 		}
 	}
 
-	public Collection getCollection() {
+	public Collection<IPElementControl> getCollection() {
 		synchronized (fChildren) {
 			return fChildren.values();
 		}
 	}
 
 	public boolean includesChild(IPElementControl child) {
-		if (fChildren.containsKey(child.getIDString()))
+		if (fChildren.containsKey(child.getID()))
 			return true;
 		return false;
 	}
@@ -80,8 +78,10 @@ public class PElementInfo {
 		fChildren.clear();
 	}
 
-	public void setChildren(Map children) {
-		fChildren.putAll(children);
+	public void setChildren(IPElementControl[] children) {
+		for (IPElementControl element : children) {
+			fChildren.put(element.getID(), element);
+		}
 	}
 
 	public boolean hasChildren() {

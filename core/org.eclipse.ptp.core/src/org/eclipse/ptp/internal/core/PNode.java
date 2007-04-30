@@ -18,16 +18,12 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.core;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IntegerAttribute;
 import org.eclipse.ptp.core.elementcontrols.IPElementControl;
 import org.eclipse.ptp.core.elementcontrols.IPMachineControl;
 import org.eclipse.ptp.core.elementcontrols.IPNodeControl;
 import org.eclipse.ptp.core.elementcontrols.IPProcessControl;
-import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.attributes.NodeAttributes;
@@ -35,11 +31,11 @@ import org.eclipse.ptp.core.elements.attributes.NodeAttributes;
 public class PNode extends Parent implements IPNodeControl {
 	protected String NAME_TAG = "node ";
 
-	public PNode(int id, IPMachineControl mac, IAttribute[] attrs) {
+	public PNode(String id, IPMachineControl mac, IAttribute[] attrs) {
 		super(id, mac, P_NODE, attrs);
 	}
 	
-	public void addProcess(IPProcessControl process) {
+	public synchronized void addProcess(IPProcessControl process) {
 		addChild(process);
 	}
 	
@@ -60,55 +56,21 @@ public class PNode extends Parent implements IPNodeControl {
 		return "";
 	}
 	
-	public IPProcessControl[] getProcessControls() {
+	public synchronized IPProcessControl[] getProcessControls() {
 		return (IPProcessControl[]) getCollection().toArray(new IPProcessControl[size()]);
 	}
-	
+
+	public synchronized void removeProcess(IPProcessControl process) {
+		removeChild(process);
+	}
+
 	public IPProcess[] getProcesses() {
 		return getProcessControls();
 	}
 	
-	public IPProcess[] getSortedProcesses() {
-		IPProcessControl[] processes = (IPProcessControl[]) getProcesses();
-		sort(processes);
-		return processes;
+	public synchronized IPProcess[] getSortedProcesses() {
+		IPProcessControl[] procs = getProcessControls();
+		sort(procs);
+		return procs;
 	}
-	public IPProcess findProcess(String processNumber) {
-		IPElementControl element = findChild(processNumber);
-		if (element != null)
-			return (IPProcessControl) element;
-		return null;
-	}
-	/*
-	 * returns a list of jobs that are running on this node - does this by looking at the processes running on this node and seeing which jobs they are part of
-	 */
-	public IPJob[] getJobs() {
-		IPProcess[] processes = getProcesses();
-		List array = new ArrayList(0);
-		for (int i = 0; i < processes.length; i++) {
-			final IPJob job = processes[i].getJob();
-			if (job != null && !array.contains(job)) {
-				array.add(job);
-			}
-		}
-		return (IPJob[]) array.toArray(new IPJob[array.size()]);
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.IPNode#getNumProcesses()
-	 */
-	public int getNumProcesses() {
-		return size();
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.IPNode#hasChildProcesses()
-	 */
-	public boolean hasChildProcesses() {
-		return getNumProcesses() > 0;
-	}
-	
-	public void removeProcess(IPProcessControl process) {
-		removeChild(process);
-	}	
 }

@@ -23,7 +23,7 @@ import org.eclipse.ptp.core.elements.attributes.ElementAttributeManager;
 
 public class RuntimeNewJobEvent extends AbstractRuntimeNewEvent implements IRuntimeNewJobEvent {
 
-	public RuntimeNewJobEvent(int parent, ElementAttributeManager attrs) {
+	public RuntimeNewJobEvent(String parent, ElementAttributeManager attrs) {
 		super(parent, attrs);
 	}
 

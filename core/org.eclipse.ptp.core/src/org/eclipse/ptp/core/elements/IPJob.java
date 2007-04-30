@@ -32,7 +32,14 @@ package org.eclipse.ptp.core.elements;
 public interface IPJob extends IPElement {
 	
 	/**
-	 * Find a Process in this Job by the Process number. Returns the Process
+	 * Returns true if all processes in the job have terminated
+	 * 
+	 * @return
+	 */
+	public boolean isTerminated();
+	
+	/**
+	 * Find a Process in this Job by its ID. Returns the Process
 	 * object if found, else returns <code>null</code>.
 	 * 
 	 * @param processNumber
@@ -40,48 +47,17 @@ public interface IPJob extends IPElement {
 	 * @return The Process object if found, else <code>null</code>
 	 * @see IPProcess
 	 */
-	public IPProcess findProcess(String processNumber);
-	
+	public IPProcess getProcessById(String id);
+
 	/**
-	 * Finds a Process in this Job by the Process's name. Returns the Process
-	 * object if found, else returns <code>null</code>.
-	 * 
-	 * @param pname
-	 *            The Process name to search for
-	 * @return The Process object if found, else <code>null</code>
-	 */
-	public IPProcess findProcessByName(String pname);
-	
-	/**
-	 * Finds a Process in by it's task ID. Returns the Process
+	 * Finds a Process in by its task ID. Returns the Process
 	 * object if found, else returns <code>null</code>.
 	 * 
 	 * @param taskId
 	 *            The Process task ID to search for
 	 * @return The Process object if found, else <code>null</code>
 	 */
-	public IPProcess findProcessByTaskId(int taskId);
-	
-	/**
-	 * @return
-	 */
-	public String getIDString();
-
-	/**
-	 * Returns an array of the Machines that this Job has Processes on. For most
-	 * realistic systems this will be a single Machine, so a one element array.
-	 * However, the model allows for something more advanced.
-	 * 
-	 * @return The Machines this Job has Processes on
-	 */
-	public IPMachine[] getMachines();
-
-	/**
-	 * Returns an array of the Nodes that this Job has Processes on.
-	 * 
-	 * @return The Nodes that this Job has Processes on
-	 */
-	public IPNode[] getNodes();
+	public IPProcess getProcessByTaskId(int taskId);
 
 	/**
 	 * Returns an array of the Processes comprised by this Job. Might return
@@ -92,17 +68,12 @@ public interface IPJob extends IPElement {
 	public IPProcess[] getProcesses();
 
 	/**
-	 * @return
+	 * Returns parent queue for this job.
+	 * 
+	 * @return IPQueue
 	 */
 	public IPQueue getQueue();
 
-	/**
-	 * Returns a sorted array of the Nodes that this Job has Processes on.
-	 * 
-	 * @return The Nodes that this Job has Processes on
-	 */
-	public IPNode[] getSortedNodes();
-	
 	/**
 	 * Returns a sorted array of the Processes comprised by this Job. Might
 	 * return <code>null</code> if no Processes have yet been assigned.
@@ -112,24 +83,16 @@ public interface IPJob extends IPElement {
 	public IPProcess[] getSortedProcesses();
 
 	/**
-	 * Returns the Universe that this Job resides within.
-	 * 
-	 * @return The Universe that this Job resides within
-	 */
-	public IPUniverse getUniverse();
-
-	/**
-	 * @return
-	 */
-	public boolean isAllStop();
-
-	/**
 	 * Returns true/false regarding whether this Job is a debug job 
 	 * 
 	 * @return True if this job is a debug job
 	 */
 	public boolean isDebug();
 	
+	/**
+	 * Remove all processes from this job
+	 *
+	 */
 	public void removeAllProcesses();
 	
 	/**
@@ -137,15 +100,6 @@ public interface IPJob extends IPElement {
 	 *
 	 */
 	public void setDebug();
-
-	/**
-	 * Returns the number of Nodes that this Job has Processes on. This may not
-	 * be the same size as the number of Processes if some Processes are
-	 * residing on the same Node as others.
-	 * 
-	 * @return The number of Nodes that this Job has Processes on
-	 */
-	public int totalNodes();
 
 	/**
 	 * Returns the number of Processes in this Job.

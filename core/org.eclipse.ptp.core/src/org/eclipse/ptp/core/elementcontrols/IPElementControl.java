@@ -109,14 +109,6 @@ public interface IPElementControl extends IPElement, ISearchPageScoreComputer {
 	public int size();
 
 	/**
-	 * This method really doesn't make sense anymore, it needs to be fixed. <br>
-	 * TODO: <i>SLATED FOR REMOVAL</i>
-	 * 
-	 * @return I have no idea, T/F obviously though :)
-	 */
-	public boolean isAllStop();
-
-	/**
 	 * Returns true if this Element has children Elements, else returns false.
 	 * 
 	 * @return True if this Element has children Elements, else false

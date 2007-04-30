@@ -22,6 +22,6 @@ package org.eclipse.ptp.rtsystem.events;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributeManager;
 
 public interface IRuntimeNewEvent extends IRuntimeEvent {
-	public int getParentId();
+	public String getParentId();
 	public ElementAttributeManager getElementAttributeManager();
 }

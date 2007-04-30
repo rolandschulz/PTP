@@ -23,7 +23,7 @@ import org.eclipse.ptp.core.elements.attributes.ElementAttributeManager;
 
 public class RuntimeNewNodeEvent extends AbstractRuntimeNewEvent implements IRuntimeNewNodeEvent {
 
-	public RuntimeNewNodeEvent(int parent, ElementAttributeManager attrs) {
+	public RuntimeNewNodeEvent(String parent, ElementAttributeManager attrs) {
 		super(parent, attrs);
 	}
 

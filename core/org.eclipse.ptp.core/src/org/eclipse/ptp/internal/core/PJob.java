@@ -19,99 +19,43 @@
 package org.eclipse.ptp.internal.core;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
 
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.elementcontrols.IPElementControl;
 import org.eclipse.ptp.core.elementcontrols.IPJobControl;
-import org.eclipse.ptp.core.elementcontrols.IPNodeControl;
 import org.eclipse.ptp.core.elementcontrols.IPProcessControl;
 import org.eclipse.ptp.core.elementcontrols.IPQueueControl;
-import org.eclipse.ptp.core.elements.IPMachine;
-import org.eclipse.ptp.core.elements.IPNode;
 import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.IPQueue;
-import org.eclipse.ptp.core.elements.IPUniverse;
-import org.eclipse.ptp.rmsystem.IResourceManager;
+import org.eclipse.ptp.core.elements.IResourceManager;
 
 public class PJob extends Parent implements IPJobControl {
 	final public static int BASE_OFFSET = 10000;
 	final public static int STATE_NEW = 5000;
-	private ArrayList<String> taskIdMap = new ArrayList<String>();
+	private ArrayList<IPProcessControl> taskIdMap = new ArrayList<IPProcessControl>();
 
 	protected String NAME_TAG = "root ";
 	
 	protected boolean isDebugJob = false;
 
-	public PJob(int id, IPQueueControl queue, IAttribute[] attrs) {
+	public PJob(String id, IPQueueControl queue, IAttribute[] attrs) {
 		super(id, queue, P_JOB, attrs);
 	}
 	
 	public void addProcess(IPProcessControl p) {
 		addChild(p);
-		taskIdMap.add(p.getTaskId(), "" + p.getID() + "");
+		taskIdMap.add(p.getTaskId(), p);
 	}
 	
-	public synchronized IPProcess findProcess(String processNumber) {
-		IPElementControl element = findChild(processNumber);
+	public synchronized IPProcess getProcessById(String id) {
+		IPElementControl element = findChild(id);
 		if (element != null)
 			return (IPProcessControl) element;
 		return null;
 	}
 
-	public synchronized IPProcess findProcessByName(String pname) {
-		Collection col = getCollection();
-		Iterator it = col.iterator();
-		while (it.hasNext()) {
-			Object ob = it.next();
-			if (ob instanceof IPProcessControl) {
-				IPProcessControl proc = (IPProcessControl) ob;
-				if (proc.getName().equals(pname))
-					return proc;
-			}
-		}
-		return null;
-	}
-
-	public synchronized IPProcess findProcessByTaskId(int taskId) {
-		String procNumber = (String) taskIdMap.get(taskId);
-		if (procNumber == null)
-			return null;
-		else
-			return findProcess(procNumber);
-	}
-	
-	/*
-	 * returns the Machines that this job is running on. this is accomplished by
-	 * drilling down to the processes, finding the nodes they are running on,
-	 * and then seeing which machines those nodes are part of
-	 */
-	public IPMachine[] getMachines() {
-		IPNode[] nodes = getNodes();
-		ArrayList<IPMachine> array = new ArrayList<IPMachine>(0);
-		for (int i = 0; i < nodes.length; i++) {
-			final IPMachine machine = nodes[i].getMachine();
-			if (machine != null && !array.contains(machine)) {
-				array.add(machine);
-			}
-		}
-
-		return (IPMachine[]) array.toArray(new IPMachine[array.size()]);
-	}
-
-	public synchronized IPNode[] getNodes() {
-		IPProcess[] processes = getProcesses();
-		List array = new ArrayList(0);
-		for (int i = 0; i < processes.length; i++) {
-			final IPNode node = processes[i].getNode();
-			if (node != null && !array.contains(node)) {
-				array.add(node);
-			}
-		}
-
-		return (IPNodeControl[]) array.toArray(new IPNodeControl[array.size()]);
+	public synchronized IPProcess getProcessByTaskId(int taskId) {
+		return taskIdMap.get(taskId);
 	}
 
 	/*
@@ -128,27 +72,12 @@ public class PJob extends Parent implements IPJobControl {
 		return getProcessControls();
 	}
 
-	public synchronized IPNode[] getSortedNodes() {
-		IPNodeControl[] nodes = (IPNodeControl[]) getNodes();
-		sort(nodes);
-		return nodes;
-	}
-
 	public synchronized IPProcess[] getSortedProcesses() {
-		IPProcessControl[] processes = (IPProcessControl[]) getProcesses();
+		IPProcessControl[] processes = getProcessControls();
 		sort(processes);
 		return processes;
 	}
 
-	public IPUniverse getUniverse() {
-		IPElementControl current = this;
-		do {
-			if (current instanceof IPUniverse)
-				return (IPUniverse) current;
-		} while ((current = current.getParent()) != null);
-		return null;
-	}
-	
 	public boolean isDebug() {
 		return isDebugJob;
 	}
@@ -165,14 +94,6 @@ public class PJob extends Parent implements IPJobControl {
 		isDebugJob = true;
 	}
 	
-	/*
-	 * returns the number of nodes that this job is running on by counting each
-	 * node that each process in this job is running on
-	 */
-	public int totalNodes() {
-		return getNodes().length;
-	}
-
 	public int totalProcesses() {
 		return size();
 	}
@@ -183,5 +104,13 @@ public class PJob extends Parent implements IPJobControl {
 
 	public IResourceManager getResourceManager() {
 		return getQueue().getResourceManager();
+	}
+
+	public boolean isTerminated() {
+		for (IPProcessControl proc : getProcessControls()) {
+			if (!proc.isTerminated())
+				return false;
+		}
+		return true;
 	}
 }

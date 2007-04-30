@@ -23,7 +23,7 @@ import org.eclipse.ptp.core.elements.attributes.ElementAttributeManager;
 
 public class RuntimeNewQueueEvent extends AbstractRuntimeNewEvent implements IRuntimeNewQueueEvent {
 
-	public RuntimeNewQueueEvent(int parent, ElementAttributeManager attrs) {
+	public RuntimeNewQueueEvent(String parent, ElementAttributeManager attrs) {
 		super(parent, attrs);
 	}
 
