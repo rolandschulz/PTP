@@ -19,8 +19,8 @@ package org.eclipse.ptp.launch.ui.extensions;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
-import org.eclipse.ptp.rmsystem.IResourceManager;
 
 
 /**
