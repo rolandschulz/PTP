@@ -25,7 +25,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.ptp.core.elements.IPMachine;
-import org.eclipse.ptp.rmsystem.IResourceManager;
+import org.eclipse.ptp.core.elements.IResourceManager;
 
 /**
  * @author rsqrd

@@ -28,7 +28,7 @@ import java.util.Set;
 
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.elements.IPJob;
-import org.eclipse.ptp.rmsystem.IResourceManager;
+import org.eclipse.ptp.core.elements.IResourceManager;
 
 /**
  * @author rsqrd

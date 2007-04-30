@@ -19,7 +19,7 @@ package org.eclipse.ptp.rmsystem.events;
 import java.util.Collection;
 
 import org.eclipse.ptp.core.elements.IPMachine;
-import org.eclipse.ptp.rmsystem.IResourceManager;
+import org.eclipse.ptp.core.elements.IResourceManager;
 
 public interface IResourceManagerChangedMachinesEvent {
 	

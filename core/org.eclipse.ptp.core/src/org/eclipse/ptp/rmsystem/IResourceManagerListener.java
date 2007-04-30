@@ -21,6 +21,7 @@
  */
 package org.eclipse.ptp.rmsystem;
 
+import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.rmsystem.events.IResourceManagerChangedJobsEvent;
 import org.eclipse.ptp.rmsystem.events.IResourceManagerChangedMachinesEvent;
 import org.eclipse.ptp.rmsystem.events.IResourceManagerChangedNodesEvent;

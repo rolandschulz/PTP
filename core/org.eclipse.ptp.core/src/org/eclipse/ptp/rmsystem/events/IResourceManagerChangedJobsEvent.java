@@ -20,7 +20,7 @@ import java.util.Collection;
 
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.elements.IPJob;
-import org.eclipse.ptp.rmsystem.IResourceManager;
+import org.eclipse.ptp.core.elements.IResourceManager;
 
 public interface IResourceManagerChangedJobsEvent {
 	
