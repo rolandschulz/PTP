@@ -17,9 +17,9 @@
 package org.eclipse.ptp.simulation.ui.rmLaunchConfiguration;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory;
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab;
-import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.simulation.core.rmsystem.SimulationResourceManager;
 
 public class SimulationRMLaunchConfigurationFactory extends

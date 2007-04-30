@@ -17,10 +17,10 @@
 package org.eclipse.ptp.lsf.ui.rmLaunchConfiguration;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory;
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.lsf.core.rmsystem.LSFResourceManager;
-import org.eclipse.ptp.rmsystem.IResourceManager;
 
 public class LSFRMLaunchConfigurationFactory extends
 		AbstractRMLaunchConfigurationFactory {

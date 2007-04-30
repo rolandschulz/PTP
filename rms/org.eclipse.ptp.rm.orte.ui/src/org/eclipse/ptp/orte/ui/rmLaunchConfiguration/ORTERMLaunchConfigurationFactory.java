@@ -17,10 +17,10 @@
 package org.eclipse.ptp.orte.ui.rmLaunchConfiguration;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory;
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.orte.core.rmsystem.ORTEResourceManager;
-import org.eclipse.ptp.rmsystem.IResourceManager;
 
 public class ORTERMLaunchConfigurationFactory extends
 		AbstractRMLaunchConfigurationFactory {
