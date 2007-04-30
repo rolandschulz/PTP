@@ -17,12 +17,12 @@ import org.eclipse.ptp.core.IModelListener;
 import org.eclipse.ptp.core.IModelPresentation;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elements.IPJob;
+import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.events.IModelErrorEvent;
 import org.eclipse.ptp.core.events.IModelEvent;
 import org.eclipse.ptp.core.events.IModelRuntimeNotifierEvent;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
-import org.eclipse.ptp.rmsystem.IResourceManager;
 
 public class RuntimeProcess implements IProcess, IModelListener {
 	private IPLaunch launch = null;
@@ -36,7 +36,7 @@ public class RuntimeProcess implements IProcess, IModelListener {
 		this.launch = launch;
 		this.job = job;		
 		initializeAttributes(attributes);
-		fTerminated = job.isAllStop();
+		fTerminated = job.isTerminated();
 		launch.addProcess(this);
 		getModelPresentation().addModelListener(this);
 		fireCreationEvent();

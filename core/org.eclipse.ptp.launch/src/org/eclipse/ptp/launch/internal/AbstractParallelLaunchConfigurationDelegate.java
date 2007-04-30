@@ -52,6 +52,7 @@ import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IPUniverse;
+import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.QueueAttributes;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
@@ -63,7 +64,6 @@ import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.internal.ui.LaunchMessages;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory;
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab;
-import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rtsystem.JobRunConfiguration;
 
 /**
@@ -132,9 +132,9 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 		IResourceManager rm = getResourceManager(configuration);
 		if (rm != null) {
 			try {
-				IPQueue queue = rm.getQueue(getQueueName(configuration));
+				IPQueue queue = rm.getQueueByName(getQueueName(configuration));
 				if (queue != null) {
-						attrMgr.setAttribute(QueueAttributes.getIdAttributeDefinition().create(queue.getIDString()));
+						attrMgr.setAttribute(QueueAttributes.getIdAttributeDefinition().create(queue.getID()));
 				}
 				
 				IPath programFile = getProgramFile(configuration);
@@ -184,7 +184,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 			return new IAttribute[0];
 		}
 		IRMLaunchConfigurationDynamicTab rmDynamicTab = rmFactory.create(rm);
-		IPQueue queue = rm.getQueue(queueName);
+		IPQueue queue = rm.getQueueByName(queueName);
 		if (queue != null) {
 			return rmDynamicTab.getAttributes(rm, queue, configuration);
 		}
