@@ -28,15 +28,18 @@ options {
  *
  * @author Craig E Rasmussen, Christopher D. Rickett
  */
+ 
+package parser.java;
 }
 
 @members {
     private Token prevToken;
     private boolean continueFlag;
+    private boolean includeLine;
 
     public boolean isKeyword(Token tmpToken) {
         if(tmpToken.getType() >= T_INTEGER && 
-            tmpToken.getType() <= T_DIMENSION) {
+            tmpToken.getType() <= T_LEN) {
             return true;
         } else {
             return false;
@@ -44,7 +47,7 @@ options {
     }// end isKeyword()
 
     public boolean isKeyword(int tokenType) {
-        if(tokenType >= T_INTEGER && tokenType <= T_DIMENSION) {
+        if(tokenType >= T_INTEGER && tokenType <= T_LEN) {
             return true;
         } else {
             return false;
@@ -58,8 +61,25 @@ options {
         tmpToken = super.nextToken();
 
         if(tmpToken.getType() != LINE_COMMENT && 
-           tmpToken.getType() != WS) {
+           tmpToken.getType() != WS &&
+           tmpToken.getType() != PREPROCESS_LINE) {
             prevToken = tmpToken;
+        } 
+
+        if(tmpToken.getType() == T_EOS && continueFlag == true) {
+            tmpToken.setChannel(99);
+        } else if(continueFlag == true) {
+            if(tmpToken.getType() != LINE_COMMENT &&
+               tmpToken.getType() != WS &&
+               tmpToken.getType() != PREPROCESS_LINE &&
+               tmpToken.getType() != CONTINUE_CHAR) {
+                // if the token we have is not T_EOS or any kind of WS or 
+                // comment, and we have a continue, then this should be the
+                // first token on the line folliwng the '&'.  this means that
+                // we only have one '&' (no '&' on the second line) and we 
+                // need to clear the flag so we know to process the T_EOS.
+                continueFlag = false;
+            }
         }
 
         return tmpToken;
@@ -80,6 +100,7 @@ options {
         super(input);
         prevToken = null;
         continueFlag = false;
+        includeLine = false;
     }// end constructor()
 
 }
@@ -106,7 +127,10 @@ T_EOS
             // statements (is this correct??).  --Rickett, 11.28.06
             if(prevToken == null || 
                 (prevToken != null && prevToken.getType() == T_EOS)) {
-                channel=99;
+//                 _channel=99;
+                $channel=HIDDEN;
+//                 $channel=99;
+//                 $channel=HIDDEN;
             }
 
         }
@@ -118,18 +142,49 @@ T_EOS
             // blank line or a semicolon at the start of the file and 
             // we need to ignore it.  
             if(prevToken == null || 
-                (prevToken != null && prevToken.getType() == T_EOS))
-               channel=99;
+                (prevToken != null && prevToken.getType() == T_EOS)) {
+//                _channel=99;
+                $channel=HIDDEN;
+//                 $channel=99;
+            } 
+
+            if(includeLine) {
+//                 _channel=99; 
+                $channel=HIDDEN;
+//                 $channel=99;
+                includeLine = false;
+            }
         }
       ;
                 
 
+/* if this is a fragment, the generated code never seems to execute the
+ * action.  the action needs to set the flag so T_EOS knows whether it should
+ * be channel 99'ed or not (ignor T_EOS if continuation is true, which is the
+ * case of the & at the end of a line).
+ */
+CONTINUE_CHAR : '&' { continueFlag = !continueFlag;
+//                       _channel = 99;
+                    $channel=HIDDEN;
+//                     $channel=99;
+        }
+              ;
 
 
 // R427 from char-literal-constant
 T_CHAR_CONSTANT
-        : ('\'' ( SQ_Rep_Char )* '\'')+ 
-        | ('\"' ( DQ_Rep_Char )* '\"')+ 
+        : ('\'' ( SQ_Rep_Char )* '\'')+ { 
+            if(includeLine) 
+//                 _channel=99;
+                $channel=HIDDEN;
+//             $channel=99;
+        }
+        | ('\"' ( DQ_Rep_Char )* '\"')+ { 
+            if(includeLine) 
+//                _channel=99;
+                $channel=HIDDEN;
+//             $channel=99;
+        }
         ;
 
 T_DIGIT_STRING
@@ -154,17 +209,12 @@ HEX_CONSTANT
     | ('z'|'Z') '\"' (Digit|'a'..'f'|'A'..'F')+ '\"'
     ;
 
-REAL_CONSTANT
-	:	Significand E_Exponent?
-	|	Digit_String  E_Exponent
-	;	
 
-DOUBLE_CONSTANT
-	:	Significand D_Exponent
-	|	Digit_String  D_Exponent
-	;	
-
-WS  :  (' '|'\r'|'\t'|'\u000C') {channel=99;}
+WS  :  (' '|'\r'|'\t'|'\u000C') {// _channel=99;
+            $channel=HIDDEN;
+//             $channel=99;
+//             _channel=99;
+        }
     ;
 
 /*
@@ -173,20 +223,8 @@ WS  :  (' '|'\r'|'\t'|'\u000C') {channel=99;}
 
 // R409 digit_string
 fragment
-Digit_String : Digit+ ;
+Digit_String : Digit+  ;
 
-// R418 significand
-fragment
-Significand
-    :   Digit_String '.' ( Digit_String )?
-    |   '.' Digit_String
-    ;	
-
-fragment
-E_Exponent : ('e'|'E') ('+'|'-')? ('0'..'9')+ ;
-
-fragment
-D_Exponent : ('d'|'D') ('+'|'-')? ('0'..'9')+ ;
 
 // R302 alphanumeric_character
 fragment
@@ -194,11 +232,11 @@ Alphanumeric_Character : Letter | Digit | '_' ;
 
 fragment
 Special_Character
-    :    ' ' .. '/'
-    |    ':' .. '@'
-    |    '[' .. '^'
-    |    '`'
-    |    '{' .. '~'
+    :    ' ' .. '/' 
+    |    ':' .. '@' 
+    |    '[' .. '^' 
+    |    '`' 
+    |    '{' .. '~' 
     ;
 
 fragment
@@ -213,16 +251,19 @@ fragment
 Letter : ('a'..'z' | 'A'..'Z') ;
 
 fragment
-Digit : '0'..'9' ;
+Digit : '0'..'9'  ;
 
-/* if this is a fragment, the generated code never seems to execute the
- * action.  the action needs to set the flag so T_EOS knows whether it should
- * be channel 99'ed or not (ignor T_EOS if continuation is true, which is the
- * case of the & at the end of a line).
- */
-CONTINUE_CHAR : '&' {continueFlag=true; channel=99; 
-                     input.setLine(input.getLine()+1); 
-                     input.setCharPositionInLine(0);};
+PREPROCESS_LINE : '#' ~('\n'|'\r')*  { // _channel=99;
+            $channel=HIDDEN;
+//             $channel=99;
+        } ;
+
+T_INCLUDE 
+options {k=1;} : 'INCLUDE' { includeLine = true; // _channel=99;
+            $channel=HIDDEN;
+//             $channel=99;
+        };
+
 
 /*
  * from fortran03_lexer.g
@@ -243,7 +284,6 @@ T_LBRACKET      : '['   ;
 T_LPAREN        : '('   ;
 T_MINUS         : '-'   ;
 T_PERCENT       : '%'   ;
-T_PERIOD        : '.'   ;
 T_PLUS          : '+'   ;
 T_POWER         : '**'  ;
 T_SLASH         : '/'   ;
@@ -268,6 +308,17 @@ T_AND           : '.AND.' ;
 T_OR            : '.OR.'  ;
 T_EQV           : '.EQV.' ;
 T_NEQV          : '.NEQV.';
+
+T_PERIOD_EXPONENT 
+    : '.' ('0'..'9')* ('E' | 'e' | 'd' | 'D') ('+' | '-')? ('0'..'9')+  
+    | '.' ('0'..'9')* ('+' | '-') ('0'..'9')+ 
+    | '.' ('0'..'9')+
+    | ('0'..'9')+ ('e' | 'E' | 'd' | 'D') ('+' | '-')? ('0'..'9')+ 
+    ;
+
+T_PERIOD        : '.' ;
+
+
 
 // not sure what this is; is it just a place holder for something 
 // else??  --Rickett, 10.27.06  
@@ -304,6 +355,7 @@ T_DEFERRED      :       'DEFERRED'      ;
 T_DO            :       'DO'            ;
 T_DOUBLE        :       'DOUBLE'        ;
 T_DOUBLEPRECISION:      'DOUBLEPRECISION' ;
+T_DOUBLECOMPLEX:        'DOUBLECOMPLEX' ;
 T_ELEMENTAL     :       'ELEMENTAL'     ;
 T_ELSE          :       'ELSE'          ;
 T_ELSEIF        :       'ELSEIF'        ;
@@ -404,6 +456,9 @@ T_END   : 'END'
 
 T_DIMENSION     :       'DIMENSION'     ;
 
+T_KIND : 'KIND' ;
+T_LEN : 'LEN' ;
+
 
 
 T_BIND_LPAREN_C
@@ -412,6 +467,8 @@ T_BIND_LPAREN_C
 
 
 // Must come after .EQ. (for example) or will get matched first
+// TODO:: this may have to be done in the parser w/ a rule such as:
+// T_PERIOD T_IDENT T_PERIOD
 T_DEFINED_OP
     :    '.' Letter+ '.'
     ;
@@ -457,5 +514,13 @@ options {k=1;}
 LINE_COMMENT
     : '!'  ~('\n'|'\r')*  
 
-        {channel=99;}
+        {// _channel=99;
+            $channel=HIDDEN;
+//             $channel=99;
+        }
     ;
+
+/* Need a catch-all rule because of fixed-form being allowed to use any 
+   character in column 6 to designate a continuation.  */
+MISC_CHAR : ~('\n' | '\r') ;
+

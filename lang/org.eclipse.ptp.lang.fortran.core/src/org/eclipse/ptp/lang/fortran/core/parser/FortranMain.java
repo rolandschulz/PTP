@@ -1,5 +1,3 @@
-package org.eclipse.ptp.lang.fortran.core.parser;
-
 /**
  * Copyright (c) 2005, 2006 Los Alamos National Security, LLC.  This
  * material was produced under U.S. Government contract DE-
@@ -18,7 +16,12 @@ package org.eclipse.ptp.lang.fortran.core.parser;
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
+
+package org.eclipse.ptp.lang.fortran.core.parser;
+
 import java.io.*;
+import java.lang.reflect.Constructor;
+
 import org.antlr.runtime.*;
 import java.util.concurrent.Callable;
 
@@ -31,18 +34,23 @@ public class FortranMain implements Callable<Boolean> {
    private FortranParser                   parser;
    private FortranLexicalPrepass           prepass;
    private String fileName;
+   private int sourceForm;
+   private boolean verbose = true;
 
+   public static final int UNKNOWN_SOURCE_FORM = -1;
    public static final int FREE_FORM = 1;
    public static final int FIXED_FORM = 2;
         
-   public FortranMain(String filename) throws IOException {
-      this.lexer = new FortranLexer(new FortranStream(filename));
+   public FortranMain(String filename, String type) throws IOException {
+      this.lexer = 
+         new FortranLexer(new FortranStream(filename, this.determineSourceForm(filename))); 
       this.tokens = new FortranTokenStream(lexer);
-      this.parser = new FortranParser(tokens);
-      this.prepass = new FortranLexicalPrepass(lexer, tokens, 
-                                               parser);
+      this.parser = new FortranParser(tokens, type, filename);
+      this.prepass = new FortranLexicalPrepass(lexer, tokens, parser);
       this.fileName = filename;
+      this.sourceForm = UNKNOWN_SOURCE_FORM;
    }
+
 	
    private static boolean parseMainProgram(FortranTokenStream tokens, 
                                            FortranParser parser, 
@@ -144,33 +152,70 @@ public class FortranMain implements Callable<Boolean> {
 
    public static void main(String args[]) throws Exception {
       Boolean error = null;
-      int i = 0;
+      Boolean verbose = true;
+      String type = "null";
+      int nArgs = 0;
 
-      try {
-         while(args[i] != null) {
-            System.out.println("********************************************");
-            System.out.println("args[" + i + "]: " + args[i]);
-            error = new FortranMain(args[i]).call();
-            i++;
-            System.out.println("********************************************");
-         }
-      } catch(ArrayIndexOutOfBoundsException e) {
-         // do nothing; simply the end of the args
+      for (int i = 0; i < args.length; i++) {
+	      if (args[i].startsWith("--dump")) {
+	          type = "dump";
+	          nArgs += 1;
+	      } else if (args[i].startsWith("--silent")) {
+	    	  verbose = false;
+	    	  nArgs += 1;
+	      } else if (args[i].startsWith("--class")) {
+	          i += 1;
+	          type = args[i];
+	          nArgs += 2;
+	      }
+      }
+      
+      if (args.length <= nArgs) {
+    	  System.out.println("Usage: java FortranMain [--dump] [--class className] file1 [file2..fileN]");
       }
 
-//       error = new FortranMain(args[0]).call();
-//       if(error.booleanValue() == true)
-//          // an error occurred
-//          System.exit(1);
+      for (int i = 0; i < args.length; i++) {
+    	  if (args[i].startsWith("--class")) {
+    		  i += 1;
+    		  continue;
+    	  } else if (args[i].startsWith("--")) {
+    		  continue;
+    	  }
+    	  if (verbose) {
+    		  System.out.println("********************************************");
+    		  System.out.println("args[" + i + "]: " + args[i]);
+    	  }
+    	  
+    	  FortranMain ofp = new FortranMain(args[i], type);
+    	  ofp.setVerbose(verbose);
+    	  if (ofp.getParser().getAction().getClass().getName() == "parser.java.FortranParserActionPrint") {
+    		  FortranParserActionPrint action = (FortranParserActionPrint) ofp.getParser().getAction();
+    		  action.setVerbose(verbose);
+    	  }
+    	  error = ofp.call();
+    	  
+    	  if (verbose) {
+    		  System.out.println("********************************************");
+    	  }
+      }
+
    }// end main()
+   
+   public void setVerbose(boolean flag) {
+	   this.verbose = flag;
+   }
+   
+   public FortranParser getParser() {
+	   return this.parser;
+   }
    
    public Boolean call() throws Exception {
       boolean error = false;
               
       if(determineSourceForm(this.fileName) == FIXED_FORM)
-         System.out.println(this.fileName + " is FIXED FORM");
+         if (verbose) System.out.println(this.fileName + " is FIXED FORM");
       else
-         System.out.println(this.fileName + " is FREE FORM");
+         if (verbose) System.out.println(this.fileName + " is FREE FORM");
 
       // determine whether the file is fixed or free form and 
       // set the source form in the prepass so it knows how to handle lines.
@@ -192,7 +237,7 @@ public class FortranMain implements Callable<Boolean> {
          if(error != false) {
             System.out.println("Parser failed");
          } else {
-            System.out.println("Parser exiting normally");
+            if (verbose) System.out.println("Parser exiting normally");
          }// end else(parser exited normally)
       }// end while(not end of file) 
 
@@ -201,10 +246,18 @@ public class FortranMain implements Callable<Boolean> {
 
    private int determineSourceForm(String fileName) {
       if(fileName.endsWith(new String(".f")) == true ||
-         fileName.endsWith(new String(".F")) == true)
+         fileName.endsWith(new String(".F")) == true) {
+         this.sourceForm = FIXED_FORM;
          return FIXED_FORM;
-      else
+      } else {
+         this.sourceForm = FREE_FORM;
          return FREE_FORM;
+      }
    }// end determineSourceForm()
+
+
+   public int getSourceForm() {
+      return this.sourceForm;
+   }
 
 }//end class FortranMain

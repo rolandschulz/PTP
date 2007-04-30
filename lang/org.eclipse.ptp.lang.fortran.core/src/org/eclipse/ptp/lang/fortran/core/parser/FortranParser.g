@@ -45,11 +45,19 @@ options {
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
+ 
+ /**
+ *
+ * @author Craig E Rasmussen, Christopher D. Rickett
+ */
+ 
+ package parser.java;
+//package org.eclipse.ptp.lang.fortran.core.parser;
 
-import org.eclipse.ptp.lang.fortran.core.parser.IFortranParserAction.LiteralConstant;
-import org.eclipse.ptp.lang.fortran.core.parser.IFortranParserAction.KindParam;
-import org.eclipse.ptp.lang.fortran.core.parser.IFortranParserAction.KindSelector;
-import org.eclipse.ptp.lang.fortran.core.parser.IFortranParserAction.IntrinsicTypeSpec;
+//import org.eclipse.ptp.lang.fortran.core.parser.IFortranParserAction.LiteralConstant;
+//import org.eclipse.ptp.lang.fortran.core.parser.IFortranParserAction.KindParam;
+//import org.eclipse.ptp.lang.fortran.core.parser.IFortranParserAction.KindSelector;
+//import org.eclipse.ptp.lang.fortran.core.parser.IFortranParserAction.IntrinsicTypeSpec;
 }
 
 @members {
@@ -65,9 +73,13 @@ import org.eclipse.ptp.lang.fortran.core.parser.IFortranParserAction.IntrinsicTy
         super.reportError(re);
         hasErrorOccurred = true;
     }
+    
+    public IFortranParserAction getAction() {
+        return action;
+    }
 
     /** Provide an action object to implement the AST */
-    private IFortranParserAction action = FortranParserActionFactory.newAction(this, "CDT");
+    private IFortranParserAction action = null;
 
 	/* TODO - implement, needed by FortranParserAction */
 	public Token getRightIToken() {
@@ -142,13 +154,14 @@ main_program
 @init{boolean hasProgramStmt = false;
 	  boolean hasExecutionPart = false;
 	  boolean hasInternalSubprogramPart = false;
-	 }
-	:	( program_stmt {hasProgramStmt = true;})?
+	 } // @init{INIT_BOOL_FALSE(hasProgramStmt); INIT_BOOL_FALSE(hasExecutionPart); INIT_BOOL_FALSE(hasInternalSubprogramPart);}
+	:		{action.main_program__begin();}
+		( program_stmt {hasProgramStmt = true;})?
 		specification_part
 		( execution_part {hasExecutionPart = true;})?
 		( internal_subprogram_part {hasInternalSubprogramPart = true;})?
 		end_program_stmt
-		{ action.buildMainProgram(hasProgramStmt, hasExecutionPart, hasInternalSubprogramPart); }
+			{ action.main_program(hasProgramStmt, hasExecutionPart, hasInternalSubprogramPart); }
 	;
 
 // added rule so could have one rule for main() to call for attempting
@@ -209,10 +222,13 @@ execution_part_construct
 
 // R210
 // T_CONTAINS inlined for contains_stmt
+// TODO can contains_stmt have a label?
 internal_subprogram_part
+@init{int count = 1;}
 	:	T_CONTAINS T_EOS
 		internal_subprogram
-		( internal_subprogram )*
+		(internal_subprogram {count += 1;})*
+			{ action.internal_subprogram_part(count); }
 	;
 
 // R211
@@ -283,6 +299,7 @@ action_stmt
 	|	call_stmt
 	|	close_stmt
 	|	(label {lbl=$label.tk;})? T_CONTINUE T_EOS
+			{ action.continue_stmt(lbl); } // R848 continue_stmt inlined
 	|	cycle_stmt
 	|	deallocate_stmt
 	|	endfile_stmt
@@ -324,15 +341,15 @@ Section 3:
 // R303 underscore inlined
 
 // R304
-name
-	:	T_IDENT
+name returns [Token tk]
+	:	T_IDENT		{ tk = $T_IDENT; }
 	;
 
 // R305
-// T_IDENT inlined as named_constant 
+// ERR_CHK 305 named_constant replaced by T_IDENT 
 constant
-	:	literal_constant
-	|	T_IDENT
+	:	literal_constant	{ action.constant(null); }
+	|	T_IDENT				{ action.constant($T_IDENT); }
 	;
 
 scalar_constant
@@ -355,16 +372,16 @@ literal_constant
 // C302 R308 int_constant shall be of type integer
 // inlined integer portion of constant
 int_constant
-	:	T_IDENT
-	|	int_literal_constant
+	:	int_literal_constant	{ action.int_constant(null); }
+	|	T_IDENT					{ action.int_constant($T_IDENT); }
 	;
 
 // R309
 // C303 R309 char_constant shall be of type character
 // inlined character portion of constant
 char_constant
-	:	T_IDENT
-	|	char_literal_constant
+	:	char_literal_constant	{ action.int_constant(null); }
+	|	T_IDENT					{ action.int_constant($T_IDENT); }
 	;
 
 // R310
@@ -383,8 +400,8 @@ intrinsic_operator
 // R311
 // removed defined_unary_op or defined_binary_op ambiguity with T_DEFINED_OP
 defined_operator
-	:	T_DEFINED_OP
-	|	extended_intrinsic_op
+	:	T_DEFINED_OP			{ action.defined_operator($T_DEFINED_OP); }
+	|	extended_intrinsic_op	{ action.defined_operator(null); }
 	;
 
 // R312
@@ -398,8 +415,12 @@ label returns [Token tk]
     : T_DIGIT_STRING {tk = $T_DIGIT_STRING;}
     ;
 
+// action.label called here to store label in action class
 label_list
-    :    label ( T_COMMA label )*
+@init{ int count=0;}
+    :  		{action.label_list__begin();}
+		lbl=label {count++; action.label($lbl.tk);} ( T_COMMA lbl=label {count++; action.label($lbl.tk);} )*
+      		{action.label_list(count);}
     ;
 
 /*
@@ -415,9 +436,9 @@ type_spec
 // R402
 // ERR_CHK 402 scalar_int_expr replaced by expr
 type_param_value
-	:	expr
-	|	T_ASTERISK
-	|	T_COLON
+	:	expr		{ action.type_param_value(true, false, false); }
+	|	T_ASTERISK	{ action.type_param_value(false, true, false); }
+	|	T_COLON 	{ action.type_param_value(false, false, true); }
 	;
 
 // inlined scalar_int_expr C101 shall be a scalar
@@ -425,48 +446,60 @@ type_param_value
 // inlined scalar_expr
 
 // R403
+// Nonstandard Extension: source BLAS
+//	|	T_DOUBLE T_COMPLEX
+//	|	T_DOUBLECOMPLEX
 intrinsic_type_spec
-	:	T_INTEGER ( kind_selector )?
-	|	T_REAL ( kind_selector )?
+@init{boolean hasKindSelector = false;} //@init{INIT_BOOL_FALSE(hasKindSelector);}
+	:	T_INTEGER (kind_selector {hasKindSelector = true;})?
+			{action.intrinsic_type_spec(IFortranParserAction.IntrinsicTypeSpec.INTEGER, hasKindSelector);}
+	|	T_REAL (kind_selector {hasKindSelector = true;})?
+			{action.intrinsic_type_spec(IFortranParserAction.IntrinsicTypeSpec.REAL, hasKindSelector);}
 	|	T_DOUBLE T_PRECISION
+			{action.intrinsic_type_spec(IFortranParserAction.IntrinsicTypeSpec.DOUBLEPRECISION, false);}
 	|	T_DOUBLEPRECISION
-	|	T_COMPLEX ( kind_selector )?
-	|	T_CHARACTER ( char_selector )?
-	|	T_LOGICAL ( kind_selector )?
+			{action.intrinsic_type_spec(IFortranParserAction.IntrinsicTypeSpec.DOUBLEPRECISION, false);}
+	|	T_COMPLEX (kind_selector {hasKindSelector = true;})?
+			{action.intrinsic_type_spec(IFortranParserAction.IntrinsicTypeSpec.COMPLEX, hasKindSelector);}
+	|	T_DOUBLE T_COMPLEX
+			{action.intrinsic_type_spec(IFortranParserAction.IntrinsicTypeSpec.DOUBLECOMPLEX, false);}
+	|	T_DOUBLECOMPLEX
+			{action.intrinsic_type_spec(IFortranParserAction.IntrinsicTypeSpec.DOUBLECOMPLEX, false);}
+	|	T_CHARACTER (char_selector {hasKindSelector = true;})?
+			{action.intrinsic_type_spec(IFortranParserAction.IntrinsicTypeSpec.CHARACTER, hasKindSelector);}
+	|	T_LOGICAL (kind_selector {hasKindSelector = true;})?
+			{action.intrinsic_type_spec(IFortranParserAction.IntrinsicTypeSpec.LOGICAL, hasKindSelector);}
 	;
 
 // R404
 // ERR_CHK 404 scalar_int_initialization_expr replaced by expr
+// Nonstandard extension: source common practice
+//	| T_ASTERISK T_DIGIT_STRING  // e.g., COMPLEX*16	
 kind_selector
-    : T_LPAREN (T_IDENT /* 'KIND' */ T_EQUALS)? expr T_RPAREN
+    : T_LPAREN (T_KIND T_EQUALS)? expr T_RPAREN
+    | T_ASTERISK T_DIGIT_STRING
     ;
 
-// TODO: turn into terminal (what about kind parameter)
 // R405
 signed_int_literal_constant
-	:	(T_PLUS|T_MINUS)? int_literal_constant
+@init{Token sign = null;} // @init{INIT_TOKEN_NULL(sign);}
+	:	(T_PLUS {sign=$T_PLUS;} | T_MINUS {sign=$T_MINUS;})?
+		int_literal_constant
+			{ action.signed_int_literal_constant(sign); }
 	;
 
 // R406
 int_literal_constant
 @init{Token kind = null;} // @init{INIT_TOKEN_NULL(kind);}
-	:	T_DIGIT_STRING (T_UNDERSCORE kind_param {kind = $kind_param.start;})?
-		{
-			IFortranParserAction.KindParam type = IFortranParserAction.KindParam.none;
-			if (kind != null) {
-				if (kind.getType() == T_DIGIT_STRING) type = IFortranParserAction.KindParam.literal;
-				else type = IFortranParserAction.KindParam.id;
-			}
-			action.buildExpressionConstant(IFortranParserAction.LiteralConstant.int_literal_constant,
-			$T_DIGIT_STRING, type, kind);
-		}
+	:	T_DIGIT_STRING (T_UNDERSCORE kind_param {kind = $kind_param.tk;})?
+		{action.int_literal_constant($T_DIGIT_STRING, kind);}
 	;
 
 // R407
 // T_IDENT inlined for scalar_int_constant_name
-kind_param
-	:	T_DIGIT_STRING
-	|	T_IDENT
+kind_param returns [Token tk]
+	:	T_DIGIT_STRING {tk = $T_DIGIT_STRING;}
+	|	T_IDENT        {tk = $T_IDENT;}
 	;
 
 // R408 signed_digit_string inlined
@@ -492,13 +525,23 @@ boz_literal_constant
 
 // R416
 signed_real_literal_constant
-	:	(T_PLUS|T_MINUS)? real_literal_constant
+@init{Token sign = null;} // @init{INIT_TOKEN_NULL(sign);}
+	:	(T_PLUS {sign=$T_PLUS;} | T_MINUS {sign=$T_PLUS;})?
+		real_literal_constant
+			{action.signed_real_literal_constant(sign);}
 	;
 
 // R417 modified to use terminal
+// Grammar Modified slightly to prevent problems with input such as: if(1.and.1) then ... 
 real_literal_constant
-    :   REAL_CONSTANT ( T_UNDERSCORE kind_param )?
-    |   DOUBLE_CONSTANT ( T_UNDERSCORE kind_param )?
+@init{Token kind = null;} // @init{INIT_TOKEN_NULL(kind);}
+    :   T_DIGIT_STRING T_PERIOD_EXPONENT (T_UNDERSCORE kind_param {kind = $kind_param.tk;})?
+    		{ action.real_literal_constant($T_DIGIT_STRING, $T_PERIOD_EXPONENT, kind); }
+    |   T_DIGIT_STRING T_PERIOD (T_UNDERSCORE kind_param {kind = $kind_param.tk;})?
+    		{ action.real_literal_constant($T_DIGIT_STRING, $T_PERIOD, kind); }
+    |   T_PERIOD_EXPONENT (T_UNDERSCORE kind_param {kind = $kind_param.tk;})?
+    		{ action.real_literal_constant(null, $T_PERIOD_EXPONENT, kind); }
+//		WARNING must parse exponent E or D in action (look for D)
     ;
 
 // R418 significand converted to fragment
@@ -515,38 +558,56 @@ complex_literal_constant
 // R422
 // ERR_CHK 422 named_constant replaced by T_IDENT
 real_part
-	:	signed_int_literal_constant
-	|	signed_real_literal_constant
-	|	T_IDENT
+	:	signed_int_literal_constant		{action.real_part(true,false,null);}
+	|	signed_real_literal_constant	{action.real_part(false,true,null);}
+	|	T_IDENT							{action.real_part(false,false,$T_IDENT);}
 	;
 
 // R423
 // ERR_CHK 423 named_constant replaced by T_IDENT
 imag_part
-	:	signed_int_literal_constant
-	|	signed_real_literal_constant
-	|	T_IDENT
+	:	signed_int_literal_constant		{action.imag_part(true,false,null);}
+	|	signed_real_literal_constant	{action.imag_part(false,true,null);}
+	|	T_IDENT							{action.imag_part(false,false,$T_IDENT);}
 	;
 
 // R424
 // ERR_CHK 424a scalar_int_initialization_expr replaced by expr
-// ERR_CHK 424b match identifiers with 'KIND =' expr / 'LEN = ' type_param_value,
-//              note, expr replaced by (isa) type_param_value
+// ERR_CHK 424b T_KIND, if type_param_value, must be a scalar_int_initialization_expr
+// ERR_CHK 424c T_KIND and T_LEN cannot both be specified
 char_selector
+@init{IFortranParserAction.KindLenParam kindOrLen1; kindOrLen1 = IFortranParserAction.KindLenParam.none;
+      IFortranParserAction.KindLenParam kindOrLen2; kindOrLen2 = IFortranParserAction.KindLenParam.none;
+      boolean hasAsterisk = false;
+     }
 	:	T_ASTERISK char_length (T_COMMA)?
-	|	T_LPAREN T_IDENT /* {'LEN','KIND'} */ T_EQUALS type_param_value
-                ( T_COMMA T_IDENT /* {'LEN','KIND'} */ T_EQUALS type_param_value )? T_RPAREN
-	|	T_LPAREN type_param_value ( T_COMMA (T_IDENT /* 'KIND' */ T_EQUALS)? expr )? T_RPAREN
+			{ hasAsterisk=true; action.char_selector(kindOrLen1, kindOrLen2, hasAsterisk); }
+	|	T_LPAREN (T_KIND {kindOrLen1=IFortranParserAction.KindLenParam.kind;} | T_LEN {kindOrLen1=IFortranParserAction.KindLenParam.len;})
+		  T_EQUALS type_param_value {action.char_selector(kindOrLen1, kindOrLen2, hasAsterisk);}
+		  ( T_COMMA (T_KIND {kindOrLen2=IFortranParserAction.KindLenParam.kind;} | T_LEN {kindOrLen2=IFortranParserAction.KindLenParam.len;})
+          T_EQUALS type_param_value )?
+		T_RPAREN
+			{ action.char_selector(kindOrLen1, kindOrLen2, hasAsterisk); }
+	|	T_LPAREN type_param_value (T_COMMA (T_KIND T_EQUALS)? expr
+			{kindOrLen2=IFortranParserAction.KindLenParam.kind; action.type_param_value(true,false,false);} )?
+        T_RPAREN
+			{ action.char_selector(IFortranParserAction.KindLenParam.len, kindOrLen2, hasAsterisk); }
 	;
 
-// R425 length_selector inlined in (and combined with) R424
+// R425
+length_selector
+	:	T_LPAREN ( T_LEN T_EQUALS )? type_param_value T_RPAREN
+			{ action.length_selector(IFortranParserAction.KindLenParam.len, false); }
+	|	T_ASTERISK char_length (T_COMMA)?
+			{ action.length_selector(IFortranParserAction.KindLenParam.none, true); }
+    ; 
 
 // R426
 char_length
-	:	T_LPAREN
-		type_param_value
-		T_RPAREN
+	:	T_LPAREN type_param_value T_RPAREN
+			{ action.char_length(true); }
 	|	scalar_int_literal_constant
+			{ action.char_length(false); }
 	;
 
 scalar_int_literal_constant
@@ -554,17 +615,35 @@ scalar_int_literal_constant
 	;
 
 // R427
+// char_literal_constant
+// // options {k=2;}
+// 	:	T_DIGIT_STRING T_UNDERSCORE T_CHAR_CONSTANT
+//         // removed the T_UNDERSCORE because underscores are valid characters 
+//         // for identifiers, which means the lexer would match the T_IDENT and 
+//         // T_UNDERSCORE as one token (T_IDENT).
+// 	|	T_IDENT T_CHAR_CONSTANT
+// 	|	T_CHAR_CONSTANT
+//     ;
 char_literal_constant
 options {k=2;}
 	:	(T_DIGIT_STRING T_UNDERSCORE) => T_DIGIT_STRING T_UNDERSCORE T_CHAR_CONSTANT
-	|	(T_IDENT T_UNDERSCORE) => T_IDENT T_UNDERSCORE T_CHAR_CONSTANT
+			{ action.char_literal_constant($T_DIGIT_STRING, null, $T_CHAR_CONSTANT); }
+        // removed the T_UNDERSCORE because underscores are valid characters 
+        // for identifiers, which means the lexer would match the T_IDENT and 
+        // T_UNDERSCORE as one token (T_IDENT).
+	|	(T_IDENT) => T_IDENT T_CHAR_CONSTANT
+			{ action.char_literal_constant(null, $T_IDENT, $T_CHAR_CONSTANT); }
 	|	T_CHAR_CONSTANT
+			{ action.char_literal_constant(null, null, $T_CHAR_CONSTANT); }
     ;
 
 // R428
 logical_literal_constant
-	:	T_TRUE ( T_UNDERSCORE kind_param )?
-	|	T_FALSE ( T_UNDERSCORE kind_param )?
+@init{Token kind = null;} // @init{INIT_TOKEN_NULL(kind);}
+	:	T_TRUE ( T_UNDERSCORE kind_param {kind = $kind_param.tk;})?
+			{action.logical_literal_constant(true, kind);}
+	|	T_FALSE ( T_UNDERSCORE kind_param {kind = $kind_param.tk;})?
+			{action.logical_literal_constant(false, kind);}
 	;
 
 // R429
@@ -611,11 +690,17 @@ derived_type_stmt
 	;
 
 type_attr_spec_list
-	:	type_attr_spec ( T_COMMA type_attr_spec )*
+@init{int count = 0;}
+	:		{action.type_attr_spec_list__begin();}
+		type_attr_spec {count++;} ( T_COMMA type_attr_spec {count++;} )*
+			{action.type_attr_spec_list(count);}
 	;
 
 generic_name_list
-	:	T_IDENT ( T_COMMA T_IDENT )*
+@init{int count = 0;}
+	:		{action.generic_name_list__begin();}
+		T_IDENT {count++;} ( T_COMMA T_IDENT {count++;} )*
+			{action.generic_name_list(count);}
 	;
 
 // R431
@@ -657,7 +742,10 @@ type_param_decl
     ;
 
 type_param_decl_list
-    :    type_param_decl ( T_COMMA type_param_decl )*
+@init{int count=0;}
+	:		{action.type_param_decl_list__begin();}
+        type_param_decl {count++;} ( T_COMMA type_param_decl {count++;} )*
+			{action.type_param_decl_list(count);}
     ;
 
 // R437
@@ -682,16 +770,24 @@ data_component_def_stmt
 
 // R441, R442-F2008
 // TODO putback F2008
+// TODO it appears there is a bug in the standard for a parameterized type,
+//      it needs to accept KIND, LEN keywords, see NOTE 4.24 and 4.25
 component_attr_spec
 	:	T_POINTER
 	|	T_DIMENSION T_LPAREN component_array_spec T_RPAREN
 	|	T_DIMENSION /* (T_LPAREN component_array_spec T_RPAREN)? */ T_LBRACKET co_array_spec T_RBRACKET
 	|	T_ALLOCATABLE
 	|	access_spec
+        // are T_KIND and T_LEN correct?
+    |   T_KIND
+    |   T_LEN
 	;
 
 component_attr_spec_list
-    :    component_attr_spec ( T_COMMA component_attr_spec )*
+@init{int count=0;}
+    :		{action.component_attr_spec_list__begin();}
+        component_attr_spec {count++;} ( T_COMMA component_attr_spec {count++;} )*
+    		{action.component_attr_spec_list(count);}
     ;
 
 // R442, R443-F2008
@@ -703,7 +799,10 @@ component_decl
     ;
 
 component_decl_list
-    :   component_decl ( T_COMMA component_decl )*
+@init{int count=0;}
+	:		{action.component_decl_list__begin();}
+       component_decl {count++;} ( T_COMMA component_decl {count++;} )*
+			{action.component_decl_list(count);}
     ;
 
 // R443
@@ -714,16 +813,18 @@ component_array_spec
 
 // deferred_shape_spec replaced by T_COLON
 deferred_shape_spec_list
-    :    T_COLON ( T_COMMA T_COLON )*
+@init{int count=0;}
+    :    	{action.deferred_shape_spec_list__begin();}
+        T_COLON {count++;} ( T_COMMA T_COLON {count++;} )*
+        	{action.deferred_shape_spec_list(count);}
     ;
 
 // R444
+// R447-F2008 can also be => initial_data_target, see NOTE 4.40 in J3/07-007
 // ERR_CHK 444 initialization_expr replaced by expr
 component_initialization
-	:	T_EQUALS
-		expr
-	|	T_EQ_GT
-		null_init
+	:	T_EQUALS expr
+	|	T_EQ_GT null_init
 	;
 
 // R445
@@ -743,7 +844,10 @@ proc_component_attr_spec
     ;
 
 proc_component_attr_spec_list
-    :    proc_component_attr_spec ( T_COMMA proc_component_attr_spec )*
+@init{int count=0;}
+    :    	{action.proc_component_attr_spec_list__begin();}
+        proc_component_attr_spec {count++;}( T_COMMA proc_component_attr_spec {count++;})*
+        	{action.proc_component_attr_spec_list(count);}
     ;
 
 // R447
@@ -798,7 +902,10 @@ binding_attr
     ;
 
 binding_attr_list
-    :    binding_attr ( T_COMMA binding_attr )*
+@init{int count=0;}
+    :		{action.binding_attr_list__begin();}
+        binding_attr {count++;} ( T_COMMA binding_attr {count++;} )*
+    		{action.binding_attr_list(count);}
     ;
 
 // R454
@@ -818,21 +925,35 @@ type_param_spec
     ;
 
 type_param_spec_list
-    :    type_param_spec ( T_COMMA type_param_spec )*
+@init{int count=0;}
+    :    	{action.type_param_spec_list__begin();} 
+        type_param_spec {count++;}( T_COMMA type_param_spec {count++;})*
+        	{action.type_param_spec_list(count);} 
     ;
 
 // R457
 // inlined derived_type_spec (R662) to remove ambiguity using backtracking
+// ERR_CHK R457 
+// If any of the type-param-specs in the list are an '*' or ':', the 
+// component-spec-list is required.
+// the second alternative to the original rule for structure_constructor is 
+// a subset of the first alternative because component_spec_list is a 
+// subset of type_param_spec_list.  by combining these two alternatives we can
+// remove the backtracking on this rule.
 structure_constructor
-options {backtrack=true;}
+// options {backtrack=true;}
+//     : T_IDENT T_LPAREN type_param_spec_list T_RPAREN
+// 		T_LPAREN
+// 		( component_spec_list )?
+// 		T_RPAREN
+//     | T_IDENT
+// 		T_LPAREN
+// 		( component_spec_list )?
+// 		T_RPAREN
     : T_IDENT T_LPAREN type_param_spec_list T_RPAREN
-		T_LPAREN
+		(T_LPAREN
 		( component_spec_list )?
-		T_RPAREN
-    | T_IDENT
-		T_LPAREN
-		( component_spec_list )?
-		T_RPAREN
+		T_RPAREN)?
 	;
 
 // R458
@@ -841,7 +962,10 @@ component_spec
     ;
 
 component_spec_list
-    :    component_spec ( T_COMMA component_spec )*
+@init{int count=0;}
+    :    	{action.component_spec_list__begin();} 
+        component_spec {count++;}( T_COMMA component_spec {count++;})*
+        	{action.component_spec_list(count);} 
     ;
 
 // R459
@@ -880,11 +1004,13 @@ enumerator
     ;
 
 enumerator_list
-    :   enumerator ( T_COMMA enumerator )*
+@init{int count=0;}
+    :    	{action.enumerator_list__begin();} 
+        enumerator {count++;}( T_COMMA enumerator {count++;})*
+        	{action.enumerator_list(count);} 
     ;
 
 // R464
-// TODO - what happened to the label statement on the first option
 end_enum_stmt
 options {k=3;}
 @init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
@@ -919,7 +1045,10 @@ options {backtrack=true;}
 	;
 
 ac_value_list
-    :   ac_value ( T_COMMA ac_value )*
+@init{int count=0;}
+    :    	{action.ac_value_list__begin();} 
+        ac_value {count++;}( T_COMMA ac_value {count++;})*
+        	{action.ac_value_list(count);} 
     ;
 
 // R470
@@ -948,8 +1077,14 @@ Section 5:
 
 // R501
 type_declaration_stmt
-@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
-    :    (label {lbl=$label.tk;})? declaration_type_spec ( ( T_COMMA attr_spec )* T_COLON_COLON )? entity_decl_list T_EOS
+@init{Token lbl = null;
+      int numAttrSpecs = 0;
+     } // @init{INIT_TOKEN_NULL(lbl);}
+    :		{ action.type_declaration_stmt__begin(); }
+        (label {lbl=$label.tk;})? declaration_type_spec
+    	 ( (T_COMMA attr_spec {numAttrSpecs += 1;})* T_COLON_COLON )?
+    	 entity_decl_list T_EOS
+    		{ action.type_declaration_stmt(lbl, numAttrSpecs); }
     ;
 
 // R502
@@ -987,20 +1122,28 @@ attr_spec
 	|	T_TARGET
 	|	T_VALUE
 	|	T_VOLATILE
+        // are T_KIND and T_LEN correct?
+    |   T_KIND
+    |   T_LEN
 	;
 
 
 // R504, R503-F2008
 // T_IDENT inlined for object_name and function_name
 // T_IDENT ( T_ASTERISK char_length )? (second alt) subsumed in first alt
+// TODO Pass more info to action....
 entity_decl
     : T_IDENT ( T_LPAREN array_spec T_RPAREN )?
               ( T_LBRACKET co_array_spec T_RBRACKET )?
               ( T_ASTERISK char_length )? ( initialization )?
+		{action.entity_decl($T_IDENT);}
     ;
 
 entity_decl_list
-    :    entity_decl ( T_COMMA entity_decl )*
+@init{int count = 0;}
+    :		{action.entity_decl_list__begin();}
+    	entity_decl {count += 1;} ( T_COMMA entity_decl {count += 1;} )*
+    		{action.entity_decl_list(count);}
     ;
 
 // R505 object_name inlined as T_IDENT
@@ -1008,16 +1151,15 @@ entity_decl_list
 // R506
 // ERR_CHK 506 initialization_expr replaced by expr
 initialization
-	:	T_EQUALS
-		expr
-	|	T_EQ_GT
-		null_init
+	:	T_EQUALS expr		{ action.initialization(true, false); }
+	|	T_EQ_GT null_init	{ action.initialization(false, true); }
 	;
 
 // R507
 // C506 The function-reference shall be a reference to the NULL intrinsic function with no arguments.
 null_init
 	:	T_IDENT /* 'NULL' */ T_LPAREN T_RPAREN
+			{ action.null_init($T_IDENT); }
 	;
 
 // R508
@@ -1054,7 +1196,10 @@ explicit_shape_spec
     ;
 
 explicit_shape_spec_list
-    : explicit_shape_spec ( T_COMMA explicit_shape_spec )*
+@init{ int count=0;}
+	:		{action.explicit_shape_spec_list__begin();}
+     	explicit_shape_spec {count++;}( T_COMMA explicit_shape_spec {count++;})*
+			{action.explicit_shape_spec_list(count);}
     ;
 
 /*
@@ -1073,7 +1218,10 @@ deferred_co_shape_spec
 	;
 
 deferred_co_shape_spec_list
-	:	T_COLON ( T_COMMA T_COLON )?
+@init{int count=0;}
+	:		{action.deferred_co_shape_spec_list__begin();}
+		T_COLON {count++;}( T_COMMA T_COLON {count++;})?
+			{action.deferred_co_shape_spec_list(count);}
 	;
 
 // R520-F2008
@@ -1127,7 +1275,10 @@ access_id
 	;
 
 access_id_list
-    :    access_id ( T_COMMA access_id )*
+@init{ int count=0;}
+    :  		{action.access_id_list__begin();}
+		access_id {count++;} ( T_COMMA access_id {count++;} )*
+      		{action.access_id_list(count);}
     ;
 
 // R520, R526-F2008
@@ -1169,7 +1320,10 @@ bind_entity
 	;
 
 bind_entity_list
-    :    bind_entity ( T_COMMA bind_entity )*
+@init{ int count=0;}
+    :  		{action.bind_entity_list__begin();}
+		bind_entity {count++;} ( T_COMMA bind_entity {count++;} )*
+      		{action.bind_entity_list(count);}
     ;
 
 // R524
@@ -1193,8 +1347,12 @@ data_stmt_object
 	;
 
 data_stmt_object_list
-    :    data_stmt_object ( T_COMMA data_stmt_object )*
+@init{ int count=0;}
+    :  		{action.data_stmt_object_list__begin();}
+		data_stmt_object {count++;} ( T_COMMA data_stmt_object {count++;} )*
+      		{action.data_stmt_object_list(count);}
     ;
+
 
 // R527
 // ERR_CHK 527 scalar_int_expr replaced by expr
@@ -1212,7 +1370,10 @@ data_i_do_object
 	;
 
 data_i_do_object_list
-    :   data_i_do_object ( T_COMMA data_i_do_object )*
+@init{ int count=0;}
+    :  		{action.data_i_do_object_list__begin();}
+		data_i_do_object {count++;} ( T_COMMA data_i_do_object {count++;} )*
+      		{action.data_i_do_object_list(count);}
     ;
 
 // R529 data_i_do_variable was scalar_int_variable inlined as T_IDENT
@@ -1236,7 +1397,10 @@ options {backtrack=true;}
     ;
 
 data_stmt_value_list
-    :    data_stmt_value ( T_COMMA data_stmt_value )*
+@init{ int count=0;}
+    :  		{action.data_stmt_value_list__begin();}
+		data_stmt_value {count++;} ( T_COMMA data_stmt_value {count++;} )*
+      		{action.data_stmt_value_list(count);}
     ;
 
 // R531 data_stmt_repeat inlined as (int_literal_constant | designator) in R530
@@ -1253,11 +1417,17 @@ scalar_int_constant
 // scalar_constant replaced by literal_constant as designator can be T_IDENT
 // then literal_constant inlined (except for signed portion)
 // structure_constructure covers null_init if 'NULL()' so null_init deleted
+// The lookahead in the alternative for signed_real_literal_constant is 
+// necessary because ANTLR won't look far enough ahead by itself and when it
+// sees a T_DIGIT_STRING, it tries the signed_int_literal_constant.  this isn't
+// correct since the new version of the real_literal_constants can start with
+// a T_DIGIT_STRING.  
 data_stmt_constant
-options {backtrack=true;}
+options {backtrack=true; k=3;}
 	:	designator
 	|	signed_int_literal_constant
-	|	signed_real_literal_constant
+	|	( (T_PLUS | T_MINUS)? (T_DIGIT_STRING (T_PERIOD | T_PERIOD_EXPONENT)) 
+            | (T_PERIOD) ) => signed_real_literal_constant
 	|	complex_literal_constant
 	|	logical_literal_constant
 	|	char_literal_constant
@@ -1310,7 +1480,10 @@ parameter_stmt
 	;
 
 named_constant_def_list
-    :    named_constant_def ( T_COMMA named_constant_def )*
+@init{ int count=0;}
+    :  		{action.named_constant_def_list__begin();}
+		named_constant_def {count++;} ( T_COMMA named_constant_def {count++;} )*
+      		{action.named_constant_def_list(count);}
     ;
 
 // R539
@@ -1327,7 +1500,10 @@ pointer_stmt
 	;
 
 pointer_decl_list
-    :    pointer_decl ( T_COMMA pointer_decl )*
+@init{ int count=0;}
+    :  		{action.pointer_decl_list__begin();}
+		pointer_decl {count++;} ( T_COMMA pointer_decl {count++;} )*
+      		{action.pointer_decl_list(count);}
     ;
 
 // R541
@@ -1357,8 +1533,12 @@ saved_entity
 	;
 
 saved_entity_list
-    :    saved_entity ( T_COMMA saved_entity )*
+@init{ int count=0;}
+    :  		{action.saved_entity_list__begin();}
+		saved_entity {count++;} ( T_COMMA saved_entity {count++;} )*
+      		{action.saved_entity_list(count);}
     ;
+
 
 // R545 proc_pointer_name was name inlined as T_IDENT
 
@@ -1402,8 +1582,12 @@ implicit_spec
 	;
 
 implicit_spec_list
-    :    implicit_spec ( T_COMMA implicit_spec )*
+@init{ int count=0;}
+    :  		{action.implicit_spec_list__begin();}
+		implicit_spec {count++;} ( T_COMMA implicit_spec {count++;} )*
+      		{action.implicit_spec_list(count);}
     ;
+
 
 // R551
 // TODO: here, we'll accept a T_IDENT, and then we'll have to do error 
@@ -1413,7 +1597,10 @@ letter_spec
     ;
 
 letter_spec_list
-    :    letter_spec ( T_COMMA letter_spec )*
+@init{ int count=0;}
+    :  		{action.letter_spec_list__begin();}
+		letter_spec {count++;} ( T_COMMA letter_spec {count++;} )*
+      		{action.letter_spec_list(count);}
     ;
 
 // R552
@@ -1428,8 +1615,12 @@ namelist_stmt
 
 // T_IDENT inlined for namelist_group_object
 namelist_group_object_list
-    :    T_IDENT ( T_COMMA T_IDENT )*
+@init{ int count=0;}
+    :  		{action.namelist_group_object_list__begin();}
+		T_IDENT {count++;} ( T_COMMA T_IDENT {count++;} )*
+      		{action.namelist_group_object_list(count);}
     ;
+
 
 // R554
 equivalence_stmt
@@ -1442,8 +1633,12 @@ equivalence_set
 	:	T_LPAREN equivalence_object T_COMMA equivalence_object_list T_RPAREN
 	;
 
+
 equivalence_set_list
-    :    equivalence_set ( T_COMMA equivalence_set )*
+@init{ int count=0;}
+    :  		{action.equivalence_set_list__begin();}
+		equivalence_set {count++;} ( T_COMMA equivalence_set {count++;} )*
+      		{action.equivalence_set_list(count);}
     ;
 
 // R556
@@ -1456,7 +1651,10 @@ equivalence_object
 	;
 
 equivalence_object_list
-    :    equivalence_object ( T_COMMA equivalence_object )*
+@init{ int count=0;}
+    :  		{action.equivalence_object_list__begin();}
+		equivalence_object {count++;} ( T_COMMA equivalence_object {count++;} )*
+      		{action.equivalence_object_list(count);}
     ;
 
 // R557
@@ -1475,7 +1673,10 @@ common_block_object
     ;
 
 common_block_object_list
-    :    common_block_object ( T_COMMA common_block_object )*
+@init{ int count=0;}
+    :  		{action.common_block_object_list__begin();}
+		common_block_object {count++;} ( T_COMMA common_block_object {count++;} )*
+      		{action.common_block_object_list(count);}
     ;
 
 /*
@@ -1484,7 +1685,7 @@ Section 6:
 
 // R601
 variable
-	:	designator
+	:	designator {action.variable();}
 	;
 
 // R602 variable_name was name inlined as T_IDENT
@@ -1498,11 +1699,11 @@ variable
 // (substring-range) may be matched in data-ref
 // this rule is now identical to substring
 designator
-// TODO: does this need backtracking?  it should be able to lookahead and 
-// see if it has a char_literal_constant to prevent any ambiguities.
-// options {backtrack=true;}
-	:	data_ref (T_LPAREN substring_range T_RPAREN)?
+@init{boolean hasSubstringRange = false;}
+	:	data_ref (T_LPAREN substring_range {hasSubstringRange=true;} T_RPAREN)?
+			{ action.designator(hasSubstringRange); }
 	|	char_literal_constant T_LPAREN substring_range T_RPAREN
+			{ hasSubstringRange=true; action.substring(hasSubstringRange); }
 	;
 
 //
@@ -1513,20 +1714,96 @@ designator
 // C1220 (R1217) The procedure-designator shall designate a function.
 // data_ref may (or not) match T_LPAREN ( actual_arg_spec_list )? T_RPAREN, so is optional
 designator_or_func_ref
-	:	data_ref (T_LPAREN substring_range_or_arg_list T_RPAREN)? 
+@init{boolean hasSubstringRangeOrArgList = false;
+	  boolean hasSubstringRange = false;
+	 }
+	:	data_ref (T_LPAREN substring_range_or_arg_list
+					{
+						hasSubstringRangeOrArgList = true;
+						hasSubstringRange=$substring_range_or_arg_list.isSubstringRange;
+					}
+				  T_RPAREN)?
+			{
+				if (hasSubstringRangeOrArgList) {
+					if (hasSubstringRange) {
+						action.designator(hasSubstringRange);
+					} else {
+						action.function_reference(true);	// hasActualArgSpecList=true
+					}
+				}
+			}
 	|	char_literal_constant T_LPAREN substring_range T_RPAREN
+			{ hasSubstringRange=true; action.substring(hasSubstringRange); }
 	;
 
-substring_range_or_arg_list
-	:	T_COLON (expr)?         // substring_range
-	|	expr substr_range_or_arg_list_suffix
-	|	keyword T_EQUALS expr ( T_COMMA actual_arg_spec )*
-	|	( keyword T_EQUALS )? T_ASTERISK label ( T_COMMA actual_arg_spec )*
+substring_range_or_arg_list returns [boolean isSubstringRange]
+@init{boolean hasUpperBound = false;
+	  Token keyword = null;
+	  int count = 0;
+	 }
+	:	T_COLON (expr {hasUpperBound = true;})?         // substring_range
+			{
+			  action.substring_range(true, hasUpperBound);
+			  isSubstringRange=true;
+			}
+	|		{ 
+			  action.actual_arg_spec_list__begin();  /* mimic actual-arg-spec-list */
+			}
+		expr substr_range_or_arg_list_suffix
+			{
+			  isSubstringRange = $substr_range_or_arg_list_suffix.isSubstringRange;
+			}
+	|		{
+			  action.actual_arg_spec_list__begin(); /* mimic actual-arg-spec-list */
+			}
+		T_IDENT T_EQUALS expr
+			{
+			  count++;
+			  action.actual_arg(true, null);
+			  action.actual_arg_spec($T_IDENT);
+			}
+		( T_COMMA actual_arg_spec {count++;} )*
+			{
+			  action.actual_arg_spec_list(count);
+			  isSubstringRange = false;
+			}
+	|		{
+			  action.actual_arg_spec_list__begin(); /* mimic actual-arg-spec-list */
+			}
+		( T_IDENT T_EQUALS {keyword=$T_IDENT;} )? T_ASTERISK label
+			{
+			  count++;
+			  action.actual_arg(false, $label.tk);
+			  action.actual_arg_spec(keyword);
+			}
+		( T_COMMA actual_arg_spec {count++;} )*
+			{
+			  action.actual_arg_spec_list(count);
+			  isSubstringRange = false;
+			}
 	;
 
-substr_range_or_arg_list_suffix
-	:	T_COLON (expr)?                 // substring_range
-	|	( T_COMMA actual_arg_spec )*    // actual_arg_spec_list
+substr_range_or_arg_list_suffix returns [boolean isSubstringRange]
+@init{boolean hasUpperBound = false; int count = 0;}
+	:		{
+			  action.actual_arg_spec_list(-1);  // guessed wrong on list creation, inform of error
+			}
+		T_COLON (expr {hasUpperBound=true;})?	// substring_range
+			{
+			  action.substring_range(true, hasUpperBound);
+			  isSubstringRange = true;
+			}
+	|
+			{
+			  count++;
+			  action.actual_arg(true, null);	// hasExpr=true, label=null
+			  action.actual_arg_spec(null);		// keywork=null
+			}
+		( T_COMMA actual_arg_spec {count++;} )*
+			{
+			  action.actual_arg_spec_list(count);
+			  isSubstringRange=false;
+			}	// actual_arg_spec_list
 	;
 
 // R604
@@ -1568,8 +1845,11 @@ int_variable
 // so required T_LPAREN substring_range T_RPAREN made optional
 // ERR_CHK 609 ensure final () is (substring-range)
 substring
-	:	data_ref (T_LPAREN substring_range T_RPAREN)?
+@init{boolean hasSubstringRange = false;}
+	:	data_ref (T_LPAREN substring_range {hasSubstringRange=true;} T_RPAREN)?
+			{ action.substring(hasSubstringRange); }
 	|	char_literal_constant T_LPAREN substring_range T_RPAREN
+			{ action.substring(true); }
 	;
 
 // R610 parent_string inlined in R609 as (data_ref | char_literal_constant)
@@ -1581,14 +1861,18 @@ substring
 // R611
 // ERR_CHK 611 scalar_int_expr replaced by expr
 substring_range
-	:	( expr )?
-		T_COLON
-		( expr )?
+@init{boolean hasLowerBound = false;
+	  boolean hasUpperBound = false;
+	 }
+	:	(expr {hasLowerBound = true;})? T_COLON	(expr {hasUpperBound = true;})?
+			{ action.substring_range(hasLowerBound, hasUpperBound); }
 	;
 
 // R612
 data_ref
-	:	part_ref ( T_PERCENT part_ref )*
+@init{int numPartRefs = 0;}
+	:	part_ref {numPartRefs += 1;} ( T_PERCENT part_ref {numPartRefs += 1;})*
+			{action.data_ref(numPartRefs);}
 	;
 
 // R613, R613-F2008
@@ -1599,9 +1883,16 @@ data_ref
 // TODO putback F2008
 part_ref
 options {k=2;}
-	:	( T_IDENT T_LPAREN) => T_IDENT T_LPAREN section_subscript_list T_RPAREN ( image_selector )? 
+@init{boolean hasSSL = false;
+      boolean hasImageSelector = false;
+     }
+	:	( T_IDENT T_LPAREN) => T_IDENT T_LPAREN section_subscript_list T_RPAREN
+		( image_selector {hasImageSelector=true;})?
+			{hasSSL=true; action.part_ref($T_IDENT, hasSSL, hasImageSelector);}
 //	|	 T_IDENT image_selector
-	|	T_IDENT 
+//			{hasImageSelector=true; action.part_ref($T_IDENT, hasSSL, hasImageSelector);}
+	|	T_IDENT
+			{action.part_ref($T_IDENT, hasSSL, hasImageSelector);}
     ;
 
 // R614 structure_component inlined as data_ref
@@ -1620,21 +1911,54 @@ options {k=2;}
 // expr inlined for subscript, vector_subscript, and stride (thus deleted option 3)
 // refactored first optional expr from subscript_triplet
 // modified to also match actual_arg_spec_list to reduce ambiguities and need for backtracking
-section_subscript
-	:	expr section_subscript_suffix
-	|	T_COLON ( expr )? ( T_COLON expr )?
-	|	T_IDENT T_EQUALS (expr | T_ASTERISK label) // isa arg list
-	|	T_ASTERISK label // isa arg list
-	|	{ /* empty isa empty arg list */ }
+section_subscript returns [boolean isEmpty]
+@init{boolean hasLowerBounds = false;
+	  boolean hasUpperBounds = false;
+	  boolean hasStride = false;
+      boolean hasExpr = false;
+     }
+	:	expr section_subscript_ambiguous
+	|	T_COLON (expr {hasUpperBounds=true;})? (T_COLON expr {hasStride=true;})?
+			{ action.section_subscript(hasLowerBounds, hasUpperBounds, hasStride, false); }
+    |   T_COLON_COLON expr
+        	{hasStride=true; action.section_subscript(hasLowerBounds, hasUpperBounds, hasStride, false);}
+	|	T_IDENT T_EQUALS expr				// could be an actual-arg, see R1220
+			{ hasExpr=true; action.actual_arg(hasExpr, null); action.actual_arg_spec($T_IDENT); }
+	|	T_IDENT T_EQUALS T_ASTERISK label	// could be an actual-arg, see R1220
+			{ action.actual_arg(hasExpr, $label.tk); action.actual_arg_spec($T_IDENT); }
+	|	T_ASTERISK label /* could be an actual-arg, see R1220 */
+			{ action.actual_arg(hasExpr, $label.tk); action.actual_arg_spec(null); }
+	|		{ isEmpty = true; /* empty could be an actual-arg, see R1220 */ }
 	;
 
-section_subscript_suffix
-	:	T_COLON ( expr )? ( T_COLON expr )?
-	|	{ /* empty, could be arg list */}
+section_subscript_ambiguous
+@init{boolean hasLowerBound = true;
+      boolean hasUpperBound = false;
+      boolean hasStride = false;
+      boolean isAmbiguous = false;}
+	:	T_COLON (expr {hasUpperBound=true;})? (T_COLON expr {hasStride=true;})?
+	        {action.section_subscript(hasLowerBound, hasUpperBound, hasStride, isAmbiguous);}
+        // this alternative is necessary because if alt1 above has no expr
+        // following the first : and there is the optional second : with no 
+        // WS between the two, the lexer will make a T_COLON_COLON token 
+        // instead of two T_COLON tokens.  in this case, the second expr is
+        // required.  for an example, see J3/04-007, Note 7.44.
+    |   T_COLON_COLON expr
+        	{hasStride=true; action.section_subscript(hasLowerBound, hasUpperBound, hasStride, isAmbiguous);}
+	|		{/* empty, could be an actual-arg, see R1220 */
+			 isAmbiguous=true; action.section_subscript(hasLowerBound, hasUpperBound, hasStride, isAmbiguous);
+			}
 	;
 
 section_subscript_list
-    :    section_subscript ( T_COMMA section_subscript )*
+@init{int count = 0;}
+    :		{ action.section_subscript_list__begin(); }
+    	isEmpty=section_subscript
+    		{
+    			if (isEmpty == false) count += 1;
+    		}
+    	(T_COMMA section_subscript {count += 1;})*
+    		{ action.section_subscript_list(count); }
     ;
 
 // R620 subscript_triplet inlined in R619
@@ -1682,7 +2006,10 @@ alloc_opt
 	;
 
 alloc_opt_list
-    :    alloc_opt ( T_COMMA alloc_opt )*
+@init{ int count=0;}
+    :  		{action.alloc_opt_list__begin();}
+		alloc_opt {count++;} ( T_COMMA alloc_opt {count++;} )*
+      		{action.alloc_opt_list(count);}
     ;
 
 // R625 stat_variable was scalar_int_variable inlined in R624 and R636
@@ -1697,8 +2024,12 @@ allocation
                       ( T_LBRACKET allocate_co_array_spec T_RBRACKET )?
     ;
 
+
 allocation_list
-    :    allocation ( T_COMMA allocation )*
+@init{ int count=0;}
+    :  		{action.allocation_list__begin();}
+		allocation {count++;} ( T_COMMA allocation {count++;} )*
+      		{action.allocation_list(count);}
     ;
 
 // R629
@@ -1710,7 +2041,10 @@ allocate_object
 	;
 
 allocate_object_list
-    :    allocate_object ( T_COMMA allocate_object )*
+@init{ int count=0;}
+    :  		{action.allocate_object_list__begin();}
+		allocate_object {count++;} ( T_COMMA allocate_object {count++;} )*
+      		{action.allocate_object_list(count);}
     ;
 
 // R630
@@ -1721,7 +2055,10 @@ allocate_shape_spec
     ;
 
 allocate_shape_spec_list
-    :    allocate_shape_spec ( T_COMMA allocate_shape_spec )*
+@init{ int count=0;}
+    :  		{action.allocate_shape_spec_list__begin();}
+		allocate_shape_spec {count++;} ( T_COMMA allocate_shape_spec {count++;} )*
+      		{action.allocate_shape_spec_list(count);}
     ;
 
 // R631 inlined lower_bound_expr was scalar_int_expr
@@ -1731,10 +2068,9 @@ allocate_shape_spec_list
 // R633
 nullify_stmt
 @init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
-	:	(label {lbl=$label.tk;})? T_NULLIFY
-		T_LPAREN
-		pointer_object_list
-		T_RPAREN T_EOS
+	:	(label {lbl=$label.tk;})?
+		T_NULLIFY T_LPAREN pointer_object_list T_RPAREN T_EOS
+			{ action.nullify_stmt(lbl); }
 	;
 
 // R634
@@ -1746,7 +2082,10 @@ pointer_object
 	;
 
 pointer_object_list
-    :    pointer_object ( T_COMMA pointer_object )*
+@init{ int count=0;}
+    :  		{action.pointer_object_list__begin();}
+		pointer_object {count++;} ( T_COMMA pointer_object {count++;} )*
+      		{action.pointer_object_list(count);}
     ;
 
 // R635
@@ -1762,7 +2101,10 @@ dealloc_opt
 	;
 
 dealloc_opt_list
-    :    dealloc_opt ( T_COMMA dealloc_opt )*
+@init{ int count=0;}
+    :  		{action.dealloc_opt_list__begin();}
+		dealloc_opt {count++;} ( T_COMMA dealloc_opt {count++;} )*
+      		{action.dealloc_opt_list(count);}
     ;
 
 // R636-F2008
@@ -1777,7 +2119,10 @@ allocate_co_shape_spec
     ;
 
 allocate_co_shape_spec_list
-    :    allocate_co_shape_spec ( T_COMMA allocate_co_shape_spec )?
+@init{ int count=0;}
+    :  		{action.allocate_co_shape_spec_list__begin();}
+		allocate_co_shape_spec {count++;} ( T_COMMA allocate_co_shape_spec {count++;} )*
+      		{action.allocate_co_shape_spec_list(count);}
     ;
 
 /*
@@ -1801,67 +2146,83 @@ options {backtrack=true;}       // alt 1,4 ambiguous
 
 // R702
 level_1_expr
-    : ( defined_unary_op )? primary
+@init{Token tk = null;} //@init{INIT_TOKEN_NULL(tk);}
+    : (defined_unary_op {tk = $defined_unary_op.tk;})? primary
+    		{action.level_1_expr(tk);}
     ;
 
 // R703
-defined_unary_op
-	:	T_DEFINED_OP
+defined_unary_op returns [Token tk]
+	:	T_DEFINED_OP {tk = $T_DEFINED_OP;}
 	;
 
 // inserted as R704 functionality
 power_operand
-	: level_1_expr ( power_op power_operand )?
+@init{boolean hasPowerOperand = false;}
+	: level_1_expr (power_op power_operand {hasPowerOperand = true;})?
+			{action.power_operand(hasPowerOperand);}
 	;	
 
 // R704
 // see power_operand
 mult_operand
+@init{int numMultOps = 0;}
 //    : level_1_expr ( power_op mult_operand )?
 //    : power_operand
-    : power_operand ( mult_op power_operand )*
+    : power_operand (mult_op power_operand
+    					{action.mult_operand__mult_op($mult_op.tk); numMultOps += 1;}
+    				)*
+    		{action.mult_operand(numMultOps);}
     ;
 
 // R705
 // moved leading optionals to mult_operand
 add_operand
+@init{int numAddOps = 0;}
 //    : ( add_operand mult_op )? mult_operand
 //    : ( mult_operand mult_op )* mult_operand
-    : (add_op)? mult_operand ( add_op mult_operand )*
+    : (tk=add_op)? mult_operand ( tk1=add_op mult_operand 
+    								{action.add_operand__add_op(tk1); numAddOps += 1;}
+    						 	)*
+    		{action.add_operand(tk, numAddOps);}
     ;
 
 // R706
 // moved leading optionals to add_operand
 level_2_expr
+@init{int numConcatOps = 0;}
 //    : ( ( level_2_expr )? add_op )? add_operand
 // check notes on how to remove this left recursion  (WARNING something like the following)
 //    : (add_op)? ( add_operand add_op )* add_operand
-    : add_operand ( concat_op add_operand )*
+    : add_operand ( concat_op add_operand {numConcatOps += 1;})*
+    		{action.level_2_expr(numConcatOps);}
     ;
 
 // R707
-power_op
-	:	T_POWER
+power_op returns [Token tk]
+	:	T_POWER	{tk = $T_POWER;}
 	;
 
 // R708
-mult_op
-	:	T_ASTERISK
-	|	T_SLASH
+mult_op returns [Token tk]
+	:	T_ASTERISK	{tk = $T_ASTERISK;}
+	|	T_SLASH		{tk = $T_SLASH;}
 	;
 
 // R709
-add_op
-	:	T_PLUS
-	|	T_MINUS
+add_op returns [Token tk]
+	:	T_PLUS  {tk = $T_PLUS;}
+	|	T_MINUS {tk = $T_MINUS;}
 	;
 
 // R710
 // moved leading optional to level_2_expr
 level_3_expr
+@init{Token relOp = null;} //@init{INIT_TOKEN_NULL(relOp);}
 //    : ( level_3_expr concat_op )? level_2_expr
 //    : ( level_2_expr concat_op )* level_2_expr
-    : level_2_expr ( rel_op level_2_expr )?
+    : level_2_expr (rel_op level_2_expr {relOp = $rel_op.tk;})?
+    		{action.level_3_expr(relOp);}
     ;
 
 // R711
@@ -1871,76 +2232,97 @@ concat_op
 
 // R712
 // moved leading optional to level_3_expr
-level_4_expr
+// inlined level_3_expr for level_4_expr in R714
+//level_4_expr
 //    : ( level_3_expr rel_op )? level_3_expr
-    : level_3_expr
-    ;
+//    : level_3_expr
+//    ;
 
 // R713
-rel_op
-	:	T_EQ
-	|	T_NE
-	|	T_LT
-	|	T_LE
-	|	T_GT
-	|	T_GE
-	|	T_EQ_EQ
-	|	T_SLASH_EQ
-	|	T_LESSTHAN
-	|	T_LESSTHAN_EQ
-	|	T_GREATERTHAN
-	|	T_GREATERTHAN_EQ
+rel_op returns [Token tk]
+	:	T_EQ				{tk=$T_EQ;}
+	|	T_NE				{tk=$T_NE;}
+	|	T_LT				{tk=$T_LT;}
+	|	T_LE				{tk=$T_LE;}
+	|	T_GT				{tk=$T_GT;}
+	|	T_GE				{tk=$T_GE;}
+	|	T_EQ_EQ				{tk=$T_EQ_EQ;}
+	|	T_SLASH_EQ			{tk=$T_SLASH_EQ;}
+	|	T_LESSTHAN			{tk=$T_LESSTHAN;}
+	|	T_LESSTHAN_EQ		{tk=$T_LESSTHAN_EQ;}
+	|	T_GREATERTHAN		{tk=$T_GREATERTHAN;}
+	|	T_GREATERTHAN_EQ	{tk=$T_GREATERTHAN_EQ;}
 	;
 
 // R714
+// level_4_expr inlined as level_3_expr
 and_operand
-//    :    ( not_op )? level_4_expr
-    :    ( not_op )? level_4_expr ( and_op level_4_expr )*
+@init{boolean hasNotOp0 = false; // @init{INIT_BOOL_FALSE(hasNotOp0);
+      boolean hasNotOp1 = false; // @init{INIT_BOOL_FALSE(hasNotOp1);
+      int numAndOps = 0;}
+//    :    ( not_op )? level_3_expr
+	:	(not_op {hasNotOp0=true;})?
+    	level_3_expr
+		(and_op {hasNotOp1=false;} (not_op {hasNotOp1=true;})? level_3_expr
+				{action.and_operand__not_op(hasNotOp1); numAndOps += 1;}
+		)*
+				{action.and_operand(hasNotOp0, numAndOps);}
     ;
 
 // R715
 // moved leading optional to or_operand
 or_operand
+@init{int numOrOps = 0;}
 //    : ( or_operand and_op )? and_operand
 //    : ( and_operand and_op )* and_operand
-    : and_operand ( or_op and_operand )*
+    : and_operand (or_op and_operand {numOrOps += 1;})*
+    		{ action.or_operand(numOrOps); }
     ;
 
 // R716
 // moved leading optional to or_operand
+// TODO - action for equiv_op token
 equiv_operand
+@init{int numEquivOps = 0;}
 //    : ( equiv_operand or_op )? or_operand
 //    : ( or_operand or_op )* or_operand
-    : or_operand ( equiv_op or_operand )*
+    : or_operand (equiv_op or_operand
+    				{action.equiv_operand__equiv_op($equiv_op.tk); numEquivOps += 1;}
+    			 )*
+			{action.equiv_operand(numEquivOps);}
     ;
 
 // R717
 // moved leading optional to equiv_operand
 level_5_expr
+@init{int numDefinedBinaryOps = 0;}
 //    : ( level_5_expr equiv_op )? equiv_operand
 //    : ( equiv_operand equiv_op )* equiv_operand
-    : equiv_operand ( defined_binary_op equiv_operand )*
+    : equiv_operand (defined_binary_op equiv_operand
+    					{action.level_5_expr__defined_binary_op($defined_binary_op.tk); numDefinedBinaryOps += 1;}
+    				)*
+    		{action.level_5_expr(numDefinedBinaryOps);}
     ;
 
 // R718
-not_op
-	:	T_NOT
+not_op returns [Token tk]
+	:	T_NOT {tk = $T_NOT;}
 	;
 
 // R719
-and_op
-	:	T_AND
+and_op returns [Token tk]
+	:	T_AND {tk = $T_AND;}
 	;
 
 // R720
-or_op
-	:	T_OR
+or_op returns [Token tk]
+	:	T_OR {tk = $T_OR;}
 	;
 
 // R721
-equiv_op
-	:	T_EQV
-	|	T_NEQV
+equiv_op returns [Token tk]
+	:	T_EQV {tk = $T_EQV;}
+	|	T_NEQV {tk = $T_NEQV;}
 	;
 
 // R722
@@ -1949,11 +2331,12 @@ expr
 //    : ( expr defined_binary_op )? level_5_expr
 //    : ( level_5_expr defined_binary_op )* level_5_expr
     : level_5_expr
+    	{action.expr();}
     ;
 
 // R723
-defined_binary_op
-	:	T_DEFINED_OP
+defined_binary_op returns [Token tk]
+	:	T_DEFINED_OP {tk = $T_DEFINED_OP;}
 	;
 
 // R724 inlined logical_expr was expr
@@ -1988,8 +2371,8 @@ defined_binary_op
 assignment_stmt
 @init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
 	:	(label {lbl=$label.tk;})? T_ASSIGNMENT_STMT variable
-		T_EQUALS 
-		expr T_EOS
+		T_EQUALS expr T_EOS
+			{action.assignment_stmt(lbl);}
 	;
 
 // R735
@@ -2025,7 +2408,10 @@ bounds_spec
 	;
 
 bounds_spec_list
-    :    bounds_spec ( T_COMMA bounds_spec )*
+@init{ int count=0;}
+    :  		{action.bounds_spec_list__begin();}
+		bounds_spec {count++;} ( T_COMMA bounds_spec {count++;} )*
+      		{action.bounds_spec_list(count);}
     ;
 
 // R738
@@ -2038,7 +2424,10 @@ bounds_remapping
 	;
 
 bounds_remapping_list
-    :    bounds_remapping ( T_COMMA bounds_remapping )*
+@init{ int count=0;}
+    :  		{action.bounds_remapping_list__begin();}
+		bounds_remapping {count++;} ( T_COMMA bounds_remapping {count++;} )*
+      		{action.bounds_remapping_list(count);}
     ;
 
 // R739 data_target inlined as expr in R459 and R735
@@ -2068,10 +2457,7 @@ proc_pointer_object
 where_stmt
 @init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
 	:	(label {lbl=$label.tk;})? T_WHERE_STMT T_WHERE
-		T_LPAREN
-		expr
-		T_RPAREN
-		assignment_stmt
+		T_LPAREN expr T_RPAREN assignment_stmt
 	;
 
 // R744
@@ -2163,8 +2549,12 @@ forall_triplet_spec
     : T_IDENT T_EQUALS expr T_COLON expr ( T_COLON expr )?
     ;
 
+
 forall_triplet_spec_list
-    :    forall_triplet_spec ( T_COMMA forall_triplet_spec )*
+@init{ int count=0;}
+    :  		{action.forall_triplet_spec_list__begin();}
+		forall_triplet_spec {count++;} ( T_COMMA forall_triplet_spec {count++;} )*
+      		{action.forall_triplet_spec_list(count);}
     ;
 
 // R756
@@ -2195,11 +2585,9 @@ options {k=3;}
 	;
 
 // R759
+// T_FORALL_STMT token is inserted by scanner to remove need for backtracking
 forall_stmt
 @init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
-// 	:	(label {lbl=$label.tk;})? T_FORALL
-// 		forall_header
-// 		forall_assignment_stmt
 	:	(label {lbl=$label.tk;})? T_FORALL_STMT T_FORALL
 		forall_header
 		forall_assignment_stmt
@@ -2254,12 +2642,8 @@ options {k=3;}
 
 // R807
 // ERR_CHK 807 scalar_logical_expr replaced by expr
+// T_IF_STMT inserted by scanner to remove need for backtracking
 if_stmt
-// 	:	(label {lbl=$label.tk;})? T_IF
-// 		T_LPAREN
-// 		expr
-// 		T_RPAREN
-// 		action_stmt
 @init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
 	:	(label {lbl=$label.tk;})? T_IF_STMT T_IF
 		T_LPAREN
@@ -2328,7 +2712,10 @@ case_value_range_suffix
 	;
 
 case_value_range_list
-    :    case_value_range ( T_COMMA case_value_range )*
+@init{ int count=0;}
+    :  		{action.case_value_range_list__begin();}
+		case_value_range {count++;} ( T_COMMA case_value_range {count++;} )*
+      		{action.case_value_range_list(count);}
     ;
 
 // R815
@@ -2351,7 +2738,10 @@ associate_stmt
     ;
 
 association_list
-    :    association ( T_COMMA association )*
+@init{ int count=0;}
+    :  		{action.association_list__begin();}
+		association {count++;} ( T_COMMA association {count++;} )*
+      		{action.association_list(count);}
     ;
 
 // R818
@@ -2530,20 +2920,23 @@ do_term_action_stmt
 // R843
 // T_IDENT inlined for do_construct_name
 cycle_stmt
-@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
-	:	(label {lbl=$label.tk;})? T_CYCLE ( T_IDENT )? T_EOS
+@init{Token lbl = null; Token id = null;} // @init{INIT_TOKEN_NULL(lbl); INIT_TOKEN_NULL(id);}
+	:	(label {lbl=$label.tk;})? T_CYCLE (T_IDENT {id=$T_IDENT;})? T_EOS
+			{ action.cycle_stmt(lbl, id); }
 	;
 
 // R844
 // T_IDENT inlined for do_construct_name
 exit_stmt
-@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
-	:	(label {lbl=$label.tk;})? T_EXIT ( T_IDENT )? T_EOS
+@init{Token lbl = null; Token id = null;} // @init{INIT_TOKEN_NULL(lbl); INIT_TOKEN_NULL(id);}
+	:	(label {lbl=$label.tk;})? T_EXIT (T_IDENT {id=$T_IDENT;})? T_EOS
+			{ action.exit_stmt(lbl, id); }
 	;
 
 // R845
 goto_stmt
 	:	t_go_to label T_EOS
+			{ action.goto_stmt($label.tk); }
 	;
 
 // R846
@@ -2551,6 +2944,7 @@ goto_stmt
 computed_goto_stmt
 @init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
 	:	(label {lbl=$label.tk;})? t_go_to T_LPAREN label_list T_RPAREN ( T_COMMA )? expr T_EOS
+			{ action.computed_goto_stmt(lbl); }
 	;
 
 t_go_to
@@ -2559,40 +2953,32 @@ options {k=2;}
 	| T_GOTO
 	;
 
-
-
 // R847
 // ERR_CHK 847 scalar_numeric_expr replaced by expr
-// TODO - fix label action handling
 arithmetic_if_stmt
 	:	(lbl=label)? T_ARITHMETIC_IF_STMT T_IF
-		T_LPAREN
-		expr
-		T_RPAREN
-		label1=label
-		T_COMMA
-		label2=label
-		T_COMMA
-		label3=label T_EOS
+		T_LPAREN expr T_RPAREN label1=label
+		T_COMMA label2=label
+		T_COMMA label3=label T_EOS
+			{ action.arithmetic_if_stmt(lbl, label1, label2, label3); }
 	;
 
 // R848 continue_stmt inlined as T_CONTINUE
 
 // R849
 stop_stmt
-@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
-	:	(label {lbl=$label.tk;})? T_STOP ( stop_code )? T_EOS
+@init{Token lbl = null; boolean hasStopCode = false;}
+	:	(label {lbl=$label.tk;})? T_STOP (stop_code {hasStopCode=true;})? T_EOS
+			{ action.stop_stmt(lbl, hasStopCode); }
 	;
 
 // R850
+// ERR_CHK 850 T_DIGIT_STRING must be 5 digits or less
 stop_code
     : scalar_char_constant
 //     | Digit ( Digit ( Digit ( Digit ( Digit )? )? )? )?
-        // TODO:
-        // Digit is a fragment in the lexer, so the parser can not see it.
-        // therefore, this was changed to accept a T_DIGIT_STRING and error
-        // checking will need to be done to make sure it's not too long!
-    | T_DIGIT_STRING  
+    | T_DIGIT_STRING
+    	{ action.stop_code($T_DIGIT_STRING); } 
     ;
 
 scalar_char_constant
@@ -2639,7 +3025,10 @@ connect_spec
     ;
 
 connect_spec_list
-    :    connect_spec ( T_COMMA connect_spec )*
+@init{ int count=0;}
+    :  		{action.connect_spec_list__begin();}
+		connect_spec {count++;} ( T_COMMA connect_spec {count++;} )*
+      		{action.connect_spec_list(count);}
     ;
 
 // inlined scalar_default_char_expr
@@ -2662,8 +3051,11 @@ close_spec
 	;
 
 close_spec_list
-	:	close_spec ( T_COMMA close_spec )*
-	;
+@init{ int count=0;}
+    :  		{action.close_spec_list__begin();}
+		close_spec {count++;} ( T_COMMA close_spec {count++;} )*
+      		{action.close_spec_list(count);}
+    ;
 
 // R910
 read_stmt
@@ -2701,8 +3093,12 @@ io_control_spec
 		T_EQUALS expr
     ;
 
+
 io_control_spec_list
-    :    io_control_spec ( T_COMMA io_control_spec )*
+@init{ int count=0;}
+    :  		{action.io_control_spec_list__begin();}
+		io_control_spec {count++;} ( T_COMMA io_control_spec {count++;} )*
+      		{action.io_control_spec_list(count);}
     ;
 
 // R914
@@ -2720,8 +3116,11 @@ input_item
 	;
 
 input_item_list
-	:	input_item ( T_COMMA input_item )*
-	;
+@init{ int count=0;}
+    :  		{action.input_item_list__begin();}
+		input_item {count++;} ( T_COMMA input_item {count++;} )*
+      		{action.input_item_list(count);}
+    ;
 
 // R916
 output_item
@@ -2730,8 +3129,12 @@ options {backtrack=true;}
 	|	io_implied_do
 	;
 
+
 output_item_list
-    :    output_item ( T_COMMA output_item )*
+@init{ int count=0;}
+    :  		{action.output_item_list__begin();}
+		output_item {count++;} ( T_COMMA output_item {count++;} )*
+      		{action.output_item_list(count);}
     ;
 
 // R917
@@ -2782,9 +3185,13 @@ wait_spec
 	|	T_IDENT /* {'UNIT','END','EOR','ERR','ID','IOMSG','IOSTAT'} */ T_EQUALS expr
 	;
 
+
 wait_spec_list
-	:	wait_spec ( T_COMMA wait_spec )*
-	;
+@init{ int count=0;}
+    :  		{action.wait_spec_list__begin();}
+		wait_spec {count++;} ( T_COMMA wait_spec {count++;} )*
+      		{action.wait_spec_list(count);}
+    ;
 
 // R923
 backspace_stmt
@@ -2820,8 +3227,11 @@ position_spec
     ;
 
 position_spec_list
-	:	position_spec ( T_COMMA position_spec )*
-	;
+@init{ int count=0;}
+    :  		{action.position_spec_list__begin();}
+		position_spec {count++;} ( T_COMMA position_spec {count++;} )*
+      		{action.position_spec_list(count);}
+    ;
 
 // R927
 flush_stmt
@@ -2839,7 +3249,10 @@ flush_spec
     ;
 
 flush_spec_list
-    :    flush_spec ( T_COMMA flush_spec )*
+@init{ int count=0;}
+    :  		{action.flush_spec_list__begin();}
+		flush_spec {count++;} ( T_COMMA flush_spec {count++;} )*
+      		{action.flush_spec_list(count);}
     ;
 
 // R929
@@ -2871,7 +3284,10 @@ inquire_spec
 	;
 
 inquire_spec_list
-    :    inquire_spec ( T_COMMA inquire_spec )*
+@init{ int count=0;}
+    :  		{action.inquire_spec_list__begin();}
+		inquire_spec {count++;} ( T_COMMA inquire_spec {count++;} )*
+      		{action.inquire_spec_list(count);}
     ;
 
 /*
@@ -2883,7 +3299,7 @@ Section 10:
 // report the error to the user.
 format_stmt
 @init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
-	:	(label)? T_FORMAT format_specification T_EOS
+	:	(label {lbl=$label.tk;})? T_FORMAT format_specification T_EOS
 	;
 
 // R1002
@@ -2905,7 +3321,10 @@ format_item
 // 17-22
 // ERR_CHK
 format_item_list
-    :    format_item ( (T_COMMA)? format_item )*
+@init{ int count=0;}
+    :  		{action.format_item_list__begin();}
+		format_item {count++;} ( (T_COMMA)? format_item {count++;} )*
+      		{action.format_item_list(count);}
     ;
 
 
@@ -2964,7 +3383,20 @@ format_item_list
 // R1010 v inlined as signed_int_literal_constant in v_list replaced by (T_PLUS or T_MINUS) T_DIGIT_STRING
 
 v_list
-    :   (T_PLUS|T_MINUS)? T_DIGIT_STRING ( T_COMMA (T_PLUS|T_MINUS)? T_DIGIT_STRING )*
+@init{int count=0;}
+    :  		{action.v_list__begin();}
+		(pm=T_PLUS|T_MINUS)? ds=T_DIGIT_STRING
+			{
+				count++;
+				action.v_list_part(pm, ds);
+			}
+		( T_COMMA (pm=T_PLUS|T_MINUS)? ds=T_DIGIT_STRING
+			{
+				count++;
+				action.v_list_part(pm, ds);
+			}
+		)*
+      		{action.v_list(count);}
     ;
 
 // R1011 control_edit_desc inlined/combined in R1005 and data_plus_control_edit_desc
@@ -3006,7 +3438,7 @@ v_list
 program_stmt
 @init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
 	:	(label {lbl=$label.tk;})? T_PROGRAM T_IDENT T_EOS
-		{ action.buildProgramStmt(lbl, $T_IDENT); }
+		{ action.program_stmt(lbl, $T_IDENT); }
 	;
 
 // R1103
@@ -3017,9 +3449,11 @@ options {k=3;}
 // @init{INIT_TOKEN_NULL(lbl); INIT_TOKEN_NULL(id);}
 	:	((label)? T_END T_PROGRAM)
 		=> (label {lbl=$label.tk;})? T_END T_PROGRAM (T_IDENT {id=$T_IDENT;})? end_of_stmt
+			{ action.end_program_stmt(lbl, id); }
 	|	(label {lbl=$label.tk;})? T_ENDPROGRAM (T_IDENT {id=$T_IDENT;})? end_of_stmt
+			{ action.end_program_stmt(lbl, id); }
 	|	(label {lbl=$label.tk;})? T_END end_of_stmt
-		{ action.buildEndProgramStmt(lbl, id); }
+			{ action.end_program_stmt(lbl, null); }
 	;
 
 	
@@ -3087,7 +3521,10 @@ rename
 	;
 
 rename_list
-    :    rename ( T_COMMA rename )*
+@init{ int count=0;}
+    :  		{action.rename_list__begin();}
+		rename {count++;} ( T_COMMA rename {count++;} )*
+      		{action.rename_list(count);}
     ;
 
 // R1112
@@ -3099,7 +3536,10 @@ only
 	;
 
 only_list
-    :    only ( T_COMMA only )*
+@init{ int count=0;}
+    :  		{action.only_list__begin();}
+		only {count++;} ( T_COMMA only {count++;} )*
+      		{action.only_list(count);}
     ;
 
 // R1113 only_use_name was use_name inlined as T_IDENT
@@ -3227,6 +3667,7 @@ proc_interface
 	;
 
 // R1213
+// TODO is there an error in the standard grammar definition?
 proc_attr_spec
 	:	access_spec
 	|	proc_language_binding_spec
@@ -3234,6 +3675,10 @@ proc_attr_spec
 	|	T_OPTIONAL
 	|	T_POINTER
 	|	T_SAVE
+        // TODO: are T_PASS, T_NOPASS, and T_DEFERRED correct?
+    |   T_PASS ( T_LPAREN T_IDENT T_RPAREN)?
+    |   T_NOPASS
+    |   T_DEFERRED
 	;
 
 // R1214
@@ -3243,7 +3688,10 @@ proc_decl
     ;
 
 proc_decl_list
-    :    proc_decl ( T_COMMA proc_decl )*
+@init{ int count=0;}
+    :  		{action.proc_decl_list__begin();}
+		proc_decl {count++;} ( T_COMMA proc_decl {count++;} )*
+      		{action.proc_decl_list(count);}
     ;
 
 // R1215 interface_name was name inlined as T_IDENT
@@ -3262,9 +3710,10 @@ intrinsic_stmt
 // R1218
 // C1222 (R1218) The procedure-designator shall designate a subroutine.
 call_stmt
-@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+@init{Token lbl = null; boolean hasActualArgSpecList = false;} // @init{INIT_TOKEN_NULL(lbl);}
     :    (label {lbl=$label.tk;})? T_CALL procedure_designator
-         ( T_LPAREN ( actual_arg_spec_list )? T_RPAREN )? T_EOS
+         ( T_LPAREN (actual_arg_spec_list {hasActualArgSpecList=true;})? T_RPAREN )? T_EOS
+         	{ action.call_stmt(lbl, hasActualArgSpecList); }
     ;
 
 // R1219
@@ -3282,13 +3731,18 @@ procedure_designator
 
 // R1220
 actual_arg_spec
-    : ( T_IDENT T_EQUALS )? actual_arg
+@init{Token keyword = null;}
+    :	(T_IDENT T_EQUALS {keyword=$T_IDENT;})? actual_arg
+    		{ action.actual_arg_spec(keyword); }
     ;
 
 // TODO - delete greedy?
 actual_arg_spec_list
 options{greedy=false;}
-    :    actual_arg_spec ( T_COMMA actual_arg_spec )*
+@init{int count = 0;}
+    :		{ action.actual_arg_spec_list__begin(); }
+    	actual_arg_spec {count++;} ( T_COMMA actual_arg_spec {count++;} )*
+    		{ action.actual_arg_spec_list(count); }
     ;
 
 // R1221
@@ -3298,8 +3752,9 @@ options{greedy=false;}
 // designator isa T_IDENT so T_IDENT deleted
 // proc_component_ref is variable T_PERCENT T_IDENT can be designator so deleted
 actual_arg
-	:	expr
-	|	T_ASTERISK label
+@init{boolean hasExpr = false;}
+	:	expr				{ hasExpr=true; action.actual_arg(hasExpr, null); }
+	|	T_ASTERISK label	{               action.actual_arg(hasExpr, $label.tk); }
 	;
 
 // R1222 alt_return_spec inlined as T_ASTERISK label in R1221
@@ -3348,10 +3803,10 @@ prefix_spec
 	|	t_prefix_spec
 	;
 
-t_prefix_spec
-	:	T_RECURSIVE
-	|	T_PURE
-	|	T_ELEMENTAL
+t_prefix_spec returns [Token tk]
+	:	T_RECURSIVE		{tk = $T_RECURSIVE;}
+	|	T_PURE			{tk = $T_PURE;}
+	|	T_ELEMENTAL		{tk = $T_ELEMENTAL;}
 	;
 
 // R1229
@@ -3399,7 +3854,10 @@ options{greedy=false; memoize=false;}
 	;
 
 dummy_arg_list
-    :    dummy_arg ( T_COMMA dummy_arg )*
+@init{ int count=0;}
+    :  		{action.dummy_arg_list__begin();}
+		dummy_arg {count++;} ( T_COMMA dummy_arg {count++;} )*
+      		{action.dummy_arg_list(count);}
     ;
 
 // R1234

@@ -15,22 +15,36 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-// remove the following two lines for use outside of Eclipse
 package org.eclipse.ptp.lang.fortran.core.parser;
-import org.eclipse.ptp.lang.fortran.internal.core.dom.parser.FortranParserActionDom;
+
+import java.lang.reflect.Constructor;
 
 public class FortranParserActionFactory {
 	
-	static IFortranParserAction newAction(FortranParser parser, String kind) {
+	static IFortranParserAction newAction(FortranParser parser, String kind, String filename) {
 		IFortranParserAction action = null;
-		if (kind.compareToIgnoreCase("cdt") == 0) {
-			// remove following line for use outside of Eclipse
-			action = new FortranParserActionDom(parser);
-		} else if (kind.compareToIgnoreCase("dump") == 0) {
-			action = new FortranParserActionPrint(parser);
+		if (kind.compareToIgnoreCase("dump") == 0) {
+			action = new FortranParserActionPrint(parser, filename);
+		} else {
+			try {
+				Constructor[] cons = Class.forName(kind).getDeclaredConstructors();
+				for (int i = 0; i < cons.length; i++) {
+					Class[] types = cons[i].getParameterTypes();
+					if (types.length == 2 && types[0] == FortranParser.class && types[1] == java.lang.String.class) {
+						Object[] args = {parser, filename};
+						action = (IFortranParserAction) cons[i].newInstance(args);
+						break;
+					}
+				}
+			} catch (Exception e) {
+				// InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException
+				// ClassNotFoundException, NoSuchMethodException
+				System.out.println(e);
+			}
 		}
+		
 		if (action == null) {
-			action = new FortranParserActionNull(parser);
+			action = new FortranParserActionNull(parser, filename);
 		}
 		return action;
 	}
