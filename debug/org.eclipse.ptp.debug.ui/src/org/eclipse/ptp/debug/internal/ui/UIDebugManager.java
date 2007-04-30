@@ -157,8 +157,13 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	 * @param taskID
 	 * @return
 	 */
-	public String getValueText(int taskID) {
-		return getJobVariableManager().getResultDisplay(getCurrentJobId(), taskID);
+	public String getValueText(String taskIDStr) {
+		try {
+			int taskID = Integer.parseInt(taskIDStr);
+			return getJobVariableManager().getResultDisplay(getCurrentJobId(), taskID);
+		} catch (NumberFormatException e) {
+			return "";
+		}
 	}
 	
 	/** Register process 0 if default registeris true 
@@ -166,7 +171,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	 */
 	public void defaultRegister(IPCDISession session) { // register process 0 if the preference is checked
 		if (prefRegisterProc0) {
-			IPProcess proc = session.getJob().getProcessByTaskId(0);
+			IPProcess proc = session.getJob().getProcessByNumber("0");
 			if (proc != null) {
 				addConsoleWindow(session.getJob(), proc);
 				registerProcess(session, session.createBitList(0), true);
@@ -315,7 +320,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 				for (int i = 0; i < elements.length; i++) {
 					// only unregister some registered elements
 					if (elements[i].isRegistered()) {
-						IPProcess proc = findProcess(job, elements[i].getIDNum());
+						IPProcess proc = findProcess(job, elements[i].getID());
 						if (proc != null) {
 							removeConsoleWindow(job, proc);
 							tasks.set(elements[i].getIDNum());
@@ -350,7 +355,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 				for (int i = 0; i < elements.length; i++) {
 					// only register some unregistered elements
 					if (!elements[i].isRegistered()) {
-						IPProcess proc = findProcess(job, elements[i].getIDNum());
+						IPProcess proc = findProcess(job, elements[i].getID());
 						if (proc != null && !proc.isTerminated()) {
 							addConsoleWindow(job, proc);
 							tasks.set(elements[i].getIDNum());
@@ -442,7 +447,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 				IElement[] registerElements = elementHandler.getRegisteredElements();
 				monitor.beginTask("Removing registering processes....", registerElements.length);
 				for (int i = 0; i < registerElements.length; i++) {
-					IPProcess proc = findProcess(job, registerElements[i].getIDNum());
+					IPProcess proc = findProcess(job, registerElements[i].getID());
 					if (proc != null) {
 						removeConsoleWindow(job, proc);
 						tasks.set(registerElements[i].getIDNum());
@@ -487,14 +492,14 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 				for (int i = 0; i<registerElements.length; i++) {
 					if (curSet.contains(registerElements[i].getID())) {//check whether the current set contains the registered process or not
 						if (curSet.isRootSet() || (preSet != null && !curSet.equals(preSet) && !preSet.contains(registerElements[i].getID()))) {
-							IPProcess proc = findProcess(job, registerElements[i].getIDNum());
+							IPProcess proc = findProcess(job, registerElements[i].getID());
 							if (proc != null) {
 								addConsoleWindow(job, proc);
 								regTasks.set(registerElements[i].getIDNum());
 							}
 						}
 					} else { //if not unregister it
-						IPProcess proc = findProcess(job, registerElements[i].getIDNum());
+						IPProcess proc = findProcess(job, registerElements[i].getID());
 						if (proc != null) {
 							removeConsoleWindow(job, proc);
 							unregTasks.set(registerElements[i].getIDNum());

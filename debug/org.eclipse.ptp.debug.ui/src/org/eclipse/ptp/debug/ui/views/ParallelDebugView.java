@@ -314,7 +314,7 @@ public class ParallelDebugView extends ParallelJobView {
 	 */
 	public String[] getToolTipText(Object obj) {
 		String[] header = super.getToolTipText(obj);
-		String variableText = ((UIDebugManager) manager).getValueText(((IPProcess)obj).getTaskId());
+		String variableText = ((UIDebugManager) manager).getValueText(((IPProcess)obj).getProcessNumber());
 		if (variableText != null && variableText.length() > 0) {
 			return new String[] { header[0], variableText };
 		}

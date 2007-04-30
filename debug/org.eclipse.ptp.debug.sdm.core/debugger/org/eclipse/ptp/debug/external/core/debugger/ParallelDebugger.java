@@ -579,12 +579,16 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 		IPCDISignal[] pcdiSignals = new IPCDISignal[0];
 		IPProcess[] sigProcs = getProcesses(e.getBitSet());
 		if (sigProcs.length > 0) {
-			int taskId = sigProcs[0].getTaskId();
-			IPCDITarget target = getSession().getTarget(taskId);
-			ProxyDebugSignal[] signals = e.getSignals();
-			pcdiSignals = new IPCDISignal[signals.length];
-			for (int j=0; j<signals.length; j++) {
-				pcdiSignals[j] = new Signal((Target)target, signals[j].getName(), signals[j].isStop(), signals[j].isPrint(), signals[j].isPass(), signals[j].getDescription()); 
+			String taskIdStr = sigProcs[0].getProcessNumber();
+			try {
+				int taskId = Integer.parseInt(taskIdStr);
+				IPCDITarget target = getSession().getTarget(taskId);
+				ProxyDebugSignal[] signals = e.getSignals();
+				pcdiSignals = new IPCDISignal[signals.length];
+				for (int j=0; j<signals.length; j++) {
+					pcdiSignals[j] = new Signal((Target)target, signals[j].getName(), signals[j].isStop(), signals[j].isPrint(), signals[j].isPass(), signals[j].getDescription()); 
+				}
+			} catch (NumberFormatException e1) {
 			}
 		}
 		completeCommand(e.getBitSet(), pcdiSignals);
