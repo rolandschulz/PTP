@@ -12,9 +12,10 @@ public class Chapter4 {
    private void parse(String file) {
 	      Boolean error = Boolean.FALSE;
 	      String path = TEST_ROOT + file;
+	      String action = "org.eclipse.ptp.lang.fortran.core.parser.FortranParserActionNull";
 
 	      try {
-	    	  FortranMain fortran = new FortranMain(path);
+	    	  FortranMain fortran = new FortranMain(path, action);
 	    	  error = fortran.call();
 	      } catch(Exception e) {
 	    	  //e.printStackTrace();
