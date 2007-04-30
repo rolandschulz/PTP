@@ -398,7 +398,7 @@ public class Target extends SessionObject implements IPCDITarget {
 		signal(signal);
 	}
 	public void resume(boolean passSignal) throws PCDIException {
-		ProcessAttributes.State state = getPProcess().getStatus();
+		ProcessAttributes.State state = getPProcess().getState();
 		if (state == State.RUNNING) {
 			throw new PCDIException("The process is already running");
 		}
@@ -492,10 +492,10 @@ public class Target extends SessionObject implements IPCDITarget {
 		return isTerminated();
 	}
 	public boolean isSuspended() {
-		return getPProcess().getStatus() == State.STOPPED;
+		return getPProcess().getState() == State.STOPPED;
 	}
 	public boolean isRunning() {
-		return getPProcess().getStatus() == State.RUNNING;
+		return getPProcess().getState() == State.RUNNING;
 	}
 	public Process getProcess() {
 		return null;

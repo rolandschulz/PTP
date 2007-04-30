@@ -81,7 +81,7 @@ public class SessionManager implements IDebugEventSetListener {
 			if (targets[i].getAdapter(IPCDITarget.class) != null && session.equals(((IPCDITarget) targets[i].getAdapter(IPCDITarget.class)).getSession()) && !targets[i].isTerminated() && !targets[i].isDisconnected())
 				terminate = false;
 		}
-		if (terminate && ((IPCDISession) session).getJob().isAllStop()) {
+		if (terminate && ((IPCDISession) session).getJob().isTerminated()) {
 			try {
 				session.terminate();
 			} catch (PCDIException e) {

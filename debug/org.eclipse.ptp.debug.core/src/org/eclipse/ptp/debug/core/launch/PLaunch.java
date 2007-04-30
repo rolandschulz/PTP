@@ -77,7 +77,7 @@ public class PLaunch extends Launch implements IPLaunch {
 	*/
 	public boolean isTerminated() {
 		if (pJob != null)
-			return pJob.isAllStop();
+			return pJob.isTerminated();
 		return super.isTerminated();
 	}
 }
