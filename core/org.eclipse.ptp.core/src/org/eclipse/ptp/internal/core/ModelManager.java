@@ -439,8 +439,8 @@ IResourceManagerListener {
 		int eventState = -1;
 		JobAttributes.State state = JobAttributes.State.values()[attr.getValueIndex()];
 		switch (state) {
-		case ABORTED:
-			eventState = IModelRuntimeNotifierEvent.ABORTED;
+		case TERMINATED:
+			eventState = IModelRuntimeNotifierEvent.STOPPED;
 			break;
 		case STARTED:
 			eventState = IModelRuntimeNotifierEvent.STARTED;
@@ -448,8 +448,8 @@ IResourceManagerListener {
 		case RUNNING:
 			eventState = IModelRuntimeNotifierEvent.RUNNING;
 			break;
-		case STOPPED:
-			eventState = IModelRuntimeNotifierEvent.STOPPED;
+		case ERROR:
+			eventState = IModelRuntimeNotifierEvent.ABORTED;
 			break;
 		default:
 			throw new IllegalArgumentException("unknown job state");
