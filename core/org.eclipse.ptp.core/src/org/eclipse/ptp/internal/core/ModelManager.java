@@ -59,6 +59,7 @@ import org.eclipse.ptp.core.events.ModelRuntimeNotifierEvent;
 import org.eclipse.ptp.core.events.ModelSysChangedEvent;
 import org.eclipse.ptp.core.events.NodeEvent;
 import org.eclipse.ptp.core.events.ProcessEvent;
+import org.eclipse.ptp.internal.core.elements.PUniverse;
 import org.eclipse.ptp.internal.rmsystem.ResourceManagerPersistence;
 import org.eclipse.ptp.rmsystem.AbstractResourceManager;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory;

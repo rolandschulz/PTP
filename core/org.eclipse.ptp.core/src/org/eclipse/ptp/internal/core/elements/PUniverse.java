@@ -16,7 +16,7 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.internal.core;
+package org.eclipse.ptp.internal.core.elements;
 
 import java.util.LinkedList;
 import java.util.List;
