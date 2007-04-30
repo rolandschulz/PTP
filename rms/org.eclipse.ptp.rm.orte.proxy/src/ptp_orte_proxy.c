@@ -79,32 +79,61 @@
 #define RTEV_ERROR_SIGNAL				RTEV_OFFSET + 1009
 
 /*
- * Attribute names must EXACTLY match org.eclipse.ptp.core.AttributeConstants
+ * Attribute names must EXACTLY match org.eclipse.ptp.core.elements.attributes
  */
-#define ATTRDEF_ID_KEY				"id"
-#define ATTRDEF_NAME_KEY			"name"
-#define ATTRDEF_JOB_STATE_KEY		"jobState"
-#define ATTRDEF_JOB_SUB_KEY			"jobSubId"
-#define ATTRDEF_NODE_STATE_KEY		"nodeState"
-#define ATTRDEF_GROUP_KEY			"group"
-#define ATTRDEF_USER_KEY			"user"
-#define ATTRDEF_MODE_KEY			"mode"
-#define ATTRDEF_PID_KEY				"pid"
-#define ATTRDEF_TASKID_KEY			"taskid"
-#define ATTRDEF_STDOUT_KEY			"stdout"
-
-#define JOB_STATE_INIT				"STARTED"
-#define JOB_STATE_RUNNING			"RUNNING"
-#define JOB_STATE_TERMINATED		"ABORTED"
-#define JOB_STATE_ERROR				"ERROR"
-
-#define NODE_STATE_UP				"UP"
-#define NODE_STATE_DOWN				"DOWN"
-#define NODE_STATE_ERROR			"ERROR"
-#define NODE_STATE_UNKNOWN			"UNKNOWN"
-
-#define DEFAULT_NODE_MODE			0111
+#define ELEMENT_ID_ATTR				"id"
+#define ELEMENT_NAME_ATTR			"name"
+/*
+ * Job attributes
+ */
+#define JOB_STATE_ATTR				"jobState"
+#define 	JOB_STATE_INIT			"STARTED"
+#define 	JOB_STATE_RUNNING		"RUNNING"
+#define 	JOB_STATE_TERMINATED	"ABORTED"
+#define 	JOB_STATE_ERROR			"ERROR"
+#define JOB_SUB_ID_ATTR				"jobSubId"
+#define JOB_EXEC_NAME_ATTR			"execName"
+#define JOB_EXEC_PATH_ATTR			"execPath"
+#define JOB_WORKING_DIR_ATTR		"workingDir"
+#define JOB_PROG_ARGS_ATTR			"progArgs"
+#define JOB_ENV_ATTR				"env"
+#define JOB_DEBUG_EXEC_NAME_ATTR	"debugExecName"
+#define JOB_DEBUG_EXEC_PATH_ATTR	"debugExecPath"
+#define JOB_DEBUG_BACKEND_PATH_ATTR	"debugBackendPath"
+#define JOB_DEBUG_ARGS_ATTR			"debugArgs"
+#define JOB_DEBUG_FLAG_ATTR			"debug"
+/*
+ * Node attributes
+ */
+#define NODE_STATE_ATTR				"nodeState"
+#define 	NODE_STATE_UP			"UP"
+#define 	NODE_STATE_DOWN			"DOWN"
+#define 	NODE_STATE_ERROR		"ERROR"
+#define 	NODE_STATE_UNKNOWN		"UNKNOWN"
+#define NODE_NUMBER_ATTR			"nodeNumber"
+#ifdef HAVE_SYS_BPROC_H
+#define NODE_GROUP_ATTR				"nodeGroup"
+#define NODE_USER_ATTR				"nodeUser"
+#define NODE_MODE_ATTR				"nodeMode"
+#define 	DEFAULT_NODE_MODE		0111
+#endif /* HAVE_SYS_BPROC_H */
+/*
+ * Process attributes
+ */
+#define PROC_NODEID_ATTR			"processNodeId"
+#define PROC_PID_ATTR				"processPID"
+#define PROC_TASKID_ATTR			"processTaskId"
+#define PROC_STDOUT_ATTR			"processStdout"
+#define PROC_EXITCODE_ATTR			"processExitCode"
+#define PROC_SIGNALNAME_ATTR		"processSignalName"
+/*
+ * Queue attributes
+ */
 #define DEFAULT_QUEUE_NAME			"default"
+/*
+ * ORTE attributes
+ */
+#define ORTE_NUM_PROCS_ATTR			"jobNumProcs"
 
 int ORTE_Initialize(int, int, char **);
 int ORTE_ModelDef(int, int, char **);
@@ -122,6 +151,7 @@ typedef struct ptp_machine	ptp_machine;
 
 struct ptp_node {
 	int 	id;
+	int		number;
 	char *	name;
 	char *	state;
 	char *	user;
@@ -243,10 +273,12 @@ new_machine()
 static ptp_node *
 new_node(ptp_machine *mach, char *name, char *state, char *user, char *group, char *mode)
 {
+	static int node_number = 0;
 	ptp_node *	n = (ptp_node *)malloc(sizeof(ptp_node));
 	
 	memset((char *)n, 0, sizeof(ptp_node));
 	n->id = generate_id();
+	n->number = node_number++;
 	if (name != NULL)
 		n->name = strdup(name);
 	if (state != NULL)
@@ -469,7 +501,7 @@ sendNewMachineEvent(int trans_id, int id, char *name)
 	proxy_msg_add_int(m, 1);	
 	proxy_msg_add_int(m, id);
 	proxy_msg_add_int(m, 1);
-	proxy_msg_add_keyval_string(m, ATTRDEF_NAME_KEY, name);
+	proxy_msg_add_keyval_string(m, ELEMENT_NAME_ATTR, name);
 	proxy_svr_queue_msg(orte_proxy, m);
 	
 	return 0;	
@@ -483,28 +515,39 @@ num_node_attrs(ptp_node *node)
 		cnt++;
 	if (node->state != NULL)
 		cnt++;
+	if (node->number >= 0)
+		cnt++;
+#ifdef HAVE_SYS_BPROC_H
 	if (node->user != NULL)
 		cnt++;
 	if (node->group != NULL)
 		cnt++;
 	if (node->mode != NULL)
 		cnt++;
+#endif /* HAVE_SYS_BPROC_H */
 	return cnt;	
 }
 
+/*
+ * NOTE: sending a NODE_NUMBER_ATTR will enable the node number ruler in the machines view.
+ */
 static void
 add_node_attrs(proxy_msg *m, ptp_node *node)
 {
 	if (node->name != NULL)
-		proxy_msg_add_keyval_string(m, ATTRDEF_NAME_KEY, node->name);
+		proxy_msg_add_keyval_string(m, ELEMENT_NAME_ATTR, node->name);
 	if (node->state != NULL)
-		proxy_msg_add_keyval_string(m, ATTRDEF_NODE_STATE_KEY, node->state);
+		proxy_msg_add_keyval_string(m, NODE_STATE_ATTR, node->state);
+	if (node->number >= 0)
+		proxy_msg_add_keyval_int(m, NODE_NUMBER_ATTR, node->number);
+#ifdef HAVE_SYS_BPROC_H
 	if (node->user != NULL)
-		proxy_msg_add_keyval_string(m, ATTRDEF_USER_KEY, node->user);
+		proxy_msg_add_keyval_string(m, NODE_USER_ATTR, node->user);
 	if (node->group != NULL)
-		proxy_msg_add_keyval_string(m, ATTRDEF_GROUP_KEY, node->group);
+		proxy_msg_add_keyval_string(m, NODE_GROUP_ATTR, node->group);
 	if (node->mode != NULL)
-		proxy_msg_add_keyval_string(m, ATTRDEF_MODE_KEY, node->mode);
+		proxy_msg_add_keyval_string(m, NODE_MODE_ATTR, node->mode);
+#endif /* HAVE_SYS_BPROC_H */
 }
 
 static int
@@ -516,8 +559,8 @@ sendNewJobEvent(int trans_id, int jobid, int jobSubId, char *state)
 	proxy_msg_add_int(m, 1);	
 	proxy_msg_add_int(m, jobid);
 	proxy_msg_add_int(m, 2);	
-	proxy_msg_add_keyval_int(m, ATTRDEF_JOB_SUB_KEY, jobSubId);
-	proxy_msg_add_keyval_string(m, ATTRDEF_JOB_STATE_KEY, state);
+	proxy_msg_add_keyval_int(m, JOB_SUB_ID_ATTR, jobSubId);
+	proxy_msg_add_keyval_string(m, JOB_STATE_ATTR, state);
 	proxy_svr_queue_msg(orte_proxy, m);
 	
 	return 0;	
@@ -550,9 +593,9 @@ sendNewProcessEvent(int trans_id, int job_id, ptp_process *p)
 	proxy_msg_add_int(m, 1);	
 	proxy_msg_add_int(m, p->id);	
 	proxy_msg_add_int(m, 3);	
-	proxy_msg_add_keyval_int(m, ATTRDEF_ID_KEY, p->node_id);	
-	proxy_msg_add_keyval_int(m, ATTRDEF_TASKID_KEY, p->task_id);	
-	proxy_msg_add_keyval_int(m, ATTRDEF_PID_KEY, p->pid);	
+	proxy_msg_add_keyval_int(m, PROC_NODEID_ATTR, p->node_id);	
+	proxy_msg_add_keyval_int(m, PROC_TASKID_ATTR, p->task_id);	
+	proxy_msg_add_keyval_int(m, PROC_PID_ATTR, p->pid);	
 	proxy_svr_queue_msg(orte_proxy, m);
 	
 	return 0;	
@@ -569,7 +612,7 @@ sendNewQueueEvent(int trans_id)
 	proxy_msg_add_int(m, 1);	
 	proxy_msg_add_int(m, gQueueID);
 	proxy_msg_add_int(m, 1);	
-	proxy_msg_add_keyval_string(m, ATTRDEF_NAME_KEY, DEFAULT_QUEUE_NAME);
+	proxy_msg_add_keyval_string(m, ELEMENT_NAME_ATTR, DEFAULT_QUEUE_NAME);
 	proxy_svr_queue_msg(orte_proxy, m);
 	
 	return 0;	
@@ -583,7 +626,7 @@ sendJobStateChangeEvent(int trans_id, int jobid, char *state)
 	proxy_msg_add_int(m, 1);	
 	proxy_msg_add_int(m, jobid);
 	proxy_msg_add_int(m, 1);	
-	proxy_msg_add_keyval_string(m, ATTRDEF_JOB_STATE_KEY, state);
+	proxy_msg_add_keyval_string(m, JOB_STATE_ATTR, state);
 	proxy_svr_queue_msg(orte_proxy, m);
 	
 	return 0;	
@@ -629,15 +672,15 @@ sendProcessChangeEvent(int trans_id, ptp_process *p, int node_id, int task_id, i
 			
 		if (p->node_id != node_id) {
 			p->node_id = node_id;
-			proxy_msg_add_keyval_int(m, ATTRDEF_ID_KEY, node_id);	
+			proxy_msg_add_keyval_int(m, ELEMENT_ID_ATTR, node_id);	
 		}
 		if (p->task_id != task_id) {
 			p->task_id = task_id;
-			proxy_msg_add_keyval_int(m, ATTRDEF_TASKID_KEY, task_id);	
+			proxy_msg_add_keyval_int(m, PROC_TASKID_ATTR, task_id);	
 		}
 		if (p->pid != pid) {
 			p->pid = pid;
-			proxy_msg_add_keyval_int(m, ATTRDEF_PID_KEY, pid);	
+			proxy_msg_add_keyval_int(m, PROC_PID_ATTR, pid);	
 		}
 		
 		proxy_svr_queue_msg(orte_proxy, m);
@@ -658,7 +701,7 @@ sendProcessOutputEvent(int trans_id, int procid, char *output)
 	proxy_msg_add_int(m, 1);
 	proxy_msg_add_int(m, procid);
 	proxy_msg_add_int(m, 1);
-	proxy_msg_add_keyval_string(m, ATTRDEF_STDOUT_KEY, output);
+	proxy_msg_add_keyval_string(m, PROC_STDOUT_ATTR, output);
 	proxy_svr_queue_msg(orte_proxy, m);
 	
 	return 0;	
@@ -1038,21 +1081,13 @@ get_node_attributes(ptp_machine *mach, ptp_node **first_node, ptp_node **last_no
 	int					rc;
 	int					i;
 	char *				name;
-	char *				user;
-	char *				group;
-	char *				status;
+	char *				user = NULL;
+	char *				group = NULL;
+	char *				status = NODE_STATE_UP;
 	char *				mode = NULL;
 	ptp_node *			node;
 	ORTE_STD_CNTR_TYPE	cnt;
 	orte_gpr_value_t **	values;
-#ifndef HAVE_SYS_BPROC_H
-	struct passwd *		pwd = getpwuid(geteuid());
-	struct group *		grp = getgrgid(getgid());
-	
-	user = pwd->pw_name;
-	group = grp->gr_name;
-	status = NODE_STATE_UP;
-#endif /* HAVE_SYS_BPROC_H */
 
 	rc = orte_gpr.get(ORTE_GPR_KEYS_OR | ORTE_GPR_TOKENS_OR, ORTE_NODE_SEGMENT, NULL, NULL, &cnt, &values);
 	if (rc != ORTE_SUCCESS)
@@ -1752,7 +1787,7 @@ ORTE_Initialize(int trans_id, int nargs, char **args)
 	
 #ifdef HAVE_SYS_BPROC_H
 	subscribe_bproc();
-#endif
+#endif /* HAVE_SYS_BPROC_H */
 
 	ORTE_QUERY(ORTE_JOBID_INVALID);
 	
@@ -1770,11 +1805,10 @@ ORTE_ModelDef(int trans_id, int nargs, char **args)
 {
 	fprintf(stdout, "ORTE_ModelDef (%d):\n", trans_id); fflush(stdout);
 	
-	sendAttrDefStringEvent(trans_id, ATTRDEF_USER_KEY, "User", "User Name", "");
-	sendAttrDefStringEvent(trans_id, ATTRDEF_GROUP_KEY, "Group", "Group Name", "");
-	sendAttrDefIntEvent(trans_id, ATTRDEF_PID_KEY, "PID", "Process ID", 0);
-	sendAttrDefIntEvent(trans_id, ATTRDEF_TASKID_KEY, "TID", "Process Task ID", 0);
-	sendAttrDefStringEvent(trans_id, ATTRDEF_STDOUT_KEY, "Output", "Process Standard Output", "");
+#ifdef HAVE_SYS_BPROC_H
+	sendAttrDefStringEvent(trans_id, NODE_USER_ATTR, "User Name", "User owner of node (BPROC)", "");
+	sendAttrDefStringEvent(trans_id, NODE_GROUP_ATTR, "Group Name", "Group owner of node (BPROC)", "");
+#endif /* HAVE_SYS_BPROC_H */
 
 	sendOKEvent(trans_id);
 	return PROXY_RES_OK;
@@ -1837,29 +1871,24 @@ ORTE_SubmitJob(int trans_id, int nargs, char **args)
 	fprintf(stdout, "  ORTE_SubmitJob (%d): %s\n", trans_id, args[0]); fflush(stdout);
 
 	for (i = 0; i < nargs; i++) {
-		if (strncmp(args[i], "jobSubId=", 9) == 0) {
-			jobsubid = (int)strtol(args[i]+9, NULL, 10);
-			printf("jobsubid=%d\n", jobsubid); fflush(stdout);
-		} else if (strncmp(args[i], "execName=", 9) == 0) {
-			pgm_name = args[i]+9;
-		} else if (strncmp(args[i], "pathToExec=", 11) == 0) {
-			exec_path = args[i] + 11;
-		} else if (strncmp(args[i], "numOfProcs=", 11) == 0) {
-			num_procs = (int)strtol(args[i] + 11, NULL, 10);
-		} else if (strncmp(args[i], "procsPerNode=", 13) == 0) {
-			// not yet
-		} else if (strncmp(args[i], "firstNodeNum=", 13) == 0) {
-			// not yet
-		} else if (strncmp(args[i], "workingDir=", 11) == 0) {
-			cwd = args[i] + 11;
-		} else if (strncmp(args[i], "progArg=", 8) == 0) {
+		if (strncmp(args[i], JOB_SUB_ID_ATTR, strlen(JOB_SUB_ID_ATTR)) == 0) {
+			jobsubid = (int)strtol(args[i]+strlen(JOB_SUB_ID_ATTR)+1, NULL, 10);
+		} else if (strncmp(args[i], JOB_EXEC_NAME_ATTR, strlen(JOB_EXEC_NAME_ATTR)) == 0) {
+			pgm_name = args[i]+strlen(JOB_EXEC_NAME_ATTR)+1;
+		} else if (strncmp(args[i], JOB_EXEC_PATH_ATTR, strlen(JOB_EXEC_PATH_ATTR)) == 0) {
+			exec_path = args[i]+strlen(JOB_EXEC_PATH_ATTR)+1;
+		} else if (strncmp(args[i], ORTE_NUM_PROCS_ATTR, strlen(ORTE_NUM_PROCS_ATTR)) == 0) {
+			num_procs = (int)strtol(args[i]+strlen(ORTE_NUM_PROCS_ATTR)+1, NULL, 10);
+		} else if (strncmp(args[i], JOB_WORKING_DIR_ATTR, strlen(JOB_WORKING_DIR_ATTR)) == 0) {
+			cwd = args[i]+strlen(JOB_WORKING_DIR_ATTR)+1;
+		} else if (strncmp(args[i], JOB_PROG_ARGS_ATTR, strlen(JOB_PROG_ARGS_ATTR)) == 0) {
 			num_args++;
-		} else if (strncmp(args[i], "progEnv=", 8) == 0) {
+		} else if (strncmp(args[i], JOB_ENV_ATTR, strlen(JOB_ENV_ATTR)) == 0) {
 			num_env++;
-		} else if (strncmp(args[i], "debuggerPath=", 13) == 0) {
-			debug_exec_path = args[i] + 13;
+		} else if (strncmp(args[i], JOB_DEBUG_BACKEND_PATH_ATTR, strlen(JOB_DEBUG_BACKEND_PATH_ATTR)) == 0) {
+			debug_exec_path = args[i]+strlen(JOB_DEBUG_BACKEND_PATH_ATTR)+1;
 			debug = 1;
-		} else if (strncmp(args[i], "debuggerArg=", 12) == 0) {
+		} else if (strncmp(args[i], JOB_DEBUG_ARGS_ATTR, strlen(JOB_DEBUG_ARGS_ATTR)) == 0) {
 			debug_argc++;
 		}
 	}
@@ -1894,8 +1923,8 @@ ORTE_SubmitJob(int trans_id, int nargs, char **args)
 	if (num_env > 0) {
 		env = (char **)malloc((num_env + 1) * sizeof(char *));
 		for (i = 0, a = 0; i < nargs; i++) {
-			if (strncmp(args[i], "progEnv=", 8) == 0)
-				env[a++] = strdup(args[i] + 8);
+			if (strncmp(args[i], JOB_ENV_ATTR, strlen(JOB_ENV_ATTR)) == 0)
+				env[a++] = strdup(args[i] + strlen(JOB_ENV_ATTR) + 1);
 		}
 		env[a] = NULL;
 	}
@@ -1929,8 +1958,8 @@ ORTE_SubmitJob(int trans_id, int nargs, char **args)
 		debug_args = (char **)malloc((debug_argc+1) * sizeof(char *));
 		debug_args[0] = debug_exec_path;
 		for (i = 0, a = 1; i < nargs; i++) {
-			if (strncmp(args[i], "debuggerArg=", 12) == 0) {
-				debug_args[a++] = args[i] + 12;
+			if (strncmp(args[i], JOB_DEBUG_ARGS_ATTR, strlen(JOB_DEBUG_ARGS_ATTR)) == 0) {
+				debug_args[a++] = args[i] + strlen(JOB_DEBUG_ARGS_ATTR) + 1;
 			}
 		}
 		debug_args[a] = NULL;
@@ -1954,8 +1983,8 @@ ORTE_SubmitJob(int trans_id, int nargs, char **args)
 	apps->argv[0] = strdup(full_path);
 	if (num_args > 0) {
 		for (i = 0, a = 1; i < nargs; i++) {
-			if (strncmp(args[i], "progArg=", 8) == 0)
-				apps->argv[a++] = strdup(args[i] + 8);
+			if (strncmp(args[i], JOB_PROG_ARGS_ATTR, strlen(JOB_PROG_ARGS_ATTR)) == 0)
+				apps->argv[a++] = strdup(args[i] + strlen(JOB_PROG_ARGS_ATTR) + 1);
 		}
 	}
 	apps->argv[num_args+1] = NULL;
