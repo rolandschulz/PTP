@@ -59,12 +59,12 @@ import org.eclipse.ptp.core.elements.attributes.NodeAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.core.elements.attributes.QueueAttributes;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
-import org.eclipse.ptp.internal.core.PElement;
-import org.eclipse.ptp.internal.core.PJob;
-import org.eclipse.ptp.internal.core.PMachine;
-import org.eclipse.ptp.internal.core.PNode;
-import org.eclipse.ptp.internal.core.PProcess;
-import org.eclipse.ptp.internal.core.PQueue;
+import org.eclipse.ptp.internal.core.elements.PElement;
+import org.eclipse.ptp.internal.core.elements.PJob;
+import org.eclipse.ptp.internal.core.elements.PMachine;
+import org.eclipse.ptp.internal.core.elements.PNode;
+import org.eclipse.ptp.internal.core.elements.PProcess;
+import org.eclipse.ptp.internal.core.elements.PQueue;
 import org.eclipse.ptp.rmsystem.events.IResourceManagerChangedJobsEvent;
 import org.eclipse.ptp.rmsystem.events.IResourceManagerChangedMachinesEvent;
 import org.eclipse.ptp.rmsystem.events.IResourceManagerChangedNodesEvent;
@@ -634,6 +634,7 @@ IResourceManagerControl {
 				node.addProcess(process);
 			}
 		}
+		job.addProcess(process);
 		return process;
 	}
 
