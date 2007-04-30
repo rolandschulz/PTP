@@ -43,6 +43,7 @@ import org.eclipse.ptp.rtsystem.proxy.command.ProxyModelDefCommand;
 import org.eclipse.ptp.rtsystem.proxy.command.ProxyStartEventsCommand;
 import org.eclipse.ptp.rtsystem.proxy.command.ProxyStopEventsCommand;
 import org.eclipse.ptp.rtsystem.proxy.command.ProxySubmitJobCommand;
+import org.eclipse.ptp.rtsystem.proxy.command.ProxyTerminateJobCommand;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeAttributeDefEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeConnectedStateEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeErrorEvent;
@@ -136,9 +137,10 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 		command.send();
 	}
 	
-	public void terminateJob(int jobId) throws IOException {
-		// TODO -add terminateJob command
-//		sendCommand("TERMJOB", Integer.toString(jobId));
+	public void terminateJob(String jobId) throws IOException {
+		IProxyCommand command = new ProxyTerminateJobCommand(this, jobId);
+		addCommand(command);
+		command.send();
 	}
 	
 	public void addProxyRuntimeEventListener(IProxyRuntimeEventListener listener) {
@@ -373,7 +375,6 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 					state = ProxyState.SHUTDOWN;
 					fireProxyRuntimeErrorEvent(new ProxyRuntimeErrorEvent(event.getTransactionID(), ErrorType.DISCONNECTED, "Proxy disconnected"));
 				} else if (event instanceof IProxyErrorEvent) {
-					state = ProxyState.SHUTDOWN;
 					fireProxyRuntimeErrorEvent(new ProxyRuntimeErrorEvent(event.getTransactionID(), ErrorType.PROXY, ((IProxyErrorEvent)event).getErrorMessage()));
 				} else {
 					state = ProxyState.ERROR;
@@ -387,7 +388,6 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 					state = ProxyState.SHUTDOWN;
 					fireProxyRuntimeErrorEvent(new ProxyRuntimeErrorEvent(event.getTransactionID(), ErrorType.DISCONNECTED, "Proxy disconnected"));
 				} else if (event instanceof IProxyErrorEvent) {
-					state = ProxyState.SHUTDOWN;
 					fireProxyRuntimeErrorEvent(new ProxyRuntimeErrorEvent(event.getTransactionID(), ErrorType.PROXY, ((IProxyErrorEvent)event).getErrorMessage()));
 				} else if (event instanceof IProxyOKEvent){
 					command = getCommandForEvent(event);
@@ -413,7 +413,6 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 					state = ProxyState.SHUTDOWN;
 					fireProxyRuntimeErrorEvent(new ProxyRuntimeErrorEvent(event.getTransactionID(), ErrorType.DISCONNECTED, "Proxy disconnected"));
 				} else if (event instanceof IProxyErrorEvent) {
-					state = ProxyState.SHUTDOWN;
 					fireProxyRuntimeErrorEvent(new ProxyRuntimeErrorEvent(event.getTransactionID(), ErrorType.PROXY, ((IProxyErrorEvent)event).getErrorMessage()));
 				} else {
 					command = getCommandForEvent(event);
@@ -441,7 +440,6 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 					state = ProxyState.SHUTDOWN;
 					fireProxyRuntimeErrorEvent(new ProxyRuntimeErrorEvent(event.getTransactionID(), ErrorType.DISCONNECTED, "Proxy disconnected"));
 				} else if (event instanceof IProxyErrorEvent) {
-					state = ProxyState.SHUTDOWN;
 					fireProxyRuntimeErrorEvent(new ProxyRuntimeErrorEvent(event.getTransactionID(), ErrorType.PROXY, ((IProxyErrorEvent)event).getErrorMessage()));
 				} else {
 					command = getCommandForEvent(event);

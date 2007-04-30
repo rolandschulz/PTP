@@ -29,7 +29,7 @@ public interface IProxyRuntimeClient {
 	public void startEvents() throws IOException;
 	public void stopEvents() throws IOException;
 	public void submitJob(String[] args) throws IOException;
-	public void terminateJob(int jobId) throws IOException;
+	public void terminateJob(String jobId) throws IOException;
 	
 	public void addProxyRuntimeEventListener(IProxyRuntimeEventListener listener);
 	public void removeProxyRuntimeEventListener(IProxyRuntimeEventListener listener);
