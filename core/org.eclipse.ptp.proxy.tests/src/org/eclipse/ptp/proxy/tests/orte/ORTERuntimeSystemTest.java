@@ -307,7 +307,7 @@ public class ORTERuntimeSystemTest implements IRuntimeEventListener {
 			for (int id : entry.getKey()) {
 				if (jobId == id) {
 					EnumeratedAttribute a = (EnumeratedAttribute) mgr.getAttribute(JobAttributes.getStateAttributeDefinition());
-					if (a != null && a.getEnumValue() == JobAttributes.State.ABORTED) {
+					if (a != null && a.getEnumValue() == JobAttributes.State.TERMINATED) {
 						System.out.println("job terminated!");
 						lock.lock();
 						try {

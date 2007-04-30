@@ -200,7 +200,7 @@ public class ORTEResourceManagerTest implements IResourceManagerListener {
 		 */
 		for (IAttribute a : e.getChangedAttributes()) {
 			if (a.getDefinition() == JobAttributes.getStateAttributeDefinition()) {
-				if (((EnumeratedAttribute)a).getEnumValue() == JobAttributes.State.ABORTED) {
+				if (((EnumeratedAttribute)a).getEnumValue() == JobAttributes.State.TERMINATED) {
 					System.out.println("job terminated!");
 					lock.lock();
 					try {
