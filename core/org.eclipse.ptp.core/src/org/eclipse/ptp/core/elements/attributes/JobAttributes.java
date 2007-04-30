@@ -15,8 +15,8 @@ public class JobAttributes {
 	public enum State {
 		STARTED,
 		RUNNING,
-		ABORTED,
-		STOPPED
+		TERMINATED,
+		ERROR
 	};
 	
 	private static final String STATE_ATTR_ID = "jobState";

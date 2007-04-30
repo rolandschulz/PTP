@@ -50,14 +50,14 @@ public interface IPJob extends IPElement {
 	public IPProcess getProcessById(String id);
 
 	/**
-	 * Finds a Process in by its task ID. Returns the Process
+	 * Finds a Process in by its number. Returns the Process
 	 * object if found, else returns <code>null</code>.
 	 * 
-	 * @param taskId
-	 *            The Process task ID to search for
+	 * @param number
+	 *            The Process number to search for
 	 * @return The Process object if found, else <code>null</code>
 	 */
-	public IPProcess getProcessByTaskId(int taskId);
+	public IPProcess getProcessByNumber(String number);
 
 	/**
 	 * Returns an array of the Processes comprised by this Job. Might return
