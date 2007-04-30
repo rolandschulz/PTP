@@ -121,7 +121,7 @@ public class ParallelMachineView extends AbstractParallelSetView implements INod
 	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#initialElement()
 	 */
 	protected void initialElement() {
-		selectMachine(manager.initial());
+		selectMachine((IPMachine)manager.initial());
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#initialView()
@@ -190,7 +190,7 @@ public class ParallelMachineView extends AbstractParallelSetView implements INod
 		BRtable.addSelectionListener(new SelectionAdapter() {
 			/* double click - throw up an editor to look at the process */
 			public void widgetDefaultSelected(SelectionEvent e) {
-				IPNode node = ((MachineManager) manager).findNode(getCurrentID(), cur_selected_element_id);
+				IPNode node = ((MachineManager) manager).findNode(cur_selected_element_id);
 				if (node != null) {
 					int idx = BRtable.getSelectionIndex();
 					IPProcess[] procs = node.getSortedProcesses();
@@ -249,7 +249,7 @@ public class ParallelMachineView extends AbstractParallelSetView implements INod
 		if (element == null)
 			return null;
 		
-		return ((MachineManager) manager).findNode(getCurrentID(), element.getID());
+		return ((MachineManager) manager).findNode(element.getID());
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.views.IContentProvider#getRulerIndex(java.lang.Object, int)
@@ -274,7 +274,7 @@ public class ParallelMachineView extends AbstractParallelSetView implements INod
 		IPNode node = (IPNode)obj;
 		StringBuffer buffer = new StringBuffer();
 		buffer.append(node.getName());
-		IElementSet[] sets = setManager.getSetsWithElement(node.getIDString());
+		IElementSet[] sets = setManager.getSetsWithElement(node.getID());
 		if (sets.length > 1)
 			buffer.append("\n Set: ");
 		for (int i = 1; i < sets.length; i++) {
@@ -289,13 +289,17 @@ public class ParallelMachineView extends AbstractParallelSetView implements INod
 	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#getCurrentID()
 	 */
 	public String getCurrentID() {
-		return ((MachineManager) manager).getCurrentMachineId();
+		IPMachine machine = ((MachineManager) manager).getCurrentMachine();
+		if (machine != null) {
+			return machine.getID();
+		}
+		return IManager.EMPTY_ID;
 	}
 	/** Change machine
 	 * @param machine_id machine ID
 	 */
-	public void selectMachine(String machine_id) {
-		((MachineManager) manager).setCurrentMachineId(machine_id);
+	public void selectMachine(IPMachine machine) {
+		((MachineManager) manager).setCurrentMachine(machine);
 		updateMachine();
 	}
 	/** Updat emachine
@@ -332,7 +336,7 @@ public class ParallelMachineView extends AbstractParallelSetView implements INod
 		if (!cur_element_set.contains(firstRegisteredElementID))
 			return;
 		cur_selected_element_id = firstRegisteredElementID;
-		IPNode node = ((MachineManager) manager).findNode(getCurrentID(), cur_selected_element_id);
+		IPNode node = ((MachineManager) manager).findNode(cur_selected_element_id);
 		if (node == null) {
 			return;
 		}
@@ -345,7 +349,7 @@ public class ParallelMachineView extends AbstractParallelSetView implements INod
 		if (procs != null) {
 			TableItem item = null;
 			for (int i = 0; i < procs.length; i++) {
-				int proc_state = ((MachineManager) manager).getProcStatus(procs[i].getStatus());
+				int proc_state = ((MachineManager) manager).getProcStatus(procs[i].getState());
 				item = new TableItem(BRtable, SWT.NULL);
 				item.setImage(ParallelImages.procImages[proc_state][0]);
 				final IPJob job = procs[i].getJob();
@@ -379,10 +383,11 @@ public class ParallelMachineView extends AbstractParallelSetView implements INod
 			idString = "none";
 		}
 		else {
-			idString = machine.getIDString();
+			idString = machine.getID();
 		}
-		if (node != null && ((MachineManager) manager).isCurrentSetContainNode(idString,
-				node.getIDString())) {
+		((MachineManager)manager).addNode(node);
+		if (((MachineManager) manager).isCurrentSetContainNode(idString,
+				node.getID())) {
 			refresh(false);
 		}		
 	}	

@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui;
 
-import org.eclipse.ptp.core.elements.IPJob;
+import org.eclipse.ptp.core.elements.IPElement;
 import org.eclipse.ptp.ui.listeners.IJobChangedListener;
 import org.eclipse.ptp.ui.listeners.ISetListener;
 import org.eclipse.ptp.ui.model.IElement;
@@ -49,7 +49,7 @@ public interface IManager {
 	/** initial elements
 	 * @return first element name
 	 */
-	public String initial();
+	public IPElement initial();
 	/** Get IElementHandler
 	 * @param id element ID
 	 * @return IElementHandler
@@ -143,33 +143,6 @@ public interface IManager {
 	 */
 	public void fireJobChangedEvent(int type, String cur_jid, String pre_jid);
 	//job
-	/** Check is job existed
-	 * @param jid Job ID
-	 * @return true job ID is existed otherwise not existed
-	 */
-	public boolean isNoJob(String jid);
-	/** Check the job is stopped
-	 * @param job_id Job ID
-	 * @return true job is stopped
-	 */
-	public boolean isJobStop(String job_id);
-	/** Search a job by job ID
-	 * @param job_id Job ID
-	 * @return null if no job found
-	 */
-	public IPJob findJobById(String job_id);
-	/** Remove Job
-	 * @param job Job
-	 */
-	public void removeJob(IPJob job);
-	/** Remove all stopped jobs
-	 * 
-	 */
-	public void removeAllStoppedJobs();
-	/** Check whether there is a job stopped
-	 * @return true if there is a job stopped
-	 */
-	public boolean hasStoppedJob();	
 	
 	//image
 	/** Get element status
