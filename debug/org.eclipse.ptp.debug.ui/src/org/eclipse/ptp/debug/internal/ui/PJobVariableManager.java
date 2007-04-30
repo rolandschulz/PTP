@@ -71,13 +71,13 @@ public final class PJobVariableManager {
 		return variableStorage;
 	}
 	public boolean isContainVariable(IPJob job, String var) {
-		return (variableStorage.getValue(job.getIDString(), var) != null);
+		return (variableStorage.getValue(job.getID(), var) != null);
 	}
 	public void addJobVariable(IPJob job, String var, String[] sets) {
 		addJobVariable(job, var, sets, true);
 	}
 	public void addJobVariable(IPJob job, String var, String[] sets, boolean enable) {
-		JobVariable jVar = (JobVariable)variableStorage.getValue(job.getIDString(), var);
+		JobVariable jVar = (JobVariable)variableStorage.getValue(job.getID(), var);
 		if (jVar == null) {
 			jVar = new JobVariable(job, var, sets, enable);
 		}
@@ -85,21 +85,21 @@ public final class PJobVariableManager {
 			jVar.setSets(sets);
 			jVar.setEnable(enable);
 		}
-		variableStorage.addValue(job.getIDString(), var, jVar);
+		variableStorage.addValue(job.getID(), var, jVar);
 		createProcessValue(job);
 	}
 	private void createProcessValue(IPJob job) {
-		ProcessValue procVal = (ProcessValue)varProcStorage.getValue(job.getIDString(), PROCESS_KEY);
+		ProcessValue procVal = (ProcessValue)varProcStorage.getValue(job.getID(), PROCESS_KEY);
 		if (procVal == null) {
 			procVal = new ProcessValue(job.totalProcesses());
-			varProcStorage.addValue(job.getIDString(), PROCESS_KEY, procVal);
+			varProcStorage.addValue(job.getID(), PROCESS_KEY, procVal);
 		}		
 	}
 	public JobVariable[] getJobVariables(String job_id) {
 		return (JobVariable[])variableStorage.getValues(job_id);
 	}
 	public void changeJobVariable(IPJob job, IPJob newJob, String[] sets, String var, String newVar, boolean enable) {
-		removeJobVariable(job.getIDString(), var);
+		removeJobVariable(job.getID(), var);
 		addJobVariable(newJob, newVar, sets, enable);
 	}
 	public void deleteSet(String job_id, String set_id) {

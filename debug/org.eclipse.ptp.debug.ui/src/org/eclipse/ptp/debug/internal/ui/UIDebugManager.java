@@ -56,6 +56,7 @@ import org.eclipse.ptp.debug.core.model.IPDebugElement;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.debug.ui.model.DebugElement;
+import org.eclipse.ptp.ui.IManager;
 import org.eclipse.ptp.ui.OutputConsole;
 import org.eclipse.ptp.ui.managers.JobManager;
 import org.eclipse.ptp.ui.model.IElement;
@@ -145,7 +146,13 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	protected IElement createElement(IElementSet set, String key, String name) {
 		return new DebugElement(set, key, name);
 	}
-	
+	public String getCurrentJobId() {
+		IPJob job = getJob();
+		if (job != null) {
+			return job.getID();
+		}
+		return IManager.EMPTY_ID;
+	}
 	/** Get value text for tooltip
 	 * @param taskID
 	 * @return
@@ -159,7 +166,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	 */
 	public void defaultRegister(IPCDISession session) { // register process 0 if the preference is checked
 		if (prefRegisterProc0) {
-			IPProcess proc = session.getJob().findProcessByTaskId(0);
+			IPProcess proc = session.getJob().getProcessByTaskId(0);
 			if (proc != null) {
 				addConsoleWindow(session.getJob(), proc);
 				registerProcess(session, session.createBitList(0), true);
@@ -189,7 +196,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	 * @return true if job is running
 	 */
 	public boolean isRunning(IPJob job) {
-		return (job != null && !job.isAllStop());
+		return (job != null && !job.isTerminated());
 	}
 	/** Is job running
 	 * @param job_id job ID
@@ -230,7 +237,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	public IPCDISession getDebugSession(IPJob job) {
 		if (job == null)
 			return null;
-		return debugModel.getPCDISession(job.getIDString());
+		return debugModel.getPCDISession(job.getID());
 	}
 	/** Convert string to integer
 	 * @param id
@@ -243,28 +250,28 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	 * @param proc
 	 */
 	private void addConsoleWindow(IPJob job, IPProcess proc) {
-		if (consoleStorage.getValue(job.getIDString(), proc.getIDString()) == null) {
+		if (consoleStorage.getValue(job.getID(), proc.getID()) == null) {
 			OutputConsole outputConsole = new OutputConsole(proc.getName(), new ProcessInputStream(proc));
-			consoleStorage.addValue(job.getIDString(), proc.getIDString(), outputConsole);
+			consoleStorage.addValue(job.getID(), proc.getID(), outputConsole);
 		}
 	}
 	/** Remove process from console list and close its output
 	 * @param proc
 	 */
 	private void removeConsoleWindow(IPJob job, IPProcess proc) {
-		OutputConsole outputConsole = (OutputConsole) consoleStorage.removeValue(job.getIDString(), proc.getIDString());
+		OutputConsole outputConsole = (OutputConsole) consoleStorage.removeValue(job.getID(), proc.getID());
 		if (outputConsole != null) {
 			outputConsole.kill();
 		}
 	}
 	private void removeConsoleWindows(IPJob job) {
-		for (Iterator i=consoleStorage.getValueIterator(job.getIDString()); i.hasNext();) {
+		for (Iterator i=consoleStorage.getValueIterator(job.getID()); i.hasNext();) {
 			OutputConsole outputConsole = (OutputConsole)i.next();
 			if (outputConsole != null) {
 				outputConsole.kill();
 			}
 		}
-		consoleStorage.removeJobStorage(job.getIDString());
+		consoleStorage.removeJobStorage(job.getID());
 	}
 	/***************************************************************************************************************************************************************************************************
 	 * Register / Unregister
@@ -296,7 +303,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	public void unregisterElements(final IElement[] elements) throws CoreException {
 		WorkbenchJob uiJob = new WorkbenchJob("Unregistering elements...") {
 			public IStatus runInUIThread(IProgressMonitor monitor) {
-				IPJob job = getCurrentJob();
+				IPJob job = getJob();
 				if (job == null)
 					return new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No job found", null);
 				IPCDISession session = getDebugSession(job);
@@ -330,7 +337,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	public void registerElements(final IElement[] elements) throws CoreException {
 		WorkbenchJob uiJob = new WorkbenchJob("registering elements...") {
 			public IStatus runInUIThread(IProgressMonitor monitor) {
-				IPJob job = getCurrentJob();
+				IPJob job = getJob();
 				if (job == null)
 					return new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No job found", null);
 		
@@ -344,7 +351,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 					// only register some unregistered elements
 					if (!elements[i].isRegistered()) {
 						IPProcess proc = findProcess(job, elements[i].getIDNum());
-						if (proc != null && !proc.isAllStop()) {
+						if (proc != null && !proc.isTerminated()) {
 							addConsoleWindow(job, proc);
 							tasks.set(elements[i].getIDNum());
 						}
@@ -647,7 +654,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 					}
 				} else {
 					try {
-						terminateAll(job_id);
+						terminateAll();
 					} catch (CoreException e) {
 						return e.getStatus();
 					}
@@ -773,7 +780,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	 */
 	public void removeJob(IPJob job) {
 		if (job.isDebug()) {
-			debugModel.deletePBreakpoint(job.getIDString());
+			debugModel.deletePBreakpoint(job.getID());
 			debugModel.deleteJob(job);
 			debugModel.shutdownSession(job);
 			removeConsoleWindows(job);

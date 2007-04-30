@@ -55,7 +55,7 @@ public class EditPExpressionAction extends Action {
 		ISelection selection = view.getSelection();
 		if (!selection.isEmpty() && selection instanceof IStructuredSelection) {
 			JobVariable jVar = (JobVariable)((IStructuredSelection)selection).getFirstElement();
-			if (!jVar.getJob().getIDString().equals(view.getUIManager().getCurrentJobId())) {
+			if (!jVar.getJob().getID().equals(view.getUIManager().getCurrentJobId())) {
 				MessageDialog.openError(view.getViewSite().getShell(), "Not allow editing", "Selected item does not belong to current Job");
 				return;
 			}

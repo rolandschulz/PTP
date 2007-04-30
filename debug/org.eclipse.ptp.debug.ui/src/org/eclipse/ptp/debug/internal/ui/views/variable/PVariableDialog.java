@@ -359,7 +359,7 @@ public class PVariableDialog extends Dialog {
 	 */
 	protected void okPressed() {
 		PJobVariableManager jobMgr = view.getUIManager().getJobVariableManager();
-		IPJob job = view.getUIManager().getCurrentJob();
+		IPJob job = view.getUIManager().getJob();
 		String[] vars = getSelectedVariables();
 		String[] sets = getSelectedSets();
 		boolean checked = checkBtn.getSelection();
@@ -381,7 +381,7 @@ public class PVariableDialog extends Dialog {
 			ISelection selection = view.getSelection();
 			if (!selection.isEmpty() && selection instanceof IStructuredSelection) {
 				JobVariable varInfo = (JobVariable)((IStructuredSelection)selection).getFirstElement();
-				jobMgr.removeJobVariable(job.getIDString(), varInfo.getVar());
+				jobMgr.removeJobVariable(job.getID(), varInfo.getVar());
 				for (int i=0; i<vars.length; i++) {
 					jobMgr.addJobVariable(job, vars[i], sets, checked);
 				}
