@@ -17,7 +17,7 @@
 package org.eclipse.ptp.core.elementcontrols;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.ptp.rmsystem.IResourceManager;
+import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 
 public interface IResourceManagerControl extends IResourceManager, IPElementControl {
@@ -45,22 +45,7 @@ public interface IResourceManagerControl extends IResourceManager, IPElementCont
 	/**
 	 * @return
 	 */
-	public IPJobControl[] getJobControls();
-	
-	/**
-	 * @return
-	 */
 	public IPMachineControl[] getMachineControls();
-
-	/**
-	 * @return
-	 */
-	public IPNodeControl[] getNodeControls();
-
-	/**
-	 * @return
-	 */
-	public IPProcessControl[] getProcessControls();
 
 	/**
 	 * @return

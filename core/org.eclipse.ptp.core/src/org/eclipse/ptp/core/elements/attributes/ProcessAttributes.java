@@ -45,8 +45,8 @@ public class ProcessAttributes {
 	private final static StringAttributeDefinition stdoutNameAttrDef = 
 		new StringAttributeDefinition(STDOUT_ATTR_ID, "Process Stdout", "Standard output from process", "");
 	
-	private final static IntegerAttributeDefinition nodeIdAttrDef = 
-		new IntegerAttributeDefinition(NODEID_ATTR_ID, "Process Node ID", "Node that this process is running on", 0);
+	private final static StringAttributeDefinition nodeIdAttrDef = 
+		new StringAttributeDefinition(NODEID_ATTR_ID, "Process Node ID", "Node that this process is running on", "");
 	
 	public static EnumeratedAttributeDefinition getStateAttributeDefinition() {
 		return stateAttrDef;
@@ -72,8 +72,8 @@ public class ProcessAttributes {
 		return stdoutNameAttrDef;
 	}
 	
-	public static IntegerAttributeDefinition getNodeIdAttributeDefinition() {
-		return taskIdAttrDef;
+	public static StringAttributeDefinition getNodeIdAttributeDefinition() {
+		return nodeIdAttrDef;
 	}
 	
 	public static IAttributeDefinition[] getDefaultAttributeDefinitions() {

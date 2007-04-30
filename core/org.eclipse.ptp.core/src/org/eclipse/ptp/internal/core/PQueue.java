@@ -19,17 +19,18 @@
 package org.eclipse.ptp.internal.core;
 
 import org.eclipse.ptp.core.attributes.IAttribute;
+import org.eclipse.ptp.core.elementcontrols.IPElementControl;
 import org.eclipse.ptp.core.elementcontrols.IPJobControl;
 import org.eclipse.ptp.core.elementcontrols.IPQueueControl;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPJob;
-import org.eclipse.ptp.rmsystem.IResourceManager;
+import org.eclipse.ptp.core.elements.IResourceManager;
 
 public class PQueue extends Parent implements IPQueueControl {
 	protected String NAME_TAG = "queue ";
 	protected String arch = "undefined";
 
-	public PQueue(int id, IResourceManagerControl rm, IAttribute[] attrs) {
+	public PQueue(String id, IResourceManagerControl rm, IAttribute[] attrs) {
 		super(id, rm, P_QUEUE, attrs);
 	}
 
@@ -41,37 +42,29 @@ public class PQueue extends Parent implements IPQueueControl {
 	}
 	
 	public void addJob(IPJobControl job) {
-		// TODO Auto-generated method stub
-		
+		addChild(job);
 	}
 
-	public IPJobControl findJobById(String job_id) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public IPJobControl getJobControl(int jobId) {
-		// TODO Auto-generated method stub
+	public IPJobControl getJobControl(String job_id) {
+		IPElementControl element = findChild(job_id);
+		if (element != null)
+			return (IPJobControl) element;
 		return null;
 	}
 
 	public IPJobControl[] getJobControls() {
-		// TODO Auto-generated method stub
-		return null;
+		return (IPJobControl[]) getCollection().toArray(new IPJobControl[size()]);
 	}
 
 	public void removeJob(IPJobControl job) {
-		// TODO Auto-generated method stub
-		
+		removeChild(job);
 	}
 
-	public IPJob getJob(int job_id) {
-		// TODO Auto-generated method stub
-		return null;
+	public IPJob getJobById(String job_id) {
+		return getJobControl(job_id);
 	}
 
 	public IPJob[] getJobs() {
-		// TODO Auto-generated method stub
-		return null;
+		return getJobControls();
 	}
 }

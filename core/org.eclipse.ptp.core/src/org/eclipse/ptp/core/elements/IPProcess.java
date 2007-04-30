@@ -23,28 +23,89 @@ import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 
 public interface IPProcess extends IPElement {
 
-	public boolean isTerminated();
-	public void setTerminated(boolean isTerminate);
-	public int getPid();
-	public int getTaskId();
-	public ProcessAttributes.State getStatus();
-	public int getExitCode();
-	public String getSignalName();
-	public void setStatus(ProcessAttributes.State status);
-	public void removeProcess();
-	public String getContents();
-	public String[] getOutputs();
-	public void clearOutput();
+	/**
+	 * @param output
+	 */
 	public void addOutput(String output);
-	/* returns the parent job that this process is encompassed by */
+	
+	/**
+	 * 
+	 */
+	public void clearOutput();
+	
+	/**
+	 * @return
+	 */
+	public String getContents();
+	
+	/**
+	 * @return
+	 */
+	public int getExitCode();
+	
+	/**
+	 * Find the parent job that this process is encompassed by 
+	 * 
+	 * @return
+	 */
 	public IPJob getJob();
-	/* sets the node that this process is running on */
-	public void setNode(IPNode node);
-	/* returns the node that this process is running on */
+	
+	/**
+	 * Find the node that this process is running on
+	 * 
+	 * @return
+	 */
 	public IPNode getNode();
 	
 	/**
 	 * @return
 	 */
-	public boolean isAllStop();
+	public String[] getOutputs();
+	
+	/**
+	 * @return
+	 */
+	public int getPid();
+	
+	/**
+	 * @return
+	 */
+	public String getSignalName();
+	
+	/**
+	 * @return
+	 */
+	public ProcessAttributes.State getState();
+	
+	/**
+	 * @return
+	 */
+	public int getTaskId();
+	
+	/**
+	 * @return
+	 */
+	public boolean isTerminated();
+	
+	/**
+	 * 
+	 */
+	public void removeProcess();
+	
+	/**
+	 * sets the node that this process is running on 
+	 * 
+	 * @param node
+	 */
+	public void setNode(IPNode node);
+	
+	/**
+	 * @param status
+	 */
+	public void setState(ProcessAttributes.State state);
+	
+	/**
+	 * @param isTerminate
+	 */
+	public void setTerminated(boolean isTerminate);
 }

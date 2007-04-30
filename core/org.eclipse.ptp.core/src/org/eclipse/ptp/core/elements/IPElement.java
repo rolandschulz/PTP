@@ -28,22 +28,15 @@ import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 public interface IPElement extends IAdaptable {
 
 	/**
-	 * Returns an int version of the ID for this Element
-	 * 
-	 * @return The ID for this Element
-	 */
-	public int getID();
-
-	/**
-	 * Returns a String version of the ID for this Element
+	 * Returns the unique ID for this Element
 	 * 
 	 * @return The ID for this Element as a String
 	 */
-	public String getIDString();
+	public String getID();
 
 	/**
-	 * Returns a name for this Element so it can be distinguished from other
-	 * Elements as well as printed out easily.
+	 * Returns a name for this Element. An Element name does not need to
+	 * be unique. It is primarily used for UI display purposes.
 	 * 
 	 * @return This Element's name
 	 */

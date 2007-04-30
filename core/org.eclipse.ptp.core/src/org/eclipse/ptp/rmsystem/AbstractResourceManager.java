@@ -38,7 +38,7 @@ import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
-import org.eclipse.ptp.core.attributes.IntegerAttribute;
+import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.elementcontrols.IPJobControl;
 import org.eclipse.ptp.core.elementcontrols.IPMachineControl;
 import org.eclipse.ptp.core.elementcontrols.IPNodeControl;
@@ -51,6 +51,7 @@ import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPNode;
 import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.IPQueue;
+import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.MachineAttributes;
@@ -111,13 +112,14 @@ IResourceManagerControl {
 	private String statusMessage;
 	private AttributeDefinitionManager attrDefManager;
 
-	private final HashMap<Integer, IPJobControl> jobs = new HashMap<Integer, IPJobControl>();
-	private final HashMap<Integer, IPMachineControl> machines = new HashMap<Integer, IPMachineControl>();
-	private final HashMap<Integer, IPNodeControl> nodes = new HashMap<Integer, IPNodeControl>();
-	private final HashMap<Integer, IPProcessControl> processes = new HashMap<Integer, IPProcessControl>();
-	private final HashMap<Integer, IPQueueControl> queues = new HashMap<Integer, IPQueueControl>();
+	private final HashMap<String, IPJobControl> jobsById = new HashMap<String, IPJobControl>();
+	private final HashMap<String, IPMachineControl> machinesById = new HashMap<String, IPMachineControl>();
+	private final HashMap<String, IPNodeControl> nodesById = new HashMap<String, IPNodeControl>();
+	private final HashMap<String, IPProcessControl> processesById = new HashMap<String, IPProcessControl>();
+	private final HashMap<String, IPQueueControl> queuesById = new HashMap<String, IPQueueControl>();
+	private final HashMap<String, IPQueueControl> queuesByName = new HashMap<String, IPQueueControl>();
 
-	public AbstractResourceManager(int id, IPUniverseControl universe, IResourceManagerConfiguration config)
+	public AbstractResourceManager(String id, IPUniverseControl universe, IResourceManagerConfiguration config)
 	{
 		super(id, universe, P_RESOURCE_MANAGER, getDefaultAttributes(config));
 		this.config = config;
@@ -177,23 +179,6 @@ IResourceManagerControl {
 	    }
 	}
 
-	public synchronized IPJob findJobById(String job_id) {
-		IPJob job = null;
-		try {
-			int id = Integer.parseInt(job_id);
-			IPQueue[] queues = getQueues();
-			for (int j = 0; j < queues.length; ++j) {
-				job = queues[j].getJob(id);
-				if (job != null) {
-					break;
-				}
-			}
-		} catch (NumberFormatException e) {
-			return null;
-		}
-		return job;
-	}
-
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.runtime.PlatformObject#getAdapter(java.lang.Class)
 	 */
@@ -237,42 +222,18 @@ IResourceManagerControl {
 	 * @see org.eclipse.ptp.internal.core.PElement#getID()
 	 */
 	@Override
-	public int getID() {
+	public String getID() {
 		// needed this to get around draconian plug-in
 		// library restrictions
 		return super.getID();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.internal.core.PElement#getIDString()
-	 */
-	@Override
-	public String getIDString() {
-		return getConfiguration().getResourceManagerId();
-	}
-
-	/**
-	 * @param ID
-	 * @return
-	 */
-	public synchronized IPJob getJob(int id) {
-		return jobs.get(id);
-	}
-
-	public synchronized IPJobControl[] getJobControls() {
-		return (IPJobControl[]) jobs.values().toArray(new IPJobControl[0]);
-	}
-
-	public IPJob[] getJobs() {
-		return getJobControls();
-	}
-	
-	public synchronized IPMachine getMachine(int id) {
-		return machines.get(id);
+	public synchronized IPMachine getMachineById(String id) {
+		return machinesById.get(id);
 	}
 
 	public synchronized IPMachineControl[] getMachineControls() {
-		return (IPMachineControl[]) machines.values().toArray(new IPMachineControl[0]);
+		return (IPMachineControl[]) machinesById.values().toArray(new IPMachineControl[0]);
 	}
 	
 	public IPMachine[] getMachines() {
@@ -286,45 +247,16 @@ IResourceManagerControl {
 		return config.getName();
 	}
 	
-	public synchronized IPNode getNode(int id) {
-		return nodes.get(id);
-	}
-
-	public synchronized IPNodeControl[] getNodeControls() {
-		return (IPNodeControl[]) nodes.values().toArray(new IPNodeControl[0]);
+	public synchronized IPQueue getQueueById(String id) {
+		return queuesById.get(id);
 	}
 	
-	public IPNode[] getNodes() {
-		return getNodeControls();
-	}
-
-	public synchronized IPProcess getProcess(int id) {
-		return processes.get(id);
-	}
-	
-	public synchronized IPProcessControl[] getProcessControls() {
-		return (IPProcessControl[]) processes.values().toArray(new IPProcessControl[0]);
-	}
-
-	public IPProcess[] getProcesses() {
-		return getProcessControls();
-	}
-	
-	public synchronized IPQueue getQueue(int id) {
-		return queues.get(id);
-	}
-	
-	public synchronized IPQueue getQueue(String name) {
-		for (IPQueue queue : getQueues()) {
-			if (queue.getName().equals(name)) {
-				return queue;
-			}
-		}
-		return null;
+	public synchronized IPQueue getQueueByName(String name) {
+		return queuesByName.get(name);
 	}
 	
 	public synchronized IPQueueControl[] getQueueControls() {
-		return (IPQueueControl[]) queues.values().toArray(new IPQueueControl[0]);
+		return (IPQueueControl[]) queuesById.values().toArray(new IPQueueControl[0]);
 	}
 	
 	public IPQueue[] getQueues() {
@@ -349,18 +281,6 @@ IResourceManagerControl {
 		return getMachines().length > 0 || getQueues().length > 0;
 	}
 	
-	public boolean isAllStop() {
-		return false;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.IResourceManager#removeJob(org.eclipse.ptp.core.IPJob)
-	 */
-	public void removeJob(IPJob job) {
-		// TODO Auto-generated method stub
-		
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -451,24 +371,31 @@ IResourceManagerControl {
 	/*
 	 * Add new model elements to the model.
 	 */
-	protected synchronized void addJob(int jobId, IPJobControl job) {
-		jobs.put(jobId, job);
+	protected synchronized void addJob(String jobId, IPJobControl job) {
+		jobsById.put(jobId, job);
 	}
 	
-	protected synchronized void addMachine(int machineId, IPMachineControl machine) {
-		machines.put(machineId, machine);
+	protected synchronized void addMachine(String machineId, IPMachineControl machine) {
+		machinesById.put(machineId, machine);
 	}
 
-	protected synchronized void addNode(int nodeId, IPNodeControl node) {
-		nodes.put(nodeId, node);
+	protected synchronized void addNode(String nodeId, IPNodeControl node) {
+		nodesById.put(nodeId, node);
 	}
 
-	protected synchronized void addProcess(int processId, IPProcessControl process) {
-		processes.put(processId, process);
+	protected synchronized void addProcess(String processId, IPProcessControl process) {
+		processesById.put(processId, process);
 	}
 	
-	protected synchronized void addQueue(int queueId, IPQueueControl queue) {
-		queues.put(queueId, queue);
+	protected synchronized void addQueue(String queueId, IPQueueControl queue) {
+		queuesById.put(queueId, queue);
+		/*
+		 * Keep a map of queue names, if the queue has a name (and it should).
+		 */
+		StringAttribute attr = (StringAttribute) queue.getAttribute(ElementAttributes.getNameAttributeDefinition());
+		if (attr != null) {
+			queuesByName.put(attr.getValue(), queue);
+		}
 	}
 	
 	/**
@@ -650,24 +577,24 @@ IResourceManagerControl {
     	}
     }
 
-	protected IPJobControl getJobControl(int jobId) {
-		return jobs.get(jobId);
+	protected IPJobControl getJobControl(String jobId) {
+		return jobsById.get(jobId);
 	}
 	
-	protected IPMachineControl getMachineControl(int machineId) {
-		return machines.get(machineId);
+	protected IPMachineControl getMachineControl(String machineId) {
+		return machinesById.get(machineId);
 	}
 
-	protected IPNodeControl getNodeControl(int nodeId) {
-		return nodes.get(nodeId);
+	protected IPNodeControl getNodeControl(String nodeId) {
+		return nodesById.get(nodeId);
 	}
 
-	protected IPProcessControl getProcessControl(int processId) {
-		return processes.get(processId);
+	protected IPProcessControl getProcessControl(String processId) {
+		return processesById.get(processId);
 	}
 
-	protected IPQueueControl getQueueControl(int machineId) {
-		return queues.get(machineId);
+	protected IPQueueControl getQueueControl(String machineId) {
+		return queuesById.get(machineId);
 	}
 
 	protected CoreException makeCoreException(String string) {
@@ -679,30 +606,30 @@ IResourceManagerControl {
 	/*
 	 * Create new model elements.
 	 */
-	protected IPJobControl newJob(IPQueueControl queue, int jobId, AttributeManager attrs) {
+	protected IPJobControl newJob(IPQueueControl queue, String jobId, AttributeManager attrs) {
 		IPJobControl job = new PJob(jobId, queue, attrs.getAttributes());
 		queue.addJob(job);
 		return job;
 	}
 
-	protected IPMachineControl newMachine(int machineId, AttributeManager attrs) {
+	protected IPMachineControl newMachine(String machineId, AttributeManager attrs) {
 		return new PMachine(machineId, this, attrs.getAttributes());
 	}
 
-	protected IPNodeControl newNode(IPMachineControl machine, int nodeId, AttributeManager attrs) {
+	protected IPNodeControl newNode(IPMachineControl machine, String nodeId, AttributeManager attrs) {
 		IPNodeControl node = new PNode(nodeId, machine, attrs.getAttributes());
 		machine.addNode(node);
 		return node;
 	}
 
-	protected IPProcessControl newProcess(IPJobControl job, int processId, AttributeManager attrs) {
+	protected IPProcessControl newProcess(IPJobControl job, String processId, AttributeManager attrs) {
 		IPProcessControl process = new PProcess(processId, job, attrs.getAttributes());
 		/*
 		 * If there is a node ID attribute, connect it up.
 		 */
-		IntegerAttribute attr = (IntegerAttribute) attrs.getAttribute(ProcessAttributes.getNodeIdAttributeDefinition());
+		StringAttribute attr = (StringAttribute) attrs.getAttribute(ProcessAttributes.getNodeIdAttributeDefinition());
 		if (attr != null) {
-			IPNodeControl node = getNodeControl(((IntegerAttribute)attr).getValue());
+			IPNodeControl node = getNodeControl(((StringAttribute)attr).getValue());
 			if (node != null) {
 				node.addProcess(process);
 			}
@@ -710,7 +637,7 @@ IResourceManagerControl {
 		return process;
 	}
 
-	protected IPQueueControl newQueue(int queueId, AttributeManager attrs) {
+	protected IPQueueControl newQueue(String queueId, AttributeManager attrs) {
 		return new PQueue(queueId, this, attrs.getAttributes());
 	}
 

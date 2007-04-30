@@ -34,32 +34,31 @@ public abstract class PElement extends PlatformObject implements IPElementContro
 	private PElementInfo elementInfo = null;
 
 	protected AttributeManager attributeValues = new AttributeManager();
-	protected int elementId = -1;
+	protected String elementId = null;
 	protected IPElementControl elementParent;
 
 	protected int elementType;
 
-	protected PElement(int id, IPElementControl parent, int type, IAttribute[] attrs) {
+	protected PElement(String id, IPElementControl parent, int type, IAttribute[] attrs) {
 		elementId = id;
 		elementType = type;
 		elementParent = parent;
 		setAttributes(attrs);
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Comparable#compareTo(java.lang.Object)
+	 */
 	public int compareTo(Object obj) {
 		if (obj instanceof IPElementControl) {
-			int my_rank = getID();
-			int his_rank = ((IPElementControl) obj).getID();
-			if (my_rank < his_rank)
-				return -1;
-			if (my_rank == his_rank)
-				return 0;
-			if (my_rank > his_rank)
-				return 1;
+			return getName().compareTo(((IPElementControl) obj).getName());
 		}
 		return 0;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.search.ui.ISearchPageScoreComputer#computeScore(java.lang.String, java.lang.Object)
+	 */
 	public int computeScore(String pageId, Object element) {
 		//FIXME
 		//if (!CoreUtils.PTP_SEARCHPAGE_ID.equals(pageId))
@@ -78,64 +77,92 @@ public abstract class PElement extends PlatformObject implements IPElementContro
 		return attributeValues.getAttribute(attrDef);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPElement#getAttribute(java.lang.String)
+	 */
 	public IAttribute getAttribute(String attrId) {
 		return attributeValues.getAttribute(attrId);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPElement#getAttributeEntrySet()
+	 */
 	public Set<Map.Entry<String, IAttribute>> getAttributeEntrySet() {
 		return attributeValues.getEntrySet();
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPElement#getAttributeKeys()
+	 */
 	public String[] getAttributeKeys() {
 		return attributeValues.getKeySet().toArray(new String[0]);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPElement#getName()
+	 */
 	public String getName() {
 		IAttribute attr = (IAttribute) attributeValues.getAttribute(ElementAttributes.getNameAttributeDefinition());
 		if (attr != null) {
 			return attr.getValueAsString();
 		}
-		return "";
+		return getID();
 	}
 	
-	/**
-	 * @return Returns the Type.
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elementcontrols.IPElementControl#getElementType()
 	 */
 	public int getElementType() {
 		return elementType;
 	}
 
-	public int getID() {
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPElement#getID()
+	 */
+	public String getID() {
 		return elementId;
 	}
-	
-	public String getIDString() {
-		return ""+elementId+"";
-	}
 
-	/**
-	 * @return Returns the Parent.
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elementcontrols.IPElementControl#getParent()
 	 */
 	public IPElementControl getParent() {
 		return elementParent;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPElement#setAttribute(org.eclipse.ptp.core.attributes.IAttribute)
+	 */
 	public void setAttribute(IAttribute attrib) {
 		attributeValues.setAttribute(attrib);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPElement#setAttributes(org.eclipse.ptp.core.attributes.IAttribute[])
+	 */
 	public void setAttributes(IAttribute[] attribs) {
 		attributeValues.setAttributes(attribs);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elementcontrols.IPElementControl#size()
+	 */
 	public int size() {
 		return getElementInfo().size();
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
 	public String toString() {
 		return getName();
 	}
 
+	/**
+	 * Find the element info for this element
+	 * 
+	 * @return PElementInfo
+	 */
 	protected PElementInfo getElementInfo() {
 		if (elementInfo == null)
 			elementInfo = new PElementInfo(this);

@@ -23,7 +23,7 @@ import org.eclipse.ptp.core.elements.attributes.ElementAttributeManager;
 
 public class RuntimeNewProcessEvent extends AbstractRuntimeNewEvent implements IRuntimeNewProcessEvent {
 
-	public RuntimeNewProcessEvent(int parent, ElementAttributeManager attrs) {
+	public RuntimeNewProcessEvent(String parent, ElementAttributeManager attrs) {
 		super(parent, attrs);
 	}
 

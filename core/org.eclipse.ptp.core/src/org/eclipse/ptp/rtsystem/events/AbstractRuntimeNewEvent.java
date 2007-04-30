@@ -22,15 +22,15 @@ package org.eclipse.ptp.rtsystem.events;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributeManager;
 
 public abstract class AbstractRuntimeNewEvent implements IRuntimeNewEvent {
-	private int parentId;
+	private String parentId;
 	private ElementAttributeManager attrMgr;
 	
-	public AbstractRuntimeNewEvent(int parentId, ElementAttributeManager attrMgr) {
+	public AbstractRuntimeNewEvent(String parentId, ElementAttributeManager attrMgr) {
 		this.parentId = parentId;
 		this.attrMgr = attrMgr;
 	}
 
-	public int getParentId() {
+	public String getParentId() {
 		return parentId;
 	}
 	

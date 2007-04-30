@@ -19,69 +19,24 @@
 
 package org.eclipse.ptp.core.elements;
 
-import org.eclipse.ptp.rmsystem.IResourceManager;
 
 
 /**
  * A Universe represents a user's view of the world. It is comprised of a set of
- * Machines and Jobs. This class has helper methods to get access to those sets
- * as well as other things down inside those sets (such as finding a node, which
- * may require searching all machines).
+ * Resource Managers.
  * 
  * @author Nathan DeBardeleben
- * @see IPMachine
- * @see IPJob
+ * @see IResourceManager
  */
-public interface IPUniverse /*extends IPElement*/ {
-	public void deleteJob(IPJob job);
-
-	/**
-	 * @param job_id
-	 * @return
-	 */
-	public IPJob findJobById(String job_id);
-
-	/**
-	 * @param machine_id
-	 * @return
-	 */
-	public IPMachine findMachineByGlobalId(String machin_id);
-		
+public interface IPUniverse extends IPElement {
 	/**
 	 * @param id
-	 * @return
+	 * @return IResourceManager
 	 */
-	public IPQueue findQueueById(String id);
-
-	/**
-	 * @param id
-	 * @return
-	 */
-	public IResourceManager findResourceManagerById(String id);
-
-	/**
-	 * Returns all the Jobs that are visible by this Universe, or null if there
-	 * are none.
-	 * 
-	 * @return An array of all Jobs in this Universe, null if there are none
-	 */
-	public IPJob[] getJobs();
+	public IResourceManager getResourceManager(String id);
 	
 	/**
-	 * Returns all the Machines that are visible by this Universe, or null if
-	 * there are none.
-	 * 
-	 * @return An array of all Machines in this Universe, null if there are none
-	 */
-	public IPMachine[] getMachines();
-	
-	/**
-	 * @return
-	 */
-	public IPQueue[] getQueues();
-	
-	/**
-	 * @return
+	 * @return IResourceManager[]
 	 */
 	public IResourceManager[] getResourceManagers();
 

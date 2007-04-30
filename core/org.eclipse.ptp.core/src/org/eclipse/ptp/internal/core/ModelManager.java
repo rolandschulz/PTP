@@ -46,6 +46,7 @@ import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPNode;
 import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.IPUniverse;
+import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.events.IModelErrorEvent;
 import org.eclipse.ptp.core.events.IModelEvent;
@@ -61,7 +62,6 @@ import org.eclipse.ptp.core.events.ProcessEvent;
 import org.eclipse.ptp.internal.rmsystem.ResourceManagerPersistence;
 import org.eclipse.ptp.rmsystem.AbstractResourceManager;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory;
-import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerChangedListener;
 import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
 import org.eclipse.ptp.rmsystem.IResourceManagerListener;
@@ -141,7 +141,7 @@ IResourceManagerListener {
 		
 		System.out.println("In getResourceManagerFactories");
 	
-		final ArrayList factoryList = new ArrayList();
+		final ArrayList<AbstractResourceManagerFactory> factoryList = new ArrayList<AbstractResourceManagerFactory>();
 	
 		IExtensionRegistry registry = Platform.getExtensionRegistry();
 		IExtensionPoint extensionPoint = registry.getExtensionPoint("org.eclipse.ptp.core.resourcemanager");
@@ -210,7 +210,7 @@ IResourceManagerListener {
 		final Collection<IPJob> jobs = e.getChangedJobs();
 		if (stateChanged) {
 			for (IPJob job : jobs) {
-				fireEvent(new ModelRuntimeNotifierEvent(job.getIDString(),
+				fireEvent(new ModelRuntimeNotifierEvent(job.getID(),
 						IModelRuntimeNotifierEvent.TYPE_JOB, eventState));
 			}
 		}
@@ -233,7 +233,7 @@ IResourceManagerListener {
 	public void handleChangedProcessesEvent(IResourceManagerChangedProcessesEvent e) {
 		for (IPProcess proc : e.getChangedProcesses()) {
 			fireEvent(new ProcessEvent(proc,
-					IProcessEvent.STATUS_CHANGE_TYPE, proc.getStatus()));
+					IProcessEvent.STATUS_CHANGE_TYPE, proc.getState()));
 		}
 	}
 	
@@ -256,7 +256,7 @@ IResourceManagerListener {
 	 */
 	public void handleNewJobsEvent(IResourceManagerNewJobsEvent e) {
 		for (IPJob job : e.getNewJobs()) {
-			fireEvent(new ModelRuntimeNotifierEvent(job.getIDString(),
+			fireEvent(new ModelRuntimeNotifierEvent(job.getID(),
 					IModelRuntimeNotifierEvent.TYPE_JOB, IModelRuntimeNotifierEvent.STARTED));
 		}
 	}	

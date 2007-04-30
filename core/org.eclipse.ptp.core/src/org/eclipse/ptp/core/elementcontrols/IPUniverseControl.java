@@ -19,7 +19,7 @@
 package org.eclipse.ptp.core.elementcontrols;
 
 import org.eclipse.ptp.core.elements.IPUniverse;
-import org.eclipse.ptp.rmsystem.IResourceManager;
+import org.eclipse.ptp.core.elements.IResourceManager;
 
 /**
  * Adds the internal functionality of an IPElement to an IPUniverse

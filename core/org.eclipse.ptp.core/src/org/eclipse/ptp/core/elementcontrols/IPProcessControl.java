@@ -20,6 +20,6 @@ package org.eclipse.ptp.core.elementcontrols;
 
 import org.eclipse.ptp.core.elements.IPProcess;
 
-public interface IPProcessControl extends IPProcess, IPElementControl {
+public interface IPProcessControl extends IPElementControl, IPProcess {
 
 }

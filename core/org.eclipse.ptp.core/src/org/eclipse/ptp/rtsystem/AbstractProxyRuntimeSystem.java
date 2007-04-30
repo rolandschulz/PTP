@@ -236,17 +236,11 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 			return;
 		}
 		
-		try {
-			int parentId = Integer.parseInt(args[0]);
-			
-			ElementAttributeManager eMgr = getElementAttributeManager(args, 1);
-			if (eMgr != null) {			
-				fireRuntimeNewJobEvent(new RuntimeNewJobEvent(parentId, eMgr));
-			} else {
-				fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: could not parse message"));				
-			}
-		} catch (NumberFormatException e1) {
-			fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: invalid parent ID"));				
+		ElementAttributeManager eMgr = getElementAttributeManager(args, 1);
+		if (eMgr != null) {			
+			fireRuntimeNewJobEvent(new RuntimeNewJobEvent(args[0], eMgr));
+		} else {
+			fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: could not parse message"));				
 		}
 	}
 	
@@ -258,17 +252,11 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 			return;
 		}
 		
-		try {
-			int parentId = Integer.parseInt(args[0]);
-			
-			ElementAttributeManager eMgr = getElementAttributeManager(args, 1);
-			if (eMgr != null) {			
-				fireRuntimeNewMachineEvent(new RuntimeNewMachineEvent(parentId, eMgr));
-			} else {
-				fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: could not parse message"));				
-			}
-		} catch (NumberFormatException e1) {
-			fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: invalid parent ID"));				
+		ElementAttributeManager eMgr = getElementAttributeManager(args, 1);
+		if (eMgr != null) {			
+			fireRuntimeNewMachineEvent(new RuntimeNewMachineEvent(args[0], eMgr));
+		} else {
+			fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: could not parse message"));				
 		}
 	}
 	
@@ -280,17 +268,11 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 			return;
 		}
 		
-		try {
-			int parentId = Integer.parseInt(args[0]);
-			
-			ElementAttributeManager eMgr = getElementAttributeManager(args, 1);
-			if (eMgr != null) {			
-				fireRuntimeNewNodeEvent(new RuntimeNewNodeEvent(parentId, eMgr));
-			} else {
-				fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: could not parse message"));				
-			}
-		} catch (NumberFormatException e1) {
-			fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: invalid parent ID"));				
+		ElementAttributeManager eMgr = getElementAttributeManager(args, 1);
+		if (eMgr != null) {			
+			fireRuntimeNewNodeEvent(new RuntimeNewNodeEvent(args[0], eMgr));
+		} else {
+			fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: could not parse message"));				
 		}
 	}
 	
@@ -302,17 +284,11 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 			return;
 		}
 		
-		try {
-			int parentId = Integer.parseInt(args[0]);
-			
-			ElementAttributeManager eMgr = getElementAttributeManager(args, 1);
-			if (eMgr != null) {			
-				fireRuntimeNewProcessEvent(new RuntimeNewProcessEvent(parentId, eMgr));
-			} else {
-				fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: could not parse message"));				
-			}
-		} catch (NumberFormatException e1) {
-			fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: invalid parent ID"));				
+		ElementAttributeManager eMgr = getElementAttributeManager(args, 1);
+		if (eMgr != null) {			
+			fireRuntimeNewProcessEvent(new RuntimeNewProcessEvent(args[0], eMgr));
+		} else {
+			fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: could not parse message"));				
 		}
 	}
 
@@ -324,17 +300,11 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 			return;
 		}
 		
-		try {
-			int parentId = Integer.parseInt(args[0]);
-			
-			ElementAttributeManager eMgr = getElementAttributeManager(args, 1);
-			if (eMgr != null) {			
-				fireRuntimeNewQueueEvent(new RuntimeNewQueueEvent(parentId, eMgr));
-			} else {
-				fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: could not parse message"));				
-			}
-		} catch (NumberFormatException e1) {
-			fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: invalid parent ID"));				
+		ElementAttributeManager eMgr = getElementAttributeManager(args, 1);
+		if (eMgr != null) {			
+			fireRuntimeNewQueueEvent(new RuntimeNewQueueEvent(args[0], eMgr));
+		} else {
+			fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: could not parse message"));				
 		}
 	}
 	
@@ -440,19 +410,11 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 			return;
 		}
 		
-		int jobID = job.getID();
-
-		if(jobID >= 0) {
-			System.out.println("LSFControlSystem: abortJob() with name "+job.toString()+" and ID "+jobID);
-			try {
-				proxy.terminateJob(jobID);
-			} catch(IOException e) {
-				throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, 
-					"Control system is shut down, proxy exception.  The proxy may have crashed or been killed.", null));
-			}
-		}
-		else {
-			System.err.println("ERROR: Tried to abort a null job.");
+		try {
+			proxy.terminateJob(job.getID());
+		} catch(IOException e) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, 
+				"Control system is shut down, proxy exception.  The proxy may have crashed or been killed.", null));
 		}
 	}
 

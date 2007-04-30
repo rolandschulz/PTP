@@ -18,24 +18,15 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.core;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
-import org.eclipse.ptp.core.elementcontrols.IPJobControl;
-import org.eclipse.ptp.core.elementcontrols.IPMachineControl;
-import org.eclipse.ptp.core.elementcontrols.IPNodeControl;
-import org.eclipse.ptp.core.elementcontrols.IPProcessControl;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
-import org.eclipse.ptp.core.elements.IPJob;
-import org.eclipse.ptp.core.elements.IPMachine;
-import org.eclipse.ptp.core.elements.IPQueue;
+import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
-import org.eclipse.ptp.rmsystem.IResourceManager;
 
 public class PUniverse extends PElement implements IPUniverseControl {
 	private static final int RMID_SHIFT = 24;
@@ -46,7 +37,7 @@ public class PUniverse extends PElement implements IPUniverseControl {
 	
 	public PUniverse() {
 		/* '1' because this is the only universe */
-		super(1, null, P_UNIVERSE, getDefaultAttributes("TheUniverse"));
+		super("1", null, P_UNIVERSE, getDefaultAttributes("TheUniverse"));
 		// setOutputStore();
 	}
 	
@@ -71,106 +62,22 @@ public class PUniverse extends PElement implements IPUniverseControl {
 		}
 	}
 
-	public void deleteJob(IPJob jobIn) {
-		IPJobControl job = (IPJobControl) jobIn;
-		IPProcessControl[] processes = job.getProcessControls();
-		for (int i = 0; i < processes.length; ++i) {
-			IPProcessControl process = processes[i];
-			if (process == null)
-				continue;
-			IPNodeControl node = (IPNodeControl) process.getNode();
-			if (node == null)
-				continue;
-			node.removeProcess(process);
-		}
-		job.removeAllProcesses();
-		IResourceManager resourceManager = job.getResourceManager();
-		resourceManager.removeJob(job);
-	}
-
-	public synchronized IPJob findJobById(String job_id) {
-		for (IResourceManager resourceManager : resourceManagers) {
-			IPJob job = resourceManager.findJobById(job_id);
-			if (job != null) {
-				return job;
-			}
-		}
-		return null;
-	}
-
-	public synchronized IPMachine findMachineByGlobalId(String machine_id) {
-		for (IResourceManagerControl resourceManager : resourceManagers) {
-			IPMachineControl[] machines = resourceManager.getMachineControls();
-			for (int i = 0; i < machines.length; ++i) {
-				if (machines[i].getIDString().equals(machine_id))
-					return machines[i];
-			}
-		}
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.IPUniverse#findQueueById(java.lang.String)
-	 */
-	public IPQueue findQueueById(String id) {
-		for (IResourceManager resourceManager : resourceManagers) {
-			IPQueue[] queues = resourceManager.getQueues();
-			for (int i = 0; i < queues.length; ++i) {
-				if (queues[i].getIDString().equals(id))
-					return queues[i];
-			}
-		}
-		return null;
-	}
-
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.IPUniverse#findResourceManagerById(java.lang.String)
 	 */
-	public synchronized IResourceManager findResourceManagerById(String id) {
+	public synchronized IResourceManager getResourceManager(String id) {
 		for (IResourceManager resourceManager : resourceManagers) {
-			if (resourceManager.getIDString().equals(id)) {
+			if (resourceManager.getID().equals(id)) {
 				return resourceManager;
 			}
 		}
 		return null;
 	}
 	
-	/*
-	 */
-	public synchronized IPJob[] getJobs() {
-		ArrayList<IPJob> jobs = new ArrayList<IPJob>();
-		for (IResourceManager resourceManager : resourceManagers) {
-			IPJob[] rmjobs = resourceManager.getJobs();
-			jobs.addAll(Arrays.asList(rmjobs));
-		}
-		return (IPJob[]) jobs.toArray(new IPJobControl[0]);
-	}
-
-	public synchronized IPMachine[] getMachines() {
-		ArrayList<IPMachine> machines = new ArrayList<IPMachine>();
-		for (IResourceManager resourceManager : resourceManagers) {
-			IPMachine[] rmMachines = resourceManager.getMachines();
-			machines.addAll(Arrays.asList(rmMachines));
-		}
-		return (IPMachine[]) machines.toArray(new IPMachineControl[0]);
-	}
-	
 	public int getNextResourceManagerId() {
 		return (nextResourceManagerId++ << RMID_SHIFT);
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.IPUniverse#getQueues()
-	 */
-	public IPQueue[] getQueues() {
-		ArrayList<IPQueue> queues = new ArrayList<IPQueue>();
-		for (IResourceManager resourceManager : resourceManagers) {
-			IPQueue[] rmQueues = resourceManager.getQueues();
-			queues.addAll(Arrays.asList(rmQueues));
-		}
-		return (IPQueue[]) queues.toArray(new IPQueue[0]);
-	}
-
 	/**
 	 * @return all of the resource managers
 	 */
@@ -190,17 +97,6 @@ public class PUniverse extends PElement implements IPUniverseControl {
 	 */
 	public boolean hasChildren() {
 		return !resourceManagers.isEmpty();
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elementcontrols.IPElementControl#isAllStop()
-	 */
-	public boolean isAllStop() {
-		for (IResourceManagerControl resourceManager : resourceManagers) {
-			if (!resourceManager.isAllStop())
-				return false;
-		}
-		return true;
 	}
 
 	public synchronized void removeResourceManager(IResourceManager removedManager) {

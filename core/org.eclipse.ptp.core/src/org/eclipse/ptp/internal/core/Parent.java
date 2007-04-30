@@ -19,8 +19,8 @@
 package org.eclipse.ptp.internal.core;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.ptp.core.attributes.IAttribute;
@@ -31,56 +31,18 @@ import org.eclipse.ptp.core.elements.IPElement;
  *  
  */
 public abstract class Parent extends PElement {
-	public static void sort(IPElementControl element[]) {
-		quickSort(element, 0, element.length - 1);
-	}
-
-	private static void quickSort(IPElementControl element[], int low, int high) {
-		int lo = low;
-		int hi = high;
-		int mid;
-		if (high > low) {
-			mid = element[(low + high) / 2].getID();
-			while (lo <= hi) {
-				while ((lo < high) && (element[lo].getID() < mid))
-					++lo;
-				while ((hi > low) && (element[hi].getID() > mid))
-					--hi;
-				if (lo <= hi) {
-					swap(element, lo, hi);
-					++lo;
-					--hi;
-				}
-			}
-			if (low < hi)
-				quickSort(element, low, hi);
-			if (lo < high)
-				quickSort(element, lo, high);
+	public static void sort(IPElementControl elements[]) {
+		if (elements.length > 0) {
+			Arrays.sort(elements, 0, elements.length - 1);
 		}
 	}
 
-	private static void swap(IPElementControl element[], int i, int j) {
-		IPElementControl tempElement;
-		tempElement = element[i];
-		element[i] = element[j];
-		element[j] = tempElement;
-	}
-
-	public Parent(int id, IPElementControl parent, int type, IAttribute[] attrs) {
+	public Parent(String id, IPElementControl parent, int type, IAttribute[] attrs) {
 		super(id, parent, type, attrs);
 	}
 
 	public boolean hasChildren() {
 		return getElementInfo().hasChildren();
-	}
-
-	public boolean isAllStop() {
-		IPElementControl[] elements = getChildren();
-		for (int i = 0; i < elements.length; i++) {
-			if (!elements[i].isAllStop())
-				return false;
-		}
-		return true;
 	}
 
 	protected void addChild(IPElementControl member) {
@@ -92,17 +54,13 @@ public abstract class Parent extends PElement {
 	}
 
 	protected IPElementControl[] getChildren() {
-		PElementInfo info = getElementInfo();
-		if (info != null)
-			return info.getChildren();
-
-		return new IPElementControl[] {};
+		return getElementInfo().getChildren();
 	}
 
 	protected List getChildrenOfType(int type) {
 		IPElementControl[] children = getChildren();
 		int size = children.length;
-		ArrayList list = new ArrayList(size);
+		ArrayList<PElement> list = new ArrayList<PElement>(size);
 		for (int i = 0; i < size; ++i) {
 			PElement elt = (PElement) children[i];
 			if (elt.getElementType() == type) {
@@ -112,12 +70,8 @@ public abstract class Parent extends PElement {
 		return list;
 	}
 
-	protected Collection getCollection() {
-		PElementInfo info = getElementInfo();
-		if (info != null)
-			return info.getCollection();
-
-		return Collections.EMPTY_LIST;
+	protected Collection<IPElementControl> getCollection() {
+		return getElementInfo().getCollection();
 	}
 
 	protected void removeChild(IPElement member) {

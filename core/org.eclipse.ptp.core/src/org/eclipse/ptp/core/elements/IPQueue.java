@@ -18,29 +18,23 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.elements;
 
-import org.eclipse.ptp.rmsystem.IResourceManager;
 
 
 public interface IPQueue extends IPElement {
 
 	/**
 	 * @param job_id
-	 * @return
+	 * @return IPJob
 	 */
-	IPJob getJob(int job_id);
+	public IPJob getJobById(String job_id);
 	
 	/**
-	 * @return
+	 * @return IPJob[]
 	 */
-	IPJob[] getJobs();
+	public IPJob[] getJobs();
 	
 	/**
-	 * @return
+	 * @return IResourceManager
 	 */
-	String getName();
-
-	/**
-	 * @return
-	 */
-	IResourceManager getResourceManager();
+	public IResourceManager getResourceManager();
 }

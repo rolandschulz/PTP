@@ -22,15 +22,13 @@ import org.eclipse.ptp.core.elements.IPMachine;
 
 public interface IPMachineControl extends IPElementControl, IPMachine {
 
-	/*
-	 * helper function to get all the processes running on this machine - doing
-	 * so by looking at all the processes on each of the nodes comprised by this
-	 * machine
-	 */
-	public IPProcessControl[] getProcessControls();
-
 	/**
 	 * @param node
 	 */
 	public void addNode(IPNodeControl node);
+	
+	/**
+	 * @return
+	 */
+	public IPNodeControl[] getNodeControls();
 }

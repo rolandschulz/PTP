@@ -19,7 +19,6 @@
 package org.eclipse.ptp.core.elementcontrols;
 
 import org.eclipse.ptp.core.elements.IPJob;
-import org.eclipse.ptp.rmsystem.IResourceManager;
 
 public interface IPJobControl extends IPElementControl, IPJob {
 
@@ -32,7 +31,4 @@ public interface IPJobControl extends IPElementControl, IPJob {
 	public IPProcessControl[] getProcessControls();
 
 	public void addProcess(IPProcessControl p);
-
-	public IResourceManager getResourceManager();
-
 }
