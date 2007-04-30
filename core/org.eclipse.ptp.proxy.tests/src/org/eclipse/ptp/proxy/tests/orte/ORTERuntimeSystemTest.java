@@ -22,6 +22,7 @@ import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.core.elements.attributes.QueueAttributes;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.core.util.RangeSet;
+import org.eclipse.ptp.orte.core.ORTEAttributes;
 import org.eclipse.ptp.orte.core.rtsystem.ORTEProxyRuntimeClient;
 import org.eclipse.ptp.orte.core.rtsystem.ORTERuntimeSystem;
 import org.eclipse.ptp.rtsystem.IRuntimeEventListener;
@@ -171,37 +172,35 @@ public class ORTERuntimeSystemTest implements IRuntimeEventListener {
 				try {
 					attrMgr.setAttribute(QueueAttributes.getIdAttributeDefinition().create(queueId));
 					
-					attrMgr.setAttribute(attrDefManager.createStringAttributeDefinition("execName", "", "", "").create(jobRunConfig.getExecName()));
+					attrMgr.setAttribute(JobAttributes.getExecutableNameAttributeDefinition().create(jobRunConfig.getExecName()));
 					
 					String path = jobRunConfig.getPathToExec();
 					if (path != null) {
-						attrMgr.setAttribute(attrDefManager.createStringAttributeDefinition("pathToExec", "", "", "").create(path));
+						attrMgr.setAttribute(JobAttributes.getExecutablePathAttributeDefinition().create(path));
 					}
 					
-					attrMgr.setAttribute(attrDefManager.createIntegerAttributeDefinition("numOfProcs", "", "", 0).create(nProcs));
-					attrMgr.setAttribute(attrDefManager.createIntegerAttributeDefinition("procsPerNode", "", "", 0).create(nProcsPerNode));
-					attrMgr.setAttribute(attrDefManager.createIntegerAttributeDefinition("firstNodeNum", "", "", 0).create(firstNodeNum));
+					attrMgr.setAttribute(ORTEAttributes.getNumberOfProcessesAttributeDefinition().create(nProcs));
 							
 					String wd = jobRunConfig.getWorkingDir();
 					if (wd != null) {
-						attrMgr.setAttribute(attrDefManager.createStringAttributeDefinition("workingDir", "", "", "").create(wd));
+						attrMgr.setAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition().create(wd));
 					}
 					
 					String[] argArr = jobRunConfig.getArguments();
 					if (argArr != null) {
-						attrMgr.setAttribute(attrDefManager.createArrayAttributeDefinition("progArg", "", "", null).create(argArr));
+						attrMgr.setAttribute(JobAttributes.getProgramArgumentsAttributeDefinition().create(argArr));
 					}
 					
 					String[] envArr = jobRunConfig.getEnvironment();
 					if (envArr != null) {
-						attrMgr.setAttribute(attrDefManager.createArrayAttributeDefinition("progEnv", "", "", null).create(envArr));
+						attrMgr.setAttribute(JobAttributes.getEnvironmentAttributeDefinition().create(envArr));
 					}
 					
 					if (jobRunConfig.isDebug()) {
-						attrMgr.setAttribute(attrDefManager.createStringAttributeDefinition("debuggerPath", "", "", "").create(jobRunConfig.getDebuggerPath()));
+						attrMgr.setAttribute(JobAttributes.getDebuggerBackendPathAttributeDefinition().create(jobRunConfig.getDebuggerPath()));
 						String[] dbgArgs = jobRunConfig.getDebuggerArgs();
 						if (dbgArgs != null) {
-							attrMgr.setAttribute(attrDefManager.createArrayAttributeDefinition("debuggerArg", "", "", null).create(dbgArgs));
+							attrMgr.setAttribute(JobAttributes.getDebuggerArgumentsAttributeDefinition().create(dbgArgs));
 						}
 					}
 					
@@ -262,7 +261,7 @@ public class ORTERuntimeSystemTest implements IRuntimeEventListener {
 	}
 
 	public void handleRuntimeNewNodeEvent(IRuntimeNewNodeEvent e) {
-		int parentId = e.getParentId();
+		String parentId = e.getParentId();
 		for (RangeSet r : e.getElementAttributeManager().getElementIds()) {
 			for (int id : r) {
 				System.out.println("new node " + parentId + " "+ id);

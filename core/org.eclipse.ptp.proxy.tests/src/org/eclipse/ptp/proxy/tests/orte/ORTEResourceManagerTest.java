@@ -8,7 +8,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute;
@@ -16,14 +15,15 @@ import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPNode;
 import org.eclipse.ptp.core.elements.IPQueue;
+import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.QueueAttributes;
 import org.eclipse.ptp.internal.core.PUniverse;
+import org.eclipse.ptp.orte.core.ORTEAttributes;
 import org.eclipse.ptp.orte.core.rmsystem.ORTEResourceManager;
 import org.eclipse.ptp.orte.core.rmsystem.ORTEResourceManagerConfiguration;
 import org.eclipse.ptp.orte.core.rmsystem.ORTEResourceManagerFactory;
 import org.eclipse.ptp.rmsystem.AbstractResourceManager;
-import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerListener;
 import org.eclipse.ptp.rmsystem.events.IResourceManagerChangedJobsEvent;
 import org.eclipse.ptp.rmsystem.events.IResourceManagerChangedMachinesEvent;
@@ -120,42 +120,39 @@ public class ORTEResourceManagerTest implements IResourceManagerListener {
 						queueName, attr, configArgs, env, dir);
 
 				AttributeManager attrMgr = new AttributeManager();
-				AttributeDefinitionManager defMgr = rm.getAttributeDefinitionManager();
 				
 				try {
-					attrMgr.setAttribute(QueueAttributes.getIdAttributeDefinition().create(subQueue.getIDString()));
+					attrMgr.setAttribute(QueueAttributes.getIdAttributeDefinition().create(subQueue.getID()));
 					
-					attrMgr.setAttribute(defMgr.createStringAttributeDefinition("execName", "", "", "").create(jobRunConfig.getExecName()));
+					attrMgr.setAttribute(JobAttributes.getExecutableNameAttributeDefinition().create(jobRunConfig.getExecName()));
 					
 					String path = jobRunConfig.getPathToExec();
 					if (path != null) {
-						attrMgr.setAttribute(defMgr.createStringAttributeDefinition("pathToExec", "", "", "").create(path));
+						attrMgr.setAttribute(JobAttributes.getExecutablePathAttributeDefinition().create(path));
 					}
 					
-					attrMgr.setAttribute(defMgr.createIntegerAttributeDefinition("numOfProcs", "", "", 0).create(nProcs));
-					attrMgr.setAttribute(defMgr.createIntegerAttributeDefinition("procsPerNode", "", "", 0).create(nProcsPerNode));
-					attrMgr.setAttribute(defMgr.createIntegerAttributeDefinition("firstNodeNum", "", "", 0).create(firstNodeNum));
+					attrMgr.setAttribute(ORTEAttributes.getNumberOfProcessesAttributeDefinition().create(nProcs));
 							
 					String wd = jobRunConfig.getWorkingDir();
 					if (wd != null) {
-						attrMgr.setAttribute(defMgr.createStringAttributeDefinition("workingDir", "", "", "").create(wd));
+						attrMgr.setAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition().create(wd));
 					}
 					
 					String[] argArr = jobRunConfig.getArguments();
 					if (argArr != null) {
-						attrMgr.setAttribute(defMgr.createArrayAttributeDefinition("progArg", "", "", null).create(argArr));
+						attrMgr.setAttribute(JobAttributes.getProgramArgumentsAttributeDefinition().create(argArr));
 					}
 					
 					String[] envArr = jobRunConfig.getEnvironment();
 					if (envArr != null) {
-						attrMgr.setAttribute(defMgr.createArrayAttributeDefinition("progEnv", "", "", null).create(envArr));
+						attrMgr.setAttribute(JobAttributes.getEnvironmentAttributeDefinition().create(envArr));
 					}
 					
 					if (jobRunConfig.isDebug()) {
-						attrMgr.setAttribute(defMgr.createStringAttributeDefinition("debuggerPath", "", "", "").create(jobRunConfig.getDebuggerPath()));
+						attrMgr.setAttribute(JobAttributes.getDebuggerBackendPathAttributeDefinition().create(jobRunConfig.getDebuggerPath()));
 						String[] dbgArgs = jobRunConfig.getDebuggerArgs();
 						if (dbgArgs != null) {
-							attrMgr.setAttribute(defMgr.createArrayAttributeDefinition("debuggerArg", "", "", null).create(dbgArgs));
+							attrMgr.setAttribute(JobAttributes.getDebuggerArgumentsAttributeDefinition().create(dbgArgs));
 						}
 					}
 					
