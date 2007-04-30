@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.core;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.elementcontrols.IPElementControl;
@@ -32,7 +32,7 @@ import org.eclipse.ptp.core.elements.IResourceManager;
 public class PJob extends Parent implements IPJobControl {
 	final public static int BASE_OFFSET = 10000;
 	final public static int STATE_NEW = 5000;
-	private ArrayList<IPProcessControl> taskIdMap = new ArrayList<IPProcessControl>();
+	private HashMap<String, IPProcessControl> numberMap = new HashMap<String, IPProcessControl>();
 
 	protected String NAME_TAG = "root ";
 	
@@ -44,7 +44,10 @@ public class PJob extends Parent implements IPJobControl {
 	
 	public void addProcess(IPProcessControl p) {
 		addChild(p);
-		taskIdMap.add(p.getTaskId(), p);
+		String num = p.getProcessNumber();
+		if (num != null) {
+			numberMap.put(num, p);
+		}
 	}
 	
 	public synchronized IPProcess getProcessById(String id) {
@@ -54,8 +57,8 @@ public class PJob extends Parent implements IPJobControl {
 		return null;
 	}
 
-	public synchronized IPProcess getProcessByTaskId(int taskId) {
-		return taskIdMap.get(taskId);
+	public synchronized IPProcess getProcessByNumber(String number) {
+		return numberMap.get(number);
 	}
 
 	/*

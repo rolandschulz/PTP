@@ -117,12 +117,12 @@ public class PProcess extends Parent implements IPProcessControl {
 		return State.ERROR;
 	}
 	
-	public int getTaskId() {
-		IntegerAttribute attr = (IntegerAttribute) getAttribute(ProcessAttributes.getTaskIdAttributeDefinition());
+	public String getProcessNumber() {
+		IntegerAttribute attr = (IntegerAttribute) getAttribute(ProcessAttributes.getNumberAttributeDefinition());
 		if (attr != null) {
-			return attr.getValue();
+			return attr.getValueAsString();
 		}
-		return 0;
+		return null;
 	}
 	
 	public boolean isTerminated() {

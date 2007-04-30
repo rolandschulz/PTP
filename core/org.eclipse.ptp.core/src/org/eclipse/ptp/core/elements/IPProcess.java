@@ -80,7 +80,7 @@ public interface IPProcess extends IPElement {
 	/**
 	 * @return
 	 */
-	public int getTaskId();
+	public String getProcessNumber();
 	
 	/**
 	 * @return
