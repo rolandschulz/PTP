@@ -39,6 +39,7 @@ import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.elements.IPJob;
+import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.debug.core.IAbstractDebugger;
@@ -50,7 +51,6 @@ import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.internal.ui.LaunchMessages;
-import org.eclipse.ptp.rmsystem.IResourceManager;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -141,9 +141,9 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			monitor.subTask("Starting the job . . .");
 			job = rm.submitJob(attrManager, new SubProgressMonitor(monitor, 150));
 			if (job == null) {
-				abort("No job created by launch manager.", null, 0);
+				abort("Job submission failed", null, 0);
 			}
-			launch.setAttribute(ElementAttributes.getIdAttributeDefinition().getId(), job.getIDString());
+			launch.setAttribute(ElementAttributes.getIdAttributeDefinition().getId(), job.getID());
 			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
 				// show ptp debug view
 				showPTPDebugView(IPTPDebugUIConstants.ID_VIEW_PARALLELDEBUG);
