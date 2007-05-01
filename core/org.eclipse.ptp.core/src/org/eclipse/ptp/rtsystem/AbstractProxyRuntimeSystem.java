@@ -395,7 +395,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 			 * use of the ID.
 			 */
 			IntegerAttribute jobSubAttr = JobAttributes.getSubIdAttributeDefinition().create(jobSubId);
-			attrMgr.setAttribute(jobSubAttr);
+			attrMgr.addAttribute(jobSubAttr);
 			proxy.submitJob(attrMgr.toStringArray());
 		} catch(IOException e) {
 			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, 
@@ -446,7 +446,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 					IAttributeDefinition attrDef = attrDefManager.getAttributeDefinition(kv[0]);
 					if(attrDef != null) {
 						IAttribute attr = attrDef.create(kv[1]);
-						mgr.setAttribute(attr);
+						mgr.addAttribute(attr);
 					} else {
 						System.out.println("AbstractProxyRuntimSystem: unknown attribute definition");
 					}

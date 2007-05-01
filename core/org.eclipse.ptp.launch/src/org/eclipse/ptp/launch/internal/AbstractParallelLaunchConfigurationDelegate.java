@@ -134,34 +134,34 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 			try {
 				IPQueue queue = rm.getQueueByName(getQueueName(configuration));
 				if (queue != null) {
-						attrMgr.setAttribute(QueueAttributes.getIdAttributeDefinition().create(queue.getID()));
+						attrMgr.addAttribute(QueueAttributes.getIdAttributeDefinition().create(queue.getID()));
 				}
 				
 				IPath programFile = getProgramFile(configuration);
-				attrMgr.setAttribute(JobAttributes.getExecutableNameAttributeDefinition().create(programFile.lastSegment()));
+				attrMgr.addAttribute(JobAttributes.getExecutableNameAttributeDefinition().create(programFile.lastSegment()));
 				
 				String path = programFile.removeLastSegments(1).toOSString();
 				if (path != null) {
-					attrMgr.setAttribute(JobAttributes.getExecutablePathAttributeDefinition().create(path));
+					attrMgr.addAttribute(JobAttributes.getExecutablePathAttributeDefinition().create(path));
 				}
 				
 				String wd = verifyWorkDirectory(configuration);
 				if (wd != null) {
-					attrMgr.setAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition().create(wd));
+					attrMgr.addAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition().create(wd));
 				}
 				
 				String[] argArr = getProgramParameters(configuration);
 				if (argArr != null) {
-					attrMgr.setAttribute(JobAttributes.getProgramArgumentsAttributeDefinition().create(argArr));
+					attrMgr.addAttribute(JobAttributes.getProgramArgumentsAttributeDefinition().create(argArr));
 				}
 				
 				String[] envArr = DebugPlugin.getDefault().getLaunchManager().getEnvironment(configuration);
 				if (envArr != null) {
-					attrMgr.setAttribute(JobAttributes.getEnvironmentAttributeDefinition().create(envArr));
+					attrMgr.addAttribute(JobAttributes.getEnvironmentAttributeDefinition().create(envArr));
 				}
 			} catch (IllegalValueException e) {
 			}
-			attrMgr.setAttributes(getLaunchAttributes(configuration));
+			attrMgr.addAttributes(getLaunchAttributes(configuration));
 		} 
 		return attrMgr;
 	}

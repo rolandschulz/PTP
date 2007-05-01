@@ -120,8 +120,8 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 				if (dbgPathConf != null) {
 					// remote setting
 					IPath path = new Path(dbgPathConf);
-					attrManager.setAttribute(JobAttributes.getDebuggerExecutableNameAttributeDefinition().create(path.lastSegment()));
-					attrManager.setAttribute(JobAttributes.getDebuggerExecutablePathAttributeDefinition().create(path.removeLastSegments(1).toOSString()));
+					attrManager.addAttribute(JobAttributes.getDebuggerExecutableNameAttributeDefinition().create(path.lastSegment()));
+					attrManager.addAttribute(JobAttributes.getDebuggerExecutablePathAttributeDefinition().create(path.removeLastSegments(1).toOSString()));
 				}
 				String dbgWD = getDebuggerWorkDirectory(configuration);
 				if (dbgWD != null) {
@@ -129,13 +129,13 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 					if (wdAttr != null) {
 						wdAttr.setValue(dbgWD);
 					} else {
-						attrManager.setAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition().create(dbgWD));
+						attrManager.addAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition().create(dbgWD));
 				
 					}
 				}
-				attrManager.setAttribute(JobAttributes.getDebuggerBackendPathAttributeDefinition().create(dbgFile));
-				attrManager.setAttribute(JobAttributes.getDebuggerArgumentsAttributeDefinition().create(dbgArgs.toArray(new String[0])));
-				attrManager.setAttribute(JobAttributes.getDebugFlagAttributeDefinition().create(true));
+				attrManager.addAttribute(JobAttributes.getDebuggerBackendPathAttributeDefinition().create(dbgFile));
+				attrManager.addAttribute(JobAttributes.getDebuggerArgumentsAttributeDefinition().create(dbgArgs.toArray(new String[0])));
+				attrManager.addAttribute(JobAttributes.getDebugFlagAttributeDefinition().create(true));
 			}
 			monitor.worked(10);
 			monitor.subTask("Starting the job . . .");

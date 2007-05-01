@@ -86,10 +86,7 @@ public class ORTEResourceManagerTest implements IResourceManagerListener {
 		boolean error = false;
 		boolean launchManually = false;
 		String proxy = "orte/ptp_orte_proxy";
-		int jobID = 3;
 		int nProcs = 4;
-		int firstNodeNum = 1;
-		int nProcsPerNode = 1;
 		
 		String exe = "ls";
 		String exePath = "/bin";
@@ -122,37 +119,37 @@ public class ORTEResourceManagerTest implements IResourceManagerListener {
 				AttributeManager attrMgr = new AttributeManager();
 				
 				try {
-					attrMgr.setAttribute(QueueAttributes.getIdAttributeDefinition().create(subQueue.getID()));
+					attrMgr.addAttribute(QueueAttributes.getIdAttributeDefinition().create(subQueue.getID()));
 					
-					attrMgr.setAttribute(JobAttributes.getExecutableNameAttributeDefinition().create(jobRunConfig.getExecName()));
+					attrMgr.addAttribute(JobAttributes.getExecutableNameAttributeDefinition().create(jobRunConfig.getExecName()));
 					
 					String path = jobRunConfig.getPathToExec();
 					if (path != null) {
-						attrMgr.setAttribute(JobAttributes.getExecutablePathAttributeDefinition().create(path));
+						attrMgr.addAttribute(JobAttributes.getExecutablePathAttributeDefinition().create(path));
 					}
 					
-					attrMgr.setAttribute(ORTEAttributes.getNumberOfProcessesAttributeDefinition().create(nProcs));
+					attrMgr.addAttribute(ORTEAttributes.getNumberOfProcessesAttributeDefinition().create(nProcs));
 							
 					String wd = jobRunConfig.getWorkingDir();
 					if (wd != null) {
-						attrMgr.setAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition().create(wd));
+						attrMgr.addAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition().create(wd));
 					}
 					
 					String[] argArr = jobRunConfig.getArguments();
 					if (argArr != null) {
-						attrMgr.setAttribute(JobAttributes.getProgramArgumentsAttributeDefinition().create(argArr));
+						attrMgr.addAttribute(JobAttributes.getProgramArgumentsAttributeDefinition().create(argArr));
 					}
 					
 					String[] envArr = jobRunConfig.getEnvironment();
 					if (envArr != null) {
-						attrMgr.setAttribute(JobAttributes.getEnvironmentAttributeDefinition().create(envArr));
+						attrMgr.addAttribute(JobAttributes.getEnvironmentAttributeDefinition().create(envArr));
 					}
 					
 					if (jobRunConfig.isDebug()) {
-						attrMgr.setAttribute(JobAttributes.getDebuggerBackendPathAttributeDefinition().create(jobRunConfig.getDebuggerPath()));
+						attrMgr.addAttribute(JobAttributes.getDebuggerBackendPathAttributeDefinition().create(jobRunConfig.getDebuggerPath()));
 						String[] dbgArgs = jobRunConfig.getDebuggerArgs();
 						if (dbgArgs != null) {
-							attrMgr.setAttribute(JobAttributes.getDebuggerArgumentsAttributeDefinition().create(dbgArgs));
+							attrMgr.addAttribute(JobAttributes.getDebuggerArgumentsAttributeDefinition().create(dbgArgs));
 						}
 					}
 					
