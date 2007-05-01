@@ -268,11 +268,10 @@ public class MachineManager extends AbstractUIManager {
 	 * @param mac machine
 	 */
 	public void addMachine(IPMachine mac) {
-		if (machineList.containsKey(mac.getID()))
-			return;
-
-		IElementHandler elementHandler = new ElementHandler();
-		machineList.put(mac.getID(), elementHandler);
+		if (!machineList.containsKey(mac.getID())) {
+			IElementHandler elementHandler = new ElementHandler();
+			machineList.put(mac.getID(), elementHandler);
+		}
 	}
 	
 	/** Add machine

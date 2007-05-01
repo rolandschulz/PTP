@@ -170,7 +170,7 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 		outputText.setText("N/A");
 		
 		if (process != null) {
-			rankLabel.setText("Rank: " + process.getTaskId());
+			rankLabel.setText("Rank: " + process.getProcessNumber());
 			final IPJob job = process.getJob();
 			String jobName = "none";
 			if (job != null) {

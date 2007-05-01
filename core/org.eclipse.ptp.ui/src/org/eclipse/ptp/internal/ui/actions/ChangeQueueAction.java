@@ -52,15 +52,14 @@ public class ChangeQueueAction extends GotoDropDownAction {
 	protected void createDropDownMenu(MenuManager dropDownMenuMgr) {
 		if (view instanceof ParallelJobView) {
 			ParallelJobView pmView = (ParallelJobView)view;
-			IPQueue curQueue = pmView.getQueue();
+			String curQueueId = pmView.getQueueID();
 			final AbstractUIManager jobManager = ((AbstractUIManager)pmView.getUIManager());
-			IResourceManager[] rms = jobManager.getResourceManagers();
-			for (int ir=0; ir<rms.length; ++ir) {
-				MenuManager cascade = new MenuManager(rms[ir].getName());
+			for (IResourceManager rm : jobManager.getResourceManagers()) {
+				MenuManager cascade = new MenuManager(rm.getName());
 				dropDownMenuMgr.add(cascade);
-				for (IPQueue queue : rms[ir].getQueues()) {
+				for (IPQueue queue : rm.getQueues()) {
 					addAction(cascade, queue.getName(), queue.getID(),
-							curQueue.getID(), queue);
+							curQueueId, queue);
 				}
 			}
 		}
@@ -130,9 +129,5 @@ public class ChangeQueueAction extends GotoDropDownAction {
 			super(name, id, view, action, data);
 		    setImageDescriptor(ParallelImages.ID_IMG_RM_ON);
 		}
-
-		public void run(IElement[] elements) {
-			super.run(elements);
-		}		
 	}
 }
