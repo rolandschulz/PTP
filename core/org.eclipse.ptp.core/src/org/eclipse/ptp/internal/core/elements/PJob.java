@@ -20,7 +20,9 @@ package org.eclipse.ptp.internal.core.elements;
 
 import java.util.HashMap;
 
+import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute;
+import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.elementcontrols.IPElementControl;
 import org.eclipse.ptp.core.elementcontrols.IPJobControl;
 import org.eclipse.ptp.core.elementcontrols.IPProcessControl;
@@ -28,6 +30,8 @@ import org.eclipse.ptp.core.elementcontrols.IPQueueControl;
 import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.core.elements.attributes.JobAttributes;
+import org.eclipse.ptp.core.elements.attributes.JobAttributes.State;
 
 public class PJob extends Parent implements IPJobControl {
 	final public static int BASE_OFFSET = 10000;
@@ -40,6 +44,17 @@ public class PJob extends Parent implements IPJobControl {
 
 	public PJob(String id, IPQueueControl queue, IAttribute[] attrs) {
 		super(id, queue, P_JOB, attrs);
+		/*
+		 * Make sure we always have a state.
+		 */
+		EnumeratedAttribute jobState = (EnumeratedAttribute) getAttribute(JobAttributes.getStateAttributeDefinition());
+		if (jobState == null) {
+			try {
+				jobState = JobAttributes.getStateAttributeDefinition().create();
+				addAttribute(jobState);
+			} catch (IllegalValueException e) {
+			}
+		}
 	}
 	
 	public void addProcess(IPProcessControl p) {
@@ -110,10 +125,11 @@ public class PJob extends Parent implements IPJobControl {
 	}
 
 	public boolean isTerminated() {
-		for (IPProcessControl proc : getProcessControls()) {
-			if (!proc.isTerminated())
-				return false;
+		EnumeratedAttribute jobState = (EnumeratedAttribute) getAttribute(JobAttributes.getStateAttributeDefinition());
+		State state = (State) jobState.getEnumValue();
+		if (state == State.TERMINATED || state == State.ERROR) {
+			return true;
 		}
-		return true;
+		return false;
 	}
 }
