@@ -41,7 +41,6 @@ import org.eclipse.ptp.core.util.OutputTextFile;
 
 public class PProcess extends Parent implements IPProcessControl {
 	protected String NAME_TAG = "process ";
-	private boolean isTerminated = false;
 	private OutputTextFile outputFile = null;
 	protected String outputDirPath = null;
 	protected int storeLine = 0;
@@ -54,6 +53,17 @@ public class PProcess extends Parent implements IPProcessControl {
 		super(id, job, P_PROCESS, attrs);
 		setOutputStore();
 		outputFile = new OutputTextFile(getName(), outputDirPath, storeLine);
+		/*
+		 * Make sure we always have a state.
+		 */
+		EnumeratedAttribute procState = (EnumeratedAttribute) getAttribute(ProcessAttributes.getStateAttributeDefinition());
+		if (procState == null) {
+			try {
+				procState = ProcessAttributes.getStateAttributeDefinition().create();
+				addAttribute(procState);
+			} catch (IllegalValueException e) {
+			}
+		}
 	}
 
 	public void addNode(IPNode node) {
@@ -117,10 +127,7 @@ public class PProcess extends Parent implements IPProcessControl {
 	
 	public State getState() {
 		EnumeratedAttribute attr = (EnumeratedAttribute) getAttribute(ProcessAttributes.getStateAttributeDefinition());
-		if (attr != null) {
-			return (State) attr.getEnumValue();
-		}
-		return State.ERROR;
+		return (State) attr.getEnumValue();
 	}
 	
 	public String getProcessNumber() {
@@ -132,7 +139,12 @@ public class PProcess extends Parent implements IPProcessControl {
 	}
 	
 	public boolean isTerminated() {
-		return isTerminated;
+		EnumeratedAttribute procState = (EnumeratedAttribute) getAttribute(ProcessAttributes.getStateAttributeDefinition());
+		State state = (State) procState.getEnumValue();
+		if (state == State.ERROR || state == State.EXITED || state == State.EXITED_SIGNALLED) {
+			return true;
+		}
+		return false;
 	}
 	
 	public void removeProcess() {
@@ -157,19 +169,12 @@ public class PProcess extends Parent implements IPProcessControl {
 	public void setState(ProcessAttributes.State state) {
 		EnumeratedAttribute procState = (EnumeratedAttribute) getAttribute(ProcessAttributes.getStateAttributeDefinition());
 		try {
-			if (procState == null) {
-				procState = ProcessAttributes.getStateAttributeDefinition().create(state);
-			} else {
-				procState.setValue(state);
-			}
+			procState.setValue(state);
 		} catch (IllegalValueException e) {
-		}
-		if (state == State.ERROR || state == State.EXITED || state == State.EXITED_SIGNALLED) {
-			setTerminated(true);
 		}
 	}
 
 	public void setTerminated(boolean isTerminated) {
-		this.isTerminated = isTerminated;
+		setState(State.EXITED);
 	}
 }
