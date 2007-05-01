@@ -89,7 +89,7 @@
 #define JOB_STATE_ATTR				"jobState"
 #define 	JOB_STATE_INIT			"STARTED"
 #define 	JOB_STATE_RUNNING		"RUNNING"
-#define 	JOB_STATE_TERMINATED	"ABORTED"
+#define 	JOB_STATE_TERMINATED	"TERMINATED"
 #define 	JOB_STATE_ERROR			"ERROR"
 #define JOB_SUB_ID_ATTR				"jobSubId"
 #define JOB_EXEC_NAME_ATTR			"execName"
@@ -120,9 +120,16 @@
 /*
  * Process attributes
  */
+#define PROC_STATE_ATTR				"processState"
+#define		PROC_STATE_STARTING			"STARTING"
+#define 	PROC_STATE_RUNNING			"RUNNING"
+#define		PROC_STATE_EXITED			"EXITED"
+#define		PROC_STATE_EXITED_SIGNALLED	"EXITED_SIGNALLED"
+#define		PROC_STATE_STOPPED			"STOPPED"
+#define		PROC_STATE_ERROR			"ERROR"
 #define PROC_NODEID_ATTR			"processNodeId"
 #define PROC_PID_ATTR				"processPID"
-#define PROC_TASKID_ATTR			"processTaskId"
+#define PROC_NUMBER_ATTR			"processNumber"
 #define PROC_STDOUT_ATTR			"processStdout"
 #define PROC_EXITCODE_ATTR			"processExitCode"
 #define PROC_SIGNALNAME_ATTR		"processSignalName"
@@ -134,6 +141,7 @@
  * ORTE attributes
  */
 #define ORTE_NUM_PROCS_ATTR			"jobNumProcs"
+#define ORTE_JOB_NAME_FMT			"job%d"
 
 int ORTE_Initialize(int, int, char **);
 int ORTE_ModelDef(int, int, char **);
@@ -551,14 +559,15 @@ add_node_attrs(proxy_msg *m, ptp_node *node)
 }
 
 static int
-sendNewJobEvent(int trans_id, int jobid, int jobSubId, char *state)
+sendNewJobEvent(int trans_id, int jobid, char *name, int jobSubId, char *state)
 {
 	proxy_msg *	m = new_proxy_msg(PROXY_EV_RT_NEW_JOB, trans_id);
 	
 	proxy_msg_add_int(m, gQueueID);	
 	proxy_msg_add_int(m, 1);	
 	proxy_msg_add_int(m, jobid);
-	proxy_msg_add_int(m, 2);	
+	proxy_msg_add_int(m, 3);	
+	proxy_msg_add_keyval_string(m, ELEMENT_NAME_ATTR, name);
 	proxy_msg_add_keyval_int(m, JOB_SUB_ID_ATTR, jobSubId);
 	proxy_msg_add_keyval_string(m, JOB_STATE_ATTR, state);
 	proxy_svr_queue_msg(orte_proxy, m);
@@ -585,16 +594,17 @@ sendNewNodeEvent(int trans_id, int mach_id, ptp_machine *mach)
 }
 
 static int
-sendNewProcessEvent(int trans_id, int job_id, ptp_process *p)
+sendNewProcessEvent(int trans_id, int job_id, ptp_process *p, char *state)
 {
 	proxy_msg *	m = new_proxy_msg(PROXY_EV_RT_NEW_PROCESS, trans_id);
 	
 	proxy_msg_add_int(m, job_id);	
 	proxy_msg_add_int(m, 1);	
 	proxy_msg_add_int(m, p->id);	
-	proxy_msg_add_int(m, 3);	
+	proxy_msg_add_int(m, 4);	
 	proxy_msg_add_keyval_int(m, PROC_NODEID_ATTR, p->node_id);	
-	proxy_msg_add_keyval_int(m, PROC_TASKID_ATTR, p->task_id);	
+	proxy_msg_add_keyval_string(m, PROC_STATE_ATTR, state);	
+	proxy_msg_add_keyval_int(m, PROC_NUMBER_ATTR, p->task_id);	
 	proxy_msg_add_keyval_int(m, PROC_PID_ATTR, p->pid);	
 	proxy_svr_queue_msg(orte_proxy, m);
 	
@@ -618,6 +628,28 @@ sendNewQueueEvent(int trans_id)
 	return 0;	
 }
 
+static int
+sendProcessStateChangeEvent(int trans_id, ptp_job *j, char *state)
+{
+	char *		range;
+	proxy_msg *	m;
+	
+	if (j == NULL || j->num_procs == 0)
+		return 0;
+		
+	m = new_proxy_msg(PROXY_EV_RT_PROCESS_CHANGE, trans_id);
+	
+	asprintf(&range, "%d-%d", j->procs[0]->id, j->procs[j->num_procs-1]->id);
+	proxy_msg_add_int(m, 1);	
+	proxy_msg_add_string(m, range);
+	proxy_msg_add_int(m, 1);	
+	proxy_msg_add_keyval_string(m, PROC_STATE_ATTR, state);
+	proxy_svr_queue_msg(orte_proxy, m);
+	free(range);
+	
+	return 0;
+}
+	
 static int
 sendJobStateChangeEvent(int trans_id, int jobid, char *state)
 {
@@ -676,7 +708,7 @@ sendProcessChangeEvent(int trans_id, ptp_process *p, int node_id, int task_id, i
 		}
 		if (p->task_id != task_id) {
 			p->task_id = task_id;
-			proxy_msg_add_keyval_int(m, PROC_TASKID_ATTR, task_id);	
+			proxy_msg_add_keyval_int(m, PROC_NUMBER_ATTR, task_id);	
 		}
 		if (p->pid != pid) {
 			p->pid = pid;
@@ -878,7 +910,7 @@ job_state_callback(orte_jobid_t jobid, orte_proc_state_t proc_state)
 #if !ORTE_VERSION_1_0
 		case ORTE_JOB_STATE_LAUNCHED:
 			get_proc_info(j);
-			/* fall through */
+			break;
 #endif /* !ORTE_VERSION_1_0 */
 			
 #if ORTE_VERSION_1_0
@@ -888,33 +920,43 @@ job_state_callback(orte_jobid_t jobid, orte_proc_state_t proc_state)
 #endif /* ORTE_VERSION_1_0 */
 		case ORTE_JOB_STATE_RUNNING:
 			state = JOB_STATE_RUNNING;
+			sendProcessStateChangeEvent(gTransID, j, PROC_STATE_RUNNING);
+			sendJobStateChangeEvent(gTransID, j->ptp_jobid, state);
 			break;
 			
 		case ORTE_JOB_STATE_TERMINATED:
+			if (orte_job_record_started(jobid)) {
+				orte_job_record_end(jobid);
+			}
+			ORTE_TERMINATE_ORTEDS(jobid);
+			sendProcessStateChangeEvent(gTransID, j, PROC_STATE_EXITED);
+			sendJobStateChangeEvent(gTransID, j->ptp_jobid, JOB_STATE_TERMINATED);
+			remove_job(jobid, JOBID_ORTE);
+			break;
+			
 		case ORTE_JOB_STATE_ABORTED:
 			if (orte_job_record_started(jobid)) {
 				orte_job_record_end(jobid);
 			}
 			ORTE_TERMINATE_ORTEDS(jobid);
+			sendProcessStateChangeEvent(gTransID, j, PROC_STATE_ERROR);
+			sendJobStateChangeEvent(gTransID, j->ptp_jobid, JOB_STATE_TERMINATED);
 			remove_job(jobid, JOBID_ORTE);
-			state = JOB_STATE_TERMINATED;
 			break;
 
 #if !ORTE_VERSION_1_0
 		case ORTE_JOB_STATE_FAILED_TO_START:
 			state = JOB_STATE_ERROR;
+			sendJobStateChangeEvent(gTransID, j->ptp_jobid, state);
+			remove_job(jobid, JOBID_ORTE);
 			break;
 #endif /* !ORTE_VERSION_1_0 */
 			
 		default: /* ignore others */
 			return;
 	}
-	
-	if (j != NULL) {
-		sendJobStateChangeEvent(gTransID, j->ptp_jobid, state);
-	}
-	printf("state callback returning state=%s\n", state); fflush(stdout);
 }
+    
 
 #if !ORTE_VERSION_1_0
 /*
@@ -986,7 +1028,7 @@ get_proc_info(ptp_job *j)
 		p = find_process(j, task_id);
 		if (p == NULL) {
 			p = new_process(j, node_id, task_id, pid);
-	    	sendNewProcessEvent(gTransID, j->ptp_jobid, p);
+	    	sendNewProcessEvent(gTransID, j->ptp_jobid, p, PROC_STATE_STARTING);
 		} else {
 			sendProcessChangeEvent(gTransID, p, node_id, task_id, pid);
 		}
@@ -1847,8 +1889,9 @@ ORTE_SubmitJob(int trans_id, int nargs, char **args)
 	int						ptpid = generate_id();
 	int						jobsubid = 0;
 	char *					full_path;
-	char	 *				pgm_name = NULL;
-	char	 *				cwd = NULL;
+	char *					name;
+	char *					pgm_name = NULL;
+	char *					cwd = NULL;
 	char *					exec_path = NULL;
 	char *					debug_exec_path;
 	char **					debug_args;
@@ -2022,9 +2065,11 @@ ORTE_SubmitJob(int trans_id, int nargs, char **args)
     j = new_job(num_procs, ptpid, ortejobid, debug_jobid);
 	
 	/*
-	 * Fake a job state event
+	 * Send new job event
 	 */
-	sendNewJobEvent(gTransID, ptpid, jobsubid, JOB_STATE_INIT);
+	asprintf(&name, ORTE_JOB_NAME_FMT, ortejobid);
+	sendNewJobEvent(gTransID, ptpid, name, jobsubid, JOB_STATE_INIT);
+	free(name);
 	
 	/*
 	 * Start I/O forwarding. Don't start it before we have
