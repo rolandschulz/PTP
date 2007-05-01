@@ -22,6 +22,13 @@ import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 
 
 public interface IPProcess extends IPElement {
+	
+	/**
+	 * sets the node that this process is running on 
+	 * 
+	 * @param node
+	 */
+	public void addNode(IPNode node);
 
 	/**
 	 * @param output
@@ -91,13 +98,6 @@ public interface IPProcess extends IPElement {
 	 * 
 	 */
 	public void removeProcess();
-	
-	/**
-	 * sets the node that this process is running on 
-	 * 
-	 * @param node
-	 */
-	public void setNode(IPNode node);
 	
 	/**
 	 * @param status

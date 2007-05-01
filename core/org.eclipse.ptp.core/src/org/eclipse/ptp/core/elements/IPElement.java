@@ -26,6 +26,20 @@ import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 
 public interface IPElement extends IAdaptable {
+	
+	/**
+	 * Sets the attribute value.
+	 * 
+	 * @param attrValue
+	 */
+	public void addAttribute(IAttribute attrValue);
+
+	/**
+	 * Sets the attribute values.
+	 * 
+	 * @param attrValues
+	 */
+	public void addAttributes(IAttribute[] attrValues);
 
 	/**
 	 * Returns the unique ID for this Element
@@ -71,19 +85,12 @@ public interface IPElement extends IAdaptable {
 	 * @return array of string keys
 	 */
 	public String[] getAttributeKeys();
-	
+
 	/**
-	 * Sets the attribute value.
+	 * Removes the attribute value.
 	 * 
 	 * @param attrValue
 	 */
-	public void setAttribute(IAttribute attrValue);
-
-	/**
-	 * Sets the attribute values.
-	 * 
-	 * @param attrValues
-	 */
-	public void setAttributes(IAttribute[] attrValues);
+	public void removeAttribute(IAttribute attrValue);
 
 }

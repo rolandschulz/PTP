@@ -55,6 +55,12 @@ public class PProcess extends Parent implements IPProcessControl {
 		setOutputStore();
 		outputFile = new OutputTextFile(getName(), outputDirPath, storeLine);
 	}
+
+	public void addNode(IPNode node) {
+		this.node = (IPNodeControl) node;
+		if (node != null)
+			this.node.addProcess(this);
+	}
 	
 	public void addOutput(String output) {
 		outputFile.write(output + "\n");
@@ -133,12 +139,6 @@ public class PProcess extends Parent implements IPProcessControl {
 		final IPNodeControl parent = (IPNodeControl) getParent();
 		if (parent != null)
 			parent.removeProcess(this);
-	}
-
-	public void setNode(IPNode node) {
-		this.node = (IPNodeControl) node;
-		if (node != null)
-			this.node.addProcess(this);
 	}
 
 	private void setOutputStore() {

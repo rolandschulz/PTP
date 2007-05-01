@@ -212,7 +212,7 @@ public abstract class AbstractRuntimeResourceManager extends
 			 * then added to the job.
 			 */
 			AttributeManager jobAttrs = new AttributeManager(jobSubAttrs.getAttributes());
-			jobAttrs.setAttributes(entry.getValue().getAttributes());
+			jobAttrs.addAttributes(entry.getValue().getAttributes());
 			RangeSet jobIds = entry.getKey();
 			changed = false;
 

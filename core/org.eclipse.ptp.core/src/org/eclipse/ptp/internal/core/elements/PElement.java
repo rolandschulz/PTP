@@ -43,7 +43,7 @@ public abstract class PElement extends PlatformObject implements IPElementContro
 		elementId = id;
 		elementType = type;
 		elementParent = parent;
-		setAttributes(attrs);
+		addAttributes(attrs);
 	}
 
 	/* (non-Javadoc)
@@ -133,15 +133,15 @@ public abstract class PElement extends PlatformObject implements IPElementContro
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.IPElement#setAttribute(org.eclipse.ptp.core.attributes.IAttribute)
 	 */
-	public void setAttribute(IAttribute attrib) {
-		attributeValues.setAttribute(attrib);
+	public void addAttribute(IAttribute attrib) {
+		attributeValues.addAttribute(attrib);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.IPElement#setAttributes(org.eclipse.ptp.core.attributes.IAttribute[])
 	 */
-	public void setAttributes(IAttribute[] attribs) {
-		attributeValues.setAttributes(attribs);
+	public void addAttributes(IAttribute[] attribs) {
+		attributeValues.addAttributes(attribs);
 	}
 
 	/* (non-Javadoc)
@@ -167,5 +167,12 @@ public abstract class PElement extends PlatformObject implements IPElementContro
 		if (elementInfo == null)
 			elementInfo = new PElementInfo(this);
 		return elementInfo;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPElement#removeAttribute(org.eclipse.ptp.core.attributes.IAttribute)
+	 */
+	public void removeAttribute(IAttribute attrib) {
+		attributeValues.removeAttribute(attrib);
 	}
 }
