@@ -183,7 +183,7 @@ public class MachineManager extends AbstractUIManager {
 			switch (nodeState) {
 			case UP:
 				IPProcess[] procs = node.getProcesses();
-				if (node.getProcesses().length > 0) {
+				if (procs.length > 0) {
 					if (node.getProcesses()[0].getJob().isTerminated()) {
 						return IPTPUIConstants.NODE_EXITED;
 					}

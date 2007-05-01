@@ -95,9 +95,9 @@ public interface IPProcess extends IPElement {
 	public boolean isTerminated();
 	
 	/**
-	 * 
+	 * Remove us from node we are running on
 	 */
-	public void removeProcess();
+	public void removeNode();
 	
 	/**
 	 * @param status

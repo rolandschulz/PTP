@@ -214,6 +214,8 @@ IResourceManagerListener {
 				fireEvent(new ModelRuntimeNotifierEvent(job.getID(),
 						IModelRuntimeNotifierEvent.TYPE_JOB, eventState));
 			}
+		} else {
+			fireEvent(new ModelSysChangedEvent(IModelSysChangedEvent.MAJOR_SYS_CHANGED, null));
 		}
 	}
 

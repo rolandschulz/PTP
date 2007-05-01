@@ -18,7 +18,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.managers;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -26,29 +25,23 @@ import java.util.LinkedList;
 import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchManager;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.ptp.core.elementcontrols.IPJobControl;
 import org.eclipse.ptp.core.elementcontrols.IPQueueControl;
 import org.eclipse.ptp.core.elements.IPElement;
 import org.eclipse.ptp.core.elements.IPJob;
-import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
 import org.eclipse.ptp.ui.IPTPUIConstants;
-import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.ui.listeners.IJobChangedListener;
 import org.eclipse.ptp.ui.model.Element;
 import org.eclipse.ptp.ui.model.ElementHandler;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
-import org.eclipse.ui.PlatformUI;
 
 /**
  * @author Clement chu
@@ -404,7 +397,6 @@ public class JobManager extends AbstractUIManager {
 				launchManager.removeLaunch(launches[i]);
 			}
 		}
-		((IPQueueControl) (job.getQueue())).removeJob((IPJobControl) job);
 		fireJobChangedEvent(IJobChangedListener.REMOVED, null, job.getID());
 		jobList.remove(job.getID());
 	}
@@ -412,37 +404,15 @@ public class JobManager extends AbstractUIManager {
 	 * @see org.eclipse.ptp.ui.IManager#removeAllStoppedJobs()
 	 */
 	public void removeAllStoppedJobs() {
-		IRunnableWithProgress runnable = new IRunnableWithProgress() {
-			public void run(IProgressMonitor pmonitor) throws InvocationTargetException {
-				if (pmonitor == null)
-					pmonitor = new NullProgressMonitor();
-				try {
-					IPQueue queue = getQueue();
-					if (queue != null) {
-						IPJob[] jobs = queue.getJobs();
-						if (jobs.length > 0) {
-							pmonitor.beginTask("Removing stopped jobs...", jobs.length);
-							for (IPJob job : jobs) {
-								if (pmonitor.isCanceled())
-									throw new InvocationTargetException(new Exception("Cancelled by user"));
-								if (job.isTerminated())
-									removeJob(job);
-								pmonitor.worked(1);
-							}
-						}
-					}
-				} finally {
-					pmonitor.done();
+		IPQueue queue = getQueue();
+		if (queue != null) {
+			for (IPJob job : queue.getJobs()) {
+				if (job.isTerminated()) {
+					removeJob(job);
 				}
 			}
-		};
-		try {
-			PlatformUI.getWorkbench().getProgressService().busyCursorWhile(runnable);
-		} catch (InterruptedException e) {
-			PTPUIPlugin.log(e);
-		} catch (InvocationTargetException e1) {
-			PTPUIPlugin.log(e1);
 		}
+		queue.getResourceManager().removeTerminatedJobs(queue);
 	}
 
 }
