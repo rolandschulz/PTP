@@ -94,8 +94,9 @@ public class FortranASTIdExpression extends FortranASTNode implements IASTIdExpr
 		if (index != null) {
 			try {
 				IndexFilter filter = IndexFilter.getFilter(ILinkage.C_LINKAGE_ID);
+				// TODO isPrefix argument corrent (added)
 				b2 = isPrefix ?
-						index.findBindingsForPrefix(n.toCharArray(), filter) :
+						index.findBindingsForPrefix(n.toCharArray(), isPrefix, filter) :
 						index.findBindings(n.toCharArray(), filter, new NullProgressMonitor());
 			} catch (CoreException e) {
 			}
