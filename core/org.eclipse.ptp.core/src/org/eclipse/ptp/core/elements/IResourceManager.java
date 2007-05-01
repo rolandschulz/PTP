@@ -91,6 +91,11 @@ IAdaptable, IResourceManagerMenuContribution {
 	public void removeResourceManagerListener(IResourceManagerListener listener);
 
 	/**
+	 * @param queue
+	 */
+	public void removeTerminatedJobs(IPQueue queue);
+	
+	/**
 	 * 
 	 */
 	public void shutdown() throws CoreException;

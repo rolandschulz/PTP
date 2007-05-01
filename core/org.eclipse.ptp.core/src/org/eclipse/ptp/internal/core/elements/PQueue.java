@@ -42,7 +42,9 @@ public class PQueue extends Parent implements IPQueueControl {
 	}
 	
 	public void addJob(IPJobControl job) {
-		addChild(job);
+		if (job != null) {
+			addChild(job);
+		}
 	}
 
 	public IPJobControl getJobControl(String job_id) {
@@ -57,7 +59,10 @@ public class PQueue extends Parent implements IPQueueControl {
 	}
 
 	public void removeJob(IPJobControl job) {
-		removeChild(job);
+		if (job != null) {
+			job.removeAllProcesses();
+			removeChild(job);
+		}
 	}
 
 	public IPJob getJobById(String job_id) {

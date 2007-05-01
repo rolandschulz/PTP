@@ -643,6 +643,19 @@ public abstract class AbstractRuntimeResourceManager extends
 		// TODO Auto-generated method stub
 		
 	}
+	
+	protected List<IPJob> doRemoveTerminatedJobs(IPQueueControl queue) {
+		List<IPJob> jobs = new ArrayList<IPJob>();
+		if (queue != null) {
+			for (IPJobControl job : queue.getJobControls()) {
+				if (job.isTerminated()) {
+					jobs.add(job);
+					queue.removeJob(job);
+				}
+			}
+		}
+		return jobs;
+	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManager#doShutdown()

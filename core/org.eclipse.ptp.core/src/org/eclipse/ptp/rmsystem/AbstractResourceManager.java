@@ -360,6 +360,11 @@ IResourceManagerControl {
 	public void terminateJob(IPJob job) throws CoreException {
 		doTerminateJob(job);
 	}
+	
+	public void removeTerminatedJobs(IPQueue queue) {
+		List<IPJob> jobs = doRemoveTerminatedJobs((IPQueueControl)queue);
+		fireJobsChanged(jobs, null);
+	}
 
 	/**
 	 * @param statusMessage the status message to set
@@ -414,6 +419,11 @@ IResourceManagerControl {
 	protected abstract void doEnableEvents();
 
 	/**
+	 * 
+	 */
+	protected abstract List<IPJob> doRemoveTerminatedJobs(IPQueueControl queue);
+
+	/**
 	 * @throws CoreException
 	 */
 	protected abstract void doShutdown(IProgressMonitor monitor) throws CoreException;
@@ -438,6 +448,9 @@ IResourceManagerControl {
 	 */
 	protected abstract void doTerminateJob(IPJob job) throws CoreException;
 
+	/**
+	 * @param message
+	 */
 	protected void fireError(String message) {
     	Object[] tmpListeners = listeners.getListeners();
     	

@@ -101,10 +101,10 @@ public class PJob extends Parent implements IPJobControl {
 	}
 
 	public void removeAllProcesses() {
-		IPProcess[] processes = getProcesses();
-		for (int i = 0; i < processes.length; i++)
-			processes[i].clearOutput();
-
+		for (IPProcess process : getProcesses()) {
+			process.clearOutput();
+			process.removeNode();
+		}
 		removeChildren();
 	}
 	

@@ -148,10 +148,11 @@ public class PProcess extends Parent implements IPProcessControl {
 		return false;
 	}
 	
-	public void removeProcess() {
-		final IPNodeControl parent = (IPNodeControl) getParent();
-		if (parent != null)
-			parent.removeProcess(this);
+	public void removeNode() {
+		if (node != null) {
+			node.removeProcess(this);
+		}
+		node = null;
 	}
 
 	private void setOutputStore() {
