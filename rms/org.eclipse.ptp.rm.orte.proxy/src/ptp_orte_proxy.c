@@ -181,6 +181,7 @@ struct ptp_job {
 	int				debug_jobid;	// job ID of debugger or -1 if not a debug job
 	int 			orte_jobid;		// job ID that will be used by program when it starts
 	int				num_procs;		// number of procs requested for program (debugger uses num_procs+1)
+	int				terminating;	// job termination has been requested
 	ptp_process **	procs;
 };
 typedef struct ptp_job ptp_job;
@@ -381,6 +382,7 @@ new_job(int num_procs, int ptp_jobid, int orte_jobid, int debug_jobid)
     j->orte_jobid = orte_jobid;
     j->debug_jobid = debug_jobid;
     j->num_procs = num_procs;
+    j->terminating = false;
     j->procs = (ptp_process **)malloc(sizeof(ptp_process *) * num_procs);
     memset(j->procs, 0, sizeof(ptp_process *) * num_procs);
     AddToList(gJobList, (void *)j);
@@ -2104,15 +2106,29 @@ int
 ORTE_TerminateJob(int trans_id, int nargs, char **args)
 {
 	int			rc;
-	int			jobid = (int)strtol(args[1], NULL, 10);
+	int			jobid;
 	ptp_job *	j;
 	
 	if (!proxy_initialized) {
-		sendErrorEvent(trans_id, RTEV_ERROR_ORTE_INIT, "must call INIT first");
+		sendErrorEvent(trans_id, RTEV_ERROR_TERMINATE_JOB, "must call INIT first");
 		return PROXY_RES_OK;
 	}
 	
+	if (nargs < 1) {
+		sendErrorEvent(trans_id, RTEV_ERROR_TERMINATE_JOB, "incorrect arg count");
+		return PROXY_RES_OK;
+	}
+	
+	jobid = (int)strtol(args[0], NULL, 10);
+
 	if ((j = find_job(jobid, JOBID_PTP)) != NULL) {
+		if (j->terminating) {
+			sendErrorEvent(trans_id, RTEV_ERROR_TERMINATE_JOB, "Job termination already requested");
+			return PROXY_RES_OK;
+		}
+		
+		j->terminating = true;
+		
 		if (j->debug_jobid < 0)
 			rc = ORTE_TERMINATE_JOB(j->orte_jobid);
 		else
