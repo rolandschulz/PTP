@@ -1,0 +1,16 @@
+R611.f03 substring-range
+  NOTE 6.3
+    P%NAME(1:1)
+    ID(4:9)
+  - (4:9) is parsed as a section-subscript-list with one section-subscript rather than substring-range
+R615.f03 type-param-inquiry
+  NOTE 6.8
+    a%kind
+    s%len
+  - this is parsed as a data-ref with two part-refs
+R1217.f03 function-reference
+    foo(expr)
+  - foo is parsed as a data-ref with a section-subscript-list
+  - section-subscript-list is also an actual-arg-spec-list
+  - see also R619.f03
+
