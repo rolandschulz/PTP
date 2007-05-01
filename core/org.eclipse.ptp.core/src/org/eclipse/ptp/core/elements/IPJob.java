@@ -100,11 +100,4 @@ public interface IPJob extends IPElement {
 	 *
 	 */
 	public void setDebug();
-
-	/**
-	 * Returns the number of Processes in this Job.
-	 * 
-	 * @return The number of Processes in this Job.
-	 */
-	public int totalProcesses();
 }

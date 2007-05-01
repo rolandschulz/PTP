@@ -78,7 +78,7 @@ public class Session implements IPCDISession, IPCDISessionObject {
 		this.job = job;
 		this.launch = launch;
 		this.file = file;
-		this.no_of_process = job.totalProcesses();
+		this.no_of_process = job.size();
 		commonSetup();
 		//job.setAttribute(PreferenceConstants.JOB_DEBUG_SESSION, this);
 	}

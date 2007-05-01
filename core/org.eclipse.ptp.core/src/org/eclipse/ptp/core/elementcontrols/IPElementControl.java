@@ -102,13 +102,6 @@ public interface IPElementControl extends IPElement, ISearchPageScoreComputer {
 	 */
 
 	/**
-	 * Returns the number of children of this Element.
-	 * 
-	 * @return The number of children of this Element
-	 */
-	public int size();
-
-	/**
 	 * Returns true if this Element has children Elements, else returns false.
 	 * 
 	 * @return True if this Element has children Elements, else false

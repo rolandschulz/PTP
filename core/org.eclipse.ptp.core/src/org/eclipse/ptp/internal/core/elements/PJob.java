@@ -111,10 +111,6 @@ public class PJob extends Parent implements IPJobControl {
 	public void setDebug() {
 		isDebugJob = true;
 	}
-	
-	public int totalProcesses() {
-		return size();
-	}
 
 	public IPQueue getQueue() {
 		return (IPQueue) getParent();

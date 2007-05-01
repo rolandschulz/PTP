@@ -113,7 +113,7 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 	public void startDebugger(final IPJob job) {
 		new Thread(new Runnable() {
 			public void run() {
-				total_process = job.totalProcesses();
+				total_process = job.size();
 				for (int i = 0; i < total_process; i++) {
 					SimulateProgram sim_program = new SimulateProgram(i, APP_NAME);
 					sim_program.addObserver(DebugSimulation2.this);

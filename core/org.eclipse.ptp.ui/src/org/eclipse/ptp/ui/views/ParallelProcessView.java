@@ -23,6 +23,7 @@ import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.ptp.core.IModelListener;
 import org.eclipse.ptp.core.IProcessListener;
 import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.elementcontrols.IPJobControl;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPNode;
 import org.eclipse.ptp.core.elements.IPProcess;
@@ -162,7 +163,7 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 	public void initialText() {
 		IPProcess process = getProcess();
 		
-		rankLabel.setText("Rank: N/A");
+		rankLabel.setText("Number: N/A");
 		totalLabel.setText("Total: N/A");
 		nodeLabel.setText("Node: N/A");
 		pidLabel.setText("PID: N/A");
@@ -170,7 +171,7 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 		outputText.setText("N/A");
 		
 		if (process != null) {
-			rankLabel.setText("Rank: " + process.getProcessNumber());
+			rankLabel.setText("Number: " + process.getProcessNumber());
 			final IPJob job = process.getJob();
 			String jobName = "none";
 			if (job != null) {
@@ -179,10 +180,11 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 			jobLabel.setText("Job: " + jobName);
 			pidLabel.setText("PID: " + process.getPid());
 			statusLabel.setText("Status: " + process.getState());
-			
+			if (job != null) {
+				totalLabel.setText("Total: " + job.size());
+			}
 			IPNode node = process.getNode();
 			if (node != null) {
-				totalLabel.setText("Total: " + node.getProcesses().length);
 				nodeLabel.setText("Node: " + node.getName());
 			}
 			
