@@ -18,7 +18,7 @@ import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.QueueAttributes;
-import org.eclipse.ptp.internal.core.PUniverse;
+import org.eclipse.ptp.internal.core.elements.PUniverse;
 import org.eclipse.ptp.orte.core.ORTEAttributes;
 import org.eclipse.ptp.orte.core.rmsystem.ORTEResourceManager;
 import org.eclipse.ptp.orte.core.rmsystem.ORTEResourceManagerConfiguration;
