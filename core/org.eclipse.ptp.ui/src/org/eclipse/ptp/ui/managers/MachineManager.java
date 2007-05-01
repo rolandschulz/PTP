@@ -44,6 +44,8 @@ import org.eclipse.ptp.ui.model.IElementSet;
 public class MachineManager extends AbstractUIManager {
 	private Map<String, IElementHandler> machineList = new HashMap<String, IElementHandler>();
 	protected IPMachine cur_machine = null;
+	protected final String DEFAULT_TITLE = "Please select a machine";
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#shutdown()
 	 */
@@ -252,6 +254,9 @@ public class MachineManager extends AbstractUIManager {
 	 * @see org.eclipse.ptp.ui.IManager#getFullyQualifiedName(java.lang.String)
 	 */
 	public String getFullyQualifiedName(String id) {
+		if (id.equals(EMPTY_ID)) {
+			return DEFAULT_TITLE;
+		}
 		//TODO check that this is what should happen. Can we just use cur_machine?
 		IPMachine machine = getCurrentMachine();
 		if (machine != null) {

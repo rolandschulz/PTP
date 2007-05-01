@@ -28,8 +28,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchManager;
-import org.eclipse.ptp.core.elementcontrols.IPJobControl;
-import org.eclipse.ptp.core.elementcontrols.IPQueueControl;
 import org.eclipse.ptp.core.elements.IPElement;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPProcess;
@@ -51,6 +49,7 @@ public class JobManager extends AbstractUIManager {
 	protected Map<String, IElementHandler> jobList = new HashMap<String, IElementHandler>();
 	protected IPJob cur_job = null;
 	protected IPQueue cur_queue = null;
+	protected final String DEFAULT_TITLE = "Please select a queue";
 
 	/** Add a job
 	 * @param job
@@ -140,12 +139,16 @@ public class JobManager extends AbstractUIManager {
 	 * @see org.eclipse.ptp.ui.IManager#getFullyQualifiedName(java.lang.String)
 	 */
 	public String getFullyQualifiedName(String id) {
+		if (id.equals(EMPTY_ID)) {
+			return DEFAULT_TITLE;
+		}
 		String name = "";
 		final IPQueue queue = getQueue();
 		if (queue != null) {
+			name = queue.getResourceManager().getName() + ":" + queue.getName();
 			IPJob job = queue.getJobById(id);
 			if (job != null) {
-				name = queue.getResourceManager().getName() + ":" + queue.getName() + ":" + job.getName();
+				name +=  ":" + job.getName();
 			}
 		}
 		return name;
@@ -243,7 +246,7 @@ public class JobManager extends AbstractUIManager {
 			queues.add(0, curQueue);
 		}
 		// loop until we find a job or run out of queues
-		for (Iterator qit = queues.iterator(); qit.hasNext() && last_job == null; ) {
+		for (Iterator<IPQueue> qit = queues.iterator(); qit.hasNext() && last_job == null; ) {
 			final IPQueue q = (IPQueue) qit.next();
 			jobs = q.getJobs();
 			if (jobs != null && jobs.length > 0) {

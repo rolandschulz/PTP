@@ -54,7 +54,7 @@ import org.eclipse.ui.PartInitException;
  * 
  */
 public abstract class AbstractParallelSetView extends AbstractParallelElementView {
-	protected List clipboard = new ArrayList();
+	protected List<IElement[]> clipboard = new ArrayList<IElement[]>();
 	
 	// selected element
 	protected String cur_selected_element_id = IManager.EMPTY_ID;
@@ -317,7 +317,7 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
     
 	class Zoom {
 		protected static final int max_depth = 3;
-		protected Map zoomImageMap = new HashMap();
+		protected Map<Image, Image[]> zoomImageMap = new HashMap<Image, Image[]>();
 		
 		public void cleanup() {
 			zoomImageMap.clear();
