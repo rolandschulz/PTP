@@ -91,7 +91,7 @@ public final class PJobVariableManager {
 	private void createProcessValue(IPJob job) {
 		ProcessValue procVal = (ProcessValue)varProcStorage.getValue(job.getID(), PROCESS_KEY);
 		if (procVal == null) {
-			procVal = new ProcessValue(job.totalProcesses());
+			procVal = new ProcessValue(job.size());
 			varProcStorage.addValue(job.getID(), PROCESS_KEY, procVal);
 		}		
 	}

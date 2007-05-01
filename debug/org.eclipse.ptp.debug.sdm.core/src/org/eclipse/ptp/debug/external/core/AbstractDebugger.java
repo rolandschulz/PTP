@@ -101,8 +101,8 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 			throw new CoreException(Status.CANCEL_STATUS);
 
 		monitor.subTask("Starting debugger...");
-		terminatedProcs = new BitList(job.totalProcesses());
-		suspendedProcs = new BitList(job.totalProcesses());
+		terminatedProcs = new BitList(job.size());
+		suspendedProcs = new BitList(job.size());
 		commandQueue = new DebugCommandQueue(this);
 		isExited = false;
 		eventThread = new EventThread(this);
@@ -332,7 +332,7 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		return tasks;
 	}
 	public synchronized boolean isJobFinished() {
-		return (getTerminatedProc().cardinality() == job.totalProcesses());
+		return (getTerminatedProc().cardinality() == job.size());
 	}
 	// internal functions
 	private synchronized BitList addTasks(BitList curTasks, BitList newTasks) {

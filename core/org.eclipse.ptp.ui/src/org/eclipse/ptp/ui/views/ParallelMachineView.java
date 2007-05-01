@@ -359,7 +359,7 @@ public class ParallelMachineView extends AbstractParallelSetView implements INod
 				if (job != null) {
 					jobName = job.getName();
 				}
-				item.setText("Process " + procs[i].getName() + ", Job " + jobName);
+				item.setText("Process " + procs[i].getProcessNumber() + ", Job " + jobName);
 			}
 		}
 	}

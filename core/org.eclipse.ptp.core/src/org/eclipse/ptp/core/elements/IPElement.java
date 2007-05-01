@@ -93,4 +93,11 @@ public interface IPElement extends IAdaptable {
 	 */
 	public void removeAttribute(IAttribute attrValue);
 
+
+	/**
+	 * Returns the number of children of this Element.
+	 * 
+	 * @return The number of children of this Element
+	 */
+	public int size();
 }

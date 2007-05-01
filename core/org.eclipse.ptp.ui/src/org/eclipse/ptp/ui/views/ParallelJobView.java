@@ -287,9 +287,12 @@ public class ParallelJobView extends AbstractParallelSetView implements IProcess
 
 		IPProcess proc = (IPProcess)obj;
 		StringBuffer buffer = new StringBuffer();
-		buffer.append("Task ID: " + proc.getProcessNumber());
-		buffer.append("\n");
-		buffer.append("Process ID: " + proc.getPid());
+		String num = proc.getProcessNumber();
+		if (num != null) {
+			buffer.append("Number: " + num);
+			buffer.append("\n");
+		}
+		buffer.append("PID: " + proc.getPid());
 		IElementSet[] sets = setManager.getSetsWithElement(proc.getID());
 		if (sets.length > 1)
 			buffer.append("\nSet: ");
@@ -459,16 +462,18 @@ public class ParallelJobView extends AbstractParallelSetView implements IProcess
 	private void safeModelEvent(final IModelEvent event) {
 		if (event instanceof IModelRuntimeNotifierEvent) {
 			IModelRuntimeNotifierEvent runtimeEvent = (IModelRuntimeNotifierEvent)event;
-			switch (runtimeEvent.getStatus()) {
-			case IModelRuntimeNotifierEvent.RUNNING:
-				build();
-				break;
-			case IModelRuntimeNotifierEvent.STARTED:
-				build();
-				break;
-			case IModelRuntimeNotifierEvent.STOPPED:
-			case IModelRuntimeNotifierEvent.ABORTED:
-				break;
+			if (runtimeEvent.getType() == IModelRuntimeNotifierEvent.TYPE_JOB) {
+				switch (runtimeEvent.getStatus()) {
+				case IModelRuntimeNotifierEvent.RUNNING:
+					build();
+					break;
+				case IModelRuntimeNotifierEvent.STARTED:
+					build();
+					break;
+				case IModelRuntimeNotifierEvent.STOPPED:
+				case IModelRuntimeNotifierEvent.ABORTED:
+					break;
+				}
 			}
 		}
 		super.modelEvent(event);

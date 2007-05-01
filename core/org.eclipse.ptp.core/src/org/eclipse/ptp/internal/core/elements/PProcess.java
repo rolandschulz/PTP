@@ -68,8 +68,9 @@ public class PProcess extends Parent implements IPProcessControl {
 
 	public void addNode(IPNode node) {
 		this.node = (IPNodeControl) node;
-		if (node != null)
+		if (node != null) {
 			this.node.addProcess(this);
+		}
 	}
 	
 	public void addOutput(String output) {
