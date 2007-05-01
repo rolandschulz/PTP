@@ -314,7 +314,9 @@ public class ParallelMachineView extends AbstractParallelSetView implements INod
 	 */
 	public void updateAction() {
 		super.updateAction();
-		changeMachineAction.setEnabled(((AbstractUIManager) manager).getResourceManagers().length > 0);
+		if (changeMachineAction != null) {
+			changeMachineAction.setEnabled(((AbstractUIManager) manager).getResourceManagers().length > 0);
+		}
 	}
 	/** Clean lower text regions information
 	 * 

@@ -85,7 +85,7 @@ public class ParallelJobView extends AbstractParallelSetView implements IProcess
 	public static final String JOB_VIEW = "1";
 	public static final String PRO_VIEW = "2";
 	protected String current_view = BOTH_VIEW;
-	private ChangeQueueAction changeQueueAction;
+	private ChangeQueueAction changeQueueAction = null;
 
 	/** Constructor
 	 * 
@@ -254,7 +254,7 @@ public class ParallelJobView extends AbstractParallelSetView implements IProcess
 	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#doubleClick(org.eclipse.ptp.ui.model.IElement)
 	 */
 	public void doubleClick(IElement element) {
-		openProcessViewer(getJobManager().findProcess(getCurrentID(), element.getIDNum()));
+		openProcessViewer(getJobManager().findProcess(element.getID()));
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#convertElementObject(org.eclipse.ptp.ui.model.IElement)
@@ -263,14 +263,17 @@ public class ParallelJobView extends AbstractParallelSetView implements IProcess
 		if (element == null)
 			return null;
 		
-		return getJobManager().findProcess(getCurrentID(), element.getIDNum());
+		return getJobManager().findProcess(element.getID());
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.views.IContentProvider#getRulerIndex(java.lang.Object, int)
 	 */
 	public String getRulerIndex(Object obj, int index) {
 		if (obj instanceof IElement) {
-			return ((IElement)obj).getID();
+			Object procObj = convertElementObject((IElement)obj);
+			if (procObj instanceof IPProcess) {
+				return ((IPProcess)procObj).getProcessNumber();
+			}
 		}
 		return super.getRulerIndex(obj, index);
 	}
@@ -284,7 +287,7 @@ public class ParallelJobView extends AbstractParallelSetView implements IProcess
 
 		IPProcess proc = (IPProcess)obj;
 		StringBuffer buffer = new StringBuffer();
-		buffer.append("Task ID: " + proc.getTaskId());
+		buffer.append("Task ID: " + proc.getProcessNumber());
 		buffer.append("\n");
 		buffer.append("Process ID: " + proc.getPid());
 		IElementSet[] sets = setManager.getSetsWithElement(proc.getID());
@@ -372,7 +375,7 @@ public class ParallelJobView extends AbstractParallelSetView implements IProcess
 	public void updateAction() {
 		super.updateAction();
 		if (changeQueueAction != null) {
-			changeQueueAction.setEnabled(getJobManager().getQueues().length > 0);
+			changeQueueAction.setEnabled(((AbstractUIManager) manager).getResourceManagers().length > 0);
 		}
 		if (terminateAllAction != null) {
 			ISelection selection = jobTableViewer.getSelection();
@@ -409,6 +412,7 @@ public class ParallelJobView extends AbstractParallelSetView implements IProcess
 	public void safeProcessEvent(final IProcessEvent event) {
 		// only redraw if the current set contain the process
 		IPProcess process = event.getProcess();
+		getJobManager().addProcess(process);
 		if (getJobManager().isCurrentSetContainProcess(getCurrentID(), process.getID())) {
 			if (event.getType() != IProcessEvent.ADD_OUTPUT_TYPE)
 				refresh(false);
@@ -436,6 +440,15 @@ public class ParallelJobView extends AbstractParallelSetView implements IProcess
 	public IPQueue getQueue() {
 		return getJobManager().getQueue();
 	}
+	
+	public String getQueueID() {
+		IPQueue queue = getQueue();
+		if (queue != null) {
+			return queue.getID();
+		}
+		return IManager.EMPTY_ID;
+	}
+	
 	public void modelEvent(final IModelEvent event) {
 		UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
 			public void run() {

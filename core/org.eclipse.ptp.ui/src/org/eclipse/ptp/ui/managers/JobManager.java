@@ -36,6 +36,7 @@ import org.eclipse.ptp.core.elementcontrols.IPJobControl;
 import org.eclipse.ptp.core.elementcontrols.IPQueueControl;
 import org.eclipse.ptp.core.elements.IPElement;
 import org.eclipse.ptp.core.elements.IPJob;
+import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
@@ -63,20 +64,18 @@ public class JobManager extends AbstractUIManager {
 	 */
 	public void addJob(IPJob job) {
 		if (!jobList.containsKey(job.getID())) {
-			IPProcess[] pProcesses = job.getSortedProcesses();
 			IElementHandler elementHandler = new ElementHandler();
-			int total_element = pProcesses.length;
-			if (total_element > 0) {
-				IElementSet set = elementHandler.getSetRoot();
-				for (int i = 0; i < total_element; i++) {
-					//task id for element key
-					set.add(createElement(set, String.valueOf(pProcesses[i].getTaskId()), pProcesses[i].getID()));
-				}
-				elementHandler.add(set);
-			}
 			jobList.put(job.getID(), elementHandler);
 		}
 	}
+	
+	public void addProcess(IPProcess proc) {
+		addJob(proc.getJob());
+		IElementHandler elementHandler = jobList.get(proc.getJob().getID());
+		IElementSet set = elementHandler.getSetRoot();
+		set.add(createElement(set, proc.getID(), proc.getProcessNumber()));
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#clear()
 	 */
@@ -90,20 +89,21 @@ public class JobManager extends AbstractUIManager {
 	 * @param id process ID
 	 * @return
 	 */
-	public IPProcess findProcess(IPJob job, int task_id) {
+	public IPProcess findProcess(IPJob job, String task_id) {
 		if (job == null)
 			return null;
-		return job.getProcessByTaskId(task_id);
+		return job.getProcessByNumber(task_id);
 		//return job.findProcess(id);
 	}
-	/** Find process
-	 * @param job_id job ID
-	 * @param id process ID
-	 * @return process
-	 */
-	public IPProcess findProcess(String job_id, int task_id) {
-		return findProcess(findJobById(job_id), task_id);
+	
+	public IPProcess findProcess(String proc_id) {
+		IPJob job = getJob();
+		if (job != null) {
+			return job.getProcessById(proc_id);
+		}
+		return null;
 	}
+	
 	/** Get current job ID
 	 * @return current job ID
 	 */
