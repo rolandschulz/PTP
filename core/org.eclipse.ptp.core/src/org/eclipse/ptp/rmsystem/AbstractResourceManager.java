@@ -623,16 +623,21 @@ IResourceManagerControl {
 	}
 
 	protected IPProcessControl newProcess(IPJobControl job, String processId, AttributeManager attrs) {
-		IPProcessControl process = new PProcess(processId, job, attrs.getAttributes());
+		IPNodeControl node = null;
+		
 		/*
-		 * If there is a node ID attribute, connect it up.
+		 * Find the node ID attribute. Remove it from the attribute manager as it will
+		 * be dealt with specially.
 		 */
 		StringAttribute attr = (StringAttribute) attrs.getAttribute(ProcessAttributes.getNodeIdAttributeDefinition());
 		if (attr != null) {
-			IPNodeControl node = getNodeControl(((StringAttribute)attr).getValue());
-			if (node != null) {
-				node.addProcess(process);
-			}
+			node = getNodeControl(((StringAttribute)attr).getValue());
+			attrs.removeAttribute(attr);
+		}
+		
+		IPProcessControl process = new PProcess(processId, job, attrs.getAttributes());
+		if (node != null) {
+			process.addNode(node);
 		}
 		job.addProcess(process);
 		return process;
@@ -663,27 +668,27 @@ IResourceManagerControl {
 	 * Update attribute information in model elements.
 	 */
 	protected boolean updateJob(IPJobControl job, AttributeManager attrs) {
-		job.setAttributes(attrs.getAttributes());
+		job.addAttributes(attrs.getAttributes());
 		return true;
 	}
 
 	protected boolean updateMachine(IPMachineControl machine, AttributeManager attrs) {
-		machine.setAttributes(attrs.getAttributes());
+		machine.addAttributes(attrs.getAttributes());
 		return true;
 	}
 
 	protected boolean updateNode(IPNodeControl node, AttributeManager attrs) {
-		node.setAttributes(attrs.getAttributes());
+		node.addAttributes(attrs.getAttributes());
 		return true;
 	}
 
 	protected boolean updateProcess(IPProcessControl process, AttributeManager attrs) {
-		process.setAttributes(attrs.getAttributes());
+		process.addAttributes(attrs.getAttributes());
 		return true;
 	}
 
 	protected boolean updateQueue(IPQueueControl queue, AttributeManager attrs) {
-		queue.setAttributes(attrs.getAttributes());
+		queue.addAttributes(attrs.getAttributes());
 		return true;
 	}
 }
