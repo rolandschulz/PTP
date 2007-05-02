@@ -66,6 +66,7 @@ static int svr_variabledelete(dbg_backend *, int, char **);
 
 static svr_cmd svr_cmd_tab[] =
 {
+	/* DBG_QUIT_CMD */					svr_quit,
 	/* DBG_STARTSESSION_CMD */			svr_start_session,
 	/* DBG_SETLINEBREAKPOINT_CMD */		svr_setlinebreakpoint,
 	/* DBG_SETFUNCBREAKPOINT_CMD */		svr_setfuncbreakpoint,
@@ -96,7 +97,6 @@ static svr_cmd svr_cmd_tab[] =
 	/* DBG_DATAEVALUATEEXPRESSION_CMD */svr_dataevaluateexpression,
 	/* DBG_GETPARTIALAIF_CMD */			svr_getpartialaif,
 	/* DBG_VARIABLEDELETE_CMD */		svr_variabledelete,
-	/* DBG_QUIT_CMD */					svr_quit,
 };
 
 static int			svr_res;
@@ -176,7 +176,7 @@ svr_interrupt(dbg_backend *db)
 static int 
 svr_start_session(dbg_backend *db, int nargs, char **args)
 {
-	if (nargs < 5) {
+	if (nargs < 4) {
 		DbgSetError(DBGERR_DEBUGGER, "not enough arguments for debug cmd");
 		return DBGRES_ERR;
 	}
