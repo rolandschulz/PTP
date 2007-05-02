@@ -290,7 +290,11 @@ void
 proxy_msg_add_string(proxy_msg *m, char *val)
 {
 	check_arg_space(m, 1);
-	m->args[m->num_args] = strdup(val);
+	if (val == NULL) {
+		m->args[m->num_args] = strdup("");
+	} else {
+		m->args[m->num_args] = strdup(val);		
+	}
 	m->free_args[m->num_args] = 1;
 	m->num_args++;
 }
@@ -299,7 +303,11 @@ void
 proxy_msg_add_string_nocopy(proxy_msg *m, char *val)
 {
 	check_arg_space(m, 1);
-	m->args[m->num_args] = val;
+	if (val == NULL) {
+		m->args[m->num_args] = "";
+	} else {
+		m->args[m->num_args] = val;
+	}
 	m->free_args[m->num_args] = 0;
 	m->num_args++;
 }
