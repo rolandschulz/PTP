@@ -99,7 +99,6 @@
 #define JOB_ENV_ATTR				"env"
 #define JOB_DEBUG_EXEC_NAME_ATTR	"debugExecName"
 #define JOB_DEBUG_EXEC_PATH_ATTR	"debugExecPath"
-#define JOB_DEBUG_BACKEND_PATH_ATTR	"debugBackendPath"
 #define JOB_DEBUG_ARGS_ATTR			"debugArgs"
 #define JOB_DEBUG_FLAG_ATTR			"debug"
 /*
@@ -1258,7 +1257,7 @@ debug_spawn(char *debug_path, int argc, char **argv, orte_app_context_t** app_co
 
 	debug_context = OBJ_NEW(orte_app_context_t);
 	debug_context->num_procs = app_context[0]->num_procs + 1;
-	debug_context->app = strdup(debug_path);
+	debug_context->app = debug_path;
 	debug_context->cwd = strdup(app_context[0]->cwd);
 	/* no special environment variables */
 #if ORTE_VERSION_1_0
@@ -1286,6 +1285,8 @@ debug_spawn(char *debug_path, int argc, char **argv, orte_app_context_t** app_co
 		return rc;
 	}
 
+	printf("About to launch debugger: %s on %d procs\n", debug_path, 	debug_context->num_procs);
+	
 	/*
 	 * launch the debugger
 	 */
@@ -1884,7 +1885,7 @@ ORTE_SubmitJob(int trans_id, int nargs, char **args)
 	int						i;
 	int						a;
 	int						num_procs = 0;
-	int						debug = 0;
+	int						debug = false;
 	int						num_args = 0;
 	int						num_env = 0;
 	int						debug_argc = 0;
@@ -1895,7 +1896,9 @@ ORTE_SubmitJob(int trans_id, int nargs, char **args)
 	char *					pgm_name = NULL;
 	char *					cwd = NULL;
 	char *					exec_path = NULL;
-	char *					debug_exec_path;
+	char *					debug_exec_name = NULL;
+	char *					debug_exec_path = NULL;
+	char *					debug_full_path;
 	char **					debug_args;
 	char **					env = NULL;
 	orte_app_context_t *	apps;
@@ -1930,11 +1933,12 @@ ORTE_SubmitJob(int trans_id, int nargs, char **args)
 			num_args++;
 		} else if (strncmp(args[i], JOB_ENV_ATTR, strlen(JOB_ENV_ATTR)) == 0) {
 			num_env++;
-		} else if (strncmp(args[i], JOB_DEBUG_BACKEND_PATH_ATTR, strlen(JOB_DEBUG_BACKEND_PATH_ATTR)) == 0) {
-			debug_exec_path = args[i]+strlen(JOB_DEBUG_BACKEND_PATH_ATTR)+1;
-			debug = 1;
 		} else if (strncmp(args[i], JOB_DEBUG_ARGS_ATTR, strlen(JOB_DEBUG_ARGS_ATTR)) == 0) {
 			debug_argc++;
+		} else if (strncmp(args[i], JOB_DEBUG_FLAG_ATTR, strlen(JOB_DEBUG_FLAG_ATTR)) == 0) {
+			if (strcmp(args[i]+strlen(JOB_DEBUG_FLAG_ATTR)+1, "true") == 0) {
+				debug = true;
+			}
 		}
 	}
 	
@@ -1993,21 +1997,38 @@ ORTE_SubmitJob(int trans_id, int nargs, char **args)
 	}
 	
 	if (debug) {		
-		if (access(debug_exec_path, X_OK) < 0) {
-			printf("ERROR debug_exec_path = '%s' not found\n", debug_exec_path); fflush(stdout);
-			sendErrorEvent(trans_id, RTEV_ERROR_ORTE_RUN, strerror(errno));
-			return PROXY_RES_OK;
-		}
-		
 		debug_argc++;
 		debug_args = (char **)malloc((debug_argc+1) * sizeof(char *));
-		debug_args[0] = debug_exec_path;
 		for (i = 0, a = 1; i < nargs; i++) {
 			if (strncmp(args[i], JOB_DEBUG_ARGS_ATTR, strlen(JOB_DEBUG_ARGS_ATTR)) == 0) {
 				debug_args[a++] = args[i] + strlen(JOB_DEBUG_ARGS_ATTR) + 1;
+			} else if (strncmp(args[i], JOB_DEBUG_EXEC_NAME_ATTR, strlen(JOB_DEBUG_EXEC_NAME_ATTR)) == 0) {
+				debug_exec_name = args[i]+strlen(JOB_DEBUG_EXEC_NAME_ATTR)+1;
+			} else if (strncmp(args[i], JOB_DEBUG_EXEC_PATH_ATTR, strlen(JOB_DEBUG_EXEC_PATH_ATTR)) == 0) {
+				debug_exec_path = args[i]+strlen(JOB_DEBUG_EXEC_PATH_ATTR)+1;
 			}
 		}
 		debug_args[a] = NULL;
+		
+		/*
+		 * If no path is specified, then try to locate execuable.
+		 */		
+		if (debug_exec_path == NULL) {
+			debug_full_path = opal_path_findv(debug_exec_name, 0, env, cwd);
+			if (debug_full_path == NULL) {
+				sendErrorEvent(trans_id, RTEV_ERROR_ORTE_RUN, "Debugger executuable not found");
+				return PROXY_RES_OK;
+			}
+		} else {
+			asprintf(&debug_full_path, "%s/%s", debug_exec_path, debug_exec_name);
+		}
+		
+		if (access(debug_full_path, X_OK) < 0) {
+			sendErrorEvent(trans_id, RTEV_ERROR_ORTE_RUN, strerror(errno));
+			return PROXY_RES_OK;
+		}
+
+		debug_args[0] = strdup(debug_full_path);
 	}
 
 	/* format the app_context_t struct */
@@ -2037,7 +2058,7 @@ ORTE_SubmitJob(int trans_id, int nargs, char **args)
 	apps->argc = num_args + 1;
 #endif /* ORTE_VERSION_1_0 */
 
-	printf("(debug ? %d) Spawning %d processes of job '%s'\n", debug, (int)apps->num_procs, apps->app);
+	printf("%s %d processes of job '%s'\n", debug ? "Debugging" : "Spawning" , (int)apps->num_procs, apps->app);
 	printf("\tprogram name '%s'\n", apps->argv[0]);
 	fflush(stdout);
 	
@@ -2045,7 +2066,7 @@ ORTE_SubmitJob(int trans_id, int nargs, char **args)
 	 * jobid assigned by the registry/ORTE.  Passes a callback function
 	 * that ORTE will call with state change on this job */
 	if (debug) {
-		rc = debug_spawn(debug_exec_path, debug_argc, debug_args, &apps, 1, &ortejobid, &debug_jobid);
+		rc = debug_spawn(debug_full_path, debug_argc, debug_args, &apps, 1, &ortejobid, &debug_jobid);
 		free(debug_args);
 	} else {
 		rc = ORTE_SPAWN(&apps, 1, &ortejobid, job_state_callback);
