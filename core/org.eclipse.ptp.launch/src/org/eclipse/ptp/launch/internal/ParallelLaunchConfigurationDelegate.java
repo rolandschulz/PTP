@@ -114,16 +114,19 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 				
 				IPDebugConfiguration debugConfig = getDebugConfig(configuration);
 				debugger = debugConfig.createDebugger();
-				dbgArgs.add(" --port=" + debugger.getDebuggerPort());
+				dbgArgs.add("--port=" + debugger.getDebuggerPort());
 			
-				String dbgPathConf = getDebuggerExePath(configuration);
-				if (dbgPathConf != null) {
-					// remote setting
-					IPath path = new Path(dbgPathConf);
-					attrManager.addAttribute(JobAttributes.getDebuggerExecutableNameAttributeDefinition().create(path.lastSegment()));
-					attrManager.addAttribute(JobAttributes.getDebuggerExecutablePathAttributeDefinition().create(path.removeLastSegments(1).toOSString()));
+				// remote setting
+				String dbgExePath = getDebuggerExePath(configuration);
+				if (dbgExePath == null) {
+					dbgExePath = dbgFile;
 				}
-				String dbgWD = getDebuggerWorkDirectory(configuration);
+				
+				IPath path = new Path(dbgExePath);
+				attrManager.addAttribute(JobAttributes.getDebuggerExecutableNameAttributeDefinition().create(path.lastSegment()));
+				attrManager.addAttribute(JobAttributes.getDebuggerExecutablePathAttributeDefinition().create(path.removeLastSegments(1).toOSString()));
+
+					String dbgWD = getDebuggerWorkDirectory(configuration);
 				if (dbgWD != null) {
 					StringAttribute wdAttr = (StringAttribute) attrManager.getAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition());
 					if (wdAttr != null) {
@@ -133,7 +136,6 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 				
 					}
 				}
-				attrManager.addAttribute(JobAttributes.getDebuggerBackendPathAttributeDefinition().create(dbgFile));
 				attrManager.addAttribute(JobAttributes.getDebuggerArgumentsAttributeDefinition().create(dbgArgs.toArray(new String[0])));
 				attrManager.addAttribute(JobAttributes.getDebugFlagAttributeDefinition().create(true));
 			}
