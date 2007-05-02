@@ -20,17 +20,7 @@
 #ifndef PROXY_CMD_H_
 #define PROXY_CMD_H_
 
-/*
- * CMD codes must EXACTLY match org.eclipse.ptp.core.proxy.IProxyCommand
- */
-
-#define CMD_QUIT			1
-#define CMD_INIT			2
-#define CMD_MODEL_DEF		3
-#define CMD_START_EVENTS	4
-#define CMD_STOP_EVENTS		5
-#define CMD_SUBMIT_JOB		6
-#define CMD_TERM_JOB		7
+#define CMD_QUIT			0
 
 #define CMD_ID_SIZE			4
 #define CMD_ID_MASK			0xffff
