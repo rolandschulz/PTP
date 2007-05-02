@@ -68,9 +68,9 @@ dbg_clnt_cmd_completed(bitset *mask, char *msg, void *data)
  		 * don't include the bitset, it is only added prior to sending back
  		 * to the client.
  		 */
- 		proxy_msg_insert_bitset(m, mask, 0);
+		proxy_msg_insert_bitset(m, mask, 0);
  		proxy_svr_queue_msg(dbg_proxy, m);
- 	}
+	}
 	
 	/*
 	 * The next event received after a quit command
@@ -156,6 +156,7 @@ DbgClntStartSession(int tid, int nargs, char **args)
 	char *		buf;
 	proxy_msg *	msg = new_proxy_msg(DBG_STARTSESSION_CMD, tid);
 	
+	proxy_msg_add_int(msg, SERVER_TIMEOUT);
 	proxy_msg_add_args_nocopy(msg, nargs, args);
 	proxy_serialize_msg(msg, &buf);
 	
