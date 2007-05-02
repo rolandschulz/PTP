@@ -79,6 +79,7 @@ static svr_cmd svr_cmd_tab[] =
 	/* DBG_GO_CMD */					svr_go,
 	/* DBG_STEP_CMD */					svr_step,
 	/* DBG_TERMINATE_CMD */				svr_terminate,
+	/* DBG_INTERRUPT_CMD */				NULL,
 	/* DBG_LISTSTACKFRAMES_CMD */		svr_liststackframes,
 	/* DBG_SETCURRENTSTACKFRAME_CMD */	svr_setcurrentstackframe,
 	/* DBG_EVALUATEEXPRESSION_CMD */	svr_evaluateexpression,
@@ -123,12 +124,13 @@ svr_init(dbg_backend *db, void (*cb)(dbg_event *, void *), void *data, char **en
 }
 
 int
-svr_dispatch(dbg_backend *db, char *cmd)
+svr_dispatch(dbg_backend *db, char *cmd_str)
 {
 	int			idx;
 	proxy_msg *	msg;
+	svr_cmd		cmd;
 	
-	if (proxy_deserialize_msg(cmd, strlen(cmd), &msg) < 0) {
+	if (proxy_deserialize_msg(cmd_str, strlen(cmd_str), &msg) < 0) {
 		svr_res = DBGRES_ERR;
 		DbgSetError(DBGERR_DEBUGGER, "bad debug message format");
 		return 0;
@@ -138,7 +140,10 @@ svr_dispatch(dbg_backend *db, char *cmd)
 	
 	if (idx >= 0 && idx < sizeof(svr_cmd_tab)/sizeof(svr_cmd)) {
 		svr_last_tid = msg->trans_id;
-		svr_res = svr_cmd_tab[idx](db, msg->num_args, msg->args);
+		cmd = svr_cmd_tab[idx];
+		if (cmd != NULL) {
+			svr_res = cmd(db, msg->num_args, msg->args);
+		}
 	} else {
 		svr_res = DBGRES_ERR;
 		DbgSetError(DBGERR_DEBUGGER, "Unknown command");
