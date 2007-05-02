@@ -374,6 +374,7 @@ proxy_tcp_svr_dispatch(proxy_svr *svr, char *msg, int len)
 	char *				err_str;
 	proxy_commands * 	cmd_tab = svr->svr_commands;
 	proxy_msg *			m;
+	proxy_cmd			cmd;
 
 	DEBUG_PRINT("SVR received <%s>\n", msg);
 	
@@ -389,7 +390,10 @@ proxy_tcp_svr_dispatch(proxy_svr *svr, char *msg, int len)
     idx = m->msg_id - cmd_tab->cmd_base;
                     
 	if (idx >= 0 && idx < cmd_tab->cmd_size) {
-		(void)cmd_tab->cmd_funcs[idx](m->trans_id, m->num_args, m->args);
+		cmd = cmd_tab->cmd_funcs[idx];
+		if (cmd != NULL) {
+			(void)cmd(m->trans_id, m->num_args, m->args);
+		}
 	} else {
 		m = new_proxy_msg(0, PROXY_EV_ERROR);
 		proxy_msg_add_int(m, ERROR_MALFORMED_COMMAND);
