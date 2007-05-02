@@ -81,6 +81,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 		proxy = new ProxyDebugClient();
 		try {
 			proxy.sessionCreate();
+			proxy.addProxyDebugEventListener(this);
 		} catch (IOException e) {
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugCorePlugin.getUniqueIdentifier(), IStatus.ERROR, "could not create proxy", null));
 		}
@@ -91,10 +92,11 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 		try {
 			//using checkConnection() instead of waitForConnect()
 			//proxy.checkConnection();
-			if (proxy.waitForConnect(monitor)) {
-				proxy.addProxyDebugEventListener(this);
+			if (!proxy.waitForConnect(monitor)) {
+				proxy.removeProxyDebugEventListener(this);
 			}
 		} catch (IOException e) {
+			proxy.removeProxyDebugEventListener(this);
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugCorePlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));
 		}
 	}
