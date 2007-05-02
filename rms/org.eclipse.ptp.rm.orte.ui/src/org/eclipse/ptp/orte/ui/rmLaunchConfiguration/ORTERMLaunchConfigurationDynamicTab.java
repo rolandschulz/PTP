@@ -28,7 +28,6 @@ import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.orte.core.ORTEAttributes;
-import org.eclipse.ptp.orte.core.rmsystem.ORTEResourceManager;
 import org.eclipse.ptp.orte.ui.Activator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -49,6 +48,7 @@ public class ORTERMLaunchConfigurationDynamicTab extends
 	private static final String ATTR_NUMPROCS = ATTR_PREFIX + ".numProcs";
 	private static final RMLaunchValidation success = new RMLaunchValidation(true, "");
 	private Text numProcsText;
+	private String numProcsString = "0";
 	private Composite control;
 
 	public ORTERMLaunchConfigurationDynamicTab(IResourceManager rm) {
@@ -59,7 +59,6 @@ public class ORTERMLaunchConfigurationDynamicTab extends
 	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab#canSave(org.eclipse.swt.widgets.Control, org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue)
 	 */
 	public RMLaunchValidation canSave(Control control, IResourceManager rm, IPQueue queue) {
-		String numProcsString = numProcsText.getText();
 		try {
 			IntegerAttributeDefinition numProcsAttrDef = getNumProcsAttrDef(rm, queue);
 			@SuppressWarnings("unused")
@@ -107,6 +106,7 @@ public class ORTERMLaunchConfigurationDynamicTab extends
 		numProcsText.addModifyListener(new ModifyListener(){
 
 			public void modifyText(ModifyEvent e) {
+				numProcsString = numProcsText.getText();
 				fireContentsChanged();
 			}});
 	}
@@ -161,7 +161,6 @@ public class ORTERMLaunchConfigurationDynamicTab extends
 	 */
 	public RMLaunchValidation isValid(ILaunchConfiguration configuration,
 			IResourceManager rm, IPQueue queue) {
-		String numProcsString = numProcsText.getText();
 		try {
 			IntegerAttributeDefinition numProcsAttrDef = getNumProcsAttrDef(rm, queue);
 			@SuppressWarnings("unused")
@@ -177,7 +176,6 @@ public class ORTERMLaunchConfigurationDynamicTab extends
 	 */
 	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration,
 			IResourceManager rm, IPQueue queue) {
-		String numProcsString = numProcsText.getText();
 		IntegerAttribute iattr = null;
 		try {
 			IntegerAttributeDefinition numProcsAttrDef = getNumProcsAttrDef(rm, queue);
