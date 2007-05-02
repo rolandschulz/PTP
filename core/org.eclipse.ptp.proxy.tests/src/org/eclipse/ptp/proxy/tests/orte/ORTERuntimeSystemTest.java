@@ -194,14 +194,6 @@ public class ORTERuntimeSystemTest implements IRuntimeEventListener {
 						attrMgr.addAttribute(JobAttributes.getEnvironmentAttributeDefinition().create(envArr));
 					}
 					
-					if (jobRunConfig.isDebug()) {
-						attrMgr.addAttribute(JobAttributes.getDebuggerBackendPathAttributeDefinition().create(jobRunConfig.getDebuggerPath()));
-						String[] dbgArgs = jobRunConfig.getDebuggerArgs();
-						if (dbgArgs != null) {
-							attrMgr.addAttribute(JobAttributes.getDebuggerArgumentsAttributeDefinition().create(dbgArgs));
-						}
-					}
-					
 					System.out.println("about to submit");
 					rtsystem.submitJob(jobSubmitID, attrMgr);
 				} catch (IllegalValueException e1) {
