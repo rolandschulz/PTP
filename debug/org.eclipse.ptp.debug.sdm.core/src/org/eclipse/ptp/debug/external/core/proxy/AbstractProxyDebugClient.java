@@ -36,7 +36,6 @@ import org.eclipse.ptp.core.proxy.event.IProxyEventListener;
 import org.eclipse.ptp.core.proxy.event.IProxyExtendedEvent;
 import org.eclipse.ptp.core.proxy.event.IProxyOKEvent;
 import org.eclipse.ptp.core.proxy.event.IProxyTimeoutEvent;
-import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugArgsEvent;
 import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugBreakpointHitEvent;
 import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugBreakpointSetEvent;
@@ -81,7 +80,7 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient imple
 		//sessionDestroy();
 	}
 	
-	public synchronized void checkConnection() throws IOException {
+	public void checkConnection() throws IOException {
 		waitLock.lock();
 		try {
 			if (!connected) {
@@ -101,7 +100,7 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient imple
 		}
 	}
 	
-	public synchronized boolean waitForConnect(IProgressMonitor monitor) throws IOException {
+	public boolean waitForConnect(IProgressMonitor monitor) throws IOException {
 		System.out.println("debug: waiting for connect");
 		waitLock.lock();
 		try {
@@ -123,25 +122,6 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient imple
 			monitor.done();
 		}
 		return true;
-	}
-	
-	protected void sendCommand(String cmd, BitList set) throws IOException {
-		String setStr = encodeBitSet(set);
-		this.sendCommand(cmd, setStr);
-	}
-	protected void sendCommand(String cmd, BitList set, String arg1) throws IOException {
-		String setStr = encodeBitSet(set);
-		this.sendCommand(cmd, setStr, arg1);
-	}
-	
-	protected void sendCommand(String cmd, BitList set, String arg1, String arg2) throws IOException {
-		String setStr = encodeBitSet(set);
-		this.sendCommand(cmd, setStr, arg1, arg2);
-	}
-
-	protected void sendCommand(String cmd, BitList set, String[] args) throws IOException {
-		String setStr = encodeBitSet(set);
-		this.sendCommand(cmd, setStr, args);
 	}
 	
 	public void addProxyDebugEventListener(IProxyDebugEventListener listener) {
