@@ -164,13 +164,6 @@
 				id="org.eclipse.ptp.ui.actions.startResourceManagersAction"
 				label="%StartResourceManagersAction.label"
 				menubarPath="org.eclipse.ptp.ui.resourceManager.popupSubMenu/content"/>
-			<action
-				class="org.eclipse.ptp.ui.actions.SetCurrentResourceManagerObjectActionDelegate"
-				enablesFor="1"
-				icon="icons/rm/rm_current.gif"
-				id="org.eclipse.ptp.ui.actions.setCurrentResourceManagerAction"
-				label="%SetCurrentResourceManagerAction.label"
-				menubarPath="org.eclipse.ptp.ui.resourceManager.popupSubMenu/content"/>
 		</objectContribution>
 	</extension>
 
