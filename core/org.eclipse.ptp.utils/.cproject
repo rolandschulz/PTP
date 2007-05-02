@@ -1,14 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?eclipse-cdt version="2.0"?>
+<?fileVersion 4.0.0?>
 
-<cdtproject id="org.eclipse.cdt.make.core.make">
-<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
-<extension id="org.eclipse.cdt.core.MachO" point="org.eclipse.cdt.core.BinaryParser">
-<attribute key="c++filt" value="c++filt"/>
-</extension>
-<extension id="org.eclipse.cdt.core.domsourceindexer" point="org.eclipse.cdt.core.CIndexer"/>
-<data>
-<item id="scannerConfiguration">
+<cproject>
+<storageModule moduleId="org.eclipse.cdt.core.settings">
+<cconfiguration id="converted.config.379004676">
+<storageModule moduleId="scannerConfiguration">
 <autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile"/>
 <profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">
 <buildOutputProvider>
@@ -50,13 +46,22 @@
 <parser enabled="false"/>
 </scannerInfoProvider>
 </profile>
-</item>
-<item id="org.eclipse.cdt.core.pathentry">
+</storageModule>
+<storageModule moduleId="org.eclipse.cdt.core.pathentry">
 <pathentry kind="src" path=""/>
 <pathentry kind="out" path=""/>
 <pathentry kind="con" path="org.eclipse.cdt.make.core.DISCOVERED_SCANNER_INFO"/>
-</item>
-
-
-</data>
-</cdtproject>
+</storageModule>
+<storageModule buildSystemId="org.eclipse.cdt.core.defaultConfigDataProvider" id="converted.config.379004676" moduleId="org.eclipse.cdt.core.settings" name="convertedConfig">
+<externalSettings/>
+<extensions>
+<extension id="org.eclipse.cdt.core.domsourceindexer" point="org.eclipse.cdt.core.CIndexer"/>
+<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+<extension id="org.eclipse.cdt.core.MachO" point="org.eclipse.cdt.core.BinaryParser">
+<attribute key="c++filt" value="c++filt"/>
+</extension>
+</extensions>
+</storageModule>
+</cconfiguration>
+</storageModule>
+</cproject>
