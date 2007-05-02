@@ -13,6 +13,6 @@ public class ProxyDebugStepCommand extends AbstractProxyDebugCommand implements 
 	}
 
 	public int getCommandID() {
-		return DEBUG_CMD_STEP;
+		return STEP;
 	}
 }

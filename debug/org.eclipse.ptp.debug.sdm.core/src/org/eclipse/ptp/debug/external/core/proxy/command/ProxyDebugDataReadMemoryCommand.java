@@ -18,6 +18,6 @@ public class ProxyDebugDataReadMemoryCommand extends AbstractProxyDebugCommand i
 	}
 
 	public int getCommandID() {
-		return DEBUG_CMD_DATAREADMEMORY;
+		return DATAREADMEMORY;
 	}
 }

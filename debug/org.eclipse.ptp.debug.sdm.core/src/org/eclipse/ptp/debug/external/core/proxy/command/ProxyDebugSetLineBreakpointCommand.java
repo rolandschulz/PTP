@@ -20,6 +20,6 @@ public class ProxyDebugSetLineBreakpointCommand extends AbstractProxyDebugComman
 	}
 
 	public int getCommandID() {
-		return DEBUG_CMD_SETLINEBREAKPOINT;
+		return SETLINEBREAKPOINT;
 	}
 }

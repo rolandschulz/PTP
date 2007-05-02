@@ -11,6 +11,6 @@ public class ProxyDebugDeleteBreakpointCommand extends AbstractProxyDebugCommand
 	}
 
 	public int getCommandID() {
-		return DEBUG_CMD_DELETEBREAKPOINT;
+		return DELETEBREAKPOINT;
 	}
 }

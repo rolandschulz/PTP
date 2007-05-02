@@ -38,12 +38,13 @@ import org.eclipse.ptp.core.proxy.event.IProxyEventListener;
 import org.eclipse.ptp.core.proxy.event.IProxyExtendedEvent;
 import org.eclipse.ptp.core.proxy.event.IProxyOKEvent;
 import org.eclipse.ptp.core.proxy.event.IProxyTimeoutEvent;
-import org.eclipse.ptp.rtsystem.proxy.command.ProxyInitCommand;
-import org.eclipse.ptp.rtsystem.proxy.command.ProxyModelDefCommand;
-import org.eclipse.ptp.rtsystem.proxy.command.ProxyStartEventsCommand;
-import org.eclipse.ptp.rtsystem.proxy.command.ProxyStopEventsCommand;
-import org.eclipse.ptp.rtsystem.proxy.command.ProxySubmitJobCommand;
-import org.eclipse.ptp.rtsystem.proxy.command.ProxyTerminateJobCommand;
+import org.eclipse.ptp.rtsystem.proxy.command.IProxyRuntimeCommand;
+import org.eclipse.ptp.rtsystem.proxy.command.ProxyRuntimeInitCommand;
+import org.eclipse.ptp.rtsystem.proxy.command.ProxyRuntimeModelDefCommand;
+import org.eclipse.ptp.rtsystem.proxy.command.ProxyRuntimeStartEventsCommand;
+import org.eclipse.ptp.rtsystem.proxy.command.ProxyRuntimeStopEventsCommand;
+import org.eclipse.ptp.rtsystem.proxy.command.ProxyRuntimeSubmitJobCommand;
+import org.eclipse.ptp.rtsystem.proxy.command.ProxyRuntimeTerminateJobCommand;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeAttributeDefEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeConnectedStateEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeErrorEvent;
@@ -132,13 +133,13 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 	}
 
 	public void submitJob(String[] args) throws IOException {
-		IProxyCommand command = new ProxySubmitJobCommand(this, args);
+		IProxyCommand command = new ProxyRuntimeSubmitJobCommand(this, args);
 		addCommand(command);
 		command.send();
 	}
 	
 	public void terminateJob(String jobId) throws IOException {
-		IProxyCommand command = new ProxyTerminateJobCommand(this, jobId);
+		IProxyCommand command = new ProxyRuntimeTerminateJobCommand(this, jobId);
 		addCommand(command);
 		command.send();
 	}
@@ -359,7 +360,7 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 				if (event instanceof IProxyConnectedEvent) {
 					try {
 						sessionHandleEvents();
-						command = new ProxyInitCommand(this, baseModelId);
+						command = new ProxyRuntimeInitCommand(this, baseModelId);
 						addCommand(command);
 						command.send();
 		    			state = ProxyState.INIT;
@@ -393,7 +394,7 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 					command = getCommandForEvent(event);
 					if (command != null) {
 						removeCommand(command);
-						command = new ProxyModelDefCommand(this);
+						command = new ProxyRuntimeModelDefCommand(this);
 						addCommand(command);
 						command.send();
 						state = ProxyState.MODEL_DEF;
@@ -469,7 +470,7 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 			System.out.println(toString() + " recieved event " + event);
 		}
     	switch (command.getCommandID()) {
-    	case IProxyCommand.CMD_START_EVENTS:
+    	case IProxyRuntimeCommand.START_EVENTS:
     		// TODO - add other events and call listeners
     		switch (event.getEventID()) {
     		case IProxyRuntimeEvent.PROXY_RUNTIME_NEW_JOB_EVENT:
@@ -507,17 +508,17 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
     			break;
      		}
  			break;
-    	case IProxyCommand.CMD_STOP_EVENTS:
+    	case IProxyRuntimeCommand.STOP_EVENTS:
 			if (event instanceof IProxyOKEvent) {
 				removeCommand(command);
 			}
     		break;
-    	case IProxyCommand.CMD_SUBMIT_JOB:
+    	case IProxyRuntimeCommand.SUBMIT_JOB:
 			if (event instanceof IProxyOKEvent) {
 				removeCommand(command);
 			}
     		break;
-    	case IProxyCommand.CMD_QUIT:
+    	case IProxyCommand.QUIT:
 			if (event instanceof IProxyOKEvent) {
 				removeCommand(command);
 				state = ProxyState.END;
@@ -590,13 +591,13 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 	}
 
 	public void startEvents() throws IOException {
-		IProxyCommand command = new ProxyStartEventsCommand(this);
+		IProxyCommand command = new ProxyRuntimeStartEventsCommand(this);
 		addCommand(command);
 		command.send();
 	}
 
 	public void stopEvents() throws IOException {
-		IProxyCommand command = new ProxyStopEventsCommand(this);
+		IProxyCommand command = new ProxyRuntimeStopEventsCommand(this);
 		addCommand(command);
 		command.send();
 	}

@@ -11,6 +11,6 @@ public class ProxyDebugSetThreadSelectCommand extends AbstractProxyDebugCommand 
 	}
 
 	public int getCommandID() {
-		return DEBUG_CMD_SETTHREADSELECT;
+		return SETTHREADSELECT;
 	}
 }

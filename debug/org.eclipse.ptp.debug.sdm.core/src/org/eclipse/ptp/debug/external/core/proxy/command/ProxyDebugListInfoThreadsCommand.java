@@ -10,7 +10,7 @@ public class ProxyDebugListInfoThreadsCommand extends AbstractProxyDebugCommand 
 	}
 
 	public int getCommandID() {
-		return DEBUG_CMD_LISTINFOTHREADS;
+		return LISTINFOTHREADS;
 	}
 
 }

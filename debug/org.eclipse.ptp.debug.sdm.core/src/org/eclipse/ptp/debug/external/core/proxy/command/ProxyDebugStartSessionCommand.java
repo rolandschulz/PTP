@@ -14,6 +14,6 @@ public class ProxyDebugStartSessionCommand extends AbstractProxyCommand implemen
 	}
 
 	public int getCommandID() {
-		return DEBUG_CMD_STARTSESSION;
+		return STARTSESSION;
 	}
 }

@@ -10,6 +10,6 @@ public class ProxyDebugStackInfoDepthCommand extends AbstractProxyDebugCommand i
 	}
 
 	public int getCommandID() {
-		return DEBUG_CMD_STACKINFODEPTH;
+		return STACKINFODEPTH;
 	}
 }

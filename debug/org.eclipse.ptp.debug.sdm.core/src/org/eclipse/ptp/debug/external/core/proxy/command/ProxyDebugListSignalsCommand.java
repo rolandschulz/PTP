@@ -11,6 +11,6 @@ public class ProxyDebugListSignalsCommand extends AbstractProxyDebugCommand impl
 	}
 
 	public int getCommandID() {
-		return DEBUG_CMD_LISTSIGNALS;
+		return LISTSIGNALS;
 	}
 }

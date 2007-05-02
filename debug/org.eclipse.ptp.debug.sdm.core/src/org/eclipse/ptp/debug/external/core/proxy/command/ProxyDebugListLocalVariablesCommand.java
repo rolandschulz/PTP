@@ -10,7 +10,7 @@ public class ProxyDebugListLocalVariablesCommand extends AbstractProxyDebugComma
 	}
 
 	public int getCommandID() {
-		return DEBUG_CMD_LISTLOCALVARIABLES;
+		return LISTLOCALVARIABLES;
 	}
 
 }
