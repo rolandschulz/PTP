@@ -35,7 +35,8 @@
 extern int digittoint(int c);
 #endif /* __linux__ */
 
-#define ARG_SIZE	100
+// FIXME this is to get around bug in check_arg_space()!
+#define ARG_SIZE	1000
 
 static char tohex[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 
@@ -172,7 +173,7 @@ proxy_deserialize_msg(char *packet, int packet_len, proxy_msg **msg)
 	m = new_proxy_msg(msg_id, trans_id);
 	
 	if (num_args > 0) {
-		m->args = (char **)malloc(sizeof(char *) * num_args);
+		m->args = (char **)malloc(sizeof(char *) * num_args+1);
 		packet = end;
 		
 		for (i = 0; i < num_args; i++) {
@@ -183,6 +184,11 @@ proxy_deserialize_msg(char *packet, int packet_len, proxy_msg **msg)
 			proxy_msg_add_string(m, arg);
 			packet++; /* skip space */
 		}
+		
+		/*
+		 * NULL terminate the args
+		 */
+		m->args[num_args] = NULL;
 	}
 		
 	*msg = m;
@@ -236,7 +242,7 @@ check_arg_space(proxy_msg *m, int n)
 	if (size == 0) {
 		m->args = (char **)malloc(sizeof(char *) * m->arg_size);
 		m->free_args = (int *)malloc(sizeof(int *) * m->arg_size);
-	} else {
+	} else if (size < m->arg_size) {
 		m->args = (char **)realloc(m->args, m->arg_size);
 		m->free_args = (int *)realloc(m->free_args, m->arg_size);
 	}
@@ -363,14 +369,14 @@ proxy_msg_insert_bitset(proxy_msg *m, bitset *b, int idx)
 	if (idx < 0)
 		return;
 		
-	if (idx > m->num_args) {
+	if (idx >= m->num_args) {
 		proxy_msg_add_bitset(m, b);
 		return;
 	}
 	
 	check_arg_space(m, 1);
 	
-	for (i = m->num_args; i > idx; i++) {
+	for (i = m->num_args; i > idx; i--) {
 		m->args[i] = m->args[i-1];
 		m->free_args[i] = m->free_args[i-1];
 	}
