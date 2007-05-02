@@ -109,15 +109,17 @@ public abstract class AbstractProxyClient implements IProxyClient {
 	public static String encodeString(String str) {
 		int len;
 		
-		if (str == null)
+		if (str == null) {
 			len = 0;
-		else
+			str = "";
+		} else {
 			len = str.length();
+		}
 		
 		return encodeIntVal(len, IProxyCommand.CMD_ARGS_LEN_SIZE) + ":" + str;		
 	}
 	
-	private String decodeString(CharBuffer buf, int start) {
+	public static String decodeString(CharBuffer buf, int start) {
 		int end = start + IProxyEvent.EVENT_ARG_LEN_SIZE;
 		int len = Integer.parseInt(buf.subSequence(start, end).toString(), 16);
 		start = end + 1; // Skip ':'
@@ -125,7 +127,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 		return buf.subSequence(start, end).toString();
 	}
 	
-	protected String encodeBitSet(BitList set) {
+	public static String encodeBitSet(BitList set) {
 		String lenStr = Integer.toHexString(set.size());
 		return lenStr + ":" + set.toString();
 	}
@@ -143,52 +145,6 @@ public abstract class AbstractProxyClient implements IProxyClient {
 		}
 	}
 
-	protected void sendCommand(String cmd, String arg1) throws IOException {
-		this.sendCommand(cmd + " " + encodeString(arg1));
-	}
-
-	protected void sendCommand(String cmd, String arg1, String arg2) throws IOException {
-		this.sendCommand(cmd + " " + encodeString(arg1) + " " + encodeString(arg2));
-	}
-
-	protected void sendCommand(String cmd, String arg1, String arg2, String arg3) throws IOException {
-		this.sendCommand(cmd + " " + encodeString(arg1) + " " + encodeString(arg2) + " " + encodeString(arg3));
-	}
-
-	protected void sendCommand(String cmd, String[] args) throws IOException {
-		for (String arg : args) {
-			cmd += " " + encodeString(arg);
-		}
-		this.sendCommand(cmd);
-	}
-
-	protected void sendCommand(String cmd, String arg1, String[] args) throws IOException {
-		cmd += " " + encodeString(arg1);
-		
-		for (String arg : args) {
-			cmd += " " + encodeString(arg);
-		}
-		this.sendCommand(cmd);
-	}
-
-	protected void sendCommand(String cmd, String arg1, String arg2, String[] args) throws IOException {
-		cmd += " " + encodeString(arg1) + " " + encodeString(arg2);
-		
-		for (String arg : args) {
-			cmd += " " + encodeString(arg);
-		}
-		this.sendCommand(cmd);
-	}
-
-	protected void sendCommand(String cmd, String arg1, String arg2, String arg3, String[] args) throws IOException {
-		cmd += " " + encodeString(arg1) + " " + encodeString(arg2) + " " + encodeString(arg3);
-		
-		for (String arg : args) {
-			cmd += " " + encodeString(arg);
-		}
-		this.sendCommand(cmd);
-	}
-	
 	public void addProxyEventListener(IProxyEventListener listener) {
 		listeners.add(listener);
 	}
@@ -240,8 +196,8 @@ public abstract class AbstractProxyClient implements IProxyClient {
 				try {
 					System.out.println("accept thread starting...");
 					sessSock = sessSvrSock.accept();
-					fireProxyConnectedEvent(new ProxyConnectedEvent());
 					setSessionState(SessionState.CONNECTED);
+					fireProxyConnectedEvent(new ProxyConnectedEvent());
 				} catch (SocketTimeoutException e) {
 					fireProxyTimeoutEvent(new ProxyTimeoutEvent());
 				} catch (ClosedByInterruptException e) {
@@ -510,7 +466,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 		} catch (IndexOutOfBoundsException e1) {
 			return false;
 		}
-		
+
 		/*
 		 * Now convert the event into an IProxyEvent
 		 */
