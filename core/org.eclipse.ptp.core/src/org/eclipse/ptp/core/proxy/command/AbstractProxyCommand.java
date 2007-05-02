@@ -64,19 +64,23 @@ public abstract class AbstractProxyCommand implements IProxyCommand {
 	}
 
 	protected void addArgument(String arg) {
-		args.add(arg);
+		if (arg == null) {
+			args.add("");
+		} else {
+			args.add(arg);
+		}
 	}
 
-	protected void addArgument(Integer arg) {
-		args.add(arg.toString());
+	protected void addArgument(int arg) {
+		args.add(Integer.toString(arg));
 	}
 
-	protected void addArgument(Boolean arg) {
+	protected void addArgument(boolean arg) {
 		addArgument(arg?"1":"0");
 	}
 
-	protected void addArgument(Long arg) {
-		args.add(arg.toString());
+	protected void addArgument(long arg) {
+		args.add(Long.toString(arg));
 	}
 
 	protected void addArgument(Character arg) {
@@ -93,7 +97,13 @@ public abstract class AbstractProxyCommand implements IProxyCommand {
 		String str = this.getClass().getSimpleName() + " tid=" + getTransactionID();
 		
 		for (String arg : args) {
-			str += " " + arg;
+			if (arg == null) {
+				str += " <null>";
+			} else if (arg.equals("")) {
+				str += " \"\"";
+			} else {
+				str += " " + arg;
+			}
 		}
 		return str;
 	}
