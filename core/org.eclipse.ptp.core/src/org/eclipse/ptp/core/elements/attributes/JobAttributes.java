@@ -28,7 +28,6 @@ public class JobAttributes {
 	private static final String ENV_ATTR_ID = "env";
 	private static final String DEBUG_EXEC_NAME_ATTR_ID = "debugExecName";
 	private static final String DEBUG_EXEC_PATH_ATTR_ID = "debugExecPath";
-	private static final String DEBUG_BACKEND_PATH_ATTR_ID = "debugBackendPath";
 	private static final String DEBUG_ARGS_ATTR_ID = "debugArgs";
 	private static final String DEBUG_FLAG_ATTR_ID = "debug";
 
@@ -58,9 +57,6 @@ public class JobAttributes {
 
 	private final static StringAttributeDefinition debugExecPathAttrDef = 
 		new StringAttributeDefinition(DEBUG_EXEC_PATH_ATTR_ID, "Debugger Executable NaPathme", "Path to debugger executable", "");
-
-	private final static StringAttributeDefinition debugBackendAttrDef = 
-		new StringAttributeDefinition(DEBUG_BACKEND_PATH_ATTR_ID, "Debugger Backend Path", "Path to backend debugger", "");
 
 	private final static ArrayAttributeDefinition debugArgsAttrDef = 
 		new ArrayAttributeDefinition(DEBUG_ARGS_ATTR_ID, DEBUG_ARGS_ATTR_ID, "Debugger Arguments", null);
@@ -104,10 +100,6 @@ public class JobAttributes {
 		return debugExecPathAttrDef;
 	}
 
-	public static StringAttributeDefinition getDebuggerBackendPathAttributeDefinition() {
-		return debugBackendAttrDef;
-	}
-
 	public static ArrayAttributeDefinition getDebuggerArgumentsAttributeDefinition() {
 		return debugArgsAttrDef;
 	}
@@ -127,7 +119,6 @@ public class JobAttributes {
 					envAttrDef,
 					debugExecNameAttrDef,
 					debugExecPathAttrDef,
-					debugBackendAttrDef,
 					debugArgsAttrDef,
 					debugFlagAttrDef
 				};
