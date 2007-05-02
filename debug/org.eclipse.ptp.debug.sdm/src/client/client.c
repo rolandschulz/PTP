@@ -66,6 +66,7 @@ static proxy_svr_helper_funcs helper_funcs = {
 };
 
 static proxy_cmd cmds[] = { 
+	/* DBG_QUIT_CMD */						DbgClntQuit,
 	/* DBG_STARTSESSION_CMD */				DbgClntStartSession,
 	/* DBG_SETLINEBREAKPOINT_CMD */			DbgClntSetLineBreakpoint,
 	/* DBG_SETFUNCBREAKPOINT_CMD */			DbgClntSetFuncBreakpoint,
@@ -97,7 +98,6 @@ static proxy_cmd cmds[] = {
 	/* DBG_DATAEVALUATEEXPRESSION_CMD */	DbgClntDataEvaluateExpression,
 	/* DBG_GETPARTIALAIF_CMD */				DbgClntGetPartialAIF,
 	/* DBG_VARIABLEDELETE_CMD */			DbgClntVariableDelete,
-	/* DBG_QUIT_CMD */						DbgClntQuit,
 };
 
 static proxy_commands	command_tab = {
