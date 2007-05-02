@@ -127,7 +127,7 @@ public class ProxyDebugEventFactory extends ProxyEventFactory {
 				numVars = Integer.parseInt(args[13]);
 				vars = new String[numVars];
 				for (int i = 0; i<numVars; i++) {
-					vars[i] = decodeString(args[i+14]);
+					vars[i] = args[i+14];
 				}
 
 				evt = new ProxyDebugSignalEvent(transID, set, args[2], args[6], sigLoc, sigTid, vars);
@@ -280,7 +280,7 @@ public class ProxyDebugEventFactory extends ProxyEventFactory {
 			String[] thread_ids = new String[numThreads + 1];
 			thread_ids[0] = args[1];
 			for (int i=1; i<thread_ids.length; i++) {
-				thread_ids[i] = decodeString(args[i+2]);
+				thread_ids[i] = args[i+2];
 			}
 			evt = new ProxyDebugInfoThreadsEvent(transID, set, thread_ids);
 			break;
@@ -403,15 +403,13 @@ public class ProxyDebugEventFactory extends ProxyEventFactory {
 		return a;
 	}
 	
-	public static IPCDIBreakpoint toBreakpoint(String ignoreStr, String spec, String del, String typeStr, IPCDILineLocation loc) {
+	public static IPCDIBreakpoint toBreakpoint(String ignoreStr, String spec, String del, String type, IPCDILineLocation loc) {
 		IPCDIBreakpoint bpt = null;
 		int typeVal;
 		
 		int ignore = Integer.parseInt(ignoreStr);
 		IPCDICondition cond = new Condition(ignore, null, null);
 		
-		String type = decodeString(typeStr);
-
 		if (type.compareTo("breakpoint") == 0)
 			typeVal = IPCDIBreakpoint.REGULAR;
 		else if (type.compareTo("hw") == 0)
