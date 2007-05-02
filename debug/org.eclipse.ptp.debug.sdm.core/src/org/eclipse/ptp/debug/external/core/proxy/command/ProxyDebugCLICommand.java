@@ -11,6 +11,6 @@ public class ProxyDebugCLICommand extends AbstractProxyDebugCommand implements I
 	}
 
 	public int getCommandID() {
-		return DEBUG_CMD_CLIHANDLE;
+		return CLIHANDLE;
 	}
 }

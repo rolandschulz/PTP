@@ -10,6 +10,6 @@ public class ProxyDebugGoCommand extends AbstractProxyDebugCommand implements IP
 	}
 
 	public int getCommandID() {
-		return DEBUG_CMD_GO;
+		return GO;
 	}
 }

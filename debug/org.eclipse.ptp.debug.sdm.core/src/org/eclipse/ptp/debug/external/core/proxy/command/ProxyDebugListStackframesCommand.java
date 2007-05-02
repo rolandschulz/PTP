@@ -13,6 +13,6 @@ public class ProxyDebugListStackframesCommand extends AbstractProxyDebugCommand 
 	}
 
 	public int getCommandID() {
-		return DEBUG_CMD_LISTSTACKFRAMES;
+		return LISTSTACKFRAMES;
 	}
 }

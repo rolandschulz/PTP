@@ -13,6 +13,6 @@ public class ProxyDebugBreakpointAfterCommand extends AbstractProxyDebugCommand 
 	}
 
 	public int getCommandID() {
-		return DEBUG_CMD_BREAKPOINTAFTER;
+		return BREAKPOINTAFTER;
 	}
 }

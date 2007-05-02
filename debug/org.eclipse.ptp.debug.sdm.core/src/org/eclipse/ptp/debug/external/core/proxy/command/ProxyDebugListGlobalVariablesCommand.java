@@ -10,7 +10,7 @@ public class ProxyDebugListGlobalVariablesCommand extends AbstractProxyDebugComm
 	}
 
 	public int getCommandID() {
-		return DEBUG_CMD_LISTGLOBALVARIABLES;
+		return LISTGLOBALVARIABLES;
 	}
 
 }

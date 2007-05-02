@@ -2,27 +2,20 @@ package org.eclipse.ptp.core.proxy.command;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.eclipse.ptp.core.proxy.AbstractProxyClient;
 import org.eclipse.ptp.core.proxy.IProxyClient;
-import org.eclipse.ptp.core.proxy.event.IProxyEvent;
-import org.eclipse.ptp.core.proxy.event.IProxyEventHandler;
 import org.eclipse.ptp.core.proxy.event.IProxyEventListener;
 
-public abstract class AbstractProxyCommand implements IProxyCommand, Runnable {
+public abstract class AbstractProxyCommand implements IProxyCommand {
 	
 	protected IProxyClient			client;
 	protected int					id;
 	protected ArrayList<String>		args;
 	protected boolean				logEvents = true;
-	
-	private IProxyEvent				event;
-	
-	protected IProxyEventHandler	handler;
 	
 	// CopyOnWriteArrayList used to reduce granularity in handleEvent and remove ConcurrentModificationException
 	protected List<IProxyEventListener> listeners = Collections.synchronizedList(new CopyOnWriteArrayList<IProxyEventListener>());
@@ -70,34 +63,6 @@ public abstract class AbstractProxyCommand implements IProxyCommand, Runnable {
 		return msg;
 	}
 
-	public void setEvent(IProxyEvent event) {
-		this.event = event;
-	}
-
-	public IProxyEventHandler getEventHandler() {
-		return handler;
-	}
-
-	public void setEventHandler(IProxyEventHandler handler) {
-		this.handler = handler;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.proxy.IProxyCommand#run()
-	 */
-	public void run() {
-		if (handler != null && event != null && event.getTransactionID() == id) {
-			handler.handleEvent(this, event);
-			event = null;
-		}
-	}
-
-	public void handleEvent(IProxyEvent event) {
-		if (handler != null && event.getTransactionID() == id) {
-			handler.handleEvent(this, event);
-		}
-	}
-
 	protected void addArgument(String arg) {
 		args.add(arg);
 	}
@@ -105,4 +70,32 @@ public abstract class AbstractProxyCommand implements IProxyCommand, Runnable {
 	protected void addArgument(Integer arg) {
 		args.add(arg.toString());
 	}
+
+	protected void addArgument(Boolean arg) {
+		addArgument(arg?"1":"0");
+	}
+
+	protected void addArgument(Long arg) {
+		args.add(arg.toString());
+	}
+
+	protected void addArgument(Character arg) {
+		args.add(arg==null ? "" : arg.toString());
+	}
+
+	protected void addArguments(String[] args) {
+		for (String arg : args) {
+			addArgument(arg);
+		}
+	}
+
+	public String toString() {
+		String str = this.getClass().getSimpleName() + " tid=" + getTransactionID();
+		
+		for (String arg : args) {
+			str += " " + arg;
+		}
+		return str;
+	}
+
 }

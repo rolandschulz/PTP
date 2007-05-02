@@ -11,6 +11,6 @@ public class ProxyDebugVariableDeleteCommand extends AbstractProxyDebugCommand i
 	}
 
 	public int getCommandID() {
-		return DEBUG_CMD_VARIABLEDELETE;
+		return VARIABLEDELETE;
 	}
 }

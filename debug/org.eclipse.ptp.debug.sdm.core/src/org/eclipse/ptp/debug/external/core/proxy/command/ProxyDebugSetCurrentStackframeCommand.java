@@ -11,6 +11,6 @@ public class ProxyDebugSetCurrentStackframeCommand extends AbstractProxyDebugCom
 	}
 
 	public int getCommandID() {
-		return DEBUG_CMD_SETCURRENTSTACKFRAME;
+		return SETCURRENTSTACKFRAME;
 	}
 }

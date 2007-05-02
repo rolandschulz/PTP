@@ -16,6 +16,6 @@ public class ProxyDebugDataWriteMemoryCommand extends AbstractProxyDebugCommand 
 	}
 
 	public int getCommandID() {
-		return DEBUG_CMD_DATAWRITEMEMORY;
+		return DATAWRITEMEMORY;
 	}
 }

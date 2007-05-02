@@ -11,6 +11,6 @@ public class ProxyDebugGetTypeCommand extends AbstractProxyDebugCommand implemen
 	}
 
 	public int getCommandID() {
-		return DEBUG_CMD_GETTYPE;
+		return GETTYPE;
 	}
 }

@@ -11,6 +11,6 @@ public class ProxyDebugSignalInfoCommand extends AbstractProxyDebugCommand imple
 	}
 
 	public int getCommandID() {
-		return DEBUG_CMD_SIGNALINFO;
+		return SIGNALINFO;
 	}
 }

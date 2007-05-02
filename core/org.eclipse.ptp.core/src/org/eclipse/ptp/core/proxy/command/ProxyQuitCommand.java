@@ -10,7 +10,7 @@ public class ProxyQuitCommand extends AbstractProxyCommand {
 	}
 
 	public int getCommandID() {
-		return CMD_QUIT;
+		return QUIT;
 	}
 
 	public String toString() {

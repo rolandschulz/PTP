@@ -13,6 +13,6 @@ public class ProxyDebugListArgumentsCommand extends AbstractProxyDebugCommand im
 	}
 
 	public int getCommandID() {
-		return DEBUG_CMD_LISTARGUMENTS;
+		return LISTARGUMENTS;
 	}
 }

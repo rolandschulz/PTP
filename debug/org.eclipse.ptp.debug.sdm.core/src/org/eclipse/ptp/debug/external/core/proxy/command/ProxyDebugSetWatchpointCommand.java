@@ -18,6 +18,6 @@ public class ProxyDebugSetWatchpointCommand extends AbstractProxyDebugCommand im
 	}
 
 	public int getCommandID() {
-		return DEBUG_CMD_SETWATCHPOINT;
+		return SETWATCHPOINT;
 	}
 }

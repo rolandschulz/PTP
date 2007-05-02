@@ -64,9 +64,9 @@ public abstract class AbstractProxyClient implements IProxyClient {
 	
 	private List<IProxyEventListener>	listeners = Collections.synchronizedList(new ArrayList<IProxyEventListener>());
 
-	private static Charset			charset = Charset.forName("US-ASCII");
-	private static CharsetEncoder	encoder = charset.newEncoder();
-	private static CharsetDecoder	decoder = charset.newDecoder();
+	private Charset			charset = Charset.forName("US-ASCII");
+	private CharsetEncoder	encoder = charset.newEncoder();
+	private CharsetDecoder	decoder = charset.newDecoder();
 
 	private enum SessionState {WAITING, CONNECTED, RUNNING, SHUTTING_DOWN, SHUT_DOWN};
 	
@@ -240,8 +240,8 @@ public abstract class AbstractProxyClient implements IProxyClient {
 				try {
 					System.out.println("accept thread starting...");
 					sessSock = sessSvrSock.accept();
-					setSessionState(SessionState.CONNECTED);
 					fireProxyConnectedEvent(new ProxyConnectedEvent());
+					setSessionState(SessionState.CONNECTED);
 				} catch (SocketTimeoutException e) {
 					fireProxyTimeoutEvent(new ProxyTimeoutEvent());
 				} catch (ClosedByInterruptException e) {

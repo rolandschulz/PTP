@@ -10,6 +10,6 @@ public class ProxyDebugInterruptCommand extends AbstractProxyDebugCommand implem
 	}
 
 	public int getCommandID() {
-		return DEBUG_CMD_INTERRUPT;
+		return INTERRUPT;
 	}
 }

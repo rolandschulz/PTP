@@ -14,6 +14,6 @@ public class ProxyDebugGetPartialAIFCommand extends AbstractProxyDebugCommand im
 	}
 
 	public int getCommandID() {
-		return DEBUG_CMD_GETPARTIALAIF;
+		return GETPARTIALAIF;
 	}
 }

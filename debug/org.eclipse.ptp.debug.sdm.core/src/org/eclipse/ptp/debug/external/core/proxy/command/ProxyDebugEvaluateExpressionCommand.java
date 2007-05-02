@@ -11,6 +11,6 @@ public class ProxyDebugEvaluateExpressionCommand extends AbstractProxyDebugComma
 	}
 
 	public int getCommandID() {
-		return DEBUG_CMD_EVALUATEEXPRESSION;
+		return EVALUATEEXPRESSION;
 	}
 }
