@@ -20,7 +20,39 @@
 package org.eclipse.ptp.debug.external.core.proxy;
 
 import java.io.IOException;
+
 import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.external.core.proxy.command.IProxyDebugCommand;
+import org.eclipse.ptp.debug.external.core.proxy.command.ProxyDebugBreakpointAfterCommand;
+import org.eclipse.ptp.debug.external.core.proxy.command.ProxyDebugCLICommand;
+import org.eclipse.ptp.debug.external.core.proxy.command.ProxyDebugConditionBreakpointCommand;
+import org.eclipse.ptp.debug.external.core.proxy.command.ProxyDebugDataReadMemoryCommand;
+import org.eclipse.ptp.debug.external.core.proxy.command.ProxyDebugDataWriteMemoryCommand;
+import org.eclipse.ptp.debug.external.core.proxy.command.ProxyDebugDeleteBreakpointCommand;
+import org.eclipse.ptp.debug.external.core.proxy.command.ProxyDebugDisableBreakpointCommand;
+import org.eclipse.ptp.debug.external.core.proxy.command.ProxyDebugEnableBreakpointCommand;
+import org.eclipse.ptp.debug.external.core.proxy.command.ProxyDebugEvaluateExpressionCommand;
+import org.eclipse.ptp.debug.external.core.proxy.command.ProxyDebugGetPartialAIFCommand;
+import org.eclipse.ptp.debug.external.core.proxy.command.ProxyDebugGetTypeCommand;
+import org.eclipse.ptp.debug.external.core.proxy.command.ProxyDebugGoCommand;
+import org.eclipse.ptp.debug.external.core.proxy.command.ProxyDebugInterruptCommand;
+import org.eclipse.ptp.debug.external.core.proxy.command.ProxyDebugListArgumentsCommand;
+import org.eclipse.ptp.debug.external.core.proxy.command.ProxyDebugListGlobalVariablesCommand;
+import org.eclipse.ptp.debug.external.core.proxy.command.ProxyDebugListInfoThreadsCommand;
+import org.eclipse.ptp.debug.external.core.proxy.command.ProxyDebugListLocalVariablesCommand;
+import org.eclipse.ptp.debug.external.core.proxy.command.ProxyDebugListSignalsCommand;
+import org.eclipse.ptp.debug.external.core.proxy.command.ProxyDebugListStackframesCommand;
+import org.eclipse.ptp.debug.external.core.proxy.command.ProxyDebugSetCurrentStackframeCommand;
+import org.eclipse.ptp.debug.external.core.proxy.command.ProxyDebugSetFunctionBreakpointCommand;
+import org.eclipse.ptp.debug.external.core.proxy.command.ProxyDebugSetLineBreakpointCommand;
+import org.eclipse.ptp.debug.external.core.proxy.command.ProxyDebugSetThreadSelectCommand;
+import org.eclipse.ptp.debug.external.core.proxy.command.ProxyDebugSetWatchpointCommand;
+import org.eclipse.ptp.debug.external.core.proxy.command.ProxyDebugSignalInfoCommand;
+import org.eclipse.ptp.debug.external.core.proxy.command.ProxyDebugStackInfoDepthCommand;
+import org.eclipse.ptp.debug.external.core.proxy.command.ProxyDebugStartSessionCommand;
+import org.eclipse.ptp.debug.external.core.proxy.command.ProxyDebugStepCommand;
+import org.eclipse.ptp.debug.external.core.proxy.command.ProxyDebugTerminateCommand;
+import org.eclipse.ptp.debug.external.core.proxy.command.ProxyDebugVariableDeleteCommand;
 
 public class ProxyDebugClient extends AbstractProxyDebugClient {
 	public static final int STEP_INTO = 0;
@@ -28,170 +60,156 @@ public class ProxyDebugClient extends AbstractProxyDebugClient {
 	public static final int STEP_FINISH = 2;
 	
 	public void debugStartSession(String prog, String path, String dir, String[] args) throws IOException {
-		sendCommand("INI", prog, path, dir, args);
+		IProxyDebugCommand cmd = new ProxyDebugStartSessionCommand(this, prog, path, dir, args);
+		cmd.send();
 	}
 	
 	public void debugSetLineBreakpoint(BitList procs, int bpid, boolean isTemporary, boolean isHardware, String file, int line, String expression, int ignoreCount, int tid) throws IOException {
-		String[] args = new String[] {
-			Integer.toString(bpid),
-			Integer.toString(isTemporary?1:0),
-			Integer.toString(isHardware?1:0),
-			file,
-			Integer.toString(line),
-			expression,
-			Integer.toString(ignoreCount),
-			Integer.toString(tid)
-		};
-		sendCommand("SLB", procs, args);
+		IProxyDebugCommand cmd = new ProxyDebugSetLineBreakpointCommand(this, procs, bpid, isTemporary, isHardware, file, line, expression, ignoreCount, tid);
+		cmd.send();
 	}
 	
 	public void debugSetFuncBreakpoint(BitList procs, int bpid, boolean isTemporary, boolean isHardware, String file, String func, String expression, int ignoreCount, int tid) throws IOException {
-		String[] args = new String[] {
-			Integer.toString(bpid),
-			Integer.toString(isTemporary?1:0),
-			Integer.toString(isHardware?1:0),
-			file,
-			func,
-			expression,
-			Integer.toString(ignoreCount),
-			Integer.toString(tid)
-		};
-		sendCommand("SFB", procs, args);
+		IProxyDebugCommand cmd = new ProxyDebugSetFunctionBreakpointCommand(this, procs, bpid, isTemporary, isHardware, file, func, expression, ignoreCount, tid);
+		cmd.send();
 	}
 	
 	public void debugSetWatchpoint(BitList procs, int bpid, String expression, boolean isAccess, boolean isRead, String condition, int ignoreCount) throws IOException {
-		String[] args = new String[] {
-			Integer.toString(bpid),
-			expression,
-			Integer.toString(isAccess?1:0),
-			Integer.toString(isRead?1:0),
-			condition,
-			Integer.toString(ignoreCount)
-		};
-		sendCommand("SWP", procs, args);
+		IProxyDebugCommand cmd = new ProxyDebugSetWatchpointCommand(this, procs, bpid, expression, isAccess, isRead, condition, ignoreCount);
+		cmd.send();
 	}
 	
 	public void debugDeleteBreakpoint(BitList procs, int bpid) throws IOException {
-		sendCommand("DBP", procs, Integer.toString(bpid));
+		IProxyDebugCommand cmd = new ProxyDebugDeleteBreakpointCommand(this, procs, bpid);
+		cmd.send();
 	}
 
 	public void debugEnableBreakpoint(BitList procs, int bpid) throws IOException {
-		sendCommand("EAB", procs, Integer.toString(bpid));
+		IProxyDebugCommand cmd = new ProxyDebugEnableBreakpointCommand(this, procs, bpid);
+		cmd.send();
 	}
 
 	public void debugDisableBreakpoint(BitList procs, int bpid) throws IOException {
-		sendCommand("DAB", procs, Integer.toString(bpid));
+		IProxyDebugCommand cmd = new ProxyDebugDisableBreakpointCommand(this, procs, bpid);
+		cmd.send();
 	}
 
 	public void debugConditionBreakpoint(BitList procs, int bpid, String expr) throws IOException {
-		sendCommand("CBP", procs, Integer.toString(bpid), expr);
+		IProxyDebugCommand cmd = new ProxyDebugConditionBreakpointCommand(this, procs, bpid, expr);
+		cmd.send();
 	}
 
 	public void debugBreakpointAfter(BitList procs, int bpid, int icount) throws IOException {
-		sendCommand("BPA", procs, Integer.toString(bpid), Integer.toString(icount));
+		IProxyDebugCommand cmd = new ProxyDebugBreakpointAfterCommand(this, procs, bpid, icount);
+		cmd.send();
 	}
 
 	public void debugStackInfoDepth(BitList procs) throws IOException {
-		sendCommand("SID", procs);
+		IProxyDebugCommand cmd = new ProxyDebugStackInfoDepthCommand(this, procs);
+		cmd.send();
 	}
+	
 	public void debugGo(BitList procs) throws IOException {
-		sendCommand("GOP", procs);
+		IProxyDebugCommand cmd = new ProxyDebugGoCommand(this, procs);
+		cmd.send();
 	}
 	
 	public void debugStep(BitList procs, int count, int type) throws IOException {
-		sendCommand("STP", procs, Integer.toString(count), Integer.toString(type));
+		IProxyDebugCommand cmd = new ProxyDebugStepCommand(this, procs, count, type);
+		cmd.send();
 	}
 	
 	public void debugTerminate(BitList procs) throws IOException {
-		sendCommand("TRM", procs);
+		IProxyDebugCommand cmd = new ProxyDebugTerminateCommand(this, procs);
+		cmd.send();
 	}
 	
 	public void debugInterrupt(BitList procs) throws IOException {
-		sendCommand("HLT", procs);
+		IProxyDebugCommand cmd = new ProxyDebugInterruptCommand(this, procs);
+		cmd.send();
 	}
 
 	public void debugListStackframes(BitList procs, int low, int high) throws IOException {
-		sendCommand("LSF", procs, Integer.toString(low), Integer.toString(high));
+		IProxyDebugCommand cmd = new ProxyDebugListStackframesCommand(this, procs, low, high);
+		cmd.send();
 	}
 
 	public void debugSetCurrentStackframe(BitList procs, int level) throws IOException {
-		sendCommand("SCS", procs, Integer.toString(level));
+		IProxyDebugCommand cmd = new ProxyDebugSetCurrentStackframeCommand(this, procs, level);
+		cmd.send();
 	}
 
 	public void debugEvaluateExpression(BitList procs, String expr) throws IOException {
-		sendCommand("EEX", procs, expr);
+		IProxyDebugCommand cmd = new ProxyDebugEvaluateExpressionCommand(this, procs, expr);
+		cmd.send();
 	}
 
 	public void debugGetType(BitList procs, String expr) throws IOException {
-		sendCommand("TYP", procs, expr);
+		IProxyDebugCommand cmd = new ProxyDebugGetTypeCommand(this, procs, expr);
+		cmd.send();
 	}
 
 	public void debugListLocalVariables(BitList procs) throws IOException {
-		sendCommand("LLV", procs);
+		IProxyDebugCommand cmd = new ProxyDebugListLocalVariablesCommand(this, procs);
+		cmd.send();
 	}
 
 	public void debugListArguments(BitList procs, int low, int high) throws IOException {
-		sendCommand("LAR", procs, Integer.toString(low), Integer.toString(low));
+		IProxyDebugCommand cmd = new ProxyDebugListArgumentsCommand(this, procs, low, high);
+		cmd.send();
 	}
 
 	public void debugListGlobalVariables(BitList procs) throws IOException {
-		sendCommand("LGV", procs);
+		IProxyDebugCommand cmd = new ProxyDebugListGlobalVariablesCommand(this, procs);
+		cmd.send();
 	}
 
 	public void debugListInfoThreads(BitList procs) throws IOException {
-		sendCommand("ITH", procs);
+		IProxyDebugCommand cmd = new ProxyDebugListInfoThreadsCommand(this, procs);
+		cmd.send();
 	}
 	public void debugSetThreadSelect(BitList procs, int threadNum) throws IOException {
-		sendCommand("THS", procs, Integer.toString(threadNum));
+		IProxyDebugCommand cmd = new ProxyDebugSetThreadSelectCommand(this, procs, threadNum);
+		cmd.send();
 	}
 	
 	public void setDataReadMemoryCommand(BitList procs, long offset, String address, String format, int wordSize, int rows, int cols, Character asChar) throws IOException {
-		String[] args = new String[] {
-				Long.toString(offset),
-				address,
-				format,
-				Integer.toString(wordSize),
-				Integer.toString(rows),
-				Integer.toString(cols),
-				asChar==null?"":asChar.toString()
-			};
-		sendCommand("DRM", procs, args);
+		IProxyDebugCommand cmd = new ProxyDebugDataReadMemoryCommand(this, procs, offset, address, format, wordSize, rows, cols, asChar);
+		cmd.send();
 	}
 	
 	public void setDataWriteMemoryCommand(BitList procs, long offset, String address, String format, int wordSize, String value) throws IOException {
-		String[] args = new String[] {
-				Long.toString(offset),
-				address,
-				format,
-				Integer.toString(wordSize),
-				value
-			};
-		sendCommand("DWM", procs, args);
+		IProxyDebugCommand cmd = new ProxyDebugDataWriteMemoryCommand(this, procs, offset, address, format, wordSize, value);
+		cmd.send();
 	}
 
 	public void debugListSignals(BitList procs, String name) throws IOException {
-		sendCommand("LSI", procs, name);
+		IProxyDebugCommand cmd = new ProxyDebugListSignalsCommand(this, procs, name);
+		cmd.send();
 	}
+	
 	public void debugSignalInfo(BitList procs, String arg) throws IOException {
-		sendCommand("SIG", procs, arg);
+		IProxyDebugCommand cmd = new ProxyDebugSignalInfoCommand(this, procs, arg);
+		cmd.send();
 	}
+	
 	public void debugCLIHandle(BitList procs, String arg) throws IOException {
-		sendCommand("CHL", procs, arg);
+		IProxyDebugCommand cmd = new ProxyDebugCLICommand(this, procs, arg);
+		cmd.send();
 	}
 
 	public void debugDataEvaluateExpression(BitList procs, String expr) throws IOException {
-		sendCommand("DEE", procs, expr);
+		IProxyDebugCommand cmd = new ProxyDebugEvaluateExpressionCommand(this, procs, expr);
+		cmd.send();
 	}
+	
 	public void debugGetPartialAIF(BitList procs, String name, String key, boolean listChildren, boolean express) throws IOException {
-		String[] args = new String[] {
-				name,
-				key,
-				Integer.toString(listChildren?1:0),
-				Integer.toString(express?1:0)
-			};
-		sendCommand("GPA", procs, args);
+		IProxyDebugCommand cmd = new ProxyDebugGetPartialAIFCommand(this, procs, name, key, listChildren, express);
+		cmd.send();
 	}
+	
 	public void debugVariableDelete(BitList procs, String name) throws IOException {
-		sendCommand("VDE", procs, name);
+		IProxyDebugCommand cmd = new ProxyDebugVariableDeleteCommand(this, procs, name);
+		cmd.send();
 	}
 }
