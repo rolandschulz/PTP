@@ -23,6 +23,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.core.proxy.AbstractProxyClient;
@@ -64,6 +67,8 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient imple
 	private boolean		waiting = false;
 	private boolean		connected = false;
 	private final long WAIT_CONNECTION = 60000;
+	private final ReentrantLock waitLock = new ReentrantLock();
+	private final Condition waitCondition = waitLock.newCondition();
 	
 	public AbstractProxyDebugClient() {
 		super(new ProxyDebugEventFactory());
@@ -77,13 +82,18 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient imple
 	}
 	
 	public synchronized void checkConnection() throws IOException {
-		if (!connected) {
-			try {
+		waitLock.lock();
+		try {
+			if (!connected) {
 				waiting = true;
-				wait(WAIT_CONNECTION);
-			} catch (InterruptedException e) {
-				throw new IOException(e.getMessage());
+				try {
+					waitCondition.await(WAIT_CONNECTION, TimeUnit.MILLISECONDS);
+				} catch (InterruptedException e) {
+					// Expect to be interrupted if monitor is cancelled
+				}
 			}
+		} finally {
+			waitLock.unlock();
 		}
 		if (!connected) {
 			closeConnection();
@@ -92,18 +102,25 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient imple
 	}
 	
 	public synchronized boolean waitForConnect(IProgressMonitor monitor) throws IOException {
+		System.out.println("debug: waiting for connect");
+		waitLock.lock();
 		try {
-			while (!connected) {
+			while (!connected && !monitor.isCanceled()) {
 				waiting = true;
-				if (monitor.isCanceled()) {
-					closeConnection();
-					return false;
+				try {
+					waitCondition.await(1000, TimeUnit.MILLISECONDS);
+					System.out.println("still waiting...");
+				} catch (InterruptedException e) {
+					// Expect to be interrupted if monitor is cancelled
 				}
-				wait(500);
 			}
-		} catch (InterruptedException e) {
-			closeConnection();
-			throw new IOException(e.getMessage());
+			if (monitor.isCanceled()) {
+				closeConnection();
+				return false;
+			}
+		} finally {
+			waitLock.unlock();
+			monitor.done();
 		}
 		return true;
 	}
@@ -136,28 +153,35 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient imple
 	}
 		
 	public void handleProxyConnectedEvent(IProxyConnectedEvent e) {
-		connected = true;
-		if (waiting) {
-			notifyAll();
-			waiting = false;
+		System.out.println("debug: received connected event");
+		waitLock.lock();
+		try {
+			connected = true;
+			if (waiting) {
+				waitCondition.signal();
+				waiting = false;
+			}
+		} finally {
+			waitLock.unlock();
 		}
 	}
 
 	public void handleProxyDisconnectedEvent(IProxyDisconnectedEvent e) {
-		// TODO Auto-generated method stub
-		
+		System.out.println("debug: received disconnected event");
 	}
 	
 	public void handleProxyErrorEvent(IProxyErrorEvent e) {
+		System.out.println("debug: received error event");
 	}
 
 	public void handleProxyOKEvent(IProxyOKEvent e) {
+		System.out.println("debug: received ok event");
 	}
 
 	public void handleProxyTimeoutEvent(IProxyTimeoutEvent e) {
-		// TODO Auto-generated method stub
-		
+		System.out.println("debug: received timeout event");
 	}
+	
 	public void handleProxyExtendedEvent(IProxyExtendedEvent e) {
 		if (e instanceof IProxyDebugArgsEvent) {
 			fireProxyDebugArgsEvent((IProxyDebugArgsEvent) e);
