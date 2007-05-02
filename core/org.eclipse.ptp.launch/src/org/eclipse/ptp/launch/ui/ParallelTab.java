@@ -351,17 +351,21 @@ public class ParallelTab extends PLaunchConfigurationTab {
 		configuration.setAttribute(IPTPLaunchConfigurationConstants.QUEUE_NAME,
 				getQueueNameFromCombo());
 		final IResourceManager rm = getResourceManagerFromCombo();
-		IRMLaunchConfigurationDynamicTab rmDynamicTab = getRMLaunchConfigurationDynamicTab(rm);
-		if (rmDynamicTab == null) {
-			setErrorMessage("No Launch Configuration Available for Resource Manager: " +
-					rm.getName());
-			return;
-		}
-		final IPQueue queue = getQueueFromCombo();
-		RMLaunchValidation validation = rmDynamicTab.performApply(configuration, rm, queue);
-		if (!validation.isSuccess()) {
-			setErrorMessage(validation.getMessage());
-			return;
+		if (rm != null) {
+			IRMLaunchConfigurationDynamicTab rmDynamicTab = getRMLaunchConfigurationDynamicTab(rm);
+			if (rmDynamicTab == null) {
+				setErrorMessage("No Launch Configuration Available for Resource Manager: " +
+						rm.getName());
+				return;
+			}
+			final IPQueue queue = getQueueFromCombo();
+			if (queue != null) {
+				RMLaunchValidation validation = rmDynamicTab.performApply(configuration, rm, queue);
+				if (!validation.isSuccess()) {
+					setErrorMessage(validation.getMessage());
+					return;
+				}
+			}
 		}
 		
 	}
