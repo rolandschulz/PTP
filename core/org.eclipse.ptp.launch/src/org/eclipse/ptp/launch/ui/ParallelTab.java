@@ -73,36 +73,14 @@ public class ParallelTab extends PLaunchConfigurationTab {
 		
 		public void widgetSelected(SelectionEvent e) {
 
+		    System.out.println("XXXXX widgetSelected");
+		    
 			if (e.getSource() == resourceManagerCombo) {
-				/*
-				 * After a resource manager is chosen the machine and
-				 * queues combo boxes must be re-loaded, and the attributes'
-				 * controls must be updated.
-				 */
-				IResourceManager rm = getResourceManagerFromCombo();
-				loadQueueCombo(rm);
-				final IPQueue queue = getQueueFromCombo();
-
-				// Update the dynamic portions of the launch configuration
-				// tab.
-				updateLaunchAttributeControls(rm, queue, getLaunchConfiguration());
+				rmSelectionChanged();
 			}
 			else if (e.getSource() == queueCombo) {
-				// If a different queue is chosen the
-				// attributes' controls must be updated.
-				final IResourceManager rm = getResourceManagerFromCombo();
-				final IPQueue queue = getQueueFromCombo();
-
-				// Update the dynamic portions of the launch configuration
-				// tab.
-				updateLaunchAttributeControls(rm, queue, getLaunchConfiguration());
+				queueSelectionChanged();
 			}
-
-			/*
-			 * Updates the buttons and message in this page's launch
-			 * configuration dialog.
-			 */
-			updateLaunchConfigurationDialog();
 		}
 	}
 
@@ -191,9 +169,8 @@ public class ParallelTab extends PLaunchConfigurationTab {
 			resourceManagers.put(i, rms[i]);
 			resourceManagerIndices.put(rms[i], i);
 		}
-		resourceManagerCombo.select(0);
 		resourceManagerCombo.addSelectionListener(combosListener);
-
+ 
 		new Label(parallelComp, SWT.NONE).setText("Select queue:");
 		queueCombo = new Combo(parallelComp, SWT.READ_ONLY);
 
@@ -218,7 +195,8 @@ public class ParallelTab extends PLaunchConfigurationTab {
 		createVerticalSpacer(attrGroup, 2);
 		
 		createVerticalSpacer(parallelComp, 2);
-	}
+		resourceManagerCombo.deselectAll();
+ 	}
 
 	/**
 	 * @see ILaunchConfigurationTab#getImage()
@@ -594,6 +572,50 @@ public class ParallelTab extends PLaunchConfigurationTab {
 		queueCombo.select(0);
 	}
 
+	/**
+     * 
+     */
+    private void queueSelectionChanged() {
+        // If a different queue is chosen the
+        // attributes' controls must be updated.
+        final IResourceManager rm = getResourceManagerFromCombo();
+        final IPQueue queue = getQueueFromCombo();
+
+        // Update the dynamic portions of the launch configuration
+        // tab.
+        updateLaunchAttributeControls(rm, queue, getLaunchConfiguration());
+
+        /*
+         * Updates the buttons and message in this page's launch
+         * configuration dialog.
+         */
+        updateLaunchConfigurationDialog();
+    }
+
+	/**
+     * 
+     */
+    private void rmSelectionChanged() {
+        /*
+         * After a resource manager is chosen the machine and
+         * queues combo boxes must be re-loaded, and the attributes'
+         * controls must be updated.
+         */
+        IResourceManager rm = getResourceManagerFromCombo();
+        loadQueueCombo(rm);
+        final IPQueue queue = getQueueFromCombo();
+    
+        // Update the dynamic portions of the launch configuration
+        // tab.
+        updateLaunchAttributeControls(rm, queue, getLaunchConfiguration());
+    
+        /*
+         * Updates the buttons and message in this page's launch
+         * configuration dialog.
+         */
+        updateLaunchConfigurationDialog();
+    }
+
 	private void setLaunchConfiguration(ILaunchConfiguration configuration) {
 		launchConfiguration = configuration;
 	}
@@ -608,17 +630,19 @@ public class ParallelTab extends PLaunchConfigurationTab {
 		if (results != null)
 			i = results.intValue();
 		queueCombo.select(i);
+		queueSelectionChanged();
 	}
 
-	private void setResourceManagerComboSelection(IResourceManager rm) {
+    private void setResourceManagerComboSelection(IResourceManager rm) {
 		final Integer results = resourceManagerIndices.get(rm);
 		int i = 0;
 		if (results != null)
 			i = results.intValue();
 		resourceManagerCombo.select(i);
+		rmSelectionChanged();
 	}
 
-	/**
+    /**
 	 * This routine is called when either the resource manager or the
 	 * queue has been changed via the combo boxes.  It's job is to
 	 * regenerate the dynamic ui components, dependent on the resource
