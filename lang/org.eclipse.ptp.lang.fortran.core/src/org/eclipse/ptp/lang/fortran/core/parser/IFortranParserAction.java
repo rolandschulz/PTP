@@ -60,6 +60,38 @@ public abstract interface IFortranParserAction {
 		CHARACTER,
 		LOGICAL
 	}
+	
+	public enum IntentSpec {
+		IN,
+		OUT,
+		INOUT
+	}
+	
+	public enum AttrSpec {
+		none,
+		PUBLIC,
+		PRIVATE,
+		ALLOCATABLE,
+		ASYNCHRONOUS,
+		DIMENSION,
+		EXTERNAL,
+		INTENT,
+		INTRINSIC,
+		BINDC,
+		OPTIONAL,
+		PARAMETER,
+		POINTER,
+		PROTECTED,
+		SAVE,
+		TARGET,
+		VALUE,
+		VOLATILE,
+		// binding-attr
+		PASS,
+		NOPASS,
+		NON_OVERRIDABLE,
+		DEFERRED
+	}
 
 	/** R102 list
 	 * generic_name (xyz-name)
@@ -67,9 +99,11 @@ public abstract interface IFortranParserAction {
 	 * 	:	T_IDENT ( T_COMMA T_IDENT )*
 	 * 
 	 * @param count The number of items in the list.
+	 * @param ident The name of the item placed in the list.
 	 */
 	public abstract void generic_name_list__begin();
 	public abstract void generic_name_list(int count);
+	public void generic_name_list_part(Token ident);
 
 	/** R210
 	 * internal_subprogram_part
@@ -214,27 +248,27 @@ public abstract interface IFortranParserAction {
 	 */
 	 public abstract void real_literal_constant(Token digits, Token fractionExp, Token kindParam);
 
-		/** R422
-		 * real_part
-		 * 
-		 * ERR_CHK 422 named_constant replaced by T_IDENT
-		 * 
-		 * @param hasIntConstant True if signed-int-literal-constant is present
-		 * @param hasRealConstant True if signed-real-literal-constant is present
-		 * @param id The named-constant (optional)
-		 */
-		public abstract void real_part(boolean hasIntConstant, boolean hasRealConstant, Token id);
+	/** R422
+	 * real_part
+	 * 
+	 * ERR_CHK 422 named_constant replaced by T_IDENT
+	 * 
+	 * @param hasIntConstant True if signed-int-literal-constant is present
+	 * @param hasRealConstant True if signed-real-literal-constant is present
+	 * @param id The named-constant (optional)
+	 */
+	public abstract void real_part(boolean hasIntConstant, boolean hasRealConstant, Token id);
 
-		/** R423
-		 * imag_part
-		 * 
-		 * ERR_CHK 423 named_constant replaced by T_IDENT
-		 * 
-		 * @param hasIntConstant True if signed-int-literal-constant is present
-		 * @param hasRealConstant True if signed-real-literal-constant is present
-		 * @param id The named-constant (optional)
-		 */
-		public abstract void imag_part(boolean hasIntConstant, boolean hasRealConstant, Token id);
+	/** R423
+	 * imag_part
+	 * 
+	 * ERR_CHK 423 named_constant replaced by T_IDENT
+	 * 
+	 * @param hasIntConstant True if signed-int-literal-constant is present
+	 * @param hasRealConstant True if signed-real-literal-constant is present
+	 * @param id The named-constant (optional)
+	 */
+	public abstract void imag_part(boolean hasIntConstant, boolean hasRealConstant, Token id);
 
 	/** R424
 	 * char-selector
@@ -350,6 +384,18 @@ public abstract interface IFortranParserAction {
 	public abstract void proc_component_attr_spec_list__begin();
 	public abstract void proc_component_attr_spec_list(int count);
 
+	/** R453
+	 * binding_attr
+	 *	: T_PASS ( T_LPAREN T_IDENT T_RPAREN )?
+	 *	| T_NOPASS
+	 *	| T_NON_OVERRIDABLE
+	 *	| T_DEFERRED
+	 *	| access_spec
+	 *
+	 * @param attr The binding attribute.
+	 */
+	public abstract void binding_attr(AttrSpec attr);
+
 	/** R453 list
 	 * binding_attr_list
 	 * 		binding_attr ( T_COMMA binding_attr )*
@@ -386,6 +432,13 @@ public abstract interface IFortranParserAction {
 	public abstract void enumerator_list__begin();
 	public abstract void enumerator_list(int count);
 
+	/** R465
+	 * array_constructor
+	 *	:	T_LPAREN T_SLASH ac_spec T_SLASH T_RPAREN
+	 *	|	T_LBRACKET ac_spec T_RBRACKET
+	 */
+	public abstract void array_constructor();
+
 	/** R469 list
 	 * ac_value_list
 	 * 		ac_value ( T_COMMA ac_value )*
@@ -405,7 +458,30 @@ public abstract interface IFortranParserAction {
 	 */
 	public abstract void type_declaration_stmt__begin();
 	public abstract void type_declaration_stmt(Token label, int numAttributes);
-	
+
+	/** R503
+	 * attr_spec
+	 *	:	access_spec
+	 *	|	T_ALLOCATABLE
+	 *	|	T_ASYNCHRONOUS
+	 *	|	T_DIMENSION T_LPAREN array_spec T_RPAREN
+	 *	|	T_EXTERNAL
+	 *	|	T_INTENT T_LPAREN intent_spec T_RPAREN
+	 *	|	T_INTRINSIC
+	 *	|	language_binding_spec		
+	 *	|	T_OPTIONAL
+	 *	|	T_PARAMETER
+	 *	|	T_POINTER
+	 *	|	T_PROTECTED
+	 *	|	T_SAVE
+	 *	|	T_TARGET
+	 *	|	T_VALUE
+	 *	|	T_VOLATILE
+	 *
+	 * @param attr The attribute specification
+	 */
+	public abstract void attr_spec(AttrSpec attr);
+
 	/** R504, R503-F2008
 	 * entity_decl
 	 *  : T_IDENT ( T_LPAREN array_spec T_RPAREN )?
@@ -446,6 +522,14 @@ public abstract interface IFortranParserAction {
 	 */
 	public abstract void null_init(Token id);
 
+	/** R511
+	 * explicit_shape_spec
+ 	 * expr ( T_COLON expr )?
+	 * 
+	 * @param hasUpperBound Whether the shape spec is of the form x:y.
+	 */
+	public abstract void explicit_shape_spec(boolean hasUpperBound);
+
 	/** R511 list
 	 * explicit_shape_spec_list
 	 *	:	explicit_shape_spec ( T_COMMA explicit_shape_spec )*
@@ -455,7 +539,15 @@ public abstract interface IFortranParserAction {
 	public abstract void explicit_shape_spec_list__begin();
 	public abstract void explicit_shape_spec_list(int count);
 
-	/** R519-08 list
+	/** R517
+	 * intent_spec
+	 *	:	T_IN | T_OUT | T_IN T_OUT | T_INOUT
+	 *
+	 * @param intent The type of intent-spec.
+	 */
+	public abstract void intent_spec(IntentSpec intent);
+
+		/** R519-08 list
 	 * deferred_co_shape_spec_list
 	 *	:	T_COLON ( T_COMMA T_COLON )*
 	 * 
@@ -685,6 +777,28 @@ public abstract interface IFortranParserAction {
 	public abstract void section_subscript_list__begin();
 	public abstract void section_subscript_list(int count);
 
+	/** R623
+	 * allocate_stmt
+	 *	:	(label)? T_ALLOCATE_STMT_1 T_ALLOCATE T_LPAREN type_spec T_COLON_COLON
+	 *		allocation_list (T_COMMA alloc_opt_list)? T_RPAREN T_EOS
+	 *	|	(label)? T_ALLOCATE T_LPAREN
+	 *		allocation_list (T_COMMA alloc_opt_list)? T_RPAREN T_EOS
+	 *
+	 * @param label Optional statement label
+	 * @param hasTypeSpec True if type-spec is present
+	 * @param hasAllocOptList True if alloc-opt-list is present
+	 */
+	public abstract void allocate_stmt(Token label, boolean hasTypeSpec, boolean hasAllocOptList);
+
+	/** R624
+	 * alloc_opt
+	 *	:	T_IDENT			// {'STAT','ERRMSG'} are variables {SOURCE'} is expr
+	 *		T_EQUALS expr
+	 *
+	 * @param allocOpt Identifier representing {'STAT','ERRMSG','SOURCE'}
+	 */
+	public abstract void alloc_opt(Token allocOpt);
+	
 	/** R624 list
 	 * alloc_opt_list
 	 * 	:    alloc_opt ( T_COMMA alloc_opt )*
@@ -693,6 +807,21 @@ public abstract interface IFortranParserAction {
 	 */
 	public abstract void alloc_opt_list__begin();
 	public abstract void alloc_opt_list(int count);
+
+	/** R628, R631-F2008
+	 * allocation
+	 *    	( T_LPAREN allocate_shape_spec_list {hasAllocateShapeSpecList=true;} T_RPAREN )?
+	 *		( T_LBRACKET allocate_co_array_spec {hasAllocateCoArraySpec=true;} T_RBRACKET )?
+	 *
+	 * NOTE: In current parser, hasAllocateShapeSpecList is always false, appears as
+	 * R619 section-subscript-list.  In a section-subscript, the stride shall not be present
+	 * and if hasUpperBound is false, hasLowerBound shall be present and must be interpreted
+	 * as an upper-bound-expr.
+	 * 
+	 * @param hasAllocateShapeSpecList True if allocate-shape-spec-list is present.
+	 * @param hasAllocateCoArraySpec True if allocate-co-array-spec is present.
+	 */
+	public abstract void allocation(boolean hasAllocateShapeSpecList, boolean hasAllocateCoArraySpec);
 
 	/** R628 list
 	 * allocation_list
@@ -705,12 +834,23 @@ public abstract interface IFortranParserAction {
 
 	/** R629 list
 	 * allocate_object_list
-	 * 	:    allocate_object ( T_COMMA allocate_object )*
+	 * 	:	allocate_object ( T_COMMA allocate_object )*
 	 * 
 	 * @param count The number of items in the list.
 	 */
 	public abstract void allocate_object_list__begin();
 	public abstract void allocate_object_list(int count);
+
+	/** R630
+	 * allocate_shape_spec
+	 *	:	expr (T_COLON expr)?
+	 *
+	 * NOTE: not called by current parser, appears as R619 section-subscript instead
+	 *
+	 * @param hasLowerBound True if optional lower-bound-expr is present.
+	 * @param hasUpperBound True if upper-bound-expr is present (note always true).
+	 */
+	public abstract void allocate_shape_spec(boolean hasLowerBound, boolean hasUpperBound);
 
 	/** R630 list
 	 * allocate_shape_spec_list
@@ -1137,6 +1277,55 @@ public abstract interface IFortranParserAction {
 	public abstract void rename_list__begin();
 	public abstract void rename_list(int count);
 
+	/** R1112 list
+	 * only_list
+	 * 	:    only ( T_COMMA only )*
+	 * 
+	 * @param count The number of items in the list.
+	 */
+	public abstract void only_list__begin();
+	public abstract void only_list(int count);
+
+	/** R1212
+	 * proc_interface
+	 *	:	T_IDENT
+	 *	|	declaration_type_spec
+	 *
+	 * @param id The interface name.
+	 */
+	public abstract void proc_interface(Token id);
+
+	/** R1213
+	 * proc_attr_spec
+	 *	:	access_spec
+	 *	|	proc_language_binding_spec
+	 *	|	T_INTENT T_LPAREN intent_spec T_RPAREN
+	 *	|	T_OPTIONAL
+	 *	|	T_POINTER
+	 *	|	T_SAVE
+	 *
+	 * @param spec The procedure attribute specification.
+	 */
+	public abstract void proc_attr_spec(AttrSpec spec);
+
+	/** R1214
+	 * proc_decl
+	 *    :	T_IDENT ( T_EQ_GT null_init {hasNullInit=true;} )?
+	 *    
+	 * @param id The name of the procedure.
+	 * @param hasNullInit True if null-init is present.
+	 */
+	public abstract void proc_decl(Token id, boolean hasNullInit);
+	   
+	/** R1214 list
+	 * proc_decl_list
+	 * 	:    proc_decl ( T_COMMA proc_decl )*
+	 * 
+	 * @param count The number of items in the list.
+	 */
+	public abstract void proc_decl_list__begin();
+	public abstract void proc_decl_list(int count);
+
 	/** R1217
 	 * function_reference
 	 * 	:	procedure-designator LPAREN (actual_arg_spec_list)* RPAREN
@@ -1148,24 +1337,6 @@ public abstract interface IFortranParserAction {
 	 * @param hasActualArgSpecList True if an actual-arg-spec-list is present
 	 */
 	public abstract void function_reference(boolean hasActualArgSpecList);
-
-	/** R1112 list
-	 * only_list
-	 * 	:    only ( T_COMMA only )*
-	 * 
-	 * @param count The number of items in the list.
-	 */
-	public abstract void only_list__begin();
-	public abstract void only_list(int count);
-
-	/** R1214 list
-	 * proc_decl_list
-	 * 	:    proc_decl ( T_COMMA proc_decl )*
-	 * 
-	 * @param count The number of items in the list.
-	 */
-	public abstract void proc_decl_list__begin();
-	public abstract void proc_decl_list(int count);
 
 	/** R1218
 	 * call_stmt
@@ -1214,6 +1385,14 @@ public abstract interface IFortranParserAction {
 	 * @param label The label of the alt-return-spec (if not null).
 	 */
 	public abstract void actual_arg(boolean hasExpr, Token label);
+	
+	/** R1233
+	 * dummy_arg
+	 *	:	T_IDENT | T_ASTERISK
+	 *
+	 * @param dummy The dummy argument token.
+	 */
+	public abstract void dummy_arg(Token dummy);
 	
 	/** R1233 list
 	 * dummy_arg_list

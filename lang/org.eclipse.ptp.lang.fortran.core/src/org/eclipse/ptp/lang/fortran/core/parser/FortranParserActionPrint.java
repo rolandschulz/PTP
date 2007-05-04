@@ -82,7 +82,13 @@ public class FortranParserActionPrint implements IFortranParserAction {
 	/** R102 list
 	 * generic_name (xyz-name)
 	 * generic_name_list (xyz-list R101)
+	 * generic_name_list_part
 	 */
+	public void generic_name_list_part(Token ident) {
+		printRuleHeader(102, "generic-name-list-part", "part");
+		printParameter(ident, "ident");
+		printRuleTrailer();
+	}
 	public void generic_name_list__begin() {
 		printRuleHeader(102, "generic-name-list__begin", "list-begin");
 		printRuleTrailer();
@@ -381,6 +387,15 @@ public class FortranParserActionPrint implements IFortranParserAction {
 		printRuleTrailer();
 	}
 
+	/** R453
+	 * binding_attr
+	 */
+	public void binding_attr(AttrSpec attr) {
+		printRuleHeader(453, "binding-attr");
+		printParameter(attr, "attr");
+		printRuleTrailer();	
+	}
+
 	/** R453 list
 	 * binding_attr_list
 	 */
@@ -434,6 +449,14 @@ public class FortranParserActionPrint implements IFortranParserAction {
 		printRuleTrailer();
 	}
 
+	/** R465
+	 * array_constructor
+	 */
+	public void array_constructor() {
+		printRuleHeader(465, "array-constructor");
+		printRuleTrailer();
+	}
+
 	/** R469 list
 	 * ac_value_list
 	 */
@@ -461,6 +484,14 @@ public class FortranParserActionPrint implements IFortranParserAction {
 		printRuleTrailer();
 	}
 	
+	/** R503
+	 * attr_spec
+	 */
+	public void attr_spec(AttrSpec attr) {
+		printRuleHeader(503, "attr-spec");
+		printParameter(attr, "attr");
+		printRuleTrailer();
+	}
 
 	/** R504, R503-F2008
 	 * entity_decl
@@ -511,6 +542,11 @@ public class FortranParserActionPrint implements IFortranParserAction {
 	 * explicit_shape_spec
 	 * explicit_shape_spec_list
 	 */
+	public void explicit_shape_spec(boolean hasUpperBound) {
+		printRuleHeader(511, "explicit-shape-spec");
+		printParameter(hasUpperBound, "hasUpperBound");
+		printRuleTrailer();
+	}
 	public void explicit_shape_spec_list__begin() {
 		printRuleHeader(511, "explicit-shape-spec-list__begin", "list-begin");
 		printRuleTrailer();
@@ -518,6 +554,15 @@ public class FortranParserActionPrint implements IFortranParserAction {
 	public void explicit_shape_spec_list(int count) {
 		printRuleHeader(511, "explicit-shape-spec-list", "list");
 		printParameter(count, "count");
+		printRuleTrailer();
+	}
+
+	/** R517
+	 * intent_spec
+	 */
+	public void intent_spec(IntentSpec intent) {
+		printRuleHeader(517, "intent-spec");
+		printParameter(intent, "intent");
 		printRuleTrailer();
 	}
 
@@ -810,6 +855,26 @@ public class FortranParserActionPrint implements IFortranParserAction {
 		printRuleTrailer();
 	}
 
+	/** R623
+	 * allocate_stmt
+	 */
+	public void allocate_stmt(Token label, boolean hasTypeSpec, boolean hasAllocOptList) {
+		printRuleHeader(623, "allocate-stmt");
+		if (label != null) printParameter(label, "label");
+		printParameter(hasTypeSpec, "hasTypeSpec");
+		printParameter(hasAllocOptList, "hasAllocOptList");
+		printRuleTrailer();
+	}
+
+	/** R624
+	 * alloc_opt
+	 */
+	public void alloc_opt(Token allocOpt) {
+		printRuleHeader(624, "alloc-opt");
+		printParameter(allocOpt, "allocOpt");
+		printRuleTrailer();
+	}
+	
 	/** R624 list
 	 * alloc_opt_list
      */
@@ -821,6 +886,16 @@ public class FortranParserActionPrint implements IFortranParserAction {
 		printRuleHeader(624, "alloc-opt-list", "list");
 		printParameter(count, "count");
 		printRuleTrailer();
+	}
+
+	/** R628, R631-F2008
+	 * allocation
+	 */
+	public void allocation(boolean hasAllocateShapeSpecList, boolean hasAllocateCoArraySpec) {
+		printRuleHeader(628, "allocation");
+		printParameter(hasAllocateShapeSpecList, "hasAllocateShapeSpecList");
+		printParameter(hasAllocateCoArraySpec, "hasAllocateCoArraySpec");
+		printRuleTrailer();	
 	}
 
 	/** R628 list
@@ -847,6 +922,16 @@ public class FortranParserActionPrint implements IFortranParserAction {
 		printRuleHeader(629, "allocate-object-list", "list");
 		printParameter(count, "count");
 		printRuleTrailer();
+	}
+
+	/** R630
+	 * allocate_shape_spec
+	 */
+	public void allocate_shape_spec(boolean hasLowerBound, boolean hasUpperBound) {
+		printRuleHeader(630, "allocate-shape-spec");
+		printParameter(hasLowerBound, "hasLowerBound");
+		printParameter(hasUpperBound, "hasUpperBound");
+		printRuleTrailer();	
 	}
 
 	/** R630 list
@@ -1451,6 +1536,34 @@ public class FortranParserActionPrint implements IFortranParserAction {
 		printParameter(count, "count");
 		printRuleTrailer();
 	}
+	
+	/** R1212
+	 * proc_interface
+	 */
+	public void proc_interface(Token id) {
+		printRuleHeader(1212, "proc-interface");
+		printParameter(id, "id");
+		printRuleTrailer();		
+	}
+
+	/** R1213
+	 * proc_attr_spec
+	 */
+	public void proc_attr_spec(AttrSpec spec) {
+		printRuleHeader(1213, "proc-attr-spec");
+		printParameter(spec, "spec");
+		printRuleTrailer();		
+	}
+
+	/** R1214
+	 * proc_decl
+	 */
+	public void proc_decl(Token id, boolean hasNullInit) {
+		printRuleHeader(1214, "proc-decl");
+		printParameter(id, "id");
+		printParameter(hasNullInit, "hasNullInit");
+		printRuleTrailer();		
+	}
 
 	/** R1214 list
 	 * proc_decl_list
@@ -1512,6 +1625,15 @@ public class FortranParserActionPrint implements IFortranParserAction {
 		printRuleHeader(1221, "actual-arg");
 		printParameter(hasExpr, "hasExpr");
 		printParameter(label, "label");
+		printRuleTrailer();
+	}
+
+	/** R1233
+	 * dummy_arg
+	 */
+	public void dummy_arg(Token dummy) {
+		printRuleHeader(1233, "dummy-arg");
+		printParameter(dummy, "dummy");
 		printRuleTrailer();
 	}
 

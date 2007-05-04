@@ -4,7 +4,7 @@ import org.antlr.runtime.Token;
 
 public class FortranParserActionNull implements IFortranParserAction {
 	
-	FortranParserActionNull(FortranParser parser, String filename) {
+	protected FortranParserActionNull(FortranParser parser, String filename) {
 		super();
 	}
 
@@ -327,9 +327,12 @@ public class FortranParserActionNull implements IFortranParserAction {
 		
 	}
 
+	public void explicit_shape_spec(boolean hasUpperBound) {
+		// TODO Auto-generated method stub
+	}
+
 	public void explicit_shape_spec_list(int count) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	public void explicit_shape_spec_list__begin() {
@@ -830,6 +833,73 @@ public class FortranParserActionNull implements IFortranParserAction {
 	}
 
 	public void nullify_stmt(Token label) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void alloc_opt(Token allocOpt) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void allocate_shape_spec(boolean hasLowerBound, boolean hasUpperBound) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void allocate_stmt(Token label, boolean hasTypeSpec,
+			boolean hasAllocOptList) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void allocation(boolean hasAllocateShapeSpecList,
+			boolean hasAllocateCoArraySpec) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void intent_spec(IntentSpec intent) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void dummy_arg(Token dummy) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void proc_decl(Token id, boolean hasNullInit) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void proc_interface(Token id) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void proc_attr_spec(AttrSpec spec) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void binding_attr(AttrSpec attr) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void attr_spec(AttrSpec attr) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void array_constructor() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void generic_name_list_part(Token ident) {
 		// TODO Auto-generated method stub
 		
 	}
