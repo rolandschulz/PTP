@@ -31,7 +31,8 @@ import org.eclipse.ptp.core.elementcontrols.IPElementControl;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
 import org.eclipse.search.ui.ISearchPageScoreComputer;
 
-public abstract class PElement extends PlatformObject implements IPElementControl, Comparable {
+public abstract class PElement extends PlatformObject implements IPElementControl,
+  Comparable<IPElementControl> {
 
 	private PElementInfo elementInfo = null;
 	protected AttributeManager attributeValues = new AttributeManager();
@@ -50,11 +51,8 @@ public abstract class PElement extends PlatformObject implements IPElementContro
 	/* (non-Javadoc)
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
-	public int compareTo(Object obj) {
-		if (obj instanceof IPElementControl) {
-			return getName().compareTo(((IPElementControl) obj).getName());
-		}
-		return 0;
+	public int compareTo(IPElementControl obj) {
+		return getName().compareTo(obj.getName());
 	}
 	
 	/* (non-Javadoc)

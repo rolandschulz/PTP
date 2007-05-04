@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.attributes;
 
-import java.util.Arrays;
+import java.util.List;
 
 public final class StringSetAttribute extends AbstractAttribute {
 
@@ -56,8 +56,8 @@ public final class StringSetAttribute extends AbstractAttribute {
 	 * @see org.eclipse.ptp.core.attributes.IAttribute#isValid(java.lang.String)
 	 */
 	public boolean isValid(String valueIn) {
-		final String[] values = getStringSetAttributeDefinition().getValues();
-		final boolean isValid = Arrays.asList(values).contains(valueIn);
+		final List<String> values = getStringSetAttributeDefinition().getValues();
+		final boolean isValid = values.contains(valueIn);
 		return isValid;
 	}
 

@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.attributes;
 
-public interface IAttributeDefinition extends Comparable {
+public interface IAttributeDefinition extends Comparable<IAttributeDefinition> {
 
 	/**
 	 * @return

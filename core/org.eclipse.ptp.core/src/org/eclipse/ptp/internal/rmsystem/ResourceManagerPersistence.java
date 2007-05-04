@@ -154,7 +154,7 @@ public class ResourceManagerPersistence {
 	private void loadResourceManagers(XMLMemento memento,
 			IResourceManagerFactory[] factories, final IProgressMonitor monitor) throws CoreException {
 		IMemento[] children = memento.getChildren(TAG_RESOURCEMANGER);
-		ArrayList statuses = new ArrayList();
+		ArrayList<IStatus> statuses = new ArrayList<IStatus>();
 		monitor.beginTask("Loading the Resource Managers", children.length);
 		try {
 			final IResourceManagerControl[] tmpRMs = new IResourceManagerControl[children.length];
@@ -196,7 +196,7 @@ public class ResourceManagerPersistence {
 			resourceManagers = rms.toArray(new IResourceManagerControl[rms.size()]);
 			if (statuses.size() > 0) {
 				throw new CoreException(new MultiStatus(PTPCorePlugin.PLUGIN_ID,
-						MultiStatus.ERROR, (IStatus[])statuses.toArray(new IStatus[0]),
+						MultiStatus.ERROR, statuses.toArray(new IStatus[0]),
 						"loading resource managers", null));
 			}
 		}

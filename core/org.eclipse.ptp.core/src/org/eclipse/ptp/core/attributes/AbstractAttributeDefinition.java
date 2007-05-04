@@ -29,9 +29,8 @@ public abstract class AbstractAttributeDefinition implements IAttributeDefinitio
 		this.description = description;
 	}
 
-	public int compareTo(Object arg0) {
-		AbstractAttributeDefinition attrDesc = (AbstractAttributeDefinition) arg0;
-		return this.name.compareTo(attrDesc.name);
+	public int compareTo(IAttributeDefinition arg0) {
+		return this.name.compareTo(arg0.getName());
 	}
 
 	public boolean equals(Object obj) {
