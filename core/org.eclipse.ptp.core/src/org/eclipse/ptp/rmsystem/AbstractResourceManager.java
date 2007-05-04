@@ -21,6 +21,8 @@
  */
 package org.eclipse.ptp.rmsystem;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
@@ -60,6 +62,7 @@ import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes.State;
 import org.eclipse.ptp.core.elements.events.IMachineChangedEvent;
 import org.eclipse.ptp.core.elements.events.IQueueChangedEvent;
+import org.eclipse.ptp.core.elements.events.IResourceManagerChangedEvent;
 import org.eclipse.ptp.core.elements.events.IResourceManagerChangedMachineEvent;
 import org.eclipse.ptp.core.elements.events.IResourceManagerChangedQueueEvent;
 import org.eclipse.ptp.core.elements.events.IResourceManagerErrorEvent;
@@ -76,8 +79,12 @@ import org.eclipse.ptp.internal.core.elements.PMachine;
 import org.eclipse.ptp.internal.core.elements.PNode;
 import org.eclipse.ptp.internal.core.elements.PProcess;
 import org.eclipse.ptp.internal.core.elements.PQueue;
+import org.eclipse.ptp.internal.core.elements.events.ResourceManagerChangedEvent;
 import org.eclipse.ptp.internal.core.elements.events.ResourceManagerChangedMachineEvent;
+import org.eclipse.ptp.internal.core.elements.events.ResourceManagerChangedQueueEvent;
 import org.eclipse.ptp.internal.core.elements.events.ResourceManagerErrorEvent;
+import org.eclipse.ptp.internal.core.elements.events.ResourceManagerNewMachineEvent;
+import org.eclipse.ptp.internal.core.elements.events.ResourceManagerNewQueueEvent;
 
 /**
  * @author rsqrd
@@ -134,21 +141,12 @@ IResourceManagerControl {
 
 		queueListener = new IQueueListener(){
 			public void handleEvent(IQueueChangedEvent e) {
-				fireQueueChanged(e.getSource());				
+				fireQueueChanged(e.getSource(), e.getAttributes());				
 			}};
 		machineListener = new IMachineListener(){
 			public void handleEvent(IMachineChangedEvent e) {
-				fireMachineChanged(e.getSource());				
+				fireMachineChanged(e.getSource(), e.getAttributes());				
 			}};
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rm.IResourceManager#addResourceManagerListener(org.eclipse.ptp.rm.IResourceManagerListener)
-	 */
-	public void addElementListener(IResourceManagerListener listener) {
-		listeners.add(listener);
 	}
 
 	/* (non-Javadoc)
@@ -165,18 +163,13 @@ IResourceManagerControl {
 		queueListeners.add(listener);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.IResourceManager#removeChildListener(org.eclipse.ptp.core.elements.listeners.IResourceManagerMachineListener)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.IResourceManager#addResourceManagerListener(org.eclipse.ptp.rm.IResourceManagerListener)
 	 */
-	public void removeChildListener(IResourceManagerMachineListener listener) {
-		machineListeners.remove(listener);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.IResourceManager#removeChildListener(org.eclipse.ptp.core.elements.listeners.IResourceManagerQueueListener)
-	 */
-	public void removeChildListener(IResourceManagerQueueListener listener) {
-		queueListeners.remove(listener);
+	public void addElementListener(IResourceManagerListener listener) {
+		listeners.add(listener);
 	}
 
 	/* (non-Javadoc)
@@ -200,7 +193,7 @@ IResourceManagerControl {
 		}
 		doDispose();
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.IResourceManager#enableEvents()
 	 */
@@ -222,10 +215,6 @@ IResourceManagerControl {
 			return super.getAdapter(adapter);
 		}
 	}
-
-	public AttributeDefinitionManager getAttributeDefinitionManager() {
-		return attrDefManager;
-	}
 	
 	/**
 	 * Lookup an attribute definition
@@ -236,21 +225,25 @@ IResourceManagerControl {
 	public IAttributeDefinition getAttributeDefinition(String attrId) {
 		return attrDefManager.getAttributeDefinition(attrId);
 	}
-	
+
+	public AttributeDefinitionManager getAttributeDefinitionManager() {
+		return attrDefManager;
+	}
+
 	/**
 	 * @return
 	 */
 	public IResourceManagerConfiguration getConfiguration() {
 		return config;
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.IResourceManager#getDescription()
 	 */
 	public String getDescription() {
 		return config.getDescription();
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.internal.core.PElement#getID()
 	 */
@@ -268,11 +261,11 @@ IResourceManagerControl {
 	public synchronized IPMachineControl[] getMachineControls() {
 		return (IPMachineControl[]) machinesById.values().toArray(new IPMachineControl[0]);
 	}
-	
+
 	public IPMachine[] getMachines() {
 		return getMachineControls();
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.IResourceManager#getName()
 	 */
@@ -295,7 +288,7 @@ IResourceManagerControl {
 	public IPQueue[] getQueues() {
 		return getQueueControls();
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.IResourceManager#getStatus()
 	 */
@@ -306,6 +299,20 @@ IResourceManagerControl {
 	public boolean hasChildren() {
 		return getMachines().length > 0 || getQueues().length > 0;
 	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IResourceManager#removeChildListener(org.eclipse.ptp.core.elements.listeners.IResourceManagerMachineListener)
+	 */
+	public void removeChildListener(IResourceManagerMachineListener listener) {
+		machineListeners.remove(listener);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IResourceManager#removeChildListener(org.eclipse.ptp.core.elements.listeners.IResourceManagerQueueListener)
+	 */
+	public void removeChildListener(IResourceManagerQueueListener listener) {
+		queueListeners.remove(listener);
+	}
 	
 	/*
 	 * (non-Javadoc)
@@ -314,6 +321,10 @@ IResourceManagerControl {
 	 */
 	public void removeElementListener(IResourceManagerListener listener) {
 		listeners.remove(listener);
+	}
+	
+	public void removeTerminatedJobs(IPQueue queue) {
+		doRemoveTerminatedJobs((IPQueueControl)queue);
 	}
 	
 	/*
@@ -385,8 +396,13 @@ IResourceManagerControl {
 		doTerminateJob(job);
 	}
 	
-	public void removeTerminatedJobs(IPQueue queue) {
-		doRemoveTerminatedJobs((IPQueueControl)queue);
+	private void fireResourceManagerChanged(List<IAttribute> attrs) {
+		IResourceManagerChangedEvent e = 
+			new ResourceManagerChangedEvent(this, attrs);
+    	
+		for (Object listener : listeners.getListeners()) {
+			((IResourceManagerListener)listener).handleEvent(e);
+		}
 	}
 	
 	/*
@@ -396,7 +412,7 @@ IResourceManagerControl {
 		job.getQueueControl().addJob(job);
 		jobsById.put(jobId, job);
 	}
-	
+
 	protected synchronized void addMachine(String machineId, IPMachineControl machine) {
 		machinesById.put(machineId, machine);
 		machine.addElementListener(machineListener);
@@ -407,12 +423,12 @@ IResourceManagerControl {
 		node.getMachineControl().addNode(node);
 		nodesById.put(nodeId, node);
 	}
-
+	
 	protected synchronized void addProcess(String processId, IPProcessControl process) {
 		process.getJobControl().addProcess(process);
 		processesById.put(processId, process);
 	}
-	
+
 	protected synchronized void addQueue(String queueId, IPQueueControl queue) {
 		queuesById.put(queueId, queue);
 		/*
@@ -425,39 +441,7 @@ IResourceManagerControl {
 		queue.addElementListener(queueListener);
 		fireNewQueue(queue);
 	}
-
-	protected synchronized void removeJob(IPJobControl job) {
-		job.getQueueControl().removeJob(job);
-		jobsById.remove(job.getID());
-	}
 	
-	protected synchronized void removeMachine(IPMachineControl machine) {
-		machinesById.remove(machine.getID());
-		machine.removeElementListener(machineListener);
-	}
-
-	protected synchronized void removeNode(IPNodeControl node) {
-		node.getMachineControl().removeNode(node);
-		nodesById.remove(node.getID());
-	}
-
-	protected synchronized void removeProcess(IPProcessControl process) {
-		process.getJobControl().removeProcess(process);
-		processesById.remove(process.getID());
-	}
-	
-	protected synchronized void removeQueue(IPQueueControl queue) {
-		queuesById.remove(queue.getID());
-		/*
-		 * Keep a map of queue names, if the queue has a name (and it should).
-		 */
-		StringAttribute attr = (StringAttribute) queue.getAttribute(ElementAttributes.getNameAttributeDefinition());
-		if (attr != null) {
-			queuesByName.remove(attr.getValue());
-		}
-		queue.removeElementListener(queueListener);
-	}
-
 	/**
 	 * 
 	 */
@@ -472,7 +456,7 @@ IResourceManagerControl {
 	 * 
 	 */
 	protected abstract void doEnableEvents();
-
+	
 	/**
 	 * 
 	 */
@@ -488,7 +472,7 @@ IResourceManagerControl {
 	 * @throws CoreException
 	 */
 	protected abstract void doStartup(IProgressMonitor monitor) throws CoreException;
-	
+
 	/**
 	 * @param attrMgr
 	 * @param monitor
@@ -515,15 +499,15 @@ IResourceManagerControl {
 		}
     }
 
-	protected void fireMachineChanged(IPMachine machine) {
+	protected void fireMachineChanged(IPMachine machine, Collection<IAttribute> attrs) {
 		IResourceManagerChangedMachineEvent e = 
-			new ResourceManagerChangedMachineEvent(this, machine);
+			new ResourceManagerChangedMachineEvent(this, machine, attrs);
 
 		for (Object listener : machineListeners.getListeners()) {
 			((IResourceManagerMachineListener)listener).handleEvent(e);
 		}
 	}
-
+	
 	protected void fireNewMachine(IPMachine machine) {
 		IResourceManagerNewMachineEvent e = 
 			new ResourceManagerNewMachineEvent(this, machine);
@@ -533,7 +517,7 @@ IResourceManagerControl {
 		}
 	}
 
-    protected void fireNewQueue(IPQueue queue) {
+	protected void fireNewQueue(IPQueue queue) {
 		IResourceManagerNewQueueEvent e = 
 			new ResourceManagerNewQueueEvent(this, queue);
 
@@ -542,9 +526,9 @@ IResourceManagerControl {
 		}
     }
 
-	protected void fireQueueChanged(IPQueue queue) {
+	protected void fireQueueChanged(IPQueue queue, Collection<IAttribute> attrs) {
 		IResourceManagerChangedQueueEvent e = 
-			new ResourceManagerChangedQueueEvent(this, queue);
+			new ResourceManagerChangedQueueEvent(this, queue, attrs);
 
 		for (Object listener : queueListeners.getListeners()) {
 			((IResourceManagerQueueListener)listener).handleEvent(e);
@@ -554,12 +538,12 @@ IResourceManagerControl {
 	protected IPJobControl getJobControl(String jobId) {
 		return jobsById.get(jobId);
 	}
-	
+
 	protected IPMachineControl getMachineControl(String machineId) {
 		return machinesById.get(machineId);
 	}
 
-	protected IPNodeControl getNodeControl(String nodeId) {
+    protected IPNodeControl getNodeControl(String nodeId) {
 		return nodesById.get(nodeId);
 	}
 
@@ -570,7 +554,7 @@ IResourceManagerControl {
 	protected IPQueueControl getQueueControl(String machineId) {
 		return queuesById.get(machineId);
 	}
-
+	
 	protected CoreException makeCoreException(String string) {
 		IStatus status = new Status(Status.ERROR, PTPCorePlugin.getUniqueIdentifier(),
 				Status.ERROR, string, null);
@@ -618,13 +602,49 @@ IResourceManagerControl {
 		return new PQueue(queueId, this, attrs.getAttributes());
 	}
 
+	protected synchronized void removeJob(IPJobControl job) {
+		job.getQueueControl().removeJob(job);
+		jobsById.remove(job.getID());
+	}
+
+	protected synchronized void removeMachine(IPMachineControl machine) {
+		machinesById.remove(machine.getID());
+		machine.removeElementListener(machineListener);
+	}
+
+	protected synchronized void removeNode(IPNodeControl node) {
+		node.getMachineControl().removeNode(node);
+		nodesById.remove(node.getID());
+	}
+
+	protected synchronized void removeProcess(IPProcessControl process) {
+		process.getJobControl().removeProcess(process);
+		processesById.remove(process.getID());
+	}
+
+	protected synchronized void removeQueue(IPQueueControl queue) {
+		queuesById.remove(queue.getID());
+		/*
+		 * Keep a map of queue names, if the queue has a name (and it should).
+		 */
+		StringAttribute attr = (StringAttribute) queue.getAttribute(ElementAttributes.getNameAttributeDefinition());
+		if (attr != null) {
+			queuesByName.remove(attr.getValue());
+		}
+		queue.removeElementListener(queueListener);
+	}
+
 	/**
 	 * @param state
 	 */
 	synchronized protected void setState(ResourceManagerAttributes.State state) {
 		if (this.state.getEnumValue() != state) {
-			this.state.setValue(state);
-			fireResourceManagerChanged();
+			try {
+				this.state.setValue(state);
+			} catch (IllegalValueException e) {
+				return;
+			}
+			fireResourceManagerChanged(Arrays.asList(new IAttribute[] {this.state}));
 		}
 	}
 
