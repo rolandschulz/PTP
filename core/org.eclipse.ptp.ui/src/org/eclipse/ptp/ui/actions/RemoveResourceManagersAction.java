@@ -22,12 +22,12 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.swt.widgets.Shell;
 
 public class RemoveResourceManagersAction extends Action {
 	
-	private IResourceManager[] selectedRMManagers;
+	private IResourceManagerControl[] selectedRMManagers;
 	@SuppressWarnings("unused")
 	private final Shell shell;
 
@@ -44,7 +44,7 @@ public class RemoveResourceManagersAction extends Action {
 	
 	}
 
-	public void setResourceManager(IResourceManager[] rmManagers) {
+	public void setResourceManager(IResourceManagerControl[] rmManagers) {
 		this.selectedRMManagers = rmManagers.clone();
 	}
 

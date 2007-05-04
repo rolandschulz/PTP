@@ -20,16 +20,15 @@ package org.eclipse.ptp.ui.views;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.util.SafeRunnable;
-import org.eclipse.ptp.core.IModelListener;
-import org.eclipse.ptp.core.IProcessListener;
-import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.core.elementcontrols.IPJobControl;
+import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
+import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPNode;
 import org.eclipse.ptp.core.elements.IPProcess;
-import org.eclipse.ptp.core.events.IModelEvent;
-import org.eclipse.ptp.core.events.IModelRuntimeNotifierEvent;
-import org.eclipse.ptp.core.events.IProcessEvent;
+import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
+import org.eclipse.ptp.core.elements.attributes.ProcessAttributes.State;
+import org.eclipse.ptp.core.elements.events.IProcessChangedEvent;
+import org.eclipse.ptp.core.elements.listeners.IProcessListener;
 import org.eclipse.ptp.ui.UIUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -51,7 +50,7 @@ import org.eclipse.ui.texteditor.ITextEditorActionConstants;
 /**
  * 
  */
-public class ParallelProcessView extends AbstractTextEditor implements IProcessListener, IModelListener {
+public class ParallelProcessView extends AbstractTextEditor implements IProcessListener {
 	private Label rankLabel = null;
 	private Label nodeLabel = null;
 	private Label jobLabel = null;
@@ -65,12 +64,12 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 	public ParallelProcessView() {
 		super();
 		setDocumentProvider(new StorageDocumentProvider());
-		PTPCorePlugin.getDefault().getModelPresentation().addModelListener(this);
-		PTPCorePlugin.getDefault().getModelPresentation().addProcessListener(this);
+		//PTPCorePlugin.getDefault().getModelPresentation().addModelListener(this);
+		//PTPCorePlugin.getDefault().getModelPresentation().addProcessListener(this);
 	}
 	public void dispose() {
-		PTPCorePlugin.getDefault().getModelPresentation().removeModelListener(this);
-		PTPCorePlugin.getDefault().getModelPresentation().removeProcessListener(this);
+		//PTPCorePlugin.getDefault().getModelPresentation().removeModelListener(this);
+		//PTPCorePlugin.getDefault().getModelPresentation().removeProcessListener(this);
 		myForm.dispose();
 		toolkit.dispose();
 		super.dispose();
@@ -192,37 +191,26 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 		}
 	}
 	
-	public void processEvent(final IProcessEvent event) {
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.listeners.IProcessListener#handleEvent(org.eclipse.ptp.core.elements.events.IProcessChangedEvent)
+	 */
+	public void handleEvent(final IProcessChangedEvent e) {
 		UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
+			@SuppressWarnings("unchecked")
 			public void run() {
-				safeProcessEvent(event);
+				for (IAttribute attr : e.getAttributes()) {
+					String id = attr.getDefinition().getId();
+					if (id.equals(ProcessAttributes.getStateAttributeDefinition().getId())) {
+						ProcessAttributes.State state = (State)((EnumeratedAttribute<State>)attr).getValue();
+						statusLabel.setText("Status: " + state.toString());
+					} else if (id.equals(ProcessAttributes.getStdoutAttributeDefinition())) {
+						outputText.append(attr.getValueAsString());
+					}
+				}
 			}
 		});
 	}
-	private void safeProcessEvent(final IProcessEvent event) {
-		if (event.getProcess() != null && event.getProcess().equals(getProcess())) {
-			getSite().getShell().getDisplay().asyncExec(new Runnable() {
-				public void run() {
-					switch (event.getType()) {
-					case IProcessEvent.STATUS_CHANGE_TYPE:
-						statusLabel.setText("Status: " + event.getState().toString());
-						break;
-						/*
-					case IProcessEvent.STATUS_EXIT_TYPE:
-						dynamicLabel.setText(EXITCODE_TEXT + event.getValue());
-						break;
-					case IProcessEvent.STATUS_SIGNALNAME_TYPE:
-						dynamicLabel.setText(SIGNALNAME_TEXT + event.getValue());
-						break;
-						*/
-					case IProcessEvent.ADD_OUTPUT_TYPE:
-						outputText.append(event.getInput());
-						break;			
-					}
-				}
-			});
-		}
-	}
+	
 	protected GridLayout createGridLayout(int columns, boolean isEqual, int mh, int mw) {
 		GridLayout gridLayout = new GridLayout();
 		gridLayout.numColumns = columns;
@@ -231,6 +219,7 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 		gridLayout.marginWidth = mw;
 		return gridLayout;
 	}
+	
 	protected GridData spanGridData(int style, int space) {
 		GridData gd = null;
 		if (style == -1)
@@ -240,6 +229,7 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 		gd.horizontalSpan = space;
 		return gd;
 	}
+	
 	protected void createVerticalSpacer(Composite comp, int colSpan) {
 		Label label = new Label(comp, SWT.NONE);
 		GridData gd = new GridData();
@@ -247,6 +237,7 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 		label.setLayoutData(gd);
 		label.setFont(comp.getFont());
 	}
+	
 	protected void updateStatusField(String category) {
 		if (category == null)
 			return;
@@ -264,6 +255,9 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 		}
 	}
 	
+	/*
+	 * DONT KNOW WHAT TO DO WITH THIS YET
+	 *
 	public void modelEvent(final IModelEvent event) {
 		UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
 			public void run() {
@@ -280,5 +274,5 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 			}
 		}	
 	}
-
+	 */
 }

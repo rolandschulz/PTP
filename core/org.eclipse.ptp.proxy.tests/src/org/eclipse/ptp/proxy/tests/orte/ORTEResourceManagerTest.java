@@ -2,7 +2,6 @@ package org.eclipse.ptp.proxy.tests.orte;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.Collection;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -12,34 +11,30 @@ import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
-import org.eclipse.ptp.core.elements.IPMachine;
-import org.eclipse.ptp.core.elements.IPNode;
+import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPQueue;
-import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.QueueAttributes;
+import org.eclipse.ptp.core.elements.attributes.JobAttributes.State;
+import org.eclipse.ptp.core.elements.events.IJobChangedEvent;
+import org.eclipse.ptp.core.elements.events.IQueueChangedJobEvent;
+import org.eclipse.ptp.core.elements.events.IQueueNewJobEvent;
+import org.eclipse.ptp.core.elements.events.IQueueRemoveJobEvent;
+import org.eclipse.ptp.core.elements.events.IResourceManagerChangedQueueEvent;
+import org.eclipse.ptp.core.elements.events.IResourceManagerNewQueueEvent;
+import org.eclipse.ptp.core.elements.events.IResourceManagerRemoveQueueEvent;
+import org.eclipse.ptp.core.elements.listeners.IJobListener;
+import org.eclipse.ptp.core.elements.listeners.IQueueJobListener;
+import org.eclipse.ptp.core.elements.listeners.IResourceManagerQueueListener;
 import org.eclipse.ptp.internal.core.elements.PUniverse;
 import org.eclipse.ptp.orte.core.ORTEAttributes;
 import org.eclipse.ptp.orte.core.rmsystem.ORTEResourceManager;
 import org.eclipse.ptp.orte.core.rmsystem.ORTEResourceManagerConfiguration;
 import org.eclipse.ptp.orte.core.rmsystem.ORTEResourceManagerFactory;
-import org.eclipse.ptp.rmsystem.AbstractResourceManager;
-import org.eclipse.ptp.rmsystem.IResourceManagerListener;
-import org.eclipse.ptp.rmsystem.events.IResourceManagerChangedJobsEvent;
-import org.eclipse.ptp.rmsystem.events.IResourceManagerChangedMachinesEvent;
-import org.eclipse.ptp.rmsystem.events.IResourceManagerChangedNodesEvent;
-import org.eclipse.ptp.rmsystem.events.IResourceManagerChangedProcessesEvent;
-import org.eclipse.ptp.rmsystem.events.IResourceManagerChangedQueuesEvent;
-import org.eclipse.ptp.rmsystem.events.IResourceManagerErrorEvent;
-import org.eclipse.ptp.rmsystem.events.IResourceManagerNewJobsEvent;
-import org.eclipse.ptp.rmsystem.events.IResourceManagerNewMachinesEvent;
-import org.eclipse.ptp.rmsystem.events.IResourceManagerNewNodesEvent;
-import org.eclipse.ptp.rmsystem.events.IResourceManagerNewProcessesEvent;
-import org.eclipse.ptp.rmsystem.events.IResourceManagerNewQueuesEvent;
 import org.eclipse.ptp.rtsystem.JobRunConfiguration;
 import org.junit.Test;
 
-public class ORTEResourceManagerTest implements IResourceManagerListener {
+public class ORTEResourceManagerTest implements IResourceManagerQueueListener, IQueueJobListener, IJobListener {
 	
 	private boolean haveQueue = false;
 	private boolean jobCompleted = false;
@@ -48,6 +43,7 @@ public class ORTEResourceManagerTest implements IResourceManagerListener {
 	private Condition notJobCompleted = lock.newCondition();
 	
 	private IPQueue subQueue;
+	private IPJob subJob;
 	private String queueName = null;
 
 	@Test public void start_stop() {
@@ -60,7 +56,7 @@ public class ORTEResourceManagerTest implements IResourceManagerListener {
 		ORTEResourceManagerConfiguration rmc = new ORTEResourceManagerConfiguration(rmf, proxy, launchManually);
 		PUniverse universe = new PUniverse();
 		ORTEResourceManager rm = new ORTEResourceManager(universe.getNextResourceManagerId(), universe, rmc);
-		rm.addResourceManagerListener(this);
+		rm.addChildListener(this);
 		
 		try {
 			System.out.println("rm: starting");
@@ -101,7 +97,7 @@ public class ORTEResourceManagerTest implements IResourceManagerListener {
 		ORTEResourceManagerConfiguration rmc = new ORTEResourceManagerConfiguration(rmf, proxy, launchManually);
 		PUniverse universe = new PUniverse();
 		ORTEResourceManager rm = new ORTEResourceManager(universe.getNextResourceManagerId(), universe, rmc);
-		rm.addResourceManagerListener(this);
+		rm.addChildListener(this);
 		
 		lock.lock();
 		try {
@@ -173,23 +169,17 @@ public class ORTEResourceManagerTest implements IResourceManagerListener {
 
 	}
 
-	public void handleErrorState(IResourceManager manager) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void handleSuspendedState(AbstractResourceManager manager) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void handleChangedJobsEvent(IResourceManagerChangedJobsEvent e) {
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.listeners.IJobListener#handleEvent(org.eclipse.ptp.core.elements.events.IJobChangedEvent)
+	 */
+	@SuppressWarnings("unchecked")
+	public void handleEvent(IJobChangedEvent e) {
 		/*
 		 * Find a state change, if any
 		 */
-		for (IAttribute a : e.getChangedAttributes()) {
+		for (IAttribute a : e.getAttributes()) {
 			if (a.getDefinition() == JobAttributes.getStateAttributeDefinition()) {
-				if (((EnumeratedAttribute)a).getEnumValue() == JobAttributes.State.TERMINATED) {
+				if (((EnumeratedAttribute<State>)a).getValue() == State.TERMINATED) {
 					System.out.println("job terminated!");
 					lock.lock();
 					try {
@@ -201,63 +191,48 @@ public class ORTEResourceManagerTest implements IResourceManagerListener {
 					break;
 				}
 			}
-		}
+		}	
 	}
 
-	public void handleChangedMachinesEvent(IResourceManagerChangedMachinesEvent e) {
-		// TODO Auto-generated method stub
-		
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.listeners.IQueueJobListener#handleEvent(org.eclipse.ptp.core.elements.events.IQueueChangedJobEvent)
+	 */
+	public void handleEvent(IQueueChangedJobEvent e) {
+		// Don't care
 	}
 
-	public void handleChangedNodesEvent(IResourceManagerChangedNodesEvent e) {
-		// TODO Auto-generated method stub
-		
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.listeners.IQueueJobListener#handleEvent(org.eclipse.ptp.core.elements.events.IQueueNewJobEvent)
+	 */
+	public void handleEvent(IQueueNewJobEvent e) {
+		subJob = e.getJob();
+		System.out.println("got new job: " + subJob.getName());
+		subJob.addElementListener(this);
 	}
 
-	public void handleChangedProcessesEvent(IResourceManagerChangedProcessesEvent e) {
-		// TODO Auto-generated method stub
-		
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.listeners.IQueueJobListener#handleEvent(org.eclipse.ptp.core.elements.events.IQueueRemoveJobEvent)
+	 */
+	public void handleEvent(IQueueRemoveJobEvent e) {
+		subJob.removeElementListener(this);
 	}
 
-	public void handleChangedQueuesEvent(IResourceManagerChangedQueuesEvent e) {
-		// TODO Auto-generated method stub
-		
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerQueueListener#handleEvent(org.eclipse.ptp.core.elements.events.IResourceManagerChangedQueueEvent)
+	 */
+	public void handleEvent(IResourceManagerChangedQueueEvent e) {
+		// Don't care
 	}
 
-	public void handleErrorStateEvent(IResourceManagerErrorEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void handleNewJobsEvent(IResourceManagerNewJobsEvent e) {
-
-	}
-
-	public void handleNewMachinesEvent(IResourceManagerNewMachinesEvent e) {
-		for (IPMachine machine : e.getNewMachines()) {
-			System.out.println("new machine " + machine.getName());
-		}
-	}
-
-	public void handleNewNodesEvent(IResourceManagerNewNodesEvent e) {
-		for (IPNode node : e.getNewNodes()) {
-			System.out.println("new node " + node.getName());
-		}
-	}
-
-	public void handleNewProcessesEvent(IResourceManagerNewProcessesEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void handleNewQueuesEvent(IResourceManagerNewQueuesEvent e) {
-		Collection<IPQueue> queues = e.getNewQueues();
-		for (IPQueue queue : queues) {
-			subQueue = queue;
-			queueName = queue.getName();
-			System.out.println("got queue: " + queueName);
-			break;
-		}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerQueueListener#handleEvent(org.eclipse.ptp.core.elements.events.IResourceManagerNewQueueEvent)
+	 */
+	public void handleEvent(IResourceManagerNewQueueEvent e) {
+		IPQueue queue = e.getQueue();
+		subQueue = queue;
+		queueName = queue.getName();
+		System.out.println("got queue: " + queueName);
 		
 		lock.lock();
 		try {
@@ -266,21 +241,13 @@ public class ORTEResourceManagerTest implements IResourceManagerListener {
 		} finally {
 			lock.unlock();
 		}
-
 	}
 
-	public void handleShutdownStateEvent(IResourceManager resourceManager) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void handleStartupStateEvent(IResourceManager resourceManager) {
-		System.out.println("got startup state");
-	}
-
-	public void handleSuspendedStateEvent(AbstractResourceManager manager) {
-		// TODO Auto-generated method stub
-		
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerQueueListener#handleEvent(org.eclipse.ptp.core.elements.events.IResourceManagerRemoveQueueEvent)
+	 */
+	public void handleEvent(IResourceManagerRemoveQueueEvent e) {
+		// Don't care
 	}
 
 }

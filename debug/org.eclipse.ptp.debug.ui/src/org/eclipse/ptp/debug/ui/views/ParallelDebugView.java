@@ -28,7 +28,6 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IThread;
-import org.eclipse.debug.internal.ui.viewers.AsynchronousTreeViewer;
 import org.eclipse.debug.ui.AbstractDebugView;
 import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.jface.action.GroupMarker;
@@ -519,13 +518,14 @@ public class ParallelDebugView extends ParallelJobView {
 		final UIDebugManager uimanager = ((UIDebugManager) manager);
 		WorkbenchJob workjob = new WorkbenchJob("Focus on Debug View") {
 			public IStatus runInUIThread(IProgressMonitor monitor) {
-				focusOnDebugView(uimanager.getDebugObject(job, task_id));
+				//focusOnDebugView(uimanager.getDebugObject(job, task_id));
 				return Status.OK_STATUS;
 			}
 		};
 		workjob.setPriority(Job.DECORATE);
 		workjob.schedule();
 	}
+/* FIXME: how should this work in 3.3?
 	private void focusOnDebugView(final Object selection) {
 		if (selection == null) {
 			return;
@@ -585,4 +585,5 @@ public class ParallelDebugView extends ParallelJobView {
         job.setPriority(Job.DECORATE);
         job.schedule();
 	}
+	*/
 }

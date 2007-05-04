@@ -18,35 +18,27 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.views;
 
-import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.ptp.core.IModelListener;
-import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.core.events.IModelErrorEvent;
-import org.eclipse.ptp.core.events.IModelEvent;
-import org.eclipse.ptp.core.events.IModelRuntimeNotifierEvent;
-import org.eclipse.ptp.core.events.IModelSysChangedEvent;
-import org.eclipse.ptp.ui.UIUtils;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.part.ViewPart;
 /**
  * @author clement chu
  *
  */
-public abstract class AbstractParallelView extends ViewPart implements IModelListener {
+public abstract class AbstractParallelView extends ViewPart {
 	protected final String DEFAULT_TITLE = "Parallel";
 
 	/** Constructor to add paralell launch listener by default
 	 * 
 	 */
 	public AbstractParallelView() {
-		PTPCorePlugin.getDefault().getModelPresentation().addModelListener(this);
+		//PTPCorePlugin.getDefault().getModelPresentation().addModelListener(this);
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.IWorkbenchPart#dispose()
 	 */
 	public void dispose() {
-		PTPCorePlugin.getDefault().getModelPresentation().removeModelListener(this);
+		//PTPCorePlugin.getDefault().getModelPresentation().removeModelListener(this);
 		super.dispose();
 	}
 
@@ -66,6 +58,7 @@ public abstract class AbstractParallelView extends ViewPart implements IModelLis
 	
 	public abstract ISelection getSelection();
     
+	/*
 	public void modelEvent(final IModelEvent event) {
 		UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
 			public void run() {
@@ -94,4 +87,5 @@ public abstract class AbstractParallelView extends ViewPart implements IModelLis
 			refresh(true);			
 		}
 	}
+	*/
 }

@@ -21,6 +21,7 @@ import org.eclipse.ptp.core.elements.attributes.NodeAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.core.elements.attributes.QueueAttributes;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
+import org.eclipse.ptp.core.elements.attributes.JobAttributes.State;
 import org.eclipse.ptp.core.util.RangeSet;
 import org.eclipse.ptp.orte.core.ORTEAttributes;
 import org.eclipse.ptp.orte.core.rtsystem.ORTEProxyRuntimeClient;
@@ -288,6 +289,7 @@ public class ORTERuntimeSystemTest implements IRuntimeEventListener {
 		
 	}
 
+	@SuppressWarnings("unchecked")
 	public void handleRuntimeJobChangeEvent(IRuntimeJobChangeEvent e) {
 		/*
 		 * Find a state change, if any
@@ -296,8 +298,8 @@ public class ORTERuntimeSystemTest implements IRuntimeEventListener {
 			AttributeManager mgr = entry.getValue();
 			for (int id : entry.getKey()) {
 				if (jobId == id) {
-					EnumeratedAttribute a = (EnumeratedAttribute) mgr.getAttribute(JobAttributes.getStateAttributeDefinition());
-					if (a != null && a.getEnumValue() == JobAttributes.State.TERMINATED) {
+					EnumeratedAttribute<State> a = (EnumeratedAttribute<State>) mgr.getAttribute(JobAttributes.getStateAttributeDefinition());
+					if (a != null && a.getValue() == JobAttributes.State.TERMINATED) {
 						System.out.println("job terminated!");
 						lock.lock();
 						try {

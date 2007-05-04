@@ -27,7 +27,7 @@ import org.eclipse.ptp.core.elements.IPUniverse;
  * @author rsqrd
  *
  */
-public interface IModelPresentation extends IModelModifier {
+public interface IModelPresentation {
 	
 	/**
 	 * @return

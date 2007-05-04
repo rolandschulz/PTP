@@ -307,10 +307,10 @@ public class ResourceManagerView extends ViewPart implements
 		manager.add(removeResourceManagerAction);
 		removeResourceManagerAction.setEnabled(inContext);
 		if (inContext) {
-			IResourceManager[] rmManagers = new IResourceManager[selection.size()];
+			IResourceManagerControl[] rmManagers = new IResourceManagerControl[selection.size()];
 			for (int i = 0; i < rmManagers.length; ++i) {
 				final IResourceManagerMenuContribution menuContrib = (IResourceManagerMenuContribution) selectedObjects[i];
-				rmManagers[i] = (IResourceManager) menuContrib.getAdapter(IResourceManager.class);
+				rmManagers[i] = (IResourceManagerControl) menuContrib.getAdapter(IResourceManagerControl.class);
 			}
 			removeResourceManagerAction.setResourceManager(rmManagers);
 		}
@@ -371,6 +371,7 @@ public class ResourceManagerView extends ViewPart implements
 				// to the added and removed resource managers
 				viewer.setInput(PTPCorePlugin.getDefault().getUniverse().getResourceManagers());
 			}});
+		e.getResourceManager().addElementListener(this);
 	}
 
 	/* (non-Javadoc)
@@ -384,6 +385,7 @@ public class ResourceManagerView extends ViewPart implements
 				// to the added and removed resource managers
 				viewer.setInput(PTPCorePlugin.getDefault().getUniverse().getResourceManagers());
 			}});
+		e.getResourceManager().removeElementListener(this);
 	}
 
 }
