@@ -30,7 +30,7 @@ import org.eclipse.ptp.core.elements.listeners.IResourceManagerListener;
 import org.eclipse.ptp.core.events.IModelManagerChangedResourceManagerEvent;
 import org.eclipse.ptp.core.events.IModelManagerNewResourceManagerEvent;
 import org.eclipse.ptp.core.events.IModelManagerRemoveResourceManagerEvent;
-import org.eclipse.ptp.core.events.IModelManagerResourceManagerListener;
+import org.eclipse.ptp.core.listeners.IModelManagerResourceManagerListener;
 import org.eclipse.ptp.internal.ui.ParallelImages;
 import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
 import org.eclipse.ptp.rmsystem.IResourceManagerMenuContribution;

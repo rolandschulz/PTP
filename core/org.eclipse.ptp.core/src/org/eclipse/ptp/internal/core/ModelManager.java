@@ -40,7 +40,7 @@ import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.events.IModelManagerNewResourceManagerEvent;
 import org.eclipse.ptp.core.events.IModelManagerRemoveResourceManagerEvent;
-import org.eclipse.ptp.core.events.IModelManagerResourceManagerListener;
+import org.eclipse.ptp.core.listeners.IModelManagerResourceManagerListener;
 import org.eclipse.ptp.internal.core.elements.PUniverse;
 import org.eclipse.ptp.internal.core.events.ModelManagerNewResourceManagerEvent;
 import org.eclipse.ptp.internal.core.events.ModelManagerRemoveResourceManagerEvent;

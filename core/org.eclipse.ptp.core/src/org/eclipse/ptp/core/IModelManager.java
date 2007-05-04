@@ -22,7 +22,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
-import org.eclipse.ptp.core.events.IModelManagerResourceManagerListener;
+import org.eclipse.ptp.core.listeners.IModelManagerResourceManagerListener;
 import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
 
 public interface IModelManager extends IModelPresentation {

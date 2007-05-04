@@ -192,7 +192,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	 * @param cur_set current set 
 	 * @param pre_set previous set
 	 */
-	public void fireChangeEvent(IElementSet cur_set, IElementSet pre_set) {
+	public void fireSetChangeEvent(IElementSet cur_set, IElementSet pre_set) {
 		manager.fireSetEvent(IManager.CHANGE_SET_TYPE, null, cur_set, pre_set);
 	}
 	/** Select set
@@ -206,7 +206,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 				manager.setCurrentSetId(set.getID());
 			}
 			canvas.setElementSet(set);
-			fireChangeEvent(set, cur_element_set);
+			fireSetChangeEvent(set, cur_element_set);
 			cur_element_set = set;
 		}
 		updateAction();
