@@ -675,4 +675,13 @@ IResourceManagerControl {
 		queue.addAttributes(attrs.getAttributes());
 		return true;
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.internal.core.elements.PElement#doAddAttributeHook(java.util.List)
+	 */
+	@Override
+	protected void doAddAttributeHook(List<IAttribute> attrs) {
+		fireResourceManagerChanged(attrs);
+	}
+
 }
