@@ -22,46 +22,45 @@ package org.eclipse.ptp.internal.core.elements.events;
 import java.util.Collection;
 
 import org.eclipse.ptp.core.attributes.IAttribute;
-import org.eclipse.ptp.core.elements.IPMachine;
-import org.eclipse.ptp.core.elements.IResourceManager;
-import org.eclipse.ptp.core.elements.events.IResourceManagerChangedMachineEvent;
+import org.eclipse.ptp.core.elements.IPJob;
+import org.eclipse.ptp.core.elements.IPProcess;
+import org.eclipse.ptp.core.elements.events.IJobChangedProcessEvent;
 
 /**
- * @author rsqrd
+ * @author grw
  *
  */
-public class ResourceManagerChangedMachineEvent implements
-		IResourceManagerChangedMachineEvent {
+public class JobChangedProcessEvent implements IJobChangedProcessEvent {
 
-	private final IPMachine machine;
-	private final IResourceManager rm;
+	private final IPJob job;
+
+	private final IPProcess process;
 	private final Collection<IAttribute> attributes;
-	
-	public ResourceManagerChangedMachineEvent(IResourceManager manager, IPMachine machine, Collection<IAttribute> attrs) {
-		this.rm = manager;
-		this.machine = machine;
+	public JobChangedProcessEvent(IPJob job, IPProcess process, Collection<IAttribute> attrs) {
+		this.job = job;
+		this.process = process;
 		this.attributes = attrs;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.events.IResourceManagerChangedMachineEvent#getAttributes()
+	 * @see org.eclipse.ptp.core.elements.events.IJobChangedProcessEvent#getAttributes()
 	 */
 	public Collection<IAttribute> getAttributes() {
 		return attributes;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.events.IResourceManagerChangedMachineEvent#getMachine()
+	 * @see org.eclipse.ptp.core.elements.events.IJobChangedProcessEvent#getProcess()
 	 */
-	public IPMachine getMachine() {
-		return machine;
+	public IPProcess getProcess() {
+		return process;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.events.IResourceManagerChangedMachineEvent#getSource()
+	 * @see org.eclipse.ptp.core.elements.events.IJobChangedProcessEvent#getSource()
 	 */
-	public IResourceManager getSource() {
-		return rm;
+	public IPJob getSource() {
+		return job;
 	}
 
 }

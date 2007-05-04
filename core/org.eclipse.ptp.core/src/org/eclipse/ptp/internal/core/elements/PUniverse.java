@@ -30,17 +30,6 @@ import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
 
 public class PUniverse extends PElement implements IPUniverseControl {
 	private static final int RMID_SHIFT = 24;
-	private int nextResourceManagerId = 1;
-	private final List<IResourceManagerControl> resourceManagers =
-		new LinkedList<IResourceManagerControl>();
-	protected String NAME_TAG = "universe ";
-	
-	public PUniverse() {
-		/* '1' because this is the only universe */
-		super("1", null, P_UNIVERSE, getDefaultAttributes("TheUniverse"));
-		// setOutputStore();
-	}
-	
 	private static IAttribute[] getDefaultAttributes(String name) {
 		IAttribute nameAttr = null;
 		
@@ -51,6 +40,17 @@ public class PUniverse extends PElement implements IPUniverseControl {
 		
 		return new IAttribute[]{nameAttr};
 	}
+	private int nextResourceManagerId = 1;
+	private final List<IResourceManagerControl> resourceManagers =
+		new LinkedList<IResourceManagerControl>();
+	
+	protected String NAME_TAG = "universe ";
+	
+	public PUniverse() {
+		/* '1' because this is the only universe */
+		super("1", null, P_UNIVERSE, getDefaultAttributes("TheUniverse"));
+		// setOutputStore();
+	}
 
 	public synchronized void addResourceManager(IResourceManagerControl addedManager) {
 		resourceManagers.add(addedManager);
@@ -60,6 +60,10 @@ public class PUniverse extends PElement implements IPUniverseControl {
 		for (int i=0; i<addedManagers.length; ++i) {
 			addResourceManager(addedManagers[i]);
 		}
+	}
+
+	public int getNextResourceManagerId() {
+		return (nextResourceManagerId++ << RMID_SHIFT);
 	}
 
 	/* (non-Javadoc)
@@ -74,17 +78,13 @@ public class PUniverse extends PElement implements IPUniverseControl {
 		return null;
 	}
 	
-	public int getNextResourceManagerId() {
-		return (nextResourceManagerId++ << RMID_SHIFT);
-	}
-	
 	/**
 	 * @return all of the resource managers
 	 */
 	public synchronized IResourceManagerControl[] getResourceManagerControls() {
 		return resourceManagers.toArray(new IResourceManagerControl[0]);
 	}
-
+	
 	/**
 	 * @return all of the resource managers
 	 */
@@ -107,5 +107,12 @@ public class PUniverse extends PElement implements IPUniverseControl {
 		for (int i=0; i<removedRMs.length; ++i) {
 			removeResourceManager(removedRMs[i]);
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.internal.core.elements.PElement#doAddAttributeHook(java.util.List)
+	 */
+	@Override
+	protected void doAddAttributeHook(List<IAttribute> attrs) {
 	}
 }

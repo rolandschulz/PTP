@@ -22,43 +22,44 @@ package org.eclipse.ptp.internal.core.elements.events;
 import java.util.Collection;
 
 import org.eclipse.ptp.core.attributes.IAttribute;
-import org.eclipse.ptp.core.elements.IPMachine;
+import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IResourceManager;
-import org.eclipse.ptp.core.elements.events.IResourceManagerChangedMachineEvent;
+import org.eclipse.ptp.core.elements.events.IResourceManagerChangedQueueEvent;
 
 /**
  * @author rsqrd
  *
  */
-public class ResourceManagerChangedMachineEvent implements
-		IResourceManagerChangedMachineEvent {
+public class ResourceManagerChangedQueueEvent implements
+		IResourceManagerChangedQueueEvent {
 
-	private final IPMachine machine;
+	private final IPQueue queues;
 	private final IResourceManager rm;
 	private final Collection<IAttribute> attributes;
-	
-	public ResourceManagerChangedMachineEvent(IResourceManager manager, IPMachine machine, Collection<IAttribute> attrs) {
+
+
+	public ResourceManagerChangedQueueEvent(IResourceManager manager, IPQueue queues, Collection<IAttribute> attrs) {
 		this.rm = manager;
-		this.machine = machine;
+		this.queues = queues;
 		this.attributes = attrs;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.events.IResourceManagerChangedMachineEvent#getAttributes()
+	 * @see org.eclipse.ptp.core.elements.events.IResourceManagerChangedQueueEvent#getAttributes()
 	 */
 	public Collection<IAttribute> getAttributes() {
 		return attributes;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.events.IResourceManagerChangedMachineEvent#getMachine()
+	 * @see org.eclipse.ptp.rmsystem.events.IResourceManagerChangedQueueEvent#getQueue()
 	 */
-	public IPMachine getMachine() {
-		return machine;
+	public IPQueue getQueue() {
+		return queues;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.events.IResourceManagerChangedMachineEvent#getSource()
+	 * @see org.eclipse.ptp.rmsystem.events.IResourceManagerChangedQueueEvent#getSource()
 	 */
 	public IResourceManager getSource() {
 		return rm;

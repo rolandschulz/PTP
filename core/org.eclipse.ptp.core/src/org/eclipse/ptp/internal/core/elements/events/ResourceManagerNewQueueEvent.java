@@ -19,38 +19,34 @@
  */
 package org.eclipse.ptp.internal.core.elements.events;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IResourceManager;
-import org.eclipse.ptp.core.elements.events.IResourceManagerChangedQueueEvent;
+import org.eclipse.ptp.core.elements.events.IResourceManagerNewQueueEvent;
 
 /**
  * @author rsqrd
  *
  */
-public class ResourceManagerChangedQueuesEvent implements
-		IResourceManagerChangedQueueEvent {
+public class ResourceManagerNewQueueEvent implements
+		IResourceManagerNewQueueEvent {
 
-	private final List<IPQueue> changedQueues;
 	private final IResourceManager rm;
+	private final IPQueue queue;
 
-	public ResourceManagerChangedQueuesEvent(IResourceManager manager, List<IPQueue> queues) {
+	public ResourceManagerNewQueueEvent(IResourceManager manager, IPQueue queue) {
 		this.rm = manager;
-		this.changedQueues = new ArrayList<IPQueue>(queues);
+		this.queue = queue;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.events.IResourceManagerChangedQueuesEvent#getChangedQueues()
+	 * @see org.eclipse.ptp.rmsystem.events.IResourceManagerNewQueueEvent#getQueue()
 	 */
 	public IPQueue getQueue() {
-		return Collections.unmodifiableList(changedQueues);
+		return queue;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.events.IResourceManagerChangedQueuesEvent#getSource()
+	 * @see org.eclipse.ptp.rmsystem.events.IResourceManagerNewQueueEvent#getSource()
 	 */
 	public IResourceManager getSource() {
 		return rm;

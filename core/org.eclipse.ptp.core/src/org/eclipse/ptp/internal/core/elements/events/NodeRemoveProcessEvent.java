@@ -19,49 +19,36 @@
  */
 package org.eclipse.ptp.internal.core.elements.events;
 
-import java.util.Collection;
-
-import org.eclipse.ptp.core.attributes.IAttribute;
-import org.eclipse.ptp.core.elements.IPMachine;
-import org.eclipse.ptp.core.elements.IResourceManager;
-import org.eclipse.ptp.core.elements.events.IResourceManagerChangedMachineEvent;
+import org.eclipse.ptp.core.elements.IPNode;
+import org.eclipse.ptp.core.elements.IPProcess;
+import org.eclipse.ptp.core.elements.events.INodeRemoveProcessEvent;
 
 /**
- * @author rsqrd
+ * @author grw
  *
  */
-public class ResourceManagerChangedMachineEvent implements
-		IResourceManagerChangedMachineEvent {
+public class NodeRemoveProcessEvent implements INodeRemoveProcessEvent {
 
-	private final IPMachine machine;
-	private final IResourceManager rm;
-	private final Collection<IAttribute> attributes;
-	
-	public ResourceManagerChangedMachineEvent(IResourceManager manager, IPMachine machine, Collection<IAttribute> attrs) {
-		this.rm = manager;
-		this.machine = machine;
-		this.attributes = attrs;
+	private final IPNode node;
+	private final IPProcess process;
+
+	public NodeRemoveProcessEvent(IPNode node, IPProcess process) {
+		this.node = node;
+		this.process = process;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.events.IResourceManagerChangedMachineEvent#getAttributes()
+	 * @see org.eclipse.ptp.core.elements.events.INodeRemoveProcessEvent#getProcess()
 	 */
-	public Collection<IAttribute> getAttributes() {
-		return attributes;
+	public IPProcess getProcess() {
+		return process;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.events.IResourceManagerChangedMachineEvent#getMachine()
+	 * @see org.eclipse.ptp.core.elements.events.INodeRemoveProcessEvent#getSource()
 	 */
-	public IPMachine getMachine() {
-		return machine;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.events.IResourceManagerChangedMachineEvent#getSource()
-	 */
-	public IResourceManager getSource() {
-		return rm;
+	public IPNode getSource() {
+		return node;
 	}
 
 }

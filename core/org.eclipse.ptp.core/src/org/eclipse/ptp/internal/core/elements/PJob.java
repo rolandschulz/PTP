@@ -35,15 +35,19 @@ import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes.State;
 import org.eclipse.ptp.core.elements.events.IJobChangedEvent;
+import org.eclipse.ptp.core.elements.events.IJobChangedProcessEvent;
 import org.eclipse.ptp.core.elements.events.IJobNewProcessEvent;
 import org.eclipse.ptp.core.elements.events.IJobRemoveProcessEvent;
+import org.eclipse.ptp.core.elements.events.IProcessChangedEvent;
 import org.eclipse.ptp.core.elements.listeners.IJobListener;
 import org.eclipse.ptp.core.elements.listeners.IJobProcessListener;
+import org.eclipse.ptp.core.elements.listeners.IProcessListener;
 import org.eclipse.ptp.internal.core.elements.events.JobChangedEvent;
+import org.eclipse.ptp.internal.core.elements.events.JobChangedProcessEvent;
 import org.eclipse.ptp.internal.core.elements.events.JobNewProcessEvent;
 import org.eclipse.ptp.internal.core.elements.events.JobRemoveProcessEvent;
 
-public class PJob extends Parent implements IPJobControl {
+public class PJob extends Parent implements IPJobControl, IProcessListener {
 	final public static int BASE_OFFSET = 10000;
 	final public static int STATE_NEW = 5000;
 
@@ -52,14 +56,6 @@ public class PJob extends Parent implements IPJobControl {
 	private HashMap<String, IPProcessControl> numberMap = 
 		new HashMap<String, IPProcessControl>();
 	private boolean isDebugJob = false;
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.internal.core.elements.PElement#doAddAttributeHook(org.eclipse.ptp.core.attributes.IAttribute[])
-	 */
-	@Override
-	protected void doAddAttributeHook(List<IAttribute> attribs) {
-		fireChangedJob(attribs);
-	}
 
 	public PJob(String id, IPQueueControl queue, IAttribute[] attrs) {
 		super(id, queue, P_JOB, attrs);
@@ -75,28 +71,29 @@ public class PJob extends Parent implements IPJobControl {
 			}
 		}
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.IPJob#addChildListener(org.eclipse.ptp.core.elements.listeners.IJobProcessListener)
 	 */
 	public void addChildListener(IJobProcessListener listener) {
 		childListeners.add(listener);
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.IPJob#addElementListener(org.eclipse.ptp.core.elements.listeners.IJobListener)
 	 */
 	public void addElementListener(IJobListener listener) {
 		elementListeners.add(listener);
 	}
-	
-	public void addProcess(IPProcessControl p) {
-		addChild(p);
-		String num = p.getProcessNumber();
+
+	public void addProcess(IPProcessControl process) {
+		addChild(process);
+		String num = process.getProcessNumber();
 		if (num != null) {
-			numberMap.put(num, p);
+			numberMap.put(num, process);
 		}
-		fireNewProcess(p);
+		fireNewProcess(process);
+		process.addElementListener(this);
 	}
 	
 	public synchronized IPProcess getProcessById(String id) {
@@ -105,7 +102,7 @@ public class PJob extends Parent implements IPJobControl {
 			return (IPProcessControl) element;
 		return null;
 	}
-
+	
 	public synchronized IPProcess getProcessByNumber(String number) {
 		return numberMap.get(number);
 	}
@@ -137,11 +134,23 @@ public class PJob extends Parent implements IPJobControl {
 	public IPQueueControl getQueueControl() {
 		return (IPQueueControl) getParent();
 	}
-	
+
 	public synchronized IPProcess[] getSortedProcesses() {
 		IPProcessControl[] processes = getProcessControls();
 		sort(processes);
 		return processes;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.listeners.IProcessListener#handleEvent(org.eclipse.ptp.core.elements.events.IProcessChangedEvent)
+	 */
+	public void handleEvent(IProcessChangedEvent e) {
+		IJobChangedProcessEvent ne = 
+			new JobChangedProcessEvent(this, e.getSource(), e.getAttributes());
+		
+		for (Object listener : childListeners.getListeners()) {
+			((IJobProcessListener)listener).handleEvent(ne);
+		}
 	}
 
 	public boolean isDebug() {
@@ -181,6 +190,7 @@ public class PJob extends Parent implements IPJobControl {
 	 * @see org.eclipse.ptp.core.elementcontrols.IPJobControl#removeProcess(org.eclipse.ptp.core.elementcontrols.IPProcessControl)
 	 */
 	public void removeProcess(IPProcessControl process) {
+		process.removeElementListener(this);
 		removeChild(process);
 		process.removeNode();
 		process.clearOutput();
@@ -199,7 +209,7 @@ public class PJob extends Parent implements IPJobControl {
 		IJobChangedEvent e = 
 			new JobChangedEvent(this, attrs);
 		
-		for (Object listener : childListeners.getListeners()) {
+		for (Object listener : elementListeners.getListeners()) {
 			((IJobListener)listener).handleEvent(e);
 		}
 	}
@@ -220,5 +230,13 @@ public class PJob extends Parent implements IPJobControl {
 		for (Object listener : childListeners.getListeners()) {
 			((IJobProcessListener)listener).handleEvent(e);
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.internal.core.elements.PElement#doAddAttributeHook(org.eclipse.ptp.core.attributes.IAttribute[])
+	 */
+	@Override
+	protected void doAddAttributeHook(List<IAttribute> attribs) {
+		fireChangedJob(attribs);
 	}
 }
