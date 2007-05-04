@@ -295,6 +295,7 @@ public class JobManager extends AbstractUIManager {
 		cur_job = job;
 		fireJobChangedEvent(IJobChangedListener.CHANGED, new_id, old_id);
 	}
+	
 	public void setQueue(IPQueue queue) {
 		if (queue != cur_queue) {
 			cur_queue = queue;
@@ -304,6 +305,7 @@ public class JobManager extends AbstractUIManager {
 	public void setCurrentSetId(String set_id) {
 		cur_set_id = set_id;
 	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#shutdown()
 	 */

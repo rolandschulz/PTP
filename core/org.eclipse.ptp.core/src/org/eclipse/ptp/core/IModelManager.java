@@ -22,7 +22,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
-import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.events.IModelManagerResourceManagerListener;
 import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
 
@@ -30,10 +29,19 @@ public interface IModelManager extends IModelPresentation {
 	
 	public void addListener(IModelManagerResourceManagerListener listener);
 	
+	/**
+	 * @param addedManager
+	 */
 	public void addResourceManager(IResourceManagerControl addedManager);
 	
+	/**
+	 * @param addedManagers
+	 */
 	public void addResourceManagers(IResourceManagerControl[] addedManagers);
 	
+	/**
+	 * @return
+	 */
 	public ILaunchConfiguration getPTPConfiguration();
 
 	/**
@@ -55,18 +63,40 @@ public interface IModelManager extends IModelPresentation {
 	 */
 	public void loadResourceManagers(IProgressMonitor monitor) throws CoreException;
 	
+	/**
+	 * @param listener
+	 */
 	public void removeListener(IModelManagerResourceManagerListener listener);
 	
-	public void removeResourceManager(IResourceManager removedManager);
+	/**
+	 * @param removedManager
+	 */
+	public void removeResourceManager(IResourceManagerControl removedManager);
 	
-	public void removeResourceManagers(IResourceManager[] removedRMs);
+	/**
+	 * @param removedRMs
+	 */
+	public void removeResourceManagers(IResourceManagerControl[] removedRMs);
 	
+	/**
+	 * 
+	 */
 	public void saveResourceManagers();
 
+	/**
+	 * @param config
+	 */
 	public void setPTPConfiguration(ILaunchConfiguration config);
 
+	/**
+	 * @throws CoreException
+	 */
 	public void shutdown() throws CoreException;
 
+	/**
+	 * @param monitor
+	 * @throws CoreException
+	 */
 	public void start(IProgressMonitor monitor) throws CoreException;
 
 	/**
