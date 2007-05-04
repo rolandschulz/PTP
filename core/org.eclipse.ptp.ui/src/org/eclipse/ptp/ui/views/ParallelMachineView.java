@@ -142,26 +142,29 @@ public class ParallelMachineView extends AbstractParallelSetView implements IRes
 		if (node != null) {
 			node.removeChildListener(this);
 		}
-		
+
+		boolean isElementRegistered = element.isRegistered();
 		/*
 		 * Unregister any registered elements
 		 */
-		boolean isElementRegistered = element.isRegistered();
 		unregister();
-		
+
 		/*
-		 * Now register the new element if we're not trying
-		 * to register the same one (toggle action).
+		 * Rregister the new element only if we're not trying
+		 * to register the same one.
 		 */
 		if (!isElementRegistered) {
+			/*
+			 * Now register the new element
+			 */
 			register(element);
 			getCurrentElementHandler().addRegisterElement(element);
 			if (element instanceof IPNode) {
 				node = (IPNode)element;
 				node.addChildListener(this);
 			}
-			updateLowerRegions();
 		}
+		updateLowerRegions();
 	}
 	
 	/* (non-Javadoc)
@@ -270,7 +273,11 @@ public class ParallelMachineView extends AbstractParallelSetView implements IRes
 		 */
 		UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
 			public void run() {
-				updateProcessInfoRegion(e.getSource());
+				IPNode node = e.getSource();
+				if (node == getRegisteredNode()) {
+					updateProcessInfoRegion(node);
+				}
+				refresh(false);
 			}
 		});
 	}
@@ -284,7 +291,11 @@ public class ParallelMachineView extends AbstractParallelSetView implements IRes
 		 */
 		UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
 			public void run() {
-				updateProcessInfoRegion(e.getSource());
+				IPNode node = e.getSource();
+				if (node == getRegisteredNode()) {
+					updateProcessInfoRegion(node);
+				}
+				refresh(false);
 			}
 		});
 	}
@@ -298,7 +309,10 @@ public class ParallelMachineView extends AbstractParallelSetView implements IRes
 		 */
 		UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
 			public void run() {
-				updateProcessInfoRegion(e.getSource());
+				IPNode node = e.getSource();
+				if (node == getRegisteredNode()) {
+					updateProcessInfoRegion(node);
+				}
 			}
 		});
 	}
@@ -347,11 +361,17 @@ public class ParallelMachineView extends AbstractParallelSetView implements IRes
 	public void selectMachine(IPMachine machine) {
 		IPMachine old = getMachineManager().getCurrentMachine();
 		if (old != null) {
+			for (IPNode node : machine.getNodes()) {
+				node.removeChildListener(this);
+			}
 			old.removeChildListener(this);
 		}
 		if (machine != null) {
 			getMachineManager().setCurrentMachine(machine);
 			machine.addChildListener(this);
+			for (IPNode node : machine.getNodes()) {
+				node.addChildListener(this);
+			}
 		}
 		updateMachineSet();
 	}
