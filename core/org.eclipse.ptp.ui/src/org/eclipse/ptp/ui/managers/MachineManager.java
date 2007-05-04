@@ -156,7 +156,21 @@ public class MachineManager extends AbstractUIManager {
 		return cur_machine.getName();
 	}
 	
-	/** Get node status
+	/** 
+	 * Get node status.
+	 * 
+	 * Currently the node status is determined as follows:
+	 * 	- if the node is up:
+	 * 		- if there are *any* running processes on the node: NODE_RUNNING
+	 * 		- if there are no running processes, but one or more exited processes on the node: NODE_EXITED
+	 *  	- if there is extraState: extraState
+	 *  	- if there is no extraState: NODE_UP
+	 *  - if the node is down: NODE_DOWN
+	 *  - if the node is error: NODE_ERROR
+	 *  
+	 *  TODO: in the future, the machine view should be linked to the jobs view. The node state should only
+	 *  be shown as NODE_RUNNING if any processes belonging to the current job are running.
+	 *  
 	 * @param node
 	 * @return
 	 */
@@ -174,10 +188,12 @@ public class MachineManager extends AbstractUIManager {
 			case UP:
 				IPProcess[] procs = node.getProcesses();
 				if (procs.length > 0) {
-					if (node.getProcesses()[0].getJob().isTerminated()) {
-						return IPTPUIConstants.NODE_EXITED;
+					for (IPProcess proc : procs) {
+						if (!proc.isTerminated()) {
+							return IPTPUIConstants.NODE_RUNNING;
+						}
 					}
-					return IPTPUIConstants.NODE_RUNNING;
+					return IPTPUIConstants.NODE_EXITED;
 				}
 				
 				EnumeratedAttribute<NodeAttributes.ExtraState> extraStateAttr =
