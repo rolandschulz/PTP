@@ -31,4 +31,9 @@ public interface IPMachineControl extends IPElementControl, IPMachine {
 	 * @return
 	 */
 	public IPNodeControl[] getNodeControls();
+
+	/**
+	 * @param node
+	 */
+	public void removeNode(IPNodeControl node);
 }

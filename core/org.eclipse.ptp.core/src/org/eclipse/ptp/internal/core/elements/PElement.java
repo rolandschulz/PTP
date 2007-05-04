@@ -18,6 +18,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.core.elements;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -135,6 +137,7 @@ public abstract class PElement extends PlatformObject implements IPElementContro
 	 */
 	public void addAttribute(IAttribute attrib) {
 		attributeValues.addAttribute(attrib);
+		doAddAttributeHook(Arrays.asList(new IAttribute[] {attrib}));
 	}
 
 	/* (non-Javadoc)
@@ -142,7 +145,10 @@ public abstract class PElement extends PlatformObject implements IPElementContro
 	 */
 	public void addAttributes(IAttribute[] attribs) {
 		attributeValues.addAttributes(attribs);
+		doAddAttributeHook(Arrays.asList(attribs));
 	}
+
+	protected abstract void doAddAttributeHook(List<IAttribute> attrs);
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elementcontrols.IPElementControl#size()

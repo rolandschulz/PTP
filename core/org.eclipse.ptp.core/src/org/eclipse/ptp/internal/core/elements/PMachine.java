@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.core.elements;
 
+import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.elementcontrols.IPElementControl;
 import org.eclipse.ptp.core.elementcontrols.IPMachineControl;
@@ -25,19 +26,41 @@ import org.eclipse.ptp.core.elementcontrols.IPNodeControl;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPNode;
 import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.core.elements.listeners.IMachineListener;
+import org.eclipse.ptp.core.elements.listeners.IMachineNodeListener;
 
 public class PMachine extends Parent implements IPMachineControl {
-	protected String NAME_TAG = "machine ";
-	protected String arch = "undefined";
+	private final ListenerList elementListeners = new ListenerList();
+	private final ListenerList childListeners = new ListenerList();
+	private String arch = "undefined";
 
 	public PMachine(String id, IResourceManagerControl rm, IAttribute[] attrs) {
 		super(id, rm, P_MACHINE, attrs);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPMachine#addChildListener(org.eclipse.ptp.core.elements.listeners.IMachineNodeListener)
+	 */
+	public void addChildListener(IMachineNodeListener listener) {
+		childListeners.add(listener);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPMachine#addElementListener(org.eclipse.ptp.core.elements.listeners.IMachineListener)
+	 */
+	public void addElementListener(IMachineListener listener) {
+		elementListeners.add(listener);
 	}
 
 	public synchronized void addNode(IPNodeControl curnode) {
 		addChild(curnode);
 	}
 
+	/* returns a string representation of the architecture of this machine */
+	public String getArch() {
+		return arch;
+	}
+	
 	/* finds a node using a string identifier - returns null if none found */
 	public synchronized IPNode getNodeById(String id) {
 		IPElementControl element = findChild(id);
@@ -46,16 +69,11 @@ public class PMachine extends Parent implements IPMachineControl {
 		return null;
 	}
 
-	/* returns a string representation of the architecture of this machine */
-	public String getArch() {
-		return arch;
-	}
-
 	/* returns an array of the nodes that are comprised by this machine */
 	public synchronized IPNodeControl[] getNodeControls() {
 		return (IPNodeControl[]) getCollection().toArray(new IPNodeControl[size()]);
 	}
-	
+
 	public IPNode[] getNodes() {
 		return getNodeControls();
 	}
@@ -66,7 +84,7 @@ public class PMachine extends Parent implements IPMachineControl {
 	public IResourceManager getResourceManager() {
 		return (IResourceManager) getParent();
 	}
-
+	
 	/* returns a list of the nodes comprised by this machine - but sorted */
 	public synchronized IPNode[] getSortedNodes() {
 		IPNodeControl[] nodes = getNodeControls();
@@ -74,11 +92,32 @@ public class PMachine extends Parent implements IPMachineControl {
 		return nodes;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPMachine#removeChildListener(org.eclipse.ptp.core.elements.listeners.IMachineNodeListener)
+	 */
+	public void removeChildListener(IMachineNodeListener listener) {
+		childListeners.remove(listener);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPMachine#removeElementListener(org.eclipse.ptp.core.elements.listeners.IMachineListener)
+	 */
+	public void removeElementListener(IMachineListener listener) {
+		elementListeners.remove(listener);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elementcontrols.IPMachineControl#removeNode(org.eclipse.ptp.core.elementcontrols.IPNodeControl)
+	 */
+	public void removeNode(IPNodeControl node) {
+		removeChild(node);
+	}
+
 	/* sets the architecture of this machine, which is merely a string */
 	public void setArch(String arch) {
 		this.arch = arch;
 	}
-	
+
 	/*
 	 * returns all the nodes comprised by this machine, which is just the size()
 	 * of its children group

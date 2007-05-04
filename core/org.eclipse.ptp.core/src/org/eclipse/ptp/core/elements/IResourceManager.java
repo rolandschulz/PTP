@@ -24,7 +24,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
-import org.eclipse.ptp.rmsystem.IResourceManagerListener;
+import org.eclipse.ptp.core.elements.listeners.IResourceManagerListener;
+import org.eclipse.ptp.core.elements.listeners.IResourceManagerMachineListener;
+import org.eclipse.ptp.core.elements.listeners.IResourceManagerQueueListener;
 import org.eclipse.ptp.rmsystem.IResourceManagerMenuContribution;
 
 public interface IResourceManager extends IPElement,
@@ -33,8 +35,18 @@ IAdaptable, IResourceManagerMenuContribution {
 	/**
 	 * @param listener
 	 */
-	public void addResourceManagerListener(IResourceManagerListener listener);
+	public void addChildListener(IResourceManagerMachineListener listener);
 	
+	/**
+	 * @param listener
+	 */
+	public void addChildListener(IResourceManagerQueueListener listener);
+
+	/**
+	 * @param listener
+	 */
+	public void addElementListener(IResourceManagerListener listener);
+
 	/**
 	 * 
 	 * @param attrId
@@ -88,7 +100,17 @@ IAdaptable, IResourceManagerMenuContribution {
 	/**
 	 * @param listener
 	 */
-	public void removeResourceManagerListener(IResourceManagerListener listener);
+	public void removeChildListener(IResourceManagerMachineListener listener);
+
+	/**
+	 * @param listener
+	 */
+	public void removeChildListener(IResourceManagerQueueListener listener);
+
+	/**
+	 * @param listener
+	 */
+	public void removeElementListener(IResourceManagerListener listener);
 
 	/**
 	 * @param queue

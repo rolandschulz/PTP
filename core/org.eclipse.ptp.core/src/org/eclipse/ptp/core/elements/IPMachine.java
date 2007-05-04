@@ -18,6 +18,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.elements;
 
+import org.eclipse.ptp.core.elements.listeners.IMachineListener;
+import org.eclipse.ptp.core.elements.listeners.IMachineNodeListener;
+
 
 /**
  * Interface class for a model of a machine. Machines are comprised of nodes
@@ -32,6 +35,23 @@ package org.eclipse.ptp.core.elements;
 public interface IPMachine extends IPElement {
 	
 	/**
+	 * @param listener
+	 */
+	public void addChildListener(IMachineNodeListener listener);
+
+	/**
+	 * @param listener
+	 */
+	public void addElementListener(IMachineListener listener);
+
+	/**
+	 * Returns the architecture of this Machine.
+	 * 
+	 * @return The architecture of this Machine
+	 */
+	public String getArch();
+	
+	/**
 	 * Given a node id, attempts to find it as a Node object
 	 * contained in this Machine. If found, the Node object is returned.
 	 * Otherwise, <code>null</code> is returned.
@@ -41,13 +61,6 @@ public interface IPMachine extends IPElement {
 	 * @return The Node object if found, else <code>null</code>
 	 */
 	public IPNode getNodeById(String id);
-	
-	/**
-	 * Returns the architecture of this Machine.
-	 * 
-	 * @return The architecture of this Machine
-	 */
-	public String getArch();
 
 	/**
 	 * Returns an array of all the Nodes that this Machine is comprised of. May
@@ -57,7 +70,7 @@ public interface IPMachine extends IPElement {
 	 *         none.
 	 */
 	public IPNode[] getNodes();
-
+	
 	/**
 	 * @return the machine's parent resource manager
 	 */
@@ -72,6 +85,16 @@ public interface IPMachine extends IPElement {
 	 *         are none.
 	 */
 	public IPNode[] getSortedNodes();
+
+	/**
+	 * @param listener
+	 */
+	public void removeChildListener(IMachineNodeListener listener);
+
+	/**
+	 * @param listener
+	 */
+	public void removeElementListener(IMachineListener listener);
 
 	/**
 	 * Sets the architecture of this machine. At this time there are no

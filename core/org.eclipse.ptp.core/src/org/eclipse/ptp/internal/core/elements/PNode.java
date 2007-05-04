@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.core.elements;
 
+import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IntegerAttribute;
 import org.eclipse.ptp.core.elementcontrols.IPElementControl;
@@ -27,19 +28,43 @@ import org.eclipse.ptp.core.elementcontrols.IPProcessControl;
 import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.attributes.NodeAttributes;
+import org.eclipse.ptp.core.elements.listeners.INodeListener;
+import org.eclipse.ptp.core.elements.listeners.INodeProcessListener;
 
 public class PNode extends Parent implements IPNodeControl {
-	protected String NAME_TAG = "node ";
+	private final ListenerList elementListeners = new ListenerList();
+	private final ListenerList childListeners = new ListenerList();
 
 	public PNode(String id, IPMachineControl mac, IAttribute[] attrs) {
 		super(id, mac, P_NODE, attrs);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPNode#addChildListener(org.eclipse.ptp.core.elements.listeners.INodeProcessListener)
+	 */
+	public void addChildListener(INodeProcessListener listener) {
+		childListeners.add(listener);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPNode#addElementListener(org.eclipse.ptp.core.elements.listeners.INodeListener)
+	 */
+	public void addElementListener(INodeListener listener) {
+		elementListeners.add(listener);
 	}
 	
 	public synchronized void addProcess(IPProcessControl process) {
 		addChild(process);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elementcontrols.IPNodeControl#getMachineControl()
+	 */
 	public IPMachine getMachine() {
+		return getMachineControl();
+	}
+
+	public IPMachineControl getMachineControl() {
 		IPElementControl current = this;
 		do {
 			if (current instanceof IPMachineControl)
@@ -47,7 +72,7 @@ public class PNode extends Parent implements IPNodeControl {
 		} while ((current = current.getParent()) != null);
 		return null;
 	}
-	
+
 	public String getNodeNumber() {
 		IntegerAttribute num = (IntegerAttribute)getAttribute(NodeAttributes.getNumberAttributeDefinition());
 		if (num != null) {
@@ -60,17 +85,31 @@ public class PNode extends Parent implements IPNodeControl {
 		return (IPProcessControl[]) getCollection().toArray(new IPProcessControl[size()]);
 	}
 
-	public synchronized void removeProcess(IPProcessControl process) {
-		removeChild(process);
-	}
-
 	public IPProcess[] getProcesses() {
 		return getProcessControls();
 	}
-	
+
 	public synchronized IPProcess[] getSortedProcesses() {
 		IPProcessControl[] procs = getProcessControls();
 		sort(procs);
 		return procs;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPNode#removeChildListener(org.eclipse.ptp.core.elements.listeners.INodeProcessListener)
+	 */
+	public void removeChildListener(INodeProcessListener listener) {
+		childListeners.remove(listener);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPNode#removeElementListener(org.eclipse.ptp.core.elements.listeners.INodeListener)
+	 */
+	public void removeElementListener(INodeListener listener) {
+		elementListeners.remove(listener);
+	}
+
+	public synchronized void removeProcess(IPProcessControl process) {
+		removeChild(process);
 	}
 }

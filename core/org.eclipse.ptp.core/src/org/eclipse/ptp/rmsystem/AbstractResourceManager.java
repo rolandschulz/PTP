@@ -21,7 +21,6 @@
  */
 package org.eclipse.ptp.rmsystem;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
@@ -35,6 +34,7 @@ import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
 import org.eclipse.ptp.core.attributes.AttributeManager;
+import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
@@ -48,8 +48,6 @@ import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPMachine;
-import org.eclipse.ptp.core.elements.IPNode;
-import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
@@ -59,33 +57,27 @@ import org.eclipse.ptp.core.elements.attributes.NodeAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.core.elements.attributes.QueueAttributes;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
+import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes.State;
+import org.eclipse.ptp.core.elements.events.IMachineChangedEvent;
+import org.eclipse.ptp.core.elements.events.IQueueChangedEvent;
+import org.eclipse.ptp.core.elements.events.IResourceManagerChangedMachineEvent;
+import org.eclipse.ptp.core.elements.events.IResourceManagerChangedQueueEvent;
+import org.eclipse.ptp.core.elements.events.IResourceManagerErrorEvent;
+import org.eclipse.ptp.core.elements.events.IResourceManagerNewMachineEvent;
+import org.eclipse.ptp.core.elements.events.IResourceManagerNewQueueEvent;
+import org.eclipse.ptp.core.elements.listeners.IMachineListener;
+import org.eclipse.ptp.core.elements.listeners.IQueueListener;
+import org.eclipse.ptp.core.elements.listeners.IResourceManagerListener;
+import org.eclipse.ptp.core.elements.listeners.IResourceManagerMachineListener;
+import org.eclipse.ptp.core.elements.listeners.IResourceManagerQueueListener;
 import org.eclipse.ptp.internal.core.elements.PElement;
 import org.eclipse.ptp.internal.core.elements.PJob;
 import org.eclipse.ptp.internal.core.elements.PMachine;
 import org.eclipse.ptp.internal.core.elements.PNode;
 import org.eclipse.ptp.internal.core.elements.PProcess;
 import org.eclipse.ptp.internal.core.elements.PQueue;
-import org.eclipse.ptp.rmsystem.events.IResourceManagerChangedJobsEvent;
-import org.eclipse.ptp.rmsystem.events.IResourceManagerChangedMachinesEvent;
-import org.eclipse.ptp.rmsystem.events.IResourceManagerChangedNodesEvent;
-import org.eclipse.ptp.rmsystem.events.IResourceManagerChangedProcessesEvent;
-import org.eclipse.ptp.rmsystem.events.IResourceManagerChangedQueuesEvent;
-import org.eclipse.ptp.rmsystem.events.IResourceManagerNewJobsEvent;
-import org.eclipse.ptp.rmsystem.events.IResourceManagerNewMachinesEvent;
-import org.eclipse.ptp.rmsystem.events.IResourceManagerNewNodesEvent;
-import org.eclipse.ptp.rmsystem.events.IResourceManagerNewProcessesEvent;
-import org.eclipse.ptp.rmsystem.events.IResourceManagerNewQueuesEvent;
-import org.eclipse.ptp.rmsystem.events.ResourceManagerChangedJobsEvent;
-import org.eclipse.ptp.rmsystem.events.ResourceManagerChangedMachinesEvent;
-import org.eclipse.ptp.rmsystem.events.ResourceManagerChangedNodesEvent;
-import org.eclipse.ptp.rmsystem.events.ResourceManagerChangedProcessesEvent;
-import org.eclipse.ptp.rmsystem.events.ResourceManagerChangedQueuesEvent;
-import org.eclipse.ptp.rmsystem.events.ResourceManagerErrorEvent;
-import org.eclipse.ptp.rmsystem.events.ResourceManagerNewJobsEvent;
-import org.eclipse.ptp.rmsystem.events.ResourceManagerNewMachinesEvent;
-import org.eclipse.ptp.rmsystem.events.ResourceManagerNewNodesEvent;
-import org.eclipse.ptp.rmsystem.events.ResourceManagerNewProcessesEvent;
-import org.eclipse.ptp.rmsystem.events.ResourceManagerNewQueuesEvent;
+import org.eclipse.ptp.internal.core.elements.events.ResourceManagerChangedMachineEvent;
+import org.eclipse.ptp.internal.core.elements.events.ResourceManagerErrorEvent;
 
 /**
  * @author rsqrd
@@ -106,10 +98,14 @@ IResourceManagerControl {
 	}
 
 	private final ListenerList listeners = new ListenerList();
+	private final ListenerList queueListeners = new ListenerList();
+	private final ListenerList machineListeners = new ListenerList();
+	
+	private final IQueueListener queueListener;
+	private final IMachineListener machineListener;
 
 	private final IResourceManagerConfiguration config;
-	private ResourceManagerAttributes.State state;
-	private String statusMessage;
+	private EnumeratedAttribute state;
 	private AttributeDefinitionManager attrDefManager;
 
 	private final HashMap<String, IPJobControl> jobsById = new HashMap<String, IPJobControl>();
@@ -123,8 +119,10 @@ IResourceManagerControl {
 	{
 		super(id, universe, P_RESOURCE_MANAGER, getDefaultAttributes(config));
 		this.config = config;
-		this.state = ResourceManagerAttributes.State.STOPPED;
-		this.statusMessage = this.state.toString();
+		try {
+			this.state = ResourceManagerAttributes.getStateAttributeDefinition().create(State.STOPPED);
+		} catch (IllegalValueException e1) {
+		}
 		this.attrDefManager = new AttributeDefinitionManager();
 		this.attrDefManager.setAttributeDefinitions(ElementAttributes.getDefaultAttributeDefinitions());
 		this.attrDefManager.setAttributeDefinitions(JobAttributes.getDefaultAttributeDefinitions());
@@ -133,6 +131,15 @@ IResourceManagerControl {
 		this.attrDefManager.setAttributeDefinitions(ProcessAttributes.getDefaultAttributeDefinitions());
 		this.attrDefManager.setAttributeDefinitions(QueueAttributes.getDefaultAttributeDefinitions());
 		this.attrDefManager.setAttributeDefinitions(ResourceManagerAttributes.getDefaultAttributeDefinitions());
+
+		queueListener = new IQueueListener(){
+			public void handleEvent(IQueueChangedEvent e) {
+				fireQueueChanged(e.getSource());				
+			}};
+		machineListener = new IMachineListener(){
+			public void handleEvent(IMachineChangedEvent e) {
+				fireMachineChanged(e.getSource());				
+			}};
 	}
 
 	/*
@@ -140,9 +147,36 @@ IResourceManagerControl {
 	 * 
 	 * @see org.eclipse.ptp.rm.IResourceManager#addResourceManagerListener(org.eclipse.ptp.rm.IResourceManagerListener)
 	 */
-	public void addResourceManagerListener(IResourceManagerListener listener) {
-		System.out.println("listener: " + listener + " added to " + this);
+	public void addElementListener(IResourceManagerListener listener) {
 		listeners.add(listener);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IResourceManager#addChildListener(org.eclipse.ptp.core.elements.listeners.IResourceManagerMachineListener)
+	 */
+	public void addChildListener(IResourceManagerMachineListener listener) {
+		machineListeners.add(listener);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IResourceManager#addChildListener(org.eclipse.ptp.core.elements.listeners.IResourceManagerQueueListener)
+	 */
+	public void addChildListener(IResourceManagerQueueListener listener) {
+		queueListeners.add(listener);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IResourceManager#removeChildListener(org.eclipse.ptp.core.elements.listeners.IResourceManagerMachineListener)
+	 */
+	public void removeChildListener(IResourceManagerMachineListener listener) {
+		machineListeners.remove(listener);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IResourceManager#removeChildListener(org.eclipse.ptp.core.elements.listeners.IResourceManagerQueueListener)
+	 */
+	public void removeChildListener(IResourceManagerQueueListener listener) {
+		queueListeners.remove(listener);
 	}
 
 	/* (non-Javadoc)
@@ -152,7 +186,6 @@ IResourceManagerControl {
 	    if (getState().equals(ResourceManagerAttributes.State.STARTED)) {
 	        doDisableEvents();
 	        setState(ResourceManagerAttributes.State.SUSPENDED);
-            fireSuspended();
         }
 	}
 
@@ -175,13 +208,13 @@ IResourceManagerControl {
 	    if (getState().equals(ResourceManagerAttributes.State.SUSPENDED)) {
 	        doEnableEvents();
 	        setState(ResourceManagerAttributes.State.STARTED);
-            fireStarted();
 	    }
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.runtime.PlatformObject#getAdapter(java.lang.Class)
 	 */
+	@SuppressWarnings("unchecked")
 	public Object getAdapter(Class adapter) {
 		if (adapter.isInstance(this)) {
 			return this;
@@ -267,14 +300,7 @@ IResourceManagerControl {
 	 * @see org.eclipse.ptp.rmsystem.IResourceManager#getStatus()
 	 */
 	synchronized public ResourceManagerAttributes.State getState() {
-		return state;
-	}
-	
-	/**
-	 * @return the status message
-	 */
-	public String getStatusMessage() {
-		return statusMessage;
+		return (State) state.getEnumValue();
 	}
 	
 	public boolean hasChildren() {
@@ -286,7 +312,7 @@ IResourceManagerControl {
 	 * 
 	 * @see org.eclipse.ptp.rm.IResourceManager#removeResourceManagerListener(org.eclipse.ptp.rm.IResourceManagerListener)
 	 */
-	public void removeResourceManagerListener(IResourceManagerListener listener) {
+	public void removeElementListener(IResourceManagerListener listener) {
 		listeners.remove(listener);
 	}
 	
@@ -308,7 +334,6 @@ IResourceManagerControl {
 				doShutdown(subMonitor);
 				if (!subMonitor.isCanceled()) {
 					setState(ResourceManagerAttributes.State.STOPPED);
-					fireShutdown();
 				}
 			}
 			finally {
@@ -338,7 +363,6 @@ IResourceManagerControl {
 				doStartup(subMonitor);
 				if (!subMonitor.isCanceled()) {
 					setState(ResourceManagerAttributes.State.STARTED);
-					fireStarted();
 				}
 			}
 			finally {
@@ -362,33 +386,30 @@ IResourceManagerControl {
 	}
 	
 	public void removeTerminatedJobs(IPQueue queue) {
-		List<IPJob> jobs = doRemoveTerminatedJobs((IPQueueControl)queue);
-		fireJobsChanged(jobs, null);
-	}
-
-	/**
-	 * @param statusMessage the status message to set
-	 */
-	private void setStatusMessage(String statusMessage) {
-		this.statusMessage = statusMessage;
+		doRemoveTerminatedJobs((IPQueueControl)queue);
 	}
 	
 	/*
 	 * Add new model elements to the model.
 	 */
 	protected synchronized void addJob(String jobId, IPJobControl job) {
+		job.getQueueControl().addJob(job);
 		jobsById.put(jobId, job);
 	}
 	
 	protected synchronized void addMachine(String machineId, IPMachineControl machine) {
 		machinesById.put(machineId, machine);
+		machine.addElementListener(machineListener);
+		fireNewMachine(machine);
 	}
 
 	protected synchronized void addNode(String nodeId, IPNodeControl node) {
+		node.getMachineControl().addNode(node);
 		nodesById.put(nodeId, node);
 	}
 
 	protected synchronized void addProcess(String processId, IPProcessControl process) {
+		process.getJobControl().addProcess(process);
 		processesById.put(processId, process);
 	}
 	
@@ -401,8 +422,42 @@ IResourceManagerControl {
 		if (attr != null) {
 			queuesByName.put(attr.getValue(), queue);
 		}
+		queue.addElementListener(queueListener);
+		fireNewQueue(queue);
+	}
+
+	protected synchronized void removeJob(IPJobControl job) {
+		job.getQueueControl().removeJob(job);
+		jobsById.remove(job.getID());
 	}
 	
+	protected synchronized void removeMachine(IPMachineControl machine) {
+		machinesById.remove(machine.getID());
+		machine.removeElementListener(machineListener);
+	}
+
+	protected synchronized void removeNode(IPNodeControl node) {
+		node.getMachineControl().removeNode(node);
+		nodesById.remove(node.getID());
+	}
+
+	protected synchronized void removeProcess(IPProcessControl process) {
+		process.getJobControl().removeProcess(process);
+		processesById.remove(process.getID());
+	}
+	
+	protected synchronized void removeQueue(IPQueueControl queue) {
+		queuesById.remove(queue.getID());
+		/*
+		 * Keep a map of queue names, if the queue has a name (and it should).
+		 */
+		StringAttribute attr = (StringAttribute) queue.getAttribute(ElementAttributes.getNameAttributeDefinition());
+		if (attr != null) {
+			queuesByName.remove(attr.getValue());
+		}
+		queue.removeElementListener(queueListener);
+	}
+
 	/**
 	 * 
 	 */
@@ -452,143 +507,49 @@ IResourceManagerControl {
 	 * @param message
 	 */
 	protected void fireError(String message) {
-    	Object[] tmpListeners = listeners.getListeners();
+		IResourceManagerErrorEvent e = 
+			new ResourceManagerErrorEvent(this, message);
     	
-    	for (int i = 0, n = tmpListeners.length; i < n; ++i) {
-    		final IResourceManagerListener listener = (IResourceManagerListener) tmpListeners[i];
-    		listener.handleErrorStateEvent(new ResourceManagerErrorEvent(this, message));
-    	}
+		for (Object listener : listeners.getListeners()) {
+			((IResourceManagerListener)listener).handleEvent(e);
+		}
     }
 
-	protected void fireJobsChanged(List<IPJob> jobs, Collection<? extends IAttribute> attrs) {
-		IResourceManagerChangedJobsEvent e = 
-			new ResourceManagerChangedJobsEvent(this, jobs, attrs);
-		Object[] tmpListeners = listeners.getListeners();
+	protected void fireMachineChanged(IPMachine machine) {
+		IResourceManagerChangedMachineEvent e = 
+			new ResourceManagerChangedMachineEvent(this, machine);
 
-		for (int i = 0, n = tmpListeners.length; i < n; ++i) {
-			final IResourceManagerListener listener = (IResourceManagerListener) tmpListeners[i];
-			listener.handleChangedJobsEvent(e);
+		for (Object listener : machineListeners.getListeners()) {
+			((IResourceManagerMachineListener)listener).handleEvent(e);
 		}
 	}
 
-	protected void fireMachinesChanged(List<IPMachine> macs) {
-		IResourceManagerChangedMachinesEvent e = 
-			new ResourceManagerChangedMachinesEvent(this, macs);
-		Object[] tmpListeners = listeners.getListeners();
+	protected void fireNewMachine(IPMachine machine) {
+		IResourceManagerNewMachineEvent e = 
+			new ResourceManagerNewMachineEvent(this, machine);
 
-		for (int i = 0, n = tmpListeners.length; i < n; ++i) {
-			final IResourceManagerListener listener = (IResourceManagerListener) tmpListeners[i];
-			listener.handleChangedMachinesEvent(e);
+		for (Object listener : machineListeners.getListeners()) {
+			((IResourceManagerMachineListener)listener).handleEvent(e);
 		}
 	}
 
-	protected void fireNewJobs(List<IPJob> jobs) {
-    	IResourceManagerNewJobsEvent e = new ResourceManagerNewJobsEvent(this, jobs);
-    	Object[] tmpListeners = listeners.getListeners();
-    	
-    	for (int i = 0, n = tmpListeners.length; i < n; ++i) {
-    		final IResourceManagerListener listener = (IResourceManagerListener) tmpListeners[i];
-    		listener.handleNewJobsEvent(e);
-    	}
+    protected void fireNewQueue(IPQueue queue) {
+		IResourceManagerNewQueueEvent e = 
+			new ResourceManagerNewQueueEvent(this, queue);
+
+		for (Object listener : queueListeners.getListeners()) {
+			((IResourceManagerQueueListener)listener).handleEvent(e);
+		}
     }
 
-	protected void fireNewMachines(List<IPMachine> macs) {
-		IResourceManagerNewMachinesEvent e = new ResourceManagerNewMachinesEvent(this, macs);
-		Object[] tmpListeners = listeners.getListeners();
+	protected void fireQueueChanged(IPQueue queue) {
+		IResourceManagerChangedQueueEvent e = 
+			new ResourceManagerChangedQueueEvent(this, queue);
 
-		for (int i = 0, n = tmpListeners.length; i < n; ++i) {
-			final IResourceManagerListener listener = (IResourceManagerListener) tmpListeners[i];
-			listener.handleNewMachinesEvent(e);
+		for (Object listener : queueListeners.getListeners()) {
+			((IResourceManagerQueueListener)listener).handleEvent(e);
 		}
 	}
-
-    protected void fireNewNodes(List<IPNode> nodes) {
-		IResourceManagerNewNodesEvent e = new ResourceManagerNewNodesEvent(this, nodes);
-		Object[] tmpListeners = listeners.getListeners();
-
-		for (int i = 0, n = tmpListeners.length; i < n; ++i) {
-			final IResourceManagerListener listener = (IResourceManagerListener) tmpListeners[i];
-			listener.handleNewNodesEvent(e);
-		}
-	}
-
-    protected void fireNewProcesses(List<IPProcess> procs) {
-    	IResourceManagerNewProcessesEvent e = new ResourceManagerNewProcessesEvent(this, procs);
-    	Object[] tmpListeners = listeners.getListeners();
-    	
-    	for (int i = 0, n = tmpListeners.length; i < n; ++i) {
-    		final IResourceManagerListener listener = (IResourceManagerListener) tmpListeners[i];
-    		listener.handleNewProcessesEvent(e);
-    	}
-    }
-
-    protected void fireNewQueues(List<IPQueue> queues) {
-    	IResourceManagerNewQueuesEvent e = new ResourceManagerNewQueuesEvent(this, queues);
-    	Object[] tmpListeners = listeners.getListeners();
-    	
-    	for (int i = 0, n = tmpListeners.length; i < n; ++i) {
-    		final IResourceManagerListener listener = (IResourceManagerListener) tmpListeners[i];
-    		listener.handleNewQueuesEvent(e);
-    	}
-    }
-
-    protected void fireNodesChanged(List<IPNode> nodes) {
-		IResourceManagerChangedNodesEvent e = new ResourceManagerChangedNodesEvent(this, nodes);
-		Object[] tmpListeners = listeners.getListeners();
-
-		for (int i = 0, n = tmpListeners.length; i < n; ++i) {
-			final IResourceManagerListener listener = (IResourceManagerListener) tmpListeners[i];
-			listener.handleChangedNodesEvent(e);
-		}
-	}
-
-	protected void fireProcessesChanged(List<IPProcess> procs) {
-		IResourceManagerChangedProcessesEvent e = 
-			new ResourceManagerChangedProcessesEvent(this, procs);
-		Object[] tmpListeners = listeners.getListeners();
-
-		for (int i = 0, n = tmpListeners.length; i < n; ++i) {
-			final IResourceManagerListener listener = (IResourceManagerListener) tmpListeners[i];
-			listener.handleChangedProcessesEvent(e);
-		}
-	}
-
-	protected void fireQueuesChanged(List<IPQueue> queues) {
-		IResourceManagerChangedQueuesEvent e = new ResourceManagerChangedQueuesEvent(this, queues);
-		Object[] tmpListeners = listeners.getListeners();
-
-		for (int i = 0, n = tmpListeners.length; i < n; ++i) {
-			final IResourceManagerListener listener = (IResourceManagerListener) tmpListeners[i];
-			listener.handleChangedQueuesEvent(e);
-		}
-	}
-
-	protected void fireShutdown() {
-		Object[] tmpListeners = listeners.getListeners();
-		
-		for (int i = 0, n = tmpListeners.length; i < n; ++i) {
-			final IResourceManagerListener listener = (IResourceManagerListener) tmpListeners[i];
-			listener.handleShutdownStateEvent(AbstractResourceManager.this);
-		}
-	}
-
-	protected void fireStarted() {
-		Object[] tmpListeners = listeners.getListeners();
-		
-		for (int i = 0, n = tmpListeners.length; i < n; ++i) {
-			final IResourceManagerListener listener = (IResourceManagerListener) tmpListeners[i];
-			listener.handleStartupStateEvent(AbstractResourceManager.this);
-		}
-	}
-
-	protected void fireSuspended() {
-    	Object[] tmpListeners = listeners.getListeners();
-    	
-    	for (int i = 0, n = tmpListeners.length; i < n; ++i) {
-    		final IResourceManagerListener listener = (IResourceManagerListener) tmpListeners[i];
-    		listener.handleSuspendedStateEvent(AbstractResourceManager.this);
-    	}
-    }
 
 	protected IPJobControl getJobControl(String jobId) {
 		return jobsById.get(jobId);
@@ -621,7 +582,6 @@ IResourceManagerControl {
 	 */
 	protected IPJobControl newJob(IPQueueControl queue, String jobId, AttributeManager attrs) {
 		IPJobControl job = new PJob(jobId, queue, attrs.getAttributes());
-		queue.addJob(job);
 		return job;
 	}
 
@@ -631,7 +591,6 @@ IResourceManagerControl {
 
 	protected IPNodeControl newNode(IPMachineControl machine, String nodeId, AttributeManager attrs) {
 		IPNodeControl node = new PNode(nodeId, machine, attrs.getAttributes());
-		machine.addNode(node);
 		return node;
 	}
 
@@ -652,7 +611,6 @@ IResourceManagerControl {
 		if (node != null) {
 			process.addNode(node);
 		}
-		job.addProcess(process);
 		return process;
 	}
 
@@ -664,17 +622,10 @@ IResourceManagerControl {
 	 * @param state
 	 */
 	synchronized protected void setState(ResourceManagerAttributes.State state) {
-		this.state = state;
-		setStatusMessage(state.toString());
-	}
-
-	/**
-	 * @param state
-	 * @param message
-	 */
-	synchronized protected void setState(ResourceManagerAttributes.State state, String message) {
-		this.state = state;
-		setStatusMessage(message);
+		if (this.state.getEnumValue() != state) {
+			this.state.setValue(state);
+			fireResourceManagerChanged();
+		}
 	}
 
 	/*

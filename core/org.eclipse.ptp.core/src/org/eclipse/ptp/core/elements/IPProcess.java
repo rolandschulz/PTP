@@ -19,10 +19,21 @@
 package org.eclipse.ptp.core.elements;
 
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
+import org.eclipse.ptp.core.elements.listeners.IProcessListener;
 
 
 public interface IPProcess extends IPElement {
 	
+	/**
+	 * @param listener
+	 */
+	public void addElementListener(IProcessListener listener);
+
+	/**
+	 * @param listener
+	 */
+	public void removeElementListener(IProcessListener listener);
+
 	/**
 	 * sets the node that this process is running on 
 	 * 

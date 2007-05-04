@@ -18,6 +18,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.elements;
 
+import org.eclipse.ptp.core.elements.listeners.IJobListener;
+import org.eclipse.ptp.core.elements.listeners.IJobProcessListener;
+
 
 /**
  * A Job can be a parallel or sequential job, consisting of one or more
@@ -32,12 +35,15 @@ package org.eclipse.ptp.core.elements;
 public interface IPJob extends IPElement {
 	
 	/**
-	 * Returns true if all processes in the job have terminated
-	 * 
-	 * @return
+	 * @param listener
 	 */
-	public boolean isTerminated();
-	
+	public void addChildListener(IJobProcessListener listener);
+
+	/**
+	 * @param listener
+	 */
+	public void addElementListener(IJobListener listener);
+
 	/**
 	 * Find a Process in this Job by its ID. Returns the Process
 	 * object if found, else returns <code>null</code>.
@@ -66,7 +72,7 @@ public interface IPJob extends IPElement {
 	 * @return The Processes in this Job.
 	 */
 	public IPProcess[] getProcesses();
-
+	
 	/**
 	 * Returns parent queue for this job.
 	 * 
@@ -88,12 +94,29 @@ public interface IPJob extends IPElement {
 	 * @return True if this job is a debug job
 	 */
 	public boolean isDebug();
-	
+
+	/**
+	 * Returns true if all processes in the job have terminated
+	 * 
+	 * @return
+	 */
+	public boolean isTerminated();
+
 	/**
 	 * Remove all processes from this job
 	 *
 	 */
 	public void removeAllProcesses();
+
+	/**
+	 * @param listener
+	 */
+	public void removeChildListener(IJobProcessListener listener);
+	
+	/**
+	 * @param listener
+	 */
+	public void removeElementListener(IJobListener listener);
 	
 	/**
 	 * Sets this job to be a debug job
