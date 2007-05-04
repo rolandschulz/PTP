@@ -44,7 +44,7 @@ public abstract class PElement extends PlatformObject implements IPElementContro
 		elementId = id;
 		elementType = type;
 		elementParent = parent;
-		addAttributes(attrs);
+		attributeValues.addAttributes(attrs);
 	}
 
 	/* (non-Javadoc)
