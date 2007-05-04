@@ -16,7 +16,11 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.core.events;
+package org.eclipse.ptp.core.listeners;
+
+import org.eclipse.ptp.core.events.IModelManagerChangedResourceManagerEvent;
+import org.eclipse.ptp.core.events.IModelManagerNewResourceManagerEvent;
+import org.eclipse.ptp.core.events.IModelManagerRemoveResourceManagerEvent;
 
 
 public interface IModelManagerResourceManagerListener {

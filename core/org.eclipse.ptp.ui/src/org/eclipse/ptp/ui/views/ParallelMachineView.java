@@ -33,8 +33,12 @@ import org.eclipse.ptp.core.elements.events.IMachineRemoveNodeEvent;
 import org.eclipse.ptp.core.elements.events.INodeChangedProcessEvent;
 import org.eclipse.ptp.core.elements.events.INodeNewProcessEvent;
 import org.eclipse.ptp.core.elements.events.INodeRemoveProcessEvent;
+import org.eclipse.ptp.core.elements.events.IResourceManagerChangedMachineEvent;
+import org.eclipse.ptp.core.elements.events.IResourceManagerNewMachineEvent;
+import org.eclipse.ptp.core.elements.events.IResourceManagerRemoveMachineEvent;
 import org.eclipse.ptp.core.elements.listeners.IMachineNodeListener;
 import org.eclipse.ptp.core.elements.listeners.INodeProcessListener;
+import org.eclipse.ptp.core.elements.listeners.IResourceManagerMachineListener;
 import org.eclipse.ptp.internal.ui.ParallelImages;
 import org.eclipse.ptp.internal.ui.actions.ChangeMachineAction;
 import org.eclipse.ptp.ui.IManager;
@@ -65,20 +69,23 @@ import org.eclipse.swt.widgets.TableItem;
  * @author clement chu
  * 
  */
-public class ParallelMachineView extends AbstractParallelSetView implements IMachineNodeListener, INodeProcessListener {
+public class ParallelMachineView extends AbstractParallelSetView implements IResourceManagerMachineListener, IMachineNodeListener, INodeProcessListener {
 
 	// view flag
 	public static final String BOTH_VIEW = "0";
 
 	public static final String MACHINE_VIEW = "1";
-
+	
 	public static final String INFO_VIEW = "2";
 
 	// actions
 	protected ParallelAction changeMachineAction = null;
+
 	// composite
 	protected SashForm sashForm = null;
+
 	protected Composite elementViewComposite = null;
+
 	protected Composite infoComposite = null;
 	protected Table BLtable = null;
 	protected Table BRtable = null;
@@ -117,7 +124,7 @@ public class ParallelMachineView extends AbstractParallelSetView implements IMac
 	public void dispose() {
 		//manager.removeJobChangedListener(this);
 		//PTPCorePlugin.getDefault().getModelPresentation().removeNodeListener(this);
-		IPMachine machine = ((MachineManager)manager).getCurrentMachine();
+		IPMachine machine = getMachineManager().getCurrentMachine();
 		if (machine != null) {
 			machine.removeChildListener(this);
 		}
@@ -161,13 +168,13 @@ public class ParallelMachineView extends AbstractParallelSetView implements IMac
 	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#getCurrentID()
 	 */
 	public String getCurrentID() {
-		IPMachine machine = ((MachineManager) manager).getCurrentMachine();
+		IPMachine machine = getMachineManager().getCurrentMachine();
 		if (machine != null) {
 			return machine.getID();
 		}
 		return IManager.EMPTY_ID;
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#getImage(int, int)
 	 */
@@ -221,7 +228,7 @@ public class ParallelMachineView extends AbstractParallelSetView implements IMac
 			}
 		});	
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.listeners.IMachineNodeListener#handleEvent(org.eclipse.ptp.core.elements.events.IMachineNewNodeEvent)
 	 */
@@ -238,8 +245,8 @@ public class ParallelMachineView extends AbstractParallelSetView implements IMac
 				else {
 					idString = machine.getID();
 				}
-				((MachineManager)manager).addNode(node);
-				if (((MachineManager) manager).isCurrentSetContainNode(idString,
+				getMachineManager().addNode(node);
+				if (getMachineManager().isCurrentSetContainNode(idString,
 						node.getID())) {
 					refresh(false);
 				}		
@@ -295,14 +302,41 @@ public class ParallelMachineView extends AbstractParallelSetView implements IMac
 			}
 		});
 	}
-		
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerMachineListener#handleEvent(org.eclipse.ptp.core.elements.events.IResourceManagerChangedMachineEvent)
+	 */
+	public void handleEvent(IResourceManagerChangedMachineEvent e) {
+		// Doesn't matter
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerMachineListener#handleEvent(org.eclipse.ptp.core.elements.events.IResourceManagerNewMachineEvent)
+	 */
+	public void handleEvent(final IResourceManagerNewMachineEvent e) {
+		UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
+			public void run() {
+				IPMachine machine = e.getMachine();
+				getMachineManager().addMachine(machine);
+				updateAction();
+			}
+		});
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerMachineListener#handleEvent(org.eclipse.ptp.core.elements.events.IResourceManagerRemoveMachineEvent)
+	 */
+	public void handleEvent(IResourceManagerRemoveMachineEvent e) {
+		// TODO implement remote machine
+	}
+	
 	/** Register element
 	 * @param element Target element
 	 */
 	public void register(IElement element) {
 		element.setRegistered(true);
 	}
-	
+		
 	public void repaint(boolean all) {
 		updateLowerRegions();
 	}
@@ -311,13 +345,15 @@ public class ParallelMachineView extends AbstractParallelSetView implements IMac
 	 * @param machine_id machine ID
 	 */
 	public void selectMachine(IPMachine machine) {
-		IPMachine old = ((MachineManager)manager).getCurrentMachine();
+		IPMachine old = getMachineManager().getCurrentMachine();
 		if (old != null) {
 			old.removeChildListener(this);
 		}
-		((MachineManager) manager).setCurrentMachine(machine);
-		machine.addChildListener(this);
-		updateMachine();
+		if (machine != null) {
+			getMachineManager().setCurrentMachine(machine);
+			machine.addChildListener(this);
+		}
+		updateMachineSet();
 	}
 	
 	/** Unregister all registered elements
@@ -333,7 +369,7 @@ public class ParallelMachineView extends AbstractParallelSetView implements IMac
 				pE.setRegistered(false);
 		}
 		elementHandler.removeAllRegisterElements();
-	}	
+	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.views.AbstractParallelSetView#updateAction()
@@ -341,16 +377,21 @@ public class ParallelMachineView extends AbstractParallelSetView implements IMac
 	public void updateAction() {
 		super.updateAction();
 		if (changeMachineAction != null) {
-			changeMachineAction.setEnabled(((AbstractUIManager) manager).getResourceManagers().length > 0);
+			boolean enabled = ((AbstractUIManager) manager).getResourceManagers().length > 0;
+			changeMachineAction.setEnabled(enabled);
 		}
-	}
+	}	
 	
 	/** Update emachine
 	 * 
 	 */
-	public void updateMachine() {
+	public void updateMachineSet() {
 		IElementHandler setManager = getCurrentElementHandler();
 		selectSet(setManager == null ? null : setManager.getSetRoot());
+	}
+	
+	private MachineManager getMachineManager() {
+		return ((MachineManager) manager);
 	}
 	
 	private IPNode getRegisteredNode() {
@@ -362,7 +403,7 @@ public class ParallelMachineView extends AbstractParallelSetView implements IMac
 		if (!cur_element_set.contains(firstRegisteredElementID))
 			return null;
 		cur_selected_element_id = firstRegisteredElementID;
-		return ((MachineManager) manager).findNode(cur_selected_element_id);
+		return getMachineManager().findNode(cur_selected_element_id);
 	}
 	
 	/** Update lower regions
@@ -391,7 +432,7 @@ public class ParallelMachineView extends AbstractParallelSetView implements IMac
 			BRtable.removeAll();
 			TableItem item = null;
 			for (int i = 0; i < procs.length; i++) {
-				int proc_state = ((MachineManager) manager).getProcStatus(procs[i].getState());
+				int proc_state = getMachineManager().getProcStatus(procs[i].getState());
 				item = new TableItem(BRtable, SWT.NULL);
 				item.setImage(ParallelImages.procImages[proc_state][0]);
 				final IPJob job = procs[i].getJob();
@@ -411,14 +452,14 @@ public class ParallelMachineView extends AbstractParallelSetView implements IMac
 		if (element == null)
 			return null;
 		
-		return ((MachineManager) manager).findNode(element.getID());
+		return getMachineManager().findNode(element.getID());
 	}
 	
 	/** Create lower text region layout
 	 * @param parent
 	 * @return
 	 */
-	protected Composite createLowerTextRegions(Composite parent) {
+	protected Composite createLowerRegions(Composite parent) {
 		Composite composite = new Composite(parent, SWT.NONE);
 		GridLayout layout = new GridLayout(2, true);
 		layout.verticalSpacing = 0;
@@ -458,7 +499,7 @@ public class ParallelMachineView extends AbstractParallelSetView implements IMac
 		BRtable.addSelectionListener(new SelectionAdapter() {
 			/* double click - throw up an editor to look at the process */
 			public void widgetDefaultSelected(SelectionEvent e) {
-				IPNode node = ((MachineManager) manager).findNode(cur_selected_element_id);
+				IPNode node = getMachineManager().findNode(cur_selected_element_id);
 				if (node != null) {
 					int idx = BRtable.getSelectionIndex();
 					IPProcess[] procs = node.getSortedProcesses();
@@ -490,7 +531,7 @@ public class ParallelMachineView extends AbstractParallelSetView implements IMac
 		sashForm.setLayout(new FillLayout(SWT.HORIZONTAL));
 		sashForm.setLayoutData(new GridData(GridData.FILL_BOTH));
 		elementViewComposite = createElementView(sashForm);
-		infoComposite = createLowerTextRegions(sashForm);
+		infoComposite = createLowerRegions(sashForm);
 		changeView(current_view);
 	}
 	
