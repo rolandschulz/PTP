@@ -27,53 +27,84 @@ import java.util.List;
  * @author rsqrd
  *
  */
-public class EnumeratedAttribute extends AbstractAttribute implements IAttribute {
+public final class EnumeratedAttribute<E extends Enum<E>> extends AbstractAttribute {
 
-	private int valueIndex;
+	private E value;
 
-	public EnumeratedAttribute(EnumeratedAttributeDefinition definition, int value) throws IllegalValueException {
-        super(definition);
-        setValueIndex(value);
-    }
+	/**
+	 * @param definition
+	 * @param valueIndex
+	 * @throws IllegalValueException
+	 */
+	public EnumeratedAttribute(EnumeratedAttributeDefinition<E> definition,
+			int valueIndex) throws IllegalValueException {
+		super(definition);
+		setValue(valueIndex);
+	}
+
+	/**
+	 * @param definition
+	 * @param valueString
+	 * @throws IllegalValueException
+	 */
+	public EnumeratedAttribute(EnumeratedAttributeDefinition<E> definition,
+			String valueString) throws IllegalValueException {
+		super(definition);
+		setValue(valueString);
+	}
 
 	/**
 	 * @param description
 	 * @param enumerations
 	 * @param value
-	 * @throws IllegalValue
 	 */
-	public EnumeratedAttribute(IAttributeDefinition definition, String value) throws IllegalValueException {
+	public EnumeratedAttribute(IAttributeDefinition definition, E value) {
 		super(definition);
 		setValue(value);
 	}
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ptp.core.attributes.IEnumeratedAttribute#getEnumValue()
+	/**
+     * @return
      */
-    public Enum getEnumValue() {
-        final Class<? extends Enum> enumClass = getEnumAttrDefinition().getEnumClass();
-        if (enumClass == null) {
-            return null;
-        }
-        Enum[] enumElements = enumClass.getEnumConstants();
-        return enumElements[valueIndex];
+    public EnumeratedAttributeDefinition<E> getEnumAttrDefinition() {
+        return (EnumeratedAttributeDefinition<E>) getDefinition();
     }
 
-    public String getValue() {
-		return getEnumerations().get(valueIndex);
+    /**
+     * @return
+     */
+    public List<E> getEnumerations() {
+		return getEnumAttrDefinition().getEnumerations();
 	}
 
-    public String getValueAsString() {
-		return getValue();
+    /**
+     * @return
+     */
+    public List<String> getEnumerationStrings() {
+		return getEnumAttrDefinition().getEnumerationStrings();
 	}
     
+	/**
+     * @return
+     */
+    public E getValue() {
+        return value;
+    }
+		
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.attributes.IAttribute#getValueAsString()
+	 */
+	public String getValueAsString() {
+		return value.toString();
+	}
+	
 	/**
 	 * @return the valueIndex
 	 */
 	public int getValueIndex() {
-		return valueIndex;
+		return value.ordinal();
 	}
-		
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.attributes.IAttribute#isValid(java.lang.String)
 	 */
@@ -85,39 +116,34 @@ public class EnumeratedAttribute extends AbstractAttribute implements IAttribute
 		return true;
 	}
 	
+	/**
+	 * @param value
+	 */
+	public void setValue(E value) {
+		this.value = value;
+	}
+
+	/**
+	 * @param valueIndex
+	 * @throws IllegalValueException
+	 */
+	public void setValue(int valueIndex) throws IllegalValueException {
+		final List<E> enumerations = getEnumerations();
+		if (valueIndex < 0 || valueIndex >= enumerations.size()) {
+			throw new IllegalValueException("valueIndex is out of range");
+		}
+		this.value = enumerations.get(valueIndex);
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.attributes.IAttribute#setValue(java.lang.String)
 	 */
 	public void setValue(String value) throws IllegalValueException {
-		int vi = getEnumerations().indexOf(value);
-		if (vi == -1) {
-			throw new IllegalValueException("enumerated value: " + value + " is not in set");
+		Class<E> enumClass = getEnumAttrDefinition().getEnumClass();
+		try {
+			this.value = E.valueOf(enumClass, value);
+		} catch (IllegalArgumentException e) {
+			throw new IllegalValueException(e);
 		}
-		valueIndex = vi;
-	}
-
-	public void setValue(Enum value) throws IllegalValueException {
-		setValueIndex(value.ordinal());
-	}
-	
-	/**
-	 * @param valueIndex the valueIndex to set
-	 */
-	public void setValueIndex(int valueIndex) throws IllegalValueException {
-		if (valueIndex < 0 || valueIndex >= getEnumerations().size()) {
-			throw new IllegalValueException("valueIndex is out of range");
-		}
-		this.valueIndex = valueIndex;
-	}
-
-	/**
-     * @return
-     */
-    private EnumeratedAttributeDefinition getEnumAttrDefinition() {
-        return (EnumeratedAttributeDefinition) getDefinition();
-    }
-	
-	private List<String> getEnumerations() {
-		return getEnumAttrDefinition().getEnumerations();
 	}
 }

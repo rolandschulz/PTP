@@ -31,8 +31,9 @@ public class JobAttributes {
 	private static final String DEBUG_ARGS_ATTR_ID = "debugArgs";
 	private static final String DEBUG_FLAG_ATTR_ID = "debug";
 
-	private final static EnumeratedAttributeDefinition stateAttrDef = 
-		new EnumeratedAttributeDefinition(STATE_ATTR_ID, "Job State", "State of a job", State.STARTED, State.values());
+	private final static EnumeratedAttributeDefinition<State> stateAttrDef = 
+		new EnumeratedAttributeDefinition<State>(STATE_ATTR_ID, "Job State", "State of a job",
+				State.STARTED);
 
 	private final static IntegerAttributeDefinition subIdAttrDef = 
 		new IntegerAttributeDefinition(SUBID_ATTR_ID, "Job Submission ID", "Temporary ID used for job submission", 0);
@@ -64,7 +65,7 @@ public class JobAttributes {
 	private final static BooleanAttributeDefinition debugFlagAttrDef = 
 		new BooleanAttributeDefinition(DEBUG_FLAG_ATTR_ID, DEBUG_FLAG_ATTR_ID, "Debug Flag", false);
 
-	public static EnumeratedAttributeDefinition getStateAttributeDefinition() {
+	public static EnumeratedAttributeDefinition<State> getStateAttributeDefinition() {
 		return stateAttrDef;
 	}
 	

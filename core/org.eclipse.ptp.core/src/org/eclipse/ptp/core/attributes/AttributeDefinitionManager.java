@@ -86,10 +86,11 @@ public class AttributeDefinitionManager {
 		return def;
 	}
 
-	public EnumeratedAttributeDefinition createEnumeratedAttributeDefinition(
+	public <E extends Enum<E>> EnumeratedAttributeDefinition<E> createEnumeratedAttributeDefinition(
 			final String uniqueId, final String name, final String description,
-			final String defaultValue, final String[] values) throws IllegalValueException {
-		EnumeratedAttributeDefinition def = new EnumeratedAttributeDefinition(uniqueId, name, description, defaultValue, values);
+			final E defaultValue) {
+		EnumeratedAttributeDefinition<E> def = 
+			new EnumeratedAttributeDefinition<E>(uniqueId, name, description, defaultValue);
 		setAttributeDefinition(def);
 		return def;
 	}
@@ -116,5 +117,12 @@ public class AttributeDefinitionManager {
 		ArrayAttributeDefinition def = new ArrayAttributeDefinition(uniqueId, name, description, defaultValue);
 		setAttributeDefinition(def);
 		return def;
+	}
+
+	public StringSetAttributeDefinition createStringSetAttributeDefinition(
+			String uniqueId, String name, String description,
+			String defaultValue, String[] values) throws IllegalValueException {
+		return new StringSetAttributeDefinition(uniqueId, name, description, defaultValue,
+				values);
 	}
 }

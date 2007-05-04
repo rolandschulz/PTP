@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006 The Regents of the University of California. 
+ * Copyright (c) 2007 The Regents of the University of California. 
  * This material was produced under U.S. Government contract W-7405-ENG-36 
  * for Los Alamos National Laboratory, which is operated by the University 
  * of California for the U.S. Department of Energy. The U.S. Government has 
@@ -18,31 +18,44 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.attributes;
 
-public abstract class AbstractAttribute implements IAttribute {
+public final class StringSetAttributeDefinition extends AbstractAttributeDefinition {
 
-	private final IAttributeDefinition definition;
-	private boolean enabled;
+	private final String defaultValue;
+	private final String[] values;
 
-	public AbstractAttribute(IAttributeDefinition definition) {
-		this.definition = definition;
-		this.enabled = true;
-	}
-	
-	public IAttributeDefinition getDefinition() {
-		return definition;
+	public StringSetAttributeDefinition(String uniqueId, String name,
+			String description, String defaultValue, String[] values) throws IllegalValueException {
+		super(uniqueId, name, description);
+		this.defaultValue = defaultValue;
+		this.values = values.clone();
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.attributes.IAttribute#isEnabled()
+	 * @see org.eclipse.ptp.core.attributes.IAttributeDefinition#create()
 	 */
-	public boolean isEnabled() {
-		return enabled;
+	public IAttribute create() throws IllegalValueException {
+		return new StringSetAttribute(this);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.attributes.IAttributeDefinition#create(java.lang.String)
+	 */
+	public IAttribute create(String value) throws IllegalValueException {
+		return new StringSetAttribute(this, value);
 	}
 
 	/**
-	 * @param enabled the enabled to set
+	 * @return the defaultValue
 	 */
-	public void setEnabled(boolean enabled) {
-		this.enabled = enabled;
+	public String getDefaultValue() {
+		return defaultValue;
 	}
+
+	/**
+	 * @return the values
+	 */
+	public String[] getValues() {
+		return values;
+	}
+
 }

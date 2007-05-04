@@ -19,13 +19,14 @@ public class QueueAttributes {
 	private static final String STATE_ATTR_ID = "queueState";
 	private static final String ID_ATTR_ID = "queueId";
 
-	private final static EnumeratedAttributeDefinition stateAttrDef = 
-		new EnumeratedAttributeDefinition(STATE_ATTR_ID, "state", "Queue State", State.NORMAL, State.values());
+	private final static EnumeratedAttributeDefinition<State> stateAttrDef = 
+		new EnumeratedAttributeDefinition<State>(STATE_ATTR_ID, "state", "Queue State",
+				State.NORMAL);
 	
 	private final static IntegerAttributeDefinition idAttrDef = 
 		new IntegerAttributeDefinition(ID_ATTR_ID, ID_ATTR_ID, "Queue ID", 0);
 	
-	public static EnumeratedAttributeDefinition getStateAttributeDefinition() {
+	public static EnumeratedAttributeDefinition<State> getStateAttributeDefinition() {
 		return stateAttrDef;
 	}
 

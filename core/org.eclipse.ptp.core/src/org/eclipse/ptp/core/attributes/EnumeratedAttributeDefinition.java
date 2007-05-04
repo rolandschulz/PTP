@@ -20,73 +20,56 @@ package org.eclipse.ptp.core.attributes;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 
-public final class EnumeratedAttributeDefinition extends AbstractAttributeDefinition implements IAttributeDefinition {
+public final class EnumeratedAttributeDefinition<E extends Enum<E>>
+extends AbstractAttributeDefinition {
 
-	private final ArrayList<String> enumerations = new ArrayList<String>();
-	private final int defaultValue;
-    final Class<? extends Enum<? extends Enum<?>>> enumClass;
+	private final E defaultValue;
+	final Class<E> enumClass;
 
-    @SuppressWarnings("unchecked")
-	public <T extends Enum<T>> EnumeratedAttributeDefinition(final String uniqueId,
-            final String name,
-            final String description, final Enum<T> defaultValueIn,
-            final Enum<T>[] values) {
-        super(uniqueId, name, description);
-        this.enumClass = (Class<? extends Enum<? extends Enum<?>>>) defaultValueIn.getClass();
-        enumerations.addAll(stringArray(values));
-        this.defaultValue = defaultValueIn.ordinal();
-    }
-    
-    public EnumeratedAttributeDefinition(final String uniqueId, final String name,
-            final String description, final String defaultValue,
-            final String[] values) throws IllegalValueException {
-        super(uniqueId, name, description);
-        enumerations.addAll(Arrays.asList(values));
-        this.enumClass = null;
-        if (getEnumerations().indexOf(defaultValue) < 0) {
-            throw new IllegalValueException("default enumerated value is not in set");
-        }
-        this.defaultValue = getEnumerations().indexOf(defaultValue);
-    }
-    
-  	/* (non-Javadoc)
+	public EnumeratedAttributeDefinition(final String uniqueId,
+			final String name,
+			final String description, final E defaultValueIn) {
+		super(uniqueId, name, description);
+		this.enumClass = (Class<E>) defaultValueIn.getClass();
+		this.defaultValue = defaultValueIn;
+	}
+
+	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.attributes.IAttribute#create(java.lang.String)
 	 */
-	public EnumeratedAttribute create() throws IllegalValueException {
-		return new EnumeratedAttribute(this, defaultValue);
+	public EnumeratedAttribute<E> create() {
+		return new EnumeratedAttribute<E>(this, defaultValue);
 	}
 
-    public <T extends Enum<T>> EnumeratedAttribute create(Enum<T> value) throws IllegalValueException {
-        return new EnumeratedAttribute(this, value.ordinal());
-    }
-
-    public EnumeratedAttribute create(int value) throws IllegalValueException {
-        return new EnumeratedAttribute(this, value);
-    }
-
-    public EnumeratedAttribute create(String value) throws IllegalValueException {
-        return new EnumeratedAttribute(this, value);
-    }
-
-	public Class<? extends Enum<?>> getEnumClass() {
-        return enumClass;
-    }
-
-	public List<String> getEnumerations() {
-		return Collections.unmodifiableList(enumerations);
+	public EnumeratedAttribute<E> create(E value) {
+		return new EnumeratedAttribute<E>(this, value);
 	}
 
-    private Collection<? extends String> stringArray(Enum<? extends Enum<?>>[] values) {
-  	    ArrayList<String> strings = new ArrayList<String>(values.length);
-        for (Enum<? extends Enum<?>> value : values) {
-            strings.add(value.toString());
-        }
-        return strings;
-    }
-	
+	public EnumeratedAttribute<E> create(int value) throws IllegalValueException {
+		return new EnumeratedAttribute<E>(this, value);
+	}
+
+	public EnumeratedAttribute<E> create(String value) throws IllegalValueException {
+		return new EnumeratedAttribute<E>(this, value);
+	}
+
+	public Class<E> getEnumClass() {
+		return enumClass;
+	}
+
+	public List<E> getEnumerations() {
+		return Arrays.asList(enumClass.getEnumConstants());
+	}
+
+	public List<String> getEnumerationStrings() {
+		final List<E> values = getEnumerations();
+		ArrayList<String> strings = new ArrayList<String>(values.size());
+		for (E value : values) {
+			strings.add(value.toString());
+		}
+		return strings;
+	}
 }

@@ -25,7 +25,6 @@ import java.util.List;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute;
-import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.elementcontrols.IPElementControl;
 import org.eclipse.ptp.core.elementcontrols.IPJobControl;
 import org.eclipse.ptp.core.elementcontrols.IPProcessControl;
@@ -62,13 +61,11 @@ public class PJob extends Parent implements IPJobControl, IProcessListener {
 		/*
 		 * Make sure we always have a state.
 		 */
-		EnumeratedAttribute jobState = (EnumeratedAttribute) getAttribute(JobAttributes.getStateAttributeDefinition());
+		EnumeratedAttribute<State> jobState = (EnumeratedAttribute<State>) getAttribute(
+				JobAttributes.getStateAttributeDefinition());
 		if (jobState == null) {
-			try {
-				jobState = JobAttributes.getStateAttributeDefinition().create();
-				addAttribute(jobState);
-			} catch (IllegalValueException e) {
-			}
+			jobState = JobAttributes.getStateAttributeDefinition().create();
+			addAttribute(jobState);
 		}
 	}
 
@@ -158,8 +155,9 @@ public class PJob extends Parent implements IPJobControl, IProcessListener {
 	}
 
 	public boolean isTerminated() {
-		EnumeratedAttribute jobState = (EnumeratedAttribute) getAttribute(JobAttributes.getStateAttributeDefinition());
-		State state = (State) jobState.getEnumValue();
+		EnumeratedAttribute<State> jobState = (EnumeratedAttribute<State>) getAttribute(
+				JobAttributes.getStateAttributeDefinition());
+		State state = jobState.getValue();
 		if (state == State.TERMINATED || state == State.ERROR) {
 			return true;
 		}

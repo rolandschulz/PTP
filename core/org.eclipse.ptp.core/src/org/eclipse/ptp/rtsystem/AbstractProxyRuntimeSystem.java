@@ -561,7 +561,8 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 					values.add(args[pos++]);
 				}
 				try {
-					attrDef = attrDefManager.createEnumeratedAttributeDefinition(attrId, attrName, attrDesc, attrDefault, values.toArray(new String[values.size()]));
+					attrDef = attrDefManager.createStringSetAttributeDefinition(attrId, attrName,
+							attrDesc, attrDefault, values.toArray(new String[values.size()]));
 				} catch (IllegalValueException ex) {
 					fireRuntimeErrorEvent(new RuntimeErrorEvent("Bad proxy event: could not create attribute definition"));					
 				}

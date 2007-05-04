@@ -112,7 +112,7 @@ IResourceManagerControl {
 	private final IMachineListener machineListener;
 
 	private final IResourceManagerConfiguration config;
-	private EnumeratedAttribute state;
+	private EnumeratedAttribute<ResourceManagerAttributes.State> state;
 	private AttributeDefinitionManager attrDefManager;
 
 	private final HashMap<String, IPJobControl> jobsById = new HashMap<String, IPJobControl>();
@@ -122,14 +122,12 @@ IResourceManagerControl {
 	private final HashMap<String, IPQueueControl> queuesById = new HashMap<String, IPQueueControl>();
 	private final HashMap<String, IPQueueControl> queuesByName = new HashMap<String, IPQueueControl>();
 
-	public AbstractResourceManager(String id, IPUniverseControl universe, IResourceManagerConfiguration config)
+	public AbstractResourceManager(String id, IPUniverseControl universe,
+			IResourceManagerConfiguration config)
 	{
 		super(id, universe, P_RESOURCE_MANAGER, getDefaultAttributes(config));
 		this.config = config;
-		try {
-			this.state = ResourceManagerAttributes.getStateAttributeDefinition().create(State.STOPPED);
-		} catch (IllegalValueException e1) {
-		}
+		this.state = ResourceManagerAttributes.getStateAttributeDefinition().create(State.STOPPED);
 		this.attrDefManager = new AttributeDefinitionManager();
 		this.attrDefManager.setAttributeDefinitions(ElementAttributes.getDefaultAttributeDefinitions());
 		this.attrDefManager.setAttributeDefinitions(JobAttributes.getDefaultAttributeDefinitions());
@@ -293,7 +291,7 @@ IResourceManagerControl {
 	 * @see org.eclipse.ptp.rmsystem.IResourceManager#getStatus()
 	 */
 	synchronized public ResourceManagerAttributes.State getState() {
-		return (State) state.getEnumValue();
+		return state.getValue();
 	}
 	
 	public boolean hasChildren() {
@@ -638,12 +636,8 @@ IResourceManagerControl {
 	 * @param state
 	 */
 	synchronized protected void setState(ResourceManagerAttributes.State state) {
-		if (this.state.getEnumValue() != state) {
-			try {
-				this.state.setValue(state);
-			} catch (IllegalValueException e) {
-				return;
-			}
+		if (this.state.getValue() != state) {
+			this.state.setValue(state);
 			fireResourceManagerChanged(Arrays.asList(new IAttribute[] {this.state}));
 		}
 	}

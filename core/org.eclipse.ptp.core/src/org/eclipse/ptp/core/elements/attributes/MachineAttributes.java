@@ -17,10 +17,11 @@ public class MachineAttributes {
 
 	private static final String STATE_ATTR_ID = "machineState";
 
-	private final static EnumeratedAttributeDefinition stateAttrDef = 
-		new EnumeratedAttributeDefinition(STATE_ATTR_ID, "state", "Machine State", State.UNKNOWN, State.values());
+	private final static EnumeratedAttributeDefinition<State> stateAttrDef = 
+		new EnumeratedAttributeDefinition<State>(STATE_ATTR_ID, "state", "Machine State",
+				State.UNKNOWN);
 	
-	public static EnumeratedAttributeDefinition getStateAttributeDefinition() {
+	public static EnumeratedAttributeDefinition<State> getStateAttributeDefinition() {
 		return stateAttrDef;
 	}
 	

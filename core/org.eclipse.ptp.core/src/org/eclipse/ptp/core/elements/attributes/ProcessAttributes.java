@@ -27,8 +27,9 @@ public class ProcessAttributes {
 	private static final String STDOUT_ATTR_ID = "processStdout";
 	private static final String NODEID_ATTR_ID = "processNodeId";
 
-	private final static EnumeratedAttributeDefinition stateAttrDef = 
-		new EnumeratedAttributeDefinition(STATE_ATTR_ID, "Process State", "Execution state of a process", State.STARTING, State.values());
+	private final static EnumeratedAttributeDefinition<State> stateAttrDef = 
+		new EnumeratedAttributeDefinition<State>(STATE_ATTR_ID, "Process State",
+				"Execution state of a process", State.STARTING);
 	
 	private final static IntegerAttributeDefinition pidAttrDef = 
 		new IntegerAttributeDefinition(PID_ATTR_ID, "Process PID", "Operating system process ID", 0);
@@ -48,7 +49,7 @@ public class ProcessAttributes {
 	private final static StringAttributeDefinition nodeIdAttrDef = 
 		new StringAttributeDefinition(NODEID_ATTR_ID, "Process Node ID", "Node that this process is running on", "");
 	
-	public static EnumeratedAttributeDefinition getStateAttributeDefinition() {
+	public static EnumeratedAttributeDefinition<State> getStateAttributeDefinition() {
 		return stateAttrDef;
 	}
 	
