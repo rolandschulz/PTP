@@ -19,41 +19,48 @@
  */
 package org.eclipse.ptp.internal.core.elements.events;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.Collection;
 
-import org.eclipse.ptp.core.elements.IPQueue;
-import org.eclipse.ptp.core.elements.IResourceManager;
-import org.eclipse.ptp.core.elements.events.IResourceManagerNewQueueEvent;
+import org.eclipse.ptp.core.attributes.IAttribute;
+import org.eclipse.ptp.core.elements.IPMachine;
+import org.eclipse.ptp.core.elements.IPNode;
+import org.eclipse.ptp.core.elements.events.IMachineChangedNodeEvent;
 
 /**
- * @author rsqrd
+ * @author grw
  *
  */
-public class ResourceManagerNewQueuesEvent implements
-		IResourceManagerNewQueueEvent {
+public class MachineChangedNodeEvent implements IMachineChangedNodeEvent {
 
-	private final IResourceManager rm;
-	private final List<IPQueue> newQueues;
-
-	public ResourceManagerNewQueuesEvent(IResourceManager manager, List<IPQueue> queues) {
-		this.rm = manager;
-		this.newQueues = new ArrayList<IPQueue>(queues);
+	private final IPMachine machine;
+	private final IPNode node;
+	private final Collection<IAttribute> attributes;
+	
+	public MachineChangedNodeEvent(IPMachine machine, IPNode node, Collection<IAttribute> attrs) {
+		this.machine = machine;
+		this.node = node;
+		this.attributes = attrs;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.events.IResourceManagerNewQueuesEvent#getNewQueues()
+	 * @see org.eclipse.ptp.core.elements.events.IMachineChangedNodeEvent#getAttributes()
 	 */
-	public IPQueue getQueue() {
-		return Collections.unmodifiableList(newQueues);
+	public Collection<IAttribute> getAttributes() {
+		return attributes;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.events.IResourceManagerNewQueuesEvent#getSource()
+	 * @see org.eclipse.ptp.core.elements.events.IMachineChangedNodeEvent#getNode()
 	 */
-	public IResourceManager getSource() {
-		return rm;
+	public IPNode getNode() {
+		return node;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.events.IMachineChangedNodeEvent#getSource()
+	 */
+	public IPMachine getSource() {
+		return machine;
 	}
 
 }

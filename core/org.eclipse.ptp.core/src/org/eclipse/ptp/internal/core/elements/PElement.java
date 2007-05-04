@@ -34,7 +34,6 @@ import org.eclipse.search.ui.ISearchPageScoreComputer;
 public abstract class PElement extends PlatformObject implements IPElementControl, Comparable {
 
 	private PElementInfo elementInfo = null;
-
 	protected AttributeManager attributeValues = new AttributeManager();
 	protected String elementId = null;
 	protected IPElementControl elementParent;

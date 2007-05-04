@@ -38,14 +38,14 @@ public class JobNewProcessEvent implements IJobNewProcessEvent {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.events.IJobRemoveProcessEvent#getProcess()
+	 * @see org.eclipse.ptp.core.elements.events.IJobNewProcessEvent#getProcess()
 	 */
 	public IPProcess getProcess() {
 		return process;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.events.IJobRemoveProcessEvent#getSource()
+	 * @see org.eclipse.ptp.core.elements.events.IJobNewProcessEvent#getSource()
 	 */
 	public IPJob getSource() {
 		return job;

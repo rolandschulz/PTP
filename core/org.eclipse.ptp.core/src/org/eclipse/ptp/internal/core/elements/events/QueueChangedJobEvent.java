@@ -22,46 +22,45 @@ package org.eclipse.ptp.internal.core.elements.events;
 import java.util.Collection;
 
 import org.eclipse.ptp.core.attributes.IAttribute;
-import org.eclipse.ptp.core.elements.IPMachine;
-import org.eclipse.ptp.core.elements.IResourceManager;
-import org.eclipse.ptp.core.elements.events.IResourceManagerChangedMachineEvent;
+import org.eclipse.ptp.core.elements.IPQueue;
+import org.eclipse.ptp.core.elements.IPJob;
+import org.eclipse.ptp.core.elements.events.IQueueChangedJobEvent;
 
 /**
- * @author rsqrd
+ * @author grw
  *
  */
-public class ResourceManagerChangedMachineEvent implements
-		IResourceManagerChangedMachineEvent {
+public class QueueChangedJobEvent implements IQueueChangedJobEvent {
 
-	private final IPMachine machine;
-	private final IResourceManager rm;
+	private final IPQueue queue;
+	private final IPJob job;
 	private final Collection<IAttribute> attributes;
 	
-	public ResourceManagerChangedMachineEvent(IResourceManager manager, IPMachine machine, Collection<IAttribute> attrs) {
-		this.rm = manager;
-		this.machine = machine;
+	public QueueChangedJobEvent(IPQueue queue, IPJob job, Collection<IAttribute> attrs) {
+		this.queue = queue;
+		this.job = job;
 		this.attributes = attrs;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.events.IResourceManagerChangedMachineEvent#getAttributes()
+	 * @see org.eclipse.ptp.core.elements.events.IQueueChangedJobEvent#getAttributes()
 	 */
 	public Collection<IAttribute> getAttributes() {
 		return attributes;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.events.IResourceManagerChangedMachineEvent#getMachine()
+	 * @see org.eclipse.ptp.core.elements.events.IQueueChangedJobEvent#getJob()
 	 */
-	public IPMachine getMachine() {
-		return machine;
+	public IPJob getJob() {
+		return job;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.events.IResourceManagerChangedMachineEvent#getSource()
+	 * @see org.eclipse.ptp.core.elements.events.IQueueChangedJobEvent#getSource()
 	 */
-	public IResourceManager getSource() {
-		return rm;
+	public IPQueue getSource() {
+		return queue;
 	}
 
 }

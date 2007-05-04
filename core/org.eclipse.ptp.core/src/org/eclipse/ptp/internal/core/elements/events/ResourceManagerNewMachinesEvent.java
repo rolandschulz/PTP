@@ -19,10 +19,6 @@
  */
 package org.eclipse.ptp.internal.core.elements.events;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.events.IResourceManagerNewMachineEvent;
@@ -35,23 +31,22 @@ public class ResourceManagerNewMachinesEvent implements
 		IResourceManagerNewMachineEvent {
 
 	private final IResourceManager rm;
-	private final List<IPMachine> newMachines;
+	private final IPMachine machine;
 
-	public ResourceManagerNewMachinesEvent(IResourceManager manager,
-			List<IPMachine> macs) {
+	public ResourceManagerNewMachinesEvent(IResourceManager manager, IPMachine machine) {
 		this.rm = manager;
-		this.newMachines = new ArrayList<IPMachine>(macs);
+		this.machine = machine;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.events.IResourceManagerNewMachinesEvent#getNewMachines()
+	 * @see org.eclipse.ptp.rmsystem.events.IResourceManagerNewMachineEvent#getMachine()
 	 */
 	public IPMachine getMachine() {
-		return Collections.unmodifiableList(newMachines);
+		return machine;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.events.IResourceManagerNewMachinesEvent#getSource()
+	 * @see org.eclipse.ptp.rmsystem.events.IResourceManagerNewMachineEvent#getSource()
 	 */
 	public IResourceManager getSource() {
 		return rm;

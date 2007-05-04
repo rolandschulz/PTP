@@ -19,49 +19,36 @@
  */
 package org.eclipse.ptp.internal.core.elements.events;
 
-import java.util.Collection;
-
-import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.elements.IPMachine;
-import org.eclipse.ptp.core.elements.IResourceManager;
-import org.eclipse.ptp.core.elements.events.IResourceManagerChangedMachineEvent;
+import org.eclipse.ptp.core.elements.IPNode;
+import org.eclipse.ptp.core.elements.events.IMachineNewNodeEvent;
 
 /**
- * @author rsqrd
+ * @author grw
  *
  */
-public class ResourceManagerChangedMachineEvent implements
-		IResourceManagerChangedMachineEvent {
+public class MachineNewNodeEvent implements IMachineNewNodeEvent {
 
 	private final IPMachine machine;
-	private final IResourceManager rm;
-	private final Collection<IAttribute> attributes;
-	
-	public ResourceManagerChangedMachineEvent(IResourceManager manager, IPMachine machine, Collection<IAttribute> attrs) {
-		this.rm = manager;
+	private final IPNode node;
+
+	public MachineNewNodeEvent(IPMachine machine, IPNode node) {
 		this.machine = machine;
-		this.attributes = attrs;
+		this.node = node;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.events.IResourceManagerChangedMachineEvent#getAttributes()
+	 * @see org.eclipse.ptp.core.elements.events.IMachineNewNodeEvent#getProcess()
 	 */
-	public Collection<IAttribute> getAttributes() {
-		return attributes;
+	public IPNode getNode() {
+		return node;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.events.IResourceManagerChangedMachineEvent#getMachine()
+	 * @see org.eclipse.ptp.core.elements.events.IMachineNewNodeEvent#getSource()
 	 */
-	public IPMachine getMachine() {
+	public IPMachine getSource() {
 		return machine;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.events.IResourceManagerChangedMachineEvent#getSource()
-	 */
-	public IResourceManager getSource() {
-		return rm;
 	}
 
 }
