@@ -57,7 +57,7 @@ public abstract class Parent extends PElement {
 		return getElementInfo().getChildren();
 	}
 
-	protected List getChildrenOfType(int type) {
+	protected List<PElement> getChildrenOfType(int type) {
 		IPElementControl[] children = getChildren();
 		int size = children.length;
 		ArrayList<PElement> list = new ArrayList<PElement>(size);

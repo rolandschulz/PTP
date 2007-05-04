@@ -18,16 +18,28 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.attributes;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public final class StringSetAttributeDefinition extends AbstractAttributeDefinition {
 
 	private final String defaultValue;
-	private final String[] values;
+	private final List<String> values;
 
 	public StringSetAttributeDefinition(String uniqueId, String name,
 			String description, String defaultValue, String[] values) throws IllegalValueException {
 		super(uniqueId, name, description);
 		this.defaultValue = defaultValue;
-		this.values = values.clone();
+		this.values = Arrays.asList(values);
+	}
+
+	public StringSetAttributeDefinition(String uniqueId, String name,
+			String description, String defaultValue, List<String> values)
+	throws IllegalValueException {
+		super(uniqueId, name, description);
+		this.defaultValue = defaultValue;
+		this.values = new ArrayList<String>(values);
 	}
 
 	/* (non-Javadoc)
@@ -54,7 +66,7 @@ public final class StringSetAttributeDefinition extends AbstractAttributeDefinit
 	/**
 	 * @return the values
 	 */
-	public String[] getValues() {
+	public List<String> getValues() {
 		return values;
 	}
 

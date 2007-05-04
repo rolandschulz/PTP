@@ -195,7 +195,7 @@ public class RMConfigurationWizard extends Wizard {
 
 	private RMConfigurationWizardPage[][] cachedPages;
 
-	private final ArrayList wizardPages = new ArrayList();
+	private final ArrayList<WizardPage> wizardPages = new ArrayList<WizardPage>();
 
 	private IResourceManagerConfiguration[] configs = null;
 

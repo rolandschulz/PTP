@@ -1,7 +1,6 @@
 package org.eclipse.ptp.core.elements.attributes;
 
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
-import org.eclipse.ptp.core.attributes.IntegerAttributeDefinition;
 import org.eclipse.ptp.core.attributes.StringAttributeDefinition;
 
 
