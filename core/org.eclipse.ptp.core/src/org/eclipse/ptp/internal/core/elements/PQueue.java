@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.core.elements;
 
+import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.elementcontrols.IPElementControl;
 import org.eclipse.ptp.core.elementcontrols.IPJobControl;
@@ -25,26 +26,39 @@ import org.eclipse.ptp.core.elementcontrols.IPQueueControl;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.core.elements.listeners.IQueueJobListener;
+import org.eclipse.ptp.core.elements.listeners.IQueueListener;
 
 public class PQueue extends Parent implements IPQueueControl {
-	protected String NAME_TAG = "queue ";
-	protected String arch = "undefined";
+	private final ListenerList elementListeners = new ListenerList();
+	private final ListenerList childListeners = new ListenerList();
 
 	public PQueue(String id, IResourceManagerControl rm, IAttribute[] attrs) {
 		super(id, rm, P_QUEUE, attrs);
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.IPMachine#getResourceManager()
+	 * @see org.eclipse.ptp.core.elements.IPQueue#addChildListener(org.eclipse.ptp.core.elements.listeners.IQueueJobListener)
 	 */
-	public IResourceManager getResourceManager() {
-		return (IResourceManager) getParent();
+	public void addChildListener(IQueueJobListener listener) {
+		childListeners.add(listener);
 	}
-	
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPQueue#addElementListener(org.eclipse.ptp.core.elements.listeners.IQueueListener)
+	 */
+	public void addElementListener(IQueueListener listener) {
+		elementListeners.add(listener);
+	}
+
 	public void addJob(IPJobControl job) {
 		if (job != null) {
 			addChild(job);
 		}
+	}
+
+	public IPJob getJobById(String job_id) {
+		return getJobControl(job_id);
 	}
 
 	public IPJobControl getJobControl(String job_id) {
@@ -53,9 +67,34 @@ public class PQueue extends Parent implements IPQueueControl {
 			return (IPJobControl) element;
 		return null;
 	}
-
+	
 	public IPJobControl[] getJobControls() {
 		return (IPJobControl[]) getCollection().toArray(new IPJobControl[size()]);
+	}
+
+	public IPJob[] getJobs() {
+		return getJobControls();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.IPMachine#getResourceManager()
+	 */
+	public IResourceManager getResourceManager() {
+		return (IResourceManager) getParent();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPQueue#removeChildListener(org.eclipse.ptp.core.elements.listeners.IQueueJobListener)
+	 */
+	public void removeChildListener(IQueueJobListener listener) {
+		childListeners.remove(listener);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPQueue#removeElementListener(org.eclipse.ptp.core.elements.listeners.IQueueListener)
+	 */
+	public void removeElementListener(IQueueListener listener) {
+		elementListeners.remove(listener);
 	}
 
 	public void removeJob(IPJobControl job) {
@@ -63,13 +102,5 @@ public class PQueue extends Parent implements IPQueueControl {
 			job.removeAllProcesses();
 			removeChild(job);
 		}
-	}
-
-	public IPJob getJobById(String job_id) {
-		return getJobControl(job_id);
-	}
-
-	public IPJob[] getJobs() {
-		return getJobControls();
 	}
 }

@@ -29,16 +29,17 @@ public final class EnumeratedAttributeDefinition extends AbstractAttributeDefini
 
 	private final ArrayList<String> enumerations = new ArrayList<String>();
 	private final int defaultValue;
-    final Class<? extends Enum> enumClass;
+    final Class<? extends Enum<? extends Enum<?>>> enumClass;
 
-    public <T extends Enum<T>> EnumeratedAttributeDefinition(final String uniqueId,
+    @SuppressWarnings("unchecked")
+	public <T extends Enum<T>> EnumeratedAttributeDefinition(final String uniqueId,
             final String name,
-            final String description, final Enum<T> defaultValue,
+            final String description, final Enum<T> defaultValueIn,
             final Enum<T>[] values) {
         super(uniqueId, name, description);
-        this.enumClass = defaultValue.getClass();
+        this.enumClass = (Class<? extends Enum<? extends Enum<?>>>) defaultValueIn.getClass();
         enumerations.addAll(stringArray(values));
-        this.defaultValue = defaultValue.ordinal();
+        this.defaultValue = defaultValueIn.ordinal();
     }
     
     public EnumeratedAttributeDefinition(final String uniqueId, final String name,
@@ -60,7 +61,7 @@ public final class EnumeratedAttributeDefinition extends AbstractAttributeDefini
 		return new EnumeratedAttribute(this, defaultValue);
 	}
 
-    public EnumeratedAttribute create(Enum value) throws IllegalValueException {
+    public <T extends Enum<T>> EnumeratedAttribute create(Enum<T> value) throws IllegalValueException {
         return new EnumeratedAttribute(this, value.ordinal());
     }
 
@@ -72,7 +73,7 @@ public final class EnumeratedAttributeDefinition extends AbstractAttributeDefini
         return new EnumeratedAttribute(this, value);
     }
 
-	public Class<? extends Enum> getEnumClass() {
+	public Class<? extends Enum<?>> getEnumClass() {
         return enumClass;
     }
 
@@ -80,9 +81,9 @@ public final class EnumeratedAttributeDefinition extends AbstractAttributeDefini
 		return Collections.unmodifiableList(enumerations);
 	}
 
-    private Collection<? extends String> stringArray(Enum[] values) {
+    private Collection<? extends String> stringArray(Enum<? extends Enum<?>>[] values) {
   	    ArrayList<String> strings = new ArrayList<String>(values.length);
-        for (Enum value : values) {
+        for (Enum<? extends Enum<?>> value : values) {
             strings.add(value.toString());
         }
         return strings;

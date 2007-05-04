@@ -22,4 +22,6 @@ import org.eclipse.ptp.core.elements.IPProcess;
 
 public interface IPProcessControl extends IPElementControl, IPProcess {
 
+	public IPJobControl getJobControl();
+
 }

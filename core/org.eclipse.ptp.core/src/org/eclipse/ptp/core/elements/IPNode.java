@@ -18,8 +18,21 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.elements;
 
+import org.eclipse.ptp.core.elements.listeners.INodeListener;
+import org.eclipse.ptp.core.elements.listeners.INodeProcessListener;
+
 
 public interface IPNode extends IPElement {
+
+	/**
+	 * @param listener
+	 */
+	public void addChildListener(INodeProcessListener listener);
+
+	/**
+	 * @param listener
+	 */
+	public void addElementListener(INodeListener listener);
 
 	/**
 	 * Returns the parent Machine that this Node is contained within.
@@ -36,7 +49,7 @@ public interface IPNode extends IPElement {
 	 * @return The node number of this Node as a String
 	 */
 	public String getNodeNumber();
-	
+
 	/**
 	 * Return any processes that are linked to this node
 	 * 
@@ -50,4 +63,14 @@ public interface IPNode extends IPElement {
 	 * @return sorted array of processes
 	 */
 	public IPProcess[] getSortedProcesses();
+	
+	/**
+	 * @param listener
+	 */
+	public void removeChildListener(INodeProcessListener listener);
+	
+	/**
+	 * @param listener
+	 */
+	public void removeElementListener(INodeListener listener);
 }

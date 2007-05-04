@@ -22,13 +22,17 @@ import org.eclipse.ptp.core.elements.IPJob;
 
 public interface IPJobControl extends IPElementControl, IPJob {
 
+	public void addProcess(IPProcessControl p);
+	
+	public IPProcessControl[] getProcessControls();
+
+	public IPQueueControl getQueueControl();
+	
 	/**
 	 * Removes all Processes from this Job. <br>
 	 * TODO: <i>LOOK AT THIS, THIS MAY BE INAPPROPRIATE HERE</i>
 	 */
 	public void removeAllProcesses();
-	
-	public IPProcessControl[] getProcessControls();
 
-	public void addProcess(IPProcessControl p);
+	public void removeProcess(IPProcessControl process);
 }

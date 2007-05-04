@@ -23,7 +23,9 @@ import org.eclipse.ptp.core.elements.IPNode;
 public interface IPNodeControl extends IPElementControl, IPNode {
 	public void addProcess(IPProcessControl process);
 
-	public void removeProcess(IPProcessControl process);
+	public IPMachineControl getMachineControl();
 
 	public IPProcessControl[] getProcessControls();
+	
+	public void removeProcess(IPProcessControl process);
 }

@@ -18,23 +18,44 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.elements;
 
-
+import org.eclipse.ptp.core.elements.listeners.IQueueJobListener;
+import org.eclipse.ptp.core.elements.listeners.IQueueListener;
 
 public interface IPQueue extends IPElement {
+
+	/**
+	 * @param listener
+	 */
+	public void addChildListener(IQueueJobListener listener);
+
+	/**
+	 * @param listener
+	 */
+	public void addElementListener(IQueueListener listener);
 
 	/**
 	 * @param job_id
 	 * @return IPJob
 	 */
 	public IPJob getJobById(String job_id);
-	
+
 	/**
 	 * @return IPJob[]
 	 */
 	public IPJob[] getJobs();
-	
+
 	/**
 	 * @return IResourceManager
 	 */
 	public IResourceManager getResourceManager();
+	
+	/**
+	 * @param listener
+	 */
+	public void removeChildListener(IQueueJobListener listener);
+	
+	/**
+	 * @param listener
+	 */
+	public void removeElementListener(IQueueListener listener);
 }
