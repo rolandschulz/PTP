@@ -29,7 +29,6 @@ import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute;
-import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.attributes.IntegerAttribute;
 import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.elementcontrols.IPElementControl;
@@ -63,14 +62,16 @@ public class PProcess extends Parent implements IPProcessControl {
 		/*
 		 * Make sure we always have a state.
 		 */
-		EnumeratedAttribute procState = (EnumeratedAttribute) getAttribute(ProcessAttributes.getStateAttributeDefinition());
+		EnumeratedAttribute<State> procState = getStateAttribute();
 		if (procState == null) {
-			try {
-				procState = ProcessAttributes.getStateAttributeDefinition().create();
-				addAttribute(procState);
-			} catch (IllegalValueException e) {
-			}
+			procState = ProcessAttributes.getStateAttributeDefinition().create();
+			addAttribute(procState);
 		}
+	}
+
+	private EnumeratedAttribute<State> getStateAttribute() {
+		return (EnumeratedAttribute<State>) getAttribute(
+				ProcessAttributes.getStateAttributeDefinition());
 	}
 
 	/* (non-Javadoc)
@@ -153,13 +154,13 @@ public class PProcess extends Parent implements IPProcessControl {
 	}
 	
 	public State getState() {
-		EnumeratedAttribute attr = (EnumeratedAttribute) getAttribute(ProcessAttributes.getStateAttributeDefinition());
-		return (State) attr.getEnumValue();
+		EnumeratedAttribute<State> attr = getStateAttribute();
+		return attr.getValue();
 	}
 	
 	public boolean isTerminated() {
-		EnumeratedAttribute procState = (EnumeratedAttribute) getAttribute(ProcessAttributes.getStateAttributeDefinition());
-		State state = (State) procState.getEnumValue();
+		EnumeratedAttribute<State> procState = getStateAttribute();
+		State state = procState.getValue();
 		if (state == State.ERROR || state == State.EXITED || state == State.EXITED_SIGNALLED) {
 			return true;
 		}
@@ -180,12 +181,9 @@ public class PProcess extends Parent implements IPProcessControl {
 		node = null;
 	}
 
-	public void setState(ProcessAttributes.State state) {
-		EnumeratedAttribute procState = (EnumeratedAttribute) getAttribute(ProcessAttributes.getStateAttributeDefinition());
-		try {
-			procState.setValue(state);
-		} catch (IllegalValueException e) {
-		}
+	public void setState(State state) {
+		EnumeratedAttribute<State> procState = getStateAttribute();
+		procState.setValue(state);
 	}
 
 	public void setTerminated(boolean isTerminated) {

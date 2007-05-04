@@ -28,20 +28,22 @@ public class NodeAttributes {
 	private static final String EXTRA_STATE_ATTR_ID = "nodeExtraState";
 	private static final String NUMBER_ATTR_ID = "nodeNumber";
 
-	private final static EnumeratedAttributeDefinition stateAttrDef = 
-		new EnumeratedAttributeDefinition(STATE_ATTR_ID, "Node State", "State of the node", State.UNKNOWN, State.values());
+	private final static EnumeratedAttributeDefinition<State> stateAttrDef = 
+		new EnumeratedAttributeDefinition<State>(STATE_ATTR_ID, "Node State", "State of the node",
+				State.UNKNOWN);
 	
-	private final static EnumeratedAttributeDefinition extraStateAttrDef = 
-		new EnumeratedAttributeDefinition(EXTRA_STATE_ATTR_ID, "Extra Node State", "Extra state information for the node (e.g. job scheduler state)", ExtraState.NONE, ExtraState.values());
+	private final static EnumeratedAttributeDefinition<ExtraState> extraStateAttrDef = 
+		new EnumeratedAttributeDefinition<ExtraState>(EXTRA_STATE_ATTR_ID, "Extra Node State",
+				"Extra state information for the node (e.g. job scheduler state)", ExtraState.NONE);
 	
 	private final static IntegerAttributeDefinition numAttrDef = 
 		new IntegerAttributeDefinition(NUMBER_ATTR_ID, "Node Number", "Zero-based index of node", 0);
 	
-	public static EnumeratedAttributeDefinition getStateAttributeDefinition() {
+	public static EnumeratedAttributeDefinition<State> getStateAttributeDefinition() {
 		return stateAttrDef;
 	}
 	
-	public static EnumeratedAttributeDefinition getExtraStateAttributeDefinition() {
+	public static EnumeratedAttributeDefinition<ExtraState> getExtraStateAttributeDefinition() {
 		return extraStateAttrDef;
 	}
 

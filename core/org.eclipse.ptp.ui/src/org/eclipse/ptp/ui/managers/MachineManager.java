@@ -29,8 +29,6 @@ import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.NodeAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
-import org.eclipse.ptp.core.elements.attributes.NodeAttributes.ExtraState;
-import org.eclipse.ptp.core.elements.attributes.NodeAttributes.State;
 import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.model.Element;
 import org.eclipse.ptp.ui.model.ElementHandler;
@@ -123,13 +121,14 @@ public class MachineManager extends AbstractUIManager {
 		if (node == null) {
 			return "Unknown";
 		}
-		EnumeratedAttribute nodeStateAttr = (EnumeratedAttribute) node.getAttribute(NodeAttributes.getStateAttributeDefinition());
+		EnumeratedAttribute<NodeAttributes.State> nodeStateAttr 
+		   = (EnumeratedAttribute<NodeAttributes.State>) node.getAttribute(NodeAttributes.getStateAttributeDefinition());
 		if(nodeStateAttr == null) {
 			return "Unknown";
 		}
-		NodeAttributes.State nodeState = (State) nodeStateAttr.getEnumValue();
+		NodeAttributes.State nodeState = nodeStateAttr.getValue();
 		
-		if (nodeState == State.UP) {
+		if (nodeState == NodeAttributes.State.UP) {
 			if (node.getProcesses().length > 0) {
 				if (node.getProcesses()[0].getJob().isTerminated()) {
 					return "Exited";
@@ -137,13 +136,14 @@ public class MachineManager extends AbstractUIManager {
 				return "Running";
 			}
 
-			EnumeratedAttribute extraStateAttr = (EnumeratedAttribute) node.getAttribute(NodeAttributes.getExtraStateAttributeDefinition());
-			NodeAttributes.ExtraState extraState = ExtraState.NONE;
+			EnumeratedAttribute<NodeAttributes.ExtraState> extraStateAttr =
+				(EnumeratedAttribute<NodeAttributes.ExtraState>) node.getAttribute(NodeAttributes.getExtraStateAttributeDefinition());
+			NodeAttributes.ExtraState extraState = NodeAttributes.ExtraState.NONE;
 			if (extraStateAttr != null) {
-				extraState = (ExtraState) extraStateAttr.getEnumValue();
+				extraState = extraStateAttr.getValue();
 			}
 			
-			if (extraState != ExtraState.NONE) {
+			if (extraState != NodeAttributes.ExtraState.NONE) {
 				return extraState.toString();
 			}
 		}
@@ -176,11 +176,12 @@ public class MachineManager extends AbstractUIManager {
 	 */
 	public int getNodeStatus(IPNode node) {
 		if (node != null) {
-			EnumeratedAttribute nodeStateAttr = (EnumeratedAttribute) node.getAttribute(NodeAttributes.getStateAttributeDefinition());
+			EnumeratedAttribute<NodeAttributes.State> nodeStateAttr = 
+				(EnumeratedAttribute<NodeAttributes.State>) node.getAttribute(NodeAttributes.getStateAttributeDefinition());
 			if(nodeStateAttr == null) {
 				return IPTPUIConstants.NODE_UNKNOWN;
 			}
-			NodeAttributes.State nodeState = (State) nodeStateAttr.getEnumValue();
+			NodeAttributes.State nodeState = nodeStateAttr.getValue();
 			
 			switch (nodeState) {
 			case UP:
@@ -192,10 +193,12 @@ public class MachineManager extends AbstractUIManager {
 					return IPTPUIConstants.NODE_RUNNING;
 				}
 				
-				EnumeratedAttribute extraStateAttr = (EnumeratedAttribute) node.getAttribute(NodeAttributes.getExtraStateAttributeDefinition());
-				NodeAttributes.ExtraState extraState = ExtraState.NONE;
+				EnumeratedAttribute<NodeAttributes.ExtraState> extraStateAttr =
+					(EnumeratedAttribute<NodeAttributes.ExtraState>) node.getAttribute(
+							NodeAttributes.getExtraStateAttributeDefinition());
+				NodeAttributes.ExtraState extraState = NodeAttributes.ExtraState.NONE;
 				if (extraStateAttr != null) {
-					extraState = (ExtraState) extraStateAttr.getEnumValue();
+					extraState = extraStateAttr.getValue();
 				}
 				
 				switch (extraState) {
