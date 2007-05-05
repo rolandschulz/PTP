@@ -337,8 +337,15 @@ public class ParallelJobView extends AbstractParallelSetView implements IQueueJo
 	 * @param job_id Target job ID
 	 */
 	protected void selectJob(IPJob job) {
+		IPJob old = getJobManager().getJob();
+		if (old != null) {
+			job.removeChildListener(this);
+		}
 		getJobManager().setJob(job);
-		updateJob();
+		if (job != null) {
+			job.addChildListener(this);			
+		}
+		updateJobSet();
 	}
 	
 	/** Get selected job
@@ -355,16 +362,8 @@ public class ParallelJobView extends AbstractParallelSetView implements IQueueJo
 	 * @param job_id Job ID
 	 */
 	public void changeJob(final String job_id) {
-		if (!elementViewComposite.isDisposed()) {
-			getDisplay().syncExec(new Runnable() {
-				public void run() {
-					IPJob job = ((JobManager)manager).findJobById(job_id);
-					changeJob(job);
-					jobTableViewer.refresh(true);
-					jobTableViewer.setSelection(job == null ? new StructuredSelection() : new StructuredSelection(job), true);
-				}
-			});
-		}
+		IPJob job = ((JobManager)manager).findJobById(job_id);
+		changeJobRefresh(job);
 	}
 	
 	/** Change job
@@ -377,21 +376,21 @@ public class ParallelJobView extends AbstractParallelSetView implements IQueueJo
 	}
 	
 	public void changeJobRefresh(final IPJob job) {
-		if (!elementViewComposite.isDisposed()) {
-			getDisplay().syncExec(new Runnable() {
-				public void run() {
+		getDisplay().syncExec(new Runnable() {
+			public void run() {
+				if (!elementViewComposite.isDisposed()) {
 					changeJob(job);
 					jobTableViewer.refresh(true);
 					jobTableViewer.setSelection(job == null ? new StructuredSelection() : new StructuredSelection(job), true);
 				}
-			});
-		}
+			}
+		});
 	}
 	
 	/** Update Job
 	 * 
 	 */
-	public void updateJob() {
+	public void updateJobSet() {
 		IElementHandler setManager = getCurrentElementHandler();
 		selectSet(setManager == null ? null : setManager.getSetRoot());
 	}
@@ -441,8 +440,15 @@ public class ParallelJobView extends AbstractParallelSetView implements IQueueJo
 	
 	public void selectQueue(IPQueue queue) {
 		JobManager jobManager = getJobManager();
+		IPQueue old = jobManager.getQueue();
+		if (old != null) {
+			old.removeChildListener(this);
+		}
 		jobManager.setQueue(queue);
-		updateJob();
+		if (queue != null) {
+			queue.addChildListener(this);
+		}
+		updateJobSet();
 	}
 	
 	public IPQueue getQueue() {
@@ -468,29 +474,21 @@ public class ParallelJobView extends AbstractParallelSetView implements IQueueJo
 	 * @see org.eclipse.ptp.core.elements.listeners.IQueueJobListener#handleEvent(org.eclipse.ptp.core.elements.events.IQueueNewJobEvent)
 	 */
 	public void handleEvent(final IQueueNewJobEvent e) {
-		UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
-			public void run() {
-				getJobManager().addJob(e.getJob());
-			}
-		});	
+		changeJobRefresh(e.getJob());
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.listeners.IQueueJobListener#handleEvent(org.eclipse.ptp.core.elements.events.IQueueRemoveJobEvent)
 	 */
 	public void handleEvent(final IQueueRemoveJobEvent e) {
-		UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
-			public void run() {
-				changeJobRefresh(null);
-			}
-		});	
+		changeJobRefresh(null);
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.listeners.IJobProcessListener#handleEvent(org.eclipse.ptp.core.elements.events.IJobChangedProcessEvent)
 	 */
 	public void handleEvent(final IJobChangedProcessEvent e) {
-		refresh(false);
+		refresh(true);
 	}
 	
 	/* (non-Javadoc)
@@ -502,6 +500,9 @@ public class ParallelJobView extends AbstractParallelSetView implements IQueueJo
 		UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
 			public void run() {
 				getJobManager().addProcess(e.getProcess());
+				updateJobSet();
+				update();
+				jobTableViewer.refresh(true);
 			}
 		});	
 	}

@@ -44,17 +44,30 @@ public class MachineManager extends AbstractUIManager {
 	protected IPMachine cur_machine = null;
 	protected final String DEFAULT_TITLE = "Please select a machine";
 	
-	/** Add machine
+	/** 
+	 * Add a new machine to machineList. Add any new nodes to the element
+	 * handler for the machine.
+	 * 
 	 * @param mac machine
 	 * @return true if the machine was added
 	 */
-	public boolean addMachine(IPMachine mac) {
-		if (!machineList.containsKey(mac.getID())) {
-			IElementHandler elementHandler = new ElementHandler();
-			machineList.put(mac.getID(), elementHandler);
-			return true;
+	public void addMachine(IPMachine mac) {
+		if (mac != null) {
+			IElementHandler handler;
+			if (!machineList.containsKey(mac.getID())) {
+				handler = new ElementHandler();
+				machineList.put(mac.getID(), handler);
+			} else {
+				handler = machineList.get(mac.getID());				
+			}
+			IElementSet set = handler.getSetRoot();
+			for (IPNode node : mac.getNodes()) {
+				String id = node.getID();
+				if (set.getElement(id) == null) {
+					set.add(new Element(set, id, node.getName()));
+				}
+			}
 		}
-		return false;
 	}
 	
 	/** Add machine
@@ -64,15 +77,10 @@ public class MachineManager extends AbstractUIManager {
 		addMachine(node.getMachine());
 		IElementHandler elementHandler = machineList.get(node.getMachine().getID());
 		IElementSet set = elementHandler.getSetRoot();
-		set.add(new Element(set, node.getID(), node.getName()));
-	}
-	
-	/** Add machine
-	 * @param mac machine
-	 */
-	private void addNode(IElementHandler handler, IPNode node) {
-		IElementSet set = handler.getSetRoot();
-		set.add(new Element(set, node.getID(), node.getName()));
+		String id = node.getID();
+		if (set.getElement(id) == null) {
+			set.add(new Element(set, id, node.getName()));
+		}
 	}
 
 	/* (non-Javadoc)
@@ -344,15 +352,10 @@ public class MachineManager extends AbstractUIManager {
 	 * 
 	 * @param machine_id machine ID
 	 */
-	public void setCurrentMachine(IPMachine machine) {
+	public void setMachine(IPMachine machine) {
 		if (machine != cur_machine) {
 			cur_machine = machine;
-			if (addMachine(machine)) {
-				IElementHandler handler = machineList.get(machine.getID());
-				for (IPNode node : machine.getNodes()) {
-					addNode(handler, node);
-				}
-			}
+			addMachine(machine);
 		}
 	}
 	
