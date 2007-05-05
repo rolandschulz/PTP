@@ -25,9 +25,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.debug.core.model.IDebugTarget;
-import org.eclipse.debug.core.model.IStackFrame;
-import org.eclipse.debug.core.model.IThread;
 import org.eclipse.debug.ui.AbstractDebugView;
 import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.jface.action.GroupMarker;
@@ -38,8 +35,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.TreePath;
-import org.eclipse.jface.viewers.TreeSelection;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPProcess;
@@ -518,14 +514,13 @@ public class ParallelDebugView extends ParallelJobView {
 		final UIDebugManager uimanager = ((UIDebugManager) manager);
 		WorkbenchJob workjob = new WorkbenchJob("Focus on Debug View") {
 			public IStatus runInUIThread(IProgressMonitor monitor) {
-				//focusOnDebugView(uimanager.getDebugObject(job, task_id));
+				focusOnDebugView(uimanager.getDebugObject(job, task_id));
 				return Status.OK_STATUS;
 			}
 		};
 		workjob.setPriority(Job.DECORATE);
 		workjob.schedule();
 	}
-/* FIXME: how should this work in 3.3?
 	private void focusOnDebugView(final Object selection) {
 		if (selection == null) {
 			return;
@@ -544,39 +539,17 @@ public class ParallelDebugView extends ParallelJobView {
 			job.schedule();
 		}
 	}
-	private void expendDebugView(AsynchronousTreeViewer asynViewer, Object selection) {
-		TreePath[] treePaths = asynViewer.getTreePaths(selection);
-		if (treePaths.length == 0) {
-			if (selection instanceof IStackFrame) {
-				expendDebugView(asynViewer, ((IStackFrame)selection).getLaunch());
-			}
-			else if (selection instanceof IThread) {
-				expendDebugView(asynViewer, ((IThread)selection).getLaunch());
-			}
-			else if (selection instanceof IDebugTarget) {
-				expendDebugView(asynViewer, ((IDebugTarget)selection).getLaunch());
-			}
-		}
-		if (treePaths.length > 0) {
-			asynViewer.expand(new TreeSelection(treePaths[0]));
-		}
-	}
 	private void doOnFocusDebugView(Object selection) {
 		Viewer viewer = getDebugViewer();
-		if (viewer instanceof AsynchronousTreeViewer) {
-			AsynchronousTreeViewer asynViewer = (AsynchronousTreeViewer)viewer;
-			expendDebugView(asynViewer, selection);
-			focusOnDebugTarget(asynViewer, selection);
+		if (viewer instanceof TreeViewer) {
+			focusOnDebugTarget((TreeViewer)viewer, selection);
 		}
 	}
-	private void focusOnDebugTarget(final AsynchronousTreeViewer asynViewer, final Object selection) {
+	private void focusOnDebugTarget(final TreeViewer treeViewer, final Object selection) {
 		WorkbenchJob job = new WorkbenchJob("Focus on Debug Target") {
 			public IStatus runInUIThread(IProgressMonitor monitor) {
-				final TreePath[] treePaths = asynViewer.getTreePaths(selection);
-				if (treePaths.length > 0) {
-					asynViewer.setSelection(new TreeSelection(treePaths[0]), true, true);
-   					//selectElements(new Object[] { selection });
-				}
+				//treeViewer.expandToLevel(selection, AbstractTreeViewer.ALL_LEVELS);
+				treeViewer.setExpandedElements(new Object[] { selection });
 				return Status.OK_STATUS;
 			}
         };
@@ -585,5 +558,4 @@ public class ParallelDebugView extends ParallelJobView {
         job.setPriority(Job.DECORATE);
         job.schedule();
 	}
-	*/
 }
