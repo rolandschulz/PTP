@@ -69,6 +69,7 @@ public class PProcess extends Parent implements IPProcessControl {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private EnumeratedAttribute<State> getStateAttribute() {
 		return (EnumeratedAttribute<State>) getAttribute(
 				ProcessAttributes.getStateAttributeDefinition());
