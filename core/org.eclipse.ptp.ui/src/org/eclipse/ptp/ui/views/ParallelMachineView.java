@@ -97,8 +97,6 @@ public class ParallelMachineView extends AbstractParallelSetView implements IRes
 	
 	public ParallelMachineView(IManager manager) {
 		super(manager);
-		//PTPCorePlugin.getDefault().getModelPresentation().addNodeListener(this);
-		//manager.addJobChangedListener(this);
 	}
 	
 	/** Change view flag
@@ -122,8 +120,6 @@ public class ParallelMachineView extends AbstractParallelSetView implements IRes
 	}
 	
 	public void dispose() {
-		//manager.removeJobChangedListener(this);
-		//PTPCorePlugin.getDefault().getModelPresentation().removeNodeListener(this);
 		IPMachine machine = getMachineManager().getCurrentMachine();
 		if (machine != null) {
 			machine.removeChildListener(this);
@@ -366,8 +362,8 @@ public class ParallelMachineView extends AbstractParallelSetView implements IRes
 			}
 			old.removeChildListener(this);
 		}
+		getMachineManager().setMachine(machine);
 		if (machine != null) {
-			getMachineManager().setCurrentMachine(machine);
 			machine.addChildListener(this);
 			for (IPNode node : machine.getNodes()) {
 				node.addChildListener(this);

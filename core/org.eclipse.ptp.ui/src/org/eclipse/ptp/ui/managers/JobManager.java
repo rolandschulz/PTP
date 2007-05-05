@@ -51,13 +51,28 @@ public class JobManager extends AbstractUIManager {
 	protected IPQueue cur_queue = null;
 	protected final String DEFAULT_TITLE = "Please select a queue";
 
-	/** Add a job
+	/** 
+	 * Add a new job to jobList. Check for any new processes and add these to
+	 * the element handler for the job.
+	 * 
 	 * @param job
 	 */
 	public void addJob(IPJob job) {
-		if (!jobList.containsKey(job.getID())) {
-			IElementHandler elementHandler = new ElementHandler();
-			jobList.put(job.getID(), elementHandler);
+		if (job != null) {
+			IElementHandler handler;
+			if (!jobList.containsKey(job.getID())) {
+				handler = new ElementHandler();
+				jobList.put(job.getID(), handler);
+			} else {
+				handler = jobList.get(job.getID());
+			}
+			IElementSet set = handler.getSetRoot();
+			for (IPProcess proc : job.getProcesses()) {
+				String id = proc.getID();
+				if (set.getElement(id) == null) {
+					set.add(createElement(set, id, proc.getProcessNumber()));
+				}
+			}
 		}
 	}
 	
@@ -65,9 +80,11 @@ public class JobManager extends AbstractUIManager {
 		addJob(proc.getJob());
 		IElementHandler elementHandler = jobList.get(proc.getJob().getID());
 		IElementSet set = elementHandler.getSetRoot();
-		set.add(createElement(set, proc.getID(), proc.getProcessNumber()));
+		if (set.getElement(proc.getID()) == null) {
+			set.add(createElement(set, proc.getID(), proc.getProcessNumber()));
+		}
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#clear()
 	 */
@@ -121,10 +138,11 @@ public class JobManager extends AbstractUIManager {
 	public IPJob[] getJobs() {
 		IPQueue queue = getQueue();
 		if (queue != null) {
-			return queue.getJobs();
+			return queue.getSortedJobs();
 		}
 		return new IPJob[0];
 	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#getName(java.lang.String)
 	 */
@@ -290,6 +308,7 @@ public class JobManager extends AbstractUIManager {
 			old_id = cur_job.getID();
 		}
 		if (job != null) {
+			addJob(job);
 			new_id = job.getID();
 		}
 		cur_job = job;
@@ -302,6 +321,7 @@ public class JobManager extends AbstractUIManager {
 			setJob(null);
 		}
 	}
+	
 	public void setCurrentSetId(String set_id) {
 		cur_set_id = set_id;
 	}
