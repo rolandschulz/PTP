@@ -32,9 +32,7 @@ import org.eclipse.ptp.core.elements.IPElement;
  */
 public abstract class Parent extends PElement {
 	public static void sort(IPElementControl elements[]) {
-		if (elements.length > 0) {
-			Arrays.sort(elements, 0, elements.length - 1);
-		}
+		Arrays.sort(elements);
 	}
 
 	public Parent(String id, IPElementControl parent, int type, IAttribute[] attrs) {

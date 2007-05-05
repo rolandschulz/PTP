@@ -56,6 +56,7 @@ public class PJob extends Parent implements IPJobControl, IProcessListener {
 		new HashMap<String, IPProcessControl>();
 	private boolean isDebugJob = false;
 
+	@SuppressWarnings("unchecked")
 	public PJob(String id, IPQueueControl queue, IAttribute[] attrs) {
 		super(id, queue, P_JOB, attrs);
 		/*
@@ -154,6 +155,7 @@ public class PJob extends Parent implements IPJobControl, IProcessListener {
 		return isDebugJob;
 	}
 
+	@SuppressWarnings("unchecked")
 	public boolean isTerminated() {
 		EnumeratedAttribute<State> jobState = (EnumeratedAttribute<State>) getAttribute(
 				JobAttributes.getStateAttributeDefinition());
