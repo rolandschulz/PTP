@@ -2218,7 +2218,7 @@ ORTE_StartEvents(int trans_id, int nargs, char **args)
 			gid = getgid();
 			grp = getgrgid(gid);
 			gethostname(hostname, 256);
-       		asprintf(&state, "%d", NODE_STATE_UP);
+       		asprintf(&state, "%s", NODE_STATE_UP);
        		
         	node = new_node(mach, hostname, state, pwd->pw_name, grp->gr_name, NULL);
 			
