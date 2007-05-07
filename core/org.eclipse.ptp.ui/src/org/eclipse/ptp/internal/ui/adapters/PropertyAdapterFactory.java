@@ -28,7 +28,8 @@ import org.eclipse.ui.views.properties.IPropertySource;
 
 public class PropertyAdapterFactory implements IAdapterFactory {
 
-	public Object getAdapter(Object adaptableObject, Class adapterType) {
+	@SuppressWarnings("unchecked")
+    public Object getAdapter(Object adaptableObject, Class adapterType) {
 		if (adapterType == IPropertySource.class) {
 			if (adaptableObject instanceof IResourceManager) {
 				return new ResourceManagerPropertySource((IResourceManager)adaptableObject);
@@ -40,7 +41,8 @@ public class PropertyAdapterFactory implements IAdapterFactory {
 		return null;
 	}
 
-	public Class[] getAdapterList() {
+	@SuppressWarnings("unchecked")
+    public Class[] getAdapterList() {
 		return new Class[] {IPropertySource.class};
 	}
 
