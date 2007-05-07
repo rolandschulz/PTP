@@ -41,15 +41,27 @@ extends AbstractAttribute<ArrayAttribute<T>> {
 	}
 	
 	public <U extends T> void setValue(U[] value) {
-		this.value = Arrays.asList((T[])value.clone());
+		if (value != null) {
+			this.value = Arrays.asList((T[])value.clone());
+		}
+		else {
+			this.value = new ArrayList<T>();
+		}
 	}
 
 	public <U extends T> void setValue(List<U> value) {
-		this.value = new ArrayList<T>(value);
+		if (value != null) {
+			this.value = new ArrayList<T>(value);
+		}
+		else {
+			this.value = new ArrayList<T>();
+		}
 	}
 
 	public <U extends T> void addAll(U[] value) {
-		this.value.addAll(Arrays.asList(value));
+		if (value != null) {
+			this.value.addAll(Arrays.asList(value));
+		}
 	}
 
 	public String getValueAsString() {
@@ -57,6 +69,12 @@ extends AbstractAttribute<ArrayAttribute<T>> {
 	}
 
 	public boolean isValid(String string) {
+		try {
+			@SuppressWarnings("unused")
+			T obj = (T) string;
+		} catch (ClassCastException e) {
+			return false;
+		}
 		return true;
 	}
 
