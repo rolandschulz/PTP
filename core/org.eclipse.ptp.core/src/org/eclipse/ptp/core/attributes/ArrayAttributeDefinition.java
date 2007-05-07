@@ -11,25 +11,30 @@
 
 package org.eclipse.ptp.core.attributes;
 
+import java.util.Arrays;
+import java.util.List;
 
-public final class ArrayAttributeDefinition extends AbstractAttributeDefinition implements IAttributeDefinition {
 
-	private Object[] defaultValue;
+public final class ArrayAttributeDefinition<T extends Comparable<T>>
+extends AbstractAttributeDefinition {
 
-	public ArrayAttributeDefinition(final String uniqueId, final String name, final String description, final Object[] defaultValue) {
+	private List<T> defaultValue;
+
+	public <U extends T> ArrayAttributeDefinition(final String uniqueId, final String name,
+			final String description, final U[] defaultValue) {
 		super(uniqueId, name, description);
-		this.defaultValue = defaultValue;
+		this.defaultValue = Arrays.asList((T[])defaultValue.clone());
 	}
 
-	public ArrayAttribute create() throws IllegalValueException {
-		return new ArrayAttribute(this, defaultValue);
+	public ArrayAttribute<T> create() {
+		return new ArrayAttribute<T>(this, defaultValue);
 	}
 
-	public ArrayAttribute create(String value) throws IllegalValueException {
-		return new ArrayAttribute(this, value);
+	public ArrayAttribute<T> create(String value) throws IllegalValueException {
+		return new ArrayAttribute<T>(this, value);
 	}
 
-	public ArrayAttribute create(Object[] value) throws IllegalValueException {
-		return new ArrayAttribute(this, value);
+	public <U extends T> ArrayAttribute<T> create(U[] value) {
+		return new ArrayAttribute<T>(this, value);
 	}
 }

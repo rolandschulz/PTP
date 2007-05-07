@@ -49,8 +49,11 @@ public class AttributeManager {
 		for (IAttribute attr : attrs) {
 			String id = attr.getDefinition().getId();
 			if (map.containsKey(id) && attr instanceof ArrayAttribute) {
+				@SuppressWarnings("unchecked")
 				ArrayAttribute exAttr = (ArrayAttribute)map.get(id);
-				exAttr.addAll(((ArrayAttribute)attr).getValue());
+				@SuppressWarnings("unchecked")
+				final Comparable[] value = ((ArrayAttribute)attr).getValue();
+				exAttr.addAll(value);
 			} else {
 				addAttribute(attr);
 			}
@@ -87,6 +90,7 @@ public class AttributeManager {
 		for (Map.Entry<String, IAttribute> entry : map.entrySet()) {
 			IAttribute attr = entry.getValue();
 			if (attr instanceof ArrayAttribute) {
+				@SuppressWarnings("unchecked")
 				Object[] arrObj = ((ArrayAttribute)attr).getValue();
 				for (Object obj : arrObj) {
 					res.add(entry.getKey() + "=" + obj.toString());					

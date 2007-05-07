@@ -113,8 +113,11 @@ public class AttributeDefinitionManager {
 		return def;
 	}
 	
-	public ArrayAttributeDefinition createArrayAttributeDefinition(final String uniqueId, final String name, final String description, final Object[] defaultValue) {
-		ArrayAttributeDefinition def = new ArrayAttributeDefinition(uniqueId, name, description, defaultValue);
+	public <T extends Comparable<T>> ArrayAttributeDefinition<T> createArrayAttributeDefinition(
+			final String uniqueId, final String name, final String description,
+			final T[] defaultValue) {
+		ArrayAttributeDefinition<T> def = new ArrayAttributeDefinition<T>(uniqueId, name,
+				description, defaultValue);
 		setAttributeDefinition(def);
 		return def;
 	}

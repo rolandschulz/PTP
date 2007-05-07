@@ -36,34 +36,44 @@ public class JobAttributes {
 				State.STARTED);
 
 	private final static IntegerAttributeDefinition subIdAttrDef = 
-		new IntegerAttributeDefinition(SUBID_ATTR_ID, "Job Submission ID", "Temporary ID used for job submission", 0);
+		new IntegerAttributeDefinition(SUBID_ATTR_ID, "Job Submission ID",
+				"Temporary ID used for job submission", 0);
 
 	private final static StringAttributeDefinition execNameAttrDef = 
-		new StringAttributeDefinition(EXEC_NAME_ATTR_ID, "Executable Name", "Name of executable to be launched", "");
+		new StringAttributeDefinition(EXEC_NAME_ATTR_ID, "Executable Name",
+				"Name of executable to be launched", "");
 
 	private final static StringAttributeDefinition execPathAttrDef = 
-		new StringAttributeDefinition(EXEC_PATH_ATTR_ID, "Executable Path", "Path of executable to be launched", "");
+		new StringAttributeDefinition(EXEC_PATH_ATTR_ID, "Executable Path",
+				"Path of executable to be launched", "");
 
 	private final static StringAttributeDefinition workingDirAttrDef = 
-		new StringAttributeDefinition(WORKING_DIR_ATTR_ID, "Working Directory", "Working directory where executable will run", "");
+		new StringAttributeDefinition(WORKING_DIR_ATTR_ID, "Working Directory",
+				"Working directory where executable will run", "");
 
-	private final static ArrayAttributeDefinition progArgsAttrDef = 
-		new ArrayAttributeDefinition(PROG_ARGS_ATTR_ID, "Program Arguments", "Command-line arguments supplied to executable", null);
+	private final static ArrayAttributeDefinition<String> progArgsAttrDef = 
+		new ArrayAttributeDefinition<String>(PROG_ARGS_ATTR_ID, "Program Arguments",
+				"Command-line arguments supplied to executable", null);
 
-	private final static ArrayAttributeDefinition envAttrDef = 
-		new ArrayAttributeDefinition(ENV_ATTR_ID, "Environment", "Environment to be supplied to executable on launch", null);
+	private final static ArrayAttributeDefinition<String> envAttrDef = 
+		new ArrayAttributeDefinition<String>(ENV_ATTR_ID, "Environment",
+				"Environment to be supplied to executable on launch", null);
 
 	private final static StringAttributeDefinition debugExecNameAttrDef = 
-		new StringAttributeDefinition(DEBUG_EXEC_NAME_ATTR_ID, "Debugger Executable Name", "Name of debugger executable", "");
+		new StringAttributeDefinition(DEBUG_EXEC_NAME_ATTR_ID, "Debugger Executable Name",
+				"Name of debugger executable", "");
 
 	private final static StringAttributeDefinition debugExecPathAttrDef = 
-		new StringAttributeDefinition(DEBUG_EXEC_PATH_ATTR_ID, "Debugger Executable NaPathme", "Path to debugger executable", "");
+		new StringAttributeDefinition(DEBUG_EXEC_PATH_ATTR_ID, "Debugger Executable NaPathme",
+				"Path to debugger executable", "");
 
-	private final static ArrayAttributeDefinition debugArgsAttrDef = 
-		new ArrayAttributeDefinition(DEBUG_ARGS_ATTR_ID, DEBUG_ARGS_ATTR_ID, "Debugger Arguments", null);
+	private final static ArrayAttributeDefinition<String> debugArgsAttrDef = 
+		new ArrayAttributeDefinition<String>(DEBUG_ARGS_ATTR_ID, DEBUG_ARGS_ATTR_ID,
+				"Debugger Arguments", null);
 
 	private final static BooleanAttributeDefinition debugFlagAttrDef = 
-		new BooleanAttributeDefinition(DEBUG_FLAG_ATTR_ID, DEBUG_FLAG_ATTR_ID, "Debug Flag", false);
+		new BooleanAttributeDefinition(DEBUG_FLAG_ATTR_ID, DEBUG_FLAG_ATTR_ID, "Debug Flag",
+				false);
 
 	public static EnumeratedAttributeDefinition<State> getStateAttributeDefinition() {
 		return stateAttrDef;
@@ -85,11 +95,11 @@ public class JobAttributes {
 		return workingDirAttrDef;
 	}
 
-	public static ArrayAttributeDefinition getProgramArgumentsAttributeDefinition() {
+	public static ArrayAttributeDefinition<String> getProgramArgumentsAttributeDefinition() {
 		return progArgsAttrDef;
 	}
 
-	public static ArrayAttributeDefinition getEnvironmentAttributeDefinition() {
+	public static ArrayAttributeDefinition<String> getEnvironmentAttributeDefinition() {
 		return envAttrDef;
 	}
 
@@ -101,7 +111,7 @@ public class JobAttributes {
 		return debugExecPathAttrDef;
 	}
 
-	public static ArrayAttributeDefinition getDebuggerArgumentsAttributeDefinition() {
+	public static ArrayAttributeDefinition<String> getDebuggerArgumentsAttributeDefinition() {
 		return debugArgsAttrDef;
 	}
 
