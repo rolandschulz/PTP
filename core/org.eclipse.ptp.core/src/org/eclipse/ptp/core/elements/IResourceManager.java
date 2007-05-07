@@ -92,7 +92,14 @@ IAdaptable, IResourceManagerMenuContribution {
 	 */
 	public IPQueue[] getQueues();
 
-	/**
+    /**
+     * Returns the id of the resource manager
+     *
+     * @return the id of the resource manager
+     */
+    public String getResourceManagerId();
+
+    /**
 	 * @return
 	 */
 	public ResourceManagerAttributes.State getState();
