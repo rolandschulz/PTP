@@ -11,6 +11,7 @@
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 public final class ArrayAttribute<T extends Comparable<T>> 
@@ -68,10 +69,29 @@ extends AbstractAttribute<ArrayAttribute<T>> {
 		}
 	}
 	
+    /* (non-Javadoc)
+     * @see org.eclipse.ptp.core.attributes.AbstractAttribute#doCompareTo(org.eclipse.ptp.core.attributes.AbstractAttribute)
+     */
     @Override
     protected int doCompareTo(ArrayAttribute<T> other) {
-        int results = value.size() - value.size();
-        return results;
+    	// This is a lexicographic compare.
+    	
+        int results = 0;
+        Iterator<T> it1 = value.iterator();
+        Iterator<T> it2 = other.value.iterator();
+        while (it1.hasNext() && it2.hasNext()) {
+        	T o1 = it1.next();
+        	T o2 = it2.next();
+        	results = o1.compareTo(o2);
+        	if (results != 0) {
+        		return results;
+        	}
+        }
+        // If they compared the same up to here
+        // then the lexicographic compare is based
+        // on their sizes, the shortest
+        // one is less than the longer one.
+        return value.size() - other.value.size();
     }
 
     @Override
