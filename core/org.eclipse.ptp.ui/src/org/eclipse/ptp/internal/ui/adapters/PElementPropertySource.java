@@ -30,8 +30,11 @@ public class PElementPropertySource implements IPropertySource {
 
 	public PElementPropertySource(IPElement pelement) {
 		this.pelement = pelement;
-		descriptors = new PropertyDescriptor[1];
-		descriptors[0] = new PropertyDescriptor("name", "name");
+        String[] keys = pelement.getAttributeKeys();
+        descriptors = new PropertyDescriptor[keys.length];
+        for (int i = 0; i < keys.length; ++i) {
+            descriptors[i] = new PropertyDescriptor(keys[i], keys[i]);
+        }
 	}
 
 	public Object getEditableValue() {
@@ -44,10 +47,7 @@ public class PElementPropertySource implements IPropertySource {
 	}
 
 	public Object getPropertyValue(Object id) {
-		if ("name".equals(id)) {
-			return pelement.getName();
-		}
-		return null;
+        return pelement.getAttribute(id.toString()).getValueAsString();
 	}
 
 	public boolean isPropertySet(Object id) {

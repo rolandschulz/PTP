@@ -23,12 +23,15 @@ import java.util.List;
 
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.ptp.core.attributes.IAttribute;
+import org.eclipse.ptp.core.attributes.IllegalValueException;
+import org.eclipse.ptp.core.attributes.IntegerAttribute;
 import org.eclipse.ptp.core.elementcontrols.IPElementControl;
 import org.eclipse.ptp.core.elementcontrols.IPMachineControl;
 import org.eclipse.ptp.core.elementcontrols.IPNodeControl;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPNode;
 import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.core.elements.attributes.MachineAttributes;
 import org.eclipse.ptp.core.elements.events.IMachineChangedEvent;
 import org.eclipse.ptp.core.elements.events.IMachineChangedNodeEvent;
 import org.eclipse.ptp.core.elements.events.IMachineNewNodeEvent;
@@ -46,9 +49,21 @@ public class PMachine extends Parent implements IPMachineControl, INodeListener 
 	private final ListenerList elementListeners = new ListenerList();
 	private final ListenerList childListeners = new ListenerList();
 	private String arch = "undefined";
+    private IntegerAttribute numNodes;
 	
 	public PMachine(String id, IResourceManagerControl rm, IAttribute[] attrs) {
 		super(id, rm, P_MACHINE, attrs);
+        numNodes = (IntegerAttribute) getAttribute(
+                MachineAttributes.getNumNodesAttributeDefinition());
+        if (numNodes == null) {
+            try {
+                numNodes = MachineAttributes.getNumNodesAttributeDefinition().create(0);
+            } catch (IllegalValueException e) {
+                //FIXME
+                throw new RuntimeException(e);
+            }
+            addAttribute(numNodes);
+        }
 	}
 
 	/* (non-Javadoc)
@@ -66,7 +81,14 @@ public class PMachine extends Parent implements IPMachineControl, INodeListener 
 	}
 
 	public synchronized void addNode(IPNodeControl node) {
-		addChild(node);
+		assert(numNodes.getValue().equals(getNodes().length));
+	    addChild(node);
+		try {
+            numNodes.setValue(getNodes().length);
+        } catch (IllegalValueException e) {
+            // FIXME
+            throw new RuntimeException(e);
+        }
 		fireNewNode(node);
 		node.addElementListener(this);
 	}

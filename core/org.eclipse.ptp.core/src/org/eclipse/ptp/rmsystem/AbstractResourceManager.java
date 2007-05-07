@@ -288,6 +288,13 @@ IResourceManagerControl {
 	}
 	
 	/* (non-Javadoc)
+     * @see org.eclipse.ptp.core.elements.IResourceManager#getResourceManagerId()
+     */
+    public String getResourceManagerId() {
+        return getConfiguration().getResourceManagerId();
+    }
+
+    /* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.IResourceManager#getStatus()
 	 */
 	synchronized public ResourceManagerAttributes.State getState() {

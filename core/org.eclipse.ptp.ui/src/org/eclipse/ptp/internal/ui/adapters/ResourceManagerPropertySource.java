@@ -66,7 +66,7 @@ public class ResourceManagerPropertySource implements IPropertySource {
 			return resourceManager.getDescription();
 		}
 		if ("type".equals(id)) {
-			final String resourceManagerId = resourceManager.getID();
+			final String resourceManagerId = resourceManager.getResourceManagerId();
 			final IModelManager modelManager = PTPCorePlugin.getDefault().getModelManager();
 			IResourceManagerFactory factory = modelManager.getResourceManagerFactory(
 					resourceManagerId);

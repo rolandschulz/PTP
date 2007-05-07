@@ -2,6 +2,7 @@ package org.eclipse.ptp.core.elements.attributes;
 
 import org.eclipse.ptp.core.attributes.EnumeratedAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
+import org.eclipse.ptp.core.attributes.IntegerAttributeDefinition;
 
 
 /**
@@ -15,17 +16,26 @@ public class MachineAttributes {
 		STOPPED
 	};
 
-	private static final String STATE_ATTR_ID = "machineState";
+    private static final String STATE_ATTR_ID = "machineState";
+    private static final String STATE_NUMNODES_ID = "numNodes";
 
-	private final static EnumeratedAttributeDefinition<State> stateAttrDef = 
-		new EnumeratedAttributeDefinition<State>(STATE_ATTR_ID, "state", "Machine State",
-				State.UNKNOWN);
-	
-	public static EnumeratedAttributeDefinition<State> getStateAttributeDefinition() {
-		return stateAttrDef;
-	}
-	
+    private final static EnumeratedAttributeDefinition<State> stateAttrDef = 
+        new EnumeratedAttributeDefinition<State>(STATE_ATTR_ID, "state", "Machine State",
+                State.UNKNOWN);
+    
+    private final static IntegerAttributeDefinition numNodesAttrDef = 
+        new IntegerAttributeDefinition(STATE_NUMNODES_ID, "nodes", "Number of Nodes",
+                0);
+    
+    public static EnumeratedAttributeDefinition<State> getStateAttributeDefinition() {
+        return stateAttrDef;
+    }
+    
+    public static IntegerAttributeDefinition getNumNodesAttributeDefinition() {
+        return numNodesAttrDef;
+    }
+    
 	public static IAttributeDefinition[] getDefaultAttributeDefinitions() {
-		return new IAttributeDefinition[]{stateAttrDef};
+		return new IAttributeDefinition[]{stateAttrDef, numNodesAttrDef};
 	}
 }
