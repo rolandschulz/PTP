@@ -46,7 +46,8 @@ public class Queue<T> {
 		}
 	}
 	
-	public T[] clearItems() {
+	@SuppressWarnings("unchecked")
+    public T[] clearItems() {
 		T[] array;
 		synchronized (list) {
 			array = (T[]) list.toArray();
