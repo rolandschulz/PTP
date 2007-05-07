@@ -23,7 +23,6 @@ import org.eclipse.ptp.ui.actions.ParallelAction;
 import org.eclipse.ptp.ui.managers.JobManager;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.views.AbstractParallelElementView;
-import org.eclipse.ptp.ui.views.ParallelJobView;
 
 /**
  * @author Clement chu
@@ -50,8 +49,5 @@ public class RemoveAllTerminatedAction extends ParallelAction {
 	 */
 	public void run() {
 		((JobManager) view.getUIManager()).removeAllStoppedJobs();
-		if (view instanceof ParallelJobView) {
-			((ParallelJobView)view).changeJob(null);
-		}
 	}
 }

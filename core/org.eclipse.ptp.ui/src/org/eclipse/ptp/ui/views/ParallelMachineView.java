@@ -309,6 +309,7 @@ public class ParallelMachineView extends AbstractParallelSetView implements IRes
 				if (node == getRegisteredNode()) {
 					updateProcessInfoRegion(node);
 				}
+				refresh(false);
 			}
 		});
 	}
@@ -427,36 +428,38 @@ public class ParallelMachineView extends AbstractParallelSetView implements IRes
 	 */
 	private void updateLowerRegions() {
 		IPNode node = getRegisteredNode();
-		if (node != null) {
-			updateNodeInfoRegion(node);
-			updateProcessInfoRegion(node);
-		}
+		updateNodeInfoRegion(node);
+		updateProcessInfoRegion(node);
 	}
 	
 	private void updateNodeInfoRegion(IPNode node) {
 		BLtable.removeAll();
-		for (Map.Entry<String, IAttribute> entry : node.getAttributeEntrySet()) {
-			String key = entry.getValue().getDefinition().getName();
-			String value = entry.getValue().getValueAsString();
-			new TableItem(BLtable, SWT.NULL).setText(new String[] { key, value });
+		if (node != null) {
+			for (Map.Entry<String, IAttribute> entry : node.getAttributeEntrySet()) {
+				String key = entry.getValue().getDefinition().getName();
+				String value = entry.getValue().getValueAsString();
+				new TableItem(BLtable, SWT.NULL).setText(new String[] { key, value });
+			}
 		}
 	}
 	
 	private void updateProcessInfoRegion(IPNode node) {
-		IPProcess procs[] = node.getSortedProcesses();
-		if (procs != null) {
-			BRtable.removeAll();
-			TableItem item = null;
-			for (int i = 0; i < procs.length; i++) {
-				int proc_state = getMachineManager().getProcStatus(procs[i].getState());
-				item = new TableItem(BRtable, SWT.NULL);
-				item.setImage(ParallelImages.procImages[proc_state][0]);
-				final IPJob job = procs[i].getJob();
-				String jobName = "none";
-				if (job != null) {
-					jobName = job.getName();
+		BRtable.removeAll();
+		if (node != null) {
+			IPProcess procs[] = node.getSortedProcesses();
+			if (procs != null) {
+				TableItem item = null;
+				for (int i = 0; i < procs.length; i++) {
+					int proc_state = getMachineManager().getProcStatus(procs[i].getState());
+					item = new TableItem(BRtable, SWT.NULL);
+					item.setImage(ParallelImages.procImages[proc_state][0]);
+					final IPJob job = procs[i].getJob();
+					String jobName = "none";
+					if (job != null) {
+						jobName = job.getName();
+					}
+					item.setText("Process " + procs[i].getProcessNumber() + ", Job " + jobName);
 				}
-				item.setText("Process " + procs[i].getProcessNumber() + ", Job " + jobName);
 			}
 		}
 	}
