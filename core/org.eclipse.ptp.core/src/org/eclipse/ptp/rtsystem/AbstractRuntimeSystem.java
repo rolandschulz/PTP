@@ -18,10 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.rtsystem;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
+import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.rtsystem.events.IRuntimeAttributeDefinitionEvent;
@@ -41,7 +38,7 @@ import org.eclipse.ptp.rtsystem.events.IRuntimeRunningStateEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeShutdownStateEvent;
 
 public abstract class AbstractRuntimeSystem implements IRuntimeSystem {
-	final private List<IRuntimeEventListener>	listeners = Collections.synchronizedList(new ArrayList<IRuntimeEventListener>());
+	final private ListenerList	listeners = new ListenerList();
 
 	public void addRuntimeEventListener(IRuntimeEventListener listener) {
 		listeners.add(listener);
@@ -67,107 +64,92 @@ public abstract class AbstractRuntimeSystem implements IRuntimeSystem {
 	}
 	
 	protected void fireRuntimeErrorEvent(IRuntimeErrorEvent event) {
-		IRuntimeEventListener[] la = listeners.toArray(new IRuntimeEventListener[0]);
-		for (IRuntimeEventListener listener : la) {
-			listener.handleRuntimeErrorEvent(event);
+		for (Object listener : listeners.getListeners()) {
+			((IRuntimeEventListener)listener).handleRuntimeErrorEvent(event);
 		}
 	}
 	
 	protected void fireRuntimeAttributeDefinitionEvent(IRuntimeAttributeDefinitionEvent event) {
-		IRuntimeEventListener[] la = listeners.toArray(new IRuntimeEventListener[0]);
-		for (IRuntimeEventListener listener : la) {
-			listener.handleRuntimeAttributeDefinitionEvent(event);
+		for (Object listener : listeners.getListeners()) {
+			((IRuntimeEventListener)listener).handleRuntimeAttributeDefinitionEvent(event);
 		}
 	}
 	
 	protected void fireRuntimeConnectedStateEvent(IRuntimeConnectedStateEvent event) {
-		IRuntimeEventListener[] la = listeners.toArray(new IRuntimeEventListener[0]);
-		for (IRuntimeEventListener listener : la) {
-			listener.handleRuntimeConnectedStateEvent(event);
+		for (Object listener : listeners.getListeners()) {
+			((IRuntimeEventListener)listener).handleRuntimeConnectedStateEvent(event);
 		}
 	}
 
 	protected void fireRuntimeJobChangeEvent(IRuntimeJobChangeEvent event) {
-		IRuntimeEventListener[] la = listeners.toArray(new IRuntimeEventListener[0]);
-		for (IRuntimeEventListener listener : la) {
-			listener.handleRuntimeJobChangeEvent(event);
+		for (Object listener : listeners.getListeners()) {
+			((IRuntimeEventListener)listener).handleRuntimeJobChangeEvent(event);
 		}
 	}
 
 	protected void fireRuntimeMachineChangeEvent(IRuntimeMachineChangeEvent event) {
-		IRuntimeEventListener[] la = listeners.toArray(new IRuntimeEventListener[0]);
-		for (IRuntimeEventListener listener : la) {
-			listener.handleRuntimeMachineChangeEvent(event);
+		for (Object listener : listeners.getListeners()) {
+			((IRuntimeEventListener)listener).handleRuntimeMachineChangeEvent(event);
 		}
 	}
 
 	protected void fireRuntimeNodeChangeEvent(IRuntimeNodeChangeEvent event) {
-		IRuntimeEventListener[] la = listeners.toArray(new IRuntimeEventListener[0]);
-		for (IRuntimeEventListener listener : la) {
-			listener.handleRuntimeNodeChangeEvent(event);
+		for (Object listener : listeners.getListeners()) {
+			((IRuntimeEventListener)listener).handleRuntimeNodeChangeEvent(event);
 		}
 	}
 
 	protected void fireRuntimeProcessChangeEvent(IRuntimeProcessChangeEvent event) {
-		IRuntimeEventListener[] la = listeners.toArray(new IRuntimeEventListener[0]);
-		for (IRuntimeEventListener listener : la) {
-			listener.handleRuntimeProcessChangeEvent(event);
+		for (Object listener : listeners.getListeners()) {
+			((IRuntimeEventListener)listener).handleRuntimeProcessChangeEvent(event);
 		}
 	}
 	
 	protected void fireRuntimeQueueChangeEvent(IRuntimeQueueChangeEvent event) {
-		IRuntimeEventListener[] la = listeners.toArray(new IRuntimeEventListener[0]);
-		for (IRuntimeEventListener listener : la) {
-			listener.handleRuntimeQueueChangeEvent(event);
+		for (Object listener : listeners.getListeners()) {
+			((IRuntimeEventListener)listener).handleRuntimeQueueChangeEvent(event);
 		}
 	}
 
 	protected void fireRuntimeNewJobEvent(IRuntimeNewJobEvent event) {
-		IRuntimeEventListener[] la = listeners.toArray(new IRuntimeEventListener[0]);
-		for (IRuntimeEventListener listener : la) {
-			listener.handleRuntimeNewJobEvent(event);
+		for (Object listener : listeners.getListeners()) {
+			((IRuntimeEventListener)listener).handleRuntimeNewJobEvent(event);
 		}
 	}
 
 	protected void fireRuntimeNewMachineEvent(IRuntimeNewMachineEvent event) {
-		IRuntimeEventListener[] la = listeners.toArray(new IRuntimeEventListener[0]);
-		for (IRuntimeEventListener listener : la) {
-			listener.handleRuntimeNewMachineEvent(event);
+		for (Object listener : listeners.getListeners()) {
+			((IRuntimeEventListener)listener).handleRuntimeNewMachineEvent(event);
 		}
 	}
 
 	protected void fireRuntimeNewNodeEvent(IRuntimeNewNodeEvent event) {
-		IRuntimeEventListener[] la = listeners.toArray(new IRuntimeEventListener[0]);
-		for (IRuntimeEventListener listener : la) {
-			listener.handleRuntimeNewNodeEvent(event);
+		for (Object listener : listeners.getListeners()) {
+			((IRuntimeEventListener)listener).handleRuntimeNewNodeEvent(event);
 		}
 	}
 
 	protected void fireRuntimeNewProcessEvent(IRuntimeNewProcessEvent event) {
-		IRuntimeEventListener[] la = listeners.toArray(new IRuntimeEventListener[0]);
-		for (IRuntimeEventListener listener : la) {
-			listener.handleRuntimeNewProcessEvent(event);
+		for (Object listener : listeners.getListeners()) {
+			((IRuntimeEventListener)listener).handleRuntimeNewProcessEvent(event);
 		}
 	}
 	
 	protected void fireRuntimeNewQueueEvent(IRuntimeNewQueueEvent event) {
-		IRuntimeEventListener[] la = listeners.toArray(new IRuntimeEventListener[0]);
-		for (IRuntimeEventListener listener : la) {
-			listener.handleRuntimeNewQueueEvent(event);
+		for (Object listener : listeners.getListeners()) {
+			((IRuntimeEventListener)listener).handleRuntimeNewQueueEvent(event);
 		}
 	}
 	
 	protected void fireRuntimeRunningStateEvent(IRuntimeRunningStateEvent event) {
-		IRuntimeEventListener[] la = listeners.toArray(new IRuntimeEventListener[0]);
-		for (IRuntimeEventListener listener : la) {
-			listener.handleRuntimeRunningStateEvent(event);
+		for (Object listener : listeners.getListeners()) {
+			((IRuntimeEventListener)listener).handleRuntimeRunningStateEvent(event);
 		}
 	}
 
 	protected void fireRuntimeShutdownStateEvent(IRuntimeShutdownStateEvent event) {
-		IRuntimeEventListener[] la = listeners.toArray(new IRuntimeEventListener[0]);
-		for (IRuntimeEventListener listener : la) {
-			listener.handleRuntimeShutdownStateEvent(event);
+		for (Object listener : listeners.getListeners()) {
+			((IRuntimeEventListener)listener).handleRuntimeShutdownStateEvent(event);
 		}
 	}
 }
