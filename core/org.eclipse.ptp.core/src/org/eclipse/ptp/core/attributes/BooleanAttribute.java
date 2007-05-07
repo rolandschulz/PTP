@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.attributes;
 
-public class BooleanAttribute extends AbstractAttribute implements IAttribute {
+public class BooleanAttribute extends AbstractAttribute<BooleanAttribute> {
 
 	private Boolean value;
 
@@ -57,5 +57,20 @@ public class BooleanAttribute extends AbstractAttribute implements IAttribute {
 		}
 		value = Boolean.valueOf(string);
 	}
+
+    @Override
+    protected int doCompareTo(BooleanAttribute other) {
+        return value.compareTo(other.value);
+    }
+
+    @Override
+    protected boolean doEquals(BooleanAttribute other) {
+        return value.equals(other.value);
+    }
+
+    @Override
+    protected int doHashCode() {
+        return value.hashCode();
+    }
 
 }

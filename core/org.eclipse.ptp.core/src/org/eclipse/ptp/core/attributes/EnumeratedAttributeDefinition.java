@@ -29,11 +29,13 @@ extends AbstractAttributeDefinition {
 	private final E defaultValue;
 	final Class<E> enumClass;
 
-	public EnumeratedAttributeDefinition(final String uniqueId,
+    public EnumeratedAttributeDefinition(final String uniqueId,
 			final String name,
 			final String description, final E defaultValueIn) {
 		super(uniqueId, name, description);
-		this.enumClass = (Class<E>) defaultValueIn.getClass();
+	    @SuppressWarnings("unchecked")
+		final Class<E> eClass = (Class<E>) defaultValueIn.getClass();
+        this.enumClass = eClass;
 		this.defaultValue = defaultValueIn;
 	}
 

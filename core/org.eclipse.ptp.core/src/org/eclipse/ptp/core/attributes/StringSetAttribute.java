@@ -20,7 +20,7 @@ package org.eclipse.ptp.core.attributes;
 
 import java.util.List;
 
-public final class StringSetAttribute extends AbstractAttribute {
+public final class StringSetAttribute extends AbstractAttribute<StringSetAttribute> {
 
 	private String value;
 
@@ -45,12 +45,20 @@ public final class StringSetAttribute extends AbstractAttribute {
 		setValue(valueIn);
 	}
 
+	public StringSetAttributeDefinition getStringSetAttributeDefinition() {
+		return (StringSetAttributeDefinition) getDefinition();
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.attributes.IAttribute#getValueAsString()
 	 */
 	public String getValueAsString() {
 		return value;
 	}
+
+	public int getValueIndex() {
+        return getStringSetAttributeDefinition().getValues().indexOf(value);
+    }
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.attributes.IAttribute#isValid(java.lang.String)
@@ -61,7 +69,7 @@ public final class StringSetAttribute extends AbstractAttribute {
 		return isValid;
 	}
 
-	/* (non-Javadoc)
+    /* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.attributes.IAttribute#setValue(java.lang.String)
 	 */
 	public void setValue(String valueIn) throws IllegalValueException {
@@ -72,8 +80,19 @@ public final class StringSetAttribute extends AbstractAttribute {
 		this.value = valueIn;
 	}
 
-	private StringSetAttributeDefinition getStringSetAttributeDefinition() {
-		return (StringSetAttributeDefinition) getDefinition();
-	}
+    @Override
+    protected int doCompareTo(StringSetAttribute other) {
+        return getValueIndex() - other.getValueIndex();
+    }
+
+    @Override
+    protected boolean doEquals(StringSetAttribute other) {
+        return value.equals(other.value);
+    }
+
+    @Override
+    protected int doHashCode() {
+        return value.hashCode();
+    }
 
 }

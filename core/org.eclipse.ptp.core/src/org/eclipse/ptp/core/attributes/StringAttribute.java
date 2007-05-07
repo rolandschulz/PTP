@@ -19,7 +19,7 @@
 package org.eclipse.ptp.core.attributes;
 
 
-public final class StringAttribute extends AbstractAttribute implements IAttribute {
+public final class StringAttribute extends AbstractAttribute<StringAttribute> {
 
 	private StringBuffer value = new StringBuffer();
 
@@ -43,4 +43,19 @@ public final class StringAttribute extends AbstractAttribute implements IAttribu
 	public void setValue(String string) throws IllegalValueException {
 		this.value.replace(0, this.value.length(), string);
 	}
+
+    @Override
+    protected int doCompareTo(StringAttribute other) {
+        return value.toString().compareTo(other.value.toString());
+    }
+
+    @Override
+    protected boolean doEquals(StringAttribute other) {
+        return value.equals(other.value);
+    }
+
+    @Override
+    protected int doHashCode() {
+        return value.hashCode();
+    }
 }
