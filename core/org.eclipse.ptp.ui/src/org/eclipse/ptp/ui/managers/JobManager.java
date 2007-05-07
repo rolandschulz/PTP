@@ -138,7 +138,6 @@ public class JobManager extends AbstractUIManager {
 	public IPJob[] getJobs() {
 		IPQueue queue = getQueue();
 		if (queue != null) {
-			System.out.println("getJobs() returns " + queue.getSortedJobs().length + " jobs");
 			return queue.getSortedJobs();
 		}
 		return new IPJob[0];
