@@ -401,7 +401,6 @@ public abstract class AbstractRuntimeResourceManager extends
 	 */
 	private void closeConnection() {
 		runtimeSystem.shutdown();
-		runtimeSystem.removeRuntimeEventListener(this);
 	}
 
 	/**
@@ -409,7 +408,6 @@ public abstract class AbstractRuntimeResourceManager extends
 	 * @throws CoreException 
 	 */
 	private void openConnection() throws CoreException {
-		runtimeSystem.addRuntimeEventListener(this);
 		runtimeSystem.startup();
 	}
 
@@ -547,6 +545,7 @@ public abstract class AbstractRuntimeResourceManager extends
 		}
 		finally {
 			startupLock.unlock();
+			runtimeSystem.removeRuntimeEventListener(this);
 			monitor.done();
 		}
 	}
@@ -562,6 +561,7 @@ public abstract class AbstractRuntimeResourceManager extends
 		try {
 			doBeforeOpenConnection();
 			runtimeSystem = doCreateRuntimeSystem();
+			runtimeSystem.addRuntimeEventListener(this);
 			openConnection();
 			while (!monitor.isCanceled() && !started) {
 				try {

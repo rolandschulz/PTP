@@ -60,6 +60,15 @@
 #define DEFAULT_ORTED_ARGS	"orted --scope public --seed --persistent --no-daemonize"
 
 /*
+ * Proxy server states. The SHUTTING_DOWN state is used to
+ * give the proxy a chance to send any pending events once
+ * a QUIT command has been received.
+ */
+#define STATE_INIT			0
+#define STATE_RUNNING		1
+#define STATE_SHUTTING_DOWN	2
+#define STATE_SHUTDOWN		3
+/*
  * RTEV codes must EXACTLY match org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEvent
  */
 #define RTEV_OFFSET						200
@@ -210,8 +219,7 @@ static int			gTransID = 0; /* transaction id for start of event stream, is 0 whe
 static int			gBaseID = 0; /* base ID for event generation */
 static int			gLastID = 1; /* ID generator */
 static int			gQueueID; /* ID of default queue */
-static int 			proxy_shutdown = 0;
-static int			proxy_initialized = 0;
+static int 			proxy_state = STATE_INIT;
 static proxy_svr *	orte_proxy;
 static pid_t		orted_pid = 0;
 static List *		gJobList;
@@ -1338,8 +1346,6 @@ do_orte_init(int trans_id, char *universe_name)
 	}
 #endif
 	
-	proxy_initialized = true;
-	
 	return 0;
 }
 
@@ -1698,7 +1704,7 @@ int
 do_orte_progress(void)
 {	
 	/* only run the progress of the ORTE code if we've initted the ORTE daemon */
-	if(proxy_initialized && !proxy_shutdown) {
+	if(proxy_state == STATE_RUNNING) {
 		opal_event_loop(OPAL_EVLOOP_ONCE);
 	}
 	
@@ -1722,7 +1728,7 @@ ORTE_Initialize(int trans_id, int nargs, char **args)
 	
 	fprintf(stdout, "ORTE_Initialize (%d):\n", trans_id); fflush(stdout);
 	
-	if (proxy_initialized) {
+	if (proxy_state != STATE_INIT) {
 		sendErrorEvent(trans_id, RTEV_ERROR_ORTE_INIT, "already initialized");
 		return 0;
 	}
@@ -1837,6 +1843,9 @@ ORTE_Initialize(int trans_id, int nargs, char **args)
 	ORTE_QUERY(ORTE_JOBID_INVALID);
 	
 	printf("Start daemon returning OK.\n");
+	
+	proxy_state = STATE_RUNNING;
+	
 	sendOKEvent(trans_id);
 	
 	return 0;
@@ -1906,7 +1915,7 @@ ORTE_SubmitJob(int trans_id, int nargs, char **args)
 	orte_jobid_t			debug_jobid = -1;
 	ptp_job *				j;
 
-	if (!proxy_initialized) {
+	if (proxy_state != STATE_RUNNING) {
 		sendErrorEvent(trans_id, RTEV_ERROR_ORTE_INIT, "must call INIT first");
 		return PROXY_RES_OK;
 	}
@@ -2130,7 +2139,7 @@ ORTE_TerminateJob(int trans_id, int nargs, char **args)
 	int			jobid;
 	ptp_job *	j;
 	
-	if (!proxy_initialized) {
+	if (proxy_state != STATE_RUNNING) {
 		sendErrorEvent(trans_id, RTEV_ERROR_TERMINATE_JOB, "must call INIT first");
 		return PROXY_RES_OK;
 	}
@@ -2180,7 +2189,7 @@ ORTE_StartEvents(int trans_id, int nargs, char **args)
 	
 	fprintf(stdout, "  ORTE_StartEvents (%d):\n", trans_id); fflush(stdout);
 
-	if (!proxy_initialized) {
+	if (proxy_state != STATE_RUNNING) {
 		sendErrorEvent(trans_id, RTEV_ERROR_ORTE_INIT, "must call INIT first");
 		return PROXY_RES_OK;
 	}
@@ -2246,15 +2255,13 @@ ORTE_Quit(int trans_id, int nargs, char **args)
 {
 	printf("ORTE_Quit called!\n"); fflush(stdout);
 	
-	if (proxy_initialized) {
+	if (proxy_state == STATE_RUNNING) {
 		do_orte_shutdown();
 	}
 	
-	proxy_shutdown++;
+	proxy_state == STATE_SHUTTING_DOWN;
 	
-	/*
-	 * No longer required to send OK event.
-	 */
+	sendOKEvent(trans_id);
 	
 	return PROXY_RES_OK;
 }
@@ -2278,7 +2285,10 @@ server(char *name, char *host, int port)
 	proxy_svr_connect(orte_proxy, host, port);
 	printf("proxy_svr_connect returned.\n");
 	
-	while (ptp_signal_exit == 0 && !proxy_shutdown) {
+	while (ptp_signal_exit == 0 && proxy_state != STATE_SHUTDOWN) {
+		if (proxy_state == STATE_SHUTTING_DOWN) {
+			proxy_state = STATE_SHUTDOWN;
+		}
 		if  ((do_orte_progress() != PROXY_RES_OK) ||
 			(proxy_svr_progress(orte_proxy) != PROXY_RES_OK))
 			break;

@@ -61,6 +61,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 	private Thread				eventThread;
 	private Thread				acceptThread;
 	private IProxyEventFactory	proxyEventFactory;
+	private int					shutdownID;
 	
 	private List<IProxyEventListener>	listeners = Collections.synchronizedList(new ArrayList<IProxyEventListener>());
 
@@ -68,9 +69,9 @@ public abstract class AbstractProxyClient implements IProxyClient {
 	private CharsetEncoder	encoder = charset.newEncoder();
 	private CharsetDecoder	decoder = charset.newDecoder();
 
-	private enum SessionState {WAITING, CONNECTED, RUNNING, SHUTTING_DOWN, SHUT_DOWN};
+	private enum SessionState {WAITING, CONNECTED, RUNNING, SHUTTING_DOWN, SHUTDOWN};
 	
-	private SessionState sessionState = SessionState.SHUT_DOWN;
+	private volatile SessionState sessionState = SessionState.SHUTDOWN;
 	
 	public AbstractProxyClient(IProxyEventFactory factory) {
 		proxyEventFactory = factory;
@@ -81,7 +82,11 @@ public abstract class AbstractProxyClient implements IProxyClient {
 	}
 	
 	public boolean isReady() {
-		return testSessionState(SessionState.RUNNING);
+		return sessionState == SessionState.RUNNING;
+	}
+	
+	public boolean isShutdown() {
+		return sessionState == SessionState.SHUTDOWN;
 	}
 
 	public CharsetEncoder encoder() {
@@ -132,13 +137,18 @@ public abstract class AbstractProxyClient implements IProxyClient {
 		return lenStr + ":" + set.toString();
 	}
 
+	private void sendCommandBuffer(String buf) throws IOException {
+		/*
+		 * Note: command length includes the first space!
+		 */
+		String sendCmd = encodeIntVal(buf.length() + 1, IProxyCommand.CMD_LENGTH_SIZE) + " " + buf;
+		fullWrite(encoder.encode(CharBuffer.wrap(sendCmd)));
+		
+	}
+	
 	public void sendCommand(String cmd) throws IOException {
 		if (isReady()) {
-			/*
-			 * Note: command length includes the first space!
-			 */
-			String buf = encodeIntVal(cmd.length() + 1, IProxyCommand.CMD_LENGTH_SIZE) + " " + cmd;
-			fullWrite(encoder.encode(CharBuffer.wrap(buf)));
+			sendCommandBuffer(cmd);
 		}
 		else {
 			throw new IOException("proxy not ready to send");
@@ -189,22 +199,22 @@ public abstract class AbstractProxyClient implements IProxyClient {
 			sessSvrSock.socket().setSoTimeout(timeout);
 		sessPort = sessSvrSock.socket().getLocalPort();
 		sessHost = sessSvrSock.socket().getLocalSocketAddress().toString();
-		setSessionState(SessionState.WAITING);
+		sessionState = SessionState.WAITING;
 		System.out.println("port=" + sessPort);
 		acceptThread = new Thread("Proxy Client Accept Thread") {
 			public void run() {
 				try {
 					System.out.println("accept thread starting...");
 					sessSock = sessSvrSock.accept();
-					setSessionState(SessionState.CONNECTED);
+					sessionState = SessionState.CONNECTED;
 					fireProxyConnectedEvent(new ProxyConnectedEvent());
 				} catch (SocketTimeoutException e) {
 					fireProxyTimeoutEvent(new ProxyTimeoutEvent());
 				} catch (ClosedByInterruptException e) {
-					setSessionState(SessionState.SHUT_DOWN);
+					sessionState = SessionState.SHUTDOWN;
 					fireProxyErrorEvent(new ProxyErrorEvent(0, 0, "Accept cancelled by user"));
 				} catch (IOException e) {
-					setSessionState(SessionState.SHUT_DOWN);
+					sessionState = SessionState.SHUTDOWN;
 					fireProxyErrorEvent(new ProxyErrorEvent(0, 0, "IOException in accept"));
 				} finally {		
 					try {
@@ -234,7 +244,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 	 * @throws IOException	if the session is not connected or the event thread fails to start
 	 */
 	public void sessionHandleEvents() throws IOException {
-		if (!testSessionState(SessionState.CONNECTED)) {
+		if (sessionState != SessionState.CONNECTED) {
 			throw new IOException("Not ready to receive events");
 		}
 
@@ -245,7 +255,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 				
 				System.out.println("event thread starting...");
 				try {
-					while (errorCount < MAX_ERRORS && !interrupted() && testSessionState(SessionState.RUNNING)) {
+					while (errorCount < MAX_ERRORS && !interrupted() && sessionState != SessionState.SHUTDOWN) {
 						if (!sessionProgress()) {
 							errorCount++;
 						}
@@ -259,31 +269,22 @@ public abstract class AbstractProxyClient implements IProxyClient {
 				
 				if (errorCount >= MAX_ERRORS) {
 					error = true;
+					sessionState = SessionState.SHUTDOWN;
 				}
-				
-				setSessionState(SessionState.SHUT_DOWN);
 				
 				try {
 					sessSock.close();
 				} catch (IOException e) {
 				} 
-				System.out.println("event thread exiting...");
 				fireProxyDisconnectedEvent(new ProxyDisconnectedEvent(error));
+				System.out.println("event thread exited");
 			}
 		};
 
-		setSessionState(SessionState.RUNNING);
+		sessionState = SessionState.RUNNING;
 		eventThread.start();
 	}
 	
-	private synchronized boolean testSessionState(SessionState state) {
-		return sessionState == state;
-	}
-	
-	private synchronized void setSessionState(SessionState state) {
-		sessionState = state;
-	}
-
 	protected void fireProxyConnectedEvent(IProxyConnectedEvent event) {
 		IProxyEventListener[] la = listeners.toArray(new IProxyEventListener[0]);
 		for (IProxyEventListener listener : la) {
@@ -476,7 +477,12 @@ public abstract class AbstractProxyClient implements IProxyClient {
 			if (e instanceof IProxyErrorEvent) {
 				fireProxyErrorEvent((IProxyErrorEvent) e);
 			} else if (e instanceof IProxyOKEvent) {
-				fireProxyOKEvent((IProxyOKEvent) e);
+				if (sessionState == SessionState.SHUTTING_DOWN && 
+						shutdownID == e.getTransactionID()) {
+					sessionState = SessionState.SHUTDOWN;
+				} else {
+					fireProxyOKEvent((IProxyOKEvent) e);
+				}
 			} else if (e instanceof IProxyExtendedEvent) {
 				fireProxyExtendedEvent((IProxyExtendedEvent) e);
 			}
@@ -507,18 +513,16 @@ public abstract class AbstractProxyClient implements IProxyClient {
 		}
 		
 		if (isReady()) {
-			/*
-			 * Send quit command
-			 */
-			IProxyCommand cmd = new ProxyQuitCommand(this);
-			cmd.send();
+			sessionState = SessionState.SHUTTING_DOWN;
 			
 			/*
-			 * Tell event thread to fininsh. We don't need to wait
-			 * for any response from the server. just assume it has
-			 * shut down.
+			 * Send quit command. Proxy will shut down when OK is
+			 * received or after shutdownTimeout.
 			 */
-			eventThread.interrupt();
+			IProxyCommand cmd = new ProxyQuitCommand(this);
+			shutdownID = cmd.getTransactionID();
+			String cmdBuf = cmd.getEncodedMessage();
+			sendCommandBuffer(cmdBuf);
 		}
 	}
 }
