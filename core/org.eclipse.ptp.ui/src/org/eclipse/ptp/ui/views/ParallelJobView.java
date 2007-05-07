@@ -339,7 +339,7 @@ public class ParallelJobView extends AbstractParallelSetView implements IQueueJo
 	protected void selectJob(IPJob job) {
 		IPJob old = getJobManager().getJob();
 		if (old != null) {
-			job.removeChildListener(this);
+			old.removeChildListener(this);
 		}
 		getJobManager().setJob(job);
 		if (job != null) {
@@ -482,6 +482,7 @@ public class ParallelJobView extends AbstractParallelSetView implements IQueueJo
 	 */
 	public void handleEvent(final IQueueRemoveJobEvent e) {
 		changeJobRefresh(null);
+		getJobManager().removeJob(e.getJob());
 	}
 	
 	/* (non-Javadoc)
@@ -511,6 +512,6 @@ public class ParallelJobView extends AbstractParallelSetView implements IQueueJo
 	 * @see org.eclipse.ptp.core.elements.listeners.IJobProcessListener#handleEvent(org.eclipse.ptp.core.elements.events.IJobRemoveProcessEvent)
 	 */
 	public void handleEvent(final IJobRemoveProcessEvent e) {
-		// TODO: Implement remove process
+		// Nothing to do
 	}
 }

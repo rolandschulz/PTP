@@ -138,6 +138,7 @@ public class JobManager extends AbstractUIManager {
 	public IPJob[] getJobs() {
 		IPQueue queue = getQueue();
 		if (queue != null) {
+			System.out.println("getJobs() returns " + queue.getSortedJobs().length + " jobs");
 			return queue.getSortedJobs();
 		}
 		return new IPJob[0];
@@ -157,16 +158,17 @@ public class JobManager extends AbstractUIManager {
 	 * @see org.eclipse.ptp.ui.IManager#getFullyQualifiedName(java.lang.String)
 	 */
 	public String getFullyQualifiedName(String id) {
-		if (id.equals(EMPTY_ID)) {
-			return DEFAULT_TITLE;
-		}
-		String name = "";
 		final IPQueue queue = getQueue();
-		if (queue != null) {
+		String name;
+		if (queue == null) {
+			name = DEFAULT_TITLE;
+		} else {
 			name = queue.getResourceManager().getName() + ":" + queue.getName();
-			IPJob job = queue.getJobById(id);
-			if (job != null) {
-				name +=  ":" + job.getName();
+			if (!id.equals(EMPTY_ID)) {
+				IPJob job = queue.getJobById(id);
+				if (job != null) {
+					name +=  ":" + job.getName();
+				}
 			}
 		}
 		return name;
@@ -431,13 +433,8 @@ public class JobManager extends AbstractUIManager {
 	public void removeAllStoppedJobs() {
 		IPQueue queue = getQueue();
 		if (queue != null) {
-			for (IPJob job : queue.getJobs()) {
-				if (job.isTerminated()) {
-					removeJob(job);
-				}
-			}
+			queue.getResourceManager().removeTerminatedJobs(queue);
 		}
-		queue.getResourceManager().removeTerminatedJobs(queue);
 	}
 
 }
