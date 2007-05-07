@@ -12,7 +12,7 @@
 import java.util.Arrays;
 import java.util.List;
 
-public final class ArrayAttribute extends AbstractAttribute implements IAttribute {
+public final class ArrayAttribute extends AbstractAttribute<ArrayAttribute> {
 
 	private List<Object> value;
 
@@ -50,4 +50,20 @@ public final class ArrayAttribute extends AbstractAttribute implements IAttribut
 		String[] values = string.split("");
 		setValue(values);
 	}
+	
+    @Override
+    protected int doCompareTo(ArrayAttribute other) {
+        int results = value.size() - value.size();
+        return results;
+    }
+
+    @Override
+    protected boolean doEquals(ArrayAttribute other) {
+        return value.equals(other.value);
+    }
+
+    @Override
+    protected int doHashCode() {
+        return value.hashCode();
+    }
 }

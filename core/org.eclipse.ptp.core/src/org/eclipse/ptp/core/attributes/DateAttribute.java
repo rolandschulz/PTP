@@ -25,7 +25,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-public class DateAttribute extends AbstractAttribute implements IAttribute {
+public class DateAttribute extends AbstractAttribute<DateAttribute> {
 
 	private static DateFormat[] dateFormats = null;
 
@@ -78,8 +78,8 @@ public class DateAttribute extends AbstractAttribute implements IAttribute {
 		setValue(initialValue);
 	}
 
-	public Calendar getValue() {
-		return (Calendar) value.clone();
+	public DateFormat getDateFormat() {
+		return ((DateAttributeDefinition)getDefinition()).getDateFormat();
 	}
 	
 	public Date getDateValue() {
@@ -87,6 +87,10 @@ public class DateAttribute extends AbstractAttribute implements IAttribute {
 	}
 
 
+	public Calendar getValue() {
+		return (Calendar) value.clone();
+	}
+	
 	public String getValueAsString() {
 		return getDateFormat().format(value);
 	}
@@ -104,7 +108,7 @@ public class DateAttribute extends AbstractAttribute implements IAttribute {
 		}
 		return true;
 	}
-	
+
 	public void setValue(Calendar calendar) throws IllegalValueException {
 		setValue(calendar.getTime());
 	}
@@ -133,6 +137,19 @@ public class DateAttribute extends AbstractAttribute implements IAttribute {
 		}
 		value.setTime(date);
 	}
+	
+	public String toString() {
+		return getValueAsString();
+		
+	}
+
+	private Date getMaxDate() {
+		return ((DateAttributeDefinition)getDefinition()).getMaxDate();
+	}
+
+	private Date getMinDate() {
+		return ((DateAttributeDefinition)getDefinition()).getMinDate();
+	}
 
 	private Date parseString(String string) {
 		Date date = null;
@@ -151,25 +168,23 @@ public class DateAttribute extends AbstractAttribute implements IAttribute {
 		return date;
 	}
 	
-	public String toString() {
-		return getValueAsString();
-		
-	}
-
 	private String toString(Date date) {
 		return getDateFormat().format(date);
 	}
 
-	private Date getMaxDate() {
-		return ((DateAttributeDefinition)getDefinition()).getMaxDate();
-	}
+    @Override
+    protected int doCompareTo(DateAttribute other) {
+        return value.compareTo(other.value);
+    }
 
-	private Date getMinDate() {
-		return ((DateAttributeDefinition)getDefinition()).getMinDate();
-	}
-	
-	public DateFormat getDateFormat() {
-		return ((DateAttributeDefinition)getDefinition()).getDateFormat();
-	}
+    @Override
+    protected boolean doEquals(DateAttribute other) {
+        return value.equals(other.value);
+    }
+
+    @Override
+    protected int doHashCode() {
+        return value.hashCode();
+    }
 
 }

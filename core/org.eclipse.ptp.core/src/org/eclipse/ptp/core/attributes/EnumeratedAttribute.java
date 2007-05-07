@@ -27,7 +27,7 @@ import java.util.List;
  * @author rsqrd
  *
  */
-public final class EnumeratedAttribute<E extends Enum<E>> extends AbstractAttribute {
+public final class EnumeratedAttribute<E extends Enum<E>> extends AbstractAttribute<EnumeratedAttribute<E>> {
 
 	private E value;
 
@@ -67,13 +67,15 @@ public final class EnumeratedAttribute<E extends Enum<E>> extends AbstractAttrib
      * @return
      */
     public EnumeratedAttributeDefinition<E> getEnumAttrDefinition() {
-        return (EnumeratedAttributeDefinition<E>) getDefinition();
+        @SuppressWarnings("unchecked")
+        EnumeratedAttributeDefinition<E> attributeDefinition = (EnumeratedAttributeDefinition<E>) getDefinition();
+        return attributeDefinition;
     }
 
     /**
      * @return
      */
-    public List<E> getEnumerations() {
+    public List<? extends E> getEnumerations() {
 		return getEnumAttrDefinition().getEnumerations();
 	}
 
@@ -128,7 +130,7 @@ public final class EnumeratedAttribute<E extends Enum<E>> extends AbstractAttrib
 	 * @throws IllegalValueException
 	 */
 	public void setValue(int valueIndex) throws IllegalValueException {
-		final List<E> enumerations = getEnumerations();
+		final List<? extends E> enumerations = getEnumerations();
 		if (valueIndex < 0 || valueIndex >= enumerations.size()) {
 			throw new IllegalValueException("valueIndex is out of range");
 		}
@@ -138,12 +140,29 @@ public final class EnumeratedAttribute<E extends Enum<E>> extends AbstractAttrib
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.attributes.IAttribute#setValue(java.lang.String)
 	 */
-	public void setValue(String value) throws IllegalValueException {
+	public void setValue(String string) throws IllegalValueException {
 		Class<E> enumClass = getEnumAttrDefinition().getEnumClass();
-		try {
-			this.value = E.valueOf(enumClass, value);
-		} catch (IllegalArgumentException e) {
-			throw new IllegalValueException(e);
-		}
+        E eval;
+        try {
+        	eval = E.valueOf(enumClass, string);
+        } catch (IllegalArgumentException e) {
+        	throw new IllegalValueException(e);
+        }
+		this.value = eval;
 	}
+
+    @Override
+    protected int doCompareTo(EnumeratedAttribute<E> other) {
+        return value.compareTo(other.value);
+    }
+
+    @Override
+    protected boolean doEquals(EnumeratedAttribute<E> other) {
+        return value == other.value;
+    }
+
+    @Override
+    protected int doHashCode() {
+        return value.hashCode();
+    }
 }

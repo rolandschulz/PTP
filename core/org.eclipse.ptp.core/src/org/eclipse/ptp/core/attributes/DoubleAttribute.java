@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.attributes;
 
-public final class DoubleAttribute extends AbstractAttribute implements IAttribute {
+public final class DoubleAttribute extends AbstractAttribute<DoubleAttribute> {
 
 	private Double value;
 
@@ -77,5 +77,20 @@ public final class DoubleAttribute extends AbstractAttribute implements IAttribu
 	private double getMaxValue() {
 		return ((DoubleAttributeDefinition)getDefinition()).getMaxValue();
 	}
+
+    @Override
+    protected int doCompareTo(DoubleAttribute other) {
+        return value.compareTo(other.value);
+    }
+
+    @Override
+    protected boolean doEquals(DoubleAttribute other) {
+        return value.equals(other.value);
+    }
+
+    @Override
+    protected int doHashCode() {
+        return value.hashCode();
+    }
 
 }

@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.attributes;
 
-public final class IntegerAttribute extends AbstractAttribute implements IAttribute {
+public final class IntegerAttribute extends AbstractAttribute<IntegerAttribute> {
 
 	private Integer value;
 
@@ -80,4 +80,19 @@ public final class IntegerAttribute extends AbstractAttribute implements IAttrib
 	private int getMaxValue() {
 		return ((IntegerAttributeDefinition)getDefinition()).getMaxValue();
 	}
+
+    @Override
+    protected int doCompareTo(IntegerAttribute other) {
+        return value.compareTo(other.value);
+    }
+
+    @Override
+    protected boolean doEquals(IntegerAttribute other) {
+        return value.equals(other.value);
+    }
+
+    @Override
+    protected int doHashCode() {
+        return value.hashCode();
+    }
 }
