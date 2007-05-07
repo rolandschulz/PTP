@@ -9,32 +9,45 @@
  * IBM Corporation - Initial API and implementation
  *******************************************************************************/package org.eclipse.ptp.core.attributes;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public final class ArrayAttribute extends AbstractAttribute<ArrayAttribute> {
+public final class ArrayAttribute<T extends Comparable<T>> 
+extends AbstractAttribute<ArrayAttribute<T>> {
 
-	private List<Object> value;
+	private List<T> value;
 
-	public ArrayAttribute(ArrayAttributeDefinition definition, String initialValue) throws IllegalValueException {
+	public ArrayAttribute(ArrayAttributeDefinition<T> definition, String initialValue)
+	throws IllegalValueException {
 		super(definition);
 		setValue(initialValue);
 	}
 
-	public ArrayAttribute(ArrayAttributeDefinition definition, Object[] initialValue) throws IllegalValueException {
+	public <U extends T> ArrayAttribute(ArrayAttributeDefinition<T> definition, U[] initialValue) {
 		super(definition);
 		setValue(initialValue);
 	}
 
-	public Object[] getValue() {
-		return this.value.toArray();
+	public <U extends T> ArrayAttribute(ArrayAttributeDefinition<T> definition,
+			List<U> initialValue) {
+		super(definition);
+		setValue(initialValue);
+	}
+
+	public T[] getValue() {
+		return (T[])this.value.toArray();
 	}
 	
-	public void setValue(Object[] value) {
-		this.value = Arrays.asList(value);
+	public <U extends T> void setValue(U[] value) {
+		this.value = Arrays.asList((T[])value.clone());
 	}
 
-	public void addAll(Object[] value) {
+	public <U extends T> void setValue(List<U> value) {
+		this.value = new ArrayList<T>(value);
+	}
+
+	public <U extends T> void addAll(U[] value) {
 		this.value.addAll(Arrays.asList(value));
 	}
 
@@ -48,17 +61,21 @@ public final class ArrayAttribute extends AbstractAttribute<ArrayAttribute> {
 
 	public void setValue(String string) throws IllegalValueException {
 		String[] values = string.split("");
-		setValue(values);
+		try {
+			setValue((T[])values);
+		} catch (ClassCastException e) {
+			throw new IllegalValueException(e);
+		}
 	}
 	
     @Override
-    protected int doCompareTo(ArrayAttribute other) {
+    protected int doCompareTo(ArrayAttribute<T> other) {
         int results = value.size() - value.size();
         return results;
     }
 
     @Override
-    protected boolean doEquals(ArrayAttribute other) {
+    protected boolean doEquals(ArrayAttribute<T> other) {
         return value.equals(other.value);
     }
 
