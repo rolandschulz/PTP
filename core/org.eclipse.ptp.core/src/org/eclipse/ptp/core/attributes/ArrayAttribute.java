@@ -14,7 +14,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-public final class ArrayAttribute<T extends Comparable<T>> 
+public final class ArrayAttribute<T extends Comparable<? super T>> 
 extends AbstractAttribute<ArrayAttribute<T>> {
 
 	private List<T> value;

@@ -16,7 +16,7 @@ import java.util.Arrays;
 import java.util.List;
 
 
-public final class ArrayAttributeDefinition<T extends Comparable<T>>
+public final class ArrayAttributeDefinition<T extends Comparable<? super T>>
 extends AbstractAttributeDefinition {
 
 	private List<T> defaultValue;
