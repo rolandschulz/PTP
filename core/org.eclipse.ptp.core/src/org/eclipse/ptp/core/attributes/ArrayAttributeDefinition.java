@@ -11,6 +11,7 @@
 
 package org.eclipse.ptp.core.attributes;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -23,7 +24,12 @@ extends AbstractAttributeDefinition {
 	public <U extends T> ArrayAttributeDefinition(final String uniqueId, final String name,
 			final String description, final U[] defaultValue) {
 		super(uniqueId, name, description);
-		this.defaultValue = Arrays.asList((T[])defaultValue.clone());
+		if (defaultValue != null) {
+			this.defaultValue = Arrays.asList((T[])defaultValue.clone());
+		}
+		else {
+			this.defaultValue = new ArrayList<T>();
+		}
 	}
 
 	public ArrayAttribute<T> create() {
