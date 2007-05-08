@@ -301,6 +301,13 @@ IResourceManagerControl {
 		return state.getValue();
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IResourceManager#getUniqueName()
+	 */
+	public String getUniqueName() {
+		return getConfiguration().getUniqueName();
+	}
+
 	public boolean hasChildren() {
 		return getMachines().length > 0 || getQueues().length > 0;
 	}

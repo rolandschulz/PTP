@@ -46,7 +46,6 @@ import org.eclipse.debug.core.model.IPersistableSourceLocator;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
@@ -64,7 +63,6 @@ import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.internal.ui.LaunchMessages;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory;
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab;
-import org.eclipse.ptp.rtsystem.JobRunConfiguration;
 
 /**
  *
@@ -229,8 +227,8 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	protected static String getQueueName(ILaunchConfiguration configuration) throws CoreException {
 		return configuration.getAttribute(IPTPLaunchConfigurationConstants.QUEUE_NAME, (String)null);
 	}
-	protected static String getResourceManagerName(ILaunchConfiguration configuration) throws CoreException {
-		return configuration.getAttribute(IPTPLaunchConfigurationConstants.RESOURCE_MANAGER_NAME, (String)null);
+	protected static String getResourceManagerUniqueName(ILaunchConfiguration configuration) throws CoreException {
+		return configuration.getAttribute(IPTPLaunchConfigurationConstants.RESOURCE_MANAGER_UNIQUENAME, (String)null);
 	}
 	/*
 	protected static String getCommunication(ILaunchConfiguration configuration) throws CoreException {
@@ -341,13 +339,14 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 			launch.setSourceLocator(sourceLocator);
 		}
 	}
+	
 	protected IResourceManager getResourceManager(ILaunchConfiguration configuration) throws CoreException {
 		IPUniverse universe = PTPCorePlugin.getDefault().getUniverse();
 		IResourceManager[] rms = universe.getResourceManagers();
-		String rmName = getResourceManagerName(configuration);
+		String rmUniqueName = getResourceManagerUniqueName(configuration);
 		for (int i = 0; i < rms.length; ++i) {
 			if (rms[i].getState() == ResourceManagerAttributes.State.STARTED &&
-					rms[i].getName().equals(rmName)) {
+					rms[i].getUniqueName().equals(rmUniqueName)) {
 				return rms[i];
 			}
 		}

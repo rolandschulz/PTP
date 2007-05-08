@@ -221,8 +221,7 @@ public class ParallelTab extends PLaunchConfigurationTab {
 		setLaunchConfiguration(configuration);
 		
 		try {
-			IResourceManager rm = getResourceManagerFromName(configuration.getAttribute(
-					IPTPLaunchConfigurationConstants.RESOURCE_MANAGER_NAME, EMPTY_STRING));
+			IResourceManager rm = getResourceManagerFromConfiguration(configuration);
 			if (rm == null) {
 				setErrorMessage(LaunchMessages.getResourceString(
 						"ParallelTab.Invalid_Resource_Manager"));
@@ -273,8 +272,7 @@ public class ParallelTab extends PLaunchConfigurationTab {
 		setErrorMessage(null);
 		setMessage(null);
 		try {
-			IResourceManager rm = getResourceManagerFromName(configuration.getAttribute(
-					IPTPLaunchConfigurationConstants.RESOURCE_MANAGER_NAME, EMPTY_STRING));
+			IResourceManager rm = getResourceManagerFromConfiguration(configuration);
 			if (rm == null) {
 				setErrorMessage(LaunchMessages.getResourceString(
 						"ParallelTab.Invalid_Resource_Manager"));
@@ -324,11 +322,10 @@ public class ParallelTab extends PLaunchConfigurationTab {
 	 * @see ILaunchConfigurationTab#performApply(ILaunchConfigurationWorkingCopy)
 	 */
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
-		configuration.setAttribute(IPTPLaunchConfigurationConstants.RESOURCE_MANAGER_NAME,
-				getResourceManagerNameFromCombo());
+		final IResourceManager rm = getResourceManagerFromCombo();
+		setResourceManagerInConfiguration(configuration, rm);
 		configuration.setAttribute(IPTPLaunchConfigurationConstants.QUEUE_NAME,
 				getQueueNameFromCombo());
-		final IResourceManager rm = getResourceManagerFromCombo();
 		if (rm != null) {
 			IRMLaunchConfigurationDynamicTab rmDynamicTab = getRMLaunchConfigurationDynamicTab(rm);
 			if (rmDynamicTab == null) {
@@ -357,8 +354,7 @@ public class ParallelTab extends PLaunchConfigurationTab {
 			setErrorMessage("Cannot find a resource manager.");
 			return;
 		}
-		configuration.setAttribute(IPTPLaunchConfigurationConstants.RESOURCE_MANAGER_NAME,
-				rm.getName());
+		setResourceManagerInConfiguration(configuration, rm);
 		final IPQueue queue = getQueueDefault(rm);
 		final String queueName = (queue != null ? queue.getName() : "");
 		configuration.setAttribute(IPTPLaunchConfigurationConstants.QUEUE_NAME,
@@ -486,7 +482,19 @@ public class ParallelTab extends PLaunchConfigurationTab {
 		return null;
 	}
 
-	private IResourceManager getResourceManagerFromName(String rmName) {
+	/**
+	 * @param configuration
+	 * @return
+	 * @throws CoreException
+	 */
+	private IResourceManager getResourceManagerFromConfiguration(
+			ILaunchConfiguration configuration) throws CoreException {
+		final String rmUniqueName = configuration.getAttribute(
+						IPTPLaunchConfigurationConstants.RESOURCE_MANAGER_UNIQUENAME, EMPTY_STRING);
+		return getResourceManagerFromUniqueName(rmUniqueName);
+	}
+
+	private IResourceManager getResourceManagerFromUniqueName(String rmUniqueName) {
 		IPUniverse universe = PTPCorePlugin.getDefault().getModelManager().getUniverse();
 		if (universe == null) {
 			return null;
@@ -495,20 +503,21 @@ public class ParallelTab extends PLaunchConfigurationTab {
 		IResourceManager[] rms = getStartedResourceManagers(universe);
 		
 		for (IResourceManager rm : rms) {
-			if (rm.getName().equals(rmName)) {
+			if (rm.getUniqueName().equals(rmUniqueName)) {
 				return rm;
 			}
 		}
 		return null;
 	}
-	private String getResourceManagerNameFromCombo() {
+
+	private String getResourceManagerUniqueNameFromCombo() {
 		IResourceManager rm = getResourceManagerFromCombo();
 		if (rm == null) {
 			return "";
 		}
-		return rm.getName();
+		return rm.getUniqueName();
 	}
-
+	
 	/**
 	 * Returns a cached launch configuration dynamic tab.  If it isn't in the cache
 	 * then it creates a new one, and puts it in the cache.
@@ -633,13 +642,23 @@ public class ParallelTab extends PLaunchConfigurationTab {
 		queueSelectionChanged();
 	}
 
-    private void setResourceManagerComboSelection(IResourceManager rm) {
+	private void setResourceManagerComboSelection(IResourceManager rm) {
 		final Integer results = resourceManagerIndices.get(rm);
 		int i = 0;
 		if (results != null)
 			i = results.intValue();
 		resourceManagerCombo.select(i);
 		rmSelectionChanged();
+	}
+
+    /**
+	 * @param configuration
+	 * @param rm
+	 */
+	private void setResourceManagerInConfiguration(ILaunchConfigurationWorkingCopy configuration,
+			final IResourceManager rm) {
+		configuration.setAttribute(IPTPLaunchConfigurationConstants.RESOURCE_MANAGER_UNIQUENAME,
+				rm.getUniqueName());
 	}
 
     /**

@@ -40,7 +40,7 @@ public interface IPTPLaunchConfigurationConstants {
 
 	public static final String ATTR_APPLICATION_NAME = PTP_LAUNCH_ID + ".APPLICATION_NAME";
 	
-	public static final String RESOURCE_MANAGER_NAME = PTP_LAUNCH_ID + ".RESOURCE_MANAGER_NAME";
+	public static final String RESOURCE_MANAGER_UNIQUENAME = PTP_LAUNCH_ID + ".RESOURCE_MANAGER_NAME";
 
 	public static final String QUEUE_NAME = PTP_LAUNCH_ID + ".QUEUE_NAME";
 	
