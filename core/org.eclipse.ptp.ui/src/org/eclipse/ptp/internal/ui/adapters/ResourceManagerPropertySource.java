@@ -42,6 +42,7 @@ public class ResourceManagerPropertySource implements IPropertySource {
 		List<PropertyDescriptor> descriptors = new ArrayList<PropertyDescriptor>();
 		descriptors.add(new PropertyDescriptor("name", "name"));
 		descriptors.add(new PropertyDescriptor("description", "description"));
+		descriptors.add(new PropertyDescriptor("uniqueId", "unique id"));
 		descriptors.add(new PropertyDescriptor("type", "type"));
 		descriptors.add(new PropertyDescriptor("status", "status"));
 		descriptors.add(new PropertyDescriptor("machines", "machines"));
@@ -82,6 +83,9 @@ public class ResourceManagerPropertySource implements IPropertySource {
 		if ("queues".equals(id)) {
 			final IPQueue[] queues = resourceManager.getQueues();
 			return Integer.toString(queues.length);
+		}
+		if ("uniqueId".equals(id)) {
+			return resourceManager.getUniqueName();
 		}
 		
 		// TODO get the property value from the rm's configuration attributes

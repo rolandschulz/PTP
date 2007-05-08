@@ -64,4 +64,9 @@ public interface IResourceManagerConfiguration {
 	 * 
 	 */
 	public void setDefaultNameAndDesc();
+
+	/**
+	 * @return
+	 */
+	public String getUniqueName();
 }

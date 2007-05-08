@@ -21,67 +21,44 @@
  */
 package org.eclipse.ptp.mpich2.core.rmsystem;
 
+import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ui.IMemento;
 
-final public class MPICH2ResourceManagerConfiguration implements IResourceManagerConfiguration {
+final public class MPICH2ResourceManagerConfiguration extends AbstractResourceManagerConfiguration {
 	
-	private static final String TAG_DESCRIPTION = "description"; //$NON-NLS-1$
-	private static final String TAG_NAME = "name"; //$NON-NLS-1$
-	private static final String TAG_FACTORY_ID = "factoryId"; //$NON-NLS-1$
 	private static final String TAG_PROXY_PATH = "proxyPath"; //$NON-NLS-1$
 	private static final String TAG_LAUNCH_MANUALLY = "launchManually"; //$NON-NLS-1$
 
 	public static IResourceManagerConfiguration load(MPICH2ResourceManagerFactory factory,
 			IMemento memento) {
-		String factoryId = memento.getString(TAG_FACTORY_ID);
-		if (!factoryId.equals(factory.getId())) {
-			throw new IllegalStateException("Incompatable factory with factoryId"
-					+ " stored id" + factoryId 
-					+ ", factory id:" + factory.getId());
-		}
-		String name = memento.getString(TAG_NAME);
-		String desc = memento.getString(TAG_DESCRIPTION);
+		
+		CommonConfig commonConfig = loadCommon(factory, memento);
+		
 		String serverFile = memento.getString(TAG_PROXY_PATH);
 		boolean launchManually = Boolean.parseBoolean(memento.getString(TAG_LAUNCH_MANUALLY));
 		
 		MPICH2ResourceManagerConfiguration config = new MPICH2ResourceManagerConfiguration(factory,
-				name, desc, serverFile, launchManually);
+				commonConfig, serverFile, launchManually);
 		
 		return config;
 	}
-	private String description;
-	private String name;
-	private final String factoryId;
 	private String serverFile;
 
 	private boolean launchManually;
 	
 	public MPICH2ResourceManagerConfiguration(MPICH2ResourceManagerFactory factory,
+			CommonConfig commonConfig,
 			String serverFile, boolean launchManually) {
-		this(factory, "", "", serverFile, launchManually);
-		setDefaultNameAndDesc();
-	}
-	
-	public MPICH2ResourceManagerConfiguration(MPICH2ResourceManagerFactory factory, String name, String desc,
-			String serverFile, boolean launchManually) {
-		this.factoryId = factory.getId();
-		this.name = name;
-		this.description = desc;
+		super(commonConfig, factory);
 		this.serverFile = serverFile;
 		this.launchManually = launchManually;
 	}
-
-	public String getDescription() {
-		return this.description;
-	}
-
-	public String getName() {
-		return this.name;
-	}
 	
-	public String getResourceManagerId() {
-		return this.factoryId;
+	public MPICH2ResourceManagerConfiguration(MPICH2ResourceManagerFactory factory,
+			String serverFile, boolean launchManually) {
+		this(factory, new CommonConfig(), serverFile, launchManually);
+		setDefaultNameAndDesc();
 	}
 
 	public String getServerFile() {
@@ -92,32 +69,21 @@ final public class MPICH2ResourceManagerConfiguration implements IResourceManage
 		return launchManually;
 	}
 
-	public void save(IMemento memento) {
-		memento.putString(TAG_FACTORY_ID, getResourceManagerId());
-		memento.putString(TAG_NAME, name);
-		memento.putString(TAG_DESCRIPTION, description);
-		memento.putString(TAG_PROXY_PATH, serverFile);
-		memento.putString(TAG_LAUNCH_MANUALLY, Boolean.toString(launchManually));
-	}
-
 	public void setDefaultNameAndDesc() {
-		this.name = "MPICH2";
-		this.description = "MPICH2 Resource Manager";
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
+		setName("MPICH2");
+		setDescription("MPICH2 Resource Manager");
 	}
 
 	public void setManualLaunch(boolean launchManually) {
 		this.launchManually = launchManually;
 	}
 
-	public void setName(String name) {
-		this.name = name;
-	}
-
 	public void setServerFile(String serverFile) {
 		this.serverFile = serverFile;
+	}
+
+	protected void doSave(IMemento memento) {
+		memento.putString(TAG_PROXY_PATH, serverFile);
+		memento.putString(TAG_LAUNCH_MANUALLY, Boolean.toString(launchManually));
 	}
 }

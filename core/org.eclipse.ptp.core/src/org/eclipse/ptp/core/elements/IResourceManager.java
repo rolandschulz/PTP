@@ -148,4 +148,10 @@ IAdaptable, IResourceManagerMenuContribution {
 	 * @param job
 	 */
 	public void terminateJob(IPJob job) throws CoreException;
+
+	/**
+	 * @return a unique name that can be used to identify this resource
+	 * manager persistently between PTP invocations.
+	 */
+	public String getUniqueName();
 }
