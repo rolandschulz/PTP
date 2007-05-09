@@ -206,7 +206,6 @@ public abstract class AbstractRuntimeResourceManager extends
 	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleRuntimeNewMachineEvent(org.eclipse.ptp.rtsystem.events.IRuntimeNewMachineEvent)
 	 */
 	public void handleRuntimeNewMachineEvent(IRuntimeNewMachineEvent e) {
-		System.out.println(this + ": handleRuntimeNewMachineEvent");
 		ElementAttributeManager mgr = e.getElementAttributeManager();
 
 		for (Map.Entry<RangeSet, AttributeManager> entry : mgr.getEntrySet()) {
@@ -278,8 +277,6 @@ public abstract class AbstractRuntimeResourceManager extends
 	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleRuntimeNewQueueEvent(org.eclipse.ptp.rtsystem.events.IRuntimeNewQueueEvent)
 	 */
 	public void handleRuntimeNewQueueEvent(IRuntimeNewQueueEvent e) {
-		System.out.println(this + ": handleRuntimeNewQueueEvent");
-
 		ElementAttributeManager mgr = e.getElementAttributeManager();
 		
 		for (Map.Entry<RangeSet, AttributeManager> entry : mgr.getEntrySet()) {
