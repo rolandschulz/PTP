@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.ptp.core.attributes.BooleanAttribute;
 import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.elementcontrols.IPElementControl;
@@ -54,19 +55,24 @@ public class PJob extends Parent implements IPJobControl, IProcessListener {
 	private final ListenerList childListeners = new ListenerList();
 	private HashMap<String, IPProcessControl> numberMap = 
 		new HashMap<String, IPProcessControl>();
-	private boolean isDebugJob = false;
 
 	@SuppressWarnings("unchecked")
 	public PJob(String id, IPQueueControl queue, IAttribute[] attrs) {
 		super(id, queue, P_JOB, attrs);
 		/*
-		 * Make sure we always have a state.
+		 * Create required attributes.
 		 */
 		EnumeratedAttribute<State> jobState = (EnumeratedAttribute<State>) getAttribute(
 				JobAttributes.getStateAttributeDefinition());
 		if (jobState == null) {
 			jobState = JobAttributes.getStateAttributeDefinition().create();
 			addAttribute(jobState);
+		}
+		BooleanAttribute debug = (BooleanAttribute) getAttribute(
+				JobAttributes.getDebugFlagAttributeDefinition());
+		if (debug == null) {
+			debug = JobAttributes.getDebugFlagAttributeDefinition().create();
+			addAttribute(debug);
 		}
 	}
 
@@ -152,7 +158,8 @@ public class PJob extends Parent implements IPJobControl, IProcessListener {
 	}
 
 	public boolean isDebug() {
-		return isDebugJob;
+		BooleanAttribute debug = (BooleanAttribute) getAttribute(JobAttributes.getDebugFlagAttributeDefinition());
+		return debug.getValue();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -202,7 +209,8 @@ public class PJob extends Parent implements IPJobControl, IProcessListener {
 	}
 
 	public void setDebug() {
-		isDebugJob = true;
+		BooleanAttribute debug = (BooleanAttribute) getAttribute(JobAttributes.getDebugFlagAttributeDefinition());
+		debug.setValue(true);
 	}
 
 	private void fireChangedJob(Collection<IAttribute> attrs) {
