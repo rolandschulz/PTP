@@ -312,27 +312,39 @@ public class PASTOMPFactory
     protected boolean isSymbolRelevant(Symbol symbol)
     {   
         IASTNode node = null;
+        IASTNode parent,gp=null;
 		try {
 			// node=symbol.getScope().getPhysicalNode(); // no longer in CDT 4.0
 			node = symbol.getPhysicalNode();//cdt40
+			parent=node.getParent();
+			gp=parent.getParent();
+			int stopHere=0;
+			node=gp;//simpleDeclaration like 3.1.2 result HACK HACK HACK
+			
+			
 
 		} catch (Exception e) {
 			return false;
 		}
         
         Utility.Location l = Utility.getLocation(node);
-        int nodeOffset = (l!=null ? l.getLow()  : 0);
-        int nodeEndset = (l!=null ? l.getHigh() : 0);
+        int nodeOffset = (l!=null ? l.getLow()  : 0);     //728
+        int nodeEndset = (l!=null ? l.getHigh() : 0);       //745
+        System.out.println("node: "+node.getRawSignature()+" nodeOffset: "+nodeOffset+" nodeEndset= "+nodeEndset);
         
-        int pOffset = pragma_.getLocalOffset();
-        int pEndset = pOffset+pragma_.getLength()-1;
+        int pOffset = pragma_.getLocalOffset();            //822
+        int pEndset = pOffset+pragma_.getLength()-1;       //864
+        System.out.println(("pragma pOffset= "+pOffset+" pEndset= "+pEndset));
         
-        boolean tf = ((nodeEndset<pOffset || pEndset<nodeOffset) ? false : true);
+        boolean tf = ((nodeEndset<pOffset || pEndset<nodeOffset) ? false : true);  //false
         if (!tf)  return tf;
+        int stopppp=0;
         
         // See if the declaration succeeds the pragma
         Utility.Location dl = Utility.getLocation(symbol.getDeclarator());
         if (dl==null)  return false;
+        System.out.println("dl.getLow()="+dl.getLow()+" pOffset="+pOffset+
+        		" > is: "+(dl.getLow()>pOffset));
         
         return (dl.getLow()>pOffset ? false : true);
     }

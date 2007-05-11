@@ -42,4 +42,8 @@ public class PASTElif extends PASTNode  implements IASTPreprocessorElifStatement
 		return elif_.taken();
 	}
 
+	public char[] getCondition() {
+		return elif_.getCondition();
+	}
+
 }

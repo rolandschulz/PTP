@@ -37,5 +37,9 @@ public class PASTError extends PASTNode implements IASTPreprocessorErrorStatemen
         return "#error";
     }
 
+	public char[] getMessage() {
+		return error_.getMessage();
+	}
+
 
 }

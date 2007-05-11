@@ -41,4 +41,9 @@ public class PASTIf extends PASTNode implements IASTPreprocessorIfStatement
 		return if_.taken();
 	}
 
+	//cdt40
+	public char[] getCondition() {
+		return if_.getCondition();
+	}
+
 }
