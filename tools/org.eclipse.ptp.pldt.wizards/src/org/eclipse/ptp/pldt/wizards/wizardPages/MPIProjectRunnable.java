@@ -21,10 +21,9 @@ import org.eclipse.cdt.managedbuilder.core.IManagedProject;
 import org.eclipse.cdt.managedbuilder.core.IOption;
 import org.eclipse.cdt.managedbuilder.core.ITool;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
-import org.eclipse.cdt.managedbuilder.ui.wizards.CProjectWizard;
 import org.eclipse.cdt.managedbuilder.ui.wizards.MBSCustomPageData;
 import org.eclipse.cdt.managedbuilder.ui.wizards.MBSCustomPageManager;
-import org.eclipse.cdt.ui.wizards.NewCProjectWizard;
+import org.eclipse.cdt.ui.wizards.CProjectWizard;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.util.Assert;
@@ -60,11 +59,13 @@ public class MPIProjectRunnable implements Runnable {
 			return;
 		}
 		MBSCustomPageData pData = MBSCustomPageManager.getPageData(pageID);
-		CProjectWizard wiz=null;//cdt40  (cdt 3.1 was NewCProjectWizard)
+ 		CProjectWizard wiz=null;//cdt40  (cdt 3.1 was NewCProjectWizard)
 
-		try {
+ 		try {
 			IWizardPage wp = pData.getWizardPage();
 			IWizard w = wp.getWizard();
+			int stopHere=0; // what is it?
+			stopHere++;
 			if(w instanceof CProjectWizard){
 				wiz = (CProjectWizard)w;
 			}
@@ -206,56 +207,29 @@ public class MPIProjectRunnable implements Runnable {
 	private void addLinkerOpt(IConfiguration cf, String libName, String libPath) {
 		String ext = "o";
 		ITool cfTool = cf.getToolFromInputExtension(ext);
-		ITool[] tools = cf.getFilteredTools();// get tools appropriate for this project
-		 //cfTool=tools[1]; // hack hack hack cdt40
-		
-		int libType=IOption.LIBRARIES;
-		IOption[] allOptions=cfTool.getOptions();
+		IOption[] allOptions = cfTool.getOptions();
 		for (int i = 0; i < allOptions.length; i++) {
 			IOption option = allOptions[i];
 			try {
 				int optionType = option.getValueType();
-				
-				if (IOption.LIBRARIES == optionType) {
+				switch (optionType) {
+				case IOption.LIBRARIES:
 					addOptionValue(cf, cfTool, option, libName);
-				    }
-				// which of the next three is the other one??? //	add to	 -L (library search path)
-				else if (IOption.LIBRARY_FILES == optionType){
-					System.out.println("found library files");
+					break;
+				case IOption.LIBRARY_PATHS:
 					addOptionValue(cf, cfTool, option, libPath);
+				default:
+					break;
 				}
-				else if (IOption.LIBRARY_PATHS == optionType){
-					System.out.println("found library paths");
-					addOptionValue(cf, cfTool, option, libPath);
-				}
-				else if (IOption.STRING_LIST == optionType){// library search path
-					String name=option.getName();
-					if(name.startsWith("Library search path")){// hack hack hack
-						addOptionValue(cf, cfTool, option, libPath);
-					}
-				}
-				} catch (BuildException e) {
-					System.out.println("MPIProjectRunnable, problem getting include paths: "
-									+ e.getMessage());
-					e.printStackTrace();
-				} 
+			} catch (BuildException e) {
+				System.out
+						.println("MPIProjectRunnable, problem getting include paths: "
+								+ e.getMessage());
+				e.printStackTrace();
 			}
 		}
-	
-	private void addLinkerOptOld(IConfiguration cf, String libName, String libPath) {
-		String ext = "o";
-		ITool cfTool = cf.getToolFromInputExtension(ext);
-		
-		// add to -l (libraries)
-		String optLibsID = "gnu.c.link.option.libs";  
-		IOption option = cfTool.getOptionById(optLibsID);
-		addOptionValue(cf, cfTool, option, libName);
-		
-		//	add to	 -L (library search path)
-		String optPathsID="gnu.c.link.option.paths";  
-		option=cfTool.getOptionById(optPathsID);
-		addOptionValue(cf, cfTool, option, libPath);
-		}
+	}
+
 	
 	private void setCompileCommand(IConfiguration cf, String buildCmd) {
 		if(traceOn)System.out.println("compile cmd: "+buildCmd);
@@ -279,7 +253,7 @@ public class MPIProjectRunnable implements Runnable {
 	 * @param value the new value to add to the list of existing values in the option
 	 */
 	private void addOptionValue(IConfiguration cf, ITool tool, IOption option, String value) {
-
+		int stopHere=0;
 		try {
 			int type = option.getValueType();
 			String[] valueList = null;
@@ -292,12 +266,17 @@ public class MPIProjectRunnable implements Runnable {
 				valueList = option.getLibraries();
 				valueList=addNotPath(valueList, value);
 				break;
-			case IOption.STRING_LIST:// this is type for library search path
+			case IOption.STRING_LIST:// this is type for library search path cdt 3.1.2
 				valueList = option.getStringListValue();
 				valueList=addNotPath(valueList,value);
 				break;
+			case IOption.LIBRARY_PATHS:// this is type for library search path cdt 4.0 as on 5/11/07
+				valueList=option.getBasicStringListValue();
+				valueList=addNotPath(valueList,value);
+				break;
+			
 			default:
-				System.out.println("Wizard runnable postprocessing, can't get type of option for " + option.getName());
+				System.out.println("MPIProjectWizard runnable postprocessing (MPIProjectRunnable), can't get type of option for " + option.getName());
 				return;
 
 			}
