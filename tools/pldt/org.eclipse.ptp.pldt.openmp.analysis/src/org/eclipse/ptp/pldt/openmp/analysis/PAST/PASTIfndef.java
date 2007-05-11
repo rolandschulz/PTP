@@ -42,4 +42,8 @@ public class PASTIfndef extends PASTNode implements IASTPreprocessorIfndefStatem
 		return ifndef_.taken();
 	}
 
+	public char[] getCondition() {
+		return ifndef_.getCondition();
+	}
+
 }

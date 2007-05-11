@@ -96,6 +96,10 @@ public class PASTPragma extends PASTNode implements IASTPreprocessorPragmaStatem
     }
     
     public void setContent(String content) { content_ = content; }
+
+	public char[] getMessage() {
+		return pragma_.getMessage();
+	}
 	
 
 }
