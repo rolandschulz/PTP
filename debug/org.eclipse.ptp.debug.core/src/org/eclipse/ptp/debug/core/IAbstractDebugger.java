@@ -36,10 +36,10 @@ import org.eclipse.ptp.debug.core.cdi.model.IPCDILocator;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 
 public interface IAbstractDebugger extends IDebugger {
-	public IPCDISession createDebuggerSession(IPLaunch launch, IBinaryObject exe, int timeout, IProgressMonitor monitor) throws CoreException;
+	public IPCDISession createDebuggerSession(IPLaunch launch, IBinaryObject exe, IProgressMonitor monitor) throws CoreException;
 	
 	/* Debugger Initialization/Termination */
-	public void initialize(IPJob job, int timeout, IProgressMonitor monitor) throws CoreException;
+	public void initialize(IPJob job, IProgressMonitor monitor) throws CoreException;
 	public void exit() throws CoreException;
 	
 	public void addDebuggerObserver(Observer obs);

@@ -48,18 +48,53 @@ public interface IDebugger {
 	 * public void handleDebugEvent(int eventType, BitList procs, String[] args);
 	 * to give notifications about events
 	 */
+
 	
-	/* Program Information */
+	/**
+	 * Create connection point that the debug server will attach to. The timeout
+	 * parameter specifies how long to wait for the incoming debug server connection.
+	 * 
+	 * @param timeout
+	 * @throws CoreException
+	 */
+	public void createConnection(int timeout) throws CoreException;
 	
+	/**
+	 * Get the port that is being listened on for incoming debugger connections.
+	 *  
+	 * @return port number
+	 * @throws CoreException
+	 */
 	public int getDebuggerPort() throws CoreException;
 	
-	public void connection(IProgressMonitor monitor) throws CoreException;
-	public void disconnection(IProgressMonitor monitor) throws CoreException;
+	/**
+	 * Wait for an incoming debugger connection. This will wait until the debugger
+	 * connects, the connection timeout expires, or the monitor is canceled.
+	 * 
+	 * @param monitor
+	 * @return true if the connection was successful, false otherwise
+	 * @throws CoreException
+	 */
+	public boolean waitForConnection(IProgressMonitor monitor) throws CoreException;
+	
+	/**
+	 * Initialize the debugger once the debugger connection has been established.
+	 * 
+	 * @param job
+	 * @throws CoreException
+	 */
 	public void startDebugger(IPJob job) throws CoreException;
+	
+	/**
+	 * @throws CoreException
+	 */
 	public void stopDebugger() throws CoreException;
 	
+	
+	/* Stackframe Information */
 	public void listStackFrames(BitList tasks, int low, int depth) throws PCDIException;
 	public void setCurrentStackFrame(BitList tasks, int level) throws PCDIException;
+	public void getStackInfoDepth(BitList tasks) throws PCDIException;
 	
 	/* Data Display and Manipulation */
 	public void getAIF(BitList tasks, String expr) throws PCDIException;
@@ -94,10 +129,9 @@ public interface IDebugger {
 	/* Thread */
 	public void getInfothreads(BitList tasks) throws PCDIException;
 	public void setThreadSelect(BitList tasks, int threadNum) throws PCDIException;
-
-	public void getStackInfoDepth(BitList tasks) throws PCDIException;
 	
 	/* Memory */
+	
 	/** Set Data Read memory to external debugger
 	 * @param tasks
 	 * @param offset
@@ -110,6 +144,7 @@ public interface IDebugger {
 	 * @throws PCDIException
 	 */
 	public void setDataReadMemoryCommand(BitList tasks, long offset, String address, int wordFormat, int wordSize, int rows, int cols, Character asChar) throws PCDIException;
+
 	/** Set Data write memory to external debugger
 	 * @param tasks
 	 * @param offset
@@ -127,12 +162,14 @@ public interface IDebugger {
 	 * @throws PCDIException
 	 */
 	public void getListSignals(BitList tasks, String name) throws PCDIException;
+
 	/** Pass Signal action
 	 * @param tasks
 	 * @param arg
 	 * @throws PCDIException
 	 */
 	public void getSignalInfo(BitList tasks, String arg) throws PCDIException;	
+
 	/** Handle CLI Command
 	 * @param tasks
 	 * @param arg
