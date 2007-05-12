@@ -19,13 +19,9 @@
 
 package org.eclipse.ptp.debug.external.core.proxy;
 
-import java.io.IOException;
-
 import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugEventListener;
 
 public interface IProxyDebugClient {
-	public void closeConnection() throws IOException;
-	
 	public void addProxyDebugEventListener(IProxyDebugEventListener listener);
 	public void removeProxyDebugEventListener(IProxyDebugEventListener listener);
 }
