@@ -7,7 +7,9 @@
  *
  * Contributors:
  * IBM Corporation - Initial API and implementation
- *******************************************************************************/package org.eclipse.ptp.core.attributes;
+ *******************************************************************************/
+
+package org.eclipse.ptp.core.attributes;
 
 import java.util.ArrayList;
 import java.util.Arrays;
