@@ -112,8 +112,16 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 				
 				verifyDebuggerPath(dbgFile);
 				
+				/*
+				 * Create the debugger extension, then the connection point for the debug server. 
+				 * The debug server is created when the job is launched via the submitJob()
+				 * command.
+				 */
 				IPDebugConfiguration debugConfig = getDebugConfig(configuration);
 				debugger = debugConfig.createDebugger();
+				int timeout = store.getInt(IPDebugConstants.PREF_PTP_DEBUG_COMM_TIMEOUT);
+				debugger.createConnection(timeout);
+				
 				dbgArgs.add("--port=" + debugger.getDebuggerPort());
 			
 				// remote setting
@@ -155,8 +163,10 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 				pLaunch.setPJob(job);
 				IBinaryObject exeFile = verifyBinary(configuration);
 				setDefaultSourceLocator(launch, configuration);
-				int timeout = store.getInt(IPDebugConstants.PREF_PTP_DEBUG_COMM_TIMEOUT);
-				PTPDebugCorePlugin.getDebugModel().createDebuggerSession(debugger, pLaunch, exeFile, timeout, new SubProgressMonitor(monitor, 40));
+				/*
+				 * Wait for the incoming debug server connection. This can be canceled by the user.
+				 */
+				PTPDebugCorePlugin.getDebugModel().createDebuggerSession(debugger, pLaunch, exeFile, new SubProgressMonitor(monitor, 40));
 				monitor.worked(10);
 				if (monitor.isCanceled()) {
 					PTPDebugCorePlugin.getDebugModel().shutdownSession(job);

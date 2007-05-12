@@ -77,26 +77,29 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 	private ProxyDebugClient	proxy;
 	private int					bpId = 0;
 
-	public int getDebuggerPort() throws CoreException {
+	public void createConnection(int timeout) throws CoreException {
 		proxy = new ProxyDebugClient();
 		proxy.addProxyDebugEventListener(this);
 		try {
-			proxy.sessionCreate();
+			proxy.doConnect(timeout);
 		} catch (IOException e) {
 			proxy.removeProxyDebugEventListener(this);
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugCorePlugin.getUniqueIdentifier(), IStatus.ERROR, "could not create proxy", null));
 		}
+	}
+
+	public int getDebuggerPort() throws CoreException {
 		return proxy.getSessionPort();
 	}
 	
-	public void connection(IProgressMonitor monitor) throws CoreException {
+	public boolean waitForConnection(IProgressMonitor monitor) throws CoreException {
 		try {
-			//using checkConnection() instead of waitForConnect()
-			//proxy.checkConnection();
-			if (proxy.waitForConnect(monitor)) {
+			if (proxy.waitConnect(monitor)) {
 				proxy.sessionHandleEvents();
+				return true;
 			} else {
 				proxy.removeProxyDebugEventListener(this);
+				return false;
 			}
 		} catch (IOException e) {
 			proxy.removeProxyDebugEventListener(this);
@@ -104,19 +107,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 		}
 	}
 	
-	public void disconnection(IProgressMonitor monitor) throws CoreException {
-		try {
-			if (proxy != null) {
-				proxy.removeProxyDebugEventListener(this);
-				proxy.closeConnection();
-			}
-		} catch (IOException e) {
-			throw new CoreException(new Status(IStatus.ERROR, PTPDebugCorePlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));
-		} finally {
-			proxy = null;
-		}
-	}
-	
+	@SuppressWarnings("unchecked")
 	public void startDebugger(IPJob job) throws CoreException {
 		try {
 			String app = job.getAttribute(JobAttributes.getExecutableNameAttributeDefinition()).getValueAsString();
@@ -132,7 +123,8 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 	public void stopDebugger() throws CoreException {
 		if (proxy != null) {
 			try {
-				proxy.sessionFinish();
+				proxy.doShutdown();
+				proxy.removeProxyDebugEventListener(this);
 			} catch (IOException e) {
 				throw new CoreException(new Status(IStatus.ERROR, PTPDebugCorePlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));
 			}
