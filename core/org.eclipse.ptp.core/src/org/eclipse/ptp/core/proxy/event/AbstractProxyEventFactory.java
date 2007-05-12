@@ -32,24 +32,13 @@ public abstract class AbstractProxyEventFactory implements IProxyEventFactory {
 		return buf.toString();
 	}
 
-	public static String decodeString(String str) {
-		String[] parts = str.split(":");
-		int len = Integer.parseInt(parts[0], 16) - 1; // Skip trailing NULL
-		return new String(decodeBytes(parts, len));
-	}
-
 	public static byte[] decodeBytes(String str) {
-		String[] parts = str.split(":");
-		int len = Integer.parseInt(parts[0], 16);
-		return decodeBytes(parts, len);
-	}
-
-	private static byte[] decodeBytes(String[] parts, int len) {
+		int len = str.length()/2;
 		byte[] strBytes = new byte[len];
 		
 		for (int i = 0, p = 0; i < len; i++, p += 2) {
-			byte c = (byte) ((Character.digit(parts[1].charAt(p), 16) & 0xf) << 4);
-			c |= (byte) ((Character.digit(parts[1].charAt(p+1), 16) & 0xf));
+			byte c = (byte) ((Character.digit(str.charAt(p), 16) & 0xf) << 4);
+			c |= (byte) ((Character.digit(str.charAt(p+1), 16) & 0xf));
 			strBytes[i] = c;
 		}
 		
