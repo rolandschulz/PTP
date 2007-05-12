@@ -62,6 +62,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 	private Thread				acceptThread;
 	private IProxyEventFactory	proxyEventFactory;
 	private int					shutdownID;
+	private boolean				debug = false;
 	
 	private List<IProxyEventListener>	listeners = Collections.synchronizedList(new ArrayList<IProxyEventListener>());
 
@@ -142,6 +143,9 @@ public abstract class AbstractProxyClient implements IProxyClient {
 		 * Note: command length includes the first space!
 		 */
 		String sendCmd = encodeIntVal(buf.length() + 1, IProxyCommand.CMD_LENGTH_SIZE) + " " + buf;
+		if (debug) {
+			System.out.println("COMMAND: " + sendCmd);
+		}
 		fullWrite(encoder.encode(CharBuffer.wrap(sendCmd)));
 		
 	}
@@ -463,6 +467,14 @@ public abstract class AbstractProxyClient implements IProxyClient {
 			for (int i = 0; i < eventNumArgs; i++) {
 				eventArgs[i] = decodeString(eventBuf, argPos);
 				argPos += eventArgs[i].length() + IProxyEvent.EVENT_ARG_LEN_SIZE + 2;
+			}
+			
+			if (debug) {
+				System.out.print("EVENT ID:" + eventID + " TID:" + eventTransID);
+				for (String arg : eventArgs) {
+					System.out.print(" ARG:\"" + arg + "\"");
+				}
+				System.out.println();
 			}
 		} catch (IndexOutOfBoundsException e1) {
 			return false;
