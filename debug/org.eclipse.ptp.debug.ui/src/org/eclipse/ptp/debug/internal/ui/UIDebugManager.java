@@ -19,6 +19,7 @@
 package org.eclipse.ptp.debug.internal.ui;
 
 import java.util.Iterator;
+
 import org.eclipse.cdt.debug.core.model.ICLineBreakpoint;
 import org.eclipse.core.resources.IMarkerDelta;
 import org.eclipse.core.runtime.CoreException;
@@ -323,7 +324,11 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 						IPProcess proc = findProcess(job, elements[i].getID());
 						if (proc != null) {
 							removeConsoleWindow(job, proc);
-							tasks.set(elements[i].getIDNum());
+							try {
+								tasks.set(Integer.parseInt(elements[i].getName()));
+							} catch (NumberFormatException e) {
+								// The element name had better be the process number
+							}
 						}
 					}
 				}
@@ -358,7 +363,11 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 						IPProcess proc = findProcess(job, elements[i].getID());
 						if (proc != null && !proc.isTerminated()) {
 							addConsoleWindow(job, proc);
-							tasks.set(elements[i].getIDNum());
+							try {
+								tasks.set(Integer.parseInt(elements[i].getName()));
+							} catch (NumberFormatException e) {
+								// The element name had better be the process number
+							}
 						}
 					}
 				}
@@ -450,7 +459,11 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 					IPProcess proc = findProcess(job, registerElements[i].getID());
 					if (proc != null) {
 						removeConsoleWindow(job, proc);
-						tasks.set(registerElements[i].getIDNum());
+						try {
+							tasks.set(Integer.parseInt(registerElements[i].getName()));
+						} catch (NumberFormatException e) {
+							// The element name had better be the process number
+						}
 					}
 					monitor.worked(1);
 				}
@@ -495,14 +508,22 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 							IPProcess proc = findProcess(job, registerElements[i].getID());
 							if (proc != null) {
 								addConsoleWindow(job, proc);
-								regTasks.set(registerElements[i].getIDNum());
+								try {
+									regTasks.set(Integer.parseInt(registerElements[i].getName()));
+								} catch (NumberFormatException e) {
+									// The element name had better be the process number
+								}
 							}
 						}
 					} else { //if not unregister it
 						IPProcess proc = findProcess(job, registerElements[i].getID());
 						if (proc != null) {
 							removeConsoleWindow(job, proc);
-							unregTasks.set(registerElements[i].getIDNum());
+							try {
+								unregTasks.set(Integer.parseInt(registerElements[i].getName()));
+							} catch (NumberFormatException e) {
+								// The element name had better be the process number
+							}
 						}
 					}
 					monitor.worked(1);
@@ -918,4 +939,5 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 			}
 		}
 	}
+
 }

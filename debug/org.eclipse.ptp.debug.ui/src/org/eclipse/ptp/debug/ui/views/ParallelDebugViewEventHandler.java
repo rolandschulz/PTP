@@ -22,8 +22,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.core.elements.IPJob;
-import org.eclipse.ptp.core.util.BitList;
-import org.eclipse.ptp.debug.core.IAbstractDebugger;
+import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.events.IPDebugErrorInfo;
 import org.eclipse.ptp.debug.core.events.IPDebugEvent;
@@ -74,8 +73,8 @@ public class ParallelDebugViewEventHandler extends AbstractPDebugEventHandler {
 						IElementHandler elementHandler = getPView().getElementHandler(job.getID());
 						if (elementHandler != null) {
 							for (int j=0; j<processes.length; j++) {
-								//IPProcess proc = job.findProcessByTaskId(processes[j]);
-								IElement element = elementHandler.getSetRoot().get(String.valueOf(processes[j]));
+								IPProcess proc = job.getProcessByNumber(processes[j]);
+								IElement element = elementHandler.getSetRoot().get(proc.getID());
 								element.setRegistered(true);
 								elementHandler.addRegisterElement(element);
 							}
