@@ -39,6 +39,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPProcess;
+import org.eclipse.ptp.core.elements.events.IQueueNewJobEvent;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
@@ -131,6 +132,7 @@ public class ParallelDebugView extends ParallelJobView {
 	public ParallelDebugView() {
 		this(PTPDebugUIPlugin.getUIDebugManager());
 	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.IWorkbenchPart#dispose()
 	 */
@@ -142,6 +144,7 @@ public class ParallelDebugView extends ParallelJobView {
 			getEventHandler().dispose();
 		super.dispose();
 	}
+	
 	/*
 	protected Viewer getViewer(String view_id) {
 		//IViewPart part = PTPDebugUIPlugin.getActiveWorkbenchWindow().getActivePage().findView(IDebugUIConstants.ID_DEBUG_VIEW);
@@ -152,6 +155,10 @@ public class ParallelDebugView extends ParallelJobView {
 		return null;
 	}
 	*/
+	
+	/**
+	 * @return
+	 */
 	protected Viewer getDebugViewer() {
 		if (launchViewer == null) {
 			IViewPart part = getViewSite().getPage().findView(IDebugUIConstants.ID_DEBUG_VIEW);
@@ -168,6 +175,7 @@ public class ParallelDebugView extends ParallelJobView {
 		}
 		return launchViewer;
 	}
+	
 	/*
 	 * FIXME does not work if create a new set.  Currently we can task id to identify icon, but viewer is using order 
 	private void selectElements(final Object[] objects) {
@@ -199,6 +207,7 @@ public class ParallelDebugView extends ParallelJobView {
 	protected void setEventHandler(AbstractPDebugEventHandler eventHandler) {
 		this.fEventHandler = eventHandler;
 	}
+	
 	/**
 	 * Returns the event handler for this view
 	 * 
@@ -208,6 +217,9 @@ public class ParallelDebugView extends ParallelJobView {
 		return this.fEventHandler;
 	}	
 		
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.views.ParallelJobView#createView(org.eclipse.swt.widgets.Composite)
+	 */
 	public void createView(Composite parent) {
 		super.createView(parent);
 		setEventHandler(new ParallelDebugViewEventHandler(this));
@@ -215,6 +227,7 @@ public class ParallelDebugView extends ParallelJobView {
 		if (viewer != null)
 			viewer.addSelectionChangedListener(debugViewSelectChangedListener);
 	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.views.AbstractParallelSetView#fillContextMenu(org.eclipse.jface.action.IMenuManager)
 	 */
@@ -235,6 +248,7 @@ public class ParallelDebugView extends ParallelJobView {
 		manager.appendToGroup(IPTPDebugUIConstants.STEP_OVER_GROUP, stepOverAction);
 		manager.appendToGroup(IPTPDebugUIConstants.EMPTY_STEP_GROUP, stepReturnAction);
 	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.views.AbstractParallelSetView#createToolBarActionGroup(org.eclipse.jface.action.IToolBarManager)
 	 */
@@ -247,7 +261,8 @@ public class ParallelDebugView extends ParallelJobView {
 		toolBarMgr.add(new GroupMarker(IPTPDebugUIConstants.EMPTY_STEP_GROUP));
 		toolBarMgr.add(new Separator(IPTPDebugUIConstants.REG_GROUP));
 		super.createToolBarActionGroup(toolBarMgr);
-	}	
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.views.AbstractParallelSetView#createToolBarActions(org.eclipse.jface.action.IToolBarManager)
 	 */
@@ -273,6 +288,7 @@ public class ParallelDebugView extends ParallelJobView {
 		super.buildInToolBarActions(toolBarMgr);
 		//createOrientationActions();
 	}
+	
 	/** Create orientation actions
 	 * 
 	 */
@@ -294,6 +310,7 @@ public class ParallelDebugView extends ParallelJobView {
 			doubleClick(element);
 		}
 	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#doubleClick(org.eclipse.ptp.ui.model.IElement)
 	 */
@@ -304,6 +321,7 @@ public class ParallelDebugView extends ParallelJobView {
 			PTPDebugUIPlugin.errorDialog(getViewSite().getShell(), "Error", e.getStatus());
 		}
 	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#getToolTipText(java.lang.Object)
 	 */
@@ -326,6 +344,7 @@ public class ParallelDebugView extends ParallelJobView {
 		else
 			((UIDebugManager) manager).registerElements(new IElement[] { element });
 	}
+	
 	/** Register selected elements
 	 * @throws CoreException
 	 */
@@ -334,6 +353,7 @@ public class ParallelDebugView extends ParallelJobView {
 			((UIDebugManager) manager).registerElements(canvas.getSelectedElements());
 		}
 	}
+	
 	/** Unregister selected elements
 	 * @throws CoreException
 	 */
@@ -342,7 +362,11 @@ public class ParallelDebugView extends ParallelJobView {
 			((UIDebugManager) manager).unregisterElements(canvas.getSelectedElements());
 		}
 	}
+	
 	//overwrite change job method
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.views.ParallelJobView#changeJob(org.eclipse.ptp.core.elements.IPJob)
+	 */
 	protected void changeJob(final IPJob job) {
 		super.changeJob(job);
 		if (job != null) {
@@ -359,7 +383,11 @@ public class ParallelDebugView extends ParallelJobView {
 			}
 		}
 	}
+	
 	//overwrite change set method
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#selectSet(org.eclipse.ptp.ui.model.IElementSet)
+	 */
 	public void selectSet(IElementSet set) {
 		super.selectSet(set);
 		if (set != null) {
@@ -376,6 +404,7 @@ public class ParallelDebugView extends ParallelJobView {
 			}
 		}
 	}
+	
 	// Update button
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.views.AbstractParallelSetView#updateAction()
@@ -411,7 +440,8 @@ public class ParallelDebugView extends ParallelJobView {
 			suspendAction.setEnabled(false);
 		}
 	}
-	/** Updtae debug button
+	
+	/** Update debug button
 	 * @param terminatedTasks
 	 * @param suspendedTasks
 	 */
@@ -454,6 +484,10 @@ public class ParallelDebugView extends ParallelJobView {
 			suspendAction.setEnabled(false);
 		}
 	}
+	
+	/**
+	 * @param source
+	 */
 	public void updateStepReturnButton(BitList source) {
 		IElementSet set = getCurrentSet();
 		if (set == null || source == null) {
@@ -478,6 +512,9 @@ public class ParallelDebugView extends ParallelJobView {
 		}
 	}
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#selectionChanged(org.eclipse.jface.viewers.SelectionChangedEvent)
+     */
     public void selectionChanged(SelectionChangedEvent event) {
     	super.selectionChanged(event);
     	ISelection selection = event.getSelection();
@@ -486,11 +523,16 @@ public class ParallelDebugView extends ParallelJobView {
     		if (structSelection.size() == 1) {
 	    		IElement element = (IElement)structSelection.getFirstElement();
 	    		if (element.isRegistered()) {
-	    			focusOnDebugTarget(getCheckedJob(), element.getIDNum());
+					try {
+		    			focusOnDebugTarget(getCheckedJob(), Integer.parseInt(element.getName()));
+					} catch (NumberFormatException e) {
+						// The element name had better be the process number
+					}
 	    		}
     		}
     	}
     }
+    
     /*
 	public void drawSpecial(Object obj, GC gc, int x_loc, int y_loc, int width, int height) {
 		super.drawSpecial(obj, gc, x_loc, y_loc, width, height);
@@ -521,6 +563,10 @@ public class ParallelDebugView extends ParallelJobView {
 		workjob.setPriority(Job.DECORATE);
 		workjob.schedule();
 	}
+	
+	/**
+	 * @param selection
+	 */
 	private void focusOnDebugView(final Object selection) {
 		if (selection == null) {
 			return;
@@ -539,12 +585,21 @@ public class ParallelDebugView extends ParallelJobView {
 			job.schedule();
 		}
 	}
+	
+	/**
+	 * @param selection
+	 */
 	private void doOnFocusDebugView(Object selection) {
 		Viewer viewer = getDebugViewer();
 		if (viewer instanceof TreeViewer) {
 			focusOnDebugTarget((TreeViewer)viewer, selection);
 		}
 	}
+	
+	/**
+	 * @param treeViewer
+	 * @param selection
+	 */
 	private void focusOnDebugTarget(final TreeViewer treeViewer, final Object selection) {
 		WorkbenchJob job = new WorkbenchJob("Focus on Debug Target") {
 			public IStatus runInUIThread(IProgressMonitor monitor) {
@@ -557,5 +612,16 @@ public class ParallelDebugView extends ParallelJobView {
         job.setSystem(true);
         job.setPriority(Job.DECORATE);
         job.schedule();
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.listeners.IQueueJobListener#handleEvent(org.eclipse.ptp.core.elements.events.IQueueNewJobEvent)
+	 */
+	public void handleEvent(final IQueueNewJobEvent e) {
+		System.out.println("debugview: got job");
+		if (e.getJob().isDebug()) {
+			System.out.println("debugview: got debug job");
+			changeJobRefresh(e.getJob());
+		}
 	}
 }
