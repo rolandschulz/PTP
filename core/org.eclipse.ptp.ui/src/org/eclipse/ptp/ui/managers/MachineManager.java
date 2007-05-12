@@ -26,6 +26,7 @@ import org.eclipse.ptp.core.elements.IPElement;
 import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPNode;
 import org.eclipse.ptp.core.elements.IPProcess;
+import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.NodeAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
@@ -306,7 +307,7 @@ public class MachineManager extends AbstractUIManager {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#initial()
 	 */
-	public IPElement initial() {
+	public IPElement initial(IPUniverse universe) {
 		IPMachine[] macs = getMachines();
 		if (macs.length > 0) {
 			cur_machine = macs[0];

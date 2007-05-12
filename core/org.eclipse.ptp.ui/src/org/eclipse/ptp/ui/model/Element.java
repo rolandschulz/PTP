@@ -24,7 +24,7 @@ package org.eclipse.ptp.ui.model;
  * @author clement chu
  *
  */
-public class Element implements IElement, Cloneable, Comparable {
+public class Element implements IElement, Cloneable, Comparable<Object> {
 	protected String id = "0";
 	protected String name = "";
 	protected boolean registered = false;
@@ -49,39 +49,33 @@ public class Element implements IElement, Cloneable, Comparable {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.model.IElement#getIDNum()
-	 */
-	public int getIDNum() {
-		try {
-			return Integer.parseInt(id);
-		} catch (NumberFormatException e) {
-			return -1;
-		}
-	}
-	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.model.IElement#getID()
 	 */
 	public String getID() {
 		return id;
 	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.model.IElement#getName()
 	 */
 	public String getName() {
 		return name;
 	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.model.IElement#isRegistered()
 	 */
 	public boolean isRegistered() {
 		return registered;
 	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.model.IElement#setRegistered(boolean)
 	 */
 	public void setRegistered(boolean registered) {
 		this.registered = registered;
 	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.model.IElement#cloneElement()
 	 */
@@ -92,6 +86,7 @@ public class Element implements IElement, Cloneable, Comparable {
 			return null;
 		}
 	}
+	
 	/**
 	 * @param obj compare to
 	 * @return -1 if smaller than obj, 1 if bigger than obj, otherwise they equal
