@@ -70,36 +70,67 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 	protected DebugCommandQueue commandQueue = null;
 	protected BitList terminatedProcs = null;
 	protected BitList suspendedProcs = null;
-	public IPCDISession createDebuggerSession(IPLaunch launch, IBinaryObject exe, int timeout, IProgressMonitor monitor) throws CoreException {
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.IAbstractDebugger#createDebuggerSession(org.eclipse.ptp.debug.core.launch.IPLaunch, org.eclipse.cdt.core.IBinaryParser.IBinaryObject, org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	public IPCDISession createDebuggerSession(IPLaunch launch, IBinaryObject exe, IProgressMonitor monitor) throws CoreException {
 		IPJob job = launch.getPJob();
 		session = new Session(this, job, launch, exe);
-		initialize(job, timeout, monitor);
+		initialize(job, monitor);
 		this.job = job;
 		return session;
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.IAbstractDebugger#getCurrentCommand()
+	 */
 	public IDebugCommand getCurrentCommand() {
 		return commandQueue.getCurrentCommand();
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.IAbstractDebugger#getInterruptCommand()
+	 */
 	public IDebugCommand getInterruptCommand() {
 		return commandQueue.getInterruptCommand();
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.IAbstractDebugger#postInterruptCommand(org.eclipse.ptp.debug.core.IDebugCommand)
+	 */
 	public void postInterruptCommand(IDebugCommand command) {
 		commandQueue.setInterruptCommand(command);
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.IAbstractDebugger#postCommand(org.eclipse.ptp.debug.core.IDebugCommand)
+	 */
 	public void postCommand(IDebugCommand command) {
-		if (!isExited)
+		if (!isExited) {
 			commandQueue.addCommand(command);
+		}
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.IAbstractDebugger#completeCommand(org.eclipse.ptp.core.util.BitList, java.lang.Object)
+	 */
 	public void completeCommand(BitList tasks, Object result) {
 		commandQueue.setCommandReturn(tasks, result);
 	}
-	public final void initialize(IPJob job, int timeout, IProgressMonitor monitor) throws CoreException {
-		monitor.subTask("Connecting to proxy server...");
-		connection(monitor);
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.IAbstractDebugger#initialize(org.eclipse.ptp.core.elements.IPJob, int, org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	public final void initialize(IPJob job, IProgressMonitor monitor) throws CoreException {
+		monitor.subTask("Connecting to debug server...");
+		boolean connected = waitForConnection(monitor);
 		monitor.worked(5);
-		if (monitor.isCanceled())
+		if (!connected) {
+			monitor.done();
 			throw new CoreException(Status.CANCEL_STATUS);
-
+		}
+		
 		monitor.subTask("Starting debugger...");
 		terminatedProcs = new BitList(job.size());
 		suspendedProcs = new BitList(job.size());
@@ -122,6 +153,10 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugExternalPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));
 		}
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.IAbstractDebugger#exit()
+	 */
 	public final void exit() throws CoreException {
 		if (!isExited) {
 			// make sure all processes are finished
@@ -135,23 +170,41 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 				deleteObservers();
 				eventThread.cancelJob();
 				commandQueue.setTerminated();
-				disconnection(null);
 			}
 		}
-		disconnection(null);
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.IAbstractDebugger#getSession()
+	 */
 	public final IPCDISession getSession() {
 		return session;
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.IAbstractDebugger#addDebuggerObserver(java.util.Observer)
+	 */
 	public final void addDebuggerObserver(Observer obs) {
 		this.addObserver(obs);
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.IAbstractDebugger#deleteDebuggerObserver(java.util.Observer)
+	 */
 	public final void deleteDebuggerObserver(Observer obs) {
 		this.deleteObserver(obs);
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.IAbstractDebugger#deleteAllObservers()
+	 */
 	public final void deleteAllObservers() {
 		this.deleteObservers();
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.IAbstractDebugger#fireEvents(org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent[])
+	 */
 	public synchronized final void fireEvents(IPCDIEvent[] events) {
 		if (events != null && events.length > 0) {
 			for (int i = 0; i < events.length; i++) {
@@ -159,6 +212,10 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 			}
 		}
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.IAbstractDebugger#fireEvent(org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent)
+	 */
 	public synchronized final void fireEvent(final IPCDIEvent event) {
 		if (event != null) {
 			BitList tasks = event.getAllProcesses();
@@ -183,6 +240,7 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 			eventThread.fireDebugEvent(event);
 		}
 	}
+	
 	protected void handleException(BitList tasks, int err_code) {
 		switch (err_code) {
 		case IPCDIErrorEvent.DBG_FATAL:
@@ -200,18 +258,28 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		// break;
 		}
 	}
+	
 	private void postStopDebugger() {
 		commandQueue.cleanup(true);
 		postCommand(new StopDebuggerCommand(getSession().createBitList()));
 		commandQueue.setStopAddCommand(true);
 	}
+	
+	/* (non-Javadoc)
+	 * @see java.util.Observable#notifyObservers(java.lang.Object)
+	 */
 	public final void notifyObservers(Object arg) {
 		setChanged();
 		super.notifyObservers(arg);
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.IAbstractDebugger#isExited()
+	 */
 	public final boolean isExited() {
 		return isExited;
 	}
+	
 	protected synchronized void setJobFinished(BitList tasks, ProcessAttributes.State status) {
 		if (tasks == null || tasks.isEmpty()) {
 			tasks = session.createBitList();
@@ -221,6 +289,7 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		setProcessStatus(tasks.toArray(), status);
 		session.unregisterTargets(tasks.copy(), true);
 	}
+	
 	protected synchronized void setTerminateTasks(boolean isAdd, BitList tasks) {
 		BitList terminatedTasks = getTerminatedProc();
 		if (isAdd)
@@ -228,6 +297,7 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		else
 			removeTasks(terminatedTasks, tasks);
 	}
+	
 	protected synchronized void setSuspendTasks(boolean isAdd, BitList tasks) {
 		BitList suspendedTasks = getSuspendedProc();
 		if (isAdd)
@@ -235,49 +305,97 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		else
 			removeTasks(suspendedTasks, tasks);
 	}
+	
 	protected void setProcessStatus(int[] tasks, ProcessAttributes.State state) {
 		for (int i = 0; i < tasks.length; i++) {
 			getProcess(tasks[i]).setState(state);
 		}
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.IAbstractDebugger#getSuspendedProc()
+	 */
 	public synchronized BitList getSuspendedProc() {
 		return suspendedProcs;
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.IAbstractDebugger#getTerminatedProc()
+	 */
 	public synchronized BitList getTerminatedProc() {
 		return terminatedProcs;
 	}
-	// event
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.IAbstractDebugger#handleStopDebuggerEvent()
+	 */
 	public void handleStopDebuggerEvent() {
 		fireEvent(new DebuggerDestroyedEvent(getSession()));
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.IAbstractDebugger#handleBreakpointCreatedEvent(org.eclipse.ptp.core.util.BitList, org.eclipse.ptp.debug.core.cdi.model.IPCDIBreakpoint)
+	 */
 	public void handleBreakpointCreatedEvent(BitList tasks, IPCDIBreakpoint cdiBpt) {
 		fireEvent(new BreakpointCreatedEvent(getSession(), tasks, cdiBpt));
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.IAbstractDebugger#handleBreakpointHitEvent(org.eclipse.ptp.core.util.BitList, int, int, java.lang.String[])
+	 */
 	public void handleBreakpointHitEvent(BitList tasks, int bpid, int thread_id, String[] varchanges) {
 		IPCDIBreakpoint bpt = ((Session) getSession()).getBreakpointManager().findCDIBreakpoint(bpid);
 		if (bpt != null) {
 			fireEvent(new BreakpointHitEvent(getSession(), tasks, bpt, thread_id, varchanges));
 		}
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.IAbstractDebugger#handleSuspendEvent(org.eclipse.ptp.core.util.BitList, org.eclipse.ptp.debug.core.cdi.model.IPCDILocator, int, java.lang.String[])
+	 */
 	public void handleSuspendEvent(BitList tasks, IPCDILocator locator, int thread_id, String[] varchanges) {
 		fireEvent(new SuspendEvent(getSession(), tasks, locator, thread_id, varchanges));
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.IAbstractDebugger#handleEndSteppingEvent(org.eclipse.ptp.core.util.BitList, int, java.lang.String, int, java.lang.String[])
+	 */
 	public void handleEndSteppingEvent(BitList tasks, int lineNumber, String filename, int thread_id, String[] varchanges) {
 		LineLocation loc = new LineLocation(filename, lineNumber);
 		fireEvent(new EndSteppingRangeEvent(getSession(), tasks, loc, thread_id, varchanges));
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.IAbstractDebugger#handleProcessSignaledEvent(org.eclipse.ptp.core.util.BitList, org.eclipse.ptp.debug.core.cdi.model.IPCDILocator, int, java.lang.String[])
+	 */
 	public void handleProcessSignaledEvent(BitList tasks, IPCDILocator locator, int thread_id, String[] varchanges) {
 		fireEvent(new InferiorSignaledEvent(getSession(), tasks, locator, thread_id, varchanges));
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.IAbstractDebugger#handleProcessResumedEvent(org.eclipse.ptp.core.util.BitList, int)
+	 */
 	public void handleProcessResumedEvent(BitList tasks, int type) {
 		fireEvent(new InferiorResumedEvent(getSession(), tasks, type));
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.IAbstractDebugger#handleProcessTerminatedEvent(org.eclipse.ptp.core.util.BitList, int)
+	 */
 	public void handleProcessTerminatedEvent(BitList tasks, int exitStatus) {
 		fireEvent(new InferiorExitedEvent(getSession(), tasks, exitStatus));
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.IAbstractDebugger#handleProcessTerminatedEvent(org.eclipse.ptp.core.util.BitList, java.lang.String, java.lang.String)
+	 */
 	public void handleProcessTerminatedEvent(BitList tasks, String signalName, String signalMeaning) {
 		fireEvent(new InferiorExitedEvent(getSession(), tasks, signalName, signalMeaning));
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.IAbstractDebugger#handleErrorEvent(org.eclipse.ptp.core.util.BitList, java.lang.String, int)
+	 */
 	public void handleErrorEvent(BitList tasks, String errMsg, int errCode) {		
 		PDebugUtils.println("----- debugger error: " + errMsg + " on Tasks: " + showBitList(tasks) + " ------------");
 		if (errCode == IPCDIErrorEvent.DBG_IGNORE)
@@ -288,9 +406,14 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		}
 		fireEvent(new ErrorEvent(getSession(), tasks, errMsg, errCode));
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.IAbstractDebugger#getProcess(int)
+	 */
 	public IPProcess getProcess(int number) {
 		return procs[number];
 	}
+	
 	public IPProcess[] getProcesses(BitList tasks) {
 		int[] taskArray = tasks.toArray();
 		IPProcess[] processes = new IPProcess[taskArray.length];
@@ -299,21 +422,26 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		}
 		return processes;
 	}
-	/**
-	 * Check if given tasks are suspened or not
-	 * 
-	 * @param tasks
-	 * @return
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.IAbstractDebugger#isSuspended(org.eclipse.ptp.core.util.BitList)
 	 */
 	public synchronized boolean isSuspended(BitList tasks) {
 		removeTasks(tasks, getSuspendedProc());
 		return tasks.isEmpty();
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.IAbstractDebugger#isTerminated(org.eclipse.ptp.core.util.BitList)
+	 */
 	public synchronized boolean isTerminated(BitList tasks) {
 		removeTasks(tasks, getTerminatedProc());
 		return tasks.isEmpty();
 	}
-	// filter process
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.IAbstractDebugger#filterRunningTasks(org.eclipse.ptp.core.util.BitList)
+	 */
 	public synchronized BitList filterRunningTasks(BitList tasks) {// get suspend tasks
 		removeTasks(tasks, getTerminatedProc());
 		BitList suspendedTasks = getSuspendedProc();
@@ -322,18 +450,31 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 			tasks.and(suspendedTasks);
 		return tasks;
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.IAbstractDebugger#filterSuspendTasks(org.eclipse.ptp.core.util.BitList)
+	 */
 	public synchronized BitList filterSuspendTasks(BitList tasks) {// get running tasks
 		removeTasks(tasks, getTerminatedProc());
 		removeTasks(tasks, getSuspendedProc());
 		return tasks;
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.IAbstractDebugger#filterTerminateTasks(org.eclipse.ptp.core.util.BitList)
+	 */
 	public synchronized BitList filterTerminateTasks(BitList tasks) {// get not terminate tasks
 		removeTasks(tasks, getTerminatedProc());
 		return tasks;
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.IAbstractDebugger#isJobFinished()
+	 */
 	public synchronized boolean isJobFinished() {
 		return (getTerminatedProc().cardinality() == job.size());
 	}
+	
 	// internal functions
 	private synchronized BitList addTasks(BitList curTasks, BitList newTasks) {
 		if (curTasks.size() < newTasks.size()) {
@@ -343,9 +484,11 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		curTasks.or(newTasks);
 		return curTasks;
 	}
+	
 	private synchronized void removeTasks(BitList curTasks, BitList newTasks) {
 		curTasks.andNot(newTasks);
 	}
+	
 	/* debug purpose */
 	public static String showBitList(BitList tasks) {
 		if (tasks == null) {
