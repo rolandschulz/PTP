@@ -19,6 +19,7 @@
 package org.eclipse.ptp.ui;
 
 import org.eclipse.ptp.core.elements.IPElement;
+import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.ui.listeners.IJobChangedListener;
 import org.eclipse.ptp.ui.listeners.ISetListener;
 import org.eclipse.ptp.ui.model.IElement;
@@ -49,7 +50,7 @@ public interface IManager {
 	/** initial elements
 	 * @return first element name
 	 */
-	public IPElement initial();
+	public IPElement initial(IPUniverse universe);
 	/** Get IElementHandler
 	 * @param id element ID
 	 * @return IElementHandler

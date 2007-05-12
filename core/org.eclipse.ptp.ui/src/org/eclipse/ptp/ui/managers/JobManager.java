@@ -18,10 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.managers;
 
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
@@ -32,6 +29,8 @@ import org.eclipse.ptp.core.elements.IPElement;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.IPQueue;
+import org.eclipse.ptp.core.elements.IPUniverse;
+import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
 import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.listeners.IJobChangedListener;
@@ -45,8 +44,10 @@ import org.eclipse.ptp.ui.model.IElementSet;
  * @author Clement chu
  * 
  */
+
 public class JobManager extends AbstractUIManager {
-	protected Map<String, IElementHandler> jobList = new HashMap<String, IElementHandler>();
+	protected Map<String, IElementHandler> jobElementHandlerList = new HashMap<String, IElementHandler>();
+	protected Map<String, IPJob> jobList = new HashMap<String, IPJob>();
 	protected IPJob cur_job = null;
 	protected IPQueue cur_queue = null;
 	protected final String DEFAULT_TITLE = "Please select a queue";
@@ -62,9 +63,10 @@ public class JobManager extends AbstractUIManager {
 			IElementHandler handler;
 			if (!jobList.containsKey(job.getID())) {
 				handler = new ElementHandler();
-				jobList.put(job.getID(), handler);
+				jobList.put(job.getID(), job);
+				jobElementHandlerList.put(job.getID(), handler);
 			} else {
-				handler = jobList.get(job.getID());
+				handler = jobElementHandlerList.get(job.getID());
 			}
 			IElementSet set = handler.getSetRoot();
 			for (IPProcess proc : job.getProcesses()) {
@@ -78,7 +80,7 @@ public class JobManager extends AbstractUIManager {
 	
 	public void addProcess(IPProcess proc) {
 		addJob(proc.getJob());
-		IElementHandler elementHandler = jobList.get(proc.getJob().getID());
+		IElementHandler elementHandler = jobElementHandlerList.get(proc.getJob().getID());
 		IElementSet set = elementHandler.getSetRoot();
 		if (set.getElement(proc.getID()) == null) {
 			set.add(createElement(set, proc.getID(), proc.getProcessNumber()));
@@ -91,8 +93,10 @@ public class JobManager extends AbstractUIManager {
 	public void clear() {
 		if (jobList != null) {
 			jobList.clear();
+			jobElementHandlerList.clear();
 		}
 	}
+	
 	/** Find process
 	 * @param job job
 	 * @param id process ID
@@ -113,34 +117,36 @@ public class JobManager extends AbstractUIManager {
 		return null;
 	}
 	
-	/** Get current job ID
+	/** 
+	 * Get current job ID. This is the job that is currently selected by the view.
+	 * 
 	 * @return current job ID
 	 */
 	public IPJob getJob() {
 		return cur_job;
 	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#getCurrentSetId()
 	 */
 	public String getCurrentSetId() {
 		return cur_set_id;
 	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#getElementHandler(java.lang.String)
 	 */
 	public IElementHandler getElementHandler(String id) {
-		return (IElementHandler) jobList.get(id);
+		return (IElementHandler) jobElementHandlerList.get(id);
 	}
 	
-	/** Get Jobs
+	/** 
+	 * Get Jobs that we know about. This is typically all jobs in the system.
+	 * 
 	 * @return jobs
 	 */
 	public IPJob[] getJobs() {
-		IPQueue queue = getQueue();
-		if (queue != null) {
-			return queue.getSortedJobs();
-		}
-		return new IPJob[0];
+		return jobList.values().toArray(new IPJob[0]);
 	}
 	
 	/* (non-Javadoc)
@@ -172,6 +178,7 @@ public class JobManager extends AbstractUIManager {
 		}
 		return name;
 	}
+	
 	/** Get process status
 	 * @param proc process
 	 * @return status
@@ -195,6 +202,7 @@ public class JobManager extends AbstractUIManager {
 		}
 		return IPTPUIConstants.PROC_ERROR;
 	}	
+	
 	/** Get process status text
 	 * @param proc process
 	 * @return status
@@ -205,12 +213,14 @@ public class JobManager extends AbstractUIManager {
 		}
 		return "Error";
 	}
+	
 	public IPQueue[] getQueues() {
 		if (cur_queue != null) {
 			return cur_queue.getResourceManager().getQueues();
 		}
 		return new IPQueue[] {};
 	}
+	
 	/** Return set id
 	 * @param jid
 	 * @return
@@ -239,6 +249,7 @@ public class JobManager extends AbstractUIManager {
 		}
 		return sets;
 	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#getStatus(java.lang.String)
 	 */
@@ -250,34 +261,22 @@ public class JobManager extends AbstractUIManager {
 		return getProcessStatus(null);
 	}
 	
-	public IPElement initial() {
-		IPJob[] jobs = getJobs();
-		for (int j = 0; j < jobs.length; j++) {
-			addJob(jobs[j]);
-		}
-		
-		IPJob last_job = null;
-		final LinkedList<IPQueue> queues = new LinkedList<IPQueue>(Arrays.asList(getQueues()));
-		final IPQueue curQueue = getQueue();
-		// move the current Queue to the front of the list
-		if (curQueue != null) {
-			queues.remove(curQueue);
-			queues.add(0, curQueue);
-		}
-		// loop until we find a job or run out of queues
-		for (Iterator<IPQueue> qit = queues.iterator(); qit.hasNext() && last_job == null; ) {
-			final IPQueue q = (IPQueue) qit.next();
-			jobs = q.getJobs();
-			if (jobs != null && jobs.length > 0) {
-				// focus on last job
-				final IPJob lastJob = jobs[jobs.length - 1];
-				cur_queue = q;
-				last_job = lastJob;
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.ui.IManager#initial()
+	 */
+	public IPElement initial(IPUniverse universe) {
+		for (IResourceManager rm : universe.getResourceManagers()) {
+			for (IPQueue queue : rm.getQueues()) {
+				for (IPJob job : queue.getJobs()) {
+					addJob(job);
+				}
 			}
 		}
+
 		setCurrentSetId(IElementHandler.SET_ROOT_ID);
-		return last_job;
+		return null;
 	}
+	
 	/** Is current set contain process
 	 * @param jid job ID
 	 * @param processID process ID
@@ -381,12 +380,14 @@ public class JobManager extends AbstractUIManager {
 	protected IElement createElement(IElementSet set, String key, String name) {
 		return new Element(set, key, name);
 	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#isNoJob(java.lang.String)
 	 */
 	public boolean isNoJob(String jid) {
 		return (jid == null || jid.length() == 0);
 	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#isJobStop(java.lang.String)
 	 */
@@ -396,20 +397,14 @@ public class JobManager extends AbstractUIManager {
 		IPJob job = findJobById(job_id);
 		return (job == null || job.isTerminated());
 	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#findJobById(java.lang.String)
 	 */
 	public IPJob findJobById(String job_id) {
-		if (job_id == null) {
-			return null;
-		}
-		
-		IPQueue queue = getQueue();
-		if (queue != null) {
-			return queue.getJobById(job_id);
-		}
-		return null;
+		return jobList.get(job_id);
 	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#removeJob(org.eclipse.ptp.core.IPJob)
 	 */
@@ -425,14 +420,20 @@ public class JobManager extends AbstractUIManager {
 		}
 		fireJobChangedEvent(IJobChangedListener.REMOVED, null, job.getID());
 		jobList.remove(job.getID());
+		jobElementHandlerList.remove(job.getID());
 	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#removeAllStoppedJobs()
 	 */
 	public void removeAllStoppedJobs() {
-		IPQueue queue = getQueue();
-		if (queue != null) {
-			queue.getResourceManager().removeTerminatedJobs(queue);
+		Map<String, IPQueue> queues = new HashMap<String, IPQueue>();
+		for (IPJob job : jobList.values()) {
+			IPQueue queue = job.getQueue();
+			if (!queues.containsKey(queue.getID())) {
+				queue.getResourceManager().removeTerminatedJobs(queue);
+				queues.put(queue.getID(), queue);
+			}
 		}
 	}
 

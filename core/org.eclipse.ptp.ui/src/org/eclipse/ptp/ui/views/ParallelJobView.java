@@ -31,17 +31,29 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.ptp.core.IModelManager;
+import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.IPQueue;
+import org.eclipse.ptp.core.elements.IPUniverse;
+import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.events.IJobChangedProcessEvent;
 import org.eclipse.ptp.core.elements.events.IJobNewProcessEvent;
 import org.eclipse.ptp.core.elements.events.IJobRemoveProcessEvent;
 import org.eclipse.ptp.core.elements.events.IQueueChangedJobEvent;
 import org.eclipse.ptp.core.elements.events.IQueueNewJobEvent;
 import org.eclipse.ptp.core.elements.events.IQueueRemoveJobEvent;
+import org.eclipse.ptp.core.elements.events.IResourceManagerChangedQueueEvent;
+import org.eclipse.ptp.core.elements.events.IResourceManagerNewQueueEvent;
+import org.eclipse.ptp.core.elements.events.IResourceManagerRemoveQueueEvent;
 import org.eclipse.ptp.core.elements.listeners.IJobProcessListener;
 import org.eclipse.ptp.core.elements.listeners.IQueueJobListener;
+import org.eclipse.ptp.core.elements.listeners.IResourceManagerQueueListener;
+import org.eclipse.ptp.core.events.IModelManagerChangedResourceManagerEvent;
+import org.eclipse.ptp.core.events.IModelManagerNewResourceManagerEvent;
+import org.eclipse.ptp.core.events.IModelManagerRemoveResourceManagerEvent;
+import org.eclipse.ptp.core.listeners.IModelManagerResourceManagerListener;
 import org.eclipse.ptp.internal.ui.ParallelImages;
 import org.eclipse.ptp.internal.ui.actions.ChangeQueueAction;
 import org.eclipse.ptp.internal.ui.actions.RemoveAllTerminatedAction;
@@ -72,7 +84,7 @@ import org.eclipse.swt.widgets.TableItem;
  * @author Clement chu
  * 
  */
-public class ParallelJobView extends AbstractParallelSetView implements IQueueJobListener, IJobProcessListener {
+public class ParallelJobView extends AbstractParallelSetView implements IModelManagerResourceManagerListener, IResourceManagerQueueListener, IQueueJobListener, IJobProcessListener {
 	// selected element
 	protected String cur_selected_element_id = IManager.EMPTY_ID;
 	// composite
@@ -95,7 +107,21 @@ public class ParallelJobView extends AbstractParallelSetView implements IQueueJo
 	 */
 	public ParallelJobView(IManager manager) {
 		super(manager);
-		//PTPCorePlugin.getDefault().getModelPresentation().addProcessListener(this);
+		
+		IModelManager mm = PTPCorePlugin.getDefault().getModelManager();
+		
+		/*
+		 * Add us to any existing RM's and queues. I guess it's possible we could
+		 * miss a RM or queue if a new event arrives while we're doing this, but is 
+		 * it a problem?
+		 */
+		for (IResourceManager rm : mm.getUniverse().getResourceManagers()) {
+			for (IPQueue queue : rm.getQueues()) {
+				queue.addChildListener(this);
+			}
+			rm.addChildListener(this);
+		}
+		mm.addListener(this);
 	}
 	
 	public ParallelJobView() {
@@ -103,8 +129,8 @@ public class ParallelJobView extends AbstractParallelSetView implements IQueueJo
 	}
 	
 	public void dispose() {
+		PTPCorePlugin.getDefault().getModelManager().removeListener(this);
 		elementViewComposite.dispose();
-		//PTPCorePlugin.getDefault().getModelPresentation().removeProcessListener(this);		
 		super.dispose();
 	}
 	
@@ -139,7 +165,8 @@ public class ParallelJobView extends AbstractParallelSetView implements IQueueJo
 	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#initialElement()
 	 */
 	protected void initialElement() {
-		changeJobRefresh((IPJob) manager.initial());
+		IPUniverse universe = PTPCorePlugin.getDefault().getUniverse();
+		changeJobRefresh((IPJob) manager.initial(universe));
 	}
 	
 	/* (non-Javadoc)
@@ -464,28 +491,6 @@ public class ParallelJobView extends AbstractParallelSetView implements IQueueJo
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.listeners.IQueueJobListener#handleEvent(org.eclipse.ptp.core.elements.events.IQueueChangedJobEvent)
-	 */
-	public void handleEvent(final IQueueChangedJobEvent e) {
-		refresh(true);
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.listeners.IQueueJobListener#handleEvent(org.eclipse.ptp.core.elements.events.IQueueNewJobEvent)
-	 */
-	public void handleEvent(final IQueueNewJobEvent e) {
-		changeJobRefresh(e.getJob());
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.listeners.IQueueJobListener#handleEvent(org.eclipse.ptp.core.elements.events.IQueueRemoveJobEvent)
-	 */
-	public void handleEvent(final IQueueRemoveJobEvent e) {
-		changeJobRefresh(null);
-		getJobManager().removeJob(e.getJob());
-	}
-	
-	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.listeners.IJobProcessListener#handleEvent(org.eclipse.ptp.core.elements.events.IJobChangedProcessEvent)
 	 */
 	public void handleEvent(final IJobChangedProcessEvent e) {
@@ -513,5 +518,72 @@ public class ParallelJobView extends AbstractParallelSetView implements IQueueJo
 	 */
 	public void handleEvent(final IJobRemoveProcessEvent e) {
 		// Nothing to do
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.listeners.IQueueJobListener#handleEvent(org.eclipse.ptp.core.elements.events.IQueueChangedJobEvent)
+	 */
+	public void handleEvent(final IQueueChangedJobEvent e) {
+		refresh(true);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.listeners.IQueueJobListener#handleEvent(org.eclipse.ptp.core.elements.events.IQueueNewJobEvent)
+	 */
+	public void handleEvent(final IQueueNewJobEvent e) {
+		System.out.println(this + ": new job");
+		changeJobRefresh(e.getJob());
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.listeners.IQueueJobListener#handleEvent(org.eclipse.ptp.core.elements.events.IQueueRemoveJobEvent)
+	 */
+	public void handleEvent(final IQueueRemoveJobEvent e) {
+		changeJobRefresh(null);
+		getJobManager().removeJob(e.getJob());
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerQueueListener#handleEvent(org.eclipse.ptp.core.elements.events.IResourceManagerChangedQueueEvent)
+	 */
+	public void handleEvent(IResourceManagerChangedQueueEvent e) {
+		// Don't need to do anything
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerQueueListener#handleEvent(org.eclipse.ptp.core.elements.events.IResourceManagerNewQueueEvent)
+	 */
+	public void handleEvent(IResourceManagerNewQueueEvent e) {
+		System.out.println(this + ": new queue");
+		e.getQueue().addChildListener(this);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerQueueListener#handleEvent(org.eclipse.ptp.core.elements.events.IResourceManagerRemoveQueueEvent)
+	 */
+	public void handleEvent(IResourceManagerRemoveQueueEvent e) {
+		e.getQueue().removeChildListener(this);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.listeners.IModelManagerResourceManagerListener#handleEvent(org.eclipse.ptp.core.events.IModelManagerChangedResourceManagerEvent)
+	 */
+	public void handleEvent(IModelManagerChangedResourceManagerEvent e) {
+		// Don't need to do anything
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.listeners.IModelManagerResourceManagerListener#handleEvent(org.eclipse.ptp.core.events.IModelManagerNewResourceManagerEvent)
+	 */
+	public void handleEvent(IModelManagerNewResourceManagerEvent e) {
+		System.out.println(this + ": new RM");
+		e.getResourceManager().addChildListener(this);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.listeners.IModelManagerResourceManagerListener#handleEvent(org.eclipse.ptp.core.events.IModelManagerRemoveResourceManagerEvent)
+	 */
+	public void handleEvent(IModelManagerRemoveResourceManagerEvent e) {
+		e.getResourceManager().removeChildListener(this);
 	}
 }

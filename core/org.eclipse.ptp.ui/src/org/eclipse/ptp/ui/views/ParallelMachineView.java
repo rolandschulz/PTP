@@ -22,11 +22,13 @@ import java.util.Map;
 
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.util.SafeRunnable;
+import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPNode;
 import org.eclipse.ptp.core.elements.IPProcess;
+import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.elements.events.IMachineChangedNodeEvent;
 import org.eclipse.ptp.core.elements.events.IMachineNewNodeEvent;
 import org.eclipse.ptp.core.elements.events.IMachineRemoveNodeEvent;
@@ -558,7 +560,8 @@ public class ParallelMachineView extends AbstractParallelSetView implements IRes
 	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#initialElement()
 	 */
 	protected void initialElement() {
-		selectMachine((IPMachine)manager.initial());
+		IPUniverse universe = PTPCorePlugin.getDefault().getUniverse();
+		selectMachine((IPMachine)manager.initial(universe));
 	}	
 	
 	/* (non-Javadoc)
