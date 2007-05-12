@@ -103,8 +103,8 @@ public class ParallelDebugViewEventHandler extends AbstractPDebugEventHandler {
 						IElementHandler elementHandler = getPView().getElementHandler(job.getID());
 						if (elementHandler != null) {
 							for (int j = 0; j < processes.length; j++) {
-								//IPProcess proc = job.findProcessByTaskId(processes[j]);
-								IElement element = elementHandler.getSetRoot().get(String.valueOf(processes[j]));
+								IPProcess proc = job.getProcessByNumber(processes[j]);
+								IElement element = elementHandler.getSetRoot().get(proc.getID());
 								element.setRegistered(false);
 								elementHandler.removeRegisterElement(element);
 							}
