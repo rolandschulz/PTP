@@ -81,8 +81,11 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 	public int getBreakpointId() {
 		return bpt_id++;
 	}
-	public void connection(IProgressMonitor monitor) throws CoreException {
+	public void createConnection(int timeout) {
+	}
+	public boolean waitForConnection(IProgressMonitor monitor) throws CoreException {
 		completeCommand(null, IDebugCommand.RETURN_OK);
+		return true;
 	}
 	public void disconnection(IProgressMonitor monitor) throws CoreException {
 	}
