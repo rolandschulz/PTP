@@ -265,7 +265,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 						}
 					}
 				} catch (IOException e) {
-					if (!interrupted()) {
+					if (!interrupted() && sessionState != SessionState.SHUTTING_DOWN) {
 						error = true;
 						System.out.println("event thread IOException . . . " + e.getMessage());
 					}
