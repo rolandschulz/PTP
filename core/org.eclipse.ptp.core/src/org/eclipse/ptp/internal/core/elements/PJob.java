@@ -111,6 +111,11 @@ public class PJob extends Parent implements IPJobControl, IProcessListener {
 		return numberMap.get(number);
 	}
 
+	
+	public synchronized IPProcess getProcessByNumber(int number) {
+		return numberMap.get(String.valueOf(number));
+	}
+
 	/*
 	 * returns all the processes in this job, which are the children of the job
 	 */

@@ -56,7 +56,7 @@ public interface IPJob extends IPElement {
 	public IPProcess getProcessById(String id);
 
 	/**
-	 * Finds a Process in by its number. Returns the Process
+	 * Finds a Process in by its String number. Returns the Process
 	 * object if found, else returns <code>null</code>.
 	 * 
 	 * @param number
@@ -64,6 +64,16 @@ public interface IPJob extends IPElement {
 	 * @return The Process object if found, else <code>null</code>
 	 */
 	public IPProcess getProcessByNumber(String number);
+	
+	/**
+	 * Finds a Process in by its integer number. Returns the Process
+	 * object if found, else returns <code>null</code>.
+	 * 
+	 * @param number
+	 *            The Process number to search for
+	 * @return The Process object if found, else <code>null</code>
+	 */
+	public IPProcess getProcessByNumber(int number);
 
 	/**
 	 * Returns an array of the Processes comprised by this Job. Might return
