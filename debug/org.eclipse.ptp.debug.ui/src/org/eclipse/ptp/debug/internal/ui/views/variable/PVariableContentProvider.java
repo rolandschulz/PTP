@@ -28,7 +28,7 @@ import org.eclipse.ptp.debug.internal.ui.PJobVariableManager;
 public class PVariableContentProvider implements IStructuredContentProvider {
 	public Object[] getElements(Object inputElement) {
 		if (inputElement instanceof PJobVariableManager) {
-			return ((PJobVariableManager)inputElement).getVariableStorage().getJobValues();
+			return ((PJobVariableManager)inputElement).getVariableStorage().getJobValueCollection().toArray();
 		}
 		return new Object[0];
 	}

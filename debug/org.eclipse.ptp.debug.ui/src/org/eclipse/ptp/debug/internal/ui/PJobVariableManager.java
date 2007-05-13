@@ -19,8 +19,8 @@
 package org.eclipse.ptp.debug.internal.ui;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.core.elements.IPJob;
@@ -56,13 +56,12 @@ public final class PJobVariableManager {
 		}
 		
 		StringBuffer display = new StringBuffer();
-		VariableValue[] values = procVal.getValues(task_id);
-		for (int i=0; i<values.length; i++) {
+		for (VariableValue value : procVal.getValues(task_id)) {
 			display.append("<i>");
-			display.append(values[i].getVar());
+			display.append(value.getVar());
 			display.append("</i>");
 			display.append(" = ");
-			display.append(values[i].getVal());
+			display.append(value.getVal());
 			display.append("<br>");
 		}
 		return display.toString();
@@ -96,25 +95,20 @@ public final class PJobVariableManager {
 		}		
 	}
 	public JobVariable[] getJobVariables(String job_id) {
-		return (JobVariable[])variableStorage.getValues(job_id);
+		return variableStorage.getValueCollection(job_id).toArray(new JobVariable[0]);
 	}
 	public void changeJobVariable(IPJob job, IPJob newJob, String[] sets, String var, String newVar, boolean enable) {
 		removeJobVariable(job.getID(), var);
 		addJobVariable(newJob, newVar, sets, enable);
 	}
 	public void deleteSet(String job_id, String set_id) {
-		List<String> removeVars = new ArrayList<String>();
-		for (Iterator i=variableStorage.getValueIterator(job_id); i.hasNext();) {
-			JobVariable jVar = (JobVariable)i.next();
+		for (JobVariable jVar : getJobVariables(job_id)) {
 			if (jVar.containSet(set_id)) {
 				jVar.removeSet(set_id);
 				if (jVar.getSetSize() == 0) {
-					removeVars.add(jVar.getVar());
+					variableStorage.removeValue(job_id, jVar.getVar());
 				}
 			}
-		}
-		for (Iterator i=removeVars.iterator(); i.hasNext();) {
-			variableStorage.removeValue(job_id, (String)i.next());
 		}
 	}
 	public boolean deleteSet(String job_id, String var, String set_id) {
@@ -138,36 +132,32 @@ public final class PJobVariableManager {
 		variableStorage.removeJobStorage(job_id);
 	}
 	public void cleanupJobVariableValues() {
-		for (Iterator i=varProcStorage.getJobValueIterator(); i.hasNext();) {
-			ProcessValue procVal = (ProcessValue)i.next();
+		for (ProcessValue procVal : varProcStorage.getJobValueCollection().toArray(new ProcessValue[0])) {
 			if (procVal != null) {
-				procVal.cleanAllValues();
+				((ProcessValue)procVal).cleanAllValues();
 			}
 		}
 	}
 	public void cleanupJobVariableValues(String job_id, BitList tasks) {
 		ProcessValue procVal = (ProcessValue)varProcStorage.getValue(job_id, PROCESS_KEY);
 		if (procVal != null) {
-			int[] task_array = tasks.toArray();
-			for (int h=0; h<task_array.length; h++) {
-				procVal.cleanValues(task_array[h]);
+			for (int task_id : tasks.toArray()) {
+				procVal.cleanValues(task_id);
 			}
 		}
 	}
 	public String[] getVariables(String job_id, String set_id, boolean enable) {
 		List<String> vars = new ArrayList<String>();
-		for (Iterator i=variableStorage.getValueIterator(job_id); i.hasNext();) {
-			JobVariable jVar = (JobVariable)i.next();
+		for (JobVariable jVar : getJobVariables(job_id)) {
 			if (jVar.isEnable() == enable && jVar.containSet(set_id)) {
 				vars.add(jVar.getVar());
 			}
 		}
-		return (String[])vars.toArray(new String[0]);
+		return vars.toArray(new String[0]);
 	}
 	public void storeProcessValue(ProcessValue procVal, BitList tasks, String var, String val) {
-		int[] task_array = tasks.toArray();
-		for (int h=0; h<task_array.length; h++) {
-			procVal.addValue(task_array[h], new VariableValue(var, val));
+		for (int task_id : tasks.toArray()) {
+			procVal.addValue(task_id, new VariableValue(var, val));
 		}
 	}
 	public void updateJobVariableValues(String job_id, String set_id, BitList tasks, IProgressMonitor monitor) throws CoreException {
@@ -236,8 +226,8 @@ public final class PJobVariableManager {
 			return enable;
 		}
 		public boolean containSet(String set_id) {
-			for (int i=0; i<sets.length; i++) {
-				if (sets[i].equals(set_id)) {
+			for (String set : sets) {
+				if (set.equals(set_id)) {
 					return true;
 				}
 			}
@@ -328,10 +318,9 @@ public final class PJobVariableManager {
 			setValues(task_id, newValues);
 		}
 		void updateValue(int task_id, VariableValue value) {
-			VariableValue[] values = getValues(task_id);
-			for (int i=0; i<values.length; i++) {
-				if (values[i].getVar().equals(value.getVar())) {
-					values[i].setVal(value.getVal());
+			for (VariableValue v : getValues(task_id)) {
+				if (v.getVar().equals(value.getVar())) {
+					v.setVal(value.getVal());
 				}
 			}
 		}

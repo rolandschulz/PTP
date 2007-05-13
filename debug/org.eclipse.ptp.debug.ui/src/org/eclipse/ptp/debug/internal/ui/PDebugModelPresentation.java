@@ -672,7 +672,7 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		int lineNumber = breakpoint.getLineNumber();
 		if (lineNumber > 0) {
 			label.append(" ");
-			label.append(MessageFormat.format(PDebugUIMessages.getString("PTPDebugModelPresentation.line1"), new String[] { Integer.toString(lineNumber) }));
+			label.append(getFormattedString(PDebugUIMessages.getString("PTPDebugModelPresentation.line1"), new String[] { Integer.toString(lineNumber) }));
 		}
 		return label;
 	}
@@ -746,13 +746,13 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 					String reason = "";
 					if (info != null && info instanceof IPCDISignalExitInfo) {
 						IPCDISignalExitInfo sigInfo = (IPCDISignalExitInfo) info;
-						reason = ' ' + MessageFormat.format(PDebugUIMessages.getString("PTPDebugModelPresentation.target2"), new String[] { sigInfo.getName(), sigInfo.getDescription() });
+						reason = ' ' + getFormattedString(PDebugUIMessages.getString("PTPDebugModelPresentation.target2"), new String[] { sigInfo.getName(), sigInfo.getDescription() });
 					} else if (info != null && info instanceof IPCDIExitInfo) {
-						reason = ' ' + MessageFormat.format(PDebugUIMessages.getString("PTPDebugModelPresentation.target3"), new Integer[] { new Integer(((IPCDIExitInfo) info).getCode()) });
+						reason = ' ' + getFormattedString(PDebugUIMessages.getString("PTPDebugModelPresentation.target3"), new Integer[] { new Integer(((IPCDIExitInfo) info).getCode()) });
 					}
-					return MessageFormat.format(label, new String[] { target.getName(), reason });
+					return getFormattedString(label, new String[] { target.getName(), reason });
 				} else if (state.equals(PDebugElementState.SUSPENDED)) {
-					return MessageFormat.format(PDebugUIMessages.getString("PTPDebugModelPresentation.target4"), new String[] { target.getName() });
+					return getFormattedString(PDebugUIMessages.getString("PTPDebugModelPresentation.target4"), new String[] { target.getName() });
 				}
 			}
 		}
@@ -788,9 +788,9 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 				Object info = element.getCurrentStateInfo();
 				if (info != null && info instanceof IPCDISignalReceived) {
 					IPCDISignal signal = ((IPCDISignalReceived) info).getSignal();
-					reason = MessageFormat.format(PDebugUIMessages.getString("PTPDebugModelPresentation.thread5"), new String[] { signal.getName(), signal.getDescription() });
+					reason = getFormattedString(PDebugUIMessages.getString("PTPDebugModelPresentation.thread5"), new String[] { signal.getName(), signal.getDescription() });
 				} else if (info != null && info instanceof IPCDIWatchpointTrigger) {
-					reason = MessageFormat.format(PDebugUIMessages.getString("PTPDebugModelPresentation.thread6"), new String[] { ((IPCDIWatchpointTrigger) info).getOldValue(), ((IPCDIWatchpointTrigger) info).getNewValue() });
+					reason = getFormattedString(PDebugUIMessages.getString("PTPDebugModelPresentation.thread6"), new String[] { ((IPCDIWatchpointTrigger) info).getOldValue(), ((IPCDIWatchpointTrigger) info).getNewValue() });
 				} else if (info != null && info instanceof IPCDIWatchpointScope) {
 					reason = PDebugUIMessages.getString("PTPDebugModelPresentation.thread7");
 				} else if (info != null && info instanceof IPCDIBreakpointHit) {
@@ -799,9 +799,9 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 					reason = PDebugUIMessages.getString("PTPDebugModelPresentation.thread9");
 				}
 			}
-			return MessageFormat.format(PDebugUIMessages.getString("PTPDebugModelPresentation.thread10"), new String[] { thread.getName(), reason });
+			return getFormattedString(PDebugUIMessages.getString("PTPDebugModelPresentation.thread10"), new String[] { thread.getName(), reason });
 		}
-		return MessageFormat.format(PDebugUIMessages.getString("PTPDebugModelPresentation.thread11"), new String[] { thread.getName() });
+		return getFormattedString(PDebugUIMessages.getString("PTPDebugModelPresentation.thread11"), new String[] { thread.getName() });
 	}
 
 	/**
@@ -873,6 +873,10 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 	 * @return
 	 */
 	public static String getFormattedString(String string, String[] args) {
+		return MessageFormat.format(string, args);
+	}
+
+	public static String getFormattedString(String string, Integer[] args) {
 		return MessageFormat.format(string, args);
 	}
 
