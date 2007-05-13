@@ -363,6 +363,8 @@ public class JobManager extends AbstractUIManager {
 	 * @see org.eclipse.ptp.ui.IManager#hasStoppedJob()
 	 */
 	public boolean hasStoppedJob() {
+		if (getQueue() == null)
+			return false;
 		IPJob[] jobs = getQueue().getJobs();
 		for (IPJob job : jobs) {
 			if (job.isTerminated())
