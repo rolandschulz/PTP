@@ -21,7 +21,6 @@ package org.eclipse.ptp.debug.core;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -36,19 +35,15 @@ public class DebugJobStorage {
 	
 	public DebugJobStorage(String name) {
 		jobMap = new HashMap<String, Storage>();
-		if (containsKey(name)) {
-			this.name = name + "1";
-			addDebugStorage(this.name, this);
+		if (containsKey(name))
 			throw new IllegalArgumentException("Key: " + name + " is already defined.");
-		}
-		else {
-			this.name = name;
-			addDebugStorage(this.name, this);
-		}
+
+		this.name = name;
+		addDebugStorage(this.name, this);
 	}
 	public void closeDebugJobStorage() {
-		for (Iterator i=jobMap.values().iterator(); i.hasNext();) {
-			((Storage)i.next()).clean();
+		for (Storage st : jobMap.values()) {
+			st.clean();
 		}
 		jobMap.clear();
 		removeDebugStorage(name);
@@ -69,32 +64,18 @@ public class DebugJobStorage {
 			}
 		}
 	}
-	public Iterator getJobValueIterator() {
+	public Collection<Object> getJobValueCollection() {
 		synchronized (jobMap) {
 			List<Object> values = new ArrayList<Object>();
-			for (Iterator i=jobMap.values().iterator(); i.hasNext();) {
-				values.addAll(((Storage)i.next()).getValues());
+			for (Storage st : jobMap.values()) {
+				values.addAll(st.getValueCollection());
 			}
-			return values.iterator();
+			return values;
 		}
 	}
-	public Object[] getJobValues() {
+	public Collection<Object> getValueCollection(String job_id) {
 		synchronized (jobMap) {
-			List<Object> values = new ArrayList<Object>();
-			for (Iterator i=jobMap.values().iterator(); i.hasNext();) {
-				values.addAll(((Storage)i.next()).getValues());
-			}
-			return values.toArray(new Object[0]);
-		}
-	}
-	public Object[] getValues(String job_id) {
-		synchronized (jobMap) {
-			return getJobStorage(job_id).getValues().toArray(new Object[0]);
-		}
-	}
-	public Iterator getValueIterator(String job_id) {
-		synchronized (jobMap) {
-			return getJobStorage(job_id).getValueIterator();
+			return getJobStorage(job_id).getValueCollection();
 		}
 	}
 	public Object getValue(String job_id, String key) {
@@ -112,8 +93,10 @@ public class DebugJobStorage {
 			return getJobStorage(job_id).removeStore(key);
 		}
 	}
-	
-	private class Storage {
+	/***********
+	 * Storage *
+	 ***********/
+	class Storage {
 		Map<String, Object> aMap = new HashMap<String, Object>();
 		void clean() {
 			aMap.clear();
@@ -138,19 +121,14 @@ public class DebugJobStorage {
 				return aMap.get(key);
 			}
 		}
-		Collection<Object> getValues() {
+		Collection<Object> getValueCollection() {
 			synchronized (aMap) {
 				return aMap.values();
 			}
 		}
-		Iterator getValueIterator() {
+		String[] getKeys() {
 			synchronized (aMap) {
-				return aMap.values().iterator();
-			}
-		}
-		Iterator getKeyIterator() {
-			synchronized (aMap) {
-				return aMap.keySet().iterator();
+				return (String[])aMap.keySet().toArray(new String[0]);
 			}
 		}
 	}
@@ -172,6 +150,11 @@ public class DebugJobStorage {
 			storages.put(name, storage);
 		}
 	}
+	public static DebugJobStorage[] getDebugStorages() {
+		synchronized (storages) {
+			return (DebugJobStorage[])storages.values().toArray(new DebugJobStorage[0]);
+		}
+	}
 	public static void removeDebugStorage(String name) {
 		synchronized (storages) {
 			DebugJobStorage storage = (DebugJobStorage)storages.remove(name);
@@ -182,11 +165,10 @@ public class DebugJobStorage {
 	}
 	public static void removeDebugStorages() {
 		synchronized (storages) {
-			for (Iterator i=storages.values().iterator(); i.hasNext();) {
-				((DebugJobStorage)i.next()).closeDebugJobStorage();
+			for (DebugJobStorage dStoreage : storages.values()) {
+				dStoreage.closeDebugJobStorage();
 			}
+			storages.clear();
 		}
-		storages.clear();
 	}
 }
-

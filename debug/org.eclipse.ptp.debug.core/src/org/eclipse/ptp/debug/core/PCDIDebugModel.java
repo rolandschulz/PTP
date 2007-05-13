@@ -20,7 +20,6 @@ package org.eclipse.ptp.debug.core;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.cdt.core.IBinaryParser.IBinaryObject;
@@ -65,8 +64,7 @@ public class PCDIDebugModel {
 	private DebugJobStorage sessionStorage = new DebugJobStorage("Session");
 	
 	public void shutdown() {
-		for (Iterator i=sessionStorage.getJobValueIterator(); i.hasNext();) {
-			IPSession pSession = (IPSession)i.next();
+		for (IPSession pSession : sessionStorage.getJobValueCollection().toArray(new IPSession[0])) {
 			if (pSession != null) {
 				IPJob job = pSession.getJob();
 				if(!job.isTerminated()) {
