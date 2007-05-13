@@ -21,7 +21,6 @@ package org.eclipse.ptp.debug.internal.ui;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
@@ -50,7 +49,7 @@ public class AnnotationGroup {
 	/** Remove annotations from the list
 	 * @param removedAnnotations list of annotations
 	 */
-	public void removeAnnotations(Collection removedAnnotations) {
+	public void removeAnnotations(Collection<PInstructionPointerAnnotation2> removedAnnotations) {
 		annotationList.removeAll(removedAnnotations);
 	}
 	/** Remove annotation from the list
@@ -59,6 +58,9 @@ public class AnnotationGroup {
 	public void removeAnnotation(PInstructionPointerAnnotation2 annotation) {
 		if (contains(annotation))
 			annotationList.remove(annotation);
+	}
+	public PInstructionPointerAnnotation2[] getAnnotations() {
+		return annotationList.toArray(new PInstructionPointerAnnotation2[0]);
 	}
 	/** Remove all annotations
 	 * 
@@ -73,12 +75,6 @@ public class AnnotationGroup {
 	public int size() {
 		return annotationList.size();
 	}
-	/** Get iterator of annotations
-	 * @return
-	 */
-	public Iterator getAnnotationIterator() {
-		return annotationList.iterator();
-	}
 	/** Is annotation list empty
 	 * @return true if there is no annotation stored
 	 */
@@ -89,16 +85,15 @@ public class AnnotationGroup {
 	 * 
 	 */
 	public void throwAllAnnotations() {
-		for (Iterator i = annotationList.iterator(); i.hasNext();) {
-			((PInstructionPointerAnnotation2) i.next()).removeAnnotation();
+		for (PInstructionPointerAnnotation2 annotation : getAnnotations()) {
+			annotation.removeAnnotation();
 		}
 	}
 	/** Retrieve all markers
 	 * 
 	 */
 	public void retrieveAllAnnontations() {
-		for (Iterator i = annotationList.iterator(); i.hasNext();) {
-			PInstructionPointerAnnotation2 annotation = (PInstructionPointerAnnotation2) i.next();
+		for (PInstructionPointerAnnotation2 annotation : getAnnotations()) {
 			String type = annotation.getType();
 			if (type.equals(IPTPDebugUIConstants.SET_ANN_INSTR_POINTER_CURRENT))
 				type = IPTPDebugUIConstants.CURSET_ANN_INSTR_POINTER_CURRENT;

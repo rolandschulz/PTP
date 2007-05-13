@@ -47,8 +47,8 @@ public class OverlayImageCache {
 	 * 
 	 */
 	public void disposeAll() {
-		for (Iterator it = getCache().values().iterator(); it.hasNext();) {
-			Image image = (Image)it.next();
+		for (Iterator<Image> it = getCache().values().iterator(); it.hasNext();) {
+			Image image = it.next();
 			image.dispose();
 		}
 		getCache().clear();

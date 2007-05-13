@@ -131,8 +131,8 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 	 */
 	protected void clearAllAnnotations() {
 		synchronized (LOCK) {
-			for (Iterator i = annotationMap.values().iterator(); i.hasNext();) {
-				((AnnotationGroup) i.next()).removeAnnotations();
+			for (Iterator<AnnotationGroup> i = annotationMap.values().iterator(); i.hasNext();) {
+				i.next().removeAnnotations();
 			}
 			annotationMap.clear();
 		}
@@ -237,9 +237,8 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 					}
 				}
 				if (editor[0] == null) {
-					IEditorReference[] refs = page.getEditorReferences();
-					for (int i = 0; i < refs.length; i++) {
-						IEditorPart refEditor = refs[i].getEditor(false);
+					for (IEditorReference refs : page.getEditorReferences()) {
+						IEditorPart refEditor = refs.getEditor(false);
 						if (refEditor == null)
 							continue;
 						IEditorInput editorInput = refEditor.getEditorInput();
@@ -587,12 +586,11 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 	 */
 	protected PInstructionPointerAnnotation2 findAnnotation(AnnotationGroup annotationGroup, Position position, String type) {
 		synchronized (LOCK) {
-			for (Iterator i = annotationGroup.getAnnotationIterator(); i.hasNext();) {
-				PInstructionPointerAnnotation2 annotation = (PInstructionPointerAnnotation2) i.next();
+			for (PInstructionPointerAnnotation2 annotation : annotationGroup.getAnnotations()) {
 				if (annotation.getPosition().length == position.length) {
 					String annotationType = annotation.getType();
 					if (annotationType.equals(type)) {
-						return (PInstructionPointerAnnotation2) annotation;
+						return annotation;
 					}
 				}
 			}
@@ -646,8 +644,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 	protected void removeAnnotation(AnnotationGroup annotationGroup, BitList tasks) throws CoreException {
 		synchronized (LOCK) {
 			List<PInstructionPointerAnnotation2> removedList = new ArrayList<PInstructionPointerAnnotation2>(0);
-			for (Iterator i = annotationGroup.getAnnotationIterator(); i.hasNext();) {
-				PInstructionPointerAnnotation2 annotation = (PInstructionPointerAnnotation2) i.next();
+			for (PInstructionPointerAnnotation2 annotation : annotationGroup.getAnnotations()) {
 				annotation.removeTasks(tasks);
 				if (annotation.isEmpty()) {
 					annotation.removeAnnotation();
@@ -664,32 +661,30 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 	 * @param type
 	 * @return
 	 */
-	public Iterator findAnnotationIterator(AnnotationGroup annotationGroup, String type) {
+	public PInstructionPointerAnnotation2[] findAnnotations(AnnotationGroup annotationGroup, String type) {
 		synchronized (LOCK) {
-			List<PInstructionPointerAnnotation2> annotations = new ArrayList<PInstructionPointerAnnotation2>();
-			for (Iterator i = annotationGroup.getAnnotationIterator(); i.hasNext();) {
-				PInstructionPointerAnnotation2 annotation = (PInstructionPointerAnnotation2) i.next();
+			List<PInstructionPointerAnnotation2> foundAnnotations = new ArrayList<PInstructionPointerAnnotation2>();
+			for (PInstructionPointerAnnotation2 annotation : annotationGroup.getAnnotations()) {
 				if (annotation.getType().equals(type)) {
-					annotations.add(annotation);
+					foundAnnotations.add(annotation);
 				}
 			}
-			return annotations.iterator();
+			return foundAnnotations.toArray(new PInstructionPointerAnnotation2[0]);
 		}
 	}
 	protected PInstructionPointerAnnotation2[] findAnnotations(AnnotationGroup annotationGroup, BitList tasks) {
 		synchronized (LOCK) {
-			List<PInstructionPointerAnnotation2> match = new ArrayList<PInstructionPointerAnnotation2>();
+			List<PInstructionPointerAnnotation2> foundAnnotations = new ArrayList<PInstructionPointerAnnotation2>();
 			if (tasks.isEmpty())
 				return new PInstructionPointerAnnotation2[0];
 
-			for (Iterator i = annotationGroup.getAnnotationIterator(); i.hasNext();) {
-				PInstructionPointerAnnotation2 annotation = (PInstructionPointerAnnotation2) i.next();
+			for (PInstructionPointerAnnotation2 annotation : annotationGroup.getAnnotations()) {
 				if (!annotation.isMarkDeleted() && annotation.contains(tasks)) {
-					if (!match.contains(annotation))
-						match.add(annotation);
+					if (!foundAnnotations.contains(annotation))
+						foundAnnotations.add(annotation);
 				}
 			}
-			return (PInstructionPointerAnnotation2[])match.toArray(new PInstructionPointerAnnotation2[0]);
+			return foundAnnotations.toArray(new PInstructionPointerAnnotation2[0]);
 		}
 	}
 	/* Find other annotation
@@ -700,8 +695,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 	 */
 	protected PInstructionPointerAnnotation2 findOtherTypeAnnotation(AnnotationGroup annotationGroup, Position position, boolean isRegister) {
 		synchronized (LOCK) {
-			for (Iterator i = annotationGroup.getAnnotationIterator(); i.hasNext();) {
-				PInstructionPointerAnnotation2 annotation = (PInstructionPointerAnnotation2) i.next();
+			for (PInstructionPointerAnnotation2 annotation : annotationGroup.getAnnotations()) {
 				if (annotation.getPosition().length == position.length) {
 					String annotationType = annotation.getType();
 					if (isRegister) {
@@ -730,15 +724,14 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 			AnnotationGroup annotationGroup = getAnnotationGroup(job_id);
 			if (annotationGroup != null) {
 				BitList cpTasks = tasks.copy();
-				PInstructionPointerAnnotation2[] annotations = findAnnotations(annotationGroup, cpTasks);
-				for (int i=0; i<annotations.length;i++) {
-					cpTasks.and(annotations[i].getTasks());
+				for (PInstructionPointerAnnotation2 annotation : findAnnotations(annotationGroup, cpTasks)) {
+					cpTasks.and(annotation.getTasks());
 					if (cpTasks.isEmpty())
 						continue;
 					
-					boolean isRegister = isRegisterType(annotations[i].getType());
+					boolean isRegister = isRegisterType(annotation.getType());
 					if (!isRegister)// register annotation
-						updateExistedAnnotation(annotationGroup, annotations[i], cpTasks, isRegister);
+						updateExistedAnnotation(annotationGroup, annotation, cpTasks, isRegister);
 				}
 			}
 		}
@@ -748,15 +741,14 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 			AnnotationGroup annotationGroup = getAnnotationGroup(job_id);
 			if (annotationGroup != null) {
 				BitList cpTasks = tasks.copy();
-				PInstructionPointerAnnotation2[] annotations = findAnnotations(annotationGroup, cpTasks);
-				for (int i=0; i<annotations.length;i++) {
-					cpTasks.and(annotations[i].getTasks());
+				for (PInstructionPointerAnnotation2 annotation : findAnnotations(annotationGroup, cpTasks)) {
+					cpTasks.and(annotation.getTasks());
 					if (cpTasks.isEmpty())
 						continue;
 					
-					boolean isRegister = isRegisterType(annotations[i].getType());
+					boolean isRegister = isRegisterType(annotation.getType());
 					if (isRegister)// register annotation
-						updateExistedAnnotation(annotationGroup, annotations[i], cpTasks, isRegister);
+						updateExistedAnnotation(annotationGroup, annotation, cpTasks, isRegister);
 				}
 			}
 		}
@@ -810,8 +802,7 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 				if (annotationGroup != null) {
 					BitList tasks = PTPDebugCorePlugin.getDebugModel().getTasks(uiDebugManager.getCurrentJobId(), currentSet.getID());
 					synchronized (LOCK) {
-						for (Iterator i = annotationGroup.getAnnotationIterator(); i.hasNext();) {
-							PInstructionPointerAnnotation2 annotation = (PInstructionPointerAnnotation2) i.next();
+						for (PInstructionPointerAnnotation2 annotation : annotationGroup.getAnnotations()) {
 							// change icon for unregistered processes only if the set is changed
 							if (!isRegisterType(annotation.getType())) {
 								// if all the tasks in current is not match the unregistered tasks, display SET_ANN

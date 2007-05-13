@@ -19,6 +19,7 @@
 package org.eclipse.ptp.debug.internal.ui.actions;
 
 import java.util.Iterator;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.model.IBreakpoint;
