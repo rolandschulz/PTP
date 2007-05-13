@@ -19,13 +19,7 @@
 
 package org.eclipse.ptp.ui;
 
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
@@ -36,17 +30,11 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.IJobChangeEvent;
-import org.eclipse.core.runtime.jobs.IJobChangeListener;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.ErrorDialog;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elements.IPElement;
 import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.internal.ui.adapters.PropertyAdapterFactory;
@@ -60,7 +48,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IPerspectiveListener;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -75,13 +62,11 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 	//Resource bundle.
 	private ResourceBundle resourceBundle;
 
-	private final HashMap configurationWizardPageFactories = new HashMap();
+	private final HashMap<String, RMConfigurationWizardPageFactory> configurationWizardPageFactories = new HashMap<String, RMConfigurationWizardPageFactory>();
 	
 	private AbstractUIManager machineManager = null;
 	private AbstractUIManager jobManager = null;
 
-	private List jobList = Collections.synchronizedList(new ArrayList());
-	
 	public PTPUIPlugin() {
 		super();
 		plugin = this;
@@ -109,7 +94,6 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 		jobManager = null;
 		plugin = null;
 		resourceBundle = null;
-		jobList.clear();
 	}
 	
 	public RMConfigurationWizardPageFactory getRMConfigurationWizardPageFactory(IResourceManagerFactory factory) {
@@ -186,13 +170,15 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 		}
 		return null;
 	}
+	/*
     public String getPluginPath() {
         try {
             return Platform.resolve(Platform.getBundle(PLUGIN_ID).getEntry("/")).getPath();
         } catch (IOException e) {
         	return null;
         }
-    }	
+    }
+    */
 	
 	/**
 	 * Returns the active workbench shell or <code>null</code> if none

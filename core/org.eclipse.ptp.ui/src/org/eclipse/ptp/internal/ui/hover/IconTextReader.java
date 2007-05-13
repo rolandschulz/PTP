@@ -38,14 +38,14 @@ import org.eclipse.swt.widgets.Display;
  */
 public class IconTextReader extends SubstitutionTextReader {
 	private static final String EMPTY_STRING= "";
-	private static final Map fgEntityLookup;
-	private static final Set fgTags;
+	private static final Map<String, String> fgEntityLookup;
+	private static final Set<String> fgTags;
 	
 	private Color red_color = Display.getDefault().getSystemColor(SWT.COLOR_RED);
 	private Color green_color = Display.getDefault().getSystemColor(SWT.COLOR_GREEN);
 
 	static {
-		fgTags= new HashSet();
+		fgTags= new HashSet<String>();
 		fgTags.add(IIconHoverTag.UNDERLINE_TAG);
 		fgTags.add(IIconHoverTag.STRIKE_TAG);
 		fgTags.add(IIconHoverTag.BOLD_TAG);
@@ -56,7 +56,7 @@ public class IconTextReader extends SubstitutionTextReader {
 		fgTags.add(IIconHoverTag.NEXT_LINE_TAG);
 		fgTags.add(IIconHoverTag.INDENT_TAG);
 
-		fgEntityLookup= new HashMap(7);
+		fgEntityLookup= new HashMap<String, String>(7);
 		fgEntityLookup.put("lt", "<");
 		fgEntityLookup.put("gt", ">");
 		fgEntityLookup.put("nbsp", " ");

@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.Iterator;
+
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.TextPresentation;
 import org.eclipse.ptp.ui.PTPUIPlugin;
@@ -33,7 +34,7 @@ import org.eclipse.swt.widgets.Display;
  */
 public class IconHoverPresenter implements DefaultInformationControl.IInformationPresenter {
 	private static final String LINE_DELIM = System.getProperty("line.separator", "\n");
-	private static final String LINE_INDENTATION = "  ";
+	//private static final String LINE_INDENTATION = "  ";
 	private int fCounter;
 	private boolean fEnforceUpperLineLimit;
 	/**
@@ -107,6 +108,7 @@ public class IconHoverPresenter implements DefaultInformationControl.IInformatio
 	 * @param line
 	 * @return
 	 */
+	/*
 	private String getIndent(String line) {
 		int length = line.length();
 		int i = 0;
@@ -114,6 +116,7 @@ public class IconHoverPresenter implements DefaultInformationControl.IInformatio
 			++i;
 		return (i == length ? line : line.substring(0, i)) + LINE_INDENTATION;
 	}
+	*/
 	/*
 	 * (non-Javadoc)
 	 * 
