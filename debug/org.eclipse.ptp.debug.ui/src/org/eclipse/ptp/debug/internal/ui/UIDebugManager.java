@@ -18,8 +18,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.ui;
 
-import java.util.Iterator;
-
 import org.eclipse.cdt.debug.core.model.ICLineBreakpoint;
 import org.eclipse.core.resources.IMarkerDelta;
 import org.eclipse.core.runtime.CoreException;
@@ -271,8 +269,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 		}
 	}
 	private void removeConsoleWindows(IPJob job) {
-		for (Iterator i=consoleStorage.getValueIterator(job.getID()); i.hasNext();) {
-			OutputConsole outputConsole = (OutputConsole)i.next();
+		for (OutputConsole outputConsole : consoleStorage.getValueCollection(job.getID()).toArray(new OutputConsole[0])) {
 			if (outputConsole != null) {
 				outputConsole.kill();
 			}
@@ -318,14 +315,14 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 				//return new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null);
 		
 				BitList tasks = session.createEmptyBitList();
-				for (int i = 0; i < elements.length; i++) {
+				for (IElement element : elements) {
 					// only unregister some registered elements
-					if (elements[i].isRegistered()) {
-						IPProcess proc = findProcess(job, elements[i].getID());
+					if (element.isRegistered()) {
+						IPProcess proc = findProcess(job, element.getID());
 						if (proc != null) {
 							removeConsoleWindow(job, proc);
 							try {
-								tasks.set(Integer.parseInt(elements[i].getName()));
+								tasks.set(Integer.parseInt(element.getName()));
 							} catch (NumberFormatException e) {
 								// The element name had better be the process number
 							}
@@ -357,14 +354,14 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 				//return new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null);
 				
 				BitList tasks = session.createEmptyBitList();
-				for (int i = 0; i < elements.length; i++) {
+				for (IElement element : elements) {
 					// only register some unregistered elements
-					if (!elements[i].isRegistered()) {
-						IPProcess proc = findProcess(job, elements[i].getID());
+					if (!element.isRegistered()) {
+						IPProcess proc = findProcess(job, element.getID());
 						if (proc != null && !proc.isTerminated()) {
 							addConsoleWindow(job, proc);
 							try {
-								tasks.set(Integer.parseInt(elements[i].getName()));
+								tasks.set(Integer.parseInt(element.getName()));
 							} catch (NumberFormatException e) {
 								// The element name had better be the process number
 							}
@@ -455,12 +452,12 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 				BitList tasks = session.createEmptyBitList();
 				IElement[] registerElements = elementHandler.getRegisteredElements();
 				monitor.beginTask("Removing registering processes....", registerElements.length);
-				for (int i = 0; i < registerElements.length; i++) {
-					IPProcess proc = findProcess(job, registerElements[i].getID());
+				for (IElement registerElement : registerElements) {
+					IPProcess proc = findProcess(job, registerElement.getID());
 					if (proc != null) {
 						removeConsoleWindow(job, proc);
 						try {
-							tasks.set(Integer.parseInt(registerElements[i].getName()));
+							tasks.set(Integer.parseInt(registerElement.getName()));
 						} catch (NumberFormatException e) {
 							// The element name had better be the process number
 						}
@@ -502,25 +499,25 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 				
 				IElement[] registerElements = elementHandler.getRegisteredElements();
 				monitor.beginTask("Registering process....", registerElements.length);
-				for (int i = 0; i<registerElements.length; i++) {
-					if (curSet.contains(registerElements[i].getID())) {//check whether the current set contains the registered process or not
-						if (curSet.isRootSet() || (preSet != null && !curSet.equals(preSet) && !preSet.contains(registerElements[i].getID()))) {
-							IPProcess proc = findProcess(job, registerElements[i].getID());
+				for (IElement registerElement : registerElements) {
+					if (curSet.contains(registerElement.getID())) {//check whether the current set contains the registered process or not
+						if (curSet.isRootSet() || (preSet != null && !curSet.equals(preSet) && !preSet.contains(registerElement.getID()))) {
+							IPProcess proc = findProcess(job, registerElement.getID());
 							if (proc != null) {
 								addConsoleWindow(job, proc);
 								try {
-									regTasks.set(Integer.parseInt(registerElements[i].getName()));
+									regTasks.set(Integer.parseInt(registerElement.getName()));
 								} catch (NumberFormatException e) {
 									// The element name had better be the process number
 								}
 							}
 						}
 					} else { //if not unregister it
-						IPProcess proc = findProcess(job, registerElements[i].getID());
+						IPProcess proc = findProcess(job, registerElement.getID());
 						if (proc != null) {
 							removeConsoleWindow(job, proc);
 							try {
-								unregTasks.set(Integer.parseInt(registerElements[i].getName()));
+								unregTasks.set(Integer.parseInt(registerElement.getName()));
 							} catch (NumberFormatException e) {
 								// The element name had better be the process number
 							}
@@ -545,8 +542,8 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 		switch (eventType) {
 		case CREATE_SET_TYPE:
 			BitList created_tasks = new BitList(cur_set.getElementHandler().getSetRoot().size());
-			for (int i = 0; i < elements.length; i++) {
-				created_tasks.set(convertToInt(elements[i].getID()));
+			for (IElement element : elements) {
+				created_tasks.set(convertToInt(element.getID()));
 			}
 			debugModel.createSet(getCurrentJobId(), cur_set.getID(), created_tasks);
 			break;
@@ -569,15 +566,15 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 			break;
 		case ADD_ELEMENT_TYPE:
 			BitList added_tasks = new BitList(cur_set.getElementHandler().getSetRoot().size());
-			for (int i = 0; i < elements.length; i++) {
-				added_tasks.set(convertToInt(elements[i].getID()));
+			for (IElement element : elements) {
+				added_tasks.set(convertToInt(element.getID()));
 			}
 			debugModel.addTasks(getCurrentJobId(), cur_set.getID(), added_tasks);
 			break;
 		case REMOVE_ELEMENT_TYPE:
 			BitList removed_tasks = new BitList(cur_set.getElementHandler().getSetRoot().size());
-			for (int i = 0; i < elements.length; i++) {
-				removed_tasks.set(convertToInt(elements[i].getID()));
+			for (IElement element : elements) {
+				removed_tasks.set(convertToInt(element.getID()));
 			}
 			debugModel.removeTasks(getCurrentJobId(), cur_set.getID(), removed_tasks);
 			break;
@@ -813,7 +810,6 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 		}
 		super.removeJob(job);
 	}
-	
 	/**********************************************************
 	 * Variable methods
 	 **********************************************************/
@@ -885,7 +881,6 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 		}
 		return null;
 	}
-	
 	public int getSelectedRegisteredTasks(Object obj) {
 		IDebugTarget target = null;
 		if (obj instanceof IStackFrame) {
@@ -939,5 +934,4 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 			}
 		}
 	}
-
 }
