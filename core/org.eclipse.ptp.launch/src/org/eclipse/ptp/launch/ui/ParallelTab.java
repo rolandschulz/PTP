@@ -323,6 +323,9 @@ public class ParallelTab extends PLaunchConfigurationTab {
 	 */
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
 		final IResourceManager rm = getResourceManagerFromCombo();
+		if (rm == null)
+			return;
+		
 		setResourceManagerInConfiguration(configuration, rm);
 		configuration.setAttribute(IPTPLaunchConfigurationConstants.QUEUE_NAME,
 				getQueueNameFromCombo());
