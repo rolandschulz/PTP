@@ -30,6 +30,10 @@
 #include "dbg_proxy.h"
 #include "backend.h"
 
+#define SVR_RUNNING				0
+#define SVR_SHUTDOWN_STARTED	1
+#define SVR_SHUTDOWN_COMPLETED	2
+
 typedef int (*svr_cmd)(dbg_backend *, int, char **);
 
 static int svr_start_session(dbg_backend *, int, char **);
@@ -105,6 +109,7 @@ static void			(*event_callback)(dbg_event *, void *);
 static void *		event_data;
 static char **		svr_env;
 static int			svr_last_tid;
+static int			svr_state;
 
 static void
 svr_event_callback(dbg_event *e)
@@ -120,6 +125,7 @@ svr_init(dbg_backend *db, void (*cb)(dbg_event *, void *), void *data, char **en
 	event_data = data;
 	svr_env = env;
 	svr_last_tid = 0;
+	svr_state = SVR_RUNNING;
 	return db->db_funcs->init(svr_event_callback);
 }
 
@@ -157,6 +163,7 @@ svr_dispatch(dbg_backend *db, char *cmd_str)
 int
 svr_progress(dbg_backend *db)
 {
+	int			res;
 	dbg_event *	e;
 	
 	if (svr_res != DBGRES_OK) {
@@ -169,7 +176,21 @@ svr_progress(dbg_backend *db)
 		return 0;
 	}
 	
-	return db->db_funcs->progress();
+	db->db_funcs->progress();
+	
+	switch (svr_state) {
+	case SVR_SHUTDOWN_STARTED:
+		svr_state = SVR_SHUTDOWN_COMPLETED;
+		res = 0;
+		
+	case SVR_SHUTDOWN_COMPLETED:
+		res = -1;
+		
+	default:
+		res = 0;
+	}
+	
+	return res;
 }
 
 int 
@@ -440,6 +461,7 @@ svr_clihandle(dbg_backend *db, int nargs, char **args)
 static int 
 svr_quit(dbg_backend *db, int nargs, char **args)
 {
+	svr_state = SVR_SHUTDOWN_STARTED;
 	return db->db_funcs->quit();
 }
 
