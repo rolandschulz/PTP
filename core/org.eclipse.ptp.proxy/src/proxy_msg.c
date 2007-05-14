@@ -171,25 +171,23 @@ proxy_deserialize_msg(char *packet, int packet_len, proxy_msg **msg)
 	num_args = strtol(packet, NULL, 16);
 
 	m = new_proxy_msg(msg_id, trans_id);
+	m->args = (char **)malloc(sizeof(char *) * num_args+1);
 	
-	if (num_args > 0) {
-		m->args = (char **)malloc(sizeof(char *) * num_args+1);
-		packet = end;
-		
-		for (i = 0; i < num_args; i++) {
-			if (proxy_msg_decode_string(packet, &arg, &packet) < 0) {
-				free_proxy_msg(m);
-				return -1;
-			}
-			proxy_msg_add_string(m, arg);
-			packet++; /* skip space */
+	packet = end;
+	
+	for (i = 0; i < num_args; i++) {
+		if (proxy_msg_decode_string(packet, &arg, &packet) < 0) {
+			free_proxy_msg(m);
+			return -1;
 		}
-		
-		/*
-		 * NULL terminate the args
-		 */
-		m->args[num_args] = NULL;
+		proxy_msg_add_string(m, arg);
+		packet++; /* skip space */
 	}
+	
+	/*
+	 * NULL terminate the args
+	 */
+	m->args[num_args] = NULL;
 		
 	*msg = m;
 	
@@ -317,6 +315,9 @@ proxy_msg_add_args(proxy_msg *m, int nargs, char **args)
 {
 	int i;
 	
+	if (nargs == 0)
+		return;
+	
 	check_arg_space(m, nargs);
 	
 	for (i = 0; i < nargs; i++) {
@@ -331,17 +332,18 @@ void
 proxy_msg_add_args_nocopy(proxy_msg *m, int nargs, char **args)
 {
 	int i;
-
-	if (nargs > 0) {
-		check_arg_space(m, nargs);
-		
-		for (i = 0; i < nargs; i++) {
-			m->args[m->num_args + i] = args[i];
-			m->free_args[m->num_args + i] = 0;
-		}
-		
-		m->num_args += nargs;
+	
+	if (nargs == 0)
+		return;
+	
+	check_arg_space(m, nargs);
+	
+	for (i = 0; i < nargs; i++) {
+		m->args[m->num_args + i] = args[i];
+		m->free_args[m->num_args + i] = 0;
 	}
+	
+	m->num_args += nargs;
 }
 
 void
