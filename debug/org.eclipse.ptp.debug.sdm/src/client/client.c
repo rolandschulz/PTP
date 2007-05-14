@@ -62,7 +62,7 @@ server_count(void)
 
 static proxy_svr_helper_funcs helper_funcs = {
 	new_connection,
-	server_count,
+	server_count
 };
 
 static proxy_cmd cmds[] = { 
@@ -97,7 +97,7 @@ static proxy_cmd cmds[] = {
 	/* DBG_CLIHANDLE_CMD */					DbgClntCLIHandle,
 	/* DBG_DATAEVALUATEEXPRESSION_CMD */	DbgClntDataEvaluateExpression,
 	/* DBG_GETPARTIALAIF_CMD */				DbgClntGetPartialAIF,
-	/* DBG_VARIABLEDELETE_CMD */			DbgClntVariableDelete,
+	/* DBG_VARIABLEDELETE_CMD */			DbgClntVariableDelete
 };
 
 static proxy_commands	command_tab = {
