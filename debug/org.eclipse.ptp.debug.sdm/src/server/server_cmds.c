@@ -182,12 +182,15 @@ svr_progress(dbg_backend *db)
 	case SVR_SHUTDOWN_STARTED:
 		svr_state = SVR_SHUTDOWN_COMPLETED;
 		res = 0;
+		break;
 		
 	case SVR_SHUTDOWN_COMPLETED:
 		res = -1;
+		break;
 		
 	default:
 		res = 0;
+		break;
 	}
 	
 	return res;
