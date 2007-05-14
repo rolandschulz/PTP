@@ -331,15 +331,17 @@ void
 proxy_msg_add_args_nocopy(proxy_msg *m, int nargs, char **args)
 {
 	int i;
-	
-	check_arg_space(m, nargs);
-	
-	for (i = 0; i < nargs; i++) {
-		m->args[m->num_args + i] = args[i];
-		m->free_args[m->num_args + i] = 0;
+
+	if (nargs > 0) {
+		check_arg_space(m, nargs);
+		
+		for (i = 0; i < nargs; i++) {
+			m->args[m->num_args + i] = args[i];
+			m->free_args[m->num_args + i] = 0;
+		}
+		
+		m->num_args += nargs;
 	}
-	
-	m->num_args += nargs;
 }
 
 void
