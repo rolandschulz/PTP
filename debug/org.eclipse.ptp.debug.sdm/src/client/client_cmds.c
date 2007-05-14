@@ -77,7 +77,7 @@ dbg_clnt_cmd_completed(bitset *mask, char *msg, void *data)
 	 * must be the server shutting down.
 	 */
 	if (dbg_shutdown == SHUTDOWN_STARTED) {
-		printf("shutdown completed\n"); fflush(stdout);//TODO
+		printf("sdm: shutdown completed\n"); fflush(stdout);//TODO
 		dbg_shutdown = SHUTDOWN_COMPLETED;
 	}
 }
@@ -846,6 +846,7 @@ DbgClntListSignals(int tid, int nargs, char **args)
 	
 	return res;
 }
+
 int 
 DbgClntSignalInfo(int tid, int nargs, char **args)
 {
@@ -910,7 +911,7 @@ DbgClntQuit(int tid, int nargs, char **args)
 	dbg_shutdown = SHUTDOWN_STARTED;
 	
 	msg = new_proxy_msg(DBG_QUIT_CMD, tid);
-	proxy_msg_add_args_nocopy(msg, --nargs, &args[1]);
+	proxy_msg_add_args_nocopy(msg, nargs, args);
 	proxy_serialize_msg(msg, &buf);
 
 	res = ClntSvrSendCommand(dbg_procs, DBG_EV_WAITALL, buf, NULL);
@@ -993,7 +994,8 @@ int
 DbgClntDataEvaluateExpression(int tid, int nargs, char **args)
 {
 	int			res;
-	char *		cmd;
+	char *		buf;
+	proxy_msg *	msg;
 	bitset *	set; 
 
 	set = str_to_bitset(args[0]);
@@ -1002,9 +1004,15 @@ DbgClntDataEvaluateExpression(int tid, int nargs, char **args)
 		return DBGRES_ERR;
 	}
 	
-	asprintf(&cmd, "%s \"%s\"", DBG_DATAEVALUATEEXPRESSION_CMD, args[2]);
-	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, cmd, NULL);
+	msg = new_proxy_msg(DBG_EVALUATEEXPRESSION_CMD, tid);
+	proxy_msg_add_args_nocopy(msg, --nargs, &args[1]);
+	proxy_serialize_msg(msg, &buf);
+
+	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, buf, NULL);
+
 	bitset_free(set);
+	free_proxy_msg(msg);
+	free(buf);
 	
 	return res;
 }
@@ -1012,7 +1020,8 @@ int
 DbgClntGetPartialAIF(int tid, int nargs, char **args)
 {
 	int			res;
-	char *		cmd;
+	char *		buf;
+	proxy_msg *	msg;
 	bitset *	set; 
 
 	set = str_to_bitset(args[0]);
@@ -1021,17 +1030,24 @@ DbgClntGetPartialAIF(int tid, int nargs, char **args)
 		return DBGRES_ERR;
 	}
 	
-	asprintf(&cmd, "%s \"%s\" \"%s\" %s %s", DBG_GETPARTIALAIF_CMD, args[2], args[3], args[4], args[5]);
-	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, cmd, NULL);
+	msg = new_proxy_msg(DBG_GETPARTIALAIF_CMD, tid);
+	proxy_msg_add_args_nocopy(msg, --nargs, &args[1]);
+	proxy_serialize_msg(msg, &buf);
+
+	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, buf, NULL);
+
 	bitset_free(set);
-	
+	free_proxy_msg(msg);
+	free(buf);
+
 	return res;
 }
 int 
 DbgClntVariableDelete(int tid, int nargs, char **args)
 {
 	int			res;
-	char *		cmd;
+	char *		buf;
+	proxy_msg *	msg;
 	bitset *	set; 
 
 	set = str_to_bitset(args[0]);
@@ -1040,9 +1056,15 @@ DbgClntVariableDelete(int tid, int nargs, char **args)
 		return DBGRES_ERR;
 	}
 	
-	asprintf(&cmd, "%s \"%s\"", DBG_VARIABLEDELETE_CMD, args[2]);
-	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, cmd, NULL);
+	msg = new_proxy_msg(DBG_VARIABLEDELETE_CMD, tid);
+	proxy_msg_add_args_nocopy(msg, --nargs, &args[1]);
+	proxy_serialize_msg(msg, &buf);
+
+	res = ClntSvrSendCommand(set, DBG_EV_WAITALL, buf, NULL);
+
 	bitset_free(set);
-	
+	free_proxy_msg(msg);
+	free(buf);
+
 	return res;
 }
