@@ -28,6 +28,13 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.ptp.core.proxy.event.IProxyConnectedEvent;
+import org.eclipse.ptp.core.proxy.event.IProxyDisconnectedEvent;
+import org.eclipse.ptp.core.proxy.event.IProxyErrorEvent;
+import org.eclipse.ptp.core.proxy.event.IProxyEventListener;
+import org.eclipse.ptp.core.proxy.event.IProxyExtendedEvent;
+import org.eclipse.ptp.core.proxy.event.IProxyOKEvent;
+import org.eclipse.ptp.core.proxy.event.IProxyTimeoutEvent;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.external.core.proxy.ProxyDebugClient;
@@ -67,11 +74,11 @@ import org.eclipse.ptp.debug.ui.tests.AbstractDebugTest;
 /**
  * @author clement
  */
-public abstract class AbstractBaseTest extends AbstractDebugTest implements IProxyDebugEventListener {
+public abstract class AbstractBaseTest extends AbstractDebugTest implements IProxyEventListener, IProxyDebugEventListener {
 	protected final String testAppName = "testmpi";
 	protected final String testApp = testAppName + ".c";
-	protected final String workPath = "/home/clement/Desktop/runtime-EclipseApplication/TestMPI/";
-	protected final String execPath = workPath + "/Debug/";
+	protected final String workPath = "/home/clement/Desktop/runtime-EclipseApplication/TestMPI";
+	protected final String execPath = workPath + "/Debug";
 	protected final String DebugHost = "127.0.0.1";
 	protected final String DebugType = "test";
 	//common
@@ -107,6 +114,7 @@ public abstract class AbstractBaseTest extends AbstractDebugTest implements IPro
 		if (debugProxy != null) {
 			System.err.println("-------------- tearDown() is called -----------------");
 			debugProxy.removeProxyDebugEventListener(this);
+			debugProxy.removeProxyEventListener(this);
 			debugProxy.doShutdown();
 		}
 		debugProxy = null;
@@ -173,6 +181,7 @@ public abstract class AbstractBaseTest extends AbstractDebugTest implements IPro
 		
 		debugProxy = new ProxyDebugClient();
 		assertNotNull(debugProxy);
+		debugProxy.addProxyEventListener(this);
 		debugProxy.addProxyDebugEventListener(this);
 		debugProxy.doConnect(10000);
 		port = debugProxy.getSessionPort();
@@ -189,19 +198,14 @@ public abstract class AbstractBaseTest extends AbstractDebugTest implements IPro
 		}
 		System.err.println();
 
-		//debugProxy.debugStartSession(testAppName, execPath, workPath, debugArgs);
 		assertTrue(debugProxy.waitConnect(monitor));
 		debugProxy.sessionHandleEvents();
-		/*
-		System.err.println("++++++ ACTIVIATED A +++++++");
+
+		debugProxy.debugStartSession(testAppName, execPath, execPath, new String[0]);
 		BitList t = createBitList();
 		//wait suspend event
-		System.err.println("++++++ ACTIVIATED B +++++++");
 		waitEvent(t);
-		System.err.println("++++++ ACTIVIATED C +++++++");
 		assertTrue("Debugger is initialized: " + t.isEmpty(), t.isEmpty());
-		System.err.println("++++++ ACTIVIATED D +++++++");
-		*/
 	}
 	/** Create BitList with all processes
 	 * @return
@@ -311,6 +315,28 @@ public abstract class AbstractBaseTest extends AbstractDebugTest implements IPro
 		}
     }
     
+    /**** IProxyEventListener ****/
+	public void handleProxyExtendedEvent(IProxyExtendedEvent e) {
+		System.err.println("IProxyExtendedEvent");
+	}
+	public void handleProxyOKEvent(IProxyOKEvent e) {
+		System.err.println("IProxyOKEvent");
+	}
+	public void handleProxyConnectedEvent(IProxyConnectedEvent e) {
+		System.err.println("IProxyConnectedEvent");
+	}
+	public void handleProxyDisconnectedEvent(IProxyDisconnectedEvent e) {
+		System.err.println("IProxyDisconnectedEvent");
+	}
+	public void handleProxyErrorEvent(IProxyErrorEvent e) {
+		System.err.println("IProxyErrorEvent");
+		
+	}
+	public void handleProxyTimeoutEvent(IProxyTimeoutEvent e) {
+		System.err.println("IProxyTimeoutEvent");
+	}
+    
+    /**** IProxyDebugEventListener ****/
 	public void handleProxyDebugArgsEvent(IProxyDebugArgsEvent e) {
 		System.err.println("IProxyDebugArgsEvent");
 	}

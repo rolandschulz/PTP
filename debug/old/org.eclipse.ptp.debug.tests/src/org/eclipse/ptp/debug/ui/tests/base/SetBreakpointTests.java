@@ -11,7 +11,6 @@
 package org.eclipse.ptp.debug.ui.tests.base;
 
 import java.io.IOException;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
@@ -20,28 +19,19 @@ import org.junit.Test;
 /**
  * @author Clement chu
  */
-public class BreakpointTests extends AbstractBaseTest {
+public class SetBreakpointTests extends AbstractBaseTest {
 	//total process
-	static final int total_process = 2;
+	static final int total_process = 8;
 	
-	/** Constructor 
-	 * @param name
-	 */
-	public BreakpointTests(String name) {
+	public SetBreakpointTests(String name) {
 		super(name, total_process, 0, total_process);
 	}
-	/** Test breakpoint
-	 * @throws CoreException
-	 * @throws IOException
-	 * @throws PCDIException
-	 * @throws InterruptedException
-	 */
 	@Test public void testBreakpoints() throws CoreException, IOException, PCDIException, InterruptedException {
 		BitList t;
 		int bpid = 0;
 		/** Function breakpoint **/
 		//Create a break point on a generic function
-		t = createBitList();
+		t = createBitList(3, total_process);
 		debugProxy.debugSetFuncBreakpoint(t, ++bpid, false, false, testApp, "func1", "", 0, 0);
 		waitEvent(t);
 		assertTrue("Command completed: " + t.isEmpty(), t.isEmpty());
