@@ -25,6 +25,8 @@
 
 #include "proxy_msg.h"
 #include "proxy_cmd.h"
+#include "proxy_event.h"
+#include "proxy_attr.h"
 
 #define PROXY_RES_OK		0
 #define PROXY_RES_ERR		-1
