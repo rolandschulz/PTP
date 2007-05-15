@@ -70,14 +70,6 @@ public class StartResourceManagersObjectActionDelegate implements
 			IResourceManagerMenuContribution menuContrib = menuContribs[i];
 			final IResourceManager rmManager = (IResourceManager) menuContrib.getAdapter(IResourceManager.class);
 
-			if (rmManager.getState().equals(ResourceManagerAttributes.State.STARTED)) {
-				MessageDialog.openInformation(targetShell,
-						"Resource Manager Already Started", "Resource Manager \""
-						+ rmManager.getName()
-						+ "\" Already Started");
-				return;
-			}
-			
 			new Job("Starting Resource Manager"){
 
 				protected IStatus run(IProgressMonitor monitor) {

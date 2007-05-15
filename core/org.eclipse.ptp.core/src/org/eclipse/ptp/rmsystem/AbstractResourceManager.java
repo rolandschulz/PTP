@@ -346,25 +346,24 @@ IResourceManagerControl {
 	 */
 	public void shutdown() throws CoreException {
 		IProgressMonitor monitor = null;
-        if (monitor == null) {
-            monitor = new NullProgressMonitor();
-        }
-		monitor.beginTask("Stopping Resource Manager " + getName(), 10);
-        ResourceManagerAttributes.State state = getState();
-		if (!state.equals(ResourceManagerAttributes.State.STOPPED)) {
+		switch (getState()) {
+		case ERROR:
+			setState(ResourceManagerAttributes.State.STOPPED);
+			break;
+		case STARTED:
+			setState(ResourceManagerAttributes.State.STOPPING);
+	        if (monitor == null) {
+	            monitor = new NullProgressMonitor();
+	        }
+			monitor.beginTask("Stopping Resource Manager " + getName(), 10);
 			SubProgressMonitor subMonitor = new SubProgressMonitor(monitor, 10);
 			try {
 				doShutdown(subMonitor);
-				if (!subMonitor.isCanceled()) {
-					setState(ResourceManagerAttributes.State.STOPPED);
-				}
 			}
 			finally {
 				monitor.done();
+				setState(ResourceManagerAttributes.State.STOPPED);
 			}
-		}
-		else {
-			monitor.done();
 		}
 	}
 	
@@ -374,27 +373,27 @@ IResourceManagerControl {
 	 * @see org.eclipse.ptp.rm.IResourceManager#start()
 	 */
 	public void startUp(IProgressMonitor monitor) throws CoreException {
-        if (monitor == null) {
-            monitor = new NullProgressMonitor();
-        }
-		monitor.beginTask("Starting Resource Manager " + getName(), 10);
-        ResourceManagerAttributes.State state = getState();
-		if (!state.equals(ResourceManagerAttributes.State.STARTED) &&
-				!state.equals(ResourceManagerAttributes.State.ERROR)) {
+        if (getState() == ResourceManagerAttributes.State.STOPPED) {
+        	setState(ResourceManagerAttributes.State.STARTING);
+            if (monitor == null) {
+                monitor = new NullProgressMonitor();
+            }
+    		monitor.beginTask("Starting Resource Manager " + getName(), 10);
 			SubProgressMonitor subMonitor = new SubProgressMonitor(monitor, 10);
 			try {
-				doStartup(subMonitor);
-				if (!subMonitor.isCanceled()) {
-					setState(ResourceManagerAttributes.State.STARTED);
+				boolean started = doStartup(subMonitor);
+				if (started) {
+					setState(ResourceManagerAttributes.State.STARTED);					
+				} else if (!subMonitor.isCanceled()) {
+					setState(ResourceManagerAttributes.State.ERROR);					
+				} else {
+		        	setState(ResourceManagerAttributes.State.STOPPED);					
 				}
 			}
 			finally {
 				monitor.done();
 			}
-		}
-		else {
-			monitor.done();
-		}
+        }
 	}
 	
 	public IPJob submitJob(AttributeManager attrMgr, IProgressMonitor monitor) throws CoreException {
@@ -480,10 +479,14 @@ IResourceManagerControl {
 	protected abstract void doShutdown(IProgressMonitor monitor) throws CoreException;
 
 	/**
+	 * Start the resource manager subsystem. Returns true if the system was started successfully
+	 * or false if not. An error can be distinguished from user canceled by checking the monitor state.
+	 * 
 	 * @param monitor
+	 * @return true if successful
 	 * @throws CoreException
 	 */
-	protected abstract void doStartup(IProgressMonitor monitor) throws CoreException;
+	protected abstract boolean doStartup(IProgressMonitor monitor) throws CoreException;
 
 	/**
 	 * @param attrMgr

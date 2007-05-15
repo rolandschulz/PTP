@@ -70,13 +70,25 @@ public class StopResourceManagersObjectActionDelegate implements
 			IResourceManagerMenuContribution menuContrib = menuContribs[i];
 			IResourceManager rmManager = (IResourceManager) menuContrib.getAdapter(IResourceManager.class);
 
-			if (!rmManager.getState().equals(ResourceManagerAttributes.State.STARTED)) {
-				MessageDialog.openInformation(targetShell,
-						UIMessage.getResourceString("StopResourceManagersObjectActionDelegate.ResourceManagerNotAlreadyStarted"), //$NON-NLS-1$
-						UIMessage.getResourceString("StopResourceManagersObjectActionDelegate.ResourceManager") //$NON-NLS-1$
-								+ rmManager.getName()
-								+ UIMessage.getResourceString("StopResourceManagersObjectActionDelegate.NotAlreadyStarted")); //$NON-NLS-1$
+			ResourceManagerAttributes.State state = rmManager.getState();
+			
+			if (state != ResourceManagerAttributes.State.STARTED &&
+					state != ResourceManagerAttributes.State.ERROR) {
 				return;
+			}
+			
+			/*
+			 * Only ask if we are really shutting down the RM
+			 */
+			if (state == ResourceManagerAttributes.State.STARTED) {
+				boolean shutdown = MessageDialog.openConfirm(targetShell,
+						UIMessage.getResourceString("StopResourceManagersObjectActionDelegate.Title"), //$NON-NLS-1$
+						UIMessage.getResourceString("StopResourceManagersObjectActionDelegate.Confirm") //$NON-NLS-1$
+						+ rmManager.getName()
+						+ UIMessage.getResourceString("StopResourceManagersObjectActionDelegate.ResourceManager")); //$NON-NLS-1$
+				if (!shutdown) {
+					return;
+				}
 			}
 
 			try {
