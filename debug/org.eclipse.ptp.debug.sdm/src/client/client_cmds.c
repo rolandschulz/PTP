@@ -37,11 +37,11 @@
 #include "handler.h"
 #include "list.h"
 
-#define SHUTDOWN_CANCELLED	0
+#define RUNNING				0
 #define SHUTDOWN_STARTED	1
 #define SHUTDOWN_COMPLETED	2
 
-static int				dbg_shutdown;
+static int				dbg_state;
 static bitset *			dbg_procs = NULL;
 static proxy_svr *		dbg_proxy;
 /*
@@ -71,15 +71,6 @@ dbg_clnt_cmd_completed(bitset *mask, char *msg, void *data)
 		proxy_msg_insert_bitset(m, mask, 0);
  		proxy_svr_queue_msg(dbg_proxy, m);
 	}
-	
-	/*
-	 * The next event received after a quit command
-	 * must be the server shutting down.
-	 */
-	if (dbg_shutdown == SHUTDOWN_STARTED) {
-		printf("sdm: shutdown completed\n"); fflush(stdout);//TODO
-		dbg_shutdown = SHUTDOWN_COMPLETED;
-	}
 }
 
 int
@@ -104,9 +95,9 @@ DbgClntInit(int num_svrs, int my_id, char *name, proxy_svr_helper_funcs *funcs, 
 	bitset_invert(dbg_procs);
 	
 	/*
-	 * Reset shutdown flag
+	 * Reset state
 	 */
-	dbg_shutdown = SHUTDOWN_CANCELLED;
+	dbg_state = RUNNING;
 	
 	/*
 	 * Initialize proxy
@@ -146,7 +137,18 @@ DbgClntFinish(void)
 int
 DbgClntIsShutdown(void)
 {
-	return dbg_shutdown == SHUTDOWN_COMPLETED;
+	
+	/*
+	 * The next event received after a quit command
+	 * must be the server shutting down.
+	 */
+	if (dbg_state == SHUTDOWN_STARTED) {
+		printf("sdm: shutdown completed\n"); fflush(stdout);//TODO
+		dbg_state = SHUTDOWN_COMPLETED;
+		return 0;
+	}
+
+	return (dbg_state == SHUTDOWN_COMPLETED) ? 1 : 0;
 }
 
 int 
@@ -908,7 +910,7 @@ DbgClntQuit(int tid, int nargs, char **args)
 	char *		buf;
 	proxy_msg *	msg;
 	
-	dbg_shutdown = SHUTDOWN_STARTED;
+	dbg_state = SHUTDOWN_STARTED;
 	
 	msg = new_proxy_msg(DBG_QUIT_CMD, tid);
 	proxy_msg_add_args_nocopy(msg, nargs, args);

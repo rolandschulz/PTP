@@ -49,6 +49,7 @@ extern int	svr_init(dbg_backend *, void (*)(dbg_event *, void *), void *, char *
 extern int	svr_dispatch(dbg_backend *, char *);
 extern int	svr_progress(dbg_backend *);
 extern int	svr_interrupt(dbg_backend *);
+extern int	svr_isshutdown(void);
 
 static void
 event_callback(dbg_event *e, void *data)
@@ -140,11 +141,9 @@ server(int nprocs, int my_id, int job_id, dbg_backend *dbgr)
 	
 	svr_init(dbgr, event_callback, NULL, env);
 	
-	for (;;) {
+	while (!svr_isshutdown()) {
 		ClntSvrProgressCmds();
-		
-		if (svr_progress(dbgr) < 0)
-			break;
+		svr_progress(dbgr);
 	}
 	
 	ClntSvrFinish();
