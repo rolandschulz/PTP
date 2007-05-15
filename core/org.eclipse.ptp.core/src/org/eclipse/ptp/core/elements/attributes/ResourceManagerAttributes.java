@@ -10,7 +10,9 @@ import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 public class ResourceManagerAttributes {
 	public enum State {
 		ERROR,
+		STARTING,
 		STARTED,
+		STOPPING,
 		STOPPED,
 	    SUSPENDED
 	}

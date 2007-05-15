@@ -63,9 +63,10 @@ public abstract class AbstractRuntimeResourceManager extends
 		AbstractResourceManager implements IRuntimeEventListener {
 
 	private IRuntimeSystem runtimeSystem;
-	private final ReentrantLock startupLock = new ReentrantLock();
-	private final Condition startupCondition = startupLock.newCondition();
-	private boolean started;
+	private final ReentrantLock stateLock = new ReentrantLock();
+	private final Condition stateCondition = stateLock.newCondition();
+	private RMState state;
+	private enum RMState {STARTING, STARTED, STOPPING, STOPPED, ERROR};
 	private final ReentrantLock jobSubmissionLock = new ReentrantLock();
 	private final Condition jobSubmissionCondition = jobSubmissionLock.newCondition();
 	private IPJob newJob;
@@ -76,7 +77,7 @@ public abstract class AbstractRuntimeResourceManager extends
 	public AbstractRuntimeResourceManager(String id, IPUniverseControl universe,
 			IResourceManagerConfiguration config) {
 		super(id, universe, config);
-		// nothing to do here
+		state = RMState.STOPPED;
 	}
 
 	/* (non-Javadoc)
@@ -114,7 +115,16 @@ public abstract class AbstractRuntimeResourceManager extends
 		} finally {
 			jobSubmissionLock.unlock();
 		}
-		//setState(ResourceManagerAttributes.State.ERROR, e.getMessage());
+		stateLock.lock();
+		try {
+			if (state == RMState.STARTING) {
+				state = RMState.ERROR;
+				stateCondition.signal();
+			}
+		} finally {
+			stateLock.unlock();
+		}
+	//setState(ResourceManagerAttributes.State.ERROR, e.getMessage());
 		fireError(e.getMessage());
 	}
 	
@@ -191,8 +201,10 @@ public abstract class AbstractRuntimeResourceManager extends
 						IntegerAttribute jobSubAttr = (IntegerAttribute) job.getAttribute(JobAttributes.getSubIdAttributeDefinition());
 						if (jobSubAttr.getValue() == jobSubId) {
 							newJob = job;
-							jobSubCompleted = true;
-							jobSubmissionCondition.signal();
+							if (!jobSubCompleted) {
+								jobSubCompleted = true;
+								jobSubmissionCondition.signal();
+							}
 						}
 					} finally {
 						jobSubmissionLock.unlock();
@@ -364,16 +376,18 @@ public abstract class AbstractRuntimeResourceManager extends
 	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleRuntimeRunningStateEvent(org.eclipse.ptp.rtsystem.events.IRuntimeRunningStateEvent)
 	 */
 	public void handleRuntimeRunningStateEvent(IRuntimeRunningStateEvent e) {
-		startupLock.lock();
+		stateLock.lock();
         CoreException exc = null;
 		try {
-            runtimeSystem.startEvents();
-			started = true;
-			startupCondition.signal();
+            if (state == RMState.STARTING) {
+            	runtimeSystem.startEvents();
+            	state = RMState.STARTED;
+				stateCondition.signal();
+            }
 		} catch (CoreException ex) {
             exc = ex;
         } finally {
-			startupLock.unlock();
+        	stateLock.unlock();
 		}
         if (exc != null) {
             fireError(exc.getMessage());
@@ -384,30 +398,40 @@ public abstract class AbstractRuntimeResourceManager extends
 	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleRuntimeShutdownStateEvent(org.eclipse.ptp.rtsystem.events.IRuntimeShutdownStateEvent)
 	 */
 	public void handleRuntimeShutdownStateEvent(IRuntimeShutdownStateEvent e) {
-		startupLock.lock();
+		stateLock.lock();
 		try {
-			started = false;
-			startupCondition.signal();
+			if (state == RMState.STOPPING) {
+				state = RMState.STOPPED;
+				stateCondition.signal();
+			}
 		} finally {
-			startupLock.unlock();
+			stateLock.unlock();
 		}
 	}
 
 	/**
-	 * close the connection.
+	 * Close the RTS connection.
 	 */
 	private void closeConnection() {
 		runtimeSystem.shutdown();
 	}
 
 	/**
-	 * @param system
+	 * Open the RTS connection.
+	 * 
 	 * @throws CoreException 
 	 */
 	private void openConnection() throws CoreException {
 		runtimeSystem.startup();
 	}
 
+	/**
+	 * Abort the RTS connection.
+	 */
+	private void abortConnection() {
+		runtimeSystem.shutdown();
+	}
+	
 	/**
 	 * 
 	 */
@@ -524,24 +548,21 @@ public abstract class AbstractRuntimeResourceManager extends
 		if (monitor == null) {
 			monitor = new NullProgressMonitor();
 		}
-		startupLock.lock();
+		stateLock.lock();
 		try {
 			doBeforeCloseConnection();
 			closeConnection();
-			while (!monitor.isCanceled() && started) {
+			state = RMState.STOPPING;
+			while (state != RMState.STOPPED && state != RMState.ERROR) {
 				try {
-					startupCondition.await(500, TimeUnit.MILLISECONDS);
+					stateCondition.await(500, TimeUnit.MILLISECONDS);
 				} catch (InterruptedException e) {
-					// Expect to be interrupted if monitor is cancelled
 				}
-			}
-			if (monitor.isCanceled()) {
-				return;
 			}
 			doAfterCloseConnection();
 		}
 		finally {
-			startupLock.unlock();
+			stateLock.unlock();
 			runtimeSystem.removeRuntimeEventListener(this);
 			monitor.done();
 		}
@@ -550,33 +571,39 @@ public abstract class AbstractRuntimeResourceManager extends
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManager#doStartup(org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	protected void doStartup(IProgressMonitor monitor) throws CoreException {
+	protected boolean doStartup(IProgressMonitor monitor) throws CoreException {
 		if (monitor == null) {
 			monitor = new NullProgressMonitor();
 		}
-		startupLock.lock();
+		stateLock.lock();
 		try {
 			doBeforeOpenConnection();
 			runtimeSystem = doCreateRuntimeSystem();
 			runtimeSystem.addRuntimeEventListener(this);
 			openConnection();
-			while (!monitor.isCanceled() && !started) {
+			state = RMState.STARTING;
+			while (!monitor.isCanceled() && state != RMState.STARTED && state != RMState.ERROR) {
 				try {
-					startupCondition.await(500, TimeUnit.MILLISECONDS);
+					stateCondition.await(500, TimeUnit.MILLISECONDS);
 				} catch (InterruptedException e) {
-					// Expect to be interrupted if monitor is cancelled
+					// Expect to be interrupted if monitor is canceled
 				}
 			}
+			if (state == RMState.ERROR) {
+				return false;
+			}
 			if (monitor.isCanceled()) {
-				//abortConnection(runtimeSystem);
-				return;
+				state = RMState.STOPPED;
+				abortConnection();
+				return false;
 			}
 			doAfterOpenConnection();
 		}
 		finally {
-			startupLock.unlock();
+			stateLock.unlock();
 			monitor.done();
 		}
+		return true;
 	}
 	
 	//
