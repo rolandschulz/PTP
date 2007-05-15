@@ -1837,7 +1837,7 @@ ORTE_SubmitJob(int trans_id, int nargs, char **args)
 	int						rc;
 	int						i;
 	int						a;
-	int						num_procs = 0;
+	int						num_procs = 1;
 	int						debug = false;
 	int						num_args = 0;
 	int						num_env = 0;
