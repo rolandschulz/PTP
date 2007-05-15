@@ -119,6 +119,17 @@ svr_event_callback(dbg_event *e)
 }
 
 int
+svr_isshutdown(void)
+{
+	if (svr_state == SVR_SHUTDOWN_STARTED) {
+		svr_state = SVR_SHUTDOWN_COMPLETED;
+		return 0;
+	}
+	
+	return (svr_state == SVR_SHUTDOWN_COMPLETED) ? 1 : 0;
+}
+
+int
 svr_init(dbg_backend *db, void (*cb)(dbg_event *, void *), void *data, char **env)
 {
 	event_callback = cb;
@@ -178,22 +189,7 @@ svr_progress(dbg_backend *db)
 	
 	db->db_funcs->progress();
 	
-	switch (svr_state) {
-	case SVR_SHUTDOWN_STARTED:
-		svr_state = SVR_SHUTDOWN_COMPLETED;
-		res = 0;
-		break;
-		
-	case SVR_SHUTDOWN_COMPLETED:
-		res = -1;
-		break;
-		
-	default:
-		res = 0;
-		break;
-	}
-	
-	return res;
+	return 0;
 }
 
 int 
