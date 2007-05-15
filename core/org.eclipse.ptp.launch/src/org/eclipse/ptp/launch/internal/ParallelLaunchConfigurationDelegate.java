@@ -150,7 +150,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			monitor.worked(10);
 			monitor.subTask("Starting the job . . .");
 			job = rm.submitJob(attrManager, new SubProgressMonitor(monitor, 150));
-			if (job == null || job.size() == 0) {
+			if (job == null) {
 				abort("Job submission failed", null, 0);
 			}
 			launch.setAttribute(ElementAttributes.getIdAttributeDefinition().getId(), job.getID());
