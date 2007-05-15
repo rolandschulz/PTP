@@ -27,7 +27,6 @@ import org.eclipse.ptp.core.elements.listeners.IJobListener;
 import org.eclipse.ptp.core.elements.listeners.IQueueJobListener;
 import org.eclipse.ptp.core.elements.listeners.IResourceManagerQueueListener;
 import org.eclipse.ptp.internal.core.elements.PUniverse;
-import org.eclipse.ptp.orte.core.ORTEAttributes;
 import org.eclipse.ptp.orte.core.rmsystem.ORTEResourceManager;
 import org.eclipse.ptp.orte.core.rmsystem.ORTEResourceManagerConfiguration;
 import org.eclipse.ptp.orte.core.rmsystem.ORTEResourceManagerFactory;
@@ -124,7 +123,7 @@ public class ORTEResourceManagerTest implements IResourceManagerQueueListener, I
 						attrMgr.addAttribute(JobAttributes.getExecutablePathAttributeDefinition().create(path));
 					}
 					
-					attrMgr.addAttribute(ORTEAttributes.getNumberOfProcessesAttributeDefinition().create(nProcs));
+					attrMgr.addAttribute(JobAttributes.getNumberOfProcessesAttributeDefinition().create(nProcs));
 							
 					String wd = jobRunConfig.getWorkingDir();
 					if (wd != null) {

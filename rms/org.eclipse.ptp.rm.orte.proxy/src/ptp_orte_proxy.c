@@ -93,7 +93,6 @@
 /*
  * ORTE attributes
  */
-#define ORTE_NUM_PROCS_ATTR			"jobNumProcs"
 #define ORTE_JOB_NAME_FMT			"job%d"
 
 int ORTE_Initialize(int, int, char **);
@@ -1879,8 +1878,8 @@ ORTE_SubmitJob(int trans_id, int nargs, char **args)
 			pgm_name = args[i]+strlen(JOB_EXEC_NAME_ATTR)+1;
 		} else if (strncmp(args[i], JOB_EXEC_PATH_ATTR, strlen(JOB_EXEC_PATH_ATTR)) == 0) {
 			exec_path = args[i]+strlen(JOB_EXEC_PATH_ATTR)+1;
-		} else if (strncmp(args[i], ORTE_NUM_PROCS_ATTR, strlen(ORTE_NUM_PROCS_ATTR)) == 0) {
-			num_procs = (int)strtol(args[i]+strlen(ORTE_NUM_PROCS_ATTR)+1, NULL, 10);
+		} else if (strncmp(args[i], JOB_NUM_PROCS_ATTR, strlen(JOB_NUM_PROCS_ATTR)) == 0) {
+			num_procs = (int)strtol(args[i]+strlen(JOB_NUM_PROCS_ATTR)+1, NULL, 10);
 		} else if (strncmp(args[i], JOB_WORKING_DIR_ATTR, strlen(JOB_WORKING_DIR_ATTR)) == 0) {
 			cwd = args[i]+strlen(JOB_WORKING_DIR_ATTR)+1;
 		} else if (strncmp(args[i], JOB_PROG_ARGS_ATTR, strlen(JOB_PROG_ARGS_ATTR)) == 0) {

@@ -23,7 +23,6 @@ import org.eclipse.ptp.core.elements.attributes.QueueAttributes;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes.State;
 import org.eclipse.ptp.core.util.RangeSet;
-import org.eclipse.ptp.orte.core.ORTEAttributes;
 import org.eclipse.ptp.orte.core.rtsystem.ORTEProxyRuntimeClient;
 import org.eclipse.ptp.orte.core.rtsystem.ORTERuntimeSystem;
 import org.eclipse.ptp.rtsystem.IRuntimeEventListener;
@@ -178,7 +177,7 @@ public class ORTERuntimeSystemTest implements IRuntimeEventListener {
 						attrMgr.addAttribute(JobAttributes.getExecutablePathAttributeDefinition().create(path));
 					}
 					
-					attrMgr.addAttribute(ORTEAttributes.getNumberOfProcessesAttributeDefinition().create(nProcs));
+					attrMgr.addAttribute(JobAttributes.getNumberOfProcessesAttributeDefinition().create(nProcs));
 							
 					String wd = jobRunConfig.getWorkingDir();
 					if (wd != null) {

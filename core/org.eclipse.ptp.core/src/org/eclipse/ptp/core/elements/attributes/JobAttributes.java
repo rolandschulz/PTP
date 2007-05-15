@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2007 IBM Corporation and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ * IBM Corporation - Initial API and implementation
+ *******************************************************************************/
 package org.eclipse.ptp.core.elements.attributes;
 
 import org.eclipse.ptp.core.attributes.ArrayAttributeDefinition;
@@ -21,6 +31,7 @@ public class JobAttributes {
 	
 	private static final String STATE_ATTR_ID = "jobState";
 	private static final String SUBID_ATTR_ID = "jobSubId";
+	private static final String NUM_PROCS_ATTR_ID = "jobNumProcs";
 	private static final String EXEC_NAME_ATTR_ID = "execName";
 	private static final String EXEC_PATH_ATTR_ID = "execPath";
 	private static final String WORKING_DIR_ATTR_ID = "workingDir";
@@ -38,6 +49,9 @@ public class JobAttributes {
 	private final static IntegerAttributeDefinition subIdAttrDef = 
 		new IntegerAttributeDefinition(SUBID_ATTR_ID, "Job Submission ID",
 				"Temporary ID used for job submission", 0);
+
+	private final static IntegerAttributeDefinition numProcsAttrDef = 
+		new IntegerAttributeDefinition(NUM_PROCS_ATTR_ID, "Number of Processes", "Number of processes to launch", 0);
 
 	private final static StringAttributeDefinition execNameAttrDef = 
 		new StringAttributeDefinition(EXEC_NAME_ATTR_ID, "Executable Name",
@@ -83,6 +97,10 @@ public class JobAttributes {
 		return subIdAttrDef;
 	}
 
+	public static IntegerAttributeDefinition getNumberOfProcessesAttributeDefinition() {
+		return numProcsAttrDef;
+	}
+
 	public static StringAttributeDefinition getExecutableNameAttributeDefinition() {
 		return execNameAttrDef;
 	}
@@ -123,6 +141,7 @@ public class JobAttributes {
 		return new IAttributeDefinition[]{
 					stateAttrDef, 
 					subIdAttrDef, 
+					numProcsAttrDef,
 					execNameAttrDef, 
 					execPathAttrDef,
 					workingDirAttrDef,
