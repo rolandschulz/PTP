@@ -461,7 +461,7 @@ public class ParallelMachineView extends AbstractParallelSetView implements IRes
 					if (job != null) {
 						jobName = job.getName();
 					}
-					item.setText("Process " + procs[i].getProcessIndex() + ", Job " + jobName);
+					item.setText(jobName + ":" + procs[i].getName());
 					item.setData(procs[i]);
 				}
 			}
