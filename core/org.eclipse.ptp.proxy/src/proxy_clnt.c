@@ -23,6 +23,7 @@
  
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "proxy.h"
 #include "proxy_tcp.h"
@@ -45,7 +46,12 @@ proxy_clnt_init(char *name, struct timeval *timeout, proxy_clnt_helper_funcs *cf
 	pc = (proxy_clnt *)malloc(sizeof(proxy_clnt));
 	pc->proxy = p;
 	pc->clnt_helper_funcs = cf;
-	pc->clnt_timeout = timeout;
+	pc->clnt_timeout = NULL;
+
+	if (timeout != NULL) {
+		pc->clnt_timeout = (struct timeval *)malloc(sizeof(struct timeval));
+		memcpy(pc->clnt_timeout, timeout, sizeof(struct timeval));
+	}
 	
 	if (p->clnt_funcs->init(pc, &data, attr, ap) < 0) {
 		free(pc);

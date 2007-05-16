@@ -275,13 +275,18 @@ proxy_tcp_clnt_progress(proxy_clnt *clnt)
 	int						res;
 	int						nfds = 0;
 	struct timeval			tv;
+	struct timeval *		timeout = &tv;
 
 	proxy_process_msgs(clnt->clnt_events, proxy_tcp_clnt_process_events, NULL);
 
 	/* Set up fd sets */
 	GenerateFDSets(&nfds, &rfds, &wfds, &efds);
 	
-	memcpy((char *)&tv, (char *)clnt->clnt_timeout, sizeof(struct timeval));
+	if (clnt->clnt_timeout == NULL) {
+		timeout = NULL;
+	} else {
+		memcpy((char *)timeout, (char *)clnt->clnt_timeout, sizeof(struct timeval));
+	}
 
 	for ( ;; ) {
 		res = select(nfds+1, &rfds, &wfds, &efds, &tv);
