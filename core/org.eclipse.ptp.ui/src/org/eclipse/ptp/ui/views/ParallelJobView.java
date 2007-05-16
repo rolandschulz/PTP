@@ -339,7 +339,7 @@ public class ParallelJobView extends AbstractParallelSetView implements IModelMa
 		StringBuffer buffer = new StringBuffer();
 		String num = proc.getProcessIndex();
 		if (num != null) {
-			buffer.append("Number: " + num);
+			buffer.append("Index: " + num);
 			buffer.append("\n");
 		}
 		buffer.append("PID: " + proc.getPid());
@@ -537,7 +537,6 @@ public class ParallelJobView extends AbstractParallelSetView implements IModelMa
 	 * @see org.eclipse.ptp.core.elements.listeners.IQueueJobListener#handleEvent(org.eclipse.ptp.core.elements.events.IQueueNewJobEvent)
 	 */
 	public void handleEvent(final IQueueNewJobEvent e) {
-		System.out.println(this + ": new job");
 		changeJobRefresh(e.getJob());
 	}
 	
@@ -560,7 +559,6 @@ public class ParallelJobView extends AbstractParallelSetView implements IModelMa
 	 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerQueueListener#handleEvent(org.eclipse.ptp.core.elements.events.IResourceManagerNewQueueEvent)
 	 */
 	public void handleEvent(IResourceManagerNewQueueEvent e) {
-		System.out.println(this + ": new queue");
 		e.getQueue().addChildListener(this);
 	}
 	
@@ -582,7 +580,6 @@ public class ParallelJobView extends AbstractParallelSetView implements IModelMa
 	 * @see org.eclipse.ptp.core.listeners.IModelManagerResourceManagerListener#handleEvent(org.eclipse.ptp.core.events.IModelManagerNewResourceManagerEvent)
 	 */
 	public void handleEvent(IModelManagerNewResourceManagerEvent e) {
-		System.out.println(this + ": new RM");
 		e.getResourceManager().addChildListener(this);
 	}
 	
