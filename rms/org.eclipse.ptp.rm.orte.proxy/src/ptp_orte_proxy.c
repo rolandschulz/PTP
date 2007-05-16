@@ -864,7 +864,7 @@ job_state_callback(orte_jobid_t jobid, orte_proc_state_t proc_state)
 #if !ORTE_VERSION_1_0
 		case ORTE_JOB_STATE_LAUNCHED:
 			get_proc_info(j);
-			break;
+			/* drop through... */
 #endif /* !ORTE_VERSION_1_0 */
 			
 #if ORTE_VERSION_1_0
