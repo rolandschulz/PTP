@@ -45,11 +45,16 @@ static int				dbg_state;
 static bitset *			dbg_procs = NULL;
 static proxy_svr *		dbg_proxy;
 /*
- * The TIMEOUT determines how often the debugger polls progress routines.
+ * The CLIENT_TIMEOUT determines how often the debugger polls for
+ * communication with the front-end. The SERVER_TIMEOUT determines 
+ * how often the debug servers are polled.
+ * 
  * Too often and it uses too much CPU, too few and things will slow down...
+ * 
+ * Values are in microseconds.
  */
-#define CLIENT_TIMEOUT	1000
-#define SERVER_TIMEOUT	1000
+#define CLIENT_TIMEOUT	10000
+#define SERVER_TIMEOUT	10000
 
 /**
  * A send command is completed. Process the result and 

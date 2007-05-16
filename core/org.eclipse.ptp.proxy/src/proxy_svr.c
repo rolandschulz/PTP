@@ -22,6 +22,7 @@
  */
  
 #include <stdlib.h>
+#include <string.h>
  
 #include "proxy.h"
 #include "proxy_cmd.h"
@@ -50,7 +51,12 @@ proxy_svr_init(char *name, struct timeval *timeout, proxy_svr_helper_funcs *sf, 
 	ps->proxy = p;
 	ps->svr_helper_funcs = sf;
 	ps->svr_commands = cmds;
-	ps->svr_timeout = timeout;
+	ps->svr_timeout = NULL;
+	
+	if (timeout != NULL) {
+		ps->svr_timeout = (struct timeval *)malloc(sizeof(struct timeval));
+		memcpy(ps->svr_timeout, timeout, sizeof(struct timeval));
+	}
 	
 	if (p->svr_funcs->init(ps, &data) < 0) {
 		free(ps);

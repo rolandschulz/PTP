@@ -324,13 +324,18 @@ proxy_tcp_svr_progress(proxy_svr *svr)
 	int						res;
 	int						nfds = 0;
 	struct timeval			tv;
+	struct timeval *		timeout = &tv;
 
 	proxy_process_msgs(svr->svr_events, proxy_tcp_svr_process_events, NULL);
 
 	/* Set up fd sets */
 	GenerateFDSets(&nfds, &rfds, &wfds, &efds);
 	
-	memcpy((char *)&tv, (char *)svr->svr_timeout, sizeof(struct timeval));
+	if (svr->svr_timeout == NULL) {
+		timeout = NULL;
+	} else {
+		memcpy((char *)timeout, (char *)svr->svr_timeout, sizeof(struct timeval));
+	}
 
 	for ( ;; ) {
 		res = select(nfds+1, &rfds, &wfds, &efds, &tv);
