@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -155,7 +156,7 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient imple
 				while (state == DebugProxyState.DISCONNECTING) {
 					waiting = true;
 					try {
-						waitCondition.await();
+						waitCondition.await(30000, TimeUnit.MILLISECONDS);
 					} catch (InterruptedException e) {
 					}
 				}

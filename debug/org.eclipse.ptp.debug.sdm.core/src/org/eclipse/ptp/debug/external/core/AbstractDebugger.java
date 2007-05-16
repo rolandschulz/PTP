@@ -24,13 +24,16 @@ package org.eclipse.ptp.debug.external.core;
 
 import java.util.Observable;
 import java.util.Observer;
+
 import org.eclipse.cdt.core.IBinaryParser.IBinaryObject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.ptp.core.attributes.IntegerAttribute;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPProcess;
+import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IAbstractDebugger;
@@ -70,14 +73,17 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 	protected DebugCommandQueue commandQueue = null;
 	protected BitList terminatedProcs = null;
 	protected BitList suspendedProcs = null;
+	protected int jobSize = 0;
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.debug.core.IAbstractDebugger#createDebuggerSession(org.eclipse.ptp.debug.core.launch.IPLaunch, org.eclipse.cdt.core.IBinaryParser.IBinaryObject, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public IPCDISession createDebuggerSession(IPLaunch launch, IBinaryObject exe, IProgressMonitor monitor) throws CoreException {
 		IPJob job = launch.getPJob();
-		session = new Session(this, job, launch, exe);
-		initialize(job, monitor);
+		IntegerAttribute numProcAttr = (IntegerAttribute)job.getAttribute(JobAttributes.getNumberOfProcessesAttributeDefinition());
+		this.jobSize = numProcAttr.getValue();
+		session = new Session(this, job, jobSize, launch, exe);
+		initialize(job, jobSize, monitor);
 		this.job = job;
 		return session;
 	}
@@ -122,7 +128,7 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.debug.core.IAbstractDebugger#initialize(org.eclipse.ptp.core.elements.IPJob, int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	public final void initialize(IPJob job, IProgressMonitor monitor) throws CoreException {
+	public final void initialize(IPJob job, int jobSize, IProgressMonitor monitor) throws CoreException {
 		monitor.subTask("Connecting to debug server...");
 		boolean connected = waitForConnection(monitor);
 		monitor.worked(5);
@@ -132,8 +138,8 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		}
 		
 		monitor.subTask("Starting debugger...");
-		terminatedProcs = new BitList(job.size());
-		suspendedProcs = new BitList(job.size());
+		terminatedProcs = new BitList(jobSize);
+		suspendedProcs = new BitList(jobSize);
 		commandQueue = new DebugCommandQueue(this);
 		isExited = false;
 		eventThread = new EventThread(this);
@@ -472,7 +478,7 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 	 * @see org.eclipse.ptp.debug.core.IAbstractDebugger#isJobFinished()
 	 */
 	public synchronized boolean isJobFinished() {
-		return (getTerminatedProc().cardinality() == job.size());
+		return (getTerminatedProc().cardinality() == jobSize);
 	}
 	
 	// internal functions

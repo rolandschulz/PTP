@@ -25,14 +25,14 @@ import org.eclipse.ptp.core.util.Queue;
 public class PseudoInputStream extends InputStream {
 	final String DESTROY = "destroyPseudoInputStream";
 	boolean finished;
-	Queue queue;
+	Queue<String> queue;
 	
 	String str;
 	int strLen;
 	
 	public PseudoInputStream() {
 		super();
-		queue = new Queue();
+		queue = new Queue<String>();
 		finished = false;
 		str = null;
 		strLen = -1;

@@ -23,7 +23,7 @@ import org.eclipse.ptp.debug.core.cdi.PCDIException;
 /**
  * @author Clement chu
  */
-public interface IDebugCommand extends Comparable {
+public interface IDebugCommand extends Comparable<IDebugCommand> {
 	public static final int PRIORITY_L = 1;
 	public static final int PRIORITY_M = 2;
 	public static final int PRIORITY_H = 3;
@@ -115,12 +115,4 @@ public interface IDebugCommand extends Comparable {
 	 * @return name of command
 	 */
 	public String getCommandName();
-	/**
-	 * Compare the command
-	 * 
-	 * @param obj
-	 *            compared object
-	 * @return 0 means equals, otherwise not equals
-	 */
-	public int compareTo(Object obj);
 }

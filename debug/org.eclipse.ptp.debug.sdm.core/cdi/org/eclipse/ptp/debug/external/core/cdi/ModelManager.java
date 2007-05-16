@@ -40,6 +40,7 @@ import org.eclipse.ptp.debug.external.core.cdi.model.Target;
 /**
  * @deprecated
  */
+@SuppressWarnings("unchecked")
 public class ModelManager extends Manager implements IPCDIModelManager {
 	// private Hashtable currentProcessSetList;
 	private Hashtable processListCache;

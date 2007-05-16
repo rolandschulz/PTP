@@ -264,16 +264,13 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 			}
 		}
 	}
-	public int compareTo(Object obj) {
-		if (obj instanceof IDebugCommand) {
-			if (!getCommandName().equals(((IDebugCommand) obj).getCommandName()))
-				return -1;
-			
-			BitList cpyTasks = getTasks().copy();
-			cpyTasks.andNot(((IDebugCommand) obj).getTasks());
-			return cpyTasks.isEmpty()?0:-1;
-		}
-		return -1;
+	public int compareTo(IDebugCommand obj) {
+		if (!getCommandName().equals(obj.getCommandName()))
+			return -1;
+		
+		BitList cpyTasks = getTasks().copy();
+		cpyTasks.andNot(obj.getTasks());
+		return cpyTasks.isEmpty()?0:-1;
 	}
 	public Object getResultValue() throws PCDIException {
 		if (getReturn() == null) {
