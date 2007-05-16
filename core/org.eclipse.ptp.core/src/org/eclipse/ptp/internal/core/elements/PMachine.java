@@ -122,13 +122,6 @@ public class PMachine extends Parent implements IPMachineControl, INodeListener 
 		return (IResourceManager) getParent();
 	}
 
-	/* returns a list of the nodes comprised by this machine - but sorted */
-	public synchronized IPNode[] getSortedNodes() {
-		IPNodeControl[] nodes = getNodeControls();
-		sort(nodes);
-		return nodes;
-	}
-
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.listeners.INodeListener#handleEvent(org.eclipse.ptp.core.elements.events.INodeChangedEvent)
 	 */

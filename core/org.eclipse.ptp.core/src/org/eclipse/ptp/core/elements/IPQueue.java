@@ -48,11 +48,6 @@ public interface IPQueue extends IPElement {
 	 * @return IResourceManager
 	 */
 	public IResourceManager getResourceManager();
-
-	/**
-	 * @return IPJob[]
-	 */
-	public IPJob[] getSortedJobs();
 	
 	/**
 	 * @param listener

@@ -93,14 +93,6 @@ public interface IPJob extends IPElement {
 	public IPQueue getQueue();
 
 	/**
-	 * Returns a sorted array of the Processes comprised by this Job. Might
-	 * return <code>null</code> if no Processes have yet been assigned.
-	 * 
-	 * @return
-	 */
-	public IPProcess[] getSortedProcesses();
-
-	/**
 	 * Returns true/false regarding whether this Job is a debug job 
 	 * 
 	 * @return True if this job is a debug job

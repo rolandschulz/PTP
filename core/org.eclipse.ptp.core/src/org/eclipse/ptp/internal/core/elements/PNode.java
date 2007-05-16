@@ -103,12 +103,6 @@ public class PNode extends Parent implements IPNodeControl, IProcessListener {
 	public IPProcess[] getProcesses() {
 		return getProcessControls();
 	}
-	
-	public synchronized IPProcess[] getSortedProcesses() {
-		IPProcessControl[] procs = getProcessControls();
-		sort(procs);
-		return procs;
-	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.listeners.IProcessListener#handleEvent(org.eclipse.ptp.core.elements.events.IProcessChangedEvent)

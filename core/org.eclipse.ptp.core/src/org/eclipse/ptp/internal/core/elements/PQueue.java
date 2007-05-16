@@ -110,15 +110,6 @@ public class PQueue extends Parent implements IPQueueControl, IJobListener {
 	public IResourceManager getResourceManager() {
 		return (IResourceManager) getParent();
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.IPQueue#getSortedJobs()
-	 */
-	public synchronized IPJob[] getSortedJobs() {
-		IPJobControl[] jobs = getJobControls();
-		sort(jobs);
-		return jobs;
-	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.listeners.IJobListener#handleEvent(org.eclipse.ptp.core.elements.events.IJobChangedEvent)
