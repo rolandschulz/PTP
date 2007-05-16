@@ -550,7 +550,7 @@ public class ParallelDebugView extends ParallelJobView {
 	*/
 	
 	/******************************************************
-	 * the focus on debug target on debug view 
+	 * focus on debug target on debug view 
 	 ******************************************************/
 	public void focusOnDebugTarget(final IPJob job, final int task_id) {
 		final UIDebugManager uimanager = ((UIDebugManager) manager);
@@ -604,7 +604,8 @@ public class ParallelDebugView extends ParallelJobView {
 		WorkbenchJob job = new WorkbenchJob("Focus on Debug Target") {
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				//treeViewer.expandToLevel(selection, AbstractTreeViewer.ALL_LEVELS);
-				treeViewer.setExpandedElements(new Object[] { selection });
+				treeViewer.setExpandedState(selection, true);
+				//treeViewer.setExpandedElements(new Object[] { selection });
 				return Status.OK_STATUS;
 			}
         };
