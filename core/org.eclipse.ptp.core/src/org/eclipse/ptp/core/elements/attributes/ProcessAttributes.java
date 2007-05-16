@@ -35,6 +35,7 @@ public class ProcessAttributes {
 	private static final String SIGNAL_NAME_ATTR_ID = "processSignalName";
 	private static final String INDEX_ATTR_ID = "processIndex";
 	private static final String STDOUT_ATTR_ID = "processStdout";
+	private static final String STDERR_ATTR_ID = "processStderr";
 	private static final String NODEID_ATTR_ID = "processNodeId";
 
 	private final static EnumeratedAttributeDefinition<State> stateAttrDef = 
@@ -53,8 +54,11 @@ public class ProcessAttributes {
 	private final static StringAttributeDefinition signalNameAttrDef = 
 		new StringAttributeDefinition(SIGNAL_NAME_ATTR_ID, "Process Signal", "Name of signal that caused process termination", "");
 	
-	private final static StringAttributeDefinition stdoutNameAttrDef = 
+	private final static StringAttributeDefinition stdoutAttrDef = 
 		new StringAttributeDefinition(STDOUT_ATTR_ID, "Process Stdout", "Standard output from process", "");
+	
+	private final static StringAttributeDefinition stderrAttrDef = 
+		new StringAttributeDefinition(STDERR_ATTR_ID, "Process Stderr", "Standard error from process", "");
 	
 	private final static StringAttributeDefinition nodeIdAttrDef = 
 		new StringAttributeDefinition(NODEID_ATTR_ID, "Process Node ID", "Node that this process is running on", "");
@@ -80,7 +84,11 @@ public class ProcessAttributes {
 	}
 	
 	public static StringAttributeDefinition getStdoutAttributeDefinition() {
-		return stdoutNameAttrDef;
+		return stdoutAttrDef;
+	}
+	
+	public static StringAttributeDefinition getStderrAttributeDefinition() {
+		return stderrAttrDef;
 	}
 	
 	public static StringAttributeDefinition getNodeIdAttributeDefinition() {
@@ -94,7 +102,8 @@ public class ProcessAttributes {
 				exitCodeAttrDef, 
 				indexAttrDef, 
 				signalNameAttrDef, 
-				stdoutNameAttrDef,
+				stdoutAttrDef,
+				stderrAttrDef,
 				nodeIdAttrDef
 			};
 	}
