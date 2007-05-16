@@ -29,6 +29,7 @@ import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute;
+import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IntegerAttribute;
 import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.elementcontrols.IPElementControl;
@@ -49,7 +50,7 @@ public class PProcess extends Parent implements IPProcessControl {
 	private final ListenerList elementListeners = new ListenerList();
 	private OutputTextFile outputFile = null;
 	private String outputDirPath = null;
-	private int storeLine = 0;
+	private int storeLines = 0;
 	/*
 	 * the node that this process is running on, or was scheduled on / will be, etc
 	 */
@@ -58,7 +59,7 @@ public class PProcess extends Parent implements IPProcessControl {
 	public PProcess(String id, IPJobControl job, IAttribute[] attrs) {
 		super(id, job, P_PROCESS, attrs);
 		setOutputStore();
-		outputFile = new OutputTextFile(getName(), outputDirPath, storeLine);
+		outputFile = new OutputTextFile(getName(), outputDirPath, storeLines);
 		/*
 		 * Make sure we always have a state.
 		 */
@@ -69,38 +70,33 @@ public class PProcess extends Parent implements IPProcessControl {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
-	private EnumeratedAttribute<State> getStateAttribute() {
-		return (EnumeratedAttribute<State>) getAttribute(
-				ProcessAttributes.getStateAttributeDefinition());
-	}
-
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.IPProcess#addElementListener(org.eclipse.ptp.core.elements.listeners.IProcessListener)
 	 */
 	public void addElementListener(IProcessListener listener) {
 		elementListeners.add(listener);
 	}
-	
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPProcess#addNode(org.eclipse.ptp.core.elements.IPNode)
+	 */
 	public void addNode(IPNode node) {
 		this.node = (IPNodeControl) node;
 		if (node != null) {
 			this.node.addProcess(this);
 		}
 	}
-
-	public void addOutput(String output) {
-		outputFile.write(output + "\n");
-	}
-
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPProcess#clearOutput()
+	 */
 	public void clearOutput() {
 		outputFile.delete();
 	}
-	
-	public String getContents() {
-		return outputFile.getContents();
-	}
-	
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPProcess#getExitCode()
+	 */
 	public int getExitCode() {
 		IntegerAttribute attr = (IntegerAttribute) getAttribute(ProcessAttributes.getExitCodeAttributeDefinition());
 		if (attr != null) {
@@ -108,11 +104,17 @@ public class PProcess extends Parent implements IPProcessControl {
 		}
 		return 0;
 	}
-	
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPProcess#getJob()
+	 */
 	public IPJob getJob() {
 		return getJobControl();
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elementcontrols.IPProcessControl#getJobControl()
+	 */
 	public IPJobControl getJobControl() {
 		IPElementControl current = this;
 		do {
@@ -122,14 +124,16 @@ public class PProcess extends Parent implements IPProcessControl {
 		return null;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPProcess#getNode()
+	 */
 	public IPNode getNode() {
 		return this.node;
 	}
-
-	public String[] getOutputs() {
-		return null;
-	}
-
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPProcess#getPid()
+	 */
 	public int getPid() {
 		IntegerAttribute attr = (IntegerAttribute) getAttribute(ProcessAttributes.getPIDAttributeDefinition());
 		if (attr != null) {
@@ -138,6 +142,9 @@ public class PProcess extends Parent implements IPProcessControl {
 		return 0;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPProcess#getProcessIndex()
+	 */
 	public String getProcessIndex() {
 		IntegerAttribute attr = (IntegerAttribute) getAttribute(ProcessAttributes.getIndexAttributeDefinition());
 		if (attr != null) {
@@ -145,7 +152,21 @@ public class PProcess extends Parent implements IPProcessControl {
 		}
 		return null;
 	}
-	
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPProcess#getSavedOutput(org.eclipse.ptp.core.attributes.IAttributeDefinition)
+	 */
+	public String getSavedOutput(IAttributeDefinition attrDef) {
+		if (attrDef == ProcessAttributes.getStdoutAttributeDefinition()) {
+			return outputFile.getContents();
+		} else {
+			return null;
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPProcess#getSignalName()
+	 */
 	public String getSignalName() {
 		StringAttribute attr = (StringAttribute) getAttribute(ProcessAttributes.getSignalNameAttributeDefinition());
 		if (attr != null) {
@@ -154,11 +175,17 @@ public class PProcess extends Parent implements IPProcessControl {
 		return "";
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPProcess#getState()
+	 */
 	public State getState() {
 		EnumeratedAttribute<State> attr = getStateAttribute();
 		return attr.getValue();
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPProcess#isTerminated()
+	 */
 	public boolean isTerminated() {
 		EnumeratedAttribute<State> procState = getStateAttribute();
 		State state = procState.getValue();
@@ -175,22 +202,41 @@ public class PProcess extends Parent implements IPProcessControl {
 		elementListeners.remove(listener);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPProcess#removeNode()
+	 */
 	public void removeNode() {
 		if (node != null) {
 			node.removeProcess(this);
 		}
 		node = null;
 	}
-
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPProcess#setState(org.eclipse.ptp.core.elements.attributes.ProcessAttributes.State)
+	 */
 	public void setState(State state) {
 		EnumeratedAttribute<State> procState = getStateAttribute();
 		procState.setValue(state);
 	}
-
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPProcess#setTerminated(boolean)
+	 */
 	public void setTerminated(boolean isTerminated) {
 		setState(State.EXITED);
 	}
 
+	/**
+	 * @param output
+	 */
+	private void addOutput(String output) {
+		outputFile.write(output + "\n");
+	}
+
+	/**
+	 * @param attrs
+	 */
 	private void fireChangedProcess(Collection<IAttribute> attrs) {
 		IProcessChangedEvent e = 
 			new ProcessChangedEvent(this, attrs);
@@ -200,17 +246,32 @@ public class PProcess extends Parent implements IPProcessControl {
 		}
 	}
 
+	/**
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	private EnumeratedAttribute<State> getStateAttribute() {
+		return (EnumeratedAttribute<State>) getAttribute(
+				ProcessAttributes.getStateAttributeDefinition());
+	}
+
+	/**
+	 * 
+	 */
 	private void setOutputStore() {
 		Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
 		outputDirPath = preferences.getString(PreferenceConstants.OUTPUT_DIR);
-		storeLine = preferences.getInt(PreferenceConstants.STORE_LINE);
-		if (outputDirPath == null || outputDirPath.length() == 0)
+		storeLines = preferences.getInt(PreferenceConstants.STORE_LINE);
+		if (outputDirPath == null || outputDirPath.length() == 0) {
 			outputDirPath = ResourcesPlugin.getWorkspace().getRoot().getLocation().append(PreferenceConstants.DEF_OUTPUT_DIR_NAME).toOSString();
-		if (storeLine == 0)
-			storeLine = PreferenceConstants.DEF_STORE_LINE;
+		}
+		if (storeLines == 0) {
+			storeLines = PreferenceConstants.DEF_STORE_LINE;
+		}
 		File outputDirectory = new File(outputDirPath);
-		if (!outputDirectory.exists())
+		if (!outputDirectory.exists()) {
 			outputDirectory.mkdir();
+		}
 	}
 	
 	/* (non-Javadoc)
@@ -218,6 +279,11 @@ public class PProcess extends Parent implements IPProcessControl {
 	 */
 	@Override
 	protected void doAddAttributeHook(List<IAttribute> attrs) {
+		for (IAttribute attr : attrs) {
+			if (attr.getDefinition() == ProcessAttributes.getStdoutAttributeDefinition()) {
+				addOutput(attr.getValueAsString());
+			}
+		}
 		fireChangedProcess(attrs);
 	}
 

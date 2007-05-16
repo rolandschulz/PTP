@@ -60,32 +60,71 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 	private Text outputText = null;
 	private FormToolkit toolkit = null;
 	private ScrolledForm myForm = null;
+	private IPProcess process = null;
 
 	public ParallelProcessView() {
 		super();
 		setDocumentProvider(new StorageDocumentProvider());
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.texteditor.AbstractTextEditor#dispose()
+	 */
 	public void dispose() {
+		process.removeElementListener(this);
 		myForm.dispose();
 		toolkit.dispose();
 		super.dispose();
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.texteditor.AbstractTextEditor#setFocus()
+	 */
 	public void setFocus() {
 		myForm.setFocus();
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.texteditor.AbstractTextEditor#doSave(org.eclipse.core.runtime.IProgressMonitor)
+	 */
 	public void doSave(IProgressMonitor monitor) {}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.texteditor.AbstractTextEditor#doSaveAs()
+	 */
 	public void doSaveAs() {}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.texteditor.AbstractTextEditor#isDirty()
+	 */
 	public boolean isDirty() {
 		return false;
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.texteditor.AbstractTextEditor#isSaveAsAllowed()
+	 */
 	public boolean isSaveAsAllowed() {
 		return false;
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.texteditor.AbstractTextEditor#init(org.eclipse.ui.IEditorSite, org.eclipse.ui.IEditorInput)
+	 */
 	public void init(IEditorSite site, IEditorInput input) throws PartInitException {
 		setSite(site);
 		setPartName(input.getName());
 		setInput(input);
+		Object obj = getEditorInput().getAdapter(IPProcess.class);
+		if (obj instanceof IPProcess) {
+			process = (IPProcess) obj;
+			process.addElementListener(this);
+		}
 	}
+	
+	/**
+	 * 
+	 */
 	public void close() {
 		getSite().getShell().getDisplay().asyncExec(new Runnable() {
 			public void run() {
@@ -95,12 +134,10 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 			}
 		});
 	}
-	public IPProcess getProcess() {
-		Object obj = getEditorInput().getAdapter(IPProcess.class);
-		if (obj instanceof IPProcess)
-			return (IPProcess) obj;
-		return null;
-	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.texteditor.AbstractTextEditor#createPartControl(org.eclipse.swt.widgets.Composite)
+	 */
 	public void createPartControl(Composite parent) {
 		toolkit = new FormToolkit(parent.getDisplay());
 		myForm = toolkit.createScrolledForm(parent);
@@ -110,6 +147,10 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 		outputSection();
 		initialText();
 	}
+	
+	/**
+	 * 
+	 */
 	protected void detailsSection() {
 		Section detailsSection = toolkit.createSection(myForm.getBody(), Section.TITLE_BAR);
 		detailsSection.setText("Process details");
@@ -137,6 +178,10 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 		
 		detailsSection.setClient(detailsContainer);
 	}
+	
+	/**
+	 * 
+	 */
 	protected void outputSection() {
 		Section outputSection = toolkit.createSection(myForm.getBody(), Section.TITLE_BAR | Section.TWISTIE);
 		outputSection.setText("Program output");
@@ -150,15 +195,28 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 		outputSection.setClient(ouputContainer);
 		toolkit.paintBordersFor(ouputContainer);
 	}
-	protected Composite createClientContainer(Composite parent, FormToolkit toolkit, int columns, boolean isEqual, int mh, int mw) {
+	
+	/**
+	 * @param parent
+	 * @param toolkit
+	 * @param columns
+	 * @param isEqual
+	 * @param mh
+	 * @param mw
+	 * @return
+	 */
+	protected Composite createClientContainer(Composite parent, FormToolkit toolkit, int columns, 
+			boolean isEqual, int mh, int mw) {
 		Composite container = toolkit.createComposite(parent);
 		container.setLayout(createGridLayout(columns, isEqual, mh, mw));
 		return container;
 	}
+	
+	/**
+	 * 
+	 */
 	public void initialText() {
-		IPProcess process = getProcess();
-		
-		rankLabel.setText("Number: N/A");
+		rankLabel.setText("Index: N/A");
 		totalLabel.setText("Total: N/A");
 		nodeLabel.setText("Node: N/A");
 		pidLabel.setText("PID: N/A");
@@ -166,7 +224,7 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 		outputText.setText("N/A");
 		
 		if (process != null) {
-			rankLabel.setText("Number: " + process.getProcessIndex());
+			rankLabel.setText("Index: " + process.getProcessIndex());
 			final IPJob job = process.getJob();
 			String jobName = "none";
 			if (job != null) {
@@ -183,7 +241,10 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 				nodeLabel.setText("Node: " + node.getName());
 			}
 			
-			outputText.setText(process.getContents());
+			/*
+			 * Set initial output text
+			 */
+			outputText.setText(process.getSavedOutput(ProcessAttributes.getStdoutAttributeDefinition()));
 		}
 	}
 	
@@ -199,14 +260,21 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 					if (id.equals(ProcessAttributes.getStateAttributeDefinition().getId())) {
 						ProcessAttributes.State state = (State)((EnumeratedAttribute<State>)attr).getValue();
 						statusLabel.setText("Status: " + state.toString());
-					} else if (id.equals(ProcessAttributes.getStdoutAttributeDefinition())) {
-						outputText.append(attr.getValueAsString());
+					} else if (id.equals(ProcessAttributes.getStdoutAttributeDefinition().getId())) {
+						outputText.append(attr.getValueAsString() + "\n");
 					}
 				}
 			}
 		});
 	}
 	
+	/**
+	 * @param columns
+	 * @param isEqual
+	 * @param mh
+	 * @param mw
+	 * @return
+	 */
 	protected GridLayout createGridLayout(int columns, boolean isEqual, int mh, int mw) {
 		GridLayout gridLayout = new GridLayout();
 		gridLayout.numColumns = columns;
@@ -216,6 +284,11 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 		return gridLayout;
 	}
 	
+	/**
+	 * @param style
+	 * @param space
+	 * @return
+	 */
 	protected GridData spanGridData(int style, int space) {
 		GridData gd = null;
 		if (style == -1)
@@ -226,6 +299,10 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 		return gd;
 	}
 	
+	/**
+	 * @param comp
+	 * @param colSpan
+	 */
 	protected void createVerticalSpacer(Composite comp, int colSpan) {
 		Label label = new Label(comp, SWT.NONE);
 		GridData gd = new GridData();
@@ -234,6 +311,9 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 		label.setFont(comp.getFont());
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.texteditor.AbstractTextEditor#updateStatusField(java.lang.String)
+	 */
 	protected void updateStatusField(String category) {
 		if (category == null)
 			return;
@@ -245,30 +325,11 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 			else if (ITextEditorActionConstants.STATUS_CATEGORY_ELEMENT_STATE.equals(category))
 				text = rankLabel.getText();
 			else if (ITextEditorActionConstants.STATUS_CATEGORY_INPUT_MODE.equals(category)) {
-				text = getProcess().getState().toString();
+				if (process != null) {
+					text = process.getState().toString();
+				}
 			}
 			field.setText(text == null ? fErrorLabel : text);
 		}
 	}
-	
-	/*
-	 * DONT KNOW WHAT TO DO WITH THIS YET
-	 *
-	public void modelEvent(final IModelEvent event) {
-		UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
-			public void run() {
-				safeModelEvent(event);
-			}
-		});
-	}
-	
-	private void safeModelEvent(IModelEvent event) {
-		if (event instanceof IModelRuntimeNotifierEvent) {
-			IModelRuntimeNotifierEvent runEvent = (IModelRuntimeNotifierEvent)event;
-			if (runEvent.getType() == IModelRuntimeNotifierEvent.STOPPED) {
-				close();
-			}
-		}	
-	}
-	 */
 }
