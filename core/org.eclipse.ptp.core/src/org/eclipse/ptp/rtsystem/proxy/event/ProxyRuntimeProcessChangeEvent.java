@@ -38,10 +38,6 @@ public class ProxyRuntimeProcessChangeEvent extends AbstractProxyRuntimeEvent im
 				str += ",";
 			str += args[i];
 		}
-		str += ")";
-		if (str.length() > 60) {
-			str = str.substring(0, 59) + "...";
-		}
-		return str;
+		return str + ")";
 	}
 }
