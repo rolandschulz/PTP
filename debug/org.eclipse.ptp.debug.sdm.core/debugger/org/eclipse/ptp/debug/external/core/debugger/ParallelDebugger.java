@@ -576,7 +576,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 		IPCDISignal[] pcdiSignals = new IPCDISignal[0];
 		IPProcess[] sigProcs = getProcesses(e.getBitSet());
 		if (sigProcs.length > 0) {
-			String taskIdStr = sigProcs[0].getProcessNumber();
+			String taskIdStr = sigProcs[0].getProcessIndex();
 			try {
 				int taskId = Integer.parseInt(taskIdStr);
 				IPCDITarget target = getSession().getTarget(taskId);

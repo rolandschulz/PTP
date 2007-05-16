@@ -138,8 +138,8 @@ public class PProcess extends Parent implements IPProcessControl {
 		return 0;
 	}
 	
-	public String getProcessNumber() {
-		IntegerAttribute attr = (IntegerAttribute) getAttribute(ProcessAttributes.getNumberAttributeDefinition());
+	public String getProcessIndex() {
+		IntegerAttribute attr = (IntegerAttribute) getAttribute(ProcessAttributes.getIndexAttributeDefinition());
 		if (attr != null) {
 			return attr.getValueAsString();
 		}

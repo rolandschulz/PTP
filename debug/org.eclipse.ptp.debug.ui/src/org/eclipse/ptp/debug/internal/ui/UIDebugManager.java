@@ -170,7 +170,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	 */
 	public void defaultRegister(IPCDISession session) { // register process 0 if the preference is checked
 		if (prefRegisterProc0) {
-			IPProcess proc = session.getJob().getProcessByNumber("0");
+			IPProcess proc = session.getJob().getProcessByIndex("0");
 			if (proc != null) {
 				addConsoleWindow(session.getJob(), proc);
 				registerProcess(session, session.createBitList(0), true);

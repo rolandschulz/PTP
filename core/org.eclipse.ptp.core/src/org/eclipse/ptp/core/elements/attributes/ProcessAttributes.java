@@ -33,7 +33,7 @@ public class ProcessAttributes {
 	private static final String PID_ATTR_ID = "processPID";
 	private static final String EXIT_CODE_ATTR_ID = "processExitCode";
 	private static final String SIGNAL_NAME_ATTR_ID = "processSignalName";
-	private static final String NUMBER_ATTR_ID = "processNumber";
+	private static final String INDEX_ATTR_ID = "processIndex";
 	private static final String STDOUT_ATTR_ID = "processStdout";
 	private static final String NODEID_ATTR_ID = "processNodeId";
 
@@ -47,8 +47,8 @@ public class ProcessAttributes {
 	private final static IntegerAttributeDefinition exitCodeAttrDef = 
 		new IntegerAttributeDefinition(EXIT_CODE_ATTR_ID, "Process Exit Code", "Operating system exit code", 0);
 	
-	private final static IntegerAttributeDefinition numberAttrDef = 
-		new IntegerAttributeDefinition(NUMBER_ATTR_ID, "Process Number", "Zero-based index of process (e.g. MPI rank)", 0);
+	private final static IntegerAttributeDefinition indexAttrDef = 
+		new IntegerAttributeDefinition(INDEX_ATTR_ID, "Process Index", "Zero-based index of process (e.g. MPI rank)", 0);
 	
 	private final static StringAttributeDefinition signalNameAttrDef = 
 		new StringAttributeDefinition(SIGNAL_NAME_ATTR_ID, "Process Signal", "Name of signal that caused process termination", "");
@@ -71,8 +71,8 @@ public class ProcessAttributes {
 		return exitCodeAttrDef;
 	}
 	
-	public static IntegerAttributeDefinition getNumberAttributeDefinition() {
-		return numberAttrDef;
+	public static IntegerAttributeDefinition getIndexAttributeDefinition() {
+		return indexAttrDef;
 	}
 	
 	public static StringAttributeDefinition getSignalNameAttributeDefinition() {
@@ -92,7 +92,7 @@ public class ProcessAttributes {
 				stateAttrDef, 
 				pidAttrDef, 
 				exitCodeAttrDef, 
-				numberAttrDef, 
+				indexAttrDef, 
 				signalNameAttrDef, 
 				stdoutNameAttrDef,
 				nodeIdAttrDef

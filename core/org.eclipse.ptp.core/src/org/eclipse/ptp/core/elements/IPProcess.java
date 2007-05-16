@@ -96,9 +96,11 @@ public interface IPProcess extends IPElement {
 	public ProcessAttributes.State getState();
 	
 	/**
-	 * @return
+	 * Returns a zero-based index of the process in a job.
+	 * 
+	 * @return process index
 	 */
-	public String getProcessNumber();
+	public String getProcessIndex();
 	
 	/**
 	 * @return
