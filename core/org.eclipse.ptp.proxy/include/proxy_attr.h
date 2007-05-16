@@ -70,7 +70,7 @@
 #define		PROC_STATE_ERROR			"ERROR"
 #define PROC_NODEID_ATTR			"processNodeId"
 #define PROC_PID_ATTR				"processPID"
-#define PROC_NUMBER_ATTR			"processNumber"
+#define PROC_INDEX_ATTR				"processIndex"
 #define PROC_STDOUT_ATTR			"processStdout"
 #define PROC_EXITCODE_ATTR			"processExitCode"
 #define PROC_SIGNALNAME_ATTR		"processSignalName"

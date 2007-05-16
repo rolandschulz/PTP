@@ -557,7 +557,7 @@ sendNewProcessEvent(int trans_id, int job_id, ptp_process *p, char *state)
 	proxy_msg_add_int(m, 4);	
 	proxy_msg_add_keyval_int(m, PROC_NODEID_ATTR, p->node_id);	
 	proxy_msg_add_keyval_string(m, PROC_STATE_ATTR, state);	
-	proxy_msg_add_keyval_int(m, PROC_NUMBER_ATTR, p->task_id);	
+	proxy_msg_add_keyval_int(m, PROC_INDEX_ATTR, p->task_id);	
 	proxy_msg_add_keyval_int(m, PROC_PID_ATTR, p->pid);	
 	proxy_svr_queue_msg(orte_proxy, m);
 	
@@ -661,7 +661,7 @@ sendProcessChangeEvent(int trans_id, ptp_process *p, int node_id, int task_id, i
 		}
 		if (p->task_id != task_id) {
 			p->task_id = task_id;
-			proxy_msg_add_keyval_int(m, PROC_NUMBER_ATTR, task_id);	
+			proxy_msg_add_keyval_int(m, PROC_INDEX_ATTR, task_id);	
 		}
 		if (p->pid != pid) {
 			p->pid = pid;
