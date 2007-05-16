@@ -80,8 +80,15 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 	 */
 	public IPCDISession createDebuggerSession(IPLaunch launch, IBinaryObject exe, IProgressMonitor monitor) throws CoreException {
 		IPJob job = launch.getPJob();
+		/*
+		 * Find number of processes in job. If the attribute does not exist, assume one process.
+		 */
 		IntegerAttribute numProcAttr = (IntegerAttribute)job.getAttribute(JobAttributes.getNumberOfProcessesAttributeDefinition());
-		this.jobSize = numProcAttr.getValue();
+		if (numProcAttr != null) {
+			this.jobSize = numProcAttr.getValue();
+		} else {
+			this.jobSize = 1;
+		}
 		session = new Session(this, job, jobSize, launch, exe);
 		initialize(job, jobSize, monitor);
 		this.job = job;
