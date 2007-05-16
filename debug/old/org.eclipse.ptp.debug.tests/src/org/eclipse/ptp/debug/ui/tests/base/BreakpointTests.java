@@ -42,26 +42,27 @@ public class BreakpointTests extends AbstractBaseTest {
 		/** Function breakpoint **/
 		//Create a break point on a generic function
 		t = createBitList();
+		/*
 		debugProxy.debugSetFuncBreakpoint(t, ++bpid, false, false, testApp, "func1", "", 0, 0);
 		waitEvent(t);
 		assertTrue("Command completed: " + t.isEmpty(), t.isEmpty());
-		
+		*/
 		//Create a break point on main
 		t = createBitList();
-		debugProxy.debugSetFuncBreakpoint(t, ++bpid, false, false, testApp, "main", "", 0, 0);
+		debugProxy.debugSetFuncBreakpoint(t, ++bpid, false, false, testAppName, "main", "", 0, 0);
 		waitEvent(t);
 		assertTrue("Command completed: " + t.isEmpty(), t.isEmpty());
 
 		/** Line breakpoint **/
 		//Create a break point in a generic function
 		t = createBitList();
-		debugProxy.debugSetLineBreakpoint(t, ++bpid, false, false, testApp, 7, "", 0, 0);
+		debugProxy.debugSetLineBreakpoint(t, ++bpid, false, false, testAppName, 11, "", 0, 0);
 		waitEvent(t);
 		assertTrue("Command completed: " + t.isEmpty(), t.isEmpty());
 
-		/*
+		/** GO **/
 		t = createBitList();
-		proxy.debugGo(t);
+		debugProxy.debugGo(t);
 		//wait suspend event
 		waitEvent(t);
 		assertTrue("All processes are suspended: " + t.isEmpty(), t.isEmpty());
@@ -69,18 +70,17 @@ public class BreakpointTests extends AbstractBaseTest {
 		//delete all breakpoints
 		for (int i=bpid; i>0; i--) {
 			t = createBitList();
-			proxy.debugDeleteBreakpoint(t, i);
+			debugProxy.debugDeleteBreakpoint(t, i);
 			waitEvent(t);
 			assertTrue("Bpt ID: " + (i) + ", Command completed: " + t.isEmpty(), t.isEmpty());
 		}
-		
+		/*
 		t = createBitList();
-		proxy.debugGo(t);
+		debugProxy.debugGo(t);
 		//wait terminated event
 		waitEvent(t);
 		assertTrue("All processes are terminated: " + t.isEmpty(), t.isEmpty());
 		*/
-		
 		t = createBitList();
 		debugProxy.debugTerminate(t);
 		//wait terminated event

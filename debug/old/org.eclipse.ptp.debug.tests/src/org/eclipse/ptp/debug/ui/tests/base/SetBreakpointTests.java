@@ -32,20 +32,20 @@ public class SetBreakpointTests extends AbstractBaseTest {
 		/** Function breakpoint **/
 		//Create a break point on a generic function
 		t = createBitList(3, total_process);
-		debugProxy.debugSetFuncBreakpoint(t, ++bpid, false, false, testApp, "func1", "", 0, 0);
+		debugProxy.debugSetFuncBreakpoint(t, ++bpid, false, false, testAppName, "func1", "", 0, 0);
 		waitEvent(t);
 		assertTrue("Command completed: " + t.isEmpty(), t.isEmpty());
 		
 		//Create a break point on main
 		t = createBitList();
-		debugProxy.debugSetFuncBreakpoint(t, ++bpid, false, false, testApp, "main", "", 0, 0);
+		debugProxy.debugSetFuncBreakpoint(t, ++bpid, false, false, testAppName, "main", "", 0, 0);
 		waitEvent(t);
 		assertTrue("Command completed: " + t.isEmpty(), t.isEmpty());
 
 		/** Line breakpoint **/
 		//Create a break point in a generic function
 		t = createBitList();
-		debugProxy.debugSetLineBreakpoint(t, ++bpid, false, false, testApp, 7, "", 0, 0);
+		debugProxy.debugSetLineBreakpoint(t, ++bpid, false, false, testAppName, 7, "", 0, 0);
 		waitEvent(t);
 		assertTrue("Command completed: " + t.isEmpty(), t.isEmpty());
 

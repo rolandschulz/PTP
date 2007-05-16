@@ -28,7 +28,6 @@ import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.debug.core.launch.PLaunch;
 import org.eclipse.ptp.debug.external.core.debugger.ParallelDebugger;
-import org.eclipse.ptp.orte.core.ORTEAttributes;
 import org.eclipse.ptp.orte.core.rmsystem.ORTEResourceManagerConfiguration;
 import org.eclipse.ptp.orte.core.rmsystem.ORTEResourceManagerFactory;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration.CommonConfig;
@@ -105,7 +104,7 @@ public class PTPDebugHelper {
 				attrMgr.addAttribute(JobAttributes.getEnvironmentAttributeDefinition().create(envArr));
 			}
 			//IRMLaunchConfigurationDynamicTab rmDynamicTab = new ORTERMLaunchConfigurationDynamicTab(rm);
-			IntegerAttribute iattr = new IntegerAttribute(ORTEAttributes.getNumberOfProcessesAttributeDefinition(), numProcs);
+			IntegerAttribute iattr = new IntegerAttribute(JobAttributes.getNumberOfProcessesAttributeDefinition(), numProcs);
 			attrMgr.addAttributes(new IAttribute[] { iattr });
 		} catch (IllegalValueException e) {
 			throw new CoreException(Status.CANCEL_STATUS);

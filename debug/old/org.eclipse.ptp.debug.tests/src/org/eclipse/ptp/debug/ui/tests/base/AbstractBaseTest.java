@@ -28,13 +28,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.ptp.core.proxy.event.IProxyConnectedEvent;
-import org.eclipse.ptp.core.proxy.event.IProxyDisconnectedEvent;
-import org.eclipse.ptp.core.proxy.event.IProxyErrorEvent;
-import org.eclipse.ptp.core.proxy.event.IProxyEventListener;
-import org.eclipse.ptp.core.proxy.event.IProxyExtendedEvent;
-import org.eclipse.ptp.core.proxy.event.IProxyOKEvent;
-import org.eclipse.ptp.core.proxy.event.IProxyTimeoutEvent;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.external.core.proxy.ProxyDebugClient;
@@ -74,15 +67,15 @@ import org.eclipse.ptp.debug.ui.tests.AbstractDebugTest;
 /**
  * @author clement
  */
-public abstract class AbstractBaseTest extends AbstractDebugTest implements IProxyEventListener, IProxyDebugEventListener {
-	protected final String testAppName = "testmpi";
-	protected final String testApp = testAppName + ".c";
-	protected final String workPath = "/home/clement/Desktop/runtime-EclipseApplication/TestMPI";
+public abstract class AbstractBaseTest extends AbstractDebugTest implements IProxyDebugEventListener {
+	protected final String testExecName = "TestFromGreg";
+	protected final String testAppName = "fromgreg.c";
+	protected final String workPath = "/home/clement/Desktop/runtime-EclipseApplication/TestFromGreg";
 	protected final String execPath = workPath + "/Debug";
 	protected final String DebugHost = "127.0.0.1";
-	protected final String DebugType = "test";
+	protected final String DebugType = "gdb-mi"; //gdb-mi or test
 	//common
-	protected final long timeout = 360000; //default 1 hour
+	protected final long timeout = 60000; //default 1 hour
 	protected BitList tasks = null;
 	protected boolean time_up = false;
 	protected boolean waitAgain = false;
@@ -114,7 +107,6 @@ public abstract class AbstractBaseTest extends AbstractDebugTest implements IPro
 		if (debugProxy != null) {
 			System.err.println("-------------- tearDown() is called -----------------");
 			debugProxy.removeProxyDebugEventListener(this);
-			debugProxy.removeProxyEventListener(this);
 			debugProxy.doShutdown();
 		}
 		debugProxy = null;
@@ -181,7 +173,6 @@ public abstract class AbstractBaseTest extends AbstractDebugTest implements IPro
 		
 		debugProxy = new ProxyDebugClient();
 		assertNotNull(debugProxy);
-		debugProxy.addProxyEventListener(this);
 		debugProxy.addProxyDebugEventListener(this);
 		debugProxy.doConnect(10000);
 		port = debugProxy.getSessionPort();
@@ -201,7 +192,7 @@ public abstract class AbstractBaseTest extends AbstractDebugTest implements IPro
 		assertTrue(debugProxy.waitConnect(monitor));
 		debugProxy.sessionHandleEvents();
 
-		debugProxy.debugStartSession(testAppName, execPath, execPath, new String[0]);
+		debugProxy.debugStartSession(testExecName, execPath, execPath, new String[0]);
 		BitList t = createBitList();
 		//wait suspend event
 		waitEvent(t);
@@ -315,103 +306,80 @@ public abstract class AbstractBaseTest extends AbstractDebugTest implements IPro
 		}
     }
     
-    /**** IProxyEventListener ****/
-	public void handleProxyExtendedEvent(IProxyExtendedEvent e) {
-		System.err.println("IProxyExtendedEvent");
-	}
-	public void handleProxyOKEvent(IProxyOKEvent e) {
-		System.err.println("IProxyOKEvent");
-	}
-	public void handleProxyConnectedEvent(IProxyConnectedEvent e) {
-		System.err.println("IProxyConnectedEvent");
-	}
-	public void handleProxyDisconnectedEvent(IProxyDisconnectedEvent e) {
-		System.err.println("IProxyDisconnectedEvent");
-	}
-	public void handleProxyErrorEvent(IProxyErrorEvent e) {
-		System.err.println("IProxyErrorEvent");
-		
-	}
-	public void handleProxyTimeoutEvent(IProxyTimeoutEvent e) {
-		System.err.println("IProxyTimeoutEvent");
-	}
-    
     /**** IProxyDebugEventListener ****/
 	public void handleProxyDebugArgsEvent(IProxyDebugArgsEvent e) {
-		System.err.println("IProxyDebugArgsEvent");
+		System.err.println("=== Tasks: " + BitList.showBitList(e.getBitSet()) + ": IProxyDebugArgsEvent");
 	}
 	public void handleProxyDebugBreakpointHitEvent(IProxyDebugBreakpointHitEvent e) {
-		//ProxyDebugBreakpointHitEvent bptHitEvent = (ProxyDebugBreakpointHitEvent)e;
-		System.err.println("IProxyDebugBreakpointHitEvent");
+		System.err.println("=== Tasks: " + BitList.showBitList(e.getBitSet()) + ": IProxyDebugBreakpointHitEvent");
 		notifyEvent(e.getBitSet(), null);
 	}
 	public void handleProxyDebugBreakpointSetEvent(IProxyDebugBreakpointSetEvent e) {
-		System.err.println("IProxyDebugBreakpointSetEvent: " + ((IProxyDebugBreakpointSetEvent)e).getBreakpointId());
+		System.err.println("=== Tasks: " + BitList.showBitList(e.getBitSet()) + ": IProxyDebugBreakpointSetEvent: " + e.getBreakpointId());
 		notifyEvent(e.getBitSet(), null);
 	}
 	public void handleProxyDebugDataEvent(IProxyDebugDataEvent e) {
-		System.err.println("IProxyDebugDataEvent");
-		notifyEvent(e.getBitSet(), ((IProxyDebugDataEvent)e).getData());
+		System.err.println("=== Tasks: " + BitList.showBitList(e.getBitSet()) + ": IProxyDebugDataEvent");
+		notifyEvent(e.getBitSet(), e.getData());
 	}
 	public void handleProxyDebugDataExpValueEvent(IProxyDebugDataExpValueEvent e) {
-		
+		System.err.println("=== Tasks: " + BitList.showBitList(e.getBitSet()) + ": IProxyDebugDataExpValueEvent");
 	}
 	public void handleProxyDebugExitEvent(IProxyDebugExitEvent e) {
-		System.err.println("IProxyDebugExitEvent");
+		System.err.println("=== Tasks: " + BitList.showBitList(e.getBitSet()) + ": IProxyDebugExitEvent - " + e.getExitStatus());
 		notifyEvent(e.getBitSet(), null);
 	}
 	public void handleProxyDebugErrorEvent(IProxyDebugErrorEvent e) {
-		IProxyDebugErrorEvent errEvent = (IProxyDebugErrorEvent)e;
-		System.err.println("IProxyDebugErrorEvent - code: " + errEvent.getErrorCode() + ", msg: " + errEvent.getErrorMessage());
+		System.err.println("!!!!!!!!! Tasks: " + BitList.showBitList(e.getBitSet()) + ": IProxyDebugErrorEvent - code: " + e.getErrorCode() + ", msg: " + e.getErrorMessage() + " !!!!!!!!!!!");
+		notifyEvent(e.getBitSet(), null);
 	}
 	public void handleProxyDebugInfoThreadsEvent(IProxyDebugInfoThreadsEvent e) {
-		
+		System.err.println("=== Tasks: " + BitList.showBitList(e.getBitSet()) + ": IProxyDebugInfoThreadsEvent");
 	}
 	public void handleProxyDebugInitEvent(IProxyDebugInitEvent e) {
-		System.err.println("IProxyDebugInitEvent");
+		System.err.println("=== Tasks: " + BitList.showBitList(e.getBitSet()) + ": IProxyDebugInitEvent");
 	}
 	public void handleProxyDebugMemoryInfoEvent(IProxyDebugMemoryInfoEvent e) {
-		
+		System.err.println("IProxyDebugMemoryInfoEvent");
 	}
 	public void handleProxyDebugOKEvent(IProxyDebugOKEvent e) {
-		System.err.println("IProxyDebugOKEvent");
+		System.err.println("=== Tasks: " + BitList.showBitList(e.getBitSet()) + ": IProxyDebugOKEvent");
 		notifyEvent(e.getBitSet(), null);
 	}
 	public void handleProxyDebugPartialAIFEvent(IProxyDebugPartialAIFEvent e) {
-		
+		System.err.println("=== Tasks: " + BitList.showBitList(e.getBitSet()) + ": IProxyDebugPartialAIFEvent");
 	}
 	public void handleProxyDebugSetThreadSelectEvent(IProxyDebugSetThreadSelectEvent e) {
-		
+		System.err.println("=== Tasks: " + BitList.showBitList(e.getBitSet()) + ": IProxyDebugSetThreadSelectEvent");
 	}
 	public void handleProxyDebugSignalEvent(IProxyDebugSignalEvent e) {
-		
+		System.err.println("=== Tasks: " + BitList.showBitList(e.getBitSet()) + ": IProxyDebugSignalEvent");
 	}
 	public void handleProxyDebugSignalExitEvent(IProxyDebugSignalExitEvent e) {
-		
+		System.err.println("=== Tasks: " + BitList.showBitList(e.getBitSet()) + ": IProxyDebugSignalExitEvent");
 	}
 	public void handleProxyDebugSignalsEvent(IProxyDebugSignalsEvent e) {
-		//ProxyDebugSignalEvent sigEvent = (ProxyDebugSignalEvent)e;
-		System.err.println("IProxyDebugSignalsEvent");
+		System.err.println("=== Tasks: " + BitList.showBitList(e.getBitSet()) + ": IProxyDebugSignalsEvent");
 		notifyEvent(e.getBitSet(), null);
 	}
 	public void handleProxyDebugStackframeEvent(IProxyDebugStackframeEvent e) {
-		
+		System.err.println("=== Tasks: " + BitList.showBitList(e.getBitSet()) + ": IProxyDebugStackframeEvent");
 	}
 	public void handleProxyDebugStackInfoDepthEvent(IProxyDebugStackInfoDepthEvent e) {
-		
+		System.err.println("=== Tasks: " + BitList.showBitList(e.getBitSet()) + ": IProxyDebugStackInfoDepthEvent");
 	}
 	public void handleProxyDebugStepEvent(IProxyDebugStepEvent e) {
-		
+		System.err.println("=== Tasks: " + BitList.showBitList(e.getBitSet()) + ": IProxyDebugStepEvent");
 	}
 	public void handleProxyDebugSuspendEvent(IProxyDebugSuspendEvent e) {
-		System.err.println("IProxyDebugSuspendEvent");
+		System.err.println("=== Tasks: " + BitList.showBitList(e.getBitSet()) + ": IProxyDebugSuspendEvent");
 		notifyEvent(e.getBitSet(), null);
 	}
 	public void handleProxyDebugTypeEvent(IProxyDebugTypeEvent e) {
-		
+		System.err.println("=== Tasks: " + BitList.showBitList(e.getBitSet()) + ": IProxyDebugTypeEvent");
 	}
 	public void handleProxyDebugVarsEvent(IProxyDebugVarsEvent e) {
-		
+		System.err.println("=== Tasks: " + BitList.showBitList(e.getBitSet()) + ": IProxyDebugVarsEvent");
 	}
 
 	/*********************************** 
