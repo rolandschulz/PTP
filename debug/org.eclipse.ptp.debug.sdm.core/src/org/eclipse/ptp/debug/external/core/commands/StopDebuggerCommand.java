@@ -31,7 +31,7 @@ public class StopDebuggerCommand extends AbstractDebugCommand {
 	private boolean sendEvent = true;
 	
 	public StopDebuggerCommand(BitList tasks, boolean sendEvent) {
-		super(tasks, true, true, false);
+		super(tasks, true, false, false);
 		setPriority(PRIORITY_H);
 		this.sendEvent = sendEvent;
 	}
