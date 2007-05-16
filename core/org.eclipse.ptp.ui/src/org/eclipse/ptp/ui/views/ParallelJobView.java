@@ -539,8 +539,8 @@ public class ParallelJobView extends AbstractParallelSetView implements IModelMa
 	 * @see org.eclipse.ptp.core.elements.listeners.IQueueJobListener#handleEvent(org.eclipse.ptp.core.elements.events.IQueueRemoveJobEvent)
 	 */
 	public void handleEvent(final IQueueRemoveJobEvent e) {
-		changeJobRefresh(null);
 		getJobManager().removeJob(e.getJob());
+		changeJobRefresh(null);
 	}
 	
 	/* (non-Javadoc)

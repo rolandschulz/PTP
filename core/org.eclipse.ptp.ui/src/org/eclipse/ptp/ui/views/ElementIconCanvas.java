@@ -20,6 +20,7 @@ package org.eclipse.ptp.ui.views;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.SafeRunnable;
@@ -105,11 +106,11 @@ public class ElementIconCanvas extends IconCanvas implements ISelectionProvider 
 	public IElement[] getElements(int[] indexes) {
 		if (cur_element_set == null)
 			return new IElement[0];
-		List selectedElements = new ArrayList();
+		List<IElement> selectedElements = new ArrayList<IElement>();
 		for (int i = 0; i < indexes.length; i++) {
 			selectedElements.add(cur_element_set.get(indexes[i]));
 		}
-		return (IElement[]) selectedElements.toArray(new IElement[selectedElements.size()]);
+		return (IElement[]) selectedElements.toArray(new IElement[0]);
 	}
 	/** Get selected elements
 	 * @return selected elements

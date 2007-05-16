@@ -35,7 +35,7 @@ public class ElementSet extends Container implements IElementSet {
 	 */
 	public ElementSet(IElement parent, String id, String name) {
 		super(parent, id, name, IContainer.ELEMENT_TYPE);
-		setData(MATCHSET_KEY, new ArrayList());
+		setData(MATCHSET_KEY, new ArrayList<String>());
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.model.IElementSet#getElementHandler()
@@ -51,12 +51,6 @@ public class ElementSet extends Container implements IElementSet {
 		return (id.equals(IElementHandler.SET_ROOT_ID));
 	}
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.model.IContainer#get()
-	 */
-	public IElement[] get() {
-		return getElements();
-	}
-	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.model.IElementSet#getSortedElements()
 	 */
 	public IElement[] getSortedElements() {
@@ -66,7 +60,7 @@ public class ElementSet extends Container implements IElementSet {
 	 * @see org.eclipse.ptp.ui.model.IElementSet#getElements()
 	 */
 	public IElement[] getElements() {
-		return (IElement[])elementMap.values().toArray(new IElement[elementMap.size()]);
+		return get().toArray(new IElement[0]);
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.model.IElementSet#getElement(java.lang.String)
@@ -84,7 +78,7 @@ public class ElementSet extends Container implements IElementSet {
 	 * @see org.eclipse.ptp.ui.model.IElementSet#addMatchSet(java.lang.String)
 	 */
 	public void addMatchSet(String setId) {
-		List setList = getMatchSetList();
+		List<String> setList = getMatchSetList();
 		if (!setList.contains(setId))
 			setList.add(setId);
 	}
@@ -92,7 +86,7 @@ public class ElementSet extends Container implements IElementSet {
 	 * @see org.eclipse.ptp.ui.model.IElementSet#removeMatchSet(java.lang.String)
 	 */
 	public void removeMatchSet(String setId) {
-		List setList = getMatchSetList();
+		List<String> setList = getMatchSetList();
 		if (setList.contains(setId))
 			setList.remove(setId);
 	}
@@ -100,28 +94,26 @@ public class ElementSet extends Container implements IElementSet {
 	 * @see org.eclipse.ptp.ui.model.IElementSet#getMatchSets()
 	 */
 	public String[] getMatchSets() {
-		List setList = getMatchSetList();
-		return (String[])setList.toArray(new String[setList.size()]);
+		return (String[])getMatchSetList().toArray(new String[0]);
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.model.IElementSet#containOtherSets()
 	 */
 	public boolean containOtherSets() {
-		List setList = getMatchSetList();
-		return (setList.size()>0);
+		return (getMatchSetList().size()>0);
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.model.IElementSet#isContainSets(java.lang.String)
 	 */
 	public boolean isContainSets(String set_id) {
-		List setList = getMatchSetList();
-		return setList.contains(set_id);
+		return getMatchSetList().contains(set_id);
 	}
 	
 	/** Get mactch set list
 	 * @return list of match set
 	 */
-	private List getMatchSetList() {
-		return (List)getData(MATCHSET_KEY);
+	@SuppressWarnings("unchecked")
+	private List<String> getMatchSetList() {
+		return (List<String>)getData(MATCHSET_KEY);
 	}
 }

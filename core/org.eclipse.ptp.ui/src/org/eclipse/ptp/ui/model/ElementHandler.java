@@ -19,7 +19,6 @@
 package org.eclipse.ptp.ui.model;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -36,7 +35,7 @@ public class ElementHandler extends Container implements IElementHandler {
 	public ElementHandler() {
 		super(null, SET_ROOT_ID, SET_ROOT_ID, IContainer.SET_TYPE);
 		//store registered list
-		setData(REGISTERED_KEY, new ArrayList());
+		setData(REGISTERED_KEY, new ArrayList<IElement>());
 		
 		//create root 
 		add(new ElementSet(this, SET_ROOT_ID, SET_ROOT_ID));
@@ -50,23 +49,16 @@ public class ElementHandler extends Container implements IElementHandler {
 		
 		return (IElementSet)get(SET_ROOT_ID);
 	}
- 	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.model.IContainer#clearAll()
-	 */
 	public void clearAll() {
-		for (Iterator i=elementMap.values().iterator(); i.hasNext();) {
-			((IContainer)i.next()).clearAll();
+		for (IElementSet eSet : get().toArray(new IElementSet[0])) {
+			eSet.clearAll();
 		}
 		super.clearAll();
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.model.IContainer#get()
-	 */
-	public IElement[] get() {
-		return (IElement[])getSets();
-	}		
+	protected IElement[] getElements() {
+		return get().toArray(new IElementSet[0]);
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.model.IElementHandler#getSortedSets()
 	 */
@@ -77,7 +69,7 @@ public class ElementHandler extends Container implements IElementHandler {
 	 * @see org.eclipse.ptp.ui.model.IElementHandler#getSets()
 	 */
 	public IElementSet[] getSets() {
-		return (IElementSet[])elementMap.values().toArray(new IElementSet[0]);
+		return get().toArray(new IElementSet[0]);
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.model.IElementHandler#getSet(java.lang.String)
@@ -95,11 +87,10 @@ public class ElementHandler extends Container implements IElementHandler {
 	 * @see org.eclipse.ptp.ui.model.IElementHandler#getSetsWithElement(java.lang.String)
 	 */
 	public IElementSet[] getSetsWithElement(String id) {
-		List aList = new ArrayList();
-		IElementSet[] sets = getSortedSets();
-		for (int i=0; i<sets.length; i++) {
-			if (sets[i].contains(id))
-				aList.add(sets[i]);
+		List<IElementSet> aList = new ArrayList<IElementSet>();
+		for (IElementSet set : getSortedSets()) {
+			if (set.contains(id))
+				aList.add(set);
 		}
 		return (IElementSet[])aList.toArray(new IElementSet[0]);
 	}
@@ -108,14 +99,13 @@ public class ElementHandler extends Container implements IElementHandler {
 	 * @see org.eclipse.ptp.ui.model.IElementHandler#containsRegisterElement(org.eclipse.ptp.ui.model.IElement)
 	 */
 	public boolean containsRegisterElement(IElement element) {
-		List setList = getRegisteredSetList();
-		return setList.contains(element);
+		return getRegisteredSetList().contains(element);
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.model.IElementHandler#addRegisterElement(org.eclipse.ptp.ui.model.IElement)
 	 */
 	public void addRegisterElement(IElement element) {
-		List setList = getRegisteredSetList();
+		List<IElement> setList = getRegisteredSetList();
 		if (!setList.contains(element))
 			setList.add(element);
 	}
@@ -123,7 +113,7 @@ public class ElementHandler extends Container implements IElementHandler {
 	 * @see org.eclipse.ptp.ui.model.IElementHandler#removeRegisterElement(org.eclipse.ptp.ui.model.IElement)
 	 */
 	public void removeRegisterElement(IElement element) {
-		List setList = getRegisteredSetList();
+		List<IElement> setList = getRegisteredSetList();
 		if (setList.contains(element))
 			setList.remove(element);
 	}
@@ -131,28 +121,26 @@ public class ElementHandler extends Container implements IElementHandler {
 	 * @see org.eclipse.ptp.ui.model.IElementHandler#getRegisteredElements()
 	 */
 	public IElement[] getRegisteredElements() {
-		List setList = getRegisteredSetList();
-		return (IElement[])setList.toArray(new IElement[0]);
+		return (IElement[])getRegisteredSetList().toArray(new IElement[0]);
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.model.IElementHandler#removeAllRegisterElements()
 	 */
 	public void removeAllRegisterElements() {
-		List setList = getRegisteredSetList();
-		setList.clear();
+		getRegisteredSetList().clear();
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.model.IElementHandler#totalRegisterElements()
 	 */
 	public int totalRegisterElements() {
-		List setList = getRegisteredSetList();
-		return setList.size();
+		return getRegisteredSetList().size();
 	}
 	
 	/** Get registered set list
 	 * @return list of registered set
 	 */
-	private List getRegisteredSetList() {
-		return (List)getData(REGISTERED_KEY);
+	@SuppressWarnings("unchecked")
+	private List<IElement> getRegisteredSetList() {
+		return (List<IElement>)getData(REGISTERED_KEY);
 	}	
 }
