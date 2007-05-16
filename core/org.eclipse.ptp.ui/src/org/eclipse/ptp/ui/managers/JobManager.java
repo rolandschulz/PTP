@@ -294,7 +294,7 @@ public class JobManager extends AbstractUIManager {
 			if (set == null)
 				return false;
 			return set.contains(processID);
-			}
+		}
 		return false;
 	}
 	
@@ -363,10 +363,7 @@ public class JobManager extends AbstractUIManager {
 	 * @see org.eclipse.ptp.ui.IManager#hasStoppedJob()
 	 */
 	public boolean hasStoppedJob() {
-		if (getQueue() == null)
-			return false;
-		IPJob[] jobs = getQueue().getJobs();
-		for (IPJob job : jobs) {
+		for (IPJob job : getJobs()) {
 			if (job.isTerminated())
 				return true;
 		}
@@ -438,5 +435,4 @@ public class JobManager extends AbstractUIManager {
 			}
 		}
 	}
-
 }

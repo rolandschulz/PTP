@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.model;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,8 +28,8 @@ import java.util.Map;
  *
  */
 public abstract class Container extends Element implements IContainer {
-	protected Map dataMap = new HashMap();
-	protected Map elementMap = new HashMap();
+	protected Map<String, Object> dataMap = new HashMap<String, Object>();
+	protected Map<String, IElement> elementMap = new HashMap<String, IElement>();
 	protected IElement[] sortedArray = new IElement[0];
 	protected int store_element_type = ELEMENT_TYPE; 
 	
@@ -94,7 +95,9 @@ public abstract class Container extends Element implements IContainer {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.model.IContainer#get()
 	 */
-	public abstract IElement[] get();
+	public Collection<IElement> get() {
+		return elementMap.values();
+	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.model.IContainer#getSorted()
@@ -129,7 +132,7 @@ public abstract class Container extends Element implements IContainer {
 	 */
 	public void clearAll() {
 		elementMap.clear();
-		sortedArray = new IContainer[0];
+		sortedArray = new IElement[0];
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.model.IContainer#size()
@@ -137,11 +140,13 @@ public abstract class Container extends Element implements IContainer {
 	public int size() {
 		return elementMap.size();
 	}
+	
+	protected abstract IElement[] getElements();
 	/**
 	 * @param type
 	 */
 	public void refresh(int type) {
-		IElement[] sortingElements = get();
+		IElement[] sortingElements = getElements();
 		sort(sortingElements, type);
 		sortedArray = sortingElements;
 	}

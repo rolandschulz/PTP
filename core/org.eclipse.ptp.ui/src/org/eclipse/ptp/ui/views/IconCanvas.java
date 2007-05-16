@@ -81,7 +81,7 @@ public class IconCanvas extends Canvas {
 	protected int max_e_row = -1;
 	protected int max_e_col = -1;
 	// key and listener
-	protected Hashtable keyActionMap = new Hashtable();
+	protected Hashtable<Integer, Integer> keyActionMap = new Hashtable<Integer, Integer>();
 	protected Listener listener = null;
 	protected boolean mouseDown = false;
 	protected boolean mouseDoubleClick = false;
@@ -539,7 +539,7 @@ public class IconCanvas extends Canvas {
 	 */
 	public int getKeyBinding(int key) {
 		checkWidget();
-		Integer action = (Integer) keyActionMap.get(new Integer(key));
+		Integer action = keyActionMap.get(new Integer(key));
 		int intAction;
 		if (action == null) {
 			intAction = SWT.NULL;
@@ -2255,8 +2255,8 @@ public class IconCanvas extends Canvas {
 		URL normalURL = null;
 		URL selectedlURL = null;
 		try {
-			normalURL = normalFile.toURL();
-			selectedlURL = selectedFile.toURL();
+			normalURL = normalFile.toURI().toURL();
+			selectedlURL = selectedFile.toURI().toURL();
 		} catch (Exception e) {
 			System.out.println("Cannot create the URL: " + e.getMessage());
 			return;

@@ -162,7 +162,7 @@ public abstract class AbstractPerferencePage extends PreferencePage implements I
 	 * @return
 	 */
 	protected IWorkbenchPage[] getPages() {
-		final List pages = new ArrayList();
+		final List<IWorkbenchPage> pages = new ArrayList<IWorkbenchPage>();
 		BusyIndicator.showWhile(getShell().getDisplay(), new Runnable() {
 			public void run() {
 				if (fWorkbench != null) {

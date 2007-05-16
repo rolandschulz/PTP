@@ -18,6 +18,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.model;
 
+import java.util.Collection;
+
 /**
  * @author clement chu
  *
@@ -60,7 +62,7 @@ public interface IContainer extends IElement {
 	/** Get elements
 	 * @return elements
 	 */
-	public IElement[] get();
+	public Collection<IElement> get();
 	/** Get sorted elements
 	 * @return sorted elements
 	 */
