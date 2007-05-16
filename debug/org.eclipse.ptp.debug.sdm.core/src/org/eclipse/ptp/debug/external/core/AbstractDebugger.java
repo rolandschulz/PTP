@@ -67,7 +67,6 @@ import org.eclipse.ptp.debug.external.core.commands.TerminateCommand;
 public abstract class AbstractDebugger extends Observable implements IAbstractDebugger {
 	protected EventThread eventThread = null;
 	protected IPCDISession session = null;
-	protected IPProcess[] procs;
 	protected boolean isExited = false;
 	protected IPJob job = null;
 	protected DebugCommandQueue commandQueue = null;
@@ -150,7 +149,6 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		commandQueue = new DebugCommandQueue(this);
 		isExited = false;
 		eventThread = new EventThread(this);
-		procs = job.getSortedProcesses();
 		monitor.worked(10);
 		// Initialize state variables
 		IDebugCommand command = new StartDebuggerCommand(session.createBitList(), job);
@@ -424,7 +422,7 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 	 * @see org.eclipse.ptp.debug.core.IAbstractDebugger#getProcess(int)
 	 */
 	public IPProcess getProcess(int number) {
-		return procs[number];
+		return job.getProcessByIndex(number);
 	}
 	
 	public IPProcess[] getProcesses(BitList tasks) {
