@@ -77,16 +77,6 @@ public interface IPMachine extends IPElement {
 	public IResourceManager getResourceManager();
 
 	/**
-	 * Returns a sorted array of all the Nodes in this Machine. May return null
-	 * if there are none. The type of sorting is left open to the implementers
-	 * of this interface.
-	 * 
-	 * @return The Nodes in this Machine, sorted - <code>null</code> if there
-	 *         are none.
-	 */
-	public IPNode[] getSortedNodes();
-
-	/**
 	 * @param listener
 	 */
 	public void removeChildListener(IMachineNodeListener listener);

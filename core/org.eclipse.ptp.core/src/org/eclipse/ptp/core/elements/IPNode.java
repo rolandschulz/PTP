@@ -58,13 +58,6 @@ public interface IPNode extends IPElement {
 	public IPProcess[] getProcesses();
 	
 	/**
-	 * Return a sorted array of processes that are linked to this node
-	 * 
-	 * @return sorted array of processes
-	 */
-	public IPProcess[] getSortedProcesses();
-	
-	/**
 	 * @param listener
 	 */
 	public void removeChildListener(INodeProcessListener listener);

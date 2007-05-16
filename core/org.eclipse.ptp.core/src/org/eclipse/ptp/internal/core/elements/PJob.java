@@ -143,12 +143,6 @@ public class PJob extends Parent implements IPJobControl, IProcessListener {
 	public IPQueueControl getQueueControl() {
 		return (IPQueueControl) getParent();
 	}
-
-	public synchronized IPProcess[] getSortedProcesses() {
-		IPProcessControl[] processes = getProcessControls();
-		sort(processes);
-		return processes;
-	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.listeners.IProcessListener#handleEvent(org.eclipse.ptp.core.elements.events.IProcessChangedEvent)
