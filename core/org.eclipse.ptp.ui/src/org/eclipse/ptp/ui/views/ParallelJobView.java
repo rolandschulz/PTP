@@ -31,6 +31,7 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elements.IPJob;
@@ -222,6 +223,11 @@ public class ParallelJobView extends AbstractParallelSetView implements IModelMa
 				return new Object[0];
 			}
 			public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
+		});
+		jobTableViewer.setSorter(new ViewerSorter() {
+			public int compare(Viewer viewer, Object j1, Object j2) {
+				return ((IPJob)j1).getName().compareTo(((IPJob)j2).getName());
+			}
 		});
 		jobTableViewer.setInput(manager);
 		jobTableViewer.getTable().addMouseListener(new MouseAdapter() {

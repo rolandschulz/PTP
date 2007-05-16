@@ -445,10 +445,11 @@ public class ParallelMachineView extends AbstractParallelSetView implements IRes
 		}
 	}
 	
+	// FIXME: why not use a content provider and sorter?
 	private void updateProcessInfoRegion(IPNode node) {
 		BRtable.removeAll();
 		if (node != null) {
-			IPProcess procs[] = node.getSortedProcesses();
+			IPProcess procs[] = node.getProcesses();
 			if (procs != null) {
 				TableItem item = null;
 				for (int i = 0; i < procs.length; i++) {
@@ -461,6 +462,7 @@ public class ParallelMachineView extends AbstractParallelSetView implements IRes
 						jobName = job.getName();
 					}
 					item.setText("Process " + procs[i].getProcessIndex() + ", Job " + jobName);
+					item.setData(procs[i]);
 				}
 			}
 		}
@@ -520,12 +522,11 @@ public class ParallelMachineView extends AbstractParallelSetView implements IRes
 		BRtable.addSelectionListener(new SelectionAdapter() {
 			/* double click - throw up an editor to look at the process */
 			public void widgetDefaultSelected(SelectionEvent e) {
-				IPNode node = getMachineManager().findNode(cur_selected_element_id);
-				if (node != null) {
-					int idx = BRtable.getSelectionIndex();
-					IPProcess[] procs = node.getSortedProcesses();
-					if (idx >= 0 && idx < procs.length) {
-						openProcessViewer(procs[idx]);
+				TableItem[] items = BRtable.getSelection();
+				for (TableItem item : items) {
+					IPProcess proc = (IPProcess)item.getData();
+					if (proc != null) {
+						openProcessViewer(proc);
 					}
 				}
 			}
