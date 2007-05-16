@@ -168,7 +168,7 @@ public class VariableManager extends Manager {
 	public Variable removeVariableFromList(Target target, String varName) {
 		List<IPCDIVariable> varList = getVariablesList(target);
 		synchronized (varList) {
-			for (Iterator iterator = varList.iterator(); iterator.hasNext();) {
+			for (Iterator<IPCDIVariable> iterator = varList.iterator(); iterator.hasNext();) {
 				Variable variable = (Variable)iterator.next();
 				try {
 					if (variable.getKeyName().equals(varName)) {
@@ -407,17 +407,16 @@ public class VariableManager extends Manager {
 	}
 	public void destroyVariable(Variable variable) throws PCDIException {
 		Target target = (Target)variable.getTarget();
-		List varList = getVariablesList(target);
+		List<IPCDIVariable> varList = getVariablesList(target);
 		if (varList.contains(variable)) {
 			removeKeyVar(target, variable.getKeyName());
 			variable.setKeyName(null);
 		}
 	}
 	public void destroyAllVariables(Target target) throws PCDIException {
-		Variable[] variables = getVariables(target);
-		for (int i=0; i<variables.length; ++i) {
-			removeKeyVar(target, variables[i].getKeyName());
-			variables[i].setKeyName(null);
+		for (Variable var : getVariables(target)) {
+			removeKeyVar(target, var.getKeyName());
+			var.setKeyName(null);
 		}
 	}
 	Variable findVariable(Variable parent, String keyname) {
@@ -452,11 +451,11 @@ public class VariableManager extends Manager {
 		*/
 		
 		List<IPCDIEvent> eventList = new ArrayList<IPCDIEvent>();
-		for (int i=0; i<varList.length; i++) {
-			Variable variable = getVariable(target, varList[i]);
+		for (String var : varList) {
+			Variable variable = getVariable(target, var);
 			if (variable != null) {
 				variable.setUpdated(true);
-				eventList.add(new VarChangedEvent(target.getSession(), target.getTask(), variable, varList[i]));
+				eventList.add(new VarChangedEvent(target.getSession(), target.getTask(), variable, var));
 			}
 		}
 		IPCDIEvent[] events = (IPCDIEvent[]) eventList.toArray(new IPCDIEvent[0]);

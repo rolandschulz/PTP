@@ -187,9 +187,9 @@ public class PDebugUtils {
 		}
 		return sb.toString();
 	}
-	public static List getReferencedProjects( IProject project ) {
-		ArrayList list = new ArrayList( 10 );
-		if ( project != null && project.exists() && project.isOpen() ) {
+	public static List<IProject> getReferencedProjects(IProject project) {
+		ArrayList<IProject> list = new ArrayList<IProject>(10);
+		if (project != null && project.exists() && project.isOpen()) {
 			IProject[] refs = new IProject[0];
 			try {
 				refs = project.getReferencedProjects();
@@ -199,13 +199,13 @@ public class PDebugUtils {
 			for( int i = 0; i < refs.length; ++i ) {
 				if ( !project.equals( refs[i] ) && refs[i] != null && refs[i].exists() && refs[i].isOpen() ) {
 					list.add( refs[i] );
-					getReferencedProjects( project, refs[i], list );
+					getReferencedProjects(project, refs[i], list);
 				}
 			}
 		}
 		return list;
 	}
-	private static void getReferencedProjects( IProject root, IProject project, List list ) {
+	private static void getReferencedProjects( IProject root, IProject project, List<IProject> list ) {
 		if ( project != null && project.exists() && project.isOpen() ) {
 			IProject[] refs = new IProject[0];
 			try {
@@ -215,7 +215,7 @@ public class PDebugUtils {
 			}
 			for( int i = 0; i < refs.length; ++i ) {
 				if ( !list.contains( refs[i] ) && refs[i] != null && !refs[i].equals( root ) && refs[i].exists() && refs[i].isOpen() ) {
-					list.add( refs[i] );
+					list.add(refs[i]);
 					getReferencedProjects( root, refs[i], list );
 				}
 			}

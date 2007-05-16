@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Random;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.core.elements.IPJob;
@@ -63,12 +64,12 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 	public static final String STEP_END_STATE = "STEP_END";
 	private static final String APP_NAME = "../main.c";
 	private final boolean EVENT_BY_EACH_PROC = false;
-	private List sim_list = new ArrayList();
+	private List<SimulateProgram> sim_list = new ArrayList<SimulateProgram>();
 	private final long TIME_RANGE = 100;
 	private int total_process = 0;
 	private InternalEventQueue intQueue = null;
-	private Map variables = new HashMap();
-	private Map arguments = new HashMap();
+	private Map<String, SimVariable> variables = new HashMap<String, SimVariable>();
+	private Map<String, SimVariable> arguments = new HashMap<String, SimVariable>();
 	private IPCDIStackFrame current_frame = null;
 	private int bpt_id = 0;
 
@@ -139,7 +140,7 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 				if (!EVENT_BY_EACH_PROC) {
 					intQueue.stopTimer();
 				}
-				for (Iterator i = sim_list.iterator(); i.hasNext();) {
+				for (Iterator<SimulateProgram> i = sim_list.iterator(); i.hasNext();) {
 					SimulateProgram sim_program = (SimulateProgram) i.next();
 					sim_program.deleteObservers();
 				}
@@ -326,7 +327,7 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 		new Thread(new Runnable() {
 			public void run() {
 				int[] taskArray = tasks.toArray();
-				List frameList = new ArrayList();
+				List<IPCDIStackFrame> frameList = new ArrayList<IPCDIStackFrame>();
 				for (int i=0; i<taskArray.length; i++) {
 					IPCDITarget target = getSession().getTarget(taskArray[i]);
 					try {
@@ -387,7 +388,7 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 		new Thread(new Runnable() {
 			public void run() {
 				int[] taskArray = tasks.toArray();
-				List argList = new ArrayList();
+				List<IPCDIArgument> argList = new ArrayList<IPCDIArgument>();
 				for (int i=0; i<taskArray.length; i++) {
 					IPCDITarget target = getSession().getTarget(taskArray[i]);
 				    SimVariable[] args = getArguments();
@@ -403,7 +404,7 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 		new Thread(new Runnable() {
 			public void run() {
 				int[] taskArray = tasks.toArray();
-				List varList = new ArrayList();
+				List<IPCDILocalVariable> varList = new ArrayList<IPCDILocalVariable>();
 				for (int i=0; i<taskArray.length; i++) {
 					IPCDITarget target = getSession().getTarget(taskArray[i]);
 				    SimVariable[] vars = getVariables();

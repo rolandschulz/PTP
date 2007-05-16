@@ -22,7 +22,7 @@ package org.eclipse.ptp.debug.external.core.simulator2;
  * 
  */
 public class SimulateFrame {
-	private final int SIM_NUM_FRAME = 5;
+	//private final int SIM_NUM_FRAME = 5;
 	private String file = "";
 	private String func = "";
 	private String addr = "";

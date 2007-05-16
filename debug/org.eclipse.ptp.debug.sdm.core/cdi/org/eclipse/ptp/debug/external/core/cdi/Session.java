@@ -73,12 +73,12 @@ public class Session implements IPCDISession, IPCDISessionObject {
 	IBinaryObject file;
 	int no_of_process = 0;
 	
-	public Session(IAbstractDebugger debugger, IPJob job, IPLaunch launch, IBinaryObject file) throws CoreException {
+	public Session(IAbstractDebugger debugger, IPJob job, int jobSize, IPLaunch launch, IBinaryObject file) throws CoreException {
 		this.debugger = debugger;
 		this.job = job;
 		this.launch = launch;
 		this.file = file;
-		this.no_of_process = job.size();
+		this.no_of_process = jobSize;
 		commonSetup();
 		//job.setAttribute(PreferenceConstants.JOB_DEBUG_SESSION, this);
 	}

@@ -53,8 +53,8 @@ public class ProcessManager extends Manager {
 	public BitList getRegisteredTargets() {
 		BitList regTasks = ((Session)getSession()).createEmptyBitList();
 		synchronized (debugTargetMap) {
-			for (Iterator i=debugTargetMap.keySet().iterator(); i.hasNext();) {
-				regTasks.set(((Integer)i.next()).intValue());
+			for (Iterator<Integer> i=debugTargetMap.keySet().iterator(); i.hasNext();) {
+				regTasks.set(i.next().intValue());
 			}
 		}
 		return regTasks;

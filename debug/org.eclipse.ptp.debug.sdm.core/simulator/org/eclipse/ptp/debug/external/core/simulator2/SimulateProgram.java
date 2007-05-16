@@ -36,8 +36,8 @@ public class SimulateProgram extends Observable implements Runnable {
 	private boolean isStepping = false;
 	private int tid = -1;
 	private String file = "";
-	private List lines = new ArrayList();
-	private List bpts = new ArrayList();
+	private List<Integer> lines = new ArrayList<Integer>();
+	private List<Integer> bpts = new ArrayList<Integer>();
 	private boolean isStopInMain = false;
 	private boolean isPause = false;
 

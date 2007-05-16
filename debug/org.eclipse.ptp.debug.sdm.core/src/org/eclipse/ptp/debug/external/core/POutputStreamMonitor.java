@@ -24,8 +24,9 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
 import org.eclipse.core.runtime.ISafeRunnable;
-import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.IStreamListener;
 import org.eclipse.debug.core.model.IFlushableStreamMonitor;
@@ -154,7 +155,6 @@ public class POutputStreamMonitor implements IFlushableStreamMonitor {
 	}
 	
 	class ContentNotifier implements ISafeRunnable {
-		
 		private IStreamListener fListener;
 		private String fText;
 		
@@ -170,9 +170,9 @@ public class POutputStreamMonitor implements IFlushableStreamMonitor {
 			if (text == null)
 				return;
 			fText = text;
-			for (Iterator i=fListeners.iterator(); i.hasNext();) {
-				fListener = (IStreamListener)i.next();
-				Platform.run(this);
+			for (Iterator<IStreamListener> i=fListeners.iterator(); i.hasNext();) {
+				fListener = i.next();
+				SafeRunner.run(this);
 			}
 			fListener = null;
 			fText = null;		

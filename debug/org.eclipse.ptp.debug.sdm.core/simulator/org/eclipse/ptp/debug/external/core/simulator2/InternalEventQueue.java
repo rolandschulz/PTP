@@ -28,7 +28,7 @@ import java.util.Observable;
  * 
  */
 public class InternalEventQueue extends Observable {
-	private List queue = null;
+	private List<QueueItem> queue = null;
 	//private long current_time = 0;
 	private Thread timer = null;
 	private boolean running_timer = true;
@@ -36,7 +36,7 @@ public class InternalEventQueue extends Observable {
 	
 	public InternalEventQueue(long time_range) {
 		FIX_TIME = time_range;
-		queue = Collections.synchronizedList(new LinkedList());
+		queue = Collections.synchronizedList(new LinkedList<QueueItem>());
 	}
 	public QueueItem getItem() {
 		synchronized (queue) {

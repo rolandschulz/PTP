@@ -39,7 +39,7 @@ public interface IAbstractDebugger extends IDebugger {
 	public IPCDISession createDebuggerSession(IPLaunch launch, IBinaryObject exe, IProgressMonitor monitor) throws CoreException;
 	
 	/* Debugger Initialization/Termination */
-	public void initialize(IPJob job, IProgressMonitor monitor) throws CoreException;
+	public void initialize(IPJob job, int jobSize, IProgressMonitor monitor) throws CoreException;
 	public void exit() throws CoreException;
 	
 	public void addDebuggerObserver(Observer obs);
