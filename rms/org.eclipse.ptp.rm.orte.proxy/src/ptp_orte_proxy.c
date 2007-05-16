@@ -554,7 +554,8 @@ sendNewProcessEvent(int trans_id, int job_id, ptp_process *p, char *state)
 	proxy_msg_add_int(m, job_id);	
 	proxy_msg_add_int(m, 1);	
 	proxy_msg_add_int(m, p->id);	
-	proxy_msg_add_int(m, 4);	
+	proxy_msg_add_int(m, 5);	
+	proxy_msg_add_keyval_int(m, ELEMENT_NAME_ATTR, p->task_id);
 	proxy_msg_add_keyval_int(m, PROC_NODEID_ATTR, p->node_id);	
 	proxy_msg_add_keyval_string(m, PROC_STATE_ATTR, state);	
 	proxy_msg_add_keyval_int(m, PROC_INDEX_ATTR, p->task_id);	
