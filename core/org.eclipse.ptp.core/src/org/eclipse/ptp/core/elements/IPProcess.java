@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.elements;
 
+import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.core.elements.listeners.IProcessListener;
 
@@ -42,19 +43,15 @@ public interface IPProcess extends IPElement {
 	public void addNode(IPNode node);
 
 	/**
-	 * @param output
-	 */
-	public void addOutput(String output);
-	
-	/**
 	 * 
 	 */
 	public void clearOutput();
 	
 	/**
+	 * @param attrDef
 	 * @return
 	 */
-	public String getContents();
+	public String getSavedOutput(IAttributeDefinition attrDef);
 	
 	/**
 	 * @return
@@ -74,11 +71,6 @@ public interface IPProcess extends IPElement {
 	 * @return
 	 */
 	public IPNode getNode();
-	
-	/**
-	 * @return
-	 */
-	public String[] getOutputs();
 	
 	/**
 	 * @return
