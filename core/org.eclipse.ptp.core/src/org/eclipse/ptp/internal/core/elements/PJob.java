@@ -53,7 +53,7 @@ public class PJob extends Parent implements IPJobControl, IProcessListener {
 
 	private final ListenerList elementListeners = new ListenerList();
 	private final ListenerList childListeners = new ListenerList();
-	private HashMap<String, IPProcessControl> numberMap = 
+	private HashMap<String, IPProcessControl> indexMap = 
 		new HashMap<String, IPProcessControl>();
 
 	@SuppressWarnings("unchecked")
@@ -92,9 +92,9 @@ public class PJob extends Parent implements IPJobControl, IProcessListener {
 
 	public void addProcess(IPProcessControl process) {
 		addChild(process);
-		String num = process.getProcessNumber();
-		if (num != null) {
-			numberMap.put(num, process);
+		String idx = process.getProcessIndex();
+		if (idx != null) {
+			indexMap.put(idx, process);
 		}
 		fireNewProcess(process);
 		process.addElementListener(this);
@@ -107,13 +107,13 @@ public class PJob extends Parent implements IPJobControl, IProcessListener {
 		return null;
 	}
 	
-	public synchronized IPProcess getProcessByNumber(String number) {
-		return numberMap.get(number);
+	public synchronized IPProcess getProcessByIndex(String index) {
+		return indexMap.get(index);
 	}
 
 	
-	public synchronized IPProcess getProcessByNumber(int number) {
-		return numberMap.get(String.valueOf(number));
+	public synchronized IPProcess getProcessByIndex(int index) {
+		return indexMap.get(String.valueOf(index));
 	}
 
 	/*
@@ -206,9 +206,9 @@ public class PJob extends Parent implements IPJobControl, IProcessListener {
 		removeChild(process);
 		process.removeNode();
 		process.clearOutput();
-		String num = process.getProcessNumber();
-		if (num != null) {
-			numberMap.remove(num);
+		String idx = process.getProcessIndex();
+		if (idx != null) {
+			indexMap.remove(idx);
 		}
 		fireRemoveProcess(process);
 	}

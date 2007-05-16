@@ -56,24 +56,26 @@ public interface IPJob extends IPElement {
 	public IPProcess getProcessById(String id);
 
 	/**
-	 * Finds a Process in by its String number. Returns the Process
+	 * Finds a Process in by its String index. A process index is a
+	 * zero-based index of all processes in the job. Returns the Process
 	 * object if found, else returns <code>null</code>.
 	 * 
 	 * @param number
-	 *            The Process number to search for
+	 *            The Process index to search for
 	 * @return The Process object if found, else <code>null</code>
 	 */
-	public IPProcess getProcessByNumber(String number);
+	public IPProcess getProcessByIndex(String number);
 	
 	/**
-	 * Finds a Process in by its integer number. Returns the Process
+	 * Finds a Process in by its integer index. A process index is a
+	 * zero-based index of all processes in the job. Returns the Process
 	 * object if found, else returns <code>null</code>.
 	 * 
 	 * @param number
 	 *            The Process number to search for
 	 * @return The Process object if found, else <code>null</code>
 	 */
-	public IPProcess getProcessByNumber(int number);
+	public IPProcess getProcessByIndex(int number);
 
 	/**
 	 * Returns an array of the Processes comprised by this Job. Might return
