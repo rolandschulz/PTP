@@ -23,18 +23,18 @@ public class MachineAttributes {
 		UNKNOWN,
 		UP,
 		DOWN,
-		STOPPED
+		ALERT
 	};
 
     private static final String STATE_ATTR_ID = "machineState";
-    private static final String STATE_NUMNODES_ID = "numNodes";
+    private static final String NUMNODES_ATTR_ID = "numNodes";
 
     private final static EnumeratedAttributeDefinition<State> stateAttrDef = 
         new EnumeratedAttributeDefinition<State>(STATE_ATTR_ID, "state", "Machine State",
                 State.UNKNOWN);
     
     private final static IntegerAttributeDefinition numNodesAttrDef = 
-        new IntegerAttributeDefinition(STATE_NUMNODES_ID, "nodes", "Number of Nodes",
+        new IntegerAttributeDefinition(NUMNODES_ATTR_ID, "nodes", "Number of Nodes",
                 0);
     
     public static EnumeratedAttributeDefinition<State> getStateAttributeDefinition() {
