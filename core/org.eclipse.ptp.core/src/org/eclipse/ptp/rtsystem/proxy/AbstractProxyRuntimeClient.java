@@ -836,6 +836,8 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 				if (isShutdown()) {
 					fireProxyRuntimeShutdownStateEvent(new ProxyRuntimeShutdownStateEvent());
 					state = ProxyState.IDLE;
+					commands.clear();
+					events.clear();
 				} else {
 					/* 
 					 * Wait for any event. We will eventually get an IProxyDisconnectedEvent.
