@@ -68,7 +68,8 @@ public class PCDIDebugModel {
 			if (pSession != null) {
 				IPJob job = pSession.getJob();
 				if(!job.isTerminated()) {
-					job.removeAllProcesses();
+					// FIXME: what should happen here?
+					//job.removeAllProcesses();
 					pSession.getPCDISession().shutdown();
 					try {
 						PDebugUtils.println("-----PCDIDebugModel - waiting debugger to stop");
