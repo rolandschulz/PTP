@@ -107,12 +107,6 @@ public interface IPJob extends IPElement {
 	public boolean isTerminated();
 
 	/**
-	 * Remove all processes from this job
-	 *
-	 */
-	public void removeAllProcesses();
-
-	/**
 	 * @param listener
 	 */
 	public void removeChildListener(IJobProcessListener listener);

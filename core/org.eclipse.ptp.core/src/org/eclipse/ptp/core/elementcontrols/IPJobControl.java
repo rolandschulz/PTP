@@ -28,11 +28,5 @@ public interface IPJobControl extends IPElementControl, IPJob {
 
 	public IPQueueControl getQueueControl();
 	
-	/**
-	 * Removes all Processes from this Job. <br>
-	 * TODO: <i>LOOK AT THIS, THIS MAY BE INAPPROPRIATE HERE</i>
-	 */
-	public void removeAllProcesses();
-
 	public void removeProcess(IPProcessControl process);
 }
