@@ -172,12 +172,6 @@ public class PJob extends Parent implements IPJobControl, IProcessListener {
 		return false;
 	}
 
-	public void removeAllProcesses() {
-		for (IPProcessControl process : getProcessControls()) {
-			removeProcess(process);
-		}
-	}
-
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.IPJob#removeChildListener(org.eclipse.ptp.core.elements.listeners.IJobProcessListener)
 	 */
