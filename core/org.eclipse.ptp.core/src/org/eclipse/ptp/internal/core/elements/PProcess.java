@@ -59,7 +59,19 @@ public class PProcess extends Parent implements IPProcessControl {
 	public PProcess(String id, IPJobControl job, IAttribute[] attrs) {
 		super(id, job, P_PROCESS, attrs);
 		setOutputStore();
-		outputFile = new OutputTextFile(getName(), outputDirPath, storeLines);
+		
+		/*
+		 * Derive a unique name for the output file
+		 */
+		String name = job.getQueue().getResourceManager().getName()
+						+ ":" + job.getQueue().getName()
+						+ ":" + job.getName()
+						+ ":" + getName();
+	
+		outputFile = new OutputTextFile(name, 
+							ProcessAttributes.getStdoutAttributeDefinition().getId(), 
+							outputDirPath, storeLines);
+		
 		/*
 		 * Make sure we always have a state.
 		 */
