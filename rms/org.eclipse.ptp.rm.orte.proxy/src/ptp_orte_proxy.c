@@ -461,8 +461,9 @@ sendNewMachineEvent(int trans_id, int id, char *name)
 	proxy_msg_add_int(m, gBaseID);
 	proxy_msg_add_int(m, 1);	
 	proxy_msg_add_int(m, id);
-	proxy_msg_add_int(m, 1);
+	proxy_msg_add_int(m, 2);
 	proxy_msg_add_keyval_string(m, ELEMENT_NAME_ATTR, name);
+	proxy_msg_add_keyval_string(m, MACHINE_STATE_ATTR, MACHINE_STATE_UP);	
 	proxy_svr_queue_msg(orte_proxy, m);
 	
 	return 0;	
