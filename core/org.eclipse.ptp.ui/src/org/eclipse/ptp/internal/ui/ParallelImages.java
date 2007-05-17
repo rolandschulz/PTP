@@ -34,6 +34,7 @@ public class ParallelImages {
 	public final static URL TOOLICONURL = PTPUIPlugin.getDefault().getBundle().getEntry("icons/tool/");
 	public final static URL PROCESSICONURL = PTPUIPlugin.getDefault().getBundle().getEntry("icons/process/");
 	public final static URL NODEICONURL = PTPUIPlugin.getDefault().getBundle().getEntry("icons/node/");
+	public final static URL MACHINEICONURL = PTPUIPlugin.getDefault().getBundle().getEntry("icons/machine/");
 	public final static URL RMICONURL = PTPUIPlugin.getDefault().getBundle().getEntry("icons/rm/");
 	
 	// ===== Icon Files =====
@@ -48,7 +49,7 @@ public class ParallelImages {
 	public static final String ICON_ZOOMIN_NORMAL = "zoomin_normal.gif";
 	public static final String ICON_ZOOMOUT_NORMAL = "zoomout_normal.gif";
 	
-	// MACHINE
+	// TOOLBAR
 	public static final String ICON_MACHINE_NORMAL = "machine_normal.gif";
 	public static final String ICON_JOB_NORMAL = "job_normal.gif";
 	public static final String ICON_TERMINATE_ALL_DISABLE = "terminate_all_disable.gif";
@@ -96,6 +97,12 @@ public class ParallelImages {
 	public static final String IMG_PROC_STOPPED = "proc_stopped.gif";
 	public static final String IMG_PROC_STOPPED_SEL = "proc_stopped_sel.gif";
 	
+	// MACHINE
+	public static final String IMG_MACHINE_UNKNOWN = "machine_unknown.gif";
+	public static final String IMG_MACHINE_UP = "machine_up.gif";
+	public static final String IMG_MACHINE_DOWN = "machine_down.gif";
+	public static final String IMG_MACHINE_ALERT = "machine_alert.gif";
+
 	// RESOURCE MANAGERS
 	public static final String IMG_RM_OFF = "rm_off.gif";
 	public static final String IMG_RM_ON = "rm_on.gif";
@@ -116,7 +123,7 @@ public class ParallelImages {
 	public static final ImageDescriptor ID_ICON_ZOOMIN_NORMAL = createImageDescriptor(TOOLICONURL, ICON_ZOOMIN_NORMAL, ICON_ZOOMIN_NORMAL);
 	public static final ImageDescriptor ID_ICON_ZOOMOUT_NORMAL = createImageDescriptor(TOOLICONURL, ICON_ZOOMOUT_NORMAL, ICON_ZOOMOUT_NORMAL);
 
-	// MACHINE
+	// TOOLBAR
 	public static final ImageDescriptor ID_ICON_MACHINE_NORMAL = createImageDescriptor(TOOLICONURL, ICON_MACHINE_NORMAL, ICON_MACHINE_NORMAL);
 	public static final ImageDescriptor ID_ICON_JOB_NORMAL = createImageDescriptor(TOOLICONURL, ICON_JOB_NORMAL, ICON_JOB_NORMAL);
 	public static final ImageDescriptor ID_ICON_TERMINATE_ALL_DISABLE = createImageDescriptor(TOOLICONURL, ICON_TERMINATE_ALL_DISABLE, ICON_TERMINATE_ALL_DISABLE);
@@ -164,6 +171,12 @@ public class ParallelImages {
 	public static final ImageDescriptor ID_IMG_PROC_STOPPED = createImageDescriptor(PROCESSICONURL, IMG_PROC_STOPPED, IMG_PROC_STOPPED);
 	public static final ImageDescriptor ID_IMG_PROC_STOPPED_SEL = createImageDescriptor(PROCESSICONURL, IMG_PROC_STOPPED_SEL, IMG_PROC_STOPPED_SEL);
 	
+	// MACHINE
+	public static final ImageDescriptor ID_IMG_MACHINE_UNKNOWN = createImageDescriptor(MACHINEICONURL, IMG_MACHINE_UNKNOWN, IMG_MACHINE_UNKNOWN);
+	public static final ImageDescriptor ID_IMG_MACHINE_UP = createImageDescriptor(MACHINEICONURL, IMG_MACHINE_UP, IMG_MACHINE_UP);
+	public static final ImageDescriptor ID_IMG_MACHINE_DOWN = createImageDescriptor(MACHINEICONURL, IMG_MACHINE_DOWN, IMG_MACHINE_DOWN);
+	public static final ImageDescriptor ID_IMG_MACHINE_ALERT = createImageDescriptor(MACHINEICONURL, IMG_MACHINE_ALERT, IMG_MACHINE_ALERT);
+
 	// RESOURCE MANAGERS
 	public static final ImageDescriptor ID_IMG_RM_OFF = createImageDescriptor(RMICONURL, IMG_RM_OFF, IMG_RM_OFF);
 	public static final ImageDescriptor ID_IMG_RM_ON = createImageDescriptor(RMICONURL, IMG_RM_ON, IMG_RM_ON);
@@ -203,6 +216,14 @@ public class ParallelImages {
 		{ getImage(ParallelImages.IMG_PROC_RUNNING),		getImage(ParallelImages.IMG_PROC_RUNNING_SEL)			},
 		{ getImage(ParallelImages.IMG_PROC_STARTING),		getImage(ParallelImages.IMG_PROC_STARTING_SEL)			},
 		{ getImage(ParallelImages.IMG_PROC_STOPPED),		getImage(ParallelImages.IMG_PROC_STOPPED_SEL)			}
+	};
+
+	// MACHINE
+	public static Image[] machineImages = {
+		getImage(ParallelImages.IMG_MACHINE_UNKNOWN),
+		getImage(ParallelImages.IMG_MACHINE_UP),
+		getImage(ParallelImages.IMG_MACHINE_DOWN),
+		getImage(ParallelImages.IMG_MACHINE_ALERT)
 	};
 	
 	// RESOURCE MANAGERS
