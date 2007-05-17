@@ -23,6 +23,15 @@
 #define ELEMENT_NAME_ATTR			"name"
 
 /*
+ * Machine attributes
+ */
+#define MACHINE_STATE_ATTR			"machineState"
+#define 	MACHINE_STATE_UNKNOWN		"UNKNOWN"
+#define 	MACHINE_STATE_UP			"UP"
+#define 	MACHINE_STATE_DOWN			"DOWN"
+#define 	MACHINE_STATE_ALERT			"ALERT"
+
+/*
  * Job attributes
  */
 #define JOB_STATE_ATTR				"jobState"
