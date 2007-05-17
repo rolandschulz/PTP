@@ -25,6 +25,7 @@ import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.elementcontrols.IPElementControl;
 import org.eclipse.ptp.core.elementcontrols.IPJobControl;
+import org.eclipse.ptp.core.elementcontrols.IPProcessControl;
 import org.eclipse.ptp.core.elementcontrols.IPQueueControl;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPJob;
@@ -142,7 +143,9 @@ public class PQueue extends Parent implements IPQueueControl, IJobListener {
 	 */
 	public void removeJob(IPJobControl job) {
 		job.removeElementListener(this);
-		job.removeAllProcesses();
+		for (IPProcessControl proc : job.getProcessControls()) {
+			job.removeProcess(proc);
+		}
 		removeChild(job);
 		fireRemoveJob(job);
 	}
