@@ -83,6 +83,10 @@ public abstract class PElement extends PlatformObject implements IPElementContro
 		return attributeValues.getAttribute(attrId);
 	}
 	
+	public IAttribute[] getAttributes() {
+		return attributeValues.getAttributes();
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.IPElement#getAttributeEntrySet()
 	 */
