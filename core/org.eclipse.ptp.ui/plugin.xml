@@ -8,19 +8,19 @@
 			name="%ParallelViewCategory.name"
 			id="org.eclipse.ptp.ui.views">
 		</category>
-		<view
-			name="%ParallelMachinesView.name"
-			icon="icons/parallel_perspective.gif"
-			category="org.eclipse.ptp.ui.views"
-			class="org.eclipse.ptp.ui.views.ParallelMachineView"
-			id="org.eclipse.ptp.ui.views.parallelMachineView">
-		</view>
+  <view
+        category="org.eclipse.ptp.ui.views"
+        class="org.eclipse.ptp.ui.views.ParallelMachinesView"
+        icon="icons/parallel_perspective.gif"
+        id="org.eclipse.ptp.ui.views.parallelMachinesView"
+        name="%ParallelMachinesView.name">
+  </view>
 		<view
 			name="%ParallelJobsView.name"
 			icon="icons/parallel_perspective.gif"
 			category="org.eclipse.ptp.ui.views"
-			class="org.eclipse.ptp.ui.views.ParallelJobView"
-			id="org.eclipse.ptp.ui.views.parallelJobView">
+			class="org.eclipse.ptp.ui.views.ParallelJobsView"
+			id="org.eclipse.ptp.ui.views.parallelJobsView">
 		</view>
 		<view
 			name="%ResourceManagersView.name"
@@ -29,6 +29,20 @@
 			class="org.eclipse.ptp.ui.views.ResourceManagerView"
 			id="org.eclipse.ptp.ui.views.resourceManagerView">
 		</view>
+		<view
+			name="%ParallelMachineView.name"
+			icon="icons/parallel_perspective.gif"
+			category="org.eclipse.ptp.ui.views"
+			class="org.eclipse.ptp.ui.views.ParallelMachineView"
+			id="org.eclipse.ptp.ui.views.parallelMachineView">
+		</view>
+  <view
+        category="org.eclipse.ptp.ui.views"
+        class="org.eclipse.ptp.ui.views.ParallelJobView"
+        icon="icons/parallel_perspective.gif"
+        id="org.eclipse.ptp.ui.views.parallelJobView"
+        name="%ParallelJobView.name">
+  </view>
 	</extension>
 	<extension
 		point="org.eclipse.ui.editors">

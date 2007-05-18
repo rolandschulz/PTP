@@ -26,8 +26,8 @@ public interface IPTPUIConstants {
 	public static final String PLUGIN_ID = PTPUIPlugin.getUniqueIdentifier();
 	public static final String PREFIX = PLUGIN_ID + ".";
 	
-	public static final String VIEW_PARALLELMACHINE = PREFIX + "views.parallelMachineView";
-	public static final String VIEW_PARALLELJOB = PREFIX + "views.parallelJobView";
+	public static final String VIEW_PARALLELMACHINES = PREFIX + "views.parallelMachinesView";
+	public static final String VIEW_PARALLELJOBS = PREFIX + "views.parallelJobsView";
 	public static final String VIEW_PARALLELProcess = PREFIX + "views.parallelProcessView";
 	public static final String VIEW_RESOURCEMANAGER = PREFIX + "views.resourceManagerView";
 	

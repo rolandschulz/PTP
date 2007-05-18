@@ -69,7 +69,7 @@ import org.eclipse.swt.widgets.TableItem;
 
 /**
  * @author clement chu
- * 
+ * @deprecated
  */
 public class ParallelMachineView extends AbstractParallelSetView implements IResourceManagerMachineListener, IMachineNodeListener, INodeProcessListener {
 
@@ -339,8 +339,14 @@ public class ParallelMachineView extends AbstractParallelSetView implements IRes
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerMachineListener#handleEvent(org.eclipse.ptp.core.elements.events.IResourceManagerRemoveMachineEvent)
 	 */
-	public void handleEvent(IResourceManagerRemoveMachineEvent e) {
-		// TODO implement remote machine
+	public void handleEvent(final IResourceManagerRemoveMachineEvent e) {
+		UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
+			public void run() {
+				IPMachine machine = e.getMachine();
+				getMachineManager().removeMachine(machine);
+				updateAction();
+			}
+		});
 	}
 	
 	/** Register element

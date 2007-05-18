@@ -33,23 +33,23 @@ public class PRunPerspectiveFactory implements IPerspectiveFactory {
 	public void createInitialLayout(IPageLayout layout) {
  		String editorArea = layout.getEditorArea();
 		
-		IFolderLayout folder1= layout.createFolder("topLeft", IPageLayout.LEFT, (float)0.25, editorArea);
-		folder1.addView(IPTPUIConstants.VIEW_PARALLELMACHINE);
-		folder1.addView(IPTPUIConstants.VIEW_PARALLELJOB);
-		folder1.addView(IPTPUIConstants.VIEW_RESOURCEMANAGER);
+		IFolderLayout rmFolder= layout.createFolder("rmFolder", IPageLayout.LEFT, (float)0.50, editorArea);
+		rmFolder.addView(IPTPUIConstants.VIEW_RESOURCEMANAGER);
 
-		folder1.addPlaceholder(IPageLayout.ID_BOOKMARKS);
-		
-		IFolderLayout folder2= layout.createFolder("bottom", IPageLayout.BOTTOM, (float)0.75, editorArea);
-		folder2.addView(IConsoleConstants.ID_CONSOLE_VIEW);
-		folder2.addView(IPageLayout.ID_PROBLEM_VIEW);
-		folder2.addView(IPageLayout.ID_PROP_SHEET);
-		folder2.addView(IPageLayout.ID_TASK_LIST);
-		folder2.addView("org.eclipse.pde.runtime.LogView");
-		
-		IFolderLayout folder3= layout.createFolder("topRight", IPageLayout.RIGHT,(float)0.75, editorArea);
-		folder3.addView(IPageLayout.ID_OUTLINE);
+		IFolderLayout jobsFolder= layout.createFolder("jobsFolder", IPageLayout.BOTTOM, (float)0.75, "rmFolder");
+		jobsFolder.addView(IPTPUIConstants.VIEW_PARALLELJOBS);
 
+		IFolderLayout machinesFolder = layout.createFolder("machinesFolder", IPageLayout.BOTTOM, (float)0.25, "rmFolder");
+		machinesFolder.addView(IPTPUIConstants.VIEW_PARALLELMACHINES);
+		machinesFolder.addPlaceholder(IPageLayout.ID_BOOKMARKS);
+		
+		IFolderLayout consoleFolder= layout.createFolder("consoleFolder", IPageLayout.BOTTOM, (float)0.75, editorArea);
+		consoleFolder.addView(IConsoleConstants.ID_CONSOLE_VIEW);
+		consoleFolder.addView(IPageLayout.ID_PROBLEM_VIEW);
+		consoleFolder.addView(IPageLayout.ID_PROP_SHEET);
+		consoleFolder.addView(IPageLayout.ID_TASK_LIST);
+		consoleFolder.addView("org.eclipse.pde.runtime.LogView");
+		
 		// set toolbar or menu icon
 		//layout.addActionSet(IDebugUIConstants.LAUNCH_ACTION_SET);
 		//layout.addActionSet(IPTPUIConstants.ACTION_SET);
@@ -61,8 +61,8 @@ public class PRunPerspectiveFactory implements IPerspectiveFactory {
 		layout.addShowViewShortcut(NewSearchUI.SEARCH_VIEW_ID);
 		
 		// views - standard workbench
-		layout.addShowViewShortcut(IPTPUIConstants.VIEW_PARALLELMACHINE);
-		layout.addShowViewShortcut(IPTPUIConstants.VIEW_PARALLELJOB);
+		layout.addShowViewShortcut(IPTPUIConstants.VIEW_PARALLELMACHINES);
+		layout.addShowViewShortcut(IPTPUIConstants.VIEW_PARALLELJOBS);
 		layout.addShowViewShortcut(IPageLayout.ID_OUTLINE);
 		layout.addShowViewShortcut(IPageLayout.ID_TASK_LIST);
 		layout.addShowViewShortcut(IPageLayout.ID_PROBLEM_VIEW);
@@ -70,8 +70,8 @@ public class PRunPerspectiveFactory implements IPerspectiveFactory {
 		layout.addShowViewShortcut("org.eclipse.pde.runtime.LogView");
 		
 		// link - things we should do
-		layout.addShowInPart(IPTPUIConstants.VIEW_PARALLELMACHINE);
-		layout.addShowInPart(IPTPUIConstants.VIEW_PARALLELJOB);
+		layout.addShowInPart(IPTPUIConstants.VIEW_PARALLELMACHINES);
+		layout.addShowInPart(IPTPUIConstants.VIEW_PARALLELJOBS);
 		//layout.addShowInPart(IPageLayout.ID_RES_NAV);
 		//layout.addShowInPart("org.eclipse.pde.runtime.LogView");
 	}
