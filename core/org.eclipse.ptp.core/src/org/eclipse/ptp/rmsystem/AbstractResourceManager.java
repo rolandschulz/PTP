@@ -77,6 +77,8 @@ import org.eclipse.ptp.core.elements.events.IResourceManagerChangedQueueEvent;
 import org.eclipse.ptp.core.elements.events.IResourceManagerErrorEvent;
 import org.eclipse.ptp.core.elements.events.IResourceManagerNewMachineEvent;
 import org.eclipse.ptp.core.elements.events.IResourceManagerNewQueueEvent;
+import org.eclipse.ptp.core.elements.events.IResourceManagerRemoveMachineEvent;
+import org.eclipse.ptp.core.elements.events.IResourceManagerRemoveQueueEvent;
 import org.eclipse.ptp.core.elements.listeners.IJobProcessListener;
 import org.eclipse.ptp.core.elements.listeners.IMachineListener;
 import org.eclipse.ptp.core.elements.listeners.IMachineNodeListener;
@@ -97,6 +99,8 @@ import org.eclipse.ptp.internal.core.elements.events.ResourceManagerChangedQueue
 import org.eclipse.ptp.internal.core.elements.events.ResourceManagerErrorEvent;
 import org.eclipse.ptp.internal.core.elements.events.ResourceManagerNewMachineEvent;
 import org.eclipse.ptp.internal.core.elements.events.ResourceManagerNewQueueEvent;
+import org.eclipse.ptp.internal.core.elements.events.ResourceManagerRemoveMachineEvent;
+import org.eclipse.ptp.internal.core.elements.events.ResourceManagerRemoveQueueEvent;
 
 /**
  * @author rsqrd
@@ -699,6 +703,30 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	}
 
 	/**
+	 * @param machine
+	 */
+	protected void fireRemoveMachine(IPMachine machine) {
+		IResourceManagerRemoveMachineEvent e = 
+			new ResourceManagerRemoveMachineEvent(this, machine);
+
+		for (Object listener : machineListeners.getListeners()) {
+			((IResourceManagerMachineListener)listener).handleEvent(e);
+		}
+	}
+
+	/**
+	 * @param queue
+	 */
+	protected void fireRemoveQueue(IPQueue queue) {
+		IResourceManagerRemoveQueueEvent e = 
+			new ResourceManagerRemoveQueueEvent(this, queue);
+
+		for (Object listener : queueListeners.getListeners()) {
+			((IResourceManagerQueueListener)listener).handleEvent(e);
+		}
+	}
+	
+	/**
 	 * @param jobId
 	 * @return
 	 */
@@ -831,6 +859,7 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 		machine.removeElementListener(machineListener);
 		machine.removeChildListener(machineNodeListener);
 		machinesById.remove(machine.getID());
+		fireRemoveMachine(machine);
 	}
 
 	/**
@@ -861,6 +890,7 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 		if (attr != null) {
 			queuesByName.remove(attr.getValue());
 		}
+		fireRemoveQueue(queue);
 	}
 
 	/**
