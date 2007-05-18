@@ -19,6 +19,7 @@
 package org.eclipse.ptp.internal.core.elements;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -230,6 +231,7 @@ public class PProcess extends Parent implements IPProcessControl {
 	public void setState(State state) {
 		EnumeratedAttribute<State> procState = getStateAttribute();
 		procState.setValue(state);
+		fireChangedProcess(Arrays.asList(new IAttribute[] { procState }));
 	}
 	
 	/* (non-Javadoc)
