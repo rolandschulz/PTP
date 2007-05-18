@@ -56,7 +56,6 @@ import org.eclipse.ptp.core.events.IModelManagerNewResourceManagerEvent;
 import org.eclipse.ptp.core.events.IModelManagerRemoveResourceManagerEvent;
 import org.eclipse.ptp.core.listeners.IModelManagerResourceManagerListener;
 import org.eclipse.ptp.internal.ui.ParallelImages;
-import org.eclipse.ptp.internal.ui.actions.ChangeQueueAction;
 import org.eclipse.ptp.internal.ui.actions.RemoveAllTerminatedAction;
 import org.eclipse.ptp.internal.ui.actions.TerminateAllAction;
 import org.eclipse.ptp.ui.IManager;
@@ -83,9 +82,10 @@ import org.eclipse.swt.widgets.TableItem;
 
 /**
  * @author Clement chu
- * @deprecated
+ * Additional changes Greg Watson
+ * 
  */
-public class ParallelJobView extends AbstractParallelSetView implements IModelManagerResourceManagerListener, IResourceManagerQueueListener, IQueueJobListener, IJobProcessListener {
+public class ParallelJobsView extends AbstractParallelSetView implements IModelManagerResourceManagerListener, IResourceManagerQueueListener, IQueueJobListener, IJobProcessListener {
 	// selected element
 	protected String cur_selected_element_id = IManager.EMPTY_ID;
 	// composite
@@ -101,12 +101,11 @@ public class ParallelJobView extends AbstractParallelSetView implements IModelMa
 	public static final String JOB_VIEW = "1";
 	public static final String PRO_VIEW = "2";
 	protected String current_view = BOTH_VIEW;
-	private ChangeQueueAction changeQueueAction = null;
 
 	/** Constructor
 	 * 
 	 */
-	public ParallelJobView(IManager manager) {
+	public ParallelJobsView(IManager manager) {
 		super(manager);
 		
 		IModelManager mm = PTPCorePlugin.getDefault().getModelManager();
@@ -125,7 +124,7 @@ public class ParallelJobView extends AbstractParallelSetView implements IModelMa
 		mm.addListener(this);
 	}
 	
-	public ParallelJobView() {
+	public ParallelJobsView() {
 		this(PTPUIPlugin.getDefault().getJobManager());
 	}
 	
@@ -147,11 +146,11 @@ public class ParallelJobView extends AbstractParallelSetView implements IModelMa
 	 */
 	public void changeView(String view_flag) {
 		current_view = view_flag;
-		if (current_view.equals(ParallelJobView.JOB_VIEW)) {
+		if (current_view.equals(ParallelJobsView.JOB_VIEW)) {
 			jobTableViewer.getTable().setVisible(true);
 			elementViewComposite.setVisible(false);
 			sashForm.setWeights(new int[] { 1, 0 });
-		} else if (current_view.equals(ParallelJobView.PRO_VIEW)) {
+		} else if (current_view.equals(ParallelJobsView.PRO_VIEW)) {
 			jobTableViewer.getTable().setVisible(false);
 			elementViewComposite.setVisible(true);
 			sashForm.setWeights(new int[] { 0, 1 });
@@ -292,8 +291,6 @@ public class ParallelJobView extends AbstractParallelSetView implements IModelMa
 	protected void createToolBarActions(IToolBarManager toolBarMgr) {
 		terminateAllAction = new TerminateAllAction(this);
 		toolBarMgr.appendToGroup(IPTPUIConstants.IUIACTIONGROUP, terminateAllAction);
-		changeQueueAction = new ChangeQueueAction(this);
-		toolBarMgr.appendToGroup(IPTPUIConstants.IUINAVIGATORGROUP, changeQueueAction);
 		super.buildInToolBarActions(toolBarMgr);
 	}
 	
@@ -433,9 +430,6 @@ public class ParallelJobView extends AbstractParallelSetView implements IModelMa
 	 */
 	public void updateAction() {
 		super.updateAction();
-		if (changeQueueAction != null) {
-			changeQueueAction.setEnabled(((AbstractUIManager) manager).getResourceManagers().length > 0);
-		}
 		if (terminateAllAction != null) {
 			ISelection selection = jobTableViewer.getSelection();
 			if (selection.isEmpty()) {
@@ -469,19 +463,6 @@ public class ParallelJobView extends AbstractParallelSetView implements IModelMa
 		if (job == null) {
 			changeJob((String)null);
 		}
-	}
-	
-	public void selectQueue(IPQueue queue) {
-		JobManager jobManager = getJobManager();
-		IPQueue old = jobManager.getQueue();
-		if (old != null) {
-			old.removeChildListener(this);
-		}
-		jobManager.setQueue(queue);
-		if (queue != null) {
-			queue.addChildListener(this);
-		}
-		updateJobSet();
 	}
 	
 	public IPQueue getQueue() {
@@ -537,15 +518,23 @@ public class ParallelJobView extends AbstractParallelSetView implements IModelMa
 	 * @see org.eclipse.ptp.core.elements.listeners.IQueueJobListener#handleEvent(org.eclipse.ptp.core.elements.events.IQueueNewJobEvent)
 	 */
 	public void handleEvent(final IQueueNewJobEvent e) {
-		changeJobRefresh(e.getJob());
+		UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
+			public void run() {
+				changeJobRefresh(e.getJob());
+			}
+		});	
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.listeners.IQueueJobListener#handleEvent(org.eclipse.ptp.core.elements.events.IQueueRemoveJobEvent)
 	 */
 	public void handleEvent(final IQueueRemoveJobEvent e) {
-		getJobManager().removeJob(e.getJob());
-		changeJobRefresh(null);
+		UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
+			public void run() {
+				getJobManager().removeJob(e.getJob());
+				changeJobRefresh(null);
+			}
+		});	
 	}
 	
 	/* (non-Javadoc)

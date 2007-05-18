@@ -33,6 +33,7 @@ import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.model.Element;
 import org.eclipse.ptp.ui.model.ElementHandler;
+import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
 
@@ -41,7 +42,8 @@ import org.eclipse.ptp.ui.model.IElementSet;
  * 
  */
 public class MachineManager extends AbstractUIManager {
-	private Map<String, IElementHandler> machineList = new HashMap<String, IElementHandler>();
+	private Map<String, IElementHandler> machineElementHandlerList = new HashMap<String, IElementHandler>();
+	private Map<String, IPMachine> machineList = new HashMap<String, IPMachine>();
 	protected IPMachine cur_machine = null;
 	protected final String DEFAULT_TITLE = "Please select a machine";
 	
@@ -57,9 +59,10 @@ public class MachineManager extends AbstractUIManager {
 			IElementHandler handler;
 			if (!machineList.containsKey(mac.getID())) {
 				handler = new ElementHandler();
-				machineList.put(mac.getID(), handler);
+				machineList.put(mac.getID(), mac);
+				machineElementHandlerList.put(mac.getID(), handler);
 			} else {
-				handler = machineList.get(mac.getID());				
+				handler = machineElementHandlerList.get(mac.getID());				
 			}
 			IElementSet set = handler.getSetRoot();
 			for (IPNode node : mac.getNodes()) {
@@ -76,11 +79,32 @@ public class MachineManager extends AbstractUIManager {
 	 */
 	public void addNode(IPNode node) {
 		addMachine(node.getMachine());
-		IElementHandler elementHandler = machineList.get(node.getMachine().getID());
+		IElementHandler elementHandler = machineElementHandlerList.get(node.getMachine().getID());
 		IElementSet set = elementHandler.getSetRoot();
 		String id = node.getID();
 		if (set.getElement(id) == null) {
 			set.add(new Element(set, id, node.getName()));
+		}
+	}
+	
+	/**
+	 * @param machine
+	 */
+	public void removeMachine(IPMachine machine) {
+		machineList.remove(machine.getID());
+		machineElementHandlerList.remove(machine.getID());
+		IElementHandler handler = machineElementHandlerList.get(machine.getID());
+		if (handler != null) {
+			IElementSet set = handler.getSetRoot();
+			for (IPNode node : machine.getNodes()) {
+				IElement element = set.getElement(node.getID());
+				if (element != null) {
+					set.remove(element);
+				}
+			}
+		}
+		if (cur_machine == machine) {
+			cur_machine = null;
 		}
 	}
 
@@ -90,6 +114,7 @@ public class MachineManager extends AbstractUIManager {
 	public void clear() {
 		if (machineList != null) {
 			machineList.clear();
+			machineElementHandlerList.clear();
 		}
 	}
 	
@@ -113,6 +138,10 @@ public class MachineManager extends AbstractUIManager {
 		return cur_machine;
 	}
 	
+	public IPMachine findMachineById(String id) {
+		return (IPMachine) machineList.get(id);
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#getCurrentSetId()
 	 */
@@ -124,7 +153,7 @@ public class MachineManager extends AbstractUIManager {
 	 * @see org.eclipse.ptp.ui.IManager#getElementHandler(java.lang.String)
 	 */
 	public IElementHandler getElementHandler(String id) {
-		return (IElementHandler) machineList.get(id);
+		return (IElementHandler) machineElementHandlerList.get(id);
 	}
 	
 	/* (non-Javadoc)
@@ -138,9 +167,8 @@ public class MachineManager extends AbstractUIManager {
 		IPMachine machine = getCurrentMachine();
 		if (machine != null) {
 			IResourceManager rm = machine.getResourceManager();
-			IPMachine machine2 = rm.getMachineById(id);
-			if (machine2 != null) {
-				return rm.getName() + ": " + machine2.getName();
+			if (rm != null) {
+				return rm.getName() + ": " + machine.getName();
 			}
 		}
 		return "";
@@ -150,10 +178,7 @@ public class MachineManager extends AbstractUIManager {
 	 * @return machines
 	 */
 	public IPMachine[] getMachines() {
-		if (cur_machine != null) {
-			return cur_machine.getResourceManager().getMachines();
-		}
-		return new IPMachine[] {};
+		return machineList.values().toArray(new IPMachine[0]);
 	}
 	
 	/* (non-Javadoc)
@@ -308,15 +333,14 @@ public class MachineManager extends AbstractUIManager {
 	 * @see org.eclipse.ptp.ui.IManager#initial()
 	 */
 	public IPElement initial(IPUniverse universe) {
-		IPMachine[] macs = getMachines();
-		if (macs.length > 0) {
-			cur_machine = macs[0];
-			for (int j = 0; j < macs.length; j++) {
-				addMachine(macs[j]);
+		for (IResourceManager rm : universe.getResourceManagers()) {
+			for (IPMachine machine : rm.getMachines()) {
+				addMachine(machine);
 			}
-			setCurrentSetId(IElementHandler.SET_ROOT_ID);
 		}
-		return cur_machine;
+
+		setCurrentSetId(IElementHandler.SET_ROOT_ID);
+		return null;
 	}	
 	
 	/** Is current set contain node

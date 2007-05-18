@@ -50,7 +50,7 @@ public class JobManager extends AbstractUIManager {
 	protected Map<String, IPJob> jobList = new HashMap<String, IPJob>();
 	protected IPJob cur_job = null;
 	protected IPQueue cur_queue = null;
-	protected final String DEFAULT_TITLE = "Please select a queue";
+	protected final String DEFAULT_TITLE = "Please select a job";
 
 	/** 
 	 * Add a new job to jobList. Check for any new processes and add these to
@@ -163,20 +163,20 @@ public class JobManager extends AbstractUIManager {
 	 * @see org.eclipse.ptp.ui.IManager#getFullyQualifiedName(java.lang.String)
 	 */
 	public String getFullyQualifiedName(String id) {
-		final IPQueue queue = getQueue();
-		String name;
-		if (queue == null) {
-			name = DEFAULT_TITLE;
-		} else {
-			name = queue.getResourceManager().getName() + ":" + queue.getName();
-			if (!id.equals(EMPTY_ID)) {
-				IPJob job = queue.getJobById(id);
-				if (job != null) {
-					name +=  ":" + job.getName();
+		if (id.equals(EMPTY_ID)) {
+			return DEFAULT_TITLE;
+		}
+		IPJob job = getJob();
+		if (job != null) {
+			IPQueue queue = job.getQueue();
+			if (queue != null) {
+				IResourceManager rm = queue.getResourceManager();
+				if (rm != null) {
+					return rm.getName() + ": " + queue.getName() + ":" + job.getName();
 				}
 			}
 		}
-		return name;
+		return "";
 	}
 	
 	/** Get process status
