@@ -73,7 +73,14 @@ public interface IPElement extends IAdaptable {
 	public IAttribute getAttribute(String attrDefId);
 
 	/**
-	 * Returns a set continain attribute name, attribute pairs
+	 * Returns an array containing all attributes.
+	 * 
+	 * @return An array of attributes for this element
+	 */
+	public IAttribute[] getAttributes();
+
+	/**
+	 * Returns a set containing attribute name, attribute pairs
 	 * 
 	 * @return entry set
 	 */
