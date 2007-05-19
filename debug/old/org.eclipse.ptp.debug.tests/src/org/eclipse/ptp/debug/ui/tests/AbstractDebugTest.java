@@ -77,11 +77,6 @@ public abstract class AbstractDebugTest extends TestCase {
 	 * Tear down when test case is finished
 	 */
 	protected void tearDown() throws CoreException, IOException, PCDIException {
-		if (job != null) {
-			if(job.isTerminated()) {
-				job.removeAllProcesses();
-			}
-		}
 		job = null;
 	}
 }
