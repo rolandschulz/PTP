@@ -163,6 +163,8 @@ public class ParallelMachinesView extends AbstractParallelSetView implements
 					changeMachine(machine);
 					machineTableViewer.refresh(true);
 					machineTableViewer.setSelection(machine == null ? new StructuredSelection() : new StructuredSelection(machine), true);
+					nodeAttrTableViewer.refresh();
+					processTableViewer.refresh();
 				}
 			}
 		});
