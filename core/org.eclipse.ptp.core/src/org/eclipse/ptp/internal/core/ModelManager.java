@@ -87,8 +87,6 @@ public class ModelManager implements IModelManager {
 			return resourceManagerFactories;
 		}
 		
-		System.out.println("In getResourceManagerFactories");
-	
 		final ArrayList<AbstractResourceManagerFactory> factoryList = new ArrayList<AbstractResourceManagerFactory>();
 	
 		IExtensionRegistry registry = Platform.getExtensionRegistry();
@@ -107,7 +105,6 @@ public class ModelManager implements IModelManager {
 					AbstractResourceManagerFactory factory = (AbstractResourceManagerFactory) ce.createExecutableExtension("class");
 					factory.setId(ce.getAttribute("id"));
 					factoryList.add(factory);
-					System.out.println("retrieved factory: " + factory.getName() + ", " + factory.getId());
 				} catch (CoreException e) {
 					PTPCorePlugin.log(e);
 				}
@@ -117,7 +114,6 @@ public class ModelManager implements IModelManager {
 			(IResourceManagerFactory[]) factoryList.toArray(
 					new IResourceManagerFactory[factoryList.size()]);
 	
-		System.out.println("leaving getResourceManagerFactories");
 		return resourceManagerFactories;
 	}
 	/**
