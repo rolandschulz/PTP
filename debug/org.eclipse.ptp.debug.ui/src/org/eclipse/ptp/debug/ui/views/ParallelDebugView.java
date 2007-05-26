@@ -18,8 +18,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.ui.views;
 
-import java.util.Iterator;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -63,7 +61,7 @@ import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.ptp.ui.views.IIconCanvasActionListener;
-import org.eclipse.ptp.ui.views.ParallelJobView;
+import org.eclipse.ptp.ui.views.ParallelJobsView;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IViewPart;
@@ -74,7 +72,7 @@ import org.eclipse.ui.progress.WorkbenchJob;
  * @author clement chu
  * 
  */
-public class ParallelDebugView extends ParallelJobView {
+public class ParallelDebugView extends ParallelJobsView {
 	// actions
 	protected ParallelAction resumeAction = null;
 	protected ParallelAction suspendAction = null;
@@ -94,11 +92,10 @@ public class ParallelDebugView extends ParallelJobView {
 				if (selection instanceof IStructuredSelection) {
 					if (canvas != null && !canvas.isDisposed()) {
 						canvas.unselectAllElements();
-						for (Iterator i=((IStructuredSelection)selection).iterator(); i.hasNext();) {
-							Object obj = i.next();
+						for (Object obj : ((IStructuredSelection)selection).toArray()) {
 							if (obj instanceof IPDebugElement) {
 								int taskID = ((IPDebugTarget)((IPDebugElement)obj).getDebugTarget()).getTargetID();
-								if (!canvas.isSelected(taskID))
+				 				if (!canvas.isSelected(taskID))
 									canvas.selectElement(taskID);
 							}
 						}
@@ -619,9 +616,7 @@ public class ParallelDebugView extends ParallelJobView {
 	 * @see org.eclipse.ptp.core.elements.listeners.IQueueJobListener#handleEvent(org.eclipse.ptp.core.elements.events.IQueueNewJobEvent)
 	 */
 	public void handleEvent(final IQueueNewJobEvent e) {
-		System.out.println("debugview: got job");
 		if (e.getJob().isDebug()) {
-			System.out.println("debugview: got debug job");
 			changeJobRefresh(e.getJob());
 		}
 	}
