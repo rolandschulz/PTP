@@ -19,7 +19,6 @@
 package org.eclipse.ptp.core.elements;
 
 import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.ptp.core.attributes.IAttribute;
@@ -80,18 +79,18 @@ public interface IPElement extends IAdaptable {
 	public IAttribute[] getAttributes();
 
 	/**
-	 * Returns a set containing attribute name, attribute pairs
+	 * Get all the attribute definitions that this element knows about.
 	 * 
-	 * @return entry set
+	 * @return array of IAttributeDefinition keys
 	 */
-	public Set<Map.Entry<String, IAttribute>> getAttributeEntrySet();
+	public IAttributeDefinition[] getAttributeKeys();
 
 	/**
-	 * Get all the attribute definition ID's that this element knows about.
+	 * Returns a map containing attribute name, attribute pairs
 	 * 
-	 * @return array of string keys
+	 * @return map
 	 */
-	public String[] getAttributeKeys();
+	public Map<IAttributeDefinition, IAttribute> getAttributeMap();
 
 	/**
 	 * Removes the attribute value.
