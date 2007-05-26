@@ -142,8 +142,6 @@ public class ResourceManagerView extends ViewPart implements
 		}
 
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-			System.out.println("inputChanged: viewer = " + viewer); //$NON-NLS-1$
-
 			parents.clear();
 
 			HashSet<IResourceManager> oldRMs = new HashSet<IResourceManager>();
