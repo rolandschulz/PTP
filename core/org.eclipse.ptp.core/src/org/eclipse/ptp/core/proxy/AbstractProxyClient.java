@@ -33,6 +33,7 @@ import java.nio.charset.CharsetEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.ptp.core.proxy.command.IProxyCommand;
 import org.eclipse.ptp.core.proxy.command.ProxyQuitCommand;
@@ -71,8 +72,8 @@ public abstract class AbstractProxyClient implements IProxyClient {
 	private CharsetDecoder	decoder = charset.newDecoder();
 
 	private enum SessionState {WAITING, CONNECTED, RUNNING, SHUTTING_DOWN, SHUTDOWN};
-	
-	private volatile SessionState sessionState = SessionState.SHUTDOWN;
+	private SessionState state = SessionState.SHUTDOWN;
+	private final ReentrantLock stateLock = new ReentrantLock();
 	
 	public AbstractProxyClient(IProxyEventFactory factory) {
 		proxyEventFactory = factory;
@@ -83,11 +84,21 @@ public abstract class AbstractProxyClient implements IProxyClient {
 	}
 	
 	public boolean isReady() {
-		return sessionState == SessionState.RUNNING;
+		stateLock.lock();
+		try {
+			return state == SessionState.RUNNING;
+		} finally {
+			stateLock.unlock();
+		}
 	}
 	
 	public boolean isShutdown() {
-		return sessionState == SessionState.SHUTDOWN;
+		stateLock.lock();
+		try {
+			return state == SessionState.SHUTDOWN;
+		} finally {
+			stateLock.unlock();
+		}
 	}
 
 	public CharsetEncoder encoder() {
@@ -187,7 +198,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 	 * 
 	 * ProxyConnectedEvent	if the incoming connection succeeded
 	 * ProxyTimeoutEvent	if no connection is established before the timeout expires
-	 * ProxyErrorEvent		if the accept fails or is cancelled
+	 * ProxyErrorEvent		if the accept fails or is canceled
 	 * 
 	 * @param	port		port number to use for incoming connection (0 = autogenerate)
 	 * @param	timeout		delay (in ms) to wait for incoming connection (0 = wait forever)
@@ -203,28 +214,48 @@ public abstract class AbstractProxyClient implements IProxyClient {
 			sessSvrSock.socket().setSoTimeout(timeout);
 		sessPort = sessSvrSock.socket().getLocalPort();
 		sessHost = sessSvrSock.socket().getLocalSocketAddress().toString();
-		sessionState = SessionState.WAITING;
+		stateLock.lock();
+		try {
+			state = SessionState.WAITING;
+		} finally {
+			stateLock.unlock();
+		}
 		System.out.println("port=" + sessPort);
 		acceptThread = new Thread("Proxy Client Accept Thread") {
 			public void run() {
+				boolean error = false;
 				try {
 					System.out.println("accept thread starting...");
 					sessSock = sessSvrSock.accept();
-					sessionState = SessionState.CONNECTED;
-					fireProxyConnectedEvent(new ProxyConnectedEvent());
 				} catch (SocketTimeoutException e) {
+					error = true;
 					fireProxyTimeoutEvent(new ProxyTimeoutEvent());
 				} catch (ClosedByInterruptException e) {
-					sessionState = SessionState.SHUTDOWN;
+					error = true;
 					fireProxyErrorEvent(new ProxyErrorEvent(0, 0, "Accept cancelled by user"));
 				} catch (IOException e) {
-					sessionState = SessionState.SHUTDOWN;
+					error = true;
 					fireProxyErrorEvent(new ProxyErrorEvent(0, 0, "IOException in accept"));
 				} finally {		
 					try {
 						sessSvrSock.close();
 					} catch (IOException e) {
 						System.out.println("IO Exception trying to close server socket (non fatal)");
+					}
+					stateLock.lock();
+					try {
+						if (isInterrupted()) {
+							error = true;
+							fireProxyErrorEvent(new ProxyErrorEvent(0, 0, "Connection cancelled by user"));
+						}
+						if (!error && state == SessionState.WAITING) {
+							state = SessionState.CONNECTED;
+							fireProxyConnectedEvent(new ProxyConnectedEvent());
+						} else {
+							state = SessionState.SHUTDOWN;
+						}
+					} finally {
+						stateLock.unlock();
 					}
 					System.out.println("accept thread exiting...");
 				}
@@ -248,10 +279,6 @@ public abstract class AbstractProxyClient implements IProxyClient {
 	 * @throws IOException	if the session is not connected or the event thread fails to start
 	 */
 	public void sessionHandleEvents() throws IOException {
-		if (sessionState != SessionState.CONNECTED) {
-			throw new IOException("Not ready to receive events");
-		}
-
 		eventThread = new Thread("Proxy Client Event Thread") {
 			public void run() {
 				boolean error = false;
@@ -259,33 +286,61 @@ public abstract class AbstractProxyClient implements IProxyClient {
 				
 				System.out.println("event thread starting...");
 				try {
-					while (errorCount < MAX_ERRORS && !interrupted() && sessionState != SessionState.SHUTDOWN) {
+					while (errorCount < MAX_ERRORS && !isInterrupted()) {
+						stateLock.lock();
+						try {
+							if (state == SessionState.SHUTDOWN) {
+								break;
+							}
+						} finally {
+							stateLock.unlock();
+						}
 						if (!sessionProgress()) {
 							errorCount++;
 						}
 					}
 				} catch (IOException e) {
-					if (!interrupted() && sessionState != SessionState.SHUTTING_DOWN) {
-						error = true;
-						System.out.println("event thread IOException . . . " + e.getMessage());
+					stateLock.lock();
+					try {
+						if (!isInterrupted() && state != SessionState.SHUTTING_DOWN) {
+							error = true;
+							System.out.println("event thread IOException . . . " + e.getMessage());
+						}
+					} finally {
+						stateLock.unlock();
 					}
 				} 
 				
 				if (errorCount >= MAX_ERRORS) {
 					error = true;
-					sessionState = SessionState.SHUTDOWN;
 				}
 				
 				try {
 					sessSock.close();
 				} catch (IOException e) {
 				} 
+				
+				stateLock.lock();
+				try {
+					state = SessionState.SHUTDOWN;
+				} finally {
+					stateLock.unlock();
+				}
+
 				fireProxyDisconnectedEvent(new ProxyDisconnectedEvent(error));
 				System.out.println("event thread exited");
 			}
 		};
 
-		sessionState = SessionState.RUNNING;
+		stateLock.lock();
+		try {
+			if (state != SessionState.CONNECTED) {
+				throw new IOException("Not ready to receive events");
+			}
+			state = SessionState.RUNNING;
+		} finally {
+			stateLock.unlock();
+		}
 		eventThread.start();
 	}
 	
@@ -489,9 +544,10 @@ public abstract class AbstractProxyClient implements IProxyClient {
 			if (e instanceof IProxyErrorEvent) {
 				fireProxyErrorEvent((IProxyErrorEvent) e);
 			} else if (e instanceof IProxyOKEvent) {
-				if (sessionState == SessionState.SHUTTING_DOWN && 
+				if (state == SessionState.SHUTTING_DOWN && 
 						shutdownID == e.getTransactionID()) {
-					sessionState = SessionState.SHUTDOWN;
+					state = SessionState.SHUTDOWN;
+					// TODO: stop shutdown timeout
 				} else {
 					fireProxyOKEvent((IProxyOKEvent) e);
 				}
@@ -516,25 +572,49 @@ public abstract class AbstractProxyClient implements IProxyClient {
 	 * @throws	IOException	if the session is already shut down
 	 */
 	public void sessionFinish() throws IOException {
-		/*
-		 * Force interrupt of accept. Note that this will cause
-		 * a ProxyErrorEvent to be generated
-		 */
-		if (acceptThread.isAlive()) {
-			acceptThread.interrupt();
-		}
-		
-		if (isReady()) {
-			sessionState = SessionState.SHUTTING_DOWN;
+		stateLock.lock();
+		try {
+			SessionState oldState = state;
 			
-			/*
-			 * Send quit command. Proxy will shut down when OK is
-			 * received or after shutdownTimeout.
-			 */
-			IProxyCommand cmd = new ProxyQuitCommand(this);
-			shutdownID = cmd.getTransactionID();
-			String cmdBuf = cmd.getEncodedMessage();
-			sendCommandBuffer(cmdBuf);
+			state = SessionState.SHUTTING_DOWN;
+			
+			switch (oldState) {
+			case WAITING:
+				if (acceptThread.isAlive()) {
+					/*
+					 * Force interrupt of accept. Note that this will cause
+					 * a ProxyErrorEvent to be generated
+					 */
+					acceptThread.interrupt();
+				}
+				break;
+			case CONNECTED:
+				try {
+					sessSock.close();
+				} catch (IOException e) {
+					state = SessionState.SHUTDOWN;
+				} 
+				break;
+			case RUNNING:
+				/*
+				 * Send quit command. Proxy will shut down when OK is
+				 * received or after shutdownTimeout.
+				 */
+				IProxyCommand cmd = new ProxyQuitCommand(this);
+				shutdownID = cmd.getTransactionID();
+				String cmdBuf = cmd.getEncodedMessage();
+				// TODO: start shutdown timeout
+				try {
+					sendCommandBuffer(cmdBuf);
+				} catch (IOException e) {
+					// Tell event thread to exit
+					state = SessionState.SHUTDOWN;
+					// TODO: stop shutdown timeout
+				}
+				break;
+			}
+		} finally {
+			stateLock.unlock();
 		}
 	}
 }
