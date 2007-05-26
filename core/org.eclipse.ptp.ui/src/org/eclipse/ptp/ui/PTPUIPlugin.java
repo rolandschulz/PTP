@@ -248,8 +248,6 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 	}
 
 	private void retrieveConfigurationWizardPageFactories() {
-
-    	System.out.println("In retrieveConfigurationWizardPageFactories");
     	configurationWizardPageFactories.clear();
     	
     	IExtensionRegistry registry = Platform.getExtensionRegistry();
@@ -268,12 +266,10 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 					RMConfigurationWizardPageFactory factory = (RMConfigurationWizardPageFactory) ce.createExecutableExtension("class");
 					Class rmFactoryClass = factory.getRMFactoryClass();
 					configurationWizardPageFactories.put(rmFactoryClass.getName(), factory);
-					System.out.println("wizard page factory: " + factory + " for class: " + rmFactoryClass);
 				} catch (CoreException e) {
 					log(e);
 				}
 			}
 		}
-	   	System.out.println("leaving retrieveConfigurationWizardPageFactories");
     }
 }
