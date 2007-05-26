@@ -38,18 +38,16 @@ public interface IControlSystem {
 	 * The AttributeManager contains resource manager specific information about 
 	 * how the user wants to run the job, such as the program name, number of processes, etc.
 	 * 
-	 * The jobSubId argument is used to provide an job submission ID that can be used
-	 * to identify the new job that is created. The ID will be returned as an attribute
-	 * on the new job.
+	 * submitJob returns a job submission ID that can be used to identify the new job that 
+	 * is created. The ID will be returned as an attribute on the new job.
 	 * 
 	 * This will call will result in either a new job event when the job is created
 	 * by the resource manager or an error event if the job submission fails.
 	 * 
-	 * @param jobSubId
 	 * @param attrMgr 
 	 * @throws CoreException 
 	 */
-	public void submitJob(int jobSubId, AttributeManager attrMgr) throws CoreException;
+	public String submitJob(AttributeManager attrMgr) throws CoreException;
 
 	/**
 	 * Terminates a running job.  The {@link IPJob} contains the job identifier used to 

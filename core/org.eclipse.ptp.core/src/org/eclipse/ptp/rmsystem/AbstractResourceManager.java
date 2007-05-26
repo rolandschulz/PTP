@@ -436,7 +436,7 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	 * Remove all the model elements below the RM. This is called when the RM
 	 * shuts down and ensures that everything is cleaned up properly.
 	 */
-	private void cleanUp() {
+	protected void cleanUp() {
 		for (IPQueueControl queue : getQueueControls()) {
 			removeQueue(queue);
 		}
@@ -508,11 +508,8 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.IResourceManager#submitJob(org.eclipse.ptp.core.attributes.AttributeManager, org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	public IPJob submitJob(AttributeManager attrMgr, IProgressMonitor monitor) throws CoreException {
-		if (monitor == null) {
-			monitor = new NullProgressMonitor();
-		}
-		return doSubmitJob(attrMgr, monitor);
+	public String submitJob(AttributeManager attrMgr) throws CoreException {
+		return doSubmitJob(attrMgr);
 	}
 	
 	/* (non-Javadoc)
@@ -628,11 +625,10 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 
 	/**
 	 * @param attrMgr
-	 * @param monitor
-	 * @return
+	 * @return String
 	 * @throws CoreException
 	 */
-	protected abstract IPJob doSubmitJob(AttributeManager attrMgr, IProgressMonitor monitor) throws CoreException;
+	protected abstract String doSubmitJob(AttributeManager attrMgr) throws CoreException;
 
 	/**
 	 * @param job

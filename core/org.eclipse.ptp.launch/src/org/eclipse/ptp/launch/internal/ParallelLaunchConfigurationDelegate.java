@@ -29,7 +29,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
@@ -39,7 +38,6 @@ import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.elements.IPJob;
-import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.debug.core.IAbstractDebugger;
@@ -58,17 +56,51 @@ import org.eclipse.ui.PartInitException;
 /**
  * 
  */
-public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchConfigurationDelegate {
-	/*
-	 * protected IPath getProgramPath(ILaunchConfiguration configuration) throws CoreException { String path = getProgramName(configuration); if (path == null) { return null; } return new Path(path); } protected IPath verifyProgramPath(ILaunchConfiguration config) throws CoreException { IProject project = verifyProject(config); IPath programPath = getProgramPath(config); if (programPath == null || programPath.isEmpty()) { return null; } if (!programPath.isAbsolute()) { programPath =
-	 * project.getFile(programPath).getLocation(); } if (!programPath.toFile().exists()) { abort(LaunchMessages.getResourceString("AbstractParallelLaunchDelegate.Program_file_does_not_exist"), new FileNotFoundException(LaunchMessages.getResourceString("AbstractParallelLaunchDelegate.PROGRAM_PATH_not_found")), IPTPLaunchConfigurationConstants.ERR_PROGRAM_NOT_EXIST); } return programPath; } protected IProject getProject(ILaunchConfiguration configuration) throws CoreException { String projectName =
-	 * getProjectName(configuration); if (projectName != null) { projectName = projectName.trim(); if (projectName.length() > 0) { return ResourcesPlugin.getWorkspace().getRoot().getProject(projectName); // ICProject cProject = // CCorePlugin.getDefault().getCoreModel().create(project); // if (cProject != null && cProject.exists()) { // return cProject; // } } } return null; }
+public class ParallelLaunchConfigurationDelegate 
+	extends AbstractParallelLaunchConfigurationDelegate {
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.launch.internal.AbstractParallelLaunchConfigurationDelegate#doCompleteJobLaunch(org.eclipse.ptp.core.elements.IPJob)
 	 */
-	public void launch(ILaunchConfiguration configuration, String mode, ILaunch launch, IProgressMonitor monitor) throws CoreException {
+	protected void doCompleteJobLaunch(ILaunchConfiguration configuration, String mode, IPLaunch launch, 
+			AttributeManager mgr, IAbstractDebugger debugger, IPJob job) {
+		launch.setAttribute(ElementAttributes.getIdAttributeDefinition().getId(), job.getID());
+		if (mode.equals(ILaunchManager.DEBUG_MODE)) {
+			// show ptp debug view
+			showPTPDebugView(IPTPDebugUIConstants.ID_VIEW_PARALLELDEBUG);
+			launch.setPJob(job);
+			IBinaryObject exeFile = null;
+			try {
+				exeFile = verifyBinary(configuration);
+				setDefaultSourceLocator(launch, configuration);
+			} catch (CoreException e) {
+				//FIXME: Error dialog?
+				System.out.println("Error completing debug job launch");
+				return;
+			}
+			/*
+			 * Wait for the incoming debug server connection. This can be canceled by the user.
+			 */
+			try {
+				PTPDebugCorePlugin.getDebugModel().createDebuggerSession(debugger, launch, exeFile, new NullProgressMonitor());
+			} catch (CoreException e) {
+				//FIXME: progress monitor?
+				System.out.println("Debug server failed to connect");
+			}
+		} else {
+			new RuntimeProcess(launch, job, null);
+		}
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.core.model.ILaunchConfigurationDelegate#launch(org.eclipse.debug.core.ILaunchConfiguration, java.lang.String, org.eclipse.debug.core.ILaunch, org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	public void launch(ILaunchConfiguration configuration, String mode, ILaunch launch, 
+			IProgressMonitor monitor) throws CoreException {
 		if (!(launch instanceof IPLaunch)) {
 			abort(LaunchMessages.getResourceString("ParallelLaunchConfigurationDelegate.Invalid_launch_object"), null, 0);
 		}
-		IPLaunch pLaunch = (IPLaunch) launch;
+		//IPLaunch pLaunch = (IPLaunch) launch;
 		if (monitor == null) {
 			monitor = new NullProgressMonitor();
 		}
@@ -80,10 +112,12 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 		IAbstractDebugger debugger = null;
 		IPJob job = null;
 		
+		/*
 		final IResourceManager rm = getResourceManager(configuration);
 		if (rm == null) {
 			abort(LaunchMessages.getResourceString("ParallelLaunchConfigurationDelegate.No_ResourceManager"), null, 0);
 		}
+		*/
 		
 		AttributeManager attrManager = getAttributeManager(configuration);
 
@@ -146,8 +180,16 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 				attrManager.addAttribute(JobAttributes.getDebuggerArgumentsAttributeDefinition().create(dbgArgs.toArray(new String[0])));
 				attrManager.addAttribute(JobAttributes.getDebugFlagAttributeDefinition().create(true));
 			}
+			
 			monitor.worked(10);
-			monitor.subTask("Starting the job . . .");
+			monitor.subTask("Submitting the job . . .");
+			
+			submitJob(configuration, mode, (IPLaunch)launch, attrManager, debugger);
+			
+			monitor.worked(10);
+			
+
+			/*
 			job = rm.submitJob(attrManager, new SubProgressMonitor(monitor, 150));
 			if (job == null) {
 				abort("Job submission failed", null, 0);
@@ -156,34 +198,24 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
 				// show ptp debug view
 				showPTPDebugView(IPTPDebugUIConstants.ID_VIEW_PARALLELDEBUG);
-				// Switch the perspective
-				// switchPerspectiveTo(DebugUITools.getLaunchPerspective(configuration.getType(), mode));
 				monitor.setTaskName("Starting the debugger . . .");
 				pLaunch.setPJob(job);
 				IBinaryObject exeFile = verifyBinary(configuration);
 				setDefaultSourceLocator(launch, configuration);
 				/*
 				 * Wait for the incoming debug server connection. This can be canceled by the user.
-				 */
+				 *
 				PTPDebugCorePlugin.getDebugModel().createDebuggerSession(debugger, pLaunch, exeFile, new SubProgressMonitor(monitor, 40));
 				monitor.worked(10);
 				if (monitor.isCanceled()) {
 					PTPDebugCorePlugin.getDebugModel().shutdownSession(job);
 				}
 			} else {
-				// showPTPDebugView(IPTPUIConstants.VIEW_PARALLELJOB);
 				new RuntimeProcess(pLaunch, job, null);
 				monitor.worked(40);
 			}
+		*/
 		} catch (CoreException e) {
-			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
-				PTPDebugCorePlugin.getDebugModel().shutdownSession(job);
-				/*
-				if (debugger != null) {
-					debugger.stopDebugger();
-				}
-				*/
-			}
 			if (e.getStatus().getPlugin().equals(PTPCorePlugin.PLUGIN_ID)) {
 				String msg = e.getMessage();
 				if (msg == null)
@@ -191,6 +223,14 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 				else
 					msg = msg + "\n\n";
 				abort(msg + LaunchMessages.getResourceString("ParallelLaunchConfigurationDelegate.Control_system_does_not_exist"), null, 0);
+			}
+			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
+				PTPDebugCorePlugin.getDebugModel().shutdownSession(job);
+				/*
+				if (debugger != null) {
+					debugger.stopDebugger();
+				}
+				*/
 			}
 			if (e.getStatus().getCode() != IStatus.CANCEL) {
 				throw e;
@@ -201,31 +241,10 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			monitor.done();
 		}
 	}
-	/*
-	private void switchPerspectiveTo(final String perspectiveID) {
-		Display display = Display.getCurrent();
-		if (display == null) {
-			display = Display.getDefault();
-		}
-		if (display != null && !display.isDisposed()) {
-			display.syncExec(new Runnable() {
-				public void run() {
-					IWorkbenchWindow window = PTPLaunchPlugin.getActiveWorkbenchWindow();
-					if (window != null) {
-						IWorkbenchPage page = window.getActivePage();
-						if (!page.getPerspective().getId().equals(perspectiveID)) {
-							try {
-								window.getWorkbench().showPerspective(perspectiveID, window);
-							} catch (WorkbenchException e) {
-								e.printStackTrace();
-							}
-						}
-					}
-				}
-			});
-		}
-	}
-	*/
+
+	/**
+	 * @param viewID
+	 */
 	private void showPTPDebugView(final String viewID) {
 		Display display = Display.getCurrent();
 		if (display == null) {
