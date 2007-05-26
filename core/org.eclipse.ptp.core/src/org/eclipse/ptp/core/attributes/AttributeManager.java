@@ -23,7 +23,7 @@ import java.util.Set;
  *
  */
 public class AttributeManager {
-	private Map<String, IAttribute>	map = new HashMap<String, IAttribute>();
+	private Map<IAttributeDefinition, IAttribute>	map = new HashMap<IAttributeDefinition, IAttribute>();
 	
 	public AttributeManager() {
 	}
@@ -35,7 +35,7 @@ public class AttributeManager {
 	}
 
 	public void addAttribute(IAttribute attr) {
-		map.put(attr.getDefinition().getId(), attr);
+		map.put(attr.getDefinition(), attr);
 	}
 
 	/**
@@ -47,10 +47,10 @@ public class AttributeManager {
 	 */
 	public void addAttributes(IAttribute[] attrs) {
 		for (IAttribute attr : attrs) {
-			String id = attr.getDefinition().getId();
-			if (map.containsKey(id) && attr instanceof ArrayAttribute) {
+			IAttributeDefinition def = attr.getDefinition();
+			if (map.containsKey(def) && attr instanceof ArrayAttribute) {
 				@SuppressWarnings("unchecked")
-				ArrayAttribute exAttr = (ArrayAttribute)map.get(id);
+				ArrayAttribute exAttr = (ArrayAttribute)map.get(def);
 				@SuppressWarnings("unchecked")
 				final Comparable[] value = ((ArrayAttribute)attr).getValue();
 				exAttr.addAll(value);
@@ -61,7 +61,12 @@ public class AttributeManager {
 	}
 
 	public IAttribute getAttribute(String id) {
-		return map.get(id);
+		for (Map.Entry<IAttributeDefinition, IAttribute> entry : map.entrySet()) {
+			if (entry.getKey().getId().equals(id)) {
+				return entry.getValue();
+			}
+		}
+		return null;
 	}
 	
 	public IAttribute getAttribute(IAttributeDefinition def) {
@@ -72,31 +77,31 @@ public class AttributeManager {
 		return map.values().toArray(new IAttribute[map.size()]);
 	}
 	
-	public Set<Map.Entry<String, IAttribute>> getEntrySet() {
-		return map.entrySet();
+	public Map<IAttributeDefinition, IAttribute> getMap() {
+		return map;
 	}
 	
-	public Set<String> getKeySet() {
+	public Set<IAttributeDefinition> getKeySet() {
 		return map.keySet();
 	}
 	
 	public void removeAttribute(IAttribute attr) {
-		map.remove(attr.getDefinition().getId());
+		map.remove(attr.getDefinition());
 	}
 	
 	public String[] toStringArray() {
 		ArrayList<String> res = new ArrayList<String>();
 		
-		for (Map.Entry<String, IAttribute> entry : map.entrySet()) {
+		for (Map.Entry<IAttributeDefinition, IAttribute> entry : map.entrySet()) {
 			IAttribute attr = entry.getValue();
 			if (attr instanceof ArrayAttribute) {
 				@SuppressWarnings("unchecked")
 				Object[] arrObj = ((ArrayAttribute)attr).getValue();
 				for (Object obj : arrObj) {
-					res.add(entry.getKey() + "=" + obj.toString());					
+					res.add(entry.getKey().getId() + "=" + obj.toString());					
 				}
 			} else {
-				res.add(entry.getKey() + "=" + attr.getValueAsString());
+				res.add(entry.getKey().getId() + "=" + attr.getValueAsString());
 			}
 		}
 		
