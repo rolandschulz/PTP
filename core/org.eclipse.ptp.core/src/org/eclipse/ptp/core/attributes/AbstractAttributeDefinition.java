@@ -36,7 +36,7 @@ public abstract class AbstractAttributeDefinition implements IAttributeDefinitio
 	public boolean equals(Object obj) {
 		if (obj instanceof AbstractAttributeDefinition) {
 			AbstractAttributeDefinition attrDesc = (AbstractAttributeDefinition) obj;
-			return this.name.equals(attrDesc.name);
+			return this.uniqueId.equals(attrDesc.uniqueId);
 		}
 		return false;
 	}
@@ -54,7 +54,7 @@ public abstract class AbstractAttributeDefinition implements IAttributeDefinitio
 	}
 
 	public int hashCode() {
-		return name.hashCode();
+		return uniqueId.hashCode();
 	}
 
 	public String toString() {
