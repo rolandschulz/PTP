@@ -21,7 +21,6 @@ package org.eclipse.ptp.internal.core.elements;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.ptp.core.attributes.AttributeManager;
@@ -88,17 +87,17 @@ public abstract class PElement extends PlatformObject implements IPElementContro
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.IPElement#getAttributeEntrySet()
+	 * @see org.eclipse.ptp.core.elements.IPElement#getAttributeKeys()
 	 */
-	public Set<Map.Entry<String, IAttribute>> getAttributeEntrySet() {
-		return attributeValues.getEntrySet();
+	public IAttributeDefinition[] getAttributeKeys() {
+		return attributeValues.getKeySet().toArray(new IAttributeDefinition[0]);
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.IPElement#getAttributeKeys()
+	 * @see org.eclipse.ptp.core.elements.IPElement#getAttributeMap()
 	 */
-	public String[] getAttributeKeys() {
-		return attributeValues.getKeySet().toArray(new String[0]);
+	public Map<IAttributeDefinition, IAttribute> getAttributeMap() {
+		return attributeValues.getMap();
 	}
 	
 	/* (non-Javadoc)
@@ -134,7 +133,7 @@ public abstract class PElement extends PlatformObject implements IPElementContro
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.IPElement#setAttribute(org.eclipse.ptp.core.attributes.IAttribute)
+	 * @see org.eclipse.ptp.core.elements.IPElement#addAttribute(org.eclipse.ptp.core.attributes.IAttribute)
 	 */
 	public void addAttribute(IAttribute attrib) {
 		attributeValues.addAttribute(attrib);
@@ -142,7 +141,7 @@ public abstract class PElement extends PlatformObject implements IPElementContro
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.IPElement#setAttributes(org.eclipse.ptp.core.attributes.IAttribute[])
+	 * @see org.eclipse.ptp.core.elements.IPElement#addAttributes(org.eclipse.ptp.core.attributes.IAttribute[])
 	 */
 	public void addAttributes(IAttribute[] attribs) {
 		attributeValues.addAttributes(attribs);
