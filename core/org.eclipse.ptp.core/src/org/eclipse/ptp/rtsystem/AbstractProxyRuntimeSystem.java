@@ -23,7 +23,9 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
@@ -34,7 +36,7 @@ import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
-import org.eclipse.ptp.core.attributes.IntegerAttribute;
+import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributeManager;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
@@ -142,6 +144,8 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	private final static int ATTR_MIN_LEN = 5;
 	protected IProxyRuntimeClient proxy = null;
 	private AttributeDefinitionManager attrDefManager;
+	private Integer jobSubId = 0;
+	private Map<String, AttributeManager> jobSubs = new HashMap<String, AttributeManager>();
 
 	public AbstractProxyRuntimeSystem(IProxyRuntimeClient proxy, AttributeDefinitionManager manager) {
 		this.proxy = proxy;
@@ -149,6 +153,9 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 		proxy.addProxyRuntimeEventListener(this);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeAttributeDefEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeAttributeDefEvent)
+	 */
 	public void handleProxyRuntimeAttributeDefEvent(IProxyRuntimeAttributeDefEvent e) {
 		String[] args = e.getArguments();
 		
@@ -184,10 +191,16 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeErrorEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeErrorEvent)
+	 */
 	public void handleProxyRuntimeErrorEvent(IProxyRuntimeErrorEvent e) {
 		fireRuntimeErrorEvent(new RuntimeErrorEvent(e.getDescription()));
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeJobChangeEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeJobChangeEvent)
+	 */
 	public void handleProxyRuntimeJobChangeEvent(IProxyRuntimeJobChangeEvent e) {
 		String[] args = e.getArguments();
 		
@@ -208,6 +221,9 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeMachineChangeEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeMachineChangeEvent)
+	 */
 	public void handleProxyRuntimeMachineChangeEvent(IProxyRuntimeMachineChangeEvent e) {
 		String[] args = e.getArguments();
 		
@@ -228,6 +244,9 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeNewJobEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeNewJobEvent)
+	 */
 	public void handleProxyRuntimeNewJobEvent(IProxyRuntimeNewJobEvent e) {
 		String[] args = e.getArguments();
 		
@@ -237,13 +256,31 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 		}
 		
 		ElementAttributeManager eMgr = getElementAttributeManager(args, 1);
+		
 		if (eMgr != null) {			
+			/*
+			 * Find any job submission attributes and add to the jobs
+			 */
+			for (Map.Entry<RangeSet, AttributeManager> entry : eMgr.getEntrySet()) {
+				IAttribute subIdAttr = entry.getValue().getAttribute(JobAttributes.getSubIdAttributeDefinition());
+				if (subIdAttr != null) {
+					String subId = subIdAttr.getValueAsString();
+					AttributeManager mgr = jobSubs.get(subId);
+					if (mgr != null) {
+						entry.getValue().addAttributes(mgr.getAttributes());
+					}
+				}
+			}
+			
 			fireRuntimeNewJobEvent(new RuntimeNewJobEvent(args[0], eMgr));
 		} else {
 			fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: could not parse message"));				
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeNewMachineEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeNewMachineEvent)
+	 */
 	public void handleProxyRuntimeNewMachineEvent(IProxyRuntimeNewMachineEvent e) {
 		String[] args = e.getArguments();
 		
@@ -260,6 +297,9 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeNewNodeEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeNewNodeEvent)
+	 */
 	public void handleProxyRuntimeNewNodeEvent(IProxyRuntimeNewNodeEvent e) {
 		String[] args = e.getArguments();
 		
@@ -276,6 +316,9 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeNewProcessEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeNewProcessEvent)
+	 */
 	public void handleProxyRuntimeNewProcessEvent(IProxyRuntimeNewProcessEvent e) {
 		String[] args = e.getArguments();
 		
@@ -292,6 +335,9 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeNewQueueEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeNewQueueEvent)
+	 */
 	public void handleProxyRuntimeNewQueueEvent(IProxyRuntimeNewQueueEvent e) {
 		String[] args = e.getArguments();
 		
@@ -308,6 +354,9 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeNodeChangeEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeNodeChangeEvent)
+	 */
 	public void handleProxyRuntimeNodeChangeEvent(IProxyRuntimeNodeChangeEvent e) {
 		String[] args = e.getArguments();
 		
@@ -328,6 +377,9 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeProcessChangeEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeProcessChangeEvent)
+	 */
 	public void handleProxyRuntimeProcessChangeEvent(IProxyRuntimeProcessChangeEvent e) {
 		String[] args = e.getArguments();
 		
@@ -348,6 +400,9 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeQueueChangeEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeQueueChangeEvent)
+	 */
 	public void handleProxyRuntimeQueueChangeEvent(IProxyRuntimeQueueChangeEvent e) {
 		String[] args = e.getArguments();
 		
@@ -368,42 +423,64 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeConnectedStateEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeConnectedStateEvent)
+	 */
 	public void handleProxyRuntimeConnectedStateEvent(IProxyRuntimeConnectedStateEvent e) {
 		fireRuntimeConnectedStateEvent(new RuntimeConnectedStateEvent());
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeRunningStateEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRunningStateEvent)
+	 */
 	public void handleProxyRuntimeRunningStateEvent(IProxyRuntimeRunningStateEvent e) {
 		fireRuntimeRunningStateEvent(new RuntimeRunningStateEvent());
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeShutdownStateEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeShutdownStateEvent)
+	 */
 	public void handleProxyRuntimeShutdownStateEvent(IProxyRuntimeShutdownStateEvent e) {
 		fireRuntimeShutdownStateEvent(new RuntimeShutdownStateEvent());
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeSystem#shutdown()
+	 */
 	public void shutdown() {
 		proxy.shutdown();
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeSystem#startup()
+	 */
 	public void startup() throws CoreException {
 		proxy.startup();
 	}
 	
-	public void submitJob(int jobSubId, AttributeManager attrMgr) throws CoreException {
+	public String submitJob(AttributeManager attrMgr) throws CoreException {
 		try {
 			/*
 			 * Add the job submission ID to the attributes. This is done here to force the
 			 * use of the ID.
 			 */
-			IntegerAttribute jobSubAttr = JobAttributes.getSubIdAttributeDefinition().create(jobSubId);
+			Integer id = getJobSubmissionID();
+			StringAttribute jobSubAttr = JobAttributes.getSubIdAttributeDefinition().create(id.toString());
 			attrMgr.addAttribute(jobSubAttr);
 			proxy.submitJob(attrMgr.toStringArray());
+			jobSubs.put(id.toString(), attrMgr);
+			return id.toString();
 		} catch(IOException e) {
 			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, 
 				"Control system is shut down, proxy exception.  The proxy may have crashed or been killed.", null));
 		} catch (IllegalValueException e) {
 		}
+		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.IControlSystem#terminateJob(org.eclipse.ptp.core.elements.IPJob)
+	 */
 	public void terminateJob(IPJob job) throws CoreException {
 		if(job == null) {
 			System.err.println("ERROR: Tried to abort a null job.");
@@ -418,6 +495,9 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.IMonitoringSystem#startEvents()
+	 */
 	public void startEvents() throws CoreException {
 		try {
 			proxy.startEvents();
@@ -427,6 +507,9 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.IMonitoringSystem#stopEvents()
+	 */
 	public void stopEvents() throws CoreException {
 		try {
 			proxy.stopEvents();
@@ -436,6 +519,12 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 		}	
 	}
 
+	/**
+	 * @param kvs
+	 * @param start
+	 * @param end
+	 * @return
+	 */
 	private AttributeManager getAttributeManager(String[] kvs, int start, int end) {
 		AttributeManager mgr = new AttributeManager();
 		
@@ -459,6 +548,11 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 		return mgr;
 	}
 
+	/**
+	 * @param args
+	 * @param pos
+	 * @return
+	 */
 	private ElementAttributeManager getElementAttributeManager(String[] args, int pos) {
 		ElementAttributeManager eMgr = new ElementAttributeManager();
 		
@@ -470,7 +564,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 					return null;					
 				}
 				
-				RangeSet jobIds = new RangeSet(args[pos++]);
+				RangeSet ids = new RangeSet(args[pos++]);
 				int numAttrs = Integer.parseInt(args[pos++]);
 				
 				int start = pos;
@@ -480,7 +574,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 					return null;					
 				}
 				
-				eMgr.setAttributeManager(jobIds, getAttributeManager(args, start, end));
+				eMgr.setAttributeManager(ids, getAttributeManager(args, start, end));
 				
 				pos = end + 1;
 			}
@@ -593,6 +687,10 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 		return attrDef;
 	}
 
+	/**
+	 * @param val
+	 * @return
+	 */
 	private int toDateStyle(String val) {
 		if (val.equals("SHORT")) {
 			return DateFormat.SHORT;
@@ -607,6 +705,10 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 		}
 	}
 
+	/**
+	 * @param val
+	 * @return
+	 */
 	private Locale toLocale(String val) {
 		if (val.equals("CANADA")) {
 			return Locale.CANADA;
@@ -631,5 +733,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 		}
 	}
 
-	
+	private Integer getJobSubmissionID() {
+		return jobSubId++;
+	}
 }
