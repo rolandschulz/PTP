@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.ui.adapters;
 
+import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.elements.IPElement;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource;
@@ -30,7 +31,11 @@ public class PElementPropertySource implements IPropertySource {
 
 	public PElementPropertySource(IPElement pelement) {
 		this.pelement = pelement;
-        String[] keys = pelement.getAttributeKeys();
+		IAttributeDefinition[] attrDefs = pelement.getAttributeKeys();
+        String[] keys = new String[attrDefs.length];
+        for (int i = 0; i < attrDefs.length; i++) {
+        	keys[i] = attrDefs[i].getId();
+        }
         descriptors = new PropertyDescriptor[keys.length];
         for (int i = 0; i < keys.length; ++i) {
             descriptors[i] = new PropertyDescriptor(keys[i], keys[i]);
