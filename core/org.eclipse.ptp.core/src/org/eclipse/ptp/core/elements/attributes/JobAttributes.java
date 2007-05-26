@@ -46,9 +46,9 @@ public class JobAttributes {
 		new EnumeratedAttributeDefinition<State>(STATE_ATTR_ID, "Job State", "State of a job",
 				State.STARTED);
 
-	private final static IntegerAttributeDefinition subIdAttrDef = 
-		new IntegerAttributeDefinition(SUBID_ATTR_ID, "Job Submission ID",
-				"Temporary ID used for job submission", 0);
+	private final static StringAttributeDefinition subIdAttrDef = 
+		new StringAttributeDefinition(SUBID_ATTR_ID, "Job Submission ID",
+				"Temporary ID used for job submission", "");
 
 	private final static IntegerAttributeDefinition numProcsAttrDef = 
 		new IntegerAttributeDefinition(NUM_PROCS_ATTR_ID, "Number of Processes", "Number of processes to launch", 0);
@@ -93,7 +93,7 @@ public class JobAttributes {
 		return stateAttrDef;
 	}
 	
-	public static IntegerAttributeDefinition getSubIdAttributeDefinition() {
+	public static StringAttributeDefinition getSubIdAttributeDefinition() {
 		return subIdAttrDef;
 	}
 
