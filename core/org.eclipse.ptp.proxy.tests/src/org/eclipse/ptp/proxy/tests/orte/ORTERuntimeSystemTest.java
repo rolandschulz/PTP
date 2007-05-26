@@ -12,7 +12,6 @@ import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
-import org.eclipse.ptp.core.attributes.IntegerAttribute;
 import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
@@ -58,10 +57,10 @@ public class ORTERuntimeSystemTest implements IRuntimeEventListener {
 	private Condition notJobCompleted = lock.newCondition();
 	private Condition notShutdown = lock.newCondition();
 	
-	private int queueId = -1;
+	private String queueId = null;
 	private String queueName = null;
-	private int jobId;
-	private int jobSubmitID = 3;
+	private String jobId;
+	private String jobSubmitID;
 	private final int rmId = 200; /* fake rm ID */
 
 	@Test public void start_stop() {
@@ -195,7 +194,7 @@ public class ORTERuntimeSystemTest implements IRuntimeEventListener {
 					}
 					
 					System.out.println("about to submit");
-					rtsystem.submitJob(jobSubmitID, attrMgr);
+					jobSubmitID = rtsystem.submitJob(attrMgr);
 				} catch (IllegalValueException e1) {
 					error = true;
 				} catch(CoreException e) {
@@ -232,10 +231,10 @@ public class ORTERuntimeSystemTest implements IRuntimeEventListener {
 	public void handleRuntimeNewJobEvent(IRuntimeNewJobEvent e) {
 		for (Map.Entry<RangeSet, AttributeManager> entry : e.getElementAttributeManager().getEntrySet()) {
 			AttributeManager mgr = entry.getValue();
-			for (int id : entry.getKey()) {
-				IntegerAttribute attr = (IntegerAttribute) mgr.getAttribute(JobAttributes.getSubIdAttributeDefinition());
-				if (attr.getValue() == jobSubmitID) {
-					jobId = id;
+			for (Integer id : entry.getKey()) {
+				StringAttribute attr = (StringAttribute) mgr.getAttribute(JobAttributes.getSubIdAttributeDefinition());
+				if (attr.getValue().equals(jobSubmitID)) {
+					jobId = id.toString();
 					return;
 				}
 			}
@@ -262,17 +261,17 @@ public class ORTERuntimeSystemTest implements IRuntimeEventListener {
 	public void handleRuntimeNewQueueEvent(IRuntimeNewQueueEvent e) {
 		for (Map.Entry<RangeSet, AttributeManager> entry : e.getElementAttributeManager().getEntrySet()) {
 			AttributeManager mgr = entry.getValue();
-			for (int id : entry.getKey()) {
+			for (Integer id : entry.getKey()) {
 				StringAttribute attr = (StringAttribute) mgr.getAttribute(ElementAttributes.getNameAttributeDefinition());
 				if (attr != null) {
-					queueId = id;
+					queueId = id.toString();
 					queueName = attr.getValueAsString();
 					System.out.println("new queue " + queueName);
 				}
 			}
 		}
 		
-		if (queueId != -1) {
+		if (queueId != null) {
 			lock.lock();
 			try {
 				haveQueue = true;
@@ -295,8 +294,8 @@ public class ORTERuntimeSystemTest implements IRuntimeEventListener {
 		 */
 		for (Map.Entry<RangeSet, AttributeManager> entry : e.getElementAttributeManager().getEntrySet()) {
 			AttributeManager mgr = entry.getValue();
-			for (int id : entry.getKey()) {
-				if (jobId == id) {
+			for (Integer id : entry.getKey()) {
+				if (jobId.equals(id)) {
 					EnumeratedAttribute<State> a = (EnumeratedAttribute<State>) mgr.getAttribute(JobAttributes.getStateAttributeDefinition());
 					if (a != null && a.getValue() == JobAttributes.State.TERMINATED) {
 						System.out.println("job terminated!");
