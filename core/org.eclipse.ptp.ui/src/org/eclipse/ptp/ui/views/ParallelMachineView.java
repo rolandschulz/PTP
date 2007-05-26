@@ -24,6 +24,7 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.IAttribute;
+import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPNode;
@@ -443,8 +444,8 @@ public class ParallelMachineView extends AbstractParallelSetView implements IRes
 	private void updateNodeInfoRegion(IPNode node) {
 		BLtable.removeAll();
 		if (node != null) {
-			for (Map.Entry<String, IAttribute> entry : node.getAttributeEntrySet()) {
-				String key = entry.getValue().getDefinition().getName();
+			for (Map.Entry<IAttributeDefinition, IAttribute> entry : node.getAttributeMap().entrySet()) {
+				String key = entry.getKey().getName();
 				String value = entry.getValue().getValueAsString();
 				new TableItem(BLtable, SWT.NULL).setText(new String[] { key, value });
 			}
