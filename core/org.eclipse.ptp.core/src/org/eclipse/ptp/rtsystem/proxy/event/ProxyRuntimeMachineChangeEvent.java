@@ -20,24 +20,8 @@
 package org.eclipse.ptp.rtsystem.proxy.event;
 
 public class ProxyRuntimeMachineChangeEvent extends AbstractProxyRuntimeEvent implements IProxyRuntimeMachineChangeEvent {
-	private String[] args;
 
 	public ProxyRuntimeMachineChangeEvent(int transID, String[] args) {
-		super(PROXY_RUNTIME_NODE_CHANGE_EVENT, transID);
-		this.args = args;
-	}
-	
-	public String[] getArguments() {
-		return this.args;
-	}
-	
-	public String toString() {
-		String str = "EVENT_RUNTIME_NODECHANGE transid=" + getTransactionID() + " (";
-		for (int i = 0 ; i < args.length; i++) {
-			if (i > 0)
-				str += ",";
-			str += args[i];
-		}
-		return str + ")";
+		super(PROXY_RUNTIME_NODE_CHANGE_EVENT, transID, args);
 	}
 }

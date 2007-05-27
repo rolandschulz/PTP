@@ -44,7 +44,7 @@ import org.eclipse.ptp.rtsystem.IRuntimeEventListener;
 import org.eclipse.ptp.rtsystem.IRuntimeSystem;
 import org.eclipse.ptp.rtsystem.events.IRuntimeAttributeDefinitionEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeConnectedStateEvent;
-import org.eclipse.ptp.rtsystem.events.IRuntimeErrorEvent;
+import org.eclipse.ptp.rtsystem.events.IRuntimeMessageEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeJobChangeEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeMachineChangeEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeNewJobEvent;
@@ -93,9 +93,9 @@ public abstract class AbstractRuntimeResourceManager extends
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleRuntimeErrorEvent(org.eclipse.ptp.rtsystem.events.IRuntimeErrorEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleRuntimeMessageEvent(org.eclipse.ptp.rtsystem.events.IRuntimeErrorEvent)
 	 */
-	public void handleRuntimeErrorEvent(IRuntimeErrorEvent e) {
+	public void handleRuntimeMessageEvent(IRuntimeMessageEvent e) {
 		stateLock.lock();
 		try {
 			if (state == RMState.STARTING) {
@@ -105,7 +105,7 @@ public abstract class AbstractRuntimeResourceManager extends
 		} finally {
 			stateLock.unlock();
 		}
-		fireError(e.getMessage());
+		fireError(e.getText());
 	}
 	
 	/* (non-Javadoc)

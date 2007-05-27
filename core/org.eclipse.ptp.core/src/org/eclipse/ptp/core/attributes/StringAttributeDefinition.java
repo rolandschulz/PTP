@@ -31,11 +31,11 @@ public final class StringAttributeDefinition extends AbstractAttributeDefinition
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.attributes.IAttribute#create(java.lang.String)
 	 */
-	public StringAttribute create() throws IllegalValueException {
+	public StringAttribute create() {
 		return new StringAttribute(this, defaultValue);
 	}
 
-	public StringAttribute create(String value) throws IllegalValueException {
+	public StringAttribute create(String value) {
 		return new StringAttribute(this, value);
 	}
 }

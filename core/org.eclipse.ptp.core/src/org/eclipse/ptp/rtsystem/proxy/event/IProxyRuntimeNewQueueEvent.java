@@ -20,5 +20,4 @@
 package org.eclipse.ptp.rtsystem.proxy.event;
 
 public interface IProxyRuntimeNewQueueEvent extends IProxyRuntimeEvent {
-	public String[] getArguments();
 }

@@ -32,7 +32,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.ptp.core.proxy.AbstractProxyClient;
 import org.eclipse.ptp.core.proxy.event.IProxyConnectedEvent;
 import org.eclipse.ptp.core.proxy.event.IProxyDisconnectedEvent;
-import org.eclipse.ptp.core.proxy.event.IProxyErrorEvent;
+import org.eclipse.ptp.core.proxy.event.IProxyMessageEvent;
 import org.eclipse.ptp.core.proxy.event.IProxyEventListener;
 import org.eclipse.ptp.core.proxy.event.IProxyExtendedEvent;
 import org.eclipse.ptp.core.proxy.event.IProxyOKEvent;
@@ -220,7 +220,7 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient imple
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.proxy.event.IProxyEventListener#handleProxyErrorEvent(org.eclipse.ptp.core.proxy.event.IProxyErrorEvent)
 	 */
-	public void handleProxyErrorEvent(IProxyErrorEvent e) {
+	public void handleProxyMessageEvent(IProxyMessageEvent e) {
 		System.out.println("debug: received error event");
 		waitLock.lock();
 		try {

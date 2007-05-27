@@ -19,16 +19,30 @@
 
 package org.eclipse.ptp.rtsystem.proxy.event;
 
-public interface IProxyRuntimeErrorEvent extends IProxyRuntimeEvent {
-	public enum ErrorType {
-		CONNECT_TIMEOUT,
-		COMMAND_TIMEOUT,
-		DISCONNECTED,
-		PROXY,
-		INTERNAL
+import org.eclipse.ptp.core.elements.attributes.MessageAttributes;
+import org.eclipse.ptp.core.elements.attributes.MessageAttributes.Level;
+import org.eclipse.ptp.core.proxy.event.AbstractProxyEvent;
+
+
+public class ProxyRuntimeMessageEvent extends AbstractProxyEvent 
+		implements IProxyRuntimeMessageEvent {
+
+	public ProxyRuntimeMessageEvent(int transID, String[] args) {
+		super(IProxyRuntimeEvent.PROXY_RUNTIME_MESSAGE_EVENT, transID, args);
 	}
 	
-	public ErrorType getType();
-	
-	public String getDescription();
+	public ProxyRuntimeMessageEvent(Level level, String message) {
+		super(IProxyRuntimeEvent.PROXY_RUNTIME_MESSAGE_EVENT, 0, new String[] {
+			MessageAttributes.getLevelAttributeDefinition().getId() + "=" + level.name(),
+			MessageAttributes.getTextAttributeDefinition() + "=" + message
+		});
+	}
+
+	public ProxyRuntimeMessageEvent(Level level, int code, String message) {
+		super(IProxyRuntimeEvent.PROXY_RUNTIME_MESSAGE_EVENT, 0, new String[] {
+			MessageAttributes.getLevelAttributeDefinition().getId() + "=" + level.name(),
+			MessageAttributes.getCodeAttributeDefinition().getId() + "=" + code,
+			MessageAttributes.getTextAttributeDefinition() + "=" + message
+		});
+	}
 }

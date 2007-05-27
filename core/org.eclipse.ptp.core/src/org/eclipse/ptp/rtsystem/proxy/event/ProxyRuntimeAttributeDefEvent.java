@@ -19,27 +19,14 @@
 
 package org.eclipse.ptp.rtsystem.proxy.event;
 
+import org.eclipse.ptp.core.proxy.event.AbstractProxyEvent;
 
-public class ProxyRuntimeAttributeDefEvent extends AbstractProxyRuntimeEvent implements IProxyRuntimeAttributeDefEvent {
-	private String[] args;
+
+public class ProxyRuntimeAttributeDefEvent extends AbstractProxyEvent 
+	implements IProxyRuntimeAttributeDefEvent {
 
 	public ProxyRuntimeAttributeDefEvent(int transID, String[] args) {
-		super(PROXY_RUNTIME_ATTR_DEF_EVENT, transID);
-		this.args = args;
-	}
-	
-	public String[] getArguments() {
-		return this.args;
-	}
-	
-	public String toString() {
-		String str = "EVENT_RUNTIME_ATTR_DEF transid=" + getTransactionID() + " (";
-		for (int i = 0 ; i < args.length; i++) {
-			if (i > 0)
-				str += ",";
-			str += args[i];
-		}
-		return str + ")";
+		super(PROXY_RUNTIME_ATTR_DEF_EVENT, transID, args);
 	}
 }
 

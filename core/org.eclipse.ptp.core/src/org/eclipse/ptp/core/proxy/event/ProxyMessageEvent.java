@@ -17,8 +17,31 @@
  * LA-CC 04-115
  *******************************************************************************/
 
-package org.eclipse.ptp.rtsystem.events;
+package org.eclipse.ptp.core.proxy.event;
 
-public interface IRuntimeErrorEvent extends IRuntimeEvent {
-	public String getMessage();
+import org.eclipse.ptp.core.elements.attributes.MessageAttributes;
+import org.eclipse.ptp.core.elements.attributes.MessageAttributes.Level;
+
+public class ProxyMessageEvent extends AbstractProxyEvent implements IProxyMessageEvent {
+	public static final int EVENT_ERR_EVENT = 11;
+	
+	public ProxyMessageEvent(int transactionID, String[] args) {
+		super(EVENT_MESSAGE, transactionID, args);
+	}
+
+	public ProxyMessageEvent(Level level, String message) {
+		super(EVENT_MESSAGE, 0, new String[] {
+			MessageAttributes.getLevelAttributeDefinition().getId() + "=" + level.name(),
+			MessageAttributes.getTextAttributeDefinition() + "=" + message
+		});
+	}
+
+	public ProxyMessageEvent(Level level, int code, String message) {
+		super(EVENT_MESSAGE, 0, new String[] {
+			MessageAttributes.getLevelAttributeDefinition().getId() + "=" + level.name(),
+			MessageAttributes.getCodeAttributeDefinition().getId() + "=" + code,
+			MessageAttributes.getTextAttributeDefinition() + "=" + message
+		});
+	}
+
 }

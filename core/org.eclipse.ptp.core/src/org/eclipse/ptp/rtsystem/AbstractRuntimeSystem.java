@@ -23,7 +23,7 @@ import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.rtsystem.events.IRuntimeAttributeDefinitionEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeConnectedStateEvent;
-import org.eclipse.ptp.rtsystem.events.IRuntimeErrorEvent;
+import org.eclipse.ptp.rtsystem.events.IRuntimeMessageEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeJobChangeEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeMachineChangeEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeNewJobEvent;
@@ -63,9 +63,9 @@ public abstract class AbstractRuntimeSystem implements IRuntimeSystem {
 
 	}
 	
-	protected void fireRuntimeErrorEvent(IRuntimeErrorEvent event) {
+	protected void fireRuntimeMessageEvent(IRuntimeMessageEvent event) {
 		for (Object listener : listeners.getListeners()) {
-			((IRuntimeEventListener)listener).handleRuntimeErrorEvent(event);
+			((IRuntimeEventListener)listener).handleRuntimeMessageEvent(event);
 		}
 	}
 	

@@ -21,10 +21,6 @@ package org.eclipse.ptp.core.proxy.event;
 
 public class ProxyOKEvent extends AbstractProxyEvent implements IProxyOKEvent {
 	public ProxyOKEvent(int transactionID) {
-		super(EVENT_OK, transactionID);
-	}
-	
-	public String toString() {
-		return "EVENT_OK transid=" + getTransactionID();
+		super(EVENT_OK, transactionID, null);
 	}
 }

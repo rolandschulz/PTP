@@ -24,8 +24,5 @@ public class ProxyRuntimeConnectedStateEvent extends AbstractProxyRuntimeEvent i
 	public ProxyRuntimeConnectedStateEvent() {
 		super(PROXY_RUNTIME_RUNNING_EVENT, 0);
 	}
-	
-	public String toString() {
-		return "EVENT_RUNTIME_RUNNING";
-	}
+
 }

@@ -35,20 +35,21 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.eclipse.ptp.core.elements.attributes.MessageAttributes;
 import org.eclipse.ptp.core.proxy.command.IProxyCommand;
 import org.eclipse.ptp.core.proxy.command.ProxyQuitCommand;
 import org.eclipse.ptp.core.proxy.event.IProxyConnectedEvent;
 import org.eclipse.ptp.core.proxy.event.IProxyDisconnectedEvent;
-import org.eclipse.ptp.core.proxy.event.IProxyErrorEvent;
 import org.eclipse.ptp.core.proxy.event.IProxyEvent;
 import org.eclipse.ptp.core.proxy.event.IProxyEventFactory;
 import org.eclipse.ptp.core.proxy.event.IProxyEventListener;
 import org.eclipse.ptp.core.proxy.event.IProxyExtendedEvent;
+import org.eclipse.ptp.core.proxy.event.IProxyMessageEvent;
 import org.eclipse.ptp.core.proxy.event.IProxyOKEvent;
 import org.eclipse.ptp.core.proxy.event.IProxyTimeoutEvent;
 import org.eclipse.ptp.core.proxy.event.ProxyConnectedEvent;
 import org.eclipse.ptp.core.proxy.event.ProxyDisconnectedEvent;
-import org.eclipse.ptp.core.proxy.event.ProxyErrorEvent;
+import org.eclipse.ptp.core.proxy.event.ProxyMessageEvent;
 import org.eclipse.ptp.core.proxy.event.ProxyTimeoutEvent;
 import org.eclipse.ptp.core.util.BitList;
 
@@ -232,10 +233,10 @@ public abstract class AbstractProxyClient implements IProxyClient {
 					fireProxyTimeoutEvent(new ProxyTimeoutEvent());
 				} catch (ClosedByInterruptException e) {
 					error = true;
-					fireProxyErrorEvent(new ProxyErrorEvent(0, 0, "Accept cancelled by user"));
+					fireProxyMessageEvent(new ProxyMessageEvent(MessageAttributes.Level.WARNING, "Accept cancelled by user"));
 				} catch (IOException e) {
 					error = true;
-					fireProxyErrorEvent(new ProxyErrorEvent(0, 0, "IOException in accept"));
+					fireProxyMessageEvent(new ProxyMessageEvent(MessageAttributes.Level.FATAL, "IOException in accept"));
 				} finally {		
 					try {
 						sessSvrSock.close();
@@ -246,7 +247,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 					try {
 						if (isInterrupted()) {
 							error = true;
-							fireProxyErrorEvent(new ProxyErrorEvent(0, 0, "Connection cancelled by user"));
+							fireProxyMessageEvent(new ProxyMessageEvent(MessageAttributes.Level.WARNING, "Connection cancelled by user"));
 						}
 						if (!error && state == SessionState.WAITING) {
 							state = SessionState.CONNECTED;
@@ -358,10 +359,10 @@ public abstract class AbstractProxyClient implements IProxyClient {
 		}
 	}
 
-	protected void fireProxyErrorEvent(IProxyErrorEvent event) {
+	protected void fireProxyMessageEvent(IProxyMessageEvent event) {
 		IProxyEventListener[] la = listeners.toArray(new IProxyEventListener[0]);
 		for (IProxyEventListener listener : la) {
-			listener.handleProxyErrorEvent(event);
+			listener.handleProxyMessageEvent(event);
 		}
 	}
 
@@ -541,8 +542,8 @@ public abstract class AbstractProxyClient implements IProxyClient {
 		IProxyEvent e = proxyEventFactory.toEvent(eventID, eventTransID, eventArgs);
 				
 		if (e != null) {
-			if (e instanceof IProxyErrorEvent) {
-				fireProxyErrorEvent((IProxyErrorEvent) e);
+			if (e instanceof IProxyMessageEvent) {
+				fireProxyMessageEvent((IProxyMessageEvent) e);
 			} else if (e instanceof IProxyOKEvent) {
 				if (state == SessionState.SHUTTING_DOWN && 
 						shutdownID == e.getTransactionID()) {

@@ -20,24 +20,8 @@
 package org.eclipse.ptp.rtsystem.proxy.event;
 
 public class ProxyRuntimeNewQueueEvent extends AbstractProxyRuntimeEvent implements IProxyRuntimeNewQueueEvent {
-	private String[] args;
 
 	public ProxyRuntimeNewQueueEvent(int transID, String[] args) {
-		super(PROXY_RUNTIME_NEW_QUEUE_EVENT, transID);
-		this.args = args;
-	}
-	
-	public String[] getArguments() {
-		return this.args;
-	}
-
-	public String toString() {
-		String str = "EVENT_RUNTIME_NEW_QUEUE  transid=" + getTransactionID() + " (";
-		for (int i = 0 ; i < args.length; i++) {
-			if (i > 0)
-				str += ",";
-			str += args[i];
-		}
-		return str + ")";
+		super(PROXY_RUNTIME_NEW_QUEUE_EVENT, transID, args);
 	}
 }

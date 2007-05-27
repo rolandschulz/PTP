@@ -20,12 +20,18 @@
 package org.eclipse.ptp.core.proxy.event;
 
 public abstract class AbstractProxyEvent implements IProxyEvent {
-	private int		eventID;
-	private int		transactionID;
+	private int			eventID;
+	private int			transactionID;
+	private String[]	attributes;
 	
-	public AbstractProxyEvent(int eventID, int transactionID) {
+	public AbstractProxyEvent(int eventID, int transactionID, String[] attrs) {
 		this.eventID		= eventID;
 		this.transactionID	= transactionID;
+		this.attributes		= attrs;
+	}
+	
+	public AbstractProxyEvent(int eventID, int transactionID) {
+		this(eventID, transactionID, null);
 	}
 	
 	public int getEventID() {
@@ -35,4 +41,23 @@ public abstract class AbstractProxyEvent implements IProxyEvent {
 	public int getTransactionID() {
 		return transactionID;
 	}
+	
+	public String[] getAttributes() {
+		return attributes;
+	}
+
+	public String toString() {
+		String str = eventID + " transid=" + getTransactionID();
+		if (attributes != null) {
+			str += " (";
+			for (int i = 0 ; i < attributes.length; i++) {
+				if (i > 0)
+					str += ",";
+				str += attributes[i];
+			}
+			str += ")";
+		}
+		return str;
+	}
+
 }
