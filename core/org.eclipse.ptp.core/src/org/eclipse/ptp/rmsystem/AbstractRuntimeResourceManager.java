@@ -19,6 +19,7 @@
 package org.eclipse.ptp.rmsystem;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -30,6 +31,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
+import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.elementcontrols.IPJobControl;
 import org.eclipse.ptp.core.elementcontrols.IPMachineControl;
 import org.eclipse.ptp.core.elementcontrols.IPNodeControl;
@@ -38,15 +40,16 @@ import org.eclipse.ptp.core.elementcontrols.IPQueueControl;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributeManager;
+import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.core.util.RangeSet;
 import org.eclipse.ptp.rtsystem.IRuntimeEventListener;
 import org.eclipse.ptp.rtsystem.IRuntimeSystem;
 import org.eclipse.ptp.rtsystem.events.IRuntimeAttributeDefinitionEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeConnectedStateEvent;
-import org.eclipse.ptp.rtsystem.events.IRuntimeMessageEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeJobChangeEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeMachineChangeEvent;
+import org.eclipse.ptp.rtsystem.events.IRuntimeMessageEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeNewJobEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeNewMachineEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeNewNodeEvent;
@@ -62,10 +65,15 @@ public abstract class AbstractRuntimeResourceManager extends
 		AbstractResourceManager implements IRuntimeEventListener {
 
 	private IRuntimeSystem runtimeSystem;
+	
 	private final ReentrantLock stateLock = new ReentrantLock();
 	private final Condition stateCondition = stateLock.newCondition();
 	private RMState state;
 	private enum RMState {STARTING, STARTED, STOPPING, STOPPED, ERROR};
+	
+	private final ReentrantLock subLock = new ReentrantLock();
+	private final Condition subCondition = subLock.newCondition();
+	private Map<String, IPJob> jobSubmissions = new HashMap<String, IPJob>();
 	
 	public AbstractRuntimeResourceManager(String id, IPUniverseControl universe,
 			IResourceManagerConfiguration config) {
@@ -170,7 +178,22 @@ public abstract class AbstractRuntimeResourceManager extends
 				if (job == null) {
 					job = doCreateJob(queue, elementId, jobAttrs);
 					addJob(elementId, job);
-				}
+					
+					StringAttribute jobSubAttr = 
+						(StringAttribute) jobAttrs.getAttribute(JobAttributes.getSubIdAttributeDefinition());
+					if (jobSubAttr != null) {
+						/*
+						 * Notify any submitJob() calls that the job has been created
+						 */
+						subLock.lock();
+						try {
+							jobSubmissions.put(jobSubAttr.getValue(), job);
+							subCondition.signalAll();
+				        } finally {
+				        	subLock.unlock();
+						}
+					}
+			 	}
 			}
 		}
 	}
@@ -575,8 +598,39 @@ public abstract class AbstractRuntimeResourceManager extends
 		return true;
 	}
 	
-	protected String doSubmitJob(AttributeManager attrMgr) throws CoreException {
-		return runtimeSystem.submitJob(attrMgr);
+	protected IPJob doSubmitJob(AttributeManager attrMgr, IProgressMonitor monitor) throws CoreException {
+		if (monitor == null) {
+			monitor = new NullProgressMonitor();
+		}
+		subLock.lock();
+		try {
+			String jobSubId = runtimeSystem.submitJob(attrMgr);
+			jobSubmissions.put(jobSubId, null);
+			while (!monitor.isCanceled() && jobSubmissions.get(jobSubId) == null) {
+				try {
+					subCondition.await(500, TimeUnit.MILLISECONDS);
+				} catch (InterruptedException e) {
+					// Expect to be interrupted if monitor is canceled
+				}
+			}
+			IPJob job = jobSubmissions.remove(jobSubId);
+			if (monitor.isCanceled()) {
+				/*
+				 * The job submission process itself can't be canceled, so
+				 * this will just cancel the job once it is queued.
+				 * 
+				 * If job is null, then we must wait for the submission to
+				 * complete and the job to be created (this will need to happen
+				 * in a thread).
+				 */
+				//FIXME: implement this
+			}
+			return job;
+		}
+		finally {
+			subLock.unlock();
+			monitor.done();
+		}
 	}
 	
 	protected void doTerminateJob(IPJob job) throws CoreException {

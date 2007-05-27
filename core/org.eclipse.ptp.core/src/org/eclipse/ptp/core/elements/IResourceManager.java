@@ -137,10 +137,11 @@ IAdaptable, IResourceManagerMenuContribution {
 
 	/**
 	 * @param attrMgr
-	 * @return String
+	 * @param monitor
+	 * @return IPJob
 	 * @throws CoreException
 	 */
-	public String submitJob(AttributeManager attrMgr) 
+	public IPJob submitJob(AttributeManager attrMgr, IProgressMonitor monitor) 
 		throws CoreException;
 
 	/**

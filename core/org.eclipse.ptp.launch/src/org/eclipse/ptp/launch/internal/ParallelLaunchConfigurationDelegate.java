@@ -175,7 +175,7 @@ public class ParallelLaunchConfigurationDelegate
 			monitor.worked(10);
 			monitor.subTask("Submitting the job . . .");
 			
-			submitJob(configuration, mode, (IPLaunch)launch, attrManager, debugger);
+			submitJob(configuration, mode, (IPLaunch)launch, attrManager, debugger, monitor);
 			
 			monitor.worked(10);
 		} catch (CoreException e) {

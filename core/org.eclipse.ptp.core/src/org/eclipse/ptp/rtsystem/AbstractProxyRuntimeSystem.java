@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
@@ -146,7 +147,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	protected IProxyRuntimeClient proxy = null;
 	private AttributeDefinitionManager attrDefManager;
 	private Integer jobSubId = 0;
-	private Map<String, AttributeManager> jobSubs = new HashMap<String, AttributeManager>();
+	private Map<String, AttributeManager> jobSubs = Collections.synchronizedMap(new HashMap<String, AttributeManager>());
 
 	public AbstractProxyRuntimeSystem(IProxyRuntimeClient proxy, AttributeDefinitionManager manager) {
 		this.proxy = proxy;
