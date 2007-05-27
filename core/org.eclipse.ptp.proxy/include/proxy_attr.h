@@ -83,4 +83,15 @@
 #define PROC_STDOUT_ATTR			"processStdout"
 #define PROC_EXITCODE_ATTR			"processExitCode"
 #define PROC_SIGNALNAME_ATTR		"processSignalName"
+
+/*
+ * Message attributes
+ */
+#define MSG_LEVEL_ATTR				"messageLevel"
+#define		MSG_LEVEL_FATAL				"FATAL"
+#define		MSG_LEVEL_ERROR				"ERROR"
+#define		MSG_LEVEL_WARNING			"WARNING"
+#define		MSG_LEVEL_INFO				"INFO"
+#define MSG_CODE_ATTR				"messageCode"
+#define MSG_TEXT_ATTR				"messageText"
 #endif /*PROXY_ATTR_H_*/
