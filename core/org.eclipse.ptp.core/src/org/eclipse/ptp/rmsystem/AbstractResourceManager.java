@@ -362,7 +362,7 @@ public abstract class AbstractResourceManager extends PElement implements IResou
     /* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.IResourceManager#getStatus()
 	 */
-	synchronized public ResourceManagerAttributes.State getState() {
+	public synchronized ResourceManagerAttributes.State getState() {
 		return state.getValue();
 	}
 	
@@ -501,8 +501,8 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.IResourceManager#submitJob(org.eclipse.ptp.core.attributes.AttributeManager, org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	public String submitJob(AttributeManager attrMgr) throws CoreException {
-		return doSubmitJob(attrMgr);
+	public IPJob submitJob(AttributeManager attrMgr, IProgressMonitor monitor) throws CoreException {
+		return doSubmitJob(attrMgr, monitor);
 	}
 	
 	/* (non-Javadoc)
@@ -618,10 +618,11 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 
 	/**
 	 * @param attrMgr
-	 * @return String
+	 * @param monitor
+	 * @return IPJob
 	 * @throws CoreException
 	 */
-	protected abstract String doSubmitJob(AttributeManager attrMgr) throws CoreException;
+	protected abstract IPJob doSubmitJob(AttributeManager attrMgr, IProgressMonitor monitor) throws CoreException;
 
 	/**
 	 * @param job

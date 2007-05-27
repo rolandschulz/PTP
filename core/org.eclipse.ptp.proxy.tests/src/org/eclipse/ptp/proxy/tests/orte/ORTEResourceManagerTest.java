@@ -6,6 +6,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute;
@@ -42,7 +43,6 @@ public class ORTEResourceManagerTest implements IResourceManagerQueueListener, I
 	
 	private IPQueue subQueue;
 	private IPJob subJob;
-	private String jobSubId;
 	private String queueName = null;
 
 	@Test public void start_stop() {
@@ -141,7 +141,8 @@ public class ORTEResourceManagerTest implements IResourceManagerQueueListener, I
 					}
 					
 					System.out.println("about to submit");
-					jobSubId = rm.submitJob(attrMgr);
+					subJob = rm.submitJob(attrMgr, new NullProgressMonitor());
+					subJob.addElementListener(this);
 				} catch (IllegalValueException e1) {
 					error = true;
 				} catch(CoreException e) {
@@ -207,10 +208,6 @@ public class ORTEResourceManagerTest implements IResourceManagerQueueListener, I
 	public void handleEvent(IQueueNewJobEvent e) {
 		IPJob job = e.getJob();
 		System.out.println("got new job: " + job.getName());
-		if (job.getAttribute(JobAttributes.getSubIdAttributeDefinition()).getValueAsString().equals(jobSubId)) {
-			job.addElementListener(this);
-			subJob = job;
-		}
 	}
 
 	/* (non-Javadoc)
