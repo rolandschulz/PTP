@@ -25,6 +25,6 @@ public interface IProxyEventListener {
 	public void handleProxyOKEvent(IProxyOKEvent e);
 	public void handleProxyConnectedEvent(IProxyConnectedEvent e);
 	public void handleProxyDisconnectedEvent(IProxyDisconnectedEvent e);
-	public void handleProxyErrorEvent(IProxyErrorEvent e);
+	public void handleProxyMessageEvent(IProxyMessageEvent e);
 	public void handleProxyTimeoutEvent(IProxyTimeoutEvent e);
 }

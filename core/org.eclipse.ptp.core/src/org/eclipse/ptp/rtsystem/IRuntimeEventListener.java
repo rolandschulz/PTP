@@ -20,7 +20,7 @@ package org.eclipse.ptp.rtsystem;
 
 import org.eclipse.ptp.rtsystem.events.IRuntimeAttributeDefinitionEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeConnectedStateEvent;
-import org.eclipse.ptp.rtsystem.events.IRuntimeErrorEvent;
+import org.eclipse.ptp.rtsystem.events.IRuntimeMessageEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeJobChangeEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeMachineChangeEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeNewJobEvent;
@@ -37,7 +37,7 @@ import org.eclipse.ptp.rtsystem.events.IRuntimeShutdownStateEvent;
 public interface IRuntimeEventListener {
 	public void handleRuntimeAttributeDefinitionEvent(IRuntimeAttributeDefinitionEvent e);
 	public void handleRuntimeConnectedStateEvent(IRuntimeConnectedStateEvent e);
-	public void handleRuntimeErrorEvent(IRuntimeErrorEvent e);
+	public void handleRuntimeMessageEvent(IRuntimeMessageEvent e);
 	public void handleRuntimeJobChangeEvent(IRuntimeJobChangeEvent e);
 	public void handleRuntimeMachineChangeEvent(IRuntimeMachineChangeEvent e);
 	public void handleRuntimeNewJobEvent(IRuntimeNewJobEvent e);

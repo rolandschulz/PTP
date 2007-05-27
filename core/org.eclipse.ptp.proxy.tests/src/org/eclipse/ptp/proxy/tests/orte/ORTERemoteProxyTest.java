@@ -15,7 +15,7 @@ import org.eclipse.ptp.orte.core.rtsystem.ORTEProxyRuntimeClient;
 import org.eclipse.ptp.rtsystem.JobRunConfiguration;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeAttributeDefEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeConnectedStateEvent;
-import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeErrorEvent;
+import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeMessageEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeJobChangeEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeMachineChangeEvent;
@@ -230,7 +230,7 @@ public class ORTERemoteProxyTest implements IProxyRuntimeEventListener {
 	}
 
 	public void handleProxyRuntimeNewMachineEvent(IProxyRuntimeNewMachineEvent e) {
-		String[] args = e.getArguments();
+		String[] args = e.getAttributes();
 		if (args.length >= 2) {
 			int parentId = Integer.parseInt(args[0]);
 			int num = Integer.parseInt(args[1]);
@@ -249,7 +249,7 @@ public class ORTERemoteProxyTest implements IProxyRuntimeEventListener {
 	}
 
 	public void handleProxyRuntimeNewNodeEvent(IProxyRuntimeNewNodeEvent e) {
-		String[] args = e.getArguments();
+		String[] args = e.getAttributes();
 		try {
 			if (args.length >= 2) {
 				int parentId = Integer.parseInt(args[0]);
@@ -268,7 +268,7 @@ public class ORTERemoteProxyTest implements IProxyRuntimeEventListener {
 	}
 
 	public void handleProxyRuntimeNewQueueEvent(IProxyRuntimeNewQueueEvent e) {
-		String[] args = e.getArguments();
+		String[] args = e.getAttributes();
 		if (args.length >= 2) {
 			int parentId = Integer.parseInt(args[0]);
 			int num = Integer.parseInt(args[1]);
@@ -305,7 +305,7 @@ public class ORTERemoteProxyTest implements IProxyRuntimeEventListener {
 	}
 
 	public void handleProxyRuntimeJobChangeEvent(IProxyRuntimeJobChangeEvent e) {
-		String[] args = e.getArguments();
+		String[] args = e.getAttributes();
 		if (args.length >= 2) {
 			int num = Integer.parseInt(args[0]);
 			int pos = 1;
@@ -357,8 +357,8 @@ public class ORTERemoteProxyTest implements IProxyRuntimeEventListener {
 		
 	}
 
-	public void handleProxyRuntimeErrorEvent(IProxyRuntimeErrorEvent e) {
-		System.out.println("got runtime error: " + e.getDescription());
+	public void handleProxyRuntimeMessageEvent(IProxyRuntimeMessageEvent e) {
+		System.out.println("got runtime error: " + e.toString());
 	}
 
 	public void handleProxyRuntimeConnectedStateEvent(IProxyRuntimeConnectedStateEvent e) {

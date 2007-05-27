@@ -26,13 +26,8 @@ public class ProxyEventFactory extends AbstractProxyEventFactory {
 			evt = new ProxyOKEvent(transID);
 			break;
 			
-		case IProxyEvent.EVENT_ERROR:
-			int errCode = 0;
-			try {
-				errCode = Integer.parseInt(args[0]);
-			} catch (NumberFormatException e) {
-			}
-			evt = new ProxyErrorEvent(transID, errCode, args[1]);
+		case IProxyEvent.EVENT_MESSAGE:
+			evt = new ProxyMessageEvent(transID, args);
 			break;
 		}
 		

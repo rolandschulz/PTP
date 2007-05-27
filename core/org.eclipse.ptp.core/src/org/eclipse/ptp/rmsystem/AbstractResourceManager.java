@@ -39,7 +39,6 @@ import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
-import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.elementcontrols.IPJobControl;
 import org.eclipse.ptp.core.elementcontrols.IPMachineControl;
@@ -110,13 +109,7 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	IResourceManagerControl {
 	
 	private static IAttribute[] getDefaultAttributes(IResourceManagerConfiguration config) {
-		IAttribute nameAttr = null;
-		
-		try {
-			 nameAttr = ElementAttributes.getNameAttributeDefinition().create(config.getName());
-		} catch (IllegalValueException e) {
-		}
-		
+		IAttribute nameAttr = ElementAttributes.getNameAttributeDefinition().create(config.getName());
 		return new IAttribute[]{nameAttr};
 	}
 

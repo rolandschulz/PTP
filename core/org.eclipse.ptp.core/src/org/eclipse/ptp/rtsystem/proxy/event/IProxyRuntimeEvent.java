@@ -20,12 +20,11 @@
 package org.eclipse.ptp.rtsystem.proxy.event;
 
 import org.eclipse.ptp.core.proxy.event.IProxyExtendedEvent;
-import org.eclipse.ptp.core.util.BitList;
 
 public interface IProxyRuntimeEvent extends IProxyExtendedEvent {
 	public static final int PROXY_RUNTIME_EVENT_OFFSET = 200;
 	
-	public static final int PROXY_RUNTIME_ERROR_EVENT = PROXY_RUNTIME_EVENT_OFFSET + 1;
+	public static final int PROXY_RUNTIME_MESSAGE_EVENT = PROXY_RUNTIME_EVENT_OFFSET + 1;
 	public static final int PROXY_RUNTIME_ATTR_DEF_EVENT = PROXY_RUNTIME_EVENT_OFFSET + 2;
 	public static final int PROXY_RUNTIME_NEW_JOB_EVENT = PROXY_RUNTIME_EVENT_OFFSET + 3;
 	public static final int PROXY_RUNTIME_NEW_MACHINE_EVENT = PROXY_RUNTIME_EVENT_OFFSET + 4;
@@ -42,6 +41,4 @@ public interface IProxyRuntimeEvent extends IProxyExtendedEvent {
 	public static final int PROXY_RUNTIME_SHUTDOWN_EVENT = PROXY_RUNTIME_EVENT_OFFSET + 15;
 
 	public static final int PROXY_RUNTIME_EVENT_TERMINAL = PROXY_RUNTIME_EVENT_OFFSET + 15;
-	
-	public BitList getBitSet();
 }

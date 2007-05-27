@@ -22,7 +22,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.ptp.core.attributes.IAttribute;
-import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IResourceManager;
@@ -31,13 +30,7 @@ import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
 public class PUniverse extends PElement implements IPUniverseControl {
 	private static final int RMID_SHIFT = 24;
 	private static IAttribute[] getDefaultAttributes(String name) {
-		IAttribute nameAttr = null;
-		
-		try {
-			 nameAttr = ElementAttributes.getNameAttributeDefinition().create(name);
-		} catch (IllegalValueException e) {
-		}
-		
+		IAttribute nameAttr = ElementAttributes.getNameAttributeDefinition().create(name);
 		return new IAttribute[]{nameAttr};
 	}
 	private int nextResourceManagerId = 1;

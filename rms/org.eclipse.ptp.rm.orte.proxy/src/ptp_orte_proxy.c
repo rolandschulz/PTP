@@ -401,7 +401,7 @@ sendOKEvent(int trans_id)
 }
 
 static int
-sendErrorEvent(int trans_id, int code, char *fmt, ...)
+sendMessageEvent(int trans_id, char *level, int code, char *fmt, ...)
 {
 	va_list		ap;
 	char *		msg;
@@ -411,8 +411,10 @@ sendErrorEvent(int trans_id, int code, char *fmt, ...)
 	vasprintf(&msg, fmt, ap);
 	va_end(ap);
 	
-	proxy_msg_add_int(m, code);
-	proxy_msg_add_string(m, msg);
+	proxy_msg_add_int(m, 3); /* 3 args in this attribute def */
+	proxy_msg_add_keyval_string(m, MSG_LEVEL_ATTR, level);
+	proxy_msg_add_keyval_int(m, MSG_CODE_ATTR, code);
+	proxy_msg_add_keyval_string(m, MSG_TEXT_ATTR, msg);
 	proxy_svr_queue_msg(orte_proxy, m);
 	
 	return 0;	
@@ -700,7 +702,7 @@ ORTECheckErrorCode(int trans_id, int type, int rc)
 	if(rc != ORTE_SUCCESS) {
 		printf("ARgh!  An error!\n"); fflush(stdout);
 		printf("ERROR %s\n", ORTE_ERROR_NAME(rc)); fflush(stdout);
-		sendErrorEvent(trans_id, type, (char *)ORTE_ERROR_NAME(rc));
+		sendMessageEvent(trans_id, MSG_LEVEL_ERROR, type, (char *)ORTE_ERROR_NAME(rc));
 		return 1;
 	}
 	
@@ -1675,17 +1677,17 @@ ORTE_Initialize(int trans_id, int nargs, char **args)
 	fprintf(stdout, "ORTE_Initialize (%d):\n", trans_id); fflush(stdout);
 	
 	if (proxy_state != STATE_INIT) {
-		sendErrorEvent(trans_id, RTEV_ERROR_ORTE_INIT, "already initialized");
+		sendMessageEvent(trans_id, MSG_LEVEL_ERROR, RTEV_ERROR_ORTE_INIT, "already initialized");
 		return 0;
 	}
 	
 	if (nargs < 2) {
-		sendErrorEvent(trans_id, RTEV_ERROR_ORTE_INIT, "incorrect arg count");
+		sendMessageEvent(trans_id, MSG_LEVEL_ERROR, RTEV_ERROR_ORTE_INIT, "incorrect arg count");
 		return 0;
 	}
 	
 	if (strcmp(args[0], WIRE_PROTOCOL_VERSION) != 0) {
-		sendErrorEvent(trans_id, RTEV_ERROR_ORTE_INIT, "wire protocol version \"%s\" not supported", args[0]);
+		sendMessageEvent(trans_id, MSG_LEVEL_ERROR, RTEV_ERROR_ORTE_INIT, "wire protocol version \"%s\" not supported", args[0]);
 		return 0;
 	}
 	
@@ -1693,14 +1695,14 @@ ORTE_Initialize(int trans_id, int nargs, char **args)
 	
 	if (pipe(pfd) < 0)
 	{
-		sendErrorEvent(trans_id, RTEV_ERROR_ORTE_INIT, "pipe() failed for the orted spawn in ORTESpawnDaemon");
+		sendMessageEvent(trans_id, MSG_LEVEL_ERROR, RTEV_ERROR_ORTE_INIT, "pipe() failed for the orted spawn in ORTESpawnDaemon");
 		return 0;
 	}
 	
 	switch(orted_pid = fork()) {
 	case -1:
 		{
-			sendErrorEvent(trans_id, RTEV_ERROR_ORTE_INIT, "fork() failed for the orted spawn in ORTESpawnDaemon");
+			sendMessageEvent(trans_id, MSG_LEVEL_ERROR, RTEV_ERROR_ORTE_INIT, "fork() failed for the orted spawn in ORTESpawnDaemon");
 			return 1;
 		}
 		break;
@@ -1752,14 +1754,14 @@ ORTE_Initialize(int trans_id, int nargs, char **args)
 			 * Something serious has gone wrong. Kill the orted and shut down.
 			 */
 			(void)kill(orted_pid, SIGKILL);
-			sendErrorEvent(trans_id, RTEV_ERROR_ORTE_INIT, "select() returned error");
+			sendMessageEvent(trans_id, MSG_LEVEL_ERROR, RTEV_ERROR_ORTE_INIT, "select() returned error");
 			return 0;
 		case 0:
 			/*
 			 * Timeout. Kill off orted (if it's running) and shut down.
 			 */
 			(void)kill(orted_pid, SIGKILL);
-			sendErrorEvent(trans_id, RTEV_ERROR_ORTE_INIT, "Timeout waiting for orted to start");
+			sendMessageEvent(trans_id, MSG_LEVEL_ERROR, RTEV_ERROR_ORTE_INIT, "Timeout waiting for orted to start");
 			return 0;
 		default:
 			if ((n = read(pfd[0], buf, BUFSIZ-1)) > 0) {
@@ -1862,12 +1864,12 @@ ORTE_SubmitJob(int trans_id, int nargs, char **args)
 	ptp_job *				j;
 
 	if (proxy_state != STATE_RUNNING) {
-		sendErrorEvent(trans_id, RTEV_ERROR_ORTE_INIT, "must call INIT first");
+		sendMessageEvent(trans_id, MSG_LEVEL_ERROR, RTEV_ERROR_ORTE_INIT, "must call INIT first");
 		return PROXY_RES_OK;
 	}
 	
 	if (nargs < 1) {
-		sendErrorEvent(trans_id, RTEV_ERROR_ORTE_INIT, "incorrect arg count");
+		sendMessageEvent(trans_id, MSG_LEVEL_ERROR, RTEV_ERROR_ORTE_INIT, "incorrect arg count");
 		return PROXY_RES_OK;
 	}
 	
@@ -1902,21 +1904,12 @@ ORTE_SubmitJob(int trans_id, int nargs, char **args)
 	 */
 	 
 	if (pgm_name == NULL) {
-		sendErrorEvent(trans_id, RTEV_ERROR_ORTE_RUN, "Must specify a program name");
+		sendMessageEvent(trans_id, MSG_LEVEL_ERROR, RTEV_ERROR_ORTE_RUN, "Must specify a program name");
 		return PROXY_RES_OK;
 	}
 	
 	if (num_procs <= 0) {
-		sendErrorEvent(trans_id, RTEV_ERROR_ORTE_RUN, "Invalid number of processes");
-		return PROXY_RES_OK;
-	}
-	
-	/*
-	 * Must specify a working directory. For local launches, this is normally the project directory. For
-	 * remote launches, it will probably be the user's home directory.
-	 */
-	if (cwd == NULL) {
-		sendErrorEvent(trans_id, RTEV_ERROR_ORTE_RUN, "Must specify a working directory");
+		sendMessageEvent(trans_id, MSG_LEVEL_ERROR,  RTEV_ERROR_ORTE_RUN, "Must specify a working directory");
 		return PROXY_RES_OK;
 	}
 		
@@ -1939,7 +1932,7 @@ ORTE_SubmitJob(int trans_id, int nargs, char **args)
 	if (exec_path == NULL) {
 		full_path = opal_path_findv(pgm_name, 0, env, cwd);
 		if (full_path == NULL) {
-			sendErrorEvent(trans_id, RTEV_ERROR_ORTE_RUN, "Executuable not found");
+			sendMessageEvent(trans_id, MSG_LEVEL_ERROR, RTEV_ERROR_ORTE_RUN, "Executuable not found");
 			return PROXY_RES_OK;
 		}
 	} else {
@@ -1947,7 +1940,7 @@ ORTE_SubmitJob(int trans_id, int nargs, char **args)
 	}
 	
 	if (access(full_path, X_OK) < 0) {
-		sendErrorEvent(trans_id, RTEV_ERROR_ORTE_RUN, strerror(errno));
+		sendMessageEvent(trans_id, MSG_LEVEL_ERROR, RTEV_ERROR_ORTE_RUN, strerror(errno));
 		return PROXY_RES_OK;
 	}
 	
@@ -1971,7 +1964,7 @@ ORTE_SubmitJob(int trans_id, int nargs, char **args)
 		if (debug_exec_path == NULL) {
 			debug_full_path = opal_path_findv(debug_exec_name, 0, env, cwd);
 			if (debug_full_path == NULL) {
-				sendErrorEvent(trans_id, RTEV_ERROR_ORTE_RUN, "Debugger executuable not found");
+				sendMessageEvent(trans_id, MSG_LEVEL_ERROR, RTEV_ERROR_ORTE_RUN, "Debugger executuable not found");
 				return PROXY_RES_OK;
 			}
 		} else {
@@ -1979,7 +1972,7 @@ ORTE_SubmitJob(int trans_id, int nargs, char **args)
 		}
 		
 		if (access(debug_full_path, X_OK) < 0) {
-			sendErrorEvent(trans_id, RTEV_ERROR_ORTE_RUN, strerror(errno));
+			sendMessageEvent(trans_id, MSG_LEVEL_ERROR, RTEV_ERROR_ORTE_RUN, strerror(errno));
 			return PROXY_RES_OK;
 		}
 
@@ -2086,12 +2079,12 @@ ORTE_TerminateJob(int trans_id, int nargs, char **args)
 	ptp_job *	j;
 	
 	if (proxy_state != STATE_RUNNING) {
-		sendErrorEvent(trans_id, RTEV_ERROR_TERMINATE_JOB, "must call INIT first");
+		sendMessageEvent(trans_id, MSG_LEVEL_ERROR, RTEV_ERROR_TERMINATE_JOB, "must call INIT first");
 		return PROXY_RES_OK;
 	}
 	
 	if (nargs < 1) {
-		sendErrorEvent(trans_id, RTEV_ERROR_TERMINATE_JOB, "incorrect arg count");
+		sendMessageEvent(trans_id, MSG_LEVEL_ERROR, RTEV_ERROR_TERMINATE_JOB, "incorrect arg count");
 		return PROXY_RES_OK;
 	}
 	
@@ -2099,7 +2092,7 @@ ORTE_TerminateJob(int trans_id, int nargs, char **args)
 
 	if ((j = find_job(jobid, JOBID_PTP)) != NULL) {
 		if (j->terminating) {
-			sendErrorEvent(trans_id, RTEV_ERROR_TERMINATE_JOB, "Job termination already requested");
+			sendMessageEvent(trans_id, MSG_LEVEL_ERROR, RTEV_ERROR_TERMINATE_JOB, "Job termination already requested");
 			return PROXY_RES_OK;
 		}
 		
@@ -2136,7 +2129,7 @@ ORTE_StartEvents(int trans_id, int nargs, char **args)
 	fprintf(stdout, "  ORTE_StartEvents (%d):\n", trans_id); fflush(stdout);
 
 	if (proxy_state != STATE_RUNNING) {
-		sendErrorEvent(trans_id, RTEV_ERROR_ORTE_INIT, "must call INIT first");
+		sendMessageEvent(trans_id, MSG_LEVEL_ERROR, RTEV_ERROR_ORTE_INIT, "must call INIT first");
 		return PROXY_RES_OK;
 	}
 
@@ -2180,7 +2173,7 @@ ORTE_StartEvents(int trans_id, int nargs, char **args)
 	
 			if( get_node_attributes(mach, &first_node, &last_node) ) {
 				/* error - so bail out */
-				sendErrorEvent(trans_id, RTEV_ERROR_NATTR, "error finding key on node or error getting keys");
+				sendMessageEvent(trans_id, MSG_LEVEL_ERROR, RTEV_ERROR_NATTR, "error finding key on node or error getting keys");
 				return PROXY_RES_OK;
 			}
 	
@@ -2287,7 +2280,7 @@ server(char *name, char *host, int port)
 		}
 		asprintf(&msg, "ptp_orte_proxy received signal %s (%s).  Exit was required and performed cleanly.", msg1, msg2);
 		//proxy_svr_event_callback(orte_proxy, ORTEErrorStr(RTEV_ERROR_SIGNAL, msg));
-		sendErrorEvent(gTransID, RTEV_ERROR_SIGNAL, msg);
+		sendMessageEvent(gTransID, MSG_LEVEL_ERROR, RTEV_ERROR_SIGNAL, msg);
 		free(msg);
 		free(msg1);
 		free(msg2);

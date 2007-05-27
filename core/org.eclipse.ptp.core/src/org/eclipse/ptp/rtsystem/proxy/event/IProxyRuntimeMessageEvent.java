@@ -17,19 +17,16 @@
  * LA-CC 04-115
  *******************************************************************************/
 
-package org.eclipse.ptp.rtsystem.events;
+package org.eclipse.ptp.rtsystem.proxy.event;
 
+import org.eclipse.ptp.core.proxy.event.IProxyMessageEvent;
 
-public class RuntimeErrorEvent implements IRuntimeErrorEvent {
-
-	private String message;
-	
-	public RuntimeErrorEvent(String msg) {
-		message = msg;
+public interface IProxyRuntimeMessageEvent extends IProxyMessageEvent {
+	public enum ErrorType {
+		CONNECT_TIMEOUT,
+		COMMAND_TIMEOUT,
+		DISCONNECTED,
+		PROXY,
+		INTERNAL
 	}
-
-	public String getMessage() {
-		return message;
-	}
-
 }

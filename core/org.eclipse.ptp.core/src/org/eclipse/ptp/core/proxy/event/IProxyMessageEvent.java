@@ -19,9 +19,5 @@
 
 package org.eclipse.ptp.core.proxy.event;
 
-public interface IProxyErrorEvent extends IProxyEvent {
-	public static final int ERROR_MALFORMED_COMMAND = 0;
-
-	public int getErrorCode();
-	public String getErrorMessage();
+public interface IProxyMessageEvent extends IProxyEvent {
 }

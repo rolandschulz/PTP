@@ -115,23 +115,19 @@ public class PTPDebugHelper {
 		String debugArgs = "--host=" + debugHost + " --debugger=" + debuggerType + " --port=" + debugPort;
 		System.err.println("*** If you start JUnit test with manually launch sdm, please type the following on command line ***");
 		System.err.println(">>> mpirun -np " + (numProcs+1) + " ./sdm " + debugArgs);
-		try {
-			String[] dbgArgs = new String[extArgs.length + 4];
-			dbgArgs[0] = "--host=" + debugHost;
-			dbgArgs[1] = "--debugger=" + debuggerType;
-			dbgArgs[2] = "--debugger_path=" + sdmPath;
-			dbgArgs[3] = "--port=" + debugPort;
-			for (int i=0; i<extArgs.length; i++) {
-				dbgArgs[4+i] = extArgs[i];
-			}
-			IPath path = new Path(sdmPath);
-			attrMgr.addAttribute(JobAttributes.getDebuggerExecutableNameAttributeDefinition().create(path.lastSegment()));
-			attrMgr.addAttribute(JobAttributes.getDebuggerExecutablePathAttributeDefinition().create(path.removeLastSegments(1).toOSString()));
-			attrMgr.addAttribute(JobAttributes.getDebuggerArgumentsAttributeDefinition().create(dbgArgs));
-			attrMgr.addAttribute(JobAttributes.getDebugFlagAttributeDefinition().create(true));
-		} catch (IllegalValueException e) {
-			throw new CoreException(Status.CANCEL_STATUS);
+		String[] dbgArgs = new String[extArgs.length + 4];
+		dbgArgs[0] = "--host=" + debugHost;
+		dbgArgs[1] = "--debugger=" + debuggerType;
+		dbgArgs[2] = "--debugger_path=" + sdmPath;
+		dbgArgs[3] = "--port=" + debugPort;
+		for (int i=0; i<extArgs.length; i++) {
+			dbgArgs[4+i] = extArgs[i];
 		}
+		IPath path = new Path(sdmPath);
+		attrMgr.addAttribute(JobAttributes.getDebuggerExecutableNameAttributeDefinition().create(path.lastSegment()));
+		attrMgr.addAttribute(JobAttributes.getDebuggerExecutablePathAttributeDefinition().create(path.removeLastSegments(1).toOSString()));
+		attrMgr.addAttribute(JobAttributes.getDebuggerArgumentsAttributeDefinition().create(dbgArgs));
+		attrMgr.addAttribute(JobAttributes.getDebugFlagAttributeDefinition().create(true));
 	}
 	public static IPath getProjectPath(ICProject project) {
 		return project.getProject().getLocation();	

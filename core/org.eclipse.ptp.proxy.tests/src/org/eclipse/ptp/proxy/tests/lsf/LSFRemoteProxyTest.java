@@ -9,22 +9,15 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.ptp.core.attributes.IAttribute;
-import org.eclipse.ptp.core.proxy.event.IProxyConnectedEvent;
-import org.eclipse.ptp.core.proxy.event.IProxyDisconnectedEvent;
-import org.eclipse.ptp.core.proxy.event.IProxyErrorEvent;
-import org.eclipse.ptp.core.proxy.event.IProxyEventListener;
-import org.eclipse.ptp.core.proxy.event.IProxyExtendedEvent;
-import org.eclipse.ptp.core.proxy.event.IProxyOKEvent;
-import org.eclipse.ptp.core.proxy.event.IProxyTimeoutEvent;
 import org.eclipse.ptp.core.util.RangeSet;
 import org.eclipse.ptp.lsf.core.rtsystem.LSFProxyRuntimeClient;
 import org.eclipse.ptp.rtsystem.JobRunConfiguration;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeAttributeDefEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeConnectedStateEvent;
-import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeErrorEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeJobChangeEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeMachineChangeEvent;
+import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeMessageEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeNewJobEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeNewMachineEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeNewNodeEvent;
@@ -230,7 +223,7 @@ public class LSFRemoteProxyTest implements IProxyRuntimeEventListener {
 	}
 
 	public void handleProxyRuntimeNewMachineEvent(IProxyRuntimeNewMachineEvent e) {
-		String[] args = e.getArguments();
+		String[] args = e.getAttributes();
 		if (args.length >= 2) {
 			RangeSet machineIds = new RangeSet(args[2]);
 			for (int id : machineIds) {
@@ -280,8 +273,8 @@ public class LSFRemoteProxyTest implements IProxyRuntimeEventListener {
 		
 	}
 
-	public void handleProxyRuntimeErrorEvent(IProxyRuntimeErrorEvent e) {
-		System.err.println("got runtime error: " + e.getDescription());
+	public void handleProxyRuntimeMessageEvent(IProxyRuntimeMessageEvent e) {
+		System.err.println("got runtime error: " + e.toString());
 		
 	}
 

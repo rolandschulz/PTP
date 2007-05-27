@@ -24,8 +24,4 @@ public class ProxyRuntimeShutdownStateEvent extends AbstractProxyRuntimeEvent im
 	public ProxyRuntimeShutdownStateEvent() {
 		super(PROXY_RUNTIME_SHUTDOWN_EVENT, 0);
 	}
-	
-	public String toString() {
-		return "EVENT_RUNTIME_SHUTDOWN";
-	}
 }

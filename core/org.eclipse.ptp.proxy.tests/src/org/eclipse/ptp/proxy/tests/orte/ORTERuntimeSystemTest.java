@@ -28,7 +28,7 @@ import org.eclipse.ptp.rtsystem.IRuntimeEventListener;
 import org.eclipse.ptp.rtsystem.JobRunConfiguration;
 import org.eclipse.ptp.rtsystem.events.IRuntimeAttributeDefinitionEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeConnectedStateEvent;
-import org.eclipse.ptp.rtsystem.events.IRuntimeErrorEvent;
+import org.eclipse.ptp.rtsystem.events.IRuntimeMessageEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeJobChangeEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeMachineChangeEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeNewJobEvent;
@@ -333,8 +333,8 @@ public class ORTERuntimeSystemTest implements IRuntimeEventListener {
 		
 	}
 
-	public void handleRuntimeErrorEvent(IRuntimeErrorEvent e) {
-		System.out.println("got runtime error: " + e.getMessage());
+	public void handleRuntimeMessageEvent(IRuntimeMessageEvent e) {
+		System.out.println("got runtime error: " + e.getText());
 	}
 
 	public void handleRuntimeConnectedStateEvent(IRuntimeConnectedStateEvent e) {

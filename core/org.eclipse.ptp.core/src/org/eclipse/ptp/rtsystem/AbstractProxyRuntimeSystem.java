@@ -40,12 +40,13 @@ import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributeManager;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
+import org.eclipse.ptp.core.elements.attributes.MessageAttributes.Level;
 import org.eclipse.ptp.core.util.RangeSet;
 import org.eclipse.ptp.rtsystem.events.RuntimeAttributeDefinitionEvent;
 import org.eclipse.ptp.rtsystem.events.RuntimeConnectedStateEvent;
-import org.eclipse.ptp.rtsystem.events.RuntimeErrorEvent;
 import org.eclipse.ptp.rtsystem.events.RuntimeJobChangeEvent;
 import org.eclipse.ptp.rtsystem.events.RuntimeMachineChangeEvent;
+import org.eclipse.ptp.rtsystem.events.RuntimeMessageEvent;
 import org.eclipse.ptp.rtsystem.events.RuntimeNewJobEvent;
 import org.eclipse.ptp.rtsystem.events.RuntimeNewMachineEvent;
 import org.eclipse.ptp.rtsystem.events.RuntimeNewNodeEvent;
@@ -59,10 +60,10 @@ import org.eclipse.ptp.rtsystem.events.RuntimeShutdownStateEvent;
 import org.eclipse.ptp.rtsystem.proxy.IProxyRuntimeClient;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeAttributeDefEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeConnectedStateEvent;
-import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeErrorEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeJobChangeEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeMachineChangeEvent;
+import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeMessageEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeNewJobEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeNewMachineEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeNewNodeEvent;
@@ -157,67 +158,70 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeAttributeDefEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeAttributeDefEvent)
 	 */
 	public void handleProxyRuntimeAttributeDefEvent(IProxyRuntimeAttributeDefEvent e) {
-		String[] args = e.getArguments();
+		String[] attrs = e.getAttributes();
 		
-		if (args.length >= ATTR_MIN_LEN + 2) {
+		if (attrs.length >= ATTR_MIN_LEN + 2) {
 			try {
-				int numDefs = Integer.parseInt(args[0]);
+				int numDefs = Integer.parseInt(attrs[0]);
 				
 				ArrayList<IAttributeDefinition> attrDefs = new ArrayList<IAttributeDefinition>(numDefs);
 
 				int pos = 1;
 				
 				for (int i = 0; i < numDefs; i++) {
-					int numArgs = Integer.parseInt(args[pos]);
+					int numArgs = Integer.parseInt(attrs[pos]);
 					
-					if (numArgs >= ATTR_MIN_LEN && pos + numArgs < args.length) {
-						IAttributeDefinition attrDef = parseAttributeDefinition(args, pos + 1, pos + numArgs);	
+					if (numArgs >= ATTR_MIN_LEN && pos + numArgs < attrs.length) {
+						IAttributeDefinition attrDef = parseAttributeDefinition(attrs, pos + 1, pos + numArgs);	
 						if (attrDef != null) {
 							attrDefs.add(attrDef);
 						}
 						pos += numArgs + 1;
 					} else {
-						fireRuntimeErrorEvent(new RuntimeErrorEvent("Bad proxy event: bad arg count"));
+						fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "Bad proxy event: bad arg count"));
 						return;
 					}
 				}
 				
 				fireRuntimeAttributeDefinitionEvent(new RuntimeAttributeDefinitionEvent(attrDefs.toArray(new IAttributeDefinition[attrDefs.size()])));
 			} catch (NumberFormatException ex) {
-				fireRuntimeErrorEvent(new RuntimeErrorEvent("Bad proxy event: could not convert arg to integer"));
+				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "Bad proxy event: could not convert arg to integer"));
 			}
 		} else {
-			fireRuntimeErrorEvent(new RuntimeErrorEvent("Bad proxy event: not enough arguments"));
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "Bad proxy event: not enough arguments"));
 		}
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeErrorEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeErrorEvent)
 	 */
-	public void handleProxyRuntimeErrorEvent(IProxyRuntimeErrorEvent e) {
-		fireRuntimeErrorEvent(new RuntimeErrorEvent(e.getDescription()));
+	public void handleProxyRuntimeMessageEvent(IProxyRuntimeMessageEvent e) {
+		String[] attrs = e.getAttributes();
+		
+		if (attrs.length > 0) {
+			AttributeManager mgr = getAttributeManager(attrs, 0, attrs.length - 1);
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(mgr));
+		} else {
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "AbstractProxyRuntimeSystem: could not parse message"));				
+		}
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeJobChangeEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeJobChangeEvent)
 	 */
 	public void handleProxyRuntimeJobChangeEvent(IProxyRuntimeJobChangeEvent e) {
-		String[] args = e.getArguments();
+		String[] attrs = e.getAttributes();
 		
-		if (args.length < 1) {
-			fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: not enough arguments"));
+		if (attrs.length < 1) {
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "AbstractProxyRuntimeSystem: not enough arguments"));
 			return;
 		}
 		
-		try {
-			ElementAttributeManager eMgr = getElementAttributeManager(args, 0);
-			if (eMgr != null) {			
-				fireRuntimeJobChangeEvent(new RuntimeJobChangeEvent(eMgr));
-			} else {
-				fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: could not parse message"));				
-			}
-		} catch (NumberFormatException e1) {
-			fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: invalid parent ID"));				
+		ElementAttributeManager eMgr = getElementAttributeManager(attrs, 0);
+		if (eMgr != null) {			
+			fireRuntimeJobChangeEvent(new RuntimeJobChangeEvent(eMgr));
+		} else {
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "AbstractProxyRuntimeSystem: could not parse message"));				
 		}
 	}
 
@@ -225,22 +229,18 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeMachineChangeEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeMachineChangeEvent)
 	 */
 	public void handleProxyRuntimeMachineChangeEvent(IProxyRuntimeMachineChangeEvent e) {
-		String[] args = e.getArguments();
+		String[] attrs = e.getAttributes();
 		
-		if (args.length < 1) {
-			fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: not enough arguments"));
+		if (attrs.length < 1) {
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "AbstractProxyRuntimeSystem: not enough arguments"));
 			return;
 		}
 		
-		try {
-			ElementAttributeManager eMgr = getElementAttributeManager(args, 0);
-			if (eMgr != null) {			
-				fireRuntimeMachineChangeEvent(new RuntimeMachineChangeEvent(eMgr));
-			} else {
-				fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: could not parse message"));				
-			}
-		} catch (NumberFormatException e1) {
-			fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: invalid parent ID"));				
+		ElementAttributeManager eMgr = getElementAttributeManager(attrs, 0);
+		if (eMgr != null) {			
+			fireRuntimeMachineChangeEvent(new RuntimeMachineChangeEvent(eMgr));
+		} else {
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "AbstractProxyRuntimeSystem: could not parse message"));				
 		}
 	}
 	
@@ -248,14 +248,14 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeNewJobEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeNewJobEvent)
 	 */
 	public void handleProxyRuntimeNewJobEvent(IProxyRuntimeNewJobEvent e) {
-		String[] args = e.getArguments();
+		String[] attrs = e.getAttributes();
 		
-		if (args.length < 2) {
-			fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: not enough arguments"));
+		if (attrs.length < 2) {
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "AbstractProxyRuntimeSystem: not enough arguments"));
 			return;
 		}
 		
-		ElementAttributeManager eMgr = getElementAttributeManager(args, 1);
+		ElementAttributeManager eMgr = getElementAttributeManager(attrs, 1);
 		
 		if (eMgr != null) {			
 			/*
@@ -269,12 +269,13 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 					if (mgr != null) {
 						entry.getValue().addAttributes(mgr.getAttributes());
 					}
+					jobSubs.remove(subId);
 				}
 			}
 			
-			fireRuntimeNewJobEvent(new RuntimeNewJobEvent(args[0], eMgr));
+			fireRuntimeNewJobEvent(new RuntimeNewJobEvent(attrs[0], eMgr));
 		} else {
-			fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: could not parse message"));				
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "AbstractProxyRuntimeSystem: could not parse message"));				
 		}
 	}
 	
@@ -282,18 +283,18 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeNewMachineEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeNewMachineEvent)
 	 */
 	public void handleProxyRuntimeNewMachineEvent(IProxyRuntimeNewMachineEvent e) {
-		String[] args = e.getArguments();
+		String[] attrs = e.getAttributes();
 		
-		if (args.length < 2) {
-			fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: not enough arguments"));
+		if (attrs.length < 2) {
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "AbstractProxyRuntimeSystem: not enough arguments"));
 			return;
 		}
 		
-		ElementAttributeManager eMgr = getElementAttributeManager(args, 1);
+		ElementAttributeManager eMgr = getElementAttributeManager(attrs, 1);
 		if (eMgr != null) {			
-			fireRuntimeNewMachineEvent(new RuntimeNewMachineEvent(args[0], eMgr));
+			fireRuntimeNewMachineEvent(new RuntimeNewMachineEvent(attrs[0], eMgr));
 		} else {
-			fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: could not parse message"));				
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "AbstractProxyRuntimeSystem: could not parse message"));				
 		}
 	}
 	
@@ -301,18 +302,18 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeNewNodeEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeNewNodeEvent)
 	 */
 	public void handleProxyRuntimeNewNodeEvent(IProxyRuntimeNewNodeEvent e) {
-		String[] args = e.getArguments();
+		String[] attrs = e.getAttributes();
 		
-		if (args.length < 2) {
-			fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: not enough arguments"));
+		if (attrs.length < 2) {
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "AbstractProxyRuntimeSystem: not enough arguments"));
 			return;
 		}
 		
-		ElementAttributeManager eMgr = getElementAttributeManager(args, 1);
+		ElementAttributeManager eMgr = getElementAttributeManager(attrs, 1);
 		if (eMgr != null) {			
-			fireRuntimeNewNodeEvent(new RuntimeNewNodeEvent(args[0], eMgr));
+			fireRuntimeNewNodeEvent(new RuntimeNewNodeEvent(attrs[0], eMgr));
 		} else {
-			fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: could not parse message"));				
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "AbstractProxyRuntimeSystem: could not parse message"));				
 		}
 	}
 	
@@ -320,18 +321,18 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeNewProcessEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeNewProcessEvent)
 	 */
 	public void handleProxyRuntimeNewProcessEvent(IProxyRuntimeNewProcessEvent e) {
-		String[] args = e.getArguments();
+		String[] attrs = e.getAttributes();
 		
-		if (args.length < 2) {
-			fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: not enough arguments"));
+		if (attrs.length < 2) {
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "AbstractProxyRuntimeSystem: not enough arguments"));
 			return;
 		}
 		
-		ElementAttributeManager eMgr = getElementAttributeManager(args, 1);
+		ElementAttributeManager eMgr = getElementAttributeManager(attrs, 1);
 		if (eMgr != null) {			
-			fireRuntimeNewProcessEvent(new RuntimeNewProcessEvent(args[0], eMgr));
+			fireRuntimeNewProcessEvent(new RuntimeNewProcessEvent(attrs[0], eMgr));
 		} else {
-			fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: could not parse message"));				
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "AbstractProxyRuntimeSystem: could not parse message"));				
 		}
 	}
 
@@ -339,18 +340,18 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeNewQueueEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeNewQueueEvent)
 	 */
 	public void handleProxyRuntimeNewQueueEvent(IProxyRuntimeNewQueueEvent e) {
-		String[] args = e.getArguments();
+		String[] attrs = e.getAttributes();
 		
-		if (args.length < 2) {
-			fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: not enough arguments"));
+		if (attrs.length < 2) {
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "AbstractProxyRuntimeSystem: not enough arguments"));
 			return;
 		}
 		
-		ElementAttributeManager eMgr = getElementAttributeManager(args, 1);
+		ElementAttributeManager eMgr = getElementAttributeManager(attrs, 1);
 		if (eMgr != null) {			
-			fireRuntimeNewQueueEvent(new RuntimeNewQueueEvent(args[0], eMgr));
+			fireRuntimeNewQueueEvent(new RuntimeNewQueueEvent(attrs[0], eMgr));
 		} else {
-			fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: could not parse message"));				
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "AbstractProxyRuntimeSystem: could not parse message"));				
 		}
 	}
 	
@@ -358,22 +359,18 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeNodeChangeEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeNodeChangeEvent)
 	 */
 	public void handleProxyRuntimeNodeChangeEvent(IProxyRuntimeNodeChangeEvent e) {
-		String[] args = e.getArguments();
+		String[] attrs = e.getAttributes();
 		
-		if (args.length < 1) {
-			fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: not enough arguments"));
+		if (attrs.length < 1) {
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "AbstractProxyRuntimeSystem: not enough arguments"));
 			return;
 		}
 		
-		try {
-			ElementAttributeManager eMgr = getElementAttributeManager(args, 0);
-			if (eMgr != null) {			
-				fireRuntimeNodeChangeEvent(new RuntimeNodeChangeEvent(eMgr));
-			} else {
-				fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: could not parse message"));				
-			}
-		} catch (NumberFormatException e1) {
-			fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: invalid parent ID"));				
+		ElementAttributeManager eMgr = getElementAttributeManager(attrs, 0);
+		if (eMgr != null) {			
+			fireRuntimeNodeChangeEvent(new RuntimeNodeChangeEvent(eMgr));
+		} else {
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "AbstractProxyRuntimeSystem: could not parse message"));				
 		}
 	}
 
@@ -381,22 +378,18 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeProcessChangeEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeProcessChangeEvent)
 	 */
 	public void handleProxyRuntimeProcessChangeEvent(IProxyRuntimeProcessChangeEvent e) {
-		String[] args = e.getArguments();
+		String[] attrs = e.getAttributes();
 		
-		if (args.length < 1) {
-			fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: not enough arguments"));
+		if (attrs.length < 1) {
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "AbstractProxyRuntimeSystem: not enough arguments"));
 			return;
 		}
 		
-		try {
-			ElementAttributeManager eMgr = getElementAttributeManager(args, 0);
-			if (eMgr != null) {			
-				fireRuntimeProcessChangeEvent(new RuntimeProcessChangeEvent(eMgr));
-			} else {
-				fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: could not parse message"));				
-			}
-		} catch (NumberFormatException e1) {
-			fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: invalid parent ID"));				
+		ElementAttributeManager eMgr = getElementAttributeManager(attrs, 0);
+		if (eMgr != null) {			
+			fireRuntimeProcessChangeEvent(new RuntimeProcessChangeEvent(eMgr));
+		} else {
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "AbstractProxyRuntimeSystem: could not parse message"));				
 		}
 	}
 	
@@ -404,22 +397,18 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeQueueChangeEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeQueueChangeEvent)
 	 */
 	public void handleProxyRuntimeQueueChangeEvent(IProxyRuntimeQueueChangeEvent e) {
-		String[] args = e.getArguments();
+		String[] attrs = e.getAttributes();
 		
-		if (args.length < 1) {
-			fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: not enough arguments"));
+		if (attrs.length < 1) {
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "AbstractProxyRuntimeSystem: not enough arguments"));
 			return;
 		}
 		
-		try {
-			ElementAttributeManager eMgr = getElementAttributeManager(args, 0);
-			if (eMgr != null) {			
-				fireRuntimeQueueChangeEvent(new RuntimeQueueChangeEvent(eMgr));
-			} else {
-				fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: could not parse message"));				
-			}
-		} catch (NumberFormatException e1) {
-			fireRuntimeErrorEvent(new RuntimeErrorEvent("AbstractProxyRuntimeSystem: invalid parent ID"));				
+		ElementAttributeManager eMgr = getElementAttributeManager(attrs, 0);
+		if (eMgr != null) {			
+			fireRuntimeQueueChangeEvent(new RuntimeQueueChangeEvent(eMgr));
+		} else {
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "AbstractProxyRuntimeSystem: could not parse message"));				
 		}
 	}
 
@@ -473,9 +462,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 		} catch(IOException e) {
 			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, 
 				"Control system is shut down, proxy exception.  The proxy may have crashed or been killed.", null));
-		} catch (IllegalValueException e) {
 		}
-		return null;
 	}
 
 	/* (non-Javadoc)
@@ -549,32 +536,32 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	}
 
 	/**
-	 * @param args
+	 * @param attrs
 	 * @param pos
 	 * @return
 	 */
-	private ElementAttributeManager getElementAttributeManager(String[] args, int pos) {
+	private ElementAttributeManager getElementAttributeManager(String[] attrs, int pos) {
 		ElementAttributeManager eMgr = new ElementAttributeManager();
 		
 		try {
-			int numRanges = Integer.parseInt(args[pos++]);
+			int numRanges = Integer.parseInt(attrs[pos++]);
 			
 			for (int i = 0; i < numRanges; i++) {
-				if (pos >= args.length) {
+				if (pos >= attrs.length) {
 					return null;					
 				}
 				
-				RangeSet ids = new RangeSet(args[pos++]);
-				int numAttrs = Integer.parseInt(args[pos++]);
+				RangeSet ids = new RangeSet(attrs[pos++]);
+				int numAttrs = Integer.parseInt(attrs[pos++]);
 				
 				int start = pos;
 				int end = pos + numAttrs - 1;
 				
-				if (end >= args.length) {
+				if (end >= attrs.length) {
 					return null;					
 				}
 				
-				eMgr.setAttributeManager(ids, getAttributeManager(args, start, end));
+				eMgr.setAttributeManager(ids, getAttributeManager(attrs, start, end));
 				
 				pos = end + 1;
 			}
@@ -588,100 +575,100 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	/**
 	 * Parse and extract an attribute definition.
 	 * 
-	 * On entry, we know that end < args.length and end - start >= ATTR_MIN_LEN
+	 * On entry, we know that end < attrs.length and end - start >= ATTR_MIN_LEN
 	 * 
 	 */
-	private IAttributeDefinition parseAttributeDefinition(String[] args, int start, int end) {
+	private IAttributeDefinition parseAttributeDefinition(String[] attrs, int start, int end) {
 		int pos = start;
 		IAttributeDefinition attrDef = null;
 		
-		String attrId = args[pos++];
-		String attrType = args[pos++];
-		String attrName = args[pos++];
-		String attrDesc = args[pos++];
-		String attrDefault = args[pos++];
+		String attrId = attrs[pos++];
+		String attrType = attrs[pos++];
+		String attrName = attrs[pos++];
+		String attrDesc = attrs[pos++];
+		String attrDefault = attrs[pos++];
 		
 		if (attrType.equals("BOOLEAN")) {
 			try {
 				Boolean defVal = Boolean.parseBoolean(attrDefault);
 				attrDef = attrDefManager.createBooleanAttributeDefinition(attrId, attrName, attrDesc, defVal);
 			} catch (NumberFormatException ex) {
-				fireRuntimeErrorEvent(new RuntimeErrorEvent("Bad proxy event: could not convert args to double"));
+				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "Bad proxy event: could not convert attrs to double"));
 			}
 		} else if (attrType.equals("DATE")) {
 			if (end - pos >= 2) {
 				try {
-					int dateStyle = toDateStyle(args[pos++]);
-					int timeStyle = toDateStyle(args[pos++]);
-					Locale locale = toLocale(args[pos++]);
+					int dateStyle = toDateStyle(attrs[pos++]);
+					int timeStyle = toDateStyle(attrs[pos++]);
+					Locale locale = toLocale(attrs[pos++]);
 					
 					DateFormat fmt = DateFormat.getDateTimeInstance(dateStyle, timeStyle, locale);
 					Date defVal = fmt.parse(attrDefault);
 					
 					if (end - pos >= 1) {
-						Date min = fmt.parse(args[pos++]);
-						Date max = fmt.parse(args[pos++]);
+						Date min = fmt.parse(attrs[pos++]);
+						Date max = fmt.parse(attrs[pos++]);
 						attrDef = attrDefManager.createDateAttributeDefinition(attrId, attrName, attrDesc, defVal, fmt, min, max);
 					} else {
 						attrDef = attrDefManager.createDateAttributeDefinition(attrId, attrName, attrDesc, defVal, fmt);
 					}
 				} catch (ParseException ex) {
-					fireRuntimeErrorEvent(new RuntimeErrorEvent("Bad proxy event: could not parse date"));
+					fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "Bad proxy event: could not parse date"));
 				} catch (IllegalValueException ex) {
-					fireRuntimeErrorEvent(new RuntimeErrorEvent("Bad proxy event: could not create attribute definition"));					
+					fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "Bad proxy event: could not create attribute definition"));					
 				}
 			} else {
-				fireRuntimeErrorEvent(new RuntimeErrorEvent("Bad proxy event: missing date format"));				
+				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "Bad proxy event: missing date format"));				
 			}
 		} else if (attrType.equals("DOUBLE")) {
 			try {
 				Double defVal = Double.parseDouble(attrDefault);
 				if (end - pos >= 1) {
-						Double min = Double.parseDouble(args[pos++]);
-						Double max = Double.parseDouble(args[pos++]);
+						Double min = Double.parseDouble(attrs[pos++]);
+						Double max = Double.parseDouble(attrs[pos++]);
 						attrDef = attrDefManager.createDoubleAttributeDefinition(attrId, attrName, attrDesc, defVal, min, max);
 				} else {
 					attrDef = attrDefManager.createDoubleAttributeDefinition(attrId, attrName, attrDesc, defVal);
 				}
 			} catch (NumberFormatException ex) {
-				fireRuntimeErrorEvent(new RuntimeErrorEvent("Bad proxy event: could not convert args to double"));
+				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "Bad proxy event: could not convert args to double"));
 			} catch (IllegalValueException ex) {
-				fireRuntimeErrorEvent(new RuntimeErrorEvent("Bad proxy event: could not create attribute definition"));					
+				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "Bad proxy event: could not create attribute definition"));					
 			}
 		} else if (attrType.equals("ENUMERATED")) {
 			if (pos != end) {
 				ArrayList<String> values = new ArrayList<String>();
 				while (pos < end) {
-					values.add(args[pos++]);
+					values.add(attrs[pos++]);
 				}
 				try {
 					attrDef = attrDefManager.createStringSetAttributeDefinition(attrId, attrName,
 							attrDesc, attrDefault, values.toArray(new String[values.size()]));
 				} catch (IllegalValueException ex) {
-					fireRuntimeErrorEvent(new RuntimeErrorEvent("Bad proxy event: could not create attribute definition"));					
+					fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "Bad proxy event: could not create attribute definition"));					
 				}
 			} else {
-				fireRuntimeErrorEvent(new RuntimeErrorEvent("Bad proxy event: no enumerated values"));	
+				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "Bad proxy event: no enumerated values"));	
 			}
 		} else if (attrType.equals("INTEGER")) {
 			try {
 				Integer defVal = Integer.parseInt(attrDefault);
 				if (end - pos >= 1) {
-						Integer min = Integer.parseInt(args[pos++]);
-						Integer max = Integer.parseInt(args[pos++]);
+						Integer min = Integer.parseInt(attrs[pos++]);
+						Integer max = Integer.parseInt(attrs[pos++]);
 						attrDef = attrDefManager.createIntegerAttributeDefinition(attrId, attrName, attrDesc, defVal, min, max);
 				} else {
 					attrDef = attrDefManager.createIntegerAttributeDefinition(attrId, attrName, attrDesc, defVal);
 				}
 			} catch (NumberFormatException ex) {
-				fireRuntimeErrorEvent(new RuntimeErrorEvent("Bad proxy event: could not convert args to integer"));
+				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "Bad proxy event: could not convert args to integer"));
 			} catch (IllegalValueException ex) {
-				fireRuntimeErrorEvent(new RuntimeErrorEvent("Bad proxy event: could not create attribute definition"));					
+				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "Bad proxy event: could not create attribute definition"));					
 			}
 		} else if (attrType.equals("STRING")) {
 			attrDef = attrDefManager.createStringAttributeDefinition(attrId, attrName, attrDesc, attrDefault);
 		} else {
-			fireRuntimeErrorEvent(new RuntimeErrorEvent("Bad proxy event: unknown attribute type"));
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "Bad proxy event: unknown attribute type"));
 		}
 		
 		return attrDef;

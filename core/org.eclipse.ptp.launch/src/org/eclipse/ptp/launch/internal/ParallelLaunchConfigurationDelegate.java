@@ -35,7 +35,6 @@ import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.AttributeManager;
-import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
@@ -100,7 +99,6 @@ public class ParallelLaunchConfigurationDelegate
 		if (!(launch instanceof IPLaunch)) {
 			abort(LaunchMessages.getResourceString("ParallelLaunchConfigurationDelegate.Invalid_launch_object"), null, 0);
 		}
-		//IPLaunch pLaunch = (IPLaunch) launch;
 		if (monitor == null) {
 			monitor = new NullProgressMonitor();
 		}
@@ -111,13 +109,6 @@ public class ParallelLaunchConfigurationDelegate
 		}
 		IAbstractDebugger debugger = null;
 		IPJob job = null;
-		
-		/*
-		final IResourceManager rm = getResourceManager(configuration);
-		if (rm == null) {
-			abort(LaunchMessages.getResourceString("ParallelLaunchConfigurationDelegate.No_ResourceManager"), null, 0);
-		}
-		*/
 		
 		AttributeManager attrManager = getAttributeManager(configuration);
 
@@ -187,34 +178,6 @@ public class ParallelLaunchConfigurationDelegate
 			submitJob(configuration, mode, (IPLaunch)launch, attrManager, debugger);
 			
 			monitor.worked(10);
-			
-
-			/*
-			job = rm.submitJob(attrManager, new SubProgressMonitor(monitor, 150));
-			if (job == null) {
-				abort("Job submission failed", null, 0);
-			}
-			launch.setAttribute(ElementAttributes.getIdAttributeDefinition().getId(), job.getID());
-			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
-				// show ptp debug view
-				showPTPDebugView(IPTPDebugUIConstants.ID_VIEW_PARALLELDEBUG);
-				monitor.setTaskName("Starting the debugger . . .");
-				pLaunch.setPJob(job);
-				IBinaryObject exeFile = verifyBinary(configuration);
-				setDefaultSourceLocator(launch, configuration);
-				/*
-				 * Wait for the incoming debug server connection. This can be canceled by the user.
-				 *
-				PTPDebugCorePlugin.getDebugModel().createDebuggerSession(debugger, pLaunch, exeFile, new SubProgressMonitor(monitor, 40));
-				monitor.worked(10);
-				if (monitor.isCanceled()) {
-					PTPDebugCorePlugin.getDebugModel().shutdownSession(job);
-				}
-			} else {
-				new RuntimeProcess(pLaunch, job, null);
-				monitor.worked(40);
-			}
-		*/
 		} catch (CoreException e) {
 			if (e.getStatus().getPlugin().equals(PTPCorePlugin.PLUGIN_ID)) {
 				String msg = e.getMessage();
@@ -235,8 +198,6 @@ public class ParallelLaunchConfigurationDelegate
 			if (e.getStatus().getCode() != IStatus.CANCEL) {
 				throw e;
 			}
-		} catch (IllegalValueException e) {
-			// TODO Not sure if it's possible to get here
 		} finally {
 			monitor.done();
 		}

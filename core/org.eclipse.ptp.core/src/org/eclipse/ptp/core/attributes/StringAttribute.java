@@ -23,7 +23,7 @@ public final class StringAttribute extends AbstractAttribute<StringAttribute> {
 
 	private StringBuffer value = new StringBuffer();
 
-	public StringAttribute(StringAttributeDefinition description, String initialValue) throws IllegalValueException {
+	public StringAttribute(StringAttributeDefinition description, String initialValue) {
 		super(description);
 		setValue(initialValue);
 	}
@@ -40,7 +40,7 @@ public final class StringAttribute extends AbstractAttribute<StringAttribute> {
 		return true;
 	}
 
-	public void setValue(String string) throws IllegalValueException {
+	public void setValue(String string) {
 		this.value.replace(0, this.value.length(), string);
 	}
 
