@@ -162,16 +162,20 @@ public final class FortranPreprocessor extends InputStream
         }
     }
 
-    private InputStream findIncludedFile(String fileToInclude) throws FileNotFoundException
+    private InputStream findIncludedFile(String fileToInclude) throws IOException
     {
         try
         {
             // TODO: INCLUDE paths
-            return new FileInputStream(new File(fileToInclude));
+            return new FileInputStream(new File("/home/joverbey/photran/photran3-workspace/org.eclipse.photran.refactoring.tests/rename-test-code/" + fileToInclude));
         }
         catch (FileNotFoundException e)
         {
-            String msg = callback.onUnableToLoad("Unable to locate INCLUDE file " + fileToInclude, fileToInclude);
+            String msg = callback.onUnableToLoad("Unable to locate INCLUDE file "
+                                                 + fileToInclude
+                                                 + " (working directory: "
+                                                 + new File(".").getCanonicalPath()
+                                                 + ")", fileToInclude);
             if (msg == null)
                 return null;
             else

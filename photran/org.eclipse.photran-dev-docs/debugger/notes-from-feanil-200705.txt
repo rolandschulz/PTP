@@ -1,0 +1,5 @@
+* All modifications have "SP06" in a comment
+* Clicking on Run As/Debug As > Local Fortran Application sometimes does not work.
+  Workaround: Use the "Run.../Debug..." dialog.
+* Remember there are TWO "Set Breakpoint" commands now (right-click
+  the editor's ruler to see them): one for C/C++ and one for Fortran
