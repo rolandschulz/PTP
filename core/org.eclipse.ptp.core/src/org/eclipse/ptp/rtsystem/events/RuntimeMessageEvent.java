@@ -84,4 +84,11 @@ public class RuntimeMessageEvent implements IRuntimeMessageEvent {
 		return text.getValue();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeMessageEvent#getAttributes()
+	 */
+	public AttributeManager getAttributes() {
+		return attributes;
+	}
+
 }
