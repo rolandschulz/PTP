@@ -19,21 +19,27 @@
 
 package org.eclipse.ptp.rtsystem.events;
 
+import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.elements.attributes.MessageAttributes;
 
 public interface IRuntimeMessageEvent extends IRuntimeEvent {
 	/**
-	 * @return
+	 * @return message level
 	 */
 	public MessageAttributes.Level getLevel();
 
 	/**
-	 * @return
+	 * @return message code
 	 */
 	public int getCode();
 
 	/**
-	 * @return
+	 * @return message text
 	 */
 	public String getText();
+	
+	/**
+	 * @return message attributes
+	 */
+	public AttributeManager getAttributes();
 }
