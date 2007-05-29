@@ -76,7 +76,7 @@
  */
 #define RTEV_ERROR_ORTE_INIT			RTEV_OFFSET + 1000
 #define RTEV_ERROR_ORTE_FINALIZE		RTEV_OFFSET + 1001
-#define RTEV_ERROR_ORTE_RUN				RTEV_OFFSET + 1002
+#define RTEV_ERROR_ORTE_SUBMIT			RTEV_OFFSET + 1002
 #define RTEV_ERROR_TERMINATE_JOB		RTEV_OFFSET + 1003
 #define RTEV_ERROR_PATTR				RTEV_OFFSET + 1004
 #define RTEV_ERROR_PROCS				RTEV_OFFSET + 1005
@@ -405,19 +405,33 @@ sendMessageEvent(int trans_id, char *level, int code, char *fmt, ...)
 {
 	va_list		ap;
 	char *		msg;
-	proxy_msg *	m = new_proxy_msg(PROXY_EV_ERROR, trans_id);
+	proxy_msg *	m = new_proxy_msg(PROXY_EV_MESSAGE, trans_id);
 	
 	va_start(ap, fmt);
 	vasprintf(&msg, fmt, ap);
 	va_end(ap);
 	
-	proxy_msg_add_int(m, 3); /* 3 args in this attribute def */
+	proxy_msg_add_int(m, 3); /* 3 attributes */
 	proxy_msg_add_keyval_string(m, MSG_LEVEL_ATTR, level);
 	proxy_msg_add_keyval_int(m, MSG_CODE_ATTR, code);
 	proxy_msg_add_keyval_string(m, MSG_TEXT_ATTR, msg);
 	proxy_svr_queue_msg(orte_proxy, m);
 	
 	return 0;	
+}
+
+static int
+sendJobSubErrorEvent(int trans_id, char *jobSubId, char *msg)
+{
+	proxy_msg *	m = new_proxy_msg(PROXY_EV_MESSAGE, trans_id);
+	
+	proxy_msg_add_int(m, 4); /* 4 attributes */
+	proxy_msg_add_keyval_string(m, MSG_LEVEL_ATTR, MSG_LEVEL_ERROR);
+	proxy_msg_add_keyval_string(m, JOB_SUB_ID_ATTR, jobSubId);
+	proxy_msg_add_keyval_int(m, MSG_CODE_ATTR, RTEV_ERROR_ORTE_SUBMIT);
+	proxy_msg_add_keyval_string(m, MSG_TEXT_ATTR, msg);
+	proxy_svr_queue_msg(orte_proxy, m);
+	return 0;
 }
 
 static int
@@ -515,7 +529,7 @@ add_node_attrs(proxy_msg *m, ptp_node *node)
 }
 
 static int
-sendNewJobEvent(int trans_id, int jobid, char *name, int jobSubId, char *state)
+sendNewJobEvent(int trans_id, int jobid, char *name, char *jobSubId, char *state)
 {
 	proxy_msg *	m = new_proxy_msg(PROXY_EV_RT_NEW_JOB, trans_id);
 	
@@ -524,7 +538,7 @@ sendNewJobEvent(int trans_id, int jobid, char *name, int jobSubId, char *state)
 	proxy_msg_add_int(m, jobid);
 	proxy_msg_add_int(m, 3);	
 	proxy_msg_add_keyval_string(m, ELEMENT_NAME_ATTR, name);
-	proxy_msg_add_keyval_int(m, JOB_SUB_ID_ATTR, jobSubId);
+	proxy_msg_add_keyval_string(m, JOB_SUB_ID_ATTR, jobSubId);
 	proxy_msg_add_keyval_string(m, JOB_STATE_ATTR, state);
 	proxy_svr_queue_msg(orte_proxy, m);
 	
@@ -1847,7 +1861,7 @@ ORTE_SubmitJob(int trans_id, int nargs, char **args)
 	int						num_env = 0;
 	int						debug_argc = 0;
 	int						ptpid = generate_id();
-	int						jobsubid = 0;
+	char *					jobsubid = NULL;
 	char *					full_path;
 	char *					name;
 	char *					pgm_name = NULL;
@@ -1863,21 +1877,11 @@ ORTE_SubmitJob(int trans_id, int nargs, char **args)
 	orte_jobid_t			debug_jobid = -1;
 	ptp_job *				j;
 
-	if (proxy_state != STATE_RUNNING) {
-		sendMessageEvent(trans_id, MSG_LEVEL_ERROR, RTEV_ERROR_ORTE_INIT, "must call INIT first");
-		return PROXY_RES_OK;
-	}
-	
-	if (nargs < 1) {
-		sendMessageEvent(trans_id, MSG_LEVEL_ERROR, RTEV_ERROR_ORTE_INIT, "incorrect arg count");
-		return PROXY_RES_OK;
-	}
-	
 	fprintf(stdout, "  ORTE_SubmitJob (%d): %s\n", trans_id, args[0]); fflush(stdout);
 
 	for (i = 0; i < nargs; i++) {
 		if (strncmp(args[i], JOB_SUB_ID_ATTR, strlen(JOB_SUB_ID_ATTR)) == 0) {
-			jobsubid = (int)strtol(args[i]+strlen(JOB_SUB_ID_ATTR)+1, NULL, 10);
+			jobsubid = args[i]+strlen(JOB_SUB_ID_ATTR)+1;
 		} else if (strncmp(args[i], JOB_EXEC_NAME_ATTR, strlen(JOB_EXEC_NAME_ATTR)) == 0) {
 			pgm_name = args[i]+strlen(JOB_EXEC_NAME_ATTR)+1;
 		} else if (strncmp(args[i], JOB_EXEC_PATH_ATTR, strlen(JOB_EXEC_PATH_ATTR)) == 0) {
@@ -1899,17 +1903,32 @@ ORTE_SubmitJob(int trans_id, int nargs, char **args)
 		}
 	}
 	
+	if (jobsubid == NULL) {
+		sendMessageEvent(trans_id, MSG_LEVEL_FATAL, 0, "missing ID on job submission");
+		return PROXY_RES_OK;
+	}
+	
+	if (proxy_state != STATE_RUNNING) {
+		sendJobSubErrorEvent(trans_id, jobsubid, "must call INIT first");
+		return PROXY_RES_OK;
+	}
+	
+	if (nargs < 1) {
+		sendJobSubErrorEvent(trans_id, jobsubid, "incorrect arg count");
+		return PROXY_RES_OK;
+	}
+	
 	/*
 	 * Do some checking first
 	 */
 	 
 	if (pgm_name == NULL) {
-		sendMessageEvent(trans_id, MSG_LEVEL_ERROR, RTEV_ERROR_ORTE_RUN, "Must specify a program name");
+		sendJobSubErrorEvent(trans_id, jobsubid, "Must specify a program name");
 		return PROXY_RES_OK;
 	}
 	
 	if (num_procs <= 0) {
-		sendMessageEvent(trans_id, MSG_LEVEL_ERROR,  RTEV_ERROR_ORTE_RUN, "Must specify a working directory");
+		sendJobSubErrorEvent(trans_id, jobsubid, "Must specify a working directory");
 		return PROXY_RES_OK;
 	}
 		
@@ -1932,7 +1951,7 @@ ORTE_SubmitJob(int trans_id, int nargs, char **args)
 	if (exec_path == NULL) {
 		full_path = opal_path_findv(pgm_name, 0, env, cwd);
 		if (full_path == NULL) {
-			sendMessageEvent(trans_id, MSG_LEVEL_ERROR, RTEV_ERROR_ORTE_RUN, "Executuable not found");
+			sendJobSubErrorEvent(trans_id, jobsubid, "Executuable not found");
 			return PROXY_RES_OK;
 		}
 	} else {
@@ -1940,7 +1959,7 @@ ORTE_SubmitJob(int trans_id, int nargs, char **args)
 	}
 	
 	if (access(full_path, X_OK) < 0) {
-		sendMessageEvent(trans_id, MSG_LEVEL_ERROR, RTEV_ERROR_ORTE_RUN, strerror(errno));
+		sendJobSubErrorEvent(trans_id, jobsubid, strerror(errno));
 		return PROXY_RES_OK;
 	}
 	
@@ -1964,7 +1983,7 @@ ORTE_SubmitJob(int trans_id, int nargs, char **args)
 		if (debug_exec_path == NULL) {
 			debug_full_path = opal_path_findv(debug_exec_name, 0, env, cwd);
 			if (debug_full_path == NULL) {
-				sendMessageEvent(trans_id, MSG_LEVEL_ERROR, RTEV_ERROR_ORTE_RUN, "Debugger executuable not found");
+				sendJobSubErrorEvent(trans_id, jobsubid, "Debugger executuable not found");
 				return PROXY_RES_OK;
 			}
 		} else {
@@ -1972,7 +1991,7 @@ ORTE_SubmitJob(int trans_id, int nargs, char **args)
 		}
 		
 		if (access(debug_full_path, X_OK) < 0) {
-			sendMessageEvent(trans_id, MSG_LEVEL_ERROR, RTEV_ERROR_ORTE_RUN, strerror(errno));
+			sendJobSubErrorEvent(trans_id, jobsubid, strerror(errno));
 			return PROXY_RES_OK;
 		}
 
@@ -2024,9 +2043,12 @@ ORTE_SubmitJob(int trans_id, int nargs, char **args)
 	
 	OBJ_RELEASE(apps);
 	
-	if(ORTECheckErrorCode(trans_id, RTEV_ERROR_ORTE_RUN, rc)) return 1;
+	if (rc != ORTE_SUCCESS) {
+		sendJobSubErrorEvent(trans_id, jobsubid, (char *)ORTE_ERROR_NAME(rc));
+		return PROXY_RES_OK;
+	}
 
-	printf("NEW JOB (%d,%d,%d)\n", jobsubid, ptpid, (int)ortejobid); fflush(stdout);
+	printf("NEW JOB (%s,%d,%d)\n", jobsubid, ptpid, (int)ortejobid); fflush(stdout);
 
 	/*
 	 * Send ok for job submission.
