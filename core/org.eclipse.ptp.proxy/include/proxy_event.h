@@ -21,7 +21,7 @@
 #define _PROXY_EVENT_H_
 
 #define PROXY_EV_OK				0
-#define PROXY_EV_ERROR			1
+#define PROXY_EV_MESSAGE		1
 #define PROXY_EV_CONNECTED		2	/* LOCAL EVENT */
 #define PROXY_EV_DISCONNECTED	3	/* LOCAL EVENT */
 #define PROXY_EV_TIMEOUT		4	/* LOCAL EVENT */

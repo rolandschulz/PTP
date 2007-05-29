@@ -333,9 +333,11 @@ proxy_tcp_clnt_event_callback(void *ev_data, void *data)
 		return;
 	
 	if (proxy_deserialize_msg(result, len, &m) < 0) {
-		m = new_proxy_msg(PROXY_EV_ERROR, 0); // TODO trans id should NOT be 0
-		proxy_msg_add_int(m, PROXY_ERR_PROTO);
-		proxy_msg_add_string(m, "Could not covert to event");
+		m = new_proxy_msg(PROXY_EV_MESSAGE, 0); // TODO trans id should NOT be 0
+		proxy_msg_add_int(m, 3); /* 3 attributes */
+		proxy_msg_add_keyval_string(m, MSG_LEVEL_ATTR, MSG_LEVEL_FATAL);
+		proxy_msg_add_keyval_int(m, MSG_CODE_ATTR, PROXY_ERR_PROTO);
+		proxy_msg_add_keyval_string(m, MSG_TEXT_ATTR, "Could not covert to event");
 	}
 	
 	free(result);
