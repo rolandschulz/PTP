@@ -73,6 +73,30 @@ public class ProxyRuntimeEventFactory extends ProxyEventFactory {
 		case IProxyRuntimeEvent.PROXY_RUNTIME_QUEUE_CHANGE_EVENT:
 			evt = new ProxyRuntimeQueueChangeEvent(transID, args);
 			break;
+
+		case IProxyRuntimeEvent.PROXY_RUNTIME_REMOVE_ALL_EVENT:
+			evt = new ProxyRuntimeRemoveAllEvent(transID, args);
+			break;
+
+		case IProxyRuntimeEvent.PROXY_RUNTIME_REMOVE_JOB_EVENT:
+			evt = new ProxyRuntimeRemoveJobEvent(transID, args);
+			break;
+
+		case IProxyRuntimeEvent.PROXY_RUNTIME_REMOVE_MACHINE_EVENT:
+			evt = new ProxyRuntimeRemoveMachineEvent(transID, args);
+			break;
+
+		case IProxyRuntimeEvent.PROXY_RUNTIME_REMOVE_NODE_EVENT:
+			evt = new ProxyRuntimeRemoveNodeEvent(transID, args);
+			break;
+
+		case IProxyRuntimeEvent.PROXY_RUNTIME_REMOVE_PROCESS_EVENT:
+			evt = new ProxyRuntimeRemoveProcessEvent(transID, args);
+			break;
+
+		case IProxyRuntimeEvent.PROXY_RUNTIME_REMOVE_QUEUE_EVENT:
+			evt = new ProxyRuntimeRemoveQueueEvent(transID, args);
+			break;
 		}
 
 

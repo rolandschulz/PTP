@@ -28,6 +28,9 @@ public abstract class AbstractRuntimeChangeEvent implements IRuntimeChangeEvent 
 		this.attrMgr = attrs;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeChangeEvent#getElementAttributeManager()
+	 */
 	public ElementAttributeManager getElementAttributeManager() {
 		return attrMgr;
 	}
