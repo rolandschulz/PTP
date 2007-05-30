@@ -48,6 +48,8 @@ import org.eclipse.ptp.rtsystem.IRuntimeEventListener;
 import org.eclipse.ptp.rtsystem.IRuntimeSystem;
 import org.eclipse.ptp.rtsystem.events.IRuntimeAttributeDefinitionEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeConnectedStateEvent;
+import org.eclipse.ptp.rtsystem.events.IRuntimeErrorStateEvent;
+import org.eclipse.ptp.rtsystem.events.IRuntimeEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeJobChangeEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeMachineChangeEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeMessageEvent;
@@ -88,9 +90,9 @@ public abstract class AbstractRuntimeResourceManager extends
 	public enum JobSubState {SUBMITTED, COMPLETED, ERROR};
 	
 	private class JobSubmission {
-		private IPJob					job = null;
-		private JobSubState				state = JobSubState.SUBMITTED;
-		private IRuntimeMessageEvent	message;
+		private IPJob			job = null;
+		private JobSubState		state = JobSubState.SUBMITTED;
+		private IRuntimeEvent	event;
 		
 		/**
 		 * @return the job
@@ -121,17 +123,17 @@ public abstract class AbstractRuntimeResourceManager extends
 		}
 		
 		/**
-		 * @return the message
+		 * @return the event
 		 */
-		public IRuntimeMessageEvent getMessage() {
-			return message;
+		public IRuntimeEvent getEvent() {
+			return event;
 		}
 		
 		/**
-		 * @param message the message to set
+		 * @param event the event to set
 		 */
-		public void setMessage(IRuntimeMessageEvent message) {
-			this.message = message;
+		public void setEvent(IRuntimeEvent event) {
+			this.event = event;
 		}
 	}
 	
@@ -142,128 +144,78 @@ public abstract class AbstractRuntimeResourceManager extends
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleRuntimeAttributeDefinitionEvent(org.eclipse.ptp.rtsystem.events.IRuntimeAttributeDefinitionEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeAttributeDefinitionEvent)
 	 *
 	 * Note: this allows redefinition of attribute definitions. This is ok as long as they
 	 * are only allowed during the initialization phase.
 	 */
-	public void handleRuntimeAttributeDefinitionEvent(IRuntimeAttributeDefinitionEvent e) {
+	public void handleEvent(IRuntimeAttributeDefinitionEvent e) {
 		for (IAttributeDefinition<?,?,?> attr : e.getDefinitions()) {
 			getAttributeDefinitionManager().setAttributeDefinition(attr);
 		}
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleRuntimeDisconnectedEvent(org.eclipse.ptp.rtsystem.events.IRuntimeDisconnectedEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeConnectedStateEvent)
 	 */
-	public void handleRuntimeConnectedStateEvent(IRuntimeConnectedStateEvent e) {
-
+	public void handleEvent(IRuntimeConnectedStateEvent e) {
+		// Ignore
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleRuntimeMessageEvent(org.eclipse.ptp.rtsystem.events.IRuntimeErrorEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeErrorEvent)
 	 */
-	public void handleRuntimeMessageEvent(IRuntimeMessageEvent e) {
+	public void handleEvent(IRuntimeMessageEvent e) {
 		MessageAttributes.Level level = e.getLevel();
-		
-		/*
-		 * Check for errors while starting.
-		 */
-		stateLock.lock();
-		try {
-			if (state == RMState.STARTING && level == MessageAttributes.Level.FATAL) {
-				state = RMState.ERROR;
-				stateCondition.signal();
-				return;
-			}
-		} finally {
-			stateLock.unlock();
-		}
-		
-		/*
-		 * Check for failed job submission
-		 */
-		subLock.lock();
-		try {
-			switch (level) {
-			case FATAL:
-				/*
-				 * Fatal error in the proxy. Terminate all job submissions.
-				 */
-				for (JobSubmission sub : jobSubmissions.values()) {
-					sub.setState(JobSubState.ERROR);
-					sub.setMessage(e);
-				}
-				subCondition.signalAll();
-				break;
-			case ERROR:
-				StringAttribute subAttr = 
-					(StringAttribute) e.getAttributes().getAttribute(JobAttributes.getSubIdAttributeDefinition());
-				if (subAttr != null) {
-					JobSubmission sub = jobSubmissions.get(subAttr.getValue());
-					if (sub != null) {
-						sub.setState(JobSubState.ERROR);
-						sub.setMessage(e);
-						subCondition.signalAll();
-					}
-				}
-				break;
-			}
-		} finally {
-			subLock.unlock();
-		}
-		
-		fireError(e.getText());
+		// FIXME: implement logging
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleRuntimeJobChangeEvent(org.eclipse.ptp.rtsystem.events.IRuntimeJobChangeEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeJobChangeEvent)
 	 */
-	public void handleRuntimeJobChangeEvent(IRuntimeJobChangeEvent e) {
+	public void handleEvent(IRuntimeJobChangeEvent e) {
 		ElementAttributeManager eMgr = e.getElementAttributeManager();
 
 		for (Map.Entry<RangeSet, AttributeManager> entry : eMgr.getEntrySet()) {
 			AttributeManager attrs = entry.getValue();
 			RangeSet jobIds = entry.getKey();
 			
-			for (Integer id : jobIds) {
-				String elementId = id.toString();
+			for (String elementId : jobIds) {
 				IPJobControl job = getJobControl(elementId);
 				if (job != null) {
 					doUpdateJob(job, attrs);
 				} else {
-					System.out.println("JobChange: unknown job " + id);
+					System.out.println("JobChange: unknown job " + elementId);
 				}
 			}
 		}
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleRuntimeMachineChangeEvent(org.eclipse.ptp.rtsystem.events.IRuntimeMachineChangeEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeMachineChangeEvent)
 	 */
-	public void handleRuntimeMachineChangeEvent(IRuntimeMachineChangeEvent e) {
+	public void handleEvent(IRuntimeMachineChangeEvent e) {
 		ElementAttributeManager eMgr = e.getElementAttributeManager();
 
 		for (Map.Entry<RangeSet, AttributeManager> entry : eMgr.getEntrySet()) {
 			AttributeManager attrs = entry.getValue();
 			RangeSet machineIds = entry.getKey();
 			
-			for (Integer id : machineIds) {
-				String elementId = id.toString();
+			for (String elementId : machineIds) {
 				IPMachineControl machine = getMachineControl(elementId);
 				if (machine != null) {
 					doUpdateMachine(machine, attrs);
 				} else {
-					System.out.println("MachineChange: unknown machine " + id);
+					System.out.println("MachineChange: unknown machine " + elementId);
 				}
 			}
 		}
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleRuntimeNewJobEvent(org.eclipse.ptp.rtsystem.events.IRuntimeNewJobEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeNewJobEvent)
 	 */
-	public void handleRuntimeNewJobEvent(IRuntimeNewJobEvent e) {
+	public void handleEvent(IRuntimeNewJobEvent e) {
 		IPQueueControl queue = getQueueControl(e.getParentId());
 		ElementAttributeManager mgr = e.getElementAttributeManager();
 
@@ -272,8 +224,7 @@ public abstract class AbstractRuntimeResourceManager extends
 			
 			RangeSet jobIds = entry.getKey();
 
-			for (Integer id : jobIds) {
-				String elementId = id.toString();
+			for (String elementId : jobIds) {
 				IPJobControl job = getJobControl(elementId);
 				if (job == null) {
 					job = doCreateJob(queue, elementId, jobAttrs);
@@ -303,17 +254,16 @@ public abstract class AbstractRuntimeResourceManager extends
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleRuntimeNewMachineEvent(org.eclipse.ptp.rtsystem.events.IRuntimeNewMachineEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeNewMachineEvent)
 	 */
-	public void handleRuntimeNewMachineEvent(IRuntimeNewMachineEvent e) {
+	public void handleEvent(IRuntimeNewMachineEvent e) {
 		ElementAttributeManager mgr = e.getElementAttributeManager();
 
 		for (Map.Entry<RangeSet, AttributeManager> entry : mgr.getEntrySet()) {
 			AttributeManager attrs = entry.getValue();
 			RangeSet machineIds = entry.getKey();
 
-			for (Integer id : machineIds) {
-				String elementId = id.toString();
+			for (String elementId : machineIds) {
 				IPMachineControl machine = getMachineControl(elementId);
 				if (machine == null) {
 					machine = doCreateMachine(elementId, attrs);
@@ -324,9 +274,9 @@ public abstract class AbstractRuntimeResourceManager extends
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleRuntimeNewNodeEvent(org.eclipse.ptp.rtsystem.events.IRuntimeNewNodeEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeNewNodeEvent)
 	 */
-	public void handleRuntimeNewNodeEvent(IRuntimeNewNodeEvent e) {
+	public void handleEvent(IRuntimeNewNodeEvent e) {
 		IPMachineControl machine = getMachineControl(e.getParentId());
 		
 		if (machine != null) {
@@ -336,8 +286,7 @@ public abstract class AbstractRuntimeResourceManager extends
 				AttributeManager attrs = entry.getValue();
 				RangeSet nodeIds = entry.getKey();
 	
-				for (Integer id : nodeIds) {
-					String elementId = id.toString();
+				for (String elementId : nodeIds) {
 					IPNodeControl node = getNodeControl(elementId);
 					if (node == null) {
 						node = doCreateNode(machine, elementId, attrs);
@@ -349,9 +298,9 @@ public abstract class AbstractRuntimeResourceManager extends
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleRuntimeNewProcessEvent(org.eclipse.ptp.rtsystem.events.IRuntimeNewProcessEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeNewProcessEvent)
 	 */
-	public void handleRuntimeNewProcessEvent(IRuntimeNewProcessEvent e) {
+	public void handleEvent(IRuntimeNewProcessEvent e) {
 		IPJobControl job = getJobControl(e.getParentId());
 		
 		if (job != null) {
@@ -361,8 +310,7 @@ public abstract class AbstractRuntimeResourceManager extends
 				AttributeManager attrs = entry.getValue();
 				RangeSet processIds = entry.getKey();
 	
-				for (Integer id : processIds) {
-					String elementId = id.toString();
+				for (String elementId : processIds) {
 					IPProcessControl process = getProcessControl(elementId);
 					if (process == null) {
 						process = doCreateProcess(job, elementId, attrs);
@@ -374,17 +322,16 @@ public abstract class AbstractRuntimeResourceManager extends
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleRuntimeNewQueueEvent(org.eclipse.ptp.rtsystem.events.IRuntimeNewQueueEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeNewQueueEvent)
 	 */
-	public void handleRuntimeNewQueueEvent(IRuntimeNewQueueEvent e) {
+	public void handleEvent(IRuntimeNewQueueEvent e) {
 		ElementAttributeManager mgr = e.getElementAttributeManager();
 		
 		for (Map.Entry<RangeSet, AttributeManager> entry : mgr.getEntrySet()) {
 			AttributeManager attrs = entry.getValue();
 			RangeSet queueIds = entry.getKey();
 
-			for (Integer id : queueIds) {
-				String elementId = id.toString();
+			for (String elementId : queueIds) {
 				IPQueueControl queue = getQueueControl(elementId);
 				if (queue == null) {
 					queue = doCreateQueue(elementId, attrs);
@@ -395,123 +342,172 @@ public abstract class AbstractRuntimeResourceManager extends
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleRuntimeNodeChangeEvent(org.eclipse.ptp.rtsystem.events.IRuntimeNodeChangeEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeNodeChangeEvent)
 	 */
-	public void handleRuntimeNodeChangeEvent(IRuntimeNodeChangeEvent e) {
+	public void handleEvent(IRuntimeNodeChangeEvent e) {
 		ElementAttributeManager eMgr = e.getElementAttributeManager();
 
 		for (Map.Entry<RangeSet, AttributeManager> entry : eMgr.getEntrySet()) {
 			AttributeManager attrs = entry.getValue();
 			RangeSet nodeIds = entry.getKey();
 			
-			for (Integer id : nodeIds) {
-				String elementId = id.toString();
+			for (String elementId : nodeIds) {
 				IPNodeControl node = getNodeControl(elementId);
 				if (node != null) {
 					doUpdateNode(node, attrs);
 				} else {
-					System.out.println("NodeChange: unknown node " + id);
+					System.out.println("NodeChange: unknown node " + elementId);
 				}
 			}
 		}
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleRuntimeProcessChangeEvent(org.eclipse.ptp.rtsystem.events.IRuntimeProcessChangeEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeProcessChangeEvent)
 	 */
-	public void handleRuntimeProcessChangeEvent(IRuntimeProcessChangeEvent e) {
+	public void handleEvent(IRuntimeProcessChangeEvent e) {
 		ElementAttributeManager eMgr = e.getElementAttributeManager();
 		
 		for (Map.Entry<RangeSet, AttributeManager> entry : eMgr.getEntrySet()) {
 			AttributeManager attrs = entry.getValue();
 			RangeSet processIds = entry.getKey();
 			
-			for (Integer id : processIds) {
-				String elementId = id.toString();
+			for (String elementId : processIds) {
 				IPProcessControl process = getProcessControl(elementId);
 				if (process != null) {
 					doUpdateProcess(process, attrs);
 				} else {
-					System.out.println("ProcessChange: unknown process " + id);
+					System.out.println("ProcessChange: unknown process " + elementId);
 				}
 			}
 		}
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleRuntimeQueueChangeEvent(org.eclipse.ptp.rtsystem.events.IRuntimeQueueChangeEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeQueueChangeEvent)
 	 */
-	public void handleRuntimeQueueChangeEvent(IRuntimeQueueChangeEvent e) {
+	public void handleEvent(IRuntimeQueueChangeEvent e) {
 		ElementAttributeManager eMgr = e.getElementAttributeManager();
 		
 		for (Map.Entry<RangeSet, AttributeManager> entry : eMgr.getEntrySet()) {
 			AttributeManager attrs = entry.getValue();
 			RangeSet queueIds = entry.getKey();
 			
-			for (Integer id : queueIds) {
-				String elementId = id.toString();
+			for (String elementId : queueIds) {
 				IPQueueControl queue = getQueueControl(elementId);
 				if (queue != null) {
 					doUpdateQueue(queue, attrs);
 				} else {
-					System.out.println("QueueChange: unknown queue " + id);
+					System.out.println("QueueChange: unknown queue " + elementId);
 				}
 			}
 		}
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleRuntimeRemoveAllEvent(org.eclipse.ptp.rtsystem.events.IRuntimeRemoveAllEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeRemoveAllEvent)
 	 */
-	public void handleRuntimeRemoveAllEvent(IRuntimeRemoveAllEvent e) {
-		// TODO Auto-generated method stub
-		
+	public void handleEvent(IRuntimeRemoveAllEvent e) {
+		cleanUp();
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleRuntimeRemoveJobEvent(org.eclipse.ptp.rtsystem.events.IRuntimeRemoveJobEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeRemoveJobEvent)
 	 */
-	public void handleRuntimeRemoveJobEvent(IRuntimeRemoveJobEvent e) {
-		// TODO Auto-generated method stub
-		
+	public void handleEvent(IRuntimeRemoveJobEvent e) {
+		for (String elementId : e.getElementIds()) {
+			IPJobControl job = getJobControl(elementId);
+			if (job != null) {
+				removeJob(job);
+			}
+		}
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleRuntimeRemoveMachineEvent(org.eclipse.ptp.rtsystem.events.IRuntimeRemoveMachineEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeRemoveMachineEvent)
 	 */
-	public void handleRuntimeRemoveMachineEvent(IRuntimeRemoveMachineEvent e) {
-		// TODO Auto-generated method stub
-		
+	public void handleEvent(IRuntimeRemoveMachineEvent e) {
+		for (String elementId : e.getElementIds()) {
+			IPMachineControl machine = getMachineControl(elementId);
+			if (machine != null) {
+				removeMachine(machine);
+			}
+		}
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleRuntimeRemoveNodeEvent(org.eclipse.ptp.rtsystem.events.IRuntimeRemoveNodeEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeRemoveNodeEvent)
 	 */
-	public void handleRuntimeRemoveNodeEvent(IRuntimeRemoveNodeEvent e) {
-		// TODO Auto-generated method stub
-		
+	public void handleEvent(IRuntimeRemoveNodeEvent e) {
+		for (String elementId : e.getElementIds()) {
+			IPNodeControl node = getNodeControl(elementId);
+			if (node != null) {
+				removeNode(node);
+			}
+		}
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleRuntimeRemoveProcessEvent(org.eclipse.ptp.rtsystem.events.IRuntimeRemoveProcessEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeRemoveProcessEvent)
 	 */
-	public void handleRuntimeRemoveProcessEvent(IRuntimeRemoveProcessEvent e) {
-		// TODO Auto-generated method stub
-		
+	public void handleEvent(IRuntimeRemoveProcessEvent e) {
+		for (String elementId : e.getElementIds()) {
+			IPProcessControl process = getProcessControl(elementId);
+			if (process != null) {
+				removeProcess(process);
+			}
+		}
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleRuntimeRemoveQueueEvent(org.eclipse.ptp.rtsystem.events.IRuntimeRemoveQueueEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeRemoveQueueEvent)
 	 */
-	public void handleRuntimeRemoveQueueEvent(IRuntimeRemoveQueueEvent e) {
-		// TODO Auto-generated method stub
-		
+	public void handleEvent(IRuntimeRemoveQueueEvent e) {
+		for (String elementId : e.getElementIds()) {
+			IPQueueControl queue = getQueueControl(elementId);
+			if (queue != null) {
+				removeQueue(queue);
+			}
+		}
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleRuntimeRunningStateEvent(org.eclipse.ptp.rtsystem.events.IRuntimeRunningStateEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeErrorStateEvent)
 	 */
-	public void handleRuntimeRunningStateEvent(IRuntimeRunningStateEvent e) {
+	public void handleEvent(IRuntimeErrorStateEvent e) {
+		/*
+		 * Fatal error in the runtime system. Cancel any pending job submissions
+		 * and inform upper levels of the problem.
+		 */
+		subLock.lock();
+		try {
+			for (JobSubmission sub : jobSubmissions.values()) {
+				sub.setState(JobSubState.ERROR);
+				sub.setEvent(e);
+			}
+			subCondition.signalAll();
+		} finally {
+			subLock.unlock();
+		}
+		
+		stateLock.lock();
+		try {
+			RMState oldState = state;
+			state = RMState.ERROR;
+			if (oldState == RMState.STOPPING) {
+				stateCondition.signal();
+			}
+			setState(ResourceManagerAttributes.State.ERROR);
+			cleanUp();
+		} finally {
+			stateLock.unlock();
+		}	
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeRunningStateEvent)
+	 */
+	public void handleEvent(IRuntimeRunningStateEvent e) {
 		stateLock.lock();
         CoreException exc = null;
 		try {
@@ -531,9 +527,9 @@ public abstract class AbstractRuntimeResourceManager extends
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleRuntimeShutdownStateEvent(org.eclipse.ptp.rtsystem.events.IRuntimeShutdownStateEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeShutdownStateEvent)
 	 */
-	public void handleRuntimeShutdownStateEvent(IRuntimeShutdownStateEvent e) {
+	public void handleEvent(IRuntimeShutdownStateEvent e) {
 		stateLock.lock();
 		try {
 			RMState oldState = state;
@@ -554,25 +550,61 @@ public abstract class AbstractRuntimeResourceManager extends
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleRuntimeStartupErrorEvent(org.eclipse.ptp.rtsystem.events.IRuntimeStartupErrorEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeStartupErrorEvent)
 	 */
-	public void handleRuntimeStartupErrorEvent(IRuntimeStartupErrorEvent e) {
-		// TODO Auto-generated method stub
-		
+	public void handleEvent(IRuntimeStartupErrorEvent e) {
+		/*
+		 * Check for errors while starting.
+		 */
+		stateLock.lock();
+		try {
+			if (state == RMState.STARTING) {
+				state = RMState.ERROR;
+				stateCondition.signal();
+				return;
+			}
+		} finally {
+			stateLock.unlock();
+		}
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleRuntimeSubmitJobErrorEvent(org.eclipse.ptp.rtsystem.events.IRuntimeSubmitJobErrorEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeSubmitJobErrorEvent)
 	 */
-	public void handleRuntimeSubmitJobErrorEvent(IRuntimeSubmitJobErrorEvent e) {
-		// TODO Auto-generated method stub
+	public void handleEvent(IRuntimeSubmitJobErrorEvent e) {
+		subLock.lock();
+		try {
+			/*
+			switch (level) {
+			case FATAL:
+				/*
+				 * Fatal error in the proxy. Terminate all job submissions.
+				 *
+				for (JobSubmission sub : jobSubmissions.values()) {
+					sub.setState(JobSubState.ERROR);
+					sub.setMessage(e);
+				}
+				subCondition.signalAll();
+				break;*/
+			if (e.getJobSubID() != null) {
+				JobSubmission sub = jobSubmissions.get(e.getJobSubID());
+				if (sub != null) {
+					sub.setState(JobSubState.ERROR);
+					sub.setEvent(e);
+					subCondition.signalAll();
+				}
+			}
+		} finally {
+			subLock.unlock();
+		}
 		
+		fireError(e.getErrorMessage());	
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleRuntimeTerminateJobErrorEvent(org.eclipse.ptp.rtsystem.events.IRuntimeTerminateJobErrorEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeTerminateJobErrorEvent)
 	 */
-	public void handleRuntimeTerminateJobErrorEvent(
+	public void handleEvent(
 			IRuntimeTerminateJobErrorEvent e) {
 		// TODO Auto-generated method stub
 		

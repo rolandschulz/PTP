@@ -19,9 +19,11 @@
 
 package org.eclipse.ptp.rtsystem.proxy.event;
 
-public class ProxyRuntimeShutdownStateEvent extends AbstractProxyRuntimeEvent implements IProxyRuntimeShutdownStateEvent {
+public class ProxyRuntimeShutdownStateEvent 
+	extends AbstractProxyRuntimeEvent 
+		implements IProxyRuntimeShutdownStateEvent {
 
 	public ProxyRuntimeShutdownStateEvent() {
-		super(PROXY_RUNTIME_SHUTDOWN_EVENT, 0);
+		super(PROXY_RUNTIME_SHUTDOWN_STATE_EVENT, 0);
 	}
 }

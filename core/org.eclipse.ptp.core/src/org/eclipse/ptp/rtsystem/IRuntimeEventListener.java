@@ -20,6 +20,7 @@ package org.eclipse.ptp.rtsystem;
 
 import org.eclipse.ptp.rtsystem.events.IRuntimeAttributeDefinitionEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeConnectedStateEvent;
+import org.eclipse.ptp.rtsystem.events.IRuntimeErrorStateEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeJobChangeEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeMachineChangeEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeMessageEvent;
@@ -44,28 +45,128 @@ import org.eclipse.ptp.rtsystem.events.IRuntimeSubmitJobErrorEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeTerminateJobErrorEvent;
 
 public interface IRuntimeEventListener {
-	public void handleRuntimeAttributeDefinitionEvent(IRuntimeAttributeDefinitionEvent e);
-	public void handleRuntimeConnectedStateEvent(IRuntimeConnectedStateEvent e);
-	public void handleRuntimeJobChangeEvent(IRuntimeJobChangeEvent e);
-	public void handleRuntimeMachineChangeEvent(IRuntimeMachineChangeEvent e);
-	public void handleRuntimeMessageEvent(IRuntimeMessageEvent e);
-	public void handleRuntimeNewJobEvent(IRuntimeNewJobEvent e);
-	public void handleRuntimeNewMachineEvent(IRuntimeNewMachineEvent e);
-	public void handleRuntimeNewNodeEvent(IRuntimeNewNodeEvent e);
-	public void handleRuntimeNewProcessEvent(IRuntimeNewProcessEvent e);
-	public void handleRuntimeNewQueueEvent(IRuntimeNewQueueEvent e);
-	public void handleRuntimeNodeChangeEvent(IRuntimeNodeChangeEvent e);
-	public void handleRuntimeProcessChangeEvent(IRuntimeProcessChangeEvent e);
-	public void handleRuntimeQueueChangeEvent(IRuntimeQueueChangeEvent e);
-	public void handleRuntimeRemoveAllEvent(IRuntimeRemoveAllEvent e);
-	public void handleRuntimeRemoveJobEvent(IRuntimeRemoveJobEvent e);
-	public void handleRuntimeRemoveMachineEvent(IRuntimeRemoveMachineEvent e);
-	public void handleRuntimeRemoveNodeEvent(IRuntimeRemoveNodeEvent e);
-	public void handleRuntimeRemoveProcessEvent(IRuntimeRemoveProcessEvent e);
-	public void handleRuntimeRemoveQueueEvent(IRuntimeRemoveQueueEvent e);
-	public void handleRuntimeRunningStateEvent(IRuntimeRunningStateEvent e);
-	public void handleRuntimeShutdownStateEvent(IRuntimeShutdownStateEvent e);
-	public void handleRuntimeStartupErrorEvent(IRuntimeStartupErrorEvent e);
-	public void handleRuntimeSubmitJobErrorEvent(IRuntimeSubmitJobErrorEvent e);
-	public void handleRuntimeTerminateJobErrorEvent(IRuntimeTerminateJobErrorEvent e);
+	/**
+	 * @param e
+	 */
+	public void handleEvent(IRuntimeAttributeDefinitionEvent e);
+	
+	/**
+	 * @param e
+	 */
+	public void handleEvent(IRuntimeConnectedStateEvent e);
+	
+	/**
+	 * @param e
+	 */
+	public void handleEvent(IRuntimeErrorStateEvent e);
+	
+	/**
+	 * @param e
+	 */
+	public void handleEvent(IRuntimeJobChangeEvent e);
+	
+	/**
+	 * @param e
+	 */
+	public void handleEvent(IRuntimeMachineChangeEvent e);
+	
+	/**
+	 * @param e
+	 */
+	public void handleEvent(IRuntimeMessageEvent e);
+	
+	/**
+	 * @param e
+	 */
+	public void handleEvent(IRuntimeNewJobEvent e);
+	
+	/**
+	 * @param e
+	 */
+	public void handleEvent(IRuntimeNewMachineEvent e);
+	
+	/**
+	 * @param e
+	 */
+	public void handleEvent(IRuntimeNewNodeEvent e);
+	
+	/**
+	 * @param e
+	 */
+	public void handleEvent(IRuntimeNewProcessEvent e);
+	
+	/**
+	 * @param e
+	 */
+	public void handleEvent(IRuntimeNewQueueEvent e);
+	
+	/**
+	 * @param e
+	 */
+	public void handleEvent(IRuntimeNodeChangeEvent e);
+	
+	/**
+	 * @param e
+	 */
+	public void handleEvent(IRuntimeProcessChangeEvent e);
+	
+	/**
+	 * @param e
+	 */
+	public void handleEvent(IRuntimeQueueChangeEvent e);
+	
+	/**
+	 * @param e
+	 */
+	public void handleEvent(IRuntimeRemoveAllEvent e);
+	
+	/**
+	 * @param e
+	 */
+	public void handleEvent(IRuntimeRemoveJobEvent e);
+	
+	/**
+	 * @param e
+	 */
+	public void handleEvent(IRuntimeRemoveMachineEvent e);
+	
+	/**
+	 * @param e
+	 */
+	public void handleEvent(IRuntimeRemoveNodeEvent e);
+	
+	/**
+	 * @param e
+	 */
+	public void handleEvent(IRuntimeRemoveProcessEvent e);
+	
+	/**
+	 * @param e
+	 */
+	public void handleEvent(IRuntimeRemoveQueueEvent e);
+	
+	/**
+	 * @param e
+	 */
+	public void handleEvent(IRuntimeRunningStateEvent e);
+	
+	/**
+	 * @param e
+	 */
+	public void handleEvent(IRuntimeShutdownStateEvent e);
+	
+	/**
+	 * @param e
+	 */
+	public void handleEvent(IRuntimeStartupErrorEvent e);
+	
+	/**
+	 * @param e
+	 */
+	public void handleEvent(IRuntimeSubmitJobErrorEvent e);
+	
+	/**
+	 * @param e
+	 */
+	public void handleEvent(IRuntimeTerminateJobErrorEvent e);
 }

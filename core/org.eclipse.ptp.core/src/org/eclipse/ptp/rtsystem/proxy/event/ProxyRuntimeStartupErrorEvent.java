@@ -11,11 +11,20 @@
 
 package org.eclipse.ptp.rtsystem.proxy.event;
 
+import org.eclipse.ptp.core.elements.attributes.ErrorAttributes;
+
 public class ProxyRuntimeStartupErrorEvent 
 	extends AbstractProxyRuntimeEvent 
 		implements IProxyRuntimeStartupErrorEvent {
 
-	public ProxyRuntimeStartupErrorEvent(int transID, String[] args) {
-		super(PROXY_RUNTIME_STARTUP_ERROR_EVENT, transID, args);
+	public ProxyRuntimeStartupErrorEvent(String message) {
+		super(PROXY_RUNTIME_STARTUP_ERROR_EVENT, 0, new String[] {
+				ErrorAttributes.getCodeAttributeDefinition().getId() + "=" + 0,
+				ErrorAttributes.getMsgAttributeDefinition().getId() + "=" + message
+		});
+	}
+
+	public ProxyRuntimeStartupErrorEvent(String[] attrs) {
+		super(PROXY_RUNTIME_STARTUP_ERROR_EVENT, 0, attrs);
 	}
 }

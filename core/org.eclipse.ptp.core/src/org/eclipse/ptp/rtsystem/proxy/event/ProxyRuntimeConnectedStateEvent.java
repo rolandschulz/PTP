@@ -19,10 +19,12 @@
 
 package org.eclipse.ptp.rtsystem.proxy.event;
 
-public class ProxyRuntimeConnectedStateEvent extends AbstractProxyRuntimeEvent implements IProxyRuntimeConnectedStateEvent {
+public class ProxyRuntimeConnectedStateEvent 
+	extends AbstractProxyRuntimeEvent 
+		implements IProxyRuntimeConnectedStateEvent {
 
 	public ProxyRuntimeConnectedStateEvent() {
-		super(PROXY_RUNTIME_RUNNING_EVENT, 0);
+		super(PROXY_RUNTIME_CONNECTED_STATE_EVENT, 0);
 	}
 
 }
