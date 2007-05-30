@@ -3044,4 +3044,367 @@ public class FortranParserActionDom implements IFortranParserAction {
 		// TODO Auto-generated method stub
 		
 	}
+
+
+	public void access_stmt(Token label, boolean hasList) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void alloc_opt(Token allocOpt) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void allocate_shape_spec(boolean hasLowerBound, boolean hasUpperBound) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void allocate_stmt(Token label, boolean hasTypeSpec,
+			boolean hasAllocOptList) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void allocation(boolean hasAllocateShapeSpecList,
+			boolean hasAllocateCoArraySpec) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void array_constructor() {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void array_spec(int count) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void array_spec__begin() {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void array_spec_element(ArraySpecElement type) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void asynchronous_stmt(Token label) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void attr_spec(AttrSpec attr) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void bind_entity(Token entity, boolean isCommonBlockName) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void bind_stmt(Token label) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void binding_attr(AttrSpec attr) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void binding_private_stmt(Token label) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void data_component_def_stmt(Token label, boolean hasSpec) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void data_stmt(Token label, int count) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void data_stmt__begin() {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void declaration_type_spec(DeclarationTypeSpec type) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void derived_type_spec(Token typeName, boolean hasTypeParamSpecList) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void derived_type_stmt(Token label, Token id) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void dimension_stmt(Token label, int count) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void dimension_stmt__begin() {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void dummy_arg(Token dummy) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void elsewhere_stmt(Token label, Token id) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void end_enum_stmt(Token label) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void end_type_stmt(Token label, Token id) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void end_where_stmt(Token label, Token id) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void enum_def_stmt(Token label) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void enumerator_def_stmt(Token label) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void equivalence_stmt(Token label) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void explicit_shape_spec(boolean hasUpperBound) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void forall_construct_stmt(Token label, Token id) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void generic_name_list_part(Token ident) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void implicit_stmt(Token label) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void intent_spec(IntentSpec intent) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void intent_stmt(Token label) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void io_control_spec(boolean hasExpression, Token keyword,
+			boolean hasAsterisk) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void kind_selector(boolean hasExpression, Token typeSize) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void language_binding_spec(Token id, boolean hasName) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void masked_elsewhere_stmt(Token label, Token id) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void optional_stmt(Token label) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void parameter_stmt(Token label) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void pointer_stmt(Token label) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void private_components_stmt(Token label) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void proc_attr_spec(AttrSpec spec) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void proc_binding_stmt(Token label) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void proc_component_def_stmt(Token label, boolean hasInterface) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void proc_decl(Token id, boolean hasNullInit) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void proc_interface(Token id) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void protected_stmt(Token label) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void save_stmt(Token label, boolean hasSavedEntityList) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void sequence_stmt(Token label) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void target_stmt(Token label, int count) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void target_stmt__begin() {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void value_stmt(Token label) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void volatile_stmt(Token label) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void where_construct_stmt(Token id) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void where_stmt(Token label) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void write_stmt(Token label, boolean hasOutputList) {
+		// TODO Auto-generated method stub
+		
+	}
 }
