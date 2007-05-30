@@ -16,6 +16,7 @@ import org.eclipse.ptp.rtsystem.JobRunConfiguration;
 import org.eclipse.ptp.rtsystem.proxy.IProxyRuntimeEventListener;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeAttributeDefEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeConnectedStateEvent;
+import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeErrorStateEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeMessageEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeJobChangeEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeMachineChangeEvent;
@@ -54,8 +55,8 @@ public class ORTERemoteProxyTest implements IProxyRuntimeEventListener {
 	private Condition notJobCompleted = lock.newCondition();
 	private Condition notShutdown = lock.newCondition();
 	
-	private int machineId;
-	private int queueId;
+	private String machineId;
+	private String queueId;
 	private String queueName = null;
 	private final int rmId = 200; /* fake rm ID */
 
@@ -111,7 +112,7 @@ public class ORTERemoteProxyTest implements IProxyRuntimeEventListener {
 		boolean error = false;
 		boolean launchManually = false;
 		String proxy = "orte/ptp_orte_proxy";
-		int jobID = 3;
+		String jobSubID = Long.toString(System.currentTimeMillis());
 		int nProcs = 4;
 		int firstNodeNum = 1;
 		int nProcsPerNode = 1;
@@ -152,7 +153,7 @@ public class ORTERemoteProxyTest implements IProxyRuntimeEventListener {
 					JobRunConfiguration jobRunConfig = new JobRunConfiguration(exe, exePath, rm,
 							queueName, attr, configArgs, env, dir);
 
-					String[] args = getJobArgs(jobID, nProcs, firstNodeNum, nProcsPerNode, jobRunConfig);
+					String[] args = getJobArgs(jobSubID, nProcs, firstNodeNum, nProcsPerNode, jobRunConfig);
 					try {
 						client.submitJob(args);
 					} catch(IOException e) {
@@ -183,45 +184,43 @@ public class ORTERemoteProxyTest implements IProxyRuntimeEventListener {
 
 	}
 
-	private String[] getJobArgs(int jobID, int nProcs, int firstNodeNum, int nProcsPerNode, JobRunConfiguration config) { 
+	private String[] getJobArgs(String jobSubID, int nProcs, int firstNodeNum, int nProcsPerNode, JobRunConfiguration config) { 
 
 		List<String> argList = new ArrayList<String>();
 		
-		argList.add("jobID=" + Integer.toString(jobID));
-		argList.add("queueID=" + Integer.toString(queueId));
+		argList.add(JobAttributes.getSubIdAttributeDefinition().getId() + "=" + jobSubID);
+		argList.add(JobAttributes.getQueueIdAttributeDefinition().getId() + "=" + queueId);
 		
-		argList.add("execName=" + config.getExecName());
+		argList.add(JobAttributes.getExecutableNameAttributeDefinition().getId() + "=" + config.getExecName());
 		String path = config.getPathToExec();
 		if (path != null) {
-			argList.add("pathToExec=" + path);
+			argList.add(JobAttributes.getExecutablePathAttributeDefinition().getId() + "=" + path);
 		}
-		argList.add("numOfProcs=" + Integer.toString(nProcs));
-		argList.add("procsPerNode=" + Integer.toString(nProcsPerNode));
-		argList.add("firstNodeNum=" + Integer.toString(firstNodeNum));
+		argList.add(JobAttributes.getNumberOfProcessesAttributeDefinition().getId() + "=" + Integer.toString(nProcs));
 		
 		String dir = config.getWorkingDir();
 		if (dir != null) {
-			argList.add("workingDir=" + dir);
+			argList.add(JobAttributes.getWorkingDirectoryAttributeDefinition().getId() + "=" + dir);
 		}
 		String[] args = config.getArguments();
 		if (args != null) {
 			for (int i = 0; i < args.length; i++) {
-				argList.add("progArg=" + args[i]);
+				argList.add(JobAttributes.getProgramArgumentsAttributeDefinition().getId() + "=" + args[i]);
 			}
 		}
 		String[] env = config.getEnvironment();
 		if (env != null) {
 			for (int i = 0; i < env.length; i++) {
-				argList.add("progEnv=" + env[i]);
+				argList.add(JobAttributes.getEnvironmentAttributeDefinition().getId() + "=" + env[i]);
 			}
 		}
 		
 		if (config.isDebug()) {
-			argList.add("debuggerPath=" + config.getDebuggerPath());
+			argList.add(JobAttributes.getDebuggerExecutablePathAttributeDefinition().getId() + "=" + config.getDebuggerPath());
 			String[] dbgArgs = config.getDebuggerArgs();
 			if (dbgArgs != null) {
 				for (int i = 0; i < dbgArgs.length; i++) {
-					argList.add("debuggerArg=" + dbgArgs[i]);
+					argList.add(JobAttributes.getDebuggerArgumentsAttributeDefinition().getId() + "=" + dbgArgs[i]);
 				}
 			}
 		}
@@ -229,16 +228,24 @@ public class ORTERemoteProxyTest implements IProxyRuntimeEventListener {
 		return argList.toArray(new String[0]);
 	}
 
-	public void handleProxyRuntimeAttributeDefEvent(IProxyRuntimeAttributeDefEvent e) {
+	public void handleEvent(IProxyRuntimeAttributeDefEvent e) {
 		System.out.println("got attribute def event");
 	}
 
-	public void handleProxyRuntimeNewJobEvent(IProxyRuntimeNewJobEvent e) {
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.proxy.IProxyRuntimeEventListener#handleProxyRuntimeErrorStateEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeErrorStateEvent)
+	 */
+	public void handleEvent(IProxyRuntimeErrorStateEvent e) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public void handleProxyRuntimeNewMachineEvent(IProxyRuntimeNewMachineEvent e) {
+	public void handleEvent(IProxyRuntimeNewJobEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void handleEvent(IProxyRuntimeNewMachineEvent e) {
 		String[] args = e.getAttributes();
 		if (args.length >= 2) {
 			int parentId = Integer.parseInt(args[0]);
@@ -249,7 +256,7 @@ public class ORTERemoteProxyTest implements IProxyRuntimeEventListener {
 				int numArgs = Integer.parseInt(args[pos++]);
 				pos += numArgs;
 				System.out.println("new machine " + parentId + " " + machineIds.toString());
-				for (int id : machineIds) {
+				for (String id : machineIds) {
 					machineId = id;
 					break;
 				}
@@ -257,7 +264,7 @@ public class ORTERemoteProxyTest implements IProxyRuntimeEventListener {
 		}
 	}
 
-	public void handleProxyRuntimeNewNodeEvent(IProxyRuntimeNewNodeEvent e) {
+	public void handleEvent(IProxyRuntimeNewNodeEvent e) {
 		String[] args = e.getAttributes();
 		try {
 			if (args.length >= 2) {
@@ -276,7 +283,7 @@ public class ORTERemoteProxyTest implements IProxyRuntimeEventListener {
 		}
 	}
 
-	public void handleProxyRuntimeNewQueueEvent(IProxyRuntimeNewQueueEvent e) {
+	public void handleEvent(IProxyRuntimeNewQueueEvent e) {
 		String[] args = e.getAttributes();
 		if (args.length >= 2) {
 			int parentId = Integer.parseInt(args[0]);
@@ -289,7 +296,7 @@ public class ORTERemoteProxyTest implements IProxyRuntimeEventListener {
 					String[] kv = args[pos++].split("=");
 					if (kv.length == 2) {
 						System.out.println("new queue " + parentId + " " + queueIds.toString());
-						for (int id : queueIds) {
+						for (String id : queueIds) {
 							queueId = id;
 							queueName = kv[1];
 							break;
@@ -308,12 +315,12 @@ public class ORTERemoteProxyTest implements IProxyRuntimeEventListener {
 		}
 	}
 
-	public void handleProxyRuntimeNodeChangeEvent(IProxyRuntimeNodeChangeEvent e) {
+	public void handleEvent(IProxyRuntimeNodeChangeEvent e) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public void handleProxyRuntimeJobChangeEvent(IProxyRuntimeJobChangeEvent e) {
+	public void handleEvent(IProxyRuntimeJobChangeEvent e) {
 		String[] args = e.getAttributes();
 		if (args.length >= 2) {
 			int num = Integer.parseInt(args[0]);
@@ -346,31 +353,31 @@ public class ORTERemoteProxyTest implements IProxyRuntimeEventListener {
 		}
 	}
 
-	public void handleProxyRuntimeMachineChangeEvent(IProxyRuntimeMachineChangeEvent e) {
+	public void handleEvent(IProxyRuntimeMachineChangeEvent e) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public void handleProxyRuntimeNewProcessEvent(IProxyRuntimeNewProcessEvent e) {
+	public void handleEvent(IProxyRuntimeNewProcessEvent e) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public void handleProxyRuntimeProcessChangeEvent(IProxyRuntimeProcessChangeEvent e) {
+	public void handleEvent(IProxyRuntimeProcessChangeEvent e) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public void handleProxyRuntimeQueueChangeEvent(IProxyRuntimeQueueChangeEvent e) {
+	public void handleEvent(IProxyRuntimeQueueChangeEvent e) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public void handleProxyRuntimeMessageEvent(IProxyRuntimeMessageEvent e) {
+	public void handleEvent(IProxyRuntimeMessageEvent e) {
 		System.out.println("got runtime error: " + e.toString());
 	}
 
-	public void handleProxyRuntimeConnectedStateEvent(IProxyRuntimeConnectedStateEvent e) {
+	public void handleEvent(IProxyRuntimeConnectedStateEvent e) {
 		lock.lock();
 		try {
 			connected = true;
@@ -383,7 +390,7 @@ public class ORTERemoteProxyTest implements IProxyRuntimeEventListener {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rtsystem.proxy.IProxyRuntimeEventListener#handleProxyRuntimeRemoveAllEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRemoveAllEvent)
 	 */
-	public void handleProxyRuntimeRemoveAllEvent(IProxyRuntimeRemoveAllEvent e) {
+	public void handleEvent(IProxyRuntimeRemoveAllEvent e) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -391,7 +398,7 @@ public class ORTERemoteProxyTest implements IProxyRuntimeEventListener {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeRemoveJobEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRemoveJobEvent)
 	 */
-	public void handleProxyRuntimeRemoveJobEvent(IProxyRuntimeRemoveJobEvent e) {
+	public void handleEvent(IProxyRuntimeRemoveJobEvent e) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -399,7 +406,7 @@ public class ORTERemoteProxyTest implements IProxyRuntimeEventListener {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeRemoveMachineEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRemoveMachineEvent)
 	 */
-	public void handleProxyRuntimeRemoveMachineEvent(
+	public void handleEvent(
 			IProxyRuntimeRemoveMachineEvent e) {
 		// TODO Auto-generated method stub
 		
@@ -408,7 +415,7 @@ public class ORTERemoteProxyTest implements IProxyRuntimeEventListener {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeRemoveNodeEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRemoveNodeEvent)
 	 */
-	public void handleProxyRuntimeRemoveNodeEvent(IProxyRuntimeRemoveNodeEvent e) {
+	public void handleEvent(IProxyRuntimeRemoveNodeEvent e) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -416,7 +423,7 @@ public class ORTERemoteProxyTest implements IProxyRuntimeEventListener {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeRemoveProcessEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRemoveProcessEvent)
 	 */
-	public void handleProxyRuntimeRemoveProcessEvent(
+	public void handleEvent(
 			IProxyRuntimeRemoveProcessEvent e) {
 		// TODO Auto-generated method stub
 		
@@ -425,13 +432,13 @@ public class ORTERemoteProxyTest implements IProxyRuntimeEventListener {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeRemoveQueueEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRemoveQueueEvent)
 	 */
-	public void handleProxyRuntimeRemoveQueueEvent(
+	public void handleEvent(
 			IProxyRuntimeRemoveQueueEvent e) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public void handleProxyRuntimeRunningStateEvent(IProxyRuntimeRunningStateEvent e) {
+	public void handleEvent(IProxyRuntimeRunningStateEvent e) {
 		lock.lock();
 		try {
 			running = true;
@@ -441,7 +448,7 @@ public class ORTERemoteProxyTest implements IProxyRuntimeEventListener {
 		}
 	}
 
-	public void handleProxyRuntimeShutdownStateEvent(IProxyRuntimeShutdownStateEvent e) {
+	public void handleEvent(IProxyRuntimeShutdownStateEvent e) {
 		lock.lock();
 		try {
 			shutdown = true;
@@ -454,7 +461,7 @@ public class ORTERemoteProxyTest implements IProxyRuntimeEventListener {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeStartupErrorEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeStartupErrorEvent)
 	 */
-	public void handleProxyRuntimeStartupErrorEvent(
+	public void handleEvent(
 			IProxyRuntimeStartupErrorEvent e) {
 		// TODO Auto-generated method stub
 		
@@ -463,7 +470,7 @@ public class ORTERemoteProxyTest implements IProxyRuntimeEventListener {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeSubmitJobErrorEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeSubmitJobErrorEvent)
 	 */
-	public void handleProxyRuntimeSubmitJobErrorEvent(
+	public void handleEvent(
 			IProxyRuntimeSubmitJobErrorEvent e) {
 		// TODO Auto-generated method stub
 		
@@ -472,7 +479,7 @@ public class ORTERemoteProxyTest implements IProxyRuntimeEventListener {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeTerminateJobErrorEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeTerminateJobErrorEvent)
 	 */
-	public void handleProxyRuntimeTerminateJobErrorEvent(
+	public void handleEvent(
 			IProxyRuntimeTerminateJobErrorEvent e) {
 		// TODO Auto-generated method stub
 		

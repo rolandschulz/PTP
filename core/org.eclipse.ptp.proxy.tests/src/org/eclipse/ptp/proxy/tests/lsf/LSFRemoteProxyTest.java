@@ -15,6 +15,7 @@ import org.eclipse.ptp.rtsystem.JobRunConfiguration;
 import org.eclipse.ptp.rtsystem.proxy.IProxyRuntimeEventListener;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeAttributeDefEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeConnectedStateEvent;
+import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeErrorStateEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeJobChangeEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeMachineChangeEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeMessageEvent;
@@ -49,7 +50,7 @@ public class LSFRemoteProxyTest implements IProxyRuntimeEventListener {
 	private Condition notRunning = lock.newCondition();
 	private Condition notShutdown = lock.newCondition();
 	
-	private int machine = -1;
+	private String machine = null;
 	private int rmId = 200;
 
 	@Test public void start_stop() {
@@ -89,7 +90,7 @@ public class LSFRemoteProxyTest implements IProxyRuntimeEventListener {
 
 		assertEquals("LSFRemoteProxyTest: Proxy Client: FAILURE, machine not found",
 	              true,
-	              machine < 0);
+	              machine == null);
 
 		assertEquals("LSFRemoteProxyTest: Proxy Client: FAILURE, unsuccessfull initialization",
 	              false,
@@ -221,73 +222,81 @@ public class LSFRemoteProxyTest implements IProxyRuntimeEventListener {
 		return argList.toArray(new String[0]);
 	}
 		
-	public void handleProxyRuntimeAttributeDefEvent(IProxyRuntimeAttributeDefEvent e) {
+	public void handleEvent(IProxyRuntimeAttributeDefEvent e) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public void handleProxyRuntimeNewJobEvent(IProxyRuntimeNewJobEvent e) {
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.proxy.IProxyRuntimeEventListener#handleProxyRuntimeErrorStateEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeErrorStateEvent)
+	 */
+	public void handleEvent(IProxyRuntimeErrorStateEvent e) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public void handleProxyRuntimeNewMachineEvent(IProxyRuntimeNewMachineEvent e) {
+	public void handleEvent(IProxyRuntimeNewJobEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void handleEvent(IProxyRuntimeNewMachineEvent e) {
 		String[] args = e.getAttributes();
 		if (args.length >= 2) {
 			RangeSet machineIds = new RangeSet(args[2]);
-			for (int id : machineIds) {
+			for (String id : machineIds) {
 				this.machine = id;
 				break;
 			}
 		}
 	}
 
-	public void handleProxyRuntimeNewNodeEvent(IProxyRuntimeNewNodeEvent e) {
+	public void handleEvent(IProxyRuntimeNewNodeEvent e) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public void handleProxyRuntimeNewQueueEvent(IProxyRuntimeNewQueueEvent e) {
+	public void handleEvent(IProxyRuntimeNewQueueEvent e) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public void handleProxyRuntimeNodeChangeEvent(IProxyRuntimeNodeChangeEvent e) {
+	public void handleEvent(IProxyRuntimeNodeChangeEvent e) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public void handleProxyRuntimeJobChangeEvent(IProxyRuntimeJobChangeEvent e) {
+	public void handleEvent(IProxyRuntimeJobChangeEvent e) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public void handleProxyRuntimeMachineChangeEvent(IProxyRuntimeMachineChangeEvent e) {
+	public void handleEvent(IProxyRuntimeMachineChangeEvent e) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public void handleProxyRuntimeNewProcessEvent(IProxyRuntimeNewProcessEvent e) {
+	public void handleEvent(IProxyRuntimeNewProcessEvent e) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public void handleProxyRuntimeProcessChangeEvent(IProxyRuntimeProcessChangeEvent e) {
+	public void handleEvent(IProxyRuntimeProcessChangeEvent e) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public void handleProxyRuntimeQueueChangeEvent(IProxyRuntimeQueueChangeEvent e) {
+	public void handleEvent(IProxyRuntimeQueueChangeEvent e) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public void handleProxyRuntimeMessageEvent(IProxyRuntimeMessageEvent e) {
+	public void handleEvent(IProxyRuntimeMessageEvent e) {
 		System.err.println("got runtime error: " + e.toString());
 		
 	}
 
-	public void handleProxyRuntimeConnectedStateEvent(IProxyRuntimeConnectedStateEvent e) {
+	public void handleEvent(IProxyRuntimeConnectedStateEvent e) {
 		lock.lock();
 		try {
 			connected = true;
@@ -300,7 +309,7 @@ public class LSFRemoteProxyTest implements IProxyRuntimeEventListener {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rtsystem.proxy.IProxyRuntimeEventListener#handleProxyRuntimeRemoveAllEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRemoveAllEvent)
 	 */
-	public void handleProxyRuntimeRemoveAllEvent(IProxyRuntimeRemoveAllEvent e) {
+	public void handleEvent(IProxyRuntimeRemoveAllEvent e) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -308,7 +317,7 @@ public class LSFRemoteProxyTest implements IProxyRuntimeEventListener {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeRemoveJobEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRemoveJobEvent)
 	 */
-	public void handleProxyRuntimeRemoveJobEvent(IProxyRuntimeRemoveJobEvent e) {
+	public void handleEvent(IProxyRuntimeRemoveJobEvent e) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -316,7 +325,7 @@ public class LSFRemoteProxyTest implements IProxyRuntimeEventListener {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeRemoveMachineEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRemoveMachineEvent)
 	 */
-	public void handleProxyRuntimeRemoveMachineEvent(
+	public void handleEvent(
 			IProxyRuntimeRemoveMachineEvent e) {
 		// TODO Auto-generated method stub
 		
@@ -325,7 +334,7 @@ public class LSFRemoteProxyTest implements IProxyRuntimeEventListener {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeRemoveNodeEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRemoveNodeEvent)
 	 */
-	public void handleProxyRuntimeRemoveNodeEvent(IProxyRuntimeRemoveNodeEvent e) {
+	public void handleEvent(IProxyRuntimeRemoveNodeEvent e) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -333,7 +342,7 @@ public class LSFRemoteProxyTest implements IProxyRuntimeEventListener {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeRemoveProcessEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRemoveProcessEvent)
 	 */
-	public void handleProxyRuntimeRemoveProcessEvent(
+	public void handleEvent(
 			IProxyRuntimeRemoveProcessEvent e) {
 		// TODO Auto-generated method stub
 		
@@ -342,13 +351,13 @@ public class LSFRemoteProxyTest implements IProxyRuntimeEventListener {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeRemoveQueueEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRemoveQueueEvent)
 	 */
-	public void handleProxyRuntimeRemoveQueueEvent(
+	public void handleEvent(
 			IProxyRuntimeRemoveQueueEvent e) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public void handleProxyRuntimeRunningStateEvent(IProxyRuntimeRunningStateEvent e) {
+	public void handleEvent(IProxyRuntimeRunningStateEvent e) {
 		lock.lock();
 		try {
 			running = true;
@@ -358,7 +367,7 @@ public class LSFRemoteProxyTest implements IProxyRuntimeEventListener {
 		}
 	}
 
-	public void handleProxyRuntimeShutdownStateEvent(IProxyRuntimeShutdownStateEvent e) {
+	public void handleEvent(IProxyRuntimeShutdownStateEvent e) {
 		lock.lock();
 		try {
 			shutdown = true;
@@ -371,7 +380,7 @@ public class LSFRemoteProxyTest implements IProxyRuntimeEventListener {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeStartupErrorEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeStartupErrorEvent)
 	 */
-	public void handleProxyRuntimeStartupErrorEvent(
+	public void handleEvent(
 			IProxyRuntimeStartupErrorEvent e) {
 		// TODO Auto-generated method stub
 		
@@ -380,7 +389,7 @@ public class LSFRemoteProxyTest implements IProxyRuntimeEventListener {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeSubmitJobErrorEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeSubmitJobErrorEvent)
 	 */
-	public void handleProxyRuntimeSubmitJobErrorEvent(
+	public void handleEvent(
 			IProxyRuntimeSubmitJobErrorEvent e) {
 		// TODO Auto-generated method stub
 		
@@ -389,7 +398,7 @@ public class LSFRemoteProxyTest implements IProxyRuntimeEventListener {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeTerminateJobErrorEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeTerminateJobErrorEvent)
 	 */
-	public void handleProxyRuntimeTerminateJobErrorEvent(
+	public void handleEvent(
 			IProxyRuntimeTerminateJobErrorEvent e) {
 		// TODO Auto-generated method stub
 		

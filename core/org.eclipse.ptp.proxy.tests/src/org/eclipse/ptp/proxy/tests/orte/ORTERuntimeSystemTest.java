@@ -28,6 +28,7 @@ import org.eclipse.ptp.rtsystem.IRuntimeEventListener;
 import org.eclipse.ptp.rtsystem.JobRunConfiguration;
 import org.eclipse.ptp.rtsystem.events.IRuntimeAttributeDefinitionEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeConnectedStateEvent;
+import org.eclipse.ptp.rtsystem.events.IRuntimeErrorStateEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeMessageEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeJobChangeEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeMachineChangeEvent;
@@ -176,7 +177,7 @@ public class ORTERuntimeSystemTest implements IRuntimeEventListener {
 				AttributeManager attrMgr = new AttributeManager();
 				
 				try {
-					attrMgr.addAttribute(QueueAttributes.getIdAttributeDefinition().create(queueId));
+					attrMgr.addAttribute(JobAttributes.getQueueIdAttributeDefinition().create(queueId));
 					
 					attrMgr.addAttribute(JobAttributes.getExecutableNameAttributeDefinition().create(jobRunConfig.getExecName()));
 					
@@ -233,15 +234,23 @@ public class ORTERuntimeSystemTest implements IRuntimeEventListener {
 
 	}
 
-	public void handleRuntimeAttributeDefinitionEvent(IRuntimeAttributeDefinitionEvent e) {
+	public void handleEvent(IRuntimeAttributeDefinitionEvent e) {
 		System.out.println("got attribute def event");
 	}
 
-	public void handleRuntimeNewJobEvent(IRuntimeNewJobEvent e) {
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleRuntimeErrorStateEvent(org.eclipse.ptp.rtsystem.events.IRuntimeErrorStateEvent)
+	 */
+	public void handleEvent(IRuntimeErrorStateEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void handleEvent(IRuntimeNewJobEvent e) {
 		for (Map.Entry<RangeSet, AttributeManager> entry : e.getElementAttributeManager().getEntrySet()) {
 			AttributeManager mgr = entry.getValue();
-			for (Integer id : entry.getKey()) {
-				StringAttribute attr = (StringAttribute) mgr.getAttribute(JobAttributes.getSubIdAttributeDefinition());
+			for (String id : entry.getKey()) {
+				StringAttribute attr = mgr.getAttribute(JobAttributes.getSubIdAttributeDefinition());
 				if (attr.getValue().equals(jobSubmitID)) {
 					jobId = id.toString();
 					return;
@@ -250,28 +259,28 @@ public class ORTERuntimeSystemTest implements IRuntimeEventListener {
 		}
 	}
 
-	public void handleRuntimeNewMachineEvent(IRuntimeNewMachineEvent e) {
+	public void handleEvent(IRuntimeNewMachineEvent e) {
 		for (RangeSet r : e.getElementAttributeManager().getElementIds()) {
-			for (int id : r) {
+			for (String id : r) {
 				System.out.println("new machine " + id);
 			}
 		}
 	}
 
-	public void handleRuntimeNewNodeEvent(IRuntimeNewNodeEvent e) {
+	public void handleEvent(IRuntimeNewNodeEvent e) {
 		String parentId = e.getParentId();
 		for (RangeSet r : e.getElementAttributeManager().getElementIds()) {
-			for (int id : r) {
+			for (String id : r) {
 				System.out.println("new node " + parentId + " "+ id);
 			}
 		}
 	}
 
-	public void handleRuntimeNewQueueEvent(IRuntimeNewQueueEvent e) {
+	public void handleEvent(IRuntimeNewQueueEvent e) {
 		for (Map.Entry<RangeSet, AttributeManager> entry : e.getElementAttributeManager().getEntrySet()) {
 			AttributeManager mgr = entry.getValue();
-			for (Integer id : entry.getKey()) {
-				StringAttribute attr = (StringAttribute) mgr.getAttribute(ElementAttributes.getNameAttributeDefinition());
+			for (String id : entry.getKey()) {
+				StringAttribute attr = mgr.getAttribute(ElementAttributes.getNameAttributeDefinition());
 				if (attr != null) {
 					queueId = id.toString();
 					queueName = attr.getValueAsString();
@@ -291,21 +300,21 @@ public class ORTERuntimeSystemTest implements IRuntimeEventListener {
 		}
 	}
 
-	public void handleRuntimeNodeChangeEvent(IRuntimeNodeChangeEvent e) {
+	public void handleEvent(IRuntimeNodeChangeEvent e) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@SuppressWarnings("unchecked")
-	public void handleRuntimeJobChangeEvent(IRuntimeJobChangeEvent e) {
+	public void handleEvent(IRuntimeJobChangeEvent e) {
 		/*
 		 * Find a state change, if any
 		 */
 		for (Map.Entry<RangeSet, AttributeManager> entry : e.getElementAttributeManager().getEntrySet()) {
 			AttributeManager mgr = entry.getValue();
-			for (Integer id : entry.getKey()) {
+			for (String id : entry.getKey()) {
 				if (jobId.equals(id)) {
-					EnumeratedAttribute<State> a = (EnumeratedAttribute<State>) mgr.getAttribute(JobAttributes.getStateAttributeDefinition());
+					EnumeratedAttribute<State> a = mgr.getAttribute(JobAttributes.getStateAttributeDefinition());
 					if (a != null && a.getValue() == JobAttributes.State.TERMINATED) {
 						System.out.println("job terminated!");
 						lock.lock();
@@ -322,31 +331,31 @@ public class ORTERuntimeSystemTest implements IRuntimeEventListener {
 		}
 	}
 
-	public void handleRuntimeMachineChangeEvent(IRuntimeMachineChangeEvent e) {
+	public void handleEvent(IRuntimeMachineChangeEvent e) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public void handleRuntimeNewProcessEvent(IRuntimeNewProcessEvent e) {
+	public void handleEvent(IRuntimeNewProcessEvent e) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public void handleRuntimeProcessChangeEvent(IRuntimeProcessChangeEvent e) {
+	public void handleEvent(IRuntimeProcessChangeEvent e) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public void handleRuntimeQueueChangeEvent(IRuntimeQueueChangeEvent e) {
+	public void handleEvent(IRuntimeQueueChangeEvent e) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public void handleRuntimeMessageEvent(IRuntimeMessageEvent e) {
+	public void handleEvent(IRuntimeMessageEvent e) {
 		System.out.println("got runtime error: " + e.getText());
 	}
 
-	public void handleRuntimeConnectedStateEvent(IRuntimeConnectedStateEvent e) {
+	public void handleEvent(IRuntimeConnectedStateEvent e) {
 		lock.lock();
 		try {
 			connected = true;
@@ -359,7 +368,7 @@ public class ORTERuntimeSystemTest implements IRuntimeEventListener {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleRuntimeRemoveAllEvent(org.eclipse.ptp.rtsystem.events.IRuntimeRemoveAllEvent)
 	 */
-	public void handleRuntimeRemoveAllEvent(IRuntimeRemoveAllEvent e) {
+	public void handleEvent(IRuntimeRemoveAllEvent e) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -367,7 +376,7 @@ public class ORTERuntimeSystemTest implements IRuntimeEventListener {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleRuntimeRemoveJobEvent(org.eclipse.ptp.rtsystem.events.IRuntimeRemoveJobEvent)
 	 */
-	public void handleRuntimeRemoveJobEvent(IRuntimeRemoveJobEvent e) {
+	public void handleEvent(IRuntimeRemoveJobEvent e) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -375,7 +384,7 @@ public class ORTERuntimeSystemTest implements IRuntimeEventListener {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleRuntimeRemoveMachineEvent(org.eclipse.ptp.rtsystem.events.IRuntimeRemoveMachineEvent)
 	 */
-	public void handleRuntimeRemoveMachineEvent(IRuntimeRemoveMachineEvent e) {
+	public void handleEvent(IRuntimeRemoveMachineEvent e) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -383,7 +392,7 @@ public class ORTERuntimeSystemTest implements IRuntimeEventListener {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleRuntimeRemoveNodeEvent(org.eclipse.ptp.rtsystem.events.IRuntimeRemoveNodeEvent)
 	 */
-	public void handleRuntimeRemoveNodeEvent(IRuntimeRemoveNodeEvent e) {
+	public void handleEvent(IRuntimeRemoveNodeEvent e) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -391,7 +400,7 @@ public class ORTERuntimeSystemTest implements IRuntimeEventListener {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleRuntimeRemoveProcessEvent(org.eclipse.ptp.rtsystem.events.IRuntimeRemoveProcessEvent)
 	 */
-	public void handleRuntimeRemoveProcessEvent(IRuntimeRemoveProcessEvent e) {
+	public void handleEvent(IRuntimeRemoveProcessEvent e) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -399,12 +408,12 @@ public class ORTERuntimeSystemTest implements IRuntimeEventListener {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleRuntimeRemoveQueueEvent(org.eclipse.ptp.rtsystem.events.IRuntimeRemoveQueueEvent)
 	 */
-	public void handleRuntimeRemoveQueueEvent(IRuntimeRemoveQueueEvent e) {
+	public void handleEvent(IRuntimeRemoveQueueEvent e) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public void handleRuntimeRunningStateEvent(IRuntimeRunningStateEvent e) {
+	public void handleEvent(IRuntimeRunningStateEvent e) {
 		lock.lock();
 		try {
 			running = true;
@@ -414,7 +423,7 @@ public class ORTERuntimeSystemTest implements IRuntimeEventListener {
 		}
 	}
 
-	public void handleRuntimeShutdownStateEvent(IRuntimeShutdownStateEvent e) {
+	public void handleEvent(IRuntimeShutdownStateEvent e) {
 		lock.lock();
 		try {
 			shutdown = true;
@@ -427,7 +436,7 @@ public class ORTERuntimeSystemTest implements IRuntimeEventListener {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleRuntimeStartupErrorEvent(org.eclipse.ptp.rtsystem.events.IRuntimeStartupErrorEvent)
 	 */
-	public void handleRuntimeStartupErrorEvent(IRuntimeStartupErrorEvent e) {
+	public void handleEvent(IRuntimeStartupErrorEvent e) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -435,7 +444,7 @@ public class ORTERuntimeSystemTest implements IRuntimeEventListener {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleRuntimeSubmitJobErrorEvent(org.eclipse.ptp.rtsystem.events.IRuntimeSubmitJobErrorEvent)
 	 */
-	public void handleRuntimeSubmitJobErrorEvent(IRuntimeSubmitJobErrorEvent e) {
+	public void handleEvent(IRuntimeSubmitJobErrorEvent e) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -443,7 +452,7 @@ public class ORTERuntimeSystemTest implements IRuntimeEventListener {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleRuntimeTerminateJobErrorEvent(org.eclipse.ptp.rtsystem.events.IRuntimeTerminateJobErrorEvent)
 	 */
-	public void handleRuntimeTerminateJobErrorEvent(
+	public void handleEvent(
 			IRuntimeTerminateJobErrorEvent e) {
 		// TODO Auto-generated method stub
 		
