@@ -67,7 +67,8 @@ am_libproxysvr_a_OBJECTS = libproxysvr_a-proxy.$(OBJEXT) \
 	libproxysvr_a-proxy_svr.$(OBJEXT) \
 	libproxysvr_a-proxy_tcp.$(OBJEXT) \
 	libproxysvr_a-proxy_tcp_svr.$(OBJEXT) \
-	libproxysvr_a-proxy_msg.$(OBJEXT)
+	libproxysvr_a-proxy_msg.$(OBJEXT) \
+	libproxysvr_a-proxy_event.$(OBJEXT)
 libproxysvr_a_OBJECTS = $(am_libproxysvr_a_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I.
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -178,7 +179,8 @@ libproxysvr_a_SOURCES = src/proxy.c \
 							src/proxy_svr.c \
 							src/proxy_tcp.c \
 							src/proxy_tcp_svr.c \
-							src/proxy_msg.c
+							src/proxy_msg.c \
+							src/proxy_event.c
 
 libproxysvr_a_CFLAGS = -I./include $(AM_CFLAGS) -g
 all: config.h
@@ -260,6 +262,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libproxyclnt_a-proxy_tcp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libproxyclnt_a-proxy_tcp_clnt.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libproxysvr_a-proxy.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libproxysvr_a-proxy_event.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libproxysvr_a-proxy_msg.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libproxysvr_a-proxy_svr.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libproxysvr_a-proxy_tcp.Po@am__quote@
@@ -418,6 +421,20 @@ libproxysvr_a-proxy_msg.obj: src/proxy_msg.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/proxy_msg.c' object='libproxysvr_a-proxy_msg.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libproxysvr_a_CFLAGS) $(CFLAGS) -c -o libproxysvr_a-proxy_msg.obj `if test -f 'src/proxy_msg.c'; then $(CYGPATH_W) 'src/proxy_msg.c'; else $(CYGPATH_W) '$(srcdir)/src/proxy_msg.c'; fi`
+
+libproxysvr_a-proxy_event.o: src/proxy_event.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libproxysvr_a_CFLAGS) $(CFLAGS) -MT libproxysvr_a-proxy_event.o -MD -MP -MF "$(DEPDIR)/libproxysvr_a-proxy_event.Tpo" -c -o libproxysvr_a-proxy_event.o `test -f 'src/proxy_event.c' || echo '$(srcdir)/'`src/proxy_event.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libproxysvr_a-proxy_event.Tpo" "$(DEPDIR)/libproxysvr_a-proxy_event.Po"; else rm -f "$(DEPDIR)/libproxysvr_a-proxy_event.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/proxy_event.c' object='libproxysvr_a-proxy_event.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libproxysvr_a_CFLAGS) $(CFLAGS) -c -o libproxysvr_a-proxy_event.o `test -f 'src/proxy_event.c' || echo '$(srcdir)/'`src/proxy_event.c
+
+libproxysvr_a-proxy_event.obj: src/proxy_event.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libproxysvr_a_CFLAGS) $(CFLAGS) -MT libproxysvr_a-proxy_event.obj -MD -MP -MF "$(DEPDIR)/libproxysvr_a-proxy_event.Tpo" -c -o libproxysvr_a-proxy_event.obj `if test -f 'src/proxy_event.c'; then $(CYGPATH_W) 'src/proxy_event.c'; else $(CYGPATH_W) '$(srcdir)/src/proxy_event.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libproxysvr_a-proxy_event.Tpo" "$(DEPDIR)/libproxysvr_a-proxy_event.Po"; else rm -f "$(DEPDIR)/libproxysvr_a-proxy_event.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/proxy_event.c' object='libproxysvr_a-proxy_event.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libproxysvr_a_CFLAGS) $(CFLAGS) -c -o libproxysvr_a-proxy_event.obj `if test -f 'src/proxy_event.c'; then $(CYGPATH_W) 'src/proxy_event.c'; else $(CYGPATH_W) '$(srcdir)/src/proxy_event.c'; fi`
 uninstall-info-am:
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)

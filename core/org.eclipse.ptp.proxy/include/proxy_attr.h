@@ -68,6 +68,16 @@
 #endif /* HAVE_SYS_BPROC_H */
 
 /*
+ * Queue attributes
+ */
+#define QUEUE_STATE_ATTR				"queueState"
+#define		QUEUE_STATE_NORMAL				"NORMAL"
+#define		QUEUE_STATE_COLLECTING			"COLLECTING"
+#define		QUEUE_STATE_DRAINING			"DRAINING"
+#define		QUEUE_STATE_STOPPED				"STOPPED"
+#define QUEUE_ID_ATTR					"queueId"
+
+/*
  * Process attributes
  */
 #define PROC_STATE_ATTR				"processState"
@@ -94,4 +104,10 @@
 #define		MSG_LEVEL_INFO				"INFO"
 #define MSG_CODE_ATTR				"messageCode"
 #define MSG_TEXT_ATTR				"messageText"
+
+/*
+ * ERROR attributes
+ */
+#define ERROR_CODE_ATTR				"errorCode"
+#define ERROR_MSG_ATTR				"errorMsg"
 #endif /*PROXY_ATTR_H_*/
