@@ -21,7 +21,6 @@ package org.eclipse.ptp.rtsystem.proxy;
 
 import java.io.IOException;
 
-import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener;
 
 public interface IProxyRuntimeClient {
 	public boolean startup();
