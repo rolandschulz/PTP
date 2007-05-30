@@ -12,7 +12,6 @@ Export-Package: org.eclipse.ptp.pldt.mpi.core,
  org.eclipse.ptp.pldt.mpi.core.analysis,
  org.eclipse.ptp.pldt.mpi.core.editorHelp,
  org.eclipse.ptp.pldt.mpi.core.prefs,
- org.eclipse.ptp.pldt.mpi.core.util,
  org.eclipse.ptp.pldt.mpi.core.views
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
