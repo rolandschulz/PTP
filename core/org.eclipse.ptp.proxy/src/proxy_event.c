@@ -91,10 +91,16 @@ proxy_message_event(int trans_id, char *level, int code, char *fmt, ...)
  * use the specific error events below.
  */
 proxy_msg *
-proxy_error_event(int trans_id, int code, char *msg)
+proxy_error_event(int trans_id, int code, char *fmt, ...)
 {
+	va_list		ap;
+	char *		msg;
 	proxy_msg *	m = new_proxy_msg(PROXY_EV_ERROR, trans_id);
 	
+	va_start(ap, fmt);
+	vasprintf(&msg, fmt, ap);
+	va_end(ap);
+
 	proxy_msg_add_int(m, 2); /* 2 attributes */
 	proxy_msg_add_keyval_int(m, ERROR_CODE_ATTR, code);
 	proxy_msg_add_keyval_string(m, ERROR_MSG_ATTR, msg);
@@ -242,27 +248,12 @@ proxy_new_node_event(int trans_id, char *mach_id, int num_nodes)
  * Add a node to a new node event.
  */
 void
-proxy_add_node(proxy_msg *m, char *node_id, char *name, char *state, int extra_args, ...)
+proxy_add_node(proxy_msg *m, char *node_id, char *name, char *state, int extra_attrs)
 {
-	int			i;
-	va_list		ap;
-	char *		attr;
-	char *		value;
-	
 	proxy_msg_add_string(m, node_id);
-	proxy_msg_add_int(m, 2 + extra_args);
+	proxy_msg_add_int(m, 2 + extra_attrs);
 	proxy_msg_add_keyval_string(m, ELEMENT_NAME_ATTR, name);
 	proxy_msg_add_keyval_string(m, NODE_STATE_ATTR, state);
-	
-	va_start(ap, extra_args);
-	
-	for (i = 0; i < extra_args; i++) {
-		attr = va_arg(ap, char *);
-		value = va_arg(ap, char *);
-		proxy_msg_add_keyval_string(m, attr, value);
-	}
-	
-	va_end(ap);
 }
 
 /*
@@ -280,27 +271,12 @@ proxy_new_process_event(int trans_id, char *job_id, int num_procs)
 }
 
 void
-proxy_add_process(proxy_msg *m, char *proc_id, char *name, char *state, int extra_args, ...)
+proxy_add_process(proxy_msg *m, char *proc_id, char *name, char *state, int extra_attrs)
 {
-	int			i;
-	va_list		ap;
-	char *		attr;
-	char *		value;
-
 	proxy_msg_add_string(m, proc_id);	
-	proxy_msg_add_int(m, 2 + extra_args);	
+	proxy_msg_add_int(m, 2 + extra_attrs);	
 	proxy_msg_add_keyval_string(m, ELEMENT_NAME_ATTR, name);
 	proxy_msg_add_keyval_string(m, PROC_STATE_ATTR, state);	
-	
-	va_start(ap, extra_args);
-	
-	for (i = 0; i < extra_args; i++) {
-		attr = va_arg(ap, char *);
-		value = va_arg(ap, char *);
-		proxy_msg_add_keyval_string(m, attr, value);
-	}
-	
-	va_end(ap);
 }
 
 /*
