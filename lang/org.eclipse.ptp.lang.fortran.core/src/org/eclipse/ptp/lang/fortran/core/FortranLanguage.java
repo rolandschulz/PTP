@@ -71,7 +71,7 @@ public class FortranLanguage extends PlatformObject implements ILanguage {
 			String env = System.getenv("CLASSPATH");
 			System.out.println("env = " + env);
 			String path = reader.getPath();
-			FortranMain parser = new FortranMain(reader.getPath(), "rose");
+			FortranMain parser = new FortranMain(new String[0], reader.getPath(), "rose");
 			parser.call();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
