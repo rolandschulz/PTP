@@ -52,6 +52,7 @@ import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
+import org.eclipse.ptp.core.elements.attributes.ErrorAttributes;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.MachineAttributes;
 import org.eclipse.ptp.core.elements.attributes.MessageAttributes;
@@ -418,6 +419,7 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	private void initialize() {
 		attrDefManager.clear();
 		attrDefManager.setAttributeDefinitions(ElementAttributes.getDefaultAttributeDefinitions());
+		attrDefManager.setAttributeDefinitions(ErrorAttributes.getDefaultAttributeDefinitions());
 		attrDefManager.setAttributeDefinitions(JobAttributes.getDefaultAttributeDefinitions());
 		attrDefManager.setAttributeDefinitions(MachineAttributes.getDefaultAttributeDefinitions());
 		attrDefManager.setAttributeDefinitions(MessageAttributes.getDefaultAttributeDefinitions());
