@@ -29,8 +29,12 @@ public class ProxyEventFactory extends AbstractProxyEventFactory {
 		case IProxyEvent.EVENT_MESSAGE:
 			evt = new ProxyMessageEvent(transID, args);
 			break;
+
+		case IProxyEvent.EVENT_ERROR:
+			evt = new ProxyErrorEvent(transID, args);
+			break;
 		}
-		
+
 		return evt;
 	}
 }

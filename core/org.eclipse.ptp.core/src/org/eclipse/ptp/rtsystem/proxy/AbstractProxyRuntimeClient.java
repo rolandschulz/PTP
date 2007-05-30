@@ -33,13 +33,13 @@ import org.eclipse.ptp.core.proxy.AbstractProxyClient;
 import org.eclipse.ptp.core.proxy.command.IProxyCommand;
 import org.eclipse.ptp.core.proxy.event.IProxyConnectedEvent;
 import org.eclipse.ptp.core.proxy.event.IProxyDisconnectedEvent;
+import org.eclipse.ptp.core.proxy.event.IProxyErrorEvent;
 import org.eclipse.ptp.core.proxy.event.IProxyEvent;
 import org.eclipse.ptp.core.proxy.event.IProxyEventListener;
 import org.eclipse.ptp.core.proxy.event.IProxyExtendedEvent;
 import org.eclipse.ptp.core.proxy.event.IProxyMessageEvent;
 import org.eclipse.ptp.core.proxy.event.IProxyOKEvent;
 import org.eclipse.ptp.core.proxy.event.IProxyTimeoutEvent;
-import org.eclipse.ptp.rtsystem.proxy.command.IProxyRuntimeCommand;
 import org.eclipse.ptp.rtsystem.proxy.command.ProxyRuntimeInitCommand;
 import org.eclipse.ptp.rtsystem.proxy.command.ProxyRuntimeModelDefCommand;
 import org.eclipse.ptp.rtsystem.proxy.command.ProxyRuntimeStartEventsCommand;
@@ -48,8 +48,6 @@ import org.eclipse.ptp.rtsystem.proxy.command.ProxyRuntimeSubmitJobCommand;
 import org.eclipse.ptp.rtsystem.proxy.command.ProxyRuntimeTerminateJobCommand;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeAttributeDefEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeConnectedStateEvent;
-import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEvent;
-import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeJobChangeEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeMachineChangeEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeMessageEvent;
@@ -61,13 +59,24 @@ import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeNewQueueEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeNodeChangeEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeProcessChangeEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeQueueChangeEvent;
+import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRemoveAllEvent;
+import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRemoveJobEvent;
+import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRemoveMachineEvent;
+import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRemoveNodeEvent;
+import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRemoveProcessEvent;
+import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRemoveQueueEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRunningStateEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeShutdownStateEvent;
+import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeStartupErrorEvent;
+import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeSubmitJobErrorEvent;
+import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeTerminateJobErrorEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeConnectedStateEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeEventFactory;
 import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeMessageEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeRunningStateEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeShutdownStateEvent;
+import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeSubmitJobErrorEvent;
+import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeTerminateJobErrorEvent;
 
 public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient implements IProxyRuntimeClient,IProxyEventListener {
 
@@ -399,61 +408,56 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 		if (logEvents) {
 			System.out.println(toString() + " recieved event " + event);
 		}
-    	switch (command.getCommandID()) {
-    	case IProxyRuntimeCommand.START_EVENTS:
-    		switch (event.getEventID()) {
-    		case IProxyRuntimeEvent.PROXY_RUNTIME_NEW_JOB_EVENT:
+    	if (command instanceof ProxyRuntimeStartEventsCommand) {
+    		if (event instanceof IProxyRuntimeNewJobEvent) {
     			fireProxyRuntimeNewJobEvent((IProxyRuntimeNewJobEvent)event);
-    			break;
-    		case IProxyRuntimeEvent.PROXY_RUNTIME_NEW_MACHINE_EVENT:
+    		} else if (event instanceof IProxyRuntimeNewMachineEvent) {
     			fireProxyRuntimeNewMachineEvent((IProxyRuntimeNewMachineEvent)event);
-    			break;
-    		case IProxyRuntimeEvent.PROXY_RUNTIME_NEW_NODE_EVENT:
+    		} else if (event instanceof IProxyRuntimeNewNodeEvent) {
     			fireProxyRuntimeNewNodeEvent((IProxyRuntimeNewNodeEvent)event);
-    			break;
-    		case IProxyRuntimeEvent.PROXY_RUNTIME_NEW_PROCESS_EVENT:
+    		} else if (event instanceof IProxyRuntimeNewProcessEvent) {
     			fireProxyRuntimeNewProcessEvent((IProxyRuntimeNewProcessEvent)event);
-    			break;
-    		case IProxyRuntimeEvent.PROXY_RUNTIME_NEW_QUEUE_EVENT:
+    		} else if (event instanceof IProxyRuntimeNewQueueEvent) {
     			fireProxyRuntimeNewQueueEvent((IProxyRuntimeNewQueueEvent)event);
-    			break;
-    		case IProxyRuntimeEvent.PROXY_RUNTIME_JOB_CHANGE_EVENT:
+    		} else if (event instanceof IProxyRuntimeJobChangeEvent) {
     			fireProxyRuntimeJobChangeEvent((IProxyRuntimeJobChangeEvent)event);
-    			break;
-    		case IProxyRuntimeEvent.PROXY_RUNTIME_MACHINE_CHANGE_EVENT:
+    		} else if (event instanceof IProxyRuntimeMachineChangeEvent) {
     			fireProxyRuntimeMachineChangeEvent((IProxyRuntimeMachineChangeEvent)event);
-    			break;
-    		case IProxyRuntimeEvent.PROXY_RUNTIME_NODE_CHANGE_EVENT:
+    		} else if (event instanceof IProxyRuntimeNodeChangeEvent) {
     			fireProxyRuntimeNodeChangeEvent((IProxyRuntimeNodeChangeEvent)event);
-    			break;
-    		case IProxyRuntimeEvent.PROXY_RUNTIME_PROCESS_CHANGE_EVENT:
+    		} else if (event instanceof IProxyRuntimeProcessChangeEvent) {
     			fireProxyRuntimeProcessChangeEvent((IProxyRuntimeProcessChangeEvent)event);
-    			break;
-    		case IProxyRuntimeEvent.PROXY_RUNTIME_QUEUE_CHANGE_EVENT:
+    		} else if (event instanceof IProxyRuntimeQueueChangeEvent) {
     			fireProxyRuntimeQueueChangeEvent((IProxyRuntimeQueueChangeEvent)event);
-    			break;
-    		case IProxyEvent.EVENT_OK:
+    		} else if (event instanceof IProxyRuntimeRemoveAllEvent) {
+    			fireProxyRuntimeRemoveAllEvent((IProxyRuntimeRemoveAllEvent)event);
+    		} else if (event instanceof IProxyRuntimeRemoveJobEvent) {
+    			fireProxyRuntimeRemoveJobEvent((IProxyRuntimeRemoveJobEvent)event);
+    		} else if (event instanceof IProxyRuntimeRemoveMachineEvent) {
+    			fireProxyRuntimeRemoveMachineEvent((IProxyRuntimeRemoveMachineEvent)event);
+    		} else if (event instanceof IProxyRuntimeRemoveNodeEvent) {
+    			fireProxyRuntimeRemoveNodeEvent((IProxyRuntimeRemoveNodeEvent)event);
+    		} else if (event instanceof IProxyRuntimeRemoveProcessEvent) {
+    			fireProxyRuntimeRemoveProcessEvent((IProxyRuntimeRemoveProcessEvent)event);
+    		} else if (event instanceof IProxyRuntimeRemoveQueueEvent) {
+    			fireProxyRuntimeRemoveQueueEvent((IProxyRuntimeRemoveQueueEvent)event);
+    		} else if (event instanceof IProxyOKEvent) {
     			removeCommand(command);
-    			break;
      		}
- 			break;
-    	case IProxyRuntimeCommand.STOP_EVENTS:
+    	} else if (command instanceof ProxyRuntimeStopEventsCommand) {
 			if (event instanceof IProxyOKEvent) {
 				removeCommand(command);
 			}
-    		break;
-    	case IProxyRuntimeCommand.SUBMIT_JOB:
-			if (event instanceof IProxyOKEvent) {
-				removeCommand(command);
+       	} else if (command instanceof ProxyRuntimeSubmitJobCommand) {
+			if (event instanceof IProxyErrorEvent) {
+				fireProxyRuntimeSubmitJobErrorEvent(new ProxyRuntimeSubmitJobErrorEvent(event.getTransactionID(), event.getAttributes()));
 			}
-    		break;
-    	case IProxyRuntimeCommand.TERMINATE_JOB:
-			if (event instanceof IProxyOKEvent) {
-				removeCommand(command);
+			removeCommand(command);
+       	} else if (command instanceof ProxyRuntimeTerminateJobCommand) {
+			if (event instanceof IProxyErrorEvent) {
+				fireProxyRuntimeTerminateJobErrorEvent(new ProxyRuntimeTerminateJobErrorEvent(event.getTransactionID(), event.getAttributes()));
 			}
-    		break;
-    	default:
-    		break;
+			removeCommand(command);
     	}
 
 	}
@@ -655,7 +659,7 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
     /**
  	 * Forward event to listeners
 	 * 
-    * @param event
+     * @param event
      */
     protected void fireProxyRuntimeRunningStateEvent(IProxyRuntimeRunningStateEvent event) {
 		for (Object listener : listeners.getListeners()) {
@@ -663,6 +667,72 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 		}
 	}
 
+    /**
+ 	 * Forward event to listeners
+	 * 
+     * @param event
+     */
+    protected void fireProxyRuntimeRemoveAllEvent(IProxyRuntimeRemoveAllEvent event) {
+		for (Object listener : listeners.getListeners()) {
+			((IProxyRuntimeEventListener)listener).handleProxyRuntimeRemoveAllEvent(event);
+		}
+	}
+    
+    /**
+ 	 * Forward event to listeners
+	 * 
+     * @param event
+     */
+    protected void fireProxyRuntimeRemoveJobEvent(IProxyRuntimeRemoveJobEvent event) {
+		for (Object listener : listeners.getListeners()) {
+			((IProxyRuntimeEventListener)listener).handleProxyRuntimeRemoveJobEvent(event);
+		}
+	}
+
+    /**
+ 	 * Forward event to listeners
+	 * 
+     * @param event
+     */
+    protected void fireProxyRuntimeRemoveMachineEvent(IProxyRuntimeRemoveMachineEvent event) {
+		for (Object listener : listeners.getListeners()) {
+			((IProxyRuntimeEventListener)listener).handleProxyRuntimeRemoveMachineEvent(event);
+		}
+	}
+
+    /**
+ 	 * Forward event to listeners
+	 * 
+     * @param event
+     */
+    protected void fireProxyRuntimeRemoveNodeEvent(IProxyRuntimeRemoveNodeEvent event) {
+		for (Object listener : listeners.getListeners()) {
+			((IProxyRuntimeEventListener)listener).handleProxyRuntimeRemoveNodeEvent(event);
+		}
+	}
+
+    /**
+ 	 * Forward event to listeners
+	 * 
+     * @param event
+     */
+    protected void fireProxyRuntimeRemoveProcessEvent(IProxyRuntimeRemoveProcessEvent event) {
+		for (Object listener : listeners.getListeners()) {
+			((IProxyRuntimeEventListener)listener).handleProxyRuntimeRemoveProcessEvent(event);
+		}
+	}
+
+    /**
+ 	 * Forward event to listeners
+	 * 
+     * @param event
+     */
+    protected void fireProxyRuntimeRemoveQueueEvent(IProxyRuntimeRemoveQueueEvent event) {
+		for (Object listener : listeners.getListeners()) {
+			((IProxyRuntimeEventListener)listener).handleProxyRuntimeRemoveQueueEvent(event);
+		}
+	}
+    
 	/**
 	 * Forward event to listeners
 	 * 
@@ -674,6 +744,39 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 		}
 	}
 
+	/**
+	 * Forward event to listeners
+	 * 
+	 * @param event
+	 */
+	protected void fireProxyRuntimeStartupErrorEvent(IProxyRuntimeStartupErrorEvent event) {
+		for (Object listener : listeners.getListeners()) {
+			((IProxyRuntimeEventListener)listener).handleProxyRuntimeStartupErrorEvent(event);
+		}
+	}
+
+	/**
+	 * Forward event to listeners
+	 * 
+	 * @param event
+	 */
+	protected void fireProxyRuntimeSubmitJobErrorEvent(IProxyRuntimeSubmitJobErrorEvent event) {
+		for (Object listener : listeners.getListeners()) {
+			((IProxyRuntimeEventListener)listener).handleProxyRuntimeSubmitJobErrorEvent(event);
+		}
+	}	
+
+	/**
+	 * Forward event to listeners
+	 * 
+	 * @param event
+	 */
+	protected void fireProxyRuntimeTerminateJobErrorEvent(IProxyRuntimeTerminateJobErrorEvent event) {
+		for (Object listener : listeners.getListeners()) {
+			((IProxyRuntimeEventListener)listener).handleProxyRuntimeTerminateJobErrorEvent(event);
+		}
+	}
+	
 	/**
 	 * Main proxy state machine. Use to manage communication with a proxy
 	 * client.

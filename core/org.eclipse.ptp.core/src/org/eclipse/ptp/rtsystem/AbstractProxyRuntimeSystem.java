@@ -37,9 +37,12 @@ import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
+import org.eclipse.ptp.core.attributes.IntegerAttribute;
 import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributeManager;
+import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
+import org.eclipse.ptp.core.elements.attributes.ErrorAttributes;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.MessageAttributes.Level;
 import org.eclipse.ptp.core.util.RangeSet;
@@ -56,12 +59,21 @@ import org.eclipse.ptp.rtsystem.events.RuntimeNewQueueEvent;
 import org.eclipse.ptp.rtsystem.events.RuntimeNodeChangeEvent;
 import org.eclipse.ptp.rtsystem.events.RuntimeProcessChangeEvent;
 import org.eclipse.ptp.rtsystem.events.RuntimeQueueChangeEvent;
+import org.eclipse.ptp.rtsystem.events.RuntimeRemoveAllEvent;
+import org.eclipse.ptp.rtsystem.events.RuntimeRemoveJobEvent;
+import org.eclipse.ptp.rtsystem.events.RuntimeRemoveMachineEvent;
+import org.eclipse.ptp.rtsystem.events.RuntimeRemoveNodeEvent;
+import org.eclipse.ptp.rtsystem.events.RuntimeRemoveProcessEvent;
+import org.eclipse.ptp.rtsystem.events.RuntimeRemoveQueueEvent;
 import org.eclipse.ptp.rtsystem.events.RuntimeRunningStateEvent;
 import org.eclipse.ptp.rtsystem.events.RuntimeShutdownStateEvent;
+import org.eclipse.ptp.rtsystem.events.RuntimeStartupErrorEvent;
+import org.eclipse.ptp.rtsystem.events.RuntimeSubmitJobErrorEvent;
+import org.eclipse.ptp.rtsystem.events.RuntimeTerminateJobErrorEvent;
 import org.eclipse.ptp.rtsystem.proxy.IProxyRuntimeClient;
+import org.eclipse.ptp.rtsystem.proxy.IProxyRuntimeEventListener;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeAttributeDefEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeConnectedStateEvent;
-import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeJobChangeEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeMachineChangeEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeMessageEvent;
@@ -73,8 +85,17 @@ import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeNewQueueEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeNodeChangeEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeProcessChangeEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeQueueChangeEvent;
+import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRemoveAllEvent;
+import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRemoveJobEvent;
+import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRemoveMachineEvent;
+import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRemoveNodeEvent;
+import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRemoveProcessEvent;
+import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRemoveQueueEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRunningStateEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeShutdownStateEvent;
+import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeStartupErrorEvent;
+import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeSubmitJobErrorEvent;
+import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeTerminateJobErrorEvent;
 
 /*
  * ProxyAttributeDefEvents are formatted as follows:
@@ -138,7 +159,23 @@ import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeShutdownStateEvent;
  *	ID_RANGE is a range of model element ID's in RangeSet notation
  *	NUM_ATTRS is the number of attributes to follow
  *	KEY=VALUE are key/value pairs, where KEY is the attribute ID and VALUE is the new attribute value
+ *
+ * ProxyRemove*Events (apart from ProxyRemoveAllEvent) are formatted as follows:
  * 
+ *	EVENT_HEADER ID_RANGE
+ * 
+ *	where:
+ * 
+ *	EVENT_HEADER is the event message header
+ *	ID_RANGE is a range of model element ID's in RangeSet notation.
+ *
+ * The ProxyRemoveAllEvent is formatted as follows:
+ * 
+ *  EVENT_HEADER
+ *  
+ *  where:
+ * 
+ *	EVENT_HEADER is the event message header
  */
 
 public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem implements IProxyRuntimeEventListener {
@@ -423,6 +460,83 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	}
 
 	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.proxy.IProxyRuntimeEventListener#handleProxyRuntimeRemoveAllEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRemoveAllEvent)
+	 */
+	public void handleProxyRuntimeRemoveAllEvent(IProxyRuntimeRemoveAllEvent e) {
+		fireRuntimeRemoveAllEvent(new RuntimeRemoveAllEvent());
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeRemoveJobEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRemoveJobEvent)
+	 */
+	public void handleProxyRuntimeRemoveJobEvent(IProxyRuntimeRemoveJobEvent e) {
+		String[] attrs = e.getAttributes();
+		
+		if (attrs.length < 1) {
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "AbstractProxyRuntimeSystem: not enough arguments"));
+			return;
+		}
+		
+		fireRuntimeRemoveJobEvent(new RuntimeRemoveJobEvent(new RangeSet(attrs[0])));
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeRemoveMachineEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRemoveMachineEvent)
+	 */
+	public void handleProxyRuntimeRemoveMachineEvent(IProxyRuntimeRemoveMachineEvent e) {
+		String[] attrs = e.getAttributes();
+		
+		if (attrs.length < 1) {
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "AbstractProxyRuntimeSystem: not enough arguments"));
+			return;
+		}
+		
+		fireRuntimeRemoveMachineEvent(new RuntimeRemoveMachineEvent(new RangeSet(attrs[0])));
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeRemoveNodeEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRemoveNodeEvent)
+	 */
+	public void handleProxyRuntimeRemoveNodeEvent(IProxyRuntimeRemoveNodeEvent e) {
+		String[] attrs = e.getAttributes();
+		
+		if (attrs.length < 1) {
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "AbstractProxyRuntimeSystem: not enough arguments"));
+			return;
+		}
+		
+		fireRuntimeRemoveNodeEvent(new RuntimeRemoveNodeEvent(new RangeSet(attrs[0])));
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeRemoveProcessEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRemoveProcessEvent)
+	 */
+	public void handleProxyRuntimeRemoveProcessEvent(IProxyRuntimeRemoveProcessEvent e) {
+			String[] attrs = e.getAttributes();
+			
+			if (attrs.length < 1) {
+				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "AbstractProxyRuntimeSystem: not enough arguments"));
+				return;
+			}
+			
+			fireRuntimeRemoveProcessEvent(new RuntimeRemoveProcessEvent(new RangeSet(attrs[0])));
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeRemoveQueueEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRemoveQueueEvent)
+	 */
+	public void handleProxyRuntimeRemoveQueueEvent(IProxyRuntimeRemoveQueueEvent e) {
+			String[] attrs = e.getAttributes();
+			
+			if (attrs.length < 1) {
+				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "AbstractProxyRuntimeSystem: not enough arguments"));
+				return;
+			}
+			
+			fireRuntimeRemoveQueueEvent(new RuntimeRemoveQueueEvent(new RangeSet(attrs[0])));
+	}
+
+	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeRunningStateEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRunningStateEvent)
 	 */
 	public void handleProxyRuntimeRunningStateEvent(IProxyRuntimeRunningStateEvent e) {
@@ -434,6 +548,71 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	 */
 	public void handleProxyRuntimeShutdownStateEvent(IProxyRuntimeShutdownStateEvent e) {
 		fireRuntimeShutdownStateEvent(new RuntimeShutdownStateEvent());
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeStartupErrorEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeStartupErrorEvent)
+	 */
+	public void handleProxyRuntimeStartupErrorEvent(
+			IProxyRuntimeStartupErrorEvent e) {
+		String[] attrs = e.getAttributes();
+		
+		if (attrs.length > 0) {
+			AttributeManager mgr = getAttributeManager(attrs, 0, attrs.length - 1);
+			IntegerAttribute codeAttr = (IntegerAttribute) mgr.getAttribute(ErrorAttributes.getCodeAttributeDefinition());
+			StringAttribute msgAttr = (StringAttribute) mgr.getAttribute(ErrorAttributes.getMsgAttributeDefinition());
+			if (codeAttr == null || msgAttr == null) {
+				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "StartupErrorEvent: missing attibutes"));				
+			} else {
+				fireRuntimeStartupErrorEvent(new RuntimeStartupErrorEvent(codeAttr.getValue(), msgAttr.getValue()));
+			}
+		} else {
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "StartupErrorEvent: could not parse message"));				
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeSubmitJobErrorEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeSubmitJobErrorEvent)
+	 */
+	public void handleProxyRuntimeSubmitJobErrorEvent(
+			IProxyRuntimeSubmitJobErrorEvent e) {
+		String[] attrs = e.getAttributes();
+		
+		if (attrs.length > 0) {
+			AttributeManager mgr = getAttributeManager(attrs, 0, attrs.length - 1);
+			IntegerAttribute codeAttr = (IntegerAttribute) mgr.getAttribute(ErrorAttributes.getCodeAttributeDefinition());
+			StringAttribute msgAttr = (StringAttribute) mgr.getAttribute(ErrorAttributes.getMsgAttributeDefinition());
+			StringAttribute jobSubIdAttr = (StringAttribute) mgr.getAttribute(JobAttributes.getSubIdAttributeDefinition());
+			if (codeAttr == null || msgAttr == null || jobSubIdAttr == null) {
+				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "SubmitJobErrorEvent: missing attibutes"));				
+			} else {
+				fireRuntimeSubmitJobErrorEvent(new RuntimeSubmitJobErrorEvent(codeAttr.getValue(), msgAttr.getValue(), jobSubIdAttr.getValue()));
+			}
+		} else {
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "SubmitJobErrorEvent: could not parse message"));				
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeTerminateJobErrorEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeTerminateJobErrorEvent)
+	 */
+	public void handleProxyRuntimeTerminateJobErrorEvent(
+			IProxyRuntimeTerminateJobErrorEvent e) {
+		String[] attrs = e.getAttributes();
+		
+		if (attrs.length > 0) {
+			AttributeManager mgr = getAttributeManager(attrs, 0, attrs.length - 1);
+			IntegerAttribute codeAttr = (IntegerAttribute) mgr.getAttribute(ErrorAttributes.getCodeAttributeDefinition());
+			StringAttribute msgAttr = (StringAttribute) mgr.getAttribute(ErrorAttributes.getMsgAttributeDefinition());
+			StringAttribute jobIdAttr = (StringAttribute) mgr.getAttribute(ElementAttributes.getIdAttributeDefinition());
+			if (codeAttr == null || msgAttr == null || jobIdAttr == null) {
+				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "TerminateJobErrorEvent: missing attibutes"));				
+			} else {
+				fireRuntimeTerminateJobErrorEvent(new RuntimeTerminateJobErrorEvent(codeAttr.getValue(), msgAttr.getValue(), jobIdAttr.getValue()));
+			}
+		} else {
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "TerminateJobErrorEvent: could not parse message"));				
+		}
 	}
 
 	/* (non-Javadoc)
