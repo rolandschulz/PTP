@@ -11,5 +11,9 @@
 
 package org.eclipse.ptp.rtsystem.events;
 
-public interface IRuntimeTerminateJobErrorEvent extends IRuntimeEvent {
+public interface IRuntimeTerminateJobErrorEvent extends IRuntimeErrorEvent {
+	/**
+	 * @return job ID
+	 */
+	public String getJobID();
 }

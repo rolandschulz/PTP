@@ -19,27 +19,6 @@
 
 package org.eclipse.ptp.rtsystem.proxy.event;
 
-import org.eclipse.ptp.core.elements.attributes.MessageAttributes;
-import org.eclipse.ptp.core.elements.attributes.MessageAttributes.Level;
-import org.eclipse.ptp.core.proxy.event.AbstractProxyEvent;
+public interface IProxyRuntimeErrorStateEvent extends IProxyRuntimeEvent {
 
-
-public class ProxyRuntimeMessageEvent extends AbstractProxyEvent 
-		implements IProxyRuntimeMessageEvent {
-
-	public ProxyRuntimeMessageEvent(int transID, String[] args) {
-		super(IProxyRuntimeEvent.PROXY_RUNTIME_MESSAGE_EVENT, transID, args);
-	}
-	
-	public ProxyRuntimeMessageEvent(Level level, String message) {
-		this(level, 0, message);
-	}
-
-	public ProxyRuntimeMessageEvent(Level level, int code, String message) {
-		super(IProxyRuntimeEvent.PROXY_RUNTIME_MESSAGE_EVENT, 0, new String[] {
-			MessageAttributes.getLevelAttributeDefinition().getId() + "=" + level.name(),
-			MessageAttributes.getCodeAttributeDefinition().getId() + "=" + code,
-			MessageAttributes.getTextAttributeDefinition().getId() + "=" + message
-		});
-	}
 }

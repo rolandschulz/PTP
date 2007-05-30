@@ -23,8 +23,8 @@ public class RuntimeSubmitJobErrorEvent
 		this.jobSubID = jobSubID;
 	}
 
-	/**
-	 * @return the jobSubID
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeSubmitJobErrorEvent#getJobSubID()
 	 */
 	public String getJobSubID() {
 		return jobSubID;

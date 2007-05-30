@@ -11,5 +11,6 @@
 
 package org.eclipse.ptp.rtsystem.events;
 
-public interface IRuntimeStartupErrorEvent extends IRuntimeErrorEvent {
+public interface IRuntimeErrorStateEvent extends IRuntimeEvent {
+
 }

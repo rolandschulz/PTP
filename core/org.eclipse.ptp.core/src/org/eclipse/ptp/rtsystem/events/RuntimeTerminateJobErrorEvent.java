@@ -23,8 +23,8 @@ public class RuntimeTerminateJobErrorEvent
 		this.jobID = jobID;
 	}
 
-	/**
-	 * @return the jobID
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeTerminateJobErrorEvent#getJobID()
 	 */
 	public String getJobID() {
 		return jobID;

@@ -21,6 +21,7 @@ package org.eclipse.ptp.rtsystem.proxy;
 
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeAttributeDefEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeConnectedStateEvent;
+import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeErrorStateEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeJobChangeEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeMachineChangeEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeMessageEvent;
@@ -45,28 +46,128 @@ import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeSubmitJobErrorEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeTerminateJobErrorEvent;
 
 public interface IProxyRuntimeEventListener {
-	public void handleProxyRuntimeAttributeDefEvent(IProxyRuntimeAttributeDefEvent e);
-	public void handleProxyRuntimeConnectedStateEvent(IProxyRuntimeConnectedStateEvent e);
-	public void handleProxyRuntimeJobChangeEvent(IProxyRuntimeJobChangeEvent e);
-	public void handleProxyRuntimeMachineChangeEvent(IProxyRuntimeMachineChangeEvent e);
-	public void handleProxyRuntimeMessageEvent(IProxyRuntimeMessageEvent e);
-	public void handleProxyRuntimeNewJobEvent(IProxyRuntimeNewJobEvent e);
-	public void handleProxyRuntimeNewMachineEvent(IProxyRuntimeNewMachineEvent e);
-	public void handleProxyRuntimeNewNodeEvent(IProxyRuntimeNewNodeEvent e);
-	public void handleProxyRuntimeNewProcessEvent(IProxyRuntimeNewProcessEvent e);
-	public void handleProxyRuntimeNewQueueEvent(IProxyRuntimeNewQueueEvent e);
-	public void handleProxyRuntimeNodeChangeEvent(IProxyRuntimeNodeChangeEvent e);	
-	public void handleProxyRuntimeProcessChangeEvent(IProxyRuntimeProcessChangeEvent e);	
-	public void handleProxyRuntimeQueueChangeEvent(IProxyRuntimeQueueChangeEvent e);
-	public void handleProxyRuntimeRemoveAllEvent(IProxyRuntimeRemoveAllEvent e);
-	public void handleProxyRuntimeRemoveJobEvent(IProxyRuntimeRemoveJobEvent e);
-	public void handleProxyRuntimeRemoveMachineEvent(IProxyRuntimeRemoveMachineEvent e);
-	public void handleProxyRuntimeRemoveNodeEvent(IProxyRuntimeRemoveNodeEvent e);
-	public void handleProxyRuntimeRemoveProcessEvent(IProxyRuntimeRemoveProcessEvent e);
-	public void handleProxyRuntimeRemoveQueueEvent(IProxyRuntimeRemoveQueueEvent e);
-	public void handleProxyRuntimeRunningStateEvent(IProxyRuntimeRunningStateEvent e);
-	public void handleProxyRuntimeShutdownStateEvent(IProxyRuntimeShutdownStateEvent e);
-	public void handleProxyRuntimeStartupErrorEvent(IProxyRuntimeStartupErrorEvent e);
-	public void handleProxyRuntimeSubmitJobErrorEvent(IProxyRuntimeSubmitJobErrorEvent e);
-	public void handleProxyRuntimeTerminateJobErrorEvent(IProxyRuntimeTerminateJobErrorEvent e);
+	/**
+	 * @param e
+	 */
+	public void handleEvent(IProxyRuntimeAttributeDefEvent e);
+	
+	/**
+	 * @param e
+	 */
+	public void handleEvent(IProxyRuntimeConnectedStateEvent e);
+	
+	/**
+	 * @param e
+	 */
+	public void handleEvent(IProxyRuntimeErrorStateEvent e);
+	
+	/**
+	 * @param e
+	 */
+	public void handleEvent(IProxyRuntimeJobChangeEvent e);
+	
+	/**
+	 * @param e
+	 */
+	public void handleEvent(IProxyRuntimeMachineChangeEvent e);
+	
+	/**
+	 * @param e
+	 */
+	public void handleEvent(IProxyRuntimeMessageEvent e);
+	
+	/**
+	 * @param e
+	 */
+	public void handleEvent(IProxyRuntimeNewJobEvent e);
+	
+	/**
+	 * @param e
+	 */
+	public void handleEvent(IProxyRuntimeNewMachineEvent e);
+	
+	/**
+	 * @param e
+	 */
+	public void handleEvent(IProxyRuntimeNewNodeEvent e);
+	
+	/**
+	 * @param e
+	 */
+	public void handleEvent(IProxyRuntimeNewProcessEvent e);
+	
+	/**
+	 * @param e
+	 */
+	public void handleEvent(IProxyRuntimeNewQueueEvent e);
+	
+	/**
+	 * @param e
+	 */
+	public void handleEvent(IProxyRuntimeNodeChangeEvent e);	
+	
+	/**
+	 * @param e
+	 */
+	public void handleEvent(IProxyRuntimeProcessChangeEvent e);	
+	
+	/**
+	 * @param e
+	 */
+	public void handleEvent(IProxyRuntimeQueueChangeEvent e);
+	
+	/**
+	 * @param e
+	 */
+	public void handleEvent(IProxyRuntimeRemoveAllEvent e);
+	
+	/**
+	 * @param e
+	 */
+	public void handleEvent(IProxyRuntimeRemoveJobEvent e);
+	
+	/**
+	 * @param e
+	 */
+	public void handleEvent(IProxyRuntimeRemoveMachineEvent e);
+	
+	/**
+	 * @param e
+	 */
+	public void handleEvent(IProxyRuntimeRemoveNodeEvent e);
+	
+	/**
+	 * @param e
+	 */
+	public void handleEvent(IProxyRuntimeRemoveProcessEvent e);
+	
+	/**
+	 * @param e
+	 */
+	public void handleEvent(IProxyRuntimeRemoveQueueEvent e);
+	
+	/**
+	 * @param e
+	 */
+	public void handleEvent(IProxyRuntimeRunningStateEvent e);
+	
+	/**
+	 * @param e
+	 */
+	public void handleEvent(IProxyRuntimeShutdownStateEvent e);
+	
+	/**
+	 * @param e
+	 */
+	public void handleEvent(IProxyRuntimeStartupErrorEvent e);
+	
+	/**
+	 * @param e
+	 */
+	public void handleEvent(IProxyRuntimeSubmitJobErrorEvent e);
+	
+	/**
+	 * @param e
+	 */
+	public void handleEvent(IProxyRuntimeTerminateJobErrorEvent e);
 }

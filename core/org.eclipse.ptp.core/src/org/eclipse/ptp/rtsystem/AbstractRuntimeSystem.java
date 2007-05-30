@@ -23,6 +23,7 @@ import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.rtsystem.events.IRuntimeAttributeDefinitionEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeConnectedStateEvent;
+import org.eclipse.ptp.rtsystem.events.IRuntimeErrorStateEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeJobChangeEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeMachineChangeEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeMessageEvent;
@@ -77,7 +78,7 @@ public abstract class AbstractRuntimeSystem implements IRuntimeSystem {
 	 */
 	protected void fireRuntimeMessageEvent(IRuntimeMessageEvent event) {
 		for (Object listener : listeners.getListeners()) {
-			((IRuntimeEventListener)listener).handleRuntimeMessageEvent(event);
+			((IRuntimeEventListener)listener).handleEvent(event);
 		}
 	}
 	
@@ -86,7 +87,7 @@ public abstract class AbstractRuntimeSystem implements IRuntimeSystem {
 	 */
 	protected void fireRuntimeAttributeDefinitionEvent(IRuntimeAttributeDefinitionEvent event) {
 		for (Object listener : listeners.getListeners()) {
-			((IRuntimeEventListener)listener).handleRuntimeAttributeDefinitionEvent(event);
+			((IRuntimeEventListener)listener).handleEvent(event);
 		}
 	}
 	
@@ -95,16 +96,25 @@ public abstract class AbstractRuntimeSystem implements IRuntimeSystem {
 	 */
 	protected void fireRuntimeConnectedStateEvent(IRuntimeConnectedStateEvent event) {
 		for (Object listener : listeners.getListeners()) {
-			((IRuntimeEventListener)listener).handleRuntimeConnectedStateEvent(event);
+			((IRuntimeEventListener)listener).handleEvent(event);
 		}
 	}
-
+	
+	/**
+	 * @param event
+	 */
+	protected void fireRuntimeErrorStateEvent(IRuntimeErrorStateEvent event) {
+		for (Object listener : listeners.getListeners()) {
+			((IRuntimeEventListener)listener).handleEvent(event);
+		}
+	}
+	
 	/**
 	 * @param event
 	 */
 	protected void fireRuntimeJobChangeEvent(IRuntimeJobChangeEvent event) {
 		for (Object listener : listeners.getListeners()) {
-			((IRuntimeEventListener)listener).handleRuntimeJobChangeEvent(event);
+			((IRuntimeEventListener)listener).handleEvent(event);
 		}
 	}
 
@@ -113,7 +123,7 @@ public abstract class AbstractRuntimeSystem implements IRuntimeSystem {
 	 */
 	protected void fireRuntimeMachineChangeEvent(IRuntimeMachineChangeEvent event) {
 		for (Object listener : listeners.getListeners()) {
-			((IRuntimeEventListener)listener).handleRuntimeMachineChangeEvent(event);
+			((IRuntimeEventListener)listener).handleEvent(event);
 		}
 	}
 
@@ -122,7 +132,7 @@ public abstract class AbstractRuntimeSystem implements IRuntimeSystem {
 	 */
 	protected void fireRuntimeNodeChangeEvent(IRuntimeNodeChangeEvent event) {
 		for (Object listener : listeners.getListeners()) {
-			((IRuntimeEventListener)listener).handleRuntimeNodeChangeEvent(event);
+			((IRuntimeEventListener)listener).handleEvent(event);
 		}
 	}
 
@@ -131,7 +141,7 @@ public abstract class AbstractRuntimeSystem implements IRuntimeSystem {
 	 */
 	protected void fireRuntimeProcessChangeEvent(IRuntimeProcessChangeEvent event) {
 		for (Object listener : listeners.getListeners()) {
-			((IRuntimeEventListener)listener).handleRuntimeProcessChangeEvent(event);
+			((IRuntimeEventListener)listener).handleEvent(event);
 		}
 	}
 	
@@ -140,7 +150,7 @@ public abstract class AbstractRuntimeSystem implements IRuntimeSystem {
 	 */
 	protected void fireRuntimeQueueChangeEvent(IRuntimeQueueChangeEvent event) {
 		for (Object listener : listeners.getListeners()) {
-			((IRuntimeEventListener)listener).handleRuntimeQueueChangeEvent(event);
+			((IRuntimeEventListener)listener).handleEvent(event);
 		}
 	}
 
@@ -149,7 +159,7 @@ public abstract class AbstractRuntimeSystem implements IRuntimeSystem {
 	 */
 	protected void fireRuntimeNewJobEvent(IRuntimeNewJobEvent event) {
 		for (Object listener : listeners.getListeners()) {
-			((IRuntimeEventListener)listener).handleRuntimeNewJobEvent(event);
+			((IRuntimeEventListener)listener).handleEvent(event);
 		}
 	}
 
@@ -158,7 +168,7 @@ public abstract class AbstractRuntimeSystem implements IRuntimeSystem {
 	 */
 	protected void fireRuntimeNewMachineEvent(IRuntimeNewMachineEvent event) {
 		for (Object listener : listeners.getListeners()) {
-			((IRuntimeEventListener)listener).handleRuntimeNewMachineEvent(event);
+			((IRuntimeEventListener)listener).handleEvent(event);
 		}
 	}
 
@@ -167,7 +177,7 @@ public abstract class AbstractRuntimeSystem implements IRuntimeSystem {
 	 */
 	protected void fireRuntimeNewNodeEvent(IRuntimeNewNodeEvent event) {
 		for (Object listener : listeners.getListeners()) {
-			((IRuntimeEventListener)listener).handleRuntimeNewNodeEvent(event);
+			((IRuntimeEventListener)listener).handleEvent(event);
 		}
 	}
 
@@ -176,7 +186,7 @@ public abstract class AbstractRuntimeSystem implements IRuntimeSystem {
 	 */
 	protected void fireRuntimeNewProcessEvent(IRuntimeNewProcessEvent event) {
 		for (Object listener : listeners.getListeners()) {
-			((IRuntimeEventListener)listener).handleRuntimeNewProcessEvent(event);
+			((IRuntimeEventListener)listener).handleEvent(event);
 		}
 	}
 	
@@ -185,7 +195,7 @@ public abstract class AbstractRuntimeSystem implements IRuntimeSystem {
 	 */
 	protected void fireRuntimeNewQueueEvent(IRuntimeNewQueueEvent event) {
 		for (Object listener : listeners.getListeners()) {
-			((IRuntimeEventListener)listener).handleRuntimeNewQueueEvent(event);
+			((IRuntimeEventListener)listener).handleEvent(event);
 		}
 	}
 	
@@ -194,7 +204,7 @@ public abstract class AbstractRuntimeSystem implements IRuntimeSystem {
 	 */
 	protected void fireRuntimeRemoveAllEvent(IRuntimeRemoveAllEvent event) {
 		for (Object listener : listeners.getListeners()) {
-			((IRuntimeEventListener)listener).handleRuntimeRemoveAllEvent(event);
+			((IRuntimeEventListener)listener).handleEvent(event);
 		}
 	}
 	
@@ -203,7 +213,7 @@ public abstract class AbstractRuntimeSystem implements IRuntimeSystem {
 	 */
 	protected void fireRuntimeRemoveJobEvent(IRuntimeRemoveJobEvent event) {
 		for (Object listener : listeners.getListeners()) {
-			((IRuntimeEventListener)listener).handleRuntimeRemoveJobEvent(event);
+			((IRuntimeEventListener)listener).handleEvent(event);
 		}
 	}
 	
@@ -212,7 +222,7 @@ public abstract class AbstractRuntimeSystem implements IRuntimeSystem {
 	 */
 	protected void fireRuntimeRemoveMachineEvent(IRuntimeRemoveMachineEvent event) {
 		for (Object listener : listeners.getListeners()) {
-			((IRuntimeEventListener)listener).handleRuntimeRemoveMachineEvent(event);
+			((IRuntimeEventListener)listener).handleEvent(event);
 		}
 	}
 	
@@ -221,7 +231,7 @@ public abstract class AbstractRuntimeSystem implements IRuntimeSystem {
 	 */
 	protected void fireRuntimeRemoveNodeEvent(IRuntimeRemoveNodeEvent event) {
 		for (Object listener : listeners.getListeners()) {
-			((IRuntimeEventListener)listener).handleRuntimeRemoveNodeEvent(event);
+			((IRuntimeEventListener)listener).handleEvent(event);
 		}
 	}
 	
@@ -230,7 +240,7 @@ public abstract class AbstractRuntimeSystem implements IRuntimeSystem {
 	 */
 	protected void fireRuntimeRemoveProcessEvent(IRuntimeRemoveProcessEvent event) {
 		for (Object listener : listeners.getListeners()) {
-			((IRuntimeEventListener)listener).handleRuntimeRemoveProcessEvent(event);
+			((IRuntimeEventListener)listener).handleEvent(event);
 		}
 	}
 	
@@ -239,7 +249,7 @@ public abstract class AbstractRuntimeSystem implements IRuntimeSystem {
 	 */
 	protected void fireRuntimeRemoveQueueEvent(IRuntimeRemoveQueueEvent event) {
 		for (Object listener : listeners.getListeners()) {
-			((IRuntimeEventListener)listener).handleRuntimeRemoveQueueEvent(event);
+			((IRuntimeEventListener)listener).handleEvent(event);
 		}
 	}
 	
@@ -248,7 +258,7 @@ public abstract class AbstractRuntimeSystem implements IRuntimeSystem {
 	 */
 	protected void fireRuntimeRunningStateEvent(IRuntimeRunningStateEvent event) {
 		for (Object listener : listeners.getListeners()) {
-			((IRuntimeEventListener)listener).handleRuntimeRunningStateEvent(event);
+			((IRuntimeEventListener)listener).handleEvent(event);
 		}
 	}
 
@@ -257,7 +267,7 @@ public abstract class AbstractRuntimeSystem implements IRuntimeSystem {
 	 */
 	protected void fireRuntimeShutdownStateEvent(IRuntimeShutdownStateEvent event) {
 		for (Object listener : listeners.getListeners()) {
-			((IRuntimeEventListener)listener).handleRuntimeShutdownStateEvent(event);
+			((IRuntimeEventListener)listener).handleEvent(event);
 		}
 	}
 
@@ -266,7 +276,7 @@ public abstract class AbstractRuntimeSystem implements IRuntimeSystem {
 	 */
 	protected void fireRuntimeStartupErrorEvent(IRuntimeStartupErrorEvent event) {
 		for (Object listener : listeners.getListeners()) {
-			((IRuntimeEventListener)listener).handleRuntimeStartupErrorEvent(event);
+			((IRuntimeEventListener)listener).handleEvent(event);
 		}
 	}
 
@@ -275,7 +285,7 @@ public abstract class AbstractRuntimeSystem implements IRuntimeSystem {
 	 */
 	protected void fireRuntimeSubmitJobErrorEvent(IRuntimeSubmitJobErrorEvent event) {
 		for (Object listener : listeners.getListeners()) {
-			((IRuntimeEventListener)listener).handleRuntimeSubmitJobErrorEvent(event);
+			((IRuntimeEventListener)listener).handleEvent(event);
 		}
 	}
 
@@ -284,7 +294,7 @@ public abstract class AbstractRuntimeSystem implements IRuntimeSystem {
 	 */
 	protected void fireRuntimeTerminateJobErrorEvent(IRuntimeTerminateJobErrorEvent event) {
 		for (Object listener : listeners.getListeners()) {
-			((IRuntimeEventListener)listener).handleRuntimeTerminateJobErrorEvent(event);
+			((IRuntimeEventListener)listener).handleEvent(event);
 		}
 	}
 }

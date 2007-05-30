@@ -11,5 +11,9 @@
 
 package org.eclipse.ptp.rtsystem.events;
 
-public interface IRuntimeSubmitJobErrorEvent extends IRuntimeEvent {
+public interface IRuntimeSubmitJobErrorEvent extends IRuntimeErrorEvent {
+	/**
+	 * @return job submission ID
+	 */
+	public String getJobSubID();
 }
