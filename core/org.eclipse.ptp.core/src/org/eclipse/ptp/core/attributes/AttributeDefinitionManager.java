@@ -24,7 +24,8 @@ import java.util.HashMap;
 
 public class AttributeDefinitionManager {
 
-	private final HashMap<String, IAttributeDefinition> attributeDefs = new HashMap<String, IAttributeDefinition>();
+	private final HashMap<String, IAttributeDefinition<?,?,?>> attributeDefs =
+		new HashMap<String, IAttributeDefinition<?,?,?>>();
 	
 	public AttributeDefinitionManager() {
 	}
@@ -34,7 +35,7 @@ public class AttributeDefinitionManager {
 	 * 
 	 * @param attr
 	 */
-	public void setAttributeDefinition(IAttributeDefinition attrDef) {
+	public void setAttributeDefinition(IAttributeDefinition<?,?,?> attrDef) {
 		if (!attributeDefs.containsKey(attrDef.getId())) {
 			attributeDefs.put(attrDef.getId(), attrDef);
 		}
@@ -43,8 +44,8 @@ public class AttributeDefinitionManager {
 	/**
 	 * @param attrDefs
 	 */
-	public void setAttributeDefinitions(IAttributeDefinition[] attrDefs) {
-		for (IAttributeDefinition attrDef : attrDefs) {
+	public void setAttributeDefinitions(IAttributeDefinition<?,?,?>[] attrDefs) {
+		for (IAttributeDefinition<?,?,?> attrDef : attrDefs) {
 			setAttributeDefinition(attrDef);
 		}
 	}
@@ -55,7 +56,7 @@ public class AttributeDefinitionManager {
 	 * @param attrId
 	 * @return attribute definition
 	 */
-	public IAttributeDefinition getAttributeDefinition(String attrId) {
+	public IAttributeDefinition<?,?,?> getAttributeDefinition(String attrId) {
 		return attributeDefs.get(attrId);
 	}
 	

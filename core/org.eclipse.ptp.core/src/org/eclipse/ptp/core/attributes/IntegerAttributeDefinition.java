@@ -19,7 +19,8 @@
 package org.eclipse.ptp.core.attributes;
 
 
-public final class IntegerAttributeDefinition extends AbstractAttributeDefinition implements IAttributeDefinition {
+public final class IntegerAttributeDefinition
+extends AbstractAttributeDefinition<Integer,IntegerAttribute,IntegerAttributeDefinition> {
 
 	private Integer minValue = 0;
 	private Integer maxValue = Integer.MAX_VALUE;

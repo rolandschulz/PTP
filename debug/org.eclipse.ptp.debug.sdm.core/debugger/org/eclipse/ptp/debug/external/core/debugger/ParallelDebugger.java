@@ -19,13 +19,13 @@
 package org.eclipse.ptp.debug.external.core.debugger;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.eclipse.cdt.debug.core.cdi.ICDICondition;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.ptp.core.attributes.ArrayAttribute;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
@@ -107,14 +107,13 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
 	public void startDebugger(IPJob job) throws CoreException {
 		try {
 			String app = job.getAttribute(JobAttributes.getExecutableNameAttributeDefinition()).getValueAsString();
 			String path = job.getAttribute(JobAttributes.getExecutablePathAttributeDefinition()).getValueAsString();
 			String dir = job.getAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition()).getValueAsString();
-			String[] args = ((ArrayAttribute<String>)job.getAttribute(JobAttributes.getProgramArgumentsAttributeDefinition())).getValue();
-			proxy.debugStartSession(app, path, dir, args);
+			List<String> args = job.getAttribute(JobAttributes.getProgramArgumentsAttributeDefinition()).getValue();
+			proxy.debugStartSession(app, path, dir, args.toArray(new String[0]));
 		} catch (IOException e) {
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugCorePlugin.getUniqueIdentifier(), IStatus.ERROR, "Cannot start debugger", e));
 		}

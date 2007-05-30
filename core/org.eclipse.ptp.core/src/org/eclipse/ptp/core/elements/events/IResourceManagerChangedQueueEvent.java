@@ -28,7 +28,7 @@ public interface IResourceManagerChangedQueueEvent {
 	/**
 	 * @return
 	 */
-	public Collection<IAttribute> getAttributes();
+	public Collection<? extends IAttribute<?, ?, ?>> getAttributes();
 	
 	/**
 	 * @return the changed queue

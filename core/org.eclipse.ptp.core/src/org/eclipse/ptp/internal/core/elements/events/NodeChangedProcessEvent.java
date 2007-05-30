@@ -34,18 +34,19 @@ public class NodeChangedProcessEvent implements INodeChangedProcessEvent {
 
 	private final IPNode node;
 	private final IPProcess process;
-	private final Collection<IAttribute> attributes;
+	private final Collection<? extends IAttribute<?, ?, ?>> attributes;
 	
-	public NodeChangedProcessEvent(IPNode node, IPProcess process, Collection<IAttribute> attrs) {
+	public NodeChangedProcessEvent(IPNode node, IPProcess process,
+			Collection<? extends IAttribute<?, ?, ?>> collection) {
 		this.node = node;
 		this.process = process;
-		this.attributes = attrs;
+		this.attributes = collection;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.events.INodeChangedProcessEvent#getAttributes()
 	 */
-	public Collection<IAttribute> getAttributes() {
+	public Collection<? extends IAttribute<?, ?, ?>> getAttributes() {
 		return attributes;
 	}
 

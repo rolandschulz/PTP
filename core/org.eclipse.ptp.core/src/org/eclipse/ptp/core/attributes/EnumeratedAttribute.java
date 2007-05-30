@@ -27,7 +27,8 @@ import java.util.List;
  * @author rsqrd
  *
  */
-public final class EnumeratedAttribute<E extends Enum<E>> extends AbstractAttribute<EnumeratedAttribute<E>> {
+public final class EnumeratedAttribute<E extends Enum<E>>
+extends AbstractAttribute<E, EnumeratedAttribute<E>, EnumeratedAttributeDefinition<E>> {
 
 	private E value;
 
@@ -50,7 +51,7 @@ public final class EnumeratedAttribute<E extends Enum<E>> extends AbstractAttrib
 	public EnumeratedAttribute(EnumeratedAttributeDefinition<E> definition,
 			String valueString) throws IllegalValueException {
 		super(definition);
-		setValue(valueString);
+		setValueAsString(valueString);
 	}
 
 	/**
@@ -58,7 +59,7 @@ public final class EnumeratedAttribute<E extends Enum<E>> extends AbstractAttrib
 	 * @param enumerations
 	 * @param value
 	 */
-	public EnumeratedAttribute(IAttributeDefinition definition, E value) {
+	public EnumeratedAttribute(EnumeratedAttributeDefinition<E> definition, E value) {
 		super(definition);
 		setValue(value);
 	}
@@ -67,7 +68,6 @@ public final class EnumeratedAttribute<E extends Enum<E>> extends AbstractAttrib
      * @return
      */
     public EnumeratedAttributeDefinition<E> getEnumAttrDefinition() {
-        @SuppressWarnings("unchecked")
         EnumeratedAttributeDefinition<E> attributeDefinition = (EnumeratedAttributeDefinition<E>) getDefinition();
         return attributeDefinition;
     }
@@ -140,7 +140,7 @@ public final class EnumeratedAttribute<E extends Enum<E>> extends AbstractAttrib
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.attributes.IAttribute#setValue(java.lang.String)
 	 */
-	public void setValue(String string) throws IllegalValueException {
+	public void setValueAsString(String string) throws IllegalValueException {
 		Class<E> enumClass = getEnumAttrDefinition().getEnumClass();
         E eval;
         try {

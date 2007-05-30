@@ -49,11 +49,11 @@ public class JobRunConfiguration {
 	protected String debuggerPath;
 	protected String[] debuggerArgs;
 	protected boolean isDebugJob;
-	protected IAttribute[] launchAttributes;
+	protected IAttribute<?,?,?>[] launchAttributes;
 	protected String queueName;
 	
 	public JobRunConfiguration(String exe, String exePath, String resourceManager,
-			String queue, IAttribute[] launchAttributes,
+			String queue, IAttribute<?,?,?>[] launchAttributes,
 			String[] args, String[] env,
 			String dir)
 	{
@@ -145,7 +145,7 @@ public class JobRunConfiguration {
 				"isDebug?\t\t"+isDebugJob;
 	}
 
-	public IAttribute[] getLaunchAttributes() {
+	public IAttribute<?,?,?>[] getLaunchAttributes() {
 		return launchAttributes;
 	}
 }

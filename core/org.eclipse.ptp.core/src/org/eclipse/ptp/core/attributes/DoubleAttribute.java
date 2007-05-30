@@ -18,18 +18,19 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.attributes;
 
-public final class DoubleAttribute extends AbstractAttribute<DoubleAttribute> {
+public final class DoubleAttribute
+extends AbstractAttribute<Double,DoubleAttribute,DoubleAttributeDefinition> {
 
 	private Double value;
 
-	public DoubleAttribute(IAttributeDefinition description, Double initialValue) throws IllegalValueException {
+	public DoubleAttribute(DoubleAttributeDefinition description, Double initialValue) throws IllegalValueException {
 		super(description);
 		setValue(initialValue);
 	}
 
-	public DoubleAttribute(IAttributeDefinition description, String initialValue) throws IllegalValueException {
+	public DoubleAttribute(DoubleAttributeDefinition description, String initialValue) throws IllegalValueException {
 		super(description);
-		setValue(initialValue);
+		setValueAsString(initialValue);
 	}
 
 	public Double getValue() {
@@ -57,7 +58,7 @@ public final class DoubleAttribute extends AbstractAttribute<DoubleAttribute> {
 		this.value = value;
 	}
 
-	public void setValue(String string) throws IllegalValueException {
+	public void setValueAsString(String string) throws IllegalValueException {
 		try {
 			Double value = Double.valueOf(string);
 			if (value.doubleValue() < getMinValue() || value.doubleValue() > getMaxValue()) {

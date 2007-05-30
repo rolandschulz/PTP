@@ -32,6 +32,6 @@ public interface INodeChangedEvent {
 	/**
 	 * @return
 	 */
-	public Collection<IAttribute> getAttributes();
+	public Collection<? extends IAttribute<?, ?, ?>> getAttributes();
 
 }

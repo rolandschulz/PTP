@@ -52,7 +52,7 @@ IAdaptable, IResourceManagerMenuContribution {
 	 * @param attrId
 	 * @return
 	 */
-	public IAttributeDefinition getAttributeDefinition(String attrId);
+	public IAttributeDefinition<?,?,?> getAttributeDefinition(String attrId);
 
 	/**
 	 * @return

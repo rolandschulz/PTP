@@ -34,7 +34,7 @@ public class LSFResourceManagerConfigurationWizardPageFactory extends
 		return new RMConfigurationWizardPage[]{new LSFResourceManagerConfigurationWizardPage(wizard)};
 	}
 
-	public Class getRMFactoryClass() {
+	public Class<LSFResourceManagerFactory> getRMFactoryClass() {
 		return LSFResourceManagerFactory.class;
 	}
 }

@@ -40,6 +40,7 @@ import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute;
+import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPNode;
 import org.eclipse.ptp.core.elements.IPProcess;
@@ -620,7 +621,7 @@ public class ParallelMachinesView extends AbstractParallelSetView implements
 		nodeAttrTableViewer.setLabelProvider(new ITableLabelProvider() {
 			public String getColumnText(Object element, int columnIndex) {
 				if (element instanceof IAttribute) {
-					IAttribute attr = (IAttribute) element;
+					IAttribute<?,?,?> attr = (IAttribute<?,?,?>) element;
 					switch (columnIndex) {
 					case 0:
 						return attr.getDefinition().getName();
@@ -657,7 +658,11 @@ public class ParallelMachinesView extends AbstractParallelSetView implements
 		});
 		nodeAttrTableViewer.setSorter(new ViewerSorter() {
 			public int compare(Viewer viewer, Object a1, Object a2) {
-				return ((IAttribute)a1).getDefinition().getName().compareTo(((IAttribute)a2).getDefinition().getName());
+				final IAttribute<?,?,?> attr1 = (IAttribute<?,?,?>)a1;
+				final IAttribute<?,?,?> attr2 = (IAttribute<?,?,?>)a2;
+				final IAttributeDefinition<?, ?, ?> def1 = attr1.getDefinition();
+				final IAttributeDefinition<?, ?, ?> def2 = attr2.getDefinition();
+				return def1.compareTo(def2);
 			}
 		});
 		nodeAttrTableViewer.setInput(manager);
@@ -772,11 +777,11 @@ public class ParallelMachinesView extends AbstractParallelSetView implements
 		machineTableViewer = new TableViewer(upperSashForm, SWT.SINGLE | SWT.BORDER);
 		machineTableViewer.getTable().setLayoutData(new GridData(GridData.FILL_BOTH));
 		machineTableViewer.setLabelProvider(new LabelProvider() {
-			@SuppressWarnings("unchecked")
 			public Image getImage(Object element) {
 				if (element instanceof IPMachine) {
 					IPMachine machine = (IPMachine) element;
-					EnumeratedAttribute<MachineAttributes.State> attr = (EnumeratedAttribute<MachineAttributes.State>)machine.getAttribute(MachineAttributes.getStateAttributeDefinition());
+					EnumeratedAttribute<MachineAttributes.State> attr = 
+						machine.getAttribute(MachineAttributes.getStateAttributeDefinition());
 					if (attr != null) {
 						return ParallelImages.machineImages[attr.getValueIndex()];
 					}

@@ -250,14 +250,13 @@ public abstract class AbstractParallelLaunchConfigurationDelegate
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.listeners.IQueueJobListener#handleEvent(org.eclipse.ptp.core.elements.events.IQueueChangedJobEvent)
 	 */
-	@SuppressWarnings("unchecked")
 	public void handleEvent(IQueueChangedJobEvent e) {
 		/*
 		 * If the job state has changed to running, find the JobSubmission that 
 		 * corresponds to this job and perform remainder of job launch actions
 		 */
 		
-		for (IAttribute attr : e.getAttributes()) {
+		for (IAttribute<?,?,?> attr : e.getAttributes()) {
 			if (attr.getDefinition() == JobAttributes.getStateAttributeDefinition() &&
 					((EnumeratedAttribute<JobAttributes.State>)attr).getValue() == JobAttributes.State.RUNNING) {
 				IPJob job = e.getJob();
@@ -292,7 +291,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate
 	 * @return IAttribute[]
 	 * @throws CoreException
 	 */
-	private IAttribute[] getLaunchAttributes(ILaunchConfiguration configuration)
+	private IAttribute<?,?,?>[] getLaunchAttributes(ILaunchConfiguration configuration)
 		throws CoreException {
 
 		String queueName = getQueueName(configuration);	

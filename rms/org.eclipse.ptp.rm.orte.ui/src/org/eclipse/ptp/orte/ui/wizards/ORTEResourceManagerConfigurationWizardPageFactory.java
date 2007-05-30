@@ -34,7 +34,7 @@ public class ORTEResourceManagerConfigurationWizardPageFactory extends
 		return new RMConfigurationWizardPage[]{new ORTEResourceManagerConfigurationWizardPage(wizard)};
 	}
 
-	public Class getRMFactoryClass() {
+	public Class<ORTEResourceManagerFactory> getRMFactoryClass() {
 		return ORTEResourceManagerFactory.class;
 	}
 }

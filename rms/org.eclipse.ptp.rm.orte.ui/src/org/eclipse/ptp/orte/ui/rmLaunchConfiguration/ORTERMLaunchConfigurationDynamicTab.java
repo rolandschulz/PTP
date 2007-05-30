@@ -114,7 +114,7 @@ public class ORTERMLaunchConfigurationDynamicTab extends
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab#getAttributes(org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue, org.eclipse.debug.core.ILaunchConfiguration)
 	 */
-	public IAttribute[] getAttributes(IResourceManager rm, IPQueue queue,
+	public IAttribute<?,?,?>[] getAttributes(IResourceManager rm, IPQueue queue,
 			ILaunchConfiguration configuration) throws CoreException {
 		int numProcs = configuration.getAttribute(ATTR_NUMPROCS, -1);
 		IntegerAttribute iattr = null;

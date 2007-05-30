@@ -47,7 +47,7 @@ public class PQueue extends Parent implements IPQueueControl, IJobListener {
 	private final ListenerList elementListeners = new ListenerList();
 	private final ListenerList childListeners = new ListenerList();
 
-	public PQueue(String id, IResourceManagerControl rm, IAttribute[] attrs) {
+	public PQueue(String id, IResourceManagerControl rm, IAttribute<?,?,?>[] attrs) {
 		super(id, rm, P_QUEUE, attrs);
 	}
 
@@ -153,7 +153,7 @@ public class PQueue extends Parent implements IPQueueControl, IJobListener {
 	/**
 	 * @param attrs
 	 */
-	private void fireChangedQueue(Collection<IAttribute> attrs) {
+	private void fireChangedQueue(Collection<? extends IAttribute<?,?,?>> attrs) {
 		IQueueChangedEvent e = 
 			new QueueChangedEvent(this, attrs);
 		
@@ -190,7 +190,7 @@ public class PQueue extends Parent implements IPQueueControl, IJobListener {
 	 * @see org.eclipse.ptp.internal.core.elements.PElement#doAddAttributeHook(java.util.List)
 	 */
 	@Override
-	protected void doAddAttributeHook(List<IAttribute> attrs) {
+	protected void doAddAttributeHook(List<? extends IAttribute<?,?,?>> attrs) {
 		fireChangedQueue(attrs);
 	}
 

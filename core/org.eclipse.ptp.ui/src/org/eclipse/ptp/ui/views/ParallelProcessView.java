@@ -253,9 +253,8 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 	 */
 	public void handleEvent(final IProcessChangedEvent e) {
 		UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
-			@SuppressWarnings("unchecked")
 			public void run() {
-				for (IAttribute attr : e.getAttributes()) {
+				for (IAttribute<?,?,?> attr : e.getAttributes()) {
 					String id = attr.getDefinition().getId();
 					if (id.equals(ProcessAttributes.getStateAttributeDefinition().getId())) {
 						ProcessAttributes.State state = (State)((EnumeratedAttribute<State>)attr).getValue();

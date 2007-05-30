@@ -24,7 +24,7 @@ import java.util.List;
 
 
 public final class EnumeratedAttributeDefinition<E extends Enum<E>>
-extends AbstractAttributeDefinition {
+extends AbstractAttributeDefinition<E,EnumeratedAttribute<E>,EnumeratedAttributeDefinition<E>> {
 
 	private final E defaultValue;
 	final Class<E> enumClass;
@@ -33,7 +33,6 @@ extends AbstractAttributeDefinition {
 			final String name,
 			final String description, final E defaultValueIn) {
 		super(uniqueId, name, description);
-	    @SuppressWarnings("unchecked")
 		final Class<E> eClass = (Class<E>) defaultValueIn.getClass();
         this.enumClass = eClass;
 		this.defaultValue = defaultValueIn;

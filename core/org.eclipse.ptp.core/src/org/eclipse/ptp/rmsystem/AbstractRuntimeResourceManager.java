@@ -139,7 +139,7 @@ public abstract class AbstractRuntimeResourceManager extends
 	 * are only allowed during the initialization phase.
 	 */
 	public void handleRuntimeAttributeDefinitionEvent(IRuntimeAttributeDefinitionEvent e) {
-		for (IAttributeDefinition attr : e.getDefinitions()) {
+		for (IAttributeDefinition<?,?,?> attr : e.getDefinitions()) {
 			getAttributeDefinitionManager().setAttributeDefinition(attr);
 		}
 	}

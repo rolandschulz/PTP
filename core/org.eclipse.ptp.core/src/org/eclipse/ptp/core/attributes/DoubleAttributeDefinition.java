@@ -19,7 +19,8 @@
 package org.eclipse.ptp.core.attributes;
 
 
-public final class DoubleAttributeDefinition extends AbstractAttributeDefinition implements IAttributeDefinition {
+public final class DoubleAttributeDefinition
+extends AbstractAttributeDefinition<Double,DoubleAttribute,DoubleAttributeDefinition> {
 
 	private Double minValue = Double.NEGATIVE_INFINITY;
 	private Double maxValue = Double.POSITIVE_INFINITY;

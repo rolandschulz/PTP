@@ -35,17 +35,18 @@ public class JobChangedProcessEvent implements IJobChangedProcessEvent {
 	private final IPJob job;
 
 	private final IPProcess process;
-	private final Collection<IAttribute> attributes;
-	public JobChangedProcessEvent(IPJob job, IPProcess process, Collection<IAttribute> attrs) {
+	private final Collection<? extends IAttribute<?, ?, ?>> attributes;
+	public JobChangedProcessEvent(IPJob job, IPProcess process,
+			Collection<? extends IAttribute<?, ?, ?>> collection) {
 		this.job = job;
 		this.process = process;
-		this.attributes = attrs;
+		this.attributes = collection;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.events.IJobChangedProcessEvent#getAttributes()
 	 */
-	public Collection<IAttribute> getAttributes() {
+	public Collection<? extends IAttribute<?, ?, ?>> getAttributes() {
 		return attributes;
 	}
 

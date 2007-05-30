@@ -32,9 +32,9 @@ import org.eclipse.ptp.core.elements.events.INodeChangedEvent;
 public class NodeChangedEvent implements INodeChangedEvent {
 
 	private final IPNode node;
-	private final Collection<IAttribute> attributes;
+	private final Collection<? extends IAttribute<?, ?, ?>> attributes;
 
-	public NodeChangedEvent(IPNode node, Collection<IAttribute> attrs) {
+	public NodeChangedEvent(IPNode node, Collection<? extends IAttribute<?, ?, ?>> attrs) {
 		this.node = node;
 		this.attributes = attrs;
 	}
@@ -42,7 +42,7 @@ public class NodeChangedEvent implements INodeChangedEvent {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.events.INodeChangedEvent#getAttributes()
 	 */
-	public Collection<IAttribute> getAttributes() {
+	public Collection<? extends IAttribute<?, ?, ?>> getAttributes() {
 		return attributes;
 	}
 

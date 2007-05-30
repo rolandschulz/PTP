@@ -82,7 +82,8 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		/*
 		 * Find number of processes in job. If the attribute does not exist, assume one process.
 		 */
-		IntegerAttribute numProcAttr = (IntegerAttribute)job.getAttribute(JobAttributes.getNumberOfProcessesAttributeDefinition());
+		IntegerAttribute numProcAttr = 
+			job.getAttribute(JobAttributes.getNumberOfProcessesAttributeDefinition());
 		if (numProcAttr != null) {
 			this.jobSize = numProcAttr.getValue();
 		} else {

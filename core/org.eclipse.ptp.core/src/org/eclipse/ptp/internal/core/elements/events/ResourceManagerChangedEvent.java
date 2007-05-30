@@ -32,9 +32,10 @@ import org.eclipse.ptp.core.elements.events.IResourceManagerChangedEvent;
 public class ResourceManagerChangedEvent implements IResourceManagerChangedEvent {
 
 	private final IResourceManager rm;
-	private final Collection<IAttribute> attributes;
+	private final Collection<? extends IAttribute<?,?,?>> attributes;
 
-	public ResourceManagerChangedEvent(IResourceManager rm, Collection<IAttribute> attrs) {
+	public ResourceManagerChangedEvent(IResourceManager rm,
+			Collection<? extends IAttribute<?,?,?>> attrs) {
 		this.rm = rm;
 		this.attributes = attrs;
 	}
@@ -42,7 +43,7 @@ public class ResourceManagerChangedEvent implements IResourceManagerChangedEvent
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.events.IResourceManagerChangedEvent#getAttributes()
 	 */
-	public Collection<IAttribute> getAttributes() {
+	public Collection<? extends IAttribute<?,?,?>> getAttributes() {
 		return attributes;
 	}
 

@@ -31,7 +31,7 @@ public class PElementPropertySource implements IPropertySource {
 
 	public PElementPropertySource(IPElement pelement) {
 		this.pelement = pelement;
-		IAttributeDefinition[] attrDefs = pelement.getAttributeKeys();
+		IAttributeDefinition<?,?,?>[] attrDefs = pelement.getAttributeKeys();
         String[] keys = new String[attrDefs.length];
         for (int i = 0; i < attrDefs.length; i++) {
         	keys[i] = attrDefs[i].getId();

@@ -39,7 +39,7 @@ public class ElementAttributes {
 		return nameAttributeDefinition;
 	}
 
-	public static IAttributeDefinition[] getDefaultAttributeDefinitions() {
+	public static IAttributeDefinition<?,?,?>[] getDefaultAttributeDefinitions() {
 		return new IAttributeDefinition[]{
 				idAttributeDefinition, 
 				nameAttributeDefinition

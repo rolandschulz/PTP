@@ -35,7 +35,7 @@ public abstract class Parent extends PElement {
 		Arrays.sort(elements);
 	}
 
-	public Parent(String id, IPElementControl parent, int type, IAttribute[] attrs) {
+	public Parent(String id, IPElementControl parent, int type, IAttribute<?,?,?>[] attrs) {
 		super(id, parent, type, attrs);
 	}
 

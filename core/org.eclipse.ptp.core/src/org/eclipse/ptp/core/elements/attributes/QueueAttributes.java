@@ -44,7 +44,7 @@ public class QueueAttributes {
 		return idAttrDef;
 	}
 	
-	public static IAttributeDefinition[] getDefaultAttributeDefinitions() {
+	public static IAttributeDefinition<?,?,?>[] getDefaultAttributeDefinitions() {
 		return new IAttributeDefinition[]{stateAttrDef, idAttrDef};
 	}
 }

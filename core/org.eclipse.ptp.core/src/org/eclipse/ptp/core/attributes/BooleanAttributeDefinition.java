@@ -19,7 +19,8 @@
 package org.eclipse.ptp.core.attributes;
 
 
-public final class BooleanAttributeDefinition extends AbstractAttributeDefinition implements IAttributeDefinition {
+public final class BooleanAttributeDefinition
+extends AbstractAttributeDefinition<Boolean,BooleanAttribute,BooleanAttributeDefinition> {
 
 	private Boolean defaultValue;
 	

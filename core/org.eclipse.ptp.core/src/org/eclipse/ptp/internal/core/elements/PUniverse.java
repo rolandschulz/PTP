@@ -22,6 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.ptp.core.attributes.IAttribute;
+import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IResourceManager;
@@ -29,8 +30,8 @@ import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
 
 public class PUniverse extends PElement implements IPUniverseControl {
 	private static final int RMID_SHIFT = 24;
-	private static IAttribute[] getDefaultAttributes(String name) {
-		IAttribute nameAttr = ElementAttributes.getNameAttributeDefinition().create(name);
+	private static IAttribute<?,?,?>[] getDefaultAttributes(String name) {
+		StringAttribute nameAttr = ElementAttributes.getNameAttributeDefinition().create(name);
 		return new IAttribute[]{nameAttr};
 	}
 	private int nextResourceManagerId = 1;
@@ -106,6 +107,6 @@ public class PUniverse extends PElement implements IPUniverseControl {
 	 * @see org.eclipse.ptp.internal.core.elements.PElement#doAddAttributeHook(java.util.List)
 	 */
 	@Override
-	protected void doAddAttributeHook(List<IAttribute> attrs) {
+	protected void doAddAttributeHook(List<? extends IAttribute<?,?,?>> attrs) {
 	}
 }

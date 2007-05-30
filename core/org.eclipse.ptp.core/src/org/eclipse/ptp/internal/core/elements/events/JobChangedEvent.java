@@ -32,9 +32,9 @@ import org.eclipse.ptp.core.elements.events.IJobChangedEvent;
 public class JobChangedEvent implements IJobChangedEvent {
 
 	private final IPJob job;
-	private final Collection<IAttribute> attributes;
+	private final Collection<? extends IAttribute<?, ?, ?>> attributes;
 
-	public JobChangedEvent(IPJob job, Collection<IAttribute> attrs) {
+	public JobChangedEvent(IPJob job, Collection<? extends IAttribute<?, ?, ?>> attrs) {
 		this.job = job;
 		this.attributes = attrs;
 	}
@@ -42,7 +42,7 @@ public class JobChangedEvent implements IJobChangedEvent {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.events.IJobChangedEvent#getAttributes()
 	 */
-	public Collection<IAttribute> getAttributes() {
+	public Collection<? extends IAttribute<?, ?, ?>> getAttributes() {
 		return attributes;
 	}
 

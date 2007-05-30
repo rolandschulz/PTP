@@ -36,7 +36,7 @@ public class ResourceManagerAttributes {
 		return stateAttrDef;
 	}
 	
-	public static IAttributeDefinition[] getDefaultAttributeDefinitions() {
+	public static IAttributeDefinition<?,?,?>[] getDefaultAttributeDefinitions() {
 		return new IAttributeDefinition[]{stateAttrDef};
 	}
 }

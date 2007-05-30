@@ -12,6 +12,7 @@ package org.eclipse.ptp.core.attributes;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -23,18 +24,19 @@ import java.util.Set;
  *
  */
 public class AttributeManager {
-	private Map<IAttributeDefinition, IAttribute>	map = new HashMap<IAttributeDefinition, IAttribute>();
+	private Map<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>> map = 
+		new HashMap<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>>();
 	
 	public AttributeManager() {
 	}
 	
-	public AttributeManager(IAttribute[] attrs) {
-		for (IAttribute attr : attrs) {
+	public AttributeManager(IAttribute<?,?,?>[] attrs) {
+		for (IAttribute<?,?,?> attr : attrs) {
 			addAttribute(attr);
 		}
 	}
 
-	public void addAttribute(IAttribute attr) {
+	public void addAttribute(IAttribute<?,?,?> attr) {
 		map.put(attr.getDefinition(), attr);
 	}
 
@@ -45,23 +47,32 @@ public class AttributeManager {
 	 * 
 	 * @param attrs
 	 */
-	public void addAttributes(IAttribute[] attrs) {
-		for (IAttribute attr : attrs) {
-			IAttributeDefinition def = attr.getDefinition();
+	public void addAttributes(IAttribute<?,?,?>[] attrs) {
+		for (IAttribute<?,?,?> attr : attrs) {
+			IAttributeDefinition<?,?,?> def = attr.getDefinition();
 			if (map.containsKey(def) && attr instanceof ArrayAttribute) {
-				@SuppressWarnings("unchecked")
-				ArrayAttribute exAttr = (ArrayAttribute)map.get(def);
-				@SuppressWarnings("unchecked")
-				final Comparable[] value = ((ArrayAttribute)attr).getValue();
-				exAttr.addAll(value);
+				ArrayAttribute<?> arrAttr = (ArrayAttribute<?>) attr;
+				addAttributeToArrayAttribute(arrAttr);
 			} else {
 				addAttribute(attr);
 			}
 		}
 	}
 
-	public IAttribute getAttribute(String id) {
-		for (Map.Entry<IAttributeDefinition, IAttribute> entry : map.entrySet()) {
+	/**
+	 * @param attr
+	 * @param def
+	 */
+	private <T extends Comparable<? super T>>
+	void addAttributeToArrayAttribute(ArrayAttribute<T> attr) {
+		ArrayAttributeDefinition<T> def = attr.getDefinition();
+		ArrayAttribute<T> exAttr = (ArrayAttribute<T>)map.get(def);
+		final List<T> value = attr.getValue();
+		exAttr.addAll(value);
+	}
+
+	public IAttribute<?,?,?> getAttribute(String id) {
+		for (Map.Entry<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>> entry : map.entrySet()) {
 			if (entry.getKey().getId().equals(id)) {
 				return entry.getValue();
 			}
@@ -69,34 +80,34 @@ public class AttributeManager {
 		return null;
 	}
 	
-	public IAttribute getAttribute(IAttributeDefinition def) {
-		return getAttribute(def.getId());
+	public <T, A extends IAttribute<T,A,D>, D extends IAttributeDefinition<T,A,D>>
+	A getAttribute(D def) {
+		return (A) this.getAttribute(def.getId());
 	}
 
-	public IAttribute[] getAttributes() {
+	public IAttribute<?,?,?>[] getAttributes() {
 		return map.values().toArray(new IAttribute[map.size()]);
 	}
 	
-	public Map<IAttributeDefinition, IAttribute> getMap() {
+	public Map<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>> getMap() {
 		return map;
 	}
 	
-	public Set<IAttributeDefinition> getKeySet() {
+	public Set<IAttributeDefinition<?,?,?>> getKeySet() {
 		return map.keySet();
 	}
 	
-	public void removeAttribute(IAttribute attr) {
+	public void removeAttribute(IAttribute<?,?,?> attr) {
 		map.remove(attr.getDefinition());
 	}
 	
 	public String[] toStringArray() {
 		ArrayList<String> res = new ArrayList<String>();
 		
-		for (Map.Entry<IAttributeDefinition, IAttribute> entry : map.entrySet()) {
-			IAttribute attr = entry.getValue();
+		for (Map.Entry<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>> entry : map.entrySet()) {
+			IAttribute<?,?,?> attr = entry.getValue();
 			if (attr instanceof ArrayAttribute) {
-				@SuppressWarnings("unchecked")
-				Object[] arrObj = ((ArrayAttribute)attr).getValue();
+				List<?> arrObj = ((ArrayAttribute<?>)attr).getValue();
 				for (Object obj : arrObj) {
 					res.add(entry.getKey().getId() + "=" + obj.toString());					
 				}

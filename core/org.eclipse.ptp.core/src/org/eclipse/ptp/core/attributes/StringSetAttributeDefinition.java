@@ -22,7 +22,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public final class StringSetAttributeDefinition extends AbstractAttributeDefinition {
+public final class StringSetAttributeDefinition
+extends AbstractAttributeDefinition<String,StringSetAttribute,StringSetAttributeDefinition> {
 
 	private final String defaultValue;
 	private final List<String> values;
@@ -45,14 +46,14 @@ public final class StringSetAttributeDefinition extends AbstractAttributeDefinit
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.attributes.IAttributeDefinition#create()
 	 */
-	public IAttribute create() throws IllegalValueException {
+	public StringSetAttribute create() throws IllegalValueException {
 		return new StringSetAttribute(this);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.attributes.IAttributeDefinition#create(java.lang.String)
 	 */
-	public IAttribute create(String value) throws IllegalValueException {
+	public StringSetAttribute create(String value) throws IllegalValueException {
 		return new StringSetAttribute(this, value);
 	}
 

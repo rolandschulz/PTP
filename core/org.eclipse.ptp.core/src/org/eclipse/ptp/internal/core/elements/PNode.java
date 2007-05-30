@@ -48,7 +48,7 @@ public class PNode extends Parent implements IPNodeControl, IProcessListener {
 	private final ListenerList elementListeners = new ListenerList();
 
 	private final ListenerList childListeners = new ListenerList();
-	public PNode(String id, IPMachineControl mac, IAttribute[] attrs) {
+	public PNode(String id, IPMachineControl mac, IAttribute<?,?,?>[] attrs) {
 		super(id, mac, P_NODE, attrs);
 	}
 
@@ -89,7 +89,7 @@ public class PNode extends Parent implements IPNodeControl, IProcessListener {
 	}
 
 	public String getNodeNumber() {
-		IntegerAttribute num = (IntegerAttribute)getAttribute(NodeAttributes.getNumberAttributeDefinition());
+		IntegerAttribute num = getAttribute(NodeAttributes.getNumberAttributeDefinition());
 		if (num != null) {
 			return num.getValueAsString();
 		}
@@ -136,7 +136,7 @@ public class PNode extends Parent implements IPNodeControl, IProcessListener {
 		fireRemoveProcess(process);
 	}
 
-	private void fireChangedNode(Collection<IAttribute> attrs) {
+	private void fireChangedNode(Collection<? extends IAttribute<?, ?, ?>> attrs) {
 		INodeChangedEvent e = 
 			new NodeChangedEvent(this, attrs);
 		
@@ -167,7 +167,7 @@ public class PNode extends Parent implements IPNodeControl, IProcessListener {
 	 * @see org.eclipse.ptp.internal.core.elements.PElement#doAddAttributeHook(java.util.List)
 	 */
 	@Override
-	protected void doAddAttributeHook(List<IAttribute> attrs) {
+	protected void doAddAttributeHook(List<? extends IAttribute<?,?,?>> attrs) {
 		fireChangedNode(attrs);
 	}
 

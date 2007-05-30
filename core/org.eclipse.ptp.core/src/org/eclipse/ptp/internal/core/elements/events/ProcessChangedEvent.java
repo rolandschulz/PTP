@@ -32,9 +32,9 @@ import org.eclipse.ptp.core.elements.events.IProcessChangedEvent;
 public class ProcessChangedEvent implements IProcessChangedEvent {
 
 	private final IPProcess process;
-	private final Collection<IAttribute> attributes;
+	private final Collection<? extends IAttribute<?, ?, ?>> attributes;
 
-	public ProcessChangedEvent(IPProcess process, Collection<IAttribute> attrs) {
+	public ProcessChangedEvent(IPProcess process, Collection<? extends IAttribute<?,?,?>> attrs) {
 		this.process = process;
 		this.attributes = attrs;
 	}
@@ -42,7 +42,7 @@ public class ProcessChangedEvent implements IProcessChangedEvent {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.events.IProcessChangedEvent#getAttributes()
 	 */
-	public Collection<IAttribute> getAttributes() {
+	public Collection<? extends IAttribute<?, ?, ?>> getAttributes() {
 		return attributes;
 	}
 

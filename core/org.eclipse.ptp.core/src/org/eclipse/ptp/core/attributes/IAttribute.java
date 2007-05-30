@@ -18,12 +18,23 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.attributes;
 
-public interface IAttribute extends Comparable<IAttribute> {
+public interface IAttribute<T, A extends IAttribute<T,A,D>, D extends IAttributeDefinition<T,A,D>>
+extends Comparable<A> {
 	
 	/**
 	 * @return the attribute definition object associated with this attribute
 	 */
-	public IAttributeDefinition getDefinition();
+	public D getDefinition();
+	
+	/**
+	 * @return
+	 */
+	public T getValue();
+	
+	/**
+	 * @return string
+	 */
+	public String getValueAsString();
 	
 	/**
 	 * @return whether any UI elements for this attribute
@@ -39,15 +50,16 @@ public interface IAttribute extends Comparable<IAttribute> {
 	 * @return
 	 */
 	public boolean isValid(String string);
-	
-	/**
-	 * @return string
-	 */
-	public String getValueAsString();
 		
+	/**
+	 * @param value
+	 * @throws IllegalValueException
+	 */
+	public void setValue(T value) throws IllegalValueException;
+	
 	/**
 	 * @param string
 	 * @throws IAttribute.IllegalValue
 	 */
-	public void setValue(String string) throws IllegalValueException;
+	public void setValueAsString(String string) throws IllegalValueException;
 }

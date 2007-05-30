@@ -30,9 +30,9 @@ import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute;
-import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IntegerAttribute;
 import org.eclipse.ptp.core.attributes.StringAttribute;
+import org.eclipse.ptp.core.attributes.StringAttributeDefinition;
 import org.eclipse.ptp.core.elementcontrols.IPElementControl;
 import org.eclipse.ptp.core.elementcontrols.IPJobControl;
 import org.eclipse.ptp.core.elementcontrols.IPNodeControl;
@@ -57,7 +57,7 @@ public class PProcess extends Parent implements IPProcessControl {
 	 */
 	private IPNodeControl node;
 
-	public PProcess(String id, IPJobControl job, IAttribute[] attrs) {
+	public PProcess(String id, IPJobControl job, IAttribute<?,?,?>[] attrs) {
 		super(id, job, P_PROCESS, attrs);
 		setOutputStore();
 		
@@ -111,7 +111,7 @@ public class PProcess extends Parent implements IPProcessControl {
 	 * @see org.eclipse.ptp.core.elements.IPProcess#getExitCode()
 	 */
 	public int getExitCode() {
-		IntegerAttribute attr = (IntegerAttribute) getAttribute(ProcessAttributes.getExitCodeAttributeDefinition());
+		IntegerAttribute attr = getAttribute(ProcessAttributes.getExitCodeAttributeDefinition());
 		if (attr != null) {
 			return attr.getValue();
 		}
@@ -148,7 +148,7 @@ public class PProcess extends Parent implements IPProcessControl {
 	 * @see org.eclipse.ptp.core.elements.IPProcess#getPid()
 	 */
 	public int getPid() {
-		IntegerAttribute attr = (IntegerAttribute) getAttribute(ProcessAttributes.getPIDAttributeDefinition());
+		IntegerAttribute attr = getAttribute(ProcessAttributes.getPIDAttributeDefinition());
 		if (attr != null) {
 			return attr.getValue();
 		}
@@ -159,7 +159,7 @@ public class PProcess extends Parent implements IPProcessControl {
 	 * @see org.eclipse.ptp.core.elements.IPProcess#getProcessIndex()
 	 */
 	public String getProcessIndex() {
-		IntegerAttribute attr = (IntegerAttribute) getAttribute(ProcessAttributes.getIndexAttributeDefinition());
+		IntegerAttribute attr = getAttribute(ProcessAttributes.getIndexAttributeDefinition());
 		if (attr != null) {
 			return attr.getValueAsString();
 		}
@@ -167,10 +167,10 @@ public class PProcess extends Parent implements IPProcessControl {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.IPProcess#getSavedOutput(org.eclipse.ptp.core.attributes.IAttributeDefinition)
+	 * @see org.eclipse.ptp.core.elements.IPProcess#getSavedOutput(org.eclipse.ptp.core.attributes.StringAttributeDefinition)
 	 */
-	public String getSavedOutput(IAttributeDefinition attrDef) {
-		if (attrDef == ProcessAttributes.getStdoutAttributeDefinition()) {
+	public String getSavedOutput(StringAttributeDefinition attrDef) {
+		if (attrDef.equals(ProcessAttributes.getStdoutAttributeDefinition())) {
 			return outputFile.getContents();
 		} else {
 			return null;
@@ -181,7 +181,7 @@ public class PProcess extends Parent implements IPProcessControl {
 	 * @see org.eclipse.ptp.core.elements.IPProcess#getSignalName()
 	 */
 	public String getSignalName() {
-		StringAttribute attr = (StringAttribute) getAttribute(ProcessAttributes.getSignalNameAttributeDefinition());
+		StringAttribute attr = getAttribute(ProcessAttributes.getSignalNameAttributeDefinition());
 		if (attr != null) {
 			return attr.getValue();
 		}
@@ -231,7 +231,7 @@ public class PProcess extends Parent implements IPProcessControl {
 	public void setState(State state) {
 		EnumeratedAttribute<State> procState = getStateAttribute();
 		procState.setValue(state);
-		fireChangedProcess(Arrays.asList(new IAttribute[] { procState }));
+		fireChangedProcess(Arrays.asList(procState));
 	}
 	
 	/* (non-Javadoc)
@@ -251,7 +251,7 @@ public class PProcess extends Parent implements IPProcessControl {
 	/**
 	 * @param attrs
 	 */
-	private void fireChangedProcess(Collection<IAttribute> attrs) {
+	private void fireChangedProcess(Collection<? extends IAttribute<?,?,?>> attrs) {
 		IProcessChangedEvent e = 
 			new ProcessChangedEvent(this, attrs);
 		
@@ -263,10 +263,8 @@ public class PProcess extends Parent implements IPProcessControl {
 	/**
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
 	private EnumeratedAttribute<State> getStateAttribute() {
-		return (EnumeratedAttribute<State>) getAttribute(
-				ProcessAttributes.getStateAttributeDefinition());
+		return getAttribute(ProcessAttributes.getStateAttributeDefinition());
 	}
 
 	/**
@@ -292,8 +290,8 @@ public class PProcess extends Parent implements IPProcessControl {
 	 * @see org.eclipse.ptp.internal.core.elements.PElement#doAddAttributeHook(java.util.List)
 	 */
 	@Override
-	protected void doAddAttributeHook(List<IAttribute> attrs) {
-		for (IAttribute attr : attrs) {
+	protected void doAddAttributeHook(List<? extends IAttribute<?,?,?>> attrs) {
+		for (IAttribute<?,?,?> attr : attrs) {
 			if (attr.getDefinition() == ProcessAttributes.getStdoutAttributeDefinition()) {
 				addOutput(attr.getValueAsString());
 			}

@@ -24,7 +24,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
+import org.eclipse.ptp.core.attributes.EnumeratedAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IAttribute;
+import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes.State;
@@ -119,16 +121,17 @@ public class ProcessInputStream extends InputStream implements IProcessListener 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.listeners.IProcessListener#handleEvent(org.eclipse.ptp.core.elements.events.IProcessChangedEvent)
 	 */
-	@SuppressWarnings("unchecked")
 	public void handleEvent(IProcessChangedEvent e) {
-		for (IAttribute attr : e.getAttributes()) {
-			String id = attr.getDefinition().getId();
-			if (id.equals(ProcessAttributes.getStateAttributeDefinition().getId())) {
+		for (IAttribute<?,?,?> attr : e.getAttributes()) {
+			IAttributeDefinition<?, ?, ?> def = attr.getDefinition();
+			final EnumeratedAttributeDefinition<State> stateAttrDef = 
+				ProcessAttributes.getStateAttributeDefinition();
+			if (def.equals(stateAttrDef)) {
 				ProcessAttributes.State state = ((EnumeratedAttribute<State>)attr).getValue();
 				if (state == State.EXITED || state == State.EXITED_SIGNALLED || state == State.ERROR) {
 					close();
 				}
-			} else if (id.equals(ProcessAttributes.getStdoutAttributeDefinition())) {
+			} else if (def.equals(ProcessAttributes.getStdoutAttributeDefinition())) {
 				addInput(attr.getValueAsString());
 			}
 		}

@@ -34,7 +34,7 @@ public class MPICH2ResourceManagerConfigurationWizardPageFactory extends
 		return new RMConfigurationWizardPage[]{new MPICH2ResourceManagerConfigurationWizardPage(wizard)};
 	}
 
-	public Class getRMFactoryClass() {
+	public Class<MPICH2ResourceManagerFactory> getRMFactoryClass() {
 		return MPICH2ResourceManagerFactory.class;
 	}
 }

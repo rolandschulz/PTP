@@ -18,17 +18,23 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.attributes;
 
-public abstract class AbstractAttribute<T extends AbstractAttribute<T>> implements IAttribute {
+public abstract class AbstractAttribute<T,
+                                        A extends AbstractAttribute<T,A,D>,
+                                        D extends IAttributeDefinition<T,A,D>>
+implements IAttribute<T,A,D> {
 
-	private final IAttributeDefinition definition;
+	private final D definition;
 	private boolean enabled;
 
-	public AbstractAttribute(IAttributeDefinition definition) {
+	public AbstractAttribute(D definition) {
 		this.definition = definition;
 		this.enabled = true;
 	}
 	
-	public int compareTo(IAttribute other) {
+	/* (non-Javadoc)
+	 * @see java.lang.Comparable#compareTo(java.lang.Object)
+	 */
+	public int compareTo(A other) {
         int results = getDefinition().compareTo(other.getDefinition());
         if (results != 0) {
             return results;
@@ -38,11 +44,13 @@ public abstract class AbstractAttribute<T extends AbstractAttribute<T>> implemen
             final int hashCode2 = other.getClass().hashCode();
             return hashCode1 < hashCode2 ? -1 : (hashCode1 > hashCode2 ? 1 : 0);
         }
-        @SuppressWarnings("unchecked")
-        final int doCompareTo = doCompareTo((T) other);
+        final int doCompareTo = doCompareTo(other);
         return doCompareTo;
     }
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	@Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -51,28 +59,29 @@ public abstract class AbstractAttribute<T extends AbstractAttribute<T>> implemen
             return false;
         if (getClass() != obj.getClass())
             return false;
-        @SuppressWarnings("unchecked")
-        final AbstractAttribute other = (AbstractAttribute) obj;
+        final A other = (A) obj;
         if (definition == null) {
             if (other.definition != null)
                 return false;
         } else if (!definition.equals(other.definition))
             return false;
-        @SuppressWarnings("unchecked")
-        final boolean doEquals = doEquals((T) other);
+        final boolean doEquals = doEquals(other);
         if (!doEquals)
             return false;
         return true;
     }
 
-	public IAttributeDefinition getDefinition() {
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.attributes.IAttribute#getDefinition()
+	 */
+	public D getDefinition() {
 		return definition;
 	}
 
     @Override
     public int hashCode() {
         final int prime = 31;
-        int result = super.hashCode();
+        int result = 1;
         result = prime * result
                 + ((definition == null) ? 0 : definition.hashCode());
         result = prime * result + doHashCode();
@@ -93,9 +102,20 @@ public abstract class AbstractAttribute<T extends AbstractAttribute<T>> implemen
 		this.enabled = enabled;
 	}
 
-    protected abstract int doCompareTo(T other);
+    /**
+     * @param other
+     * @return
+     */
+    protected abstract int doCompareTo(A other);
 
-    protected abstract boolean doEquals(T other);
+    /**
+     * @param other
+     * @return
+     */
+    protected abstract boolean doEquals(A other);
     
+    /**
+     * @return
+     */
     protected abstract int doHashCode();
 }

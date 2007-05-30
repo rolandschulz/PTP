@@ -162,7 +162,7 @@ public class ParallelLaunchConfigurationDelegate
 				if (dbgWD != null) {
 					StringAttribute wdAttr = (StringAttribute) attrManager.getAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition());
 					if (wdAttr != null) {
-						wdAttr.setValue(dbgWD);
+						wdAttr.setValueAsString(dbgWD);
 					} else {
 						attrManager.addAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition().create(dbgWD));
 				

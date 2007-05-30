@@ -444,7 +444,8 @@ public class ParallelMachineView extends AbstractParallelSetView implements IRes
 	private void updateNodeInfoRegion(IPNode node) {
 		BLtable.removeAll();
 		if (node != null) {
-			for (Map.Entry<IAttributeDefinition, IAttribute> entry : node.getAttributeMap().entrySet()) {
+			for (Map.Entry<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>> entry :
+				node.getAttributeMap().entrySet()) {
 				String key = entry.getKey().getName();
 				String value = entry.getValue().getValueAsString();
 				new TableItem(BLtable, SWT.NULL).setText(new String[] { key, value });

@@ -34,18 +34,18 @@ public class MachineChangedNodeEvent implements IMachineChangedNodeEvent {
 
 	private final IPMachine machine;
 	private final IPNode node;
-	private final Collection<IAttribute> attributes;
+	private final Collection<? extends IAttribute<?, ?, ?>> attributes;
 	
-	public MachineChangedNodeEvent(IPMachine machine, IPNode node, Collection<IAttribute> attrs) {
+	public MachineChangedNodeEvent(IPMachine machine, IPNode node, Collection<? extends IAttribute<?, ?, ?>> collection) {
 		this.machine = machine;
 		this.node = node;
-		this.attributes = attrs;
+		this.attributes = collection;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.events.IMachineChangedNodeEvent#getAttributes()
 	 */
-	public Collection<IAttribute> getAttributes() {
+	public Collection<? extends IAttribute<?, ?, ?>> getAttributes() {
 		return attributes;
 	}
 
