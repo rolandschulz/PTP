@@ -34,18 +34,19 @@ public class QueueChangedJobEvent implements IQueueChangedJobEvent {
 
 	private final IPQueue queue;
 	private final IPJob job;
-	private final Collection<IAttribute> attributes;
+	private final Collection<? extends IAttribute<?, ?, ?>> attributes;
 	
-	public QueueChangedJobEvent(IPQueue queue, IPJob job, Collection<IAttribute> attrs) {
+	public QueueChangedJobEvent(IPQueue queue, IPJob job,
+			Collection<? extends IAttribute<?, ?, ?>> collection) {
 		this.queue = queue;
 		this.job = job;
-		this.attributes = attrs;
+		this.attributes = collection;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.events.IQueueChangedJobEvent#getAttributes()
 	 */
-	public Collection<IAttribute> getAttributes() {
+	public Collection<? extends IAttribute<?, ?, ?>> getAttributes() {
 		return attributes;
 	}
 

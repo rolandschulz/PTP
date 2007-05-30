@@ -32,9 +32,9 @@ import org.eclipse.ptp.core.elements.events.IQueueChangedEvent;
 public class QueueChangedEvent implements IQueueChangedEvent {
 
 	private final IPQueue queue;
-	private final Collection<IAttribute> attributes;
+	private final Collection<? extends IAttribute<?, ?, ?>> attributes;
 
-	public QueueChangedEvent(IPQueue queue, Collection<IAttribute> attrs) {
+	public QueueChangedEvent(IPQueue queue, Collection<? extends IAttribute<?, ?, ?>> attrs) {
 		this.queue = queue;
 		this.attributes = attrs;
 	}
@@ -42,7 +42,7 @@ public class QueueChangedEvent implements IQueueChangedEvent {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.events.IQueueChangedEvent#getAttributes()
 	 */
-	public Collection<IAttribute> getAttributes() {
+	public Collection<? extends IAttribute<?,?,?>> getAttributes() {
 		return attributes;
 	}
 

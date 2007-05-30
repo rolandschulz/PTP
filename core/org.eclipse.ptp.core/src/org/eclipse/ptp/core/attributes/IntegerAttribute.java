@@ -18,7 +18,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.attributes;
 
-public final class IntegerAttribute extends AbstractAttribute<IntegerAttribute> {
+public final class IntegerAttribute
+extends AbstractAttribute<Integer,IntegerAttribute,IntegerAttributeDefinition> {
 
 	private Integer value;
 
@@ -29,7 +30,7 @@ public final class IntegerAttribute extends AbstractAttribute<IntegerAttribute> 
 
 	public IntegerAttribute(IntegerAttributeDefinition definition, String initialValue) throws IllegalValueException {
 		super(definition);
-		setValue(initialValue);
+		setValueAsString(initialValue);
 	}
 
 	public Integer getValue() {
@@ -60,7 +61,7 @@ public final class IntegerAttribute extends AbstractAttribute<IntegerAttribute> 
 		this.value = value;
 	}
 
-	public void setValue(String string) throws IllegalValueException {
+	public void setValueAsString(String string) throws IllegalValueException {
 		try {
 			Integer value = Integer.valueOf(string);
 			if (value.intValue() < getMinValue() || value.intValue() > getMaxValue()) {

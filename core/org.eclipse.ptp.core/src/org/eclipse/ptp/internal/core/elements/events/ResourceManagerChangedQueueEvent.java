@@ -35,19 +35,20 @@ public class ResourceManagerChangedQueueEvent implements
 
 	private final IPQueue queues;
 	private final IResourceManager rm;
-	private final Collection<IAttribute> attributes;
+	private final Collection<? extends IAttribute<?, ?, ?>> attributes;
 
 
-	public ResourceManagerChangedQueueEvent(IResourceManager manager, IPQueue queues, Collection<IAttribute> attrs) {
+	public ResourceManagerChangedQueueEvent(IResourceManager manager, IPQueue queues,
+			Collection<? extends IAttribute<?, ?, ?>> collection) {
 		this.rm = manager;
 		this.queues = queues;
-		this.attributes = attrs;
+		this.attributes = collection;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.events.IResourceManagerChangedQueueEvent#getAttributes()
 	 */
-	public Collection<IAttribute> getAttributes() {
+	public Collection<? extends IAttribute<?, ?, ?>> getAttributes() {
 		return attributes;
 	}
 

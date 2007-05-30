@@ -18,43 +18,67 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.attributes;
 
-public abstract class AbstractAttributeDefinition implements IAttributeDefinition {
+public abstract class AbstractAttributeDefinition<T,
+												  A extends IAttribute<T,A,D>,
+												  D extends AbstractAttributeDefinition<T,A,D>>
+implements IAttributeDefinition<T,A,D> {
 	private final String name;
 	private final String description;
 	private final String uniqueId;
 	
-	public AbstractAttributeDefinition(final String uniqueId, final String name, final String description) {
+	public AbstractAttributeDefinition(final String uniqueId, final String name,
+			final String description) {
 		this.uniqueId = uniqueId;
 		this.name = name;
 		this.description = description;
 	}
 
-	public int compareTo(IAttributeDefinition arg0) {
+	public int compareTo(IAttributeDefinition<?, ?, ?> arg0) {
 		return this.name.compareTo(arg0.getName());
 	}
 
-	public boolean equals(Object obj) {
-		if (obj instanceof AbstractAttributeDefinition) {
-			AbstractAttributeDefinition attrDesc = (AbstractAttributeDefinition) obj;
-			return this.uniqueId.equals(attrDesc.uniqueId);
-		}
-		return false;
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	final public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		final D other = (D) obj;
+		if (uniqueId == null) {
+			if (other.uniqueId != null)
+				return false;
+		} else if (!uniqueId.equals(other.uniqueId))
+			return false;
+		return true;
 	}
 	
 	public String getDescription() {
 		return description;
 	}
 
-	public String getName() {
-		return name;
-	}
-
 	public String getId() {
 		return uniqueId;
 	}
 
-	public int hashCode() {
-		return uniqueId.hashCode();
+	public String getName() {
+		return name;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	final public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result +
+				((uniqueId == null) ? 0 : uniqueId.hashCode());
+		return result;
 	}
 
 	public String toString() {

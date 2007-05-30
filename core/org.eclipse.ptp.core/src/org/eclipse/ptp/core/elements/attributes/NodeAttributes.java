@@ -61,7 +61,7 @@ public class NodeAttributes {
 		return numAttrDef;
 	}
 	
-	public static IAttributeDefinition[] getDefaultAttributeDefinitions() {
+	public static IAttributeDefinition<?,?,?>[] getDefaultAttributeDefinitions() {
 		return new IAttributeDefinition[]{stateAttrDef, extraStateAttrDef, numAttrDef};
 	}
 }

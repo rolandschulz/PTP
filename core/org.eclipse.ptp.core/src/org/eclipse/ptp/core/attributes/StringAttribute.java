@@ -19,13 +19,14 @@
 package org.eclipse.ptp.core.attributes;
 
 
-public final class StringAttribute extends AbstractAttribute<StringAttribute> {
+public final class StringAttribute
+extends AbstractAttribute<String,StringAttribute,StringAttributeDefinition> {
 
 	private StringBuffer value = new StringBuffer();
 
 	public StringAttribute(StringAttributeDefinition description, String initialValue) {
 		super(description);
-		setValue(initialValue);
+		setValueAsString(initialValue);
 	}
 
 	public String getValue() {
@@ -40,7 +41,17 @@ public final class StringAttribute extends AbstractAttribute<StringAttribute> {
 		return true;
 	}
 
-	public void setValue(String string) {
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.attributes.IAttribute#setValue(java.lang.Object)
+	 */
+	public void setValue(String value) throws IllegalValueException {
+		setValueAsString(value);
+	}
+
+    /* (non-Javadoc)
+     * @see org.eclipse.ptp.core.attributes.IAttribute#setValueAsString(java.lang.String)
+     */
+    public void setValueAsString(String string) {
 		this.value.replace(0, this.value.length(), string);
 	}
 
@@ -54,7 +65,7 @@ public final class StringAttribute extends AbstractAttribute<StringAttribute> {
         return value.equals(other.value);
     }
 
-    @Override
+	@Override
     protected int doHashCode() {
         return value.hashCode();
     }

@@ -31,14 +31,14 @@ public interface IPElement extends IAdaptable {
 	 * 
 	 * @param attrValue
 	 */
-	public void addAttribute(IAttribute attrValue);
+	public void addAttribute(IAttribute<?,?,?> attrValue);
 
 	/**
 	 * Sets the attribute values.
 	 * 
 	 * @param attrValues
 	 */
-	public void addAttributes(IAttribute[] attrValues);
+	public void addAttributes(IAttribute<?,?,?>[] attrValues);
 
 	/**
 	 * Returns the unique ID for this Element
@@ -61,7 +61,8 @@ public interface IPElement extends IAdaptable {
 	 * @param attrDef
 	 * @return The attribute for this attribute definition
 	 */
-	public IAttribute getAttribute(IAttributeDefinition attrDef);
+	public <T, A extends IAttribute<T,A,D>, D extends IAttributeDefinition<T,A,D>>
+	A getAttribute(D attrDef);
 	
 	/**
 	 * Returns the attribute corresponding to the attribute definition ID.
@@ -69,35 +70,35 @@ public interface IPElement extends IAdaptable {
 	 * @param attrDefId
 	 * @return The attribute for this attribute definition
 	 */
-	public IAttribute getAttribute(String attrDefId);
+	public IAttribute<?,?,?> getAttribute(String attrDefId);
 
 	/**
 	 * Returns an array containing all attributes.
 	 * 
 	 * @return An array of attributes for this element
 	 */
-	public IAttribute[] getAttributes();
+	public IAttribute<?,?,?>[] getAttributes();
 
 	/**
 	 * Get all the attribute definitions that this element knows about.
 	 * 
 	 * @return array of IAttributeDefinition keys
 	 */
-	public IAttributeDefinition[] getAttributeKeys();
+	public IAttributeDefinition<?,?,?>[] getAttributeKeys();
 
 	/**
 	 * Returns a map containing attribute name, attribute pairs
 	 * 
 	 * @return map
 	 */
-	public Map<IAttributeDefinition, IAttribute> getAttributeMap();
+	public Map<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>> getAttributeMap();
 
 	/**
 	 * Removes the attribute value.
 	 * 
 	 * @param attrValue
 	 */
-	public void removeAttribute(IAttribute attrValue);
+	public void removeAttribute(IAttribute<?,?,?> attrValue);
 
 
 	/**

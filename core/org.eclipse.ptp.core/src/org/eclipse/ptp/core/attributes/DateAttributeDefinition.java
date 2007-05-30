@@ -19,9 +19,11 @@
 package org.eclipse.ptp.core.attributes;
 
 import java.text.DateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
-public final class DateAttributeDefinition extends AbstractAttributeDefinition implements IAttributeDefinition {
+public final class DateAttributeDefinition
+extends AbstractAttributeDefinition<Calendar, DateAttribute, DateAttributeDefinition> {
 
 	private Date minDate = new Date(Long.MIN_VALUE);
 	private Date maxDate = new Date(Long.MAX_VALUE);

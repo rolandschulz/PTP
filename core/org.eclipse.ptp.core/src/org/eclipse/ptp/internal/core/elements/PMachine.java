@@ -51,10 +51,9 @@ public class PMachine extends Parent implements IPMachineControl, INodeListener 
 	private String arch = "undefined";
     private IntegerAttribute numNodes;
 	
-	public PMachine(String id, IResourceManagerControl rm, IAttribute[] attrs) {
+	public PMachine(String id, IResourceManagerControl rm, IAttribute<?,?,?>[] attrs) {
 		super(id, rm, P_MACHINE, attrs);
-        numNodes = (IntegerAttribute) getAttribute(
-                MachineAttributes.getNumNodesAttributeDefinition());
+        numNodes = getAttribute(MachineAttributes.getNumNodesAttributeDefinition());
         if (numNodes == null) {
             try {
                 numNodes = MachineAttributes.getNumNodesAttributeDefinition().create(0);
@@ -170,7 +169,7 @@ public class PMachine extends Parent implements IPMachineControl, INodeListener 
 		return size();
 	}
 
-	private void fireChangedMachine(Collection<IAttribute> attrs) {
+	private void fireChangedMachine(Collection<? extends IAttribute<?,?,?>> attrs) {
 		IMachineChangedEvent e = 
 			new MachineChangedEvent(this, attrs);
 		
@@ -201,7 +200,7 @@ public class PMachine extends Parent implements IPMachineControl, INodeListener 
 	 * @see org.eclipse.ptp.internal.core.elements.PElement#doAddAttributeHook(java.util.List)
 	 */
 	@Override
-	protected void doAddAttributeHook(List<IAttribute> attrs) {
+	protected void doAddAttributeHook(List<? extends IAttribute<?,?,?>> attrs) {
 		fireChangedMachine(attrs);
 	}
 

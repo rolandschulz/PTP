@@ -109,8 +109,8 @@ import org.eclipse.ptp.internal.core.elements.events.ResourceManagerRemoveQueueE
 public abstract class AbstractResourceManager extends PElement implements IResourceManager,
 	IResourceManagerControl {
 	
-	private static IAttribute[] getDefaultAttributes(IResourceManagerConfiguration config) {
-		IAttribute nameAttr = ElementAttributes.getNameAttributeDefinition().create(config.getName());
+	private static IAttribute<?,?,?>[] getDefaultAttributes(IResourceManagerConfiguration config) {
+		StringAttribute nameAttr = ElementAttributes.getNameAttributeDefinition().create(config.getName());
 		return new IAttribute[]{nameAttr};
 	}
 
@@ -262,7 +262,7 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	 * @param attrId
 	 * @return attribute definition
 	 */
-	public IAttributeDefinition getAttributeDefinition(String attrId) {
+	public IAttributeDefinition<?,?,?> getAttributeDefinition(String attrId) {
 		return attrDefManager.getAttributeDefinition(attrId);
 	}
 
@@ -517,7 +517,7 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	/**
 	 * @param attrs
 	 */
-	private void fireResourceManagerChanged(List<IAttribute> attrs) {
+	private void fireResourceManagerChanged(List<? extends IAttribute<?,?,?>> attrs) {
 		IResourceManagerChangedEvent e = 
 			new ResourceManagerChangedEvent(this, attrs);
     	
@@ -573,7 +573,7 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 		/*
 		 * Keep a map of queue names, if the queue has a name (and it should).
 		 */
-		StringAttribute attr = (StringAttribute) queue.getAttribute(ElementAttributes.getNameAttributeDefinition());
+		StringAttribute attr = queue.getAttribute(ElementAttributes.getNameAttributeDefinition());
 		if (attr != null) {
 			queuesByName.put(attr.getValue(), queue);
 		}
@@ -646,11 +646,11 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 
 	/**
 	 * @param machine
-	 * @param attrs
+	 * @param collection
 	 */
-	protected void fireMachineChanged(IPMachine machine, Collection<IAttribute> attrs) {
+	protected void fireMachineChanged(IPMachine machine, Collection<? extends IAttribute<?, ?, ?>> collection) {
 		IResourceManagerChangedMachineEvent e = 
-			new ResourceManagerChangedMachineEvent(this, machine, attrs);
+			new ResourceManagerChangedMachineEvent(this, machine, collection);
 
 		for (Object listener : machineListeners.getListeners()) {
 			((IResourceManagerMachineListener)listener).handleEvent(e);
@@ -683,11 +683,11 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 
 	/**
 	 * @param queue
-	 * @param attrs
+	 * @param collection
 	 */
-	protected void fireQueueChanged(IPQueue queue, Collection<IAttribute> attrs) {
+	protected void fireQueueChanged(IPQueue queue, Collection<? extends IAttribute<?, ?, ?>> collection) {
 		IResourceManagerChangedQueueEvent e = 
-			new ResourceManagerChangedQueueEvent(this, queue, attrs);
+			new ResourceManagerChangedQueueEvent(this, queue, collection);
 
 		for (Object listener : queueListeners.getListeners()) {
 			((IResourceManagerQueueListener)listener).handleEvent(e);
@@ -878,7 +878,7 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 		queue.removeElementListener(queueListener);
 		queue.removeChildListener(queueJobListener);
 		queuesById.remove(queue.getID());
-		StringAttribute attr = (StringAttribute) queue.getAttribute(ElementAttributes.getNameAttributeDefinition());
+		StringAttribute attr = queue.getAttribute(ElementAttributes.getNameAttributeDefinition());
 		if (attr != null) {
 			queuesByName.remove(attr.getValue());
 		}
@@ -891,7 +891,7 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	synchronized protected void setState(ResourceManagerAttributes.State state) {
 		if (this.state.getValue() != state) {
 			this.state.setValue(state);
-			fireResourceManagerChanged(Arrays.asList(new IAttribute[] {this.state}));
+			fireResourceManagerChanged(Arrays.asList(this.state));
 		}
 	}
 
@@ -949,7 +949,7 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	 * @see org.eclipse.ptp.internal.core.elements.PElement#doAddAttributeHook(java.util.List)
 	 */
 	@Override
-	protected void doAddAttributeHook(List<IAttribute> attrs) {
+	protected void doAddAttributeHook(List<? extends IAttribute<?,?,?>> attrs) {
 		fireResourceManagerChanged(attrs);
 	}
 }

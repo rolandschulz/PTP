@@ -165,7 +165,8 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 			try {
 				int numDefs = Integer.parseInt(attrs[0]);
 				
-				ArrayList<IAttributeDefinition> attrDefs = new ArrayList<IAttributeDefinition>(numDefs);
+				ArrayList<IAttributeDefinition<?,?,?>> attrDefs = 
+					new ArrayList<IAttributeDefinition<?,?,?>>(numDefs);
 
 				int pos = 1;
 				
@@ -173,7 +174,8 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 					int numArgs = Integer.parseInt(attrs[pos]);
 					
 					if (numArgs >= ATTR_MIN_LEN && pos + numArgs < attrs.length) {
-						IAttributeDefinition attrDef = parseAttributeDefinition(attrs, pos + 1, pos + numArgs);	
+						IAttributeDefinition<?,?,?> attrDef = 
+							parseAttributeDefinition(attrs, pos + 1, pos + numArgs);	
 						if (attrDef != null) {
 							attrDefs.add(attrDef);
 						}
@@ -263,7 +265,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 			 * Find any job submission attributes and add to the jobs
 			 */
 			for (Map.Entry<RangeSet, AttributeManager> entry : eMgr.getEntrySet()) {
-				IAttribute subIdAttr = entry.getValue().getAttribute(JobAttributes.getSubIdAttributeDefinition());
+				StringAttribute subIdAttr = entry.getValue().getAttribute(JobAttributes.getSubIdAttributeDefinition());
 				if (subIdAttr != null) {
 					String subId = subIdAttr.getValueAsString();
 					AttributeManager mgr = jobSubs.get(subId);
@@ -520,9 +522,9 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 			String[] kv = kvs[i].split("=");
 			if (kv.length == 2) {
 				try {
-					IAttributeDefinition attrDef = attrDefManager.getAttributeDefinition(kv[0]);
+					IAttributeDefinition<?,?,?> attrDef = attrDefManager.getAttributeDefinition(kv[0]);
 					if(attrDef != null) {
-						IAttribute attr = attrDef.create(kv[1]);
+						IAttribute<?,?,?> attr = attrDef.create(kv[1]);
 						mgr.addAttribute(attr);
 					} else {
 						System.out.println("AbstractProxyRuntimSystem: unknown attribute definition");
@@ -579,9 +581,9 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	 * On entry, we know that end < attrs.length and end - start >= ATTR_MIN_LEN
 	 * 
 	 */
-	private IAttributeDefinition parseAttributeDefinition(String[] attrs, int start, int end) {
+	private IAttributeDefinition<?,?,?> parseAttributeDefinition(String[] attrs, int start, int end) {
 		int pos = start;
-		IAttributeDefinition attrDef = null;
+		IAttributeDefinition<?,?,?> attrDef = null;
 		
 		String attrId = attrs[pos++];
 		String attrType = attrs[pos++];

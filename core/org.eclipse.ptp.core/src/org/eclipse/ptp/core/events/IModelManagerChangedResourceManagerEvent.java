@@ -31,6 +31,6 @@ public interface IModelManagerChangedResourceManagerEvent {
 	/**
 	 * @return
 	 */
-	public Collection<IAttribute> getAttributes();
+	public Collection<? extends IAttribute<?, ?, ?>> getAttributes();
 
 }

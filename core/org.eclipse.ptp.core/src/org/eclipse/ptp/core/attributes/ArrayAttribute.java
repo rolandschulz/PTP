@@ -13,24 +13,14 @@ package org.eclipse.ptp.core.attributes;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
 public final class ArrayAttribute<T extends Comparable<? super T>> 
-extends AbstractAttribute<ArrayAttribute<T>> {
+extends AbstractAttribute<List<? extends T>, ArrayAttribute<T>, ArrayAttributeDefinition<T>> {
 
 	private List<T> value;
-
-	public ArrayAttribute(ArrayAttributeDefinition<T> definition, String initialValue)
-	throws IllegalValueException {
-		super(definition);
-		setValue(initialValue);
-	}
-
-	public <U extends T> ArrayAttribute(ArrayAttributeDefinition<T> definition, U[] initialValue) {
-		super(definition);
-		setValue(initialValue);
-	}
 
 	public <U extends T> ArrayAttribute(ArrayAttributeDefinition<T> definition,
 			List<U> initialValue) {
@@ -38,32 +28,31 @@ extends AbstractAttribute<ArrayAttribute<T>> {
 		setValue(initialValue);
 	}
 
-	public T[] getValue() {
-		return (T[])this.value.toArray();
-	}
-	
-	public <U extends T> void setValue(U[] value) {
-		if (value != null) {
-			this.value = Arrays.asList((T[])value.clone());
-		}
-		else {
-			this.value = new ArrayList<T>();
-		}
+	public ArrayAttribute(ArrayAttributeDefinition<T> definition, String initialValue)
+	throws IllegalValueException {
+		super(definition);
+		setValueAsString(initialValue);
 	}
 
-	public <U extends T> void setValue(List<U> value) {
-		if (value != null) {
-			this.value = new ArrayList<T>(value);
-		}
-		else {
-			this.value = new ArrayList<T>();
-		}
+	public <U extends T> ArrayAttribute(ArrayAttributeDefinition<T> definition, U[] initialValue) {
+		super(definition);
+		setValue(initialValue);
 	}
 
 	public <U extends T> void addAll(U[] value) {
 		if (value != null) {
 			this.value.addAll(Arrays.asList(value));
 		}
+	}
+	
+	public <U extends T> void addAll(List<U> value) {
+		if (value != null) {
+			this.value.addAll(value);
+		}
+	}
+	
+	public List<T> getValue() {
+		return Collections.unmodifiableList(value);
 	}
 
 	public String getValueAsString() {
@@ -80,7 +69,25 @@ extends AbstractAttribute<ArrayAttribute<T>> {
 		return true;
 	}
 
-	public void setValue(String string) throws IllegalValueException {
+	public void setValue(List<? extends T> value) {
+		if (value != null) {
+			this.value = new ArrayList<T>(value);
+		}
+		else {
+			this.value = new ArrayList<T>();
+		}
+	}
+
+	public <U extends T> void setValue(U[] value) {
+		if (value != null) {
+			this.value = Arrays.asList((T[])value.clone());
+		}
+		else {
+			this.value = new ArrayList<T>();
+		}
+	}
+	
+    public void setValueAsString(String string) throws IllegalValueException {
 		String[] values = string.split("");
 		try {
 			setValue((T[])values);
@@ -88,7 +95,7 @@ extends AbstractAttribute<ArrayAttribute<T>> {
 			throw new IllegalValueException(e);
 		}
 	}
-	
+
     /* (non-Javadoc)
      * @see org.eclipse.ptp.core.attributes.AbstractAttribute#doCompareTo(org.eclipse.ptp.core.attributes.AbstractAttribute)
      */
@@ -119,7 +126,7 @@ extends AbstractAttribute<ArrayAttribute<T>> {
         return value.equals(other.value);
     }
 
-    @Override
+	@Override
     protected int doHashCode() {
         return value.hashCode();
     }

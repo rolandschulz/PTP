@@ -28,7 +28,7 @@ public interface INodeChangedProcessEvent {
 	/**
 	 * @return
 	 */
-	public Collection<IAttribute> getAttributes();
+	public Collection<? extends IAttribute<?, ?, ?>> getAttributes();
 	
 	/**
 	 * @return the changed process

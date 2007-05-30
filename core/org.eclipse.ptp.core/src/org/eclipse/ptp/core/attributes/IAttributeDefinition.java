@@ -18,7 +18,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.attributes;
 
-public interface IAttributeDefinition extends Comparable<IAttributeDefinition> {
+public interface IAttributeDefinition<T,
+									  A extends IAttribute<T,A,D>,
+                                      D extends IAttributeDefinition<T,A,D>>
+extends Comparable<IAttributeDefinition<?,?,?>> {
 
 	/**
 	 * @return
@@ -38,10 +41,10 @@ public interface IAttributeDefinition extends Comparable<IAttributeDefinition> {
 	/**
 	 * @return
 	 */
-	public IAttribute create() throws IllegalValueException;
+	public A create() throws IllegalValueException;
 	
 	/**
 	 * @return
 	 */
-	public IAttribute create(String value) throws IllegalValueException;
+	public A create(String value) throws IllegalValueException;
 }

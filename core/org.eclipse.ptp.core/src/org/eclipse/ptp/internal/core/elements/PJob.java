@@ -56,20 +56,18 @@ public class PJob extends Parent implements IPJobControl, IProcessListener {
 	private HashMap<String, IPProcessControl> indexMap = 
 		new HashMap<String, IPProcessControl>();
 
-	@SuppressWarnings("unchecked")
-	public PJob(String id, IPQueueControl queue, IAttribute[] attrs) {
+	public PJob(String id, IPQueueControl queue, IAttribute<?,?,?>[] attrs) {
 		super(id, queue, P_JOB, attrs);
 		/*
 		 * Create required attributes.
 		 */
-		EnumeratedAttribute<State> jobState = (EnumeratedAttribute<State>) getAttribute(
-				JobAttributes.getStateAttributeDefinition());
+		EnumeratedAttribute<State> jobState = 
+			getAttribute(JobAttributes.getStateAttributeDefinition());
 		if (jobState == null) {
 			jobState = JobAttributes.getStateAttributeDefinition().create();
 			addAttribute(jobState);
 		}
-		BooleanAttribute debug = (BooleanAttribute) getAttribute(
-				JobAttributes.getDebugFlagAttributeDefinition());
+		BooleanAttribute debug = getAttribute(JobAttributes.getDebugFlagAttributeDefinition());
 		if (debug == null) {
 			debug = JobAttributes.getDebugFlagAttributeDefinition().create();
 			addAttribute(debug);
@@ -157,14 +155,13 @@ public class PJob extends Parent implements IPJobControl, IProcessListener {
 	}
 
 	public boolean isDebug() {
-		BooleanAttribute debug = (BooleanAttribute) getAttribute(JobAttributes.getDebugFlagAttributeDefinition());
+		BooleanAttribute debug = getAttribute(JobAttributes.getDebugFlagAttributeDefinition());
 		return debug.getValue();
 	}
 
-	@SuppressWarnings("unchecked")
 	public boolean isTerminated() {
-		EnumeratedAttribute<State> jobState = (EnumeratedAttribute<State>) getAttribute(
-				JobAttributes.getStateAttributeDefinition());
+		EnumeratedAttribute<State> jobState = 
+			getAttribute(JobAttributes.getStateAttributeDefinition());
 		State state = jobState.getValue();
 		if (state == State.TERMINATED || state == State.ERROR) {
 			return true;
@@ -202,11 +199,11 @@ public class PJob extends Parent implements IPJobControl, IProcessListener {
 	}
 
 	public void setDebug() {
-		BooleanAttribute debug = (BooleanAttribute) getAttribute(JobAttributes.getDebugFlagAttributeDefinition());
+		BooleanAttribute debug = getAttribute(JobAttributes.getDebugFlagAttributeDefinition());
 		debug.setValue(true);
 	}
 
-	private void fireChangedJob(Collection<IAttribute> attrs) {
+	private void fireChangedJob(Collection<? extends IAttribute<?,?,?>> attrs) {
 		IJobChangedEvent e = 
 			new JobChangedEvent(this, attrs);
 		
@@ -237,7 +234,7 @@ public class PJob extends Parent implements IPJobControl, IProcessListener {
 	 * @see org.eclipse.ptp.internal.core.elements.PElement#doAddAttributeHook(org.eclipse.ptp.core.attributes.IAttribute[])
 	 */
 	@Override
-	protected void doAddAttributeHook(List<IAttribute> attribs) {
+	protected void doAddAttributeHook(List<? extends IAttribute<?,?,?>> attribs) {
 		fireChangedJob(attribs);
 	}
 }

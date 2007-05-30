@@ -84,7 +84,7 @@ public interface IRMLaunchConfigurationDynamicTab {
 	 * @return
 	 * @throws CoreException 
 	 */
-	public abstract IAttribute[] getAttributes(IResourceManager rm, IPQueue queue,
+	public abstract IAttribute<?,?,?>[] getAttributes(IResourceManager rm, IPQueue queue,
 			ILaunchConfiguration configuration) throws CoreException;
 
 	/**

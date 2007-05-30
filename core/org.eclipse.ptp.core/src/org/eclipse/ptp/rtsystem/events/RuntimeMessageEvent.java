@@ -57,30 +57,27 @@ public class RuntimeMessageEvent implements IRuntimeMessageEvent {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeErrorEvent#getLevel()
 	 */
-	@SuppressWarnings("unchecked")
 	public MessageAttributes.Level getLevel() {
 		EnumeratedAttribute<Level> level = 
-			(EnumeratedAttribute<Level>) attributes.getAttribute(MessageAttributes.getLevelAttributeDefinition());
+			attributes.getAttribute(MessageAttributes.getLevelAttributeDefinition());
 		return level.getValue();
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeErrorEvent#getCode()
 	 */
-	@SuppressWarnings("unchecked")
 	public int getCode() {
 		IntegerAttribute code = 
-			(IntegerAttribute) attributes.getAttribute(MessageAttributes.getCodeAttributeDefinition());
+			attributes.getAttribute(MessageAttributes.getCodeAttributeDefinition());
 		return code.getValue();
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeErrorEvent#getText()
 	 */
-	@SuppressWarnings("unchecked")
 	public String getText() {
 		StringAttribute text = 
-			(StringAttribute) attributes.getAttribute(MessageAttributes.getTextAttributeDefinition());
+			attributes.getAttribute(MessageAttributes.getTextAttributeDefinition());
 		return text.getValue();
 	}
 

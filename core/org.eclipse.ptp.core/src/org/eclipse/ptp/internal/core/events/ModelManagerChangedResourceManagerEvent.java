@@ -34,9 +34,10 @@ public class ModelManagerChangedResourceManagerEvent implements IModelManagerCha
 
 	private final IModelManager mm;
 	private final IResourceManager rm;
-	private final Collection<IAttribute> attributes;
+	private final Collection<? extends IAttribute<?, ?, ?>> attributes;
 	
-	public ModelManagerChangedResourceManagerEvent(IModelManager mm, IResourceManager rm, Collection<IAttribute> attrs) {
+	public ModelManagerChangedResourceManagerEvent(IModelManager mm, IResourceManager rm,
+			Collection<? extends IAttribute<?,?,?>> attrs) {
 		this.mm = mm;
 		this.rm = rm;
 		this.attributes = attrs;
@@ -45,7 +46,7 @@ public class ModelManagerChangedResourceManagerEvent implements IModelManagerCha
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.events.IModelManagerChangedResourceManagerEvent#getAttributes()
 	 */
-	public Collection<IAttribute> getAttributes() {
+	public Collection<? extends IAttribute<?, ?, ?>> getAttributes() {
 		return attributes;
 	}
 

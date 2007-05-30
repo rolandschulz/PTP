@@ -35,18 +35,19 @@ public class ResourceManagerChangedMachineEvent implements
 
 	private final IPMachine machine;
 	private final IResourceManager rm;
-	private final Collection<IAttribute> attributes;
+	private final Collection<? extends IAttribute<?, ?, ?>> attributes;
 	
-	public ResourceManagerChangedMachineEvent(IResourceManager manager, IPMachine machine, Collection<IAttribute> attrs) {
+	public ResourceManagerChangedMachineEvent(IResourceManager manager, IPMachine machine,
+			Collection<? extends IAttribute<?, ?, ?>> collection) {
 		this.rm = manager;
 		this.machine = machine;
-		this.attributes = attrs;
+		this.attributes = collection;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.events.IResourceManagerChangedMachineEvent#getAttributes()
 	 */
-	public Collection<IAttribute> getAttributes() {
+	public Collection<? extends IAttribute<?, ?, ?>> getAttributes() {
 		return attributes;
 	}
 

@@ -45,7 +45,7 @@ public class MachineAttributes {
         return numNodesAttrDef;
     }
     
-	public static IAttributeDefinition[] getDefaultAttributeDefinitions() {
+	public static IAttributeDefinition<?,?,?>[] getDefaultAttributeDefinitions() {
 		return new IAttributeDefinition[]{stateAttrDef, numNodesAttrDef};
 	}
 }

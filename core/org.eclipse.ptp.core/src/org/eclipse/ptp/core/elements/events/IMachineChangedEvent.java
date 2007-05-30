@@ -32,6 +32,6 @@ public interface IMachineChangedEvent {
 	/**
 	 * @return
 	 */
-	public Collection<IAttribute> getAttributes();
+	public Collection<? extends IAttribute<?, ?, ?>> getAttributes();
 
 }

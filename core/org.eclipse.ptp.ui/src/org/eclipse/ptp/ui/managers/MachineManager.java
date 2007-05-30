@@ -208,11 +208,10 @@ public class MachineManager extends AbstractUIManager {
 	 * @param node
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
 	public int getNodeStatus(IPNode node) {
 		if (node != null) {
 			EnumeratedAttribute<NodeAttributes.State> nodeStateAttr = 
-				(EnumeratedAttribute<NodeAttributes.State>) node.getAttribute(NodeAttributes.getStateAttributeDefinition());
+				node.getAttribute(NodeAttributes.getStateAttributeDefinition());
 			if(nodeStateAttr == null) {
 				return IPTPUIConstants.NODE_UNKNOWN;
 			}
@@ -231,8 +230,7 @@ public class MachineManager extends AbstractUIManager {
 				}
 				
 				EnumeratedAttribute<NodeAttributes.ExtraState> extraStateAttr =
-					(EnumeratedAttribute<NodeAttributes.ExtraState>) node.getAttribute(
-							NodeAttributes.getExtraStateAttributeDefinition());
+					node.getAttribute(NodeAttributes.getExtraStateAttributeDefinition());
 				NodeAttributes.ExtraState extraState = NodeAttributes.ExtraState.NONE;
 				if (extraStateAttr != null) {
 					extraState = extraStateAttr.getValue();
@@ -262,13 +260,12 @@ public class MachineManager extends AbstractUIManager {
 	 * @param node
 	 * @return status text
 	 */
-	@SuppressWarnings("unchecked")
 	public String getNodeStatusText(IPNode node) {
 		if (node == null) {
 			return "Unknown";
 		}
-		EnumeratedAttribute<NodeAttributes.State> nodeStateAttr 
-		   = (EnumeratedAttribute<NodeAttributes.State>) node.getAttribute(NodeAttributes.getStateAttributeDefinition());
+		EnumeratedAttribute<NodeAttributes.State> nodeStateAttr =
+			node.getAttribute(NodeAttributes.getStateAttributeDefinition());
 		if(nodeStateAttr == null) {
 			return "Unknown";
 		}
@@ -283,7 +280,7 @@ public class MachineManager extends AbstractUIManager {
 			}
 
 			EnumeratedAttribute<NodeAttributes.ExtraState> extraStateAttr =
-				(EnumeratedAttribute<NodeAttributes.ExtraState>) node.getAttribute(NodeAttributes.getExtraStateAttributeDefinition());
+				node.getAttribute(NodeAttributes.getExtraStateAttributeDefinition());
 			NodeAttributes.ExtraState extraState = NodeAttributes.ExtraState.NONE;
 			if (extraStateAttr != null) {
 				extraState = extraStateAttr.getValue();

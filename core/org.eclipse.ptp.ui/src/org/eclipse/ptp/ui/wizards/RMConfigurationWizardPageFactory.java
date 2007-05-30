@@ -18,6 +18,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.wizards;
 
+import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
+
 
 /**
  * Abstract class that is the extension point for contributing
@@ -41,6 +43,6 @@ public abstract class RMConfigurationWizardPageFactory {
 	 * 
 	 * @return
 	 */
-	public abstract Class getRMFactoryClass();
+	public abstract Class<? extends IResourceManagerFactory> getRMFactoryClass();
 
 }

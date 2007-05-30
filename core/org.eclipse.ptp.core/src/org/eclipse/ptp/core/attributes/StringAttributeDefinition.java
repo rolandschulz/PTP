@@ -19,7 +19,8 @@
 package org.eclipse.ptp.core.attributes;
 
 
-public final class StringAttributeDefinition extends AbstractAttributeDefinition implements IAttributeDefinition {
+public final class StringAttributeDefinition
+extends AbstractAttributeDefinition<String,StringAttribute,StringAttributeDefinition> {
 
 	private String defaultValue;
 	

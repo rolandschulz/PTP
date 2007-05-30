@@ -95,7 +95,7 @@ public class ProcessAttributes {
 		return nodeIdAttrDef;
 	}
 	
-	public static IAttributeDefinition[] getDefaultAttributeDefinitions() {
+	public static IAttributeDefinition<?,?,?>[] getDefaultAttributeDefinitions() {
 		return new IAttributeDefinition[]{
 				stateAttrDef, 
 				pidAttrDef, 

@@ -20,7 +20,8 @@ package org.eclipse.ptp.core.attributes;
 
 import java.util.List;
 
-public final class StringSetAttribute extends AbstractAttribute<StringSetAttribute> {
+public final class StringSetAttribute
+extends AbstractAttribute<String,StringSetAttribute,StringSetAttributeDefinition> {
 
 	private String value;
 
@@ -31,7 +32,7 @@ public final class StringSetAttribute extends AbstractAttribute<StringSetAttribu
 	public StringSetAttribute(StringSetAttributeDefinition definition)
 	throws IllegalValueException {
 		super(definition);
-		setValue(definition.getDefaultValue());
+		setValueAsString(definition.getDefaultValue());
 	}
 
 	/**
@@ -42,11 +43,18 @@ public final class StringSetAttribute extends AbstractAttribute<StringSetAttribu
 	public StringSetAttribute(StringSetAttributeDefinition definition,
 			String valueIn) throws IllegalValueException {
 		super(definition);
-		setValue(valueIn);
+		setValueAsString(valueIn);
 	}
 
 	public StringSetAttributeDefinition getStringSetAttributeDefinition() {
 		return (StringSetAttributeDefinition) getDefinition();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.attributes.IAttribute#getValue()
+	 */
+	public String getValue() {
+		return getValueAsString();
 	}
 
 	/* (non-Javadoc)
@@ -60,7 +68,7 @@ public final class StringSetAttribute extends AbstractAttribute<StringSetAttribu
         return getStringSetAttributeDefinition().getValues().indexOf(value);
     }
 
-	/* (non-Javadoc)
+    /* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.attributes.IAttribute#isValid(java.lang.String)
 	 */
 	public boolean isValid(String valueIn) {
@@ -70,9 +78,16 @@ public final class StringSetAttribute extends AbstractAttribute<StringSetAttribu
 	}
 
     /* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.attributes.IAttribute#setValue(java.lang.Object)
+	 */
+	public void setValue(String value) throws IllegalValueException {
+		setValueAsString(value);
+	}
+
+    /* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.attributes.IAttribute#setValue(java.lang.String)
 	 */
-	public void setValue(String valueIn) throws IllegalValueException {
+	public void setValueAsString(String valueIn) throws IllegalValueException {
 		if (!isValid(valueIn)) {
 			throw new IllegalValueException("value: " + valueIn +
 					" is not in StringSetAttribute: " +	getDefinition().getName());
@@ -85,12 +100,12 @@ public final class StringSetAttribute extends AbstractAttribute<StringSetAttribu
         return getValueIndex() - other.getValueIndex();
     }
 
-    @Override
+	@Override
     protected boolean doEquals(StringSetAttribute other) {
         return value.equals(other.value);
     }
 
-    @Override
+	@Override
     protected int doHashCode() {
         return value.hashCode();
     }

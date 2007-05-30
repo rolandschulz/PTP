@@ -57,7 +57,7 @@ public class MessageAttributes {
 		return textAttrDef;
 	}
 
-	public static IAttributeDefinition[] getDefaultAttributeDefinitions() {
+	public static IAttributeDefinition<?,?,?>[] getDefaultAttributeDefinitions() {
 		return new IAttributeDefinition[]{
 				levelAttrDef, 
 				codeAttrDef, 

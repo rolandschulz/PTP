@@ -137,7 +137,7 @@ public class JobAttributes {
 		return debugFlagAttrDef;
 	}
 
-	public static IAttributeDefinition[] getDefaultAttributeDefinitions() {
+	public static IAttributeDefinition<?,?,?>[] getDefaultAttributeDefinitions() {
 		return new IAttributeDefinition[]{
 					stateAttrDef, 
 					subIdAttrDef, 

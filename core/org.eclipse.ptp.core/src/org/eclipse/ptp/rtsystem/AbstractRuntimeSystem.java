@@ -52,8 +52,8 @@ public abstract class AbstractRuntimeSystem implements IRuntimeSystem {
 	 * @see org.eclipse.ptp.rmsystem.IResourceManager#getLaunchAttributes(java.lang.String,
 	 *  java.lang.String, org.eclipse.ptp.core.attributes.IAttribute[])
 	 */
-	public IAttribute[] getLaunchAttributes(String machineName, String queueName,
-			IAttribute[] currentAttrs) {
+	public IAttribute<?,?,?>[] getLaunchAttributes(String machineName, String queueName,
+			IAttribute<?,?,?>[] currentAttrs) {
 		// TODO Auto-generated method stub
 		return null;
 	}

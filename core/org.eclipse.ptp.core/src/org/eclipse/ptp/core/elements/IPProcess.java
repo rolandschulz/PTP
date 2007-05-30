@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.elements;
 
-import org.eclipse.ptp.core.attributes.IAttributeDefinition;
+import org.eclipse.ptp.core.attributes.StringAttributeDefinition;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.core.elements.listeners.IProcessListener;
 
@@ -51,7 +51,7 @@ public interface IPProcess extends IPElement {
 	 * @param attrDef
 	 * @return
 	 */
-	public String getSavedOutput(IAttributeDefinition attrDef);
+	public String getSavedOutput(StringAttributeDefinition attrDef);
 	
 	/**
 	 * @return

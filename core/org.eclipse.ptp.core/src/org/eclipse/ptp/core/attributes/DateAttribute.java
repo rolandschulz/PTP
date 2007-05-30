@@ -25,7 +25,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-public class DateAttribute extends AbstractAttribute<DateAttribute> {
+public class DateAttribute
+extends AbstractAttribute<Calendar, DateAttribute, DateAttributeDefinition> {
 
 	private static DateFormat[] dateFormats = null;
 
@@ -38,7 +39,7 @@ public class DateAttribute extends AbstractAttribute<DateAttribute> {
 		String str = mda.toString();
 		cal.add(Calendar.MONTH, 2);
 		System.out.println(mda.toString());
-		mda.setValue(str);
+		mda.setValueAsString(str);
 		System.out.println(mda.toString());
 	}
 
@@ -75,7 +76,7 @@ public class DateAttribute extends AbstractAttribute<DateAttribute> {
 
 	public DateAttribute(DateAttributeDefinition definition, String initialValue) throws IllegalValueException {
 		super(definition);
-		setValue(initialValue);
+		setValueAsString(initialValue);
 	}
 
 	public DateFormat getDateFormat() {
@@ -123,7 +124,7 @@ public class DateAttribute extends AbstractAttribute<DateAttribute> {
 		}
 	}
 
-	public void setValue(String string) throws IllegalValueException {
+	public void setValueAsString(String string) throws IllegalValueException {
 		final Date date = parseString(string);
 		if (date == null) {
 			throw new IllegalValueException("Unable to parse \"" + string

@@ -32,9 +32,9 @@ import org.eclipse.ptp.core.elements.events.IMachineChangedEvent;
 public class MachineChangedEvent implements IMachineChangedEvent {
 
 	private final IPMachine machine;
-	private final Collection<IAttribute> attributes;
+	private final Collection<? extends IAttribute<?, ?, ?>> attributes;
 
-	public MachineChangedEvent(IPMachine machine, Collection<IAttribute> attrs) {
+	public MachineChangedEvent(IPMachine machine, Collection<? extends IAttribute<?, ?, ?>> attrs) {
 		this.machine = machine;
 		this.attributes = attrs;
 	}
@@ -42,7 +42,7 @@ public class MachineChangedEvent implements IMachineChangedEvent {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.events.IMachineChangedEvent#getAttributes()
 	 */
-	public Collection<IAttribute> getAttributes() {
+	public Collection<? extends IAttribute<?, ?, ?>> getAttributes() {
 		return attributes;
 	}
 

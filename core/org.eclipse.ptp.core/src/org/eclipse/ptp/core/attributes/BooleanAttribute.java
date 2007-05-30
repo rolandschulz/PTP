@@ -18,16 +18,17 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.attributes;
 
-public class BooleanAttribute extends AbstractAttribute<BooleanAttribute> {
+public class BooleanAttribute 
+extends AbstractAttribute<Boolean,BooleanAttribute,BooleanAttributeDefinition> {
 
 	private Boolean value;
 
-	public BooleanAttribute(IAttributeDefinition definition, Boolean initialValue) {
+	public BooleanAttribute(BooleanAttributeDefinition definition, Boolean initialValue) {
 		super(definition);
 		this.value = initialValue;
 	}
 	
-	public BooleanAttribute(IAttributeDefinition definition, String initialValue) {
+	public BooleanAttribute(BooleanAttributeDefinition definition, String initialValue) {
 		super(definition);
 		this.value = Boolean.valueOf(initialValue);
 	}
@@ -51,7 +52,7 @@ public class BooleanAttribute extends AbstractAttribute<BooleanAttribute> {
 		this.value = value;
 	}
 
-	public void setValue(String string) throws IllegalValueException {
+	public void setValueAsString(String string) throws IllegalValueException {
 		if (!isValid(string)) {
 			throw new IllegalValueException(string + " is not a legal Boolean");
 		}
