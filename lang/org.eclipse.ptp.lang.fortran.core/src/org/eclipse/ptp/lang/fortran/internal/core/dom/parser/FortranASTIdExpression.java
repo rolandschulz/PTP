@@ -17,24 +17,13 @@
 
 package org.eclipse.ptp.lang.fortran.internal.core.dom.parser;
 
-import org.eclipse.cdt.core.dom.ILinkage;
 import org.eclipse.cdt.core.dom.ast.ASTVisitor;
-import org.eclipse.cdt.core.dom.ast.DOMException;
 import org.eclipse.cdt.core.dom.ast.IASTCompletionContext;
 import org.eclipse.cdt.core.dom.ast.IASTIdExpression;
 import org.eclipse.cdt.core.dom.ast.IASTName;
 import org.eclipse.cdt.core.dom.ast.IBinding;
-import org.eclipse.cdt.core.dom.ast.IScope;
 import org.eclipse.cdt.core.dom.ast.IType;
-import org.eclipse.cdt.core.index.IIndex;
-import org.eclipse.cdt.core.index.IndexFilter;
-import org.eclipse.cdt.core.parser.util.ArrayUtil;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.NullProgressMonitor;
 
-/**
- * @author jcamelon
- */
 public class FortranASTIdExpression extends FortranASTNode implements IASTIdExpression, IASTCompletionContext {
 
     private IASTName name;
@@ -78,34 +67,7 @@ public class FortranASTIdExpression extends FortranASTNode implements IASTIdExpr
 	}
 	
 	public IBinding[] findBindings(IASTName n, boolean isPrefix) {
-		IScope scope = FortranVisitor.getContainingScope(n);
-		
-		IBinding[] b1 = null;
-		if (scope != null) {
-			try {
-				b1 = scope.find(n.toString(), isPrefix);
-			} catch (DOMException e) {
-			}	
-		}
-		
-		IIndex index = getTranslationUnit().getIndex();
-		
-		IBinding[] b2 = null;
-		if (index != null) {
-			try {
-				IndexFilter filter = IndexFilter.getFilter(ILinkage.C_LINKAGE_ID);
-				// TODO isPrefix argument corrent (added)
-				b2 = isPrefix ?
-						index.findBindingsForPrefix(n.toCharArray(), isPrefix, filter) :
-						index.findBindings(n.toCharArray(), filter, new NullProgressMonitor());
-			} catch (CoreException e) {
-			}
-		}
-		
-		int size = (b1 == null ? 0 : b1.length) + (b2 == null ? 0 : b2.length);
-		IBinding[] all = new IBinding[size];
-		if (b1 != null) ArrayUtil.addAll(IBinding.class, all, b1);
-		if (b2 != null) ArrayUtil.addAll(IBinding.class, all, b2);
-		return all;
+		return FortranVisitor.findBindingsForContentAssist(n, isPrefix);
 	}
+
 }
