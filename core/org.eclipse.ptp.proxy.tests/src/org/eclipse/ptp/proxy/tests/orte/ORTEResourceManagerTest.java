@@ -14,7 +14,6 @@ import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
-import org.eclipse.ptp.core.elements.attributes.QueueAttributes;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes.State;
 import org.eclipse.ptp.core.elements.events.IJobChangedEvent;
 import org.eclipse.ptp.core.elements.events.IQueueChangedJobEvent;
@@ -114,7 +113,7 @@ public class ORTEResourceManagerTest implements IResourceManagerQueueListener, I
 				AttributeManager attrMgr = new AttributeManager();
 				
 				try {
-					attrMgr.addAttribute(QueueAttributes.getIdAttributeDefinition().create(subQueue.getID()));
+					attrMgr.addAttribute(JobAttributes.getQueueIdAttributeDefinition().create(subQueue.getID()));
 					
 					attrMgr.addAttribute(JobAttributes.getExecutableNameAttributeDefinition().create(jobRunConfig.getExecName()));
 					

@@ -23,7 +23,6 @@ import org.eclipse.ptp.core.attributes.IntegerAttribute;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
-import org.eclipse.ptp.core.elements.attributes.QueueAttributes;
 import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.debug.core.launch.PLaunch;
@@ -78,7 +77,7 @@ public class PTPDebugHelper {
 		try {
 			IPQueue[] queues = rm.getQueues();
 			if (queues != null) {
-				attrMgr.addAttribute(QueueAttributes.getIdAttributeDefinition().create(queues[0].getID()));
+				attrMgr.addAttribute(JobAttributes.getQueueIdAttributeDefinition().create(queues[0].getID()));
 			}
 			IPath appPath = new Path(app);
 			if (!appPath.toFile().exists()) {

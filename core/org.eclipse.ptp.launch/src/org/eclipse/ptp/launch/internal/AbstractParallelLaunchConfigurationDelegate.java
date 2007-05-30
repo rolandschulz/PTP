@@ -52,13 +52,11 @@ import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute;
-import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
-import org.eclipse.ptp.core.elements.attributes.QueueAttributes;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.core.elements.events.IQueueChangedJobEvent;
 import org.eclipse.ptp.core.elements.events.IQueueNewJobEvent;
@@ -337,35 +335,32 @@ public abstract class AbstractParallelLaunchConfigurationDelegate
 		AttributeManager attrMgr = new AttributeManager();
 		IResourceManager rm = getResourceManager(configuration);
 		if (rm != null) {
-			try {
-				IPQueue queue = rm.getQueueByName(getQueueName(configuration));
-				if (queue != null) {
-						attrMgr.addAttribute(QueueAttributes.getIdAttributeDefinition().create(queue.getID()));
-				}
-				
-				IPath programFile = getProgramFile(configuration);
-				attrMgr.addAttribute(JobAttributes.getExecutableNameAttributeDefinition().create(programFile.lastSegment()));
-				
-				String path = programFile.removeLastSegments(1).toOSString();
-				if (path != null) {
-					attrMgr.addAttribute(JobAttributes.getExecutablePathAttributeDefinition().create(path));
-				}
-				
-				String wd = verifyWorkDirectory(configuration);
-				if (wd != null) {
-					attrMgr.addAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition().create(wd));
-				}
-				
-				String[] argArr = getProgramParameters(configuration);
-				if (argArr != null) {
-					attrMgr.addAttribute(JobAttributes.getProgramArgumentsAttributeDefinition().create(argArr));
-				}
-				
-				String[] envArr = DebugPlugin.getDefault().getLaunchManager().getEnvironment(configuration);
-				if (envArr != null) {
-					attrMgr.addAttribute(JobAttributes.getEnvironmentAttributeDefinition().create(envArr));
-				}
-			} catch (IllegalValueException e) {
+			IPQueue queue = rm.getQueueByName(getQueueName(configuration));
+			if (queue != null) {
+					attrMgr.addAttribute(JobAttributes.getQueueIdAttributeDefinition().create(queue.getID()));
+			}
+			
+			IPath programFile = getProgramFile(configuration);
+			attrMgr.addAttribute(JobAttributes.getExecutableNameAttributeDefinition().create(programFile.lastSegment()));
+			
+			String path = programFile.removeLastSegments(1).toOSString();
+			if (path != null) {
+				attrMgr.addAttribute(JobAttributes.getExecutablePathAttributeDefinition().create(path));
+			}
+			
+			String wd = verifyWorkDirectory(configuration);
+			if (wd != null) {
+				attrMgr.addAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition().create(wd));
+			}
+			
+			String[] argArr = getProgramParameters(configuration);
+			if (argArr != null) {
+				attrMgr.addAttribute(JobAttributes.getProgramArgumentsAttributeDefinition().create(argArr));
+			}
+			
+			String[] envArr = DebugPlugin.getDefault().getLaunchManager().getEnvironment(configuration);
+			if (envArr != null) {
+				attrMgr.addAttribute(JobAttributes.getEnvironmentAttributeDefinition().create(envArr));
 			}
 			attrMgr.addAttributes(getLaunchAttributes(configuration));
 		} 
