@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2005, 2006 IBM Corporation.
+ * Copyright (c) 2005, 2007 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,7 +26,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.jface.action.IAction;
@@ -173,7 +172,7 @@ public abstract class RunAnalyseBase implements IObjectActionDelegate,
 
 				} catch (InvocationTargetException e) {
 					err = true;
-					System.out.println("Error running analysis: ITE "
+					System.out.println("Error running analysis: ITE: "
 							+ e.getMessage());
 					System.out.println("  cause: " + e.getCause() + " - "
 							+ e.getCause().getMessage());
@@ -204,12 +203,19 @@ public abstract class RunAnalyseBase implements IObjectActionDelegate,
 						.getBoolean(IDs.SHOW_ANALYSIS_CONFIRMATION);
 				if (showDialog) {
 					String title = "Analysis complete.";
-					String sMsg = cumulativeArtifacts + " " + name
-							+ " Artifacts found";
+					StringBuffer sMsg = new StringBuffer(cumulativeArtifacts + " " + name
+							+ " Artifacts found");
+					// provide some explanation of why perhaps no artifacts were found.
+					// Note: should this perhaps be in a "Details" section of the dialog?
+					if(cumulativeArtifacts==0) {
+						sMsg.append("\n\n").append(name).append(" Artifacts are defined as APIs found in the include path specified in the ");
+						sMsg.append(name).append(" preferences.  The same include path should be present in the project properties, ");
+						sMsg.append("regardless of whether or not a build command (e.g. mpicc) implicitly does this for compilation.");
+					}
 					String togMsg = "Don't show me this again";
-					MessageDialogWithToggle.openInformation(shell, title, sMsg,
+					MessageDialogWithToggle.openInformation(shell, title, sMsg.toString(),
 							togMsg, false, pf, key);
-					showStatusMessage(sMsg, "RunAnalyseBase.run()");
+					showStatusMessage(sMsg.toString(), "RunAnalyseBase.run()");
 				}
 				activateProblemsView();
 				activateArtifactView();
