@@ -23,6 +23,8 @@ import java.io.*;
 import java.lang.reflect.Constructor;
 
 import org.antlr.runtime.*;
+
+import java.util.ArrayList;
 import java.util.concurrent.Callable;
 
 // figured out what to write for a main() by looking at the generated 
@@ -41,11 +43,11 @@ public class FortranMain implements Callable<Boolean> {
    public static final int FREE_FORM = 1;
    public static final int FIXED_FORM = 2;
         
-   public FortranMain(String filename, String type) throws IOException {
+   public FortranMain(String[] args, String filename, String type) throws IOException {
       this.lexer = 
          new FortranLexer(new FortranStream(filename, this.determineSourceForm(filename))); 
       this.tokens = new FortranTokenStream(lexer);
-      this.parser = new FortranParser(tokens, type, filename);
+      this.parser = new FortranParser(args, tokens, type, filename);
       this.prepass = new FortranLexicalPrepass(lexer, tokens, parser);
       this.fileName = filename;
       this.sourceForm = UNKNOWN_SOURCE_FORM;
@@ -153,6 +155,7 @@ public class FortranMain implements Callable<Boolean> {
    public static void main(String args[]) throws Exception {
       Boolean error = null;
       Boolean verbose = true;
+      ArrayList<String> newArgs = new ArrayList<String>(0);
       String type = "null";
       int nArgs = 0;
 
@@ -160,33 +163,43 @@ public class FortranMain implements Callable<Boolean> {
 	      if (args[i].startsWith("--dump")) {
 	          type = "dump";
 	          nArgs += 1;
+	          continue;
 	      } else if (args[i].startsWith("--silent")) {
 	    	  verbose = false;
 	    	  nArgs += 1;
+	    	  continue;
 	      } else if (args[i].startsWith("--class")) {
 	          i += 1;
 	          type = args[i];
 	          nArgs += 2;
+	          continue;
+	      } else if (args[i].startsWith("--")) {
+	    	  newArgs.add(args[i]);
+	    	  newArgs.add(args[i+1]);
+	    	  i += 1;
+	    	  nArgs += 2;
+	    	  continue;
 	      }
       }
       
       if (args.length <= nArgs) {
-    	  System.out.println("Usage: java FortranMain [--dump] [--class className] file1 [file2..fileN]");
+    	  System.out.println("Usage: java parser.java.FortranMain [--dump] [--silent] [--class className] ");
+    	  System.out.println("                                    [--user_option user_arg] file1 [file2..fileN]");
       }
 
       for (int i = 0; i < args.length; i++) {
-    	  if (args[i].startsWith("--class")) {
-    		  i += 1;
-    		  continue;
-    	  } else if (args[i].startsWith("--")) {
-    		  continue;
-    	  }
+	      if (args[i].startsWith("--dump") | args[i].startsWith("--silent")) {
+	    	  continue;
+	      } else if (args[i].startsWith("--")) {
+	    	  i += 1;
+	    	  continue;
+	      }
     	  if (verbose) {
     		  System.out.println("********************************************");
     		  System.out.println("args[" + i + "]: " + args[i]);
     	  }
     	  
-    	  FortranMain ofp = new FortranMain(args[i], type);
+    	  FortranMain ofp = new FortranMain(newArgs.toArray(new String[newArgs.size()]), args[i], type);
     	  ofp.setVerbose(verbose);
     	  if (ofp.getParser().getAction().getClass().getName() == "parser.java.FortranParserActionPrint") {
     		  FortranParserActionPrint action = (FortranParserActionPrint) ofp.getParser().getAction();

@@ -20,19 +20,21 @@ package org.eclipse.ptp.lang.fortran.core.parser;
 import java.lang.reflect.Constructor;
 
 public class FortranParserActionFactory {
-	
-	static IFortranParserAction newAction(FortranParser parser, String kind, String filename) {
+
+	static IFortranParserAction newAction(String[] args, FortranParser parser, String kind, String filename) {
 		IFortranParserAction action = null;
 		if (kind.compareToIgnoreCase("dump") == 0) {
-			action = new FortranParserActionPrint(parser, filename);
+			action = new FortranParserActionPrint(args, parser, filename);
+		} else if (kind.compareToIgnoreCase("null") == 0) {
+			action = new FortranParserActionNull(args, parser, filename);
 		} else {
 			try {
 				Constructor[] cons = Class.forName(kind).getDeclaredConstructors();
 				for (int i = 0; i < cons.length; i++) {
 					Class[] types = cons[i].getParameterTypes();
-					if (types.length == 2 && types[0] == FortranParser.class && types[1] == java.lang.String.class) {
-						Object[] args = {parser, filename};
-						action = (IFortranParserAction) cons[i].newInstance(args);
+					if (types.length == 3 & types[0] == String[].class & types[1] == FortranParser.class & types[2] == java.lang.String.class) {
+						Object[] actionArgs = {args, parser, filename};
+						action = (IFortranParserAction) cons[i].newInstance(actionArgs);
 						break;
 					}
 				}
@@ -44,7 +46,7 @@ public class FortranParserActionFactory {
 		}
 		
 		if (action == null) {
-			action = new FortranParserActionNull(parser, filename);
+			action = new FortranParserActionNull(args, parser, filename);
 		}
 		return action;
 	}
