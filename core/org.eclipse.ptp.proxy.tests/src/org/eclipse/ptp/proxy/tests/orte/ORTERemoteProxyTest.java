@@ -13,10 +13,10 @@ import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.util.RangeSet;
 import org.eclipse.ptp.orte.core.rtsystem.ORTEProxyRuntimeClient;
 import org.eclipse.ptp.rtsystem.JobRunConfiguration;
+import org.eclipse.ptp.rtsystem.proxy.IProxyRuntimeEventListener;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeAttributeDefEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeConnectedStateEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeMessageEvent;
-import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeJobChangeEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeMachineChangeEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeNewJobEvent;
@@ -27,8 +27,17 @@ import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeNewQueueEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeNodeChangeEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeProcessChangeEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeQueueChangeEvent;
+import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRemoveAllEvent;
+import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRemoveJobEvent;
+import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRemoveMachineEvent;
+import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRemoveNodeEvent;
+import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRemoveProcessEvent;
+import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRemoveQueueEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRunningStateEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeShutdownStateEvent;
+import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeStartupErrorEvent;
+import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeSubmitJobErrorEvent;
+import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeTerminateJobErrorEvent;
 import org.junit.Test;
 
 public class ORTERemoteProxyTest implements IProxyRuntimeEventListener {
@@ -371,6 +380,57 @@ public class ORTERemoteProxyTest implements IProxyRuntimeEventListener {
 		}		
 	}	
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.proxy.IProxyRuntimeEventListener#handleProxyRuntimeRemoveAllEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRemoveAllEvent)
+	 */
+	public void handleProxyRuntimeRemoveAllEvent(IProxyRuntimeRemoveAllEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeRemoveJobEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRemoveJobEvent)
+	 */
+	public void handleProxyRuntimeRemoveJobEvent(IProxyRuntimeRemoveJobEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeRemoveMachineEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRemoveMachineEvent)
+	 */
+	public void handleProxyRuntimeRemoveMachineEvent(
+			IProxyRuntimeRemoveMachineEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeRemoveNodeEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRemoveNodeEvent)
+	 */
+	public void handleProxyRuntimeRemoveNodeEvent(IProxyRuntimeRemoveNodeEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeRemoveProcessEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRemoveProcessEvent)
+	 */
+	public void handleProxyRuntimeRemoveProcessEvent(
+			IProxyRuntimeRemoveProcessEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeRemoveQueueEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRemoveQueueEvent)
+	 */
+	public void handleProxyRuntimeRemoveQueueEvent(
+			IProxyRuntimeRemoveQueueEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
 	public void handleProxyRuntimeRunningStateEvent(IProxyRuntimeRunningStateEvent e) {
 		lock.lock();
 		try {
@@ -389,5 +449,32 @@ public class ORTERemoteProxyTest implements IProxyRuntimeEventListener {
 		} finally {
 			lock.unlock();
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeStartupErrorEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeStartupErrorEvent)
+	 */
+	public void handleProxyRuntimeStartupErrorEvent(
+			IProxyRuntimeStartupErrorEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeSubmitJobErrorEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeSubmitJobErrorEvent)
+	 */
+	public void handleProxyRuntimeSubmitJobErrorEvent(
+			IProxyRuntimeSubmitJobErrorEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeTerminateJobErrorEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeTerminateJobErrorEvent)
+	 */
+	public void handleProxyRuntimeTerminateJobErrorEvent(
+			IProxyRuntimeTerminateJobErrorEvent e) {
+		// TODO Auto-generated method stub
+		
 	}
 }
