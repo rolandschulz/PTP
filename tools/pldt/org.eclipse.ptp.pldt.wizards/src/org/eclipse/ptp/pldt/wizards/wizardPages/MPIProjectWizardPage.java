@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006 IBM Corp. and others.
+ * Copyright (c) 2006,2007 IBM Corp. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -73,6 +73,7 @@ public class MPIProjectWizardPage extends MBSCustomPage {
 	
 	public static final String MPI_COMPILE_COMMAND_PROP_ID = "mpiCompileCommand";
 	public static final String MPI_LINK_COMMAND_PROP_ID = "mpiLinkCommand";
+	public static final String MPI_SAMPLE_FILE_PROP_ID = "mpiSampleFile";
 
 	private String currentMpiIncludePath;
 	private String currentLibName;
@@ -98,6 +99,8 @@ public class MPIProjectWizardPage extends MBSCustomPage {
 	private Button useDefaultsButton;
 	private Button useMpiProjectSettingsButton;
 	private static boolean defaultUseMpiIncludes=false;
+	
+	private Button mpiSampleButton;
 
 	private IPreferenceStore preferenceStore;
 
@@ -238,6 +241,10 @@ public class MPIProjectWizardPage extends MBSCustomPage {
 	private void setCurrentMpiLinkCommand(String buildCommand) {
 		currentMpiLinkCommand = buildCommand;
 		MBSCustomPageManager.addPageProperty(pageID, MPI_LINK_COMMAND_PROP_ID, buildCommand);
+	}
+	private void setCurrentMpiSample(boolean doit){
+		String str=Boolean.toString(doit);
+		MBSCustomPageManager.addPageProperty(pageID, MPI_SAMPLE_FILE_PROP_ID, str);
 	}
 
 
@@ -465,6 +472,7 @@ public class MPIProjectWizardPage extends MBSCustomPage {
 			}
 		});
 		(new Label(composite,SWT.NONE)).setText(" ");//spacer
+
 		
 	}
 
@@ -499,10 +507,12 @@ public class MPIProjectWizardPage extends MBSCustomPage {
 				MBSCustomPageManager.addPageProperty(pageID, DO_MPI_INCLUDES, Boolean.toString(useMpiProjectSettings));
 				
 				useDefaultsButton.setEnabled(useMpiProjectSettings);
+				mpiSampleButton.setEnabled(useMpiProjectSettings);
 				if(useMpiProjectSettings) {
 				  boolean useDefaults=useDefaultsButton.getSelection();
 				  setUserAreaEnabled(!useDefaults);
 				}
+				
 				else
 					setUserAreaEnabled(false);
 				
@@ -546,6 +556,25 @@ public class MPIProjectWizardPage extends MBSCustomPage {
 		});
 
 		createUserEntryArea(group, defaultEnabled);
+		
+		mpiSampleButton = new Button(group, SWT.CHECK | SWT.RIGHT);
+		mpiSampleButton.setText("Include sample MPI source file?");
+		mpiSampleButton.setSelection(false);
+		mpiSampleButton.setEnabled(false);
+		GridData gdSample=new GridData();
+		gdSample.horizontalSpan = columns;
+		mpiSampleButton.setLayoutData(gdSample);
+		mpiSampleButton.addSelectionListener(new SelectionAdapter() {
+		
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				boolean doit=mpiSampleButton.getSelection();
+				System.out.println("mpi sample button selected: "+doit);
+				setCurrentMpiSample(doit);
+			}
+		
+		});
+		
 		setUserAreaEnabled(!defaultEnabled);
 
 	}
