@@ -129,4 +129,11 @@ public class CommonPlugin extends AbstractUIPlugin {
 		getDefault().getLog().log(status);
 
     }
+    /**
+     * Write to the ".log" file with default status type of IStatus.INFO
+     * @param msg the message to be displayed.
+     */
+    public static void log(String msg){
+    	log(IStatus.INFO, msg);
+    }
 }
