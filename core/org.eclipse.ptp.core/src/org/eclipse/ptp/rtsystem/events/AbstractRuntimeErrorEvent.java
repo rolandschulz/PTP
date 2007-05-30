@@ -19,28 +19,27 @@
 
 package org.eclipse.ptp.rtsystem.events;
 
-import org.eclipse.ptp.core.elements.attributes.ElementAttributeManager;
 
-public abstract class AbstractRuntimeNewEvent implements IRuntimeNewEvent {
-	private String parentId;
-	private ElementAttributeManager attrMgr;
+public abstract class AbstractRuntimeErrorEvent implements IRuntimeErrorEvent {
+	private int errorCode;
+	private String errorMessage;
 	
-	public AbstractRuntimeNewEvent(String parentId, ElementAttributeManager attrMgr) {
-		this.parentId = parentId;
-		this.attrMgr = attrMgr;
+	public AbstractRuntimeErrorEvent(int code, String message) {
+		this.errorCode = code;
+		this.errorMessage = message;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeNewEvent#getParentId()
+	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeErrorEvent#getErrorCode()
 	 */
-	public String getParentId() {
-		return parentId;
+	public int getErrorCode() {
+		return errorCode;
 	}
-	
+
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeNewEvent#getElementAttributeManager()
+	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeErrorEvent#getErrorMessage()
 	 */
-	public ElementAttributeManager getElementAttributeManager() {
-		return attrMgr;
+	public String getErrorMessage() {
+		return errorMessage;
 	}
 }
