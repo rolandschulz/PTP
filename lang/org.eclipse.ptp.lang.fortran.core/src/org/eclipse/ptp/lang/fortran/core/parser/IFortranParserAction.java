@@ -61,14 +61,32 @@ public abstract interface IFortranParserAction {
 		LOGICAL
 	}
 	
+	public enum DeclarationTypeSpec {
+		INTRINSIC,
+		TYPE,
+		CLASS,
+		unlimited
+	}
+	
 	public enum IntentSpec {
 		IN,
 		OUT,
 		INOUT
 	}
 	
+	public enum ArraySpecElement {
+		expr,
+		expr_colon,
+		expr_colon_expr,
+		expr_colon_asterisk,
+		asterisk,
+		colon
+	}
+	
 	public enum AttrSpec {
 		none,
+		access,
+		language_binding,
 		PUBLIC,
 		PRIVATE,
 		ALLOCATABLE,
@@ -207,6 +225,17 @@ public abstract interface IFortranParserAction {
 	 */
 	public abstract void intrinsic_type_spec(IntrinsicTypeSpec type, boolean hasKindSelector);
 
+	/** R404
+	 * kind_selector
+	 *	:	T_LPAREN (T_KIND T_EQUALS)? expr T_RPAREN
+	 *	|	T_ASTERISK T_DIGIT_STRING		// Nonstandard extension: source common practice
+	 *                                      // e.g., COMPLEX*16
+	 *
+	 * @param hasExpression True if an expr is present (standard-confirming option)
+	 * @param typeSize The size of the type (nonstandard *size usage)
+	 */
+	public abstract void kind_selector(boolean hasExpression, Token typeSize);
+
 	/** R405
 	 * signed_int_literal_constant
 	 *  : 	(T_PLUS|T_MINUS)? int_literal_constant
@@ -326,6 +355,15 @@ public abstract interface IFortranParserAction {
 	 */
 	public abstract void logical_literal_constant(boolean isTrue, Token kindParam);
 	
+	/** R430 
+	 * derived_type_stmt
+	 * 
+	 * T_TYPE ( ( T_COMMA type_attr_spec_list )? T_COLON_COLON )? T_IDENT
+	 * ( T_LPAREN generic_name_list T_RPAREN )? T_EOS
+	 *
+	 */
+	public abstract void derived_type_stmt(Token label, Token id);
+
 	/** R431 list
 	 * type_attr_spec
 	 * type_attr_spec_list
@@ -336,6 +374,24 @@ public abstract interface IFortranParserAction {
 	public abstract void type_attr_spec_list__begin();
 	public abstract void type_attr_spec_list(int count);
 
+	/** R433
+	 * end_type_stmt
+	 * : (label)? T_END T_TYPE (T_IDENT)? T_EOS
+	 * | (label)? T_ENDTYPE (T_IDENT)? T_EOS
+	 * 
+	 * @param label The label.
+	 * @param id The identifier.
+	 */
+	public abstract void end_type_stmt(Token label, Token id);
+
+	/** R434
+	 * sequence_stmt
+	 * :	(label)? T_SEQUENCE T_EOS
+	 * 
+	 * @param label The label.
+	 */
+	public abstract void sequence_stmt(Token label);
+
 	/** R436 list
 	 * type_param_decl
 	 * type_param_decl_list
@@ -345,6 +401,17 @@ public abstract interface IFortranParserAction {
 	 */
 	public abstract void type_param_decl_list__begin();
 	public abstract void type_param_decl_list(int count);
+
+	/** R440
+	 *	data_component_def_stmt
+     * :    (label)? declaration_type_spec 
+	 * 		( ( T_COMMA component_attr_spec_list {hasSpecList=true;})?
+	 *		T_COLON_COLON )? component_decl_list T_EOS
+	 * 
+	 * @param label The label.
+	 * @param hasSpecList Boolean true if has a component_attr_spec(_list).
+	 */
+	public abstract void data_component_def_stmt(Token label, boolean hasSpec);
 
 	/** R441 list
 	 * component_attr_spec
@@ -375,6 +442,16 @@ public abstract interface IFortranParserAction {
 	public abstract void deferred_shape_spec_list__begin();
 	public abstract void deferred_shape_spec_list(int count);
 
+	/** R445
+	 *	proc_component_def_stmt
+	 * :	(label)? T_PROCEDURE T_LPAREN (proc_interface)? T_RPAREN T_COMMA
+	 * 	    proc_component_attr_spec_list T_COLON_COLON proc_decl_list T_EOS
+	 * 
+	 * @param label The label.
+	 * @param hasInterface Boolean true if has a nonempty interface.
+	 */
+	public abstract void proc_component_def_stmt(Token label, boolean hasInterface);
+
 	/** R446 list
 	 * proc_component_attr_spec_list
 	 * 		proc_component_attr_spec ( T_COMMA proc_component_attr_spec )*
@@ -383,6 +460,32 @@ public abstract interface IFortranParserAction {
 	 */
 	public abstract void proc_component_attr_spec_list__begin();
 	public abstract void proc_component_attr_spec_list(int count);
+
+	/** R447
+	 * private_components_stmt
+	 * :	(label)? T_PRIVATE T_EOS
+	 * 
+	 * @param label The label.
+	 */
+	public abstract void private_components_stmt(Token label);
+
+	/** R449
+	 * binding_private_stmt
+	 * :	(label)? T_PRIVATE T_EOS
+	 * 
+	 * @param label The label.
+	 */
+	public abstract void binding_private_stmt(Token label);
+
+	/** R450
+	 * proc_binding_stmt
+	 * :	(label)? specific_binding T_EOS
+	 * |	(label)? generic_binding T_EOS
+	 * |	(label)? final_binding T_EOS
+	 * 
+	 * @param label The label.
+	 */
+	public abstract void proc_binding_stmt(Token label);
 
 	/** R453
 	 * binding_attr
@@ -404,6 +507,15 @@ public abstract interface IFortranParserAction {
 	 */
 	public abstract void binding_attr_list__begin();
 	public abstract void binding_attr_list(int count);
+	
+	/** R455
+	 * derived_type_spec
+	 *	: T_IDENT ( T_LPAREN type_param_spec_list T_RPAREN )?
+	 *
+	 * @param typeName The name of the derived type or class.
+	 * @param hasTypeParamSpecList True if type-param-spec-list is present.
+	 */
+	public abstract void derived_type_spec(Token typeName, boolean hasTypeParamSpecList);
 
 	/** R456 list
 	 * type_param_spec_list
@@ -423,6 +535,20 @@ public abstract interface IFortranParserAction {
 	public abstract void component_spec_list__begin();
 	public abstract void component_spec_list(int count);
 
+	/** R461
+	 * enum_def_stmt
+	 * 	:	(label)? T_ENUM T_COMMA T_BIND T_LPAREN T_IDENT T_RPAREN T_EOS
+	 * @param label The label.
+	 */
+	public abstract void enum_def_stmt(Token label);
+
+	/** R462
+	 * enumerator_def_stmt
+	:	(label)? T_ENUMERATOR ( T_COLON_COLON )? enumerator_list T_EOS
+	 * @param label The label.
+	 */
+	public abstract void enumerator_def_stmt(Token label);
+
 	/** R463 list
 	 * enumerator_list
 	 * 		enumerator ( T_COMMA enumerator )*
@@ -431,6 +557,15 @@ public abstract interface IFortranParserAction {
 	 */
 	public abstract void enumerator_list__begin();
 	public abstract void enumerator_list(int count);
+
+	/** R464
+	 * end_enum_stmt
+	 * :	(label)? T_END T_ENUM T_EOS
+	 * |	(label)? T_ENDENUM T_EOS
+	 *
+	 * @param label The label.
+	 */
+	public abstract void end_enum_stmt(Token label);
 
 	/** R465
 	 * array_constructor
@@ -458,6 +593,17 @@ public abstract interface IFortranParserAction {
 	 */
 	public abstract void type_declaration_stmt__begin();
 	public abstract void type_declaration_stmt(Token label, int numAttributes);
+	
+	/** R502
+	 * declaration_type_spec
+	 *	:	intrinsic_type_spec
+	 *	|	T_TYPE T_LPAREN	derived_type_spec T_RPAREN
+	 *	|	T_CLASS	T_LPAREN derived_type_spec T_RPAREN
+	 *	|	T_CLASS T_LPAREN T_ASTERISK T_RPAREN
+	 *
+	 * @param type The type of declaration-type-spec {INTRINSIC,TYPE,CLASS,POLYMORPHIC}.
+	 */
+	public abstract void declaration_type_spec(DeclarationTypeSpec type);
 
 	/** R503
 	 * attr_spec
@@ -522,6 +668,31 @@ public abstract interface IFortranParserAction {
 	 */
 	public abstract void null_init(Token id);
 
+	/** R509
+	 * language_binding_spec
+	 *	:	T_BIND T_LPAREN T_IDENT // 'C' // (T_COMMA name T_EQUALS expr)? T_RPAREN
+	 *
+	 * @param id The identifier representing the language binding, must be 'C' or 'c'.
+	 * @param hasName True if the language-binding-spec has a name expression.	 
+	 */
+	public abstract void language_binding_spec(Token id, boolean hasName);
+
+	/** R510
+	 * array_spec
+	 * 	:	array_spec_element (T_COMMA array_spec_element)*
+	 * 
+	 * array_spec_element
+	 * 	:	expr ( T_COLON (expr | T_ASTERISK)? )?
+	 *	|   T_ASTERISK
+	 *	|	T_COLON
+	 *
+	 * @param count The number of items in the list.
+	 * @param type The type of the array-spec element.
+	 */
+	public abstract void array_spec__begin();
+	public abstract void array_spec(int count);
+	public abstract void array_spec_element(ArraySpecElement type);
+
 	/** R511
 	 * explicit_shape_spec
  	 * expr ( T_COLON expr )?
@@ -546,6 +717,16 @@ public abstract interface IFortranParserAction {
 	 * @param intent The type of intent-spec.
 	 */
 	public abstract void intent_spec(IntentSpec intent);
+	
+	/** R518
+	 * access_stmt
+	 *
+	 *    :    (label)? access_spec ((T_COLON_COLON)? access_id_list)? T_EOS
+	 *
+	 * @param label The label.
+	 * @param hasList True if access-id-list is present.
+	 */
+	public abstract void access_stmt(Token label, boolean hasList);
 
 		/** R519-08 list
 	 * deferred_co_shape_spec_list
@@ -564,15 +745,52 @@ public abstract interface IFortranParserAction {
 	 */
 	public abstract void access_id_list__begin();
 	public abstract void access_id_list(int count);
+	
+	/** R521
+	 * asynchronous_stmt
+	 *
+	 * :	(label)? T_ASYNCHRONOUS ( T_COLON_COLON )?  generic_name_list T_EOS
+	 *
+	 * @param label The label.
+	 */
+	public abstract void asynchronous_stmt(Token label);
+
+	/** R522
+	 * bind_stmt
+	 *	:	(label)? language_binding_spec (T_COLON_COLON)? bind_entity_list T_EOS
+	 *
+	 * @param label Optional statement label
+	 */
+	public abstract void bind_stmt(Token label);
+
+	/** R523
+	 * bind_entity
+	 *	:	T_IDENT | T_SLASH T_IDENT T_SLASH
+	 *
+	 * @param entity The thing to bind.
+	 * @param isCommonBlockName True if the entity is the name of a common block
+	 */
+	public abstract void bind_entity(Token entity, boolean isCommonBlockName);
 
 	/** R523 list
 	 * bind_entity_list
-	 * 	:    bind_entity ( T_COMMA bind_entity )*
+	 * 	:	bind_entity ( T_COMMA bind_entity )*
 	 * 
 	 * @param count The number of items in the list.
 	 */
 	public abstract void bind_entity_list__begin();
 	public abstract void bind_entity_list(int count);
+
+	/** R524
+	 * data_stmt
+	 *
+     * : (label)? T_DATA data_stmt_set ((T_COMMA)? data_stmt_set)* T_EOS
+	 * 
+	 * @param label The label.
+	 * @param count The number of items in the list.
+	 */
+	public abstract void data_stmt__begin();
+	public abstract void data_stmt(Token label, int count);
 
 	/** R526 list
 	 * data_stmt_object_list
@@ -601,6 +819,46 @@ public abstract interface IFortranParserAction {
 	public abstract void data_stmt_value_list__begin();
 	public abstract void data_stmt_value_list(int count);
 
+	/** R535
+	 * dimension_stmt
+	 *
+	 * (label)? T_DIMENSION ( T_COLON_COLON )? dimension_decl 
+	 * 			( T_COMMA dimension_decl {count++;})* T_EOS
+	 * 
+	 * @param label The label.
+	 * @param count The number of items in the list.
+	 */
+	public abstract void dimension_stmt__begin();
+	public abstract void dimension_stmt(Token label, int count);
+
+	/** R536
+	 * intent_stmt
+	 *
+	 * (label)? T_INTENT T_LPAREN intent_spec T_RPAREN ( T_COLON_COLON )? 
+	 * 		generic_name_list T_EOS
+	 *
+	 * @param label The label.
+	 */
+	public abstract void intent_stmt(Token label);
+
+	/** R537
+	 * optional_stmt
+	 *
+	 * : (label)? T_OPTIONAL ( T_COLON_COLON )? generic_name_list T_EOS
+	 *
+	 * @param label The label.
+	 */
+	public abstract void optional_stmt(Token label);
+
+	/** R538
+	 * parameter_stmt
+	 *
+	:	(label)? T_PARAMETER T_LPAREN named_constant_def_list T_RPAREN T_EOS
+	 *
+	 * @param label The label.
+	 */
+	public abstract void parameter_stmt(Token label);
+
 	/** R539 list
 	 * named_constant_def_list
 	 * 	:    named_constant_def ( T_COMMA named_constant_def )*
@@ -609,6 +867,15 @@ public abstract interface IFortranParserAction {
 	 */
 	public abstract void named_constant_def_list__begin();
 	public abstract void named_constant_def_list(int count);
+
+	/** R540
+	 * pointer_stmt
+	 *
+	:	(label)? T_POINTER ( T_COLON_COLON )? pointer_decl_list T_EOS
+	 *
+	 * @param label The label.
+	 */
+	public abstract void pointer_stmt(Token label);
 
 	/** R541 list
 	 * pointer_decl_list
@@ -619,6 +886,25 @@ public abstract interface IFortranParserAction {
 	public abstract void pointer_decl_list__begin();
 	public abstract void pointer_decl_list(int count);
 
+	/** R542
+	 * protected_stmt
+	 *
+	 * :	(label)? T_PROTECTED ( T_COLON_COLON )? generic_name_list T_EOS
+	 *
+	 * @param label The label.
+	 */
+	public abstract void protected_stmt(Token label);
+
+	/** R543
+	 * save_stmt
+	 *
+	 * :	(label)? T_PROTECTED ( T_COLON_COLON )? generic_name_list T_EOS
+	 *
+	 * @param label The label.
+	 * @param hasSavedEntityList True if has saved-entity-list.
+	 */
+	public abstract void save_stmt(Token label,boolean hasSavedEntityList);
+
 	/** R544 list
 	 * saved_entity_list
 	 * 	:    saved_entity ( T_COMMA saved_entity )*
@@ -627,6 +913,46 @@ public abstract interface IFortranParserAction {
 	 */
 	public abstract void saved_entity_list__begin();
 	public abstract void saved_entity_list(int count);
+
+	/** R546 list
+	 * target_stmt
+	 *	
+     * : (label)? T_TARGET ( T_COLON_COLON )? target_decl 
+	 * 			( T_COMMA target_decl)* T_EOS
+	 * 
+	 * @param label The label.
+	 * @param count The number of items in the list.
+	 */
+	public abstract void target_stmt__begin();
+	public abstract void target_stmt(Token label, int count);
+
+	/** R547
+	 * value_stmt
+	 *
+	 * 	(label)? T_VALUE ( T_COLON_COLON )? generic_name_list T_EOS
+	 *
+	 * @param label The label.
+	 */
+	public abstract void value_stmt(Token label);
+
+	/** R548
+	 * volatile_stmt
+	 *
+	 *	(label)? T_VOLATILE ( T_COLON_COLON )? generic_name_list T_EOS
+	 *
+	 * @param label The label.
+	 */
+	public abstract void volatile_stmt(Token label);
+
+	/** R549
+	 * implicit_stmt
+	 *
+	 * :	(label)? T_IMPLICIT implicit_spec_list T_EOS
+	 * |	(label)? T_IMPLICIT T_NONE T_EOS
+	 *
+	 * @param label The label.
+	 */
+	public abstract void implicit_stmt(Token label);
 
 	/** R550 list
 	 * implicit_spec_list
@@ -654,6 +980,15 @@ public abstract interface IFortranParserAction {
 	 */
 	public abstract void namelist_group_object_list__begin();
 	public abstract void namelist_group_object_list(int count);
+
+	/** R554
+	 * equivalence_stmt
+	 *
+	 * : (label)? T_EQUIVALENCE equivalence_set_list T_EOS
+	 *
+	 * @param label The label.
+	 */
+	public abstract void equivalence_stmt(Token label);
 
 	/** R555 list
 	 * equivalence_set_list
@@ -1026,6 +1361,69 @@ public abstract interface IFortranParserAction {
 	public abstract void bounds_remapping_list__begin();
 	public abstract void bounds_remapping_list(int count);
 
+	/** R743 
+	 * where_stmt
+	 *
+	 *	(label {lbl=$label.tk;})? T_WHERE_STMT T_WHERE
+	 *		T_LPAREN expr T_RPAREN assignment_stmt
+	 *
+	 * @param label The label
+	 */
+	public abstract void where_stmt(Token label);
+
+	/** R744 
+	 * where_construct_stmt
+	 *
+	 *  ( T_IDENT T_COLON )? T_WHERE_CONSTRUCT_STMT T_WHERE 
+     *       T_LPAREN expr T_RPAREN T_EOS
+	 *
+	 * @param id Possible identifier.
+	 */
+	public abstract void where_construct_stmt(Token id);
+
+	/** R749 
+	 * masked_elsewhere_stmt
+	 *
+	 * T_ELSE T_WHERE T_LPAREN expr T_RPAREN ( T_IDENT )? T_EOS
+	 *	T_ELSEWHERE    T_LPAREN expr T_RPAREN ( T_IDENT )? T_EOS
+	 *  ( T_IDENT T_COLON )? T_WHERE_CONSTRUCT_STMT T_WHERE 
+     *       T_LPAREN expr T_RPAREN T_EOS
+	 *
+	 * @param id The identifier.
+	 */
+	public abstract void masked_elsewhere_stmt(Token label, Token id);
+
+	/** R750 
+	 * elsewhere_stmt
+	 *
+	 * 		(label {lbl=$label.tk;})? T_ELSE T_WHERE (id=T_IDENT)? T_EOS
+	 * |	(label {lbl=$label.tk;})? T_ELSEWHERE    (id=T_IDENT)? T_EOS 
+	 *
+	 * @param label The label
+	 * @param id The identifier
+	 */
+	public abstract void elsewhere_stmt(Token label, Token id);
+
+	/** R751 
+	 * end_where_stmt
+	 *
+	 * : T_END T_WHERE ( T_IDENT )? T_EOS
+	 * | T_ENDWHERE ( T_IDENT )? T_EOS
+	 *
+	 * @param label The label
+	 * @param id The identifier
+	 */
+	public abstract void end_where_stmt(Token label, Token id);
+
+	/** R753 
+	 * forall_construct_stmt
+	 *
+	 * (T_IDENT T_COLON)? T_FORALL_CONSTRUCT_STMT T_FORALL forall_header T_EOS
+	 * @param label The label
+	 * @param id The identifier
+	 */
+	public abstract void forall_construct_stmt(Token label, Token id);
+
 	/** R755 list
 	 * forall_triplet_spec_list
 	 * 	:    forall_triplet_spec ( T_COMMA forall_triplet_spec )*
@@ -1152,6 +1550,38 @@ public abstract interface IFortranParserAction {
 	 */
 	public abstract void close_spec_list__begin();
 	public abstract void close_spec_list(int count);
+	
+	/** R911
+	 * write_stmt
+	 *	:	(label)? T_WRITE T_LPAREN io_control_spec_list T_RPAREN (output_item_list)? T_EOS
+	 *
+	 * @param label The statement label
+	 * @param hasOutputList True if output-item-list is present
+	 */
+	public abstract void write_stmt(Token label, boolean hasOutputList);
+
+	/** R913
+	 * io_control_spec
+	 *	:	expr
+	 *	|	T_ASTERISK
+	 *	|	T_IDENT // {'UNIT','FMT'}
+	 *		    T_EQUALS T_ASTERISK
+	 *	|	T_IDENT
+	 *		// {'UNIT','FMT'} are expr 'NML' is T_IDENT}
+	 *		// {'ADVANCE','ASYNCHRONOUS','BLANK','DECIMAL','DELIM'} are expr
+	 *	    // {'END','EOR','ERR'} are labels
+	 *	    // {'ID','IOMSG',IOSTAT','SIZE'} are variables
+	 *	    // {'PAD','POS','REC','ROUND','SIGN'} are expr
+	 *		T_EQUALS expr
+	 *
+	 * ERR_CHK 913 check expr type with identifier
+	 * io_unit and format are both (expr|'*') so combined
+	 * 
+	 * @param hasExpression True if the io-control-spec has an expression
+	 * @param keyword Represents the keyword if present
+	 * @param hasAsterisk True if an '*' is present
+	 */
+	 public abstract void io_control_spec(boolean hasExpression, Token keyword, boolean hasAsterisk);
 
 	/** R913 list
 	 * io_control_spec_list

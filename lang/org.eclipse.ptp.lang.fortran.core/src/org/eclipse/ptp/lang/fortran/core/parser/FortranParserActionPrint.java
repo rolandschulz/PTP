@@ -23,7 +23,7 @@ public class FortranParserActionPrint implements IFortranParserAction {
 	
 	private boolean verbose = true;
 	
-	FortranParserActionPrint(FortranParser parser, String filename) {
+	FortranParserActionPrint(String[] args, FortranParser parser, String filename) {
 		super();
 	}
 	
@@ -189,6 +189,16 @@ public class FortranParserActionPrint implements IFortranParserAction {
 		printRuleTrailer();
 	}
 
+	/** R404
+	 * kind_selector
+	 */
+	public void kind_selector(boolean hasExpression, Token typeSize) {
+		printRuleHeader(404, "kind-selector");
+		printParameter(hasExpression, "hasExpression");
+		printParameter(typeSize, "typeSize");
+		printRuleTrailer();
+	}
+
 	/** R405
 	 * signed_int_literal_constant
 	 */
@@ -301,6 +311,17 @@ public class FortranParserActionPrint implements IFortranParserAction {
 		printRuleTrailer(); 
 	}
 
+	/** R430 
+	 * derived_type_stmt
+	 *
+	 */
+	public void derived_type_stmt(Token label, Token id) {
+		printRuleHeader(430, "derived-type-stmt");
+		if (label != null) printParameter(label, "label");
+		printParameter(id, "id");
+		printRuleTrailer();
+	}
+
 	/** R431 list
 	 * type_attr_spec
 	 * type_attr_spec_list
@@ -315,6 +336,27 @@ public class FortranParserActionPrint implements IFortranParserAction {
 		printRuleTrailer();	
 	}
 
+	/** R433 
+	 * end_type_stmt
+	 *
+	 */
+	public void end_type_stmt(Token label, Token id) {
+		printRuleHeader(430, "end-type-stmt");
+		if (label != null) printParameter(label, "label");
+		if (id != null) printParameter(id, "id");
+		printRuleTrailer();
+	}
+
+	/** R434 
+	 * sequence_stmt
+	 *
+	 */
+	public void sequence_stmt(Token label) {
+		printRuleHeader(430, "sequence-stmt");
+		if (label != null) printParameter(label, "label");
+		printRuleTrailer();
+	}
+
 	/** R436 list
 	 * type_param_decl
 	 * type_param_decl_list
@@ -327,6 +369,16 @@ public class FortranParserActionPrint implements IFortranParserAction {
 		printRuleHeader(436, "type-param-decl-list", "list");
 		printParameter(count, "count");
 		printRuleTrailer();	
+	}
+
+	/** R440
+	 *	data_component_def_stmt
+	 */
+	public void data_component_def_stmt(Token label, boolean hasSpec) {
+		printRuleHeader(440, "data-component-def-stmt");
+		if (label != null) printParameter(label, "label");
+		printParameter(hasSpec, "hasSpec");
+		printRuleTrailer();
 	}
 
 	/** R441 list
@@ -373,6 +425,16 @@ public class FortranParserActionPrint implements IFortranParserAction {
 		printRuleTrailer();
 	}
 
+	/** R445
+	 *	proc_component_def_stmt
+	 */
+	public void proc_component_def_stmt(Token label, boolean hasInterface) {
+		printRuleHeader(445, "proc-component-def-stmt");
+		if (label != null) printParameter(label, "label");
+		printParameter(hasInterface, "hasInterface");
+		printRuleTrailer();
+	}
+
 	/** R446 list
 	 * proc_component_attr_spec_list
 	 */
@@ -384,6 +446,33 @@ public class FortranParserActionPrint implements IFortranParserAction {
 	public void proc_component_attr_spec_list(int count) {
 		printRuleHeader(446, "proc-component-attr-spec-list", "list");
 		printParameter(count, "count");
+		printRuleTrailer();
+	}
+
+	/** R447
+	 * private_components_stmt
+	 */
+	public void private_components_stmt(Token label) {
+		printRuleHeader(447, "private-components-stmt");
+		if (label != null) printParameter(label, "label");
+		printRuleTrailer();
+	}
+
+	/** R449
+	 * binding_private_stmt
+	 */
+	public void binding_private_stmt(Token label) {
+		printRuleHeader(447, "binding-private-stmt");
+		if (label != null) printParameter(label, "label");
+		printRuleTrailer();
+	}
+
+	/** R450
+	 * proc_binding_stmt
+	 */
+	public void proc_binding_stmt(Token label) {
+		printRuleHeader(450, "proc-binding-stmt");
+		if (label != null) printParameter(label, "label");
 		printRuleTrailer();
 	}
 
@@ -408,6 +497,16 @@ public class FortranParserActionPrint implements IFortranParserAction {
 		printRuleHeader(453, "binding-attr-list", "list");
 		printParameter(count, "count");
 		printRuleTrailer();
+	}
+
+	/** R455
+	 * derived_type_spec
+	 */
+	public void derived_type_spec(Token typeName, boolean hasTypeParamSpecList) {
+		printRuleHeader(455, "derived-type-spec");
+		printParameter(typeName, "typeName");
+		printParameter(hasTypeParamSpecList, "hasTypeParamSpecList");
+		printRuleTrailer();			
 	}
 
 	/** R456 list
@@ -436,6 +535,24 @@ public class FortranParserActionPrint implements IFortranParserAction {
 		printRuleTrailer();
 	}
 
+	/** R461
+	 * enum_def_stmt
+	 */
+	public void enum_def_stmt(Token label) {
+		printRuleHeader(461, "enum-def-stmt");
+		if (label != null) printParameter(label, "label");
+		printRuleTrailer();
+	}
+
+	/** R462
+	 * enumerator_def_stmt
+	 */
+	public void enumerator_def_stmt(Token label) {
+		printRuleHeader(462, "enumerator-def-stmt");
+		if (label != null) printParameter(label, "label");
+		printRuleTrailer();
+	}
+
 	/** R463 list
 	 * enumerator_list
 	 */
@@ -446,6 +563,15 @@ public class FortranParserActionPrint implements IFortranParserAction {
 	public void enumerator_list(int count) {
 		printRuleHeader(463, "enumerator-list", "list");
 		printParameter(count, "count");
+		printRuleTrailer();
+	}
+
+	/** R464
+	 * end_enum_stmt
+	 */
+	public void end_enum_stmt(Token label) {
+		printRuleHeader(464, "end-enum-stmt");
+		if (label != null) printParameter(label, "label");
 		printRuleTrailer();
 	}
 
@@ -483,7 +609,22 @@ public class FortranParserActionPrint implements IFortranParserAction {
 		printParameter(numAttributes, "numAttributes");
 		printRuleTrailer();
 	}
-	
+
+	/** R502
+	 * declaration_type_spec
+	 *	:	intrinsic_type_spec
+	 *	|	T_TYPE T_LPAREN	derived_type_spec T_RPAREN
+	 *	|	T_CLASS	T_LPAREN derived_type_spec T_RPAREN
+	 *	|	T_CLASS T_LPAREN T_ASTERISK T_RPAREN
+	 *
+	 * @param type The type of declaration-type-spec {INTRINSIC,TYPE,CLASS,POLYMORPHIC}.
+	 */
+	public void declaration_type_spec(DeclarationTypeSpec type) {
+		printRuleHeader(502, "declaration-type-spec");
+		printParameter(type, "type");
+		printRuleTrailer();
+	}
+
 	/** R503
 	 * attr_spec
 	 */
@@ -538,6 +679,34 @@ public class FortranParserActionPrint implements IFortranParserAction {
 		printRuleTrailer();	
 	}
 
+	/** R509
+	 * language_binding_spec 
+	 */
+	public void language_binding_spec(Token id, boolean hasName) {
+		printRuleHeader(509, "language-binding-spec");
+		printParameter(id, "language");
+		printParameter(hasName, "hasName");
+		printRuleTrailer();	
+	}
+
+	/** R510
+	 * array_spec
+	 */
+	public void array_spec__begin() {
+		printRuleHeader(510, "array-spec__begin", "begin");
+		printRuleTrailer();
+	}
+	public void array_spec(int count) {
+		printRuleHeader(510, "array-spec");
+		printParameter(count, "count");
+		printRuleTrailer();
+	}
+	public void array_spec_element(ArraySpecElement type) {
+		printRuleHeader(510, "array-spec-element");
+		printParameter(type, "type");
+		printRuleTrailer();
+	}
+
 	/** R511 list
 	 * explicit_shape_spec
 	 * explicit_shape_spec_list
@@ -580,6 +749,16 @@ public class FortranParserActionPrint implements IFortranParserAction {
 		printRuleTrailer();
 	}
 
+	/** R518
+	 * access_stmt
+	 */
+	public void access_stmt(Token label, boolean hasList) {
+		printRuleHeader(447, "access-stmt");
+		if (label != null) printParameter(label, "label");
+		printParameter(hasList, "has-access-id-list");
+		printRuleTrailer();
+	}
+
 	/** R519 list
 	 * access_id_list
      */
@@ -593,16 +772,54 @@ public class FortranParserActionPrint implements IFortranParserAction {
 		printRuleTrailer();
 	}
 
+	/** R521
+	 * asynchronous_stmt
+	 */
+	public void asynchronous_stmt(Token label) {
+		printRuleHeader(447, "asynchronous-stmt");
+		if (label != null) printParameter(label, "label");
+		printRuleTrailer();
+	}
+
+	/** R522
+	 * bind_stmt
+     */
+	public void bind_stmt(Token label) {
+		printRuleHeader(522, "bind-stmt");
+		printParameter(label, "label");
+		printRuleTrailer();
+	}
 
 	/** R523 list
+	 * bind_entity
 	 * bind_entity_list
      */
+	public void bind_entity(Token entity, boolean isCommonBlockName) {
+		printRuleHeader(523, "bind-entity");
+		printParameter(entity, "entity");
+		printParameter(isCommonBlockName, "isCommonBlockName");
+		printRuleTrailer();
+	}
 	public void bind_entity_list__begin() {
 		printRuleHeader(523, "bind-entity-list__begin", "list-begin");
 		printRuleTrailer();	
 	}
 	public void bind_entity_list(int count) {
 		printRuleHeader(523, "bind-entity-list", "list");
+		printParameter(count, "count");
+		printRuleTrailer();
+	}
+
+	/** R524
+	 * data_stmt (Kinda, sorta list like.)
+     */
+	public void data_stmt__begin() {
+		printRuleHeader(524, "data-stmt__begin", "list-begin");
+		printRuleTrailer();	
+	}
+	public void data_stmt(Token label, int count) {
+		printRuleHeader(524, "data-stmt");
+		if (label != null) printParameter(label, "label");
 		printParameter(count, "count");
 		printRuleTrailer();
 	}
@@ -646,6 +863,47 @@ public class FortranParserActionPrint implements IFortranParserAction {
 		printRuleTrailer();
 	}
 
+	/** R535
+	 * dimension_stmt (Kinda, sorta list like.)
+     */
+	public void dimension_stmt__begin() {
+		printRuleHeader(535, "dimension-stmt__begin", "list-begin");
+		printRuleTrailer();	
+	}
+	public void dimension_stmt(Token label, int count) {
+		printRuleHeader(535, "dimension-stmt");
+		if (label != null) printParameter(label, "label");
+		printParameter(count, "count");
+		printRuleTrailer();
+	}
+
+	/** R536
+	 * intent_stmt
+     */
+	public void intent_stmt(Token label) {
+		printRuleHeader(536, "intent-stmt");
+		if (label!=null) printParameter(label, "label");
+		printRuleTrailer();
+	}
+
+	/** R537
+	 * optional_stmt
+     */
+	public void optional_stmt(Token label) {
+		printRuleHeader(536, "optional-stmt");
+		if (label!=null) printParameter(label, "label");
+		printRuleTrailer();
+	}
+
+	/** R538
+	 * parameter_stmt
+     */
+	public void parameter_stmt(Token label) {
+		printRuleHeader(538, "parameter-stmt");
+		if (label!=null) printParameter(label, "label");
+		printRuleTrailer();
+	}
+
 	/** R539 list
 	 * named_constant_def_list
      */
@@ -656,6 +914,15 @@ public class FortranParserActionPrint implements IFortranParserAction {
 	public void named_constant_def_list(int count) {
 		printRuleHeader(539, "named-constant-def-list", "list");
 		printParameter(count, "count");
+		printRuleTrailer();
+	}
+
+	/** R540
+	 * pointer_stmt
+     */
+	public void pointer_stmt(Token label) {
+		printRuleHeader(540, "pointer-stmt");
+		if (label!=null) printParameter(label, "label");
 		printRuleTrailer();
 	}
 
@@ -672,6 +939,25 @@ public class FortranParserActionPrint implements IFortranParserAction {
 		printRuleTrailer();
 	}
 
+	/** R542
+	 * protected_stmt
+     */
+	public void protected_stmt(Token label) {
+		printRuleHeader(542, "protected-stmt");
+		if (label!=null) printParameter(label, "label");
+		printRuleTrailer();
+	}
+
+	/** R543
+	 * save_stmt
+     */
+	public void save_stmt(Token label, boolean hasSavedEntityList) {
+		printRuleHeader(543, "save-stmt");
+		if (label!=null) printParameter(label, "label");
+		printParameter(hasSavedEntityList, "hasSavedEntityList");
+		printRuleTrailer();
+	}
+
 	/** R544 list
 	 * saved_entity_list
      */
@@ -682,6 +968,47 @@ public class FortranParserActionPrint implements IFortranParserAction {
 	public void saved_entity_list(int count) {
 		printRuleHeader(544, "saved-entity-list", "list");
 		printParameter(count, "count");
+		printRuleTrailer();
+	}
+
+	/** R546
+	 * target_stmt
+     */
+	public void target_stmt__begin() {
+		printRuleHeader(546, "target-stmt__begin");
+		printRuleTrailer();	
+	}
+	public void target_stmt(Token label, int count) {
+		printRuleHeader(546, "target-stmt");
+		if (label!=null) printParameter(label, "label");
+		printParameter(count, "count");
+		printRuleTrailer();
+	}
+
+	/** R547
+	 * value_stmt
+     */
+	public void value_stmt(Token label) {
+		printRuleHeader(547, "value-stmt");
+		if (label!=null) printParameter(label, "label");
+		printRuleTrailer();
+	}
+
+	/** R548
+	 * volatile_stmt
+     */
+	public void volatile_stmt(Token label) {
+		printRuleHeader(548, "volatile-stmt");
+		if (label!=null) printParameter(label, "label");
+		printRuleTrailer();
+	}
+
+	/** R549
+	 * implicit_stmt
+     */
+	public void implicit_stmt(Token label) {
+		printRuleHeader(549, "implicit-stmt");
+		if (label!=null) printParameter(label, "label");
 		printRuleTrailer();
 	}
 
@@ -721,6 +1048,15 @@ public class FortranParserActionPrint implements IFortranParserAction {
 	public void namelist_group_object_list(int count) {
 		printRuleHeader(553, "namelist-group-object-list", "list");
 		printParameter(count, "count");
+		printRuleTrailer();
+	}
+
+	/** R554
+	 * equivalence_stmt
+     */
+	public void equivalence_stmt(Token label) {
+		printRuleHeader(554, "equivalence-stmt");
+		if (label!=null) printParameter(label, "label");
 		printRuleTrailer();
 	}
 
@@ -1190,6 +1526,64 @@ public class FortranParserActionPrint implements IFortranParserAction {
 		printRuleTrailer();
 	}
 
+	/** R743
+	 * where_stmt
+     */
+	public void where_stmt(Token label) {
+		printRuleHeader(743, "where-stmt");
+		if (label != null) printParameter(label, "label");
+		printRuleTrailer();
+	}
+
+	/** R744
+	 * where_construct_stmt
+     */
+	public void where_construct_stmt(Token id) {
+		printRuleHeader(744, "where-construct-stmt");
+		if (id != null) printParameter(id, "id");
+		printRuleTrailer();
+	}
+
+	/** R749
+	 * masked_elsewhere_stmt
+     */
+	public void masked_elsewhere_stmt(Token label, Token id) {
+		printRuleHeader(749, "masked-elsewhere-stmt");
+		if (label != null) printParameter(label, "label");
+		if (id != null) printParameter(id, "id");
+		printRuleTrailer();
+	}
+
+	/** R750
+	 * elsewhere_stmt
+     */
+	public void elsewhere_stmt(Token label, Token id) {
+		printRuleHeader(750, "elsewhere-stmt");
+		if (label != null) printParameter(label, "label");
+		if (id != null) printParameter(id, "id");
+		printRuleTrailer();
+	}
+
+	/** R751
+	 * end_where_stmt
+     */
+	public void end_where_stmt(Token label, Token id) {
+		printRuleHeader(751, "end-where-stmt");
+		if (label != null) printParameter(label, "label");
+		if (id != null) printParameter(id, "id");
+		printRuleTrailer();
+	}
+
+	/** R753
+	 * forall_construct_stmt
+     */
+	public void forall_construct_stmt(Token label, Token id) {
+		printRuleHeader(753, "forall-construct-stmt");
+		if (label != null) printParameter(label, "label");
+		if (id != null) printParameter(id, "id");
+		printRuleTrailer();
+	}
+
 	/** R755 list
 	 * forall_triplet_spec_list
      */
@@ -1339,6 +1733,26 @@ public class FortranParserActionPrint implements IFortranParserAction {
 		printRuleTrailer();
 	}
 
+	/** R911
+	 * write_stmt
+	 */
+	public void write_stmt(Token label, boolean hasOutputList) {
+		printRuleHeader(911, "write-stmt");
+		if (label != null) printParameter(label, "label");
+		printParameter(hasOutputList, "hasOutputList");
+		printRuleTrailer();
+	}
+
+	/** R913
+	 * io_control_spec
+	 */
+	 public void io_control_spec(boolean hasExpression, Token keyword, boolean hasAsterisk) {
+			printRuleHeader(913, "io-control-spec-list");
+			printParameter(hasExpression, "hasExpression");
+			printParameter(keyword, "keyword");
+			printParameter(hasAsterisk, "hasAsterisk");
+			printRuleTrailer();		 
+	 }
 	/** R913 list
 	 * io_control_spec_list
      */
