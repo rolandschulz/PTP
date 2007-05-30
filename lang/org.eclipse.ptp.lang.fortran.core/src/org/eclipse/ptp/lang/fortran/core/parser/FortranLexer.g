@@ -310,8 +310,8 @@ T_EQV           : '.EQV.' ;
 T_NEQV          : '.NEQV.';
 
 T_PERIOD_EXPONENT 
-    : '.' ('0'..'9')* ('E' | 'e' | 'd' | 'D') ('+' | '-')? ('0'..'9')+  
-    | '.' ('0'..'9')* ('+' | '-') ('0'..'9')+ 
+    : '.' ('0'..'9')+ ('E' | 'e' | 'd' | 'D') ('+' | '-')? ('0'..'9')+  
+    | '.' ('E' | 'e' | 'd' | 'D') ('+' | '-')? ('0'..'9')+  
     | '.' ('0'..'9')+
     | ('0'..'9')+ ('e' | 'E' | 'd' | 'D') ('+' | '-')? ('0'..'9')+ 
     ;
@@ -459,12 +459,7 @@ T_DIMENSION     :       'DIMENSION'     ;
 T_KIND : 'KIND' ;
 T_LEN : 'LEN' ;
 
-
-
-T_BIND_LPAREN_C
-        : 'BIND' '(' 'C'
-        ;
-
+T_BIND : 'BIND' ;
 
 // Must come after .EQ. (for example) or will get matched first
 // TODO:: this may have to be done in the parser w/ a rule such as:
