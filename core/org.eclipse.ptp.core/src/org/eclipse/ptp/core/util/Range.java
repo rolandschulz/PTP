@@ -18,10 +18,10 @@ import java.util.NoSuchElementException;
  * Represents a range of numbers inclusive of max and min.
  *
  */
-public class Range implements Iterable<Integer> {
-	private int min;
-	private int max;
-	private int curr;
+public class Range implements Iterable<String> {
+	private Integer min;
+	private Integer max;
+	private Integer curr;
 	
 	public Range(int val) {
 		this(val, val);
@@ -66,17 +66,17 @@ public class Range implements Iterable<Integer> {
 		return min + "-" + max;
 	}
 
-	public Iterator<Integer> iterator() {
+	public Iterator<String> iterator() {
 		curr = min;
 		
-		return new Iterator<Integer>() {
+		return new Iterator<String>() {
 			public boolean hasNext() {
 				return curr <= max;
 			}
 
-			public Integer next() {
+			public String next() {
 				if (hasNext()) {
-					return curr++;
+					return (curr++).toString();
 				} else {
 					throw new NoSuchElementException();
 				}

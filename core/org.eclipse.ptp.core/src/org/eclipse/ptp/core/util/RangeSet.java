@@ -20,10 +20,10 @@ import java.util.NoSuchElementException;
  * kept in a sorted list.
  *
  */
-public class RangeSet implements Iterable<Integer> {
+public class RangeSet implements Iterable<String> {
 	private ArrayList<Range>	rangeList = new ArrayList<Range>(0);
 	private Iterator<Range>		rangeListIter;
-	private Iterator<Integer>	rangeIter;
+	private Iterator<String>	rangeIter;
 	
 	public RangeSet() {
 		
@@ -249,7 +249,7 @@ public class RangeSet implements Iterable<Integer> {
 	    return -(low+1);
 	}
 
-	public Iterator<Integer> iterator() {
+	public Iterator<String> iterator() {
 		rangeListIter = rangeList.iterator();
 		
 		if (rangeListIter.hasNext())
@@ -257,12 +257,12 @@ public class RangeSet implements Iterable<Integer> {
 		else
 			rangeIter = null;
 		
-		return new Iterator<Integer>() {
+		return new Iterator<String>() {
 			public boolean hasNext() {
 				return rangeIter != null && (rangeIter.hasNext() || rangeListIter.hasNext());
 			}
 
-			public Integer next() {
+			public String next() {
 				if (hasNext()) {
 					if (!rangeIter.hasNext()) {
 						rangeIter = rangeListIter.next().iterator();
