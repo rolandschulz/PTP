@@ -1059,7 +1059,7 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 						IMarker m2 = (IMarker) e2;
 						tempObj = m2.getAttribute(LINE);
 						// we assume if the first was Integer, this one is, too.
-						Assert.isTrue(tempObj instanceof Integer);
+						assert tempObj instanceof Integer;
 						line2 = ((Integer) tempObj).intValue();
 
 					}
