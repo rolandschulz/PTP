@@ -66,4 +66,32 @@
 #define PROXY_EV_RT_STARTUP_ERROR		PROXY_EV_RT_OFFSET + 22	/*LOCAL EVENT */
 #define PROXY_EV_RT_SUBMITJOB_ERROR		PROXY_EV_RT_OFFSET + 23	/*LOCAL EVENT */
 #define PROXY_EV_RT_TERMINATEJOB_ERROR	PROXY_EV_RT_OFFSET + 24	/*LOCAL EVENT */
+
+void		proxy_add_string_attribute(proxy_msg *m, char *attr, char *value);
+void		proxy_add_int_attribute(proxy_msg *m, char *attr, int value);
+proxy_msg *	proxy_ok_event(int trans_id);
+proxy_msg *	proxy_message_event(int trans_id, char *level, int code, char *fmt, ...);
+proxy_msg *	proxy_error_event(int trans_id, int code, char *msg);
+proxy_msg *	proxy_submitjob_error_event(int trans_id, char *jobSubId, int code, char *msg);
+proxy_msg *	proxy_job_error_event(int trans_id, char *jobId, int code, char *msg);
+proxy_msg *	proxy_attr_def_int_event(int trans_id, char *id, char *name, char *desc, int def);
+proxy_msg *	proxy_attr_def_string_event(int trans_id, char *id, char *name, char *desc, char *def);
+proxy_msg *	proxy_new_machine_event(int trans_id, char *rm_id, char *machine_id_range, char *name, char *state);
+proxy_msg *	proxy_new_job_event(int trans_id, char *queue_id, char *job_id_range, char *name, char *state, char *jobSubId);
+proxy_msg *	proxy_new_node_event(int trans_id, char *mach_id, int num_nodes);
+void		proxy_add_node(proxy_msg *m, char *node_id, char *name, char *state, int extra_args, ...);
+proxy_msg *	proxy_new_process_event(int trans_id, char *job_id, int num_procs);
+void		proxy_add_process(proxy_msg *m, char *proc_id, char *name, char *state, int extra_args, ...);
+proxy_msg *	proxy_new_queue_event(int trans_id, char *rm_id, char *queue_id, char *name, char *state);
+proxy_msg *	proxy_job_change_event(int trans_id, char *id_range, int num_attrs);
+proxy_msg *	proxy_machine_change_event(int trans_id, char *id_range, int num_attrs);
+proxy_msg *	proxy_node_change_event(int trans_id, char *id_range, int num_attrs);
+proxy_msg *	proxy_process_change_event(int trans_id, char *id_range, int num_attrs);
+proxy_msg *	proxy_queue_change_event(int trans_id, char *id_range, int num_attrs);
+proxy_msg *	proxy_remove_all_event(int trans_id);
+proxy_msg *	proxy_remove_job_event(int trans_id, char *id_range);
+proxy_msg *	proxy_remove_machine_event(int trans_id, char *id_range);
+proxy_msg *	proxy_remove_node_event(int trans_id, char *id_range);
+proxy_msg *	proxy_remove_process_event(int trans_id, char *id_range);
+proxy_msg *	proxy_remove_queue_event(int trans_id, char *id_range);
 #endif /* !_PROXY_EVENT_H_ */
