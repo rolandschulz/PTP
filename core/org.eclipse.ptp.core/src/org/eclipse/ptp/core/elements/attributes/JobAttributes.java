@@ -31,6 +31,7 @@ public class JobAttributes {
 	
 	private static final String STATE_ATTR_ID = "jobState";
 	private static final String SUBID_ATTR_ID = "jobSubId";
+	private static final String QUEUEID_ATTR_ID = "queueId";
 	private static final String NUM_PROCS_ATTR_ID = "jobNumProcs";
 	private static final String EXEC_NAME_ATTR_ID = "execName";
 	private static final String EXEC_PATH_ATTR_ID = "execPath";
@@ -50,6 +51,9 @@ public class JobAttributes {
 		new StringAttributeDefinition(SUBID_ATTR_ID, "Job Submission ID",
 				"Temporary ID used for job submission", "");
 
+	private final static StringAttributeDefinition queueIdAttrDef = 
+		new StringAttributeDefinition(QUEUEID_ATTR_ID, QUEUEID_ATTR_ID, "Job submission queue ID", "");
+	
 	private final static IntegerAttributeDefinition numProcsAttrDef = 
 		new IntegerAttributeDefinition(NUM_PROCS_ATTR_ID, "Number of Processes", "Number of processes to launch", 0);
 
@@ -97,6 +101,10 @@ public class JobAttributes {
 		return subIdAttrDef;
 	}
 
+	public static StringAttributeDefinition getQueueIdAttributeDefinition() {
+		return queueIdAttrDef;
+	}
+	
 	public static IntegerAttributeDefinition getNumberOfProcessesAttributeDefinition() {
 		return numProcsAttrDef;
 	}
@@ -141,6 +149,7 @@ public class JobAttributes {
 		return new IAttributeDefinition[]{
 					stateAttrDef, 
 					subIdAttrDef, 
+					queueIdAttrDef,
 					numProcsAttrDef,
 					execNameAttrDef, 
 					execPathAttrDef,
