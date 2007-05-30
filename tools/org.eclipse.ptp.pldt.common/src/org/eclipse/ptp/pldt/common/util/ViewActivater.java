@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2005 IBM Corporation.
+ * Copyright (c) 2005,2007 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,7 +11,6 @@
 
 package org.eclipse.ptp.pldt.common.util;
 
-import org.eclipse.jface.util.Assert;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
@@ -28,7 +27,7 @@ public class ViewActivater
      */
     public static void activateView(String strViewId)
     {
-        Assert.isNotNull(strViewId);
+        assert strViewId!=null;
         IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
         try {
             page.showView(strViewId);
