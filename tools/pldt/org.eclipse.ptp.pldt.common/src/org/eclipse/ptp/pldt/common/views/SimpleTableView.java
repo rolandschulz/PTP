@@ -28,7 +28,6 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.util.Assert;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
@@ -873,7 +872,7 @@ public class SimpleTableView extends ViewPart {
 						IMarker m2 = (IMarker) e2;
 						tempObj= m2.getAttribute(LINE);
 						// we assume if the first was Integer, this one is, too.
-						Assert.isTrue(tempObj instanceof Integer);
+						assert tempObj instanceof Integer;
 						line2 = ((Integer)tempObj).intValue();
 
 					}
@@ -1575,13 +1574,13 @@ public class SimpleTableView extends ViewPart {
 					}
 				} // end if CHANGED
 				else if (delta.getKind() == IResourceDelta.ADDED) {
-					System.out.println("Resource added.");
+					//System.out.println("Resource added.");
 					checkMarkerDeltas(delta);
 				} else if (delta.getKind() == IResourceDelta.REPLACED) {
-					System.out.println("Resource replaced.");
+					//System.out.println("Resource replaced.");
 					checkMarkerDeltas(delta);
 				} else if (delta.getKind() == IResourceDelta.REMOVED) {
-					System.out.println("Resource removed.");
+					//System.out.println("Resource removed.");
 					checkMarkerDeltas(delta);
 				}
 			} // end if FILE
@@ -1591,7 +1590,7 @@ public class SimpleTableView extends ViewPart {
 		private void checkMarkerDeltas(IResourceDelta delta) {
 			IMarkerDelta[] md1 = delta.getMarkerDeltas();
 			int len = md1.length;
-			System.out.println("       ... found " + len + " markerDeltas.");
+			//System.out.println("       ... found " + len + " markerDeltas.");
 		}
 
 		/**
