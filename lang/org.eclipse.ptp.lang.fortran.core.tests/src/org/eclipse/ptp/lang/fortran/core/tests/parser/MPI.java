@@ -18,7 +18,7 @@ public class MPI {
 	    String action = "org.eclipse.ptp.lang.fortran.core.parser.FortranParserActionNull";
 
 		try {
-			FortranMain fortran = new FortranMain(path, action);
+			FortranMain fortran = new FortranMain(new String[0], path, action);
 			error = fortran.call();
 		} catch(Exception e) {
 			 //        e.printStackTrace();
