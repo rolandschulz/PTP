@@ -110,10 +110,23 @@ public class FortranLexicalPrepass {
             // the LPAREN or LBRACKET.  
             lookAhead = matchClosingParen(start, lookAhead);
             tmpToken = tokens.currLineLA(lookAhead);
-         } else if(tmpToken == FortranLexer.T_BIND_LPAREN_C) {
+//
+// TODO - fix this for removal of token.
+// This was removed because T_BIND_LPAREN_C token was removed and replaced by
+// T_BIND T_LPAREN T_IDENT [='c'|'C']
+//
+//          } else if(tmpToken == FortranLexer.T_BIND_LPAREN_C) {
+          } else if(tmpToken == FortranLexer.T_BIND) {
+
             parenOffset = tokens.findToken(lookAhead-1, 
-                                           FortranLexer.T_BIND_LPAREN_C);
-            parenOffset++;
+//                  FortranLexer.T_BIND_LPAREN_C);
+                  FortranLexer.T_BIND);
+            // we need to advance by two.  parenOffset returned above is the 
+            // raw location of the T_BIND.  we need to skip past it to be on
+            // the LPAREN.  then, we add one more to convert the offset of the 
+            // LPAREN into the lookAhead of the LPAREN, which is needed by 
+            // the matchClosingParen routine.
+            parenOffset+=2;
             lookAhead = matchClosingParen(lookAhead+1, parenOffset);
             tmpToken = tokens.currLineLA(lookAhead);
          }
@@ -334,7 +347,9 @@ public class FortranLexicalPrepass {
 
       tokenType = tokens.currLineLA(1);
       // look for a bind statement
-      bindOffset = tokens.findToken(lineStart, FortranLexer.T_BIND_LPAREN_C);
+// TODO - fix for T_BIND token
+//      bindOffset = tokens.findToken(lineStart, FortranLexer.T_BIND_LPAREN_C);
+      bindOffset = tokens.findToken(lineStart, FortranLexer.T_BIND);
       if(bindOffset != -1) {
          // use the T_BIND_LPAREN_C token as a marker for the end 
          // of the subroutine name and any args.
@@ -608,12 +623,17 @@ public class FortranLexicalPrepass {
          int lParenOffset;
          lParenOffset = tokens.findToken(lineStart+1, FortranLexer.T_LPAREN);
          identOffset = matchClosingParen(lineStart, lParenOffset+1);
-      } else if(firstToken == FortranLexer.T_BIND_LPAREN_C) {
+//      } else if(firstToken == FortranLexer.T_BIND_LPAREN_C) {
+      // TODO - fix for T_BIND token
+      } else if(firstToken == FortranLexer.T_BIND) {
          int rParenOffset;
          
          // find the closing paren, starting at first location after the
          // left paren.  what follows it is optional :: and the ident(s).
-         rParenOffset = matchClosingParen(lineStart, lineStart+1);
+         // the T_BIND and T_LPAREN are the first two tokens, so lineStart+2
+         // puts you on the lookahead for LPAREN, which is the starting point
+         // for the matching routine.
+         rParenOffset = matchClosingParen(lineStart, lineStart+2);
          // rParenOffset will be at the location following the T_RPAREN
          identOffset = rParenOffset;
       } else if(firstToken == FortranLexer.T_PARAMETER) {
@@ -631,17 +651,43 @@ public class FortranLexicalPrepass {
          int lparenOffset = -1;
          int rparenOffset = -1;
 
-         // fixup an implicit statement
-         // search for the parens, if given.
-         // if not given, nothing needs updated because it's an IMPLICIT NONE
-         lparenOffset = tokens.findToken(lineStart, FortranLexer.T_LPAREN);
-         if(lparenOffset != -1) {
-            rparenOffset = matchClosingParen(lineStart, lparenOffset+1);
-            // everything between the parens must be an identifier
-            convertToIdents(lparenOffset, rparenOffset);
-            // between the T_IMPLICIT and the left paren is a 
-            // declaration_type_spec.  have to fix it up too
-            fixupDataDecl(lineStart+1, lparenOffset);
+         // fixup an implicit statement.  search for the T_NONE.  
+         // if given, nothing needs updated because it's an IMPLICIT NONE
+         if(tokens.currLineLA(lineStart+2) != FortranLexer.T_NONE) {
+            do {
+               lparenOffset = 
+                  tokens.findToken(lineStart, FortranLexer.T_LPAREN);
+               if(lparenOffset != -1) {
+                  rparenOffset = matchClosingParen(lineStart, lparenOffset+1);
+                  // the first set of parens could be the optional kind 
+                  // selector, or it is the letter designators for the 
+                  // implicit stmt.  either way, we can convert anything 
+                  // that's not T_KIND or T_LEN to an ident because T_KIND 
+                  // and T_LEN can only appear in the kind selector.  then, 
+                  // we don't need to look for an optional second paren set.
+                  for(int i = lparenOffset; i < rparenOffset; i++) {
+                     if(lexer.isKeyword(tokens.currLineLA(i+1)) &&
+                        tokens.currLineLA(i+1) != FortranLexer.T_KIND &&
+                        tokens.currLineLA(i+1) != FortranLexer.T_LEN) {
+                        tokens.getToken(i).setType(FortranLexer.T_IDENT);
+                     }
+                  }
+
+                  // there could be another set of parens, if the first set 
+                  // (above) was for the kind selector, then the second set 
+                  // would be for the letter designator(s) (required).
+                  if(tokens.currLineLA(rparenOffset+1) == 
+                     FortranLexer.T_LPAREN) {
+                     rparenOffset = 
+                        matchClosingParen(lineStart, rparenOffset+1);
+                  }
+
+                  // reset the lineStart so we can accept a an 
+                  // implicit_spec_list
+                  lineStart = rparenOffset;
+               }
+            } while(lineStart < lineEnd && 
+                    tokens.currLineLA(lineStart+1) != FortranLexer.T_EOS);
          }
       } else {
          identOffset = lineStart+1;
@@ -813,7 +859,9 @@ public class FortranLexicalPrepass {
       // use the scan function so that it will skip any tokens inside 
       // of parens (which, in this case, would make them args)
       resultOffset = salesScanForToken(lineStart, FortranLexer.T_RESULT);
-      bindOffset = salesScanForToken(lineStart, FortranLexer.T_BIND_LPAREN_C);
+//      bindOffset = salesScanForToken(lineStart, FortranLexer.T_BIND_LPAREN_C);
+// TODO - fix for T_BIND token
+      bindOffset = salesScanForToken(lineStart, FortranLexer.T_BIND);
       
       // get the actual tokens for result and bind(c)
       if(resultOffset != -1) {
@@ -833,7 +881,9 @@ public class FortranLexicalPrepass {
       if(bindToken != null) {
          // this one probably not necessary because i don't think it
          // is actually considered a keyword by lexer.isKeyword()
-         bindToken.setType(FortranLexer.T_BIND_LPAREN_C);
+//          bindToken.setType(FortranLexer.T_BIND_LPAREN_C);
+// TODO - fix for T_BIND token
+          bindToken.setType(FortranLexer.T_BIND);
       }
  
       return;
@@ -1499,7 +1549,8 @@ public class FortranLexicalPrepass {
          firstToken == FortranLexer.T_CLASS || 
          firstToken == FortranLexer.T_INTERFACE ||
          firstToken == FortranLexer.T_ENTRY ||
-         firstToken == FortranLexer.T_IMPORT) {
+         firstToken == FortranLexer.T_IMPORT ||
+         firstToken == FortranLexer.T_DATA) {
          // if we have a T_CLASS, it must be used in a select-type because
          // we should have already tried to match the T_CLASS used in a 
          // data declaration.  there appears to be no overlap between a 
@@ -1916,7 +1967,9 @@ public class FortranLexicalPrepass {
       case FortranLexer.T_VOLATILE:
       case FortranLexer.T_EXTERNAL:
       case FortranLexer.T_INTRINSIC:
-      case FortranLexer.T_BIND_LPAREN_C:
+//      case FortranLexer.T_BIND_LPAREN_C:
+// TODO - fix to T_BIND token
+      case FortranLexer.T_BIND:
       case FortranLexer.T_PARAMETER:
       case FortranLexer.T_IMPLICIT:
          return matchAttrStmt(lineStart, lineEnd);
@@ -2000,6 +2053,14 @@ public class FortranLexicalPrepass {
       }
 
       tokensStart = tokens.mark();
+      // the mark is the curr index into the tokens array and needs to start 
+      // at -1 (before the list).  this use to be what it always was when 
+      // entering this method in antlr-3.0b*, but in antlr-3.0, the number 
+      // was no longer guaranteed to be -1.  so, seek the index ptr to -1.
+      if(tokensStart != -1) {
+         tokens.seek(-1);
+         tokensStart = -1;
+      }
       
       while(tokens.LA(1) != FortranLexer.EOF) {
          // initialize necessary variables
