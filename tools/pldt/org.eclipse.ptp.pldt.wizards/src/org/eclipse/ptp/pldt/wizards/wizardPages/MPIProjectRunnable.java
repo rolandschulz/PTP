@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006 IBM Corp. and others.
+ * Copyright (c) 2006,2007 IBM Corp. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,8 +11,14 @@
 
 package org.eclipse.ptp.pldt.wizards.wizardPages;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 
 import org.eclipse.cdt.managedbuilder.core.BuildException;
 import org.eclipse.cdt.managedbuilder.core.IConfiguration;
@@ -25,10 +31,14 @@ import org.eclipse.cdt.managedbuilder.ui.wizards.MBSCustomPageData;
 import org.eclipse.cdt.managedbuilder.ui.wizards.MBSCustomPageManager;
 import org.eclipse.cdt.ui.wizards.CProjectWizard;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.util.Assert;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.IWizardPage;
+import org.eclipse.ptp.pldt.wizards.MpiWizardsPlugin;
+import org.osgi.framework.Bundle;
 
 /**
  * 
@@ -64,8 +74,6 @@ public class MPIProjectRunnable implements Runnable {
  		try {
 			IWizardPage wp = pData.getWizardPage();
 			IWizard w = wp.getWizard();
-			int stopHere=0; // what is it?
-			stopHere++;
 			if(w instanceof CProjectWizard){
 				wiz = (CProjectWizard)w;
 			}
@@ -93,6 +101,9 @@ public class MPIProjectRunnable implements Runnable {
 		
 		propID=MPIProjectWizardPage.MPI_LINK_COMMAND_PROP_ID;
 		String mpiLinkCommand=getNewPropValue(pageID,propID,"mpicc");
+		
+		propID=MPIProjectWizardPage.MPI_SAMPLE_FILE_PROP_ID;
+		String mpiSampleFileInsert=getNewPropValue(pageID, propID, "false");
  
 		IManagedBuildInfo info = null;
 		try {
@@ -129,8 +140,36 @@ public class MPIProjectRunnable implements Runnable {
 		// values are persisted in the build model, otherwise they will
 		// be lost when you shut down Eclipse.
 		if(traceOn)System.out.println("ManagedBuildManager.saveBuildInfo...");
+		
+		if(mpiSampleFileInsert.equals("true")){
+			 try {
+				FileInputStream fis=null;
+				Bundle bundle = Platform.getBundle(MpiWizardsPlugin.getPluginId());
+				Path path = new Path("testMPI.c");
+				URL fileURL = Platform.find(bundle, path);
+				InputStream mpiFileStream = null;
+				try {
+					String fname="testMPI.c";
+					mpiFileStream = fileURL.openStream();
+					proj.getFile(fname).create(mpiFileStream,false,null);
+					System.out.println("file "+fname+" created.");
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			} catch (CoreException e) {
+				System.out.println("Error creating testMPI.c");
+			}
+		}
 		ManagedBuildManager.saveBuildInfo(proj, true);
 
+	}
+	public static String getResourceString(String key) {
+		ResourceBundle bundle = MpiWizardsPlugin.getDefault().getResourceBundle();
+		try {
+			return (bundle != null) ? bundle.getString(key) : key;
+		} catch (MissingResourceException e) {
+			return key;
+		}
 	}
 
 	/**
