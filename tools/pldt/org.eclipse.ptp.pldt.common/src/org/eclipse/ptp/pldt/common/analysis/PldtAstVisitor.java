@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2005 IBM Corporation.
+ * Copyright (c) 2005, 2007 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -172,12 +172,26 @@ public class PldtAstVisitor extends CASTVisitor {
 		String name=binding.getName(); 
 		String rawSig=funcName.getRawSignature();
 		if(name.length()==0) {
-			name=funcName.getRawSignature();
+			name=rawSig;
 		}
 
-		// CDT4.0: 
-		IASTName[] decls=funcName.getTranslationUnit().getDeclarationsInAST(binding);//1/2/07: empty! for MPB
-		if(decls.length==0)System.out.println("decls empty!");
+		// cdt40 CDT4.0: declarations null
+		IASTName[] decls=funcName.getTranslationUnit().getDeclarationsInAST(binding);//1/2/07: empty! for MPB/MPI & OpenMP
+		if (traceOn) {
+			if (decls.length == 0) { // BRT decls=null detection
+				IASTTranslationUnit tu = funcName.getTranslationUnit();
+				IASTName[] na = tu.getDeclarationsInAST(binding);
+				IASTDeclaration[] astDecls = tu.getDeclarations();
+				for (int i = 0; i < na.length; i++) {
+					IASTName nm = na[i];
+					System.out.println(nm);
+
+				}
+			}
+		}
+		if(decls.length==0){
+			System.out.println("PldtAstVisitor.isArtifact(): decls empty!");
+		}
 		//CDT3.1 IASTName[] decls = funcName.getTranslationUnit().getDeclarations(binding);
 		
 		
@@ -199,7 +213,7 @@ public class PldtAstVisitor extends CASTVisitor {
 	public void processMacroLiteral(IASTLiteralExpression expression) {
 		IASTNodeLocation[] locations = expression.getNodeLocations();
 		if ((locations.length == 1) && (locations[0] instanceof IASTMacroExpansion)) {//path taken &not
-			// found a macro, does it come from MPI include?
+			// found a macro, does it come from the include path required to be "one of ours"?
 			IASTMacroExpansion astMacroExpansion = (IASTMacroExpansion) locations[0];
 			IASTPreprocessorMacroDefinition preprocessorMacroDefinition = astMacroExpansion
 					.getMacroDefinition();
@@ -320,8 +334,6 @@ public class PldtAstVisitor extends CASTVisitor {
 	}
 
 	public void processIdExprAsLiteral(IASTIdExpression expression) {
-
-		// when does this get called?
 		IASTName name = expression.getName();
 
 		if (isArtifact(name)) {
