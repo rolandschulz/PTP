@@ -23,9 +23,9 @@ import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.rtsystem.events.IRuntimeAttributeDefinitionEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeConnectedStateEvent;
-import org.eclipse.ptp.rtsystem.events.IRuntimeMessageEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeJobChangeEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeMachineChangeEvent;
+import org.eclipse.ptp.rtsystem.events.IRuntimeMessageEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeNewJobEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeNewMachineEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeNewNodeEvent;
@@ -34,8 +34,17 @@ import org.eclipse.ptp.rtsystem.events.IRuntimeNewQueueEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeNodeChangeEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeProcessChangeEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeQueueChangeEvent;
+import org.eclipse.ptp.rtsystem.events.IRuntimeRemoveAllEvent;
+import org.eclipse.ptp.rtsystem.events.IRuntimeRemoveJobEvent;
+import org.eclipse.ptp.rtsystem.events.IRuntimeRemoveMachineEvent;
+import org.eclipse.ptp.rtsystem.events.IRuntimeRemoveNodeEvent;
+import org.eclipse.ptp.rtsystem.events.IRuntimeRemoveProcessEvent;
+import org.eclipse.ptp.rtsystem.events.IRuntimeRemoveQueueEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeRunningStateEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeShutdownStateEvent;
+import org.eclipse.ptp.rtsystem.events.IRuntimeStartupErrorEvent;
+import org.eclipse.ptp.rtsystem.events.IRuntimeSubmitJobErrorEvent;
+import org.eclipse.ptp.rtsystem.events.IRuntimeTerminateJobErrorEvent;
 
 public abstract class AbstractRuntimeSystem implements IRuntimeSystem {
 	final private ListenerList	listeners = new ListenerList();
@@ -63,93 +72,219 @@ public abstract class AbstractRuntimeSystem implements IRuntimeSystem {
 
 	}
 	
+	/**
+	 * @param event
+	 */
 	protected void fireRuntimeMessageEvent(IRuntimeMessageEvent event) {
 		for (Object listener : listeners.getListeners()) {
 			((IRuntimeEventListener)listener).handleRuntimeMessageEvent(event);
 		}
 	}
 	
+	/**
+	 * @param event
+	 */
 	protected void fireRuntimeAttributeDefinitionEvent(IRuntimeAttributeDefinitionEvent event) {
 		for (Object listener : listeners.getListeners()) {
 			((IRuntimeEventListener)listener).handleRuntimeAttributeDefinitionEvent(event);
 		}
 	}
 	
+	/**
+	 * @param event
+	 */
 	protected void fireRuntimeConnectedStateEvent(IRuntimeConnectedStateEvent event) {
 		for (Object listener : listeners.getListeners()) {
 			((IRuntimeEventListener)listener).handleRuntimeConnectedStateEvent(event);
 		}
 	}
 
+	/**
+	 * @param event
+	 */
 	protected void fireRuntimeJobChangeEvent(IRuntimeJobChangeEvent event) {
 		for (Object listener : listeners.getListeners()) {
 			((IRuntimeEventListener)listener).handleRuntimeJobChangeEvent(event);
 		}
 	}
 
+	/**
+	 * @param event
+	 */
 	protected void fireRuntimeMachineChangeEvent(IRuntimeMachineChangeEvent event) {
 		for (Object listener : listeners.getListeners()) {
 			((IRuntimeEventListener)listener).handleRuntimeMachineChangeEvent(event);
 		}
 	}
 
+	/**
+	 * @param event
+	 */
 	protected void fireRuntimeNodeChangeEvent(IRuntimeNodeChangeEvent event) {
 		for (Object listener : listeners.getListeners()) {
 			((IRuntimeEventListener)listener).handleRuntimeNodeChangeEvent(event);
 		}
 	}
 
+	/**
+	 * @param event
+	 */
 	protected void fireRuntimeProcessChangeEvent(IRuntimeProcessChangeEvent event) {
 		for (Object listener : listeners.getListeners()) {
 			((IRuntimeEventListener)listener).handleRuntimeProcessChangeEvent(event);
 		}
 	}
 	
+	/**
+	 * @param event
+	 */
 	protected void fireRuntimeQueueChangeEvent(IRuntimeQueueChangeEvent event) {
 		for (Object listener : listeners.getListeners()) {
 			((IRuntimeEventListener)listener).handleRuntimeQueueChangeEvent(event);
 		}
 	}
 
+	/**
+	 * @param event
+	 */
 	protected void fireRuntimeNewJobEvent(IRuntimeNewJobEvent event) {
 		for (Object listener : listeners.getListeners()) {
 			((IRuntimeEventListener)listener).handleRuntimeNewJobEvent(event);
 		}
 	}
 
+	/**
+	 * @param event
+	 */
 	protected void fireRuntimeNewMachineEvent(IRuntimeNewMachineEvent event) {
 		for (Object listener : listeners.getListeners()) {
 			((IRuntimeEventListener)listener).handleRuntimeNewMachineEvent(event);
 		}
 	}
 
+	/**
+	 * @param event
+	 */
 	protected void fireRuntimeNewNodeEvent(IRuntimeNewNodeEvent event) {
 		for (Object listener : listeners.getListeners()) {
 			((IRuntimeEventListener)listener).handleRuntimeNewNodeEvent(event);
 		}
 	}
 
+	/**
+	 * @param event
+	 */
 	protected void fireRuntimeNewProcessEvent(IRuntimeNewProcessEvent event) {
 		for (Object listener : listeners.getListeners()) {
 			((IRuntimeEventListener)listener).handleRuntimeNewProcessEvent(event);
 		}
 	}
 	
+	/**
+	 * @param event
+	 */
 	protected void fireRuntimeNewQueueEvent(IRuntimeNewQueueEvent event) {
 		for (Object listener : listeners.getListeners()) {
 			((IRuntimeEventListener)listener).handleRuntimeNewQueueEvent(event);
 		}
 	}
 	
+	/**
+	 * @param event
+	 */
+	protected void fireRuntimeRemoveAllEvent(IRuntimeRemoveAllEvent event) {
+		for (Object listener : listeners.getListeners()) {
+			((IRuntimeEventListener)listener).handleRuntimeRemoveAllEvent(event);
+		}
+	}
+	
+	/**
+	 * @param event
+	 */
+	protected void fireRuntimeRemoveJobEvent(IRuntimeRemoveJobEvent event) {
+		for (Object listener : listeners.getListeners()) {
+			((IRuntimeEventListener)listener).handleRuntimeRemoveJobEvent(event);
+		}
+	}
+	
+	/**
+	 * @param event
+	 */
+	protected void fireRuntimeRemoveMachineEvent(IRuntimeRemoveMachineEvent event) {
+		for (Object listener : listeners.getListeners()) {
+			((IRuntimeEventListener)listener).handleRuntimeRemoveMachineEvent(event);
+		}
+	}
+	
+	/**
+	 * @param event
+	 */
+	protected void fireRuntimeRemoveNodeEvent(IRuntimeRemoveNodeEvent event) {
+		for (Object listener : listeners.getListeners()) {
+			((IRuntimeEventListener)listener).handleRuntimeRemoveNodeEvent(event);
+		}
+	}
+	
+	/**
+	 * @param event
+	 */
+	protected void fireRuntimeRemoveProcessEvent(IRuntimeRemoveProcessEvent event) {
+		for (Object listener : listeners.getListeners()) {
+			((IRuntimeEventListener)listener).handleRuntimeRemoveProcessEvent(event);
+		}
+	}
+	
+	/**
+	 * @param event
+	 */
+	protected void fireRuntimeRemoveQueueEvent(IRuntimeRemoveQueueEvent event) {
+		for (Object listener : listeners.getListeners()) {
+			((IRuntimeEventListener)listener).handleRuntimeRemoveQueueEvent(event);
+		}
+	}
+	
+	/**
+	 * @param event
+	 */
 	protected void fireRuntimeRunningStateEvent(IRuntimeRunningStateEvent event) {
 		for (Object listener : listeners.getListeners()) {
 			((IRuntimeEventListener)listener).handleRuntimeRunningStateEvent(event);
 		}
 	}
 
+	/**
+	 * @param event
+	 */
 	protected void fireRuntimeShutdownStateEvent(IRuntimeShutdownStateEvent event) {
 		for (Object listener : listeners.getListeners()) {
 			((IRuntimeEventListener)listener).handleRuntimeShutdownStateEvent(event);
+		}
+	}
+
+	/**
+	 * @param event
+	 */
+	protected void fireRuntimeStartupErrorEvent(IRuntimeStartupErrorEvent event) {
+		for (Object listener : listeners.getListeners()) {
+			((IRuntimeEventListener)listener).handleRuntimeStartupErrorEvent(event);
+		}
+	}
+
+	/**
+	 * @param event
+	 */
+	protected void fireRuntimeSubmitJobErrorEvent(IRuntimeSubmitJobErrorEvent event) {
+		for (Object listener : listeners.getListeners()) {
+			((IRuntimeEventListener)listener).handleRuntimeSubmitJobErrorEvent(event);
+		}
+	}
+
+	/**
+	 * @param event
+	 */
+	protected void fireRuntimeTerminateJobErrorEvent(IRuntimeTerminateJobErrorEvent event) {
+		for (Object listener : listeners.getListeners()) {
+			((IRuntimeEventListener)listener).handleRuntimeTerminateJobErrorEvent(event);
 		}
 	}
 }

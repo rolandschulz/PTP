@@ -59,8 +59,17 @@ import org.eclipse.ptp.rtsystem.events.IRuntimeNewQueueEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeNodeChangeEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeProcessChangeEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeQueueChangeEvent;
+import org.eclipse.ptp.rtsystem.events.IRuntimeRemoveAllEvent;
+import org.eclipse.ptp.rtsystem.events.IRuntimeRemoveJobEvent;
+import org.eclipse.ptp.rtsystem.events.IRuntimeRemoveMachineEvent;
+import org.eclipse.ptp.rtsystem.events.IRuntimeRemoveNodeEvent;
+import org.eclipse.ptp.rtsystem.events.IRuntimeRemoveProcessEvent;
+import org.eclipse.ptp.rtsystem.events.IRuntimeRemoveQueueEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeRunningStateEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeShutdownStateEvent;
+import org.eclipse.ptp.rtsystem.events.IRuntimeStartupErrorEvent;
+import org.eclipse.ptp.rtsystem.events.IRuntimeSubmitJobErrorEvent;
+import org.eclipse.ptp.rtsystem.events.IRuntimeTerminateJobErrorEvent;
 
 public abstract class AbstractRuntimeResourceManager extends
 		AbstractResourceManager implements IRuntimeEventListener {
@@ -162,9 +171,10 @@ public abstract class AbstractRuntimeResourceManager extends
 		 */
 		stateLock.lock();
 		try {
-			if (state == RMState.STARTING) {
+			if (state == RMState.STARTING && level == MessageAttributes.Level.FATAL) {
 				state = RMState.ERROR;
 				stateCondition.signal();
+				return;
 			}
 		} finally {
 			stateLock.unlock();
@@ -451,6 +461,54 @@ public abstract class AbstractRuntimeResourceManager extends
 	}
 
 	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleRuntimeRemoveAllEvent(org.eclipse.ptp.rtsystem.events.IRuntimeRemoveAllEvent)
+	 */
+	public void handleRuntimeRemoveAllEvent(IRuntimeRemoveAllEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleRuntimeRemoveJobEvent(org.eclipse.ptp.rtsystem.events.IRuntimeRemoveJobEvent)
+	 */
+	public void handleRuntimeRemoveJobEvent(IRuntimeRemoveJobEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleRuntimeRemoveMachineEvent(org.eclipse.ptp.rtsystem.events.IRuntimeRemoveMachineEvent)
+	 */
+	public void handleRuntimeRemoveMachineEvent(IRuntimeRemoveMachineEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleRuntimeRemoveNodeEvent(org.eclipse.ptp.rtsystem.events.IRuntimeRemoveNodeEvent)
+	 */
+	public void handleRuntimeRemoveNodeEvent(IRuntimeRemoveNodeEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleRuntimeRemoveProcessEvent(org.eclipse.ptp.rtsystem.events.IRuntimeRemoveProcessEvent)
+	 */
+	public void handleRuntimeRemoveProcessEvent(IRuntimeRemoveProcessEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleRuntimeRemoveQueueEvent(org.eclipse.ptp.rtsystem.events.IRuntimeRemoveQueueEvent)
+	 */
+	public void handleRuntimeRemoveQueueEvent(IRuntimeRemoveQueueEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleRuntimeRunningStateEvent(org.eclipse.ptp.rtsystem.events.IRuntimeRunningStateEvent)
 	 */
 	public void handleRuntimeRunningStateEvent(IRuntimeRunningStateEvent e) {
@@ -493,6 +551,31 @@ public abstract class AbstractRuntimeResourceManager extends
 		} finally {
 			stateLock.unlock();
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleRuntimeStartupErrorEvent(org.eclipse.ptp.rtsystem.events.IRuntimeStartupErrorEvent)
+	 */
+	public void handleRuntimeStartupErrorEvent(IRuntimeStartupErrorEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleRuntimeSubmitJobErrorEvent(org.eclipse.ptp.rtsystem.events.IRuntimeSubmitJobErrorEvent)
+	 */
+	public void handleRuntimeSubmitJobErrorEvent(IRuntimeSubmitJobErrorEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleRuntimeTerminateJobErrorEvent(org.eclipse.ptp.rtsystem.events.IRuntimeTerminateJobErrorEvent)
+	 */
+	public void handleRuntimeTerminateJobErrorEvent(
+			IRuntimeTerminateJobErrorEvent e) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	/**
@@ -663,27 +746,29 @@ public abstract class AbstractRuntimeResourceManager extends
 		}
 		stateLock.lock();
 		try {
-			doBeforeOpenConnection();
-			runtimeSystem = doCreateRuntimeSystem();
-			runtimeSystem.addRuntimeEventListener(this);
-			openConnection();
-			state = RMState.STARTING;
-			while (!monitor.isCanceled() && state != RMState.STARTED && state != RMState.ERROR) {
-				try {
-					stateCondition.await(500, TimeUnit.MILLISECONDS);
-				} catch (InterruptedException e) {
-					// Expect to be interrupted if monitor is canceled
+			if (state == RMState.STOPPED) {
+				doBeforeOpenConnection();
+				runtimeSystem = doCreateRuntimeSystem();
+				runtimeSystem.addRuntimeEventListener(this);
+				openConnection();
+				state = RMState.STARTING;
+				while (!monitor.isCanceled() && state != RMState.STARTED && state != RMState.ERROR) {
+					try {
+						stateCondition.await(500, TimeUnit.MILLISECONDS);
+					} catch (InterruptedException e) {
+						// Expect to be interrupted if monitor is canceled
+					}
 				}
+				if (state == RMState.ERROR) {
+					return false;
+				}
+				if (monitor.isCanceled()) {
+					state = RMState.STOPPED;
+					abortConnection();
+					return false;
+				}
+				doAfterOpenConnection();
 			}
-			if (state == RMState.ERROR) {
-				return false;
-			}
-			if (monitor.isCanceled()) {
-				state = RMState.STOPPED;
-				abortConnection();
-				return false;
-			}
-			doAfterOpenConnection();
 		}
 		finally {
 			stateLock.unlock();
