@@ -47,13 +47,19 @@ public class FortranStream extends ANTLRFileStream {
          letter_value = (int)(Character.toUpperCase((char)(letter_value)));
       } 
 
-      if(this.sourceForm == FortranMain.FIXED_FORM &&
-         (letter_value == 'C' || letter_value == '*') &&
-         super.getCharPositionInLine() == 0) {
-         // return '!' to signify a line comment so the lexer won't try and 
-         // parser this line.
-         letter_value = (int)'!';
-      } 
+      if(this.sourceForm == FortranMain.FIXED_FORM) {
+         if((letter_value == 'C' || letter_value == '*') &&
+            super.getCharPositionInLine() == 0) {
+            // return '!' to signify a line comment so the lexer won't try and 
+            // parser this line.
+            letter_value = (int)'!';
+         } else if(super.getCharPositionInLine() == 5 &&
+                   Character.isWhitespace((char)letter_value) == false) {
+            // if a character appears in the 6th column in fixed format it 
+            // is a continuation character.  
+            letter_value = (int)'&';
+         }
+      }
 
       return letter_value;
    }// end LA()
