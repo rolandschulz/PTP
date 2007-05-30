@@ -48,23 +48,17 @@ options {
  
  /**
  *
- * @author Craig E Rasmussen, Christopher D. Rickett
+ * @author Craig E Rasmussen, Christopher D. Rickett, Bryan Rasmussen
  */
  
  package parser.java;
-//package org.eclipse.ptp.lang.fortran.core.parser;
-
-//import org.eclipse.ptp.lang.fortran.core.parser.IFortranParserAction.LiteralConstant;
-//import org.eclipse.ptp.lang.fortran.core.parser.IFortranParserAction.KindParam;
-//import org.eclipse.ptp.lang.fortran.core.parser.IFortranParserAction.KindSelector;
-//import org.eclipse.ptp.lang.fortran.core.parser.IFortranParserAction.IntrinsicTypeSpec;
 }
 
 @members {
-	public FortranParser(TokenStream input, String kind, String filename) {
+	public FortranParser(String[] args, TokenStream input, String kind, String filename) {
 		super(input);
 		ruleMemo = new HashMap[489+1];
-		this.action = FortranParserActionFactory.newAction(this, kind, filename);
+		this.action = FortranParserActionFactory.newAction(args, this, kind, filename);
 	}
 
 	public boolean hasErrorOccurred = false;
@@ -263,7 +257,6 @@ specification_stmt
 
 // R213
 executable_construct
-// options {backtrack=true;}
 	:	action_stmt
 	|	associate_construct
 	|	case_construct
@@ -475,9 +468,12 @@ intrinsic_type_spec
 // ERR_CHK 404 scalar_int_initialization_expr replaced by expr
 // Nonstandard extension: source common practice
 //	| T_ASTERISK T_DIGIT_STRING  // e.g., COMPLEX*16	
+// TODO - check to see if second alternative is where it should go
 kind_selector
     : T_LPAREN (T_KIND T_EQUALS)? expr T_RPAREN
+    	{ action.kind_selector(true, null); }				// hasExpression = true
     | T_ASTERISK T_DIGIT_STRING
+    	{ action.kind_selector(false, $T_DIGIT_STRING); }	// hasExpression = false
     ;
 
 // R405
@@ -492,7 +488,7 @@ signed_int_literal_constant
 int_literal_constant
 @init{Token kind = null;} // @init{INIT_TOKEN_NULL(kind);}
 	:	T_DIGIT_STRING (T_UNDERSCORE kind_param {kind = $kind_param.tk;})?
-		{action.int_literal_constant($T_DIGIT_STRING, kind);}
+			{action.int_literal_constant($T_DIGIT_STRING, kind);}
 	;
 
 // R407
@@ -625,13 +621,12 @@ scalar_int_literal_constant
 // 	|	T_CHAR_CONSTANT
 //     ;
 char_literal_constant
-options {k=2;}
-	:	(T_DIGIT_STRING T_UNDERSCORE) => T_DIGIT_STRING T_UNDERSCORE T_CHAR_CONSTANT
+	:	T_DIGIT_STRING T_UNDERSCORE T_CHAR_CONSTANT
 			{ action.char_literal_constant($T_DIGIT_STRING, null, $T_CHAR_CONSTANT); }
         // removed the T_UNDERSCORE because underscores are valid characters 
         // for identifiers, which means the lexer would match the T_IDENT and 
         // T_UNDERSCORE as one token (T_IDENT).
-	|	(T_IDENT) => T_IDENT T_CHAR_CONSTANT
+	|	T_IDENT T_CHAR_CONSTANT
 			{ action.char_literal_constant(null, $T_IDENT, $T_CHAR_CONSTANT); }
 	|	T_CHAR_CONSTANT
 			{ action.char_literal_constant(null, null, $T_CHAR_CONSTANT); }
@@ -665,9 +660,13 @@ derived_type_def
 // Includes:
 //    ( type_param_def_stmt)*
 //    ( component_def_stmt )* if starts with T_INTEGER (could be a parse error)
+// REMOVED T_INTEGER junk (see statement above) with k=1
+// TODO this must be tested can we get rid of this????
 type_param_or_comp_def_stmt_list
-options {k=1;}
-	:	(T_INTEGER) => (kind_selector)? T_COMMA type_param_or_comp_def_stmt
+//options {k=1;}
+//	:	(T_INTEGER) => (kind_selector)? T_COMMA type_param_or_comp_def_stmt
+//			type_param_or_comp_def_stmt_list
+	:	(kind_selector)? T_COMMA type_param_or_comp_def_stmt
 			type_param_or_comp_def_stmt_list
 	|
 		{ /* ERR_CHK R435
@@ -687,6 +686,7 @@ derived_type_stmt
 @init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
 	:	(label {lbl=$label.tk;})? T_TYPE ( ( T_COMMA type_attr_spec_list )? T_COLON_COLON )? T_IDENT
 		( T_LPAREN generic_name_list T_RPAREN )? T_EOS
+			{action.derived_type_stmt(lbl,$T_IDENT);}
 	;
 
 type_attr_spec_list
@@ -699,7 +699,15 @@ type_attr_spec_list
 generic_name_list
 @init{int count = 0;}
 	:		{action.generic_name_list__begin();}
-		T_IDENT {count++;} ( T_COMMA T_IDENT {count++;} )*
+		ident=T_IDENT
+			{
+				count++;
+				action.generic_name_list_part(ident);
+			} ( T_COMMA ident=T_IDENT 
+			{
+				count++;
+				action.generic_name_list_part(ident);
+			} )*
 			{action.generic_name_list(count);}
 	;
 
@@ -709,7 +717,7 @@ type_attr_spec
 	:	access_spec
 	|	T_EXTENDS T_LPAREN T_IDENT T_RPAREN
 	|	T_ABSTRACT
-	|	T_BIND_LPAREN_C T_RPAREN
+	|	T_BIND T_LPAREN T_IDENT /* 'C' */ T_RPAREN
 	;
 
 // R432
@@ -720,16 +728,18 @@ private_or_sequence
 
 // R433
 end_type_stmt
-options {k=3;}
-@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
-	: ((label)? T_END T_TYPE) => (label {lbl=$label.tk;})? T_END T_TYPE ( T_IDENT )? T_EOS
-	| (label {lbl=$label.tk;})? T_ENDTYPE ( T_IDENT )? T_EOS
+@init{Token lbl = null;Token id=null;} 
+	: (label {lbl=$label.tk;})? T_END T_TYPE ( T_IDENT {id=$T_IDENT;})? T_EOS
+		{action.end_type_stmt(lbl,id);}
+	| (label {lbl=$label.tk;})? T_ENDTYPE ( T_IDENT {id=$T_IDENT;})? T_EOS
+		{action.end_type_stmt(lbl,id);}
 	;
 
 // R434
 sequence_stmt
 @init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
 	:	(label {lbl=$label.tk;})? T_SEQUENCE T_EOS
+			{action.sequence_stmt(lbl);}
 	;
 
 // R435 type_param_def_stmt inlined in type_param_or_comp_def_stmt_list
@@ -764,8 +774,9 @@ component_def_stmt
 
 // R440
 data_component_def_stmt
-@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
-    :    (label {lbl=$label.tk;})? declaration_type_spec ( ( T_COMMA component_attr_spec_list )? T_COLON_COLON )? component_decl_list T_EOS
+@init{Token lbl = null; boolean hasSpec=false; }
+    :    (label {lbl=$label.tk;})? declaration_type_spec ( ( T_COMMA component_attr_spec_list {hasSpec=true;})? T_COLON_COLON )? component_decl_list T_EOS
+			{action.data_component_def_stmt(lbl,hasSpec);}
     ;
 
 // R441, R442-F2008
@@ -829,9 +840,10 @@ component_initialization
 
 // R445
 proc_component_def_stmt
-@init{Token lbl = null;}
-	:	(label {lbl=$label.tk;})? T_PROCEDURE T_LPAREN ( proc_interface )? T_RPAREN T_COMMA
+@init{Token lbl = null; boolean hasInterface=false;}
+	:	(label {lbl=$label.tk;})? T_PROCEDURE T_LPAREN ( proc_interface {hasInterface=true;})? T_RPAREN T_COMMA
 		    proc_component_attr_spec_list T_COLON_COLON proc_decl_list T_EOS
+				{action.proc_component_def_stmt(lbl,hasInterface);}
 	;
 
 // R446
@@ -852,8 +864,9 @@ proc_component_attr_spec_list
 
 // R447
 private_components_stmt
-@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+@init{Token lbl = null;}
 	:	(label {lbl=$label.tk;})? T_PRIVATE T_EOS
+			{action.private_components_stmt(lbl);}
 	;
 
 // R448
@@ -865,16 +878,20 @@ type_bound_procedure_part
 
 // R449
 binding_private_stmt
-@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+@init{Token lbl = null;}
 	:	(label {lbl=$label.tk;})? T_PRIVATE T_EOS
+			{action.binding_private_stmt(lbl);}
 	;
 
 // R450
 proc_binding_stmt
-@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+@init{Token lbl = null;}
 	:	(label {lbl=$label.tk;})? specific_binding T_EOS
+			{action.proc_binding_stmt(lbl);}
 	|	(label {lbl=$label.tk;})? generic_binding T_EOS
+			{action.proc_binding_stmt(lbl);}
 	|	(label {lbl=$label.tk;})? final_binding T_EOS
+			{action.proc_binding_stmt(lbl);}
 	;
 
 // R451
@@ -895,10 +912,11 @@ generic_binding
 // T_IDENT inlined for arg_name
 binding_attr
     : T_PASS ( T_LPAREN T_IDENT T_RPAREN )?
-    | T_NOPASS
-    | T_NON_OVERRIDABLE
-    | T_DEFERRED
-    | access_spec
+						{ action.binding_attr(IFortranParserAction.AttrSpec.PASS); }
+    | T_NOPASS			{ action.binding_attr(IFortranParserAction.AttrSpec.NOPASS); }
+    | T_NON_OVERRIDABLE	{ action.binding_attr(IFortranParserAction.AttrSpec.NON_OVERRIDABLE); }
+    | T_DEFERRED		{ action.binding_attr(IFortranParserAction.AttrSpec.DEFERRED); }
+    | access_spec		{ action.binding_attr(IFortranParserAction.AttrSpec.none); }
     ;
 
 binding_attr_list
@@ -916,7 +934,9 @@ final_binding
 
 // R455
 derived_type_spec
-    : T_IDENT ( T_LPAREN type_param_spec_list T_RPAREN )?
+@init{boolean hasList = false;}
+    : T_IDENT ( T_LPAREN type_param_spec_list {hasList=true;} T_RPAREN )?
+    	{ action.derived_type_spec($T_IDENT, hasList); }
     ;
 
 // R456
@@ -986,14 +1006,16 @@ enum_def
 
 // R461
 enum_def_stmt
-@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
-	:	(label {lbl=$label.tk;})? T_ENUM T_COMMA T_BIND_LPAREN_C T_RPAREN T_EOS
+@init{Token lbl = null;}
+	:	(label {lbl=$label.tk;})? T_ENUM T_COMMA T_BIND T_LPAREN T_IDENT /* 'C' */ T_RPAREN T_EOS
+			{action.enum_def_stmt(lbl);}
 	;
 
 // R462
 enumerator_def_stmt
-@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+@init{Token lbl = null;}
 	:	(label {lbl=$label.tk;})? T_ENUMERATOR ( T_COLON_COLON )? enumerator_list T_EOS
+			{action.enumerator_def_stmt(lbl);}
 	;
 
 // R463
@@ -1012,18 +1034,18 @@ enumerator_list
 
 // R464
 end_enum_stmt
-options {k=3;}
-@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
-	:	((label)? T_END T_ENUM) => T_END T_ENUM T_EOS
-	|	(label {lbl=$label.tk;})? T_ENDENUM T_EOS
+@init{Token lbl = null;}
+	:	(label {lbl=$label.tk;})? T_END T_ENUM T_EOS {action.end_enum_stmt(lbl);}
+	|	(label {lbl=$label.tk;})? T_ENDENUM T_EOS {action.end_enum_stmt(lbl);}
 	;
 
 // R465
 array_constructor
 	:	T_LPAREN T_SLASH ac_spec T_SLASH T_RPAREN
+			{ action.array_constructor(); }
 	|	T_LBRACKET ac_spec T_RBRACKET
+			{ action.array_constructor(); }
 	;
-
 
 // R466
 // refactored to remove optional from lhs
@@ -1090,39 +1112,36 @@ type_declaration_stmt
 // R502
 declaration_type_spec
 	:	intrinsic_type_spec
-	|	T_TYPE
-		T_LPAREN
-		derived_type_spec
-		T_RPAREN
-	|	T_CLASS
-		T_LPAREN
-		derived_type_spec
-		T_RPAREN
-	|	T_CLASS
-		T_LPAREN
-		T_ASTERISK
-		T_RPAREN
+	|	T_TYPE T_LPAREN	derived_type_spec T_RPAREN
+			{ action.declaration_type_spec(IFortranParserAction.DeclarationTypeSpec.TYPE); }
+	|	T_CLASS	T_LPAREN derived_type_spec T_RPAREN
+			{ action.declaration_type_spec(IFortranParserAction.DeclarationTypeSpec.CLASS); }
+	|	T_CLASS T_LPAREN T_ASTERISK T_RPAREN
+			{ action.declaration_type_spec(IFortranParserAction.DeclarationTypeSpec.unlimited); }
 	;
 
 // R503
 attr_spec
-	:	access_spec
-	|	T_ALLOCATABLE
-	|	T_ASYNCHRONOUS
+	:	access_spec		{ action.attr_spec(IFortranParserAction.AttrSpec.access); }
+	|	T_ALLOCATABLE	{ action.attr_spec(IFortranParserAction.AttrSpec.ALLOCATABLE); }
+	|	T_ASYNCHRONOUS	{ action.attr_spec(IFortranParserAction.AttrSpec.ASYNCHRONOUS); }
 	|	T_DIMENSION T_LPAREN array_spec T_RPAREN
-	|	T_EXTERNAL
+						{ action.attr_spec(IFortranParserAction.AttrSpec.DIMENSION ); }
+	|	T_EXTERNAL		{ action.attr_spec(IFortranParserAction.AttrSpec.EXTERNAL); }
 	|	T_INTENT T_LPAREN intent_spec T_RPAREN
-	|	T_INTRINSIC
-	|	language_binding_spec
-	|	T_OPTIONAL
-	|	T_PARAMETER
-	|	T_POINTER
-	|	T_PROTECTED
-	|	T_SAVE
-	|	T_TARGET
-	|	T_VALUE
-	|	T_VOLATILE
-        // are T_KIND and T_LEN correct?
+						{ action.attr_spec(IFortranParserAction.AttrSpec.INTENT); }
+	|	T_INTRINSIC		{ action.attr_spec(IFortranParserAction.AttrSpec.INTRINSIC); }
+	|	language_binding_spec		
+						{ action.attr_spec(IFortranParserAction.AttrSpec.language_binding); }
+	|	T_OPTIONAL		{ action.attr_spec(IFortranParserAction.AttrSpec.OPTIONAL); }
+	|	T_PARAMETER		{ action.attr_spec(IFortranParserAction.AttrSpec.PARAMETER); }
+	|	T_POINTER		{ action.attr_spec(IFortranParserAction.AttrSpec.POINTER); }
+	|	T_PROTECTED		{ action.attr_spec(IFortranParserAction.AttrSpec.PROTECTED); }
+	|	T_SAVE			{ action.attr_spec(IFortranParserAction.AttrSpec.SAVE); }
+	|	T_TARGET		{ action.attr_spec(IFortranParserAction.AttrSpec.TARGET); }
+	|	T_VALUE			{ action.attr_spec(IFortranParserAction.AttrSpec.VALUE); }
+	|	T_VOLATILE		{ action.attr_spec(IFortranParserAction.AttrSpec.VOLATILE); }
+// TODO are T_KIND and T_LEN correct?
     |   T_KIND
     |   T_LEN
 	;
@@ -1171,29 +1190,50 @@ access_spec
 // R509
 // ERR_CHK 509 scalar_char_initialization_expr replaced by expr
 language_binding_spec
-    : T_BIND_LPAREN_C ( T_COMMA name T_EQUALS expr )? T_RPAREN
+@init{boolean hasName = false;}
+    :	T_BIND T_LPAREN T_IDENT /* 'C' */ (T_COMMA name T_EQUALS expr {hasName=true;})? T_RPAREN
+    		{ action.language_binding_spec($T_IDENT, hasName); }
     ;
 
 // R510
-// ERR_CHK 510 T_ASTERISK must not appear in any but the last dimension
-// array-spec grammar was changed to make it easier to parse (less ambiguous)
 array_spec
-	:	T_COLON ( T_COMMA array_spec )?			// assumed shape
-	|	T_ASTERISK ( T_COMMA array_spec )?		// assumed_size
-	|	expr (upper_bound_spec)? ( T_COMMA array_spec )?// explicit shape (if no upper_spec)
+@init{int count=0;}
+	:		{action.array_spec__begin();}
+	 	array_spec_element {count++;}
+		(T_COMMA array_spec_element {count++;})*
+			{action.array_spec(count);}
 	;
 
-upper_bound_spec
-	:	T_COLON			// assumed shape
-	|	T_COLON T_ASTERISK	// assumed size
-	|	T_COLON expr		// explicit shape
-	;	
+// Array specifications can consist of these beasts. Note that we can't 
+// mix/match arbitrarily, so we have to check validity in actions.
+// Types: 	0 expr (e.g. 3 or m+1)
+// 			1 expr: (e.g. 3:)
+// 			2 expr:expr (e.g. 3:5 or 7:(m+1))
+// 			3 expr:* (e.g. 3:* end of assumed size)
+// 			4 *  (end of assumed size)
+// 			5 :	 (could be part of assumed or deferred shape)
+array_spec_element
+@init{IFortranParserAction.ArraySpecElement type = null;}
+	:   expr {type=IFortranParserAction.ArraySpecElement.expr;}
+          (T_COLON {type=IFortranParserAction.ArraySpecElement.expr_colon;}
+        	(  expr {type=IFortranParserAction.ArraySpecElement.expr_colon_expr;}
+        	 | T_ASTERISK {type=IFortranParserAction.ArraySpecElement.expr_colon_asterisk;}
+        	)?
+          )?
+			{ action.array_spec_element(type); }
+	|   T_ASTERISK
+			{ action.array_spec_element(IFortranParserAction.ArraySpecElement.asterisk); }
+	|	T_COLON
+			{ action.array_spec_element(IFortranParserAction.ArraySpecElement.colon); }
+	;
 
 // R511
 // refactored to remove conditional from lhs and inlined lower_bound and upper_bound
 explicit_shape_spec
-    : expr ( T_COLON expr )?
-    ;
+@init{boolean hasUpperBound=false;}
+    : 	expr (T_COLON expr {hasUpperBound=true;})?
+			{action.explicit_shape_spec(hasUpperBound);}
+	;
 
 explicit_shape_spec_list
 @init{ int count=0;}
@@ -1245,25 +1285,21 @@ explicit_co_shape_spec_suffix
 
 // R515 deferred_shape_spec inlined as T_COLON in deferred_shape_spec_list
 
-// R516
-// ERR_CHK R516 last dimension of array_spec must be ( T_ASTERISK | expr T_COLON T_ASTERISK )
-assumed_size_spec
-    : array_spec
-    ;
+// R516 assumed_size_spec absorbed into array_spec.
 
 // R517
 intent_spec
-options {k=2;}
-	:	T_IN
-	|	T_OUT
-	|	(T_IN T_OUT) => T_IN T_OUT
-	|	T_INOUT
+	:	T_IN		{ action.intent_spec(IFortranParserAction.IntentSpec.IN); }
+	|	T_OUT		{ action.intent_spec(IFortranParserAction.IntentSpec.OUT); }
+	|	T_IN T_OUT	{ action.intent_spec(IFortranParserAction.IntentSpec.INOUT); }
+	|	T_INOUT		{ action.intent_spec(IFortranParserAction.IntentSpec.INOUT); }
 	;
 
 // R518
 access_stmt
-@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
-    :    (label {lbl=$label.tk;})? access_spec ( ( T_COLON_COLON )? access_id_list )? T_EOS
+@init{Token lbl = null;boolean hasList=false;} // @init{INIT_TOKEN_NULL(lbl);}
+    :    (label {lbl=$label.tk;})? access_spec ( ( T_COLON_COLON )? access_id_list {hasList=true;})? T_EOS
+			{action.access_stmt(lbl,hasList);}
     ;
 
 // R519
@@ -1298,25 +1334,25 @@ allocatable_decl
 // R521
 // generic_name_list substituted for object_name_list
 asynchronous_stmt
-@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
-	:	(label {lbl=$label.tk;})? T_ASYNCHRONOUS
-		( T_COLON_COLON )?
+@init{Token lbl = null;}
+	:	(label {lbl=$label.tk;})? T_ASYNCHRONOUS ( T_COLON_COLON )?
 		generic_name_list T_EOS
+			{action.asynchronous_stmt(lbl);}
 	;
 
 // R522
 bind_stmt
 @init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
 	:	(label {lbl=$label.tk;})? language_binding_spec
-		( T_COLON_COLON )?
-		bind_entity_list T_EOS
+		( T_COLON_COLON )? bind_entity_list T_EOS
+			{ action.bind_stmt(lbl); }
 	;
 
 // R523
 // T_IDENT inlined for entity_name and common_block_name
 bind_entity
-	:	T_IDENT
-	|	T_SLASH T_IDENT T_SLASH
+	:	T_IDENT {action.bind_entity($T_IDENT, false);}	// isCommonBlockName=false
+	|	T_SLASH T_IDENT T_SLASH {action.bind_entity($T_IDENT, true);}	// isCommonBlockname=true
 	;
 
 bind_entity_list
@@ -1328,8 +1364,10 @@ bind_entity_list
 
 // R524
 data_stmt
-@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
-    :    (label {lbl=$label.tk;})? T_DATA data_stmt_set ( ( T_COMMA )? data_stmt_set )* T_EOS
+@init{Token lbl = null; int count=1;}
+	:		{action.data_stmt__begin();}
+        (label {lbl=$label.tk;})? T_DATA data_stmt_set ( ( T_COMMA )? data_stmt_set {count++;})* T_EOS
+			{action.data_stmt(lbl,count);}
     ;
 
 // R525
@@ -1383,12 +1421,16 @@ data_i_do_object_list
 // ERR_CHK R530 designator is scalar-constant or integer constant when followed by '*'
 // data_stmt_repeat inlined from R531
 // structure_constructure covers null_init if 'NULL()' so null_init deleted
+// TODO - check for other cases of signed_real_literal_constant and real_literal_constant problems
 data_stmt_value
-options {backtrack=true;}
+options {backtrack=true; k=3;}
 	:	designator (T_ASTERISK data_stmt_constant)?
 	|	int_literal_constant (T_ASTERISK data_stmt_constant)?
-	|	( T_PLUS | T_MINUS ) int_literal_constant
+		// added to fix bug #185631
+	|	(T_DIGIT_STRING (T_PERIOD | T_PERIOD_EXPONENT)) => signed_real_literal_constant
+	|	(T_PERIOD) => signed_real_literal_constant // see R532 comment for why k=3 lookahead
 	|	signed_real_literal_constant
+	|	( T_PLUS | T_MINUS ) int_literal_constant
 	|	complex_literal_constant
 	|	logical_literal_constant
 	|	char_literal_constant
@@ -1427,7 +1469,7 @@ options {backtrack=true; k=3;}
 	:	designator
 	|	signed_int_literal_constant
 	|	( (T_PLUS | T_MINUS)? (T_DIGIT_STRING (T_PERIOD | T_PERIOD_EXPONENT)) 
-            | (T_PERIOD) ) => signed_real_literal_constant
+    |	(T_PERIOD) ) => signed_real_literal_constant
 	|	complex_literal_constant
 	|	logical_literal_constant
 	|	char_literal_constant
@@ -1443,8 +1485,10 @@ options {backtrack=true; k=3;}
 // R535, R543-F2008
 // array_name replaced by T_IDENT
 dimension_stmt
-@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
-    :    (label {lbl=$label.tk;})? T_DIMENSION ( T_COLON_COLON )? dimension_decl ( T_COMMA dimension_decl )* T_EOS
+@init{Token lbl=null; int count=1;} // @init{INIT_TOKEN_NULL(lbl);}
+	:		{action.dimension_stmt__begin();}
+        (label {lbl=$label.tk;})? T_DIMENSION ( T_COLON_COLON )? dimension_decl ( T_COMMA dimension_decl {count++;})* T_EOS
+			{action.dimension_stmt(lbl,count);}
     ;
 
 // R544-F2008
@@ -1462,21 +1506,25 @@ dimension_spec
 // R536
 // generic_name_list substituted for dummy_arg_name_list
 intent_stmt
-@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+@init{Token lbl = null;}
 	:	(label {lbl=$label.tk;})? T_INTENT T_LPAREN intent_spec T_RPAREN ( T_COLON_COLON )? generic_name_list T_EOS
+			{action.intent_stmt(lbl);}
 	;
 
 // R537
 // generic_name_list substituted for dummy_arg_name_list
 optional_stmt
-@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+@init{Token lbl = null;}
 	:	(label {lbl=$label.tk;})? T_OPTIONAL ( T_COLON_COLON )? generic_name_list T_EOS
+			{action.optional_stmt(lbl);}
+		
 	;
 
 // R538
 parameter_stmt
-@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+@init{Token lbl = null;}
 	:	(label {lbl=$label.tk;})? T_PARAMETER T_LPAREN named_constant_def_list T_RPAREN T_EOS
+			{action.parameter_stmt(lbl);}
 	;
 
 named_constant_def_list
@@ -1497,6 +1545,7 @@ named_constant_def
 pointer_stmt
 @init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
 	:	(label {lbl=$label.tk;})? T_POINTER ( T_COLON_COLON )? pointer_decl_list T_EOS
+			{action.pointer_stmt(lbl);}
 	;
 
 pointer_decl_list
@@ -1515,14 +1564,16 @@ pointer_decl
 // R542
 // generic_name_list substituted for entity_name_list
 protected_stmt
-@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+@init{Token lbl = null;}
 	:	(label {lbl=$label.tk;})? T_PROTECTED ( T_COLON_COLON )? generic_name_list T_EOS
+			{action.protected_stmt(lbl);}
 	;
 
 // R543
 save_stmt
-@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
-    : (label {lbl=$label.tk;})? T_SAVE ( ( T_COLON_COLON )? saved_entity_list )? T_EOS
+@init{Token lbl = null;boolean hasSavedEntityList=false;}
+    : (label {lbl=$label.tk;})? T_SAVE ( ( T_COLON_COLON )? saved_entity_list {hasSavedEntityList=true;})? T_EOS
+		{action.save_stmt(lbl,hasSavedEntityList);}
     ;
 
 // R544
@@ -1545,8 +1596,10 @@ saved_entity_list
 // R546, R555-F2008
 // T_IDENT inlined for object_name
 target_stmt
-@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
-    : (label {lbl=$label.tk;})? T_TARGET ( T_COLON_COLON )? target_decl ( T_COMMA target_decl )* T_EOS
+@init{Token lbl = null;int count=1;}
+	:		{action.target_stmt__begin();}
+     (label {lbl=$label.tk;})? T_TARGET ( T_COLON_COLON )? target_decl ( T_COMMA target_decl {count++;} )* T_EOS
+		{action.target_stmt(lbl,count);}
     ;
 
 // R556-F2008
@@ -1558,22 +1611,26 @@ target_decl
 // R547
 // generic_name_list substituted for dummy_arg_name_list
 value_stmt
-@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+@init{Token lbl = null;}
 	:	(label {lbl=$label.tk;})? T_VALUE ( T_COLON_COLON )? generic_name_list T_EOS
+		{action.value_stmt(lbl);}
 	;
 
 // R548
 // generic_name_list substituted for object_name_list
 volatile_stmt
-@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+@init{Token lbl = null;}
 	:	(label {lbl=$label.tk;})? T_VOLATILE ( T_COLON_COLON )? generic_name_list T_EOS
+		{action.volatile_stmt(lbl);}
 	;
 
 // R549
 implicit_stmt
-@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+@init{Token lbl = null;}
 	:	(label {lbl=$label.tk;})? T_IMPLICIT implicit_spec_list T_EOS
+			{action.implicit_stmt(lbl);}
 	|	(label {lbl=$label.tk;})? T_IMPLICIT T_NONE T_EOS
+			{action.implicit_stmt(lbl);}
 	;
 
 // R550
@@ -1624,8 +1681,9 @@ namelist_group_object_list
 
 // R554
 equivalence_stmt
-@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
+@init{Token lbl = null;}
 	:	(label {lbl=$label.tk;})? T_EQUIVALENCE equivalence_set_list T_EOS
+			{action.equivalence_stmt(lbl);}
 	;
 
 // R555
@@ -1743,7 +1801,7 @@ substring_range_or_arg_list returns [boolean isSubstringRange]
 	 }
 	:	T_COLON (expr {hasUpperBound = true;})?         // substring_range
 			{
-			  action.substring_range(true, hasUpperBound);
+			  action.substring_range(false, hasUpperBound);	// hasLowerBound=false
 			  isSubstringRange=true;
 			}
 	|		{ 
@@ -1790,7 +1848,7 @@ substr_range_or_arg_list_suffix returns [boolean isSubstringRange]
 			}
 		T_COLON (expr {hasUpperBound=true;})?	// substring_range
 			{
-			  action.substring_range(true, hasUpperBound);
+			  action.substring_range(true, hasUpperBound);	// hasLowerBound=true
 			  isSubstringRange = true;
 			}
 	|
@@ -1987,15 +2045,24 @@ image_selector
 // modified to remove backtracking by looking for the token inserted during
 // the lexical prepass if a :: was found (which required alt1 below).
 allocate_stmt
-options {k=2;}
-@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
-// options {backtrack=true;}
-//     :    (label {lbl=$label.tk;})? T_ALLOCATE T_LPAREN type_spec T_COLON_COLON allocation_list ( T_COMMA alloc_opt_list )? T_RPAREN T_EOS
-    :    ((label)? T_ALLOCATE_STMT_1) => 
-         (label {lbl=$label.tk;})? T_ALLOCATE_STMT_1 T_ALLOCATE T_LPAREN type_spec 
-            T_COLON_COLON allocation_list 
-            ( T_COMMA alloc_opt_list )? T_RPAREN T_EOS
-    |    (label {lbl=$label.tk;})? T_ALLOCATE T_LPAREN allocation_list ( T_COMMA alloc_opt_list )? T_RPAREN T_EOS
+@init{Token lbl = null;
+	  boolean hasTypeSpec = false;
+	  boolean hasAllocOptList = false;
+	 }
+    :	(label {lbl=$label.tk;})? T_ALLOCATE_STMT_1 T_ALLOCATE T_LPAREN
+		type_spec T_COLON_COLON
+		allocation_list 
+		( T_COMMA alloc_opt_list {hasAllocOptList=true;} )? T_RPAREN T_EOS
+    		{
+    			hasTypeSpec = true;
+    			action.allocate_stmt(lbl, hasTypeSpec, hasAllocOptList);
+    		}
+    |	(label {lbl=$label.tk;})? T_ALLOCATE T_LPAREN
+    	allocation_list
+    	( T_COMMA alloc_opt_list {hasAllocOptList=true;} )? T_RPAREN T_EOS
+    		{
+    			action.allocate_stmt(lbl, hasTypeSpec, hasAllocOptList);
+    		}
     ;
 
 // R624
@@ -2003,6 +2070,7 @@ options {k=2;}
 // stat_variable and errmsg_variable replaced by designator
 alloc_opt
 	:	T_IDENT /* {'STAT','ERRMSG'} are variables {SOURCE'} is expr */ T_EQUALS expr
+			{ action.alloc_opt($T_IDENT); }
 	;
 
 alloc_opt_list
@@ -2020,8 +2088,11 @@ alloc_opt_list
 
 // R628, R631-F2008
 allocation
-    : allocate_object ( T_LPAREN allocate_shape_spec_list T_RPAREN )?
-                      ( T_LBRACKET allocate_co_array_spec T_RBRACKET )?
+@init{boolean hasAllocateShapeSpecList = false; boolean hasAllocateCoArraySpec = false;}
+    : allocate_object
+    	( T_LPAREN allocate_shape_spec_list {hasAllocateShapeSpecList=true;} T_RPAREN )?
+		( T_LBRACKET allocate_co_array_spec {hasAllocateCoArraySpec=true;} T_RBRACKET )?
+			{ action.allocation(hasAllocateShapeSpecList, hasAllocateCoArraySpec); }
     ;
 
 
@@ -2051,7 +2122,12 @@ allocate_object_list
 // ERR_CHK 630a lower_bound_expr replaced by expr
 // ERR_CHK 630b upper_bound_expr replaced by expr
 allocate_shape_spec
-    :    expr ( T_COLON expr )?
+@init{boolean hasLowerBound = false; boolean hasUpperBound = true;}
+	:	expr (T_COLON expr)?
+    		{	// note, allocate-shape-spec always has upper bound
+    			// grammar was refactored to remove left recursion, looks deceptive
+    			action.allocate_shape_spec(hasLowerBound, hasUpperBound);
+    		}
     ;
 
 allocate_shape_spec_list
@@ -2403,8 +2479,7 @@ data_pointer_object
 // R737
 // ERR_CHK 737 lower_bound_expr replaced by expr
 bounds_spec
-	:	expr
-		T_COLON
+	:	expr T_COLON
 	;
 
 bounds_spec_list
@@ -2418,9 +2493,7 @@ bounds_spec_list
 // ERR_CHK 738a lower_bound_expr replaced by expr
 // ERR_CHK 738b upper_bound_expr replaced by expr
 bounds_remapping
-	:	expr
-		T_COLON
-		expr
+	:	expr T_COLON expr
 	;
 
 bounds_remapping_list
@@ -2458,6 +2531,7 @@ where_stmt
 @init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
 	:	(label {lbl=$label.tk;})? T_WHERE_STMT T_WHERE
 		T_LPAREN expr T_RPAREN assignment_stmt
+			{action.where_stmt(lbl);}
 	;
 
 // R744
@@ -2469,18 +2543,17 @@ where_construct
 // R745
 // ERR_CHK 745 mask_expr replaced by expr
 where_construct_stmt
-//     :    ( T_IDENT T_COLON )? T_WHERE T_LPAREN expr T_RPAREN T_EOS
-    :    ( T_IDENT T_COLON )? T_WHERE_CONSTRUCT_STMT T_WHERE 
+@init{Token id=null;}
+	:	( T_IDENT T_COLON {id=$T_IDENT;})? T_WHERE_CONSTRUCT_STMT T_WHERE 
             T_LPAREN expr T_RPAREN T_EOS
+				{action.where_construct_stmt(id);}
     ;
 
 // R746
 // assignment_stmt inlined for where_assignment_stmt
 where_body_construct
-// options {backtrack=true;}
-options {k=2;}
 	:	assignment_stmt
-	|	( (label)? T_WHERE_STMT ) => where_stmt
+	|	where_stmt
 	|	where_construct
 	;
 
@@ -2495,30 +2568,29 @@ options {k=2;}
 // R749
 // ERR_CHK 749 mask_expr replaced by expr
 masked_elsewhere_stmt
-options {k=3;}
-@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
-	:	((label)? T_ELSE T_WHERE) => (label {lbl=$label.tk;})? T_ELSE T_WHERE
-		T_LPAREN	expr T_RPAREN ( T_IDENT )? T_EOS
-	|	((label)? T_ELSEWHERE) => (label {lbl=$label.tk;})? T_ELSEWHERE
-		T_LPAREN	expr T_RPAREN ( T_IDENT )? T_EOS
+@init{Token lbl = null;Token id=null;}
+	:	(label {lbl=$label.tk;})? T_ELSE T_WHERE T_LPAREN expr T_RPAREN ( T_IDENT {id=$T_IDENT;})? T_EOS 
+			{action.masked_elsewhere_stmt(lbl,id);}
+	|	(label {lbl=$label.tk;})? T_ELSEWHERE T_LPAREN expr T_RPAREN ( T_IDENT {id=$T_IDENT;})? T_EOS 
+			{action.masked_elsewhere_stmt(lbl,id);}
 	;
 
 // R750
 elsewhere_stmt
-options {k=3;}
-@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
-	:	((label)? T_ELSE T_WHERE) => (label {lbl=$label.tk;})? T_ELSE T_WHERE
-		( T_IDENT )? T_EOS
-	|	((label)? T_ELSEWHERE) => (label {lbl=$label.tk;})? T_ELSEWHERE
-		( T_IDENT )? T_EOS
+@init{ Token lbl = null; Token id=null;} 
+	:	(label {lbl=$label.tk;})? T_ELSE T_WHERE (T_IDENT {id=$T_IDENT;})? T_EOS
+			{action.elsewhere_stmt(lbl,id);}
+	|	(label {lbl=$label.tk;})? T_ELSEWHERE (T_IDENT {id=$T_IDENT;})? T_EOS 
+			{action.elsewhere_stmt(lbl,id);}
 	;
 
 // R751
 end_where_stmt
-options {k=3;}
-@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
-	: ((label)? T_END T_WHERE) => (label {lbl=$label.tk;})? T_END T_WHERE ( T_IDENT )? T_EOS
-	| (label {lbl=$label.tk;})? T_ENDWHERE ( T_IDENT )? T_EOS
+@init{Token lbl = null; Token id=null;} // @init{INIT_TOKEN_NULL(lbl);}
+	: (label {lbl=$label.tk;})? T_END T_WHERE ( T_IDENT {id=$T_IDENT;} )? T_EOS
+		{action.end_where_stmt(lbl,id);}
+	| (label {lbl=$label.tk;})? T_ENDWHERE ( T_IDENT {id=$T_IDENT;} )? T_EOS
+		{action.end_where_stmt(lbl,id);}
 	;
 
 // R752
@@ -2530,10 +2602,10 @@ forall_construct
 
 // R753
 forall_construct_stmt
-@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
-//     :    (label {lbl=$label.tk;})? ( T_IDENT T_COLON )? T_FORALL forall_header T_EOS
-    :    (label {lbl=$label.tk;})? ( T_IDENT T_COLON )? T_FORALL_CONSTRUCT_STMT T_FORALL 
+@init{Token lbl = null; Token id = null;} 
+    :    (label {lbl=$label.tk;})? ( T_IDENT T_COLON {id=$T_IDENT;})? T_FORALL_CONSTRUCT_STMT T_FORALL 
             forall_header T_EOS
+				{action.forall_construct_stmt(lbl,id);}
     ;
 
 // R754
@@ -2559,28 +2631,23 @@ forall_triplet_spec_list
 
 // R756
 forall_body_construct
-// options {backtrack=true;}
-options {k=2;}
 	:	forall_assignment_stmt
-	|	( (label)? T_WHERE_STMT ) => where_stmt
-	|	( T_WHERE_CONSTRUCT) => where_construct
-	|	( T_FORALL_CONSTRUCT) => forall_construct
-	|	( (label)? T_FORALL_STMT) => forall_stmt
+	|	where_stmt
+	|	where_construct
+	|	forall_construct
+	|	forall_stmt
 	;
 
 // R757
 forall_assignment_stmt
-// options {backtrack=true;}
-options {k=2;}
-	:	( (label)? T_ASSIGNMENT_STMT ) => assignment_stmt
-	|	( (label)? T_PTR_ASSIGNMENT_STMT ) => pointer_assignment_stmt
+	:	assignment_stmt
+	|	pointer_assignment_stmt
 	;
 
 // R758
 end_forall_stmt
-options {k=3;}
 @init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
-	: ((label)? T_END T_FORALL) => (label {lbl=$label.tk;})? T_END T_FORALL ( T_IDENT )? T_EOS
+	: (label {lbl=$label.tk;})? T_END T_FORALL ( T_IDENT )? T_EOS
 	| (label {lbl=$label.tk;})? T_ENDFORALL ( T_IDENT )? T_EOS
 	;
 
@@ -2617,9 +2684,8 @@ if_then_stmt
 // R804
 // ERR_CHK 804 scalar_logical_expr replaced by expr
 else_if_stmt
-options {k=3;}
 @init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
-	: ((label)? T_ELSE T_IF) => (label {lbl=$label.tk;})? T_ELSE T_IF
+	: (label {lbl=$label.tk;})? T_ELSE T_IF
         T_LPAREN expr T_RPAREN T_THEN ( T_IDENT )? T_EOS
 	| (label {lbl=$label.tk;})? T_ELSEIF
         T_LPAREN expr T_RPAREN T_THEN ( T_IDENT )? T_EOS
@@ -2634,10 +2700,9 @@ else_stmt
 
 // R806
 end_if_stmt
-options {k=3;}
 @init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
-	: ((label)? T_END T_IF) => (label {lbl=$label.tk;})? T_END T_IF ( T_IDENT )? T_EOS
-	| (label {lbl=$label.tk;})? T_ENDIF ( T_IDENT )? T_EOS
+	: (label {lbl=$label.tk;})? T_END T_IF ( T_IDENT )? T_EOS
+	| (label {lbl=$label.tk;})? T_ENDIF    ( T_IDENT )? T_EOS
 	;
 
 // R807
@@ -2662,14 +2727,8 @@ case_construct
 select_case_stmt
 @init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
     :    (label {lbl=$label.tk;})? ( T_IDENT T_COLON )?
-        t_select_case
+        (T_SELECT T_CASE | T_SELECTCASE)
         T_LPAREN expr T_RPAREN T_EOS
-    ;
-
-t_select_case
-options {k=2;}
-    : (T_SELECT T_CASE) => T_SELECT T_CASE
-    | T_SELECTCASE
     ;
 
 // R810
@@ -2682,10 +2741,9 @@ case_stmt
 
 // R811
 end_select_stmt
-options {k=3;}
 @init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
-	: ((label)? T_END T_SELECT) => (label {lbl=$label.tk;})? T_END T_SELECT (T_IDENT)? T_EOS
-	| (label {lbl=$label.tk;})? T_ENDSELECT (T_IDENT)? T_EOS
+	: (label {lbl=$label.tk;})? T_END T_SELECT (T_IDENT)? T_EOS
+	| (label {lbl=$label.tk;})? T_ENDSELECT    (T_IDENT)? T_EOS
 	;
 
 // R812 inlined case_expr with expr was either scalar_int_expr scalar_char_expr scalar_logical_expr
@@ -2758,10 +2816,9 @@ selector
 
 // R820
 end_associate_stmt
-options {k=3;}
 @init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
-	: ((label)? T_END T_ASSOCIATE) => (label {lbl=$label.tk;})? T_END T_ASSOCIATE ( T_IDENT )? T_EOS
-	| (label {lbl=$label.tk;})? T_ENDASSOCIATE ( T_IDENT )? T_EOS
+	: (label {lbl=$label.tk;})? T_END T_ASSOCIATE ( T_IDENT )? T_EOS
+	| (label {lbl=$label.tk;})? T_ENDASSOCIATE    ( T_IDENT )? T_EOS
 	;
 
 // R821
@@ -2778,8 +2835,7 @@ select_type_stmt
     ;
 
 select_type
-options {k=2;}
-    : (T_SELECT T_TYPE) => T_SELECT T_TYPE
+    : T_SELECT T_TYPE
     | T_SELECTTYPE
     ;
 
@@ -2805,10 +2861,9 @@ type_guard_stmt
 // R824
 // T_IDENT inlined for select_construct_name
 end_select_type_stmt
-options {k=3;}
 @init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
-	:	((label)? T_END T_SELECT) => (label {lbl=$label.tk;})? T_END T_SELECT ( T_IDENT )? T_EOS
-	|	(label {lbl=$label.tk;})? T_ENDSELECT ( T_IDENT )? T_EOS
+	:	(label {lbl=$label.tk;})? T_END T_SELECT ( T_IDENT )? T_EOS
+	|	(label {lbl=$label.tk;})? T_ENDSELECT    ( T_IDENT )? T_EOS
 	;
 
 // R825
@@ -2848,11 +2903,7 @@ label_do_stmt
 // ERR_CHK 830a scalar_int_expr replaced by expr
 // ERR_CHK 830b scalar_logical_expr replaced by expr
 loop_control
-// options {backtrack=true; memoize=true; greedy=true;}
-//     : ( T_COMMA )? do_variable T_EQUALS expr T_COMMA expr ( T_COMMA expr )?
-//     | ( T_COMMA )? T_WHILE T_LPAREN expr T_RPAREN
-options {k=2;}
-    : ( (T_COMMA)? T_WHILE ) => ( T_COMMA )? T_WHILE T_LPAREN expr T_RPAREN
+    : ( T_COMMA )? T_WHILE T_LPAREN expr T_RPAREN
     | ( T_COMMA )? do_variable T_EQUALS expr T_COMMA expr ( T_COMMA expr )?
     ;
 
@@ -2877,10 +2928,9 @@ end_do
 // R834
 // T_IDENT inlined for do_construct_name
 end_do_stmt
-options {k=3;}
 @init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
-	: ((label)? T_END T_DO) => (label {lbl=$label.tk;})? T_END T_DO ( T_IDENT )? T_EOS
-	| (label {lbl=$label.tk;})? T_ENDDO ( T_IDENT )? T_EOS
+	: (label {lbl=$label.tk;})? T_END T_DO ( T_IDENT )? T_EOS
+	| (label {lbl=$label.tk;})? T_ENDDO    ( T_IDENT )? T_EOS
 	;
 
 // R835 nonblock_do_construct deleted as it was combined with block_do_construct to reduce backtracking
@@ -2935,7 +2985,7 @@ exit_stmt
 
 // R845
 goto_stmt
-	:	t_go_to label T_EOS
+	:	(T_GO T_TO | T_GOTO) label T_EOS
 			{ action.goto_stmt($label.tk); }
 	;
 
@@ -2943,14 +2993,9 @@ goto_stmt
 // ERR_CHK 846 scalar_int_expr replaced by expr
 computed_goto_stmt
 @init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
-	:	(label {lbl=$label.tk;})? t_go_to T_LPAREN label_list T_RPAREN ( T_COMMA )? expr T_EOS
+	:	(label {lbl=$label.tk;})?
+		(T_GO T_TO | T_GOTO) T_LPAREN label_list T_RPAREN ( T_COMMA )? expr T_EOS
 			{ action.computed_goto_stmt(lbl); }
-	;
-
-t_go_to
-options {k=2;}
-	: (T_GO T_TO) => T_GO T_TO
-	| T_GOTO
 	;
 
 // R847
@@ -3067,8 +3112,9 @@ options {k=3;}
 
 // R911
 write_stmt
-@init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
-	:	(label {lbl=$label.tk;})? T_WRITE T_LPAREN io_control_spec_list T_RPAREN ( output_item_list )? T_EOS
+@init{Token lbl = null; boolean hasOutputList=false;} // @init{INIT_TOKEN_NULL(lbl);}
+	:	(label {lbl=$label.tk;})? T_WRITE T_LPAREN io_control_spec_list T_RPAREN ( output_item_list {hasOutputList=true;})? T_EOS
+			{ action.write_stmt(lbl, hasOutputList); }
 	;
 
 // R912
@@ -3082,8 +3128,11 @@ print_stmt
 // io_unit and format are both (expr|'*') so combined
 io_control_spec
         :	expr
+        		{ action.io_control_spec(true, null, false); }	// hasExpression=true
         |	T_ASTERISK
+        		{ action.io_control_spec(false, null, true); }	// hasAsterisk=true
         |	T_IDENT /* {'UNIT','FMT'} */ T_EQUALS T_ASTERISK
+        		{ action.io_control_spec(false, $T_IDENT, true); }	// hasAsterisk=true
         |	T_IDENT
 		    /* {'UNIT','FMT'} are expr 'NML' is T_IDENT} */
 		    /* {'ADVANCE','ASYNCHRONOUS','BLANK','DECIMAL','DELIM'} are expr */
@@ -3091,6 +3140,7 @@ io_control_spec
 		    /* {'ID','IOMSG',IOSTAT','SIZE'} are variables */
 		    /* {'PAD','POS','REC','ROUND','SIGN'} are expr */
 		T_EQUALS expr
+        		{ action.io_control_spec(true, $T_IDENT, false); }	// hasExpression=true
     ;
 
 
@@ -3257,12 +3307,10 @@ flush_spec_list
 
 // R929
 inquire_stmt
-// options {backtrack=true;}
-options{k=2;}
 @init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
 	:	(label)? T_INQUIRE T_LPAREN inquire_spec_list T_RPAREN T_EOS
 // 	|	(label)? T_INQUIRE T_LPAREN T_IDENT /* 'IOLENGTH' */ T_EQUALS scalar_int_variable T_RPAREN output_item_list T_EOS
-	|	( (label)? T_INQUIRE_STMT_2 ) => (label {lbl=$label.tk;})? T_INQUIRE_STMT_2 
+	|	(label {lbl=$label.tk;})? T_INQUIRE_STMT_2 
             T_INQUIRE T_LPAREN T_IDENT /* 'IOLENGTH' */ T_EQUALS 
             scalar_int_variable T_RPAREN output_item_list T_EOS
 	;
@@ -3444,11 +3492,8 @@ program_stmt
 // R1103
 // T_IDENT inlined for program_name
 end_program_stmt
-options {k=3;}
 @init{Token lbl = null; Token id = null;}
-// @init{INIT_TOKEN_NULL(lbl); INIT_TOKEN_NULL(id);}
-	:	((label)? T_END T_PROGRAM)
-		=> (label {lbl=$label.tk;})? T_END T_PROGRAM (T_IDENT {id=$T_IDENT;})? end_of_stmt
+	:	(label {lbl=$label.tk;})? T_END T_PROGRAM (T_IDENT {id=$T_IDENT;})? end_of_stmt
 			{ action.end_program_stmt(lbl, id); }
 	|	(label {lbl=$label.tk;})? T_ENDPROGRAM (T_IDENT {id=$T_IDENT;})? end_of_stmt
 			{ action.end_program_stmt(lbl, id); }
@@ -3476,10 +3521,9 @@ module_stmt
 
 // R1106
 end_module_stmt
-options {k=3;}
 @init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
-        :       ((label)? T_END T_MODULE) => (label {lbl=$label.tk;})? T_END T_MODULE ( T_IDENT )? end_of_stmt
-        |       (label {lbl=$label.tk;})? T_ENDMODULE ( T_IDENT )? end_of_stmt
+        :       (label {lbl=$label.tk;})? T_END T_MODULE ( T_IDENT )? end_of_stmt
+        |       (label {lbl=$label.tk;})? T_ENDMODULE    ( T_IDENT )? end_of_stmt
         |       (label {lbl=$label.tk;})? T_END end_of_stmt
         ;
 
@@ -3558,20 +3602,18 @@ block_data
 
 // R1117
 block_data_stmt
-options {k=3;}
 @init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
-	:	((label)? T_BLOCK T_DATA) => (label {lbl=$label.tk;})? T_BLOCK T_DATA ( T_IDENT )? T_EOS
+	:	(label {lbl=$label.tk;})? T_BLOCK T_DATA ( T_IDENT )? T_EOS
 	|   (label {lbl=$label.tk;})? T_BLOCKDATA ( T_IDENT )? T_EOS
 	;
 
 // R1118
 end_block_data_stmt
-options {k=3;}
 @init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
-	:   ((label)? T_END T_BLOCK) => (label {lbl=$label.tk;})? T_END T_BLOCK T_DATA ( T_IDENT )? end_of_stmt
-	|   ((label)? T_ENDBLOCK T_DATA) => (label {lbl=$label.tk;})? T_ENDBLOCK T_DATA ( T_IDENT )? end_of_stmt
-	|   ((label)? T_END T_BLOCKDATA) => (label {lbl=$label.tk;})? T_END T_BLOCKDATA ( T_IDENT )? end_of_stmt
-	|   (label {lbl=$label.tk;})? T_ENDBLOCKDATA ( T_IDENT )? end_of_stmt
+	:   (label {lbl=$label.tk;})? T_END T_BLOCK T_DATA ( T_IDENT )? end_of_stmt
+	|   (label {lbl=$label.tk;})? T_ENDBLOCK T_DATA    ( T_IDENT )? end_of_stmt
+	|   (label {lbl=$label.tk;})? T_END T_BLOCKDATA    ( T_IDENT )? end_of_stmt
+	|   (label {lbl=$label.tk;})? T_ENDBLOCKDATA       ( T_IDENT )? end_of_stmt
 	|	(label)? T_END end_of_stmt
 	;
 
@@ -3601,10 +3643,9 @@ interface_stmt
 
 // R1204
 end_interface_stmt
-options {k=3;}
 @init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
-	: ((label)? T_END T_INTERFACE) => (label {lbl=$label.tk;})? T_END T_INTERFACE ( generic_spec )? T_EOS
-	| (label {lbl=$label.tk;})? T_ENDINTERFACE ( generic_spec )? T_EOS
+	: (label {lbl=$label.tk;})? T_END T_INTERFACE ( generic_spec )? T_EOS
+	| (label {lbl=$label.tk;})? T_ENDINTERFACE    ( generic_spec )? T_EOS
 	;
 
 // R1205
@@ -3662,21 +3703,24 @@ procedure_declaration_stmt
 // R1212
 // T_IDENT inlined for interface_name
 proc_interface
-	:	T_IDENT
-	|	declaration_type_spec
+	:	T_IDENT					{ action.proc_interface($T_IDENT); }
+	|	declaration_type_spec	{ action.proc_interface(null); }
 	;
 
 // R1213
-// TODO is there an error in the standard grammar definition?
 proc_attr_spec
 	:	access_spec
+					{ action.proc_attr_spec(IFortranParserAction.AttrSpec.none); }
 	|	proc_language_binding_spec
+					{ action.proc_attr_spec(IFortranParserAction.AttrSpec.none); }
 	|	T_INTENT T_LPAREN intent_spec T_RPAREN
-	|	T_OPTIONAL
-	|	T_POINTER
-	|	T_SAVE
-        // TODO: are T_PASS, T_NOPASS, and T_DEFERRED correct?
-    |   T_PASS ( T_LPAREN T_IDENT T_RPAREN)?
+					{ action.proc_attr_spec(IFortranParserAction.AttrSpec.INTENT); }
+	|	T_OPTIONAL	{ action.proc_attr_spec(IFortranParserAction.AttrSpec.OPTIONAL); }
+	|	T_POINTER	{ action.proc_attr_spec(IFortranParserAction.AttrSpec.POINTER); }
+	|	T_SAVE		{ action.proc_attr_spec(IFortranParserAction.AttrSpec.SAVE); }
+// TODO: are T_PASS, T_NOPASS, and T_DEFERRED correct?
+// From R453 binding-attr
+	|   T_PASS ( T_LPAREN T_IDENT T_RPAREN)?
     |   T_NOPASS
     |   T_DEFERRED
 	;
@@ -3684,7 +3728,9 @@ proc_attr_spec
 // R1214
 // T_IDENT inlined for procedure_entity_name
 proc_decl
-    :    T_IDENT ( T_EQ_GT null_init )?
+@init{boolean hasNullInit = false;}
+    :	T_IDENT ( T_EQ_GT null_init {hasNullInit=true;} )?
+    		{ action.proc_decl($T_IDENT, hasNullInit); }
     ;
 
 proc_decl_list
@@ -3821,10 +3867,9 @@ result_name
 
 // R1230
 end_function_stmt
-options {k=3;}
 @init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
-	: ((label)? T_END T_FUNCTION) => (label {lbl=$label.tk;})? T_END T_FUNCTION ( T_IDENT )? end_of_stmt
-	| (label {lbl=$label.tk;})? T_ENDFUNCTION ( T_IDENT )? end_of_stmt
+	: (label {lbl=$label.tk;})? T_END T_FUNCTION ( T_IDENT )? end_of_stmt
+	| (label {lbl=$label.tk;})? T_ENDFUNCTION    ( T_IDENT )? end_of_stmt
 	| (label {lbl=$label.tk;})? T_END end_of_stmt
 	;
 
@@ -3849,8 +3894,8 @@ subroutine_stmt
 // T_IDENT inlined for dummy_arg_name
 dummy_arg
 options{greedy=false; memoize=false;}
-	:	T_IDENT
-	|	T_ASTERISK
+	:	T_IDENT		{ action.dummy_arg($T_IDENT); }
+	|	T_ASTERISK	{ action.dummy_arg($T_ASTERISK); }
 	;
 
 dummy_arg_list
@@ -3862,10 +3907,9 @@ dummy_arg_list
 
 // R1234
 end_subroutine_stmt
-options {k=3;}
 @init{Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
-    : ((label)? T_END T_SUBROUTINE) => (label {lbl=$label.tk;})? T_END T_SUBROUTINE ( T_IDENT )? end_of_stmt
-    | (label {lbl=$label.tk;})? T_ENDSUBROUTINE ( T_IDENT )? end_of_stmt
+    : (label {lbl=$label.tk;})? T_END T_SUBROUTINE ( T_IDENT )? end_of_stmt
+    | (label {lbl=$label.tk;})? T_ENDSUBROUTINE    ( T_IDENT )? end_of_stmt
     | (label {lbl=$label.tk;})? T_END end_of_stmt
     ;
 
