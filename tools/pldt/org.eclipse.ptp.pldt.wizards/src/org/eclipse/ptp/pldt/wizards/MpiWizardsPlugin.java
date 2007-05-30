@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006 IBM Corporation
+ * Copyright (c) 2006,2007 IBM Corporation
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -93,5 +93,9 @@ public class MpiWizardsPlugin extends AbstractUIPlugin {
 	 */
 	public static ImageDescriptor getImageDescriptor(String path) {
 		return AbstractUIPlugin.imageDescriptorFromPlugin("org.eclipse.cdt.managedbuilder.ui.tests", path);
+	}
+
+	public static String getPluginId() {
+		return "org.eclipse.ptp.pldt.wizards";
 	}
 }
