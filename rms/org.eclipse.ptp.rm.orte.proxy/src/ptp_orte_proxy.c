@@ -77,10 +77,7 @@
 #define RTEV_ERROR_ORTE_INIT			RTEV_OFFSET + 1000
 #define RTEV_ERROR_ORTE_FINALIZE		RTEV_OFFSET + 1001
 #define RTEV_ERROR_ORTE_SUBMIT			RTEV_OFFSET + 1002
-#define RTEV_ERROR_TERMINATE_JOB		RTEV_OFFSET + 1003
-#define RTEV_ERROR_PATTR				RTEV_OFFSET + 1004
-#define RTEV_ERROR_PROCS				RTEV_OFFSET + 1005
-#define RTEV_ERROR_NODES				RTEV_OFFSET + 1006
+#define RTEV_ERROR_JOB					RTEV_OFFSET + 1003
 #define RTEV_ERROR_NATTR				RTEV_OFFSET + 1007
 #define RTEV_ERROR_ORTE_BPROC_SUBSCRIBE	RTEV_OFFSET + 1008
 #define RTEV_ERROR_SIGNAL				RTEV_OFFSET + 1009
@@ -388,111 +385,63 @@ find_job(int jobid, int which)
 	return NULL;
 }
 
- 
-/**
- * See org.eclipse.ptp.rtsysmte.AbstractProxyRuntimeSystem for a description
- * of the protocol format.
- */
 static void
 sendOKEvent(int trans_id)
 {
- 	proxy_msg *	m = new_proxy_msg(PROXY_EV_OK, trans_id);
-	proxy_svr_queue_msg(orte_proxy, m);
+	proxy_svr_queue_msg(orte_proxy, proxy_ok_event(trans_id));
 }
 
-static int
+static void
 sendMessageEvent(int trans_id, char *level, int code, char *fmt, ...)
 {
 	va_list		ap;
-	char *		msg;
-	proxy_msg *	m = new_proxy_msg(PROXY_EV_MESSAGE, trans_id);
-	
+
 	va_start(ap, fmt);
-	vasprintf(&msg, fmt, ap);
+	proxy_svr_queue_msg(orte_proxy, proxy_message_event(trans_id, level, code, fmt, ap));
 	va_end(ap);
-	
-	proxy_msg_add_int(m, 3); /* 3 attributes */
-	proxy_msg_add_keyval_string(m, MSG_LEVEL_ATTR, level);
-	proxy_msg_add_keyval_int(m, MSG_CODE_ATTR, code);
-	proxy_msg_add_keyval_string(m, MSG_TEXT_ATTR, msg);
-	proxy_svr_queue_msg(orte_proxy, m);
-	
-	return 0;	
 }
 
-static int
+static void
+sendErrorEvent(int trans_id, int code, char *fmt, ...)
+{
+	va_list		ap;
+
+	va_start(ap, fmt);
+	proxy_svr_queue_msg(orte_proxy, proxy_error_event(trans_id, code, fmt, ap));
+	va_end(ap);
+}
+
+static void
 sendJobSubErrorEvent(int trans_id, char *jobSubId, char *msg)
 {
-	proxy_msg *	m = new_proxy_msg(PROXY_EV_MESSAGE, trans_id);
-	
-	proxy_msg_add_int(m, 4); /* 4 attributes */
-	proxy_msg_add_keyval_string(m, MSG_LEVEL_ATTR, MSG_LEVEL_ERROR);
-	proxy_msg_add_keyval_string(m, JOB_SUB_ID_ATTR, jobSubId);
-	proxy_msg_add_keyval_int(m, MSG_CODE_ATTR, RTEV_ERROR_ORTE_SUBMIT);
-	proxy_msg_add_keyval_string(m, MSG_TEXT_ATTR, msg);
-	proxy_svr_queue_msg(orte_proxy, m);
-	return 0;
+	proxy_svr_queue_msg(orte_proxy, proxy_submitjob_error_event(trans_id, jobSubId, RTEV_ERROR_ORTE_SUBMIT, msg));
 }
 
-static int
-sendAttrDefIntEvent(int trans_id, char *id, char *name, char *desc, int def)
+static void
+sendJobErrorEvent(int trans_id, char *jobid, char *msg)
 {
-	proxy_msg *	m = new_proxy_msg(PROXY_EV_RT_ATTR_DEF, trans_id);
-	
-	proxy_msg_add_int(m, 1); /* 1 attribute def */
-	proxy_msg_add_int(m, 5); /* 5 args in this attribute def */
-	proxy_msg_add_string(m, id);
-	proxy_msg_add_string(m, "INTEGER");
-	proxy_msg_add_string(m, name);
-	proxy_msg_add_string(m, desc);
-	proxy_msg_add_int(m, def);
-	proxy_svr_queue_msg(orte_proxy, m);
-	
-	return 0;	
+	proxy_svr_queue_msg(orte_proxy, proxy_job_error_event(trans_id, jobid, RTEV_ERROR_JOB, msg));
 }
 
-
-static int
-sendAttrDefStringEvent(int trans_id, char *id, char *name, char *desc, char *def)
-{
-	proxy_msg *	m = new_proxy_msg(PROXY_EV_RT_ATTR_DEF, trans_id);
-	
-	proxy_msg_add_int(m, 1); /* 1 attribute def */
-	proxy_msg_add_int(m, 5); /* 5 args in this attribute def */
-	proxy_msg_add_string(m, id);
-	proxy_msg_add_string(m, "STRING");
-	proxy_msg_add_string(m, name);
-	proxy_msg_add_string(m, desc);
-	proxy_msg_add_string(m, def);
-	proxy_svr_queue_msg(orte_proxy, m);
-	
-	return 0;	
-}
-
-static int
+static void
 sendNewMachineEvent(int trans_id, int id, char *name)
 {
-	proxy_msg *	m = new_proxy_msg(PROXY_EV_RT_NEW_MACHINE, trans_id);
+	char *	rm_id;
+	char *	machine_id;
 	
-	proxy_msg_add_int(m, gBaseID);
-	proxy_msg_add_int(m, 1);	
-	proxy_msg_add_int(m, id);
-	proxy_msg_add_int(m, 2);
-	proxy_msg_add_keyval_string(m, ELEMENT_NAME_ATTR, name);
-	proxy_msg_add_keyval_string(m, MACHINE_STATE_ATTR, MACHINE_STATE_UP);	
-	proxy_svr_queue_msg(orte_proxy, m);
+	asprintf(&rm_id, "%d", gBaseID);	
+	asprintf(&machine_id, "%d", id);	
 	
-	return 0;	
+	proxy_svr_queue_msg(orte_proxy, proxy_new_machine_event(trans_id, rm_id, machine_id, name, MACHINE_STATE_UP));
+	
+	free(machine_id);
+	free(rm_id);
 }
 
 static int
 num_node_attrs(ptp_node *node)
 {
 	int	cnt = 0;
-	if (node->name != NULL)
-		cnt++;
-	if (node->state != NULL)
-		cnt++;
 	if (node->number >= 0)
 		cnt++;
 #ifdef HAVE_SYS_BPROC_H
@@ -512,155 +461,140 @@ num_node_attrs(ptp_node *node)
 static void
 add_node_attrs(proxy_msg *m, ptp_node *node)
 {
-	if (node->name != NULL)
-		proxy_msg_add_keyval_string(m, ELEMENT_NAME_ATTR, node->name);
-	if (node->state != NULL)
-		proxy_msg_add_keyval_string(m, NODE_STATE_ATTR, node->state);
 	if (node->number >= 0)
-		proxy_msg_add_keyval_int(m, NODE_NUMBER_ATTR, node->number);
+		proxy_add_int_attribute(m, NODE_NUMBER_ATTR, node->number);
 #ifdef HAVE_SYS_BPROC_H
 	if (node->user != NULL)
-		proxy_msg_add_keyval_string(m, NODE_USER_ATTR, node->user);
+		proxy_add_string_attribute(m, NODE_USER_ATTR, node->user);
 	if (node->group != NULL)
-		proxy_msg_add_keyval_string(m, NODE_GROUP_ATTR, node->group);
+		proxy_add_string_attribute(m, NODE_GROUP_ATTR, node->group);
 	if (node->mode != NULL)
-		proxy_msg_add_keyval_string(m, NODE_MODE_ATTR, node->mode);
+		proxy_add_string_attribute(m, NODE_MODE_ATTR, node->mode);
 #endif /* HAVE_SYS_BPROC_H */
 }
 
-static int
+static void
 sendNewJobEvent(int trans_id, int jobid, char *name, char *jobSubId, char *state)
 {
-	proxy_msg *	m = new_proxy_msg(PROXY_EV_RT_NEW_JOB, trans_id);
+	char *	queue_id;
+	char *	job_id;
 	
-	proxy_msg_add_int(m, gQueueID);	
-	proxy_msg_add_int(m, 1);	
-	proxy_msg_add_int(m, jobid);
-	proxy_msg_add_int(m, 3);	
-	proxy_msg_add_keyval_string(m, ELEMENT_NAME_ATTR, name);
-	proxy_msg_add_keyval_string(m, JOB_SUB_ID_ATTR, jobSubId);
-	proxy_msg_add_keyval_string(m, JOB_STATE_ATTR, state);
-	proxy_svr_queue_msg(orte_proxy, m);
+	asprintf(&queue_id, "%d", gQueueID);	
+	asprintf(&job_id, "%d", jobid);
 	
-	return 0;	
+	proxy_svr_queue_msg(orte_proxy, proxy_new_job_event(trans_id, queue_id, job_id, name, state, jobSubId));
+	
+	free(queue_id);
+	free(job_id);
 }
 
-static int
-sendNewNodeEvent(int trans_id, int mach_id, ptp_machine *mach)
+static void
+sendNewNodeEvent(int trans_id, int machid, ptp_machine *mach)
 {
 	ptp_node *	n;
-	proxy_msg *	m = new_proxy_msg(PROXY_EV_RT_NEW_NODE, trans_id);
+	proxy_msg *	m;
+	char *		machine_id;
+	char *		node_id;
 	
-	proxy_msg_add_int(m, mach_id);
-	proxy_msg_add_int(m, SizeOfList(mach->nodes));
+	asprintf(&machine_id, "%d", machid);
+	
+	m = proxy_new_node_event(trans_id, machine_id, SizeOfList(mach->nodes));
+	
 	for (SetList(mach->nodes); (n = (ptp_node *)GetListElement(mach->nodes)) != NULL; ) {
-		proxy_msg_add_int(m, n->id);
-		proxy_msg_add_int(m, num_node_attrs(n));
+		asprintf(&node_id, "%d", n->id);
+		proxy_add_node(m, node_id, n->name, n->state, num_node_attrs(n));
 		add_node_attrs(m, n);
+		free(node_id);
 	}
+	
 	proxy_svr_queue_msg(orte_proxy, m);
 	
-	return 0;	
+	free(machine_id);
 }
 
-static int
-sendNewProcessEvent(int trans_id, int job_id, ptp_process *p, char *state)
+static void
+sendNewProcessEvent(int trans_id, int jobid, ptp_process *p, char *state)
 {
-	proxy_msg *	m = new_proxy_msg(PROXY_EV_RT_NEW_PROCESS, trans_id);
+	proxy_msg *	m;
+	char *		job_id;
+	char *		proc_id;
+	char *		name;
 	
-	proxy_msg_add_int(m, job_id);	
-	proxy_msg_add_int(m, 1);	
-	proxy_msg_add_int(m, p->id);	
-	proxy_msg_add_int(m, 5);	
-	proxy_msg_add_keyval_int(m, ELEMENT_NAME_ATTR, p->task_id);
-	proxy_msg_add_keyval_int(m, PROC_NODEID_ATTR, p->node_id);	
-	proxy_msg_add_keyval_string(m, PROC_STATE_ATTR, state);	
-	proxy_msg_add_keyval_int(m, PROC_INDEX_ATTR, p->task_id);	
-	proxy_msg_add_keyval_int(m, PROC_PID_ATTR, p->pid);	
+	asprintf(&job_id, "%d", jobid);
+	asprintf(&proc_id, "%d", p->id);
+	asprintf(&name, "%d",  p->task_id);
+	
+	m = proxy_new_process_event(trans_id, job_id, 1);
+	proxy_add_process(m, proc_id, name, state, 3);
+	proxy_add_int_attribute(m, PROC_NODEID_ATTR, p->node_id);	
+	proxy_add_int_attribute(m, PROC_INDEX_ATTR, p->task_id);	
+	proxy_add_int_attribute(m, PROC_PID_ATTR, p->pid);
+	
 	proxy_svr_queue_msg(orte_proxy, m);
 	
-	return 0;	
+	free(job_id);
+	free(proc_id);
+	free(name);
 }
 
-static int
+static void
 sendNewQueueEvent(int trans_id)
 {
-	proxy_msg *	m = new_proxy_msg(PROXY_EV_RT_NEW_QUEUE, trans_id);
+	char *		rm_id;
+	char *		queue_id;
 	
 	gQueueID = generate_id();
 	
-	proxy_msg_add_int(m, gBaseID);	
-	proxy_msg_add_int(m, 1);	
-	proxy_msg_add_int(m, gQueueID);
-	proxy_msg_add_int(m, 1);	
-	proxy_msg_add_keyval_string(m, ELEMENT_NAME_ATTR, DEFAULT_QUEUE_NAME);
-	proxy_svr_queue_msg(orte_proxy, m);
+	asprintf(&rm_id, "%d", gBaseID);
+	asprintf(&queue_id, "%d", gQueueID);
+
+	proxy_svr_queue_msg(orte_proxy, proxy_new_queue_event(trans_id, rm_id, queue_id, DEFAULT_QUEUE_NAME, QUEUE_STATE_NORMAL));
 	
-	return 0;	
+	free(rm_id);
+	free(queue_id);
 }
 
-static int
+static void
 sendProcessStateChangeEvent(int trans_id, ptp_job *j, char *state)
 {
 	char *		range;
 	proxy_msg *	m;
 	
 	if (j == NULL || j->num_procs == 0)
-		return 0;
+		return;
 		
-	m = new_proxy_msg(PROXY_EV_RT_PROCESS_CHANGE, trans_id);
-	
 	asprintf(&range, "%d-%d", j->procs[0]->id, j->procs[j->num_procs-1]->id);
-	proxy_msg_add_int(m, 1);	
-	proxy_msg_add_string(m, range);
-	proxy_msg_add_int(m, 1);	
-	proxy_msg_add_keyval_string(m, PROC_STATE_ATTR, state);
-	proxy_svr_queue_msg(orte_proxy, m);
-	free(range);
 	
-	return 0;
+	m = proxy_process_change_event(trans_id, range, 1);
+	proxy_add_string_attribute(m, PROC_STATE_ATTR, state);
+	proxy_svr_queue_msg(orte_proxy, m);
+	
+	free(range);
 }
 	
-static int
+static void
 sendJobStateChangeEvent(int trans_id, int jobid, char *state)
 {
-	proxy_msg *	m = new_proxy_msg(PROXY_EV_RT_JOB_CHANGE, trans_id);
+	char *		job_id;
+	proxy_msg *	m;
 	
-	proxy_msg_add_int(m, 1);	
-	proxy_msg_add_int(m, jobid);
-	proxy_msg_add_int(m, 1);	
-	proxy_msg_add_keyval_string(m, JOB_STATE_ATTR, state);
+	asprintf(&job_id, "%d", jobid);
+
+	m = proxy_process_change_event(trans_id, job_id, 1);
+	proxy_add_string_attribute(m, JOB_STATE_ATTR, state);
 	proxy_svr_queue_msg(orte_proxy, m);
 	
-	return 0;	
+	free(job_id);
 }
 
-static int
-sendNodeChangeEvent(int trans_id, ptp_node *node)
-{
-	proxy_msg *	m = new_proxy_msg(PROXY_EV_RT_NODE_CHANGE, trans_id);
-	
-	proxy_msg_add_int(m, 1);	
-	proxy_msg_add_int(m, node->id);	
-	proxy_msg_add_int(m, num_node_attrs(node));	
-	add_node_attrs(m, node);
-	proxy_svr_queue_msg(orte_proxy, m);
-	
-	return 0;	
-}
-
-static int
+static void
 sendProcessChangeEvent(int trans_id, ptp_process *p, int node_id, int task_id, int pid)
 {
 	int			cnt = 0;
+	char *		proc_id;
 	proxy_msg *	m;
 	
 	if (p->node_id != node_id || p->task_id != task_id || p->pid != pid) {
-		m = new_proxy_msg(PROXY_EV_RT_PROCESS_CHANGE, trans_id);
-		
-		proxy_msg_add_int(m, 1);	
-		proxy_msg_add_int(m, p->id);
-		
 		if (p->node_id != node_id) {
 			cnt++;	
 		}
@@ -671,43 +605,46 @@ sendProcessChangeEvent(int trans_id, ptp_process *p, int node_id, int task_id, i
 			cnt++;	
 		}
 		
-		proxy_msg_add_int(m, cnt);
-			
+		asprintf(&proc_id, "%d", p->id);
+
+		m = proxy_process_change_event(trans_id, proc_id, cnt);
+		
 		if (p->node_id != node_id) {
 			p->node_id = node_id;
-			proxy_msg_add_keyval_int(m, ELEMENT_ID_ATTR, node_id);	
+			proxy_add_int_attribute(m, ELEMENT_ID_ATTR, node_id);	
 		}
 		if (p->task_id != task_id) {
 			p->task_id = task_id;
-			proxy_msg_add_keyval_int(m, PROC_INDEX_ATTR, task_id);	
+			proxy_add_int_attribute(m, PROC_INDEX_ATTR, task_id);	
 		}
 		if (p->pid != pid) {
 			p->pid = pid;
-			proxy_msg_add_keyval_int(m, PROC_PID_ATTR, pid);	
+			proxy_add_int_attribute(m, PROC_PID_ATTR, pid);	
 		}
 		
 		proxy_svr_queue_msg(orte_proxy, m);
+		
+		free(proc_id);
 	}
-	
-	return 0;	
 }
 
 /*
  * TODO: optimize this so that we don't send one event for
  * every process, even if the output is identical.
  */
-static int
+static void
 sendProcessOutputEvent(int trans_id, int procid, char *output)
 {
-	proxy_msg *	m = new_proxy_msg(PROXY_EV_RT_PROCESS_CHANGE, trans_id);
+	char *		proc_id;
+	proxy_msg *	m;
 	
-	proxy_msg_add_int(m, 1);
-	proxy_msg_add_int(m, procid);
-	proxy_msg_add_int(m, 1);
-	proxy_msg_add_keyval_string(m, PROC_STDOUT_ATTR, output);
+	asprintf(&proc_id, "%d", procid);
+	
+	m = proxy_process_change_event(trans_id, proc_id, 1);
+	proxy_add_string_attribute(m, PROC_STDOUT_ATTR, output);
 	proxy_svr_queue_msg(orte_proxy, m);
 	
-	return 0;	
+	free(proc_id);	
 }
 
 int
@@ -716,7 +653,7 @@ ORTECheckErrorCode(int trans_id, int type, int rc)
 	if(rc != ORTE_SUCCESS) {
 		printf("ARgh!  An error!\n"); fflush(stdout);
 		printf("ERROR %s\n", ORTE_ERROR_NAME(rc)); fflush(stdout);
-		sendMessageEvent(trans_id, MSG_LEVEL_ERROR, type, (char *)ORTE_ERROR_NAME(rc));
+		sendErrorEvent(trans_id, type, (char *)ORTE_ERROR_NAME(rc));
 		return 1;
 	}
 	
@@ -1691,17 +1628,17 @@ ORTE_Initialize(int trans_id, int nargs, char **args)
 	fprintf(stdout, "ORTE_Initialize (%d):\n", trans_id); fflush(stdout);
 	
 	if (proxy_state != STATE_INIT) {
-		sendMessageEvent(trans_id, MSG_LEVEL_ERROR, RTEV_ERROR_ORTE_INIT, "already initialized");
+		sendErrorEvent(trans_id, RTEV_ERROR_ORTE_INIT, "already initialized");
 		return 0;
 	}
 	
 	if (nargs < 2) {
-		sendMessageEvent(trans_id, MSG_LEVEL_ERROR, RTEV_ERROR_ORTE_INIT, "incorrect arg count");
+		sendErrorEvent(trans_id, RTEV_ERROR_ORTE_INIT, "incorrect arg count");
 		return 0;
 	}
 	
 	if (strcmp(args[0], WIRE_PROTOCOL_VERSION) != 0) {
-		sendMessageEvent(trans_id, MSG_LEVEL_ERROR, RTEV_ERROR_ORTE_INIT, "wire protocol version \"%s\" not supported", args[0]);
+		sendErrorEvent(trans_id, RTEV_ERROR_ORTE_INIT, "wire protocol version \"%s\" not supported", args[0]);
 		return 0;
 	}
 	
@@ -1709,14 +1646,14 @@ ORTE_Initialize(int trans_id, int nargs, char **args)
 	
 	if (pipe(pfd) < 0)
 	{
-		sendMessageEvent(trans_id, MSG_LEVEL_ERROR, RTEV_ERROR_ORTE_INIT, "pipe() failed for the orted spawn in ORTESpawnDaemon");
+		sendErrorEvent(trans_id, RTEV_ERROR_ORTE_INIT, "pipe() failed for the orted spawn in ORTESpawnDaemon");
 		return 0;
 	}
 	
 	switch(orted_pid = fork()) {
 	case -1:
 		{
-			sendMessageEvent(trans_id, MSG_LEVEL_ERROR, RTEV_ERROR_ORTE_INIT, "fork() failed for the orted spawn in ORTESpawnDaemon");
+			sendErrorEvent(trans_id, RTEV_ERROR_ORTE_INIT, "fork() failed for the orted spawn in ORTESpawnDaemon");
 			return 1;
 		}
 		break;
@@ -1768,14 +1705,14 @@ ORTE_Initialize(int trans_id, int nargs, char **args)
 			 * Something serious has gone wrong. Kill the orted and shut down.
 			 */
 			(void)kill(orted_pid, SIGKILL);
-			sendMessageEvent(trans_id, MSG_LEVEL_ERROR, RTEV_ERROR_ORTE_INIT, "select() returned error");
+			sendErrorEvent(trans_id, RTEV_ERROR_ORTE_INIT, "select() returned error");
 			return 0;
 		case 0:
 			/*
 			 * Timeout. Kill off orted (if it's running) and shut down.
 			 */
 			(void)kill(orted_pid, SIGKILL);
-			sendMessageEvent(trans_id, MSG_LEVEL_ERROR, RTEV_ERROR_ORTE_INIT, "Timeout waiting for orted to start");
+			sendErrorEvent(trans_id, RTEV_ERROR_ORTE_INIT, "Timeout waiting for orted to start");
 			return 0;
 		default:
 			if ((n = read(pfd[0], buf, BUFSIZ-1)) > 0) {
@@ -1904,7 +1841,7 @@ ORTE_SubmitJob(int trans_id, int nargs, char **args)
 	}
 	
 	if (jobsubid == NULL) {
-		sendMessageEvent(trans_id, MSG_LEVEL_FATAL, 0, "missing ID on job submission");
+		sendMessageEvent(trans_id, MSG_LEVEL_ERROR, 0, "missing ID on job submission");
 		return PROXY_RES_OK;
 	}
 	
@@ -2101,12 +2038,12 @@ ORTE_TerminateJob(int trans_id, int nargs, char **args)
 	ptp_job *	j;
 	
 	if (proxy_state != STATE_RUNNING) {
-		sendMessageEvent(trans_id, MSG_LEVEL_ERROR, RTEV_ERROR_TERMINATE_JOB, "must call INIT first");
+		sendErrorEvent(trans_id, RTEV_ERROR_JOB, "must call INIT first");
 		return PROXY_RES_OK;
 	}
 	
 	if (nargs < 1) {
-		sendMessageEvent(trans_id, MSG_LEVEL_ERROR, RTEV_ERROR_TERMINATE_JOB, "incorrect arg count");
+		sendErrorEvent(trans_id, RTEV_ERROR_JOB, "incorrect arg count");
 		return PROXY_RES_OK;
 	}
 	
@@ -2114,7 +2051,7 @@ ORTE_TerminateJob(int trans_id, int nargs, char **args)
 
 	if ((j = find_job(jobid, JOBID_PTP)) != NULL) {
 		if (j->terminating) {
-			sendMessageEvent(trans_id, MSG_LEVEL_ERROR, RTEV_ERROR_TERMINATE_JOB, "Job termination already requested");
+			sendJobErrorEvent(trans_id, args[0], "Job termination already requested");
 			return PROXY_RES_OK;
 		}
 		
@@ -2125,7 +2062,7 @@ ORTE_TerminateJob(int trans_id, int nargs, char **args)
 		else
 			rc = ORTE_TERMINATE_JOB(j->debug_jobid);
 		
-		if(ORTECheckErrorCode(trans_id, RTEV_ERROR_TERMINATE_JOB, rc)) return 1;
+		if(ORTECheckErrorCode(trans_id, RTEV_ERROR_JOB, rc)) return 1;
 	}
 	
 	return PROXY_RES_OK;
@@ -2151,7 +2088,7 @@ ORTE_StartEvents(int trans_id, int nargs, char **args)
 	fprintf(stdout, "  ORTE_StartEvents (%d):\n", trans_id); fflush(stdout);
 
 	if (proxy_state != STATE_RUNNING) {
-		sendMessageEvent(trans_id, MSG_LEVEL_ERROR, RTEV_ERROR_ORTE_INIT, "must call INIT first");
+		sendErrorEvent(trans_id, RTEV_ERROR_ORTE_INIT, "must call INIT first");
 		return PROXY_RES_OK;
 	}
 
@@ -2195,7 +2132,7 @@ ORTE_StartEvents(int trans_id, int nargs, char **args)
 	
 			if( get_node_attributes(mach, &first_node, &last_node) ) {
 				/* error - so bail out */
-				sendMessageEvent(trans_id, MSG_LEVEL_ERROR, RTEV_ERROR_NATTR, "error finding key on node or error getting keys");
+				sendErrorEvent(trans_id, RTEV_ERROR_NATTR, "error finding key on node or error getting keys");
 				return PROXY_RES_OK;
 			}
 	
@@ -2302,7 +2239,7 @@ server(char *name, char *host, int port)
 		}
 		asprintf(&msg, "ptp_orte_proxy received signal %s (%s).  Exit was required and performed cleanly.", msg1, msg2);
 		//proxy_svr_event_callback(orte_proxy, ORTEErrorStr(RTEV_ERROR_SIGNAL, msg));
-		sendMessageEvent(gTransID, MSG_LEVEL_ERROR, RTEV_ERROR_SIGNAL, msg);
+		sendErrorEvent(gTransID, RTEV_ERROR_SIGNAL, msg);
 		free(msg);
 		free(msg1);
 		free(msg2);
