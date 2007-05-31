@@ -52,6 +52,9 @@ extends AbstractAttribute<String,StringAttribute,StringAttributeDefinition> {
      * @see org.eclipse.ptp.core.attributes.IAttribute#setValueAsString(java.lang.String)
      */
     public void setValueAsString(String string) {
+    	if (string == null) {
+    		string = "";
+    	}
 		this.value.replace(0, this.value.length(), string);
 	}
 
