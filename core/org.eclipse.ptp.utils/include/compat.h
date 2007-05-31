@@ -20,6 +20,8 @@
 #ifndef _COMPAT_H_
 #define _COMPAT_H_
 
+#include "config.h"
+
 #include <sys/types.h>
 #include <ctype.h>
 #include <unistd.h>
@@ -52,6 +54,10 @@ extern int digittoint(int);
 #else
 #error "Need to define BITSPERBYTE for your operating system"
 #endif
+
+#ifndef HAVE_ASPRINTF
+int asprintf(char ** ret, const char * fmt, ...);
+#endif /* !HAVE_ASPRINTF */
 
 #define SOCKET			int
 #define CLOSE_SOCKET(s)	(void)close(s)
