@@ -17,9 +17,9 @@
  * LA-CC 04-115
  ******************************************************************************/
 
-#ifdef __linux__
 #include "compat.h"
 
+#ifdef __linux__
 int
 digittoint(int c)
 {
@@ -37,9 +37,7 @@ digittoint(int c)
 #endif /* __linux__ */
 
 
-/* need to look for asprintf in configure */
-
-#ifdef DONT_HAVE_ASPRINTF
+#ifndef HAVE_ASPRINTF
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
@@ -65,4 +63,4 @@ asprintf(char ** ret, const char * fmt, ...)
 	return len;
 }
 
-#endif /* DONT_HAVE_ASPRINTF */
+#endif /* !HAVE_ASPRINTF */
