@@ -580,7 +580,7 @@ sendJobStateChangeEvent(int trans_id, int jobid, char *state)
 	
 	asprintf(&job_id, "%d", jobid);
 
-	m = proxy_process_change_event(trans_id, job_id, 1);
+	m = proxy_job_change_event(trans_id, job_id, 1);
 	proxy_add_string_attribute(m, JOB_STATE_ATTR, state);
 	proxy_svr_queue_msg(orte_proxy, m);
 	
