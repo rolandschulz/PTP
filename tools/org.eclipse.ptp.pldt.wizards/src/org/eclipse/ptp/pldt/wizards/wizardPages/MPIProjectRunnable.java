@@ -11,7 +11,6 @@
 
 package org.eclipse.ptp.pldt.wizards.wizardPages;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -32,9 +31,9 @@ import org.eclipse.cdt.managedbuilder.ui.wizards.MBSCustomPageManager;
 import org.eclipse.cdt.ui.wizards.CProjectWizard;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.jface.util.Assert;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.ptp.pldt.wizards.MpiWizardsPlugin;
@@ -79,8 +78,9 @@ public class MPIProjectRunnable implements Runnable {
 			}
 		}
 		catch (Exception e) {
-			System.out.println(e.getMessage());
 			Throwable reason = e.getCause();
+			System.out.println(e.getMessage()+" reason: "+reason);
+			
 		}
 		IProject proj=wiz.getProject(true);
 
@@ -115,7 +115,7 @@ public class MPIProjectRunnable implements Runnable {
 			e.printStackTrace();
 			return;
 		}
-		Assert.isNotNull(info);
+		assert(info!=null);
 		
 		IManagedProject mProj = info.getManagedProject();
 		if(traceOn)showOptions(mProj);
@@ -143,16 +143,19 @@ public class MPIProjectRunnable implements Runnable {
 		
 		if(mpiSampleFileInsert.equals("true")){
 			 try {
-				FileInputStream fis=null;
+				//FileInputStream fis=null;
 				Bundle bundle = Platform.getBundle(MpiWizardsPlugin.getPluginId());
 				Path path = new Path("testMPI.c");
-				URL fileURL = Platform.find(bundle, path);
+				//URL fileURL = Platform.find(bundle, path); deprecated
+				URL fileURL = FileLocator.find(bundle, path, null);
+				
+				
 				InputStream mpiFileStream = null;
 				try {
 					String fname="testMPI.c";
 					mpiFileStream = fileURL.openStream();
 					proj.getFile(fname).create(mpiFileStream,false,null);
-					System.out.println("file "+fname+" created.");
+					//System.out.println("file "+fname+" created.");
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -292,7 +295,6 @@ public class MPIProjectRunnable implements Runnable {
 	 * @param value the new value to add to the list of existing values in the option
 	 */
 	private void addOptionValue(IConfiguration cf, ITool tool, IOption option, String value) {
-		int stopHere=0;
 		try {
 			int type = option.getValueType();
 			String[] valueList = null;
@@ -317,11 +319,7 @@ public class MPIProjectRunnable implements Runnable {
 			default:
 				System.out.println("MPIProjectWizard runnable postprocessing (MPIProjectRunnable), can't get type of option for " + option.getName());
 				return;
-
 			}
-
-			// add the new one to the list of old ones
-			//valueList = add(valueList, value);
 			// update the option in the managed builder options
 			ManagedBuildManager.setOption(cf, tool, option, valueList);
 
@@ -420,7 +418,7 @@ public class MPIProjectRunnable implements Runnable {
 	 * @throws BuildException
 	 */
 	private void showIncludePaths(IOption opt) throws BuildException {
-		Assert.isTrue(opt.getValueType() == IOption.INCLUDE_PATH);
+		assert opt.getValueType() == IOption.INCLUDE_PATH ;
 		// if the option is a list of include paths, display them.
 		String[] includePaths = opt.getIncludePaths();
 		for (int index = 0; index < includePaths.length; index++) {
