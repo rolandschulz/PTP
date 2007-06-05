@@ -569,7 +569,6 @@ public class MPIProjectWizardPage extends MBSCustomPage {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				boolean doit=mpiSampleButton.getSelection();
-				System.out.println("mpi sample button selected: "+doit);
 				setCurrentMpiSample(doit);
 			}
 		
