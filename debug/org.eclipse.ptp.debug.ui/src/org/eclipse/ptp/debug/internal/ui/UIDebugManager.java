@@ -142,8 +142,8 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 		jobMgr.shutdown();
 		super.shutdown();
 	}
-	protected IElement createElement(IElementSet set, String key, String name) {
-		return new DebugElement(set, key, name);
+	protected IElement createElement(IElementSet set, String key, String task_id) {
+		return new DebugElement(set, key, task_id);
 	}
 	public String getCurrentJobId() {
 		IPJob job = getJob();
@@ -318,7 +318,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 				for (IElement element : elements) {
 					// only unregister some registered elements
 					if (element.isRegistered()) {
-						IPProcess proc = findProcess(job, element.getID());
+						IPProcess proc = findProcess(job, element.getName());
 						if (proc != null) {
 							removeConsoleWindow(job, proc);
 							try {
@@ -357,7 +357,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 				for (IElement element : elements) {
 					// only register some unregistered elements
 					if (!element.isRegistered()) {
-						IPProcess proc = findProcess(job, element.getID());
+						IPProcess proc = findProcess(job, element.getName());
 						if (proc != null && !proc.isTerminated()) {
 							addConsoleWindow(job, proc);
 							try {
@@ -453,7 +453,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 				IElement[] registerElements = elementHandler.getRegisteredElements();
 				monitor.beginTask("Removing registering processes....", registerElements.length);
 				for (IElement registerElement : registerElements) {
-					IPProcess proc = findProcess(job, registerElement.getID());
+					IPProcess proc = findProcess(job, registerElement.getName());
 					if (proc != null) {
 						removeConsoleWindow(job, proc);
 						try {
@@ -502,7 +502,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 				for (IElement registerElement : registerElements) {
 					if (curSet.contains(registerElement.getID())) {//check whether the current set contains the registered process or not
 						if (curSet.isRootSet() || (preSet != null && !curSet.equals(preSet) && !preSet.contains(registerElement.getID()))) {
-							IPProcess proc = findProcess(job, registerElement.getID());
+							IPProcess proc = findProcess(job, registerElement.getName());
 							if (proc != null) {
 								addConsoleWindow(job, proc);
 								try {
@@ -513,7 +513,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 							}
 						}
 					} else { //if not unregister it
-						IPProcess proc = findProcess(job, registerElement.getID());
+						IPProcess proc = findProcess(job, registerElement.getName());
 						if (proc != null) {
 							removeConsoleWindow(job, proc);
 							try {
@@ -543,16 +543,16 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 		case CREATE_SET_TYPE:
 			BitList created_tasks = new BitList(cur_set.getElementHandler().getSetRoot().size());
 			for (IElement element : elements) {
-				created_tasks.set(convertToInt(element.getID()));
+				created_tasks.set(convertToInt(element.getName()));
 			}
-			debugModel.createSet(getCurrentJobId(), cur_set.getID(), created_tasks);
+			debugModel.createSet(getCurrentJobId(), cur_set.getName(), created_tasks);
 			break;
 		case DELETE_SET_TYPE:
-			debugModel.deletePBreakpoint(getCurrentJobId(), cur_set.getID());
-			debugModel.deleteSet(getCurrentJobId(), cur_set.getID());
+			debugModel.deletePBreakpoint(getCurrentJobId(), cur_set.getName());
+			debugModel.deleteSet(getCurrentJobId(), cur_set.getName());
 			String cur_job_id = getCurrentJobId();
 			if (cur_job_id != null && cur_job_id.length() > 0) {
-				getJobVariableManager().deleteSet(cur_job_id, cur_set.getID());
+				getJobVariableManager().deleteSet(cur_job_id, cur_set.getName());
 			}		
 			break;
 		case CHANGE_SET_TYPE:
@@ -560,23 +560,23 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 				break;
 			}
 			annotationMgr.updateAnnotation(cur_set, pre_set);
-			updateBreakpointMarker(cur_set.getID());
+			updateBreakpointMarker(cur_set.getName());
 			updateRegisterUnRegisterElements(cur_set, pre_set, getCurrentJobId());
 			updateVariableValueOnChange();
 			break;
 		case ADD_ELEMENT_TYPE:
 			BitList added_tasks = new BitList(cur_set.getElementHandler().getSetRoot().size());
 			for (IElement element : elements) {
-				added_tasks.set(convertToInt(element.getID()));
+				added_tasks.set(convertToInt(element.getName()));
 			}
-			debugModel.addTasks(getCurrentJobId(), cur_set.getID(), added_tasks);
+			debugModel.addTasks(getCurrentJobId(), cur_set.getName(), added_tasks);
 			break;
 		case REMOVE_ELEMENT_TYPE:
 			BitList removed_tasks = new BitList(cur_set.getElementHandler().getSetRoot().size());
 			for (IElement element : elements) {
-				removed_tasks.set(convertToInt(element.getID()));
+				removed_tasks.set(convertToInt(element.getName()));
 			}
-			debugModel.removeTasks(getCurrentJobId(), cur_set.getID(), removed_tasks);
+			debugModel.removeTasks(getCurrentJobId(), cur_set.getName(), removed_tasks);
 			break;
 		}
 		super.fireSetEvent(eventType, elements, cur_set, pre_set);

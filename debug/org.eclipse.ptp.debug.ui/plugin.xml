@@ -603,11 +603,15 @@
 	<extension
 		point="org.eclipse.ui.propertyPages">
 		<page
-			adaptable="true"
-			objectClass="org.eclipse.ptp.debug.core.model.IPBreakpoint"
 			class="org.eclipse.ptp.debug.internal.ui.propertypages.PBreakpointPropertyPage"
 			name="%CommonBreakpointPage.label"
-			id="org.eclipse.ptp.debug.ui.propertypages.breakpoint.common"/>
+			id="org.eclipse.ptp.debug.ui.propertypages.breakpoint.common">
+			<enabledWhen>
+				<adapt
+					type="org.eclipse.ptp.debug.core.model.IPBreakpoint">
+				</adapt>
+			</enabledWhen>
+		</page>
 		<!--
 		<page
 			adaptable="true"
@@ -617,10 +621,15 @@
 			id="org.eclipse.ptp.debug.ui.propertypages.breakpoint.filtering"/>
 		//-->
 		<page
-			objectClass="org.eclipse.ptp.debug.core.model.IPSignal"
 			class="org.eclipse.ptp.debug.internal.ui.propertypages.SignalPropertyPage"
 			name="%CommonSignalPage.label"
-			id="org.eclipse.ptp.debug.ui.propertypages.signal.common"/>
+			id="org.eclipse.ptp.debug.ui.propertypages.signal.common">
+			<enabledWhen>
+				<adapt
+					type="org.eclipse.ptp.debug.core.model.IPSignal">
+				</adapt>
+			</enabledWhen>
+		</page>
 	</extension>
 
 	<extension
@@ -628,7 +637,6 @@
 		<hover
 			label="%DebugTextHover.label"
 			description="%DebugTextHover.description"
-			perspective="org.eclipse.ptp.debug.ui.PTPDebugPerspective"
 			class="org.eclipse.ptp.debug.internal.ui.editors.PDebugTextHover"
 			id="org.eclipse.ptp.debug.internal.ui.editors.PDebugTextHover">
 		</hover>
