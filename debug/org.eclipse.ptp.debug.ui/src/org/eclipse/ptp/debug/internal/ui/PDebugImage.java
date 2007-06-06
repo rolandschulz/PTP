@@ -35,7 +35,7 @@ public class PDebugImage {
 	public final static String ICONPATH = "icons/";
 	public final static String TOOLICONPATH = ICONPATH + "tool/";
 	public final static String PROCESSICONPATH = ICONPATH + "process/";
-	public final static String DEBUGICONPATH = ICONPATH + "debug";
+	public final static String DEBUGICONPATH = ICONPATH + "debug/";
 	
 	/*
 	public final static URL ICONURL = PTPDebugUIPlugin.getDefault().getBundle().getEntry(ICONPATH);
