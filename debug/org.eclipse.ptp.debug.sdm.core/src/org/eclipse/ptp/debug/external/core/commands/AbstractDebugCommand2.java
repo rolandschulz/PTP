@@ -41,7 +41,8 @@ public abstract class AbstractDebugCommand2 extends AbstractDebugCommand {
 		super(tasks);
 	}
 	protected boolean checkReturn() throws PCDIException {
-		synchronized (lock) {
+		waitLock.lock();
+		try {
 			Object result = getReturn();
 			if (result != null) {
 				if (result.equals(RETURN_NOTHING)) {
@@ -70,10 +71,13 @@ public abstract class AbstractDebugCommand2 extends AbstractDebugCommand {
 				throw new PCDIException("Incomplete - Command " + getCommandName());
 			}
 			return true;
+		} finally {
+			waitLock.unlock();
 		}
 	}
 	public void setReturn(BitList return_tasks, Object result) {
-		synchronized (lock) {
+		waitLock.lock();
+		try {
 			setCheckTasks();
 			if (return_tasks != null) {
 				if (result instanceof PCDIException) {
@@ -97,6 +101,8 @@ public abstract class AbstractDebugCommand2 extends AbstractDebugCommand {
 			else {
 				setReturn(RETURN_INCOMPLETE);
 			}
+		} finally {
+			waitLock.unlock();
 		}
 	}
 	public ICommandResult getCommandResult() throws PCDIException {
