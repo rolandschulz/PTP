@@ -18,6 +18,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.core.commands;
 
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
+
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.IDebugCommand;
@@ -32,7 +36,7 @@ import org.eclipse.ptp.debug.core.cdi.event.IPCDIErrorEvent;
  * 
  */
 public abstract class AbstractDebugCommand implements IDebugCommand {
-	protected final Object lock = new Object();
+	//protected final Object lock = new Object();
 	
 	protected BitList tasks = null;
 	protected BitList check_tasks = null;
@@ -48,6 +52,9 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 	
 	protected boolean command_finish = false;
 	protected int priority = PRIORITY_M;
+	
+	protected final ReentrantLock waitLock = new ReentrantLock();
+	protected final Condition waitCondition = waitLock.newCondition();
 	
 	/** constructor
 	 * @param tasks
@@ -95,17 +102,14 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 		return tasks;
 	}
 	public boolean isWaitForReturn() {
-		synchronized (lock) {
-			return waitForReturn;
-		}
+		return waitForReturn;
 	}
 	protected Object getReturn() {
-		synchronized (lock) {
-			return result;
-		}
+		return result;
 	}
 	protected boolean checkReturn() throws PCDIException {
-		synchronized (lock) {
+		waitLock.lock();
+		try {
 			Object result = getReturn();
 			if (result == null) {
 				if (check_tasks != null && !check_tasks.isEmpty()) {
@@ -138,43 +142,36 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 				return false;
 			}		
 			return true;
+		} finally {
+			waitLock.unlock();
 		}
 	}
 	protected boolean isBlocked() {
-    	synchronized (lock) {
-    		return blocked;
-    	}
+   		return blocked;
 	}
     protected void releaseLock() {
-    	synchronized (lock) {
-    		waitAgain = false;
-    		blocked = false;
-    		lock.notifyAll();
-    	}
+   		waitAgain = false;
+   		blocked = false;
+   		waitCondition.signalAll();
     }
     protected void lockAgain() {
-    	synchronized (lock) {
-    		waitAgain = true;
-    		lock.notify();
-    	}
+   		waitAgain = true;
+   		waitCondition.signalAll();
     }
 	//wait again for return back
 	protected void doWait(long timeout) throws InterruptedException {
-		synchronized (lock) {
-			do {
-				waitAgain = false;
-				blocked = true;
-				lock.wait(timeout);
-			} while (waitAgain);
-		}
+		do {
+			waitAgain = false;
+			blocked = true;
+			waitCondition.await(timeout, TimeUnit.MILLISECONDS);
+		} while (waitAgain);
 	}
 	public boolean waitForReturn() throws PCDIException {
-		synchronized (lock) {
-			return waitForReturn(timeout);
-		}
+		return waitForReturn(timeout);
 	}
 	public boolean waitForReturn(long timeout) throws PCDIException {
-		synchronized (lock) {
+		waitLock.lock();
+		try {
 			//no need to wait return back
 			if (!isWaitForReturn() || command_finish)
 				return true;
@@ -185,11 +182,14 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 			} catch (InterruptedException e) {
 				throw new PCDIException(e);
 			}
+
 			try {
 				return checkReturn();
 			} finally {
 				command_finish = true;
 			}
+		} finally {
+			waitLock.unlock();
 		}
 	}
 	public void setTimeout(long timeout) {
@@ -205,42 +205,38 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 		return flush;
 	}
 	public void doCancelWaiting() {
-		synchronized (lock) {
-			command_finish = true;
-			cancelled = true;
-			setReturn(RETURN_CANCEL);
-		}
+		command_finish = true;
+		cancelled = true;
+		setReturn(RETURN_CANCEL);
 	}
 	public void doFlush() {
-		synchronized (lock) {
-			if (getReturn() == null) {
-				command_finish = true;
-				flush = true;
-				setReturn(RETURN_FLUSH);
-			}
+		if (getReturn() == null) {
+			command_finish = true;
+			flush = true;
+			setReturn(RETURN_FLUSH);
 		}
 	}
 	protected void setCheckTasks() {
-		synchronized (lock) {
-			if (check_tasks == null) {
-				check_tasks = tasks.copy();
-			}
+		if (check_tasks == null) {
+			check_tasks = tasks.copy();
 		}
 	}
 	public void setResult(Object result) {
-		synchronized (lock) {
-			this.result = result;
-		}
+		this.result = result;
 	}
 	public void setReturn(Object result) {
-		synchronized (lock) {
+		waitLock.lock();
+		try {
 			setCheckTasks();
 			setResult(result);
 			releaseLock();
+		} finally {
+			waitLock.unlock();
 		}
 	}
 	public void setReturn(BitList return_tasks, Object result) {
-		synchronized (lock) {
+		waitLock.lock();
+		try {
 			setCheckTasks();
 			if (return_tasks != null) {
 				//check whether return tasks is same as command tasks
@@ -262,6 +258,8 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 				lock.notifyAll();
 				*/
 			}
+		} finally {
+			waitLock.unlock();
 		}
 	}
 	public int compareTo(IDebugCommand obj) {
@@ -282,13 +280,14 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 		return getReturn();
 	} 
 	protected void waitSuspendExecCommand(IAbstractDebugger debugger) throws PCDIException {
-		synchronized (lock) {
+		waitLock.lock();
+		try {
 			if (!debugger.isSuspended(tasks.copy())) {
 				try {
-					wait(2000);
+					waitCondition.await(2000, TimeUnit.MILLISECONDS);
 					//wait again if tasks are not suspended
 					if (!debugger.isSuspended(tasks.copy())) {
-						wait(2000);
+						waitCondition.await(2000, TimeUnit.MILLISECONDS);
 					}
 				} catch (InterruptedException e) {
 					throw new PCDIException(e);
@@ -302,6 +301,8 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 			else {
 				exec(debugger);
 			}
+		} finally {
+			waitLock.unlock();
 		}
 	}
 	protected void checkBeforeExecCommand(IAbstractDebugger debugger) throws PCDIException {
