@@ -389,7 +389,6 @@ proxy_remove_job_event(int trans_id, char *id_range)
 {
 	proxy_msg *m = new_proxy_msg(PROXY_EV_RT_REMOVE_JOB, trans_id);
 	
-	proxy_msg_add_int(m, 1); /* 1 id range */
 	proxy_msg_add_string(m, id_range);
 	
 	return m;
@@ -403,7 +402,6 @@ proxy_remove_machine_event(int trans_id, char *id_range)
 {
 	proxy_msg *m = new_proxy_msg(PROXY_EV_RT_REMOVE_MACHINE, trans_id);
 	
-	proxy_msg_add_int(m, 1); /* 1 id range */
 	proxy_msg_add_string(m, id_range);
 	
 	return m;
@@ -417,7 +415,6 @@ proxy_remove_node_event(int trans_id, char *id_range)
 {
 	proxy_msg *m = new_proxy_msg(PROXY_EV_RT_REMOVE_NODE, trans_id);
 	
-	proxy_msg_add_int(m, 1); /* 1 id range */
 	proxy_msg_add_string(m, id_range);
 	
 	return m;
@@ -431,7 +428,6 @@ proxy_remove_process_event(int trans_id, char *id_range)
 {
 	proxy_msg *m = new_proxy_msg(PROXY_EV_RT_REMOVE_PROCESS, trans_id);
 	
-	proxy_msg_add_int(m, 1); /* 1 id range */
 	proxy_msg_add_string(m, id_range);
 	
 	return m;
@@ -445,7 +441,6 @@ proxy_remove_queue_event(int trans_id, char *id_range)
 {
 	proxy_msg *m = new_proxy_msg(PROXY_EV_RT_REMOVE_QUEUE, trans_id);
 	
-	proxy_msg_add_int(m, 1); /* 1 id range */
 	proxy_msg_add_string(m, id_range);
 	
 	return m;
