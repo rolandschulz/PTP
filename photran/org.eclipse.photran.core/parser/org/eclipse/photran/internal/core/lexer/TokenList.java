@@ -2,10 +2,31 @@ package org.eclipse.photran.internal.core.lexer;
 
 import java.util.Iterator;
 
+import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
+import org.eclipse.photran.internal.core.parser.GenericParseTreeVisitor;
+
 public class TokenList
 {
-    private Token[] array = new Token[4096]; // Heuristic
-    private int size = 0;
+    private Token[] array;
+    private int size;
+    
+    public TokenList()
+    {
+    	this.array = new Token[4096]; // Heuristic
+    	this.size = 0;
+    }
+    
+    public TokenList(ASTExecutableProgramNode ast)
+    {
+    	this();
+    	ast.visitUsing(new GenericParseTreeVisitor()
+    	{
+			public void visitToken(Token token)
+			{
+				add(token);
+			}
+    	});
+    }
 
     public void add(Token token)
     {
