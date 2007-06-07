@@ -147,6 +147,7 @@ public final class ORTEResourceManagerConfigurationWizardPage extends
 		browseButton.addSelectionListener(listener);
 		
 		fManualButton = createCheckButton(parent, "Launch ORTE server manually");
+		fManualButton.addSelectionListener(listener);
 	}
 
 	private void loadSaved()

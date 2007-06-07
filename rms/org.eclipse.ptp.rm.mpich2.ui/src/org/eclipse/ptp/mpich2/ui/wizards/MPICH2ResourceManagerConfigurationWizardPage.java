@@ -147,6 +147,7 @@ public final class MPICH2ResourceManagerConfigurationWizardPage extends
 		browseButton.addSelectionListener(listener);
 		
 		fManualButton = createCheckButton(parent, "Launch MPICH2 server manually");
+		fManualButton.addSelectionListener(listener);
 	}
 
 	private void loadSaved()
