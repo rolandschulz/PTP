@@ -295,16 +295,26 @@ public class ResourceManagerView extends ViewPart implements
 		final IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
 		manager.add(addResourceManagerAction);
 		Object[] selectedObjects = selection.toArray();
-		boolean inContext = selection.size() > 0;
+		boolean inContextForRM = selection.size() > 0;
+		boolean inContextForRemoveRM = inContextForRM;
 		for (int i = 0; i < selectedObjects.length; ++i) {
 			if (!(selectedObjects[i] instanceof IResourceManagerMenuContribution)) {
-				// Not all of the selected can be removed;
-				inContext = false;
+				// Not all of the selected are RMs
+				inContextForRM = false;
+				inContextForRemoveRM = false;
+				break;
+			}
+			else {
+                final IResourceManagerMenuContribution menuContrib = (IResourceManagerMenuContribution) selectedObjects[i];
+			    IResourceManagerControl rm = (IResourceManagerControl) menuContrib.getAdapter(IResourceManagerControl.class);
+			    if (rm.getState() != ResourceManagerAttributes.State.STOPPED) {
+			        inContextForRemoveRM = false;
+			    }
 			}
 		}
 		manager.add(removeResourceManagerAction);
-		removeResourceManagerAction.setEnabled(inContext);
-		if (inContext) {
+		removeResourceManagerAction.setEnabled(inContextForRemoveRM);
+		if (inContextForRemoveRM) {
 			IResourceManagerControl[] rmManagers = new IResourceManagerControl[selection.size()];
 			for (int i = 0; i < rmManagers.length; ++i) {
 				final IResourceManagerMenuContribution menuContrib = (IResourceManagerMenuContribution) selectedObjects[i];
