@@ -27,10 +27,13 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.PTPCorePlugin;
@@ -253,12 +256,26 @@ public class ModelManager implements IModelManager {
 
 	private void startResourceManagers(IResourceManagerControl[] rmsNeedStarting,
 	        IProgressMonitor monitor) throws CoreException {
-	    monitor.beginTask("Starting Resource Managers",
-	            rmsNeedStarting.length);
+	    monitor.beginTask("Starting Resource Managers", 1);
 	    try {
-	        SubProgressMonitor subMonitor = new SubProgressMonitor(monitor, 1);
-	        for (IResourceManagerControl rm : rmsNeedStarting) {
-	            rm.startUp(subMonitor);
+	        for (final IResourceManagerControl rm : rmsNeedStarting) {
+	            Job job = new Job("Starting ResourceManager: " + rm.getName()) {
+
+                    @Override
+                    protected IStatus run(IProgressMonitor monitor) {
+                        try {
+                            rm.startUp(monitor);
+                        } catch (CoreException e) {
+                            return e.getStatus();
+                        }
+                        if (monitor.isCanceled()) {
+                            return Status.CANCEL_STATUS;
+                        }
+                        return Status.OK_STATUS;
+                   }
+	                
+	            };
+	            job.schedule();
 	        }
 	    }
 	    finally {
