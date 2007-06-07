@@ -85,7 +85,7 @@ public class ORTEResourceManagerTest implements IResourceManagerQueueListener, I
 		String exe = "ls";
 		String exePath = "/bin";
 		
-		IAttribute[] attr = null;
+		IAttribute<?,?,?>[] attr = null;
 
 		String[] configArgs = null;
 		String[] env = null;

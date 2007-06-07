@@ -118,7 +118,7 @@ public class LSFRemoteProxyTest implements IProxyRuntimeEventListener {
 		String machine = "flash";
 		String queue = "default";
 		
-		IAttribute[] attr = null;
+		IAttribute<?,?,?>[] attr = null;
 
 		String[] configArgs = null;
 		String[] env = null;

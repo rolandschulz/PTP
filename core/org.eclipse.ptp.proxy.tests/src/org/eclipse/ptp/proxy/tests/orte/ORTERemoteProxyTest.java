@@ -121,7 +121,7 @@ public class ORTERemoteProxyTest implements IProxyRuntimeEventListener {
 		String exePath = "/bin";
 		String rm = "ORTE";
 		
-		IAttribute[] attr = null;
+		IAttribute<?,?,?>[] attr = null;
 
 		String[] configArgs = null;
 		String[] env = null;
