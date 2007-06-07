@@ -75,30 +75,43 @@ public class ORTERMLaunchConfigurationDynamicTab extends
 	public void createControl(Composite parent,	IResourceManager rm, IPQueue queue) {
 		control = new Composite(parent, SWT.NONE);
 		control.setLayout(new GridLayout(1, true));
-		GridData gd = new GridData(GridData.FILL_BOTH);
-		control.setLayoutData(gd);
+		GridData gd;
 		
 		Label label = new Label(control, SWT.NONE);
 		label.setText("ORTE Specific info goes here");
 		
+		final int numColumns = 2;
+		
 		final Composite comp = new Composite(control, SWT.NONE);
-		GridLayout launchConfigLayout = new GridLayout();
+		GridLayout launchConfigLayout = new GridLayout(numColumns, true);
 		launchConfigLayout.marginHeight = 0;
 		launchConfigLayout.marginWidth = 0;
-		launchConfigLayout.numColumns = 2;
+		launchConfigLayout.numColumns = numColumns;
 		comp.setLayout(launchConfigLayout);
 		gd = new GridData(GridData.FILL_BOTH);
-		gd.horizontalSpan = 2;
+		gd.horizontalSpan = numColumns;
 		comp.setLayoutData(gd);
+		
+		
 		label = new Label(comp, SWT.NONE);
 		label.setText(NUMBER_OF_PROCESSES_LABEL);
-		gd = new GridData(GridData.FILL_HORIZONTAL);
-		gd.minimumWidth = MIN_TEXT_WIDTH;
+		gd = new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1);
+		gd.minimumWidth = label.computeSize(SWT.DEFAULT, SWT.DEFAULT).x;
 		label.setLayoutData(gd);
+		
+		
 		numProcsText = new Text(comp, SWT.NONE);
 		numProcsText.setTextLimit(10);
-		numProcsText.setLayoutData(gd);
+		gd = new GridData(SWT.FILL, SWT.FILL, true, false, numColumns-1, 1);
 		numProcsText.setText("1000");
+		gd.minimumWidth = numProcsText.computeSize(SWT.DEFAULT, SWT.DEFAULT).x;
+		numProcsText.setLayoutData(gd);
+
+		//TODO remove these when we get scrolling working OK
+		for (int i=0; i<10; ++i) {
+			label = new Label(comp, SWT.NONE);
+			label.setText("labels for debugging scrolling: " + i);
+		}
 		
 		// Tell the client of this dynamic tab that the
 		// contents of this tab are affected by the contents
@@ -109,6 +122,7 @@ public class ORTERMLaunchConfigurationDynamicTab extends
 				numProcsString = numProcsText.getText();
 				fireContentsChanged();
 			}});
+		
 	}
 
 	/* (non-Javadoc)

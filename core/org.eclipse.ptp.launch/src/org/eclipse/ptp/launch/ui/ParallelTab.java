@@ -41,9 +41,11 @@ import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationContentsChange
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
@@ -91,7 +93,7 @@ public class ParallelTab extends PLaunchConfigurationTab {
 	private final WidgetListener combosListener = new WidgetListener();
 
 	// The composite that holds the RM's attributes for the launch configuration 
-	private Composite launchConfigurationComposite;
+	private ScrolledComposite launchAttrsScrollComposite;
 
 	private final Map<Integer, IPQueue> queues = new HashMap<Integer, IPQueue>();
 	private final Map<IPQueue, Integer> queueIndices = new HashMap<IPQueue, Integer>();
@@ -125,7 +127,7 @@ public class ParallelTab extends PLaunchConfigurationTab {
 			//TODO return false;
 		}
 		IRMLaunchConfigurationDynamicTab rmDynamicTab = getRMLaunchConfigurationDynamicTab(rm);
-		final Composite launchComp = getLaunchConfigurationComposite();
+		final Composite launchComp = getLaunchAttrsScrollComposite();
 		if (rmDynamicTab == null || launchComp == null) {
 			setErrorMessage("No Launch Control Available for Resource Manager: " + rm.getName());
 			return false;
@@ -142,18 +144,16 @@ public class ParallelTab extends PLaunchConfigurationTab {
 	 * @see ILaunchConfigurationTab#createControl(Composite)
 	 */
 	public void createControl(Composite parent) {
-		Composite comp = new Composite(parent, SWT.NONE);
-		setControl(comp);
-		
-		GridLayout topLayout = new GridLayout();
-		comp.setLayout(topLayout);
-		// createVerticalSpacer(comp, 1);
 
-		final Composite parallelComp = new Composite(comp, SWT.NONE);
-		parallelComp.setLayout(createGridLayout(2, false, 0, 0));
-		parallelComp.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 5));
+		final Composite parallelComp = new Composite(parent, SWT.NONE);
+		setControl(parallelComp);
+		final int numColumns = 2;
+		parallelComp.setLayout(createGridLayout(numColumns, false, 0, 0));
+		GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
+		gridData.horizontalSpan = 5;
+		parallelComp.setLayoutData(gridData);
 
-		createVerticalSpacer(parallelComp, 2);
+		//createVerticalSpacer(parallelComp, numColumns);
 
 		IPUniverse universe = PTPCorePlugin.getDefault().getModelManager().getUniverse();
 		if (universe == null) {
@@ -179,22 +179,27 @@ public class ParallelTab extends PLaunchConfigurationTab {
 		
 		queueCombo.addSelectionListener(combosListener);
 
-		createVerticalSpacer(parallelComp, 2);
+		//createVerticalSpacer(parallelComp, numColumns);
 
 		// The composite that holds the RM's attributes for the launch configuration
 		Group attrGroup = new Group(parallelComp, SWT.SHADOW_ETCHED_IN);
 		attrGroup.setText("Launch Attributes");
-		attrGroup.setLayout(createGridLayout(1, false, 0, 0));
-		attrGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 5));
+		gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
+		gridData.horizontalSpan = numColumns;
+		attrGroup.setLayoutData(gridData);
+		GridLayout gridLayout = new GridLayout();
+		gridLayout.numColumns = 1;
+		attrGroup.setLayout(gridLayout);
 
-		createVerticalSpacer(attrGroup, 2);
+		//createVerticalSpacer(attrGroup, 2);
 		
-		final Composite launchComp = createLaunchAttributeControlComposite(attrGroup, 2);
-		setLaunchConfigurationComposite(launchComp);
+		final ScrolledComposite scrollComp = createLaunchAttributeControlComposite(attrGroup,
+				numColumns);
+		setLaunchAttrsScrollComposite(scrollComp);
 		
-		createVerticalSpacer(attrGroup, 2);
+		//createVerticalSpacer(attrGroup, 2);
 		
-		createVerticalSpacer(parallelComp, 2);
+		//createVerticalSpacer(parallelComp, numColumns);
 		resourceManagerCombo.deselectAll();
  	}
 
@@ -245,7 +250,7 @@ public class ParallelTab extends PLaunchConfigurationTab {
 			setQueueComboSelection(queue);
 			
 			IRMLaunchConfigurationDynamicTab rmDynamicTab = getRMLaunchConfigurationDynamicTab(rm);
-			final Composite launchComp = getLaunchConfigurationComposite();
+			final Composite launchComp = getLaunchAttrsScrollComposite();
 			if (rmDynamicTab == null || launchComp == null) {
 				setErrorMessage("No Launch Control Available for Resource Manager: " +
 						rm.getName());
@@ -377,18 +382,35 @@ public class ParallelTab extends PLaunchConfigurationTab {
 		super.setLaunchConfigurationDialog(dialog);
 	}
 
-	private Composite createLaunchAttributeControlComposite(Composite parent, int colspan) {
-		Composite attrComp = new Composite(parent, SWT.NONE);
-//		attrComp.setLayout(createGridLayout(1, false, 0, 0));
-//		attrComp.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 5));
-		GridLayout launchConfigLayout = new GridLayout();
-		launchConfigLayout.marginHeight = 0;
-		launchConfigLayout.marginWidth = 0;
-		launchConfigLayout.numColumns = 1;
-		attrComp.setLayout(launchConfigLayout);
-		GridData gd = new GridData(GridData.FILL_BOTH);
-		gd.horizontalSpan = colspan;
-		attrComp.setLayoutData(gd);
+	private ScrolledComposite createLaunchAttributeControlComposite(Composite parent, int colspan) {
+		ScrolledComposite attrComp = new ScrolledComposite(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
+		GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
+		gridData.horizontalSpan = colspan;
+		attrComp.setLayoutData(gridData);
+		attrComp.setExpandHorizontal(true);
+		attrComp.setExpandVertical(true);
+//		attrComp.addControlListener(new ControlListener(){
+//
+//			public void controlMoved(ControlEvent e) {
+//				// TODO Auto-generated method stub
+//				
+//			}
+//
+//			public void controlResized(ControlEvent e) {
+//				Point size = launchConfigurationComposite.getSize();
+//				System.out.println("scrollbar resized: " + size.x + ", " + size.y);
+//				final Control content = launchConfigurationComposite.getContent();
+//				if (content != null) {
+//					size = content.getSize();
+//					System.out.println("scrollbar content: " + size.x + ", " + size.y);
+//				}
+//				else {
+//					System.out.println("scrollbar content is null");
+//				}
+//				int w = launchConfigurationComposite.getMinWidth();
+//				int h = launchConfigurationComposite.getMinHeight();
+//				System.out.println("scrollbar min size: " + w + ", " + h);
+//			}});
 		return attrComp;
 	}
 
@@ -415,15 +437,15 @@ public class ParallelTab extends PLaunchConfigurationTab {
 		return rmDynamicTab;
 	}
 
+	private ScrolledComposite getLaunchAttrsScrollComposite() {
+		return launchAttrsScrollComposite;
+	}
+
 	/**
 	 * @return the launchConfiguration
 	 */
 	private ILaunchConfiguration getLaunchConfiguration() {
 		return launchConfiguration;
-	}
-
-	private Composite getLaunchConfigurationComposite() {
-		return launchConfigurationComposite;
 	}
 
 	private IPQueue getQueueDefault(IResourceManager rm) {
@@ -628,12 +650,12 @@ public class ParallelTab extends PLaunchConfigurationTab {
         updateLaunchConfigurationDialog();
     }
 
-	private void setLaunchConfiguration(ILaunchConfiguration configuration) {
-		launchConfiguration = configuration;
+	private void setLaunchAttrsScrollComposite(ScrolledComposite comp) {
+		this.launchAttrsScrollComposite = comp;
 	}
 
-	private void setLaunchConfigurationComposite(Composite launchConfigurationComposite) {
-		this.launchConfigurationComposite = launchConfigurationComposite;
+	private void setLaunchConfiguration(ILaunchConfiguration configuration) {
+		launchConfiguration = configuration;
 	}
 
 	private void setQueueComboSelection(IPQueue queue) {
@@ -676,20 +698,25 @@ public class ParallelTab extends PLaunchConfigurationTab {
 	 */
 	private void updateLaunchAttributeControls(IResourceManager rm, IPQueue queue,
 			ILaunchConfiguration launchConfiguration) {
-		final Composite launchComp = getLaunchConfigurationComposite();
-		for (Control child : launchComp.getChildren()) {
+		final ScrolledComposite launchAttrsScrollComp = getLaunchAttrsScrollComposite();
+		launchAttrsScrollComp.setContent(null);
+		for (Control child : launchAttrsScrollComp.getChildren()) {
 			child.dispose();
 		}
 		IRMLaunchConfigurationDynamicTab rmDynamicTab = getRMLaunchConfigurationDynamicTab(rm);
 		if (rmDynamicTab != null) {
 			try {
-				rmDynamicTab.createControl(launchComp, rm, queue);
-				rmDynamicTab.initializeFrom(launchComp, rm, queue, launchConfiguration);
+				rmDynamicTab.createControl(launchAttrsScrollComp, rm, queue);
+				final Control dynControl = rmDynamicTab.getControl();
+				launchAttrsScrollComp.setContent(dynControl);
+				Point size = dynControl.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+				launchAttrsScrollComp.setMinSize(size);
+				rmDynamicTab.initializeFrom(launchAttrsScrollComp, rm, queue, launchConfiguration);
 			} catch (CoreException e) {
 				setErrorMessage(e.getMessage());
 				PTPLaunchPlugin.errorDialog(e.getMessage(), e);
 			}
 		}		
-		launchComp.layout(true);
+		launchAttrsScrollComp.layout(true);
 	}
 }
