@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -66,12 +67,12 @@ public class ModelManager implements IModelManager {
 		resourceManagerListeners.add(listener);
 	}
 	
-	public void addResourceManager(IResourceManagerControl rm) {
+	public synchronized void addResourceManager(IResourceManagerControl rm) {
 		universe.addResourceManager(rm);
 		fireNewResourceManager(rm);
 	}
 	
-	public void addResourceManagers(IResourceManagerControl[] rms) {
+	public synchronized void addResourceManagers(IResourceManagerControl[] rms) {
 		for (IResourceManagerControl rm : rms) {
 			addResourceManager(rm);
 		}
@@ -140,35 +141,47 @@ public class ModelManager implements IModelManager {
 	 * @see org.eclipse.ptp.core.IModelManager#loadResourceManagers()
 	 */
 	public void loadResourceManagers(IProgressMonitor monitor) throws CoreException {
-		ResourceManagerPersistence rmp = new ResourceManagerPersistence();
-		// Loads and, if necessary, starts saved resource managers.
-		rmp.loadResourceManagers(getResourceManagersFile(), getResourceManagerFactories(),
-				monitor);
-		IResourceManagerControl[] resourceManagers = rmp.getResourceManagerControls();
-		addResourceManagers(resourceManagers);
+	    if (monitor == null) {
+	        monitor = new NullProgressMonitor();
+	    }
+	    monitor.beginTask("Loading Resource Managers", 110);
+	    try {
+	        ResourceManagerPersistence rmp = new ResourceManagerPersistence();
+	        // Loads and, if necessary, starts saved resource managers.
+	        rmp.loadResourceManagers(getResourceManagersFile(), getResourceManagerFactories(),
+	                new SubProgressMonitor(monitor, 10));
+	        IResourceManagerControl[] resourceManagers = rmp.getResourceManagerControls();
+	        IResourceManagerControl[] rmsNeedStarting = rmp.getResourceManagerControlsNeedStarting();
+	        addResourceManagers(resourceManagers);
+	        startResourceManagers(rmsNeedStarting,
+	                new SubProgressMonitor(monitor, 100));
+	    }
+	    finally {
+	        monitor.done();
+	    }
 	}
 	
 	public void removeListener(IModelManagerResourceManagerListener listener) {
 		resourceManagerListeners.remove(listener);
 	}
 
-	public void removeResourceManager(IResourceManagerControl rm) {
+    public synchronized void removeResourceManager(IResourceManagerControl rm) {
 		universe.removeResourceManager(rm);
 		fireRemoveResourceManager(rm);
 	}
-	
-	public void removeResourceManagers(IResourceManagerControl[] rms) {
+
+	public synchronized void removeResourceManagers(IResourceManagerControl[] rms) {
 		for (IResourceManagerControl rm : rms) {
 			removeResourceManager(rm);
 		}
 	}
-
+	
 	public void saveResourceManagers() {
 		ResourceManagerPersistence.saveResourceManagers(getResourceManagersFile(),
 				universe.getResourceManagerControls());
 	}
 
-    public void setPTPConfiguration(ILaunchConfiguration config) {
+	public void setPTPConfiguration(ILaunchConfiguration config) {
 		this.config = config;
 	}
 
@@ -183,10 +196,10 @@ public class ModelManager implements IModelManager {
 		processListeners.clear();
 	}
 
-	/**
+    /**
 	 * shuts down all of the resource managers.
 	 */
-	public void shutdownResourceManagers() {
+	public synchronized void shutdownResourceManagers() {
 		IResourceManagerControl[] resourceManagers = universe.getResourceManagerControls();
 		for (int i = 0; i<resourceManagers.length; ++i) {
 			resourceManagers[i].dispose();
@@ -224,7 +237,6 @@ public class ModelManager implements IModelManager {
 		}
 	}
 
-
 	private void fireRemoveResourceManager(final IResourceManager rm) {
 		IModelManagerRemoveResourceManagerEvent event = 
 			new ModelManagerRemoveResourceManagerEvent(this, rm);
@@ -233,9 +245,25 @@ public class ModelManager implements IModelManager {
 		}
 	}
 
+
 	private File getResourceManagersFile() {
 		final PTPCorePlugin plugin = PTPCorePlugin.getDefault();
 		return plugin.getStateLocation().append("resourceManagers.xml").toFile();
 	}
+
+	private void startResourceManagers(IResourceManagerControl[] rmsNeedStarting,
+	        IProgressMonitor monitor) throws CoreException {
+	    monitor.beginTask("Starting Resource Managers",
+	            rmsNeedStarting.length);
+	    try {
+	        SubProgressMonitor subMonitor = new SubProgressMonitor(monitor, 1);
+	        for (IResourceManagerControl rm : rmsNeedStarting) {
+	            rm.startUp(subMonitor);
+	        }
+	    }
+	    finally {
+	        monitor.done();
+	    }
+    }
 
 }

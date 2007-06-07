@@ -133,15 +133,17 @@ public class ParallelMachinesView extends AbstractParallelSetView implements
 		
 		IModelManager mm = PTPCorePlugin.getDefault().getModelManager();
 		
-		/*
-		 * Add us to any existing RM's. I guess it's possible we could
-		 * miss a RM if a new event arrives while we're doing this, but is 
-		 * it a problem?
-		 */
-		for (IResourceManager rm : mm.getUniverse().getResourceManagers()) {
-			rm.addChildListener(this);
+		synchronized (mm) {
+		    /*
+		     * Add us to any existing RM's. I guess it's possible we could
+		     * miss a RM if a new event arrives while we're doing this, but is 
+		     * it a problem?
+		     */
+		    for (IResourceManager rm : mm.getUniverse().getResourceManagers()) {
+		        rm.addChildListener(this);
+		    }
+		    mm.addListener(this);
 		}
-		mm.addListener(this);
 	}
 	
 	/** 
@@ -349,7 +351,8 @@ public class ParallelMachinesView extends AbstractParallelSetView implements
 		 * Add resource manager child listener so we get notified when new
 		 * machines are added to the model.
 		 */
-		e.getResourceManager().addChildListener(this);
+		final IResourceManager rm = e.getResourceManager();
+        rm.addChildListener(this);
 	}
 	
 	/* (non-Javadoc)
