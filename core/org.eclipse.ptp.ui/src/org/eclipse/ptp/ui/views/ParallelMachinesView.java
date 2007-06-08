@@ -220,6 +220,10 @@ public class ParallelMachinesView extends AbstractParallelSetView implements
 			register(element);
 			getCurrentElementHandler().addRegisterElement(element);
 		}
+		
+		/*
+		 * Refresh the attribute and process panes.
+		 */
 		nodeAttrTableViewer.refresh();
 		processTableViewer.refresh();
 	}
@@ -348,6 +352,8 @@ public class ParallelMachinesView extends AbstractParallelSetView implements
 					updateMachineSet();
 					update();
 					machineTableViewer.refresh(true);
+					nodeAttrTableViewer.refresh();
+					processTableViewer.refresh();
 				}
 			}
 		});	
