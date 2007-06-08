@@ -228,7 +228,7 @@ public class ParallelMachinesView extends AbstractParallelSetView implements
 	 * Get selected machine
 	 * @return selected machine
 	 */
-	public IPMachine getCurrentMachine() {
+	public synchronized IPMachine getCurrentMachine() {
 		return getMachineManager().getCurrentMachine();
 	}
 
@@ -305,7 +305,9 @@ public class ParallelMachinesView extends AbstractParallelSetView implements
 	 */
 	public void handleEvent(final IMachineNewNodeEvent e) {
 		final IPNode node = e.getNode();
-		if (node.getMachine().equals(getCurrentMachine())) {
+		final boolean isCurrent = node.getMachine().equals(getCurrentMachine());
+
+		if (isCurrent) {
 			/*
 			 * Add node child listener so that we get notified when new processes
 			 * are added to the node and can update the node icons.
@@ -316,9 +318,11 @@ public class ParallelMachinesView extends AbstractParallelSetView implements
 		UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
 			public void run() {
 				getMachineManager().addNode(node);
-				updateMachineSet();
-				update();
-				machineTableViewer.refresh(true);
+				if (isCurrent) {
+					updateMachineSet();
+					update();
+					machineTableViewer.refresh(true);
+				}
 			}
 		});	
 	}
@@ -327,13 +331,26 @@ public class ParallelMachinesView extends AbstractParallelSetView implements
 	 * @see org.eclipse.ptp.core.elements.listeners.IMachineNodeListener#handleEvent(org.eclipse.ptp.core.elements.events.IMachineRemoveNodeEvent)
 	 */
 	public void handleEvent(final IMachineRemoveNodeEvent e) {
-		IPNode node = e.getNode();
-		if (node.getMachine().equals(getCurrentMachine())) {
+		final IPNode node = e.getNode();
+		final boolean isCurrent = node.getMachine().equals(getCurrentMachine());
+
+		if (isCurrent) {
 			/*
 			 * Remove node child listener when node is removed (if ever)
 			 */
 			node.removeChildListener(this);
 		}
+		
+		UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
+			public void run() {
+				getMachineManager().removeNode(node);
+				if (isCurrent) {
+					updateMachineSet();
+					update();
+					machineTableViewer.refresh(true);
+				}
+			}
+		});	
 	}
 	
 	/* (non-Javadoc)
@@ -431,6 +448,11 @@ public class ParallelMachinesView extends AbstractParallelSetView implements
 	 */
 	public void handleEvent(final IResourceManagerNewMachineEvent e) {
 		/*
+		 * Add us as a child listener so we get notified of node events
+		 */
+		e.getMachine().addChildListener(this);
+		
+		/*
 		 * Update views when a new machine is added
 		 */
 		UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
@@ -444,6 +466,11 @@ public class ParallelMachinesView extends AbstractParallelSetView implements
 	 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerMachineListener#handleEvent(org.eclipse.ptp.core.elements.events.IResourceManagerRemoveMachineEvent)
 	 */
 	public void handleEvent(final IResourceManagerRemoveMachineEvent e) {
+		/*
+		 * Remove child listener
+		 */
+		e.getMachine().removeChildListener(this);
+
 		/*
 		 * Update views when a machine is removed.
 		 */
@@ -856,6 +883,19 @@ public class ParallelMachinesView extends AbstractParallelSetView implements
 	 */
 	protected void initialElement() {
 		IPUniverse universe = PTPCorePlugin.getDefault().getUniverse();
+		
+		/*
+		 * Add us as a child listener to any existing machines
+		 */
+		for (IResourceManager rm : universe.getResourceManagers()) {
+			for (IPMachine machine : rm.getMachines()) {
+				machine.addChildListener(this);
+			}
+		}
+		
+		/*
+		 * Select initial machine
+		 */
 		changeMachineRefresh((IPMachine) manager.initial(universe));
 	}
 	
@@ -874,14 +914,12 @@ public class ParallelMachinesView extends AbstractParallelSetView implements
 	protected void selectMachine(IPMachine machine) {
 		IPMachine old = getMachineManager().getCurrentMachine();
 		if (old != null) {
-			old.removeChildListener(this);
 			for (IPNode node : old.getNodes()) {
 				node.removeChildListener(this);
 			}
 		}
 		getMachineManager().setMachine(machine);
 		if (machine != null) {
-			machine.addChildListener(this);			
 			for (IPNode node : machine.getNodes()) {
 				node.addChildListener(this);
 			}

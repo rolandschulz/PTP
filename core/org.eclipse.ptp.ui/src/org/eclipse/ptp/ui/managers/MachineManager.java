@@ -107,7 +107,16 @@ public class MachineManager extends AbstractUIManager {
 			cur_machine = null;
 		}
 	}
-
+	
+	/** Add machine
+	 * @param mac machine
+	 */
+	public void removeNode(IPNode node) {
+		IElementHandler elementHandler = machineElementHandlerList.get(node.getMachine().getID());
+		IElementSet set = elementHandler.getSetRoot();
+		set.remove(node.getID());
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#clear()
 	 */

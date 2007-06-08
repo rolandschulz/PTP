@@ -87,6 +87,13 @@ public class JobManager extends AbstractUIManager {
 		}
 	}
 
+	
+	public void removeProcess(IPProcess proc) {
+		IElementHandler elementHandler = jobElementHandlerList.get(proc.getJob().getID());
+		IElementSet set = elementHandler.getSetRoot();
+		set.remove(proc.getID());
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#clear()
 	 */
