@@ -355,7 +355,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements IModelM
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#getCurrentID()
 	 */
-	public String getCurrentID() {
+	public synchronized String getCurrentID() {
 		IPJob job = getJobManager().getJob();
 		if (job != null) {
 			return job.getID();
@@ -488,14 +488,19 @@ public class ParallelJobsView extends AbstractParallelSetView implements IModelM
 	 * @see org.eclipse.ptp.core.elements.listeners.IJobProcessListener#handleEvent(org.eclipse.ptp.core.elements.events.IJobNewProcessEvent)
 	 */
 	public void handleEvent(final IJobNewProcessEvent e) {
+		final IPProcess process = e.getProcess();
+		final boolean isCurrent = e.getSource().getID().equals(getCurrentID());
+		
 		// FIXME: make JobManager thread safe so we can get rid
 		// of this safeRunAsyncInUIThread stuff!
 		UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
 			public void run() {
-				getJobManager().addProcess(e.getProcess());
-				updateJobSet();
-				update();
-				jobTableViewer.refresh(true);
+				getJobManager().addProcess(process);
+				if (isCurrent) {
+					updateJobSet();
+					update();
+					jobTableViewer.refresh(true);
+				}
 			}
 		});	
 	}
@@ -504,7 +509,19 @@ public class ParallelJobsView extends AbstractParallelSetView implements IModelM
 	 * @see org.eclipse.ptp.core.elements.listeners.IJobProcessListener#handleEvent(org.eclipse.ptp.core.elements.events.IJobRemoveProcessEvent)
 	 */
 	public void handleEvent(final IJobRemoveProcessEvent e) {
-		// Nothing to do
+		final IPProcess process = e.getProcess();
+		final boolean isCurrent = e.getSource().getID().equals(getCurrentID());
+		
+		UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
+			public void run() {
+				if (isCurrent) {
+					getJobManager().removeProcess(process);
+					updateJobSet();
+					update();
+					jobTableViewer.refresh(true);
+				}
+			}
+		});
 	}
 	
 	/* (non-Javadoc)
