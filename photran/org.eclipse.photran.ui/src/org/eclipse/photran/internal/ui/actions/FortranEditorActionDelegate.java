@@ -17,6 +17,7 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.photran.internal.ui.editor.AbstractFortranEditor;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorActionDelegate;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -110,6 +111,11 @@ public abstract class FortranEditorActionDelegate
     protected AbstractFortranEditor getFortranEditor()
     {
         return fEditor;
+    }
+    
+    protected Shell getShell()
+    {
+        return fEditor == null ? null : fEditor.getShell();
     }
 
     protected File createTempFile() throws IOException
