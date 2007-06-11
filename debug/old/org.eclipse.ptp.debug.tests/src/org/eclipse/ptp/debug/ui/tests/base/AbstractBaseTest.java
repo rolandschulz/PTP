@@ -287,7 +287,7 @@ public abstract class AbstractBaseTest extends AbstractDebugTest implements IPro
 		waitLock.lock();
 		try {
 	    	waitAgain = true;
-			waitCondition.signal();
+			waitCondition.signalAll();
 		} finally {
 			waitLock.unlock();
 		}
@@ -300,7 +300,7 @@ public abstract class AbstractBaseTest extends AbstractDebugTest implements IPro
 		try {
 	    	waitAgain = false;
 	   		time_up = false;
-			waitCondition.signal();
+			waitCondition.signalAll();
 		} finally {
 			waitLock.unlock();
 		}
