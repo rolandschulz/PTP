@@ -21,6 +21,7 @@
  */
 package org.eclipse.ptp.rmsystem;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -37,6 +38,7 @@ import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
+import org.eclipse.ptp.core.attributes.EnumeratedAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.attributes.StringAttribute;
@@ -111,8 +113,34 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	IResourceManagerControl {
 	
 	private static IAttribute<?,?,?>[] getDefaultAttributes(IResourceManagerConfiguration config) {
+		ArrayList<IAttribute<?,?,?>> attrs = new ArrayList<IAttribute<?,?,?>>();
+		
 		StringAttribute nameAttr = ElementAttributes.getNameAttributeDefinition().create(config.getName());
-		return new IAttribute[]{nameAttr};
+		attrs.add(nameAttr);
+		
+		StringAttribute idAttr = ElementAttributes.getIdAttributeDefinition().create(config.getUniqueName());
+		attrs.add(idAttr);
+		
+		StringAttribute descAttr = 
+			ResourceManagerAttributes.getDescriptionAttributeDefinition().create(
+					config.getDescription());
+		attrs.add(descAttr);
+		
+		StringAttribute typeAttr = 
+			ResourceManagerAttributes.getTypeAttributeDefinition().create(
+					config.getDescription());
+		attrs.add(typeAttr);
+		
+		EnumeratedAttribute<State> stateAttr = 
+			ResourceManagerAttributes.getStateAttributeDefinition().create(
+				ResourceManagerAttributes.State.STOPPED);
+		attrs.add(stateAttr);
+		
+		StringAttribute rmIDAttr = ResourceManagerAttributes.getRmIDAttributeDefinition().create(
+				config.getUniqueName());
+		attrs.add(rmIDAttr);
+		
+		return attrs.toArray(new IAttribute<?, ?, ?>[0]);
 	}
 
 	private final ListenerList listeners = new ListenerList();
@@ -126,7 +154,6 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	private final IMachineNodeListener machineNodeListener;
 	
 	private final IResourceManagerConfiguration config;
-	private EnumeratedAttribute<ResourceManagerAttributes.State> state;
 	private AttributeDefinitionManager attrDefManager = new AttributeDefinitionManager();
 
 	private final HashMap<String, IPJobControl> jobsById = new HashMap<String, IPJobControl>();
@@ -141,7 +168,6 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	{
 		super(id, universe, P_RESOURCE_MANAGER, getDefaultAttributes(config));
 		this.config = config;
-		this.state = ResourceManagerAttributes.getStateAttributeDefinition().create(State.STOPPED);
 
 		queueListener = new IQueueListener(){
 			public void handleEvent(IQueueChangedEvent e) {
@@ -365,7 +391,8 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	 * @see org.eclipse.ptp.rmsystem.IResourceManager#getStatus()
 	 */
 	public synchronized ResourceManagerAttributes.State getState() {
-		return state.getValue();
+		EnumeratedAttribute<State> stateAttr = getStateAttribute();
+		return stateAttr.getValue();
 	}
 	
 	/* (non-Javadoc)
@@ -410,36 +437,6 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	 */
 	public void removeTerminatedJobs(IPQueue queue) {
 		doRemoveTerminatedJobs((IPQueueControl)queue);
-	}
-	
-	/**
-	 * Initialize the resource manager. This is called each time the
-	 * resource manager is started.
-	 */
-	private void initialize() {
-		attrDefManager.clear();
-		attrDefManager.setAttributeDefinitions(ElementAttributes.getDefaultAttributeDefinitions());
-		attrDefManager.setAttributeDefinitions(ErrorAttributes.getDefaultAttributeDefinitions());
-		attrDefManager.setAttributeDefinitions(JobAttributes.getDefaultAttributeDefinitions());
-		attrDefManager.setAttributeDefinitions(MachineAttributes.getDefaultAttributeDefinitions());
-		attrDefManager.setAttributeDefinitions(MessageAttributes.getDefaultAttributeDefinitions());
-		attrDefManager.setAttributeDefinitions(NodeAttributes.getDefaultAttributeDefinitions());
-		attrDefManager.setAttributeDefinitions(ProcessAttributes.getDefaultAttributeDefinitions());
-		attrDefManager.setAttributeDefinitions(QueueAttributes.getDefaultAttributeDefinitions());
-		attrDefManager.setAttributeDefinitions(ResourceManagerAttributes.getDefaultAttributeDefinitions());
-	}
-	
-	/**
-	 * Remove all the model elements below the RM. This is called when the RM
-	 * shuts down and ensures that everything is cleaned up properly.
-	 */
-	protected void cleanUp() {
-		for (IPQueueControl queue : getQueueControls()) {
-			removeQueue(queue);
-		}
-		for (IPMachineControl machine : getMachineControls()) {
-			removeMachine(machine);
-		}
 	}
 	
 	/*
@@ -528,6 +525,33 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 		}
 	}
 	
+	/**
+	 * @return
+	 */
+	private EnumeratedAttribute<State> getStateAttribute() {
+		EnumeratedAttributeDefinition<State> stateAttrDef =
+			ResourceManagerAttributes.getStateAttributeDefinition();
+		EnumeratedAttribute<State> stateAttr = getAttribute(stateAttrDef);
+		return stateAttr;
+	}
+	
+	/**
+	 * Initialize the resource manager. This is called each time the
+	 * resource manager is started.
+	 */
+	private void initialize() {
+		attrDefManager.clear();
+		attrDefManager.setAttributeDefinitions(ElementAttributes.getDefaultAttributeDefinitions());
+		attrDefManager.setAttributeDefinitions(ErrorAttributes.getDefaultAttributeDefinitions());
+		attrDefManager.setAttributeDefinitions(JobAttributes.getDefaultAttributeDefinitions());
+		attrDefManager.setAttributeDefinitions(MachineAttributes.getDefaultAttributeDefinitions());
+		attrDefManager.setAttributeDefinitions(MessageAttributes.getDefaultAttributeDefinitions());
+		attrDefManager.setAttributeDefinitions(NodeAttributes.getDefaultAttributeDefinitions());
+		attrDefManager.setAttributeDefinitions(ProcessAttributes.getDefaultAttributeDefinitions());
+		attrDefManager.setAttributeDefinitions(QueueAttributes.getDefaultAttributeDefinitions());
+		attrDefManager.setAttributeDefinitions(ResourceManagerAttributes.getDefaultAttributeDefinitions());
+	}
+	
 	/*
 	 * Add new model elements to the model.
 	 */
@@ -585,10 +609,31 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	}
 	
 	/**
+	 * Remove all the model elements below the RM. This is called when the RM
+	 * shuts down and ensures that everything is cleaned up properly.
+	 */
+	protected void cleanUp() {
+		for (IPQueueControl queue : getQueueControls()) {
+			removeQueue(queue);
+		}
+		for (IPMachineControl machine : getMachineControls()) {
+			removeMachine(machine);
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.internal.core.elements.PElement#doAddAttributeHook(java.util.List)
+	 */
+	@Override
+	protected void doAddAttributeHook(List<? extends IAttribute<?,?,?>> attrs) {
+		fireResourceManagerChanged(attrs);
+	}
+
+	/**
 	 * 
 	 */
 	protected abstract void doDisableEvents();
-
+	
 	/**
 	 * 
 	 */
@@ -598,7 +643,7 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	 * 
 	 */
 	protected abstract void doEnableEvents();
-	
+
 	/**
 	 * @param queue
 	 * @return
@@ -633,7 +678,7 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	 * @throws CoreException
 	 */
 	protected abstract void doTerminateJob(IPJob job) throws CoreException;
-
+	
 	/**
 	 * @param message
 	 */
@@ -658,7 +703,7 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 			((IResourceManagerMachineListener)listener).handleEvent(e);
 		}
 	}
-	
+
 	/**
 	 * @param machine
 	 */
@@ -695,7 +740,7 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 			((IResourceManagerQueueListener)listener).handleEvent(e);
 		}
 	}
-
+	
 	/**
 	 * @param machine
 	 */
@@ -719,8 +764,8 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 			((IResourceManagerQueueListener)listener).handleEvent(e);
 		}
 	}
-	
-	/**
+
+    /**
 	 * @param jobId
 	 * @return
 	 */
@@ -736,14 +781,14 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 		return machinesById.get(machineId);
 	}
 
-    /**
+	/**
      * @param nodeId
      * @return
      */
     protected IPNodeControl getNodeControl(String nodeId) {
 		return nodesById.get(nodeId);
 	}
-
+	
 	/**
 	 * @param processId
 	 * @return
@@ -759,7 +804,7 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	protected IPQueueControl getQueueControl(String machineId) {
 		return queuesById.get(machineId);
 	}
-	
+
 	/**
 	 * @param string
 	 * @return
@@ -891,9 +936,10 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	 * @param state
 	 */
 	synchronized protected void setState(ResourceManagerAttributes.State state) {
-		if (this.state.getValue() != state) {
-			this.state.setValue(state);
-			fireResourceManagerChanged(Arrays.asList(this.state));
+		EnumeratedAttribute<State> stateAttr = getStateAttribute();
+		if (stateAttr.getValue() != state) {
+			stateAttr.setValue(state);
+			fireResourceManagerChanged(Arrays.asList(stateAttr));
 		}
 	}
 
@@ -936,7 +982,7 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 		process.addAttributes(attrs.getAttributes());
 		return true;
 	}
-
+	
 	/**
 	 * @param queue
 	 * @param attrs
@@ -945,13 +991,5 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	protected boolean updateQueue(IPQueueControl queue, AttributeManager attrs) {
 		queue.addAttributes(attrs.getAttributes());
 		return true;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.internal.core.elements.PElement#doAddAttributeHook(java.util.List)
-	 */
-	@Override
-	protected void doAddAttributeHook(List<? extends IAttribute<?,?,?>> attrs) {
-		fireResourceManagerChanged(attrs);
 	}
 }

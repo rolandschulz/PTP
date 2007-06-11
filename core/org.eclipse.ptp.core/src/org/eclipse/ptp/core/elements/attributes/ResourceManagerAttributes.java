@@ -12,6 +12,7 @@ package org.eclipse.ptp.core.elements.attributes;
 
 import org.eclipse.ptp.core.attributes.EnumeratedAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
+import org.eclipse.ptp.core.attributes.StringAttributeDefinition;
 
 
 /**
@@ -36,7 +37,28 @@ public class ResourceManagerAttributes {
 		return stateAttrDef;
 	}
 	
+	private final static String DESC_ATTR_ID = "rmDescription";
+	private final static StringAttributeDefinition descAttrDef = 
+		new StringAttributeDefinition(DESC_ATTR_ID, "description", "RM description", "");
+	public static StringAttributeDefinition getDescriptionAttributeDefinition() {
+		return descAttrDef;
+	}
+	
+	private final static String RMID_ATTR_ID = "rmID";
+	private final static StringAttributeDefinition rmIDAttrDef = 
+		new StringAttributeDefinition(RMID_ATTR_ID, "RM ID", "RM unique identifier", "");
+	public static StringAttributeDefinition getRmIDAttributeDefinition() {
+		return rmIDAttrDef;
+	}
+	
+	private final static String TYPE_ATTR_ID = "rmType";
+	private final static StringAttributeDefinition typeAttrDef = 
+		new StringAttributeDefinition(TYPE_ATTR_ID, "type", "RM type", "unspecified");
+	public static StringAttributeDefinition getTypeAttributeDefinition() {
+		return typeAttrDef;
+	}
+	
 	public static IAttributeDefinition<?,?,?>[] getDefaultAttributeDefinitions() {
-		return new IAttributeDefinition[]{stateAttrDef};
+		return new IAttributeDefinition[]{stateAttrDef, descAttrDef, typeAttrDef, rmIDAttrDef};
 	}
 }

@@ -18,95 +18,38 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.ui.adapters;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.eclipse.ptp.core.IModelManager;
-import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IResourceManager;
-import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
-import org.eclipse.ui.views.properties.IPropertyDescriptor;
-import org.eclipse.ui.views.properties.IPropertySource;
 import org.eclipse.ui.views.properties.PropertyDescriptor;
 
-public class ResourceManagerPropertySource implements IPropertySource {
+public class ResourceManagerPropertySource extends PElementPropertySource {
 
 	private final IResourceManager resourceManager;
-	private final PropertyDescriptor[] descriptors;
 
 	public ResourceManagerPropertySource(IResourceManager resourceManager) {
+		super(resourceManager);
+		
 		this.resourceManager = resourceManager;
-		// TODO get attributes from the resourceManager's configuration
-		List<PropertyDescriptor> descriptors = new ArrayList<PropertyDescriptor>();
-		descriptors.add(new PropertyDescriptor("name", "name"));
-		descriptors.add(new PropertyDescriptor("description", "description"));
-		descriptors.add(new PropertyDescriptor("uniqueId", "unique id"));
-		descriptors.add(new PropertyDescriptor("type", "type"));
-		descriptors.add(new PropertyDescriptor("status", "status"));
-		descriptors.add(new PropertyDescriptor("machines", "machines"));
-		descriptors.add(new PropertyDescriptor("queues", "queues"));
-		this.descriptors = descriptors.toArray(new PropertyDescriptor[0]);
-	}
-
-	public Object getEditableValue() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public IPropertyDescriptor[] getPropertyDescriptors() {
-		return descriptors;
+		addDescriptor(new PropertyDescriptor("rm.machines", "num machines"));
+		addDescriptor(new PropertyDescriptor("rm.queues", "num queues"));
+		
 	}
 
 	public Object getPropertyValue(Object id) {
-		if ("name".equals(id)) {
-			return resourceManager.getName();
+		Object value = super.getPropertyValue(id);
+		if (value != null) {
+			return value;
 		}
-		if ("description".equals(id)) {
-			return resourceManager.getDescription();
-		}
-		if ("type".equals(id)) {
-			final String resourceManagerId = resourceManager.getResourceManagerId();
-			final IModelManager modelManager = PTPCorePlugin.getDefault().getModelManager();
-			IResourceManagerFactory factory = modelManager.getResourceManagerFactory(
-					resourceManagerId);
-			return factory.getName();
-		}
-		if ("status".equals(id)) {
-			return resourceManager.getState().toString();
-		}
-		if ("machines".equals(id)) {
+		if ("rm.machines".equals(id)) {
 			final IPMachine[] machines = resourceManager.getMachines();
 			return Integer.toString(machines.length);
 		}
-		if ("queues".equals(id)) {
+		if ("rm.queues".equals(id)) {
 			final IPQueue[] queues = resourceManager.getQueues();
 			return Integer.toString(queues.length);
 		}
-		if ("uniqueId".equals(id)) {
-			return resourceManager.getUniqueName();
-		}
-		
-		// TODO get the property value from the rm's configuration attributes
-		//... get configuration attributes here
-		
 		return null;
-	}
-
-	public boolean isPropertySet(Object id) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	public void resetPropertyValue(Object id) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void setPropertyValue(Object id, Object value) {
-		// TODO Auto-generated method stub
-		
 	}
 
 }

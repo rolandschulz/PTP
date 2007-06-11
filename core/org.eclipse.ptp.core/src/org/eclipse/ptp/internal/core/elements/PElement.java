@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.core.elements;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -44,7 +45,9 @@ public abstract class PElement extends PlatformObject implements IPElementContro
 		elementId = id;
 		elementType = type;
 		elementParent = parent;
-		attributeValues.addAttributes(attrs);
+		ArrayList<IAttribute<?, ?, ?>> attrList = new ArrayList<IAttribute<?,?,?>>(Arrays.asList(attrs));
+		attrList.add(ElementAttributes.getIdAttributeDefinition().create(id));
+		attributeValues.addAttributes(attrList.toArray(new IAttribute<?, ?, ?>[0]));
 	}
 
 	/* (non-Javadoc)
