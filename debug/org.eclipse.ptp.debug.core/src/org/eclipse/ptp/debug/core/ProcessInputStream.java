@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.EnumeratedAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
@@ -122,12 +121,12 @@ public class ProcessInputStream extends InputStream implements IProcessListener 
 	 * @see org.eclipse.ptp.core.elements.listeners.IProcessListener#handleEvent(org.eclipse.ptp.core.elements.events.IProcessChangedEvent)
 	 */
 	public void handleEvent(IProcessChangedEvent e) {
-		for (IAttribute<?,?,?> attr : e.getAttributes()) {
+		for (IAttribute<?, ?, ?> attr : e.getAttributes()) {
 			IAttributeDefinition<?, ?, ?> def = attr.getDefinition();
-			final EnumeratedAttributeDefinition<State> stateAttrDef = 
-				ProcessAttributes.getStateAttributeDefinition();
+			final EnumeratedAttributeDefinition<State> stateAttrDef = ProcessAttributes.getStateAttributeDefinition();
 			if (def.equals(stateAttrDef)) {
-				ProcessAttributes.State state = ((EnumeratedAttribute<State>)attr).getValue();
+				ProcessAttributes.State state = (State)attr.getValue();
+				//ProcessAttributes.State state = ((EnumeratedAttribute<State>)attr).getValue();
 				if (state == State.EXITED || state == State.EXITED_SIGNALLED || state == State.ERROR) {
 					close();
 				}
