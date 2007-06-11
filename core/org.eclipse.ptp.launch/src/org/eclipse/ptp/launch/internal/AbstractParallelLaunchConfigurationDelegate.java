@@ -50,7 +50,6 @@ import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.AttributeManager;
-import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPQueue;
@@ -58,6 +57,7 @@ import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
+import org.eclipse.ptp.core.elements.attributes.JobAttributes.State;
 import org.eclipse.ptp.core.elements.events.IQueueChangedJobEvent;
 import org.eclipse.ptp.core.elements.events.IQueueNewJobEvent;
 import org.eclipse.ptp.core.elements.events.IQueueRemoveJobEvent;
@@ -253,18 +253,17 @@ public abstract class AbstractParallelLaunchConfigurationDelegate
 		 * If the job state has changed to running, find the JobSubmission that 
 		 * corresponds to this job and perform remainder of job launch actions
 		 */
-		
 		for (IAttribute<?,?,?> attr : e.getAttributes()) {
-			if (attr.getDefinition() == JobAttributes.getStateAttributeDefinition() &&
-					((EnumeratedAttribute<JobAttributes.State>)attr).getValue() == JobAttributes.State.RUNNING) {
-				IPJob job = e.getJob();
-				JobSubmission jobSub = jobSubmissions.get(job);
-				if (jobSub != null) {
-					doCompleteJobLaunch(jobSub.getConfiguration(), jobSub.getMode(), jobSub.getLaunch(),
-							jobSub.getAttrMgr(), jobSub.getDebugger(), job);
-					jobSubmissions.remove(job);
+			if (attr.getDefinition() == JobAttributes.getStateAttributeDefinition() && (State)attr.getValue() == JobAttributes.State.RUNNING) {
+				synchronized (jobSubmissions) {
+					IPJob job = e.getJob();
+					JobSubmission jobSub = jobSubmissions.get(job);
+					if (jobSub != null) {
+						doCompleteJobLaunch(jobSub.getConfiguration(), jobSub.getMode(), jobSub.getLaunch(), jobSub.getAttrMgr(), jobSub.getDebugger(), job);
+						jobSubmissions.remove(job);
+					}
+					break;
 				}
-				break;
 			}
 		}
 	}
@@ -499,16 +498,18 @@ public abstract class AbstractParallelLaunchConfigurationDelegate
 	protected void submitJob(ILaunchConfiguration configuration, String mode, IPLaunch launch,
 			AttributeManager attrMgr, IAbstractDebugger debugger, IProgressMonitor monitor) throws CoreException {
 		
-		final IResourceManager rm = getResourceManager(configuration);
-		if (rm == null) {
-			abort(LaunchMessages.getResourceString("AbstractParallelLaunchConfigurationDelegate.No_ResourceManager"), null, 0);
-		}
-
-		IPJob job = rm.submitJob(attrMgr, monitor);
-		
-		if (job != null) {
-			JobSubmission jobSub = new JobSubmission(configuration, mode, launch, attrMgr, debugger);
-			jobSubmissions.put(job, jobSub);
+		synchronized (jobSubmissions) {
+			final IResourceManager rm = getResourceManager(configuration);
+			if (rm == null) {
+				abort(LaunchMessages.getResourceString("AbstractParallelLaunchConfigurationDelegate.No_ResourceManager"), null, 0);
+			}
+	
+			IPJob job = rm.submitJob(attrMgr, monitor);
+			
+			if (job != null) {
+				JobSubmission jobSub = new JobSubmission(configuration, mode, launch, attrMgr, debugger);
+				jobSubmissions.put(job, jobSub);
+			}
 		}
 	}
 
