@@ -722,7 +722,7 @@ GDBMIStartSession(char *gdb_path, char *prog, char *path, char *work_dir, char *
 	}
 	
 	sess = MISessionNew();
-	
+
 #ifdef DEBUG
 	MISessionSetDebug(TEST_DEBUG_LEVEL(DEBUG_LEVEL_BACKEND));
 #endif /* DEBUG */
@@ -829,7 +829,7 @@ GDBMISetLineBreakpoint(int bpid, int isTemp, int isHard, char *file, int line, c
 	int		res;
 	char *	where;
 
-	CHECK_SESSION()
+	CHECK_SESSION();
 
 	if (file == NULL || *file == '\0')
 		asprintf(&where, "%d", line);
@@ -852,7 +852,7 @@ GDBMISetFuncBreakpoint(int bpid, int isTemp, int isHard, char *file, char *func,
 	int		res;
 	char *	where;
 
-	CHECK_SESSION()
+	CHECK_SESSION();
 
 	if (file == NULL || *file == '\0')
 		asprintf(&where, "%s", func);
@@ -939,7 +939,7 @@ GDBMIDeleteBreakpoint(int bpid)
 	char *		bpstr;
 	MICommand *	cmd;
 	
-	CHECK_SESSION()
+	CHECK_SESSION();
 
 	if ((bp = FindRemoteBP(bpid)) == NULL) {
 		asprintf(&bpstr, "%d", bpid);
@@ -974,7 +974,7 @@ GDBMIEnableBreakpoint(int bpid)
 	char *		bpstr;
 	MICommand *	cmd;
 	
-	CHECK_SESSION()
+	CHECK_SESSION();
 
 	if ((bp = FindRemoteBP(bpid)) == NULL) {
 		asprintf(&bpstr, "%d", bpid);
@@ -1005,7 +1005,7 @@ GDBMIDisableBreakpoint(int bpid)
 	char *		bpstr;
 	MICommand *	cmd;
 	
-	CHECK_SESSION()
+	CHECK_SESSION();
 
 	if ((bp = FindRemoteBP(bpid)) == NULL) {
 		asprintf(&bpstr, "%d", bpid);
@@ -1036,7 +1036,7 @@ GDBMIConditionBreakpoint(int bpid, char *expr)
 	char *		bpstr;
 	MICommand *	cmd;
 	
-	CHECK_SESSION()
+	CHECK_SESSION();
 
 	if ((bp = FindRemoteBP(bpid)) == NULL) {
 		asprintf(&bpstr, "%d", bpid);
@@ -1067,7 +1067,7 @@ GDBMIBreakpointAfter(int bpid, int icount)
 	char *		bpstr;
 	MICommand *	cmd;
 	
-	CHECK_SESSION()
+	CHECK_SESSION();
 
 	if ((bp = FindRemoteBP(bpid)) == NULL) {
 		asprintf(&bpstr, "%d", bpid);
@@ -1155,8 +1155,8 @@ static int
 GDBMIGo(void)
 {
 	MICommand *	cmd;
-		
-	CHECK_SESSION()
+	
+	CHECK_SESSION();
 
 	if (Started)
 		cmd = MIExecContinue();
@@ -1166,7 +1166,6 @@ GDBMIGo(void)
 	}
 
 	SendCommandWait(DebugSession, cmd);
-	
 	if (!MICommandResultOK(cmd)) {
 		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
 		MICommandFree(cmd);
@@ -1174,7 +1173,6 @@ GDBMIGo(void)
 	}
 		
 	MICommandFree(cmd);
-	
 	return DBGRES_OK;
 }
 
@@ -1191,7 +1189,7 @@ GDBMIStep(int count, int type)
 {
 	MICommand *	cmd;
 
-	CHECK_SESSION()
+	CHECK_SESSION();
 
 	switch ( type ) {
 	case 0:
@@ -1232,7 +1230,7 @@ GDBMITerminate(void)
 {
 	MICommand *	cmd;
 	
-	CHECK_SESSION()
+	CHECK_SESSION();
 
 	cmd = MICommandNew("kill", MIResultRecordDONE);
 	
@@ -1259,7 +1257,7 @@ GDBMIInterrupt(void)
 {
 	MICommand *	cmd;
 	
-	CHECK_SESSION()
+	CHECK_SESSION();
 
 	/*
 	 * Don't do anything if there's an event pending or the
@@ -1298,7 +1296,7 @@ GDBMISetCurrentStackframe(int level)
 {
 	MICommand *	cmd;
 	
-	CHECK_SESSION()
+	CHECK_SESSION();
 
 	cmd = MIStackSelectFrame(level);
 	
@@ -1393,7 +1391,7 @@ GDBMIListStackframes(int low, int high)
 	dbg_event *	e;
 	List *		frames;
 	
-	CHECK_SESSION()
+	CHECK_SESSION();
 
 	if (GetStackframes(0, low, high, &frames) != DBGRES_OK)
 		return DBGRES_ERR;
@@ -1492,7 +1490,7 @@ GDBMIGetLocalVariables(void)
 	MIArg *		arg;
 	List *		args;
 
-	CHECK_SESSION()
+	CHECK_SESSION();
 
 	cmd = MIStackListLocals(0);
 
@@ -1572,7 +1570,7 @@ GDBMIListArguments(int low, int high)
 	MIFrame *	frame;
 	List *		frames;
 
-	CHECK_SESSION()
+	CHECK_SESSION();
 
 	cmd = MIStackListArguments(0, low, high);
 
@@ -1619,7 +1617,7 @@ GDBMIListArguments(int low, int high)
 static int
 GDBMIGetGlobalVariables(void)
 {
-	CHECK_SESSION()
+	CHECK_SESSION();
 
 	DbgSetError(DBGERR_NOTIMP, NULL);
 	return DBGRES_ERR;
