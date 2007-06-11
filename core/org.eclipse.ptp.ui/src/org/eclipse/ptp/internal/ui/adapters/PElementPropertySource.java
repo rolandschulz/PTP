@@ -18,6 +18,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.ui.adapters;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.elements.IPElement;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
@@ -27,7 +31,7 @@ import org.eclipse.ui.views.properties.PropertyDescriptor;
 public class PElementPropertySource implements IPropertySource {
 
 	private final IPElement pelement;
-	private final PropertyDescriptor[] descriptors;
+	private final List<PropertyDescriptor> descriptors = new ArrayList<PropertyDescriptor>();
 
 	public PElementPropertySource(IPElement pelement) {
 		this.pelement = pelement;
@@ -36,9 +40,8 @@ public class PElementPropertySource implements IPropertySource {
         for (int i = 0; i < attrDefs.length; i++) {
         	keys[i] = attrDefs[i].getId();
         }
-        descriptors = new PropertyDescriptor[keys.length];
         for (int i = 0; i < keys.length; ++i) {
-            descriptors[i] = new PropertyDescriptor(keys[i], keys[i]);
+            addDescriptor(new PropertyDescriptor(keys[i], attrDefs[i].getName()));
         }
 	}
 
@@ -48,11 +51,15 @@ public class PElementPropertySource implements IPropertySource {
 	}
 
 	public IPropertyDescriptor[] getPropertyDescriptors() {
-		return descriptors;
+		return descriptors.toArray(new IPropertyDescriptor[0]);
 	}
 
 	public Object getPropertyValue(Object id) {
-        return pelement.getAttribute(id.toString()).getValueAsString();
+        final IAttribute<?, ?, ?> attribute = pelement.getAttribute(id.toString());
+        if (attribute != null) {
+        	return attribute.getValueAsString();
+        }
+        return null;
 	}
 
 	public boolean isPropertySet(Object id) {
@@ -68,6 +75,10 @@ public class PElementPropertySource implements IPropertySource {
 	public void setPropertyValue(Object id, Object value) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	protected void addDescriptor(PropertyDescriptor desc) {
+		descriptors.add(desc);
 	}
 
 }

@@ -873,6 +873,15 @@ public class ParallelMachinesView extends AbstractParallelSetView implements
 		});
 		createMachineContextMenu();
 		elementViewComposite = createElementView(upperSashForm);
+		
+		// ----------------------------------------------------------------------
+		// Enable property sheet updates when tree items are selected.
+		// Note for this to work each item in the tree must either implement
+		// IPropertySource, or support IPropertySource.class as an adapter type
+		// in its AdapterFactory.
+		// ----------------------------------------------------------------------
+		getSite().setSelectionProvider(machineTableViewer);
+		
 		infoComposite = createLowerRegions(sashForm);
 		changeView(current_view);
 	}
