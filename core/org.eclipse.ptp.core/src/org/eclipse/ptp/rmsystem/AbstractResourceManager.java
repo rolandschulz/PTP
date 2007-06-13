@@ -613,6 +613,8 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	 * shuts down and ensures that everything is cleaned up properly.
 	 */
 	protected void cleanUp() {
+		doCleanUp();
+		
 		for (IPQueueControl queue : getQueueControls()) {
 			removeQueue(queue);
 		}
@@ -629,6 +631,11 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 		fireResourceManagerChanged(attrs);
 	}
 
+	/**
+	 * 
+	 */
+	protected abstract void doCleanUp();
+	
 	/**
 	 * 
 	 */

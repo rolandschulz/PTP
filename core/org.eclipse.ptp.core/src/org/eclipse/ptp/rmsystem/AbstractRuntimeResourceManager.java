@@ -76,18 +76,7 @@ import org.eclipse.ptp.rtsystem.events.IRuntimeTerminateJobErrorEvent;
 public abstract class AbstractRuntimeResourceManager extends
 		AbstractResourceManager implements IRuntimeEventListener {
 
-	private IRuntimeSystem runtimeSystem;
-	
-	private final ReentrantLock stateLock = new ReentrantLock();
-	private final Condition stateCondition = stateLock.newCondition();
-	private RMState state;
-	private enum RMState {STARTING, STARTED, STOPPING, STOPPED, ERROR};
-	
-	private final ReentrantLock subLock = new ReentrantLock();
-	private final Condition subCondition = subLock.newCondition();
-	private Map<String, JobSubmission> jobSubmissions = new HashMap<String, JobSubmission>();
-	
-	public enum JobSubState {SUBMITTED, COMPLETED, ERROR};
+	public enum JobSubState {SUBMITTED, COMPLETED, ERROR}
 	
 	private class JobSubmission {
 		private IPJob			job = null;
@@ -95,17 +84,17 @@ public abstract class AbstractRuntimeResourceManager extends
 		private IRuntimeEvent	event;
 		
 		/**
+		 * @return the event
+		 */
+		public IRuntimeEvent getEvent() {
+			return event;
+		}
+		
+		/**
 		 * @return the job
 		 */
 		public IPJob getJob() {
 			return job;
-		}
-		
-		/**
-		 * @param job the job to set
-		 */
-		public void setJob(IPJob job) {
-			this.job = job;
 		}
 		
 		/**
@@ -116,26 +105,37 @@ public abstract class AbstractRuntimeResourceManager extends
 		}
 		
 		/**
-		 * @param error the error to set
-		 */
-		public void setState(JobSubState state) {
-			this.state = state;
-		}
-		
-		/**
-		 * @return the event
-		 */
-		public IRuntimeEvent getEvent() {
-			return event;
-		}
-		
-		/**
 		 * @param event the event to set
 		 */
 		public void setEvent(IRuntimeEvent event) {
 			this.event = event;
 		}
+		
+		/**
+		 * @param job the job to set
+		 */
+		public void setJob(IPJob job) {
+			this.job = job;
+		}
+		
+		/**
+		 * @param error the error to set
+		 */
+		public void setState(JobSubState state) {
+			this.state = state;
+		}
 	}
+	private enum RMState {STARTING, STARTED, STOPPING, STOPPED, ERROR}
+	private IRuntimeSystem runtimeSystem;
+	private final ReentrantLock stateLock = new ReentrantLock();;
+	
+	private final Condition stateCondition = stateLock.newCondition();
+	private RMState state;
+	private final ReentrantLock subLock = new ReentrantLock();
+	
+	private final Condition subCondition = subLock.newCondition();;
+	
+	private Map<String, JobSubmission> jobSubmissions = new HashMap<String, JobSubmission>();
 	
 	public AbstractRuntimeResourceManager(String id, IPUniverseControl universe,
 			IResourceManagerConfiguration config) {
@@ -163,11 +163,36 @@ public abstract class AbstractRuntimeResourceManager extends
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeErrorEvent)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeErrorStateEvent)
 	 */
-	public void handleEvent(IRuntimeMessageEvent e) {
-		MessageAttributes.Level level = e.getLevel();
-		// FIXME: implement logging
+	public void handleEvent(IRuntimeErrorStateEvent e) {
+		/*
+		 * Fatal error in the runtime system. Cancel any pending job submissions
+		 * and inform upper levels of the problem.
+		 */
+		subLock.lock();
+		try {
+			for (JobSubmission sub : jobSubmissions.values()) {
+				sub.setState(JobSubState.ERROR);
+				sub.setEvent(e);
+			}
+			subCondition.signalAll();
+		} finally {
+			subLock.unlock();
+		}
+		
+		stateLock.lock();
+		try {
+			RMState oldState = state;
+			state = RMState.ERROR;
+			if (oldState == RMState.STOPPING) {
+				stateCondition.signal();
+			}
+			setState(ResourceManagerAttributes.State.ERROR);
+			cleanUp();
+		} finally {
+			stateLock.unlock();
+		}	
 	}
 	
 	/* (non-Javadoc)
@@ -213,6 +238,14 @@ public abstract class AbstractRuntimeResourceManager extends
 	}
 
 	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeErrorEvent)
+	 */
+	public void handleEvent(IRuntimeMessageEvent e) {
+		MessageAttributes.Level level = e.getLevel();
+		// FIXME: implement logging
+	}
+
+	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeNewJobEvent)
 	 */
 	public void handleEvent(IRuntimeNewJobEvent e) {
@@ -252,7 +285,7 @@ public abstract class AbstractRuntimeResourceManager extends
 			}
 		}
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeNewMachineEvent)
 	 */
@@ -296,7 +329,7 @@ public abstract class AbstractRuntimeResourceManager extends
 			}
 		}
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeNewProcessEvent)
 	 */
@@ -361,7 +394,7 @@ public abstract class AbstractRuntimeResourceManager extends
 			}
 		}
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeProcessChangeEvent)
 	 */
@@ -382,7 +415,7 @@ public abstract class AbstractRuntimeResourceManager extends
 			}
 		}
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeQueueChangeEvent)
 	 */
@@ -469,39 +502,6 @@ public abstract class AbstractRuntimeResourceManager extends
 				removeQueue(queue);
 			}
 		}
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeErrorStateEvent)
-	 */
-	public void handleEvent(IRuntimeErrorStateEvent e) {
-		/*
-		 * Fatal error in the runtime system. Cancel any pending job submissions
-		 * and inform upper levels of the problem.
-		 */
-		subLock.lock();
-		try {
-			for (JobSubmission sub : jobSubmissions.values()) {
-				sub.setState(JobSubState.ERROR);
-				sub.setEvent(e);
-			}
-			subCondition.signalAll();
-		} finally {
-			subLock.unlock();
-		}
-		
-		stateLock.lock();
-		try {
-			RMState oldState = state;
-			state = RMState.ERROR;
-			if (oldState == RMState.STOPPING) {
-				stateCondition.signal();
-			}
-			setState(ResourceManagerAttributes.State.ERROR);
-			cleanUp();
-		} finally {
-			stateLock.unlock();
-		}	
 	}
 
 	/* (non-Javadoc)
@@ -611,6 +611,13 @@ public abstract class AbstractRuntimeResourceManager extends
 	}
 
 	/**
+	 * Abort the RTS connection.
+	 */
+	private void abortConnection() {
+		runtimeSystem.shutdown();
+	}
+
+	/**
 	 * Close the RTS connection.
 	 */
 	private void closeConnection() {
@@ -624,13 +631,6 @@ public abstract class AbstractRuntimeResourceManager extends
 	 */
 	private void openConnection() throws CoreException {
 		runtimeSystem.startup();
-	}
-
-	/**
-	 * Abort the RTS connection.
-	 */
-	private void abortConnection() {
-		runtimeSystem.shutdown();
 	}
 	
 	/**
@@ -653,6 +653,14 @@ public abstract class AbstractRuntimeResourceManager extends
 	 */
 	protected abstract void doBeforeOpenConnection();
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManager#doCleanUp()
+	 */
+	@Override
+	protected void doCleanUp() {
+		state = RMState.STOPPED;
+	}
+	
 	/**
 	 * Template pattern method to actually create the job.
 	 *
@@ -661,7 +669,7 @@ public abstract class AbstractRuntimeResourceManager extends
 	 * @return
 	 */
 	abstract protected IPJobControl doCreateJob(IPQueueControl queue, String jobId, AttributeManager attrs);
-	
+
 	/**
 	 * Template pattern method to actually create the machine.
 	 *
@@ -720,7 +728,7 @@ public abstract class AbstractRuntimeResourceManager extends
 		// TODO Auto-generated method stub
 		
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManager#doEnableEvents()
 	 */
@@ -728,7 +736,7 @@ public abstract class AbstractRuntimeResourceManager extends
 		// TODO Auto-generated method stub
 		
 	}
-	
+
 	protected List<IPJob> doRemoveTerminatedJobs(IPQueueControl queue) {
 		List<IPJob> jobs = new ArrayList<IPJob>();
 		if (queue != null) {
@@ -768,7 +776,7 @@ public abstract class AbstractRuntimeResourceManager extends
 			monitor.done();
 		}
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManager#doStartup(org.eclipse.core.runtime.IProgressMonitor)
 	 */
@@ -855,7 +863,7 @@ public abstract class AbstractRuntimeResourceManager extends
 			monitor.done();
 		}
 	}
-	
+
 	protected void doTerminateJob(IPJob job) throws CoreException {
 		runtimeSystem.terminateJob(job);
 	}

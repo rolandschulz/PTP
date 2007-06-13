@@ -26,7 +26,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elements.attributes.MessageAttributes;
 import org.eclipse.ptp.core.proxy.AbstractProxyClient;
@@ -496,7 +498,10 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 			sessionCreate();
 
 			if (launchManually) {
-				System.out.println("Waiting for manual launch of proxy on port " + getSessionPort() + "...");
+				final String msg = "Waiting for manual launch of proxy on port " + getSessionPort() + "...";
+				System.out.println(msg);
+				Status info = new Status(IStatus.INFO, PTPCorePlugin.getUniqueIdentifier(), IStatus.INFO, msg, null);
+				PTPCorePlugin.log(info);
 			} else {
 				Thread runThread = new Thread(new ProxyServerThread(), proxyName + ProxyServerThread.name);
 				runThread.setDaemon(true);
