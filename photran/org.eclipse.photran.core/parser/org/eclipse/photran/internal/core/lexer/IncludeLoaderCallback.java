@@ -1,29 +1,57 @@
 package org.eclipse.photran.internal.core.lexer;
 
-public interface IncludeLoaderCallback
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.photran.internal.core.properties.SearchPathProperties;
+
+public class IncludeLoaderCallback
 {
+    protected IProject project;
+    
+    public IncludeLoaderCallback(IProject project)
+    {
+        this.project = project;
+    }
+    
     /**
-     * Called back when an INCLUDE file cannot be loaded.  The given message is displayed to the user.
+     * Called back when an INCLUDE line is found.  The parameter is the (verbatim) text of the file
+     * to include.
+     * 
+     * @param fileToInclude
+     * @return <code>InputStream</code>, not null
+     * @throws FileNotFoundException if the file cannot be found
+     */
+    public InputStream getIncludedFileAsStream(String fileToInclude) throws FileNotFoundException
+    {
+        String[] paths = SearchPathProperties.parseString(SearchPathProperties.getProperty(project, SearchPathProperties.INCLUDE_PATHS_PROPERTY_NAME));
+        for (int i = 0; i < paths.length; i++)
+        {
+            IResource result = ResourcesPlugin.getWorkspace().getRoot().findMember(paths[i] + File.separatorChar + fileToInclude);
+            if (result != null && result instanceof IFile)
+                try { return ((IFile)result).getContents(); }
+                catch (CoreException e) {;}
+        }
+        throw new FileNotFoundException(fileToInclude);
+    }
+    
+    /**
+     * Called back when an INCLUDE file cannot be loaded.  Subclasses are expected to override this method and
+     * display the given message to the user.
+     * 
      * @param message
      * @param filename
      * @return <code>null</code> to continue, or a <code>String</code> containing a message if an <code>Exception</code>
      * should be thrown and parsing/binding aborted
      */
-    String onUnableToLoad(String message, String filename);
-    
-    public static IncludeLoaderCallback DEFAULT = new IncludeLoaderCallback()
+    public String onUnableToLoad(String message, String filename)
     {
-        public String onUnableToLoad(String message, String filename)
-        {
-            return message;
-        }
-    };
-    
-    public static IncludeLoaderCallback IGNORE = new IncludeLoaderCallback()
-    {
-        public String onUnableToLoad(String message, String filename)
-        {
-            return null;
-        }
-    };
+        return message;
+    }
 }

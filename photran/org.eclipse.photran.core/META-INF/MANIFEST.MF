@@ -12,6 +12,7 @@ Export-Package: org.eclipse.photran.core,
  org.eclipse.photran.internal.core.lexer,
  org.eclipse.photran.internal.core.parser,
  org.eclipse.photran.internal.core.preferences,
+ org.eclipse.photran.internal.core.properties,
  org.eclipse.photran.internal.errorparsers
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.cdt.core,

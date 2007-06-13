@@ -166,16 +166,16 @@ public final class FortranPreprocessor extends InputStream
     {
         try
         {
-            // TODO: INCLUDE paths
-            return new FileInputStream(new File("/home/joverbey/photran/photran3-workspace/org.eclipse.photran.refactoring.tests/rename-test-code/" + fileToInclude));
+            return callback.getIncludedFileAsStream(fileToInclude);
         }
         catch (FileNotFoundException e)
         {
-            String msg = callback.onUnableToLoad("Unable to locate INCLUDE file "
-                                                 + fileToInclude
-                                                 + " (working directory: "
-                                                 + new File(".").getCanonicalPath()
-                                                 + ")", fileToInclude);
+            String msg = callback.onUnableToLoad("Unable to locate INCLUDE file \""
+                                                 + fileToInclude + "\""
+                                                 //+ " (working directory: "
+                                                 //+ new File(".").getCanonicalPath()
+                                                 //+ ")"
+                                                 , fileToInclude);
             if (msg == null)
                 return null;
             else
