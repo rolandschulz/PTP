@@ -23,9 +23,6 @@
                menubarPath="mpiMenu/mpiGroup"
                toolbarPath="mpiToolbarGroup"
                id="org.eclipse.ptp.pldt.mpi.core.ui.actions.RemoveMarkerAction">
-            <selection
-                  class="org.eclipse.core.resources.IProject">
-            </selection>
          </action>
          <action
                label="Run MPI Analysis"
