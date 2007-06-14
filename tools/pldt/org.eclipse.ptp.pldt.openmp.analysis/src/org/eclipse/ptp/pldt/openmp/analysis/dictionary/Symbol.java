@@ -20,7 +20,6 @@ import org.eclipse.cdt.core.dom.ast.IASTNode;
 import org.eclipse.cdt.core.dom.ast.IASTParameterDeclaration;
 import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit;
 import org.eclipse.cdt.core.dom.ast.IBinding;
-import org.eclipse.cdt.core.dom.ast.IFunction;
 import org.eclipse.cdt.core.dom.ast.IScope;
 import org.eclipse.cdt.internal.core.dom.parser.c.CFunction;
 import org.eclipse.cdt.internal.core.dom.parser.c.CParameter;
@@ -108,8 +107,8 @@ public class Symbol {
 	public IScope getScope() {
 		// find the unique scope for this name
 		IASTName name = declarator_.getName();
-		IBinding rb = name.resolveBinding();
-		IBinding binding = name.getBinding();
+		IBinding binding = name.resolveBinding();
+		//IBinding binding = name.getBinding();
 		if (binding == null)
 			return null;
 
@@ -148,6 +147,10 @@ public class Symbol {
 	/**
 	 * get the physical node (IASTNode) that this symbol is contained in. <br>
 	 * (Formerly supplied by IScope.getPhysicalNode() )
+	 * Note: this isn't used, and doesn't work. Left here for possible future fixup.
+	 * PASTOMPFactory.isSymbolRelevant computes this differently now, using some
+	 * classes/packages with discouraged access, so it seems eventually it would be nice
+	 * to fix this to be "proper."
 	 * 
 	 * @return
 	 */
@@ -166,7 +169,7 @@ public class Symbol {
 		try {
 			sn = scope.getScopeName();
 			if(sn instanceof IASTName){
-				name=(IASTName)sn; // this *should* be mnore accurate
+				name=(IASTName)sn; // this *should* be more accurate
 			}
 		} catch (DOMException e) {return null;}
 		
