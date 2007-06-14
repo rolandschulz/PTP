@@ -13,7 +13,6 @@ package org.eclipse.ptp.pldt.openmp.analysis.PAST;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import org.eclipse.cdt.core.dom.IName;
 import org.eclipse.cdt.core.dom.ast.ASTVisitor;
 import org.eclipse.cdt.core.dom.ast.IASTCompoundStatement;
 import org.eclipse.cdt.core.dom.ast.IASTFileLocation;
@@ -27,12 +26,14 @@ import org.eclipse.cdt.core.parser.ISourceElementRequestor;
 import org.eclipse.cdt.core.parser.IToken;
 import org.eclipse.cdt.core.parser.NullSourceElementRequestor;
 import org.eclipse.cdt.internal.core.dom.parser.ASTNode;
+import org.eclipse.cdt.internal.core.dom.parser.c.CScope;
+import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPScope;
 import org.eclipse.cdt.internal.core.parser.scanner2.ScannerCallbackManager;
 import org.eclipse.cdt.internal.core.parser.scanner2.ScannerProblemFactory;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.ptp.pldt.common.util.Utility;
 import org.eclipse.ptp.pldt.openmp.analysis.OpenMPError;
 import org.eclipse.ptp.pldt.openmp.analysis.OpenMPErrorManager;
-import org.eclipse.ptp.pldt.openmp.analysis.Utility;
 import org.eclipse.ptp.pldt.openmp.analysis.dictionary.Dictionary;
 import org.eclipse.ptp.pldt.openmp.analysis.dictionary.Symbol;
 import org.eclipse.ptp.pldt.openmp.analysis.parser.OpenMPScanner;
@@ -51,6 +52,7 @@ public class PASTOMPFactory
     protected Dictionary          dictionary_   = null;
     
     protected static boolean      traceOn_      = false;
+    private static final boolean traceOn=false;
     
     protected OpenMPScanner scanner_ = null;
     protected OpenMPToken   token_   = null;
@@ -311,18 +313,23 @@ public class PASTOMPFactory
      */
     protected boolean isSymbolRelevant(Symbol symbol)
     {   
+    	if(traceOn)System.out.println("Symbol: "+symbol.getName()+"  PASTOMPFactory.isSymbolRelevant()");
         IASTNode node = null;
         IASTNode parent,gp=null;
 		try {
 			// node=symbol.getScope().getPhysicalNode(); // no longer in CDT 4.0
-			node = symbol.getPhysicalNode();//cdt40
-			parent=node.getParent();
-			gp=parent.getParent();
-			int stopHere=0;
-			node=gp;//simpleDeclaration like 3.1.2 result HACK HACK HACK
-			
-			
-
+			// The following probably isn't an ideal solution (casting and using Discouraged access methods)
+			// but seems to work for now. 
+			// alternatively I tried implementing: symbol.getPhysicalNode() but could not get the same answer from there.
+			IScope scope=symbol.getScope();
+			if(scope instanceof CScope){
+				CScope cScope = (CScope)scope;
+				node=cScope.getPhysicalNode();
+			}
+			else if(scope instanceof CPPScope){
+				CPPScope cppScope=(CPPScope)scope;
+				node = cppScope.getPhysicalNode();
+			}
 		} catch (Exception e) {
 			return false;
 		}
@@ -330,20 +337,19 @@ public class PASTOMPFactory
         Utility.Location l = Utility.getLocation(node);
         int nodeOffset = (l!=null ? l.getLow()  : 0);     //728
         int nodeEndset = (l!=null ? l.getHigh() : 0);       //745
-        System.out.println("node: "+node.getRawSignature()+" nodeOffset: "+nodeOffset+" nodeEndset= "+nodeEndset);
+        if(traceOn)System.out.println("node: "+node.getRawSignature()+" nodeOffset: "+nodeOffset+" nodeEndset= "+nodeEndset);
         
         int pOffset = pragma_.getLocalOffset();            //822
         int pEndset = pOffset+pragma_.getLength()-1;       //864
-        System.out.println(("pragma pOffset= "+pOffset+" pEndset= "+pEndset));
+        if(traceOn)System.out.println(("pragma pOffset= "+pOffset+" pEndset= "+pEndset));
         
         boolean tf = ((nodeEndset<pOffset || pEndset<nodeOffset) ? false : true);  //false
         if (!tf)  return tf;
-        int stopppp=0;
         
         // See if the declaration succeeds the pragma
         Utility.Location dl = Utility.getLocation(symbol.getDeclarator());
         if (dl==null)  return false;
-        System.out.println("dl.getLow()="+dl.getLow()+" pOffset="+pOffset+
+        if(traceOn)System.out.println("dl.getLow()="+dl.getLow()+" pOffset="+pOffset+
         		" > is: "+(dl.getLow()>pOffset));
         
         return (dl.getLow()>pOffset ? false : true);
