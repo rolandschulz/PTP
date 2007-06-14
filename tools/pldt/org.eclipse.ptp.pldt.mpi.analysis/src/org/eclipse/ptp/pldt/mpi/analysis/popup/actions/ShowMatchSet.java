@@ -31,17 +31,19 @@ import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.ptp.pldt.common.ScanReturn;
 import org.eclipse.ptp.pldt.common.util.SourceInfo;
+import org.eclipse.ptp.pldt.common.util.Utility;
 import org.eclipse.ptp.pldt.common.util.ViewActivater;
 import org.eclipse.ptp.pldt.mpi.analysis.IDs;
 import org.eclipse.ptp.pldt.mpi.analysis.analysis.BarrierTable;
 import org.eclipse.ptp.pldt.mpi.analysis.analysis.MPIBarrierAnalysisResults;
 import org.eclipse.ptp.pldt.mpi.analysis.analysis.BarrierTable.BarrierInfo;
 import org.eclipse.ptp.pldt.mpi.analysis.view.MPIArtifactMarkingVisitor;
-import org.eclipse.ptp.pldt.openmp.analysis.Utility;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.ui.IEditorActionDelegate;
+import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.actions.ActionDelegate;
 
 /**
@@ -117,9 +119,14 @@ public class ShowMatchSet extends ActionDelegate
             showMessage(TITLE, "No Barrier Analysis has been performed");
             return;
         }
-        
-        IFile file = editor_.getInputFile();
+        IEditorInput ieu = editor_.getEditorInput();
+        IFile file= null;
+        if(ieu instanceof IFileEditorInput){
+        	file=((IFileEditorInput)ieu).getFile();  // cdt40
+        }
+        //IFile file = editor_.getInputFile();//cdt31
         String fileName = file.getFullPath().toOSString();
+        //String filename2 = Utility.getInputFile(editor_);
         /* This filename may not contain the FULL path information */
 
         BarrierInfo barrier = findSelectedBarrier(fileName, selection.getOffset());
@@ -186,7 +193,7 @@ public class ShowMatchSet extends ActionDelegate
     
     protected void showNode(IASTNode node, String markerType)
     {
-        Utility.Location l = Utility.getLocation(node);
+        Utility.Location l = Utility.getLocation(node); 
 
         
         IAnnotationModel am = editor_.getDocumentProvider().getAnnotationModel(editor_.getEditorInput());
