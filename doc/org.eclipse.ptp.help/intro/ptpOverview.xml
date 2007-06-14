@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<introContent>
+  	<extensionContent id="orgeclipseptphelp-introExtension" style="css/sample.css" name="PTP overview intro Extension" path="overview/@">
+		<group style-id="content-group" id="orgeclipseptphelp-introLink-group">
+       		<link label="Parallel Tools Platform" url="http://www.eclipse.org/ptp" id="orgeclipseptphelp-introLink" style-id="content-link">
+          		<text>Learn more about PTP on the Eclipse web site.</text>
+       		</link>
+       	</group>
+  	</extensionContent>
+</introContent>

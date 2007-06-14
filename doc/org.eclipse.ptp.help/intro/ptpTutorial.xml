@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<introContent>
+  	<extensionContent id="orgeclipseptphelp-introExtension" style="css/sample.css" name="PTP tutorial intro Extension" path="tutorials/@">
+		<group style-id="content-group" id="orgeclipseptphelp-introLink-group">
+       		<link label="Parallel Tools Platform"  
+       		url="http://org.eclipse.ui.intro/showHelpTopic?id=/org.eclipse.ptp.help/html/01buildMPIprog.html"
+       		id="orgeclipseptphelp-introLink" style-id="content-link">
+          		<text>Learn how to create, run, and debug a Parallel Project with MPI.
+          		</text>
+		</link>
+       	</group>
+  	</extensionContent>
+</introContent>

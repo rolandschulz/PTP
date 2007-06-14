@@ -1,0 +1,135 @@
+<html>
+<head>
+
+<title>New and Noteworthy - Parallel Tools Platform (PTP) Release 1.1 </title>
+</head>
+<body>
+<h1>Parallel Tools Platform (PTP) Release 1.1 - New and Noteworthy</h1>
+<p>The 1.1 release of PTP gives some new functionality, some bug fixes, and some
+increased scalability to continue to enhance development and debug capabilities
+for parallel projects.
+</p>
+
+<table border="0" cellpadding="10" cellspacing="0" width="80%">
+  <tr> 
+    <td colspan="2"> <hr /> <h2>Major Features</h2>
+      <hr /></td>
+  </tr>
+  <tr> 
+    <td width="30%" valign="top" align="left"><b>Parallel Language Development Tools (PLDT)</b></td>
+    <td width="70%" valign="top">
+    The  Parallel Language Development Tools (PLDT) now replaces and generalizes the
+    MPI Language Tools framework.
+	This will allow other programming models and parallel languages to use the static analysis
+	features.
+      </td>
+
+  </tr>
+  <tr> 
+    <td colspan="2"> <hr /> </td>
+  </tr>
+  <tr> 
+    <td width="30%" valign="top" align="left"><b>OpenMP Support</b></td>
+    <td width="70%" valign="top">Static analysis of OpenMP codes has been added to PLDT. This
+provides similar functionality to the MPI support, but includes additional
+support for detecting certain OpenMP common problems, #pragma regions, and
+some simple conconcurrency analysis.
+<br><img src="images/mpi-openmp.gif">
+</td>
+
+  </tr>
+  <tr> 
+    <td colspan="2"> <hr /> </td>
+  </tr>
+  <tr> 
+    <td width="30%" valign="top" align="left"><b>Debugger Scalability</b></td>
+    <td width="70%" valign="top">The debugger has been enhanced to improve
+scalability on very large parallel machines. It is has been tested on a 1000
+process job.
+<p>Zoom in / Zoom out on process icons allows more processes to be 
+displayed in the Machines view of the Parallel Debug Perspective;
+a similar zoom in/out is available in the Parallel Runtime Perspective's views.
+<br><img src="images/zoom1ann.gif">
+<br><img src="images/zoom2ann.gif">
+<br><img src="images/zoom3ann.gif">
+<p>Similar zooming is available in the Machines view of the Runtime Perspective.
+<br><img src="images/zoom1runtimeCrop.gif">
+<br><img src="images/zoom2runtimeCrop.gif">
+<br><img src="images/zoom3runtimeCrop.gif">
+</td>
+  </tr>
+
+  <tr> 
+    <td colspan="2"> <hr /> </td>
+  </tr>
+  <tr> 
+    <td width="30%" valign="top" align="left"><b>Debugger UI Features and Performance</b></td>
+    <td width="70%" valign="top">Improvements have been made to how
+variables are fetched and displayed in the UI in order to improve
+performance. 
+<p>If you open the PTP Variable View (Window -> Show View -> Other)
+you can add a variable. 
+<br>
+<img src="images/ptpVarAdd1.png"> 
+<p>The following PTP Variable Dialog allows you to select a variable or expression,
+and a process set (use Root for all processes) for which to create the variable to watch for each process.
+<br>
+<img src="images/ptpVarAdd.png">
+<p>
+Then when you mouse over a process icon in the
+Parallel Debug view, it will show the value of the variable in the tooltip.
+<br>
+<img src="images/ptpVarDisplay.png">
+</td>
+  </tr>
+
+  <tr> 
+    <td colspan="2"> <hr /> </td>
+  </tr>
+  <tr> 
+    <td width="30%" valign="top" align="left"><b>MPICH2 Runtime</b></td>
+    <td width="70%" valign="top">Support for the MPICH2 runtime has been added.
+This allows programs compiled with the MPICH2 runtime to be
+launched using PTP. Debugging is not supported yet. </td>
+  </tr>
+  <tr> 
+    <td colspan="2"> <hr /> </td>
+
+  </tr>
+    <tr> 
+    <td width="30%" valign="top" align="left"><b>Build improvements</b></td>
+    <td width="70%" valign="top">PTP supports a large range of
+machine architectures, operating systems and parallel runtime
+systems.
+In 1.1, dynamically linked executables have  been deprecated, and
+build scripts have been improved so this only requires one command
+for PTP installation.
+
+</td>
+  </tr>
+    <tr> 
+    <td colspan="2"> <hr /> </td>
+  <tr> 
+    <td width="30%" valign="top" align="left"><b>PTP 1.1 Release Notes</b></td>
+    <td width="70%" valign="top">Detailed PTP 1.1 release notes are available
+    	at <a href="http://www.eclipse.org/ptp/docs/releases/release-1.1.php">
+    	http://www.eclipse.org/ptp/docs/releases/release-1.1.php</a>
+     </td>
+  </tr>
+  <tr> 
+    <td colspan="2"> <hr /> </td>
+  </tr>
+
+
+  
+  
+  
+ 
+</table>
+
+
+
+<p><a href="#top">Back to Top</a> | <a href="toc.html">Back to Table of Contents</a>
+
+</body>
+</html>
