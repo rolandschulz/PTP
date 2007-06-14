@@ -11,21 +11,26 @@
 package org.eclipse.ptp.pldt.openmp.analysis.textview;
 
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Set;
 
 import org.eclipse.cdt.core.dom.ast.IASTNode;
 import org.eclipse.cdt.internal.ui.editor.CEditor;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
+import org.eclipse.ptp.pldt.common.util.Utility;
 import org.eclipse.ptp.pldt.openmp.analysis.OpenMPAnalysisManager;
-import org.eclipse.ptp.pldt.openmp.analysis.Utility;
+import org.eclipse.ptp.pldt.openmp.analysis.OpenMpIDs;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.ui.IEditorActionDelegate;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.actions.ActionDelegate;
 
@@ -112,7 +117,17 @@ public class ShowConcurrencyAction extends ActionDelegate
         }
         //String f1 = oam.getTU().getFilePath();
         //String f2 = editor_.getInputFile().getLocation().toOSString();
-        if (!oam.getTU().getFilePath().equals(editor_.getInputFile().getLocation().toOSString())) {
+        IEditorInput ieu = editor_.getEditorInput();
+        IFile inputFile=null;
+        if(ieu instanceof IFileEditorInput){
+        	inputFile = ((IFileEditorInput)ieu).getFile();//cdt40
+        }
+        else{
+        	showMessage(TITLE, "Cannot locate file in editor");//cdt40
+        	return;
+        }
+
+        if (!oam.getTU().getFilePath().equals(inputFile.getLocation().toOSString())) {//cdt40
             showMessage(TITLE, "OpenMP analysis required on editor file");
             return;
         }
@@ -128,19 +143,19 @@ public class ShowConcurrencyAction extends ActionDelegate
             return;
         }
         
-        Utility.removeConcurrencyMarkers(editor_.getDocumentProvider().getAnnotationModel(editor_.getEditorInput()));
+        removeConcurrencyMarkers(editor_.getDocumentProvider().getAnnotationModel(editor_.getEditorInput()));
         
         Set cSet = oam.getNodesConcurrentTo(node);
         
         // Display all concurrent statements
         for(Iterator i=cSet.iterator(); i.hasNext();) {
             IASTNode n = (IASTNode)i.next();
-            showNode(n, Utility.ConcurrencyType);
+            showNode(n, OpenMpIDs.ConcurrencyType);
         }
         
         // If node is not concurrent to itself, we adopt a different marker color
         if (!cSet.contains(node))
-           showNode(node, Utility.NonConcurrencyType); 
+           showNode(node, OpenMpIDs.NonConcurrencyType); 
         
         // select the key stmt
         Utility.Location l = Utility.getLocation(node);
@@ -167,6 +182,22 @@ public class ShowConcurrencyAction extends ActionDelegate
         am.addAnnotation(a, p);
         
         //System.out.println("annotate node="+node.getClass().toString()+" begin="+l.low_+" end="+end);
+    }
+    
+    /**
+     * remove the concurrency markers from the screen
+     * @param am - IAnnotationModel
+     */
+    public static void removeConcurrencyMarkers(IAnnotationModel am)
+    {
+        LinkedList ais = new LinkedList();
+        for(Iterator ai=am.getAnnotationIterator(); ai.hasNext();) { ais.add(ai.next()); }
+        for(Iterator it=ais.iterator(); it.hasNext();) {
+            Annotation a = (Annotation)it.next();
+            if (a.getType().equals(OpenMpIDs.ConcurrencyType) || a.getType().equals(OpenMpIDs.NonConcurrencyType)) {
+                am.removeAnnotation(a);
+            }
+        }
     }
 
 }
