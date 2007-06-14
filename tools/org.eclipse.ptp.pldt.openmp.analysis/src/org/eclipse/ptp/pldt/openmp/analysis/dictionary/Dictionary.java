@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2006 IBM Corporation.
+ * Copyright (c) 2006,2007 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,6 +21,7 @@ import org.eclipse.cdt.core.dom.ast.IASTNode;
 import org.eclipse.cdt.core.dom.ast.IASTParameterDeclaration;
 import org.eclipse.cdt.core.dom.ast.IASTSimpleDeclaration;
 import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit;
+import org.eclipse.cdt.core.dom.ast.IBinding;
 import org.eclipse.cdt.core.dom.ast.IScope;
 
 
@@ -197,7 +198,8 @@ public class Dictionary
             //   IType t = biv.getType();
             //   t=null;
             //}
-            scopeKey_ = nameNode.getBinding().getScope();
+            IBinding binding=nameNode.resolveBinding();//cdt40 fix: was getBinding(); could have been null
+            scopeKey_ = binding.getScope();
         }
         
         /**
