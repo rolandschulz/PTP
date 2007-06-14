@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2006 IBM Corporation.
+ * Copyright (c) 2006,2007 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,6 +20,7 @@ import org.eclipse.cdt.core.dom.ast.IASTPreprocessorStatement;
 import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.ptp.pldt.common.util.Utility;
 import org.eclipse.ptp.pldt.openmp.analysis.PAST.PASTElif;
 import org.eclipse.ptp.pldt.openmp.analysis.PAST.PASTElse;
 import org.eclipse.ptp.pldt.openmp.analysis.PAST.PASTEndif;
