@@ -36,8 +36,8 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ptp.core.elements.IPElement;
-import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.internal.ui.adapters.PropertyAdapterFactory;
+import org.eclipse.ptp.internal.ui.adapters.WorkbenchAdapterAdapterFactory;
 import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
 import org.eclipse.ptp.ui.managers.AbstractUIManager;
 import org.eclipse.ptp.ui.managers.JobManager;
@@ -82,7 +82,9 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 	private void registerAdapterFactories() {
 		IAdapterManager manager = Platform.getAdapterManager();
 		IAdapterFactory factory = new PropertyAdapterFactory();
-		manager.registerAdapters(factory, IResourceManager.class);
+		//manager.registerAdapters(factory, IResourceManager.class);
+		manager.registerAdapters(factory, IPElement.class);
+		factory = new WorkbenchAdapterAdapterFactory();
 		manager.registerAdapters(factory, IPElement.class);
 	}
 	
