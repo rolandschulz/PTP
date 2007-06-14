@@ -5,9 +5,10 @@ PTP Parallel Language Development Tools
 </title>
 <body>
 <h1> <img src="images/mpiLg.gif">PTP Parallel Language Development Tools </h1>
-<p>Version 1.1
-<p>The PTP Parallel Language Development Tools Eclipse plug-in provides
+<p>Version 2.0, June 2007
+<p>The PTP Parallel Language Development Tools provide
 tools to aid in MPI Programming and other parallel languages and tools.
+<br>Features of the PLDT include:
 <ul>
 <li>Analysis of C and C++ code to determine the location of MPI and OpenMP Artifacts
 <li>"Artifact View" indicates locations of Artifacts found
@@ -16,20 +17,24 @@ in source code
 <li>Reference information about the MPI and OpenMP calls via F1 (Cntl-F1 on Linux; Help key on Mac)
 <li>Content assist via Cntl-Space
 <li>Hover help 
-<p>The newest features include:
+
 <li>OpenMP problems view of common errors, OpenMP "show #pragma region" action,
 OpenMP "Show Concurrency" action.
-<li>CDT "New Managed Make C Project" wizard includes a new wizard page that can 
+<li>CDT "New C Project" wizard includes a  wizard page that can 
 automatically add in the include paths etc. for MPI projects.
+
+<p>The newest features (2.0) include:
+<li>MPI Barrier Analysis detects potential deadlocks in MPI applications
+<li>New project wizard can include a sample MPI source file.
 </ul>
 <h2>
 Pre-requisites:
 </h2>
-<p>This plug-in requires the base Eclipse platform, the CDT, and MPI and/or OpenMP.
+<p>PLDT requires the base Eclipse platform, the CDT, and MPI and/or OpenMP.
 <ul>
-<li><b>Eclipse</b> platform: Version  3.2 or later
+<li><b>Eclipse</b> platform: Version  3.3 or later
 <li><b>CDT:</b>
-Version 3.1 or later for C/C++ files.  (Wherever CDT is mentioned, Photran projects and files,
+Version 4.0 or later for C/C++ files.  (Wherever CDT is mentioned, Photran projects and files,
 for C/C++, should also work)
 
 <li><b>MPI:</b>
@@ -51,12 +56,14 @@ Just the header files are required in order to know which "artifacts" should
 be located.
 <p>To run the core part of PTP (Parallel Tools Platform, <a href="http://eclipse.org/ptp">http://eclipse.org/ptp</a>,
 to run and debug parallel programs), you need whatever runtime it requires.  Currently 
-(November 2006) this is OpenMPI, which is available for Linux and Mac Only.  
+(2.0, June 2007) this is OpenMPI, which is available for Linux and Mac Only.  
 But for PLDT, this is not required, and PLDT will work
 on Windows as well.
 
 
 <h2>Help Topics</h2>
+<p><a href="http://www.eclipse.org/ptp/docs/install.html">Basic instructions on installing Eclipse, CDT, PTP, and PLDT</a>
+from the Eclipse PTP web site.
 <p>The following instructions describe setup and run information.
 <h3>MPI</h3>
 <ul><li>
