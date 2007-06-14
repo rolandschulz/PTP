@@ -26,9 +26,6 @@
                menubarPath="openMPMenu/openMPGroup"
                toolbarPath="openMPToolbarGroup"
                id="org.eclipse.ptp.pldt.openmp.core.actions.RemoveMarkerAction">
-            <selection
-                  class="org.eclipse.core.resources.IProject">
-            </selection>
          </action>
          <action
                label="%run.label"
