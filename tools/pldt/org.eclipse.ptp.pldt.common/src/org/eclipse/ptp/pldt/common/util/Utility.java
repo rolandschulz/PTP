@@ -34,7 +34,7 @@ import org.eclipse.ui.ide.ResourceUtil;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 /**
- * Various function/methods of use
+ * Various function/methods of use, Originally in OpenMP analysis but used more generally now
  * 
  * @author pazel
  *
@@ -42,9 +42,6 @@ import org.eclipse.ui.texteditor.ITextEditor;
 public class Utility
 {
     
-    // These are the marker types used for showing concurrency and non-concurrency
-    public static final String ConcurrencyType = "org.eclipse.ptp.pldt.openmp.analysis.concurrency";
-    public static final String NonConcurrencyType = "org.eclipse.ptp.pldt.openmp.analysis.nonconcurrency";
     
     /**
      * compute the location relative to file, ignoring includes
@@ -93,21 +90,7 @@ public class Utility
         public int getHigh() { return high_; }
     }
     
-    /**
-     * remove the concurrency markers from the screen
-     * @param am - IAnnotationModel
-     */
-    public static void removeConcurrencyMarkers(IAnnotationModel am)
-    {
-        LinkedList ais = new LinkedList();
-        for(Iterator ai=am.getAnnotationIterator(); ai.hasNext();) { ais.add(ai.next()); }
-        for(Iterator it=ais.iterator(); it.hasNext();) {
-            Annotation a = (Annotation)it.next();
-            if (a.getType().equals(Utility.ConcurrencyType) || a.getType().equals(Utility.NonConcurrencyType)) {
-                am.removeAnnotation(a);
-            }
-        }
-    }
+ 
     
     /**
      * get document using full path name
