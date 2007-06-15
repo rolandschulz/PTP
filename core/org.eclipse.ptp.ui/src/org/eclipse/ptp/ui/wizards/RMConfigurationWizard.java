@@ -39,7 +39,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Text;
@@ -59,24 +58,48 @@ public class RMConfigurationWizard extends Wizard {
 		}
 
 		public void createControl(Composite parent) {
-			Group mainGroup = new Group(parent, SWT.NONE);
-			mainGroup.setLayout(new GridLayout(1, false));
-			mainGroup.setText(UIMessage.getResourceString("ConfigurationWizard.HeadLabel")); //$NON-NLS-1$
+	        Composite composite = new Composite(parent, SWT.NULL);
+	        composite.setFont(parent.getFont());
+	        composite.setLayout(new GridLayout());
+	        composite.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-			createNameDescControl(mainGroup);
+			createNameDescControl(composite);
 
 			final boolean textAndDescriptionEnabled = hasFactories;
 			nameText.setEnabled(textAndDescriptionEnabled);
 			descText.setEnabled(textAndDescriptionEnabled);
 
-			setControl(mainGroup);
+			setControl(composite);
 		}
 
-		private void createNameDescControl(Group mainGroup) {
-			Group nameGroup = new Group(mainGroup, SWT.NONE);
-			nameGroup.setLayout(new GridLayout(1, false));
+		private void createNameDescControl(Composite container) {
+
+			Composite nameGroup = new Composite(container, SWT.NONE);
+			GridLayout layout = new GridLayout();
+			layout.numColumns = 2;
+			nameGroup.setLayout(layout);
 			nameGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-			nameGroup.setText(UIMessage.getResourceString("ConfigurationWizard.NameDescriptiion")); //$NON-NLS-1$
+
+			final Button useDefaultsButton = new Button(nameGroup,
+					SWT.TOGGLE | SWT.CHECK);
+			useDefaultsButton.setText(UIMessage.getResourceString("ConfigurationWizard.UseDefaultButtonLabel")); //$NON-NLS-1$
+			useDefaultsButton.setSelection(useDefaultNameAndDesc);
+			GridData buttonData = new GridData();
+			buttonData.horizontalSpan = 2;
+			useDefaultsButton.setLayoutData(buttonData);
+			useDefaultsButton.addSelectionListener(new SelectionListener() {
+				public void widgetDefaultSelected(SelectionEvent e) {
+				}
+
+				public void widgetSelected(SelectionEvent e) {
+					useDefaultNameAndDesc = useDefaultsButton.getSelection();
+					final boolean enabled = hasFactories
+							&& !useDefaultNameAndDesc;
+					nameAndDescPage.setEnabled(enabled);
+					getContainer().updateButtons();
+				}
+			});
+			
 			Label nameLabel = new Label(nameGroup, SWT.NONE);
 			nameLabel.setText(UIMessage.getResourceString("ConfigurationWizard.NameLabel")); //$NON-NLS-1$
 			nameText = new Text(nameGroup, SWT.BORDER);
@@ -96,7 +119,8 @@ public class RMConfigurationWizard extends Wizard {
 				public void modifyText(ModifyEvent e) {
 					configs[selectedFactory].setDescription(descText.getText());
 				}});
-
+			
+			setPageComplete(true);
 		}
 
 		private void setEnabled(boolean enabled) {
@@ -122,11 +146,12 @@ public class RMConfigurationWizard extends Wizard {
 		}
 
 		public void createControl(Composite parent) {
-			Group mainGroup = new Group(parent, SWT.NONE);
-			mainGroup.setLayout(new GridLayout(1, false));
-			mainGroup.setText(UIMessage.getResourceString("ConfigurationWizard.HeadLabel")); //$NON-NLS-1$
-
-			createRMFactoryChoiceControl(mainGroup);
+	        Composite composite = new Composite(parent, SWT.NULL);
+	        composite.setFont(parent.getFont());
+	        composite.setLayout(new GridLayout());
+	        composite.setLayoutData(new GridData(GridData.FILL_BOTH));
+	        
+			createRMFactoryChoiceControl(composite);
 
 			if (hasFactories) {
 				parent.getDisplay().asyncExec(new Runnable() {
@@ -138,7 +163,7 @@ public class RMConfigurationWizard extends Wizard {
 				});
 			}
 
-			setControl(mainGroup);
+			setControl(composite);
 		}
 
 		private void createRMFactoryChoiceControl(Composite container) {
@@ -147,13 +172,9 @@ public class RMConfigurationWizard extends Wizard {
 				factoryNames[i] = factories[i].getName();
 			}
 
-			Group factoryGroup = new Group(container, SWT.NONE);
-			factoryGroup.setLayout(new GridLayout(1, false));
-			factoryGroup.setText(UIMessage.getResourceString("ConfigurationWizard.ChooseResourceManager")); //$NON-NLS-1$
-			factoryGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-			Label factoryLabel = new Label(factoryGroup, SWT.NONE);
+			Label factoryLabel = new Label(container, SWT.NONE);
 			factoryLabel.setText(UIMessage.getResourceString("ConfigurationWizard.ResourceManagerTypesLabel")); //$NON-NLS-1$
-			factoryList = new List(factoryGroup, SWT.SINGLE | SWT.BORDER
+			factoryList = new List(container, SWT.SINGLE | SWT.BORDER
 					| SWT.V_SCROLL);
 			factoryList.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 			factoryList.setItems(factoryNames);
@@ -165,23 +186,6 @@ public class RMConfigurationWizard extends Wizard {
 
 				public void widgetSelected(SelectionEvent e) {
 					handleFactorySeclection();
-				}
-			});
-
-			final Button useDefaultNameDescButton = new Button(container,
-					SWT.TOGGLE | SWT.CHECK);
-			useDefaultNameDescButton.setText(UIMessage.getResourceString("ConfigurationWizard.UseDefaultButtonLabel")); //$NON-NLS-1$
-			useDefaultNameDescButton.setSelection(false);
-			useDefaultNameDescButton.addSelectionListener(new SelectionListener() {
-				public void widgetDefaultSelected(SelectionEvent e) {
-				}
-
-				public void widgetSelected(SelectionEvent e) {
-					useDefaultNameAndDesc = useDefaultNameDescButton.getSelection();
-					final boolean enabled = hasFactories
-							&& !useDefaultNameAndDesc;
-					nameAndDescPage.setEnabled(enabled);
-					getContainer().updateButtons();
 				}
 			});
 		}
@@ -207,7 +211,9 @@ public class RMConfigurationWizard extends Wizard {
 
 	private IResourceManagerFactory resourceManagerFactory;
 
-	private boolean useDefaultNameAndDesc = false;
+	private boolean useDefaultNameAndDesc = true;
+	
+	private boolean useRemotePage = true;
 
 	private final NameAndDescPage nameAndDescPage;
 
@@ -223,7 +229,7 @@ public class RMConfigurationWizard extends Wizard {
 		this.selectFactoryPage = new SelectFactoryPage(
 				UIMessage.getResourceString("ConfigurationWizard.FirstWizardPageName")); //$NON-NLS-1$
 		this.nameAndDescPage = new NameAndDescPage(
-				UIMessage.getResourceString("ConfigurationWizard.LastWizardPageName")); //$NON-NLS-1$
+				UIMessage.getResourceString("ConfigurationWizard.SecondWizardPageName")); //$NON-NLS-1$
 	}
 
 	public void addPages() {
@@ -235,8 +241,6 @@ public class RMConfigurationWizard extends Wizard {
 	public boolean canFinish() {
 		if (!hasFactories)
 			return false;
-//		if (getNextPage(getContainer().getCurrentPage()) != null)
-//			return false;
 
 		int numPages = getNumPages();
 		for (int i = 0; i < numPages; ++i) {
@@ -300,17 +304,17 @@ public class RMConfigurationWizard extends Wizard {
 			configs[selectedFactory] = resourceManagerFactory.createConfiguration();
 		}
 		nameAndDescPage.setNameAndDescription(configs[selectedFactory]);
+		nameAndDescPage.setEnabled(!useDefaultNameAndDesc);
 
 		setWizardPages(selectedFactory);
 	}
 
 	private int getNumPages() {
-		return needsLastPage() ? wizardPages.size()	: wizardPages.size() - 1;
+		return needsRemotePage() ? wizardPages.size()	: wizardPages.size() - 1;
 	}
 
-	private boolean needsLastPage() {
-		// Don't need last page if we are using default name and description
-		return !useDefaultNameAndDesc;
+	private boolean needsRemotePage() {
+		return useRemotePage;
 	}
 
 	private void setWizardPages(int index) {
@@ -336,12 +340,12 @@ public class RMConfigurationWizard extends Wizard {
 			}
 		}
 
-		// add the first and last page to the selected factory's pages
+		// add the first and second pages to the selected factory's pages
 		
 		wizardPages.clear();
 		wizardPages.add(selectFactoryPage);
-		wizardPages.addAll(Arrays.asList(cachedPages[index]));
 		wizardPages.add(nameAndDescPage);
+		wizardPages.addAll(Arrays.asList(cachedPages[index]));
 	}
 
 }
