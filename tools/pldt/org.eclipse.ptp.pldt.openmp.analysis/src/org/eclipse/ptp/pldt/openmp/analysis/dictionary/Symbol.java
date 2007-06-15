@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.pldt.openmp.analysis.dictionary;
 
-import org.eclipse.cdt.core.dom.IName;
 import org.eclipse.cdt.core.dom.ast.DOMException;
 import org.eclipse.cdt.core.dom.ast.IASTDeclaration;
 import org.eclipse.cdt.core.dom.ast.IASTDeclarator;
@@ -21,11 +20,7 @@ import org.eclipse.cdt.core.dom.ast.IASTParameterDeclaration;
 import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit;
 import org.eclipse.cdt.core.dom.ast.IBinding;
 import org.eclipse.cdt.core.dom.ast.IScope;
-import org.eclipse.cdt.internal.core.dom.parser.c.CFunction;
-import org.eclipse.cdt.internal.core.dom.parser.c.CParameter;
-import org.eclipse.cdt.internal.core.dom.parser.c.CStructure;
-import org.eclipse.cdt.internal.core.dom.parser.c.CTypedef;
-import org.eclipse.cdt.internal.core.dom.parser.c.CVariable;
+import org.eclipse.cdt.internal.core.dom.parser.ASTInternal;
 
 /**
  * Holds a symbol definition
@@ -123,99 +118,32 @@ public class Symbol {
 		return scope;
 	}
 
-	/**
-	 * getDefiningFunction - get the function in which declarator is defined
-	 * 
-	 * @return IASTNode - either IASTTranslationUnit or IASTFunctionDefinition
-	 */
-
-	public IASTNode getDefiningFunction() {
-		IASTNode node = getPhysicalNode();// should it be scope's node?
-
-		// keep moving up the tree until we find the node
-		while (true) {
-			if (node == null)
-				return null;
-			if (node instanceof IASTTranslationUnit)
-				return node; // global dict
-			if (node instanceof IASTFunctionDefinition)
-				return node; // our function
-			node = node.getParent();
-		}
-	}
-
-	/**
-	 * get the physical node (IASTNode) that this symbol is contained in. <br>
-	 * (Formerly supplied by IScope.getPhysicalNode() )
-	 * Note: this isn't used, and doesn't work. Left here for possible future fixup.
-	 * PASTOMPFactory.isSymbolRelevant computes this differently now, using some
-	 * classes/packages with discouraged access, so it seems eventually it would be nice
-	 * to fix this to be "proper."
-	 * 
-	 * @return
-	 */
-	// @SuppressWarnings("restriction")
-	public IASTNode getPhysicalNode() {
-		IASTNode node = null;
-		IASTName name = declarator_.getName();
-		IASTNode parentNode=name.getParent();
-		boolean foo=true;
-		if(foo)
-			return parentNode;
-		
-		// Also retrievable from IScope (which was original question)
-		IScope scope = getScope();
-		IName sn;
-		try {
-			sn = scope.getScopeName();
-			if(sn instanceof IASTName){
-				name=(IASTName)sn; // this *should* be more accurate
-			}
-		} catch (DOMException e) {return null;}
-		
-		IBinding binding = name.resolveBinding();
-
-		// try to avoid discouraged access
-//		if(binding instanceof IFunction){
-//			IFunction func = (IFunction)binding;
-//			IASTTranslationUnit ast = declarator_.getTranslationUnit();
-//			IASTName[] defs=ast.getDefinitionsInAST(binding);
-//			IASTName def=defs[0];
-//			
-//		}
-		if (binding instanceof CFunction) {
-			CFunction cf = (CFunction) binding;
-			if (traceOn)
-				System.out.println("Symbol .. CFunction: " + cf.getName());
-
-
-			node = cf.getPhysicalNode();
-		} else if (binding instanceof CParameter) {
-			CParameter cp = (CParameter) binding;
-			if (traceOn)
-				System.out.println("Symbol .. CParameter: " + cp.getName());
-
-		} else if (binding instanceof CVariable) {
-			CVariable cv = (CVariable) binding;
-			if (traceOn)
-				System.out.println("Symbol .. CVariable: " + cv.getName());
-			node = cv.getPhysicalNode();
-		} else if (binding instanceof CTypedef) {
-			CTypedef ct = (CTypedef) binding;
-			if (traceOn)
-				System.out.println("Symbol .. CTypedef: " + ct.getName());
-			node = ct.getPhysicalNode();
-		} else if (binding instanceof CStructure) {
-			CStructure cs = (CStructure) binding;
-			if (traceOn)
-				System.out.println("Symbol .. CStructure: " + cs.getName());
-			node = cs.getPhysicalNode();
-		}else {// any other types I can get a physical node from???
-			System.out
-					.println("**\n**Symbol.getPhysicalNode(): Binding type unknown. is: "
-							+ binding);// ProblemBinding
-		}
-		//System.out.println("nodeSig: "+node.getRawSignature()+" name: "+name);
-		return node;
-	}
+    /**
+     * getDefiningFunction - get the function in which declartor is defined
+     * @return IASTNode - either IASTTranslationUnit or IASTFunctionDefinition
+     */
+    public IASTNode getDefiningFunction()
+    {
+        IScope scope = getScope();
+        
+        if (scope==null)  return null;
+        
+        IASTNode node = null;
+        try {
+            //node = scope.getPhysicalNode(); // cdt 3.1
+            node = ASTInternal.getPhysicalNodeOfScope(scope); // cdt40
+        }
+        catch(DOMException e) { 
+            System.out.println("Symbol.getDefiningFunction exception "+e);
+            return null;
+        }
+        
+        // keep moving up the tree until we find the node
+        while(true) {
+            if (node==null)  return null;
+            if (node instanceof IASTTranslationUnit) return node;      // global dict
+            if (node instanceof IASTFunctionDefinition)  return node;  // our function
+            node = node.getParent();
+        }
+    }
 }
