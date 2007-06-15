@@ -41,7 +41,6 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.util.Assert;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
@@ -418,7 +417,8 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 				parentID = ((Integer) marker.getAttribute(IDs.parentIDAttr))
 						.intValue();
 			} catch (CoreException e) {
-				e.printStackTrace();
+				System.out.println("Barrier SimpleTreeTableMarkerView.getParentID,  "+e.getMessage());
+				//e.printStackTrace();
 			}
 			return parentID;
 		}
