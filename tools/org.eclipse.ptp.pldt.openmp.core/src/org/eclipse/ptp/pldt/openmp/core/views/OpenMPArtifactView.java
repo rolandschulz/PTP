@@ -5,6 +5,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ptp.pldt.openmp.analysis.PAST.PASTOMPPragma;
@@ -69,9 +70,7 @@ public class OpenMPArtifactView extends SimpleTableView {
     protected void makeShowInfoAction()
     {
         infoAction = new Action() {
-            /* (non-Javadoc)
-             * @see org.eclipse.jface.action.IAction#run()
-             */
+
             /* (non-Javadoc)
              * @see org.eclipse.jface.action.IAction#run()
              */
@@ -80,6 +79,10 @@ public class OpenMPArtifactView extends SimpleTableView {
                 ISelection selection = viewer.getSelection();
                 Object obj = ((IStructuredSelection) selection).getFirstElement();
                 IMarker marker = (IMarker) obj;
+                if(marker==null){
+                	MessageDialog.openInformation(null, "No selection", "No artifact selected");
+                	return;
+                }
 
                 try {
                     Object o = artifactManager_.getArtifact((String)marker.getAttribute(IDs.ID));
