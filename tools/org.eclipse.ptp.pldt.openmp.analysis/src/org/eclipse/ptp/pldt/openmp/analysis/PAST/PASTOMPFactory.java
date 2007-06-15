@@ -25,6 +25,7 @@ import org.eclipse.cdt.core.dom.ast.IScope;
 import org.eclipse.cdt.core.parser.ISourceElementRequestor;
 import org.eclipse.cdt.core.parser.IToken;
 import org.eclipse.cdt.core.parser.NullSourceElementRequestor;
+import org.eclipse.cdt.internal.core.dom.parser.ASTInternal;
 import org.eclipse.cdt.internal.core.dom.parser.ASTNode;
 import org.eclipse.cdt.internal.core.dom.parser.c.CScope;
 import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPScope;
@@ -132,7 +133,7 @@ public class PASTOMPFactory
         // The first two tokens should be # and pragma
     	OpenMPToken tok=nextToken();
     	if(tok==null){
-    		System.out.println("PASTOMPFactory.parser()..null token, ignored.");
+    		if(traceOn)System.out.println("PASTOMPFactory.parser()..null token, ignored.");
     		return false; //robustly handle empty tokens
     	}
         if (tok.getType()!=OpenMPScanner.mpPound) return false;
@@ -318,18 +319,16 @@ public class PASTOMPFactory
         IASTNode parent,gp=null;
 		try {
 			// node=symbol.getScope().getPhysicalNode(); // no longer in CDT 4.0
-			// The following probably isn't an ideal solution (casting and using Discouraged access methods)
+			// BRT replacement for getPhysicalNode() for CDT 4.0
+			// The following probably isn't an ideal solution (using Discouraged access methods)
 			// but seems to work for now. 
 			// alternatively I tried implementing: symbol.getPhysicalNode() but could not get the same answer from there.
+			
 			IScope scope=symbol.getScope();
-			if(scope instanceof CScope){
-				CScope cScope = (CScope)scope;
-				node=cScope.getPhysicalNode();
-			}
-			else if(scope instanceof CPPScope){
-				CPPScope cppScope=(CPPScope)scope;
-				node = cppScope.getPhysicalNode();
-			}
+			// see: http://dev.eclipse.org/mhonarc/lists/cdt-dev/msg08653.html
+			// Another alternative would be to cast to CScope and do cScope.getPhysicalNode() from there.
+			node = ASTInternal.getPhysicalNodeOfScope(scope);
+
 		} catch (Exception e) {
 			return false;
 		}
