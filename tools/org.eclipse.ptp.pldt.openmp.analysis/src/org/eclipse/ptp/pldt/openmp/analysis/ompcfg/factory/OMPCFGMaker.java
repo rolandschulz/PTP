@@ -55,8 +55,8 @@ public class OMPCFGMaker extends ASTVisitor
     
     // These get passed down to each level - 
     //     pragmaRegionMap_ never changes
-    //     pragmaContext increases/decreases on encountering pragma statements
-    protected static Hashtable  pragmaRegionMap_   = null;  // maps IASTNode to pragam, if node is a pragma region
+    //     pragmaContext increases/decreases on encountering pragma statements 
+    protected static Hashtable  pragmaRegionMap_   = null;  // maps IASTNode to pragma, if node is a pragma region
     protected static Hashtable  pragmaLocationMap_ = null;  // maps IASTnode to list of pragmas that may immed. succeed it
     protected static Stack      pragmaContext_     = null;  // stack of pragma - indicating depth of OMP control
     
