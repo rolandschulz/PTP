@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2006,2007 IBM Corp. 
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     IBM Corp. - initial implementation
+ *******************************************************************************/
 package org.eclipse.ptp.pldt.openmp.ui.pv.views;
 
 
@@ -39,20 +49,7 @@ import org.eclipse.ptp.pldt.openmp.ui.pv.PvPlugin;
 import org.eclipse.ptp.pldt.openmp.ui.pv.views.ProblemMarkerAttrIds;
 
 /**
- * This sample class demonstrates how to plug-in a new
- * workbench view. The view shows data obtained from the
- * model. The sample creates a dummy model on the fly,
- * but a real implementation would connect to the model
- * available either in this or another plug-in (e.g. the workspace).
- * The view is connected to the model using a content provider.
- * <p>
- * The view uses a label provider to define how model
- * objects should be presented in the view. Each
- * view can present the same model objects using
- * different labels and icons, if needed. Alternatively,
- * a single label provider can be shared between views
- * in order to ensure that objects of the same type are
- * presented in the same way everywhere.
+ * OpenMP Problems View
  * <p>
  */
 
@@ -211,13 +208,6 @@ public class OpenMPProblemsView extends ViewPart {
 	}
 	class ViewLabelProvider extends LabelProvider implements ITableLabelProvider {
         private HashMap   iconHash = new HashMap();
-		//public Image getColumnImage(Object obj, int index) {
-		//	return getImage(obj);
-		//}
-		//public Image getImage(Object obj) {
-		//	return PlatformUI.getWorkbench().
-		//			getSharedImages().getImage(ISharedImages.IMG_OBJ_ELEMENT);
-		//}
         
         public Image getColumnImage(Object obj, int index)
         {
@@ -232,7 +222,6 @@ public class OpenMPProblemsView extends ViewPart {
         protected Image getCustomImage(Object obj)
         {
             // if we've already created one of this type of icon, reuse it.
-            // Note: use ImageRegistry instead?
             Image img = (Image) iconHash.get(iconName_);
             if (img == null) {
                 Path path= new Path(iconName_);
@@ -288,11 +277,6 @@ public class OpenMPProblemsView extends ViewPart {
                         return "";
                 }
             } catch (CoreException ce) {
-                // get this error 3x "Marker id: 999 not found." while deleting
-                // markers. why?
-                // Why is this even getting called, and why does it matter?
-                // String tmp = ce.getMessage();
-                // ce.printStackTrace();
                 return ("ViewLabelProvider.getColumnText error: "+ce);
             }
         }
@@ -464,26 +448,6 @@ public class OpenMPProblemsView extends ViewPart {
         private void showMarkerDeltaKind(IMarkerDelta delta3)
         {
 
-            // int mdKind = delta3.getKind();
-            //IMarker m = delta3.getMarker();
-
-            /*String kind = "UNKNOWN";
-            switch (delta3.getKind()) {
-                case IResourceDelta.ADDED:
-                    kind = "ADDED";
-                    break;
-                case IResourceDelta.CHANGED:
-                    kind = "CHANGED";
-                    break;
-                case IResourceDelta.REMOVED:
-                    kind = "REMOVED";
-                    break;
-                default:
-                    kind = "UNKNOWN";
-                    break;
-            }*/
-
-            //if (traceOn) System.out.println("    markerDeltaKind=" + kind);
             String mid = "", ml = "", mlpi = "";
             try {
                 // note: we're getting marker deltas on ALL markers,
