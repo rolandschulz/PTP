@@ -1,15 +1,23 @@
+/*******************************************************************************
+ * Copyright (c) 2006,2007 IBM Corp. 
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     IBM Corp. - initial implementation
+ *******************************************************************************/
 package org.eclipse.ptp.pldt.openmp.ui.pv.views;
-//*****************************************************************************
-//File Name: ProblemMarkerAttrIds
-//Function: Ids used in mapping for this marker
-//Author: Donald P Pazel
-//Created: Feb 1, 2006
-//*****************************************************************************
 
+
+/**
+ * IDs for OpenMP problem markers
+ */
 public class ProblemMarkerAttrIds
 {
     
-    // identifies the marker
+    /** identifies the OpenMP Error marker */
     public static final String MARKER_ERROR_ID       = "org.eclipse.ptp.pldt.openmp.ui.pv.openMPProblemMarker";
  
     
