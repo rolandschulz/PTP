@@ -131,7 +131,7 @@ public class ParallelLaunchConfigurationDelegate
 				
 				String dbgExtraArgs = store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_ARGS);
 				if (dbgExtraArgs.length() > 0) {
-					dbgArgs.addAll(Arrays.asList(dbgExtraArgs.split("")));
+					dbgArgs.addAll(Arrays.asList(dbgExtraArgs.split(" ")));
 				}
 				
 				verifyDebuggerPath(dbgFile);
