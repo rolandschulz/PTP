@@ -78,7 +78,9 @@ static void			(*EventCallback)(dbg_event *);
 static int			ServerExit;
 static int			Started;
 static struct bpmap	BPMap = { 0, 0, NULL };
+#if 0
 static struct varmap VARMap = { 0, 0, NULL };
+#endif
 static int			(*AsyncFunc)(void *) = NULL;
 static void *		AsyncFuncData;
 
