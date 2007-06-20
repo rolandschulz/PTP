@@ -44,6 +44,8 @@ extern void MICommandAddOption(MICommand *cmd, char *opt, char *arg);
 extern int MICommandCompleted(MICommand *cmd);
 extern int MICommandResultOK(MICommand *cmd);
 extern MIResultRecord *MICommandResult(MICommand *cmd);
+extern int MICommandResultClass(MICommand *cmd);
+extern char *MICommandResultErrorMessage(MICommand *cmd);
 extern void MICommandRegisterCallback(MICommand *cmd, void (*callback)(MIResultRecord *, void *), void *data);
 extern char *MICommandToString(MICommand *cmd);
 

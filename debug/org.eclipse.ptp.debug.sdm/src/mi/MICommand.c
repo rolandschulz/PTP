@@ -24,6 +24,7 @@
 #define MICOMMAND_OPT_SIZE	10
 
 #include "MICommand.h"
+#include "MIResult.h"
 
 MICommand *
 MICommandNew(char *command, int class)
@@ -106,6 +107,39 @@ MICommandResultOK(MICommand *cmd)
 		return 0;
 		
 	return cmd->output->rr->resultClass == cmd->expected_class;
+}
+
+int
+MICommandResultClass(MICommand *cmd)
+{
+	if (!cmd->completed || cmd->output == NULL || cmd->output->rr == NULL)
+		return MIResultRecordINVALID;
+
+	return cmd->output->rr->resultClass;
+}
+
+char *
+MICommandResultErrorMessage(MICommand *cmd)
+{
+	MIResult *	r;
+	MIString *	s;
+	char *		res = NULL;
+	
+	if (!cmd->completed || cmd->output == NULL || cmd->output->rr == NULL)
+		return NULL;
+
+	if (MICommandResultClass(cmd) != MIResultRecordERROR)
+		return NULL;
+	
+	for (SetList(cmd->output->rr->results); (r = (MIResult *)GetListElement(cmd->output->rr->results)) != NULL;) {
+		if (r->value != NULL) {	
+			s = MIValueToString(r->value);
+			res = strdup(MIStringToCString(s));
+			break;
+		}
+	}
+	
+	return res;
 }
 
 char *
