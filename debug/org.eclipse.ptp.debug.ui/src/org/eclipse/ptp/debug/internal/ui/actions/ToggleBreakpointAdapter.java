@@ -65,8 +65,11 @@ public class ToggleBreakpointAdapter implements IToggleBreakpointsTarget {
 	 * @see org.eclipse.debug.ui.actions.IToggleBreakpointsTarget#toggleLineBreakpoints(org.eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection)
 	 */
 	public void toggleLineBreakpoints(IWorkbenchPart part, ISelection selection) throws CoreException {
-		//if (!PTPDebugUIPlugin.isPTPDebugPerspective())
-			//return;
+		/**	FIXME
+		 * 	problem on 3.3 RC4 - AbstractRulerActionDelegate.run called twice, previously version double click action cannot fire this action.run
+		 */  
+		if (!PTPDebugUIPlugin.isPTPDebugPerspective())
+			return;
 		
 		String errorMessage = null;
 		if (part instanceof ITextEditor) {
