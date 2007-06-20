@@ -25,6 +25,7 @@
 #define _MIRESULT_H_
 
 #include "MIString.h"
+#include "MIValue.h"
 
 /**
  * GDB/MI result sematic (Variable=Value)
