@@ -185,7 +185,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	private final static int ATTR_MIN_LEN = 5;
 	protected IProxyRuntimeClient proxy = null;
 	private AttributeDefinitionManager attrDefManager;
-	private Integer jobSubId = 0;
+	private int jobSubIdCount = 0;
 	private Map<String, AttributeManager> jobSubs = Collections.synchronizedMap(new HashMap<String, AttributeManager>());
 
 	public AbstractProxyRuntimeSystem(IProxyRuntimeClient proxy, AttributeDefinitionManager manager) {
@@ -644,12 +644,12 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 			 * Add the job submission ID to the attributes. This is done here to force the
 			 * use of the ID.
 			 */
-			Integer id = getJobSubmissionID();
-			StringAttribute jobSubAttr = JobAttributes.getSubIdAttributeDefinition().create(id.toString());
+			String id = getJobSubmissionID();
+			StringAttribute jobSubAttr = JobAttributes.getSubIdAttributeDefinition().create(id);
 			attrMgr.addAttribute(jobSubAttr);
 			proxy.submitJob(attrMgr.toStringArray());
-			jobSubs.put(id.toString(), attrMgr);
-			return id.toString();
+			jobSubs.put(id, attrMgr);
+			return id;
 		} catch(IOException e) {
 			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, 
 				"Control system is shut down, proxy exception.  The proxy may have crashed or been killed.", null));
@@ -911,7 +911,8 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 		}
 	}
 
-	private Integer getJobSubmissionID() {
-		return jobSubId++;
+	private String getJobSubmissionID() {
+		long time = System.currentTimeMillis();
+		return "JOB_" + Long.toString(time) + Integer.toString(jobSubIdCount++);
 	}
 }
