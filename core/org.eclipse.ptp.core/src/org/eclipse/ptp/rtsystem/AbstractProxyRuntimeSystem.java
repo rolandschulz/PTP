@@ -787,7 +787,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "Bad proxy event: could not convert attrs to double"));
 			}
 		} else if (attrType.equals("DATE")) {
-			if (end - pos >= 2) {
+			if (end - pos > 2) {
 				try {
 					int dateStyle = toDateStyle(attrs[pos++]);
 					int timeStyle = toDateStyle(attrs[pos++]);
@@ -796,7 +796,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 					DateFormat fmt = DateFormat.getDateTimeInstance(dateStyle, timeStyle, locale);
 					Date defVal = fmt.parse(attrDefault);
 					
-					if (end - pos >= 1) {
+					if (end - pos > 1) {
 						Date min = fmt.parse(attrs[pos++]);
 						Date max = fmt.parse(attrs[pos++]);
 						attrDef = attrDefManager.createDateAttributeDefinition(attrId, attrName, attrDesc, defVal, fmt, min, max);
@@ -814,7 +814,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 		} else if (attrType.equals("DOUBLE")) {
 			try {
 				Double defVal = Double.parseDouble(attrDefault);
-				if (end - pos >= 1) {
+				if (end - pos > 1) {
 						Double min = Double.parseDouble(attrs[pos++]);
 						Double max = Double.parseDouble(attrs[pos++]);
 						attrDef = attrDefManager.createDoubleAttributeDefinition(attrId, attrName, attrDesc, defVal, min, max);
@@ -827,24 +827,20 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "Bad proxy event: could not create attribute definition"));					
 			}
 		} else if (attrType.equals("ENUMERATED")) {
-			if (pos != end) {
-				ArrayList<String> values = new ArrayList<String>();
-				while (pos < end) {
-					values.add(attrs[pos++]);
-				}
-				try {
-					attrDef = attrDefManager.createStringSetAttributeDefinition(attrId, attrName,
-							attrDesc, attrDefault, values.toArray(new String[values.size()]));
-				} catch (IllegalValueException ex) {
-					fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "Bad proxy event: could not create attribute definition"));					
-				}
-			} else {
-				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "Bad proxy event: no enumerated values"));	
+			ArrayList<String> values = new ArrayList<String>();
+			while (pos <= end) {
+				values.add(attrs[pos++]);
+			}
+			try {
+				attrDef = attrDefManager.createStringSetAttributeDefinition(attrId, attrName,
+						attrDesc, attrDefault, values.toArray(new String[values.size()]));
+			} catch (IllegalValueException ex) {
+				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "Bad proxy event: could not create attribute definition"));					
 			}
 		} else if (attrType.equals("INTEGER")) {
 			try {
 				Integer defVal = Integer.parseInt(attrDefault);
-				if (end - pos >= 1) {
+				if (end - pos > 1) {
 						Integer min = Integer.parseInt(attrs[pos++]);
 						Integer max = Integer.parseInt(attrs[pos++]);
 						attrDef = attrDefManager.createIntegerAttributeDefinition(attrId, attrName, attrDesc, defVal, min, max);
