@@ -253,6 +253,7 @@ AddBPMap(int local, int remote, int temp)
 			map->local = local;
 			map->temp = temp;
 			BPMap.nels++;
+			break;
 		}
 	}
 }
@@ -262,14 +263,14 @@ RemoveBPMap(bpentry *bp)
 {
 	int				i;
 	struct bpentry *	map;
-	for (i = 0; i < BPMap.nels; i++) {
+	for (i = 0; i < BPMap.size; i++) {
 		map = &BPMap.maps[i];
 		if (map == bp) {
 			map->remote = -1;
 			map->local = -1;
 			map->temp = 0;
 			BPMap.nels--;
-			return;
+			break;
 		}
 	}		
 }
@@ -279,7 +280,7 @@ FindLocalBP(int local)
 {
 	int				i;
 	struct bpentry *	map;
-	for (i = 0; i < BPMap.nels; i++) {
+	for (i = 0; i < BPMap.size; i++) {
 		map = &BPMap.maps[i];
 		if (map->local == local) {
 			return map;
@@ -293,7 +294,7 @@ FindRemoteBP(int remote)
 {
 	int				i;
 	struct bpentry *	map;
-	for (i = 0; i < BPMap.nels; i++) {
+	for (i = 0; i < BPMap.size; i++) {
 		map = &BPMap.maps[i];
 		if (map->remote == remote) {
 			return map;
@@ -307,7 +308,7 @@ RemoveAllBPMap()
 {
 	int				i;
 	struct bpentry *	map;
-	int length = BPMap.nels;
+	int length = BPMap.size;
 	for (i = 0; i < length; i++) {
 		map = &BPMap.maps[i];
 		if (map == NULL)
@@ -1535,7 +1536,7 @@ CurrentFrame(int level, char *name)
 	List *		frames;
 	int val = 0;
 	
-	if (GDB_Version > 6.3 && GDB_Version < 6.6) {
+	if (GDB_Version >= 6.3 && GDB_Version < 6.7) {
 		cmd = MIStackListFrames(level, level);
 		SendCommandWait(DebugSession, cmd);
 		if (!MICommandResultOK(cmd)) {
