@@ -392,6 +392,7 @@ AddVARMap(char *name, MIVar *mivar)
 			map->name = strdup(name);
 			map->mivar = mivar;
 			VARMap.nels++;
+			break;
 		}
 	}
 }
@@ -401,7 +402,7 @@ FindVARByName(char *name)
 {
 	int	i;
 	struct varinfo *map;
-	for (i=0; i<VARMap.nels; i++) {
+	for (i=0; i<VARMap.size; i++) {
 		map = &VARMap.maps[i];
 		if (map != NULL && strcmp(map->name, name) == 0) {
 			return map;
@@ -415,7 +416,7 @@ FindVARByMIName(char *mi_name)
 {
 	int i;
 	struct varinfo *map;
-	for (i=0; i<VARMap.nels; i++) {
+	for (i=0; i<VARMap.size; i++) {
 		map = &VARMap.maps[i];
 		if (map != NULL && strcmp(map->mivar->name, mi_name) == 0) {
 			return map;
@@ -423,7 +424,6 @@ FindVARByMIName(char *mi_name)
 	}
 	return NULL;
 }
-#endif
 
 static void
 RemoveVARMap(varinfo *map)
@@ -442,7 +442,6 @@ RemoveVARMap(varinfo *map)
 	}
 }
 
-#if 0
 static void
 RemoveVARMapByName(char *name)
 {
@@ -458,14 +457,13 @@ RemoveVARMapByMIName(char *mi_name)
 	map = FindVARByMIName(mi_name);
 	RemoveVARMap(map);
 }
-#endif
 
 static void
 RemoveAllVARMap()
 {
 	int				i;
 	struct varinfo *map;
-	int length = VARMap.nels;
+	int length = VARMap.size;
 	for (i = 0; i < length; i++) {
 		map = &VARMap.maps[i];
 		if (map == NULL)
@@ -474,14 +472,32 @@ RemoveAllVARMap()
 		RemoveVARMap(map);
 	}	
 }
+#endif
 
 static void
 RemoveAllMaps()
 {
 	RemoveAllBPMap();
+#if 0
 	RemoveAllVARMap();
+#endif
 }
 
+static void 
+SetDebugError(MICommand * cmd)
+{
+	if (MICommandResultClass(cmd) == MIResultRecordERROR) {
+		char *err = MICommandResultErrorMessage(cmd);
+		if (err != NULL) {
+			DbgSetError(DBGERR_DEBUGGER, err);
+			free(err);
+		} else {
+			DbgSetError(DBGERR_DEBUGGER, "got error from gdb, but no message");				
+		}
+	} else {
+		DbgSetError(DBGERR_DEBUGGER, "bad response from gdb");
+	}
+}
 static List * 
 GetChangedVariables()
 {
@@ -494,17 +510,7 @@ GetChangedVariables()
 	SendCommandWait(DebugSession, cmd);
 	if (!MICommandResultOK(cmd)) {
 		DEBUG_PRINTS(DEBUG_LEVEL_BACKEND, "------------------- GetChangedVariables error\n");
-		if (MICommandResultClass(cmd) == MIResultRecordERROR) {
-			char *err = MICommandResultErrorMessage(cmd);
-			if (err != NULL) {
-				DbgSetError(DBGERR_DEBUGGER, err);
-				free(err);
-			} else {
-				DbgSetError(DBGERR_DEBUGGER, "got error from gdb, but no message");				
-			}
-		} else {
-			DbgSetError(DBGERR_DEBUGGER, "bad response from gdb");
-		}
+		SetDebugError(cmd);
 		MICommandFree(cmd);
 		return NULL;
 	}
@@ -962,17 +968,7 @@ GDBMIDeleteBreakpoint(int bpid)
 	SendCommandWait(DebugSession, cmd);
 	
 	if (!MICommandResultOK(cmd)) {
-		if (MICommandResultClass(cmd) == MIResultRecordERROR) {
-			char *err = MICommandResultErrorMessage(cmd);
-			if (err != NULL) {
-				DbgSetError(DBGERR_DEBUGGER, err);
-				free(err);
-			} else {
-				DbgSetError(DBGERR_DEBUGGER, "got error from gdb, but no message");				
-			}
-		} else {
-			DbgSetError(DBGERR_DEBUGGER, "bad response from gdb");
-		}
+		SetDebugError(cmd);
 		MICommandFree(cmd);
 		return DBGRES_ERR;
 	}
@@ -1007,17 +1003,7 @@ GDBMIEnableBreakpoint(int bpid)
 	SendCommandWait(DebugSession, cmd);
 	
 	if (!MICommandResultOK(cmd)) {
-		if (MICommandResultClass(cmd) == MIResultRecordERROR) {
-			char *err = MICommandResultErrorMessage(cmd);
-			if (err != NULL) {
-				DbgSetError(DBGERR_DEBUGGER, err);
-				free(err);
-			} else {
-				DbgSetError(DBGERR_DEBUGGER, "got error from gdb, but no message");				
-			}
-		} else {
-			DbgSetError(DBGERR_DEBUGGER, "bad response from gdb");
-		}
+		SetDebugError(cmd);
 		MICommandFree(cmd);
 		return DBGRES_ERR;
 	}
@@ -1048,17 +1034,7 @@ GDBMIDisableBreakpoint(int bpid)
 	SendCommandWait(DebugSession, cmd);
 	
 	if (!MICommandResultOK(cmd)) {
-		if (MICommandResultClass(cmd) == MIResultRecordERROR) {
-			char *err = MICommandResultErrorMessage(cmd);
-			if (err != NULL) {
-				DbgSetError(DBGERR_DEBUGGER, err);
-				free(err);
-			} else {
-				DbgSetError(DBGERR_DEBUGGER, "got error from gdb, but no message");				
-			}
-		} else {
-			DbgSetError(DBGERR_DEBUGGER, "bad response from gdb");
-		}
+		SetDebugError(cmd);
 		MICommandFree(cmd);
 		return DBGRES_ERR;
 	}
@@ -1089,17 +1065,7 @@ GDBMIConditionBreakpoint(int bpid, char *expr)
 	SendCommandWait(DebugSession, cmd);
 	
 	if (!MICommandResultOK(cmd)) {
-		if (MICommandResultClass(cmd) == MIResultRecordERROR) {
-			char *err = MICommandResultErrorMessage(cmd);
-			if (err != NULL) {
-				DbgSetError(DBGERR_DEBUGGER, err);
-				free(err);
-			} else {
-				DbgSetError(DBGERR_DEBUGGER, "got error from gdb, but no message");				
-			}
-		} else {
-			DbgSetError(DBGERR_DEBUGGER, "bad response from gdb");
-		}
+		SetDebugError(cmd);
 		MICommandFree(cmd);
 		return DBGRES_ERR;
 	}
@@ -1130,17 +1096,7 @@ GDBMIBreakpointAfter(int bpid, int icount)
 	SendCommandWait(DebugSession, cmd);
 	
 	if (!MICommandResultOK(cmd)) {
-		if (MICommandResultClass(cmd) == MIResultRecordERROR) {
-			char *err = MICommandResultErrorMessage(cmd);
-			if (err != NULL) {
-				DbgSetError(DBGERR_DEBUGGER, err);
-				free(err);
-			} else {
-				DbgSetError(DBGERR_DEBUGGER, "got error from gdb, but no message");				
-			}
-		} else {
-			DbgSetError(DBGERR_DEBUGGER, "bad response from gdb");
-		}
+		SetDebugError(cmd);
 		MICommandFree(cmd);
 		return DBGRES_ERR;
 	}
@@ -1167,17 +1123,7 @@ GDBMIWatchpoint(int bpid, char *expr, int isAccess, int isRead, char *condition,
 	SendCommandWait(DebugSession, cmd);
 
 	if (!MICommandResultOK(cmd)) {
-		if (MICommandResultClass(cmd) == MIResultRecordERROR) {
-			char *err = MICommandResultErrorMessage(cmd);
-			if (err != NULL) {
-				DbgSetError(DBGERR_DEBUGGER, err);
-				free(err);
-			} else {
-				DbgSetError(DBGERR_DEBUGGER, "got error from gdb, but no message");				
-			}
-		} else {
-			DbgSetError(DBGERR_DEBUGGER, "bad response from gdb");
-		}
+		SetDebugError(cmd);
 		MICommandFree(cmd);
 		return DBGRES_ERR;
 	}
@@ -1237,17 +1183,7 @@ GDBMIGo(void)
 
 	SendCommandWait(DebugSession, cmd);
 	if (!MICommandResultOK(cmd)) {
-		if (MICommandResultClass(cmd) == MIResultRecordERROR) {
-			char *err = MICommandResultErrorMessage(cmd);
-			if (err != NULL) {
-				DbgSetError(DBGERR_DEBUGGER, err);
-				free(err);
-			} else {
-				DbgSetError(DBGERR_DEBUGGER, "got error from gdb, but no message");				
-			}
-		} else {
-			DbgSetError(DBGERR_DEBUGGER, "bad response from gdb");
-		}
+		SetDebugError(cmd);
 		MICommandFree(cmd);
 		return DBGRES_ERR;
 	}
@@ -1292,17 +1228,7 @@ GDBMIStep(int count, int type)
 	SendCommandWait(DebugSession, cmd);
 	
 	if (!MICommandResultOK(cmd)) {
-		if (MICommandResultClass(cmd) == MIResultRecordERROR) {
-			char *err = MICommandResultErrorMessage(cmd);
-			if (err != NULL) {
-				DbgSetError(DBGERR_DEBUGGER, err);
-				free(err);
-			} else {
-				DbgSetError(DBGERR_DEBUGGER, "got error from gdb, but no message");				
-			}
-		} else {
-			DbgSetError(DBGERR_DEBUGGER, "bad response from gdb");
-		}
+		SetDebugError(cmd);
 		MICommandFree(cmd);
 		return DBGRES_ERR;
 	}
@@ -1327,17 +1253,7 @@ GDBMITerminate(void)
 	SendCommandWait(DebugSession, cmd);
 	
 	if (!MICommandResultOK(cmd)) {
-		if (MICommandResultClass(cmd) == MIResultRecordERROR) {
-			char *err = MICommandResultErrorMessage(cmd);
-			if (err != NULL) {
-				DbgSetError(DBGERR_DEBUGGER, err);
-				free(err);
-			} else {
-				DbgSetError(DBGERR_DEBUGGER, "got error from gdb, but no message");				
-			}
-		} else {
-			DbgSetError(DBGERR_DEBUGGER, "bad response from gdb");
-		}
+		SetDebugError(cmd);
 		MICommandFree(cmd);
 		return DBGRES_ERR;
 	}
@@ -1403,17 +1319,7 @@ GDBMISetCurrentStackframe(int level)
 	SendCommandWait(DebugSession, cmd);
 	
 	if (!MICommandResultOK(cmd)) {
-		if (MICommandResultClass(cmd) == MIResultRecordERROR) {
-			char *err = MICommandResultErrorMessage(cmd);
-			if (err != NULL) {
-				DbgSetError(DBGERR_DEBUGGER, err);
-				free(err);
-			} else {
-				DbgSetError(DBGERR_DEBUGGER, "got error from gdb, but no message");				
-			}
-		} else {
-			DbgSetError(DBGERR_DEBUGGER, "bad response from gdb");
-		}
+		SetDebugError(cmd);
 		MICommandFree(cmd);
 		return DBGRES_ERR;
 	}
@@ -1454,17 +1360,7 @@ GetStackframes(int current, int low, int high, List **flist)
 	
 	if (!MICommandResultOK(cmd)) {
 		DEBUG_PRINTS(DEBUG_LEVEL_BACKEND, "------------------- GetStackframes error\n");
-		if (MICommandResultClass(cmd) == MIResultRecordERROR) {
-			char *err = MICommandResultErrorMessage(cmd);
-			if (err != NULL) {
-				DbgSetError(DBGERR_DEBUGGER, err);
-				free(err);
-			} else {
-				DbgSetError(DBGERR_DEBUGGER, "got error from gdb, but no message");				
-			}
-		} else {
-			DbgSetError(DBGERR_DEBUGGER, "bad response from gdb");
-		}
+		SetDebugError(cmd);
 		MICommandFree(cmd);
 		return DBGRES_ERR;
 	}
@@ -1590,17 +1486,7 @@ DumpBinaryValue(MISession *sess, char *exp, char *file)
 	SendCommandWait(DebugSession, cmd);
 	
 	if (!MICommandResultOK(cmd)) {
-		if (MICommandResultClass(cmd) == MIResultRecordERROR) {
-			char *err = MICommandResultErrorMessage(cmd);
-			if (err != NULL) {
-				DbgSetError(DBGERR_DEBUGGER, err);
-				free(err);
-			} else {
-				DbgSetError(DBGERR_DEBUGGER, "got error from gdb, but no message");				
-			}
-		} else {
-			DbgSetError(DBGERR_DEBUGGER, "bad response from gdb");
-		}
+		SetDebugError(cmd);
 		MICommandFree(cmd);
 		return -1;
 	}		
@@ -1627,17 +1513,7 @@ GDBMIGetLocalVariables(void)
 	SendCommandWait(DebugSession, cmd);
 	
 	if (!MICommandResultOK(cmd)) {
-		if (MICommandResultClass(cmd) == MIResultRecordERROR) {
-			char *err = MICommandResultErrorMessage(cmd);
-			if (err != NULL) {
-				DbgSetError(DBGERR_DEBUGGER, err);
-				free(err);
-			} else {
-				DbgSetError(DBGERR_DEBUGGER, "got error from gdb, but no message");				
-			}
-		} else {
-			DbgSetError(DBGERR_DEBUGGER, "bad response from gdb");
-		}
+		SetDebugError(cmd);
 		MICommandFree(cmd);
 		return DBGRES_ERR;
 	}
@@ -1717,17 +1593,7 @@ GDBMIListArguments(int low, int high)
 	SendCommandWait(DebugSession, cmd);
 	
 	if (!MICommandResultOK(cmd)) {
-		if (MICommandResultClass(cmd) == MIResultRecordERROR) {
-			char *err = MICommandResultErrorMessage(cmd);
-			if (err != NULL) {
-				DbgSetError(DBGERR_DEBUGGER, err);
-				free(err);
-			} else {
-				DbgSetError(DBGERR_DEBUGGER, "got error from gdb, but no message");				
-			}
-		} else {
-			DbgSetError(DBGERR_DEBUGGER, "bad response from gdb");
-		}
+		SetDebugError(cmd);
 		MICommandFree(cmd);
 		return DBGRES_ERR;
 	}
@@ -1807,17 +1673,7 @@ GDBMIGetInfoThread(void)
 	SendCommandWait(DebugSession, cmd);
 	if (!MICommandResultOK(cmd)) {
 		DEBUG_PRINTS(DEBUG_LEVEL_BACKEND, "------------------- GDBMIGetInfoThread error\n");		
-		if (MICommandResultClass(cmd) == MIResultRecordERROR) {
-			char *err = MICommandResultErrorMessage(cmd);
-			if (err != NULL) {
-				DbgSetError(DBGERR_DEBUGGER, err);
-				free(err);
-			} else {
-				DbgSetError(DBGERR_DEBUGGER, "got error from gdb, but no message");				
-			}
-		} else {
-			DbgSetError(DBGERR_DEBUGGER, "bad response from gdb");
-		}
+		SetDebugError(cmd);
 		MICommandFree(cmd);
 		return DBGRES_ERR;
 	}
@@ -1852,17 +1708,7 @@ GDBMISetThreadSelect(int threadNum)
 	cmd = MIThreadSelect(threadNum);
 	SendCommandWait(DebugSession, cmd);
 	if (!MICommandResultOK(cmd)) {
-		if (MICommandResultClass(cmd) == MIResultRecordERROR) {
-			char *err = MICommandResultErrorMessage(cmd);
-			if (err != NULL) {
-				DbgSetError(DBGERR_DEBUGGER, err);
-				free(err);
-			} else {
-				DbgSetError(DBGERR_DEBUGGER, "got error from gdb, but no message");				
-			}
-		} else {
-			DbgSetError(DBGERR_DEBUGGER, "bad response from gdb");
-		}
+		SetDebugError(cmd);
 		MICommandFree(cmd);
 		return DBGRES_ERR;
 	}
@@ -1908,17 +1754,7 @@ GDBMIStackInfoDepth()
 	SendCommandWait(DebugSession, cmd);
 	if (!MICommandResultOK(cmd)) {
 		DEBUG_PRINTS(DEBUG_LEVEL_BACKEND, "------------------- GDBMIStackInfoDepth error\n");
-		if (MICommandResultClass(cmd) == MIResultRecordERROR) {
-			char *err = MICommandResultErrorMessage(cmd);
-			if (err != NULL) {
-				DbgSetError(DBGERR_DEBUGGER, err);
-				free(err);
-			} else {
-				DbgSetError(DBGERR_DEBUGGER, "got error from gdb, but no message");				
-			}
-		} else {
-			DbgSetError(DBGERR_DEBUGGER, "bad response from gdb");
-		}
+		SetDebugError(cmd);
 		MICommandFree(cmd);
 		return DBGRES_ERR;
 	}
@@ -1947,17 +1783,7 @@ GDBMIDataReadMemory(long offset, char* address, char* format, int wordSize, int 
 	cmd = MIDataReadMemory(offset, address, format, wordSize, rows, cols, asChar);
 	SendCommandWait(DebugSession, cmd);
 	if (!MICommandResultOK(cmd)) {
-		if (MICommandResultClass(cmd) == MIResultRecordERROR) {
-			char *err = MICommandResultErrorMessage(cmd);
-			if (err != NULL) {
-				DbgSetError(DBGERR_DEBUGGER, err);
-				free(err);
-			} else {
-				DbgSetError(DBGERR_DEBUGGER, "got error from gdb, but no message");				
-			}
-		} else {
-			DbgSetError(DBGERR_DEBUGGER, "bad response from gdb");
-		}
+		SetDebugError(cmd);
 		MICommandFree(cmd);
 		return DBGRES_ERR;
 	}
@@ -2015,17 +1841,7 @@ GDBMIDataWriteMemory(long offset, char* address, char* format, int wordSize, cha
 	cmd = MIDataWriteMemory(offset, address, format, wordSize, value);
 	SendCommandWait(DebugSession, cmd);
 	if (!MICommandResultOK(cmd)) {
-		if (MICommandResultClass(cmd) == MIResultRecordERROR) {
-			char *err = MICommandResultErrorMessage(cmd);
-			if (err != NULL) {
-				DbgSetError(DBGERR_DEBUGGER, err);
-				free(err);
-			} else {
-				DbgSetError(DBGERR_DEBUGGER, "got error from gdb, but no message");				
-			}
-		} else {
-			DbgSetError(DBGERR_DEBUGGER, "bad response from gdb");
-		}
+		SetDebugError(cmd);
 		MICommandFree(cmd);
 		return DBGRES_ERR;
 	}
@@ -2048,17 +1864,7 @@ GDBCLIListSignals(char* name)
 	cmd = CLIListSignals(name);
 	SendCommandWait(DebugSession, cmd);
 	if (!MICommandResultOK(cmd)) {
-		if (MICommandResultClass(cmd) == MIResultRecordERROR) {
-			char *err = MICommandResultErrorMessage(cmd);
-			if (err != NULL) {
-				DbgSetError(DBGERR_DEBUGGER, err);
-				free(err);
-			} else {
-				DbgSetError(DBGERR_DEBUGGER, "got error from gdb, but no message");				
-			}
-		} else {
-			DbgSetError(DBGERR_DEBUGGER, "bad response from gdb");
-		}
+		SetDebugError(cmd);
 		MICommandFree(cmd);
 		return DBGRES_ERR;
 	}
@@ -2083,17 +1889,7 @@ GDBCLISignalInfo(char* arg)
 	MICommandRegisterCallback(cmd, ProcessCLIResultRecord, DebugSession);	
 	SendCommandWait(DebugSession, cmd);
 	if (!MICommandResultOK(cmd)) {
-		if (MICommandResultClass(cmd) == MIResultRecordERROR) {
-			char *err = MICommandResultErrorMessage(cmd);
-			if (err != NULL) {
-				DbgSetError(DBGERR_DEBUGGER, err);
-				free(err);
-			} else {
-				DbgSetError(DBGERR_DEBUGGER, "got error from gdb, but no message");				
-			}
-		} else {
-			DbgSetError(DBGERR_DEBUGGER, "bad response from gdb");
-		}
+		SetDebugError(cmd);
 		MICommandFree(cmd);
 		return DBGRES_ERR;
 	}
@@ -2111,17 +1907,7 @@ GDBCLIHandle(char *arg)
 	cmd = CLIHandle(arg);
 	SendCommandWait(DebugSession, cmd);
 	if (!MICommandResultOK(cmd)) {
-		if (MICommandResultClass(cmd) == MIResultRecordERROR) {
-			char *err = MICommandResultErrorMessage(cmd);
-			if (err != NULL) {
-				DbgSetError(DBGERR_DEBUGGER, err);
-				free(err);
-			} else {
-				DbgSetError(DBGERR_DEBUGGER, "got error from gdb, but no message");				
-			}
-		} else {
-			DbgSetError(DBGERR_DEBUGGER, "bad response from gdb");
-		}
+		SetDebugError(cmd);
 		MICommandFree(cmd);
 		return DBGRES_ERR;
 	}
@@ -2259,17 +2045,7 @@ GetVarValue(char *var)
 
 	SendCommandWait(DebugSession, cmd);
 	if (!MICommandResultOK(cmd)) {
-		if (MICommandResultClass(cmd) == MIResultRecordERROR) {
-			char *err = MICommandResultErrorMessage(cmd);
-			if (err != NULL) {
-				DbgSetError(DBGERR_DEBUGGER, err);
-				free(err);
-			} else {
-				DbgSetError(DBGERR_DEBUGGER, "got error from gdb, but no message");				
-			}
-		} else {
-			DbgSetError(DBGERR_DEBUGGER, "bad response from gdb");
-		}
+		SetDebugError(cmd);
 		MICommandFree(cmd);
 		return "";
 	}
@@ -2288,17 +2064,7 @@ GetAddressLength()
 	MICommand * cmd = MIDataEvaluateExpression("\"sizeof(char *)\"");
 	SendCommandWait(DebugSession, cmd);
 	if (!MICommandResultOK(cmd)) {
-		if (MICommandResultClass(cmd) == MIResultRecordERROR) {
-			char *err = MICommandResultErrorMessage(cmd);
-			if (err != NULL) {
-				DbgSetError(DBGERR_DEBUGGER, err);
-				free(err);
-			} else {
-				DbgSetError(DBGERR_DEBUGGER, "got error from gdb, but no message");				
-			}
-		} else {
-			DbgSetError(DBGERR_DEBUGGER, "bad response from gdb");
-		}
+		SetDebugError(cmd);
 		MICommandFree(cmd);
 		return 0;
 	}
