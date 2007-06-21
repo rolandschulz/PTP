@@ -39,6 +39,29 @@ import org.eclipse.swt.widgets.Shell;
 
 public class LegendDialog extends Dialog 
 {
+	private String nodeStateText[] = {
+		"UP",
+		"DOWN",
+		"ERROR",
+		"UNKNOWN",
+		"ALLOCATED TO YOU EXCLUSIVELY, BUT IDLE",
+		"ALLOCATED TO YOU SHARED, BUT IDLE",
+		"ALLOCATED TO SOMEONE ELSE EXCLUSIVELY",
+		"ALLOCATED TO SOMEONE ELSE SHARED",
+		"PROCESS RUNNING ON NODE",
+		"TERMINATED PROCESS ON NODE",
+	};
+	
+	private String processStateText[] = {
+		"STARTING",
+		"RUNNING",
+		"EXITED NORMALLY",
+		"EXITED WITH SIGNAL",
+		"STOPPED",
+		"ERROR",
+		"UNKNOWN"
+	};
+	
 	/**
 	 * @param parent
 	 */
@@ -81,227 +104,31 @@ public class LegendDialog extends Dialog
 		GridData data = new GridData(GridData.FILL_BOTH);
 		top.setLayoutData(data);
 
-		/* one horizontal box */
-		Composite c = new Composite(top, SWT.NONE);
-        FormLayout layout = new FormLayout();     
-        c.setLayout(layout);
-        /* the contents of the horizontal box */
-		CLabel b = new CLabel(c, SWT.FLAT);
-		b.setImage(ParallelImages.nodeImages[IPTPUIConstants.NODE_DOWN][0]);
-		CLabel l = new CLabel(c, SWT.LEFT);
-		l.setText("DOWN");
-		/* formdata stuff so they take up the right amount of space */
-		fd = new FormData();
-		fd.top = new FormAttachment(0);
-		fd.bottom = new FormAttachment(100);
-		fd.right = new FormAttachment(20);
-		fd.left = new FormAttachment(0);
-		b.setLayoutData(fd);
-		fd = new FormData();
-		fd.top = new FormAttachment(0);
-		fd.bottom = new FormAttachment(100);
-		fd.right = new FormAttachment(100);
-		fd.left = new FormAttachment(b);
-		l.setLayoutData(fd);
-		
-		c = new Composite(top, SWT.NONE);
-        layout = new FormLayout();        
-        c.setLayout(layout);
-        /* the contents of the horizontal box */
-		b = new CLabel(c, SWT.FLAT);
-		b.setImage(ParallelImages.nodeImages[IPTPUIConstants.NODE_UP][0]);
-		l = new CLabel(c, SWT.LEFT);
-		l.setText("UNALLOCATED");
-		/* formdata stuff so they take up the right amount of space */
-		fd = new FormData();
-		fd.top = new FormAttachment(0);
-		fd.bottom = new FormAttachment(100);
-		fd.right = new FormAttachment(20);
-		fd.left = new FormAttachment(0);
-		b.setLayoutData(fd);
-		fd = new FormData();
-		fd.top = new FormAttachment(0);
-		fd.bottom = new FormAttachment(100);
-		fd.right = new FormAttachment(100);
-		fd.left = new FormAttachment(b);
-		l.setLayoutData(fd);
-		
-		c = new Composite(top, SWT.NONE);
-        layout = new FormLayout();        
-        c.setLayout(layout);
-        /* the contents of the horizontal box */
-		b = new CLabel(c, SWT.FLAT);
-		b.setImage(ParallelImages.nodeImages[IPTPUIConstants.NODE_USER_ALLOC_EXCL][0]);
-		l = new CLabel(c, SWT.LEFT);
-		l.setText("ALLOCATED TO YOU EXCLUSIVELY, BUT IDLE");
-		/* formdata stuff so they take up the right amount of space */
-		fd = new FormData();
-		fd.top = new FormAttachment(0);
-		fd.bottom = new FormAttachment(100);
-		fd.right = new FormAttachment(20);
-		fd.left = new FormAttachment(0);
-		b.setLayoutData(fd);
-		fd = new FormData();
-		fd.top = new FormAttachment(0);
-		fd.bottom = new FormAttachment(100);
-		fd.right = new FormAttachment(100);
-		fd.left = new FormAttachment(b);
-		l.setLayoutData(fd);
-		
-		c = new Composite(top, SWT.NONE);
-        layout = new FormLayout();        
-        c.setLayout(layout);
-        /* the contents of the horizontal box */
-		b = new CLabel(c, SWT.FLAT);
-		b.setImage(ParallelImages.nodeImages[IPTPUIConstants.NODE_USER_ALLOC_SHARED][0]);
-		l = new CLabel(c, SWT.LEFT);
-		l.setText("ALLOCATED TO YOU SHARED, BUT IDLE");
-		/* formdata stuff so they take up the right amount of space */
-		fd = new FormData();
-		fd.top = new FormAttachment(0);
-		fd.bottom = new FormAttachment(100);
-		fd.right = new FormAttachment(20);
-		fd.left = new FormAttachment(0);
-		b.setLayoutData(fd);
-		fd = new FormData();
-		fd.top = new FormAttachment(0);
-		fd.bottom = new FormAttachment(100);
-		fd.right = new FormAttachment(100);
-		fd.left = new FormAttachment(b);
-		l.setLayoutData(fd);
-
-		c = new Composite(top, SWT.NONE);
-        layout = new FormLayout();        
-        c.setLayout(layout);
-        /* the contents of the horizontal box */
-		b = new CLabel(c, SWT.FLAT);
-		b.setImage(ParallelImages.nodeImages[IPTPUIConstants.NODE_OTHER_ALLOC_EXCL][0]);
-		l = new CLabel(c, SWT.LEFT);
-		l.setText("ALLOCATED TO SOMEONE ELSE EXCLUSIVELY");
-		/* formdata stuff so they take up the right amount of space */
-		fd = new FormData();
-		fd.top = new FormAttachment(0);
-		fd.bottom = new FormAttachment(100);
-		fd.right = new FormAttachment(20);
-		fd.left = new FormAttachment(0);
-		b.setLayoutData(fd);
-		fd = new FormData();
-		fd.top = new FormAttachment(0);
-		fd.bottom = new FormAttachment(100);
-		fd.right = new FormAttachment(100);
-		fd.left = new FormAttachment(b);
-		l.setLayoutData(fd);
-		
-		c = new Composite(top, SWT.NONE);
-        layout = new FormLayout();        
-        c.setLayout(layout);
-        /* the contents of the horizontal box */
-		b = new CLabel(c, SWT.FLAT);
-		b.setImage(ParallelImages.nodeImages[IPTPUIConstants.NODE_OTHER_ALLOC_SHARED][0]);
-		l = new CLabel(c, SWT.LEFT);
-		l.setText("ALLOCATED TO SOMEONE ELSE SHARED");
-		/* formdata stuff so they take up the right amount of space */
-		fd = new FormData();
-		fd.top = new FormAttachment(0);
-		fd.bottom = new FormAttachment(100);
-		fd.right = new FormAttachment(20);
-		fd.left = new FormAttachment(0);
-		b.setLayoutData(fd);
-		fd = new FormData();
-		fd.top = new FormAttachment(0);
-		fd.bottom = new FormAttachment(100);
-		fd.right = new FormAttachment(100);
-		fd.left = new FormAttachment(b);
-		l.setLayoutData(fd);
-		
-		c = new Composite(top, SWT.NONE);
-        layout = new FormLayout();        
-        c.setLayout(layout);
-        /* the contents of the horizontal box */
-		b = new CLabel(c, SWT.FLAT);
-		b.setImage(ParallelImages.nodeImages[IPTPUIConstants.NODE_RUNNING][0]);
-		l = new CLabel(c, SWT.LEFT);
-		l.setText("JOB RUNNING");
-		/* formdata stuff so they take up the right amount of space */
-		fd = new FormData();
-		fd.top = new FormAttachment(0);
-		fd.bottom = new FormAttachment(100);
-		fd.right = new FormAttachment(20);
-		fd.left = new FormAttachment(0);
-		b.setLayoutData(fd);
-		fd = new FormData();
-		fd.top = new FormAttachment(0);
-		fd.bottom = new FormAttachment(100);
-		fd.right = new FormAttachment(100);
-		fd.left = new FormAttachment(b);
-		l.setLayoutData(fd);
-		
-		c = new Composite(top, SWT.NONE);
-        layout = new FormLayout();        
-        c.setLayout(layout);
-        /* the contents of the horizontal box */
-		b = new CLabel(c, SWT.FLAT);
-		b.setImage(ParallelImages.nodeImages[IPTPUIConstants.NODE_EXITED][0]);
-		l = new CLabel(c, SWT.LEFT);
-		l.setText("JOB STOPPED");
-		/* formdata stuff so they take up the right amount of space */
-		fd = new FormData();
-		fd.top = new FormAttachment(0);
-		fd.bottom = new FormAttachment(100);
-		fd.right = new FormAttachment(20);
-		fd.left = new FormAttachment(0);
-		b.setLayoutData(fd);
-		fd = new FormData();
-		fd.top = new FormAttachment(0);
-		fd.bottom = new FormAttachment(100);
-		fd.right = new FormAttachment(100);
-		fd.left = new FormAttachment(b);
-		l.setLayoutData(fd);
-		
-		c = new Composite(top, SWT.NONE);
-        layout = new FormLayout();        
-        c.setLayout(layout);
-        /* the contents of the horizontal box */
-		b = new CLabel(c, SWT.FLAT);
-		b.setImage(ParallelImages.nodeImages[IPTPUIConstants.NODE_ERROR][0]);
-		l = new CLabel(c, SWT.LEFT);
-		l.setText("ERROR");
-		/* formdata stuff so they take up the right amount of space */
-		fd = new FormData();
-		fd.top = new FormAttachment(0);
-		fd.bottom = new FormAttachment(100);
-		fd.right = new FormAttachment(20);
-		fd.left = new FormAttachment(0);
-		b.setLayoutData(fd);
-		fd = new FormData();
-		fd.top = new FormAttachment(0);
-		fd.bottom = new FormAttachment(100);
-		fd.right = new FormAttachment(100);
-		fd.left = new FormAttachment(b);
-		l.setLayoutData(fd);
-		
-		c = new Composite(top, SWT.NONE);
-        layout = new FormLayout();        
-        c.setLayout(layout);
-        /* the contents of the horizontal box */
-		b = new CLabel(c, SWT.FLAT);
-		b.setImage(ParallelImages.nodeImages[IPTPUIConstants.NODE_UNKNOWN][0]);
-		l = new CLabel(c, SWT.LEFT);
-		l.setText("UNKNOWN / UNDEFINED");
-		/* formdata stuff so they take up the right amount of space */
-		fd = new FormData();
-		fd.top = new FormAttachment(0);
-		fd.bottom = new FormAttachment(100);
-		fd.right = new FormAttachment(20);
-		fd.left = new FormAttachment(0);
-		b.setLayoutData(fd);
-		fd = new FormData();
-		fd.top = new FormAttachment(0);
-		fd.bottom = new FormAttachment(100);
-		fd.right = new FormAttachment(100);
-		fd.left = new FormAttachment(b);
-		l.setLayoutData(fd);
-		
+		for (int i = 0; i < nodeStateText.length; i++) {
+			/* one horizontal box */
+			Composite c = new Composite(top, SWT.NONE);
+	        FormLayout layout = new FormLayout();     
+	        c.setLayout(layout);
+	        /* the contents of the horizontal box */
+			CLabel b = new CLabel(c, SWT.FLAT);
+			b.setImage(ParallelImages.nodeImages[i][0]);
+			CLabel l = new CLabel(c, SWT.LEFT);
+			l.setText(nodeStateText[i]);
+			/* formdata stuff so they take up the right amount of space */
+			fd = new FormData();
+			fd.top = new FormAttachment(0);
+			fd.bottom = new FormAttachment(100);
+			fd.right = new FormAttachment(20);
+			fd.left = new FormAttachment(0);
+			b.setLayoutData(fd);
+			fd = new FormData();
+			fd.top = new FormAttachment(0);
+			fd.bottom = new FormAttachment(100);
+			fd.right = new FormAttachment(100);
+			fd.left = new FormAttachment(b);
+			l.setLayoutData(fd);
+		}
+				
 		/* the top box */
 		Group middle = new Group(shell, SWT.BORDER);
 		middle.setText("Process Colors");
@@ -312,143 +139,30 @@ public class LegendDialog extends Dialog
 		data = new GridData(GridData.FILL_BOTH);
 		middle.setLayoutData(data);
 		
-		/* one horizontal box */
-		c = new Composite(middle, SWT.NONE);
-        layout = new FormLayout();     
-        c.setLayout(layout);
-        /* the contents of the horizontal box */
-		b = new CLabel(c, SWT.FLAT);
-		b.setImage(ParallelImages.procImages[IPTPUIConstants.PROC_STARTING][0]);
-		l = new CLabel(c, SWT.LEFT);
-		l.setText("STARTING");
-		/* formdata stuff so they take up the right amount of space */
-		fd = new FormData();
-		fd.top = new FormAttachment(0);
-		fd.bottom = new FormAttachment(100);
-		fd.right = new FormAttachment(20);
-		fd.left = new FormAttachment(0);
-		b.setLayoutData(fd);
-		fd = new FormData();
-		fd.top = new FormAttachment(0);
-		fd.bottom = new FormAttachment(100);
-		fd.right = new FormAttachment(100);
-		fd.left = new FormAttachment(b);
-		l.setLayoutData(fd);
-		
-		/* one horizontal box */
-		c = new Composite(middle, SWT.NONE);
-        layout = new FormLayout();     
-        c.setLayout(layout);
-        /* the contents of the horizontal box */
-		b = new CLabel(c, SWT.FLAT);
-		b.setImage(ParallelImages.procImages[IPTPUIConstants.PROC_RUNNING][0]);
-		l = new CLabel(c, SWT.LEFT);
-		l.setText("RUNNING");
-		/* formdata stuff so they take up the right amount of space */
-		fd = new FormData();
-		fd.top = new FormAttachment(0);
-		fd.bottom = new FormAttachment(100);
-		fd.right = new FormAttachment(20);
-		fd.left = new FormAttachment(0);
-		b.setLayoutData(fd);
-		fd = new FormData();
-		fd.top = new FormAttachment(0);
-		fd.bottom = new FormAttachment(100);
-		fd.right = new FormAttachment(100);
-		fd.left = new FormAttachment(b);
-		l.setLayoutData(fd);
-		
-		/* one horizontal box */
-		c = new Composite(middle, SWT.NONE);
-        layout = new FormLayout();     
-        c.setLayout(layout);
-        /* the contents of the horizontal box */
-		b = new CLabel(c, SWT.FLAT);
-		b.setImage(ParallelImages.procImages[IPTPUIConstants.PROC_EXITED][0]);
-		l = new CLabel(c, SWT.LEFT);
-		l.setText("EXITED NORMALLY");
-		/* formdata stuff so they take up the right amount of space */
-		fd = new FormData();
-		fd.top = new FormAttachment(0);
-		fd.bottom = new FormAttachment(100);
-		fd.right = new FormAttachment(20);
-		fd.left = new FormAttachment(0);
-		b.setLayoutData(fd);
-		fd = new FormData();
-		fd.top = new FormAttachment(0);
-		fd.bottom = new FormAttachment(100);
-		fd.right = new FormAttachment(100);
-		fd.left = new FormAttachment(b);
-		l.setLayoutData(fd);
-		
-		/* one horizontal box */
-		c = new Composite(middle, SWT.NONE);
-        layout = new FormLayout();     
-        c.setLayout(layout);
-        /* the contents of the horizontal box */
-		b = new CLabel(c, SWT.FLAT);
-		b.setImage(ParallelImages.procImages[IPTPUIConstants.PROC_EXITED_SIGNAL][0]);
-		l = new CLabel(c, SWT.LEFT);
-		l.setText("EXITED WITH SIGNAL");
-		/* formdata stuff so they take up the right amount of space */
-		fd = new FormData();
-		fd.top = new FormAttachment(0);
-		fd.bottom = new FormAttachment(100);
-		fd.right = new FormAttachment(20);
-		fd.left = new FormAttachment(0);
-		b.setLayoutData(fd);
-		fd = new FormData();
-		fd.top = new FormAttachment(0);
-		fd.bottom = new FormAttachment(100);
-		fd.right = new FormAttachment(100);
-		fd.left = new FormAttachment(b);
-		l.setLayoutData(fd);
-		
-		/* one horizontal box */
-		c = new Composite(middle, SWT.NONE);
-        layout = new FormLayout();     
-        c.setLayout(layout);
-        /* the contents of the horizontal box */
-		b = new CLabel(c, SWT.FLAT);
-		b.setImage(ParallelImages.procImages[IPTPUIConstants.PROC_STOPPED][0]);
-		l = new CLabel(c, SWT.LEFT);
-		l.setText("STOPPED");
-		/* formdata stuff so they take up the right amount of space */
-		fd = new FormData();
-		fd.top = new FormAttachment(0);
-		fd.bottom = new FormAttachment(100);
-		fd.right = new FormAttachment(20);
-		fd.left = new FormAttachment(0);
-		b.setLayoutData(fd);
-		fd = new FormData();
-		fd.top = new FormAttachment(0);
-		fd.bottom = new FormAttachment(100);
-		fd.right = new FormAttachment(100);
-		fd.left = new FormAttachment(b);
-		l.setLayoutData(fd);
-		
-		/* one horizontal box */
-		c = new Composite(middle, SWT.NONE);
-        layout = new FormLayout();     
-        c.setLayout(layout);
-        /* the contents of the horizontal box */
-		b = new CLabel(c, SWT.FLAT);
-		b.setImage(ParallelImages.procImages[IPTPUIConstants.PROC_ERROR][0]);
-		l = new CLabel(c, SWT.LEFT);
-		l.setText("ERROR");
-		/* formdata stuff so they take up the right amount of space */
-		fd = new FormData();
-		fd.top = new FormAttachment(0);
-		fd.bottom = new FormAttachment(100);
-		fd.right = new FormAttachment(20);
-		fd.left = new FormAttachment(0);
-		b.setLayoutData(fd);
-		fd = new FormData();
-		fd.top = new FormAttachment(0);
-		fd.bottom = new FormAttachment(100);
-		fd.right = new FormAttachment(100);
-		fd.left = new FormAttachment(b);
-		l.setLayoutData(fd);
+		for (int i = 0; i < processStateText.length; i++) {
+			/* one horizontal box */
+			Composite c = new Composite(middle, SWT.NONE);
+			FormLayout layout = new FormLayout();     
+	        c.setLayout(layout);
+	        /* the contents of the horizontal box */
+	        CLabel b = new CLabel(c, SWT.FLAT);
+			b.setImage(ParallelImages.procImages[i][0]);
+			CLabel l = new CLabel(c, SWT.LEFT);
+			l.setText(processStateText[i]);
+			/* formdata stuff so they take up the right amount of space */
+			fd = new FormData();
+			fd.top = new FormAttachment(0);
+			fd.bottom = new FormAttachment(100);
+			fd.right = new FormAttachment(20);
+			fd.left = new FormAttachment(0);
+			b.setLayoutData(fd);
+			fd = new FormData();
+			fd.top = new FormAttachment(0);
+			fd.bottom = new FormAttachment(100);
+			fd.right = new FormAttachment(100);
+			fd.left = new FormAttachment(b);
+			l.setLayoutData(fd);
+		}
 		
         Button close = new Button(shell, SWT.PUSH);
         close.setText("Close");

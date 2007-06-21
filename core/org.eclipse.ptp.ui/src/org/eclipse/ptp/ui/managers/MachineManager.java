@@ -29,8 +29,6 @@ import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.NodeAttributes;
-import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
-import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.model.Element;
 import org.eclipse.ptp.ui.model.ElementHandler;
 import org.eclipse.ptp.ui.model.IElement;
@@ -219,50 +217,33 @@ public class MachineManager extends AbstractUIManager {
 	 */
 	public int getNodeStatus(IPNode node) {
 		if (node != null) {
-			EnumeratedAttribute<NodeAttributes.State> nodeStateAttr = 
-				node.getAttribute(NodeAttributes.getStateAttributeDefinition());
-			if(nodeStateAttr == null) {
-				return IPTPUIConstants.NODE_UNKNOWN;
-			}
-			NodeAttributes.State nodeState = nodeStateAttr.getValue();
+			NodeAttributes.State nodeState = node.getState();
 			
-			switch (nodeState) {
-			case UP:
+			EnumeratedAttribute<NodeAttributes.ExtraState> extraStateAttr = 
+				node.getAttribute(NodeAttributes.getExtraStateAttributeDefinition());
+			
+			if (extraStateAttr != null) {
+				return NodeAttributes.State.values().length + extraStateAttr.getValueIndex();
+			}
+			
+			// FIXME: this should be provided by the proxy
+			
+			if (nodeState == NodeAttributes.State.UP) {
 				IPProcess[] procs = node.getProcesses();
 				if (procs.length > 0) {
 					for (IPProcess proc : procs) {
 						if (!proc.isTerminated()) {
-							return IPTPUIConstants.NODE_RUNNING;
+							return NodeAttributes.State.values().length + NodeAttributes.ExtraState.RUNNING_PROCESS.ordinal();
 						}
 					}
-					return IPTPUIConstants.NODE_EXITED;
+					return NodeAttributes.State.values().length + NodeAttributes.ExtraState.EXITED_PROCESS.ordinal();
 				}
 				
-				EnumeratedAttribute<NodeAttributes.ExtraState> extraStateAttr =
-					node.getAttribute(NodeAttributes.getExtraStateAttributeDefinition());
-				NodeAttributes.ExtraState extraState = NodeAttributes.ExtraState.NONE;
-				if (extraStateAttr != null) {
-					extraState = extraStateAttr.getValue();
-				}
-				
-				switch (extraState) {
-				case USER_ALLOC_EXCL:
-					return IPTPUIConstants.NODE_USER_ALLOC_EXCL;
-				case USER_ALLOC_SHARED:
-					return IPTPUIConstants.NODE_USER_ALLOC_SHARED;
-				case OTHER_ALLOC_EXCL:
-					return IPTPUIConstants.NODE_OTHER_ALLOC_EXCL;
-				case OTHER_ALLOC_SHARED:
-					return IPTPUIConstants.NODE_OTHER_ALLOC_SHARED;
-				}
-				return IPTPUIConstants.NODE_UP;
-			case DOWN:
-				return IPTPUIConstants.NODE_DOWN;
-			case ERROR:
-				return IPTPUIConstants.NODE_ERROR;
 			}
+			
+			return nodeState.ordinal();
 		}
-		return IPTPUIConstants.NODE_UNKNOWN;
+		return NodeAttributes.State.UNKNOWN.ordinal();
 	}
 	
 	/** Get node status text
@@ -300,28 +281,6 @@ public class MachineManager extends AbstractUIManager {
 			}
 		}
 		return nodeState.toString();
-	}
-	
-	/** Get process status
-	 * @param state
-	 * @return status
-	 */
-	public int getProcStatus(ProcessAttributes.State state) {
-		switch (state) {
-		case STARTING:
-			return IPTPUIConstants.PROC_STARTING;
-		case RUNNING:
-			return IPTPUIConstants.PROC_RUNNING;
-		case EXITED:
-			return IPTPUIConstants.PROC_EXITED;
-		case EXITED_SIGNALLED:
-			return IPTPUIConstants.PROC_EXITED_SIGNAL;
-		case STOPPED:
-			return IPTPUIConstants.PROC_STOPPED;
-		case ERROR:
-		default:
-			return IPTPUIConstants.PROC_ERROR;
-		}
 	}
 	
 	/* (non-Javadoc)
