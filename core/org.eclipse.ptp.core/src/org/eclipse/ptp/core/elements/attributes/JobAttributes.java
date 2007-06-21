@@ -23,10 +23,13 @@ import org.eclipse.ptp.core.attributes.StringAttributeDefinition;
  */
 public class JobAttributes {
 	public enum State {
+		PENDING,
 		STARTED,
 		RUNNING,
 		TERMINATED,
-		ERROR
+		SUSPENDED,
+		ERROR,
+		UNKNOWN
 	};
 	
 	private static final String STATE_ATTR_ID = "jobState";

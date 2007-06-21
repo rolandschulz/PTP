@@ -20,10 +20,11 @@ import org.eclipse.ptp.core.attributes.IntegerAttributeDefinition;
  */
 public class MachineAttributes {
 	public enum State {
-		UNKNOWN,
 		UP,
 		DOWN,
-		ALERT
+		ALERT,
+		ERROR,
+		UNKNOWN,
 	};
 
     private static final String STATE_ATTR_ID = "machineState";

@@ -20,12 +20,12 @@ import org.eclipse.ptp.core.attributes.StringAttributeDefinition;
  */
 public class ResourceManagerAttributes {
 	public enum State {
-		ERROR,
 		STARTING,
 		STARTED,
 		STOPPING,
 		STOPPED,
-	    SUSPENDED
+	    SUSPENDED,
+		ERROR
 	}
 	
 	private final static String STATE_ATTR_ID = "rmState";
