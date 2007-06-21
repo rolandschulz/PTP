@@ -75,11 +75,11 @@ extends AbstractAttribute<Integer,IntegerAttribute,IntegerAttributeDefinition> {
 	}
 	
 	private int getMinValue() {
-		return ((IntegerAttributeDefinition)getDefinition()).getMinValue();
+		return getDefinition().getMinValue();
 	}
 	
 	private int getMaxValue() {
-		return ((IntegerAttributeDefinition)getDefinition()).getMaxValue();
+		return getDefinition().getMaxValue();
 	}
 
     @Override
