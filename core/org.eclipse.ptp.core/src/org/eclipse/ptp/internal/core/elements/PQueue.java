@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.elementcontrols.IPElementControl;
 import org.eclipse.ptp.core.elementcontrols.IPJobControl;
@@ -30,6 +31,8 @@ import org.eclipse.ptp.core.elementcontrols.IPQueueControl;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.core.elements.attributes.QueueAttributes;
+import org.eclipse.ptp.core.elements.attributes.QueueAttributes.State;
 import org.eclipse.ptp.core.elements.events.IJobChangedEvent;
 import org.eclipse.ptp.core.elements.events.IQueueChangedEvent;
 import org.eclipse.ptp.core.elements.events.IQueueChangedJobEvent;
@@ -46,9 +49,18 @@ import org.eclipse.ptp.internal.core.elements.events.QueueRemoveJobEvent;
 public class PQueue extends Parent implements IPQueueControl, IJobListener {
 	private final ListenerList elementListeners = new ListenerList();
 	private final ListenerList childListeners = new ListenerList();
-
+	private EnumeratedAttribute<State> queueState;
+	
 	public PQueue(String id, IResourceManagerControl rm, IAttribute<?,?,?>[] attrs) {
 		super(id, rm, P_QUEUE, attrs);
+		/*
+		 * Create required attributes.
+		 */
+		queueState = getAttribute(QueueAttributes.getStateAttributeDefinition());
+		if (queueState == null) {
+			queueState = QueueAttributes.getStateAttributeDefinition().create();
+			addAttribute(queueState);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -104,12 +116,19 @@ public class PQueue extends Parent implements IPQueueControl, IJobListener {
 	public IPJob[] getJobs() {
 		return getJobControls();
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.IPMachine#getResourceManager()
 	 */
 	public IResourceManager getResourceManager() {
 		return (IResourceManager) getParent();
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPQueue#getState()
+	 */
+	public State getState() {
+		return queueState.getValue();
 	}
 
 	/* (non-Javadoc)

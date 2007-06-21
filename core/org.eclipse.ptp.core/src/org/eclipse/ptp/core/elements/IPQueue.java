@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.elements;
 
+import org.eclipse.ptp.core.elements.attributes.QueueAttributes;
 import org.eclipse.ptp.core.elements.listeners.IQueueJobListener;
 import org.eclipse.ptp.core.elements.listeners.IQueueListener;
 
@@ -48,6 +49,13 @@ public interface IPQueue extends IPElement {
 	 * @return IResourceManager
 	 */
 	public IResourceManager getResourceManager();
+	
+	/**
+	 * Get the state of the queue
+	 * 
+	 * @return queue state
+	 */
+	public QueueAttributes.State getState();
 	
 	/**
 	 * @param listener

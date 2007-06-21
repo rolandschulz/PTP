@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.elements;
 
+import org.eclipse.ptp.core.elements.attributes.NodeAttributes;
 import org.eclipse.ptp.core.elements.listeners.INodeListener;
 import org.eclipse.ptp.core.elements.listeners.INodeProcessListener;
 
@@ -57,6 +58,13 @@ public interface IPNode extends IPElement {
 	 */
 	public IPProcess[] getProcesses();
 	
+	/**
+	 * Returns the state of the node
+	 * 
+	 * @return node state
+	 */
+	public NodeAttributes.State getState();
+
 	/**
 	 * @param listener
 	 */
