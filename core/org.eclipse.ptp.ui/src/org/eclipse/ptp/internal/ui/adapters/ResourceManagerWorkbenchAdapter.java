@@ -122,19 +122,7 @@ public class ResourceManagerWorkbenchAdapter extends WorkbenchAdapter {
 	@Override
 	public ImageDescriptor getImageDescriptor(Object object) {
 		ResourceManagerAttributes.State status = ((IResourceManager) object).getState();
-		if (status.equals(ResourceManagerAttributes.State.STARTED))
-			return new ImageImageDescriptor(ParallelImages.rmImages[1]);
-		if (status.equals(ResourceManagerAttributes.State.SUSPENDED))
-			return new ImageImageDescriptor(ParallelImages.rmImages[1]);
-		if (status.equals(ResourceManagerAttributes.State.STOPPED))
-			return new ImageImageDescriptor(ParallelImages.rmImages[0]);
-		if (status.equals(ResourceManagerAttributes.State.STARTING))
-			return new ImageImageDescriptor(ParallelImages.rmImages[2]);
-		if (status.equals(ResourceManagerAttributes.State.STOPPING))
-			return new ImageImageDescriptor(ParallelImages.rmImages[3]);
-		if (status.equals(ResourceManagerAttributes.State.ERROR))
-			return new ImageImageDescriptor(ParallelImages.rmImages[4]);
-		return super.getImageDescriptor(object);
+		return new ImageImageDescriptor(ParallelImages.rmImages[status.ordinal()]);
 	}
 
 	/* (non-Javadoc)
