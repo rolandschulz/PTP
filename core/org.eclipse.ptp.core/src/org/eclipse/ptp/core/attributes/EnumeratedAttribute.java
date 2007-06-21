@@ -67,23 +67,15 @@ extends AbstractAttribute<E, EnumeratedAttribute<E>, EnumeratedAttributeDefiniti
 	/**
      * @return
      */
-    public EnumeratedAttributeDefinition<E> getEnumAttrDefinition() {
-        EnumeratedAttributeDefinition<E> attributeDefinition = (EnumeratedAttributeDefinition<E>) getDefinition();
-        return attributeDefinition;
-    }
-
-    /**
-     * @return
-     */
     public List<? extends E> getEnumerations() {
-		return getEnumAttrDefinition().getEnumerations();
+		return getDefinition().getEnumerations();
 	}
 
     /**
      * @return
      */
     public List<String> getEnumerationStrings() {
-		return getEnumAttrDefinition().getEnumerationStrings();
+		return getDefinition().getEnumerationStrings();
 	}
     
 	/**
@@ -141,7 +133,7 @@ extends AbstractAttribute<E, EnumeratedAttribute<E>, EnumeratedAttributeDefiniti
 	 * @see org.eclipse.ptp.core.attributes.IAttribute#setValue(java.lang.String)
 	 */
 	public void setValueAsString(String string) throws IllegalValueException {
-		Class<E> enumClass = getEnumAttrDefinition().getEnumClass();
+		Class<E> enumClass = getDefinition().getEnumClass();
         E eval;
         try {
         	eval = E.valueOf(enumClass, string);
