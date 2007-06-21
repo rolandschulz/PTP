@@ -104,9 +104,10 @@ public class ParallelImages {
 	public static final String IMG_MACHINE_ALERT = "machine_alert.gif";
 
 	// RESOURCE MANAGERS
-	public static final String IMG_RM_OFF = "rm_off.gif";
-	public static final String IMG_RM_ON = "rm_on.gif";
-	public static final String IMG_RM_CURRENT = "rm_current.gif";
+	public static final String IMG_RM_STOPPED = "rm_stopped.gif";
+	public static final String IMG_RM_STARTED = "rm_started.gif";
+	public static final String IMG_RM_STARTING = "rm_starting.gif";
+	public static final String IMG_RM_STOPPING = "rm_stopping.gif";
 	public static final String IMG_RM_ERROR = "rm_error.gif";
 	public static final String IMG_RM_START = "start.gif";
 	public static final String IMG_RM_STOP = "stop.gif";
@@ -178,9 +179,10 @@ public class ParallelImages {
 	public static final ImageDescriptor ID_IMG_MACHINE_ALERT = createImageDescriptor(MACHINEICONURL, IMG_MACHINE_ALERT, IMG_MACHINE_ALERT);
 
 	// RESOURCE MANAGERS
-	public static final ImageDescriptor ID_IMG_RM_OFF = createImageDescriptor(RMICONURL, IMG_RM_OFF, IMG_RM_OFF);
-	public static final ImageDescriptor ID_IMG_RM_ON = createImageDescriptor(RMICONURL, IMG_RM_ON, IMG_RM_ON);
-	public static final ImageDescriptor ID_IMG_RM_CURRENT = createImageDescriptor(RMICONURL, IMG_RM_CURRENT, IMG_RM_CURRENT);
+	public static final ImageDescriptor ID_IMG_RM_STOPPED = createImageDescriptor(RMICONURL, IMG_RM_STOPPED, IMG_RM_STOPPED);
+	public static final ImageDescriptor ID_IMG_RM_STARTED = createImageDescriptor(RMICONURL, IMG_RM_STARTED, IMG_RM_STARTED);
+	public static final ImageDescriptor ID_IMG_RM_STARTING = createImageDescriptor(RMICONURL, IMG_RM_STARTING, IMG_RM_STARTING);
+	public static final ImageDescriptor ID_IMG_RM_STOPPING = createImageDescriptor(RMICONURL, IMG_RM_STOPPING, IMG_RM_STOPPING);
 	public static final ImageDescriptor ID_IMG_RM_ERROR = createImageDescriptor(RMICONURL, IMG_RM_ERROR, IMG_RM_ERROR);
 	public static final ImageDescriptor ID_IMG_RM_START= createImageDescriptor(RMICONURL, IMG_RM_START, IMG_RM_START);
 	public static final ImageDescriptor ID_IMG_RM_STOP = createImageDescriptor(RMICONURL, IMG_RM_STOP, IMG_RM_STOP);
@@ -228,9 +230,10 @@ public class ParallelImages {
 	
 	// RESOURCE MANAGERS
 	public static Image[] rmImages = {
-		getImage(ParallelImages.IMG_RM_OFF),
-		getImage(ParallelImages.IMG_RM_ON),
-		getImage(ParallelImages.IMG_RM_CURRENT),
+		getImage(ParallelImages.IMG_RM_STOPPED),
+		getImage(ParallelImages.IMG_RM_STARTED),
+		getImage(ParallelImages.IMG_RM_STARTING),
+		getImage(ParallelImages.IMG_RM_STOPPING),
 		getImage(ParallelImages.IMG_RM_ERROR)
 	};
 	
