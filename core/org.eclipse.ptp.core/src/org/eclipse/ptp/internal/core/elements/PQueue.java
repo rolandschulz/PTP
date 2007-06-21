@@ -49,14 +49,13 @@ import org.eclipse.ptp.internal.core.elements.events.QueueRemoveJobEvent;
 public class PQueue extends Parent implements IPQueueControl, IJobListener {
 	private final ListenerList elementListeners = new ListenerList();
 	private final ListenerList childListeners = new ListenerList();
-	private EnumeratedAttribute<State> queueState;
 	
 	public PQueue(String id, IResourceManagerControl rm, IAttribute<?,?,?>[] attrs) {
 		super(id, rm, P_QUEUE, attrs);
 		/*
 		 * Create required attributes.
 		 */
-		queueState = getAttribute(QueueAttributes.getStateAttributeDefinition());
+		EnumeratedAttribute<State> queueState = getAttribute(QueueAttributes.getStateAttributeDefinition());
 		if (queueState == null) {
 			queueState = QueueAttributes.getStateAttributeDefinition().create();
 			addAttribute(queueState);
@@ -128,7 +127,7 @@ public class PQueue extends Parent implements IPQueueControl, IJobListener {
 	 * @see org.eclipse.ptp.core.elements.IPQueue#getState()
 	 */
 	public State getState() {
-		return queueState.getValue();
+		return getAttribute(QueueAttributes.getStateAttributeDefinition()).getValue();
 	}
 
 	/* (non-Javadoc)

@@ -56,20 +56,17 @@ public class PJob extends Parent implements IPJobControl, IProcessListener {
 	private HashMap<String, IPProcessControl> indexMap = 
 		new HashMap<String, IPProcessControl>();
 	
-	private EnumeratedAttribute<State> jobState;
-	private BooleanAttribute debugFlag;
-	
 	public PJob(String id, IPQueueControl queue, IAttribute<?,?,?>[] attrs) {
 		super(id, queue, P_JOB, attrs);
 		/*
 		 * Create required attributes.
 		 */
-		jobState = getAttribute(JobAttributes.getStateAttributeDefinition());
+		EnumeratedAttribute<State> jobState = getAttribute(JobAttributes.getStateAttributeDefinition());
 		if (jobState == null) {
 			jobState = JobAttributes.getStateAttributeDefinition().create();
 			addAttribute(jobState);
 		}
-		debugFlag = getAttribute(JobAttributes.getDebugFlagAttributeDefinition());
+		BooleanAttribute debugFlag = getAttribute(JobAttributes.getDebugFlagAttributeDefinition());
 		if (debugFlag == null) {
 			debugFlag = JobAttributes.getDebugFlagAttributeDefinition().create();
 			addAttribute(debugFlag);
@@ -148,7 +145,7 @@ public class PJob extends Parent implements IPJobControl, IProcessListener {
 	 * @see org.eclipse.ptp.core.elements.IPJob#getState()
 	 */
 	public State getState() {
-		return jobState.getValue();
+		return getAttribute(JobAttributes.getStateAttributeDefinition()).getValue();
 	}
 
 	/* (non-Javadoc)
@@ -164,7 +161,7 @@ public class PJob extends Parent implements IPJobControl, IProcessListener {
 	}
 
 	public boolean isDebug() {
-		return debugFlag.getValue();
+		return getAttribute(JobAttributes.getDebugFlagAttributeDefinition()).getValue();
 	}
 
 	public boolean isTerminated() {

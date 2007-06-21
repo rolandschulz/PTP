@@ -49,15 +49,13 @@ import org.eclipse.ptp.internal.core.elements.events.NodeRemoveProcessEvent;
 public class PNode extends Parent implements IPNodeControl, IProcessListener {
 	private final ListenerList elementListeners = new ListenerList();
 
-	private EnumeratedAttribute<State> nodeState;
-
 	private final ListenerList childListeners = new ListenerList();
 	public PNode(String id, IPMachineControl mac, IAttribute<?,?,?>[] attrs) {
 		super(id, mac, P_NODE, attrs);
 		/*
 		 * Create required attributes.
 		 */
-		nodeState = getAttribute(NodeAttributes.getStateAttributeDefinition());
+		EnumeratedAttribute<State> nodeState = getAttribute(NodeAttributes.getStateAttributeDefinition());
 		if (nodeState == null) {
 			nodeState = NodeAttributes.getStateAttributeDefinition().create();
 			addAttribute(nodeState);
@@ -120,7 +118,7 @@ public class PNode extends Parent implements IPNodeControl, IProcessListener {
 	 * @see org.eclipse.ptp.core.elements.IPNode#getState()
 	 */
 	public State getState() {
-		return nodeState.getValue();
+		return getAttribute(NodeAttributes.getStateAttributeDefinition()).getValue();
 	}
 
 	/* (non-Javadoc)

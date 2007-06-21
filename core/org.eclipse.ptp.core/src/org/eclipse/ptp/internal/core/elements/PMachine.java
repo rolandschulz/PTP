@@ -52,19 +52,18 @@ public class PMachine extends Parent implements IPMachineControl, INodeListener 
 
 	private final ListenerList childListeners = new ListenerList();
 	private String arch = "undefined";
-	private IntegerAttribute numNodes;
-    private EnumeratedAttribute<State> machineState;
+    
     public PMachine(String id, IResourceManagerControl rm, IAttribute<?,?,?>[] attrs) {
 		super(id, rm, P_MACHINE, attrs);
 		/*
 		 * Create required attributes.
 		 */
-		machineState = getAttribute(MachineAttributes.getStateAttributeDefinition());
+		EnumeratedAttribute<State> machineState = getAttribute(MachineAttributes.getStateAttributeDefinition());
 		if (machineState == null) {
 			machineState = MachineAttributes.getStateAttributeDefinition().create();
 			addAttribute(machineState);
 		}
-       numNodes = getAttribute(MachineAttributes.getNumNodesAttributeDefinition());
+		IntegerAttribute numNodes = getAttribute(MachineAttributes.getNumNodesAttributeDefinition());
         if (numNodes == null) {
             try {
                 numNodes = MachineAttributes.getNumNodesAttributeDefinition().create(0);
@@ -91,10 +90,10 @@ public class PMachine extends Parent implements IPMachineControl, INodeListener 
 	}
 
 	public synchronized void addNode(IPNodeControl node) {
-		assert(numNodes.getValue().equals(getNodes().length));
+		assert(getAttribute(MachineAttributes.getNumNodesAttributeDefinition()).getValue().equals(getNodes().length));
 	    addChild(node);
 		try {
-            numNodes.setValue(getNodes().length);
+			getAttribute(MachineAttributes.getNumNodesAttributeDefinition()).setValue(getNodes().length);
         } catch (IllegalValueException e) {
             // FIXME
             throw new RuntimeException(e);
@@ -136,7 +135,7 @@ public class PMachine extends Parent implements IPMachineControl, INodeListener 
 	 * @see org.eclipse.ptp.core.elements.IPMachine#getState()
 	 */
 	public State getState() {
-		return machineState.getValue();
+		return getAttribute(MachineAttributes.getStateAttributeDefinition()).getValue();
 	}
 
 	/* (non-Javadoc)
