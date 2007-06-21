@@ -43,7 +43,7 @@ public class ChangeQueueAction extends GotoDropDownAction {
 	 */
 	public ChangeQueueAction(AbstractParallelElementView view) {
 		super(name, view);
-	    setImageDescriptor(ParallelImages.ID_IMG_RM_ON);
+	    setImageDescriptor(ParallelImages.ID_IMG_RM_STARTED);
 	}
 	
 	/* (non-Javadoc)
@@ -127,7 +127,7 @@ public class ChangeQueueAction extends GotoDropDownAction {
 		public InternalQueueAction(String name, String id,
 				AbstractParallelElementView view, GotoDropDownAction action, Object data) {
 			super(name, id, view, action, data);
-		    setImageDescriptor(ParallelImages.ID_IMG_RM_ON);
+		    setImageDescriptor(ParallelImages.ID_IMG_RM_STARTED);
 		}
 	}
 }
