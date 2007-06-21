@@ -26,7 +26,8 @@ public class ProcessAttributes {
 		EXITED,
 		EXITED_SIGNALLED,
 		STOPPED,
-		ERROR
+		ERROR,
+		UNKNOWN
 	};
 
 	private static final String STATE_ATTR_ID = "processState";

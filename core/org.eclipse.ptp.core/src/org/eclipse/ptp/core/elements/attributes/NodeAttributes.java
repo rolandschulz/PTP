@@ -20,18 +20,20 @@ import org.eclipse.ptp.core.attributes.IntegerAttributeDefinition;
  */
 public class NodeAttributes {
 	public enum State {
-		UNKNOWN,
 		UP,
 		DOWN,
-		ERROR
+		ERROR,
+		UNKNOWN,
 	};
 	
 	public enum ExtraState {
-		NONE,
 		USER_ALLOC_EXCL,
 		USER_ALLOC_SHARED,
 		OTHER_ALLOC_EXCL,
-		OTHER_ALLOC_SHARED
+		OTHER_ALLOC_SHARED,
+		RUNNING_PROCESS,
+		EXITED_PROCESS,
+		NONE,
 	};
 
 	private static final String STATE_ATTR_ID = "nodeState";
