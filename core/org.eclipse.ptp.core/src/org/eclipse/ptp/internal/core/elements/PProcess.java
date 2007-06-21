@@ -53,11 +53,6 @@ public class PProcess extends Parent implements IPProcessControl {
 	private OutputTextFile outputFile = null;
 	private String outputDirPath = null;
 	private int storeLines = 0;
-	private EnumeratedAttribute<State> procState;
-	private IntegerAttribute exitCode;
-	private IntegerAttribute pid;
-	private IntegerAttribute index;
-	private StringAttribute signalName;
 
 	/*
 	 * the node that this process is running on, or was scheduled on / will be, etc
@@ -83,12 +78,12 @@ public class PProcess extends Parent implements IPProcessControl {
 		/*
 		 * Create required attributes.
 		 */
-		procState = getAttribute(ProcessAttributes.getStateAttributeDefinition());
+		EnumeratedAttribute<State> procState = getAttribute(ProcessAttributes.getStateAttributeDefinition());
 		if (procState == null) {
 			procState = ProcessAttributes.getStateAttributeDefinition().create();
 			addAttribute(procState);
 		}
-		exitCode = getAttribute(ProcessAttributes.getExitCodeAttributeDefinition());
+		IntegerAttribute exitCode = getAttribute(ProcessAttributes.getExitCodeAttributeDefinition());
 		if (exitCode == null) {
 			try {
 				exitCode = ProcessAttributes.getExitCodeAttributeDefinition().create();
@@ -96,7 +91,7 @@ public class PProcess extends Parent implements IPProcessControl {
 			} catch (IllegalValueException e) {
 			}
 		}
-		pid = getAttribute(ProcessAttributes.getPIDAttributeDefinition());
+		IntegerAttribute pid = getAttribute(ProcessAttributes.getPIDAttributeDefinition());
 		if (pid == null) {
 			try {
 				pid = ProcessAttributes.getPIDAttributeDefinition().create();
@@ -104,7 +99,7 @@ public class PProcess extends Parent implements IPProcessControl {
 			} catch (IllegalValueException e) {
 			}
 		}
-		index = getAttribute(ProcessAttributes.getIndexAttributeDefinition());
+		IntegerAttribute index = getAttribute(ProcessAttributes.getIndexAttributeDefinition());
 		if (index == null) {
 			try {
 				index = ProcessAttributes.getIndexAttributeDefinition().create();
@@ -112,7 +107,7 @@ public class PProcess extends Parent implements IPProcessControl {
 			} catch (IllegalValueException e) {
 			}
 		}	
-		signalName = getAttribute(ProcessAttributes.getSignalNameAttributeDefinition());
+		StringAttribute signalName = getAttribute(ProcessAttributes.getSignalNameAttributeDefinition());
 		if (signalName == null) {
 			signalName = ProcessAttributes.getSignalNameAttributeDefinition().create();
 			addAttribute(signalName);
@@ -147,7 +142,7 @@ public class PProcess extends Parent implements IPProcessControl {
 	 * @see org.eclipse.ptp.core.elements.IPProcess#getExitCode()
 	 */
 	public int getExitCode() {
-		return exitCode.getValue();
+		return getAttribute(ProcessAttributes.getExitCodeAttributeDefinition()).getValue();
 	}
 
 	/* (non-Javadoc)
@@ -180,14 +175,14 @@ public class PProcess extends Parent implements IPProcessControl {
 	 * @see org.eclipse.ptp.core.elements.IPProcess#getPid()
 	 */
 	public int getPid() {
-		return pid.getValue();
+		return getAttribute(ProcessAttributes.getPIDAttributeDefinition()).getValue();
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.IPProcess#getProcessIndex()
 	 */
 	public String getProcessIndex() {
-		return index.getValueAsString();
+		return getAttribute(ProcessAttributes.getIndexAttributeDefinition()).getValueAsString();
 	}
 
 	/* (non-Javadoc)
@@ -205,21 +200,21 @@ public class PProcess extends Parent implements IPProcessControl {
 	 * @see org.eclipse.ptp.core.elements.IPProcess#getSignalName()
 	 */
 	public String getSignalName() {
-		return signalName.getValue();
+		return getAttribute(ProcessAttributes.getSignalNameAttributeDefinition()).getValue();
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.IPProcess#getState()
 	 */
 	public State getState() {
-		return procState.getValue();
+		return getAttribute(ProcessAttributes.getStateAttributeDefinition()).getValue();
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.IPProcess#isTerminated()
 	 */
 	public boolean isTerminated() {
-		State state = procState.getValue();
+		State state = getState();
 		if (state == State.ERROR || state == State.EXITED || state == State.EXITED_SIGNALLED) {
 			return true;
 		}
@@ -247,6 +242,7 @@ public class PProcess extends Parent implements IPProcessControl {
 	 * @see org.eclipse.ptp.core.elements.IPProcess#setState(org.eclipse.ptp.core.elements.attributes.ProcessAttributes.State)
 	 */
 	public void setState(State state) {
+		EnumeratedAttribute<State> procState = getAttribute(ProcessAttributes.getStateAttributeDefinition());
 		procState.setValue(state);
 		fireChangedProcess(Arrays.asList(procState));
 	}
