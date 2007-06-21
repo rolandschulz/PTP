@@ -70,6 +70,14 @@ extends AbstractAttribute<BigInteger,BigIntegerAttribute,BigIntegerAttributeDefi
 		this.value = value;
 	}
 
+	public void setValue(Integer ivalue) throws IllegalValueException {
+		BigInteger value = BigInteger.valueOf(ivalue);
+		if (value.compareTo(getMinValue()) < 0 || value.compareTo(getMaxValue()) > 0) {
+			throw new IllegalValueException("The set valid range does not include the new value");
+		}
+		this.value = value;
+	}
+
 	public void setValueAsString(String string) throws IllegalValueException {
 		try {
 			BigInteger value = new BigInteger(string);
