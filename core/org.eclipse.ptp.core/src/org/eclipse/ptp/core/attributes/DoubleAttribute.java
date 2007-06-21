@@ -72,11 +72,11 @@ extends AbstractAttribute<Double,DoubleAttribute,DoubleAttributeDefinition> {
 	}
 	
 	private double getMinValue() {
-		return ((DoubleAttributeDefinition)getDefinition()).getMinValue();
+		return getDefinition().getMinValue();
 	}
 	
 	private double getMaxValue() {
-		return ((DoubleAttributeDefinition)getDefinition()).getMaxValue();
+		return getDefinition().getMaxValue();
 	}
 
     @Override

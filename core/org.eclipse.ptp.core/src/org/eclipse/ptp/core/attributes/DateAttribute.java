@@ -80,7 +80,7 @@ extends AbstractAttribute<Calendar, DateAttribute, DateAttributeDefinition> {
 	}
 
 	public DateFormat getDateFormat() {
-		return ((DateAttributeDefinition)getDefinition()).getDateFormat();
+		return getDefinition().getDateFormat();
 	}
 	
 	public Date getDateValue() {
@@ -145,11 +145,11 @@ extends AbstractAttribute<Calendar, DateAttribute, DateAttributeDefinition> {
 	}
 
 	private Date getMaxDate() {
-		return ((DateAttributeDefinition)getDefinition()).getMaxDate();
+		return getDefinition().getMaxDate();
 	}
 
 	private Date getMinDate() {
-		return ((DateAttributeDefinition)getDefinition()).getMinDate();
+		return getDefinition().getMinDate();
 	}
 
 	private Date parseString(String string) {

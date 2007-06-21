@@ -46,10 +46,6 @@ extends AbstractAttribute<String,StringSetAttribute,StringSetAttributeDefinition
 		setValueAsString(valueIn);
 	}
 
-	public StringSetAttributeDefinition getStringSetAttributeDefinition() {
-		return (StringSetAttributeDefinition) getDefinition();
-	}
-
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.attributes.IAttribute#getValue()
 	 */
@@ -65,14 +61,14 @@ extends AbstractAttribute<String,StringSetAttribute,StringSetAttributeDefinition
 	}
 
 	public int getValueIndex() {
-        return getStringSetAttributeDefinition().getValues().indexOf(value);
+        return getDefinition().getValues().indexOf(value);
     }
 
     /* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.attributes.IAttribute#isValid(java.lang.String)
 	 */
 	public boolean isValid(String valueIn) {
-		final List<String> values = getStringSetAttributeDefinition().getValues();
+		final List<String> values = getDefinition().getValues();
 		final boolean isValid = values.contains(valueIn);
 		return isValid;
 	}
