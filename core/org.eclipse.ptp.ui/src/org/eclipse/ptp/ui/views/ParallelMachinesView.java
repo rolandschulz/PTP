@@ -736,8 +736,7 @@ public class ParallelMachinesView extends AbstractParallelSetView implements
 			public Image getImage(Object element) {
 				if (element instanceof IPProcess) {
 					IPProcess process = (IPProcess) element;
-					int proc_state = getMachineManager().getProcStatus(process.getState());
-					return ParallelImages.procImages[proc_state][0];
+					return ParallelImages.procImages[process.getState().ordinal()][0];
 				}
 				return null;
 			}

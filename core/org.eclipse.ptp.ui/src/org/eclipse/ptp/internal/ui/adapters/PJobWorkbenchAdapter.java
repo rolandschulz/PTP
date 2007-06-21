@@ -45,11 +45,7 @@ public class PJobWorkbenchAdapter extends WorkbenchAdapter {
 	 * @return
 	 */
 	private Image getImage(IPJob job) {
-		if (job.isTerminated())
-			return ParallelImages.jobImages[2];
-		if (job.isDebug())
-			return ParallelImages.jobImages[1];
-		return ParallelImages.jobImages[0];
+		return ParallelImages.jobImages[job.getState().ordinal()][job.isDebug() ? 1 : 0];
 	}
 
 }

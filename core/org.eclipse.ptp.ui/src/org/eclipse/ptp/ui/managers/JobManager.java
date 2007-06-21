@@ -32,7 +32,7 @@ import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
-import org.eclipse.ptp.ui.IPTPUIConstants;
+import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.ui.listeners.IJobChangedListener;
 import org.eclipse.ptp.ui.model.Element;
 import org.eclipse.ptp.ui.model.ElementHandler;
@@ -186,30 +186,6 @@ public class JobManager extends AbstractUIManager {
 		return "";
 	}
 	
-	/** Get process status
-	 * @param proc process
-	 * @return status
-	 */
-	public int getProcessStatus(IPProcess proc) {
-		if (proc != null) {
-			switch (proc.getState()) {
-			case STARTING:
-				return IPTPUIConstants.PROC_STARTING;
-			case RUNNING:
-				return IPTPUIConstants.PROC_RUNNING;
-			case EXITED:
-				return IPTPUIConstants.PROC_EXITED;
-			case EXITED_SIGNALLED:
-				return IPTPUIConstants.PROC_EXITED_SIGNAL;
-			case STOPPED:
-				return IPTPUIConstants.PROC_STOPPED;
-			case ERROR:
-				return IPTPUIConstants.PROC_ERROR;
-			}
-		}
-		return IPTPUIConstants.PROC_ERROR;
-	}	
-	
 	/** Get process status text
 	 * @param proc process
 	 * @return status
@@ -263,9 +239,12 @@ public class JobManager extends AbstractUIManager {
 	public int getStatus(String id) {
 		IPJob job = getJob();
 		if (job != null) {
-			return getProcessStatus(job.getProcessById(id));
+			IPProcess proc = job.getProcessById(id);
+			if (proc != null) {
+				return proc.getState().ordinal();
+			}
 		}
-		return getProcessStatus(null);
+		return ProcessAttributes.State.UNKNOWN.ordinal();
 	}
 	
 	/* (non-Javadoc)

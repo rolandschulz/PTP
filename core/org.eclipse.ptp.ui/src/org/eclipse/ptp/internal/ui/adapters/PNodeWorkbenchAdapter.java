@@ -19,10 +19,7 @@
 package org.eclipse.ptp.internal.ui.adapters;
 
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.elements.IPNode;
-import org.eclipse.ptp.core.elements.attributes.NodeAttributes;
-import org.eclipse.ptp.core.elements.attributes.NodeAttributes.State;
 import org.eclipse.ptp.internal.ui.ParallelImages;
 import org.eclipse.ptp.ui.utils.ImageImageDescriptor;
 import org.eclipse.ui.model.WorkbenchAdapter;
@@ -35,12 +32,7 @@ public class PNodeWorkbenchAdapter extends WorkbenchAdapter {
 	@Override
 	public ImageDescriptor getImageDescriptor(Object object) {
 		IPNode node = (IPNode) object;
-		EnumeratedAttribute<State> attr = 
-			node.getAttribute(NodeAttributes.getStateAttributeDefinition());
-		if (attr != null) {
-			return new ImageImageDescriptor(ParallelImages.nodeImages[attr.getValueIndex()][0]);
-		}
-		return null;
+		return new ImageImageDescriptor(ParallelImages.nodeImages[node.getState().ordinal()][0]);
 	}
 
 }
