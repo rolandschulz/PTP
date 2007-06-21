@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.elements;
 
+import org.eclipse.ptp.core.elements.attributes.MachineAttributes;
 import org.eclipse.ptp.core.elements.listeners.IMachineListener;
 import org.eclipse.ptp.core.elements.listeners.IMachineNodeListener;
 
@@ -75,6 +76,13 @@ public interface IPMachine extends IPElement {
 	 * @return the machine's parent resource manager
 	 */
 	public IResourceManager getResourceManager();
+	
+	/**
+	 * Get the state of the machine
+	 * 
+	 * @return machine state
+	 */
+	public MachineAttributes.State getState();
 
 	/**
 	 * @param listener

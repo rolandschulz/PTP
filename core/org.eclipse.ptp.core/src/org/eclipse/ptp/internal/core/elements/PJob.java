@@ -55,22 +55,24 @@ public class PJob extends Parent implements IPJobControl, IProcessListener {
 	private final ListenerList childListeners = new ListenerList();
 	private HashMap<String, IPProcessControl> indexMap = 
 		new HashMap<String, IPProcessControl>();
-
+	
+	private EnumeratedAttribute<State> jobState;
+	private BooleanAttribute debugFlag;
+	
 	public PJob(String id, IPQueueControl queue, IAttribute<?,?,?>[] attrs) {
 		super(id, queue, P_JOB, attrs);
 		/*
 		 * Create required attributes.
 		 */
-		EnumeratedAttribute<State> jobState = 
-			getAttribute(JobAttributes.getStateAttributeDefinition());
+		jobState = getAttribute(JobAttributes.getStateAttributeDefinition());
 		if (jobState == null) {
 			jobState = JobAttributes.getStateAttributeDefinition().create();
 			addAttribute(jobState);
 		}
-		BooleanAttribute debug = getAttribute(JobAttributes.getDebugFlagAttributeDefinition());
-		if (debug == null) {
-			debug = JobAttributes.getDebugFlagAttributeDefinition().create();
-			addAttribute(debug);
+		debugFlag = getAttribute(JobAttributes.getDebugFlagAttributeDefinition());
+		if (debugFlag == null) {
+			debugFlag = JobAttributes.getDebugFlagAttributeDefinition().create();
+			addAttribute(debugFlag);
 		}
 	}
 
@@ -105,13 +107,13 @@ public class PJob extends Parent implements IPJobControl, IProcessListener {
 		return null;
 	}
 	
-	public synchronized IPProcess getProcessByIndex(String index) {
-		return indexMap.get(index);
+	public synchronized IPProcess getProcessByIndex(int index) {
+		return indexMap.get(String.valueOf(index));
 	}
 
 	
-	public synchronized IPProcess getProcessByIndex(int index) {
-		return indexMap.get(String.valueOf(index));
+	public synchronized IPProcess getProcessByIndex(String index) {
+		return indexMap.get(index);
 	}
 
 	/*
@@ -143,6 +145,13 @@ public class PJob extends Parent implements IPJobControl, IProcessListener {
 	}
 	
 	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPJob#getState()
+	 */
+	public State getState() {
+		return jobState.getValue();
+	}
+
+	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.listeners.IProcessListener#handleEvent(org.eclipse.ptp.core.elements.events.IProcessChangedEvent)
 	 */
 	public void handleEvent(IProcessChangedEvent e) {
@@ -155,14 +164,11 @@ public class PJob extends Parent implements IPJobControl, IProcessListener {
 	}
 
 	public boolean isDebug() {
-		BooleanAttribute debug = getAttribute(JobAttributes.getDebugFlagAttributeDefinition());
-		return debug.getValue();
+		return debugFlag.getValue();
 	}
 
 	public boolean isTerminated() {
-		EnumeratedAttribute<State> jobState = 
-			getAttribute(JobAttributes.getStateAttributeDefinition());
-		State state = jobState.getValue();
+		State state = getState();
 		if (state == State.TERMINATED || state == State.ERROR) {
 			return true;
 		}

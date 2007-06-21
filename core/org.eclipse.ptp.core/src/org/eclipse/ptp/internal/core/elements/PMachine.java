@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.attributes.IntegerAttribute;
@@ -32,6 +33,7 @@ import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPNode;
 import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.MachineAttributes;
+import org.eclipse.ptp.core.elements.attributes.MachineAttributes.State;
 import org.eclipse.ptp.core.elements.events.IMachineChangedEvent;
 import org.eclipse.ptp.core.elements.events.IMachineChangedNodeEvent;
 import org.eclipse.ptp.core.elements.events.IMachineNewNodeEvent;
@@ -47,13 +49,22 @@ import org.eclipse.ptp.internal.core.elements.events.MachineRemoveNodeEvent;
 
 public class PMachine extends Parent implements IPMachineControl, INodeListener {
 	private final ListenerList elementListeners = new ListenerList();
+
 	private final ListenerList childListeners = new ListenerList();
 	private String arch = "undefined";
-    private IntegerAttribute numNodes;
-	
-	public PMachine(String id, IResourceManagerControl rm, IAttribute<?,?,?>[] attrs) {
+	private IntegerAttribute numNodes;
+    private EnumeratedAttribute<State> machineState;
+    public PMachine(String id, IResourceManagerControl rm, IAttribute<?,?,?>[] attrs) {
 		super(id, rm, P_MACHINE, attrs);
-        numNodes = getAttribute(MachineAttributes.getNumNodesAttributeDefinition());
+		/*
+		 * Create required attributes.
+		 */
+		machineState = getAttribute(MachineAttributes.getStateAttributeDefinition());
+		if (machineState == null) {
+			machineState = MachineAttributes.getStateAttributeDefinition().create();
+			addAttribute(machineState);
+		}
+       numNodes = getAttribute(MachineAttributes.getNumNodesAttributeDefinition());
         if (numNodes == null) {
             try {
                 numNodes = MachineAttributes.getNumNodesAttributeDefinition().create(0);
@@ -64,7 +75,7 @@ public class PMachine extends Parent implements IPMachineControl, INodeListener 
             addAttribute(numNodes);
         }
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.IPMachine#addChildListener(org.eclipse.ptp.core.elements.listeners.IMachineNodeListener)
 	 */
@@ -109,16 +120,23 @@ public class PMachine extends Parent implements IPMachineControl, INodeListener 
 	public synchronized IPNodeControl[] getNodeControls() {
 		return (IPNodeControl[]) getCollection().toArray(new IPNodeControl[size()]);
 	}
-	
+
 	public IPNode[] getNodes() {
 		return getNodeControls();
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.IPMachine#getResourceManager()
 	 */
 	public IResourceManager getResourceManager() {
 		return (IResourceManager) getParent();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPMachine#getState()
+	 */
+	public State getState() {
+		return machineState.getValue();
 	}
 
 	/* (non-Javadoc)

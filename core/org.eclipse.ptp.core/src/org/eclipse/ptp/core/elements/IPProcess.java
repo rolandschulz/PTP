@@ -83,7 +83,9 @@ public interface IPProcess extends IPElement {
 	public String getSignalName();
 	
 	/**
-	 * @return
+	 * Get the state of the process
+	 * 
+	 * @return process state
 	 */
 	public ProcessAttributes.State getState();
 	

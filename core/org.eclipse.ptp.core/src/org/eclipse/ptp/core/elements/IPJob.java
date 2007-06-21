@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.elements;
 
+import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.listeners.IJobListener;
 import org.eclipse.ptp.core.elements.listeners.IJobProcessListener;
 
@@ -91,6 +92,13 @@ public interface IPJob extends IPElement {
 	 * @return IPQueue
 	 */
 	public IPQueue getQueue();
+	
+	/**
+	 * Returns the state of the job
+	 * 
+	 * @return job state
+	 */
+	public JobAttributes.State getState();
 
 	/**
 	 * Returns true/false regarding whether this Job is a debug job 
@@ -102,7 +110,7 @@ public interface IPJob extends IPElement {
 	/**
 	 * Returns true if all processes in the job have terminated
 	 * 
-	 * @return
+	 * @return 
 	 */
 	public boolean isTerminated();
 

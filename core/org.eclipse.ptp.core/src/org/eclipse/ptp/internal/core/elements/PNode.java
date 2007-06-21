@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IntegerAttribute;
 import org.eclipse.ptp.core.elementcontrols.IPElementControl;
@@ -31,6 +32,7 @@ import org.eclipse.ptp.core.elementcontrols.IPProcessControl;
 import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.attributes.NodeAttributes;
+import org.eclipse.ptp.core.elements.attributes.NodeAttributes.State;
 import org.eclipse.ptp.core.elements.events.INodeChangedEvent;
 import org.eclipse.ptp.core.elements.events.INodeChangedProcessEvent;
 import org.eclipse.ptp.core.elements.events.INodeNewProcessEvent;
@@ -47,9 +49,19 @@ import org.eclipse.ptp.internal.core.elements.events.NodeRemoveProcessEvent;
 public class PNode extends Parent implements IPNodeControl, IProcessListener {
 	private final ListenerList elementListeners = new ListenerList();
 
+	private EnumeratedAttribute<State> nodeState;
+
 	private final ListenerList childListeners = new ListenerList();
 	public PNode(String id, IPMachineControl mac, IAttribute<?,?,?>[] attrs) {
 		super(id, mac, P_NODE, attrs);
+		/*
+		 * Create required attributes.
+		 */
+		nodeState = getAttribute(NodeAttributes.getStateAttributeDefinition());
+		if (nodeState == null) {
+			nodeState = NodeAttributes.getStateAttributeDefinition().create();
+			addAttribute(nodeState);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -102,6 +114,13 @@ public class PNode extends Parent implements IPNodeControl, IProcessListener {
 
 	public IPProcess[] getProcesses() {
 		return getProcessControls();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPNode#getState()
+	 */
+	public State getState() {
+		return nodeState.getValue();
 	}
 
 	/* (non-Javadoc)
