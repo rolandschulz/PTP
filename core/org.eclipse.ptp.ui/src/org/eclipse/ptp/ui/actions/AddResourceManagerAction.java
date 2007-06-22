@@ -35,7 +35,7 @@ public class AddResourceManagerAction extends Action {
 	private final Shell shell;
 
 	public AddResourceManagerAction(Shell shell) {
-		super("Add Resource Manager");
+		super("Add Resource Manager...");
 		this.shell = shell;
 	}
 
