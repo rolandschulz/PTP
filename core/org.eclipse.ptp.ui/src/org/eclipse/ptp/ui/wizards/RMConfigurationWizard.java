@@ -54,7 +54,7 @@ public class RMConfigurationWizard extends Wizard {
 		public NameAndDescPage(String pageName) {
 			super(pageName);
 			setTitle(pageName);
-			setDescription(UIMessage.getResourceString("ConfigurationWizard.WizardDesc")); //$NON-NLS-1$
+			setDescription(UIMessage.getResourceString("ConfigurationWizard.NameDesc")); //$NON-NLS-1$
 		}
 
 		public void createControl(Composite parent) {
@@ -142,7 +142,7 @@ public class RMConfigurationWizard extends Wizard {
 		public SelectFactoryPage(String pageName) {
 			super(pageName);
 			setTitle(pageName);
-			setDescription(UIMessage.getResourceString("ConfigurationWizard.WizardDesc")); //$NON-NLS-1$
+			setDescription(UIMessage.getResourceString("ConfigurationWizard.SelectFactoryDesc")); //$NON-NLS-1$
 		}
 
 		public void createControl(Composite parent) {
@@ -286,7 +286,6 @@ public class RMConfigurationWizard extends Wizard {
 	}
 
 	public boolean performFinish() {
-		System.out.println("In performFinish()");
 		final IResourceManagerConfiguration config = configs[selectedFactory];
 		if (useDefaultNameAndDesc) {
 			config.setDefaultNameAndDesc();
@@ -344,8 +343,8 @@ public class RMConfigurationWizard extends Wizard {
 		
 		wizardPages.clear();
 		wizardPages.add(selectFactoryPage);
-		wizardPages.add(nameAndDescPage);
 		wizardPages.addAll(Arrays.asList(cachedPages[index]));
+		wizardPages.add(nameAndDescPage);
 	}
 
 }
