@@ -18,6 +18,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.actions;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -42,22 +45,8 @@ public class StopResourceManagersObjectActionDelegate implements
 
 	private Shell targetShell;
 
-	private IResourceManagerMenuContribution[] menuContribs;
-
-	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
-		targetShell = targetPart.getSite().getShell();
-	}
-
-	public void run(IAction action) {
-		// no-op
-	}
-
-	public void selectionChanged(IAction action, ISelection selection) {
-		IStructuredSelection ss = (IStructuredSelection) selection;
-		Object[] selections = ss.toArray();
-		menuContribs = new IResourceManagerMenuContribution[selections.length];
-		System.arraycopy(selections, 0, menuContribs, 0, menuContribs.length);
-	}
+	private List<IResourceManagerMenuContribution> menuContribs =
+		new ArrayList<IResourceManagerMenuContribution>();
 
 	public void dispose() {
 	}
@@ -65,9 +54,12 @@ public class StopResourceManagersObjectActionDelegate implements
 	public void init(IAction action) {
 	}
 
+	public void run(IAction action) {
+		// no-op
+	}
+
 	public void runWithEvent(IAction action, Event event) {
-		for (int i = 0; i < menuContribs.length; ++i) {
-			IResourceManagerMenuContribution menuContrib = menuContribs[i];
+		for (IResourceManagerMenuContribution menuContrib : menuContribs) {
 			IResourceManager rmManager = (IResourceManager) menuContrib.getAdapter(IResourceManager.class);
 
 			ResourceManagerAttributes.State state = rmManager.getState();
@@ -105,5 +97,36 @@ public class StopResourceManagersObjectActionDelegate implements
 				PTPUIPlugin.log(status);
 			}
 		}
+	}
+
+	public void selectionChanged(IAction action, ISelection selection) {
+		IStructuredSelection ss = (IStructuredSelection) selection;
+		menuContribs.clear();
+		menuContribs.addAll(ss.toList());
+
+		boolean isEnabled = isEnabled();
+		action.setEnabled(isEnabled);
+	}
+
+	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
+		targetShell = targetPart.getSite().getShell();
+	}
+
+	/**
+	 * @return
+	 */
+	private boolean isEnabled() {
+		boolean isEnabled = true;
+		for (IResourceManagerMenuContribution menuContrib : menuContribs) {
+			final IResourceManager rmManager = 
+				(IResourceManager) menuContrib.getAdapter(IResourceManager.class);
+			ResourceManagerAttributes.State state = rmManager.getState();
+			if (state != ResourceManagerAttributes.State.STARTED &&
+					state != ResourceManagerAttributes.State.ERROR) {
+				isEnabled = false;
+				break;
+			}
+		}
+		return isEnabled;
 	}
 }
