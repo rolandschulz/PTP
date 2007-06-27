@@ -18,13 +18,15 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.actions;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ptp.core.elements.IResourceManager;
@@ -41,23 +43,8 @@ public class StartResourceManagersObjectActionDelegate implements
 
 	private Shell targetShell;
 
-	private IResourceManagerMenuContribution[] menuContribs;
-
-	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
-		targetShell = targetPart.getSite().getShell();
-	}
-
-	public void run(IAction action) {
-		// no-op
-		System.out.println("StartResourceManagerObjectActionDelegate.run");
-	}
-
-	public void selectionChanged(IAction action, ISelection selection) {
-		IStructuredSelection ss = (IStructuredSelection) selection;
-		Object[] selections = ss.toArray();
-		menuContribs = new IResourceManagerMenuContribution[selections.length];
-		System.arraycopy(selections, 0, menuContribs, 0, menuContribs.length);
-	}
+	private List<IResourceManagerMenuContribution> menuContribs =
+		new ArrayList<IResourceManagerMenuContribution>();
 
 	public void dispose() {
 	}
@@ -65,10 +52,15 @@ public class StartResourceManagersObjectActionDelegate implements
 	public void init(IAction action) {
 	}
 
+	public void run(IAction action) {
+		// no-op
+		System.out.println("StartResourceManagerObjectActionDelegate.run");
+	}
+
 	public void runWithEvent(IAction action, Event event) {
-		for (int i = 0; i < menuContribs.length; ++i) {
-			IResourceManagerMenuContribution menuContrib = menuContribs[i];
-			final IResourceManager rmManager = (IResourceManager) menuContrib.getAdapter(IResourceManager.class);
+		for (IResourceManagerMenuContribution menuContrib : menuContribs) {
+			final IResourceManager rmManager = 
+				(IResourceManager) menuContrib.getAdapter(IResourceManager.class);
 
 			new Job("Starting Resource Manager"){
 
@@ -85,5 +77,34 @@ public class StartResourceManagersObjectActionDelegate implements
 				}
 			}.schedule();
 		}
+	}
+
+	public void selectionChanged(IAction action, ISelection selection) {
+		IStructuredSelection ss = (IStructuredSelection) selection;
+		menuContribs.clear();
+		menuContribs.addAll(ss.toList());
+
+		boolean isEnabled = isEnabled();
+		action.setEnabled(isEnabled);
+	}
+
+	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
+		targetShell = targetPart.getSite().getShell();
+	}
+
+	/**
+	 * @return
+	 */
+	private boolean isEnabled() {
+		boolean isEnabled = true;
+		for (IResourceManagerMenuContribution menuContrib : menuContribs) {
+			final IResourceManager rmManager = 
+				(IResourceManager) menuContrib.getAdapter(IResourceManager.class);
+			if (rmManager.getState() != ResourceManagerAttributes.State.STOPPED) {
+				isEnabled = false;
+				break;
+			}
+		}
+		return isEnabled;
 	}
 }

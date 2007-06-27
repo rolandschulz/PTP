@@ -143,6 +143,20 @@
 		<objectContribution
 			id="org.eclipse.ptp.ui.resourceManager.popupuMenu"
 			objectClass="org.eclipse.ptp.rmsystem.IResourceManagerMenuContribution">
+			<action
+				class="org.eclipse.ptp.ui.actions.StopResourceManagersObjectActionDelegate"
+				enablesFor="+"
+				icon="icons/rm/stop.gif"
+				id="org.eclipse.ptp.ui.actions.stopResourceManagersAction"
+				label="%StopResourceManagersAction.label"
+				menubarPath="additions"/>
+			<action
+				class="org.eclipse.ptp.ui.actions.StartResourceManagersObjectActionDelegate"
+				enablesFor="+"
+				icon="icons/rm/start.gif"
+				id="org.eclipse.ptp.ui.actions.startResourceManagersAction"
+				label="%StartResourceManagersAction.label"
+				menubarPath="additions"/>
 			<menu
 				id="org.eclipse.ptp.ui.resourceManager.popupSubMenu"
 				label="%ResourceManagersMenu.label"
@@ -150,20 +164,6 @@
 				<groupMarker name="content"/>
 				<separator name="additions"/>
 			</menu>
-			<action
-				class="org.eclipse.ptp.ui.actions.StopResourceManagersObjectActionDelegate"
-				enablesFor="+"
-				icon="icons/rm/stop.gif"
-				id="org.eclipse.ptp.ui.actions.stopResourceManagersAction"
-				label="%StopResourceManagersAction.label"
-				menubarPath="org.eclipse.ptp.ui.resourceManager.popupSubMenu/content"/>
-			<action
-				class="org.eclipse.ptp.ui.actions.StartResourceManagersObjectActionDelegate"
-				enablesFor="+"
-				icon="icons/rm/start.gif"
-				id="org.eclipse.ptp.ui.actions.startResourceManagersAction"
-				label="%StartResourceManagersAction.label"
-				menubarPath="org.eclipse.ptp.ui.resourceManager.popupSubMenu/content"/>
 		</objectContribution>
 	</extension>
 
