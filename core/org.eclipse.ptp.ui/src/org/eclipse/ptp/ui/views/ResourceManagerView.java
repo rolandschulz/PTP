@@ -42,6 +42,7 @@ import org.eclipse.ptp.ui.actions.AddResourceManagerAction;
 import org.eclipse.ptp.ui.actions.RemoveResourceManagersAction;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
@@ -287,7 +288,11 @@ public class ResourceManagerView extends ViewPart implements
 	}
 
 	private void refreshViewer(final IPElement element) {
-		Display display = viewer.getControl().getDisplay();
+		final Control control = viewer.getControl();
+		if (control.isDisposed()) {
+			return;
+		}
+		Display display = control.getDisplay();
 		display.asyncExec(new Runnable(){
 			public void run() {
 				viewer.refresh(element);
@@ -295,7 +300,11 @@ public class ResourceManagerView extends ViewPart implements
 	}
 
 	private void updateViewer(final IPElement element) {
-		Display display = viewer.getControl().getDisplay();
+		final Control control = viewer.getControl();
+		if (control.isDisposed()) {
+			return;
+		}
+		Display display = control.getDisplay();
 		display.asyncExec(new Runnable(){
 			public void run() {
 				viewer.update(element, null);
