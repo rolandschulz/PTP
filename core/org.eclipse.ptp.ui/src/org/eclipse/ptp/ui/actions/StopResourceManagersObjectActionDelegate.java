@@ -18,62 +18,36 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.actions;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.rmsystem.IResourceManagerMenuContribution;
 import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.ui.UIMessage;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.IActionDelegate2;
-import org.eclipse.ui.IObjectActionDelegate;
-import org.eclipse.ui.IWorkbenchPart;
 
-public class StopResourceManagersObjectActionDelegate implements
-		IObjectActionDelegate, IActionDelegate2 {
-
-	private Shell targetShell;
-
-	private List<IResourceManagerMenuContribution> menuContribs =
-		new ArrayList<IResourceManagerMenuContribution>();
-
-	public void dispose() {
-	}
-
-	public void init(IAction action) {
-	}
+public class StopResourceManagersObjectActionDelegate
+extends AbstractResourceManagerSelectionActionDelegate {
 
 	public void run(IAction action) {
-		// no-op
-	}
-
-	public void runWithEvent(IAction action, Event event) {
-		for (IResourceManagerMenuContribution menuContrib : menuContribs) {
+		
+		for (IResourceManagerMenuContribution menuContrib : getMenuContribs()) {
 			IResourceManager rmManager = (IResourceManager) menuContrib.getAdapter(IResourceManager.class);
 
-			ResourceManagerAttributes.State state = rmManager.getState();
-			
-			if (state != ResourceManagerAttributes.State.STARTED &&
-					state != ResourceManagerAttributes.State.ERROR) {
-				return;
+			if (!isEnabledFor(rmManager)) {
+				continue;
 			}
 			
 			/*
 			 * Only ask if we are really shutting down the RM
 			 */
+			ResourceManagerAttributes.State state = rmManager.getState();
 			if (state == ResourceManagerAttributes.State.STARTED) {
-				boolean shutdown = MessageDialog.openConfirm(targetShell,
+				boolean shutdown = MessageDialog.openConfirm(getTargetShell(),
 						UIMessage.getResourceString("StopResourceManagersObjectActionDelegate.Title"), //$NON-NLS-1$
 						UIMessage.getResourceString("StopResourceManagersObjectActionDelegate.Confirm") //$NON-NLS-1$
 						+ rmManager.getName()
@@ -90,7 +64,7 @@ public class StopResourceManagersObjectActionDelegate implements
 						+ rmManager.getName() + "\""; //$NON-NLS-1$
 				Status status = new Status(Status.ERROR, PTPUIPlugin.PLUGIN_ID,
 						1, message, e);
-				ErrorDialog dlg = new ErrorDialog(targetShell,
+				ErrorDialog dlg = new ErrorDialog(getTargetShell(),
 						UIMessage.getResourceString("StopResourceManagersObjectActionDelegate.ErrorStopingResourceManager"), message, status, //$NON-NLS-1$
 						IStatus.ERROR);
 				dlg.open();
@@ -99,34 +73,14 @@ public class StopResourceManagersObjectActionDelegate implements
 		}
 	}
 
-	public void selectionChanged(IAction action, ISelection selection) {
-		IStructuredSelection ss = (IStructuredSelection) selection;
-		menuContribs.clear();
-		menuContribs.addAll(ss.toList());
-
-		boolean isEnabled = isEnabled();
-		action.setEnabled(isEnabled);
-	}
-
-	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
-		targetShell = targetPart.getSite().getShell();
-	}
-
-	/**
-	 * @return
-	 */
-	private boolean isEnabled() {
-		boolean isEnabled = true;
-		for (IResourceManagerMenuContribution menuContrib : menuContribs) {
-			final IResourceManager rmManager = 
-				(IResourceManager) menuContrib.getAdapter(IResourceManager.class);
-			ResourceManagerAttributes.State state = rmManager.getState();
-			if (state != ResourceManagerAttributes.State.STARTED &&
-					state != ResourceManagerAttributes.State.ERROR) {
-				isEnabled = false;
-				break;
-			}
+	@Override
+	protected boolean isEnabledFor(IResourceManager rmManager) {
+		ResourceManagerAttributes.State state = rmManager.getState();
+		if (state == ResourceManagerAttributes.State.STARTED ||
+				state == ResourceManagerAttributes.State.ERROR) {
+			return true;
 		}
-		return isEnabled;
+		return false;
 	}
+
 }
