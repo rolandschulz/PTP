@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2005 IBM Corporation.
+ * Copyright (c) 2005,2007 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,6 +24,12 @@ public class CHelpResourceDescriptorImpl implements ICHelpResourceDescriptor
     String        href;
     IHelpResource [] resources;
 
+    /**
+     * This is where the location of the html help file (to be displayed for an API) is located
+     * @param helpBook
+     * @param functionSummary
+     * @param pluginId
+     */
     public CHelpResourceDescriptorImpl(ICHelpBook helpBook, IFunctionSummary functionSummary, String pluginId)
     {
         book = helpBook;
@@ -32,8 +38,8 @@ public class CHelpResourceDescriptorImpl implements ICHelpResourceDescriptor
         StringBuffer buf=new StringBuffer();
         buf.append("/").append(pluginId).append("/html/").append(name).append(".html");
         href=buf.toString();
-System.out.println("looking for help file: "+href);
-        
+        //System.out.println("looking for help file: "+href);
+        // href="file://c:/temp/foo.html";      
         label = functionSummary.getPrototype().getPrototypeString(false);
         resources = new IHelpResource[1];
         resources[0] = new IHelpResource() {
