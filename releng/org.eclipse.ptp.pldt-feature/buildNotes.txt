@@ -69,6 +69,9 @@ This jars the feature too, which doesn't work.
 The feature setup item above sets the jarring of the individual plug-ins.
 
 
+==== the zip that is built will not have eclipse as its root
+unzip to c:\temp\eclipse, then re-zip with eclipse as its root.
+
 ===========
 Upload notes
 Once you've exported the feature and  
