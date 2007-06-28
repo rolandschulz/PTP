@@ -97,7 +97,7 @@ public class LAPIPreferencePage extends FieldEditorPreferencePage implements IWo
         //"Use default?"
 //        BooleanFieldEditor bed = new BooleanFieldEditor(LAPI_HELP_DEFAULT_ID,LAPI_HELP_DEFAULT,getFieldEditorParent());
 //        addField(bed);
-        
+  /*      
         int numCol=1;
     	RadioGroupFieldEditor choiceFE = new RadioGroupFieldEditor(LAPI_WHICH_HELP_ID, LAPI_HELP, numCol, new String[][] {
 				{ LAPI_HELP_DEFAULT, "choice1" }, 
@@ -109,6 +109,7 @@ public class LAPIPreferencePage extends FieldEditorPreferencePage implements IWo
     	
     	StringFieldEditor otherLoc=new StringFieldEditor(LAPI_HELP_OTHER_ID, LAPI_HELP_OTHER,getFieldEditorParent());
     	addField(otherLoc);
+    	*/
     	
     }
     
