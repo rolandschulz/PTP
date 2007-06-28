@@ -1,9 +1,11 @@
 package org.eclipse.ptp.ui.views;
 
+import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.ptp.core.PTPCorePlugin;
@@ -38,11 +40,11 @@ import org.eclipse.ptp.core.events.IModelManagerNewResourceManagerEvent;
 import org.eclipse.ptp.core.events.IModelManagerRemoveResourceManagerEvent;
 import org.eclipse.ptp.core.listeners.IModelManagerResourceManagerListener;
 import org.eclipse.ptp.rmsystem.IResourceManagerMenuContribution;
+import org.eclipse.ptp.ui.UIUtils;
 import org.eclipse.ptp.ui.actions.AddResourceManagerAction;
 import org.eclipse.ptp.ui.actions.RemoveResourceManagersAction;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
@@ -288,27 +290,23 @@ public class ResourceManagerView extends ViewPart implements
 	}
 
 	private void refreshViewer(final IPElement element) {
-		final Control control = viewer.getControl();
-		if (control.isDisposed()) {
-			return;
-		}
-		Display display = control.getDisplay();
-		display.asyncExec(new Runnable(){
-			public void run() {
+		ISafeRunnable safeRunnable = new SafeRunnable(){
+
+			public void run() throws Exception {
 				viewer.refresh(element);
-			}});
+			}
+		};
+		UIUtils.safeRunAsyncInUIThread(safeRunnable);
 	}
 
 	private void updateViewer(final IPElement element) {
-		final Control control = viewer.getControl();
-		if (control.isDisposed()) {
-			return;
-		}
-		Display display = control.getDisplay();
-		display.asyncExec(new Runnable(){
-			public void run() {
+		ISafeRunnable safeRunnable = new SafeRunnable(){
+
+			public void run() throws Exception {
 				viewer.update(element, null);
-			}});
+			}
+		};
+		UIUtils.safeRunAsyncInUIThread(safeRunnable);
 	}
 
 }
