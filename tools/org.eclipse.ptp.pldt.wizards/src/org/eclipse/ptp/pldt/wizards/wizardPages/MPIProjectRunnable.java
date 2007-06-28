@@ -150,20 +150,22 @@ public class MPIProjectRunnable implements Runnable {
 		if(mpiSampleFileInsert.equals("true")){
 			 try {
 				Bundle bundle = Platform.getBundle(MpiWizardsPlugin.getPluginId());
-				String mpiFilename="testMPI.c";
-				Path path = new Path(mpiFilename);
+				String sourceFilename="samples/testMPI.c";
+				String destFileName="testMPI.c";
+				Path path = new Path(sourceFilename);
 				URL fileURL = FileLocator.find(bundle, path, null);
-				InputStream mpiFileStream = null;
+				InputStream destFileStream = null;
 				try {
-					mpiFileStream = fileURL.openStream();
-					proj.getFile(mpiFilename).create(mpiFileStream,false,null);
+					destFileStream = fileURL.openStream();
+					proj.getFile(destFileName).create(destFileStream,false,null);
 					//System.out.println("file "+fname+" created.");
 				} catch (IOException e) {
-					System.out.println("Error creating file: "+mpiFilename);
+					System.out.println("Error creating file: "+destFileName);
 					//e.printStackTrace();
 				}
 			} catch (CoreException e) {
 				System.out.println("Error creating testMPI.c");
+				e.printStackTrace();
 			}
 		}
 		ManagedBuildManager.saveBuildInfo(proj, true);
