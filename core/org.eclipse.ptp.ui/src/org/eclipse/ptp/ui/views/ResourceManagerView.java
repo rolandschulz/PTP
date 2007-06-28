@@ -45,7 +45,6 @@ import org.eclipse.ptp.ui.actions.AddResourceManagerAction;
 import org.eclipse.ptp.ui.actions.RemoveResourceManagersAction;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchActionConstants;
@@ -63,7 +62,7 @@ public class ResourceManagerView extends ViewPart implements
 		}
 
 		public void handleEvent(IQueueChangedJobEvent e) {
-			refreshViewer(e.getSource());
+			updateViewer(e.getJob());
 		}
 
 		public void handleEvent(IQueueNewJobEvent e) {
@@ -82,7 +81,7 @@ public class ResourceManagerView extends ViewPart implements
 		}
 
 		public void handleEvent(IMachineChangedNodeEvent e) {
-			updateViewer(e.getSource());
+			updateViewer(e.getNode());
 		}
 
 		public void handleEvent(IMachineNewNodeEvent e) {
@@ -188,12 +187,9 @@ public class ResourceManagerView extends ViewPart implements
 		e.getResourceManager().addElementListener(this);
 		e.getResourceManager().addChildListener(rmMachineListener);
 		e.getResourceManager().addChildListener(rmQueueListener);
-		Display display = viewer.getControl().getDisplay();
-		display.asyncExec(new Runnable(){
+		UIUtils.safeRunAsyncInUIThread(new SafeRunnable(){
 			public void run() {
-				// Let the content provider register and unregister
-				// to the added and removed resource managers
-				viewer.setInput(PTPCorePlugin.getDefault().getUniverse());
+				refreshViewer(PTPCorePlugin.getDefault().getUniverse());
 			}});
 	}
 
@@ -204,12 +200,9 @@ public class ResourceManagerView extends ViewPart implements
 		e.getResourceManager().removeElementListener(this);
 		e.getResourceManager().removeChildListener(rmMachineListener);
 		e.getResourceManager().removeChildListener(rmQueueListener);
-		Display display = viewer.getControl().getDisplay();
-		display.asyncExec(new Runnable(){
+		UIUtils.safeRunAsyncInUIThread(new SafeRunnable(){
 			public void run() {
-				// Let the content provider register and unregister
-				// to the added and removed resource managers
-				viewer.setInput(PTPCorePlugin.getDefault().getUniverse());
+				refreshViewer(PTPCorePlugin.getDefault().getUniverse());
 			}});
 	}
 
@@ -224,9 +217,7 @@ public class ResourceManagerView extends ViewPart implements
 	 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerListener#handleEvent(org.eclipse.ptp.core.elements.events.IResourceManagerErrorEvent)
 	 */
 	public void handleEvent(IResourceManagerErrorEvent e) {
-		// TODO An error from the resource manager is a non-fatal error message generated
-		// by the runtime. Should this be handled by an error dialog? is the
-		// resource manager view the correct place?
+		refreshViewer(e.getSource());
 	}
 
 	public void setFocus() {
