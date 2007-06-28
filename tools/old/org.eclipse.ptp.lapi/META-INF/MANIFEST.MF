@@ -1,8 +1,8 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Lapi Plug-in
+Bundle-Name: LAPI support for PLDT
 Bundle-SymbolicName: org.eclipse.ptp.pldt.lapi; singleton:=true
-Bundle-Version: 2.0.0
+Bundle-Version: 2.0.0.qualifier
 Bundle-Activator: org.eclipse.ptp.pldt.lapi.LapiPlugin
 Bundle-Vendor: IBM Research
 Bundle-Localization: plugin
