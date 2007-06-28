@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+    <extension
+         point="org.eclipse.ui.actionSets">
+      <actionSet
+            label="LAPI Artifacts Action Set"
+            visible="true"
+            id="org.eclipse.ptp.pldt.lapi.ui.actionSet">
+         <menu
+               label="&amp;LAPI Artifacts"
+               id="lapiMenu">
+            <separator
+                  name="lapiGroup">
+            </separator>
+         </menu>
+         <action
+               label="Clear LAPI Artifact Markers"
+               icon="icons/nolapi.gif"
+               class="org.eclipse.ptp.pldt.lapi.actions.RemoveMarkerAction"
+               tooltip="Clear LAPI Artifacts Markers"
+               menubarPath="lapiMenu/lapiGroup"
+               toolbarPath="lapiToolbarGroup"
+               id="org.eclipse.ptp.pldt.lapi.ui.actions.RemoveMarkerAction">
+            <selection
+                  class="org.eclipse.core.resources.IProject">
+            </selection>
+         </action>
+         <action
+               label="%run.label"
+               icon="icons/lapi.gif"
+               class="org.eclipse.ptp.pldt.lapi.actions.RunAnalyseLAPI"
+               tooltip="%run.tooltip"
+               menubarPath="lapiMenu/lapiGroup"               
+               toolbarPath="lapiToolbarGroup"
+               id="org.eclipse.ptp.pldt.lapi.ui.actions.RunAnalyseAction">
+         </action>
+      </actionSet>
+   </extension>
+   
+   <extension
+         point="org.eclipse.ui.preferencePages">
+         <page
+            class="org.eclipse.ptp.pldt.lapi.prefs.LAPIPreferencePage"
+            id="org.eclipse.ptp.pldt.lapi.prefpage"
+            category="org.eclipse.ptp.pldt.common.prefs.PLDTPreferencePage"
+            name="LAPI"/>
+         
+   </extension>
+
+   <!--  LAPI markers -->
+   <extension point="org.eclipse.core.resources.markers"
+		id="lapiMarker"
+        name="LAPI Artifact Marker">
+      <super type="org.eclipse.ptp.pldt.mpi.mpiMarker"/>
+   </extension>
+   <!-- this changes the marker image in the editor marker bar  -->
+   <extension
+         point="org.eclipse.ui.editors.annotationTypes">
+      <type
+            markerType="org.eclipse.ptp.pldt.lapi.lapiMarker"
+            name="org.eclipse.ptp.pldt.lapi.lapiMarkerAnnotation">
+      </type>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors.markerAnnotationSpecification">
+      <specification
+            annotationType="org.eclipse.ptp.pldt.lapi.lapiMarkerAnnotation"
+            icon="icons/lapi.gif" 
+            
+            presentationLayer="3"
+            label="LAPI Annotation Marker"
+            
+            textPreferenceKey="lapiIndication"
+            textPreferenceValue="true"
+            highlightPreferenceKey="artifactHighlighting"
+            highlightPreferenceValue="false"
+            colorPreferenceKey="artifactIndicationColor"
+            colorPreferenceValue="128,128,192"
+            verticalRulerPreferenceKey="artifactIndicationInVerticalRuler"
+            verticalRulerPreferenceValue="true"
+			showInNextPrevDropdownToolbarActionKey="showPortingInNextPrevDropdownToolbarAction"
+            showInNextPrevDropdownToolbarAction="false"
+            overviewRulerPreferenceKey="artifactIndicationInOverviewRuler"
+            overviewRulerPreferenceValue="true"
+            
+            includeOnPreferencePage="true"
+            isGoToPreviousNavigationTargetKey="isPortingGoToPreviousNavigationTarget"
+
+            isGoToNextNavigationTargetKey="isPortingRecordGoToNextNavigationTarget"
+            >
+      </specification>  
+   </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            name="%viewcat.name"
+            id="org.eclipse.ptp.pldt.lapi">
+      </category>
+      <view
+            name="%view.name"
+            icon="icons/lapi.gif"
+            category="org.eclipse.ptp.pldt.lapi"
+            class="org.eclipse.ptp.pldt.lapi.views.LapiArtifactView"
+            id="org.eclipse.ptp.pldt.lapi.views.LapiArtifactView">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.cdt.ui.CHelpProvider">
+      <provider
+            class="org.eclipse.ptp.pldt.lapi.editorHelp.LapiCHelpInfoProvider"
+            id="org.eclipse.ptp.pldt.lapi.editorHelp.LapiCHelpInfoProvider"/>
+   </extension>
+</plugin>
