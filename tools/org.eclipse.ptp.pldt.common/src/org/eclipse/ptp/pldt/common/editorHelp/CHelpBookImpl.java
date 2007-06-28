@@ -92,7 +92,7 @@ public class CHelpBookImpl implements ICHelpBook {
 		ICHelpResourceDescriptor resourceDescriptor[] = new ICHelpResourceDescriptor[1];
 		CHelpResourceDescriptorImpl hrd = new CHelpResourceDescriptorImpl(this,
 				functionSummary, this.pluginId);
-		resourceDescriptor[0] = hrd;
+		resourceDescriptor[0] = hrd; // html file path is in here
 		return resourceDescriptor;
 	}
 }
