@@ -73,18 +73,18 @@ The feature setup item above sets the jarring of the individual plug-ins.
 unzip to c:\temp\eclipse, 
 rename orig. archive (so empty dirs don't get created) 
 then re-zip with eclipse as its root into the final zip file name.
-
+OR use rezip.bat  which automates this [brt]
 ===========
 Upload notes
 Once you've exported the feature and  
 zipped it up, try this command:
 
-		 scp zip_file.zip user@dev.eclipse.org:downloads/technology/ptp/builds
+		 scp zip_file.zip user@dev.eclipse.org:downloads/tools/ptp/builds
 
 where 'btibbitts' is your committer username and zip_file.zip is:
 
 		 org.eclipse.ptp.pldt-1.1-IYYYYMMDDHHMM.zip
 
-where I is a capital i (for integration I think) and YYYYMMDDHHMM is  
+where I is a capital i (for integration) and YYYYMMDDHHMM is  
 the year, month, day, hour and minute of the build.
 
