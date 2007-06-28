@@ -70,7 +70,9 @@ The feature setup item above sets the jarring of the individual plug-ins.
 
 
 ==== the zip that is built will not have eclipse as its root
-unzip to c:\temp\eclipse, then re-zip with eclipse as its root.
+unzip to c:\temp\eclipse, 
+rename orig. archive (so empty dirs don't get created) 
+then re-zip with eclipse as its root into the final zip file name.
 
 ===========
 Upload notes
