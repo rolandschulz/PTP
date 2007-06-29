@@ -1,16 +1,23 @@
 package org.eclipse.ptp.ui.views;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.util.SafeRunnable;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPElement;
+import org.eclipse.ptp.core.elements.IPMachine;
+import org.eclipse.ptp.core.elements.IPQueue;
+import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.core.elements.events.IMachineChangedEvent;
 import org.eclipse.ptp.core.elements.events.IMachineChangedNodeEvent;
@@ -44,9 +51,13 @@ import org.eclipse.ptp.ui.UIUtils;
 import org.eclipse.ptp.ui.actions.AddResourceManagerAction;
 import org.eclipse.ptp.ui.actions.RemoveResourceManagersAction;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.model.WorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
@@ -54,7 +65,7 @@ import org.eclipse.ui.part.ViewPart;
 
 public class ResourceManagerView extends ViewPart implements
 		IModelManagerResourceManagerListener, IResourceManagerListener {
-
+	
 	public class QueueListener implements IQueueListener, IQueueJobListener {
 
 		public void handleEvent(IQueueChangedEvent e) {
@@ -96,20 +107,33 @@ public class ResourceManagerView extends ViewPart implements
 	private final class RMMachineListener implements
 			IResourceManagerMachineListener {
 		private final MachineListener machineListener = new MachineListener();
+		private final Set<IPMachine> machines = new HashSet<IPMachine>();
+
+		public synchronized void dispose() {
+			for (IPMachine machine : machines) {
+				machine.removeElementListener(machineListener);
+				machine.removeChildListener(machineListener);
+			}
+			machines.clear();
+		}
 
 		public void handleEvent(IResourceManagerChangedMachineEvent e) {
 			updateViewer(e.getSource());
 		}
 
-		public void handleEvent(IResourceManagerNewMachineEvent e) {
-			e.getMachine().addElementListener(machineListener);
-			e.getMachine().addChildListener(machineListener);
+		public synchronized void handleEvent(IResourceManagerNewMachineEvent e) {
+			final IPMachine machine = e.getMachine();
+			machines.add(machine);
+			machine.addElementListener(machineListener);
+			machine.addChildListener(machineListener);
 			refreshViewer(e.getSource());
 		}
-
-		public void handleEvent(IResourceManagerRemoveMachineEvent e) {
-			e.getMachine().removeElementListener(machineListener);
-			e.getMachine().removeChildListener(machineListener);
+		
+		public synchronized void handleEvent(IResourceManagerRemoveMachineEvent e) {
+			final IPMachine machine = e.getMachine();
+			machines.remove(machine);
+			machine.removeElementListener(machineListener);
+			machine.removeChildListener(machineListener);
 			refreshViewer(e.getSource());
 		}
 	}
@@ -117,23 +141,38 @@ public class ResourceManagerView extends ViewPart implements
 	private final class RMQueueListener implements
 			IResourceManagerQueueListener {
 		private QueueListener queueListener = new QueueListener();
+		private final Set<IPQueue> queues = new HashSet<IPQueue>();
+
+		public synchronized void dispose() {
+			for (IPQueue queue : queues) {
+				queue.removeElementListener(queueListener);
+				queue.removeChildListener(queueListener);
+			}
+			queues.clear();
+		}
 
 		public void handleEvent(IResourceManagerChangedQueueEvent e) {
 			updateViewer(e.getSource());
 		}
 
-		public void handleEvent(IResourceManagerNewQueueEvent e) {
-			e.getQueue().addElementListener(queueListener);
-			e.getQueue().addChildListener(queueListener);
+		public synchronized void handleEvent(IResourceManagerNewQueueEvent e) {
+			final IPQueue queue = e.getQueue();
+			queues.add(queue);
+			queue.addElementListener(queueListener);
+			queue.addChildListener(queueListener);
 			refreshViewer(e.getSource());
 		}
-
-		public void handleEvent(IResourceManagerRemoveQueueEvent e) {
-			e.getQueue().removeElementListener(queueListener);
-			e.getQueue().removeChildListener(queueListener);
+		
+		public synchronized void handleEvent(IResourceManagerRemoveQueueEvent e) {
+			final IPQueue queue = e.getQueue();
+			queues.remove(queue);
+			queue.removeElementListener(queueListener);
+			queue.removeChildListener(queueListener);
 			refreshViewer(e.getSource());
 		}
 	}
+
+	private final Set<IResourceManager> resourceManagers = new HashSet<IResourceManager>();
 
 	private TreeViewer viewer;
 
@@ -141,9 +180,9 @@ public class ResourceManagerView extends ViewPart implements
 
 	private AddResourceManagerAction addResourceManagerAction;
 
-	private final IResourceManagerMachineListener rmMachineListener = new RMMachineListener();
+	private final RMMachineListener rmMachineListener = new RMMachineListener();
 
-	private final IResourceManagerQueueListener rmQueueListener = new RMQueueListener();
+	private final RMQueueListener rmQueueListener = new RMQueueListener();
 
 	public void createPartControl(Composite parent) {
 		viewer = new TreeViewer(parent, SWT.MULTI);
@@ -165,11 +204,31 @@ public class ResourceManagerView extends ViewPart implements
 		// ----------------------------------------------------------------------
 		getSite().setSelectionProvider(viewer);
 
+		viewer.getTree().addMouseListener(new MouseAdapter() {
+			public void mouseDown(MouseEvent e) {
+				ISelection selection = viewer.getSelection();
+				TreeItem item = viewer.getTree().getItem(new Point(e.x, e.y));
+				if (item == null && !selection.isEmpty()) {
+					viewer.getTree().deselectAll();
+				}
+				else if (item != null) {
+				}
+			}
+		});
+
 		PTPCorePlugin.getDefault().getModelManager().addListener(this);
 	}
 
-	public void dispose() {
+	public synchronized void dispose() {
 		PTPCorePlugin.getDefault().getModelManager().removeListener(this);
+		for (IResourceManager resourceManager : resourceManagers) {
+			resourceManager.removeElementListener(this);
+			resourceManager.removeChildListener(rmMachineListener);
+			resourceManager.removeChildListener(rmQueueListener);
+		}
+		resourceManagers.clear();
+		rmMachineListener.dispose();
+		rmQueueListener.dispose();
 		super.dispose();
 	}
 
@@ -183,10 +242,12 @@ public class ResourceManagerView extends ViewPart implements
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.events.IModelManagerResourceManagerListener#handleEvent(org.eclipse.ptp.core.events.IModelManagerNewResourceManagerEvent)
 	 */
-	public void handleEvent(IModelManagerNewResourceManagerEvent e) {
-		e.getResourceManager().addElementListener(this);
-		e.getResourceManager().addChildListener(rmMachineListener);
-		e.getResourceManager().addChildListener(rmQueueListener);
+	public synchronized void handleEvent(IModelManagerNewResourceManagerEvent e) {
+		final IResourceManager resourceManager = e.getResourceManager();
+		resourceManagers.add(resourceManager);
+		resourceManager.addElementListener(this);
+		resourceManager.addChildListener(rmMachineListener);
+		resourceManager.addChildListener(rmQueueListener);
 		UIUtils.safeRunAsyncInUIThread(new SafeRunnable(){
 			public void run() {
 				refreshViewer(PTPCorePlugin.getDefault().getUniverse());
@@ -196,10 +257,12 @@ public class ResourceManagerView extends ViewPart implements
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.events.IModelManagerResourceManagerListener#handleEvent(org.eclipse.ptp.core.events.IModelManagerRemoveResourceManagerEvent)
 	 */
-	public void handleEvent(IModelManagerRemoveResourceManagerEvent e) {
-		e.getResourceManager().removeElementListener(this);
-		e.getResourceManager().removeChildListener(rmMachineListener);
-		e.getResourceManager().removeChildListener(rmQueueListener);
+	public synchronized void handleEvent(IModelManagerRemoveResourceManagerEvent e) {
+		final IResourceManager resourceManager = e.getResourceManager();
+		resourceManagers.remove(resourceManager);
+		resourceManager.removeElementListener(this);
+		resourceManager.removeChildListener(rmMachineListener);
+		resourceManager.removeChildListener(rmQueueListener);
 		UIUtils.safeRunAsyncInUIThread(new SafeRunnable(){
 			public void run() {
 				refreshViewer(PTPCorePlugin.getDefault().getUniverse());
