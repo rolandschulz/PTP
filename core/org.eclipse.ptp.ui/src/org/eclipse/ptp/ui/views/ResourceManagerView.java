@@ -1,6 +1,8 @@
 package org.eclipse.ptp.ui.views;
 
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.runtime.ISafeRunnable;
@@ -111,8 +113,7 @@ public class ResourceManagerView extends ViewPart implements
 
 		public synchronized void dispose() {
 			for (IPMachine machine : machines) {
-				machine.removeElementListener(machineListener);
-				machine.removeChildListener(machineListener);
+				removeListeners(machine);
 			}
 			machines.clear();
 		}
@@ -124,17 +125,40 @@ public class ResourceManagerView extends ViewPart implements
 		public synchronized void handleEvent(IResourceManagerNewMachineEvent e) {
 			final IPMachine machine = e.getMachine();
 			machines.add(machine);
-			machine.addElementListener(machineListener);
-			machine.addChildListener(machineListener);
+			addListeners(machine);
 			refreshViewer(e.getSource());
 		}
-		
+
 		public synchronized void handleEvent(IResourceManagerRemoveMachineEvent e) {
 			final IPMachine machine = e.getMachine();
 			machines.remove(machine);
+			removeListeners(machine);
+			refreshViewer(e.getSource());
+		}
+
+		public synchronized void removeListeners(IResourceManager resourceManager) {
+			List<IPMachine> removeMachines = Arrays.asList(resourceManager.getMachines());
+			removeMachines.retainAll(machines);
+			for (IPMachine machine : removeMachines) {
+				removeListeners(machine);
+			}
+			machines.removeAll(removeMachines);
+		}
+		
+		/**
+		 * @param machine
+		 */
+		private void addListeners(final IPMachine machine) {
+			machine.addElementListener(machineListener);
+			machine.addChildListener(machineListener);
+		}
+
+		/**
+		 * @param machine
+		 */
+		private void removeListeners(final IPMachine machine) {
 			machine.removeElementListener(machineListener);
 			machine.removeChildListener(machineListener);
-			refreshViewer(e.getSource());
 		}
 	}
 
@@ -145,8 +169,7 @@ public class ResourceManagerView extends ViewPart implements
 
 		public synchronized void dispose() {
 			for (IPQueue queue : queues) {
-				queue.removeElementListener(queueListener);
-				queue.removeChildListener(queueListener);
+				removeListeners(queue);
 			}
 			queues.clear();
 		}
@@ -158,17 +181,40 @@ public class ResourceManagerView extends ViewPart implements
 		public synchronized void handleEvent(IResourceManagerNewQueueEvent e) {
 			final IPQueue queue = e.getQueue();
 			queues.add(queue);
-			queue.addElementListener(queueListener);
-			queue.addChildListener(queueListener);
+			addListeners(queue);
 			refreshViewer(e.getSource());
 		}
-		
+
 		public synchronized void handleEvent(IResourceManagerRemoveQueueEvent e) {
 			final IPQueue queue = e.getQueue();
 			queues.remove(queue);
+			removeListeners(queue);
+			refreshViewer(e.getSource());
+		}
+
+		public synchronized void removeListeners(IResourceManager resourceManager) {
+			List<IPQueue> removeQueues = Arrays.asList(resourceManager.getQueues());
+			removeQueues.retainAll(queues);
+			for (IPQueue queue : removeQueues) {
+				removeListeners(queue);
+			}
+			queues.removeAll(removeQueues);
+		}
+		
+		/**
+		 * @param queue
+		 */
+		private void addListeners(final IPQueue queue) {
+			queue.addElementListener(queueListener);
+			queue.addChildListener(queueListener);
+		}
+
+		/**
+		 * @param queue
+		 */
+		private void removeListeners(IPQueue queue) {
 			queue.removeElementListener(queueListener);
 			queue.removeChildListener(queueListener);
-			refreshViewer(e.getSource());
 		}
 	}
 
@@ -262,7 +308,9 @@ public class ResourceManagerView extends ViewPart implements
 		resourceManagers.remove(resourceManager);
 		resourceManager.removeElementListener(this);
 		resourceManager.removeChildListener(rmMachineListener);
+		rmMachineListener.removeListeners(resourceManager);
 		resourceManager.removeChildListener(rmQueueListener);
+		rmQueueListener.removeListeners(resourceManager);
 		UIUtils.safeRunAsyncInUIThread(new SafeRunnable(){
 			public void run() {
 				refreshViewer(PTPCorePlugin.getDefault().getUniverse());
