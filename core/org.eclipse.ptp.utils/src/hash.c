@@ -326,11 +326,11 @@ HashRemove(Hash *htab, unsigned int idx)
 		THREAD_UNLOCK(hash);
 		return;
 	}
-		
+	
 	/*
 	 * Update scan values
 	 */
-	if (htab->scan_entry == h)
+	if (htab->scan_entry == *hp)
 		htab->scan_entry = htab->scan_entry->h_next;
 	
 	/*
