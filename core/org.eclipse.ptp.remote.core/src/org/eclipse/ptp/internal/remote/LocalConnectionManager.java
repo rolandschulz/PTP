@@ -12,6 +12,7 @@ package org.eclipse.ptp.internal.remote;
 
 import org.eclipse.ptp.remote.IRemoteConnection;
 import org.eclipse.ptp.remote.IRemoteConnectionManager;
+import org.eclipse.swt.widgets.Shell;
 
 
 public class LocalConnectionManager implements IRemoteConnectionManager {
@@ -39,10 +40,9 @@ public class LocalConnectionManager implements IRemoteConnectionManager {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteConnectionManager#getNewConnection()
+	 * @see org.eclipse.ptp.remote.IRemoteConnectionManager#newConnection()
 	 */
-	public IRemoteConnection getNewConnection() {
-		return localConnection;
+	public void newConnection(Shell shell) {
 	}
 
 	/* (non-Javadoc)

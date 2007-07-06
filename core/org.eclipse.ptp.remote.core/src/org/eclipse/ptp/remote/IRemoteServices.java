@@ -15,20 +15,6 @@ import java.util.List;
 
 public interface IRemoteServices {
 	/**
-	 * Get a process builder for creating remote processes
-	 * 
-	 * @return process builder
-	 */
-	public IRemoteProcessBuilder getProcessBuilder(IRemoteConnection conn, List<String>command);
-	
-	/**
-	 * Get a process builder for creating remote processes
-	 * 
-	 * @return process builder
-	 */
-	public IRemoteProcessBuilder getProcessBuilder(IRemoteConnection conn, String... command);
-
-	/**
 	 * Get a connection manager for managing remote connections
 	 * 
 	 * @return connection manager
@@ -41,4 +27,25 @@ public interface IRemoteServices {
 	 * @return file manager
 	 */
 	public IRemoteFileManager getFileManager();
+
+	/**
+	 * Get a process builder for creating remote processes
+	 * 
+	 * @return process builder
+	 */
+	public IRemoteProcessBuilder getProcessBuilder(IRemoteConnection conn, List<String>command);
+	
+	/**
+	 * Get a process builder for creating remote processes
+	 * 
+	 * @return process builder
+	 */
+	public IRemoteProcessBuilder getProcessBuilder(IRemoteConnection conn, String... command);
+	
+	/**
+	 * Initialize the remote service.
+	 * 
+	 * @return true if successfully initialized, false otherwise
+	 */
+	public boolean initialize();
 }

@@ -9,4 +9,10 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.core.filesystem
 Eclipse-LazyStart: true
-Export-Package: org.eclipse.ptp.remote
+Export-Package: org.eclipse.ptp.remote;
+  uses:="org.eclipse.core.filesystem,
+   org.osgi.framework,
+   org.eclipse.ui.plugin,
+   org.eclipse.swt.widgets,
+   org.eclipse.core.runtime,
+   org.eclipse.ui"
