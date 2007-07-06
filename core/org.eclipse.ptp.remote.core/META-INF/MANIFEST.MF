@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: PTP Remote UI Plug-in
+Bundle-SymbolicName: org.eclipse.ptp.remote;singleton:=true
+Bundle-Version: 2.0.0
+Bundle-Activator: org.eclipse.ptp.remote.PTPRemotePlugin
+Bundle-Vendor: Eclipse.org
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.core.filesystem
+Eclipse-LazyStart: true
+Export-Package: org.eclipse.ptp.remote
