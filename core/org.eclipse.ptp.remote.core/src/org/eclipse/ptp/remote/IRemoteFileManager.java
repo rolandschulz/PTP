@@ -10,10 +10,12 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote;
 
+import org.eclipse.swt.widgets.Shell;
+
 public interface IRemoteFileManager {
 	/**
 	 * @param conn
 	 * @return
 	 */
-	public String browseRemoteFile(IRemoteConnection conn, String message, String correctPath);
+	public String browseRemoteFile(Shell shell, IRemoteConnection conn, String message, String correctPath);
 }

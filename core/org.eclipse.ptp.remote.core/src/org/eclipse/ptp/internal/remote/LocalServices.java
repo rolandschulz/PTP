@@ -20,6 +20,9 @@ import org.eclipse.ptp.remote.IRemoteServices;
 
 
 public class LocalServices implements IRemoteServices {
+	private IRemoteConnectionManager connMgr;
+	private IRemoteFileManager fileMgr;
+	
 	public IRemoteProcessBuilder getProcessBuilder(IRemoteConnection conn, List<String>command) {
 		return new LocalProcessBuilder(conn, command);
 	}
@@ -29,10 +32,16 @@ public class LocalServices implements IRemoteServices {
 	}
 	
 	public IRemoteConnectionManager getConnectionManager() {
-		return new LocalConnectionManager();
+		return connMgr;
 	}
 	
 	public IRemoteFileManager getFileManager() {
-		return new LocalFileManager();
+		return fileMgr;
+	}
+	
+	public boolean initialize() {
+		connMgr = new LocalConnectionManager();
+		fileMgr = new LocalFileManager();
+		return true;
 	}
 }

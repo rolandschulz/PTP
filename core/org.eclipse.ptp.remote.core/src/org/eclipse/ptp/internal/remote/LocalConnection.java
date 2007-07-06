@@ -13,6 +13,15 @@ package org.eclipse.ptp.internal.remote;
 import org.eclipse.ptp.remote.IRemoteConnection;
 
 public class LocalConnection implements IRemoteConnection {
+	private String name = "Local";
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.IRemoteConnection#getName()
+	 */
+	public String getName() {
+		return name;
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnection#setHostname(java.lang.String)
 	 */

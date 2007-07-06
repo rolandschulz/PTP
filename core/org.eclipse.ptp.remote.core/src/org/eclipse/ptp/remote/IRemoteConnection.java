@@ -12,6 +12,13 @@ package org.eclipse.ptp.remote;
 
 public interface IRemoteConnection {
 	/**
+	 * Get unique name for this connection.
+	 * 
+	 * @return connection name
+	 */
+	public String getName();
+	
+	/**
 	 * @param hostname
 	 */
 	public void setHostname(String hostname);

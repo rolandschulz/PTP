@@ -16,10 +16,11 @@ import org.eclipse.ptp.remote.IRemoteConnection;
 import org.eclipse.ptp.remote.IRemoteFileManager;
 import org.eclipse.ptp.remote.PTPRemotePlugin;
 import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Shell;
 
 
 public class LocalFileManager implements IRemoteFileManager {
-	public String browseRemoteFile(IRemoteConnection conn, String message, String correctPath) {
+	public String browseRemoteFile(Shell shell, IRemoteConnection conn, String message, String correctPath) {
 		FileDialog dialog = new FileDialog(PTPRemotePlugin.getShell());
 		dialog.setText(message);
 		if (correctPath != null) {

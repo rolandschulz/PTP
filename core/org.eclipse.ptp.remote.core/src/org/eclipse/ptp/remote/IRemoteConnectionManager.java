@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote;
 
+import org.eclipse.swt.widgets.Shell;
+
 
 public interface IRemoteConnectionManager {
 	/**
@@ -37,10 +39,8 @@ public interface IRemoteConnectionManager {
 	/**
 	 * Create a new connection. The implementation can chose to do this in any way,
 	 * but typically will use a dialog or wizard.
-	 * 
-	 * @return the newly created connection, or null if creation was cancelled
 	 */
-	public IRemoteConnection getNewConnection();
+	public void newConnection(Shell shell);
 	
 	/**
 	 * Set the remote connection
