@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<psf version="2.0">
+<provider id="org.eclipse.team.cvs.core.cvsnature">
+<project reference="1.0,:pserver:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/core/org.eclipse.ptp.core,org.eclipse.ptp.core"/>
+<project reference="1.0,:pserver:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/debug/org.eclipse.ptp.debug.core,org.eclipse.ptp.debug.core"/>
+<project reference="1.0,:pserver:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/debug/org.eclipse.ptp.debug.external.core,org.eclipse.ptp.debug.external.core"/>
+<project reference="1.0,:pserver:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/debug/org.eclipse.ptp.debug.external.ui,org.eclipse.ptp.debug.external.ui"/>
+<project reference="1.0,:pserver:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/debug/org.eclipse.ptp.debug.ui,org.eclipse.ptp.debug.ui"/>
+<project reference="1.0,:pserver:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/core/org.eclipse.ptp.launch,org.eclipse.ptp.launch"/>
+<project reference="1.0,:pserver:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/core/org.eclipse.ptp.lsf.core,org.eclipse.ptp.lsf.core"/>
+<project reference="1.0,:pserver:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/core/org.eclipse.ptp.lsf.ui,org.eclipse.ptp.lsf.ui"/>
+<project reference="1.0,:pserver:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/core/org.eclipse.ptp.mpich2.core,org.eclipse.ptp.mpich2.core"/>
+<project reference="1.0,:pserver:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/core/org.eclipse.ptp.mpich2.ui,org.eclipse.ptp.mpich2.ui"/>
+<project reference="1.0,:pserver:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/core/org.eclipse.ptp.orte.core,org.eclipse.ptp.orte.core"/>
+<project reference="1.0,:pserver:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/core/org.eclipse.ptp.orte.ui,org.eclipse.ptp.orte.ui"/>
+<project reference="1.0,:pserver:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/core/org.eclipse.ptp.ui,org.eclipse.ptp.ui"/>
+</provider>
+</psf>
