@@ -213,8 +213,6 @@ public class RMConfigurationWizard extends Wizard {
 
 	private boolean useDefaultNameAndDesc = true;
 	
-	private boolean useRemotePage = true;
-
 	private final NameAndDescPage nameAndDescPage;
 
 	private int selectedFactory = -1;
@@ -272,6 +270,11 @@ public class RMConfigurationWizard extends Wizard {
 			// last page or page not found
 			return null;
 		}
+		if (index == numPages - 2) {
+			// initialize last page
+			nameAndDescPage.setNameAndDescription(configs[selectedFactory]);
+			nameAndDescPage.setEnabled(!useDefaultNameAndDesc);
+		}
 		return (IWizardPage) wizardPages.get(index + 1);
 	}
 
@@ -302,18 +305,12 @@ public class RMConfigurationWizard extends Wizard {
 		if (configs[selectedFactory] == null) {
 			configs[selectedFactory] = resourceManagerFactory.createConfiguration();
 		}
-		nameAndDescPage.setNameAndDescription(configs[selectedFactory]);
-		nameAndDescPage.setEnabled(!useDefaultNameAndDesc);
 
 		setWizardPages(selectedFactory);
 	}
 
 	private int getNumPages() {
-		return needsRemotePage() ? wizardPages.size()	: wizardPages.size() - 1;
-	}
-
-	private boolean needsRemotePage() {
-		return useRemotePage;
+		return wizardPages.size();
 	}
 
 	private void setWizardPages(int index) {
@@ -339,7 +336,7 @@ public class RMConfigurationWizard extends Wizard {
 			}
 		}
 
-		// add the first and second pages to the selected factory's pages
+		// add the first and last pages to the selected factory's pages
 		
 		wizardPages.clear();
 		wizardPages.add(selectFactoryPage);
