@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.2"?>
 <plugin>
-   <extension-point id="remote" name="Remote" schema="schema/remote.exsd"/>
+   <extension-point id="remoteServices" name="Remote" schema="schema/remote.exsd"/>
    <extension
-         point="org.eclipse.ptp.remote.remote">
+         point="org.eclipse.ptp.remote.remoteServices">
       <remoteServices
             class="org.eclipse.ptp.internal.remote.LocalServicesFactory"
             id="org.eclipse.ptp.remote.LocalServices"

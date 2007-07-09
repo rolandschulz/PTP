@@ -32,7 +32,7 @@ import org.osgi.framework.BundleContext;
 public class PTPRemotePlugin extends AbstractUIPlugin {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "org.eclipse.ptp.remote.ui";
+	public static final String PLUGIN_ID = "org.eclipse.ptp.remote";
 
 	// The shared instance
 	private static PTPRemotePlugin plugin;
@@ -57,10 +57,7 @@ public class PTPRemotePlugin extends AbstractUIPlugin {
 		super.start(context);
 		plugin = this;
 		selectedServices = null;
-		remoteServices = retrieveRemoteServices();
-		for (RemoteServicesProxy p : remoteServices) {
-			System.out.println("found remote services: " + p.getName());
-		}
+		remoteServices = null;
 	}
 
 	/*
@@ -173,8 +170,18 @@ public class PTPRemotePlugin extends AbstractUIPlugin {
 		return services.toArray(new RemoteServicesProxy[services.size()]);
     }
 	
-	public RemoteServicesProxy[] getRemoteServices() {
-		return remoteServices;
+	public String[] getRemoteServicesNames() {
+		if (remoteServices == null) {
+			remoteServices = retrieveRemoteServices();
+			for (RemoteServicesProxy p : remoteServices) {
+				System.out.println("found remote services: " + p.getName());
+			}
+		}
+		String[] names = new String[remoteServices.length];
+		for (int i = 0; i < remoteServices.length; i++) {
+			names[i] = remoteServices[i].getName();
+		}
+		return names;
 	}
 	
 	public void setSelectedServices(String id) {
