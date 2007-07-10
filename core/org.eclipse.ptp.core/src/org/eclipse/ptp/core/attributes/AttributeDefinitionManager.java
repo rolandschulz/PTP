@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.attributes;
 
+import java.math.BigInteger;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -74,8 +75,26 @@ public class AttributeDefinitionManager {
 	 * @param defaultValue
 	 * @return
 	 */
-	public BooleanAttributeDefinition createBooleanAttributeDefinition(final String uniqueId, final String name, final String description, final Boolean defaultValue) {
-		BooleanAttributeDefinition def = new BooleanAttributeDefinition(uniqueId, name, description, defaultValue);
+	public BigIntegerAttributeDefinition createBigIntegerAttributeDefinition(final String uniqueId,
+			final String name, final String description, final BigInteger defaultValue) {
+
+		BigIntegerAttributeDefinition def = new BigIntegerAttributeDefinition(uniqueId, name,
+				description, defaultValue);
+		setAttributeDefinition(def);
+		return def;
+	}
+	
+	/**
+	 * @param uniqueId
+	 * @param name
+	 * @param description
+	 * @param defaultValue
+	 * @return
+	 */
+	public BooleanAttributeDefinition createBooleanAttributeDefinition(final String uniqueId,
+			final String name, final String description, final Boolean defaultValue) {
+		BooleanAttributeDefinition def = new BooleanAttributeDefinition(uniqueId, name,
+				description, defaultValue);
 		setAttributeDefinition(def);
 		return def;
 	}
