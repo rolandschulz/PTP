@@ -19,6 +19,7 @@
 package org.eclipse.ptp.rtsystem;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -784,7 +785,8 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 				Boolean defVal = Boolean.parseBoolean(attrDefault);
 				attrDef = attrDefManager.createBooleanAttributeDefinition(attrId, attrName, attrDesc, defVal);
 			} catch (NumberFormatException ex) {
-				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "Bad proxy event: could not convert attrs to double"));
+				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR,
+						"Bad proxy event: could not convert attrs to boolean"));
 			}
 		} else if (attrType.equals("DATE")) {
 			if (end - pos > 2) {
@@ -804,12 +806,16 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 						attrDef = attrDefManager.createDateAttributeDefinition(attrId, attrName, attrDesc, defVal, fmt);
 					}
 				} catch (ParseException ex) {
-					fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "Bad proxy event: could not parse date"));
+					fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR,
+							"Bad proxy event: could not parse date"));
 				} catch (IllegalValueException ex) {
-					fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "Bad proxy event: could not create attribute definition"));					
+					fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR,
+							"Bad proxy event: could not create attribute definition, "
+							+ ex.getMessage()));					
 				}
 			} else {
-				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "Bad proxy event: missing date format"));				
+				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR,
+						"Bad proxy event: missing date format"));				
 			}
 		} else if (attrType.equals("DOUBLE")) {
 			try {
@@ -822,9 +828,12 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 					attrDef = attrDefManager.createDoubleAttributeDefinition(attrId, attrName, attrDesc, defVal);
 				}
 			} catch (NumberFormatException ex) {
-				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "Bad proxy event: could not convert args to double"));
+				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR,
+						"Bad proxy event: could not convert args to double"));
 			} catch (IllegalValueException ex) {
-				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "Bad proxy event: could not create attribute definition"));					
+				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR,
+						"Bad proxy event: could not create attribute definition, " 
+						+ ex.getMessage()));					
 			}
 		} else if (attrType.equals("ENUMERATED")) {
 			ArrayList<String> values = new ArrayList<String>();
@@ -835,7 +844,9 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 				attrDef = attrDefManager.createStringSetAttributeDefinition(attrId, attrName,
 						attrDesc, attrDefault, values.toArray(new String[values.size()]));
 			} catch (IllegalValueException ex) {
-				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "Bad proxy event: could not create attribute definition"));					
+				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR,
+						"Bad proxy event: could not create attribute definition, " 
+						+ ex.getMessage()));					
 			}
 		} else if (attrType.equals("INTEGER")) {
 			try {
@@ -848,14 +859,38 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 					attrDef = attrDefManager.createIntegerAttributeDefinition(attrId, attrName, attrDesc, defVal);
 				}
 			} catch (NumberFormatException ex) {
-				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "Bad proxy event: could not convert args to integer"));
+				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, 
+						"Bad proxy event: could not convert args to integer"));
 			} catch (IllegalValueException ex) {
-				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "Bad proxy event: could not create attribute definition"));					
+				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR,
+						"Bad proxy event: could not create attribute definition, " 
+						+ ex.getMessage()));					
+			}
+		} else if (attrType.equals("BIGINTEGER")) {
+			try {
+				BigInteger defVal = new BigInteger(attrDefault);
+				if (end - pos > 1) {
+						BigInteger min = new BigInteger(attrs[pos++]);
+						BigInteger max = new BigInteger(attrs[pos++]);
+						attrDef = attrDefManager.createBigIntegerAttributeDefinition(attrId,
+								attrName, attrDesc, defVal, min, max);
+				} else {
+					attrDef = attrDefManager.createBigIntegerAttributeDefinition(attrId, attrName,
+							attrDesc, defVal);
+				}
+			} catch (NumberFormatException ex) {
+				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR,
+						"Bad proxy event: could not convert args to BigInteger"));
+			} catch (IllegalValueException ex) {
+				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR,
+						"Bad proxy event: could not create attribute definition, "
+						+ ex.getMessage()));					
 			}
 		} else if (attrType.equals("STRING")) {
 			attrDef = attrDefManager.createStringAttributeDefinition(attrId, attrName, attrDesc, attrDefault);
 		} else {
-			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, "Bad proxy event: unknown attribute type"));
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR,
+					"Bad proxy event: unknown attribute type"));
 		}
 		
 		return attrDef;
