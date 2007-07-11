@@ -89,6 +89,25 @@ public class AttributeDefinitionManager {
 	 * @param name
 	 * @param description
 	 * @param defaultValue
+	 * @param min
+	 * @param max
+	 * @return
+	 * @throws IllegalValueException
+	 */
+	public BigIntegerAttributeDefinition createBigIntegerAttributeDefinition(final String uniqueId,
+			final String name, final String description, final BigInteger defaultValue,
+			final BigInteger min, final BigInteger max) throws IllegalValueException {
+		BigIntegerAttributeDefinition def = new BigIntegerAttributeDefinition(uniqueId, name,
+				description, defaultValue, min, max);
+		setAttributeDefinition(def);
+		return def;
+	}
+
+	/**
+	 * @param uniqueId
+	 * @param name
+	 * @param description
+	 * @param defaultValue
 	 * @return
 	 */
 	public BooleanAttributeDefinition createBooleanAttributeDefinition(final String uniqueId,
@@ -183,8 +202,10 @@ public class AttributeDefinitionManager {
 	 * @param defaultValue
 	 * @return
 	 */
-	public IntegerAttributeDefinition createIntegerAttributeDefinition(final String uniqueId, final String name, final String description, final Integer defaultValue) {
-		IntegerAttributeDefinition def = new IntegerAttributeDefinition(uniqueId, name, description, defaultValue);
+	public IntegerAttributeDefinition createIntegerAttributeDefinition(final String uniqueId,
+			final String name, final String description, final Integer defaultValue) {
+		IntegerAttributeDefinition def = new IntegerAttributeDefinition(uniqueId, name,
+				description, defaultValue);
 		setAttributeDefinition(def);
 		return def;
 	}
@@ -199,8 +220,11 @@ public class AttributeDefinitionManager {
 	 * @return
 	 * @throws IllegalValueException
 	 */
-	public IntegerAttributeDefinition createIntegerAttributeDefinition(final String uniqueId, final String name, final String description, final Integer defaultValue, final Integer min, final Integer max) throws IllegalValueException {
-		IntegerAttributeDefinition def = new IntegerAttributeDefinition(uniqueId, name, description, defaultValue, min, max);
+	public IntegerAttributeDefinition createIntegerAttributeDefinition(final String uniqueId,
+			final String name, final String description, final Integer defaultValue,
+			final Integer min, final Integer max) throws IllegalValueException {
+		IntegerAttributeDefinition def = new IntegerAttributeDefinition(uniqueId, name,
+				description, defaultValue, min, max);
 		setAttributeDefinition(def);
 		return def;
 	}
