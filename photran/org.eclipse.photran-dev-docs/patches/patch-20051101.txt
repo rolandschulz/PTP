@@ -1,0 +1,1266 @@
+Index: src/org/eclipse/photran/internal/ui/editor/AdaptedSourceViewer.java
+===================================================================
+RCS file: /cvsroot/technology/org.eclipse.photran/org.eclipse.photran.ui/src/org/eclipse/photran/internal/ui/editor/AdaptedSourceViewer.java,v
+retrieving revision 1.1
+diff -u -r1.1 AdaptedSourceViewer.java
+--- src/org/eclipse/photran/internal/ui/editor/AdaptedSourceViewer.java	29 Sep 2005 19:08:24 -0000	1.1
++++ src/org/eclipse/photran/internal/ui/editor/AdaptedSourceViewer.java	16 Oct 2005 07:51:09 -0000
+@@ -9,9 +9,6 @@
+ 
+ import org.eclipse.jface.text.DocumentCommand;
+ import org.eclipse.jface.text.source.IOverviewRuler;
+-import org.eclipse.jface.text.source.ISourceViewer;
+-import org.eclipse.jface.text.source.ISourceViewerExtension;
+-import org.eclipse.jface.text.source.ISourceViewerExtension2;
+ import org.eclipse.jface.text.source.IVerticalRuler;
+ import org.eclipse.jface.text.source.SourceViewer;
+ import org.eclipse.jface.text.source.SourceViewerConfiguration;
+Index: src/org/eclipse/photran/internal/ui/editor/FortranFixedFormEditor.java
+===================================================================
+RCS file: /cvsroot/technology/org.eclipse.photran/org.eclipse.photran.ui/src/org/eclipse/photran/internal/ui/editor/FortranFixedFormEditor.java,v
+retrieving revision 1.1
+diff -u -r1.1 FortranFixedFormEditor.java
+--- src/org/eclipse/photran/internal/ui/editor/FortranFixedFormEditor.java	29 Sep 2005 19:08:24 -0000	1.1
++++ src/org/eclipse/photran/internal/ui/editor/FortranFixedFormEditor.java	16 Oct 2005 07:51:09 -0000
+@@ -46,7 +46,7 @@
+ 
+ 	// This is '6' because of the way Eclipse handles spaces and tabs.
+ 	// If this were '7', the tab would insert 7 spaces and you would start at column 8
+-	private static final int COLUMM_6_WIDTH = 6;
++	public static final int COLUMM_6_WIDTH = 6;
+ 	private static final int COLUMN_5_WIDTH = 5;
+ 	private static final int COLUMN_72_WIDTH = 72;
+ 
+Index: src/org/eclipse/photran/internal/ui/editor/FortranFreeFormHorizontalRuler.java
+===================================================================
+RCS file: /cvsroot/technology/org.eclipse.photran/org.eclipse.photran.ui/src/org/eclipse/photran/internal/ui/editor/FortranFreeFormHorizontalRuler.java,v
+retrieving revision 1.1
+diff -u -r1.1 FortranFreeFormHorizontalRuler.java
+--- src/org/eclipse/photran/internal/ui/editor/FortranFreeFormHorizontalRuler.java	29 Sep 2005 19:08:24 -0000	1.1
++++ src/org/eclipse/photran/internal/ui/editor/FortranFreeFormHorizontalRuler.java	16 Oct 2005 07:51:09 -0000
+@@ -7,7 +7,7 @@
+ import org.eclipse.swt.widgets.Composite;
+ 
+ /**
+- * @ author nchen
++ * @author nchen
+  * @author cheah
+  * 
+  * Basic ruler that extends as wide as the editor
+Index: src/org/eclipse/photran/internal/ui/editor/FortranPartitionScanner.java
+===================================================================
+RCS file: /cvsroot/technology/org.eclipse.photran/org.eclipse.photran.ui/src/org/eclipse/photran/internal/ui/editor/FortranPartitionScanner.java,v
+retrieving revision 1.1
+diff -u -r1.1 FortranPartitionScanner.java
+--- src/org/eclipse/photran/internal/ui/editor/FortranPartitionScanner.java	29 Sep 2005 19:08:24 -0000	1.1
++++ src/org/eclipse/photran/internal/ui/editor/FortranPartitionScanner.java	16 Oct 2005 07:51:10 -0000
+@@ -24,6 +24,7 @@
+ import org.eclipse.photran.ui.FortranUIPlugin;
+ import org.eclipse.swt.SWT;
+ import org.eclipse.swt.graphics.Color;
++import org.eclipse.swt.graphics.RGB;
+ 
+ /**
+  * Defines a lexer-based partition scanner for Fortran files.
+@@ -35,404 +36,399 @@
+  * @author nchen
+  * @author cheahcf
+  */
+-public final class FortranPartitionScanner implements IDocumentPartitioner
+-{
++public final class FortranPartitionScanner implements IDocumentPartitioner {
+ 
+-    // ----- SET UP THE DIFFERENT TYPES OF PARTITIONS --------------------------
++	// ----- SET UP THE DIFFERENT TYPES OF PARTITIONS --------------------------
+ 
+-    static final String F90_STRING_CONSTANTS_PARTITION = "__fortran_string_constants";
++	static final String F90_STRING_CONSTANTS_PARTITION = "__fortran_string_constants";
+ 
+-    static final String F90_IDENTIFIER_PARTITION = "__fortran_identifier";
++	static final String F90_IDENTIFIER_PARTITION = "__fortran_identifier";
+ 
+-    static final String F90_KEYWORD_PARTITION = "__fortran_keyword";
+-
+-    static final String F90_CODE_PARTITION = "__fortran_code";
+-
+-    private IDocument doc;
+-
+-    private String filename;
+-
+-    private ArrayList partitions = null;
+-    
+-    private boolean isFixedForm;
+-
+-    public static class Partition
+-    {
+-        protected String contentType;
+-
+-        protected ITokenScanner tokenScanner;
+-
+-        protected org.eclipse.jface.text.rules.Token token;
+-
+-        public Partition(String aContentType, TextAttribute color)
+-        {
+-            this.contentType = aContentType;
+-
+-            // Default token scanner: return the entire partition
+-            // (there are no tokens within partitions)
+-
+-            RuleBasedScanner rbs = new RuleBasedScanner();
+-            token = new org.eclipse.jface.text.rules.Token(color);
+-            rbs.setDefaultReturnToken(token);
+-            this.tokenScanner = rbs;
+-        }
+-
+-        /**
+-         * Each partition type has a unique name for its content type
+-         * 
+-         * @return the content type for this partition (a String)
+-         */
+-        public final String getContentType()
+-        {
+-            return contentType;
+-        }
+-
+-        /**
+-         * @return a scanner that detects tokens within this type of partition.
+-         */
+-        public final ITokenScanner getTokenScanner()
+-        {
+-            return tokenScanner;
+-        }
+-
+-        /**
+-         * This token is used to change the color
+-         * 
+-         * @return the token used for the current RuleBasedScanner
+-         */
+-        public org.eclipse.jface.text.rules.Token getToken()
+-        {
+-            return token;
+-        }
+-    }
+-
+-    // TODO-Nick: Refactor to be cleaner if there is a need for more types
+-    private static IPreferenceStore store = FortranUIPlugin.getDefault().getPreferenceStore();
+-
+-    private static Partition[] partitionTypes = new Partition[] {
+-             new Partition(
+-                 F90_STRING_CONSTANTS_PARTITION,
+-                 new TextAttribute(
+-                     new Color(
+-                         null,
+-                         PreferenceConverter
+-                             .getColor(
+-                                 store,
+-                                 ColorPreferencePage.F90_STRING_CONSTANTS_COLOR_PREF)))),
+-             new Partition(
+-                 F90_IDENTIFIER_PARTITION,
+-                 new TextAttribute(
+-                     new Color(
+-                         null,
+-                         PreferenceConverter
+-                             .getColor(
+-                                 store,
+-                                 ColorPreferencePage.F90_IDENTIFIER_COLOR_PREF)))),
+-             new Partition(
+-                 F90_CODE_PARTITION,
+-                 new TextAttribute(
+-                     new Color(
+-                         null,
+-                         PreferenceConverter
+-                             .getColor(
+-                                 store,
+-                                 ColorPreferencePage.F90_COMMENT_COLOR_PREF)))),
+-             new Partition(
+-                 F90_KEYWORD_PARTITION,
+-                 new TextAttribute(
+-                     new Color(
+-                         null,
+-                         PreferenceConverter
+-                             .getColor(
+-                                 store,
+-                                 ColorPreferencePage.F90_KEYWORD_COLOR_PREF)),
+-                     null, SWT.BOLD)) };
+-
+-    IPropertyChangeListener colorPreferenceListener = new IPropertyChangeListener()
+-    {
+-        /*
+-         * @see IPropertyChangeListener.propertyChange()
+-         */
+-        public void propertyChange(PropertyChangeEvent event)
+-        {
+-            if (ColorPreferencePage.respondToPreferenceChange(event))
+-            {
+-                updateColorPreferences();
+-                documentChanged(null);
+-            }
+-        }
+-    };
+-
+-    private void updateColorPreferences()
+-    {
+-        partitionTypes[0].getToken().setData(
+-            new TextAttribute(new Color(null, PreferenceConverter.getColor(store,
+-                ColorPreferencePage.F90_STRING_CONSTANTS_COLOR_PREF))));
+-        partitionTypes[1].getToken().setData(
+-            new TextAttribute(new Color(null, PreferenceConverter.getColor(store,
+-                ColorPreferencePage.F90_IDENTIFIER_COLOR_PREF))));
+-        partitionTypes[2].getToken().setData(
+-            new TextAttribute(new Color(null, PreferenceConverter.getColor(store,
+-                ColorPreferencePage.F90_COMMENT_COLOR_PREF))));
+-        partitionTypes[3].getToken().setData(
+-            new TextAttribute(new Color(null, PreferenceConverter.getColor(store,
+-                ColorPreferencePage.F90_KEYWORD_COLOR_PREF)), null, SWT.BOLD));
+-    }
+-
+-    /**
+-     * Get a new FortranPartitionScanner Retains the doc if there is one
+-     */
+-    public FortranPartitionScanner(String filename, boolean isFixedForm)
+-    {
+-        // JO: Take the document filename as a parameter so that we can
+-        // guess whether or not it's fixed form source
+-
+-        this.filename = filename;
+-        this.isFixedForm = isFixedForm;
+-        
+-        FortranUIPlugin.getDefault().getPreferenceStore().addPropertyChangeListener(
+-            colorPreferenceListener);
+-    }
+-
+-    /**
+-     * @return an array of FortranPartitionScanner.Partitions, each of which contains a name for its
+-     *         content type, a predicate for detecting that type of partition, and a rule for
+-     *         scanning tokens within that type of partition.
+-     */
+-    static final Partition[] getPartitionTypes()
+-    {
+-        return partitionTypes;
+-    }
+-
+-    /**
+-     * @return an array of Strings which identify the content types of the various types of
+-     *         partition for a photran file
+-     */
+-    static final String[] getContentTypes()
+-    {
+-        String[] contentTypes = new String[partitionTypes.length];
+-        for (int i = 0; i < partitionTypes.length; i++)
+-            contentTypes[i] = partitionTypes[i].getContentType();
+-        return contentTypes;
+-    }
+-
+-    /**
+-     * @param terminal a terminal ID, from the Terminal class
+-     * @return the name of the partition (one of the String constants above) corresponding to that
+-     *         terminal
+-     */
+-    private String mapTerminalToPartitionType(Terminal terminal)
+-    {
+-        if (terminal == Terminal.T_SCON) return F90_STRING_CONSTANTS_PARTITION;
+-        if (terminal == Terminal.T_IDENT) return F90_IDENTIFIER_PARTITION;
+-
+-        return F90_KEYWORD_PARTITION;
+-    }
+-
+-    /*
+-     * (non-Javadoc)
+-     * 
+-     * @see org.eclipse.jface.text.IDocumentPartitioner#connect(org.eclipse.jface.text.IDocument)
+-     */
+-    public void connect(IDocument document)
+-    {
+-        doc = document;
+-        documentChanged(null);
+-    }
+-
+-    /*
+-     * (non-Javadoc)
+-     * 
+-     * @see org.eclipse.jface.text.IDocumentPartitioner#disconnect()
+-     */
+-    public void disconnect()
+-    {
+-        doc = null;
+-    }
+-
+-    /*
+-     * (non-Javadoc)
+-     * 
+-     * @see org.eclipse.jface.text.IDocumentPartitioner#documentAboutToBeChanged(org.eclipse.jface.text.DocumentEvent)
+-     */
+-    public void documentAboutToBeChanged(DocumentEvent event)
+-    {
+-
+-    }
+-
+-    /*
+-     * (non-Javadoc)
+-     * 
+-     * @see org.eclipse.jface.text.IDocumentPartitioner#documentChanged(org.eclipse.jface.text.DocumentEvent)
+-     */
+-    public boolean documentChanged(DocumentEvent event)
+-    {
+-        // System.out.println("documentChanged");
+-        int endOfLastPartition = -1;
+-        // Get the text of the current document
+-        String documentText = doc.get();
+-
+-        ArrayList newPartitions = new ArrayList();
+-
+-        try
+-        {
+-            // Run it through the lexer
+-            ILexer lexer = Lexer.createLexer(new ByteArrayInputStream(doc.get()
+-                .getBytes()), this.filename, isFixedForm);
+-
+-            // Create a partition for each token in the document, as well as
+-            // a partition for the space between tokens
+-            Token token;
+-            Terminal terminal;
+-            for (token = null, terminal = null; (terminal = (token = lexer.yylex()).getTerminal()) != Terminal.END_OF_INPUT;)
+-            {
+-                // JO: The fixed form lexer puts these in the stream
+-                // out of order, and they don't really matter to us
+-                // anyway since they're just whitespace
+-                if (terminal == Terminal.T_EOS) continue;
+-
+-                int offset = token.getOffset();
+-                int length = token.getLength();
+-                String type = mapTerminalToPartitionType(terminal);
+-                // we know that the parser is initialized and is scanning!
+-                // but is it not returning the right offsets or the right types
+-                // System.err.println("offset: " + offset + " length: " + length
+-                // + " type: " + type + " text: " + token.getText());
+-
+-                // Is there space between the last partition and this one?
+-                // Fill it!
+-                if (endOfLastPartition < offset)
+-                {
+-                    int beginningOfGap = endOfLastPartition + 1;
+-                    int lengthOfGap = offset - endOfLastPartition - 1;
+-                    newPartitions.add(new TypedRegion(beginningOfGap, lengthOfGap,
+-                        F90_CODE_PARTITION));
+-                }
+-
+-                // And make a new partition
+-                newPartitions.add(new TypedRegion(offset, length, type));
+-
+-                endOfLastPartition = offset + length - 1;
+-            }
+-        }
+-        catch (FileNotFoundException e)
+-        {
+-            e.printStackTrace();
+-        }
+-        catch (Exception e1)
+-        {
+-            // Ignore lexer exceptions (e.g., unterminated string constant)
+-        }
+-
+-        // Is there a gap between the last token and the end of the document?
+-        // Assume it's code...
+-        if (endOfLastPartition < documentText.length() - 1)
+-        {
+-            int beginningOfGap = endOfLastPartition + 1;
+-            int lengthOfGap = documentText.length() - endOfLastPartition - 1;
+-            newPartitions.add(new TypedRegion(beginningOfGap, lengthOfGap, F90_CODE_PARTITION));
+-        }
+-
+-        // case for empty document
+-
+-        if (newPartitions.size() == 0)
+-            newPartitions.add(new TypedRegion(0, 0, F90_CODE_PARTITION));
+-
+-        // We should return true iff the partitioning has changed
+-        if (newPartitions.equals(partitions))
+-            return false;
+-        else
+-        {
+-            partitions = newPartitions;
+-
+-            return true;
+-        }
+-    }
+-
+-    /*
+-     * (non-Javadoc)
+-     * 
+-     * @see org.eclipse.jface.text.IDocumentPartitioner#getLegalContentTypes()
+-     */
+-    public String[] getLegalContentTypes()
+-    {
+-        return getContentTypes();
+-    }
+-
+-    /*
+-     * (non-Javadoc)
+-     * 
+-     * @see org.eclipse.jface.text.IDocumentPartitioner#getContentType(int)
+-     */
+-    public String getContentType(int offset)
+-    {
+-        int partitionNum = findRegionContainingOffset(offset);
+-        if (partitionNum >= 0)
+-            return ((ITypedRegion)partitions.get(partitionNum)).getType();
+-        else
+-            // Assume it's part of some code...
+-            return F90_CODE_PARTITION;
+-
+-    }
+-
+-    /*
+-     * (non-Javadoc)
+-     * 
+-     * @see org.eclipse.jface.text.IDocumentPartitioner#computePartitioning(int, int)
+-     */
+-    public ITypedRegion[] computePartitioning(int offset, int length)
+-    {
+-
+-        int firstRegion = findRegionContainingOffset(offset);
+-        int lastRegion = findRegionContainingOffset(offset + length - 1);
+-
+-        if (firstRegion < 0) throw new Error("No region contains start offset " + offset + "!");
+-        if (lastRegion < 0) lastRegion = partitions.size() - 1;
+-
+-        ITypedRegion[] ret = new ITypedRegion[lastRegion - firstRegion + 1];
+-        partitions.subList(firstRegion, lastRegion + 1).toArray(ret);
+-        return ret;
+-    }
+-
+-    /*
+-     * (non-Javadoc)
+-     * 
+-     * @see org.eclipse.jface.text.IDocumentPartitioner#getPartition(int)
+-     */
+-    public ITypedRegion getPartition(int offset)
+-    {
+-        int partitionNum = findRegionContainingOffset(offset);
+-
+-        ITypedRegion lastPartition = (ITypedRegion)partitions.get(partitions.size() - 1);
+-        int lastOffsetOfLastPartition = lastPartition.getOffset() + lastPartition.getLength() - 1;
+-        if (partitionNum < 0)
+-        {
+-            if (offset > lastOffsetOfLastPartition)
+-            {
+-                // Add a new partition to the end
+-                int newPartitionStart = lastOffsetOfLastPartition + 1;
+-                int newPartitionLength = offset - newPartitionStart + 1;
+-                partitions.add(new TypedRegion(newPartitionStart, newPartitionLength,
+-                    F90_CODE_PARTITION));
+-                partitionNum = partitions.size() - 1;
+-            }
+-            else
+-                throw new Error("No region contains offset " + offset + "!");
+-        }
+-
+-        return (ITypedRegion)partitions.get(partitionNum);
+-
+-    }
+-
+-    private int findRegionContainingOffset(int offset)
+-    {
+-        for (int i = 0; i < partitions.size(); i++)
+-        {
+-            ITypedRegion region = (ITypedRegion)partitions.get(i);
+-            int firstCharOffset = region.getOffset();
+-            int lastCharOffset = firstCharOffset + region.getLength() - 1;
+-            if (firstCharOffset <= offset && lastCharOffset >= offset) return i;
+-        }
+-        return -1;
+-    }
++	static final String F90_KEYWORD_PARTITION = "__fortran_keyword";
++
++	static final String F90_CODE_PARTITION = "__fortran_code";
++
++	static final String F90_KEYWORD_PARTITION_WITH_INDENTATION_RIGHT = "__fortran_keyword_indentation_right";
++
++	static final String F90_KEYWORD_PARTITION_WITH_INDENTATION_LEFT = "__fortran_keyword_indentation_left";
++
++	private IDocument doc;
++
++	private String filename;
++
++	private ArrayList partitions = null;
++
++	private boolean isFixedForm;
++
++	public static class Partition {
++		protected String contentType;
++
++		protected ITokenScanner tokenScanner;
++
++		protected org.eclipse.jface.text.rules.Token token;
++
++		public Partition(String aContentType, TextAttribute color) {
++			this.contentType = aContentType;
++
++			// Default token scanner: return the entire partition
++			// (there are no tokens within partitions)
++
++			RuleBasedScanner rbs = new RuleBasedScanner();
++			token = new org.eclipse.jface.text.rules.Token(color);
++			rbs.setDefaultReturnToken(token);
++			this.tokenScanner = rbs;
++		}
++
++		/**
++		 * Each partition type has a unique name for its content type
++		 * 
++		 * @return the content type for this partition (a String)
++		 */
++		public final String getContentType() {
++			return contentType;
++		}
++
++		/**
++		 * @return a scanner that detects tokens within this type of partition.
++		 */
++		public final ITokenScanner getTokenScanner() {
++			return tokenScanner;
++		}
++
++		/**
++		 * This token is used to change the color
++		 * 
++		 * @return the token used for the current RuleBasedScanner
++		 */
++		public org.eclipse.jface.text.rules.Token getToken() {
++			return token;
++		}
++	}
++
++	// TODO-Nick: Refactor to be cleaner if there is a need for more types
++	private static IPreferenceStore store = FortranUIPlugin.getDefault()
++			.getPreferenceStore();
++
++	private static Partition[] partitionTypes = new Partition[] {
++		new Partition(
++				F90_STRING_CONSTANTS_PARTITION,
++				new TextAttribute(
++						new Color(
++								null,
++								PreferenceConverter
++								.getColor(
++										store,
++										ColorPreferencePage.F90_STRING_CONSTANTS_COLOR_PREF)))),
++			new Partition(F90_IDENTIFIER_PARTITION, new TextAttribute(
++					new Color(null, PreferenceConverter.getColor(store,
++							ColorPreferencePage.F90_IDENTIFIER_COLOR_PREF)))),
++			new Partition(F90_CODE_PARTITION, new TextAttribute(new Color(null,
++					PreferenceConverter.getColor(store,
++							ColorPreferencePage.F90_COMMENT_COLOR_PREF)))),
++			new Partition(F90_KEYWORD_PARTITION, new TextAttribute(new Color(
++					null, PreferenceConverter.getColor(store,
++							ColorPreferencePage.F90_KEYWORD_COLOR_PREF)), null,
++					SWT.BOLD)),
++			new Partition(
++					F90_KEYWORD_PARTITION_WITH_INDENTATION_RIGHT,
++					new TextAttribute(
++							new Color(null, PreferenceConverter.getColor(store,
++									ColorPreferencePage.F90_KEYWORD_COLOR_PREF)),
++							null, SWT.BOLD)),
++			new Partition(
++					F90_KEYWORD_PARTITION_WITH_INDENTATION_LEFT,
++					new TextAttribute(
++							new Color(null, PreferenceConverter.getColor(store,
++									ColorPreferencePage.F90_KEYWORD_COLOR_PREF)),
++							null, SWT.BOLD)) };
++
++	IPropertyChangeListener colorPreferenceListener = new IPropertyChangeListener() {
++		/*
++		 * @see IPropertyChangeListener.propertyChange()
++		 */
++		public void propertyChange(PropertyChangeEvent event) {
++			if (ColorPreferencePage.respondToPreferenceChange(event)) {
++				updateColorPreferences();
++				documentChanged(null);
++			}
++		}
++	};
++
++	private void updateColorPreferences() {
++		partitionTypes[0].getToken().setData(
++				new TextAttribute(new Color(null, PreferenceConverter.getColor(
++						store,
++						ColorPreferencePage.F90_STRING_CONSTANTS_COLOR_PREF))));
++		partitionTypes[1]
++				.getToken()
++				.setData(
++						new TextAttribute(
++								new Color(
++										null,
++										PreferenceConverter
++												.getColor(
++														store,
++														ColorPreferencePage.F90_IDENTIFIER_COLOR_PREF))));
++		partitionTypes[2].getToken().setData(
++				new TextAttribute(new Color(null, PreferenceConverter.getColor(
++						store, ColorPreferencePage.F90_COMMENT_COLOR_PREF))));
++		partitionTypes[3].getToken().setData(
++				new TextAttribute(new Color(null, PreferenceConverter.getColor(
++						store, ColorPreferencePage.F90_KEYWORD_COLOR_PREF)),
++						null, SWT.BOLD));
++		partitionTypes[4].getToken().setData(
++				new TextAttribute(new Color(null, PreferenceConverter.getColor(
++						store, ColorPreferencePage.F90_KEYWORD_COLOR_PREF)),
++						null, SWT.BOLD));
++		partitionTypes[5].getToken().setData(
++				new TextAttribute(new Color(null, PreferenceConverter.getColor(
++						store, ColorPreferencePage.F90_KEYWORD_COLOR_PREF)),
++						null, SWT.BOLD));
++		
++	}
++
++	/**
++	 * Get a new FortranPartitionScanner Retains the doc if there is one
++	 */
++	public FortranPartitionScanner(String filename, boolean isFixedForm) {
++		// JO: Take the document filename as a parameter so that we can
++		// guess whether or not it's fixed form source
++
++		this.filename = filename;
++		this.isFixedForm = isFixedForm;
++
++		FortranUIPlugin.getDefault().getPreferenceStore()
++				.addPropertyChangeListener(colorPreferenceListener);
++	}
++
++	/**
++	 * @return an array of FortranPartitionScanner.Partitions, each of which contains a name for its
++	 *         content type, a predicate for detecting that type of partition, and a rule for
++	 *         scanning tokens within that type of partition.
++	 */
++	static final Partition[] getPartitionTypes() {
++		return partitionTypes;
++	}
++
++	/**
++	 * @return an array of Strings which identify the content types of the various types of
++	 *         partition for a photran file
++	 */
++	static final String[] getContentTypes() {
++		String[] contentTypes = new String[partitionTypes.length];
++		for (int i = 0; i < partitionTypes.length; i++)
++			contentTypes[i] = partitionTypes[i].getContentType();
++		return contentTypes;
++	}
++
++	/**
++	 * @param terminal a terminal ID, from the Terminal class
++	 * @return the name of the partition (one of the String constants above) corresponding to that
++	 *         terminal
++	 */
++	private String mapTerminalToPartitionType(Terminal terminal) {
++		if (terminal == Terminal.T_SCON)
++			return F90_STRING_CONSTANTS_PARTITION;
++		if (terminal == Terminal.T_IDENT)
++			return F90_IDENTIFIER_PARTITION;
++		if (ListOfWordsToIndent.checkIfKeywordNeedsRightIndentation(terminal))
++			return F90_KEYWORD_PARTITION_WITH_INDENTATION_RIGHT;
++		if (ListOfWordsToIndent.checkIfKeywordNeedsLeftIndentation(terminal))
++			return F90_KEYWORD_PARTITION_WITH_INDENTATION_LEFT;
++		return F90_KEYWORD_PARTITION;
++	}
++
++	/*
++	 * (non-Javadoc)
++	 * 
++	 * @see org.eclipse.jface.text.IDocumentPartitioner#connect(org.eclipse.jface.text.IDocument)
++	 */
++	public void connect(IDocument document) {
++		doc = document;
++		documentChanged(null);
++	}
++
++	/*
++	 * (non-Javadoc)
++	 * 
++	 * @see org.eclipse.jface.text.IDocumentPartitioner#disconnect()
++	 */
++	public void disconnect() {
++		doc = null;
++	}
++
++	/*
++	 * (non-Javadoc)
++	 * 
++	 * @see org.eclipse.jface.text.IDocumentPartitioner#documentAboutToBeChanged(org.eclipse.jface.text.DocumentEvent)
++	 */
++	public void documentAboutToBeChanged(DocumentEvent event) {
++
++	}
++
++	/*
++	 * (non-Javadoc)
++	 * 
++	 * @see org.eclipse.jface.text.IDocumentPartitioner#documentChanged(org.eclipse.jface.text.DocumentEvent)
++	 */
++	public boolean documentChanged(DocumentEvent event) {
++		// System.out.println("documentChanged");
++		int endOfLastPartition = -1;
++		// Get the text of the current document
++		String documentText = doc.get();
++
++		ArrayList newPartitions = new ArrayList();
++
++		try {
++			// Run it through the lexer
++			ILexer lexer = Lexer.createLexer(new ByteArrayInputStream(doc.get()
++					.getBytes()), this.filename, isFixedForm);
++
++			// Create a partition for each token in the document, as well as
++			// a partition for the space between tokens
++			Token token;
++			Terminal terminal;
++			for (token = null, terminal = null; (terminal = (token = lexer
++					.yylex()).getTerminal()) != Terminal.END_OF_INPUT;) {
++				// JO: The fixed form lexer puts these in the stream
++				// out of order, and they don't really matter to us
++				// anyway since they're just whitespace
++				if (terminal == Terminal.T_EOS)
++					continue;
++
++				int offset = token.getOffset();
++				int length = token.getLength();
++				String type = mapTerminalToPartitionType(terminal);
++				// we know that the parser is initialized and is scanning!
++				// but is it not returning the right offsets or the right types
++				// System.err.println("offset: " + offset + " length: " + length
++				// + " type: " + type + " text: " + token.getText());
++
++				// Is there space between the last partition and this one?
++				// Fill it!
++				if (endOfLastPartition < offset) {
++					int beginningOfGap = endOfLastPartition + 1;
++					int lengthOfGap = offset - endOfLastPartition - 1;
++					newPartitions.add(new TypedRegion(beginningOfGap,
++							lengthOfGap, F90_CODE_PARTITION));
++				}
++
++				// And make a new partition
++				newPartitions.add(new TypedRegion(offset, length, type));
++
++				endOfLastPartition = offset + length - 1;
++			}
++		} catch (FileNotFoundException e) {
++			e.printStackTrace();
++		} catch (Exception e1) {
++			// Ignore lexer exceptions (e.g., unterminated string constant)
++			e1.printStackTrace();
++		}
++
++		// Is there a gap between the last token and the end of the document?
++		// Assume it's code...
++		if (endOfLastPartition < documentText.length() - 1) {
++			int beginningOfGap = endOfLastPartition + 1;
++			int lengthOfGap = documentText.length() - endOfLastPartition - 1;
++			newPartitions.add(new TypedRegion(beginningOfGap, lengthOfGap,
++					F90_CODE_PARTITION));
++		}
++
++		// case for empty document
++
++		if (newPartitions.size() == 0)
++			newPartitions.add(new TypedRegion(0, 0, F90_CODE_PARTITION));
++
++		// We should return true iff the partitioning has changed
++		if (newPartitions.equals(partitions))
++			return false;
++		else {
++			partitions = newPartitions;
++
++			return true;
++		}
++	}
++
++	/*
++	 * (non-Javadoc)
++	 * 
++	 * @see org.eclipse.jface.text.IDocumentPartitioner#getLegalContentTypes()
++	 */
++	public String[] getLegalContentTypes() {
++		return getContentTypes();
++	}
++
++	/*
++	 * (non-Javadoc)
++	 * 
++	 * @see org.eclipse.jface.text.IDocumentPartitioner#getContentType(int)
++	 */
++	public String getContentType(int offset) {
++		int partitionNum = findRegionContainingOffset(offset);
++		if (partitionNum >= 0)
++			return ((ITypedRegion) partitions.get(partitionNum)).getType();
++		else
++			// Assume it's part of some code...
++			return F90_CODE_PARTITION;
++
++	}
++
++	/*
++	 * (non-Javadoc)
++	 * 
++	 * @see org.eclipse.jface.text.IDocumentPartitioner#computePartitioning(int, int)
++	 */
++	public ITypedRegion[] computePartitioning(int offset, int length) {
++
++		int firstRegion = findRegionContainingOffset(offset);
++		int lastRegion = findRegionContainingOffset(offset + length - 1);
++
++		if (firstRegion < 0)
++			throw new Error("No region contains start offset " + offset + "!");
++		if (lastRegion < 0)
++			lastRegion = partitions.size() - 1;
++
++		ITypedRegion[] ret = new ITypedRegion[lastRegion - firstRegion + 1];
++		partitions.subList(firstRegion, lastRegion + 1).toArray(ret);
++		return ret;
++	}
++
++	/*
++	 * (non-Javadoc)
++	 * 
++	 * @see org.eclipse.jface.text.IDocumentPartitioner#getPartition(int)
++	 */
++	public ITypedRegion getPartition(int offset) {
++		int partitionNum = findRegionContainingOffset(offset);
++
++		ITypedRegion lastPartition = (ITypedRegion) partitions.get(partitions
++				.size() - 1);
++		int lastOffsetOfLastPartition = lastPartition.getOffset()
++				+ lastPartition.getLength() - 1;
++		if (partitionNum < 0) {
++			if (offset > lastOffsetOfLastPartition) {
++				// Add a new partition to the end
++				int newPartitionStart = lastOffsetOfLastPartition + 1;
++				int newPartitionLength = offset - newPartitionStart + 1;
++				partitions.add(new TypedRegion(newPartitionStart,
++						newPartitionLength, F90_CODE_PARTITION));
++				partitionNum = partitions.size() - 1;
++			} else
++				throw new Error("No region contains offset " + offset + "!");
++		}
++
++		return (ITypedRegion) partitions.get(partitionNum);
++
++	}
++
++	private int findRegionContainingOffset(int offset) {
++		for (int i = 0; i < partitions.size(); i++) {
++			ITypedRegion region = (ITypedRegion) partitions.get(i);
++			int firstCharOffset = region.getOffset();
++			int lastCharOffset = firstCharOffset + region.getLength() - 1;
++			if (firstCharOffset <= offset && lastCharOffset >= offset)
++				return i;
++		}
++		return -1;
++	}
+ }
+Index: src/org/eclipse/photran/internal/ui/editor/FortranSourceViewerConfiguration.java
+===================================================================
+RCS file: /cvsroot/technology/org.eclipse.photran/org.eclipse.photran.ui/src/org/eclipse/photran/internal/ui/editor/FortranSourceViewerConfiguration.java,v
+retrieving revision 1.1
+diff -u -r1.1 FortranSourceViewerConfiguration.java
+--- src/org/eclipse/photran/internal/ui/editor/FortranSourceViewerConfiguration.java	29 Sep 2005 19:08:24 -0000	1.1
++++ src/org/eclipse/photran/internal/ui/editor/FortranSourceViewerConfiguration.java	16 Oct 2005 07:51:10 -0000
+@@ -3,7 +3,11 @@
+ import java.util.ArrayList;
+ import java.util.List;
+ 
++import org.eclipse.cdt.internal.ui.text.CAutoIndentStrategy;
++import org.eclipse.cdt.internal.ui.text.CCommentAutoIndentStrategy;
++import org.eclipse.cdt.internal.ui.text.ICPartitions;
+ import org.eclipse.jface.preference.IPreferenceStore;
++import org.eclipse.jface.text.IAutoEditStrategy;
+ import org.eclipse.jface.text.IDocument;
+ import org.eclipse.jface.text.ITextDoubleClickStrategy;
+ import org.eclipse.jface.text.TextAttribute;
+@@ -104,6 +108,16 @@
+ 			ISourceViewer sourceViewer, String contentType) {
+ 		return doubleClickStrategy;
+ 	}
++	
++	// ----- AUTO-INDENTING STRATEGY ------------------------------------------
++	/* (non-Javadoc)
++	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getAutoEditStrategies(org.eclipse.jface.text.source.ISourceViewer, java.lang.String)
++	 */
++	public IAutoEditStrategy[] getAutoEditStrategies(ISourceViewer sourceViewer, String contentType) {
++
++		
++		return new IAutoEditStrategy[] {new FortranAutoIndentStrategy(editor instanceof FortranFreeFormEditor)};
++	}
+ 
+ 	// ----- SYNTAX HIGHLIGHTING -----------------------------------------------
+ 
+Index: src/org/eclipse/photran/internal/ui/editor/TabConverter.java
+===================================================================
+RCS file: /cvsroot/technology/org.eclipse.photran/org.eclipse.photran.ui/src/org/eclipse/photran/internal/ui/editor/TabConverter.java,v
+retrieving revision 1.1
+diff -u -r1.1 TabConverter.java
+--- src/org/eclipse/photran/internal/ui/editor/TabConverter.java	29 Sep 2005 19:08:24 -0000	1.1
++++ src/org/eclipse/photran/internal/ui/editor/TabConverter.java	16 Oct 2005 07:51:10 -0000
+@@ -8,6 +8,8 @@
+ import org.eclipse.jface.text.IDocument;
+ import org.eclipse.jface.text.ILineTracker;
+ import org.eclipse.jface.text.IRegion;
++import org.eclipse.jface.text.ITextSelection;
++import org.eclipse.jface.viewers.ISelection;
+ 
+ /**
+  * @author nchen
+@@ -20,6 +22,7 @@
+ 
+ 	private ILineTracker fLineTracker;
+ 
++
+ 	public TabConverter() {
+ 	}
+ 
+@@ -49,11 +52,10 @@
+ 		if (text == null)
+ 			return;
+ 
+-		int index = text.indexOf('\t');
++		int index = text.indexOf('\t');// + text.indexOf('\n');
+ 		if (index > -1) {
+ 
+ 			StringBuffer buffer = new StringBuffer();
+-
+ 			fLineTracker.set(command.text);
+ 			int lines = fLineTracker.getNumberOfLines();
+ 
+@@ -75,7 +77,7 @@
+ 					int length = line.length();
+ 					for (int j = 0; j < length; j++) {
+ 						char c = line.charAt(j);
+-						if (c == '\t') {
++						if (c == '\t') { // a tab has been inserted
+ 							position += insertTabString(buffer, position);
+ 						} else {
+ 							buffer.append(c);
+@@ -88,6 +90,7 @@
+ 				command.text = buffer.toString();
+ 
+ 			} catch (BadLocationException x) {
++				x.printStackTrace();
+ 			}
+ 		}
+ 	}
+Index: src/org/eclipse/photran/internal/ui/editor/FortranAutoIndentStrategy.java
+===================================================================
+RCS file: src/org/eclipse/photran/internal/ui/editor/FortranAutoIndentStrategy.java
+diff -N src/org/eclipse/photran/internal/ui/editor/FortranAutoIndentStrategy.java
+--- /dev/null	1 Jan 1970 00:00:00 -0000
++++ src/org/eclipse/photran/internal/ui/editor/FortranAutoIndentStrategy.java	1 Jan 1970 00:00:00 -0000
+@@ -0,0 +1,189 @@
++/*******************************************************************************
++ * Copyright (c) 2000 2005 IBM Corporation and others.
++ * All rights reserved. This program and the accompanying materials
++ * are made available under the terms of the Eclipse Public License v1.0
++ * which accompanies this distribution, and is available at
++ * http://www.eclipse.org/legal/epl-v10.html
++ *
++ * Contributors:
++ *     IBM Corporation - initial API and implementation
++ *     QNX Software System
++ *******************************************************************************/
++package org.eclipse.photran.internal.ui.editor;
++
++import org.eclipse.jface.text.BadLocationException;
++import org.eclipse.jface.text.DefaultIndentLineAutoEditStrategy;
++import org.eclipse.jface.text.DocumentCommand;
++import org.eclipse.jface.text.IDocument;
++import org.eclipse.jface.text.IDocumentPartitioner;
++import org.eclipse.jface.text.ITypedRegion;
++import org.eclipse.photran.internal.core.f95parser.Terminal;
++import org.eclipse.photran.internal.ui.preferences.FortranFreeFormSpacePreferencePage;
++
++import org.eclipse.cdt.ui.CUIPlugin;
++
++/**
++ * Auto indent strategy sensitive to brackets.
++ */
++public class FortranAutoIndentStrategy extends
++		DefaultIndentLineAutoEditStrategy {
++
++	private boolean isFreeForm;
++
++	public FortranAutoIndentStrategy(boolean isFreeForm) {
++		this.isFreeForm = isFreeForm;
++	}
++
++	protected void smartIndentAfterNewLine(IDocument d, DocumentCommand c) {
++		int docLength = d.getLength();
++		if (c.offset == -1 || docLength == 0)
++			return;
++
++		try {
++			int p = (c.offset == docLength ? c.offset - 1 : c.offset);
++			int line = d.getLineOfOffset(p); // our current line
++
++			StringBuffer buf = new StringBuffer(c.text);
++			int start = d.getLineOffset(line);
++			int whiteend = findEndOfWhiteSpace(d, start, c.offset);
++			buf.append(d.get(start, whiteend - start));
++			if (isIndentRightWord(d, whiteend)) {
++				buf.append('\t');
++			}
++			c.text = buf.toString();
++
++		} catch (BadLocationException excp) {
++			excp.printStackTrace();
++		}
++	}
++
++	private boolean isIndentRightWord(IDocument doc, int firstChar) {
++		// ITypedRegion = doc.getDocumentPartitioner().getPartition(firstChar);
++		String partitionType = doc.getDocumentPartitioner().getPartition(
++				firstChar).getType();
++		if (partitionType
++				.equals(FortranPartitionScanner.F90_KEYWORD_PARTITION_WITH_INDENTATION_RIGHT)) {
++			return true;
++		}
++		return false;
++	}
++
++	/**
++	 * Returns whether the text ends with one of the given search strings.
++	 */
++	private boolean endsWithDelimiter(IDocument d, String txt) {
++		String[] delimiters = d.getLegalLineDelimiters();
++
++		for (int i = 0; i < delimiters.length; i++) {
++			if (txt.endsWith(delimiters[i]))
++				return true;
++		}
++		return false;
++	}
++
++	/**
++	 * @see IAutoIndentStrategy#customizeDocumentCommand
++	 */
++	public void customizeDocumentCommand(IDocument d, DocumentCommand c) {
++		if (c.length == 0 && c.text != null && endsWithDelimiter(d, c.text))
++			smartIndentAfterNewLine(d, c);
++		else if (soonToContainsEnd(d, c)) {
++			smartUnindentAfterEnd(d, c);
++		}
++	}
++
++	/**
++	 * Unindents the line by the number indicated in the preference pane
++	 * 
++	 * @param doc
++	 * @param command
++	 */
++	private void smartUnindentAfterEnd(IDocument doc, DocumentCommand command) {
++		if (command.offset == -1 || doc.getLength() == 0)
++			return;
++
++		try {
++			int p = (command.offset == doc.getLength() ? command.offset - 1
++					: command.offset);
++			int line = doc.getLineOfOffset(p);
++			int startOfLineOffset = doc.getLineOffset(line);
++			int whiteend = findEndOfWhiteSpace(doc, startOfLineOffset,
++					command.offset);
++
++			if (whiteend != command.offset) {
++
++				int offsetOfLine = findEndOfWhiteSpace(doc, doc
++						.getLineOffset(line), doc.getLineOffset(line)
++						+ doc.getLineLength(line));
++				int numberOfSpacesOnLeft = offsetOfLine
++						- doc.getLineOffset(line);
++
++				if (isFreeForm)
++					numberOfSpacesOnLeft -= FortranFreeFormSpacePreferencePage
++							.getTabSize();
++				else
++					numberOfSpacesOnLeft -= FortranFixedFormEditor.COLUMM_6_WIDTH;
++
++				if (numberOfSpacesOnLeft >= 0) {
++					// convert to number of spaces
++					String spaces = "";
++					for (int i = 0; i < numberOfSpacesOnLeft; i++)
++						spaces += " ";
++
++					StringBuffer replaceText = new StringBuffer(spaces);
++
++					// add the rest of the current line including the just added
++					replaceText.append(doc.get(whiteend, command.offset
++							- whiteend));
++					replaceText.append(command.text);
++					// modify document command
++					command.length = command.offset - startOfLineOffset;
++					command.offset = startOfLineOffset;
++					command.text = replaceText.toString();
++				}
++			}
++		} catch (BadLocationException excp) {
++			excp.printStackTrace();
++		}
++
++	}
++
++	/**
++	 * Returns true if after inserting the current character we have end
++	 * 
++	 * @param doc
++	 * @param command
++	 * @return whether we have end
++	 * 
++	 * Using simple character mathing instead of the parser so that it works
++	 * even if the lexer is not available; in the case of Free Form with more
++	 * than a 1000 lines
++	 */
++	private boolean soonToContainsEnd(IDocument doc, DocumentCommand command) {
++		if (command.offset == -1 || doc.getLength() == 0)
++			return false;
++
++		try {
++			// convert all matches to lowercase since
++			int commandOffset = (command.offset == doc.getLength() ? command.offset - 1
++					: command.offset);
++			int line = doc.getLineOfOffset(commandOffset); // our current line
++			int start = doc.getLineOffset(line);
++			int whiteend = findEndOfWhiteSpace(doc, start, command.offset);
++
++			// if c equals d and after appending this we have "end"
++			if ("d".equals(command.text.toLowerCase())) {
++				int end = doc.getLineOffset(line) + doc.getLineLength(line)
++						- whiteend;
++				if (doc.get(whiteend, end).toLowerCase().equals("en")) {
++					return true;
++				}
++			}
++		} catch (BadLocationException e) {
++			e.printStackTrace();
++		}
++		return false;
++
++	}
++
++}
+Index: src/org/eclipse/photran/internal/ui/editor/ListOfWordsToIndent.java
+===================================================================
+RCS file: src/org/eclipse/photran/internal/ui/editor/ListOfWordsToIndent.java
+diff -N src/org/eclipse/photran/internal/ui/editor/ListOfWordsToIndent.java
+--- /dev/null	1 Jan 1970 00:00:00 -0000
++++ src/org/eclipse/photran/internal/ui/editor/ListOfWordsToIndent.java	1 Jan 1970 00:00:00 -0000
+@@ -0,0 +1,111 @@
++package org.eclipse.photran.internal.ui.editor;
++
++import java.util.HashSet;
++
++import org.eclipse.photran.internal.core.f95parser.Terminal;
++
++/**
++ * @author nchen
++ * @author cheah
++ * 
++ * This returns an hashtable of words that require indentation in Fortran The
++ * FortranPartitionScanner class would then make use of it as it checks to see
++ * if we will auto-indent or not.
++ * 
++ */
++public class ListOfWordsToIndent {
++
++	/**
++	 * @author cheah
++	 * @author nchen
++	 *
++	 * This class stores a tuple
++	 */
++	static class Pair {
++		public Object fFirst = null;
++
++		public Object fSecond = null;
++
++		public Pair(Object first, Object second) {
++			fFirst = first;
++			fSecond = second;
++		}
++
++		/*
++		 * String accessors
++		 */
++		public String firstAsString() {
++			return (String) fFirst;
++		}
++
++		public String secondAsString() {
++			return (String) fSecond;
++		}
++	}
++
++	// Augment this list as necessary
++	private static Pair[] fortranKeywordsPairs = new Pair[] {
++			new Pair(Terminal.T_PROGRAM, Terminal.T_ENDPROGRAM),
++			new Pair(Terminal.T_FUNCTION, Terminal.T_ENDFUNCTION),
++			new Pair(Terminal.T_SUBROUTINE, Terminal.T_ENDSUBROUTINE),
++			new Pair(Terminal.T_MODULE, Terminal.T_ENDMODULE),
++			new Pair(Terminal.T_BLOCKDATA, Terminal.T_ENDBLOCKDATA),
++			new Pair(Terminal.T_TYPE, Terminal.T_ENDTYPE),
++			new Pair(Terminal.T_FORALL, Terminal.T_ENDFORALL),
++			new Pair(Terminal.T_WHERE, Terminal.T_ENDWHERE),
++			new Pair(Terminal.T_ELSEWHERE, Terminal.T_ENDWHERE),
++			new Pair(Terminal.T_IF, Terminal.T_ENDIF),
++			new Pair(Terminal.T_ELSEIF, Terminal.T_ENDIF),
++			new Pair(Terminal.T_SELECTCASE, Terminal.T_ENDSELECT),
++			new Pair(Terminal.T_CASE, Terminal.T_END),
++			new Pair(Terminal.T_DO, Terminal.T_ENDDO),
++			new Pair(Terminal.T_INTERFACE, Terminal.T_ENDINTERFACE) };
++
++	private static HashSet wordsToIndentRight = new HashSet();
++	
++	private static HashSet wordsToIndentLeft = new HashSet();
++	
++	private static ListOfWordsToIndent uniqueInstance;
++
++	// Singleton
++	private ListOfWordsToIndent() {
++		//generate the hashtable from the list of keywords
++		for (int index = 0; index < fortranKeywordsPairs.length; index++) {
++			wordsToIndentRight.add((Terminal)(fortranKeywordsPairs[index].fFirst));
++		}
++		
++		// add the one and only terminal to indent left
++		wordsToIndentLeft.add((Terminal)Terminal.T_END);
++	}
++
++	/**
++	 * Singleton implementation
++	 * @return the unique instance
++	 */
++	public static ListOfWordsToIndent getListOfWordsToIndentInstance() {
++		if (uniqueInstance == null)
++			uniqueInstance = new ListOfWordsToIndent();
++
++		return uniqueInstance;
++	}
++
++	/**
++	 * Checks to see if the keyword causes indentation
++	 * @param terminal
++	 * @return
++	 */
++	public static boolean checkIfKeywordNeedsRightIndentation(Terminal terminal) {
++		return getListOfWordsToIndentInstance().wordsToIndentRight
++				.contains(terminal);
++	}
++	
++	/**
++	 * Checks to see if the keyword causes indentation
++	 * @param terminal
++	 * @return
++	 */
++	public static boolean checkIfKeywordNeedsLeftIndentation(Terminal terminal) {
++		return getListOfWordsToIndentInstance().wordsToIndentLeft
++				.contains(terminal);
++	}
++}
+
+
