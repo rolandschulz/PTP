@@ -10,8 +10,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
@@ -37,12 +37,15 @@ public class PTPRemotePlugin extends AbstractUIPlugin {
 	// The shared instance
 	private static PTPRemotePlugin plugin;
 	
-	// Active remote services plugins
-	private RemoteServicesProxy[] remoteServices;
+	// Active remote services plugins (not necessarily loaded)
+	private Map<String, RemoteServicesProxy> allRemoteServices;
 	
-	// Selected remote service plugin
-	private IRemoteServices selectedServices;
+	// Default remote services for new RM wizard
+	private IRemoteServices defaultRemoteServices;
 	
+	// Current remote services
+	private IRemoteServices remoteServices;
+
 	/**
 	 * The constructor
 	 */
@@ -56,8 +59,8 @@ public class PTPRemotePlugin extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
-		selectedServices = null;
 		remoteServices = null;
+		defaultRemoteServices = null;
 	}
 
 	/*
@@ -146,14 +149,14 @@ public class PTPRemotePlugin extends AbstractUIPlugin {
 	}
 
 	/**
-	 * 
+	 * Find and load all remoteServices plugins.
 	 */
-	private RemoteServicesProxy[] retrieveRemoteServices() {
+	private Map<String, RemoteServicesProxy> retrieveRemoteServices() {
     	IExtensionRegistry registry = Platform.getExtensionRegistry();
 		IExtensionPoint extensionPoint = registry.getExtensionPoint(PLUGIN_ID + ".remoteServices");
 		final IExtension[] extensions = extensionPoint.getExtensions();
 		
-		List<RemoteServicesProxy> services = new ArrayList<RemoteServicesProxy>(5);
+		Map<String, RemoteServicesProxy> services = new HashMap<String, RemoteServicesProxy>(5);
 		
 		for (IExtension ext : extensions) {
 			final IConfigurationElement[] elements = ext.getConfigurationElements();
@@ -161,39 +164,59 @@ public class PTPRemotePlugin extends AbstractUIPlugin {
 			for (IConfigurationElement ce : elements)
 			{
 				RemoteServicesProxy proxy = new RemoteServicesProxy(ce);
-				if (proxy != null) {
-					services.add(proxy);
+				if (proxy != null && proxy.initialize()) {
+					services.put(proxy.getId(), proxy);
 				}
 			}
 		}
 		
-		return services.toArray(new RemoteServicesProxy[services.size()]);
+		return services;
     }
 	
-	public String[] getRemoteServicesNames() {
-		if (remoteServices == null) {
-			remoteServices = retrieveRemoteServices();
-			for (RemoteServicesProxy p : remoteServices) {
-				System.out.println("found remote services: " + p.getName());
-			}
+	/**
+	 * Retrieve a list of remote services.
+	 * 
+	 * @return remote services
+	 */
+	public IRemoteServices[] getAllRemoteServices() {
+		if (allRemoteServices == null) {
+			allRemoteServices = retrieveRemoteServices();
 		}
-		String[] names = new String[remoteServices.length];
-		for (int i = 0; i < remoteServices.length; i++) {
-			names[i] = remoteServices[i].getName();
-		}
-		return names;
+		return allRemoteServices.values().toArray(new IRemoteServices[allRemoteServices.size()]);
 	}
 	
-	public void setSelectedServices(String id) {
-		for (RemoteServicesProxy proxy : remoteServices) {
-			if (proxy.getId().equals(id)) {
-				AbstractRemoteServicesFactory factory = proxy.getFactory();
-				selectedServices = factory.create();
-			}
+	/**
+	 * Retrieve the default remote services plugin.
+	 * 
+	 * @return 
+	 */
+	public IRemoteServices getDefaultServices() {
+		if (defaultRemoteServices == null) {
+			IRemoteServices[] services = getAllRemoteServices();
+			defaultRemoteServices = services[services.length-1];
 		}
+		
+		return defaultRemoteServices;
 	}
 	
-	public IRemoteServices getSelectedServices() {
-		return selectedServices;
+	/**
+	 * Set the default services plugin
+	 * 
+	 * @param services
+	 */
+	public void setDefaultServices(IRemoteServices services) {
+		defaultRemoteServices = services;
+	}
+		
+	/**
+	 * Get the remote services identified by id
+	 * 
+	 * @return services
+	 */
+	public IRemoteServices getRemoteServices(String id) {
+		if (allRemoteServices == null) {
+			allRemoteServices = retrieveRemoteServices();
+		}
+		return allRemoteServices.get(id);
 	}
 }

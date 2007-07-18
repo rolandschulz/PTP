@@ -8,29 +8,13 @@
  * Contributors:
  * IBM Corporation - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.remote;
 
+package org.eclipse.ptp.remote.ui.preferences;
 
-
-public interface IRemoteServices extends IRemoteServicesDelegate {
-	/**
-	 * Get unique ID of this service. Can be used as a lookup key.
-	 * 
-	 * @return unique ID
-	 */
-	public String getId();
-	
-	/**
-	 * Get display name of this service.
-	 * 
-	 * @return display name
-	 */
-	public String getName();
-	
-	/**
-	 * Get state of this service
-	 * 
-	 * @return true if initialized successfully
-	 */
-	public boolean isInitialized();
+/**
+ * Constant definitions for plug-in preferences
+ */
+public interface PreferenceConstants {
+	public static final String PROXY_PATH = "PROXY_PATH";
+	public static final String LAUNCH_MANUALLY = "LAUNCH_MANUALLY";
 }

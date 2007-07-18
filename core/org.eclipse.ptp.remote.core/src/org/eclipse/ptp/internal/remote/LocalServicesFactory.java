@@ -11,14 +11,14 @@
 package org.eclipse.ptp.internal.remote;
 
 import org.eclipse.ptp.remote.AbstractRemoteServicesFactory;
-import org.eclipse.ptp.remote.IRemoteServices;
+import org.eclipse.ptp.remote.IRemoteServicesDelegate;
 
 public class LocalServicesFactory extends AbstractRemoteServicesFactory {
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.AbstractRemoteServicesFactory#doCreate()
 	 */
-	protected IRemoteServices doCreate() {
+	protected IRemoteServicesDelegate doCreate() {
 		return new LocalServices();
 	}
 }

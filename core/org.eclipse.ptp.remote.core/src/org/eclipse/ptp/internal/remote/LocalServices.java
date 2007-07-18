@@ -16,10 +16,10 @@ import org.eclipse.ptp.remote.IRemoteConnection;
 import org.eclipse.ptp.remote.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.IRemoteFileManager;
 import org.eclipse.ptp.remote.IRemoteProcessBuilder;
-import org.eclipse.ptp.remote.IRemoteServices;
+import org.eclipse.ptp.remote.IRemoteServicesDelegate;
 
 
-public class LocalServices implements IRemoteServices {
+public class LocalServices implements IRemoteServicesDelegate {
 	private IRemoteConnectionManager connMgr;
 	private IRemoteFileManager fileMgr;
 	
