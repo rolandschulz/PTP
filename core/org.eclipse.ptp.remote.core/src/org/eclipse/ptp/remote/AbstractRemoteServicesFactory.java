@@ -25,7 +25,7 @@ public abstract class AbstractRemoteServicesFactory {
 	 * @param rm
 	 * @return
 	 */
-	public IRemoteServices create() {
+	public IRemoteServicesDelegate create() {
 		return doCreate();
 	}
 
@@ -33,5 +33,5 @@ public abstract class AbstractRemoteServicesFactory {
 	 * @param rm
 	 * @return
 	 */
-	protected abstract IRemoteServices doCreate();
+	protected abstract IRemoteServicesDelegate doCreate();
 }
