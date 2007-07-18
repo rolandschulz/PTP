@@ -32,7 +32,7 @@ public class RemoveResourceManagersAction extends Action {
 	private final Shell shell;
 
 	public RemoveResourceManagersAction(Shell shell) {
-		super("Remove Resource Managers");
+		super("Remove Resource Manager");
 		this.shell = shell;
 	}
 

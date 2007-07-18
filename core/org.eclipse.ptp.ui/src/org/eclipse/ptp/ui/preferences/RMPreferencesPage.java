@@ -18,13 +18,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.preferences;
 
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.ptp.remote.PTPRemotePlugin;
-import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
@@ -36,7 +31,7 @@ import org.eclipse.swt.widgets.Control;
  * 
  */
 public class RMPreferencesPage extends AbstractPerferencePage {
-	protected Combo remoteServices;
+	protected Combo remoteServicesCombo;
 		
 	/** Constructor
 	 * 
@@ -44,7 +39,7 @@ public class RMPreferencesPage extends AbstractPerferencePage {
 	public RMPreferencesPage() {
 		super();
 		setPreferenceStore(PTPUIPlugin.getDefault().getPreferenceStore());
-		setDescription(PreferenceMessages.getString("RMPreferencePage.desc"));
+		setDescription(PreferenceMessages.getString("RMPreferencesPage.desc"));
 	}
 	
 	/* (non-Javadoc)
@@ -61,37 +56,14 @@ public class RMPreferencesPage extends AbstractPerferencePage {
 		data.verticalAlignment = GridData.FILL;
 		data.horizontalAlignment = GridData.FILL;
 		composite.setLayoutData(data);
-		remoteServices = new Combo(composite, SWT.DROP_DOWN | SWT.READ_ONLY);
-		data = new GridData(GridData.FILL_HORIZONTAL);
-		data.verticalAlignment = GridData.FILL;
-		data.horizontalAlignment = GridData.FILL;
-		remoteServices.setLayoutData(data);
-		remoteServices.addModifyListener(new ModifyListener() {
-			public void modifyText(ModifyEvent e) {
-			}
-		});
-		updateRemoteServices();
-		setValues();
+
 		return composite;
 	}
 	
-	private void updateRemoteServices() {
-		remoteServices.removeAll();
-		String[] services = PTPRemotePlugin.getDefault().getRemoteServicesNames();
-		for(String name : services) {
-			remoteServices.add(name);
-		}
-		if(services.length > 0) {
-			remoteServices.select(services.length - 1);
-		}
-	}
-
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.preference.PreferencePage#performDefaults()
 	 */
 	public void performDefaults() { 
-		IPreferenceStore store = getPreferenceStore();
-		remoteServices.select(store.getDefaultInt(IPTPUIConstants.RM_REMOTE_SERVICES));
 		super.performDefaults();
 	}
 	
@@ -99,8 +71,6 @@ public class RMPreferencesPage extends AbstractPerferencePage {
 	 * @see org.eclipse.jface.preference.IPreferencePage#performOk()
 	 */
 	public boolean performOk() {
-		storeValues();
-		PTPUIPlugin.getDefault().savePluginPreferences();
 		return true;
 	}
 	
@@ -108,16 +78,12 @@ public class RMPreferencesPage extends AbstractPerferencePage {
 	 * @see org.eclipse.ptp.ui.preferences.AbstractPerferencePage#setValues()
 	 */
 	protected void setValues() {
-		IPreferenceStore store = getPreferenceStore();
-		remoteServices.select(store.getInt(IPTPUIConstants.RM_REMOTE_SERVICES));
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.preferences.AbstractPerferencePage#storeValues()
 	 */
 	protected void storeValues() {
-		IPreferenceStore store = getPreferenceStore();
-		store.setValue(IPTPUIConstants.RM_REMOTE_SERVICES, remoteServices.getSelectionIndex());
 	}
 	
 	/* (non-Javadoc)
