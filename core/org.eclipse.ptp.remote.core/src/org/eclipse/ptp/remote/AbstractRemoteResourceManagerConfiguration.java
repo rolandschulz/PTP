@@ -25,6 +25,12 @@ import org.eclipse.ui.IMemento;
 
 public abstract class AbstractRemoteResourceManagerConfiguration extends AbstractResourceManagerConfiguration {
 	
+	/**
+	 * Static class to hold remote configuration information
+	 * 
+	 * @author greg
+	 *
+	 */
 	static public class RemoteConfig {
 		private final CommonConfig commonConfig;
 		private final String proxyPath;
@@ -70,6 +76,13 @@ public abstract class AbstractRemoteResourceManagerConfiguration extends Abstrac
 	private static final String TAG_CONNECTION_NAME = "connectionName"; //$NON-NLS-1$
 	private static final String TAG_REMOTE_SERVICES_ID = "remoteServicesID"; //$NON-NLS-1$
 
+	/**
+	 * Load remote configuration from saved information
+	 * 
+	 * @param factory
+	 * @param memento
+	 * @return
+	 */
 	public static RemoteConfig loadRemote(IResourceManagerFactory factory,
 			IMemento memento) {
 
@@ -101,47 +114,81 @@ public abstract class AbstractRemoteResourceManagerConfiguration extends Abstrac
 		this.launchManually = remoteConfig.getLaunchManually();
 	}
 	
+	/**
+	 * Get the connection name. This is a string used by the remote subsystem to
+	 * identify a particular connection.
+	 * 
+	 * @return connection name
+	 */
 	public String getConnectionName() {
 		return connectionName;
 	}
 	
+	/**
+	 * Get the proxy server path. This may be a path on a remote system.
+	 * 
+	 * @return path
+	 */
 	public String getProxyServerPath() {
 		return proxyServerPath;
 	}
 	
+	/**
+	 * Get the ID of the remote services subsystem.
+	 * 
+	 * @return
+	 */
 	public String getRemoteServicesId() {
 		return remoteServicesId;
 	}
 
+	/**
+	 * Get the launch manually flag.
+	 * 
+	 * @return true for manual launch
+	 */
 	public boolean isLaunchManually() {
 		return launchManually;
 	}
 
+	/**
+	 * Set the connection name.
+	 * 
+	 * @param connectionName
+	 */
 	public void setConnectionName(String connectionName) {
 		this.connectionName = connectionName;
 	}
 
-	public void setDefaultNameAndDesc() {
-		String name = "ORTE";
-		if (connectionName != null && !connectionName.equals("")) {
-			name += "@" + connectionName;
-		}
-		setName(name);
-		setDescription("ORTE Resource Manager");
-	}
-
+	/**
+	 * Set the launch manually flag
+	 * 
+	 * @param launchManually
+	 */
 	public void setManualLaunch(boolean launchManually) {
 		this.launchManually = launchManually;
 	}
 
+	/**
+	 * Set the proxy server path
+	 * 
+	 * @param proxyServerPath
+	 */
 	public void setProxyServerPath(String proxyServerPath) {
 		this.proxyServerPath = proxyServerPath;
 	}
 
+	/**
+	 * Set the remote services subsystem id
+	 * @param id
+	 */
 	public void setRemoteServicesId(String id) {
 		this.remoteServicesId = id;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration#doSave(org.eclipse.ui.IMemento)
+	 */
 	protected void doSave(IMemento memento) {
 		memento.putString(TAG_REMOTE_SERVICES_ID, remoteServicesId);
 		memento.putString(TAG_CONNECTION_NAME, connectionName);
