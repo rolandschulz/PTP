@@ -16,13 +16,13 @@ import org.eclipse.ptp.remote.IRemoteConnection;
 import org.eclipse.ptp.remote.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.IRemoteFileManager;
 import org.eclipse.ptp.remote.IRemoteProcessBuilder;
-import org.eclipse.ptp.remote.IRemoteServices;
+import org.eclipse.ptp.remote.IRemoteServicesDelegate;
 import org.eclipse.rse.core.RSECorePlugin;
 import org.eclipse.rse.core.model.ISystemRegistry;
 import org.eclipse.rse.ui.RSEUIPlugin;
 
 
-public class RSEServices implements IRemoteServices {
+public class RSEServices implements IRemoteServicesDelegate {
 	private ISystemRegistry registry;
 	private IRemoteConnectionManager connMgr;
 	private IRemoteFileManager fileMgr;
