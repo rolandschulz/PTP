@@ -345,6 +345,7 @@ public class AbstractRemoteResourceManagerConfigurationWizardPage extends
 			if (connections.length > 0) {
 				connectionCombo.select(connections.length - 1);
 			}
+			newRemoteConnectionButton.setEnabled(connMgr.supportsNewConnections());
 		}
 	}
 	
