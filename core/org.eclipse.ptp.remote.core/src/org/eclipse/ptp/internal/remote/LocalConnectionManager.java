@@ -17,32 +17,39 @@ import org.eclipse.swt.widgets.Shell;
 
 public class LocalConnectionManager implements IRemoteConnectionManager {
 	private IRemoteConnection localConnection = new LocalConnection();
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnectionManager#getConnection()
 	 */
 	public IRemoteConnection getConnection() {
 		return localConnection;
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnectionManager#getConnection(java.lang.String)
 	 */
 	public IRemoteConnection getConnection(String name) {
 		return localConnection;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnectionManager#getConnections()
 	 */
 	public IRemoteConnection[] getConnections() {
 		return new IRemoteConnection[]{localConnection};
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnectionManager#newConnection()
 	 */
 	public void newConnection(Shell shell) {
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.IRemoteConnectionManager#supportsNewConnections()
+	 */
+	public boolean supportsNewConnections() {
+		return false;
 	}
 
 	/* (non-Javadoc)

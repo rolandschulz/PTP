@@ -37,6 +37,13 @@ public interface IRemoteConnectionManager {
 	public IRemoteConnection[] getConnections();
 	
 	/**
+	 * Check if this connection manager supports new connection creation
+	 * 
+	 * @return true if new connections can be created
+	 */
+	public boolean supportsNewConnections();
+	
+	/**
 	 * Create a new connection. The implementation can chose to do this in any way,
 	 * but typically will use a dialog or wizard.
 	 */
