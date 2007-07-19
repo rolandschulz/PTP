@@ -128,11 +128,7 @@ public class RemoteServicesProxy implements IRemoteServices {
 	 */
 	public boolean initialize() {
 		loadServices();
-		if (delegate.initialize()) {
-			initialized = true;
-			return true;
-		}
-		return false;
+		return initialized;
 	}
 	
 	public boolean isInitialized() {
@@ -145,8 +141,6 @@ public class RemoteServicesProxy implements IRemoteServices {
 			delegate = factory.create();
 			if (delegate.initialize()) {
 				initialized = true;
-			} else {
-				//throw new CoreException() ?
 			}
 		}
 	}
