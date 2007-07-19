@@ -43,9 +43,6 @@ public class PTPRemotePlugin extends AbstractUIPlugin {
 	// Default remote services for new RM wizard
 	private IRemoteServices defaultRemoteServices;
 	
-	// Current remote services
-	private IRemoteServices remoteServices;
-
 	/**
 	 * The constructor
 	 */
@@ -59,7 +56,6 @@ public class PTPRemotePlugin extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
-		remoteServices = null;
 		defaultRemoteServices = null;
 	}
 
