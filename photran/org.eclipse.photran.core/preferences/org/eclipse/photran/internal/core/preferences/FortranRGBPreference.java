@@ -5,12 +5,9 @@ import org.eclipse.jface.resource.StringConverter;
 import org.eclipse.swt.graphics.RGB;
 
 /**
- * Parent class for preferences which hold an <code>RGB</code> value.
+ * Parent class for preferences which hold an <code>RGB</code> (color) value.
  * 
- * This should be eliminated and <code>FortranPreference</code> parameterized by type once we
- * start using Java 5.
- * 
- * @author joverbey
+ * @author Jeff Overbey
  */
 public final class FortranRGBPreference extends FortranPreference
 {

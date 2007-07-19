@@ -18,6 +18,11 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
+/**
+* gfortran Error Parser -- An error parser for gfortran (GNU GCC Fortran)
+*
+* @author ?
+*/
 public class GFortranErrorParser implements IErrorParser {
 	
 	String fileName = null;

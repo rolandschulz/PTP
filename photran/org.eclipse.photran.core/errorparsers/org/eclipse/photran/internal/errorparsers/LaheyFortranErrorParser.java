@@ -13,7 +13,7 @@ import org.eclipse.core.resources.IFile;
  * This Lahey 7.1 error parser only picks up __####-S: errors. 
  * We'll need to see what warnings look like, and if this format is consistent.
  * 
- * @author foote
+ * @author Brian Foote
  */
 public class LaheyFortranErrorParser implements IErrorParser
 {

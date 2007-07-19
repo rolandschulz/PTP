@@ -10,8 +10,11 @@ import java.util.regex.*;
 /**
 * Absoft Error Parser -- An error parser for Absoft
 *
+* This error parser matches compiler errors of the following form:
+* <pre>
 * cf90-400 f90fe: ERROR $MAIN, File = f.f95, Line = 44, Column = 13
 *    Oops!
+* </pre>
 *
 * @author Jeff Overbey
 */

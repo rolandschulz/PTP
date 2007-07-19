@@ -10,14 +10,13 @@ import org.eclipse.core.resources.IFile;
 /**
  * Intel Fortran 8.1 error parser
  * 
- * @author joverbey
+ * This error parser extracts file, line number, and error information from lines of the form
+ * <pre>fortcom: Error: test.f90, line 3: Message</pre>
+ *
+ * @author Jeff Overbey
  */
 public class IntelFortranErrorParser implements IErrorParser
 {
-    /**
-     * Extracts file, line number, and error information from lines of the form
-     * fortcom: Error: test.f90, line 3: Message
-     */
     public boolean processLine(String line, ErrorParserManager eoParser)
     {
         String /*fortcom,*/ severitystr, filestr, linestr, message;

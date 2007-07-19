@@ -9,7 +9,7 @@ import org.eclipse.core.resources.IFile;
 /**
  * g95 Error Parser -- An error parser for g95
  * 
- * @author foote 
+ * @author Brian Foote 
  */
 public class G95FortranErrorParser implements IErrorParser
 {

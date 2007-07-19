@@ -1,5 +1,10 @@
 package org.eclipse.photran.internal.core.preferences;
 
+/**
+ * Parent class for preferences which hold a string value.
+ * 
+ * @author Jeff Overbey
+ */
 public final class FortranStringPreference extends FortranPreference
 {
     private String defaultValue;

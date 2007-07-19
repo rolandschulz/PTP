@@ -1,7 +1,10 @@
 package org.eclipse.photran.internal.core.preferences;
 
-import org.eclipse.photran.core.FortranCorePlugin;
-
+/**
+ * Parent class for preferences which hold a boolean value.
+ * 
+ * @author Jeff Overbey
+ */
 public final class FortranBooleanPreference extends FortranPreference
 {
     private boolean defaultValue;

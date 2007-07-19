@@ -10,10 +10,8 @@ import java.util.regex.*;
 /**
 * PGI Fortran Error Parser -- An error parser for the Portland Group compiler
 *
-* cf90-400 f90fe: ERROR $MAIN, File = f.f95, Line = 44, Column = 13
-*    Oops!
-*    
-* PGFTN-S-0034-Syntax error at or near :: (life_f.f: 19)
+* This error parser matches compiler errors of the following form:
+* <pre>PGFTN-S-0034-Syntax error at or near :: (life_f.f: 19)</pre>
 *
 * @author Craig Rasmussen
 */

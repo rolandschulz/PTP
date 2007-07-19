@@ -13,14 +13,21 @@ import org.eclipse.core.runtime.QualifiedName;
  * 
  * The user may set these via the Fortran Refactoring Engine Search Paths project properties page.
  * 
+ * Valid <b>property names</b> are
+ * <ul>
+ * <li> {@link SearchPathProperties#MODULE_PATHS_PROPERTY_NAME}
+ * <li> {@link SearchPathProperties#INCLUDE_PATHS_PROPERTY_NAME}
+ * </ul>
+ * 
  * @see org.eclipse.photran.internal.ui.properties.SearchPathsPropertyPage
- * @author joverbey
+ * @author Jeff Overbey
  */
 public class SearchPathProperties
 {
     public static final String MODULE_PATHS_PROPERTY_NAME = "FortranModulePaths";
     public static final String INCLUDE_PATHS_PROPERTY_NAME = "FortranIncludePaths";
     
+    /** @return the value of the given property for the given project */
     public static String getProperty(IProject project, String propertyName)
     {
         try
@@ -35,11 +42,14 @@ public class SearchPathProperties
         }
     }
     
+    /** @return the default value of the given property for the given project (i.e., its value if it has not been
+     * explicitly set by the user) */
     public static String getPropertyDefault(IProject project, String propertyName)
     {
         return project.getFullPath().toOSString() + File.pathSeparator;
     }
 
+    /** Sets the given property to the given value in the given project */
     public static void setProperty(IProject project, String propertyName, String value)
     {
         try

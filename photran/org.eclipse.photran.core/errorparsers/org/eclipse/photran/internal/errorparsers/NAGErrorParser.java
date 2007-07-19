@@ -7,7 +7,8 @@ import org.eclipse.core.resources.IFile;
 /**
  * NAG Error Parser -- An error parser for NAG Fortran (and F)
  *
- * Error: f.f95, line 44: Oops, you blew it!
+ * This error parser matches compiler errors of the following form:
+ * <pre>Error: f.f95, line 44: Oops, you blew it!</pre>
  *
  * @author Walt Brainerd
  */

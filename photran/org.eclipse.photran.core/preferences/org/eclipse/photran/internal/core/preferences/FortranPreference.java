@@ -4,13 +4,13 @@ import org.eclipse.core.runtime.Preferences;
 import org.eclipse.photran.core.FortranCorePlugin;
 
 /**
- * Parent class for preferences that should be set in the Core and/or UI plug-ins.
+ * Parent class for preferences that should be set in Photran's Core plug-in.
  * 
- * This should be parameterized by type, and type-based subclasses like
+ * @author Jeff Overbey
+ * 
+ * JAVA5: This should be parameterized by type, and type-based subclasses like
  * <code>FortranStringPreference</code> and <code>FortranBooleanPreference</code> should be
  * eliminated once we start using Java 5.
- * 
- * @author joverbey
  */
 abstract class FortranPreference
 {
@@ -23,16 +23,6 @@ abstract class FortranPreference
         this.suffix = suffix;
         this.preferences = FortranCorePlugin.getDefault().getPluginPreferences();
     }
-    
-    protected Preferences getPreferenceStore()
-    {
-        return preferences;
-    }
-
-    protected void savePreferenceStore()
-    {
-        FortranCorePlugin.getDefault().savePluginPreferences();
-    }
 
     /**
      * @return the name of this preference, e.g., <code>org.eclipse.photran.core.myPreference</code>
@@ -44,7 +34,20 @@ abstract class FortranPreference
 
     /**
      * Sets the default value of this preference
-     * @param preferences
      */
     public abstract void setDefault();
+    
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Utility Methods for Subclasses
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    protected Preferences getPreferenceStore()
+    {
+        return preferences;
+    }
+
+    protected void savePreferenceStore()
+    {
+        FortranCorePlugin.getDefault().savePluginPreferences();
+    }
 }
