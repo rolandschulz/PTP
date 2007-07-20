@@ -90,7 +90,7 @@
 /*
  * ORTE attributes
  */
-#define ORTE_JOB_NAME_FMT			"job%d"
+#define ORTE_JOB_NAME_FMT			"job%02d"
 
 int ORTE_Initialize(int, int, char **);
 int ORTE_ModelDef(int, int, char **);
@@ -2151,13 +2151,15 @@ ORTE_StartEvents(int trans_id, int nargs, char **args)
 int
 ORTE_Quit(int trans_id, int nargs, char **args)
 {
+	int old_state = proxy_state;
+	
 	printf("ORTE_Quit called!\n"); fflush(stdout);
 	
-	if (proxy_state == STATE_RUNNING) {
+	proxy_state = STATE_SHUTTING_DOWN;
+
+	if (old_state == STATE_RUNNING) {
 		do_orte_shutdown();
 	}
-	
-	proxy_state = STATE_SHUTTING_DOWN;
 	
 	sendOKEvent(trans_id);
 	
@@ -2167,11 +2169,7 @@ ORTE_Quit(int trans_id, int nargs, char **args)
 int
 server(char *name, char *host, int port)
 {
-	char *			msg;
-	char *			msg1;
-	char *			msg2;
 	int				rc;
-	int				shutdown_orted = 1;
 	struct timeval	timeout = {0, 20000};
 	
 	gJobList = NewList();
@@ -2193,56 +2191,9 @@ server(char *name, char *host, int port)
 	}
 	
 	if (ptp_signal_exit != 0) {
-		switch(ptp_signal_exit) {
-			case SIGINT:
-				asprintf(&msg1, "INT");
-				asprintf(&msg2, "Interrupt");
-				break;
-			case SIGHUP:
-				asprintf(&msg1, "HUP");
-				asprintf(&msg2, "Hangup");
-				break;
-			case SIGILL:
-				asprintf(&msg1, "ILL");
-				asprintf(&msg2, "Illegal Instruction");
-				break;
-			case SIGSEGV:
-				asprintf(&msg1, "SEGV");
-				asprintf(&msg2, "Segmentation Violation");
-				break;
-			case SIGTERM:
-				asprintf(&msg1, "TERM");
-				asprintf(&msg2, "Termination");
-				break;
-			case SIGQUIT:
-				asprintf(&msg1, "QUIT");
-				asprintf(&msg2, "Quit");
-				break;
-			case SIGABRT:
-				asprintf(&msg1, "ABRT");
-				asprintf(&msg2, "Process Aborted");
-				break;
-			case SIGCHLD:
-				asprintf(&msg1, "CHLD");
-				asprintf(&msg2, "ORTED Process Exited");
-				shutdown_orted = 0;
-				break;
-			default:
-				asprintf(&msg1, "***UNKNOWN SIGNAL***");
-				asprintf(&msg2, "ERROR - UNKNOWN SIGNAL, REPORT THIS!");
-				break;
-		}
-		printf("###### SIGNAL: %s\n", msg1);
-		if (shutdown_orted) {
-			printf("###### Shutting down ORTEd\n");
+		if (ptp_signal_exit != SIGCHLD && proxy_state != STATE_SHUTTING_DOWN && proxy_state != STATE_SHUTDOWN) {
 			do_orte_shutdown();
 		}
-		asprintf(&msg, "ptp_orte_proxy received signal %s (%s).  Exit was required and performed cleanly.", msg1, msg2);
-		//proxy_svr_event_callback(orte_proxy, ORTEErrorStr(RTEV_ERROR_SIGNAL, msg));
-		sendErrorEvent(gTransID, RTEV_ERROR_SIGNAL, msg);
-		free(msg);
-		free(msg1);
-		free(msg2);
 		/* our return code = the signal that fired */
 		rc = ptp_signal_exit;
 	}
