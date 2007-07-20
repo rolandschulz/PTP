@@ -11,6 +11,11 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.photran.internal.core.properties.SearchPathProperties;
 
+/**
+ * Provides callbacks to handle errors encountered while loading files in order to process INCLUDE lines.
+ * 
+ * @author Jeff Overbey
+ */
 public class IncludeLoaderCallback
 {
     protected IProject project;

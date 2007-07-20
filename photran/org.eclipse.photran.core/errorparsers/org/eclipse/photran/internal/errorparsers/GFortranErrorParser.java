@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-
 package org.eclipse.photran.internal.errorparsers;
 
 import org.eclipse.cdt.core.ErrorParserManager;
