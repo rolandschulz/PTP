@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2007 University of Illinois at Urbana-Champaign and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     UIUC - Initial API and implementation
+ *******************************************************************************/
 package org.eclipse.photran.internal.ui.editor;
 
 import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
@@ -21,6 +31,12 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 
+/**
+ * Simple scanner for Fortran keywords (for syntax highlighting)
+ * 
+ * @author Jeff Overbey based on code from Photran 1.0
+ *         (by Vaishali De or Julia Dragan-Chirila?)
+ */
 public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -29,7 +45,6 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
 
     /**
      * Rule which detects any string occurring past column 72 as a comment
-     * @author joverbey
      */
     private final class FixedFormColumn72CommentRule implements IRule
     {
@@ -51,7 +66,6 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
 
     /**
      * Rule which detects identifiers between columns 7 and 72 
-     * @author joverbey
      */
     private static final class FixedFormIdentifierWordRule extends WordRule
     {

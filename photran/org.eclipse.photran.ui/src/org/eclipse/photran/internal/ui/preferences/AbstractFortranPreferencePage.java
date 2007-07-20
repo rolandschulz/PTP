@@ -23,9 +23,10 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
 /**
- * Base class for Fortran preference pages which set preferences via static members of FortranPreferences
+ * Base class for Fortran preference pages which set preferences via static members of
+ * {@link org.eclipse.photran.internal.core.preferences.FortranPreferences}
  * 
- * @author joverbey
+ * @author Jeff Overbey
  */
 public abstract class AbstractFortranPreferencePage
     extends FieldEditorPreferencePage

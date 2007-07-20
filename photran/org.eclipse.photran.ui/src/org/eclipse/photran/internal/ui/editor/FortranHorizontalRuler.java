@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2007 University of Illinois at Urbana-Champaign and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     UIUC - Initial API and implementation
+ *******************************************************************************/
 package org.eclipse.photran.internal.ui.editor;
 
 import org.eclipse.jface.text.BadLocationException;
@@ -26,9 +36,9 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * @author nchen
- * @author cheah
- * @author joverbey combined into single class
+ * @author Nicholas Chen
+ * @author Cheah Chin Fei
+ * @author Jeff Overbey combined into single class
  *
  * Base class for horizontal rulers. Draws thin ruler on the top of the editor
  * once associated with the editor at hand.

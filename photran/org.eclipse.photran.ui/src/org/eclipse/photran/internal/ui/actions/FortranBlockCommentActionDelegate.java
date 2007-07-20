@@ -1,11 +1,21 @@
+/*******************************************************************************
+ * Copyright (c) 2007 University of Illinois at Urbana-Champaign and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     UIUC - Initial API and implementation
+ *******************************************************************************/
 package org.eclipse.photran.internal.ui.actions;
 
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.text.Assert;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.BadPartitioningException;
 import org.eclipse.jface.text.BadPositionCategoryException;
@@ -23,8 +33,8 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 /**
  * Action supporting block commenting in the Fortran editor
  * 
- * @author cheahcf based on org.eclipse.cdt.internal.ui.actions
- * @author joverbey made FortranEditorActionDelegate
+ * @author Cheah Chin Fei based on org.eclipse.cdt.internal.ui.actions
+ * @author Jeff Overbey made FortranEditorActionDelegate
  */
 public class FortranBlockCommentActionDelegate extends FortranEditorActionDelegate
 {

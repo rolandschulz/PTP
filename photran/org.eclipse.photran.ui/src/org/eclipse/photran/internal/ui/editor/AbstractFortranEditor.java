@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2007 University of Illinois at Urbana-Champaign and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     UIUC - Initial API and implementation
+ *******************************************************************************/
 package org.eclipse.photran.internal.ui.editor;
 
 import org.eclipse.cdt.core.model.CModelException;
@@ -58,6 +68,11 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.WorkbenchChainedTextFontFieldEditor;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 
+/**
+ * Base class for the fixed and free-form Fortran editors
+ * 
+ * @author Jeff Overbey
+ */
 public abstract class AbstractFortranEditor extends TextEditor implements ISelectionChangedListener
 {
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -507,17 +522,20 @@ public abstract class AbstractFortranEditor extends TextEditor implements ISelec
     
     public void forceOutlineViewUpdate()
     {
-        //  //     ///     ////   //  //    ///
-        //  //   //  //   //      // //    /////
-        //////   //////   //      ////      ///
-        //  //   //  //   //      // //
-        //  //   //  //    ////   //  //    //
-        
-        IDocument doc = getIDocument();
-        if (doc == null) return;
-        doc.set(" " + doc.get());
-        doSave(null);
-        doc.set(doc.get().substring(1));
-        doSave(null);
+    	firePropertyChange(PROP_DIRTY);
+
+    	
+//      //  //     ///     ////   //  //    ///
+//      //  //   //  //   //      // //    /////
+//      //////   //////   //      ////      ///
+//      //  //   //  //   //      // //
+//      //  //   //  //    ////   //  //    //
+//      
+//      IDocument doc = getIDocument();
+//      if (doc == null) return;
+//      doc.set(" " + doc.get());
+//      doSave(null);
+//      doc.set(doc.get().substring(1));
+//      doSave(null);
     }
 }
