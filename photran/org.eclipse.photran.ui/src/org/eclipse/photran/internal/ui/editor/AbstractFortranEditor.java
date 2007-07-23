@@ -13,6 +13,7 @@ package org.eclipse.photran.internal.ui.editor;
 import org.eclipse.cdt.core.model.CModelException;
 import org.eclipse.cdt.core.model.ISourceRange;
 import org.eclipse.cdt.core.model.ISourceReference;
+import org.eclipse.cdt.internal.core.model.CModelManager;
 import org.eclipse.cdt.internal.ui.editor.CContentOutlinePage;
 import org.eclipse.cdt.internal.ui.editor.CTextEditorActionConstants;
 import org.eclipse.cdt.ui.CUIPlugin;
@@ -522,20 +523,17 @@ public abstract class AbstractFortranEditor extends TextEditor implements ISelec
     
     public void forceOutlineViewUpdate()
     {
-    	firePropertyChange(PROP_DIRTY);
-
-    	
-//      //  //     ///     ////   //  //    ///
-//      //  //   //  //   //      // //    /////
-//      //////   //////   //      ////      ///
-//      //  //   //  //   //      // //
-//      //  //   //  //    ////   //  //    //
-//      
-//      IDocument doc = getIDocument();
-//      if (doc == null) return;
-//      doc.set(" " + doc.get());
-//      doSave(null);
-//      doc.set(doc.get().substring(1));
-//      doSave(null);
+        //  //     ///     ////   //  //    ///
+        //  //   //  //   //      // //    /////
+        //////   //////   //      ////      ///
+        //  //   //  //   //      // //
+        //  //   //  //    ////   //  //    //
+      
+        IDocument doc = getIDocument();
+        if (doc == null) return;
+        doc.set(" " + doc.get());
+        doSave(null);
+        doc.set(doc.get().substring(1));
+        doSave(null);
     }
 }
