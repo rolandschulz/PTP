@@ -1,0 +1,1 @@
+http://wiki.eclipse.org/Development_Conventions_and_Guidelines
