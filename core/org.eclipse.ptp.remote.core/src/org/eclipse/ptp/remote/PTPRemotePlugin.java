@@ -160,8 +160,11 @@ public class PTPRemotePlugin extends AbstractUIPlugin {
 			for (IConfigurationElement ce : elements)
 			{
 				RemoteServicesProxy proxy = new RemoteServicesProxy(ce);
-				if (proxy != null && proxy.initialize()) {
+				if (proxy.initialize()) {
+					System.out.println("Adding remote service: " + proxy.getId() + "(" + proxy.getName() + ")");
 					services.put(proxy.getId(), proxy);
+				} else {
+					System.out.println("Failed to initialize remote service: " + proxy.getId() + "(" + proxy.getName() + ")");
 				}
 			}
 		}
@@ -174,7 +177,7 @@ public class PTPRemotePlugin extends AbstractUIPlugin {
 	 * 
 	 * @return remote services
 	 */
-	public IRemoteServices[] getAllRemoteServices() {
+	public synchronized IRemoteServices[] getAllRemoteServices() {
 		if (allRemoteServices == null) {
 			allRemoteServices = retrieveRemoteServices();
 		}
@@ -186,7 +189,7 @@ public class PTPRemotePlugin extends AbstractUIPlugin {
 	 * 
 	 * @return 
 	 */
-	public IRemoteServices getDefaultServices() {
+	public synchronized IRemoteServices getDefaultServices() {
 		if (defaultRemoteServices == null) {
 			IRemoteServices[] services = getAllRemoteServices();
 			defaultRemoteServices = services[services.length-1];
@@ -200,7 +203,7 @@ public class PTPRemotePlugin extends AbstractUIPlugin {
 	 * 
 	 * @param services
 	 */
-	public void setDefaultServices(IRemoteServices services) {
+	public synchronized void setDefaultServices(IRemoteServices services) {
 		defaultRemoteServices = services;
 	}
 		
@@ -209,7 +212,7 @@ public class PTPRemotePlugin extends AbstractUIPlugin {
 	 * 
 	 * @return services
 	 */
-	public IRemoteServices getRemoteServices(String id) {
+	public synchronized IRemoteServices getRemoteServices(String id) {
 		if (allRemoteServices == null) {
 			allRemoteServices = retrieveRemoteServices();
 		}
