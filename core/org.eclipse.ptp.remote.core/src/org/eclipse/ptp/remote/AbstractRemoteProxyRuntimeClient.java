@@ -29,7 +29,6 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 	private final String	remoteServicesId;
 	private final String	connectionName;
 
-
 	public AbstractRemoteProxyRuntimeClient(AbstractRemoteResourceManagerConfiguration config, 
 			int baseModelId) {
 		super(config, baseModelId);
@@ -65,10 +64,11 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 		
 		try {
 			// This will attempt to load and initialized the remote services plugin. If
-			// initialization failse, we abandon attempt to start RM
+			// initialization fails, we abandon attempt to start RM
 			
 			IRemoteServices remoteServices = PTPRemotePlugin.getDefault().getRemoteServices(remoteServicesId);
 			if (remoteServices == null) {
+				PTPCorePlugin.log(toString() + " startup: Could not find remote services ID " + remoteServicesId);
 				return false;
 			}
 			
@@ -82,7 +82,7 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 			} else {
 				String args = "--port="+getSessionPort();
 				IRemoteConnectionManager connMgr = remoteServices.getConnectionManager();
-				IRemoteConnection conn = connMgr.getConnection();
+				IRemoteConnection conn = connMgr.getConnection(connectionName);
 				IRemoteProcessBuilder processBuilder = remoteServices.getProcessBuilder(conn, proxyPath, args);
 				IRemoteProcess process = processBuilder.asyncStart();
 				
