@@ -13,7 +13,6 @@ package org.eclipse.photran.internal.ui.editor;
 import org.eclipse.cdt.core.model.CModelException;
 import org.eclipse.cdt.core.model.ISourceRange;
 import org.eclipse.cdt.core.model.ISourceReference;
-import org.eclipse.cdt.internal.core.model.CModelManager;
 import org.eclipse.cdt.internal.ui.editor.CContentOutlinePage;
 import org.eclipse.cdt.ui.CUIPlugin;
 import org.eclipse.cdt.ui.IWorkingCopyManager;
@@ -87,7 +86,6 @@ public abstract class AbstractFortranEditor extends TextEditor implements ISelec
     private static String CONTEXT_MENU_ID = "#FortranEditorContextMenu";
     
     private static String BLOCK_COMMENT_COMMAND_ID = "org.eclipse.photran.ui.CommentCommand";
-    private static String OPEN_DECLARATION_COMMAND_ID = "org.eclipse.photran.ui.OpenDeclarationCommand";
     
     private static final RGB VERTICAL_LINE_COLOR = new RGB(176, 180, 185);
 
