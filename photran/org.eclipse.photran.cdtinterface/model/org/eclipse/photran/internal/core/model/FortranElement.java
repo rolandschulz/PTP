@@ -38,7 +38,7 @@ import org.eclipse.photran.internal.core.lexer.Token;
  * FortranElementInfo, pieces of the Outline view seem to be missing (things beyond two levels
  * deep?) WTF?!
  * 
- * @author joverbey
+ * @author Jeff Overbey
  * @see ICElement
  * @see Parent
  * @see FortranElementInfo
@@ -100,7 +100,21 @@ public abstract class FortranElement extends SourceManipulation // Parent
      */
 	public FortranElement(Parent parent, Token identifier)
     {
-		super(parent, identifier != null ? identifier.getText() : "(anonymous)", -1); // type);
+		this(parent, identifier, -1);
+    }
+
+	/**
+     * Creates a new <code>FortranElement</code> under the given parent, which has the given name
+     * (passed as a <code>Token</code>) from the source text and the given type
+     * (see {@link org.eclipse.cdt.core.model.ICElement})
+     * 
+     * @param parent
+     * @param identifier
+     * @param parseTreeNode
+     */
+	public FortranElement(Parent parent, Token identifier, int type)
+    {
+		super(parent, identifier != null ? identifier.getText() : "(anonymous)", type);
         this.setIdentifier(identifier);
     }
 
@@ -202,7 +216,7 @@ public abstract class FortranElement extends SourceManipulation // Parent
     {
         public DerivedType(Parent parent, Token nameToken)
         {
-            super(parent, nameToken);
+            super(parent, nameToken, ICElement.C_STRUCT);
         }
 
         public ImageDescriptor getBaseImageDescriptor()
@@ -215,7 +229,7 @@ public abstract class FortranElement extends SourceManipulation // Parent
     {
         public Function(Parent parent, Token nameToken)
         {
-            super(parent, nameToken);
+            super(parent, nameToken, ICElement.C_FUNCTION);
         }
 
         public ImageDescriptor getBaseImageDescriptor()
@@ -228,7 +242,7 @@ public abstract class FortranElement extends SourceManipulation // Parent
     {
         public Subroutine(Parent parent, Token nameToken)
         {
-            super(parent, nameToken);
+            super(parent, nameToken, ICElement.C_FUNCTION);
         }
 
         public ImageDescriptor getBaseImageDescriptor()
