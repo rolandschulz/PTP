@@ -13,14 +13,7 @@ package org.eclipse.ptp.remote;
 import org.eclipse.swt.widgets.Shell;
 
 
-public interface IRemoteConnectionManager {
-	/**
-	 * Get the current remote connection
-	 * 
-	 * @return remote connection
-	 */
-	public IRemoteConnection getConnection();
-	
+public interface IRemoteConnectionManager {	
 	/**
 	 * Find a remote connection given its name
 	 * 
@@ -48,11 +41,4 @@ public interface IRemoteConnectionManager {
 	 * but typically will use a dialog or wizard.
 	 */
 	public void newConnection(Shell shell);
-	
-	/**
-	 * Set the remote connection
-	 * 
-	 * @param conn
-	 */
-	public void setConnection(IRemoteConnection conn);
 }
