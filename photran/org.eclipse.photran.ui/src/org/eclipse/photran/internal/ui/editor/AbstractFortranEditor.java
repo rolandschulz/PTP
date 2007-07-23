@@ -15,7 +15,6 @@ import org.eclipse.cdt.core.model.ISourceRange;
 import org.eclipse.cdt.core.model.ISourceReference;
 import org.eclipse.cdt.internal.core.model.CModelManager;
 import org.eclipse.cdt.internal.ui.editor.CContentOutlinePage;
-import org.eclipse.cdt.internal.ui.editor.CTextEditorActionConstants;
 import org.eclipse.cdt.ui.CUIPlugin;
 import org.eclipse.cdt.ui.IWorkingCopyManager;
 import org.eclipse.core.resources.IFile;
@@ -66,6 +65,7 @@ import org.eclipse.ui.part.IShowInTargetList;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 import org.eclipse.ui.texteditor.DefaultRangeIndicator;
 import org.eclipse.ui.texteditor.IDocumentProvider;
+import org.eclipse.ui.texteditor.ITextEditorActionConstants;
 import org.eclipse.ui.texteditor.WorkbenchChainedTextFontFieldEditor;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 
@@ -463,7 +463,13 @@ public abstract class AbstractFortranEditor extends TextEditor implements ISelec
                     getSourceViewer().revealRange(start, length);
                     getSourceViewer().setSelectedRange(start, length);
                 }
-                updateStatusField(CTextEditorActionConstants.STATUS_CURSOR_POS);
+                // JO: This was used in CDT 3.3 and earlier
+                // Replaced constant with literal string since CTextEditorActionConstants no longer exists in CDT 4
+                //updateStatusField(CTextEditorActionConstants.STATUS_CURSOR_POS);
+                updateStatusField("CursorPosition");
+                
+                // JO: This is used in CDT 4.0 (7/18/07) according to CEditor.java
+                updateStatusField(ITextEditorActionConstants.STATUS_CATEGORY_INPUT_POSITION);
             }
             return;
         } catch (IllegalArgumentException x) {
