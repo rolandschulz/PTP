@@ -293,7 +293,7 @@ public class AbstractRemoteResourceManagerConfigurationWizardPage extends
 	{
 		IRemoteServices remoteServices = PTPRemotePlugin.getDefault().getRemoteServices(remoteServicesId);
 		IRemoteConnectionManager connMgr = remoteServices.getConnectionManager();
-		IRemoteConnection connection = connMgr.getConnection();
+		IRemoteConnection connection = connMgr.getConnection(connectionName);
 		IRemoteFileManager fileMgr = remoteServices.getFileManager();
 		String correctPath = getFieldContent(serverText.getText());
 		String selectedPath = fileMgr.browseRemoteFile(getControl().getShell(), connection, "Select Proxy Server Executable", correctPath);
