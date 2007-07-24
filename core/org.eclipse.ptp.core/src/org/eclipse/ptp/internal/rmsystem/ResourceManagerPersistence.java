@@ -27,11 +27,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IResourceManager;
@@ -114,43 +111,32 @@ public class ResourceManagerPersistence {
 	}
 
 	/**
-	 * Loads and, if necessary, starts saved resource managers.
+	 * Loads saved resource managers.
 	 * @param file
 	 * @param factories
 	 * @param monitor
 	 * @throws CoreException 
 	 */
 	public void loadResourceManagers(File file,
-			IResourceManagerFactory[] factories, IProgressMonitor monitor) throws CoreException {
-	    if (monitor == null) {
-	        monitor = new NullProgressMonitor();
-	    }
-	    monitor.beginTask("loading resource manager from " + file, 100);
-	    try {
-	        rmsNeedStarting.clear();
-	        resourceManagers.clear();
+			IResourceManagerFactory[] factories) throws CoreException {
+        rmsNeedStarting.clear();
+        resourceManagers.clear();
 
-	        FileReader reader = null;
-	        try {
-	            reader = new FileReader(file);
-	            // Loads and, if necessary, starts saved resource managers.
-	            loadResourceManagers(XMLMemento.createReadRoot(reader), factories,
-	                    new SubProgressMonitor(monitor, 100));
-	        } catch (FileNotFoundException e) {
-	            // ignored... no ResourceManager items exist yet.
-	        } finally {
-	            try {
-	                if (reader != null) {
-	                    reader.close();
-	                }
-	            } catch (IOException e) {
-	                PTPCorePlugin.log(e);
-	            }
-	        }
-	    }
-		finally {
-		    monitor.done();
-		}
+        FileReader reader = null;
+        try {
+            reader = new FileReader(file);
+            loadResourceManagers(XMLMemento.createReadRoot(reader), factories);
+        } catch (FileNotFoundException e) {
+            // ignored... no ResourceManager items exist yet.
+        } finally {
+            try {
+                if (reader != null) {
+                    reader.close();
+                }
+            } catch (IOException e) {
+                PTPCorePlugin.log(e);
+            }
+        }
 	}
 
 	private IResourceManagerFactory getResourceManagerFactory(
@@ -164,60 +150,47 @@ public class ResourceManagerPersistence {
 	}
 
     /**
-	 * Loads and, if necessary, starts saved resource managers.
+	 * Loads saved resource managers.
 	 * @param memento
 	 * @param factories
 	 * @param monitor
 	 * @throws CoreException 
 	 */
 	private void loadResourceManagers(XMLMemento memento,
-			IResourceManagerFactory[] factories,
-			final IProgressMonitor monitor) throws CoreException {
+			IResourceManagerFactory[] factories) throws CoreException {
 		IMemento[] children = memento.getChildren(TAG_RESOURCEMANGER);
 		ArrayList<IStatus> statuses = new ArrayList<IStatus>();
-		monitor.beginTask("Loading the Resource Managers", children.length);
-		try {
-			final IResourceManagerControl[] tmpRMs = new IResourceManagerControl[children.length];
-			ArrayList<IResourceManagerControl> rms = new ArrayList<IResourceManagerControl>(tmpRMs.length);
+		final IResourceManagerControl[] tmpRMs = new IResourceManagerControl[children.length];
+		ArrayList<IResourceManagerControl> rms = new ArrayList<IResourceManagerControl>(tmpRMs.length);
 
-			for (int i = 0; i < children.length; ++i) {
-				String resourceManagerId = children[i].getString(TAG_RESOURCEMANGER_ID);
-				final int index = children[i].getInteger(TAG_RESOURCEMANAGER_INDEX).intValue();
-				String isRunningRep = children[i].getString(TAG_RESOURCEMANGER_RUNNING);
-				boolean isRunning = "true".equalsIgnoreCase(isRunningRep);
-				IResourceManagerFactory factory = getResourceManagerFactory(
-						factories, resourceManagerId);
-				if (factory == null) {
-					monitor.worked(1);
-				}
-				else {
-					final IMemento grandchild = children[i].getChild(TAG_RESOURCEMANGER_CONFIGURATION);
-					IResourceManagerConfiguration configuration = factory.loadConfiguration(grandchild);
-					if (configuration != null) {
-						tmpRMs[index] = factory.create(configuration);
-						if (tmpRMs[index] != null) {
-							// start the resource manager if it was running when saved.
-							if (isRunning) {
-							    rmsNeedStarting .add(tmpRMs[index]);
-							}
-							else {
-								monitor.worked(1);
-							}
-							rms.add(tmpRMs[index]);
+		for (int i = 0; i < children.length; ++i) {
+			String resourceManagerId = children[i].getString(TAG_RESOURCEMANGER_ID);
+			final int index = children[i].getInteger(TAG_RESOURCEMANAGER_INDEX).intValue();
+			String isRunningRep = children[i].getString(TAG_RESOURCEMANGER_RUNNING);
+			boolean isRunning = "true".equalsIgnoreCase(isRunningRep);
+			IResourceManagerFactory factory = getResourceManagerFactory(
+					factories, resourceManagerId);
+			if (factory != null) {
+				final IMemento grandchild = children[i].getChild(TAG_RESOURCEMANGER_CONFIGURATION);
+				IResourceManagerConfiguration configuration = factory.loadConfiguration(grandchild);
+				if (configuration != null) {
+					tmpRMs[index] = factory.create(configuration);
+					if (tmpRMs[index] != null) {
+						// start the resource manager if it was running when saved.
+						if (isRunning) {
+						    rmsNeedStarting .add(tmpRMs[index]);
 						}
+						rms.add(tmpRMs[index]);
 					}
 				}
 			}
-
-			resourceManagers.addAll(rms);
-			if (statuses.size() > 0) {
-				throw new CoreException(new MultiStatus(PTPCorePlugin.PLUGIN_ID,
-						MultiStatus.ERROR, statuses.toArray(new IStatus[0]),
-						"loading resource managers", null));
-			}
 		}
-		finally {
-			monitor.done();
+
+		resourceManagers.addAll(rms);
+		if (statuses.size() > 0) {
+			throw new CoreException(new MultiStatus(PTPCorePlugin.PLUGIN_ID,
+					MultiStatus.ERROR, statuses.toArray(new IStatus[0]),
+					"loading resource managers", null));
 		}
 	}
 

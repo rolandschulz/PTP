@@ -19,7 +19,6 @@
 package org.eclipse.ptp.core;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.listeners.IModelManagerResourceManagerListener;
@@ -57,11 +56,11 @@ public interface IModelManager extends IModelPresentation {
 	public IResourceManagerFactory getResourceManagerFactory(String id);
 
 	/**
-	 * Loads and, if necessary, starts saved resource managers.
-	 * @param monitor
+	 * Loads saved resource managers.
+	 * 
 	 * @throws CoreException
 	 */
-	public void loadResourceManagers(IProgressMonitor monitor) throws CoreException;
+	public void loadResourceManagers() throws CoreException;
 	
 	/**
 	 * @param listener
@@ -89,15 +88,17 @@ public interface IModelManager extends IModelPresentation {
 	public void setPTPConfiguration(ILaunchConfiguration config);
 
 	/**
+	 * Shuts down the model manager. Should only be called at plugin shutdown.
 	 * @throws CoreException
 	 */
 	public void shutdown() throws CoreException;
 
 	/**
-	 * @param monitor
+	 * Start the model manager. Should only be called once at plugin startup.
+	 * 
 	 * @throws CoreException
 	 */
-	public void start(IProgressMonitor monitor) throws CoreException;
+	public void start() throws CoreException;
 
 	/**
 	 * stops all of the resource managers.
@@ -105,6 +106,4 @@ public interface IModelManager extends IModelPresentation {
 	 * @throws CoreException
 	 */
 	public void stopResourceManagers() throws CoreException;
-
-
 }

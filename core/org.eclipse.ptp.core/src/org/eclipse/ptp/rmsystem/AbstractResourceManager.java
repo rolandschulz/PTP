@@ -480,14 +480,13 @@ public abstract class AbstractResourceManager extends PElement implements IResou
             if (monitor == null) {
                 monitor = new NullProgressMonitor();
             }
-    		monitor.beginTask("Starting Resource Manager " + getName(), 10);
-			SubProgressMonitor subMonitor = new SubProgressMonitor(monitor, 10);
+       		monitor.beginTask("Resource manager starting: " + getName(), 10);
 			try {
 				initialize();
-				boolean started = doStartup(subMonitor);
+				boolean started = doStartup(new SubProgressMonitor(monitor, 10));
 				if (started) {
 					setState(ResourceManagerAttributes.State.STARTED);
-				} else if (!subMonitor.isCanceled()) {
+				} else if (!monitor.isCanceled()) {
 					setState(ResourceManagerAttributes.State.ERROR);					
 				} else {
 		        	setState(ResourceManagerAttributes.State.STOPPED);					
