@@ -69,29 +69,22 @@
       <category
             name="Fortran"
             id="org.eclipse.photran.ui.newFortranWizards" />
-      <!-- New Project Wizards -->
-      <wizard
-            name="Standard Make Fortran Project"
-            icon="icons/etool16/newfortran_app.gif"
-            category="org.eclipse.photran.ui.newFortranWizards"
-            class="org.eclipse.photran.cdtinterface.ui.NewMakeFortranProjectWizard"
-            project="true"
-            finalPerspective="org.eclipse.photran.ui.FortranPerspective"
-            id="org.eclipse.photran.ui.wizards.NewMakeFortranProjectWizard">
+            
+      <!-- New Fortran Project Wizards -->
+      
+      <!-- CDT 4.0 and later -->
+       <wizard
+             canFinishEarly="false"
+             category="org.eclipse.photran.ui.newFortranWizards"
+             class="org.eclipse.photran.cdtinterface.ui.FortranProjectWizard"
+             finalPerspective="org.eclipse.photran.ui.FortranPerspective"
+             hasPages="true"
+             icon="icons/etool16/newfortran_app.gif"
+             id="org.eclipse.photran.ui.wizards.CDT4FortranProjectWizard"
+             name="Fortran Project"
+             project="true">
          <description>
-             Create a new Fortran project.  You must supply your own makefile.
-         </description>
-      </wizard>
-      <wizard
-            name="Managed Make Fortran Project"
-            icon="icons/etool16/newfortran_app.gif"
-            category="org.eclipse.photran.ui.newFortranWizards"
-            class="org.eclipse.photran.cdtinterface.ui.NewManagedFortranProjectWizard"
-            project="true"
-            finalPerspective="org.eclipse.photran.ui.FortranPerspective"
-            id="org.eclipse.photran.ui.wizards.NewManagedFortranProjectWizard">
-         <description>
-            Create a new Fortran project and let Eclipse create and manage the makefile.
+             Create a new Fortran project
          </description>
       </wizard>
  

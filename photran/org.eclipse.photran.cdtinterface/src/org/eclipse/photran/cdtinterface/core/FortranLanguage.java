@@ -4,18 +4,17 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.eclipse.cdt.core.dom.ICodeReaderFactory;
-import org.eclipse.cdt.core.dom.ast.ASTCompletionNode;
+import org.eclipse.cdt.core.dom.ast.IASTCompletionNode;
 import org.eclipse.cdt.core.dom.ast.IASTName;
 import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit;
+import org.eclipse.cdt.core.index.IIndex;
+import org.eclipse.cdt.core.model.AbstractLanguage;
 import org.eclipse.cdt.core.model.IContributedModelBuilder;
-import org.eclipse.cdt.core.model.ILanguage;
 import org.eclipse.cdt.core.model.ITranslationUnit;
-import org.eclipse.cdt.core.model.IWorkingCopy;
-import org.eclipse.cdt.internal.core.pdom.PDOM;
-import org.eclipse.cdt.internal.core.pdom.dom.IPDOMLinkageFactory;
-import org.eclipse.cdt.internal.core.pdom.dom.PDOMLinkage;
+import org.eclipse.cdt.core.parser.CodeReader;
+import org.eclipse.cdt.core.parser.IParserLogService;
+import org.eclipse.cdt.core.parser.IScannerInfo;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.photran.core.FortranCorePlugin;
 import org.eclipse.photran.internal.core.model.FortranModelBuilder;
 
@@ -24,14 +23,9 @@ import org.eclipse.photran.internal.core.model.FortranModelBuilder;
  * 
  * @author joverbey
  */
-public class FortranLanguage extends PlatformObject implements ILanguage
+public class FortranLanguage extends AbstractLanguage
 {
 	public static final String LANGUAGE_ID = "org.eclipse.photran.cdtinterface.fortran";
-    
-    public Collection getRegisteredContentTypeIds()
-    {
-        return Arrays.asList(new String[] { FortranCorePlugin.FIXED_FORM_CONTENT_TYPE, FortranCorePlugin.FREE_FORM_CONTENT_TYPE });
-    }
 
 	public String getId()
 	{
@@ -43,67 +37,18 @@ public class FortranLanguage extends PlatformObject implements ILanguage
 		return new FortranModelBuilder(tu, tu.getContentTypeId().equals(FortranCorePlugin.FIXED_FORM_CONTENT_TYPE));
 	}
 
-	public Object getAdapter(Class adapter)
+	public IASTTranslationUnit getASTTranslationUnit(CodeReader reader,
+			IScannerInfo scanInfo, ICodeReaderFactory fileCreator,
+			IIndex index, IParserLogService log) throws CoreException
 	{
-		//System.out.println("getAdapter " + adapter.getName());
-		
-        if (adapter == IPDOMLinkageFactory.class)
-			return new IPDOMLinkageFactory()
-			{
-				public PDOMLinkage getLinkage(PDOM pdom, int record)
-				{
-					return null; //return new PDOMFortranLinkage(pdom, record);
-				}
-
-				public PDOMLinkage createLinkage(PDOM pdom) throws CoreException
-				{
-					return null; //return new PDOMFortranLinkage(pdom);
-				}
-			};
-		else
-			return super.getAdapter(adapter);
+		return null;
 	}
 
-    public IASTTranslationUnit getASTTranslationUnit(ITranslationUnit file, ICodeReaderFactory codeReaderFactory, int style)
-    {
-        return getASTTranslationUnit(file, style);
-    }
-    
-    public IASTTranslationUnit getASTTranslationUnit(ITranslationUnit file, int style)
-    {
-        //System.out.println("getASTTranslationUnit");
-        
-//        //IResource resource = file.getResource();
-//        ICProject project = file.getCProject();
-//        //IProject rproject = project.getProject();
-//        
-//        PDOM pdom = (PDOM)CCorePlugin.getPDOMManager().getPDOM(project).getAdapter(PDOM.class);
-//        String path;
-//        if (file instanceof IWorkingCopy)
-//        {
-//            IFile rfile = (IFile)file.getResource();
-//            path = rfile.getLocation().toOSString();
-//            // Maybe later we can get the working copy contents using file.getContents()
-//        }
-//        else
-//        {
-//            path = file.getPath().toOSString();
-//        }
-//        
-//        // Parse
-//        IASTTranslationUnit ast = new FortranIASTTranslationUnitAdapter(path);
-//
-//        if ((style & AST_USE_INDEX) != 0) 
-//            ast.setIndex(pdom);
-//
-//        return ast;
-        return null;
-    }
-	
-	public ASTCompletionNode getCompletionNode(IWorkingCopy workingCopy, int offset)
+	public IASTCompletionNode getCompletionNode(CodeReader reader,
+			IScannerInfo scanInfo, ICodeReaderFactory fileCreator,
+			IIndex index, IParserLogService log, int offset)
+			throws CoreException
 	{
-		//System.out.println("getCompletionNode");
-		
 		return null;
 	}
 	
@@ -122,4 +67,37 @@ public class FortranLanguage extends PlatformObject implements ILanguage
 		// TODO This needs to be implemented.  I just added an empty stub to satisfy the interface (C.E.Rasmussen)
 		return new IASTName[0];
 	}
+
+	
+	
+	
+	
+	
+
+	// JO - This is not required as of CDT 4.0, but it is used by the Fortran dependency calculator, so I'm leaving it in...
+    public Collection getRegisteredContentTypeIds()
+    {
+        return Arrays.asList(new String[] { FortranCorePlugin.FIXED_FORM_CONTENT_TYPE, FortranCorePlugin.FREE_FORM_CONTENT_TYPE });
+    }
+
+//	public Object getAdapter(Class adapter)
+//	{
+//		//System.out.println("getAdapter " + adapter.getName());
+//		
+//        if (adapter == IPDOMLinkageFactory.class)
+//			return new IPDOMLinkageFactory()
+//			{
+//				public PDOMLinkage getLinkage(PDOM pdom, int record)
+//				{
+//					return null; //return new PDOMFortranLinkage(pdom, record);
+//				}
+//
+//				public PDOMLinkage createLinkage(PDOM pdom) throws CoreException
+//				{
+//					return null; //return new PDOMFortranLinkage(pdom);
+//				}
+//			};
+//		else
+//			return super.getAdapter(adapter);
+//	}
 }
