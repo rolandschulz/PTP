@@ -635,8 +635,8 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rtsystem.IRuntimeSystem#startup()
 	 */
-	public void startup() throws CoreException {
-		proxy.startup();
+	public boolean startup() throws CoreException {
+		return proxy.startup();
 	}
 	
 	public String submitJob(AttributeManager attrMgr) throws CoreException {
