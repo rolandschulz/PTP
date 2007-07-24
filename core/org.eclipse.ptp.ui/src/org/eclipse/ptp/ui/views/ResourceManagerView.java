@@ -282,7 +282,7 @@ public class ResourceManagerView extends ViewPart implements
 	 * @see org.eclipse.ptp.core.events.IModelManagerResourceManagerListener#handleEvent(org.eclipse.ptp.core.events.IModelManagerChangedResourceManagerEvent)
 	 */
 	public void handleEvent(IModelManagerChangedResourceManagerEvent e) {
-        updateViewer(e.getResourceManager());
+		refreshViewer(e.getResourceManager());
 	}
 
 	/* (non-Javadoc)
@@ -321,7 +321,7 @@ public class ResourceManagerView extends ViewPart implements
 	 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerListener#handleEvent(org.eclipse.ptp.core.elements.events.IResourceManagerChangedEvent)
 	 */
 	public void handleEvent(IResourceManagerChangedEvent e) {
-		refreshViewer(e.getSource());
+		// No need to do anything. This is already handled by the IModelManagerChangedResourceManager event
 	}
 
 	/* (non-Javadoc)
