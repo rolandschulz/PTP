@@ -58,9 +58,10 @@ public class RSEServices implements IRemoteServicesDelegate {
 		while (!RSECorePlugin.getThePersistenceManager().isRestoreComplete() && timeout < 5) {
 			System.out.println("waiting for restore...");
 			try {
-				Thread.sleep(100);
+				Thread.sleep(1000);
 				timeout++;
 			} catch (InterruptedException e) {
+				// Ignore
 			}
 		}
 		
