@@ -22,18 +22,10 @@ import org.eclipse.swt.widgets.Shell;
 
 public class RSEConnectionManager implements IRemoteConnectionManager {
 	private ISystemRegistry registry;
-
-	private IRemoteConnection current = null;
 	private SystemNewConnectionAction action;
+	
 	public RSEConnectionManager(ISystemRegistry registry) {
 		this.registry = registry;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteConnectionManager#getConnection()
-	 */
-	public IRemoteConnection getConnection() {
-		return current;
 	}
 	
 	/* (non-Javadoc)
@@ -90,12 +82,5 @@ public class RSEConnectionManager implements IRemoteConnectionManager {
 	 */
 	public boolean supportsNewConnections() {
 		return true;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteConnectionManager#setConnection(org.eclipse.ptp.remote.IRemoteConnection)
-	 */
-	public void setConnection(IRemoteConnection conn) {
-		current = conn;
 	}
 }
