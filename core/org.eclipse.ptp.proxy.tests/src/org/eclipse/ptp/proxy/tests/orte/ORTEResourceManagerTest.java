@@ -51,7 +51,7 @@ public class ORTEResourceManagerTest implements IResourceManagerQueueListener, I
 		String proxy = "orte/ptp_orte_proxy";
 
 		ORTEResourceManagerFactory rmf = new ORTEResourceManagerFactory();
-		ORTEResourceManagerConfiguration rmc = new ORTEResourceManagerConfiguration(rmf, proxy, launchManually);
+		ORTEResourceManagerConfiguration rmc = new ORTEResourceManagerConfiguration(rmf);
 		PUniverse universe = new PUniverse();
 		ORTEResourceManager rm = new ORTEResourceManager(universe.getNextResourceManagerId(), universe, rmc);
 		rm.addChildListener(this);
@@ -92,9 +92,8 @@ public class ORTEResourceManagerTest implements IResourceManagerQueueListener, I
 		String dir = "/etc";
 		
 		ORTEResourceManagerFactory rmf = new ORTEResourceManagerFactory();
-		ORTEResourceManagerConfiguration rmc = new ORTEResourceManagerConfiguration(rmf, proxy, launchManually);
-		PUniverse universe = new PUniverse();
-		ORTEResourceManager rm = new ORTEResourceManager(universe.getNextResourceManagerId(), universe, rmc);
+		ORTEResourceManagerConfiguration rmc = new ORTEResourceManagerConfiguration(rmf);
+		ORTEResourceManager rm = (ORTEResourceManager) rmf.create(rmc);
 		rm.addChildListener(this);
 		
 		lock.lock();

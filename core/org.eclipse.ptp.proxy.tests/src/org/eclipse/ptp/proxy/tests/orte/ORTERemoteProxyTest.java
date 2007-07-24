@@ -11,6 +11,8 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.util.RangeSet;
+import org.eclipse.ptp.orte.core.rmsystem.ORTEResourceManagerConfiguration;
+import org.eclipse.ptp.orte.core.rmsystem.ORTEResourceManagerFactory;
 import org.eclipse.ptp.orte.core.rtsystem.ORTEProxyRuntimeClient;
 import org.eclipse.ptp.rtsystem.JobRunConfiguration;
 import org.eclipse.ptp.rtsystem.proxy.IProxyRuntimeEventListener;
@@ -70,7 +72,11 @@ public class ORTERemoteProxyTest implements IProxyRuntimeEventListener {
 		boolean launchManually = false;
 		String proxy = "orte/ptp_orte_proxy";
 
-		ORTEProxyRuntimeClient client = new ORTEProxyRuntimeClient(proxy, rmId, launchManually);
+		ORTEResourceManagerFactory rmf = new ORTEResourceManagerFactory();
+		ORTEResourceManagerConfiguration rmc = new ORTEResourceManagerConfiguration(rmf);
+		rmc.setManualLaunch(launchManually);
+		rmc.setProxyServerPath(proxy);
+		ORTEProxyRuntimeClient client = new ORTEProxyRuntimeClient(rmc, rmId);
 		client.addProxyRuntimeEventListener(this);
 		
 		if (client.startup()) {
@@ -127,7 +133,11 @@ public class ORTERemoteProxyTest implements IProxyRuntimeEventListener {
 		String[] env = null;
 		String dir = "/etc";
 		
-		ORTEProxyRuntimeClient client = new ORTEProxyRuntimeClient(proxy, rmId, launchManually);
+		ORTEResourceManagerFactory rmf = new ORTEResourceManagerFactory();
+		ORTEResourceManagerConfiguration rmc = new ORTEResourceManagerConfiguration(rmf);
+		rmc.setManualLaunch(launchManually);
+		rmc.setProxyServerPath(proxy);
+		ORTEProxyRuntimeClient client = new ORTEProxyRuntimeClient(rmc, rmId);
 		client.addProxyRuntimeEventListener(this);
 		
 		if (client.startup()) {

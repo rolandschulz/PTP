@@ -22,6 +22,8 @@ import org.eclipse.ptp.core.elements.attributes.QueueAttributes;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes.State;
 import org.eclipse.ptp.core.util.RangeSet;
+import org.eclipse.ptp.orte.core.rmsystem.ORTEResourceManagerConfiguration;
+import org.eclipse.ptp.orte.core.rmsystem.ORTEResourceManagerFactory;
 import org.eclipse.ptp.orte.core.rtsystem.ORTEProxyRuntimeClient;
 import org.eclipse.ptp.orte.core.rtsystem.ORTERuntimeSystem;
 import org.eclipse.ptp.rtsystem.IRuntimeEventListener;
@@ -83,7 +85,11 @@ public class ORTERuntimeSystemTest implements IRuntimeEventListener {
 		boolean launchManually = false;
 		String proxy = "orte/ptp_orte_proxy";
 
-		ORTEProxyRuntimeClient client = new ORTEProxyRuntimeClient(proxy, rmId, launchManually);
+		ORTEResourceManagerFactory rmf = new ORTEResourceManagerFactory();
+		ORTEResourceManagerConfiguration rmc = new ORTEResourceManagerConfiguration(rmf);
+		rmc.setManualLaunch(launchManually);
+		rmc.setProxyServerPath(proxy);
+		ORTEProxyRuntimeClient client = new ORTEProxyRuntimeClient(rmc, rmId);
 		ORTERuntimeSystem rtsystem = new ORTERuntimeSystem(client, new AttributeDefinitionManager());
 		rtsystem.addRuntimeEventListener(this);
 		
@@ -147,7 +153,11 @@ public class ORTERuntimeSystemTest implements IRuntimeEventListener {
 		attrDefManager.setAttributeDefinitions(ProcessAttributes.getDefaultAttributeDefinitions());
 		attrDefManager.setAttributeDefinitions(QueueAttributes.getDefaultAttributeDefinitions());
 		attrDefManager.setAttributeDefinitions(ResourceManagerAttributes.getDefaultAttributeDefinitions());
-		ORTEProxyRuntimeClient client = new ORTEProxyRuntimeClient(proxy, rmId, launchManually);
+		ORTEResourceManagerFactory rmf = new ORTEResourceManagerFactory();
+		ORTEResourceManagerConfiguration rmc = new ORTEResourceManagerConfiguration(rmf);
+		rmc.setManualLaunch(launchManually);
+		rmc.setProxyServerPath(proxy);
+		ORTEProxyRuntimeClient client = new ORTEProxyRuntimeClient(rmc, rmId);
 		ORTERuntimeSystem rtsystem = new ORTERuntimeSystem(client, attrDefManager);
 		rtsystem.addRuntimeEventListener(this);
 		

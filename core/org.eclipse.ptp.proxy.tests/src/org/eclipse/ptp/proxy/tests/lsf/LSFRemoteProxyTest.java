@@ -10,6 +10,8 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.util.RangeSet;
+import org.eclipse.ptp.lsf.core.rmsystem.LSFResourceManagerConfiguration;
+import org.eclipse.ptp.lsf.core.rmsystem.LSFResourceManagerFactory;
 import org.eclipse.ptp.lsf.core.rtsystem.LSFProxyRuntimeClient;
 import org.eclipse.ptp.rtsystem.JobRunConfiguration;
 import org.eclipse.ptp.rtsystem.proxy.IProxyRuntimeEventListener;
@@ -63,7 +65,11 @@ public class LSFRemoteProxyTest implements IProxyRuntimeEventListener {
 		boolean launchManually = false;
 		String proxy = "lsf/ptp_lsf_proxy";
 
-		LSFProxyRuntimeClient client = new LSFProxyRuntimeClient(proxy, rmId, launchManually);
+		LSFResourceManagerFactory rmf = new LSFResourceManagerFactory();
+		LSFResourceManagerConfiguration rmc = new LSFResourceManagerConfiguration(rmf);
+		rmc.setManualLaunch(launchManually);
+		rmc.setProxyServerPath(proxy);
+		LSFProxyRuntimeClient client = new LSFProxyRuntimeClient(rmc, rmId);
 		client.addProxyRuntimeEventListener(this);
 		
 		if (client.startup()) {
@@ -127,7 +133,11 @@ public class LSFRemoteProxyTest implements IProxyRuntimeEventListener {
 		JobRunConfiguration jobRunConfig = new JobRunConfiguration(exe, exePath, rm,
 				queue, attr, configArgs, env, dir);
 
-		LSFProxyRuntimeClient client = new LSFProxyRuntimeClient(proxy, rmId, launchManually);
+		LSFResourceManagerFactory rmf = new LSFResourceManagerFactory();
+		LSFResourceManagerConfiguration rmc = new LSFResourceManagerConfiguration(rmf);
+		rmc.setManualLaunch(launchManually);
+		rmc.setProxyServerPath(proxy);
+		LSFProxyRuntimeClient client = new LSFProxyRuntimeClient(rmc, rmId);
 		client.addProxyRuntimeEventListener(this);
 		
 		if (client.startup()) {

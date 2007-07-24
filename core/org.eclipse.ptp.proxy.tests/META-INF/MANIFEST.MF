@@ -6,5 +6,6 @@ Bundle-Version: 1.1.0
 Bundle-Activator: org.eclipse.ptp.proxy.tests.Activator
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui,
- org.eclipse.core.runtime
+ org.eclipse.core.runtime,
+ org.eclipse.ptp.remote
 Eclipse-LazyStart: true
