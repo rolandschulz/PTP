@@ -23,14 +23,11 @@ import java.net.URL;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.internal.core.ModelManager;
 import org.osgi.framework.Bundle;
@@ -180,22 +177,8 @@ public class PTPCorePlugin extends Plugin {
 	 */
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
-
 		modelManager = new ModelManager();
-		new Job("Starting Model Manager"){
-
-			protected IStatus run(IProgressMonitor monitor) {
-				try {
-					modelManager.start(monitor);
-				} catch (CoreException e) {
-					return e.getStatus();
-				}
-				if (monitor.isCanceled()) {
-					return Status.CANCEL_STATUS;
-				}
-				return Status.OK_STATUS;
-			}
-		}.schedule();
+		modelManager.start();
 	}
 
 	/**

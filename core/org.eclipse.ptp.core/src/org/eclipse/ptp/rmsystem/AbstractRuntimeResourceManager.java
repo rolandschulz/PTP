@@ -126,13 +126,13 @@ public abstract class AbstractRuntimeResourceManager extends
 		}
 	}
 	private enum RMState {STARTING, STARTED, STOPPING, STOPPED, ERROR}
+	
 	private IRuntimeSystem runtimeSystem;
-	private final ReentrantLock stateLock = new ReentrantLock();;
-	
-	private final Condition stateCondition = stateLock.newCondition();
 	private RMState state;
-	private final ReentrantLock subLock = new ReentrantLock();
 	
+	private final ReentrantLock stateLock = new ReentrantLock();;
+	private final Condition stateCondition = stateLock.newCondition();
+	private final ReentrantLock subLock = new ReentrantLock();
 	private final Condition subCondition = subLock.newCondition();;
 	
 	private Map<String, JobSubmission> jobSubmissions = new HashMap<String, JobSubmission>();
@@ -787,10 +787,20 @@ public abstract class AbstractRuntimeResourceManager extends
 		stateLock.lock();
 		try {
 			if (state == RMState.STOPPED) {
+				monitor.beginTask("Runtime resource manager startup", 10);
 				doBeforeOpenConnection();
+				monitor.subTask("Creating runtime system");
 				runtimeSystem = doCreateRuntimeSystem();
+				monitor.worked(1);
 				runtimeSystem.addRuntimeEventListener(this);
-				openConnection();
+				monitor.worked(2);
+				monitor.subTask("Starting runtime system");
+				if (!runtimeSystem.startup()) {
+					monitor.worked(7);
+					state = RMState.ERROR;
+					return false;
+				}
+				monitor.worked(7);
 				state = RMState.STARTING;
 				while (!monitor.isCanceled() && state != RMState.STARTED && state != RMState.ERROR) {
 					try {
