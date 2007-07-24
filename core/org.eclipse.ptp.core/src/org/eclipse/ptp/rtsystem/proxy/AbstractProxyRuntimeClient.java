@@ -19,17 +19,12 @@
 
 package org.eclipse.ptp.rtsystem.proxy;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elements.attributes.MessageAttributes;
 import org.eclipse.ptp.core.proxy.AbstractProxyClient;
 import org.eclipse.ptp.core.proxy.command.IProxyCommand;
@@ -42,6 +37,7 @@ import org.eclipse.ptp.core.proxy.event.IProxyExtendedEvent;
 import org.eclipse.ptp.core.proxy.event.IProxyMessageEvent;
 import org.eclipse.ptp.core.proxy.event.IProxyOKEvent;
 import org.eclipse.ptp.core.proxy.event.IProxyTimeoutEvent;
+import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ptp.rtsystem.proxy.command.ProxyRuntimeInitCommand;
 import org.eclipse.ptp.rtsystem.proxy.command.ProxyRuntimeModelDefCommand;
 import org.eclipse.ptp.rtsystem.proxy.command.ProxyRuntimeStartEventsCommand;
@@ -85,53 +81,6 @@ import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeTerminateJobErrorEvent;
 
 public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient implements IProxyRuntimeClient,IProxyEventListener {
 
-	private class ProxyServerThread implements Runnable {
-		private static final String name = "Proxy Server Thread";
-
-		public void run() {
-			String[] cmd = new String[2];
-			cmd[0] = proxyPath;
-			cmd[1] = "--port="+getSessionPort();
-			if (logEvents)
-				System.out.println("RUNNING PROXY SERVER COMMAND: '"+cmd[0]+" "+cmd[1]+"'");
-			
-			try {
-				Process process = Runtime.getRuntime().exec(cmd);
-				final BufferedReader err_reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-				final BufferedReader out_reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-
-				new Thread(new Runnable() {
-					public void run() {
-						try {
-							String output;
-							while ((output = out_reader.readLine()) != null) {
-								if (proxyDebugOutput) System.out.println(proxyName + ": " + output);
-							}
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-					}
-				}, "Program output Thread").start();
-				
-				new Thread(new Runnable() {
-					public void run() {
-						try {
-							String line;
-							while ((line = err_reader.readLine()) != null) {
-								if (proxyDebugOutput) System.err.println(proxyName + ": " + line);
-							}
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-					}
-				}, "Error output Thread").start();
-			} catch(IOException e) {
-				//PTPCorePlugin.log(e);
-				e.printStackTrace();
-			}
-		}
-	}
-
 	private class StateMachineThread implements Runnable {
 		private static final String name = "State Machine Thread";
 		public void run() {
@@ -160,13 +109,9 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 	}
 	
 	private boolean			logEvents = true;
-	private boolean			proxyDebugOutput = true;
 	private String			proxyName = "";
 	private boolean			serverStarted = false;
-	
-	protected final String	proxyPath;
 	protected final int		baseModelId;
-	protected final boolean launchManually;
 
 	/* state is volatile so no explicit synchronization needed */
 	// TODO - if can limit to state machine thread, remove volatile
@@ -176,13 +121,11 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 	private LinkedBlockingQueue<IProxyEvent>	events = new LinkedBlockingQueue<IProxyEvent>();
 	private ListenerList						listeners = new ListenerList();
 
-	public AbstractProxyRuntimeClient(String proxyName, String proxyPath, int baseModelId, boolean launchManually) {
+	public AbstractProxyRuntimeClient(IResourceManagerConfiguration config, int baseModelId) {
 		super(new ProxyRuntimeEventFactory());
 		super.addProxyEventListener(this);
-		this.proxyName = proxyName;
-		this.proxyPath = proxyPath;
+		this.proxyName = config.getName();
 		this.baseModelId = baseModelId;
-		this.launchManually = launchManually;
 		this.state = ProxyState.IDLE;
 	}
 	
@@ -298,19 +241,23 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 		this.logEvents = logEvents;
 	}
 	
+	/**
+	 * Get flag that controls logging of events
+	 * 
+	 * @return flag that specifies if event logging is turned on or off
+	 */
+	public boolean getEventLogging() {
+		return this.logEvents;
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rtsystem.proxy.IProxyRuntimeClient#shutdown()
 	 */
 	public void shutdown() {
 		if (state != ProxyState.SHUTDOWN) {
-			try {
-				if (logEvents) System.out.println(toString() + ": shutting down server...");
-				state = ProxyState.SHUTDOWN;
-				sessionFinish();
-			} catch (IOException e) {
-				e.printStackTrace();
-				PTPCorePlugin.log(e);
-			}
+			if (logEvents) System.out.println(toString() + ": shutting down server...");
+			state = ProxyState.SHUTDOWN;
+			shutdownProxyServer();
 		}
 	}
 	
@@ -334,6 +281,13 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 	 */
 	public boolean startup() {
 		if (state == ProxyState.IDLE) {
+			serverStarted = startupProxyServer();
+			if (serverStarted == false) {
+				return false;
+			}
+			
+			state = ProxyState.STARTUP;
+
 			Thread smt = new Thread(new StateMachineThread(), proxyName + StateMachineThread.name);
 			smt.start();
 		}
@@ -479,48 +433,19 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 	}	
 	
 	/**
-	 * Start the proxy server. The server will eventually connect to the session
-	 * created using sessionCreate(). This will result in a connected event.
-	 * 
-	 * NOTE: This code will change when remote server support is added
+	 * Start the proxy server, possibly on a remote machine. The server will eventually connect 
+	 * to the session created using sessionCreate(). This will result in a connected event.
 	 * 
 	 * @return true if the session was created. Server errors are handled separately
 	 * as events.
 	 */
-	private boolean startupProxyServer() {
+	protected abstract boolean startupProxyServer();
 
-		if (logEvents) {
-			System.out.println(toString() + " - firing up proxy, waiting for connection.  Please wait!  This can take a minute . . .");
-			System.out.println("PROXY_SERVER path = '" + proxyPath + "'");
-		}
+	/**
+	 * Stop the proxy server.
+	 */
+	protected abstract void shutdownProxyServer();
 
-		try {
-			sessionCreate();
-
-			if (launchManually) {
-				final String msg = "Waiting for manual launch of proxy on port " + getSessionPort() + "...";
-				System.out.println(msg);
-				Status info = new Status(IStatus.INFO, PTPCorePlugin.getUniqueIdentifier(), IStatus.INFO, msg, null);
-				PTPCorePlugin.log(info);
-			} else {
-				Thread runThread = new Thread(new ProxyServerThread(), proxyName + ProxyServerThread.name);
-				runThread.setDaemon(true);
-				runThread.start();
-			}
-			if (logEvents) System.out.println(toString() + ": Waiting on accept.");
-
-		} catch (IOException e) {
-			System.err.println("Exception starting up proxy. :(");
-			try {
-				sessionFinish();
-			} catch (IOException e1) {
-				PTPCorePlugin.log(e1);
-			}
-			return false;
-		}
-		return true;
-	}
-	
 	/**
 	 * Forward event to listeners
 	 * 
@@ -808,15 +733,6 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 	 * @throws IllegalStateException
 	 */
 	protected void runStateMachine() throws IOException, InterruptedException, IllegalStateException {
-
-		serverStarted = startupProxyServer();
-		if (serverStarted == false) {
-			state = ProxyState.SHUTDOWN;
-			fireProxyRuntimeMessageEvent(new ProxyRuntimeMessageEvent(MessageAttributes.Level.FATAL, "Could not start proxy"));
-		} else {
-			state = ProxyState.STARTUP;
-		}
-		
 		while (state != ProxyState.IDLE && state != ProxyState.ERROR) {
 			IProxyCommand command;
 			IProxyEvent event;

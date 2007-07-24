@@ -21,96 +21,41 @@
  */
 package org.eclipse.ptp.lsf.core.rmsystem;
 
-import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration;
+import org.eclipse.ptp.remote.AbstractRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ui.IMemento;
 
 final public class LSFResourceManagerConfiguration 
-	extends AbstractResourceManagerConfiguration {
+	extends AbstractRemoteResourceManagerConfiguration {
 	
-	private static final String TAG_PROXY_PATH = "proxyPath"; //$NON-NLS-1$
-	private static final String TAG_LAUNCH_MANUALLY = "launchManually"; //$NON-NLS-1$
-	private static final String TAG_HOST = "host"; //$NON-NLS-1$
-
 	public static IResourceManagerConfiguration load(LSFResourceManagerFactory factory,
 			IMemento memento) {
 
-		CommonConfig commonConfig = loadCommon(factory, memento);
+		RemoteConfig remoteConfig = loadRemote(factory, memento);
 
-		String serverFile = memento.getString(TAG_PROXY_PATH);
-		String host = memento.getString(TAG_HOST);
-		boolean launchManually = Boolean.parseBoolean(memento.getString(TAG_LAUNCH_MANUALLY));
-		
 		LSFResourceManagerConfiguration config = new LSFResourceManagerConfiguration(factory,
-				commonConfig, serverFile, host, launchManually);
+				remoteConfig);
 		
 		return config;
 	}
-	private String serverFile;
-
-	private boolean launchManually;
-	private String host;
 	
 	public LSFResourceManagerConfiguration(LSFResourceManagerFactory factory,
-			CommonConfig commonConfig,
-			String serverFile, String host, boolean launchManually) {
-		super(commonConfig, factory);
-		this.serverFile = serverFile;
-		this.host = host;
-		this.launchManually = launchManually;
+			RemoteConfig remoteConfig) {
+		super(remoteConfig, factory);
 	}
 	
-	public LSFResourceManagerConfiguration(LSFResourceManagerFactory factory,
-			String serverFile, String host, boolean launchManually) {
-		this(factory, new CommonConfig(), serverFile, host, launchManually);
+	public LSFResourceManagerConfiguration(LSFResourceManagerFactory factory) {
+		this(factory, new RemoteConfig());
 		setDefaultNameAndDesc();
 	}
 
-	/**
-	 * @return the host
-	 */
-	public String getHost() {
-		return host;
-	}
-	
-	public String getServerFile() {
-		return serverFile;
-	}
-
-	public boolean isLaunchManually() {
-		return launchManually;
-	}
-
 	public void setDefaultNameAndDesc() {
-		setName("LSF");
+		String name = "LSF";
+		String conn = getConnectionName();
+		if (conn != null && !conn.equals("")) {
+			name += "@" + conn;
+		}
+		setName(name);
 		setDescription("LSF Resource Manager");
-	}
-
-	/**
-	 * @param host the host to set
-	 */
-	public void setHost(String host) {
-		this.host = host;
-	}
-
-	/**
-	 * @param launchManually the launchManually to set
-	 */
-	public void setLaunchManually(boolean launchManually) {
-		this.launchManually = launchManually;
-	}
-
-	public void setManualLaunch(boolean launchManually) {
-		this.launchManually = launchManually;
-	}
-
-	public void setServerFile(String serverFile) {
-		this.serverFile = serverFile;
-	}
-
-	protected void doSave(IMemento memento) {
-		memento.putString(TAG_PROXY_PATH, serverFile);
-		memento.putString(TAG_HOST, host);
-		memento.putString(TAG_LAUNCH_MANUALLY, Boolean.toString(launchManually));
 	}
 }

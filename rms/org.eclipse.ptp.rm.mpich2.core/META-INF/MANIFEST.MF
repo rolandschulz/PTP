@@ -9,7 +9,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ptp.core,
  org.eclipse.search,
  org.eclipse.ui,
- org.eclipse.debug.core
+ org.eclipse.debug.core,
+ org.eclipse.ptp.remote
 Eclipse-LazyStart: true
 Bundle-Vendor: Los Alamos National Laboratory
 Export-Package: org.eclipse.ptp.mpich2.core,

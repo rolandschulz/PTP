@@ -48,11 +48,7 @@ public class LSFResourceManagerFactory extends AbstractResourceManagerFactory {
 	 * @see org.eclipse.ptp.rmsystem.IResourceManagerFactory#createConfiguration()
 	 */
 	public IResourceManagerConfiguration createConfiguration() {
-		String proxyPath = "";
-		String host = "";
-		boolean launchManually = false;
-		LSFResourceManagerConfiguration config = new LSFResourceManagerConfiguration(this,
-				proxyPath, host, launchManually);
+		LSFResourceManagerConfiguration config = new LSFResourceManagerConfiguration(this);
 		return config;
 	}
 

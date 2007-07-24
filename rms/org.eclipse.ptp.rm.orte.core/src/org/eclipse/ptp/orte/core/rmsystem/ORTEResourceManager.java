@@ -92,10 +92,8 @@ public class ORTEResourceManager extends AbstractRuntimeResourceManager {
 	@Override
 	protected IRuntimeSystem doCreateRuntimeSystem() {
 		ORTEResourceManagerConfiguration config = (ORTEResourceManagerConfiguration) getConfiguration();
-		String serverFile = config.getOrteServerFile();
-		boolean launchManually = config.isLaunchManually();
 		/* load up the control and monitoring systems for OMPI */
-		ORTEProxyRuntimeClient runtimeProxy = new ORTEProxyRuntimeClient(serverFile, ORTERMID, launchManually);
+		ORTEProxyRuntimeClient runtimeProxy = new ORTEProxyRuntimeClient(config, ORTERMID);
 		return new ORTERuntimeSystem(runtimeProxy, getAttributeDefinitionManager());
 	}
 

@@ -21,70 +21,44 @@
  */
 package org.eclipse.ptp.orte.core.rmsystem;
 
-import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration;
+import org.eclipse.ptp.remote.AbstractRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ui.IMemento;
 
-final public class ORTEResourceManagerConfiguration extends AbstractResourceManagerConfiguration {
-	
-	private static final String TAG_PROXY_PATH = "proxyPath"; //$NON-NLS-1$
-	private static final String TAG_LAUNCH_MANUALLY = "launchManually"; //$NON-NLS-1$
+final public class ORTEResourceManagerConfiguration extends AbstractRemoteResourceManagerConfiguration {
 
 	public static IResourceManagerConfiguration load(ORTEResourceManagerFactory factory,
 			IMemento memento) {
 
-		CommonConfig commonConfig = loadCommon(factory, memento);
-
-		String orteServerFile = memento.getString(TAG_PROXY_PATH);
-		boolean launchManually = Boolean.parseBoolean(memento.getString(TAG_LAUNCH_MANUALLY));
-
+		RemoteConfig remoteConfig = loadRemote(factory, memento);
+		
 		ORTEResourceManagerConfiguration config = 
-			new ORTEResourceManagerConfiguration(factory, commonConfig, orteServerFile,
-					launchManually);
+			new ORTEResourceManagerConfiguration(factory, remoteConfig);
 
 		return config;
 	}
-	private String orteServerFile;
-
-	private boolean launchManually;
 	
 	public ORTEResourceManagerConfiguration(ORTEResourceManagerFactory factory,
-			CommonConfig commonConfig,
-			String orteServerFile, boolean launchManually) {
-		super(commonConfig, factory);
-		this.orteServerFile = orteServerFile;
-		this.launchManually = launchManually;
+			RemoteConfig remoteConfig) {
+		super(remoteConfig, factory);
 	}
 	
-	public ORTEResourceManagerConfiguration(ORTEResourceManagerFactory factory,
-			String orteServerFile, boolean launchManually) {
-		this(factory, new CommonConfig(), orteServerFile, launchManually);
+	public ORTEResourceManagerConfiguration(ORTEResourceManagerFactory factory) {
+		this(factory, new RemoteConfig());
 		setDefaultNameAndDesc();
 	}
+	
 
-	public String getOrteServerFile() {
-		return orteServerFile;
-	}
-
-	public boolean isLaunchManually() {
-		return launchManually;
-	}
-
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#setDefaultNameAndDesc()
+	 */
 	public void setDefaultNameAndDesc() {
-		setName("ORTE");
+		String name = "ORTE";
+		String conn = getConnectionName();
+		if (conn != null && !conn.equals("")) {
+			name += "@" + conn;
+		}
+		setName(name);
 		setDescription("ORTE Resource Manager");
-	}
-
-	public void setManualLaunch(boolean launchManually) {
-		this.launchManually = launchManually;
-	}
-
-	public void setOrteServerFile(String orteServerFile) {
-		this.orteServerFile = orteServerFile;
-	}
-
-	protected void doSave(IMemento memento) {
-		memento.putString(TAG_PROXY_PATH, orteServerFile);
-		memento.putString(TAG_LAUNCH_MANUALLY, Boolean.toString(launchManually));
 	}
 }

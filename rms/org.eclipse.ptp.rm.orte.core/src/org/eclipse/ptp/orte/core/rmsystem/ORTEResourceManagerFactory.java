@@ -34,17 +34,12 @@ public class ORTEResourceManagerFactory extends AbstractResourceManagerFactory {
 	public IResourceManagerControl create(IResourceManagerConfiguration confIn) {
 		ORTEResourceManagerConfiguration configuration = (ORTEResourceManagerConfiguration) confIn;
 		final PTPCorePlugin plugin = PTPCorePlugin.getDefault();
-		//Preferences p = plugin.getPluginPreferences();
 		final IPUniverseControl universe = (IPUniverseControl) plugin.getUniverse();
 		return new ORTEResourceManager(universe.getNextResourceManagerId(), universe, configuration);
 	}
 
 	public IResourceManagerConfiguration createConfiguration() {
-		String proxyPath = "";
-		boolean launchManually = false;
-		ORTEResourceManagerConfiguration config = new ORTEResourceManagerConfiguration(this,
-				proxyPath, launchManually);
-		return config;
+		return new ORTEResourceManagerConfiguration(this);
 	}
 
 	public IResourceManagerConfiguration loadConfiguration(IMemento memento) {

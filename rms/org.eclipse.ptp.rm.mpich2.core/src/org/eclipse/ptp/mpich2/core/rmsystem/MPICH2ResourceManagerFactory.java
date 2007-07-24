@@ -40,10 +40,7 @@ public class MPICH2ResourceManagerFactory extends AbstractResourceManagerFactory
 	}
 
 	public IResourceManagerConfiguration createConfiguration() {
-		String proxyPath = "";
-		boolean launchManually = false;
-		MPICH2ResourceManagerConfiguration config = new MPICH2ResourceManagerConfiguration(this,
-				proxyPath, launchManually);
+		MPICH2ResourceManagerConfiguration config = new MPICH2ResourceManagerConfiguration(this);
 		return config;
 	}
 

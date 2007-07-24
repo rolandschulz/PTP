@@ -13,5 +13,6 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.debug.ui,
  org.eclipse.ptp.ui,
  org.eclipse.ptp.launch,
- org.eclipse.debug.core
+ org.eclipse.debug.core,
+ org.eclipse.ptp.remote
 Eclipse-LazyStart: true

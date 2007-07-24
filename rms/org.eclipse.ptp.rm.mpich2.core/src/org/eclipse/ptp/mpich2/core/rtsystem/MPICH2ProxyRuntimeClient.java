@@ -1,11 +1,12 @@
 package org.eclipse.ptp.mpich2.core.rtsystem;
 
-import org.eclipse.ptp.rtsystem.proxy.AbstractProxyRuntimeClient;
+import org.eclipse.ptp.mpich2.core.rmsystem.MPICH2ResourceManagerConfiguration;
+import org.eclipse.ptp.remote.AbstractRemoteProxyRuntimeClient;
 
-public class MPICH2ProxyRuntimeClient extends AbstractProxyRuntimeClient {
+public class MPICH2ProxyRuntimeClient extends AbstractRemoteProxyRuntimeClient {
 	
-	public MPICH2ProxyRuntimeClient(String proxyPath, int baseModelId, boolean launchManually) {
-		super("MPICH2", proxyPath, baseModelId,  launchManually);
+	public MPICH2ProxyRuntimeClient(MPICH2ResourceManagerConfiguration config, int baseModelId) {
+		super(config, baseModelId);
 	}
 
 }

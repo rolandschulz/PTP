@@ -125,10 +125,8 @@ public class MPICH2ResourceManager extends AbstractRuntimeResourceManager {
 	@Override
 	protected IRuntimeSystem doCreateRuntimeSystem() throws CoreException {
 		MPICH2ResourceManagerConfiguration config = (MPICH2ResourceManagerConfiguration) getConfiguration();
-		String serverFile = config.getServerFile();
-		boolean launchManually = config.isLaunchManually();
 		/* load up the control and monitoring systems for OMPI */
-		MPICH2ProxyRuntimeClient runtimeProxy = new MPICH2ProxyRuntimeClient(serverFile, MPICH2RMID, launchManually);
+		MPICH2ProxyRuntimeClient runtimeProxy = new MPICH2ProxyRuntimeClient(config, MPICH2RMID);
 		return new MPICH2RuntimeSystem(runtimeProxy, getAttributeDefinitionManager());
 	}
 

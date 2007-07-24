@@ -5,7 +5,7 @@
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
-            category="org.eclipse.ptp.ui.preferences.ptpPreferencesPage"
+            category="org.eclipse.ptp.ui.preferences.rmPreferencesPage"
             class="org.eclipse.ptp.mpich2.ui.preferences.MPICH2PreferencePage"
             id="org.eclipse.ptp.mpich2.ui.preferences.MPICH2PreferencePage"
             name="MPICH 2">

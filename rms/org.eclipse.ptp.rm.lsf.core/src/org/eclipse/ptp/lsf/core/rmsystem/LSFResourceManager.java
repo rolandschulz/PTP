@@ -135,10 +135,8 @@ public class LSFResourceManager extends AbstractRuntimeResourceManager {
 	@Override
 	protected IRuntimeSystem doCreateRuntimeSystem() throws CoreException {
 		LSFResourceManagerConfiguration config = (LSFResourceManagerConfiguration) getConfiguration();
-		String serverFile = config.getServerFile();
-		boolean launchManually = config.isLaunchManually();
 		/* load up the control and monitoring systems for OMPI */
-		LSFProxyRuntimeClient runtimeProxy = new LSFProxyRuntimeClient(serverFile, LSFRMID, launchManually);
+		LSFProxyRuntimeClient runtimeProxy = new LSFProxyRuntimeClient(config, LSFRMID);
 		return new LSFRuntimeSystem(runtimeProxy, getAttributeDefinitionManager());
 	}
 

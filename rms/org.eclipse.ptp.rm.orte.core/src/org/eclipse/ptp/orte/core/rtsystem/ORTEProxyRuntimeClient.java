@@ -1,11 +1,11 @@
 package org.eclipse.ptp.orte.core.rtsystem;
 
-import org.eclipse.ptp.rtsystem.proxy.AbstractProxyRuntimeClient;
+import org.eclipse.ptp.orte.core.rmsystem.ORTEResourceManagerConfiguration;
+import org.eclipse.ptp.remote.AbstractRemoteProxyRuntimeClient;
 
-public class ORTEProxyRuntimeClient extends AbstractProxyRuntimeClient {
-	
-	public ORTEProxyRuntimeClient(String proxyPath, int baseModelId, boolean launchManually) {
-		super("ORTE", proxyPath, baseModelId, launchManually);
+public class ORTEProxyRuntimeClient extends AbstractRemoteProxyRuntimeClient {
+	public ORTEProxyRuntimeClient(ORTEResourceManagerConfiguration config, 
+			int baseModelId) {
+		super(config, baseModelId);
 	}
-
 }

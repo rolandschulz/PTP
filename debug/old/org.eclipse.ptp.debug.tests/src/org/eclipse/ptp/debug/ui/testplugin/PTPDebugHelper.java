@@ -29,7 +29,7 @@ import org.eclipse.ptp.debug.core.launch.PLaunch;
 import org.eclipse.ptp.debug.external.core.debugger.ParallelDebugger;
 import org.eclipse.ptp.orte.core.rmsystem.ORTEResourceManagerConfiguration;
 import org.eclipse.ptp.orte.core.rmsystem.ORTEResourceManagerFactory;
-import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration.CommonConfig;
+import org.eclipse.ptp.remote.AbstractRemoteResourceManagerConfiguration.RemoteConfig;
 
 /**
  * @author Clement chu
@@ -48,10 +48,7 @@ public class PTPDebugHelper {
 	 */
 	public static IResourceManager createOrteManager(String ptp_orte_proxyPath) {
 		ORTEResourceManagerFactory factory = new ORTEResourceManagerFactory();
-		String key = "ORTE";
-		String desc = "Orte Resource";
-		String uniqueID = "RMID:1178771512777"; 
-		return factory.create(new ORTEResourceManagerConfiguration(factory, new CommonConfig(key, desc, uniqueID), ptp_orte_proxyPath, false));
+		return factory.create(new ORTEResourceManagerConfiguration(factory, new RemoteConfig()));
 	}
 	
 	public static AttributeManager createRuntimeAttrManager(IResourceManager rm, String workDir, String app, String[] argArr, String[] envArr, int numProcs) {
