@@ -18,7 +18,16 @@
  *******************************************************************************/
 package org.eclipse.ptp.mpich2.ui.preferences;
 
+import org.eclipse.core.runtime.Preferences;
+import org.eclipse.ptp.mpich2.ui.Activator;
 import org.eclipse.ptp.remote.ui.preferences.AbstractRemotePreferencePage;
 
 public class MPICH2PreferencePage extends AbstractRemotePreferencePage {
+	public Preferences getPreferences() {
+		return Activator.getDefault().getPluginPreferences();
+	}
+	
+	public void savePreferences() {
+		Activator.getDefault().savePluginPreferences();
+	}
 }

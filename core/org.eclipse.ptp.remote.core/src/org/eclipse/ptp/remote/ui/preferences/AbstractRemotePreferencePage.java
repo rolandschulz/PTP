@@ -27,7 +27,6 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.remote.ui.Messages;
-import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.ui.utils.SWTUtil;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -46,31 +45,10 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-public class AbstractRemotePreferencePage extends PreferencePage implements IWorkbenchPreferencePage, PreferenceConstants 
+public abstract class AbstractRemotePreferencePage extends PreferencePage implements IWorkbenchPreferencePage, PreferenceConstants 
 {
-	public static final String EMPTY_STRING = "";
-
-	protected Text serverText = null;
-	protected Button browseButton = null;
-	protected Button fManualButton = null;
-	private String serverFile = EMPTY_STRING;
-
-	private boolean loading = true;
-
-	public AbstractRemotePreferencePage() {
-		setPreferenceStore(PTPUIPlugin.getDefault().getPreferenceStore());
-	}
-
 	protected class WidgetListener extends SelectionAdapter implements ModifyListener, IPropertyChangeListener 
 	{
-		public void widgetSelected(SelectionEvent e) {
-			Object source = e.getSource();
-			if (source == browseButton)
-				handlePathBrowseButtonSelected();
-			else
-				updatePreferencePage();
-		}
-
 		public void modifyText(ModifyEvent evt) {
 			Object source = evt.getSource();
 			if(!loading && source == serverText)
@@ -81,9 +59,96 @@ public class AbstractRemotePreferencePage extends PreferencePage implements IWor
 			if (event.getProperty().equals(FieldEditor.IS_VALID))
 				updatePreferencePage();
 		}
+
+		public void widgetSelected(SelectionEvent e) {
+			Object source = e.getSource();
+			if (source == browseButton)
+				handlePathBrowseButtonSelected();
+			else
+				updatePreferencePage();
+		}
 	}
 
+	public static final String EMPTY_STRING = "";
+	private String serverFile = EMPTY_STRING;
+	private boolean loading = true;
+	protected Text serverText = null;
+
+	protected Button browseButton = null;
+
+	protected Button fManualButton = null;
+
 	protected WidgetListener listener = new WidgetListener();
+
+	public AbstractRemotePreferencePage() {
+	}
+
+	public void dispose() 
+	{
+		super.dispose();
+	}
+
+	public abstract Preferences getPreferences();
+
+	public abstract void savePreferences();
+	
+	public void init(IWorkbench workbench) 
+	{
+	}
+	
+	public void performDefaults() 
+	{
+		defaultSetting();
+		updateApplyButton();
+	}
+	
+	public boolean performOk() 
+	{
+		store();
+		Preferences preferences = getPreferences();
+
+		preferences.setValue(PreferenceConstants.PROXY_PATH, serverFile);
+		preferences.setValue(PreferenceConstants.LAUNCH_MANUALLY, fManualButton.getSelection());
+
+		savePreferences();
+
+		return true;
+	}
+
+	private void loadSaved()
+	{
+		Preferences preferences = getPreferences();
+		
+		serverFile = preferences.getString(PreferenceConstants.PROXY_PATH);
+		/* if they don't have the ptp_orte_proxy path set, let's try and give them a default that might help */
+		if(serverFile.equals("")) {
+			serverFile = PTPCorePlugin.getDefault().locateFragmentFile("org.eclipse.ptp", "ptp_orte_proxy");
+        }
+		
+		if (serverFile == null) {
+			serverFile = "";
+		}
+		
+		serverText.setText(serverFile);
+		fManualButton.setSelection(preferences.getBoolean(PreferenceConstants.LAUNCH_MANUALLY));
+	}
+
+	private void store() 
+	{
+		serverFile = serverText.getText();
+	}
+
+	protected Button createButton(Composite parent, String label, int type) {
+		Button button = new Button(parent, type);
+		button.setText(label);
+		GridData data = new GridData();
+		button.setLayoutData(data);
+		return button;
+	}
+
+	protected Button createCheckButton(Composite parent, String label) {
+		return createButton(parent, label, SWT.CHECK | SWT.LEFT);
+	}
 
 	protected Control createContents(Composite parent) 
 	{
@@ -121,75 +186,29 @@ public class AbstractRemotePreferencePage extends PreferencePage implements IWor
 		defaultSetting();
 		return composite;
 	}
+	
+	protected GridLayout createGridLayout(int columns, boolean isEqual, int mh, int mw)  {
+		GridLayout gridLayout = new GridLayout();
+		gridLayout.numColumns = columns;
+		gridLayout.makeColumnsEqualWidth = isEqual;
+		gridLayout.marginHeight = mh;
+		gridLayout.marginWidth = mw;
+		return gridLayout;
+	}
 
-	protected Button createCheckButton(Composite parent, String label) {
-		return createButton(parent, label, SWT.CHECK | SWT.LEFT);
-	}
-	
-	protected Button createButton(Composite parent, String label, int type) {
-		Button button = new Button(parent, type);
-		button.setText(label);
-		GridData data = new GridData();
-		button.setLayoutData(data);
-		return button;
-	}
-	
 	protected void defaultSetting() 
 	{
 		serverText.setText(serverFile);
 	}
+
+	protected String getFieldContent(String text) 
+	{
+		if (text.trim().length() == 0 || text.equals(EMPTY_STRING))
+			return null;
+
+		return text;
+	}
 	
-	private void loadSaved()
-	{
-		Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
-		
-		serverFile = preferences.getString(PreferenceConstants.PROXY_PATH);
-		/* if they don't have the ptp_orte_proxy path set, let's try and give them a default that might help */
-		if(serverFile.equals("")) {
-			serverFile = PTPCorePlugin.getDefault().locateFragmentFile("org.eclipse.ptp", "ptp_orte_proxy");
-        }
-		
-		if (serverFile == null) {
-			serverFile = "";
-		}
-		
-		serverText.setText(serverFile);
-		fManualButton.setSelection(preferences.getBoolean(PreferenceConstants.LAUNCH_MANUALLY));
-	}
-
-	public void init(IWorkbench workbench) 
-	{
-	}
-
-	public void dispose() 
-	{
-		super.dispose();
-	}
-
-	public void performDefaults() 
-	{
-		defaultSetting();
-		updateApplyButton();
-	}
-
-	private void store() 
-	{
-		serverFile = serverText.getText();
-	}
-
-	public boolean performOk() 
-	{
-		store();
-		Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
-
-		preferences.setValue(PreferenceConstants.PROXY_PATH, serverFile);
-		preferences.setValue(PreferenceConstants.LAUNCH_MANUALLY, fManualButton.getSelection());
-
-		PTPCorePlugin.getDefault().savePluginPreferences();
-
-		return true;
-	}
-
 	/**
 	 * Show a dialog that lets the user select a file
 	 */
@@ -232,35 +251,6 @@ public class AbstractRemotePreferencePage extends PreferencePage implements IWor
 
 		return true;
 	}
-	
-	protected void updatePreferencePage() 
-	{
-		setErrorMessage(null);
-		setMessage(null);
-
-		if (!isValidSetting())
-			return;
-
-		performOk();
-		setValid(true);
-	}
-
-	protected String getFieldContent(String text) 
-	{
-		if (text.trim().length() == 0 || text.equals(EMPTY_STRING))
-			return null;
-
-		return text;
-	}
-
-	protected GridLayout createGridLayout(int columns, boolean isEqual, int mh, int mw)  {
-		GridLayout gridLayout = new GridLayout();
-		gridLayout.numColumns = columns;
-		gridLayout.makeColumnsEqualWidth = isEqual;
-		gridLayout.marginHeight = mh;
-		gridLayout.marginWidth = mw;
-		return gridLayout;
-	}
 
 	protected GridData spanGridData(int style, int space) 
 	{
@@ -271,5 +261,17 @@ public class AbstractRemotePreferencePage extends PreferencePage implements IWor
 			gd = new GridData(style);
 		gd.horizontalSpan = space;
 		return gd;
+	}
+
+	protected void updatePreferencePage() 
+	{
+		setErrorMessage(null);
+		setMessage(null);
+
+		if (!isValidSetting())
+			return;
+
+		performOk();
+		setValid(true);
 	}
 }

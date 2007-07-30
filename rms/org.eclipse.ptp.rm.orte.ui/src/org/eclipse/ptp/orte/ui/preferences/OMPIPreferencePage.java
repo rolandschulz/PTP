@@ -18,7 +18,16 @@
  *******************************************************************************/
 package org.eclipse.ptp.orte.ui.preferences;
 
+import org.eclipse.core.runtime.Preferences;
+import org.eclipse.ptp.orte.ui.Activator;
 import org.eclipse.ptp.remote.ui.preferences.AbstractRemotePreferencePage;
 
 public class OMPIPreferencePage extends AbstractRemotePreferencePage {
+	public Preferences getPreferences() {
+		return Activator.getDefault().getPluginPreferences();
+	}
+	
+	public void savePreferences() {
+		Activator.getDefault().savePluginPreferences();
+	}
 }
