@@ -685,7 +685,7 @@ public class ParallelMachinesView extends AbstractParallelSetView implements
 				if (inputElement instanceof AbstractUIManager) {
 					IPNode node = getRegisteredNode();
 					if (node != null) {
-						return node.getAttributes();
+						return node.getDisplayAttributes();
 					}
 				}
 				return new Object[0];
