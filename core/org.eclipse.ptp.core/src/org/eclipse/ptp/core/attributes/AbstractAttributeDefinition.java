@@ -25,12 +25,14 @@ implements IAttributeDefinition<T,A,D> {
 	private final String name;
 	private final String description;
 	private final String uniqueId;
+	private final boolean display;
 	
 	public AbstractAttributeDefinition(final String uniqueId, final String name,
-			final String description) {
+			final String description, final boolean display) {
 		this.uniqueId = uniqueId;
 		this.name = name;
 		this.description = description;
+		this.display = display;
 	}
 
 	public int compareTo(IAttributeDefinition<?, ?, ?> arg0) {
@@ -57,14 +59,30 @@ implements IAttributeDefinition<T,A,D> {
 		return true;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.attributes.IAttributeDefinition#getDescription()
+	 */
 	public String getDescription() {
 		return description;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.attributes.IAttributeDefinition#getDisplay()
+	 */
+	public boolean getDisplay() {
+		return display;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.attributes.IAttributeDefinition#getId()
+	 */
 	public String getId() {
 		return uniqueId;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.attributes.IAttributeDefinition#getName()
+	 */
 	public String getName() {
 		return name;
 	}

@@ -19,7 +19,7 @@
 package org.eclipse.ptp.core.attributes;
 
 public interface IAttribute<T, A extends IAttribute<T,A,D>, D extends IAttributeDefinition<T,A,D>>
-extends Comparable<A> {
+	extends Comparable<A> {
 	
 	/**
 	 * @return the attribute definition object associated with this attribute
@@ -37,11 +37,10 @@ extends Comparable<A> {
 	public String getValueAsString();
 	
 	/**
-	 * @return whether any UI elements for this attribute
-	 * should be enabled.
+	 * @return whether this attribute is enabled.
 	 */
 	public boolean isEnabled();
-	
+
 	/**
 	 * Is the string parsable to a valid
 	 * attribute of this type?

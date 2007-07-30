@@ -24,8 +24,9 @@ extends AbstractAttributeDefinition<String,StringAttribute,StringAttributeDefini
 
 	private String defaultValue;
 	
-	public StringAttributeDefinition(final String uniqueId, final String name, final String description, final String defaultValue) {
-		super(uniqueId, name, description);
+	public StringAttributeDefinition(final String uniqueId, final String name, 
+			final String description, final boolean display, final String defaultValue) {
+		super(uniqueId, name, description, display);
 		this.defaultValue = defaultValue;
 	}
 

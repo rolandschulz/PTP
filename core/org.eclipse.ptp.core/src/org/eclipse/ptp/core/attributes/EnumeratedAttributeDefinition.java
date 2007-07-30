@@ -30,9 +30,9 @@ extends AbstractAttributeDefinition<E,EnumeratedAttribute<E>,EnumeratedAttribute
 	final Class<E> enumClass;
 
     public EnumeratedAttributeDefinition(final String uniqueId,
-			final String name,
-			final String description, final E defaultValueIn) {
-		super(uniqueId, name, description);
+			final String name, final String description, final boolean display, 
+			final E defaultValueIn) {
+		super(uniqueId, name, description, display);
 		final Class<E> eClass = (Class<E>) defaultValueIn.getClass();
         this.enumClass = eClass;
 		this.defaultValue = defaultValueIn;

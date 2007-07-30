@@ -22,8 +22,8 @@ extends AbstractAttributeDefinition<List<? extends T>,ArrayAttribute<T>,ArrayAtt
 	private List<T> defaultValue;
 
 	public <U extends T> ArrayAttributeDefinition(final String uniqueId, final String name,
-			final String description, final U[] defaultValue) {
-		super(uniqueId, name, description);
+			final String description, final boolean display, final U[] defaultValue) {
+		super(uniqueId, name, description, display);
 		if (defaultValue != null) {
 			this.defaultValue = Arrays.asList((T[])defaultValue.clone());
 		}

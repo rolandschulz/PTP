@@ -111,7 +111,7 @@ import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeTerminateJobErrorEvent;
  *	NUM_DEFS is the number of attribute definitions to follow
  *	ATTR_DEF is an attribute definition of the form:
  * 
- *	NUM_ARGS ID TYPE NAME DESCRIPTION DEFAULT [ADDITIONAL_PARAMS]
+ *	NUM_ARGS ID TYPE NAME DESCRIPTION DISPLAY DEFAULT [ADDITIONAL_PARAMS]
  * 
  *	where:
  * 
@@ -121,6 +121,7 @@ import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeTerminateJobErrorEvent;
  *		'BOOLEAN', 'DATE', 'DOUBLE', 'ENUMERATED', 'INTEGER', 'STRING', 'ARRAY'
  *	NAME is the short name of the attribute
  *	DESCRIPTION is the long name of the attribute
+ *  DISPLAY is true if the attribute should be displayed in a UI
  *	DEFAULT is the default value of the attribute
  *	ADDITIONAL_PARAMS are optional parameters depending on the attribute type:
  *		BOOLEAN - none
@@ -778,12 +779,22 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 		String attrType = attrs[pos++];
 		String attrName = attrs[pos++];
 		String attrDesc = attrs[pos++];
+		boolean attrDisplay;
+			
+		try {
+			attrDisplay = Boolean.parseBoolean(attrs[pos++]);
+		} catch (NumberFormatException ex) {
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR,
+					"Bad proxy event: could not convert attr to boolean"));
+			return null;
+		}
+		
 		String attrDefault = attrs[pos++];
 		
 		if (attrType.equals("BOOLEAN")) {
 			try {
 				Boolean defVal = Boolean.parseBoolean(attrDefault);
-				attrDef = attrDefManager.createBooleanAttributeDefinition(attrId, attrName, attrDesc, defVal);
+				attrDef = attrDefManager.createBooleanAttributeDefinition(attrId, attrName, attrDesc, attrDisplay, defVal);
 			} catch (NumberFormatException ex) {
 				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR,
 						"Bad proxy event: could not convert attrs to boolean"));
@@ -801,9 +812,9 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 					if (end - pos > 1) {
 						Date min = fmt.parse(attrs[pos++]);
 						Date max = fmt.parse(attrs[pos++]);
-						attrDef = attrDefManager.createDateAttributeDefinition(attrId, attrName, attrDesc, defVal, fmt, min, max);
+						attrDef = attrDefManager.createDateAttributeDefinition(attrId, attrName, attrDesc, attrDisplay, defVal, fmt, min, max);
 					} else {
-						attrDef = attrDefManager.createDateAttributeDefinition(attrId, attrName, attrDesc, defVal, fmt);
+						attrDef = attrDefManager.createDateAttributeDefinition(attrId, attrName, attrDesc, attrDisplay, defVal, fmt);
 					}
 				} catch (ParseException ex) {
 					fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR,
@@ -823,9 +834,9 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 				if (end - pos > 1) {
 						Double min = Double.parseDouble(attrs[pos++]);
 						Double max = Double.parseDouble(attrs[pos++]);
-						attrDef = attrDefManager.createDoubleAttributeDefinition(attrId, attrName, attrDesc, defVal, min, max);
+						attrDef = attrDefManager.createDoubleAttributeDefinition(attrId, attrName, attrDesc, attrDisplay, defVal, min, max);
 				} else {
-					attrDef = attrDefManager.createDoubleAttributeDefinition(attrId, attrName, attrDesc, defVal);
+					attrDef = attrDefManager.createDoubleAttributeDefinition(attrId, attrName, attrDesc, attrDisplay, defVal);
 				}
 			} catch (NumberFormatException ex) {
 				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR,
@@ -842,7 +853,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 			}
 			try {
 				attrDef = attrDefManager.createStringSetAttributeDefinition(attrId, attrName,
-						attrDesc, attrDefault, values.toArray(new String[values.size()]));
+						attrDesc, attrDisplay, attrDefault, values.toArray(new String[values.size()]));
 			} catch (IllegalValueException ex) {
 				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR,
 						"Bad proxy event: could not create attribute definition, " 
@@ -854,9 +865,9 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 				if (end - pos > 1) {
 						Integer min = Integer.parseInt(attrs[pos++]);
 						Integer max = Integer.parseInt(attrs[pos++]);
-						attrDef = attrDefManager.createIntegerAttributeDefinition(attrId, attrName, attrDesc, defVal, min, max);
+						attrDef = attrDefManager.createIntegerAttributeDefinition(attrId, attrName, attrDesc, attrDisplay, defVal, min, max);
 				} else {
-					attrDef = attrDefManager.createIntegerAttributeDefinition(attrId, attrName, attrDesc, defVal);
+					attrDef = attrDefManager.createIntegerAttributeDefinition(attrId, attrName, attrDesc, attrDisplay, defVal);
 				}
 			} catch (NumberFormatException ex) {
 				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, 
@@ -873,10 +884,10 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 						BigInteger min = new BigInteger(attrs[pos++]);
 						BigInteger max = new BigInteger(attrs[pos++]);
 						attrDef = attrDefManager.createBigIntegerAttributeDefinition(attrId,
-								attrName, attrDesc, defVal, min, max);
+								attrName, attrDesc, attrDisplay, defVal, min, max);
 				} else {
 					attrDef = attrDefManager.createBigIntegerAttributeDefinition(attrId, attrName,
-							attrDesc, defVal);
+							attrDesc, attrDisplay, defVal);
 				}
 			} catch (NumberFormatException ex) {
 				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR,
@@ -887,7 +898,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 						+ ex.getMessage()));					
 			}
 		} else if (attrType.equals("STRING")) {
-			attrDef = attrDefManager.createStringAttributeDefinition(attrId, attrName, attrDesc, attrDefault);
+			attrDef = attrDefManager.createStringAttributeDefinition(attrId, attrName, attrDesc, attrDisplay, attrDefault);
 		} else {
 			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR,
 					"Bad proxy event: unknown attribute type"));

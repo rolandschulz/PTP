@@ -31,6 +31,11 @@ extends Comparable<IAttributeDefinition<?,?,?>> {
 	/**
 	 * @return
 	 */
+	public boolean getDisplay();
+	
+	/**
+	 * @return
+	 */
 	public String getName();
 	
 	/**

@@ -26,13 +26,16 @@ extends AbstractAttributeDefinition<Double,DoubleAttribute,DoubleAttributeDefini
 	private Double maxValue = Double.POSITIVE_INFINITY;
 	private Double defaultValue;
 
-	public DoubleAttributeDefinition(final String uniqueId, final String name, final String description, final Double defaultValue) {
-		super(uniqueId, name, description);
+	public DoubleAttributeDefinition(final String uniqueId, final String name, 
+			final String description, final boolean display, final Double defaultValue) {
+		super(uniqueId, name, description, display);
 		this.defaultValue = defaultValue;
 	}
 
-	public DoubleAttributeDefinition(final String uniqueId, final String name, final String description, final Double defaultValue, final double minValue, final double maxValue) throws IllegalValueException {
-		super(uniqueId, name, description);
+	public DoubleAttributeDefinition(final String uniqueId, final String name, 
+			final String description, final boolean display, 
+			final Double defaultValue, final double minValue, final double maxValue) throws IllegalValueException {
+		super(uniqueId, name, description, display);
 		if (minValue > maxValue) {
 			throw new IllegalArgumentException("minValue must be less than or equal to maxValue");
 		}

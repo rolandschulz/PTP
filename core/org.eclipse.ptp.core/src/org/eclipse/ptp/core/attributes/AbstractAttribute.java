@@ -102,7 +102,7 @@ implements IAttribute<T,A,D> {
 		this.enabled = enabled;
 	}
 
-    /**
+	/**
      * @param other
      * @return
      */

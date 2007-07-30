@@ -42,14 +42,15 @@ public class NodeAttributes {
 
 	private final static EnumeratedAttributeDefinition<State> stateAttrDef = 
 		new EnumeratedAttributeDefinition<State>(STATE_ATTR_ID, "Node State", "State of the node",
-				State.UNKNOWN);
+				true, State.UNKNOWN);
 	
 	private final static EnumeratedAttributeDefinition<ExtraState> extraStateAttrDef = 
 		new EnumeratedAttributeDefinition<ExtraState>(EXTRA_STATE_ATTR_ID, "Extra Node State",
-				"Extra state information for the node (e.g. job scheduler state)", ExtraState.NONE);
+				"Extra state information for the node (e.g. job scheduler state)", true, ExtraState.NONE);
 	
 	private final static IntegerAttributeDefinition numAttrDef = 
-		new IntegerAttributeDefinition(NUMBER_ATTR_ID, "Node Number", "Zero-based index of node", 0);
+		new IntegerAttributeDefinition(NUMBER_ATTR_ID, "Node Number", 
+				"Zero-based index of node", true, 0);
 	
 	public static EnumeratedAttributeDefinition<State> getStateAttributeDefinition() {
 		return stateAttrDef;

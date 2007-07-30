@@ -36,6 +36,9 @@ public class AttributeManager {
 		}
 	}
 
+	/**
+	 * @param attr
+	 */
 	public void addAttribute(IAttribute<?,?,?> attr) {
 		map.put(attr.getDefinition(), attr);
 	}
@@ -71,6 +74,10 @@ public class AttributeManager {
 		exAttr.addAll(value);
 	}
 
+	/**
+	 * @param id
+	 * @return
+	 */
 	public IAttribute<?,?,?> getAttribute(String id) {
 		for (Map.Entry<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>> entry : map.entrySet()) {
 			if (entry.getKey().getId().equals(id)) {
@@ -80,27 +87,65 @@ public class AttributeManager {
 		return null;
 	}
 	
+	/**
+	 * @param <T>
+	 * @param <A>
+	 * @param <D>
+	 * @param def
+	 * @return
+	 */
 	public <T, A extends IAttribute<T,A,D>, D extends IAttributeDefinition<T,A,D>>
 	A getAttribute(D def) {
 		return (A) this.getAttribute(def.getId());
 	}
 
+	/**
+	 * @return
+	 */
 	public IAttribute<?,?,?>[] getAttributes() {
 		return map.values().toArray(new IAttribute[map.size()]);
 	}
 	
+
+	/**
+	 * @return
+	 */
+	public IAttribute<?,?,?>[] getDisplayAttributes() {
+		List<IAttribute<?,?,?>> attrs = new ArrayList<IAttribute<?,?,?>>();
+		
+		for (IAttribute<?,?,?> attr : map.values()) {
+			if (attr.getDefinition().getDisplay()) {
+				attrs.add(attr);
+			}
+		}
+		
+		return attrs.toArray(new IAttribute[attrs.size()]);
+	}
+	
+	/**
+	 * @return
+	 */
 	public Map<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>> getMap() {
 		return map;
 	}
 	
+	/**
+	 * @return
+	 */
 	public Set<IAttributeDefinition<?,?,?>> getKeySet() {
 		return map.keySet();
 	}
 	
+	/**
+	 * @param attr
+	 */
 	public void removeAttribute(IAttribute<?,?,?> attr) {
 		map.remove(attr.getDefinition());
 	}
 	
+	/**
+	 * @return
+	 */
 	public String[] toStringArray() {
 		ArrayList<String> res = new ArrayList<String>();
 		

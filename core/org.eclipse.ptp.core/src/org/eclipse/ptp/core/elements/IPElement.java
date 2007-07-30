@@ -41,6 +41,51 @@ public interface IPElement extends IAdaptable {
 	public void addAttributes(IAttribute<?,?,?>[] attrValues);
 
 	/**
+	 * Returns the attribute corresponding to the attribute definition.
+	 * 
+	 * @param attrDef
+	 * @return The attribute for this attribute definition
+	 */
+	public <T, A extends IAttribute<T,A,D>, D extends IAttributeDefinition<T,A,D>>
+	A getAttribute(D attrDef);
+
+	/**
+	 * Returns the attribute corresponding to the attribute definition ID.
+	 * 
+	 * @param attrDefId
+	 * @return The attribute for this attribute definition
+	 */
+	public IAttribute<?,?,?> getAttribute(String attrDefId);
+	
+	/**
+	 * Get all the attribute definitions that this element knows about.
+	 * 
+	 * @return array of IAttributeDefinition keys
+	 */
+	public IAttributeDefinition<?,?,?>[] getAttributeKeys();
+	
+	/**
+	 * Returns a map containing attribute name, attribute pairs
+	 * 
+	 * @return map
+	 */
+	public Map<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>> getAttributeMap();
+
+	/**
+	 * Returns an array containing all attributes.
+	 * 
+	 * @return An array of attributes for this element
+	 */
+	public IAttribute<?,?,?>[] getAttributes();
+
+	/**
+	 * Returns an array containing all attributes that should be displayed in a UI.
+	 * 
+	 * @return An array of attributes for this element
+	 */
+	public IAttribute<?,?,?>[] getDisplayAttributes();
+
+	/**
 	 * Returns the unique ID for this Element
 	 * 
 	 * @return The ID for this Element as a String
@@ -54,44 +99,6 @@ public interface IPElement extends IAdaptable {
 	 * @return This Element's name
 	 */
 	public String getName();
-	
-	/**
-	 * Returns the attribute corresponding to the attribute definition.
-	 * 
-	 * @param attrDef
-	 * @return The attribute for this attribute definition
-	 */
-	public <T, A extends IAttribute<T,A,D>, D extends IAttributeDefinition<T,A,D>>
-	A getAttribute(D attrDef);
-	
-	/**
-	 * Returns the attribute corresponding to the attribute definition ID.
-	 * 
-	 * @param attrDefId
-	 * @return The attribute for this attribute definition
-	 */
-	public IAttribute<?,?,?> getAttribute(String attrDefId);
-
-	/**
-	 * Returns an array containing all attributes.
-	 * 
-	 * @return An array of attributes for this element
-	 */
-	public IAttribute<?,?,?>[] getAttributes();
-
-	/**
-	 * Get all the attribute definitions that this element knows about.
-	 * 
-	 * @return array of IAttributeDefinition keys
-	 */
-	public IAttributeDefinition<?,?,?>[] getAttributeKeys();
-
-	/**
-	 * Returns a map containing attribute name, attribute pairs
-	 * 
-	 * @return map
-	 */
-	public Map<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>> getAttributeMap();
 
 	/**
 	 * Removes the attribute value.

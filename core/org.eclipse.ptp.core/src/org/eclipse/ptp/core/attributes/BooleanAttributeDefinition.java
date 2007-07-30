@@ -24,8 +24,9 @@ extends AbstractAttributeDefinition<Boolean,BooleanAttribute,BooleanAttributeDef
 
 	private Boolean defaultValue;
 	
-	public BooleanAttributeDefinition(final String uniqueId, final String name, final String description, final Boolean defaultValue) {
-		super(uniqueId, name, description);
+	public BooleanAttributeDefinition(final String uniqueId, final String name, 
+			final String description, final boolean display, final Boolean defaultValue) {
+		super(uniqueId, name, description, display);
 		this.defaultValue = defaultValue;
 	}
 

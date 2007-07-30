@@ -47,54 +47,56 @@ public class JobAttributes {
 	private static final String DEBUG_FLAG_ATTR_ID = "debug";
 
 	private final static EnumeratedAttributeDefinition<State> stateAttrDef = 
-		new EnumeratedAttributeDefinition<State>(STATE_ATTR_ID, "Job State", "State of a job",
-				State.STARTED);
+		new EnumeratedAttributeDefinition<State>(STATE_ATTR_ID, "Job State", "State of a job", 
+				true, State.STARTED);
 
 	private final static StringAttributeDefinition subIdAttrDef = 
 		new StringAttributeDefinition(SUBID_ATTR_ID, "Job Submission ID",
-				"Temporary ID used for job submission", "");
+				"Temporary ID used for job submission", false, "");
 
 	private final static StringAttributeDefinition queueIdAttrDef = 
-		new StringAttributeDefinition(QUEUEID_ATTR_ID, QUEUEID_ATTR_ID, "Job submission queue ID", "");
+		new StringAttributeDefinition(QUEUEID_ATTR_ID, QUEUEID_ATTR_ID, 
+				"Job submission queue ID", true, "");
 	
 	private final static IntegerAttributeDefinition numProcsAttrDef = 
-		new IntegerAttributeDefinition(NUM_PROCS_ATTR_ID, "Number of Processes", "Number of processes to launch", 0);
+		new IntegerAttributeDefinition(NUM_PROCS_ATTR_ID, "Number of Processes", 
+				"Number of processes to launch", true, 0);
 
 	private final static StringAttributeDefinition execNameAttrDef = 
 		new StringAttributeDefinition(EXEC_NAME_ATTR_ID, "Executable Name",
-				"Name of executable to be launched", "");
+				"Name of executable to be launched", true, "");
 
 	private final static StringAttributeDefinition execPathAttrDef = 
 		new StringAttributeDefinition(EXEC_PATH_ATTR_ID, "Executable Path",
-				"Path of executable to be launched", "");
+				"Path of executable to be launched", true, "");
 
 	private final static StringAttributeDefinition workingDirAttrDef = 
 		new StringAttributeDefinition(WORKING_DIR_ATTR_ID, "Working Directory",
-				"Working directory where executable will run", "");
+				"Working directory where executable will run", true, "");
 
 	private final static ArrayAttributeDefinition<String> progArgsAttrDef = 
 		new ArrayAttributeDefinition<String>(PROG_ARGS_ATTR_ID, "Program Arguments",
-				"Command-line arguments supplied to executable", null);
+				"Command-line arguments supplied to executable", true, null);
 
 	private final static ArrayAttributeDefinition<String> envAttrDef = 
 		new ArrayAttributeDefinition<String>(ENV_ATTR_ID, "Environment",
-				"Environment to be supplied to executable on launch", null);
+				"Environment to be supplied to executable on launch", true, null);
 
 	private final static StringAttributeDefinition debugExecNameAttrDef = 
 		new StringAttributeDefinition(DEBUG_EXEC_NAME_ATTR_ID, "Debugger Executable Name",
-				"Name of debugger executable", "");
+				"Name of debugger executable", true, "");
 
 	private final static StringAttributeDefinition debugExecPathAttrDef = 
 		new StringAttributeDefinition(DEBUG_EXEC_PATH_ATTR_ID, "Debugger Executable NaPathme",
-				"Path to debugger executable", "");
+				"Path to debugger executable", true,"");
 
 	private final static ArrayAttributeDefinition<String> debugArgsAttrDef = 
 		new ArrayAttributeDefinition<String>(DEBUG_ARGS_ATTR_ID, DEBUG_ARGS_ATTR_ID,
-				"Debugger Arguments", null);
+				"Debugger Arguments", true, null);
 
 	private final static BooleanAttributeDefinition debugFlagAttrDef = 
-		new BooleanAttributeDefinition(DEBUG_FLAG_ATTR_ID, DEBUG_FLAG_ATTR_ID, "Debug Flag",
-				false);
+		new BooleanAttributeDefinition(DEBUG_FLAG_ATTR_ID, DEBUG_FLAG_ATTR_ID, 
+				"Debug Flag", true, false);
 
 	public static EnumeratedAttributeDefinition<State> getStateAttributeDefinition() {
 		return stateAttrDef;

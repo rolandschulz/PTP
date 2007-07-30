@@ -31,14 +31,18 @@ extends AbstractAttributeDefinition<Calendar, DateAttribute, DateAttributeDefini
 	private final DateFormat outputDateFormat;
 	private Date defaultValue;
 
-	public DateAttributeDefinition(final String uniqueId, final String name, final String description, final Date defaultValue, final DateFormat outputDateFormat) {
-		super(uniqueId, name, description);
+	public DateAttributeDefinition(final String uniqueId, final String name, 
+			final String description, final boolean display, 
+			final Date defaultValue, final DateFormat outputDateFormat) {
+		super(uniqueId, name, description, display);
 		this.defaultValue = defaultValue;
 		this.outputDateFormat = outputDateFormat;
 	}
 
-	public DateAttributeDefinition(final String uniqueId, final String name, final String description, final Date defaultValue, final DateFormat outputDateFormat, final Date min, final Date max) throws IllegalValueException {
-		super(uniqueId, name, description);
+	public DateAttributeDefinition(final String uniqueId, final String name, 
+			final String description, final boolean display, 
+			final Date defaultValue, final DateFormat outputDateFormat, final Date min, final Date max) throws IllegalValueException {
+		super(uniqueId, name, description, display);
 		if (defaultValue.compareTo(getMinDate()) < 0) {
 			throw new IllegalValueException("default date specified is before min date");
 		}

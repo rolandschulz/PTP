@@ -32,11 +32,11 @@ public class MachineAttributes {
 
     private final static EnumeratedAttributeDefinition<State> stateAttrDef = 
         new EnumeratedAttributeDefinition<State>(STATE_ATTR_ID, "state", "Machine State",
-                State.UNKNOWN);
+                true, State.UNKNOWN);
     
     private final static IntegerAttributeDefinition numNodesAttrDef = 
         new IntegerAttributeDefinition(NUMNODES_ATTR_ID, "nodes", "Number of Nodes",
-                0);
+                true, 0);
     
     public static EnumeratedAttributeDefinition<State> getStateAttributeDefinition() {
         return stateAttrDef;
