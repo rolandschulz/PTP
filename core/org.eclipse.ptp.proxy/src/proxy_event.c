@@ -149,7 +149,7 @@ proxy_job_error_event(int trans_id, char *jobId, int code, char *msg)
  * in subsequent events.
  */
 proxy_msg *
-proxy_attr_def_int_event(int trans_id, char *id, char *name, char *desc, int def)
+proxy_attr_def_int_event(int trans_id, char *id, char *name, char *desc, int disp, int def)
 {
 	proxy_msg *	m = new_proxy_msg(PROXY_EV_RT_ATTR_DEF, trans_id);
 	
@@ -159,6 +159,7 @@ proxy_attr_def_int_event(int trans_id, char *id, char *name, char *desc, int def
 	proxy_msg_add_string(m, "INTEGER");
 	proxy_msg_add_string(m, name);
 	proxy_msg_add_string(m, desc);
+	proxy_msg_add_string(m, disp ? "true" : "false");
 	proxy_msg_add_int(m, def);
 	
 	return m;	
@@ -169,7 +170,7 @@ proxy_attr_def_int_event(int trans_id, char *id, char *name, char *desc, int def
  * in subsequent events.
  */
 proxy_msg *
-proxy_attr_def_string_event(int trans_id, char *id, char *name, char *desc, char *def)
+proxy_attr_def_string_event(int trans_id, char *id, char *name, char *desc, int disp, char *def)
 {
 	proxy_msg *	m = new_proxy_msg(PROXY_EV_RT_ATTR_DEF, trans_id);
 	
@@ -179,6 +180,7 @@ proxy_attr_def_string_event(int trans_id, char *id, char *name, char *desc, char
 	proxy_msg_add_string(m, "STRING");
 	proxy_msg_add_string(m, name);
 	proxy_msg_add_string(m, desc);
+	proxy_msg_add_string(m, disp ? "true" : "false");
 	proxy_msg_add_string(m, def);
 	
 	return m;	
