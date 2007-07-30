@@ -41,28 +41,35 @@ public class ProcessAttributes {
 
 	private final static EnumeratedAttributeDefinition<State> stateAttrDef = 
 		new EnumeratedAttributeDefinition<State>(STATE_ATTR_ID, "Process State",
-				"Execution state of a process", State.STARTING);
+				"Execution state of a process", true, State.STARTING);
 	
 	private final static IntegerAttributeDefinition pidAttrDef = 
-		new IntegerAttributeDefinition(PID_ATTR_ID, "Process PID", "Operating system process ID", 0);
+		new IntegerAttributeDefinition(PID_ATTR_ID, "Process PID", 
+				"Operating system process ID", true, 0);
 	
 	private final static IntegerAttributeDefinition exitCodeAttrDef = 
-		new IntegerAttributeDefinition(EXIT_CODE_ATTR_ID, "Process Exit Code", "Operating system exit code", 0);
+		new IntegerAttributeDefinition(EXIT_CODE_ATTR_ID, "Process Exit Code", 
+				"Operating system exit code", true, 0);
 	
 	private final static IntegerAttributeDefinition indexAttrDef = 
-		new IntegerAttributeDefinition(INDEX_ATTR_ID, "Process Index", "Zero-based index of process (e.g. MPI rank)", 0);
+		new IntegerAttributeDefinition(INDEX_ATTR_ID, "Process Index", 
+				"Zero-based index of process (e.g. MPI rank)", true, 0);
 	
 	private final static StringAttributeDefinition signalNameAttrDef = 
-		new StringAttributeDefinition(SIGNAL_NAME_ATTR_ID, "Process Signal", "Name of signal that caused process termination", "");
+		new StringAttributeDefinition(SIGNAL_NAME_ATTR_ID, "Process Signal", 
+				"Name of signal that caused process termination", true, "");
 	
 	private final static StringAttributeDefinition stdoutAttrDef = 
-		new StringAttributeDefinition(STDOUT_ATTR_ID, "Process Stdout", "Standard output from process", "");
+		new StringAttributeDefinition(STDOUT_ATTR_ID, "Process Stdout", 
+				"Standard output from process", false, "");
 	
 	private final static StringAttributeDefinition stderrAttrDef = 
-		new StringAttributeDefinition(STDERR_ATTR_ID, "Process Stderr", "Standard error from process", "");
+		new StringAttributeDefinition(STDERR_ATTR_ID, "Process Stderr", 
+				"Standard error from process", false, "");
 	
 	private final static StringAttributeDefinition nodeIdAttrDef = 
-		new StringAttributeDefinition(NODEID_ATTR_ID, "Process Node ID", "Node that this process is running on", "");
+		new StringAttributeDefinition(NODEID_ATTR_ID, "Process Node ID", 
+				"Node that this process is running on", true, "");
 	
 	public static EnumeratedAttributeDefinition<State> getStateAttributeDefinition() {
 		return stateAttrDef;

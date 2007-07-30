@@ -26,13 +26,16 @@ extends AbstractAttributeDefinition<Integer,IntegerAttribute,IntegerAttributeDef
 	private Integer maxValue = Integer.MAX_VALUE;
 	private Integer defaultValue;
 
-	public IntegerAttributeDefinition(final String uniqueId, final String name, final String description, final Integer defaultValue) {
-		super(uniqueId, name, description);
+	public IntegerAttributeDefinition(final String uniqueId, final String name, 
+			final String description, final boolean display, final Integer defaultValue) {
+		super(uniqueId, name, description, display);
 		this.defaultValue = defaultValue;
 	}
 
-	public IntegerAttributeDefinition(final String uniqueId, final String name, final String description, final Integer defaultValue, final Integer minValue, final Integer maxValue) throws IllegalValueException {
-		super(uniqueId, name, description);
+	public IntegerAttributeDefinition(final String uniqueId, final String name, 
+			final String description, final boolean display, 
+			final Integer defaultValue, final Integer minValue, final Integer maxValue) throws IllegalValueException {
+		super(uniqueId, name, description, display);
 		if (minValue > maxValue) {
 			throw new IllegalArgumentException("minValue must be less than or equal to maxValue");
 		}

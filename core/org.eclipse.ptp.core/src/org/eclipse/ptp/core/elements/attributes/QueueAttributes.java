@@ -29,7 +29,7 @@ public class QueueAttributes {
 
 	private final static EnumeratedAttributeDefinition<State> stateAttrDef = 
 		new EnumeratedAttributeDefinition<State>(STATE_ATTR_ID, "state", "Queue State",
-				State.NORMAL);
+				true, State.NORMAL);
 	
 	public static EnumeratedAttributeDefinition<State> getStateAttributeDefinition() {
 		return stateAttrDef;

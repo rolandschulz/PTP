@@ -32,7 +32,7 @@ extends AbstractAttribute<Calendar, DateAttribute, DateAttributeDefinition> {
 
 	public static void main(String[] args) throws IllegalValueException {
 		Calendar cal = Calendar.getInstance();
-		DateAttributeDefinition def = new DateAttributeDefinition("uniqId", "name", "desc", cal.getTime(), DateFormat.getDateTimeInstance());
+		DateAttributeDefinition def = new DateAttributeDefinition("uniqId", "name", "desc", true, cal.getTime(), DateFormat.getDateTimeInstance());
 		DateAttribute mda = (DateAttribute)def.create();
 		mda.setValue(cal);
 		System.out.println(mda.toString());

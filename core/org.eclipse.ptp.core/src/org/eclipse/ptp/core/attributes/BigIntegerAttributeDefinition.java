@@ -29,15 +29,15 @@ extends AbstractAttributeDefinition<BigInteger,BigIntegerAttribute,BigIntegerAtt
 	private BigInteger defaultValue;
 
 	public BigIntegerAttributeDefinition(final String uniqueId, final String name,
-			final String description, final BigInteger defaultValue) {
-		super(uniqueId, name, description);
+			final String description, final boolean display, final BigInteger defaultValue) {
+		super(uniqueId, name, description, display);
 		this.defaultValue = defaultValue;
 	}
 
 	public BigIntegerAttributeDefinition(final String uniqueId, final String name,
-			final String description, final BigInteger defaultValue,
+			final String description, final boolean display, final BigInteger defaultValue,
 			final BigInteger minValue, final BigInteger maxValue) throws IllegalValueException {
-		super(uniqueId, name, description);
+		super(uniqueId, name, description, display);
 		if (minValue.compareTo(maxValue) > 0) {
 			throw new IllegalArgumentException("minValue must be less than or equal to maxValue");
 		}

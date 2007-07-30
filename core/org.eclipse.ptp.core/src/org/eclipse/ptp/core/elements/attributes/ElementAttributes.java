@@ -26,10 +26,10 @@ public class ElementAttributes {
 	private final static String ATTR_NAME = "name";
 	
 	private final static StringAttributeDefinition idAttributeDefinition = 
-		new StringAttributeDefinition(ATTR_ID, "ID", "Unique ID of element", "");
+		new StringAttributeDefinition(ATTR_ID, "ID", "Unique ID of element", false, "");
 
 	private final static StringAttributeDefinition nameAttributeDefinition = 
-		new StringAttributeDefinition(ATTR_NAME, "Name", "Name of element", "");
+		new StringAttributeDefinition(ATTR_NAME, "Name", "Name of element", true, "");
 
 	public static StringAttributeDefinition getIdAttributeDefinition() {
 		return idAttributeDefinition;

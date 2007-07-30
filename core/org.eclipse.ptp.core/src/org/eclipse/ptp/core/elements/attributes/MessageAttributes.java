@@ -35,15 +35,15 @@ public class MessageAttributes {
 
 	private final static EnumeratedAttributeDefinition<Level> levelAttrDef = 
 		new EnumeratedAttributeDefinition<Level>(LEVEL_ATTR_ID, "Message Level", 
-				"Level of the message", Level.UNDEFINED);
+				"Level of the message", true, Level.UNDEFINED);
 
 	private final static IntegerAttributeDefinition codeAttrDef = 
 		new IntegerAttributeDefinition(CODE_ATTR_ID, "Message Code", 
-				"Code assigned to this message", 0);
+				"Code assigned to this message", true, 0);
 
 	private final static StringAttributeDefinition textAttrDef = 
 		new StringAttributeDefinition(TEXT_ATTR_ID, "Message Text",
-				"Text of message", "");
+				"Text of message", true, "");
 
 	public static EnumeratedAttributeDefinition<Level> getLevelAttributeDefinition() {
 		return levelAttrDef;

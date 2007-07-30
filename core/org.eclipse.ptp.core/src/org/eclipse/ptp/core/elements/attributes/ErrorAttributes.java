@@ -24,11 +24,11 @@ public class ErrorAttributes {
 
 	private final static IntegerAttributeDefinition codeAttrDef = 
 		new IntegerAttributeDefinition(CODE_ATTR_ID, "Error Code", 
-				"Code assigned to this error", 0);
+				"Code assigned to this error", true, 0);
 
 	private final static StringAttributeDefinition msgAttrDef = 
 		new StringAttributeDefinition(MESSAGE_ATTR_ID, "Error Message",
-				"Text of error message", "");
+				"Text of error message", true, "");
 
 	public static IntegerAttributeDefinition getCodeAttributeDefinition() {
 		return codeAttrDef;
