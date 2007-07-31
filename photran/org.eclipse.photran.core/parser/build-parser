@@ -14,4 +14,7 @@ for file in AST*Node.java; do
 done
 patch ASTVisitor.java <$SRCDIR/ASTVisitor.patch
 patch Parser.java <$SRCDIR/Parser.patch
+for file in *.java; do
+  patch $file <$SRCDIR/Copyright.patch
+done
 mv $SRCDIR/GenericParseTreeVisitor.java .
