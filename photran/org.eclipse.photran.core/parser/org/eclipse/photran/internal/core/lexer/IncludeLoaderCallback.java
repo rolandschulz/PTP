@@ -35,13 +35,24 @@ public class IncludeLoaderCallback
      */
     public InputStream getIncludedFileAsStream(String fileToInclude) throws FileNotFoundException
     {
+        try
+        {
+        	return getIncludedFile(fileToInclude).getContents();
+        }
+        catch (CoreException e)
+        {
+        	throw new FileNotFoundException(fileToInclude + " - " + e.getMessage());
+        }
+    }
+    
+    protected IFile getIncludedFile(String fileToInclude) throws FileNotFoundException
+    {
         String[] paths = SearchPathProperties.parseString(SearchPathProperties.getProperty(project, SearchPathProperties.INCLUDE_PATHS_PROPERTY_NAME));
         for (int i = 0; i < paths.length; i++)
         {
             IResource result = ResourcesPlugin.getWorkspace().getRoot().findMember(paths[i] + File.separatorChar + fileToInclude);
             if (result != null && result instanceof IFile)
-                try { return ((IFile)result).getContents(); }
-                catch (CoreException e) {;}
+                return (IFile)result;
         }
         throw new FileNotFoundException(fileToInclude);
     }
