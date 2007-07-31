@@ -6,7 +6,7 @@ import org.eclipse.cdt.core.model.CModelException;
 import org.eclipse.cdt.internal.core.model.Parent;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.GenericParseTreeVisitor;
-import org.eclipse.photran.internal.core.parser.ParseTreeNode;
+import org.eclipse.photran.internal.core.parser.Parser.InteriorNode;
 
 /**
  * This visitor is used to build the Outline view when the user chooses the (debugging) option to
@@ -44,21 +44,21 @@ public final class FortranParseTreeModelBuildingVisitor extends GenericParseTree
             return (Parent)parentElementStack.getLast();
     }
 
-    private boolean isCurrentParent(ParseTreeNode node)
+    private boolean isCurrentParent(InteriorNode node)
     {
         if (parentParseTreeNodeStack.isEmpty())
             return false;
         else
-            return node == (ParseTreeNode)parentParseTreeNodeStack.getLast();
+            return node == (InteriorNode)parentParseTreeNodeStack.getLast();
     }
 
-    private void beginAddingChildrenFor(ParseTreeNode parseTreeNode, FortranElement element)
+    private void beginAddingChildrenFor(InteriorNode parseTreeNode, FortranElement element)
     {
         parentParseTreeNodeStack.addLast(parseTreeNode);
         parentElementStack.addLast(element);
     }
 
-    private void doneAddingChildrenFor(ParseTreeNode node)
+    private void doneAddingChildrenFor(InteriorNode node)
     {
         if (isCurrentParent(node))
         {
@@ -69,20 +69,19 @@ public final class FortranParseTreeModelBuildingVisitor extends GenericParseTree
 
     // --VISITOR METHODS-------------------------------------------------
 
-    public void preparingToVisitChildrenOf(ParseTreeNode node)
+    public void preparingToVisitChildrenOf(InteriorNode node)
     {
         // beginAddingChildrenFor is called in addToModel
     }
 
-    public void doneVisitingChildrenOf(ParseTreeNode node)
+    public void doneVisitingChildrenOf(InteriorNode node)
     {
         doneAddingChildrenFor(node);
     }
 
-    public void visitParseTreeNode(ParseTreeNode node)
+    public void visitParseTreeNode(InteriorNode node)
     {
-        FortranElement element = new FortranElement.UnknownNode(getCurrentParent(),
-                                                                node.getNonterminal().getDescription());
+        FortranElement element = new FortranElement.UnknownNode(getCurrentParent(),node.getNonterminal().toString());
 
 //        Token firstToken = ParseTreeSearcher.findFirstTokenIn(node);
 //        Token lastToken = ParseTreeSearcher.findLastTokenIn(node);

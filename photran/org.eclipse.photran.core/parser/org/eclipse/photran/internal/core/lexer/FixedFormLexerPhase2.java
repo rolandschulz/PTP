@@ -5,7 +5,7 @@ import java.io.InputStream;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.photran.internal.core.parser.Parser;
-import org.eclipse.photran.internal.core.parser.Terminal;
+import org.eclipse.photran.internal.core.parser.Parser.Terminal;
 
 /**
  * This is the lexical analyzer that is used directly in the Fortran parser.

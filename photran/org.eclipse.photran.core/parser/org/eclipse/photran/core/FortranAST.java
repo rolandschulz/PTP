@@ -7,7 +7,6 @@ import org.eclipse.photran.internal.core.lexer.TokenList;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 import org.eclipse.photran.internal.core.parser.ASTVisitor;
 import org.eclipse.photran.internal.core.parser.GenericParseTreeVisitor;
-import org.eclipse.photran.internal.core.parser.ParseTreeVisitor;
 
 public class FortranAST implements IFortranAST
 {
@@ -33,11 +32,6 @@ public class FortranAST implements IFortranAST
     public void visitTopDownUsing(ASTVisitor visitor)
     {
         root.visitTopDownUsing(visitor);
-    }
-    
-    public void visitUsing(ParseTreeVisitor visitor)
-    {
-        root.visitUsing(visitor);
     }
     
     public void visitUsing(GenericParseTreeVisitor visitor)

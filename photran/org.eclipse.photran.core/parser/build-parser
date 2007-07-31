@@ -1,15 +1,17 @@
 #!/bin/bash
-cd /home/joverbey/ludwig-workspace/bz.over.ludwig.ui.cmdline
-./ludwig /home/joverbey/photran/photran3-workspace/org.eclipse.photran.core/parser/fortran95.lalr acst
-cd /home/joverbey/photran/photran3-workspace/org.eclipse.photran.core/parser/org/eclipse/photran/internal/core/parser
-sed -e "s/Yylex/ILexer/g; s/getNextToken/yylex/g" Parser.java >Parser.java.x
-mv -f Parser.java.x Parser.java
-sed -e "s/abstract int getActionRow();/int getActionRow() { return -9999; }/g;" Terminal.java >Terminal.java.x
-mv -f Terminal.java.x Terminal.java
-sed -e "s/public class ASTExecutableProgramNode extends ParseTreeNode/public class ASTExecutableProgramNode extends ParseTreeNode implements IFortranAST/g; s/package org.eclipse.photran.internal.core.parser;/package org.eclipse.photran.internal.core.parser; import org.eclipse.photran.core.IFortranAST;/g" ASTExecutableProgramNode.java >ASTExecutableProgramNode.java.x
-mv -f ASTExecutableProgramNode.java.x ASTExecutableProgramNode.java
-for file in *.java; do
-  sed -e "s/package org.eclipse.photran.internal.core.parser;/package org.eclipse.photran.internal.core.parser; import org.eclipse.photran.internal.core.lexer.*;/g" $file >$file.x
-  mv -f $file.x $file
+SRCDIR=`pwd`
+cd org/eclipse/photran/internal/core/parser
+cp GenericParseTreeVisitor.java $SRCDIR
+rm -f *.java
+java -Xmx256M -jar $SRCDIR/ludwig.jar \
+	-shift T_COMMA "<IoControlSpecList>" \
+	-reduce "<SFVarName>" "<SFDummyArgName>" \
+	-package "org.eclipse.photran.internal.core.parser" \
+	-parserClassName Parser \
+	$SRCDIR/fortran95.bnf
+for file in AST*Node.java; do
+  patch $file <$SRCDIR/ASTNode.patch
 done
-rm -f Token.java
+patch ASTVisitor.java <$SRCDIR/ASTVisitor.patch
+patch Parser.java <$SRCDIR/Parser.patch
+mv $SRCDIR/GenericParseTreeVisitor.java .

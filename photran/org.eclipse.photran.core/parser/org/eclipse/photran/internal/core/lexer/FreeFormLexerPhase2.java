@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.photran.internal.core.parser.Parser;
-import org.eclipse.photran.internal.core.parser.Terminal;
+import org.eclipse.photran.internal.core.parser.Parser.Terminal;
 
 /**
  * This is the lexical analyzer that is used directly in the Fortran parser.
@@ -810,7 +810,7 @@ class FreeFormLexerPhase2 implements ILexer
     private void applyRulesTo(Terminal tokenTerminal)
     {
         if (rules.containsKey(tokenTerminal))
-            throw new Error("Multiple rule lists specified for token " + tokenTerminal.getDescription());
+            throw new Error("Multiple rule lists specified for token " + tokenTerminal);
         rules.put(tokenTerminal, ruleList);
     }
 
@@ -944,37 +944,17 @@ class FreeFormLexerPhase2 implements ILexer
      * the token being investigated.  The wildcard ANY_DEFINED_OPERATOR can
      * also be used.
      */
-    private final Terminal ANY_TOKEN = new Terminal()
-    {
-        public String getDescription()
-        {
-            throw new Error("Cannot describe ANY_TOKEN");
-        }
-    };
-    
+    private final Terminal ANY_TOKEN = new Terminal(-1, "any token");
+   
     /**
      * Wildcard referring to any defined operator (obviously)
      */
-    private final Terminal ANY_DEFINED_OPERATOR = new Terminal()
-    {
-        public String getDescription()
-        {
-            throw new Error("Cannot describe ANY_DEFINED_OPERATOR");
-        }
-        
-    };
+    private final Terminal ANY_DEFINED_OPERATOR = new Terminal(-1, "any defined operator");
     
     /**
      * This is used when we need a reasonable default in some places...
      */
-    private final Terminal ALWAYS_RETURN_TRUE = new Terminal()
-    {
-        public String getDescription()
-        {
-            throw new Error("Cannot describe ALWAYS_RETURN_TRUE");
-        }
-        
-    };
+    private final Terminal ALWAYS_RETURN_TRUE = new Terminal(-1, "always return true");
 
     private final class MustBeFollowedBy extends Rule
     {
@@ -1531,7 +1511,7 @@ class FreeFormLexerPhase2 implements ILexer
       for (int i = 0; i < tokenStream.size(); i++)
       {
         Token t = (Token)tokenStream.elementAt(i);
-        s.print(t.getTerminal().getDescription());
+        s.print(t.getTerminal());
         s.print("(" + t.getText().replaceAll("\\n", "\\\\n") + ")");
         //THESE DON'T WORK: The stream gets bigger than the arrays if tokens
         //                  are split, so these will be inaccurate and may

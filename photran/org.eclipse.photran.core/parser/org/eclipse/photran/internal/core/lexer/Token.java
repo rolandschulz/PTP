@@ -5,16 +5,14 @@ import java.io.PrintStream;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.photran.core.util.OffsetLength;
 import org.eclipse.photran.internal.core.parser.ASTVisitor;
-import org.eclipse.photran.internal.core.parser.AbstractParseTreeNode;
 import org.eclipse.photran.internal.core.parser.GenericParseTreeVisitor;
-import org.eclipse.photran.internal.core.parser.ParseTreeVisitor;
-import org.eclipse.photran.internal.core.parser.ParserSymbol;
-import org.eclipse.photran.internal.core.parser.Terminal;
+import org.eclipse.photran.internal.core.parser.Parser.CSTNode;
+import org.eclipse.photran.internal.core.parser.Parser.Terminal;
 
 /**
  * Enumerates the terminal symbols in the grammar being parsed
  */
-public class Token extends AbstractParseTreeNode implements ParserSymbol
+public class Token extends CSTNode
 {
     ///////////////////////////////////////////////////////////////////////////
     // Fields
@@ -233,13 +231,22 @@ public class Token extends AbstractParseTreeNode implements ParserSymbol
     // Visitor Support
     ///////////////////////////////////////////////////////////////////////////
 
-    public void visitTopDownUsing(ASTVisitor visitor) { visitor.visitToken(this); }
+    @Override protected void visitTopDownUsing(ASTVisitor visitor, boolean shouldVisitRoot)
+    {
+        if (shouldVisitRoot)
+            visitor.visitToken(this);
+    }
 
-    public void visitBottomUpUsing(ASTVisitor visitor) { visitor.visitToken(this); }
+    @Override protected void visitBottomUpUsing(ASTVisitor visitor, boolean shouldVisitRoot)
+    {
+        if (shouldVisitRoot)
+            visitor.visitToken(this);
+    }
 
-    public void visitUsing(ParseTreeVisitor visitor) { ; }
-
-    public void visitUsing(GenericParseTreeVisitor visitor) { visitor.visitToken(this); }
+    public void visitUsing(GenericParseTreeVisitor visitor)
+    {
+        visitor.visitToken(this);
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     // Debugging Output
@@ -250,7 +257,7 @@ public class Token extends AbstractParseTreeNode implements ParserSymbol
     /**
      * Returns a string describing the token
      */
-    public String getDescription() { return terminal.getDescription() + ": \"" + text + "\""; }
+    public String getDescription() { return terminal.toString() + ": \"" + text + "\""; }
     
     ///////////////////////////////////////////////////////////////////////////
     // Source Code Reproduction

@@ -1,0 +1,10 @@
+--- ASTVisitor.java	2007-07-27 08:38:21.000000000 -0600
++++ ASTVisitor.java.new	2007-07-27 08:41:26.000000000 -0600
+@@ -1,6 +1,6 @@
+ package org.eclipse.photran.internal.core.parser;
+ 
+-import org.eclipse.photran.internal.core.parser.Parser.Token;
++import org.eclipse.photran.internal.core.lexer.Token;
+ 
+ public class ASTVisitor
+ {

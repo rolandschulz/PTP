@@ -25,7 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.LinkedList;
-import org.eclipse.photran.internal.core.parser.Terminal;
+import org.eclipse.photran.internal.core.parser.Parser.Terminal;
 import org.eclipse.core.resources.IFile;
 
 %%
@@ -449,8 +449,8 @@ FortranInclude="INCLUDE"[^=(%\r\n]*{LineTerminator}
 
 
 <IMPLICIT> {
-{xImpl}/{xImplLkahead}			{ wantEos = true;                     return token(Terminal.T_XIMPL); }
-{xImpl}$						{ wantEos = true;                     return token(Terminal.T_XIMPL); }
+{xImpl}/{xImplLkahead}			{ wantEos = true;                     return token(Terminal.T_X_IMPL); }
+{xImpl}$						{ wantEos = true;                     return token(Terminal.T_X_IMPL); }
 }
 
 <YYSTANDARD,IMPLICIT> {

@@ -21,7 +21,7 @@ import org.eclipse.photran.internal.core.parser.ASTStmtFunctionStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTSubroutineSubprogramNode;
 import org.eclipse.photran.internal.core.parser.ASTVisitor;
 import org.eclipse.photran.internal.core.parser.GenericParseTreeVisitor;
-import org.eclipse.photran.internal.core.parser.ParseTreeNode;
+import org.eclipse.photran.internal.core.parser.Parser.InteriorNode;
 
 /**
  * This parse tree visitor is used by the <code>FortranModelBuilder</code> to create the model you
@@ -62,15 +62,15 @@ public final class FortranModelBuildingVisitor extends GenericParseTreeVisitor
             return (Parent)parentElementStack.getLast();
     }
 
-    private boolean isCurrentParent(ParseTreeNode node)
+    private boolean isCurrentParent(InteriorNode node)
     {
         if (parentParseTreeNodeStack.isEmpty())
             return false;
         else
-            return node == (ParseTreeNode)parentParseTreeNodeStack.getLast();
+            return node == (InteriorNode)parentParseTreeNodeStack.getLast();
     }
 
-    private void addToModel(ParseTreeNode parseTreeNode, FortranElement element)
+    private void addToModel(InteriorNode parseTreeNode, FortranElement element)
     {
         try
         {
@@ -83,13 +83,13 @@ public final class FortranModelBuildingVisitor extends GenericParseTreeVisitor
         }
     }
 
-    private void beginAddingChildrenFor(ParseTreeNode parseTreeNode, FortranElement element)
+    private void beginAddingChildrenFor(InteriorNode parseTreeNode, FortranElement element)
     {
         parentParseTreeNodeStack.addLast(parseTreeNode);
         parentElementStack.addLast(element);
     }
 
-    private void doneAddingChildrenFor(ParseTreeNode node)
+    private void doneAddingChildrenFor(InteriorNode node)
     {
         if (isCurrentParent(node))
         {
@@ -100,13 +100,13 @@ public final class FortranModelBuildingVisitor extends GenericParseTreeVisitor
 
     // --VISITOR METHODS-------------------------------------------------
     
-    public void preparingToVisitChildrenOf(ParseTreeNode node)
+    public void preparingToVisitChildrenOf(InteriorNode node)
     {
         // beginAddingChildrenFor is called in addToModel
         node.visitOnlyThisNodeUsing(elementMappingVisitor);
     }
 
-    public void doneVisitingChildrenOf(ParseTreeNode node)
+    public void doneVisitingChildrenOf(InteriorNode node)
     {
         doneAddingChildrenFor(node);
     }
@@ -115,76 +115,76 @@ public final class FortranModelBuildingVisitor extends GenericParseTreeVisitor
     {
         public void visitASTMainProgramNode(ASTMainProgramNode node)
         {
-            Token token = node.getASTProgramStmt() == null
+            Token token = node.getProgramStmt() == null
                 ? null
-                : node.getASTProgramStmt().getASTProgramName().getASTTident();
+                : node.getProgramStmt().getProgramName().getTIdent();
             addToModel(node, new FortranElement.MainProgram(getCurrentParent(), token));
         }
     
         public void visitASTModuleNode(ASTModuleNode node)
         {
-            Token token = node.getASTModuleStmt().getASTModuleName().getASTTident();
+            Token token = node.getModuleStmt().getModuleName().getTIdent();
             addToModel(node, new FortranElement.Module(getCurrentParent(), token));
         }
     
         public void visitASTFunctionSubprogramNode(ASTFunctionSubprogramNode node)
         {
-            Token token = node.getASTFunctionStmt().getASTFunctionName().getASTTident();
+            Token token = node.getFunctionStmt().getFunctionName().getTIdent();
             addToModel(node, new FortranElement.Function(getCurrentParent(), token));
         }
     
         public void visitASTSubroutineSubprogramNode(ASTSubroutineSubprogramNode node)
         {
-            Token token = node.getASTSubroutineStmt().getASTSubroutineName().getASTTident();
+            Token token = node.getSubroutineStmt().getSubroutineName().getTIdent();
             addToModel(node, new FortranElement.Subroutine(getCurrentParent(), token));
         }
     
         public void visitASTBlockDataSubprogramNode(ASTBlockDataSubprogramNode node)
         {
-            Token token = node.getASTBlockDataStmt().getASTBlockDataName() == null
+            Token token = node.getBlockDataStmt().getBlockDataName() == null
                 ? null
-                : node.getASTBlockDataStmt().getASTBlockDataName().getASTTident();
+                : node.getBlockDataStmt().getBlockDataName().getTIdent();
             addToModel(node, new FortranElement.BlockData(getCurrentParent(), token));
         }
     
         public void visitASTDerivedTypeDefNode(ASTDerivedTypeDefNode node)
         {
-            Token token = node.getASTDerivedTypeStmt().getASTTypeName().getASTTident();
+            Token token = node.getDerivedTypeStmt().getTypeName().getTIdent();
             addToModel(node, new FortranElement.DerivedType(getCurrentParent(), token));
         }
     
         public void visitASTComponentDefStmtNode(ASTComponentDefStmtNode node)
         {
-            ASTComponentDeclListNode list = node.getASTComponentDeclList();
-            for (int i = 0; i < list.count(); i++)
-                addToModel(node, new FortranElement.Variable(getCurrentParent(), list.getASTComponentDecl(i).getASTComponentName().getASTTident()));
+            ASTComponentDeclListNode list = node.getComponentDeclList();
+            for (int i = 0; i < list.size(); i++)
+                addToModel(node, new FortranElement.Variable(getCurrentParent(), list.getComponentDecl(i).getComponentName().getTIdent()));
         }
     
         public void visitASTExternalStmtNode(ASTExternalStmtNode node)
         {
-            ASTExternalNameListNode list = node.getASTExternalNameList();
-            for (int i = 0; i < list.count(); i++)
-                addToModel(node, new FortranElement.Variable(getCurrentParent(), list.getASTExternalName(i).getASTTident()));
+            ASTExternalNameListNode list = node.getExternalNameList();
+            for (int i = 0; i < list.size(); i++)
+                addToModel(node, new FortranElement.Variable(getCurrentParent(), list.getExternalName(i).getTIdent()));
         }
     
         public void visitASTInterfaceBlockNode(ASTInterfaceBlockNode node)
         {
-            Token token = node.getASTInterfaceStmt().getASTGenericName() == null
+            Token token = node.getInterfaceStmt().getGenericName() == null
                 ? null
-                : node.getASTInterfaceStmt().getASTGenericName().getASTTident();
+                : node.getInterfaceStmt().getGenericName().getTIdent();
             addToModel(node, new FortranElement.Variable(getCurrentParent(), token));
         }
     
         public void visitASTIntrinsicStmtNode(ASTIntrinsicStmtNode node)
         {
-            ASTIntrinsicListNode list = node.getASTIntrinsicList();
-            for (int i = 0; i < list.count(); i++)
-                addToModel(node, new FortranElement.Variable(getCurrentParent(), list.getASTIntrinsicProcedureName(i).getASTTident()));
+            ASTIntrinsicListNode list = node.getIntrinsicList();
+            for (int i = 0; i < list.size(); i++)
+                addToModel(node, new FortranElement.Variable(getCurrentParent(), list.getIntrinsicProcedureName(i).getTIdent()));
         }
         
         public void visitASTStmtFunctionStmtNode(ASTStmtFunctionStmtNode node)
         {
-            addToModel(node, new FortranElement.Variable(getCurrentParent(), node.getASTName().getASTTident()));
+            addToModel(node, new FortranElement.Variable(getCurrentParent(), node.getName().getTIdent()));
         }
     }
 }
