@@ -334,7 +334,7 @@ public class JobManager extends AbstractUIManager {
 	/** terminate all processes in current job
 	 * @throws CoreException
 	 */
-	public void terminateAll() throws CoreException {
+	public void terminateJob() throws CoreException {
 		IPJob job = getJob();
 		if (job != null) {
 			job.getQueue().getResourceManager().terminateJob(job);
