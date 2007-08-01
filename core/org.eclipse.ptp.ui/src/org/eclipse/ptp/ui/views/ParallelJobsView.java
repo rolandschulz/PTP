@@ -57,7 +57,7 @@ import org.eclipse.ptp.core.events.IModelManagerRemoveResourceManagerEvent;
 import org.eclipse.ptp.core.listeners.IModelManagerResourceManagerListener;
 import org.eclipse.ptp.internal.ui.ParallelImages;
 import org.eclipse.ptp.internal.ui.actions.RemoveAllTerminatedAction;
-import org.eclipse.ptp.internal.ui.actions.TerminateAllAction;
+import org.eclipse.ptp.internal.ui.actions.TerminateJobAction;
 import org.eclipse.ptp.ui.IManager;
 import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.PTPUIPlugin;
@@ -293,7 +293,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements IModelM
 	 * @see org.eclipse.ptp.ui.views.AbstractParallelSetView#createToolBarActions(org.eclipse.jface.action.IToolBarManager)
 	 */
 	protected void createToolBarActions(IToolBarManager toolBarMgr) {
-		terminateAllAction = new TerminateAllAction(this);
+		terminateAllAction = new TerminateJobAction(this);
 		toolBarMgr.appendToGroup(IPTPUIConstants.IUIACTIONGROUP, terminateAllAction);
 		super.buildInToolBarActions(toolBarMgr);
 	}

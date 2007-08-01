@@ -32,16 +32,16 @@ import org.eclipse.ptp.ui.views.AbstractParallelElementView;
  * @author Clement chu
  *
  */
-public class TerminateAllAction extends ParallelAction {
-	public static final String name = "Terminate All";
+public class TerminateJobAction extends ParallelAction {
+	public static final String name = "Terminate Job";
 	
 	/** Constructor
 	 * @param view
 	 */
-	public TerminateAllAction(AbstractParallelElementView view) {
+	public TerminateJobAction(AbstractParallelElementView view) {
 		super(name, view);
-	    setImageDescriptor(ParallelImages.ID_ICON_TERMINATE_ALL_NORMAL);
-	    setDisabledImageDescriptor(ParallelImages.ID_ICON_TERMINATE_ALL_DISABLE);
+	    setImageDescriptor(ParallelImages.ID_ICON_TERMINATE_JOB_NORMAL);
+	    setDisabledImageDescriptor(ParallelImages.ID_ICON_TERMINATE_JOB_DISABLE);
 	}
 	
 	/* (non-Javadoc)

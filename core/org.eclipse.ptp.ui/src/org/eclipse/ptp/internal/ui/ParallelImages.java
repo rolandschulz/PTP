@@ -51,8 +51,8 @@ public class ParallelImages {
 	public static final String ICON_ZOOMOUT_NORMAL = "zoomout_normal.gif";
 	
 	// TOOLBAR
-	public static final String ICON_TERMINATE_ALL_DISABLE = "terminate_all_disable.gif";
-	public static final String ICON_TERMINATE_ALL_NORMAL = "terminate_all_normal.gif";
+	public static final String ICON_TERMINATE_JOB_DISABLE = "terminate_job_disable.gif";
+	public static final String ICON_TERMINATE_JOB_NORMAL = "terminate_job_normal.gif";
 	public static final String ICON_REMOVEALLTERMINATED_NORMAL = "remove_all_terminated_normal.gif";
 	
 	// SHOW LEGEND
@@ -141,8 +141,8 @@ public class ParallelImages {
 	public static final ImageDescriptor ID_ICON_ZOOMOUT_NORMAL = createImageDescriptor(TOOLICONURL, ICON_ZOOMOUT_NORMAL, ICON_ZOOMOUT_NORMAL);
 
 	// TOOLBAR
-	public static final ImageDescriptor ID_ICON_TERMINATE_ALL_DISABLE = createImageDescriptor(TOOLICONURL, ICON_TERMINATE_ALL_DISABLE, ICON_TERMINATE_ALL_DISABLE);
-	public static final ImageDescriptor ID_ICON_TERMINATE_ALL_NORMAL = createImageDescriptor(TOOLICONURL, ICON_TERMINATE_ALL_NORMAL, ICON_TERMINATE_ALL_NORMAL);
+	public static final ImageDescriptor ID_ICON_TERMINATE_JOB_DISABLE = createImageDescriptor(TOOLICONURL, ICON_TERMINATE_JOB_DISABLE, ICON_TERMINATE_JOB_DISABLE);
+	public static final ImageDescriptor ID_ICON_TERMINATE_JOB_NORMAL = createImageDescriptor(TOOLICONURL, ICON_TERMINATE_JOB_NORMAL, ICON_TERMINATE_JOB_NORMAL);
 	public static final ImageDescriptor ID_ICON_REMOVEALLTERMINATED_NORMAL = createImageDescriptor(TOOLICONURL, ICON_REMOVEALLTERMINATED_NORMAL, ICON_REMOVEALLTERMINATED_NORMAL);
 
 	// SHOW LEGEND
