@@ -236,7 +236,7 @@ check_arg_space(proxy_msg *m, int n)
 	while (m->arg_size < m->num_args + n) {
 		m->arg_size += ARG_SIZE;
 	}
-	
+
 	if (size == 0) {
 		m->args = (char **)malloc(sizeof(char *) * m->arg_size);
 		m->free_args = (int *)malloc(sizeof(int *) * m->arg_size);
@@ -280,7 +280,7 @@ proxy_msg_add_int(proxy_msg *m, int val)
 {
 	check_arg_space(m, 1);
 	asprintf(&m->args[m->num_args], "%d", val);
-	m->free_args[m->num_args] = 0;
+	m->free_args[m->num_args] = 1;
 	m->num_args++;
 }
 
@@ -408,6 +408,7 @@ new_proxy_msg(int msg_id, int trans_id)
 	m->arg_size = 0;
 	m->num_args = 0;
 	m->args = NULL;
+	m->free_args = NULL;
 	
 	return m;
 }
@@ -418,12 +419,13 @@ free_proxy_msg(proxy_msg *m)
 	int i;
 	
 	for (i = 0; i < m->num_args; i++) {
-		if (m->free_args) {
+		if (m->free_args[i]) {
 			free(m->args[i]);
 		}
 	}
 		
 	free(m->args);
+	free(m->free_args);
 	free(m);
 }
 
