@@ -180,7 +180,7 @@ proxy_deserialize_msg(char *packet, int packet_len, proxy_msg **msg)
 			free_proxy_msg(m);
 			return -1;
 		}
-		proxy_msg_add_string(m, arg);
+		proxy_msg_add_string_nocopy(m, arg);
 		packet++; /* skip space */
 	}
 	

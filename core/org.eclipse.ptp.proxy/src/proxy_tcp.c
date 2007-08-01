@@ -50,6 +50,7 @@ proxy_tcp_create_conn(proxy_tcp_conn **conn)
 	c = (proxy_tcp_conn *) malloc(sizeof(proxy_tcp_conn));
 		
 	c->sess_sock = INVALID_SOCKET;
+	c->svr_sock = INVALID_SOCKET;
 	c->host = NULL;
 	c->port = 0;
 	c->connected = 0;

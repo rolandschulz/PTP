@@ -35,6 +35,7 @@ NewList(void)
 	l->l_head = (ListElement *)NULL;
 	l->l_tail = &l->l_head;
 	l->l_nel = 0;
+	l->l_scan = NULL;
 
 	return l;
 }
