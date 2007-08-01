@@ -20,9 +20,11 @@ package org.eclipse.ptp.ui.actions;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
+import org.eclipse.ptp.ui.UIMessage;
 import org.eclipse.swt.widgets.Shell;
 
 public class RemoveResourceManagersAction extends Action {
@@ -37,7 +39,22 @@ public class RemoveResourceManagersAction extends Action {
 	}
 
 	public void run() {
-		PTPCorePlugin.getDefault().getModelManager().removeResourceManagers(selectedRMManagers);
+		String rmNames = "";
+		for (int i = 0; i < selectedRMManagers.length; i++) {
+			if (i > 0) {
+				rmNames += ",";
+			}
+			rmNames += "\n\t" + selectedRMManagers[i].getName();
+		}
+		
+		boolean remove = MessageDialog.openConfirm(shell,
+				UIMessage.getResourceString("RemoveResourceManagersAction.Title"), //$NON-NLS-1$
+				UIMessage.getResourceString("RemoveResourceManagersAction.Question") //$NON-NLS-1$
+				+ rmNames);
+		
+		if (remove) {
+			PTPCorePlugin.getDefault().getModelManager().removeResourceManagers(selectedRMManagers);
+		}
 	}
 
 	public void selectionChanged(IAction action, ISelection selection) {
