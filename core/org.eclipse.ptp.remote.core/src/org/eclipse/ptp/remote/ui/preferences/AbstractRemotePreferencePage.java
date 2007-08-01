@@ -25,7 +25,6 @@ import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.remote.ui.Messages;
 import org.eclipse.ptp.ui.utils.SWTUtil;
 import org.eclipse.swt.SWT;
@@ -83,25 +82,41 @@ public abstract class AbstractRemotePreferencePage extends PreferencePage implem
 	public AbstractRemotePreferencePage() {
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.dialogs.DialogPage#dispose()
+	 */
 	public void dispose() 
 	{
 		super.dispose();
 	}
 
+	/**
+	 * Gets the preference settings to use for the RM. Each RM should supply
+	 * different preference settings.
+	 * 
+	 * @return table of prefence settings
+	 */
 	public abstract Preferences getPreferences();
-
-	public abstract void savePreferences();
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
+	 */
 	public void init(IWorkbench workbench) 
 	{
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.preference.PreferencePage#performDefaults()
+	 */
 	public void performDefaults() 
 	{
 		defaultSetting();
 		updateApplyButton();
 	}
-	
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.preference.PreferencePage#performOk()
+	 */
 	public boolean performOk() 
 	{
 		store();
@@ -114,30 +129,38 @@ public abstract class AbstractRemotePreferencePage extends PreferencePage implem
 
 		return true;
 	}
+	
+	/**
+	 * Called to save the current preferences to the store.
+	 */
+	public abstract void savePreferences();
 
+	/**
+	 * 
+	 */
 	private void loadSaved()
 	{
 		Preferences preferences = getPreferences();
 		
 		serverFile = preferences.getString(PreferenceConstants.PROXY_PATH);
-		/* if they don't have the ptp_orte_proxy path set, let's try and give them a default that might help */
-		if(serverFile.equals("")) {
-			serverFile = PTPCorePlugin.getDefault().locateFragmentFile("org.eclipse.ptp", "ptp_orte_proxy");
-        }
-		
-		if (serverFile == null) {
-			serverFile = "";
-		}
-		
 		serverText.setText(serverFile);
 		fManualButton.setSelection(preferences.getBoolean(PreferenceConstants.LAUNCH_MANUALLY));
 	}
 
+	/**
+	 * 
+	 */
 	private void store() 
 	{
 		serverFile = serverText.getText();
 	}
 
+	/**
+	 * @param parent
+	 * @param label
+	 * @param type
+	 * @return
+	 */
 	protected Button createButton(Composite parent, String label, int type) {
 		Button button = new Button(parent, type);
 		button.setText(label);
@@ -146,10 +169,18 @@ public abstract class AbstractRemotePreferencePage extends PreferencePage implem
 		return button;
 	}
 
+	/**
+	 * @param parent
+	 * @param label
+	 * @return
+	 */
 	protected Button createCheckButton(Composite parent, String label) {
 		return createButton(parent, label, SWT.CHECK | SWT.LEFT);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.preference.PreferencePage#createContents(org.eclipse.swt.widgets.Composite)
+	 */
 	protected Control createContents(Composite parent) 
 	{
 		Composite composite = new Composite(parent, SWT.NONE);
@@ -187,6 +218,13 @@ public abstract class AbstractRemotePreferencePage extends PreferencePage implem
 		return composite;
 	}
 	
+	/**
+	 * @param columns
+	 * @param isEqual
+	 * @param mh
+	 * @param mw
+	 * @return
+	 */
 	protected GridLayout createGridLayout(int columns, boolean isEqual, int mh, int mw)  {
 		GridLayout gridLayout = new GridLayout();
 		gridLayout.numColumns = columns;
@@ -196,11 +234,18 @@ public abstract class AbstractRemotePreferencePage extends PreferencePage implem
 		return gridLayout;
 	}
 
+	/**
+	 * 
+	 */
 	protected void defaultSetting() 
 	{
 		serverText.setText(serverFile);
 	}
 
+	/**
+	 * @param text
+	 * @return
+	 */
 	protected String getFieldContent(String text) 
 	{
 		if (text.trim().length() == 0 || text.equals(EMPTY_STRING))
@@ -230,6 +275,9 @@ public abstract class AbstractRemotePreferencePage extends PreferencePage implem
 			serverText.setText(selectedPath);
 	}
 
+	/**
+	 * @return
+	 */
 	protected boolean isValidSetting() 
 	{
 		String name = getFieldContent(serverText.getText());
@@ -252,6 +300,11 @@ public abstract class AbstractRemotePreferencePage extends PreferencePage implem
 		return true;
 	}
 
+	/**
+	 * @param style
+	 * @param space
+	 * @return
+	 */
 	protected GridData spanGridData(int style, int space) 
 	{
 		GridData gd = null;
@@ -263,6 +316,9 @@ public abstract class AbstractRemotePreferencePage extends PreferencePage implem
 		return gd;
 	}
 
+	/**
+	 * 
+	 */
 	protected void updatePreferencePage() 
 	{
 		setErrorMessage(null);

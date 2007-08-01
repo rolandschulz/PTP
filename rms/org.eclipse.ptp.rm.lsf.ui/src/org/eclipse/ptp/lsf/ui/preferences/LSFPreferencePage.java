@@ -19,15 +19,21 @@
 package org.eclipse.ptp.lsf.ui.preferences;
 
 import org.eclipse.core.runtime.Preferences;
-import org.eclipse.ptp.lsf.ui.Activator;
+import org.eclipse.ptp.lsf.ui.LSFPreferenceManager;
 import org.eclipse.ptp.remote.ui.preferences.AbstractRemotePreferencePage;
 
 public class LSFPreferencePage extends AbstractRemotePreferencePage {
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.ui.preferences.AbstractRemotePreferencePage#getPreferences()
+	 */
 	public Preferences getPreferences() {
-		return Activator.getDefault().getPluginPreferences();
+		return LSFPreferenceManager.getPreferences();
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.ui.preferences.AbstractRemotePreferencePage#savePreferences()
+	 */
 	public void savePreferences() {
-		Activator.getDefault().savePluginPreferences();
+		LSFPreferenceManager.savePreferences();
 	}
 }

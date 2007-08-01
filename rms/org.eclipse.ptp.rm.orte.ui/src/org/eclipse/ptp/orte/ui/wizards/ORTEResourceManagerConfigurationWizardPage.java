@@ -18,6 +18,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.orte.ui.wizards;
 
+import org.eclipse.core.runtime.Preferences;
+import org.eclipse.ptp.orte.ui.OMPIPreferenceManager;
 import org.eclipse.ptp.remote.ui.wizards.AbstractRemoteResourceManagerConfigurationWizardPage;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizard;
 
@@ -28,5 +30,13 @@ public final class ORTEResourceManagerConfigurationWizardPage extends
 		super(wizard, "ORTE Proxy Configuration");
 		setTitle("ORTE Proxy Configuration");
 		setDescription("Enter information to connect to an ORTE proxy server");
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.ui.wizards.AbstractRemoteResourceManagerConfigurationWizardPage#getPreferences()
+	 */
+	@Override
+	public Preferences getPreferences() {
+		return OMPIPreferenceManager.getPreferences();
 	}
 }

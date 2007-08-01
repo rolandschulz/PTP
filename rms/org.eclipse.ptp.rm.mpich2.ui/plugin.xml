@@ -8,7 +8,7 @@
             category="org.eclipse.ptp.ui.preferences.rmPreferencesPage"
             class="org.eclipse.ptp.mpich2.ui.preferences.MPICH2PreferencePage"
             id="org.eclipse.ptp.mpich2.ui.preferences.MPICH2PreferencePage"
-            name="MPICH 2">
+            name="MPICH2">
       </page>
    </extension>
    <extension

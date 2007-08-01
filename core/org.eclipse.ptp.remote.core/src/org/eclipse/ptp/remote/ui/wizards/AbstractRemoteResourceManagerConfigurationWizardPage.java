@@ -24,7 +24,6 @@ import org.eclipse.core.runtime.Preferences;
 import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.remote.AbstractRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.remote.IRemoteConnection;
 import org.eclipse.ptp.remote.IRemoteConnectionManager;
@@ -48,7 +47,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-public class AbstractRemoteResourceManagerConfigurationWizardPage extends
+public abstract class AbstractRemoteResourceManagerConfigurationWizardPage extends
 		RMConfigurationWizardPage {
 	
 	protected class WidgetListener extends SelectionAdapter implements ModifyListener, IPropertyChangeListener 
@@ -77,7 +76,7 @@ public class AbstractRemoteResourceManagerConfigurationWizardPage extends
 
 	public static final String EMPTY_STRING = "";
 	private AbstractRemoteResourceManagerConfiguration config;
-	private String proxyPath = EMPTY_STRING;
+	private String proxyFile = EMPTY_STRING;
 	private String connectionName = EMPTY_STRING;
 	private String remoteServicesId = EMPTY_STRING;
 	private boolean manualLaunch = false;
@@ -122,17 +121,33 @@ public class AbstractRemoteResourceManagerConfigurationWizardPage extends
 		setControl(composite);
 	}
 
+	/**
+	 * Get the preferences for this RM
+	 * 
+	 * @return RM preferences
+	 */
+	public abstract Preferences getPreferences();
+
+	/**
+	 * @return
+	 */
 	public boolean performOk() 
 	{
 		store();
 		config.setRemoteServicesId(remoteServicesId);
 		config.setConnectionName(connectionName);
-		config.setProxyServerPath(proxyPath);
+		config.setProxyServerPath(proxyFile);
 		config.setManualLaunch(manualLaunch);
 		config.setDefaultNameAndDesc();
 		return true;
 	}
-
+	
+	/**
+	 * @param parent
+	 * @param label
+	 * @param type
+	 * @return
+	 */
 	private Button createButton(Composite parent, String label, int type) {
 		Button button = new Button(parent, type);
 		button.setText(label);
@@ -141,10 +156,19 @@ public class AbstractRemoteResourceManagerConfigurationWizardPage extends
 		return button;
 	}
 	
+	/**
+	 * @param parent
+	 * @param label
+	 * @return
+	 */
 	private Button createCheckButton(Composite parent, String label) {
 		return createButton(parent, label, SWT.CHECK | SWT.LEFT);
 	}
 	
+	/**
+	 * @param parent
+	 * @param colSpan
+	 */
 	private void createContents(Composite parent, int colSpan) {
 		Composite projComp = new Composite(parent, SWT.NONE);
 		GridLayout projLayout = new GridLayout();
@@ -234,43 +258,49 @@ public class AbstractRemoteResourceManagerConfigurationWizardPage extends
 		manualButton = createCheckButton(parent, "Launch ORTE server manually");
 		manualButton.addSelectionListener(listener);
 	}
-	
+
+	/**
+	 * 
+	 */
 	private void loadSaved()
 	{
-		Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
+		Preferences preferences = getPreferences();
 		
-		proxyPath = preferences.getString(PreferenceConstants.PROXY_PATH);
-		/* if they don't have the ptp_orte_proxy path set, let's try and give them a default that might help */
-		if(proxyPath.equals("")) {
-			proxyPath = PTPCorePlugin.getDefault().locateFragmentFile("org.eclipse.ptp", "ptp_orte_proxy");
-	    }
-		
-		if (proxyPath == null || proxyPath.equals("")) {
-			proxyPath = "";
-			setValid(false);
-			return;
-		}
-		serverText.setText(proxyPath);
+		proxyFile = preferences.getString(PreferenceConstants.PROXY_PATH);
+		serverText.setText(proxyFile);
 		manualButton.setSelection(preferences.getBoolean(PreferenceConstants.LAUNCH_MANUALLY));
 	}
 
+	/**
+	 * @param b
+	 */
 	private void setValid(boolean b) {
 		isValid = b;
 		setPageComplete(isValid);
 	}
-
+	
+	/**
+	 * 
+	 */
 	private void store() 
 	{
 		if (serverText != null) {
-			proxyPath = serverText.getText();
+			proxyFile = serverText.getText();
 		}
 	}
-	
+
+	/**
+	 * 
+	 */
 	protected void defaultSetting() 
 	{
-		serverText.setText(proxyPath);
+		serverText.setText(proxyFile);
 	}
 
+	/**
+	 * @param text
+	 * @return
+	 */
 	protected String getFieldContent(String text) 
 	{
 		if (text.trim().length() == 0 || text.equals(EMPTY_STRING))
@@ -279,6 +309,9 @@ public class AbstractRemoteResourceManagerConfigurationWizardPage extends
 		return text;
 	}
 
+	/**
+	 * 
+	 */
 	protected void handleNewRemoteConnectionSelected() 
 	{
 		IRemoteServices remoteServices = PTPRemotePlugin.getDefault().getRemoteServices(remoteServicesId);
@@ -302,6 +335,9 @@ public class AbstractRemoteResourceManagerConfigurationWizardPage extends
 		}
 	}
 
+	/**
+	 * @return
+	 */
 	protected boolean isValidSetting() 
 	{
 		if (serverText != null) {
@@ -323,7 +359,10 @@ public class AbstractRemoteResourceManagerConfigurationWizardPage extends
 	
 		return true;
 	}
-
+	
+	/**
+	 * 
+	 */
 	protected void updateConnection() {
 		int currentSelection = connectionCombo.getSelectionIndex();
 		if (currentSelection >= 0) {
@@ -331,6 +370,9 @@ public class AbstractRemoteResourceManagerConfigurationWizardPage extends
 		}
 	}
 	
+	/**
+	 * 
+	 */
 	protected void updateConnectionPulldown() {
 		IRemoteServices[] allRemoteServices = PTPRemotePlugin.getDefault().getAllRemoteServices();
 		if (allRemoteServices != null && allRemoteServices.length > 0) {
@@ -348,7 +390,10 @@ public class AbstractRemoteResourceManagerConfigurationWizardPage extends
 			newRemoteConnectionButton.setEnabled(connMgr.supportsNewConnections());
 		}
 	}
-	
+
+	/**
+	 * 
+	 */
 	protected void updatePage() 
 	{
 		setValid(false);
@@ -363,6 +408,9 @@ public class AbstractRemoteResourceManagerConfigurationWizardPage extends
 		setValid(true);
 	}
 
+	/**
+	 * 
+	 */
 	protected void updateRemotePulldown() {
 		IRemoteServices[] remoteServices = PTPRemotePlugin.getDefault().getAllRemoteServices();
 		IRemoteServices defServices = PTPRemotePlugin.getDefault().getDefaultServices();
@@ -378,5 +426,4 @@ public class AbstractRemoteResourceManagerConfigurationWizardPage extends
 			remoteCombo.select(defIndex);
 		}
 	}
-
 }
