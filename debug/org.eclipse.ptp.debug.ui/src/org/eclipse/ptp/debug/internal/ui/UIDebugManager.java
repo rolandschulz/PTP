@@ -677,7 +677,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 					}
 				} else {
 					try {
-						terminateAll();
+						terminateJob();
 					} catch (CoreException e) {
 						return e.getStatus();
 					}
