@@ -384,15 +384,15 @@ proxy_tcp_svr_dispatch(proxy_svr *svr, char *msg, int len)
 	DEBUG_PRINT("SVR received <%s>\n", msg);
 	
 	if (proxy_deserialize_msg(msg, len, &m) < 0) {
-		m = new_proxy_msg(0, PROXY_EV_MESSAGE);
-		proxy_msg_add_int(m, 3); /* 3 attributes */
-		proxy_msg_add_keyval_string(m, MSG_LEVEL_ATTR, MSG_LEVEL_FATAL);
-		proxy_msg_add_keyval_int(m, MSG_CODE_ATTR, PROXY_ERR_PROTO);
-		proxy_msg_add_int(m, ERROR_MALFORMED_COMMAND);
+		proxy_msg *err = new_proxy_msg(0, PROXY_EV_MESSAGE);
+		proxy_msg_add_int(err, 3); /* 3 attributes */
+		proxy_msg_add_keyval_string(err, MSG_LEVEL_ATTR, MSG_LEVEL_FATAL);
+		proxy_msg_add_keyval_int(err, MSG_CODE_ATTR, PROXY_ERR_PROTO);
+		proxy_msg_add_int(err, ERROR_MALFORMED_COMMAND);
 		asprintf(&err_str, "malformed command, len is %d", len);
-		proxy_msg_add_keyval_string(m, MSG_TEXT_ATTR, err_str);
+		proxy_msg_add_keyval_string(err, MSG_TEXT_ATTR, err_str);
 		free(err_str);
-		proxy_queue_msg(svr->svr_events, m);
+		proxy_queue_msg(svr->svr_events, err);
 		return 0;
 	}
     
@@ -404,16 +404,18 @@ proxy_tcp_svr_dispatch(proxy_svr *svr, char *msg, int len)
 			(void)cmd(m->trans_id, m->num_args, m->args);
 		}
 	} else {
-		m = new_proxy_msg(0, PROXY_EV_MESSAGE);
-		proxy_msg_add_int(m, 3); /* 3 attributes */
-		proxy_msg_add_keyval_string(m, MSG_LEVEL_ATTR, MSG_LEVEL_FATAL);
-		proxy_msg_add_keyval_int(m, MSG_CODE_ATTR, PROXY_ERR_PROTO);
-		proxy_msg_add_int(m, ERROR_MALFORMED_COMMAND);
+		proxy_msg *err = new_proxy_msg(0, PROXY_EV_MESSAGE);
+		proxy_msg_add_int(err, 3); /* 3 attributes */
+		proxy_msg_add_keyval_string(err, MSG_LEVEL_ATTR, MSG_LEVEL_FATAL);
+		proxy_msg_add_keyval_int(err, MSG_CODE_ATTR, PROXY_ERR_PROTO);
+		proxy_msg_add_int(err, ERROR_MALFORMED_COMMAND);
 		asprintf(&err_str, "malformed command, len is %d", len);
-		proxy_msg_add_keyval_string(m, MSG_TEXT_ATTR, err_str);
+		proxy_msg_add_keyval_string(err, MSG_TEXT_ATTR, err_str);
 		free(err_str);
-		proxy_queue_msg(svr->svr_events, m);
+		proxy_queue_msg(svr->svr_events, err);
 	}
+	
+	free_proxy_msg(m);
 	
 	return 0;
 }
