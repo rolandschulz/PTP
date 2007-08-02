@@ -35,8 +35,7 @@
 extern int digittoint(int c);
 #endif /* __linux__ */
 
-// FIXME this is to get around bug in check_arg_space()!
-#define ARG_SIZE	1000
+#define ARG_SIZE	100
 
 static char tohex[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 
@@ -171,7 +170,6 @@ proxy_deserialize_msg(char *packet, int packet_len, proxy_msg **msg)
 	num_args = strtol(packet, NULL, 16);
 
 	m = new_proxy_msg(msg_id, trans_id);
-	m->args = (char **)malloc(sizeof(char *) * num_args+1);
 	
 	packet = end;
 	
@@ -184,11 +182,6 @@ proxy_deserialize_msg(char *packet, int packet_len, proxy_msg **msg)
 		packet++; /* skip space */
 	}
 	
-	/*
-	 * NULL terminate the args
-	 */
-	m->args[num_args] = NULL;
-		
 	*msg = m;
 	
 	return 0;
@@ -229,21 +222,50 @@ proxy_msg_decode_string(char *str, char **arg, char **end)
 }
 
 static void
-check_arg_space(proxy_msg *m, int n)
+add_arg(proxy_msg *m, char *arg, int free_arg)
 {
-	int size = m->arg_size;
+	int		i;
+	int 	size = m->arg_size;
+	char **	tmp_args;
+	int *	tmp_free;
 
-	while (m->arg_size < m->num_args + n) {
+	if (m->arg_size < m->num_args + 1) {
 		m->arg_size += ARG_SIZE;
 	}
 
 	if (size == 0) {
+		m->arg_size++; // extra space to null terminate arguments
 		m->args = (char **)malloc(sizeof(char *) * m->arg_size);
 		m->free_args = (int *)malloc(sizeof(int *) * m->arg_size);
 	} else if (size < m->arg_size) {
-		m->args = (char **)realloc(m->args, m->arg_size);
-		m->free_args = (int *)realloc(m->free_args, m->arg_size);
+		/*
+		 * Create new allocation for args and copy old arguments across.
+		 * This is used instead of realloc() due to buggy realloc()
+		 * implementations.
+		 */
+		tmp_args = (char **)malloc(sizeof(char *) * m->arg_size);
+		tmp_free = (int *)malloc(sizeof(int *) * m->arg_size);
+		
+		for (i = 0; i < m->num_args; i++) {
+			tmp_args[i] = m->args[i];
+			tmp_free[i] = m->free_args[i];
+		}
+		
+		free(m->args);
+		free(m->free_args);
+		
+		m->args = tmp_args;
+		m->free_args = tmp_free;
 	}
+	
+	m->args[m->num_args] = arg;
+	m->free_args[m->num_args] = free_arg;
+	m->num_args++;
+	
+	/*
+	 * Make sure that args are always null terminated
+	 */
+	m->args[m->num_args] = NULL;
 }
 
 void
@@ -278,36 +300,28 @@ proxy_msg_add_data(proxy_msg *m, char *data, int len)
 void
 proxy_msg_add_int(proxy_msg *m, int val)
 {
-	check_arg_space(m, 1);
-	asprintf(&m->args[m->num_args], "%d", val);
-	m->free_args[m->num_args] = 1;
-	m->num_args++;
+	char *	str_val;
+	
+	asprintf(&str_val, "%d", val);
+	add_arg(m, str_val, 1);
 }
 
 void
 proxy_msg_add_string(proxy_msg *m, char *val)
 {
-	check_arg_space(m, 1);
 	if (val == NULL) {
-		m->args[m->num_args] = strdup("");
-	} else {
-		m->args[m->num_args] = strdup(val);		
+		val = "";
 	}
-	m->free_args[m->num_args] = 1;
-	m->num_args++;
+	add_arg(m, strdup(val), 1);
 }
 
 void
 proxy_msg_add_string_nocopy(proxy_msg *m, char *val)
 {
-	check_arg_space(m, 1);
 	if (val == NULL) {
-		m->args[m->num_args] = "";
-	} else {
-		m->args[m->num_args] = val;
+		val = "";
 	}
-	m->free_args[m->num_args] = 0;
-	m->num_args++;
+	add_arg(m, val, 0);
 }
 
 void
@@ -318,14 +332,9 @@ proxy_msg_add_args(proxy_msg *m, int nargs, char **args)
 	if (nargs == 0)
 		return;
 	
-	check_arg_space(m, nargs);
-	
 	for (i = 0; i < nargs; i++) {
-		m->args[m->num_args + i] = strdup(args[i]);
-		m->free_args[m->num_args + i] = 1;
+		add_arg(m, strdup(args[i]), 1);
 	}
-	
-	m->num_args += nargs;
 }
 
 void
@@ -336,66 +345,71 @@ proxy_msg_add_args_nocopy(proxy_msg *m, int nargs, char **args)
 	if (nargs == 0)
 		return;
 	
-	check_arg_space(m, nargs);
-	
 	for (i = 0; i < nargs; i++) {
-		m->args[m->num_args + i] = args[i];
-		m->free_args[m->num_args + i] = 0;
+		add_arg(m, args[i], 0);
 	}
-	
-	m->num_args += nargs;
 }
 
 void
 proxy_msg_add_keyval_int(proxy_msg *m, char *key, int val)
 {
-	check_arg_space(m, 1);
-	asprintf(&m->args[m->num_args], "%s=%d", key, val);
-	m->free_args[m->num_args] = 1;
-	m->num_args++;
+	char *	kv;
+	
+	asprintf(&kv, "%s=%d", key, val);
+	add_arg(m, kv, 1);
 }
 
 void
 proxy_msg_add_keyval_string(proxy_msg *m, char *key, char *val)
 {
-	check_arg_space(m, 1);
-	asprintf(&m->args[m->num_args], "%s=%s", key, val);
-	m->free_args[m->num_args] = 1;
-	m->num_args++;
+	char *	kv;
+	
+	asprintf(&kv, "%s=%s", key, val);
+	add_arg(m, kv, 1);
 }
 
 void
 proxy_msg_add_bitset(proxy_msg *m, bitset *b)
 {
-	check_arg_space(m, 1);
-	m->args[m->num_args] = bitset_to_str(b);
-	m->free_args[m->num_args] = 1;
-	m->num_args++;
+	add_arg(m, bitset_to_str(b), 1);
 }
 
 void
 proxy_msg_insert_bitset(proxy_msg *m, bitset *b, int idx)
 {
-	int i;
+	int 	i;
+	int		tmp_free;
+	char *	tmp_arg;
 
 	if (idx < 0)
-		return;
-		
+		idx = 0;
+
+	/*
+	 * First add bitset to end
+	 */
+	proxy_msg_add_bitset(m, b);
+
+	/*
+	 * Just return if the insert location is at or past end
+	 */
 	if (idx >= m->num_args) {
-		proxy_msg_add_bitset(m, b);
 		return;
 	}
 	
-	check_arg_space(m, 1);
+	/*
+	 * Otherwise rotate last argument into required position
+	 */
 	
-	for (i = m->num_args; i > idx; i--) {
+	tmp_arg = m->args[m->num_args-1];
+	tmp_free = m->free_args[m->num_args-1];
+	
+	for (i = m->num_args-2; i > idx; i--) {
 		m->args[i] = m->args[i-1];
 		m->free_args[i] = m->free_args[i-1];
 	}
 	
-	m->args[idx] = bitset_to_str(b);
-	m->free_args[m->num_args] = 1;
-	m->num_args++;
+	m->args[idx] = tmp_arg;
+	m->free_args[idx] = tmp_free;
 }
 
 proxy_msg *	
