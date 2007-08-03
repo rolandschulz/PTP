@@ -18,6 +18,7 @@ import org.eclipse.cdt.core.dom.ast.IASTIdExpression;
 import org.eclipse.cdt.core.dom.ast.IASTLiteralExpression;
 import org.eclipse.cdt.core.dom.ast.IASTName;
 import org.eclipse.cdt.core.dom.ast.IBinding;
+import org.eclipse.ptp.pldt.common.CommonPlugin;
 import org.eclipse.ptp.pldt.common.ScanReturn;
 import org.eclipse.ptp.pldt.common.analysis.PldtAstVisitor;
 
@@ -33,7 +34,7 @@ import org.eclipse.ptp.pldt.common.analysis.PldtAstVisitor;
 public class MpiCASTVisitor extends PldtAstVisitor {
 	private static final String PREFIX = "MPI_";
 
-	private static final boolean traceOn = false;
+	private static /*final*/ boolean traceOn = false;
 
 	{
 		this.shouldVisitExpressions = true;
@@ -46,6 +47,9 @@ public class MpiCASTVisitor extends PldtAstVisitor {
 		super(mpiIncludes, fileName, msr);
 		ARTIFACT_CALL = "MPI Call";
 		ARTIFACT_CONSTANT = "MPI Constant";
+		
+		traceOn=CommonPlugin.getTraceOn();
+		if(traceOn)System.out.println("MpiCASTVisitor.ctor: traceOn="+traceOn);
 
 	}
 
