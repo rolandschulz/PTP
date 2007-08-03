@@ -32,6 +32,7 @@ import org.eclipse.cdt.core.dom.ast.c.CASTVisitor;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ptp.pldt.common.Artifact;
+import org.eclipse.ptp.pldt.common.CommonPlugin;
 import org.eclipse.ptp.pldt.common.ScanReturn;
 import org.eclipse.ptp.pldt.common.util.SourceInfo;
 
@@ -51,7 +52,7 @@ public class PldtAstVisitor extends CASTVisitor {
 	protected static String ARTIFACT_CALL = "Artifact Call";
 	protected static String ARTIFACT_CONSTANT = "Artifact Constant";
 	protected static String PREFIX = "";
-	private static final boolean traceOn=false;
+	private static /*final*/ boolean traceOn=false;
 
 	/**
 	 * List of include paths that we'll probably want to consider in the work that this visitor does.
@@ -78,6 +79,8 @@ public class PldtAstVisitor extends CASTVisitor {
 		this.includes_ = includes;
 		this.fileName = fileName;
 		this.scanReturn = scanReturn;
+		traceOn=CommonPlugin.getTraceOn();
+		if(traceOn)System.out.println("PldtAstVisitor, traceOn="+traceOn);
 	}
 
 	/**
@@ -205,6 +208,7 @@ public class PldtAstVisitor extends CASTVisitor {
 			if(traceOn)System.out.println("PldtAstVisitor found path " + path);
 
 			if (isInIncludePath(path))
+				if(traceOn)System.out.println("   path match! "+name+" is an artifact.");
 				return true;
 		}
 		return false;
