@@ -62,7 +62,7 @@ import org.eclipse.ui.actions.WorkspaceModifyOperation;
  */
 public abstract class RunAnalyseBase implements IObjectActionDelegate,
 		IWorkbenchWindowActionDelegate {
-	private static final boolean traceOn = false;
+	private static /*final*/ boolean traceOn = false;
 
 	/**
 	 * indent amount for each level of nesting; useful when printing debug
@@ -104,6 +104,9 @@ public abstract class RunAnalyseBase implements IObjectActionDelegate,
 		this.name = name;
 		this.visitor = visitor;
 		this.markerID = markerID;
+		
+		traceOn=CommonPlugin.getTraceOn();
+		if(traceOn)System.out.println("RunAnalyseBase.ctor: traceOn="+traceOn);
 	}
 
 	/**
@@ -562,8 +565,12 @@ public abstract class RunAnalyseBase implements IObjectActionDelegate,
 			if (traceOn)
 				System.out.println("RunAnalyzeBase: ScanReturn received for "
 						+ tu.getElementName());
-			if (traceOn)
-				System.out.println("   Analysis err? = " + nr.wasError());
+//			if (traceOn)
+//				if(nr!=null){
+//					System.out.println("   Analysis err? = " + nr.wasError());
+//					scanReturn.wasError()
+//				}
+//				else System.out.println("   Analysis err? ScanReturn is Null.");
 		}
 
 		if (scanReturn != null) {

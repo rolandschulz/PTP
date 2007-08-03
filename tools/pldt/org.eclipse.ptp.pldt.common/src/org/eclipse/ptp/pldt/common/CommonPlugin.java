@@ -15,10 +15,13 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
 
@@ -33,6 +36,22 @@ public class CommonPlugin extends AbstractUIPlugin {
 	private static CommonPlugin plugin;
     // Resource bundle.
     private ResourceBundle       resourceBundle;
+    
+    private static boolean eclipseTraceOn=false;
+    private static boolean haveReadTraceStatus=false;
+    
+    public static boolean getTraceOn(){
+    	if(!haveReadTraceStatus){
+    		String traceFilter=Platform.getDebugOption("org.eclipse.ptp.pldt.common/debug/pldtTrace");
+    		if(traceFilter!=null){
+    			System.out.println("CommonPlugin.getTraceOn(): pldtTrace trace filtering is on; traceFilter= "+traceFilter);
+    			eclipseTraceOn=true;
+    		}
+    		haveReadTraceStatus=true;
+    	}
+    	return eclipseTraceOn;
+	}
+
 
 	
 	/**
@@ -49,6 +68,19 @@ public class CommonPlugin extends AbstractUIPlugin {
 		super.start(context);
 		// there's probably a better place to put this, but...
 		getPreferenceStore().setDefault(IDs.SHOW_ANALYSIS_CONFIRMATION, true);
+		
+		Bundle cdtBundle=Platform.getBundle("org.eclipse.cdt");
+		String version = (String) cdtBundle.getHeaders().get(org.osgi.framework.Constants.BUNDLE_VERSION);
+		System.out.println("CDT version: "+version);
+		if(!version.startsWith("4")){
+			System.out.println("**Warning, wrong version of CDT.  Version 4.0 or higher is required with PLDT 2.0");
+			String msg="This is PLDT 2.0 which requires CDT Version 4.0 or higher.";
+				msg+="\nThis eclipse installation contains CDT version "+version;
+			MessageDialog.openError(null, "Version mismatch", msg);
+		}
+		
+		
+		
 	}
 
 	/**
