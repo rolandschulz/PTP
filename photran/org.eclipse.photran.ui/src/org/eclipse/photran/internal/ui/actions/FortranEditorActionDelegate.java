@@ -49,8 +49,8 @@ public abstract class FortranEditorActionDelegate
     // Fields
     ///////////////////////////////////////////////////////////////////////////
     
-    private IWorkbenchWindow window = null;
-    private AbstractFortranEditor fEditor = null;
+    protected IWorkbenchWindow window = null;
+    protected AbstractFortranEditor fEditor = null;
     
     ///////////////////////////////////////////////////////////////////////////
     // Constructors
@@ -64,7 +64,7 @@ public abstract class FortranEditorActionDelegate
     // IActionDelegate Implementation
     ///////////////////////////////////////////////////////////////////////////
 
-    public final void run(IAction action)
+    public void run(IAction action)
     {
         if (this.window != null)
         {
