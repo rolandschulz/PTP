@@ -118,4 +118,6 @@ public interface IPTPLaunchConfigurationConstants {
 	public static final int ERR_PROGRAM_NOT_BINARY = 107;
 
 	public static final String ATTR_DEBUGGER_MEMORY_BLOCKS = PTP_LAUNCH_ID + ".MEMORY_BLOCKS";
+	
+	public static final String ATTR_DEBUGGER_REGISTER_GROUPS = PTP_LAUNCH_ID + ".DEBUGGER_REGISTER_GROUPS";
 }
