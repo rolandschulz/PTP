@@ -13,6 +13,7 @@ import org.eclipse.ptp.core.util.RangeSet;
 import org.eclipse.ptp.lsf.core.rmsystem.LSFResourceManagerConfiguration;
 import org.eclipse.ptp.lsf.core.rmsystem.LSFResourceManagerFactory;
 import org.eclipse.ptp.lsf.core.rtsystem.LSFProxyRuntimeClient;
+import org.eclipse.ptp.remote.IRemoteProxyOptions;
 import org.eclipse.ptp.rtsystem.JobRunConfiguration;
 import org.eclipse.ptp.rtsystem.proxy.IProxyRuntimeEventListener;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeAttributeDefEvent;
@@ -62,12 +63,12 @@ public class LSFRemoteProxyTest implements IProxyRuntimeEventListener {
 		this.shutdown = false;
 		
 		boolean error = false;
-		boolean launchManually = false;
+		int options = IRemoteProxyOptions.PORT_FORWARDING;
 		String proxy = "lsf/ptp_lsf_proxy";
 
 		LSFResourceManagerFactory rmf = new LSFResourceManagerFactory();
 		LSFResourceManagerConfiguration rmc = new LSFResourceManagerConfiguration(rmf);
-		rmc.setManualLaunch(launchManually);
+		rmc.setOptions(options);
 		rmc.setProxyServerPath(proxy);
 		LSFProxyRuntimeClient client = new LSFProxyRuntimeClient(rmc, rmId);
 		client.addProxyRuntimeEventListener(this);
@@ -111,7 +112,7 @@ public class LSFRemoteProxyTest implements IProxyRuntimeEventListener {
 		this.shutdown = false;
 
 		boolean error = false;
-		boolean launchManually = false;
+		int options = IRemoteProxyOptions.PORT_FORWARDING;
 		String proxy = "lsf/ptp_lsf_proxy";
 		int jobID = 3;
 		int nProcs = 4;
@@ -135,7 +136,7 @@ public class LSFRemoteProxyTest implements IProxyRuntimeEventListener {
 
 		LSFResourceManagerFactory rmf = new LSFResourceManagerFactory();
 		LSFResourceManagerConfiguration rmc = new LSFResourceManagerConfiguration(rmf);
-		rmc.setManualLaunch(launchManually);
+		rmc.setOptions(options);
 		rmc.setProxyServerPath(proxy);
 		LSFProxyRuntimeClient client = new LSFProxyRuntimeClient(rmc, rmId);
 		client.addProxyRuntimeEventListener(this);
