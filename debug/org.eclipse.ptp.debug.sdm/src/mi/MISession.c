@@ -114,6 +114,7 @@ void
 MISessionSetDebug(int debug)
 {
 	MISessionDebug = debug;
+//	MISessionDebug = 1;
 }
 
 int
@@ -285,22 +286,26 @@ WriteCommand(int fd, char *cmd)
  * The buffer is static, so we just reuse it for each
  * call and increase the size if necessary.
  */
+#define MI_BUFSIZ 1024 //BUFSIZ
 static char *
 ReadResponse(int fd)
 {
 	int				n;
 	int				len = 0;
 	char *			p;
-	static int		res_buf_len = BUFSIZ;
+	static int		res_buf_len = MI_BUFSIZ;
 	static char *	res_buf = NULL;
 	
+	//if (res_buf != NULL) {
+		//free(res_buf);
+	//}
+	
 	if (res_buf == NULL)
-		res_buf = (char *)malloc(BUFSIZ);
-	
+		res_buf = (char *)malloc(MI_BUFSIZ);
+
 	p = res_buf;
-	
 	for (;;) {
-		n = read(fd, p, BUFSIZ);
+		n = read(fd, p, MI_BUFSIZ);
 		if (n <= 0) {
 			if (n < 0) {
 				if (errno == EAGAIN)
@@ -312,13 +317,13 @@ ReadResponse(int fd)
 			return NULL;
 		}
 
-		if (n < BUFSIZ)
+		if (n < MI_BUFSIZ)
 			break;
 			
-		len += BUFSIZ;
+		len += MI_BUFSIZ;
 
 		if (len == res_buf_len) {
-			res_buf_len += BUFSIZ;
+			res_buf_len += MI_BUFSIZ;
 			res_buf = (char *)realloc(res_buf, res_buf_len);
 		}
 		
