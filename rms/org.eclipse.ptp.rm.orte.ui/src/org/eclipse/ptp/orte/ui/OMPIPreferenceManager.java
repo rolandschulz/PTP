@@ -21,19 +21,16 @@ package org.eclipse.ptp.orte.ui;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.remote.IRemoteProxyOptions;
 import org.eclipse.ptp.remote.ui.preferences.PreferenceConstants;
 
 public class OMPIPreferenceManager {
 	private static final String PROXY_EXECUTABLE_NAME = "ptp_orte_proxy";
 	private static final String PROXY_EXECUTABLE_PATH = null; // use local fragment directory
-	private static final boolean LAUNCH_MANUALLY = false; // use local fragment directory
+	private static final int OPTIONS = IRemoteProxyOptions.PORT_FORWARDING;
 	
-	public static boolean getDefaultLaunchManualFlag() {
-		return LAUNCH_MANUALLY;
-	}
-
-	public static String getDefaultProxyExecutableName() {
-		return PROXY_EXECUTABLE_NAME;
+	public static int getDefaultOptions() {
+		return OPTIONS;
 	}
 
 	public static String getDefaultProxyExecutablePath() {
@@ -63,6 +60,6 @@ public class OMPIPreferenceManager {
        }
 		
 		preferences.setDefault(PreferenceConstants.PROXY_PATH, server);
-		preferences.setDefault(PreferenceConstants.LAUNCH_MANUALLY, LAUNCH_MANUALLY);
+		preferences.setDefault(PreferenceConstants.OPTIONS, OPTIONS);
 	}
 }

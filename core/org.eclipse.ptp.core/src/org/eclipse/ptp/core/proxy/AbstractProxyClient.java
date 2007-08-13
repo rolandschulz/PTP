@@ -20,13 +20,18 @@
 package org.eclipse.ptp.core.proxy;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
+import java.nio.channels.Channels;
 import java.nio.channels.ClosedByInterruptException;
+import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.nio.channels.WritableByteChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
@@ -60,6 +65,8 @@ public abstract class AbstractProxyClient implements IProxyClient {
 	private int					sessPort = 0;
 	private ServerSocketChannel	sessSvrSock = null;
 	private SocketChannel		sessSock = null;
+	private ReadableByteChannel	sessInput;
+	private WritableByteChannel	sessOutput;
 	private Thread				eventThread;
 	private Thread				acceptThread;
 	private IProxyEventFactory	proxyEventFactory;
@@ -80,10 +87,16 @@ public abstract class AbstractProxyClient implements IProxyClient {
 		proxyEventFactory = factory;
 	}
 	
-	public int newTransactionID() {
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.proxy.IProxyClient#newTransactionID()
+	 */
+	public synchronized int newTransactionID() {
 		return ++transactionID;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.proxy.IProxyClient#isReady()
+	 */
 	public boolean isReady() {
 		stateLock.lock();
 		try {
@@ -93,6 +106,11 @@ public abstract class AbstractProxyClient implements IProxyClient {
 		}
 	}
 	
+	/**
+	 * Test if proxy has shut down
+	 * 
+	 * @return shut down state
+	 */
 	public boolean isShutdown() {
 		stateLock.lock();
 		try {
@@ -102,14 +120,31 @@ public abstract class AbstractProxyClient implements IProxyClient {
 		}
 	}
 
+	/**
+	 * Character set encoder
+	 * 
+	 * @return encoder
+	 */
 	public CharsetEncoder encoder() {
 		return encoder;
 	}
 	
+	/**
+	 * Character set decoder
+	 * 
+	 * @return decoder
+	 */
 	public CharsetDecoder decoder() {
 		return decoder;
 	}
 
+	/**
+	 * Convert an integer to it's proxy representation
+	 * 
+	 * @param val
+	 * @param len
+	 * @return proxy representation
+	 */
 	public static String encodeIntVal(int val, int len) {
 		char[] res = new char[len];
 		String str = Integer.toHexString(val);
@@ -124,6 +159,12 @@ public abstract class AbstractProxyClient implements IProxyClient {
 		return String.valueOf(res);
 	}
 	
+	/**
+	 * Encode a string into it's proxy representation
+	 * 
+	 * @param str
+	 * @return proxy representation
+	 */
 	public static String encodeString(String str) {
 		int len;
 		
@@ -137,6 +178,12 @@ public abstract class AbstractProxyClient implements IProxyClient {
 		return encodeIntVal(len, IProxyCommand.CMD_ARGS_LEN_SIZE) + ":" + str;		
 	}
 	
+	/**
+	 * Convert a proxy representation of a string into a Java String
+	 * @param buf
+	 * @param start
+	 * @return proxy string converted to Java String
+	 */
 	public static String decodeString(CharBuffer buf, int start) {
 		int end = start + IProxyEvent.EVENT_ARG_LEN_SIZE;
 		int len = Integer.parseInt(buf.subSequence(start, end).toString(), 16);
@@ -145,11 +192,24 @@ public abstract class AbstractProxyClient implements IProxyClient {
 		return buf.subSequence(start, end).toString();
 	}
 	
+	/**
+	 * Convert a BitList to it's proxy representation
+	 * 
+	 * @param set
+	 * @return proxy representation of a BitList
+	 */
 	public static String encodeBitSet(BitList set) {
 		String lenStr = Integer.toHexString(set.size());
 		return lenStr + ":" + set.toString();
 	}
 
+	/**
+	 * Send the supplied string to the remote proxy. Formats the string
+	 * into the correct proxy format.
+	 * 
+	 * @param buf
+	 * @throws IOException
+	 */
 	private void sendCommandBuffer(String buf) throws IOException {
 		/*
 		 * Note: command length includes the first space!
@@ -162,6 +222,9 @@ public abstract class AbstractProxyClient implements IProxyClient {
 		
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.proxy.IProxyClient#sendCommand(java.lang.String)
+	 */
 	public void sendCommand(String cmd) throws IOException {
 		if (isReady()) {
 			sendCommandBuffer(cmd);
@@ -171,22 +234,37 @@ public abstract class AbstractProxyClient implements IProxyClient {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.proxy.IProxyClient#addProxyEventListener(org.eclipse.ptp.core.proxy.event.IProxyEventListener)
+	 */
 	public void addProxyEventListener(IProxyEventListener listener) {
 		listeners.add(listener);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.proxy.IProxyClient#removeProxyEventListener(org.eclipse.ptp.core.proxy.event.IProxyEventListener)
+	 */
 	public void removeProxyEventListener(IProxyEventListener listener) {
 		listeners.remove(listener);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.proxy.IProxyClient#sessionConnect()
+	 */
 	public int sessionConnect() {
-		return 0;
+		return 0; // Not implemented
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.proxy.IProxyClient#sessionCreate()
+	 */
 	public void sessionCreate() throws IOException {
 		sessionCreate(0);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.proxy.IProxyClient#sessionCreate(int)
+	 */
 	public void sessionCreate(int timeout) throws IOException {
 		sessionCreate(0, timeout);
 	}
@@ -228,6 +306,8 @@ public abstract class AbstractProxyClient implements IProxyClient {
 				try {
 					System.out.println("accept thread starting...");
 					sessSock = sessSvrSock.accept();
+					sessInput = sessSock.socket().getChannel();
+					sessOutput = sessSock.socket().getChannel();
 				} catch (SocketTimeoutException e) {
 					error = true;
 					fireProxyTimeoutEvent(new ProxyTimeoutEvent());
@@ -265,10 +345,37 @@ public abstract class AbstractProxyClient implements IProxyClient {
 		acceptThread.start();
 	}
 
+	/**
+	 * Create a proxy session that will read from InputStream and write to OutputStream
+	 * 
+	 * Generates a ProxyConnectedEvent
+	 * 
+	 * @param	output		stream to write to
+	 * @param	input		stream to read from
+	 */
+	public void sessionCreate(OutputStream output, InputStream input) {
+		System.out.println("sessionCreate(stdin, stdout)");
+		sessInput = Channels.newChannel(input);
+		sessOutput = Channels.newChannel(output);
+		stateLock.lock();
+		try {
+			state = SessionState.CONNECTED;
+		} finally {
+			stateLock.unlock();
+		}
+		fireProxyConnectedEvent(new ProxyConnectedEvent());
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.proxy.IProxyClient#getSessionPort()
+	 */
 	public int getSessionPort() {
 		return sessPort;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.proxy.IProxyClient#getSessionHost()
+	 */
 	public String getSessionHost() {
 		return sessHost;
 	}
@@ -345,6 +452,11 @@ public abstract class AbstractProxyClient implements IProxyClient {
 		eventThread.start();
 	}
 	
+	/**
+	 * Send event to event handlers
+	 * 
+	 * @param event
+	 */
 	protected void fireProxyConnectedEvent(IProxyConnectedEvent event) {
 		IProxyEventListener[] la = listeners.toArray(new IProxyEventListener[0]);
 		for (IProxyEventListener listener : la) {
@@ -352,6 +464,11 @@ public abstract class AbstractProxyClient implements IProxyClient {
 		}
 	}
 
+	/**
+	 * Send event to event handlers
+	 * 
+	 * @param event
+	 */
 	protected void fireProxyDisconnectedEvent(IProxyDisconnectedEvent event) {
 		IProxyEventListener[] la = listeners.toArray(new IProxyEventListener[0]);
 		for (IProxyEventListener listener : la) {
@@ -359,6 +476,11 @@ public abstract class AbstractProxyClient implements IProxyClient {
 		}
 	}
 
+	/**
+	 * Send event to event handlers
+	 * 
+	 * @param event
+	 */
 	protected void fireProxyMessageEvent(IProxyMessageEvent event) {
 		IProxyEventListener[] la = listeners.toArray(new IProxyEventListener[0]);
 		for (IProxyEventListener listener : la) {
@@ -366,6 +488,11 @@ public abstract class AbstractProxyClient implements IProxyClient {
 		}
 	}
 
+	/**
+	 * Send event to event handlers
+	 * 
+	 * @param event
+	 */
 	protected void fireProxyOKEvent(IProxyOKEvent event) {
 		IProxyEventListener[] la = listeners.toArray(new IProxyEventListener[0]);
 		for (IProxyEventListener listener : la) {
@@ -373,6 +500,11 @@ public abstract class AbstractProxyClient implements IProxyClient {
 		}
 	}
 
+	/**
+	 * Send event to event handlers
+	 * 
+	 * @param event
+	 */
 	protected void fireProxyTimeoutEvent(IProxyTimeoutEvent event) {
 		IProxyEventListener[] la = listeners.toArray(new IProxyEventListener[0]);
 		for (IProxyEventListener listener : la) {
@@ -380,6 +512,11 @@ public abstract class AbstractProxyClient implements IProxyClient {
 		}
 	}
 	
+	/**
+	 * Send event to event handlers
+	 * 
+	 * @param event
+	 */
 	protected void fireProxyExtendedEvent(IProxyExtendedEvent event) {
 		IProxyEventListener[] la = listeners.toArray(new IProxyEventListener[0]);
 		for (IProxyEventListener listener : la) {
@@ -397,7 +534,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 		int n = 0;
 		buf.clear();
 		while (buf.remaining() > 0) {
-			n = sessSock.read(buf);
+			n = sessInput.read(buf);
 			if (n < 0) {
 				throw new IOException("EOF from proxy");
 			}
@@ -416,7 +553,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 	public int fullWrite(ByteBuffer buf) throws IOException {
 		int n = 0;
 		while (buf.remaining() > 0) {
-			n = sessSock.write(buf);
+			n = sessOutput.write(buf);
 			if (n < 0) {
 				throw new IOException("EOF from proxy");
 			}

@@ -11,10 +11,43 @@
 package org.eclipse.ptp.internal.remote;
 
 import org.eclipse.ptp.remote.IRemoteConnection;
+import org.eclipse.ptp.remote.exception.RemoteConnectionException;
+import org.eclipse.ptp.remote.exception.UnableToForwardPortException;
 
 public class LocalConnection implements IRemoteConnection {
-	private String name = "Local";
+	private String name;
+	private String hostname;
+	private String username;
 	
+	public LocalConnection() {
+		this.name = "Local";
+		this.hostname = "localhost";
+		this.username = System.getProperty("user.name");
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.IRemoteConnection#forwardLocalTCPPort(int, java.lang.String, int)
+	 */
+	public void forwardLocalTCPPort(int localPort, String fwdAddress,
+			int fwdPort) throws RemoteConnectionException {
+		throw new UnableToForwardPortException("Port forwarding not supported");
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.IRemoteConnection#forwardRemoteTCPPort(int, java.lang.String, int)
+	 */
+	public void forwardRemoteTCPPort(int remotePort, String fwdAddress,
+			int fwdPort) throws RemoteConnectionException {
+		throw new UnableToForwardPortException("Port forwarding not supported");
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.IRemoteConnection#getHostname()
+	 */
+	public String getHostname() {
+		return hostname;
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnection#getName()
 	 */
@@ -26,20 +59,24 @@ public class LocalConnection implements IRemoteConnection {
 	 * @see org.eclipse.ptp.remote.IRemoteConnection#setHostname(java.lang.String)
 	 */
 	public void setHostname(String hostname) {
-		
+		this.hostname = hostname;
+	}
+
+	public String getUsername() {
+		return username;
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnection#setUsername(java.lang.String)
 	 */
 	public void setUsername(String username) {
-		
+		this.username = username;
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteConnection#setPassword(java.lang.String)
+	 * @see org.eclipse.ptp.remote.IRemoteConnection#supportsTCPPortForwarding()
 	 */
-	public void setPassword(String password) {
-		
+	public boolean supportsTCPPortForwarding() {
+		return false;
 	}
 }

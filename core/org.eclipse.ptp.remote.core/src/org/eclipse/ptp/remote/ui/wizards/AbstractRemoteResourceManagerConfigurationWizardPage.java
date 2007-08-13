@@ -28,8 +28,10 @@ import org.eclipse.ptp.remote.AbstractRemoteResourceManagerConfiguration;
 import org.eclipse.ptp.remote.IRemoteConnection;
 import org.eclipse.ptp.remote.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.IRemoteFileManager;
+import org.eclipse.ptp.remote.IRemoteProxyOptions;
 import org.eclipse.ptp.remote.IRemoteServices;
 import org.eclipse.ptp.remote.PTPRemotePlugin;
+import org.eclipse.ptp.remote.ui.Messages;
 import org.eclipse.ptp.remote.ui.preferences.PreferenceConstants;
 import org.eclipse.ptp.ui.utils.SWTUtil;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizard;
@@ -39,11 +41,13 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
@@ -65,10 +69,21 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 	
 		public void widgetSelected(SelectionEvent e) {
 			Object source = e.getSource();
-			if (source == browseButton)
+			if (source == browseButton) {
 				handlePathBrowseButtonSelected();
-			else if (source == manualButton) {
-				manualLaunch = manualButton.getSelection();
+			} else {
+				stdioMux = stdioButton.getSelection();
+				portForwardingMux = portForwardingButton.getSelection();
+				
+				if (stdioMux) {
+					manualButton.setEnabled(false);
+					manualButton.setSelection(false);
+					manualLaunch = false;
+				} else {
+					manualButton.setEnabled(true);
+					manualLaunch = manualButton.getSelection();
+				}
+				
 				updatePage();
 			}
 		}
@@ -79,12 +94,17 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 	private String proxyFile = EMPTY_STRING;
 	private String connectionName = EMPTY_STRING;
 	private String remoteServicesId = EMPTY_STRING;
+	private boolean stdioMux = false;
+	private boolean portForwardingMux = true;
 	private boolean manualLaunch = false;
 	private boolean loading = true;
 	private boolean isValid;
 
 	protected Text serverText = null;
 	protected Button browseButton = null;
+	protected Button noneButton = null;
+	protected Button stdioButton = null;
+	protected Button portForwardingButton = null;
 	protected Button manualButton = null;
 	protected WidgetListener listener = new WidgetListener();
 	protected Button newRemoteConnectionButton;
@@ -134,10 +154,20 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 	public boolean performOk() 
 	{
 		store();
+		int options = 0;
+		if (stdioMux) {
+			options |= IRemoteProxyOptions.STDIO;
+		}
+		if (portForwardingMux) {
+			options |= IRemoteProxyOptions.PORT_FORWARDING;
+		}
+		if (manualLaunch) {
+			options |= IRemoteProxyOptions.MANUAL_LAUNCH;
+		}
 		config.setRemoteServicesId(remoteServicesId);
 		config.setConnectionName(connectionName);
 		config.setProxyServerPath(proxyFile);
-		config.setManualLaunch(manualLaunch);
+		config.setOptions(options);
 		config.setDefaultNameAndDesc();
 		return true;
 	}
@@ -148,7 +178,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 	 * @param type
 	 * @return
 	 */
-	private Button createButton(Composite parent, String label, int type) {
+	protected Button createButton(Composite parent, String label, int type) {
 		Button button = new Button(parent, type);
 		button.setText(label);
 		GridData data = new GridData();
@@ -161,8 +191,61 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 	 * @param label
 	 * @return
 	 */
-	private Button createCheckButton(Composite parent, String label) {
+	protected Button createCheckButton(Composite parent, String label) {
 		return createButton(parent, label, SWT.CHECK | SWT.LEFT);
+	}
+	
+	/**
+	 * Creates an new radiobutton instance and sets the default
+	 * layout data.
+	 *
+	 * @param group  the composite in which to create the radiobutton
+	 * @param label  the string to set into the radiobutton
+	 * @param value  the string to identify radiobutton
+	 * @return the new checkbox
+	 */ 
+	protected Button createRadioButton(Composite parent, String label, String value, SelectionListener listener) {
+		Button button = createButton(parent, label, SWT.RADIO | SWT.LEFT);
+		button.setData((null == value) ? label : value);
+		GridData data = new GridData(GridData.FILL_HORIZONTAL);
+		data.horizontalAlignment = GridData.FILL;
+		data.verticalAlignment = GridData.BEGINNING;
+		button.setLayoutData(data);
+		if(null != listener)
+			button.addSelectionListener(listener);
+		return button;
+	}
+	
+	/**
+	 * @param columns
+	 * @param isEqual
+	 * @param mh
+	 * @param mw
+	 * @return
+	 */
+	protected GridLayout createGridLayout(int columns, boolean isEqual, int mh, int mw)  {
+		GridLayout gridLayout = new GridLayout();
+		gridLayout.numColumns = columns;
+		gridLayout.makeColumnsEqualWidth = isEqual;
+		gridLayout.marginHeight = mh;
+		gridLayout.marginWidth = mw;
+		return gridLayout;
+	}
+
+	/**
+	 * @param style
+	 * @param space
+	 * @return
+	 */
+	protected GridData spanGridData(int style, int space) 
+	{
+		GridData gd = null;
+		if (style == -1)
+			gd = new GridData();
+		else
+			gd = new GridData(style);
+		gd.horizontalSpan = space;
+		return gd;
 	}
 	
 	/**
@@ -181,7 +264,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		projComp.setLayoutData(gd);
 
 		Label label = new Label(projComp, SWT.NONE);
-		label.setText("Remote service provider:");
+		label.setText(Messages.getString("RemoteConfigurationWizard.provider"));
 		gd = new GridData();
 		gd.horizontalSpan = 1;
 		label.setLayoutData(gd);
@@ -204,7 +287,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		label.setLayoutData(gd);
 
 		connectionLabel = new Label(projComp, SWT.NONE);
-		connectionLabel.setText("Proxy server location:");
+		connectionLabel.setText(Messages.getString("RemoteConfigurationWizard.location"));
 		gd = new GridData();
 		gd.horizontalSpan = 1;
 		connectionLabel.setLayoutData(gd);
@@ -220,7 +303,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 			}
 		});
 
-		newRemoteConnectionButton = SWTUtil.createPushButton(projComp, "New...", null);
+		newRemoteConnectionButton = SWTUtil.createPushButton(projComp, Messages.getString("RemoteConfigurationWizard.newButton"), null);
 		newRemoteConnectionButton.addSelectionListener(new SelectionAdapter() {
 
 			public void widgetSelected(SelectionEvent evt) {
@@ -242,7 +325,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		proxyComp.setLayoutData(gd);
 		
 		Label proxyLabel = new Label(proxyComp, SWT.NONE);
-		proxyLabel.setText("Path to proxy server executable:");
+		proxyLabel.setText(Messages.getString("RemoteConfigurationWizard.path"));
 		gd = new GridData();
 		gd.horizontalSpan = 2;
 		proxyLabel.setLayoutData(gd);
@@ -252,10 +335,24 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		gd.horizontalSpan = 1;
 		serverText.setLayoutData(gd);
 		serverText.addModifyListener(listener);
-		browseButton = SWTUtil.createPushButton(proxyComp, "Browse", null);
+		browseButton = SWTUtil.createPushButton(proxyComp, Messages.getString("RemoteConfigurationWizard.browseButton"), null);
 		browseButton.addSelectionListener(listener);
 		
-		manualButton = createCheckButton(parent, "Launch ORTE server manually");
+		Group mxGroup = new Group(proxyComp, SWT.SHADOW_ETCHED_IN);
+		mxGroup.setLayout(createGridLayout(1, true, 10, 10));
+		mxGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
+		mxGroup.setText(Messages.getString("RemoteConfigurationWizard.mxOptions"));
+		
+		noneButton = createRadioButton(mxGroup, Messages.getString("RemoteConfigurationWizard.noneButton"), "mxGroup", listener);
+		portForwardingButton = createRadioButton(mxGroup, Messages.getString("RemoteConfigurationWizard.portForwardingButton"), "mxGroup", listener);
+		stdioButton = createRadioButton(mxGroup, Messages.getString("RemoteConfigurationWizard.stdioButton"), "mxGroup", listener);
+
+		Group otherGroup = new Group(proxyComp, SWT.SHADOW_ETCHED_IN);
+		otherGroup.setLayout(createGridLayout(1, true, 10, 10));
+		otherGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
+		otherGroup.setText(Messages.getString("RemoteConfigurationWizard.otherOptions"));
+
+		manualButton = createCheckButton(otherGroup, Messages.getString("RemoteConfigurationWizard.manualButton"));
 		manualButton.addSelectionListener(listener);
 	}
 
@@ -268,9 +365,28 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		
 		proxyFile = preferences.getString(PreferenceConstants.PROXY_PATH);
 		serverText.setText(proxyFile);
-		manualButton.setSelection(preferences.getBoolean(PreferenceConstants.LAUNCH_MANUALLY));
-	}
+		int options = preferences.getInt(PreferenceConstants.OPTIONS);
+		
+		stdioMux = (options & IRemoteProxyOptions.STDIO) == IRemoteProxyOptions.STDIO;
+		portForwardingMux =	(options & IRemoteProxyOptions.PORT_FORWARDING) == IRemoteProxyOptions.PORT_FORWARDING;
+		manualLaunch = (options & IRemoteProxyOptions.MANUAL_LAUNCH) == IRemoteProxyOptions.MANUAL_LAUNCH;
 
+		if (stdioMux) {
+			stdioButton.setSelection(stdioMux);
+		} else if (true) {
+			portForwardingButton.setSelection(true);
+		} else {
+			noneButton.setSelection(true);
+		}
+		
+		if (stdioMux) {
+			manualButton.setEnabled(false);
+			manualButton.setSelection(false);
+		} else {
+			manualButton.setSelection(manualLaunch);
+		}
+	}
+	
 	/**
 	 * @param b
 	 */
@@ -329,7 +445,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		IRemoteConnection connection = connMgr.getConnection(connectionName);
 		IRemoteFileManager fileMgr = remoteServices.getFileManager();
 		String correctPath = getFieldContent(serverText.getText());
-		String selectedPath = fileMgr.browseRemoteFile(getControl().getShell(), connection, "Select Proxy Server Executable", correctPath);
+		String selectedPath = fileMgr.browseRemoteFile(getControl().getShell(), connection, Messages.getString("RemoteConfigurationWizard.select"), correctPath);
 		if (selectedPath != null) {
 			serverText.setText(selectedPath);
 		}
@@ -343,14 +459,14 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		if (serverText != null) {
 			String name = getFieldContent(serverText.getText());
 			if (name == null) {
-				setErrorMessage("Invalid proxy server executable");
+				setErrorMessage(Messages.getString("RemoteConfigurationWizard.invalid"));
 				//setValid(false);
 				return false;
 			}
 			else {
 				File path = new File(name);
 				if (!path.exists() || !path.isFile()) {
-					setErrorMessage("Invalid proxy server executable");
+					setErrorMessage(Messages.getString("RemoteConfigurationWizard.invalid"));
 					//setValid(false);
 					return false;
 				}
@@ -375,8 +491,9 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 	 */
 	protected void updateConnectionPulldown() {
 		IRemoteServices[] allRemoteServices = PTPRemotePlugin.getDefault().getAllRemoteServices();
-		if (allRemoteServices != null && allRemoteServices.length > 0) {
-			IRemoteServices selectedServices = allRemoteServices[remoteCombo.getSelectionIndex()];
+		int selectionIndex = remoteCombo.getSelectionIndex();
+		if (allRemoteServices != null && allRemoteServices.length > 0 && selectionIndex >=0) {
+			IRemoteServices selectedServices = allRemoteServices[selectionIndex];
 			remoteServicesId = selectedServices.getId();
 			IRemoteConnectionManager connMgr = selectedServices.getConnectionManager();
 			IRemoteConnection[] connections = connMgr.getConnections();
