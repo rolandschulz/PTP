@@ -2113,8 +2113,9 @@ GetPtypeValue(char *exp)
 #define T_POINTER		21
 
 static int 
-get_simple_type(char *type) 
+get_simple_type(char *type)
 {
+	char *pt;
 	char *t = NULL;
 	int id;
 	int len = strlen(type);
@@ -2174,8 +2175,8 @@ get_simple_type(char *type)
  	else if (strncmp(t, "logical4", 8) == 0)
  		id = T_BOOLEAN;	
 	else
-		id = T_OTHER;
-		
+		id =  T_OTHER;
+
 	free(t);
 	return id;
 }
@@ -2184,7 +2185,6 @@ static int
 get_complex_type(char *type) 
 {
 	int len = strlen(type);
-
 	switch (type[len - 1]) {
 	case ']':
 		return T_ARRAY;
@@ -2197,7 +2197,11 @@ get_complex_type(char *type)
 	default:
 		if (strncmp(type, "union", 5) == 0)
 			return T_UNION;
-		return T_STRUCT;
+
+		if (strncmp(type, "struct", 6) == 0)
+			return T_STRUCT;
+
+		return T_OTHER;
 	}
 }
 
@@ -2301,10 +2305,18 @@ GetCharPointerAIF(char *res)
 static AIF *
 GetSimpleAIF(MIVar *var, char *exp)
 {
-	AIF *	a = NULL;
+	AIF		*a = NULL;
 	AIF		*ac;
+	char	*pt;
 
 	int id = get_simple_type(var->type);
+	if (id == T_OTHER) {
+		pt = GetPtypeValue(var->type);
+		if (pt != NULL) {
+			var->type = pt;
+			id = get_simple_type(var->type);
+		}
+	}
 	switch (id) {
 	case T_FUNCTION:
 		return MakeAIF("&/is4", exp);
@@ -2319,7 +2331,6 @@ GetSimpleAIF(MIVar *var, char *exp)
 		if (exp == NULL)
 			return NULL;
 		
-		var->type = GetPtypeValue(exp);
 		return GetSimpleAIF(var, NULL);
 	default:
 		return GetPrimitiveAIF(id, GetVarValue(var->name));
@@ -2496,7 +2507,6 @@ GetComplexAIF(MIVar *var, char *exp, int named)
 static AIF *
 GetAIF(MIVar *var, char *exp, int named)
 {
-	AIF *	a = NULL;
 	MICommand	*cmd;
 
 	if (strcmp(var->type, "<text variable, no debug info>") == 0) {
@@ -2527,15 +2537,7 @@ GetAIF(MIVar *var, char *exp, int named)
 	MIGetVarListChildrenInfo(var, cmd);
 	MICommandFree(cmd);
 
-	a = GetComplexAIF(var, exp, named);
-	if (a == NULL) {//try again with ptype
-		if (exp == NULL)
-			return NULL;
-
-		var->type = GetPtypeValue(exp);
-		a = GetComplexAIF(var, NULL, named);
-	}
-	return a;
+	return GetComplexAIF(var, exp, named);
 }
 
 /*************************** PARTIAL AIF ***************************/
@@ -2546,6 +2548,8 @@ GetPartialArrayAIF(MIVar *var)
 	AIF *ac;
 	int i;
 	char *pch;
+	char *pt;
+	int id;
 
 	if (var->children == NULL) {
 		pch = strchr(var->type, '[');
@@ -2553,7 +2557,15 @@ GetPartialArrayAIF(MIVar *var)
 		while (var->type[strlen(var->type) - 1] == ' ') {//remove whilespace
 			var->type[strlen(var->type) - 1] = '\0';
 		}
-		ac = GetPrimitiveAIF(get_simple_type(var->type), "");
+		id = get_simple_type(var->type);
+		if (id == T_OTHER) {
+			pt = GetPtypeValue(var->type);
+			if (pt != NULL) {
+				var->type = pt;
+				id = get_simple_type(var->type);
+			}
+		}
+		ac = GetPrimitiveAIF(id, "");
 		a = EmptyArrayToAIF(0, var->numchild-1, ac);
 		AIFFree(ac);
 	}
@@ -2687,7 +2699,15 @@ GetPartialPointerAIF(MIVar *var)
 static AIF * 
 GetPartialComplexAIF(MIVar *var, char *exp)
 {
+	char *pt;
 	int id = get_complex_type(var->type);
+	if (id == T_OTHER) {
+		pt = GetPtypeValue(var->type);
+		if (pt != NULL) {
+			var->type = pt;
+			id = get_complex_type(var->type);
+		}
+	}
 	switch (id) {
 	case T_ARRAY:
 		return GetPartialArrayAIF(var);
@@ -2705,8 +2725,6 @@ GetPartialComplexAIF(MIVar *var, char *exp)
 static AIF *
 GetPartialAIF(MIVar *var, char *exp)
 {
-	AIF *a;
-	
 	if (strcmp(var->type, "<text variable, no debug info>") == 0) {
 		DbgSetError(DBGERR_NOSYMS, "");
 		return NULL;
@@ -2714,15 +2732,7 @@ GetPartialAIF(MIVar *var, char *exp)
 	if (var->numchild == 0) {
 		return GetSimpleAIF(var, exp);
 	}
-	a = GetPartialComplexAIF(var, exp);
-	if (a == NULL) {//try again with ptype
-		if (exp == NULL)
-			return NULL;
-
-		var->type = GetPtypeValue(exp);
-		a = GetPartialComplexAIF(var, NULL);
-	}
-	return a;
+	return GetPartialComplexAIF(var, exp);
 }
 
 static MIVar *
