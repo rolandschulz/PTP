@@ -36,18 +36,19 @@ public abstract class AbstractRemoteResourceManagerConfiguration extends Abstrac
 		private final String proxyPath;
 		private final String remoteServicesId;
 		private final String connectionName;
-		private final boolean launchManually;
+		private final int options;
 
 		public RemoteConfig() {
-			this(new CommonConfig(), "", "", "", false);
+			this(new CommonConfig(), "", "", "", IRemoteProxyOptions.PORT_FORWARDING);
 		}
 		
-		public RemoteConfig(CommonConfig config, String remoteId, String conn, String path, boolean manual) {
+		public RemoteConfig(CommonConfig config, String remoteId, String conn, String path, 
+				int options) {
 			this.commonConfig = config;
 			this.proxyPath = path;
 			this.remoteServicesId = remoteId;
 			this.connectionName = conn;
-			this.launchManually = manual;
+			this.options = options;
 		}
 		
 		public CommonConfig getCommonConfig() {
@@ -58,8 +59,8 @@ public abstract class AbstractRemoteResourceManagerConfiguration extends Abstrac
 			return connectionName;
 		}
 
-		public boolean getLaunchManually() {
-			return launchManually;
+		public int getOptions() {
+			return options;
 		}
 
 		public String getProxyPath() {
@@ -72,7 +73,7 @@ public abstract class AbstractRemoteResourceManagerConfiguration extends Abstrac
 	}
 	
 	private static final String TAG_PROXY_PATH = "proxyPath"; //$NON-NLS-1$
-	private static final String TAG_LAUNCH_MANUALLY = "launchManually"; //$NON-NLS-1$
+	private static final String TAG_OPTIONS = "options"; //$NON-NLS-1$
 	private static final String TAG_CONNECTION_NAME = "connectionName"; //$NON-NLS-1$
 	private static final String TAG_REMOTE_SERVICES_ID = "remoteServicesID"; //$NON-NLS-1$
 
@@ -91,11 +92,11 @@ public abstract class AbstractRemoteResourceManagerConfiguration extends Abstrac
 		String remoteServicesId = memento.getString(TAG_REMOTE_SERVICES_ID);
 		String connectionName = memento.getString(TAG_CONNECTION_NAME);
 		String proxyServerPath = memento.getString(TAG_PROXY_PATH);
-		boolean launchManually = Boolean.parseBoolean(memento.getString(TAG_LAUNCH_MANUALLY));
+		int options = Integer.parseInt(memento.getString(TAG_OPTIONS));
 
 		RemoteConfig config = 
 			new RemoteConfig(commonConfig, remoteServicesId, connectionName, proxyServerPath,
-					launchManually);
+					options);
 
 		return config;
 	}
@@ -103,7 +104,7 @@ public abstract class AbstractRemoteResourceManagerConfiguration extends Abstrac
 	private String remoteServicesId;
 	private String connectionName;
 	private String proxyServerPath;
-	private boolean launchManually;
+	private int options;
 	
 	public AbstractRemoteResourceManagerConfiguration(RemoteConfig remoteConfig, 
 			IResourceManagerFactory factory) {
@@ -111,7 +112,7 @@ public abstract class AbstractRemoteResourceManagerConfiguration extends Abstrac
 		this.remoteServicesId = remoteConfig.getRemoteServicesId();
 		this.connectionName = remoteConfig.getConnectionName();
 		this.proxyServerPath = remoteConfig.getProxyPath();
-		this.launchManually = remoteConfig.getLaunchManually();
+		this.options = remoteConfig.getOptions();
 	}
 	
 	/**
@@ -143,12 +144,12 @@ public abstract class AbstractRemoteResourceManagerConfiguration extends Abstrac
 	}
 
 	/**
-	 * Get the launch manually flag.
+	 * Get the remote configuration options.
 	 * 
-	 * @return true for manual launch
+	 * @return remote configuration options
 	 */
-	public boolean isLaunchManually() {
-		return launchManually;
+	public int getOptions() {
+		return options;
 	}
 
 	/**
@@ -161,12 +162,12 @@ public abstract class AbstractRemoteResourceManagerConfiguration extends Abstrac
 	}
 
 	/**
-	 * Set the launch manually flag
+	 * Set the remote configuration options
 	 * 
-	 * @param launchManually
+	 * @param options
 	 */
-	public void setManualLaunch(boolean launchManually) {
-		this.launchManually = launchManually;
+	public void setOptions(int options) {
+		this.options = options;
 	}
 
 	/**
@@ -193,6 +194,6 @@ public abstract class AbstractRemoteResourceManagerConfiguration extends Abstrac
 		memento.putString(TAG_REMOTE_SERVICES_ID, remoteServicesId);
 		memento.putString(TAG_CONNECTION_NAME, connectionName);
 		memento.putString(TAG_PROXY_PATH, proxyServerPath);
-		memento.putString(TAG_LAUNCH_MANUALLY, Boolean.toString(launchManually));
+		memento.putString(TAG_OPTIONS, Integer.toString(options));
 	}
 }

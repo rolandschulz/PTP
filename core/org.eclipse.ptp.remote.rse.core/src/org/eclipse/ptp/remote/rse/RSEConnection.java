@@ -11,13 +11,31 @@
 package org.eclipse.ptp.remote.rse;
 
 import org.eclipse.ptp.remote.IRemoteConnection;
+import org.eclipse.ptp.remote.exception.RemoteConnectionException;
+import org.eclipse.ptp.remote.exception.UnableToForwardPortException;
 import org.eclipse.rse.core.model.IHost;
 
 public class RSEConnection implements IRemoteConnection {
 	private IHost rseHost;
-	
+
 	public RSEConnection(IHost host) {
 		rseHost = host;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.IRemoteConnection#forwardLocalTCPPort(int, java.lang.String, int)
+	 */
+	public void forwardLocalTCPPort(int localPort, String fwdAddress,
+			int fwdPort) throws RemoteConnectionException {
+		throw new UnableToForwardPortException("Port forwarding not supported");
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.IRemoteConnection#forwardRemoteTCPPort(int, java.lang.String, int)
+	 */
+	public void forwardRemoteTCPPort(int remotePort, String fwdAddress,
+			int fwdPort) throws RemoteConnectionException {
+		throw new UnableToForwardPortException("Port forwarding not supported");
 	}
 	
 	/**
@@ -29,6 +47,10 @@ public class RSEConnection implements IRemoteConnection {
 		return rseHost;
 	}
 	
+	public String getHostname() {
+		return rseHost.getHostName();
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnection#getName()
 	 */
@@ -36,17 +58,15 @@ public class RSEConnection implements IRemoteConnection {
 		return rseHost.getAliasName();
 	}
 	
+	public String getUsername() {
+		return rseHost.getDefaultUserId();
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnection#setHostname(java.lang.String)
 	 */
 	public void setHostname(String hostname) {
 		rseHost.setHostName(hostname);
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteConnection#setPassword(java.lang.String)
-	 */
-	public void setPassword(String password) {
 	}
 
 	/* (non-Javadoc)
@@ -54,5 +74,12 @@ public class RSEConnection implements IRemoteConnection {
 	 */
 	public void setUsername(String username) {
 		rseHost.setDefaultUserId(username);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.IRemoteConnection#supportsTCPPortForwarding()
+	 */
+	public boolean supportsTCPPortForwarding() {
+		return false;
 	}
 }

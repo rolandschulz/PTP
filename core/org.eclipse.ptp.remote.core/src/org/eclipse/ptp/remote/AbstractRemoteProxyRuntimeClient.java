@@ -25,7 +25,7 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 	private boolean			proxyDebugOutput = true;
 	private final String	proxyName;
 	private final String	proxyPath;
-	private final boolean 	launchManually;
+	private final int	 	proxyOptions;
 	private final String	remoteServicesId;
 	private final String	connectionName;
 
@@ -36,7 +36,7 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 		this.connectionName = config.getConnectionName();
 		this.proxyName = config.getName();
 		this.proxyPath = config.getProxyServerPath();
-		this.launchManually = config.isLaunchManually();
+		this.proxyOptions = config.getOptions();
 	}
 
 	/* (non-Javadoc)
@@ -62,61 +62,102 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 			System.out.println("PROXY_SERVER path = '" + proxyPath + "'");
 		}
 		
+		boolean stdio = (proxyOptions & IRemoteProxyOptions.STDIO) == IRemoteProxyOptions.STDIO;
+		boolean portForwarding = (proxyOptions & IRemoteProxyOptions.PORT_FORWARDING) == IRemoteProxyOptions.PORT_FORWARDING;
+		boolean manualLaunch = (proxyOptions & IRemoteProxyOptions.MANUAL_LAUNCH) == IRemoteProxyOptions.MANUAL_LAUNCH;
+		
 		try {
-			// This will attempt to load and initialized the remote services plugin. If
-			// initialization fails, we abandon attempt to start RM
-			
+			/*
+			 * This can fail if we are restarting the RM from saved information and the saved remote
+			 * services provider is no longer available...
+			 */
 			IRemoteServices remoteServices = PTPRemotePlugin.getDefault().getRemoteServices(remoteServicesId);
 			if (remoteServices == null) {
 				PTPCorePlugin.log(toString() + " startup: Could not find remote services ID " + remoteServicesId);
 				return false;
 			}
 			
-			sessionCreate();
-
-			if (launchManually) {
+			if (manualLaunch) {
+				sessionCreate();
 				final String msg = "Waiting for manual launch of proxy on port " + getSessionPort() + "...";
 				System.out.println(msg);
 				Status info = new Status(IStatus.INFO, PTPCorePlugin.getUniqueIdentifier(), IStatus.INFO, msg, null);
 				PTPCorePlugin.log(info);
 			} else {
-				String args = "--port="+getSessionPort();
 				IRemoteConnectionManager connMgr = remoteServices.getConnectionManager();
 				IRemoteConnection conn = connMgr.getConnection(connectionName);
-				IRemoteProcessBuilder processBuilder = remoteServices.getProcessBuilder(conn, proxyPath, args);
-				IRemoteProcess process = processBuilder.asyncStart();
-				
-				final BufferedReader err_reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-				final BufferedReader out_reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 
-				new Thread(new Runnable() {
-					public void run() {
-						try {
-							String output;
-							while ((output = out_reader.readLine()) != null) {
-								if (proxyDebugOutput) System.out.println(proxyName + ": " + output);
-							}
-						} catch (IOException e) {
-							// Ignore
-						}
+				if (!stdio) {
+					sessionCreate();
+					
+					String args = "--port="+getSessionPort();
+					if (portForwarding) {
+						args = "--host=localhost " + args;
+					} else {
+						args = "--host=" + getSessionHost() + " " + args;
 					}
-				}, "Program output Thread").start();
-				
-				new Thread(new Runnable() {
-					public void run() {
-						try {
-							String line;
-							while ((line = err_reader.readLine()) != null) {
-								if (proxyDebugOutput) System.err.println(proxyName + ": " + line);
+					
+					IRemoteProcessBuilder processBuilder = remoteServices.getProcessBuilder(conn, proxyPath, args);
+					IRemoteProcess process = processBuilder.asyncStart();
+					
+					final BufferedReader err_reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+					final BufferedReader out_reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+
+					new Thread(new Runnable() {
+						public void run() {
+							try {
+								String output;
+								while ((output = out_reader.readLine()) != null) {
+									if (proxyDebugOutput) System.out.println(proxyName + ": " + output);
+								}
+							} catch (IOException e) {
+								// Ignore
 							}
-						} catch (IOException e) {
-							// Ignore
 						}
+					}, "Program output Thread").start();
+					
+					new Thread(new Runnable() {
+						public void run() {
+							try {
+								String line;
+								while ((line = err_reader.readLine()) != null) {
+									if (proxyDebugOutput) System.err.println(proxyName + ": " + line);
+								}
+							} catch (IOException e) {
+								// Ignore
+							}
+						}
+					}, "Error output Thread").start();
+					
+					if (getEventLogging()) {
+						System.out.println(toString() + ": Waiting on accept.");
 					}
-				}, "Error output Thread").start();
+				} else {
+					IRemoteProcessBuilder processBuilder = remoteServices.getProcessBuilder(conn, proxyPath, "--proxy=stdio");
+					IRemoteProcess process = processBuilder.asyncStart();
+					
+					sessionCreate(process.getOutputStream(), process.getInputStream());
+					
+					final BufferedReader err_reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+					
+					new Thread(new Runnable() {
+						public void run() {
+							try {
+								String line;
+								while ((line = err_reader.readLine()) != null) {
+									if (proxyDebugOutput) System.err.println(proxyName + ": " + line);
+								}
+							} catch (IOException e) {
+								// Ignore
+							}
+						}
+					}, "Error output Thread").start();
+					
+					if (getEventLogging()) {
+						System.out.println(toString() + ": Waiting on accept.");
+					}
+				}
 			}
-			if (getEventLogging()) System.out.println(toString() + ": Waiting on accept.");
-
 		} catch (IOException e) {
 			System.err.println("Exception starting up proxy. :(");
 			try {

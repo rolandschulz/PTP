@@ -9,12 +9,31 @@
  * IBM Corporation - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.ptp.remote.ui.preferences;
+package org.eclipse.ptp.remote.exception;
 
-/**
- * Constant definitions for plug-in preferences
- */
-public interface PreferenceConstants {
-	public static final String PROXY_PATH = "PROXY_PATH";
-	public static final String OPTIONS = "OPTIONS";
+public class RemoteConnectionException extends Exception {
+	private static final long serialVersionUID = -7794871221470179956L;
+
+	/**
+	 * @param message
+	 * @param cause
+	 */
+	public RemoteConnectionException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
+	/**
+	 * @param message
+	 */
+	public RemoteConnectionException(String message) {
+		super(message);
+	}
+
+	/**
+	 * @param cause
+	 */
+	public RemoteConnectionException(Throwable cause) {
+		super(cause);
+	}
+
 }

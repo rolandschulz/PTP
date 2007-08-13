@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote;
 
+import org.eclipse.ptp.remote.exception.RemoteConnectionException;
+
 public interface IRemoteConnection {
 	/**
 	 * Get unique name for this connection.
@@ -18,6 +20,20 @@ public interface IRemoteConnection {
 	 */
 	public String getName();
 	
+	/**
+	 * Gets the implementation dependent hostname for this connection
+	 * 
+	 * return hostname
+	 */
+	public String getHostname();
+
+	/**
+	 * Gets the username for this connection
+	 * 
+	 * return username
+	 */
+	public String getUsername();
+
 	/**
 	 * @param hostname
 	 */
@@ -29,7 +45,32 @@ public interface IRemoteConnection {
 	public void setUsername(String username);
 	
 	/**
-	 * @param password
+	 * Test if this connection supports forwarding of TCP connections
+	 * 
+	 * @return true if TCP port forwarding is supported
 	 */
-	public void setPassword(String password);
+	public boolean supportsTCPPortForwarding();
+	
+	/**
+	 * Forward local port localPort to remote port remotePort on remote machine fwdAddress. If this
+	 * connection is not to fwdAddress, the port will be routed via the connection machine to
+	 * fwdAddress. 
+	 * 
+	 * @param localPort local port to forward
+	 * @param remoteAddress address of remote machine
+	 * @param remotePort remote port on remote machine
+	 * @throws RemoteConnectionException
+	 */
+	public void forwardLocalTCPPort(int localPort, String fwdAddress, int fwdPort) throws RemoteConnectionException;
+
+	/**
+	 * Forward remote port remotePort to port fwdPort on machine fwdAddress. If fwdAddress is not the
+	 * local machine, the port will be routed via the local machine to fwdAddress.
+	 * 
+	 * @param remotePort remote port to forward
+	 * @param fwdAddress address of recipient machine
+	 * @param fwdPort port on recipient machine
+	 * @throws RemoteConnectionException
+	 */
+	public void forwardRemoteTCPPort(int remotePort, String fwdAddress, int fwdPort) throws RemoteConnectionException;
 }

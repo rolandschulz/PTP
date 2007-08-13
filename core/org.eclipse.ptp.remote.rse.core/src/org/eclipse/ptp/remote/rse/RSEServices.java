@@ -12,6 +12,7 @@ package org.eclipse.ptp.remote.rse;
 
 import java.util.List;
 
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.remote.IRemoteConnection;
 import org.eclipse.ptp.remote.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.IRemoteFileManager;
@@ -53,19 +54,19 @@ public class RSEServices implements IRemoteServicesDelegate {
 			return false;
 		}
 		
-		int timeout = 0;
-		
-		while (!RSECorePlugin.getThePersistenceManager().isRestoreComplete() && timeout < 5) {
-			System.out.println("waiting for restore...");
-			try {
-				Thread.sleep(1000);
-				timeout++;
-			} catch (InterruptedException e) {
-				// Ignore
-			}
+		Job[] jobs = Job.getJobManager().find(null);
+		for(int i=0; i<jobs.length; i++) {
+		    if ("Initialize RSE".equals(jobs[i].getName())) { //$NON-NLS-1$
+		        try {
+					jobs[i].join();
+				} catch (InterruptedException e) {
+					// Ignore
+				}
+		        break;
+		    }
 		}
 		
-		if (timeout == 5) {
+		if (!RSECorePlugin.getThePersistenceManager().isRestoreComplete()) {
 			return false;
 		}
 
