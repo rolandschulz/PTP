@@ -36,9 +36,9 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.IProgressService;
 
 /**
- * Action supporting block commenting in the Fortran editor
+ * Base class (with utility methods) for Fortran editor actions
  * 
- * @author Cheah Chin Fei  from org.eclipse.cdt.internal.ui.actions
+ * @author Jeff Overbey
  */
 public abstract class FortranEditorActionDelegate
     extends Action
@@ -158,9 +158,6 @@ public abstract class FortranEditorActionDelegate
         }
     }
     
-    /**
-     * @see bz.over.rex.ui.actions.IUIThreadAccess#openHtmlViewerOn(java.lang.String, java.io.File)
-     */
     public void openHtmlViewerOn(final String title, final File file)
     {
         final class HtmlRunnable implements Runnable
