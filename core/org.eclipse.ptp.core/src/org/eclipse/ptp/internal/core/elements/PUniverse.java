@@ -46,16 +46,25 @@ public class PUniverse extends PElement implements IPUniverseControl {
 		// setOutputStore();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elementcontrols.IPUniverseControl#addResourceManager(org.eclipse.ptp.core.elementcontrols.IResourceManagerControl)
+	 */
 	public synchronized void addResourceManager(IResourceManagerControl addedManager) {
 		resourceManagers.add(addedManager);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elementcontrols.IPUniverseControl#addResourceManagers(org.eclipse.ptp.core.elementcontrols.IResourceManagerControl[])
+	 */
 	public synchronized void addResourceManagers(IResourceManagerControl[] addedManagers) {
 		for (int i=0; i<addedManagers.length; ++i) {
 			addResourceManager(addedManagers[i]);
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elementcontrols.IPUniverseControl#getNextResourceManagerId()
+	 */
 	public int getNextResourceManagerId() {
 		return (nextResourceManagerId++ << RMID_SHIFT);
 	}
@@ -72,15 +81,15 @@ public class PUniverse extends PElement implements IPUniverseControl {
 		return null;
 	}
 	
-	/**
-	 * @return all of the resource managers
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elementcontrols.IPUniverseControl#getResourceManagerControls()
 	 */
 	public synchronized IResourceManagerControl[] getResourceManagerControls() {
 		return resourceManagers.toArray(new IResourceManagerControl[0]);
 	}
 	
-	/**
-	 * @return all of the resource managers
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPUniverse#getResourceManagers()
 	 */
 	public synchronized IResourceManager[] getResourceManagers() {
 		return (IResourceManager[]) getResourceManagerControls();
@@ -93,10 +102,16 @@ public class PUniverse extends PElement implements IPUniverseControl {
 		return !resourceManagers.isEmpty();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elementcontrols.IPUniverseControl#removeResourceManager(org.eclipse.ptp.core.elements.IResourceManager)
+	 */
 	public synchronized void removeResourceManager(IResourceManager removedManager) {
 		resourceManagers.remove(removedManager);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elementcontrols.IPUniverseControl#removeResourceManagers(org.eclipse.ptp.core.elements.IResourceManager[])
+	 */
 	public void removeResourceManagers(IResourceManager[] removedRMs) {
 		for (int i=0; i<removedRMs.length; ++i) {
 			removeResourceManager(removedRMs[i]);
