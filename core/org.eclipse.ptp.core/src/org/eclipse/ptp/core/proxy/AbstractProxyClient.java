@@ -22,6 +22,7 @@ package org.eclipse.ptp.core.proxy;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
@@ -292,7 +293,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 		if (timeout > 0)
 			sessSvrSock.socket().setSoTimeout(timeout);
 		sessPort = sessSvrSock.socket().getLocalPort();
-		sessHost = sessSvrSock.socket().getLocalSocketAddress().toString();
+		sessHost = InetAddress.getLocalHost().getCanonicalHostName();
 		stateLock.lock();
 		try {
 			state = SessionState.WAITING;
