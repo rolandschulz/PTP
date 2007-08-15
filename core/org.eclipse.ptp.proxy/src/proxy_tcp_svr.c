@@ -183,7 +183,6 @@ proxy_tcp_svr_connect(proxy_svr *svr, char *host, int port)
 {
 	SOCKET					sd;
 	struct hostent *		hp;
-	long int				haddr;
 	struct sockaddr_in		scket;
 	proxy_tcp_conn *		conn = (proxy_tcp_conn *)svr->svr_data;
 		        
@@ -199,11 +198,6 @@ proxy_tcp_svr_connect(proxy_svr *svr, char *host, int port)
 		return PROXY_RES_ERR;
 	}
 	
-	haddr = ((hp->h_addr[0] & 0xff) << 24) |
-			((hp->h_addr[1] & 0xff) << 16) |
-			((hp->h_addr[2] & 0xff) <<  8) |
-			((hp->h_addr[3] & 0xff) <<  0);
-	
 	if ( (sd = socket(PF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET )
 	{
 		proxy_set_error(PROXY_ERR_SYSTEM, strerror(errno));
@@ -213,7 +207,7 @@ proxy_tcp_svr_connect(proxy_svr *svr, char *host, int port)
 	memset (&scket,0,sizeof(scket));
 	scket.sin_family = PF_INET;
 	scket.sin_port = htons((u_short) port);
-	scket.sin_addr.s_addr = htonl(haddr);
+	memcpy(&(scket.sin_addr), *(hp->h_addr_list), sizeof(struct in_addr));
 	
 	if ( connect(sd, (struct sockaddr *) &scket, sizeof(scket)) == SOCKET_ERROR )
 	{
