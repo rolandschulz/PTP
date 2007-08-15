@@ -160,7 +160,7 @@ public abstract class AbstractRemoteProcessBuilder implements IRemoteProcessBuil
 					}
 				}
 			}
-		});
+		}, commandArgs.get(0));
 		
 		runThread.start();
 		
