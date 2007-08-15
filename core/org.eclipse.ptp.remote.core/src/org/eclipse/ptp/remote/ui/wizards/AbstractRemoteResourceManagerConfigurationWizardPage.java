@@ -251,12 +251,6 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.horizontalSpan = 1;
 		remoteCombo.setLayoutData(gd);
-		remoteCombo.addModifyListener(new ModifyListener() {
-
-			public void modifyText(ModifyEvent e) {
-				handleRemoteServiceSelected();
-			}
-		});
 		
 		// TODO work out how to skip a cell!!!
 		label = new Label(projComp, SWT.NONE);
@@ -274,24 +268,11 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.horizontalSpan = 1;
 		connectionCombo.setLayoutData(gd);
-		connectionCombo.addModifyListener(new ModifyListener() {
-
-			public void modifyText(ModifyEvent e) {
-				handleConnectionSelected();
-				updatePage();
-			}
-		});
 
 		newRemoteConnectionButton = SWTUtil.createPushButton(projComp, Messages.getString("RemoteConfigurationWizard.newButton"), null);
-		newRemoteConnectionButton.addSelectionListener(new SelectionAdapter() {
-
-			public void widgetSelected(SelectionEvent evt) {
-				handleNewRemoteConnectionSelected();
-				updatePage();
-			}
-		});	
 
 		initializeRemoteServicesCombo();
+		registerListeners();
 		
 		Composite proxyComp = new Composite(parent, SWT.NONE);
 		GridLayout proxyLayout = new GridLayout();
@@ -335,6 +316,26 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 
 		manualButton = createCheckButton(otherGroup, Messages.getString("RemoteConfigurationWizard.manualButton"));
 		manualButton.addSelectionListener(listener);
+	}
+	
+	private void registerListeners() {
+		remoteCombo.addModifyListener(new ModifyListener() {
+			public void modifyText(ModifyEvent e) {
+				handleRemoteServiceSelected();
+			}
+		});
+		connectionCombo.addModifyListener(new ModifyListener() {
+			public void modifyText(ModifyEvent e) {
+				handleConnectionSelected();
+				updatePage();
+			}
+		});
+		newRemoteConnectionButton.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent evt) {
+				handleNewRemoteConnectionSelected();
+				updatePage();
+			}
+		});	
 	}
 	
 	/**
@@ -563,6 +564,8 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		if (remoteServices.length > 0) {
 			// Should trigger call to selection handler
 			remoteCombo.select(defIndex);
+			handleRemoteServiceSelected();
+			handleConnectionSelected();
 		}
 	}
 	
