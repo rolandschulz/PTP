@@ -31,9 +31,11 @@
 #include <list.h>
 
 extern proxy_svr_funcs 	proxy_tcp_svr_funcs;
+extern proxy_svr_funcs 	proxy_stdio_svr_funcs;
 
 proxy proxies[] = {
 	{"tcp", NULL, NULL,  &proxy_tcp_svr_funcs},
+	{"stdio", NULL, NULL, &proxy_stdio_svr_funcs},
 	{NULL, NULL, NULL, NULL}
 };
 
