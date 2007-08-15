@@ -14,6 +14,7 @@ package org.eclipse.ptp.remote;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -79,7 +80,23 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 			
 			if (manualLaunch) {
 				sessionCreate();
-				final String msg = "Waiting for manual launch of proxy on port " + getSessionPort() + "...";
+				
+				ArrayList<String> args = new ArrayList<String>();
+				args.add(proxyPath);
+				args.add("--proxy=tcp");
+				if (portForwarding) {
+					args.add("--host=localhost");
+				} else {
+					args.add("--host=" + getSessionHost());
+				}
+				args.add("--port="+getSessionPort());
+				
+				if (getEventLogging()) {
+					System.out.println("Launch command: " + args.toString());
+				}
+
+				
+				final String msg = "Waiting for manual launch of proxy: " + args.toString();
 				System.out.println(msg);
 				Status info = new Status(IStatus.INFO, PTPCorePlugin.getUniqueIdentifier(), IStatus.INFO, msg, null);
 				PTPCorePlugin.log(info);
@@ -90,14 +107,21 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 				if (!stdio) {
 					sessionCreate();
 					
-					String args = "--port="+getSessionPort();
+					ArrayList<String> args = new ArrayList<String>();
+					args.add(proxyPath);
+					args.add("--proxy=tcp");
 					if (portForwarding) {
-						args = "--host=localhost " + args;
+						args.add("--host=localhost");
 					} else {
-						args = "--host=" + getSessionHost() + " " + args;
+						args.add("--host=" + getSessionHost());
 					}
+					args.add("--port="+getSessionPort());
 					
-					IRemoteProcessBuilder processBuilder = remoteServices.getProcessBuilder(conn, proxyPath, args);
+					if (getEventLogging()) {
+						System.out.println("Launch command: " + args.toString());
+					}
+
+					IRemoteProcessBuilder processBuilder = remoteServices.getProcessBuilder(conn, args);
 					IRemoteProcess process = processBuilder.asyncStart();
 					
 					final BufferedReader err_reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
@@ -133,7 +157,11 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 						System.out.println(toString() + ": Waiting on accept.");
 					}
 				} else {
-					IRemoteProcessBuilder processBuilder = remoteServices.getProcessBuilder(conn, proxyPath, "--proxy=stdio");
+					ArrayList<String> args = new ArrayList<String>();
+					args.add(proxyPath);
+					args.add("--proxy=stdio");
+
+					IRemoteProcessBuilder processBuilder = remoteServices.getProcessBuilder(conn, args);
 					IRemoteProcess process = processBuilder.asyncStart();
 					
 					sessionCreate(process.getOutputStream(), process.getInputStream());
