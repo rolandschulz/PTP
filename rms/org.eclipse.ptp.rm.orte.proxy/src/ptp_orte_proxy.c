@@ -54,6 +54,7 @@
 
 #define WIRE_PROTOCOL_VERSION	"2.0"
 
+#define DEFAULT_HOST		"localhost"
 #define DEFAULT_PROXY		"tcp"
 #define DEFAULT_ORTED_ARGS	"orted --scope public --seed --persistent --no-daemonize"
 
@@ -651,8 +652,8 @@ int
 ORTECheckErrorCode(int trans_id, int type, int rc)
 {
 	if(rc != ORTE_SUCCESS) {
-		printf("ARgh!  An error!\n"); fflush(stdout);
-		printf("ERROR %s\n", ORTE_ERROR_NAME(rc)); fflush(stdout);
+		fprintf(stderr, "ARgh!  An error!\n"); fflush(stderr);
+		fprintf(stderr, "ERROR %s\n", ORTE_ERROR_NAME(rc)); fflush(stderr);
 		sendErrorEvent(trans_id, type, (char *)ORTE_ERROR_NAME(rc));
 		return 1;
 	}
@@ -744,7 +745,7 @@ orte_job_record_start(orte_jobid_t jobid)
         	return;
     	}
     	
-    	printf("registering IO forwarding - name = '%s'\n", (char *)name); fflush(stdout);
+	fprintf(stderr, "registering IO forwarding - name = '%s'\n", (char *)name); fflush(stderr);
             	
 	if (ORTE_SUCCESS != (rc = orte_iof.iof_subscribe(name, ORTE_NS_CMP_JOBID, ORTE_IOF_STDOUT, iof_callback, NULL))) {                
 		opal_output(0, "[%s:%d] orte_iof.iof_subscribed failed\n", __FILE__, __LINE__);
@@ -774,9 +775,9 @@ orte_job_record_end(orte_jobid_t jobid)
 			if (ORTE_SUCCESS != (rc = orte_ns.create_process_name(&name, 0, jobid, 0))) {
              	ORTE_ERROR_LOG(rc);
                 	return;
-            	}
-            	printf("unregistering IO forwarding - name = %s\n", (char *)name); fflush(stdout);
-            	if (ORTE_SUCCESS != (rc = orte_iof.iof_unsubscribe(name, ORTE_NS_CMP_JOBID, ORTE_IOF_STDOUT))) {                
+            }
+			fprintf(stderr, "unregistering IO forwarding - name = %s\n", (char *)name); fflush(stderr);
+            if (ORTE_SUCCESS != (rc = orte_iof.iof_unsubscribe(name, ORTE_NS_CMP_JOBID, ORTE_IOF_STDOUT))) {                
 				opal_output(0, "[%s:%d] orte_iof.iof_unsubscribed failed\n", __FILE__, __LINE__);
 			}
 			if (ORTE_SUCCESS != (rc = orte_iof.iof_unsubscribe(name, ORTE_NS_CMP_JOBID, ORTE_IOF_STDERR))) {                
@@ -802,11 +803,11 @@ job_state_callback(orte_jobid_t jobid, orte_proc_state_t proc_state)
 	ptp_job *	j = find_job(jobid, JOBID_ORTE);
 	
 	if (j == NULL) {
-		printf("JOB STATE CALLBACK: could not find jobid %d\n", jobid); fflush(stdout);
+		fprintf(stderr, "JOB STATE CALLBACK: could not find jobid %d\n", jobid); fflush(stderr);
 		return;
 	}
 	
-	printf("JOB STATE CALLBACK: %d\n", proc_state); fflush(stdout);
+	fprintf(stderr, "JOB STATE CALLBACK: %d\n", proc_state); fflush(stderr);
 		
 	/* not sure yet how we want to handle this callback, what events
 	 * we want to generate, but here are the states that I know of
@@ -1192,7 +1193,7 @@ debug_spawn(char *debug_path, int argc, char **argv, orte_app_context_t** app_co
 		return rc;
 	}
 
-	printf("About to launch debugger: %s on %d procs\n", debug_path, 	debug_context->num_procs);
+	fprintf(stderr, "About to launch debugger: %s on %d procs\n", debug_path, debug_context->num_procs);
 	
 	/*
 	 * launch the debugger
@@ -1217,7 +1218,7 @@ do_orte_init(int trans_id, char *universe_name)
 	int rc;
 	char *str;
 		
-	printf("ORTEInit (%s)\n", universe_name); fflush(stdout);
+	fprintf(stderr, "ORTEInit (%s)\n", universe_name); fflush(stderr);
 	asprintf(&str, "OMPI_MCA_universe=%s", universe_name);
 	putenv(str);
 	
@@ -1237,11 +1238,11 @@ do_orte_init(int trans_id, char *universe_name)
 	{
 	orte_ras_base_module_t *module = NULL;
   	orte_jobid_t jobid = 1;
-	printf("Calling RDS_base_query() . . .\n"); fflush(stdout);
+	fprintf(stderr, "Calling RDS_base_query() . . .\n"); fflush(stderr);
 	orte_rds_base_query();
-	printf("Calling RAS_Base_allocate() . . .\n"); fflush(stdout);
+	fprintf(stderr, "Calling RAS_Base_allocate() . . .\n"); fflush(stderr);
 	orte_ras_base_allocate(jobid, &module);
-	printf("Success with BOTH!\n"); fflush(stdout);
+	fprintf(stderr, "Success with BOTH!\n"); fflush(stderr);
 	}
 #endif
 	
@@ -1351,11 +1352,11 @@ subscribe_proc(ptp_job * job, int procid)
 	orte_gpr_value_t *			values;
 	orte_process_name_t			proc;
 
-	printf("subscribing proc %d\n", procid); fflush(stdout);
+	fprintf(stderr, "subscribing proc %d\n", procid); fflush(stderr);
 	
 	rc = orte_ns.convert_jobid_to_string(&jobid_str, job->orte_jobid);
 	if(rc != ORTE_SUCCESS) {
-		printf("ERROR: '%s'\n", ORTE_ERROR_NAME(rc)); fflush(stdout);
+		fprintf(stderr, "ERROR: '%s'\n", ORTE_ERROR_NAME(rc)); fflush(stderr);
 		return -1;
 	}
 		
@@ -1415,13 +1416,13 @@ subscribe_job(orte_jobid_t jobid)
 	ptp_job *	job;
 	
 	if (ORTE_SUCCESS != (rc = ORTE_GET_VPID_RANGE(jobid, &vpid_start, &vpid_range))) {
-		printf("no processes for job\n"); fflush(stdout);
+		fprintf(stderr, "no processes for job\n"); fflush(stderr);
 		return -1;
 	}
 	
 	job = find_job(jobid, JOBID_ORTE);
 	if (job != NULL) {
-		printf("subscribing %d procs\n", vpid_range); fflush(stdout);
+		fprintf(stderr, "subscribing %d procs\n", vpid_range); fflush(stderr);
 		
 		for (vpid = vpid_start; vpid < vpid_start + vpid_range; vpid++)
 			subscribe_proc(job, vpid);
@@ -1446,7 +1447,7 @@ bproc_notify_callback(orte_gpr_notify_data_t *data, void *cbdata)
 	char *res, *kv, *str1, *str2, *str3, *foo, *bar, *nodename;
 	int machID;
 	
-	printf("BPROC NOTIFY CALLBACK!\n"); fflush(stdout);
+	fprintf(stderr, "BPROC NOTIFY CALLBACK!\n"); fflush(stderr);
 	
 	values = (orte_gpr_value_t**)(data->values)->addr;
 	
@@ -1460,13 +1461,13 @@ bproc_notify_callback(orte_gpr_notify_data_t *data, void *cbdata)
 		keyvals = value->keyvals;
 		
 		asprintf(&nodename, "%s", value->tokens[1]);
-		printf("NODE NAME = %s\n", nodename);
+		fprintf(stderr, "NODE NAME = %s\n", nodename);
 		
 		for(j=0; j<value->cnt; j++) {
 			orte_gpr_keyval_t *keyval = keyvals[j];
 			char *external_key;
 			
-			printf("--- BPROC CHANGE: key = %s\n", keyval->key); fflush(stdout);
+			fprintf(stderr, "--- BPROC CHANGE: key = %s\n", keyval->key); fflush(stderr);
 			
 			if(!strcmp(keyval->key, ORTE_NODE_NAME_KEY))
 				asprintf(&external_key, "%s", ATTRIB_NODE_NAME);
@@ -1479,23 +1480,23 @@ bproc_notify_callback(orte_gpr_notify_data_t *data, void *cbdata)
 			else if(!strcmp(keyval->key, ORTE_SOH_BPROC_NODE_MODE))
 				asprintf(&external_key, "%s", ATTRIB_NODE_MODE);
 			else
-				printf("******************* Unknown key type on bproc event - key = '%s'\n", keyval->key); fflush(stdout);
+				fprintf(stderr, "******************* Unknown key type on bproc event - key = '%s'\n", keyval->key); fflush(stderr);
 					
 			switch(keyval->type) {
 				case ORTE_NODE_STATE:
-					printf("--- BPROC CHANGE: (state) val = %d\n", keyval->value.node_state); fflush(stdout);
+					fprintf(stderr, "--- BPROC CHANGE: (state) val = %d\n", keyval->value.node_state); fflush(stderr);
 					asprintf(&kv, "%s=%d", external_key, keyval->value.node_state);
 					break;
 				case ORTE_STRING:
-					printf("--- BPROC CHANGE: (str) val = %s\n", keyval->value.strptr); fflush(stdout);
+					fprintf(stderr, "--- BPROC CHANGE: (str) val = %s\n", keyval->value.strptr); fflush(stderr);
 					asprintf(&kv, "%s=%s", external_key, keyval->value.strptr);
 					break;
 				case ORTE_UINT32:
-					printf("--- BPROC CHANGE: (uint32) val = %d\n", keyval->value.ui32); fflush(stdout);
+					fprintf(stderr, "--- BPROC CHANGE: (uint32) val = %d\n", keyval->value.ui32); fflush(stderr);
 					asprintf(&kv, "%s=%d", external_key, keyval->value.ui32);
 					break;
 				default:
-					printf("--- BPROC CHANGE: unknown type %d\n", keyval->type); fflush(stdout);
+					fprintf(stderr, "--- BPROC CHANGE: unknown type %d\n", keyval->type); fflush(stderr);
 					asprintf(&kv, "%s=%d", external_key, keyval->type);
 			}
 			
@@ -1587,9 +1588,9 @@ subscribe_bproc(void)
 int
 do_orte_shutdown(void)
 {
-	printf("ORTEShutdown() called.  Telling daemon to turn off.\n"); fflush(stdout);
+	fprintf(stderr, "ORTEShutdown() called.  Telling daemon to turn off.\n"); fflush(stderr);
 	ORTE_SHUTDOWN();
-	printf("ORTEShutdown() - told ORTEd to exit.\n"); fflush(stdout);
+	fprintf(stderr, "ORTEShutdown() - told ORTEd to exit.\n"); fflush(stderr);
 	
 	orte_finalize();
 	
@@ -1625,7 +1626,7 @@ ORTE_Initialize(int trans_id, int nargs, char **args)
 	fd_set			fds;
 	struct timeval	timeout;
 	
-	fprintf(stdout, "ORTE_Initialize (%d):\n", trans_id); fflush(stdout);
+	fprintf(stderr, "ORTE_Initialize (%d):\n", trans_id); fflush(stderr);
 	
 	if (proxy_state != STATE_INIT) {
 		sendErrorEvent(trans_id, RTEV_ERROR_ORTE_INIT, "already initialized");
@@ -1667,11 +1668,11 @@ ORTE_Initialize(int trans_id, int nargs, char **args)
 			asprintf(&res, "%s --universe PTP-ORTE-%d --report-uri %d", DEFAULT_ORTED_ARGS, getpid(), pfd[1]);
 
 			orted_args  = Str2Args(res);
-			printf("StartDaemon(orted %s)\n", res); fflush(stdout);
+			fprintf(stderr, "StartDaemon(orted %s)\n", res); fflush(stderr);
 			free(res);
 			
 			/* spawn the daemon */
-			printf("CHILD: Starting execvp now!\n"); fflush(stdout);
+			fprintf(stderr, "CHILD: Starting execvp now!\n"); fflush(stderr);
 			errno = 0;
 			close(pfd[0]);
 
@@ -1681,15 +1682,15 @@ ORTE_Initialize(int trans_id, int nargs, char **args)
 			FreeArgs(orted_args);
 			
 			if (ret != 0) {
-				printf("CHILD: error return from execvp, ret = %d, errno = %d\n", ret, errno); fflush(stdout);
-				printf("CHILD: PATH = %s\n", getenv("PATH")); fflush(stdout);
+				fprintf(stderr, "CHILD: error return from execvp, ret = %d, errno = %d\n", ret, errno); fflush(stderr);
+				fprintf(stderr, "CHILD: PATH = %s\n", getenv("PATH")); fflush(stderr);
 				exit(ret);
 			}
 		}
 		break;
     /* parent */
     default:
-    	printf("PARENT: orted_pid = %d\n", orted_pid); fflush(stdout);
+    	fprintf(stderr, "PARENT: orted_pid = %d\n", orted_pid); fflush(stderr);
     	
 		/* 
 		 * the daemon will report it's URI on the pipe when it's started up 
@@ -1717,7 +1718,7 @@ ORTE_Initialize(int trans_id, int nargs, char **args)
 		default:
 			if ((n = read(pfd[0], buf, BUFSIZ-1)) > 0) {
 				buf[n] = '\0';
-				printf("PARENT: URI = %s\n", buf); fflush(stdout);
+				fprintf(stderr, "PARENT: URI = %s\n", buf); fflush(stderr);
 			}
 		}
 
@@ -1741,7 +1742,7 @@ ORTE_Initialize(int trans_id, int nargs, char **args)
 
 	ORTE_QUERY(ORTE_JOBID_INVALID);
 	
-	printf("Start daemon returning OK.\n");
+	fprintf(stderr, "Start daemon returning OK.\n"); fflush(stderr);
 	
 	proxy_state = STATE_RUNNING;
 	
@@ -1756,7 +1757,7 @@ ORTE_Initialize(int trans_id, int nargs, char **args)
 int
 ORTE_ModelDef(int trans_id, int nargs, char **args)
 {
-	fprintf(stdout, "ORTE_ModelDef (%d):\n", trans_id); fflush(stdout);
+	fprintf(stderr, "ORTE_ModelDef (%d):\n", trans_id); fflush(stderr);
 	
 #ifdef HAVE_SYS_BPROC_H
 	sendAttrDefStringEvent(trans_id, NODE_USER_ATTR, "User Name", "User owner of node (BPROC)", "");
@@ -1773,7 +1774,7 @@ ORTE_ModelDef(int trans_id, int nargs, char **args)
  int
 ORTE_StopEvents(int trans_id, int nargs, char **args)
 {
-	fprintf(stdout, "  ORTE_StopEvents (%d):\n", trans_id); fflush(stdout);
+	fprintf(stderr, "  ORTE_StopEvents (%d):\n", trans_id); fflush(stderr);
 	/* notification that start events have completed */
 	sendOKEvent(gTransID);
 	gTransID = 0;
@@ -1814,7 +1815,7 @@ ORTE_SubmitJob(int trans_id, int nargs, char **args)
 	orte_jobid_t			debug_jobid = -1;
 	ptp_job *				j;
 
-	fprintf(stdout, "  ORTE_SubmitJob (%d): %s\n", trans_id, args[0]); fflush(stdout);
+	fprintf(stderr, "  ORTE_SubmitJob (%d): %s\n", trans_id, args[0]); fflush(stderr);
 
 	for (i = 0; i < nargs; i++) {
 		if (strncmp(args[i], JOB_SUB_ID_ATTR, strlen(JOB_SUB_ID_ATTR)) == 0) {
@@ -1962,9 +1963,9 @@ ORTE_SubmitJob(int trans_id, int nargs, char **args)
 	apps->argc = num_args + 1;
 #endif /* ORTE_VERSION_1_0 */
 
-	printf("%s %d processes of job '%s'\n", debug ? "Debugging" : "Spawning" , (int)apps->num_procs, apps->app);
-	printf("\tprogram name '%s'\n", apps->argv[0]);
-	fflush(stdout);
+	fprintf(stderr, "%s %d processes of job '%s'\n", debug ? "Debugging" : "Spawning" , (int)apps->num_procs, apps->app);
+	fprintf(stderr, "\tprogram name '%s'\n", apps->argv[0]);
+	fflush(stderr);
 	
 	/* calls the ORTE spawn function with the app to spawn.  Return the
 	 * jobid assigned by the registry/ORTE.  Passes a callback function
@@ -1976,7 +1977,7 @@ ORTE_SubmitJob(int trans_id, int nargs, char **args)
 		rc = ORTE_SPAWN(&apps, 1, &ortejobid, job_state_callback);
 	}
 	
-	printf("SPAWNED [error code %d = '%s'], now unlocking\n", rc, ORTE_ERROR_NAME(rc)); fflush(stdout);
+	fprintf(stderr, "SPAWNED [error code %d = '%s'], now unlocking\n", rc, ORTE_ERROR_NAME(rc)); fflush(stderr);
 	
 	OBJ_RELEASE(apps);
 	
@@ -1985,7 +1986,7 @@ ORTE_SubmitJob(int trans_id, int nargs, char **args)
 		return PROXY_RES_OK;
 	}
 
-	printf("NEW JOB (%s,%d,%d)\n", jobsubid, ptpid, (int)ortejobid); fflush(stdout);
+	fprintf(stderr, "NEW JOB (%s,%d,%d)\n", jobsubid, ptpid, (int)ortejobid); fflush(stderr);
 
 	/*
 	 * Send ok for job submission.
@@ -2085,7 +2086,7 @@ ORTE_StartEvents(int trans_id, int nargs, char **args)
 	int				nodeid;
 	int				num_nodes;
 	
-	fprintf(stdout, "  ORTE_StartEvents (%d):\n", trans_id); fflush(stdout);
+	fprintf(stderr, "  ORTE_StartEvents (%d):\n", trans_id); fflush(stderr);
 
 	if (proxy_state != STATE_RUNNING) {
 		sendErrorEvent(trans_id, RTEV_ERROR_ORTE_INIT, "must call INIT first");
@@ -2153,7 +2154,7 @@ ORTE_Quit(int trans_id, int nargs, char **args)
 {
 	int old_state = proxy_state;
 	
-	printf("ORTE_Quit called!\n"); fflush(stdout);
+	fprintf(stderr, "ORTE_Quit called!\n"); fflush(stderr);
 	
 	proxy_state = STATE_SHUTTING_DOWN;
 
@@ -2175,31 +2176,35 @@ server(char *name, char *host, int port)
 	gJobList = NewList();
 	gMachineList = NewList();
 	
-	if (proxy_svr_init(name, &timeout, &helper_funcs, &command_tab, &orte_proxy) != PROXY_RES_OK)
+	if (proxy_svr_init(name, &timeout, &helper_funcs, &command_tab, &orte_proxy) != PROXY_RES_OK) {
+		fprintf(stderr, "proxy failed to initialized\n"); fflush(stderr);
 		return 0;
-	
-	proxy_svr_connect(orte_proxy, host, port);
-	printf("proxy_svr_connect returned.\n");
-	
-	while (ptp_signal_exit == 0 && proxy_state != STATE_SHUTDOWN) {
-		if (proxy_state == STATE_SHUTTING_DOWN) {
-			proxy_state = STATE_SHUTDOWN;
-		}
-		if  ((do_orte_progress() != PROXY_RES_OK) ||
-			(proxy_svr_progress(orte_proxy) != PROXY_RES_OK))
-			break;
 	}
 	
-	if (ptp_signal_exit != 0) {
-		if (ptp_signal_exit != SIGCHLD && proxy_state != STATE_SHUTTING_DOWN && proxy_state != STATE_SHUTDOWN) {
-			do_orte_shutdown();
+	if (proxy_svr_connect(orte_proxy, host, port) == PROXY_RES_OK) {
+		fprintf(stderr, "proxy connected\n"); fflush(stderr);
+		
+		while (ptp_signal_exit == 0 && proxy_state != STATE_SHUTDOWN) {
+			if (proxy_state == STATE_SHUTTING_DOWN) {
+				proxy_state = STATE_SHUTDOWN;
+			}
+			if  ((do_orte_progress() != PROXY_RES_OK) ||
+				(proxy_svr_progress(orte_proxy) != PROXY_RES_OK))
+				break;
 		}
-		/* our return code = the signal that fired */
-		rc = ptp_signal_exit;
+		
+		if (ptp_signal_exit != 0) {
+			if (ptp_signal_exit != SIGCHLD && proxy_state != STATE_SHUTTING_DOWN && proxy_state != STATE_SHUTDOWN) {
+				do_orte_shutdown();
+			}
+			/* our return code = the signal that fired */
+			rc = ptp_signal_exit;
+		}
+	} else {
+		fprintf(stderr, "proxy connection failed\n"); fflush(stderr);
 	}
 	
 	proxy_svr_finish(orte_proxy);
-	printf("proxy_svr_finish returned.\n");
 	
 	return rc;
 }
@@ -2224,7 +2229,7 @@ main(int argc, char *argv[])
 {
 	int				ch;
 	int				port = PROXY_TCP_PORT;
-	char *			host = "localhost";
+	char *			host = DEFAULT_HOST;
 	char *			proxy_str = DEFAULT_PROXY;
 	int				rc;
 	
@@ -2261,29 +2266,29 @@ main(int argc, char *argv[])
 	saved_signals[SIGCHLD] = signal(SIGCHLD, ptp_signal_handler);
 	
 	if(saved_signals[SIGINT] != SIG_ERR && saved_signals[SIGINT] != SIG_IGN && saved_signals[SIGINT] != SIG_DFL) {
-		printf("  ---> SIGNAL SIGINT was previously already defined.  Shadowing.\n"); fflush(stdout);
+		fprintf(stderr, "  ---> SIGNAL SIGINT was previously already defined.  Shadowing.\n"); fflush(stderr);
 	}
 	if(saved_signals[SIGHUP] != SIG_ERR && saved_signals[SIGHUP] != SIG_IGN && saved_signals[SIGHUP] != SIG_DFL) {
-		printf("  ---> SIGNAL SIGHUP was previously already defined.  Shadowing.\n"); fflush(stdout);
+		fprintf(stderr, "  ---> SIGNAL SIGHUP was previously already defined.  Shadowing.\n"); fflush(stderr);
 	}
 	if(saved_signals[SIGILL] != SIG_ERR && saved_signals[SIGILL] != SIG_IGN && saved_signals[SIGILL] != SIG_DFL) {
-		printf("  ---> SIGNAL SIGILL was previously already defined.  Shadowing.\n"); fflush(stdout);
+		fprintf(stderr, "  ---> SIGNAL SIGILL was previously already defined.  Shadowing.\n"); fflush(stderr);
 	}
 	if(saved_signals[SIGSEGV] != SIG_ERR && saved_signals[SIGSEGV] != SIG_IGN && saved_signals[SIGSEGV] != SIG_DFL) {
-		printf("  ---> SIGNAL SIGSEGV was previously already defined.  Shadowing.\n"); fflush(stdout);
+		fprintf(stderr, "  ---> SIGNAL SIGSEGV was previously already defined.  Shadowing.\n"); fflush(stderr);
 	}	
 	if(saved_signals[SIGTERM] != SIG_ERR && saved_signals[SIGTERM] != SIG_IGN && saved_signals[SIGTERM] != SIG_DFL) {
-		printf("  ---> SIGNAL SIGTERM was previously already defined.  Shadowing.\n"); fflush(stdout);
+		fprintf(stderr, "  ---> SIGNAL SIGTERM was previously already defined.  Shadowing.\n"); fflush(stderr);
 	}
 	if(saved_signals[SIGQUIT] != SIG_ERR && saved_signals[SIGQUIT] != SIG_IGN && saved_signals[SIGQUIT] != SIG_DFL) {
-		printf("  ---> SIGNAL SIGQUIT was previously already defined.  Shadowing.\n"); fflush(stdout);
+		fprintf(stderr, "  ---> SIGNAL SIGQUIT was previously already defined.  Shadowing.\n"); fflush(stderr);
 	}
 	if(saved_signals[SIGABRT] != SIG_ERR && saved_signals[SIGABRT] != SIG_IGN && saved_signals[SIGABRT] != SIG_DFL) {
-		printf("  ---> SIGNAL SIGABRT was previously already defined.  Shadowing.\n"); fflush(stdout);
+		fprintf(stderr, "  ---> SIGNAL SIGABRT was previously already defined.  Shadowing.\n"); fflush(stderr);
 	}	
 	if(saved_signals[SIGCHLD] != SIG_ERR && saved_signals[SIGABRT] != SIG_IGN && saved_signals[SIGCHLD] != SIG_DFL) {
-		printf("  ---> SIGNAL SIGABRT was previously already defined.  Shadowing.\n"); fflush(stdout);
-	}	
+		fprintf(stderr, "  ---> SIGNAL SIGABRT was previously already defined.  Shadowing.\n"); fflush(stderr);
+	}
 	rc = server(proxy_str, host, port);
 	
 	return rc;
