@@ -2122,7 +2122,6 @@ GetPtypeValue(char *exp)
 static int 
 get_simple_type(char *type)
 {
-	char *pt;
 	char *t = NULL;
 	int id;
 	int len = strlen(type);
