@@ -37,10 +37,9 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 
 /**
- * Simple scanner for Fortran keywords (for syntax highlighting)
+ * Scans for for Fortran keywords (for syntax highlighting)
  * 
- * @author Jeff Overbey based on code from Photran 1.0
- *         (by Vaishali De or Julia Dragan-Chirila?)
+ * @author Jeff Overbey
  */
 public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
 {

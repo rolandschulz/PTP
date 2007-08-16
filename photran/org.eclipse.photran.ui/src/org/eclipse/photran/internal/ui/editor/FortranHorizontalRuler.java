@@ -36,16 +36,15 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * @author Nicholas Chen
- * @author Cheah Chin Fei
- * @author Jeff Overbey combined into single class
- *
  * Base class for horizontal rulers. Draws thin ruler on the top of the editor
  * once associated with the editor at hand.
- *
+ * <p>
  * Based on the work of the zen.xhtml.editor that was released in the Eclipse newsgroups
  * Zenil - org.zen.xhtml.editor
  * 
+ * @author Nicholas Chen
+ * @author Cheah Chin Fei
+ * @author Jeff Overbey combined into single class
  */
 public class FortranHorizontalRuler extends Composite {
 	
