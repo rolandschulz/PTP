@@ -914,7 +914,14 @@ SetAndCheckBreak(int bpid, int isTemp, int isHard, char *where, char *condition,
 		//DbgSetError(DBGERR_NOFILE, "error getting breakpoint information");
 		return DBGRES_ERR;
 	}
-		
+	
+	//if the type is temporary, no need to store it and send bpt set event
+	if (isTemp) {
+		SaveEvent(NewDbgEvent(DBGEV_OK));
+		DestroyList(bpts, MIBreakpointFree);
+		return DBGRES_OK;
+	}
+
 	SetList(bpts);
 	bpt = (MIBreakpoint *)GetListElement(bpts);
 	
@@ -2115,6 +2122,7 @@ GetPtypeValue(char *exp)
 static int 
 get_simple_type(char *type)
 {
+	char *pt;
 	char *t = NULL;
 	int id;
 	int len = strlen(type);
