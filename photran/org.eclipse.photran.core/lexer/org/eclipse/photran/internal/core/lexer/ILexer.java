@@ -5,7 +5,7 @@ import org.eclipse.core.resources.IFile;
 /**
  * Common interface implemented by fixed and free form Fortran lexers
  * 
- * @author joverbey
+ * @author Jeff Overbey
  */
 public interface ILexer
 {
