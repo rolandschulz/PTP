@@ -831,7 +831,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 		} else if (attrType.equals("DOUBLE")) {
 			try {
 				Double defVal = Double.parseDouble(attrDefault);
-				if (end - pos > 1) {
+				if (end - pos > 0) {
 						Double min = Double.parseDouble(attrs[pos++]);
 						Double max = Double.parseDouble(attrs[pos++]);
 						attrDef = attrDefManager.createDoubleAttributeDefinition(attrId, attrName, attrDesc, attrDisplay, defVal, min, max);
@@ -862,7 +862,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 		} else if (attrType.equals("INTEGER")) {
 			try {
 				Integer defVal = Integer.parseInt(attrDefault);
-				if (end - pos > 1) {
+				if (end - pos > 0) {
 						Integer min = Integer.parseInt(attrs[pos++]);
 						Integer max = Integer.parseInt(attrs[pos++]);
 						attrDef = attrDefManager.createIntegerAttributeDefinition(attrId, attrName, attrDesc, attrDisplay, defVal, min, max);
@@ -880,7 +880,7 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 		} else if (attrType.equals("BIGINTEGER")) {
 			try {
 				BigInteger defVal = new BigInteger(attrDefault);
-				if (end - pos > 1) {
+				if (end - pos > 0) {
 						BigInteger min = new BigInteger(attrs[pos++]);
 						BigInteger max = new BigInteger(attrs[pos++]);
 						attrDef = attrDefManager.createBigIntegerAttributeDefinition(attrId,
