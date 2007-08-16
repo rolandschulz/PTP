@@ -229,7 +229,7 @@ add_arg(proxy_msg *m, char *arg, int free_arg)
 	char **	tmp_args;
 	int *	tmp_free;
 
-	if (m->arg_size < m->num_args + 1) {
+	if (m->arg_size < m->num_args + 2) {
 		m->arg_size += ARG_SIZE;
 	}
 
