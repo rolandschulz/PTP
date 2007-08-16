@@ -259,12 +259,12 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
             //wordRule = new FixedFormIdentifierWordRule(new FortranWordDetector(), colorIdentifiers);
         }
         
+        Eclipse33WordRule wordRule = new Eclipse33WordRule(new FortranWordDetector(), Token.UNDEFINED, true);
         SalesScanKeywordRule salesRule = new SalesScanKeywordRule(new FortranWordDetector(), colorIdentifiers);
-        Eclipse33WordRule wordRule = new Eclipse33WordRule(new FortranWordDetector(), colorIdentifiers, true);
 
         createSpecialWordRules(salesRule, wordRule);
         rules[i++] = wordRule;
-        rules[i++] = salesRule; // Apply Sales last, since it will 
+        rules[i++] = salesRule; // Apply Sales last, since it will mark "everything else" as an identifier
 
         setRules(rules);
         
