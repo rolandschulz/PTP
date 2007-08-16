@@ -299,7 +299,10 @@ public class BreakpointManager extends SessionObject implements IPCDIBreakpointM
 			throw new PCDIException("No breakpoint command created");
 		}
 		getSession().getDebugger().postCommand(command);
-		addBreakpoint(bpt, command.getPCDIBreakpoint());
+		if (cdiBpt.isTemporary())
+			command.waitForReturn();
+		else
+			addBreakpoint(bpt, command.getPCDIBreakpoint());
 	}
 	private AbstractBreakpointCommand getSetBreakpointCommand(BitList tasks, IPCDIBreakpoint bkpt, boolean ignoreCheck) {
 		if (bkpt instanceof IPCDILineBreakpoint) {
