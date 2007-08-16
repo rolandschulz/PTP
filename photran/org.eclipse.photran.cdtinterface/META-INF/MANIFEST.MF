@@ -10,7 +10,7 @@ Bundle-Localization: plugin
 Export-Package: org.eclipse.photran.cdtinterface,
  org.eclipse.photran.cdtinterface.core,
  org.eclipse.photran.cdtinterface.ui,
- org.eclipse.photran.internal.core.model;x-friends:="org.eclipse.photran.cdtinterface.tests"
+ org.eclipse.photran.internal.core.model
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.jface,

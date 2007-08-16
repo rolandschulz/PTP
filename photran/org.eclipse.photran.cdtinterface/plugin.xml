@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.2"?>
 <plugin>
-
    <!--======================-->
    <!-- CDT Core Integration -->
    <!--======================-->
@@ -187,4 +186,10 @@
          <part id="org.eclipse.search.SearchResultView"/>
       </actionSetPartAssociation>
    </extension>
+
+   <!--===============================-->
+   <!-- Model Builder Extension Point -->
+   <!--===============================-->
+
+   <extension-point id="modelbuilder" name="Model Builder" schema="schema/modelbuilder.exsd"/>
 </plugin>

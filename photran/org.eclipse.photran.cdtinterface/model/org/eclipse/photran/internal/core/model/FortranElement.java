@@ -8,7 +8,7 @@ import org.eclipse.cdt.internal.core.model.Parent;
 import org.eclipse.cdt.internal.core.model.SourceManipulation;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.photran.cdtinterface.CDTInterfacePlugin;
-import org.eclipse.photran.internal.core.lexer.Token;
+import org.eclipse.photran.internal.core.lexer.IToken;
 
 /**
  * Photran inherits from its CDT heritage the C Model, which is a tree representing a C workspace.
@@ -51,7 +51,7 @@ public abstract class FortranElement extends SourceManipulation // Parent
      * subroutines, etc.). For the ones that do, this is the <code>Token</code> for that name. It
      * is expected to contain position information within the source file.
      */
-    protected Token identifier = null;
+    protected IToken identifier = null;
 
     /**
      * Most elements in the <code>FortranElement</code> hierarchy have a name (functions,
@@ -60,7 +60,7 @@ public abstract class FortranElement extends SourceManipulation // Parent
      * 
      * @return the identifier <code>Token</code> for this element.
      */
-    public Token getIdentifier()
+    public IToken getIdentifier()
     {
         return identifier;
     }
@@ -72,7 +72,7 @@ public abstract class FortranElement extends SourceManipulation // Parent
      * 
      * @param identifier The identifier <code>Token</code> for this element.
      */
-    public void setIdentifier(Token identifier)
+    public void setIdentifier(IToken identifier)
     {
         this.identifier = identifier;
 
@@ -98,23 +98,9 @@ public abstract class FortranElement extends SourceManipulation // Parent
      * @param identifier
      * @param parseTreeNode
      */
-	public FortranElement(Parent parent, Token identifier)
+	public FortranElement(Parent parent, IToken identifier)
     {
-		this(parent, identifier, -1);
-    }
-
-	/**
-     * Creates a new <code>FortranElement</code> under the given parent, which has the given name
-     * (passed as a <code>Token</code>) from the source text and the given type
-     * (see {@link org.eclipse.cdt.core.model.ICElement})
-     * 
-     * @param parent
-     * @param identifier
-     * @param parseTreeNode
-     */
-	public FortranElement(Parent parent, Token identifier, int type)
-    {
-		super(parent, identifier != null ? identifier.getText() : "(anonymous)", type);
+        super(parent, identifier != null ? identifier.getText() : "(anonymous)", -1);
         this.setIdentifier(identifier);
     }
 
@@ -188,7 +174,7 @@ public abstract class FortranElement extends SourceManipulation // Parent
 
     public static class MainProgram extends FortranElement
     {
-        public MainProgram(Parent parent, Token nameToken)
+        public MainProgram(Parent parent, IToken nameToken)
         {
             super(parent, nameToken);
         }
@@ -201,7 +187,7 @@ public abstract class FortranElement extends SourceManipulation // Parent
 
     public static class Module extends FortranElement
     {
-        public Module(Parent parent, Token nameToken)
+        public Module(Parent parent, IToken nameToken)
         {
             super(parent, nameToken);
         }
@@ -214,9 +200,9 @@ public abstract class FortranElement extends SourceManipulation // Parent
 
     public static class DerivedType extends FortranElement
     {
-        public DerivedType(Parent parent, Token nameToken)
+        public DerivedType(Parent parent, IToken nameToken)
         {
-            super(parent, nameToken, ICElement.C_STRUCT);
+            super(parent, nameToken);
         }
 
         public ImageDescriptor getBaseImageDescriptor()
@@ -227,9 +213,9 @@ public abstract class FortranElement extends SourceManipulation // Parent
 
     public static class Function extends FortranElement
     {
-        public Function(Parent parent, Token nameToken)
+        public Function(Parent parent, IToken nameToken)
         {
-            super(parent, nameToken, ICElement.C_FUNCTION);
+            super(parent, nameToken);
         }
 
         public ImageDescriptor getBaseImageDescriptor()
@@ -240,9 +226,9 @@ public abstract class FortranElement extends SourceManipulation // Parent
 
     public static class Subroutine extends FortranElement
     {
-        public Subroutine(Parent parent, Token nameToken)
+        public Subroutine(Parent parent, IToken nameToken)
         {
-            super(parent, nameToken, ICElement.C_FUNCTION);
+            super(parent, nameToken);
         }
 
         public ImageDescriptor getBaseImageDescriptor()
@@ -251,9 +237,22 @@ public abstract class FortranElement extends SourceManipulation // Parent
         }
     }
 
+    public static class Interface extends FortranElement
+    {
+        public Interface(Parent parent, IToken nameToken)
+        {
+            super(parent, nameToken);
+        }
+
+        public ImageDescriptor getBaseImageDescriptor()
+        {
+            return getImageDescriptorForIcon("unknown.gif");
+        }
+    }
+
     public static class BlockData extends FortranElement
     {
-        public BlockData(Parent parent, Token nameToken)
+        public BlockData(Parent parent, IToken nameToken)
         {
             super(parent, nameToken);
         }
@@ -266,7 +265,7 @@ public abstract class FortranElement extends SourceManipulation // Parent
 
     public static class Variable extends FortranElement
     {
-        public Variable(Parent parent, Token nameToken)
+        public Variable(Parent parent, IToken nameToken)
         {
             super(parent, nameToken);
         }

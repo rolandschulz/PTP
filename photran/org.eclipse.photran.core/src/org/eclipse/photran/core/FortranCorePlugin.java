@@ -11,7 +11,6 @@
 package org.eclipse.photran.core;
 
 import org.eclipse.core.runtime.Plugin;
-import org.eclipse.photran.internal.core.parser.Parser;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -26,8 +25,6 @@ public class FortranCorePlugin extends Plugin
     
     // The shared instance.
     private static FortranCorePlugin plugin;
-    
-    private static Parser parser = new Parser();
 
     /**
      * The constructor.
@@ -60,13 +57,5 @@ public class FortranCorePlugin extends Plugin
     public static FortranCorePlugin getDefault()
     {
         return plugin;
-    }
-    
-    /**
-     * @return the Fortran 95 parser
-     */
-    public static Parser getParser()
-    {
-        return parser;
     }
 }

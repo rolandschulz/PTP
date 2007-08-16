@@ -15,8 +15,11 @@ import org.eclipse.cdt.core.parser.CodeReader;
 import org.eclipse.cdt.core.parser.IParserLogService;
 import org.eclipse.cdt.core.parser.IScannerInfo;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.photran.core.FortranCorePlugin;
-import org.eclipse.photran.internal.core.model.FortranModelBuilder;
+import org.eclipse.photran.internal.core.model.IFortranModelBuilder;
+import org.eclipse.photran.internal.core.model.SimpleFortranModelBuilder;
 
 /**
  * CDT extension language for Fortran
@@ -34,7 +37,20 @@ public class FortranLanguage extends AbstractLanguage
 
 	public IContributedModelBuilder createModelBuilder(ITranslationUnit tu)
 	{
-		return new FortranModelBuilder(tu, tu.getContentTypeId().equals(FortranCorePlugin.FIXED_FORM_CONTENT_TYPE));
+	    IFortranModelBuilder modelBuilder = null;
+	    
+	    IConfigurationElement[] configs= Platform.getExtensionRegistry().getConfigurationElementsFor("org.eclipse.photran.cdtinterface.modelbuilder");
+	    if (configs.length > 0)
+	    {
+	        try { modelBuilder = (IFortranModelBuilder)configs[0].createExecutableExtension("class"); }
+	        catch (CoreException e) {;}
+	    }
+	        
+	    if (modelBuilder == null) modelBuilder = new SimpleFortranModelBuilder();
+	    
+	    modelBuilder.setTranslationUnit(tu);
+	    modelBuilder.setIsFixedForm(tu.getContentTypeId().equals(FortranCorePlugin.FIXED_FORM_CONTENT_TYPE));
+	    return modelBuilder;
 	}
 
 	public IASTTranslationUnit getASTTranslationUnit(CodeReader reader,
