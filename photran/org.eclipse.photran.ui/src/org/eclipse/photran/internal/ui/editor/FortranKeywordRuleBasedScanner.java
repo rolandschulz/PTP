@@ -66,6 +66,8 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
 
     /**
      * Rule which detects identifiers between columns 7 and 72 
+     * 
+     * @see org.eclipse.jface.text.rules.WordRule
      */
     private static final class FixedFormIdentifierWordRule extends WordRule
     {
@@ -110,7 +112,6 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
 
     /**
      * Word detector for Fortran identifiers and generic operators
-     * @author joverbey
      */
     private static final class FortranWordDetector implements IWordDetector
     {
@@ -228,7 +229,7 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
     {
         FortranCorePlugin.getDefault().getPluginPreferences().addPropertyChangeListener(new PreferenceChangeListener(sourceViewer));
 
-        IRule[] rules = new IRule[isFixedForm ? 7 : 4];
+        IRule[] rules = new IRule[isFixedForm ? 8 : 5];
         int i = 0;
 
         rules[i++] = new MultiLineRule("\"", "\"", colorStrings);
@@ -236,7 +237,7 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
 
         rules[i++] = new EndOfLineRule("!", colorComments);
         
-        WordRule rule;
+        WordRule salesRule, wordRule;
         if (isFixedForm)
         {
             EndOfLineRule c1 = new EndOfLineRule("c", colorComments);
@@ -250,14 +251,19 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
             IRule c3 = new FixedFormColumn72CommentRule();
             rules[i++] = c3;
 
-            rule = new FixedFormIdentifierWordRule(new FortranWordDetector(), colorIdentifiers);
+            //salesRule = new FixedFormIdentifierWordRule(new FortranWordDetector(), colorIdentifiers);
+            //wordRule = new FixedFormIdentifierWordRule(new FortranWordDetector(), colorIdentifiers);
+            salesRule = new SalesScanKeywordRule(new FortranWordDetector(), colorIdentifiers);
+            wordRule = new WordRule(new FortranWordDetector(), colorIdentifiers);
         }
         else
         {
-            rule = new WordRule(new FortranWordDetector(), colorIdentifiers);
+            salesRule = new SalesScanKeywordRule(new FortranWordDetector(), colorIdentifiers);
+            wordRule = new WordRule(new FortranWordDetector(), colorIdentifiers);
         }
-        createSpecialWordRules(rule);
-        rules[i++] = rule;
+        createSpecialWordRules(salesRule, wordRule);
+        rules[i++] = salesRule;
+        rules[i++] = wordRule;
 
         setRules(rules);
         
@@ -265,32 +271,33 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
         setDefaultReturnToken(new Token(new TextAttribute(new Color(Display.getCurrent(), new RGB(0, 0, 0)))));
     }
 
-    private void createSpecialWordRules(WordRule rule)
+    private void createSpecialWordRules(WordRule salesRule, WordRule wordRule)
     {
         // If a word appears more than once (e.g., "real" or "len"), the LAST rule assigned to it will apply
-        for (int i = 0; i < fgTextualOperators.length; i++)
-        {
-            rule.addWord(fgTextualOperators[i].toLowerCase(), colorKeywords);
-            rule.addWord(fgTextualOperators[i], colorKeywords);
-        }
         for (int i = 0; i < fgPreprocessor.length; i++)
         {
-            rule.addWord(fgPreprocessor[i], colorKeywords);
-        }
-        for (int i = 0; i < fgIntrinsics.length; i++)
-        {
-            rule.addWord(fgIntrinsics[i].toLowerCase(), colorIntrinsics);
-            rule.addWord(fgIntrinsics[i], colorIntrinsics);
+            salesRule.addWord(fgPreprocessor[i], colorKeywords);
         }
         for (int i = 0; i < fgTypes.length; i++)
         {
-            rule.addWord(fgTypes[i].toLowerCase(), colorKeywords);
-            rule.addWord(fgTypes[i], colorKeywords);
+            salesRule.addWord(fgTypes[i].toLowerCase(), colorKeywords);
+            salesRule.addWord(fgTypes[i], colorKeywords);
         }
         for (int i = 0; i < fgKeywords.length; i++)
         {
-            rule.addWord(fgKeywords[i].toLowerCase(), colorKeywords);
-            rule.addWord(fgKeywords[i], colorKeywords);
+            salesRule.addWord(fgKeywords[i].toLowerCase(), colorKeywords);
+            salesRule.addWord(fgKeywords[i], colorKeywords);
+        }
+
+        for (int i = 0; i < fgTextualOperators.length; i++)
+        {
+            wordRule.addWord(fgTextualOperators[i].toLowerCase(), colorKeywords);
+            wordRule.addWord(fgTextualOperators[i], colorKeywords);
+        }
+        for (int i = 0; i < fgIntrinsics.length; i++)
+        {
+            wordRule.addWord(fgIntrinsics[i].toLowerCase(), colorIntrinsics);
+            wordRule.addWord(fgIntrinsics[i], colorIntrinsics);
         }
     }
 }

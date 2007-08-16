@@ -246,15 +246,15 @@ public class SalesScanKeywordRule extends WordRule implements IRule
         SalesScanner salesScanner = new SalesScanner(fLineBuffer.toString(), fBuffer.toString());
         boolean result = salesScanner.retainAsKeyword(fWordCol);
         
-        System.out.println();
-        System.out.println("\"" + fLineBuffer + "\"");
-        System.out.println("\"" + fBuffer + "\"");
-        System.out.println("Position " + fWordCol);
-        System.out.println("First token at column " + (salesScanner.firstTokenPos));
-        System.out.println("First token following ) at " + (salesScanner.tokenFollowingParentheticalPos));
-        System.out.println("Open context comma?   " + salesScanner.openContextComma);
-        System.out.println("Open context equals?  " + salesScanner.openContextEquals);
-        System.out.println("Letter follows paren? " + salesScanner.letterFollowsParenthetical);
+//        System.out.println();
+//        System.out.println("\"" + fLineBuffer + "\"");
+//        System.out.println("\"" + fBuffer + "\"");
+//        System.out.println("Position " + fWordCol);
+//        System.out.println("First token at column " + (salesScanner.firstTokenPos));
+//        System.out.println("First token following ) at " + (salesScanner.tokenFollowingParentheticalPos));
+//        System.out.println("Open context comma?   " + salesScanner.openContextComma);
+//        System.out.println("Open context equals?  " + salesScanner.openContextEquals);
+//        System.out.println("Letter follows paren? " + salesScanner.letterFollowsParenthetical);
         
         return result ? token : fDefaultToken;
     }
@@ -413,7 +413,7 @@ public class SalesScanKeywordRule extends WordRule implements IRule
             if (precedingKeyword.indexOf("(") >= 0) precedingKeyword = precedingKeyword.substring(0, precedingKeyword.indexOf("("));
             precedingKeyword = precedingKeyword.trim();
             
-            System.out.println("Preceding keyword is " + precedingKeyword);
+            //System.out.println("Preceding keyword is " + precedingKeyword);
             
             if (isType(keyword))
                 return isPrefixSpec(precedingKeyword) || precedingKeyword.equalsIgnoreCase("implicit");
