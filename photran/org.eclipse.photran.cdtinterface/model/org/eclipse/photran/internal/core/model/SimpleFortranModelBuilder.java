@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2007 University of Illinois at Urbana-Champaign and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     UIUC - Initial API and implementation
+ *******************************************************************************/
 package org.eclipse.photran.internal.core.model;
 
 import java.io.ByteArrayInputStream;
@@ -24,17 +34,19 @@ import org.eclipse.photran.internal.core.lexer.SimpleTokenFactory;
 import org.eclipse.photran.internal.core.lexer.Terminal;
 
 /**
- * The Fortran model builder calls a <code>FortranModelBuildingVisitor</code> to create the model
- * you see in the (normal) Outline view.
- * 
+ * This is a minimal Fortran model builder (which populates the model
+ * you see in the Outline view) based only on lexical analysis.
+ * The preferred model builder (based on the parser) is in the Core VPG
+ * plug-in.
+ * <p>
  * Editors can force the model builder to use fixed or free format for a given file by calling
  * <code>forceFormat</code>.  Otherwise, the format is determined by content type (i.e., by the
  * filename extension and the user's workspace preferences).
- * 
+ * <p>
  * All CDT extension languages are expected to supply a model builder.
  * @see IContributedModelBuilder
  * 
- * @author joverbey
+ * @author Jeff Overbey
  */
 public class SimpleFortranModelBuilder implements IFortranModelBuilder
 {

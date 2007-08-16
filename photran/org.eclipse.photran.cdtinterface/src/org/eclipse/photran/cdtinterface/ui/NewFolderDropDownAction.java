@@ -18,15 +18,16 @@ import org.eclipse.jface.action.IAction;
  * 
  * @author C.E.Rasmussen
  */
-
-public class NewFolderDropDownAction extends AbstractWizardDropDownAction {
-
-	public NewFolderDropDownAction() {
+public class NewFolderDropDownAction extends AbstractWizardDropDownAction
+{
+	public NewFolderDropDownAction()
+	{
 	    super();
 //		WorkbenchHelp.setHelp(this, ICHelpContextIds.OPEN_FOLDER_WIZARD_ACTION);
 	}
 
-	protected IAction[] getWizardActions() {
+	protected IAction[] getWizardActions()
+	{
 		return FortranWizardRegistry.getFolderWizardActions();
 	}
 }

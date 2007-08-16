@@ -20,15 +20,16 @@ import org.eclipse.ui.PlatformUI;
  * 
  * @author C.E.Rasmussen
  */
-
-public class NewProjectDropDownAction extends AbstractWizardDropDownAction {
-
-	public NewProjectDropDownAction() {
+public class NewProjectDropDownAction extends AbstractWizardDropDownAction
+{
+	public NewProjectDropDownAction()
+	{
 	    super();
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(this, ICHelpContextIds.OPEN_PROJECT_WIZARD_ACTION);
 	}
 	
-	protected IAction[] getWizardActions() {
+	protected IAction[] getWizardActions()
+	{
 		return FortranWizardRegistry.getProjectWizardActions();
 	}
 }

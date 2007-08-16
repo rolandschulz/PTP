@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2007 University of Illinois at Urbana-Champaign and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     UIUC - Initial API and implementation
+ *******************************************************************************/
 package org.eclipse.photran.cdtinterface;
 
 import org.eclipse.ui.plugin.*;
@@ -5,9 +15,9 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.osgi.framework.BundleContext;
 
 /**
- * Main plug-in class for the Fortran Model Icons plug-in
+ * Main plug-in class for the Photran CDT Interface plug-in
  * 
- * @author joverbey
+ * @author (generated)
  */
 public class CDTInterfacePlugin extends AbstractUIPlugin
 {

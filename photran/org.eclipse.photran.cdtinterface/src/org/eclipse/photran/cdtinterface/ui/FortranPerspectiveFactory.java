@@ -20,19 +20,19 @@ import org.eclipse.ui.console.IConsoleConstants;
 
 /**
  * The Fortran perspective.
- * 
+ * <p>
  * This is identical to CPerspectiveFactory, except we replace
  * the C/C++ Projects View with the Fortran Projects view.
- * 
+ * <p>
  * This is, as far as I know, the only place where we have to actually copy
  * code from the CDT.  Inheritance doesn't work since there is no way I know
  * of to let the CDT add the C/C++ Projects View (super.createInitialLayout())
  * and then remove it in our own implementation.
- * 
+ * <p>
  * Other files that are copied from CDT are starting to create in to add
  * Fortran branding (CER)
  * 
- * @author joverbey
+ * @author Jeff Overbey
  */
 public class FortranPerspectiveFactory implements IPerspectiveFactory
 {

@@ -24,6 +24,8 @@ import org.eclipse.ui.PlatformUI;
  * Convenience class for drop-in Fortran Wizard contributions.
  * 
  * Copied from org.eclipse.cdt.internal.ui.wizards.CWizardRegistry (1.5)
+ * 
+ * @author C.E.Rasmussen
  */
 public class FortranWizardRegistry {
 
