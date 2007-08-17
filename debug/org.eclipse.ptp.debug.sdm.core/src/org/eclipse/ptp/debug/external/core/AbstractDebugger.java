@@ -89,8 +89,8 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 			this.jobSize = 1;
 		}
 		session = new Session(this, job, jobSize, launch, exe);
-		initialize(job, jobSize, monitor);
 		this.job = job;
+		initialize(job, jobSize, monitor);
 		return session;
 	}
 	
