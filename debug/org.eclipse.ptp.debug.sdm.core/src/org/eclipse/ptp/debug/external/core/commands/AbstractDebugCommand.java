@@ -336,6 +336,8 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 	}
 	protected void presetTimeout(int timeout) {
 		int size = tasks.cardinality();
+		if (timeout < 10000)
+			timeout = 10000;
 		setTimeout(timeout * (size>0?size:1));
 	}
 	protected abstract void preExecCommand(IAbstractDebugger debugger) throws PCDIException;
