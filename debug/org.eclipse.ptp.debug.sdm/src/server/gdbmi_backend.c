@@ -542,18 +542,19 @@ AsyncStop(void *data)
 	{
 	case MIEventTypeBreakpointHit:
 		bpmap = FindLocalBP(evt->bkptno);
-		
-		if (!bpmap->temp) {
-			e = NewDbgEvent(DBGEV_SUSPEND);
-			e->dbg_event_u.suspend_event.reason = DBGEV_SUSPEND_BPHIT;
-			e->dbg_event_u.suspend_event.ev_u.bpid = bpmap->remote;
-			e->dbg_event_u.suspend_event.thread_id = evt->threadId;
-			e->dbg_event_u.suspend_event.frame = NULL;
-			e->dbg_event_u.suspend_event.changed_vars = GetChangedVariables();
-			break;
+		if (bpmap != NULL) {
+			if (!bpmap->temp) {
+				e = NewDbgEvent(DBGEV_SUSPEND);
+				e->dbg_event_u.suspend_event.reason = DBGEV_SUSPEND_BPHIT;
+				e->dbg_event_u.suspend_event.ev_u.bpid = bpmap->remote;
+				e->dbg_event_u.suspend_event.thread_id = evt->threadId;
+				e->dbg_event_u.suspend_event.frame = NULL;
+				e->dbg_event_u.suspend_event.changed_vars = GetChangedVariables();
+				break;
+			}
+			/* else must be a temporary breakpoint drop through... */
+			RemoveBPMap(bpmap);
 		}
-		/* else must be a temporary breakpoint drop through... */
-		RemoveBPMap(bpmap);
 
 	case MIEventTypeSuspended:
 		frame = ConvertMIFrameToStackframe(evt->frame);
@@ -613,14 +614,14 @@ AsyncStop(void *data)
 		e->dbg_event_u.exit_event.ev_u.sig = NewSignalInfo();
 		e->dbg_event_u.exit_event.ev_u.sig->name = strdup(evt->sigName);
 		e->dbg_event_u.exit_event.ev_u.sig->desc = strdup(evt->sigMeaning);
-		RemoveAllMaps();
+		//RemoveAllMaps();
 		break;
 		
 	case MIEventTypeInferiorExit:
 		e = NewDbgEvent(DBGEV_EXIT);
 		e->dbg_event_u.exit_event.reason = DBGEV_EXIT_NORMAL;
 		e->dbg_event_u.exit_event.ev_u.exit_status = evt->code;
-		RemoveAllMaps();
+		//RemoveAllMaps();
 		break;
 
 	default:
@@ -962,7 +963,7 @@ GDBMIDeleteBreakpoint(int bpid)
 	MICommand *	cmd;
 	
 	CHECK_SESSION();
-
+	
 	if ((bp = FindRemoteBP(bpid)) == NULL) {
 		asprintf(&bpstr, "%d", bpid);
 		DbgSetError(DBGERR_NOBP, bpstr);
@@ -980,7 +981,6 @@ GDBMIDeleteBreakpoint(int bpid)
 	}
 
 	RemoveBPMap(bp);
-
 	SaveEvent(NewDbgEvent(DBGEV_OK));
 
 	return DBGRES_OK;
@@ -1658,7 +1658,7 @@ GDBMIQuit(void)
 		SendCommandWait(DebugSession, cmd);
 		MICommandFree(cmd);
 	}
-		
+	RemoveAllMaps();
 	SaveEvent(NewDbgEvent(DBGEV_OK));
 	ServerExit++;
 	
