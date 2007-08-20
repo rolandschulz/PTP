@@ -542,19 +542,17 @@ AsyncStop(void *data)
 	{
 	case MIEventTypeBreakpointHit:
 		bpmap = FindLocalBP(evt->bkptno);
-		if (bpmap != NULL) {
-			if (!bpmap->temp) {
-				e = NewDbgEvent(DBGEV_SUSPEND);
-				e->dbg_event_u.suspend_event.reason = DBGEV_SUSPEND_BPHIT;
-				e->dbg_event_u.suspend_event.ev_u.bpid = bpmap->remote;
-				e->dbg_event_u.suspend_event.thread_id = evt->threadId;
-				e->dbg_event_u.suspend_event.frame = NULL;
-				e->dbg_event_u.suspend_event.changed_vars = GetChangedVariables();
-				break;
-			}
-			/* else must be a temporary breakpoint drop through... */
-			RemoveBPMap(bpmap);
+		if (!bpmap->temp) {
+			e = NewDbgEvent(DBGEV_SUSPEND);
+			e->dbg_event_u.suspend_event.reason = DBGEV_SUSPEND_BPHIT;
+			e->dbg_event_u.suspend_event.ev_u.bpid = bpmap->remote;
+			e->dbg_event_u.suspend_event.thread_id = evt->threadId;
+			e->dbg_event_u.suspend_event.frame = NULL;
+			e->dbg_event_u.suspend_event.changed_vars = GetChangedVariables();
+			break;
 		}
+		/* else must be a temporary breakpoint drop through... */
+		RemoveBPMap(bpmap);
 
 	case MIEventTypeSuspended:
 		frame = ConvertMIFrameToStackframe(evt->frame);
@@ -916,17 +914,17 @@ SetAndCheckBreak(int bpid, int isTemp, int isHard, char *where, char *condition,
 		return DBGRES_ERR;
 	}
 	
-	//if the type is temporary, no need to store it and send bpt set event
+	SetList(bpts);
+	bpt = (MIBreakpoint *)GetListElement(bpts);
+	
+	AddBPMap(bpt->number, bpid, isTemp);
+	
+	//if the type is temporary, no need to send bpt set event
 	if (isTemp) {
 		SaveEvent(NewDbgEvent(DBGEV_OK));
 		DestroyList(bpts, MIBreakpointFree);
 		return DBGRES_OK;
 	}
-
-	SetList(bpts);
-	bpt = (MIBreakpoint *)GetListElement(bpts);
-	
-	AddBPMap(bpt->number, bpid, isTemp);
 	
 	bp = NewBreakpoint(bpt->number);
 
@@ -948,7 +946,6 @@ SetAndCheckBreak(int bpid, int isTemp, int isHard, char *where, char *condition,
 	SaveEvent(e);
 	
 	DestroyList(bpts, MIBreakpointFree);
-
 	return DBGRES_OK;
 }
 
