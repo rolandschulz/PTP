@@ -23,7 +23,9 @@ public class BitList {
 	private byte[]	bits;
 	private int		nBits;
 	private int		nBytes;
-	
+	/** Cache the hash code for the BitList */
+	private int hash = 0;
+
 	private void init(int nbits) throws NegativeArraySizeException {
 		if (nbits < 0) 
 			throw new NegativeArraySizeException();
@@ -309,6 +311,44 @@ public class BitList {
 	
 	private int bitInByte(int idx) {
 		return idx - (bytePos(idx) << 3);
+	}
+	
+    /**
+     * Returns a hash code for this BitList. 
+     * (The hash value of the empty BitList is zero.)
+     * @return  a hash code value for this object.
+     */
+	public int hashCode() {
+		int h = hash;
+		if (h == 0) {
+			for (int i = 0; i < nBytes; i++) {
+				h = 31*h + bits[i];
+	        }
+	        hash = h;
+		}
+		return h;
+	}
+    /**
+     * Compares this BitList to the specified object.
+     * @param  obj The object to compare this {@code BitList} against
+     * @return  {@code true} if the given object represents a {@code BitList} equivalent to this BitList, {@code false} otherwise
+     */
+	public boolean equals(Object obj) {
+		if (this == obj) {
+		    return true;
+		}
+		if (obj instanceof BitList) {
+			BitList anotherBitList = (BitList)obj;
+			if (nBits != anotherBitList.nBits || nBytes != anotherBitList.nBytes)
+				return false;
+			
+			for (int i = 0; i < nBytes; i++) {
+				if (bits[i] != anotherBitList.bits[i])
+					return false;
+			}
+			return true;
+		}
+		return false;
 	}
 
 	public static String showBitList(BitList tasks) {
