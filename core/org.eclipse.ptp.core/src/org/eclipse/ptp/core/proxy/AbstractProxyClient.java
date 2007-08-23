@@ -52,6 +52,7 @@ import org.eclipse.ptp.core.proxy.event.IProxyEventListener;
 import org.eclipse.ptp.core.proxy.event.IProxyExtendedEvent;
 import org.eclipse.ptp.core.proxy.event.IProxyMessageEvent;
 import org.eclipse.ptp.core.proxy.event.IProxyOKEvent;
+import org.eclipse.ptp.core.proxy.event.IProxyShutdownEvent;
 import org.eclipse.ptp.core.proxy.event.IProxyTimeoutEvent;
 import org.eclipse.ptp.core.proxy.event.ProxyConnectedEvent;
 import org.eclipse.ptp.core.proxy.event.ProxyDisconnectedEvent;
@@ -71,7 +72,6 @@ public abstract class AbstractProxyClient implements IProxyClient {
 	private Thread				eventThread;
 	private Thread				acceptThread;
 	private IProxyEventFactory	proxyEventFactory;
-	private int					shutdownID;
 	private boolean				debug = false;
 	
 	private List<IProxyEventListener>	listeners = Collections.synchronizedList(new ArrayList<IProxyEventListener>());
@@ -683,12 +683,11 @@ public abstract class AbstractProxyClient implements IProxyClient {
 			if (e instanceof IProxyMessageEvent) {
 				fireProxyMessageEvent((IProxyMessageEvent) e);
 			} else if (e instanceof IProxyOKEvent) {
-				if (state == SessionState.SHUTTING_DOWN && 
-						shutdownID == e.getTransactionID()) {
+				fireProxyOKEvent((IProxyOKEvent) e);
+			} else if (e instanceof IProxyShutdownEvent) {
+				if (state == SessionState.SHUTTING_DOWN) { 
 					state = SessionState.SHUTDOWN;
 					// TODO: stop shutdown timeout
-				} else {
-					fireProxyOKEvent((IProxyOKEvent) e);
 				}
 			} else if (e instanceof IProxyExtendedEvent) {
 				fireProxyExtendedEvent((IProxyExtendedEvent) e);
@@ -740,7 +739,6 @@ public abstract class AbstractProxyClient implements IProxyClient {
 				 * received or after shutdownTimeout.
 				 */
 				IProxyCommand cmd = new ProxyQuitCommand(this);
-				shutdownID = cmd.getTransactionID();
 				String cmdBuf = cmd.getEncodedMessage();
 				// TODO: start shutdown timeout
 				try {

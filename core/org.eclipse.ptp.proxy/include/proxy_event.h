@@ -37,6 +37,7 @@
 #define PROXY_EV_DISCONNECTED	3	/* LOCAL EVENT */
 #define PROXY_EV_TIMEOUT		4	/* LOCAL EVENT */
 #define PROXY_EV_ERROR			5
+#define PROXY_EV_SHUTDOWN		6
 
 /*
  * Codes must EXACTLY match org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEvent
@@ -90,6 +91,7 @@
 void		proxy_add_string_attribute(proxy_msg *m, char *attr, char *value);
 void		proxy_add_int_attribute(proxy_msg *m, char *attr, int value);
 proxy_msg *	proxy_ok_event(int trans_id);
+proxy_msg *	proxy_shutdown_event(int trans_id);
 proxy_msg *	proxy_message_event(int trans_id, char *level, int code, char *fmt, ...);
 proxy_msg *	proxy_error_event(int trans_id, int code, char *fmt, ...);
 proxy_msg *	proxy_submitjob_error_event(int trans_id, char *jobSubId, int code, char *msg);

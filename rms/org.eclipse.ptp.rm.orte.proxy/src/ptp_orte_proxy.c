@@ -392,6 +392,13 @@ sendOKEvent(int trans_id)
 	proxy_svr_queue_msg(orte_proxy, proxy_ok_event(trans_id));
 }
 
+
+static void
+sendShutdownEvent(int trans_id)
+{
+	proxy_svr_queue_msg(orte_proxy, proxy_shutdown_event(trans_id));
+}
+
 static void
 sendMessageEvent(int trans_id, char *level, int code, char *fmt, ...)
 {
@@ -1815,9 +1822,10 @@ ORTE_SubmitJob(int trans_id, int nargs, char **args)
 	orte_jobid_t			debug_jobid = -1;
 	ptp_job *				j;
 
-	fprintf(stderr, "  ORTE_SubmitJob (%d): %s\n", trans_id, args[0]); fflush(stderr);
+	fprintf(stderr, "  ORTE_SubmitJob (%d):\n", trans_id);
 
 	for (i = 0; i < nargs; i++) {
+		fprintf(stderr, "\t%s\n", args[i]);
 		if (strncmp(args[i], JOB_SUB_ID_ATTR, strlen(JOB_SUB_ID_ATTR)) == 0) {
 			jobsubid = args[i]+strlen(JOB_SUB_ID_ATTR)+1;
 		} else if (strncmp(args[i], JOB_EXEC_NAME_ATTR, strlen(JOB_EXEC_NAME_ATTR)) == 0) {
@@ -1840,6 +1848,7 @@ ORTE_SubmitJob(int trans_id, int nargs, char **args)
 			}
 		}
 	}
+	fflush(stderr);
 	
 	if (jobsubid == NULL) {
 		sendMessageEvent(trans_id, MSG_LEVEL_ERROR, 0, "missing ID on job submission");
@@ -2162,7 +2171,7 @@ ORTE_Quit(int trans_id, int nargs, char **args)
 		do_orte_shutdown();
 	}
 	
-	sendOKEvent(trans_id);
+	sendShutdownEvent(trans_id);
 	
 	return PROXY_RES_OK;
 }
