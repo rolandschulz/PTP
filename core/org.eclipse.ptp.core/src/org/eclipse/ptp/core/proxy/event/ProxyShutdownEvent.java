@@ -19,26 +19,8 @@
 
 package org.eclipse.ptp.core.proxy.event;
 
-public interface IProxyEvent {
-	public static final int EVENT_OK = 0;
-	public static final int EVENT_MESSAGE = 1;
-	public static final int EVENT_CONNECTED = 2;
-	public static final int EVENT_DISCONNECTED = 3;
-	public static final int EVENT_TIMEOUT = 4;
-	public static final int EVENT_ERROR = 5;
-	public static final int EVENT_SHUTDOWN = 6;
-	
-	/*
-	 * Sizeof encoded values (bytes)
-	 */
-	public static final int EVENT_LENGTH_SIZE = 8;
-	public static final int EVENT_CHANNEL_SIZE = 2;
-	public static final int EVENT_ID_SIZE = 4;
-	public static final int EVENT_TRANS_ID_SIZE = 8;
-	public static final int EVENT_NARGS_SIZE = 8;
-	public static final int EVENT_ARG_LEN_SIZE = 8;
-	
-	public int getEventID();
-	public int getTransactionID();
-	public String[] getAttributes();
+public class ProxyShutdownEvent extends AbstractProxyEvent implements IProxyShutdownEvent {
+	public ProxyShutdownEvent(int transactionID) {
+		super(EVENT_SHUTDOWN, transactionID, null);
+	}
 }

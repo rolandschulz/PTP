@@ -63,6 +63,15 @@ proxy_ok_event(int trans_id)
 }
 
 /*
+ * SHUTDOWN EVENT. Sent in response to a quit command.
+ */
+proxy_msg *
+proxy_shutdown_event(int trans_id)
+{
+ 	return new_proxy_msg(PROXY_EV_SHUTDOWN, trans_id);
+}
+
+/*
  * MESSAGE EVENT. Used for sending messages that
  * should be logged by the client.
  */
