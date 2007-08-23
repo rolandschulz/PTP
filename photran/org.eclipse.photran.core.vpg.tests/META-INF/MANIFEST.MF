@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Photran Virtual Program Graph Tests Plug-in
+Bundle-SymbolicName: org.eclipse.photran.core.vpg.tests
+Bundle-Version: 1.0.0
+Bundle-Vendor: University of Illinois at Urbana-Champaign and Los Alamos National Laboratory
+Require-Bundle: org.eclipse.photran.core.vpg,
+ org.eclipse.cdt.core.tests,
+ org.eclipse.core.resources,
+ org.eclipse.ltk.core.refactoring,
+ org.eclipse.core.runtime,
+ org.eclipse.jface.text,
+ org.junit
+Eclipse-LazyStart: true
+Bundle-Activator: org.eclipse.photran.refactoring.tests.Activator

@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+
+   <!-- Commands, key bindings, and popup menu entries
+   
+        - Open Declaration (F3 or Ctrl+F3)
+        
+        Each command should have its ID declared as a constant in AbstractFortranEditor, and
+        it must be set up in AbstractFortranEditor#createActions().
+        
+        For menubarPath, see class ITextEditorActionConstants -->
+
+   <extension point="org.eclipse.ui.popupMenus">
+	  <viewerContribution 
+	        targetID="#FortranEditorContextMenu" 
+	        id="org.eclipse.photran.ui.NavigationContribution">
+	     <action
+            class="org.eclipse.photran.internal.ui.actions.OpenDeclaration"
+            definitionId="org.eclipse.photran.ui.OpenDeclarationCommand"
+            id="org.eclipse.photran.ui.OpenDeclarationMenuAction"
+            label="&amp;Open Declaration"
+            menubarPath="group.open"/>
+	  </viewerContribution>
+   </extension>
+
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            name="Navigation"
+            description="Navigation"
+            id="org.eclipse.photran.ui.NavigationCategory">
+      </category>
+      <command
+            categoryId="org.eclipse.photran.ui.NavigationCategory"
+            description="Open Declaration"
+            id="org.eclipse.photran.ui.OpenDeclarationCommand"
+            name="Open Declaration">
+      </command>
+   </extension>
+
+   <extension
+            point="org.eclipse.ui.bindings">
+      <!--  win32:  M1=CTRL,    M2=SHIFT, M3=ALT, M4=-
+            carbon: M1=COMMAND, M2=SHIFT, M3=ALT, M4=CTRL -->
+        <key
+            sequence="F3"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            contextId="org.eclipse.photran.ui.FortranEditorContext"
+            commandId="org.eclipse.photran.ui.OpenDeclarationCommand"/>
+        <key
+            sequence="M1+F3"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            contextId="org.eclipse.photran.ui.FortranEditorContext"
+            commandId="org.eclipse.photran.ui.OpenDeclarationCommand"/>
+   </extension>
+
+   <extension point="org.eclipse.ui.actionSets">
+      <actionSet
+            label="Fortran Analysis Actions"
+            description="Fortran Analysis Actions"
+            visible="true"
+            id="org.eclipse.photran.ui.AnalysisActionSet">
+         <action
+               label="&amp;Open Declaration"
+               definitionId="org.eclipse.photran.ui.OpenDeclarationCommand"
+               class="org.eclipse.photran.internal.ui.actions.OpenDeclaration"
+               menubarPath="navigate/additions"
+               id="org.eclipse.photran.ui.OpenDeclarationAction"/>
+      </actionSet>
+   </extension>
+
+   <!--=========================================-->
+   <!-- Fortran-specific project property pages -->
+   <!--=========================================-->
+   <extension
+         point="org.eclipse.ui.propertyPages">
+      <page
+            objectClass="org.eclipse.core.resources.IProject"
+            adaptable="true"
+            name="Fortran Refactoring Engine Search Paths"
+            class="org.eclipse.photran.internal.ui.properties.SearchPathsPropertyPage"
+            id="org.eclipse.photran.ui.SearchPathsPropertyPage">
+         <!--filter
+               name="nature"
+               value="org.eclipse.cdt.managedbuilder.core.managedBuildNature">
+         </filter-->
+      </page>
+   </extension>
+
+   <!--============================-->
+   <!-- Actions for debugging only -->
+   <!--============================-->
+   <extension point="org.eclipse.ui.actionSets">
+      <actionSet
+            label="Fortran Debug Actions"
+            description="Fortran Debug Actions"
+            visible="true"
+            id="org.eclipse.photran.ui.DebugActionSet">
+         <menu
+               label="Refac&amp;tor"
+               path="edit"
+               id="org.eclipse.jdt.ui.refactoring.menu">
+            <separator name="debugging"/>
+         </menu>
+         
+         <menu
+               label="(&amp;Debugging)"
+               path="org.eclipse.jdt.ui.refactoring.menu/debugging"
+               id="org.eclipse.photran.ui.AnalysisDebuggingMenu">
+            <separator name="debugging"/>
+         </menu>
+         <action
+               label="Select Enclosing &amp;Scope"
+               class="org.eclipse.photran.internal.ui.actions.SelectEnclosingScope"
+               menubarPath="org.eclipse.jdt.ui.refactoring.menu/org.eclipse.photran.ui.AnalysisDebuggingMenu/debugging"
+               id="org.eclipse.photran.ui.FindEnclosingScopeAction"/>
+         <action
+               label="Find All &amp;Declarations in Scope"
+               class="org.eclipse.photran.internal.ui.actions.FindAllDeclarationsInScope"
+               menubarPath="org.eclipse.jdt.ui.refactoring.menu/org.eclipse.photran.ui.AnalysisDebuggingMenu/debugging"
+               id="org.eclipse.photran.ui.FindAllDeclarationsInScopeAction"/>
+         <action
+               class="org.eclipse.photran.internal.ui.actions.DisplayVPGDatabase"
+               id="org.eclipse.photran.ui.DisplayVPGDatabaseAction"
+               label="Display &amp;Virtual Program Graph Database"
+               menubarPath="org.eclipse.jdt.ui.refactoring.menu/org.eclipse.photran.ui.AnalysisDebuggingMenu/debugging"/>
+         <action
+               class="org.eclipse.photran.internal.ui.actions.DisplaySymbolTable"
+               id="org.eclipse.photran.ui.DisplaySymbolTableAction"
+               label="Display &amp;Symbol Table for Current File"
+               menubarPath="org.eclipse.jdt.ui.refactoring.menu/org.eclipse.photran.ui.AnalysisDebuggingMenu/debugging"/>
+      </actionSet>
+   </extension>
+
+
+
+
+
+
+   <!-- Fortran editor popup menu -->
+   <extension point="org.eclipse.ui.popupMenus">
+      <viewerContribution 
+            targetID="#FortranEditorContextMenu" 
+            id="org.eclipse.photran.refactoring.refactoringEditorContribution">
+         <menu
+               id="org.eclipse.photran.ui.RefactoringMenu"
+               label="Refac&amp;tor"
+               path="group.reorganize">
+            <separator name="refactorings"/>
+         </menu>
+         <!--action 
+               label="E&amp;xtract Procedure..." 
+               class="org.eclipse.photran.internal.refactoring.ui.ExtractProcedureAction" 
+               menubarPath="org.eclipse.photran.ui.RefactoringMenu/refactorings" 
+               id="org.eclipse.photran.ui.ExtractProcedureRefactoringAction"/-->
+         <!--action 
+               label="Extract &amp;Local Variable..." 
+               class="org.eclipse.photran.internal.refactoring.ui.ExtractLocalVariableAction" 
+               menubarPath="org.eclipse.photran.ui.RefactoringMenu/refactorings" 
+               id="org.eclipse.photran.ui.ExtractLocalVariableRefactoringAction"/-->
+         <action 
+               label="&amp;Introduce Implicit None" 
+               class="org.eclipse.photran.internal.refactoring.ui.IntroImplicitNoneAction" 
+               menubarPath="org.eclipse.photran.ui.RefactoringMenu/refactorings" 
+               id="org.eclipse.photran.ui.IntroImplicitNoneRefactoringAction"/>
+         <action 
+               label="&amp;Rename..." 
+               class="org.eclipse.photran.internal.refactoring.ui.RenameAction" 
+               menubarPath="org.eclipse.photran.ui.RefactoringMenu/refactorings" 
+               id="org.eclipse.photran.ui.RenameRefactoringAction"/>
+      </viewerContribution>
+   </extension>
+
+   <!-- Commands and keybindings -->
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            name="Fortran Refactoring Commands"
+            id="org.eclipse.photran.ui.RefactoringCategory">
+      </category>
+      <!--command
+            name="Extract Procedure"
+            categoryId="org.eclipse.photran.ui.RefactoringCategory"
+            id="org.eclipse.photran.ui.ExtractProcedureRefactoringCommand">
+      </command-->
+      <!--command
+            name="Extract Local Variable"
+            categoryId="org.eclipse.photran.ui.RefactoringCategory"
+            id="org.eclipse.photran.ui.ExtractLocalVariableRefactoringCommand">
+      </command-->
+      <command
+            name="Introduce Implicit None"
+            categoryId="org.eclipse.photran.ui.RefactoringCategory"
+            id="org.eclipse.photran.ui.IntroImplicitNoneRefactoringCommand">
+      </command>
+      <command
+            name="Rename"
+            categoryId="org.eclipse.photran.ui.RefactoringCategory"
+            id="org.eclipse.photran.ui.RenameRefactoringCommand">
+      </command>
+   </extension>
+   <!--  win32:  M1=CTRL,    M2=SHIFT, M3=ALT, M4=-
+         carbon: M1=COMMAND, M2=SHIFT, M3=ALT, M4=CTRL -->
+   <extension
+         point="org.eclipse.ui.bindings">
+     <!--key
+            sequence="M3+M2+M"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            contextId="org.eclipse.photran.ui.FortranEditorContext"
+            commandId="org.eclipse.photran.ui.ExtractProcedureRefactoringCommand"
+     /-->
+     <!--key
+            sequence="M3+M2+L"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            contextId="org.eclipse.photran.ui.FortranEditorContext"
+            commandId="org.eclipse.photran.ui.ExtractLocalVariableRefactoringCommand"
+     /-->
+     <key
+            sequence="M3+M2+I"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            contextId="org.eclipse.photran.ui.FortranEditorContext"
+            commandId="org.eclipse.photran.ui.IntroduceImplicitNoneRefactoringCommand"
+     />
+     <key
+            sequence="M3+M2+R"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            contextId="org.eclipse.photran.ui.FortranEditorContext"
+            commandId="org.eclipse.photran.ui.RenameRefactoringCommand"
+     />
+   </extension>
+   
+   <!-- Refactoring menu in menu bar -->
+   <extension point="org.eclipse.ui.actionSets">
+      <actionSet
+            label="Fortran Refactorings"
+            description="Fortran Refactorings"
+            visible="false"
+            id="org.eclipse.photran.ui.RefactoringActionSet">
+         <menu
+               label="Refac&amp;tor"
+               path="edit"
+               id="org.eclipse.jdt.ui.refactoring.menu">
+            <separator name="reorgGroup"/>
+            <separator name="typeGroup"/>
+            <separator name="codingGroup"/>
+         </menu>
+         <!--action
+               label="E&amp;xtract Procedure..."
+               definitionId="org.eclipse.photran.ui.ExtractProcedureRefactoringCommand"
+               class="org.eclipse.photran.internal.refactoring.ui.ExtractProcedureAction"
+               menubarPath="org.eclipse.jdt.ui.refactoring.menu/reorgGroup"
+               id="org.eclipse.photran.ui.ExtractProcedureRefactoringAction"/-->
+         <!--action
+               label="Extract &amp;Local Variable (Fortran)..."
+               definitionId="org.eclipse.photran.ui.ExtractLocalVariableRefactoringCommand"
+               class="org.eclipse.photran.internal.refactoring.ui.ExtractLocalVariableAction"
+               menubarPath="org.eclipse.jdt.ui.refactoring.menu/codingGroup"
+               id="org.eclipse.photran.ui.ExtractLocalVariableRefactoringAction"/-->
+         <action
+               label="&amp;Introduce Implicit None (Fortran)"
+               definitionId="org.eclipse.photran.ui.IntroImplicitNoneRefactoringCommand"
+               class="org.eclipse.photran.internal.refactoring.ui.IntroImplicitNoneAction"
+               menubarPath="org.eclipse.jdt.ui.refactoring.menu/typeGroup"
+               id="org.eclipse.photran.ui.IntroImplicitNoneRefactoringAction"/>
+         <action
+               label="Re&amp;name (Fortran)..."
+               definitionId="org.eclipse.photran.ui.RenameRefactoringCommand"
+               class="org.eclipse.photran.internal.refactoring.ui.RenameAction"
+               menubarPath="org.eclipse.jdt.ui.refactoring.menu/reorgGroup"
+               id="org.eclipse.photran.ui.RenameRefactoringAction"/>
+      </actionSet>
+   </extension> 
+   <!--extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension targetID="org.eclipse.photran.ui.FortranPerspective">
+         <actionSet id="org.eclipse.photran.ui.RefactoringActionSet"/>
+      </perspectiveExtension>
+   </extension-->
+   <extension
+         point="org.eclipse.ui.actionSetPartAssociations">
+      <actionSetPartAssociation targetID="org.eclipse.photran.ui.RefactoringActionSet">
+         <part id="org.eclipse.photran.ui.FreeFormFortranEditor"/>
+         <!--part id="org.eclipse.photran.ui.FixedFormFortranEditor"/-->
+      </actionSetPartAssociation>
+   </extension>
+</plugin>

@@ -1,0 +1,31 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Photran Virtual Program Graph Core Plug-in
+Bundle-SymbolicName: org.eclipse.photran.core.vpg;singleton:=true
+Bundle-Version: 1.0.0
+Bundle-Activator: org.eclipse.photran.core.vpg.Activator
+Bundle-Vendor: University of Illinois at Urbana-Champaign and Los Alamos National Laboratory
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.core.resources,
+ org.eclipse.cdt.core,
+ org.eclipse.ui,
+ org.eclipse.jface.text,
+ org.eclipse.ltk.core.refactoring,
+ org.eclipse.photran.core,
+ org.eclipse.photran.cdtinterface
+Eclipse-LazyStart: true
+Export-Package: bz.over.vpg,
+ bz.over.vpg.db.cdt,
+ bz.over.vpg.eclipse,
+ org.eclipse.photran.core,
+ org.eclipse.photran.core.vpg,
+ org.eclipse.photran.core.vpg.util,
+ org.eclipse.photran.internal.core.analysis.binding,
+ org.eclipse.photran.internal.core.analysis.types,
+ org.eclipse.photran.internal.core.lexer,
+ org.eclipse.photran.internal.core.parser,
+ org.eclipse.photran.internal.core.properties,
+ org.eclipse.photran.internal.core.refactoring,
+ org.eclipse.photran.internal.core.refactoring.infrastructure
+Bundle-ClassPath: vpg-eclipse.jar,
+ .

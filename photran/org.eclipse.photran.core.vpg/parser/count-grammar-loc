@@ -1,0 +1,2 @@
+#!/bin/sh
+sed -e '/^[ \t]*$/d; /^[ \t]*#/d' fortran95.bnf | wc -l

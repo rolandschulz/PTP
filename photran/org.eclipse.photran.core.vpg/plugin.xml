@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <!-- Load the VPG plug-in at startup -->
+   <extension point="org.eclipse.ui.startup">
+     <startup class="org.eclipse.photran.core.vpg.PhotranVPGStartup" />
+  </extension>
+
+   <!-- VPG-based model builder -->
+
+   <extension
+         point="org.eclipse.photran.cdtinterface.modelbuilder">
+      <modelbuilder
+            class="org.eclipse.photran.internal.core.model.FortranModelBuilder"
+            id="defaultModelBilder"
+            name="Photran VPG Model Builder" />
+   </extension>
+</plugin>

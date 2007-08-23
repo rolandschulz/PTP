@@ -1,0 +1,9 @@
+--- ASTIntrinsicStmtNode.java	2007-07-27 08:33:05.000000000 -0600
++++ ASTIntrinsicStmtNode.java.new	2007-07-27 08:36:01.000000000 -0600
+@@ -1,5 +1,6 @@
+ package org.eclipse.photran.internal.core.parser;
+ 
++import org.eclipse.photran.internal.core.lexer.Token;
+ import org.eclipse.photran.internal.core.parser.Parser.*;
+ import java.util.List;
+ 

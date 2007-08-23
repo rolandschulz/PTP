@@ -1,0 +1,30 @@
+program p
+    implicit none
+    real :: a
+    real :: d
+    a = 3
+    d = 4
+    stop
+contains
+subroutine s
+    implicit none
+    integer :: b
+    integer :: c
+    real :: e
+    type(t) :: f
+    integer :: g
+    complex :: h
+    type t
+        integer n
+    end type
+    
+    a = 3
+    b = 3
+    c = 3
+    d = 3.0
+    e = 3.0
+    f%n = 3
+    g = 3
+    h = (3, 4)
+end subroutine
+end program
