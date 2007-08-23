@@ -62,83 +62,30 @@ import org.eclipse.ptp.core.util.BitList;
 
 public abstract class AbstractProxyClient implements IProxyClient {
 
-	private int					transactionID = 1;
-	private String				sessHost = null;
-	private int					sessPort = 0;
-	private ServerSocketChannel	sessSvrSock = null;
-	private SocketChannel		sessSock = null;
-	private ReadableByteChannel	sessInput;
-	private WritableByteChannel	sessOutput;
-	private Thread				eventThread;
-	private Thread				acceptThread;
-	private IProxyEventFactory	proxyEventFactory;
-	private boolean				debug = false;
-	
-	private List<IProxyEventListener>	listeners = Collections.synchronizedList(new ArrayList<IProxyEventListener>());
-
-	private Charset			charset = Charset.forName("US-ASCII");
-	private CharsetEncoder	encoder = charset.newEncoder();
-	private CharsetDecoder	decoder = charset.newDecoder();
-
-	private enum SessionState {WAITING, CONNECTED, RUNNING, SHUTTING_DOWN, SHUTDOWN};
-	private SessionState state = SessionState.SHUTDOWN;
-	private final ReentrantLock stateLock = new ReentrantLock();
-	
-	public AbstractProxyClient(IProxyEventFactory factory) {
-		proxyEventFactory = factory;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.proxy.IProxyClient#newTransactionID()
-	 */
-	public synchronized int newTransactionID() {
-		return ++transactionID;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.proxy.IProxyClient#isReady()
-	 */
-	public boolean isReady() {
-		stateLock.lock();
-		try {
-			return state == SessionState.RUNNING;
-		} finally {
-			stateLock.unlock();
-		}
-	}
-	
+	private enum SessionState {WAITING, CONNECTED, RUNNING, SHUTTING_DOWN, SHUTDOWN}
 	/**
-	 * Test if proxy has shut down
-	 * 
-	 * @return shut down state
+	 * Convert a proxy representation of a string into a Java String
+	 * @param buf
+	 * @param start
+	 * @return proxy string converted to Java String
 	 */
-	public boolean isShutdown() {
-		stateLock.lock();
-		try {
-			return state == SessionState.SHUTDOWN;
-		} finally {
-			stateLock.unlock();
-		}
+	public static String decodeString(CharBuffer buf, int start) {
+		int end = start + IProxyEvent.EVENT_ARG_LEN_SIZE;
+		int len = Integer.parseInt(buf.subSequence(start, end).toString(), 16);
+		start = end + 1; // Skip ':'
+		end = start + len;
+		return buf.subSequence(start, end).toString();
 	}
-
 	/**
-	 * Character set encoder
+	 * Convert a BitList to it's proxy representation
 	 * 
-	 * @return encoder
+	 * @param set
+	 * @return proxy representation of a BitList
 	 */
-	public CharsetEncoder encoder() {
-		return encoder;
+	public static String encodeBitSet(BitList set) {
+		String lenStr = Integer.toHexString(set.size());
+		return lenStr + ":" + set.toString();
 	}
-	
-	/**
-	 * Character set decoder
-	 * 
-	 * @return decoder
-	 */
-	public CharsetDecoder decoder() {
-		return decoder;
-	}
-
 	/**
 	 * Convert an integer to it's proxy representation
 	 * 
@@ -159,7 +106,6 @@ public abstract class AbstractProxyClient implements IProxyClient {
 		}
 		return String.valueOf(res);
 	}
-	
 	/**
 	 * Encode a string into it's proxy representation
 	 * 
@@ -178,51 +124,132 @@ public abstract class AbstractProxyClient implements IProxyClient {
 		
 		return encodeIntVal(len, IProxyCommand.CMD_ARGS_LEN_SIZE) + ":" + str;		
 	}
+	private int					transactionID = 1;
+	private String				sessHost = null;
+	private int					sessPort = 0;
+	private ServerSocketChannel	sessSvrSock = null;
+	private SocketChannel		sessSock = null;
+	private ReadableByteChannel	sessInput;
 	
-	/**
-	 * Convert a proxy representation of a string into a Java String
-	 * @param buf
-	 * @param start
-	 * @return proxy string converted to Java String
-	 */
-	public static String decodeString(CharBuffer buf, int start) {
-		int end = start + IProxyEvent.EVENT_ARG_LEN_SIZE;
-		int len = Integer.parseInt(buf.subSequence(start, end).toString(), 16);
-		start = end + 1; // Skip ':'
-		end = start + len;
-		return buf.subSequence(start, end).toString();
+	private WritableByteChannel	sessOutput;
+
+	private Thread				eventThread;
+	private Thread				acceptThread;
+	private IProxyEventFactory	proxyEventFactory;
+
+	private boolean				debug = false;;
+	private List<IProxyEventListener>	listeners = Collections.synchronizedList(new ArrayList<IProxyEventListener>());
+	private Charset			charset = Charset.forName("US-ASCII");
+	
+	private CharsetEncoder	encoder = charset.newEncoder();
+	
+	private CharsetDecoder	decoder = charset.newDecoder();
+	
+	private SessionState state = SessionState.SHUTDOWN;
+	
+	private final ReentrantLock stateLock = new ReentrantLock();
+
+	public AbstractProxyClient(IProxyEventFactory factory) {
+		proxyEventFactory = factory;
 	}
 	
-	/**
-	 * Convert a BitList to it's proxy representation
-	 * 
-	 * @param set
-	 * @return proxy representation of a BitList
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.proxy.IProxyClient#addProxyEventListener(org.eclipse.ptp.core.proxy.event.IProxyEventListener)
 	 */
-	public static String encodeBitSet(BitList set) {
-		String lenStr = Integer.toHexString(set.size());
-		return lenStr + ":" + set.toString();
+	public void addProxyEventListener(IProxyEventListener listener) {
+		listeners.add(listener);
 	}
 
 	/**
-	 * Send the supplied string to the remote proxy. Formats the string
-	 * into the correct proxy format.
+	 * Character set decoder
 	 * 
-	 * @param buf
-	 * @throws IOException
+	 * @return decoder
 	 */
-	private void sendCommandBuffer(String buf) throws IOException {
-		/*
-		 * Note: command length includes the first space!
-		 */
-		String sendCmd = encodeIntVal(buf.length() + 1, IProxyCommand.CMD_LENGTH_SIZE) + " " + buf;
-		if (debug) {
-			System.out.println("COMMAND: " + sendCmd);
-		}
-		fullWrite(encoder.encode(CharBuffer.wrap(sendCmd)));
-		
+	public CharsetDecoder decoder() {
+		return decoder;
 	}
 	
+	/**
+	 * Character set encoder
+	 * 
+	 * @return encoder
+	 */
+	public CharsetEncoder encoder() {
+		return encoder;
+	}
+	
+	/**
+	 * Write a full buffer to the socket.
+	 * 
+	 * @param buf
+	 * @return number of bytes written
+	 * @throws IOException
+	 */
+	public int fullWrite(ByteBuffer buf) throws IOException {
+		int n = 0;
+		while (buf.remaining() > 0) {
+			n = sessOutput.write(buf);
+			if (n < 0) {
+				throw new IOException("EOF from proxy");
+			}
+		}
+		return n;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.proxy.IProxyClient#getSessionHost()
+	 */
+	public String getSessionHost() {
+		return sessHost;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.proxy.IProxyClient#getSessionPort()
+	 */
+	public int getSessionPort() {
+		return sessPort;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.proxy.IProxyClient#isReady()
+	 */
+	public boolean isReady() {
+		stateLock.lock();
+		try {
+			return state == SessionState.RUNNING;
+		} finally {
+			stateLock.unlock();
+		}
+	}
+
+	/**
+	 * Test if proxy has shut down
+	 * 
+	 * @return shut down state
+	 */
+	public boolean isShutdown() {
+		stateLock.lock();
+		try {
+			return state == SessionState.SHUTDOWN;
+		} finally {
+			stateLock.unlock();
+		}
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.proxy.IProxyClient#newTransactionID()
+	 */
+	public synchronized int newTransactionID() {
+		return ++transactionID;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.proxy.IProxyClient#removeProxyEventListener(org.eclipse.ptp.core.proxy.event.IProxyEventListener)
+	 */
+	public void removeProxyEventListener(IProxyEventListener listener) {
+		listeners.remove(listener);
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.proxy.IProxyClient#sendCommand(java.lang.String)
 	 */
@@ -234,20 +261,6 @@ public abstract class AbstractProxyClient implements IProxyClient {
 			throw new IOException("proxy not ready to send");
 		}
 	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.proxy.IProxyClient#addProxyEventListener(org.eclipse.ptp.core.proxy.event.IProxyEventListener)
-	 */
-	public void addProxyEventListener(IProxyEventListener listener) {
-		listeners.add(listener);
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.proxy.IProxyClient#removeProxyEventListener(org.eclipse.ptp.core.proxy.event.IProxyEventListener)
-	 */
-	public void removeProxyEventListener(IProxyEventListener listener) {
-		listeners.remove(listener);
-	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.proxy.IProxyClient#sessionConnect()
@@ -255,21 +268,21 @@ public abstract class AbstractProxyClient implements IProxyClient {
 	public int sessionConnect() {
 		return 0; // Not implemented
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.proxy.IProxyClient#sessionCreate()
 	 */
 	public void sessionCreate() throws IOException {
 		sessionCreate(0);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.proxy.IProxyClient#sessionCreate(int)
 	 */
 	public void sessionCreate(int timeout) throws IOException {
 		sessionCreate(0, timeout);
 	}
-	
+
 	/**
 	 * Create a proxy session. This starts a thread that waits for an incoming proxy connection.
 	 * If the connection is successful, then an event thread is started.
@@ -345,7 +358,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 		};
 		acceptThread.start();
 	}
-
+	
 	/**
 	 * Create a proxy session that will read from InputStream and write to OutputStream
 	 * 
@@ -367,20 +380,62 @@ public abstract class AbstractProxyClient implements IProxyClient {
 		fireProxyConnectedEvent(new ProxyConnectedEvent());
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.proxy.IProxyClient#getSessionPort()
+	/**
+	 * sessionFinish() will attempt to shut down the proxy session regardless of state.
+	 * 
+	 * Events that can be generated as a result of sessionFinish() are:
+	 * 
+	 * ProxyErrorEvent			if sessionCreate() was waiting for an incoming connection
+	 * ProxyDisconnectedEvent	if the proxy shut down successfully
+	 * 
+	 * @throws	IOException	if the session is already shut down
 	 */
-	public int getSessionPort() {
-		return sessPort;
+	public void sessionFinish() throws IOException {
+		stateLock.lock();
+		try {
+			SessionState oldState = state;
+			
+			state = SessionState.SHUTTING_DOWN;
+			
+			switch (oldState) {
+			case WAITING:
+				if (acceptThread.isAlive()) {
+					/*
+					 * Force interrupt of accept. Note that this will cause
+					 * a ProxyErrorEvent to be generated
+					 */
+					acceptThread.interrupt();
+				}
+				break;
+			case CONNECTED:
+				try {
+					sessSock.close();
+				} catch (IOException e) {
+					state = SessionState.SHUTDOWN;
+				} 
+				break;
+			case RUNNING:
+				/*
+				 * Send quit command. Proxy will shut down when OK is
+				 * received or after shutdownTimeout.
+				 */
+				IProxyCommand cmd = new ProxyQuitCommand(this);
+				String cmdBuf = cmd.getEncodedMessage();
+				// TODO: start shutdown timeout
+				try {
+					sendCommandBuffer(cmdBuf);
+				} catch (IOException e) {
+					// Tell event thread to exit
+					state = SessionState.SHUTDOWN;
+					// TODO: stop shutdown timeout
+				}
+				break;
+			}
+		} finally {
+			stateLock.unlock();
+		}
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.proxy.IProxyClient#getSessionHost()
-	 */
-	public String getSessionHost() {
-		return sessHost;
-	}
-
 	/**
 	 * Start a thread to process events from the proxy by repeatedly calling sessionProgress(). 
 	 * The thread is guaranteed to produce a ProxyDisconnectedEvent when it exits.
@@ -452,78 +507,6 @@ public abstract class AbstractProxyClient implements IProxyClient {
 		}
 		eventThread.start();
 	}
-	
-	/**
-	 * Send event to event handlers
-	 * 
-	 * @param event
-	 */
-	protected void fireProxyConnectedEvent(IProxyConnectedEvent event) {
-		IProxyEventListener[] la = listeners.toArray(new IProxyEventListener[0]);
-		for (IProxyEventListener listener : la) {
-			listener.handleProxyConnectedEvent(event);
-		}
-	}
-
-	/**
-	 * Send event to event handlers
-	 * 
-	 * @param event
-	 */
-	protected void fireProxyDisconnectedEvent(IProxyDisconnectedEvent event) {
-		IProxyEventListener[] la = listeners.toArray(new IProxyEventListener[0]);
-		for (IProxyEventListener listener : la) {
-			listener.handleProxyDisconnectedEvent(event);
-		}
-	}
-
-	/**
-	 * Send event to event handlers
-	 * 
-	 * @param event
-	 */
-	protected void fireProxyMessageEvent(IProxyMessageEvent event) {
-		IProxyEventListener[] la = listeners.toArray(new IProxyEventListener[0]);
-		for (IProxyEventListener listener : la) {
-			listener.handleProxyMessageEvent(event);
-		}
-	}
-
-	/**
-	 * Send event to event handlers
-	 * 
-	 * @param event
-	 */
-	protected void fireProxyOKEvent(IProxyOKEvent event) {
-		IProxyEventListener[] la = listeners.toArray(new IProxyEventListener[0]);
-		for (IProxyEventListener listener : la) {
-			listener.handleProxyOKEvent(event);
-		}
-	}
-
-	/**
-	 * Send event to event handlers
-	 * 
-	 * @param event
-	 */
-	protected void fireProxyTimeoutEvent(IProxyTimeoutEvent event) {
-		IProxyEventListener[] la = listeners.toArray(new IProxyEventListener[0]);
-		for (IProxyEventListener listener : la) {
-			listener.handleProxyTimeoutEvent(event);
-		}
-	}
-	
-	/**
-	 * Send event to event handlers
-	 * 
-	 * @param event
-	 */
-	protected void fireProxyExtendedEvent(IProxyExtendedEvent event) {
-		IProxyEventListener[] la = listeners.toArray(new IProxyEventListener[0]);
-		for (IProxyEventListener listener : la) {
-			listener.handleProxyExtendedEvent(event);
-		}
-	}
 
 	/**
 	 * Read a full buffer from the socket.
@@ -543,25 +526,26 @@ public abstract class AbstractProxyClient implements IProxyClient {
 		buf.flip();
 		return n;
 	}
-	
+
 	/**
-	 * Write a full buffer to the socket.
+	 * Send the supplied string to the remote proxy. Formats the string
+	 * into the correct proxy format.
 	 * 
 	 * @param buf
-	 * @return number of bytes written
 	 * @throws IOException
 	 */
-	public int fullWrite(ByteBuffer buf) throws IOException {
-		int n = 0;
-		while (buf.remaining() > 0) {
-			n = sessOutput.write(buf);
-			if (n < 0) {
-				throw new IOException("EOF from proxy");
-			}
+	private void sendCommandBuffer(String buf) throws IOException {
+		/*
+		 * Note: command length includes the first space!
+		 */
+		String sendCmd = encodeIntVal(buf.length() + 1, IProxyCommand.CMD_LENGTH_SIZE) + " " + buf;
+		if (debug) {
+			System.out.println("COMMAND: " + sendCmd);
 		}
-		return n;
+		fullWrite(encoder.encode(CharBuffer.wrap(sendCmd)));
+		
 	}
-	
+
 	/**
 	 * Process packets from the wire. Each packet comprises a length, header and a body 
 	 * formatted as follows:
@@ -698,60 +682,76 @@ public abstract class AbstractProxyClient implements IProxyClient {
 		
 		return false;
 	}
+
+	/**
+	 * Send event to event handlers
+	 * 
+	 * @param event
+	 */
+	protected void fireProxyConnectedEvent(IProxyConnectedEvent event) {
+		IProxyEventListener[] la = listeners.toArray(new IProxyEventListener[0]);
+		for (IProxyEventListener listener : la) {
+			listener.handleProxyConnectedEvent(event);
+		}
+	}
 	
 	/**
-	 * sessionFinish() will attempt to shut down the proxy session regardless of state.
+	 * Send event to event handlers
 	 * 
-	 * Events that can be generated as a result of sessionFinish() are:
-	 * 
-	 * ProxyErrorEvent			if sessionCreate() was waiting for an incoming connection
-	 * ProxyDisconnectedEvent	if the proxy shut down successfully
-	 * 
-	 * @throws	IOException	if the session is already shut down
+	 * @param event
 	 */
-	public void sessionFinish() throws IOException {
-		stateLock.lock();
-		try {
-			SessionState oldState = state;
-			
-			state = SessionState.SHUTTING_DOWN;
-			
-			switch (oldState) {
-			case WAITING:
-				if (acceptThread.isAlive()) {
-					/*
-					 * Force interrupt of accept. Note that this will cause
-					 * a ProxyErrorEvent to be generated
-					 */
-					acceptThread.interrupt();
-				}
-				break;
-			case CONNECTED:
-				try {
-					sessSock.close();
-				} catch (IOException e) {
-					state = SessionState.SHUTDOWN;
-				} 
-				break;
-			case RUNNING:
-				/*
-				 * Send quit command. Proxy will shut down when OK is
-				 * received or after shutdownTimeout.
-				 */
-				IProxyCommand cmd = new ProxyQuitCommand(this);
-				String cmdBuf = cmd.getEncodedMessage();
-				// TODO: start shutdown timeout
-				try {
-					sendCommandBuffer(cmdBuf);
-				} catch (IOException e) {
-					// Tell event thread to exit
-					state = SessionState.SHUTDOWN;
-					// TODO: stop shutdown timeout
-				}
-				break;
-			}
-		} finally {
-			stateLock.unlock();
+	protected void fireProxyDisconnectedEvent(IProxyDisconnectedEvent event) {
+		IProxyEventListener[] la = listeners.toArray(new IProxyEventListener[0]);
+		for (IProxyEventListener listener : la) {
+			listener.handleProxyDisconnectedEvent(event);
+		}
+	}
+
+	/**
+	 * Send event to event handlers
+	 * 
+	 * @param event
+	 */
+	protected void fireProxyExtendedEvent(IProxyExtendedEvent event) {
+		IProxyEventListener[] la = listeners.toArray(new IProxyEventListener[0]);
+		for (IProxyEventListener listener : la) {
+			listener.handleProxyExtendedEvent(event);
+		}
+	}
+	
+	/**
+	 * Send event to event handlers
+	 * 
+	 * @param event
+	 */
+	protected void fireProxyMessageEvent(IProxyMessageEvent event) {
+		IProxyEventListener[] la = listeners.toArray(new IProxyEventListener[0]);
+		for (IProxyEventListener listener : la) {
+			listener.handleProxyMessageEvent(event);
+		}
+	}
+	
+	/**
+	 * Send event to event handlers
+	 * 
+	 * @param event
+	 */
+	protected void fireProxyOKEvent(IProxyOKEvent event) {
+		IProxyEventListener[] la = listeners.toArray(new IProxyEventListener[0]);
+		for (IProxyEventListener listener : la) {
+			listener.handleProxyOKEvent(event);
+		}
+	}
+	
+	/**
+	 * Send event to event handlers
+	 * 
+	 * @param event
+	 */
+	protected void fireProxyTimeoutEvent(IProxyTimeoutEvent event) {
+		IProxyEventListener[] la = listeners.toArray(new IProxyEventListener[0]);
+		for (IProxyEventListener listener : la) {
+			listener.handleProxyTimeoutEvent(event);
 		}
 	}
 }
