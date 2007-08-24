@@ -224,10 +224,7 @@ proxy_msg_decode_string(char *str, char **arg, char **end)
 static void
 add_arg(proxy_msg *m, char *arg, int free_arg)
 {
-	int		i;
 	int 	size = m->arg_size;
-	char **	tmp_args;
-	int *	tmp_free;
 
 	if (m->arg_size < m->num_args + 2) {
 		m->arg_size += ARG_SIZE;
@@ -238,24 +235,8 @@ add_arg(proxy_msg *m, char *arg, int free_arg)
 		m->args = (char **)malloc(sizeof(char *) * m->arg_size);
 		m->free_args = (int *)malloc(sizeof(int *) * m->arg_size);
 	} else if (size < m->arg_size) {
-		/*
-		 * Create new allocation for args and copy old arguments across.
-		 * This is used instead of realloc() due to buggy realloc()
-		 * implementations.
-		 */
-		tmp_args = (char **)malloc(sizeof(char *) * m->arg_size);
-		tmp_free = (int *)malloc(sizeof(int *) * m->arg_size);
-		
-		for (i = 0; i < m->num_args; i++) {
-			tmp_args[i] = m->args[i];
-			tmp_free[i] = m->free_args[i];
-		}
-		
-		free(m->args);
-		free(m->free_args);
-		
-		m->args = tmp_args;
-		m->free_args = tmp_free;
+		m->args = (char **)realloc(m->args, sizeof(char *) * m->arg_size);
+		m->free_args = (int *)realloc(m->free_args, sizeof(int *) * m->arg_size);
 	}
 	
 	m->args[m->num_args] = arg;
@@ -403,7 +384,7 @@ proxy_msg_insert_bitset(proxy_msg *m, bitset *b, int idx)
 	tmp_arg = m->args[m->num_args-1];
 	tmp_free = m->free_args[m->num_args-1];
 	
-	for (i = m->num_args-2; i > idx; i--) {
+	for (i = m->num_args-1; i > idx; i--) {
 		m->args[i] = m->args[i-1];
 		m->free_args[i] = m->free_args[i-1];
 	}
