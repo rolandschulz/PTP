@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2005, 2006 IBM Corporation.
+ * Copyright (c) 2005, 2007 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -31,6 +31,7 @@ public class MPIPreferencePage extends FieldEditorPreferencePage implements IWor
     private static final String MPI_INCLUDES_PREFERENCE_LABEL  = "MPI include paths:";
     private static final String MPI_INCLUDES_PREFERENCE_BROWSE = "Please choose a directory:";
     private static final String MPI_BUILD_COMMAND_LABEL = "MPI build command:";
+    private static final boolean traceOn=false;
 
     public MPIPreferencePage()
     {
@@ -67,8 +68,6 @@ public class MPIPreferencePage extends FieldEditorPreferencePage implements IWor
 
     public void init(IWorkbench workbench)
     {
-    	IPreferenceStore store = MpiPlugin.getDefault().getPreferenceStore();
-    	store.setDefault(MpiIDs.MPI_BUILD_CMD, "mpicc");
     }
 
     protected void createFieldEditors()

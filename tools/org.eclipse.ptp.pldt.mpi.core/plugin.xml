@@ -122,4 +122,10 @@
             class="org.eclipse.ptp.pldt.mpi.core.editorHelp.MpiCHelpProvider"
             id="org.eclipse.ptp.pldt.mpi.core.editorHelp.MpiCHelpProvider"/>
    </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+               <initializer
+            class="org.eclipse.ptp.pldt.mpi.core.prefs.MPIPreferenceInitializer">
+      </initializer>
+   </extension>
 </plugin>
