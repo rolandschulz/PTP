@@ -2,46 +2,46 @@
 
 \textit{Last Updated 4/4/07}
 
-\hspace{1em}\textbf{Part~I.  Check out the CDT 3.1.2 sources from CVS}
+\emph{BEFORE YOU BEGIN: Make sure you are running Eclipse 3.3
+      and a Java~5 or later JVM.}
 
-If you already have CDT 3.2 installed and do not need
+\hspace{1em}\textbf{Part~I.  Check out the CDT 4.0 sources from CVS}
+
+If you already have CDT 4.0 installed and do not need
 to edit the CDT source code, Part~I can be skipped.
 
 \begin{enumerate}
 \item  In Eclipse, switch to the CVS Repository Exploring perspective.
 \item  Right-click the CVS Repositories view; choose New, Repository Location
-\item  Enter the following information, then click Finish: \\
+\item  In the dialog box, enter the following information, then click Finish: \\
 \begin{tabular}{ll}
          Host name:       & dev.eclipse.org \\
          Repository path: & /cvsroot/tools \\
-         Connection type: & pserver \\
          Username:        & anonymous \\
          Password:        & (no password) \\
+         Connection type: & pserver \\
 \end{tabular}
-%\item  Right-click on :pserver:anonymous@dev.eclipse.org:/cvsroot/tools, and choose
-%    Refresh Branches...
-%\item  Select the following, and click OK:
-%\begin{itemize}
-%    \item     org.eclipse.cdt-build
-%    \item     org.eclipse.cdt-core
-%    \item     org.eclipse.cdt-doc
-%    \item     org.eclipse.cdt-debug
-%    \item     org.eclipse.cdt-launch
-%\end{itemize}
-%    When prompted, tell it to Search Deeply.
-%\item  Expand :pserver:anonymous@dev.eclipse.org:/cvsroot/tools,
-%    and then expand Versions (in the CVS Repositories view)
-\item  Expand :pserver:anonymous@dev.eclipse.org:/cvsroot/tools,
-    and then expand HEAD (in the CVS Repositories view)
-%\item  Under org.eclipse.cdt-build, expand org.eclipse.cdt-build CDT\_3\_1\_2
-\item  Expand org.eclipse.cdt-build
-%\item  Right click and check out all of the org.eclipse.cdt.* packages
-\item  Under org.eclipse.cdt-build, right click and check out all of the org.eclipse.cdt.* packages
-    (it is OK to skip the ones ending in "tests")
-\item  Do the same with org.eclipse.cdt-core, org.eclipse.cdt-debug,
-    org.eclipse.cdt-doc, and org.eclipse.cdt-launch
-\item You now have the CDT source code.  Make sure it compiles successfully
-    (lots of warnings, but no errors).
+\item  Right-click on :pserver:anonymous@dev.eclipse.org:/cvsroot/tools, and choose
+       Refresh Branches...
+\item  In the dialog box, scroll down, check the box next to org.eclipse.cdt, and click Finish.
+       When prompted, click on Search Deeply.  You may have to wait for a few minutes
+       for processing to complete and the dialog to disappear.
+\item  Now, in the CVS Repositories view
+       \begin{itemize}
+       \item  Expand ``:pserver:anonymous@dev.eclipse.org:/cvsroot/tools''
+       \item  Then expand ``Versions''
+       \item  Then expand ``org.eclipse.cdt CDT\_4\_0\_0''
+       \item  Then expand ``all''
+       \end{itemize}
+\item  Click on the first entry under ``all''
+       (it should be org.eclipse.cdt), then shift-click on the last entry
+       under ``all'' (it should be org.eclipse.cdt-feature).
+       All of the intervening plug-ins should now be selected.
+       Right-click on any of the selected plug-ins, and select
+       Check Out from the pop-up menu.
+       (Check out will take several minutes.)
+\item  You now have the CDT source code.  Make sure it compiles successfully
+       (lots of warnings, but no errors).
 
 \vspace{.5em}
 \noindent\textbf{Part~II.  Check out the Photran sources from CVS}
@@ -53,19 +53,39 @@ to edit the CDT source code, Part~I can be skipped.
 \begin{tabular}{ll}
         Host name:       & dev.eclipse.org \\
         Repository path: & /cvsroot/technology \\
-        Connection type: & extssh \\
         Username/passwd: & (your eclipse.org committer username and password) \\
+        Connection type: & extssh \\
 \textit{Otherwise:} \\
         Host name:       & dev.eclipse.org \\
         Repository path: & /cvsroot/technology \\
-        Connection type: & pserver \\
         Username:        & anonymous \\
         Password:        & (no password) \\
+        Connection type: & pserver \\
 \end{tabular}
 \item Expand the node for dev.eclipse.org:/home/technology,
     then expand HEAD (in the CVS Repositories view), then expand
     org.eclipse.photran
-\item Right-click and check out all of the projects under org.eclipse.photran
+\item  Check out the following projects under org.eclipse.photran:
+       \begin{itemize}
+       \item  org.eclipse.photran.core
+       \item  org.eclipse.photran.core.vpg
+       \item  org.eclipse.photran.core.vpg.tests
+       \item  org.eclipse.photran.errorparsers.xlf
+       \item  org.eclipse.photran.intel-feature
+       \item  org.eclipse.photran.managedbuilder.core
+       \item  org.eclipse.photran.managedbuilder.gnu.ui
+       \item  org.eclipse.photran.managedbuilder.intel.ui
+       \item  org.eclipse.photran.managedbuilder.ui
+       \item  org.eclipse.photran.managedbuilder.xlf.ui
+       \item  org.eclipse.photran.ui
+       \item  org.eclipse.photran.ui.vpc
+       \item  org.eclipse.photran-dev-docs
+       \item  org.eclipse.photran-feature
+       \end{itemize}
+       (The debug and launch plug-ins are not part of Photran 4.0 and will
+       not compile.  The analysis and refactoring plug-ins have been deprecated;
+       they do not contain any files, since that functionality is in the
+       VPG plug-ins.)
 
 The sources should all compile (albeit with lots of warnings).
 
