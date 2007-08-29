@@ -51,6 +51,7 @@ import org.eclipse.ptp.core.listeners.IModelManagerResourceManagerListener;
 import org.eclipse.ptp.rmsystem.IResourceManagerMenuContribution;
 import org.eclipse.ptp.ui.UIUtils;
 import org.eclipse.ptp.ui.actions.AddResourceManagerAction;
+import org.eclipse.ptp.ui.actions.EditResourceManagerAction;
 import org.eclipse.ptp.ui.actions.RemoveResourceManagersAction;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
@@ -223,8 +224,8 @@ public class ResourceManagerView extends ViewPart implements
 	private TreeViewer viewer;
 
 	private RemoveResourceManagersAction removeResourceManagerAction;
-
 	private AddResourceManagerAction addResourceManagerAction;
+	private EditResourceManagerAction editResourceManagerAction;
 
 	private final RMMachineListener rmMachineListener = new RMMachineListener();
 
@@ -339,6 +340,7 @@ public class ResourceManagerView extends ViewPart implements
 		final Shell shell = getSite().getShell();
 		addResourceManagerAction = new AddResourceManagerAction(shell);
 		removeResourceManagerAction = new RemoveResourceManagersAction(shell);
+		editResourceManagerAction = new EditResourceManagerAction(shell);
 
 		MenuManager menuManager = new MenuManager("#PopupMenu"); //$NON-NLS-1$
 		menuManager.setRemoveAllWhenShown(true);
@@ -358,11 +360,13 @@ public class ResourceManagerView extends ViewPart implements
 		manager.add(addResourceManagerAction);
 		Object[] selectedObjects = selection.toArray();
 		boolean inContextForRM = selection.size() > 0;
+		boolean inContextForEditRM = inContextForRM;
 		boolean inContextForRemoveRM = inContextForRM;
 		for (int i = 0; i < selectedObjects.length; ++i) {
 			if (!(selectedObjects[i] instanceof IResourceManagerMenuContribution)) {
 				// Not all of the selected are RMs
 				inContextForRM = false;
+				inContextForEditRM = false;
 				inContextForRemoveRM = false;
 				break;
 			}
@@ -370,6 +374,7 @@ public class ResourceManagerView extends ViewPart implements
                 final IResourceManagerMenuContribution menuContrib = (IResourceManagerMenuContribution) selectedObjects[i];
 			    IResourceManagerControl rm = (IResourceManagerControl) menuContrib.getAdapter(IResourceManagerControl.class);
 			    if (rm.getState() != ResourceManagerAttributes.State.STOPPED) {
+			    	inContextForEditRM = false;
 			        inContextForRemoveRM = false;
 			    }
 			}
@@ -384,7 +389,13 @@ public class ResourceManagerView extends ViewPart implements
 			}
 			removeResourceManagerAction.setResourceManager(rmManagers);
 		}
-
+		manager.add(editResourceManagerAction);
+		editResourceManagerAction.setEnabled(inContextForEditRM);
+		if (inContextForEditRM) {
+			final IResourceManagerMenuContribution menuContrib = (IResourceManagerMenuContribution) selectedObjects[0];
+			IResourceManagerControl rmManager = (IResourceManagerControl) menuContrib.getAdapter(IResourceManagerControl.class);
+			editResourceManagerAction.setResourceManager(rmManager);
+		}
 		manager.add(new Separator());
 		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS

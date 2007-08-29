@@ -211,27 +211,48 @@ public class RMConfigurationWizard extends Wizard {
 
 	private IResourceManagerFactory resourceManagerFactory;
 
-	private boolean useDefaultNameAndDesc = true;
+	private boolean useDefaultNameAndDesc;
 	
 	private final NameAndDescPage nameAndDescPage;
 
 	private int selectedFactory = -1;
+	
+	private IResourceManagerControl resourceManager;
 
+	/*
+	 * Constructor used when creating a new resource manager.
+	 */
 	public RMConfigurationWizard(
 			IResourceManagerFactory[] resourceManagerFactories) {
 		setForcePreviousAndNextButtons(true);
 		this.factories = resourceManagerFactories;
-		this.hasFactories = factories.length > 0;
+		this.hasFactories = factories != null && factories.length > 0;
 		this.cachedPages = new RMConfigurationWizardPage[factories.length][];
 		this.configs = new IResourceManagerConfiguration[factories.length];
 		this.selectFactoryPage = new SelectFactoryPage(
 				UIMessage.getResourceString("ConfigurationWizard.FirstWizardPageName")); //$NON-NLS-1$
 		this.nameAndDescPage = new NameAndDescPage(
 				UIMessage.getResourceString("ConfigurationWizard.SecondWizardPageName")); //$NON-NLS-1$
+		this.useDefaultNameAndDesc = true;
+		this.resourceManager = null;
+	}
+
+	/*
+	 * Constructor used when editing configuration of an existing resource manager.
+	 */
+	public RMConfigurationWizard(IResourceManagerFactory resourceManagerFactory,
+			IResourceManagerControl resourceManager) {
+		this(new IResourceManagerFactory[] { resourceManagerFactory });
+		this.configs[0] = resourceManager.getConfiguration();
+		this.useDefaultNameAndDesc = false;
+		this.resourceManager = resourceManager;
+		factorySelected(0);
 	}
 
 	public void addPages() {
-		addPage(selectFactoryPage);
+		if (resourceManager == null) {
+			addPage(selectFactoryPage);
+		}
 		addPage(nameAndDescPage);
 		super.addPages();
 	}
@@ -272,6 +293,9 @@ public class RMConfigurationWizard extends Wizard {
 		}
 		if (index == numPages - 2) {
 			// initialize last page
+			if (useDefaultNameAndDesc) {
+				configs[selectedFactory].setDefaultNameAndDesc();
+			}
 			nameAndDescPage.setNameAndDescription(configs[selectedFactory]);
 			nameAndDescPage.setEnabled(!useDefaultNameAndDesc);
 		}
@@ -293,8 +317,13 @@ public class RMConfigurationWizard extends Wizard {
 		if (useDefaultNameAndDesc) {
 			config.setDefaultNameAndDesc();
 		}
-		IResourceManagerControl rm = resourceManagerFactory.create(config);
-		PTPCorePlugin.getDefault().getModelManager().addResourceManager(rm);
+		if (resourceManager != null) {
+			resourceManager.setConfiguration(config);
+			PTPCorePlugin.getDefault().getModelManager().saveResourceManagers();
+		} else {
+			IResourceManagerControl rm = resourceManagerFactory.create(config);
+			PTPCorePlugin.getDefault().getModelManager().addResourceManager(rm);
+		}
 		Arrays.fill(configs, null);
 		return true;
 	}
@@ -339,7 +368,9 @@ public class RMConfigurationWizard extends Wizard {
 		// add the first and last pages to the selected factory's pages
 		
 		wizardPages.clear();
-		wizardPages.add(selectFactoryPage);
+		if (resourceManager == null) {
+			wizardPages.add(selectFactoryPage);
+		}
 		wizardPages.addAll(Arrays.asList(cachedPages[index]));
 		wizardPages.add(nameAndDescPage);
 	}
