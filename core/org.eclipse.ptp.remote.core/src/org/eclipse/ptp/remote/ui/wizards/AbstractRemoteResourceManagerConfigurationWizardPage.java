@@ -220,7 +220,6 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		}
 		config.setProxyServerPath(proxyFile);
 		config.setOptions(options);
-		config.setDefaultNameAndDesc();
 		return true;
 	}
 	
