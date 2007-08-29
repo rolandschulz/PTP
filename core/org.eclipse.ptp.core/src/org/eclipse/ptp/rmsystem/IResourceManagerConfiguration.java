@@ -44,6 +44,13 @@ public interface IResourceManagerConfiguration {
 	public String getResourceManagerId();
 	
 	/**
+	 * Returns the type of the resource manager. This is the name of the resource manager factory.
+	 *
+	 * @return the type of the resource manager
+	 */
+	public String getType();
+
+	/**
 	 * Save the state of the configuration.
 	 * 
 	 * @param memento
