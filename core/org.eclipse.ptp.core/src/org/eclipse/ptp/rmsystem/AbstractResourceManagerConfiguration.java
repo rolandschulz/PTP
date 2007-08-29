@@ -83,6 +83,7 @@ public abstract class AbstractResourceManagerConfiguration implements IResourceM
 	private String description;
 	private String name;
 	private final String resourceManagerId;
+	private final String resourceManagerType;
 
 	private final String uniqueName;
 
@@ -96,6 +97,7 @@ public abstract class AbstractResourceManagerConfiguration implements IResourceM
 		this.name = commonConfig.getName();
 		this.description = commonConfig.getDescription();
 		this.resourceManagerId = factory.getId();
+		this.resourceManagerType = factory.getName();
 		this.uniqueName = commonConfig.getUniqueName();
 	}
 
@@ -119,7 +121,14 @@ public abstract class AbstractResourceManagerConfiguration implements IResourceM
 	public String getResourceManagerId() {
 		return resourceManagerId;
 	}
-
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#getType()
+	 */
+	public String getType() {
+		return resourceManagerType;
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#getUniqueName()
 	 */
