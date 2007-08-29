@@ -765,6 +765,8 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 				} else if (event instanceof IProxyDisconnectedEvent) {
 					state = ProxyState.IDLE;
 					fireProxyRuntimeStartupErrorEvent(new ProxyRuntimeStartupErrorEvent("Proxy disconnected"));
+				} else if (event instanceof IProxyMessageEvent) {
+					fireProxyRuntimeMessageEvent(new ProxyRuntimeMessageEvent((IProxyMessageEvent)event));
 				} else {
 					state = ProxyState.ERROR;
 					fireProxyRuntimeErrorStateEvent(new ProxyRuntimeErrorStateEvent());
