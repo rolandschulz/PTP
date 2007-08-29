@@ -13,6 +13,7 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
@@ -252,6 +253,24 @@ public class ResourceManagerView extends ViewPart implements
 		getSite().setSelectionProvider(viewer);
 
 		viewer.getTree().addMouseListener(new MouseAdapter() {
+			/* (non-Javadoc)
+			 * @see org.eclipse.swt.events.MouseAdapter#mouseDoubleClick(org.eclipse.swt.events.MouseEvent)
+			 */
+			@Override
+			public void mouseDoubleClick(MouseEvent e) {
+				ITreeSelection selection = (ITreeSelection)viewer.getSelection();
+				if (!selection.isEmpty()) {
+					IResourceManagerControl rm = (IResourceManagerControl)selection.getFirstElement();
+					if (rm.getState() == ResourceManagerAttributes.State.STOPPED) {
+						editResourceManagerAction.setResourceManager(rm);
+						editResourceManagerAction.run();
+					}
+				}
+			}
+
+			/* (non-Javadoc)
+			 * @see org.eclipse.swt.events.MouseAdapter#mouseDown(org.eclipse.swt.events.MouseEvent)
+			 */
 			public void mouseDown(MouseEvent e) {
 				ISelection selection = viewer.getSelection();
 				TreeItem item = viewer.getTree().getItem(new Point(e.x, e.y));
