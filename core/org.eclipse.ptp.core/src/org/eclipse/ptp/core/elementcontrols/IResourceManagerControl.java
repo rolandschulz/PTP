@@ -23,33 +23,52 @@ import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 public interface IResourceManagerControl extends IResourceManager, IPElementControl {
 
 	/**
+	 * Disable event processing. The RM state will be set to SUSPENDED.
+	 * 
 	 * @throws CoreException
 	 */
 	public void disableEvents() throws CoreException;
 
 	/**
-	 * 
+	 * Safely dispose of this Resource Manager.
 	 */
 	public void dispose();
 
 	/**
+	 * Enable event processing. The RM state will be set to STARTED.
+	 * 
 	 * @throws CoreException
 	 */
 	public void enableEvents() throws CoreException;
 	
 	/**
-	 * @return
+	 * Get the configuration associated with this resource manager.
+	 * 
+	 * @return resource manager configuration
 	 */
 	public IResourceManagerConfiguration getConfiguration();
 	
 	/**
-	 * @return
+	 * Get the IPMachineControl interfaces for machines that this resource manager knows about.
+	 * 
+	 * @return IPMachineControl interfaces
 	 */
 	public IPMachineControl[] getMachineControls();
-
+	
 	/**
-	 * @return
+	 * Get the IPQueueControl interfaces for queues that this resource manager knows about.
+	 * 
+	 * @return IPQueueControl interfaces
 	 */
 	public IPQueueControl[] getQueueControls();
+	
+	/**
+	 * Set the configuration for this resource manager. This will replace the existing
+	 * configuration with a new configuration. The method is responsible for dealing with
+	 * any saved state that needs to be cleaned up.
+	 * 
+	 * @param config the new configuration
+	 */
+	public void setConfiguration(IResourceManagerConfiguration config);
 
 }
