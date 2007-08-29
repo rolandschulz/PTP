@@ -16,7 +16,7 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.orte.ui;
+package org.eclipse.ptp.orte.core;
 
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Preferences;
@@ -24,7 +24,7 @@ import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.remote.IRemoteProxyOptions;
 import org.eclipse.ptp.remote.ui.preferences.PreferenceConstants;
 
-public class OMPIPreferenceManager {
+public class ORTEPreferenceManager {
 	private static final String PROXY_EXECUTABLE_NAME = "ptp_orte_proxy";
 	private static final String PROXY_EXECUTABLE_PATH = null; // use local fragment directory
 	private static final int OPTIONS = IRemoteProxyOptions.PORT_FORWARDING;

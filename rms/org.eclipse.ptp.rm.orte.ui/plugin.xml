@@ -6,7 +6,7 @@
          point="org.eclipse.ui.preferencePages">
       <page
             category="org.eclipse.ptp.ui.preferences.rmPreferencesPage"
-            class="org.eclipse.ptp.orte.ui.preferences.OMPIPreferencePage"
+            class="org.eclipse.ptp.orte.ui.preferences.ORTEPreferencePage"
             id="org.eclipse.ptp.orte.ui.preferences.OMPIPreferencePage"
             name="Open RTE">
       </page>
