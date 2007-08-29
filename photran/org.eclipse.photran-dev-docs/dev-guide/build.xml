@@ -18,12 +18,12 @@
 			failifexecutionfails="true">
 			<arg value="dev-guide.ltx" />
 		</exec>
-		<exec command="${pdflatex}"
+		<exec executable="${pdflatex}"
 			failonerror="true"
 			failifexecutionfails="true">
 			<arg value="dev-guide.ltx" />
 		</exec>
-		<exec command="${pdflatex}"
+		<exec executable="${pdflatex}"
 			failonerror="true"
 			failifexecutionfails="true">
 			<arg value="cvs-instructions.ltx" />

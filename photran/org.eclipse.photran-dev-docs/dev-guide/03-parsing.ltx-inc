@@ -2,6 +2,8 @@
 
 \textit{Last Updated 4/11/07}
 
+\bfseries{\Huge This information is out of date and is being updated (8/07).}
+
 \section{Abstract Syntax Trees: The \texttt{FortranWorkspace}}
 
 \subsection{Visualizing ASTs}

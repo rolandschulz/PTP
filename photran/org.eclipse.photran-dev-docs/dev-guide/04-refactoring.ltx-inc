@@ -2,6 +2,8 @@
 
 \textit{Last Updated 4/11/07}
 
+\bfseries{\Huge This information is out of date and is being updated (8/07).}
+
 \section{Structure of a Refactoring}
 
 Refactorings in Photran are subclassed from \texttt{FortranRefactoring},

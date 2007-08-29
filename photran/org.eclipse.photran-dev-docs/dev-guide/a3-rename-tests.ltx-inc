@@ -2,6 +2,8 @@
 
 \textit{Last Updated 4/12/07}
 
+\bfseries{\large This information is out of date and is being updated (8/07).}
+
 JUnit tests for the Rename refactoring are located in the
 org.eclipse.photran.refactoring.tests plug-in.  A Rename test
 has two components:
