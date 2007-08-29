@@ -22,6 +22,7 @@ package org.eclipse.ptp.rtsystem.proxy.event;
 import org.eclipse.ptp.core.elements.attributes.MessageAttributes;
 import org.eclipse.ptp.core.elements.attributes.MessageAttributes.Level;
 import org.eclipse.ptp.core.proxy.event.AbstractProxyEvent;
+import org.eclipse.ptp.core.proxy.event.IProxyMessageEvent;
 
 
 public class ProxyRuntimeMessageEvent extends AbstractProxyEvent 
@@ -41,5 +42,9 @@ public class ProxyRuntimeMessageEvent extends AbstractProxyEvent
 			MessageAttributes.getCodeAttributeDefinition().getId() + "=" + code,
 			MessageAttributes.getTextAttributeDefinition().getId() + "=" + message
 		});
+	}
+	
+	public ProxyRuntimeMessageEvent(IProxyMessageEvent event) {
+		this(event.getTransactionID(), event.getAttributes());
 	}
 }
