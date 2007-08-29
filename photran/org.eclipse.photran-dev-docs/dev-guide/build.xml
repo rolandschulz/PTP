@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<project default="main" basedir=".">
+	<target name="init">
+		<tstamp/>
+	</target>
+
+	<target name="main" description="Generate PDFs using pdflatex">
+		<!-- Run find-pdflatex.sh in the build directory to find pdflatex -->
+		<exec executable="find-pdflatex.sh"
+			resolveexecutable="true"
+			outputproperty="pdflatex"
+			failonerror="true"
+			failifexecutionfails="true"/>
+		
+		<!-- Now run pdflatex -->
+		<exec executable="${pdflatex}"
+			failonerror="true"
+			failifexecutionfails="true">
+			<arg value="dev-guide.ltx" />
+		</exec>
+		<exec command="${pdflatex}"
+			failonerror="true"
+			failifexecutionfails="true">
+			<arg value="dev-guide.ltx" />
+		</exec>
+		<exec command="${pdflatex}"
+			failonerror="true"
+			failifexecutionfails="true">
+			<arg value="cvs-instructions.ltx" />
+		</exec>
+	  	<delete><fileset dir="." includes="*.aux *.log *.toc *.dvi *.ps" /></delete>
+	  	<exec executable="bash"><arg value="-c" /><arg value="if [ &quot;$$LOGNAME&quot; == &quot;joverbey&quot; ]; then xpdf -paper letter dev-guide.pdf; fi" /></exec>
+	</target>
+
+	<target name="clean" description="Remove generated PDFs">
+		<delete><fileset includes="*.pdf" /></delete>
+	</target>
+
+</project>

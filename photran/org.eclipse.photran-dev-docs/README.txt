@@ -10,9 +10,12 @@ dev-guide
 	
 	If you edit this, make sure your name is added
 	to authors.tex!
+	
+	Run Ant on build.xml to build the documentation
+	using pdflateex.
 
 misc-notes
 	Various notes-to-self that aren't import enough to
 	be in the developer's guide.
 
---Jeff Overbey 8/19/05
+--Jeff Overbey 8/19/05, updated 8/29/08
