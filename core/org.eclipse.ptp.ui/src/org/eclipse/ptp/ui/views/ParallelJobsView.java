@@ -174,7 +174,8 @@ public class ParallelJobsView extends AbstractParallelSetView implements IModelM
 	 */
 	protected void initialView() {
 		initialElement();
-		update();
+		//update();
+		refresh(true);
 	}
 	
 	/* (non-Javadoc)
@@ -405,7 +406,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements IModelM
 	 */
 	protected void changeJob(final IPJob job) {
 		selectJob(job);
-		updateAction();
+		//updateAction();
 		update();
 	}
 	
@@ -502,8 +503,9 @@ public class ParallelJobsView extends AbstractParallelSetView implements IModelM
 				getJobManager().addProcess(process);
 				if (isCurrent) {
 					updateJobSet();
-					update();
-					jobTableViewer.refresh(true);
+					repaint(true);
+					//update();
+					//jobTableViewer.refresh(true);
 				}
 			}
 		});	
@@ -521,8 +523,9 @@ public class ParallelJobsView extends AbstractParallelSetView implements IModelM
 				if (isCurrent) {
 					getJobManager().removeProcess(process);
 					updateJobSet();
-					update();
-					jobTableViewer.refresh(true);
+					repaint(true);
+					//update();
+					//jobTableViewer.refresh(true);
 				}
 			}
 		});

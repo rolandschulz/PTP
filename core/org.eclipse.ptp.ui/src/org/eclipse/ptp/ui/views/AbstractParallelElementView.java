@@ -18,6 +18,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.views;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.core.runtime.Preferences.PropertyChangeEvent;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -38,6 +41,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.progress.WorkbenchJob;
 
 /**
  *
@@ -209,7 +213,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 			fireSetChangeEvent(set, cur_element_set);
 			cur_element_set = set;
 		}
-		updateAction();
+		//updateAction();
 	}
 	/** Get current set
 	 * @return current set
@@ -224,6 +228,18 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	 * 
 	 */
 	public void refresh(final boolean all) {
+		WorkbenchJob uiJob = new WorkbenchJob("Refreshing icons...") {
+			public IStatus runInUIThread(IProgressMonitor monitor) {
+				repaint(all);
+				if (!canvas.isDisposed()) {
+					canvas.redraw();
+				}
+				return Status.OK_STATUS;
+			}
+		};
+		uiJob.setSystem(true);
+		uiJob.schedule();
+	/*
 		getDisplay().asyncExec(new Runnable() {
 			public void run() {
 				if (all)
@@ -234,6 +250,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 				}
 			}
 		});
+	*/
 	}
 	public abstract void updateAction();
 	// Set element info
