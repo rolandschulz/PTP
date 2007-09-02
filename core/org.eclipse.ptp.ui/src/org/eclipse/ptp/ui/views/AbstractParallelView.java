@@ -79,7 +79,6 @@ public abstract class AbstractParallelView extends ViewPart implements IModelMan
 		UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
 			public void run() {
 				build();
-				refresh(true);
 			}
 		});	
 	}

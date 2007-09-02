@@ -264,7 +264,7 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 				else {
 					manager.addToSet(clipElements, cur_element_set.getID(), cur_element_set.getElementHandler());
 					selectSet(cur_element_set.getElementHandler().getSet(cur_element_set.getID()));					
-					update();
+					//update();
 					refresh(false);
 				}
 				type = -1;

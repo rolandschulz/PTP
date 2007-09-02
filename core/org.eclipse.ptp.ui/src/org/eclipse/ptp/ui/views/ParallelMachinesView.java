@@ -324,8 +324,9 @@ public class ParallelMachinesView extends AbstractParallelSetView implements
 				getMachineManager().addNode(node);
 				if (isCurrent) {
 					updateMachineSet();
-					update();
-					machineTableViewer.refresh(true);
+					repaint(true);
+					//update();
+					//machineTableViewer.refresh(true);
 				}
 			}
 		});	
@@ -350,8 +351,9 @@ public class ParallelMachinesView extends AbstractParallelSetView implements
 				getMachineManager().removeNode(node);
 				if (isCurrent) {
 					updateMachineSet();
-					update();
-					machineTableViewer.refresh(true);
+					repaint(true);
+					//update();
+					//machineTableViewer.refresh(true);
 					nodeAttrTableViewer.refresh();
 					processTableViewer.refresh();
 				}
@@ -576,7 +578,7 @@ public class ParallelMachinesView extends AbstractParallelSetView implements
 	 */
 	protected void changeMachine(final IPMachine machine) {
 		selectMachine(machine);
-		updateAction();
+		//updateAction();
 		update();
 	}
 	
