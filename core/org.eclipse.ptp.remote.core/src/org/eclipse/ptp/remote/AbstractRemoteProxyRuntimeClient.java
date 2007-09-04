@@ -15,6 +15,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -23,12 +24,13 @@ import org.eclipse.ptp.rtsystem.proxy.AbstractProxyRuntimeClient;
 
 public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient {
 	
-	private boolean			proxyDebugOutput = true;
-	private final String	proxyName;
-	private final String	proxyPath;
-	private final int	 	proxyOptions;
-	private final String	remoteServicesId;
-	private final String	connectionName;
+	private boolean				proxyDebugOutput = true;
+	private final String		proxyName;
+	private final String		proxyPath;
+	private final int	 		proxyOptions;
+	private final String		remoteServicesId;
+	private final String		connectionName;
+	private final List<String>	invocationOptions;
 
 	public AbstractRemoteProxyRuntimeClient(AbstractRemoteResourceManagerConfiguration config, 
 			int baseModelId) {
@@ -38,6 +40,7 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 		this.proxyName = config.getName();
 		this.proxyPath = config.getProxyServerPath();
 		this.proxyOptions = config.getOptions();
+		this.invocationOptions = config.getInvocationOptions();
 	}
 
 	/* (non-Javadoc)
@@ -81,7 +84,7 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 			if (manualLaunch) {
 				sessionCreate();
 				
-				ArrayList<String> args = new ArrayList<String>();
+				List<String> args = new ArrayList<String>();
 				args.add(proxyPath);
 				args.add("--proxy=tcp");
 				if (portForwarding) {
@@ -90,11 +93,11 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 					args.add("--host=" + getSessionHost());
 				}
 				args.add("--port="+getSessionPort());
+				args.addAll(invocationOptions);
 				
 				if (getEventLogging()) {
 					System.out.println("Launch command: " + args.toString());
 				}
-
 				
 				final String msg = "Waiting for manual launch of proxy: " + args.toString();
 				System.out.println(msg);
@@ -116,6 +119,7 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 						args.add("--host=" + getSessionHost());
 					}
 					args.add("--port="+getSessionPort());
+					args.addAll(invocationOptions);
 					
 					if (getEventLogging()) {
 						System.out.println("Launch command: " + args.toString());
@@ -160,6 +164,7 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 					ArrayList<String> args = new ArrayList<String>();
 					args.add(proxyPath);
 					args.add("--proxy=stdio");
+					args.addAll(invocationOptions);
 
 					IRemoteProcessBuilder processBuilder = remoteServices.getProcessBuilder(conn, args);
 					IRemoteProcess process = processBuilder.asyncStart();

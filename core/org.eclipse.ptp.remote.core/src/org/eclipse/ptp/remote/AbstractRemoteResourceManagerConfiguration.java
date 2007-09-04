@@ -18,6 +18,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
 import org.eclipse.ui.IMemento;
@@ -36,19 +39,21 @@ public abstract class AbstractRemoteResourceManagerConfiguration extends Abstrac
 		private final String proxyPath;
 		private final String remoteServicesId;
 		private final String connectionName;
+		private final String invocationOptions;
 		private final int options;
 
 		public RemoteConfig() {
-			this(new CommonConfig(), "", "", "", IRemoteProxyOptions.PORT_FORWARDING);
+			this(new CommonConfig(), "", "", "", "", IRemoteProxyOptions.PORT_FORWARDING);
 		}
 		
 		public RemoteConfig(CommonConfig config, String remoteId, String conn, String path, 
-				int options) {
+				    String invocationOptions, int options) {
 			this.commonConfig = config;
 			this.proxyPath = path;
 			this.remoteServicesId = remoteId;
 			this.connectionName = conn;
 			this.options = options;
+			this.invocationOptions = invocationOptions;
 		}
 		
 		public CommonConfig getCommonConfig() {
@@ -70,12 +75,17 @@ public abstract class AbstractRemoteResourceManagerConfiguration extends Abstrac
 		public String getRemoteServicesId() {
 			return remoteServicesId;
 		}
+		
+		public String getInvocationOptions() {
+		    return invocationOptions;
+		}
 	}
 	
 	private static final String TAG_PROXY_PATH = "proxyPath"; //$NON-NLS-1$
 	private static final String TAG_OPTIONS = "options"; //$NON-NLS-1$
 	private static final String TAG_CONNECTION_NAME = "connectionName"; //$NON-NLS-1$
 	private static final String TAG_REMOTE_SERVICES_ID = "remoteServicesID"; //$NON-NLS-1$
+	private static final String TAG_INVOCATION_OPTIONS = "invocationOptions"; //$NON-NLS-1$
 
 	/**
 	 * Load remote configuration from saved information
@@ -93,10 +103,11 @@ public abstract class AbstractRemoteResourceManagerConfiguration extends Abstrac
 		String connectionName = memento.getString(TAG_CONNECTION_NAME);
 		String proxyServerPath = memento.getString(TAG_PROXY_PATH);
 		int options = Integer.parseInt(memento.getString(TAG_OPTIONS));
+		String invocationOptions = memento.getString(TAG_INVOCATION_OPTIONS);
 
 		RemoteConfig config = 
 			new RemoteConfig(commonConfig, remoteServicesId, connectionName, proxyServerPath,
-					options);
+					 invocationOptions, options);
 
 		return config;
 	}
@@ -104,6 +115,7 @@ public abstract class AbstractRemoteResourceManagerConfiguration extends Abstrac
 	private String remoteServicesId;
 	private String connectionName;
 	private String proxyServerPath;
+	private List<String> invocationOptions;
 	private int options;
 	
 	public AbstractRemoteResourceManagerConfiguration(RemoteConfig remoteConfig, 
@@ -113,6 +125,8 @@ public abstract class AbstractRemoteResourceManagerConfiguration extends Abstrac
 		this.connectionName = remoteConfig.getConnectionName();
 		this.proxyServerPath = remoteConfig.getProxyPath();
 		this.options = remoteConfig.getOptions();
+		this.invocationOptions = new ArrayList<String>();
+		this.setInvocationOptions(remoteConfig.getInvocationOptions());
 	}
 	
 	/**
@@ -151,6 +165,15 @@ public abstract class AbstractRemoteResourceManagerConfiguration extends Abstrac
 	public int getOptions() {
 		return options;
 	}
+	
+	/**
+	 * Get the invocation options
+	 * @return Invocation options
+	 */
+	public List<String> getInvocationOptions()
+	{
+	    return invocationOptions;
+	}
 
 	/**
 	 * Set the connection name.
@@ -186,6 +209,28 @@ public abstract class AbstractRemoteResourceManagerConfiguration extends Abstrac
 	public void setRemoteServicesId(String id) {
 		this.remoteServicesId = id;
 	}
+	
+	/**
+	 * Set the invocation options
+	 * @param options Invocation options
+	 */
+	public void setInvocationOptions(String optionString) {
+		this.invocationOptions.clear();
+		addInvocationOptions(optionString);
+	}
+	
+	
+	/**
+	 * Append invocation options to the list
+	 * @param options Invocation options
+	 */
+	public void addInvocationOptions(String optionString) {
+		String[] options = optionString.split(" ");
+		
+		for (String option : options) {
+			this.invocationOptions.add(option);
+		}
+	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerConfiguration#doSave(org.eclipse.ui.IMemento)
@@ -195,5 +240,13 @@ public abstract class AbstractRemoteResourceManagerConfiguration extends Abstrac
 		memento.putString(TAG_CONNECTION_NAME, connectionName);
 		memento.putString(TAG_PROXY_PATH, proxyServerPath);
 		memento.putString(TAG_OPTIONS, Integer.toString(options));
+		String opts = "";
+		for (int i = 0; i < invocationOptions.size(); i++) {
+			if (i > 0) {
+				opts += " ";
+			}
+			opts += invocationOptions.get(i);
+		}
+		memento.putString(TAG_INVOCATION_OPTIONS, opts);
 	}
 }
