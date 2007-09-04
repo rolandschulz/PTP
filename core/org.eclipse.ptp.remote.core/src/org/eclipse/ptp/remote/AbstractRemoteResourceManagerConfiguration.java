@@ -167,8 +167,10 @@ public abstract class AbstractRemoteResourceManagerConfiguration extends Abstrac
 	}
 	
 	/**
-	 * Get the invocation options
-	 * @return Invocation options
+	 * Get the invocation options as a list of strings. Returns
+	 * an empty list if there are no options
+	 * 
+	 * @return list of strings containing invocation options
 	 */
 	public List<String> getInvocationOptions()
 	{
@@ -211,8 +213,10 @@ public abstract class AbstractRemoteResourceManagerConfiguration extends Abstrac
 	}
 	
 	/**
-	 * Set the invocation options
-	 * @param options Invocation options
+	 * Set the invocation options. The contents of optionString are split into space
+	 * separated strings. Any existing options are discarded.
+	 * 
+	 * @param optionString string containing the space separated invocation options
 	 */
 	public void setInvocationOptions(String optionString) {
 		this.invocationOptions.clear();
@@ -221,8 +225,10 @@ public abstract class AbstractRemoteResourceManagerConfiguration extends Abstrac
 	
 	
 	/**
-	 * Append invocation options to the list
-	 * @param options Invocation options
+	 * Append invocation options to existing options. The contents of optionString are 
+	 * split into space separated strings.
+	 * 
+	 * @param optionString string containing the space separated invocation options
 	 */
 	public void addInvocationOptions(String optionString) {
 		String[] options = optionString.split(" ");
