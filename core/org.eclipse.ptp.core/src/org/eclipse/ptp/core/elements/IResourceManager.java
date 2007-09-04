@@ -33,62 +33,84 @@ public interface IResourceManager extends IPElement,
 IAdaptable, IResourceManagerMenuContribution {
 
 	/**
-	 * @param listener
+	 * Add a listener for machine-related events.
+	 * 
+	 * @param listener listener to add to the list of listeners
 	 */
 	public void addChildListener(IResourceManagerMachineListener listener);
 	
 	/**
-	 * @param listener
+	 * Add a listener for queue-realted events
+	 * 
+	 * @param listener listener to add to the list of listeners
 	 */
 	public void addChildListener(IResourceManagerQueueListener listener);
 
 	/**
-	 * @param listener
+	 * Add a listener for events related to this resource manager.
+	 * 
+	 * @param listener listener to add to the list of listeners
 	 */
 	public void addElementListener(IResourceManagerListener listener);
 
 	/**
+	 * Get the attribute definition corresponding to the attrId. This will
+	 * only check for attribute definitions that the RM knows about.
 	 * 
-	 * @param attrId
-	 * @return
+	 * @param attrId ID of the attribute definition
+	 * @return the attribute definition corresponding to the attribute definition ID
 	 */
 	public IAttributeDefinition<?,?,?> getAttributeDefinition(String attrId);
 
 	/**
-	 * @return
+	 * Get a string description of this RM
+	 * 
+	 * @return string describing the RM
 	 */
 	public String getDescription();
 	
 	/**
-	 * @param id
-	 * @return
+	 * Find a machine object using its ID
+	 * 
+	 * @param id ID of the machine object
+	 * @return machine object corresponding to the ID
 	 */
 	public IPMachine getMachineById(String id);
 	
 	/**
-	 * @return
+	 * Get an array containing all the machines known by this RM
+	 * 
+	 * @return array of machines known by this RM
 	 */
 	public IPMachine[] getMachines();
 
 	/**
-	 * @return
+	 * Get the name of this RM
+	 * 
+	 * @return string name of the RM
 	 */
 	public String getName();
 
 	/**
-	 * @param id
-	 * @return IPQueue
+	 * Find a queue object using its ID
+	 * 
+	 * @param id ID of the queue object
+	 * @return queue object corresponding to the ID
 	 */
 	public IPQueue getQueueById(String id);
 
 	/**
-	 * @param name
-	 * @return IPQueue
+	 * Fina a queue object using its name attribute
+	 * 
+	 * @param name name attribute of the queue object
+	 * @return queue object corresponding to the name
 	 */
 	public IPQueue getQueueByName(String name);
 
 	/**
-	 * @return
+	 * Get an array containing all the queues known by this RM
+	 * 
+	 * @return array of queues known by this RM
 	 */
 	public IPQueue[] getQueues();
 
@@ -100,58 +122,81 @@ IAdaptable, IResourceManagerMenuContribution {
     public String getResourceManagerId();
 
     /**
-	 * @return
+     * Get the state of this RM
+     * 
+	 * @return state value representing the state of the RM
 	 */
 	public ResourceManagerAttributes.State getState();
 	
 	/**
-	 * @param listener
+	 * Remove listener for machine-related events
+	 * 
+	 * @param listener listener to remove
 	 */
 	public void removeChildListener(IResourceManagerMachineListener listener);
 
 	/**
-	 * @param listener
+	 * Remove listener for queue-related events
+	 * 
+	 * @param listener listener to remove
 	 */
 	public void removeChildListener(IResourceManagerQueueListener listener);
 
 	/**
-	 * @param listener
+	 * Remove listener for events relating to this resource manager
+	 * 
+	 * @param listener listener to remove
 	 */
 	public void removeElementListener(IResourceManagerListener listener);
 
 	/**
-	 * @param queue
+	 * Remove all terminated jobs from the given queue. A terminated job is determined
+	 * by its state attribute.
+	 * 
+	 * @param queue queue from which all terminated jobs will be removed
 	 */
 	public void removeTerminatedJobs(IPQueue queue);
 	
 	/**
-	 * 
+	 * Shutdown the resource manager
 	 */
 	public void shutdown() throws CoreException;
 
 	/**
-	 * @param monitor
+	 * Start up the resource manager. This could potentially take a long time (or forever),
+	 * particularly if the RM is located on a remote system.
 	 * 
+	 * @param monitor progress monitor to indicate startup progress
 	 */
 	public void startUp(IProgressMonitor monitor) throws CoreException;
 
 	/**
-	 * @param attrMgr
-	 * @param monitor
-	 * @return IPJob
+	 * Submit a job. The attribute manager must contain the appropriate attributes for
+	 * a successful job launch (e.g. the queue, etc.)
+	 * 
+	 * @param attrMgr attribute manager containing the job launch attributes
+	 * @param monitor progress monitor
+	 * @return a job object representing the submitted job
 	 * @throws CoreException
 	 */
 	public IPJob submitJob(AttributeManager attrMgr, IProgressMonitor monitor) 
 		throws CoreException;
 
 	/**
-	 * @param job
+	 * Terminate the job. The action this takes depends on the RM implementation and
+	 * the state of the job. For queued but not running jobs, this would be equivalent
+	 * to canceling the job. For running jobs, this would mean halting its execution.
+	 * 
+	 * @param job job object representing the job to be canceled.
 	 */
 	public void terminateJob(IPJob job) throws CoreException;
 
 	/**
-	 * @return a unique name that can be used to identify this resource
-	 * manager persistently between PTP invocations.
+	 * Get a unique name that can be used to identify this resource
+	 * manager persistently between PTP invocations. Used by the 
+	 * ResourceManagerPersistence.
+	 * 
+	 * @return string representing a unique name for the resource manager
 	 */
 	public String getUniqueName();
 }
