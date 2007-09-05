@@ -8,8 +8,8 @@
       <category name="Parallel Tools Platform"/>
    </feature>
    <feature url="features/org.eclipse.ptp.pldt_1.1.1.jar" id="org.eclipse.ptp.pldt" version="1.1.1">
-      <category name="Parallal Language Development Tools"/>
+      <category name="Parallel Language Development Tools"/>
    </feature>
    <category-def name="Parallel Tools Platform" label="PTP"/>
-   <category-def name="Parallal Language Development Tools" label="PLDT"/>
+   <category-def name="Parallel Language Development Tools" label="PLDT"/>
 </site>
