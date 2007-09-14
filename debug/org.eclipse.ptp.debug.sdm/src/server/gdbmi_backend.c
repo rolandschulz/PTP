@@ -115,6 +115,7 @@ static int	GDBMIQuit(void);
 static int	GDBMIDataEvaluateExpression(char*);
 static int	GDBGetPartialAIF(char *, char *, int, int);
 static int	GDBMIVarDelete(char*);
+static int	GDBGetAIFType(char*);
 
 static void SendCommandWait(MISession *, MICommand *);
 static int	SetAndCheckBreak(int, int, int, char *, char *, int, int);
@@ -160,6 +161,7 @@ dbg_backend_funcs	GDBMIBackend =
 	GDBMIDataEvaluateExpression,
 	GDBGetPartialAIF,
 	GDBMIVarDelete,
+	//GDBGetAIFType,
 	GDBMIQuit
 };
 
@@ -321,12 +323,32 @@ RemoveAllBPMap()
 }
 
 static stackframe *
+get_current_frame()
+{
+	stackframe *f;
+	List *	frames;
+	
+	if (GetStackframes(1, 0, 0, &frames) != DBGRES_OK)
+		return NULL;
+
+	if (EmptyList(frames)) {
+		DbgSetError(DBGERR_DEBUGGER, "Could not get current stack frame");
+		return NULL;
+	} 
+	
+	SetList(frames);
+	f = (stackframe *)GetListElement(frames);
+	DestroyList(frames, NULL);
+	return f;
+}
+
+static stackframe *
 ConvertMIFrameToStackframe(MIFrame *f)
 {
 	stackframe *	s;
-	if (f == NULL)
-		return NULL;
-		
+	if (f == NULL) {//by default return current frame
+		return get_current_frame();
+	}
 	s = NewStackframe(f->level);
 	if ( f->addr != NULL )
 		s->loc.addr = strdup(f->addr);
@@ -338,24 +360,6 @@ ConvertMIFrameToStackframe(MIFrame *f)
 	return s;	
 }
 
-static int
-get_current_frame(stackframe **frame)
-{
-	List *	frames;
-	
-	if (GetStackframes(1, 0, 0, &frames) != DBGRES_OK)
-		return -1;
-
-	if (EmptyList(frames)) {
-		DbgSetError(DBGERR_DEBUGGER, "Could not get current stack frame");
-		return -1;
-	} 
-	
-	SetList(frames);
-	*frame = (stackframe *)GetListElement(frames);
-	DestroyList(frames, NULL);
-	return 0;
-}
 
 #if 0
 static void
@@ -529,6 +533,47 @@ GetChangedVariables()
 	return changedVars;
 }
 
+static int 
+get_info_depth()
+{
+	MICommand *cmd;
+	int depth;
+
+	cmd = MIStackInfoDepth();
+	SendCommandWait(DebugSession, cmd);
+	if (!MICommandResultOK(cmd)) {
+		DEBUG_PRINTS(DEBUG_LEVEL_BACKEND, "------------------- GDBMIStackInfoDepth error\n");
+		SetDebugError(cmd);
+		MICommandFree(cmd);
+		return -1;
+	}
+	depth = MIGetStackInfoDepth(cmd);
+	MICommandFree(cmd);
+	return depth;
+}
+static void
+set_frame_with_line(stackframe *current_f, int depth)
+{
+	stackframe *f;
+	List * frames;
+	
+	if (GetStackframes(0, 1, depth, &frames) != DBGRES_OK) {
+		return NULL;
+	}
+	
+	for (SetList(frames); (f = (stackframe *)GetListElement(frames)) != NULL;) {
+		if (f->loc.line > 0) {
+			current_f->level = f->level;
+			current_f->loc.file = strdup(f->loc.file);
+			current_f->loc.func = strdup(f->loc.func);
+			current_f->loc.addr = strdup(f->loc.addr);
+			current_f->loc.line = f->loc.line;
+			break;
+		}
+	}
+	DestroyList(frames, FreeStackframe);
+}
+
 /**** aysn stop ****/
 static int
 AsyncStop(void *data)
@@ -537,17 +582,20 @@ AsyncStop(void *data)
 	stackframe *	frame;
 	bpentry * bpmap;
 	MIEvent *	evt = (MIEvent *)data;
+	int depth;
 
-	switch ( evt->type )
+	switch (evt->type)
 	{
 	case MIEventTypeBreakpointHit:
 		bpmap = FindLocalBP(evt->bkptno);
 		if (!bpmap->temp) {
+			depth = get_info_depth();
 			e = NewDbgEvent(DBGEV_SUSPEND);
 			e->dbg_event_u.suspend_event.reason = DBGEV_SUSPEND_BPHIT;
 			e->dbg_event_u.suspend_event.ev_u.bpid = bpmap->remote;
 			e->dbg_event_u.suspend_event.thread_id = evt->threadId;
 			e->dbg_event_u.suspend_event.frame = NULL;
+			e->dbg_event_u.suspend_event.depth = depth;
 			e->dbg_event_u.suspend_event.changed_vars = GetChangedVariables();
 			break;
 		}
@@ -557,15 +605,18 @@ AsyncStop(void *data)
 	case MIEventTypeSuspended:
 		frame = ConvertMIFrameToStackframe(evt->frame);
 		if (frame == NULL) {
-			if (get_current_frame(&frame) < 0) {
-				ERROR_TO_EVENT(e);
-			}
+			ERROR_TO_EVENT(e);
 		}
-		if (frame != NULL) {
+		else {
+			depth = get_info_depth();
+			if (frame->loc.line == 0) {
+				set_frame_with_line(frame, depth);
+			}
 			e = NewDbgEvent(DBGEV_SUSPEND);
 			e->dbg_event_u.suspend_event.reason = DBGEV_SUSPEND_INT;
 			e->dbg_event_u.suspend_event.thread_id = evt->threadId;
 			e->dbg_event_u.suspend_event.frame = frame;
+			e->dbg_event_u.suspend_event.depth = depth;
 			e->dbg_event_u.suspend_event.changed_vars = GetChangedVariables();
 		}
 		break;
@@ -574,15 +625,18 @@ AsyncStop(void *data)
 	case MIEventTypeSteppingRange:
 		frame = ConvertMIFrameToStackframe(evt->frame);
 		if (frame == NULL) {
-			if (get_current_frame(&frame) < 0) {
-				ERROR_TO_EVENT(e);
-			}
+			ERROR_TO_EVENT(e);
 		}
-		if (frame != NULL) {
+		else {
+			depth = get_info_depth();
+			if (frame->loc.line == 0) {
+				set_frame_with_line(frame, depth);
+			}
 			e = NewDbgEvent(DBGEV_SUSPEND);
 			e->dbg_event_u.suspend_event.reason = DBGEV_SUSPEND_STEP;
 			e->dbg_event_u.suspend_event.thread_id = evt->threadId;
 			e->dbg_event_u.suspend_event.frame = frame;
+			e->dbg_event_u.suspend_event.depth = depth;
 			e->dbg_event_u.suspend_event.changed_vars = GetChangedVariables();
 		}
 		break;
@@ -590,11 +644,13 @@ AsyncStop(void *data)
 	case MIEventTypeSignal:
 		frame = ConvertMIFrameToStackframe(evt->frame);
 		if (frame == NULL) {
-			if (get_current_frame(&frame) < 0) {
-				ERROR_TO_EVENT(e);
-			}
+			ERROR_TO_EVENT(e);
 		}
-		if (frame != NULL) {
+		else {
+			depth = get_info_depth();
+			if (frame->loc.line == 0) {
+				set_frame_with_line(frame, depth);
+			}
 			e = NewDbgEvent(DBGEV_SUSPEND);
 			e->dbg_event_u.suspend_event.reason = DBGEV_SUSPEND_SIGNAL;
 			e->dbg_event_u.suspend_event.ev_u.sig = NewSignalInfo();
@@ -602,6 +658,7 @@ AsyncStop(void *data)
 			e->dbg_event_u.suspend_event.ev_u.sig->desc = strdup(evt->sigMeaning);
 			e->dbg_event_u.suspend_event.thread_id = evt->threadId;
 			e->dbg_event_u.suspend_event.frame = frame;
+			e->dbg_event_u.suspend_event.depth = depth;
 			e->dbg_event_u.suspend_event.changed_vars = GetChangedVariables();
 		}
 		break;
@@ -1384,17 +1441,6 @@ GetStackframes(int current, int low, int high, List **flist)
 	*flist = NewList();
 	for (SetList(frames); (f = (MIFrame *)GetListElement(frames)) != NULL; ) {
 		s = ConvertMIFrameToStackframe(f);
-		/*
-		s = NewStackframe(f->level);
-
-		if ( f->addr != NULL )
-			s->loc.addr = strdup(f->addr);
-		if ( f->func != NULL )
-			s->loc.func = strdup(f->func);
-		if ( f->file != NULL )
-			s->loc.file = strdup(f->file);
-		s->loc.line = f->line;
-		*/
 		AddToList(*flist, (void *)s);
 	}
 	DestroyList(frames, MIFrameFree);
@@ -1718,21 +1764,9 @@ GDBMISetThreadSelect(int threadNum)
 	info = MISetThreadSelectInfo(cmd);
 	MICommandFree(cmd);
 
-	s = ConvertMIFrameToStackframe(info->frame);
-	/*
-	f = info->frame;
-	if (f != NULL) {
-		s = NewStackframe(f->level);
-		if ( f->addr != NULL )
-			s->loc.addr = strdup(f->addr);
-		if ( f->func != NULL )
-			s->loc.func = strdup(f->func);
-		if ( f->file != NULL )
-			s->loc.file = strdup(f->file);
-		s->loc.line = f->line;
+	if (info->frame != NULL) {
+		s = ConvertMIFrameToStackframe(info->frame);
 	}
-	*/
-	
 	e = NewDbgEvent(DBGEV_THREAD_SELECT);
 	e->dbg_event_u.thread_select_event.thread_id = info->current_thread_id;
 	e->dbg_event_u.thread_select_event.frame = s;
@@ -1747,27 +1781,17 @@ GDBMISetThreadSelect(int threadNum)
 static int 
 GDBMIStackInfoDepth() 
 {
-	MICommand *	cmd;
-	dbg_event *	e;
 	int depth;
+	dbg_event *	e;
 	
 	CHECK_SESSION();
-	
-	cmd = MIStackInfoDepth();
-	SendCommandWait(DebugSession, cmd);
-	if (!MICommandResultOK(cmd)) {
-		DEBUG_PRINTS(DEBUG_LEVEL_BACKEND, "------------------- GDBMIStackInfoDepth error\n");
-		SetDebugError(cmd);
-		MICommandFree(cmd);
+
+	if ((depth = get_info_depth()) == -1) {
 		return DBGRES_ERR;
 	}
-	depth = MIGetStackInfoDepth(cmd);
-	MICommandFree(cmd);
-
 	e = NewDbgEvent(DBGEV_STACK_DEPTH);
 	e->dbg_event_u.stack_depth = depth;
 	SaveEvent(e);
-	
 	return DBGRES_OK;
 }
 
@@ -2316,8 +2340,9 @@ GetSimpleAIF(MIVar *var, char *exp)
 	if (id == T_OTHER) {
 		pt = GetPtypeValue(var->type);
 		if (pt != NULL) {
-			var->type = pt;
+			var->type = strdup(pt);
 			id = get_simple_type(var->type);
+			free(pt);
 		}
 	}
 	switch (id) {
@@ -2564,8 +2589,9 @@ GetPartialArrayAIF(MIVar *var)
 		if (id == T_OTHER) {
 			pt = GetPtypeValue(var->type);
 			if (pt != NULL) {
-				var->type = pt;
+				var->type = strdup(pt);
 				id = get_simple_type(var->type);
+				free(pt);
 			}
 		}
 		ac = GetPrimitiveAIF(id, "");
@@ -2787,6 +2813,49 @@ GetMIVarDetails(char *name)
 	MIGetVarInfoNumChildren(cmd, mivar);
 	MICommandFree(cmd);
 	return mivar;
+}
+
+static int 
+GDBGetAIFType(char* name)
+{
+	MIVar *mivar;
+	int id;
+	char *pt;
+	
+	mivar = CreateMIVar(name);
+	if (mivar == NULL) {
+		DbgSetError(DBGERR_UNKNOWN_VARIABLE, name);
+		return DBGRES_ERR; 
+	}
+
+	if (strcmp(mivar->type, "<text variable, no debug info>") == 0) {
+		DeleteMIVar(mivar->name);
+		MIVarFree(mivar);
+		DbgSetError(DBGERR_NOSYMS, "");
+		return DBGRES_ERR; 
+	}
+
+	id = get_simple_type(mivar->type);
+	if (id == T_OTHER) {
+		pt = GetPtypeValue(mivar->type);
+		if (pt != NULL) {
+			mivar->type = strdup(pt);
+			id = get_simple_type(mivar->type);
+			free(pt);
+		}
+	}
+	if (id == T_OTHER) {
+		
+	}
+	else if (id == T_ARRAY) {
+		
+	}
+	else {
+		
+	}
+	DeleteMIVar(mivar->name);
+	MIVarFree(mivar);
+	return DBGRES_OK;
 }
 
 static int

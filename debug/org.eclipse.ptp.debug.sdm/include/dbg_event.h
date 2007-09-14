@@ -72,6 +72,7 @@ struct dbg_suspend_event {
 	
 	int				thread_id;
 	stackframe *	frame;
+	int				depth;
 	
 	List *			changed_vars;
 };
