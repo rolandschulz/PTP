@@ -202,6 +202,7 @@ DbgSerializeEvent(dbg_event *e, char **result)
 		case DBGEV_SUSPEND_BPHIT:
 			proxy_msg_add_int(p, e->dbg_event_u.suspend_event.ev_u.bpid);
 			proxy_msg_add_int(p, e->dbg_event_u.suspend_event.thread_id);
+			proxy_msg_add_int(p, e->dbg_event_u.suspend_event.depth);
 			dbg_add_strings(p, e->dbg_event_u.suspend_event.changed_vars);
 			break;
 			
@@ -209,6 +210,7 @@ DbgSerializeEvent(dbg_event *e, char **result)
 			dbg_add_signalinfo(p, e->dbg_event_u.suspend_event.ev_u.sig);
 			dbg_add_stackframe(p, e->dbg_event_u.suspend_event.frame);
 			proxy_msg_add_int(p, e->dbg_event_u.suspend_event.thread_id);
+			proxy_msg_add_int(p, e->dbg_event_u.suspend_event.depth);
 			dbg_add_strings(p, e->dbg_event_u.suspend_event.changed_vars);
 			break;
 	
@@ -216,6 +218,7 @@ DbgSerializeEvent(dbg_event *e, char **result)
 		case DBGEV_SUSPEND_INT:
 			dbg_add_stackframe(p, e->dbg_event_u.suspend_event.frame);
 			proxy_msg_add_int(p, e->dbg_event_u.suspend_event.thread_id);
+			proxy_msg_add_int(p, e->dbg_event_u.suspend_event.depth);
 			dbg_add_strings(p, e->dbg_event_u.suspend_event.changed_vars);
 			break;
 		}
@@ -650,6 +653,7 @@ DbgDeserializeEvent(int id, int nargs, char **args, dbg_event **ev)
 		case DBGEV_SUSPEND_BPHIT:
 			dbg_str_to_int(&args, &nargs, &e->dbg_event_u.suspend_event.ev_u.bpid);
 			dbg_str_to_int(&args, &nargs, &e->dbg_event_u.suspend_event.thread_id);
+			dbg_str_to_int(&args, &nargs, &e->dbg_event_u.suspend_event.depth);
 			dbg_str_to_list(&args, &nargs, &e->dbg_event_u.suspend_event.changed_vars);
 			break;
 
@@ -657,6 +661,7 @@ DbgDeserializeEvent(int id, int nargs, char **args, dbg_event **ev)
 			dbg_str_to_signalinfo(&args, &nargs, &e->dbg_event_u.suspend_event.ev_u.sig);
 			dbg_str_to_stackframe(&args, &nargs, &e->dbg_event_u.suspend_event.frame);
 			dbg_str_to_int(&args, &nargs, &e->dbg_event_u.suspend_event.thread_id);
+			dbg_str_to_int(&args, &nargs, &e->dbg_event_u.suspend_event.depth);
 			dbg_str_to_list(&args, &nargs, &e->dbg_event_u.suspend_event.changed_vars);
 			break;
 
@@ -664,6 +669,7 @@ DbgDeserializeEvent(int id, int nargs, char **args, dbg_event **ev)
 		case DBGEV_SUSPEND_INT:
 			dbg_str_to_stackframe(&args, &nargs, &e->dbg_event_u.suspend_event.frame);
 			dbg_str_to_int(&args, &nargs, &e->dbg_event_u.suspend_event.thread_id);
+			dbg_str_to_int(&args, &nargs, &e->dbg_event_u.suspend_event.depth);
 			dbg_str_to_list(&args, &nargs, &e->dbg_event_u.suspend_event.changed_vars);
 			break;
 		
