@@ -25,6 +25,7 @@ import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPASTLinkageSpecification;
 import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPASTUsingDirective;
 import org.eclipse.ptp.pldt.common.ScanReturn;
 import org.eclipse.ptp.pldt.common.analysis.PldtAstVisitor;
+import org.eclipse.ptp.pldt.mpi.core.Messages;
 
 /**
  * This dom-walker collects artifacts (currently function calls and constants),
@@ -34,9 +35,9 @@ import org.eclipse.ptp.pldt.common.analysis.PldtAstVisitor;
 public class MpiCPPASTVisitor extends PldtAstVisitor {
 	private static final boolean traceOn = false;
 
-	private static final String PREFIX1 = "MPI_";
+	private static final String PREFIX1 = "MPI_"; //$NON-NLS-1$
 
-	private static final String PREFIX2 = "MPI::";
+	private static final String PREFIX2 = "MPI::"; //$NON-NLS-1$
 
 	{
 		this.shouldVisitExpressions = true;
@@ -50,14 +51,14 @@ public class MpiCPPASTVisitor extends PldtAstVisitor {
 	public MpiCPPASTVisitor(List mpiIncludes, String fileName, ScanReturn msr) {
 		super(mpiIncludes, fileName, msr);
 		usingNamespaceMPI = false;
-		ARTIFACT_CALL = "MPI Call";
-		ARTIFACT_CONSTANT = "MPI Constant";
+		ARTIFACT_CALL = Messages.getString("MpiCPPASTVisitor.mpiCall"); //$NON-NLS-1$
+		ARTIFACT_CONSTANT = Messages.getString("MpiCPPASTVisitor.mpiConstant"); //$NON-NLS-1$
 	}
 
 	public int visit(IASTDeclaration declaration) {
 		if (declaration instanceof CPPASTUsingDirective) {
 			CPPASTUsingDirective cppASTUsingDirective = (CPPASTUsingDirective) declaration;
-			if ("MPI".equals(cppASTUsingDirective.getQualifiedName().getRawSignature())) {
+			if ("MPI".equals(cppASTUsingDirective.getQualifiedName().getRawSignature())) { //$NON-NLS-1$
 				usingNamespaceMPI = true;
 			}
 		}
@@ -69,7 +70,7 @@ public class MpiCPPASTVisitor extends PldtAstVisitor {
 
 		if (declaration.getFileLocation() == null) {
 			if (traceOn)
-				System.out.println("MpiCPPASTVisitor.visit(decl): null decl");
+				System.out.println("MpiCPPASTVisitor.visit(decl): null decl"); //$NON-NLS-1$
 		}
 
 		return super.visit(declaration);
