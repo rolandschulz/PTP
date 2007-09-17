@@ -16,6 +16,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PathEditor;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.ptp.pldt.mpi.core.Messages;
 import org.eclipse.ptp.pldt.mpi.core.MpiIDs;
 import org.eclipse.ptp.pldt.mpi.core.MpiPlugin;
 import org.eclipse.ui.IWorkbench;
@@ -28,9 +29,9 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class MPIPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage
 {
-    private static final String MPI_INCLUDES_PREFERENCE_LABEL  = "MPI include paths:";
-    private static final String MPI_INCLUDES_PREFERENCE_BROWSE = "Please choose a directory:";
-    private static final String MPI_BUILD_COMMAND_LABEL = "MPI build command:";
+    private static final String MPI_INCLUDES_PREFERENCE_LABEL  = Messages.getString("MPIPreferencePage.mpiIncludePaths"); //$NON-NLS-1$
+    private static final String MPI_INCLUDES_PREFERENCE_BROWSE = Messages.getString("MPIPreferencePage.pleaseChooseAdirectory"); //$NON-NLS-1$
+    private static final String MPI_BUILD_COMMAND_LABEL = Messages.getString("MPIPreferencePage.mpiBuildCommand"); //$NON-NLS-1$
     private static final boolean traceOn=false;
 
     public MPIPreferencePage()

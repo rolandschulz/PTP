@@ -37,7 +37,7 @@ public class MpiPlugin extends AbstractUIPlugin
     private ResourceBundle   resourceBundle;
     private static final boolean traceOn=false;
     
-    private static final String PLUGIN_ID = "org.eclipse.ptp.pldt.mpi.core";
+    private static final String PLUGIN_ID = "org.eclipse.ptp.pldt.mpi.core"; //$NON-NLS-1$
 
     /**
      * The constructor.
@@ -94,7 +94,7 @@ public class MpiPlugin extends AbstractUIPlugin
     {
         try {
             if (resourceBundle == null)
-                resourceBundle = ResourceBundle.getBundle("org.eclipse.ptp.pldt.mpi.core.MpiPluginResources");
+                resourceBundle = ResourceBundle.getBundle("org.eclipse.ptp.pldt.mpi.core.MpiPluginResources"); //$NON-NLS-1$
         } catch (MissingResourceException x) {
             resourceBundle = null;
         }

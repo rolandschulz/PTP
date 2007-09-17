@@ -31,7 +31,7 @@ public class RunAnalyseMPI extends RunAnalyseBase {
 	 * Constructor for the "Run Analysis" action
 	 */
 	public RunAnalyseMPI() {
-		super("MPI", new MPIArtifactMarkingVisitor(MpiIDs.MARKER_ID), MpiIDs.MARKER_ID);
+		super("MPI", new MPIArtifactMarkingVisitor(MpiIDs.MARKER_ID), MpiIDs.MARKER_ID); //$NON-NLS-1$
 	}
 
 	/**
@@ -53,7 +53,8 @@ public class RunAnalyseMPI extends RunAnalyseBase {
 			IASTTranslationUnit atu = tu.getAST();
 			if (lang.getId().equals(GCCLanguage.ID)) {// cdt40
 				atu.accept(new MpiCASTVisitor(includes, fileName, msr));
-				// BRT FIXME  inconsistent way of accessing Language
+				// BRT FIXME  inconsistent way of accessing Language;
+				// clean up when Fortran is integrated here
 			} else if (atu instanceof CPPASTTranslationUnit) {
 				atu.accept(new MpiCPPASTVisitor(includes, fileName, msr));
 

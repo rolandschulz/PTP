@@ -21,6 +21,7 @@ import org.eclipse.cdt.core.dom.ast.IBinding;
 import org.eclipse.ptp.pldt.common.CommonPlugin;
 import org.eclipse.ptp.pldt.common.ScanReturn;
 import org.eclipse.ptp.pldt.common.analysis.PldtAstVisitor;
+import org.eclipse.ptp.pldt.mpi.core.Messages;
 
 /**
  * This dom-walker collects "artifacts" related to the specific domain <br>
@@ -32,7 +33,7 @@ import org.eclipse.ptp.pldt.common.analysis.PldtAstVisitor;
  * 
  */
 public class MpiCASTVisitor extends PldtAstVisitor {
-	private static final String PREFIX = "MPI_";
+	private static final String PREFIX = "MPI_"; //$NON-NLS-1$
 
 	private static /*final*/ boolean traceOn = false;
 
@@ -45,11 +46,11 @@ public class MpiCASTVisitor extends PldtAstVisitor {
 
 	public MpiCASTVisitor(List mpiIncludes, String fileName, ScanReturn msr) {
 		super(mpiIncludes, fileName, msr);
-		ARTIFACT_CALL = "MPI Call";
-		ARTIFACT_CONSTANT = "MPI Constant";
+		ARTIFACT_CALL = Messages.getString("MpiCASTVisitor.mpiCall"); //$NON-NLS-1$
+		ARTIFACT_CONSTANT = Messages.getString("MpiCASTVisitor.mpiConstant"); //$NON-NLS-1$
 		
 		traceOn=CommonPlugin.getTraceOn();
-		if(traceOn)System.out.println("MpiCASTVisitor.ctor: traceOn="+traceOn);
+		if(traceOn)System.out.println("MpiCASTVisitor.ctor: traceOn="+traceOn); //$NON-NLS-1$
 
 	}
 
@@ -76,7 +77,7 @@ public class MpiCASTVisitor extends PldtAstVisitor {
 				IASTName tempFN = ((IASTIdExpression) astExpr).getName();
 				IBinding tempBIND = tempFN.resolveBinding();
 				String tempNAME = tempBIND.getName();
-				if(traceOn)System.out.println("MCAV name: "+tempNAME+" rawsig: "+signature);
+				if(traceOn)System.out.println("MCAV name: "+tempNAME+" rawsig: "+signature); //$NON-NLS-1$ //$NON-NLS-2$
 				// if e.g. preprocessor substitution used, use that for function
 				// name
 				boolean preProcUsed = !signature.equals(tempNAME);
