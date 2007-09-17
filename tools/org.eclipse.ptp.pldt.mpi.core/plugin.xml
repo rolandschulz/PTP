@@ -8,22 +8,6 @@
             label="MPI Artifacts Action Set"
             visible="true"
             id="org.eclipse.ptp.pldt.mpi.core.ui.actionSet">
-         <menu
-               label="&amp;MPI Artifacts"
-               id="mpiMenu">
-            <separator
-                  name="mpiGroup">
-            </separator>
-         </menu>
-         <action
-               label="Clear MPI Artifact Markers"
-               icon="icons/nompi.gif"
-               class="org.eclipse.ptp.pldt.mpi.core.actions.RemoveMarkerAction"
-               tooltip="Clear MPI Artifacts Markers"
-               menubarPath="mpiMenu/mpiGroup"
-               toolbarPath="mpiToolbarGroup"
-               id="org.eclipse.ptp.pldt.mpi.core.ui.actions.RemoveMarkerAction">
-         </action>
          <action
                label="Run MPI Analysis"
                icon="icons/mpi.gif"

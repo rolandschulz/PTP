@@ -11,22 +11,6 @@
             label="OpenMP Artifacts Action Set"
             visible="true"
             id="org.eclipse.ptp.pldt.openmp.core.ui.actionSet">
-         <menu
-               label="&amp;OpenMP Artifacts"
-               id="openMPMenu">
-            <separator
-                  name="openMPGroup">
-            </separator>
-         </menu>
-         <action
-               label="Clear OpenMP Artifact Markers"
-               icon="icons/noOpenMP.gif"
-               class="org.eclipse.ptp.pldt.openmp.core.actions.RemoveMarkerAction"
-               tooltip="Clear OpenMP Artifacts Markers"
-               menubarPath="openMPMenu/openMPGroup"
-               toolbarPath="openMPToolbarGroup"
-               id="org.eclipse.ptp.pldt.openmp.core.actions.RemoveMarkerAction">
-         </action>
          <action
                label="%run.label"
                icon="icons/openMP.gif"

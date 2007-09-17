@@ -7,25 +7,6 @@
             label="LAPI Artifacts Action Set"
             visible="true"
             id="org.eclipse.ptp.pldt.lapi.ui.actionSet">
-         <menu
-               label="&amp;LAPI Artifacts"
-               id="lapiMenu">
-            <separator
-                  name="lapiGroup">
-            </separator>
-         </menu>
-         <action
-               label="Clear LAPI Artifact Markers"
-               icon="icons/nolapi.gif"
-               class="org.eclipse.ptp.pldt.lapi.actions.RemoveMarkerAction"
-               tooltip="Clear LAPI Artifacts Markers"
-               menubarPath="lapiMenu/lapiGroup"
-               toolbarPath="lapiToolbarGroup"
-               id="org.eclipse.ptp.pldt.lapi.ui.actions.RemoveMarkerAction">
-            <selection
-                  class="org.eclipse.core.resources.IProject">
-            </selection>
-         </action>
          <action
                label="%run.label"
                icon="icons/lapi.gif"
