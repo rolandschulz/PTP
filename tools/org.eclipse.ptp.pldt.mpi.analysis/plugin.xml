@@ -8,13 +8,6 @@
             label="MPI Barrier Analysis action set"
             visible="true"
             id="org.eclipse.ptp.pldt.mpi.analysis.actionSet">
-         <menu
-               label="Sample &amp;Menu"
-               id="sampleMenu">
-            <separator
-                  name="sampleGroup">
-            </separator>
-         </menu>
 
          <action
                class="org.eclipse.ptp.pldt.mpi.analysis.actions.MPIAnalysisMultipleAction"
