@@ -77,9 +77,6 @@ public class ORTERMLaunchConfigurationDynamicTab extends
 		control.setLayout(new GridLayout(1, true));
 		GridData gd;
 		
-		Label label = new Label(control, SWT.NONE);
-		label.setText("ORTE Specific info goes here");
-		
 		final int numColumns = 2;
 		
 		final Composite comp = new Composite(control, SWT.NONE);
@@ -93,7 +90,7 @@ public class ORTERMLaunchConfigurationDynamicTab extends
 		comp.setLayoutData(gd);
 		
 		
-		label = new Label(comp, SWT.NONE);
+		Label label = new Label(comp, SWT.NONE);
 		label.setText(NUMBER_OF_PROCESSES_LABEL);
 		gd = new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1);
 		gd.minimumWidth = label.computeSize(SWT.DEFAULT, SWT.DEFAULT).x;
@@ -107,12 +104,6 @@ public class ORTERMLaunchConfigurationDynamicTab extends
 		gd.minimumWidth = numProcsText.computeSize(SWT.DEFAULT, SWT.DEFAULT).x;
 		numProcsText.setLayoutData(gd);
 
-		//TODO remove these when we get scrolling working OK
-		for (int i=0; i<10; ++i) {
-			label = new Label(comp, SWT.NONE);
-			label.setText("labels for debugging scrolling: " + i);
-		}
-		
 		// Tell the client of this dynamic tab that the
 		// contents of this tab are affected by the contents
 		// of this widget.
