@@ -25,11 +25,9 @@ import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.layout.FormAttachment;
-import org.eclipse.swt.layout.FormData;
-import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Dialog;
@@ -71,12 +69,12 @@ public class LegendDialog extends Dialog
 		"DOWN",
 		"ERROR",
 		"UNKNOWN",
-		"ALLOCATED TO USER EXCLUSIVELY",
-		"ALLOCATED TO USER SHARED",
-		"ALLOCATED TO OTHER EXCLUSIVELY",
-		"ALLOCATED TO OTHER SHARED",
-		"PROCESS RUNNING ON NODE",
-		"TERMINATED PROCESS ON NODE",
+		"USER EXCLUSIVE",
+		"USER SHARED",
+		"OTHER EXCLUSIVE",
+		"OTHER SHARED",
+		"PROCESS RUNNING",
+		"PROCESS TERMINATED",
 	};
 	
 	private String processStateText[] = {
@@ -118,7 +116,9 @@ public class LegendDialog extends Dialog
 	}
 	
 	private void createContents(final Shell shell) {
-		shell.setLayout(new GridLayout(1, true));
+		GridLayout grid = new GridLayout();
+		grid.numColumns = 2;
+		shell.setLayout(grid);
 		
 		/* the RM box */
 		Group box = new Group(shell, SWT.BORDER);
@@ -127,33 +127,28 @@ public class LegendDialog extends Dialog
 		fill.marginHeight = 5;
 		fill.marginWidth = 5;
 		box.setLayout(fill);
-		FormData fd ;
+		
 		GridData data = new GridData(GridData.FILL_BOTH);
+		data.horizontalSpan = 2;
 		box.setLayoutData(data);
 
 		for (int i = 0; i < rmStateText.length; i++) {
 			/* one horizontal box */
 			Composite c = new Composite(box, SWT.NONE);
-	        FormLayout layout = new FormLayout();     
-	        c.setLayout(layout);
-	        /* the contents of the horizontal box */
+			RowLayout r = new RowLayout();
+			r.wrap = true;
+			r.pack = true;
+			r.justify = false;
+			r.marginBottom = 0;
+			r.marginLeft = 5;
+			r.marginRight = 5;
+			r.marginTop = 0;
+			r.spacing = 10;
+			c.setLayout(r);
 			CLabel b = new CLabel(c, SWT.FLAT);
 			b.setImage(ParallelImages.rmImages[i]);
 			CLabel l = new CLabel(c, SWT.LEFT);
 			l.setText(rmStateText[i]);
-			/* formdata stuff so they take up the right amount of space */
-			fd = new FormData();
-			fd.top = new FormAttachment(0);
-			fd.bottom = new FormAttachment(100);
-			fd.right = new FormAttachment(20);
-			fd.left = new FormAttachment(0);
-			b.setLayoutData(fd);
-			fd = new FormData();
-			fd.top = new FormAttachment(0);
-			fd.bottom = new FormAttachment(100);
-			fd.right = new FormAttachment(100);
-			fd.left = new FormAttachment(b);
-			l.setLayoutData(fd);
 		}
 		
 		/* the machines box */
@@ -169,61 +164,49 @@ public class LegendDialog extends Dialog
 		for (int i = 0; i < machineStateText.length; i++) {
 			/* one horizontal box */
 			Composite c = new Composite(box, SWT.NONE);
-	        FormLayout layout = new FormLayout();     
-	        c.setLayout(layout);
-	        /* the contents of the horizontal box */
+			RowLayout r = new RowLayout();
+			r.wrap = true;
+			r.pack = true;
+			r.justify = false;
+			r.marginBottom = 0;
+			r.marginLeft = 5;
+			r.marginRight = 5;
+			r.marginTop = 0;
+			r.spacing = 10;
+			c.setLayout(r);
 			CLabel b = new CLabel(c, SWT.FLAT);
 			b.setImage(ParallelImages.machineImages[i]);
 			CLabel l = new CLabel(c, SWT.LEFT);
 			l.setText(machineStateText[i]);
-			/* formdata stuff so they take up the right amount of space */
-			fd = new FormData();
-			fd.top = new FormAttachment(0);
-			fd.bottom = new FormAttachment(100);
-			fd.right = new FormAttachment(20);
-			fd.left = new FormAttachment(0);
-			b.setLayoutData(fd);
-			fd = new FormData();
-			fd.top = new FormAttachment(0);
-			fd.bottom = new FormAttachment(100);
-			fd.right = new FormAttachment(100);
-			fd.left = new FormAttachment(b);
-			l.setLayoutData(fd);
 		}
 		
 		/* the node box */
 		box = new Group(shell, SWT.BORDER);
 		box.setText("Node Icons");
-		fill = new FillLayout(SWT.VERTICAL);
-		fill.marginHeight = 5;
-		fill.marginWidth = 5;
-		box.setLayout(fill);
-		data = new GridData(GridData.FILL_BOTH);
+		GridLayout g = new GridLayout(2, true);
+		box.setLayout(g);
+		data = new GridData(SWT.FILL, SWT.FILL, true, true);
 		box.setLayoutData(data);
 
-		for (int i = 0; i < nodeStateText.length; i++) {
-			/* one horizontal box */
-			Composite c = new Composite(box, SWT.NONE);
-	        FormLayout layout = new FormLayout();     
-	        c.setLayout(layout);
-	        /* the contents of the horizontal box */
-			CLabel b = new CLabel(c, SWT.FLAT);
-			b.setImage(ParallelImages.nodeImages[i][0]);
-			CLabel l = new CLabel(c, SWT.LEFT);
-			l.setText(nodeStateText[i]);
-			/* formdata stuff so they take up the right amount of space */
-			fd = new FormData();
-			fd.top = new FormAttachment(0);
-			fd.bottom = new FormAttachment(100);
-			fd.right = new FormAttachment(20);
-			fd.left = new FormAttachment(0);
-			b.setLayoutData(fd);
-			fd = new FormData();
-			fd.top = new FormAttachment(0);
-			fd.bottom = new FormAttachment(100);
-			fd.right = new FormAttachment(100);
-			fd.left = new FormAttachment(b);
-			l.setLayoutData(fd);
+		/* layout column first instead of row first */
+		for (int j = 0; j < nodeStateText.length/2; j++) {
+			for (int i = 0 ; i < 2; i++) {
+				Composite c = new Composite(box, SWT.NONE);
+				RowLayout r = new RowLayout();
+				r.wrap = true;
+				r.pack = true;
+				r.justify = false;
+				r.marginBottom = 0;
+				r.marginLeft = 5;
+				r.marginRight = 5;
+				r.marginTop = 0;
+				r.spacing = 10;
+				c.setLayout(r);
+				CLabel b = new CLabel(c, SWT.FLAT);
+				b.setImage(ParallelImages.nodeImages[i*nodeStateText.length/2 + j][0]);
+				CLabel l = new CLabel(c, SWT.LEFT);
+				l.setText(nodeStateText[i*nodeStateText.length/2 + j]);
+			}
 		}
 		
 		/* the job box */
@@ -239,26 +222,20 @@ public class LegendDialog extends Dialog
 		for (int i = 0; i < jobStateText.length; i++) {
 			/* one horizontal box */
 			Composite c = new Composite(box, SWT.NONE);
-	        FormLayout layout = new FormLayout();     
-	        c.setLayout(layout);
-	        /* the contents of the horizontal box */
+			RowLayout r = new RowLayout();
+			r.wrap = true;
+			r.pack = true;
+			r.justify = false;
+			r.marginBottom = 0;
+			r.marginLeft = 5;
+			r.marginRight = 5;
+			r.marginTop = 0;
+			r.spacing = 10;
+			c.setLayout(r);
 			CLabel b = new CLabel(c, SWT.FLAT);
 			b.setImage(ParallelImages.jobImages[i][0]);
 			CLabel l = new CLabel(c, SWT.LEFT);
 			l.setText(jobStateText[i]);
-			/* formdata stuff so they take up the right amount of space */
-			fd = new FormData();
-			fd.top = new FormAttachment(0);
-			fd.bottom = new FormAttachment(100);
-			fd.right = new FormAttachment(20);
-			fd.left = new FormAttachment(0);
-			b.setLayoutData(fd);
-			fd = new FormData();
-			fd.top = new FormAttachment(0);
-			fd.bottom = new FormAttachment(100);
-			fd.right = new FormAttachment(100);
-			fd.left = new FormAttachment(b);
-			l.setLayoutData(fd);
 		}
 				
 		/* the process box */
@@ -274,31 +251,26 @@ public class LegendDialog extends Dialog
 		for (int i = 0; i < processStateText.length; i++) {
 			/* one horizontal box */
 			Composite c = new Composite(box, SWT.NONE);
-			FormLayout layout = new FormLayout();     
-	        c.setLayout(layout);
-	        /* the contents of the horizontal box */
+			RowLayout r = new RowLayout();
+			r.wrap = true;
+			r.pack = true;
+			r.justify = false;
+			r.marginBottom = 0;
+			r.marginLeft = 5;
+			r.marginRight = 5;
+			r.marginTop = 0;
+			r.spacing = 10;
+			c.setLayout(r);
 	        CLabel b = new CLabel(c, SWT.FLAT);
 			b.setImage(ParallelImages.procImages[i][0]);
 			CLabel l = new CLabel(c, SWT.LEFT);
 			l.setText(processStateText[i]);
-			/* formdata stuff so they take up the right amount of space */
-			fd = new FormData();
-			fd.top = new FormAttachment(0);
-			fd.bottom = new FormAttachment(100);
-			fd.right = new FormAttachment(20);
-			fd.left = new FormAttachment(0);
-			b.setLayoutData(fd);
-			fd = new FormData();
-			fd.top = new FormAttachment(0);
-			fd.bottom = new FormAttachment(100);
-			fd.right = new FormAttachment(100);
-			fd.left = new FormAttachment(b);
-			l.setLayoutData(fd);
 		}
 		
         Button close = new Button(shell, SWT.PUSH);
         close.setText("Close");
         data = new GridData(GridData.HORIZONTAL_ALIGN_CENTER);
+        data.horizontalSpan = 2;
 		close.setLayoutData(data);
 
         close.addSelectionListener(new SelectionAdapter() {
