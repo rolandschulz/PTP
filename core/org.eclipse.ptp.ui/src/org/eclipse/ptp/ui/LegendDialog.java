@@ -39,15 +39,42 @@ import org.eclipse.swt.widgets.Shell;
 
 public class LegendDialog extends Dialog 
 {
+	private String rmStateText[] = {
+		"STARTING",
+		"STARTED",
+		"STOPPING",
+		"STOPPED",
+		"SUSPENDED",
+		"ERROR"
+	};
+	
+	private String machineStateText[] = {
+		"UP",
+		"DOWN",
+		"ALERT",
+		"ERROR",
+		"UNKNOWN"
+	};
+
+	private String jobStateText[] = {
+		"PENDING",
+		"STARTED",
+		"RUNNING",
+		"TERMINATED",
+		"SUSPENDED",
+		"ERROR",
+		"UNKNOWN"		
+	};
+	
 	private String nodeStateText[] = {
 		"UP",
 		"DOWN",
 		"ERROR",
 		"UNKNOWN",
-		"ALLOCATED TO YOU EXCLUSIVELY, BUT IDLE",
-		"ALLOCATED TO YOU SHARED, BUT IDLE",
-		"ALLOCATED TO SOMEONE ELSE EXCLUSIVELY",
-		"ALLOCATED TO SOMEONE ELSE SHARED",
+		"ALLOCATED TO USER EXCLUSIVELY",
+		"ALLOCATED TO USER SHARED",
+		"ALLOCATED TO OTHER EXCLUSIVELY",
+		"ALLOCATED TO OTHER SHARED",
 		"PROCESS RUNNING ON NODE",
 		"TERMINATED PROCESS ON NODE",
 	};
@@ -57,7 +84,7 @@ public class LegendDialog extends Dialog
 		"RUNNING",
 		"EXITED NORMALLY",
 		"EXITED WITH SIGNAL",
-		"STOPPED",
+		"SUSPENDED",
 		"ERROR",
 		"UNKNOWN"
 	};
@@ -93,20 +120,90 @@ public class LegendDialog extends Dialog
 	private void createContents(final Shell shell) {
 		shell.setLayout(new GridLayout(1, true));
 		
-		/* the top box */
-		Group top = new Group(shell, SWT.BORDER);
-		top.setText("Node Colors");
+		/* the RM box */
+		Group box = new Group(shell, SWT.BORDER);
+		box.setText("Resource Manager Icons");
 		FillLayout fill = new FillLayout(SWT.VERTICAL);
 		fill.marginHeight = 5;
 		fill.marginWidth = 5;
-		top.setLayout(fill);
+		box.setLayout(fill);
 		FormData fd ;
 		GridData data = new GridData(GridData.FILL_BOTH);
-		top.setLayoutData(data);
+		box.setLayoutData(data);
+
+		for (int i = 0; i < rmStateText.length; i++) {
+			/* one horizontal box */
+			Composite c = new Composite(box, SWT.NONE);
+	        FormLayout layout = new FormLayout();     
+	        c.setLayout(layout);
+	        /* the contents of the horizontal box */
+			CLabel b = new CLabel(c, SWT.FLAT);
+			b.setImage(ParallelImages.rmImages[i]);
+			CLabel l = new CLabel(c, SWT.LEFT);
+			l.setText(rmStateText[i]);
+			/* formdata stuff so they take up the right amount of space */
+			fd = new FormData();
+			fd.top = new FormAttachment(0);
+			fd.bottom = new FormAttachment(100);
+			fd.right = new FormAttachment(20);
+			fd.left = new FormAttachment(0);
+			b.setLayoutData(fd);
+			fd = new FormData();
+			fd.top = new FormAttachment(0);
+			fd.bottom = new FormAttachment(100);
+			fd.right = new FormAttachment(100);
+			fd.left = new FormAttachment(b);
+			l.setLayoutData(fd);
+		}
+		
+		/* the machines box */
+		box = new Group(shell, SWT.BORDER);
+		box.setText("Machine Icons");
+		fill = new FillLayout(SWT.VERTICAL);
+		fill.marginHeight = 5;
+		fill.marginWidth = 5;
+		box.setLayout(fill);
+		data = new GridData(GridData.FILL_BOTH);
+		box.setLayoutData(data);
+
+		for (int i = 0; i < machineStateText.length; i++) {
+			/* one horizontal box */
+			Composite c = new Composite(box, SWT.NONE);
+	        FormLayout layout = new FormLayout();     
+	        c.setLayout(layout);
+	        /* the contents of the horizontal box */
+			CLabel b = new CLabel(c, SWT.FLAT);
+			b.setImage(ParallelImages.machineImages[i]);
+			CLabel l = new CLabel(c, SWT.LEFT);
+			l.setText(machineStateText[i]);
+			/* formdata stuff so they take up the right amount of space */
+			fd = new FormData();
+			fd.top = new FormAttachment(0);
+			fd.bottom = new FormAttachment(100);
+			fd.right = new FormAttachment(20);
+			fd.left = new FormAttachment(0);
+			b.setLayoutData(fd);
+			fd = new FormData();
+			fd.top = new FormAttachment(0);
+			fd.bottom = new FormAttachment(100);
+			fd.right = new FormAttachment(100);
+			fd.left = new FormAttachment(b);
+			l.setLayoutData(fd);
+		}
+		
+		/* the node box */
+		box = new Group(shell, SWT.BORDER);
+		box.setText("Node Icons");
+		fill = new FillLayout(SWT.VERTICAL);
+		fill.marginHeight = 5;
+		fill.marginWidth = 5;
+		box.setLayout(fill);
+		data = new GridData(GridData.FILL_BOTH);
+		box.setLayoutData(data);
 
 		for (int i = 0; i < nodeStateText.length; i++) {
 			/* one horizontal box */
-			Composite c = new Composite(top, SWT.NONE);
+			Composite c = new Composite(box, SWT.NONE);
 	        FormLayout layout = new FormLayout();     
 	        c.setLayout(layout);
 	        /* the contents of the horizontal box */
@@ -128,20 +225,55 @@ public class LegendDialog extends Dialog
 			fd.left = new FormAttachment(b);
 			l.setLayoutData(fd);
 		}
-				
-		/* the top box */
-		Group middle = new Group(shell, SWT.BORDER);
-		middle.setText("Process Colors");
+		
+		/* the job box */
+		box = new Group(shell, SWT.BORDER);
+		box.setText("Job Icons");
 		fill = new FillLayout(SWT.VERTICAL);
 		fill.marginHeight = 5;
 		fill.marginWidth = 5;
-		middle.setLayout(fill);
+		box.setLayout(fill);
 		data = new GridData(GridData.FILL_BOTH);
-		middle.setLayoutData(data);
+		box.setLayoutData(data);
+
+		for (int i = 0; i < jobStateText.length; i++) {
+			/* one horizontal box */
+			Composite c = new Composite(box, SWT.NONE);
+	        FormLayout layout = new FormLayout();     
+	        c.setLayout(layout);
+	        /* the contents of the horizontal box */
+			CLabel b = new CLabel(c, SWT.FLAT);
+			b.setImage(ParallelImages.jobImages[i][0]);
+			CLabel l = new CLabel(c, SWT.LEFT);
+			l.setText(jobStateText[i]);
+			/* formdata stuff so they take up the right amount of space */
+			fd = new FormData();
+			fd.top = new FormAttachment(0);
+			fd.bottom = new FormAttachment(100);
+			fd.right = new FormAttachment(20);
+			fd.left = new FormAttachment(0);
+			b.setLayoutData(fd);
+			fd = new FormData();
+			fd.top = new FormAttachment(0);
+			fd.bottom = new FormAttachment(100);
+			fd.right = new FormAttachment(100);
+			fd.left = new FormAttachment(b);
+			l.setLayoutData(fd);
+		}
+				
+		/* the process box */
+		box = new Group(shell, SWT.BORDER);
+		box.setText("Process Icons");
+		fill = new FillLayout(SWT.VERTICAL);
+		fill.marginHeight = 5;
+		fill.marginWidth = 5;
+		box.setLayout(fill);
+		data = new GridData(GridData.FILL_BOTH);
+		box.setLayoutData(data);
 		
 		for (int i = 0; i < processStateText.length; i++) {
 			/* one horizontal box */
-			Composite c = new Composite(middle, SWT.NONE);
+			Composite c = new Composite(box, SWT.NONE);
 			FormLayout layout = new FormLayout();     
 	        c.setLayout(layout);
 	        /* the contents of the horizontal box */
