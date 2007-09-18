@@ -551,6 +551,9 @@ get_info_depth()
 	MICommandFree(cmd);
 	return depth;
 }
+/**
+ * not used
+ * 
 static void
 set_frame_with_line(stackframe *current_f, int depth)
 {
@@ -573,6 +576,7 @@ set_frame_with_line(stackframe *current_f, int depth)
 	}
 	DestroyList(frames, FreeStackframe);
 }
+*/
 
 /**** aysn stop ****/
 static int
@@ -582,20 +586,18 @@ AsyncStop(void *data)
 	stackframe *	frame;
 	bpentry * bpmap;
 	MIEvent *	evt = (MIEvent *)data;
-	int depth;
 
 	switch (evt->type)
 	{
 	case MIEventTypeBreakpointHit:
 		bpmap = FindLocalBP(evt->bkptno);
 		if (!bpmap->temp) {
-			depth = get_info_depth();
 			e = NewDbgEvent(DBGEV_SUSPEND);
 			e->dbg_event_u.suspend_event.reason = DBGEV_SUSPEND_BPHIT;
 			e->dbg_event_u.suspend_event.ev_u.bpid = bpmap->remote;
 			e->dbg_event_u.suspend_event.thread_id = evt->threadId;
 			e->dbg_event_u.suspend_event.frame = NULL;
-			e->dbg_event_u.suspend_event.depth = depth;
+			e->dbg_event_u.suspend_event.depth = get_info_depth();
 			e->dbg_event_u.suspend_event.changed_vars = GetChangedVariables();
 			break;
 		}
@@ -608,15 +610,11 @@ AsyncStop(void *data)
 			ERROR_TO_EVENT(e);
 		}
 		else {
-			depth = get_info_depth();
-			if (frame->loc.line == 0) {
-				set_frame_with_line(frame, depth);
-			}
 			e = NewDbgEvent(DBGEV_SUSPEND);
 			e->dbg_event_u.suspend_event.reason = DBGEV_SUSPEND_INT;
 			e->dbg_event_u.suspend_event.thread_id = evt->threadId;
 			e->dbg_event_u.suspend_event.frame = frame;
-			e->dbg_event_u.suspend_event.depth = depth;
+			e->dbg_event_u.suspend_event.depth = get_info_depth();
 			e->dbg_event_u.suspend_event.changed_vars = GetChangedVariables();
 		}
 		break;
@@ -628,15 +626,11 @@ AsyncStop(void *data)
 			ERROR_TO_EVENT(e);
 		}
 		else {
-			depth = get_info_depth();
-			if (frame->loc.line == 0) {
-				set_frame_with_line(frame, depth);
-			}
 			e = NewDbgEvent(DBGEV_SUSPEND);
 			e->dbg_event_u.suspend_event.reason = DBGEV_SUSPEND_STEP;
 			e->dbg_event_u.suspend_event.thread_id = evt->threadId;
 			e->dbg_event_u.suspend_event.frame = frame;
-			e->dbg_event_u.suspend_event.depth = depth;
+			e->dbg_event_u.suspend_event.depth = get_info_depth();
 			e->dbg_event_u.suspend_event.changed_vars = GetChangedVariables();
 		}
 		break;
@@ -647,10 +641,6 @@ AsyncStop(void *data)
 			ERROR_TO_EVENT(e);
 		}
 		else {
-			depth = get_info_depth();
-			if (frame->loc.line == 0) {
-				set_frame_with_line(frame, depth);
-			}
 			e = NewDbgEvent(DBGEV_SUSPEND);
 			e->dbg_event_u.suspend_event.reason = DBGEV_SUSPEND_SIGNAL;
 			e->dbg_event_u.suspend_event.ev_u.sig = NewSignalInfo();
@@ -658,7 +648,7 @@ AsyncStop(void *data)
 			e->dbg_event_u.suspend_event.ev_u.sig->desc = strdup(evt->sigMeaning);
 			e->dbg_event_u.suspend_event.thread_id = evt->threadId;
 			e->dbg_event_u.suspend_event.frame = frame;
-			e->dbg_event_u.suspend_event.depth = depth;
+			e->dbg_event_u.suspend_event.depth = get_info_depth();
 			e->dbg_event_u.suspend_event.changed_vars = GetChangedVariables();
 		}
 		break;
