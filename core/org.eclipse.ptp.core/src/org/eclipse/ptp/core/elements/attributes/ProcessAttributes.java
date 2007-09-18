@@ -25,7 +25,7 @@ public class ProcessAttributes {
 		RUNNING,
 		EXITED,
 		EXITED_SIGNALLED,
-		STOPPED,
+		SUSPENDED,
 		ERROR,
 		UNKNOWN
 	};
