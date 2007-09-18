@@ -107,8 +107,8 @@ public class ParallelImages {
 	public static final String IMG_PROC_RUNNING_SEL = "proc_running_sel.gif";
 	public static final String IMG_PROC_STARTING = "proc_starting.gif";
 	public static final String IMG_PROC_STARTING_SEL = "proc_starting_sel.gif";
-	public static final String IMG_PROC_STOPPED = "proc_stopped.gif";
-	public static final String IMG_PROC_STOPPED_SEL = "proc_stopped_sel.gif";
+	public static final String IMG_PROC_SUSPENDED = "proc_suspended.gif";
+	public static final String IMG_PROC_SUSPENDED_SEL = "proc_suspended_sel.gif";
 	public static final String IMG_PROC_UNKNOWN = "proc_unknown.gif";
 	public static final String IMG_PROC_UNKNOWN_SEL = "proc_unknown_sel.gif";
 	
@@ -124,6 +124,7 @@ public class ParallelImages {
 	public static final String IMG_RM_STARTED = "rm_started.gif";
 	public static final String IMG_RM_STARTING = "rm_starting.gif";
 	public static final String IMG_RM_STOPPING = "rm_stopping.gif";
+	public static final String IMG_RM_SUSPENDED = "rm_suspended.gif";
 	public static final String IMG_RM_ERROR = "rm_error.gif";
 	public static final String IMG_RM_START = "start.gif";
 	public static final String IMG_RM_STOP = "stop.gif";
@@ -197,8 +198,8 @@ public class ParallelImages {
 	public static final ImageDescriptor ID_IMG_PROC_RUNNING_SEL = createImageDescriptor(PROCESSICONURL, IMG_PROC_RUNNING_SEL, IMG_PROC_RUNNING_SEL);
 	public static final ImageDescriptor ID_IMG_PROC_STARTING = createImageDescriptor(PROCESSICONURL, IMG_PROC_STARTING, IMG_PROC_STARTING);
 	public static final ImageDescriptor ID_IMG_PROC_STARTING_SEL = createImageDescriptor(PROCESSICONURL, IMG_PROC_STARTING_SEL, IMG_PROC_STARTING_SEL);
-	public static final ImageDescriptor ID_IMG_PROC_STOPPED = createImageDescriptor(PROCESSICONURL, IMG_PROC_STOPPED, IMG_PROC_STOPPED);
-	public static final ImageDescriptor ID_IMG_PROC_STOPPED_SEL = createImageDescriptor(PROCESSICONURL, IMG_PROC_STOPPED_SEL, IMG_PROC_STOPPED_SEL);
+	public static final ImageDescriptor ID_IMG_PROC_SUSPENDED = createImageDescriptor(PROCESSICONURL, IMG_PROC_SUSPENDED, IMG_PROC_SUSPENDED);
+	public static final ImageDescriptor ID_IMG_PROC_SUSPENDED_SEL = createImageDescriptor(PROCESSICONURL, IMG_PROC_SUSPENDED_SEL, IMG_PROC_SUSPENDED_SEL);
 	public static final ImageDescriptor ID_IMG_PROC_UNKNOWN = createImageDescriptor(PROCESSICONURL, IMG_PROC_UNKNOWN, IMG_PROC_UNKNOWN);
 	public static final ImageDescriptor ID_IMG_PROC_UNKNOWN_SEL = createImageDescriptor(PROCESSICONURL, IMG_PROC_UNKNOWN_SEL, IMG_PROC_UNKNOWN_SEL);
 	
@@ -214,6 +215,7 @@ public class ParallelImages {
 	public static final ImageDescriptor ID_IMG_RM_STARTED = createImageDescriptor(RMICONURL, IMG_RM_STARTED, IMG_RM_STARTED);
 	public static final ImageDescriptor ID_IMG_RM_STARTING = createImageDescriptor(RMICONURL, IMG_RM_STARTING, IMG_RM_STARTING);
 	public static final ImageDescriptor ID_IMG_RM_STOPPING = createImageDescriptor(RMICONURL, IMG_RM_STOPPING, IMG_RM_STOPPING);
+	public static final ImageDescriptor ID_IMG_RM_SUSPENDED = createImageDescriptor(RMICONURL, IMG_RM_SUSPENDED, IMG_RM_SUSPENDED);
 	public static final ImageDescriptor ID_IMG_RM_ERROR = createImageDescriptor(RMICONURL, IMG_RM_ERROR, IMG_RM_ERROR);
 	public static final ImageDescriptor ID_IMG_RM_START= createImageDescriptor(RMICONURL, IMG_RM_START, IMG_RM_START);
 	public static final ImageDescriptor ID_IMG_RM_STOP = createImageDescriptor(RMICONURL, IMG_RM_STOP, IMG_RM_STOP);
@@ -255,7 +257,7 @@ public class ParallelImages {
 		{ getImage(ParallelImages.IMG_PROC_RUNNING),		getImage(ParallelImages.IMG_PROC_RUNNING_SEL)			},
 		{ getImage(ParallelImages.IMG_PROC_EXITED),			getImage(ParallelImages.IMG_PROC_EXITED_SEL)			},
 		{ getImage(ParallelImages.IMG_PROC_EXITED_SIGNAL),	getImage(ParallelImages.IMG_PROC_EXITED_SIGNAL_SEL)		},
-		{ getImage(ParallelImages.IMG_PROC_STOPPED),		getImage(ParallelImages.IMG_PROC_STOPPED_SEL)			},
+		{ getImage(ParallelImages.IMG_PROC_SUSPENDED),		getImage(ParallelImages.IMG_PROC_SUSPENDED_SEL)			},
 		{ getImage(ParallelImages.IMG_PROC_ERROR),			getImage(ParallelImages.IMG_PROC_ERROR_SEL)				},
 		{ getImage(ParallelImages.IMG_PROC_UNKNOWN),		getImage(ParallelImages.IMG_PROC_UNKNOWN_SEL)			}
 	};
@@ -275,7 +277,7 @@ public class ParallelImages {
 		getImage(ParallelImages.IMG_RM_STARTED),
 		getImage(ParallelImages.IMG_RM_STOPPING),
 		getImage(ParallelImages.IMG_RM_STOPPED),
-		getImage(ParallelImages.IMG_RM_STARTED),
+		getImage(ParallelImages.IMG_RM_SUSPENDED),
 		getImage(ParallelImages.IMG_RM_ERROR),
 	};
 	
