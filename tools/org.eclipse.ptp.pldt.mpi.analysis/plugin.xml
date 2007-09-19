@@ -14,9 +14,8 @@
                icon="icons/barrier.gif"
                id="org.eclipse.ptp.pldt.mpi.analysis.action1"
                label="MPI Barrier Analysis"
-               menubarPath="sampleMenu/sampleGroup"
                style="push"
-               toolbarPath="sampleGroup"
+               toolbarPath="testGroup"
                tooltip="MPI barrier analysis">
          </action>
       </actionSet>
