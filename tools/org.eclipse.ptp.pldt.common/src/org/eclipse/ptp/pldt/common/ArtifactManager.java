@@ -13,6 +13,9 @@ package org.eclipse.ptp.pldt.common;
 
 import java.util.HashMap;
 
+import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.runtime.CoreException;
+
 
 /**
  * Manage the artifacts: be able to retrieve an artifact from the id in a marker, for example.
@@ -21,6 +24,7 @@ import java.util.HashMap;
  * an ID, probably a markerID.  That is, all artifacts of the same markerID
  * (probably shown in the same view) are managed by the same (distinct) ArtifactManager.
  * 
+ * TODO Question: why can't we just store the objects in an attribute?? 
  * @author Beth Tibbitts
  * 
  * 
@@ -62,6 +66,24 @@ public class ArtifactManager {
         if (o==null)
             new ArtifactManager(id);
 		return (ArtifactManager) registry.get(id);
+	}
+	/**
+	 * return the artifact for a marker; involves looking up the
+	 * Artifact Manager, then the Artifact within that.
+	 * 
+	 * Maybe we just need a big hashtable or other big Map instead???
+	 * 
+	 * @param marker
+	 * @return
+	 * @throws CoreException
+	 */
+	public static IArtifact getArtifact(IMarker marker) throws CoreException{
+		String id = (String) marker.getAttribute(IDs.UNIQUE_ID);
+		String markerID=marker.getAttribute(IDs.ID).toString();
+		ArtifactManager aMgr=getManager(markerID);
+		IArtifact a =  aMgr.getArtifact(id);
+		
+		return a;
 	}
 
 
