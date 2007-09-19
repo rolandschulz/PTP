@@ -1,6 +1,6 @@
 package org.eclipse.ptp.pldt.mpi.core.views;
 
-import org.eclipse.ptp.pldt.common.views.SimpleTableView;
+import org.eclipse.ptp.pldt.common.views.SimpleTableMarkerView;
 import org.eclipse.ptp.pldt.mpi.core.MpiIDs;
 import org.eclipse.ptp.pldt.mpi.core.MpiPlugin;
 
@@ -11,10 +11,10 @@ import org.eclipse.ptp.pldt.mpi.core.MpiPlugin;
  * If you need to read icon images, etc. from the plug-in, be sure to pass in an
  * actual Plugin class instance for first arg
  */
-public class MPITableView extends SimpleTableView {
+public class MPITableView extends SimpleTableMarkerView {
 	public MPITableView() {
 
-		super(MpiPlugin.getDefault(), "MPI Artifact", "MPI Artifacts",
+		super(MpiPlugin.getDefault(), "Artifact", "Artifacts",
 				"Construct", MpiIDs.MARKER_ID);
 	}
 }
