@@ -48,75 +48,125 @@ public abstract class AbstractRemoteProcessBuilder implements IRemoteProcessBuil
 	 * @see org.eclipse.ptp.remote.IRemoteProcessBuilder#connection()
 	 */
 	public IRemoteConnection connection() {
-		return remoteConnection;
+		threadLock.lock();
+		try {
+			return remoteConnection;
+		} finally {
+			threadLock.unlock();
+		}
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteProcessBuilder#connection(org.eclipse.ptp.remote.IRemoteConnection)
 	 */
 	public IRemoteProcessBuilder connection(IRemoteConnection conn) {
-		remoteConnection = conn;
-		return this;
+		threadLock.lock();
+		try {
+			remoteConnection = conn;
+			return this;
+		} finally {
+			threadLock.unlock();
+		}
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteProcessBuilder#command()
 	 */
 	public List<String> command() {
-		return commandArgs;
+		threadLock.lock();
+		try {
+			return commandArgs;
+		} finally {
+			threadLock.unlock();
+		}
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteProcessBuilder#command(java.util.List)
 	 */
 	public IRemoteProcessBuilder command(List<String> command) {
-		commandArgs = command;
-		return this;
+		threadLock.lock();
+		try {
+			commandArgs = command;
+			return this;
+		} finally {
+			threadLock.unlock();
+		}
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteProcessBuilder#command(java.lang.String)
 	 */
 	public IRemoteProcessBuilder command(String... command) {
-		commandArgs = Arrays.asList(command);
-		return this;
+		threadLock.lock();
+		try {
+			commandArgs = Arrays.asList(command);
+			return this;
+		} finally {
+			threadLock.unlock();
+		}
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteProcessBuilder#directory()
 	 */
 	public IFileStore directory() {
-		return remoteDir;
+		threadLock.lock();
+		try {
+			return remoteDir;
+		} finally {
+			threadLock.unlock();
+		}
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteProcessBuilder#directory(org.eclipse.core.filesystem.IFileStore)
 	 */
 	public IRemoteProcessBuilder directory(IFileStore directory) {
-		remoteDir = directory;
-		return this;
+		threadLock.lock();
+		try {
+			remoteDir = directory;
+			return this;
+		} finally {
+			threadLock.unlock();
+		}
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteProcessBuilder#environment()
 	 */
 	public Map<String, String> environment() {
-		return remoteEnv;
+		threadLock.lock();
+		try {
+			return remoteEnv;
+		} finally {
+			threadLock.unlock();
+		}
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteProcessBuilder#redirectErrorStream()
 	 */
 	public boolean redirectErrorStream() {
-		return redirectErrorStream;
+		threadLock.lock();
+		try {
+			return redirectErrorStream;
+		} finally {
+			threadLock.unlock();
+		}
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteProcessBuilder#redirectErrorStream(boolean)
 	 */
 	public IRemoteProcessBuilder redirectErrorStream(boolean redirectErrorStream) {
-		this.redirectErrorStream = redirectErrorStream;
-		return this;
+		threadLock.lock();
+		try {
+			this.redirectErrorStream = redirectErrorStream;
+			return this;
+		} finally {
+			threadLock.unlock();
+		}
 	}
 
 	/* (non-Javadoc)
