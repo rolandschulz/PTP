@@ -10,5 +10,32 @@
             pageClass="org.eclipse.ptp.pldt.wizards.wizardPages.MPIProjectWizardPage"/>
 
    </extension>
+   
+      <extension
+         point="org.eclipse.cdt.core.templates">
+      <template
+            filterPattern=" "
+            id="org.eclipse.ptp.pldt.projects.HelloMPIWorldCProject"
+            location="templates/MPIhelloWorldCproject/template.xml"
+            pagesAfterTemplateSelectionProvider="org.eclipse.ptp.pldt.wizards.wizardPages.MPIPageProvider"
+            projectType="org.eclipse.cdt.build.core.buildArtefactType.exe">
+      </template>
+      <template
+            id="org.eclipse.ptp.pldt.projects.EmptyMPICproject"
+            location="templates/MPIemptyCproject/template.xml"
+            projectType="org.eclipse.cdt.build.core.buildArtefactType.exe">
+      </template>
+         <template
+            id="org.eclipse.ptp.pldt.projects.HelloOpenMPWorldCProject"
+            location="templates/OpenMPhelloWorldCproject/template.xml"
+            projectType="org.eclipse.cdt.build.core.buildArtefactType.exe">
+      </template>
+      <template
+            id="org.eclipse.ptp.pldt.projects.EmptyOpenMPCproject"
+            location="templates/OpenMPemptyCproject/template.xml"
+            projectType="org.eclipse.cdt.build.core.buildArtefactType.exe">
+      </template>
+   
+   </extension>
 
 </plugin>
