@@ -43,6 +43,7 @@ public interface IDs
 	 * dialog when analysis is complete.
 	 */
 	String SHOW_ANALYSIS_CONFIRMATION = "showAnalysisConfirmation";
+	String UNIQUE_ID = "uniqueID";
     
     // id for MPI Artifact view
 //    String MPI_VIEW_ID = "org.eclipse.ptp.pldt.mpi.core.views.MPITableView";
