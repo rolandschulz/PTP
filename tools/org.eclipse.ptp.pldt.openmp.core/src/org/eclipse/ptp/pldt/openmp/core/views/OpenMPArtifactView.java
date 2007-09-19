@@ -10,8 +10,9 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ptp.pldt.openmp.analysis.PAST.PASTOMPPragma;
 import org.eclipse.ptp.pldt.common.Artifact;
+import org.eclipse.ptp.pldt.common.ArtifactManager;
 import org.eclipse.ptp.pldt.common.IDs;
-import org.eclipse.ptp.pldt.common.views.SimpleTableView;
+import org.eclipse.ptp.pldt.common.views.SimpleTableMarkerView;
 import org.eclipse.ptp.pldt.openmp.core.OpenMPPlugin;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.ISharedImages;
@@ -29,7 +30,7 @@ import org.eclipse.ui.texteditor.AbstractTextEditor;
  * Note that the ID must be unique.
  * 
  */
-public class OpenMPArtifactView extends SimpleTableView {
+public class OpenMPArtifactView extends SimpleTableMarkerView {
 	public OpenMPArtifactView() {
 		// if you need to read icon images, etc. from the plug-in, be sure to
 		// pass in an actual Plugin class instance for first arg
@@ -85,7 +86,8 @@ public class OpenMPArtifactView extends SimpleTableView {
                 }
 
                 try {
-                    Object o = artifactManager_.getArtifact((String)marker.getAttribute(IDs.ID));
+                    //Object o = artifactManager_.getArtifact((String)marker.getAttribute(IDs.ID));
+                    Object o = ArtifactManager.getArtifact(marker);
                     if (o==null || !(o instanceof Artifact))  return;
                     Artifact artifact = (Artifact)o;
                     Object p = artifact.getArtifactAssist();
