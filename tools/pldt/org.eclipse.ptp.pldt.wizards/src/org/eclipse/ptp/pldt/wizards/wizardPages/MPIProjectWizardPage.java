@@ -52,7 +52,7 @@ public class MPIProjectWizardPage extends MBSCustomPage {
 	private Composite composite;
 	public static final String PAGE_ID="org.eclipse.ptp.pldt.wizards.wizardPages.MPIProjectWizardPage";
 
-	// The following are IDs for storing info in MBSPageData so it can be retrived in MpiProjectRunnable
+	// The following are IDs for storing info in MBSPageData so it can be retrieved in MpiProjectRunnable
 	// when the wizard is done.
 	/**
 	 * Store in MBSPageData  (with this ID) whether user wants to include MPI info in the project.
@@ -108,6 +108,8 @@ public class MPIProjectWizardPage extends MBSCustomPage {
 	/**
 	 * By default we do NOT use MPI project settings in a new project.<br>
 	 * Only set MPI includes (etc) if user selects it on this page.
+	 * FIXME make indiv. pages for openmp, etc. and use particular page
+	 * for each template.  Might be able to do it all in the template as well.
 	 */
 	private boolean useMpiProjectSettings=false;
 	private String desc = "MPI Project Page";
@@ -556,7 +558,8 @@ public class MPIProjectWizardPage extends MBSCustomPage {
 		});
 
 		createUserEntryArea(group, defaultEnabled);
-		
+/*		
+ 		// mpi sample file now provided by project template (also openmp)
 		mpiSampleButton = new Button(group, SWT.CHECK | SWT.RIGHT);
 		mpiSampleButton.setText("Include sample MPI source file?");
 		mpiSampleButton.setSelection(false);
@@ -573,7 +576,7 @@ public class MPIProjectWizardPage extends MBSCustomPage {
 			}
 		
 		});
-		
+		*/
 		setUserAreaEnabled(!defaultEnabled);
 
 	}
