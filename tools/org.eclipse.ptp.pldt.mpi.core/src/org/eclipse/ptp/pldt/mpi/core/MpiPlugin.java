@@ -111,6 +111,14 @@ public class MpiPlugin extends AbstractUIPlugin
     {
         return AbstractUIPlugin.imageDescriptorFromPlugin(MpiIDs.MPI_VIEW_ID, path);
     }
+    /**
+     * so that other plugins can access the icon that represents this plugin
+     * @return
+     */
+    public ImageDescriptor getIconImageDescriptor(){
+    	ImageDescriptor id = getImageDescriptor("icons/mpi.gif");
+    	return id;
+    }
 
     /**
      * Returns the workspace instance.
