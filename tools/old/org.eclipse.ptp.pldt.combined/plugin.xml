@@ -9,7 +9,7 @@
             id="org.eclipse.ptp.pldt.combined.ui.actionSet">
          <action
                class="org.eclipse.ptp.pldt.combined.actions.ParallelAnalysisMenuAction"
-               icon="icons/unused/analyze.gif"
+               icon="icons/analyze.gif"
                id="org.eclipse.ptp.pldt.combined.core.actions.RunAnalyse"
                label="Parallel Analysis"
                style="pulldown"
