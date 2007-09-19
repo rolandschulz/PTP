@@ -54,7 +54,7 @@ public class RSEProcessBuilder extends AbstractRemoteProcessBuilder {
 		// See Bug 158786.
 		List<String> cmdArgs = command();
 		if (cmdArgs.size() < 1) {
-			return null;
+			throw new IndexOutOfBoundsException();
 		}
 		
 		String remoteCmd = "";
@@ -70,24 +70,17 @@ public class RSEProcessBuilder extends AbstractRemoteProcessBuilder {
 		
 		IShellService shellService = (IShellService) getConnectedRemoteService();
 		
-		if (shellService != null) {
-			// This is necessary because runCommand does not actually run the command right now.
-			String env[] = new String[0];
-			IHostShell hostShell = shellService.launchShell("", env,new NullProgressMonitor()); //$NON-NLS-1$
-			hostShell.writeToShell(remoteCmd);
-			
-			Process p = null;
-			try {
-				p = new HostShellProcessAdapter(hostShell);
-			} catch (Exception e) {
-				if (p != null) {
-					p.destroy();
-				}
-				return null;
-			}
-			return new RSEProcess(p);
+		if (shellService == null) {
+			throw new IOException("Remote service not found");
 		}
-		return null;
+		
+		// This is necessary because runCommand does not actually run the command right now.
+		String env[] = new String[0];
+		IHostShell hostShell = shellService.launchShell("", env,new NullProgressMonitor()); //$NON-NLS-1$
+		hostShell.writeToShell(remoteCmd);
+		
+		Process p = new HostShellProcessAdapter(hostShell);
+		return new RSEProcess(p);
 	}
 
 	private IService getConnectedRemoteService() {
