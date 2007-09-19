@@ -10,11 +10,10 @@
             id="org.eclipse.ptp.pldt.mpi.core.ui.actionSet">
          <action
                label="Run MPI Analysis"
-               icon="icons/mpi.gif"
+               icon="icons/mpi_aLg.gif"
                class="org.eclipse.ptp.pldt.mpi.core.actions.RunAnalyseMPI"
                tooltip="Run MPI Analysis on selected file, folder, or project to find MPI Artifacts"
-               menubarPath="mpiMenu/mpiGroup"
-               toolbarPath="mpiToolbarGroup"
+               toolbarPath="additions"
                id="org.eclipse.ptp.pldt.mpi.core.actions.RunAnalyseMPI">
          </action>
         </actionSet>
@@ -27,7 +26,7 @@
       </category>
       <view
             name="MPI Artifact View"
-            icon="icons/mpi.gif"
+            icon="icons/mpi_aLg.gif"
             category="org.eclipse.ptp.pldt.mpi"
             class="org.eclipse.ptp.pldt.mpi.core.views.MPITableView"
             id="org.eclipse.ptp.pldt.mpi.core.views.MPITableView">
