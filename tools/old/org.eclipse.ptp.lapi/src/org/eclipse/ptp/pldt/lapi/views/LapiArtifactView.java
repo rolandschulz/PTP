@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.pldt.lapi.views;
 
-import org.eclipse.ptp.pldt.common.views.SimpleTableView;
+import org.eclipse.ptp.pldt.common.views.SimpleTableMarkerView;
 import org.eclipse.ptp.pldt.lapi.LapiIDs;
 import org.eclipse.ptp.pldt.lapi.LapiPlugin;
 
@@ -20,7 +20,7 @@ import org.eclipse.ptp.pldt.lapi.LapiPlugin;
  * A LAPI artifact view based on SimpleTableView Note that the ID must be unique.
  * 
  */
-public class LapiArtifactView extends SimpleTableView
+public class LapiArtifactView extends SimpleTableMarkerView
 {
     public LapiArtifactView()
     {
