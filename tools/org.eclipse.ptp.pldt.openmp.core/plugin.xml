@@ -16,7 +16,6 @@
                icon="icons/openMP.gif"
                class="org.eclipse.ptp.pldt.openmp.core.actions.RunAnalyseOpenMP"
                tooltip="%run.tooltip"
-               menubarPath="openMPMenu/openMPGroup"
                toolbarPath="openMPToolbarGroup"
                id="org.eclipse.ptp.pldt.openmp.core.actions.RunAnalyseAction">
          </action>
