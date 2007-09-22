@@ -9,7 +9,6 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ptp.pldt.common,
  org.eclipse.ptp.pldt.mpi.core,
  org.eclipse.ptp.pldt.openmp.core,
- org.eclipse.ptp.pldt.lapi,
  org.eclipse.ptp.pldt.mpi.analysis
 Eclipse-LazyStart: true
 Bundle-Vendor: IBM Research
