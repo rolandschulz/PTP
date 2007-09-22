@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.ptp"
       label="%featureName"
-      version="1.0.0"
+      version="2.0.0"
       provider-name="%providerName"
       image="eclipse_update_120.jpg">
 
@@ -45,54 +45,117 @@
          id="org.eclipse.ptp.core"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="2.0.0"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.ptp.debug.core"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="1.1.0"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.ptp.debug.ui"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="2.0.0"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.ptp.launch"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="2.0.0"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.ptp.ui"
          download-size="0"
          install-size="0"
-         version="0.0.0"/>
+         version="2.0.0"/>
 
    <plugin
          id="org.eclipse.ptp.debug.external.core"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="1.1.0"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.ptp.debug.external.ui"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="2.0.0"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.ptp.help"
          download-size="0"
          install-size="0"
-         version="0.0.0"/>
+         version="1.1.0"/>
+
+   <plugin
+         id="org.eclipse.ptp.remote"
+         download-size="0"
+         install-size="0"
+         version="2.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ptp.remote.rse"
+         download-size="0"
+         install-size="0"
+         version="2.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ptp.linux.x86"
+         download-size="0"
+         install-size="0"
+         version="1.1.0"
+         fragment="true"/>
+
+   <plugin
+         id="org.eclipse.ptp.lsf.core"
+         download-size="0"
+         install-size="0"
+         version="2.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ptp.lsf.ui"
+         download-size="0"
+         install-size="0"
+         version="2.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ptp.mpich2.core"
+         download-size="0"
+         install-size="0"
+         version="2.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ptp.mpich2.ui"
+         download-size="0"
+         install-size="0"
+         version="2.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ptp.orte.core"
+         download-size="0"
+         install-size="0"
+         version="2.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ptp.orte.ui"
+         download-size="0"
+         install-size="0"
+         version="2.0.0"
+         unpack="false"/>
 
 </feature>
