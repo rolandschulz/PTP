@@ -15,23 +15,23 @@
          point="org.eclipse.cdt.core.templates">
       <template
             filterPattern=" "
-            id="org.eclipse.ptp.pldt.projects.HelloMPIWorldCProject"
+            id="org.eclipse.ptp.pldt.projects.MPIhelloWorldCProject"
             location="templates/MPIhelloWorldCproject/template.xml"
             pagesAfterTemplateSelectionProvider="org.eclipse.ptp.pldt.wizards.wizardPages.MPIPageProvider"
             projectType="org.eclipse.cdt.build.core.buildArtefactType.exe">
       </template>
       <template
-            id="org.eclipse.ptp.pldt.projects.EmptyMPICproject"
+            id="org.eclipse.ptp.pldt.projects.MPIemptyCproject"
             location="templates/MPIemptyCproject/template.xml"
             projectType="org.eclipse.cdt.build.core.buildArtefactType.exe">
       </template>
          <template
-            id="org.eclipse.ptp.pldt.projects.HelloOpenMPWorldCProject"
+            id="org.eclipse.ptp.pldt.projects.OpenMPhelloWorldCProject"
             location="templates/OpenMPhelloWorldCproject/template.xml"
             projectType="org.eclipse.cdt.build.core.buildArtefactType.exe">
       </template>
       <template
-            id="org.eclipse.ptp.pldt.projects.EmptyOpenMPCproject"
+            id="org.eclipse.ptp.pldt.projects.OpenMPemptyCproject"
             location="templates/OpenMPemptyCproject/template.xml"
             projectType="org.eclipse.cdt.build.core.buildArtefactType.exe">
       </template>
