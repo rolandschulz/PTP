@@ -9,35 +9,47 @@
  */
 #include <stdio.h>
 #include <string.h>
-#include <stdlib.h>  
-#include <math.h>    
-#include "openmp.h"    
-
- 
-// Sample dummy OpenMP program 
-
-
+#include "mpi.h"
+// Sample MPI program
 int main(int argc, char* argv[]){
-	int    i,arraySize;
-	double *x, *y;     /* the arrays                 */
-	printf("Hello OpenMP World.\n");	
+	int  my_rank; /* rank of process */
+	int  p;       /* number of processes */
+	int source;   /* rank of sender */
+	int dest;     /* rank of receiver */
+	int tag=0;    /* tag for messages */
+	char message[100];        /* storage for message */
+	MPI_Status status ;   /* return status for receive */
 	
-// sample openMP API
-	if (omp_in_parallel()){
-		printf("true"); 
+	/* start up MPI */
+	
+	MPI_Init(&argc, &argv);
+	
+	/* find out process rank */
+	MPI_Comm_rank(MPI_COMM_WORLD, &my_rank); 
+	
+	/* find out number of processes */
+	MPI_Comm_size(MPI_COMM_WORLD, &p); 
+	
+	
+	if (my_rank !=0){
+		/* create message */
+		sprintf(message, "Greetings from process %d!", my_rank);
+		dest = 0;
+		/* use strlen+1 so that '\0' get transmitted */
+		MPI_Send(message, strlen(message)+1, MPI_CHAR,
+		   dest, tag, MPI_COMM_WORLD);
 	}
-	  /* Allocate memory for the arrays. */
-  x = (double *) malloc( (size_t) (  arraySize * sizeof(double) ) );
-  y = (double *) malloc( (size_t) (  arraySize * sizeof(double) ) );
- 
-  /* Here's the OpenMP pragma that parallelizes the for-loop. */
-#pragma omp parallel for
-  for ( i = 0; i < arraySize; i++ )
-    {
-      y[i] = sin( exp( cos( - exp( sin(x[i]) ) ) ) );
-    }
-	  
-	 
-	return 0;   
+	else{
+		printf("From process 0: Num processes: %d\n",p);
+		for (source = 1; source < p; source++) {
+			MPI_Recv(message, 100, MPI_CHAR, source, tag,
+			      MPI_COMM_WORLD, &status);
+			printf("%s\n",message);
+		}
+	}
+	/* shut down MPI */
+	MPI_Finalize(); 
+	
+	
+	return 0;
 }
-
