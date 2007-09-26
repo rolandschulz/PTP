@@ -18,6 +18,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.views;
 
+import java.util.concurrent.locks.ReentrantLock;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -57,6 +59,11 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	// title
 	protected final String EMPTY_TITLE = " ";
 	protected Color registerColor = null;
+	
+	protected UIWorkbenchJob uijob = new UIWorkbenchJob();
+	
+	protected boolean refreshing = false;
+	private final ReentrantLock	waitLock = new ReentrantLock();
 	
 	/**
 	 * update preference setting 
@@ -228,6 +235,8 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	 * 
 	 */
 	public void refresh(final boolean all) {
+		uijob.schedule();
+		/*
 		WorkbenchJob uiJob = new WorkbenchJob("Refreshing icons...") {
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				repaint(all);
@@ -239,7 +248,8 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 		};
 		uiJob.setSystem(true);
 		uiJob.schedule();
-	/*
+		*/
+		/*
 		getDisplay().asyncExec(new Runnable() {
 			public void run() {
 				if (all)
@@ -250,7 +260,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 				}
 			}
 		});
-	*/
+		 */
 	}
 	public abstract void updateAction();
 	// Set element info
@@ -329,9 +339,9 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.views.IImageProvider#getStatusIcon(java.lang.Object, boolean)
 	 */
-	public Image getStatusIcon(Object obj, boolean isSelected) {
+	public Image getStatusIcon(Object obj, int index, boolean isSelected) {
 		if (cur_element_set != null && obj instanceof IElement) {
-			int status = manager.getStatus((IElement)obj);
+			int status = manager.getStatus((IElement)obj, index);
 			return getImage(status, isSelected ? 1 : 0);
 		}
 		return null;
@@ -339,7 +349,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.views.IImageProvider#drawSpecial(java.lang.Object, org.eclipse.swt.graphics.GC, int, int, int, int)
 	 */
-	public void drawSpecial(Object obj, GC gc, int x_loc, int y_loc, int width, int height) {
+	public void drawSpecial(Object obj, int index, GC gc, int x_loc, int y_loc, int width, int height) {
 		if (cur_element_set != null && obj instanceof IElement) {
 			if (((IElement)obj).isRegistered()) {
 				gc.setForeground(registerColor);
@@ -390,6 +400,36 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	public ISelection getSelection() {
 		return canvas.getSelection();
 	}
+	private void setRefreshing(boolean rehreshing) {
+		waitLock.lock();
+		try {
+			this.refreshing = rehreshing;
+		}
+		finally {
+			waitLock.unlock();
+		}
+	}
 	
     public void selectionChanged(SelectionChangedEvent event) {}
+    
+	class UIWorkbenchJob extends WorkbenchJob {
+		public UIWorkbenchJob() {
+			super("Refreshing icons...");
+		}
+		public IStatus runInUIThread(IProgressMonitor monitor) {
+			repaint(true);
+			if (!canvas.isDisposed()) {
+				canvas.redraw();
+			}
+			setRefreshing(false);
+			return Status.OK_STATUS;
+		}
+		public boolean shouldSchedule() {
+			if (!refreshing) {
+				setRefreshing(true);
+				return true;
+			}
+			return false;
+		}
+	}
 }
