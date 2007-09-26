@@ -148,9 +148,10 @@ public interface IManager {
 	//image
 	/** Get element status
 	 * @param element IElement
+	 * @param index IElement index position
 	 * @return element status
 	 */
-	public int getStatus(IElement element);
+	public int getStatus(IElement element, int index);
 	/** Get element status
 	 * @param id Element ID
 	 * @return element status

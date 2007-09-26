@@ -307,8 +307,8 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 			}
 		}
 	}
-	public Image getStatusIcon(Object obj, boolean isSelected) {
-		Image img = super.getStatusIcon(obj, isSelected);
+	public Image getStatusIcon(Object obj, int index, boolean isSelected) {
+		Image img = super.getStatusIcon(obj, index, isSelected);
 		if (img != null) {
 			return zoom.getImage(img, zoom_depth);
 		}

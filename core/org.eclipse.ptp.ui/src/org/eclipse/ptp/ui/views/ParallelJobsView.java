@@ -323,7 +323,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements IModelM
 		if (obj instanceof IElement) {
 			Object procObj = convertElementObject((IElement)obj);
 			if (procObj instanceof IPProcess) {
-				return ((IPProcess)procObj).getProcessIndex();
+				return "" + ((IPProcess)procObj).getProcessIndex();
 			}
 		}
 		return super.getRulerIndex(obj, index);
@@ -339,7 +339,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements IModelM
 
 		IPProcess proc = (IPProcess)obj;
 		StringBuffer buffer = new StringBuffer();
-		String num = proc.getProcessIndex();
+		String num = "" + proc.getProcessIndex();
 		if (num != null) {
 			buffer.append("Index: " + num);
 			buffer.append("\n");

@@ -28,17 +28,19 @@ import org.eclipse.swt.graphics.Image;
 public interface IImageProvider {
 	/** Get icon status
 	 * @param obj Target element
+	 * @param index Tagret index position
 	 * @param isSelected whether it is selected or not
 	 * @return Image
 	 */
-	public Image getStatusIcon(Object obj, boolean isSelected);
+	public Image getStatusIcon(Object obj, int index, boolean isSelected);
 	/** Draw special on the image
 	 * @param obj Target element
+	 * @param index Tagret index position
 	 * @param gc GC
 	 * @param x_loc x coordinate
 	 * @param y_loc y corrdinate
 	 * @param width image size
 	 * @param height image height
 	 */
-	public void drawSpecial(Object obj, GC gc, int x_loc, int y_loc, int width, int height);
+	public void drawSpecial(Object obj, int index, GC gc, int x_loc, int y_loc, int width, int height);
 }
