@@ -306,7 +306,17 @@ public abstract class AbstractProxyClient implements IProxyClient {
 		if (timeout > 0)
 			sessSvrSock.socket().setSoTimeout(timeout);
 		sessPort = sessSvrSock.socket().getLocalPort();
+		
+		/*
+		 * getCanonicalHostName() tries to find the FQDN for the host, but if passed
+		 * an IP address with no associated domain name, seems to return a reverse 
+		 * name resolution. If this happens, we just use the IP address.
+		 */
 		sessHost = InetAddress.getLocalHost().getCanonicalHostName();
+		if (sessHost.endsWith(".in-addr.arpa")) {
+			sessHost = InetAddress.getLocalHost().getHostAddress();
+		}
+		
 		stateLock.lock();
 		try {
 			state = SessionState.WAITING;
