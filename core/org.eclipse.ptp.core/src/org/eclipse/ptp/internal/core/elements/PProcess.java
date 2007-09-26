@@ -181,8 +181,9 @@ public class PProcess extends Parent implements IPProcessControl {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.IPProcess#getProcessIndex()
 	 */
-	public String getProcessIndex() {
-		return getAttribute(ProcessAttributes.getIndexAttributeDefinition()).getValueAsString();
+	public int getProcessIndex() {
+		//return getAttribute(ProcessAttributes.getIndexAttributeDefinition()).getValueAsString();
+		return getAttribute(ProcessAttributes.getIndexAttributeDefinition()).getValue();
 	}
 
 	/* (non-Javadoc)

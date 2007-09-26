@@ -94,7 +94,8 @@ public interface IPProcess extends IPElement {
 	 * 
 	 * @return process index
 	 */
-	public String getProcessIndex();
+	//public String getProcessIndex();
+	public int getProcessIndex();
 	
 	/**
 	 * @return
