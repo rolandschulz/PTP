@@ -181,9 +181,8 @@ public class PProcess extends Parent implements IPProcessControl {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.IPProcess#getProcessIndex()
 	 */
-	public int getProcessIndex() {
-		//return getAttribute(ProcessAttributes.getIndexAttributeDefinition()).getValueAsString();
-		return getAttribute(ProcessAttributes.getIndexAttributeDefinition()).getValue();
+	public String getProcessIndex() {
+		return getAttribute(ProcessAttributes.getIndexAttributeDefinition()).getValueAsString();
 	}
 
 	/* (non-Javadoc)
@@ -256,6 +255,8 @@ public class PProcess extends Parent implements IPProcessControl {
 	}
 
 	/**
+	 * Cache output from process to local file.
+	 * 
 	 * @param output
 	 */
 	private void addOutput(String output) {
@@ -263,6 +264,8 @@ public class PProcess extends Parent implements IPProcessControl {
 	}
 
 	/**
+	 * Notify listeners of changed attributes.
+	 * 
 	 * @param attrs
 	 */
 	private void fireChangedProcess(Collection<? extends IAttribute<?,?,?>> attrs) {
@@ -275,7 +278,7 @@ public class PProcess extends Parent implements IPProcessControl {
 	}
 
 	/**
-	 * 
+	 * Create a local cache for process output.
 	 */
 	private void setOutputStore() {
 		Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
