@@ -198,7 +198,7 @@ public abstract class AbstractUIManager implements IManager {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IManager#getStatus(org.eclipse.ptp.ui.model.IElement)
 	 */
-	public int getStatus(IElement element) {
+	public int getStatus(IElement element, int index) {
 		return getStatus(element.getID());
 	}
 	/** Get Resource Managers

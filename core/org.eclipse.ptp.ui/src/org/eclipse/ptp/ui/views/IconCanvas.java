@@ -1633,7 +1633,7 @@ public class IconCanvas extends Canvas {
 					if (col_count == 0 && isDisplayRuler()) {
 						drawIndex(newGC, obj, index, y_loc);
 					}
-					drawImage(newGC, obj, x_loc, y_loc, (selectedElements.get(index) || tempSelectedElements.get(index)));
+					drawImage(newGC, obj, index, x_loc, y_loc, (selectedElements.get(index) || tempSelectedElements.get(index)));
 				}
 			}
 		}
@@ -1667,11 +1667,11 @@ public class IconCanvas extends Canvas {
 	 * @param y_loc
 	 * @param isSelected
 	 */
-	protected void drawImage(GC gc, Object obj, int x_loc, int y_loc, boolean isSelected) {
-		Image statusImage = getStatusIcon(obj, isSelected);
+	protected void drawImage(GC gc, Object obj, int index, int x_loc, int y_loc, boolean isSelected) {
+		Image statusImage = getStatusIcon(obj, index, isSelected);
 		if (statusImage != null) {
 			gc.drawImage(statusImage, x_loc, y_loc);
-			drawSpecial(obj, gc, x_loc, y_loc, e_width, e_height);
+			drawSpecial(obj, index, gc, x_loc, y_loc, e_width, e_height);
 		}
 	}
 	/** Draw selection
@@ -2193,13 +2193,14 @@ public class IconCanvas extends Canvas {
 
 	/** Get status image
 	 * @param obj
+	 * @param index target index position
 	 * @param isSelected true if element is selected
 	 * @return
 	 */
-	protected Image getStatusIcon(Object obj, boolean isSelected) {
+	protected Image getStatusIcon(Object obj, int index, boolean isSelected) {
 		if (imageProvider == null)
 			return null;
-		return imageProvider.getStatusIcon(obj, isSelected);
+		return imageProvider.getStatusIcon(obj, index, isSelected);
 	}
 	/** Draw special on selected element
 	 * @param obj
@@ -2209,9 +2210,9 @@ public class IconCanvas extends Canvas {
 	 * @param width
 	 * @param height
 	 */
-	protected void drawSpecial(Object obj, GC gc, int x_loc, int y_loc, int width, int height) {
+	protected void drawSpecial(Object obj, int index, GC gc, int x_loc, int y_loc, int width, int height) {
 		if (imageProvider != null) {
-			imageProvider.drawSpecial(obj, gc, x_loc, y_loc, width, height);
+			imageProvider.drawSpecial(obj, index, gc, x_loc, y_loc, width, height);
 		}
 	}
 	/** Get information control
@@ -2284,10 +2285,10 @@ public class IconCanvas extends Canvas {
         	}
         });
         iconCanvas.setImageProvider(new IImageProvider() {
-        	public Image getStatusIcon(Object obj, boolean isSelected) {
+        	public Image getStatusIcon(Object obj, int index, boolean isSelected) {
         		return isSelected?selectedImage:normalImage;
         	}
-        	public void drawSpecial(Object obj, GC gc, int x_loc, int y_loc, int width, int height) {
+        	public void drawSpecial(Object obj, int index, GC gc, int x_loc, int y_loc, int width, int height) {
         	}
         });
         iconCanvas.setToolTipProvider(new IToolTipProvider() {

@@ -70,9 +70,11 @@ public class JobManager extends AbstractUIManager {
 			}
 			IElementSet set = handler.getSetRoot();
 			for (IPProcess proc : job.getProcesses()) {
+				if (proc == null)
+					continue;
 				String id = proc.getID();
 				if (set.getElement(id) == null) {
-					set.add(createElement(set, id, proc.getProcessIndex()));
+					set.add(createElement(set, id, ""+proc.getProcessIndex()));
 				}
 			}
 		}
@@ -83,7 +85,7 @@ public class JobManager extends AbstractUIManager {
 		IElementHandler elementHandler = jobElementHandlerList.get(proc.getJob().getID());
 		IElementSet set = elementHandler.getSetRoot();
 		if (set.getElement(proc.getID()) == null) {
-			set.add(createElement(set, proc.getID(), proc.getProcessIndex()));
+			set.add(createElement(set, proc.getID(), ""+proc.getProcessIndex()));
 		}
 	}
 
