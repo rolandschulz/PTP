@@ -136,4 +136,17 @@ public class ArraySpec implements Serializable
         sb.append(")");
         return sb.toString();
     }
+    
+    @Override public boolean equals(Object other)
+    {
+        if (!(other instanceof ArraySpec)) return false;
+        
+        ArraySpec o = (ArraySpec)other;
+        return this.dimensions.equals(o.dimensions) && this.assumedOrDeferredShape == o.assumedOrDeferredShape;
+    }
+    
+    @Override public int hashCode()
+    {
+        return dimensions.hashCode() + (assumedOrDeferredShape ? 1 : 0);
+    }
 }

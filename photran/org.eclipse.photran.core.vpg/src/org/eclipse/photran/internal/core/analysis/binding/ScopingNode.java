@@ -378,8 +378,9 @@ public abstract class ScopingNode extends InteriorNode
 		
 		Set<PhotranTokenRef> result = new HashSet<PhotranTokenRef>();
 		for (Definition def : getAllDefinitions())
-	    	for (TokenRef<Token> t : vpg.getOutgoingEdgeTargets(def.getTokenRef(), PhotranVPG.IMPORTED_INTO_SCOPE_EDGE_TYPE))
-	    		result.add((PhotranTokenRef)t);
+		    if (def != null) // TODO: Why are we getting null here?
+		        for (TokenRef<Token> t : vpg.getOutgoingEdgeTargets(def.getTokenRef(), PhotranVPG.IMPORTED_INTO_SCOPE_EDGE_TYPE))
+		            result.add((PhotranTokenRef)t);
 	    	
 	    List<ScopingNode> scopes = new LinkedList<ScopingNode>();
 	    for (PhotranTokenRef tokenRef : result)
@@ -432,7 +433,7 @@ public abstract class ScopingNode extends InteriorNode
 
     	for (Definition def : getAllDefinitions())
     	{
-    		if (def.matches(name))
+    		if (def != null && def.matches(name)) // TODO: Why are we getting null here?
     		{
     			bindings.foundDefinition(def.getTokenRef(), this);
     			wasSuccessful = true;

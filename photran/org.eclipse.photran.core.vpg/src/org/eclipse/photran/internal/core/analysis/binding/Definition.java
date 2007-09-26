@@ -393,4 +393,45 @@ public class Definition implements Serializable
         	+ tokenRef.getOffset()
         	+ ")";
     }
+
+    
+    @Override public boolean equals(Object other)
+    {
+        if (!(other instanceof Definition)) return false;
+        
+        Definition o = (Definition)other;
+        return equals(this.arraySpec, o.arraySpec)
+            && equals(this.canonicalizedName, o.canonicalizedName)
+            && equals(this.classification, o.classification)
+            && this.subprogramArgument == o.subprogramArgument
+            && equals(this.tokenRef, o.tokenRef)
+            && equals(this.type, o.type)
+            && equals(this.visibility, o.visibility);
+    }
+    
+    private boolean equals(Object a, Object b)
+    {
+        if (a == null && b == null)
+            return true;
+        else if (a != null && b != null)
+            return a.equals(b);
+        else
+            return false;
+    }
+    
+    @Override public int hashCode()
+    {
+        return hashCode(this.arraySpec)
+            + hashCode(this.canonicalizedName)
+            + hashCode(this.classification)
+            + (this.subprogramArgument ? 1 : 0)
+            + hashCode(this.tokenRef)
+            + 0 //hashCode(this.type)
+            + hashCode(this.visibility);
+    }
+
+    private int hashCode(Object o)
+    {
+        return o == null ? 0 : o.hashCode();
+    }
 }

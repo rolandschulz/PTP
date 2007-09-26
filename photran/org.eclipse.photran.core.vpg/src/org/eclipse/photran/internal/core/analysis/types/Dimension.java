@@ -92,4 +92,32 @@ public class Dimension implements Serializable
         sb.append(uboundAsString);
         return sb.toString();
     }
+    
+    @Override public boolean equals(Object other)
+    {
+        if (!(other instanceof Dimension)) return false;
+        
+        Dimension o = (Dimension)other;
+        return equals(this.lboundAsString, o.lboundAsString) && equals(this.uboundAsString, o.uboundAsString);
+    }
+    
+    private boolean equals(Object a, Object b)
+    {
+        if (a == null && b == null)
+            return true;
+        else if (a != null && b != null)
+            return a.equals(b);
+        else
+            return false;
+    }
+
+    @Override public int hashCode()
+    {
+        return hashCode(lboundAsString) + hashCode(uboundAsString);
+    }
+
+    private int hashCode(Object o)
+    {
+        return o == null ? 0 : o.hashCode();
+    }
 }

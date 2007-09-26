@@ -28,6 +28,7 @@ public abstract class TypeProcessor<T>
 	public T ifLogical(Type type) {return null;}
 	public T ifCharacter(Type type) {return null;}
     public T ifDerivedType(String derivedTypeName, DerivedType type) {return null;}
+    public T ifFunctionType(String name, FunctionType functionType) {return null;}
     public T ifUnknown(Type type) {return null;}
     public T ifUnclassified(Type type) {return null;}
 }
