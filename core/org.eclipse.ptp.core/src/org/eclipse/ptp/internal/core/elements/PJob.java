@@ -19,8 +19,10 @@
 package org.eclipse.ptp.internal.core.elements;
 
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.ptp.core.attributes.BooleanAttribute;
@@ -53,8 +55,14 @@ public class PJob extends Parent implements IPJobControl, IProcessListener {
 
 	private final ListenerList elementListeners = new ListenerList();
 	private final ListenerList childListeners = new ListenerList();
-	private HashMap<String, IPProcessControl> indexMap = 
-		new HashMap<String, IPProcessControl>();
+	private Map<Integer, IPProcessControl> indexMap = new TreeMap<Integer, IPProcessControl>(new Comparator<Integer>() {
+		public int compare(Integer o1, Integer o2) {
+			return o1.compareTo(o2);
+		}
+		public boolean equals(Object obj) {
+			return this.equals(obj);
+		}
+	});
 	
 	public PJob(String id, IPQueueControl queue, IAttribute<?,?,?>[] attrs) {
 		super(id, queue, P_JOB, attrs);
@@ -89,10 +97,7 @@ public class PJob extends Parent implements IPJobControl, IProcessListener {
 
 	public void addProcess(IPProcessControl process) {
 		addChild(process);
-		String idx = process.getProcessIndex();
-		if (idx != null) {
-			indexMap.put(idx, process);
-		}
+		indexMap.put(new Integer(process.getProcessIndex()), process);
 		fireNewProcess(process);
 		process.addElementListener(this);
 	}
@@ -105,26 +110,27 @@ public class PJob extends Parent implements IPJobControl, IProcessListener {
 	}
 	
 	public synchronized IPProcess getProcessByIndex(int index) {
-		return indexMap.get(String.valueOf(index));
+		return indexMap.get(new Integer(index));
 	}
 
 	
 	public synchronized IPProcess getProcessByIndex(String index) {
-		return indexMap.get(index);
+		return indexMap.get(new Integer(index));
 	}
 
 	/*
 	 * returns all the processes in this job, which are the children of the job
 	 */
 	public synchronized IPProcessControl[] getProcessControls() {
-		return (IPProcessControl[]) getCollection().toArray(new IPProcessControl[size()]);
+		return (IPProcessControl[]) getCollection().toArray(new IPProcessControl[0]);
 	}
 
 	/*
 	 * returns all the processes in this job, which are the children of the job
 	 */
 	public IPProcess[] getProcesses() {
-		return getProcessControls();
+		return indexMap.values().toArray(new IPProcessControl[0]);
+		//return getProcessControls();
 	}
 
 	/* (non-Javadoc)
@@ -194,10 +200,7 @@ public class PJob extends Parent implements IPJobControl, IProcessListener {
 		removeChild(process);
 		process.removeNode();
 		process.clearOutput();
-		String idx = process.getProcessIndex();
-		if (idx != null) {
-			indexMap.remove(idx);
-		}
+		indexMap.remove(new Integer(process.getProcessIndex()));
 		fireRemoveProcess(process);
 	}
 
@@ -216,18 +219,14 @@ public class PJob extends Parent implements IPJobControl, IProcessListener {
 	}
 
 	private void fireNewProcess(IPProcess process) {
-		IJobNewProcessEvent e = 
-			new JobNewProcessEvent(this, process);
-		
+		IJobNewProcessEvent e =  new JobNewProcessEvent(this, process);
 		for (Object listener : childListeners.getListeners()) {
 			((IJobProcessListener)listener).handleEvent(e);
 		}
 	}
 
 	private void fireRemoveProcess(IPProcess process) {
-		IJobRemoveProcessEvent e = 
-			new JobRemoveProcessEvent(this, process);
-		
+		IJobRemoveProcessEvent e = new JobRemoveProcessEvent(this, process);
 		for (Object listener : childListeners.getListeners()) {
 			((IJobProcessListener)listener).handleEvent(e);
 		}
