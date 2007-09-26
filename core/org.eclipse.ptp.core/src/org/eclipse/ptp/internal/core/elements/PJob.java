@@ -19,10 +19,8 @@
 package org.eclipse.ptp.internal.core.elements;
 
 import java.util.Collection;
-import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.ptp.core.attributes.BooleanAttribute;
@@ -55,14 +53,8 @@ public class PJob extends Parent implements IPJobControl, IProcessListener {
 
 	private final ListenerList elementListeners = new ListenerList();
 	private final ListenerList childListeners = new ListenerList();
-	private Map<Integer, IPProcessControl> indexMap = new TreeMap<Integer, IPProcessControl>(new Comparator<Integer>() {
-		public int compare(Integer o1, Integer o2) {
-			return o1.compareTo(o2);
-		}
-		public boolean equals(Object obj) {
-			return this.equals(obj);
-		}
-	});
+	private HashMap<String, IPProcessControl> indexMap = 
+		new HashMap<String, IPProcessControl>();
 	
 	public PJob(String id, IPQueueControl queue, IAttribute<?,?,?>[] attrs) {
 		super(id, queue, P_JOB, attrs);
@@ -95,13 +87,22 @@ public class PJob extends Parent implements IPJobControl, IProcessListener {
 		elementListeners.add(listener);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elementcontrols.IPJobControl#addProcess(org.eclipse.ptp.core.elementcontrols.IPProcessControl)
+	 */
 	public void addProcess(IPProcessControl process) {
 		addChild(process);
-		indexMap.put(new Integer(process.getProcessIndex()), process);
+		String idx = process.getProcessIndex();
+		if (idx != null) {
+			indexMap.put(idx, process);
+		}
 		fireNewProcess(process);
 		process.addElementListener(this);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPJob#getProcessById(java.lang.String)
+	 */
 	public synchronized IPProcess getProcessById(String id) {
 		IPElementControl element = findChild(id);
 		if (element != null)
@@ -109,28 +110,33 @@ public class PJob extends Parent implements IPJobControl, IProcessListener {
 		return null;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPJob#getProcessByIndex(int)
+	 */
 	public synchronized IPProcess getProcessByIndex(int index) {
-		return indexMap.get(new Integer(index));
+		return indexMap.get(String.valueOf(index));
 	}
 
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPJob#getProcessByIndex(java.lang.String)
+	 */
 	public synchronized IPProcess getProcessByIndex(String index) {
-		return indexMap.get(new Integer(index));
+		return indexMap.get(index);
 	}
 
 	/*
 	 * returns all the processes in this job, which are the children of the job
 	 */
 	public synchronized IPProcessControl[] getProcessControls() {
-		return (IPProcessControl[]) getCollection().toArray(new IPProcessControl[0]);
+		return (IPProcessControl[]) getCollection().toArray(new IPProcessControl[size()]);
 	}
 
 	/*
 	 * returns all the processes in this job, which are the children of the job
 	 */
 	public IPProcess[] getProcesses() {
-		return indexMap.values().toArray(new IPProcessControl[0]);
-		//return getProcessControls();
+		return getProcessControls();
 	}
 
 	/* (non-Javadoc)
@@ -166,10 +172,16 @@ public class PJob extends Parent implements IPJobControl, IProcessListener {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPJob#isDebug()
+	 */
 	public boolean isDebug() {
 		return getAttribute(JobAttributes.getDebugFlagAttributeDefinition()).getValue();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPJob#isTerminated()
+	 */
 	public boolean isTerminated() {
 		State state = getState();
 		if (state == State.TERMINATED || state == State.ERROR) {
@@ -200,15 +212,26 @@ public class PJob extends Parent implements IPJobControl, IProcessListener {
 		removeChild(process);
 		process.removeNode();
 		process.clearOutput();
-		indexMap.remove(new Integer(process.getProcessIndex()));
+		String idx = process.getProcessIndex();
+		if (idx != null) {
+			indexMap.remove(idx);
+		}
 		fireRemoveProcess(process);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPJob#setDebug()
+	 */
 	public void setDebug() {
 		BooleanAttribute debug = getAttribute(JobAttributes.getDebugFlagAttributeDefinition());
 		debug.setValue(true);
 	}
 
+	/**
+	 * Notify listeners when a job attribute has changed.
+	 * 
+	 * @param attrs
+	 */
 	private void fireChangedJob(Collection<? extends IAttribute<?,?,?>> attrs) {
 		IJobChangedEvent e = 
 			new JobChangedEvent(this, attrs);
@@ -218,15 +241,29 @@ public class PJob extends Parent implements IPJobControl, IProcessListener {
 		}
 	}
 
+	/**
+	 * Notify listeners when a new process is created.
+	 * 
+	 * @param process
+	 */
 	private void fireNewProcess(IPProcess process) {
-		IJobNewProcessEvent e =  new JobNewProcessEvent(this, process);
+		IJobNewProcessEvent e = 
+			new JobNewProcessEvent(this, process);
+		
 		for (Object listener : childListeners.getListeners()) {
 			((IJobProcessListener)listener).handleEvent(e);
 		}
 	}
 
+	/**
+	 * Notify listeners when a process is removed.
+	 * 
+	 * @param process
+	 */
 	private void fireRemoveProcess(IPProcess process) {
-		IJobRemoveProcessEvent e = new JobRemoveProcessEvent(this, process);
+		IJobRemoveProcessEvent e = 
+			new JobRemoveProcessEvent(this, process);
+		
 		for (Object listener : childListeners.getListeners()) {
 			((IJobProcessListener)listener).handleEvent(e);
 		}

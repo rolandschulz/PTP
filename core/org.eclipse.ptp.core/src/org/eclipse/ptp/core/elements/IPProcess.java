@@ -22,7 +22,6 @@ import org.eclipse.ptp.core.attributes.StringAttributeDefinition;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.core.elements.listeners.IProcessListener;
 
-
 public interface IPProcess extends IPElement {
 	
 	/**
@@ -43,7 +42,7 @@ public interface IPProcess extends IPElement {
 	public void addNode(IPNode node);
 
 	/**
-	 * 
+	 * Clear the local cache of process output
 	 */
 	public void clearOutput();
 	
@@ -54,31 +53,40 @@ public interface IPProcess extends IPElement {
 	public String getSavedOutput(StringAttributeDefinition attrDef);
 	
 	/**
-	 * @return
+	 * Get the value of the exit code attribute. This is the exit code
+	 * that the process returned on termination.
+	 * 
+	 * @return value of the exit code attribute
 	 */
 	public int getExitCode();
 	
 	/**
 	 * Find the parent job that this process is encompassed by 
 	 * 
-	 * @return
+	 * @return parent job
 	 */
 	public IPJob getJob();
 	
 	/**
 	 * Find the node that this process is running on
 	 * 
-	 * @return
+	 * @return node that the process is running on
 	 */
 	public IPNode getNode();
 	
 	/**
-	 * @return
+	 * Get the value of the PID attribute
+	 * 
+	 * @return value of the PID attribute
 	 */
 	public int getPid();
 	
 	/**
-	 * @return
+	 * Get the value of the signal name attribute. If the process was
+	 * terminated by a signal, this is the name of the signal that caused
+	 * the termination.
+	 * 
+	 * @return value of the signal name attribute
 	 */
 	public String getSignalName();
 	
@@ -94,26 +102,31 @@ public interface IPProcess extends IPElement {
 	 * 
 	 * @return process index
 	 */
-	//public String getProcessIndex();
-	public int getProcessIndex();
+	public String getProcessIndex();
 	
 	/**
-	 * @return
+	 * Check if process is terminated
+	 * 
+	 * @return true if process terminated
 	 */
 	public boolean isTerminated();
 	
 	/**
-	 * Remove us from node we are running on
+	 * Remove the mapping from this process to a node
 	 */
 	public void removeNode();
 	
 	/**
-	 * @param status
+	 * Set the state attribute on the process
+	 * 
+	 * @param state of the process
 	 */
 	public void setState(ProcessAttributes.State state);
 	
 	/**
-	 * @param isTerminate
+	 * Set the value of the terminated attribute on the process
+	 * 
+	 * @param boolean representing termination status of the process
 	 */
 	public void setTerminated(boolean isTerminate);
 }
