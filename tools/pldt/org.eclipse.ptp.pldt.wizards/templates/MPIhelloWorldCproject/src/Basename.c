@@ -4,7 +4,7 @@
  Author      : $(author)
  Version     :
  Copyright   : $(copyright)
- Description : Hello OpenMP World in C 
+ Description : Hello MPI World in C 
  ============================================================================
  */
 #include <stdio.h>
