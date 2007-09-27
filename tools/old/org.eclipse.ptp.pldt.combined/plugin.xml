@@ -86,17 +86,6 @@
    </extension>
   
    
-   <extension
-         point="org.eclipse.ui.preferencePages">
-
-     <page
-           category="org.eclipse.ptp.pldt.common.prefs.PLDTPreferencePage"
-           class="org.eclipse.ptp.pldt.combined.prefs.CombinedPreferencePage"
-           id="org.eclipse.ptp.pldt.combined.prefpage"
-           name="Combined"/>
- <!--          category="org.eclipse.ptp.ui.preferences.ptpPreferencesPage/org.eclipse.ptp.pldt.common.prefs.PLDTPreferencePage"
- -->
-   </extension>
    
    <extension
          point="org.eclipse.cdt.ui.CHelpProvider">
