@@ -11,14 +11,14 @@ public class MPIPageProvider implements IPagesAfterTemplateSelectionProvider {
 
 	public IWizardDataPage[] createAdditionalPages(IWorkbenchWizard wizard, IWorkbench workbench,
 			IStructuredSelection selection) {
-		System.out.println("createAdditionalPages");
+		System.out.println("MPIPageProvider.createAdditionalPages()...");
 		pages = new IWizardDataPage[0];
 		
 		return pages;
 	}
 
 	public IWizardDataPage[] getCreatedPages(IWorkbenchWizard wizard) {
-		System.out.println("getCreatedPages");
+		System.out.println("MPIPageProvider.getCreatedPages()...");
 		return pages;
 	}
 
