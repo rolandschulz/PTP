@@ -39,7 +39,7 @@ public class ParallelAnalysisMenuAction implements IWorkbenchWindowPulldownDeleg
 			
 			// hack hack hack put fake menu items for screenshots
 			MenuItem menuitem = new MenuItem(menu, SWT.NONE);
-			menuitem.setText("MPI analysis");
+			menuitem.setText("Show MPI Artifacts");
 			//MpiPlugin mpiPlugin=MpiPlugin.getDefault();
 			
 			CombinedActivator ca = CombinedActivator.getDefault();
@@ -49,7 +49,7 @@ public class ParallelAnalysisMenuAction implements IWorkbenchWindowPulldownDeleg
 			menuitem.setImage(iconImage);
 			
 			menuitem = new MenuItem(menu,SWT.None);
-			menuitem.setText("OpenMP analysis");
+			menuitem.setText("Show OpenMP Artifacts");
 			iconImage=createImage(ca,"icons/artifact_turq.gif");
 			menuitem.setImage(iconImage);
 			
