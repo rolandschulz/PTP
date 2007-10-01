@@ -23,13 +23,12 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.ptp.core.attributes.EnumeratedAttributeDefinition;
+import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute;
-import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes.State;
-import org.eclipse.ptp.core.elements.events.IProcessChangedEvent;
+import org.eclipse.ptp.core.elements.events.IProcessChangeEvent;
 import org.eclipse.ptp.core.elements.listeners.IProcessListener;
 
 /**
@@ -120,19 +119,18 @@ public class ProcessInputStream extends InputStream implements IProcessListener 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.listeners.IProcessListener#handleEvent(org.eclipse.ptp.core.elements.events.IProcessChangedEvent)
 	 */
-	public void handleEvent(IProcessChangedEvent e) {
-		for (IAttribute<?, ?, ?> attr : e.getAttributes()) {
-			IAttributeDefinition<?, ?, ?> def = attr.getDefinition();
-			final EnumeratedAttributeDefinition<State> stateAttrDef = ProcessAttributes.getStateAttributeDefinition();
-			if (def.equals(stateAttrDef)) {
-				ProcessAttributes.State state = (State)attr.getValue();
-				//ProcessAttributes.State state = ((EnumeratedAttribute<State>)attr).getValue();
-				if (state == State.EXITED || state == State.EXITED_SIGNALLED || state == State.ERROR) {
-					close();
-				}
-			} else if (def.equals(ProcessAttributes.getStdoutAttributeDefinition())) {
-				addInput(attr.getValueAsString());
+	public void handleEvent(IProcessChangeEvent e) {
+		IAttribute<?,?,?> attr = e.getAttributes().get(ProcessAttributes.getStateAttributeDefinition());
+		if (attr != null) {
+			ProcessAttributes.State state = (State)((EnumeratedAttribute<?>)attr).getValue();
+			if (state == State.EXITED || state == State.EXITED_SIGNALLED || state == State.ERROR) {
+				close();
 			}
+		} 
+		
+		attr = e.getAttributes().get(ProcessAttributes.getStdoutAttributeDefinition());
+		if (attr != null) {
+			addInput(attr.getValueAsString());
 		}
 	}
 }

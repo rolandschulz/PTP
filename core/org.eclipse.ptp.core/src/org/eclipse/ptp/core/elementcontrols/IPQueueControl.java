@@ -18,26 +18,46 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.elementcontrols;
 
+import java.util.Collection;
+
+import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.elements.IPQueue;
 
 public interface IPQueueControl extends IPElementControl, IPQueue {
 	/**
-	 * @param job
+	 * Add attributes to a collection of jobs.
+	 * 
+	 * @param jobs collection of IJobControls
+	 * @param attrs array of attributes to add to each job
 	 */
-	public void addJob(IPJobControl job);
-	
+	public void addJobAttributes(Collection<IPJobControl> jobs, IAttribute<?,?,?>[] attrs);
+
 	/**
+	 * Add the collection of jobs to the queue.
+	 * 
+	 * @param jobs collection of IJobControls
+	 */
+	public void addJobs(Collection<IPJobControl> jobs);
+
+	/**
+	 * Lookup a job from a job ID
+	 * 
 	 * @param job_id
-	 * @return
+	 * @return job associated with the job ID
 	 */
 	public IPJobControl getJobControl(String job_id);
-	/**
-	 * @return
-	 */
-	public IPJobControl[] getJobControls();
 	
 	/**
-	 * @param job
+	 * Get all the jobs in this queue.
+	 * 
+	 * @return array of jobs
 	 */
-	public void removeJob(IPJobControl job);
+	public Collection<IPJobControl> getJobControls();
+	
+	/**
+	 * Remove job from the queue
+	 * 
+	 * @param jobs to remove
+	 */
+	public void removeJobs(Collection<IPJobControl> jobs);
 }

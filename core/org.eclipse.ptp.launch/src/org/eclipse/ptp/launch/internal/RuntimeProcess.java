@@ -19,7 +19,7 @@ import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes.State;
-import org.eclipse.ptp.core.elements.events.IJobChangedEvent;
+import org.eclipse.ptp.core.elements.events.IJobChangeEvent;
 import org.eclipse.ptp.core.elements.listeners.IJobListener;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
@@ -139,15 +139,14 @@ public class RuntimeProcess implements IProcess, IJobListener {
 	 **************************************************************************************************************************************************************************************************/
 
 	@SuppressWarnings("unchecked")
-	public void handleEvent(IJobChangedEvent e) {
-		for (IAttribute attr : e.getAttributes()) {
-			if (attr.getDefinition().getId().equals(JobAttributes.getStateAttributeDefinition().getId())) {
-				JobAttributes.State state = ((EnumeratedAttribute<State>)attr).getValue();
-				if (state == State.TERMINATED || state == State.ERROR) {
-					terminated();
-				}
+	public void handleEvent(IJobChangeEvent e) {
+		IAttribute<?,?,?> attr = e.getAttributes().get(JobAttributes.getStateAttributeDefinition());
+		if (attr != null) {
+			JobAttributes.State state = (State)((EnumeratedAttribute<?>)attr).getValue();
+			if (state == State.TERMINATED || state == State.ERROR) {
+				terminated();
 			}
-		}
+		} 
 	}
 	
 	/***************************************************************************************************************************************************************************************************

@@ -1,10 +1,10 @@
 package org.eclipse.ptp.core.elements.listeners;
 
-import org.eclipse.ptp.core.elements.events.IQueueChangedEvent;
+import org.eclipse.ptp.core.elements.events.IQueueChangeEvent;
 
 public interface IQueueListener {
 	/**
 	 * @param e
 	 */
-	public void handleEvent(IQueueChangedEvent e);
+	public void handleEvent(IQueueChangeEvent e);
 }

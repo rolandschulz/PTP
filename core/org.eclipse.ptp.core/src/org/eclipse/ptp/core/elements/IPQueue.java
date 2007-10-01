@@ -19,7 +19,7 @@
 package org.eclipse.ptp.core.elements;
 
 import org.eclipse.ptp.core.elements.attributes.QueueAttributes;
-import org.eclipse.ptp.core.elements.listeners.IQueueJobListener;
+import org.eclipse.ptp.core.elements.listeners.IQueueChildListener;
 import org.eclipse.ptp.core.elements.listeners.IQueueListener;
 
 public interface IPQueue extends IPElement {
@@ -27,7 +27,7 @@ public interface IPQueue extends IPElement {
 	/**
 	 * @param listener
 	 */
-	public void addChildListener(IQueueJobListener listener);
+	public void addChildListener(IQueueChildListener listener);
 
 	/**
 	 * @param listener
@@ -60,7 +60,7 @@ public interface IPQueue extends IPElement {
 	/**
 	 * @param listener
 	 */
-	public void removeChildListener(IQueueJobListener listener);
+	public void removeChildListener(IQueueChildListener listener);
 	
 	/**
 	 * @param listener

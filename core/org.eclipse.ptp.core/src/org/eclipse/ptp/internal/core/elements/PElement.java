@@ -20,7 +20,6 @@ package org.eclipse.ptp.internal.core.elements;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.PlatformObject;
@@ -55,7 +54,7 @@ public abstract class PElement extends PlatformObject implements IPElementContro
 	 */
 	public void addAttribute(IAttribute<?,?,?> attrib) {
 		attributeValues.addAttribute(attrib);
-		doAddAttributeHook(Arrays.asList(attrib));
+		doAddAttributeHook(attributeValues.getMap());
 	}
 	
 	/* (non-Javadoc)
@@ -63,7 +62,7 @@ public abstract class PElement extends PlatformObject implements IPElementContro
 	 */
 	public void addAttributes(IAttribute<?,?,?>[] attribs) {
 		attributeValues.addAttributes(attribs);
-		doAddAttributeHook(Arrays.asList(attribs));
+		doAddAttributeHook(attributeValues.getMap());
 	}
 
 	/* (non-Javadoc)
@@ -183,7 +182,7 @@ public abstract class PElement extends PlatformObject implements IPElementContro
 		return getName();
 	}
 
-	protected abstract void doAddAttributeHook(List<? extends IAttribute<?,?,?>> list);
+	protected abstract void doAddAttributeHook(Map<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>> map);
 	
 	/**
 	 * Find the element info for this element

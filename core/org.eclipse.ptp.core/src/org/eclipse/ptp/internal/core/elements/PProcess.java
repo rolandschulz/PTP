@@ -19,9 +19,8 @@
 package org.eclipse.ptp.internal.core.elements;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.ListenerList;
@@ -30,6 +29,7 @@ import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute;
+import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.attributes.IntegerAttribute;
 import org.eclipse.ptp.core.attributes.StringAttribute;
@@ -42,10 +42,10 @@ import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPNode;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes.State;
-import org.eclipse.ptp.core.elements.events.IProcessChangedEvent;
+import org.eclipse.ptp.core.elements.events.IProcessChangeEvent;
 import org.eclipse.ptp.core.elements.listeners.IProcessListener;
 import org.eclipse.ptp.core.util.OutputTextFile;
-import org.eclipse.ptp.internal.core.elements.events.ProcessChangedEvent;
+import org.eclipse.ptp.internal.core.elements.events.ProcessChangeEvent;
 
 public class PProcess extends Parent implements IPProcessControl {
 
@@ -126,9 +126,6 @@ public class PProcess extends Parent implements IPProcessControl {
 	 */
 	public void addNode(IPNode node) {
 		this.node = (IPNodeControl) node;
-		if (node != null) {
-			this.node.addProcess(this);
-		}
 	}
 	
 	/* (non-Javadoc)
@@ -232,9 +229,6 @@ public class PProcess extends Parent implements IPProcessControl {
 	 * @see org.eclipse.ptp.core.elements.IPProcess#removeNode()
 	 */
 	public void removeNode() {
-		if (node != null) {
-			node.removeProcess(this);
-		}
 		node = null;
 	}
 	
@@ -244,7 +238,10 @@ public class PProcess extends Parent implements IPProcessControl {
 	public void setState(State state) {
 		EnumeratedAttribute<State> procState = getAttribute(ProcessAttributes.getStateAttributeDefinition());
 		procState.setValue(state);
-		fireChangedProcess(Arrays.asList(procState));
+		Map<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>> map = 
+			new HashMap<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>>();
+		map.put(ProcessAttributes.getStateAttributeDefinition(), procState);
+		fireChangedProcess(map);
 	}
 	
 	/* (non-Javadoc)
@@ -268,9 +265,9 @@ public class PProcess extends Parent implements IPProcessControl {
 	 * 
 	 * @param attrs
 	 */
-	private void fireChangedProcess(Collection<? extends IAttribute<?,?,?>> attrs) {
-		IProcessChangedEvent e = 
-			new ProcessChangedEvent(this, attrs);
+	private void fireChangedProcess(Map<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>> attrs) {
+		IProcessChangeEvent e = 
+			new ProcessChangeEvent(this, attrs);
 		
 		for (Object listener : elementListeners.getListeners()) {
 			((IProcessListener)listener).handleEvent(e);
@@ -300,11 +297,10 @@ public class PProcess extends Parent implements IPProcessControl {
 	 * @see org.eclipse.ptp.internal.core.elements.PElement#doAddAttributeHook(java.util.List)
 	 */
 	@Override
-	protected void doAddAttributeHook(List<? extends IAttribute<?,?,?>> attrs) {
-		for (IAttribute<?,?,?> attr : attrs) {
-			if (attr.getDefinition() == ProcessAttributes.getStdoutAttributeDefinition()) {
-				addOutput(attr.getValueAsString());
-			}
+	protected void doAddAttributeHook(Map<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>> attrs) {
+		StringAttribute attr = (StringAttribute) attrs.get(ProcessAttributes.getStdoutAttributeDefinition());
+		if (attr != null) {
+			addOutput(attr.getValue());
 		}
 		fireChangedProcess(attrs);
 	}

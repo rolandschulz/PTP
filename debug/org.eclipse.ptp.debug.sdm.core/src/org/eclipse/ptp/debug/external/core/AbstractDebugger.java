@@ -245,7 +245,7 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 				handleException(tasks, ((IPCDIErrorEvent) event).getErrorCode());
 			} else if (event instanceof IPCDISuspendedEvent) {
 				setSuspendTasks(true, tasks);
-				setProcessStatus(tasks.toArray(), ProcessAttributes.State.STOPPED);
+				setProcessStatus(tasks.toArray(), ProcessAttributes.State.SUSPENDED);
 			}
 			// FIXME - add item here or??
 			eventThread.fireDebugEvent(event);

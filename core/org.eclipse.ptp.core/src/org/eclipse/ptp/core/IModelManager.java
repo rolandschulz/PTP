@@ -21,12 +21,12 @@ package org.eclipse.ptp.core;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
-import org.eclipse.ptp.core.listeners.IModelManagerResourceManagerListener;
+import org.eclipse.ptp.core.listeners.IModelManagerChildListener;
 import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
 
 public interface IModelManager extends IModelPresentation {
 	
-	public void addListener(IModelManagerResourceManagerListener listener);
+	public void addListener(IModelManagerChildListener listener);
 	
 	/**
 	 * @param addedManager
@@ -65,7 +65,7 @@ public interface IModelManager extends IModelPresentation {
 	/**
 	 * @param listener
 	 */
-	public void removeListener(IModelManagerResourceManagerListener listener);
+	public void removeListener(IModelManagerChildListener listener);
 	
 	/**
 	 * @param removedManager

@@ -18,14 +18,36 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.elementcontrols;
 
+import java.util.Collection;
+
 import org.eclipse.ptp.core.elements.IPNode;
 
 public interface IPNodeControl extends IPElementControl, IPNode {
-	public void addProcess(IPProcessControl process);
+	/**
+	 * Add a collection of processes to the node
+	 * 
+	 * @param processes to add
+	 */
+	public void addProcesses(Collection<IPProcessControl> processes);
 
+	/**
+	 * Get the parent machine for this node
+	 * 
+	 * @return parent machine
+	 */
 	public IPMachineControl getMachineControl();
 
-	public IPProcessControl[] getProcessControls();
+	/**
+	 * Get the processes associated with this node
+	 * 
+	 * @return collection of processes
+	 */
+	public Collection<IPProcessControl> getProcessControls();
 	
-	public void removeProcess(IPProcessControl process);
+	/**
+	 * Remove processes from this node
+	 * 
+	 * @param processe to remove
+	 */
+	public void removeProcesses(Collection<IPProcessControl> processes);
 }

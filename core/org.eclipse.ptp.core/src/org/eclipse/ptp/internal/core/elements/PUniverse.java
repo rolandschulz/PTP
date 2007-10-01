@@ -20,8 +20,10 @@ package org.eclipse.ptp.internal.core.elements;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.ptp.core.attributes.IAttribute;
+import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
@@ -119,9 +121,9 @@ public class PUniverse extends PElement implements IPUniverseControl {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.internal.core.elements.PElement#doAddAttributeHook(java.util.List)
+	 * @see org.eclipse.ptp.internal.core.elements.PElement#doAddAttributeHook(java.util.Map)
 	 */
 	@Override
-	protected void doAddAttributeHook(List<? extends IAttribute<?,?,?>> attrs) {
+	protected void doAddAttributeHook(Map<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>> attrs) {
 	}
 }

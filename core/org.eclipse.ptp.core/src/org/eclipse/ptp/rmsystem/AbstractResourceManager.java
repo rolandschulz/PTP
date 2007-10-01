@@ -22,10 +22,10 @@
 package org.eclipse.ptp.rmsystem;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -53,6 +53,8 @@ import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPMachine;
+import org.eclipse.ptp.core.elements.IPNode;
+import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
@@ -65,47 +67,42 @@ import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.core.elements.attributes.QueueAttributes;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes.State;
-import org.eclipse.ptp.core.elements.events.IJobChangedProcessEvent;
-import org.eclipse.ptp.core.elements.events.IJobNewProcessEvent;
-import org.eclipse.ptp.core.elements.events.IJobRemoveProcessEvent;
-import org.eclipse.ptp.core.elements.events.IMachineChangedEvent;
-import org.eclipse.ptp.core.elements.events.IMachineChangedNodeEvent;
-import org.eclipse.ptp.core.elements.events.IMachineNewNodeEvent;
-import org.eclipse.ptp.core.elements.events.IMachineRemoveNodeEvent;
-import org.eclipse.ptp.core.elements.events.IQueueChangedEvent;
-import org.eclipse.ptp.core.elements.events.IQueueChangedJobEvent;
-import org.eclipse.ptp.core.elements.events.IQueueNewJobEvent;
-import org.eclipse.ptp.core.elements.events.IQueueRemoveJobEvent;
-import org.eclipse.ptp.core.elements.events.IResourceManagerChangedEvent;
-import org.eclipse.ptp.core.elements.events.IResourceManagerChangedMachineEvent;
-import org.eclipse.ptp.core.elements.events.IResourceManagerChangedQueueEvent;
+import org.eclipse.ptp.core.elements.events.IChangedNodeEvent;
+import org.eclipse.ptp.core.elements.events.IChangedProcessEvent;
+import org.eclipse.ptp.core.elements.events.INewJobEvent;
+import org.eclipse.ptp.core.elements.events.INewMachineEvent;
+import org.eclipse.ptp.core.elements.events.INewNodeEvent;
+import org.eclipse.ptp.core.elements.events.INewProcessEvent;
+import org.eclipse.ptp.core.elements.events.INewQueueEvent;
+import org.eclipse.ptp.core.elements.events.IRemoveProcessEvent;
+import org.eclipse.ptp.core.elements.events.IChangedJobEvent;
+import org.eclipse.ptp.core.elements.events.IRemoveJobEvent;
+import org.eclipse.ptp.core.elements.events.IRemoveNodeEvent;
+import org.eclipse.ptp.core.elements.events.IResourceManagerChangeEvent;
+import org.eclipse.ptp.core.elements.events.IChangedMachineEvent;
+import org.eclipse.ptp.core.elements.events.IChangedQueueEvent;
 import org.eclipse.ptp.core.elements.events.IResourceManagerErrorEvent;
-import org.eclipse.ptp.core.elements.events.IResourceManagerNewMachineEvent;
-import org.eclipse.ptp.core.elements.events.IResourceManagerNewQueueEvent;
-import org.eclipse.ptp.core.elements.events.IResourceManagerRemoveMachineEvent;
-import org.eclipse.ptp.core.elements.events.IResourceManagerRemoveQueueEvent;
-import org.eclipse.ptp.core.elements.listeners.IJobProcessListener;
-import org.eclipse.ptp.core.elements.listeners.IMachineListener;
-import org.eclipse.ptp.core.elements.listeners.IMachineNodeListener;
-import org.eclipse.ptp.core.elements.listeners.IQueueJobListener;
-import org.eclipse.ptp.core.elements.listeners.IQueueListener;
+import org.eclipse.ptp.core.elements.events.IRemoveMachineEvent;
+import org.eclipse.ptp.core.elements.events.IRemoveQueueEvent;
+import org.eclipse.ptp.core.elements.listeners.IJobChildListener;
+import org.eclipse.ptp.core.elements.listeners.IMachineChildListener;
+import org.eclipse.ptp.core.elements.listeners.IQueueChildListener;
+import org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener;
 import org.eclipse.ptp.core.elements.listeners.IResourceManagerListener;
-import org.eclipse.ptp.core.elements.listeners.IResourceManagerMachineListener;
-import org.eclipse.ptp.core.elements.listeners.IResourceManagerQueueListener;
 import org.eclipse.ptp.internal.core.elements.PElement;
 import org.eclipse.ptp.internal.core.elements.PJob;
 import org.eclipse.ptp.internal.core.elements.PMachine;
 import org.eclipse.ptp.internal.core.elements.PNode;
 import org.eclipse.ptp.internal.core.elements.PProcess;
 import org.eclipse.ptp.internal.core.elements.PQueue;
-import org.eclipse.ptp.internal.core.elements.events.ResourceManagerChangedEvent;
-import org.eclipse.ptp.internal.core.elements.events.ResourceManagerChangedMachineEvent;
-import org.eclipse.ptp.internal.core.elements.events.ResourceManagerChangedQueueEvent;
+import org.eclipse.ptp.internal.core.elements.events.NewMachineEvent;
+import org.eclipse.ptp.internal.core.elements.events.NewQueueEvent;
+import org.eclipse.ptp.internal.core.elements.events.ResourceManagerChangeEvent;
+import org.eclipse.ptp.internal.core.elements.events.ChangedMachineEvent;
+import org.eclipse.ptp.internal.core.elements.events.ChangedQueueEvent;
 import org.eclipse.ptp.internal.core.elements.events.ResourceManagerErrorEvent;
-import org.eclipse.ptp.internal.core.elements.events.ResourceManagerNewMachineEvent;
-import org.eclipse.ptp.internal.core.elements.events.ResourceManagerNewQueueEvent;
-import org.eclipse.ptp.internal.core.elements.events.ResourceManagerRemoveMachineEvent;
-import org.eclipse.ptp.internal.core.elements.events.ResourceManagerRemoveQueueEvent;
+import org.eclipse.ptp.internal.core.elements.events.RemoveMachineEvent;
+import org.eclipse.ptp.internal.core.elements.events.RemoveQueueEvent;
 
 /**
  * @author rsqrd
@@ -146,14 +143,11 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	}
 
 	private final ListenerList listeners = new ListenerList();
-	private final ListenerList queueListeners = new ListenerList();
-	private final ListenerList machineListeners = new ListenerList();
+	private final ListenerList childListeners = new ListenerList();
 	
-	private final IQueueListener queueListener;
-	private final IMachineListener machineListener;
-	private final IQueueJobListener queueJobListener;
-	private final IJobProcessListener jobProcessListener;
-	private final IMachineNodeListener machineNodeListener;
+	private final IQueueChildListener queueJobListener;
+	private final IJobChildListener jobProcessListener;
+	private final IMachineChildListener machineNodeListener;
 	
 	private IResourceManagerConfiguration config;
 	private AttributeDefinitionManager attrDefManager = new AttributeDefinitionManager();
@@ -171,65 +165,53 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 		super(id, universe, P_RESOURCE_MANAGER, getDefaultAttributes(config));
 		this.config = config;
 
-		queueListener = new IQueueListener(){
-			public void handleEvent(IQueueChangedEvent e) {
-				fireQueueChanged(e.getSource(), e.getAttributes());				
-			}
-		};
-		machineListener = new IMachineListener(){
-			public void handleEvent(IMachineChangedEvent e) {
-				fireMachineChanged(e.getSource(), e.getAttributes());				
-			}
-		};
-		queueJobListener = new IQueueJobListener(){
-			public void handleEvent(IQueueChangedJobEvent e) {
+		queueJobListener = new IQueueChildListener(){
+			public void handleEvent(IChangedJobEvent e) {
 				// OK to ignore
 			}
-			public void handleEvent(IQueueNewJobEvent e) {
+			public void handleEvent(INewJobEvent e) {
 				// OK to ignore
 			}
-			public void handleEvent(IQueueRemoveJobEvent e) {
-				IPJob job = e.getJob();
-				job.removeChildListener(jobProcessListener);
-				jobsById.remove(job.getID());
+			public void handleEvent(IRemoveJobEvent e) {
+				for (IPJob job : e.getJobs()) {
+					job.removeChildListener(jobProcessListener);
+					jobsById.remove(job.getID());
+				}
 			}
 		};
-		jobProcessListener = new IJobProcessListener(){
-			public void handleEvent(IJobChangedProcessEvent e) {
+		jobProcessListener = new IJobChildListener(){
+			public void handleEvent(IChangedProcessEvent e) {
 				// OK to ignore
 			}
-			public void handleEvent(IJobNewProcessEvent e) {
+			public void handleEvent(INewProcessEvent e) {
 				// OK to ignore		
 			}
-			public void handleEvent(IJobRemoveProcessEvent e) {
-				processesById.remove(e.getProcess().getID());
+			public void handleEvent(IRemoveProcessEvent e) {
+				for (IPProcess process : e.getProcesses()) {
+					processesById.remove(process.getID());
+				}
 			}			
 		};
-		machineNodeListener = new IMachineNodeListener(){
-			public void handleEvent(IMachineChangedNodeEvent e) {
+		machineNodeListener = new IMachineChildListener(){
+			public void handleEvent(IChangedNodeEvent e) {
 				// OK to ignore
 			}
-			public void handleEvent(IMachineNewNodeEvent e) {
+			public void handleEvent(INewNodeEvent e) {
 				// OK to ignore
 			}
-			public void handleEvent(IMachineRemoveNodeEvent e) {
-				nodesById.remove(e.getNode().getID());
+			public void handleEvent(IRemoveNodeEvent e) {
+				for (IPNode node : e.getNodes()) {
+					nodesById.remove(node.getID());
+				}
 			}
 		};
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.IResourceManager#addChildListener(org.eclipse.ptp.core.elements.listeners.IResourceManagerMachineListener)
+	 * @see org.eclipse.ptp.core.elements.IResourceManager#addChildListener(org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener)
 	 */
-	public void addChildListener(IResourceManagerMachineListener listener) {
-		machineListeners.add(listener);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.IResourceManager#addChildListener(org.eclipse.ptp.core.elements.listeners.IResourceManagerQueueListener)
-	 */
-	public void addChildListener(IResourceManagerQueueListener listener) {
-		queueListeners.add(listener);
+	public void addChildListener(IResourceManagerChildListener listener) {
+		childListeners.add(listener);
 	}
 
 	/*
@@ -239,6 +221,36 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	 */
 	public void addElementListener(IResourceManagerListener listener) {
 		listeners.add(listener);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elementcontrols.IResourceManagerControl#addMachineAttributes(java.util.Collection, org.eclipse.ptp.core.attributes.IAttribute<?,?,?>[])
+	 */
+	public void addMachineAttributes(Collection<IPMachineControl> machineControls,
+			IAttribute<?, ?, ?>[] attrs) {
+		List<IPMachine> machines = new ArrayList<IPMachine>(machineControls.size());
+		
+		for (IPMachineControl machine : machineControls) {
+			machine.addAttributes(attrs);
+			machines.add(machine);
+		}
+		
+		fireChangedMachines(machines);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elementcontrols.IResourceManagerControl#addQueueAttributes(java.util.Collection, org.eclipse.ptp.core.attributes.IAttribute<?,?,?>[])
+	 */
+	public void addQueueAttributes(Collection<IPQueueControl> queueControls,
+			IAttribute<?, ?, ?>[] attrs) {
+		List<IPQueue> queues = new ArrayList<IPQueue>(queueControls.size());
+		
+		for (IPQueueControl queue : queueControls) {
+			queue.addAttributes(attrs);
+			queues.add(queue);
+		}
+		
+		fireChangedQueues(queues);
 	}
 
 	/* (non-Javadoc)
@@ -262,7 +274,7 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 		}
 		doDispose();
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.IResourceManager#enableEvents()
 	 */
@@ -284,7 +296,7 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 			return super.getAdapter(adapter);
 		}
 	}
-	
+
 	/**
 	 * Lookup an attribute definition
 	 * 
@@ -294,7 +306,7 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	public IAttributeDefinition<?,?,?> getAttributeDefinition(String attrId) {
 		return attrDefManager.getAttributeDefinition(attrId);
 	}
-
+	
 	/**
 	 * Returns the resource managers attribute definition manager
 	 * 
@@ -333,7 +345,7 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 		// library restrictions
 		return super.getID();
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.IResourceManager#getMachineById(java.lang.String)
 	 */
@@ -344,17 +356,17 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elementcontrols.IResourceManagerControl#getMachineControls()
 	 */
-	public synchronized IPMachineControl[] getMachineControls() {
-		return (IPMachineControl[]) machinesById.values().toArray(new IPMachineControl[0]);
+	public synchronized Collection<IPMachineControl> getMachineControls() {
+		return machinesById.values();
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.IResourceManager#getMachines()
 	 */
 	public IPMachine[] getMachines() {
-		return getMachineControls();
+		return getMachineControls().toArray(new IPMachineControl[getMachineControls().size()]);
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.IResourceManager#getQueueById(java.lang.String)
 	 */
@@ -372,18 +384,18 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elementcontrols.IResourceManagerControl#getQueueControls()
 	 */
-	public synchronized IPQueueControl[] getQueueControls() {
-		return (IPQueueControl[]) queuesById.values().toArray(new IPQueueControl[0]);
+	public synchronized Collection<IPQueueControl> getQueueControls() {
+		return queuesById.values();
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.IResourceManager#getQueues()
 	 */
 	public IPQueue[] getQueues() {
-		return getQueueControls();
+		return getQueueControls().toArray(new IPQueue[getQueueControls().size()]);
 	}
-	
-	/* (non-Javadoc)
+
+    /* (non-Javadoc)
      * @see org.eclipse.ptp.core.elements.IResourceManager#getResourceManagerId()
      */
     public String getResourceManagerId() {
@@ -398,32 +410,25 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 		return stateAttr.getValue();
 	}
 
-    /* (non-Javadoc)
+	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.IResourceManager#getUniqueName()
 	 */
 	public String getUniqueName() {
 		return getConfiguration().getUniqueName();
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elementcontrols.IPElementControl#hasChildren()
 	 */
 	public boolean hasChildren() {
 		return getMachines().length > 0 || getQueues().length > 0;
 	}
-
+	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.IResourceManager#removeChildListener(org.eclipse.ptp.core.elements.listeners.IResourceManagerMachineListener)
+	 * @see org.eclipse.ptp.core.elements.IResourceManager#removeChildListener(org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener)
 	 */
-	public void removeChildListener(IResourceManagerMachineListener listener) {
-		machineListeners.remove(listener);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.IResourceManager#removeChildListener(org.eclipse.ptp.core.elements.listeners.IResourceManagerQueueListener)
-	 */
-	public void removeChildListener(IResourceManagerQueueListener listener) {
-		queueListeners.remove(listener);
+	public void removeChildListener(IResourceManagerChildListener listener) {
+		childListeners.remove(listener);
 	}
 	
 	/*
@@ -451,7 +456,8 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 		/*
 		 * Update attributes from the new configuration
 		 */
-		List<IAttribute<?,?,?>> attrList = new ArrayList<IAttribute<?,?,?>>();
+		Map<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>> attrMap = 
+			new HashMap<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>>();
 		
 		StringAttributeDefinition nameAttrDef =
 			ElementAttributes.getNameAttributeDefinition();
@@ -459,7 +465,7 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 		if (nameAttr != null) {
 			try {
 				nameAttr.setValue(config.getName());
-				attrList.add(nameAttr);
+				attrMap.put(nameAttrDef, nameAttr);
 			} catch (IllegalValueException e) {
 			}
 		}
@@ -469,12 +475,12 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 		if (descAttr != null) {
 			try {
 				descAttr.setValue(config.getDescription());
-				attrList.add(descAttr);
+				attrMap.put(descAttrDef, descAttr);
 			} catch (IllegalValueException e) {
 			}
 		}
 		
-		fireResourceManagerChanged(attrList);
+		fireResourceManagerChanged(attrMap);
 	}
 	
 	/*
@@ -555,9 +561,9 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	 * 
 	 * @param attrs attributes that have changed
 	 */
-	private void fireResourceManagerChanged(List<? extends IAttribute<?,?,?>> attrs) {
-		IResourceManagerChangedEvent e = 
-			new ResourceManagerChangedEvent(this, attrs);
+	private void fireResourceManagerChanged(Map<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>> attrs) {
+		IResourceManagerChangeEvent e = 
+			new ResourceManagerChangeEvent(this, attrs);
     	
 		for (Object listener : listeners.getListeners()) {
 			((IResourceManagerListener)listener).handleEvent(e);
@@ -575,7 +581,7 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 		EnumeratedAttribute<State> stateAttr = getAttribute(stateAttrDef);
 		return stateAttr;
 	}
-	
+
 	/**
 	 * Initialize the resource manager. This is called each time the
 	 * resource manager is started.
@@ -592,63 +598,136 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 		attrDefManager.setAttributeDefinitions(QueueAttributes.getDefaultAttributeDefinitions());
 		attrDefManager.setAttributeDefinitions(ResourceManagerAttributes.getDefaultAttributeDefinitions());
 	}
-	
-	/*
-	 * Add new model elements to the model.
-	 */
-	protected synchronized void addJob(String jobId, IPJobControl job) {
-		job.getQueueControl().addJob(job);
-		job.addChildListener(jobProcessListener);
-		jobsById.put(jobId, job);
-	}
 
 	/**
-	 * @param machineId
-	 * @param machine
-	 */
-	protected synchronized void addMachine(String machineId, IPMachineControl machine) {
-		machinesById.put(machineId, machine);
-		machine.addElementListener(machineListener);
-		machine.addChildListener(machineNodeListener);
-		fireNewMachine(machine);
-	}
-
-	/**
-	 * @param nodeId
-	 * @param node
-	 */
-	protected synchronized void addNode(String nodeId, IPNodeControl node) {
-		node.getMachineControl().addNode(node);
-		nodesById.put(nodeId, node);
-	}
-	
-	/**
-	 * @param processId
-	 * @param process
-	 */
-	protected synchronized void addProcess(String processId, IPProcessControl process) {
-		process.getJobControl().addProcess(process);
-		processesById.put(processId, process);
-	}
-
-	/**
-	 * @param queueId
+	 * Add a collection of jobs to the model. This will result in a INewJobEvent 
+	 * being propagated to listeners on the queue.
+	 * 
 	 * @param queue
+	 * @param jobs
 	 */
-	protected synchronized void addQueue(String queueId, IPQueueControl queue) {
-		queuesById.put(queueId, queue);
-		/*
-		 * Keep a map of queue names, if the queue has a name (and it should).
-		 */
-		StringAttribute attr = queue.getAttribute(ElementAttributes.getNameAttributeDefinition());
-		if (attr != null) {
-			queuesByName.put(attr.getValue(), queue);
+	protected synchronized void addJobs(IPQueueControl queue, 
+			Collection<IPJobControl> jobs) {
+		
+		for (IPJobControl job : jobs) {
+			job.addChildListener(jobProcessListener);
+			jobsById.put(job.getID(), job);
 		}
-		queue.addElementListener(queueListener);
-		queue.addChildListener(queueJobListener);
-		fireNewQueue(queue);
+		
+		queue.addJobs(jobs);
 	}
 	
+	/**
+	 * Add a collection of machines to the model. This will result in a INewMachineEvent 
+	 * being propagated to listeners on the RM.
+	 * 
+	 * @param machineControls Collection of IMachineControls
+	 */
+	protected synchronized void addMachines(Collection<IPMachineControl> machineControls) {
+		List<IPMachine> machines = new ArrayList<IPMachine>(machineControls.size());
+		
+		for (IPMachineControl machine : machineControls) {
+			machinesById.put(machine.getID(), machine);
+			machine.addChildListener(machineNodeListener);
+			machines.add(machine);
+		}
+		
+		fireNewMachines(machines);
+	}
+
+	/**
+	 * Add a collection of machines to the model. This will result in a INewNodeEvent 
+	 * being propagated to listeners on the machine.
+	 * 
+	 * @param machine parent of the nodes
+	 * @param nodes collection of IPNodeControls
+	 */
+	protected synchronized void addNodes(IPMachineControl machine, 
+			Collection<IPNodeControl> nodes) {
+		
+		for (IPNodeControl node : nodes) {
+			nodesById.put(node.getID(), node);
+		}
+		
+		machine.addNodes(nodes);
+	}
+	
+	/**
+	 * Add a collection of processes to the model. This involves adding the processes
+	 * to a job *and* to a node. The node information is an attribute on the process.
+	 * This will result in a INewProcessEvent being propagated to listeners on the job 
+	 * and nodes.
+	 * 
+	 * @param job parent of the processes
+	 * @param processes collection of IPProcesControls
+	 */
+	protected synchronized void addProcesses(IPJobControl job, 
+			Collection<IPProcessControl> processes) {
+
+		/*
+		 * Map containing a list of processes that are linked to nodes
+		 */
+		Map<IPNodeControl, List<IPProcessControl>> nodeProcMap =
+			new HashMap<IPNodeControl, List<IPProcessControl>>();
+		
+		for (IPProcessControl process : processes) {
+			/*
+			 * Find the node ID attribute and add the process to the list for each node. 
+			 * Remove the attribute from the attribute manager.
+			 */
+			StringAttribute attr = (StringAttribute) process.getAttribute(ProcessAttributes.getNodeIdAttributeDefinition());
+			if (attr != null) {
+				IPNodeControl node = getNodeControl(attr.getValue());
+				if (node != null) {
+					List<IPProcessControl> procs = nodeProcMap.get(node);
+					if (procs == null) {
+						procs = new ArrayList<IPProcessControl>();
+						nodeProcMap.put(node, procs);
+					}
+					procs.add(process);
+				}
+				process.removeAttribute(attr);
+			}
+			
+			processesById.put(process.getID(), process);
+		}
+		
+		job.addProcesses(processes);
+		
+		/*
+		 * Bulk add the processes to the nodes
+		 */
+		for (Map.Entry<IPNodeControl, List<IPProcessControl>> entry : nodeProcMap.entrySet()) {
+			entry.getKey().addProcesses(entry.getValue());
+		}
+
+	}
+
+	/**
+	 * Add a collection of processes to the model. This will result in a INewProcessEvent 
+	 * being propagated to listeners on the job.
+	 * 
+	 * @param queues collection of IPQueueControls
+	 */
+	protected synchronized void addQueues(Collection<IPQueueControl> queueControls) {
+		List<IPQueue> queues = new ArrayList<IPQueue>(queueControls.size());
+
+		for (IPQueueControl queue : queueControls) {
+			queuesById.put(queue.getID(), queue);
+			/*
+			 * Keep a map of queue names, if the queue has a name (and it should).
+			 */
+			StringAttribute attr = queue.getAttribute(ElementAttributes.getNameAttributeDefinition());
+			if (attr != null) {
+				queuesByName.put(attr.getValue(), queue);
+			}
+			queue.addChildListener(queueJobListener);
+			queues.add(queue);
+		}
+		
+		fireNewQueues(queues);
+	}
+
 	/**
 	 * Remove all the model elements below the RM. This is called when the RM
 	 * shuts down and ensures that everything is cleaned up properly.
@@ -656,32 +735,28 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	protected void cleanUp() {
 		doCleanUp();
 		
-		for (IPQueueControl queue : getQueueControls()) {
-			removeQueue(queue);
-		}
-		for (IPMachineControl machine : getMachineControls()) {
-			removeMachine(machine);
-		}
+		removeQueues(this, getQueueControls());
+		removeMachines(this, getMachineControls());
 	}
-
+	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.internal.core.elements.PElement#doAddAttributeHook(java.util.List)
+	 * @see org.eclipse.ptp.internal.core.elements.PElement#doAddAttributeHook(java.util.Map)
 	 */
 	@Override
-	protected void doAddAttributeHook(List<? extends IAttribute<?,?,?>> attrs) {
+	protected void doAddAttributeHook(Map<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>> attrs) {
 		fireResourceManagerChanged(attrs);
 	}
-
+	
 	/**
 	 * 
 	 */
 	protected abstract void doCleanUp();
-	
+
 	/**
 	 * 
 	 */
 	protected abstract void doDisableEvents();
-	
+
 	/**
 	 * 
 	 */
@@ -696,7 +771,7 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	 * @param queue
 	 * @return
 	 */
-	protected abstract List<IPJob> doRemoveTerminatedJobs(IPQueueControl queue);
+	protected abstract List<IPJobControl> doRemoveTerminatedJobs(IPQueueControl queue);
 
 	/**
 	 * @throws CoreException
@@ -712,7 +787,7 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	 * @throws CoreException
 	 */
 	protected abstract boolean doStartup(IProgressMonitor monitor) throws CoreException;
-
+	
 	/**
 	 * @param attrMgr
 	 * @param monitor
@@ -726,7 +801,33 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	 * @throws CoreException
 	 */
 	protected abstract void doTerminateJob(IPJob job) throws CoreException;
-	
+
+	/**
+	 * @param machine
+	 * @param collection
+	 */
+	protected void fireChangedMachines(Collection<IPMachine> machines) {
+		IChangedMachineEvent e = 
+			new ChangedMachineEvent(this, machines);
+
+		for (Object listener : childListeners.getListeners()) {
+			((IResourceManagerChildListener)listener).handleEvent(e);
+		}
+	}
+
+	/**
+	 * @param queue
+	 * @param collection
+	 */
+	protected void fireChangedQueues(Collection<IPQueue> queues) {
+		IChangedQueueEvent e = 
+			new ChangedQueueEvent(this, queues);
+
+		for (Object listener : childListeners.getListeners()) {
+			((IResourceManagerChildListener)listener).handleEvent(e);
+		}
+	}
+
 	/**
 	 * @param message
 	 */
@@ -738,89 +839,65 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 			((IResourceManagerListener)listener).handleEvent(e);
 		}
     }
-
+	
 	/**
-	 * @param machine
-	 * @param collection
+	 * Propagate a IResourceManagerNewMachinesEvent to listeners.
+	 * 
+	 * @param machines collection containing the new machines
 	 */
-	protected void fireMachineChanged(IPMachine machine, Collection<? extends IAttribute<?, ?, ?>> collection) {
-		IResourceManagerChangedMachineEvent e = 
-			new ResourceManagerChangedMachineEvent(this, machine, collection);
+	protected void fireNewMachines(Collection<IPMachine> machines) {
+		INewMachineEvent e = 
+			new NewMachineEvent(this, machines);
 
-		for (Object listener : machineListeners.getListeners()) {
-			((IResourceManagerMachineListener)listener).handleEvent(e);
-		}
-	}
-
-	/**
-	 * @param machine
-	 */
-	protected void fireNewMachine(IPMachine machine) {
-		IResourceManagerNewMachineEvent e = 
-			new ResourceManagerNewMachineEvent(this, machine);
-
-		for (Object listener : machineListeners.getListeners()) {
-			((IResourceManagerMachineListener)listener).handleEvent(e);
+		for (Object listener : childListeners.getListeners()) {
+			((IResourceManagerChildListener)listener).handleEvent(e);
 		}
 	}
 
 	/**
 	 * @param queue
 	 */
-	protected void fireNewQueue(IPQueue queue) {
-		IResourceManagerNewQueueEvent e = 
-			new ResourceManagerNewQueueEvent(this, queue);
+	protected void fireNewQueues(Collection<IPQueue> queues) {
+		INewQueueEvent e = 
+			new NewQueueEvent(this, queues);
 
-		for (Object listener : queueListeners.getListeners()) {
-			((IResourceManagerQueueListener)listener).handleEvent(e);
+		for (Object listener : childListeners.getListeners()) {
+			((IResourceManagerChildListener)listener).handleEvent(e);
 		}
     }
 
-	/**
-	 * @param queue
-	 * @param collection
-	 */
-	protected void fireQueueChanged(IPQueue queue, Collection<? extends IAttribute<?, ?, ?>> collection) {
-		IResourceManagerChangedQueueEvent e = 
-			new ResourceManagerChangedQueueEvent(this, queue, collection);
-
-		for (Object listener : queueListeners.getListeners()) {
-			((IResourceManagerQueueListener)listener).handleEvent(e);
-		}
-	}
-	
-	/**
+    /**
 	 * @param machine
 	 */
-	protected void fireRemoveMachine(IPMachine machine) {
-		IResourceManagerRemoveMachineEvent e = 
-			new ResourceManagerRemoveMachineEvent(this, machine);
+	protected void fireRemoveMachines(Collection<IPMachine> machines) {
+		IRemoveMachineEvent e = 
+			new RemoveMachineEvent(this, machines);
 
-		for (Object listener : machineListeners.getListeners()) {
-			((IResourceManagerMachineListener)listener).handleEvent(e);
+		for (Object listener : childListeners.getListeners()) {
+			((IResourceManagerChildListener)listener).handleEvent(e);
 		}
 	}
 
 	/**
 	 * @param queue
 	 */
-	protected void fireRemoveQueue(IPQueue queue) {
-		IResourceManagerRemoveQueueEvent e = 
-			new ResourceManagerRemoveQueueEvent(this, queue);
+	protected void fireRemoveQueues(Collection<IPQueue> queues) {
+		IRemoveQueueEvent e = 
+			new RemoveQueueEvent(this, queues);
 
-		for (Object listener : queueListeners.getListeners()) {
-			((IResourceManagerQueueListener)listener).handleEvent(e);
+		for (Object listener : childListeners.getListeners()) {
+			((IResourceManagerChildListener)listener).handleEvent(e);
 		}
 	}
 
-    /**
+	/**
 	 * @param jobId
 	 * @return
 	 */
 	protected IPJobControl getJobControl(String jobId) {
 		return jobsById.get(jobId);
 	}
-
+	
 	/**
 	 * @param machineId
 	 * @return
@@ -836,7 +913,7 @@ public abstract class AbstractResourceManager extends PElement implements IResou
     protected IPNodeControl getNodeControl(String nodeId) {
 		return nodesById.get(nodeId);
 	}
-	
+
 	/**
 	 * @param processId
 	 * @return
@@ -864,10 +941,12 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	}
 
 	/**
-	 * @param queue
-	 * @param jobId
-	 * @param attrs
-	 * @return
+	 * Helper method to create a new job.
+	 * 
+	 * @param queue queue that this job belongs to
+	 * @param jobId job ID for the job
+	 * @param attrs initial attributes for the job
+	 * @return newly created job model element
 	 */
 	protected IPJobControl newJob(IPQueueControl queue, String jobId, AttributeManager attrs) {
 		IPJobControl job = new PJob(jobId, queue, attrs.getAttributes());
@@ -875,19 +954,23 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	}
 
 	/**
-	 * @param machineId
-	 * @param attrs
-	 * @return
+	 * Helper method to create a new machine.
+	 * 
+	 * @param machineId ID for the machine
+	 * @param attrs initial attributes for the machine
+	 * @return newly created machine model element
 	 */
 	protected IPMachineControl newMachine(String machineId, AttributeManager attrs) {
 		return new PMachine(machineId, this, attrs.getAttributes());
 	}
 
 	/**
-	 * @param machine
-	 * @param nodeId
-	 * @param attrs
-	 * @return
+	 * Helper method to create a new node
+	 * 
+	 * @param machine machine that this node belongs to
+	 * @param nodeId ID for the node
+	 * @param attrs initial attributes for the node
+	 * @return newly created node model element
 	 */
 	protected IPNodeControl newNode(IPMachineControl machine, String nodeId, AttributeManager attrs) {
 		IPNodeControl node = new PNode(nodeId, machine, attrs.getAttributes());
@@ -895,35 +978,23 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	}
 
 	/**
-	 * @param job
-	 * @param processId
-	 * @param attrs
-	 * @return
+	 * Helper method to create a new process
+	 * 
+	 * @param job job that this process belongs to
+	 * @param processId ID for the process
+	 * @param attrs initial attributes for the process
+	 * @return newly created process model element
 	 */
 	protected IPProcessControl newProcess(IPJobControl job, String processId, AttributeManager attrs) {
-		IPNodeControl node = null;
-		
-		/*
-		 * Find the node ID attribute. Remove it from the attribute manager as it will
-		 * be dealt with specially.
-		 */
-		StringAttribute attr = (StringAttribute) attrs.getAttribute(ProcessAttributes.getNodeIdAttributeDefinition());
-		if (attr != null) {
-			node = getNodeControl(((StringAttribute)attr).getValue());
-			attrs.removeAttribute(attr);
-		}
-		
-		IPProcessControl process = new PProcess(processId, job, attrs.getAttributes());
-		if (node != null) {
-			process.addNode(node);
-		}
-		return process;
+		return new PProcess(processId, job, attrs.getAttributes());
 	}
 
 	/**
-	 * @param queueId
-	 * @param attrs
-	 * @return
+	 * Helper method to create a new queue
+	 * 
+	 * @param queueId ID for the queue
+	 * @param attrs initial attributes for the queue
+	 * @return newly created queue model element
 	 */
 	protected IPQueueControl newQueue(String queueId, AttributeManager attrs) {
 		return new PQueue(queueId, this, attrs.getAttributes());
@@ -932,52 +1003,70 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 	/**
 	 * @param job
 	 */
-	protected synchronized void removeJob(IPJobControl job) {
-		job.getQueueControl().removeJob(job);
+	protected synchronized void removeJobs(IPQueueControl queue, Collection<IPJobControl> jobs) {
+		queue.removeJobs(jobs);
 	}
 
 	/**
 	 * @param machine
 	 */
-	protected synchronized void removeMachine(IPMachineControl machine) {
-		for (IPNodeControl node : machine.getNodeControls()) {
-			machine.removeNode(node);
+	protected synchronized void removeMachines(IResourceManager rm, 
+			Collection<IPMachineControl> machineControls) {
+		List<IPMachine> machines = new ArrayList<IPMachine>(machineControls.size());
+		
+		for (IPMachineControl machine : machineControls) {
+			machine.removeNodes(machine.getNodeControls());
+			machine.removeChildListener(machineNodeListener);
+			machinesById.remove(machine.getID());
+			machines.add(machine);
 		}
-		machine.removeElementListener(machineListener);
-		machine.removeChildListener(machineNodeListener);
-		machinesById.remove(machine.getID());
-		fireRemoveMachine(machine);
+		
+		fireRemoveMachines(machines);
 	}
 
 	/**
-	 * @param node
+	 * Remove nodes from the machine.
+	 * 
+	 * @param machine machine containing the nodes to remove
+	 * @param nodes nodes to remove from the model
 	 */
-	protected synchronized void removeNode(IPNodeControl node) {
-		node.getMachineControl().removeNode(node);
+	protected synchronized void removeNodes(IPMachineControl machine, 
+			Collection<IPNodeControl> nodes) {
+		machine.removeNodes(nodes);
 	}
 
 	/**
-	 * @param process
+	 * Remove processes from the job. This will also result in the processes being
+	 * removed from the associated nodes, as the nodes were registered as child
+	 * listeners on the job.
+	 * 
+	 * @param job job containing the processes to remove
+	 * @param processes processes to remove from the model
 	 */
-	protected synchronized void removeProcess(IPProcessControl process) {
-		process.getJobControl().removeProcess(process);
+	protected synchronized void removeProcesses(IPJobControl job,
+			Collection<IPProcessControl> processes) {
+		job.removeProcesses(processes);
 	}
 
 	/**
 	 * @param queue
 	 */
-	protected synchronized void removeQueue(IPQueueControl queue) {
-		for (IPJobControl job : queue.getJobControls()) {
-			queue.removeJob(job);
+	protected synchronized void removeQueues(IResourceManager rm, 
+			Collection<IPQueueControl> queueControls) {
+		List<IPQueue> queues = new ArrayList<IPQueue>(queueControls.size());
+		
+		for (IPQueueControl queue : queueControls) {
+			queue.removeJobs(queue.getJobControls());
+			queue.removeChildListener(queueJobListener);
+			queuesById.remove(queue.getID());
+			StringAttribute attr = queue.getAttribute(ElementAttributes.getNameAttributeDefinition());
+			if (attr != null) {
+				queuesByName.remove(attr.getValue());
+			}
+			queues.add(queue);
 		}
-		queue.removeElementListener(queueListener);
-		queue.removeChildListener(queueJobListener);
-		queuesById.remove(queue.getID());
-		StringAttribute attr = queue.getAttribute(ElementAttributes.getNameAttributeDefinition());
-		if (attr != null) {
-			queuesByName.remove(attr.getValue());
-		}
-		fireRemoveQueue(queue);
+		
+		fireRemoveQueues(queues);
 	}
 
 	/**
@@ -987,57 +1076,76 @@ public abstract class AbstractResourceManager extends PElement implements IResou
 		EnumeratedAttribute<State> stateAttr = getStateAttribute();
 		if (stateAttr.getValue() != state) {
 			stateAttr.setValue(state);
-			fireResourceManagerChanged(Arrays.asList(stateAttr));
+			Map<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>> map =
+				new HashMap<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>>();
+			map.put(stateAttr.getDefinition(), stateAttr);
+			fireResourceManagerChanged(map);
 		}
 	}
 
 	/**
-	 * @param job
-	 * @param attrs
-	 * @return
+	 * Update attributes on a collection of jobs.
+	 *  
+	 * @param queue parent of jobs
+	 * @param jobs jobs to update
+	 * @param attrs attributes to update
+	 * @return true if updated
 	 */
-	protected boolean updateJob(IPJobControl job, AttributeManager attrs) {
-		job.addAttributes(attrs.getAttributes());
+	protected boolean updateJobs(IPQueueControl queue, 
+			Collection<IPJobControl> jobs, AttributeManager attrs) {
+		queue.addJobAttributes(jobs, attrs.getAttributes());
 		return true;
 	}
 
 	/**
-	 * @param machine
-	 * @param attrs
-	 * @return
+	 * Update attributes on a collection of machines.
+	 * 
+	 * @param machines machines to update
+	 * @param attrs attributes to update
+	 * @return true if updated
 	 */
-	protected boolean updateMachine(IPMachineControl machine, AttributeManager attrs) {
-		machine.addAttributes(attrs.getAttributes());
-		return true;
-	}
-
-	/**
-	 * @param node
-	 * @param attrs
-	 * @return
-	 */
-	protected boolean updateNode(IPNodeControl node, AttributeManager attrs) {
-		node.addAttributes(attrs.getAttributes());
-		return true;
-	}
-
-	/**
-	 * @param process
-	 * @param attrs
-	 * @return
-	 */
-	protected boolean updateProcess(IPProcessControl process, AttributeManager attrs) {
-		process.addAttributes(attrs.getAttributes());
+	protected boolean updateMachines(Collection<IPMachineControl> machines, AttributeManager attrs) {
+		addMachineAttributes(machines, attrs.getAttributes());
 		return true;
 	}
 	
 	/**
-	 * @param queue
-	 * @param attrs
-	 * @return
+	 * Update attributes on a collection of nodes.
+	 * 
+	 * @param machine parent of nodes
+	 * @param nodes collection of nodes
+	 * @param attrs attributes to update
+	 * @return true if updated
 	 */
-	protected boolean updateQueue(IPQueueControl queue, AttributeManager attrs) {
-		queue.addAttributes(attrs.getAttributes());
+	protected boolean updateNodes(IPMachineControl machine, 
+			Collection<IPNodeControl> nodes, AttributeManager attrs) {
+		machine.addNodeAttributes(nodes, attrs.getAttributes());
+		return true;
+	}
+
+	/**
+	 * Update attributes on a collection of processes.
+	 * 
+	 * @param job parent of processes
+	 * @param processes collection of processes
+	 * @param attrs attributes to update
+	 * @return true if updated
+	 */
+	protected boolean updateProcesses(IPJobControl job, 
+			Collection<IPProcessControl> processes, AttributeManager attrs) {
+		job.addProcessAttributes(processes, attrs.getAttributes());
+		return true;
+	}
+
+	/**
+	 * Update attributes on a collection of queues.
+	 * 
+	 * @param queues queues to update
+	 * @param attrs attributes to update
+	 * @return true if updated
+	 */
+	protected boolean updateQueues(Collection<IPQueueControl> queues, AttributeManager attrs) {
+		addQueueAttributes(queues, attrs.getAttributes());
 		return true;
 	}
 }

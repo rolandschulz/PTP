@@ -16,11 +16,29 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.elementcontrols;
 
+import java.util.Collection;
+
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 
 public interface IResourceManagerControl extends IResourceManager, IPElementControl {
+	/**
+	 * Add attributes to a collection of machines.
+	 * 
+	 * @param machines collection of IPMachineControl
+	 * @param attrs array of attributes to add to each machine
+	 */
+	public void addMachineAttributes(Collection<IPMachineControl> machines, IAttribute<?,?,?>[] attrs);
+	
+	/**
+	 * Add attributes to a collection of queues.
+	 * 
+	 * @param queues collection of IPQueueControl
+	 * @param attrs array of attributes to add to each queue
+	 */
+	public void addQueueAttributes(Collection<IPQueueControl> queues, IAttribute<?,?,?>[] attrs);
 
 	/**
 	 * Disable event processing. The RM state will be set to SUSPENDED.
@@ -53,14 +71,14 @@ public interface IResourceManagerControl extends IResourceManager, IPElementCont
 	 * 
 	 * @return IPMachineControl interfaces
 	 */
-	public IPMachineControl[] getMachineControls();
+	public Collection<IPMachineControl> getMachineControls();
 	
 	/**
 	 * Get the IPQueueControl interfaces for queues that this resource manager knows about.
 	 * 
 	 * @return IPQueueControl interfaces
 	 */
-	public IPQueueControl[] getQueueControls();
+	public Collection<IPQueueControl> getQueueControls();
 	
 	/**
 	 * Set the configuration for this resource manager. This will replace the existing
