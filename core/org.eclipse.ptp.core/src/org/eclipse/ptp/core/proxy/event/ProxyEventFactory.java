@@ -15,10 +15,11 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.ptp.internal.core.proxy.event;
+package org.eclipse.ptp.core.proxy.event;
 
-import org.eclipse.ptp.core.proxy.event.AbstractProxyEventFactory;
-import org.eclipse.ptp.core.proxy.event.IProxyEvent;
+import org.eclipse.ptp.internal.core.proxy.event.ProxyErrorEvent;
+import org.eclipse.ptp.internal.core.proxy.event.ProxyMessageEvent;
+import org.eclipse.ptp.internal.core.proxy.event.ProxyOKEvent;
 
 public class ProxyEventFactory extends AbstractProxyEventFactory {
 	public IProxyEvent toEvent(int type, int transID, String[] args) {
