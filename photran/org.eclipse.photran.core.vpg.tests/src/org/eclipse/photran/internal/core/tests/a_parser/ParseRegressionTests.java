@@ -11,6 +11,6 @@ public class ParseRegressionTests
 {
     public static Test suite() throws FileNotFoundException, IOException
     {
-        return new ParserTestSuite("reg_tests", false, true);
+        return new ParserTestSuite("reg_tests", false, true) {};
     }
 }

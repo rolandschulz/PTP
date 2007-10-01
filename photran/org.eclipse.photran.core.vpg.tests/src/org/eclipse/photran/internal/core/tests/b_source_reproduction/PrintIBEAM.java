@@ -11,6 +11,6 @@ public class PrintIBEAM
 {
     public static Test suite() throws FileNotFoundException, IOException
     {
-        return new SourceReproductionTestSuite("confidential-ibeam-object_cpp_mod", false, false);
+        return new SourceReproductionTestSuite("confidential-ibeam-object_cpp_mod", false, false) {};
     }
 }

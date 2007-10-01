@@ -11,6 +11,6 @@ public class ParseIBEAM
 {
     public static Test suite() throws FileNotFoundException, IOException
     {
-        return new ParserTestSuite("confidential-ibeam-object_cpp_mod", false, false);
+        return new ParserTestSuite("confidential-ibeam-object_cpp_mod", false, false) {};
     }
 }

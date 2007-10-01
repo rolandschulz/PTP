@@ -11,6 +11,6 @@ public class ParseSamples
 {
     public static Test suite() throws FileNotFoundException, IOException
     {
-        return new ParserTestSuite("../../org.eclipse.photran-samples", false, true);
+        return new ParserTestSuite("../../org.eclipse.photran-samples", false, true) {};
     }
 }

@@ -11,6 +11,6 @@ public class ParseManagedBuildFiles
 {
     public static Test suite() throws FileNotFoundException, IOException
     {
-        return new ParserTestSuite("managed-build", false, true);
+        return new ParserTestSuite("managed-build", false, true) {};
     }
 }

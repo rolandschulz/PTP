@@ -11,6 +11,6 @@ public class ParseConfidentialFreeFormFiles
 {
     public static Test suite() throws FileNotFoundException, IOException
     {
-        return new ParserTestSuite("confidential-walt-free", false, false);
+        return new ParserTestSuite("confidential-walt-free", false, false) {};
     }
 }

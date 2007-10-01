@@ -11,6 +11,6 @@ public class PrintTestFiles
 {
     public static Test suite() throws FileNotFoundException, IOException
     {
-        return new SourceReproductionTestSuite("testFiles", false, true);
+        return new SourceReproductionTestSuite("testFiles", false, true) {};
     }
 }

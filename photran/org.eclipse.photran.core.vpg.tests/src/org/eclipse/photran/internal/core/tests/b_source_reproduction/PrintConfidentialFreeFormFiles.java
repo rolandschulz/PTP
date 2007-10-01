@@ -11,6 +11,6 @@ public class PrintConfidentialFreeFormFiles
 {
     public static Test suite() throws FileNotFoundException, IOException
     {
-        return new SourceReproductionTestSuite("confidential-walt-free", false, false);
+        return new SourceReproductionTestSuite("confidential-walt-free", false, false) {};
     }
 }

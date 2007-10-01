@@ -11,6 +11,6 @@ public class PrintManagedBuildFiles
 {
     public static Test suite() throws FileNotFoundException, IOException
     {
-        return new SourceReproductionTestSuite("managed-build", false, true);
+        return new SourceReproductionTestSuite("managed-build", false, true) {};
     }
 }

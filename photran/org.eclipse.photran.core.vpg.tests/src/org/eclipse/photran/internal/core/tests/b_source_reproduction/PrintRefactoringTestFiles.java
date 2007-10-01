@@ -11,6 +11,6 @@ public class PrintRefactoringTestFiles
 {
     public static Test suite() throws FileNotFoundException, IOException
     {
-        return new SourceReproductionTestSuite("refactoring_test_files", false, true);
+        return new SourceReproductionTestSuite("refactoring_test_files", false, true) {};
     }
 }

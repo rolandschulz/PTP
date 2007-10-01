@@ -7,7 +7,7 @@ import junit.framework.TestSuite;
 
 import org.eclipse.photran.core.vpg.util.LineCol;
 
-abstract class RenameTestSuite extends TestSuite
+public abstract class RenameTestSuite extends TestSuite
 {
     ///////////////////////////////////////////////////////////////////////////
     //

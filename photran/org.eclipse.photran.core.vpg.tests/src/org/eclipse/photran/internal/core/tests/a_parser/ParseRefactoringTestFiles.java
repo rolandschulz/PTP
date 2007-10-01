@@ -11,6 +11,6 @@ public class ParseRefactoringTestFiles
 {
     public static Test suite() throws FileNotFoundException, IOException
     {
-        return new ParserTestSuite("refactoring_test_files", false, true);
+        return new ParserTestSuite("refactoring_test_files", false, true) {};
     }
 }

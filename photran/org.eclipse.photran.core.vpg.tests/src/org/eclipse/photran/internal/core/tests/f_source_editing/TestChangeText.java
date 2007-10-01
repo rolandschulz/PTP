@@ -13,7 +13,7 @@ public class TestChangeText extends AbstractSourceEditorTestCase
     public void testChangeProggie() throws Exception
     {
         ASTExecutableProgramNode ast = load("hello-1-initial.f90");
-        ASTProgramUnitNode programUnit1 = ast.getProgramUnit(1);
+        ASTProgramUnitNode programUnit1 = ast.getProgramUnit(0);
         ASTMainProgramNode mainProgram = programUnit1.getMainProgram();
         ASTProgramStmtNode programStmt = mainProgram.getProgramStmt();
         ASTProgramNameNode programName = programStmt.getProgramName();

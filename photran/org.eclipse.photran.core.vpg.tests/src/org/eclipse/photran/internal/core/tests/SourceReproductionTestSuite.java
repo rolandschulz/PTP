@@ -4,8 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-
-public class SourceReproductionTestSuite extends AbstractParserTestSuite
+public abstract class SourceReproductionTestSuite extends AbstractParserTestSuite
 {
     public SourceReproductionTestSuite(String directorySuffix, boolean isFixedForm, boolean mustExist) throws FileNotFoundException, IOException
     {

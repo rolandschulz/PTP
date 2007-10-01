@@ -11,6 +11,6 @@ public class PrintRegressionTests
 {
     public static Test suite() throws FileNotFoundException, IOException
     {
-        return new SourceReproductionTestSuite("reg_tests", false, true);
+        return new SourceReproductionTestSuite("reg_tests", false, true) {};
     }
 }

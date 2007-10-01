@@ -11,6 +11,6 @@ public class PrintSamples
 {
     public static Test suite() throws FileNotFoundException, IOException
     {
-        return new SourceReproductionTestSuite("../../org.eclipse.photran-samples", false, false);
+        return new SourceReproductionTestSuite("../../org.eclipse.photran-samples", false, false) {};
     }
 }

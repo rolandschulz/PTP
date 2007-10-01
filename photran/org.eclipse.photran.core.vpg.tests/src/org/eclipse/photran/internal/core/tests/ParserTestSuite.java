@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-public class ParserTestSuite extends AbstractParserTestSuite
+public abstract class ParserTestSuite extends AbstractParserTestSuite
 {
     public ParserTestSuite(String directorySuffix, boolean isFixedForm, boolean mustExist) throws FileNotFoundException, IOException
     {
@@ -22,5 +22,4 @@ public class ParserTestSuite extends AbstractParserTestSuite
     {
         return new ParserTestCase(file, isFixedForm, fileDescription);
     }
-
 }
