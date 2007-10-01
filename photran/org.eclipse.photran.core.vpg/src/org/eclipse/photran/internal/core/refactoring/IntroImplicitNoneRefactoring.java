@@ -154,7 +154,7 @@ public class IntroImplicitNoneRefactoring extends FortranRefactoring
         final ArrayList<Definition> definitions = new ArrayList<Definition>(16);
         
         for (Definition def : scope.getAllDefinitions())
-        	if (def.isImplicit())
+        	if (def != null && def.isImplicit())
         		definitions.add(def);
         
         StringBuilder newStmts = new StringBuilder();
