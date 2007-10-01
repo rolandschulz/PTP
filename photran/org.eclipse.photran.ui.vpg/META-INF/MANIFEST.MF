@@ -18,3 +18,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ltk.ui.refactoring,
  org.eclipse.photran.core
 Eclipse-LazyStart: true
+Export-Package: org.eclipse.photran.internal.refactoring.ui,
+ org.eclipse.photran.internal.ui.actions,
+ org.eclipse.photran.internal.ui.properties,
+ org.eclipse.photran.ui.vpg
