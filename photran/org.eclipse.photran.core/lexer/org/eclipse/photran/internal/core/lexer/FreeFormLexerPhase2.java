@@ -399,7 +399,7 @@ public class FreeFormLexerPhase2 implements ILexer
         // R746
         addRules(Terminal.T_WHERE,
                 new StmtMustStartWith(Terminal.T_END),
-                new MustBePrecededBy(Terminal.T_END));
+                new MustBePrecededByOneOf(Terminal.T_END, Terminal.T_ELSE));
         
         // R748
         addRules(Terminal.T_FORALL,
