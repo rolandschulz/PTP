@@ -17,36 +17,20 @@
  * LA-CC 04-115
  *******************************************************************************/
 
-package org.eclipse.ptp.rtsystem;
+package org.eclipse.ptp.internal.rtsystem.events;
 
-import org.eclipse.core.runtime.CoreException;
+import org.eclipse.ptp.core.attributes.IAttributeDefinition;
+import org.eclipse.ptp.rtsystem.events.IRuntimeAttributeDefinitionEvent;
 
-public interface IRuntimeSystem extends IControlSystem, IMonitoringSystem {	
+public class RuntimeAttributeDefinitionEvent implements IRuntimeAttributeDefinitionEvent {
 
-	/**
-	 * Called to start the runtime system.
-	 * @throws CoreException
-	 */
-	public boolean startup() throws CoreException;
+	private IAttributeDefinition<?,?,?>[] attributeDefs;
 	
-	/**
-	 * Called when the control system is being shutdown.
-	 */
-	public void shutdown();
-	
-	/**
-	 * Adds a listener to the runtime system.  The runtime system may fire events
-	 * and will use this list of listeners to determine who to send these events to.
-	 * 
-	 * @param listener someone that wants to listener to runtime events
-	 */
-	public void addRuntimeEventListener(IRuntimeEventListener listener);
+	public RuntimeAttributeDefinitionEvent(IAttributeDefinition<?,?,?>[] defs) {
+		attributeDefs = defs;
+	}
 
-	/**
-	 * Removes a listener from the list of things listening to runtime events on
-	 * this runtime system.
-	 * 
-	 * @param listener the listener to remove
-	 */
-	public void removeRuntimeEventListener(IRuntimeEventListener listener);
+	public IAttributeDefinition<?,?,?>[] getDefinitions() {
+		return attributeDefs;
+	}
 }

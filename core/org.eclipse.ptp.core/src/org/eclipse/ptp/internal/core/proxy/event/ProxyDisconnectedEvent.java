@@ -17,36 +17,19 @@
  * LA-CC 04-115
  *******************************************************************************/
 
-package org.eclipse.ptp.rtsystem;
+package org.eclipse.ptp.internal.core.proxy.event;
 
-import org.eclipse.core.runtime.CoreException;
+import org.eclipse.ptp.core.proxy.event.AbstractProxyEvent;
+import org.eclipse.ptp.core.proxy.event.IProxyDisconnectedEvent;
 
-public interface IRuntimeSystem extends IControlSystem, IMonitoringSystem {	
-
-	/**
-	 * Called to start the runtime system.
-	 * @throws CoreException
-	 */
-	public boolean startup() throws CoreException;
+public class ProxyDisconnectedEvent extends AbstractProxyEvent implements IProxyDisconnectedEvent {
 	
-	/**
-	 * Called when the control system is being shutdown.
-	 */
-	public void shutdown();
+	private boolean error = false;
 	
-	/**
-	 * Adds a listener to the runtime system.  The runtime system may fire events
-	 * and will use this list of listeners to determine who to send these events to.
-	 * 
-	 * @param listener someone that wants to listener to runtime events
-	 */
-	public void addRuntimeEventListener(IRuntimeEventListener listener);
-
-	/**
-	 * Removes a listener from the list of things listening to runtime events on
-	 * this runtime system.
-	 * 
-	 * @param listener the listener to remove
-	 */
-	public void removeRuntimeEventListener(IRuntimeEventListener listener);
+	public ProxyDisconnectedEvent(boolean error) {
+		super(EVENT_DISCONNECTED, 0, null);
+		this.error = error;
+	}
+	
+	public boolean wasError() { return error; }
 }

@@ -25,14 +25,19 @@ import org.eclipse.core.runtime.CoreException;
  * A Monitoring System is a portion of a runtime system that handles status and information about
  * the system (generally things outside the control of the runtime system).  This includes
  * what machines are available, the nodes for those machines, the status of those nodes, etc.
- * Monitoring Systems also can fire events, specifically {@link RuntimeEvent}s.
  * 
  * @author Nathan DeBardeleben
  *
  */
 public interface IMonitoringSystem {
 
+	/**
+	 * @throws CoreException
+	 */
 	public void startEvents() throws CoreException;
 	
+	/**
+	 * @throws CoreException
+	 */
 	public void stopEvents() throws CoreException;
 }
