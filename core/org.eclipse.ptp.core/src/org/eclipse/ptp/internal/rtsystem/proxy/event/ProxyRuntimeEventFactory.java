@@ -18,7 +18,7 @@
 package org.eclipse.ptp.internal.rtsystem.proxy.event;
 
 import org.eclipse.ptp.core.proxy.event.IProxyEvent;
-import org.eclipse.ptp.internal.core.proxy.event.ProxyEventFactory;
+import org.eclipse.ptp.core.proxy.event.ProxyEventFactory;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEvent;
 
 public class ProxyRuntimeEventFactory extends ProxyEventFactory {
