@@ -446,7 +446,7 @@ public class SalesScanKeywordRule extends WordRule implements IRule
             if (!openContextComma && !openContextEquals)
                 return !lineContainsColonColon;
             else if (openContextEquals && !openContextComma)
-                return false;
+                return match("if", firstTokenPos) || match("where", firstTokenPos);
             else if (openContextComma)
                 return true;
             else if (letterFollowsParenthetical)
