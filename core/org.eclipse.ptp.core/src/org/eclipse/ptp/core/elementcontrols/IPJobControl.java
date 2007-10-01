@@ -18,15 +18,46 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.elementcontrols;
 
+import java.util.Collection;
+
+import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.elements.IPJob;
 
 public interface IPJobControl extends IPElementControl, IPJob {
 
-	public void addProcess(IPProcessControl p);
-	
-	public IPProcessControl[] getProcessControls();
+	/**
+	 * Add attributes to a collection of processes.
+	 * 
+	 * @param processes collection of IPProcessControl
+	 * @param attrs array of attributes to add to each process
+	 */
+	public void addProcessAttributes(Collection<IPProcessControl> processes, IAttribute<?,?,?>[] attrs);
 
+	/**
+	 * Add the collection of processes to the job.
+	 * 
+	 * @param processes collection of IPProcessControls
+	 */
+	public void addProcesses(Collection<IPProcessControl> processes);
+	
+	/**
+	 * Get all the processes known by this job
+	 * 
+	 * @return collection of processes
+	 */
+	public Collection<IPProcessControl> getProcessControls();
+
+	/**
+	 * Get the parent of this job
+	 * 
+	 * @return parent queue
+	 */
 	public IPQueueControl getQueueControl();
 	
-	public void removeProcess(IPProcessControl process);
+	/**
+	 * Remove processes from the job
+	 * 
+	 * @param processes to remove
+	 */
+	public void removeProcesses(Collection<IPProcessControl> processes);
 }

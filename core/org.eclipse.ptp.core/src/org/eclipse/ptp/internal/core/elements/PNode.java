@@ -18,38 +18,45 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.core.elements;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute;
+import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IntegerAttribute;
 import org.eclipse.ptp.core.elementcontrols.IPElementControl;
 import org.eclipse.ptp.core.elementcontrols.IPMachineControl;
 import org.eclipse.ptp.core.elementcontrols.IPNodeControl;
 import org.eclipse.ptp.core.elementcontrols.IPProcessControl;
+import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.attributes.NodeAttributes;
 import org.eclipse.ptp.core.elements.attributes.NodeAttributes.State;
-import org.eclipse.ptp.core.elements.events.INodeChangedEvent;
-import org.eclipse.ptp.core.elements.events.INodeChangedProcessEvent;
-import org.eclipse.ptp.core.elements.events.INodeNewProcessEvent;
-import org.eclipse.ptp.core.elements.events.INodeRemoveProcessEvent;
-import org.eclipse.ptp.core.elements.events.IProcessChangedEvent;
+import org.eclipse.ptp.core.elements.events.IChangedProcessEvent;
+import org.eclipse.ptp.core.elements.events.INewProcessEvent;
+import org.eclipse.ptp.core.elements.events.INodeChangeEvent;
+import org.eclipse.ptp.core.elements.events.IRemoveProcessEvent;
+import org.eclipse.ptp.core.elements.listeners.IJobChildListener;
+import org.eclipse.ptp.core.elements.listeners.INodeChildListener;
 import org.eclipse.ptp.core.elements.listeners.INodeListener;
-import org.eclipse.ptp.core.elements.listeners.INodeProcessListener;
-import org.eclipse.ptp.core.elements.listeners.IProcessListener;
-import org.eclipse.ptp.internal.core.elements.events.NodeChangedEvent;
-import org.eclipse.ptp.internal.core.elements.events.NodeChangedProcessEvent;
-import org.eclipse.ptp.internal.core.elements.events.NodeNewProcessEvent;
-import org.eclipse.ptp.internal.core.elements.events.NodeRemoveProcessEvent;
+import org.eclipse.ptp.internal.core.elements.events.ChangedProcessEvent;
+import org.eclipse.ptp.internal.core.elements.events.NewProcessEvent;
+import org.eclipse.ptp.internal.core.elements.events.NodeChangeEvent;
+import org.eclipse.ptp.internal.core.elements.events.RemoveProcessEvent;
 
-public class PNode extends Parent implements IPNodeControl, IProcessListener {
+public class PNode extends Parent implements IPNodeControl, IJobChildListener {
+	
 	private final ListenerList elementListeners = new ListenerList();
 
 	private final ListenerList childListeners = new ListenerList();
+
 	public PNode(String id, IPMachineControl mac, IAttribute<?,?,?>[] attrs) {
 		super(id, mac, P_NODE, attrs);
 		/*
@@ -65,10 +72,9 @@ public class PNode extends Parent implements IPNodeControl, IProcessListener {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.IPNode#addChildListener(org.eclipse.ptp.core.elements.listeners.INodeProcessListener)
 	 */
-	public void addChildListener(INodeProcessListener listener) {
+	public void addChildListener(INodeChildListener listener) {
 		childListeners.add(listener);
 	}
-	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.IPNode#addElementListener(org.eclipse.ptp.core.elements.listeners.INodeListener)
 	 */
@@ -76,12 +82,49 @@ public class PNode extends Parent implements IPNodeControl, IProcessListener {
 		elementListeners.add(listener);
 	}
 	
-	public synchronized void addProcess(IPProcessControl process) {
-		addChild(process);
-		fireNewProcess(process);
-		process.addElementListener(this);
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elementcontrols.IPNodeControl#addProcess(org.eclipse.ptp.core.elementcontrols.IPProcessControl)
+	 */
+	public synchronized void addProcesses(Collection<IPProcessControl> processControls) {
+		List<IPProcess> procs = new ArrayList<IPProcess>(processControls.size());
+		Set<IPJob> jobs = new HashSet<IPJob>();
+		
+		for (IPProcessControl process : processControls) {
+			/*
+			 * Add the process as a child of the node
+			 */
+			addChild(process);
+			
+			/*
+			 * Add this node to the process
+			 */
+			process.addNode(this);
+			
+			/*
+			 * Find the set of jobs that started these processes
+			 */
+			jobs.add(process.getJob());
+			
+			/*
+			 * Add the process to the event list
+			 */
+			procs.add(process);
+		}
+		
+		/*
+		 * Add this node to the listeners for job child events. This is so
+		 * we can forward IChangedProcess events to the INodeChildListers.
+		 */
+		for (IPJob job : jobs) {
+			job.addChildListener(this);
+		}
+		
+		/*
+		 * Fire the INewProcess event for these processes
+		 */
+		fireNewProcesses(procs);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elementcontrols.IPNodeControl#getMachineControl()
 	 */
@@ -89,6 +132,9 @@ public class PNode extends Parent implements IPNodeControl, IProcessListener {
 		return getMachineControl();
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elementcontrols.IPNodeControl#getMachineControl()
+	 */
 	public IPMachineControl getMachineControl() {
 		IPElementControl current = this;
 		do {
@@ -97,7 +143,10 @@ public class PNode extends Parent implements IPNodeControl, IProcessListener {
 		} while ((current = current.getParent()) != null);
 		return null;
 	}
-
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPNode#getNodeNumber()
+	 */
 	public String getNodeNumber() {
 		IntegerAttribute num = getAttribute(NodeAttributes.getNumberAttributeDefinition());
 		if (num != null) {
@@ -105,13 +154,24 @@ public class PNode extends Parent implements IPNodeControl, IProcessListener {
 		}
 		return "";
 	}
-
-	public synchronized IPProcessControl[] getProcessControls() {
-		return (IPProcessControl[]) getCollection().toArray(new IPProcessControl[size()]);
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elementcontrols.IPNodeControl#getProcessControls()
+	 */
+	public synchronized Collection<IPProcessControl> getProcessControls() {
+		List<IPProcessControl> processes =
+			new ArrayList<IPProcessControl>(getCollection().size());
+		for (IPElementControl element : getCollection()) {
+			processes.add((IPProcessControl)element);
+		}
+		return processes;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPNode#getProcesses()
+	 */
 	public IPProcess[] getProcesses() {
-		return getProcessControls();
+		return getProcessControls().toArray(new IPProcess[getProcessControls().size()]);
 	}
 
 	/* (non-Javadoc)
@@ -122,21 +182,34 @@ public class PNode extends Parent implements IPNodeControl, IProcessListener {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.listeners.IProcessListener#handleEvent(org.eclipse.ptp.core.elements.events.IProcessChangedEvent)
+	 * @see org.eclipse.ptp.core.elements.listeners.IJobChildListener#handleEvent(org.eclipse.ptp.core.elements.events.IChangedProcessEvent)
 	 */
-	public void handleEvent(IProcessChangedEvent e) {
-		INodeChangedProcessEvent ne = 
-			new NodeChangedProcessEvent(this, e.getSource(), e.getAttributes());
-	
-		for (Object listener : childListeners.getListeners()) {
-			((INodeProcessListener)listener).handleEvent(ne);
+	public void handleEvent(IChangedProcessEvent e) {
+		fireChangedProcesses(e.getProcesses());
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.listeners.IJobChildListener#handleEvent(org.eclipse.ptp.core.elements.events.IRemoveProcessEvent)
+	 */
+	public void handleEvent(IRemoveProcessEvent e) {
+		for (IPProcess process : e.getProcesses()) {
+			removeChild((IPProcessControl)process);
 		}
+		
+		fireRemoveProcesses(e.getProcesses());
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.listeners.IJobChildListener#handleEvent(org.eclipse.ptp.core.elements.events.INewProcessEvent)
+	 */
+	public void handleEvent(INewProcessEvent e) {
+		// TODO Auto-generated method stub
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.IPNode#removeChildListener(org.eclipse.ptp.core.elements.listeners.INodeProcessListener)
 	 */
-	public void removeChildListener(INodeProcessListener listener) {
+	public void removeChildListener(INodeChildListener listener) {
 		childListeners.remove(listener);
 	}
 
@@ -147,44 +220,80 @@ public class PNode extends Parent implements IPNodeControl, IProcessListener {
 		elementListeners.remove(listener);
 	}
 
-	public synchronized void removeProcess(IPProcessControl process) {
-		process.removeElementListener(this);
-		removeChild(process);
-		fireRemoveProcess(process);
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elementcontrols.IPNodeControl#removeProcess(org.eclipse.ptp.core.elementcontrols.IPProcessControl)
+	 */
+	public synchronized void removeProcesses(Collection<IPProcessControl> processControls) {
+		List<IPProcess> processes = new ArrayList<IPProcess>(processControls.size());
+		
+		for (IPProcessControl process : processControls) {
+			removeChild(process);
+			process.removeNode();
+			processes.add(process);
+		}
+		
+		fireRemoveProcesses(processes);
 	}
 
-	private void fireChangedNode(Collection<? extends IAttribute<?, ?, ?>> attrs) {
-		INodeChangedEvent e = 
-			new NodeChangedEvent(this, attrs);
+	/**
+	 * Notify listeners when a node attribute has changed.
+	 * 
+	 * @param attrs
+	 */
+	private void fireChangedNode(Map<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>> attrs) {
+		INodeChangeEvent e = 
+			new NodeChangeEvent(this, attrs);
 		
 		for (Object listener : elementListeners.getListeners()) {
 			((INodeListener)listener).handleEvent(e);
 		}
 	}
-
-	private void fireNewProcess(IPProcess process) {
-		INodeNewProcessEvent e = 
-			new NodeNewProcessEvent(this, process);
+	
+	/**
+	 * Send INewProcessEvent to registered listeners
+	 * 
+	 * @param process
+	 */
+	private void fireNewProcesses(Collection<IPProcess> processes) {
+		INewProcessEvent e = 
+			new NewProcessEvent(this, processes);
 		
 		for (Object listener : childListeners.getListeners()) {
-			((INodeProcessListener)listener).handleEvent(e);
+			((INodeChildListener)listener).handleEvent(e);
 		}
 	}
 
-	private void fireRemoveProcess(IPProcess process) {
-		INodeRemoveProcessEvent e = 
-			new NodeRemoveProcessEvent(this, process);
+	/**
+	 * @param process
+	 */
+	private void fireRemoveProcesses(Collection<IPProcess> processes) {
+		IRemoveProcessEvent e = 
+			new RemoveProcessEvent(this, processes);
 		
 		for (Object listener : childListeners.getListeners()) {
-			((INodeProcessListener)listener).handleEvent(e);
+			((INodeChildListener)listener).handleEvent(e);
 		}
 	}
 
+	/**
+	 * Send IChangedProcessEvent to registered listeners
+	 * 
+	 * @param nodes
+	 */
+	private void fireChangedProcesses(Collection<IPProcess> processes) {
+		IChangedProcessEvent e = 
+			new ChangedProcessEvent(this, processes);
+		
+		for (Object listener : childListeners.getListeners()) {
+			((INodeChildListener)listener).handleEvent(e);
+		}
+	}
+	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.internal.core.elements.PElement#doAddAttributeHook(java.util.List)
+	 * @see org.eclipse.ptp.internal.core.elements.PElement#doAddAttributeHook(java.util.Map)
 	 */
 	@Override
-	protected void doAddAttributeHook(List<? extends IAttribute<?,?,?>> attrs) {
+	protected void doAddAttributeHook(Map<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>> attrs) {
 		fireChangedNode(attrs);
 	}
 

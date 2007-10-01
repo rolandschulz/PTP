@@ -37,7 +37,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPProcess;
-import org.eclipse.ptp.core.elements.events.IQueueNewJobEvent;
+import org.eclipse.ptp.core.elements.events.INewJobEvent;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
@@ -615,9 +615,11 @@ public class ParallelDebugView extends ParallelJobsView {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.listeners.IQueueJobListener#handleEvent(org.eclipse.ptp.core.elements.events.IQueueNewJobEvent)
 	 */
-	public void handleEvent(final IQueueNewJobEvent e) {
-		if (e.getJob().isDebug()) {
-			changeJobRefresh(e.getJob());
+	public void handleEvent(final INewJobEvent e) {
+		for (IPJob job : e.getJobs()) {
+			if (job.isDebug()) { 
+				changeJobRefresh(job);
+			}
 		}
 	}
 }

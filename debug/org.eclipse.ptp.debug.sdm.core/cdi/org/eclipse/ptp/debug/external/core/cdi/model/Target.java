@@ -402,7 +402,7 @@ public class Target extends SessionObject implements IPCDITarget {
 		if (state == State.RUNNING) {
 			throw new PCDIException("The process is already running");
 		}
-		else if (state == State.STOPPED) {
+		else if (state == State.SUSPENDED) {
 			if (passSignal) {
 				signal();
 			} else {
@@ -492,7 +492,7 @@ public class Target extends SessionObject implements IPCDITarget {
 		return isTerminated();
 	}
 	public boolean isSuspended() {
-		return getPProcess().getState() == State.STOPPED;
+		return getPProcess().getState() == State.SUSPENDED;
 	}
 	public boolean isRunning() {
 		return getPProcess().getState() == State.RUNNING;

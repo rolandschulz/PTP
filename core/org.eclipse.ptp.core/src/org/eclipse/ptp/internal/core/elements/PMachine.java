@@ -18,12 +18,15 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.core.elements;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute;
+import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.attributes.IntegerAttribute;
 import org.eclipse.ptp.core.elementcontrols.IPElementControl;
@@ -34,20 +37,18 @@ import org.eclipse.ptp.core.elements.IPNode;
 import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.MachineAttributes;
 import org.eclipse.ptp.core.elements.attributes.MachineAttributes.State;
-import org.eclipse.ptp.core.elements.events.IMachineChangedEvent;
-import org.eclipse.ptp.core.elements.events.IMachineChangedNodeEvent;
-import org.eclipse.ptp.core.elements.events.IMachineNewNodeEvent;
-import org.eclipse.ptp.core.elements.events.IMachineRemoveNodeEvent;
-import org.eclipse.ptp.core.elements.events.INodeChangedEvent;
+import org.eclipse.ptp.core.elements.events.IChangedNodeEvent;
+import org.eclipse.ptp.core.elements.events.IMachineChangeEvent;
+import org.eclipse.ptp.core.elements.events.IRemoveNodeEvent;
+import org.eclipse.ptp.core.elements.events.INewNodeEvent;
 import org.eclipse.ptp.core.elements.listeners.IMachineListener;
-import org.eclipse.ptp.core.elements.listeners.IMachineNodeListener;
-import org.eclipse.ptp.core.elements.listeners.INodeListener;
-import org.eclipse.ptp.internal.core.elements.events.MachineChangedEvent;
-import org.eclipse.ptp.internal.core.elements.events.MachineChangedNodeEvent;
-import org.eclipse.ptp.internal.core.elements.events.MachineNewNodeEvent;
-import org.eclipse.ptp.internal.core.elements.events.MachineRemoveNodeEvent;
+import org.eclipse.ptp.core.elements.listeners.IMachineChildListener;
+import org.eclipse.ptp.internal.core.elements.events.ChangedNodeEvent;
+import org.eclipse.ptp.internal.core.elements.events.MachineChangeEvent;
+import org.eclipse.ptp.internal.core.elements.events.RemoveNodeEvent;
+import org.eclipse.ptp.internal.core.elements.events.NewNodeEvent;
 
-public class PMachine extends Parent implements IPMachineControl, INodeListener {
+public class PMachine extends Parent implements IPMachineControl {
 	private final ListenerList elementListeners = new ListenerList();
 
 	private final ListenerList childListeners = new ListenerList();
@@ -78,7 +79,7 @@ public class PMachine extends Parent implements IPMachineControl, INodeListener 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.IPMachine#addChildListener(org.eclipse.ptp.core.elements.listeners.IMachineNodeListener)
 	 */
-	public void addChildListener(IMachineNodeListener listener) {
+	public void addChildListener(IMachineChildListener listener) {
 		childListeners.add(listener);
 	}
 
@@ -89,25 +90,50 @@ public class PMachine extends Parent implements IPMachineControl, INodeListener 
 		elementListeners.add(listener);
 	}
 
-	public synchronized void addNode(IPNodeControl node) {
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elementcontrols.IPMachineControl#addNodeAttributes(java.util.Collection, org.eclipse.ptp.core.attributes.IAttribute<?,?,?>[])
+	 */
+	public void addNodeAttributes(Collection<IPNodeControl> nodeControls,
+			IAttribute<?, ?, ?>[] attrs) {
+		List<IPNode> nodes = new ArrayList<IPNode>(nodeControls.size());
+		for (IPNodeControl node : nodeControls) {
+			node.addAttributes(attrs);
+		}
+		fireChangedNodes(nodes);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elementcontrols.IPMachineControl#addNodes(java.util.Collection)
+	 */
+	public synchronized void addNodes(Collection<IPNodeControl> nodeControls) {
 		assert(getAttribute(MachineAttributes.getNumNodesAttributeDefinition()).getValue().equals(getNodes().length));
-	    addChild(node);
+		List<IPNode> nodes = new ArrayList<IPNode>(nodeControls.size());
+		
+		for (IPNodeControl node : nodeControls) {
+			addChild(node);
+			nodes.add(node);
+		}
+		
 		try {
 			getAttribute(MachineAttributes.getNumNodesAttributeDefinition()).setValue(getNodes().length);
         } catch (IllegalValueException e) {
             // FIXME
             throw new RuntimeException(e);
         }
-		fireNewNode(node);
-		node.addElementListener(this);
+        
+		fireNewNodes(nodes);
 	}
 
-	/* returns a string representation of the architecture of this machine */
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPMachine#getArch()
+	 */
 	public String getArch() {
 		return arch;
 	}
 
-	/* finds a node using a string identifier - returns null if none found */
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPMachine#getNodeById(java.lang.String)
+	 */
 	public synchronized IPNode getNodeById(String id) {
 		IPElementControl element = findChild(id);
 		if (element != null)
@@ -115,22 +141,33 @@ public class PMachine extends Parent implements IPMachineControl, INodeListener 
 		return null;
 	}
 
-	/* returns an array of the nodes that are comprised by this machine */
-	public synchronized IPNodeControl[] getNodeControls() {
-		return (IPNodeControl[]) getCollection().toArray(new IPNodeControl[size()]);
-	}
-
-	public IPNode[] getNodes() {
-		return getNodeControls();
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elementcontrols.IPMachineControl#getNodeControls()
+	 */
+	public synchronized Collection<IPNodeControl> getNodeControls() {
+		List<IPNodeControl> nodes =
+			new ArrayList<IPNodeControl>(getCollection().size());
+		for (IPElementControl element : getCollection()) {
+			nodes.add((IPNodeControl)element);
+		}
+		return nodes;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPMachine#getNodes()
+	 */
+	public IPNode[] getNodes() {
+		Collection<IPNodeControl> nodes = getNodeControls();
+		return nodes.toArray(new IPNode[nodes.size()]);
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.IPMachine#getResourceManager()
 	 */
 	public IResourceManager getResourceManager() {
 		return (IResourceManager) getParent();
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.IPMachine#getState()
 	 */
@@ -139,21 +176,9 @@ public class PMachine extends Parent implements IPMachineControl, INodeListener 
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.listeners.INodeListener#handleEvent(org.eclipse.ptp.core.elements.events.INodeChangedEvent)
-	 */
-	public void handleEvent(INodeChangedEvent e) {
-		IMachineChangedNodeEvent ne = 
-			new MachineChangedNodeEvent(this, e.getSource(), e.getAttributes());
-		
-		for (Object listener : childListeners.getListeners()) {
-			((IMachineNodeListener)listener).handleEvent(ne);
-		}
-	}
-	
-	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.IPMachine#removeChildListener(org.eclipse.ptp.core.elements.listeners.IMachineNodeListener)
 	 */
-	public void removeChildListener(IMachineNodeListener listener) {
+	public void removeChildListener(IMachineChildListener listener) {
 		childListeners.remove(listener);
 	}
 
@@ -167,57 +192,88 @@ public class PMachine extends Parent implements IPMachineControl, INodeListener 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elementcontrols.IPMachineControl#removeNode(org.eclipse.ptp.core.elementcontrols.IPNodeControl)
 	 */
-	public void removeNode(IPNodeControl node) {
-		node.removeElementListener(this);
-		removeChild(node);
-		fireRemoveNode(node);
+	public void removeNodes(Collection<IPNodeControl> nodeControls) {
+		List<IPNode> nodes = new ArrayList<IPNode>(nodeControls.size());
+		
+		for (IPNodeControl node : nodeControls) {
+			removeChild(node);
+			nodes.add(node);
+		}
+		
+		fireRemoveNodes(nodes);
 	}
 
-	/* sets the architecture of this machine, which is merely a string */
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPMachine#setArch(java.lang.String)
+	 */
 	public void setArch(String arch) {
 		this.arch = arch;
 	}
 
-	/*
-	 * returns all the nodes comprised by this machine, which is just the size()
-	 * of its children group
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPMachine#totalNodes()
 	 */
 	public int totalNodes() {
 		return size();
 	}
-
-	private void fireChangedMachine(Collection<? extends IAttribute<?,?,?>> attrs) {
-		IMachineChangedEvent e = 
-			new MachineChangedEvent(this, attrs);
+	
+	/**
+	 * @param attrs
+	 */
+	private void fireChangedMachine(Map<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>> attrs) {
+		IMachineChangeEvent e = 
+			new MachineChangeEvent(this, attrs);
 		
 		for (Object listener : elementListeners.getListeners()) {
 			((IMachineListener)listener).handleEvent(e);
 		}
 	}
-
-	private void fireNewNode(IPNode node) {
-		IMachineNewNodeEvent e = 
-			new MachineNewNodeEvent(this, node);
+	
+	/**
+	 * Send IChangedNodeEvent to registered listeners
+	 * 
+	 * @param nodes
+	 */
+	private void fireChangedNodes(Collection<IPNode> nodes) {
+		IChangedNodeEvent e = 
+			new ChangedNodeEvent(this, nodes);
 		
 		for (Object listener : childListeners.getListeners()) {
-			((IMachineNodeListener)listener).handleEvent(e);
+			((IMachineChildListener)listener).handleEvent(e);
 		}
 	}
 
-	private void fireRemoveNode(IPNode node) {
-		IMachineRemoveNodeEvent e = 
-			new MachineRemoveNodeEvent(this, node);
+	/**
+	 * Send INewNodeEvent to registered listeners
+	 * 
+	 * @param nodes
+	 */
+	private void fireNewNodes(Collection<IPNode> nodes) {
+		INewNodeEvent e = 
+			new NewNodeEvent(this, nodes);
 		
 		for (Object listener : childListeners.getListeners()) {
-			((IMachineNodeListener)listener).handleEvent(e);
+			((IMachineChildListener)listener).handleEvent(e);
+		}
+	}
+
+	/**
+	 * @param node
+	 */
+	private void fireRemoveNodes(Collection<IPNode> nodes) {
+		IRemoveNodeEvent e = 
+			new RemoveNodeEvent(this, nodes);
+		
+		for (Object listener : childListeners.getListeners()) {
+			((IMachineChildListener)listener).handleEvent(e);
 		}
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.internal.core.elements.PElement#doAddAttributeHook(java.util.List)
+	 * @see org.eclipse.ptp.internal.core.elements.PElement#doAddAttributeHook(java.util.Map)
 	 */
 	@Override
-	protected void doAddAttributeHook(List<? extends IAttribute<?,?,?>> attrs) {
+	protected void doAddAttributeHook(Map<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>> attrs) {
 		fireChangedMachine(attrs);
 	}
 

@@ -18,22 +18,39 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.elementcontrols;
 
+import java.util.Collection;
+
+import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.elements.IPMachine;
 
 public interface IPMachineControl extends IPElementControl, IPMachine {
 
 	/**
-	 * @param node
+	 * Add attributes to a collection of nodes.
+	 * 
+	 * @param nodes collection of IPNodeControls
+	 * @param attrs array of attributes to add to each node
 	 */
-	public void addNode(IPNodeControl node);
+	public void addNodeAttributes(Collection<IPNodeControl> nodes, IAttribute<?,?,?>[] attrs);
 	
 	/**
-	 * @return
+	 * Add a collection of nodes to the machine.
+	 * 
+	 * @param node collection of IPNodeControls
 	 */
-	public IPNodeControl[] getNodeControls();
+	public void addNodes(Collection<IPNodeControl> nodes);
+	
+	/**
+	 * Get the nodes known by this machine
+	 * 
+	 * @return array of nodes
+	 */
+	public Collection<IPNodeControl> getNodeControls();
 
 	/**
-	 * @param node
+	 * Remove a collection of nodes from this machine
+	 * 
+	 * @param nodes to remove
 	 */
-	public void removeNode(IPNodeControl node);
+	public void removeNodes(Collection<IPNodeControl> nodes);
 }

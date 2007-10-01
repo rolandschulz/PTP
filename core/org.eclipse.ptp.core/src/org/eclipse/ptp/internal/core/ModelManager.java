@@ -41,22 +41,18 @@ import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.elements.IResourceManager;
-import org.eclipse.ptp.core.elements.events.IResourceManagerChangedEvent;
 import org.eclipse.ptp.core.elements.events.IResourceManagerErrorEvent;
-import org.eclipse.ptp.core.elements.listeners.IResourceManagerListener;
-import org.eclipse.ptp.core.events.IModelManagerChangedResourceManagerEvent;
-import org.eclipse.ptp.core.events.IModelManagerNewResourceManagerEvent;
-import org.eclipse.ptp.core.events.IModelManagerRemoveResourceManagerEvent;
-import org.eclipse.ptp.core.listeners.IModelManagerResourceManagerListener;
+import org.eclipse.ptp.core.events.INewResourceManagerEvent;
+import org.eclipse.ptp.core.events.IRemoveResourceManagerEvent;
+import org.eclipse.ptp.core.listeners.IModelManagerChildListener;
 import org.eclipse.ptp.internal.core.elements.PUniverse;
-import org.eclipse.ptp.internal.core.events.ModelManagerChangedResourceManagerEvent;
-import org.eclipse.ptp.internal.core.events.ModelManagerNewResourceManagerEvent;
-import org.eclipse.ptp.internal.core.events.ModelManagerRemoveResourceManagerEvent;
+import org.eclipse.ptp.internal.core.events.NewResourceManagerEvent;
+import org.eclipse.ptp.internal.core.events.RemoveResourceManagerEvent;
 import org.eclipse.ptp.internal.rmsystem.ResourceManagerPersistence;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory;
 import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
 
-public class ModelManager implements IModelManager, IResourceManagerListener {
+public class ModelManager implements IModelManager {
 	private class RMStartupJob extends Job {
 		private IResourceManagerControl resourceManager;
 		
@@ -99,9 +95,9 @@ public class ModelManager implements IModelManager, IResourceManagerListener {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.IModelManager#addListener(org.eclipse.ptp.core.listeners.IModelManagerResourceManagerListener)
+	 * @see org.eclipse.ptp.core.IModelManager#addListener(org.eclipse.ptp.core.listeners.IModelManagerChildListener)
 	 */
-	public void addListener(IModelManagerResourceManagerListener listener) {
+	public void addListener(IModelManagerChildListener listener) {
 		resourceManagerListeners.add(listener);
 	}
 
@@ -110,7 +106,6 @@ public class ModelManager implements IModelManager, IResourceManagerListener {
 	 */
 	public synchronized void addResourceManager(IResourceManagerControl rm) {
 		universe.addResourceManager(rm);
-		rm.addElementListener(this);
 		fireNewResourceManager(rm);
 	}
 
@@ -193,18 +188,6 @@ public class ModelManager implements IModelManager, IResourceManagerListener {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerListener#handleEvent(org.eclipse.ptp.core.elements.events.IResourceManagerChangedEvent)
-	 */
-	public void handleEvent(IResourceManagerChangedEvent e) {
-		IModelManagerChangedResourceManagerEvent event =
-			new ModelManagerChangedResourceManagerEvent(this, e.getSource(), e.getAttributes());
-		
-		for (Object listener : resourceManagerListeners.getListeners()) {
-			((IModelManagerResourceManagerListener)listener).handleEvent(event);
-		}
-	}
-
-	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerListener#handleEvent(org.eclipse.ptp.core.elements.events.IResourceManagerErrorEvent)
 	 */
 	public void handleEvent(IResourceManagerErrorEvent e) {
@@ -221,9 +204,9 @@ public class ModelManager implements IModelManager, IResourceManagerListener {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.IModelManager#removeListener(org.eclipse.ptp.core.listeners.IModelManagerResourceManagerListener)
+	 * @see org.eclipse.ptp.core.IModelManager#removeListener(org.eclipse.ptp.core.listeners.IModelManagerChildListener)
 	 */
-	public void removeListener(IModelManagerResourceManagerListener listener) {
+	public void removeListener(IModelManagerChildListener listener) {
 		resourceManagerListeners.remove(listener);
 	}
 
@@ -300,10 +283,10 @@ public class ModelManager implements IModelManager, IResourceManagerListener {
 	 * @param rm
 	 */
 	private void fireNewResourceManager(final IResourceManager rm) {
-		IModelManagerNewResourceManagerEvent event = 
-			new ModelManagerNewResourceManagerEvent(this, rm);
+		INewResourceManagerEvent event = 
+			new NewResourceManagerEvent(this, rm);
 		for (Object listener : resourceManagerListeners.getListeners()) {
-			((IModelManagerResourceManagerListener)listener).handleEvent(event);
+			((IModelManagerChildListener)listener).handleEvent(event);
 		}
 	}
 
@@ -311,10 +294,10 @@ public class ModelManager implements IModelManager, IResourceManagerListener {
 	 * @param rm
 	 */
 	private void fireRemoveResourceManager(final IResourceManager rm) {
-		IModelManagerRemoveResourceManagerEvent event = 
-			new ModelManagerRemoveResourceManagerEvent(this, rm);
+		IRemoveResourceManagerEvent event = 
+			new RemoveResourceManagerEvent(this, rm);
 		for (Object listener : resourceManagerListeners.getListeners()) {
-			((IModelManagerResourceManagerListener)listener).handleEvent(event);
+			((IModelManagerChildListener)listener).handleEvent(event);
 		}
 	}
 

@@ -15,6 +15,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPElement;
@@ -22,33 +23,32 @@ import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
-import org.eclipse.ptp.core.elements.events.IMachineChangedEvent;
-import org.eclipse.ptp.core.elements.events.IMachineChangedNodeEvent;
-import org.eclipse.ptp.core.elements.events.IMachineNewNodeEvent;
-import org.eclipse.ptp.core.elements.events.IMachineRemoveNodeEvent;
-import org.eclipse.ptp.core.elements.events.IQueueChangedEvent;
-import org.eclipse.ptp.core.elements.events.IQueueChangedJobEvent;
-import org.eclipse.ptp.core.elements.events.IQueueNewJobEvent;
-import org.eclipse.ptp.core.elements.events.IQueueRemoveJobEvent;
-import org.eclipse.ptp.core.elements.events.IResourceManagerChangedEvent;
-import org.eclipse.ptp.core.elements.events.IResourceManagerChangedMachineEvent;
-import org.eclipse.ptp.core.elements.events.IResourceManagerChangedQueueEvent;
+import org.eclipse.ptp.core.elements.events.IChangedNodeEvent;
+import org.eclipse.ptp.core.elements.events.IMachineChangeEvent;
+import org.eclipse.ptp.core.elements.events.IRemoveNodeEvent;
+import org.eclipse.ptp.core.elements.events.INewJobEvent;
+import org.eclipse.ptp.core.elements.events.INewMachineEvent;
+import org.eclipse.ptp.core.elements.events.INewNodeEvent;
+import org.eclipse.ptp.core.elements.events.INewQueueEvent;
+import org.eclipse.ptp.core.elements.events.IQueueChangeEvent;
+import org.eclipse.ptp.core.elements.events.IChangedJobEvent;
+import org.eclipse.ptp.core.elements.events.IRemoveJobEvent;
+import org.eclipse.ptp.core.elements.events.IResourceManagerChangeEvent;
+import org.eclipse.ptp.core.elements.events.IChangedMachineEvent;
+import org.eclipse.ptp.core.elements.events.IChangedQueueEvent;
 import org.eclipse.ptp.core.elements.events.IResourceManagerErrorEvent;
-import org.eclipse.ptp.core.elements.events.IResourceManagerNewMachineEvent;
-import org.eclipse.ptp.core.elements.events.IResourceManagerNewQueueEvent;
-import org.eclipse.ptp.core.elements.events.IResourceManagerRemoveMachineEvent;
-import org.eclipse.ptp.core.elements.events.IResourceManagerRemoveQueueEvent;
+import org.eclipse.ptp.core.elements.events.IRemoveMachineEvent;
+import org.eclipse.ptp.core.elements.events.IRemoveQueueEvent;
+import org.eclipse.ptp.core.elements.listeners.IMachineChildListener;
 import org.eclipse.ptp.core.elements.listeners.IMachineListener;
-import org.eclipse.ptp.core.elements.listeners.IMachineNodeListener;
-import org.eclipse.ptp.core.elements.listeners.IQueueJobListener;
+import org.eclipse.ptp.core.elements.listeners.IQueueChildListener;
 import org.eclipse.ptp.core.elements.listeners.IQueueListener;
+import org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener;
 import org.eclipse.ptp.core.elements.listeners.IResourceManagerListener;
-import org.eclipse.ptp.core.elements.listeners.IResourceManagerMachineListener;
-import org.eclipse.ptp.core.elements.listeners.IResourceManagerQueueListener;
-import org.eclipse.ptp.core.events.IModelManagerChangedResourceManagerEvent;
-import org.eclipse.ptp.core.events.IModelManagerNewResourceManagerEvent;
-import org.eclipse.ptp.core.events.IModelManagerRemoveResourceManagerEvent;
-import org.eclipse.ptp.core.listeners.IModelManagerResourceManagerListener;
+import org.eclipse.ptp.core.events.IChangedResourceManagerEvent;
+import org.eclipse.ptp.core.events.INewResourceManagerEvent;
+import org.eclipse.ptp.core.events.IRemoveResourceManagerEvent;
+import org.eclipse.ptp.core.listeners.IModelManagerChildListener;
 import org.eclipse.ptp.rmsystem.IResourceManagerMenuContribution;
 import org.eclipse.ptp.ui.UIUtils;
 import org.eclipse.ptp.ui.actions.AddResourceManagerAction;
@@ -68,76 +68,117 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.eclipse.ui.part.ViewPart;
 
 public class ResourceManagerView extends ViewPart implements
-		IModelManagerResourceManagerListener, IResourceManagerListener {
+		IModelManagerChildListener, IResourceManagerListener {
 	
-	public class QueueListener implements IQueueListener, IQueueJobListener {
+	public class QueueListener implements IQueueListener, IQueueChildListener {
 
-		public void handleEvent(IQueueChangedEvent e) {
-			updateViewer(e.getSource());
-		}
-
-		public void handleEvent(IQueueChangedJobEvent e) {
-			updateViewer(e.getJob());
-		}
-
-		public void handleEvent(IQueueNewJobEvent e) {
+		public void handleEvent(INewJobEvent e) {
 			refreshViewer(e.getSource());
 		}
 
-		public void handleEvent(IQueueRemoveJobEvent e) {
+		public void handleEvent(IChangedJobEvent e) {
+			updateViewer(e.getSource());
+		}
+
+		public void handleEvent(IQueueChangeEvent e) {
+			updateViewer(e.getSource());
+		}
+
+		public void handleEvent(IRemoveJobEvent e) {
 			refreshViewer(e.getSource());
 		}
 
 	}
 
-	private final class MachineListener implements IMachineNodeListener, IMachineListener {
-		public void handleEvent(IMachineChangedEvent e) {
+	private final class MachineListener implements IMachineChildListener, IMachineListener {
+		public void handleEvent(IChangedNodeEvent e) {
 			updateViewer(e.getSource());
 		}
 
-		public void handleEvent(IMachineChangedNodeEvent e) {
-			updateViewer(e.getNode());
+		public void handleEvent(IMachineChangeEvent e) {
+			updateViewer(e.getSource());
 		}
 
-		public void handleEvent(IMachineNewNodeEvent e) {
+		public void handleEvent(IRemoveNodeEvent e) {
 			refreshViewer(e.getSource());
 		}
 
-		public void handleEvent(IMachineRemoveNodeEvent e) {
+		public void handleEvent(INewNodeEvent e) {
 			refreshViewer(e.getSource());
 		}
 	}
 
-	private final class RMMachineListener implements
-			IResourceManagerMachineListener {
+	private final class RMChildListener implements
+			IResourceManagerChildListener {
 		private final MachineListener machineListener = new MachineListener();
+		private QueueListener queueListener = new QueueListener();		
 		private final Set<IPMachine> machines = new HashSet<IPMachine>();
+		private final Set<IPQueue> queues = new HashSet<IPQueue>();
 
 		public synchronized void dispose() {
 			for (IPMachine machine : machines) {
 				removeListeners(machine);
 			}
 			machines.clear();
+			
+			for (IPQueue queue : queues) {
+				removeListeners(queue);
+			}
+			queues.clear();
 		}
 
-		public void handleEvent(IResourceManagerChangedMachineEvent e) {
+		public synchronized void handleEvent(INewMachineEvent e) {
+			for (IPMachine machine : e.getMachines()) {
+				machines.add(machine);
+				addListeners(machine);
+			}
+			refreshViewer(e.getSource());
+		}
+		
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener#handleEvent(org.eclipse.ptp.core.elements.events.INewQueueEvent)
+		 */
+		public void handleEvent(INewQueueEvent e) {
+			for (IPQueue queue : e.getQueues()) {
+				queues.add(queue);
+				addListeners(queue);
+			}
+			refreshViewer(e.getSource());
+		}
+
+		public void handleEvent(IChangedMachineEvent e) {
 			updateViewer(e.getSource());
 		}
 
-		public synchronized void handleEvent(IResourceManagerNewMachineEvent e) {
-			final IPMachine machine = e.getMachine();
-			machines.add(machine);
-			addListeners(machine);
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener#handleEvent(org.eclipse.ptp.core.elements.events.IResourceManagerChangedQueueEvent)
+		 */
+		public void handleEvent(IChangedQueueEvent e) {
+			updateViewer(e.getSource());
+		}
+
+		public synchronized void handleEvent(IRemoveMachineEvent e) {
+			for (IPMachine machine : e.getMachines()) {
+				machines.remove(machine);
+				removeListeners(machine);
+			}
 			refreshViewer(e.getSource());
 		}
 
-		public synchronized void handleEvent(IResourceManagerRemoveMachineEvent e) {
-			final IPMachine machine = e.getMachine();
-			machines.remove(machine);
-			removeListeners(machine);
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener#handleEvent(org.eclipse.ptp.core.elements.events.IResourceManagerRemoveQueueEvent)
+		 */
+		public void handleEvent(IRemoveQueueEvent e) {
+			for (IPQueue queue : e.getQueues()) {
+				queues.remove(queue);
+				removeListeners(queue);
+			}
 			refreshViewer(e.getSource());
 		}
 
+		/**
+		 * @param resourceManager
+		 */
 		public synchronized void removeListeners(IResourceManager resourceManager) {
 			List<IPMachine> removeMachines = Arrays.asList(resourceManager.getMachines());
 			removeMachines.retainAll(machines);
@@ -145,6 +186,13 @@ public class ResourceManagerView extends ViewPart implements
 				removeListeners(machine);
 			}
 			machines.removeAll(removeMachines);
+			
+			List<IPQueue> removeQueues = Arrays.asList(resourceManager.getQueues());
+			removeQueues.retainAll(queues);
+			for (IPQueue queue : removeQueues) {
+				removeListeners(queue);
+			}
+			queues.removeAll(removeQueues);
 		}
 		
 		/**
@@ -162,46 +210,6 @@ public class ResourceManagerView extends ViewPart implements
 			machine.removeElementListener(machineListener);
 			machine.removeChildListener(machineListener);
 		}
-	}
-
-	private final class RMQueueListener implements
-			IResourceManagerQueueListener {
-		private QueueListener queueListener = new QueueListener();
-		private final Set<IPQueue> queues = new HashSet<IPQueue>();
-
-		public synchronized void dispose() {
-			for (IPQueue queue : queues) {
-				removeListeners(queue);
-			}
-			queues.clear();
-		}
-
-		public void handleEvent(IResourceManagerChangedQueueEvent e) {
-			updateViewer(e.getSource());
-		}
-
-		public synchronized void handleEvent(IResourceManagerNewQueueEvent e) {
-			final IPQueue queue = e.getQueue();
-			queues.add(queue);
-			addListeners(queue);
-			refreshViewer(e.getSource());
-		}
-
-		public synchronized void handleEvent(IResourceManagerRemoveQueueEvent e) {
-			final IPQueue queue = e.getQueue();
-			queues.remove(queue);
-			removeListeners(queue);
-			refreshViewer(e.getSource());
-		}
-
-		public synchronized void removeListeners(IResourceManager resourceManager) {
-			List<IPQueue> removeQueues = Arrays.asList(resourceManager.getQueues());
-			removeQueues.retainAll(queues);
-			for (IPQueue queue : removeQueues) {
-				removeListeners(queue);
-			}
-			queues.removeAll(removeQueues);
-		}
 		
 		/**
 		 * @param queue
@@ -217,7 +225,7 @@ public class ResourceManagerView extends ViewPart implements
 		private void removeListeners(IPQueue queue) {
 			queue.removeElementListener(queueListener);
 			queue.removeChildListener(queueListener);
-		}
+		}	
 	}
 
 	private final Set<IResourceManager> resourceManagers = new HashSet<IResourceManager>();
@@ -228,10 +236,24 @@ public class ResourceManagerView extends ViewPart implements
 	private AddResourceManagerAction addResourceManagerAction;
 	private EditResourceManagerAction editResourceManagerAction;
 
-	private final RMMachineListener rmMachineListener = new RMMachineListener();
+	private final RMChildListener rmChildListener = new RMChildListener();
 
-	private final RMQueueListener rmQueueListener = new RMQueueListener();
-
+	public ResourceManagerView() {
+		IModelManager mm = PTPCorePlugin.getDefault().getModelManager();
+		
+	    /*
+	     * Add us to any existing RM's. I guess it's possible we could
+	     * miss a RM if a new event arrives while we're doing this, but is 
+	     * it a problem?
+	     */
+	    for (IResourceManager rm : mm.getUniverse().getResourceManagers()) {
+	        rm.addElementListener(this);
+	    }
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
+	 */
 	public void createPartControl(Composite parent) {
 		viewer = new TreeViewer(parent, SWT.MULTI);
 		viewer.setContentProvider(new WorkbenchContentProvider());
@@ -289,31 +311,30 @@ public class ResourceManagerView extends ViewPart implements
 		PTPCorePlugin.getDefault().getModelManager().removeListener(this);
 		for (IResourceManager resourceManager : resourceManagers) {
 			resourceManager.removeElementListener(this);
-			resourceManager.removeChildListener(rmMachineListener);
-			resourceManager.removeChildListener(rmQueueListener);
+			resourceManager.removeChildListener(rmChildListener);
 		}
 		resourceManagers.clear();
-		rmMachineListener.dispose();
-		rmQueueListener.dispose();
+		rmChildListener.dispose();
 		super.dispose();
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.events.IModelManagerResourceManagerListener#handleEvent(org.eclipse.ptp.core.events.IModelManagerChangedResourceManagerEvent)
+	 * @see org.eclipse.ptp.core.events.IModelManagerResourceManagerListener#handleEvent(org.eclipse.ptp.core.events.IChangedResourceManagerEvent)
 	 */
-	public void handleEvent(IModelManagerChangedResourceManagerEvent e) {
-		refreshViewer(e.getResourceManager());
+	public void handleEvent(IChangedResourceManagerEvent e) {
+		for (IResourceManager rm : e.getResourceManagers()) {
+			//refreshViewer(rm);
+		}
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.events.IModelManagerResourceManagerListener#handleEvent(org.eclipse.ptp.core.events.IModelManagerNewResourceManagerEvent)
+	 * @see org.eclipse.ptp.core.events.IModelManagerResourceManagerListener#handleEvent(org.eclipse.ptp.core.events.INewResourceManagerEvent)
 	 */
-	public synchronized void handleEvent(IModelManagerNewResourceManagerEvent e) {
+	public synchronized void handleEvent(INewResourceManagerEvent e) {
 		final IResourceManager resourceManager = e.getResourceManager();
 		resourceManagers.add(resourceManager);
 		resourceManager.addElementListener(this);
-		resourceManager.addChildListener(rmMachineListener);
-		resourceManager.addChildListener(rmQueueListener);
+		resourceManager.addChildListener(rmChildListener);
 		UIUtils.safeRunAsyncInUIThread(new SafeRunnable(){
 			public void run() {
 				refreshViewer(PTPCorePlugin.getDefault().getUniverse());
@@ -321,16 +342,14 @@ public class ResourceManagerView extends ViewPart implements
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.events.IModelManagerResourceManagerListener#handleEvent(org.eclipse.ptp.core.events.IModelManagerRemoveResourceManagerEvent)
+	 * @see org.eclipse.ptp.core.events.IModelManagerResourceManagerListener#handleEvent(org.eclipse.ptp.core.events.IRemoveResourceManagerEvent)
 	 */
-	public synchronized void handleEvent(IModelManagerRemoveResourceManagerEvent e) {
+	public synchronized void handleEvent(IRemoveResourceManagerEvent e) {
 		final IResourceManager resourceManager = e.getResourceManager();
 		resourceManagers.remove(resourceManager);
 		resourceManager.removeElementListener(this);
-		resourceManager.removeChildListener(rmMachineListener);
-		rmMachineListener.removeListeners(resourceManager);
-		resourceManager.removeChildListener(rmQueueListener);
-		rmQueueListener.removeListeners(resourceManager);
+		resourceManager.removeChildListener(rmChildListener);
+		rmChildListener.removeListeners(resourceManager);
 		UIUtils.safeRunAsyncInUIThread(new SafeRunnable(){
 			public void run() {
 				refreshViewer(PTPCorePlugin.getDefault().getUniverse());
@@ -340,8 +359,8 @@ public class ResourceManagerView extends ViewPart implements
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerListener#handleEvent(org.eclipse.ptp.core.elements.events.IResourceManagerChangedEvent)
 	 */
-	public void handleEvent(IResourceManagerChangedEvent e) {
-		// No need to do anything. This is already handled by the IModelManagerChangedResourceManager event
+	public void handleEvent(IResourceManagerChangeEvent e) {
+		refreshViewer(e.getSource());
 	}
 
 	/* (non-Javadoc)

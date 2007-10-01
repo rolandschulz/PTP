@@ -27,7 +27,7 @@ import org.eclipse.ptp.core.elements.IPNode;
 import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes.State;
-import org.eclipse.ptp.core.elements.events.IProcessChangedEvent;
+import org.eclipse.ptp.core.elements.events.IProcessChangeEvent;
 import org.eclipse.ptp.core.elements.listeners.IProcessListener;
 import org.eclipse.ptp.ui.UIUtils;
 import org.eclipse.swt.SWT;
@@ -118,7 +118,6 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 		Object obj = getEditorInput().getAdapter(IPProcess.class);
 		if (obj instanceof IPProcess) {
 			process = (IPProcess) obj;
-			process.addElementListener(this);
 		}
 	}
 	
@@ -251,17 +250,18 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.listeners.IProcessListener#handleEvent(org.eclipse.ptp.core.elements.events.IProcessChangedEvent)
 	 */
-	public void handleEvent(final IProcessChangedEvent e) {
+	public void handleEvent(final IProcessChangeEvent e) {
 		UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
 			public void run() {
-				for (IAttribute<?,?,?> attr : e.getAttributes()) {
-					String id = attr.getDefinition().getId();
-					if (id.equals(ProcessAttributes.getStateAttributeDefinition().getId())) {
-						ProcessAttributes.State state = (State)((EnumeratedAttribute<State>)attr).getValue();
-						statusLabel.setText("Status: " + state.toString());
-					} else if (id.equals(ProcessAttributes.getStdoutAttributeDefinition().getId())) {
-						outputText.append(attr.getValueAsString() + "\n");
-					}
+				IAttribute<?,?,?> attr = e.getAttributes().get(ProcessAttributes.getStateAttributeDefinition());
+				if (attr != null) {
+					ProcessAttributes.State state = (State)((EnumeratedAttribute<?>)attr).getValue();
+					statusLabel.setText("Status: " + state.toString());
+				} 
+				
+				attr = e.getAttributes().get(ProcessAttributes.getStdoutAttributeDefinition());
+				if (attr != null) {
+					outputText.append(attr.getValueAsString() + "\n");
 				}
 			}
 		});

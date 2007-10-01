@@ -20,7 +20,7 @@ package org.eclipse.ptp.core.elements;
 
 import org.eclipse.ptp.core.elements.attributes.MachineAttributes;
 import org.eclipse.ptp.core.elements.listeners.IMachineListener;
-import org.eclipse.ptp.core.elements.listeners.IMachineNodeListener;
+import org.eclipse.ptp.core.elements.listeners.IMachineChildListener;
 
 
 /**
@@ -38,7 +38,7 @@ public interface IPMachine extends IPElement {
 	/**
 	 * @param listener
 	 */
-	public void addChildListener(IMachineNodeListener listener);
+	public void addChildListener(IMachineChildListener listener);
 
 	/**
 	 * @param listener
@@ -87,7 +87,7 @@ public interface IPMachine extends IPElement {
 	/**
 	 * @param listener
 	 */
-	public void removeChildListener(IMachineNodeListener listener);
+	public void removeChildListener(IMachineChildListener listener);
 
 	/**
 	 * @param listener

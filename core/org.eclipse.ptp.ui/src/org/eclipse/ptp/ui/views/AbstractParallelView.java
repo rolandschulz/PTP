@@ -21,10 +21,10 @@ package org.eclipse.ptp.ui.views;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.core.events.IModelManagerChangedResourceManagerEvent;
-import org.eclipse.ptp.core.events.IModelManagerNewResourceManagerEvent;
-import org.eclipse.ptp.core.events.IModelManagerRemoveResourceManagerEvent;
-import org.eclipse.ptp.core.listeners.IModelManagerResourceManagerListener;
+import org.eclipse.ptp.core.events.IChangedResourceManagerEvent;
+import org.eclipse.ptp.core.events.INewResourceManagerEvent;
+import org.eclipse.ptp.core.events.IRemoveResourceManagerEvent;
+import org.eclipse.ptp.core.listeners.IModelManagerChildListener;
 import org.eclipse.ptp.ui.UIUtils;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.part.ViewPart;
@@ -32,7 +32,7 @@ import org.eclipse.ui.part.ViewPart;
  * @author clement chu
  *
  */
-public abstract class AbstractParallelView extends ViewPart implements IModelManagerResourceManagerListener {
+public abstract class AbstractParallelView extends ViewPart implements IModelManagerChildListener {
 	protected final String DEFAULT_TITLE = "Parallel";
 
 	/** Constructor to add paralell launch listener by default
@@ -66,16 +66,16 @@ public abstract class AbstractParallelView extends ViewPart implements IModelMan
 	public abstract ISelection getSelection();
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.listeners.IModelManagerResourceManagerListener#handleEvent(org.eclipse.ptp.core.events.IModelManagerChangedResourceManagerEvent)
+	 * @see org.eclipse.ptp.core.listeners.IModelManagerChildListener#handleEvent(org.eclipse.ptp.core.events.IChangedResourceManagerEvent)
 	 */
-	public void handleEvent(IModelManagerChangedResourceManagerEvent e) {
+	public void handleEvent(IChangedResourceManagerEvent e) {
 		// Doesn't matter
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.listeners.IModelManagerResourceManagerListener#handleEvent(org.eclipse.ptp.core.events.IModelManagerNewResourceManagerEvent)
+	 * @see org.eclipse.ptp.core.listeners.IModelManagerChildListener#handleEvent(org.eclipse.ptp.core.events.INewResourceManagerEvent)
 	 */
-	public void handleEvent(IModelManagerNewResourceManagerEvent e) {
+	public void handleEvent(INewResourceManagerEvent e) {
 		UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
 			public void run() {
 				build();
@@ -84,9 +84,9 @@ public abstract class AbstractParallelView extends ViewPart implements IModelMan
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.listeners.IModelManagerResourceManagerListener#handleEvent(org.eclipse.ptp.core.events.IModelManagerRemoveResourceManagerEvent)
+	 * @see org.eclipse.ptp.core.listeners.IModelManagerChildListener#handleEvent(org.eclipse.ptp.core.events.IRemoveResourceManagerEvent)
 	 */
-	public void handleEvent(IModelManagerRemoveResourceManagerEvent e) {
+	public void handleEvent(IRemoveResourceManagerEvent e) {
 		// TODO implement remove resource manager
 	}
 }

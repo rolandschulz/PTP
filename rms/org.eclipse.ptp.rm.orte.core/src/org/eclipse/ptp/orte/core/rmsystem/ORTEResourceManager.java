@@ -18,6 +18,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.orte.core.rmsystem;
 
+import java.util.Collection;
+
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.elementcontrols.IPJobControl;
 import org.eclipse.ptp.core.elementcontrols.IPMachineControl;
@@ -64,31 +66,49 @@ public class ORTEResourceManager extends AbstractRuntimeResourceManager {
 	protected void doBeforeOpenConnection() {
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.AbstractRuntimeResourceManager#doCreateJob(org.eclipse.ptp.core.elementcontrols.IPQueueControl, java.lang.String, org.eclipse.ptp.core.attributes.AttributeManager)
+	 */
 	@Override
 	protected IPJobControl doCreateJob(IPQueueControl queue, String jobId, AttributeManager attrs) {
 		return newJob(queue, jobId, attrs);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.AbstractRuntimeResourceManager#doCreateMachine(java.lang.String, org.eclipse.ptp.core.attributes.AttributeManager)
+	 */
 	@Override
 	protected IPMachineControl doCreateMachine(String machineId, AttributeManager attrs) {
 		return newMachine(machineId, attrs);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.AbstractRuntimeResourceManager#doCreateNode(org.eclipse.ptp.core.elementcontrols.IPMachineControl, java.lang.String, org.eclipse.ptp.core.attributes.AttributeManager)
+	 */
 	@Override
 	protected IPNodeControl doCreateNode(IPMachineControl machine, String nodeId, AttributeManager attrs) {
 		return newNode(machine, nodeId, attrs);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.AbstractRuntimeResourceManager#doCreateProcess(org.eclipse.ptp.core.elementcontrols.IPJobControl, java.lang.String, org.eclipse.ptp.core.attributes.AttributeManager)
+	 */
 	@Override
 	protected IPProcessControl doCreateProcess(IPJobControl job, String processId, AttributeManager attrs) {
 		return newProcess(job, processId, attrs);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.AbstractRuntimeResourceManager#doCreateQueue(java.lang.String, org.eclipse.ptp.core.attributes.AttributeManager)
+	 */
 	@Override
 	protected IPQueueControl doCreateQueue(String queueId, AttributeManager attrs) {
 		return newQueue(queueId, attrs);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.AbstractRuntimeResourceManager#doCreateRuntimeSystem()
+	 */
 	@Override
 	protected IRuntimeSystem doCreateRuntimeSystem() {
 		ORTEResourceManagerConfiguration config = (ORTEResourceManagerConfiguration) getConfiguration();
@@ -97,28 +117,49 @@ public class ORTEResourceManager extends AbstractRuntimeResourceManager {
 		return new ORTERuntimeSystem(runtimeProxy, getAttributeDefinitionManager());
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.AbstractRuntimeResourceManager#doUpdateJobs(org.eclipse.ptp.core.elements.IPQueue, java.util.Collection, org.eclipse.ptp.core.attributes.AttributeManager)
+	 */
 	@Override
-	protected boolean doUpdateJob(IPJobControl job, AttributeManager attrs) {
-		return updateJob(job, attrs);
+	protected boolean doUpdateJobs(IPQueueControl queue, Collection<IPJobControl> jobs,
+			AttributeManager attrs) {
+		return updateJobs(queue, jobs, attrs);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.AbstractRuntimeResourceManager#doUpdateMachines(java.util.Collection, org.eclipse.ptp.core.attributes.AttributeManager)
+	 */
 	@Override
-	protected boolean doUpdateMachine(IPMachineControl machine, AttributeManager attrs) {
-		return updateMachine(machine, attrs);
+	protected boolean doUpdateMachines(Collection<IPMachineControl> machines,
+			AttributeManager attrs) {
+		return updateMachines(machines, attrs);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.AbstractRuntimeResourceManager#doUpdateNodes(org.eclipse.ptp.core.elementcontrols.IPMachineControl, java.util.Collection, org.eclipse.ptp.core.attributes.AttributeManager)
+	 */
 	@Override
-	protected boolean doUpdateNode(IPNodeControl node, AttributeManager attrs) {
-		return updateNode(node, attrs);
+	protected boolean doUpdateNodes(IPMachineControl machine, 
+			Collection<IPNodeControl> nodes, AttributeManager attrs) {
+		return updateNodes(machine, nodes, attrs);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.AbstractRuntimeResourceManager#doUpdateProcesses(org.eclipse.ptp.core.elementcontrols.IPJobControl, java.util.Collection, org.eclipse.ptp.core.attributes.AttributeManager)
+	 */
 	@Override
-	protected boolean doUpdateProcess(IPProcessControl process, AttributeManager attrs) {
-		return updateProcess(process, attrs);
+	protected boolean doUpdateProcesses(IPJobControl job,
+			Collection<IPProcessControl> processes, AttributeManager attrs) {
+		return updateProcesses(job, processes, attrs);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.AbstractRuntimeResourceManager#doUpdateQueues(java.util.Collection, org.eclipse.ptp.core.attributes.AttributeManager)
+	 */
 	@Override
-	protected boolean doUpdateQueue(IPQueueControl queue, AttributeManager attrs) {
-		return updateQueue(queue, attrs);
+	protected boolean doUpdateQueues(Collection<IPQueueControl> queues,
+			AttributeManager attrs) {
+		return updateQueues(queues, attrs);
 	}
+
 }

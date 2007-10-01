@@ -19,8 +19,8 @@
 package org.eclipse.ptp.core.elements;
 
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
+import org.eclipse.ptp.core.elements.listeners.IJobChildListener;
 import org.eclipse.ptp.core.elements.listeners.IJobListener;
-import org.eclipse.ptp.core.elements.listeners.IJobProcessListener;
 
 
 /**
@@ -38,7 +38,7 @@ public interface IPJob extends IPElement {
 	/**
 	 * @param listener
 	 */
-	public void addChildListener(IJobProcessListener listener);
+	public void addChildListener(IJobChildListener listener);
 
 	/**
 	 * @param listener
@@ -117,7 +117,7 @@ public interface IPJob extends IPElement {
 	/**
 	 * @param listener
 	 */
-	public void removeChildListener(IJobProcessListener listener);
+	public void removeChildListener(IJobChildListener listener);
 	
 	/**
 	 * @param listener

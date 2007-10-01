@@ -24,28 +24,20 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
+import org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener;
 import org.eclipse.ptp.core.elements.listeners.IResourceManagerListener;
-import org.eclipse.ptp.core.elements.listeners.IResourceManagerMachineListener;
-import org.eclipse.ptp.core.elements.listeners.IResourceManagerQueueListener;
 import org.eclipse.ptp.rmsystem.IResourceManagerMenuContribution;
 
 public interface IResourceManager extends IPElement,
-IAdaptable, IResourceManagerMenuContribution {
+	IAdaptable, IResourceManagerMenuContribution {
 
 	/**
-	 * Add a listener for machine-related events.
+	 * Add a listener for child events.
 	 * 
 	 * @param listener listener to add to the list of listeners
 	 */
-	public void addChildListener(IResourceManagerMachineListener listener);
+	public void addChildListener(IResourceManagerChildListener listener);
 	
-	/**
-	 * Add a listener for queue-realted events
-	 * 
-	 * @param listener listener to add to the list of listeners
-	 */
-	public void addChildListener(IResourceManagerQueueListener listener);
-
 	/**
 	 * Add a listener for events related to this resource manager.
 	 * 
@@ -129,18 +121,11 @@ IAdaptable, IResourceManagerMenuContribution {
 	public ResourceManagerAttributes.State getState();
 	
 	/**
-	 * Remove listener for machine-related events
+	 * Remove listener for child events
 	 * 
 	 * @param listener listener to remove
 	 */
-	public void removeChildListener(IResourceManagerMachineListener listener);
-
-	/**
-	 * Remove listener for queue-related events
-	 * 
-	 * @param listener listener to remove
-	 */
-	public void removeChildListener(IResourceManagerQueueListener listener);
+	public void removeChildListener(IResourceManagerChildListener listener);
 
 	/**
 	 * Remove listener for events relating to this resource manager

@@ -25,33 +25,17 @@ import org.eclipse.ptp.core.elements.listeners.IProcessListener;
 public interface IPProcess extends IPElement {
 	
 	/**
+	 * Add listener for element events.
+	 * 
 	 * @param listener
 	 */
 	public void addElementListener(IProcessListener listener);
 
 	/**
-	 * @param listener
-	 */
-	public void removeElementListener(IProcessListener listener);
-
-	/**
-	 * sets the node that this process is running on 
-	 * 
-	 * @param node
-	 */
-	public void addNode(IPNode node);
-
-	/**
 	 * Clear the local cache of process output
 	 */
 	public void clearOutput();
-	
-	/**
-	 * @param attrDef
-	 * @return
-	 */
-	public String getSavedOutput(StringAttributeDefinition attrDef);
-	
+
 	/**
 	 * Get the value of the exit code attribute. This is the exit code
 	 * that the process returned on termination.
@@ -82,6 +66,19 @@ public interface IPProcess extends IPElement {
 	public int getPid();
 	
 	/**
+	 * Returns a zero-based index of the process in a job.
+	 * 
+	 * @return process index
+	 */
+	public String getProcessIndex();
+	
+	/**
+	 * @param attrDef
+	 * @return
+	 */
+	public String getSavedOutput(StringAttributeDefinition attrDef);
+	
+	/**
 	 * Get the value of the signal name attribute. If the process was
 	 * terminated by a signal, this is the name of the signal that caused
 	 * the termination.
@@ -98,13 +95,6 @@ public interface IPProcess extends IPElement {
 	public ProcessAttributes.State getState();
 	
 	/**
-	 * Returns a zero-based index of the process in a job.
-	 * 
-	 * @return process index
-	 */
-	public String getProcessIndex();
-	
-	/**
 	 * Check if process is terminated
 	 * 
 	 * @return true if process terminated
@@ -112,9 +102,11 @@ public interface IPProcess extends IPElement {
 	public boolean isTerminated();
 	
 	/**
-	 * Remove the mapping from this process to a node
+	 * Remove listener for element events.
+	 * 
+	 * @param listener
 	 */
-	public void removeNode();
+	public void removeElementListener(IProcessListener listener);
 	
 	/**
 	 * Set the state attribute on the process

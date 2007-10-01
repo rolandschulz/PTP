@@ -20,7 +20,7 @@ package org.eclipse.ptp.core.elements;
 
 import org.eclipse.ptp.core.elements.attributes.NodeAttributes;
 import org.eclipse.ptp.core.elements.listeners.INodeListener;
-import org.eclipse.ptp.core.elements.listeners.INodeProcessListener;
+import org.eclipse.ptp.core.elements.listeners.INodeChildListener;
 
 
 public interface IPNode extends IPElement {
@@ -28,7 +28,7 @@ public interface IPNode extends IPElement {
 	/**
 	 * @param listener
 	 */
-	public void addChildListener(INodeProcessListener listener);
+	public void addChildListener(INodeChildListener listener);
 
 	/**
 	 * @param listener
@@ -68,7 +68,7 @@ public interface IPNode extends IPElement {
 	/**
 	 * @param listener
 	 */
-	public void removeChildListener(INodeProcessListener listener);
+	public void removeChildListener(INodeChildListener listener);
 	
 	/**
 	 * @param listener

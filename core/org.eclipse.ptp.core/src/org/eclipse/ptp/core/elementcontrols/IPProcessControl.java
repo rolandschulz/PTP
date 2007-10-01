@@ -18,10 +18,26 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.elementcontrols;
 
+import org.eclipse.ptp.core.elements.IPNode;
 import org.eclipse.ptp.core.elements.IPProcess;
 
 public interface IPProcessControl extends IPElementControl, IPProcess {
 
+	/**
+	 * Add a mapping from this process to a node
+	 */
+	public void addNode(IPNode node);
+	
+	/**
+	 * Get the parent job for this process
+	 * 
+	 * @return parent job
+	 */
 	public IPJobControl getJobControl();
 
+	/**
+	 * Remove the mapping from this process to a node
+	 */
+	public void removeNode();
+	
 }

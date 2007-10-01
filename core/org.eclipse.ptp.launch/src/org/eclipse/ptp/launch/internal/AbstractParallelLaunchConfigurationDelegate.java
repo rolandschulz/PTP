@@ -50,6 +50,7 @@ import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.AttributeManager;
+import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPQueue;
@@ -58,10 +59,8 @@ import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes.State;
-import org.eclipse.ptp.core.elements.events.IQueueChangedJobEvent;
-import org.eclipse.ptp.core.elements.events.IQueueNewJobEvent;
-import org.eclipse.ptp.core.elements.events.IQueueRemoveJobEvent;
-import org.eclipse.ptp.core.elements.listeners.IQueueJobListener;
+import org.eclipse.ptp.core.elements.events.IJobChangeEvent;
+import org.eclipse.ptp.core.elements.listeners.IJobListener;
 import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.IPDebugConfiguration;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
@@ -77,7 +76,7 @@ import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab;
  *
  */
 public abstract class AbstractParallelLaunchConfigurationDelegate 
-	extends LaunchConfigurationDelegate implements IQueueJobListener {
+	extends LaunchConfigurationDelegate implements IJobListener {
 	
 	/**
 	 * The JobSubmission class encapsulates all the information used in 
@@ -137,16 +136,8 @@ public abstract class AbstractParallelLaunchConfigurationDelegate
 	}
 	
     protected Map<IPJob, JobSubmission> jobSubmissions = new HashMap<IPJob, JobSubmission>();
-    protected Map<String, IPQueue> queues = new HashMap<String, IPQueue>();
     
 	public AbstractParallelLaunchConfigurationDelegate() {
-		IPUniverse universe = PTPCorePlugin.getDefault().getUniverse();
-		for (IResourceManager rm : universe.getResourceManagers()) {
-			for (IPQueue queue : rm.getQueues()) {
-				queue.addChildListener(this);
-				queues.put(queue.getID(), queue);
-			}
-		}
 	}
 	
 	/**
@@ -230,15 +221,6 @@ public abstract class AbstractParallelLaunchConfigurationDelegate
 	}    
 	
 	/* (non-Javadoc)
-	 * @see java.lang.Object#finalize()
-	 */
-	public void finalize() {
-		for (IPQueue queue : queues.values()) {
-			queue.removeChildListener(this);
-		}
-	}
-	
-	/* (non-Javadoc)
 	 * @see org.eclipse.debug.core.model.LaunchConfigurationDelegate#getLaunch(org.eclipse.debug.core.ILaunchConfiguration, java.lang.String)
 	 */
 	public ILaunch getLaunch(ILaunchConfiguration configuration, String mode) throws CoreException {
@@ -246,39 +228,28 @@ public abstract class AbstractParallelLaunchConfigurationDelegate
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.listeners.IQueueJobListener#handleEvent(org.eclipse.ptp.core.elements.events.IQueueChangedJobEvent)
+	 * @see org.eclipse.ptp.core.elements.listeners.IJobListener#handleEvent(org.eclipse.ptp.core.elements.events.IJobChangeEvent)
 	 */
-	public void handleEvent(IQueueChangedJobEvent e) {
+	public void handleEvent(IJobChangeEvent e) {
 		/*
 		 * If the job state has changed to running, find the JobSubmission that 
 		 * corresponds to this job and perform remainder of job launch actions
 		 */
-		for (IAttribute<?,?,?> attr : e.getAttributes()) {
-			if (attr.getDefinition() == JobAttributes.getStateAttributeDefinition() && (State)attr.getValue() == JobAttributes.State.RUNNING) {
+		IAttribute<?,?,?> attr = e.getAttributes().get(JobAttributes.getStateAttributeDefinition());
+		if (attr != null) {
+			JobAttributes.State state = (State)((EnumeratedAttribute<?>)attr).getValue();
+			if (state == JobAttributes.State.RUNNING) {
 				synchronized (jobSubmissions) {
-					IPJob job = e.getJob();
+					IPJob job = e.getSource();
 					JobSubmission jobSub = jobSubmissions.get(job);
 					if (jobSub != null) {
 						doCompleteJobLaunch(jobSub.getConfiguration(), jobSub.getMode(), jobSub.getLaunch(), jobSub.getAttrMgr(), jobSub.getDebugger(), job);
 						jobSubmissions.remove(job);
+						job.removeElementListener(this);
 					}
-					break;
 				}
 			}
 		}
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.listeners.IQueueJobListener#handleEvent(org.eclipse.ptp.core.elements.events.IQueueNewJobEvent)
-	 */
-	public void handleEvent(IQueueNewJobEvent e) {
-	}
-    	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.listeners.IQueueJobListener#handleEvent(org.eclipse.ptp.core.elements.events.IQueueRemoveJobEvent)
-	 */
-	public void handleEvent(IQueueRemoveJobEvent e) {
-		// Ignore
 	}
 	
 	/**
@@ -509,6 +480,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate
 			if (job != null) {
 				JobSubmission jobSub = new JobSubmission(configuration, mode, launch, attrMgr, debugger);
 				jobSubmissions.put(job, jobSub);
+				job.addElementListener(this);
 			}
 		}
 	}
