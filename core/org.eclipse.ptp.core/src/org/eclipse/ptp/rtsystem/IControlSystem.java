@@ -26,7 +26,6 @@ import org.eclipse.ptp.core.elements.IPJob;
 /**
  * A Control System is a portion of a runtime system that handles controlling jobs.  This includes
  * starting new jobs, terminating jobs, getting information about running jobs and processes, etc.
- * Control Systems also can fire events, specifically {@link RuntimeEvent}s.
  * 
  * @author Nathan DeBardeleben
  */

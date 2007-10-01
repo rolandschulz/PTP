@@ -43,7 +43,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.ptp.core.elements.attributes.MessageAttributes;
 import org.eclipse.ptp.core.proxy.command.IProxyCommand;
-import org.eclipse.ptp.core.proxy.command.ProxyQuitCommand;
 import org.eclipse.ptp.core.proxy.event.IProxyConnectedEvent;
 import org.eclipse.ptp.core.proxy.event.IProxyDisconnectedEvent;
 import org.eclipse.ptp.core.proxy.event.IProxyEvent;
@@ -54,11 +53,12 @@ import org.eclipse.ptp.core.proxy.event.IProxyMessageEvent;
 import org.eclipse.ptp.core.proxy.event.IProxyOKEvent;
 import org.eclipse.ptp.core.proxy.event.IProxyShutdownEvent;
 import org.eclipse.ptp.core.proxy.event.IProxyTimeoutEvent;
-import org.eclipse.ptp.core.proxy.event.ProxyConnectedEvent;
-import org.eclipse.ptp.core.proxy.event.ProxyDisconnectedEvent;
-import org.eclipse.ptp.core.proxy.event.ProxyMessageEvent;
-import org.eclipse.ptp.core.proxy.event.ProxyTimeoutEvent;
 import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.internal.core.proxy.command.ProxyQuitCommand;
+import org.eclipse.ptp.internal.core.proxy.event.ProxyConnectedEvent;
+import org.eclipse.ptp.internal.core.proxy.event.ProxyDisconnectedEvent;
+import org.eclipse.ptp.internal.core.proxy.event.ProxyMessageEvent;
+import org.eclipse.ptp.internal.core.proxy.event.ProxyTimeoutEvent;
 
 public abstract class AbstractProxyClient implements IProxyClient {
 
