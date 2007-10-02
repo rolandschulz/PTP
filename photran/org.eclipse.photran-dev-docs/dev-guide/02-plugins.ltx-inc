@@ -2,8 +2,6 @@
 
 \textit{Last Updated 4/4/07}
 
-\section{The Photran Feature}
-
 The following projects comprise the ``base'' of Photran.
 All sources in these projects are Java 4.
 
@@ -45,16 +43,16 @@ All sources in these projects are Java 4.
 	Error parser for the XLF compiler.
 	Managed by Craig Rasmussen at LANL.
 
-\item org.eclipse.photran.managedbuilder.core,
-      org.eclipse.photran.managedbuilder.gnu.ui,
-      org.eclipse.photran.managedbuilder.xlf.ui,
+\item org.eclipse.photran.managedbuilder.core, \\
+      org.eclipse.photran.managedbuilder.gnu.ui, \\
+      org.eclipse.photran.managedbuilder.xlf.ui, \\
       org.eclipse.photran.managedbuilder.ui
 
 	Support for Managed Build projects using the GNU toolchain.
 	Managed by Craig Rasmussen at LANL.
 
-\item org.eclipse.photran.core.intel,
-      org.eclipse.photran.intel-feature,
+\item org.eclipse.photran.core.intel, \\
+      org.eclipse.photran.intel-feature, \\
       org.eclipse.photran.managedbuilder.intel.ui
 
 	Support for Managed Build projects using Intel toolchains.
@@ -68,11 +66,14 @@ All sources in these projects are Java 4.
 	\item Preference pages
 	\end{itemize}
 
-\section{The Virtual Program Graph (VPG) Feature: Analysis and Refactoring Support}
+\end{itemize}
 
+\noindent
 The following projects support parsing, analysis, and refactoring of Fortran sources.
 They are written in Java 5.
 The Virtual Program Graph is described in more detail later.
+
+\begin{itemize}
 
 \item org.eclipse.photran.vpg.core
 
@@ -91,9 +92,17 @@ The Virtual Program Graph is described in more detail later.
 	\item Refactorings
 	\end{itemize}
 
-\item org.eclipse.photran.core.vpg.tests
+\item org.eclipse.photran.core.vpg.tests, \\
+      org.eclipse.photran.core.vpg.tests.failing
 
 	JUnit Plug-in tests for the VPG core plug-in.
+	
+	All tests in org.eclipse.photran.core.vpg.tests should pass.
+	Test suites and test cases are placed in the ``failing'' plug-in until all of their tests pass.
+	
+	These plug-ins \textit{must} be run as a ``JUnit Plug-in Test,'' not a ``JUnit Test.''
+	In the launch configuration, the environment variable TESTING must be set to some non-empty value.
+	(This ensures that the VPG will not try to run in the background and interfere with testing.)
 
 \item org.eclipse.photran.ui.vpg
 
@@ -102,10 +111,14 @@ The Virtual Program Graph is described in more detail later.
 	Open Declaration action,
 	a project property page where the user can customize the search path for Fortran modules and include files,
 	and all of the actions in the Refactoring menu.
+	Search and other VPG-dependent features will be placed here in the future.
 
-\section{Other Plug-ins}
+\end{itemize}
 
+\noindent
 The following projects are in CVS but are not distributed to users:
+
+\begin{itemize}
 
 \item org.eclipse.photran-dev-docs
 

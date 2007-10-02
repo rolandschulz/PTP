@@ -1,46 +1,53 @@
-% Parsing, Analysis, and Refactoring
+% Parsing and Program Analysis
 
-\textit{Last Updated 4/11/07}
+\textit{Last Updated 10/2/07}
 
-\bfseries{\Huge This information is out of date and is being updated (8/07).}
+\section{The Virtual Program Graph}
 
-\section{Abstract Syntax Trees: The \texttt{FortranWorkspace}}
+In Photran, it is almost never necessary to call the lexer, parser, or analysis components directly.  Instead, it
+uses a \textit{virtual program graph} (VPG), which provides the fa\,cade of a whole-program abstract syntax tree with
+embedded analysis information.
 
-\subsection{Visualizing ASTs}
+An overview of VPGs is available at the following link and will not repeated here:
 
-Photran can display ASTs rather than the ordinary Outline view.
-This behavior can be enabled from the Fortran workspace preferences
-(click on Window $>$ Preferences).  Clicking on an AST node in the Outline
-view will move the cursor to that construct's position in the source file.
+http://jeff.over.bz/software/vpg/doc/
+
+\section{Using the Photran VPG}
 
 \subsection{Acquiring and Releasing Translation Units}
 
-\texttt{FortranWorkspace} is a singleton object responsible for constructing
-ASTs for Fortran source code.  ASTs are retrived by invoking
+\texttt{PhotranVPG} is a singleton object responsible for constructing
+ASTs for Fortran source code.  ASTs are retrieved by invoking either
 {\footnotesize\begin{verbatim}
-public IFortranAST acquireTU(IFile file,
-                             boolean shouldImportModules,
-                             boolean shouldDieWhenModuleNotFound,
-                             boolean isFixedForm,
-                             IProgressMonitor progressMonitor) throws Exception
+    public IFortranAST acquireTransientAST(IFile file)
 \end{verbatim}}
-or one of its less verbose overloads.
+or
+{\footnotesize\begin{verbatim}
+	public IFortranAST acquirePermanentAST(IFile file)
+\end{verbatim}}
 
-ASTs are retained in memory until \texttt{releaseTU} or \texttt{releaseAll} is
-called.  Until a release method is called, subsequent requests for the same
-\texttt{IFile} will return the same (pointer-identical) AST.
+A \textit{transient AST} can be garbage collected as soon as references to any
+of its nodes disappear.  A \textit{permanent AST} will be explicitly kept in
+memory until a call is made to either
+{\footnotesize\begin{verbatim}
+	public void releaseAST(IFile file)
+\end{verbatim}}
+or
+{\footnotesize\begin{verbatim}
+	public void releaseAllASTs()
+\end{verbatim}}
 
-If an AST is constructed with the \texttt{shouldImportModules} option set,
-the ASTs for all of the files containing loaded modules may be in memory.
-In this case, it is particularly important to call \texttt{releaseAll} when
-you are done.
+Only one AST for a particular file is in memory at any particular point in time,
+so successive requests for the same
+\texttt{IFile} will return the same (pointer-identical) AST
+until the AST is released (permanent) or garbage collected (transient).
 
 \subsection{The Program Representation: IFortranAST}
 
-The \texttt{acquireTU} methods return an object implementing \texttt{IFortranAST}.
+The \texttt{acquireTransient/PermanentAST} methods return an object implementing \texttt{IFortranAST}.
 
 {\footnotesize\begin{verbatim}
-public interface IFortranAST extends Iterable/*<Token>*/
+public interface IFortranAST extends Iterable<Token>
 {
     ///////////////////////////////////////////////////////////////////////////
     // Visitor Support
@@ -49,34 +56,35 @@ public interface IFortranAST extends Iterable/*<Token>*/
     public void visitTopDownUsing(ASTVisitor visitor);
     public void visitBottomUpUsing(ASTVisitor visitor);
     public void visitOnlyThisNodeUsing(ASTVisitor visitor);
+    public void visitUsing(GenericParseTreeVisitor visitor);
     
     ///////////////////////////////////////////////////////////////////////////
     // Other Methods
     ///////////////////////////////////////////////////////////////////////////
 
     public ASTExecutableProgramNode getRoot();
-    
-    public Token findTokenByOffsetLength(int offset, int length);
+
+    public Iterator<Token> iterator();
+    public Token findTokenByStreamOffsetLength(int offset, int length);
     public Token findFirstTokenOnLine(int line);
+    public Token findTokenByFileOffsetLength(IFile file, int offset, int length);
 }
 \end{verbatim}}
 
 The \texttt{getRoot} method returns the root of the AST, while the \texttt{find...}
 methods provide an efficient means to search for tokens based on their lexical
-positioning.\footnote{In addition to the AST, Photran internally maintains an array of
-the \texttt{Token}s in a program (in a \texttt{TokenList} object);
-the \texttt{find...} methods perform a binary search on this array.}
+positioning.
 
 \subsection{AST Structure}
 
-The Fortran AST comprises 381 classes.  The class names of AST nodes all begin with
-\texttt{AST}, and all are located in \texttt{org.eclipse.photran.internal.core.parser}.
+The Fortran AST comprises several hundred classes.  The class names of AST nodes all begin with
+\texttt{AST}, and all are located in the \texttt{org.eclipse.photran.internal.core.parser} package.
 The AST classes are generated automatically from the parsing grammar,
 \texttt{fortran95.bnf}.
 
 \subsubsection{Ordinary AST Nodes}
 
-The children of any AST node are retrieved by calling one of its \texttt{getAST...}
+The children of any AST node are retrieved by calling one of its \texttt{get...}
 methods, which return \texttt{null} if that child is not present.
 For example, \texttt{fortran95.bnf} defines a \textit{$<$ProgramUnit$>$} as follows.
 
@@ -119,8 +127,53 @@ indicates that a \textit{$<$Body$>$} consists of several \textit{$<$BodyConstruc
 They can be iterated with code such as the following.
 
 {\footnotesize\begin{verbatim}
-for (int i = 0; i < astBodyNode.count(); i++)
+for (int i = 0, size = astBodyNode.size(); i < size; i++)
     doSomething(astBodyNode.getASTBodyConstruct(i);
+\end{verbatim}}
+
+\subsubsection{Elevated Nodes}
+
+Consider the following productions for a main program in Fortran.
+
+{\footnotesize\begin{verbatim}
+<MainProgram> ::=
+  |               <MainRange>
+  | <ProgramStmt> <MainRange>
+
+<MainRange> ::=
+    <Body>              <EndProgramStmt>
+  | <BodyPlusInternals> <EndProgramStmt>
+  |                     <EndProgramStmt>
+\end{verbatim}}
+
+From the standpoint of a typical Fortran user,
+a main program consists of a Program statement, a body (list of statements), perhaps some internal
+subprograms, and an End Program statement.
+This does not match the definition of a MainProgram in the parsing grammar above: the body and End Program
+statement are relegated to a separate MainRange nonterminal. 
+
+The solution is to label the MainRange nonterminal with a caret (\^), indicating that it is an ``elevated'' or
+``pulled-up'' node.
+
+{\footnotesize\begin{verbatim}
+<MainProgram> ::=
+  |               ^:<MainRange>
+  | <ProgramStmt> ^:<MainRange>
+
+<MainRange> ::=
+    <Body>              <EndProgramStmt>
+  | <BodyPlusInternals> <EndProgramStmt>
+  |                     <EndProgramStmt>
+\end{verbatim}}
+
+This means that accessor methods that would otherwise be in a separate MainRange object will be placed in the
+MainProgram object instead.  This means that an \texttt{ASTMainProgramNode} object has the following interface.
+
+{\footnotesize\begin{verbatim}
+    public ASTProgramStmtNode getProgramStmt();
+    public ASTBodyNode getBody();
+    public ASTBodyPlusInternalsNode getBodyPlusInternals();
+    public ASTEndProgramStmtNode getEndProgramStmt();
 \end{verbatim}}
 
 \subsubsection{Tokens}
@@ -130,39 +183,78 @@ for (int i = 0; i < astBodyNode.count(); i++)
 \item The terminal symbol in the grammar that the token is an instance of (\texttt{getTerminal()})
 \item The actual text of the token (\texttt{getText()})
 \item The line, column, offset, and length of the token text in the source file (\texttt{getLine(), getCol(), getOffset(), getLength()})
-\item Scope and binding (\texttt{getScope(), getBinding()}, discussed below)
 \end{itemize}
 Most of the remaining fields are used internally for refactoring.
 
 \section{Scope and Binding Analysis}
 
-As mentioned above, every \texttt{Token} has a \texttt{Scope} associated with it, and
-identifier tokens (\texttt{Token}s for which \texttt{token.getTerminal() == Terminal.T\_IDENT}),
-which represent functions, variables, etc. in the Fortran grammar, also have a
-\texttt{Binding} associated with them.\footnote{The \texttt{getScope()} and \texttt{getBinding()}
-methods are declared to return an \texttt{Object}; this is because the \texttt{Token} class is located in the
-org.eclipse.photran.core plug-in and compiled using Java 4, so that it can be used to build the
-Outline view, while \texttt{Scope} and \texttt{Binding}
-are located in org.eclipse.photran.core.analysis, compiled using Java 5, which already has a dependency
-on org.eclipse.photran.core.}
+Certain nodes in a Fortran AST represent a lexical scope.  All of these are declared as subclasses of
+\texttt{ScopingNode.}
+\begin{itemize}
+\item ASTBlockDataSubprogramNode
+\item ASTDerivedTypeDefNode
+\item ASTExecutableProgramNode
+\item ASTFunctionSubprogramNode
+\item ASTInterfaceBlockNode\footnote{An interface block defines a nested scope only if it is a named interface.
+                                     Anonymous (unnamed) interfaces provide signatures for subprograms in their
+                                     enclosing scope.}
+\item ASTMainProgramNode
+\item ASTModuleNode
+\item ASTSubroutineSubprogramNode
+\end{itemize}
 
-A \texttt{Scope} is essentially a collection of \texttt{Binding}s.  To a typical user of an AST,
-it is not very useful.
+The enclosing scope of a \texttt{Token} can be retrieved by calling the following method on the \texttt{Token} object.
+ 
+{\footnotesize\begin{verbatim}
+    public ScopingNode getEnclosingScope()
+\end{verbatim}}
 
-\texttt{Binding}, on the other hand, is very useful.  \texttt{Binding} is an abstract class;
-every \texttt{Binding} is either a \texttt{Definition} or a \texttt{Reference}.
-Some \texttt{Reference}s are also \texttt{Declaration}s.  Any binding can be resolved to all of its potential
-definitions by invoking its \texttt{resolve()} method (or a similarly-named method).
-The exact source token can be located by calling the \texttt{findSourceToken} method on the \texttt{Binding}.
-(Note that a binding may resolve to a definition in another source file; this can be checked by calling
-the \texttt{getContainerFile} method on a \texttt{Binding}.)
+Identifier tokens (\texttt{Token}s for which \texttt{token.getTerminal() == Terminal.T\_IDENT}),
+which represent functions, variables, etc. in the Fortran grammar, are \emph{bound} to a declaration.
+(The introduction to VPGs (URL above) provides an example visually.)  Although, ideally, every identifier
+will be bound to exactly one declaration, this is not always the case (the programmer may have written incorrect code,
+or Photran may not have enough information to resolve the binding uniquely).  So the \texttt{resolveBinding} method
+on a token has the following signature: 
 
-For debugging, the \texttt{printGlobalSymbolTableOn} method may be invoked on any \texttt{Binding} to output
-that file's symbol table.  (Photran provides an item in its Refactoring menu which dumps the symbol table
-for the file in the editor to standard output using this method.)
+{\footnotesize\begin{verbatim}
+    public List<Definition> resolveBinding()
+\end{verbatim}}
+
+The \texttt{Definition} object contains information about what type of entity was defined (local variable, function,
+common block, etc.), array information (if applicable), whether it was defined implicitly, etc.
 
 \section{Type Checking}
 
 The type of any expression (\texttt{ASTExprNode}) can be determined by invoking the static method
 \texttt{TypeChecker.getTypeOf(node)}.  At the time of writing, this behavior is not completely implemented.
-(TODO)
+
+
+
+\section{How to Get Acquainted with the Program Representation}
+
+\subsection{Visualizing ASTs}
+
+Photran can display ASTs rather than the ordinary Outline view.
+This behavior can be enabled from the Fortran workspace preferences
+(click on Window $>$ Preferences in Windows/Linux, or
+Eclipse $>$ Preferences in Mac OS X).  Clicking on an AST node in the Outline
+view will move the cursor to that construct's position in the source file.
+
+\subsection{Visually Resolving Bindings}
+
+In a Fortran editor, click on an identifier (positioning the cursor over it),
+and press F3 (or click Navigate $>$ Open Declaration, or right-click and choose Open Declaration.)  The
+binding will be resolved and the declaration highlighted.  If there are multiple bindings, a popup window will open
+and one can be selected.  If the identifier is bound to a declaration in a module defined in a different file, an
+editor will be opened on that file.
+
+\subsection{Visualizing Enclosing Scopes}
+
+Click on any token in the Fortran editor, and click Refactor $>$ (Debugging) $>$ Select Enclosing Scope.
+The entire range of source text for that token's enclosing \texttt{ScopingNode} will be highlighted.
+
+\subsection{Visualizing Definitions}
+
+Open a file in the Fortran editor, and
+click Refactor $>$ (Debugging) $>$ Display Symbol Table for Current File.
+Indentation shows scope nesting, and each line summarizes the information in a \texttt{Definition} object.

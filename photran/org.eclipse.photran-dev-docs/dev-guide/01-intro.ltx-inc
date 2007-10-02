@@ -30,7 +30,7 @@ Photran.
 \begin{itemize}
 
 \item \textbf{Standard Make projects} are ordinary Eclipse projects, except that
-the CDT (and Photran) recognize them as being ``their'' type of project
+the CDT (and Photran) recognize them as being ``their own'' type of project
 (as opposed to, say, projects for JDT, EMF, or another Eclipse-based tool).
 The user must supply their own Makefile, typically with targets ``clean''
 and ``all.''  CDT/Photran cleans and builds the project by running
