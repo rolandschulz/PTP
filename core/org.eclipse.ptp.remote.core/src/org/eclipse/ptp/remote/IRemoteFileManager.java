@@ -14,8 +14,29 @@ import org.eclipse.swt.widgets.Shell;
 
 public interface IRemoteFileManager {
 	/**
-	 * @param conn
-	 * @return
+	 * Browse for a remote file. The return value is the the path to the remote file,
+	 * on the remote system. Equivalent to {@link FileDialog}.
+	 * 
+	 * @param shell workbench shell
+	 * @param conn remote connection to use for browsing
+	 * @param message message to display in dialog
+	 * @param filterPath initial path to use when displaying files
+	 * @return a string representing the path to the file
 	 */
-	public String browseRemoteFile(Shell shell, IRemoteConnection conn, String message, String correctPath);
+	public String browseRemoteFile(Shell shell, IRemoteConnection conn, 
+			String message, String filterPath);
+
+	/**
+	 * Browse for a remote directory. The return value is the the path to the remote directory,
+	 * on the remote system. Equivalent to {@link DirectoryDialog}.
+	 * 
+	 * @param shell workbench shell
+	 * @param conn remote connection to use for browsing
+	 * @param message message to display in dialog
+	 * @param filterPath initial path to use when displaying files
+	 * @return a string representing the path to the directory
+	 */
+	public String browseRemoteDirectory(Shell shell, IRemoteConnection conn, 
+			String message, String filterPath);
+
 }
