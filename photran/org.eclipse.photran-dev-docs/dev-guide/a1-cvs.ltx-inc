@@ -1,13 +1,13 @@
 % Getting the Photran Sources from CVS
 
-\textit{Last Updated 4/4/07}
+\textit{Last Updated 10/2/07}
 
 \emph{BEFORE YOU BEGIN: Make sure you are running Eclipse 3.3
       and a Java~5 or later JVM.}
 
-\hspace{1em}\textbf{Part~I.  Check out the CDT 4.0 sources from CVS}
+\hspace{1em}\textbf{Part~I.  Check out the CDT 4.0.1 sources from CVS}
 
-If you already have CDT 4.0 installed and do not need
+If you already have CDT 4.0.1 installed and do not need
 to edit the CDT source code, Part~I can be skipped.
 
 \begin{enumerate}
@@ -30,7 +30,7 @@ to edit the CDT source code, Part~I can be skipped.
        \begin{itemize}
        \item  Expand ``:pserver:anonymous@dev.eclipse.org:/cvsroot/tools''
        \item  Then expand ``Versions''
-       \item  Then expand ``org.eclipse.cdt CDT\_4\_0\_0''
+       \item  Then expand ``org.eclipse.cdt CDT\_4\_0\_1''
        \item  Then expand ``all''
        \end{itemize}
 \item  Click on the first entry under ``all''
@@ -67,9 +67,11 @@ to edit the CDT source code, Part~I can be skipped.
     org.eclipse.photran
 \item  Check out the following projects under org.eclipse.photran:
        \begin{itemize}
+       \item  org.eclipse.photran.cdtinterface
        \item  org.eclipse.photran.core
        \item  org.eclipse.photran.core.vpg
        \item  org.eclipse.photran.core.vpg.tests
+       \item  org.eclipse.photran.core.vpg.tests.failing
        \item  org.eclipse.photran.errorparsers.xlf
        \item  org.eclipse.photran.intel-feature
        \item  org.eclipse.photran.managedbuilder.core
