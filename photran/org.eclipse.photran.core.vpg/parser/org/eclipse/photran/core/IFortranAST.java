@@ -23,7 +23,7 @@ import org.eclipse.photran.internal.core.parser.GenericParseTreeVisitor;
  * 
  * @author Jeff Overbey
  */
-public interface IFortranAST /*extends Iterable<Token>*/
+public interface IFortranAST extends Iterable<Token>
 {
     ///////////////////////////////////////////////////////////////////////////
     // Visitor Support
@@ -41,7 +41,7 @@ public interface IFortranAST /*extends Iterable<Token>*/
     public ASTExecutableProgramNode getRoot();
 
     //public void rebuildTokenList();
-    public Iterator/*<Token*/ iterator();
+    public Iterator<Token> iterator();
     public Token findTokenByStreamOffsetLength(int offset, int length);
     public Token findFirstTokenOnLine(int line);
 	public Token findTokenByFileOffsetLength(IFile file, int offset, int length);
