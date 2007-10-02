@@ -15,33 +15,47 @@ import java.io.OutputStream;
 
 public interface IRemoteProcess {
 	/**
-	 * 
+	 * Terminate the process
 	 */
 	public void destroy();
 
 	/**
-	 * @return
+	 * Returns the exit value for the process
+	 * 
+	 * @return the exit value
 	 */
 	public int exitValue();
 
 	/**
-	 * @return
+	 * Gets the error output stream of the process
+	 * 
+	 * @return the output stream connected to the standard
+	 * error of the process
 	 */
 	public InputStream getErrorStream();
 
 	/**
-	 * @return
+	 * Gets the standard input stream to the process
+	 * 
+	 * @return the input stream connected to the standard
+	 * input of the process
 	 */
 	public InputStream getInputStream();
 
 	/**
-	 * @return
+	 * Gets the standard output stream of the process
+	 * 
+	 * @return the output stream connected to the standard
+	 * output of the process
 	 */
 	public OutputStream getOutputStream();
 
 	/**
-	 * @return
-	 * @throws InterruptedException
+	 * Wait until the process has terminated
+	 * 
+	 * @return the exit value of the process
+	 * @throws InterruptedException if the current thread is
+	 * interrupted by another thread while it is waiting
 	 */
 	public int waitFor() throws InterruptedException;
 	

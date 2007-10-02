@@ -23,22 +23,37 @@ public class LocalServices implements IRemoteServicesDelegate {
 	private IRemoteConnectionManager connMgr;
 	private IRemoteFileManager fileMgr;
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.IRemoteServicesDelegate#getProcessBuilder(org.eclipse.ptp.remote.IRemoteConnection, java.util.List)
+	 */
 	public IRemoteProcessBuilder getProcessBuilder(IRemoteConnection conn, List<String>command) {
 		return new LocalProcessBuilder(conn, command);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.IRemoteServicesDelegate#getProcessBuilder(org.eclipse.ptp.remote.IRemoteConnection, java.lang.String[])
+	 */
 	public IRemoteProcessBuilder getProcessBuilder(IRemoteConnection conn, String... command) {
 		return new LocalProcessBuilder(conn, command);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.IRemoteServicesDelegate#getConnectionManager()
+	 */
 	public IRemoteConnectionManager getConnectionManager() {
 		return connMgr;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.IRemoteServicesDelegate#getFileManager()
+	 */
 	public IRemoteFileManager getFileManager() {
 		return fileMgr;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.IRemoteServicesDelegate#initialize()
+	 */
 	public boolean initialize() {
 		connMgr = new LocalConnectionManager();
 		fileMgr = new LocalFileManager();

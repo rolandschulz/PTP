@@ -65,6 +65,11 @@ public class RemoteServicesProxy implements IRemoteServices {
 		return delegate.getConnectionManager();
 	}
 	
+	/**
+	 * Get the factory from the plugin
+	 * 
+	 * @return instance of the factory
+	 */
 	public AbstractRemoteServicesFactory getFactory() {
 		if (factory != null) {
 			return factory;
@@ -131,10 +136,16 @@ public class RemoteServicesProxy implements IRemoteServices {
 		return initialized;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.IRemoteServices#isInitialized()
+	 */
 	public boolean isInitialized() {
 		return initialized;
 	}
 	
+	/**
+	 * Create and initialize the remote services factory
+	 */
 	private void loadServices() {
 		if (delegate == null) {
 			AbstractRemoteServicesFactory factory = getFactory();

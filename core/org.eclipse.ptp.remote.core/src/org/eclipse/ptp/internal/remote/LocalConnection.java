@@ -62,6 +62,9 @@ public class LocalConnection implements IRemoteConnection {
 		this.hostname = hostname;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.IRemoteConnection#getUsername()
+	 */
 	public String getUsername() {
 		return username;
 	}
