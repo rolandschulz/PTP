@@ -190,7 +190,7 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
         "RETURN", "REWIND", "SAVE", "SELECT", "SEQUENCE", "SEQUENTIAL", "SIZE", "STAT", "STATUS", "STOP", "SUBROUTINE", "TARGET", "THEN", "TO", "TYPE", "UNFORMATTED",
         "UNIT", "USE", "VOLATILE", "WHERE", "WHILE", "WRITE" };
 
-    private static String[] fgTextualOperators = { ".EQ.", ".EQV.", ".FALSE.", ".GE.", ".GT.", ".LE.", ".NE.", ".NEQV.", ".NOT.", ".OR.", ".TRUE." };
+    private static String[] fgTextualOperators = { ".EQ.", ".EQV.", ".FALSE.", ".GE.", ".GT.", ".LE.", ".LT.", ".NE.", ".NEQV.", ".NOT.", ".OR.", ".TRUE." };
 
     private static String[] fgIntrinsics =
     {
