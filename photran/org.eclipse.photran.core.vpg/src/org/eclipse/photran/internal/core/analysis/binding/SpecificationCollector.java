@@ -39,7 +39,7 @@ import org.eclipse.photran.internal.core.parser.ASTTargetStmtNode;
  * 
  * @author Jeff Overbey
  */
-public class SpecificationCollector extends BindingCollector
+class SpecificationCollector extends BindingCollector
 {
     // # R520
     // <IntentStmt> ::=

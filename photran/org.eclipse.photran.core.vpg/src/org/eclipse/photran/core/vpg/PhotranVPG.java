@@ -29,17 +29,12 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.photran.core.FortranAST;
 import org.eclipse.photran.core.IFortranAST;
+import org.eclipse.photran.internal.core.analysis.binding.Binder;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
-import org.eclipse.photran.internal.core.analysis.binding.DefinitionCollector;
-import org.eclipse.photran.internal.core.analysis.binding.ImplicitSpecCollector;
-import org.eclipse.photran.internal.core.analysis.binding.ModuleLoader;
-import org.eclipse.photran.internal.core.analysis.binding.ReferenceCollector;
-import org.eclipse.photran.internal.core.analysis.binding.SpecificationCollector;
 import org.eclipse.photran.internal.core.analysis.types.Type;
 import org.eclipse.photran.internal.core.lexer.IAccumulatingLexer;
 import org.eclipse.photran.internal.core.lexer.IncludeLoaderCallback;
@@ -290,27 +285,7 @@ public class PhotranVPG extends EclipseVPG<IFortranAST, Token>
 		
 		if (ast == null) return;
 
-        long[] t = new long[6];
-		t[0] = System.currentTimeMillis();
-		ast.visitTopDownUsing(new ImplicitSpecCollector());
-        t[1] = System.currentTimeMillis();
-		ast.visitBottomUpUsing(new DefinitionCollector(getIFileForFilename(filename)));
-        t[2] = System.currentTimeMillis();
-		ast.visitBottomUpUsing(new SpecificationCollector());
-        t[3] = System.currentTimeMillis();
-		ast.visitBottomUpUsing(
-			new ModuleLoader(getIFileForFilename(filename),
-					new NullProgressMonitor()));
-					//PhotranVPG.getInstance().getCurrentProgressMonitor()));
-		// TODO: Type check here so derived type components can be resolved
-        t[4] = System.currentTimeMillis();
-		ast.visitBottomUpUsing(new ReferenceCollector());
-        t[5] = System.currentTimeMillis();
-
-//        String s = "";
-//        for (int i = 1; i < t.length; i++)
-//            s += (t[i] - t[i-1]) + " ";
-//        System.out.println(s);
+		Binder.bind(ast, getIFileForFilename(filename));
 	}
 	
 	public IFortranAST acquireTransientAST(IFile file)

@@ -87,7 +87,7 @@ import org.eclipse.photran.internal.core.parser.Parser.Nonterminal;
  * 
  * @author Jeff Overbey
  */
-public class ReferenceCollector extends BindingCollector
+class ReferenceCollector extends BindingCollector
 {
     // <NamedConstantUse> ::= T_IDENT
 

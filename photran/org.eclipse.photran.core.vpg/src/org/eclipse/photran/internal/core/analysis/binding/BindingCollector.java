@@ -12,11 +12,15 @@ package org.eclipse.photran.internal.core.analysis.binding;
 
 import java.util.List;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.photran.core.vpg.PhotranTokenRef;
 import org.eclipse.photran.core.vpg.PhotranVPG;
 import org.eclipse.photran.core.vpg.PhotranVPGBuilder;
 import org.eclipse.photran.internal.core.analysis.types.Type;
 import org.eclipse.photran.internal.core.lexer.Token;
+import org.eclipse.photran.internal.core.parser.ASTAccessStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTModuleStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTPrivateSequenceStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTVisitor;
 
 /**
@@ -25,10 +29,25 @@ import org.eclipse.photran.internal.core.parser.ASTVisitor;
  * 
  * @author Jeff Overbey
  */
-abstract class BindingCollector extends ASTVisitor
+public abstract class BindingCollector extends ASTVisitor
 {
 	protected PhotranVPGBuilder vpg = (PhotranVPGBuilder)PhotranVPG.getInstance();
+
+    protected void markModuleExport(IFile file, String moduleName)
+    {
+        vpg.markFileAsExportingModule(file, moduleName);
+    }
+
+    protected void setScopeDefaultVisibilityToPrivate(ScopingNode scope)
+    {
+        vpg.setDefaultScopeVisibilityToPrivate(scope);
+    }
 	
+    protected void setDefinition(Token ident, Definition def)
+    {
+        vpg.setDefinitionFor(ident.getTokenRef(), def);
+    }
+
 	// addDefinition() and bindRenamedEntity() accept null to support the module loader
 	// (its code is cleaner if it doesn't have to special-case nulls)
 	

@@ -57,9 +57,9 @@ import org.eclipse.photran.internal.core.parser.ASTWhereConstructStmtNode;
  * 
  * @author Jeff Overbey
  */
-public class DefinitionCollector extends BindingCollector
+class DefinitionCollector extends BindingCollector
 {
-    private IFile file;
+    protected IFile file;
 
     public DefinitionCollector(IFile file)
     {
@@ -95,7 +95,7 @@ public class DefinitionCollector extends BindingCollector
         {
         	try
         	{
-        		vpg.setDefaultScopeVisibilityToPrivate(node.getTPrivate().getEnclosingScope());
+        		setScopeDefaultVisibilityToPrivate(node.getTPrivate().getEnclosingScope());
         	}
         	catch (Exception e)
         	{
@@ -153,7 +153,7 @@ public class DefinitionCollector extends BindingCollector
                                            Type.parse(node.getTypeSpec()));
             def.setAttributes(node.getAttrSpecSeq());
             def.setArraySpec(getArraySpec(entityDecl)); // (p.119) This overrides the DIMENSION attribute
-            vpg.setDefinitionFor(objectNameIdent.getTokenRef(), def);
+            setDefinition(objectNameIdent, def);
         }
     }
 
@@ -202,7 +202,7 @@ public class DefinitionCollector extends BindingCollector
         	{
         		try
         		{
-        			vpg.setDefaultScopeVisibilityToPrivate(node.getAccessSpec().getTPrivate().getEnclosingScope());
+        			setScopeDefaultVisibilityToPrivate(node.getAccessSpec().getTPrivate().getEnclosingScope());
         		}
         		catch (Exception e)
         		{
@@ -347,7 +347,7 @@ public class DefinitionCollector extends BindingCollector
     @Override public void visitASTModuleStmtNode(ASTModuleStmtNode node)
     {
         addDefinition(node.getModuleName().getTIdent(), Definition.Classification.MODULE, Type.VOID);
-        try { vpg.markFileAsExportingModule(file, node.getModuleName().getTIdent().getText()); }
+        try { markModuleExport(file, node.getModuleName().getTIdent().getText()); }
         catch (Exception e) { throw new Error(e); }
     }
 

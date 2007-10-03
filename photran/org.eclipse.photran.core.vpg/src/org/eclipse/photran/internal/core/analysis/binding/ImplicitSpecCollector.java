@@ -29,7 +29,7 @@ import org.eclipse.photran.internal.core.parser.ASTSubroutineSubprogramNode;
  * 
  * @author Jeff Overbey
  */
-public class ImplicitSpecCollector extends BindingCollector
+class ImplicitSpecCollector extends BindingCollector
 {
     // # R541
     // <ImplicitStmt> ::=
