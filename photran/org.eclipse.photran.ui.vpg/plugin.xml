@@ -78,9 +78,10 @@
       <page
             objectClass="org.eclipse.core.resources.IProject"
             adaptable="true"
-            name="Fortran Analysis/Refactoring"
+            name="Analysis/Refactoring"
             class="org.eclipse.photran.internal.ui.properties.SearchPathsPropertyPage"
-            id="org.eclipse.photran.ui.SearchPathsPropertyPage">
+            id="org.eclipse.photran.ui.SearchPathsPropertyPage"
+            category="org.eclipse.photran.ui.newui.Page_head_general">
          <!--filter
                name="nature"
                value="org.eclipse.cdt.managedbuilder.core.managedBuildNature">

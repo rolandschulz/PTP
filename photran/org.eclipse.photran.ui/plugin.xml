@@ -164,6 +164,7 @@
 	        id="org.eclipse.photran.ui.BlockCommentEditorContribution">
 	     <action 
 	           label="Comment/Uncomment" 
+               definitionId="org.eclipse.photran.ui.CommentCommand"
 	           class="org.eclipse.photran.internal.ui.actions.FortranBlockCommentActionDelegate" 
 	           menubarPath="group.edit" 
 	           id="org.eclipse.photran.ui.BlockCommentMenuAction"/>
@@ -183,6 +184,29 @@
             name="Photran Block Comment">
       </command>
    </extension>
+   <extension point="org.eclipse.ui.actionSets">
+      <actionSet
+            label="Comment/Uncomment"
+            description="Comment/Uncomment"
+            visible="true"
+            id="org.eclipse.photran.ui.CommentUncomment">
+	     <action 
+	           label="Comment/Uncomment" 
+               menubarPath="edit/additions"
+               definitionId="org.eclipse.photran.ui.CommentCommand"
+	           class="org.eclipse.photran.internal.ui.actions.FortranBlockCommentActionDelegate" 
+	           id="org.eclipse.photran.ui.BlockCommentAction">
+	     </action>
+      </actionSet>
+   </extension>
+   <extension
+         point="org.eclipse.ui.actionSetPartAssociations">
+      <actionSetPartAssociation
+            targetID="org.eclipse.photran.ui.CommentUncomment">
+         <part id="org.eclipse.photran.ui.editor.FreeFormFortranEditor"/>
+         <part id="org.eclipse.photran.ui.editor.FixedFormFortranEditor"/>
+      </actionSetPartAssociation>      
+   </extension>
    <extension
             point="org.eclipse.ui.bindings">
       <!--  win32:  M1=CTRL,    M2=SHIFT, M3=ALT, M4=-
@@ -194,6 +218,13 @@
             commandId="org.eclipse.photran.ui.CommentCommand"/>
         <key
             sequence="M1+M2+/"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            contextId="org.eclipse.photran.ui.FortranEditorContext"
+            commandId="org.eclipse.photran.ui.CommentCommand"/>
+        <!-- The above don't seem to work anymore... something else is taking over those keystrokes,
+             so install this one as well -->
+        <key
+            sequence="M1+M2+1"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             contextId="org.eclipse.photran.ui.FortranEditorContext"
             commandId="org.eclipse.photran.ui.CommentCommand"/>
@@ -253,4 +284,33 @@
             id="org.eclipse.photran.ui.FortranEditorPreferencePage">
       </page>
    </extension>
+
+   <!--=========================================-->
+   <!-- Fortran-specific project property pages -->
+   <!--=========================================-->
+   <extension
+         point="org.eclipse.ui.propertyPages">
+      <page
+            class="org.eclipse.photran.internal.ui.properties.Page_head_general"
+            id="org.eclipse.photran.ui.newui.Page_head_general"
+            name="Fortran General"
+            >
+         <filter
+               name="projectNature"
+               value="org.eclipse.cdt.core.cnature">
+         </filter>            
+         <enabledWhen>
+            <or>
+		     <instanceof value="org.eclipse.core.resources.IProject"/>
+		     <instanceof value="org.eclipse.cdt.core.model.ICProject"/>
+		     
+		     <instanceof value="org.eclipse.core.resources.IFolder"/>
+		     <instanceof value="org.eclipse.cdt.core.model.ICContainer"/>
+
+	         <instanceof value="org.eclipse.core.resources.IFile"/>
+         	 <instanceof value="org.eclipse.cdt.core.model.ITranslationUnit"/>
+		    </or>          
+         </enabledWhen>
+      </page>
+    </extension>    
 </plugin>
