@@ -89,7 +89,7 @@
       <actionSet
             label="Comment/Uncomment"
             description="Comment/Uncomment"
-            visible="true"
+            visible="false"
             id="org.eclipse.photran.ui.CommentUncomment">
 	     <action 
 	           label="Comment/Uncomment" 
@@ -102,11 +102,10 @@
    </extension>
    <extension
          point="org.eclipse.ui.actionSetPartAssociations">
-      <actionSetPartAssociation
-            targetID="org.eclipse.photran.ui.CommentUncomment">
-         <part id="org.eclipse.photran.ui.editor.FreeFormFortranEditor"/>
-         <part id="org.eclipse.photran.ui.editor.FixedFormFortranEditor"/>
-      </actionSetPartAssociation>      
+      <actionSetPartAssociation targetID="org.eclipse.photran.ui.CommentUncomment">
+         <part id="org.eclipse.photran.ui.FreeFormFortranEditor"/>
+         <part id="org.eclipse.photran.ui.FixedFormFortranEditor"/>
+      </actionSetPartAssociation>
    </extension>
    <extension
             point="org.eclipse.ui.bindings">
@@ -163,8 +162,8 @@
          point="org.eclipse.ui.actionSetPartAssociations">
       <actionSetPartAssociation
             targetID="org.eclipse.ui.edit.text.actionSet.annotationNavigation">
-         <part id="org.eclipse.photran.ui.editor.FreeFormFortranEditor"/>
-         <part id="org.eclipse.photran.ui.editor.FixedFormFortranEditor"/>
+         <part id="org.eclipse.photran.ui.FreeFormFortranEditor"/>
+         <part id="org.eclipse.photran.ui.FixedFormFortranEditor"/>
       </actionSetPartAssociation>      
    </extension>
 
