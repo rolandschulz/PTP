@@ -34,6 +34,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.photran.core.FortranAST;
 import org.eclipse.photran.core.IFortranAST;
+import org.eclipse.photran.internal.core.analysis.binding.ChainedVisitor;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.analysis.binding.DefinitionCollector;
 import org.eclipse.photran.internal.core.analysis.binding.ImplicitSpecCollector;
@@ -288,20 +289,28 @@ public class PhotranVPG extends EclipseVPG<IFortranAST, Token>
 		
 		if (ast == null) return;
 		
-		ast.visitTopDownUsing(new ImplicitSpecCollector());
+//		ast.visitTopDownUsing(new ImplicitSpecCollector());
+//		
+//		ast.visitBottomUpUsing(new DefinitionCollector(getIFileForFilename(filename)));
+//		
+//		ast.visitBottomUpUsing(new SpecificationCollector());
+//
+//		ast.visitBottomUpUsing(
+//			new ModuleLoader(getIFileForFilename(filename),
+//					new NullProgressMonitor()));
+//					//PhotranVPG.getInstance().getCurrentProgressMonitor()));
+//
+//		// TODO: Type check here so derived type components can be resolved
+//		
+//		ast.visitBottomUpUsing(new ReferenceCollector());
 		
-		ast.visitBottomUpUsing(new DefinitionCollector(getIFileForFilename(filename)));
-		
-		ast.visitBottomUpUsing(new SpecificationCollector());
-
-		ast.visitBottomUpUsing(
-			new ModuleLoader(getIFileForFilename(filename),
-					new NullProgressMonitor()));
-					//PhotranVPG.getInstance().getCurrentProgressMonitor()));
-
-		// TODO: Type check here so derived type components can be resolved
-		
-		ast.visitBottomUpUsing(new ReferenceCollector());
+		ChainedVisitor v = new ChainedVisitor();
+		v.addTopDownVisitor(new ImplicitSpecCollector());
+        v.addBottomUpVisitor(new DefinitionCollector(getIFileForFilename(filename)));
+        v.addBottomUpVisitor(new SpecificationCollector());
+        v.addBottomUpVisitor(new ModuleLoader(getIFileForFilename(filename), new NullProgressMonitor()));
+        v.addBottomUpVisitor(new ReferenceCollector());
+        ast.visitUsing(v);
 	}
 	
 	public IFortranAST acquireTransientAST(IFile file)
