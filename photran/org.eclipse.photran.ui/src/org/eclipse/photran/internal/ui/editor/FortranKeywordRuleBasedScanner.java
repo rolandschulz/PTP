@@ -192,14 +192,134 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
 
     private static String[] fgTextualOperators = { ".EQ.", ".EQV.", ".FALSE.", ".GE.", ".GT.", ".LE.", ".NE.", ".NEQV.", ".NOT.", ".OR.", ".TRUE." };
 
-    private static String[] fgIntrinsics = { "ABS", "ACHAR", "ACOS", "ADJUSTL", "ADJUSTR", "AIMAG", "AINT", "ALL", "ALLOCATED", "AND", "ANINT", "ANY", "ASIN",
+    private static String[] fgIntrinsics =
+    {
+         // From Metcalf and Reid, "Fortran 90/95 Explained", Chapter 8
+         // Functions
+         "associated",
+         "present",
+         "kind",
+         "abs",
+         "aimag",
+         "aint",
+         "anint",
+         "ceiling",
+         "cmplx",
+         "floor",
+         "int",
+         "nint",
+         "real",
+         "conjg",
+         "dim",
+         "max",
+         "min",
+         "mod",
+         "modulo",
+         "sign",
+         "acos",
+         "asin",
+         "atan",
+         "atan2",
+         "cos",
+         "cosh",
+         "exp",
+         "log",
+         "log10",
+         "sin",
+         "sinh",
+         "sqrt",
+         "tan",
+         "tanh",
+         "achar",
+         "char",
+         "iachar",
+         "ichar",
+         "lge",
+         "lgt",
+         "lle",
+         "llt",
+         "adjustl",
+         "adjustr",
+         "index",
+         "len_trim",
+         "scan",
+         "verify",
+         "logical",
+         "len",
+         "repeat",
+         "trim",
+         "digits",
+         "epsilon",
+         "huge",
+         "maxexponent",
+         "minexponent",
+         "precision",
+         "radix",
+         "range",
+         "tiny",
+         "exponent",
+         "fraction",
+         "nearest",
+         "rrspacing",
+         "scale",
+         "set_exponent",
+         "spacing",
+         "selected_int_kind",
+         "selected_real_kind",
+         "bit_size",
+         "btest",
+         "iand",
+         "ibclr",
+         "ibits",
+         "ibset",
+         "ieor",
+         "ior",
+         "ishft",
+         "ishftc",
+         "not",
+         "dot_product",
+         "matmul",
+         "all",
+         "any",
+         "count",
+         "maxval",
+         "minval",
+         "product",
+         "sum",
+         "allocated",
+         "lbound",
+         "shape",
+         "size",
+         "ubound",
+         "merge",
+         "pack",
+         "unpack",
+         "reshape",
+         "spread",
+         "cshift",
+         "eoshift",
+         "transpose",
+         "maxloc",
+         "minloc",
+         "null",
+    
+         // Subroutines
+         "mvbits",
+         "date_and_time",
+         "system_clock",
+         "cpu_time",
+         "random_number",
+         "random_seed"
+    };
+
+    /* { "ABS", "ACHAR", "ACOS", "ADJUSTL", "ADJUSTR", "AIMAG", "AINT", "ALL", "ALLOCATED", "AND", "ANINT", "ANY", "ASIN",
         "ASSOCIATED", "ATAN", "ATAN2", "BIT_SIZE", "BTEST", "CEILING", "CHAR", "CMPLX", "CONJG", "COS", "COSH", "COUNT", "CSHIFT", "DATE_AND_TIME", "DBLE", "DIGITS",
         "DIM", "DOT_PRODUCT", "DPROD", "EOSHIFT", "EPSILON", "EQV", "EXP", "EXPONENT", "FALSE", "FLOOR", "FRACTION", "HUGE", "IACHAR", "IAND", "IBCLR", "IBITS", "IBSET",
         "ICHAR", "IEOR", "INDEX", "INT", "IOR", "ISHFT", "ISHFTC", "KIND", "LBOUND", "LEN", "LEN_TRIM", "LGE", "LGT", "LLE", "LLT", "LOG", "LOG10", "LOGICAL", "MATMUL",
         "MAX", "MAXEXPONENT", "MAXLOC", "MAXVAL", "MERGE", "MIN", "MINEXPONENT", "MINLOC", "MINVAL", "MOD", "MODULO", "MVBITS", "NEAREST", "NEQV", "NINT", "NOT", "OR",
         "PACK", "PRECISION", "PRESENT", "PRODUCT", "RADIX", "RANDOM_NUMBER", "RANDOM_SEED", "RANGE", "REAL", "REPEAT", "RESHAPE", "RRSPACING", "SCALE", "SCAN",
         "SELECTED_INT_KIND", "SELECTED_REAL_KIND", "SET_EXPONENT", "SHAPE", "SIGN", "SIN", "SINH", "SIZE", "SPACING", "SPREAD", "SQRT", "SUM", "SYSTEM_CLOCK", "TAN",
-        "TANH", "TINY", "TRANSFER", "TRANSPOSE", "TRIM", "TRUE", "UBOUND", "UNPACK", "VERIFY" };
+        "TANH", "TINY", "TRANSFER", "TRANSPOSE", "TRIM", "TRUE", "UBOUND", "UNPACK", "VERIFY" }; */
 
     private static String[] fgTypes = { "REAL", "INTEGER", "CHARACTER", "LOGICAL", "COMPLEX" };
 
@@ -277,9 +397,9 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
 
         for (int i = 0; i < fgTextualOperators.length; i++)
             wordRule.addWord(fgTextualOperators[i], colorKeywords);
-        for (int i = 0; i < fgIntrinsics.length; i++)
-            wordRule.addWord(fgIntrinsics[i], colorIntrinsics);
 
+        for (int i = 0; i < fgIntrinsics.length; i++)
+            salesRule.addIdentifier(fgIntrinsics[i], colorIntrinsics);
         for (int i = 0; i < fgPreprocessor.length; i++)
             salesRule.addWord(fgPreprocessor[i], colorKeywords);
         for (int i = 0; i < fgTypes.length; i++)
