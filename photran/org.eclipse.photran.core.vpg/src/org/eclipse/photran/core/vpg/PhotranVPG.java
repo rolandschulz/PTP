@@ -289,21 +289,22 @@ public class PhotranVPG extends EclipseVPG<IFortranAST, Token>
 		
 		if (ast == null) return;
 		
-//		ast.visitTopDownUsing(new ImplicitSpecCollector());
-//		
-//		ast.visitBottomUpUsing(new DefinitionCollector(getIFileForFilename(filename)));
-//		
-//		ast.visitBottomUpUsing(new SpecificationCollector());
-//
-//		ast.visitBottomUpUsing(
-//			new ModuleLoader(getIFileForFilename(filename),
-//					new NullProgressMonitor()));
-//					//PhotranVPG.getInstance().getCurrentProgressMonitor()));
-//
-//		// TODO: Type check here so derived type components can be resolved
-//		
-//		ast.visitBottomUpUsing(new ReferenceCollector());
+		ast.visitTopDownUsing(new ImplicitSpecCollector());
 		
+		ast.visitBottomUpUsing(new DefinitionCollector(getIFileForFilename(filename)));
+		
+		ast.visitBottomUpUsing(new SpecificationCollector());
+
+		ast.visitBottomUpUsing(
+			new ModuleLoader(getIFileForFilename(filename),
+					new NullProgressMonitor()));
+					//PhotranVPG.getInstance().getCurrentProgressMonitor()));
+
+		// TODO: Type check here so derived type components can be resolved
+		
+		ast.visitBottomUpUsing(new ReferenceCollector());
+		
+		/*
 		ChainedVisitor v = new ChainedVisitor();
 		v.addTopDownVisitor(new ImplicitSpecCollector());
         v.addBottomUpVisitor(new DefinitionCollector(getIFileForFilename(filename)));
@@ -311,6 +312,7 @@ public class PhotranVPG extends EclipseVPG<IFortranAST, Token>
         v.addBottomUpVisitor(new ModuleLoader(getIFileForFilename(filename), new NullProgressMonitor()));
         v.addBottomUpVisitor(new ReferenceCollector());
         ast.visitUsing(v);
+        */
 	}
 	
 	public IFortranAST acquireTransientAST(IFile file)
