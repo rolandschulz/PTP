@@ -34,6 +34,7 @@ import org.eclipse.core.runtime.QualifiedName;
  */
 public class SearchPathProperties
 {
+    public static final String ENABLE_VPG_PROPERTY_NAME = "EnableVPG";
     public static final String MODULE_PATHS_PROPERTY_NAME = "FortranModulePaths";
     public static final String INCLUDE_PATHS_PROPERTY_NAME = "FortranIncludePaths";
     

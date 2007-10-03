@@ -47,6 +47,7 @@ import org.eclipse.photran.internal.core.lexer.LexerFactory;
 import org.eclipse.photran.internal.core.lexer.SourceForm;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.Parser;
+import org.eclipse.photran.internal.core.properties.SearchPathProperties;
 
 import bz.over.vpg.TokenRef;
 import bz.over.vpg.VPGDependency;
@@ -156,7 +157,8 @@ public class PhotranVPG extends EclipseVPG<IFortranAST, Token>
 	{
 		try
 		{
-			return project.hasNature(CProjectNature.C_NATURE_ID) || project.hasNature(CCProjectNature.CC_NATURE_ID);
+			return (project.hasNature(CProjectNature.C_NATURE_ID) || project.hasNature(CCProjectNature.CC_NATURE_ID))
+			    && (inTestingMode() || SearchPathProperties.getProperty(project, SearchPathProperties.ENABLE_VPG_PROPERTY_NAME).equals("true"));
 		}
 		catch (CoreException e)
 		{

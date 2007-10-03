@@ -78,7 +78,7 @@
       <page
             objectClass="org.eclipse.core.resources.IProject"
             adaptable="true"
-            name="Fortran Refactoring Engine Search Paths"
+            name="Fortran Analysis/Refactoring"
             class="org.eclipse.photran.internal.ui.properties.SearchPathsPropertyPage"
             id="org.eclipse.photran.ui.SearchPathsPropertyPage">
          <!--filter

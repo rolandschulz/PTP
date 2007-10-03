@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.ListEditor;
 import org.eclipse.photran.internal.core.properties.SearchPathProperties;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.dialogs.ContainerSelectionDialog;
 
@@ -54,6 +55,7 @@ public class WorkspacePathEditor extends ListEditor
      */
     public WorkspacePathEditor(IProject project, String name, String labelText, String dirChooserLabelText, Composite parent)
     {
+        parent = new Composite(parent, SWT.NONE);
         init(name, labelText);
         this.project = project;
         this.dirChooserLabelText = dirChooserLabelText;
