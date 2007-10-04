@@ -161,71 +161,64 @@ Java and all Java-based trademarks are trademarks of Sun Microsystems, Inc. in t
    </requires>
 
    <plugin
-         id="org.eclipse.ptp.tau.launch"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="org.eclipse.ptp.tau.papiselect"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="1.0.0"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.ptp.tau.perfdmf"
          download-size="0"
          install-size="0"
-         version="0.0.0"/>
+         version="1.0.0"/>
 
    <plugin
          id="org.eclipse.ptp.tau.selinst"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="1.0.0"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.ptp.tau.selinstfort"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="1.0.0"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.ptp.tau.jars"
          download-size="0"
          install-size="0"
-         version="0.0.0"/>
+         version="1.0.0"/>
 
    <plugin
          id="org.eclipse.ptp.tau.managedbuilder.other.photran.ui"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="1.0.0"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.ptp.tau.managedbuilder.other.ui"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="1.0.0"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.ptp.tau.performance"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="1.0.0"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.ptp.tau.performance.parallel"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="1.0.0"
          fragment="true"
          unpack="false"/>
 
@@ -233,7 +226,7 @@ Java and all Java-based trademarks are trademarks of Sun Microsystems, Inc. in t
          id="org.eclipse.ptp.tau.toolopts"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="1.0.0"
          unpack="false"/>
 
 </feature>
