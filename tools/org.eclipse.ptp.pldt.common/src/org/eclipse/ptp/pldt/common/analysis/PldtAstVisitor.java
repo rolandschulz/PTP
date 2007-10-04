@@ -179,7 +179,7 @@ public class PldtAstVisitor extends CASTVisitor {
 		}
 
 		// cdt40 CDT4.0: declarations null
-		IASTName[] decls=funcName.getTranslationUnit().getDeclarationsInAST(binding);//1/2/07: empty! for MPB/MPI & OpenMP
+		IASTName[] decls=funcName.getTranslationUnit().getDeclarationsInAST(binding);//10/2/07: empty for MPI/C++ MPI::
 		if (traceOn) {
 			if (decls.length == 0) { // BRT decls=null detection
 				IASTTranslationUnit tu = funcName.getTranslationUnit();

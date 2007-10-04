@@ -1348,7 +1348,7 @@ public class SimpleTableMarkerView extends ViewPart {
 			}//end run()
 		};// end new action
 		removeMarkerAction.setText("Remove Markers");
-		removeMarkerAction.setToolTipText("Remove all the tuningfork instrumentation markers");
+		removeMarkerAction.setToolTipText("Remove Markers");
 		removeMarkerAction.setImageDescriptor(PlatformUI.getWorkbench()
 				.getSharedImages().getImageDescriptor(
 						ISharedImages.IMG_TOOL_DELETE));// nice "red X" image

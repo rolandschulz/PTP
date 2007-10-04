@@ -14,5 +14,68 @@
          point="org.eclipse.core.runtime.preferences">
       <initializer class="org.eclipse.ptp.pldt.common.prefs.PreferenceInitializer"/>
    </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            id="org.eclipse.ptp.pldt.common.analysisDropdownCategory"
+            name="Analysis Dropdown Category">
+      </category>
+      <command
+            id="org.eclipse.ptp.pldt.common.dropDownCommand"
+            categoryId="org.eclipse.ptp.pldt.common.analysisDropdownCategory"
+            defaultHandler="org.eclipse.ptp.pldt.common.actions.AnalysisDropdownHandler"
+            name="Analysis dropdown menu">
+         <commandParameter
+               id="org.eclipse.ptp.pldt.common.dropDownCommand.msg"
+               name="Message"
+               optional="true"
+               typeId="String">
+         </commandParameter>
+         <defaultHandler
+               class="org.eclipse.ptp.pldt.common.actions.AnalysisDropdownHandler">
+            <parameter
+                  name="org.eclipse.ptp.pldt.common.parameter1"
+                  value="org.eclipse.ptp.pldt.common.parameter1">
+            </parameter>
+         </defaultHandler>
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commandImages">
+      <image
+            commandId="org.eclipse.ptp.pldt.common.dropDownCommand"
+            icon="icons/analyze.gif">
+      </image>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+         <toolbar
+               id="org.eclipse.ptp.pldt.common.toolbar1">
+            <command
+                  commandId="org.eclipse.ptp.pldt.common.dropDownCommand"
+                  id="org.eclipse.ptp.pldt.common.toolbar.command1"
+                  style="pulldown"
+                  tooltip="Repeat last Parallel Analysis ">
+            </command>
+         </toolbar>
+      </menuContribution>
+   </extension>
+   
+   <!-- these go under the dropdown menu; could come from another plugin -->
+   <extension
+         id="tempID"
+         name="tempNAME"
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="menu:org.eclipse.ptp.pldt.common.toolbar.command1?after=additions">
+        
+          <separator name="additions" visible="false">
+        </separator>
+        
+      </menuContribution>
+   </extension>
+
 
 </plugin>
