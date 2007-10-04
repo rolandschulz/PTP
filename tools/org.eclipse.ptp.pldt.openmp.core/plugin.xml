@@ -1,26 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.0"?>
 <plugin>
-   <extension  
-	    point="org.eclipse.ui.actionSets"
-         id="org.eclipse.ptp.pldt.openmp.core.ui.actionSet"
-         name="OpenMP Artifacts action set"
-        >
-
-      <actionSet
-            label="OpenMP Artifacts Action Set"
-            visible="true"
-            id="org.eclipse.ptp.pldt.openmp.core.ui.actionSet">
-         <action
-               label="%run.label"
-               icon="icons/openMP.gif"
-               class="org.eclipse.ptp.pldt.openmp.core.actions.RunAnalyseOpenMP"
-               tooltip="%run.tooltip"
-               toolbarPath="openMPToolbarGroup"
-               id="org.eclipse.ptp.pldt.openmp.core.actions.RunAnalyseAction">
-         </action>
-        </actionSet>
-   </extension>
    <extension
          point="org.eclipse.ui.views">
       <category
@@ -67,7 +47,7 @@
             presentationLayer="5"
             label="OpenMP Annotation Marker"
             
-            textPreferenceKey="openMPIndication"
+            textPreferenceKey="openopenmpndication"
             textPreferenceValue="true"
             highlightPreferenceKey="artifactHighlighting"
             highlightPreferenceValue="false"
@@ -75,7 +55,7 @@
             colorPreferenceValue="0,128,192"
             verticalRulerPreferenceKey="artifactIndicationInVerticalRuler"
             verticalRulerPreferenceValue="true"
-			showInNextPrevDropdownToolbarActionKey="showOpenMPInNextPrevDropdownToolbarAction"
+			showInNextPrevDropdownToolbarActionKey="showOpenopenmpnNextPrevDropdownToolbarAction"
             showInNextPrevDropdownToolbarAction="false"
             overviewRulerPreferenceKey="artifactIndicationInOpldt.verviewRuler"
             overviewRulerPreferenceValue="true"
@@ -101,4 +81,26 @@
             class="org.eclipse.ptp.pldt.openmp.core.editorHelp.OpenMPCHelpProvider"
             id="org.eclipse.ptp.pldt.openmp.core.editorHelp.OpenMPCHelpProvider"/>
    </extension>
+      <extension
+            point="org.eclipse.ui.commands">
+         <command
+               defaultHandler="org.eclipse.ptp.pldt.openmp.core.actions.RunAnalyseOpenMPcommandHandler"
+               id="org.eclipse.ptp.pldt.openmp.core.command2"
+               name="Show OpenMP artifacts">
+         </command>
+      </extension>
+      <extension
+            id="teopenmpD"
+            name="tempNAME"
+            point="org.eclipse.ui.menus">
+         <menuContribution
+               locationURI="menu:org.eclipse.ptp.pldt.common.toolbar.command1 ">
+            <command
+                  commandId="org.eclipse.ptp.pldt.openmp.core.command2"
+                  icon="icons/openmp.gif"
+                  label="Show OpenMP Artifacts"
+                  style="push">
+            </command>
+         </menuContribution>
+      </extension>
 </plugin>
