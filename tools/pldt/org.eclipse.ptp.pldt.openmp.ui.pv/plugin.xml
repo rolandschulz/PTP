@@ -10,7 +10,7 @@
       </category>
       <view
             name="OpenMP Problems"
-            icon="icons/sample.gif"
+            icon="icons/openMPproblem.gif"
             category="org.eclipse.ptp.pldt.openmp" 
             class="org.eclipse.ptp.pldt.openmp.ui.pv.views.OpenMPProblemsView"
             id="org.eclipse.ptp.pldt.openmp.ui.pv.views.OpenMPProblemsView">
