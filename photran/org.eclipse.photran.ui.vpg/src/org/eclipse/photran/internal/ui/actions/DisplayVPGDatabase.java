@@ -32,7 +32,7 @@ public class DisplayVPGDatabase extends FortranEditorActionDelegate
 
             File temp = createTempFile();
             final PrintStream ps = createPrintStream(temp);
-            PhotranVPG.getInstance().printOn(ps);
+            PhotranVPG.getDatabase().printOn(ps);
             ps.close();
 
             openHtmlViewerOn("Symbol Table", temp);

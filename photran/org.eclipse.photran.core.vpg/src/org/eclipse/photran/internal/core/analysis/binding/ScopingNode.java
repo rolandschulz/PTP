@@ -307,7 +307,7 @@ public abstract class ScopingNode extends InteriorNode
     
     public ImplicitSpec getImplicitSpec()
     {
-    	return (ImplicitSpec)PhotranVPG.getInstance().getAnnotation(getRepresentativeToken(), PhotranVPG.SCOPE_IMPLICIT_SPEC_ANNOTATION_TYPE);
+    	return (ImplicitSpec)PhotranVPG.getDatabase().getAnnotation(getRepresentativeToken(), PhotranVPG.SCOPE_IMPLICIT_SPEC_ANNOTATION_TYPE);
     }
     
     public boolean isImplicitNone()
@@ -317,7 +317,7 @@ public abstract class ScopingNode extends InteriorNode
     
     public boolean isDefaultVisibilityPrivate()
     {
-		return PhotranVPG.getInstance().getAnnotation(getRepresentativeToken(), PhotranVPG.SCOPE_DEFAULT_VISIBILITY_IS_PRIVATE_ANNOTATION_TYPE) != null;
+		return PhotranVPG.getDatabase().getAnnotation(getRepresentativeToken(), PhotranVPG.SCOPE_DEFAULT_VISIBILITY_IS_PRIVATE_ANNOTATION_TYPE) != null;
     }
     
     public boolean isParentScopeOf(ScopingNode scope)
@@ -379,7 +379,7 @@ public abstract class ScopingNode extends InteriorNode
 		Set<PhotranTokenRef> result = new HashSet<PhotranTokenRef>();
 		for (Definition def : getAllDefinitions())
 		    if (def != null) // TODO: Why are we getting null here?
-		        for (TokenRef<Token> t : vpg.getOutgoingEdgeTargets(def.getTokenRef(), PhotranVPG.IMPORTED_INTO_SCOPE_EDGE_TYPE))
+		        for (TokenRef<Token> t : vpg.db.getOutgoingEdgeTargets(def.getTokenRef(), PhotranVPG.IMPORTED_INTO_SCOPE_EDGE_TYPE))
 		            result.add((PhotranTokenRef)t);
 	    	
 	    List<ScopingNode> scopes = new LinkedList<ScopingNode>();
@@ -486,10 +486,10 @@ public abstract class ScopingNode extends InteriorNode
 		PhotranVPG vpg = PhotranVPG.getInstance();
 		List<Definition> result = new LinkedList<Definition>();
 		
-    	for (TokenRef<Token> t : vpg.getIncomingEdgeSources(this.getRepresentativeToken(), PhotranVPG.DEFINED_IN_SCOPE_EDGE_TYPE))
+    	for (PhotranTokenRef t : vpg.db.getIncomingEdgeSources(this.getRepresentativeToken(), PhotranVPG.DEFINED_IN_SCOPE_EDGE_TYPE))
     		result.add(vpg.getDefinitionFor(t));
 		
-    	for (TokenRef<Token> t : vpg.getIncomingEdgeSources(this.getRepresentativeToken(), PhotranVPG.IMPORTED_INTO_SCOPE_EDGE_TYPE))
+    	for (PhotranTokenRef t : vpg.db.getIncomingEdgeSources(this.getRepresentativeToken(), PhotranVPG.IMPORTED_INTO_SCOPE_EDGE_TYPE))
     		result.add(vpg.getDefinitionFor(t));
     	
     	return result;

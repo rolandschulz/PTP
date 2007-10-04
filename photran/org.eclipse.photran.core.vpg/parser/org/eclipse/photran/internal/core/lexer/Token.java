@@ -394,7 +394,7 @@ public class Token extends CSTNode implements IToken
 			return result;
 		}
 		
-		for (VPGEdge<IFortranAST, Token> edge : PhotranVPG.getInstance().getOutgoingEdgesFrom(getTokenRef(), PhotranVPG.BINDING_EDGE_TYPE))
+		for (VPGEdge<IFortranAST, Token, PhotranTokenRef> edge : PhotranVPG.getDatabase().getOutgoingEdgesFrom(getTokenRef(), PhotranVPG.BINDING_EDGE_TYPE))
 		{
     		def = PhotranVPG.getInstance().getDefinitionFor(edge.getSink());
     		if (def != null) result.add(def);

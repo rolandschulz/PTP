@@ -32,6 +32,7 @@ import org.eclipse.ltk.core.refactoring.RefactoringStatusContext;
 import org.eclipse.ltk.core.refactoring.TextFileChange;
 import org.eclipse.photran.core.FortranAST;
 import org.eclipse.photran.core.IFortranAST;
+import org.eclipse.photran.core.vpg.PhotranTokenRef;
 import org.eclipse.photran.core.vpg.PhotranVPG;
 import org.eclipse.photran.core.vpg.util.IterableWrapper;
 import org.eclipse.photran.core.vpg.util.Notification;
@@ -143,7 +144,7 @@ public abstract class FortranRefactoring extends Refactoring
 
     private void logVPGErrors(RefactoringStatus status)
     {
-		for (VPGErrorOrWarning<Token> entry : vpg.getErrorLog())
+		for (VPGErrorOrWarning<Token, PhotranTokenRef> entry : vpg.getErrorLog())
 		{
 			if (entry.isWarning())
 				status.addWarning(entry.getMessage(), createContext(entry.getTokenRef()));

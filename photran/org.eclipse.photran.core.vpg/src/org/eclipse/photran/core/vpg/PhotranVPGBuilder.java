@@ -17,7 +17,6 @@ import org.eclipse.photran.internal.core.analysis.binding.ImplicitSpec;
 import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 import org.eclipse.photran.internal.core.lexer.Token;
 
-import bz.over.vpg.TokenRef;
 import bz.over.vpg.VPGDependency;
 import bz.over.vpg.VPGEdge;
 
@@ -36,44 +35,44 @@ public class PhotranVPGBuilder extends PhotranVPG
 
 	public void markFileAsExportingModule(IFile file, String moduleName)
 	{
-		ensure(new VPGDependency<IFortranAST, Token>(this, "module:" + canonicalizeIdentifier(moduleName), getFilenameForIFile(file)));
+		db.ensure(new VPGDependency<IFortranAST, Token, PhotranTokenRef>(this, "module:" + canonicalizeIdentifier(moduleName), getFilenameForIFile(file)));
 	}
 	
 	public void markFileAsImportingModule(IFile file, String moduleName)
 	{
-		ensure(new VPGDependency<IFortranAST, Token>(this, getFilenameForIFile(file), "module:" + canonicalizeIdentifier(moduleName)));
+	    db.ensure(new VPGDependency<IFortranAST, Token, PhotranTokenRef>(this, getFilenameForIFile(file), "module:" + canonicalizeIdentifier(moduleName)));
 	}
 	
-	public void setDefinitionFor(TokenRef<Token> tokenRef, Definition definition)
+	public void setDefinitionFor(PhotranTokenRef tokenRef, Definition definition)
 	{
-		setAnnotation(tokenRef, DEFINITION_ANNOTATION_TYPE, definition);
+	    db.setAnnotation(tokenRef, DEFINITION_ANNOTATION_TYPE, definition);
 	}
 	
 	public void markScope(Token identifier, ScopingNode scope)
 	{
-		ensure(new VPGEdge<IFortranAST, Token>(this, identifier.getTokenRef(), scope.getRepresentativeToken(), DEFINED_IN_SCOPE_EDGE_TYPE));
+	    db.ensure(new VPGEdge<IFortranAST, Token, PhotranTokenRef>(this, identifier.getTokenRef(), scope.getRepresentativeToken(), DEFINED_IN_SCOPE_EDGE_TYPE));
 	}
 	
 	public void markBinding(Token reference, PhotranTokenRef definition)
 	{
-		ensure(new VPGEdge<IFortranAST, Token>(this, reference.getTokenRef(), definition, BINDING_EDGE_TYPE));
+	    db.ensure(new VPGEdge<IFortranAST, Token, PhotranTokenRef>(this, reference.getTokenRef(), definition, BINDING_EDGE_TYPE));
 	}
 	
 	public void markRenamedBinding(Token reference, PhotranTokenRef definition)
 	{
-		ensure(new VPGEdge<IFortranAST, Token>(this, reference.getTokenRef(), definition, RENAMED_BINDING_EDGE_TYPE));
+	    db.ensure(new VPGEdge<IFortranAST, Token, PhotranTokenRef>(this, reference.getTokenRef(), definition, RENAMED_BINDING_EDGE_TYPE));
 	}
 	
 	public void setScopeImplicitSpec(ScopingNode scope, ImplicitSpec implicitSpec)
 	{
 		if (implicitSpec != null)
-			setAnnotation(scope.getRepresentativeToken(), SCOPE_IMPLICIT_SPEC_ANNOTATION_TYPE, implicitSpec);
+		    db.setAnnotation(scope.getRepresentativeToken(), SCOPE_IMPLICIT_SPEC_ANNOTATION_TYPE, implicitSpec);
 		else
-			deleteAnnotation(scope.getRepresentativeToken(), SCOPE_IMPLICIT_SPEC_ANNOTATION_TYPE);
+		    db.deleteAnnotation(scope.getRepresentativeToken(), SCOPE_IMPLICIT_SPEC_ANNOTATION_TYPE);
 	}
 	
 	public void setDefaultScopeVisibilityToPrivate(ScopingNode scope)
 	{
-		setAnnotation(scope.getRepresentativeToken(), SCOPE_DEFAULT_VISIBILITY_IS_PRIVATE_ANNOTATION_TYPE, Boolean.TRUE);
+	    db.setAnnotation(scope.getRepresentativeToken(), SCOPE_DEFAULT_VISIBILITY_IS_PRIVATE_ANNOTATION_TYPE, Boolean.TRUE);
 	}
 }

@@ -84,7 +84,7 @@ public abstract class RenameTestCase extends RefactoringTestCase
 
     private RenameRefactoring createRefactoring(final String filename, final LineCol lineCol, final Set<String> allFiles) throws Exception
     {
-    	PhotranVPG.getInstance().clearDatabase();
+    	PhotranVPG.getDatabase().clearDatabase();
     	
         final IFile thisFile = importFile(DIR, filename);
         PhotranVPG.getInstance().acquireTransientAST(thisFile);

@@ -10,14 +10,8 @@
  *******************************************************************************/
 package org.eclipse.photran.core.vpg;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -44,7 +38,6 @@ import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.Parser;
 import org.eclipse.photran.internal.core.properties.SearchPathProperties;
 
-import bz.over.vpg.TokenRef;
 import bz.over.vpg.VPGDependency;
 import bz.over.vpg.eclipse.EclipseVPG;
 
@@ -53,7 +46,7 @@ import bz.over.vpg.eclipse.EclipseVPG;
  * 
  * @author Jeff Overbey
  */
-public class PhotranVPG extends EclipseVPG<IFortranAST, Token>
+public class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranTokenRef>
 {
 	// Copied from FortranCorePlugin to avoid dependencies on the Photran Core plug-in
 	// (since our parser declares classes with the same name)
@@ -80,10 +73,17 @@ public class PhotranVPG extends EclipseVPG<IFortranAST, Token>
 	
 	private static PhotranVPG instance = null;
 	
+	public PhotranVPGDB db = null;
+	
 	public static PhotranVPG getInstance()
 	{
 		if (instance == null) instance = new PhotranVPGBuilder();
 		return instance;
+	}
+	
+	public static PhotranVPGDB getDatabase()
+	{
+	    return getInstance().db;
 	}
 	
 	@Override public void start()
@@ -93,22 +93,8 @@ public class PhotranVPG extends EclipseVPG<IFortranAST, Token>
 
 	protected PhotranVPG()
 	{
-        super(inTestingMode() ? createTempFile() : Activator.getDefault().getStateLocation().addTrailingSeparator().toOSString() + "vpg",
-              "Synchronizing Photran VPG");
-    }
-	
-	private static String createTempFile()
-    {
-	    try
-        {
-            File f = File.createTempFile("vpg", null);
-            f.deleteOnExit();
-            return f.getAbsolutePath();
-        }
-        catch (IOException e)
-        {
-            throw new Error(e);
-        }
+        super(new PhotranVPGDB(), "Synchronizing Photran VPG");
+        db = (PhotranVPGDB)super.db;
     }
 
     public static boolean inTestingMode()
@@ -160,18 +146,6 @@ public class PhotranVPG extends EclipseVPG<IFortranAST, Token>
 			throw new Error(e);
 		}
 	}
-	
-	@Override protected byte[] serialize(Serializable annotation) throws IOException
-	{
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		new ObjectOutputStream(out).writeObject(annotation);
-		return out.toByteArray();
-	}
-	
-	@Override protected Serializable deserialize(InputStream binaryStream) throws IOException, ClassNotFoundException
-	{
-		return (Serializable)new ObjectInputStream(binaryStream).readObject();
-	}
 
 	protected String describeEdgeType(int edgeType)
 	{
@@ -191,31 +165,23 @@ public class PhotranVPG extends EclipseVPG<IFortranAST, Token>
 			
 			Token token = acquireTransientAST(filename).findTokenByStreamOffsetLength(offset, length);
 			if (token == null)
-				return super.describeToken(filename, offset, length);
+				return db.describeToken(filename, offset, length);
 			else
 				return token.getText() + " (offset " + offset + ")";
 		}
 		catch (Exception e)
 		{
-			return super.describeToken(filename, offset, length);
+			return db.describeToken(filename, offset, length);
 		}
 	}
 	
-	@Override public TokenRef<Token> createTokenRef(String filename, int offset, int length)
+	@Override public PhotranTokenRef createTokenRef(String filename, int offset, int length)
 	{
 		return new PhotranTokenRef(filename, offset, length);
 	}
 
 	@Override
-	protected long getModificationStamp(String filename)
-	{
-		if (filename.startsWith("module:")) return Long.MIN_VALUE;
-		
-		return getIFileForFilename(filename).getLocalTimeStamp();
-	}
-
-	@Override
-	public Token findToken(TokenRef<Token> tokenRef)
+	public Token findToken(PhotranTokenRef tokenRef)
 	{
 		IFortranAST ast = acquireTransientAST(tokenRef.getFilename());
 		if (ast == null)
@@ -225,7 +191,7 @@ public class PhotranVPG extends EclipseVPG<IFortranAST, Token>
 	}
 
 	@Override
-	protected TokenRef<Token> getTokenRef(Token forToken)
+	protected PhotranTokenRef getTokenRef(Token forToken)
 	{
 		return forToken.getTokenRef();
 	}
@@ -253,7 +219,7 @@ public class PhotranVPG extends EclipseVPG<IFortranAST, Token>
 				{
 					// When we encounter an INCLUDE directive, set up a file dependency in the VPG
 					
-					ensure(new VPGDependency<IFortranAST, Token>(PhotranVPG.this,
+					db.ensure(new VPGDependency<IFortranAST, Token, PhotranTokenRef>(PhotranVPG.this,
 								filename,
 								getFilenameForIFile(getIncludedFile(fileToInclude))));
 					
@@ -279,8 +245,8 @@ public class PhotranVPG extends EclipseVPG<IFortranAST, Token>
 	{
 		if (!filename.startsWith("module:"))
 		{
-			deleteAllIncomingDependenciesFor(filename);
-			deleteAllOutgoingDependenciesFor(filename);
+		    db.deleteAllIncomingDependenciesFor(filename);
+		    db.deleteAllOutgoingDependenciesFor(filename);
 		}
 		
 		if (ast == null) return;
@@ -311,7 +277,7 @@ public class PhotranVPG extends EclipseVPG<IFortranAST, Token>
 	public List<IFile> findFilesThatExportModule(String moduleName)
 	{
 		List<IFile> files = new LinkedList<IFile>();
-		for (String filename : getOutgoingDependenciesFrom("module:" + canonicalizeIdentifier(moduleName)))
+		for (String filename : db.getOutgoingDependenciesFrom("module:" + canonicalizeIdentifier(moduleName)))
 		{
 			IFile file = getIFileForFilename(filename);
 			if (file == null)
@@ -337,13 +303,13 @@ public class PhotranVPG extends EclipseVPG<IFortranAST, Token>
 		return files;
 	}
 	
-	public Definition getDefinitionFor(TokenRef<Token> tokenRef)
+	public Definition getDefinitionFor(PhotranTokenRef tokenRef)
 	{
-		return (Definition)getAnnotation(tokenRef, DEFINITION_ANNOTATION_TYPE);
+		return (Definition)db.getAnnotation(tokenRef, DEFINITION_ANNOTATION_TYPE);
 	}
 	
-	public Type getTypeFor(TokenRef<Token> tokenRef)
+	public Type getTypeFor(PhotranTokenRef tokenRef)
 	{
-		return (Type)getAnnotation(tokenRef, TYPE_ANNOTATION_TYPE);
+		return (Type)db.getAnnotation(tokenRef, TYPE_ANNOTATION_TYPE);
 	}
 }

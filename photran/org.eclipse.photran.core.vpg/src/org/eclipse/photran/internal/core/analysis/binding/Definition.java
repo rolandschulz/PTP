@@ -375,7 +375,7 @@ public class Definition implements Serializable
     {
 		ArrayList<PhotranTokenRef> result = new ArrayList<PhotranTokenRef>();
 		
-		for (TokenRef<Token> r : PhotranVPG.getInstance().getIncomingEdgeSources(tokenRef, PhotranVPG.BINDING_EDGE_TYPE))
+		for (TokenRef<Token> r : PhotranVPG.getDatabase().getIncomingEdgeSources(tokenRef, PhotranVPG.BINDING_EDGE_TYPE))
 			result.add((PhotranTokenRef)r);
 		
 		return result;
