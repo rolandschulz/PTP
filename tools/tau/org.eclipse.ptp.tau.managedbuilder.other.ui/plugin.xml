@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension
+         id="tau.managedbuild.info"
+         name="Other Managed Build Tools"
+         point="org.eclipse.cdt.managedbuilder.core.buildDefinitions">
+      <managedBuildRevision fileVersion="3.1.0"/>
+      <projectType
+            id="tau.managedbuild.target.other.exe"
+            isAbstract="false"
+            isTest="false"
+            name="Executable (Other)">
+         <configuration
+               id="tau.managedbuild.config.other.exe.debug"
+               name="Default"
+               parent="cdt.managedbuild.config.gnu.exe.debug">
+            <toolChain
+                  id="org.eclipse.ptp.tau.managedbuilder.other.ui.toolChain1"
+                  isAbstract="false"
+                  name="Other Tool Chain"
+                  superClass="cdt.managedbuild.toolchain.gnu.exe.debug">
+               <tool
+                     id="tau.managedbuild.tool.other.cpp.compiler.exe.default.loc"
+                     isAbstract="false"
+                     name="Other C++ Compiler"
+                     superClass="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug">
+                     <option
+                           category="gnu.cpp.compiler.category.optimization"
+                           defaultValue="tau.cpp.optimization.level.default"
+                           id="tau.cpp.compiler.option.optimization.level"
+                           superClass="gnu.cpp.compiler.option.optimization.level"
+                           valueType="enumerated">
+                        <enumeratedOptionValue
+                              id="tau.cpp.optimization.level.default"
+                              isDefault="true"
+                              name="Default ()"/>
+		  <enumeratedOptionValue
+		  		  name="None (-O0)"
+				  command="-O0"
+				  id="gnu.cpp.optimization.level.none">
+		  </enumeratedOptionValue>
+		  <enumeratedOptionValue
+				  name="Optimize (-O1)"
+				  command="-O1"
+				  id="gnu.cpp.optimization.level.optimize">
+		  </enumeratedOptionValue>
+		  <enumeratedOptionValue
+				  name="Optimize More (-O2)"
+				  command="-O2"
+				  id="gnu.cpp.optimization.level.more">
+		  </enumeratedOptionValue>
+		  <enumeratedOptionValue
+				  name="Optimize Most (-O3)"
+				  command="-O3"
+				  id="gnu.cpp.optimization.level.most">
+		  </enumeratedOptionValue>
+		  </option>
+                     <option
+                           category="gnu.cpp.compiler.category.warnings"
+                           command="-Wall"
+                           defaultValue="false"
+                           id="tau.cpp.compiler.option.warnings.allwarn"
+                           superClass="gnu.cpp.compiler.option.warnings.allwarn"
+                           valueType="boolean"/>
+                     <option
+                           defaultValue="gnu.cpp.compiler.debugging.level.none"
+                           id="tau.cpp.compiler.exe.debug.option.debugging.level"
+                           superClass="gnu.cpp.compiler.option.debugging.level"/>
+                     <option
+                           defaultValue="-c"
+                           id="tau.cpp.compiler.option.other.other"
+                           name="Other Flags"
+                           superClass="gnu.cpp.compiler.option.other.other"/>
+                     </tool>
+               <tool
+                     id="tau.managedbuild.tool.other.c.compiler.exe.default.loc"
+                     isAbstract="false"
+                     name="Other C Compiler"
+                     superClass="cdt.managedbuild.tool.gnu.c.compiler.exe.debug">
+                     <option
+                           category="gnu.c.compiler.category.optimization"
+                           defaultValue="tau.c.optimization.level.default"
+                           id="tau.c.compiler.option.optimization.level"
+                           superClass="gnu.c.compiler.option.optimization.level"
+                           valueType="enumerated">
+                        <enumeratedOptionValue
+                              id="tau.c.optimization.level.default"
+                              isDefault="true"
+                              name="Default ()"/>
+		  <enumeratedOptionValue
+		  		  name="None (-O0)"
+				  command="-O0"
+				  id="tau.c.optimization.level.none">
+		  </enumeratedOptionValue>
+		  <enumeratedOptionValue
+				  name="Optimize (-O1)"
+				  command="-O1"
+				  id="tau.c.optimization.level.optimize">
+		  </enumeratedOptionValue>
+		  <enumeratedOptionValue
+				  name="Optimize More (-O2)"
+				  command="-O2"
+				  id="tau.c.optimization.level.more">
+		  </enumeratedOptionValue>
+		  <enumeratedOptionValue
+				  name="Optimize Most (-O3)"
+				  command="-O3"
+				  id="tau.c.optimization.level.most">
+		  </enumeratedOptionValue>
+		  </option>
+                     <option
+                           defaultValue="false"
+                           id="tau.c.compiler.option.warnings.allwarn"
+                           superClass="gnu.c.compiler.option.warnings.allwarn"/>
+                     <option
+                           defaultValue="gnu.c.debugging.level.none"
+                           id="tau.c.compiler.exe.debug.option.debugging.level"
+                           superClass="gnu.c.compiler.option.debugging.level"/>
+                     <option
+                           defaultValue="-c"
+                           id="tau.c.compiler.option.other.other"
+                           name="Other Flags"
+                           superClass="gnu.c.compiler.option.misc.other"/>
+                     </tool>
+               <tool
+                     id="tau.managedbuild.tool.other.cpp.linker.exe.default"
+                     name="Other C++ Linker"
+                     superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug"/>
+               <tool
+                     id="tau.managedbuild.tool.other.c.linker.exe.default"
+                     name="Other C Linker"
+                     superClass="cdt.managedbuild.tool.gnu.c.linker.exe.debug"/>
+               <tool
+                     id="tau.managedbuild.tool.other.assembler.exe.default"
+                     name="Other Assembler"
+                     superClass="cdt.managedbuild.tool.gnu.assembler.exe.debug"/>
+            </toolChain>
+         </configuration>
+         
+      </projectType>
+   </extension>
+
+</plugin>

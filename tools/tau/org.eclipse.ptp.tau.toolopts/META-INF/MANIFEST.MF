@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Toolopts Plug-in
+Bundle-SymbolicName: org.eclipse.ptp.tau.toolopts
+Bundle-Version: 1.0.0
+Bundle-Vendor: TAU
+Bundle-Localization: plugin
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.debug.core,
+ org.eclipse.core.runtime
+Export-Package: org.eclipse.ptp.tau.toolopts

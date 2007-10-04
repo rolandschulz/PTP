@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension
+         id="tau.managedbuild.info.photran"
+         name="Other Photran Managed Build Tools"
+         point="org.eclipse.cdt.managedbuilder.core.buildDefinitions">
+      <managedBuildRevision fileVersion="3.1.0"/>
+      <projectType
+            id="tau.managedbuild.target.other.fortran.exe"
+            isAbstract="false"
+            isTest="false"
+            name="Executable (Other Fortran)">
+         <configuration
+               id="tau.managedbuild.config.other.fortran.exe.default"
+               name="Default"
+               parent="photran.managedbuild.config.gnu.fortran.exe.debug">
+            <toolChain
+                  id="org.eclipse.ptp.tau.managedbuilder.other.photran.ui.toolChain3"
+                  isAbstract="false"
+                  name="Other Fortran Tool Chain"
+                  superClass="photran.managedbuild.toolchain.gnu.fortran.exe.debug">
+               <tool
+                     id="tau.managedbuild.tool.other.c.compiler.fortran.exe.default.loc"
+                     name="Other C Compiler"
+                     superClass="photran.managedbuild.tool.gnu.c.compiler.exe.debug">
+                     
+                      <option
+                           category="gnu.c.compiler.category.optimization"
+                           defaultValue="tau.c.optimization.level.default"
+                           id="tau.c.fortran.compiler.option.optimization.level"
+                           superClass="gnu.c.compiler.option.optimization.level"
+                           valueType="enumerated">
+                        <enumeratedOptionValue
+                              id="tau.c.optimization.level.default"
+                              isDefault="true"
+                              name="Default ()"/>
+		  <enumeratedOptionValue
+		  		  name="None (-O0)"
+				  command="-O0"
+				  id="tau.c.optimization.level.none">
+		  </enumeratedOptionValue>
+		  <enumeratedOptionValue
+				  name="Optimize (-O1)"
+				  command="-O1"
+				  id="tau.c.optimization.level.optimize">
+		  </enumeratedOptionValue>
+		  <enumeratedOptionValue
+				  name="Optimize More (-O2)"
+				  command="-O2"
+				  id="tau.c.optimization.level.more">
+		  </enumeratedOptionValue>
+		  <enumeratedOptionValue
+				  name="Optimize Most (-O3)"
+				  command="-O3"
+				  id="tau.c.optimization.level.most">
+		  </enumeratedOptionValue>
+		  </option>
+                     <option
+                           defaultValue="false"
+                           id="tau.c.fortran.compiler.option.warnings.allwarn"
+                           superClass="gnu.c.compiler.option.warnings.allwarn"/>
+                     <option
+                           defaultValue="gnu.c.debugging.level.none"
+                           id="tau.c.fortran.compiler.exe.debug.option.debugging.level"
+                           superClass="gnu.c.compiler.option.debugging.level"/>
+                     <option
+                           defaultValue="-c"
+                           id="tau.c.fortran.compiler.option.other.other"
+                           name="Other Flags"
+                           superClass="gnu.c.compiler.option.misc.other"/>
+                     
+              </tool>
+               <tool
+                     id="tau.managedbuild.tool.other.fortran.compiler.exe.default"
+                     isAbstract="false"
+                     name="Other Fortran Compiler"
+                     superClass="photran.managedbuild.tool.gnu.fortran.compiler.exe.debug">
+              
+              <option
+                    category="gnu.fortran.compiler.category.symbols"
+                    id="tau.fortran.compiler.option.underscoring.level"
+                    name="Symbol Underscoring"
+                    superClass="gnu.fortran.compiler.option.underscoring.level"
+                    valueType="enumerated">
+			  <enumeratedOptionValue
+		  		  name="Default"
+				  isDefault="true"
+				  command=""
+				  id="gnu.fortran.underscoring.default">
+		  </enumeratedOptionValue>
+		  <enumeratedOptionValue
+		  		  name="None (-fno-underscoring)"
+				  isDefault="false"
+				  command="-fno-underscoring"
+				  id="gnu.fortran.underscoring.none">
+		  </enumeratedOptionValue>
+		  <enumeratedOptionValue
+				  name="Single (-funderscoring)"
+				  isDefault="false"
+				  command="-funderscoring"
+				  id="gnu.fortran.underscoring.one">
+		  </enumeratedOptionValue>
+		  <enumeratedOptionValue
+				  name="No Second (-fno-second-underscore)"
+				  isDefault="false"
+				  command="-fno-second-underscore"
+				  id="gnu.fortran.underscoring.notwo">
+		  </enumeratedOptionValue>
+		  </option>
+              
+              
+              
+                                    <option
+                           category="gnu.fortran.compiler.category.optimization"
+                           defaultValue="tau.c.optimization.level.default"
+                           id="tau.fortran.compiler.option.optimization.level"
+                           superClass="gnu.fortran.compiler.option.optimization.level"
+                           valueType="enumerated">
+                        <enumeratedOptionValue
+                              id="tau.c.optimization.level.default"
+                              isDefault="true"
+                              name="Default ()"/>
+		  <enumeratedOptionValue
+		  		  name="None (-O0)"
+				  command="-O0"
+				  id="tau.c.optimization.level.none">
+		  </enumeratedOptionValue>
+		  <enumeratedOptionValue
+				  name="Optimize (-O1)"
+				  command="-O1"
+				  id="tau.c.optimization.level.optimize">
+		  </enumeratedOptionValue>
+		  <enumeratedOptionValue
+				  name="Optimize More (-O2)"
+				  command="-O2"
+				  id="tau.c.optimization.level.more">
+		  </enumeratedOptionValue>
+		  <enumeratedOptionValue
+				  name="Optimize Most (-O3)"
+				  command="-O3"
+				  id="tau.c.optimization.level.most">
+		  </enumeratedOptionValue>
+		  </option>
+                     <option
+                           defaultValue="false"
+                           id="tau.fortran.compiler.option.warnings.allwarn"
+                           superClass="gnu.fortran.compiler.option.warnings.allwarn"/>
+                     <option
+                           defaultValue="gnu.fortran.debugging.level.none"
+                           id="tau.fortran.compiler.exe.debug.option.debugging.level"
+                           superClass="gnu.fortran.compiler.option.debugging.level"/>
+                     <option
+                           defaultValue="-c"
+                           id="tau.fortran.compiler.option.other.other"
+                           name="Other Flags"
+                           superClass="gnu.fortran.compiler.option.misc.other"/>
+              
+                     
+              </tool>
+               <tool
+                     id="tau.managedbuild.tool.other.fortran.linker.exe.debug"
+                     name="Other Fortran Linker"
+                     superClass="photran.managedbuild.tool.gnu.fortran.linker.exe.debug"/>
+               <tool
+                     id="tau.managedbuild.tool.other.fortran.assembler.exe.default"
+                     name="Other Assembler"
+                     superClass="photran.managedbuild.tool.gnu.assembler.exe.debug"/>
+            </toolChain>
+         </configuration>
+      </projectType>
+   </extension>
+
+</plugin>

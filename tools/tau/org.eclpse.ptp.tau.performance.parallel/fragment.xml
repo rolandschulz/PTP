@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<fragment>
+   <extension
+         point="org.eclipse.debug.core.launchConfigurationTypes">
+         <launchConfigurationType
+			name="Parallel Performance Analysis"
+			delegate="org.eclipse.ptp.tau.performance.parallel.ParallelPerformanceLaunchConfigurationDelegate"
+			sourceLocatorId="org.eclipse.ptp.debug.core.sourceLocator"
+			sourcePathComputerId="org.eclipse.ptp.debug.core.sourcePathComputer"
+			modes="profile"
+			public="true"
+			id="org.eclipse.ptp.tau.performance.performancelaunch.parallel">
+		</launchConfigurationType>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.launchConfigurationTabGroups">
+      <launchConfigurationTabGroup
+            class="org.eclipse.ptp.tau.performance.parallel.ParallelPerformanceLaunchConfigurationTabGroup"
+            id="org.eclipse.ptp.tau.performance.launchConfigurationTabGroup.parallel"
+            type="org.eclipse.ptp.tau.performance.performancelaunch.parallel">
+         <launchMode
+               description="Build C, C++ or Fortran applications with performance analysis tools.  Launch parallel programs from within Eclipse via the PTP."
+               mode="profile"/>
+      </launchConfigurationTabGroup>
+   </extension>
+</fragment>

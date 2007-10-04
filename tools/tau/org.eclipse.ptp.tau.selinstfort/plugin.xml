@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <viewerContribution
+            id="org.eclipse.ptp.tau.selinstfort.AddAtomicEvent"
+            targetID="#FortranEditorContextMenu">
+         <action
+               class="org.eclipse.ptp.tau.selinstfort.popup.actions.Instrument"
+               enablesFor="*"
+               id="org.eclipse.ptp.tau.selinstfort.te.Select"
+               label="Insert TAU Atomic User Defined Event"
+               menubarPath="org.eclipse.ptp.tau.selinstfort.menu1/group1">
+            <selection class="org.eclipse.jface.text.ITextSelection"/>
+         </action>
+         <menu
+               id="org.eclipse.ptp.tau.selinstfort.menu1"
+               label="Selective Instrumentation"
+               path="additions"/>
+      </viewerContribution>
+      <viewerContribution
+            id="org.eclipse.ptp.tau.selinstfort.AddIncrementalEvent"
+            targetID="#FortranEditorContextMenu">
+         <action
+               class="org.eclipse.ptp.tau.selinstfort.popup.actions.IncrementInstrument"
+               enablesFor="*"
+               id="org.eclipse.ptp.tau.selinstfort.te.SelectInstFunc"
+               label="Insert TAU Interval (start/stop) User Defined Event"
+               menubarPath="org.eclipse.ptp.tau.selinstfort.menu1/group1">
+            <selection class="org.eclipse.jface.text.ITextSelection"/>
+         </action>
+         <menu
+               id="org.eclipse.ptp.tau.selinstfort.menu1"
+               label="Selective Instrumentation"
+               path="additions"/>
+      </viewerContribution>
+   </extension>
+
+</plugin>

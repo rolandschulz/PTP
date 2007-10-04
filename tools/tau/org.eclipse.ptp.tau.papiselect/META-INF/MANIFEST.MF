@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Papiselect Plug-in
+Bundle-SymbolicName: org.eclipse.ptp.tau.papiselect
+Bundle-Version: 1.0.0
+Bundle-Localization: plugin
+Export-Package: org.eclipse.ptp.tau.papiselect
+Require-Bundle: org.eclipse.jface,
+ org.eclipse.ui

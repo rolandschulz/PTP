@@ -1,0 +1,23 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Core Plug-in
+Bundle-SymbolicName: org.eclipse.ptp.tau.performance;singleton:=true
+Bundle-Version: 1.0.0
+Bundle-Activator: org.eclipse.ptp.tau.performance.Activator
+Bundle-Localization: plugin
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.debug.core,
+ org.eclipse.core.resources,
+ org.eclipse.cdt.core,
+ org.eclipse.cdt.make.core,
+ org.eclipse.cdt.managedbuilder.core,
+ org.eclipse.cdt.debug.core,
+ org.eclipse.debug.ui,
+ org.eclipse.cdt.launch,
+ org.eclipse.ptp.tau.toolopts,
+ org.eclipse.ptp.tau.papiselect,
+ org.eclipse.ptp.tau.perfdmf
+Eclipse-LazyStart: true
+Export-Package: org.eclipse.ptp.tau.performance.internal,
+ org.eclipse.ptp.tau.performance.ui
