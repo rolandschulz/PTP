@@ -41,8 +41,11 @@ import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 
 import org.eclipse.ptp.pldt.openmp.ui.pv.PvPlugin;
@@ -58,11 +61,12 @@ public class OpenMPProblemsView extends ViewPart {
 	private Action action1;
 	//private Action action2;
 	private Action doubleClickAction;
+	private Action removeMarkerAction;
     
     private   String                  markerID_   = PvPlugin.MARKER_ID;
     protected UpdateVisitor           visitor_    = new UpdateVisitor();
     
-    private String                    iconName_          = "icons/sample.gif";
+    private String                    iconName_          = "icons/openMPproblem.gif";
     private AbstractUIPlugin          thePlugin_;
     
     protected boolean                 traceOn     = false;
@@ -319,7 +323,8 @@ public class OpenMPProblemsView extends ViewPart {
 	
 	private void fillLocalToolBar(IToolBarManager manager) {
 		manager.add(action1);
-		//manager.add(action2);
+		manager.add(removeMarkerAction);
+
 	}
 
 	private void makeActions() {
@@ -335,6 +340,7 @@ public class OpenMPProblemsView extends ViewPart {
 			getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
         
         doubleClickAction = new GotoLineAction(this, viewer);
+        makeRemoveMarkerAction();
 	}
 
 	private void hookDoubleClickAction() {
@@ -343,6 +349,44 @@ public class OpenMPProblemsView extends ViewPart {
 				doubleClickAction.run();
 			}
 		});
+	}
+	/**
+	 * Make "remove marker" action to display artifact information
+	 */
+	protected void makeRemoveMarkerAction() {
+		removeMarkerAction = new Action() {
+			public void run() {
+				// batch changes so we get only one resource change event
+				final IWorkspaceRoot wsResource = ResourcesPlugin.getWorkspace().getRoot();
+				
+				IWorkspaceRunnable runnable = new IWorkspaceRunnable(){
+					public void run(IProgressMonitor monitor) throws CoreException {
+					try {
+						int depth = IResource.DEPTH_INFINITE;
+						wsResource.deleteMarkers(markerID_,false,depth);
+						//if(traceOn)
+							System.out.println("markers removed id="+markerID_);
+					} catch (CoreException e) {
+						System.out.println("RM: exception deleting markers.");
+						// e.printStackTrace();
+					}
+					}};
+					try {
+						runnable.run(null);
+					} catch (CoreException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
+				 
+			}//end run()
+		};// end new action
+		removeMarkerAction.setText("Remove Markers");
+		removeMarkerAction.setToolTipText("Remove all markers");
+		removeMarkerAction.setImageDescriptor(PlatformUI.getWorkbench()
+				.getSharedImages().getImageDescriptor(
+						ISharedImages.IMG_TOOL_DELETE));// nice "red X" image
+
 	}
 	private void showMessage(String message) {
 		MessageDialog.openInformation(
