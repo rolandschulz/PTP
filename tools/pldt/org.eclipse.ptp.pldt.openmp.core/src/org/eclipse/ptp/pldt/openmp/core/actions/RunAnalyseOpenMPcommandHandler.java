@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2005, 2006 IBM Corporation.
+ * Copyright (c) 2007 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,12 +22,13 @@ import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit;
 import org.eclipse.cdt.core.dom.ast.gnu.c.GCCLanguage;
 import org.eclipse.cdt.core.model.ILanguage;
 import org.eclipse.cdt.core.model.ITranslationUnit;
+import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPASTTranslationUnit;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.pldt.common.Artifact;
 import org.eclipse.ptp.pldt.common.ScanReturn;
-import org.eclipse.ptp.pldt.common.actions.RunAnalyseBase;
+import org.eclipse.ptp.pldt.common.actions.RunAnalyseHandlerBase;
 import org.eclipse.ptp.pldt.common.util.SourceInfo;
 import org.eclipse.ptp.pldt.common.util.ViewActivater;
 import org.eclipse.ptp.pldt.openmp.analysis.OpenMPAnalysisManager;
@@ -44,26 +45,17 @@ import org.eclipse.ptp.pldt.openmp.ui.pv.views.ProblemMarkerAttrIds;
 import org.eclipse.ui.texteditor.MarkerUtilities;
 
 /**
- * 
- * Run analysis to create OpenMP artifact markers. <br>
- * The analysis is done in the doArtifactAnalysis() method
- * 
- * 
- * IObjectActionDelegate enables popup menu selection IWindowActionDelegate
- * enables toolbar(or menu) selection
+ * @author tibbitts
+ *
  */
-public class RunAnalyseOpenMP extends RunAnalyseBase {
+public class RunAnalyseOpenMPcommandHandler extends RunAnalyseHandlerBase {
 	private static final String OPENMP_DIRECTIVE = "OpenMP directive";
-
 	/**
 	 * Constructor for the "Run Analysis" action
 	 */
-	public RunAnalyseOpenMP() {
-		super("OpenMP",
-				new OpenMPArtifactMarkingVisitor(OpenMPPlugin.MARKER_ID),
-				OpenMPPlugin.MARKER_ID);
+	public RunAnalyseOpenMPcommandHandler() {
+		super("OpenMP", new OpenMPArtifactMarkingVisitor(OpenMPPlugin.MARKER_ID), OpenMPPlugin.MARKER_ID); //$NON-NLS-1$
 	}
-
 	/**
 	 * Returns OpenMP analysis artifacts for file
 	 * 
@@ -102,7 +94,6 @@ public class RunAnalyseOpenMP extends RunAnalyseBase {
 		processOpenMPPragmas(msr, atu, file);
 		return msr;
 	}
-
 	/**
 	 * Special processing to find #pragmas, since the CDT AST
 	 * does not normally include them.<br>
@@ -131,7 +122,6 @@ public class RunAnalyseOpenMP extends RunAnalyseBase {
 		msr.addProblems(OpenMPErrorManager.getCurrentErrorManager()
 						.getErrors());
 	}
-
 	/**
 	 * Get exact source locational info for a function call
 	 * 
@@ -157,19 +147,6 @@ public class RunAnalyseOpenMP extends RunAnalyseBase {
 		}
 		return sourceInfo;
 	}
-
-	protected List getIncludePath() {
-		return OpenMPPlugin.getDefault().getIncludeDirs();
-	}
-
-	protected void activateArtifactView() {
-		ViewActivater.activateView(OpenMPPlugin.VIEW_ID);
-	}
-
-	protected void activateProblemsView() {
-		ViewActivater.activateView(PvPlugin.VIEW_ID);
-	}
-
 	/**
 	 * processResults - override from RunAnalyse base, to process both pragma
 	 * artifacts and problems
@@ -190,6 +167,7 @@ public class RunAnalyseOpenMP extends RunAnalyseBase {
 		// DPP - put in stuff for problems view
 		// Just subclass scanreturn and create markers for problems view here
 		List problems = osr.getProblems();
+		System.out.println("RunAnalyseOpenMP.processResults, have "+problems.size()+ " problems.");
 		try {
 			for (Iterator i = problems.iterator(); i.hasNext();)
 				processProblem((OpenMPError) i.next(), resource);
@@ -199,9 +177,8 @@ public class RunAnalyseOpenMP extends RunAnalyseBase {
 			e.printStackTrace();
 		}
 	}
-
 	/**
-	 * processProblem - put a problem on the omp problems view
+	 * Create problem marker which will put a problem on the OpenMP problems view
 	 * 
 	 * @param problem -
 	 *            OpenMPError
@@ -227,9 +204,8 @@ public class RunAnalyseOpenMP extends RunAnalyseBase {
 				ProblemMarkerAttrIds.MARKER_ERROR_ID);
 
 	}
-
 	/**
-	 * Remove the markers currently set on a resource.
+	 * Remove the OpenMP problem markers currently set on a resource.
 	 * 
 	 * @param resource -
 	 *            IResource
@@ -245,5 +221,19 @@ public class RunAnalyseOpenMP extends RunAnalyseBase {
 					+ resource.getProjectRelativePath());
 		}
 	}
+
+
+	protected List getIncludePath() {
+		return OpenMPPlugin.getDefault().getIncludeDirs();
+	}
+
+	protected void activateArtifactView() {
+		ViewActivater.activateView(OpenMPPlugin.VIEW_ID);
+	}
+
+	protected void activateProblemsView() {
+		ViewActivater.activateView(PvPlugin.VIEW_ID);
+	}	
+	 
 
 }

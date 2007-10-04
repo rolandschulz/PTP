@@ -3,24 +3,6 @@
 <plugin>
 
    <extension
-         point="org.eclipse.ui.actionSets">
-      <actionSet
-            label="MPI Barrier Analysis action set"
-            visible="true"
-            id="org.eclipse.ptp.pldt.mpi.analysis.actionSet">
-
-         <action
-               class="org.eclipse.ptp.pldt.mpi.analysis.actions.MPIAnalysisMultipleAction"
-               icon="icons/barrier.gif"
-               id="org.eclipse.ptp.pldt.mpi.analysis.action1"
-               label="MPI Barrier Analysis"
-               style="push"
-               toolbarPath="testGroup"
-               tooltip="MPI barrier analysis">
-         </action>
-      </actionSet>
-   </extension>
-   <extension
          point="org.eclipse.ui.popupMenus">
       <objectContribution
             objectClass="org.eclipse.core.resources.IFile"
@@ -292,5 +274,26 @@
             >
       </specification>  
    </extension>
+   
+      <extension
+            point="org.eclipse.ui.commands">
+         <command
+               defaultHandler="org.eclipse.ptp.pldt.mpi.analysis.actions.RunAnalyseMPIAnalysiscommandHandler"
+               id="org.eclipse.ptp.pldt.mpi.analysis.command2"
+               name="MPI Barrier Analysis">
+         </command>
+      </extension>
+      <extension point="org.eclipse.ui.menus">
+         <menuContribution
+               locationURI="menu:org.eclipse.ptp.pldt.common.toolbar.command1 ">
+            <command
+                  commandId="org.eclipse.ptp.pldt.mpi.analysis.command2"
+                  icon="icons/barrier.gif"
+                  label="MPI Barrier Analysis"
+                  style="push"
+                  tooltip="Run MPI Barrier Analysis on selected project, folder, or file">
+            </command>
+         </menuContribution>
+      </extension>
 
 </plugin>

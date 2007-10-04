@@ -2,22 +2,6 @@
 <?eclipse version="3.0"?>
 <plugin>
 
-     <extension
-         point="org.eclipse.ui.actionSets">
-      <actionSet
-            label="MPI Artifacts Action Set"
-            visible="true"
-            id="org.eclipse.ptp.pldt.mpi.core.ui.actionSet">
-         <action
-               label="Run MPI Analysis"
-               icon="icons/mpi_aLg.gif"
-               class="org.eclipse.ptp.pldt.mpi.core.actions.RunAnalyseMPI"
-               tooltip="Run MPI Analysis on selected file, folder, or project to find MPI Artifacts"
-               toolbarPath="additions"
-               id="org.eclipse.ptp.pldt.mpi.core.actions.RunAnalyseMPI">
-         </action>
-        </actionSet>
-   </extension>
    <extension
          point="org.eclipse.ui.views">
       <category
@@ -26,7 +10,7 @@
       </category>
       <view
             name="MPI Artifact View"
-            icon="icons/mpi_aLg.gif"
+            icon="icons/mpi.gif"
             category="org.eclipse.ptp.pldt.mpi"
             class="org.eclipse.ptp.pldt.mpi.core.views.MPITableView"
             id="org.eclipse.ptp.pldt.mpi.core.views.MPITableView">
@@ -110,5 +94,29 @@
                <initializer
             class="org.eclipse.ptp.pldt.mpi.core.prefs.MPIPreferenceInitializer">
       </initializer>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            defaultHandler="org.eclipse.ptp.pldt.mpi.core.actions.RunAnalyseMPIcommandHandler"
+            id="org.eclipse.ptp.pldt.mpi.core.command2"
+            name="find mpi artifacts">
+      </command>
+   </extension>
+   <!-- these go under the dropdown menu; could come from another plugin -->
+   <extension
+         id="tempID"
+         name="tempNAME"
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="menu:org.eclipse.ptp.pldt.common.toolbar.command1 ">
+         <command
+               commandId="org.eclipse.ptp.pldt.mpi.core.command2"
+               icon="icons/mpi.gif"
+               label="Show MPI Artifacts"
+               style="push">
+         </command>
+        
+      </menuContribution>
    </extension>
 </plugin>
