@@ -952,17 +952,17 @@ public class FreeFormLexerPhase2 implements ILexer
      * the token being investigated.  The wildcard ANY_DEFINED_OPERATOR can
      * also be used.
      */
-    private final Terminal ANY_TOKEN = new Terminal(-1, "any token");
+    private final Terminal ANY_TOKEN = new Terminal("any token");
    
     /**
      * Wildcard referring to any defined operator (obviously)
      */
-    private final Terminal ANY_DEFINED_OPERATOR = new Terminal(-1, "any defined operator");
+    private final Terminal ANY_DEFINED_OPERATOR = new Terminal("any defined operator");
     
     /**
      * This is used when we need a reasonable default in some places...
      */
-    private final Terminal ALWAYS_RETURN_TRUE = new Terminal(-1, "always return true");
+    private final Terminal ALWAYS_RETURN_TRUE = new Terminal("always return true");
 
     private final class MustBeFollowedBy extends Rule
     {
