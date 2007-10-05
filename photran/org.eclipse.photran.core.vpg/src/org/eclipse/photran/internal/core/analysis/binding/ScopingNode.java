@@ -500,7 +500,7 @@ public abstract class ScopingNode extends InteriorNode
 		List<Definition> result = new LinkedList<Definition>();
 		
     	for (Definition def : getAllDefinitions())
-    		if (def.isPublic())
+    		if (def != null && def.isPublic())
     			result.add(def);
     	
     	return result;
