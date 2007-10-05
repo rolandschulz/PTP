@@ -10,7 +10,8 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.Token;
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
@@ -23,6 +24,18 @@ public class ASTAcImpliedDoNode extends InteriorNode
          for (Object o : childNodes)
              addChild((CSTNode)o);
          constructionFinished();
+    }
+        
+    @Override public InteriorNode getASTParent()
+    {
+        InteriorNode actualParent = super.getParent();
+        
+        // If a node has been pulled up in an ACST, its physical parent in
+        // the CST is not its logical parent in the ACST
+        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
+            return actualParent.getParent();
+        else 
+            return actualParent;
     }
     
     @Override protected void visitThisNodeUsing(ASTVisitor visitor)
@@ -54,10 +67,6 @@ public class ASTAcImpliedDoNode extends InteriorNode
             return (ASTExprNode)getChild(1);
         else if (getProduction() == Production.AC_IMPLIED_DO_226)
             return (ASTExprNode)getChild(1);
-        else if (getProduction() == Production.AC_IMPLIED_DO_227)
-            return (ASTExprNode)getChild(5);
-        else if (getProduction() == Production.AC_IMPLIED_DO_228)
-            return (ASTExprNode)getChild(5);
         else
             return null;
     }
@@ -110,7 +119,7 @@ public class ASTAcImpliedDoNode extends InteriorNode
             return null;
     }
 
-    public ASTExprNode getExpr2()
+    public ASTExprNode getLb()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
@@ -119,39 +128,25 @@ public class ASTAcImpliedDoNode extends InteriorNode
         else if (getProduction() == Production.AC_IMPLIED_DO_226)
             return (ASTExprNode)getChild(5);
         else if (getProduction() == Production.AC_IMPLIED_DO_227)
-            return (ASTExprNode)getChild(7);
+            return (ASTExprNode)getChild(5);
         else if (getProduction() == Production.AC_IMPLIED_DO_228)
-            return (ASTExprNode)getChild(7);
+            return (ASTExprNode)getChild(5);
         else
             return null;
     }
 
-    public Token getTComma2()
+    public ASTExprNode getUb()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         if (getProduction() == Production.AC_IMPLIED_DO_225)
-            return (Token)getChild(6);
+            return (ASTExprNode)getChild(7);
         else if (getProduction() == Production.AC_IMPLIED_DO_226)
-            return (Token)getChild(6);
+            return (ASTExprNode)getChild(7);
         else if (getProduction() == Production.AC_IMPLIED_DO_227)
-            return (Token)getChild(6);
-        else if (getProduction() == Production.AC_IMPLIED_DO_228)
-            return (Token)getChild(6);
-        else
-            return null;
-    }
-
-    public ASTExprNode getExpr3()
-    {
-        if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
-
-        if (getProduction() == Production.AC_IMPLIED_DO_225)
-            return (ASTExprNode)getChild(7);
-        else if (getProduction() == Production.AC_IMPLIED_DO_226)
             return (ASTExprNode)getChild(7);
         else if (getProduction() == Production.AC_IMPLIED_DO_228)
-            return (ASTExprNode)getChild(9);
+            return (ASTExprNode)getChild(7);
         else
             return null;
     }
@@ -172,7 +167,7 @@ public class ASTAcImpliedDoNode extends InteriorNode
             return null;
     }
 
-    public Token getTComma3()
+    public Token getTComma2()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
@@ -184,11 +179,13 @@ public class ASTAcImpliedDoNode extends InteriorNode
             return null;
     }
 
-    public ASTExprNode getExpr4()
+    public ASTExprNode getStep()
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         if (getProduction() == Production.AC_IMPLIED_DO_226)
+            return (ASTExprNode)getChild(9);
+        else if (getProduction() == Production.AC_IMPLIED_DO_228)
             return (ASTExprNode)getChild(9);
         else
             return null;
@@ -204,5 +201,19 @@ public class ASTAcImpliedDoNode extends InteriorNode
             return (ASTAcImpliedDoNode)getChild(1);
         else
             return null;
+    }
+
+    @Override protected boolean shouldVisitChild(int index)
+    {
+        if (getProduction() == Production.AC_IMPLIED_DO_225 && index == 6)
+            return false;
+        else if (getProduction() == Production.AC_IMPLIED_DO_226 && index == 6)
+            return false;
+        else if (getProduction() == Production.AC_IMPLIED_DO_227 && index == 6)
+            return false;
+        else if (getProduction() == Production.AC_IMPLIED_DO_228 && index == 6)
+            return false;
+        else
+            return true;
     }
 }

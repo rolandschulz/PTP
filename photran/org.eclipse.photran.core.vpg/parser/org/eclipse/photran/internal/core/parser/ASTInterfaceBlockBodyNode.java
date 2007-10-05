@@ -10,11 +10,13 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.Token;
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
 import org.eclipse.photran.internal.core.parser.Parser.*;
+import java.util.Iterator;
 import java.util.List;
 
-public class ASTInterfaceBlockBodyNode extends InteriorNode
+public class ASTInterfaceBlockBodyNode extends InteriorNode implements Iterable<ASTInterfaceSpecificationNode>
 {
     protected int count = -1;
 
@@ -25,6 +27,35 @@ public class ASTInterfaceBlockBodyNode extends InteriorNode
          for (Object o : childNodes)
              addChild((CSTNode)o);
          constructionFinished();
+    }
+        
+    @Override public InteriorNode getASTParent()
+    {
+        // This is a recursive node in a list, so its logical parent node
+        // is the parent of the first node in the list
+    
+        InteriorNode parent = super.getParent();
+        InteriorNode grandparent = parent == null ? null : parent.getParent();
+        InteriorNode logicalParent = parent;
+        
+        while (parent != null && grandparent != null
+               && parent instanceof ASTInterfaceBlockBodyNode
+               && grandparent instanceof ASTInterfaceBlockBodyNode
+               && ((ASTInterfaceBlockBodyNode)grandparent).getRecursiveNode() == parent)
+        {
+            logicalParent = grandparent;
+            parent = grandparent;
+            grandparent = grandparent.getParent() == null ? null : grandparent.getParent();
+        }
+        
+        InteriorNode logicalGrandparent = logicalParent.getParent();
+        
+        // If a node has been pulled up in an ACST, its physical parent in
+        // the CST is not its logical parent in the ACST
+        if (logicalGrandparent != null && logicalGrandparent.childIsPulledUp(logicalGrandparent.findChild(logicalParent)))
+            return logicalParent.getASTParent();
+        else 
+            return logicalParent;
     }
 
     /**
@@ -62,6 +93,41 @@ public class ASTInterfaceBlockBodyNode extends InteriorNode
     @Override protected void visitThisNodeUsing(ASTVisitor visitor)
     {
         visitor.visitASTInterfaceBlockBodyNode(this);
+    }
+
+    public Iterator<ASTInterfaceSpecificationNode> iterator()
+    {
+        final int listSize = size();
+        
+        ASTInterfaceBlockBodyNode node = this;
+        for (int depth = listSize-1, i = 0; i < depth; i++)
+            node = (ASTInterfaceBlockBodyNode)node.getRecursiveNode();
+
+        final ASTInterfaceBlockBodyNode baseNode = node;
+        
+        return new Iterator<ASTInterfaceSpecificationNode>()
+        {
+            private ASTInterfaceBlockBodyNode node = baseNode;
+            private int index = 0;
+            
+            public boolean hasNext()
+            {
+                return index < listSize;
+            }
+
+            public ASTInterfaceSpecificationNode next()
+            {
+                ASTInterfaceSpecificationNode result = (ASTInterfaceSpecificationNode)node.getChild(1);
+                node = (ASTInterfaceBlockBodyNode)node.parent;
+                index++;
+                return result;
+            }
+
+            public void remove()
+            {
+                throw new UnsupportedOperationException();
+            }
+        };
     }
 
     public ASTInterfaceSpecificationNode getInterfaceSpecification(int listIndex)

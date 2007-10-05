@@ -10,12 +10,10 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import java.util.List;
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 
-import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
-import org.eclipse.photran.internal.core.parser.Parser.CSTNode;
-import org.eclipse.photran.internal.core.parser.Parser.InteriorNode;
-import org.eclipse.photran.internal.core.parser.Parser.Production;
+import org.eclipse.photran.internal.core.parser.Parser.*;
+import java.util.List;
 
 public class ASTMainProgramNode extends ScopingNode
 {
@@ -26,6 +24,18 @@ public class ASTMainProgramNode extends ScopingNode
          for (Object o : childNodes)
              addChild((CSTNode)o);
          constructionFinished();
+    }
+        
+    @Override public InteriorNode getASTParent()
+    {
+        InteriorNode actualParent = super.getParent();
+        
+        // If a node has been pulled up in an ACST, its physical parent in
+        // the CST is not its logical parent in the ACST
+        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
+            return actualParent.getParent();
+        else 
+            return actualParent;
     }
     
     @Override protected void visitThisNodeUsing(ASTVisitor visitor)
@@ -48,9 +58,9 @@ public class ASTMainProgramNode extends ScopingNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         if (getProduction() == Production.MAIN_PROGRAM_8)
-            return (ASTBodyNode)getChild(0, 0);
+            return (ASTBodyNode)((ASTMainRangeNode)getChild(0)).getBody();
         else if (getProduction() == Production.MAIN_PROGRAM_9)
-            return (ASTBodyNode)getChild(1, 0);
+            return (ASTBodyNode)((ASTMainRangeNode)getChild(1)).getBody();
         else
             return null;
     }
@@ -59,18 +69,10 @@ public class ASTMainProgramNode extends ScopingNode
     {
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
-        if (getProduction() == Production.MAIN_PROGRAM_8 && ((InteriorNode)getChild(0)).getProduction() == Production.MAIN_RANGE_10)
-            return (ASTEndProgramStmtNode)getChild(0, 1);
-        else if (getProduction() == Production.MAIN_PROGRAM_8 && ((InteriorNode)getChild(0)).getProduction() == Production.MAIN_RANGE_11)
-            return (ASTEndProgramStmtNode)getChild(0, 1);
-        else if (getProduction() == Production.MAIN_PROGRAM_8 && ((InteriorNode)getChild(0)).getProduction() == Production.MAIN_RANGE_12)
-            return (ASTEndProgramStmtNode)getChild(0, 0);
-        else if (getProduction() == Production.MAIN_PROGRAM_9 && ((InteriorNode)getChild(1)).getProduction() == Production.MAIN_RANGE_10)
-            return (ASTEndProgramStmtNode)getChild(1, 1);
-        else if (getProduction() == Production.MAIN_PROGRAM_9 && ((InteriorNode)getChild(1)).getProduction() == Production.MAIN_RANGE_11)
-            return (ASTEndProgramStmtNode)getChild(1, 1);
-        else if (getProduction() == Production.MAIN_PROGRAM_9 && ((InteriorNode)getChild(1)).getProduction() == Production.MAIN_RANGE_12)
-            return (ASTEndProgramStmtNode)getChild(1, 0);
+        if (getProduction() == Production.MAIN_PROGRAM_8)
+            return (ASTEndProgramStmtNode)((ASTMainRangeNode)getChild(0)).getEndProgramStmt();
+        else if (getProduction() == Production.MAIN_PROGRAM_9)
+            return (ASTEndProgramStmtNode)((ASTMainRangeNode)getChild(1)).getEndProgramStmt();
         else
             return null;
     }
@@ -80,9 +82,9 @@ public class ASTMainProgramNode extends ScopingNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         if (getProduction() == Production.MAIN_PROGRAM_8)
-            return (ASTBodyPlusInternalsNode)getChild(0, 0);
+            return (ASTBodyPlusInternalsNode)((ASTMainRangeNode)getChild(0)).getBodyPlusInternals();
         else if (getProduction() == Production.MAIN_PROGRAM_9)
-            return (ASTBodyPlusInternalsNode)getChild(1, 0);
+            return (ASTBodyPlusInternalsNode)((ASTMainRangeNode)getChild(1)).getBodyPlusInternals();
         else
             return null;
     }

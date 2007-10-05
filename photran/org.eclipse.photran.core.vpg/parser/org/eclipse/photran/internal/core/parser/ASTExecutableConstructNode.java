@@ -10,7 +10,8 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.Token;
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
@@ -23,6 +24,18 @@ public class ASTExecutableConstructNode extends InteriorNode
          for (Object o : childNodes)
              addChild((CSTNode)o);
          constructionFinished();
+    }
+        
+    @Override public InteriorNode getASTParent()
+    {
+        InteriorNode actualParent = super.getParent();
+        
+        // If a node has been pulled up in an ACST, its physical parent in
+        // the CST is not its logical parent in the ACST
+        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
+            return actualParent.getParent();
+        else 
+            return actualParent;
     }
     
     @Override protected void visitThisNodeUsing(ASTVisitor visitor)
@@ -95,7 +108,7 @@ public class ASTExecutableConstructNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         if (getProduction() == Production.EXECUTABLE_CONSTRUCT_75)
-            return (ASTAllocateStmtNode)getChild(0, 0);
+            return (ASTAllocateStmtNode)((ASTActionStmtNode)getChild(0)).getAllocateStmt();
         else
             return null;
     }
@@ -105,7 +118,7 @@ public class ASTExecutableConstructNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         if (getProduction() == Production.EXECUTABLE_CONSTRUCT_75)
-            return (ASTAssignmentStmtNode)getChild(0, 0);
+            return (ASTAssignmentStmtNode)((ASTActionStmtNode)getChild(0)).getAssignmentStmt();
         else
             return null;
     }
@@ -115,7 +128,7 @@ public class ASTExecutableConstructNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         if (getProduction() == Production.EXECUTABLE_CONSTRUCT_75)
-            return (ASTBackspaceStmtNode)getChild(0, 0);
+            return (ASTBackspaceStmtNode)((ASTActionStmtNode)getChild(0)).getBackspaceStmt();
         else
             return null;
     }
@@ -125,7 +138,7 @@ public class ASTExecutableConstructNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         if (getProduction() == Production.EXECUTABLE_CONSTRUCT_75)
-            return (ASTCallStmtNode)getChild(0, 0);
+            return (ASTCallStmtNode)((ASTActionStmtNode)getChild(0)).getCallStmt();
         else
             return null;
     }
@@ -135,7 +148,7 @@ public class ASTExecutableConstructNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         if (getProduction() == Production.EXECUTABLE_CONSTRUCT_75)
-            return (ASTCloseStmtNode)getChild(0, 0);
+            return (ASTCloseStmtNode)((ASTActionStmtNode)getChild(0)).getCloseStmt();
         else
             return null;
     }
@@ -145,7 +158,7 @@ public class ASTExecutableConstructNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         if (getProduction() == Production.EXECUTABLE_CONSTRUCT_75)
-            return (ASTContinueStmtNode)getChild(0, 0);
+            return (ASTContinueStmtNode)((ASTActionStmtNode)getChild(0)).getContinueStmt();
         else
             return null;
     }
@@ -155,7 +168,7 @@ public class ASTExecutableConstructNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         if (getProduction() == Production.EXECUTABLE_CONSTRUCT_75)
-            return (ASTCycleStmtNode)getChild(0, 0);
+            return (ASTCycleStmtNode)((ASTActionStmtNode)getChild(0)).getCycleStmt();
         else
             return null;
     }
@@ -165,7 +178,7 @@ public class ASTExecutableConstructNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         if (getProduction() == Production.EXECUTABLE_CONSTRUCT_75)
-            return (ASTDeallocateStmtNode)getChild(0, 0);
+            return (ASTDeallocateStmtNode)((ASTActionStmtNode)getChild(0)).getDeallocateStmt();
         else
             return null;
     }
@@ -175,7 +188,7 @@ public class ASTExecutableConstructNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         if (getProduction() == Production.EXECUTABLE_CONSTRUCT_75)
-            return (ASTEndfileStmtNode)getChild(0, 0);
+            return (ASTEndfileStmtNode)((ASTActionStmtNode)getChild(0)).getEndfileStmt();
         else
             return null;
     }
@@ -185,7 +198,7 @@ public class ASTExecutableConstructNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         if (getProduction() == Production.EXECUTABLE_CONSTRUCT_75)
-            return (ASTExitStmtNode)getChild(0, 0);
+            return (ASTExitStmtNode)((ASTActionStmtNode)getChild(0)).getExitStmt();
         else
             return null;
     }
@@ -195,7 +208,7 @@ public class ASTExecutableConstructNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         if (getProduction() == Production.EXECUTABLE_CONSTRUCT_75)
-            return (ASTForallStmtNode)getChild(0, 0);
+            return (ASTForallStmtNode)((ASTActionStmtNode)getChild(0)).getForallStmt();
         else
             return null;
     }
@@ -205,7 +218,7 @@ public class ASTExecutableConstructNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         if (getProduction() == Production.EXECUTABLE_CONSTRUCT_75)
-            return (ASTGotoStmtNode)getChild(0, 0);
+            return (ASTGotoStmtNode)((ASTActionStmtNode)getChild(0)).getGotoStmt();
         else
             return null;
     }
@@ -215,7 +228,7 @@ public class ASTExecutableConstructNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         if (getProduction() == Production.EXECUTABLE_CONSTRUCT_75)
-            return (ASTIfStmtNode)getChild(0, 0);
+            return (ASTIfStmtNode)((ASTActionStmtNode)getChild(0)).getIfStmt();
         else
             return null;
     }
@@ -225,7 +238,7 @@ public class ASTExecutableConstructNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         if (getProduction() == Production.EXECUTABLE_CONSTRUCT_75)
-            return (ASTInquireStmtNode)getChild(0, 0);
+            return (ASTInquireStmtNode)((ASTActionStmtNode)getChild(0)).getInquireStmt();
         else
             return null;
     }
@@ -235,7 +248,7 @@ public class ASTExecutableConstructNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         if (getProduction() == Production.EXECUTABLE_CONSTRUCT_75)
-            return (ASTNullifyStmtNode)getChild(0, 0);
+            return (ASTNullifyStmtNode)((ASTActionStmtNode)getChild(0)).getNullifyStmt();
         else
             return null;
     }
@@ -245,7 +258,7 @@ public class ASTExecutableConstructNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         if (getProduction() == Production.EXECUTABLE_CONSTRUCT_75)
-            return (ASTOpenStmtNode)getChild(0, 0);
+            return (ASTOpenStmtNode)((ASTActionStmtNode)getChild(0)).getOpenStmt();
         else
             return null;
     }
@@ -255,7 +268,7 @@ public class ASTExecutableConstructNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         if (getProduction() == Production.EXECUTABLE_CONSTRUCT_75)
-            return (ASTPointerAssignmentStmtNode)getChild(0, 0);
+            return (ASTPointerAssignmentStmtNode)((ASTActionStmtNode)getChild(0)).getPointerAssignmentStmt();
         else
             return null;
     }
@@ -265,7 +278,7 @@ public class ASTExecutableConstructNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         if (getProduction() == Production.EXECUTABLE_CONSTRUCT_75)
-            return (ASTPrintStmtNode)getChild(0, 0);
+            return (ASTPrintStmtNode)((ASTActionStmtNode)getChild(0)).getPrintStmt();
         else
             return null;
     }
@@ -275,7 +288,7 @@ public class ASTExecutableConstructNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         if (getProduction() == Production.EXECUTABLE_CONSTRUCT_75)
-            return (ASTReadStmtNode)getChild(0, 0);
+            return (ASTReadStmtNode)((ASTActionStmtNode)getChild(0)).getReadStmt();
         else
             return null;
     }
@@ -285,7 +298,7 @@ public class ASTExecutableConstructNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         if (getProduction() == Production.EXECUTABLE_CONSTRUCT_75)
-            return (ASTReturnStmtNode)getChild(0, 0);
+            return (ASTReturnStmtNode)((ASTActionStmtNode)getChild(0)).getReturnStmt();
         else
             return null;
     }
@@ -295,7 +308,7 @@ public class ASTExecutableConstructNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         if (getProduction() == Production.EXECUTABLE_CONSTRUCT_75)
-            return (ASTRewindStmtNode)getChild(0, 0);
+            return (ASTRewindStmtNode)((ASTActionStmtNode)getChild(0)).getRewindStmt();
         else
             return null;
     }
@@ -305,7 +318,7 @@ public class ASTExecutableConstructNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         if (getProduction() == Production.EXECUTABLE_CONSTRUCT_75)
-            return (ASTStopStmtNode)getChild(0, 0);
+            return (ASTStopStmtNode)((ASTActionStmtNode)getChild(0)).getStopStmt();
         else
             return null;
     }
@@ -315,7 +328,7 @@ public class ASTExecutableConstructNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         if (getProduction() == Production.EXECUTABLE_CONSTRUCT_75)
-            return (ASTWhereStmtNode)getChild(0, 0);
+            return (ASTWhereStmtNode)((ASTActionStmtNode)getChild(0)).getWhereStmt();
         else
             return null;
     }
@@ -325,7 +338,7 @@ public class ASTExecutableConstructNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         if (getProduction() == Production.EXECUTABLE_CONSTRUCT_75)
-            return (ASTWriteStmtNode)getChild(0, 0);
+            return (ASTWriteStmtNode)((ASTActionStmtNode)getChild(0)).getWriteStmt();
         else
             return null;
     }
@@ -335,7 +348,7 @@ public class ASTExecutableConstructNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         if (getProduction() == Production.EXECUTABLE_CONSTRUCT_75)
-            return (ASTAssignStmtNode)getChild(0, 0);
+            return (ASTAssignStmtNode)((ASTActionStmtNode)getChild(0)).getAssignStmt();
         else
             return null;
     }
@@ -345,7 +358,7 @@ public class ASTExecutableConstructNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         if (getProduction() == Production.EXECUTABLE_CONSTRUCT_75)
-            return (ASTAssignedGotoStmtNode)getChild(0, 0);
+            return (ASTAssignedGotoStmtNode)((ASTActionStmtNode)getChild(0)).getAssignedGotoStmt();
         else
             return null;
     }
@@ -355,7 +368,7 @@ public class ASTExecutableConstructNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         if (getProduction() == Production.EXECUTABLE_CONSTRUCT_75)
-            return (ASTPauseStmtNode)getChild(0, 0);
+            return (ASTPauseStmtNode)((ASTActionStmtNode)getChild(0)).getPauseStmt();
         else
             return null;
     }
@@ -365,7 +378,7 @@ public class ASTExecutableConstructNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         if (getProduction() == Production.EXECUTABLE_CONSTRUCT_75)
-            return (ASTStmtFunctionStmtNode)getChild(0, 0, 0);
+            return (ASTStmtFunctionStmtNode)((ASTActionStmtNode)getChild(0)).getStmtFunctionStmt();
         else
             return null;
     }
@@ -375,7 +388,7 @@ public class ASTExecutableConstructNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         if (getProduction() == Production.EXECUTABLE_CONSTRUCT_75)
-            return (ASTArithmeticIfStmtNode)getChild(0, 0, 0);
+            return (ASTArithmeticIfStmtNode)((ASTActionStmtNode)getChild(0)).getArithmeticIfStmt();
         else
             return null;
     }
@@ -385,7 +398,7 @@ public class ASTExecutableConstructNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         if (getProduction() == Production.EXECUTABLE_CONSTRUCT_75)
-            return (ASTComputedGotoStmtNode)getChild(0, 0, 0);
+            return (ASTComputedGotoStmtNode)((ASTActionStmtNode)getChild(0)).getComputedGotoStmt();
         else
             return null;
     }

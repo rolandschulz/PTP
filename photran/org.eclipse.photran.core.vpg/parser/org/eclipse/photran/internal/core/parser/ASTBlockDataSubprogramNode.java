@@ -10,11 +10,10 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import java.util.List;
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 
-import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
-import org.eclipse.photran.internal.core.parser.Parser.CSTNode;
-import org.eclipse.photran.internal.core.parser.Parser.Production;
+import org.eclipse.photran.internal.core.parser.Parser.*;
+import java.util.List;
 
 public class ASTBlockDataSubprogramNode extends ScopingNode
 {
@@ -25,6 +24,18 @@ public class ASTBlockDataSubprogramNode extends ScopingNode
          for (Object o : childNodes)
              addChild((CSTNode)o);
          constructionFinished();
+    }
+        
+    @Override public InteriorNode getASTParent()
+    {
+        InteriorNode actualParent = super.getParent();
+        
+        // If a node has been pulled up in an ACST, its physical parent in
+        // the CST is not its logical parent in the ACST
+        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
+            return actualParent.getParent();
+        else 
+            return actualParent;
     }
     
     @Override protected void visitThisNodeUsing(ASTVisitor visitor)

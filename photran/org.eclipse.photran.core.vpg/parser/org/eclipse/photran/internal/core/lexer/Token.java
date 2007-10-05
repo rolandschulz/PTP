@@ -23,6 +23,7 @@ import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 import org.eclipse.photran.internal.core.analysis.types.Type;
 import org.eclipse.photran.internal.core.parser.ASTVisitor;
+import org.eclipse.photran.internal.core.parser.CSTVisitor;
 import org.eclipse.photran.internal.core.parser.GenericParseTreeVisitor;
 import org.eclipse.photran.internal.core.parser.Parser.CSTNode;
 
@@ -258,6 +259,16 @@ public class Token extends CSTNode implements IToken
     {
         if (shouldVisitRoot)
             visitor.visitToken(this);
+    }
+
+    @Override public void visitTopDownUsing(CSTVisitor visitor)
+    {
+        visitor.visitToken(this);
+    }
+
+    @Override public void visitBottomUpUsing(CSTVisitor visitor)
+    {
+        visitor.visitToken(this);
     }
 
     public void visitUsing(GenericParseTreeVisitor visitor)

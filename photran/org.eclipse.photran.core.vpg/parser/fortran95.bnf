@@ -43,7 +43,7 @@
 #######################################################################################################################
 
 # R201
-<ExecutableProgram> ::=
+<ExecutableProgram> ::= (superclass=ScopingNode)
   |                       <ProgramUnit>
   | @:<ExecutableProgram> <ProgramUnit>
 
@@ -58,7 +58,7 @@
 # R203 chain rule eliminated
 
 # R1101 doesn't ensure ordering as the standard requires
-<MainProgram> ::=
+<MainProgram> ::= (superclass=ScopingNode)
   |               ^:<MainRange>
   | <ProgramStmt> ^:<MainRange>
 
@@ -82,7 +82,7 @@
 #######################################################################################################################
 
 # R1216
-<FunctionSubprogram> ::=
+<FunctionSubprogram> ::= (superclass=ScopingNode)
   <FunctionStmt> ^:<FunctionRange>
 
 <FunctionRange> ::=
@@ -91,7 +91,7 @@
   | <BodyPlusInternals> <EndFunctionStmt>
 
 # R1221
-<SubroutineSubprogram> ::=
+<SubroutineSubprogram> ::= (superclass=ScopingNode)
   <SubroutineStmt> ^:<SubroutineRange>
 
 <SubroutineRange> ::=
@@ -104,7 +104,7 @@
 #######################################################################################################################
 
 # R1104
-<Module> ::=
+<Module> ::= (superclass=ScopingNode)
   <ModuleStmt> ^:<ModuleBlock>
 
 <ModuleBlock> ::=
@@ -119,7 +119,7 @@
 
 
 # R1112
-<BlockDataSubprogram> ::=
+<BlockDataSubprogram> ::= (superclass=ScopingNode)
   | <BlockDataStmt> <BlockDataBody> <EndBlockDataStmt>
   | <BlockDataStmt>                 <EndBlockDataStmt>
 
@@ -412,7 +412,7 @@
 # R414-R416 components of symbols recognized by the lexical analyzer
 
 # R417
-<ComplexConst> ::= T_LPAREN <Expr> T_COMMA <Expr> T_RPAREN
+<ComplexConst> ::= T_LPAREN real-part:<Expr> T_COMMA complex-part:<Expr> T_RPAREN
 
 # R418 chain rule deleted
 
@@ -428,7 +428,7 @@
   | T_FALSE T_UNDERSCORE <KindParam>
 
 # R422 This does not enforce the required sequence
-<DerivedTypeDef> ::=
+<DerivedTypeDef> ::= (superclass=ScopingNode)
   <DerivedTypeStmt> <DerivedTypeBody> <EndTypeStmt>
 
 <DerivedTypeBody> ::=
@@ -441,9 +441,9 @@
 
 # R423
 <DerivedTypeStmt> ::=
-  | <LblDef> T_TYPE                                      <TypeName> T_EOS
-  | <LblDef> T_TYPE                      T_COLON T_COLON <TypeName> T_EOS
-  | <LblDef> T_TYPE T_COMMA <AccessSpec> T_COLON T_COLON <TypeName> T_EOS
+  | <LblDef> T_TYPE                                          <TypeName> T_EOS
+  | <LblDef> T_TYPE                      -:T_COLON -:T_COLON <TypeName> T_EOS
+  | <LblDef> T_TYPE T_COMMA <AccessSpec> -:T_COLON -:T_COLON <TypeName> T_EOS
 
 # R424
 <PrivateSequenceStmt> ::=
@@ -452,9 +452,9 @@
 
 # R425
 <ComponentDefStmt> ::=
-  | <LblDef> <TypeSpec> T_COMMA <ComponentAttrSpecList> T_COLON T_COLON <ComponentDeclList> T_EOS
-  | <LblDef> <TypeSpec>                                 T_COLON T_COLON <ComponentDeclList> T_EOS
-  | <LblDef> <TypeSpec>                                                 <ComponentDeclList> T_EOS
+  | <LblDef> <TypeSpec> T_COMMA <ComponentAttrSpecList> -:T_COLON -:T_COLON <ComponentDeclList> T_EOS
+  | <LblDef> <TypeSpec>                                 -:T_COLON -:T_COLON <ComponentDeclList> T_EOS
+  | <LblDef> <TypeSpec>                                                     <ComponentDeclList> T_EOS
 
 # R426
 <ComponentAttrSpecList> ::=
@@ -513,7 +513,7 @@
   | <AcValueList1>
 
 <AcValueList1> ::=
-  | <Expr> T_COMMA <Expr>
+  | <Expr> T_COMMA expr2:<Expr>
   | <Expr> T_COMMA <AcImpliedDo>
   | <AcImpliedDo>
   | @:<AcValueList1> T_COMMA <Expr>
@@ -521,10 +521,10 @@
 
 # R434
 <AcImpliedDo> ::=
-  | T_LPAREN <Expr>        T_COMMA <ImpliedDoVariable> T_EQUALS <Expr> T_COMMA <Expr>                T_RPAREN
-  | T_LPAREN <Expr>        T_COMMA <ImpliedDoVariable> T_EQUALS <Expr> T_COMMA <Expr> T_COMMA <Expr> T_RPAREN
-  | T_LPAREN <AcImpliedDo> T_COMMA <ImpliedDoVariable> T_EQUALS <Expr> T_COMMA <Expr>                T_RPAREN
-  | T_LPAREN <AcImpliedDo> T_COMMA <ImpliedDoVariable> T_EQUALS <Expr> T_COMMA <Expr> T_COMMA <Expr> T_RPAREN
+  | T_LPAREN <Expr>        T_COMMA <ImpliedDoVariable> T_EQUALS lb:<Expr> -:T_COMMA ub:<Expr>                     T_RPAREN
+  | T_LPAREN <Expr>        T_COMMA <ImpliedDoVariable> T_EQUALS lb:<Expr> -:T_COMMA ub:<Expr> T_COMMA step:<Expr> T_RPAREN
+  | T_LPAREN <AcImpliedDo> T_COMMA <ImpliedDoVariable> T_EQUALS lb:<Expr> -:T_COMMA ub:<Expr>                     T_RPAREN
+  | T_LPAREN <AcImpliedDo> T_COMMA <ImpliedDoVariable> T_EQUALS lb:<Expr> -:T_COMMA ub:<Expr> T_COMMA step:<Expr> T_RPAREN
 
 # R435 chain rule deleted
 
@@ -536,9 +536,9 @@
 
 # R501
 <TypeDeclarationStmt> ::=
-  | <LblDef> <TypeSpec> <AttrSpecSeq> T_COLON T_COLON <EntityDeclList> T_EOS
-  | <LblDef> <TypeSpec>               T_COLON T_COLON <EntityDeclList> T_EOS
-  | <LblDef> <TypeSpec>                               <EntityDeclList> T_EOS
+  | <LblDef> <TypeSpec> <AttrSpecSeq> -:T_COLON -:T_COLON <EntityDeclList> T_EOS
+  | <LblDef> <TypeSpec>               -:T_COLON -:T_COLON <EntityDeclList> T_EOS
+  | <LblDef> <TypeSpec>                                   <EntityDeclList> T_EOS
 
 <AttrSpecSeq> ::=
   |                 T_COMMA <AttrSpec>
@@ -1998,7 +1998,7 @@
 #######################################################################################################################
 
 # R1201
-<InterfaceBlock> ::=
+<InterfaceBlock> ::= (superclass=ScopingNode)
   <InterfaceStmt> <InterfaceRange>
 
 <InterfaceRange> ::=

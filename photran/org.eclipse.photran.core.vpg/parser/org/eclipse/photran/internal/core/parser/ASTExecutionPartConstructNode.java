@@ -10,7 +10,8 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.Token;
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
@@ -23,6 +24,18 @@ public class ASTExecutionPartConstructNode extends InteriorNode
          for (Object o : childNodes)
              addChild((CSTNode)o);
          constructionFinished();
+    }
+        
+    @Override public InteriorNode getASTParent()
+    {
+        InteriorNode actualParent = super.getParent();
+        
+        // If a node has been pulled up in an ACST, its physical parent in
+        // the CST is not its logical parent in the ACST
+        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
+            return actualParent.getParent();
+        else 
+            return actualParent;
     }
     
     @Override protected void visitThisNodeUsing(ASTVisitor visitor)
@@ -65,7 +78,7 @@ public class ASTExecutionPartConstructNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         if (getProduction() == Production.EXECUTION_PART_CONSTRUCT_47)
-            return (ASTDataStmtNode)getChild(0, 0);
+            return (ASTDataStmtNode)((ASTObsoleteExecutionPartConstructNode)getChild(0)).getDataStmt();
         else
             return null;
     }

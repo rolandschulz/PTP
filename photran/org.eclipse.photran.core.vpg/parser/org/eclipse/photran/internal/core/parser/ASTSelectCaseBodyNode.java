@@ -10,7 +10,8 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.Token;
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
@@ -25,6 +26,35 @@ public class ASTSelectCaseBodyNode extends InteriorNode
          for (Object o : childNodes)
              addChild((CSTNode)o);
          constructionFinished();
+    }
+        
+    @Override public InteriorNode getASTParent()
+    {
+        // This is a recursive node in a list, so its logical parent node
+        // is the parent of the first node in the list
+    
+        InteriorNode parent = super.getParent();
+        InteriorNode grandparent = parent == null ? null : parent.getParent();
+        InteriorNode logicalParent = parent;
+        
+        while (parent != null && grandparent != null
+               && parent instanceof ASTSelectCaseBodyNode
+               && grandparent instanceof ASTSelectCaseBodyNode
+               && ((ASTSelectCaseBodyNode)grandparent).getRecursiveNode() == parent)
+        {
+            logicalParent = grandparent;
+            parent = grandparent;
+            grandparent = grandparent.getParent() == null ? null : grandparent.getParent();
+        }
+        
+        InteriorNode logicalGrandparent = logicalParent.getParent();
+        
+        // If a node has been pulled up in an ACST, its physical parent in
+        // the CST is not its logical parent in the ACST
+        if (logicalGrandparent != null && logicalGrandparent.childIsPulledUp(logicalGrandparent.findChild(logicalParent)))
+            return logicalParent.getASTParent();
+        else 
+            return logicalParent;
     }
 
     /**

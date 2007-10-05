@@ -1,46 +1,29 @@
---- Parser.java.orig	2007-07-30 21:12:14.000000000 -0600
-+++ Parser.java	2007-07-30 21:21:06.000000000 -0600
-@@ -1,10 +1,13 @@
- package org.eclipse.photran.internal.core.parser;
+--- org/eclipse/photran/internal/core/parser/Parser.java	2007-09-01 21:31:35.000000000 -0600
++++ ./Parser.java.new	2007-09-01 21:27:39.000000000 -0600
+@@ -179,14 +179,14 @@
+             
+             switch (action)
+             {
+-               case RecoveryTable.DISCARD_STATE_ACTION:
+-                   if (stateStack.size() > 1)
+-                   {
+-                       stateStack.pop();
+-                       discardedSymbols.addFirst(valueStack.pop());
+-                   }
+-                   doneParsing = stateStack.size() <= 1;
+-                   break;
++                case RecoveryTable.DISCARD_STATE_ACTION:
++                	if (stateStack.size() > 1)
++            		{
++                		stateStack.pop();
++                		discardedSymbols.addFirst(valueStack.pop());
++            		}
++                    doneParsing = stateStack.size() <= 1;
++                    break;
  
- import java.io.PrintStream;
--import java.util.Stack;
--import java.util.List;
- import java.util.ArrayList;
- import java.util.LinkedList;
-+import java.util.List;
-+import java.util.Stack;
-+
-+import org.eclipse.photran.internal.core.lexer.ILexer;
-+import org.eclipse.photran.internal.core.lexer.Token;
- 
- /**
-  * An LALR(1) parser
-@@ -393,7 +396,7 @@
-         private int index;
-         private String description;
- 
--        private Terminal(int index, String description)
-+        public Terminal(int index, String description)
-         {
-             this.index = index;
-             this.description = description;
-@@ -14109,14 +14112,6 @@
-             return sb.toString();
-         }
-     }
--    
--    public static interface ILexer
--    {
--        Token yylex();
--        String getFilename();
--        int getLastTokenLine();
--        int getLastTokenCol();
--    }
- 
-     /**
-      * Common superclass for <code>Token</code>s and <code>InteriorNode</code>s, the two types of
-@@ -14164,6 +14159,8 @@
+                 case RecoveryTable.DISCARD_TERMINAL_ACTION:
+                     discardedSymbols.addLast(lookaheadToken);
+@@ -13979,6 +13979,8 @@
          protected abstract void visitTopDownUsing(ASTVisitor visitor, boolean shouldVisitRoot);
          
          protected abstract void visitBottomUpUsing(ASTVisitor visitor, boolean shouldVisitRoot);
@@ -49,7 +32,7 @@
      
          ///////////////////////////////////////////////////////////////////////////
          // Debugging Output
-@@ -14188,7 +14185,7 @@
+@@ -14003,7 +14005,7 @@
          // Source Code Reproduction
          ///////////////////////////////////////////////////////////////////////////
          
@@ -58,15 +41,15 @@
      }
  
      public static class InteriorNode extends CSTNode
-@@ -14203,6 +14200,7 @@
-     
-             @Override protected void visitBottomUpUsing(ASTVisitor visitor, boolean shouldVisitRoot) {}
+@@ -14020,6 +14022,7 @@
+             @Override public void visitBottomUpUsing(CSTVisitor visitor) {}
              @Override protected void visitTopDownUsing(ASTVisitor visitor, boolean shouldVisitRoot) {}
+             @Override protected void visitBottomUpUsing(ASTVisitor visitor, boolean shouldVisitRoot) {}
 +            @Override public void visitUsing(GenericParseTreeVisitor visitor) {}
              
              public String toString(int numSpaces)
              {
-@@ -14213,9 +14211,9 @@
+@@ -14030,9 +14033,9 @@
                  return sb.toString();
              }
      
@@ -78,7 +61,7 @@
              }
          }
          
-@@ -14435,7 +14433,18 @@
+@@ -14291,7 +14294,18 @@
          {
              ;
          }
@@ -98,7 +81,7 @@
          ///////////////////////////////////////////////////////////////////////////
          // Debugging Output
          ///////////////////////////////////////////////////////////////////////////
-@@ -14458,11 +14467,12 @@
+@@ -14314,11 +14328,12 @@
          // Source Code Reproduction
          ///////////////////////////////////////////////////////////////////////////
          
@@ -113,11 +96,12 @@
          }
      }
      
-@@ -14527,142 +14537,15 @@
+@@ -14395,13 +14410,16 @@
          // Source Code Reproduction
          ///////////////////////////////////////////////////////////////////////////
          
 -        public void printOn(PrintStream out)
++        
 +        @Override public String printOn(PrintStream out, String currentPreprocessorDirective)
          {
 -            super.printOn(out);
@@ -126,135 +110,6 @@
              if (symbolsDiscardedDuringErrorRecovery != null)
                  for (CSTNode discardedSymbol : symbolsDiscardedDuringErrorRecovery)
 -                    discardedSymbol.printOn(out);
--        }
--    }
--
--    /**
--     * Enumerates the terminal symbols in the grammar being parsed
--     */
--    public static class Token extends CSTNode
--    {
--        ///////////////////////////////////////////////////////////////////////////
--        // Fields
--        ///////////////////////////////////////////////////////////////////////////
--        
--        /**
--         * The Terminal that this token is an instance of
--         */
--        protected Terminal terminal = null;
--    
--        /**
--         * Whitespace and whitetext appearing before this token that should be associated with this token
--         */
--        protected String whiteBefore = "";
--    
--        /**
--         * The token text
--         */
--        protected String text = "";
--    
--        /**
--         * Whitespace and whitetext appearing after this token that should be associated with this token, not the next
--         */
--        protected String whiteAfter = "";
--    
--        ///////////////////////////////////////////////////////////////////////////
--        // Constructors
--        ///////////////////////////////////////////////////////////////////////////
--        
--        public Token(Terminal terminal, String whiteBefore, String tokenText, String whiteAfter)
--        {
--            this.terminal    = terminal;
--            this.whiteBefore = whiteBefore == null ? "" : whiteBefore;
--            this.text   = tokenText   == null ? "" : tokenText;
--            this.whiteAfter  = whiteAfter  == null ? "" : whiteAfter;
--        }
--        
--        public Token(Terminal terminal, String tokenText)
--        {
--            this(terminal, null, tokenText, null);
--        }
--        
--        ///////////////////////////////////////////////////////////////////////////
--        // Accessor/Mutator Methods
--        ///////////////////////////////////////////////////////////////////////////
--    
--        /**
--         * Returns the Terminal that this token is an instance of
--         */
--        public Terminal getTerminal() { return terminal; }
--    
--        /**
--         * Sets the Terminal that this token is an instance of
--         */
--        public void setTerminal(Terminal value) { terminal = value; }
--    
--        /**
--         * Returns the token text
--         */
--        public String getText() { return text; }
--    
--        /**
--         * Sets the token text
--         */
--        public void setText(String value) { text = value == null ? "" : value; }
--    
--        /**
--         * Returns whitespace and whitetext appearing before this token that should be associated with this token
--         */
--        public String getWhiteBefore() { return whiteBefore; }
--    
--        /**
--         * Sets whitespace and whitetext appearing before this token that should be associated with this token
--         */
--        public void setWhiteBefore(String value) { whiteBefore = value == null ? "" : value; }
--    
--        /**
--         * Returns whitespace and whitetext appearing after this token that should be associated with this token, not the next
--         */
--        public String getWhiteAfter() { return whiteAfter; }
--    
--        /**
--         * Sets whitespace and whitetext appearing after this token that should be associated with this token, not the next
--         */
--        public void setWhiteAfter(String value) { whiteAfter = value == null ? "" : value; }
--    
--        ///////////////////////////////////////////////////////////////////////////
--        // Visitor Support
--        ///////////////////////////////////////////////////////////////////////////
--    
--        @Override protected void visitTopDownUsing(ASTVisitor visitor, boolean shouldVisitRoot)
--        {
--            if (shouldVisitRoot)
--                visitor.visitToken(this);
--        }
--    
--        @Override protected void visitBottomUpUsing(ASTVisitor visitor, boolean shouldVisitRoot)
--        {
--            if (shouldVisitRoot)
--                visitor.visitToken(this);
--        }
--    
--        ///////////////////////////////////////////////////////////////////////////
--        // Debugging Output
--        ///////////////////////////////////////////////////////////////////////////
--        
--        public String toString(int numSpaces) { return indent(numSpaces) + this + "\n"; }
--    
--        /**
--         * Returns a string describing the token
--         */
--        @Override public String toString() { return terminal + ": \"" + text + "\""; }
--        
--        ///////////////////////////////////////////////////////////////////////////
--        // Source Code Reproduction
--        ///////////////////////////////////////////////////////////////////////////
--        
--        public void printOn(PrintStream out)
--        {
--            out.print(whiteBefore);
--            out.print(text);
--            out.print(whiteAfter);
 +                    currentPreprocessorDirective = discardedSymbol.printOn(out, currentPreprocessorDirective);
 +            
 +            return currentPreprocessorDirective;

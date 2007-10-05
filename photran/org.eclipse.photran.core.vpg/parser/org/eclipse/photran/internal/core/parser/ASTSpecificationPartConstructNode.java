@@ -10,7 +10,8 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.Token;
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
@@ -23,6 +24,18 @@ public class ASTSpecificationPartConstructNode extends InteriorNode
          for (Object o : childNodes)
              addChild((CSTNode)o);
          constructionFinished();
+    }
+        
+    @Override public InteriorNode getASTParent()
+    {
+        InteriorNode actualParent = super.getParent();
+        
+        // If a node has been pulled up in an ACST, its physical parent in
+        // the CST is not its logical parent in the ACST
+        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
+            return actualParent.getParent();
+        else 
+            return actualParent;
     }
     
     @Override protected void visitThisNodeUsing(ASTVisitor visitor)
@@ -85,7 +98,7 @@ public class ASTSpecificationPartConstructNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         if (getProduction() == Production.SPECIFICATION_PART_CONSTRUCT_42)
-            return (ASTDerivedTypeDefNode)getChild(0, 0);
+            return (ASTDerivedTypeDefNode)((ASTDeclarationConstructNode)getChild(0)).getDerivedTypeDef();
         else
             return null;
     }
@@ -95,7 +108,7 @@ public class ASTSpecificationPartConstructNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         if (getProduction() == Production.SPECIFICATION_PART_CONSTRUCT_42)
-            return (ASTInterfaceBlockNode)getChild(0, 0);
+            return (ASTInterfaceBlockNode)((ASTDeclarationConstructNode)getChild(0)).getInterfaceBlock();
         else
             return null;
     }
@@ -105,7 +118,7 @@ public class ASTSpecificationPartConstructNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         if (getProduction() == Production.SPECIFICATION_PART_CONSTRUCT_42)
-            return (ASTTypeDeclarationStmtNode)getChild(0, 0);
+            return (ASTTypeDeclarationStmtNode)((ASTDeclarationConstructNode)getChild(0)).getTypeDeclarationStmt();
         else
             return null;
     }
@@ -115,7 +128,7 @@ public class ASTSpecificationPartConstructNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         if (getProduction() == Production.SPECIFICATION_PART_CONSTRUCT_42)
-            return (ASTSpecificationStmtNode)getChild(0, 0);
+            return (ASTSpecificationStmtNode)((ASTDeclarationConstructNode)getChild(0)).getSpecificationStmt();
         else
             return null;
     }

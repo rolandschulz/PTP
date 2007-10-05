@@ -10,7 +10,8 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import org.eclipse.photran.internal.core.lexer.Token;
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+
 import org.eclipse.photran.internal.core.parser.Parser.*;
 import java.util.List;
 
@@ -23,6 +24,18 @@ public class ASTActionStmtNode extends InteriorNode
          for (Object o : childNodes)
              addChild((CSTNode)o);
          constructionFinished();
+    }
+        
+    @Override public InteriorNode getASTParent()
+    {
+        InteriorNode actualParent = super.getParent();
+        
+        // If a node has been pulled up in an ACST, its physical parent in
+        // the CST is not its logical parent in the ACST
+        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
+            return actualParent.getParent();
+        else 
+            return actualParent;
     }
     
     @Override protected void visitThisNodeUsing(ASTVisitor visitor)
@@ -305,7 +318,7 @@ public class ASTActionStmtNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         if (getProduction() == Production.ACTION_STMT_82)
-            return (ASTStmtFunctionStmtNode)getChild(0, 0);
+            return (ASTStmtFunctionStmtNode)((ASTObsoleteActionStmtNode)getChild(0)).getStmtFunctionStmt();
         else
             return null;
     }
@@ -315,7 +328,7 @@ public class ASTActionStmtNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         if (getProduction() == Production.ACTION_STMT_82)
-            return (ASTArithmeticIfStmtNode)getChild(0, 0);
+            return (ASTArithmeticIfStmtNode)((ASTObsoleteActionStmtNode)getChild(0)).getArithmeticIfStmt();
         else
             return null;
     }
@@ -325,7 +338,7 @@ public class ASTActionStmtNode extends InteriorNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         if (getProduction() == Production.ACTION_STMT_82)
-            return (ASTComputedGotoStmtNode)getChild(0, 0);
+            return (ASTComputedGotoStmtNode)((ASTObsoleteActionStmtNode)getChild(0)).getComputedGotoStmt();
         else
             return null;
     }

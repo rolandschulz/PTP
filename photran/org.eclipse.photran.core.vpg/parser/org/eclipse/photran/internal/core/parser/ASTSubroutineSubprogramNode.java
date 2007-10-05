@@ -10,11 +10,10 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.parser;
 
-import java.util.List;
+import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 
-import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
-import org.eclipse.photran.internal.core.parser.Parser.CSTNode;
-import org.eclipse.photran.internal.core.parser.Parser.Production;
+import org.eclipse.photran.internal.core.parser.Parser.*;
+import java.util.List;
 
 public class ASTSubroutineSubprogramNode extends ScopingNode
 {
@@ -25,6 +24,18 @@ public class ASTSubroutineSubprogramNode extends ScopingNode
          for (Object o : childNodes)
              addChild((CSTNode)o);
          constructionFinished();
+    }
+        
+    @Override public InteriorNode getASTParent()
+    {
+        InteriorNode actualParent = super.getParent();
+        
+        // If a node has been pulled up in an ACST, its physical parent in
+        // the CST is not its logical parent in the ACST
+        if (actualParent != null && actualParent.childIsPulledUp(actualParent.findChild(this)))
+            return actualParent.getParent();
+        else 
+            return actualParent;
     }
     
     @Override protected void visitThisNodeUsing(ASTVisitor visitor)
@@ -47,7 +58,7 @@ public class ASTSubroutineSubprogramNode extends ScopingNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         if (getProduction() == Production.SUBROUTINE_SUBPROGRAM_21)
-            return (ASTBodyNode)getChild(1, 0);
+            return (ASTBodyNode)((ASTSubroutineRangeNode)getChild(1)).getBody();
         else
             return null;
     }
@@ -57,11 +68,7 @@ public class ASTSubroutineSubprogramNode extends ScopingNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         if (getProduction() == Production.SUBROUTINE_SUBPROGRAM_21)
-            return (ASTEndSubroutineStmtNode)getChild(1, 1);
-        else if (getProduction() == Production.SUBROUTINE_SUBPROGRAM_21)
-            return (ASTEndSubroutineStmtNode)getChild(1, 0);
-        else if (getProduction() == Production.SUBROUTINE_SUBPROGRAM_21)
-            return (ASTEndSubroutineStmtNode)getChild(1, 1);
+            return (ASTEndSubroutineStmtNode)((ASTSubroutineRangeNode)getChild(1)).getEndSubroutineStmt();
         else
             return null;
     }
@@ -71,7 +78,7 @@ public class ASTSubroutineSubprogramNode extends ScopingNode
         if (treeHasBeenModified()) throw new IllegalStateException("Accessor methods cannot be called on the nodes of a CST after it has been modified");
 
         if (getProduction() == Production.SUBROUTINE_SUBPROGRAM_21)
-            return (ASTBodyPlusInternalsNode)getChild(1, 0);
+            return (ASTBodyPlusInternalsNode)((ASTSubroutineRangeNode)getChild(1)).getBodyPlusInternals();
         else
             return null;
     }
