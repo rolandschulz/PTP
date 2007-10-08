@@ -149,9 +149,11 @@ public class RemoteServicesProxy implements IRemoteServices {
 	private void loadServices() {
 		if (delegate == null) {
 			AbstractRemoteServicesFactory factory = getFactory();
-			delegate = factory.create();
-			if (delegate.initialize()) {
-				initialized = true;
+			if (factory != null) {
+				delegate = factory.create();
+				if (delegate.initialize()) {
+					initialized = true;
+				}
 			}
 		}
 	}
