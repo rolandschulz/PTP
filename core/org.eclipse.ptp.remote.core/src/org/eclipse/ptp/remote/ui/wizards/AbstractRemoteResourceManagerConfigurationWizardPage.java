@@ -18,8 +18,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote.ui.wizards;
 
-import java.io.File;
-
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.jface.preference.FieldEditor;
@@ -578,16 +576,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 			String name = getFieldContent(serverText.getText());
 			if (name == null) {
 				setErrorMessage(Messages.getString("RemoteConfigurationWizard.invalid"));
-				//setValid(false);
 				return false;
-			}
-			else {
-				File path = new File(name);
-				if (!path.exists() || !path.isFile()) {
-					setErrorMessage(Messages.getString("RemoteConfigurationWizard.invalid"));
-					//setValid(false);
-					return false;
-				}
 			}
 		}
 	
