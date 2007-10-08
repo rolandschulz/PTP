@@ -10,33 +10,44 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote;
 
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.widgets.Shell;
 
 public interface IRemoteFileManager {
 	/**
-	 * Browse for a remote file. The return value is the the path to the remote file,
-	 * on the remote system. Equivalent to {@link FileDialog}.
+	 * Browse for a remote file. The return value is the path of the file
+	 * <i>on the remote system</i>. 
+	 * 
+	 * Equivalent to {@link org.eclipse.swt.widgets.FileDialog}.
 	 * 
 	 * @param shell workbench shell
-	 * @param conn remote connection to use for browsing
 	 * @param message message to display in dialog
-	 * @param filterPath initial path to use when displaying files
-	 * @return a string representing the path to the file
+	 * @param initialPath initial path to use when displaying files
+	 * @return the path to the file relative to the remote system
 	 */
-	public String browseRemoteFile(Shell shell, IRemoteConnection conn, 
-			String message, String filterPath);
+	public IPath browseFile(Shell shell, String message, String initialPath);
 
 	/**
-	 * Browse for a remote directory. The return value is the the path to the remote directory,
-	 * on the remote system. Equivalent to {@link DirectoryDialog}.
+	 * Browse for a remote directory. The return value is the path of the directory
+	 * <i>on the remote system</i>.
+	 * 
+	 * Equivalent to {@link org.eclipse.swt.widgets.DirectoryDialog}.
 	 * 
 	 * @param shell workbench shell
-	 * @param conn remote connection to use for browsing
 	 * @param message message to display in dialog
-	 * @param filterPath initial path to use when displaying files
-	 * @return a string representing the path to the directory
+	 * @param initialPath initial path to use when displaying files
+	 * @return the path to the directory relative to the remote system
 	 */
-	public String browseRemoteDirectory(Shell shell, IRemoteConnection conn, 
-			String message, String filterPath);
+	public IPath browseDirectory(Shell shell, String message, String initialPath);
 
+	/**
+	 * Get the resource associated with path. IRemoteResource can then
+	 * be used to perform operations on the file.
+	 * 
+	 * @param path path to resource
+	 * @param monitor progress monitor
+	 * @return the file store representing the remote path
+	 */
+	public IRemoteResource getResource(IPath path, IProgressMonitor monitor);
 }

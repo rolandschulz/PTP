@@ -26,24 +26,41 @@ import org.eclipse.rse.ui.RSEUIPlugin;
 public class RSEServices implements IRemoteServicesDelegate {
 	private ISystemRegistry registry;
 	private IRemoteConnectionManager connMgr;
-	private IRemoteFileManager fileMgr;
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.IRemoteServicesDelegate#getProcessBuilder(org.eclipse.ptp.remote.IRemoteConnection, java.util.List)
+	 */
 	public IRemoteProcessBuilder getProcessBuilder(IRemoteConnection conn, List<String>command) {
 		return new RSEProcessBuilder(conn, command);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.IRemoteServicesDelegate#getProcessBuilder(org.eclipse.ptp.remote.IRemoteConnection, java.lang.String[])
+	 */
 	public IRemoteProcessBuilder getProcessBuilder(IRemoteConnection conn, String... command) {
 		return new RSEProcessBuilder(conn, command);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.IRemoteServicesDelegate#getConnectionManager()
+	 */
 	public IRemoteConnectionManager getConnectionManager() {
 		return connMgr;
 	}
 	
-	public IRemoteFileManager getFileManager() {
-		return fileMgr;
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.IRemoteServicesDelegate#getFileManager(org.eclipse.ptp.remote.IRemoteConnection)
+	 */
+	public IRemoteFileManager getFileManager(IRemoteConnection conn) {
+		if (!(conn instanceof RSEConnection)) {
+			return null;
+		}
+		return new RSEFileManager((RSEConnection)conn);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.IRemoteServicesDelegate#initialize()
+	 */
 	public boolean initialize() {
 		if (!RSEUIPlugin.isTheSystemRegistryActive()) {
 			return false;
@@ -71,7 +88,6 @@ public class RSEServices implements IRemoteServicesDelegate {
 		}
 
 		connMgr = new RSEConnectionManager(registry);
-		fileMgr = new RSEFileManager();
 		return true;
 	}
 }

@@ -45,10 +45,13 @@ public class LocalServices implements IRemoteServicesDelegate {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteServicesDelegate#getFileManager()
+	 * @see org.eclipse.ptp.remote.IRemoteServicesDelegate#getFileManager(org.eclipse.ptp.remote.IRemoteConnection)
 	 */
-	public IRemoteFileManager getFileManager() {
-		return fileMgr;
+	public IRemoteFileManager getFileManager(IRemoteConnection conn) {
+		if (!(conn instanceof LocalConnection)) {
+			return null;
+		}
+		return new LocalFileManager();
 	}
 	
 	/* (non-Javadoc)
@@ -56,7 +59,6 @@ public class LocalServices implements IRemoteServicesDelegate {
 	 */
 	public boolean initialize() {
 		connMgr = new LocalConnectionManager();
-		fileMgr = new LocalFileManager();
 		return true;
 	}
 }

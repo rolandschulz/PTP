@@ -24,13 +24,15 @@ public interface IRemoteServicesDelegate {
 	/**
 	 * Get a file manager for managing remote files
 	 * 
+	 * @param conn connection to use for managing files
 	 * @return file manager
 	 */
-	public IRemoteFileManager getFileManager();
+	public IRemoteFileManager getFileManager(IRemoteConnection conn);
 	
 	/**
 	 * Get a process builder for creating remote processes
 	 * 
+	 * @param conn connection to use for creating remote processes
 	 * @return process builder
 	 */
 	public IRemoteProcessBuilder getProcessBuilder(IRemoteConnection conn, List<String>command);
@@ -38,6 +40,7 @@ public interface IRemoteServicesDelegate {
 	/**
 	 * Get a process builder for creating remote processes
 	 * 
+	 * @param conn connection to use for creating remote processes
 	 * @return process builder
 	 */
 	public IRemoteProcessBuilder getProcessBuilder(IRemoteConnection conn, String... command);

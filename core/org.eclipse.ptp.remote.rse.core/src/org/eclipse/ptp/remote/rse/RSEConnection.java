@@ -10,6 +10,11 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote.rse;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.ptp.remote.IRemoteConnection;
 import org.eclipse.ptp.remote.exception.RemoteConnectionException;
 import org.eclipse.ptp.remote.exception.UnableToForwardPortException;
@@ -21,7 +26,7 @@ public class RSEConnection implements IRemoteConnection {
 	public RSEConnection(IHost host) {
 		rseHost = host;
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnection#forwardLocalTCPPort(int, java.lang.String, int)
 	 */
@@ -37,7 +42,7 @@ public class RSEConnection implements IRemoteConnection {
 			int fwdPort) throws RemoteConnectionException {
 		throw new UnableToForwardPortException("Port forwarding not supported");
 	}
-	
+
 	/**
 	 * Get RSE host object 
 	 * 
@@ -46,7 +51,7 @@ public class RSEConnection implements IRemoteConnection {
 	public IHost getHost() {
 		return rseHost;
 	}
-	
+
 	public String getHostname() {
 		return rseHost.getHostName();
 	}
@@ -61,14 +66,14 @@ public class RSEConnection implements IRemoteConnection {
 	public String getUsername() {
 		return rseHost.getDefaultUserId();
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnection#setHostname(java.lang.String)
 	 */
 	public void setHostname(String hostname) {
 		rseHost.setHostName(hostname);
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnection#setUsername(java.lang.String)
 	 */
@@ -81,5 +86,23 @@ public class RSEConnection implements IRemoteConnection {
 	 */
 	public boolean supportsTCPPortForwarding() {
 		return false;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.IRemoteConnection#toPath(java.net.URI)
+	 */
+	public IPath toPath(URI uri) {
+		return new Path(uri.getPath());
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.IRemoteConnection#toURI(org.eclipse.core.runtime.IPath)
+	 */
+	public URI toURI(IPath path) {
+		try {
+			return new URI("rse", rseHost.getHostName(), path.toPortableString(), null); //$NON-NLS-1$
+		} catch (URISyntaxException e) {
+			return null;
+		}
 	}
 }

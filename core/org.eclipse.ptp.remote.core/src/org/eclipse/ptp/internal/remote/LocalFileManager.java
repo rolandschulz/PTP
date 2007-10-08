@@ -12,8 +12,12 @@ package org.eclipse.ptp.internal.remote;
 
 import java.io.File;
 
-import org.eclipse.ptp.remote.IRemoteConnection;
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.ptp.remote.IRemoteFileManager;
+import org.eclipse.ptp.remote.IRemoteResource;
 import org.eclipse.ptp.remote.PTPRemotePlugin;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.FileDialog;
@@ -21,11 +25,13 @@ import org.eclipse.swt.widgets.Shell;
 
 
 public class LocalFileManager implements IRemoteFileManager {
+	public LocalFileManager() {
+	}
+	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteFileManager#browseRemoteFile(org.eclipse.swt.widgets.Shell, org.eclipse.ptp.remote.IRemoteConnection, java.lang.String, java.lang.String)
+	 * @see org.eclipse.ptp.remote.IRemoteFileManager#browseFile(org.eclipse.swt.widgets.Shell, java.lang.String, java.lang.String)
 	 */
-	public String browseRemoteFile(Shell shell, IRemoteConnection conn, 
-			String message, String filterPath) {
+	public IPath browseFile(Shell shell, String message, String filterPath) {
 		FileDialog dialog = new FileDialog(PTPRemotePlugin.getShell());
 		dialog.setText(message);
 		if (filterPath != null) {
@@ -35,14 +41,18 @@ public class LocalFileManager implements IRemoteFileManager {
 			}
 		}
 	
-		return dialog.open();
+		String path = dialog.open();
+		if (path == null) {
+			return null;
+		}
+
+		return new Path(path);
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteFileManager#browseRemoteDirectory(org.eclipse.swt.widgets.Shell, org.eclipse.ptp.remote.IRemoteConnection, java.lang.String, java.lang.String)
+	 * @see org.eclipse.ptp.remote.IRemoteFileManager#browseDirectory(org.eclipse.swt.widgets.Shell, java.lang.String, java.lang.String)
 	 */
-	public String browseRemoteDirectory(Shell shell, IRemoteConnection conn,
-			String message, String filterPath) {
+	public IPath browseDirectory(Shell shell, String message, String filterPath) {
 		DirectoryDialog dialog = new DirectoryDialog(PTPRemotePlugin.getShell());
 		dialog.setText(message);
 		if (filterPath != null) {
@@ -52,6 +62,23 @@ public class LocalFileManager implements IRemoteFileManager {
 			}
 		}
 	
-		return dialog.open();
+		
+		String path = dialog.open();
+		if (path == null) {
+			return null;
+		}
+		
+		return new Path(path);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.IRemoteFileManager#getResource(org.eclipse.core.runtime.IPath, org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	public IRemoteResource getResource(IPath path, IProgressMonitor monitor) {
+		try {
+			return new LocalResource(EFS.getLocalFileSystem().getStore(path));
+		} finally {
+			monitor.done();
+		}
 	}
 }
