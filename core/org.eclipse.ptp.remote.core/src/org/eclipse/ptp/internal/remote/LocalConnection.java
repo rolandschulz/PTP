@@ -10,6 +10,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.remote;
 
+import java.net.URI;
+
+import org.eclipse.core.filesystem.URIUtil;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.ptp.remote.IRemoteConnection;
 import org.eclipse.ptp.remote.exception.RemoteConnectionException;
 import org.eclipse.ptp.remote.exception.UnableToForwardPortException;
@@ -24,7 +28,7 @@ public class LocalConnection implements IRemoteConnection {
 		this.hostname = "localhost";
 		this.username = System.getProperty("user.name");
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnection#forwardLocalTCPPort(int, java.lang.String, int)
 	 */
@@ -32,7 +36,7 @@ public class LocalConnection implements IRemoteConnection {
 			int fwdPort) throws RemoteConnectionException {
 		throw new UnableToForwardPortException("Port forwarding not supported");
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnection#forwardRemoteTCPPort(int, java.lang.String, int)
 	 */
@@ -56,6 +60,13 @@ public class LocalConnection implements IRemoteConnection {
 	}
 
 	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.IRemoteConnection#getUsername()
+	 */
+	public String getUsername() {
+		return username;
+	}
+
+	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnection#setHostname(java.lang.String)
 	 */
 	public void setHostname(String hostname) {
@@ -63,23 +74,30 @@ public class LocalConnection implements IRemoteConnection {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteConnection#getUsername()
-	 */
-	public String getUsername() {
-		return username;
-	}
-	
-	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnection#setUsername(java.lang.String)
 	 */
 	public void setUsername(String username) {
 		this.username = username;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.IRemoteConnection#supportsTCPPortForwarding()
 	 */
 	public boolean supportsTCPPortForwarding() {
 		return false;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.IRemoteConnection#toPath(java.net.URI)
+	 */
+	public IPath toPath(URI uri) {
+		return URIUtil.toPath(uri);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.IRemoteConnection#toURI(org.eclipse.core.runtime.IPath)
+	 */
+	public URI toURI(IPath path) {
+		return URIUtil.toURI(path);
 	}
 }

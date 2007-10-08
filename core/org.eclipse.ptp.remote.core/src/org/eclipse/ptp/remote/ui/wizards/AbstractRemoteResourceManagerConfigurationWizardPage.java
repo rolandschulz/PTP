@@ -20,6 +20,7 @@ package org.eclipse.ptp.remote.ui.wizards;
 
 import java.io.File;
 
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -504,11 +505,11 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 	protected void handlePathBrowseButtonSelected() 
 	{
 		if (connection != null) {
-			IRemoteFileManager fileMgr = remoteServices.getFileManager();
+			IRemoteFileManager fileMgr = remoteServices.getFileManager(connection);
 			String correctPath = getFieldContent(serverText.getText());
-			String selectedPath = fileMgr.browseRemoteFile(getControl().getShell(), connection, Messages.getString("RemoteConfigurationWizard.select"), correctPath);
+			IPath selectedPath = fileMgr.browseFile(getControl().getShell(), Messages.getString("RemoteConfigurationWizard.select"), correctPath);
 			if (selectedPath != null) {
-				serverText.setText(selectedPath);
+				serverText.setText(selectedPath.toString());
 			}
 		}
 	}

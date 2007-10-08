@@ -89,11 +89,11 @@ public class RemoteServicesProxy implements IRemoteServices {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteServices#getFileManager()
+	 * @see org.eclipse.ptp.remote.IRemoteServicesDelegate#getFileManager(org.eclipse.ptp.remote.IRemoteConnection)
 	 */
-	public IRemoteFileManager getFileManager() {
+	public IRemoteFileManager getFileManager(IRemoteConnection conn) {
 		loadServices();
-		return delegate.getFileManager();
+		return delegate.getFileManager(conn);
 	}
 	
 	/* (non-Javadoc)
