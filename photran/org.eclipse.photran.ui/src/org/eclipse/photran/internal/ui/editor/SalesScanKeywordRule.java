@@ -434,8 +434,8 @@ public class SalesScanKeywordRule extends WordRule implements IRule
         
         public boolean retainAsKeyword(int column)
         {
-            System.out.println(line.substring(column));
-            System.out.println(line + "\nOC,: " + openContextComma + "\tOC=: " + openContextEquals + "\t)L: " + letterFollowsParenthetical + "\n");
+//            System.out.println(line.substring(column));
+//            System.out.println(line + "\nOC,: " + openContextComma + "\tOC=: " + openContextEquals + "\t)L: " + letterFollowsParenthetical + "\n");
 
             if (column < 0) return false;
             if (salesRetainAsKeyword(column)) return true;
