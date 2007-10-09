@@ -23,7 +23,7 @@ import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.rules.WordRule;
 
 /**
- * Rule which identifies a word as a keyword or an identifier based on Sale's algorithm
+ * Syntax highlighting rule which identifies a word as a keyword or an identifier based on Sale's algorithm
  * <p>
  * The logic is somewhat based on FreeFormLexerPhase2, although this version is much less
  * precise and is based on a character-by-character scan rather than a token stream.
@@ -354,6 +354,7 @@ public class SalesScanKeywordRule extends WordRule implements IRule
             boolean justClosedParen = false;    // Does this token immediately follow T_RPAREN?
             boolean firstParenthetical = true;  // Is this the first non-nested T_RPAREN?
             boolean inArrayLiteral = false;     // Are we inside an (/ array literal /)
+            boolean followingThen = false;      // Have we seen a THEN token
             
             for (pos = 0; pos < length; pos++)
             {
@@ -363,13 +364,15 @@ public class SalesScanKeywordRule extends WordRule implements IRule
                         inArrayLiteral = true;
                     else if (match("/)"))
                         inArrayLiteral = false;
+                    else if (match("then"))
+                        followingThen = true;
                     
                     if (!inArrayLiteral)
                     {
                         // The pos test ensures that we don't match the = in "integer, kind=3 :: if"
                         if (match(",") && pos >= firstTokenPos)
                             openContextComma = true;
-                        else if (match("=") && pos >= firstTokenPos)
+                        else if (match("=") && pos >= firstTokenPos && !followingThen)
                             openContextEquals = true;
         
                         if (justClosedParen && firstParenthetical)
@@ -431,9 +434,17 @@ public class SalesScanKeywordRule extends WordRule implements IRule
         
         public boolean retainAsKeyword(int column)
         {
+            System.out.println(line.substring(column));
+            System.out.println(line + "\nOC,: " + openContextComma + "\tOC=: " + openContextEquals + "\t)L: " + letterFollowsParenthetical + "\n");
+
             if (column < 0) return false;
-            
             if (salesRetainAsKeyword(column)) return true;
+            
+//            if (keyword.equalsIgnoreCase("then"))
+//            {
+//                String s = line.substring(firstTokenPos);
+//                return s.startsWith("if") || s.startsWith("IF");
+//            }
             
             int precedingKeywordOffset = findPrecedingKeyword(column);
             if (precedingKeywordOffset == column) return false;
@@ -457,6 +468,8 @@ public class SalesScanKeywordRule extends WordRule implements IRule
                 return precedingKeyword.equalsIgnoreCase("end") || isType(precedingKeyword) || isPrefixSpec(precedingKeyword);
             else if (keyword.equalsIgnoreCase("while"))
                 return precedingKeyword.equalsIgnoreCase("do");
+            else if (keyword.equalsIgnoreCase("then"))
+                return !openContextEquals && !openContextComma && match("if", firstTokenPos);
             else
                 return precedingKeyword.equalsIgnoreCase("end");
         }
@@ -478,7 +491,9 @@ public class SalesScanKeywordRule extends WordRule implements IRule
             if (!openContextComma && !openContextEquals)
                 return !lineContainsColonColon;
             else if (openContextEquals && !openContextComma)
-                return match("if", firstTokenPos) || match("where", firstTokenPos);
+                return !lineContainsColonColon
+                    && letterFollowsParenthetical
+                    && (match("if", firstTokenPos) || match("where", firstTokenPos));
             else if (openContextComma)
                 return true;
             else if (letterFollowsParenthetical)
