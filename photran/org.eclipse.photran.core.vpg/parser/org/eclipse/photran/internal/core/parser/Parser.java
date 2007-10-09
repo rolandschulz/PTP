@@ -187,7 +187,7 @@ public class Parser
      */
     protected void accept()
     {
-        assert stateStack.size() == 0 && valueStack.size() == 1;
+        assert stateStack.size() == 2 && valueStack.size() == 1;
         
         doneParsing = true;
     }
