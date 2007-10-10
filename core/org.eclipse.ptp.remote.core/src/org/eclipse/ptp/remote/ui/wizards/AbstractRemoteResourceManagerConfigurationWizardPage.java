@@ -19,7 +19,6 @@
 package org.eclipse.ptp.remote.ui.wizards;
 
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Preferences;
 import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -31,7 +30,6 @@ import org.eclipse.ptp.remote.IRemoteProxyOptions;
 import org.eclipse.ptp.remote.IRemoteServices;
 import org.eclipse.ptp.remote.PTPRemotePlugin;
 import org.eclipse.ptp.remote.ui.Messages;
-import org.eclipse.ptp.remote.ui.preferences.PreferenceConstants;
 import org.eclipse.ptp.ui.utils.SWTUtil;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizard;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage;
@@ -174,23 +172,20 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		GridLayout topLayout = new GridLayout();
 	    composite.setLayout(topLayout);
 
+		loading = true;
+		
+		loadSaved();
+		
 		createContents(composite, 3);
 		
-		loading = true;
-		loadSaved();
-		loading = false;
-		
+		updateUIFromOptions();
 		defaultSetting();
+		
+		loading = false;
 
 		setControl(composite);
+		updatePage();
 	}
-
-	/**
-	 * Get the preferences for this RM
-	 * 
-	 * @return RM preferences
-	 */
-	public abstract Preferences getPreferences();
 
 	/**
 	 * Save the current state in the RM configuration. This is called whenever
@@ -337,21 +332,29 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 	}
 	
 	/**
-	 * Load the initial wizard state from the preference settings.
+	 * Load the initial wizard state from the configuration settings.
 	 */
 	private void loadSaved()
 	{
-		Preferences preferences = getPreferences();
+		proxyFile = config.getProxyServerPath();
+		if (proxyFile == null) {
+			proxyFile = "";
+		}
 		
-		proxyFile = preferences.getString(PreferenceConstants.PROXY_PATH);
-		serverText.setText(proxyFile);
-		int options = preferences.getInt(PreferenceConstants.OPTIONS);
+		String rmID = config.getRemoteServicesId();
+		if (rmID != null) {
+			remoteServices = PTPRemotePlugin.getDefault().getRemoteServices(rmID);
+			String conn = config.getConnectionName();
+			if (remoteServices != null && conn != null) {
+				connection = remoteServices.getConnectionManager().getConnection(conn);
+			}
+		}
+		
+		int options = config.getOptions();
 		
 		muxStdio = (options & IRemoteProxyOptions.STDIO) == IRemoteProxyOptions.STDIO;
 		muxPortFwd = (options & IRemoteProxyOptions.PORT_FORWARDING) == IRemoteProxyOptions.PORT_FORWARDING;
 		manualLaunch = (options & IRemoteProxyOptions.MANUAL_LAUNCH) == IRemoteProxyOptions.MANUAL_LAUNCH;
-
-		updateUIFromOptions();
 	}
 	
 	/**
@@ -527,12 +530,27 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 			connectionManager = remoteServices.getConnectionManager();
 			IRemoteConnection[] connections = connectionManager.getConnections();
 			connectionCombo.removeAll();
+			int selected = connections.length - 1;
 			for (int i = 0; i < connections.length; i++) {
 				connectionCombo.add(connections[i].getName());
+				if (connection != null && connections[i].equals(connection)) {
+					selected = i;
+				}
 			}
 			if (connections.length > 0) {
-				// Should trigger call to selection handler
-				connectionCombo.select(connections.length - 1);
+				/*
+				 * If we're not initializing then reset connection when new
+				 * service provider is selected.
+				 */
+				if (!loading) {
+					selected = connections.length - 1;
+					connection = null;
+				}
+				
+				/*
+				 * Should trigger call to selection handler
+				 */
+				connectionCombo.select(selected);
 			}
 			
 			/*
@@ -543,23 +561,28 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 	}
 	
 	/**
-	 * Intialize the contents of the remote services combo.
+	 * Initialize the contents of the remote services combo.
 	 * 
 	 * The assumption is that this will trigger a call to the selection handling
-	 * routing when the default index is selected.
+	 * routine when the default index is selected.
 	 */
 	protected void initializeRemoteServicesCombo() {
-		IRemoteServices[] remoteServices = PTPRemotePlugin.getDefault().getAllRemoteServices();
-		IRemoteServices defServices = PTPRemotePlugin.getDefault().getDefaultServices();
-		int defIndex = remoteServices.length - 1; 
+		IRemoteServices[] allServices = PTPRemotePlugin.getDefault().getAllRemoteServices();
+		IRemoteServices defServices;
+		if (remoteServices != null) {
+			defServices = remoteServices;
+		} else {
+			defServices = PTPRemotePlugin.getDefault().getDefaultServices();
+		}
+		int defIndex = allServices.length - 1; 
 		remoteCombo.removeAll();
-		for (int i = 0; i < remoteServices.length; i++) {
-			remoteCombo.add(remoteServices[i].getName());
-			if (remoteServices[i].equals(defServices)) {
+		for (int i = 0; i < allServices.length; i++) {
+			remoteCombo.add(allServices[i].getName());
+			if (allServices[i].equals(defServices)) {
 				defIndex = i;
 			}
 		}
-		if (remoteServices.length > 0) {
+		if (allServices.length > 0) {
 			// Should trigger call to selection handler
 			remoteCombo.select(defIndex);
 			handleRemoteServiceSelected();
