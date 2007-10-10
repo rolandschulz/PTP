@@ -4,32 +4,19 @@
 PTP Parallel Language Development Tools 
 </title>
 <body>
-<h1> <img src="images/mpiLg.gif">PLDT What's New </h1>
-<p>Version 2.0, June 2007
+<h1> <img src="images/analyze.gif"> PLDT What's New </h1>
+<p>Version 2.0, June-October 2007
 <p>What's new in 2.0
 <ul>
 <li>MPI Barrier analysis
-<li>New MPI project wizard page can add sample testMPI.c file to project
+<li>New project templates allow easy creation of MPI <i>and OpenMP</i> projects.
+<li>New MPI project wizard page can add sample MPI file to project
 <li>If CDT version is incorrect (!= 4.x) an error dialog complains.
+<li>Welcome page includes pointers to information for PLDT.
 <p>
-<li>Tracing is enabled.  To use this:
-<p>
-Create a file ".options" in the same directory as your eclipse executable.
-Put this in the file:
-<pre>
-   org.eclipse.ptp.pldt.common/debug = true
-   org.eclipse.ptp.pldt.common/debug/pldtTrace = true
-</pre>
-Then launch eclipse in debug mode using the -debug option, and mirror the
-Console view output
-to the command line console using the -consoleLog option.  (Maybe Linux already
-spits out the console, not sure.)
-<pre>
-   eclipse -debug -consoleLog
-</pre>
-When you run with this tracing enabled,  it will print out a bunch of
-trace information to the console.  At least MPI artifact analysis
-has been enabled for user-directed tracing.
+<li>Tracing is enabled.  <a href="tracing.html">See tracing instructions for how to turn this on.</a>
+
+
 
 </ul>
 </body>
