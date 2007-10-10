@@ -5,8 +5,8 @@ PTP Parallel Language Development Tools
 </title>
 <body>
 <h1> <img src="images/analyze.gif"> PTP Parallel Language Development Tools </h1>
-<p>Version 2.0, June-October 2007
-<p>The PTP Parallel Language Development Tools provide
+<p>Version 2.0 beta, June-October 2007
+<p>The PTP Parallel Language Development Tools (PLDT) provide
 tools to aid in MPI Programming and other parallel languages and tools.
 <br>Features of the PLDT include:
 <ul>
@@ -14,9 +14,10 @@ tools to aid in MPI Programming and other parallel languages and tools.
 <li>"Artifact View" indicates locations of Artifacts found
 in source code
 <li>Navigation to source code location of artifacts
+<li>Content assist via Cntl-Space completes API names
+while typing, and fills in arguments too.
+<li>Hover help shows API names, arguments, and descriptions.
 <li>Reference information about the MPI and OpenMP calls via F1 (Cntl-F1 on Linux; Help key on Mac)
-<li>Content assist via Cntl-Space
-<li>Hover help 
 
 <li>OpenMP problems view of common errors, OpenMP "show #pragma region" action,
 OpenMP "Show Concurrency" action.
@@ -24,19 +25,25 @@ OpenMP "Show Concurrency" action.
 automatically add in the include paths etc. for MPI projects.
 
 <p>The newest features (2.0) include:
-<li>MPI Barrier Analysis detects potential deadlocks in MPI applications
+<li>MPI Barrier Analysis detects potential deadlocks in MPI applications,
+and shows barrier matches, barrier errors, and paths of all barrier
+matching sets.  Includes detections across multiple functions and source files.
 <li>New project wizard can include sample MPI and OpenMP source files 
 and set up the projects to save time.
+<li>New welcome pages introduce new Eclipse users to PLDT.
+<li>New single-menu UI for PLDT analysis features simplifies the editor toolbar.
+<br><img src="images/pldt-menu.gif">
 </ul>
+For more details, see <a href="whatsnew.html">What's new</a>
 <h2>
 Pre-requisites:
 </h2>
-<p>PLDT requires the base Eclipse platform, the CDT, and MPI and/or OpenMP.
+<p>PLDT 2.0 requires the base Eclipse platform, the CDT, and MPI and/or OpenMP.
 <ul>
 <li><b>Eclipse</b> platform: Version  3.3 or later
 <li><b>CDT:</b>
-Version 4.0 or later for C/C++ files.  (Wherever CDT is mentioned, Photran projects and files,
-for C/C++, should also work)
+Version 4.0.1 or later for C/C++ files.  (Wherever CDT is mentioned, Photran projects and files,
+for C/C++, if based on Eclipse 3.3/CDT 4.0.x, should also work)
 
 <li><b>MPI:</b>
 Get MPI and its header file, a version that runs on
