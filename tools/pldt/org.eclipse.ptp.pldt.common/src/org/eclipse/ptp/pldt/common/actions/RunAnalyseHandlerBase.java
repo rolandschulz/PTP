@@ -331,7 +331,10 @@ public abstract class RunAnalyseHandlerBase extends RunAnalyseHandler {
 
 	abstract protected void activateArtifactView();
 
-	abstract protected void activateProblemsView();
+	/**
+	 * If the analysis has an additional view to bring up, override this
+	 */
+	protected void activateProblemsView(){}
 
 	/**
 	 * Get the include path. Subclass should override this method.
