@@ -285,7 +285,7 @@
       </extension>
       <extension point="org.eclipse.ui.menus">
          <menuContribution
-               locationURI="menu:org.eclipse.ptp.pldt.common.toolbar.command1 ">
+               locationURI="menu:org.eclipse.ptp.pldt.common.toolbar.command1?after=separator4.barrier">
             <command
                   commandId="org.eclipse.ptp.pldt.mpi.analysis.command2"
                   icon="icons/barrier.gif"
@@ -294,6 +294,49 @@
                   tooltip="Run MPI Barrier Analysis on selected project, folder, or file">
             </command>
          </menuContribution>
+         <!--  testing of separator areas
+         <menuContribution
+               locationURI="menu:org.eclipse.ptp.pldt.common.toolbar.command1?after=additions">
+            <command
+                  commandId="org.eclipse.ptp.pldt.mpi.analysis.command2"
+                  icon="icons/collapseall.gif"
+                  label="test insertion after 'additions'"
+                  style="push"
+                  tooltip="tooltipFoo">
+            </command>
+         </menuContribution>
+                  <menuContribution
+               locationURI="menu:org.eclipse.ptp.pldt.common.toolbar.command1?after=separator5.other">
+            <command
+                  commandId="org.eclipse.ptp.pldt.mpi.analysis.command2"
+                  icon="icons/collapseall.gif"
+                  label="test insertion after 'sep5.other'"
+                  style="push"
+                  tooltip="tooltipFoo">
+            </command>
+         </menuContribution>
+         <menuContribution
+               locationURI="menu:org.eclipse.ptp.pldt.common.toolbar.command1?after=nonexistantSeparator">
+            <command
+                  commandId="org.eclipse.ptp.pldt.mpi.analysis.command2"
+                  icon="icons/collapseall.gif"
+                  label="test insertion after nonExistantSeparator"
+                  style="push"
+                  tooltip="tooltipFoo">
+            </command>
+         </menuContribution>
+         <menuContribution
+               locationURI="menu:org.eclipse.ptp.pldt.common.toolbar.command1">
+            <command
+                  commandId="org.eclipse.ptp.pldt.mpi.analysis.command2"
+                  icon="icons/collapseall.gif"
+                  label="test insertion without ?after=separator"
+                  style="push"
+                  tooltip="tooltipFoo">
+            </command>
+         </menuContribution>
+         -->
+         <!-- end of test section -->
       </extension>
 
 </plugin>
