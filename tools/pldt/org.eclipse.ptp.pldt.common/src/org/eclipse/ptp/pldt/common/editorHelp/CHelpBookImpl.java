@@ -24,6 +24,7 @@ import org.eclipse.cdt.ui.text.ICHelpInvocationContext;
 
 public class CHelpBookImpl implements ICHelpBook {
 	private String title = "Generic C Help Book";
+	private static final boolean traceOn=false;
 
 	private String pluginId;
 
@@ -54,6 +55,11 @@ public class CHelpBookImpl implements ICHelpBook {
 	public IFunctionSummary getFunctionInfo(ICHelpInvocationContext context,
 			String name) {
 		IFunctionSummary fs = (IFunctionSummary) funcName2FuncInfo.get(name);
+		if(traceOn){
+			String cn=this.getClass().getSimpleName();
+			String finfo=(fs!=null)?(fs.toString().substring(0,25)):null;
+			System.out.println("CHelpBookImpl "+cn+" getFunctionInfo for "+name+ "= "+finfo);
+		}
 		return fs;
 	}
 
