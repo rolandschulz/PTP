@@ -124,6 +124,7 @@ public class PldtAstVisitor extends CASTVisitor {
 			SourceInfo sourceInfo = getSourceInfo(astExpr, Artifact.FUNCTION_CALL);
 			if (sourceInfo != null) {
 				if(traceOn) System.out.println("found MPI artifact: " + funcName.toString());
+				// FIXME we're determining the artifact name twice. (also in chooseName())
 				String artName=funcName.toString();
 				String rawName=funcName.getRawSignature();
 				String bName=funcName.getBinding().getName();
@@ -174,9 +175,8 @@ public class PldtAstVisitor extends CASTVisitor {
 		IBinding binding = funcName.resolveBinding();
 		String name=binding.getName(); 
 		String rawSig=funcName.getRawSignature();
-		if(name.length()==0) {
-			name=rawSig;
-		}
+		name = chooseName(name, rawSig);
+
 
 		// cdt40 CDT4.0: declarations null
 		IASTName[] decls=funcName.getTranslationUnit().getDeclarationsInAST(binding);//10/2/07: empty for MPI/C++ MPI::
@@ -207,11 +207,28 @@ public class PldtAstVisitor extends CASTVisitor {
 			// is this path valid?
 			if(traceOn)System.out.println("PldtAstVisitor found path " + path);
 
-			if (isInIncludePath(path))
+			if (isInIncludePath(path)){
 				if(traceOn)System.out.println("   path match! "+name+" is an artifact.");
 				return true;
+			}
 		}
 		return false;
+	}
+	
+	/**
+	 * Choose how to distinguish between binding name, and raw signature.<br>
+	 * Could be overridden by subclasses if, for example, a name with a prefix e.g. "MPI::foo" should be preferred over "foo".<br>
+	 * Here, the default case is that we always choose the regular/binding name, unless it's empty, in which case we choose the rawSignature.
+	 * @param bindingName
+	 * @param rawSignature
+	 * @return
+	 */
+	protected String chooseName(String bindingName, String rawSignature){
+		String name=bindingName;
+		if(bindingName.length()==0) {
+			name=rawSignature;
+		}
+		return name;
 	}
  
 	public void processMacroLiteral(IASTLiteralExpression expression) {
@@ -262,7 +279,9 @@ public class PldtAstVisitor extends CASTVisitor {
 		// if (includePath.isPrefixOf(includeFilePath)) return true;
 		// }
 		for (Iterator it = includes_.iterator(); it.hasNext();) {
+			System.out.println(" ");
 			String includeDir = (String) it.next();
+			System.out.println("is "+includeFilePath+" found in "+includeDir+"?");
 			IPath includePath = new Path(includeDir);
 			if (includePath.isPrefixOf(includeFilePath))
 				return true;
