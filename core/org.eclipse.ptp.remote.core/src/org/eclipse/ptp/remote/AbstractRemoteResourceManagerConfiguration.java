@@ -43,7 +43,7 @@ public abstract class AbstractRemoteResourceManagerConfiguration extends Abstrac
 		private final int options;
 
 		public RemoteConfig() {
-			this(new CommonConfig(), "", "", "", "", IRemoteProxyOptions.PORT_FORWARDING);
+			this(new CommonConfig(), null, null, null, "", IRemoteProxyOptions.PORT_FORWARDING);
 		}
 		
 		public RemoteConfig(CommonConfig config, String remoteId, String conn, String path, 
