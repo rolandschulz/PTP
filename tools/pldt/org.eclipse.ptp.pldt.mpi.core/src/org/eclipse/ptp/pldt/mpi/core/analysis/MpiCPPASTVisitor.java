@@ -124,4 +124,15 @@ public class MpiCPPASTVisitor extends PldtAstVisitor {
 
 		return PROCESS_CONTINUE;
 	}
+	@Override
+	protected String chooseName(String bindingName, String rawSignature){
+		String name=bindingName;
+		if(bindingName.length()==0) {
+			name=rawSignature;
+		}
+		if(rawSignature.startsWith(PREFIX2)){
+			name=rawSignature;
+		}
+		return name;
+	}
 }
