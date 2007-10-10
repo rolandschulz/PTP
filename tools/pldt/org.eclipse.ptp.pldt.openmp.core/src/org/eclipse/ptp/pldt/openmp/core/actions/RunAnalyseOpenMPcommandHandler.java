@@ -50,6 +50,7 @@ import org.eclipse.ui.texteditor.MarkerUtilities;
  */
 public class RunAnalyseOpenMPcommandHandler extends RunAnalyseHandlerBase {
 	private static final String OPENMP_DIRECTIVE = "OpenMP directive";
+	private static final boolean traceOn=false;
 	/**
 	 * Constructor for the "Run Analysis" action
 	 */
@@ -167,7 +168,7 @@ public class RunAnalyseOpenMPcommandHandler extends RunAnalyseHandlerBase {
 		// DPP - put in stuff for problems view
 		// Just subclass scanreturn and create markers for problems view here
 		List problems = osr.getProblems();
-		System.out.println("RunAnalyseOpenMP.processResults, have "+problems.size()+ " problems.");
+		if(traceOn)System.out.println("RunAnalyseOpenMP.processResults, have "+problems.size()+ " problems.");
 		try {
 			for (Iterator i = problems.iterator(); i.hasNext();)
 				processProblem((OpenMPError) i.next(), resource);

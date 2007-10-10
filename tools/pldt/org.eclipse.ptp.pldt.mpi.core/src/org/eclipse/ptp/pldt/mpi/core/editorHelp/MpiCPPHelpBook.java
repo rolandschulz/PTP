@@ -34,11 +34,12 @@ import org.osgi.framework.Bundle;
 public class MpiCPPHelpBook extends CHelpBookImpl
 {
     private static final String TITLE = "MPI C++ Help Book";
+    private static final boolean traceOn=false;
 
     public MpiCPPHelpBook()
     {
 		super(MpiPlugin.getPluginId());
-		System.out.println("MPI CPP help book ctor()...");
+		if(traceOn)System.out.println("MPI CPP help book ctor()...");
 		// populate func map
 		Bundle bundle = Platform.getBundle(MpiPlugin.getPluginId());
 		Path path = new Path("mpiref.xml");
@@ -55,7 +56,7 @@ public class MpiCPPHelpBook extends CHelpBookImpl
 		int temp=0;
 		for (Iterator<FunctionSummaryImpl> it = mpiFuncList.iterator(); it.hasNext();) {
 			FunctionSummaryImpl functionSummary = it.next();
-			if(2>temp++)System.out.println("  "+functionSummary.getName()+"-"+functionSummary.getDescription());
+			if(traceOn)if(2>temp++)System.out.println("  "+functionSummary.getName()+"-"+functionSummary.getDescription());
 			funcName2FuncInfo.put(functionSummary.getName(), functionSummary);
 		};
     	// set title
