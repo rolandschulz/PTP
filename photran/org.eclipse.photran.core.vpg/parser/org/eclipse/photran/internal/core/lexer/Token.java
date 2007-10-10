@@ -225,6 +225,11 @@ public class Token extends CSTNode implements IToken
         this.length = length;
     }
 
+    public boolean containsFileOffset(int offset)
+    {
+        return OffsetLength.contains(fileOffset, length, offset, 0);
+    }
+
     public boolean containsFileOffset(OffsetLength other)
     {
         return OffsetLength.contains(fileOffset, length, other);
