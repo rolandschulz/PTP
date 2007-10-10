@@ -54,7 +54,7 @@ public class RunAnalyseMPIcommandHandler extends RunAnalyseHandlerBase
 	 *            MPI include paths
 	 * @return
 	 */
-
+	@Override
 	public ScanReturn doArtifactAnalysis(final ITranslationUnit tu,	final List includes) {
 		final ScanReturn msr = new ScanReturn();
 		final String fileName = tu.getElementName();
@@ -80,20 +80,16 @@ public class RunAnalyseMPIcommandHandler extends RunAnalyseHandlerBase
 	}
 
 
+	@Override
 	protected List getIncludePath() {
 		return MpiPlugin.getDefault().getMpiIncludeDirs();
 	}
-
+    @Override
 	protected void activateArtifactView() {
 		ViewActivater.activateView(MpiIDs.MPI_VIEW_ID);
 	}
 
-	/**
-	 * MPI doesn't have a problems view (only OpenMP analysis does)
-	 */
-	protected void activateProblemsView() {
-
-	}	
+	
 	 
 
 }
