@@ -88,6 +88,10 @@
       <provider
             class="org.eclipse.ptp.pldt.mpi.core.editorHelp.MpiCHelpProvider"
             id="org.eclipse.ptp.pldt.mpi.core.editorHelp.MpiCHelpProvider"/>
+      <provider
+            class="org.eclipse.ptp.pldt.mpi.core.editorHelp.MpiCPPHelpProvider"
+            id="org.eclipse.ptp.pldt.mpi.core.editorHelp.MpiCPPHelpProvider">
+      </provider>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
@@ -109,7 +113,7 @@
          name="tempNAME"
          point="org.eclipse.ui.menus">
       <menuContribution
-            locationURI="menu:org.eclipse.ptp.pldt.common.toolbar.command1 ">
+            locationURI="menu:org.eclipse.ptp.pldt.common.toolbar.command1?after=separator1.mpi">
          <command
                commandId="org.eclipse.ptp.pldt.mpi.core.command2"
                icon="icons/mpi.gif"
