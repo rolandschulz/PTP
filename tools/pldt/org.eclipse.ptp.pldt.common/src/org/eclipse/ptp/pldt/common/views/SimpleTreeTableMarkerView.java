@@ -106,7 +106,7 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 
 	private Action doubleClickAction;
 
-	private static final boolean traceOn = true;
+	private static final boolean traceOn = false;
 
 	private static final boolean traceStatusLine = false;
 
