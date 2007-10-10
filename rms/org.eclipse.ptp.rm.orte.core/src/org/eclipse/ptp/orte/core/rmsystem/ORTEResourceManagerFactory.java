@@ -18,9 +18,12 @@
  *******************************************************************************/
 package org.eclipse.ptp.orte.core.rmsystem;
 
+import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
+import org.eclipse.ptp.orte.core.ORTEPreferenceManager;
+import org.eclipse.ptp.remote.ui.preferences.PreferenceConstants;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ui.IMemento;
@@ -39,7 +42,14 @@ public class ORTEResourceManagerFactory extends AbstractResourceManagerFactory {
 	}
 
 	public IResourceManagerConfiguration createConfiguration() {
-		return new ORTEResourceManagerConfiguration(this);
+		ORTEResourceManagerConfiguration conf = new ORTEResourceManagerConfiguration(this);
+		
+		Preferences preferences = ORTEPreferenceManager.getPreferences();
+		
+		conf.setProxyServerPath(preferences.getString(PreferenceConstants.PROXY_PATH));
+		conf.setOptions(preferences.getInt(PreferenceConstants.OPTIONS));
+
+		return conf;
 	}
 
 	public IResourceManagerConfiguration loadConfiguration(IMemento memento) {

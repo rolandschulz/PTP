@@ -18,9 +18,12 @@
  *******************************************************************************/
 package org.eclipse.ptp.mpich2.core.rmsystem;
 
+import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
+import org.eclipse.ptp.mpich2.core.MPICH2PreferenceManager;
+import org.eclipse.ptp.remote.ui.preferences.PreferenceConstants;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ui.IMemento;
@@ -41,6 +44,12 @@ public class MPICH2ResourceManagerFactory extends AbstractResourceManagerFactory
 
 	public IResourceManagerConfiguration createConfiguration() {
 		MPICH2ResourceManagerConfiguration config = new MPICH2ResourceManagerConfiguration(this);
+		
+		Preferences preferences = MPICH2PreferenceManager.getPreferences();
+		
+		config.setProxyServerPath(preferences.getString(PreferenceConstants.PROXY_PATH));
+		config.setOptions(preferences.getInt(PreferenceConstants.OPTIONS));
+
 		return config;
 	}
 

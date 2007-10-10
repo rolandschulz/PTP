@@ -1,6 +1,7 @@
 package org.eclipse.ptp.mpich2.ui;
 
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.ptp.mpich2.core.MPICH2PreferenceManager;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 

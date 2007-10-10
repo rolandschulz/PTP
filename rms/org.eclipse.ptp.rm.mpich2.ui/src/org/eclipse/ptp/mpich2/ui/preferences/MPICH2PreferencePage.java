@@ -19,7 +19,7 @@
 package org.eclipse.ptp.mpich2.ui.preferences;
 
 import org.eclipse.core.runtime.Preferences;
-import org.eclipse.ptp.mpich2.ui.MPICH2PreferenceManager;
+import org.eclipse.ptp.mpich2.core.MPICH2PreferenceManager;
 import org.eclipse.ptp.remote.ui.preferences.AbstractRemotePreferencePage;
 
 public class MPICH2PreferencePage extends AbstractRemotePreferencePage {

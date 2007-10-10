@@ -18,8 +18,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.mpich2.ui.wizards;
 
-import org.eclipse.core.runtime.Preferences;
-import org.eclipse.ptp.mpich2.ui.MPICH2PreferenceManager;
 import org.eclipse.ptp.remote.ui.wizards.AbstractRemoteResourceManagerConfigurationWizardPage;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizard;
 
@@ -30,13 +28,5 @@ public final class MPICH2ResourceManagerConfigurationWizardPage extends
 		super(wizard, "MPICH2 Proxy Configuration");
 		setTitle("MPICH2 Proxy Configuration");
 		setDescription("Enter information to connect to an MPICH2 proxy server");
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.ui.wizards.AbstractRemoteResourceManagerConfigurationWizardPage#getPreferences()
-	 */
-	@Override
-	public Preferences getPreferences() {
-		return MPICH2PreferenceManager.getPreferences();
 	}
 }

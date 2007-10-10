@@ -1,5 +1,6 @@
 package org.eclipse.ptp.lsf.ui;
 
+import org.eclipse.ptp.lsf.core.LSFPreferenceManager;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 

@@ -18,9 +18,12 @@
  *******************************************************************************/
 package org.eclipse.ptp.lsf.core.rmsystem;
 
+import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
+import org.eclipse.ptp.lsf.core.LSFPreferenceManager;
+import org.eclipse.ptp.remote.ui.preferences.PreferenceConstants;
 import org.eclipse.ptp.rmsystem.AbstractResourceManagerFactory;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ui.IMemento;
@@ -49,6 +52,12 @@ public class LSFResourceManagerFactory extends AbstractResourceManagerFactory {
 	 */
 	public IResourceManagerConfiguration createConfiguration() {
 		LSFResourceManagerConfiguration config = new LSFResourceManagerConfiguration(this);
+		
+		Preferences preferences = LSFPreferenceManager.getPreferences();
+		
+		config.setProxyServerPath(preferences.getString(PreferenceConstants.PROXY_PATH));
+		config.setOptions(preferences.getInt(PreferenceConstants.OPTIONS));
+
 		return config;
 	}
 

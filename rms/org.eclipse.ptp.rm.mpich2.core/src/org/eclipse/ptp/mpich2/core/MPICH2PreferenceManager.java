@@ -16,7 +16,7 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.mpich2.ui;
+package org.eclipse.ptp.mpich2.core;
 
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Preferences;
