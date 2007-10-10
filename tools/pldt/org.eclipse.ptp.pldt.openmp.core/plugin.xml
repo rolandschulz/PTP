@@ -97,7 +97,7 @@
                locationURI="menu:org.eclipse.ptp.pldt.common.toolbar.command1?after=separator2.openmp">
             <command
                   commandId="org.eclipse.ptp.pldt.openmp.core.command2"
-                  icon="icons/openmp.gif"
+                  icon="icons/openMP.gif"
                   label="Show OpenMP Artifacts"
                   style="push">
             </command>
