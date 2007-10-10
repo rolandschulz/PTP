@@ -94,7 +94,7 @@
             name="tempNAME"
             point="org.eclipse.ui.menus">
          <menuContribution
-               locationURI="menu:org.eclipse.ptp.pldt.common.toolbar.command1 ">
+               locationURI="menu:org.eclipse.ptp.pldt.common.toolbar.command1?after=separator2.openmp">
             <command
                   commandId="org.eclipse.ptp.pldt.openmp.core.command2"
                   icon="icons/openmp.gif"
