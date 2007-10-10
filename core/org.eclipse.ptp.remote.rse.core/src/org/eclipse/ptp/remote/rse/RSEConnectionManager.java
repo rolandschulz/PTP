@@ -10,6 +10,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote.rse;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.ptp.remote.IRemoteConnection;
 import org.eclipse.ptp.remote.IRemoteConnectionManager;
 import org.eclipse.rse.core.IRSESystemType;
@@ -23,6 +26,7 @@ import org.eclipse.swt.widgets.Shell;
 public class RSEConnectionManager implements IRemoteConnectionManager {
 	private ISystemRegistry registry;
 	private SystemNewConnectionAction action;
+	private Map<IHost, IRemoteConnection> connections = null;
 	
 	public RSEConnectionManager(ISystemRegistry registry) {
 		this.registry = registry;
@@ -45,15 +49,14 @@ public class RSEConnectionManager implements IRemoteConnectionManager {
 	 * @see org.eclipse.ptp.remote.IRemoteConnectionManager#getConnections()
 	 */
 	public IRemoteConnection[] getConnections() {
-		if (registry != null) {
+		if (connections == null && registry != null) {
 			IHost[] hosts = registry.getHostsBySubSystemConfigurationCategory("shells"); //$NON-NLS-1$
-			IRemoteConnection[] conns = new RSEConnection[hosts.length];
-			for (int i = 0; i < hosts.length; i++) {
-				conns[i] = new RSEConnection(hosts[i]);
+			connections = new HashMap<IHost,IRemoteConnection>();
+			for (IHost host : hosts) {
+				connections.put(host, new RSEConnection(host));
 			}
-			return conns;
 		}
-		return new RSEConnection[0];
+		return connections.values().toArray(new IRemoteConnection[connections.size()]);
 	}
 	
 	/* (non-Javadoc)
@@ -74,6 +77,18 @@ public class RSEConnectionManager implements IRemoteConnectionManager {
 		} catch (Exception e)
 		{
 			// Ignore
+		}
+		
+		/*
+		 * Check for new connections
+		 */
+		if (connections != null) {
+			IHost[] hosts = registry.getHostsBySubSystemConfigurationCategory("shells"); //$NON-NLS-1$
+			for (IHost host : hosts) {
+				if (!connections.containsKey(host)) {
+					connections.put(host, new RSEConnection(host));
+				}
+			}
 		}
 	}
 
