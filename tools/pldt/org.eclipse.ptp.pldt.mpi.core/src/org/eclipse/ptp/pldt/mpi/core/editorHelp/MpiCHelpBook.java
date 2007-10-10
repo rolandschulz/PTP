@@ -16,7 +16,10 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.ptp.pldt.common.editorHelp.CHelpBookImpl;
@@ -37,7 +40,9 @@ public class MpiCHelpBook extends CHelpBookImpl {
 		// populate func map
 		Bundle bundle = Platform.getBundle(MpiPlugin.getPluginId());
 		Path path = new Path("mpiref.xml");
-		URL fileURL = Platform.find(bundle, path);
+		////
+		//URL fileURL = Platform.find(bundle, path); // old
+		URL fileURL = FileLocator.find(bundle, path, null);
 		InputStream xmlIn = null;
 		try {
 			xmlIn = fileURL.openStream();
@@ -45,9 +50,9 @@ public class MpiCHelpBook extends CHelpBookImpl {
 			e.printStackTrace();
 		}
 
-		List mpiFuncList = MPIDocXMLParser.parseDOM(xmlIn);
-		for (Iterator it = mpiFuncList.iterator(); it.hasNext();) {
-			FunctionSummaryImpl functionSummary = (FunctionSummaryImpl) it.next();
+		List<FunctionSummaryImpl> mpiFuncList = MPIDocXMLParser.parseDOM(xmlIn, "cname");
+		for (Iterator<FunctionSummaryImpl> it = mpiFuncList.iterator(); it.hasNext();) {
+			FunctionSummaryImpl functionSummary = it.next();
 			funcName2FuncInfo.put(functionSummary.getName(), functionSummary);
 		}
 		
