@@ -33,10 +33,6 @@
          </commandParameter>
          <defaultHandler
                class="org.eclipse.ptp.pldt.common.actions.AnalysisDropdownHandler">
-            <parameter
-                  name="org.eclipse.ptp.pldt.common.parameter1"
-                  value="org.eclipse.ptp.pldt.common.parameter1">
-            </parameter>
          </defaultHandler>
       </command>
    </extension>
@@ -68,8 +64,14 @@
       <menuContribution
             locationURI="menu:org.eclipse.ptp.pldt.common.toolbar.command1?after=additions">
         
-          <separator name="additions" visible="false">
-        </separator>
+          <separator name="separator1.mpi"/>
+          <separator name="separator2.openmp"/>
+          <separator name="separator3.otherArtifact"/>
+          <separator name="separator4.barrier"/>
+          <separator name="separator5.other" visible="false"/>
+          <separator
+                name="additions">
+          </separator>
         
       </menuContribution>
    </extension>
