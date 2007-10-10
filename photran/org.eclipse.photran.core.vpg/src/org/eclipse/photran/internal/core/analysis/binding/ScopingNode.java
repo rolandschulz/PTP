@@ -159,7 +159,7 @@ public abstract class ScopingNode extends InteriorNode
 		return false;
 	}
 
-	static boolean isScopingNode(CSTNode node)
+	public static boolean isScopingNode(CSTNode node)
     {
     	return node instanceof ASTExecutableProgramNode
     		|| node instanceof ASTMainProgramNode
