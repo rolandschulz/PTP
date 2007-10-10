@@ -78,26 +78,26 @@ public abstract class AbstractFortranEditor extends TextEditor //implements ISel
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Constants
     ///////////////////////////////////////////////////////////////////////////////////////////////
+
+    protected static String[] PARTITION_TYPES = new String[] { IDocument.DEFAULT_CONTENT_TYPE };
     
-    private static String[] PARTITION_TYPES = new String[] { IDocument.DEFAULT_CONTENT_TYPE };
+    protected static String FORTRAN_EDITOR_CONTEXT_ID = "org.eclipse.photran.ui.FortranEditorContext";
     
-    private static String FORTRAN_EDITOR_CONTEXT_ID = "org.eclipse.photran.ui.FortranEditorContext";
+    protected static String CONTEXT_MENU_ID = "#FortranEditorContextMenu";
     
-    private static String CONTEXT_MENU_ID = "#FortranEditorContextMenu";
+    protected static String BLOCK_COMMENT_COMMAND_ID = "org.eclipse.photran.ui.CommentCommand";
     
-    private static String BLOCK_COMMENT_COMMAND_ID = "org.eclipse.photran.ui.CommentCommand";
-    
-    private static final RGB VERTICAL_LINE_COLOR = new RGB(176, 180, 185);
+    protected static final RGB VERTICAL_LINE_COLOR = new RGB(176, 180, 185);
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Fields
     ///////////////////////////////////////////////////////////////////////////////////////////////
     
-    private IPreferenceStore fCombinedPreferenceStore;
-    private Composite fMainComposite;
-    private CContentOutlinePage fOutlinePage;
-    private FortranHorizontalRuler fHRuler;
-    private Color verticalLineColor;
+    protected IPreferenceStore fCombinedPreferenceStore;
+    protected Composite fMainComposite;
+    protected CContentOutlinePage fOutlinePage;
+    protected FortranHorizontalRuler fHRuler;
+    protected Color verticalLineColor;
     
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Constructor
@@ -180,7 +180,7 @@ public abstract class AbstractFortranEditor extends TextEditor //implements ISel
         //createAction(new FortranOpenDeclarationActionDelegate(this), OPEN_DECLARATION_COMMAND_ID);
     }
 
-    private void createAction(IAction action, String id)
+    protected void createAction(IAction action, String id)
     {
         action.setActionDefinitionId(id);
         setAction(id, action);
@@ -196,7 +196,7 @@ public abstract class AbstractFortranEditor extends TextEditor //implements ISel
      * @param mainComposite
      * This creates the horizontal ruler and adds it to the top of the editor
      */
-    private void createHorizontalRuler(Composite mainComposite)
+    protected void createHorizontalRuler(Composite mainComposite)
     {
         GC gc = new GC(getSourceViewer().getTextWidget());
         GridData data = new GridData(GridData.FILL_HORIZONTAL);
@@ -219,7 +219,7 @@ public abstract class AbstractFortranEditor extends TextEditor //implements ISel
     /**
      * Display a light gray line between columns 6/7 and 72/73
      */
-    private void createLightGrayLines()
+    protected void createLightGrayLines()
     {
         verticalLineColor = new Color(null, VERTICAL_LINE_COLOR);
         
@@ -259,7 +259,7 @@ public abstract class AbstractFortranEditor extends TextEditor //implements ISel
     // Syntax Highlighting
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
-    private void configurePartitionScanner(IDocument document)
+    protected void configurePartitionScanner(IDocument document)
     {
         IDocumentPartitioner partitioner = new FastPartitioner(new RuleBasedPartitionScanner(),
                                                                PARTITION_TYPES);
@@ -269,65 +269,63 @@ public abstract class AbstractFortranEditor extends TextEditor //implements ISel
 
     protected abstract ITokenScanner getTokenScanner();
     
-    private SourceViewerConfiguration createSourceViewerConfiguration()
+    protected SourceViewerConfiguration createSourceViewerConfiguration()
     {
-        return new SourceViewerConfiguration()
+        return new FortranSourceViewerConfiguration();
+    }
+    
+    protected class FortranSourceViewerConfiguration extends SourceViewerConfiguration
+    {
+        protected PresentationReconciler reconciler = null;
+
+        /**
+         * Returns a list of the possible partitions' content types.
+         * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getConfiguredContentTypes(org.eclipse.jface.text.source.ISourceViewer)
+         */
+        public String[] getConfiguredContentTypes(ISourceViewer sourceViewer)
         {
-            private PresentationReconciler reconciler = null;
-            
-            /**
-             * Returns a list of the possible partitions' content types.
-             * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getConfiguredContentTypes(org.eclipse.jface.text.source.ISourceViewer)
-             */
-            public String[] getConfiguredContentTypes(ISourceViewer sourceViewer)
-            {
-                return PARTITION_TYPES;
-            }
-    
-            /**
-             * Sets up rules for syntax highlighting.
-             * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getPresentationReconciler(org.eclipse.jface.text.source.ISourceViewer)
-             */
-            public IPresentationReconciler getPresentationReconciler(ISourceViewer sourceViewer)
-            {
-                if (reconciler == null)
-                {
-                    reconciler = new PresentationReconciler();
-            
-                    // Set up a damager-repairer for each content type
-                    
-                    DefaultDamagerRepairer dr = new DefaultDamagerRepairer(getTokenScanner());
-                    reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
-                    reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
-                }
-    
-                return reconciler;
-            }
+            return PARTITION_TYPES;
+        }
 
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    // Outline Support (mostly copied from CDT)
-    ///////////////////////////////////////////////////////////////////////////////////////////////
+        /**
+         * Sets up rules for syntax highlighting.
+         * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getPresentationReconciler(org.eclipse.jface.text.source.ISourceViewer)
+         */
+        public IPresentationReconciler getPresentationReconciler(ISourceViewer sourceViewer)
+        {
+            if (reconciler == null)
+            {
+                reconciler = new PresentationReconciler();
+        
+                // Set up a damager-repairer for each content type
+                
+                DefaultDamagerRepairer dr = new DefaultDamagerRepairer(getTokenScanner());
+                reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
+                reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
+            }
+   
+            return reconciler;
+        }
 
-            /*
-             * The CReconciler is used to ensure that an ElementChangedEvent is fired.
-             * Without this, the Outline view says "Pending..." but never populates.
-             * 
-             * From Anton Leherbaurer (cdt-dev, 8/16/07):
-             *     The outline view waits for the initial reconciler to run and it requires
-             *     an ElementChangedEvent when it is done to populate the view.
-             *     See CContentOutlinerProvider$ElementChangedListener#elementChanged().
-             *     The event should usually be issued from the
-             *     ReconcileWorkingCopyOperation.
-             */
-			public IReconciler getReconciler(ISourceViewer sourceViewer)
-			{
-				MonoReconciler reconciler = new CReconciler(AbstractFortranEditor.this, new CReconcilingStrategy(AbstractFortranEditor.this));
-				reconciler.setIsIncrementalReconciler(false);
-				reconciler.setProgressMonitor(new NullProgressMonitor());
-				reconciler.setDelay(500);
-				return reconciler;
-			}
-        };
+        /*
+         * The CReconciler is used to ensure that an ElementChangedEvent is fired.
+         * Without this, the Outline view says "Pending..." but never populates.
+         * 
+         * From Anton Leherbaurer (cdt-dev, 8/16/07):
+         *     The outline view waits for the initial reconciler to run and it requires
+         *     an ElementChangedEvent when it is done to populate the view.
+         *     See CContentOutlinerProvider$ElementChangedListener#elementChanged().
+         *     The event should usually be issued from the
+         *     ReconcileWorkingCopyOperation.
+         */
+        public IReconciler getReconciler(ISourceViewer sourceViewer)
+        {
+            MonoReconciler reconciler = new CReconciler(AbstractFortranEditor.this, new CReconcilingStrategy(AbstractFortranEditor.this));
+            reconciler.setIsIncrementalReconciler(false);
+            reconciler.setProgressMonitor(new NullProgressMonitor());
+            reconciler.setDelay(500);
+            return reconciler;
+        }
     }
 
 	/**
@@ -461,7 +459,7 @@ public abstract class AbstractFortranEditor extends TextEditor //implements ISel
 //     * @return <code>true</code> if editor is the active part of the
 //     *         workbench.
 //     */
-//    private boolean isActivePart() {
+//    protected boolean isActivePart() {
 //        IWorkbenchWindow window = getSite().getWorkbenchWindow();
 //        IPartService service = window.getPartService();
 //        return (this == service.getActivePart());

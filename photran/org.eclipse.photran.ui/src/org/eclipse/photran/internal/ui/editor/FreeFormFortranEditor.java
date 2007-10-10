@@ -18,7 +18,7 @@ import org.eclipse.swt.widgets.Composite;
  * 
  * @author Jeff Overbey
  */
-public final class FreeFormFortranEditor extends AbstractFortranEditor
+public class FreeFormFortranEditor extends AbstractFortranEditor
 {
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Custom Ruler
