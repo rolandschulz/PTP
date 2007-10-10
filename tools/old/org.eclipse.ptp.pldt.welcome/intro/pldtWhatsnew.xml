@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<introContent>
+  	<extensionContent id="orgeclipseptppldtwelcome-introExtension" style="css/sample.css" name="PLDT whats new Extension" path="whatsnew/@">
+		<group style-id="content-group" id="orgeclipseptppldtwelcome-introLink-group">
+       		<link label="Parallel Language Development Tools" 
+       		url="http://org.eclipse.ui.intro/showHelpTopic?id=/org.eclipse.ptp.pldt.help/html/whatsnew.html" 
+       		id="orgeclipseptppldtwelcome-introLink" style-id="content-link">
+          		<text>Learn about what's new in PLDT 2.0.</text>
+       		</link>
+       	</group>
+  	</extensionContent>
+</introContent>
