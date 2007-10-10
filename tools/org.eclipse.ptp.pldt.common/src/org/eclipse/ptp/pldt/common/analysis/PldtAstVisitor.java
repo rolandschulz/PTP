@@ -279,9 +279,8 @@ public class PldtAstVisitor extends CASTVisitor {
 		// if (includePath.isPrefixOf(includeFilePath)) return true;
 		// }
 		for (Iterator it = includes_.iterator(); it.hasNext();) {
-			System.out.println(" ");
 			String includeDir = (String) it.next();
-			System.out.println("is "+includeFilePath+" found in "+includeDir+"?");
+			if(traceOn)System.out.println("PldtAstVisitor: is "+includeFilePath+" found in "+includeDir+"?");
 			IPath includePath = new Path(includeDir);
 			if (includePath.isPrefixOf(includeFilePath))
 				return true;

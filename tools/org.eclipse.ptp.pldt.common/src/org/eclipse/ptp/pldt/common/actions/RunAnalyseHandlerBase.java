@@ -130,7 +130,7 @@ public abstract class RunAnalyseHandlerBase extends RunAnalyseHandler {
 
 	public void run() {
 		if (traceOn)
-			System.out.println("RunAnalyseBase.run()...");
+			System.out.println("RunAnalyseHandlerBase.run()...");
 
 		cancelledByUser = false;
 		err = false;
@@ -653,9 +653,9 @@ public abstract class RunAnalyseHandlerBase extends RunAnalyseHandler {
 	 */
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		System.out.println("RunAnalyseHandlerBase.run()...");
+		if(traceOn)System.out.println("RunAnalyseHandlerBase.execute()...");
 		getSelection(event);
-		System.out.println("selection: "+selection);
+		if(traceOn)System.out.println("selection: "+selection);
 		run();
 		AnalysisDropdownHandler.setLastHandledAnalysis(this, selection);
 	    return null;
