@@ -16,7 +16,7 @@ import org.eclipse.ptp.pldt.common.editorHelp.CHelpProviderImpl;
 
 /**
  * 
- * Provides help information for MPI APIs (F1, hover, content assist, etc.)
+ * Provides help information for MPI APIs for C (F1, hover, content assist, etc.)
  */
 public class MpiCHelpProvider extends CHelpProviderImpl
 {    
