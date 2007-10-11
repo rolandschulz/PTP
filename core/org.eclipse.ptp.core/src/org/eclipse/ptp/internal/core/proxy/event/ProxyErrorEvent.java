@@ -20,9 +20,9 @@
 package org.eclipse.ptp.internal.core.proxy.event;
 
 import org.eclipse.ptp.core.proxy.event.AbstractProxyEvent;
-import org.eclipse.ptp.core.proxy.event.IProxyOKEvent;
+import org.eclipse.ptp.core.proxy.event.IProxyErrorEvent;
 
-public class ProxyErrorEvent extends AbstractProxyEvent implements IProxyOKEvent {
+public class ProxyErrorEvent extends AbstractProxyEvent implements IProxyErrorEvent {
 	public ProxyErrorEvent(int transactionID, String[] args) {
 		super(EVENT_ERROR, transactionID, args);
 	}
