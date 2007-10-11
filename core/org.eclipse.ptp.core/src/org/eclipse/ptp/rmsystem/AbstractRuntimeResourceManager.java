@@ -709,18 +709,6 @@ public abstract class AbstractRuntimeResourceManager extends
 	public void handleEvent(IRuntimeSubmitJobErrorEvent e) {
 		subLock.lock();
 		try {
-			/*
-			switch (level) {
-			case FATAL:
-				/*
-				 * Fatal error in the proxy. Terminate all job submissions.
-				 *
-				for (JobSubmission sub : jobSubmissions.values()) {
-					sub.setState(JobSubState.ERROR);
-					sub.setMessage(e);
-				}
-				subCondition.signalAll();
-				break;*/
 			if (e.getJobSubID() != null) {
 				JobSubmission sub = jobSubmissions.get(e.getJobSubID());
 				if (sub != null) {
