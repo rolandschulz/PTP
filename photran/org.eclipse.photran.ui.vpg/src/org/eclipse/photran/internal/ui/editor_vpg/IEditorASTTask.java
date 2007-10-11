@@ -1,6 +1,6 @@
 package org.eclipse.photran.internal.ui.editor_vpg;
 
-import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
+import org.eclipse.photran.core.IFortranAST;
 
 /**
  * An <code>IEditorASTTask</code> can be run if an AST for the file in the editor is available but the VPG is not
@@ -15,5 +15,5 @@ import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
  */
 public interface IEditorASTTask
 {
-    void handle(ASTExecutableProgramNode astRootNode);
+    void handle(IFortranAST ast);
 }

@@ -45,6 +45,10 @@ public class ExperimentalFreeFormFortranEditor extends FreeFormFortranEditor
     {
         astTasks.add(new SampleEditorASTTask(this));
         vpgTasks.add(new SampleEditorVPGTask(this));
+        
+        SampleEditorMappingTask t = new SampleEditorMappingTask(this);
+        astTasks.add(t.astTask);
+        vpgTasks.add(t.vpgTask);
     }
     
     ///////////////////////////////////////////////////////////////////////////////////////////////

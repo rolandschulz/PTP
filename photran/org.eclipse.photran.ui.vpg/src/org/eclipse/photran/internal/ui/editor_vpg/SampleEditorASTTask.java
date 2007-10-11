@@ -2,6 +2,7 @@ package org.eclipse.photran.internal.ui.editor_vpg;
 
 import org.eclipse.jface.text.TextPresentation;
 import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.lexer.Terminal;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
@@ -20,30 +21,25 @@ final class SampleEditorASTTask implements IEditorASTTask
         this.freeFormVPGEditor = freeFormVPGEditor;
     }
 
-    public void handle(ASTExecutableProgramNode astRootNode)
+    public void handle(IFortranAST ast)
     {
         // Sample Action: Highlight all identifiers (and destroy most of the rest of the highlighting)
         
         final TextPresentation presentation = new TextPresentation();
-        astRootNode.visitTopDownUsing(new ASTVisitor()
+        for (Token token : ast)
         {
-            @Override public void visitToken(Token token)
-            {
-                if (token.getTerminal() == Terminal.T_IDENT)
-                    presentation.addStyleRange(new StyleRange(token.getFileOffset(),
-                                                              token.getLength(),
-                                                              null,
-                                                              LIGHT_YELLOW));
-            }
-        });
+            if (token.getTerminal() == Terminal.T_IDENT)
+                presentation.addStyleRange(new StyleRange(token.getFileOffset(),
+                                                          token.getLength(),
+                                                          null,
+                                                          LIGHT_YELLOW));
+        }
             
         this.freeFormVPGEditor.getSite().getShell().getDisplay().asyncExec(new Runnable()
         {
             public void run()
             {
-                System.out.println("Updating");
-                ISourceViewer sv = freeFormVPGEditor.getSourceViewerx();
-                sv.changeTextPresentation(presentation, true);
+                freeFormVPGEditor.getSourceViewerx().changeTextPresentation(presentation, true);
             }
         });
     }

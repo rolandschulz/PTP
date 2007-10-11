@@ -1,7 +1,6 @@
 package org.eclipse.photran.internal.ui.editor_vpg;
 
-import java.util.HashSet;
-import java.util.LinkedList;
+import java.util.HashMap;
 
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
@@ -20,117 +19,10 @@ import org.eclipse.photran.internal.core.parser.ASTSubroutineSubprogramNode;
 import org.eclipse.photran.internal.core.parser.ASTVisitor;
 import org.eclipse.photran.internal.core.parser.GenericParseTreeVisitor;
 import org.eclipse.photran.internal.core.parser.Parser.InteriorNode;
-import org.eclipse.photran.internal.core.parser.Parser.Nonterminal;
 
 public final class DefinitionMap
 {
-    private static class FullyQualifiedIdentifier
-    {
-        private LinkedList<Qualifier> qualifiers = new LinkedList<Qualifier>();
-        private String canonicalizedName;
-        
-        FullyQualifiedIdentifier(Definition def)
-        {
-            canonicalizedName = def.getCanonicalizedName();
-            
-            AddQualifiers v = new AddQualifiers(qualifiers);
-            for (InteriorNode n = def.getTokenRef().findToken().getASTParent();
-                 n != null;
-                 n = n.getASTParent())
-            {
-                if (ScopingNode.isScopingNode(n))
-                {
-                    n.visitOnlyThisNodeUsing(v);
-                }
-            }
-        }
-    }
-    
-    private static class Qualifier
-    {
-        String canonicalizedName;
-        Nonterminal type;
-        
-        public Qualifier(String canonicalizedName, Nonterminal type)
-        {
-            if (canonicalizedName == null)
-                this.canonicalizedName = "";
-            else
-                this.canonicalizedName = canonicalizedName;
-            this.type = type;
-        }
-    }
-    
-    private static class AddQualifiers extends ASTVisitor
-    {
-        private LinkedList<Qualifier> qualifiers;
-        
-        AddQualifiers(LinkedList<Qualifier> qualifiers)
-        {
-            this.qualifiers = qualifiers;
-        }
-        
-        private void addQualifier(String name, InteriorNode node)
-        {
-            qualifiers.add(0, new Qualifier(name, node.getNonterminal()));
-        }
-
-        private void addQualifier(Token name, InteriorNode node)
-        {
-            qualifiers.add(0, new Qualifier(name.getText(), node.getNonterminal()));
-        }
-
-        @Override public void visitASTExecutableProgramNode(ASTExecutableProgramNode node)
-        {
-            addQualifier("", node);
-        }
-
-        @Override public void visitASTMainProgramNode(ASTMainProgramNode node)
-        {
-            ASTProgramStmtNode ps = node.getProgramStmt();
-            if (ps != null && ps.getProgramName() != null)
-                addQualifier(ps.getProgramName().getTIdent(), node);
-            else
-                addQualifier("", node);
-        }
-
-        @Override public void visitASTFunctionSubprogramNode(ASTFunctionSubprogramNode node)
-        {
-            addQualifier(node.getFunctionStmt().getFunctionName().getTIdent(), node);
-        }
-
-        @Override public void visitASTSubroutineSubprogramNode(ASTSubroutineSubprogramNode node)
-        {
-            addQualifier(node.getSubroutineStmt().getSubroutineName().getTIdent(), node);
-        }
-
-        @Override public void visitASTModuleNode(ASTModuleNode node)
-        {
-            addQualifier(node.getModuleStmt().getModuleName().getTIdent(), node);
-        }
-
-        @Override public void visitASTBlockDataSubprogramNode(ASTBlockDataSubprogramNode node)
-        {
-            ASTBlockDataNameNode name = node.getBlockDataStmt().getBlockDataName();
-            if (name == null)
-                addQualifier("", node);
-            else
-                addQualifier(name.getTIdent(), node);
-        }
-
-        @Override public void visitASTDerivedTypeDefNode(ASTDerivedTypeDefNode node)
-        {
-            addQualifier(node.getDerivedTypeStmt().getTypeName().getTIdent(), node);
-        }
-
-        @Override public void visitASTInterfaceStmtNode(ASTInterfaceStmtNode node)
-        {
-            if (node.getGenericName() != null)
-                addQualifier(node.getGenericName().getTIdent(), node);
-        }
-    }
-
-    private HashSet<FullyQualifiedIdentifier> definitions = new HashSet<FullyQualifiedIdentifier>();
+    private HashMap<String, Definition> definitions = new HashMap<String, Definition>();
     
     public DefinitionMap(IFortranAST ast)
     {
@@ -140,8 +32,99 @@ public final class DefinitionMap
             {
                 if (ScopingNode.isScopingNode(node))
                     for (Definition def : ((ScopingNode)node).getAllDefinitions())
-                        definitions.add(new FullyQualifiedIdentifier(def));
+                        definitions.put(qualify(def.getTokenRef().findToken()),
+                                        def);
             }
         });
+        
+        for (String def : definitions.keySet())
+            System.out.println(def);
+    }
+    
+    public Definition lookup(Token token)
+    {
+        String qualifiedName = qualify(token);
+        while (true)
+        {
+            System.out.println("Checking " + qualifiedName);
+            if (definitions.containsKey(qualifiedName))
+                return definitions.get(qualifiedName);
+            
+            int index = qualifiedName.indexOf(':');
+            if (index < 0)
+                return null;
+            else
+                qualifiedName = qualifiedName.substring(index+1);
+        }
+    }
+
+    private String qualify(Token token)
+    {
+        StringBuilder result = new StringBuilder();
+        
+        // Append scopes in *reverse* order
+        for (ScopingNode scope = token.getEnclosingScope();
+             scope != null && !(scope instanceof ASTExecutableProgramNode);
+             scope = scope.getEnclosingScope())
+        {
+            result.append(getQualifier(scope));
+        }
+        
+        // Then append the identifier
+        result.append(token.getText().toLowerCase());
+        
+        return result.toString();
+    }
+    
+    private String getQualifier(ScopingNode node)
+    {
+        class GetScopeVisitor extends ASTVisitor
+        {
+            private String name = "";
+            
+            @Override public void visitASTMainProgramNode(ASTMainProgramNode node)
+            {
+                ASTProgramStmtNode ps = node.getProgramStmt();
+                if (ps != null && ps.getProgramName() != null)
+                    name = ps.getProgramName().getTIdent().getText();
+            }
+    
+            @Override public void visitASTFunctionSubprogramNode(ASTFunctionSubprogramNode node)
+            {
+                name = node.getFunctionStmt().getFunctionName().getTIdent().getText();
+            }
+    
+            @Override public void visitASTSubroutineSubprogramNode(ASTSubroutineSubprogramNode node)
+            {
+                name = node.getSubroutineStmt().getSubroutineName().getTIdent().getText();
+            }
+    
+            @Override public void visitASTModuleNode(ASTModuleNode node)
+            {
+                name = node.getModuleStmt().getModuleName().getTIdent().getText();
+            }
+    
+            @Override public void visitASTBlockDataSubprogramNode(ASTBlockDataSubprogramNode node)
+            {
+                ASTBlockDataNameNode name = node.getBlockDataStmt().getBlockDataName();
+                if (name != null)
+                    this.name = name.getTIdent().getText();
+            }
+    
+            @Override public void visitASTDerivedTypeDefNode(ASTDerivedTypeDefNode node)
+            {
+                name = node.getDerivedTypeStmt().getTypeName().getTIdent().getText();
+            }
+    
+            @Override public void visitASTInterfaceStmtNode(ASTInterfaceStmtNode node)
+            {
+                if (node.getGenericName() != null)
+                    name = node.getGenericName().getTIdent().getText();
+            }
+        }
+        
+        GetScopeVisitor visitor = new GetScopeVisitor();
+        node.visitOnlyThisNodeUsing(visitor);
+        return node.getNonterminal() + "/" + visitor.name.toLowerCase() + ":";
     }
 }

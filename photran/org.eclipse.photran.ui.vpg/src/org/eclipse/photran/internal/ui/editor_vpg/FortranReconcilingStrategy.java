@@ -8,6 +8,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.text.IRegion;
+import org.eclipse.photran.core.FortranAST;
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.core.vpg.PhotranVPG;
 import org.eclipse.photran.internal.core.lexer.IAccumulatingLexer;
@@ -70,7 +71,9 @@ public class FortranReconcilingStrategy extends CReconcilingStrategy
                     if (astRootNode == null) return Status.OK_STATUS;
                     
                     for (IEditorASTTask task : editor.astTasks)
-                        task.handle(astRootNode);
+                        task.handle(new FortranAST(editor.getIFile(),
+                                                   astRootNode,
+                                                   lexer.getTokenList()));
                 }
                 catch (Exception e)
                 {
