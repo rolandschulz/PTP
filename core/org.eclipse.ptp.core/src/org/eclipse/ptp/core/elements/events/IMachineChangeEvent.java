@@ -34,7 +34,7 @@ public interface IMachineChangeEvent {
 	/**
 	 * @return the source of the event
 	 */
-	IPMachine getSource();
+	public IPMachine getSource();
 	
 	/**
 	 * @return
