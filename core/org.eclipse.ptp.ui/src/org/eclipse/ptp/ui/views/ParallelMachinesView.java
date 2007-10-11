@@ -102,6 +102,236 @@ import org.eclipse.swt.widgets.TableItem;
  * 
  */
 public class ParallelMachinesView extends AbstractParallelSetView {
+	private final class MMChildListener implements IModelManagerChildListener {
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.core.listeners.IModelManagerChildListener#handleEvent(org.eclipse.ptp.core.events.IChangedResourceManagerEvent)
+		 */
+		public void handleEvent(IChangedResourceManagerEvent e) {
+			// Don't need to do anything
+		}
+		
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.core.listeners.IModelManagerChildListener#handleEvent(org.eclipse.ptp.core.events.INewResourceManagerEvent)
+		 */
+		public void handleEvent(INewResourceManagerEvent e) {
+			/*
+			 * Add resource manager child listener so we get notified when new
+			 * machines are added to the model.
+			 */
+			final IResourceManager rm = e.getResourceManager();
+	        rm.addChildListener(resourceManagerListener);
+		}
+		
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.core.listeners.IModelManagerChildListener#handleEvent(org.eclipse.ptp.core.events.IRemoveResourceManagerEvent)
+		 */
+		public void handleEvent(IRemoveResourceManagerEvent e) {
+			/*
+			 * Removed resource manager child listener when resource manager is removed.
+			 */
+			e.getResourceManager().removeChildListener(resourceManagerListener);
+		}		
+	}
+
+	private final class RMChildListener implements IResourceManagerChildListener {
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerMachineListener#handleEvent(org.eclipse.ptp.core.elements.events.IResourceManagerChangedMachineEvent)
+		 */
+		public void handleEvent(IChangedMachineEvent e) {
+			// Don't need to do anything
+		}
+		
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener#handleEvent(org.eclipse.ptp.core.elements.events.IResourceManagerChangedQueueEvent)
+		 */
+		public void handleEvent(IChangedQueueEvent e) {
+			// Can safely ignore
+		}
+		
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerMachineListener#handleEvent(org.eclipse.ptp.core.elements.events.IResourceManagerNewMachineEvent)
+		 */
+		public void handleEvent(final INewMachineEvent e) {
+			for (IPMachine machine : e.getMachines()) {
+				/*
+				 * Add us as a child listener so we get notified of node events
+				 */
+				machine.addChildListener(machineListener);
+				
+				/*
+				 * Update views when a new machine is added
+				 */
+				changeMachineRefresh(machine);
+			}
+		}
+		
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener#handleEvent(org.eclipse.ptp.core.elements.events.INewQueueEvent)
+		 */
+		public void handleEvent(INewQueueEvent e) {
+			// Can safely ignore
+		}
+		
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerMachineListener#handleEvent(org.eclipse.ptp.core.elements.events.IResourceManagerRemoveMachineEvent)
+		 */
+		public void handleEvent(final IRemoveMachineEvent e) {
+			/*
+			 * Update views when a machine is removed.
+			 */
+			UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
+				public void run() {
+					for (IPMachine machine : e.getMachines()) {
+						/*
+						 * Remove child listener
+						 */
+						machine.removeChildListener(machineListener);
+						
+						/* 
+						 * remove from machine manager
+						 */
+						getMachineManager().removeMachine(machine);
+					}
+					
+					changeMachineRefresh(null);
+				}
+			});	
+		}
+		
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener#handleEvent(org.eclipse.ptp.core.elements.events.IResourceManagerRemoveQueueEvent)
+		 */
+		public void handleEvent(IRemoveQueueEvent e) {
+			// Can safely ignore
+		}
+	}
+	
+	private final class MachineChildListener implements IMachineChildListener {
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.core.elements.listeners.IMachineNodeListener#handleEvent(org.eclipse.ptp.core.elements.events.IMachineChangedNodeEvent)
+		 */
+		public void handleEvent(final IChangedNodeEvent e) {
+			refresh(true);
+		}
+		
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.core.elements.listeners.IMachineNodeListener#handleEvent(org.eclipse.ptp.core.elements.events.IMachineNewNodeEvent)
+		 */
+		public void handleEvent(final INewNodeEvent e) {
+			final boolean isCurrent = e.getSource().equals(getCurrentMachine());
+
+			UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
+				public void run() {
+					for (IPNode node : e.getNodes()) {
+						if (isCurrent) {
+							/*
+							 * Add node child listener so that we get notified when new processes
+							 * are added to the node and can update the node icons.
+							 */
+							node.addChildListener(nodeListener);
+						}
+						
+						getMachineManager().addNode(node);
+					}
+					
+					if (isCurrent) {
+						updateMachineSet();
+						repaint(true);
+					}
+				}
+			});	
+		}
+
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.core.elements.listeners.IMachineNodeListener#handleEvent(org.eclipse.ptp.core.elements.events.IMachineRemoveNodeEvent)
+		 */
+		public void handleEvent(final IRemoveNodeEvent e) {
+			final boolean isCurrent = e.getSource().equals(getCurrentMachine());
+
+			UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
+				public void run() {
+					for (IPNode node : e.getNodes()) {
+						if (isCurrent) {
+							/*
+							 * Remove node child listener when node is removed (if ever)
+							 */
+							node.removeChildListener(nodeListener);
+							
+						}
+	
+						getMachineManager().removeNode(node);
+					}
+			
+					if (isCurrent) {
+						updateMachineSet();
+						repaint(true);
+						nodeAttrTableViewer.refresh();
+						processTableViewer.refresh();
+					}
+				}
+			});	
+		}
+	}
+	
+	private final class NodeChildListener implements INodeChildListener {
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.core.elements.listeners.INodeChildListener#handleEvent(org.eclipse.ptp.core.elements.events.IChangedProcessEvent)
+		 */
+		public void handleEvent(final IChangedProcessEvent e) {
+			/*
+			 * Update views if any node's processes status changes
+			 */
+			if (e.getSource() instanceof IPNode) {
+				if ((IPNode) e.getSource() == getRegisteredNode()) {	
+					UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
+						public void run() {
+							processTableViewer.refresh();
+						}
+					});
+				}
+				refresh(false);
+			}
+		}
+		
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.core.elements.listeners.INodeProcessListener#handleEvent(org.eclipse.ptp.core.elements.events.INodeNewProcessEvent)
+		 */
+		public void handleEvent(final INewProcessEvent e) {
+			/*
+			 * Update node icons when a process is added to a node. 
+			 */
+			if (e.getSource() instanceof IPNode) {
+				if ((IPNode) e.getSource() == getRegisteredNode()) {	
+					UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
+						public void run() {
+							processTableViewer.refresh();
+						}
+					});
+					refresh(false);
+				}
+			}
+		}
+		
+		/* (non-Javadoc)
+		 * @see org.eclipse.ptp.core.elements.listeners.INodeChildListener#handleEvent(org.eclipse.ptp.core.elements.events.IRemoveProcessEvent)
+		 */
+		public void handleEvent(final IRemoveProcessEvent e) {
+			/*
+			 * Update node icons when a process is removed from a node. 
+			 */
+			if (e.getSource() instanceof IPNode) {
+				UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
+					public void run() {
+						IPNode node = (IPNode)e.getSource();
+						if (node == getRegisteredNode()) {
+							processTableViewer.refresh();
+						}
+					}
+				});
+				refresh(false);
+			}
+		}	
+	}
 	
 	// view flag
 	public static final String BOTH_VIEW = "0";
@@ -125,10 +355,10 @@ public class ParallelMachinesView extends AbstractParallelSetView {
 	protected ParallelAction terminateAllAction = null;
 	protected String current_view = BOTH_VIEW;
 	
-	private final IModelManagerChildListener modelManagerListener;
-	private final IResourceManagerChildListener resourceManagerListener;
-	private final IMachineChildListener machineListener;
-	private final INodeChildListener nodeListener;
+	private final IModelManagerChildListener modelManagerListener = new MMChildListener();
+	private final IResourceManagerChildListener resourceManagerListener = new RMChildListener();
+	private final IMachineChildListener machineListener = new MachineChildListener();
+	private final INodeChildListener nodeListener = new NodeChildListener();
 	
 	public ParallelMachinesView() {
 		this(PTPUIPlugin.getDefault().getMachineManager());
@@ -139,256 +369,6 @@ public class ParallelMachinesView extends AbstractParallelSetView {
 	 */
 	public ParallelMachinesView(IManager manager) {
 		super(manager);
-		
-		modelManagerListener = new IModelManagerChildListener() {
-			
-			/* (non-Javadoc)
-			 * @see org.eclipse.ptp.core.listeners.IModelManagerChildListener#handleEvent(org.eclipse.ptp.core.events.IChangedResourceManagerEvent)
-			 */
-			public void handleEvent(IChangedResourceManagerEvent e) {
-				// Don't need to do anything
-			}
-			
-			/* (non-Javadoc)
-			 * @see org.eclipse.ptp.core.listeners.IModelManagerChildListener#handleEvent(org.eclipse.ptp.core.events.INewResourceManagerEvent)
-			 */
-			public void handleEvent(INewResourceManagerEvent e) {
-				/*
-				 * Add resource manager child listener so we get notified when new
-				 * machines are added to the model.
-				 */
-				final IResourceManager rm = e.getResourceManager();
-		        rm.addChildListener(resourceManagerListener);
-			}
-			
-			/* (non-Javadoc)
-			 * @see org.eclipse.ptp.core.listeners.IModelManagerChildListener#handleEvent(org.eclipse.ptp.core.events.IRemoveResourceManagerEvent)
-			 */
-			public void handleEvent(IRemoveResourceManagerEvent e) {
-				/*
-				 * Removed resource manager child listener when resource manager is removed.
-				 */
-				e.getResourceManager().removeChildListener(resourceManagerListener);
-			}			
-		};
-		
-		resourceManagerListener = new IResourceManagerChildListener() {
-			
-			/* (non-Javadoc)
-			 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerMachineListener#handleEvent(org.eclipse.ptp.core.elements.events.IResourceManagerChangedMachineEvent)
-			 */
-			public void handleEvent(IChangedMachineEvent e) {
-				// Don't need to do anything
-			}
-			
-			/* (non-Javadoc)
-			 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener#handleEvent(org.eclipse.ptp.core.elements.events.IResourceManagerChangedQueueEvent)
-			 */
-			public void handleEvent(IChangedQueueEvent e) {
-				// Can safely ignore
-			}
-			
-			/* (non-Javadoc)
-			 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerMachineListener#handleEvent(org.eclipse.ptp.core.elements.events.IResourceManagerNewMachineEvent)
-			 */
-			public void handleEvent(final INewMachineEvent e) {
-				for (IPMachine machine : e.getMachines()) {
-					/*
-					 * Add us as a child listener so we get notified of node events
-					 */
-					machine.addChildListener(machineListener);
-					
-					/*
-					 * Update views when a new machine is added
-					 */
-					changeMachineRefresh(machine);
-				}
-			}
-			
-			/* (non-Javadoc)
-			 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener#handleEvent(org.eclipse.ptp.core.elements.events.INewQueueEvent)
-			 */
-			public void handleEvent(INewQueueEvent e) {
-				// Can safely ignore
-			}
-			
-			/* (non-Javadoc)
-			 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerMachineListener#handleEvent(org.eclipse.ptp.core.elements.events.IResourceManagerRemoveMachineEvent)
-			 */
-			public void handleEvent(final IRemoveMachineEvent e) {
-				/*
-				 * Update views when a machine is removed.
-				 */
-				UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
-					public void run() {
-						for (IPMachine machine : e.getMachines()) {
-							/*
-							 * Remove child listener
-							 */
-							machine.removeChildListener(machineListener);
-							
-							/* 
-							 * remove from machine manager
-							 */
-							getMachineManager().removeMachine(machine);
-						}
-						
-						changeMachineRefresh(null);
-					}
-				});	
-			}
-			
-			/* (non-Javadoc)
-			 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener#handleEvent(org.eclipse.ptp.core.elements.events.IResourceManagerRemoveQueueEvent)
-			 */
-			public void handleEvent(IRemoveQueueEvent e) {
-				// Can safely ignore
-			}
-		};
-		
-		machineListener = new IMachineChildListener() {
-			/* (non-Javadoc)
-			 * @see org.eclipse.ptp.core.elements.listeners.IMachineNodeListener#handleEvent(org.eclipse.ptp.core.elements.events.IMachineChangedNodeEvent)
-			 */
-			public void handleEvent(final IChangedNodeEvent e) {
-				refresh(true);
-			}
-			
-			/* (non-Javadoc)
-			 * @see org.eclipse.ptp.core.elements.listeners.IMachineNodeListener#handleEvent(org.eclipse.ptp.core.elements.events.IMachineNewNodeEvent)
-			 */
-			public void handleEvent(final INewNodeEvent e) {
-				final boolean isCurrent = e.getSource().equals(getCurrentMachine());
-
-				UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
-					public void run() {
-						for (IPNode node : e.getNodes()) {
-							if (isCurrent) {
-								/*
-								 * Add node child listener so that we get notified when new processes
-								 * are added to the node and can update the node icons.
-								 */
-								node.addChildListener(nodeListener);
-							}
-							
-							getMachineManager().addNode(node);
-						}
-						
-						if (isCurrent) {
-							updateMachineSet();
-							repaint(true);
-						}
-					}
-				});	
-			}
-
-			/* (non-Javadoc)
-			 * @see org.eclipse.ptp.core.elements.listeners.IMachineNodeListener#handleEvent(org.eclipse.ptp.core.elements.events.IMachineRemoveNodeEvent)
-			 */
-			public void handleEvent(final IRemoveNodeEvent e) {
-				final boolean isCurrent = e.getSource().equals(getCurrentMachine());
-
-				UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
-					public void run() {
-						for (IPNode node : e.getNodes()) {
-							if (isCurrent) {
-								/*
-								 * Remove node child listener when node is removed (if ever)
-								 */
-								node.removeChildListener(nodeListener);
-								
-							}
-		
-							getMachineManager().removeNode(node);
-						}
-				
-						if (isCurrent) {
-							updateMachineSet();
-							repaint(true);
-							nodeAttrTableViewer.refresh();
-							processTableViewer.refresh();
-						}
-					}
-				});	
-			}
-
-		};
-		
-		nodeListener = new INodeChildListener() {
-			
-			/* (non-Javadoc)
-			 * @see org.eclipse.ptp.core.elements.listeners.INodeChildListener#handleEvent(org.eclipse.ptp.core.elements.events.IChangedProcessEvent)
-			 */
-			public void handleEvent(final IChangedProcessEvent e) {
-				/*
-				 * Update views if any node's processes status changes
-				 */
-				if (e.getSource() instanceof IPNode) {
-					if ((IPNode) e.getSource() == getRegisteredNode()) {	
-						UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
-							public void run() {
-								processTableViewer.refresh();
-							}
-						});
-					}
-					refresh(false);
-				}
-			}
-			
-			/* (non-Javadoc)
-			 * @see org.eclipse.ptp.core.elements.listeners.INodeProcessListener#handleEvent(org.eclipse.ptp.core.elements.events.INodeNewProcessEvent)
-			 */
-			public void handleEvent(final INewProcessEvent e) {
-				/*
-				 * Update node icons when a process is added to a node. 
-				 */
-				if (e.getSource() instanceof IPNode) {
-					if ((IPNode) e.getSource() == getRegisteredNode()) {	
-						UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
-							public void run() {
-								processTableViewer.refresh();
-							}
-						});
-						refresh(false);
-					}
-				}
-			}
-			
-			/* (non-Javadoc)
-			 * @see org.eclipse.ptp.core.elements.listeners.INodeChildListener#handleEvent(org.eclipse.ptp.core.elements.events.IRemoveProcessEvent)
-			 */
-			public void handleEvent(final IRemoveProcessEvent e) {
-				/*
-				 * Update node icons when a process is removed from a node. 
-				 */
-				if (e.getSource() instanceof IPNode) {
-					UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
-						public void run() {
-							IPNode node = (IPNode)e.getSource();
-							if (node == getRegisteredNode()) {
-								processTableViewer.refresh();
-							}
-						}
-					});
-					refresh(false);
-				}
-			}			
-		};
-		
-		IModelManager mm = PTPCorePlugin.getDefault().getModelManager();
-		
-		synchronized (mm) {
-		    /*
-		     * Add us to any existing RM's. I guess it's possible we could
-		     * miss a RM if a new event arrives while we're doing this, but is 
-		     * it a problem?
-		     */
-		    for (IResourceManager rm : mm.getUniverse().getResourceManagers()) {
-		        rm.addChildListener(resourceManagerListener);
-		    }
-		    
-		    mm.addListener(modelManagerListener);
-		}
 	}
 	/** 
 	 * Change machine
@@ -936,6 +916,24 @@ public class ParallelMachinesView extends AbstractParallelSetView {
 		
 		infoComposite = createLowerRegions(sashForm);
 		changeView(current_view);
+		
+		/*
+		 * Wait until the view has been created before registering for events
+		 */
+		IModelManager mm = PTPCorePlugin.getDefault().getModelManager();
+		
+		synchronized (mm) {
+		    /*
+		     * Add us to any existing RM's. I guess it's possible we could
+		     * miss a RM if a new event arrives while we're doing this, but is 
+		     * it a problem?
+		     */
+		    for (IResourceManager rm : mm.getUniverse().getResourceManagers()) {
+		        rm.addChildListener(resourceManagerListener);
+		    }
+		    
+		    mm.addListener(modelManagerListener);
+		}
 	}
 	
 	/** 
