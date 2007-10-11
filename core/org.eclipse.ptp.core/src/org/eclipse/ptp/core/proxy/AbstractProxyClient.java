@@ -45,6 +45,7 @@ import org.eclipse.ptp.core.elements.attributes.MessageAttributes;
 import org.eclipse.ptp.core.proxy.command.IProxyCommand;
 import org.eclipse.ptp.core.proxy.event.IProxyConnectedEvent;
 import org.eclipse.ptp.core.proxy.event.IProxyDisconnectedEvent;
+import org.eclipse.ptp.core.proxy.event.IProxyErrorEvent;
 import org.eclipse.ptp.core.proxy.event.IProxyEvent;
 import org.eclipse.ptp.core.proxy.event.IProxyEventFactory;
 import org.eclipse.ptp.core.proxy.event.IProxyEventListener;
@@ -63,6 +64,7 @@ import org.eclipse.ptp.internal.core.proxy.event.ProxyTimeoutEvent;
 public abstract class AbstractProxyClient implements IProxyClient {
 
 	private enum SessionState {WAITING, CONNECTED, RUNNING, SHUTTING_DOWN, SHUTDOWN}
+	
 	/**
 	 * Convert a proxy representation of a string into a Java String
 	 * @param buf
@@ -76,6 +78,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 		end = start + len;
 		return buf.subSequence(start, end).toString();
 	}
+	
 	/**
 	 * Convert a BitList to it's proxy representation
 	 * 
@@ -86,6 +89,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 		String lenStr = Integer.toHexString(set.size());
 		return lenStr + ":" + set.toString();
 	}
+	
 	/**
 	 * Convert an integer to it's proxy representation
 	 * 
@@ -106,6 +110,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 		}
 		return String.valueOf(res);
 	}
+	
 	/**
 	 * Encode a string into it's proxy representation
 	 * 
@@ -124,6 +129,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 		
 		return encodeIntVal(len, IProxyCommand.CMD_ARGS_LEN_SIZE) + ":" + str;		
 	}
+	
 	private int					transactionID = 1;
 	private String				sessHost = null;
 	private int					sessPort = 0;
@@ -678,6 +684,8 @@ public abstract class AbstractProxyClient implements IProxyClient {
 				fireProxyMessageEvent((IProxyMessageEvent) e);
 			} else if (e instanceof IProxyOKEvent) {
 				fireProxyOKEvent((IProxyOKEvent) e);
+			} else if (e instanceof IProxyErrorEvent) {
+				fireProxyErrorEvent((IProxyErrorEvent) e);
 			} else if (e instanceof IProxyShutdownEvent) {
 				if (state == SessionState.SHUTTING_DOWN) { 
 					state = SessionState.SHUTDOWN;
@@ -701,7 +709,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 	protected void fireProxyConnectedEvent(IProxyConnectedEvent event) {
 		IProxyEventListener[] la = listeners.toArray(new IProxyEventListener[0]);
 		for (IProxyEventListener listener : la) {
-			listener.handleProxyConnectedEvent(event);
+			listener.handleEvent(event);
 		}
 	}
 	
@@ -713,10 +721,22 @@ public abstract class AbstractProxyClient implements IProxyClient {
 	protected void fireProxyDisconnectedEvent(IProxyDisconnectedEvent event) {
 		IProxyEventListener[] la = listeners.toArray(new IProxyEventListener[0]);
 		for (IProxyEventListener listener : la) {
-			listener.handleProxyDisconnectedEvent(event);
+			listener.handleEvent(event);
 		}
 	}
-
+	
+	/**
+	 * Send event to event handlers
+	 * 
+	 * @param event
+	 */
+	protected void fireProxyErrorEvent(IProxyErrorEvent event) {
+		IProxyEventListener[] la = listeners.toArray(new IProxyEventListener[0]);
+		for (IProxyEventListener listener : la) {
+			listener.handleEvent(event);
+		}
+	}
+	
 	/**
 	 * Send event to event handlers
 	 * 
@@ -725,7 +745,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 	protected void fireProxyExtendedEvent(IProxyExtendedEvent event) {
 		IProxyEventListener[] la = listeners.toArray(new IProxyEventListener[0]);
 		for (IProxyEventListener listener : la) {
-			listener.handleProxyExtendedEvent(event);
+			listener.handleEvent(event);
 		}
 	}
 	
@@ -737,7 +757,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 	protected void fireProxyMessageEvent(IProxyMessageEvent event) {
 		IProxyEventListener[] la = listeners.toArray(new IProxyEventListener[0]);
 		for (IProxyEventListener listener : la) {
-			listener.handleProxyMessageEvent(event);
+			listener.handleEvent(event);
 		}
 	}
 	
@@ -749,7 +769,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 	protected void fireProxyOKEvent(IProxyOKEvent event) {
 		IProxyEventListener[] la = listeners.toArray(new IProxyEventListener[0]);
 		for (IProxyEventListener listener : la) {
-			listener.handleProxyOKEvent(event);
+			listener.handleEvent(event);
 		}
 	}
 	
@@ -761,7 +781,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 	protected void fireProxyTimeoutEvent(IProxyTimeoutEvent event) {
 		IProxyEventListener[] la = listeners.toArray(new IProxyEventListener[0]);
 		for (IProxyEventListener listener : la) {
-			listener.handleProxyTimeoutEvent(event);
+			listener.handleEvent(event);
 		}
 	}
 }
