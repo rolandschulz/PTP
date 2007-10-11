@@ -83,17 +83,21 @@ public class JobManager extends AbstractUIManager {
 	public void addProcess(IPProcess proc) {
 		addJob(proc.getJob());
 		IElementHandler elementHandler = jobElementHandlerList.get(proc.getJob().getID());
-		IElementSet set = elementHandler.getSetRoot();
-		if (set.getElement(proc.getID()) == null) {
-			set.add(createElement(set, proc.getID(), ""+proc.getProcessIndex()));
+		if (elementHandler != null) {
+			IElementSet set = elementHandler.getSetRoot();
+			if (set.getElement(proc.getID()) == null) {
+				set.add(createElement(set, proc.getID(), ""+proc.getProcessIndex()));
+			}
 		}
 	}
 
 	
 	public void removeProcess(IPProcess proc) {
 		IElementHandler elementHandler = jobElementHandlerList.get(proc.getJob().getID());
-		IElementSet set = elementHandler.getSetRoot();
-		set.remove(proc.getID());
+		if (elementHandler != null) {
+			IElementSet set = elementHandler.getSetRoot();
+			set.remove(proc.getID());
+		}
 	}
 	
 	/* (non-Javadoc)
@@ -112,10 +116,10 @@ public class JobManager extends AbstractUIManager {
 	 * @return
 	 */
 	public IPProcess findProcess(IPJob job, String task_id) {
-		if (job == null)
+		if (job == null) {
 			return null;
+		}
 		return job.getProcessByIndex(task_id);
-		//return job.findProcess(id);
 	}
 	
 	public IPProcess findProcess(String proc_id) {
