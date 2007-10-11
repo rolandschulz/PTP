@@ -32,9 +32,10 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.ptp.core.proxy.AbstractProxyClient;
 import org.eclipse.ptp.core.proxy.event.IProxyConnectedEvent;
 import org.eclipse.ptp.core.proxy.event.IProxyDisconnectedEvent;
-import org.eclipse.ptp.core.proxy.event.IProxyMessageEvent;
+import org.eclipse.ptp.core.proxy.event.IProxyErrorEvent;
 import org.eclipse.ptp.core.proxy.event.IProxyEventListener;
 import org.eclipse.ptp.core.proxy.event.IProxyExtendedEvent;
+import org.eclipse.ptp.core.proxy.event.IProxyMessageEvent;
 import org.eclipse.ptp.core.proxy.event.IProxyOKEvent;
 import org.eclipse.ptp.core.proxy.event.IProxyTimeoutEvent;
 import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugArgsEvent;
@@ -182,9 +183,9 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient imple
 	}
 		
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.proxy.event.IProxyEventListener#handleProxyConnectedEvent(org.eclipse.ptp.core.proxy.event.IProxyConnectedEvent)
+	 * @see org.eclipse.ptp.core.proxy.event.IProxyEventListener#handleEvent(org.eclipse.ptp.core.proxy.event.IProxyConnectedEvent)
 	 */
-	public void handleProxyConnectedEvent(IProxyConnectedEvent e) {
+	public void handleEvent(IProxyConnectedEvent e) {
 		System.out.println("debug: received connected event");
 		waitLock.lock();
 		try {
@@ -199,9 +200,9 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient imple
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.proxy.event.IProxyEventListener#handleProxyDisconnectedEvent(org.eclipse.ptp.core.proxy.event.IProxyDisconnectedEvent)
+	 * @see org.eclipse.ptp.core.proxy.event.IProxyEventListener#handleEvent(org.eclipse.ptp.core.proxy.event.IProxyDisconnectedEvent)
 	 */
-	public void handleProxyDisconnectedEvent(IProxyDisconnectedEvent e) {
+	public void handleEvent(IProxyDisconnectedEvent e) {
 		System.out.println("debug: received disconnected event");
 		waitLock.lock();
 		try {
@@ -218,9 +219,16 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient imple
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.proxy.event.IProxyEventListener#handleProxyErrorEvent(org.eclipse.ptp.core.proxy.event.IProxyErrorEvent)
+	 * @see org.eclipse.ptp.core.proxy.event.IProxyEventListener#handleEvent(org.eclipse.ptp.core.proxy.event.IProxyErrorEvent)
 	 */
-	public void handleProxyMessageEvent(IProxyMessageEvent e) {
+	public void handleEvent(IProxyErrorEvent e) {
+		System.out.println("debug: received error event");
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.proxy.event.IProxyEventListener#handleEvent(org.eclipse.ptp.core.proxy.event.IProxyMessageEvent)
+	 */
+	public void handleEvent(IProxyMessageEvent e) {
 		System.out.println("debug: received error event");
 		waitLock.lock();
 		try {
@@ -237,16 +245,16 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient imple
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.proxy.event.IProxyEventListener#handleProxyOKEvent(org.eclipse.ptp.core.proxy.event.IProxyOKEvent)
+	 * @see org.eclipse.ptp.core.proxy.event.IProxyEventListener#handleEvent(org.eclipse.ptp.core.proxy.event.IProxyOKEvent)
 	 */
-	public void handleProxyOKEvent(IProxyOKEvent e) {
+	public void handleEvent(IProxyOKEvent e) {
 		System.out.println("debug: received ok event");
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.proxy.event.IProxyEventListener#handleProxyTimeoutEvent(org.eclipse.ptp.core.proxy.event.IProxyTimeoutEvent)
+	 * @see org.eclipse.ptp.core.proxy.event.IProxyEventListener#handleEvent(org.eclipse.ptp.core.proxy.event.IProxyTimeoutEvent)
 	 */
-	public void handleProxyTimeoutEvent(IProxyTimeoutEvent e) {
+	public void handleEvent(IProxyTimeoutEvent e) {
 		System.out.println("debug: received timeout event");
 		waitLock.lock();
 		try {
@@ -260,7 +268,7 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient imple
 		}
 	}
 	
-	public void handleProxyExtendedEvent(IProxyExtendedEvent e) {
+	public void handleEvent(IProxyExtendedEvent e) {
 		if (e instanceof IProxyDebugArgsEvent) {
 			fireProxyDebugArgsEvent((IProxyDebugArgsEvent) e);
 		} else if (e instanceof IProxyDebugBreakpointHitEvent) {
