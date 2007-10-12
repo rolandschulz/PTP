@@ -28,19 +28,98 @@ public interface IProxyClient {
 	public static final String WIRE_PROTOCOL_VERSION = "2.0";
 	public static final int MAX_ERRORS = 5;
 	
-	public int newTransactionID();
+	/**
+	 * Add listener to receive proxy events.
+	 * 
+	 * @param listener listener to receive events
+	 */
+	public void addProxyEventListener(IProxyEventListener listener);
+	
+	/**
+	 * Get the port that has been allocated for incoming connections.
+	 * 
+	 * @return port number
+	 */
+	public int getSessionPort();
+	
+	/**
+	 * Check if the client is ready to send commands
+	 * 
+	 * @return true if client is ready to send commands
+	 */
 	public boolean isReady();
-	public void sendCommand(String command) throws IOException;
 
-	public void addProxyEventListener(IProxyEventListener listener);	
+	/**
+	 * Generate a new transaction ID.
+	 * 
+	 * @return new transaction ID
+	 */
+	public int newTransactionID();	
+	
+	/**
+	 * Remove listener from receiving proxy events
+	 * 
+	 * @param listener listener to remove
+	 */
 	public void removeProxyEventListener(IProxyEventListener listener);
 	
+	/**
+	 * Send a command string to the proxy server. The command must have already
+	 * been correctly formatted before calling this method.
+	 * 
+	 * @param command command string to send
+	 * @throws IOException
+	 */
+	public void sendCommand(String command) throws IOException;
+	
+	/**
+	 * Connect to a remote proxy server. This is not currently implemented.
+	 * 
+	 * @return
+	 */
 	public int sessionConnect();
-	public void sessionCreate() throws IOException;
-	public void sessionCreate(int timeout) throws IOException;	
+	
+	/**
+	 * Convenience method. Same as sessionCreate(0, 0)
+	 * 
+	 * @throws IOException
+	 */
+	public void sessionCreate() throws IOException;	
+	
+	/**
+	 * Convenience method. Same as sessionCreate(0, timeout)
+	 * 
+	 * @param timeout
+	 * @throws IOException
+	 */
+	public void sessionCreate(int timeout) throws IOException;
+	
+	/**
+	 * Create a proxy session. This starts a thread that waits for an incoming proxy connection.
+	 * If the connection is successful, then an event thread is started.
+	 * 
+	 * On a successful return one of three events are guaranteed to be generated:
+	 * 
+	 * ProxyConnectedEvent	if the incoming connection succeeded
+	 * ProxyTimeoutEvent	if no connection is established before the timeout expires
+	 * ProxyErrorEvent		if the accept fails or is canceled
+	 * 
+	 * @param	port		port number to use for incoming connection (0 = autogenerate)
+	 * @param	timeout		delay (in ms) to wait for incoming connection (0 = wait forever)
+	 * @throws	IOException	if accept thread fails to start 
+	 */
 	public void sessionCreate(int port, int timeout) throws IOException;
-	public int getSessionPort();
-	public String getSessionHost();
+	
+	/**
+	 * Attempt to shut down the proxy session regardless of state.
+	 * 
+	 * Events that can be generated as a result of sessionFinish() are:
+	 * 
+	 * ProxyErrorEvent			if sessionCreate() was waiting for an incoming connection
+	 * ProxyDisconnectedEvent	if the proxy shut down successfully
+	 * 
+	 * @throws	IOException	if the session is already shut down
+	 */
 	public void sessionFinish() throws IOException;
 
 }
