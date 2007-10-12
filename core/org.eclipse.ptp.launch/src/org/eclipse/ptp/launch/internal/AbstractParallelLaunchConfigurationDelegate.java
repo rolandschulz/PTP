@@ -372,7 +372,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate
 			programPath = project.getFile(programPath).getLocation();
 		}
 		if (!programPath.toFile().exists()) {
-			abort(LaunchMessages.getResourceString("AbstractParallelLaunchConfigurationDelegate.Application_file_does_not_exist"), new FileNotFoundException(LaunchMessages.getResourceString("AbstractParallelLaunchDelegate.PROGRAM_PATH_not_found")), IPTPLaunchConfigurationConstants.ERR_PROGRAM_NOT_EXIST);
+			abort(LaunchMessages.getResourceString("AbstractParallelLaunchConfigurationDelegate.Application_file_does_not_exist"), new FileNotFoundException(LaunchMessages.getResourceString("AbstractParallelLaunchConfigurationDelegate.PROGRAM_PATH_not_found")), IPTPLaunchConfigurationConstants.ERR_PROGRAM_NOT_EXIST);
 		}
 		/* --old
 		IFile programPath = project.getFile(fileName);
@@ -476,7 +476,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate
 			}
 	
 			IPJob job = rm.submitJob(attrMgr, monitor);
-			
+
 			if (job != null) {
 				JobSubmission jobSub = new JobSubmission(configuration, mode, launch, attrMgr, debugger);
 				jobSubmissions.put(job, jobSub);
@@ -525,9 +525,9 @@ public abstract class AbstractParallelLaunchConfigurationDelegate
 		} catch (ClassCastException e) {
 		} catch (IOException e) {
 		}
-		Throwable exception = new FileNotFoundException(LaunchMessages.getResourceString("AbstractParallelLaunchDelegate.Program_is_not_a_recongnized_executable"));
+		Throwable exception = new FileNotFoundException(LaunchMessages.getResourceString("AbstractParallelLaunchConfigurationDelegate.Program_is_not_a_recongnized_executable"));
 		int code = IPTPLaunchConfigurationConstants.ERR_PROGRAM_NOT_BINARY;
-		MultiStatus status = new MultiStatus(PTPCorePlugin.getUniqueIdentifier(), code, LaunchMessages.getResourceString("AbstractParallelLaunchDelegate.Program_is_not_a_recongnized_executable"), exception);
+		MultiStatus status = new MultiStatus(PTPCorePlugin.getUniqueIdentifier(), code, LaunchMessages.getResourceString("AbstractParallelLaunchConfigurationDelegate.Program_is_not_a_recongnized_executable"), exception);
 		status.add(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), code, exception == null ? "" : exception.getLocalizedMessage(), exception));
 		throw new CoreException(status);
 	}
@@ -538,7 +538,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate
 	 */
 	protected void verifyDebuggerPath(String path) throws CoreException {
 		if (!verifyPath(path)) {
-			abort(LaunchMessages.getResourceString("AbstractParallelLaunchDelegate.Debugger_path_not_found"), new FileNotFoundException(LaunchMessages.getResourceString("AbstractParallelLaunchDelegate.Debugger_path_not_found")), IPTPLaunchConfigurationConstants.ERR_PROGRAM_NOT_EXIST);
+			abort(LaunchMessages.getResourceString("AbstractParallelLaunchConfigurationDelegate.Debugger_path_not_found"), new FileNotFoundException(LaunchMessages.getResourceString("AbstractParallelLaunchConfigurationDelegate.Debugger_path_not_found")), IPTPLaunchConfigurationConstants.ERR_PROGRAM_NOT_EXIST);
 		}
 	}
 
