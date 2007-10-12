@@ -29,7 +29,10 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.attributes.StringAttribute;
@@ -51,7 +54,6 @@ import org.eclipse.ptp.rtsystem.IRuntimeSystem;
 import org.eclipse.ptp.rtsystem.events.IRuntimeAttributeDefinitionEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeConnectedStateEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeErrorStateEvent;
-import org.eclipse.ptp.rtsystem.events.IRuntimeEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeJobChangeEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeMachineChangeEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeMessageEvent;
@@ -83,13 +85,13 @@ public abstract class AbstractRuntimeResourceManager extends
 	private class JobSubmission {
 		private IPJob			job = null;
 		private JobSubState		state = JobSubState.SUBMITTED;
-		private IRuntimeEvent	event;
+		private String			reason;
 		
 		/**
-		 * @return the event
+		 * @return the reason for the error
 		 */
-		public IRuntimeEvent getEvent() {
-			return event;
+		public String getErrorReason() {
+			return reason;
 		}
 		
 		/**
@@ -107,10 +109,10 @@ public abstract class AbstractRuntimeResourceManager extends
 		}
 		
 		/**
-		 * @param event the event to set
+		 * @param reason the reason for the error
 		 */
-		public void setEvent(IRuntimeEvent event) {
-			this.event = event;
+		public void setErrorReason(String reason) {
+			this.reason = reason;
 		}
 		
 		/**
@@ -176,7 +178,7 @@ public abstract class AbstractRuntimeResourceManager extends
 		try {
 			for (JobSubmission sub : jobSubmissions.values()) {
 				sub.setState(JobSubState.ERROR);
-				sub.setEvent(e);
+				sub.setErrorReason("Fatal error ocurred in runtime system");
 			}
 			subCondition.signalAll();
 		} finally {
@@ -713,7 +715,7 @@ public abstract class AbstractRuntimeResourceManager extends
 				JobSubmission sub = jobSubmissions.get(e.getJobSubID());
 				if (sub != null) {
 					sub.setState(JobSubState.ERROR);
-					sub.setEvent(e);
+					sub.setErrorReason(e.getErrorMessage());
 					subCondition.signalAll();
 				}
 			}
@@ -952,7 +954,8 @@ public abstract class AbstractRuntimeResourceManager extends
 		return true;
 	}
 	
-	protected IPJob doSubmitJob(AttributeManager attrMgr, IProgressMonitor monitor) throws CoreException {
+	protected IPJob doSubmitJob(AttributeManager attrMgr, IProgressMonitor monitor) 
+			throws CoreException {
 		if (monitor == null) {
 			monitor = new NullProgressMonitor();
 		}
@@ -977,18 +980,29 @@ public abstract class AbstractRuntimeResourceManager extends
 			IPJob job = null;
 			
 			if (sub != null) {
-				if (sub.getState() == JobSubState.SUBMITTED && monitor.isCanceled()) {
-					/*
-					 * The job submission process itself can't be canceled, so
-					 * this will just cancel the job once it is queued.
-					 * 
-					 * If job is null, then we must wait for the submission to
-					 * complete and the job to be created (this will need to happen
-					 * in a thread).
-					 */
-					//FIXME: implement this
-				} else {
+				switch (sub.getState()) {
+				case SUBMITTED:
+					if (monitor.isCanceled()) {
+						/*
+						 * The job submission process itself can't be canceled, so
+						 * this will just cancel the job once it is queued.
+						 * 
+						 * If job is null, then we must wait for the submission to
+						 * complete and the job to be created (this will need to happen
+						 * in a thread).
+						 */
+						//FIXME: implement this
+					}
+					break;
+					
+				case COMPLETED:
 					job = sub.getJob();
+					break;
+					
+				case ERROR:
+					throw new CoreException(new Status(IStatus.ERROR, 
+							PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, 
+							sub.getErrorReason(), null));
 				}
 			}
 			return job;
