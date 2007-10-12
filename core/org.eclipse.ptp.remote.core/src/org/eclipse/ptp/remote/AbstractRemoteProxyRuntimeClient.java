@@ -27,6 +27,7 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 	private boolean				proxyDebugOutput = true;
 	private final String		proxyName;
 	private final String		proxyPath;
+	private final String		localAddr;
 	private final int	 		proxyOptions;
 	private final String		remoteServicesId;
 	private final String		connectionName;
@@ -39,6 +40,7 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 		this.connectionName = config.getConnectionName();
 		this.proxyName = config.getName();
 		this.proxyPath = config.getProxyServerPath();
+		this.localAddr = config.getLocalAddress();
 		this.proxyOptions = config.getOptions();
 		this.invocationOptions = config.getInvocationOptions();
 	}
@@ -90,7 +92,7 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 				if (portForwarding) {
 					args.add("--host=localhost");
 				} else {
-					args.add("--host=" + getSessionHost());
+					args.add("--host=" + localAddr);
 				}
 				args.add("--port="+getSessionPort());
 				args.addAll(invocationOptions);
@@ -116,7 +118,7 @@ public class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient
 					if (portForwarding) {
 						args.add("--host=localhost");
 					} else {
-						args.add("--host=" + getSessionHost());
+						args.add("--host=" + localAddr);
 					}
 					args.add("--port="+getSessionPort());
 					args.addAll(invocationOptions);

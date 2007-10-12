@@ -33,6 +33,11 @@ package org.eclipse.ptp.remote;
 
 public interface IRemoteProxyOptions {
 	/**
+	 * No options selected
+	 */
+	public static final int NONE = 0x00;
+
+	/**
 	 * Multiplex all proxy communication over a single per-RM connection using stdio.
 	 */
 	public static final int STDIO = 0x01;
