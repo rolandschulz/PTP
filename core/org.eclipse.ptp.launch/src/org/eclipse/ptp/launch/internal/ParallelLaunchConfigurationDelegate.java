@@ -33,7 +33,6 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.elements.IPJob;
@@ -179,21 +178,8 @@ public class ParallelLaunchConfigurationDelegate
 			
 			monitor.worked(10);
 		} catch (CoreException e) {
-			if (e.getStatus().getPlugin().equals(PTPCorePlugin.PLUGIN_ID)) {
-				String msg = e.getMessage();
-				if (msg == null)
-					msg = "";
-				else
-					msg = msg + "\n\n";
-				abort(msg + LaunchMessages.getResourceString("ParallelLaunchConfigurationDelegate.Control_system_does_not_exist"), null, 0);
-			}
 			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
 				PTPDebugCorePlugin.getDebugModel().shutdownSession(job);
-				/*
-				if (debugger != null) {
-					debugger.stopDebugger();
-				}
-				*/
 			}
 			if (e.getStatus().getCode() != IStatus.CANCEL) {
 				throw e;
