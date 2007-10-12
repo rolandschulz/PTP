@@ -22,7 +22,6 @@ package org.eclipse.ptp.core.proxy;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
@@ -131,7 +130,6 @@ public abstract class AbstractProxyClient implements IProxyClient {
 	}
 	
 	private int					transactionID = 1;
-	private String				sessHost = null;
 	private int					sessPort = 0;
 	private ServerSocketChannel	sessSvrSock = null;
 	private SocketChannel		sessSock = null;
@@ -202,13 +200,6 @@ public abstract class AbstractProxyClient implements IProxyClient {
 		return n;
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.proxy.IProxyClient#getSessionHost()
-	 */
-	public String getSessionHost() {
-		return sessHost;
-	}
-
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.proxy.IProxyClient#getSessionPort()
 	 */
@@ -289,19 +280,8 @@ public abstract class AbstractProxyClient implements IProxyClient {
 		sessionCreate(0, timeout);
 	}
 
-	/**
-	 * Create a proxy session. This starts a thread that waits for an incoming proxy connection.
-	 * If the connection is successful, then an event thread is started.
-	 * 
-	 * On a successful return one of three events are guaranteed to be generated:
-	 * 
-	 * ProxyConnectedEvent	if the incoming connection succeeded
-	 * ProxyTimeoutEvent	if no connection is established before the timeout expires
-	 * ProxyErrorEvent		if the accept fails or is canceled
-	 * 
-	 * @param	port		port number to use for incoming connection (0 = autogenerate)
-	 * @param	timeout		delay (in ms) to wait for incoming connection (0 = wait forever)
-	 * @throws	IOException	if accept thread fails to start 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.proxy.IProxyClient#sessionCreate(int, int)
 	 */
 	public void sessionCreate(int port, int timeout) throws IOException {
 		System.out.println("sessionCreate("+port+","+timeout+")");
@@ -312,16 +292,6 @@ public abstract class AbstractProxyClient implements IProxyClient {
 		if (timeout > 0)
 			sessSvrSock.socket().setSoTimeout(timeout);
 		sessPort = sessSvrSock.socket().getLocalPort();
-		
-		/*
-		 * getCanonicalHostName() tries to find the FQDN for the host, but if passed
-		 * an IP address with no associated domain name, seems to return a reverse 
-		 * name resolution. If this happens, we just use the IP address.
-		 */
-		sessHost = InetAddress.getLocalHost().getCanonicalHostName();
-		if (sessHost.endsWith(".in-addr.arpa")) {
-			sessHost = InetAddress.getLocalHost().getHostAddress();
-		}
 		
 		stateLock.lock();
 		try {
@@ -396,15 +366,8 @@ public abstract class AbstractProxyClient implements IProxyClient {
 		fireProxyConnectedEvent(new ProxyConnectedEvent());
 	}
 
-	/**
-	 * sessionFinish() will attempt to shut down the proxy session regardless of state.
-	 * 
-	 * Events that can be generated as a result of sessionFinish() are:
-	 * 
-	 * ProxyErrorEvent			if sessionCreate() was waiting for an incoming connection
-	 * ProxyDisconnectedEvent	if the proxy shut down successfully
-	 * 
-	 * @throws	IOException	if the session is already shut down
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.proxy.IProxyClient#sessionFinish()
 	 */
 	public void sessionFinish() throws IOException {
 		stateLock.lock();
