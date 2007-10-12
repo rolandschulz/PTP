@@ -18,6 +18,14 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote.ui.wizards;
 
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.UnknownHostException;
+import java.util.Enumeration;
+import java.util.Set;
+import java.util.TreeSet;
+
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -55,13 +63,15 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 	{
 		public void modifyText(ModifyEvent evt) {
 			Object source = evt.getSource();
-			if(!loading && source == serverText)
+			if(!loading && source == serverText) {
 				updatePage();
+			}
 		}
 	
 		public void propertyChange(PropertyChangeEvent event) {
-			if (event.getProperty().equals(FieldEditor.IS_VALID))
+			if (event.getProperty().equals(FieldEditor.IS_VALID)) {
 				updatePage();
+			}
 		}
 	
 		public void widgetSelected(SelectionEvent e) {
@@ -69,7 +79,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 			if (source == browseButton) {
 				handlePathBrowseButtonSelected();
 			} else {
-				updateOptionsFromUI();
+				updateSettings();
 				updatePage();
 			}
 		}
@@ -78,27 +88,27 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 	public static final String EMPTY_STRING = "";
 	private AbstractRemoteResourceManagerConfiguration config;
 	private String proxyFile = EMPTY_STRING;
+	private String localAddr = EMPTY_STRING;
 	private IRemoteServices remoteServices = null;
 	private IRemoteConnectionManager connectionManager = null;
 	private IRemoteConnection connection = null;
 	private boolean loading = true;
 	private boolean isValid;
 	private boolean muxPortFwd = false;
-	private boolean muxStdio = false;
 	private boolean portFwdSupported = true;
 	private boolean manualLaunch = false;
 
-	protected Text serverText = null;
-	protected Button browseButton = null;
-	protected Button noneButton = null;
-	protected Button stdioButton = null;
-	protected Button portForwardingButton = null;
-	protected Button manualButton = null;
-	protected WidgetListener listener = new WidgetListener();
-	protected Button newRemoteConnectionButton;
-	protected Label  connectionLabel;
-	protected Combo  remoteCombo;
-	protected Combo  connectionCombo;
+	private Text serverText = null;
+	private Button browseButton = null;
+	private Button noneButton = null;
+	private Button portForwardingButton = null;
+	private Button manualButton = null;
+	private WidgetListener listener = new WidgetListener();
+	private Button newRemoteConnectionButton;
+	private Label  connectionLabel;
+	private Combo  remoteCombo;
+	private Combo  connectionCombo;
+	private Combo  localAddrCombo;
 
 	public AbstractRemoteResourceManagerConfigurationWizardPage(RMConfigurationWizard wizard,
 			String title) {
@@ -111,22 +121,35 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 	}
 
 	/**
-	 * Update wizard UI selections from options
+	 * Update wizard UI selections from settings. This should be called whenever any
+	 * settings are changed.
 	 */
-	private void updateUIFromOptions() {
+	private void updateSettings() {
 		/*
-		 * Fix options first
+		 * Get current settings unless we're initializing things
+		 */
+		if (!loading) {
+			muxPortFwd = portForwardingButton.getSelection();
+			localAddr = localAddrCombo.getItem(localAddrCombo.getSelectionIndex());
+			manualLaunch = manualButton.getSelection();
+		}
+		
+		/*
+		 * Fix settings
 		 */
 		if (muxPortFwd && !portFwdSupported) {
 			muxPortFwd = false;
 		}
 		
-		if (muxStdio && manualLaunch) {
+		if (muxPortFwd && manualLaunch) {
 			manualLaunch = false;
 		}
 		
+		/*
+		 * Update UI to display correct settings
+		 */
 		if (noneButton != null) {
-			noneButton.setSelection(!muxPortFwd && !muxStdio);
+			noneButton.setSelection(!muxPortFwd);
 		}
 		
 		if (portForwardingButton != null) {
@@ -134,35 +157,16 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 			portForwardingButton.setEnabled(portFwdSupported);
 		}
 		
-		if (stdioButton != null) {
-			stdioButton.setSelection(muxStdio);
+		if (localAddrCombo != null) {
+			localAddrCombo.setEnabled(!muxPortFwd);
 		}
 		
 		if (manualButton != null) {
-			manualButton.setSelection(manualLaunch);
-			manualButton.setEnabled(!muxStdio);
+			manualButton.setSelection(manualLaunch && !muxPortFwd);
+			manualButton.setEnabled(!muxPortFwd);
 		}
 	}
 	
-	/**
-	 * Update wizard options from UI selections
-	 */
-	private void updateOptionsFromUI() {
-		muxPortFwd = portForwardingButton.getSelection();
-		muxStdio = stdioButton.getSelection();
-		
-		/*
-		 * Stdio multiplexing and manual launch are mutually exclusive
-		 */
-		if (muxStdio) {
-			manualButton.setSelection(false);
-			manualButton.setEnabled(false);
-		} else {
-			manualButton.setEnabled(true);
-		}
-		
-		manualLaunch = manualButton.getSelection();
-	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage#createControl(org.eclipse.swt.widgets.Composite)
@@ -175,10 +179,8 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		loading = true;
 		
 		loadSaved();
-		
-		createContents(composite, 3);
-		
-		updateUIFromOptions();
+		createContents(composite);
+		updateSettings();
 		defaultSetting();
 		
 		loading = false;
@@ -197,9 +199,6 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 	{
 		store();
 		int options = 0;
-		if (muxStdio) {
-			options |= IRemoteProxyOptions.STDIO;
-		}
 		if (muxPortFwd) {
 			options |= IRemoteProxyOptions.PORT_FORWARDING;
 		}
@@ -212,6 +211,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		if (connection != null) {
 			config.setConnectionName(connection.getName());
 		}
+		config.setLocalAddress(localAddr);
 		config.setProxyServerPath(proxyFile);
 		config.setOptions(options);
 		return true;
@@ -223,92 +223,124 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 	 * @param parent
 	 * @param colSpan
 	 */
-	private void createContents(Composite parent, int colSpan) {
-		Composite projComp = new Composite(parent, SWT.NONE);
-		GridLayout projLayout = new GridLayout();
-		projLayout.numColumns = 3;
-		projLayout.marginHeight = 0;
-		projLayout.marginWidth = 0;
-		projComp.setLayout(projLayout);
+	private void createContents(Composite parent) {
+		/*
+		 * Composite for remote provider and proxy location combo's
+		 */
+		Composite remoteComp = new Composite(parent, SWT.NONE);
+		GridLayout remoteLayout = new GridLayout();
+		remoteLayout.numColumns = 3;
+		remoteLayout.marginWidth = 0;
+		remoteComp.setLayout(remoteLayout);
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-		gd.horizontalSpan = colSpan;
-		projComp.setLayoutData(gd);
+		gd.horizontalSpan = 3;
+		remoteComp.setLayoutData(gd);
 
-		Label label = new Label(projComp, SWT.NONE);
+		/*
+		 * Remote provider
+		 */
+		Label label = new Label(remoteComp, SWT.NONE);
 		label.setText(Messages.getString("RemoteConfigurationWizard.provider"));
 		gd = new GridData();
 		gd.horizontalSpan = 1;
 		label.setLayoutData(gd);
 		
-		remoteCombo = new Combo(projComp, SWT.DROP_DOWN | SWT.READ_ONLY);
+		remoteCombo = new Combo(remoteComp, SWT.DROP_DOWN | SWT.READ_ONLY);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
-		gd.horizontalSpan = 1;
+		gd.horizontalSpan = 2;
 		remoteCombo.setLayoutData(gd);
 		
-		// TODO work out how to skip a cell!!!
-		label = new Label(projComp, SWT.NONE);
-		gd = new GridData();
-		gd.horizontalSpan = 1;
-		label.setLayoutData(gd);
-
-		connectionLabel = new Label(projComp, SWT.NONE);
+		/*
+		 * Proxy location
+		 */
+		connectionLabel = new Label(remoteComp, SWT.NONE);
 		connectionLabel.setText(Messages.getString("RemoteConfigurationWizard.location"));
 		gd = new GridData();
 		gd.horizontalSpan = 1;
 		connectionLabel.setLayoutData(gd);
 		
-		connectionCombo = new Combo(projComp, SWT.DROP_DOWN | SWT.READ_ONLY);
+		connectionCombo = new Combo(remoteComp, SWT.DROP_DOWN | SWT.READ_ONLY);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.horizontalSpan = 1;
 		connectionCombo.setLayoutData(gd);
 
-		newRemoteConnectionButton = SWTUtil.createPushButton(projComp, Messages.getString("RemoteConfigurationWizard.newButton"), null);
+		newRemoteConnectionButton = SWTUtil.createPushButton(remoteComp, Messages.getString("RemoteConfigurationWizard.newButton"), null);
 
-		initializeRemoteServicesCombo();
-		registerListeners();
-		
+		/*
+		 * Composite for proxy path
+		 */
 		Composite proxyComp = new Composite(parent, SWT.NONE);
 		GridLayout proxyLayout = new GridLayout();
 		proxyLayout.numColumns = 2;
-		proxyLayout.marginHeight = 0;
 		proxyLayout.marginWidth = 0;
 		proxyComp.setLayout(proxyLayout);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		proxyComp.setLayoutData(gd);
 		
-		Label proxyLabel = new Label(proxyComp, SWT.NONE);
+		/*
+		 * Proxy path
+		 */
+		Label proxyLabel = new Label(remoteComp, SWT.NONE);
 		proxyLabel.setText(Messages.getString("RemoteConfigurationWizard.path"));
 		gd = new GridData();
-		gd.horizontalSpan = 2;
+		gd.horizontalSpan = 1;
 		proxyLabel.setLayoutData(gd);
 
-		serverText = new Text(proxyComp, SWT.SINGLE | SWT.BORDER);
+		serverText = new Text(remoteComp, SWT.SINGLE | SWT.BORDER);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.horizontalSpan = 1;
+		gd.widthHint = 60;
 		serverText.setLayoutData(gd);
 		serverText.addModifyListener(listener);
-		browseButton = SWTUtil.createPushButton(proxyComp, Messages.getString("RemoteConfigurationWizard.browseButton"), null);
+		browseButton = SWTUtil.createPushButton(remoteComp, Messages.getString("RemoteConfigurationWizard.browseButton"), null);
 		browseButton.addSelectionListener(listener);
 		
-		Group mxGroup = new Group(proxyComp, SWT.SHADOW_ETCHED_IN);
+		/*
+		 * Multiplexing options
+		 */
+		Group mxGroup = new Group(parent, SWT.SHADOW_ETCHED_IN);
 		mxGroup.setLayout(createGridLayout(1, true, 10, 10));
 		mxGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
 		mxGroup.setText(Messages.getString("RemoteConfigurationWizard.mxOptions"));
 		
 		noneButton = createRadioButton(mxGroup, Messages.getString("RemoteConfigurationWizard.noneButton"), "mxGroup", listener);
 		noneButton.addSelectionListener(listener);
+		
+		/*
+		 * Local address
+		 */
+		Composite addrComp = new Composite(mxGroup, SWT.NONE);
+		GridLayout addrLayout = new GridLayout();
+		addrLayout.numColumns = 2;
+		addrLayout.marginWidth = 0;
+		addrLayout.marginLeft = 15;
+		addrComp.setLayout(addrLayout);
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		addrComp.setLayoutData(gd);
+
+		label = new Label(addrComp, SWT.NONE);
+		label.setText(Messages.getString("RemoteConfigurationWizard.localAddress"));
+		gd = new GridData();
+		gd.horizontalSpan = 1;
+		label.setLayoutData(gd);
+		
+		localAddrCombo = new Combo(addrComp, SWT.DROP_DOWN | SWT.READ_ONLY);
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.horizontalSpan = 1;
+		localAddrCombo.setLayoutData(gd);
+
 		portForwardingButton = createRadioButton(mxGroup, Messages.getString("RemoteConfigurationWizard.portForwardingButton"), "mxGroup", listener);
 		portForwardingButton.addSelectionListener(listener);
-		stdioButton = createRadioButton(mxGroup, Messages.getString("RemoteConfigurationWizard.stdioButton"), "mxGroup", listener);
-		stdioButton.addSelectionListener(listener);
-		
-		Group otherGroup = new Group(proxyComp, SWT.SHADOW_ETCHED_IN);
-		otherGroup.setLayout(createGridLayout(1, true, 10, 10));
-		otherGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
-		otherGroup.setText(Messages.getString("RemoteConfigurationWizard.otherOptions"));
 
-		manualButton = createCheckButton(otherGroup, Messages.getString("RemoteConfigurationWizard.manualButton"));
+		/*
+		 * Manual launch
+		 */
+		manualButton = createCheckButton(parent, Messages.getString("RemoteConfigurationWizard.manualButton"));
 		manualButton.addSelectionListener(listener);
+
+		initializeRemoteServicesCombo();
+		initializeLocalHostCombo();
+		registerListeners();
 	}
 	
 	private void registerListeners() {
@@ -329,6 +361,12 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 				updatePage();
 			}
 		});	
+		localAddrCombo.addModifyListener(new ModifyListener() {
+			public void modifyText(ModifyEvent e) {
+				updateSettings();
+				updatePage();
+			}
+		});
 	}
 	
 	/**
@@ -337,9 +375,7 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 	private void loadSaved()
 	{
 		proxyFile = config.getProxyServerPath();
-		if (proxyFile == null) {
-			proxyFile = "";
-		}
+		localAddr = config.getLocalAddress();
 		
 		String rmID = config.getRemoteServicesId();
 		if (rmID != null) {
@@ -352,7 +388,6 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		
 		int options = config.getOptions();
 		
-		muxStdio = (options & IRemoteProxyOptions.STDIO) == IRemoteProxyOptions.STDIO;
 		muxPortFwd = (options & IRemoteProxyOptions.PORT_FORWARDING) == IRemoteProxyOptions.PORT_FORWARDING;
 		manualLaunch = (options & IRemoteProxyOptions.MANUAL_LAUNCH) == IRemoteProxyOptions.MANUAL_LAUNCH;
 	}
@@ -481,7 +516,6 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 		 */
 		if (connection != null) {
 			portFwdSupported = connection.supportsTCPPortForwarding();
-			updateUIFromOptions();
 		}
 	}
 
@@ -588,6 +622,61 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 			handleRemoteServiceSelected();
 			handleConnectionSelected();
 		}
+	}
+	
+	/**
+	 * In some nameserver configurations, getCanonicalHostName() will return the inverse mapping 
+	 * of the IP address (e.g. 1.1.0.192.in-addr.arpa). In this case we just use the IP address.
+	 * 
+	 * @param hostname host name to be fixed
+	 * @return fixed host name
+	 */
+	private String fixHostName(String hostname) {
+		try {
+			if (hostname.endsWith(".in-addr.arpa")) {
+				return InetAddress.getLocalHost().getHostAddress();
+			}
+		} catch (UnknownHostException e) {
+		}
+		return hostname;
+	}
+	
+	/**
+	 * Initialize the contents of the local address selection combo. Host names are obtained by
+	 * performing a reverse lookup on the IP addresses of each network interface. If DNS is configured
+	 * correctly, this should add the fully qualified domain name, otherwise it will probably be
+	 * the IP address.
+	 */
+	public void initializeLocalHostCombo() {
+		Set<String> addrs = new TreeSet<String>();
+		try {
+			Enumeration<NetworkInterface> netInterfaces = NetworkInterface.getNetworkInterfaces();
+			while (netInterfaces.hasMoreElements()) {
+				NetworkInterface ni = (NetworkInterface)netInterfaces.nextElement();
+				Enumeration<InetAddress> alladdr = ni.getInetAddresses();
+				while (alladdr.hasMoreElements()) {
+					InetAddress ip = (InetAddress)alladdr.nextElement();
+					if (ip instanceof Inet4Address) {
+						addrs.add(fixHostName(ip.getCanonicalHostName()));
+					}
+				}
+			}                  
+		} catch (Exception e) {
+		}
+		if (addrs.size() == 0) {
+			addrs.add("localhost");
+		}
+		localAddrCombo.removeAll();
+		int index = 0;
+		int selection = 0;
+		for (String addr : addrs) {
+			localAddrCombo.add(addr);
+			if (addr.equals(localAddr)) {
+				selection = index;
+			}
+			index++;
+		}
+		localAddrCombo.select(selection);
 	}
 	
 	/**
